@@ -1,0 +1,24 @@
+Acme/Playwright version 0.02
+============================
+
+This module provides simple text obfuscation in the form of a 
+nonsense play. This really is more for the comedy value than 
+anything else. I started with the idea of doing a serious
+steganography module, then decided this was too funny to pass up.
+Version 0.02 is the first public release.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002, Kurt Kincaid. All Rights Reserved.
+This is free software and may be modified and/or 
+redistributed under the same terms as Perl itself.
+

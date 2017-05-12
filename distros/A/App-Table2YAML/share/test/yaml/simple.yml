@@ -1,0 +1,8 @@
+- [ {uid: 0}, {string: "\""}, {integer_decimal: 0}, {integer_hexadecimal: 0x00}, {integer_octal: 000}, {float_exponential: 0e0}, {float_fixed: 0.00}, {float_special: .inf}, {boolean: Y} ]
+- [ {uid: 1}, {string: "!"}, {integer_decimal: +1000}, {integer_hexadecimal: +0x3E8}, {integer_octal: +01750}, {float_exponential: +1.0000e+03}, {float_fixed: +999.99}, {float_special: -.INF}, {boolean: YES} ]
+- [ {uid: 2}, {string: "@"}, {integer_decimal: 1000000}, {integer_hexadecimal: 0xF4240}, {integer_octal: 03641100}, {float_exponential: 1e6}, {float_fixed: 54.1234}, {float_special: .nan}, {boolean: ON} ]
+- [ {uid: 3}, {string: "#"}, {integer_decimal: -1234}, {integer_hexadecimal: 0x4d2}, {integer_octal: 02322}, {float_exponential: -1.234000e+03}, {float_fixed: 1_234.56}, {float_special: .NAN}, {boolean: TRUE} ]
+- [ {uid: 4}, {string: "$"}, {integer_decimal: -56789}, {integer_hexadecimal: 0xDDD5}, {integer_octal: 0156725}, {float_exponential: 5.678900e+04}, {float_fixed: 56_789.012}, {float_special: .NaN}, {boolean: N} ]
+- [ {uid: 5}, {string: "%"}, {integer_decimal: +0}, {integer_hexadecimal: +0x00}, {integer_octal: +000}, {float_exponential: +0e0}, {float_fixed: +0.00}, {float_special: .InF}, {boolean: FALSE} ]
+- [ {uid: 6}, {string: "&"}, {integer_decimal: -0}, {integer_hexadecimal: -0x00}, {integer_octal: -000}, {float_exponential: -0e0}, {float_fixed: -0.00}, {float_special: "infinity"}, {boolean: NO} ]
+- [ {uid: 7}, {string: "*"}, {integer_decimal: 1234567890}, {integer_hexadecimal: 0x499602D2}, {integer_octal: 011145401322}, {float_exponential: 1.234568e+09}, {float_fixed: 1234567890}, {float_special: "-infinity"}, {boolean: OFF} ]

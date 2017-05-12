@@ -1,0 +1,139 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+Alien::GvaScript::Intro - A javascript framework born in Geneva.
+
+=head1 SYNOPSIS
+
+  <head>
+    <script src="path/to/prototype.js"></script>
+    <script src="path/to/GvaScript.js"></script>
+    <link href="path/to/GvaScript.css" rel="stylesheet" type="text/css">
+  
+    var cl = GvaScript.ChoiceList(choices, options);
+    var ac = GvaScript.AutoCompleter(datasource, options);
+    var tn = GvaScript.TreeNavigator(element, options);
+  </head>
+
+
+=head1 DESCRIPTION
+
+GvaScript (pronounce "gee-vascript") is a javascript framework 
+born in Geneva, Switzerland (C<GVA> is the IATA code for 
+Geneva Cointrin International Airport). 
+It is built on top of the B<prototype>
+object-oriented javascript framework (L<http://prototype.conio.net>).
+
+It contains four core components :
+
+=over
+
+=item * 
+
+L<Alien::GvaScript::ProtoExtensions> : 
+some extensions to the prototype javascript framework
+(mainly walking the DOM searching for collections of classnames).
+
+=item * 
+
+L<Alien::GvaScript::Event> : 
+registering and firing application-specific events (in addition
+to the standard W3C event model)
+
+=item *
+
+L<Alien::GvaScript::KeyMap> : 
+managing maps of handlers for key events (similar
+in spirit to Emacs keymaps)
+
+=item *
+
+L<Alien::GvaScript::Repeat> : 
+managing repeated sections
+
+
+=back
+
+and four widgets:
+
+=over
+
+=item *
+
+L<Alien::GvaScript::ChoiceList> : 
+dropdown list of choices with navigation 
+
+=item *
+
+L<Alien::GvaScript::AutoCompleter> : 
+autocompletion on form input fields
+
+=item *
+
+L<Alien::GvaScript::TreeNavigator> : 
+navigation in a tree structure, opening and closing nodes
+
+=item *
+
+L<Alien::GvaScript::Form> : 
+various extensions to HTML forms (working with data trees
+and repeated sections, automatic focus, etc.)
+
+
+=back
+
+
+
+
+=head1 TARGETED PLATFORMS
+
+=over
+
+=item *
+
+Microsoft Internet Explorer for Windows, version 6.0 and higher
+
+=item *
+
+Mozilla Firefox 2.0 and higher
+
+=item *
+
+may work on other platforms supported by prototype.js, but was 
+not tested
+
+=back
+
+=head1 DEPENDENCIES
+
+
+=over
+
+=item * 
+
+the L<http://prototype.conio.net> javascript framework,
+version 1.5.0 or higher
+
+=back
+
+=head1 AUTHORS
+
+Laurent Dami,  C<< <laurent.d...@etat.ge.ch> >>
+
+Mona Remlawi,  C<< <mona.r...@etat.ge.ch> >>
+
+Jean-Christophe Durand
+
+Sébastien Cuendet
+
+
+=head1 LICENSE
+
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl's artistic license
+(see L<http://perldoc.perl.org/perlartistic.html>).
+
+
+
+

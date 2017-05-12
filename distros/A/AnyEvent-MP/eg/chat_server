@@ -1,0 +1,43 @@
+#!/opt/bin/perl
+
+# Usage: ./chat_server
+# implement a chat server using "traditional message passing"
+
+use common::sense;
+use AnyEvent::MP;
+use AnyEvent::MP::Global;
+
+configure;
+
+my %clients;
+
+sub msg {
+   print "relaying: $_[0]\n";
+   snd $_, $_[0]
+      for values %clients;
+}
+
+our $server = port;
+
+rcv $server, join => sub {
+   my ($client, $nick) = @_;
+
+   $clients{$client} = $client;
+
+   mon $client, sub {
+      delete $clients{$client};
+      msg "$nick (quits, @_)";
+   };
+   msg "$nick (joins)";
+};
+
+rcv $server, privmsg => sub {
+   my ($nick, $msg) = @_;
+   msg "$nick: $msg";
+};
+
+grp_reg eg_chat_server => $server;
+
+warn "server ready.\n";
+
+AE::cv->recv;

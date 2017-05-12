@@ -1,0 +1,17 @@
+abstract: ActiveSupport equivalent to Perl numeric variables
+author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Acme-DateTime-Duration-Numeric
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  DateTime: 0
+  DateTime::Duration: 0
+  perl: 5.8.1
+version: 0.03

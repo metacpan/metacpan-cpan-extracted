@@ -1,0 +1,38 @@
+Revision history for Array-To-Moose
+
+0.09  Monday 21 September 2015
+
+  - Added 'ANON' to "Simle" types, to handle enum attributes
+
+0.08  Thursday 24 April 2014
+
+  - Made ugly kludge to handle Moose type "Maybe[`]". Needs further work to
+    properly handle user-defined data types a la Moose::Util::TypeConstraints
+
+0.07  Sunday 13 April 2014
+
+  - Added more tests, especially for _check_subobj()
+
+0.06  Friday 04 April 2014
+
+  - Found errors in _check_ref_attribs() and _check_non_ref_attribs()
+
+0.05  Friday 04 April 2014
+
+  - Changed dependence from Params::Validate to Paramas::Validate::Array
+
+0.04  Tuesday 01 April 2014
+
+  - Added capability for arrayrefs of "simple" types, like 'Str', 'Int', etc.
+
+0.03  Saturday 05 Jan 2013
+
+  - Oops! Left in a "use VarianReports" in many of the test files
+
+0.02  Wednesday 02 Jan 2013
+
+  - Corrected some POD errors, mainly links (L<...>)
+
+0.01  Tuesday 01 19:30:44 2013
+
+  - Initial release.

@@ -1,0 +1,10 @@
+Changes
+FastPermute.pm
+FastPermute.xs
+multicall.h
+MANIFEST
+Makefile.PL
+README
+perms.pl
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

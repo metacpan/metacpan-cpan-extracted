@@ -1,0 +1,84 @@
+--- 
+name: Reciprocal BLAST
+version: '0.5'
+description: "Two-step reciprocal BLAST for distribution of protein functions" 
+steps: 
+  s1: 
+    name: fetch_known_genes.pl
+    description: "Fetch UniProt seqs with keyword search"
+    args: 
+      db: uniprot
+      in: 
+        type: str
+        value: 
+      out: 
+        type: file
+        value: kw.fasta
+    next: 
+      - s2
+  s2: 
+    name: run_blast.pl
+    description: "Find all similar UniProt sequences"
+    args: 
+      run: first
+      db: uniprot
+      in: 
+        type: file
+        value: kw.fasta
+      out: 
+        type: dir
+        value: blast1.output
+    next:
+      - s3
+  s3: 
+    name: candidate_ids.pl
+    description: "Parse unique UniProt IDs from BLAST output"
+    args: 
+      in: 
+        type: dir
+        value: blast1.output
+      out: 
+        type: file
+        value: candidate.ids
+    next: 
+      - s4
+  s4: 
+    name: fetch_seq_by_id.pl
+    description: "Retrieve UniProt sequences"
+    args: 
+      c: {}
+      in: 
+        type: file
+        value: candidate.ids
+      out: 
+        type: file
+        value: candidate.fasta
+      db: newreads
+    next: 
+      - s5
+  s5:
+    name: run_blast.pl
+    description: "Find similar sequences in study data"
+    args: 
+      run: first
+      in: 
+        type: file
+        value: candidate.fasta
+      out:
+        type: dir
+        value: blast2.output
+      db: newreads
+    next:
+      - s6
+  s6:
+    name: sample_distribution.pl
+    args:
+      in:
+        type: redir
+        value: blast2.output
+      out:
+        type: redir
+        value: distribution
+
+    
+

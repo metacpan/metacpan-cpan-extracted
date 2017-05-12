@@ -1,0 +1,7 @@
+Revision history for Perl extension Apache2::SafePnotes.
+
+0.01  Mon Jan  9 19:57:46 2006
+	- original version
+
+0.03  Tue Jun  6 19:00:39 CEST 2006
+	- added support for connection pnotes

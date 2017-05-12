@@ -1,0 +1,28 @@
+.travis.yml
+Archive-Ar-2.00.tar.gz
+CHANGES
+lib/Archive/Ar.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/05_class.t
+t/10_object.t
+t/10objects.t
+t/15_compat.t
+t/20_add_data.t
+t/20new.t
+t/25_add_files.t
+t/30_empty.t
+t/30write.t
+t/35_list.t
+t/40_mode.t
+t/40mode.t
+t/45_content.t
+t/50_remove.t
+t/50empty.t
+t/55_write.t
+t/60_extract.t
+t/65_gnu.t
+t/66_gnu_symtab.t
+t/70_bsd.t
+META.yml                                 Module meta-data (added by MakeMaker)

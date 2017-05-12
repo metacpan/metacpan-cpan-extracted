@@ -1,0 +1,25 @@
+BUGS
+CHANGES
+MANIFEST
+README
+README.win32
+SIGNATURE
+LICENSE
+TODO
+NEW
+Makefile.PL
+Audiere_perl.xs
+examples/psp
+examples/3d.pl			# 3D sound example
+lib/Audio/Audiere.pm		# the sound device
+lib/Audio/Audiere/Error.pm	# error messages
+lib/Audio/Audiere/Stream.pm	# one 2D sound stream
+lib/Audio/Audiere/Stream/3D.pm	# one 3D sound stream
+t/audiere.t			# general tests
+t/stream.t			# stream/sound tests
+t/tone_noise.t			# tone and noise generation tests
+t/error.t			# error handling
+t/mute.t			# mute testing
+t/test.wav
+META.yml			# Module meta-data (added by MakeMaker)
+typemap

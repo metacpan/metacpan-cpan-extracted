@@ -1,0 +1,734 @@
+#!/usr/bin/perl -w
+#
+#  This script started as a fork of 'rename' by Robin Barker
+#  (Robin.Barker@npl.co.uk), from Larry Wall's original script
+#  eg/rename from the perl source.
+#
+#  This script is free software; you can redistribute it and/or modify it
+#  under the same terms as Perl itself.
+#
+# Larry(?)'s RCS header:
+#  RCSfile: rename,v   Revision: 4.1   Date: 92/08/07 17:20:30
+#
+# $RCSfile: rename,v $$Revision: 1.5 $$Date: 1998/12/18 16:16:31 $
+#
+# $Log: rename,v $
+# Revision 1.5  1998/12/18 16:16:31  rmb1
+# moved to perl/source
+# changed man documentation to POD
+#
+# Revision 1.4  1997/02/27  17:19:26  rmb1
+# corrected usage string
+#
+# Revision 1.3  1997/02/27  16:39:07  rmb1
+# added -v
+#
+# Revision 1.2  1997/02/27  16:15:40  rmb1
+# *** empty log message ***
+#
+# Revision 1.1  1997/02/27  15:48:51  rmb1
+# Initial revision
+
+# Updated Log.
+#
+# 2010/04/10 - Moved to Git     sti
+
+package main;
+use strict;
+
+# use this module BEFORE declaring use utf8, because it isn't.
+use Config::IniFiles;
+
+use utf8;
+use feature 'unicode_strings';
+use open IO => ":encoding(UTF-8)";
+binmode STDOUT, ":encoding(UTF-8)";
+binmode STDERR, ":encoding(UTF-8)";
+binmode STDIN,  ":encoding(UTF-8)";
+
+BEGIN
+  { $main::VERSION = substr '$$Version: 0.07 $$', 11, -3; }
+
+use FindBin qw($RealBin);
+FindBin::again(); # Other modules can call FindBin too.
+
+use lib "$RealBin/../lib"; # Relative path to our libraries.
+
+use Contextual::Return;
+use Encode qw/encode_utf8 decode_utf8/;
+use Getopt::Long qw(GetOptionsFromString);
+use IO::File;
+use List::Util qw(min max);
+use Text::ParseWords;
+
+use App::FileTools::BulkRename::Docs qw(usage help manpage readme);
+use App::FileTools::BulkRename::Errors;
+use App::FileTools::BulkRename::UserCommands;
+
+# for debug only.
+use Data::Dump qw(dd pp dump);
+use Data::Dumper;
+# $Getopt::Long::debug = 1;
+
+Getopt::Long::Configure(qw/bundling permute/);
+
+# preload config options with defaults
+my %cfg	=
+  ( config    => "$ENV{HOME}/.config/brn.conf"
+  , verbosity => 1
+  );
+
+# %cfg_in is a hash of (ONLY) options that appeared on the command-line
+my %cfg_in;
+
+# Stores global runtime information.
+my %data;
+
+sub version
+  {
+    print "Version: $main::VERSION\n";
+    exit BulkRename_Error_Info;
+  }
+
+# Closure to control verbosity
+sub verbosify
+  { my $diff = shift;
+
+    return sub { $cfg{verbosity} += $diff; };
+  }
+
+my @optlist;
+my @optstk = (\@optlist);
+
+my %optsub =
+  ( 'quiet'   => verbosify(-1)
+  , 'verbose' => verbosify(+1)
+  );
+
+sub record
+  { my $optobj = $_[0];
+    my $key = $#_ > 1 ? $_[1] : undef;
+    my $val = $_[$#_];
+
+    my $ref = $optstk[$#optstk];
+
+    my $opt  = $optobj."";
+    my $spec = [ $opt ];
+
+    if( defined $key )
+      { push @$spec, $key, $val; }
+    else
+      { push @$spec, $val if defined $val; }
+
+    push @$ref, $spec;
+  }
+
+
+sub notasuboption
+  { my $opt = shift;
+
+    my $msg = $cfg{verbosity} >= 0
+      ? "Option \"--$opt\" is not allowed in Presets\n"
+      : "\n";
+    $! = BulkRename_Error_NotAllowedInPresets;
+    die $msg;
+  }
+
+# Processs Getop::Long options to wrap them so that we
+# maintain option order information.
+sub optionizer
+  { my $optref = shift;
+    my $badref = shift;
+    my @ret;
+
+    while( @$optref )
+      { my $opt = shift @$optref;
+	my $nxt = @$optref ? $$optref[0] : undef;
+	my ($nam) = split '[|:=+!%@]', $opt;
+
+	shift @$optref if ref $nxt; # eat the reference
+
+	push @ret, $opt;
+
+	my $put;
+
+	if( ! ref $nxt )
+	  {
+	    if( index($opt,"%")>=0 )
+	      { $put = sub { $cfg{$nam}{$_[1]} = $_[2] }; }
+	    elsif( index($opt,"@") >=0 )
+	      { $put = sub { push @{$cfg{$nam}}, $_[1] }; }
+	    else
+	      { $put = sub { $cfg{$nam} = $_[1]; }; }
+	  }
+	elsif( ref $nxt eq 'SCALAR' )
+	  { $put = sub { $$nxt = $_[1]; }; }
+	elsif( ref $nxt eq 'ARRAY' )
+	  { $put = sub { push @$nxt, $_[1]; }; }
+	elsif( ref $nxt eq 'HASH' )
+	  { $put = sub { $$nxt{$_[1]} = $_[2]; }; }
+	elsif( ref $nxt eq 'CODE' )
+	  { $put = $nxt; }
+	else
+	  { die "(Internal) Bad Scalar Destination '$nxt'";}
+	push @ret, sub { &record; &$put; };
+      }
+    while( defined $badref && @$badref )
+      { my $opt = shift @$badref;
+	my $nxt = @$badref ? $$badref[0] : undef;
+
+	shift @$badref if ref $nxt; # discard references
+
+	push @ret, $opt, \&notasuboption;
+      }
+    return @ret;
+  }
+
+###########[ Config Processing ]##########
+
+# Options, sorted alphabetically by short form.
+# First the main options, which can only appear on
+# The command line, then the sub-options which
+# can be used in presets
+
+my @main_options =
+  ( 'help|?'
+  , 'force|f'
+  , 'man|m'
+  , 'nop|n'
+  , 'readme|R'
+  , 'save|S=s'
+  , 'version|V'
+  );
+
+my @sub_options	=
+  ( 'expr|e=s@'
+  , 'preamble|p=s@'
+  , 'quiet|q'	=> verbosify(-1)
+  , 'use|u=s@'
+  , 'verbose|v' => verbosify(+1)
+  , 'config|C=s'
+  , 'debug|D'
+  , 'list|L:s@'
+  , 'module|M=s@'
+  );
+
+
+my @options = optionizer([@main_options,@sub_options]);
+my @subopts = optionizer(\@sub_options, \@main_options);
+
+# dd( \@options, \@subopts);
+
+sub LoadPresetFile
+  { my $config = shift;
+    my $cfgobj;
+
+    if( exists $data{config}{$config} )
+      {
+	$cfgobj = $data{config}{$config}
+      }
+    else
+      { my %opts = ( -allowcontinue => 1 );
+
+	$opts{-import} = $data{cfgobj} if exists $data{cfgobj};
+
+	my $fil = IO::File->new( $config, '<:utf8' );
+	if( !defined $fil )
+	  { my $msg = "".$!;
+
+	    $! = BulkRename_Error_BadConfigFile;
+	    die "Can't open \"$config\", $msg\n";
+	  }
+
+	$opts{-file} = $fil;
+	$cfgobj = new Config::IniFiles %opts;
+	if( !defined $cfgobj )
+	  {
+	    $! = BulkRename_Error_BadConfigFile;
+
+	    my $err="Bad Configuration File: \"$config\":\n";
+	    $err .= join("\n",@Config::IniFiles::errors)."\n";
+	    die $err;
+	  }
+	$data{config}{$config} = $cfgobj;
+
+      }
+
+    $data{cfgobj} = $cfgobj;
+    return $cfgobj;
+  }
+
+sub ListPreset
+  { my ($config,$presets) = @_;
+    my $cfgobj = LoadPresetFile($config);
+
+    my @defn =
+      ( [qw/Preset Value/]
+      , [qw/------ -----/]
+      );
+
+    for my $pre (@$presets)
+      { my @set = ($pre eq '') ? (sort $cfgobj->Parameters('rules')) : ($pre);
+
+	push @defn, [$_, $cfgobj->val('rules',$_)] foreach @set;
+      }
+    printf("%-16s  %s\n",$$_[0],defined($$_[1])?$$_[1]:"<UNDEFINED>")
+      foreach @defn;
+  }
+
+sub LoadPreset
+  { my ($dest,$preset,$config) = @_;
+
+    my $cfgobj = LoadPresetFile($config);
+    my $defn = $cfgobj->val('rules',$preset);
+
+    die "No definition found for preset '$preset'"
+      unless defined $defn;
+    die "Preset Loop Detected for preset '$preset'"
+      if $data{preset}{$preset};
+
+    $data{preset}{$preset}=1;
+
+    die "Cannot parse preset definition: < $defn >"
+      unless scalar(shellwords($defn));
+
+    delete $$dest{use};
+    my ($ret,$args) = GetOptionsFromString($defn,$dest,@subopts);
+    print "Preset string with error: $defn\n\n" and usage(2) unless $ret;
+    unshift(@ARGV, @$args) if @$args;
+
+    if( exists $$dest{use} )
+      { my @list  = @{$$dest{use}};
+	my $cfile = $$dest{config};
+
+	LoadPreset($dest,$_,$cfile) foreach @list;
+      }
+  }
+
+
+sub SavePreset
+  { my ($src,$preset,$config) = @_;
+
+    $! = BulkRename_Error_NotImplemented;
+    die "Save Preset Option: Not Implemented\n";
+  }
+
+##############[ Main Program ]##############
+
+# parse options into pristine hash
+GetOptions(\%cfg_in, @options) or usage(2);
+
+# override our defaults with command-line options.
+%cfg = (%cfg, %cfg_in);
+
+version() if exists $cfg{version};
+help()    if exists $cfg{help};
+manpage() if exists $cfg{man};
+readme()  if exists $cfg{readme};
+
+if( exists $cfg{list} )
+  {
+    ListPreset($cfg{config},$cfg{list});
+    exit BulkRename_Error_Info;
+  }
+
+if( exists $cfg{use} )
+  { my $conf = $cfg{config};
+
+    LoadPreset(\%cfg,$_,$conf) foreach @{$cfg{use}};
+  }
+
+if( !exists $cfg{expr} )
+  { (my $expr = shift) or usage(1);
+
+    $cfg{expr} = [$expr];
+  }
+
+if( exists $cfg{save} )
+  {
+    SavePreset(\%cfg_in, $cfg{save}, $cfg{config});
+    exit BulkRename_Error_None;
+  }
+
+if( exists $cfg{debug} )
+  { print "\%cfg: ",pp(\%cfg),"\n"; }
+
+# NOP implies a minimal verbosity
+$cfg{verbosity} = max(1,$cfg{verbosity}) if exists $cfg{nop};
+
+if (!@ARGV)
+  {
+    print "reading filenames from STDIN\n" if $cfg{verbosity} > 0;
+    @ARGV = <STDIN>;
+    chop(@ARGV);
+  }
+
+if( $cfg{module} )
+  {
+    foreach my $modopt (@{$cfg{module}})
+      { my @mods=split('\b:(?!:)',$modopt);
+
+	foreach (@mods)
+	  { my ($mod,$qw)=m/([^=]+)(?:=(.*))?/;
+	    my $imps='';
+
+	    if( $qw )
+	      {
+		$qw=~tr/,/ /;
+		$imps="qw($qw)";
+	      }
+	    eval "package _USER; use $mod $imps"; ## no critic (StringyEval)
+	    die $@ if $@;
+	  }
+      }
+  }
+
+if( $cfg{preamble} )
+  {
+    foreach my $preopt (@{$cfg{preamble}})
+      {
+	eval "package _USER; no strict; $preopt"; ## no critic (StringyEval)
+	die $@ if $@;
+      }
+  }
+
+for (@ARGV)
+  { my $was = $_;
+
+    for my $op (@{$cfg{expr}})
+      {
+	eval "package _USER; no strict; $op"; ## no critic (StringyEval)
+	die $@ if $@;
+      }
+    next if $was eq $_; # ignore quietly
+    no warnings 'newline';
+#    $_ = encode_utf8($_);
+    if (-e $_ and !exists $cfg{force})
+      {
+	warn "$was not renamed: $_ already exists\n"
+	  if $cfg{verbosity} > -1;
+      }
+    elsif (exists $cfg{nop} or rename $was, $_)
+      {
+	print "$was renamed as $_\n" if $cfg{verbosity} > 0;
+      }
+    else
+      { my $msg =
+	  $cfg{verbosity} >= 0 ? "Can't rename $was to $_: $!\n" : "\n";
+
+	# No idea what's wrong, so we issue a general error.
+	$! = BulkRename_Error_General;
+	die $msg;
+      }
+}
+
+##############[ Ties for User Namespace ]##############
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+brn - bulk rename - a fork of rename.
+
+=head1 SYNOPSIS
+
+B<brn> S<[ { B<-v> | B<-q> } ... ] ]>
+S<[ B<-n> ]> S<[ B<-f> ]> S<[ B<-D> ]>
+S<[ B<-C> I<configpath> ]>
+S<[ B<-M> I<perlmodule> ]>
+S<[ B<-p> I<perlexpr> [ B<-p> I<perlexpr> ... ] ]>
+S<{ [ B<-e> ] I<perlexpr> | B<-u> I<preset> }>
+S<[ I<files> ... ]>
+
+B<brn> S<[ B<-C> I<configpath> ]>
+S<{ B<-L> | B<--list> } [ I<preset> ] ...>
+
+B<brn> S<[ B<-C> I<configpath> ]> ...
+S<{ B<-S> | B<--save> } I<preset>>
+
+B<brn> B<-V> | B<--version>
+
+B<brn> B<-?> | B<--help>
+
+B<brn> B<-R> | B<--readme>
+
+B<brn> B<-m> | B<--man>
+
+=head1 DESCRIPTION
+
+C<brn> renames the filenames supplied according to the rule(s)
+given by the --expr (-e) option(s). If no such option is present then
+the first argument is taken to be the rule. The I<perlexpr> argument is
+a Perl expression which is expected to modify the C<$_> string in Perl
+for at least some of the filenames specified. If a given filename is
+not modified by the expression, it will not be renamed. If no
+filenames are given on the command line, filenames will be read via
+standard input.
+
+For example, to rename all files matching C<*.bak> to strip the extension,
+you might say
+
+	brn 's/\.bak$//' *.bak
+
+To translate uppercase names to lower, you'd use
+
+	brn 'y/A-Z/a-z/' *
+
+brn loads all Modules into a _USER package, and this is also where all
+expresions are evaluated. Note that the _USER package doesn't have
+'strict' turned on, so variables do not need to be pre-declared. There
+are also a few predefined helper functions in its scope, to ease
+common rename tasks.
+
+In void context, all of these helper functions output as if in scalar
+context by modifing their first parameter or $_ (if their parameter
+is unmodifiable). They will use $_ for their input data if called
+without. Thus, one can now uppercase all files in a directory just by
+saying
+
+	brn 'uc' *
+
+This can also be used in expression interpolation inside larger
+strings, so as to achieve more complex results. The command:
+
+	brn 's/Show-(.*?).avi/Show - @{[ hc(spc($1)) ]}.avi/' *
+
+Will extract a substring, perform space replacement, convert to
+highlight case, and re-insert the substring back into the name.
+
+The full set of helper functions are:
+
+=over 12
+
+=item B<slurp>
+
+slurp reads in an entire file given a filename or filehandle. In array
+context it returns individual chomped lines, while in scalar context
+it returns the entire file.
+
+=item B<rd>
+
+rd reads entire directories and is the equivalent of slurp. In array
+context it returns an array containing all the entries in all the
+directories passed to it. In scalar context it returns all the
+directory names in a single string, separated by newlines.
+
+=item B<spc($;$)>
+
+by default spc() takes a string and returns it with all dots ('.') and
+underscores ('_') converted to spaces. An optional second argument can
+provide a string of characters that overrides the list of characters
+to convert to spaces.
+
+=item B<sc($)>
+
+sc() returns its input string converted to 'Sentence' case, meaning
+that the letter of each embedded sentence will be capitalized.
+
+=item B<tc($)>
+
+tc() returns its input string converted to 'Title' case, meaning that
+the first letter of each word is uppercased.
+
+=item B<hc($)>
+
+hc() returns its input string converted to 'Highlight' case, meaning
+that the first letter of each non-trivial word is uppercased.
+
+=back
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-v>, B<--verbose>
+
+Verbose: increases the verbosity of brn. This option can appear
+multiple times, and each appearance increases brn's verbosity level by
+one. The option B<--quiet> can be used to decrease verbosity.  The
+following table lists the information presented at different verbosity
+levels. The default verbosity is 1.
+
+=over 4
+
+=over
+
+=item S<-1> B<Very Quiet>     No Text Output at All
+
+=item S< 0> B<Quiet>          Only Display Errors
+
+=item S< 1> B<Normal>         Display Errors and Warnings
+
+=item S< 2> B<Verbose>        List the Files being Processed.
+
+=back
+
+=back
+
+Note that currently not all text is surpressed at level -1.
+
+=item B<-q>, B<--quiet>
+
+Quiet: decreases the verbosity level of brn by 1. See B<--verbose> for
+a discussion of verbosity levels.
+
+=item B<-n>, B<--nop>
+
+No Operation (NOP): show what files would have been renamed.
+
+=item B<-f>, B<--force>
+
+Force: overwrite existing files.
+
+=item B<-D>, B<--debug>
+
+Debug: Turn on internal debugging shims. Intended for developers only.
+
+=item B<-e>, B<--expr>
+
+Expression: this option holds a rename expression to be used to rename
+files. Multiple instances of this flag may appear on the command line,
+and they are executed in order, for each file specified.
+
+If no occurance of this flag appears on the command line, then the
+first argument will be taken as a rename expression and subsequent
+arguments will be taken as file names.
+
+If this flag does appear on the command line, then all arguments are
+assumed to be file names.
+
+=item B<-M> I<moduleS<[=foo,bar]>>
+
+Load the listed modules at the start of the program. If the optional
+extra parameters are added, then they will be used to import the
+listed functions. Multiple instances can appear on the command line,
+and they will be loaded in the order given.
+
+=item B<-p> I<perlexpr>, B<--preamble>=I<perlexpr>
+
+Preamble: execute the expression once, before looping over the files
+to rename, this can be useful to load data files or do other setup before
+complex rename procedures. Multiple preambles can be given, and they
+will be executed in order.
+
+=item B<-u> | B<--use> I<preset>
+
+Use preset: Rather than specifying a complex operation on the command
+line, you can also save a set of command line options in a config
+file, and use them by using the 'use' option. By default the config
+file is stored in F<${HOME}/.config/rn.conf> but this can be changed
+with the B<--config> (B<-c>) command. Multiple use options can be
+specified, and their operations will be executed in turn.
+
+=item B<-S> | B<--save> I<preset>
+
+Save preset: Rather than executing the contents of the current command
+line, the options will be stored in the rn config file under the given
+preset name.
+
+=item B<-L> | B<--list> I<preset>
+
+List preset: Rather than performing a rename operation, just list the
+command line options stored under the given preset name. Multiple
+B<--list> options can be given, to see multiple presets.
+
+=item B<-C> | B<--config> I<configpath>
+
+Normally, all stored presets are assumed to be in the default
+location, which is F<${HOME}/.config/rn.conf>, but this can be changed
+on a preset-by-preset basis with the B<--config> option, which allows
+you to specify the full pathname of another config file.
+
+If a preset itself references other presets then they will be looked
+up either in the last specified config file, which will be the one
+specified in that preset (if any).
+
+=item B<-V> | B<--version>
+
+Version: display the current version of this program.
+
+=item B<-?>, B<--help>
+
+Help: Display this documentation.
+
+=item B<-m>, B<--man>
+
+Manual: Display a full man page.
+
+=back
+
+=head1 EXIT CODES
+
+brn returns an exit code indicating the success or failure of the
+requested operation. 0 always indicates a success. A return code less
+than 16 indicates success in an auxiliary function of brn (such as
+successfully return its version.) Starting at 16, the error codes
+indicate various fatal errors.
+
+=over 4
+
+=over
+
+=item S< 0> B<None>           No Error
+
+=item S< 1> B<Help>           Help was requested
+
+=item S< 2> B<Docs>           Readme or manual was requested
+
+=item S< 3> B<Info>           Other information was requested
+
+=item S<16> B<General>        Unknown Error
+
+=item S<17> B<NoSuchFile>     File Not Found
+
+=item S<18> B<BadConfigFile>  Configuration File Error
+
+=item S<19> B<BadPreset>      No Such Preset
+
+=item S<20> B<NotImplemented> This Feature is Currently Not Implemented
+
+=back
+
+=back
+
+=head1 ENVIRONMENT
+
+The 'HOME' environment variable is used to determine the default
+location of the rn.conf file.
+
+=head1 AUTHOR
+
+ Original Author: Larry Wall
+ Second Author:   Robin Barker
+ Current Author:  Stirling Westrup
+
+=head1 SEE ALSO
+
+mv(1), perl(1), rename(1), prename(1), File::rename(3pm), App::perlmv(3pm)
+
+=head1 DIAGNOSTICS
+
+If you give an invalid Perl expression you'll get a syntax error.
+
+=head1 BUGS
+
+There are probably innumerable bugs in this code as it is still in
+alpha state. Among the known problems are the possibly incorrect
+chaining of -u options, and the failure to always maintain the order
+of mixed -e and -u options.
+
+In addition there are many stubs for features that do not yet work
+fully (if at all) and the documentation is slightly behind the work.
+
+=head1 HISTORY
+
+The original C<rename> did not check for the existence of target filenames,
+so had to be used with care.  I hope I've fixed that (Robin Barker).
+
+The original C<rename> seemed to me to be lacking a number of useful
+features, and as its last update had been back in 1998, I (Stirling
+Westrup) decided to fork a version to work on.
+
+=cut

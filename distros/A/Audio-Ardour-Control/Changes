@@ -1,0 +1,6 @@
+Revision history for Perl extension Audio::Ardour::Control.
+
+0.10  Wed Jan  9 13:43:20 2008
+	- original version; created by h2xs 1.23 with options
+		-AXn Audio::Ardour::Control
+

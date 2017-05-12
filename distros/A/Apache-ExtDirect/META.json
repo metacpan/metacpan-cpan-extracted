@@ -1,0 +1,52 @@
+{
+   "abstract" : "RPC::ExtDirect gateway for Apache2/mod_perl",
+   "author" : [
+      "Alexander Tokarev <tokarev@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Apache-ExtDirect",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "LWP::UserAgent" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache2::Request" : "2.0",
+            "RPC::ExtDirect" : "2.0",
+            "mod_perl2" : "2.0",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/nohuhu/Apache-ExtDirect/issues"
+      },
+      "repository" : {
+         "url" : "http://github.com/nohuhu/Apache-ExtDirect"
+      }
+   },
+   "version" : "0.90"
+}

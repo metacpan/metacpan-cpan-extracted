@@ -1,0 +1,61 @@
+my @ascii = 
+	(
+	'house' => <<'EOA',
+  ___________  
+ //////|\\\\\\ 
+'.-----------.'
+ |    ___    | 
+ | [] | | [] | 
+ |____|_|____| 
+EOA
+
+	'corporate building' => <<'EOA',
+          .-'-.          
+      _.-'-._.-'-._      
+     '-.  _.-._ .' '
+     |   '-._.-'   |
+     |'-_|  |  |_.'|
+     |   |'-|-'|   |
+     |'-_|  |  |_.'|
+     |   |'-|-'|   |
+     |'-_|  |  |_.'|
+     |   |'-|-'|   | ___ 
+   .'['-_|  |  |_.-]   .`
+ .'  '-'_'-.|.-|_'-' .`  
+' --..._ '._| _|-'_.'    
+EOA
+
+	'building' => <<'EOA',
+   .--------.
+ ,'       .'|
+:-------.'# |
+| # # # | # |
+| # # # | # |
+| # # # | # |
+| # # # | # |
+| # # # | #  
+| # # # |    
+EOA
+
+	) ;
+	
+my @boxes ;
+
+use App::Guiio::stripes::editable_box2 ;
+
+for(my $ascii_index = 0 ; $ascii_index < $#ascii ; $ascii_index+= 2)
+	{
+	my $box = new App::Guiio::stripes::editable_box2
+				({
+				TEXT_ONLY => $ascii[$ascii_index + 1],
+				EDITABLE => 1,
+				RESIZABLE => 1,
+				}) ;
+
+	$box->set_box_type([map{$_->[0] = 0; $_} @{$box->get_box_type()}]) ;
+	$box->shrink() ;
+	$box->{'NAME'} = $ascii[$ascii_index] ;
+	push @boxes, $box ;
+	}
+	
+[@boxes] ;

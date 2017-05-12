@@ -1,0 +1,6 @@
+You will generally want to start lbcd at system boot.  All that is needed
+is a simple init script to start lbcd with the appropriate options or kill
+it again.  It writes its PID into `/var/run/lbcd.pid` by default (and this
+can be changed with the `-P` option).  On many systems, lbcd will need to
+run as root or as a member of particular groups to obtain system load
+average and uptime information.

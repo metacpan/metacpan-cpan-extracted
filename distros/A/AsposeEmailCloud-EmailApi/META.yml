@@ -1,0 +1,112 @@
+---
+abstract: 'Aspose.Email Cloud SDK for Perl'
+author:
+  - 'Farooq Sheikh <farooq.sheikh@aspose.com>'
+build_requires:
+  Test::More: '0.10'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AsposeEmailCloud-EmailApi
+provides:
+  AsposeEmailCloud::ApiClient:
+    file: lib/AsposeEmailCloud/ApiClient.pm
+  AsposeEmailCloud::Configuration:
+    file: lib/AsposeEmailCloud/Configuration.pm
+  AsposeEmailCloud::EmailApi:
+    file: lib/AsposeEmailCloud/EmailApi.pm
+    version: '1.01'
+  AsposeEmailCloud::Object::BaseObject:
+    file: lib/AsposeEmailCloud/Object/BaseObject.pm
+  AsposeEmailCloud::Object::EmailDocument:
+    file: lib/AsposeEmailCloud/Object/EmailDocument.pm
+  AsposeEmailCloud::Object::EmailDocumentResponse:
+    file: lib/AsposeEmailCloud/Object/EmailDocumentResponse.pm
+  AsposeEmailCloud::Object::EmailProperties:
+    file: lib/AsposeEmailCloud/Object/EmailProperties.pm
+  AsposeEmailCloud::Object::EmailPropertiesResponse:
+    file: lib/AsposeEmailCloud/Object/EmailPropertiesResponse.pm
+  AsposeEmailCloud::Object::EmailProperty:
+    file: lib/AsposeEmailCloud/Object/EmailProperty.pm
+  AsposeEmailCloud::Object::EmailPropertyResponse:
+    file: lib/AsposeEmailCloud/Object/EmailPropertyResponse.pm
+  AsposeEmailCloud::Object::HttpResponseMessage:
+    file: lib/AsposeEmailCloud/Object/HttpResponseMessage.pm
+  AsposeEmailCloud::Object::HttpStatusCode:
+    file: lib/AsposeEmailCloud/Object/HttpStatusCode.pm
+  AsposeEmailCloud::Object::LineNumberRestartMode:
+    file: lib/AsposeEmailCloud/Object/LineNumberRestartMode.pm
+  AsposeEmailCloud::Object::Link:
+    file: lib/AsposeEmailCloud/Object/Link.pm
+  AsposeEmailCloud::Object::ListFoldersResponse:
+    file: lib/AsposeEmailCloud/Object/ListFoldersResponse.pm
+  AsposeEmailCloud::Object::ListResponse:
+    file: lib/AsposeEmailCloud/Object/ListResponse.pm
+  AsposeEmailCloud::Object::MailServerFolder:
+    file: lib/AsposeEmailCloud/Object/MailServerFolder.pm
+  AsposeEmailCloud::Object::MimeResponse:
+    file: lib/AsposeEmailCloud/Object/MimeResponse.pm
+  AsposeEmailCloud::Object::NumberStyle:
+    file: lib/AsposeEmailCloud/Object/NumberStyle.pm
+  AsposeEmailCloud::Object::Orientation:
+    file: lib/AsposeEmailCloud/Object/Orientation.pm
+  AsposeEmailCloud::Object::PageBorderAppliesTo:
+    file: lib/AsposeEmailCloud/Object/PageBorderAppliesTo.pm
+  AsposeEmailCloud::Object::PageBorderDistanceFrom:
+    file: lib/AsposeEmailCloud/Object/PageBorderDistanceFrom.pm
+  AsposeEmailCloud::Object::PageVerticalAlignment:
+    file: lib/AsposeEmailCloud/Object/PageVerticalAlignment.pm
+  AsposeEmailCloud::Object::PaperSize:
+    file: lib/AsposeEmailCloud/Object/PaperSize.pm
+  AsposeEmailCloud::Object::ProtocolType:
+    file: lib/AsposeEmailCloud/Object/ProtocolType.pm
+  AsposeEmailCloud::Object::ReportType:
+    file: lib/AsposeEmailCloud/Object/ReportType.pm
+  AsposeEmailCloud::Object::ResponseMessage:
+    file: lib/AsposeEmailCloud/Object/ResponseMessage.pm
+  AsposeEmailCloud::Object::SaaSposeResponse:
+    file: lib/AsposeEmailCloud/Object/SaaSposeResponse.pm
+  AsposeEmailCloud::Object::SectionStart:
+    file: lib/AsposeEmailCloud/Object/SectionStart.pm
+  AsposeEmailCloud::Object::SecurityOptions:
+    file: lib/AsposeEmailCloud/Object/SecurityOptions.pm
+  AsposeEmailCloud::Object::StyleIdentifier:
+    file: lib/AsposeEmailCloud/Object/StyleIdentifier.pm
+  AsposeEmailCloud::Object::TextEffect:
+    file: lib/AsposeEmailCloud/Object/TextEffect.pm
+  AsposeEmailCloud::Object::Underline:
+    file: lib/AsposeEmailCloud/Object/Underline.pm
+requires:
+  AsposeStorageCloud::StorageApi: '0'
+  Carp: '0'
+  Data::Dumper: '0'
+  Date::Parse: '0'
+  DateTime: '0'
+  Digest::HMAC_SHA1: '0'
+  Exporter: '0'
+  File::Slurp: '0'
+  HTTP::Headers: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Response: '0'
+  HTTP::Status: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Log::Any: '0'
+  MIME::Base64: '0'
+  Module::Runtime: '0'
+  Scalar::Util: '0'
+  Test::Exception: '0'
+  URI::Escape: '0'
+  URI::Query: '0'
+  perl: v5.6.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: '1.01'

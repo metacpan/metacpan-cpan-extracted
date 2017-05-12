@@ -1,0 +1,26 @@
+requires "AnyEvent::Fork" => "0";
+requires "AnyEvent::Fork::RPC" => "0";
+requires "AnyEvent::RabbitMQ" => "1.18";
+requires "Carp" => "0";
+requires "File::ShareDir" => "0";
+requires "Guard" => "0";
+requires "Moo" => "0";
+requires "Net::AMQP" => "0";
+requires "Scalar::Util" => "0";
+requires "Types::Standard" => "0";
+requires "constant" => "0";
+requires "namespace::clean" => "0";
+requires "perl" => "v5.6.1";
+requires "strict" => "0";
+requires "warnings" => "0";
+
+on 'test' => sub {
+  requires "Data::Dumper" => "0";
+  requires "IO::Socket::INET" => "0";
+  requires "Test::Exception" => "0";
+  requires "Test::More" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "6.30";
+};

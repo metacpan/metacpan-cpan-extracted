@@ -1,0 +1,10 @@
+NAME
+    App::Nopaste::Service::Linode - App::Nopaste interface to
+    <http://p.linode.com>
+
+AUTHOR
+    Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Ævar Arnfjörð Bjarmason <avar@cpan.org>
+

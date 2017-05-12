@@ -1,0 +1,129 @@
+Apache::ParseLog 
+- Object-oriented Perl extension for parsing Apache log files
+
+
+DESCRIPTION
+
+Apache::ParseLog provides an easy way to parse the Apache log files, 
+using an object-oriented constructs. The data obtained using this 
+module are generic enough that it is flexible to use the data for 
+your own applications, such as CGI, simple text-only report generater, 
+feeding RDBMS, data for Perl/Tk-based GUI application, etc.
+
+
+FEATURES
+
+1   Easy and Portable Log-Parsing Methods
+
+Because all the work (parsing logs, constructing regex, matching and 
+assigning to variables, etc.) is done inside this module, you can easily 
+create log reports (unless your logs need intense scrutiny). Read on this
+manpage as well as the the section on EXAMPLES section to see how easy it 
+is to create log reports with this module.
+
+Also, this module does not require C compiler, and it can (should) run on 
+any platforms supported by Perl.
+
+2   Support for LogFormat/CustomLog
+
+The Apache Web Server 1.3.x's new LogForamt/CustomLog feature (with 
+mod_log_config) is supported.
+
+The log format specified with Apache's LogFormat directive in the 
+httpd.conf file will be parsed and the regular expressions will be 
+created dynamically inside this module, so re-writing your existing code 
+will be minimal when the log format is changed.
+
+3   Reports on Unique Visitor Counts
+
+Tranditionally, the hit count is calculated based on the number of files 
+requested by visitors (the simplest is the the total number of lines of 
+the log file calculated as the "total hit").
+
+As such, the hit count obviously can be misleading in the sense of 
+"how many visitors who actually visited to my site?", especially if the 
+pages of your site contain many images (because each image is counted 
+as one hit).
+
+Apache::ParseLog provides the methods to obtain such traditional data, 
+because those data also are very important for monitoring your web site's 
+activities. However, this module also provides the methods to obtain
+the unique visitor counts, i.e., the actual number of "people" (well, 
+IP or hostname) who visited your site, by date, time, and date and time.
+
+See the the section on LOG OBJECT METHODS for details about those methods.
+
+4   Pre-Compiled Regex
+
+The new pre-compiled regex feature introduced by Perl 5.005 is used (if 
+you have the version installed on your machine).
+
+For the pre-compiled regex and the new quote-like assignment operator (qr), 
+see perlop(1) and perlre(1) manpages.
+
+
+PREREQUISITES
+
+You will need Perl 5.004 or later. To use the pre-compiled regex, you will
+need 5.005 or later. 
+
+Although this package names may suggest, the mod_perl as well as any other
+Apache::* modules are not necessary. 
+
+
+INSTALLATION
+
+The same as any perl modules:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+The Makefile.PL script will check the version of your perl, and if it is
+newer than 5.005, it rewrites the ParseLog.pm file for the 5.005-compatible
+version. For some reasons, if you need to rewrite the ParseLog.pm back to
+the distributed version (5.004-compatible), run the command (note the option)
+
+    perl Makefile.PL -r
+
+Running this will rewrite the ParseLog.pm to the 5.004 version. 
+
+
+DOCUMENTATION
+
+If you want to read the manpage before you install, you can use perldoc to
+read the manpage from the ParseLog.pm file, like:
+
+    perldoc -F ParseLog.pm
+
+
+TO DO
+
+- Add the support for HTTP header log (%{<header>}x) directive 
+  in LogFormat (this actually should be considered as a bug)
+- Add methods that return more analytical data
+
+
+CURRENT VERSION
+
+Current version is 1.02 (10/17/1998)
+
+
+AUTHOR
+
+Akira Hangai (akira@discover-net.net)
+
+Please email with any suggestions, comments, etc. (especially the suggestions
+for methods that return more elaborate data). 
+
+
+COPYRIGHT
+
+Copyright 1998 by Akira Hangai. All rights reserved. 
+
+This package is free software, and you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+
+

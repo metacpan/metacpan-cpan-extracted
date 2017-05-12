@@ -1,0 +1,21 @@
+---
+abstract: unknown
+author:
+  - 'Gianluca Torta <torta@di.unito.it>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112150'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AI-PBDD
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: 0.01

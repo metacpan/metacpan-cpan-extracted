@@ -1,0 +1,6 @@
+
+# This is the foo policy
+
+my $foo;
+
+die "No global thing" unless length($global_thing);

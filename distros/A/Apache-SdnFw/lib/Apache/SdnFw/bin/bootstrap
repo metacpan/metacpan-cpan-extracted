@@ -1,0 +1,36 @@
+#! /bin/bash
+
+set -e
+
+if [ -z "$1" ]; then
+	echo "usage: $0 <project>"
+	exit 1
+fi
+
+CODE=$1
+createdb $1
+mkdir -v $1
+rsync -aCv sdnfw/template/* $1/
+perl -pe "s/SITENAME/$1/g" <sdnfw/template/conf.pl >$1/conf.pl
+for F in $(ls $CODE/object/*.pm); do
+	cat $F | perl -pe "s/SITECODE/$CODE/g" >$F.tmp
+	mv $F.tmp $F
+done
+
+cd $1/db
+cat $(cat install/script) | psql $1
+
+ln -v -s /code/$1 /usr/local/apache
+mkdir -v /usr/local/apache/logs/$1
+echo "DB_STRING=dbname=$1" >/usr/local/apache/conf/$1.conf
+echo "DB_USER=sdnfw" >>/usr/local/apache/conf/$1.conf
+echo "DEV=1" >>/usr/local/apache/conf/$1.conf
+echo "STATINC=1" >>/usr/local/apache/conf/$1.conf
+echo "SERVER_NAME=$1-local.smalldognet.com" >>/usr/local/apache/conf/$1.conf
+echo "#FORCE_HTTPS=1" >>/usr/local/apache/conf/$1.conf
+
+mkdir -v /data/$1
+mkdir -v /data/$1/content
+ln -v -s /code/sdnfw/css /data/$1/content/css
+ln -v -s /code/sdnfw/js /data/$1/content/js
+

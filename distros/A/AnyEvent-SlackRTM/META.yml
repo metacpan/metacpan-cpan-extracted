@@ -1,0 +1,30 @@
+---
+abstract: 'AnyEvent module for interacting with the Slack RTM API'
+author:
+  - 'Andrew Sterling Hanenkamp <hanenkamp@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-SlackRTM
+requires:
+  AnyEvent: '0'
+  AnyEvent::WebSocket::Client: '0.12'
+  Carp: '0'
+  Furl: '0'
+  IO::Socket::SSL: '0'
+  JSON: '0'
+  Try::Tiny: '0'
+  perl: v5.14.0
+  vars: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=AnyEvent-SlackRTM
+  repository: git://github.com/zostay/AnyEvent-SlackRTM.git
+version: '0.161950'
+x_serialization_backend: 'YAML::Tiny version 1.69'

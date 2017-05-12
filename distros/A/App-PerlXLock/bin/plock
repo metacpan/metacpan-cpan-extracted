@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+use App::PerlXLock;
+
+#PODNAME: plock
+
+main_loop();
+
+1;
+
+=head1 DESCRIPTION
+
+See App::PerlXLock for the documentation.
+
+=cut
+
+

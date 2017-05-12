@@ -1,0 +1,14 @@
+SYNOPSIS
+
+    This distribution provides the following command-line utilities related
+    to perl dist repos:
+
+    #INSERT_EXECS_LIST
+
+DESCRIPTION
+
+    If you have one or more CPAN (or DarkPAN) perl distribution repos on
+    your filesystem, then this suite of CLI utilities might be useful for
+    you. Currently only the combination of Dist::Zilla-based Perl
+    distributions managed by git version control is supported.
+

@@ -1,0 +1,29 @@
+Revision history for App-Twitch
+
+0.904     2011-02-15 17:23:08 Europe/Berlin
+	- Added proper FeedAggregator
+	- Added logger handling for the subcomponents
+
+0.903     2011-02-11 02:25:52 Europe/Berlin
+
+0.902     2011-02-10 01:30:43 Europe/Berlin
+	- Many tuning on layout and POE performance
+
+0.901     2011-02-04 19:12:17 Europe/Berlin
+
+0.900     2011-02-03 06:03:42 Europe/Berlin
+	- Huge refactoring and redesign of twitch (pre-v1, still in test)
+
+0.006     2010-11-14 00:06:09 Europe/Berlin
+	- Implemented ignore_first, removed name setting on the feed
+
+0.005     2010-11-06 20:52:25 Europe/Berlin
+
+0.004     2010-11-05 21:58:18 Europe/Berlin
+	- Release for new Dist::Zilla::PluginBundle::GETTY
+
+0.003     2010-11-04 19:36:08 Europe/Berlin
+
+0.002     2010-11-04 03:09:19 Europe/Berlin
+
+0.001     2010-11-04 03:04:48 Europe/Berlin

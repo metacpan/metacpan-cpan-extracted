@@ -1,0 +1,7 @@
+Revision history for Perl extension Anansi::Database::Oracle.
+
+0.01  Thu Jun 06 16:36:22 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Anansi::Database::Oracle
+0.02  Thu Jun 06 20:10:54 2013
+	- modified the POD to accommodate changes to "Anansi::Class".

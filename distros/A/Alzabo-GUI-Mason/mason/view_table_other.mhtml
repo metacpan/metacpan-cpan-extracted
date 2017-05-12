@@ -1,0 +1,204 @@
+  <td>
+
+<div class="middle">
+ <p>
+ <& href,
+    text => 'jump to columns',
+    path => 'view_table' . Alzabo::GUI::Mason::Config::mason_extension(),
+    query => { table => $t->name,
+               schema => $s->name,
+             },
+  &>
+ </p>
+
+% if ( $t->all_foreign_keys ) {
+ <h2>Foreign keys</h2>
+
+ <table width="100%" border="1" align="center" cellspacing="0" cellpadding="0">
+  <tr valign="middle">
+   <td align="center"><span class="text"><b>From</b></span></td>
+   <td>&nbsp;</td>
+   <td align="center"><span class="text"><b>To</b></span></td>
+   <td>&nbsp;</td>
+  </tr>
+%   foreach my $fk ($t->all_foreign_keys) {
+  <tr valign="middle">
+   <td align="center">
+    <span class="text">
+%     foreach my $c_from ($fk->columns_from) {
+<& 'href', text => $c_from->name, path => 'view_column' . Alzabo::GUI::Mason::Config::mason_extension(), query => { schema => $t->schema->name, table => $t->name, column => $c_from->name } &>
+%         unless ($c_from->name eq ($fk->columns_from)[-1]->name) {
+<br />
+%     }
+%   }
+    - <% $fk->from_is_dependent ? '' : 'in' %>dependent
+    </span>
+   </td>
+   <td align="center">
+    <span class="text"><% join '..', $fk->cardinality %></span>
+   </td>
+   <td align="center">
+    <span class="text">
+%     foreach my $c_to ($fk->columns_to) {
+<& 'href', text => $fk->table_to->name, path => 'view_table' . Alzabo::GUI::Mason::Config::mason_extension(), query => { schema => $t->schema->name, table => $fk->table_to->name } &>
+ .
+<& 'href', text => $c_to->name, path => 'view_column' . Alzabo::GUI::Mason::Config::mason_extension(), query => { schema => $t->schema->name, table => $fk->table_to->name, column => $c_to->name } &>
+%         unless ($c_to->name eq ($fk->columns_to)[-1]->name) {
+<br />
+%     }
+%   }
+    </span>
+   </td>
+   <td align="center">
+<form action="delete_foreign_key<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="hidden" name="table_from" value="<% $fk->table_from->name %>">
+ <input type="hidden" name="table_to" value="<% $fk->table_to->name %>">
+ <input type="hidden" name="column_from" value="<% ($fk->columns_from)[0]->name %>">
+ <input type="hidden" name="fk_id" value="<% $fk->id %>">
+ <input type="submit" value="Delete">
+</form>
+   </td>
+  </tr>
+%       if ( $fk->comment && length $fk->comment ) {
+  <tr>
+   <td colspan="4">
+    <span class="text"><% $fk->comment | h %></span>
+   </td>
+  </tr>
+%       }
+%     }
+ </table>
+% }
+
+</div>
+
+% if ($t->columns && grep {$_ ne $t && $_->columns} $s->tables) {
+
+<div class="middle">
+
+ <h2>Create relationship</h2>
+
+ <form action="add_relationship<% Alzabo::GUI::Mason::Config::mason_extension() %>" method="post">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="hidden" name="table_from" value="<% $t->name %>">
+  <table width="100%" cellspacing="5">
+   <tr valign="top">
+    <td><span class="text">To table:</span></td>
+   </tr>
+   <tr valign="top">
+    <td>
+     <select name="table_to">
+%   foreach my $t ( sort {$a->name cmp $b->name} $s->tables ) {
+%     next unless $t->columns;
+      <option value="<% $t->name %>"><% $t->name %></option>
+%   }
+     </select>
+    </td>   
+   </tr>
+   <tr valign="top">
+    <td><input type="submit" value="Submit"></td>
+   </tr>
+  </table>
+ </form>
+% }
+
+
+  </td>
+  <td>
+
+<div class="right">
+
+<h2>Indexes</h2>
+
+% if ($t->indexes) {
+ <table width="100%" border="1" align="center" cellspacing="0" cellpadding="0">
+%   foreach my $i ($t->indexes) {
+  <tr valign="middle">
+   <td align="center">
+<& .index, $i &>
+   </td>
+   <td align="center">
+<form action="delete_index<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="hidden" name="table" value="<% $t->name %>">
+ <input type="hidden" name="index" value="<% $i->id %>">
+ <input type="submit" value="Delete">
+</form>
+   </td>
+  </tr>
+%   }
+ </table>
+% }
+
+</div>
+
+% if ($t->columns) {
+<div class="right">
+ <h2>Add index</h2>
+
+ <form action="add_index_1<% Alzabo::GUI::Mason::Config::mason_extension() %>" method="post">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="hidden" name="table" value="<% $t->name %>">
+  <table width="100%" cellspacing="5">
+   <tr valign="top">
+    <td>
+     <select name="columns" multiple="multiple">
+%   foreach my $c ( $t->columns ) {
+      <option value="<% $c->name %>"><% $c->name %></option>
+%   }
+     </select>
+    </td>
+   </tr>
+   <tr valign="top">
+    <td>
+     <input type="submit" value="Submit">
+    </td>
+   </tr>
+  </table>
+ </form>
+
+</div>
+% }
+ 
+  </td>
+
+<%args>
+$s
+$t
+</%args>
+
+<%init>
+my @columns = $t->columns;
+my $last = $columns[-1];
+</%init>
+
+<%def .index>
+<span class="text">
+% if ( $i->can('function') && $i->function ) {
+<% $i->function | h %> -
+% }
+<% join ', ', @c %>
+% if ($i->unique) {
+ - <b>unique</b>
+% }
+% if ($i->fulltext) {
+ - <b>fulltext</b>
+% }
+</span>
+<%init>
+my $i = shift;
+
+my @c;
+foreach my $c ( $i->columns )
+{
+    my $url = $m->scomp( 'href', text => $c->name, path => 'view_column' . Alzabo::GUI::Mason::Config::mason_extension(), query => { schema => $i->table->schema->name, table => $i->table->name, column => $c->name } );
+    $url .= '(' . $i->prefix($c) . ')' if $i->prefix($c);
+    push @c, $url;
+}
+</%init>
+</%def>
+
+<%attr>
+show_columns => 0
+</%attr>

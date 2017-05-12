@@ -1,0 +1,45 @@
+NAME
+    hl7send - Script to send hl7 message file to host.
+
+SYNOPSIS
+     hl7send [-h] [--version] host port hl7_file
+
+ARGUMENTS
+    *       "-h"
+
+             Print help.
+
+    *       "--version"
+
+             Print version of script.
+
+    *       "host"
+
+             Host.
+
+    *       "port"
+
+             Host port.
+
+    *       "hl7_file"
+
+             File with HL7 messages.
+
+EXAMPLE
+     hl7send -h
+
+REPOSITORY
+    <https://github.com/tupinek/App-HL7-Send>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2016 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.01
+

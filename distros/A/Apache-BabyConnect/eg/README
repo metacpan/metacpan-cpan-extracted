@@ -1,0 +1,121 @@
+
+Make sure that you have the current version 0.93 of DBI::BabyConnect and
+Apache::BabyConnect. Prior versions to 0.93 will not work.
+
+From CPAN download and install DBI::BabyConnect.
+Follow the instructions on how to test the DBI::BabyConnect.
+
+From CPAN download and install Apache::BabyConnect.
+Let's assume you have extracted the Apache-BabyConnect-0.93.tar.gz into /opt.
+
+Locate the babystartup.pl in the directory
+The directory /opt/Apache-BabyConnect-0.93/startupscripts
+
+
+The directory /opt/Apache-BabyConnect-0.93/eg/perl contains the
+perl test scripts for Apache::BabyConnect.
+If you have configured mod_perl to serve from /var/www/perl, then
+copy the test scripts from eg/perl to /var/www/perl,
+
+
+1- Edit the file babystartup.pl and make the appropriate changes
+ if necessary.
+
+-----------------------------------
+
+2- Edit /etc/httpd/conf.d/perl.conf and add the code to set the
+  BABYCONNECT environment variable and to the babystartup.pl before
+  anything else. For instance a typical perl.conf will have the
+  following code.
+
+PerlSetupEnv Off
+PerlSetEnv BABYCONNECT /opt/DBI-BabyConnect/configuration
+PerlRequire /opt/Apache-BabyConnect-0.93/startupscripts/babystartup.pl
+
+Alias /perl /var/www/perl
+<Directory /var/www/perl>
+    SetHandler perl-script
+    PerlResponseHandler ModPerl::Registry
+    PerlOptions +ParseHeaders
+    Options +ExecCGI
+</Directory>
+
+
+
+WARNING: you do not need to load Apache::DBI, refer to the man
+  page of Apache::BabyConnect for information on the caching mechanism
+  of Apache::BabyConnect module.
+ 
+
+-----------------------------------
+
+3- Restart httpd
+
+You can tail the httpd error_log file to view the initialization
+of the connection as the httpd servers start up. Each server
+will be started with 4 database descriptors, therefore each server
+will have 4 active DBI::BabyConnect objects that will server
+4 data sources. While a descriptor is uniquely identified by its
+name, two or more descriptors can point to the same data source. The
+sample scripts delivered with the distribution use all database
+descriptors that point to the same data source.
+
+4- Make sure that you have copied the test scripts from
+   /opt/Apache-BabyConnect-0.93/eg/perl/ to /var/www/perl
+   and you have set their permission to executable (chmod 755 /var/www/perl/*.pl)
+
+  Test your connection from a browser:
+    http://yourserver.com/perl/testbaby.pl
+
+5- Test the caching:
+    http://yourserver.com/perl/testcache.pl
+Keep on requesting testcache.pl for couple of time and observe
+the counter of the cached database descriptor increasing.
+
+   Request http://yourserver.com/perl/testbaby.pl
+This should display the cached database descriptor as well.
+Both testbaby.pl and testcache.pl are using the DBI::BabyConnect
+that have been cached by the babystartup.pl script.
+
+6- Test caching a new DBI::BabyConnect object with a different database descriptor.
+   Issue the following request just once:
+     http://yourserver.com/perl/onemore.pl
+   Now issue the following request couple of time:
+     http://yourserver.com/perl/testcache.pl
+
+   You should notice that only one of the http server has the cached database
+   descriptor.
+   You can place another request to
+     http://yourserver.com/perl/onemore.pl
+   If the http server serving your request has the database descriptor cached, then
+   the cached DBI::BabyConnect object is used and its counter is increased. Otherwise, the
+   http server will load that new DBI::BabyConnect object and cache it.
+
+   In a random situation where DBI::BabyConnect objects are requested, if you have 4 database
+   descriptors to be used, and 8 http servers started, then you end up having each of the
+   http server caching 4 database descriptors.
+   Two http servers will never share the same DBI::BabyConnect objects.
+   If you are reading data from the data sources, then you are doing fine. But if you
+   are writing to the database, then you need to know what you are doing.
+
+7- Test the rollback
+In globalconf.pl set 
+ON_FAILED_DBIEXECUTE_ROLLBACK_AND_EXIT=1
+and restart the httpd
+this will rollback and exit on error. With Apache::BabyConnect the rollback
+is effectively handled by DBI::BabyConnect, and the exit is handled by Apache
+MD2. In other word your script will end at that point (after the rollback took
+effect)
+Test script: testrollback.pl
+   Request http://yourserver.com/perl/testrollback.pl
+
+In globalconf.pl set 
+ON_FAILED_DBIEXECUTE_ROLLBACK_AND_EXIT=0
+and restart the httpd (/etc/rc.d/init.d/httpd restart)
+this will neither rollback nor exit on error. In addition
+your script will continue past the point of the do()'s. You can
+chose to rollback programmatically if you want.
+Test script: testrollback.pl
+   Request http://yourserver.com/perl/testrollback.pl
+
+

@@ -1,0 +1,68 @@
+0.16    2014-12-24
+    * Argon::Client->queue now supports task classes
+    * Added Argon::Simple::task - supports task class
+    * Switched from UNIVERSAL::require to Module::Load
+    * Bumped required Coro::ProcessPool to 0.15 for better error messages, task classes
+
+0.15    2014-11-06
+    * Added comments to internally used classes
+    * Replaced // usaged with || for perl 5.8-ophiles
+    * Bumped required version of Coro::ProcessPool to 0.14 for better 5.8 support
+    * SKIP tests on MSWin32 systems (not supported)
+    * Fixed ugly sleep causing race condition in tests
+
+0.14    2014-10-31
+    * Bug fixes
+
+0.13    2014-10-30
+    * Added task age to status results from manager
+    * Added Argon::Simple
+
+0.12    2014-10-29
+    * Added priority queueing to Managers
+    * Added retry to Client when system at max capacity
+    * Manager now deletes uncollected results after $Argon::DEL_COMPLETE_AFTER seconds
+    * Added Manager status report (CMD_STATUS)
+    * Switched from Test::TinyMocker to Sub::Override
+    * Logging now handled with Log::Log4perl
+
+0.11    2014-10-27
+    * Tests now force use of AnyEvent::Loop (pure perl loop) for consistency
+    * Force version 0.11 of Coro::ProcessPool, which fixes recursive Coro::Handle read bug
+    * Removed namespace::autoclean from Argon.pm (thanks CPAN testers)
+
+0.10    2014-10-24
+    * Migrated to Moo and Types::Standard
+    * Bug fixes in service initialization and shutdown
+    * Added integration test
+
+0.9     2014-03-06
+    * Made bin/argon installable
+    * Fixed missing deps
+
+0.8     2014-02-24
+    * No longer dies when decoding messages in older perl versions
+
+0.7     2014-02-21
+    * Forgot to update Changes and MANIFEST
+
+0.6     2014-02-21
+    * Major refactor
+    * Unified bin scripts
+    * Fixed import errors for static builds (thanks folio - https://github.com/foilo)
+
+0.5     2013-??-??
+    * Forgot to put this one in
+
+0.4     2013-07-30
+    * Fixed invalid import in Argon::Stream
+
+0.3     2013-07-26
+    * Added missing scripts to MANIFEST
+
+0.2     2013-07-22
+    * Renamed scripts to avoid MakeMaker issues
+    * Fixed POD links
+
+0.1     2013-07-17
+    * Initial release

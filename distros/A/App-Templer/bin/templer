@@ -1,0 +1,538 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+package main;
+
+use Getopt::Long;
+use Pod::Find qw! pod_where!;
+use Pod::Usage;
+
+
+#
+# Core templer libraries.
+#
+require App::Templer;
+require Templer::Timer;
+require Templer::Global;
+require Templer::Site;
+require Templer::Site::Asset;
+require Templer::Site::Page;
+require Templer::Plugin::Factory;
+
+
+
+
+####
+##
+#  Entry point to the code.
+##
+########
+
+
+
+
+
+#
+#  Configuration variables
+#
+my %CONFIG;
+
+
+#
+#  Parse the command line.
+#
+parseCommandLine();
+
+
+#
+#  Test that we have required dependencies.
+#
+testDependencies();
+
+
+#
+# Unless config file already specified, if we're not in a templer-directory
+# then go up the filesystem looking for one.  Stop after "a few" attempts.
+#
+if ( !defined( $CONFIG{ 'config' } ) )
+{
+    for ( my $count = 0 ; $count < 10 ; $count += 1 )
+    {
+        if ( !( ( -e "templer.cfg" ) || ( -d "input/" ) ) )
+        {
+            chdir("../");
+        }
+    }
+}
+
+
+#
+#  Read the global configuration file, which might have been
+# specified upon the command-line, but will otherwise be
+# templer.cfg.
+#
+my $cnf = $CONFIG{ 'config' } || "./templer.cfg";
+my $cfg =
+  Templer::Global->new( file => $cnf, debug => ( $CONFIG{ 'debug' } || 0 ) );
+
+
+#
+# These are the default settings.
+#
+my %DEFAULTS = ( "in-place"     => 0,
+                 "include-path" => "./includes",
+                 "input"        => "./input/",
+                 "layout"       => "default.layout",
+                 "layout-path"  => "./layouts",
+                 "output"       => "./output/",
+                 "plugin-path"  => "./plugins",
+                 "suffix"       => ".skx",
+                 "verbose"      => ( $CONFIG{ 'verbose' } || 0 ),
+                 "debug"        => ( $CONFIG{ 'debug' } || 0 ),
+                 "force"        => ( $CONFIG{ 'force' } || 0 ),
+                 "sync"         => ( $CONFIG{ 'sync' } || 0 ),
+               );
+
+
+#
+#  The defaults will now be over-ridden by anything which is specified
+# in the configuration file that we've loaded/parsed.
+#
+my %SITE = $cfg->fields();
+foreach my $field ( keys %SITE )
+{
+    $DEFAULTS{ $field } = $SITE{ $field };
+}
+
+#
+# We need to keep the global configuration file name to add it as a dependency
+# for every page
+#
+$DEFAULTS{ 'config' } = $cnf;
+
+#
+#  Add in any definitions we've received.
+#
+if ( $CONFIG{ 'defines' } )
+{
+    my $defs = $CONFIG{ 'defines' };
+
+    foreach my $kv (@$defs)
+    {
+        if ( $kv =~ /^([^=]+)=(.*)$/ )
+        {
+            my $key = $1;
+            my $val = $2;
+            $DEFAULTS{ lc $key } = $val;
+        }
+    }
+}
+
+
+#
+#  If we're running a HTTP-server do it now, since we've got
+# all the data we need.
+#
+runHTTPD() if ( $CONFIG{ 'serve' } );
+
+
+#
+#  Now we've setup the defaults, and updated them via the configuration
+# file we're ready to actually build/rebuild the templer-site.
+#
+#  We'll create the Templer::Site object to do that, the init method
+# will ensure we have the input directory, and create the output directory
+# if it is missing and required.
+#
+my $site = Templer::Site->new(%DEFAULTS);
+$site->init();
+
+
+#
+#  Execute any pre-build commands the user might have defined.
+#
+runCommands('pre-build');
+
+
+#
+#  Record the start time.
+#
+my $timer = Templer::Timer->new();
+
+
+#
+#  Build/rebuild the site.
+#
+my $rebuilt = $site->build();
+
+#
+#  Copy the assets into place.
+#
+$site->copyAssets();
+
+#
+#  Synchronize destination with input
+#
+$site->sync();
+
+#
+#  Run any post-build commands the user might have defined.
+#
+runCommands("post-build");
+
+
+
+
+#
+# All done.
+#
+my $duration = $timer->elapsed();
+print "\nAll done: $rebuilt page(s) updated in $duration.\n"
+  unless ( $CONFIG{ 'quiet' } );
+
+exit(0);
+
+
+
+
+#
+#  Parse the command line
+#
+sub parseCommandLine
+{
+    my @defines;
+
+    #
+    #  Parse the command line.
+    #
+    exit
+      if (
+        !Getopt::Long::GetOptions(
+
+            # Help options
+            "help",   \$CONFIG{ 'help' },
+            "manual", \$CONFIG{ 'manual' },
+
+            # load the config file
+            "config=s", \$CONFIG{ 'config' },
+
+            # define a variable
+            "define=s", \@defines,
+
+            # force a rebuild
+            "force", \$CONFIG{ 'force' },
+
+            # undocumented.
+            "serve=i", \$CONFIG{ 'serve' },
+
+            # run quietly.
+            "quiet", \$CONFIG{ 'quiet' },
+
+            # run verbosely.
+            "verbose", \$CONFIG{ 'verbose' },
+            "version", \$CONFIG{ 'version' },
+            "debug",   \$CONFIG{ 'debug' },
+        ) );
+
+
+    #
+    #  Help/Manual handling.
+    #
+    Pod::Usage::pod2usage( -input => \*DATA, ) if ( $CONFIG{ 'help' } );
+    Pod::Usage::pod2usage( -input => \*DATA, -verbose => 2 )
+      if ( $CONFIG{ 'manual' } );
+
+
+    #
+    #  Show the release.
+    #
+    if ( $CONFIG{'version'} )
+    {
+        print $App::Templer::VERSION . "\n";
+        exit(0);
+    }
+
+    #
+    #  Poke in definitions
+    #
+    foreach my $kv (@defines)
+    {
+        push( @{ $CONFIG{ 'defines' } }, $kv );
+    }
+}
+
+
+
+#
+#  Test for required dependencies
+#
+sub testDependencies
+{
+    my $fatal = 0;
+
+    #
+    #  The required modules
+    #
+    foreach my $module (qw!  HTML::Template !)
+    {
+        my $eval = "use $module;";
+
+        ## no critic (Eval)
+        eval($eval);
+        ## use critic
+        if ($@)
+        {
+            print "The $module module doesn't seem to be installed.\n";
+            $fatal = 1;
+        }
+    }
+
+    exit(1) if ($fatal);
+}
+
+
+
+#
+# Run the commands the user might have specified for pre-build/post-build
+# execution
+#
+sub runCommands
+{
+    my ($type) = (@_);
+
+    my $cmds = $cfg->field($type);
+    if ($cmds)
+    {
+        foreach my $cmd (@$cmds)
+        {
+            $CONFIG{ 'verbose' } && print "$type command: $cmd\n";
+            system($cmd );
+        }
+    }
+}
+
+
+
+#
+#  Launch python(!!) to run a HTTP-server.
+#
+sub runHTTPD
+{
+
+    #
+    # Document root
+    #
+    my $root = $DEFAULTS{ 'output' };
+    $root = $DEFAULTS{ 'input' }
+      if ( defined $DEFAULTS{ 'in-place' } && $DEFAULTS{ 'in-place' } );
+
+    if ( !-d $root )
+    {
+        print "Document root doesn't exist: $root\n";
+        exit 0;
+    }
+
+    #
+    #  This is appalling.
+    #
+    my $port = $CONFIG{ 'serve' } || "8000";
+    system("cd $root && python -m SimpleHTTPServer $port");
+    exit(0);
+}
+
+
+__DATA__
+
+
+=head1 NAME
+
+templer - A static-site generator, written in perl.
+
+=cut
+
+=head1 SYNOPSIS
+
+  templer [options]
+
+
+  Help Options:
+
+    --help        Show the help information for this script.
+    --manual      Read the manual for this script.
+
+  Flags
+
+    --config=I<FILE> Use I<FILE> as global config file
+    --force          Force a rebuild of all pages/assets
+    --in-place       Specify we're processing pages in-place, ignoring the output dir.
+    --quiet          Don't show output.
+    --verbose        Be noisy during the execution.
+
+=cut
+
+=head1 ABOUT
+
+Templer is the static-site generator utility I use for my websites.
+
+Templer flexible with input pages, and allows variables to be defined
+on a global or per-page basis, and then inserted into the output.
+
+Given a single template a complete site may be generated with an arbitrary
+number of pages, each sharing a common look and feel.  If required you can
+define a range of templates and select which to use on a per-page basis.
+
+We allow variable interpolation, loops, and conditional expansion in the
+generated output via the use of the L<HTML::Template> module.
+
+The name?  It stuck.  Initially I was thinking "templator" and
+"Templer" popped into my mind, via Knights Templer.
+
+=cut
+
+=head1 Live Usage
+
+This code is in use on several domains I host/maintain:
+
+=over 8
+
+=item http://blogspam.net/
+
+=item http://kvm-hosting.org/
+
+=item http://steve.org.uk/
+
+=item http://stolen-souls.com/
+
+=back
+
+Originally I had one utility to generate the HTML for each of those sites, called
+'webgen'.  Over time this single version divererged into several, as I made ad-hoc
+changes to cope with the different sites.
+
+Templer was created to replace my previous script, ensuring that each of the
+site-specific requirements would continue to be satisified, on that basis it
+should be generally flexible and usable by others.
+
+=cut
+
+
+=head1 Site Structure
+
+A templer-based site consists of a configuration file C<templer.cfg> and
+an input directory.  Input files are processed with L<HTML::Template>, to
+expand any variables set in the pages themselves, or in the global template.
+
+Once page-content is expanded it is then inserted into a global layout template.
+
+There are two modes of operation when it comes to processing files:
+
+=over 8
+
+=item "In-place"
+
+Files are processed and the suffix is replaced with .html
+
+=item Output Path
+
+Files are generated in a distinct output-tree, and any static
+assets such as JPG, GIF, PNG, CSS, and JS files are copied across too.
+
+=back
+
+This allows you to run in-place in your C<~/public_html> directory or to
+setup an output path which is later synced to your final/live location.
+
+=cut
+
+
+=head1 Code Layout
+
+The implementation uses several simple classes, mostly as wrappers around
+variable parsing:
+
+=over 8
+
+=item Templer::Global
+
+This contains the parsing code for the global configuration file, which is
+located at the top-level directory of the site.  (It must be named
+C<templer.cfg>).
+
+=item Templer::Plugin::Factory
+
+A class-factory for loading/invoking plugin methods.
+
+=item Templer::Site
+
+Given an input directory this module finds and returns C<Templer::Site::Asset> and
+C<Templer::Site::Page> objects for each file present.  This module is also where
+all the actual building occurs.
+
+=item Templer::Site::Asset
+
+An item which requires zero expansion.  Media, javascript, etc.
+
+=item Templer::Site::Page
+
+A page which requires template expansion.
+
+=item Templer::Timer
+
+A utility to report upon time-durations.
+
+=back
+
+Note #1: The command-line options override those specified in the global object.
+
+Note #2: The global object has sensible defaults.
+
+=cut
+
+=head1 Questions / Bug Reports
+
+The code is developed and hosted on gitub in the following location:
+
+=over 8
+
+=item https://github.com/skx/templer
+
+=back
+
+Please raise any issues in the tracker there.
+
+=cut
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the terms of either:
+
+a) the GNU General Public License as published by the Free Software
+Foundation; either version 2, or (at your option) any later version,
+or
+
+b) the Perl "Artistic License".
+
+=cut
+
+=head1 AUTHOR
+
+ Steve
+ --
+ http://www.steve.org.uk/
+
+=cut
+
+=head1 LICENSE
+
+Copyright (c) 2012-2015 by Steve Kemp.  All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.
+The LICENSE file contains the full text of the license.
+
+=cut
+

@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/ARGV/JSON.pm
+minil.toml
+t/00_compile.t
+t/01_argv.t
+t/data/01.json
+META.yml
+MANIFEST

@@ -1,0 +1,9 @@
+MANIFEST			This list of files
+Makefile.PL
+common.pl
+lib/Alien/HDF4.pm.PL
+lib/Alien/HDF4/Install/Files.pm.PL
+t/compile.t
+t/inline.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

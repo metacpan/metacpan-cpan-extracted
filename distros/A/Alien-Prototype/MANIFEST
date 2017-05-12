@@ -1,0 +1,15 @@
+Build.PL
+Makefile.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README.txt
+prototype.js
+bin/prototype-install
+inc/MY/Build.pm
+lib/Alien/Prototype.pm
+t/01-loads.t
+t/02-install.t
+t/pod.t
+t/pod-coverage.t

@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache::AppCluster.
+
+0.01  Sat Jan  5 18:09:03 2002
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Apache::AppCluster
+

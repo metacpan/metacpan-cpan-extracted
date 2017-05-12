@@ -1,0 +1,49 @@
+Revision history for Perl extension Alvis::TermTagger.
+
+0.82    - Add semantic tags in the brat output
+
+0.81    - Improvement in the term matching and the recording of the terms
+        - Add lemmatised term tagging on the lemmatised sentence
+        - Brat output
+
+0.8     - correction in the documentation
+        - add the possibility of a case sensitive matching, according
+          to (or not) the length of the term
+
+0.7     - tagging of the term with the lemmatised form of its words
+
+0.6     - Correction in Build.PL
+	- * was forget in the quote meta character function
+        - Correction in the documentation
+        - Few meta characters unspecialised in the terms 
+	- the returned term form is the matching form according to the regex
+	- Optimization of the term selection
+
+0.5     - Add '/' character to the regex frontier while final term tagging
+        - Addition of the method print_corpus_index to print on STDERR
+          the corpus index
+        - Correction in the step for selecting potentially appearing
+          terms in the corpus (some terms were missing)
+        - Additional information as semantic tag associated to terms
+          (set from the third column are managed
+	- Add the LICENSE file
+
+0.4     - Improvement in displaying the tagging process
+        - Documentation of the modules and scripts are gathered at the
+          end of each file.
+        - Addition of a Build.PL file        
+        - Addition of examples
+
+0.3     - addition of a new function to record tagged term in a array
+          or a hashtable
+
+
+0.2
+        - correcting some regex for matching in the corpus and
+	  spliting in the terminological resource
+        - term tagging return the matched term and its canonical form
+        - option management
+
+0.1  
+	- original version
+

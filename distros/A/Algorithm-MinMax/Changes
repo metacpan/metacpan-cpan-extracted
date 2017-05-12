@@ -1,0 +1,6 @@
+Revision history for Perl extension Algorithm::MinMax.
+
+0.01  Tue May 27 17:59:59 2003
+	- original version; created by h2xs 1.21 with options
+		-XA -n Algorithm::MinMax
+

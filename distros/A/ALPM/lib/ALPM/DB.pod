@@ -1,0 +1,139 @@
+=head1 NAME
+
+ALPM::DB - Database base class, inherited by local and sync databases.
+
+=head1 SYNOPSIS
+
+  use ALPM::Conf qw(/etc/pacman.conf);
+  my $db = $alpm->localdb;
+  printf "Playing with %s database\n", $db->name;
+  my $perl = $db->find('perl') or die 'where is perl';
+  
+  $db = $alpm->register('community') or die;
+  $db->add_server('ftp://ftp.archlinux.org/community/os/i686') or die;
+  
+  for my $pkg ($db->search('perl')){
+      printf "%s\t%s\n", $pkg->name, $pkg->version;
+  }
+  
+  for my $pkg ($db->find_group('xfce4')){
+      printf "xfce4:\t%s\t%s\n", $pkg->name, $pkg->version;
+  }
+  
+  my %grps = $db->groups;
+  while(my($g, $pkgs) = each %grps){
+      printf "%s\t%s\n", $g, $_->name for(@$pkgs);
+  }
+
+=head1 OBJECT METHODS
+
+=head2 name
+
+  $NAME = $DB->name()
+
+=over 4
+
+=item C<$NAME>
+
+The previously assigned name of the database or 'local' for the local database.
+
+=back
+
+=head2 pkgs
+
+  @PKGS = $DB->pkgs()
+
+=over 4
+
+=item C<@PKGS>
+
+A list of packages in the package cache for this database.
+
+=back
+
+=head2 find
+
+  $PKGS | undef = $DB->find($NAME)
+
+=over 4
+
+=item C<$NAME>
+
+The exact name of a package to look for.
+
+=item C<$PKGS>
+
+On success, an L<ALPM::Package> object of the package found.
+
+=item C<undef>
+
+On failure, returned when a matching package is not found.
+
+=back
+
+=head2 search
+
+  @PKGS = $DB->search($MATCH)
+
+=over 4
+
+=item C<$MATCH>
+
+A substring to search for within the names of packages.
+
+=item C<@PKGS>
+
+A list of found packages, in the form of L<ALPM::Package> objects. This may
+be empty.
+
+=back
+
+=head2 groups
+
+  %GROUPS = $DB->groups()
+
+=over 4
+
+=item C<%GROUPS>
+
+A hash (name/value pairs) of groups contained within the database. Each group
+name is followed by an arrayref of L<ALPM::Package> objects. This may be empty.
+
+=back
+
+=head2 find_group
+
+  @PKGS = $DB->find_group($NAME)
+
+=over 4
+
+=item C<$NAME>
+
+The exact name of a group to search for.
+
+=item C<@PKGS>
+
+A list of packages which belong to the given group name. If no group was
+found then this is empty.
+
+=back
+
+=head1 SEE ALSO
+
+L<ALPM::DB::Local>, L<ALPM::DB::Sync>, L<ALPM::Package>, L<ALPM>
+
+=head1 AUTHOR
+
+Justin Davis, C<< <juster at cpan dot org> >>
+
+Andrew Gregory <apg@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Justin Davis
+
+Copyright (C) 2015 by Andrew Gregory <apg@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

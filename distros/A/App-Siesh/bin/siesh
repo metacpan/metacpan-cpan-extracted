@@ -1,0 +1,179 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::Siesh;
+use Getopt::Long;
+use IO::Prompt;
+use Config::Find;
+use Pod::Usage;
+
+use IO::Interactive qw(is_interactive);
+use IO::Handle;
+use IO::File;
+
+my (%config, %configfile, %commandline);
+
+my $result = GetOptions( \%commandline,
+    'debug',
+    'user=s',
+    'host=s',
+    'port=s',
+    'tls=s',
+    'password=s',
+    'command=s@',
+    'file=s',
+    'config=s',
+    'help|?',
+    'man',
+) or pod2usage( -verbose => 0);
+
+pod2usage( -verbose => 0, -exitval => 0 ) if $commandline{'help'};
+pod2usage( -verbose => 2, -exitval => 0 ) if $commandline{'man'};
+
+%configfile = %{ App::Siesh->read_config($commandline{'config'}) };
+
+%config = ( %configfile, %commandline );
+
+if(!$config{password}) {
+	$config{password} = prompt( "Password: ", -e => '*' );
+}
+
+if ( !is_interactive(*STDIN) ) {
+    $config{file} = IO::Handle->new_from_fd( *STDIN, 'r' );
+}
+elsif ( $config{command} and not $config{file} ) {
+    my $fh = IO::File->new_tmpfile();
+
+    for my $command ( @{ $config{command} } ) {
+        print {$fh} $command . "\n";
+    }
+    $fh->flush();
+    $fh->seek( 0, 0 );
+
+    $config{file} = $fh;
+    delete $config{command}
+
+} elsif ( $config{file} ) {
+    $config{file} = IO::File->new($config{file},'r');
+}
+	
+
+App::Siesh->run(%config);
+
+0;
+
+__END__
+
+=head1 NAME
+
+siesh - interactive sieve shell
+
+=head1 SYNOPSIS
+
+ siesh
+    --debug 
+    --user USER 
+    --host SERVER 
+    --tls {require|auto|off} 
+    --port PORT
+    --password PASSWORD
+    --command COMMAND
+    --file FILE
+    --config FILE
+    --help
+    --man
+
+=head1 DESCRIPTION
+
+Siesh provides a shell-like interface for manipulating sieve scripts
+using the ManageSieve protocol.
+
+The documentation for L<App::Siesh> provides more details on how
+to use this probram interactively.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--debug>|B<-d>
+
+Enable debugging.
+
+=item B<--user>|B<-u> USERNAME
+
+Specifies the username to use when logging into the sieve server. This
+option defaults to the value of the environment variable C<USER>.
+
+=item B<--host>|B<-h> HOST
+
+Specifies the machine to connect to. Defaults to C<imap>.
+
+=item B<--port>|B<-p> PORT
+
+Specifies the remote port to connect to. Defaults to C<2000>.
+
+=item B<--tls>|B<-t> {require|auto|off}
+
+Specifies whether TLS is required ("require"), optional
+("auto"), or disabled ("off"). Defaults to "auto".
+
+=item B<--password> PASSWORD
+
+Specifies the password to login.
+
+=item B<--file> FILE
+
+The commands in FILE are executed as they were entered on the shell
+prompt. This options is ignored when batch commands are provided on
+STDIN.
+
+=item B<--command> COMMAND
+
+COMMAND is a acceptable command as entered on the shell prompt. This
+option maybe provided more than once. It it ignored if batch commands
+are passed in via --file or STDIN.
+
+=item B<--config> FILE
+
+If specified, configuration options are read from this file instead
+of that returned by L<Config::Find>.
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+When siesh is invoked, it first reads configurations variables from
+F</etc/siesh.conf> or F<~/.siesh.conf> (or whatever L<Config::Find>
+returns) if one of these files exist. The file is structured as a
+set of lines with name and values seperated by an equal sign.
+
+	user     = mario
+	host     = sieve.example.com
+	port     = 2000
+	tls      = require
+	debug    = 1
+	password = secret
+
+Currently only these six options are recognized. Values are overriden
+by options specified on the command line.
+
+=head1 SEE ALSO
+
+L<App::Siesh>, L<Net::ManageSieve::Siesh>, L<Net::ManageSieve>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2008 Mario Domgoergen, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

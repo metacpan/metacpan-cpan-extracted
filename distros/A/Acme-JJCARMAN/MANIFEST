@@ -1,0 +1,28 @@
+Acme-JJCARMAN-0.02_02.tar.gz
+Acme-JJCARMAN-0.02_02/Changes
+Acme-JJCARMAN-0.02_02/lib/Acme/JJCARMAN.pm
+Acme-JJCARMAN-0.02_02/Makefile.PL
+Acme-JJCARMAN-0.02_02/MANIFEST
+Acme-JJCARMAN-0.02_02/META.json
+Acme-JJCARMAN-0.02_02/META.yml
+Acme-JJCARMAN-0.02_02/MYMETA.json
+Acme-JJCARMAN-0.02_02/MYMETA.yml
+Acme-JJCARMAN-0.02_02/README
+Acme-JJCARMAN-0.02_02/t/00-load.t
+Acme-JJCARMAN-0.02_02/t/manifest.t
+Acme-JJCARMAN-0.02_02/t/pod-coverage.t
+Acme-JJCARMAN-0.02_02/t/pod.t
+Changes
+ignore.txt
+lib/Acme/JJCARMAN.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/sum.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

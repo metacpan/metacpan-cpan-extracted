@@ -1,0 +1,9 @@
+MANIFEST
+Changes
+README
+Makefile.PL
+lib/Algorithm/Numerical/Shuffle.pm
+t/000_tests.t
+t/950_pod.t
+t/960_pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

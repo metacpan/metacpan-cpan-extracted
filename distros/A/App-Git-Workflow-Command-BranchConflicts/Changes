@@ -1,0 +1,39 @@
+Revision history for module
+
+0.4   2015-12-19
+        Updating for release of version 0.4
+        Removed creation of makefile (Ivan Wills)
+
+0.3   2015-08-11
+        Updating for release of version 0.3
+        Removed creation of makefile (Ivan Wills)
+
+0.2   2015-07-28
+        Updating for release of version 0.2
+        Removed Path::Dependency (Ivan Wills)
+
+0.1     2014-10-26
+        Added missing dependencies (Ivan Wills)
+        Fixed version numbers (Ivan Wills)
+        Fixed ignores (Ivan Wills)
+        Fixing tests (Ivan Wills)
+        Fixed skipping build files (Ivan Wills)
+        Removed incorrect to manifest files (Ivan Wills)
+        Updated mock data to match code changes (Ivan Wills)
+        Fixed up documentation (Ivan Wills)
+        Added ability to ignore certain file changes (Ivan Wills)
+        Added further cleaning up of branch before moving on (Ivan Wills)
+        Added capturing stderr from git to keep output clean (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+        Added meta.json file (Ivan Wills)
+        Updated licence (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+        Fixed module description (Ivan Wills)
+        Fixed test data (Ivan Wills)
+        Added ability to limit checked branches not merged to another branch or not modified after a certain date (Ivan Wills)
+        Added more content to skip file (Ivan Wills)
+        Fixed boilerplate test (Ivan Wills)
+        Fixed tests (Ivan Wills)
+        More tests working (Ivan Wills)
+        Started to implement (trying TDD) (Ivan Wills)
+        Initial release (Ivan Wills)

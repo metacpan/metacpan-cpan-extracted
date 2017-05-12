@@ -1,0 +1,43 @@
+---
+swagger: 2.0
+info:
+  title: DigitalOcean API
+  description: Unofficial DigitalOcean API specification
+  version: 3
+host: api.digitalocean.com
+schemes: [https]
+basePath: /v2
+paths:
+  /account:
+    get:
+      description: Account information
+      parameters: []
+  /droplets:
+    get:
+      description: List all droplets
+  /droplets/:id:
+    get:
+      description: Retrieve a droplet by id
+      parameters:
+        -   name: id
+            type: integer
+            required: true
+            in: path
+  /droplets/:id/actions:
+    post:
+      description: Trigger droplet action
+      parameters:
+        - name: type
+          in: body
+          description: action type
+          required: true
+          type:
+            enum:
+            - rename
+        - name: name
+          in: body
+          description: new droplet name
+          required: true
+          type: string
+
+# vim:et:sts=2:sws=2:sw=2:foldmethod=indent

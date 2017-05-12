@@ -1,0 +1,26 @@
+#  $Id: SUN_4_NEW_DEF,v 1.1 2002/11/14 20:00:06 lstein Exp $
+
+#################################################################
+############### acedb: R.Durbin and J.Thierry-Mieg ##############
+############### wmake/SUN_DEF    Jan-12-1992       ##############
+#################################################################
+
+#################################################################
+########## Machine dependant compiler modification ##############
+########### for the SUN3/80 and sparc stations ##################
+#################################################################
+########### This file is included by wmake/truemake #############
+######  Edit this file to adapt the ACeDB to a new machine ######
+#####   following the explanations given in wmake/truemake  #####
+#################################################################
+
+NAME = SUN
+COMPILER = gcc -g -Wreturn-type -Wimplicit -Wunused -Wcomment \
+	-fwritable-strings -DACEDB4 -DNEW_MODELS
+LINKER = gcc -g -static
+
+LIBS = -lm
+
+
+#################################################################
+#################################################################

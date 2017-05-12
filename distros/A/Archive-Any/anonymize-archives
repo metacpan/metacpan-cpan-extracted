@@ -1,0 +1,121 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Temp qw( tempdir tempfile );
+use Archive::Any;
+use File::LibMagic;
+use Path::Class;
+
+# This program will replace the content of any files contained in a tar,
+# tar.gz or zip archive by random noise, while preserving the permissions
+# and ownership (assuming all files in the archive have the same owner as
+# the first file).
+#
+# It will skip unrecognized files. It requires GNU tar for extracting
+# the archives and bsdtar for repacking them.
+#
+# Usage: anonymize-archives file ...
+
+my $magic = File::LibMagic->new;
+
+# process files given on the command line
+while ( my $file = shift ) {
+
+    # open the archive
+    my $archive = eval {
+        local $SIG{__WARN__} = sub { };    # no warnings from Archive::Any
+        Archive::Any->new($file);
+    } or do {
+        print STDERR "Skipping $file\n";
+        next;
+    };
+    my $type = $archive->type;
+    print STDERR "Processing $file ($type)\n";
+
+    # get the list of files
+    my @files = $archive->files;
+
+    # extract the archive in a temporary directory
+    my $dir = tempdir( CLEANUP => 1 );
+
+    # re-create an archive with same files and dummy content
+    my $tmp = "$file.tmp";
+    if ( $type eq 'tar' ) {
+
+        # save differently if compressed
+        my ($mime) = split ';', $magic->checktype_filename($file);
+        my $gzip = $mime eq 'application/x-gzip' ? 'z' : '';
+
+        # record list of files for tar
+        ( undef, my $list ) = tempfile( UNLINK => 1 );
+        file($list)->spew(
+            [   map +( $archive->is_naughty ? substr( $_, 1 ) : $_ ) . "\n",
+                @files
+            ]
+        );
+
+        # extract archive
+        `tar x${gzip}f $file -C $dir --delay-directory-restore`;
+
+        # replace all file content with random data
+        my @mtime;
+        for my $path (@files) {
+            my $mode;
+            my $member = file( $dir, $path );
+            unshift @mtime, [ ( ( stat $member )[9] ) x 2, "$member" ];
+            next if -d $member;
+            if ( !-w $member ) {
+                $mode = ( stat $member )[2] if !-w $member;
+                chmod 0644, $member;
+            }
+            $member->spew( pack "C*", map rand 256, 1 .. -s $member );
+            chmod $mode, $member if $mode;
+        }
+
+        # restore date and time
+        utime @$_ for @mtime;
+
+        # pick up owner and group
+        my $iter   = Archive::Tar->iter($file);
+        my $member = $iter->();
+        my @opts   = (
+            '--uid'   => $member->uid,
+            '--uname' => $member->uname,
+            '--gid'   => $member->gid,
+            '--gname' => $member->gname,
+          ( '-s', ':^:/:', '--absolute-paths' )x!! $archive->is_naughty,
+        );
+
+        # repack the file
+        `bsdtar -c${gzip}f $tmp -C $dir -T $list --no-recursion @opts`;
+    }
+    elsif ( $type eq 'zip' ) {
+
+        # read the list of files and their properties
+        my $old = Archive::Zip->new;
+        $old->read($file) and do { warn "Error reading $file\n"; next };
+        my @members = $old->members();
+
+        # create a new zip file with dummy content
+        my $zip = Archive::Zip->new;
+        for my $member (@members) {
+            $member->contents(
+                pack "C*",
+                map rand 256,
+                1 .. $member->uncompressedSize
+            );
+            $zip->addMember($member);
+        }
+
+        # save the new zip
+        $zip->writeToFileNamed($tmp);
+    }
+    else {
+        print STDERR "Skipping $file ($type)\n";
+        next;
+    }
+
+    # replace archive
+    rename $tmp, $file;
+}

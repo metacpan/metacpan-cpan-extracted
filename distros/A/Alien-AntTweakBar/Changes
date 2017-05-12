@@ -1,0 +1,20 @@
+Revision history for Alien-AntTweakBar
+
+0.03    2014-07-30
+
+	Repository URLs updated to PerlGameDev github account
+	Build on FreeBSD 10 was fixed
+
+
+0.02    2014-07-12
+
+	The library now builds as static libary (.a).
+	Succesful tests has been reported on Linux, Win32 and FreeBSD.
+	POD documentation has been updated.
+        Fix build failures, and more precicely detect build failures
+
+
+0.01    2014-06-28
+
+        First version, released on an unsuspecting world.
+

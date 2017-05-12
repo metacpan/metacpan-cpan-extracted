@@ -1,0 +1,9 @@
+Revision history for Perl extension Algorithm::RectanglesContainingDot.
+
+0.02  Mar 9, 2007
+        - use Algorithm::RectanglesContainingDot_XS when available
+
+0.01  Tue Mar  6 16:56:02 2007
+	- original version; created by h2xs 1.23 with options
+		-AXn Algorithm::RectanglesContainingDot
+

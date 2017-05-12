@@ -1,0 +1,17 @@
+Revision history for Acme-AsciiArtinator
+
+0.04	2009-11-25
+	Improved handling of regular expressions, which can be more flexible
+	when used with /x, /e modifiers
+
+0.03    2009-11-05
+	Fixed issue with splitting special Perl vars across newlines
+        (you shouldn't).
+
+0.02	2009-11-04
+	Improved padding algorithm, added hooks for pre- and post-testing.
+
+0.01    2009-11-03
+        First version, released on an unsuspecting world.
+
+

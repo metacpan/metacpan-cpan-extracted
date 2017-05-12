@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Authen/Simple/Kerberos.pm
+MANIFEST			This list of files
+t/01use.t
+t/02pod.t
+t/03podcoverage.t
+META.yml
+Makefile.PL
+README

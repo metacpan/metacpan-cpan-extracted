@@ -1,0 +1,35 @@
+0.08 2016-08-22
+   [ Build ]
+	- move to Dist::Zilla and Inline::Module
+
+0.06	2015-02-08
+
+	[ Bug Fixes ]
+	- add override_redirect to window attributes
+
+0.06	2015-02-06
+
+	[ Doc ]
+	- makefile fix
+
+0.05	2015-01-28
+
+	[ Doc ]
+	- doc update
+
+0.04	2015-01-28
+
+	[ Error handling ]
+	- croak if X connection could not be established
+
+0.03	2015-01-19
+
+	[ Bug Fixes ]
+	- Documentation update
+	- Read password from env if set
+
+0.02	2015-01-15
+
+	[ Bug Fixes ]
+	- Documentation update
+	- Remove unnecessary files from the distro

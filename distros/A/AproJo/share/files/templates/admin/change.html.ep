@@ -1,0 +1,4 @@
+% layout 'default';
+% title "Administer $table: $id";
+
+<%= include 'front/macros/change', table => $table %>

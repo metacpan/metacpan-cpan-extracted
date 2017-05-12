@@ -1,0 +1,12 @@
+Revision history for Perl extension Apache::HEADRegistry.
+
+0.01 06.08.2004
+	- original version; created by h2xs 1.20 with options
+		-AXn Apache::HEADRegistry
+        - thanks to Jean-Michel Hiver for help debugging and
+          some additional prodding to make certain it worked properly
+        - add BINMODE and PRINTF routines and tests
+          thanks to Bruno De Fraine for the spot and code
+        - add CLOSE
+
+

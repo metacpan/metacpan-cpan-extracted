@@ -1,0 +1,22 @@
+Revision history for App-jpath
+
+0.04    2016-03-11 (PERLANCAR)
+
+	- Replace JSON with JSON::MaybeXS.
+
+
+0.03    2014-02-14 (SHARYANTO)
+
+        - Use Data::Format::Pretty::* modules for all output.
+
+
+0.02    2014-02-14 (SHARYANTO)
+
+        - No functional changes.
+
+        - Mention more related modules in See Also.
+
+
+0.01    2014-02-14 (SHARYANTO)
+
+        - First release.

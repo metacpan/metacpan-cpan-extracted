@@ -1,0 +1,58 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use warnings 'all';
+use ASP4::API;
+my $api; BEGIN { $api = ASP4::API->new }
+
+my $url = shift(@ARGV) or die <<"USAGE";
+  Usage:  $0 "<url>"
+USAGE
+
+
+my $res = $api->ua->get( $url );
+if( $res->is_success )
+{
+  print $res->as_string;
+}
+else
+{
+  warn "ERROR - Response As Follows:\n" . ("="x80) . "\n\n" . $res->as_string;
+}# end if()
+
+=pod
+
+=head1 NAME
+
+asp4 - execute asp scripts from the command-line.
+
+=head1 USAGE
+
+  asp4 <url>
+
+=head2 Examples
+
+  asp4 /
+
+Same as
+
+  asp4 /index.asp
+
+Call with arguments:
+
+  asp4 "/some/page.asp?foo=bar&baz=bux"
+
+B<NOTE:> because of the "?" and "&" characters, you have to "quote" requests like this.
+
+=head1 DESCRIPTION
+
+C<asp4> provides a command-line means of calling asp scripts without involving a webserver.
+
+The entire http response is printed - using the C<as_string> method of L<HTTP::Response>.
+
+=head1 SEE ALSO
+
+L<ASP4::API>, L<ASP4::UserAgent>
+
+=cut
+

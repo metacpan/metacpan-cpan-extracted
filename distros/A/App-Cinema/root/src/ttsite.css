@@ -1,0 +1,175 @@
+
+html {
+    height: 100%;
+}
+
+body { 
+    background-color: [% site.col.page %];
+    color: [% site.col.text %];
+    font-family: [% site.font.family %];
+    /*font-size: 12px;*/
+    margin: 0px;
+    padding: 0px;
+}
+
+a {
+	color: [% site.col.link %];
+	text-decoration: none;
+}
+
+a:hover {
+      text-decoration: underline;
+}
+
+#header {
+    background-color: [% site.col.head %];
+    /*border-bottom: 1px solid [% site.col.line %];*/
+    /*border-bottom: 1px solid #c6c9cc;*/
+    color: #FFFFFF;
+    margin: 0 auto;
+    /*height: 100px;*/
+    width: 940px;    
+}
+
+#header a{
+	color: #FFFFFF;
+}
+
+#header table,th,td
+{
+	border:0px;
+}
+
+#footer {
+	color: #FFFFFF;
+    background-color: [% site.col.head %];
+    text-align: left;
+    /*border-top: 1px solid [% site.col.line %];*/
+    /*padding: 4px;*/
+    width: 940px;
+    /*height: 50px;*/
+    margin: 0 auto;
+	bottom:0px; 
+}
+
+#content {
+    padding: 10px;
+    margin: 0 auto;
+    width: 940px;
+    /*height: 100%*/
+}
+
+table.detail{
+	border-style:solid;
+	border-color:[% site.col.border %];
+}
+
+/*
+#content table,th,td
+{
+	border:1px solid black;
+}
+*/
+h1.title {
+    padding: 4px;
+    margin: 0px;
+    color: #FFFFFF;
+}
+
+.message {
+    color: [% site.col.message %];
+}
+
+#search select {
+	font-family: [% site.font.family %];
+}
+
+.error {
+    color: [% site.col.error %];
+}
+
+.date {
+    color: red;
+}
+
+/* Menu */
+
+#menu {
+	  color: white;
+      width: 940px;
+      height: 50px;
+      margin: 0 auto;
+      background: #000000;      
+}
+
+#menu ul {
+      margin: 0;
+      padding: 16px 0px;
+      list-style: none;
+      line-height: normal;
+}
+
+#menu li {
+      float: left;
+}
+
+#menu a {
+      padding: 0 10px;
+      background: none;
+      text-transform: uppercase;
+      text-decoration: none;      
+      color: [% site.col.link %];
+      font-weight:bold;
+}
+
+#menu a:hover, #menu .current_page_item a {
+      color: #FFFFFF;
+}
+
+#menu a:hover {
+      text-decoration: underline;
+}
+
+#about b {
+	color : [% site.col.head %];	
+}
+
+#event_object {
+	color : [% site.col.head %];
+	font-weight:bold;
+}
+
+.fb_textarea, fb_input, fb_select, fb_radio {
+	font-family: [% site.font.family %];
+}
+
+.fb_required {
+    font-weight: bold;
+}
+
+.fb_submit {
+	padding-top: 1em;
+    text-align: left;
+}
+
+.fb_invalid {
+    color: #c00;
+    font-weight: bold;
+}
+
+.fb_error {
+    color: #c00;
+    font-style: italic;
+}
+
+.fb_label {
+    text-align: right;
+    padding-right: 1em;
+}
+
+.fb_comment {
+    font-size: 8pt;
+    font-style: italic;
+}
+
+

@@ -1,0 +1,121 @@
+#!/usr/local/bin/perl
+
+package main;
+
+use strict;
+use warnings;
+
+use Astro::SIMBAD::Client;
+use Data::Dumper;
+use File::Basename;
+use Getopt::Long;
+
+$Data::Dumper::Terse = 1;
+
+my $usage = <<eod;
+
+Query SIMBAD 4 for the objects on the command line. The result is given
+as comma-separated values.
+
+usage: @{[basename $0]} [options] object ...
+
+where the options are
+  -help
+    displays this text;
+  -parse
+    invokes a simple parser, and displays the result with Data::Dumper.
+
+eod
+
+my %opt;
+
+(GetOptions (\%opt, qw{parse},
+	help => sub {print $usage; exit},
+    ) && @ARGV) or die $usage;
+
+my $simbad = Astro::SIMBAD::Client->new (
+    type => 'txt',
+    format => {txt => <<'eod'},
+%idlist(NAME|1),%coord(d;A),%coord(d;D),%plx(V),
+%pm(A),%pm(D),%rv(V)\n
+eod
+    parser => {txt => $opt{parse} ? 'parse_csv' : ''},
+);
+
+my @rslt;
+foreach my $obj (@ARGV) {
+    eval {
+	push @rslt, $simbad->query (id => $obj);
+	1;
+    } or print ( $@ || 'An unknown error occurred' );
+}
+
+print $opt{parse} ? Dumper (\@rslt) : @rslt;
+
+sub parse_csv {
+    my $line = shift;
+    my @data;
+    foreach (split '\n', $line) {
+	push @data, [split '\s*,\s*', $_];
+    }
+    return wantarray ? @data : \@data;
+}
+
+__END__
+
+=head1 TITLE
+
+csv - Download SIMBAD data in CSV format
+
+=head1 SYNOPSIS
+
+ csv Arcturus >arcturus.csv
+ csv -help
+
+=head1 OPTIONS
+
+=over
+
+=item -help
+
+This option displays documentation and then exits.
+
+=item -parse
+
+This option causes a display of the raw data in
+L<Data::Dumper|Data::Dumper> format, rather than as CSV.
+
+=back
+
+=head1 DETAILS
+
+This script takes as its arguments the names of objects to be looked up
+in the SIMBAD database, and copies the obtained information to standard
+output as comma-separated values, one line per object. The individual
+fields are:
+
+ object name
+ right ascension (in decimal degrees)
+ declination (in decimal degrees)
+ distance
+ proper motion in right ascension
+ proper motion in declination
+ velocity in recession
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006, 2008, 2010-2016 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+# ex: set textwidth=72 :

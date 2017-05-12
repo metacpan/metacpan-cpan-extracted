@@ -1,0 +1,42 @@
+Apache-Syntax-Highlight-Perl version 1.01
+=========================================
+
+This package is a mod_perl (1.0 and 2.0) module that provides syntax
+highlighting for Perl code. This module is a wrapper around
+Syntax::Highlight::Perl.
+
+See perldoc Apache::Syntax::Highlight::Perl for module documentation and use
+
+CHANGES FROM PREVIOUS VERSION
+
+	- Fixs documentation bugs [thanks to Ken Burcham <ken@burcham.com>]
+	
+See 'Changes' file in this distribution for complete history revision
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   o mod_perl 1 or 2 (of course)
+   o Syntax::Highlight::Perl >= 1.00
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 by Enrico Sorcinelli <enrico@sorcinelli.it>
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.8.2 or, at your option,
+any later version of Perl 5 you may have available.
+
+

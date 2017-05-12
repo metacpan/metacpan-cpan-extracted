@@ -1,0 +1,32 @@
+###############################################################################
+# $Id: typemap,v 1.7 1998/10/28 01:23:12 paulg Exp $
+# O_OBJECT from "perlobject.map"  Dean Roehrich, version 19960302
+###############################################################################
+
+###############################################################################
+TYPEMAP
+PASSWD *	O_OBJECT
+uid_t	T_NV
+aid_t	T_NV
+ushort	T_IV
+uchar_t	T_IV
+
+######################################################################
+INPUT
+
+O_OBJECT
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+
+######################################################################
+OUTPUT
+
+# The Perl object is blessed into 'CLASS', which should be a
+# char* having the name of the package for the blessing.
+O_OBJECT
+	sv_setref_pv( $arg, CLASS, (void*)$var );
+

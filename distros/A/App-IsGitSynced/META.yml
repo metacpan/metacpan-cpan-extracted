@@ -1,0 +1,26 @@
+---
+abstract: 'script to find out if the local git repos are fully synced'
+author:
+  - 'Ivan Bessarabov <ivan@bessarabov.ru>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-IsGitSynced
+requires:
+  Hash::Util: '0'
+  Pod::Usage: '0'
+  Term::ANSIColor: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/bessarabov/App-IsGitSynced/issues
+  homepage: https://github.com/bessarabov/App-IsGitSynced
+  repository: https://github.com/bessarabov/App-IsGitSynced.git
+version: 1.0.3

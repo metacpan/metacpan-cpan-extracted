@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+
+use App::TemplateServer;
+App::TemplateServer->new_with_options->run;
+
+__END__
+
+=head1 NAME
+
+template-server - run App::TemplateServer
+
+=head1 SYNOPSIS
+
+  template-server [--docroot /path/to/templates]+
+                  [--port 4000]
+                  [--datafile /path/to/data.yml]
+                  [--provider App::TemplateServer::Provider::TT]
+
+=head1 DESCRIPTION
+
+This script starts up an C<App::TemplateServer> server.  Given a
+docroot, it will serve rendered HTML templates in that directory (or
+directories if you specify C<--docroot> more than once).  See
+L<App::TemplateServer> for all the details.

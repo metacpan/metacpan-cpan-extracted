@@ -1,0 +1,9 @@
+##-*- Mode: Change-Log; coding: utf-8; -*-
+##
+## Change log for perl distribution Alien::DDC::Concordance
+
+v0.002 Wed, 02 Mar 2016 15:45:11 +0100 moocow
+	+ specify Alien::Base::ModuleBuild in configure_requires, fixes RT bug #112613
+
+v0.001 Mon, 22 Feb 2016 15:05:34 +0100 moocow
+	+ initial version

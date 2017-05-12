@@ -1,0 +1,27 @@
+Revision history for App-Module-Setup
+
+0.06	2013-07-04
+	Some changes for older Perl versions. Should run under 5.8,
+	maybe even 5.6.
+
+0.05	2013-07-03
+	Add --postcmd and --git command line options.
+	Do not replace text if no replacement is available.
+	Better warnings.
+	Minor bug fixes.
+
+0.04	2013-07-02
+	(META) Prevent App::Module::Setup::Templates::Default from
+	being indexed.
+	Documentation fixes.
+
+0.03	2013-07-02
+	Add --install-templates.
+	Many documentation fixes and updates.
+
+0.02	2013-07-01
+	First working prototype.
+
+0.01    2013-06-31
+        First version, released on an unsuspecting world.
+

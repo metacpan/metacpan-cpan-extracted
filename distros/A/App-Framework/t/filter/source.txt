@@ -1,0 +1,44 @@
+#============================================================================================
+# USES
+#============================================================================================
+use File::Path ;
+use File::Basename ;
+use File::Spec ;
+use App::Framework::Core ;
+
+
+#============================================================================================
+# OBJECT HIERARCHY
+#============================================================================================
+use App::Framework::Extension ;
+our @ISA ;  // c++ type comment 
+
+#============================================================================================
+# GLOBALS
+#============================================================================================
+
+Revision history for App-Framework
+
+//0.07    Sat Mar 14 20:33:00 2009
+//        Bug fix: Corrected Sql initialisation (was claiming DBI not installed)
+//        Added: -man-dev option to display app developer man pages
+//        Added: allow 'dev:' prefix to make option only show in developer man pages
+//        Added: Sql support for 'group by'
+
+0.06    Thu Mar 05 15:09:00 2009 // c++ type comment
+        Updated script pod. Modified so that scripts can be used without DBI. Corrected build fail when DBI not installed.
+
+0.05    Wed Mar 04 13:29:00 2009
+        Corrected MANIFEST problem that caused t/04-Args.t test to fail.
+
+0.04    Wed Mar 04 08:07:00 2009
+        Various bug fixes.
+
+0.03    Tue Mar 03 15:55:56 2009  // c++ type comment
+        Better testing, better documentation, various bug fixes.
+
+0.02    Fri Feb 27 08:38:56 2009
+        Fixed MANIFEST.SKIP (and MANIFEST).
+
+0.01    Thu Feb 26 15:51:56 2009
+        First version, testing distribution files are correct. This version has very limited testing.

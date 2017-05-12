@@ -1,0 +1,66 @@
+=head1 Alien::TinyCC
+
+A Perl Alien module for the Tiny C Compiler. This Perl distribution
+distributes and contains the build steps necessary to ensure that the
+Tiny C Compiler is available on your system.
+
+=head1 INSTALLATION
+
+I assume that if you are installing this module, you are doing so from
+CPAN. The usual Module::Build incantation shold work:
+
+ perl Build.PL
+ ./Build
+ ./Build test
+ ./Build install
+
+On Windows, you should omit the C<./> part of the C<Build> commands.
+
+=head1 DEVELOPMENT
+
+If you want to work on Alien::TCC itself, you will need to work with a clone of
+this repository, as well as a clone of the tinycc subrepository. To set
+everything up, create a F<Build> file and run the C<devsetup> command:
+
+ perl Build.PL
+ ./Build devsetup
+
+The C<devsetup> command is essentially equivalent to
+
+ git submodule init
+ git submodule update
+ cp git-pre-commit-hook.pl .git/hooks/pre-commit
+
+The last bit, the commit hook, helps me keep the Changes file up-to-date. :-)
+
+Also, C<devclean> and C<devrealclean> will restore the contents of F<src/> to 
+their original state, and should be used instead of Build command C<clean> and 
+C<realclean>.
+
+=head1 LICENSE, COPYRIGHT
+
+This distribution distributes the source for the Tiny C Compiler project
+under the src/ directory, for which the following notice is in effect:
+
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+
+The Alien::TCC Perl module itself is distributed under the same terms as
+Perl itself.	
+
+=cut

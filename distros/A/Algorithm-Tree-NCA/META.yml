@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Algorithm-Tree-NCA
+version:             0.02
+abstract:            Constant time retrieval of I<Nearest Common Ancestor>
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Mats Kindahl <matkin@acm.org>

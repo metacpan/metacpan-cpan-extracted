@@ -1,0 +1,53 @@
+#!/usr/bin/env perl
+#
+# Cover My Ass Mode
+#
+
+use strict;
+use warnings;
+use Mac::FSEvents;
+use IO::Select;
+use Getopt::Long;
+
+my ($repo_dir, $watch_dir);
+my $latency = 5.0;
+my $ok = GetOptions(
+  "repo=s"    => \$repo_dir,
+  "watch=s"   => \$watch_dir,
+  "latency=i" => \$latency,
+);
+
+die "Usage: cacm --repo=dir_for_git_repo --watch=dir_to_watch\n" unless $repo_dir && $watch_dir;
+die "Fatal: dir to watch '$watch_dir' must be a directory.\n"    unless -d $watch_dir;
+
+$ENV{GIT_DIR} = $repo_dir;
+
+unless (-d $repo_dir) {
+  system('git', 'init', '--bare');
+  die "Error: $!\n" if $?;
+}
+
+my $fs = Mac::FSEvents->new( {
+    path    => $watch_dir, # required, the path to watch
+    latency => $latency,   # optional, time to delay before returning events
+} );
+
+$ENV{GIT_WORK_TREE} = $watch_dir;
+
+my $fh = $fs->watch;
+my $sel = IO::Select->new($fh);
+
+print STDERR "Watching '$watch_dir' (latency $)\n";
+while ($sel->can_read) {
+  commit_files();
+  $fs->read_events;
+}
+
+$fs->stop;
+
+
+sub commit_files {
+  system('git', 'add', '--all');
+  system('git', 'commit', '-s', '-m', 'Automatic commit at '.localtime());
+}
+

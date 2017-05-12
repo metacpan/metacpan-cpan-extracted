@@ -1,0 +1,30 @@
+---
+abstract: 'SASL Authentication framework'
+author:
+  - 'Graham Barr <gbarr@pobox.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Authen-SASL
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  GSSAPI: 0
+requires:
+  Digest::HMAC_MD5: 0
+  Digest::MD5: 0
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/gbarr/perl-authen-sasl
+version: 2.16

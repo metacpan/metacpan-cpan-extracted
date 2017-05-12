@@ -1,0 +1,16 @@
+Revision history for Perl extension AnyEvent::POE_Reference.
+
+0.11 Mon Feb 28 19:31:59 CET 2011
+     - FreezeThaw didn't pass the test
+     - skip in tests was not used correctly
+
+0.10 Sat Feb 19 13:28:40 CET 2011
+     - Bogus test corrected
+
+0.9  Fri Feb 18 10:17:59 CET 2011
+     - Tests are done
+     - No remaining bugs
+     - Wait a little before bumping to 1.0... :)
+
+0.01  Thu Feb 17 15:21:34 2011
+      First version.

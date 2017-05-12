@@ -1,0 +1,18 @@
+0.41
+  Modification of t/util.t to make it more compatible with perl 5.6 -- Some of the
+  tests failed because I forgot that the special form for opening a string as
+  a file handle was only recently introduced in 5.8
+0.39
+  Umm. I accidently included duplicate information from two projects in the last push.
+  This version has an improved version of the rabin.pl that allows (requires, actually)
+  you to pass it a glob pattern before the directories it will scan.  Much better
+  reporting, as well.
+0.38:
+  Speed up the next method a little by reducing the number of times it copies its internal
+  buffer.  I've also added a script ('rabin.pl') that demonstrates how to use
+  Algorithm::RabinKarp with multiple files.  Patches welcome and desired.
+
+0.37:
+  Well, it looks like I messed up the Build.PL file.  Making an incremental release to attempt
+  to make it possible to build using the Build.PL, and also reduce the minimum requirements to
+  install this module.

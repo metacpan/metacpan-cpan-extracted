@@ -1,0 +1,20 @@
+Revision history for App-mirai
+
+0.003     2015-02-01 16:47:05+00:00 Europe/London
+	New features:
+	* Installs mirai-trace, a version of the examples/simple-trace.pl script
+	which allows tracing an existing script:
+	 mirai-trace somescript.pl
+
+	Bug fixes:
+	* Support Future 0.30 and the ->_new_convergent method (previously was
+	_new_dependent)
+
+0.002     2014-09-02 02:07:05+01:00 Europe/London
+	No new features.
+
+	Dependency fixes:
+	* Tickit::Async
+
+0.001     2014-08-31 23:22:32+01:00 Europe/London
+	Initial CPAN release

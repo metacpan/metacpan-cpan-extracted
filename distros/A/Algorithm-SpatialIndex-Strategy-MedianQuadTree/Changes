@@ -1,0 +1,7 @@
+Revision history for Perl extension Algorithm::SpatialIndex::Strategy::MedianQuadTree
+
+0.02   Fri Mar 11 20:00:00 CEST 2011
+  - Fix for failing tests
+
+0.01   Sat Jan 22 20:00:00 CEST 2011
+  - First release.

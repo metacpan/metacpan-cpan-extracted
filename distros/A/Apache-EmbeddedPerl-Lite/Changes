@@ -1,0 +1,23 @@
+Revision history for Perl extension Apache::EmbeddedPerl::Lite
+
+0.06  Mon Jan 27 20:50:13 PST 2014
+	correct corrupted test scripts
+
+0.05  Mon Jan 27 12:47:58 PST 2014
+	correct typo in Makefile.pm
+
+0.04  Mon Jan 27 11:56:19 PST 2014
+	clean up typos in /testfiles/*
+	modify Makefile.PL to bypass missing 'pod2text'
+
+0.03  Sun May 19 20:23:19 PDT 2013
+	revised to eval "perl" in one operation
+	added "diagnostics" to eval when it is active in the module
+	added package statement to put eval'd perl into
+	__PACKAGE__::anon::scriptname
+
+0.02  Mon May 13 18:26:42 PDT 2013
+	pass @args to 'embedded'
+
+0.01  Sat May 11 16:19:38 PDT 2013
+	first release

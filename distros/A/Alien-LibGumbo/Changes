@@ -1,0 +1,8 @@
+0.04 2016-03-05
+
+  - slight correct to configure_requires list
+    https://github.com/ruz/Alien-LibGumbo/pull/4
+
+0.03 2015-12-28
+
+  - update to libgumbo 0.10.1

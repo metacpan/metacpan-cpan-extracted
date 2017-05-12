@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-group
+# ABSTRACT: Return a list of changesets bound to the same issue
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    changeset_group
+    changeset_merged_to
+    history
+    history_status
+);
+
+my $changeset = shift || current_branch();
+my $group = changeset_group($changeset);
+printf( "$_ - %s\n", summary($_) ) for @$group;
+
+sub summary {
+    my $cs        = shift;
+    my $merged_to = changeset_merged_to($cs);
+    return $merged_to if $merged_to;
+
+    my $history = history($cs);
+    my $status  = history_status($history);
+    return '' if not $status;
+    return "($status)";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-group - Return a list of changesets bound to the same issue
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

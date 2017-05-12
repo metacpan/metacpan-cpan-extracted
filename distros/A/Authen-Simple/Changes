@@ -1,0 +1,19 @@
+Revision history for Perl extension Authen::Simple
+
+0.5 2012-04-19
+    - Prompt browser to re-authenticate upon unsuccessful authentication 
+      when used as a mod_perl Authen Handler. (RT #26464)
+
+0.4 2006-01-13
+    - Documented supported password formats
+    - Added reference to Authen::Simple::DBI and Authen::Simple::CDBI
+
+0.3 2006-01-12
+    - Added Authen::Simple::Password
+    - Added reference to Authen::Simple::NIS
+
+0.2 2006-01-04
+    - Added tests
+
+0.1 2006-01-03
+    - First release

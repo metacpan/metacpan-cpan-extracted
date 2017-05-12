@@ -1,0 +1,39 @@
+Primary Author
+--------------
+
+  Steve Kemp <steve [at] steve.org.uk>
+
+
+Contributions
+-------------
+
+  Listed alphabetically by surname.
+
+  Dave Baird
+   - Contributed fixes to allow policy isolation.
+   - Added test-cases to validate the same.
+
+  Jean Baptiste
+   - Contributed Microsoft Windows support, under Strawberry Perl.
+   - Added --version option.
+   - Added OS-name to meta-info for a host.
+   - Useful feedback :)
+
+  Raphael Daum
+   - Reported issue with `hostname` not outputing FQDN in all cases.
+   - Added IP address(es) to the meta-info for a host.
+
+  Kristian Lyngstol
+   - Diagnosed issue with template expansion causing file comparisions to always fail.
+
+  Jason J. Rodrigues
+   - Added --no-log option.  (Obsolete in 2.x).
+
+  CSILLAG Tamas
+   - Implemented --agent.
+   - Implemented strict/non-strict SSL-checking.  (Disable with --mitmok).
+   - Implemented UserCreate for linux/freebsd/openbsd
+   - Implemented the MOJO transport.
+   - Suggested the slaughter inclusion facilities.
+   - Fixed Debian packages to include (new) ::API:: modules.
+   - Much useful advice, and suggestions, in the transition from 1.x to 2.x.

@@ -1,0 +1,38 @@
+ dpkg-buildpackage -rfakeroot -D -us -uc
+dpkg-buildpackage: set CFLAGS to default value: -g -O2
+dpkg-buildpackage: set CPPFLAGS to default value: 
+dpkg-buildpackage: set LDFLAGS to default value: -Wl,-Bsymbolic-functions
+dpkg-buildpackage: set FFLAGS to default value: -g -O2
+dpkg-buildpackage: set CXXFLAGS to default value: -g -O2
+dpkg-buildpackage: source package qux
+dpkg-buildpackage: source version 1.0-1
+dpkg-buildpackage: source changed by Esteban Manchado Velázquez <estebanm@estebanm-desktop>
+dpkg-buildpackage: host architecture i386
+ fakeroot debian/rules clean
+dh_testdir
+dh_testroot
+dh_clean
+ dpkg-source -b equivs.L7nGZG
+dpkg-source: warning: source directory 'equivs.L7nGZG' is not <sourcepackage>-<upstreamversion> 'qux-1.0'
+dpkg-source: info: using source format `1.0'
+dpkg-source: info: building qux in qux_1.0-1.tar.gz
+dpkg-source: info: building qux in qux_1.0-1.dsc
+ debian/rules build
+make: Nothing to be done for `build'.
+ fakeroot debian/rules binary
+dh_testdir
+dh_testroot
+dh_clean -k
+dh_testdir
+dh_testroot
+dh_install
+dh_installdocs
+dh_installchangelogs
+dh_compress
+dh_fixperms
+dh_installdeb
+dh_gencontrol
+dpkg-gencontrol: error: current host architecture 'i386' does not appear in package's architecture list (amd64)
+dh_gencontrol: command returned error code 65280
+make: *** [binary-arch] Error 1
+dpkg-buildpackage: failure: fakeroot debian/rules binary gave error exit status 2

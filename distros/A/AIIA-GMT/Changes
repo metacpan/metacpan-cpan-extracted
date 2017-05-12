@@ -1,0 +1,6 @@
+Revision history for Perl extension AIIA::GMT.
+
+0.01  Sat Jan 26 22:45:35 2008
+	- original version; created by h2xs 1.23 with options
+		-cfn AIIA::GMT
+

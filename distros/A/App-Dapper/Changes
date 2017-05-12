@@ -1,0 +1,66 @@
+Revision history for App-Dapper
+
+0.18    2014-05-02
+        Adopted the TT3 mini-language as provided by Template::Alloy
+        Added urlpattern and extension variables to site and page definitions
+        Added consistent handling of urlpattern, and output file extensions
+
+0.17    2014-04-15
+        Clarified JSON Perl module dependency in Makefile.PL
+
+0.16    2014-04-15
+        Added README content for config files, source files, and layouts.
+        Added 'json' filter for dumping Liquid variables to JSON for debug.
+
+0.15    2014-04-07
+        Added command-line option to specify web server port number.
+        Dapper now works with Perl installations as old as v5.8.
+
+0.14    2014-04-02
+        Added deploy instructions to README and a getting started guide.
+        Changed MIN_PERL_VERSION from v-string to string to eliminate NetBSD errors.
+
+0.13    2014-04-27
+        Added explicit hash derefs in attempt to support Perl 5.19.{8-10}.
+
+0.12    2014-04-26
+        Added explicit hash deref to avoid experimental warning in Perl 5.19.
+
+0.11    2014-04-26
+        Added auto-reload of files while serving local webserver.
+        Changed format of post IDs from their URL to a global incrementing integer.
+
+0.10    2014-03-05
+        Improved README narrative.
+        Watch routine now watches everything except contents of the _output dir.
+
+0.09    2014-02-20
+        Added 5.14.0 minimum perl version requirement.
+
+0.08    2014-02-20
+        Eliminated some tests (init, build) that were causing CI failures.
+
+0.07    2014-02-20
+        Added Getopt::Mixed to list of build options.
+
+0.06    2014-02-20
+        Addded DateTime::Format::XSD dependency to resolve test errors.
+
+0.05    2014-02-19
+        Updated Makefile.PL dependencies to resolve errors for cpantesters.org.
+
+0.04    2014-02-18
+        Removed unicode characters from App::Dapper pod.
+        Added references to source and issue tracking on github.
+
+0.03    2014-02-18
+        Added significant documentation to App::Dapper and bin/dapper.
+        Simplified default _config.yml file.
+
+0.02    2014-02-17
+        Added documentation link from App::Dapper to bin/dapper.
+        Fixed FreeBSD testing error as reported by cpantesters.org.
+
+0.01    2014-02-01
+        First version.
+

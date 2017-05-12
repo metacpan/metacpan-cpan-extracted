@@ -1,0 +1,13 @@
+use inc::Module::Install;
+name 'AnyEvent-DBI-Abstract';
+all_from 'lib/AnyEvent/DBI/Abstract.pm';
+readme_from 'lib/AnyEvent/DBI/Abstract.pm';
+requires 'parent';
+requires 'AnyEvent::DBI';
+requires 'SQL::Abstract';
+build_requires 'Test::More';
+test_requires 'Test::Requires';
+auto_include_deps;
+author_tests('xt');
+auto_set_repository;
+WriteAll;

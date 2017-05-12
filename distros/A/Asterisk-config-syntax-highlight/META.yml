@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Asterisk-config-syntax-highlight
+version:             0.5
+abstract:            highlight Asterisk config syntax
+license:             perl
+author:              
+    - XuHao <loveme1314@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Class::Std::Utils:             0
+    Syntax::Highlight::Engine::Simple: 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

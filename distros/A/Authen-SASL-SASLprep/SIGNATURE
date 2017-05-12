@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 ec9b06ea31aafa75fa7ad99f6de0385540ae162c Build.PL
+SHA1 0790ba75a720923feacc514acd9a455fe0d4e4da Changes
+SHA1 b14d6fc74f523068501342f52f3d442883844bdb LICENSE
+SHA1 f54f9f84ccd6a094ee82023cffb0b89bf2041037 MANIFEST
+SHA1 4480d8e057f9b5eea74cec9f5ffa6d0cb72a5b85 META.json
+SHA1 b9430ec06663f6d5825b29e24fad0168a949f7fb META.yml
+SHA1 79ac5eeb7fada249eb2d847851ee47acc666aeee Makefile.PL
+SHA1 6ca158d831c98cf7ef92b5bc936edf09aa594b59 README
+SHA1 f4a634691d5fb13c57f084e4ec7f8b6f46f14b2b lib/Authen/SASL/SASLprep.pm
+SHA1 79e57b2e7266e84a6cea9d1a13c46373262e6adb t/00use.t
+SHA1 0ed7a7c687eafb552ddd99f2f99268fd613cda00 t/10pod.t
+SHA1 8f5a4f1ff1108a5169d651a71a52ea2543ec1419 t/11pod_cover.t
+SHA1 d5284f2776c5e53f25c66b7d218b0e03af676138 t/saslprep.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBCAAGBQJX6AJSAAoJEIS+srvgrWBm8nMH/2UKXBoR/jtNg/yPiZu0i3pw
+gpew+IymrPXeQLno5fZ0YsnnjH9SnOpK1uYNzGCUCld87yXEiC/K8Pmd+ZXpqgHx
+ZnbpKEtI0ktRpSDt5jTa1H1uCdFQW5AqMh020EE3scEarq6XmESGNhKKxmzQ8B4Z
+GUgpwsgKLVMuf2dfiPjQP+0mqOKWfh5vlrpzzQBQmVIfQHd4zpb1SdHf3QY5O/KY
+MTVPrwcQGbT6+3bmhtZVrK6kkIcq+sXZ1pC3+mUUmf+21Lqw5FB/7h2iAfFF6saQ
+J7vz3Cja8FlNqKtfYXbH8LBx8iVlKKCELI0Vla+Vb0kLhlSRTQgG41WM5YUvL2k=
+=FLVe
+-----END PGP SIGNATURE-----

@@ -1,0 +1,65 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use App::htmlcat;
+
+App::htmlcat->new(@ARGV)->run;
+
+__END__
+
+=head1 NAME
+
+htmlcat - stdin to your browser
+
+=head1 SYNOPSIS
+
+   $ command-that-prints-to-stdout | htmlcat --exec=open
+
+=head1 DESCRIPTION
+
+C<htmlcat> renders stdin in HTML, by establishing a temporary HTTP server.
+
+Requires modern browser that recognize Server-Sent Events <http://dev.w3.org/html5/eventsource/>.
+
+=head1 FEATURES
+
+=over 4
+
+=item Highlights ANSI code in HTML
+
+=item Real-time stdin stream to browsers
+
+=item Support for multiple clients
+
+=back
+
+=head1 OPTION
+
+=over 4
+
+=item --exec=I<command>
+
+Invokes I<command> with the URL C<htmlcat> listens as the only argument.
+Typically a command which opens a browser would be useful.
+
+=item --host=I<host>, --port=I<port>
+
+Specifies the host or port to listen. Actually they are
+handled by L<Plack::Runner>, so C<htmlcat> does nothing with them.
+
+=back
+
+=head1 AUTHOR
+
+motemen E<lt>motemen@gmail.comE<gt>
+
+=head1 THANKS TO
+
+mala, for Server-sent events implementation
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

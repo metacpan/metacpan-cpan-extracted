@@ -1,0 +1,32 @@
+---
+abstract: 'Crontab in AnyEvent! provide an interface to register event on specified time.'
+author:
+  - 'Cornelius, C<< <cornelius.howl_at_gmail.com> >>'
+  - 'Cornelius <cornelius.howl_at_gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.03'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-Cron
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  AnyEvent: 0
+  DateTime: 0
+  DateTime::Event::Cron: 0
+  Moose: 0
+  Try::Tiny: 0
+  perl: 5.12.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

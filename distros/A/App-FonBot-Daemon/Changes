@@ -1,0 +1,22 @@
+Revision history for Perl extension App::FonBot::Daemon.
+
+0.001 2015-05-02T23:13+03:00
+ - First "stable" release
+ - Add Email plugin
+ - Fix some warnings
+ - Fix $httpd_port not having any effect
+ - Fix resources in Makefile.PL
+
+0.000_5 2014-09-21T00:33+03:00
+ - Add IRC to resources
+
+0.000_4 2014-08-31T01:05+03:00
+ - Update Changes to follow CPAN::Changes::Spec
+ - Remove test boilerplate (tests are still not included)
+ - Reindent code and reformat Makefile.PL
+ - Enable SIGN, move to a git repository
+ - Changed license (in META) to open_source, as AGPL_3 requires META version 2
+
+0.000_3 2013-08-12
+0.000_2 2013-08-11
+0.000_1 2013-08-11

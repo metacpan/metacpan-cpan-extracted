@@ -1,0 +1,11 @@
+--- Session/Lock/File.pm	2004-01-23 16:29:20.000000000 +0100
++++ Session/Lock/File.pm-patched	2004-01-23 16:29:13.000000000 +0100
+@@ -133,7 +133,7 @@
+     my @files = readdir(DIR);
+     foreach my $file (@files) {
+         if ($file =~ /^Apache-Session.*\.lock$/) {
+-            if ((stat($dir.'/'.$file))[8] - $now >= $time) {
++            if ($now - (stat($dir.'/'.$file))[8] >= $time) {
+                 open(FH, "+>$dir/".$file) || next;
+                 flock(FH, LOCK_EX) || next;
+                 unlink($dir.'/'.$file) || next;

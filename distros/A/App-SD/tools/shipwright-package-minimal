@@ -1,0 +1,58 @@
+export TODAY=`date +%Y-%m-%d`
+export REPO=${HOME}/shipwright-sd-min-${TODAY}
+export GIT_PATH="git:file://$REPO"
+export MIN_PERL=5.008006
+export SKIP="--skip=Pod::Simple,Module::Signature,Test::Pod,Test::Pod::Coverage,Test::Distribution,Pod::Readme,Archive::Tar,HTML::Lint,Encode,Date::Calc,Test::Cukes,Quantum::Superpositions,Test::Memory::Cycle,Text::Greeking,Test::HTTP::Server::Simple,Test::WWW::Mechanize,Module::Build,Test::Warn,Test::MockTime,Test::MockModule,Test::MockObject,Test::Warn,Compress::Raw::Bzip2,Digest::SHA1,Compress::Raw::Zlib,Test::Script::Run,Test::Exception,Test::Simple,Test::More,Compress::Zlib,Digest::SHA"
+export IMPORT="shipwright import --min-perl-version=$MIN_PERL $SKIP -r $GIT_PATH --log-file - --log-level debug --skip-all-recommends"
+rm -rf $REPO
+mkdir $REPO
+shipwright create -r $GIT_PATH
+# Optional deps we still want
+$IMPORT \
+ cpan:Digest::SHA::PurePerl \
+ cpan:App::SD
+
+cd /tmp
+shipwright maintain -r $GIT_PATH --update-order
+cd /tmp
+
+git clone file://${REPO} hack-$$
+cd /tmp/hack-$$/sources/cpan-Lingua-EN-Inflect/vendor
+git mv Build.pl Build.PL
+cd /tmp/hack-$$/scripts/cpan-DateTime-Format-Natural
+perl -pi -e 's/Build test/Build/g' build
+
+cd /tmp/hack-$$/scripts/cpan-Net-DNS
+perl -pi -e 's/make:/make: COMMAND_MODE=unix2003/' build
+git commit -m 'hack COMMAND_MODE to make Net-DNS happy on mac' build
+
+cd /tmp/hack-$$/scripts/cpan-Params-Util
+perl -pi -e 's/Makefile.PL/Makefile.PL -pm/g' build
+
+cd /tmp/hack-$$/scripts/cpan-Params-Validate
+perl -pi -e 's/Build.PL/Build.PL --pp/g' build
+
+cd /tmp/hack-$$/scripts/cpan-DateTime
+perl -pi -e 's/Makefile.PL/Makefile.PL --pm/g' build
+
+cd /tmp/hack-$$/scripts/cpan-List-MoreUtils
+perl -pi -e 's/Makefile.PL/Makefile.PL -pm/g' build
+
+git config push.default matching
+git commit -m 'Made DTFN not run its tests which add a slew of deps' -a
+git push
+cd /tmp/
+rm -rf hack-$$
+
+git clone file://$REPO /tmp/sdex-$$
+cd /tmp/sdex-$$ 
+rm -rf .git
+
+echo "# one argument per line
+--skip-man-pages
+--skip-test
+--install-base=~/sd
+" > __default_builder_options 
+./bin/shipwright-utility --generate-tar-file /tmp/sd-image-${TODAY}.bin
+
+rm -rf /tmp/sdex-$$

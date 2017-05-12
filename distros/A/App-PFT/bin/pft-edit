@@ -1,0 +1,695 @@
+#!/usr/bin/perl
+#
+# Copyright 2014-2016 - Giovanni Simoni
+#
+# This file is part of PFT.
+#
+# PFT is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# PFT is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with PFT.  If not, see <http://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+pft edit - Edit an entry
+
+=head1 SYNOPSYS
+
+    pft edit -P [options] title of your page
+    pft edit -B [options] title of your blog page
+    pft edit -M [options] title of your month page
+    pft edit -T [options] title of your tag page
+
+=head1 DESCRIPTION
+
+The C<pft edit> command allows to conveniently edit a text entry in a
+I<PFT> site. It takes care of creating a skeleton for the new entries, to
+position them correctly within your I<PFT> site, and to maintain their
+position consistent with the type of content.
+
+All entries are stored under the C<ROOT/content> directory, where C<ROOT>
+is the base path of your I<PFT> site. Each entry has the same format:
+a text file encoded as by locale, composed by a YAML header concatenated
+with Markdown text (more details later in this document).
+
+There can be different kind of entries:
+
+=over
+
+=item Regular Pages
+
+Regular pages do not declare a date in their header. They get positioned
+in C<ROOT/content/pages>. Their file name depends on their title.
+
+Example: a page entitled I<Hello World> gets
+
+    ROOT/content/pages/hello-world
+
+=item Blog pages
+
+Blog pages declare a full date (year, month and day) in their header. They
+get positioned in the C<ROOT/content/blog/YYYY-MM> directory (where
+C<YYYY> and C<MM> correspond to the declared year and month respectively).
+Their file name starts with a C<DD-> prefix, where C<DD> corresponds to
+the declared day. The remaining part of the file name depends on their
+title.
+
+Example: an entry entitled I<Hello World> edited the 12th of September 2015
+gets
+
+    ROOT/content/blog/2015-09/12-hello-world
+
+=item Month pages
+
+Month pages are meant as C<entries summarizing a whole month>. They are
+like blog pages, but the date defined in their headers lack of the day
+part (it is replaced by C<*>). They are stored as
+C<ROOT/content/blog/YYYY-MM.month> (where C<YYYY> and C<MM> represent the
+declared year and month).
+
+Example: the month page for September 2015 gets
+
+    ROOT/content/blog/2016-09.month
+
+=item Tag pages
+
+All pages can optionally declare one or more tags. A tag can optionally be
+associated to a tag page.
+
+For example, if your site has have a number of entries about cuisine, some
+of them might be tagged with the C<chicken> tag. You may want to have a
+tag page entitled C<chicken>, where you give a description of what
+I<chicken> is (just in case someone does not know).
+
+Tag pages are stored in C<ROOT/content/tags>, and their file name depends
+on the tag title.
+
+Example: a page containing a description of the tag I<chicken> gets
+
+    ROOT/content/tags/chicken
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item -P
+
+Edit a page
+
+A title is mandatory.
+
+=item -B
+
+Edit a blog page
+
+If no title is specified, it defaults to C<today>.
+
+=item -M
+
+Edit a month page
+
+The title is optional.
+
+=item -T
+
+Edit a tag page
+
+A title is mandatory.
+
+=item --year=<y> | -y <y>
+
+Defines a year for the edited entry. Implies -B unless -M is set.
+
+This flag cannot be used if -P or -T are specified. It gets honored only
+when generating a header for the entry, that is if the file does not exist
+yet.
+
+=item --month=<m> | -m <m>
+
+Defines a month for the edited entry. Implies -B unless -M is set.
+
+This flag cannot be used if -P or -T are specified. It gets honored only
+when generating a header for the entry, that is if the file does not exist
+yet.
+
+=item --day=<d> | -d <d>
+
+Defines a day for the edited entry. Implies -B unless -M is set.
+
+This flag cannot be used if -P or -T are specified. It gets honored only
+when generating a header for the entry, that is if the file does not exist
+yet.
+
+=item --author=<name> | -a <name>
+
+Defines the author for the entry.
+
+This flag gets honored only when generating a header for the entry, that
+is if the file does not exist yet.
+
+=item --tag=<tag> | -t <tag>
+
+This flag gets honored only when generating a header for the entry, that
+is if the file does not exist yet.
+
+=item --resume | -r
+
+Resume editing of a blog entry.
+
+This option implies C<-B>. The blog entry resumed for editing corresponds by
+default to the latest in chronological order.
+
+A date can be specified via the C<-y>, C<-m> and C<-d> options. If the date
+is only partially specified, that is not all of C<-y>, C<-m> and C<-d> are
+provided, the missing bits get completed with the current date.  If no date
+is specified, C<-r> is equivalent to C<--back 0>.
+
+If more then one entry exists for the specified date, the command fails and
+the user is explicitly required to specify a selection via the C<--select>
+option.
+
+=item --back=<count> | -b <count>
+
+Resume editing an old entry. The supplied parameter defines how many days
+we should go back in history since the last day we have an entry for (0
+means the most recent day, 1 means the second to last).
+
+=item --editor <command>
+
+Specify an editor to use.
+
+The editor can be specified by name (e.g. C<vim>) or as a shell command,
+where C<%s> is replaced with the file name (e.g. C<vim [options] %s>).
+
+This flag overrides the C<$EDITOR> environment variable and the
+C<system.editor> setting in the main configuration file.
+
+=item --stdin
+
+Retrieve content from stdin.
+
+The content file is selected according to the given options, and the content is
+retrieved from standard input.  If the file does exist it gets created with a
+reasonable header. If the file exists but the header is corrupted, the whole
+file gets replaced.  If the file exists and the header is well formed, the
+header is maintained and the remaining part of the file is replaced with content
+retrieved from standard input.
+
+If this option is in use the C<--editor> gets ignored.
+
+This mode handles input and output encoding according to the current locale,
+under the assumption that your content is B<plain text>.
+
+=item --append
+
+As for C<--stdin>, but append content instead of replacing it.
+
+If the content file does not exist or is empty it will be created with a
+reasonable header. Otherwise the content will be appended to it. If the header
+is corrupted the command will issue a warning, but no further action will be
+taken.
+
+=item --select=<id>
+
+Select a certain entry by index, in case of ambiguity.
+
+This option applies when multiple files are matching the parameters for file
+selection, and a choice is required.  In these situations, if C<--select> is
+not provided the C<pft edit> command will fail, and the use of C<--select>
+will be explicitly requested by an error message.
+
+=item --raw
+
+This option is useful only if C<--stdin> or C<--append> are specified.
+
+If the C<--raw> option is used the header is not maintained: C<--stdin> will
+behave like the C<cat E<gt> $content_file> unix command line, and C<--append>
+will behave like C<cat E<gt>E<gt> $content_file>.
+
+=item --help | -h
+
+Shows this help.
+
+=back
+
+=head2 Editing
+
+Content entries are in encoded text format.
+
+The expected encoding for the file corresponds to the C<locale> encoding.
+On most modern Unix systems this is I<UTF-8>, but you can use the
+C<locale> command in order to figure it out.
+
+Each file starts with a header in I<YAML> format. The header is followed
+by a line with three dashes (C<--->) which marks the beginning of the
+actual content. The content will be parsed as I<Markdown> when the site is
+compiled.
+
+The header of a content entry is created automatically by C<pft edit> when
+the accessed entry does not exist. The file gets then opened with a text
+editor. The C<$EDITOR> environment variable will be honored unless an
+editor is defined in the C<pft.yaml> configuration file (see the manual of
+C<pft init> for further information). You may also specify a different
+editor using the C<--editor> command line option.
+
+After the editor is closed a warning will be issued if the header is
+invalid. If the file completely empty (as in I<zero bytes>) it will be
+removed from the filesystem. If the header is valid but it is not
+consistent with the position in the filesystem (e.g. the date was manually
+changed) the file position is updated to be consistent.
+
+=head2 The content header
+
+Each entry starts with a header in YAML format. The header defines the
+properties of the entries. Valid properties with their descriptions follow
+in this section.
+
+=over
+
+=item I<Author>
+
+The author of the entry. Any string can be entered as value. The default
+value of it is taken from the C<pft.yaml> configuration file.
+
+=item I<Date>
+
+The date associated with the entry. This field is required only for blog
+entries. Changing the value while editing with C<pft edit> will result to
+the position in the filesystem to be adapted consistently.
+
+=item I<Options>
+
+Some optional properties of the entry:
+
+=over
+
+=item I<hide>
+
+If set to 1 the entry is going to be hidden.
+
+This option is meant as a way to temporarily hide an entry. Currently it is
+somewhat broken, so its use is not recommended.
+
+=item I<template>
+
+Each page can specify a different template to use by means of this field.
+It is by default defined as C<~> (in YAML that is I<null>) meaning that the
+page will use the global template as defined in the C<pft.yaml>
+configuration file.
+
+=back
+
+=item I<Slug>
+
+The slug determines how the file will be named.
+
+By default it is derived by removing non-word characters from the I<Title>
+field. The purpose is having a reasonable file name, which is both
+convenient and I<healty> to handle with command line programs (escape
+sequences get removed, etc).
+
+=item I<Tags>
+
+A list of tags for the entry.
+
+Tags can be specified one per line with a leading C<->:
+
+    Tags:
+    - chicken
+    - tomato
+
+=item I<Title>
+
+The title of the entry, in human readable form.
+
+=back
+
+=head2 The content text
+
+Upon compilation the content text is parsed as Markdown and gets
+translated into HTML (see the manual of C<pft make> for additional
+details). In this phase some special symbols are recognized:  HTML tags
+such as C<E<lt>aE<gt>> and C<E<lt>imgE<gt>> are analyzed in search of
+links to internal resources, like pictures or other pages within your
+I<PFT> site.
+
+This section contains a reference manual for the recognized special links.
+Since Markdown is a super-set of HTML, direct HTML can be supplied in the
+text too, so both Markdown and HTML syntaxes will be mentioned in the
+following description.
+
+The recognized syntax for special links is:
+
+    :kind:param/param/...
+
+Follows a list of valid C<kind> keywords. The meaning of each C<param>
+depends on the specified C<kind>. Separation is done with the C</> symbol.
+
+=head3 Pictures with C<:pic:path/to/picture.jpg>
+
+Picture reference accept special links in the form
+
+    ![alttext](:pic:filename)
+    <img alt="alttext" src=":pic:filename"/>
+
+This form will be resolved to an HTML link towards a file named named
+I<filename> under the C<I<ROOT>/content/pics> directory.  The name
+provided is used directly for lookup, so it must be complete of file
+extension, if any.  The C</> symbol will work as path separator regardless
+of the operating system.
+
+HTML Example:
+
+    <!-- ROOT/content/pics/test.png -->
+    <img src=":pic:test.png"/>
+
+Markdown Example:
+
+    <!-- ROOT/content/pics/cars/golf.png -->
+    ![](:pic:cars/golf.png)
+
+=head3 URLs:
+
+Regular URLs in C<E<lt>aE<gt>> tags accept the following special
+prefixes:
+
+=over
+
+=item :page:I<pagename>
+
+Resolve the link as the page having identified by C<pagename>.
+
+=item :blog:date/I<yy>/I<mm>/I<dd>/I<slug>
+
+Resolve the link as the blog entry published at date I<yy/mm/dd> and
+having the slug I<slug>.
+
+The I<slug> parameter is optional if only one entry was published in the
+given date. The keyword C<date> can be shortened as C<d>.
+
+=item :blog:back/I<N>
+
+Only valid within a blog entry. The generated link refers to I<N + 1> blog
+entries before the current one. The I<N> parameter is optional, and
+defaults to zero (i.e. previous entry).
+
+Examples:
+
+    <a href=":blog:back/0">     (previous entry)
+
+    <a href=":blog:back">       (equivalently, previous entry)
+
+    <a href=":blog:back/1">     (before previous, two entries ago)
+
+    <a href=":blog:back/5">     (six entries ago)
+
+=item :web:I<service>/I<param>/I<param>/...
+
+Generate an URL which points to a web site or service (e.g. search
+In all other cases the C<--select> flag is silently ignored.
+
+engines, or specialized website) and passes data on the query. A number of
+valid values are supported for the  I<service> argument. The list of
+I<param> arguments depend on the specific service.
+
+Supported services:
+
+=over
+
+=item Duck Duck Go
+
+C<:web:ddg/I<bang>/I<param>/I<param>/...>
+
+Search query on the I<Duck Duck Go> search engine. The first parameter is
+used for Duck Duck Go's Bang syntax, and can be empty in order not to
+use any Bang.
+
+Example: search C<linux howto> on Duck Duck Go:
+
+    :web:ddg//linux/howto
+
+Example: search C<linux howto> with the C<!yt> bang (redirects search
+on I<YouTube>):
+
+    :web:ddg/yt/linux/howto
+
+Example: search C<linux howto> with the C<!so> bang (redirects search
+on I<StackOverflow>):
+
+    :web:ddg/so/linux/howto
+
+=item Manpages
+
+C<:web:man/I<name>>
+
+C<:web:man/I<name>/I<section>>
+
+Point to an online Unix manual page. Manual section can be optionally
+supplied.
+
+Examples:
+
+    :web:man/bash
+
+    :web:man/signal/7
+
+=back
+
+=back
+
+=head2 Examples
+
+=head3 Blog about today:
+
+    pft edit -B
+
+=head3 Blog about today specifying a title
+
+    pft edit -B A lucky day
+
+=head3 Remove the page C<garbage>
+
+    pft edit --editor ':> %s' -P garbage
+
+=head3 Resume the blog entry of the 27th of August 2014
+
+    pft edit -B -r -y2014 -d27 -m Aug
+
+=cut
+
+use strict;
+use warnings;
+
+use App::PFT;
+
+use PFT::Tree;
+use PFT::Date;
+
+use Pod::Usage;
+
+use Encode;
+use Encode::Locale;
+
+use Getopt::Long qw/GetOptionsFromArray/;
+Getopt::Long::Configure qw/bundling/;
+
+my %opts;
+my %datespec;
+
+GetOptions(
+    'year|y=i'      => sub { $datespec{y}  = $_[1] },
+    'month|m=s'     => sub { $datespec{m} = $_[1] },
+    'day|d=i'       => sub { $datespec{d}  = $_[1] },
+    'B!'            => \$opts{B},
+    'M!'            => \$opts{M},
+    'T!'            => \$opts{T},
+    'P!'            => \$opts{P},
+    'author|a=s'    => sub { $opts{author} = $_[1] },
+    'tag|t=s@'      => sub { push @{$opts{tags}}, $_[1] },
+    'resume|r!'     => sub { $opts{back} = 0 },
+    'back=i'        => sub { $opts{back} = int($_[1]) },
+    'editor=s'      => sub { $opts{editor} = $_[1] },
+    'stdin!'        => sub { $opts{stdin} = 1 },
+    'append!'       => sub { $opts{append} = 1 },
+    'select=i'      => sub { $opts{select} = $_[1] },
+    'raw!'          => sub { $opts{raw} = 1 },
+    'help|h!'       => sub {
+        pod2usage
+            -exitval => 1,
+            -verbose => 2,
+            -input => App::PFT::help_of 'edit',
+    },
+) or exit 1;
+
+$opts{B} = 1 if !$opts{M} &&
+    grep defined, $opts{back}, map $datespec{$_}, qw(y m d);
+
+do {
+    my @sel = grep $opts{$_}, qw(B M T P);
+    if (@sel != 1) {
+        local $, = ' -';
+        say STDERR 'Select exactly one mode: -B -M -T -P';
+        exit 2
+    }
+};
+
+my $tree = eval{ PFT::Tree->new } || do {
+    say STDERR $@ =~ s/ at.*$//rs;
+    exit 3
+};
+
+my $conf = eval{ $tree->conf } || do {
+    say STDERR 'Configuration error: ', $@ =~ s/ at.*$//rs;
+    exit 4
+};
+
+my($entry, $hdr);
+
+# The following block defines $entry as the entry we are going to edit.
+# In some of the cases also $hdr will be defined with the corresponding header.
+do {
+    local $SIG{__DIE__} = sub {
+        say STDERR 'Cannot edit entry: ',
+            shift =~ s/ at .*$//rs;
+        exit 6
+    };
+
+    if (defined $opts{back}) {
+        my @entries;
+        if (keys %datespec) {
+            my $date = PFT::Date->from_spec(%datespec);
+            @entries = $tree->content->blog_at($date);
+            die 'none for the specified date ', $date unless @entries;
+        }
+        else {
+            @entries = $tree->content->blog_back($opts{back})
+                or die 'cannot go back by ', $opts{back}, ': ',
+                    $@ =~ s/ at .*$//rs;
+            die "cannot go back $opts{back} days" unless @entries;
+        }
+
+        if (@entries == 1) {
+            $entry = $entries[0];
+        }
+        elsif (exists $opts{select}) {
+            $entry = $entries[$opts{select}];
+            die 'invalid index ', $opts{select} unless defined $entry;
+        }
+        else {
+            say STDERR 'Multiple entries:';
+            for (my $idx = 0; $idx < @entries; $idx ++) {
+                my $hdr = $entries[$idx]->header;
+                say STDERR sprintf("%d: %s",
+                    $idx,
+                    $hdr ? $hdr->title : $_->name
+                )
+            }
+            die 'disambiguate by providing --select=<index>'
+        }
+        $hdr = eval{ $entry->header };  # Might be malformed.
+    } elsif ($opts{T}) {
+        die 'mandatory title' unless @ARGV;
+        $hdr = PFT::Header->new(
+            title => join(' ', @ARGV),
+            author => $conf->{site}{author},
+        );
+        $entry = $tree->content->new_tag($hdr)
+    } else {
+        if ($opts{M}) {
+            $hdr = PFT::Header->new(
+                author => $conf->{site}{author},
+                date => PFT::Date->from_spec(%datespec)->derive(d => undef),
+            )
+        } elsif ($opts{B}) {
+            $hdr = PFT::Header->new(
+                title => join(' ', @ARGV) || 'Today',
+                author => $conf->{site}{author},
+                tags => $opts{tags} || [],
+                date => eval{ PFT::Date->from_spec(%datespec) } || do {
+                    say STDERR 'Invalid date: ', $@ =~ s/ at.*$//rs;
+                },
+            )
+        } elsif ($opts{P}) {
+            die 'mandatory title' unless @ARGV;
+            $hdr = PFT::Header->new(
+                title => join(' ', @ARGV),
+                author => $conf->{site}{author},
+                tags => $opts{tags} || [],
+            )
+        } else { die "unhandled case? This is a bug" }
+
+        $entry = $tree->content->new_entry($hdr)
+    }
+};
+
+sub edit_file {
+    my $path = $entry->path;
+    my $editor = $opts{editor}
+              || $conf->{system}{editor}
+              || $ENV{EDITOR}
+              || do {
+        say STDERR "Cannot infer editor. Try setting env EDITOR or to";
+        say STDERR "define it in configuration file (system -> editor)";
+        exit 5
+    };
+    if ($editor =~ s/(?<!%)%s/$path/g) {
+        system($editor)
+    }
+    else {
+        system($editor, $path)
+    }
+}
+
+sub feed_file {
+    my $mode = '>';
+    my $skip_header = $opts{raw} || !defined $hdr;
+    if ($opts{stdin}) {
+        die "Supported --stdin or --append, not both" if $opts{append};
+    }
+    elsif ($opts{append}) {
+        if (-f $entry->path) {
+            $mode .= '>';
+            $skip_header = 1;
+        }
+    }
+
+    open my $out, "$mode:encoding(locale)", $entry->path
+        or die 'Cannot open ', $entry->path, ": $!";
+    $hdr->dump($out) unless $skip_header;
+    print $out <STDIN>;
+    close $out;
+}
+
+eval {
+    if ($opts{stdin} or $opts{append}) {
+        feed_file
+    }
+    else {
+        edit_file
+    }
+
+    if ($entry->exists) {
+        if ($entry->void) {
+            say STDERR "Removing empty entry at ", $entry->path;
+            $entry->unlink;
+        }
+        else {
+            $entry->make_consistent;
+        }
+    }
+} or $@ && do {
+    say STDERR "After editing: ", $@ =~ s/at .*$//sr;
+    exit 7
+}

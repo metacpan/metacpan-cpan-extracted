@@ -1,0 +1,135 @@
+Revision history for Perl extension Apache::Dispatch
+
+0.15 02.12.2010 18:38 PST
+  - set explicit versions in files so MakeMaker can parse them
+
+0.14 02.08.2010 23:09 PST
+  - set the exit code to 255 if Apache::Bootstrap dependencies missing
+
+0.13 02.06.2010 13:08 PST
+  - require Apache::Bootstrap 0.07 to install on mp1/mp2 properly
+  - fix some of the Makefile.PL logic so that mp2 is checked first
+
+0.12 04.25.2009 16:06 PST
+  - set library versions to $Apache::Dispatch::Util::VERSION so PAUSE
+	can index them correctly
+
+0.11 04.25.2009 14:32 PST
+  - remove t/TEST.PL (it is not needed)
+  - put version in Apache::Dispatch::Util to avoid issue with Apache2::Module
+  - document PerlLoadModule for Dispatch* directives - ideysus@annocpan
+  - reduce unnecessary log verbosity
+  - use Apache::Bootstrap to bootstrap mod_perl version
+
+0.10 01.08.2008
+  - steal the RELEASE doc from Apache::Reload and adapt it - fred
+  - steal the Makefile.PL from A::R, and merge it with our needed custom
+    config directive generation, it detects the version more reliably - fred
+
+0.10_03 12.14.2007
+  - use the :withtestmore feature correctly - fred, thanks to geoff for the spot
+  - use like() instead of ok( $foo =~ m/bar/ ) - fred
+
+0.10_02  07.19.2007
+  - fix the unadvertised feature which allows handling <Location /> - fred
+
+0.10_01  10.23.2006
+  - move common methods to Apache::Dispatch::Util and adjust @ISA for
+	Apache*::Dispatch modules to use common methods via inheritance - fred
+  - deprecated $Apache::Dispatch::DEBUG directive per dev notes in favor
+	of DispatchDebug, which accepts the same arguments, see pod - fred
+  - mod_perl2 compatibility via Apache2::Dispatch - fred
+  - source code now under subversion at 
+	http://svn.sourceforge.net/viewcvs.cgi/apache-dispatch/ - geoff, domm
+  - project moved to http://sourceforge.net/projects/apache-dispatch - geoff
+  * new maintainer: Fred Moyer <fred@redhotpenguin.com>
+  - pass $rc to error handler to allow for finer grained error handling
+  - print "Using/Exiting A::D" only if $debug>=1
+  * new maintainer: Thomas Klausner, domm@zsi.at
+  - fixed DispatchISA bug that kept adding the same classes to @ISA
+    (Barrie Slaymaker)
+  - fixed bug for <Location /> (thanks again to Barrie for the spot)
+  - suggested use of NEXT.pm pseudoclass in AUTOLOAD documentation
+  - added test suite based on Apache::Test (from 2.0)
+  - made invoked method available from pre/post/error handlers
+    (suggested by Tatsuhiko Miyagawa)
+
+0.09  01.31.2001
+  - added DispatchLocation - now .htaccess configs should work (really)
+    thanks yet again to Matt Sergeant
+  - documented DispatchLocation
+  - added DispatchRequire (suggested by Vivek Khera, and many others
+    I can't remember specifically)
+  - documented DispatchRequire
+  - fixed DispatchExtras Post documentation (Vivek Khera)
+  - Apache::Dispatch was added to Joshua Chamas' benchmarking
+    stuff - see ToDo for some results
+
+0.08  12.04.2000
+  - minor documentation additions and fixups
+  - changed all directives so that they can be used from within
+    .htaccess files (suggested by Matt Sergeant)
+  - removed extraneous SERVER_CREATE and SERVER_MERGE sections
+
+0.07  10.26.2000
+  - added support for output filtering
+    thanks to Ken Williams for additional Apache::Filter functionality
+  - added FILTERING section to documentation
+  - added DispatchISA functionality to set parent classes for 
+    dispatched module
+  - added DispatchAUTOLOAD directive to make AUTOLOAD behavior user
+    defined
+  - added AUTOLOAD section to documentation
+  - more, better documentation
+  - modified Apache::ModuleConfig->get() calls
+    thanks to Doug MacEachern for the enlightenment
+  - fixed bug that allowed for duplicate DispatchExtras directives
+  - fixed directive inheritance problems
+  - fixed dispatch_index bug
+  - fixed one minor "my $x if 0" condition
+  - fixed DispatchStat ISA directive to properly recurse all levels
+  - made mod_perl 1.2401 required due to DIR_MERGE memory leak in 
+    mod_perl < 1.24
+
+0.06  8.29.2000
+  - changed call to error_dispatch to pass $r and $@
+  - documented the arguments passed to the extras
+  - log the error if the handler dies and there is no 
+    error_dispatch() routine defined
+
+0.05  8.11.2000
+  - made several changes to _stat - should be more stable now
+  - added AUTOLOAD support
+
+0.04  8.8.2000
+  - fixed bug to allow null DispatchExtras directive
+  - cleaned up Makefile.PL
+  - borrowed from Apache::StatINC and added DispatchStat 
+    directive (suggested by Matt Sergeant and Dan Campbell)
+
+0.03  8.4.2000
+  - complete API and internal rewrite
+      o added DispatchExtras and DispatchPrefix directive
+      o removed per-server configurations
+      o added new pre_dispatch, post_dispatch, error_dispatch
+        and dispatch_index method tie-ins
+  - updated documentation
+  - more kudos to Matt Sergeant for invaluable insight
+
+0.02  8.1.2000
+  - thanks again to Matt Sergeant for input not limited to
+    the following valuable suggestions
+      o add DispatchBase for dispatching on a protected,
+        per-location basis
+      o add DispatchMethod Prefix for protecting methods
+        behind a dispatch_ prepend
+  - changed behavior of directory and server merges
+  - updated the documentation
+
+0.01  7.28.2000
+  - original version
+  - many kudos and thanks to:
+      Vivek Khera
+      Matt Sergeant
+    for the initial ideas and impetus
+

@@ -1,0 +1,489 @@
+#!perl
+
+{ use 5.006; }
+use warnings;
+use strict;
+
+use App::olson ();
+use Getopt::Std 1.02 qw(getopts);
+
+our $VERSION = "0.000";
+
+die "App::olson version mismatch ($App::olson::VERSION != $VERSION)"
+	unless $App::olson::VERSION == $VERSION;
+$Getopt::Std::STANDARD_HELP_VERSION = $Getopt::Std::STANDARD_HELP_VERSION = 1;
+getopts("", {}) or die "bad options\n";
+App::olson::run(@ARGV);
+exit 0;
+
+=head1 NAME
+
+olson - query the Olson timezone database
+
+=head1 SYNOPSIS
+
+    olson list <criterion>... <attribute>...
+    olson version
+
+=head1 DESCRIPTION
+
+This program provides facilities for extracting information from the Olson
+timezone database.  It can be used to assist selection of a timezone,
+and for other purposes.
+
+The major action to perform is determined by a subcommand, specified as
+the first command-line argument.  The subcommands are:
+
+=over
+
+=item B<list>
+
+Searches the Olson database for combinations of entities (mainly
+timezones) matching specified criteria, and report specified attributes
+of them.  For details see L</LISTING> below.
+
+=item B<version>
+
+Indicates which version is being used of the Olson database and of the
+relevant Perl modules.  This information is vital in any bug report.
+
+=back
+
+=head1 LISTING
+
+The listing mode searches through the timezones and country-based
+selection data of the Olson database.  Various attributes of the timezones
+and other entities can be addressed.  An attribute can be used in a
+criterion to determine which items will be displayed, displayed in
+the output, or used to sort the output.  Each command-line argument
+specifies either a matching criterion, an attribute to display, or a
+sorting directive.  The three kinds of argument can be mixed arbitrarily.
+At least one attribute to display must be specified, but matching criteria
+and sorting directives are entirely optional.
+
+=head2 Attributes
+
+The addressable attributes each have a long descriptive name and a
+short name to save typing.  In compound attribute names, segments can
+be separated with spaces.  The attributes are:
+
+=over
+
+=item B<zone_name>
+
+=item B<z>
+
+Hierarchical name of a timezone, such as "B<Europe/London>".  The timezone
+may be either a canonical timezone or an alias for (link to) a canonical
+timezone.  On input, a timezone name must be supplied with exact casing,
+and only names of defined timezones will be accepted.
+
+=item B<area_name>
+
+=item B<a>
+
+First segment of a geographical timezone name.  This is the name of a
+continent or ocean, and is used for rough geographical categorisation of
+timezones.  There are also timezone names that don't begin with an area
+name, either because it's not a geographical timezone or because it's a
+historical alias.  On output, an area name has standard capitalisation.
+On input, an area name is accepted case insensitively, and only names
+of defined areas will be accepted.
+
+=item B<country_code>
+
+=item B<c>
+
+ISO 3166 alpha-2 code of a country.  Countries are not used as a primary
+means of categorising timezones, but country-based categorisation data
+is supplied to support the selection of timezones based on political
+geography.  On output, a country code is expressed in uppercase.
+On input, a country code is accepted case insensitively, and only defined
+country codes will be accepted.
+
+=item B<country_name>
+
+=item B<cn>
+
+An English name for a country, possibly in a modified form, optimised
+to help humans find the right entry in alphabetical lists.  This is not
+necessarily identical to the country's standard short or long name.
+
+=item B<region_description>
+
+=item B<rd>
+
+A brief English description of a segment of a country, used to distinguish
+between the regions of a single country.  Empty string if the country
+has only one region for timezone purposes.
+
+=item B<canonical_zone_name>
+
+=item B<k>
+
+Hierarchical name of a canonical timezone, such as "B<Europe/London>".
+On input, a timezone name must be supplied with exact casing, and only
+names of defined canonical timezones will be accepted.
+
+=item B<offset @> I<absolute-time>
+
+=item B<o @> I<absolute-time>
+
+The offset from UT that a timezone observes at the specified absolute
+time.  See below for the format in which the absolute time must be stated.
+An offset is expressed in hours, minutes, and seconds, two digits of each,
+with a leading sign.  On output, components are separated by colons, and
+trailing zero-valued components are omitted.  On input, colon separators
+are optional, and trailing zero-valued components are optional.
+
+=item B<initialism @> I<absolute-time>
+
+=item B<i @> I<absolute-time>
+
+The initialism used to refer to a timezone at the specified absolute time.
+See below for the format in which the absolute time must be stated.
+On input, an initialism must be supplied with exact casing.
+
+=item B<dst_status @> I<absolute-time>
+
+=item B<d @> I<absolute-time>
+
+Whether a timezone is observing DST at the specified absolute time.
+See below for the format in which the absolute time must be stated.
+It is expressed as a single character: a "C<+>" indicates DST, and a
+"C<->" indicates not DST.
+
+=item B<local_time @> I<absolute-time>
+
+=item B<t @> I<absolute-time>
+
+The local time in a timezone at the specified absolute time.  See below
+for the format in which the absolute time must be stated.  A local time
+is expressed in the Gregorian calendar in ISO 8601 format: year, month,
+day, hour, minute, and second.  The year is four digits, and the other
+components two digits.  On output, date is separated from time of day by
+a "B<T>", dash and colon separators are used between components, and all
+components are emitted.  On input, the separators are optional, "B<T>" is
+accepted case insensitively and can be surrounded or replaced with spaces,
+and trailing components with the lowest possible value are optional.
+
+=back
+
+Where an absolute time must be used to parameterise an attribute, it
+can be expressed in these forms:
+
+=over
+
+=item I<local-time> B<Z>
+
+Time in UT expressed in ISO 8601 format.  The I<local-time> is as
+described for the B<local_time> attribute, and "B<Z>" indicates that
+it is UT.  "B<Z>" is accepted case insensitively and can be preceded
+by spaces.
+
+=item B<now>
+
+The time at which the program is running.  A single time is used as "now"
+for the entire program run, even if it takes a non-negligible amount of
+time to run.
+
+=back
+
+=head2 Exceptions
+
+Sometimes a proper value for an attribute is not available.  On output,
+this doesn't prevent a line appearing, and the place of the attribute
+is taken by a possibly-repeated punctuation character signalling the
+kind of exception.  The kinds of exception are:
+
+=over
+
+=item B<~~~>
+
+A particular local time doesn't exist because it is skipped as a timezone
+changes offset.  Typically occurs at Spring DST changes.
+(Currently this program doesn't support any queries that can generate
+this exception.)
+
+=item B<???>
+
+The information in the Olson database is incomplete.  Typically occurs
+for the distant future in timezones with tricky DST rules.
+
+=item B<!!!>
+
+There is definitively no applicable value.  Occurs where entities
+don't match up at all, for example when requesting the area of a
+non-geographical timezone.  Also occurs when requesting observance data
+(such as offset) for a disused timezone (e.g., before the location
+was inhabited).
+
+=back
+
+=head2 Criteria
+
+Criteria restricting which items should be displayed are supplied in
+command-line arguments.  In the criterion syntax, tokens may generally be
+separated with spaces.  Be sure to quote appropriately for your shell,
+where the operators include shell metacharacters or if using spaces.
+The forms of criterion are:
+
+=over
+
+=item I<attribute> I<compare> I<value>
+
+Compares the value of an attribute against a literal value.  Matches if
+the comparison produces the kind of result requested by the comparison
+operator.  The comparison operators are:
+
+=over
+
+=item B<=>
+
+equal
+
+=item B<!=>
+
+not equal
+
+=item B<E<lt>>
+
+sorts before
+
+=item B<!E<lt>>
+
+does not sort before
+
+=item B<E<lt>=>
+
+sorts before or equal
+
+=item B<!E<lt>=>
+
+does not sort before or equal
+
+=item B<E<gt>>
+
+sorts after
+
+=item B<!E<gt>>
+
+does not sort after
+
+=item B<E<gt>=>
+
+sorts after or equal
+
+=item B<!E<gt>=>
+
+does not sort after or equal
+
+=back
+
+The positive comparisons never match when the attribute has an exception
+rather than a normal value, whereas the negative comparisons always
+match on exception.  That is, exceptions don't sort relative to normal
+values for matching purposes.  This is the difference between B<!E<lt>>
+and B<E<gt>=>, and the other pairs that otherwise seem equivalent.
+Normal values always have a defined total ordering.
+
+=item I<attribute> B<?>
+
+Match if the attribute has a normal (non-exception) value.
+
+=item I<attribute> B<!?>
+
+Match if the attribute has an exception value.
+
+=back
+
+=head2 Output
+
+A command-line argument requesting that an attribute be displayed consists
+only of the attribute name.  A command-line argument controlling sorting
+consists of the name of an attribute to sort on, preceded by a "B<+>"
+for standard sorting or "B<->" for reversed sorting.  (Spaces are
+permitted between the sign and the attribute name.)  Items are sorted
+first according to the supplied sorting directives, first supplied being
+the most significant.  Where the sorting directives don't distinguish
+items, they are sorted according to the attributes being displayed.
+
+Each line of output describes one combination of entities matching
+all the specified criteria.  Within each line, the values of the
+attributes requested for display are stated in the order requested,
+separated by spaces.  Most attribute values are expressed without using
+spaces internally, so splitting the line on spaces suffices to separate
+the attributes.  Watch out for the abnormal `initialism' used by the
+"Factory" timezone, which, unlike all real initialisms, has internal
+spaces.  Spacing is varied so that in most cases each attribute is a
+visually distinct column, but wide values will break the column format
+for a particular line.
+
+Where multiple matching combinations of entities are identical in all
+the attributes selected for display and sorting, they are merged into one
+line.  As a result, if all the sorting is on attributes being displayed,
+all the output lines are necessarily different.  (Sorting on attributes
+that are algebraically distant from all those being displayed can result
+in many identical output lines, which looks strange.  The ability to do
+this may be curtailed in the future.)  Any item where all the display
+and sort attributes have only B<!!!> exceptions (unmatched entities)
+is suppressed.
+
+Most attribute values are intended to be parseable by computer programs,
+and therefore the notation is intended to be very stable.  The amount
+of spacing used, however, should not be relied upon.
+
+=head2 Entities and relationships
+
+The listing facility can be well understood in terms of the relational
+algebra commonly seen in databases with SQL.  The relevant entity types
+and their relatioships are:
+
+=over
+
+=item timezone
+
+A named context in which there is an agreed set of behaviour for local
+clocks.  A timezone is primarily identified by its hierarchical name.
+
+A timezone is related to zero or one area, as determined by its name.
+It is also related to zero or more regions; currently this is never more
+than one region, but there's no rule requiring such a limit.  Via regions,
+a timezone is related to zero or more (in practice zero or one) countries.
+
+A timezone is related to exactly one canonical timezone, which is
+what defines the behaviour of local clocks.  The algebra is slightly
+muddled here, because the Olson database uses the same namespace for
+clock contexts (timezones) and clock behaviour (canonical timezones).
+In Olson terminology, a timezone is related to a canonical timezone
+either by being the canonical timezone (if it has behaviour defined in
+its own right) or by being a link to the canonical timezone.
+
+=item area
+
+A broad geographical area, either a continent or an ocean.  An area is
+primarily identified by its monomial name.
+
+An area is related to one or more timezones.  This relationship is
+determined by the timezone's name, of which the area (if any) is the
+first segment.  Via timezones, an area is related to zero or more regions,
+zero or more countries, and one or more canonical timezones.
+
+=item country
+
+A political entity claiming authority over some geographical area.
+The existence and geographical extent of countries is relatively volatile,
+and in places controversial, which is why the Olson database doesn't
+use countries as a primary means to identify timezones.  A country
+is primarily identified by its ISO 3166 alpha-2 code, and it is this
+assignment by the ISO 3166 Maintenance Agency that determines what
+is a country, for the purposes of the Olson database.  A country also
+has a name.  Formal country names vary between languages and are often
+rather long; the Olson database maintains only a short English name for
+each country.
+
+A country is related to zero or more (in practice always one or more)
+regions.  Via regions, it is related to zero or more (in practice always
+one or more) timezones, zero or more (in practice always one or more)
+canonical timezones, and zero or more (in practice always one or more,
+more being rare) areas.
+
+=item region
+
+A geographical segment of a country.  It has no primary identifier.
+
+A region has, in the Olson database, a description distinguishing it
+from other regions of the same country.  A region also has a pointlike
+principal geographical location, identified by latitude and longitude,
+which is not currently accessible through this program.
+
+A region is related to exactly one country and exactly one timezone.
+Via the timezone it is related to zero or one area and exactly one
+canonical timezone.
+
+=item canonical timezone
+
+A set of behaviour for local clocks.  A canonical timezone is primarily
+identified by its hierarchical name.
+
+For each absolute time, a canonical timezone has either zero or one
+combination of offset, initialism, and DST status.  These features are
+treated in this program as attributes, parameterised by absolute time,
+but in relational algebra would be more properly treated as a relationship
+to "observance" entities.  It is intended that a future version of this
+program will be able to search among observances within a canonical
+timezone, treating observances as first-class entities.
+
+A canonical timezone is related to one or more timezone, which is
+what defines where the clock behaviour is used.  See the notes in the
+timezone entry above about the namespace confusion.  Via the timezones,
+a canonical timezone is related to zero or more areas, zero or more
+regions, and zero or more countries.
+
+=back
+
+In relational algebra terms, the listing facility selects from a join
+between all of these entity types.  With only distinct result rows being
+shown, some of the entity types are typically irrelevant, and can be seen
+as being implicitly dropped from the join.  The join is fully outer,
+meaning that all of the underlying entities are available for output
+even where they don't relate to any other entities through the join.
+(This is part of what the exceptions are about.)
+
+=head2 Examples
+
+=over
+
+=item *
+
+List countries in a particular area, as an intermediate step in a user
+selecting a timezone:
+
+    olson list a=pacific c cn +cn
+
+=item *
+
+List timezones in a particular country, as the final step in a user
+selecting a timezone:
+
+    olson list c=ki z rd +rd
+
+=item *
+
+Which offsets from UT could be meant by "CST"?
+
+    olson list i@now=CST o@now
+
+This misses out on any timezones where "CST" is used in part of the year
+but not right now.
+
+=item *
+
+Which timezones have jumped westward across the International Date Line
+since 1900?
+
+    olson list 'o@1900z < -08' 'o@now > +08' k
+
+=back
+
+=head1 SEE ALSO
+
+L<DateTime::TimeZone::Olson>,
+L<Time::OlsonTZ::Data>
+
+=head1 AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012 Andrew Main (Zefram) <zefram@fysh.org>
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+1;

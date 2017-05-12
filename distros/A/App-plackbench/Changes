@@ -1,0 +1,21 @@
+0.5  2014-07-25
+      - Fix test failures on Windows
+
+0.4  2014-07-14
+      - Clean up the test output.
+      - Adding some missing standard POD headers
+      - Specify required Perl version (5.10.1).
+
+0.3  2014-07-12
+      - Attempting to fix 01_invoke.t on Win32
+
+0.2  2014-07-11
+      - switch shebang to /usr/bin/perl (/bin/env is not that common apparently,
+        maybe /usr/bin/env would have been better, but I'm hoping /usr/bin/perl
+        is really standard.)
+      - Use the older API for Getopt::Long (should work in 2.38 at least,
+        probably older versions as well.)
+      - Removed test that assumed "No such file" will be in English
+
+0.1  2014-07-11
+      - Initial release

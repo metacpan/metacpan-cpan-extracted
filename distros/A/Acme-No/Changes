@@ -1,0 +1,17 @@
+Revision history for Perl extension Acme::No.
+
+0.01  Mon Jul 29 08:59:47 2002
+	- original version; created by h2xs 1.22 with options
+		-AXn Acme::No
+        - helpful feeback and comments from Rafael Garcia-Suarez
+
+0.02  08.13.2002
+	- fixed perl version foo and added more tests
+
+0.03  08.16.2002
+	- added 05package.t
+        - skip some tests on perl < 5.8.0
+        - added INSTALL doc that explains (a bit) about the
+          issues with the test suite and perl < 5.8.0
+        - minor changes to logic
+        - now handles commented lines in code

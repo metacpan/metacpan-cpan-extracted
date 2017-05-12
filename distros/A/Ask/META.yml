@@ -1,0 +1,46 @@
+---
+abstract: 'ask your users about stuff'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Ask
+name: Ask
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+recommends:
+  File::Which: 0
+  Gtk2: 0
+  System::Command: 0
+  Tk: 0
+  Wx: 0
+requires:
+  Lingua::Boolean::Tiny: 0.003
+  Module::Runtime: 0
+  Moo: 1.000006
+  Sub::Exporter::Progressive: 0
+  namespace::sweep: 0.006
+  perl: 5.10.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Ask
+  homepage: https://metacpan.org/release/Ask
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/tobyink/p5-ask
+version: 0.007
+x_contributors:
+  - 'Graham Knop <haarg@cpan.org>'

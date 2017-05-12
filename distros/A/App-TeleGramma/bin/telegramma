@@ -1,0 +1,166 @@
+#!/usr/bin/env perl
+
+# PODNAME: telegramma
+# ABSTRACT: TeleGramma main application
+
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use feature 'say';
+
+use App::TeleGramma;
+use Getopt::Long qw/GetOptions/;
+use Proc::Daemon;
+
+use strict;
+use warnings;
+
+my $daemon_mode = 1;
+my $verbose     = 0;
+my $shutdown    = 0;
+my $status      = 0;
+my $version     = 0;
+my $help        = 0;
+my $plugin_cmd;
+
+GetOptions(
+  "daemon!"  => \$daemon_mode,
+  "status"   => \$status,
+  "shutdown" => \$shutdown,
+  "verbose"  => \$verbose,
+  "version"  => \$version,
+  "help"     => \$help,
+  "plugin=s" => \$plugin_cmd,
+) || die "Bad command line\n";
+
+my $bot = App::TeleGramma->new;
+$bot->startup;
+
+if ($version) {
+  say "Version " . $App::TeleGramma::VERSION;
+  exit 0;
+}
+
+if ($help) {
+  my $cp = $bot->config->path_base;
+
+  my $bin = `which telegramma`;
+
+  if ($bin) {
+    $bin = "telegramma";
+  }
+  else {
+    $bin = $0;
+  }
+
+  say <<EOF;
+App::TeleGramma v$App::TeleGramma::VERSION
+https://metacpan.org/release/App-TeleGramma
+
+Configuration is stored in $cp (automatically created on first run).
+
+Starting and managing:
+
+  $bin             # start in daemon mode
+  $bin --status    # show running process status
+  $bin --shutdown  # shut down running process
+
+Plugins:
+
+  $bin --plugins list  # list available plugins
+
+Other options:
+
+  --no-daemon    # run in foreground
+EOF
+  exit;
+}
+
+if ($plugin_cmd && $plugin_cmd eq 'list') {
+  say "Enabled plugins:";
+  foreach (@{ $bot->plugins->list }) {
+    say " - " . $_->truncated_package_name . " - " . $_->synopsis;
+  }
+  exit;
+}
+
+elsif ($plugin_cmd) {
+  die "Unknown plugin command '$plugin_cmd'\n";
+}
+
+else {
+  $bot->bail_if_misconfigured;
+
+  my $daemon = Proc::Daemon->new(
+    pid_file => $bot->config->path_pid
+  );
+
+  if ($shutdown) {
+    if (my $existing_pid = $daemon->Status) {
+      $daemon->Kill_Daemon;
+      say "Killed $existing_pid" if ($verbose);
+      exit;
+    }
+    say "Not running?";
+    exit;
+  }
+
+  if ($status) {
+    if (my $existing_pid = $daemon->Status) {
+      say "Running: $existing_pid";
+      exit;
+    }
+    else {
+      die "Is not running\n";
+    }
+  }
+
+  if (my $existing_pid = $daemon->Status) {
+    die "Already running, pid: $existing_pid\n";
+  }
+
+  if ($daemon_mode) {
+    my $child_pid = $daemon->Init;
+    unless ($child_pid) {
+      $bot->think;
+      exit; # never reached
+    }
+    say "Daemon started in $child_pid";
+  }
+  else {
+    say "App::TeleGramma running in foreground: $$";
+    $bot->think;
+    exit; # next reached
+  }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+telegramma - TeleGramma main application
+
+=head1 VERSION
+
+version 0.13
+
+=head1 SYNOPSIS
+
+See L<App::TeleGramma>
+
+=head1 AUTHOR
+
+Justin Hawkins <justin@eatmorecode.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Justin Hawkins <justin@eatmorecode.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

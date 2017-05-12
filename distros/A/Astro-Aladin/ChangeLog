@@ -1,0 +1,17 @@
+2003-11-12  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * t/*.t: Added skips to test for machines without the correct
+          environment defined.
+          
+2003-02-26  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Aladin.pm: POD documentation fixed
+        
+2003-02-24  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Fixed some minor problems, minimal test suite.
+
+2003-02-18  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Original version, fully functional, minimal test suite.
+

@@ -1,0 +1,41 @@
+/*#########################################################*/
+/*#         SNMPTraps-Frontend for Nagios & ASNMTAP       #*/
+/*#                                                       #*/
+/*#                    by Michael Lübben                  #*/
+/*#                   --- Lizenz GPL ---                  #*/
+/*#########################################################*/
+
+/* ******************** ----- Links ----- ******************** */
+a:link 
+	{
+		font-family: arial,serif;
+		font-size: 8pt;	 
+		color: #000000;
+		text-decoration: none;
+	}
+a:visited
+    {
+	    font-family: arial,serif;
+		font-size: 8pt;	 
+		color: #000000;
+		text-decoration: none;
+	}
+	
+a:hover
+    {
+	    font-family: arial,serif;
+		font-size: 8pt;	 
+		color: #339966;
+		text-decoration: none;
+	}
+
+/* ******************** ----- Status ----- ******************** */	
+td.statusNormal        { font-family: arial,serif; font-size: 8pt; background-color: #33FF00; }
+
+/*#########################################################*/
+/*#     added by Alex Peeters [alex.peeters@citap.be]     #*/
+/*#########################################################*/
+td.statusINFORMATIONAL { font-family: arial,serif; font-size: 8pt; background-color: #33FF00; }
+td.statusMINOR         { font-family: arial,serif; font-size: 8pt; background-color: #FFFF00; }
+td.statusSEVERE        { font-family: arial,serif; font-size: 8pt; background-color: #F83838; }
+td.statusMAJOR         { font-family: arial,serif; font-size: 8pt; background-color: #F83838; }

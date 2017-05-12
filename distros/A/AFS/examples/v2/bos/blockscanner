@@ -1,0 +1,26 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::BOS;
+
+my ($server, $cellname, $bos);
+
+die "Usage: $0 server [cell]\n" if $#ARGV < 0;
+
+$server   = shift;
+$cellname = shift;
+
+if ($cellname) { $bos = AFS::BOS->new($server, 0, 0, $cellname); }
+else           { $bos = AFS::BOS->new($server); }
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+my $ok = $bos->exec('/usr/afs/bin/scanner -block');
+print "Start Block Scanner OK-Status: $ok \n";
+
+$ok = $bos->exec('/usr/afs/bin/scanner -noblock');
+print "Start Unblock Scanner OK-Status: $ok \n";
+
+$bos->DESTROY;

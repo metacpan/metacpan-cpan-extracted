@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name: Acme-Filter-Kenny
+version: 1.01
+author:
+  - Gergely Nagy <algernon@bonehunter.rulez.org>
+abstract: Kenny source filter
+license: gpl
+requires:
+  Filter::Util::Call: 0
+  perl: 5.6.0
+provides:
+  Acme::Filter::Kenny:
+    file: lib/Acme/Filter/Kenny.pm
+    version: 1.01
+generated_by: Module::Build version 0.24

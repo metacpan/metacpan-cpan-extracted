@@ -1,0 +1,27 @@
+Revision history for Perl extension Apache::HTTunnel.
+
+0.07  Fri Feb 16 21:31:17 EST 2007
+    - Fixed IE compatibility in Client.js
+
+0.06  Sat Jan 21 15:05:36 EST 2006
+    - Fixed a bug with a missing alarm() reset
+    - Fixed UDP support
+    - Improved get_peer_info performance
+	- Added a (incomplete) Javascript client
+
+0.05  Mon Feb 14 10:37:26 EST 2005
+    - Fixed screwed-up test suite dependencies
+
+0.04  Sun Feb  6 19:38:03 EST 2005
+    - Replaced HTTunnelForceHost/HTTunnelForcePort by HTTunnelAllowedTunnels
+    - Implemented initial UDP support
+
+0.02  Wed Jan 26 20:26:42 EST 2005
+    - Documentation fixes
+
+0.01  Wed Jan 12 13:35:14 2005
+	- original version; created by h2xs 1.23 with options
+		-AX Apache::HTTunnel
+
+
+

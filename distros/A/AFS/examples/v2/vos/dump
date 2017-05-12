@@ -1,0 +1,33 @@
+#!/usr/local/bin/perl
+
+use v5.10.0;
+use blib;
+use strict;
+use warnings;
+
+use AFS::VOS;
+use Scalar::Util qw(looks_like_number);
+
+my ($vos, $volume, $time, $file, $server, $part, $clone, $omit, $ok);
+
+die "Usage: $0 volume [time [file [server partition clone omit]]]\n" if $#ARGV < 0;
+
+$volume = shift;
+$time   = shift // '';
+$file   = shift // '';
+$server = shift // '';
+$part   = shift // '';
+$clone  = shift // 0;
+$omit   = shift // 0;
+
+if (defined $clone and !looks_like_number($clone)) { warn "$0: CLONE is not an INTEGER ...\n"; }
+else                                               { $clone = int($clone); }
+if (defined $omit  and !looks_like_number($omit))  { warn "$0: OMIT is not an INTEGER ...\n"; }
+else                                               { $omit = int($omit); }
+
+$vos = AFS::VOS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+$ok = $vos->dump($volume, $time, $file, $server, $part, $clone, $omit);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "Dumped volume $volume in file $file\n" if ($file); }

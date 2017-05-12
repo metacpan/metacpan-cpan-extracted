@@ -1,0 +1,62 @@
+{
+   "abstract" : "Alien package for the MuPDF PDF rendering library",
+   "author" : [
+      "Zakariyya Mughal <zmughal@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-MuPDF",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0.020",
+            "File::ShareDir" : "1.03",
+            "Path::Class" : "0.013"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Inline" : "0.67",
+            "Inline::C" : "0.62"
+         },
+         "requires" : {
+            "Alien::Base" : "0.020",
+            "File::ShareDir" : "1.03",
+            "File::Spec" : "0",
+            "Path::Class" : "0.013",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Which" : "1.21",
+            "Module::Load" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/project-renard/p5-Alien-MuPDF",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/project-renard/p5-Alien-MuPDF.git",
+         "web" : "https://github.com/project-renard/p5-Alien-MuPDF"
+      }
+   },
+   "version" : "0.007",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0211"
+}
+

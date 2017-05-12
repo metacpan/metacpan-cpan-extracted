@@ -1,0 +1,36 @@
+---
+abstract: 'Weighted kernel k-means clusterer'
+author:
+  - 'Koichi SATOH <sekia@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Algorithm-KernelKMeans
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Carp: 1.16
+  Exporter::Lite: 0.02
+  List::MoreUtils: 0.22
+  List::Util: 1.23
+  Moose: 1.1
+  MooseX::Types::Common::Numeric: 0.001001
+  MooseX::Types::Moose: 0.23
+  POSIX: 1.19
+  UNIVERSAL::require: 0.13
+  namespace::autoclean: 0.11
+  parent: 0.223
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: http://bitbucket.org/sekia/algorithm-kernelkmeans
+version: 0.03

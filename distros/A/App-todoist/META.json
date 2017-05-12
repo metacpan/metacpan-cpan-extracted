@@ -1,0 +1,51 @@
+{
+   "abstract" : "command-line for manipulating your todoist.com todo list",
+   "author" : [
+      "Neil Bowers <neil@bowers.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-todoist",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AppConfig::Std" : "0",
+            "Carp" : "0",
+            "File::Slurper" : "0",
+            "Net::Todoist" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilbowers/App-todoist",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilbowers/App-todoist.git",
+         "web" : "https://github.com/neilbowers/App-todoist"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

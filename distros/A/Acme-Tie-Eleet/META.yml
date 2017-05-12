@@ -1,0 +1,25 @@
+---
+name: Acme-Tie-Eleet
+version: 1.0.2
+author:
+  - 'Jerome Quelin <jquelin@cpan.org>'
+abstract: Perl extension to 5pE4k 1Ik3 4n 3l337!
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: 5.006
+build_requires:
+  Test::More: 0
+  perl: 5.006
+recommends:
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Acme::Tie::Eleet:
+    file: lib/Acme/Tie/Eleet.pm
+    version: 1.0.2
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

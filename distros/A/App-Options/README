@@ -1,0 +1,189 @@
+######################################################################
+## File: $Id: README 3442 2005-05-14 14:14:01Z spadkins $
+######################################################################
+
+1. What is the App-Options distribution?
+
+You might say App-Options distribution is "yet another command line
+option processor."  However, it was created for maximum ease of use
+with the needs of the Perl 5 Enterprise Environment in mind
+(more on that later).
+
+The distribution consists of one Perl module and one shell script.
+
+   App::Options - a perl module which combines command line parameters,
+       environment variables, and configuration files to produce
+       a hash of option values.
+
+   prefix - a shell script which works for ksh (Korn shell) or
+       bash (Bourne Again Shell) which allows you to change
+       a family of environment variables (PATH, LD_LIBRARY_PATH,
+       MANPATH, etc.) necessary for running programs out of a
+       directory in which software has been installed.
+       (This script is useful but not necessary, and non-Unix users
+       may safely ignore it.)
+
+2. What are the features?
+
+FEATURES OF App::Options
+
+ o Flexible command line syntax
+   Parse long (--whatever) and short (-w) command line options
+   (with [--verbose=3] or without [--verbose] arguments)
+   and just put the values in %App::options (or some other hash
+   that you may specify).
+ o Automatic boolean command line switches
+   An option like "--help" is equivalent to "--help=1".
+ o Combines options with Environment Variables
+   The --whatever=value option can be supplied with the
+   APP_WHATEVER environment variable.
+ o Combines options with variables in global and local config files
+   The --whatever=value option can be supplied in config files with
+   the "whatever = value" statement.  Initialization searches
+   "$HOME/.app/$prog.conf", "$HOME/.app/app.conf",
+   "$progdir/$prog.conf", "$progdir/app.conf",
+   "$prefix/etc/app/$prog.conf", "$prefix/etc/app/app.conf", and
+   "/etc/app.conf" in order to find the option values.
+ o Import other files with "import = filename" statement
+   Config files can, in essence, include other config files.
+ o Stop importing other files with "flush_imports = 1" statement
+   A config file can use this statement to tell the program
+   to stop searching for other config files it was planning
+   on searching.
+ o Option values undergo variable expansion
+   This means that some values may rely on other values.
+   i.e. "prefix = /usr/mycompany/3.2.1" and "logdir = ${prefix}/log"
+ o Config files can have conditional sections
+   A section specifier "[cleanup]" begins a section only valid
+   for the program "cleanup" (or "cleanup.exe" or cleanup.pl, etc.).
+   A section specifier "[ALL]" (or just "[]") begins another
+   unconditional section.  In fact, "[cleanup]" is just a synonym
+   for "[app=cleanup]".  Sections can be made conditional on the
+   current values of any variables. i.e. "[country=US;city=LAX]"
+   would begin a section of variables only valid if the two
+   specified variables have the required values.
+ o Config files can have conditional lines
+   Any section specifier can apply only to a single line by
+   putting a statement after it. "[city=LAX] state = CA"
+ o Modify @INC variable with the "perlinc = path1,path2" statement
+   This allows the person deploying the software to set up the Perl
+   include path so that a particular version of the software
+   installed on the system is used.  Subsequent uses of "use" and
+   "require" will load modules from the configured locations.
+ o Validate that "required" options are provided
+   Certain options can be identified as required. Otherwise the
+   program will not run.
+ o Validate option values against types
+   Certain options can be identified as to their type or pattern
+   (integer, int, float, number, date, datetime, string, regexp).
+   If the option value is provided and it does not match the
+   type or pattern, the program will not run.
+ o Provide automatic "-?" and "--help" messages
+   Adds user-friendliness to programs with no extra effort.
+
+3. What were the design goals that make this distribution unique?
+
+ #1 Support multiple installations of a complex suite of software.
+    This is useful for development and deployment of large systems,
+    where multiple versions may be in varying states of development,
+    testing, or production.
+
+ #2 Support a suite of programs all using a common set of configuration
+    files.  Large systems have many programs.  We don't want to 
+    repeat the database name, username, and password in a separate
+    config file for each program.
+
+ #3 Make it so easy to use that a developer would be silly not to
+    use it in even his smallest and simplest of scripts.  However,
+    it should be powerful enough to support advanced features as
+    the developer needs them.
+
+ #4 Support conditions where the environment variables are not
+    easy to control. i.e. CGI programs or cron jobs.
+
+These were important design goals to support the App-Context variant
+of the Perl 5 Enterprise Environment (P5EE).  See the P5EE website
+(http://www.officevision.com/pub/p5ee) for more details.
+
+4. Why another module? Why not use Getopt::Long or others?
+
+There are many configuration modules on CPAN.  See
+
+ http://search.cpan.org/modlist/Option_Parameter_Config_Processing
+
+The most important feature was to be able to run it within a
+BEGIN block to modify the Perl include path (@INC).  This is
+most of design goal #1.  This means very few dependencies and
+only on core modules.
+
+I started by writing a few lines of code in a BEGIN block.
+Then it got to be a lot of lines of code in a BEGIN block.
+Then I moved it out to a module so I could reuse it easily.
+Then it grew into a full-fledged command line, environment
+variable, and config file value option processor.
+
+I did try Getopt::Long, but it wasn't that easy to use, you had
+to code your own "--help" feature, and it didn't incorporate
+environment variables or config files.  I wanted something
+more high-level and full-featured, so I wrote App::Options.
+
+The description of the AppConfig distribution sounds similar
+to what is described here.  However, the following are the key
+differences.
+
+ * App::Options does its option processing in the BEGIN block.
+   This allows for the @INC variable to be modified in time
+   for subsequent "use" and "require" statements.
+   This met design goal #1.
+
+ * App::Options consults a cascading set of option files.
+   These files include those which are system global, project
+   global, and user private.  This allows for system
+   administrators, project developers, and in individual
+   users to all have complementary roles on defining
+   the configuration values.  This met design goal #2.
+
+ * App::Options "sections" (i.e. "[cleanup]") are conditional.
+   It is conditional in App::Options, allowing you to use one
+   set of option files to configure an entire suite of programs
+   and scripts.  In AppConfig, the section name is simply a 
+   prefix which gets prepended to subsequest option names.
+   This also helped to meet design goal #2.
+
+ * App::Options is not a toolkit but a standardized way of
+   doing option processing.  With AppConfig, you still have
+   to decide where to put config files, you still have to
+   code the "--help" feature, etc.  With App::Options, you simply
+   "use App::Options;" and all the hard work is done.
+   Advanced options can be added later as necessary as args
+   to the "use" statement.  This met design goal #3.
+
+Design goal #4 required the autodetection of the ${prefix}
+variable.  Thus, the App::Options module can be integrated with
+the discipline of choosing a root directory for your
+software installation (i.e. PREFIX=/usr/mycompany/2.0.12).
+
+5. You say it's so easy. Show me.
+
+  #!/usr/bin/perl
+  use App::Options;
+  # now use the %App::options hash
+  print "yada yada\n" if ($App::options{verbose});
+
+It's that easy.
+
+And it automatically has "-?" and "--help" support without
+you having to code a thing.
+
+Read the man page (or the code) if you want more power.
+
+6. How do I install it?
+
+To install this module, cd to the directory that contains this README
+file and type the following (as usual).
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

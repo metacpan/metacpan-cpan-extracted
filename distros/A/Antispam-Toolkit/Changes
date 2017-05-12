@@ -1,0 +1,43 @@
+0.08    2011-01-16
+
+- Document Antispam::Toolkit::Result's boolean overloading and make it
+  actually work.
+
+
+0.07    2011-01-16
+
+- The BerkeleyDB role now dies when it cannot create a BerkelyDB object.
+
+
+0.06    2010-11-23
+
+- Lots of API changes to the provided roles. Instead of UserChecker, there are
+  now separate roles for checking email, usernames, and ip addresses.
+
+
+0.05    2010-11-18
+
+- The Antispam::Toolkit::Role::BerkeleyDB role now checks to make sure that
+  the BerkeleyDB.pm module is linked against BerkeleyDB 4.4+, and dies if it
+  isn't. The BerkeleyDB tests are skipped in this case as well. Previously,
+  they just died at runtime.
+
+
+0.04    2010-11-18
+
+- There were still a few prereqs missing.
+
+
+0.03    2010-11-16
+
+- Fix inter-module links in the docs.
+
+
+0.02    2010-11-16
+
+- I forgot include any prereqs in 0.01. Epic fail.
+
+
+0.01    2010-11-16
+
+- First release.

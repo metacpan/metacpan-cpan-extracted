@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# PODNAME: booklog2amazon
+# ABSTRACT: Update amazon recommended according to booklog status
+our $VERSION = 'v0.0.1'; # VERSION
+
+use App::booklog2amazon;
+
+App::booklog2amazon->run(@ARGV);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+booklog2amazon - Update amazon recommended according to booklog status
+
+=head1 VERSION
+
+version v0.0.1
+
+=head1 SYNOPSIS
+
+  # Without argument, configuration is read from ~/.booklog2amazon.yaml
+  booklog2amazon
+  
+  # Override configuration
+  booklog2amazon myconfig.yaml
+
+=head1 DESCRIPTION
+
+This script reads from status in L<Booklog|http://booklog.jp/> and update Amazon recommended configuration according to the status.
+
+~/.booklog2amazon.yaml is a YAML file as the followings:
+
+  amazon:
+    email: your_email@example.com
+    password: your_password
+  booklog:
+    account: your_account
+
+This includes sensitive information so you should set appropriate permissions.
+After the first execution, C<last_sync> is added to the file. So, write permission is also necessary.
+
+=head1 CAVEATS
+
+=over 4
+
+=item *
+
+Currently, all items you registered to booklog are considered that you owned them even though their status is 'want read'.
+
+=item *
+
+Currently, it is assumed that rank is set at read time.
+
+=item *
+
+This script stores the last executed time into configuration file and skips the items registered/read before. So, if you set read time of some items prior to the last executed time, they are skipped.
+
+=back
+
+=head1 AUTHOR
+
+Yasutaka ATARASHI <yakex@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Yasutaka ATARASHI.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

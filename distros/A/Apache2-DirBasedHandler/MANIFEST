@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Apache2/DirBasedHandler.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/classes.t
+t/conf/extra.conf.in
+t/loads.t
+t/My/Thingy.pm
+t/pod_coverage.t
+META.json

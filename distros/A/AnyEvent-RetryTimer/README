@@ -1,0 +1,156 @@
+NAME
+    AnyEvent::RetryTimer - Retry timers for AnyEvent
+
+VERSION
+    0.1
+
+SYNOPSIS
+       use AnyEvent::RetryTimer;
+
+       my $con =
+          Something::Connection->new;
+
+       my $timer;
+
+       $con->on_disconnect (sub {
+          $timer ||=
+             AnyEvent::RetryTimer->new (
+                on_retry => sub {
+                   $con->connect;
+                });
+
+          $timer->retry;
+
+          my $secs = $timer->current_interval;
+
+          warn "Lost connection, reconnecting in $secs seconds!";
+       });
+
+       $con->on_connect (sub {
+          warn "Connected successfully!";
+
+          $timer->success;
+          undef $timer;
+       });
+
+DESCRIPTION
+    This is a small helper utility to manage timed retries.
+
+    This is a pattern I often stumble across when managing network
+    connections. And I'm tired to reimplement it again and again. So I wrote
+    this module.
+
+    At the moment it only implements a simple exponential back off retry
+    mechanism (with configurable multiplier) using AnyEvent timers. If there
+    are other back off strategies you find useful you are free to send a
+    feature request or even better a patch!
+
+METHODS
+    my $timer = AnyEvent::RetryTimer->new (%args)
+        This is the constructor, it constructs the object.
+
+        At the end of the objects lifetime, when you get rid of the last
+        reference to $timer, it will stop and running timeouts and not call
+        any of the configured callbacks again.
+
+        %args can contain these keys:
+
+        on_retry => $retry_cb->($timer)
+            $retry_cb is the callback that will be called for (re)tries.
+
+            When this constructor is called and no "no_first_try" is given,
+            an initial retry interval of the length 0 is started, which
+            counts as the first try.
+
+            Later it is also called after a retry interval has passed, which
+            was initiated by a call to the "retry" method.
+
+            The first argument is the $timer object itself.
+
+        no_first_try => $bool
+            This parameter defines whether the $retry_cb will be called when
+            the AnyEvent::RetryTimer object is created or not. If $bool is
+            true $retry_cb will not be called.
+
+            The default is false.
+
+        backoff => 'exponential'
+            This is the back off algorithm that is used. Currently only
+            "exponential" is implemented and is the default.
+
+        max_retries => $max_retry_cnt
+            This is the maximum number of retries that are done between the
+            first call to "retry" and the finishing call to "success".
+
+            If the number of retries is exceeded by a call to "retry" the
+            "on_max_retries" callback is called (see below).
+
+            Please note that a call to "success" will of course reset the
+            internal count of calls to "retry".
+
+            Default for this option is 0 (disabled).
+
+        on_max_retries => $max_retry_cb->($timer)
+            After "max_retries" the $max_retry_cb callback will be called
+            with the $timer as first argument.
+
+            It is usually called when a call to "retry" would exceed
+            "max_retries".
+
+        And then there are keys that are specific to the "backoff" method
+        used:
+
+        exponential
+
+            start_interval => $secs
+                This is the length of the first interval. Given in seconds.
+
+                Default is 10.
+
+            multiplier => $float
+                This is the multiplier for the retry intervals. Each time a
+                "retry" is done the previous (if any) interval will be
+                multiplied with $float and used for the next interval.
+
+                Default is 1.5.
+
+            max_interval => $max_interval_secs
+                As exponential back off intervals can increase quite a lot
+                you can give the maximum time to wait in $max_interval_secs.
+
+                Default is "3600 * 4", which is 4 hours.
+
+    $timer->retry
+        This method initiates or continues retries. If already a retry
+        interval is installed (eg. by the constructor or another previous
+        unfinished call to "retry"), the call will be a nop.
+
+        That means you can call "retry" directly after you created this
+        object and will not cause the initial try to be "retried".
+
+        If you are interested in the length of the current interval (after a
+        call to this method), you can call the "current_interval" method.
+
+    $timer->success
+        This signals that the last retry was successful and it will reset
+        any state or intervals to the initial settings given to the
+        constructor.
+
+        You can reuse the $timer object after a call to "success".
+
+    my $secs = $timer->current_interval
+        Returns the length of the current interval to the next call to the
+        $retry_cb.
+
+AUTHOR
+    Robin Redeker, "<elmex@ta-sa.org>"
+
+SEE ALSO
+    AnyEvent
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Robin Redeker, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

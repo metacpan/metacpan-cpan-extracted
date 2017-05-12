@@ -1,0 +1,47 @@
+# Version control files and dirs.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\B\.git\b
+\B\.gitignore\b
+\b_darcs\b
+
+# Module::Build generated files and dirs.
+^Build$
+^_build/
+
+# Module::Install included files.
+^inc/Module/Install/
+
+# Makemaker generated files and dirs.
+^Makefile$              # Module::Build::Compat generates this
+^MANIFEST\.bak$
+^blib/
+^MakeMaker-\d
+^pm_to_blib(?:\.ts)?$
+^blibdirs\.ts$          # 6.18 through 6.25 generated this
+
+# Temp, old and emacs backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+
+# Devel::Cover files.
+^cover_db/
+
+# Test::Kwalitee cache files.
+^Debian_CPANTS\.txt
+
+# Compiled files: libjio
+\.(o|a|so|lib|dll|mak)$
+^libjio/libjio/build/build-flags$
+^libjio/libjio/build/libjio.pc$
+^libjio/libjio/build/jiofsck$
+^libjio/libjio/build/libjio.so # .so symlink
+
+# Debian package control files
+^debian/

@@ -1,0 +1,32 @@
+---
+abstract: 'Build and make available libarchive'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Alien::Libarchive::Installer: '0.15'
+  Alien::bz2::Installer: '0.03'
+  Module::Build: '0.3601'
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  Alien::Libarchive::Installer: '0.15'
+  Alien::bz2::Installer: '0.03'
+  Module::Build: '0.3601'
+  perl: '5.006'
+dynamic_config: '1'
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Libarchive
+requires:
+  Alien::Libarchive::Installer: '0.15'
+  File::ShareDir: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/plicease/Alien-Libarchive2/issues
+  homepage: http://perl.wdlabs.com/Alien-Libarchive
+  repository: git://github.com/plicease/Alien-Libarchive2.git
+version: '0.28'
+x_serialization_backend: 'YAML::Tiny version 1.69'

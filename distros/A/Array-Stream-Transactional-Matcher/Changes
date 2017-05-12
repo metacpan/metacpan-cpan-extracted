@@ -1,0 +1,8 @@
+Revision history for Perl extension Array-Stream-Transactional-Match.
+
+0.01  Wed Mar 31 23:28:20 2004
+	- original version; created by h2xs 1.22 with options
+		-X -b 5.6.1 --skip-autoloader -n Array-Stream-Transactional-Match
+
+1.00  Sat Jun 12 05:00:00 2004
+        - Initial release

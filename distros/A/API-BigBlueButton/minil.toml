@@ -1,0 +1,6 @@
+name = "API-BigBlueButton"
+authority = "cpan:BCDE"
+abstract="client for BigBlueButton API"
+readme_from="lib/API/BigBlueButton.pm"
+license="gpl_1"
+# badges = ["travis"]

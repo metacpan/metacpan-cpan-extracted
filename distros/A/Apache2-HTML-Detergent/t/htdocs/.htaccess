@@ -1,0 +1,2 @@
+AddType application/xhtml+xml .aspx
+Options +MultiViews

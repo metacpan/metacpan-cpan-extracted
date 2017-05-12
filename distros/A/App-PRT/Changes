@@ -1,0 +1,77 @@
+Revision history for Perl extension App-PRT
+
+0.20 2016-10-28T06:14:32Z
+    - Implement introduce_variables
+
+0.19 2014-09-02T02:20:48Z
+    - Rename rename_name_space to rename_namespace
+
+0.18 2014-09-02T01:37:56Z
+    - Index failed. reverted 334bf37b4b265220031a7af647dd18766d904ea5
+
+0.17 2014-09-02T01:01:32Z
+    - Rename rename_name_space to rename_namespace (thanks miyagawa)
+    - Delete help command for DRY. You can use perldoc prt instead.
+
+0.16 2014-08-31T10:35:30Z
+    - Fix typo, add documentation (thanks syohex)
+
+0.15 2014-08-01T10:16:21Z
+    - Version 0.14 was released from wrong branch
+
+0.14 2014-08-01T10:14:51Z
+    - Fixed a bug of directory preparation
+    - Support renaming packages in script
+
+0.13 2014-05-13T08:35:25Z
+    - Support function to rename symbols on RenameClass command
+
+0.12 2014-04-28T10:26:59Z
+    - I forgot to git pull
+
+0.11 2014-04-28T10:21:50Z
+    - Implement rename_name_space command
+
+0.10 2014-04-18T03:29:09Z
+
+    - Collect target files with git ls-files in Git repository
+    - Implement move_class_method command
+
+0.09 2014-04-03T02:53:51Z
+
+    - Fix a document
+
+0.08 2014-04-03T02:47:03Z
+
+    - Slurp all of perl files if script executes with no file args (thanks moznion)
+    - Fix missing 'literal' method error while renaming class (thanks ishikawa)
+    - avoid warnings saying smartmatch is experimental (thanks miyagawa)
+
+0.07 2014-03-28T08:44:39Z
+
+    - Fix a typo
+
+0.06 2014-03-28T07:21:49Z
+
+    - Fix a bug
+
+0.05 2014-03-28T07:12:05Z
+
+    - Improve renaming behavior
+
+0.04 2014-03-25T04:46:18Z
+
+    - Various fixes by moznion
+
+0.03 2014-03-25T03:19:54Z
+
+    - Remove cpanfile.snapshot
+
+0.02 2014-03-25T03:16:37Z
+
+    - FAKE_RELEASE succeed at version 0.01
+
+0.01 2014-03-25T03:04:47Z
+
+    - original version
+

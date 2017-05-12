@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+dist.ini
+lib/Acme/SWUECHO/Meta.pm
+perlcriticrc
+t/basic.t
+t/release-pod-syntax.t
+tidyall.ini

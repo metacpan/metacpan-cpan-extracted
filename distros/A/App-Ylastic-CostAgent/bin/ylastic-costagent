@@ -1,0 +1,192 @@
+#!/usr/bin/perl
+#
+# This file is part of App-Ylastic-CostAgent
+#
+# This software is Copyright (c) 2011 by David Golden.
+#
+# This is free software, licensed under:
+#
+#   The Apache License, Version 2.0, January 2004
+#
+use strict;
+use warnings;
+# PODNAME: ylastic-costagent
+# ABSTRACT: Send AWS usage and cost data to Ylastic
+
+use File::Basename;
+use Getopt::Lucid ':all';
+use Log::Dispatchouli 2;
+use Pod::Usage;
+
+use App::Ylastic::CostAgent;
+
+my $opts = Getopt::Lucid->getopt([
+  Param("dir|d"),
+  Param("syslog|s"),
+  Param("logpath|l"),
+  Switch("dry-run|n"),
+  Switch("debug"),
+  Switch("help|h"),
+]);
+
+if ($opts->get_help ) {
+  pod2usage(1);
+  exit;
+}
+
+my $cf = shift @ARGV
+  or die "usage: $0 <config-file>\n";
+
+local $ENV{DISPATCHOULI_PATH} = $opts->get_logpath
+  if $opts->get_logpath;
+
+my $logger = Log::Dispatchouli->new({
+  ident     => basename($0),
+  facility  => $opts->get_syslog ? $opts->get_syslog : undef,
+  to_file   => $opts->get_logpath ? 1 : undef,
+  log_pid   => 0,
+  debug     => $opts->get_debug,
+});
+
+my $app = App::Ylastic::CostAgent->new(
+  config_file => $cf,
+  logger      => $logger,
+  dir         => $opts->get_dir,
+  upload      => ! $opts->get_dry_run,
+);
+
+exit $app->run;
+
+
+
+=pod
+
+=head1 NAME
+
+ylastic-costagent - Send AWS usage and cost data to Ylastic
+
+=head1 VERSION
+
+version 0.006
+
+=head1 SYNOPSIS
+
+   ylastic-costagent [OPTIONS] <CONFIG_FILE>
+ 
+   --dir|-d      Directory to hold downloads (default is tempdir)
+   --syslog|-s   Syslogd facility for logging (default is none)
+   --logpath|-l  Directory to hold a logfile (default is no logfile)
+   --dry-run|-n  Download, but don't upload (default is false)
+   --debug       Log with extra detail (default is false)
+   --help|h      Show summary of options
+
+=head1 DESCRIPTION
+
+This program downloads your Amazon Web Services usage data and uploads it to
+your Ylastic account for cost analysis.  It should be run regularly from a cron
+job to ensure up-to-date usage and spending history.
+
+=for Pod::Coverage method_names_here
+
+=head1 CONFIGURATION
+
+=head2 Installation
+
+Install L<App::Ylastic::CostAgent> using your regular CPAN client or
+distribution package manager (if available).  You may need the
+OpenSSL development libraries installed if you don't already have
+SSL working.
+
+If you aren't sure how to configure a CPAN client, see this excellent post on
+L<using CPAN as a non-root user|http://goo.gl/j27IB>.
+
+For example, assuming Ubuntu Linux and a bash shell:
+
+  $ sudo apt-get install libssl-dev
+  $ curl -L http://cpanmin.us | perl - -l ~/perl5 App::cpanminus local::lib
+  $ eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`
+  $ echo 'eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`' >> ~/.bashrc
+  $ cpanm App::Ylastic::CostAgent
+
+=head2 Config file format
+
+The C<<< ylastic-costagent >>> program requires a configuration file that
+specifies your Ylastic and AWS account data.  The file is 'INI' format.
+Here is a template:
+
+   ylastic_id = 1234567890abdcef1234567890abcdef12345678
+ 
+   [1234-5689-0123]
+   user = foo@example.com
+   pass = trustno1
+ 
+   [4321-9865-3210]
+   user = foo@example.com
+   pass = trustno1
+
+Each Amazon account should be listed as a separate section with
+the account ID number in brackets.  (You may omit dashes if you wish.)
+
+=head2 Security
+
+Your config file contains AWS usernames and passwords.  These give
+complete control over your AWS account(s).  Do not make your config file
+groupE<sol>world readable.  You should only run this program on a machine that is
+safely behind a firewall.  All web requests with account data are transmitted
+over SSL.
+
+=head2 Automation
+
+This program should be run regularly to keep your usage data current on
+Ylastic.  Here is an example cron job entry that updates usage data every 12
+hours:
+
+   0 */12 * * * /path/to/ylastic-costagent -s user /path/to/config.ini
+
+The C<<< -s user >>> option will log to the C<<< user >>> facility of syslogd.
+
+If you use a local perl library, be sure to add an appropriate PERL5LIB to
+your crontab file:
+
+   PERL5LIB=$HOME/perl5/lib/perl5/i686-linux:$HOME/perl5/lib/perl5
+
+Look at the PERL5LIB set by L<local::lib> for the right paths to use.
+
+=head1 ACKNOWLEDGMENTS
+
+This program is based on the original ylastic_aws_costs_agent.py program
+distributed by Ylastic, which was credited as based on a Python scrypt by
+Robert Coup.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Amazon Web Services|http://aws.amazon.com>
+
+=item *
+
+L<Ylastic|http://ylastic.com>
+
+=back
+
+=head1 AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by David Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut
+
+
+__END__
+
+

@@ -1,0 +1,22 @@
+Recompiling packages for newer distributions (eg. when a new builder is created)
+================================================================================
+
+There's no good automated solution for it:
+
+* Not everything in Squeeze might be worth compiling on Wheezy.
+* Not everything in Squeeze might *compile* in Wheezy.
+* Not everything in Squeeze might be needed in Wheezy.
+
+So it has to be done by hand. The following SQL statement will give
+the *names* of the *source* packages intended for "unstable" (ie. any
+distribution) that are present in squeeze-opera but not in
+wheezy-opera, regardless of the version. It can be run on the SQLite
+database in /var/arepa/db/package.db:
+
+   select distinct source_packages.name from compilation_queue join source_packages on compilation_queue.source_package_id = source_packages.id where source_packages.distribution = 'unstable' and source_packages.name in (select name from compilation_queue join source_packages on compilation_queue.source_package_id = source_packages.id where compilation_queue.distribution = 'squeeze-opera') and source_packages.name not in (select name from compilation_queue join source_packages on compilation_queue.source_package_id = source_packages.id where compilation_queue.distribution = 'wheezy-opera');
+
+Once this list is retrieved, relevant packages must be "injected" into
+Wheezy for compilation. That can be done by running the following
+command as the "arepa-master" user:
+
+    arepa build <package> wheezy-opera

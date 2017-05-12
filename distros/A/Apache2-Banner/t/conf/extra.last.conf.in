@@ -1,0 +1,33 @@
+# early start
+<Perl>
+  package My;
+  use strict;
+  use Apache2::Banner ();
+  use Apache2::ServerUtil ();
+  use Apache2::RequestRec ();
+  use Apache2::RequestIO ();
+
+  sub handler {
+    my ($r)=@_;
+    $r->content_type('text/plain');
+    my $what=(do{no strict 'refs'; \&{$r->args}})->();
+    $r->print($what);
+    0;
+  }
+  sub date {
+    my ($r)=@_;
+    $r->content_type('text/plain');
+    $r->print(Apache2::Banner::date 1_000_000_000);
+    0;
+  }
+</Perl>
+
+<Location /b>
+  SetHandler modperl
+  PerlResponseHandler My
+</Location>
+
+<Location /d>
+  SetHandler modperl
+  PerlResponseHandler My::date
+</Location>

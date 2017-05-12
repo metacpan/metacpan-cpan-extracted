@@ -1,0 +1,13 @@
+Revision history for Amazon-CloudFront-Thin
+
+0.04    2015-12-29
+    - Docs on handling unicode paths (Devin Ceartas)
+
+0.03    2015-09-19
+    - Amazon expects GMT times (Devin Ceartas)
+
+0.02    2015-08-11
+    - pod fixes
+
+0.01    2015-08-11
+    - initial release to the unsuspecting world.

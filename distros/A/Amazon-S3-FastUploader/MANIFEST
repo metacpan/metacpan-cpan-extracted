@@ -1,0 +1,18 @@
+.gitattributes
+.shipit
+Changes
+ignore.txt
+lib/Amazon/S3/FastUploader.pm
+lib/Amazon/S3/FastUploader/File.pm
+Makefile.PL
+MANIFEST			This list of files
+s3uploader.pl
+README
+t/00-load.t
+t/01-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,2 @@
+version=3
+https://github.com/ioanrogers/app-fastishcgi   .*/app-fastishcgi-v?(\d[\d.-]+)\.(?:tar(?:\.gz|\.bz2)?|tgz|zip)$

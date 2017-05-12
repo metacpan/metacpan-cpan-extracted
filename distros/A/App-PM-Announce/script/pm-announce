@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::PM::Announce::App;
+App::PM::Announce::App->run;
+
+1;

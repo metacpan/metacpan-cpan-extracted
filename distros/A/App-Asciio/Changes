@@ -1,0 +1,23 @@
+commit eafe1b5ab197e0f0a7f4a691a2664a8984a962e9 (HEAD -> master)
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Tue Jun 30 13:02:05 2015 +0200
+
+    FIXED: git command in Build.PL
+
+commit beb4bd8da8de11c249b61f52cf5e5eb19caad8a4 (origin/master, origin/HEAD)
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Sun Jun 28 14:24:09 2015 +0200
+
+    CHANGED: newly added elements are selected
+
+commit 192b3212c5dfa12002ed34785b5e262b448272d0
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Sat Jun 27 22:38:45 2015 +0200
+
+    FIX: use /usr/bin/env to start asciio
+
+commit edf35e1944bacda8681140ea7fca3b003909f640
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Sun Sep 16 13:49:28 2012 +0200
+
+    ADDED: Asciio version 1.51

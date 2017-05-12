@@ -1,0 +1,43 @@
+Revision history for App-IndonesianFinanceUtils
+
+0.07    2016-10-14 (PERLANCAR)
+
+	- Add utilities: get-usd-idr-rates-from-gmc,
+	  list-currency-exchange-rates-from-gmc,
+	  convert-currency-using-gmt.
+
+	- Make main module contain no code.
+
+
+0.06    2016-07-22 (PERLANCAR)
+
+	- Add utility: list-currency-exchange-rates-from-klikbca.
+
+
+0.05    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+
+0.04    2015-10-23 (PERLANCAR)
+
+	- Add script: get-jisdor-rates.
+
+
+0.03    2015-10-23 (PERLANCAR)
+
+        - Add script: get-usd-idr-rate-from-klikbca.
+
+
+0.02    2015-07-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dzil] Fix plugin ordering.
+
+
+0.01    2015-07-10 (PERLANCAR)
+
+        - First release.

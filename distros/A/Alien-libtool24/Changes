@@ -1,0 +1,15 @@
+Revision history for Alien-libtool24
+
+0.04      2016-01-29 10:09:16 -0500
+  - Use Alien::Base::ModuleBuild as configure_requires
+    instead of Alien::Base
+
+0.03      2015-12-23 08:24:41 -0700
+  - First cpan release
+  - Included documentation for use
+
+0.02      2015-12-22 21:33:17 -0700
+  - Tweaks for windows
+
+0.01      2015-12-22 14:14:11 -0700
+  - initial version

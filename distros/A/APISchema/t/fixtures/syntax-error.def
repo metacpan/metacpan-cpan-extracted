@@ -1,0 +1,14 @@
+title 'Incorrect API definition';
+description 'API definition with a syntax error';
+
+resource value  => {
+    type => 'number',
+    description => 'value' # , missing here
+    example => 1,
+};
+
+GET '/value' => {
+    title           => 'Value API',
+    description     => 'Endpoint for test.',
+    response        => 'value',
+};

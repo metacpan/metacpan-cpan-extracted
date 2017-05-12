@@ -1,0 +1,55 @@
+==================================================
+Changes from 2012-03-30 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.14 at 2017-03-29 14:55:28 +0000
+-----------------------------------------
+
+  Change: 7f6cd9a518cb89be16b1962bf8c5848db2aada35
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-03-29 15:55:28 +0000
+
+    Added Brexit 
+
+-----------------------------------------
+version 1.12 at 2016-09-02 20:10:34 +0000
+-----------------------------------------
+
+  Change: 5f7371e42720e937fa8bdb38b57cf18137723b10
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2016-09-02 21:10:34 +0000
+
+    Added some changes from upstream 
+
+-----------------------------------------
+version 1.10 at 2014-03-24 22:24:12 +0000
+-----------------------------------------
+
+  Change: 7e2f3cbd3441facddea9502699721994e36be5e3
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-03-24 22:24:12 +0000
+
+    Added some new upstream nouns 
+
+-----------------------------------------
+version 1.08 at 2014-03-24 21:58:10 +0000
+-----------------------------------------
+
+  Change: ea1b899ddd2c341a9c4a27c7dff4ce1ef487068a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-03-24 21:58:10 +0000
+
+    Added dailyfail command
+
+    Suggested by those fine gentlemen jkg and Trelane from #london.pm 
+
+  Change: bf6453c561c70999f01837e15835442ca6d30454
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-03-31 11:10:40 +0000
+
+    Trailing whitespace fixen 
+
+================================================
+Plus 5 releases after 2012-03-30 00:00:00 +0000.
+================================================

@@ -1,0 +1,52 @@
+NAME
+
+    Acme::CPANAuthors::Chinese - We are Chinese CPAN authors
+
+SYNOPSIS
+
+       use Acme::CPANAuthors;
+       use Acme::CPANAuthors::Chinese;
+    
+       my $authors = Acme::CPANAuthors->new('Chinese');
+    
+       my $number   = $authors->count;
+       my @ids      = $authors->id;
+       my @distros  = $authors->distributions('AGENT');
+       my $url      = $authors->avatar_url('FAYLAND');
+       my $kwalitee = $authors->kwalitee('YEWENBIN');
+
+DESCRIPTION
+
+    CPAN 中国作者
+
+    This class is used to provide a hash of Chinese CPAN author's PAUSE
+    id/name to Acme::CPANAuthors.
+
+MAINTENANCE
+
+    If you are a Chinese CPAN author not listed here, please send me your
+    id/name via email or RT so we can always keep this module up to date.
+    If there's a mistake and you're listed here but are not Chinese (or
+    just don't want to be listed), sorry for the inconvenience: please
+    contact me and I'll remove the entry right away.
+
+SEE ALSO
+
+    Acme::CPANAuthors - Main class to manipulate this one
+
+    Acme::CPANAuthors::Japanese - Code and documentation nearly taken
+    verbatim from it
+
+    Acme::CPANAuthors::Brazilian - inspired me directly
+
+AUTHOR
+
+    Fayland Lam, <fayland at gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2008-2012 Fayland Lam, PerlChina all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

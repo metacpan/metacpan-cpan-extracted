@@ -1,0 +1,15 @@
+#
+#  Ensure no mount-point is "too full".
+#
+
+foreach my $point ( Mounts() )
+{
+   if ( PercentageUsed( Path => $point ) > 80 )
+   {
+      Alert( To => "root",
+             From => "root",
+             Subject => "$fqdn is running out of space on $point",
+             Message => "This is a friendly warning." );
+   }
+}
+

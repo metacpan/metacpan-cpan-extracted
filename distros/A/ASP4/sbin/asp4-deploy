@@ -1,0 +1,217 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings 'all';
+use Getopt::Long;
+use Test::Harness;
+use Cwd 'cwd';
+
+my $res = GetOptions(
+  "src=s"     => \my $src,
+  "target=s"  => \my $target
+);
+
+$src or die "Usage: $0 --src=</path/to/MyApp_2011-11-29_12.03.34.tar.gz> [--target=/var/www/appname/]\n";
+
+my $start_cwd = cwd();
+
+my ($id) = $src =~ m{\b/?([^/]+?\d\d\d\d\-\d\d\-\d\d_\d\d\.\d\d\.\d\d)\.tar\.gz$}
+  or die "Invalid --src: '$src' does not match the standard filename.\n";
+if( $target )
+{
+  -d $target && chdir($target)
+    or die "Invalid --target: '$target': $!\n";
+}# end if()
+
+if( -d 'latest' )
+{
+  `rm -f deploying`;
+  
+  # Copy over the config files:
+  `tar -zxvf "$src" && ln -s "$id" deploying`;
+  my @test_errors = ( );
+  foreach( grep { $_ !~ m{latest/common$} } <latest/*> )
+  {
+    my ($folder) = $_ =~ m{latest/([^/]+)};
+    `cp -rf latest/$folder/conf/* deploying/$folder/conf/`;
+    chdir("deploying/$folder");
+    unless( eval { runtests( <t/*/*.t> ) } ) #/
+    {
+      push @test_errors, $@;
+    }# end unless()
+  }# end foreach()
+  chdir($start_cwd);
+  
+  if( @test_errors )
+  {
+    die "Tests failed:\n", join "\n", @test_errors;
+  }# end if()
+  
+  `rm -rf latest`;
+  `rm -rf deploying`;
+  `ln -s "$id" latest`;
+}
+else
+{
+  `tar -zxvf "$src" && ln -s "$id" latest`;
+  my @to_update = ( );
+  my @files = qw( asp4-config.json httpd.conf );
+  foreach( grep { $_ !~ m{latest/common$} } <latest/*> )
+  {
+    my ($folder) = $_ =~ m{latest/([^/]+)};
+    foreach my $file ( @files )
+    {
+      if( (stat("latest/$folder/conf/$file.template"))[7]  )
+      {
+        `cp latest/$folder/conf/$file.template latest/$folder/conf/$file`;
+        push @to_update, "latest/$folder/conf/$file";
+      }# end if()
+    }# end foreach()
+  }# end foreach()
+  warn "\n\n***You must update the following configuration files:***\n";
+  warn join( "\n", map {"\t* $_"} @to_update), "\n\n";
+}# end if()
+
+=pod
+
+=head1 NAME
+
+asp4-deploy - Deploy your prepared ASP4 application.
+
+=head1 USAGE
+
+  asp4-deploy --src=/path/to/MyWeb_2011-11-15_23.59.39.tar.gz [--target=/var/www/myweb.com]
+
+=head1 ARGUMENTS
+
+=head2 --src=/path/to/MyWeb_2011-11-15_23.59.39.tar.gz
+
+Required.
+
+=head2 --target=/var/www/myweb.com
+
+Optional.  Defaults to the current directory.
+
+=head1 DESCRIPTION
+
+C<asp4-deploy> behaves differently the B<first time> you deploy an app than it does
+the second, third or tenth times.
+
+=head2 The First Deployment
+
+=over 4
+
+=item Step 1
+
+Unzips the tar.gz archive into the target folder.
+
+=item Step 2
+
+Copies all the C<conf/*.template> files to be non-template files.
+
+eg:
+
+  cp conf/asp4-config.json.template conf/asp4-config.json
+  cp conf/httpd.conf.template conf/httpd.conf
+
+=item Step 3
+
+Makes a symbolic link from C</the/target/path/latest/> to C</the/target/path/MyWeb_2011-11-15_23.59.39>.
+
+=item Step 4
+
+You update your C<conf/asp4-config.json> and C<conf/httpd.conf> to work for the new environment.
+
+You run your tests:
+
+  prove -r t/
+
+If everything checks out, then you update your server's other configuration (eg: /etc/apache2/sites-enabled/*) to include:
+
+  /the/target/path/latest/www/conf/httpd.conf
+
+B<Restart apache and you're done.>
+
+=back
+
+=head2 Subsequent Deployments
+
+Subsequent deployments are easier for us humans, but more work for the computers.
+
+=over 4
+
+=item Step 1
+
+Unzips the tar.gz into the target folder.
+
+=item Step 2
+
+Creates a symbolic link 'C<deploying>' in your project folder.
+
+eg:
+
+  /var/www/myweb/deploying  ->  /var/www/myweb/MyWeb_2011-11-15_23.59.39
+
+=item Step 3
+
+Copies all your configuration files from 'C<latest/*/conf/*>' into 'C<deploying/*/conf/*>'
+
+=item Step 4
+
+Runs unit tests on all folders under deploying except for 'C<common>'.
+
+If all tests pass, we continue.  Otherwise, we bail out with errors.
+
+=item Step 5
+
+Unlink the C<deploying> symbolic link and change C<latest> to point to the new directory.
+
+=item Step 6
+
+B<After a successful deployment, you should restart apache.>
+
+=back
+
+=head1 DEPLOYMENT DIRECTORY FOLDER STRUCTURE
+
+Initially you will have a folder structure like this:
+
+  .
+  |-- MyWeb_2011-10-28_15.37.55
+  `-- latest -> MyWeb_2011-10-28_15.37.55
+
+After several deployments, it will look like this:
+
+  .
+  |-- MyWeb_2011-10-28_15.37.55
+  |-- MyWeb_2011-10-28_16.04.35
+  |-- MyWeb_2011-10-29_23.55.55
+  |-- MyWeb_2011-10-29_23.59.39
+  |-- MyWeb_2011-10-30_00.00.13
+  `-- latest -> MyWeb_2011-10-30_00.00.13
+
+If you need to rollback to a previous release, simply update the symbolic link
+so that it points to a previous version.
+
+  rm latest
+  ln -s MyWeb_2011-10-29_23.59.39 latest
+
+=head1 GNU/LINUX, POSIX OS ONLY
+
+This tool makes use of symbolic links and the GNU tools to Get The Job Done.
+
+If your operating system doesn't provide them, consider upgrading to one that does.
+
+=head1 BUGS
+
+It's possible that some bugs have found their way into this release.
+
+Use RT L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=ASP4> to submit bug reports.
+
+=head1 HOMEPAGE
+
+Please visit the ASP4 homepage at L<http://0x31337.org/code/> to see examples
+of ASP4 in action.
+
+=cut
+

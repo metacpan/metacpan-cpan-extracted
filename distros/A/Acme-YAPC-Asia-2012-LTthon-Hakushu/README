@@ -1,0 +1,39 @@
+This is Perl module Acme::YAPC::Asia::2012::LTthon::Hakushu.
+
+INSTALLATION
+
+Type the following command:
+
+    $ curl -L http://cpanmin.us | perl - Acme::YAPC::Asia::2012::LTthon::Hakushu
+
+Or install cpanm and then run the following command to install
+Acme::YAPC::Asia::2012::LTthon::Hakushu:
+
+    $ cpanm Acme::YAPC::Asia::2012::LTthon::Hakushu
+
+If you get an archive of this distribution, unpack it and build it
+as per the usual:
+
+    $ tar xzf Acme-YAPC-Asia-2012-LTthon-Hakushu-$version.tar.gz
+    $ cd Acme-YAPC-Asia-2012-LTthon-Hakushu-$version
+    $ perl Makefile.PL
+    $ make && make test
+
+Then install it:
+
+    $ make install
+
+DOCUMENTATION
+
+Acme::YAPC::Asia::2012::LTthon::Hakushu documentation is available as in POD. So you can do:
+
+    $ perldoc Acme::YAPC::Asia::2012::LTthon::Hakushu
+
+to read the documentation online with your favorite pager.
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2012, <<YOUR NAME HERE>>. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

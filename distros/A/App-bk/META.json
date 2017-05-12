@@ -1,0 +1,65 @@
+{
+   "abstract" : "A pre-edit file backup program",
+   "author" : [
+      "Duncan Ferguson <duncan_j_ferguson@yahoo.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-bk",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "CPAN::Meta::Spec" : "2.13338",
+            "English" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Which" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "Module::Build" : "0.42",
+            "POSIX" : "0",
+            "Pod::Usage" : "0",
+            "Test::More" : "0.94",
+            "Test::Trap" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "English" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Which" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "POSIX" : "0",
+            "Pod::Usage" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::bk" : {
+         "file" : "lib/App/bk.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/duncs/perl-app-bk",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.06"
+}

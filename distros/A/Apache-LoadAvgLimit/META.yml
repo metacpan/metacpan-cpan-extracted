@@ -1,0 +1,38 @@
+---
+abstract: 'limiting client request by system CPU load-averages (deprecated)'
+author:
+  - 'Ryo Okamoto <ryo@aquahill.net>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.3, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Apache-LoadAvgLimit
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Apache::LoadAvgLimit:
+    file: lib/Apache/LoadAvgLimit.pm
+    version: 0.04
+  Apache::LoadAvgLimit::GetAvg:
+    file: lib/Apache/LoadAvgLimit/GetAvg.pm
+    version: 0.04
+resources:
+  bugtracker: https://github.com/ryochin/p5-apache-loadavglimit/issues
+  homepage: https://github.com/ryochin/p5-apache-loadavglimit
+  repository: git://github.com/ryochin/p5-apache-loadavglimit.git
+version: 0.04

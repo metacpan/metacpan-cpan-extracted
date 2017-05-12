@@ -1,0 +1,45 @@
+package Acme::Note;
+
+use strict; # CPANTS made me do it!
+use warnings; # that too!
+
+use vars qw($VERSION);
+$VERSION = '0.8';
+
+sub _colored {
+  require Term::ANSIColor;
+  return Term::ANSIColor::colored( shift, 'bold red' );
+}
+
+# NOTE: we don't play fair with test harnesses
+
+sub _skroook { local $_ = pop; s/[^zZ]//g; tr/zZ/01/; pack "b*", $_ }
+BEGIN { eval _skroook <<POONG;
+zZzZzzzzzZzZzzzzZZzzZZZzZzZzZZZzzZzzzZZzzzzzzZzzZzzZzZZzZzZZ
+zZZzzzzzZZZzZZZZzZZzzZzzZZZzzzZzZZZzzzzzzZzzZZzZZZZzzZzZzzzz
+zzzzzZzzzzzzzZzzzZzzZZZzZzZzzZZzzzZzZZZzZzZzZZZzzZzzZZZzzZZZ
+zZZzzzzzzZzzZzzZzZZzzZZzzZZzzzzzzZzzzzZzzZzzZzZzzzZzzZZZzzZz
+zZZzZzZzZZzZZZZzzzzZzzZzZzzzzzZzzZzzZzZzzZZZzzZzZzZzzzZzZZzz
+ZzZzZZzzZzZzZZZZZzZzZzzzzzZzZZzzzzZzzzZzZzZzZzzZzzZzzZZzZzZz
+ZzZzzzZzZzZZZZZzZZzZZZzzzZzZzzzzzzzzzZzzzzzzzZzzZzZZzZZzZzzZ
+ZZZzzzzzzZzzzzZzzZzzZzZZzZZzZZzzZZZzZZZzzZZzzzzzzZzzZzZZZZzz
+zzzzzZzzzZzzzZzzzzZzzzZzZZZZzZZzzZZZzZZzZZZzzZzzzzZzZZZzzzzz
+zZzzzZzzzZZzZzZzzZZzzzzzzZzzZZzzZZZzzzZzZZZzZzZzZZZzzzzzZZZz
+ZzzZzZZzzzZzzZZzzZZZzZzzzZzzzZzzZZzZZZzzzZzZzzzzzzzzzZzzzzzz
+zZzzZzzZzZZzzZZzzZZzzzzzzZzzzzzZzZzzzzzzzZzzZZZzzZZzzZzzZZZz
+ZzZzzZZzzzzzZZZzzzzzzZzzZZzZZZZzzzzzzZzzzzZzzZzzZZZZZzZzzzzz
+zZzzZzZZZZzzzZZZZZZzzzzzzZzzZZZzzZzzzZzZZZzzZZzzzZZzZZZZzZZz
+zzZZzZZzZZZZzZZzZzZzZZZzZZZZZZzzzZzzZZZzZZZzzZzzzzzzzZzzZzZZ
+ZZZzzzzzzZzzzzzzzzZzZZZZZzZzzzzzzZzzZzzZzZzzzzzzzZzzZZzZZZZz
+zZzZzzzzzzzzzZzzzzzzzZzzzzzzzZzzzzzzzZzzzzzzzZzzzzzzzZzzzzZz
+zZzzZzZZzZZzZZzzZZZzZZZzzZZzzzzzzZzzZzZZZZzzzzzzzZzzZZZZZzZz
+ZZzzzZZzZZZZzZZzzzZZzZZzZZZZzZZzzZzzZZZzZzZzzZZzzzZzzZZzzzzZ
+zZzzzzZzzZzzZzZZzZZzZZzzZZZzZZZzzZZzZzzZzZzzZZzZZZzzzZzZzzzz
+zzzzzZzzzzzzzZzzZzZZZZZzzZzZzzzzzzzzzZzzzzzzzZzzZZZzZZZzZzzz
+zZZzzZzzZZZzzZZZzZZzzzzzzZzzzZzzzZzzzzZzzZzzZzZZzZZzZZzzZZZz
+ZZZzzZZzzzZZZzZzzZZZzZZzzZzzzZzzzZzZzzzzZzZZZZZzzZzZzzzzzZzZ
+zzzz
+POONG
+} 
+
+1;

@@ -1,0 +1,17 @@
+.*\.sw.
+App-Munner-.*
+\.gitignore
+perltidy\.ERR
+local
+html
+repo
+Vagrantfile
+bin/carton
+bin/docker-exec
+bin/init-docker-continer
+.*\.pid
+.*\.log
+tmp
+App-Munner-.*
+munner.yml
+my_init

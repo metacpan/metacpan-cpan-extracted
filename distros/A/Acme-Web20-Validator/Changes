@@ -1,0 +1,6 @@
+Revision history for Perl extension Acme::Web20::Validator.
+
+0.01  Sun Nov 13 13:57:44 2005
+	- original version; created by h2xs 1.23 with options
+		-X -A -n Acme::Web20::Validator
+

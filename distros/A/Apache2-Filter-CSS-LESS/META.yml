@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Apache2-Filter-CSS-LESS
+version:            0.30
+abstract:           Apache2 LESS to CSS conversion filter
+author:
+    - Michael Schout <mschout@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Apache::Test:  1.22
+    CSS::LESSp:    0
+    mod_perl2:     1.9922
+resources:
+    bugtracker:  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Apache2-Filter-CSS-LESS
+    repository:  http://github.com/mschout/apache2-filter-css-less
+no_index:
+    directory:
+        - t
+        - inc
+        - t
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

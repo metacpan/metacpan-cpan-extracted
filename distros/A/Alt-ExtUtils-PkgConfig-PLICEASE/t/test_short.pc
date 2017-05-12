@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name: TestShort
+Description: Bla blub
+Version: 2
+Libs: -L${libdir} -ltest-short
+Cflags: -I${includedir}/test-short

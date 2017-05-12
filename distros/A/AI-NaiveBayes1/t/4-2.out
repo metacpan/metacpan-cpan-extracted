@@ -1,0 +1,161 @@
+--- #YAML:1.0 !perl/AI::NaiveBayes1
+attributes:
+  - outlook
+  - windy
+  - humidity
+  - temperature
+attvals:
+  humidity:
+    - 85
+    - 90
+    - 86
+    - 96
+    - 80
+    - 70
+    - 65
+    - 95
+    - 75
+    - 91
+  outlook:
+    - sunny
+    - overcast
+    - rainy
+  temperature:
+    - 85
+    - 80
+    - 83
+    - 70
+    - 68
+    - 65
+    - 64
+    - 72
+    - 69
+    - 75
+    - 81
+    - 71
+  windy:
+    - FALSE
+    - TRUE
+labels:
+  - play=>no
+  - play=>yes
+model:
+  condprob:
+    outlook:
+      overcast:
+        play=>no: 0
+        play=>yes: 0.444444444444444
+      rainy:
+        play=>no: 0.4
+        play=>yes: 0.333333333333333
+      sunny:
+        play=>no: 0.6
+        play=>yes: 0.222222222222222
+    windy:
+      FALSE:
+        play=>no: 0.4
+        play=>yes: 0.666666666666667
+      TRUE:
+        play=>no: 0.6
+        play=>yes: 0.333333333333333
+  labelprob:
+    play=>no: 0.357142857142857
+    play=>yes: 0.642857142857143
+  real_attr: &1
+    humidity: 1
+    temperature: 1
+  real_stat:
+    humidity:
+      play=>no:
+        count: 5
+        mean: 86.2
+        stddev: 9.73139250056229
+        sum: 431
+      play=>yes:
+        count: 9
+        mean: 79.1111111111111
+        stddev: 10.2157286138146
+        sum: 712
+    temperature:
+      play=>no:
+        count: 5
+        mean: 74.6
+        stddev: 7.89303490426845
+        sum: 373
+      play=>yes:
+        count: 9
+        mean: 73
+        stddev: 6.16441400296898
+        sum: 657
+numof_instances: 14
+real_attr: *1
+real_stat: {}
+stat_attributes:
+  humidity:
+    65:
+      play=>yes: 1
+    70:
+      play=>no: 1
+      play=>yes: 2
+    75:
+      play=>yes: 1
+    80:
+      play=>yes: 2
+    85:
+      play=>no: 1
+    86:
+      play=>yes: 1
+    90:
+      play=>no: 1
+      play=>yes: 1
+    91:
+      play=>no: 1
+    95:
+      play=>no: 1
+    96:
+      play=>yes: 1
+  outlook:
+    overcast:
+      play=>yes: 4
+    rainy:
+      play=>no: 2
+      play=>yes: 3
+    sunny:
+      play=>no: 3
+      play=>yes: 2
+  temperature:
+    64:
+      play=>yes: 1
+    65:
+      play=>no: 1
+    68:
+      play=>yes: 1
+    69:
+      play=>yes: 1
+    70:
+      play=>yes: 1
+    71:
+      play=>no: 1
+    72:
+      play=>no: 1
+      play=>yes: 1
+    75:
+      play=>yes: 2
+    80:
+      play=>no: 1
+    81:
+      play=>yes: 1
+    83:
+      play=>yes: 1
+    85:
+      play=>no: 1
+  windy:
+    FALSE:
+      play=>no: 2
+      play=>yes: 6
+    TRUE:
+      play=>no: 3
+      play=>yes: 3
+stat_labels:
+  play=>no: 5
+  play=>yes: 9

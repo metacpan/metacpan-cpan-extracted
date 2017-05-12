@@ -1,0 +1,139 @@
+NAME
+    Apache2::AuthCASSimple - Apache2 module to authentificate through a CAS
+    server
+
+DESCRIPTION
+    Apache2::AuthCASSimple is an authentication module for
+    Apache2/mod_perl2. It allow you to authentificate users through a Yale
+    CAS server. It means you don't need to give login/password if you've
+    already be authentificate by the CAS server, only tickets are exchanged
+    between Web client, Apache2 server and CAS server. If you not're
+    authentificate yet, you'll be redirect on the CAS server login form.
+
+    This module allow the use of simple text files for sessions.
+
+SYNOPSIS
+      PerlOptions +GlobalRequest
+
+      <Location /protected>
+        AuthType Apache2::AuthCASSimple
+        PerlAuthenHandler Apache2::AuthCASSimple
+
+        PerlSetVar CASServerName my.casserver.com
+        PerlSetVar CASServerPath /
+        # PerlSetVar CASServerPort 443
+        # PerlSetVar CASServerNoSSL 1
+        PerlSetVar CASSessionTimeout 3660
+        PerlSetVar CASSessionDirectory /tmp
+        # PerlSetVar CASFixDirectory /
+        # PerlSetVar ModProxy 1
+        # PerlSetVar HTTPSServer 1
+
+        require valid-user
+      </Location>
+
+    or
+
+      order deny,allow
+      deny from all
+
+      require user xxx yyyy
+
+      satisfy any
+
+CONFIGURATION
+    CASServerName
+        Name of the CAS server. It can be a numeric IP address.
+
+    CASServerPort
+        Port of the CAS server. Default is 443.
+
+    CASServerPath
+        Path (URI) of the CAS server. Default is "/cas".
+
+    CASServerNoSSL
+        Disable SSL transaction wih CAS server (HTTPS). Default is off.
+
+    CASCaFile
+        CAS server public key. This file is used to allow secure connection
+        between the webserver using Apache2::AuthCASSimple and the CAS
+        server.
+
+        DEPRECATED : Authen::CAS::Client use LWP::UserAgent to make https
+        requests
+
+    CASSessionTimeout
+        Timeout (in second) for session create by Apache2::AuthCASSimple (to
+        avoid CAS server overloading). Default is 60.
+
+        -1 means disable.
+
+        0 mean infinite (until the user close browser).
+
+    CASSessionDirectory
+        Directory where session data are stored. Default is /tmp.
+
+    CASFixDirectory
+        Force the path of the session cookie for same policy in all
+        subdirectories else current directory is used.
+
+    ModProxy
+        Apache2 mod_perl2 don't be use with mod_proxy. Default is off.
+
+    HTTPSServer
+        If you want to keep a HTTPS server for all data. Default is 0.
+
+    OK AUTH_REQUIRED DECLINED REDIRECT SERVER_ERROR M_GET
+        Apache constants to make pod coverage happy
+
+METHOD
+  handler
+    call by apache2
+
+VERSION
+    This documentation describes Apache2::AuthCASSimple version 0.10
+
+BUGS AND TROUBLESHOOTING
+    *   Old expired sessions files must be deleted with an example provided
+        script : "delete_session_data.pl"
+
+    *   Apache::Session::Wrapper certainly need Apache2::Cookie
+
+    *   $r must be global for sessions with Apache::Session::Wrapper, add
+
+          PerlOptions +GlobalRequest
+
+        in your virtualhost conf
+
+    *   Apreq module must be enable in debian
+
+          a2enmod apreq
+
+        or add
+
+          LoadModule apreq_module /usr/lib/apache2/modules/mod_apreq2.so
+
+        in your apache configuration file
+
+    Please submit any bug reports to agostini@univ-metz.fr.
+
+NOTES
+    Requires "mod_perl 2" version 2.02 or later Requires Authen::CAS::Client
+    Requires Apache::Session::Wrapper
+
+AUTHOR
+        Yves Agostini
+        CPAN ID: YVESAGO
+        Univ Metz
+        agostini@univ-metz.fr
+        http://www.crium.univ-metz.fr
+
+COPYRIGHT
+    Copyright (c) 2009 by Yves Agostini
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

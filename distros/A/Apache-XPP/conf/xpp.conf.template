@@ -1,0 +1,11 @@
+# Set up correct MIME type
+AddType text/html .xpml
+DirectoryIndex index.html index.xpml
+
+<Files *.xpml>
+   PerlSendHeader Off
+   SetHandler perl-script
+   PerlHandler Apache::XPP
+   PerlSetVar XPPIncludeDir include
+   PerlSetVar XPMLHeaders code_header.xmi
+</Files>

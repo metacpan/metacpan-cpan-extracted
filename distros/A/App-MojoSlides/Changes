@@ -1,0 +1,48 @@
+Revision history for Perl module App::MojoSlides
+
+0.11 2017-03-13
+  - Deprecate the dist
+    - There will be no further support given
+    - Adoption requests will be considered
+  - Fix deprecated use of Mojo::Util::slurp
+    - Bump Mojolicious dependency to 7.15
+  - Fix tests failing since Mojolicious 7.0
+
+0.10 2014-05-21
+  - Fixed missing dependency in Build.PL
+
+0.09 2014-05-17
+  - fixed compatibility with newer Mojolicious version
+    - bumped required Mojolicious version to 4.77
+
+0.08 2013-11-10
+  - fixed ms_overlay bug preventing more than 9 increments
+  - column can now take an array reference of classes
+
+0.07 2013-11-10
+  - added finally key for further flexibility
+  - added more diagnostics for some Heisenbugs seen on CPANTesters for v0.06
+
+0.06 2013-11-06
+  - renamed msOverlay attribute to ms_overlay for case-invariance (html compliance)
+  - added "incremental" helper, especially useful for building incrementing lists
+
+0.05 2013-11-05
+  - added vspace helper
+  - handle msOverlay with a single number correctly
+  - added extra_css and extra_js config keys
+  - added header_template and footer_template config keys
+
+0.04 2013-11-03
+  - Simplified specification of slides in configuration.
+
+0.03 2013-11-03
+  - Include App::MojoSlides::MoreTagHelpers.
+  - Better mocking of DATA handle.
+
+0.02 2013-11-02
+  - Can use a __DATA__ section of the config file for slides.
+
+0.01 2013-11-02
+  - Alpha release. You have been warned.
+

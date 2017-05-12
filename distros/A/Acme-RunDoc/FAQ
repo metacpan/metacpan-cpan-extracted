@@ -1,0 +1,14 @@
+This isn't really a FAQ.
+
+There are some examples bundled with the installation, but they are
+not installed by default. If you grab a copy of the "word-examples"
+and "word-lib" directories though, you ought to be able to run them
+like this (assuming Acme::RunDoc and icrosoft::Word are installed on
+your system)...
+
+# Example .doc
+perl -Microsoft::Word 'word-examples/helloworld.doc'
+
+# Example .docm
+perl -Iword-lib -MAcme::RunDoc=Hello::World -E'greet;'
+

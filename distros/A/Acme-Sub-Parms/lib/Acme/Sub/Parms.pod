@@ -1,0 +1,505 @@
+
+=head1 NAME
+
+Acme::Sub::Parms - Provides simple, fast parsing of named subroutine parameters
+
+=head1 SYNOPSIS
+
+ use Acme::Sub::Parms;
+
+ ################
+ # A simple function with two required parameters
+
+ sub simple_bind_parms_function {
+     BindParms : (
+         my $handle : handle;
+         my $thing  : thing;
+     )
+
+     #...
+ }
+
+ ################
+ # A complex method interface with multiple parameters
+ # and validation requirements
+
+ sub complex_bind_parms_function {
+     my $self = shift;
+
+     BindParms : (
+         my $handle         : handle  [required, is_defined, can=param];
+         my $thing          : thing   [optional, isa=CGI::Minimal];
+         my $another_thing  : another [optional, type=SCALAR, callback=_legal_thing];
+         my $yathing        : yathing [optional, is_defined];
+         my $defaulted      : dthing  [optional, default="help me"];
+     )
+
+     #...
+ }
+
+=head1 DESCRIPTION
+
+Acme::Sub::Parms uses a source filter to rewrite the code during the
+module load with efficient inline parameter processing code that
+handles some common cases for simple Perl style named parameter key/value
+parameter lists. It can handle either case-sensitive or case-insensitive
+parameters as desired.
+
+In essence, it provides some syntactic sugar for parameter declaration
+and validation.
+
+Typical usage is follows:
+
+  sub a_function {
+    BindParms : (
+        my $somevariable    : parameter_name         [required];
+        my $anothervariable : another_parameter_name [optional];
+    )
+
+    #...
+  }
+
+B<IMPORTANT:> The whitespace before and after the ':' in the 
+'BindParms : (' starting declaration B<IS NOT> optional.
+
+Second, the entire declaration must be on one line: No line breaks in
+the middle or other code on the line.
+
+You can make the passed parameter names case insensitive by adding the
+':normalize' option on the 'use' line.
+
+Acme::Sub::Parms does not handle anonymous hashes for parameters. It
+expects parameters lists to be passed as 'flat' lists. This is due to
+performance issues. The additional code required to handle both 'flat'
+and 'anon hash' parameters has a noticable performance hit for simple
+cases. Since one of the goals of this module is to be B<fast> and a
+survey of existing modules indicates most authors use 'flat' parameters
+lists, that is what Acme::Sub::Parms does as well. If you prefer using
+anon hashes. just dereference them before using them to call.
+
+Good Example:
+
+ some_function('a_parm' => 'value);
+
+ sub some_function {
+	BindParms : (
+		my $variable : a_parm;
+        )
+
+    #.....
+ }
+
+Example of dereferencing anon hash parms:
+
+ my $parms = { 'a_parm' => 'value' };
+ some_function(%$parms);
+
+Broken Examples:
+
+ some_function({ 'a_parm' => 'value} }); # WILL NOT WORK
+
+ my $parms = { 'a_parm' => 'value' };
+ some_function($parms);  # WILL NOT WORK
+
+
+ sub some_function {
+	BindParms : (
+		my $variable : a_parm;
+        )
+
+    #.....
+ }
+
+=head1 'use' options
+
+There are three compile-time 'use' options available.
+
+  use Acme::Sub::Parms qw(:no_validation :normalize :dump_to_stdout);
+
+=over 4
+
+=item :no_validation
+
+This flags that bound parameters should B<NOT> be validated according
+to any validation specifications.
+
+If this flag is used, then parameters will be bound, callbacks and
+defaults applied, but validation checking will be disabled. This
+provides a significant performance boost to parameter processing
+in mature code that doesn't need runtime parameter assertion checking.
+
+=item :normalize
+
+This flags that bound parameters should ignore the difference between
+upper and lowercase names for parameters. This permits the caller to
+use MixedCase, UPPERCASE, or lowercase parameters names interchangeably
+(with a noticable performance penalty).
+
+=item :dump_to_stdout
+
+This signals that the code should be printed to STDOUT as the source
+filter runs. This is useful primarily to see what the source filter
+actually does, for debugging, or if you want to capture the transformed
+code so it can be used B<without> needing Acme::Sub::Parms to be
+installed at all.
+
+This would typically be used by setting the flag on the
+'use Acme::Sub::Parms', and then running 
+  perl -c sourcefile > outputfile
+(with 'sourcefile' and 'outputfile' replaced with the appropriate
+filenames).
+
+=back
+
+=head1 Parameter Binding and Validation
+
+A syntax is available to perform argument validation. This is both fast
+and powerful, but has some caveats.
+
+The basic format is as follows
+
+  BindParms : (
+     my $somevariable    : parameter_name         [required];
+     my $anothervariable : another_parameter_name [optional];
+  )
+
+The format of each line of the binding declaration is formatted as:
+
+   <stuff being assigned to> : parameter_name [binding options];
+
+The simplest possible binding is like the following:
+
+ BindParms : (
+    my $somevariable : parameter_name;
+ )
+
+That declares that the required named parameter 'parameter_name' will
+be bound to the lexical variable $somevariable.
+
+parameter_name may B<NOT> contain whitespace, single or double quotes,
+or a left bracket ('[') character. It must be a bare (unquoted) string.
+
+Pretty much any expression that is legal to assign to may be used for
+the left side. With the caveat that it B<CANNOT> contain the literal
+string ' : ' (whitespace colon whitespace) as that will confuse the
+line parser. This excludes the use of the trinary ( statement ? value : value)
+conditional operator on the left side, but you shouldn't need it in this
+context since there is sufficient power in the binding options to cover
+the cases where you might want it.
+
+If you need to use the " : " string in an embedded quoted literal
+string, use backslash escaping on it:
+
+Bad:
+  my $thing{" : "}   : something [optional];
+
+Good:
+  my $thing{" \: "} : something [optional];
+
+Pretty much anything else you want to do on the left of the ':' binding
+is fine as long as it is legal to be assigned to.
+
+Ex.
+  BindParms : (
+    my Dog $rover  : dog_record [required];
+  }
+
+The options available for parameter binding are as follows:
+
+=head1 Parameter Validation
+
+=over 4
+
+=item Optional/Required Parameters
+
+Optional vs Required is flagged by either (surprise) B<optional> or
+B<required> in the parameter options declaration.
+
+The parameter options declaration is the section between the '[' and ']'
+characters after the name of field being bound.
+
+ # Optional parameter
+ BindParms : (
+       my $handle : handle [optional];
+ )
+
+ # Required parameter
+ BindParms : (
+       my $handle : handle [required];
+ )
+
+'required' specifies validation code to the bind that verifies that the
+'handle' parameter was in fact passed and causes a C<confess> at that
+line if it was not passed.  This does not ensure that the parameter has
+a defined value - only that it was passed.
+
+If neither 'required' or 'optional' is specified, then 'required' is defaulted.
+
+Example of default required parameters:
+
+ sub a_subroutine {
+    BindParms : (
+        my $handle : handle;
+        my $thing  : thing;
+    )
+    #....
+ )
+
+=back
+
+=over 4
+
+=item is_defined
+
+The 'is_defined' declaration generates a validation requirement that the
+parameter B<IF PRESENT> must not have an undefined value - passing an
+undefined value results in a runtime 'croak'.
+
+If the parameter is B<optional> it may still be omitted - but must not have an undefined value if passed.
+
+If the the parameter is B<required> then it B<must> be present, B<AND> must not have an undefined value.
+
+Example:
+
+  # Optional but may not be undefined if passed
+  BindParms : (
+      my $handle : handle [optional, is_defined];
+  )
+
+  # Required and may not be undefined
+  BindParms : (
+      my $handle : handle [required, is_defined];
+  )
+
+=back
+
+=over 4
+
+=item can=method | can="method1 method2 method3 ..."
+
+The 'can' declaration generates a validation requirement that a passed
+value has all of the specified
+object methods available. This is useful when you want to verify that a
+passed object posesses a method you need. This is considered better than
+verifying that a specific class was passed.
+
+Note; This B<does not> verify that anything _was_ passed, only that
+B<if> something was passed, it posesses the specified object method.
+
+If only one method is being specified, the quote marks around the names
+of the method may be omitted.
+
+The 'can' requirements are cumulative - if you specify two or more they
+are B<all> required.
+
+Examples:
+
+  # Required parameter with a 'param' method
+  BindParms : (
+      my $cgi = cgi [required, can=param];
+  )
+
+  # Required parameter with 'param' and 'cookie' methods
+  BindParms : (
+      my $cgi = cgi [required, can="param cookie"]
+  )
+
+=back
+
+=over 4
+
+=item isa=classname | isa="classname1 classname2 classname3 ..."
+
+The 'isa' declaration generates a validation requirement that a passed
+value 'isa' reference to a class or a subclass of one or more of the
+specified classes.
+
+This can also be used for checking Perl's built-in reference types such
+as 'HASH', 'ARRAY' or 'CODE'.
+
+Note: This B<does not> verify that anything _was_ passed, only that
+B<if> something was passed, it 'isa' instance or subclass of the
+specified type.
+
+Examples:
+
+  # Optional 'HASH'
+  BindParms : (
+      my $data = thing [optional, isa=HASH];
+  )
+
+  # Required 'Mammal' or 'Bacteria' or 'Virus' object or subclasses
+  BindParms : (
+       my $lifeform = organism [required, isa="Mammal Bacteria Virus"];
+  )
+
+=back
+
+=over 4
+
+=item type=classname | type="type1 type2 type3 ..."
+
+The 'type' declaration generates a validation requirement that a passed
+value is an instance of the specified type. This is an B<exact match>
+requirement. It does not check for class inheritance or blessed objects.
+If you specify a reference type or a class name it must match B<exactly>.
+
+This can also be used for checking Perl's built-in reference types such
+as 'HASH', 'ARRAY' or 'CODE'.
+
+Note: This B<does not> verify that anything _was_ passed, only that
+B<if> something was passed, it is of the specified type.
+
+Examples:
+
+  # Optional 'HASH'
+  BindParms : (
+      my $data = thing [optional, type=HASH];
+  )
+
+  # Required 'Mammal' or 'Bacteria' or 'Virus' object
+  BindParms : (
+       my $lifeform = organism [type="Mammal Bacteria Virus"];
+  )
+
+=back
+
+=over 4
+
+=item default=something | default="some thing with spaces"
+
+The 'default' declaration allows the setting of default values for
+optional parameters (it is implicit that if omitted the default value
+is undef).
+
+If the value contains whitespace (or if you want the empty string
+value), you will need to use quotes around it.
+
+'default' behaves differently for required and optional parameters:
+
+For an optional parameter, it only activates if the parameter is
+omitted completely. It will not kick in for a value that is passed
+but has the undefined value.
+
+For a required parameter, it only activates if the parameter is
+undefined.
+
+=back
+
+=over 4
+
+=item callback=function_name
+
+The 'callback' declaration lets you specify a function name to be used
+to perform validation on the parameter(s). 
+The syntax is simple: callback=validation_function_name
+
+There is no support for method style calls, only ordinary function calls.
+
+The callback function is called with three
+parameters: ($field_name, $field_value, $arguments_anon_hash)
+
+The $field_name and $field_value arguments are obvious,
+the $arguments_anon_hash is a 'live' reference to a hash containing
+all of the arguments being processed by BindParms block.
+
+Because it is a 'live' hash reference, alterations to the hash will be
+reflected in subsequent binding lines and in the final values bound.
+This is a powerful, but simultaneously very dangerous feature. Use
+this ability with caution. 
+
+The callback must return either a true or a false value (not the
+literal words 'true' or 'false' but something that evaluates to
+a true or false logical value) and a string with an error message
+(if a false value was returned.)
+
+Callback function example:
+
+ # Checking if the field value is an integer
+ sub _is_integer {
+    my ($field_name, $field_value, $args_hash) = @_;
+    unless (defined ($field_value))            { return (0, 'Not defined');    }
+    unless (int($field_value) eq $field_value) { return (0, 'Not an integer'); }
+    return 1;
+ }
+
+Callbacks are a powerful feature that allow you to do complex
+validation well beyond the capabilities of the simple BindParms
+specifications. If you are finding yourself wishing that the syntax for
+BindParms let you do more complicated things, then use a callback.
+
+=back
+
+=head1 CHANGES
+
+ 1.02 2008.05.17 - Permissions fixes for build tools and added more examples.
+
+ 1.01 2008.05.16 - Fixed minor permissions problem
+
+ 1.00 2008.05.13 - Initial public release.
+
+=head1 ERRORS
+
+Syntactic errors using Acme::Sub::Parms will generally cause
+compilation errors near (but probably not exactly at) the line
+containing the error. When you see that kind of error, look for a
+syntax error in the declaration.
+
+=head1 BUGS
+
+You can't used parameters names containing single or double quotes,
+whitespace or the '[' character. Line numbering can sometimes get
+thrown off a little in error messages and I haven't been able to figure
+a fix out yet. 
+
+=head1 TODO
+
+Handle multiline argument declarations. Handle comments on BindParm
+lines. Generate thread-safe parameter parsing code. Handle parameter
+names containing single or double quotes, whitespace or the '[' character.
+Make error messages always align with the source lines.
+
+=head1 AUTHOR
+
+Benjamin Franz <snowhare@cpan.org>
+
+=head1 VERSION
+
+Version 1.02 - 2008.05.17
+
+=head1 COPYRIGHT
+
+Copyright (c) Benjamin Franz
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms and conditions as
+Perl itself.
+
+This means that you can, at your option, redistribute it and/or modify
+it under either the terms the GNU Public License (GPL) version 1 or
+later, or under the Perl Artistic License.
+
+See http://dev.perl.org/licenses/
+
+=head1 DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE.
+
+Use of this software in any way or in any form, source or binary,
+is not allowed in any country or locale which prohibits disclaimers
+of any implied warranties of merchantability or fitness for a particular
+purpose or any disclaimers of a similar nature.
+
+IN NO EVENT SHALL I BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OF THIS SOFTWARE AND ITS DOCUMENTATION (INCLUDING, BUT NOT
+LIMITED TO, LOST PROFITS) EVEN IF I HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE
+
+=cut
+

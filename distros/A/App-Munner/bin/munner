@@ -1,0 +1,451 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use App::Munner;
+use App::Munner::Runner;
+use Cwd qw( abs_path getcwd );
+use File::Temp qw( tempfile );
+use Getopt::Long::Descriptive qw( describe_options );
+use IPC::Signal qw( sig_num );
+use List::MoreUtils qw( uniq );
+use Module::Load qw( load );
+use Parallel::ForkManager;
+use YAML qw( Load );
+
+my $command = $ARGV[0] || "start";
+
+my $supported_commands =
+"start|duck|stop|restart|graceful|status|(access-|error-|)(logs|log)|help|doc";
+
+if ( $command =~ /($supported_commands)/ ) {
+    shift @ARGV;
+}
+else {
+    $command = "start";
+}
+
+my $version = $App::Munner::VERSION || q{};
+
+$ENV{PWD} ||= getcwd();
+
+my ( $args, $usage ) = describe_options(
+    "munner [$supported_commands] %o\nversion: $version",
+    [
+        "config|c:s" => "App runner config file ( default ./munner.yml )",
+        { default => "$ENV{PWD}/munner.yml" }
+    ],
+    [ "base-dir|d:s" => "Global base directory ( default ../ )" ],
+    [ 'app|a:s@'     => "App to run", { default => [] } ],
+    [ "all|A"        => "Start All", { default => 0 } ],
+    [ "group|g=s@"   => "Start a group of apps", { default => 0 } ],
+);
+
+if ( $command eq "help" ) {
+    cmd_help(" ");
+}
+
+if ( $command eq "doc" ) {
+    exec perldoc => "App::Munner";
+}
+
+my $config = load_config( $args->config );
+
+my $base_dir = $args->base_dir || $config->{base_dir}
+  or cmd_help("Missing base_dir");
+
+cmd_help("base_dir is not found --> $base_dir")
+  if !-d $base_dir;
+
+if ( !$config->{apps} ) {
+    config_help("Missing apps section in your config");
+}
+
+if ( !UNIVERSAL::isa( $config->{apps}, "HASH" ) ) {
+    config_help("apps section of the config needs to be in hash list");
+}
+
+my %apps = %{ $config->{apps} }
+  or config_help("Please specify APPs in your config");
+
+my @apps =
+  $args->all
+  ? ( keys %apps )
+  : @{ $args->app };
+
+push @apps, group_of_apps( $args->group );
+
+@apps or cmd_help("Please specify the APP you want to start");
+
+@apps = uniq @apps;
+
+my $forker = Parallel::ForkManager->new( scalar @apps );
+
+foreach my $app_name (@apps) {
+
+    my $app_config = $apps{$app_name}
+      or config_help("APP $app_name config is not found");
+
+    my $app_dir = $app_config->{dir} || ".";
+
+    my $app_wd = $app_dir =~ /^\// ? $app_dir : "$base_dir/$app_dir";
+
+    config_help("APP $app_name working directory is not found --> $app_wd")
+      if !-d $app_wd;
+
+    $app_wd = abs_path($app_wd);
+
+    my $run = $app_config->{run}
+      or config_help("APP $app_name has no start command");
+
+    $app_config->{carton} //= 0;
+
+    my $exec = ( $run =~ /;/s ) ? q{} : "exec ";
+
+    my $carton = $app_config->{carton} ? "carton exec " : q{};
+
+    $app_config->{env} ||= [];
+
+    my $using_leash =
+      ( $ENV{CHILD_PROCESS_LEASH}
+          // _env_hash( $app_config->{env} )->{CHILD_PROCESS_LEASH}
+          // $app_config->{leash} ) ? 1 : 0;
+
+    if ($using_leash) {
+        my $existing_perl5opt =
+             _env_hash( $app_config->{env} )->{PERL5OPT}
+          || $ENV{PERL5OPT}
+          || qq{};
+        push @{ $app_config->{env} },
+          {
+            PERL5OPT => join( qq{ },
+                grep { length } "-MProcess::Child::Leash",
+                $existing_perl5opt )
+          };
+    }
+
+    $app_config->{pid} = $forker->start
+      and next;
+
+    my $env = _env( ($exec ? qq{} : "export") => $app_config->{env} );
+
+    my ( $fh, $script ) = tempfile(
+        CLEANUP => 1,
+        UNLINK  => 1,
+        SUFFIX  => ".sh"
+    );
+
+    _make_run_script(
+        $app_name => (
+                "cd $app_wd\n"
+              . qq{echo "$app_name Started: \$(date)";\n}
+              . qq{echo "$app_name Started: \$(date)" 1>&2;\n}
+              . ($app_config->{debug} ? "cat $script\n" : qq{}) 
+              . ($app_config->{debug} ? "set -x\n" : qq{}) 
+              . "set -e\n"
+              . $env
+              . "$exec$carton$run"
+        ) => ( $script, $fh )
+    );
+
+    my %timeout_thing = ();
+    my $timeout_seconds =
+      int( $app_config->{timeout} || _env_hash($app_config->{env})->{MUNNER_TIMEOUT} || $ENV{MUNNER_TIMEOUT} || 0 );
+
+    if ($timeout_seconds) {
+        @timeout_thing{qw( fh script )} = tempfile(
+            CLEANUP => 1,
+            UNLINK  => 1,
+            SUFFIX  => ".sh"
+        );
+        _make_run_script(
+            $app_name => ("exec timeout $timeout_seconds $script") =>
+              @timeout_thing{qw( script fh )} );
+    }
+
+    my $runner = App::Munner::Runner->new(
+        name        => $app_name,
+        base_dir    => $app_wd,
+        config_file => $args->config,
+        command     => ( $timeout_thing{script} || $script ),
+        app_config  => $app_config,
+        todo        => $command,
+    );
+
+    if ( $command eq "start" ) {
+        $runner->run;
+    }
+    elsif ( $command eq "duck" ) {
+        $runner->run_at_bg;
+    }
+    elsif ( $command eq "stop" ) {
+        $runner->$command;
+    }
+    elsif ( $command eq "restart" ) {
+        $runner->$command;
+    }
+    elsif ( $command eq "graceful" ) {
+        $runner->$command;
+    }
+    elsif ( $command eq "status" ) {
+        $runner->$command;
+    }
+    elsif ( $command =~ /log/ ) {
+        my $error_log  = $runner->error_log;
+        my $access_log = $runner->access_log;
+        if ( $command =~ /access/ ) {
+            system "tail -F $access_log";
+        }
+        elsif ( $command =~ /error/ ) {
+            system "tail -F $error_log";
+        }
+        else {
+            system "tail -F $access_log $error_log";
+        }
+    }
+    else {
+        cmd_help("Unknown command");
+    }
+
+    sleep 1;
+
+    $forker->finish;
+}
+
+load "sigtrap", handler => \&killer, "INT";
+load "sigtrap", handler => \&killer, "STOP";
+load "sigtrap", handler => \&killer, "QUIT";
+
+END { killer() }
+
+$forker->wait_all_children;
+
+exit;
+
+sub load_config {
+    my $file = shift;
+    open FILE, "<", $file
+      or config_help("Unable to load config file $file");
+    local $/;
+    my $config = Load(<FILE>);
+    close FILE;
+    return $config;
+}
+
+sub cmd_help {
+    my $message = shift || q{};
+    print "$message\n\n" . $usage->text;
+    print "\n\n";
+    exit
+      if $message;
+}
+
+sub _env {
+    my $export = shift || qq{};
+    my $list   = shift
+      or return q{};
+
+    return config_help("env need to be in list")
+      if ref $list ne "ARRAY";
+
+    my $env = q{};
+
+    foreach my $pair (@$list) {
+        next
+          if !$pair;
+
+        next
+          if ref $pair ne "HASH";
+
+        my ( $key, $val ) = %$pair;
+
+        if ( $export ) {
+            $env .= "export ";
+        }
+
+        $env .= join "=", quotemeta($key), $val;
+
+        if ( $export ) {
+            $env .= ";\n";
+        }
+        else {
+            $env .= " \\\n";
+        }
+    }
+
+    return $env;
+}
+
+sub _env_hash {
+    my $list = shift
+      or return q{};
+
+    return config_help("env need to be in list")
+      if ref $list ne "ARRAY";
+
+    my %env = ();
+
+    foreach my $pair (@$list) {
+        next
+          if !$pair;
+
+        next
+          if ref $pair ne "HASH";
+
+        my ( $key, $val ) = %$pair;
+
+        $env{$key} = $val;
+    }
+
+    return \%env;
+}
+
+sub _make_run_script {
+    my $app_name = shift;
+    my $command  = shift
+      or die "$app_name is MISSING RUN COMMAND.";
+
+    my $filename = shift;
+    my $fh       = shift;
+    print $fh "#!/bin/sh\n";
+    print $fh $command;
+    close $fh;
+    chmod 0700, $filename;
+}
+
+sub killer {
+    foreach my $app_name (@apps) {
+        my $app_config = $apps{$app_name};
+        my $pid        = delete $app_config->{pid}
+          or next;
+        kill sig_num("INT"), $pid;
+    }
+    exit;
+}
+
+sub group_of_apps {
+    my $wanted_groups = shift
+      or return ();
+
+    return ()
+      if ref $wanted_groups ne "ARRAY"
+      or !@$wanted_groups;
+
+    my $groups = $config->{groups}
+      or config_help("No group is define in your config");
+
+    config_help("Group config is missing or invalid")
+      if ref $groups ne "HASH"
+      or !%$groups;
+
+    foreach my $group_name (@$wanted_groups) {
+        my $group_config = $groups->{$group_name}
+          or config_help("Group name $group_name is not defined in the config");
+
+        my $apps = $group_config->{apps} || [];
+
+        config_help("groups.$group_name.apps need to be an array")
+          if ref $apps ne "ARRAY";
+
+        push @apps, @$apps;
+
+        my $grps = $group_config->{groups} || [];
+
+        config_help("groups.$group_name.groups need to be an array")
+          if ref $grps ne "ARRAY";
+
+        if (@$grps) {
+            push @apps, group_of_apps($grps);
+        }
+    }
+
+    return uniq @apps;
+}
+
+sub config_help {
+    my $message = shift || q{};
+    print <<"HELP";
+$message
+
+munner.yml config template:
+---------------------------
+base_dir: "... base directory to find the app ..."
+apps:
+    web-frontend:
+        dir: "... either full path or the tail part after base_dir ..."
+        env:
+            ## specify the username of the running process
+            - USER: web
+            - PID_FILE: /tmp/web.pid
+            - ACCESS_LOG: /var/log/web.acc.log
+            - ERROR_LOG: /var/log/web.err.log
+        run: "... command ..."
+        carton: 1 or 0
+    db-api:
+        dir: "... path cound find the command to run ..."
+        env:
+            - USER: db
+            ## Having your own pid file and access and error log path
+            - PID_FILE: /tmp/db.pid
+            - ACCESS_LOG: /var/log/db.acc.log
+            - ERROR_LOG: /var/log/db.err.log
+            - foo: 1
+            - bar: 2
+        leash: "make sure all the child processes stopped"
+        run: "... start up command ..."
+    event-api:
+        dir: "websrc/event-api"
+        env:
+            - USER: event
+            ## access and error log will be stored at app dir
+            ## specific your pid file path
+            - PID_FILE: /var/log/event.pid
+            - CHILD_PROCESS_LEASH: "make sure no abandoned children procresses"
+        run: bin/app.pl
+        carton: 1
+    login-server:
+        ## Use abs path as app base path
+        dir: /home/gateway/websrc/login-server
+        env:
+            - USER: gateway
+              ## Using LOG_DIR for pid file, access log and error log
+            - LOG_DIR: /var/log
+        run: bin/app.pl
+        carton: 1
+    ssh-port-forward:
+        dir: /tmp
+        env:
+            - USER: me
+            ## Using TERMINAL to let ssh stay alive in the background
+            - TERMINAL: 1
+        timeout: 5
+        run: ssh -L 3306:localhost:3306 db-server
+groups:
+    database:
+        ## only start these apps
+        apps:
+            - login-server
+            - db-api
+    events:
+        apps:
+            - login-server
+            - event-api
+    website:
+        ## start apps and above groups
+        apps:
+            - web-frontend
+        groups:
+            - database
+            - events
+    initd:
+        ## add startup script in /etc/init.d folder
+        ## to run "munner duck -g initd"
+        groups:
+            - website
+            - database
+            - events
+
+HELP
+
+    exit;
+}

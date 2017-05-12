@@ -1,0 +1,43 @@
+Apache::Blog - a simple handler for weblogs
+
+  All files in this package are Copyright (c) 2002, Daniel Gardner
+  All rights reserved.  This program is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
+
+This is a simple weblog handler for mod_perl. Setting it up is as simple
+as installing the module, adding a couple of lines to httpd.conf, and
+deciding on how you want the thing to look.
+
+There's a couple of default templates included in the distribution,
+but creating new ones is easy.
+
+All the files are plain text; nothing complicated involving databases
+and whatnot. Just fire up your editor of choice and bash away.
+
+I'm using it on my site, exactly as it is here, and it's been working
+great. However, I don't know anyone else who's using it so no promises on
+what'll happen. But it only takes about a minute to install and set up,
+so you might as well have a go anyway.
+
+Setup details are in the Apache::Blog pod.
+
+Install using the usual litany:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+The tests are pretty poor at the moment, it just checks if the thing
+loads. But I haven't got into clever mod_perl testing stuff yet.
+
+This will probably get a sourceforge project or something sometime. At
+the moment this is the first release and there isn't anywhere you can
+look for more stuff.
+
+I'm daniel@danielgardner.org, you can mail me about the module.
+
+Oh, and of course, if you make a pretty graphics-free template, then
+i'll include it in the distribution if you want.
+
+

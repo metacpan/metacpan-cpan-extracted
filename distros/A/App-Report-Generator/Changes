@@ -1,0 +1,11 @@
+Revision history for App-Report-Generator
+
+0.002	August 15th, 2010
+	- replace test configuration file with a JSON formatted
+	  configuration to avoid stupid warnings as described in
+	  RT#59973
+	- no module code changes
+
+0.001	July 30th, 2010
+        First version, released on an unsuspecting world.
+

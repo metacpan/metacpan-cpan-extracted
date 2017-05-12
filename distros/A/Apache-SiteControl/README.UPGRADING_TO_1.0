@@ -1,0 +1,21 @@
+Version 1.0 has a significant change from previous versions. AccessController
+is dropped in favor of a module actually called SiteControl. This makes the
+whole system work better in the Perl sense, and make version checking and
+installation smoother with CPAN.
+
+To upgrade:
+
+1) Edit all of your modules that depend on 
+   Apache::SiteControl::AccessController, and change them to use 
+   Apache::SiteControl.
+2) Make the same change in all of your pages. i.e.:
+
+   $user = Apache::SiteControl::AccessController->getPermissionManager($r)
+
+   becomes:
+
+   $user = Apache::SiteControl->getPermissionManager($r)
+
+   i.e. 
+   
+   perl -pi'.bak' 's/SiteControl::AccessController/SiteControl/' *.html

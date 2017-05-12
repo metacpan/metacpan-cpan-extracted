@@ -1,0 +1,60 @@
+{
+   "abstract" : "A Simple per-class clan warnlogger loader",
+   "author" : [
+      "Kent Fredric <kentnl@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Beamerang-Logger",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.013"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Contextual" : "0",
+            "Log::Contextual::WarnLogger::Fancy" : "0.002000",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Term::ANSIColor" : "2.01",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Beamerang::Logger" : {
+         "file" : "lib/Acme/Beamerang/Logger.pm",
+         "version" : "0.001000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kentnl/Acme-Beamerang-Logger/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kentnl/Acme-Beamerang-Logger",
+         "web" : "https://github.com/kentnl/Acme-Beamerang-Logger"
+      }
+   },
+   "version" : "0.001000",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,68 @@
+Astro::Telescope
+================
+
+This class can be used to retrieve and process details of particular
+telescopes. It can be used to determine the location and altitude
+of a telescope as well as the observational limits.
+
+The list of supported telescopes can be obtained from the SLA or PAL
+documentation: http://www.starlink.ac.uk/star/docs/sun67.htx/sun67.html
+(in particular the palObs routine).
+
+Requirements
+------------
+
+This class uses Astro::PAL which can be installed directly from CPAN.
+
+Modifying the MPC observatory code list
+---------------------------------------
+
+To allow for Minor Planet Center observatory code use, this module
+uses a data file containing the MPC observatory code, longitude, and
+parallax coefficients for a large number of observatories. This data
+file resides in tmpl/MPC.dat and a new version can be
+obtained from http://www.minorplanetcenter.net/iau/lists/ObsCodes.html.
+To use an updated version, copy the information from that page (only the data,
+not any of the headers) into tmpl/MPC.dat, then build
+this module again. This will automatically create Telescope/MPC.pm,
+which can then be installed as part of this module.
+
+Building
+--------
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+The test make sure some simple parameters can be obtained and
+that limits work as expected.
+
+
+Authors
+-------
+
+This module was written by Tim Jenness  <t.jenness@jach.hawaii.edu>
+of the Joint Astronomy Centre. Updates have been supplied by Brad
+Cavanagh <b.cavanagh@jach.hawaii.edu> of the Joint Astronomy Centre.
+
+Copyright (C) 2007, 2008, 2010, 2012 Science and Technology Facilities Council.
+Copyright (C) 1998-2005 Particle Physics and Astronomy Research Council.
+All Rights Reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+Changes
+-------
+
+  v0.71 - Switch to using Astro::PAL
+
+  v0.70 - Now uses Module::Build
+        - MPC functionality available without requiring Astro::SLA
+        - Default limits of the horizon for observability
+        - setlimits() method can now be used to set observability limits.
+
+  v0.60 - Updates for MPC observatory codes and related information.
+          Can now instantiate an object with specified coordinates.
+
+  v0.50 - First release to CPAN
+

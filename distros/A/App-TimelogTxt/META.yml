@@ -1,0 +1,33 @@
+---
+abstract: 'Commandline tracking of time for tasks and projects.'
+author:
+  - 'G. Wade Johnson <gwadej@cpan.org>'
+build_requires:
+  Test::Most: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-TimelogTxt
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  App::CmdDispatch: '0.42'
+  Config::Tiny: '0'
+  File::Path: '0'
+  Getopt::Long: '0'
+  List::Util: '0'
+  POSIX: '0'
+  Time::Local: '0'
+  autodie: '0'
+  perl: '5.01'
+resources:
+  repository: https://github.com/gwadej/app-timelogtxt.git
+version: '0.22'

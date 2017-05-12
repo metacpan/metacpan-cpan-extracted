@@ -1,0 +1,19 @@
+0.04    18 January 2008
+        - add "use 5.010" in various places
+
+0.03    18 January 2008
+        - fix the docs for instantiating a class with a custom method from data
+        - make the code for that actually work (whoops; test added :)
+        - bump required version of Moose
+
+0.02    15 January 2008
+        - docroot is an arrayref now
+        - no need to specify provider as App::TemplateServer::Provider::,
+          it's implied
+        - unescape URI (server/foo%20bar.tt => "foo bar.tt")
+        - add Null provider (for testing)
+
+0.01    14 January 2008
+        - very first version
+          released upon the world
+          with much rejoicing

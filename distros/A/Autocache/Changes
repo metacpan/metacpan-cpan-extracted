@@ -1,0 +1,33 @@
+
+Autocache revision history
+
+0.004 - 2010-??-??
+
+Modified build script to only run lru test if feature has been turned on.
+
+Added FIFO eviction strategy.
+
+Removed stats config options, we can use strategies for this.
+
+Added Autocache::Logger.
+
+0.003 - 2010-07-31
+
+Removed distinction between strategies and stores. Stores are now a kind of
+strategy.
+
+Split MemoryLRU store into seperate eviction stratgey that can be layered on
+top of the existing Memory strategy.
+
+Added request object to encapsulate information required to serve a request.
+
+0.002 - 2010-07-27
+
+Hide log4perl statements using Resurrector functionality
+
+Modify requirements so that we can install without those required by
+the MemoryLRU store
+
+0.001 - 2010-07-24
+
+Initial release.

@@ -1,0 +1,90 @@
+NAME
+    Apache2::WebApp::Plugin::Filters - Plugin providing data filtering
+    methods
+
+SYNOPSIS
+      my $obj = $c->plugin('Filters')->method( ... );     # Apache2::WebApp::Plugin::Filters->method()
+
+        or
+
+      $c->plugin('Filters')->method( ... );
+
+DESCRIPTION
+    Common methods for filtering HTTP request parameters.
+
+PREREQUISITES
+    This package is part of a larger distribution and was NOT intended to be
+    used directly. In order for this plugin to work properly, the following
+    packages must be installed:
+
+      Apache2::WebApp
+      HTML::StripScripts::Parser
+      Params::Validate
+
+INSTALLATION
+    From source:
+
+      $ tar xfz Apache2-WebApp-Plugin-Filters-0.X.X.tar.gz
+      $ perl MakeFile.PL PREFIX=~/path/to/custom/dir LIB=~/path/to/custom/lib
+      $ make
+      $ make test
+      $ make install
+
+    Perl one liner using CPAN.pm:
+
+      $ perl -MCPAN -e 'install Apache2::WebApp::Plugin::Filters'
+
+    Use of CPAN.pm in interactive mode:
+
+      $ perl -MCPAN -e shell
+      cpan> install Apache2::WebApp::Plugin::Filters
+      cpan> quit
+
+    Just like the manual installation of Perl modules, the user may need
+    root access during this process to insure write permission is allowed
+    within the installation directory.
+
+OBJECT METHODS
+  encode_url
+    Encode URL to ASCII.
+
+      my $ascii = $c->plugin('Filters')->encode_url($url);
+
+  decode_url
+    Decode ASCII to URL.
+
+      my $url = $c->plugin('Filters')->decode_url($url);
+
+  strip_domain_alias
+    Remove the subdomain (alias) from a domain name.
+
+      my $result = $c->plugin('Filters')->strip_domain_alias($domain);
+
+  strip_html
+    Remove all HTML tags and attributes.
+
+      my $result = $c->plugin('Filters')->strip_html($markup);
+
+  untaint_html
+    Remove restricted HTML tags and attributes.
+
+      my $result = $c->plugin('Filters')->untaint_html($markup);
+
+    Supported tags:
+
+      a blockquote br dd dl div em font form img input hr h1 h2 h3 h4 h5 h6
+      label legend li ol option p pre ul script select small span strong style
+      table tbody tfoot thead tr td
+
+SEE ALSO
+    Apache2::WebApp, Apache2::WebApp::Plugin, HTML::StripScripts::Parser
+
+AUTHOR
+    Marc S. Brooks, <mbrooks@cpan.org> - <http://mbrooks.info>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://dev.perl.org/licenses/artistic.html>
+

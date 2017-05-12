@@ -1,0 +1,54 @@
+App-Framework
+
+A framework for making script development simpler. The framework does all of the common jobs for you, you just concentrate
+of writing the application itself.
+
+Also provides various useful utility functions via the 'Feature' modules.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+EXAMPLES
+
+The example scripts in examples/ show the expected use of App::Framework
+
+	examples/eg1.pl	- Shows how to set up named arguments and the general structure of an application
+	examples/eg2.pl	- Shows how to use options and how to drive the Config feature
+	
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::Framework
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Framework
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-Framework
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-Framework
+
+    Search CPAN
+        http://search.cpan.org/dist/App-Framework/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Steve Price
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

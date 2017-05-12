@@ -1,0 +1,195 @@
+TYPEMAP
+
+SetOption	T_SETOPT
+IntOption	T_INTOPT
+StringOption	T_STROPT
+
+# This should really be called zero_is_success...
+negative_is_error	I_NEG_IS_ERROR
+ALPM_Handle		T_ALPM_HANDLE
+ALPM_DB			T_ALPM_DB
+ALPM_LocalDB		T_ALPM_LOCALDB
+ALPM_SyncDB		T_ALPM_SYNCDB
+ALPM_Package		T_ALPM_PACKAGE
+ALPM_PackageFree	T_ALPM_PACKAGEFREE
+ALPM_FileList		T_ALPM_FILELIST
+ALPM_SigLevel		T_SIGLEVEL
+ALPM_Origin		T_ORIGIN
+ALPM_Validity		T_VALIDITY
+ALPM_Depend		T_DEPEND
+
+PackageList		L_PACKAGE
+DependList		L_DEPEND
+StringList		L_STRING
+StringListFree		L_STRINGFREE
+
+alpm_pkgreason_t	T_PKGREASON
+off_t			T_INT
+
+#--------------------
+# INPUT # Perl ==> C
+#--------------------
+
+INPUT
+
+T_ALPM_HANDLE
+	if(sv_derived_from($arg, \"ALPM\")){
+		$var = INT2PTR($type, SvIV((SV *)SvRV($arg)));
+	}else{
+		croak(\"error: expected an ALPM object\");
+	}
+
+T_ALPM_DB
+	if(sv_derived_from($arg, \"ALPM::DB\")){
+		IV tmp = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, tmp);
+	}else{
+		croak(\"error: expected an ALPM::DB object\");
+	}
+
+T_ALPM_LOCALDB
+	if(sv_derived_from($arg, \"ALPM::DB::Local\")){
+		IV tmp = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, tmp);
+	}else{
+		croak(\"error: expected an ALPM::DB::Local object\");
+	}
+
+T_ALPM_SYNCDB
+	if(sv_derived_from($arg, \"ALPM::DB::Sync\")){
+		IV tmp = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type, tmp);
+	}else{
+		croak(\"error: expected an ALPM::DB::Sync object\");
+	}
+
+T_ALPM_PACKAGE
+	if(sv_derived_from($arg, \"ALPM::Package\")){
+		$var = INT2PTR($type, SvIV((SV *)SvRV($arg)));
+	}else{
+		croak(\"error: expected an ALPM::Package object\");
+	}
+
+T_ALPM_PACKAGEFREE
+	if(sv_derived_from($arg, \"ALPM::PackageFree\")){
+		IV tmp = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type,tmp);
+	}else{
+		croak(\"error: expected an ALPM::PackageFree object\");
+	}
+
+T_SIGLEVEL
+	$var = p2c_siglevel($arg);
+
+T_DEPEND
+	$var = p2c_depend($arg);
+
+T_PKGREASON
+	$var = p2c_pkgreason($arg);
+
+#---------------------
+# OUTPUT # C ==> Perl
+#---------------------
+
+OUTPUT
+
+# The handle should never be NULL. This is the only error condition
+# but hopefully doesn't affect us. However, the string is sometimes NULL
+# so we should convert it to undef.
+T_STROPT
+	if($var == NULL){
+		$arg = &PL_sv_undef;
+	}else{
+		$arg = newSVpv($var, 0);
+	}
+
+T_SETOPT
+	if($var == -1){
+		alpm_croak(self);
+	}else{
+		$arg = &PL_sv_yes;
+	}
+
+T_INTOPT
+	if($var == -1){
+		alpm_croak(self);
+	}else{
+		$arg = newSViv($var);
+	}
+
+I_NEG_IS_ERROR
+	$arg = ($var == 0 ? &PL_sv_yes : &PL_sv_no);
+
+T_ALPM_HANDLE
+	if($var == NULL){
+		croak(\"error: ALPM handle is NULL\");
+	}else{
+		sv_setref_pv($arg, \"ALPM\", (void *)$var);
+	}
+
+T_ALPM_DB
+	if($var == NULL){
+		$arg = &PL_sv_undef;
+	}else{
+		$arg = c2p_db($var);
+	}
+
+T_ALPM_LOCALDB
+	if($var == NULL){
+		$arg = &PL_sv_undef;
+	}else{
+		$arg = c2p_localdb($var);
+	}
+
+T_ALPM_SYNCDB
+	if($var == NULL){
+		$arg = &PL_sv_undef;
+	}else{
+		$arg = c2p_syncdb($var);
+	}
+
+T_ALPM_PACKAGE
+	if($var == NULL){
+		$arg = &PL_sv_undef;
+	}else{
+		$arg = c2p_pkg($var);
+	}
+
+T_ALPM_PACKAGEFREE
+	if($var == NULL){
+		$arg = &PL_sv_undef;
+	}else{
+		sv_setref_pv($arg, \"ALPM::PackageFree\", (void *)$var);
+	}
+
+T_ALPM_FILELIST
+	$arg = c2p_filelist($var);
+
+T_SIGLEVEL
+	$arg = c2p_siglevel($var);
+
+T_ORIGIN
+	$arg = c2p_pkgfrom($var);
+
+T_PKGREASON
+	$arg = c2p_pkgreason($var);
+
+T_VALIDITY
+	$arg = c2p_pkgvalidation($var);
+
+T_DEPEND
+	$arg = c2p_depend($var);
+
+L_PACKAGE
+	$arg = newRV_noinc((SV*)list2av($var, c2p_pkg));
+
+L_DEPEND
+	$arg = newRV_noinc((SV*)list2av($var, c2p_depend));
+
+L_STRING
+	$arg = newRV_noinc((SV*)list2av($var, c2p_str));
+
+L_STRINGFREE
+	$arg = newRV_noinc((SV*)list2av($var, c2p_str));
+	ZAPLIST($var, free);
+

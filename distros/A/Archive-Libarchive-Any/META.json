@@ -1,0 +1,81 @@
+{
+   "abstract" : "Perl bindings to libarchive",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : "1",
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Archive-Libarchive-Any",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "YAML::XS" : "0"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         },
+         "suggests" : {
+            "Archive::Libarchive::FFI" : "0.0800",
+            "Archive::Libarchive::XS" : "0.0800"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0.94",
+            "open" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Archive-Libarchive-Any/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/Archive-Libarchive-Any",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Archive-Libarchive-Any.git",
+         "web" : "https://github.com/plicease/Archive-Libarchive-Any"
+      }
+   },
+   "version" : "0.0900"
+}
+

@@ -1,0 +1,87 @@
+---
+abstract: 'Dochazka ATT system command line client'
+author:
+  - 'Smithfarm <presnypreklad@gmail.com>'
+build_requires:
+  App::CELL: '0.209'
+  App::Dochazka::Common: '0.199'
+  Date::Calc: '0'
+  Params::Validate: '1.06'
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::Warnings: '0'
+  Web::MREST::CLI: '0.28'
+configure_requires:
+  Module::Build: '0.37'
+  Software::License: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.150005'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Dochazka-CLI
+provides:
+  App::Dochazka::CLI:
+    file: lib/App/Dochazka/CLI.pm
+    version: '0.238'
+  App::Dochazka::CLI::CommandMap:
+    file: lib/App/Dochazka/CLI/CommandMap.pm
+  App::Dochazka::CLI::Commands::Activity:
+    file: lib/App/Dochazka/CLI/Commands/Activity.pm
+  App::Dochazka::CLI::Commands::Component:
+    file: lib/App/Dochazka/CLI/Commands/Component.pm
+  App::Dochazka::CLI::Commands::Employee:
+    file: lib/App/Dochazka/CLI/Commands/Employee.pm
+  App::Dochazka::CLI::Commands::History:
+    file: lib/App/Dochazka/CLI/Commands/History.pm
+  App::Dochazka::CLI::Commands::Interval:
+    file: lib/App/Dochazka/CLI/Commands/Interval.pm
+  App::Dochazka::CLI::Commands::Misc:
+    file: lib/App/Dochazka/CLI/Commands/Misc.pm
+  App::Dochazka::CLI::Commands::Priv:
+    file: lib/App/Dochazka/CLI/Commands/Priv.pm
+  App::Dochazka::CLI::Commands::Schedule:
+    file: lib/App/Dochazka/CLI/Commands/Schedule.pm
+  App::Dochazka::CLI::Completion:
+    file: lib/App/Dochazka/CLI/Completion.pm
+  App::Dochazka::CLI::Guide:
+    file: lib/App/Dochazka/CLI/Guide.pm
+    version: '0.238'
+  App::Dochazka::CLI::Parser:
+    file: lib/App/Dochazka/CLI/Parser.pm
+  App::Dochazka::CLI::Shared:
+    file: lib/App/Dochazka/CLI/Shared.pm
+  App::Dochazka::CLI::Test:
+    file: lib/App/Dochazka/CLI/Test.pm
+  App::Dochazka::CLI::Testers:
+    file: lib/App/Dochazka/CLI/Testers.pm
+  App::Dochazka::CLI::TokenMap:
+    file: lib/App/Dochazka/CLI/TokenMap.pm
+  App::Dochazka::CLI::Util:
+    file: lib/App/Dochazka/CLI/Util.pm
+requires:
+  App::CELL: '0.209'
+  App::Dochazka::Common: '0.199'
+  Date::Calc: '0'
+  File::HomeDir: '0'
+  File::ShareDir: '1.00'
+  File::Slurp: '0'
+  File::Temp: '0'
+  Getopt::Long: '2.32'
+  HTTP::Cookies: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Params::Validate: '1.06'
+  Term::ReadKey: '0'
+  Term::ReadLine::Gnu: '0'
+  Text::Table: '0'
+  Web::MREST::CLI: '0.281'
+  perl: '5.012'
+resources:
+  bugtracker: https://github.com/smithfarm/dochazka-cli/issues
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: https://github.com/smithfarm/dochazka-cli
+version: '0.238'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

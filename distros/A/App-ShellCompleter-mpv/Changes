@@ -1,0 +1,34 @@
+Revision history for App-ShellCompleter-mpv
+
+0.05    2016-10-21 (PERLANCAR)
+
+	- Allow script to be detected by Getopt::Long::util as Getopt::Long
+	  script.
+
+
+0.04    2015-09-17 (PERLANCAR)
+
+	- Adjust to Complete::Util 0.36 (complete_file() split to
+	  Complete-File).
+
+
+0.03    2015-08-11 (PERLANCAR)
+
+	- Use ShellCompleter::Util to be more DRY, complete the rest of the
+	  options' values.
+
+	- [pod] Don't linkify non-perl program mpv because they generally
+	  won't work in MetaCPAN etc.
+
+
+0.02    2015-08-06 (PERLANCAR)
+
+        - Remove the use of Log::Any to reduce startup overhead.
+
+        - [doc] Mention the version of mpv supported.
+
+
+0.01    2015-08-06 (PERLANCAR)
+
+	- First release (not all option values are completed yet, boy mpv has a
+          LOT of options).

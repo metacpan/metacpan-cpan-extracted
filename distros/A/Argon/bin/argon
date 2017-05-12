@@ -1,0 +1,125 @@
+#!perl
+
+use strict;
+use warnings;
+use Pod::Usage;
+use Getopt::Long;
+use Module::Load qw(load);
+use Argon qw(:logging);
+use Argon::Manager;
+use Argon::Worker;
+
+# Determine type of service to run
+my $kind = shift @ARGV;
+unless (defined $kind && $kind =~ /manager|worker/) {
+    pod2usage({
+        -message => 'Expected one of [ worker | manager ]',
+        -exitval => 1,
+        -verbose => 1,
+    });
+}
+
+# Get options
+my $help;
+my $verbose;
+my %opt = (
+    port       => undef,
+    host       => undef,
+    manager    => undef,
+    workers    => undef,
+    max_reqs   => undef,
+    queue_size => undef,
+);
+
+GetOptions(
+    'help'           => \$help,
+    'verbose'        => \$verbose,
+    'host=s'         => \$opt{host},
+    'port=i'         => \$opt{port},
+    'workers=i'      => \$opt{workers},
+    'max-requests=i' => \$opt{max_requests},
+    'manager=s'      => \$opt{manager},
+    'queue-size=i'   => \$opt{queue_size},
+) or pod2usage(1);
+
+$help && pod2usage(0);
+
+if ($verbose) {
+    SET_LOG_LEVEL($INFO);
+}
+
+# Clean up host
+$opt{host} = '127.0.0.1' if !defined $opt{host} || $opt{host} eq 'localhost';
+
+# Filter out undefined options
+%opt = map { $_ => $opt{$_} } grep { defined $opt{$_} } keys %opt;
+
+# Validate options
+pod2usage('invalid options for manager')
+    if $kind eq 'manager' && @opt{'workers', 'max_reqs', 'manager'};
+
+my $class = $kind eq 'manager' ? 'Argon::Manager' : 'Argon::Worker';
+load $class;
+
+my $service = $class->new(%opt);
+$service->start;
+
+exit 0;
+__END__
+
+=head1 NAME
+
+argon - run an Argon service
+
+=head1 SYNOPSIS
+
+    argon manager --host 127.0.0.1 --port=8000
+    argon worker  --host 127.0.0.1 --port=8001 --manager=127.0.0.1:8000 --workers=4 --max_requests=100 --queue_size=100
+
+=head1 DESCRIPTION
+
+Starts an Argon service node.
+
+=head1 OPTIONS
+
+=over
+
+=item help
+
+Prints out this help text.
+
+=item verbose
+
+When specified, turns on extra logging.
+
+=item host
+
+IP address of the host interface on which to listen. Defaults to 127.0.0.1.
+
+=item port
+
+Port number on which to listen. Defaults to an OS-assigned port.
+
+=item queue-size (manager)
+
+Sets the maximum number of items which may be queued when all workers are busy,
+after which new tasks are rejected until the queue is below the maximum size.
+Defaults to no limit.
+
+=item workers (worker)
+
+The number of worker processes to start. Defaults to the number of CPUs present
+on the system. Applies only to workers.
+
+=item max-requests (worker)
+
+The maximum number of tasks a worker may handle before it is restarted. If not
+specified, worker processes are never considered exhausted. Applies only to
+workers.
+
+=item manager (worker)
+
+The address of the manager process in the format host:port. If not specified,
+the worker is run in standalone mode. Applies only to workers.
+
+=back

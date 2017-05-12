@@ -1,0 +1,6 @@
+.cvsignore
+AuthenMT.pm
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL

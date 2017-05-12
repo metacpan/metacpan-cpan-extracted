@@ -1,0 +1,4 @@
+PerlLoadModule Apache2::MimeInfo
+PerlOutputFilterHandler Apache2::MimeInfo
+
+AddType application/vnd.openxmlformats-officedocument.wordprocessingml.document docx

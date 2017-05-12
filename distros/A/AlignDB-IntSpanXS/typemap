@@ -1,0 +1,3 @@
+const char *	T_PV
+veci *	T_PTRREF
+AlignDB::IntSpanXS 	T_PTROBJ

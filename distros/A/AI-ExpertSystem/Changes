@@ -1,0 +1,6 @@
+Revision history for Perl extension AI::ExpertSystem::Simple
+
+1.0  Fri Apr 25 22:02:02 2003
+	- original version; created by h2xs 1.20 with options
+		-AX -n AI::ExpertSystem::Simple
+

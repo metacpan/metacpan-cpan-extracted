@@ -1,0 +1,489 @@
+# ----------------------------------------------------------------------------------------------------------
+# © Copyright 2003-2011 Alex Peeters [alex.peeters@citap.be]
+# ----------------------------------------------------------------------------------------------------------
+# 2011/mm/dd, v3.002.003, module sde-supportRequest.pm for ASNMTAP::Asnmtap::Applications::CGI
+# ----------------------------------------------------------------------------------------------------------
+
+use strict;
+use warnings;           # Must be used in test mode only. This reduces a little process speed
+#use diagnostics;       # Must be used in test mode only. This reduces a lot of process speed
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+BEGIN { if ( $ENV{ASNMTAP_PERL5LIB} ) { eval 'use lib ( "$ENV{ASNMTAP_PERL5LIB}" )'; } }
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+use ASNMTAP::Time qw(&get_datetimeSignal);
+
+use ASNMTAP::Asnmtap::Plugins v3.002.003;
+use ASNMTAP::Asnmtap::Plugins qw(:PLUGINS);
+
+use ASNMTAP::Asnmtap::Plugins::SOAP qw(&get_soap_request);
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+use ASNMTAP::Asnmtap::Applications::CGI v3.002.003;
+use ASNMTAP::Asnmtap::Applications::CGI qw(:APPLICATIONS :CGI :DBREADONLY :DBTABLES);
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+use SOAP::Lite;
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+sub webserviceSupportRequest {
+  my ($catalogID, $uKey, $method, $whereClause, $fieldlist, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID, $debug) = @_;
+
+  # DATABASE  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  my $CARTO_SERVER   = 'crinaeadtbs01';
+  my $CARTO_DATABASE = 'carto';
+  my $CARTO_TABLE    = 'TestRelationships';
+
+  # SOAP  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  my $tool           = 'ASNMTAP';
+  my $cluster        = 'http://itiltest1.smals-mvm.be/ivwse';
+  my $namespace      = 'http://itiltest1.smals-mvm.be/ivwse/';
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  my ($UserID, $customer, $source) = ('MonitoringOffice', "$tool MONITORING", 'Alarm');
+
+  my %soapService_NS = ('http://schemas.xmlsoap.org/wsdl/mime/'        => 'mime',
+                        'http://schemas.xmlsoap.org/wsdl/soap/'        => 'soap',
+                        'http://schemas.xmlsoap.org/wsdl/soap11/'      => 'soap11',
+                        'http://schemas.xmlsoap.org/soap/encoding/'    => 'soapenc',
+                        'http://www.w3.org/2001/XMLSchema'             => 's',
+                        'http://schemas.xmlsoap.org/wsdl/'             => 'wsdl',
+                        'http://schemas.xmlsoap.org/wsdl/http/'        => 'http',
+
+                        'http://microsoft.com/wsdl/mime/textMatching/' => 'tm',
+                        'http://infravision.com/ivwse'                 => 's1'
+                       );
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	sub _getEventsData {
+    my ($catalogID, $uKey, $hash_valueEventsData, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID, $debug) = @_;
+
+    my $rv  = 1;
+    my $dbh = DBI->connect("DBI:mysql:$DATABASE:$SERVERNAMEREADONLY:$SERVERPORTREADONLY", "$SERVERUSERREADONLY", "$SERVERPASSREADONLY") or $rv = error_trap_DBI(*STDOUT, "Cannot connect to the database", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID);
+
+    if ($dbh and $rv) {
+      my $sql = "select SQL_NO_CACHE title, duration, timeslot, endDate, endTime, status, statusMessage, filename from $SERVERTABLEVENTSDISPLAYDT where catalogID = '$catalogID' and uKey = '$uKey' and step <> '0' order by timeslot desc limit 1";
+      my $sth = $dbh->prepare( $sql ) or $rv = error_trap_DBI(*STDOUT, "Cannot dbh->prepare: $sql", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID);
+      $sth->execute or $rv = error_trap_DBI(*STDOUT, "Cannot sth->execute: $sql", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID) if $rv;
+
+      if ( $rv ) {
+        while ( my $ref = $sth->fetchrow_hashref() ) {
+          $$hash_valueEventsData{found}         = 1;
+          $$hash_valueEventsData{title}         = $ref->{title}         if ( $ref->{title} );
+          $$hash_valueEventsData{duration}      = $ref->{duration}      if ( $ref->{duration} );
+          $$hash_valueEventsData{timeslot}      = $ref->{timeslot}      if ( $ref->{timeslot} );
+          $$hash_valueEventsData{endDate}       = $ref->{endDate}       if ( $ref->{endDate} );
+          $$hash_valueEventsData{endTime}       = $ref->{endTime}       if ( $ref->{endTime} );
+          $$hash_valueEventsData{status}        = $ref->{status}        if ( $ref->{status} );
+          $$hash_valueEventsData{statusMessage} = $ref->{statusMessage} if ( $ref->{statusMessage} );
+          $$hash_valueEventsData{filename}      = $ref->{filename}      if ( $ref->{filename} );
+        }
+
+        $sth->finish() or $rv = error_trap_DBI(*STDOUT, "Cannot sth->finish: $sql", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID);
+
+        if ( $rv and exists $$hash_valueEventsData{found} and $$hash_valueEventsData{status} !~ /$STATE{$ERRORS{OK}}/ ) {
+          my @table = ( "$SERVERTABLEVENTSDISPLAYDT", "$SERVERTABLEVENTS USE INDEX (catalogID, uKey, key_timeslot)" );
+
+          foreach my $table ( @table ) {
+            if ( $$hash_valueEventsData{status} =~ /$STATE{$ERRORS{WARNING}}/ ) { # event
+              $sql = "select SQL_NO_CACHE endDate, endTime, timeslot, status from $table where catalogID = '$catalogID' and uKey = '$uKey' and step <> '0' and not ( status = '". $STATE{$ERRORS{WARNING}} ."' ) order by timeslot desc limit 1";
+            } elsif ( $$hash_valueEventsData{status} =~ /($STATE{$ERRORS{UNKNOWN}}|$STATE{$ERRORS{CRITICAL}}|$STATE{$ERRORS{'NO DATA'}})/ ) { # incident
+              $sql = "select SQL_NO_CACHE endDate, endTime, timeslot, status from $table where catalogID = '$catalogID' and uKey = '$uKey' and step <> '0' and not ( status = '". $STATE{$ERRORS{UNKNOWN}} ."' or status = '". $STATE{$ERRORS{CRITICAL}} ."' or status = '". $STATE{$ERRORS{'NO DATA'}} ."' ) order by timeslot desc limit 1";
+            }
+
+            my $sth = $dbh->prepare( $sql ) or $rv = error_trap_DBI(*STDOUT, "Cannot dbh->prepare: $sql", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID);
+            $sth->execute or $rv = error_trap_DBI(*STDOUT, "Cannot sth->execute: $sql", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID) if $rv;
+
+            if ( $rv ) {
+              while ( my $ref = $sth->fetchrow_hashref() ) {
+                $$hash_valueEventsData{OUT_SCOPE}{found}    = $ERRORS{$ref->{status}};
+                $$hash_valueEventsData{OUT_SCOPE}{timeslot} = $ref->{timeslot} if ( $ref->{timeslot} );
+                $$hash_valueEventsData{OUT_SCOPE}{endDate}  = $ref->{endDate}  if ( $ref->{endDate} );
+                $$hash_valueEventsData{OUT_SCOPE}{endTime}  = $ref->{endTime}  if ( $ref->{endTime} );
+              }
+
+              $sth->finish() or $rv = error_trap_DBI(*STDOUT, "Cannot sth->finish: $sql", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID);
+              last if ( exists $$hash_valueEventsData{OUT_SCOPE}{found} );
+            }
+          }
+
+          if ( $rv and exists $$hash_valueEventsData{OUT_SCOPE}{found} and defined $$hash_valueEventsData{OUT_SCOPE}{found} ) {
+            my $timeRange = "timeslot > '". $$hash_valueEventsData{OUT_SCOPE}{timeslot} ."'";
+
+            foreach my $table ( @table ) {
+              if ( $$hash_valueEventsData{status} =~ /$STATE{$ERRORS{WARNING}}/ ) { # event
+                $sql = "select SQL_NO_CACHE endDate, endTime, timeslot, status from $table where catalogID = '$catalogID' and uKey = '$uKey' and step <> '0' and $timeRange and ( status = '". $STATE{$ERRORS{WARNING}} ."' ) order by timeslot asc limit 1";
+              } elsif ( $$hash_valueEventsData{status} =~ /($STATE{$ERRORS{UNKNOWN}}|$STATE{$ERRORS{CRITICAL}}|$STATE{$ERRORS{'NO DATA'}})/ ) { # incident
+                $sql = "select SQL_NO_CACHE endDate, endTime, timeslot, status from $table where catalogID = '$catalogID' and uKey = '$uKey' and step <> '0' and $timeRange and ( status = '". $STATE{$ERRORS{UNKNOWN}} ."' or status = '". $STATE{$ERRORS{CRITICAL}} ."' or status = '". $STATE{$ERRORS{'NO DATA'}} ."' ) order by timeslot asc limit 1";
+              }
+
+              my $sth = $dbh->prepare( $sql ) or $rv = error_trap_DBI(*STDOUT, "Cannot dbh->prepare: $sql", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID);
+              $sth->execute or $rv = error_trap_DBI(*STDOUT, "Cannot sth->execute: $sql", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID) if $rv;
+
+              if ( $rv ) {
+                while (my $ref = $sth->fetchrow_hashref()) {
+                  $$hash_valueEventsData{IN_SCOPE}{found}    = $ERRORS{$ref->{status}};
+                  $$hash_valueEventsData{IN_SCOPE}{timeslot} = $ref->{timeslot} if ( $ref->{timeslot} );
+                  $$hash_valueEventsData{IN_SCOPE}{endDate}  = $ref->{endDate}  if ( $ref->{endDate} );
+                  $$hash_valueEventsData{IN_SCOPE}{endTime}  = $ref->{endTime}  if ( $ref->{endTime} );
+                }
+
+                $sth->finish() or $rv = error_trap_DBI(*STDOUT, "Cannot sth->finish: $sql", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID);
+                last if ( exists $$hash_valueEventsData{IN_SCOPE}{found} );
+              }
+            }
+          }
+        }
+      }
+
+      $dbh->disconnect or $rv = error_trap_DBI(*STDOUT, "Sorry, the database was unable to add your entry.", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID) if ($dbh and $rv);
+    }
+
+    return $rv;
+  }
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	sub _getSupportRequestData {
+    my ($serverName, $database, $table, $catalogID, $uKey, $hash_valueSupportRequestData, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID, $debug) = @_;
+
+    $$hash_valueSupportRequestData{code}        = '?';
+    $$hash_valueSupportRequestData{slaID}       = '?';
+    $$hash_valueSupportRequestData{impact}      = 'High';
+    $$hash_valueSupportRequestData{invoicedOrg} = '?';
+    $$hash_valueSupportRequestData{service}     = '?';
+    $$hash_valueSupportRequestData{priority}    = 'P01';
+
+    my $rv  = 1;
+    my $dbh = DBI->connect("DBI:mysql:$database:$serverName:$SERVERPORTREADONLY", "$SERVERUSERREADONLY", "$SERVERPASSREADONLY") or $rv = error_trap_DBI(*STDOUT, "Cannot connect to the database", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID);
+
+    if ($dbh and $rv) {
+      my $sql = "select SQL_NO_CACHE code, slaID, invoicedOrg, service, impact, priority from $table where catalogID = '$catalogID' and uKey = '$uKey'";
+      my $sth = $dbh->prepare( $sql ) or $rv = error_trap_DBI(*STDOUT, "Cannot dbh->prepare: $sql", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID);
+      $sth->execute or $rv = error_trap_DBI(*STDOUT, "Cannot sth->execute: $sql", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID) if $rv;
+
+      if ( $rv ) {
+        while (my $ref = $sth->fetchrow_hashref()) {
+          $$hash_valueSupportRequestData{code}        = $ref->{code}        if ( $ref->{code} );
+          $$hash_valueSupportRequestData{slaID}       = $ref->{slaID}       if ( $ref->{slaID} );
+          $$hash_valueSupportRequestData{impact}      = $ref->{impact}      if ( $ref->{impact} );
+          $$hash_valueSupportRequestData{invoicedOrg} = $ref->{invoicedOrg} if ( $ref->{invoicedOrg} );
+          $$hash_valueSupportRequestData{service}     = $ref->{service}     if ( $ref->{service} );
+          $$hash_valueSupportRequestData{priority}    = $ref->{priority}    if ( $ref->{priority} );
+        }
+
+        $sth->finish() or $rv = error_trap_DBI(*STDOUT, "Cannot sth->finish: $sql", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID);
+      }
+
+      $dbh->disconnect or $rv = error_trap_DBI(*STDOUT, "Sorry, the database was unable to add your entry.", $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID) if ($dbh and $rv);
+    }
+
+    return $rv;
+  }
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  sub _actionOnSoapResponse {
+    my ($asnmtapInherited, $som, $arguments) = @_;
+
+    my $root = $som->dataof ('/Envelope/Body');
+    my $WebServiceResults = $root->value;
+
+    if ( $asnmtapInherited->getOptionsValue('debug') ) {
+      use Data::Dumper;
+      print Dumper ($WebServiceResults), "\n";
+    }
+
+    my $response = $arguments->{method} .'Response';
+    my $returnCode = ( ( exists $WebServiceResults->{ $response } ) ? ( ( defined $WebServiceResults->{ $response } and $WebServiceResults->{ $response } ne '' ) ? $ERRORS{OK} : $ERRORS{WARNING} ) : $ERRORS{CRITICAL} );
+
+    unless ( $returnCode ) {
+      if ( $arguments->{method} eq 'InsertSupportRequest' ) {
+  	    # ...
+      } else { # $arguments->{method} =~ /^GetSupportRequest(?:List)*$/
+        if ( exists $WebServiceResults->{$response}->{SupportRequest} ) {
+          sub processGetSupportRequestResponse {
+            my ($supportRequest, $arguments, $counter) = @_;
+
+            if ( defined $supportRequest->{Number} ) {
+              my ($header, $data) = ('', '');
+
+              if ( defined $arguments->{fieldlist}->{'*'} ) {
+                while (my ($key, $value) = each %{ $supportRequest } ) {
+                  $header .=  '"'. $key .'",' unless ($counter);
+                 $data .= '"'. $value .'",';
+                }
+              } else {
+                foreach my $key (sort keys %{ $arguments->{fieldlist} } ) {
+                  my $value = $arguments->{fieldlist}->{$key};
+
+                  if ( defined $supportRequest->{$value} ) {
+                    $header .=  '"'. $value .'",' unless ($counter);
+                   $data .= '"'. $supportRequest->{$value} .'",';
+                  }
+                }
+              }
+
+              unless ($counter) {
+                chop $header;
+                $header .= "\n";
+              }
+
+              chop $data;
+              $data .= "\n";
+
+              print $header, $data;
+              $counter++;
+            }
+
+            return ($counter);
+          }
+
+          if ( ref $WebServiceResults->{$response}->{SupportRequest} eq 'ARRAY' ) {
+            my $counter = 0;
+
+            foreach my $supportRequest ( @{$WebServiceResults->{$response}->{SupportRequest}} ) {
+              $counter = processGetSupportRequestResponse ( $supportRequest, \%$arguments, $counter );
+            }
+          } elsif ( exists $WebServiceResults->{$response}->{SupportRequest}->{Number} ) {
+            processGetSupportRequestResponse ( $WebServiceResults->{$response}->{SupportRequest}, \%$arguments, 0 );
+          }
+        }
+      }
+    }
+
+    $asnmtapInherited->pluginValues ( { stateValue => $returnCode, alert => $arguments->{method} ."\@". $arguments->{FQDN} .": ". $STATE{$returnCode} }, $TYPE{APPEND} );
+    return ($returnCode);
+  }
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  my $objectPlugins = ASNMTAP::Asnmtap::Plugins->new (
+    _programName        => 'sde-supportRequest.pm',
+    _programDescription => 'SDE Support Request',
+    _programVersion     => '1.0',
+    _timeout            => 30,
+    _plugins            => 0,
+    _debug              => 0);
+
+  no warnings 'deprecated';
+  $objectPlugins->{_getOptionsValues}->{debug} = ($debug eq 'T') ? 1 : (($debug eq 'L') ? 2 : (($debug eq 'M') ? 3 : (($debug eq 'A') ? 4 : ((($debug eq 'S') ? 5 : 0)))));
+  use warnings;
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  my $succeeded = 0;
+
+  my %methods;
+
+  for ( $method ) {
+    /^InsertSupportRequest$/ && do {
+      %methods = (
+        "$method" => {
+          parameters => [
+            SOAP::Data->new(name => 'customer', type => 's:string', value => $customer, attr => {}),
+            SOAP::Data->new(name => 'UserID', type => 's:string', value => $UserID, attr => {}),
+            SOAP::Data->new(name => 'service', type => 's:string', attr => {}),
+            SOAP::Data->new(name => 'ci', type => 's:string', attr => {}),
+            SOAP::Data->new(name => 'Ci_Type', type => 's:int', attr => {}),
+            SOAP::Data->new(name => 'description', type => 's:string', attr => {}),
+            SOAP::Data->new(name => 'informationUpdate', type => 's:string', attr => {}),
+            SOAP::Data->new(name => 'source', type => 's:string', value => $source, attr => {}),
+            SOAP::Data->new(name => 'category', type => 's:string', attr => {}),
+            SOAP::Data->new(name => 'impact', type => 's:string', attr => {}),
+            SOAP::Data->new(name => 'group', type => 's:string', attr => {}),
+            SOAP::Data->new(name => 'OutageStart', type => 's:dateTime', attr => {})
+          ], # end parameters
+        }, # end InsertSupportRequest
+      ); # end my %methods
+
+      last; };
+    /^GetSupportRequest$/ && do {
+      unless ( defined $whereClause ) {
+        $objectPlugins->pluginValues ( { error => 'GetSupportRequest: whereClause NOT DEFINED' }, $TYPE{APPEND} );
+        $succeeded = error_SupportRequest(*STDOUT, $objectPlugins->pluginValue ('error'), $debug, $pagedir, $pageset, $htmlTitle, $subTitle, -2, $onload, $sessionID);
+        return ( $succeeded, $objectPlugins->pluginValue ( 'alert' ), $objectPlugins->pluginValue ( 'error' ) );
+      }
+
+      %methods = (
+        "$method" => {
+          parameters => [
+            SOAP::Data->new(name => 'whereClause', type => 's:string', value => $whereClause, attr => {})
+          ], # end parameters
+        }, # end GetSupportRequest
+      ); # end my %methods
+
+      last; };
+    /^GetSupportRequestList$/ && do {
+      unless ( defined $whereClause ) {
+        $objectPlugins->pluginValues ( { error => 'InsertSupportRequest: whereClause NOT DEFINED' }, $TYPE{APPEND} );
+        $succeeded = error_SupportRequest(*STDOUT, $objectPlugins->pluginValue ('error'), $debug, $pagedir, $pageset, $htmlTitle, $subTitle, -2, $onload, $sessionID);
+        return ( $succeeded, $objectPlugins->pluginValue ('alert'), $objectPlugins->pluginValue ('error') );
+      }
+
+      %methods = (
+        "$method" => {
+          parameters => [
+            SOAP::Data->new(name => 'whereClause', type => 's:string', value => '<![CDATA['. $whereClause .']]>', attr => {}),
+            SOAP::Data->new(name => 'orderBy', type => 's:string', value => 'number', attr => {}),
+          ], # end parameters
+        }, # end GetSupportRequestList
+      ); # end my %methods
+
+      last; };
+    /^UpdateSupportRequest$/ && do {
+      unless ( defined $whereClause ) {
+        $objectPlugins->pluginValues ( { error => 'InsertSupportRequest: whereClause NOT DEFINED' }, $TYPE{APPEND} );
+        $succeeded = error_SupportRequest(*STDOUT, $objectPlugins->pluginValue ('error'), $debug, $pagedir, $pageset, $htmlTitle, $subTitle, -2, $onload, $sessionID);
+        return ( $succeeded, $objectPlugins->pluginValue ('alert'), $objectPlugins->pluginValue ('error') );
+      }
+
+      %methods = (
+        "$method" => {
+          parameters => [
+            # ...
+          ], # end parameters
+        }, # end UpdateSupportRequest
+      ); # end my %methods
+
+      last; };
+    $objectPlugins->pluginValues ( { error => 'method: UNKNOWN' }, $TYPE{APPEND} );
+    $succeeded = error_SupportRequest(*STDOUT, $objectPlugins->pluginValue ('error'), $debug, $pagedir, $pageset, $htmlTitle, $subTitle, -2, $onload, $sessionID);
+    return ( $succeeded, $objectPlugins->pluginValue ('alert'), $objectPlugins->pluginValue ('error') );
+  }
+
+  if ( $debug eq 'T' ) {
+    use Data::Dumper;
+    print Dumper (%methods), "\n";
+  }
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  my %fieldlist;
+
+  if ( defined $fieldlist ) {
+    my $counter = 10;
+    %fieldlist = map { $counter++ => $_ } split (/,/, $fieldlist);
+  } else {
+    $fieldlist {'*'} = '*';
+  }
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  my ($rv, %valueEventsDataDisplay, %valueSupportRequestData) = ( 1 );
+
+	$rv = _getEventsData ($catalogID, $uKey, \%valueEventsDataDisplay, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID, $debug);
+
+  if ( $debug eq 'T' ) {
+    use Data::Dumper;
+    print Dumper (%valueEventsDataDisplay), "\n";
+  }
+
+  unless ( $rv ) {
+    $objectPlugins->pluginValues ( { error => '_getEventsData' }, $TYPE{APPEND} );
+    $succeeded = error_SupportRequest(*STDOUT, $objectPlugins->pluginValue ('error'), $debug, $pagedir, $pageset, $htmlTitle, $subTitle, -2, $onload, $sessionID);
+    return ( $rv, $objectPlugins->pluginValue ('alert'), $objectPlugins->pluginValue ('error') );
+  }
+
+	$rv = _getSupportRequestData ($CARTO_SERVER, $CARTO_DATABASE, $CARTO_TABLE, $catalogID, $uKey, \%valueSupportRequestData, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID, $debug);
+
+  if ( $debug eq 'T' ) {
+    use Data::Dumper;
+    print Dumper (%valueSupportRequestData), "\n";
+  }
+
+  unless ( $rv ) {
+    $objectPlugins->pluginValues ( { error => '_getSupportRequestData' }, $TYPE{APPEND} );
+    $succeeded = error_SupportRequest(*STDOUT, $objectPlugins->pluginValue ('error'), $debug, $pagedir, $pageset, $htmlTitle, $subTitle, -2, $onload, $sessionID);
+    return ( $rv, $objectPlugins->pluginValue ('alert'), $objectPlugins->pluginValue ('error') );
+  }
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  foreach my $FQDN ( split ( /,/, $cluster ) ) {
+    my %customArguments = (FQDN => $FQDN, method => $method, fieldlist => \%fieldlist);
+
+    my ($returnCode, $xml) = get_soap_request (
+      asnmtapInherited  => \$objectPlugins,
+      custom            => \&_actionOnSoapResponse,
+      customArguments   => \%customArguments,
+      proxy             => $FQDN .'/Service.asmx',
+      namespace         => $namespace,
+      method            => SOAP::Data->name("$method")->attr( {'xmlns' => $namespace} ),
+      soapaction        => $method,
+      registerNamespace => \%soapService_NS,
+      params            => \@{$methods{$method}{parameters}},
+      cookies           => 1,
+      perfdataLabel     => $method .'\@'. $FQDN,
+      TYPE_ERROR_RETURN => 'APPEND'
+    );
+
+    last unless ( $returnCode );
+  }
+
+  $succeeded = 'SR <#>' unless ( $objectPlugins->pluginValue ( 'stateValue' ) );
+  my $alert  = $objectPlugins->pluginValue ('alert');
+  my $error  = $objectPlugins->pluginValue ('error');
+  undef $objectPlugins;
+  $succeeded = error_SupportRequest(*STDOUT, $error, $debug, $pagedir, $pageset, $htmlTitle, $subTitle, -2, $onload, $sessionID) unless ( $succeeded );
+  return ( $succeeded, $alert, $error );
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+sub insertSupportRequest {
+  my ($catalogID, $uKey, $title, $remoteUser, $outageStartDate, $outageStartTime, $description, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID, $debug) = @_;
+
+  return ( webserviceSupportRequest( $catalogID, $uKey, 'InsertSupportRequest', undef, undef, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID, $debug ) );
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+sub getSupportRequest {
+  my ($catalogID, $uKey, $title, $remoteUser, $problemSolved, $list, $updated, $supportRequest, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID, $debug) = @_;
+
+  return ( webserviceSupportRequest($catalogID, $uKey, ( ( defined $list && $list ) ? 'GetSupportRequestList' : 'GetSupportRequest' ), "Customer='ASNMTAP MONITORING' and source='Alarm' CompletionCode<>'SOLVED'", 'Number,Status,CompletionCode,CI,Category', $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID, $debug ) );
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+sub updateSupportRequest {
+  my ($catalogID, $uKey, $title, $remoteUser, $outageEndDate, $outageEndTime, $description, $supportRequest, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID, $debug) = @_;
+
+  return ( webserviceSupportRequest( $catalogID, $uKey, 'UpdateSupportRequest', undef, undef, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID, $debug ) );
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+sub error_SupportRequest {
+  my ($HTML, $error_message, $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID) = @_;
+
+  my $subject = "$htmlTitle / error_SupportRequest: " . get_datetimeSignal();
+  my $message = get_datetimeSignal() . "\npagedir   : $pagedir\npageset   : $pageset\nhtml title: $htmlTitle\n\nerror message:\n$error_message\n";
+  my $returnCode = sending_mail ( $SERVERLISTSMTP, $SENDEMAILTO, $SENDMAILFROM, $subject, $message, $debug );
+  print "Problem sending email to the '$APPLICATION' server administrators\n" unless ( $returnCode );
+
+  if ( $refresh == 0 ) {
+    return (0, $error_message, "Error: ...", "String: ...");
+  } elsif ( $refresh == -1 ) {
+    print "<H1>Support Request Error:</H1>\n", $error_message, "\n<BR>";
+    return 0;
+  } elsif ( $refresh == -2 ) {
+    return 0;
+  } else {
+    print_header ($HTML, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, 'F', '', $sessionID);
+    print "<H1>Support Request Error:</H1>\n", $error_message, "\n<BR>";
+    return 0;
+  }
+}
+
+# End sde-supportRequest.pm --------------------------------------------------------------------------------
+
+1;

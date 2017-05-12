@@ -1,0 +1,26 @@
+verbose = %f:%l:%c:%m (%e %P)\n
+severity = 1
+
+[-CodeLayout::RequireTidyCode]
+[-ControlStructures::ProhibitPostfixControls]
+[-Documentation::PodSpelling]
+[-Miscellanea::RequireRcsKeywords]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | SYNOPSIS | AUTHOR | COPYRIGHT AND LICENSE
+
+[-Modules::RequireExplicitPackage]
+[Lax::RequireExplicitPackage::ExceptForPragmata]
+allowed_pragmata = Modern::Perl
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Modern::Perl
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Modern::Perl
+
+[Variables::ProhibitPunctuationVars]
+allow = $@

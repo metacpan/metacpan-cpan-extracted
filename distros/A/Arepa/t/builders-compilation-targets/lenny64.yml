@@ -1,0 +1,5 @@
+type: test
+architecture: amd64
+architecture_all: yes
+distribution: lenny-opera
+distribution_aliases: [lenny, unstable]

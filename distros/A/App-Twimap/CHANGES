@@ -1,0 +1,15 @@
+Revision history for Perl module App::Twimap:
+
+0.03 Sat Jun 15 18:37:05 BST 2013
+    - migrate to v1.1 of the Twitter API (and implement rate limiting)
+
+0.02 Sat Oct 29 07:13:40 BST 2011
+    - fix bug where newlines in tweets would create a malformed subject
+      header in the email
+    - handle replies to private/deleted tweets
+    - add a plain text version (with multipart/alternative)
+    - move to using the _str JSON entries for IDs
+    - try and go as fast as we can, given Twitter's rate limiting
+
+0.01 Wed Sep 14 11:19:03 BST 2011
+    - initial release

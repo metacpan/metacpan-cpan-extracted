@@ -1,0 +1,79 @@
+NAME
+    AnyEvent::SerialPort - AnyEvent::Handle subclass for serial ports
+
+VERSION
+    version 1.130171
+
+SYNOPSIS
+      use AnyEvent;
+      use AnyEvent::SerialPort;
+
+      my $cv = AnyEvent->condvar;
+
+      my $hdl;
+      $hdl = AnyEvent::SerialPort->new(
+               serial_port => '/dev/ttyUSB0',
+               # other AnyEvent::Handle arguments here
+             );
+
+      # or to use something other than 9600 8n1 raw
+      $hdl = AnyEvent::SerialPort->new
+              (
+               serial_port =>
+                 [ '/dev/ttyUSB0',
+                   [ baudrate => 4800 ],
+                   # other [ "Device::SerialPort setter name" => \@arguments ] here
+                 ],
+               # other AnyEvent::Handle arguments here
+             );
+
+      # obtain the Device::SerialPort object
+      my $port = $hdl->serial_port;
+
+DESCRIPTION
+    This module is a subclass of AnyEvent::Handle for serial ports.
+
+    IMPORTANT: This is a new API and is still subject to change. Feedback
+    and suggestions would be very welcome.
+
+METHODS
+  new(%parameters)
+    Constructs an AnyEvent::SerialPort object based on the given parameters.
+    The permitted parameters are those of the AnyEvent::Handle super class
+    constructor (except "connect" and "fh" which would not make sense) and a
+    "serial_port" parameter. The value of the serial port parameter may be
+    either:
+
+    *   the full path name of the serial device, or
+
+    *   a list reference containing the full path name of the serial device
+        and zero or more list references each containing a
+        Device::SerialPort method name and arguments to be executed on the
+        wrapped Device::SerialPort object.
+
+    By default, the following setter methods are called on the underlying
+    Device::SerialPort object:
+
+    baudrate(9600),
+    databits(8),
+    parity('none'),
+    stopbits(1), and
+    datatype('raw')
+
+    The second form of the "serial_port" parameter value described above can
+    be used to override these settings and apply additional setters.
+
+    See the "SYNOPSIS" for examples.
+
+  serial_port()
+    Return the wrapped Device::SerialPort object.
+
+AUTHOR
+    Mark Hindess <soft-cpan@temporalanomaly.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Mark Hindess.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

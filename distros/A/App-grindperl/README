@@ -1,0 +1,46 @@
+NAME
+    App::grindperl - Guts of the grindperl tool
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+      use App::grindperl;
+      my $app = App::grindperl->new;
+      exit $app->run;
+
+DESCRIPTION
+    This module contains the guts of the grindperl program.
+
+SEE ALSO
+    grindperl
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/App-grindperl/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/App-grindperl>
+
+      git clone https://github.com/dagolden/App-grindperl.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   David Golden <xdg@xdg.me>
+
+    *   Sawyer X <xsawyerx@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

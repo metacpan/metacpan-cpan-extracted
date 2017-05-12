@@ -1,0 +1,26 @@
+---
+abstract: 'Look into TAP-Archives'
+author:
+  - 'Boris Däppen <bdaeppen.perl@gmail.com>'
+build_requires:
+  TAP::Formatter::HTML: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Archive-TAP-Peek
+requires:
+  Archive::Extract: 0
+  File::Temp: 0
+  TAP::Parser: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/borisdaeppen/Archive-TAP-Peek
+  repository: git://github.com/borisdaeppen/Archive-TAP-Peek.git
+version: 0.002

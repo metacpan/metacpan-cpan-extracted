@@ -1,0 +1,58 @@
+#########################################
+# CHANGE LOG
+#########################################
+
+VERSION 0.968
+ o App::Widget::TabbedAppFrame, App::Widget::TabbedSelector - add support for deep-linking to a particular tab within the AppFrame with the 'screen=foo' URL parameter
+ o ensure that MANIFEST is clean and that all files are in it (including App::Widget::Graph)
+
+VERSION 0.967
+ o App::Widget::DataTable2 - Fix bug when nowrap was set to 0, it wasn't working
+ o App::Widget::Graph      - fixed a couple bugs on graphs
+ o App::Widget             - cleaned up an extraneous </script> tag
+ o App::Widget             - added the action="$url" to the mainform <form> tag (includes PATH_INFO but not QUERY_STRING)
+
+VERSION 0.966
+ o App::Widget::Select: add {init_default}
+ o App::Widget::DataTable2: fix use of get_table_def() so that it works on redirected tables
+ o App::Widget::DataTable2: add {deletable}, {copyable}, and {addable} options for the {editable} option
+
+VERSION 0.965
+ x add <input name=app.loaded> for handling js-app back button stuff
+ x App::Widget->format() method
+
+VERSION 0.964
+ x DataTable2, ImageButton: look for app-button in cgi-bin/App/app-button, not cgi-bin/app-button
+ x TemplateEngine: do the {xyz} subs before the [%xyz%] subs. strict disallows {xyz} syntax
+
+VERSION 0.963
+ x Fixed bug in get_theme_value, needed to use labels instead of values
+ x add theme support to all widgets via get_theme_value()
+ x Added the ablity to use a different filename in set_alternative_content
+ x Added themable templates
+ x changed the way the default values are determined for substitution
+ x added multi-level, auth, outer table
+ x added DTD to widget HTML
+ x add support for onLoad handling
+ x per-module VERSION (svn)
+
+VERSION 0.961
+ x App::Widget::DataTable2 - fixed a (pretty serious) bug with delete()
+
+VERSION 0.96
+ x App::Widget::DataTable2 - finishes the job DataTable set out to do
+ x App::Widget::DataTable - per-column align, format, scale_factor
+ x App::Widget::TabbedSelector/HierSelector - fix up multi-level tab selector
+ x App::Widget::TextArea - new
+ x App::Widget::Graph - new
+ x App::Widget::DataAnalysis - new, but not finished
+ x App::Widget::Hidden - new
+ x App::Widget::Select - support EACH value
+
+VERSION 0.95
+ x Widget containership is defined in the widget name by dashes ("-") instead of dots (".") (better for CSS)
+ x Added better support for JavaScript and CSS (style sheets)
+
+VERSION 0.93
+ x Initial release (first one I started keeping this change log, anyway)
+

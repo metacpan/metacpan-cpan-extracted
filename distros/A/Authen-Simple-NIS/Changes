@@ -1,0 +1,10 @@
+Revision history for Perl extension Authen::Simple::NIS
+
+0.3 2006-01-13 00:00
+    - Use Authen::Simple::Password for password verification
+
+0.2 2006-01-05 00:00
+    - obtain default domain at runtime instead of compiletime.
+
+0.1 2006-01-04 00:00
+    - first release

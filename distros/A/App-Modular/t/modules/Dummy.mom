@@ -1,0 +1,11 @@
+#!/usr/bin/perl -w
+use strict;
+
+package App::Modular::Module::Dummy;
+
+use App::Modular;
+use base qw(App::Modular::Module);
+
+# a complete do-noting module :-)
+
+1;

@@ -1,0 +1,153 @@
+NAME
+    ArangoDB - ArangoDB client for Perl
+
+SYNOPSIS
+      use ArangoDB;
+  
+      my $db = ArangoDB->new(
+          host       => 'localhost',
+          port       => 8529,
+          keep_alive => 1,
+      );
+  
+      # Find or create collection
+      my $foo = $db->('foo');
+  
+      # Create new document
+      $foo->save({ x => 42, y => { a => 1, b => 2, } });
+      $foo->save({ x => 1, y => { a => 1, b => 10, } });
+      $foo->name('new_name'); # rename the collection
+  
+      # Create hash index.
+      $foo->ensure_hash_index([qw/x y/]);
+  
+      # Simple query
+      my $cursor = $db->('new_name')->by_example({ b => 2 });
+      while( my $doc = $cursor->next ){
+          # do something
+      }
+  
+      # AQL
+      my $cursor2 = $db->query( 
+          'FOR u IN users FILTER u.age > @age SORT u.name ASC RETURN u' 
+      )->bind( { age => 19 } )->execute();
+      my $docs = $cursor2->all;
+
+DESCRIPTION
+    This module is an ArangoDB's REST API client for Perl.
+
+    ArangoDB is a universal open-source database with a flexible data model
+    for documents, graphs, and key-values.
+
+    More information: <http://www.arangodb.org/>
+
+SUPPORT API VERSION
+    This supports ArangoDB API implementation 1.01.
+
+METHODS
+  new($options)
+    Constructor.
+
+    $options is HASH reference.The attributes of $options are:
+
+    host
+        Hostname or IP address of ArangoDB server.
+
+        Default: localhost
+
+    port
+        Port number of ArangoDB server.
+
+        Default: 8529
+
+    timeout
+        Seconds of HTTP connection timeout.
+
+        Default: 300
+
+    keep_alive
+        If it is true, use HTTP Keep-Alive connection.
+
+        Default: false
+
+    auth_type
+        Authentication method. Supporting "Basic" only.
+
+    auth_user
+        User name for authentication
+
+    auth_passwd
+        Password for authentication
+
+    proxy
+        Proxy url for HTTP connection.
+
+    inet_aton
+        A callback function to customize name resolution. Takes two
+        arguments: ($hostname, $timeout_in_seconds).
+
+        See Furl::HTTP.
+
+  collection($name)
+    Get or create a collection based on $name. Returns instance of
+    ArangoDB::Collection.
+
+    If the Collection $name does not exist, Create it.
+
+    There is shorthand method for get collection instance.
+
+        my $collection = $db->('collection-name');
+
+  create($name)
+    Create new collection. Returns instance of ArangoDB::Collection.
+
+  find($name)
+    Get a Collection based on $name. Returns instance of
+    ArangoDB::Collection.
+
+    If the collection does not exist, returns "undef".
+
+  collections()
+    Get all collections. Returns ARRAY reference.
+
+  query($query)
+    Get AQL statement handler. Returns instance of ArangoDB::Statement.
+
+        my $sth = $db->query('FOR u IN users FILTER u.age > @age SORT u.name ASC RETURN u');
+
+  document($doc)
+    Get documnet in the collection based on $doc. Returns instance of
+    ArangoDB::Document.
+
+  edge($edge)
+    Get edge in the collection. Returns instance of ArangoDB::Edge.
+
+  index($index_id)
+    Returns index object.(ArangoDB::Index::*)
+
+    See:
+
+    *   ArangoDB::Index::Primary
+
+    *   ArangoDB::Index::Hash
+
+    *   ArangoDB::Index::SkipList
+
+    *   ArangoDB::Index::Geo
+
+    *   ArangoDB::Index::CapConstraint
+
+SEE ALSO
+    ArangoDB websie <http://www.arangodb.org/>
+
+DEVELOPMENT
+  Repository
+    <https://github.com/hideo55/p5-ArangoDB>
+
+AUTHOR
+    Hideaki Ohno <hide.o.j55 {at} gmail.com>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

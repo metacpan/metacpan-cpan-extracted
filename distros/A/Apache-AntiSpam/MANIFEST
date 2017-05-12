@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Apache/AntiSpam.pm
+lib/Apache/AntiSpam/HTMLEncode.pm
+lib/Apache/AntiSpam/Heuristic.pm
+lib/Apache/AntiSpam/NoSpam.pm
+t/00_load.t
+t/01_heuristic.t
+t/02_htmlencode.t
+t/03_nospam.t
+t/lib/FilterTest.pm
+t/sample.txt

@@ -1,0 +1,27 @@
+0.7  2014-02-03 19:39:21 GMT
+
+    move to github
+
+0.6  2012-12-01 15:50:25 Europe/Paris
+
+    update meta
+
+0.5  2012-07-16 16:49:59 Europe/Paris
+
+    Use Dist::Zilla::PluginBundle::Author::Celogeek v0.7
+
+0.4  2012-07-08 18:46:43 Europe/Paris
+
+    Use Dist::Zilla::PluginBundle::Author::Celogeek
+
+0.3  2012-06-08 00:20
+
+  * Change author name
+
+0.2   2011-11-27 14:10
+
+  * Add bug tracker page
+
+0.1   2011-11-27 14:00
+
+  * First commit

@@ -1,0 +1,25 @@
+---
+abstract: 'Schedule batch files for the SList suite of programs '
+author:
+  - 'Klaus Eichner <klaus03@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-SList-Scheduler
+requires:
+  Acme::SList::Utilities: '0'
+  Exporter: '0'
+  Getopt::Std: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/klaus03/Acme-SList-Scheduler
+  repository: https://github.com/klaus03/Acme-SList-Scheduler.git
+version: '0.04'

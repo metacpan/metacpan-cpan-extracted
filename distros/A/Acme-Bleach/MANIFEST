@@ -1,0 +1,22 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+unbleach.pl
+lib/Acme/Bleach.pm
+lib/Acme/Morse.pm
+lib/Acme/DWIM.pm
+t/bleach.t
+t/morse.t
+t/DWIM.t
+demo/demo_bleach.pl
+demo/demo_bleach_c.pl
+demo/demo_bleach_eng.pl
+demo/demo_bleach_lisp.pl
+demo/demo_bleach_sh.pl
+demo/demo_morse.pl
+demo/demo_empty.pl
+demo/demo_DWIM.pl
+demo/Empty.pm
+t/die.t
+META.yml                                 Module meta-data (added by MakeMaker)

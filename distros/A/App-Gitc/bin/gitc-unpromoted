@@ -1,0 +1,171 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-unpromoted
+# ABSTRACT: Return a list of unpromoted changesets
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    environment_preceding
+    git
+    is_auto_fetch
+    its_for_changeset
+    sort_changesets_by_name
+    unpromoted
+);
+use Getopt::Long;
+
+our $format = '%n';
+our $verbose;
+our $verbose2;
+our $very_verbose;
+our $very_very_verbose;
+our $for_deploy;
+GetOptions(
+    'format=s'              => \$format,
+    'verbose|v'             => \$verbose,
+    'verbose2|v2'           => \$verbose2,
+    'very_verbose|vv'       => \$very_verbose,
+    'very_very_verbose|vvv' => \$very_very_verbose,
+    'deploy'                => \$for_deploy,
+);
+$format = '%n - %s'             if $verbose;
+$format = '%n - %p - %s'        if $verbose2;
+$format = '%n - %p %r - %S - %s'   if $very_verbose;
+$format = '%n - %p %r - %S - %s%P' if $very_very_verbose;
+$format = 'EV: %n - %p %r - %S - %s%P' if $for_deploy;
+
+# define output format components
+our %formats = (
+    # changeset name
+    'n' => sub { return $_[0] },
+
+    # a new line
+    'N' => sub { return "\n" },
+
+    # changeset project name
+    'p' => sub {
+        my ($changeset) = @_;
+        my $its = its_for_changeset($changeset) or return '';
+        my $issue = eval { $its->get_issue($changeset) } or return '';
+        return ( $its->issue_project($issue) . '' ) || '';
+    },
+
+    # changeset promotion notes
+    'P' => sub {
+        my ($changeset) = @_;
+        my $its = its_for_changeset($changeset) or return '';
+        my $issue = eval { $its->get_issue($changeset) } or return '';
+        our %notes;
+        my $number = $its->issue_number($issue);
+        return '' if $notes{$number}++;
+        my $notes = $its->issue_promotion_notes($issue);
+        return '' if not $notes;
+        if ($for_deploy) {
+            return sprintf "$number:\n\n$notes\n%s\n", '-' x 30;
+        }
+        else {
+            return sprintf "\n\n$notes\n%s\n", '-' x 30;
+        }
+    },
+
+    # changeset's scheduled release
+    'r' => sub {
+        my ($changeset) = @_;
+        my $its = its_for_changeset($changeset) or return '';
+        my $issue = eval { $its->get_issue($changeset) } or return '';
+        my $release = $its->issue_scheduled_release($issue);
+        $release = '' if not $release;
+        return "$release";
+    },
+
+    # changeset summary
+    's' => sub {
+        my ($changeset) = @_;
+        my $its = its_for_changeset($changeset) or return '';
+        my $issue = eval { $its->get_issue($changeset) } or return '';
+        our %summaries;
+        my $number = $its->issue_number($issue);
+        return 'already seen' if $summaries{$number}++;
+        return $its->issue_summary($issue) || '';
+    },
+
+    # changeset status
+    'S' => sub {
+        my ($changeset) = @_;
+        my $its = its_for_changeset($changeset) or return '';
+        my $issue = eval { $its->get_issue($changeset) } or return '';
+        return ( $its->issue_state($issue) . '' ) || '';
+    },
+);
+
+my $target = shift
+    or die "You must specify the target of a hypothetical promotion\n";
+
+# which branch precedes the target branch?
+my $before_target = environment_preceding($target);
+die "Calling unpromoted with a target of '$target' is meaningless\n"
+    if not defined $before_target;
+
+# find all the changeset merges in $before_target that're not in $target
+git "fetch origin" if is_auto_fetch();
+my @unpromoted = unpromoted( "origin/$before_target", "origin/$target" );
+sort_changesets_by_name(\@unpromoted);
+display($_) for @unpromoted;
+
+sub display {
+    my ($changeset) = @_;
+    my $rx = join '|', keys %formats;
+    my @escapes = $format =~ m/%($rx)/g;
+    my %values;
+    for my $escape (@escapes) {
+        next if exists $values{$escape};
+        $values{$escape} = $formats{$escape}->($changeset);
+    }
+
+    ( my $result = $format ) =~ s/%($rx)/$values{$1}/eg;
+    print "$result\n";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-unpromoted - Return a list of unpromoted changesets
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

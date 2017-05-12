@@ -1,0 +1,14 @@
+#  date "+%a, %d %b %Y %H:%M:%S %z"
+
+0.04  Sat, 28 Aug 2010 11:45:10 +0200
+  * Add rbo, getty, data, Eikeg
+  * use utf8
+
+0.03  Mon, 10 Aug 2009 13:10:23 +0200
+  * Add Mario.
+
+0.02  Mon, 10 Aug 2009 06:11:28 +0200
+  * Add a couple of other authors.
+
+0.01  Sun, 09 Aug 2009 00:39:42 +0200
+  * Initial release.

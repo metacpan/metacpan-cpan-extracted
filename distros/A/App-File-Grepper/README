@@ -1,0 +1,48 @@
+App-File-Grepper
+
+Module: App::File::Grepper.
+Script: afg.
+
+A simple but powerful tool to examine hierarchies of text files for
+the occurrence of a pattern. Kind of recursive 'grep'.
+
+A feature not present in similar tools is the ability to pass each
+file that matches to vi or emacs for editing.
+
+A simple driver script 'afg' is included for convenience.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::File::Grepper
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-File-Grepper
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-File-Grepper
+
+    Search CPAN
+        http://search.cpan.org/dist/App-File-Grepper
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012,2016 Johan Vromans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

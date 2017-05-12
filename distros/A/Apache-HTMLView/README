@@ -1,0 +1,77 @@
+
+Apache::HTMLView
+
+This module runs as a PerlHandler in mod_perl for compiled fmt-files created
+by HTMLView. For information about how to configure apache with mod_perl
+look at the mod_perl distribution in CPAN, this README assumes that it is
+configured and running perfectly.
+
+At startup it loads files from one or many directories. File starting with _
+is considered as an action and files with the extention .cfmt as an page.
+All other files are ignored. All files are loaded into memory and parsed by
+perls eval to references to subrutines. These sub's are then called
+everytime the page is requested.
+
+The actions are subs which are called with 3 parameters. The first is
+a DBI connection that you can use to access the database. The second
+is a CGI object that you can take parameters from. The last one is a
+apace server object that you can access the apache server from.
+
+Here is an example of an action:
+
+----
+sub {
+    my ($dbi, $q, $r)=@_;
+		$dbi->prepare("select * from tab");
+		$q->param('id');
+	  $r->connection->user;		
+}  
+----
+
+In httpd.conf you specify which directories to look for compiled fmt's in
+and how to access the database for this set of fmt's. If you have fmt's that
+connect to the db in diffrent ways then you should keep them in diffrent
+directories.
+It is important you load the Apache::HTMLView after these are set!!!
+
+Here is an example of how an httpd.conf could look:
+
+----
+# HTMLView test
+PerlSetVar test_fmtpath /var/www/lib/fmttest
+PerlSetVar test_DBIstr "DBI:mysql:fmttest"
+PerlSetVar test_DBI_User "username"
+PerlSetVar test_DBI_Password "password"
+
+<Location /fmt/test>
+PerlSetVar Name test
+SetHandler perl-script
+PerlHandler Apache::HTMLView
+</Location>
+
+# HTMLView test2
+PerlSetVar test2_fmtpath /var/www/lib/fmttest2
+PerlSetVar test2_DBIstr "DBI:mysql:fmttest"
+PerlSetVar test2_DBI_User "username"
+PerlSetVar test2_DBI_Password "password"
+
+<Location /fmt/test2>
+PerlSetVar Name test2
+SetHandler perl-script
+PerlHandler Apache::HTMLView
+</Location>
+
+PerlModule Apache::HTMLView
+----
+
+If you have a file called mypage.cfmt in /var/www/lib/fmttest2 then you
+access it with: http://myhost.org/fmt/test2/mypage
+
+If any page has the "uid" set the the value of connection->user will be
+pased as the first argument to the page. The value of this parameter is set
+by the autentification routins in apache earlier in the request and thus
+this module can be used with as strong form of autentification as needed.
+
+Any questions, ask: Bjorn Ardo <f98ba@efd.lth.se>
+
+

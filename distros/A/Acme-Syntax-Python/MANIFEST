@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Acme/Syntax/Python.pm
+t/01-function.t
+t/02-lamba.t
+t/03-if-else.t
+t/04-class.t
+t/05-alltogether.t

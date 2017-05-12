@@ -1,0 +1,28 @@
+0.161950  2016-07-13 12:56:03-05:00 America/Chicago
+
+    * The on() method now allows multiple registrations with one call.
+    * The off() method now allows multiple deregistraitons with one call.
+
+0.160720  2016-03-11 23:08:09-06:00 America/Chicago
+
+    * Adding better error handling for malformatted JSON in start and in
+      handling incoming WebSocket messages. HT: robn
+
+0.152750  2015-10-02 13:28:35CDT-0500 America/Chicago
+
+    * Adding IO::Socket::SSL as a prereq. HT: shoichikaji
+
+0.152660  2015-09-23 10:39:17CDT-0500 America/Chicago
+
+    * Fixed the SYNOPSIS code. HT: robn
+    * Removed the dependency on AIO. HT: robn
+
+0.151800  2015-06-29 13:57:02CDT-0500 America/Chicago
+
+    * Fixed a bug in ping where a call with no arguments would die, which was
+      especially critical since the API itself calls ping regularly to help keep
+      the connection alive (and/or notice when it is not). HT: jsime
+
+0.151570    June 6, 2015
+
+    * Initial release of base API.

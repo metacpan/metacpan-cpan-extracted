@@ -1,0 +1,7 @@
+Build.PL
+lib/AnyEvent/ImageShack.pm
+MANIFEST			This list of files
+t/compile.t
+Makefile.PL
+META.yml
+META.json

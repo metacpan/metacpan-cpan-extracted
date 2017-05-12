@@ -1,0 +1,15 @@
+Fixed bugs :
+
+	* $errorcode=ERAR_ENCR _WRONG_PASS;
+	  There was a space in the "ERAR_ENCR_WRONG_PASS" which causes the module to die in case 
+	  an incorrect password is specified.
+
+	* fixed issue "could not list the contents of password protected archives"
+      when calling 'list_files_in_archive' function	
+	
+	
+	
+
+
+
+

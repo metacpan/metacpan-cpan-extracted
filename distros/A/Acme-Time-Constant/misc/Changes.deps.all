@@ -1,0 +1,99 @@
+This file contains ALL changes in dependencies in both REQUIRED / OPTIONAL dependencies for all phases (configure/build/runtime/test/develop)
+
+0.001006
+ [Added / develop requires]
+ - Test::MinimumVersion
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Test::Compile::PerFile 0 → 0.003902
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.002005 → 0.002006
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.025010 → 2.025021
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.001005 2016-04-27T14:50:17Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::CONTRIBUTING 0.001003
+ - Dist::Zilla::Plugin::RemovePrereqs::Provided
+ - English
+ - Software::License::Perl_5
+
+ [Changed / develop requires]
+ - Test::More 0.88 → 0.96
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.024002 → 2.025010
+
+ [Changed / runtime requires]
+ - Time::Warp 0 → 0.52
+
+0.001004 2015-06-23T04:50:45Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / develop recommends]
+ - Test::More 0.99
+
+ [Added / develop requires]
+ - Dist::Zilla 5
+ - Dist::Zilla::Plugin::Author::KENTNL::TravisCI 0.001002
+ - Dist::Zilla::Plugin::MetaYAML::Minimal
+ - Dist::Zilla::Plugin::Prereqs::AuthorDeps
+ - Dist::Zilla::Plugin::Prereqs::Upgrade
+ - Dist::Zilla::Plugin::Readme::Brief
+ - Dist::Zilla::Plugin::Test::EOL
+ - Test::EOL
+ - Test::More 0.88
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / configure recommends]
+ - ExtUtils::MakeMaker 6.98 → 7.00
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.001001 → 0.004002
+ - Dist::Zilla::Plugin::Git::NextRelease 0 → 0.004000
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 0 → 1.004000
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.001002 → 0.002005
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.020000 → 2.024002
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Changed / test recommends]
+ - ExtUtils::MakeMaker 6.98 → 7.00
+ - Test::More 1.001003 → 0.99
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::EOLTests
+ - Dist::Zilla::Plugin::MetaYAML
+ - Dist::Zilla::Plugin::ReadmeFromPod
+
+ [Removed / runtime requires]
+ - utf8
+
+0.001003 2014-08-30T07:49:40Z
+
+0.001002 2014-08-30T00:35:43Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.001001
+
+ [Changed / develop requires]
+ - Test::Kwalitee 1.12 → 1.21
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.001001 → 0.001002
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.017002 → 2.020000
+
+0.001001 2014-08-15T21:11:15Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Git::Contributors 0.006
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.016007 → 2.017002

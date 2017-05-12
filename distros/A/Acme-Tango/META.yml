@@ -1,0 +1,19 @@
+---
+abstract: 'Turn colours orange'
+author:
+  - 'Peter Sergeant <pete@clueball.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102343, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Tango
+requires:
+  Convert::Color: 0.02
+  Test::More: 0.01
+  perl: v5.8.0
+version: 0.07

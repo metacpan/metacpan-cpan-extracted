@@ -1,0 +1,159 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::livehttperf;
+
+App::livehttperf->run();
+
+# PODNAME: livehttperf
+# ABSTRACT: Real life web performance testing tool
+
+
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+livehttperf - Real life web performance testing tool
+
+=head1 VERSION
+
+version 0.03
+
+=head1 SYNOPSIS
+
+  livehttperf -md 1 -cm 20 -o test.xlsx < session.txt
+        Read session from session.txt, set maximum delay between requests to
+        1 second and run with concurrency: 1, 5, 10, 15 and 20. Save results
+        in test.xlsx
+
+  livehttperf -nd -m Content-Length -t 5 -c 20 -c 50 -o test.xlsx < session.txt
+        Read session from session.txt, require matching Content-Length header
+        and run without any delay with concurrency: 20 and 50. Save results
+        in test.xlsx
+
+=head1 OPTIONS
+
+=head2 Input
+
+=over 4
+
+=item -i, --input=file
+
+Input file with recoreded session from LiveHTTP headers Firefox extension.
+
+Default: "-" (STDIN)
+
+=item -nd, --no_delay
+
+Send requests one after another without detected delays.
+
+Default: use delay
+
+=item -md, --max_delay=NUM
+
+If using delay, wait for no more then NUM seconds
+
+Default: none
+
+=item -h, --hostname=STRING
+
+Override hostname in requests and set Host header to STRING.
+
+Default: no change
+
+=item -rc, --reuse_cookies
+
+Use Cookie/Set-Cookie headers from recorded session.
+
+Default: do not reuse
+
+=back
+
+=head2 Sessions
+
+=over 4
+
+=item -n, --repeat=NUM
+
+Repeat recorded session NUM times.
+
+Default: 10
+
+=item -t, --timeout=NUM
+
+Connection timeout.
+
+Default: 10
+
+=item -m, --match=STRING
+
+In addition to comparing HTTP response status line, use specified STRING header
+to confirm successful request. If provided multiple times all headers have to match.
+
+Default: none
+
+=item -c, --concurrency=NUM
+
+Run NUM concurrent connections. Can be provided multiple times.
+
+Default: 1
+
+=item -cs, --concurrency_step=NUM
+
+=item -cm, --concurrency_max=NUM
+
+Alternatively specify maximum concurrency and incremented by provided step value.
+
+Default max: none
+
+Default step: 5
+
+=back
+
+=head2 Display and results
+
+=over 4
+
+=item -o, --output=file
+
+Save results in Excel 2007 (XLSX) format.
+
+Default: none
+
+=item -v, --verbose
+
+Repeat to increase verbosity level. Available levels: WARN, INFO, DEBUG, TRACE.
+
+Default: WARN
+
+=item -q, --quiet
+
+Display only results.
+
+Default: none
+
+=back
+
+=head1 SEE ALSO
+
+* L<App::livehttperf>
+
+=head1 AUTHOR
+
+Alex J. G. Burzyński <ajgb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Alex J. G. Burzyński <ajgb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

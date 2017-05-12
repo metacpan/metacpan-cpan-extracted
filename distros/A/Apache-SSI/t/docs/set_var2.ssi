@@ -1,0 +1,6 @@
+<!--#set var="foo" value="bar" -->
+foo = <!--#echo var="foo" -->
+QUERY_STRING = <!--#echo var=QUERY_STRING -->
+<!--#include virtual=incl.ssi -->
+foo = <!--#echo var="foo" -->
+QUERY_STRING = <!--#echo var=QUERY_STRING -->

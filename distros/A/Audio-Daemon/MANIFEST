@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Daemon.pm
+Daemon/Client.pm
+Daemon/MPG123.pm
+Daemon/Shout.pm
+Daemon/Xmms.pm
+test.pl
+examples/ad-client.pl
+examples/ad-server.pl

@@ -1,0 +1,252 @@
+#!perl
+use v5.10.0;
+use strict;
+use warnings;
+our $VERSION = '0.004';
+
+use App::grindperl;
+my $app = App::grindperl->new;
+exit $app->run;
+
+# PODNAME: grindperl
+# ABSTRACT: Command-line tool to help build and test bleadperl
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+grindperl - Command-line tool to help build and test bleadperl
+
+=head1 VERSION
+
+version 0.004
+
+=head1 SYNOPSIS
+
+These commands are intended to be run from within a clone of
+the Perl git repository.
+
+  # Configure && make && make test (in parallel)
+  $ grindperl
+
+  # Configure && make && make test_porting (in parallel)
+  $ grindperl --porting
+
+  # Same as first example, but without threads
+  $ grindperl --no-threads
+
+  # Configure/make/test and install
+  $ grindperl --prefix=/opt/perl/blead --install
+
+=head1 DESCRIPTION
+
+Hacking on the Perl source tree requires one to regularly build and test.  The
+C<< grindperl >> tool helps automate some common configuration, build and test
+tasks.  Most Perl 5 porters have written something like this and I'm putting
+mine on CPAN to help new (or less automated) contributors.
+
+Instead of typing this:
+
+  $ ./Configure -des -Dusedevel -Dcc='ccache=gcc' \
+    -Dprefix=/tmp/blead-$(git describe) -DDEBUGGING \
+    -Dusethreads
+  $ make -j 9 test_prep
+  $ TEST_JOBS=9 make test_harness
+
+You can just type this:
+
+  $ grindperl
+
+If you want to run C<< make test_porting >> before committing or before
+merging a submitted patch -- which is strongly encouraged -- that is
+as easy as:
+
+  $ grindperl --porting
+
+Generally, the following steps are taken (unless modified by options):
+
+=over 4
+
+=item *
+
+clean the source directory, with C<< git clean -dxf >> or C<< make distclean >>
+
+as necessary
+
+=item *
+
+run C<< Configure >> with desired options
+
+=item *
+
+run either C<< make test_harness >> or C<< make test_porting >> or C<< make test_prep >>
+
+depending on various options
+
+=back
+
+If anything fails along the way, C<< grindperl >> will stop with an error message.
+
+=head1 OPTIONS
+
+Any boolean options that default to true may be negated by prefixing their long
+form with C<< no- >>, e.g. C<< --no-threads >>.
+
+=head2 --config
+
+Boolean flag.  When set, C<< grindperl >> will halt after running C<< Configure >>.
+Default is false.
+
+=head2 --jobs=N or -j N
+
+Controls how many parallel make jobs to run.  Defaults to 9.
+
+=head2 --testjobs=N or -t N
+
+Controls the number of parallel test jobs to run.  Defaults to 9.
+Setting this to 0 will run C<< make test_prep >> but will not run tests.
+
+=head2 --porting
+
+Boolean flag.  When set, C<< make test_porting >> will be run instead
+of C<< make test_harness >>.  The number of jobs to run in parallel
+will still be based on the C<< --testjobs >> option.  Default is false.
+
+=head2 --install
+
+Boolean flag.  When set, C<< grindperl >> will run C<< make install >> after all
+other steps.  Be sure to set C<< --prefix >> to a writeable destination.  Default
+is false.
+
+=head2 --output FILE or -o FILE
+
+Instructs C<< grindperl >> to merge STDERR and STDOUT and redirect output
+to the given file to capture build/test results.
+
+=head2 --prefix PATH
+
+Sets an explicit installation path via C<< -Dprefix=... >>.
+
+If not set, a default prefix will be calculated relative to C<< --install_root >>.
+
+If a C<< .git >> directory exists, the prefix will resemble C<< ROOT/BRANCH-DESCRIBE >>
+if a branch can be determined or C<< ROOT/fromgit-DESCRIBE >> if the branch cannot
+be determined (as from a detached HEAD).  E.g. given the default C<< --install_root >>
+of C<< /tmp >>, the prefix for the blead branch might resemble this:
+
+  /tmp/blead-v5.15.1-22-g5213914
+
+This ensures the the prefix is different for different places in the
+commit history.
+
+If there is no C<< .git >> directory, then the prefix will resemble
+C<< ROOT/DIRNAME-EPOCH >> where DIRNAME is the name of the current directory
+and EPOCH is the number of epoch seconds.
+
+  /tmp/perl-5.15.1-1311278560
+
+These prefix choices ensure that installing different grindperl runs
+will generally not clobber each other.
+
+=head2 --install_root
+
+A base path for a generated default C<< --prefix >>. The default install root
+is C<< /tmp >>.  This needs to be a directory for which you have write
+permissions.
+
+=head2 --debugging
+
+Boolean flag.  Sets C<< -DDEBUGGING >>.  Default is true.
+
+=head2 --threads
+
+Boolean flag.  Sets C<< -Dusethreads >>.  Default is true.
+
+=head2 --cache
+
+Boolean flag.  When true, C<< grindperl >> will save your C<< config.sh >>
+and C<< Policy.sh >> files to a hidden cache file.  If these files
+exist, it will restore them and run C<< Configure >> with the C<< -r >> option.
+
+Using cached config files from a different commit can break things
+and is not recommended.
+
+Defaults to false.
+
+=head2 --man
+
+Boolean flag.  When false, C<< grindperl >> will disable man directories
+and man files will not be generated or installed.  Defaults to false.
+
+=head2 --verbose or -v
+
+Outputs some extra progress messages and warnings.
+
+=head2 --define KEY=VALUE or -D KEY=VALUE
+
+=head2 --undefine KEY or -U KEY
+
+=head2 --additions KEY=VALUE or -A KEY=VALUE
+
+May be specified multiple times with different values of KEY.  These set
+the C<< -D >>, C<< -U >> and C<< -A >> options for C<< Configure >>.  Note
+that unlike C<< Configure >>, these require a space between the option and
+the key or key/value pair.
+
+=head2 --32 (EXPERIMENTAL)
+
+This experimental flag tries to force as much 32-bitness as possible, even on
+a 64 bit operating system.  It's very hacky, messes with compiler and linker
+flags and is not guaranteed on all platforms.
+
+=head1 CONFIGURATION FILE
+
+You can put command line options into a configuration file, one per line,
+and they will be prepended to C<< @ARGV >> before options are processed.  For
+example, here is what I have in my config file.
+
+    --install_root=/opt/perl
+    -D cc='ccache gcc'
+    -D cf_by=dagolden
+    -D cf_email='dagolden@cpan.org'
+    -D perladmin='dagolden@cpan.org'
+    -D optimize=-g
+    -A ccflags=-DPERL_USE_SAFE_PUTENV
+
+To edit the config file, be sure your C<< EDITOR >> environment variable is set
+and then run C<< grindperl --edit >>.
+
+=head1 CAVEATS
+
+=over 4
+
+=item *
+
+You must have git installed and in your path
+
+=item *
+
+This depends on certain shell redirection constructs and is unlikely to work on non-POSIX systems
+
+=back
+
+=head1 AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by David Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut
+
+__END__
+
+
+# vim: ts=2 sts=2 sw=2 et:

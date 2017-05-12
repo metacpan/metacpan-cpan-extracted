@@ -1,0 +1,125 @@
+NAME
+    Algorithm::SkipList - Perl implementation of skip lists
+
+REQUIREMENTS
+    Perl 5.6.1 is required.
+
+    The following non-standard modules are required:
+
+      enum
+
+Installation
+    Installation can be done using the traditional Makefile.PL or the
+    newer Build.PL methods.
+
+    Using Makefile.PL:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    (On Windows platforms you should use nmake instead.)
+
+    Using Build.PL (if you have Module::Build installed):
+
+      perl Build.PL
+      perl Build
+      perl Build test
+      perl Build install    
+
+SYNOPSIS
+      my $list = new Algorithm::SkipList();
+
+      $list->insert( 'key1', 'value' );
+      $list->insert( 'key2', 'another value' );
+
+      $value = $list->find('key2');
+
+      $list->delete('key1');
+
+DESCRIPTION
+    This is an implementation of skip lists in Perl.  What are "skip
+    lists"?
+
+      Skip lists are a probabilistic data structure that seem likely
+      to supplant balanced trees as the implementation method of
+      choice for many applications. Skip list algorithms have the same
+      asymptotic expected time bounds as balanced trees and are
+      simpler, faster and use less space.(*)
+
+    This implementation may not be faster or use less space, but in
+    superficial testing, it does appear to be a reasonably faster
+    substitute for some pure-Perl tree modules.  (However, see the
+    included Benchmark.txt file for comparisons with similar Perl
+    modules, as well as the SEE ALSO section below.)
+
+    Skip lists are similar to linked lists, except that they have
+    random links at various levels that allow searches to skip over
+    sections of the list, like so:
+
+      4 +---------------------------> +----------------------> +
+        |                             |                        |
+      3 +------------> +------------> +-------> +-------> +--> +
+        |              |              |         |         |    |
+      2 +-------> +--> +-------> +--> +--> +--> +-------> +--> +
+        |         |    |         |    |    |    |         |    |
+      1 +--> +--> +--> +--> +--> +--> +--> +--> +--> +--> +--> +
+             A    B    C    D    E    F    G    H    I    J   NIL
+
+    A search would start at the top level: if the link to the right
+    exceeds the target key, then it descends a level.
+
+    More information is available in the module documentation.
+
+    (*) Bill Pugh, inventor of skip lists.  Quoted from WikiPedia
+        <http://en.wikipedia.org/wiki/Skip_list>
+
+REVISION HISTORY
+    Changes since v1.01:
+
+    1.02 Wed Jan  4 2005
+	* removed validate_key and validate_value methods from node types
+	- removed commented-out assertions
+	- added _search_nodes method
+	- keys and values methods rewritten, and can retrieve keys or
+	  values between key ranges ranges 
+	- copy method rewritten
+	- corrected typo in error message
+	- added missing test to MANIFEST
+	- added additional tests
+	- added SIGNATURE to distribution
+
+    A detailed revision history is in the Changes file included with
+    this distribution.
+
+KNOWN ISSUES
+  The following issues are known:
+
+  * If you are upgrading a prior version of List::SkipList, then
+    you may want to uninstall the module before installing
+    Algorithm::SkipList, so as to remove unused autoloading files.
+
+  * Skip lists are non-deterministic.  Because of this, bugs in programs
+    that use this module may be subtle and difficult to reproduce without
+    many repeated attempts.
+
+  See http://rt.cpan.org for any additional issues.
+
+AUTHOR
+    Robert Rothenberg <rrwo at cpan.org>
+
+LICENSE
+    Copyright (c) 2003-2005 Robert Rothenberg. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    See the article "A Skip List Cookbook" (William Pugh, 1989), or
+    similar ones by the author at http://www.cs.umd.edu/~pugh/ which
+    discuss skip lists.
+
+    Because of the way Perl manages memory, you may be better off
+    using a hash with sorted keys (such as Tie::Hash::Sorted) rather
+    than maintaining a sorted dictionary using this or similar
+    modules.

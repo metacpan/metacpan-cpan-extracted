@@ -1,0 +1,39 @@
+SYNOPSIS
+
+     use Array::Find qw(find_in_array);
+     use Data::Dump;
+    
+     dd find_in_array(
+         items      => [qw/a x/],
+         array      => [qw/a b d a y x/],
+         max_result => 2,
+     ); # ['a', 'a']
+    
+     # return unique results
+     dd find_in_array(
+         items      => [qw/a x/],
+         array      => [qw/a b d a y x/],
+         max_result => 2,
+         unique     => 1,
+     ); # ['a', 'x']
+    
+     # find by prefix (or suffix, with/without word separator), in multiple arrays
+     dd find_in_array(
+         item       => 'a.b',
+         mode       => 'prefix',
+         word_sep   => '.',
+         arrays     => [
+             [qw/a a.b. a.b a.bb/],
+             [qw/a.b.c b.c.d/],
+         ],
+     ); # ['a.b.', 'a.b', 'a.b.c']
+
+DESCRIPTION
+
+    This module provides one subroutine: find_in_array to find items in
+    array.
+
+SEE ALSO
+
+    List::Util, List::MoreUtils
+

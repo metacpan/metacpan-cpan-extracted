@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - ars_Login</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_Login(server, username, password, lang, authString, tcpport, rpcnumber)</CODE></H2>
+
+      Returns a control structure for the specified server, username,
+      and password.  Specifying a null server will use whatever the default
+      server is for your system. <P>
+      <code>lang</code>, <code>authString</code>, <code>tcpport</code> and <code>rpcnumber</code>
+	are optional. <P>"lang" is the language the user is using. If not
+	specified, the default will be used.<P> 
+	    "authString" has something to do with the Windows Domain. I
+	    don't have any more information about this parameter. Pass
+	    <code>undef</code> to be safe.
+ 
+	
+	If you want to use a private server, specify <code>tcpport</code> and
+	<code>rpcnumber</code>. 
+	If you pass an empty string as the "server" parameter,
+	ars_Login will attempt to identify one.
+
+      <DL>
+         <DT><B>On success</B><DD>
+                Returns a scalar control record.
+         <DT><B>On failure</B><DD>
+                Returns <CODE>undef</CODE> for invalid number of arguments.
+      </DL>
+
+      <P>Example:
+
+      <PRE>
+      $c = ars_Login("","jmurphy","blah")
+      </PRE>
+
+      <PRE>
+      $c = ars_Login("yourserver.example.com", "jmurphy", "blah", undef, undef, 9000, 390680)
+      </PRE>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 29th March 2003 by jcmurphy<br>
+&#169; J.C.Murphy, J.W.Murphy 1997 arsperl@arsperl.org
+</address>
+</BODY>
+</HTML>

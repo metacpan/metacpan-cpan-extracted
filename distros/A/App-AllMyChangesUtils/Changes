@@ -1,0 +1,28 @@
+Revision history for App::AllMyChangesUtils
+
+1.0.0   2014-08-12
+        * First public release
+
+1.0.1   2014-08-14
+        [Patch]
+        * Fixing work with perl 5.14
+
+1.0.2   2014-11-15
+        [Patch]
+        * Added dependency IO::Socket::SSL
+
+1.0.3   2015-02-28
+        [Patch]
+        * Fixing dependencies
+        * Using lowercase namespace and name in `get_github_favorites`
+
+1.0.4   2015-08-02
+        [Patch]
+        * Fixing get_pauseid_favorites (it was broken because ElasticSearch was renamed to Search::Elasticsearch)
+        * Fixing get_pauseid_distributions (it was broken because ElasticSearch was renamed to Search::Elasticsearch)
+        * Fixing get_github_favorites to return all starred repositories instead of first 30
+        * Using https instead of http link to allmychanges.com
+
+1.0.5   2015-08-07
+        [Patch]
+        * Removed debug output

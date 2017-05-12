@@ -1,0 +1,53 @@
+--- #YAML:1.0 !perl/AI::NaiveBayes1
+attributes:
+  - place
+  - model
+attvals:
+  model:
+    - H
+    - T
+  place:
+    - B
+    - N
+labels:
+  - repairs=Y
+  - repairs=N
+model:
+  condprob:
+    model:
+      H:
+        repairs=N: 0.209677419354839
+        repairs=Y: 0.631578947368421
+      T:
+        repairs=N: 0.790322580645161
+        repairs=Y: 0.368421052631579
+    place:
+      B:
+        repairs=N: 0.193548387096774
+        repairs=Y: 0.684210526315789
+      N:
+        repairs=N: 0.806451612903226
+        repairs=Y: 0.315789473684211
+  labelprob:
+    repairs=N: 0.62
+    repairs=Y: 0.38
+  numerical_attr: {}
+numof_instances: 200
+stat_attributes:
+  model:
+    H:
+      repairs=N: 26
+      repairs=Y: 48
+    T:
+      repairs=N: 98
+      repairs=Y: 28
+  place:
+    B:
+      repairs=N: 24
+      repairs=Y: 52
+    N:
+      repairs=N: 100
+      repairs=Y: 24
+stat_labels:
+  repairs=N: 124
+  repairs=Y: 76

@@ -1,0 +1,29 @@
+---
+abstract: 'Tiny DNS server for IPv6 Reverse DNS'
+author:
+  - 'Michael Stapelberg, C<< <michael at stapelberg.de> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AllKnowingDNS
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Mouse: 0
+  MouseX::NativeTraits: 0
+  Net::DNS: 0
+  NetAddr::IP: 0
+  Privileges::Drop: 0
+  perl: 5.10.0
+resources:
+  license: http://opensource.org/licenses/bsd-license.php
+version: 1.0

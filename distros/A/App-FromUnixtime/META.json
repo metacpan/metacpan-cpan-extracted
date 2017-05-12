@@ -1,0 +1,61 @@
+{
+   "abstract" : "to convert from unixtime to date suitably",
+   "author" : [
+      "Dai Okabayashi <bayashi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-FromUnixtime",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::CmdRC" : "0",
+            "Exporter" : "0",
+            "Getopt::Long" : "2.36",
+            "IO::Interactive::Tiny" : "0",
+            "POSIX" : "0",
+            "Pod::Usage" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::FromUnixtime" : {
+         "file" : "lib/App/FromUnixtime.pm",
+         "version" : "0.17"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/bayashi/App-FromUnixtime/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/bayashi/App-FromUnixtime"
+      }
+   },
+   "version" : "0.17"
+}

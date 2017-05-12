@@ -1,0 +1,11 @@
+Revision history for Audio-XMMSClient-XMLRPC
+
+0.03    Sun, 22 Oct 2006 21:00:22 +0200
+        - Use Module::Install instead of ExtUtils::MakeMaker
+        - Add bin/xmms2-xmlrpc
+
+0.02    Sun, 22 Oct 2006 20:46:19 +0200
+        - Fixed prerequirements in Makefile.PL
+
+0.01    Sat, 21 Oct 2006 17:19:09 +0200
+        - First version, released on an unsuspecting world.

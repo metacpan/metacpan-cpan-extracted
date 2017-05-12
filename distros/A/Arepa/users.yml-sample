@@ -1,0 +1,6 @@
+---
+users:
+  # Passwords are MD5. Just run "echo -n 'mypass' | md5sum -"
+  admin: 21232f297a57a5a743894a0e4a801fc3
+admins:
+  - admin

@@ -1,0 +1,86 @@
+Revision history for App-Framework
+
+1.07    Thu Jul 28 07:44:0 2016
+		Bug Fix: corrected POD in modules
+		Fix: corrected use of Date::Manip
+
+1.06    Thu Mar 22 08:05:0 2012
+		Fix: removed use of "defined(@array)" to eliminate Perl "deprecated" error message
+
+1.05    Mon Aug 30 14:47:00 2011
+		Minor fixes
+		
+1.04    Mon Nov 16 13:45:00 2009
+		Bug fix: Corrected config path environment definition (see rt.cpan.org #49649)
+		
+1.03    Tue Sep 15 13:45:00 2009
+		Bug fix: corrected Sql test (mysql user setting)
+		Bug fix: Removed unnecessary debug output from Object
+		
+1.02    Tue Jul 28 15:45:00 2009
+		Bug fix: Corrected pre-requisite PM list created in Makefile.PL
+		Bug fix: corrected Run test (required programs checking)
+		Added wildcard args support (for Windows)
+		
+1.01    Wed Jul 22 15:45:00 2009
+		Bug fix: Corrected Run feature status checking
+		Updated Mail feature & added documentation
+		Modified Sql test to stop failures on some systems
+
+1.00    Mon Jul 20 15:45:00 2009
+		Release after user testing
+		Bug fix: Corrected Run feature timeout capability
+		Updated Run feature testing
+		Re-worked options/args/data so that their "variables" can be used in any of the other sections
+		Added logging feature
+
+0.95    Wed Jun 10 14:04:00 2009
+		Bug fix: Corrected various test scripts for other OSs
+		Updated Makefile.PL to allow user to fully install optional modules with their dependencies
+		Updated some more POD
+
+0.94    Wed Jun 03 14:04:00 2009
+		Fixed Filter extension
+		Bug fix: Args defaults was not checking properly
+		Updated Makefile.PL to check website for later version
+		Updated some more POD
+
+0.93    Fri May 22 14:04:00 2009
+		Optimised debug & verbose methods in Object (was slugging apps)
+		Corrected Extension & Filter modules
+		Updated some more POD
+
+0.92    Tue May 18 12:30:00 2009
+		Tweak to Makefile to correct removal of old installation
+
+0.91    Tue May 18 08:07:00 2009
+		MANIFEST corrections
+
+0.90    Mon May 18 12:30:00 2009
+		Major re-write to make the framework modular. Now has core/extensions/features
+		NOTE: Application 'run' subroutine renamed to 'app'
+
+0.07    Sat Mar 14 20:33:00 2009
+        Bug fix: Corrected Sql initialisation (was claiming DBI not installed)
+        Added: -man-dev option to display app developer man pages
+        Added: allow 'dev:' prefix to make option only show in developer man pages
+        Added: Sql support for 'group by'
+
+0.06    Thu Mar 05 15:09:00 2009
+        Updated script pod. Modified so that scripts can be used without DBI. Corrected build fail when DBI not installed.
+
+0.05    Wed Mar 04 13:29:00 2009
+        Corrected MANIFEST problem that caused t/04-Args.t test to fail.
+
+0.04    Wed Mar 04 08:07:00 2009
+        Various bug fixes.
+
+0.03    Tue Mar 03 15:55:56 2009
+        Better testing, better documentation, various bug fixes.
+
+0.02    Fri Feb 27 08:38:56 2009
+        Fixed MANIFEST.SKIP (and MANIFEST).
+
+0.01    Thu Feb 26 15:51:56 2009
+        First version, testing distribution files are correct. This version has very limited testing.
+

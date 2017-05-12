@@ -1,0 +1,28 @@
+#################################################################
+############### acedb: R.Durbin and J.Thierry-Mieg ##############
+############### wmake/IBM_DEF    Jan-12-1992       ##############
+#################################################################
+
+#################################################################
+########## Machine dependant compiler modification ##############
+###########  for the IBM work stations         ##################
+#################################################################
+########### This file is included by wmake/truemake #############
+######  Edit this file to adapt the ACeDB to a new machine ######
+#####   following the explanations given in wmake/truemake  #####
+########################################################################
+# $Id: IBM_4_DEF,v 1.1 2002/11/14 20:00:06 lstein Exp $
+
+NAME = IBM
+
+COMPILER = xlc -DACEDB4 -D_ALL_SOURCE
+LINKER = xlc
+
+LIBS = -lm 
+
+.c.o:
+	$(CC) -c $*.c
+
+#  -D_ALL_SOURCE: flag needed by xlc compiler in /usr/include
+#################################################################
+#################################################################

@@ -1,0 +1,182 @@
+TELESCOP= 'JCMT    '           / Name of Telescope
+ORIGIN  = 'Joint Astronomy Centre, Hilo' / Origin of file
+
+        ---- x,y,z triplet for JCMT relative to centre of earth ----
+ALT-OBS =               4120.0 / [m] Height of observatory above sea level
+LAT-OBS =      19.822838905884 / [deg] Latitude of Observatory
+LONG-OBS=    -155.477027838737 / [deg] East longitude of observatory
+OBSGEO-X=    -5464588.18050757 / [m]
+OBSGEO-Y=    -2492998.04950289 / [m]
+OBSGEO-Z=     2150657.49484049 / [m]
+ETAL    =                  0.6 / Telescope efficiency
+
+        ---- OMP and ORAC-DR Specific ----
+PROJECT = 'MJLSJ02 '           / PATT number
+RECIPE  = 'REDUCE_SCAN_EXTENDED_SOURCES' / ORAC-DR recipe
+DRGROUP =                      / Data Reduction group ID
+MSBID   = '1331e9f8f6dda55ed786e6738d52c8b3S' / Id of minimum scheduable block
+MSBTID  = 'JCMT_1341560231_942514' / Transaction ID of MSB
+SURVEY  = 'JPS     '           / Survey Name
+RMTAGENT=                      / Name of Remote Agent
+AGENTID =                      / Unique identifier for remote agent
+
+        ---- Obs Id, Date, Pointing Info ----
+OBJECT  = 'JPS30:t03'          / Object of interest
+STANDARD=                    F / True if the observation is a calibrator
+OBSNUM  =                   22 / Observation number
+NSUBSCAN=                   49 / Subscan number for this file
+OBSEND  =                    F / True if file is last subscan in obs.
+UTDATE  =             20120706 / UT Date as integer in yyyymmdd format
+DATE-OBS= '2012-07-06T08:23:51' / UTC Datetime of start of observation
+DATE-END= '2012-07-06T08:24:27' / UTC Datetime of end of observation
+DUT1    =  4.79158346698552E-6 / [d] UT1-UTC correction
+OBSID   = 'scuba2_00022_20120706T075541' / Unique observation identifier
+OBSIDSS = 'scuba2_22_20120706T075541_450' / Unique observation subsys identifier
+INSTAP  =                      / Subarray at tracking centre (if any)
+INSTAP_X=                  0.0 / [arcsec] Aperture X off. rel. to instr centre
+INSTAP_Y=                  0.0 / [arcsec] Aperture Y off. rel. to instr centre
+AMSTART =                      / Airmass at start of sub-scan
+AMEND   =     1.19609195279221 / Airmass at end of sub-scan
+AZSTART =                      / [deg] Azimuth at sub-scan start
+AZEND   =     127.225669719891 / [deg] Azimuth at sub-scan end
+ELSTART =                      / [deg] Elevation at sub-scan start
+ELEND   =     56.7259696443258 / [deg] Elevation at sub-scan end
+TRACKSYS= 'GAL     '           / TCS Tracking coordinate system
+BASEC1  =                      / [deg] Base C1 at sub-scan start
+BASEC2  =                      / [deg] Base C2 at sub-scan start
+HSTSTART= '2012-07-05T22:23:51' / HST at start of observation
+HSTEND  = '2012-07-05T22:24:27' / HST at end of observation
+LSTSTART= '01:44:06.9558'      / LST at start of observation
+LSTEND  = '01:44:42.6669'      / LST at end of observation
+
+        ---- Integration time related -----
+INT_TIME=     35.6185867536068 / [s] Integration time per bolometer (TSTREAM) or
+EXP_TIME=     35.6185867536068 / [s] Exposure time for each basic measurement
+SEQSTART=              1293293 / RTS index number of first frame
+SEQEND  =              1299292 / RTS index number of last frame
+
+        ---- SCUBA-2 Specific ----
+INSTRUME= 'SCUBA-2 '           / Instrument name
+SUBARRAY= 's4d     '           / [s8a-d] for 850 micron, [s4a-d] for 450 micron
+ARRAYID = 'SG450_M1009D1008'   / Manufacturer's serial number for the subarray
+SHUTTER =                  1.0 / shutter position 0-Closed 1-Open
+FILTER  = '450     '           / Filter name
+WAVELEN =              0.00045 / [m] Filter central wavelength
+BANDWID =               7.0E-5 / [m] Filter bandwidth
+DATAMODE=                    2 / Data Acquisition mode
+BOLODIST=                 6.28 / [arcsec]  Nominal Bolometer spacing
+BBHEAT  =                  0.0 / [deg C] Blackbody temperature
+DARKHEAT=                32020 / Bolometer heater D/A dark setting
+PIXHEAT =                24842 / Bolometer heater D/A setting
+DETBIAS =                21000 / Bolometer Bias D/A setting
+MUXTEMP =               1000.0 / [K] Mux temperature
+BASETEMP=             0.077801 / [K] Base temperature
+MIXSETP =               8000.0 / [ohms] Mixing chamber set point
+FLAT    = 's4d20120706_00020_0001_flat.sdf' / Name of flat-field file
+SEQCOUNT=                    3 / Setup Sequence Counter
+
+        ---- Environmental Data ----
+ATSTART =                  3.0 / [degC] Air temp at start
+ATEND   =                  3.0 / [degC] Air temp at end
+HUMSTART=                 35.3 / Rel. Humidity at start
+HUMEND  =                 34.7 / Rel. Humidity at end
+BPSTART =     626.299987792969 / [mbar] Pressure at start
+BPEND   =     626.599975585938 / [mbar] Pressure at end
+WNDSPDST=             25.92696 / [km/h] Wind Speed at start
+WNDSPDEN=             23.47342 / [km/h] Wind Speed at end
+WNDDIRST=             93.01656 / [deg] Wind direction, azimuth at start
+WNDDIREN=            101.83316 / [deg] Wind direction, azimuth at end
+TAU225ST=                0.113 / Tau at 225 GHz from CSO at start
+TAU225EN=                0.113 / Tau at 225 GHz from CSO at end
+TAUDATST= '2012-07-06T08:14:00' / Time of TAU225ST observation
+TAUDATEN= '2012-07-06T08:14:00' / Time of TAU225EN observation
+TAUSRC  = 'CSO225GHZ'          / Source of the TAU225 value
+WVMTAUST=    0.106313668191433 / 186GHz Tau from JCMT WVM at start
+WVMTAUEN=    0.106405682861805 / 186GHz Tau from JCMT WVM at end
+WVMDATST= '2012-07-06T08:23:39' / Time of WVMTAUST
+WVMDATEN= '2012-07-06T08:24:02' / Time of WVMTAUEN
+SEEINGST=                      / [arcsec] SAO atmospheric seeing (start)
+SEEINGEN=                      / [arcsec] SAO atmospheric seeing (end)
+SEEDATST=                      / Date/Time of SEEINGST
+SEEDATEN=                      / Date/Time of SEEINGEN
+FRLEGTST=           6.81337075 / [degC] Mean Front leg temperature - Start
+FRLEGTEN=           6.81337075 / [degC] Mean Front Leg temperature -End
+BKLEGTST=             7.327598 / [degC] Mean back leg temperature -Start
+BKLEGTEN=             7.296209 / [degC] Mean back leg temperature -End
+
+        ---- Switching and Map setup for the observation ----
+SAM_MODE= 'scan    '           / Sampling Mode
+SW_MODE = 'self    '           / Switch Mode: CHOP, PSSW, NONE, etc
+INBEAM  =                      / Hardware in the beam
+SEQ_TYPE= 'science '           / Type of sequence
+OBS_TYPE= 'science '           / Type of observation
+CHOP_CRD=                      / Chopping co-ordinate system
+CHOP_FRQ=                      / [Hz] Chop frequency
+CHOP_PA =                      / [deg] Chop PA; 0=in lat, 90=in long
+CHOP_THR=                      / [arcsec] Chop throw
+JIGL_CNT=                      / Number of offsets in jiggle pattern
+JIGL_NAM=                      / File containing the jiggle offsets
+JIG_PA  =                      / [deg] Jiggling PA; 0=in lat, 90=in long
+JIG_CRD =                      / Jiggling co-ordinate system
+JIG_SCAL=                      / [arcsec] Scale of jiggle pattern
+DRMWGHTS=                      / Name of file containing DREAM weights
+MAP_HGHT=               3600.0 / [arcsec] Requested height of map
+MAP_PA  =                  0.0 / [deg] Requested PA of map
+MAP_WDTH=               3600.0 / [arcsec] Requested width of map
+LOCL_CRD= 'TRACKING'           / Local offset/map PA co-ordinate system
+MAP_X   =                  0.0 / [arcsec] Requested map offset from tel centre
+MAP_Y   =                  0.0 / [arcsec] Requested map offset from tel centre
+SCAN_CRD= 'FPLANE  '           / Co-ordinate system for scanning direction
+SCAN_VEL=                600.0 / [arcsec/sec] Scan velocity along scan axis
+SCAN_DY =                180.0 / [arcsec] Scan spacing perp. to scan axis
+SCAN_PA =                  0.0 / [deg] Scan PA relative to SAM_CRDS
+SCAN_PAT= 'CURVY_PONG'         / Scan pattern name
+
+        ---- SMU ----
+ALIGN_DX=   -0.153841242194176 / SMU tables X axis focus offset
+ALIGN_DY=    0.262384504079819 / SMU tables Y axis focus offset
+FOCUS_DZ=   -0.238344147801399 / SMU tables Z axis focus offset
+DAZ     =    -7.34676599502563 / SMU azimuth pointing offset
+DEL     =     80.0847625732422 / SMU elevation pointing offset
+UAZ     =                -1.81 / User azimuth pointing offset
+UEL     =                 3.08 / User elevation pointing offset
+
+        ---- JOS parameters ----
+STEPTIME=                0.005 / RTS step time during an RTS sequence
+NUM_CYC =                    1 / Number of times to repeat entire recipe
+JOS_MULT=                    1 / MULT from JOS used in total steps calculation
+JOS_MIN =               397241 / MIN from JOS used in total steps calculation
+NDRKSTEP=                 1724 / Number of RTS steps for each Dark (if any)
+STBETDRK=               397241 / Target number of RTS steps between darks
+STARTIDX=                    1 / Index into pattern at start of obs
+FOCAXIS =                      / Focus Axis to move (X, Y, Z)
+NFOCSTEP=                      / Number of focal position steps (odd number)
+FOCSTEP =                      / Distance between focus steps
+FOCPOSN =                      / [mm] Relative SMU position
+
+        ---- Miscellaneous ----
+OCSCFG  = 'scuba2_20120706_075516_091813.xml' / OCS config filename
+DHSVER  =                      / Data Handling System Version
+SIM_SMU =                    F / True if SMU data is simulated
+SIM_TCS =                    F / True if TCS data is simulated
+SIM_RTS =                    F / True if RTS data is simulated
+SIM_POL =                    F / True if polarization data is simulated
+SIMULATE=                    F / True if any data are simulated
+STATUS  = 'NORMAL  '           / Status of end of obervation
+
+        ---- Polarimeter Specific ----
+POL_MODE= 'UNKNOWN '           / Step-and-integrate (STOP_START) or Spin (CONSTA
+ROTAFREQ=                  0.0 / [Hz] Spin frequency (if spinning) of polarimete
+POL_CRD = '        '           / Coordinate system of polarimeter
+POL_FAXS=                      / Frequency dependency of waveplate offset of pol
+POLCALIN=                    F / True if polarimeter calibrator is in the beam
+POLWAVIN=                    F / True if polarimeter waveplate is in the beam
+POLANLIN=                    F / True if polarimeter analyzer is in the beam
+
+        ---- FTS Specific ----
+FTS_MODE= 'UNKNOWN '           / Step-and-integrate (STEPINT) or fast-scanning
+SCANVEL =                  0.0 / [mm/s] Mirror scan rate in FSCAN mode
+FTS_IN  =                    F / True if FTS pickoff mirror is in the beam
+SCANDIR =                    0 / 1 -> back to front, -1 -> front to back
+STEPDIST=                  0.0 / [mm] Amount to move each step in STEPINT mode
+SIM_FTS =                    F / True if FTS data is simulated

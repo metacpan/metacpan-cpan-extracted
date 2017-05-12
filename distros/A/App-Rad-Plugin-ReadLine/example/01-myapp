@@ -1,0 +1,13 @@
+#! /usr/bin/perl
+use warnings; use strict;             # boring
+use lib qw[ lib ];                    # boring
+use App::Rad::Plugin::ReadLine::Demo; # boring
+use App::Rad qw[ ReadLine ];
+App::Rad->run();
+sub turtles :Help('do it in the shell'){
+    my $c = shift;
+    $c->shell({
+        GreetWithCommand => '',  # use what App::Rad decides is the default
+        ShellPrompt => 'c/,,\\'  # ascii turtle for the prompt
+    });
+}

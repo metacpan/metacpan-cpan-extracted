@@ -1,0 +1,13 @@
+Revision history for Perl extension App::httpstatus
+
+2.0.0 2013-02-22T07:16:30
+
+    - `httpstatus Auth` should be match. Keyword match should not be prefix match
+      (Suggested by hanekomu++)
+
+1.0.0 2013-02-21T06:31:06
+
+    - doc fix
+
+0.0.1 2013-02-19T09:51:47
+    - original version

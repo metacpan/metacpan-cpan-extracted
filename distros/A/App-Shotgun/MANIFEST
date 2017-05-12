@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/shotgun
+dist.ini
+ex/sync.pl
+lib/App/Shotgun.pm
+lib/App/Shotgun/Target.pm
+lib/App/Shotgun/Target/FTP.pm
+lib/App/Shotgun/Target/SFTP.pm
+t/01-load.t
+t/release-pod-syntax.t

@@ -1,0 +1,34 @@
+NAME
+    Archive::BagIt::App
+
+VERSION
+    version 0.049
+
+NAME
+    Archive::BagIt::App - The MooseX::App that bagit.pl runs
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <https://metacpan.org/module/Archive::BagIt::App/>.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/rjeschmi/Archive-BagIt-App> and may be cloned from
+    <git://github.com/rjeschmi/Archive-BagIt-App.git>
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at <https://github.com/rjeschmi/Archive-BagIt-App/issues>.
+
+AUTHOR
+    Rob Schmidt <rjeschmi@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Rob Schmidt and William
+    Wueppelmann.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

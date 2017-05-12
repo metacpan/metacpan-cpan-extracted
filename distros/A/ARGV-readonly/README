@@ -1,0 +1,8 @@
+ARGV-readonly version 0.01
+==========================
+
+See discussion on Perl 5 porters (July, 2008) concerning
+alleged security hole caused by football operator using
+2-arg rather than 3-arg C<open>.
+
+

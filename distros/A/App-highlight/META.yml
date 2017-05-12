@@ -1,0 +1,27 @@
+---
+abstract: 'A simple grep-like filter that highlights chosen words or lines rather than removing non-filtered lines.'
+author:
+  - 'Alex Balhatchet <kaoru@slackwise.net>'
+build_requires:
+  App::Cmd::Tester: 0.309
+  Test::More: 0.92
+  Test::Without::Module: 0.17
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-highlight
+requires:
+  App::Cmd::Simple: 0.309
+  ExtUtils::MakeMaker: 6.55_02
+  Getopt::Long: 2.39
+  Getopt::Long::Descriptive: 0.085
+  Module::Load: 0.18
+  Try::Tiny: 0.09
+resources:
+  repository: git://github.com/kaoru/App-highlight.git
+version: 0.14

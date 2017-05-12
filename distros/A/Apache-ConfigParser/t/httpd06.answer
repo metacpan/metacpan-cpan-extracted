@@ -1,0 +1,33 @@
+reference 0 EmptySubclass=HASH with 6 keys
+reference 0 EmptySubclass=HASH key 'current_node'
+  reference 1-0 Apache::ConfigParser::Directive=HASH with 10 keys
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'attributes'
+    reference 1-1-0 HASH with 0 keys
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'daughters'
+    reference 1-1-1 ARRAY with 0 elements
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'filename'
+     ''
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'line_number'
+     '-1'
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'mother'
+     UNDEFINED
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'name'
+     'root'
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'orig_value'
+     ''
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+    reference 1-1-2 ARRAY with 0 elements
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'value'
+     ''
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'value_array'
+    reference 1-1-3 ARRAY with 0 elements
+reference 0 EmptySubclass=HASH key 'errstr'
+   ''
+reference 0 EmptySubclass=HASH key 'post_transform_path_sub'
+   ''
+reference 0 EmptySubclass=HASH key 'pre_transform_path_sub'
+   ''
+reference 0 EmptySubclass=HASH key 'root'
+   SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+reference 0 EmptySubclass=HASH key 'server_root'
+   ''

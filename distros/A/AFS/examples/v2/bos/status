@@ -1,0 +1,84 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::BOS;
+use POSIX qw(strftime);
+
+my ($server, $cellname, $instance, $long, $bos);
+my ($nargs, $status, $laststart, $lastexit, @instance);
+
+die "Usage: $0 server [instances [long [cell]]]\n" if $#ARGV < 0;
+
+$nargs    = $#ARGV;
+$server   = shift;
+$instance = shift if $nargs > 0;
+$long     = shift if $nargs > 1;
+$cellname = shift if $nargs > 2;
+
+$long     = 0 if $nargs == 1;
+#warn ">$server< >$instance< >$long< >$cellname< \n";
+
+if (defined $instance and $instance =~ / /) { @instance = split / /, $instance; }
+
+if ($cellname) { $bos = AFS::BOS->new($server, 0, 0, $cellname); }
+else           { $bos = AFS::BOS->new($server); }
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+if (@instance)        { $status = $bos->status($long, \@instance); }
+elsif ($instance)     { $status = $bos->status($long, $instance); }
+elsif (defined $long) { $status = $bos->status($long); }
+else                  { $status = $bos->status(); }
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+$bos->DESTROY;
+
+if ($status) {
+    foreach my $inst (keys %$status) {
+
+        if (defined %{$status->{$inst}}) { print "Instance $inst, "; }
+        else { die "failed to get instance info for \'$inst\' \n"; }
+
+        print "currently running normally.\n" if $status->{$inst}->{status};
+        print "\tAuxiliary status is: $status->{$inst}->{aux_status}\n" if $status->{$inst}->{aux_status};
+        chomp($laststart = strftime('%d %b %R %Y', localtime($status->{$inst}->{procStartTime})));
+        chomp($lastexit  = strftime('%d %b %R %Y', localtime($status->{$inst}->{lastAnyExit})));
+        print "\tProcess last started at $laststart\n";
+        print "\tLast exit at $lastexit\n";
+
+        foreach my $val (keys %{$status->{$inst}}) {
+            if ($val eq 'status') { next; }
+            elsif ($val eq "aux_status") { next; }
+            elsif ($val eq "command") {
+                foreach (@{$status->{$inst}->{$val}}) {
+                    print "\tCommand is $_\n";
+                }
+            }
+        }
+    }
+}
+
+
+my $Debugging = 0;
+
+if ($Debugging) {
+    print "\n\n\nDEBUG\n\n";
+    if ($status) {
+        foreach my $inst (keys %$status) {
+            print "Instance: $inst\n";
+            foreach my $val (keys %{$status->{$inst}}) {
+                if ($val eq "command") {
+                    print "\tKey: $val\n";
+                    foreach (@{$status->{$inst}->{$val}}) {
+                        print "\t\tValue: $_\n";
+                    }
+                }
+                else {
+                    print "\tKey: $val, Value: $status->{$inst}->{$val}\n";
+                }
+            }
+        }
+    }
+}

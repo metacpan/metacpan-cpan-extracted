@@ -1,0 +1,33 @@
+Apache::UploadMeter
+================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   mod_perl2
+   Apache2::Request
+   Cache::Cache
+
+COMPATIBILITY
+
+Beginning from version 0.99_01, this module is only compatible with
+Apache2/mod_perl2 Support for Apache 1.3.x is discontinued, as it's too damn
+complicated to configure in Apache 1.3.x  This may change in the future, but I
+doubt it; servers are slowly but surely migrating from 1.3 to 2.x  Maybe it's
+finally time for you to upgrade too.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c)2001-2007 Issac Goldstand - All rights reserved.
+This library is free software. It can be redistributed and/or modified
+under the same terms as Perl itself.

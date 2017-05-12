@@ -1,0 +1,132 @@
+=head2 Mon Aug 15 14:14:08 2016: C<Module> L<YAML::Tiny|YAML::Tiny>
+
+=over 4
+
+=item *
+
+C<installed into: /home/rdrake/code/tel/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.69>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Aug 15 14:14:10 2016: C<Module> L<File::Remove|File::Remove>
+
+=over 4
+
+=item *
+
+C<installed into: /home/rdrake/code/tel/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.57>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Aug 15 14:14:10 2016: C<Module> L<Test::Requires|Test::Requires>
+
+=over 4
+
+=item *
+
+C<installed into: /home/rdrake/code/tel/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.10>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Aug 15 14:14:11 2016: C<Module> L<Module::ScanDeps|Module::ScanDeps>
+
+=over 4
+
+=item *
+
+C<installed into: /home/rdrake/code/tel/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.21>
+
+=item *
+
+C<EXE_FILES: script/scandeps.pl>
+
+=back
+
+=head2 Mon Aug 15 14:14:12 2016: C<Module> L<Module::Install|Module::Install>
+
+=over 4
+
+=item *
+
+C<installed into: /home/rdrake/code/tel/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.16>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Aug 15 14:14:12 2016: C<Module> L<Module::Install::AuthorTests|Module::Install::AuthorTests>
+
+=over 4
+
+=item *
+
+C<installed into: /home/rdrake/code/tel/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.002>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+

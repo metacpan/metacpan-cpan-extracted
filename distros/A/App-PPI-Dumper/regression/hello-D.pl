@@ -1,0 +1,9 @@
+PPI::Document
+  PPI::Token::Comment
+  PPI::Token::Whitespace
+  PPI::Statement
+    PPI::Token::Word
+    PPI::Token::Whitespace
+    PPI::Token::Quote::Double
+    PPI::Token::Structure
+  PPI::Token::Whitespace

@@ -1,0 +1,38 @@
+clear
+power on
+regs
+
+# Base test --------------------
+memset beef 72
+
+op a9 55
+op 2d efbe
+
+# Should be:  ACC=50
+test acc = 50
+
+# Zero test --------------------
+power on
+
+memset beef aa
+
+op a9 55
+op 2d efbe
+
+# Should be:  ACC=0, Z=1
+test acc = 0
+test z = 1
+
+# Negative test ----------------
+power on
+
+memset beef aa
+
+op a9 84
+op 2d efbe
+
+# Should be:  ACC=80, S=1
+test acc = 80
+test s = 1
+
+save verify_2D.txt

@@ -1,0 +1,28 @@
+---
+abstract: 'A generic archive extracting mechanism (using libarchive)'
+author:
+  - 'Leon Brocard <acme@astray.com>'
+build_requires:
+  ExtUtils::CBuilder: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Archive-Extract-Libarchive
+provides:
+  Archive::Extract::Libarchive:
+    file: lib/Archive/Extract/Libarchive.pm
+    version: 0.38
+requires:
+  File::Slurp: 0
+  Object::Tiny: 0
+  Path::Class: 0
+  Test::More: 0
+resources:
+  homepage: http://search.cpan.org/dist/Archive-Extract-Libarchive/
+  license: http://dev.perl.org/licenses/
+version: 0.38

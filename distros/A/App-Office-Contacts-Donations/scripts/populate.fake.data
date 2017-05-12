@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# $1 may be -v.
+
+echo Populating App::Office::Contacts fake data
+
+cd ~/perl.modules/App-Office-Contacts
+
+perl -Ilib scripts/populate.fake.data.pl -v
+
+echo Done

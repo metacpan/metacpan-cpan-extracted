@@ -1,0 +1,56 @@
+Revision history for mod_perl module Apache::AuthCAS
+
+Release 0.5
+===========
+Sun Mar 23 15:23:09 PDT 2008
+	- fixed a security vulnerability where a tainted cookie could be sent
+	  by a malicious user and it would be used in an SQL query without
+	  protection against SQL injection.  All database calls have been updated
+	  to use bind parameters to prevent this possibility.
+	- patch to allow for DBs other than PostgreSQL
+
+Release 0.4
+===========
+1.7  Tue Oct 12 17:33:24 PDT 2004
+	- fixed a bug which made AuthCAS only initialize once.  This meant that
+	  only one configuration could be used on any host properly.  Fixed to
+	  allow single-configuration setups for speed with STATIC_INITIALIZATION
+	  flag.  This "enhancement" sneaked into 0.3 without being logged below =P
+
+Tue Oct 12 16:18:38 PDT 2004
+	- spec file generated with cpan2rpm and then modified.  The old file was
+      broken
+
+Release 0.3
+===========
+1.6  Tue Oct 05 15:37:00 2004
+	- redirect user to error page instead of login in the invalid PGT case.
+	  This will prevent looping redirects in the case there is a
+      misconfiguration
+	- static configuration initialization (initially not logged)
+
+1.5  Tue Oct 05 15:26:00 2004
+	- fixed a bug that was causing invalid PGT to be used when CAS session had
+	  expired
+
+Release 0.2
+===========
+
+1.4  Wed Sep 15 13:07:00 2004
+    - fixed wrong package name Apache::CAS to Apache::AuthCAS
+
+Release 0.1
+===========
+1.3  Wed Sep 15 11:41:00 2004
+    - POD documentation update, had incorrect dependency listed
+      Net::SSLeay was listed twice instead of including MIME::Base64
+
+1.2  Wed Sep 15 11:26:00 2004
+    - Changed session/pgt cleanup to a more consistent method
+    - Initialization only occurs once, not hitting the directory
+      config for every protected request
+    - Added ability to masquerade as a "Basic Auth" module
+
+1.0  Fri Aug 13 05:57:00 2004
+    - initial version
+

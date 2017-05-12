@@ -1,0 +1,22 @@
+Revision history for Perl extension App::Prove::Plugin::MySQLPool
+
+0.06 2016-12-20T12:07:54Z
+    - using Test::mysqld->start_mysqls in launch mysqld servers (shogo82148)
+
+0.05 2014-09-15T11:43:21Z
+     - add custom my.cnf support
+
+0.04 2013-03-19T18:11:00+09:00
+     - fix dependencies
+
+0.03 2013-03-14T23:40:00+09:00
+     - dont include DBI in test_requires
+     - perlcritic
+
+0.02 2013-03-14T15:22:02+09:00
+     - removed README.pod from cpan
+     - add 'lib' to @INC for preparer, when prove invoked with '-l' flag
+     - more kind error message when preparer load failed
+
+0.01 2013-03-13T22:35:01+09:00
+     - original version

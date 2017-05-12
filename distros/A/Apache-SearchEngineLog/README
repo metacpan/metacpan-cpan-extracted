@@ -1,0 +1,96 @@
+Apache::SearchEngineLog 0.51 README
+-----------------------------------
+
+Apache::SearchEngineLog is a mod_perl module for apache to log the terms
+used in searchengines to a SQL database.
+
+Table Layout
+------------
+
+Apache::SearchEngineLog needs two tables: one for storing configuration
+data, and one for storing the actual data wanted. The two tables should
+look as follows:
+
+This is the table for the actual reference data, by default named "hits".
+  +--------+-------------+------+-----+---------------------+-------+
+  | Field  | Type        | Null | Key | Default             | Extra |
+  +--------+-------------+------+-----+---------------------+-------+
+  | term   | varchar(50) |      |     |                     |       |
+  | vhost  | varchar(20) |      | MUL |                     |       |
+  | uri    | varchar(50) |      |     |                     |       |
+  | domain | varchar(20) |      |     |                     |       |
+  | date   | datetime    |      |     | 0000-00-00 00:00:00 |       |
+  +--------+-------------+------+-----+---------------------+-------+
+
+This is the table "config", used for storing collected information about
+searchengines.
+  +--------+-------------+------+-----+---------+-------+
+  | Field  | Type        | Null | Key | Default | Extra |
+  +--------+-------------+------+-----+---------+-------+
+  | domain | varchar(20) |      | PRI |         |       |
+  | field  | varchar(10) |      |     |         |       |
+  +--------+-------------+------+-----+---------+-------+
+
+You can use the included "createtable.sql" file to create these tables.
+
+
+Configuration
+-------------
+
+Apache::SearchEngineLog is configured using environment variables which
+you can set in apache's httpd.conf; An configuration could be:
+
+  #in httpd.conf
+
+  PerlSetEnv DBI_data_source  dbi:driver:dsn
+  PerlSetEnv DBI_username     username
+  PerlSetEnv DBI_password     password
+  PerlSetEnv DBI_table        db_table #optional, defaults to "hits"
+  PerlSetEnv DBI_timeout      seconds  #optional, defaults to 120
+
+  PerlModule Apache::SearchEngineLog
+
+  <Location /test>
+    PerlLogHandler Apache::SearchEngineLog
+  </Location>
+
+To ensure a database conenction the database is pinged after DBI_timeout
+seconds of inactivity. When set to 0 the database will always be pinged
+before sending the request.
+
+
+Performance
+-----------
+
+Since this is the very first release I don't have any information on this
+topic yet. If you gather any experience with this module under load or any
+other platform than those listed on the homepage please let me know!
+
+Although this module does not use Apache::DBI it still uses persistent
+connections to the database. Same thing: Please report any experiences you
+make!
+
+The 'createtable.sql' creates indexes for the 'hits' table which should be
+a performance gain if you have a few entries in the database.
+
+
+Evaluation
+----------
+
+There is a script, called 'analyse.pl', in this bundle which may be used
+to analyse the collected data. (who would have guessed?! ;) It is really
+simple and not very detailed, so I propably will write a better one.. When
+calles without arguments it will print a usage table.
+
+The second script, 'analyse.cgi' does basically the very same job, but
+formats the results as HTML. It relies on mod_perl aswell, since it reads
+the configuration the same way Apache::SearchEngineLog does it itself.
+There are security issues (a parameter is taken without checking and used
+further..) which is why I highly recommend to NOT make it accessible by
+the general public. The positive news is, that it doen't need any
+configuration at all, so using it should be as easy as "Copy into document
+root, set permissions, open a browser"..
+
+--
+Florian 'octo' Forster
+octopus@verplant.org

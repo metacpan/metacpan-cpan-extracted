@@ -1,0 +1,48 @@
+{
+   "abstract" : "Non-blocking wrapper for Net::Whois::Raw",
+   "author" : [
+      "Oleg G <oleg@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-Whois-Raw",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "3.3",
+            "AnyEvent::HTTP" : "1.43",
+            "Net::Whois::Raw" : "2.31"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/olegwtf/p5-AnyEvent-Whois-Raw"
+      }
+   },
+   "version" : "0.07"
+}

@@ -1,0 +1,30 @@
+Apache-Status-DBI README ($Id: README 9324 2007-03-24 22:23:08Z timbo $)
+
+A plugin for Apache::Status that adds a 'DBI handles' menu item to the Apache::Status page.
+
+The DBI handles menu item leads to a page that shows all the key information
+for all the drivers, database handles and statement handles that currently
+exist within the process.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+Apache::Status & DBI, naturally
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Tim Bunce, L<http://www.linkedin.com/in/timbunce>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

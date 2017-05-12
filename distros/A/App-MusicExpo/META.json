@@ -1,0 +1,56 @@
+{
+   "abstract" : "script which generates a HTML table of music tags",
+   "author" : [
+      "Marius Gavrilescu <marius@ieval.ro>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-MusicExpo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Audio::FLAC::Header" : "0",
+            "Audio::Opusfile" : "0",
+            "MP3::Info" : "0",
+            "MP4::Info" : "0",
+            "Ogg::Vorbis::Header::PurePerl" : "0"
+         },
+         "requires" : {
+            "DB_File" : "0",
+            "HTML::Template::Compiled" : "0",
+            "Memoize" : "0",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://git.ieval.ro/?p=app-musicexpo.git"
+      }
+   },
+   "version" : "1.002001"
+}

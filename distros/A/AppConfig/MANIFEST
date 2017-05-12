@@ -1,0 +1,31 @@
+Changes
+lib/AppConfig.pm
+lib/AppConfig/Args.pm
+lib/AppConfig/CGI.pm
+lib/AppConfig/File.pm
+lib/AppConfig/Getopt.pm
+lib/AppConfig/State.pm
+lib/AppConfig/Sys.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/97-pod.t
+t/99_author.t
+t/appconfig.t
+t/args.t
+t/block.t
+t/cgi.t
+t/compact.t
+t/const.t
+t/default.t
+t/file.t
+t/flag.t
+t/getopt.t
+t/multi.t
+t/novars.t
+t/state.t
+t/sys.t
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

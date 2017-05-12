@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: /local/CPAN/Apache-AxKit-Language-XSP-ObjectTaglib/t/htdocs/courses.xsp 1493 2005-02-04T00:46:30.844190Z claco  $ -->
+<xsp:page xmlns:xsp="http://apache.org/xsp/core/v1"
+	xmlns:demo="http://today.icantfocus.com/CPAN/AxKit/XSP/ObjectTaglib/Demo"
+>
+	<body>
+		<demo:courses>
+			<course>
+				<name><demo:name/></name>
+				<code><demo:code/></code>
+				<summary><demo:summary/></summary>
+				<description><demo:description/></description>
+
+				<demo:prerequisites>
+					<prerequisite>
+						<name><demo:name/></name>
+						<code><demo:code/></code>
+					</prerequisite>
+				</demo:prerequisites>
+
+				<demo:presentations>
+					<presentation>
+						<size><demo:size/></size>
+					</presentation>
+				</demo:presentations>
+
+				<demo:resources>
+					<resource><demo:name/></resource>
+				</demo:resources>
+
+			</course>
+		</demo:courses>
+	</body>
+</xsp:page>

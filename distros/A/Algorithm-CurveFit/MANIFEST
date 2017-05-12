@@ -1,0 +1,14 @@
+Build.PL
+Changes
+examples/examplefit.data
+examples/examplefit.pl
+examples/examplefit_generate_data.pl
+lib/Algorithm/CurveFit.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00pod.t
+t/00podcover.t
+t/01basic.t
+t/02bad_deriv.t

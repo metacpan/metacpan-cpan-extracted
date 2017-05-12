@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::Pmhack;
+use Pod::Usage::CommandLine;
+
+BEGIN { our $VERSION = $App::Pmhack::VERSION; }
+
+print App::Pmhack::pmhack(shift);
+
+=head1 NAME
+
+pmhack
+
+=head1 ABSTRACT
+
+Command-line tool to copy a perl module to a development directory
+
+=head1 SYNOPSIS
+
+  pmhack Module::Name
+
+=head1 DESCRIPTION
+
+Sometimes you want to debug an installed perl module, e.g. by sprinkling some print statements. Instead of being tempted to mess with the module code directly, it is a good practice to copy that module to a development directory, edit it there, and then add that directory to C<@INC> so that perl uses the modified code instead of the original. C<pmhack> is a tool to aid that - it grabs a module from <@INC>, puts it in a directory specified in the C<PERL5HACKLIB> environment variable, creating all additional directories as needed, removes any read-only attributes from the file, and prints the new filename to C<STDOUT>.
+
+=head1 INSTALLATION
+
+=over
+
+=item *
+
+Create an environment variable PERL5HACKLIB and set it to a directory where modules will be copied for hacking
+
+=item *
+
+You may also want to add the above directory to PERL5LIB so that perl uses your hacked version rather than the installed version by default.
+
+=item *
+
+Install C<App::Pmhack> from C<CPAN>. It provides the C<pmhack> command-line tool that you will use to copy modules.
+
+=back
+
+=head1 AUTHOR
+
+Peter Shangov <pshangov at yahoo dot com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Peter Shangov.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.
+

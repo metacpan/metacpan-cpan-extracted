@@ -1,0 +1,15 @@
+0.0.5 Thu Jan  1 00:10:42 PST 2015
+ - Update docs
+
+0.0.4 Wed Dec 24 23:57:24 PST 2014
+ - Build in .inline
+
+0.0.3 Thu Dec 18 11:00:45 PST 2014
+ - Build with Inline::Module 0.25
+
+0.0.2 Sun Dec 14 23:18:24 PST 2014
+ - Release using latest Inline::Module
+
+0.0.1 Sun Nov 16 09:02:11 PST 2014
+ - First Release
+

@@ -1,0 +1,12 @@
+Revision history for Perl module Alien::SDL2
+
+0.002 17/08/2013 
+    - Added patch for compiling libtiff 4.0.3 with jpeg-9 on Debian/Ubuntu machines
+    - Added travis integration for continous testing [mtj++]
+    - Fixed /usr/include => /usr/lib & /usr/lib64 bug where on Unix 64 /usr/lib was being excluded in the file path search for existing libraries
+    - Fixed depreciated File::Temp::tempfile calls (Updated to File::Temp 0.23)
+    - Updated libraries to first official release of SDL2 [kmx]
+    - Added patch for png [kmx]
+
+0.001 XXX
+    - initial version by kmx

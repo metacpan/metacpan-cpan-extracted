@@ -1,0 +1,82 @@
+NAME
+
+    Algorithm::Burg - extrapolate time series using Burg's method
+
+VERSION
+
+    version 0.001
+
+SYNOPSIS
+
+DESCRIPTION
+
+    The Algorithm::Burg module uses the Burg method to fit an
+    autoregressive (AR) model to the input data by minimizing (least
+    squares) the forward and backward prediction errors while constraining
+    the AR parameters to satisfy the Levinson-Durbin recursion.
+
+    DISCLAIMER: This is work in progress! The code is buggy and the
+    interface is subject to change.
+
+ATTRIBUTES
+
+ coefficients
+
+    AR model polynomial coefficients computed by the train method.
+
+ order
+
+    AR model order
+
+ series_tail
+
+    Store the last "order" terms of the time series for "predict($n)".
+
+METHODS
+
+ train($time_series)
+
+    Computes vector of coefficients using Burg algorithm applied to the
+    input source data $time_series.
+
+ predict($n)
+
+    Predict $n next values for the time series. If $n is 0 or bigger than
+    "order", assume $n = "order".
+
+        #!/usr/bin/env perl;
+        use strict;
+        use warnings qw(all);
+        use Algorithm::Burg;
+        ...;
+        my $burg = Algorithm::Burg->new(order => 150);
+        $burg->train(\@time_series);
+        my $result = $burg->predict();
+
+REFERENCES
+
+      * Burg's Method, Algorithm and Recursion
+      <http://www.emptyloop.com/technotes/A%20tutorial%20on%20Burg's%20meth
+      od,%20algorithm%20and%20recursion.pdf>
+
+      * C++ implementation
+      <https://github.com/RhysU/ar/blob/master/collomb2009.cpp>
+
+      * Matlab/Octave implementation
+      <https://gist.github.com/tobin/2843661>
+
+      * Python implementation
+      <https://github.com/MrKriss/Old-PhD-Code/blob/master/Algorithms/burg_
+      AR.py>
+
+AUTHOR
+
+    Stanislaw Pusep <stas@sysd.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Stanislaw Pusep.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

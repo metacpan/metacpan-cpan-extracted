@@ -1,0 +1,69 @@
+{
+   "abstract" : "Macro processor for creating static HTML pages",
+   "author" : [
+      "Moritz Lenz"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Mowyw",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DBI" : "0",
+            "Text::VimColor" : "0",
+            "XML::Simple" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Config::File" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "File::Compare" : "0",
+            "File::Temp" : "0",
+            "Scalar::Util" : "0",
+            "Storable" : "0",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "App::Mowyw" : {
+         "file" : "lib/App/Mowyw.pm",
+         "version" : "v0.8.0"
+      },
+      "App::Mowyw::Datasource" : {
+         "file" : "lib/App/Mowyw/Datasource.pm"
+      },
+      "App::Mowyw::Datasource::Array" : {
+         "file" : "lib/App/Mowyw/Datasource/Array.pm"
+      },
+      "App::Mowyw::Datasource::DBI" : {
+         "file" : "lib/App/Mowyw/Datasource/DBI.pm"
+      },
+      "App::Mowyw::Datasource::XML" : {
+         "file" : "lib/App/Mowyw/Datasource/XML.pm"
+      },
+      "App::Mowyw::Lexer" : {
+         "file" : "lib/App/Mowyw/Lexer.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "v0.8.0"
+}

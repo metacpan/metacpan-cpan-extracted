@@ -1,0 +1,52 @@
+{
+   "abstract" : "Command line tool for inspecting installed modules",
+   "author" : [
+      "Chad Granum <exodist@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Inspect",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "0",
+            "Term::ANSIColor" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Suite" : "0.000018"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/App-Inspect/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/exodist/App-Inspect/"
+      }
+   },
+   "version" : "0.002"
+}
+

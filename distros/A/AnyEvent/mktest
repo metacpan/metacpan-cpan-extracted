@@ -1,0 +1,42 @@
+#!/bin/sh
+
+# this creates duplicate tests for each event loop, and then deletes those
+# that fail due to bugs in them.
+# also patches MANIFEST.
+
+(
+cat <<EOF
+61_fltk         AnyEvent::Impl::FLTK
+62_cocoa        AnyEvent::Impl::Cocoa
+63_eventlib     AnyEvent::Impl::EventLib
+64_glib         AnyEvent::Impl::Glib
+65_event        AnyEvent::Impl::Event
+66_ioasync      AnyEvent::Impl::IOAsync
+67_tk           AnyEvent::Impl::Tk
+68_poe          AnyEvent::Impl::POE $^W = 0;
+69_ev           AnyEvent::Impl::EV
+70_uv           AnyEvent::Impl::UV
+EOF
+) | while read base module extra; do
+   for test in 01 02 03 04 05 07 09; do
+      set -- t/"$test"_*.t
+      t=${1#t/}
+      <t/"$t" \
+      sed -e "s/.*require AnyEvent::Impl::Perl.*/\\
+         BEGIN { $^W = 0 }\\
+         BEGIN { \$ENV{PERL_ANYEVENT_LOOP_TESTS} or ((print qq{1..0 # SKIP PERL_ANYEVENT_LOOP_TESTS not true\\\\n}), exit 0) }\\
+         BEGIN { eval q{use $module;1} or ((print qq{1..0 # SKIP $module not loadable\\\\n}), exit 0) }\\
+         $extra\\
+      /" \
+      >t/"$base"_$t
+   done
+done
+
+if false; then
+   (
+      grep -v ^t/6._ MANIFEST
+      for t in t/6?_*; do
+         echo $t
+      done
+   ) >MANIFEST~ && mv MANIFEST~ MANIFEST
+fi

@@ -1,0 +1,78 @@
+{
+   "abstract" : "Make someone co-maint of your module on PAUSE/CPAN",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-PAUSE-Comaint",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.17",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "WWW::Mechanize" : "0",
+            "YAML" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/miyagawa/App-PAUSE-Comaint/issues"
+      },
+      "homepage" : "https://github.com/miyagawa/App-PAUSE-Comaint",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/miyagawa/App-PAUSE-Comaint.git",
+         "web" : "https://github.com/miyagawa/App-PAUSE-Comaint"
+      }
+   },
+   "version" : "0.07",
+   "x_contributors" : [
+      "Dagfinn Ilmari Manns\u00e5ker <ilmari@ilmari.org>",
+      "Fuji, Goro (gfx) <goro-fuji@cookpad.com>",
+      "karupanerura <karupa@cpan.org>",
+      "Tatsuhiko Miyagawa <miyagawa@gmail.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+}
+

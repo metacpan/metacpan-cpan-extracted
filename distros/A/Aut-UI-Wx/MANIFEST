@@ -1,0 +1,9 @@
+lib/Aut/UI/wxGUI.pm
+lib/Aut/UI/Wx.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+wxGlade/gui.wxg
+

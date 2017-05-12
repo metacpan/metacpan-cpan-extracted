@@ -1,0 +1,192 @@
+#!perl
+
+our $DATE = '2016-11-04'; # DATE
+our $VERSION = '0.13'; # VERSION
+
+BEGIN { $ENV{TRACE} = 1 }
+
+use 5.010;
+use strict;
+use warnings;
+use Log::Any::IfLOG '$log';
+
+use File::Which qw(which);
+use Getopt::Long;
+use Log::Any::Adapter qw(Screen);
+use String::ShellQuote;
+
+my %Opts = (
+    shell => undef,
+);
+
+my @inc;
+Getopt::Long::Configure(
+    'no_ignore_case', 'bundling', 'no_permute', 'pass_through',
+    'auto_help', 'auto_version');
+GetOptions(
+    'include|I=s' => sub {
+        unshift @inc, $_[1];
+    },
+    'shell|s=s' => \$Opts{shell},
+    'bash' => sub { $Opts{shell} = 'bash' },
+    'tcsh' => sub { $Opts{shell} = 'tcsh' },
+    'fish' => sub { $Opts{shell} = 'fish' },
+    'zsh'  => sub { $Opts{shell} = 'zsh'  },
+);
+
+@ARGV or die "testcomp: Please specify script to run as first argument\n";
+my $script = shift @ARGV;
+if (!(-f $script) && $script !~ m!/!) {
+    my $script_p = which($script)
+        or die "testcomp: Script '$script' not found in PATH\n";
+    $script = $script_p;
+}
+
+unless ($Opts{shell}) {
+    require Shell::Guess;
+    my $shell = Shell::Guess->running_shell;
+    $shell = "tcsh" if $shell eq 'c';
+    $shell = "zsh"  if $shell eq 'z';
+    $Opts{shell} = $shell;
+}
+
+my $comp_line = "$script ";
+if (@ARGV == 1 && $ARGV[0] =~ /\s/) {
+    # user types: scriptname 'arg1 arg2 ...'. we should split the quoted args
+    $comp_line .= join(" ", @ARGV);
+} else {
+    # user types: scriptname 'arg1' 'arg two'. we should re-quote to avoid the
+    # space inside arg value to split args.
+    $comp_line .= join(" ", map {shell_quote($_)} @ARGV);
+}
+
+my $comp_point;
+if ($comp_line =~ /\^/) {
+    $comp_point = index($comp_line, '^');
+    $comp_line =~ s/\^//;
+} else {
+    $comp_point = length($comp_line);
+}
+
+my @cmd = ($^X, (map {"-I$_"} @inc),
+           "-MLog::Any::Adapter=Screen",
+           $script);
+
+if ($Opts{shell} eq 'tcsh') {
+    $log->tracef("[testcomp] COMMAND_LINE=<%s>", $comp_line);
+    $ENV{COMMAND_LINE} = $comp_line;
+} else {
+    $log->tracef("[testcomp] COMP_LINE=<%s>, COMP_POINT=%d", $comp_line, $comp_point);
+    $ENV{COMP_LINE}  = $comp_line;
+    $ENV{COMP_POINT} = $comp_point;
+}
+$log->tracef("[testcomp] exec(): %s", \@cmd);
+exec @cmd;
+
+# ABSTRACT: Test your tab completion
+# PODNAME: testcomp
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+testcomp - Test your tab completion
+
+=head1 VERSION
+
+This document describes version 0.13 of testcomp (from Perl distribution App-CompleteUtils), released on 2016-11-04.
+
+=head1 SYNOPSIS
+
+Usage (place caret sign (C<^>) somewhere to place cursor):
+
+ % testcomp [testcomp-options] -- <your-script> [your-script-options]^ ...
+ % testcomp [testcomp-options] -- <your-script> '[your-script-options]^ ...'
+
+Examples:
+
+ % testcomp -- yourscript --opt1 val --opt2
+ % testcomp -Ilib -- 'yourscript --opt1^  --opt2 val'
+
+=head1 DESCRIPTION
+
+This utility will run your script (finding it in C<PATH> if not found in current
+directory) while setting C<COMP_LINE> and C<COMP_POINT> to test how your script
+will perform shell completion. In addition to that, it will also load
+L<Log::Any::Adapter::Screen> and set C<TRACE=1> to let you see trace log
+messages.
+
+You can place caret sign (C<^>) somewhere in the argument to place cursor (set
+C<COMP_POINT>)>. If no caret sign is present, C<COMP_POINT> is put at the end of
+C<COMP_LINE>.
+
+=head1 OPTIONS
+
+=head2 --include=dir, -I
+
+Like Perl's C<-I>.
+
+=head2 --shell=SHELL, -s
+
+Set shell. Currently this has a single effect: if shell is set to C<tcsh>, then
+C<COMMAND_LINE> will be set for the program instead of C<COMP_LINE> and
+C<COMP_POINT>. If unspecified, will be detected using C<<
+Shell::Guess->running_shell >>.
+
+=head2 --bash
+
+Shortcut for C<--shell=bash>.
+
+=head2 --fish
+
+Shortcut for C<--shell=fish>.
+
+=head2 --tcsh
+
+Shortcut for C<--shell=tcsh>.
+
+=head2 --zsh
+
+Shortcut for C<--shell=zsh>.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CompleteUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CompleteUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CompleteUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<App::CompleteUtils>
+
+You can use this utility to test scripts using these frameworks:
+L<Perinci::CmdLine>, L<Getopt::Long::Complete>, L<Getopt::Long::Subcommand>. But
+actually all scripts which can complete itself by detecting C<COMP_LINE> and
+C<COMP_POINT> can be tested.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

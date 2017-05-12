@@ -1,0 +1,113 @@
+#!/usr/bin/env perl
+# $Id: nyaa.PL,v 1.2 2011/02/11 10:20:26 ak Exp $
+use strict;
+use warnings;
+use utf8;
+use Acme::Nyaa;
+use IO::File;
+use Encode;
+use Getopt::Long qw(:config posix_default no_ignore_case gnu_compat);
+use File::Basename qw(basename);
+
+BEGIN {
+    my $modulelist = [ 'Acme::Nyaa' ];
+
+    if( defined $ARGV[0] ) {
+
+        if( $ARGV[0] eq '--modules' ) {
+
+            print $_.qq(\n) for @$modulelist;
+            exit 0;
+        }
+    }
+}
+
+my $Version = $Acme::Nyaa::VERSION;
+my $CatConf = { 'language' => 'ja' };
+my $Options = {
+    'nyaa' => ( 1 << 0 ),
+    'noun' => ( 1 << 1 ),
+    #'lang' => ( 1 << 2 ),
+    #'test' => ( 1 << 3 ),
+};
+my $RunMode = parseoptions();
+
+if( $RunMode ) {
+
+    my $inputfiles = \@ARGV || [];
+    my $filehandle = undef;
+    my $nekonyaaaa = Acme::Nyaa->new( %$CatConf );
+    my $nekobuffer = q();
+    my $nounoption = $RunMode & $Options->{'noun'};
+
+    push @$inputfiles, \*STDIN unless scalar @$inputfiles;
+
+    foreach my $e ( @$inputfiles ) {
+
+        $filehandle = ref $e ? $e : IO::File->new( $e, 'r' ) or die 'Cannot open '.$e;
+        $nekobuffer = [ <$filehandle> ];
+        print $nekonyaaaa->straycat( $nekobuffer, $nounoption );
+    }
+}
+
+sub parseoptions {
+
+    my $o = 0;
+    my $opt_nyaa;
+    my $opt_noun;
+    #my $opt_lang;
+
+    Getopt::Long::Configure( qw/posix_default no_ignore_case gnu_compat/ );
+    Getopt::Long::GetOptions(
+        'n'         => \$opt_noun,
+        'noun'      => \$opt_noun,
+    #   'L=s'       => \$opt_lang,
+    #   'lang=s'    => \$opt_lang,
+        'help'      => sub { help(); exit(0); },
+        'version'   => sub { printf(STDERR "%s\n", $Version); exit(0); },
+    );
+
+    #if( $opt_lang )
+    #{
+    #   $o |= $Options->{'lang'};
+    #   $CatConf->{'language'} = $opt_lang;
+    #}
+
+    $o |= $Options->{'nyaa'};
+    $o |= $Options->{'noun'} if $opt_noun;
+
+    return $o;
+}
+
+sub help {
+
+    printf( STDERR "%s [OPTIONS] <FILE>\n", $0 );
+    printf( STDERR "cat <FILE> | %s [OPTIONS]\n", $0 );
+    printf( STDERR "\n" );
+    printf( STDERR "  -n, --noun             : Replace some nouns with 'ネコ'.\n" );
+    printf( STDERR "   --help                : This screen'.\n" );
+    printf( STDERR "   --version             : Print %s version'.\n", basename $0 );
+    #printf( STDERR "  -L, --lang <lang-code> : Specify a language (only 'ja' for now).\n" );
+    printf( STDERR "\n" );
+}
+
+__END__
+=head1 NAME
+
+nyaa - Translate Japanese texts to texts like which a cat talking.
+
+=head1 DESCRIPTION
+
+Implementation as a sample code using Acme::Nyaa module
+
+=head1 USAGE
+
+    % nyaa /path/to/textfile
+    % cat /path/to/textfile | nyaa
+
+=head1 OPTIONS
+
+see `nyaa --help`
+
+=cut
+

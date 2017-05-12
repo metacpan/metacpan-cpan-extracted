@@ -1,0 +1,42 @@
+  <td>
+
+<div class="page">
+
+<p>
+The SQL was successfully executed.
+</p>
+
+<p>
+<a href="view_schema<% Alzabo::GUI::Mason::Config::mason_extension() %>?schema=<% $s->name | u %>">Back</a>
+</p>
+
+</div>
+
+  </td>
+<%args>
+$s
+$user => undef
+$password => undef
+$host => undef
+$port => undef
+</%args>
+
+<%init>
+eval
+{
+    $s->create( user => $user,
+		password => $password,
+		host => $host,
+		port => $port,
+	      );
+    $s->save_to_file;
+};
+
+my $e = $@;
+
+$m->comp( 'exception', $e ) if $e;
+</%init>
+
+<%attr>
+show_tables => 0
+</%attr>

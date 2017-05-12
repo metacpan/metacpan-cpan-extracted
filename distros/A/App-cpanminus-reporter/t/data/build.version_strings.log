@@ -1,0 +1,75 @@
+cpanm (App::cpanminus) 1.7001 on perl 5.019009 built for darwin-2level
+Work directory is /Users/garu/.cpanm/work/1395033791.15036
+You have make /usr/bin/make
+You have LWP 6.05
+You have /usr/bin/tar: bsdtar 2.8.3 - libarchive 2.8.3
+You have /usr/bin/unzip
+Searching X86::Udis86 on cpanmetadb ...
+--> Working on X86::Udis86
+Fetching http://www.cpan.org/authors/id/B/BO/BOBW/X86-Udis86-1.7.2.3.tar.gz
+-> OK
+Unpacking X86-Udis86-1.7.2.3.tar.gz
+Entering X86-Udis86-1.7.2.3
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (6.88)
+Configuring X86-Udis86-v1.7.2.3
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Warning (mostly harmless): No library found for -ludis86
+Generating a Unix-style Makefile
+Writing Makefile for X86::Udis86
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (6.88)
+Building and testing X86-Udis86-v1.7.2.3
+cp lib/X86/Udis86.pm blib/lib/X86/Udis86.pm
+AutoSplitting blib/lib/X86/Udis86.pm (blib/lib/auto/X86/Udis86)
+cp lib/X86/Udis86/Operand.pm blib/lib/X86/Udis86/Operand.pm
+AutoSplitting blib/lib/X86/Udis86/Operand.pm (blib/lib/auto/X86/Udis86/Operand)
+Running Mkbootstrap for X86::Udis86 ()
+chmod 644 Udis86.bs
+/Users/garu/perl5/perlbrew/perls/perl-5.19.9/bin/perl5.19.9 /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/5.19.9/ExtUtils/xsubpp  -typemap /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/5.19.9/ExtUtils/typemap -typemap typemap  Udis86.xs > Udis86.xsc && mv Udis86.xsc Udis86.c
+Please specify prototyping behavior for Udis86.xs (see perlxs manual)
+cc -c  -I. -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector -O3   -DVERSION=\"1.7.2.3\" -DXS_VERSION=\"1.7.2.3\"  "-I/Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/5.19.9/darwin-2level/CORE"   Udis86.c
+rm -f blib/arch/auto/X86/Udis86/Udis86.bundle
+env MACOSX_DEPLOYMENT_TARGET=10.3 cc  -bundle -undefined dynamic_lookup -fstack-protector Udis86.o  -o blib/arch/auto/X86/Udis86/Udis86.bundle 	\
+	     	\
+	  
+chmod 755 blib/arch/auto/X86/Udis86/Udis86.bundle
+/Users/garu/perl5/perlbrew/perls/perl-5.19.9/bin/perl5.19.9 -MExtUtils::Command::MM -e 'cp_nonempty' -- Udis86.bs blib/arch/auto/X86/Udis86/Udis86.bs 644
+Manifying blib/man3/X86::Udis86.3
+Manifying blib/man3/X86::Udis86::Operand.3
+Running Mkbootstrap for X86::Udis86 ()
+chmod 644 Udis86.bs
+PERL_DL_NONLAZY=1 /Users/garu/perl5/perlbrew/perls/perl-5.19.9/bin/perl5.19.9 "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+
+#   Failed test 'use X86::Udis86;'
+#   at t/X86-Udis86.t line 10.
+#     Tried to use 'X86::Udis86'.
+#     Error:  Can't load '/Users/garu/.cpanm/work/1395033791.15036/X86-Udis86-1.7.2.3/blib/arch/auto/X86/Udis86/Udis86.bundle' for module X86::Udis86: dlopen(/Users/garu/.cpanm/work/1395033791.15036/X86-Udis86-1.7.2.3/blib/arch/auto/X86/Udis86/Udis86.bundle, 2): Symbol not found: _ud_translate_att
+#   Referenced from: /Users/garu/.cpanm/work/1395033791.15036/X86-Udis86-1.7.2.3/blib/arch/auto/X86/Udis86/Udis86.bundle
+#   Expected in: dynamic lookup
+#  at t/X86-Udis86.t line 10.
+# Compilation failed in require at t/X86-Udis86.t line 10.
+# BEGIN failed--compilation aborted at t/X86-Udis86.t line 10.
+&X86::Udis86::constant not defined at t/X86-Udis86.t line 17.
+# Looks like you planned 71 tests but ran 2.
+# Looks like you failed 1 test of 2 run.
+# Looks like your test exited with 255 just after 2.
+t/X86-Udis86.t .. 
+Dubious, test returned 255 (wstat 65280, 0xff00)
+Failed 70/71 subtests 
+
+Test Summary Report
+-------------------
+t/X86-Udis86.t (Wstat: 65280 Tests: 2 Failed: 1)
+  Failed test:  1
+  Non-zero exit status: 255
+  Parse errors: Bad plan.  You planned 71 tests but ran 2.
+Files=1, Tests=2,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.03 cusr  0.00 csys =  0.06 CPU)
+Result: FAIL
+Failed 1/1 test programs. 1/2 subtests failed.
+make: *** [test_dynamic] Error 255
+-> FAIL Installing X86::Udis86 failed. See /Users/garu/.cpanm/work/1395033791.15036/build.log for details. Retry with --force to force install it.

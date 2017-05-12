@@ -1,0 +1,33 @@
+Revision history for App::AltSQL
+
+v0.05 Fri, 01 Jun 2012 12:49:25 -0400
+  
+  - Adding pre-release Term::Plugin::SyntaxHighlight and View::Plugin::VerticalSorted
+  - Customizable prompt in altsql config with substitutions (and test file)
+  - Cache autocomplete and fix minor issue with it
+  - Allow CLI -p to override .my.cnf if empty string
+  - Refactor Model::MySQL render_prompt into parse_prompt
+  - Add setup() method to subclasses
+  - View::Plugin::UnicodeBox header_reminder option (default: 100)
+
+v0.04 Tue, 29 May 2012 08:51:45 -0400
+
+  - Fixing build dependency issue
+
+v0.03  Fri, 25 May 2012 15:39:15 -0400
+
+  - Adding Dump plugin [contributed by https://github.com/joeshin]
+  - Parsing of .my.cnf w/ tests [contributed by https://github.com/spikegrobstein]
+  - Change the prompt with .my.cnf 'prompt' setting
+  - Adding INSTALL document and some minor build changes
+  - Use JSON instead of JSON::XS
+  - Make non-critical dependencies optional
+
+v0.02  Fri May 18 10:33:00 2012 -0400
+
+  - Remove unused dependency on Switch
+
+v0.01  Wed May 16 10:07:51 2012 -0400
+
+  - Initial release
+

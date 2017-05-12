@@ -1,0 +1,50 @@
+---
+abstract: 'Ark plugins for japanese feature phones'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  HTTP::Request::Common: 0
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.9.0, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Ark-Plugin-MobileJP
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Ark::Plugin::Encoding::MobileJP:
+    file: lib/Ark/Plugin/Encoding/MobileJP.pm
+  Ark::Plugin::MobileAgent:
+    file: lib/Ark/Plugin/MobileAgent.pm
+  Ark::Plugin::MobileJP:
+    file: lib/Ark/Plugin/MobileJP.pm
+    version: 0.01
+requires:
+  Ark: 0
+  Encode::JP::Mobile: 0
+  HTTP::MobileAgent: 0
+  HTTP::MobileAgent::Plugin::Charset: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/ark-framework/Ark-Plugin-MobileJP/issues
+  homepage: https://github.com/ark-framework/Ark-Plugin-MobileJP
+  repository: git://github.com/ark-framework/Ark-Plugin-MobileJP.git
+version: 0.01
+x_contributors:
+  - 'Songmu <y.songmu@gmail.com>'

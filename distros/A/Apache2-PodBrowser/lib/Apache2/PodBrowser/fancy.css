@@ -1,0 +1,252 @@
+BODY {
+    background-color: #fff;
+    color: black;
+    font-family: sans-serif;
+    margin: 0;
+    padding: 1ex 32px 1ex 10px;
+}
+
+TABLE {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border-width: 0;
+    color: inherit;
+}
+
+A:link, A:visited {
+    background: transparent;
+    color: #069;
+}
+
+pre, code, kbd, samp, tt {
+    font-family: monospace,monospace;
+    font-size: 1em;
+}
+
+PRE {
+    background: #eeeeee;
+    border: 1px solid #888888;
+    color: black;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    white-space: pre;
+}
+
+CODE {
+    color: #c00;
+    font-weight: bold;
+}
+
+DT {
+    color: #06c;
+}
+
+H1 {
+    background: transparent;
+    color: #069;
+    font-size: 120%;
+    font-family: sans-serif;
+}
+
+H2 {
+    background: transparent;
+    color: #069;
+    font-size: 110%;
+    font-family: sans-serif;
+}
+
+H3 {
+    background: transparent;
+    color: #06c;
+    font-size: 100%;
+    font-family: sans-serif;
+    font-style: italic;
+}
+
+H3 A:link, H3 A:visited {
+    color: #06c;
+}
+
+H4 {
+    background: transparent;
+    color: #06c;
+    font-size: 100%;
+    font-family: sans-serif;
+}
+
+H4 A:link, H4 A:visited {
+    color: #06c;
+}
+
+.block {
+    background: transparent;
+}
+
+TD .block {
+    color: #069;
+    background: #dddddd;
+    padding: 0.2em;
+    font-size: large;
+}
+
+.podindex a {
+    display: inline-block;
+    width: 19em;
+}
+
+.podindex .indexgroup a {
+    width: 2em;
+    text-align: center;
+}
+
+@media screen {
+  DIV.indexgroup:before {
+    content: "C";
+    display: block;
+    color: #069;
+    font-size: 80%;
+    font-family: sans-serif;
+    font-variant: small-caps;
+    text-decoration: none;
+    font-weight: bold;
+    padding-top: 10px;
+    border-left: solid #aab 1px;
+    border-bottom: solid #aab 1px;
+    text-align: center;
+    width: 20px;
+    height: 28px;
+    background-color: #eef;
+    -moz-border-radius-bottomleft: 0.8em;
+    -webkit-border-bottom-left-radius: 0.8em;
+    border-bottom-left-radius: 0.8em;
+    -moz-opacity: 0.7;
+    opacity: 0.7;
+  }
+
+  DIV.indexgroup:hover:before {
+    content: "Content >>";
+    height: auto;
+    width: auto;
+    text-align: left;
+    -moz-border-radius-bottomleft: 0;
+    -webkit-border-bottom-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: 0.3em;
+  }
+
+  DIV.indexgroup:hover:after {
+    content: "<< Content";
+    text-align: right;
+    display: block;
+    color: #069;
+    font-size: 80%;
+    font-family: sans-serif;
+    font-variant: small-caps;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0.3em;
+    border: solid #aab 1px;
+    width: auto;
+    height: auto;
+    background-color: #eef;
+    -moz-border-radius-bottomleft: 0.8em;
+    -webkit-border-bottom-left-radius: 0.8em;
+    border-bottom-left-radius: 0.8em;
+    -moz-opacity: 0.7;
+    opacity: 0.7;
+  }
+
+  DIV.indexgroup {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    -moz-opacity: 0.9;
+    opacity: 0.9;
+  }
+
+  DIV.indexgroup > * {
+    display: none;
+  }
+
+  DIV.indexgroup:hover > * {
+    display: block;
+    position: relative;
+    right: 0;
+    width: 30em;
+    height: 19.7em;
+    border-left: solid #aab 1px;
+    border-right: solid #aab 1px;
+    overflow: auto;
+    background-color: #eee;
+    margin: 0;
+  }
+
+  DIV.indexgroup:hover > div {
+    height: 6em;
+    padding-left: 1em;
+  }
+
+  DIV.uplink {
+    position: fixed;
+    top: 39px;
+    right: 0;
+    height: auto;
+    width: 21px;
+    overflow: clip;
+  }
+
+  DIV.uplink:hover {
+    width: 16em;
+  }
+
+  DIV.uplink A {
+    color: #069;
+    font-size: 80%;
+    font-family: sans-serif;
+    font-variant: small-caps;
+    text-decoration: none;
+    font-weight: bold;
+    padding-top: 10px;
+    padding-left: 6px;
+    padding-right: 6px;
+    border: solid #aab 1px;
+    background-color: #eef;
+    -moz-border-radius-topleft: 0.8em;
+    -webkit-border-top-left-radius: 0.8em;
+    border-top-left-radius: 0.8em;
+    -moz-border-radius-bottomleft: 0.8em;
+    -webkit-border-bottom-left-radius: 0.8em;
+    border-bottom-left-radius: 0.8em;
+    -moz-opacity: 0.7;
+    opacity: 0.7;
+    display: block;
+    margin: 0;
+    text-align: left;
+    letter-spacing: 1em;	/* make sure that only the first letter */
+    width: 100em;		/* is shown */
+    height: 28px;
+    margin-top: -1px;
+  }
+
+  DIV.uplink:hover a {
+    width: 100%;
+    text-align: center;
+    letter-spacing: normal;
+    
+  }
+}
+
+@media print {
+  DIV.indexgroup, DIV.uplink {
+    display: none;
+  }
+
+  BODY {
+    font-size: 70%;
+  }
+}
+
+HR {
+    display: none;
+}

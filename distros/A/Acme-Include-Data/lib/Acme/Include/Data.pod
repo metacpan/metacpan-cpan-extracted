@@ -1,0 +1,81 @@
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Acme::Include::Data - how to include data files with a CPAN module
+
+=head1 SYNOPSIS
+
+This is a demonstration module which exists for the purpose of
+examining its source code rather than for use.
+
+=head1 VERSION
+
+This documents Acme::Include::Data version 0.05
+corresponding to git commit L<888db01e4ebcd8509cf550a8be559e728425126b|https://github.com/benkasminbullock/Acme-Include-Data/commit/888db01e4ebcd8509cf550a8be559e728425126b> released on Thu Feb 2 09:04:20 2017 +0900.
+
+=head1 DESCRIPTION
+
+This is a demonstration module which demonstrates how to include a
+data file with a Perl module and how to read it in at run time.
+
+If you are a CPAN author or use the CPAN-style tools to distribute
+your data, you may have wondered how to include data with your Perl
+distribution.
+
+Any file under lib in the distribution is bundled into the
+distribution by F<Makefile.PL>. So if your distribution is called
+F<Acme::Include::Data>, then a file called
+F<lib/Acme/Include/this-is-a-data-file.txt> is automatically included
+into the distribution.
+
+To read the data file in, simply use __FILE__: 
+
+    my $data = __FILE__;
+    
+    # Make whatever substitutions are necessary:
+    
+    $data =~ s/Data\.pm$/this-is-a-data-file.txt/;
+    
+    # Read the data in:
+    
+    open my $in, "<", $data or die $!;
+    my $text = '';
+    while (<$in>) {
+        $text .= $_;
+    }
+    
+
+(This example is included as L<F<read-data.pl>|https://api.metacpan.org/source/BKB/Acme-Include-Data-0.05/examples/read-data.pl> in the distribution.)
+
+
+=head1 FUNCTIONS
+
+=head2 yes_it_works
+
+This is a function for testing the module.
+
+=head1 SEE ALSO
+
+Please see L<this blog
+post|http://www.lemoda.net/perl/data-in-distro/> for more explanation.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2014-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

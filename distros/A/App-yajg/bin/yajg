@@ -1,0 +1,139 @@
+#!/usr/bin/env perl
+
+use 5.014000;
+use strict;
+use warnings;
+no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+use utf8;
+
+use App::yajg;
+use App::yajg::Hooks;
+use Getopt::Long qw(:config no_ignore_case bundling no_auto_abbrev);
+use Pod::Find qw(pod_where);
+use Pod::Usage qw(pod2usage);
+
+sub usage ($) {
+    my ($exitval) = @_;
+    pod2usage(
+        -exitval  => $exitval,
+        -verbose  => 99,
+        -sections => [qw(SYNOPSIS)],
+        -output   => $exitval ? \*STDERR : \*STDOUT,
+        -input    => pod_where({ -inc => 1 }, 'App::yajg'),
+    );
+}
+
+sub version () {
+    say "$0 version $App::yajg::VERSION";
+    exit 0;
+}
+
+my @options = qw(
+  boolean|b:s
+  color|c!
+  filename!
+  help|h!
+  exec|e:s@
+  escapes|E!
+  ignore-case|i!
+  invert-match|v!
+  key-pattern|p:s
+  max-depth|d:i
+  minimal|m!
+  output|o:s
+  quiet|q!
+  select|s:s
+  select-tiny|S:s
+  sort-keys!
+  substring|z!
+  url-parse|u!
+  value-pattern|P:s
+  version
+);
+
+my $options = {
+    color       => -t STDOUT,
+    'max-depth' => 0,
+    # FIXME pretty this ugly eval
+    output      => eval { require Data::Printer } ? 'ddp' : 'json',
+};
+
+GetOptions($options, @options) or usage(2);
+utf8::decode($_) for grep { not ref and not utf8::is_utf8($_) } values %$options;
+
+my $output = App::yajg::output($options->{'output'});
+my @select_path = App::yajg::parse_select(
+    length($options->{'select-tiny'}) ? $options->{'select-tiny'} : $options->{'select'},
+    {
+        ignore_case => $options->{'ignore-case'},
+    }
+);
+
+my %patterns;
+for (grep { $options->{$_} } qw/key-pattern value-pattern/) {
+    local $SIG{__DIE__} = \&App::yajg::die_without_line;
+    my $pat = $options->{$_};
+    $pat = quotemeta($pat) if $options->{'substring'};
+    $pat = '(?i)' . $pat   if $options->{'ignore-case'};
+    $patterns{$_} = eval {qr/$pat/};
+    die "Bad option $_: $@" if $@;
+}
+
+version  if $options->{'version'};
+usage(0) if $options->{'help'};
+usage(2) if -t STDIN and not @ARGV;
+
+$options->{'max-depth'} = 0 if $options->{'max-depth'} < 0;
+
+my @hooks;
+given ($options->{'boolean'}) {
+    push @hooks, \&App::yajg::Hooks::boolean_to_scalar_ref when [qw/ref 1/];
+    push @hooks, \&App::yajg::Hooks::boolean_to_int when        [qw/int 2/];
+    push @hooks, \&App::yajg::Hooks::boolean_to_str when        [qw/str 3/];
+    default {}
+}
+push @hooks, \&App::yajg::Hooks::uri_parse if $options->{'url-parse'};
+push @hooks, map { App::yajg::Hooks::make_code_hook($_) } @{ $options->{'exec'} || [] };
+
+$options->{'filename'} //= 1 if @ARGV > 1;
+$options->{'sort-keys'} //= not $options->{'minimal'};
+$options->{'escapes'}   //= $options->{'minimal'};
+
+my $files = @ARGV || 1;
+my $success = 0;
+
+while (defined(my $data = App::yajg::read_next_json_file)) {
+    my $ref = ref $data;
+    $data = App::yajg::select_by_path($data, @select_path);
+    $data //= $ref eq 'HASH' ? {} : [];
+    if (exists $options->{'select-tiny'}) {
+        my $i = scalar @select_path;
+        $data = (App::yajg::values_ref($data))[0]
+          while App::yajg::values_ref($data) == 1 and $i--;
+    }
+    $data = App::yajg::filter($data,
+        $patterns{'key-pattern'},
+        $patterns{'value-pattern'},
+        $options->{'invert-match'}
+    );
+
+    App::yajg::modify_data($data, \@hooks);
+
+    $files--;
+    $success ||= App::yajg::size($data);
+
+    next if $options->{'quiet'};
+
+    say $ARGV . ':' if $options->{'filename'};
+    $output
+      ->data($data)
+      ->color($options->{'color'})
+      ->max_depth($options->{'max-depth'})
+      ->sort_keys($options->{'sort-keys'})
+      ->escapes($options->{'escapes'})
+      ->minimal($options->{'minimal'})
+      ->print;
+}
+
+exit 2 if $files;
+exit int not $success;

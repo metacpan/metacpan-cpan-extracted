@@ -1,0 +1,31 @@
+---
+abstract: 'App::Unicheck module to check web urls.'
+author:
+  - 'Matthias Krull <<m.krull@uninets.eu>>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Unicheck-Modules-HTTP
+no_index:
+  directory:
+    - t
+provides:
+  App::Unicheck::Modules::HTTP:
+    file: lib/App/Unicheck/Modules/HTTP.pm
+    version: 0.03
+requires:
+  JSON: 0
+  Mojo::UserAgent: 0
+  Moo: 0
+  perl: v5.10.1
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+  repository: https://github.com/uninets/App-Unicheck-Modules-HTTP
+version: 0.03

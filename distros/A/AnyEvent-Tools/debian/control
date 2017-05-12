@@ -1,0 +1,16 @@
+Source: libanyevent-tools-perl
+Section: perl
+Homepage: http://search.cpan.org/~unera/AnyEvent-Tools/
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+VCS-Browser: http://git.uvw.ru/?p=anyevent-tools;a=summary
+Build-Depends: debhelper (>= 7), cdbs
+
+Package: libanyevent-tools-perl
+Depends: ${perl:Depends}, ${misc:Depends}
+Architecture: all
+Description: instrument collection for AnyEvent
+ The package contains a few instruments that can be used with AnyEvent:
+  * mutexes/rw_mutexes - sharing one resource between many processes
+  * foreaches - non-blocking cycles
+  * pools - sharing many resources between many processes
+  * buffers implementation, etc

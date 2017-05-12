@@ -1,0 +1,24 @@
+[% PROCESS header.html title='Module Search for "' _ pod_name _ '"' %]
+[% PROCESS login_form.html %]
+[% PROCESS form.html %]
+
+<h2>Module Search for "[% pod_name | html %]"
+[% IF pods.size > 1 && user.privs >= 10 %]
+<a href="[% root_uri_rel %]/?mode=join_pod;name=[% pod_name | myuri %]">[Join]</a></p>
+[% END %]
+</h2>
+
+<table>
+<tr><th>Author</th><th>Distribution</th><th>POD</th><th>Date</th></tr>
+[% FOR podver = podvers.nsort('mtime').reverse %]
+    <tr class="[% loop.count % 2 ? 'even' : 'odd' %]">
+    <td>[% link_author(podver.distver.pause_id) %]</td>
+    <td>[% link_distver(podver.distver) %]</td>
+    <td>[% link_podver(podver) %]</td>
+    <td>[% YMD.format(podver.mtime) %]</td>
+    </tr>
+[% END %]
+</table>
+
+[% PROCESS footer.html %]
+

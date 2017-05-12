@@ -1,0 +1,286 @@
+{
+   "abstract" : "All about \"Nogizaka46\"",
+   "author" : [
+      "=over 4"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.2",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Nogizaka46",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "DateTime" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Nogizaka46" : {
+         "file" : "lib/Acme/Nogizaka46.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::AkimotoManatsu" : {
+         "file" : "lib/Acme/Nogizaka46/AkimotoManatsu.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::AndoMikumo" : {
+         "file" : "lib/Acme/Nogizaka46/AndoMikumo.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::Base" : {
+         "file" : "lib/Acme/Nogizaka46/Base.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::EtoMisa" : {
+         "file" : "lib/Acme/Nogizaka46/EtoMisa.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::FukagawaMai" : {
+         "file" : "lib/Acme/Nogizaka46/FukagawaMai.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::HashimotoNanami" : {
+         "file" : "lib/Acme/Nogizaka46/HashimotoNanami.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::HatanakaSeira" : {
+         "file" : "lib/Acme/Nogizaka46/HatanakaSeira.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::HiguchiHina" : {
+         "file" : "lib/Acme/Nogizaka46/HiguchiHina.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::HoriMiona" : {
+         "file" : "lib/Acme/Nogizaka46/HoriMiona.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::HoshinoMinami" : {
+         "file" : "lib/Acme/Nogizaka46/HoshinoMinami.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::IchikiRena" : {
+         "file" : "lib/Acme/Nogizaka46/IchikiRena.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::IkomaRina" : {
+         "file" : "lib/Acme/Nogizaka46/IkomaRina.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::IkutaErika" : {
+         "file" : "lib/Acme/Nogizaka46/IkutaErika.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::InoueSayuri" : {
+         "file" : "lib/Acme/Nogizaka46/InoueSayuri.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::ItoJunna" : {
+         "file" : "lib/Acme/Nogizaka46/ItoJunna.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::ItoKarin" : {
+         "file" : "lib/Acme/Nogizaka46/ItoKarin.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::ItoMarika" : {
+         "file" : "lib/Acme/Nogizaka46/ItoMarika.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::ItoNene" : {
+         "file" : "lib/Acme/Nogizaka46/ItoNene.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::IwaseYumiko" : {
+         "file" : "lib/Acme/Nogizaka46/IwaseYumiko.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::KashiwaYukina" : {
+         "file" : "lib/Acme/Nogizaka46/KashiwaYukina.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::KawagoHina" : {
+         "file" : "lib/Acme/Nogizaka46/KawagoHina.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::KawamuraMahiro" : {
+         "file" : "lib/Acme/Nogizaka46/KawamuraMahiro.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::KitanoHinako" : {
+         "file" : "lib/Acme/Nogizaka46/KitanoHinako.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::MatsuiRena" : {
+         "file" : "lib/Acme/Nogizaka46/MatsuiRena.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::MatsumuraSayuri" : {
+         "file" : "lib/Acme/Nogizaka46/MatsumuraSayuri.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::MiyazawaSeira" : {
+         "file" : "lib/Acme/Nogizaka46/MiyazawaSeira.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::NagashimaSeira" : {
+         "file" : "lib/Acme/Nogizaka46/NagashimaSeira.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::NakadaKana" : {
+         "file" : "lib/Acme/Nogizaka46/NakadaKana.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::NakamotoHimeka" : {
+         "file" : "lib/Acme/Nogizaka46/NakamotoHimeka.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::NishikawaNanami" : {
+         "file" : "lib/Acme/Nogizaka46/NishikawaNanami.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::NishinoNanase" : {
+         "file" : "lib/Acme/Nogizaka46/NishinoNanase.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::NojoAmi" : {
+         "file" : "lib/Acme/Nogizaka46/NojoAmi.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::SagaraIori" : {
+         "file" : "lib/Acme/Nogizaka46/SagaraIori.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::SaitoAsuka" : {
+         "file" : "lib/Acme/Nogizaka46/SaitoAsuka.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::SaitoChiharu" : {
+         "file" : "lib/Acme/Nogizaka46/SaitoChiharu.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::SaitoYuri" : {
+         "file" : "lib/Acme/Nogizaka46/SaitoYuri.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::SakuraiReika" : {
+         "file" : "lib/Acme/Nogizaka46/SakuraiReika.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::SasakiKotoko" : {
+         "file" : "lib/Acme/Nogizaka46/SasakiKotoko.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::ShinuchiMai" : {
+         "file" : "lib/Acme/Nogizaka46/ShinuchiMai.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::ShiraishiMai" : {
+         "file" : "lib/Acme/Nogizaka46/ShiraishiMai.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::SuzukiAyane" : {
+         "file" : "lib/Acme/Nogizaka46/SuzukiAyane.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::TakayamaKazumi" : {
+         "file" : "lib/Acme/Nogizaka46/TakayamaKazumi.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::TeradaRanze" : {
+         "file" : "lib/Acme/Nogizaka46/TeradaRanze.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::WadaMaaya" : {
+         "file" : "lib/Acme/Nogizaka46/WadaMaaya.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::WakatsukiYumi" : {
+         "file" : "lib/Acme/Nogizaka46/WakatsukiYumi.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::WatanabeMiria" : {
+         "file" : "lib/Acme/Nogizaka46/WatanabeMiria.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::YadaRisako" : {
+         "file" : "lib/Acme/Nogizaka46/YadaRisako.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::YamamotoHonoka" : {
+         "file" : "lib/Acme/Nogizaka46/YamamotoHonoka.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::YamatoRina" : {
+         "file" : "lib/Acme/Nogizaka46/YamatoRina.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::YamazakiRena" : {
+         "file" : "lib/Acme/Nogizaka46/YamazakiRena.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::YonetokuKyoka" : {
+         "file" : "lib/Acme/Nogizaka46/YonetokuKyoka.pm",
+         "version" : "0.3"
+      },
+      "Acme::Nogizaka46::YoshimotoAyaka" : {
+         "file" : "lib/Acme/Nogizaka46/YoshimotoAyaka.pm",
+         "version" : "0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/2GMon/perl-acme-nogizaka46/issues"
+      },
+      "homepage" : "https://github.com/2GMon/perl-acme-nogizaka46",
+      "repository" : {
+         "url" : "git://github.com/2GMon/perl-acme-nogizaka46.git",
+         "web" : "https://github.com/2GMon/perl-acme-nogizaka46"
+      }
+   },
+   "version" : "0.3",
+   "x_contributors" : [
+      "2GMon <2gmon.t@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

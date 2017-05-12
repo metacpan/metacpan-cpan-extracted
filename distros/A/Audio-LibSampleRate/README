@@ -1,0 +1,45 @@
+Audio-LibSampleRate version 0.002
+=================================
+
+Secret Rabbit Code (aka libsamplerate) is a Sample Rate Converter for
+audio. One example of where such a thing would be useful is converting
+audio from the CD sample rate of 44.1kHz to the 48kHz sample rate used
+by DAT players.
+
+SRC is capable of arbitrary and time varying conversions ; from
+downsampling by a factor of 256 to upsampling by the same factor.
+Arbitrary in this case means that the ratio of input and output sample
+rates can be an irrational number. The conversion ratio can also vary
+with time for speeding up and slowing down effects.
+
+SRC provides a small set of converters to allow quality to be traded
+off against computation cost. The current best converter provides a
+signal-to-noise ratio of 145dB with -3dB passband extending from DC to
+96% of the theoretical best bandwidth for a given pair of input and
+output sample rates.
+
+This distribution is a Perl interface to libsamplerate.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries, as libsamplerate
+is bundled with this module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015-2016 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

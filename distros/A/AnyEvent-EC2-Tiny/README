@@ -1,0 +1,125 @@
+NAME
+    AnyEvent::EC2::Tiny - Tiny asynchronous (non-blocking) interface to EC2
+    using AnyEvent
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+        use v5.14;
+        use AnyEvent::EC2::Tiny;
+
+        my $ec2 = AnyEvent::EC2::Tiny->new(
+            AWSAccessKey => $ENV{'AWS_ACCESS_KEY'},
+            AWSSecretKey => $ENV{'AWS_SECRET_KEY'},
+            region       => $ENV{'AWS_REGION'},
+            debug        => 1,
+        );
+
+        # We are essentially encoding 'raw' EC2 API calls with a v2
+        # signature and turning XML responses into Perl data structures
+        my $xml = $ec2->send(
+            'RegionName.1' => 'us-east-1',
+            Action         => 'DescribeRegions',
+
+            success_cb => sub {
+                my $xml = shift;
+
+                # prints ec2.us-east-1.amazonaws.com
+                say $xml->{'regionInfo'}{'item'}[0]{'regionEndpoint'};
+            },
+
+            fail_cb => sub {
+                my $error = shift;
+                $error->{'type'} # HTTP or XML
+                $error->{'data'} # hashref to body, errors, xml, headers, etc.
+                $error->{'text'} # text of the error
+            },
+        );
+
+DESCRIPTION
+    This is a basic asynchronous, non-blocking, interface to EC2 based on
+    Net::EC2::Tiny. It's relatively compatible while the only difference is
+    with regards to the callbacks and returned information.
+
+METHODS
+  send
+    "send()" expects the same arguments as "send()" in Net::EC2::Tiny,
+    except you should also provide two additional arguments.
+
+   success_cb
+        $ec2->send(
+            ...
+            success_cb => sub {
+                my $xml = shift;
+                # do whatever you want with it
+            },
+        );
+
+    Receives the resulting XML you would normally receive. Then you do
+    whatever you want with it, such as fetching the information or using it
+    to create another request.
+
+   fail_cb
+        $ec2->send(
+            ...
+            fail_cb => sub {
+                my $error = shift;
+
+                if ( $error->{'type'} eq 'HTTP' ) {
+                    # this was an HTTP error
+                    my $http_headers = $error->{'data'}{'headers'};
+                    my $http_body    = $error->{'data'}{'body'};
+
+                    warn 'HTTP error received: ', $error->{'text'};
+                } else {
+                    # $error->{'type'} eq 'XML'
+                    # this was an XML error
+                    my $http_headers = $error->{'data'}{'headers'};
+                    my $http_body    = $error->{'data'}{'body'};
+                    my $xml          = $error->{'data'}{'xml'};
+                    my $xml_errors   = $error->{'data'}{'errors'};
+
+                    warn "XML error received: ', $error->{'text'};
+                }
+            },
+        );
+
+    Since we can't simply "die" or "croak" in event-based code (the event
+    loop would catch it and you won't be able to do much about it), we
+    instead provide a failure callback. The failure callback receives a hash
+    reference including all information relevant to the request.
+
+    These are the available keys in the returned hash reference:
+
+    "type"
+        Either HTTP or XML.
+
+        Since there are two possible failures (one being the HTTP request,
+        and the other being any problems expressed in the XML returned) you
+        can use the "type" key to know which type of error you received.
+
+    "data"
+        Additional information for the error.
+
+        HTTP error receives the HTTP body ("body") and headers ("headers").
+
+        XML error receives the HTTP body ("body"), headers ("headers"), XML
+        data ("xml") and XML errors ("errors").
+
+    "text"
+        A string containing the error that occured. This matches the errors
+        returned by Net::EC2::Tiny.
+
+CREDITS
+    Credit goes to Mark Allen for Net::EC2::Tiny.
+
+AUTHOR
+    Sawyer X <xsawyerx@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Sawyer X.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

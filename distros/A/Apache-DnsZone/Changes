@@ -1,0 +1,6 @@
+Revision history for Perl extension DnsZone.
+
+0.01  Wed Jan 10 21:22:20 2001
+	- original version; created by h2xs 1.20 with options
+		-A -X -c -n DnsZone
+

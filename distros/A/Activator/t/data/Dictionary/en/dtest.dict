@@ -1,0 +1,7 @@
+fkey1 fvalue1
+# fkey2      fvalue2
+           # fkey3      fvalue3
+fkey4           fvalue4 has many words
+  fkey5 fvalue5 has trailing whitespace   
+fkey6           "  fvalue6 is quoted  "
+fkey7 "fvalue 7 has nested "quotes""

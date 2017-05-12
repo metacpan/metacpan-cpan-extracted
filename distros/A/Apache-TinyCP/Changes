@@ -1,0 +1,26 @@
+version: 1.01
+date:    Sun Dec  4 20:22:20 EST 2005
+changes:
+  - updating Kwalitee
+----
+version: 1.00
+date:    Tue Aug 17 21:01:02 EDT 2004
+changes:
+  - documentation tweaks
+  - called it 1.0
+---
+version: 0.03
+date:    Sun Jun 27 16:42:20 EDT 2004
+changes:
+  - made it actually subclassable
+---
+version: 0.02
+date:    Wed Jun  2 00:51:14 EDT 2004
+changes:
+  - fixed title and documentation
+  - added examples
+---
+version: 0.01
+date:    Tue Jun  1 19:48:46 EDT 2004
+changes:
+  - initial public release

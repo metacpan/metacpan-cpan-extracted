@@ -1,0 +1,17 @@
+Revision history for AlignDB-IntSpanXS.
+
+1.0.3  Sat Apr  9 23:11:54 CST 2016
+    - Use kroundup32() from kseq.h
+    - Fix intspan_as_string()
+    - Rewrite test_ai.pl
+
+1.0.2  Fri Apr  8 07:31:41 2016
+    - Remove dependance on AlignDB::IntSpan
+    - Add travis-ci
+
+1.0.0  2016-04-1 15:12:02 CST
+    - Make this official.
+
+0.01  Sun Jan 26 00:41:06 2014
+	- original version; created by h2xs 1.23 with options
+		-O -n IntspanXS ./IntspanXS/intspan/intspan.h -b 5.16.0

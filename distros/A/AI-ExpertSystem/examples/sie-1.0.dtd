@@ -1,0 +1,19 @@
+<!ELEMENT knowledgebase (goal, rules, questions)>
+
+<!ELEMENT goal (attribute, text)>
+
+<!ELEMENT rules (rule*)>
+<!ELEMENT rule (name, conditions, actions)>
+<!ELEMENT conditions (condition*)>
+<!ELEMENT condition (attribute, value)>
+<!ELEMENT actions (action*)>
+<!ELEMENT action (attribute, value)>
+
+<!ELEMENT questions (question*)>
+<!ELEMENT question (attribute, text, response*)>
+
+<!ELEMENT attribute (#PCDATA)>
+<!ELEMENT text (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT value (#PCDATA)>
+<!ELEMENT response (#PCDATA)>

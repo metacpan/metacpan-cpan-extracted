@@ -1,0 +1,30 @@
+Revision history for Perl extension Acme-MilkyHolmes
+
+0.07 2016-02-03T13:13:51Z
+
+    - add Alice's birthday!
+
+0.06 2015-11-19T15:00:18Z
+    - Happy Birthday Kazumi!!(add Kazumi's birthday)
+
+
+0.05 2014-10-21T13:04:48Z
+
+    - POD fix(htk291)
+
+0.04 2014-10-05T14:53:43Z
+
+    - new feature: nickname_voiced_by() (htk291)
+
+0.03 2014-06-25T14:18:04Z
+
+    - add missing dependency(Test::MockTime)
+
+0.02 2014-06-25T14:06:12Z
+
+    - return sufficient Kazumi's voiced_by (issue #2)
+
+0.01 2014-06-07T05:07:55Z
+
+    - original version
+

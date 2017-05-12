@@ -1,0 +1,21 @@
+Revision history for Alien-ProtoBuf
+
+0.05      2016-03-10 21:27:41 CET
+
+    - Fix configure_requires
+
+0.04      2016-01-04 11:11:37 CET
+
+    - Fix missing configure-time requirement
+
+0.03      2016-01-03 20:47:37 CET
+
+    - Try to get an "NA" if the protobuf library is not installed
+
+0.02      2016-01-02 22:21:46 CET
+
+    - Abort at Build.PL time if the protobuf library is not installed
+
+0.01      2015-12-31 22:09:31 CET
+
+    - First public release

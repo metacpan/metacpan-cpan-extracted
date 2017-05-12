@@ -1,0 +1,60 @@
+{
+   "abstract" : "Flexible non-blocking STOMP client",
+   "author" : [
+      "Eugene Ponizovsky <ponizovsky@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-Stomper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Fatal" : "0.013",
+            "Test::MockObject" : "1.20150527",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "6.01",
+            "Carp" : "0",
+            "List::MoreUtils" : "0.410",
+            "Scalar::Util" : "0",
+            "perl" : "5.008000",
+            "version" : "0.77"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/iph0/AnyEvent-Stomper/issues"
+      },
+      "homepage" : "https://github.com/iph0/AnyEvent-Stomper",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/iph0/AnyEvent-Stomper"
+      }
+   },
+   "version" : "0.34"
+}

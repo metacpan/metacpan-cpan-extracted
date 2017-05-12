@@ -1,0 +1,86 @@
+       AxKit::XSP::Param - A namespace wrapper for accessing HTTP
+       request paramaters by name, as XML elements.
+
+       Add the param: namespace to your XSP <xsp:page> tag:
+
+           <?xml-stylesheet href="." type="application/x-xsp"?>>
+           <xsp:page
+                language="Perl"
+                xmlns:xsp="http://www.apache.org/1999/XSP/Core"
+                xmlns:sendmail="http://axkit.org/XSP/param"
+           >
+
+       And add the taglib to AxKit (via httpd.conf or .htaccess):
+
+           AxAddXSPTaglib AxKit::XSP::Param
+
+
+       The XSP param: tag library implements a simple way to
+       access HTTP request parameters (query string and posted
+       form data) by field name.
+
+       Thus, the value submitted from this text box
+
+           <input type="text" name="username"/>
+
+       is available after POSTing as
+
+           <param:username/>
+
+       The same is true for information passed through the query
+       string.
+
+       The best way to describe this taglib's use is with a few
+       examples:
+
+           <p>
+             Greetings, <param:username />, welcome to our site!
+           </p>
+
+           <custom-element><param:param_name /></custom-element>
+
+           <input type="hidden" name="foo">
+             <xsp:attribute name="value"><param:foo/></xsp:attribute>
+           </input>
+
+       Note that if the specified parameter field does not exist
+       no error is thrown. So, this:
+
+           <input type="hidden" name="secret_data">
+             <xsp:attribute name="value"><param:bogus_name/></xsp:attribute>
+           </input>
+
+       Will result in following after proccessing:
+
+           <input type="hidden" name="secret_data" value="">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+14/Feb/2001            perl 5.005, patch 03                     2
+
+

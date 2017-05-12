@@ -1,0 +1,17 @@
+Changes
+lib/App/Module/Setup.pm
+lib/App/Module/Setup/Templates.pm
+lib/App/Module/Setup/Templates/Default.pm
+Makefile.PL
+MANIFEST
+README
+scripts/module-setup
+t/00-load.t
+t/ref/default/Changes
+t/ref/default/lib/App/Module/Setup.pm
+t/ref/default/Makefile.PL
+t/ref/default/MANIFEST
+t/ref/default/README
+t/ref/default/t/00-load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

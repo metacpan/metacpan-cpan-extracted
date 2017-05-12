@@ -1,0 +1,17 @@
+# Comment lines must begin with #
+
+cluster
+
+0 0
+
+15 0
+0 15
+
+cluster
+
+10 10
+
+15 0
+0 15
+
+

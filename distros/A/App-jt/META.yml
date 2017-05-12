@@ -1,0 +1,29 @@
+---
+abstract: 'JSON transformer'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
+build_requires:
+  IO::String: 0
+  Test::More: 0
+  strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300031, CPAN::Meta::Converter version 2.120921'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-jt
+requires:
+  Hash::Flatten: 0
+  IO::Handle: 0
+  JSON::PP: 0
+  JSON::Path: 0
+  List::MoreUtils: 0
+  Moo: 0
+  MooX::Options: 0
+  Pod::Usage: 0
+  Text::CSV: 0
+  perl: 5.010
+version: 0.43

@@ -1,0 +1,113 @@
+#!/usr/bin/env perl 
+use strict;
+use warnings;
+use File::Spec::Functions qw/catdir catfile rel2abs splitpath/;
+use File::Path 'mkpath';
+use File::Copy qw/copy/;
+
+use Getopt::Long;
+my %args;
+GetOptions( \%args, 'help|h', 'location|l=s', 'recursive|r', 'dry-run' )
+  or exit;
+
+@ARGV = grep { defined } @ARGV;
+
+if ( $args{help} || !@ARGV ) {
+    print <<'EOF';
+USAGE: mhere Module [ ... ]
+EXAMPLES:
+    mhere Carp                                    # copy Carp.pm in @INC to cwd
+    mhere -r Carp                                 # copy Carp and all under it.
+    mhere Carp CGI                                # copy both Carp.pm and CGI.pm
+    APP_MODULES_HERE=outlib mhere Carp            # copy to outlib dir in cwd
+    mhere -l outlib Carp                          # ditto
+    APP_MODULES_HERE=/tmp/ mhere Carp             # copy to /tmp/
+    mhere -l /tmp/ Carp                           # ditto
+    mhere Carp --dry-run                          # don't actually copy
+EOF
+    exit;
+}
+
+if (@ARGV) {
+    my $to = $args{location} || $ENV{APP_MODULES_HERE} || '.';
+    my @success;
+    if ( -e $to && !-d $to ) {
+        warn "failed to make path '$to': it exists but not a directory\n";
+    }
+    else {
+        if ( $args{recursive} ) {
+            eval { require File::Copy::Recursive };
+            if ($@) {
+                print
+"you need to install File::Copy::Recursive to use the -r flag\n";
+                exit;
+            }
+            no warnings 'once';
+            $File::Copy::Recursive::KeepMode = 0;
+        }
+
+        for my $mod (@ARGV) {
+            eval "require $mod" or warn "failed to require '$mod'\n" and next;
+
+            my @parts = split /::/, $mod;
+            my $inc = join( '/', @parts ) . '.pm';
+            my $source = $INC{$inc};
+            warn "failed to find source of '$mod'\n" and next unless $source;
+
+            my $dest = catfile( $to, @parts ) . '.pm';
+            warn "failed to copy '$source' to '$dest': they are the same path\n"
+              and next
+              if rel2abs($source) eq rel2abs($dest);
+
+            my $here = catdir( $to, @parts[ 0 .. $#parts - 1 ] );
+            if ( -e $here && !-d $here ) {
+                warn
+"failed to make path '$here': it exists but not a directory\n";
+                next;
+            }
+
+            if ( $args{'dry-run'} ) {
+                print "going to copy '$source' to '$dest'\n";
+            }
+            else {
+
+                mkpath($here)
+                  or warn "failed to make path '$here': $!\n" and next
+                  unless -e $here;
+
+                copy( $source, $dest )
+                  or warn "failed to copy '$source' to '$dest': $!\n" and next;
+            }
+
+            if ( $args{recursive} ) {
+                my $dir = $source;
+                $dir =~ s/\.pm$//;
+                my $last_name = ( splitpath $dir)[-1];
+                if ( -e $dir ) {
+                    if ( $args{'dry-run'} ) {
+                        print "going to copy '$dir' to '"
+                          . catdir( $here, $last_name ) . "'\n";
+                    }
+                    else {
+                        File::Copy::Recursive::dircopy( $dir,
+                            catdir( $here, $last_name ) )
+                          or warn "failed to copy '$dir' to '$here': $!\n"
+                          and next;
+                    }
+                }
+            }
+
+            push @success, $mod unless $args{'dry-run'};
+        }
+    }
+
+    exit if $args{'dry-run'};
+
+    if (@success) {
+        print 'copied module(s): ', join ', ', @success;
+        print "\n";
+    }
+    else {
+        print "0 modules are copied\n";
+    }
+}

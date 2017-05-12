@@ -1,0 +1,14 @@
+#
+#     To find out the type of Perl you are using
+#
+use warnings;
+use strict;
+
+use Config;
+
+if ($Config{usethreads}) {
+    print "Your Perl is \'Threaded Perl\'\n";
+}
+else {
+    print "Your Perl is \'Non-Threaded Perl\'\n";
+}

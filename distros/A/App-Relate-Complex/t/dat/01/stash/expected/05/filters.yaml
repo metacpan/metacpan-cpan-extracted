@@ -1,0 +1,20 @@
+---
+:skipdull:
+  description: Screen out some uninteresting files.
+  method: skip_any
+  modifiers: x
+  terms:
+    - '~$'
+    - /\#
+    - /\.\#
+    - ',v$'
+    - /CVS$
+    - /CVS/
+    - /RCS$
+    - \.elc$
+bleach:
+  description: gets rid of unsightly blemishes
+  method: skip_any
+  modifiers: x
+  terms:
+    - '^.*$'

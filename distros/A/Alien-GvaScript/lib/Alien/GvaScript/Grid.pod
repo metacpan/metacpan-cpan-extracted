@@ -1,0 +1,529 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+Alien::GvaScript::Grid - ChoiceList based Grid with Pagination
+
+=head1 SYNOPSIS
+
+  var my_url  = "/app/path/to/data/list";
+  var grid_id = "my_unique_grid_id";
+  
+  var my_grid = new GvaScript.Grid(grid_id, my_url, {
+        css: 'grid-class-name',
+        grid_container: 'grid_will_display_here',
+        toolbar_container: 'grid_toolbar_will_display_here',
+        dto: {VUE: 'JSON'},
+        columns: [
+            {label: 'Full Name', value: function(e) { 
+                return e.lname.toUpperCase() + ' ' + e.name;
+            }},
+            {label: 'Gender', value: 'gender', css: 'tcenter', default_value: 'unknown'}
+        ],
+        actions: [
+            {
+                label: 'Add', 
+                condition: function() {return this.rights.can_create},
+                callback: function()  {alert('Add action has been called')}
+            }
+        ],
+        grabfocus: true,
+        onShow: function() {
+        
+        },
+        onEmpty: function() {
+            $('grid_will_display_here').update('empty list was retrieved');
+        },        
+        onPing: function(target) {
+            alert('record:\n'+$H(target).inspect() + '\nin grid has been pinged!')}
+        }, 
+        onCancel: function() {alert('ESC pressed')}
+    });
+
+
+=head1 DESCRIPTION
+
+Displays a dataset in a grid format.  
+Dataset is bound to a JSON datasource retrieved via an AJAX request.  
+
+JSON object has a predefined format that the Grid class understands and renders.
+
+A Grid is made up of two components:
+
+=over
+
+=item Grid Result
+
+The grid (table) that would be the container to display the result dataset.
+Result is displayed with the help of C<GvaScript.ChoiceList>.
+
+=item Grid Toolbar
+
+The grid's toolbar that would be the container to display grid's actions and pagination links.
+Toolbar is displayed with the help of C<GvaScript.CustomButtons> and C<GvaScript.Paginator>
+
+=back
+
+=head2 GvaScript.Grids 
+
+interface that provides one useful method:
+
+=head3 GvaScript.Grids.get(id)
+
+finds and returns the Grid instance where id is the unique id of the grid. 
+
+=head1 BEHAVIOUR
+
+Grid's display is based on a C<GvaScript.ChoiceList> object and thus has the behaviour of that of a choice list.
+
+=head2 Grid Navigation Behaviour
+
+=over 
+
+=item C<DOWN> / C<UP> 
+
+navigate by recordCustomButtons
+
+=item C<HOME> / C<END> 
+
+start/end of current page
+CustomButtons
+
+=item C<RETURN> 
+
+fires C<onPing> event handler
+
+=item C<ESC> 
+
+fires C<onCancel> event handler
+
+=item C<PAGEUP / LEFT> and C<PAGEDOWN / RIGHT> 
+
+navigate by page
+
+=item C<[Ctrl-HOME]> and C<[Ctrl-END]> 
+
+navigate to first and last page correspondingly.
+
+=back
+
+=head1 JSON Datasource
+
+As mentioned before, the Grid expects the JSON datasource object to be of a predefined format.
+
+  json = {
+    'liste'  : [
+        {'fname': 'John',    'lname': 'Stiles', 'gender': 'm'},
+        {'fname': 'Mary',    'lname': 'Major',  'gender': 'f'},
+        {'fname': 'Richard', 'lname': 'Miles',  'gender': 'm'}
+    ], 
+    'total'  : 15,
+    'rights' : {
+        can_create : 0,
+        can_update : 1,
+        can_delete : 0
+    }
+  };
+
+=over
+
+=item liste I<(Array)>
+
+array of records.
+
+mandatory.
+
+=item total I<(numeric)>
+
+total number of records that are being paginated.
+
+mandatory.
+
+=item rights I<(JSON Object)>
+
+object containing the access rights to the records in the list. Rights values should be boolean expressions.
+this object will be stored and referenced later via C<grid.rights> for grid actions conditions.
+
+=back
+
+=head1 CONSTRUCTOR
+
+  var grid = new GvaScript.Grid(id, url, options);
+
+=head2 id
+
+A unique id to identify a Grid.  Might be later used in C<GvaScript.Grids.get(id)> to retrieve the grid instance.
+
+=head2 url
+
+Url for AJAX request to retrieve current page dataset.
+
+=head2 options
+
+=over
+
+=item css I<(String)>
+
+A string value of space seperated list of class names to be applied to the table element.
+
+optional - defaulted to ''
+
+=item dto I<(JSON Object)>
+
+Data transfer Object to the AJAX request. C<Ex: {param1: 'value1', param2: 'value2'}>
+
+optional - defaulted to C<{VUE: 'JSON'}>
+
+=item method I<(String)>
+
+HTTP method to open in the AJAX request.
+
+optional - defaulted to C<'post'>
+
+=item columns I<(Array)>
+
+Array of objects that defines the grid columns. 
+
+Ex column object: 
+
+    {
+        label: 'Gender',  
+        value: 'gender', 
+        css: 'tcenter', 
+        default_value: 'unknown'
+    }
+
+
+=over 
+
+=item label I<(string)>
+
+column label. can be an empty string
+
+mandatory.
+
+=item value I<(string|Function)>
+
+string representing the key of the json element that the column is bound to.
+
+Function that takes the records as an argument and returns string value of the column.
+Ex: C<value: function(e) {return e.fname + ' ' + e.lname}>
+
+mandatory.
+
+=item default_value I<(string)>
+
+string value representing the column's default value if no value was found in the JSON datasource.
+
+optional.
+
+=item css I<(string|Array)>
+
+a single css class or and array of css classes to be given to the column header/cells.
+
+optional.
+
+=back 
+
+=item actions I<(Array)>
+
+Array that defines the grids list of actions (to be rendered in the grid's tool bar).
+
+Action object here is identical to GvaScript.CustomButtons.Button.options
+
+=item grabfocus I<(boolean)>
+
+boolean indicating whether the grid container is to grab focus right after the grid has been initialized.
+
+optional - defaulted to C<true>
+
+=item pagesize I<(numeric|'auto')>
+
+a numeric specifying number of records to show on a page. To keep this number variable and dependant on grid's container available space, set it to 'auto'.
+
+optional - defaulted to C<'auto'>
+
+=item gridheight I<(numeric|'auto')>
+
+height to set to the grid. To keep this number variable and dependant on the grid's container available space, set it to 'auto'.
+
+optional - defaulted to C<'auto'>
+
+=item recordheight I<(numeric)>
+
+height to set to the grid record.
+
+optional - defaulted to C<21>
+
+=item requestTimeout I<(numeric)>
+
+time in seconds to wait before aborting the AJAX request.
+
+optional - defaulted to 15
+
+=item errorMsg I<(string)>
+
+message to display in the grid container area when the request times out.
+
+optional - defaulted to "Problème de connexion. Réessayer et si le problème persiste, contacter un administrateur.".
+
+=back
+
+=head1 PROPERTIES
+
+Here's a list of useful properties of the Grid Object.
+
+=head2 grid_container
+
+  grid.grid_container
+
+C<HTMLElement> container of the grid list 
+
+=head2 toolbar_container
+
+  grid.toolbar_container
+
+C<HTMLElement> container of the toolbar (pagination links + action buttons)
+
+=head2 paginatorbar_container
+
+  grid.paginatorbar_container 
+
+C<HTMLElement> container of the pagination links
+
+=head2 actionsbar_container
+
+ grid.actionsbar_container 
+
+C<HTMLElement> container of the action buttons
+
+=head1 METHODS
+
+=head2 clearResult
+
+  grid.clearResult(msg)
+
+This method clears the grid result container and displays C<msg> instead.
+
+=head2 clearToolbar
+
+  grid.clearToolbar()
+
+This methods clears the grid toolbar container.
+
+=head2 clearActionButtons
+
+  grid.clearActionButtons()
+
+This method clears the action buttons container and thus removes the buttons
+
+=head2 clear
+
+  grid.clear(msg)
+
+This method is equivalent to C<grid.clearResult(msg)> and C<grid.clearToolbar()>
+
+=head2 addActionButtons
+
+  grid.addActionButtons()
+
+This method renders the action buttons based on the grids actions. 
+NOTE that the actions conditions will be re-evaluated.
+
+
+=head2 destroy
+
+  my_grid.destroy();
+
+This method will unregister the Grid in the GvaScript.Grids namespace and 
+will iteratively call the destructor on all the grid's depedencies
+this removing all handlers attached.
+Call this method when the grid is removed
+from the DOM.
+
+
+=head1 EVENTS
+
+=head2 onShow
+
+This event is triggered of the table is rendered and displayed.
+Useful for attaching custom events on table records/cells.
+
+=head2 onHighlight
+
+This event is triggered when a choice in the list is highlighted.
+The event handler may use C<event.index> to know the index of the
+highlighted choice.
+
+=head2 onPing
+
+This event is triggered when a choice in the list is "ping-ed", i.e.
+either by dblclicking, clicking on selected row or by pressing the C<RETURN> key.
+The event handler will recieve 1 arguement C<target> which is the record object that has been "Pinged".
+
+Ex: C<{'fname': 'Mary', 'lname': 'Major', 'gender': 'f'}>
+
+=head2 onCancel
+
+This event is triggered when the user presses the C<ESCAPE> key.
+
+=head2 onEmpty 
+
+This event is triggered when the list is empty.
+
+=head1 EXAMPLE
+
+=head2 JAVASCRIPT
+
+  var my_url  = "/app/path/to/data/list";
+  var my_grid = new GvaScript.Grid("ex_grid", my_url, {
+    grid_container: 'ex_grid_list',
+    toolbar_container: 'ex_grid_toolbar',
+    dto: {VUE: 'JSON'},
+    pagesize: 3,
+    columns: [
+        {label: 'Full Name', value: function(e) { 
+            return e.fname + ' ' + e.lname;
+        }},
+        {label: 'Gender', value: 'gender', css: 'tcenter', default_value: 'unknown'}
+    ],
+    actions: [
+        {
+            label: 'Add', 
+            condition: function() {return this.rights.can_create},
+            callback: function()  {alert('Add action has been called')}
+        }
+    ]
+  });
+
+  // my_url response : Content-type "application/json"
+  {
+    'liste'  : [
+        {'fname': 'John',    'lname': 'Stiles', 'gender': 'm'},
+        {'fname': 'Mary',    'lname': 'Major',  'gender': 'f'},
+        {'fname': 'Richard', 'lname': 'Miles',  'gender': 'm'}
+    ], 
+    'total'  : 15,
+    'rights' : {
+        can_create : 0,
+        can_update : 1,
+        can_delete : 0
+    }
+  }
+
+=head2 HTML
+
+  <div id="ex_container">
+     
+   <div tabindex="0" id="ex_grid_list">
+     <table class="dmweb-grid">
+       <thead>
+         <tr>
+           <th class="grid-marker"> </th>
+           <th class="grid-header">Full Name</th>
+           <th class="grid-header">Gender</th>
+        </tr>
+       </thead>
+       <tbody>
+        <tr id="ex_grid_list.CL_choice.0" class="CL_choiceItem liste_highlight">
+           <td class="grid-marker"> </td>
+           <td valign="top" class="grid-cell index_0">John Stiles</td>
+           <td valign="top" class="grid-cell index_0 tcenter">m</td>
+        </tr>
+        <tr id="ex_grid_list.CL_choice.1" class="CL_choiceItem">
+           <td class="grid-marker"> </td>
+           <td valign="top" class="grid-cell index_1">Mary Major</td>
+           <td valign="top" class="grid-cell index_1 tcenter">f</td>
+        </tr>
+         <tr id="ex_grid_list.CL_choice.3" class="CL_choiceItem">
+           <td class="grid-marker"> </td>
+           <td valign="top" class="grid-cell index_0">Richard Miles</td>
+           <td valign="top" class="grid-cell index_0 tcenter">m</td>
+        </tr>
+      </tbody>
+    </table>
+   </div>
+  
+   <div id="ex_grid_toolbar" class="dmweb-grid-toolbar">
+    <div class="dmweb-paginatorbar">
+      <div title="Dernière page" class="last"></div>
+      <div title="Page suivante" class="forward"></div>
+      <div class="text">1 à 3 de 15</div>
+      <div title="Page précédente" class="back inactive"></div>
+      <div title="Première page" class="first inactive"></div>
+    </div>
+    <div class="dmweb-grid-actionsbar">
+      <span id="grid_id_btn_0" class="dmweb-btn-container">
+        <span class="left"/>
+        <span class="center">
+          <button class="btn" style="width: auto;" type="button">Add</button>
+        </span>
+        <span class="right"/>
+      </span>
+    </div>
+   </div>
+ 
+  </div>
+
+=head2 CSS
+
+  /* class given to grid list container when an AJAX request is being affected */
+  .dmweb-loading {
+    background:url(ajax_loading.gif) no-repeat center center;
+    position:absolute;
+    width:30px;height:30px;
+    top:50%;left:50%;
+  }
+
+  /* grid toolbar */
+  .dmweb-grid-toolbar {
+    background:#C5CCE8 url(glass-bg-n.gif) repeat-x scroll left top;
+    border:1px solid #A3BAD9;
+    height:28px;
+  }
+  .dmweb-grid-actionsbar {float:left;}
+  .dmweb-paginatorbar {float:right;width:250px;}
+  .dmweb-paginatorbar div {width:16px;height:16px;cursor:pointer;float:right;}
+  .dmweb-paginatorbar div.first {background:url(page-first.gif) no-repeat top center;}
+  .dmweb-paginatorbar div.last {background:url(page-last.gif) no-repeat top center;}
+  .dmweb-paginatorbar div.back {background:url(page-prev.gif) no-repeat top center;}
+  .dmweb-paginatorbar div.forward {background:url(page-next.gif) no-repeat top center;}
+  .dmweb-paginatorbar div.inactive {cursor:default;opacity:0.25;filter:alpha(opacity=25);}
+  .dmweb-paginatorbar div.text {text-align:center;width:140px;color:#4b34c5;font-size:10pt;}
+  .dmweb-paginatorbar span.dmweb-btn-container {display:block;margin-right:4px;}
+  
+  /* grid table */
+  .dmweb-grid {width:100%;}
+  .dmweb-grid th.grid-header {
+    text-align:center;
+    padding:2px;
+    font-size:75%;
+    color: #183E6C;
+    background-color: #D0D6ED;
+    border:1px solid #6F82A5;
+  }
+  .dmweb-grid td {font-size:75%;color:#183E6C;}
+  .dmweb-grid .grid-marker {width:15px;background-color: #D0D6ED;border:1px solid #6F82A5;}
+  .dmweb-grid tr.liste_highlight td.grid-marker {
+    background: #D0D6ED url(selector.gif) no-repeat center center;
+  }
+  .dmweb-grid tr.liste_highlight td.grid-cell {background-color: #6F82A5 !important;color:#f5f5f5 !important;}
+  .dmweb-grid td.grid-cell {padding:2px !important;border:1px solid #e8e8e8;}
+  .dmweb-grid td.grid-cell.index_1 {background-color:#EFEFEF;}
+  .dmweb-grid td.grid-cell.center {text-align:center;float:none;}
+  .dmweb-grid td.grid-cell.right {text-align:right;float:none;}
+  .dmweb-grid td.grid-cell.red {color:red;}
+
+=head1 DEPENDENCIES
+
+This class depends on the following GvaScript classes:
+
+=over 12
+
+=item GvaScript.ChoiceList
+
+=item GvaScript.Paginator
+
+=item GvaScript.CustomButtons
+
+=back

@@ -1,0 +1,39 @@
+---
+abstract: 'Builds on Asyncore, makes easier to handle client and server asynchronous communication'
+author:
+  - 'Sebastiano Piccoli <sebastiano.piccoli@gmail.com>'
+build_requires:
+  Module::Build: 0.3601
+  Storable: 0
+  Test::Fatal: 0
+  Test::More: 0.88
+  utf8: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Asynchat
+provides:
+  Asynchat:
+    file: lib/Asynchat.pm
+    version: 0.01
+  Asynchat::SimpleProducer:
+    file: lib/Asynchat.pm
+requires:
+  Asyncore: 0
+  Carp: 0
+  Scalar::Util::Numeric: 0
+  base: 0
+  constant: 0
+  integer: 0
+  overload: 0
+  perl: 5.008001
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  license: http://opensource.org/licenses/lgpl-license.php
+version: 0.01

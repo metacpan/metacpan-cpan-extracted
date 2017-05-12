@@ -1,0 +1,60 @@
+{
+   "abstract" : "AnyEvent::HTTP OO-wrapper",
+   "author" : [
+      "Denis Ibaev <dionys@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-UserAgent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "HTTP::Request::Common" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::HTTP" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Message" : "0",
+            "Moo" : "0",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/AdCampRu/anyevent-useragent/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/AdCampRu/anyevent-useragent"
+      }
+   },
+   "version" : "0.07"
+}

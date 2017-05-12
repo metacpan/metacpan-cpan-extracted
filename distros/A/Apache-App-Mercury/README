@@ -1,0 +1,45 @@
+Apache::App::Mercury 0.80 - Internal web server messaging for Apache mod_perl
+
+Apache::App::Mercury is a customizable, extensible customer to customer,
+store and forward messaging application for Apache mod_perl (1.x).
+It uses a relational database (accessed via DBI) to store and retrieve
+messages, and uses CGI.pm to display them in standard HTML.  It's design
+closely resembles a MVC design pattern, and it handles all message box
+navigation, message composition, sending, replying, etc.  In short, it
+is a complete web (intra server) messaging application for your Apache
+mod_perl server, which can be customized to fit your specific needs
+(e.g. private labelling).
+
+It was originally written to provide a basic, easy-to-use secure messaging
+system: if it is run on an SSL-enabled server, and your message database
+is on an encrypted filesystem, then it's "pretty secure".
+I would call it a good balance between security and ease-of-use, since
+all messages are encrypted, but users don't need to manage any digital keys.
+The fact that all messages are kept on one server could be viewed either as
+a security weakness or strength: if that machine is compromised, the
+attacker gets all the messages; on the other hand, you can heavily
+secure this one machine, whereas if you use a distributed messaging system
+users typically store their messages in plaintext on very insecure boxes.
+(ie. Windows)
+
+Dependencies:
+ o Perl
+ o Apache 1.3.x
+ o mod_perl 1.x
+ o DBI
+ o MySQL, DBD::mysql
+ o MIME::Lite  (optional: for e-mail auto-forwarding)
+ o POSIX
+ o Storable
+ o Text::Wrap
+ o URI::Escape
+
+Note on version: the version is < 1.0 not because it is not ready for
+production, but because there is more documentation to be written,
+test suites to be written, better installation procedure to be designed, etc.
+
+For detailed installation instructions, see the INSTALL file.
+
+Adi Fairbank
+adi@adiraj.org
+July 19, 2003

@@ -1,0 +1,11 @@
+SYNOPSIS
+
+    See the included script gitwrap.
+
+SEE ALSO
+
+    git
+
+    Git::Wrapper - similar name but this wraps the git command so it can be
+    used like a Perl library.
+

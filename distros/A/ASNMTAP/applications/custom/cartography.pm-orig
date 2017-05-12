@@ -1,0 +1,55 @@
+# ----------------------------------------------------------------------------------------------------------
+# © Copyright 2003-2011 Alex Peeters [alex.peeters@citap.be]
+# ----------------------------------------------------------------------------------------------------------
+# 2011/mm/dd, v3.002.003, module cartography.pm for ASNMTAP::Asnmtap::Applications::Display
+# ----------------------------------------------------------------------------------------------------------
+
+use strict;
+use warnings;           # Must be used in test mode only. This reduces a little process speed
+#use diagnostics;       # Must be used in test mode only. This reduces a lot of process speed
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+BEGIN { if ( $ENV{ASNMTAP_PERL5LIB} ) { eval 'use lib ( "$ENV{ASNMTAP_PERL5LIB}" )'; } }
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+use ASNMTAP::Asnmtap::Applications v3.002.003;
+use ASNMTAP::Asnmtap::Applications qw($IMAGESPATH %ICONS);
+
+use ASNMTAP::Asnmtap::Applications::Display v3.002.003;
+use ASNMTAP::Asnmtap::Applications::Display qw(:APPLICATIONS :DBDISPLAY);
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+sub createGifForCartography {
+  my ($catalogID_uniqueKey, $status) = @_;
+
+  my $value = $catalogID_uniqueKey;
+  $value =~ s/-/_/g;
+
+  my $command = "cp ${IMAGESPATH}/$ICONS{$status} ${RESULTSPATH}/_ASNMTAP/${value}.gif";
+  system ("$command");
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+sub printLinkToCartography {
+  my ($serverName, $checklist, $catalogID, $uniqueKey) = @_;
+
+  # modify the value of $url with the link to your cartography tool - - -
+  my $url = 'http://cartography.citap.be/index.htm?entry';
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  my $value = "${catalogID}_${uniqueKey}";
+  $value =~ s/-/_/g;
+  
+  my $dataLinkToCartography = "<TR><TD BGCOLOR=#000080 ALIGN=RIGHT COLSPAN=2>Cartography</TD></TR>";
+  $dataLinkToCartography   .= "<TR><TD BGCOLOR=#000080 WIDTH=100 ALIGN=RIGHT>Link</TD><TD BGCOLOR=#0000FF><a href=${url}=${value} target=_blank>Click Here</a></TD></TR>";
+
+  return $dataLinkToCartography;
+}
+
+# End cartography.pm -----------------------------------------------------------------------------
+
+1;

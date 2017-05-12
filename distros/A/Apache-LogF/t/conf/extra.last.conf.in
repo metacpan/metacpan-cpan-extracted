@@ -1,0 +1,7 @@
+#<IfModule mod_perl2.c>
+#PerlLoadModule TestApache2::use_logf
+#</IfModule>
+
+#<IfModule mod_perl.c>
+#PerlModule TestApache::use_logf
+#</IfModule>

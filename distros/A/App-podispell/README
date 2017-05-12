@@ -1,0 +1,20 @@
+NAME
+    App::podispell - Interactive Pod spell checker
+
+DESCRIPTION
+    See podispell for documentation. This module is not usable directly.
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+CONTRIBUTORS
+    None yet.
+
+COPYRIGHT
+    Copyright (c) 2015 the podispell "AUTHOR" and "CONTRIBUTORS" as listed
+    above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself. See <http://dev.perl.org/licenses/>.
+

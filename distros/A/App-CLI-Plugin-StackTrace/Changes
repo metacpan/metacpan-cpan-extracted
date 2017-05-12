@@ -1,0 +1,7 @@
+Revision history for Perl extension App::CLI::Plugin::StackTrace
+
+1.1     Sun Jul 18 23:25:45 JST 2010
+        - change pod
+        - change stacktrace config 
+1.0     Sat Jan  9 15:02:42 2010
+        - original version

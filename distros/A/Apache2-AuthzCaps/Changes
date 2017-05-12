@@ -1,0 +1,12 @@
+Revision history for Perl extension Apache2::AuthzCaps.
+
+0.002 2015-09-12T18:25+03:00
+ - Add Apache 2.4 support
+ - Get rid of smartmatch
+
+0.001001 2014-02-28T23:32+03:00
+ - Recommend mod_perl instead of depending on it
+ - Silence warnings about exprimental smartmatch
+
+0.001 2013-08-05T11:22+03:00
+ - Initial release

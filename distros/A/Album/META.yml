@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Album
+version:      1.06
+version_from: script/album
+installdirs:  site
+requires:
+    File::Spec:                    0
+    Getopt::Long:                  2.1
+    Image::Info:                   1.16
+    Image::Magick:                 6
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

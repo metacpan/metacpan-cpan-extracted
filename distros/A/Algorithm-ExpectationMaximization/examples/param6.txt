@@ -1,0 +1,39 @@
+# Comment lines must begin with #
+#
+# IMPORTANT:  Only one blank space allowed between consecutive numbers 
+# in each line
+
+priors 0.25 0.25 0.25 0.25
+
+cluster
+
+5 0 0.0
+
+3 0 0
+0 60 0
+0 0 60
+
+cluster
+
+20.0 0 0
+
+3 0 0
+0 60 0
+0 0 60
+
+cluster
+
+35.0 0 0
+
+3 0 0
+0 60 0
+0 0 60
+
+cluster
+
+20.0 0 0
+
+80 0 0
+0 5 0
+0 0 5
+

@@ -1,0 +1,22 @@
+Acme-Gosub
+
+Implement BASIC-like "gosub" and "greturn" for Perl.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (c) 1997-2003, Damian Conway. All Rights Reserved.
+Copyright (c) 2005 Shlomi Fish, All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

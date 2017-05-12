@@ -1,0 +1,11 @@
+DESCRIPTION
+
+    This distribution is created for testing only.
+
+FUNCTIONS
+
+ primes([ $base, ] $num) => list
+
+    Return prime numbers (from $base if specified) that are less or equal
+    to $num.
+

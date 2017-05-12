@@ -1,0 +1,99 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Code::TidyAll::Plugin::Test::Vars' => '0.02',
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Parallel::ForkManager' => '1.19',
+                                      'Perl::Critic' => '1.126',
+                                      'Perl::Tidy' => '20160302',
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Wordlist' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta::JSON' => '0.16',
+                                      'Test::CleanNamespaces' => '0.15',
+                                      'Test::Code::TidyAll' => '0.50',
+                                      'Test::EOL' => '0',
+                                      'Test::Mojibake' => '0',
+                                      'Test::More' => '0.96',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Synopsis' => '0',
+                                      'Test::Vars' => '0.009',
+                                      'Test::Version' => '2.05',
+                                      'blib' => '1.01'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'File::HomeDir' => '0',
+                                      'FindBin' => '0',
+                                      'IPC::Run3' => '0',
+                                      'IPC::System::Simple' => '0',
+                                      'Import::Into' => '0',
+                                      'Lingua::EN::Inflect' => '0',
+                                      'List::AllUtils' => '0',
+                                      'List::Gather' => '0',
+                                      'List::Util' => '1.44',
+                                      'Module::Pluggable::Object' => '0',
+                                      'Moose' => '0',
+                                      'Moose::Exporter' => '0',
+                                      'Moose::Role' => '0',
+                                      'Moose::Util' => '0',
+                                      'MooseX::Getopt::Dashes' => '0',
+                                      'MooseX::Role::Parameterized' => '0',
+                                      'MooseX::Role::Parameterized::Meta::Trait::Parameterizable' => '0',
+                                      'MooseX::SemiAffordanceAccessor' => '0',
+                                      'MooseX::StrictConstructor' => '0',
+                                      'MooseX::Types::Combine' => '0',
+                                      'MooseX::Types::Common::Numeric' => '0',
+                                      'MooseX::Types::Moose' => '0',
+                                      'Path::Class' => '0',
+                                      'Term::CallEditor' => '0',
+                                      'Term::Choose' => '0',
+                                      'WebService::PivotalTracker' => '0.04',
+                                      'autodie' => '2.25',
+                                      'experimental' => '0',
+                                      'feature' => '0',
+                                      'indirect' => '0',
+                                      'lib' => '0',
+                                      'mro' => '0',
+                                      'multidimensional' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'open' => '0',
+                                      'parent' => '0',
+                                      'perl' => 'v5.20.0',
+                                      'strict' => '0',
+                                      'utf8' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Hash::Objectify' => '0',
+                                   'Test::Class::Moose' => '0.82',
+                                   'Test::Class::Moose::AttributeRegistry' => '0',
+                                   'Test::Class::Moose::Load' => '0',
+                                   'Test::Class::Moose::Runner' => '0',
+                                   'Test::Differences' => '0',
+                                   'Test::More' => '0.96',
+                                   'Test::Output' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

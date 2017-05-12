@@ -1,0 +1,28 @@
+Revision history for Audio-Metadata-Flac
+
+0.16    23 Dec 2013
+        Fixed uninitialised value warnings, thanks to Cameron Thornton.
+
+0.15    28 Nov 2010
+        Removed POD coverage check. It did more harm than good.
+
+0.14    08 Nov 2010
+        Tag names are no longer lower-cased.
+        Removed obsolete version information.
+
+0.12    07 Nov 2010
+        Bugfix release
+
+0.11    07 Nov 2010
+        Added tools for processing metadata sets as plain text files.
+        Added command-line utility.
+
+0.04    19 Sep 2010
+        Bugfix release.
+
+0.03    17 Sep 2010
+        Bugfix release.
+
+0.02    13 Sep 2010
+        First public version.
+

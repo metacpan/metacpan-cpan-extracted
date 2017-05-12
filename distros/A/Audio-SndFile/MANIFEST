@@ -1,0 +1,16 @@
+lib/Audio/SndFile.pm
+lib/Audio/SndFile/Constants.pm
+MANIFEST			This list of files
+Makefile.PL
+MANIFEST.SKIP
+SndFile.xs
+t/01basic.t
+t/02copy.t
+t/03errors.t
+t/test.wav
+t/empty.wav
+typemap
+COPYING
+README
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

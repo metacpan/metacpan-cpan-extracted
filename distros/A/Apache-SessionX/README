@@ -1,0 +1,106 @@
+
+Apache::SessionX  - An extented persistence framework for session data
+----------------------------------------------------------------------
+
+Copyright (c) 1997-2001 Gerald Richter / ecos gmbh
+
+You may distribute under the terms of either the GNU General Public 
+License or the Artistic License, as specified in the Perl README file.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+$Id: README,v 1.2 2001/08/14 04:37:28 richter Exp $
+
+
+OVERVIEW
+========
+
+Apache::SessionX extents Apache::Session. It was initialy written to
+use Apache::Session from inside of HTML::Embperl, but is seems to be
+usefull outside of Embperl as well, so here is it as standalone module.
+
+Apache::Session is a persistence framework which is particularly useful
+for tracking session data between httpd requests.  Apache::Session is
+designed to work with Apache and mod_perl, but it should work under
+CGI and other web servers, and it also works outside of a web server
+altogether.
+
+Addtionaly to Apache::Session, Apache::SessionX provides the following
+possibilites:
+
+- Configuration: Makefile.PL checks which componemnts are installed
+  on the system and interactivly builds a set of configuration, 
+  including a default one. This configurations are saved and can
+  be used by name later on. The default configuration is used, if
+  no parameters are given to Apache::SessionX. This simplifies
+  the configuration and usage.
+
+- Lazy operation: Apache::SessionX supports lazy operation, that means
+  that the actual data access only takes place if the session data is
+  needed, so you are able to setup the session object, without worrying
+  about performance in case you don't access the session data.
+
+- Specifing the ID: Apache::SessionX can use a given ID instead of
+  creating it's own one. You can also give an string which is used to
+  generate the ID
+
+- Genrate unique ID: Apache::SessionX is able to save the session with
+  an new ID every time data is modified. This make it possible to keep
+  an history.
+
+- Addtionaly methods are provided to get the ID, the inital ID, the
+  modified status and to close a session, without destroying the
+  session object itself.
+
+
+DOCUMENTATION
+=============
+
+After Installation the documentaion could be viewed via
+
+    perldoc Apache::SessionX
+
+You should addtionaly read the 
+
+    perldoc Apache::SessionX
+    perldoc Apache::SessionX::Generate::MD5
+    perldoc Apache::Session::Store::*
+    perldoc Apache::Session::Lock::*
+    perldoc Apache::Session::Serialize::*
+
+
+INSTALLATION
+============
+
+perl Makefile.PL
+make
+make test
+make install
+
+Makefile.PL will ask you what configuration you want to use and saves 
+them for later use with the config parameter. This configuration are
+tested when you run make test, so it's really a good idea to run 
+make test, to make sure everything works as expected. Even better is
+to run make test as the user, that your webserver is running as, so
+you are able to detected permission problems early.
+
+
+SUPPORT
+=======
+
+You can get support for this module via the mod_perl or Embperl 
+mailing list. Please use the lists for any questions and don't
+contact me directly. Details about the list can be found at
+
+    http://perl.apache.org/ 
+
+
+AUTHOR
+======
+
+G. Richter (richter@dev.ecos.de)
+
+
+

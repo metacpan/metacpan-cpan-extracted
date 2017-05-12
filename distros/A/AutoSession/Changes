@@ -1,0 +1,7 @@
+Revision history for Perl extension AutoSession.
+
+0.01  Tue May 20 16:03:00 2003
+        - This is the first release!
+	- original version; created by h2xs 1.21 with options
+		-X -A -n AutoSession
+

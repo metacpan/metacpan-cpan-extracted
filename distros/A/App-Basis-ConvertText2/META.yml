@@ -1,0 +1,58 @@
+---
+abstract: 'Wrapper for pandoc, lots of plugins for fenced code blocks.'
+author:
+  - 'Kevin Mulholland <moodfarm@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Basis-ConvertText2
+requires:
+  App::Basis: 0
+  App::Basis::Config: 0
+  Capture::Tiny: 0
+  Data::Printer: 0
+  Digest::MD5: 0
+  Encode: 0
+  Exporter: 0
+  Furl: 0
+  GD: 0
+  GD::Barcode: 0
+  GD::Graph::area: 0
+  GD::Graph::bars: 0
+  GD::Graph::bars3d: 0
+  GD::Graph::lines: 0
+  GD::Graph::lines3d: 0
+  GD::Graph::linespoints: 0
+  GD::Graph::mixed: 0
+  GD::Graph::pie: 0
+  GD::Graph::points: 0
+  GD::Sparkline: 0
+  Image::Resize: 0
+  JSON: 0
+  MIME::Base64: 0
+  Module::Pluggable: 0
+  Moo: 0
+  POSIX: 0
+  Path::Tiny: 0
+  Text::Markdown: 0
+  Try::Tiny: 0
+  Venn::Chart: 0
+  YAML: 0
+  constant: 0
+  feature: 0
+  namespace::autoclean: 0
+  namespace::clean: 0
+  perl: v5.10.0
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  repository: git://github.com/27escape/App-Basis-ConvertText2.git
+version: 0.4

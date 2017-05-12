@@ -1,0 +1,16 @@
+ChangeLog
+INSTALL
+MANIFEST
+Makefile.PL
+LibWCS.pm
+LibWCS.xs
+LICENSE
+README
+typemap
+util.c
+util.h
+wcsdecl.h
+t/AAA_load.t
+t/dateutil.t
+t/wcsinit.t
+META.yml                                 Module meta-data (added by MakeMaker)

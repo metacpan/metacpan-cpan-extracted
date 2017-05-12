@@ -1,0 +1,29 @@
+Revision history for Perl extension Authen::Tcpdmatch.
+
+0.07  Thu Jul 24 20:10:38 2008
+       - Fixed required modules, warnings
+
+0.06  Thu Jul 24 19:01:53 2008
+       - Fixed Perl version ( to 5.006 )
+
+0.04  Sun Sep 25 23:07:51 2005
+       - Disabled yapp parser and yapp tests. They will come back when 
+	 Parse::Flex is updated.
+       - Packaging changes to keep CPANTS happy.
+       - Now, also builds with Module::Build.
+
+0.03  Sun Oct 12 02:47:44 2003
+       - Added a Yapp parser with a Parse::Lex lexer .
+       - The Yapp parser is several times faster than P::RD and
+	  used by default;  P::RD is still available.
+       - Since the Yapp parser can only detect (but not rsync)  wrong 
+	 syntax in hosts.*, I removed test cases with illegal syntax.
+       - A simple benchmark is now available (in ./scripts/ directory) . 
+
+0.02  Tue Sep 30 00:47:44 2003
+       - added function prototype to tcpdmatch
+
+0.01  Sat Sep 27 21:32:00 2003
+	- original version; created by h2xs 1.21 with options
+		-A -n Authen::Tcpdmatch
+

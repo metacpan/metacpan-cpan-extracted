@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Acme/DarmstadtPM/TieHash.pm
+t/01_TieHash.t
+t/99_manifest.t
+t/99_pod.t
+t/99_pod_coverage.t

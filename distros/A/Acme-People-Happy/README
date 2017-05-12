@@ -1,0 +1,63 @@
+NAME
+    Acme::People::Happy - Does people happy?
+
+SYNOPSIS
+     use Acme::People::Happy;
+     my $obj = Acme::People::Happy->new;
+     my $text = $obj->are_you_happy;
+     my $text = $obj->everybody;
+
+METHODS
+    *       "new()"
+
+             Constructor.
+             Returns object.
+
+    *       "are_you_happy()"
+
+             Are you happy question?
+             Returns answer.
+
+    *       "everybody()"
+
+             Everybody?
+             Returns answer.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Acme::People::Happy;
+
+     # Object.
+     my $people = Acme::People::Happy->new;
+
+     # Are you happy?
+     print $people->are_you_happy."\n";
+
+     # Output like:
+     # Yes, i'm.
+
+DEPENDENCIES
+    Class::Utils.
+
+REPOSITORY
+    <https://github.com/tupinek/Acme-People-Happy>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2015 Michal Špaček
+     BSD 2-Clause License
+
+DEDICATION
+    To Mario for his ideas.
+
+VERSION
+    0.03
+

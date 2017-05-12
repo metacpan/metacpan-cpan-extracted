@@ -1,0 +1,43 @@
+<form id="occ_form">
+
+<table align="center">
+	<tr>
+		<td align="center" colspan="2"><span class="blue_centered">Occupations for <: $name :></span></td>
+	</tr>
+	<tr>
+		<td colspan="2"><span id="occ_list_div"><: $occupation_list :></span></td>
+	</tr>
+	<tr>
+		<td colspan="2"><hr></td>
+	</tr>
+	<tr>
+		<td align="center">Organization</td>
+		<td align="center">Occupation</td>
+	</tr>
+	<tr>
+		<td><input id="add_occ_org_name" type="text" size="40" maxlength="100"></td>
+		<td><input id="add_occ_occ_title" type="text" size="40" maxlength="100"></td>
+	</tr>
+	<tr>
+		<td align="center"><span id="add_occ_button">Add</span></td>
+		<td align="center"><input id="reset_occ_button" type="reset" value="Reset"></td>
+	</tr>
+</table>
+
+<input type="hidden" id="occ_sid" value="<: $sid :>">
+</form>
+
+<table align="center">
+	<tr>
+		<td>Notes:</td>
+	</tr>
+	<tr>
+		<td>1: Both Organization and Occupation accept '-' (without the quotes) for a generic name.</td>
+	</tr>
+	<tr>
+		<td>2: And, for either field, you can type 2 or more characters to trigger auto-completion.</td>
+	</tr>
+	<tr>
+		<td>This means a menu of database matches, if any, will be displayed.</td>
+	</tr>
+</table>

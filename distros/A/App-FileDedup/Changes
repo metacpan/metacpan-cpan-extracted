@@ -1,0 +1,4 @@
+Revision history for App-FileDedup
+
+0.001       2015-07-24
+    - small wrapper around L<File::Dedup> built using MooseX::App::Simple

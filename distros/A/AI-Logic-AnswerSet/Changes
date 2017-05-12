@@ -1,0 +1,6 @@
+Revision history for Perl extension AI::Logic::AnswerSet.
+
+0.01  Sat Jan 28 18:10:08 2012
+	- original version; created by h2xs 1.23 with options
+		-AXc -n AI::Logic::AnswerSet
+

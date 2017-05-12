@@ -1,0 +1,10 @@
+0.01    2017-01-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Use Pod::Weaver plugin PWP:App::lcpan.
+
+
+0.00    2016-02-26 (PERLANCAR)
+
+        - First early prototype.

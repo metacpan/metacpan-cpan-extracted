@@ -1,0 +1,11 @@
+ChangeLog			Revision history
+MANIFEST			This file
+MANIFEST.SKIP
+Makefile.PL			Makefile generator
+README				I mean it! :-)
+lib/Apache/Roaming.pm		The roaming access module
+lib/Apache/Roaming/LiPrefs.pm	A module for parsing liprefs files
+lib/Bundle/Apache/Roaming.pm	A bundle for CPAN installation
+t/01base.t			Base test (Loading the module)
+t/10methods.t			Testing the PUT, GET, MOVE and DELETE methods
+t/20liprefs.t			Testing Apache::Roaming::LiPrefs

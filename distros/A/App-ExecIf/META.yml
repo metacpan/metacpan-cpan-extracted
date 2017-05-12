@@ -1,0 +1,25 @@
+---
+abstract: 'Execute command on some condition'
+author:
+  - 'Steven Haryanto <stevenharyanto@gmail.com>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-ExecIf
+requires:
+  perl: 5.010001
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ExecIf
+  homepage: https://metacpan.org/release/App-ExecIf
+  repository: git://github.com/sharyanto/perl-App-ExecIf.git
+version: 0.01

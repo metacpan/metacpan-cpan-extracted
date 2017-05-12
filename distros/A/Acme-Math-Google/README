@@ -1,0 +1,37 @@
+NAME
+    Acme::Math::Google - Let Google do the math
+
+SYNOPSIS
+      use Acme::Math::Google;
+      my $amg = Acme::Math::Google->new;
+      print $amg->calc('e**(i*pi)');    # -1
+      print $amg->calc('e**(i*pi)', 1); # 'e ** (i * pi) = -1'
+                                        # WWW::Google::Calculator compat
+
+DESCRIPTION
+    Need I say more than above?
+
+  EXPORT
+    None.
+
+  Acme::Math::Google vs. WWW::Google::Calculator
+    Darn, another wheel reinvented. This module does essentially the same as
+    WWW::Google::Calculator but much simpler. All you need is URI and
+    LWP::UserAgent whereas WWW::Google::Calculator demands WWW::Mechanize,
+    HTML::TokeParser and Class::Accessor::Fast.
+
+SEE ALSO
+    WWW::Google::Calculator
+
+    <http://www.google.com/intl/en/help/features.html#calculator>
+
+AUTHOR
+    Dan Kogai, <dankogai@dan.co.jp>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Dan Kogai
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

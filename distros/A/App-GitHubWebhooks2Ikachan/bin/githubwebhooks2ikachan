@@ -1,0 +1,62 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use utf8;
+use App::GitHubWebhooks2Ikachan;
+
+my ($opt, $argv) = App::GitHubWebhooks2Ikachan->parse_options(@ARGV);
+my $g2i = App::GitHubWebhooks2Ikachan->new($opt);
+$g2i->run(@$argv);
+
+__END__
+
+=encoding utf-8
+
+=for stopwords ikachan
+
+=head1 NAME
+
+githubwebhooks2ikachan - Starter script for L<App::GitHubWebhooks2Ikachan>
+
+=head1 SYNOPSIS
+
+    $ githubwebhooks2ikachan --ikachan_url=http://your-ikachan-server.com --port=12345
+
+This script uses port 5555 as default.
+
+=head1 DESCRIPTION
+
+This script is the starter for L<App::GitHubWebhooks2Ikachan>.
+
+=head1 PARAMETERS
+
+=over 4
+
+=item * ikachan_url
+
+URL of ikachan server. This parameter is requires.
+
+=item * port
+
+Port number of this server. Default number is 5555.
+
+=item * debug
+
+If you enable this, contents of payload will be dumped.
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) moznion.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+moznion E<lt>moznion@gmail.comE<gt>
+
+=cut
+

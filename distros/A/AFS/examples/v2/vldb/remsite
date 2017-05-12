@@ -1,0 +1,22 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::VLDB;
+
+my ($vldb, $server, $part, $volume, $ok);
+
+die "Usage: $0 server partition volume \n" if $#ARGV != 2;
+
+$server = shift;
+$part   = shift;
+$volume = shift;
+
+$vldb = AFS::VLDB->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+$ok = $vldb->remsite($server, $part, $volume);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "\nRemoved replication site $server /vicep$part for volume $volume \n"; }

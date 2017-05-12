@@ -1,0 +1,84 @@
+"Acme::Pythonic::Functions" is Copyright (C) 2009-2017, Hauke Lubenow.
+
+NAME
+
+Acme::Pythonic::Functions - Python-like functions for Perl
+
+This Perl-module offers some basic string-, list- and other functions, that try to mimic those of the programming-language "Python".
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+
+and as "root":
+
+	make install
+
+USAGE
+
+Python-like functions, that can be found here, are:
+
+    Strings:
+
+        endswith()
+        isdigit()
+        isin()
+        len()
+        lstrip()
+        replace()
+        rstrip()
+        startswith()
+        strip()
+
+    Lists:
+
+        append()
+        extend()
+        insert()
+        isin()
+        len()
+        remove()
+
+    Hashes:
+
+        has_key()
+        isin()
+        len()
+
+    Files:
+
+        isdir()
+        isfile()
+        listdir(), oslistdir()
+
+    System:
+        osname()
+
+    print-Replacement:
+        pyprint()
+
+Please see the scripts in the "examples"-directory in the tar-ball about how to use them.
+
+There are a few additional (hopefully useful) functions that don't have a model in Python.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Acme::Pythonic::Functions
+
+AUTHOR
+       Hauke Lubenow, <hlubenow2@gmx.net>
+
+LICENSE INFORMATION
+
+Acme::Pythonic::Functions is Copyright (C) 2009-2017, Hauke Lubenow.
+
+This module is free software; you can redistribute it and/or modify it under the same terms as Perl 5.14.2. For more details, see the full text of the licenses in the directory LICENSES.
+The full text of the licenses can also be found in the documents 'perldoc perlgpl' and 'perldoc perlartistic' of the official Perl 5.14.2-distribution. In case of any contradictions, these 'perldoc'-texts are decisive.
+
+THIS PROGRAM IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. FOR MORE DETAILS, SEE THE FULL TEXTS OF THE LICENSES IN THE DIRECTORY "LICENSES" AND IN THE 'PERLDOC'-TEXTS MENTIONED ABOVE.

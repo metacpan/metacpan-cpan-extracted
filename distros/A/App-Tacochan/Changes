@@ -1,0 +1,31 @@
+Revision history for Perl extension App::Tacochan
+
+0.07 2013-11-27T12:04:24Z
+
+    - support for Skype::Any 0.04
+    - minil migrate
+
+0.06    Tue Feb 26 00:43:54 2013
+        - improve web interface
+        - depend to Amon2::Lite
+        - /chat_list: JSON data structure has changed
+        - add docs
+        - add error message: "Skype is not running"
+
+0.05    Tue Jan 22 23:39:47 2013
+        - oops... You don't use 0.04! It doesn't work.
+
+0.04    Tue Jan 22 23:32:59 2013
+        - support Skype URI
+
+0.03
+        - tacochan_client added to installation script
+        - remove trash
+        - fix pod section
+        - fix typo
+
+0.02
+        - fix pod section
+
+0.01
+        - original version

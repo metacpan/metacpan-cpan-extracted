@@ -1,0 +1,15 @@
+lib/Algorithm/Diff/Apply.pm
+lib/Algorithm/Diff/Apply.pod
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+ChangeLog
+t/10plainsingle.t
+t/20plainmerge.t
+t/25mergemany.t
+t/50confict.t
+t/60regress1.t
+t/60regress2.t
+t/80optsimple.t
+t/81opthash.t
+META.yml                                 Module meta-data (added by MakeMaker)

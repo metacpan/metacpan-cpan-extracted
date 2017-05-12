@@ -1,0 +1,27 @@
+This is Perl module App::CLI::Plugin::Config::YAML::Sycka.
+
+INSTALLATION
+
+App::CLI::Plugin::Config::YAML::Syck installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan App::CLI::Plugin::Config::YAML::Syck
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+App::CLI::Plugin::Config::YAML::Syck documentation is available as in POD. So you can do:
+
+    % perldoc App::CLI::Plugin::Config::YAML::Syck
+
+to read the documentation online with your favorite pager.
+
+Akira Horimoto

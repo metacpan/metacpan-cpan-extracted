@@ -1,0 +1,138 @@
+=head1 How do I use this CMS?
+
+CMS means Content Management System.
+
+If you're starting with an empty database, the program will default to
+the [New Site] tab.
+
+If you have designs on file, the program will default to the [Edit Site] tab,
+where you use the search engine to find a site, design or page to work on.
+
+But first, a note on deleting things.
+
+=head1 Deletion of Sites/Designs/Pages
+
+Each delete button displays a Javascript warning, so you can cancel the delete
+before any message is sent to the server.
+
+Deletes cascade, which means deleting a site I<automatically> deletes all designs
+and pages (and their content!) which belong to that site.
+
+In the same way, deleting a design I<automatically> deletes all pages (and their content!)
+which belong to that design.
+
+So, proceed with caution.
+
+=head1 Duplication of Data
+
+There are various buttons allowing you the duplicate sites, designs and pages.
+
+Clicking on [Duplicate site] will use the new name you entered to copy all designs
+and pages, and their content, from the current site to the new site.
+
+Clicking on [Duplicate design] will use the new name you entered to copy the current
+design's pages and their content to a new design within the current site.
+
+=head2 1: Create a new Site and a new Design
+
+Start by creating a new site. Each site's name must be unique.
+
+You can have any number of sites, and a single site can have any number of designs.
+
+Each design's name must be unique, for a given site.
+
+=head2 2: Build the Site via it's menu
+
+Use the [Edit Site] tab to search for a design you've saved.
+
+Select a site and click the [Edit pages] button. On the [Edit Pages] tab, you'll
+create the menu of how this design's pages link together.
+
+So, each design must have a menu.
+
+This menu will allow the user of your web site to navigate around the pages.
+
+This program's design is completely based on the assumption
+that every web site has a menu of some sort, which link's the site's pages.
+
+Each item on this menu will be a clickable link to a page
+whose content you design. You also choose the template to be used for each page,
+when the time comes to output the design as a set of web pages.
+
+The program displays the menu you design as a tree, at the bottom of the [Edit Pages] tab.
+The tree displayed is called the Site map, and you can click on it while designing, to
+move from page to page.
+
+From here, you move to the [Edit Content] tab, to input the content per page.
+
+When the program finally outputs (generates) your design as
+a set of web pages, the content is poured into the templates like wine into a glass.
+
+The menu can be displayed on any output page as either a vertical menu (a tree),
+a horizontal menu, both or neither.
+
+=head2 3: Edit the Design's content
+
+Use the 2 textareas on the Edit Content tab to add content
+to each menu item's page, so that when a visitor to your site clicks on a menu item,
+they see the content you have designed for that page.
+
+=head2 4: Generate the web site's pages
+
+Specify the output directory, and click the [Generate] button.
+
+=head1 Changing the names of Sites/Designs/Pages
+
+=head2 1: Editing names
+
+In general, whenever the program is displaying the name of a site, design or
+page, you can just try in a new name, and click [Save].
+
+So, if you changed the site's name, a new site will be created, using the given
+design name of course, and it will contain a new homepage.
+
+If you just change the design's name, a new design will be created, with a matching
+homepage.
+
+Likewise, changing the name on an existing page will just change the name of that page.
+
+All this will happen, as long as the program can work out what your intention is.
+
+The complex part begins when you're building up the site's menu.
+
+=head2 2: Editing menus
+
+You use the buttons on the [Edit Pages] tab to add pages to the menu, one at a time.
+
+Starting with a menu containing just the homepage, you can extend the menu tree up or down,
+or you can add submenus to any existing page.
+
+This menu structure will produce a corresponding directory structure when you finally
+generate the web site's files.
+
+For each menu item, and hence for each page, you specify the content to appear on that
+page, and the page template to be used when generating pages' files and writing them to disk.
+
+=head1 Deleting Pages
+
+After you delete a page, the homepage becomes the 'current' page. If no page is flagged as
+the home page, then the first page in the design becomes the 'current' page.
+
+The 'first page' is the one on the Edit Pages tab which appears at the top of the site map.
+
+=head1 How do I skin the Design?
+
+See L<http://developer.yahoo.com/yui/articles/skinning/>.
+
+YUI is the Yahoo User Interface, the Javascript library I used to write the client-side
+code for this program.
+
+=head1 How do I backup my Designs?
+
+All designs are stored in a database, so it's a matter of running the database's standard
+backup procedure.
+
+That means also that to restore after a mistake, you need to run the database's
+recovery program.
+
+Which is a way of saying that this program does not yet have an undo command.

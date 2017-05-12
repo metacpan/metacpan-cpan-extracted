@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Algorithm-BinPack.t
+lib/Algorithm/BinPack.pm
+META.yml                                 Module meta-data (added by MakeMaker)

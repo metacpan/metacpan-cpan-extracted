@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+
+# PODNAME: automaton
+
+# ABSTRACT: shell script wrapper for App::Automaton
+
+use strict;
+use warnings;
+
+use App::Automaton;
+use Getopt::Std;
+use File::HomeDir;
+use File::Spec::Functions;
+use Data::Dumper;
+
+
+my $opts = {};
+getopts('vtc:', $opts);
+
+# find config
+my $conf_file;
+if ($opts->{c}) {
+    $conf_file = $opts->{c};
+} else {
+	$conf_file = catfile( File::HomeDir->my_home, '.automaton' );
+}
+
+my $a = App::Automaton->new(conf_file => $conf_file, debug => $opts->{v});
+$a->check_sources();
+$a->apply_filters();
+$a->dedupe();
+$a->do_actions();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+automaton - shell script wrapper for App::Automaton
+
+=head1 VERSION
+
+version 0.150912
+
+=head1 OVERVIEW
+
+For more information please see L<App::Automaton>
+
+=head1 AUTHOR
+
+Michael LaGrasta <michael@lagrasta.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Michael LaGrasta.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

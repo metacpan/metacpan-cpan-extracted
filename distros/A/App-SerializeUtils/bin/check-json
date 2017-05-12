@@ -1,0 +1,103 @@
+#!perl
+
+our $DATE = '2017-03-01'; # DATE
+our $VERSION = '0.12'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+my $json_mod = '';
+GetOptions(
+    'pp' => sub { $json_mod = 'PP' },
+    'xs' => sub { $json_mod = 'XS' },
+    'help' => sub {
+        print "Usage: check-json [--pp|--xs] <file>\n";
+        exit 0;
+    },
+);
+
+my $json;
+if ($json_mod eq 'PP') {
+    require JSON::PP; $json = JSON::PP->new->allow_nonref;
+} elsif ($json_mod eq 'XS') {
+    require Cpanel::JSON::XS; $json = Cpanel::JSON::XS->new->allow_nonref;
+} else {
+    require JSON::MaybeXS; $json = JSON->new->allow_nonref;
+}
+
+eval {
+    undef $/;
+    $json->decode(~~<>);
+};
+
+die $@ if $@;
+
+1;
+# ABSTRACT: Check JSON syntax
+# PODNAME: check-json
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+check-json - Check JSON syntax
+
+=head1 VERSION
+
+This document describes version 0.12 of check-json (from Perl distribution App-SerializeUtils), released on 2017-03-01.
+
+=head1 DESCRIPTION
+
+Check JSON syntax. Prints nothing if JSON syntax is okay.
+
+=head1 OPTIONS
+
+=over
+
+=item * --pp
+
+Force using a PP module (currently L<JSON::PP>) instead of the default
+L<JSON::MaybeXS>.
+
+=item * --xs
+
+Force using an XS module (currently L<Cpanel::JSON::XS>) instead of
+the default L<JSON::MaybeXS>.
+
+=back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-SerializeUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-App-SerializeUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SerializeUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2015, 2014, 2013, 2011 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

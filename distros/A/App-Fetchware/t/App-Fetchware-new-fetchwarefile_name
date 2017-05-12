@@ -1,0 +1,47 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+# Tests App::Fetchware's fetchwarefile_name() subroutine that uses Term::UI to
+# ask the user questions. This "test script" is called by
+# t/bin-fetchware-new.t's using Test::Expect, if its optionally installed. And
+# Test::Expect answer's the questsions that this script asks thereby testing
+# fetchwarefile_name() Q&A interface.
+
+use Test::More;
+use Test::Builder;
+use Term::ReadLine;
+use Term::UI;
+
+use App::Fetchware 'fetchwarefile_name';
+
+
+my $term = Term::ReadLine->new('testing fetchware new');
+
+my ($fetchwarefile_name, $fetchwarefile_value) =
+    fetchwarefile_name($term, program => undef);
+
+is($fetchwarefile_name, 'program', 'checked fetchwarefile_name() program.');
+is($fetchwarefile_value, 'test', 'checked fetchwarefile_name() value.');
+
+
+# Spit out # of tests run.
+done_testing();
+
+# Print a bogus "prompt" to keep Expect from freaking out, because it presumes
+# the prompt works like it does in a shell, but fetchware new is not a shell.
+print "Bogus shell: \n";
+
+# Because we're in a child process not the same one that is running the main
+# test suite, if any tests fail this failure will not be reported back to our
+# caller. So, we use Test::Builder to check if our tests have passed, and if
+# they have we do nothing and return succes, but if not we throw an exception.
+my $test = Test::Builder->new();
+unless ($test->is_passing()) {
+    diag explain \[$test->details()];
+    die <<EOD;
+fetchwarefile_name test file for testing fetchwarefile_name() using Test::Expect
+has failed! The details() method of this process's Test::Builder object should
+have been printed above to help you figure out what went wrong.
+EOD
+}

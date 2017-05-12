@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use List::Util qw/max/;
+use Term::ANSIColor qw/color/;
+
+my $normal = color('reset');
+my $red    = color('bold red');
+my $grn    = color('bold green');
+my $blu    = color('blue');
+my $ylw    = color('yellow');
+
+run(@ARGV) unless $^C || caller;
+
+sub run {
+    my @args = @_;
+    my $mod_length = 0;
+    my $ver_length = 0;
+    my @lines;
+
+    for my $mod (@args) {
+        my $file = "$mod\.pm";
+        $file =~ s{::}{/}g;
+
+        $mod_length = max($mod_length, length($mod));
+
+        my $installed;
+        {
+            local $^C = 1;
+            $installed = eval { require $file; 1 };
+        }
+
+        my $version = $mod->VERSION;
+        my $path    = $INC{$file}   || '';
+
+        $ver_length = max($ver_length, length($version || '--'));
+
+        push @lines => [$installed, $installed ? $grn : $red, $version ? $grn : $ylw, $mod, $version || '--', $path];
+    }
+
+    print "\n";
+    for my $line (@lines) {
+        my $i  = shift @$line;
+        my $c  = shift @$line;
+        my $vc = shift @$line;
+
+        $vc = $red unless $i;
+        my $it = $i ? "is installed at  " : "${red}is not installed${normal}";
+
+        printf(qq|${c}\%-${mod_length}s${normal} ${vc}%-${ver_length}s${normal} $it${blu}%s${normal}\n|, @$line);
+    }
+    print "\n";
+}
+
+1;

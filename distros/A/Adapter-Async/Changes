@@ -1,0 +1,111 @@
+Revision history for Adapter-Async
+
+0.018     2017-03-26 15:50:00+08:00 Asia/Kuala_Lumpur
+	New features:
+	* Added extract_first_by to ::Array
+
+0.018     2016-11-06 22:41:55+08:00 Asia/Kuala_Lumpur
+	New dependencies:
+	* List::BinarySearch is now required, rather than optional
+
+	Features:
+	* ->find_idx and ->find_insert_pos on arrays
+
+0.017     2015-03-06 16:37:04+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* ->push on an ::OrderedList now adds to the end, rather than the start
+
+	Test fixes:
+	* Missed a defer_methods override in model.t, was failing without Check::UnitCheck
+
+0.016     2015-03-06 16:15:29+00:00 Europe/London
+
+0.015     2015-03-06 15:11:54+00:00 Europe/London
+	No new features.
+
+	Dependency fixes:
+	* Include Variable::Disposition and only run UNITCHECK tests when Check::UnitCheck is installed
+	(RT102513)
+
+0.014     2015-03-04 17:05:00+00:00 Europe/London
+	Features:
+	* Adapter::Async::Model
+
+0.013     2015-02-11 22:10:56+00:00 Europe/London
+	Features:
+	* ->range for retrieving available results from an OrderedList when actual size is not
+	yet known.
+
+	Dependencies:
+	* perl 5.012, for ... construct
+
+0.012     2015-02-03 22:37:49+00:00 Europe/London
+	Features:
+	* UnorderedMap and hashref implementation. API might take a few versions
+	to stabilise.
+
+0.011     2014-08-31 17:48:45+01:00 Europe/London
+	No new features.
+
+	Bug fixes:
+	* ->find_from_method index might already be off the end of the
+	array, compensate for this
+
+0.010     2014-08-31 00:29:41+01:00 Europe/London
+	Features:
+	* Undocumented ->find_from method in OrderedList::Array
+
+0.009     2014-08-30 00:43:28+01:00 Europe/London
+	No new features.
+
+	Test fixes:
+	* Missing tests from previous release added
+
+0.008     2014-08-30 00:38:42+01:00 Europe/London
+	Features:
+	* ->modify for changing a single element
+
+0.007     2014-08-21 17:20:12+01:00 Europe/London
+	Features:
+	* Helper methods for ->all
+
+	Bug fixes:
+	* Off-by-one on ->pop
+	* Better splice handling - now also returns the elements found,
+	might need to make this optional so it's undocumented for now.
+
+0.006     2014-08-16 09:42:43+01:00 Europe/London
+	No new features.
+
+	Bug fixes:
+	* Allow calling ->push and ->pop in void context
+
+0.005     2014-08-16 09:30:50+01:00 Europe/London
+	No new features.
+
+	Documentation fixes:
+	* Minimal documentation for new helper methods
+
+0.004     2014-08-16 09:23:55+01:00 Europe/London
+	Features:
+	* Helper methods for ->push, ->shift, ->unshift, ->pop
+	* Moved ->insert, ->append to ::OrderedList, since
+	the wrappers are likely to be appropriate for other
+	implementations as well
+
+0.003     2014-08-12 18:39:22+01:00 Europe/London
+	No new features
+
+	Dependency fixes:
+	* Add curry to the list
+
+0.002     2014-08-10 14:58:33+01:00 Europe/London
+	No new features
+
+	Documentation fixes:
+	* Fix NAME section for ::OrderedList to resolve CPAN indexing issues
+
+0.001     2014-08-10 08:31:22+01:00 Europe/London
+	Initial CPAN release

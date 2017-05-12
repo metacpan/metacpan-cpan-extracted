@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/Acme/Code/Police.pm
+README
+t/load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,30 @@
+---
+abstract: "Perl extension for NTLM-over-HTTP related computations\r"
+author:
+  - "This implementation was written by Yee Man Chan (ymc@yahoo.com).\r"
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Authen-NTLM-HTTP
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Crypt::DES: 2.03
+  Digest::MD4: 1.1
+requires:
+  Crypt::DES_PP: 1.00
+  Digest::Perl::MD4: 1.0
+  MIME::Base64: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.33

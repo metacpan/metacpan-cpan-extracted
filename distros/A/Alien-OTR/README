@@ -1,0 +1,28 @@
+NAME
+    Alien::OTR - Install and make available libotr v4 library
+
+VERSION
+    version 4.1.1.0
+
+SYNOPSIS
+        use Alien::OTR;
+
+        my $cflags = Alien::OTR->cflags;
+        my $libs = Alien::OTR->libs;
+
+DESCRIPTION
+    Alien::OTR installs the C library "libotr" version v4.1.1.
+
+SEE ALSO
+    *   <https://otr.cypherpunks.ca/>
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2016 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

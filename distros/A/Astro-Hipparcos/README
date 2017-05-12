@@ -1,0 +1,41 @@
+NAME
+    Astro::Hipparcos - Perl extension for reading the Hipparcos star catalog
+
+SYNOPSIS
+      use Astro::Hipparcos;
+      my $catalog = Astro::Hipparcos->new("thefile.dat");
+      while (defined(my $record = $catalog->get_record())) {
+        print $record->get_HIP(), "\n"; # print record id
+      }
+
+DESCRIPTION
+    This is an extension for reading the Hipparcos star catalog.
+
+METHODS
+  new
+    Given a file name, returns a new Astro::Hipparcos catalog object.
+
+  get_record
+    Returns the next record (line) from the catalog as an
+    Astro::Hipparcos::Record object.
+
+SEE ALSO
+    Astro::Hipparcos::Record
+
+    <http://en.wikipedia.org/wiki/Hipparcos_Catalogue>
+
+    At the time of this writing, you could obtain a copy of the Hipparcos
+    catalogue from
+    <ftp://adc.gsfc.nasa.gov/pub/adc/archives/catalogs/1/1239/>
+    (hip_main.dat.gz).
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

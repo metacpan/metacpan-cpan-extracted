@@ -1,0 +1,29 @@
+Revision history for Perl extension Authen::TypeKey::Sign.
+
+0.07 Sep 11 2007
+    - Fixed sign method encoding to handle = properly. (Brian Cassidy)
+    - Code tidying
+ 
+0.06 Jan 25 2004
+    - Fixed stash method which was causing hide_email(0) calls to be 
+      ignored. (Brian Cassidy)
+
+0.05 Dec 23 2004
+    - Added missing Class::ErrorHandler dependency to Makefile.PL
+
+0.04 Dec 22 2004
+    - Added missing Math::Pari dependency to Makefile.PL
+
+0.03 Dec 22 2004
+    - Removed ability to override timestamp and token in sign call out
+      of security concerns. If not careful, an outside resources could
+      exploit these values.
+    - Minor documentation fixes.
+
+0.02 Dec 22 2004
+	- Initial release into CPAN.
+	- sign method takes objects that can param. (Ben Trott)
+	- Improved performance through mp2bin and Math::Pari. (Ben Trott)
+
+0.01 Dec 21 2004
+	- Private release. 

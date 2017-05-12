@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+
+use 5.008001;
+use strict;
+use warnings;
+use App::pwhich;
+
+# PODNAME: pwhich
+# ABSTRACT: Perl-only `which'
+our $VERSION = '1.14'; # VERSION
+
+exit App::pwhich::main(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pwhich - Perl-only `which'
+
+=head1 VERSION
+
+version 1.14
+
+=head1 SYNOPSIS
+
+ $ pwhich perl
+ $ pwhich -a perl          # print all matches
+ $ pwhich perl perldoc ... # look for multiple programs
+ $ pwhich -a perl perldoc ...
+
+=head1 DESCRIPTION
+
+`pwhich' is a command-line utility program for finding paths to other
+programs based on the user's C<PATH>. It is similar to the usually Unix
+tool `which', and tries to emulate its functionality, but is written
+purely in Perl (uses the module C<File::Which>), so is portable.
+
+=head2 Calling syntax
+
+ $ pwhich [-a] [-v] programname [programname ...]
+
+=head2 Options
+
+=over
+
+=item -a
+
+The option I<-a> will make C<pwhich> print all matches found in the
+C<PATH> variable instead of just the first one. Each match is printed
+on a separate line.
+
+=item -v
+
+Prints version (of C<File::Which>) and copyright notice and exits.
+
+=back
+
+=head1 SUPPORT
+
+Bugs should be reported via the GitHub issue tracker
+L<https://github.com/plicease/App-pwhich/issues>
+For other issues, contact the maintainer.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<File::Which>
+
+Perl API for L<pwhich>
+
+=item L<App::pwhich>
+
+Guts of this script.
+
+=item L<Devel::CheckBin>
+
+This module purports to "check that a command is available", but does not
+
+provide any documentation on how you might use it.
+
+=back
+
+=cut
+
+=head1 AUTHOR
+
+Original author: Per Einar Ellefsen E<lt>pereinar@cpan.orgE<gt>
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2002 by Per Einar Ellefsen <pereinar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

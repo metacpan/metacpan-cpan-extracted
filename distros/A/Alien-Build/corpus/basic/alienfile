@@ -1,0 +1,15 @@
+use alienfile;
+
+requires 'Foo', '1.00';
+
+configure {
+  requires 'Early::Module', '1.234';
+};
+
+share {
+  requires 'Bar', '2.00';
+};
+
+sys {
+  requires 'Baz', '3.00';
+};

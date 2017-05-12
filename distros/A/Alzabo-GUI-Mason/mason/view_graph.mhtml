@@ -1,0 +1,33 @@
+  <td>
+
+<div class="page">
+
+<p>
+Graphs are generated via the GraphViz module.  There is no way to
+exactly control the layout so results can be erratic, particularly for
+more complicated graphs.  Also, there is no simple way to constrain
+the size of the graph.
+</p>
+
+<p>
+Also, as you may have noticed below, schemas without any foreign keys
+defined look very silly.
+</p>
+
+<p>
+<a href="view_graph<% Alzabo::GUI::Mason::Config::mason_extension() %>?schema=<% $s->name %>&neato=<% $neato ? 0 : 1 %>">Alternate layout</a>
+</p>
+
+<img src="draw_graph<% Alzabo::GUI::Mason::Config::mason_extension() %>?schema=<% $s->name %>&neato=<% $neato %>">
+
+</div>
+
+  </td>
+<%args>
+$s
+$neato => 0
+</%args>
+<%attr>
+show_tables => 0
+show_columns => 0
+</%attr>

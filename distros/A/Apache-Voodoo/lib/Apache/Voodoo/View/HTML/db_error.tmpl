@@ -1,0 +1,58 @@
+<style>
+div.voodooDbError {
+	margin: 20px;
+}
+
+div.voodooDbError h1 {
+	color: red;
+	font-size: 16px;
+	padding-bottom: 4px;
+}
+
+div.voodooDbError h2 {
+	font-size: 14px;
+}
+
+div.voodooDbError table {
+	padding: 5px 0px 5px 0px;
+	border-collapse: collapse;
+}
+
+div.voodooDbError td {
+	padding-left: 2px;
+	padding-right: 2px;
+	border: 1px solid black;
+	color: #000000;
+}
+
+div.voodooDbError td.label {
+	font-weight: bold;
+}
+
+div.voodooDbError td.nowrap {
+	white-space: pre;
+}
+</style>
+
+<div class="voodooDbError">
+<h1>An Error Occurred While Processing This Request:</h1>
+<h2>Database Error</h2>
+<table>
+<tr>
+	<td class="label">Error:</td>
+	<td><tmpl_var message></td>
+</tr>
+<tr>
+	<td class="label">Module:</td>
+	<td><tmpl_var package></td>
+</tr>
+<tr>
+	<td class="label">Line:</td>
+	<td><tmpl_var line></td>
+</tr>
+<tr>
+	<td class="label">Query:</td>
+	<td class="nowrap"><tmpl_var query></td>
+</tr>
+</table>
+</div>

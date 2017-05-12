@@ -1,0 +1,15 @@
+#file:t/conf/extra.conf.in
+#-------------------------
+# this file will be Include-d by @ServerRoot@/conf/httpd.conf
+
+# where Apache2::Imager::Resize can be found
+PerlSwitches -I@ServerRoot@/../lib
+# preload the module
+PerlModule Apache2::Imager::Resize
+<Location /test>
+    PerlHandler Apache2::Imager::Resize
+    PerlSetVar ImgResizeNoCache on
+    SetHandler modperl
+    #PerlFixupHandler Apache2::Imager::Resize
+    #PerlSetVar ImgResizeCacheDir /var/cache/AIRCache/
+</Location>

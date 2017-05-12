@@ -1,0 +1,79 @@
+NAME
+    Akado::Account - get internet provider Akado account info
+
+SYNOPSIS
+    Akado is the internet provider that works in Moscow, Russia.
+    http://www.akado.ru/
+
+    Every Akado customer has access to the site https://office.akado.ru/
+    where he can see his account info. This module creates Perl object that
+    gets account info from that site.
+
+    Unfortunately Akdado account site has no API, so this module acts as a
+    browser to get needed info.
+
+    Every module method dies in case of error.
+
+METHODS
+  new
+    This a constuctor. It creates object. The constractor will not access
+    the account site. All network interaction is made in the methods that
+    return data.
+
+        my $aa = Akado::Account->new({
+            login => $login,
+            password => $password,
+        });
+
+  get_balance
+    It will return number. The number is the sum of money that is left on
+    the user account. The currencty is RUB (Russian rouble).
+
+        say $aa->get_balance();     # will print '749.82', or something like this
+
+    If the object hasn't accessed the Akado account site
+    https://office.akado.ru/ since the object was created, the method will
+    access site, get data from it and store it in the object. The object
+    will access Akado site only once, after saving data in the object all
+    methods use that cached data.
+
+  get_next_month_payment
+    It will return number. The number is the sum of money that the user will
+    have to pay for the next month. The currencty is RUB (Russian rouble).
+
+        say $aa->get_next_month_payment();
+
+    If the object hasn't accessed the Akado account site
+    https://office.akado.ru/ since the object was created, the method will
+    access site, get data from it and store it in the object. The object
+    will access Akado site only once, after saving data in the object all
+    methods use that cached data.
+
+AUTHOR
+    Ivan Bessarabov, `<ivan@bessarabov.ru>'
+
+SOURCE CODE
+    The source code for this module is hosted on GitHub
+    https://github.com/bessarabov/Akado-Account
+
+BUGS
+    Please report any bugs or feature requests in GitHub Issues
+    https://github.com/bessarabov/Akado-Account/issues
+
+TODO
+    For now the object can return only several numbers, but the Akado site
+    has much more data in it. So it will be great if this module can get
+    more details about user account.
+
+    For now he module does not have tests. It was created interacting with
+    the production system. This is not good. The test should be added that
+    mocks Akado site and its data.
+
+LICENSE AND COPYRIGHT
+    Copyright 2012 Ivan Bessarabov.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.

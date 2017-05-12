@@ -1,0 +1,67 @@
+clear
+power on
+regs
+
+op a2 55
+
+# IX should now show $55
+test ix = 55
+
+op 9a
+op a2 00
+
+# Only SP should now show $55
+test ix = 0
+test sp = 55
+
+op ba
+
+# SP and IX should now show $55
+test sp = 55
+test ix = 55
+
+# Now for the Z flag case --------------------
+power on
+
+op a2 00
+op 9a
+op a2 55
+
+# Clear Z with the ACC
+op a9 01
+
+# Should be: IX=55, SP=0, Z=0
+test ix = 55
+test sp = 0
+test z = 0
+
+op ba
+
+# SP and IX should now show $00 and Z should be 1
+test sp = 0
+test ix = 0
+test z = 1
+
+# Now for the S flag case --------------------
+power on
+
+op a2 f2
+op 9a
+op a2 55
+
+# Clear S with the ACC
+op a9 01
+
+# Should be: IX=55, SP=F2, S=0
+test ix = 55
+test sp = f2
+test s = 0
+
+op ba
+
+# SP and IX should now show $f2 and S should be 1
+test sp = f2
+test ix = f2
+test s = 1
+
+save verify_BA.txt

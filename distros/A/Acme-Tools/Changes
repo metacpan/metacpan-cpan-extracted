@@ -1,0 +1,34 @@
+Revision history for Perl extension Acme::Tools.
+
+See also HISTORY in Acme::Tools doc.
+
+0.21  Mar 2017   Improved nicenum() and its tests
+ 
+0.20  Mar 2017   Subs: a2h cnttbl h2a log10 log2 nicenum rstddev sec_readable
+                 throttle timems refa refaa refah refh refha refhh refs
+                 eachr globr keysr popr pushr shiftr splicer unshiftr valuesr
+                 Commands: 2bz2 2gz 2xz z2z
+
+0.172 Dec 2015   Subs: curb openstr pwgen sleepms sleepnm srlz tms username
+                  self_update install_acme_command_tools
+                  Commands: conv due freq wipe xcat (see "Commands")
+
+0.16  Feb 2015   bigr curb cpad isnum parta parth read_conf resolve_equation
+                 roman2int trim. Improved: conv (numbers currency) range ("derivatives")
+
+0.15  Nov 2014   Improved doc
+
+0.14  Nov 2014   New subs, improved tests and doc
+
+0.13  Oct 2010   Non-linux test issue, resolve. improved: bloom filter, tests, doc
+
+0.12  Oct 2010   Improved tests, doc, bloom filter, random_gauss, bytes_readable
+
+0.11  Dec 2008   Improved doc
+
+0.10  Dec 2008
+
+0.01  Mon Dec 22 01:26:38 2008
+	- original version; created by h2xs 1.22 with options
+		-A -X -n Acme::Tools
+

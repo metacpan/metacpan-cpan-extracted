@@ -1,0 +1,17 @@
+Revision history for plockf.
+
+0.04	2017-03-19
+	- cleanup only if lock file was successfully acquired
+	- make sure O_RDONLY is everywhere specified
+	- require newer Time::HiRes (because of RT #35899)
+	- simplify acquire_lock_other if -k was given
+	- fix minor Pod typo
+
+0.03	2016-07-03
+	- fix alarm handling
+
+0.02	2016-07-03
+	- implementation overhaul
+
+0.01    2016-07-03
+	- initial release

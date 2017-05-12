@@ -1,0 +1,1528 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2007 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+loghack - process and query apache logs
+
+=cut
+
+package bin::loghack;
+
+use ApacheLog::Parser qw(parse_line :fields);
+use ApacheLog::Parser::SkipList;
+
+use Getopt::Helpful;
+
+use YAML ();
+use POSIX ();
+use File::Basename qw(basename dirname);
+use Digest::MD5 ();
+
+use Date::Piece qw(date months weeks);
+
+use Carp;
+
+BEGIN {
+  unless($ENV{HOSTNAME}) {
+    if(open(my $fh, '<', '/etc/hostname')) {
+      chomp(my $line = <$fh>);
+      $ENV{HOSTNAME} = $line;
+    }
+  }
+}
+$SIG{CHLD} = sub {
+  my $child;
+  while(($child = waitpid(-1, POSIX::WNOHANG())) > 0) {
+    # XXX this dies before we get a cluster child's output?
+    if($?) {
+      my $code = $? >> 8;
+      my $sig = $? & 127;
+      die "$child status: $? ($code/$sig)";
+    }
+  }
+};
+
+sub open_file {
+  my ($file) = @_;
+
+  # better than IO::Zlib because it leverages multiple cores, duh
+  if($file =~ m/\.(gz|bz2)$/) {
+    my $ext = $1;
+    my %prog = (
+      gz  => 'gunzip',
+      bz2 => 'bunzip2',
+    );
+    my $prog = $prog{$ext} or die "cannot read $ext files";
+    my $pid = open(my $fh, '-|');
+    unless($pid) {
+      local $SIG{CHLD};
+      open(STDIN, '<', $file) or die "cannot open $file $!";
+      exec($prog, '-c') or die "ack $!";
+    }
+    #warn "launch $prog < $file on $pid\n";
+    return($fh);
+  }
+  else {
+    open(my $fh, '<', $file) or die "cannot open '$file' $!";
+    return($fh);
+  }
+}
+
+sub pipe_out {
+  my ($file) = @_;
+  $file =~ m/\.(gz|bz2)$/ or die "unknown extension on $file";
+  my $ext = $1;
+  my %prog = (
+    gz  => 'gzip',
+    bz2 => 'bzip2',
+  );
+  my $prog = $prog{$ext} or die "cannot write $ext files";
+
+  my $pid = open(my $fh, '|-');
+  unless($pid) {
+    local $SIG{CHLD};
+    open(STDOUT, '>', $file) or die "cannot write '$file' $!";
+    exec($prog, '-c') or die "ack $!";
+  }
+  #warn "launch $prog > $file on $pid\n";
+  return($fh);
+}
+
+sub main {
+  my (@args) = @_;
+
+  my %o = (
+    archive    => '',
+    repository => '',
+    missok     => 0,
+    daemon     => '',
+    cluster    => '',
+    skip       => 1,
+    quiet      => 0,
+  );
+  my $hopt = Getopt::Helpful->new(
+    usage => 'CALLER <mode> [options] <arguments>',
+    ['a|archive=s', \$o{archive}, '<dir>', 'archive dir'],
+    ['r|repository=s', \$o{repository}, '<dir>', 'repository dir'],
+    ['missok', \$o{missok}, '', 'skip missing files'],
+    ['d|daemon=s', \$o{daemon}, '<dir>', 'daemon mode - needs chdir'],
+    ['c|cluster=s', \$o{cluster}, '<hosts>', 'cluster mode'],
+    ['s|skip!', \$o{skip}, '', 'use skipper (default yes)'],
+    ['q|quiet', \$o{quiet}, '', 'suppress status'],
+    '+help',
+  );
+  $hopt->Get_from(\@args);
+
+  if(not $o{repository}) {
+    $o{repository} = '.' if(-e '.config');
+  }
+
+  if($o{daemon}) {
+    daemon(\%o, @args);
+    exit;
+  }
+
+  my %modes = map({$_ => 1} qw(
+    makelinks
+    import
+    prep check sweep verify confirm list
+    unique day_unique month_unique month_unique2
+    compile
+    aggregate report date dump tabulate count reskip
+  ));
+  my $mode = shift(@args);
+  $modes{$mode} or die "USAGE: mode must be one of ",
+    join(", ", sort(keys(%modes))), "\n";
+
+  # TODO deal with the do_ stuff
+  if($o{cluster}) {
+    cluster(\%o, $mode, @args);
+  }
+  else {
+    my $run = __PACKAGE__->can('do_' . $mode) or
+      die "cannot find method 'do_$mode'";
+    $run->(\%o, @args);
+  }
+}
+
+sub name_as_date {
+  my ($n) = @_;
+  $n =~ s/(?:.*\.)?(\d{4}-\d{2}-\d{2})\..*/$1/ or
+    croak("weird name -- $n");
+  $n =~ s#.*/##;
+  return($n);
+}
+sub nice_name {
+  my ($name) = @_;
+  my @d = split(/\/+/, $name);
+  my $n = '*.' . name_as_date(pop(@d)) . '.*';
+  @d or return($n);
+  return(join("/", $d[-1], $n));
+}
+sub record_source {
+  my ($opt, $file, $dir, $md5) = @_;
+
+  my $writefile = $dir.$md5;
+
+  want_dir($dir);
+
+  if(-e $writefile) {
+    warn "skipping $writefile ($file)\n";
+    return;
+  }
+  open(my $fh, '>', $writefile) or die "cannot write '$writefile' $!";
+  print $fh File::Basename::basename($file), "\n";
+  close($fh) or die "cannot write '$writefile' $!";
+}
+sub want_dir {
+  my ($dir) = @_;
+
+  return if(-d $dir);
+
+  unless(mkdir($dir)) {
+    die "cannot create $dir $!" unless(-d $dir);
+  }
+}
+
+sub daemon {
+  my ($opt, @args) = @_;
+
+  my $dir = $opt->{daemon};
+  chdir($dir) or die "no such dir $dir\n";
+  $| = 1;
+  while(my $line = <STDIN>) {
+    chomp($line);
+    main(split(/\t/, $line));
+    print ".done\n";
+    #warn "done\n";
+    #die ".done\n";
+    #sleep(1);
+  }
+}
+
+sub start_cluster {
+  my ($dir, @hosts) = @_;
+  require IPC::Open3;
+  require IO::Select;
+  require IO::Handle;
+  my $sel = IO::Select->new();
+  my %track;
+  my $prog = basename($0);
+  foreach my $host (@hosts) {
+    (my $realhost = $host) =~ s/#\d+$//;
+    my $stdin;
+    my ($stdout, $stderr) = map({IO::Handle->new} 1..3);
+    my $pid = IPC::Open3::open3(
+      $stdin, $stdout, $stderr,
+      ($realhost eq 'localhost' ? () : ('ssh', $realhost)),
+      $prog, '-d', $dir
+    );
+    #warn "started $pid to $host";
+    $stdout->autoflush;
+    $stderr->autoflush;
+    $pid or die "gah no pid\n";
+    #warn "$stdin, $stdout, $stderr";
+    $track{$pid} = my $obj = {
+      stdin  => $stdin,
+      stdout => $stdout,
+      stderr => $stderr,
+      host   => $host,
+    };
+    $sel->add($obj->{sel_o} = [$stdout, $pid, 'stdout']);
+    $sel->add($obj->{sel_e} = [$stderr, $pid, 'stderr']);
+  }
+  return($sel, %track);
+}
+my $lglob = sub {
+  my ($opt, @spec) = @_;
+  local $opt->{lazy_glob} = 1;
+  return(repo_files($opt, @spec));
+};
+my $datethru = sub {shift(@_); _date_dwim(@_) };
+my %cluster_fspec = (
+  report        => $lglob,
+  compile       => $datethru,
+  unique        => $lglob,
+  day_unique    => $datethru,
+  month_unique  => sub {shift(@_); @_},
+  month_unique2 => sub {$_[1]},
+);
+sub cluster {
+  my ($opt, $mode, @files) = @_;
+
+  require Cwd;
+  my $dir = Cwd::abs_path($opt->{repository});
+
+  if(my $code = $cluster_fspec{$mode}) {
+    @files = $code->($opt, @files);
+    #die join("\n  ", 'files', @files);
+  }
+  else {
+    @files = repo_files($opt, @files);
+    foreach my $file (@files) {
+      my $msg = "missing $file\n";
+      (-e $file) or $opt->{missok} ? warn $msg : die $msg;
+    }
+  }
+
+  my @hosts = map({my ($h, $n) = split(/:/, $_);
+    ($n ? map({$h.'#'.$_} 1..$n) : $h)
+  } split(/, ?/, $opt->{cluster}));
+
+  if(@hosts > @files) { # XXX weighting?
+    warn "that would get boring\n";
+    $#hosts = $#files;
+  }
+  my ($sel, %track) = start_cluster($dir, @hosts);
+
+  my $hlen = 0;
+  foreach my $host (@hosts) {
+    my $l = length($host);
+    $hlen = $l if($l > $hlen);
+  }
+
+  #die map({"$_ => " . join(", ", %{$track{$_}})} keys(%track));
+  my %hmap = map({$track{$_}{host} => $_} keys(%track));
+  my %sels = map({$track{$_->[1]}{host} => $_} $sel->handles); 
+
+  my %blacklist;
+  my $output = sub {
+    my ($host, $which, @lines) = @_;
+    my $pref = ($which eq 'stderr' ? '!' : '#');
+    printf("%-${hlen}s %s %s", $host, $pref, $_) for(@lines);
+  };
+  my $end_host = sub {
+    my ($host) = @_;
+
+    my $pid = delete($hmap{$host}) or die "no pid at $host";
+    my $obj = delete($track{$pid});
+
+    warn ' 'x($hlen+1), "closing $host\n";
+    close($obj->{stdin});
+    my $errh = $obj->{stdout};
+    local $SIG{ALRM} = sub { warn "no stderr on $host\n"};
+    alarm(2);
+    $output->($host, 'stderr', <$errh>);
+    alarm(0);
+    $sel->remove(delete($obj->{sel_o})) or die;
+    #$errh->blocking(0);
+    $sel->remove(delete($obj->{sel_e})) or die;
+  };
+  my $fill_host = sub {
+    my ($host) = @_;
+
+    if($blacklist{$host}) {
+      warn "$host is blacklisted\n";
+      eval { $end_host->($host) };
+      return;
+    }
+
+    my $pid = $hmap{$host} or die "no pid at $host";
+    my $obj = $track{$pid};
+    my $fh = $obj->{stdin};
+
+    unless(@files) {
+      $end_host->($host);
+      return;
+    }
+
+    my $file = shift(@files);
+    #warn "fill $host with $file\n";
+    if($opt->{missok} and not -e $file) {
+      warn "still missing '$file'\n";
+      my @later = ($file);
+      while($file = shift(@files)) {
+        if(-e $file) {
+          push(@files, @later);
+          last;
+        }
+        else {
+          warn "still missing '$file'\n";
+          push(@later, $file);
+        }
+      }
+      $file or die "out of files to use while waiting\n";
+      # grr, needs a loop
+    }
+    #warn "send $host $mode\t$file\n";
+    print $fh "$mode\t$file\n";
+  };
+  local $SIG{CHLD} = sub {
+    my $child;
+    while(($child = waitpid(-1, POSIX::WNOHANG())) > 0) {
+      if($?) {
+        my $code = $? >> 8;
+        my $sig = $? & 127;
+        my $host = $track{$child}{host};
+        warn "  error $host ($child) status: $? ($code/$sig)\n";
+        $blacklist{$host} = 1;
+        $end_host->($host);
+      }
+    }
+  };
+
+
+  # go!
+  $fill_host->($_) for(@hosts);
+
+  my %f = (stderr => 0, stdout => 1);
+  while($sel->count) {
+    READ: while(my @ready = $sel->can_read) {
+      @ready = sort({$f{$a->[2]} <=> $f{$b->[2]}} @ready);
+
+      foreach my $bit (@ready) {
+        my ($fh, $pid, $which) = @$bit;
+        my $obj = $track{$pid};
+        my $host = $obj->{host};
+        $fh->blocking(0);
+        until(eof($fh)) {
+          my $line = <$fh>;
+
+          # XXX probably never need this bit
+          unless(defined($line)) {
+            warn "undef line from $host\n";
+            $sel->remove($bit);
+            last;
+          }
+          # TODO handle death
+          if(($which eq 'stdout') and ($line =~ m/^.done$/)) {
+            #warn "$host said done\n";
+            $fill_host->($host);
+            last;
+          }
+          $output->($host, $which, $line);
+        }
+        $fh->blocking(1);
+      }
+    }
+    #warn "twiddling\n";
+  }
+  if(@files) {
+    die "ACK all my hosts died! (",
+      scalar(@files), " files left to process.)\n";
+  }
+}
+
+=head2 reskip
+
+Regenerate the skiplist for a given chunk.
+
+=cut
+
+sub do_reskip {
+  my ($opt, @files) = @_;
+
+  @files = repo_files($opt, @files);
+
+  my $skipper = get_skipper($opt);
+  my $doskip = $skipper->get_matcher;
+  foreach my $file (@files) {
+    unless(-e $file) {
+      die "no such file:\n  $file\n";
+    }
+    my $fh = open_file($file);
+
+    my $nicename = nice_name($file);
+    my $start = time;
+    print "$nicename -- ",
+      sprintf("%02d:%02d:%02d", (localtime($start))[2,1,0]), "\n";
+
+    my $skipfile = skipfilename($opt, $file);
+    my $sw = $skipper->new_writer($skipfile);
+    my $lnum = 0;
+    while(my $line = <$fh>) {
+      $lnum++;
+      chomp($line);
+      my @v = split(/\t/, $line);
+      # create skiplist
+      if($doskip and $doskip->(\@v)) {$sw->skip($lnum);}
+    }
+  }
+
+}
+
+=begin notes
+
+The files are split per-hour.  Time zone adjustments are going to be an
+issue.  There's also a potential race condition between two nodes, so
+the outputs will always have a ".$chunk" appended to them.  The value of
+$part is either 0 or 1 (and only switched to 1 at the start of the file.)
+
+And another issue:  delay.  The request init time is what's shown, but
+it doesn't get logged until the request completes.  So a 10min request
+will not appear until 10min later.  If there are any large downloads,
+they could possibly even span a couple of logrotates.
+
+This also means that tomorrow or the next day could concievably hold a
+bit of data from a big download that started 24+ hours ago.  In
+practice, logrotate is actually just disposing of this data when it runs
+gzip.  That is, a request always goes in the logfile that was open when
+the apache process spawned?
+
+Still need to figure out the cleanup pass.  Add the skiplists together
+(and/or rename them), figure out where to tie-off the last item, etc.
+Probably need some tracking of sources and/or chunks.  Chunks can
+probably be treated as closed until further notice as long as a
+chunkcount file is maintained somewhere.
+
+=end notes
+
+=begin tznotes
+
+Probably going to just leave the date string unprocessed (but we will
+definitely slot it into files according to the adjusted zone.)  Of
+course, the date+hour+tz is used to memoize the outgoing date, so taking
+the localtime and chunking that back together with the minutes+seconds
+wouldn't be a big deal.  We will need to address the dst issue though.
+
+=end tznotes
+
+=cut
+
+=head2 prep
+
+Parse a raw logfile and split it into hourly chunks.
+
+  loghack prep servername/logfile.gz
+
+=cut
+
+sub do_prep {
+  my ($opt, @files) = @_;
+
+  my $repo = $opt->{repository} or
+    die "must have repository setting for prep()\n";
+
+  my $doskip;
+  my $skipper;
+  if(-e (my $skipconf = "$repo/.config/skips.conf")) {
+    my ($skip) = YAML::LoadFile($skipconf);
+    $skipper = ApacheLog::Parser::SkipList->new();
+    $skipper->set_config($skip);
+    $doskip = $skipper->get_matcher;
+  }
+
+  my @loaded;
+  foreach my $file (@files) {
+    unless(-e $file) {
+      my $msg = "no such file:\n  $file\n";
+      if($opt->{missok}) { warn $msg; next };
+      die $msg;
+    }
+    my $outpath = repository_path($opt, $file);
+    my $fh = open_file($file);
+
+    my $nicename = nice_name($file);
+
+    my $checksum = checksum($fh, 50);
+    my $checkfile = "$outpath.loaded/$checksum";
+    my $linecount = 0;
+    my $ch;
+    if(-e "$outpath/.loaded/$checksum") {
+      warn "assume $nicename is done\n";
+      {local $SIG{CHLD}; close($fh);} # stupid macs
+      next;
+      # TODO fast-forward support
+      # $linecount = $old_linecount; and etc
+    }
+    else {
+      record_source($opt, $file, "$outpath.sources/", $checksum);
+
+      # TODO this could stand to be more atomic
+      { # record results
+        want_dir("$outpath.loaded");
+        my $tag = ($ENV{HOSTNAME} || '') . '.' . $$;
+        open($ch, '>', "$checkfile.$tag") or
+          die "cannot write '$checkfile.$tag' $!";
+        # TODO chmod
+        rename("$checkfile.$tag", $checkfile) or
+          die "cannot make $checkfile $!";
+      }
+
+      # TODO a replayable pipe would be nice
+      {local $SIG{CHLD}; close($fh);} # stupid macs
+      $fh = open_file($file);
+    }
+
+    $opt->{quiet} or print "$nicename -- ",
+      sprintf("%02d:%02d:%02d", (localtime)[2,1,0]), "\n";
+
+    my %outhandles;
+    my $sw;
+    my $out;
+
+    my $chunk = 2;
+    my $next_chunk = sub {
+      my ($date, $hour, $tz) = @_;
+
+      # might have already started that chunk
+      if(my $handles = $outhandles{"$date$hour$tz"}) {
+        #warn "back to $date:$hour$tz\n";
+        ($out, $sw) = @$handles;
+        return;
+      }
+
+      # TODO include timezone in this calc
+      my $datestring = get_datestring($date);
+
+      # make the tz three digits
+      (my $tzout = $tz) =~ s/00$//;
+      $tzout = '+' . $tzout if(length($tzout) == 2);
+
+      my $outfile = $outpath . $datestring . ".$hour$tzout.$chunk.tsv.gz";
+      push(@loaded, $outfile);
+      #warn "writing $outfile\n";
+      if(-e $outfile) {
+        # XXX how to decide whether to skip completely?
+        die "already have $outfile\n";
+      }
+      $chunk = 1; # from now on
+      if($skipper) { # TODO how to reset skipcount?
+        my $skipfile = skipfilename($opt, $outfile);
+        $sw = $skipper->new_writer($skipfile);
+      }
+      $out = pipe_out($outfile);
+      print $ch File::Basename::basename($outfile), "\n";
+      $outhandles{"$date$hour$tz"} = [$out, $sw];
+    };
+
+    my $cdate = '';
+    my %lc;
+    while(my $line = <$fh>) {
+      $linecount++;
+      chomp($line);
+      my $v = parse_line($line);
+
+      # check date/time
+      my ($d, $h, $rest) = split(/:/, $v->[dtime], 3);
+      my ($tz) = ($rest =~ m/ ([-+]?\d+)/);
+      if("$d$h$tz" ne $cdate) {
+        $next_chunk->($d, $h, $tz);
+        $cdate = "$d$h$tz";
+        $lc{$cdate} ||= 0;
+        #warn "$d $h $tz\n";
+      }
+      my $lnum = ++$lc{$cdate};
+
+      # create skiplist
+      if($doskip->($v)) {$sw->skip($lnum);}
+
+      print $out join("\t", @$v), "\n";
+    }
+
+    print $ch "$linecount\n";
+    close($ch) or die "write '$checkfile' failed $!";
+    # TODO race checks/chmod
+
+  }
+  wait(); # XXX need this?
+  return(@loaded);
+}
+
+=for doc ###############################################################
+Examine the */.loaded files and verify that each one has a linecount
+(finished loading.)
+  loghack check */.loaded/*
+
+=cut
+
+sub do_check {
+  my ($opt, @files) = @_;
+
+  foreach my $file (@files) {
+    my $err = run_check($file) or next;
+    print "NC $file (", scalar(@$err), " parts)\n";
+  }
+}
+sub do_sweep {
+  my ($opt, @files) = @_;
+
+  foreach my $file (@files) {
+    my $err = run_check($file) or next;
+    print "NC $file (", scalar(@$err), " parts)\n";
+    foreach my $part (@$err) {
+      print "  $part\n";
+      if(-e $part) {
+        unlink($part) or die "cannot unlink('$part') $!";
+      }
+    }
+    unlink($file) or die "cannot unlink('$file') $!";
+  }
+}
+sub run_check {
+  my ($checkfile) = @_;
+
+  die "'$checkfile' is a directory" if(-d $checkfile);
+  open(my $fh, '<', $checkfile) or die "cannot read '$checkfile' $!";
+  my @list = map({chomp; $_} <$fh>);
+
+  return() if(@list and $list[-1] and $list[-1] =~ m/^\d+$/);
+
+  my $dir = File::Basename::dirname(File::Basename::dirname($checkfile));
+  return([map({"$dir/$_"} @list)]);
+}
+
+sub _date_dwim {
+  my (@in) = @_;
+
+  my @dates;
+  while(@in) {
+    my $date = shift(@in);
+
+    if($date eq 'thru') {
+      push(@dates, date(pop(@dates))->thru(date(shift(@in))));
+      next;
+    }
+    push(@dates, $date);
+  }
+  return(@dates);
+}
+
+=for doc ###############################################################
+Given a date range, verify that all files + hours for that server are
+done (with the exception of those listed in the .MIA file.)
+
+=cut
+
+sub do_verify {
+  my ($opt, @in) = @_;
+
+  my @dates = _date_dwim(@in) or die "you gave no dates";
+  foreach my $dir (glob('*')) {
+    (-d $dir) or next;
+    foreach my $date (@dates) {
+      my @got = glob("$dir/$date*");
+      print "$dir/$date ", scalar(@got), "\n";
+    }
+  }
+}
+
+=for doc ###############################################################
+Make sure that all files are claimed somewhere.  This is useful when a
+load-in crashed.
+
+  loghack confirm *
+
+=cut
+
+sub do_confirm {
+  my ($opt, @dirs) = @_;
+
+  foreach my $dir (@dirs) {
+    my %loaded = map({$_ => 1} sub {
+      my ($s_dir) = @_;
+      $s_dir .= '/.loaded';
+      -d $s_dir or return();
+      opendir(my $dh, $s_dir) or die "cannot opendir '$s_dir' $!";
+      my @ans;
+      foreach my $name (grep({$_ !~ m/^\./} readdir($dh))) {
+        my $file = "$s_dir/$name";
+        open(my $fh, '<', $file) or die "cannot read '$file' $!";
+        my @list = map({chomp; $_} <$fh>);
+        pop(@list) if($list[-1] =~ m/^\d+$/);
+        push(@ans, @list);
+      }
+      return(@ans);
+    }->($dir)
+    );
+    $dir =~ s#/*$#/#;
+    opendir(my $dh, $dir) or die "cannot opendir '$dir' $!";
+    foreach my $name (grep({$_ !~ m/^\./} readdir($dh))) {
+      unless($loaded{$name}) {
+        print "$dir$name\n";
+      }
+    }
+  }
+  # TODO exit with error?
+}
+
+=head2 list
+
+List files in the repository.
+
+  loghack list 2008-01-01 thru 2008-01-31 in *
+
+=cut
+
+sub do_list {
+  my ($opt, @files) = @_;
+
+  @files = repo_files($opt, @files);
+  print join("\n", @files), "\n";
+}
+
+# TODO repo_hash as groups of 'in' bits
+
+# note: also parses stuff like '2007-10-12 in foo bar baz'
+
+sub repo_files {
+  my ($opt, @files) = @_;
+
+  my $repo = $opt->{repository} or die "must have repository";
+
+  my $spec_re = qr/(?:^\d{4}-\d{2}-\d{2}$)|\*/;
+  return(@files)
+    unless($files[0] =~ $spec_re and not -f $files[0]);
+
+  my @dates;
+  while(@files) {
+    my $date = shift(@files);
+    if($date eq 'in') {
+      last;
+    }
+    elsif($date eq 'thru') {
+      push(@dates, date(pop(@dates))->thru(date(shift(@files))));
+      next;
+    }
+    $date =~ $spec_re or die "$date doesn't look like a date";
+    push(@dates, $date);
+  }
+
+  # TODO need an iterator for this
+  my @globs;
+  if(my @dirs = @files) {
+    (-d $_) or die "$_ not a dir" for(@dirs);
+    @globs = map({my $d = $_; map({"$repo/$_/$d.*"} @dirs)} @dates);
+  }
+  else {
+    @globs = map({"$repo/$_"} @dates);
+  }
+  $opt->{lazy_glob} and return(@globs);
+  @files = ();
+  foreach my $glob (@globs) {
+    my @got = glob($glob);
+    (-f $_) or die "$_ is not a file" for(@got);
+    push(@files, @got);
+  }
+  return(@files);
+}
+
+=head2 compile
+
+Assemble reports into daily chunks (in the .compiled/ directory.)
+
+  loghack compile 2007-10-01
+
+=cut
+
+sub do_compile {
+  my ($opt, @dates) = @_;
+  foreach my $date (@dates) {
+    do_aggregate($opt, 'compile', $date);
+  }
+}
+
+=head2 aggregate
+
+Build aggregate reports.
+
+  loghack aggregate month $start_date
+
+  loghack aggregate week $start_date
+
+=cut
+
+sub do_aggregate {
+  my ($opt, @spec) = @_;
+
+  require ApacheLog::Parser::Report;
+
+  my ($type, $date) = @spec;
+  my $name;
+  my @files;
+
+  $opt->{quiet} or
+    printf("$date -- %02d:%02d:%02d\n", (localtime)[2,1,0]);
+  if($type eq 'compile') {
+    @files = repo_files($opt, $date, 'in', glob('*'));
+    want_dir($opt->{repository} . '/.compiled');
+    $name = '.compiled/' . $date;
+  }
+  else {
+    my %disp = (
+      month => sub {shift(@_)->end_of_month},
+      week  => sub {shift(@_)+6},
+    );
+    $date = Date::Piece->new($date);
+    my $do = $disp{$type} or
+      die "'$type' must be one of ", join(', ', keys(%disp));
+    @files = map({$opt->{repository} . '/.compiled/' . $_ . '.yml'}
+      $date->thru($do->($date))
+    );
+    want_dir($opt->{repository} . '/.aggregate');
+    $name = ".aggregate/$type.$date";
+  }
+
+  my $r_config = $opt->{repository} . '/.config/report.conf';
+  (-e $r_config) or die "must have a report config file $r_config";
+  my $rep = ApacheLog::Parser::Report->new(
+    conf => YAML::LoadFile($r_config)
+  );
+
+  require YAML::Syck;
+
+  foreach my $file (@files) {
+    my $report_file = ($file =~ m/\.yml$/) ?
+      $file : report_filename($opt, $file);
+    # warn "load $report_file\n";
+    my $data = YAML::Syck::LoadFile($report_file);
+    $rep->aggregate($data);
+  }
+
+  # and save them
+  my $ag_name = $opt->{repository} . '/' . $name . '.yml';
+
+  if($type eq 'compile') {
+    $rep->write_report($ag_name);
+    return;
+  }
+
+  my ($text, $yaml) = $rep->print_report;
+
+  {
+    open(my $ofh, '>', $ag_name) or
+      die "cannot write $ag_name $!";
+    print $ofh $yaml;
+  }
+  {
+    $ag_name =~ s/\.yml$/.txt/;
+    open(my $ofh, '>', $ag_name) or
+      die "cannot write $ag_name $!";
+    print $ofh $text;
+  }
+}
+
+=head2 tabulate
+
+  loghack tabulate daily 2007-10-01 thru 2007-10-31
+
+=cut
+
+sub do_tabulate {
+  my ($opt, @list) = @_;
+
+  my $daily = ($list[0] eq 'daily') ? shift(@list) : 0;
+
+  require ApacheLog::Parser::Report;
+
+  my $outname;
+  my @files;
+  if($daily) {
+    if(@list == 3 and $list[1] eq 'thru') {
+      $outname = join('_', @list[0,2]);
+      $opt->{quiet} or print "$outname\n";
+    }
+    @list = sort(_date_dwim(@list));
+
+    # TODO something to allow this-month-so-far
+    my %spec = map({
+      $_ => [
+        $opt->{repository} . '/.compiled/' . $_ . '.yml'
+      ]} @list);
+    @files = (\%spec, @list);
+    foreach my $file (map({@{$spec{$_}}} keys %spec)) {
+      (-e $file) or die "no such file: $file\n";
+    }
+  }
+  else {
+    @list = sort(@list);
+
+    my $dir = $opt->{repository} . '/.aggregate/';
+    @files = map({$dir . $_ . '.yml'} @list); 
+    foreach my $file (@files) {
+      (-e $file) or die "no such file: $file\n";
+    }
+  }
+
+  my $r_config = $opt->{repository} . '/.config/report.conf';
+  (-e $r_config) or die "must have a report config file $r_config";
+  my $rep = ApacheLog::Parser::Report->new(
+    conf => YAML::LoadFile($r_config)
+  );
+
+  my @table = $rep->table_report(@files);
+  unshift(@table, ['', @list]);
+  if($outname) {
+    my $t_dir = '.tables';
+    want_dir($t_dir);
+    my $file = "$t_dir/$outname.tsv";
+    open(my $fh, '>', $file) or die "cannot write '$file' $!";
+    print $fh join("\n", map({join("\t", @$_)} @table)), "\n";
+    close($fh) or die "cannot write '$file' $!";
+    $opt->{quiet} or print "wrote $file\n";
+  }
+  else {
+    print join("\n", map({join("\t", @$_)} @table)), "\n";
+  }
+}
+
+=head2 report
+
+Crunch the prepared data and generate a report for the given chunk(s).
+
+  loghack report $server/$chunk.tar.gz
+
+=cut
+
+sub do_report {
+  my ($opt, @files) = @_;
+
+  require ApacheLog::Parser::Report;
+
+  my $do_print = !$opt->{quiet};
+  my $show_status = sub {
+    my ($status) = @_;
+    $do_print or return;
+    printf("$status -- %02d:%02d:%02d\n", (localtime)[2,1,0]);
+  };
+  if(@files == 1 and $files[0] =~ m/\*$/) {
+    $show_status->($files[0]);
+    $do_print = 0;
+  }
+  @files = repo_files($opt, @files);
+  my $skipper = get_skipper($opt);
+
+  my $r_config = $opt->{repository} . '/.config/report.conf';
+  (-e $r_config) or die "must have a report config file $r_config";
+
+  foreach my $file (@files) {
+    my $fh = open_file($file);
+
+    my $rep = ApacheLog::Parser::Report->new(
+      conf => YAML::LoadFile($r_config)
+    );
+    my $rfunc = $rep->get_func;
+
+    my $report_file = report_filename($opt, $file);
+    if(-e $report_file) {
+      # TODO unless force or check staleness or something
+      warn "skip (got) $file\n";
+      next;
+    }
+
+    $show_status->($file);
+
+    my $sr;
+    if($skipper) {
+      my $skipfile = skipfilename($opt, $file);
+      (-e $skipfile) or die "missing $skipfile";
+      $sr = $skipper->new_reader($skipfile);
+    }
+    my $skip = defined($sr) ? $sr->next_skip : 0;
+
+    my $lnum = 0;
+    while(my $line = <$fh>) {
+      $lnum++;
+      if($lnum == $skip) {
+        $lnum += $sr->skip_lines($fh);
+        $skip = $sr->next_skip;
+        next;
+      }
+
+      my @v = split(/\t/, $line);
+      # now for some reporting
+      $rfunc->(\@v);
+      #if($lnum > 100000) { warn "exit hack"; last;}
+    }
+    $rep->write_report($report_file);
+  }
+
+}
+
+=head2 unique
+
+Experimental:  count/report unique visitors within a chunk.
+
+=cut
+
+sub do_unique {
+  my ($opt, @files) = @_;
+
+  my $do_print = !$opt->{quiet};
+  my $show_status = sub {
+    my ($status) = @_;
+    $do_print or return;
+    printf("$status -- %02d:%02d:%02d\n", (localtime)[2,1,0]);
+  };
+  if(@files == 1 and $files[0] =~ m/\*$/) {
+    $show_status->($files[0]);
+    $do_print = 0;
+  }
+  @files = repo_files($opt, @files);
+
+  foreach my $file (@files) {
+    my $fh = open_file($file);
+    $show_status->($file);
+
+    my %unique;
+    while(my $line = <$fh>) {
+      my ($ip, $rest) = split(/\t/, $line);
+      ($unique{$ip}||= 0)++;
+    }
+
+    my $u_file = uniques_filename($opt, $file);
+    want_dir(File::Basename::dirname($u_file));
+    my $ofh = pipe_out($u_file);
+    print $ofh map({"$_\t$unique{$_}\n"} sort keys %unique);
+  }
+}
+
+=head2 day_unique
+
+Experimental:  count/report unique visitors within a day.
+
+=cut
+
+sub do_day_unique {
+  my ($opt, @dates) = @_;
+
+  want_dir($opt->{repository} . '/.day_uniques');
+  foreach my $date (@dates) {
+    $opt->{quiet} or
+      printf("$date -- %02d:%02d:%02d\n", (localtime)[2,1,0]);
+    my @files = repo_files($opt, $date, 'in', glob('*'));
+    my %unique;
+    foreach my $file (@files) {
+      my $u_file = uniques_filename($opt, $file);
+      my $fh = open_file($u_file);
+      while(my $line = <$fh>) {
+        chomp($line);
+        my ($ip, $count) = split(/\t/, $line, 2);
+        ($unique{$ip}||=0)+= $count;
+      }
+    }
+    my $outfile = day_uniques_filename($opt, $date);
+    my $ofh = pipe_out($outfile);
+    print $ofh map({"$_\t$unique{$_}\n"} sort keys %unique);
+  }
+}
+
+# here we run out of memory, so need a piecewise algorithm
+
+=head2 month_unique
+
+Experimental:  count/report unique visitors within a month.
+
+=cut
+
+sub do_month_unique {
+  my ($opt, $month) = @_;
+
+  my $out_dir = $opt->{repository} . '/.month_uniques';
+  want_dir($out_dir);
+  my $source_dir = $opt->{repository} . '/.day_uniques';
+
+  $opt->{quiet} or
+    printf("$month -- %02d:%02d:%02d\n", (localtime)[2,1,0]);
+  my @work;
+  my $fill = sub {
+    my ($index) = @_;
+    my $val;
+    unless(defined($val = readline($work[$index][2]))) {
+      splice(@work, $index, 1);
+      return;
+    }
+    chomp($val);
+    @{$work[$index]}[0,1] = split(/\t/, $val, 2);
+  };
+  foreach my $file (glob("$source_dir/$month-*.gz")) {
+    my $fh = open_file($file);
+    push(@work, ['', 0, $fh]);
+    $fill->($#work);
+  }
+
+  my $outfile = $out_dir . '/' . $month . '.gz';
+  my $ofh = pipe_out($outfile);
+
+  my $ucount = 0;
+  my $outc = 0;
+  while(@work) {
+    (++$ucount % 1_000_000) or do {
+      $opt->{quiet} or
+        printf("$ucount ($outc) -- %02d:%02d:%02d\n", (localtime)[2,1,0])
+    };
+    my @l = sort({$work[$a][0] cmp $work[$b][0]} 0..$#work);
+    my @o = (0);
+    my $ip = $work[$l[0]][0];
+    for(1..$#l) {
+      ($ip eq $work[$l[$_]][0]) or last;
+      push(@o, $_);
+    }
+
+    my $count = 0;
+    $count += $work[$l[$_]][1] for(@o);
+
+    # have to be careful about stale indices in removal
+    $fill->($_) for(sort({$b <=> $a} @l[@o]));
+    $outc += scalar(@o);
+    print $ofh "$ip\t$count\n";
+  }
+
+  # and write the count
+  {
+    my $cfile = $out_dir . '/' . $month . '.count';
+    open(my $out, '>', $cfile) or die "cannot write '$cfile' $!";
+    print $out $ucount, "\n"; 
+    print "$month -- $ucount\n";
+  }
+}
+
+=head2 month_unique2
+
+Experimental:  count/report unique visitors within a month (alternate,
+memory-hungry algorithm.)
+
+=cut
+
+sub do_month_unique2 {
+  my ($opt, $month) = @_;
+
+  my $out_dir = $opt->{repository} . '/.month_uniques';
+  want_dir($out_dir);
+  my $source_dir = $opt->{repository} . '/.day_uniques';
+  my %unique;
+  my $ucount = 0;
+  foreach my $file (glob("$source_dir/$month-*.gz")) {
+    my $fh = open_file($file);
+    $opt->{quiet} or
+      printf("$file -- %02d:%02d:%02d\n", (localtime)[2,1,0]);
+    while(my $line = <$fh>) {
+      chomp($line);
+      my ($ip, $count) = split(/\t/, $line, 2);
+      unless($unique{$ip}) {
+        $unique{$ip} = 1;
+        $ucount++;
+      }
+    }
+  }
+  my $outfile = $out_dir . '/' . $month . '.count';
+  open(my $ofh, '>', $outfile) or
+    die "cannot write '$outfile' $!";
+  print $ofh $ucount, "\n"; 
+  print $ucount, "\n";
+}
+
+=head2 makelinks
+
+Create hardlinks with dated names.
+
+=cut
+
+sub do_makelinks { # TODO --delete option?
+  my ($opt, $ldir, @files) = @_;
+
+  if(-e $ldir) {
+    (-d $ldir) or die "USAGE: makelinks <dir> <files>\n";
+  }
+  unless(-d $ldir) {
+    mkdir($ldir) or die "cannot create $ldir $!";
+  }
+
+  foreach my $file (@files) {
+    my $date = get_date($file);
+
+    # XXX bah
+    my $base = basename($file);
+    my $dir  = basename(dirname($file));
+    my $dest = (-d "$ldir/$dir" ? "$ldir/$dir" : $ldir);
+    my $ext;
+    if($base =~ s/(?:\.\d+)?(\.(?:gz|bz2))?$//) {
+      $ext = $1 || '';
+    }
+    $dest .= '/' . "$base.$date$ext";
+
+    link($file, $dest) or die "cannot create link $!";
+  }
+}
+
+=head2 import
+
+Run the prep, report, compile, and aggregate actions (nice for automatic
+daily imports.)
+
+  loghack import $file1 $file2 ...
+
+=cut
+
+sub do_import {
+  my ($opt, @files) = @_;
+
+  my @loaded = do_prep($opt, @files);
+
+  @loaded or die "imported nothing";
+  do_report($opt, @loaded);
+
+  my @dates = do {
+    my %dates = map({m#.*/(\d{4}-\d{2}-\d{2})\..*#; ($1 => 1)} @loaded);
+    sort(keys(%dates));
+  };
+
+  do_compile($opt, @dates);
+
+  my @actions;
+  foreach my $date (@dates) {
+    $date = date($date);
+
+    # TODO tabulate daily $date, 'thru', 'latest'
+
+    # note: these triggers might look strange (a day late), but we don't
+    # know we have all of last week's/month's data until we see some
+    # trickle of the new week/month in the input -- if logrotate happens
+    # after midnight, this will be only the first few minutes of the
+    # week/month (though weekly logrotate with no interim updates will
+    # definitely delay that on a slow site.)
+
+    # TODO may need to retabulate farther back in slow-site cases
+    # (except that should trigger by any bit of the trigger date being
+    # in the new file?)
+
+    if($date->day == 1) {
+      my $last_month = $date-1*months;
+      push(@actions, ['aggregate', 'month', $last_month]);
+      push(@actions, ['tabulate', 'daily',
+        $last_month, 'thru', $last_month->end_of_month]
+      );
+    }
+    if($date->iso_wday == 1) {
+      push(@actions, ['aggregate', 'week', $date - 1*weeks]);
+    }
+  }
+  foreach my $action (@actions) {
+    my @do = @$action;
+    #warn "run @do\n";
+    my $method = shift(@do);
+    my $ref = __PACKAGE__->can('do_'.$method); # XXX go oo already
+    $ref->($opt, @do);
+  }
+}
+
+sub repository_path {
+  my ($opt, $file) = @_;
+
+  my $repo = $opt->{repository} or die "need repository name";
+  $repo =~ s#/*$##;
+
+  # TODO we need to sort-out this server bit
+  my $dir  = basename(dirname($file));
+  my $dest = (-d "$repo/$dir" ? "$repo/$dir" : $repo);
+  return("$dest/");
+}
+sub skipfilename {
+  my ($opt, $file) = @_;
+
+  my $repo = $opt->{repository} or die "need repository name";
+  $repo =~ s#/*$##;
+
+  my $base = basename($file);
+  my $dest = dirname($file);
+  $base =~ s/\.(tsv\.gz|gz|bz2)$//;
+  $dest .= '/.skipdir/';
+  unless(-d $dest) {
+    unless(mkdir($dest)) {
+      die "cannot create $dest dir $!" unless(-d $dest);
+    }
+  }
+  $dest .= $base . '.skip';
+  return($dest);
+}
+sub report_filename {
+  my ($opt, $file) = @_;
+  my $repo = $opt->{repository} or die "need repository name";
+  $repo =~ s#/*$##;
+
+  my $base = basename($file);
+  my $dir  = basename(dirname($file));
+  my $dest = (-d "$repo/$dir" ? "$repo/$dir" : $repo);
+  $base =~ s/\.(tsv\.gz|gz|bz2)$//;
+  $dest .= '/.reports/';
+  unless(-d $dest) {
+    mkdir($dest) or die "cannot create $dest dir $!";
+  }
+  $dest .= $base . '.yml';
+  return($dest);
+}
+
+sub inner_filename {
+  my ($opt, $file, $indir, $ext) = @_;
+  my $repo = $opt->{repository} or die "need repository name";
+  $repo =~ s#/*$##;
+
+  my $base = basename($file);
+  my $dir  = basename(dirname($file));
+  my $dest = (-d "$repo/$dir" ? "$repo/$dir" : $repo);
+  $base =~ s/\.(tsv\.gz|gz|bz2)$//;
+  $dest .= "/$indir/";
+  unless(-d $dest) {
+    mkdir($dest) or die "cannot create $dest dir $!";
+  }
+  $dest .= $base . $ext;
+  return($dest);
+}
+sub uniques_filename {
+  my ($opt, $file) = @_;
+  inner_filename($opt, $file, '.uniques', '.gz');
+}
+sub day_uniques_filename {
+  my ($opt, $day) = @_;
+  # TODO outer_filename ?
+  $opt->{repository} . '/' . '.day_uniques/' . $day . '.gz';
+}
+
+sub get_skipper {
+  my ($opt) = @_;
+
+  my $repo = $opt->{repository} or die "need repository";
+  $opt->{skip} or return();
+
+  my $skipper;
+  if(-e (my $skipfile = "$repo/.config/skips.conf")) {
+    my ($skip) = YAML::LoadFile($skipfile);
+    $skipper = ApacheLog::Parser::SkipList->new();
+    $skipper->set_config($skip);
+  }
+  return($skipper);
+}
+
+=head2 count
+
+Count the records in a given chunk (accounting for skiplist.)
+
+=cut
+
+sub do_count {
+  my ($opt, @files) = @_;
+
+  @files = repo_files($opt, @files);
+
+  my $skipper = get_skipper($opt);
+  $skipper or die "you just want cat?";
+  foreach my $file (@files) {
+    my $fh = open_file($file);
+
+    my $skipfile = skipfilename($opt, $file);
+    my $sr = $skipper->new_reader($skipfile);
+    my $skip = $sr->next_skip;
+
+    my $lnum = 0;
+    my $real = 0;
+    while(my $line = <$fh>) {
+      if(++$lnum == $skip) {
+        $lnum += $sr->skip_lines($fh);
+        $skip = $sr->next_skip;
+        next;
+      }
+      $real++;
+    }
+    print join("\t", nice_name($file), $real, $lnum), "\n";
+  }
+}
+
+=head2 dump
+
+Dump the records in a given chunk (accounting for skiplist.)
+
+=cut
+
+sub do_dump {
+  my ($opt, @files) = @_;
+
+  @files = repo_files($opt, @files);
+
+  my $skipper = get_skipper($opt);
+  $skipper or die "you just want cat?";
+  foreach my $file (@files) {
+    my $fh = open_file($file);
+
+    my $skipfile = skipfilename($opt, $file);
+    my $sr = $skipper->new_reader($skipfile);
+    my $skip = $sr->next_skip;
+
+    my $lnum = 0;
+    while(my $line = <$fh>) {
+      if(++$lnum == $skip) {
+        $lnum += $sr->skip_lines($fh);
+        $skip = $sr->next_skip;
+        next;
+      }
+      print $line;
+    }
+  }
+}
+
+=head2 date
+
+Print a date for the first line in a raw logfile.
+
+  date=$(loghack date logfile.gz)
+
+=cut
+
+sub do_date {
+  my ($opt, $file) = @_;
+  my $date = get_date($file);
+  print $date, "\n";
+}
+
+# TODO put this is the Parser module?
+{
+my @abbr = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
+my %months = map({$abbr[$_] => sprintf("%02d", $_ + 1)} 0..11);
+sub get_datestring {
+  my ($date) = @_;
+  $date =~ s#^(\d+)/(\w+)/(\d+)$#"$3-".$months{$2}."-$1"#e;
+  return($date);
+}
+sub get_date {
+  my ($file) = @_;
+  my $fh = open_file($file);
+
+  chomp(my $line = <$fh>);
+  my $date = @{parse_line($line)}[dtime];
+
+  $date =~ s#^(\d+)/(\w+)/(\d+):.*#"$3-".$months{$2}."-$1"#e;
+  return($date);
+}
+}
+
+=begin doc
+
+=head2 checksum
+
+Returns an md5 hexdigest of the first $nlines lines of the file (or the
+whole thing if $nlines is omitted.)
+
+  my $md5 = checksum($fh, $nlines);
+
+=end doc
+
+=cut
+
+sub checksum {
+  my ($fh, $num) = @_;
+  $num ||= 0;
+
+  my $data = '';
+  my $count = 0;
+  while(my $line = <$fh>) {
+    $data .= $line;
+    (++$count == $num) and last;
+  }
+  ($count >= $num) or croak("don't have $num lines to checksum");
+
+  return(Digest::MD5::md5_hex($data));
+} # end subroutine checksum definition
+########################################################################
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::loghack::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::loghack';

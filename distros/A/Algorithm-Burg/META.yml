@@ -1,0 +1,25 @@
+---
+abstract: "extrapolate time series using Burg's method"
+author:
+  - 'Stanislaw Pusep <stas@sysd.org>'
+build_requires:
+  Test::More: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-Burg
+requires:
+  List::Util: '0'
+  Moo: '0'
+  MooX::Types::MooseLike::Base: '0'
+  MooX::Types::MooseLike::Numeric: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/creaktive/Algorithm-Burg/issues
+  homepage: https://github.com/creaktive/Algorithm-Burg
+  repository: git://github.com/creaktive/Algorithm-Burg.git
+version: '0.001'

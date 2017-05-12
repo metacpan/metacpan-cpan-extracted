@@ -1,0 +1,7 @@
+.git
+_build
+MANIFEST.bak
+Build$
+^t/TEST$
+^MYMETA\.yml$
+^MYMETA\.json$

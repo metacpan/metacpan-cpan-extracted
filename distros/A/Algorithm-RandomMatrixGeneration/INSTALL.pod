@@ -1,0 +1,92 @@
+=head1 NAME
+
+INSTALL - How to install Algorithm::RandomMatrixGeneration
+
+=head1 SYNOPSIS
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+	make clean	
+
+=head1 DESCRIPTION
+
+=head2 Prerequisites
+
+=head3 Perl Modules:
+
+ L<Math::BigFloat>
+
+=head2 Installing
+
+=head3 Method 1:
+
+The usual way to install the package is to run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+	make clean
+
+=head3	Method 2
+
+If you are not a superuser or want to install the module locally then following installation procedure should  be used
+
+	perl Makefile.PL LIB=/home/anagha/lib
+	make
+	make test
+	make install
+	make clean
+
+In this case the module will be installed in /home/anagha/lib (provided you have read-write permissions to this directory) and this path should be appended to PERL5LIB environment variable.
+
+=head3 Method 3
+
+Executing the following commands
+
+	perl Makefile.PL PREFIX=/home/anagha/Algorithm-RandomMatrixGeneration
+	make
+	make test
+	make install
+	make clean
+
+will install the module in /home/anagha/Algorithm-RandomMatrixGeneration/lib/perl5/site_perl/5.8.5 (provided you have 
+read-write permissions to /home/anagha/Algorithm-RandomMatrixGeneration directory and you have Perl v5.8.5 or else the 
+last directory in the path will be your systems perl version). This path 
+should be appended to PERL5LIB environment variable.
+
+=head1  System Requirements
+
+This package has been written in Perl(v5.6), which is freely available 
+from L<http://www.perl.org>. 
+
+=head1 AUTHORS
+
+	Anagha Kulkarni, Carnegie-Mellon University
+	anaghak <at> cs.cmu.edu
+	
+	Ted Pedersen,  University of Minnesota Duluth
+	tpederse <at> d.umn.edu
+
+=head2 SEE ALSO
+
+L<README>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2008, Anagha Kulkarni and Ted Pedersen
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.

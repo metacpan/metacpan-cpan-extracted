@@ -1,0 +1,30 @@
+---
+abstract: 'Simple. Git-based. Notes.'
+author:
+  - 'William Wolf <throughnothing@gmail.com>'
+  - 'Naveed Massjouni <naveedm9@gmail.com>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300031, CPAN::Meta::Converter version 2.120921'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Notes
+requires:
+  App::Rad: 0
+  Capture::Tiny: 0
+  Git::Repository: 0
+  List::MoreUtils: 0
+  Path::Class: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/throughnothing/App-Notes.git
+version: 0.013

@@ -1,0 +1,203 @@
+#!/usr/bin/perl -w
+
+use strict ;
+use warnings ;
+use Carp ;
+
+=head1 NAME 
+
+ $> plog - The one and a half minute blog
+
+=head1 USAGE
+
+ $> plog [--option[s]] command [argument] [argument] ...
+
+=head1 OPTIONS
+
+ --h|help                displays this help
+ --blog_id=s (a string)  the blog to work on
+ --configuration_path=s  override the default configuration path
+ --temporary_directory=s use path as temporary working directory
+
+=head1 COMMANDS
+
+Default commands  implemented in B<App::Plog::Commands> (see CONFIGURATION);
+
+=head3 add
+
+Instantiates a new blog entry from a template
+
+=head3 ls
+
+List all the entries in the default directory in chronological order
+
+=head3 ls_blogs
+
+List all the blogs found in the plog root directory (see CONFIGURATION)
+
+=head3 copy data [data] ...
+
+Copies the files passed as arguments to the elements directory (see CONFIGURATION)
+of the blog. If the argument is a directory, its contents as well as the contents of its sub directories are copied
+
+=head3 generate
+
+Creates the blog document and feed
+
+=head3 update
+
+Generates and publishes the blog
+
+=head1 CONFIGURATION
+
+A I<.plog> directory will be created in your home directory to store configuration files. The 
+configuration files must be edited before they can be used.
+
+=head2 Global Plog configuration
+
+At installation time, B<App::Plog> will creates :
+
+I<~/.plog/config.pl> which contains:
+
+ {
+ # where blogs configurations are stored
+ plog_root_directory => 'home/you/.plog',
+ 
+ # the blog to work with if no --blog_id is passed to plog
+ default_blog => ,
+ }
+
+and the directory I<~/.plog/template> which contains an exemple template for a blog.
+
+The B<INSTALL> file contains a step by step description of the configuration changes you need to do.
+
+=head2 Configuration per blog
+
+Each blog configuration is kept within its blog directory which is directly under $plog_root_directory, as  defined in L<Plog global configuration>.
+The configuration allows you to fine tune the generation of your blog. eg: I<~/.plog/perl/configuration.pl> is the configuration for your Perl blog.
+
+The configuration file contents should be self explanatory (send me a mail if you ever have problems configuring your blog. You may also find me
+on irc.perl.org on #perl.)
+
+You can also add commands to the script by deriving from B<App::Plog::Commands> and settings the I<commands> field
+of the configuration to your derived class, see L<App::Plog> documentation.
+
+The B<INSTALL> file contains a step by step description of the configuration changes you need to do.
+
+=head1 DOCUMENTATION
+
+This module installs a script that allow you to generate a rudimentary blog using your prefered editor and the command line.
+
+=head2 Supported in the default Plog installation
+
+=over 2
+
+=item * single HTML file blog
+
+=item * no DB or web blog application installation
+
+=item * git backend
+
+=item * multiple blogs
+
+=item * Pod input (IE)
+
+=over 2
+
+=item * css
+
+=item * HTML
+
+=item * links to URLS, and other supported by Pod
+
+=back 
+
+=item * Asciidoc input
+
+=item * Atom feed
+
+=back
+
+=head2 May be supported at some point
+
+=over 2
+
+=item * syntax hilighting for programming languages
+
+=back
+
+=head2 Probably never supported
+
+=over 2
+
+=item * Answers to blog entries, note that nothing stops you from putting your blog on a git hub and merge answers
+
+=item * xmlrpc, pingback
+
+=item * fancy searching and sorting, ...
+
+=back
+
+=head1 BLOG ENTRIES ORDER
+
+New blog entries or modified blog entries will be placed at the top of the blog as logic dictates but not how most
+other blog software do.
+
+If you have blog entries [A, B, C, D], where A is the oldest entry thus displayed at the bottom of your blog, and you modify
+I<entry A>, the new blog order will be [B, C, D, A]. The module responsible for the rendering can be overridden allowing you
+to have another sorting order.
+
+=head1 EXAMPLES
+
+ # add or update a blog entry in the default blog
+ $> plog add entry_name
+ 
+ # add or update a blog entry in the specified blog
+ $> plog add --blog_id perl entry_name
+ 
+ # list all the blog entries for the default blog in chronologic order
+ $> plog ls
+ 
+ # list all the blogs
+ $> plog ls_blogs
+ 
+ # list all the blog entries for your perl blog
+ $> plog ls --blog_id perl
+ 
+ # copy resources to the default plog
+ $> plog copy some_image.png
+ 
+ # generate default blog on standard output
+ $> plog generate
+ 
+ # generate and put the default blog online
+ $> plog update
+ 
+ # generate and  put the specified blog online
+ $> plog update --blog_id perl
+
+ # take configuration from specified directory (not ~/.plog)
+ $> plog --configuration_path ./my_configuration_path ...
+
+=head1 EXIT STATUS
+
+0 (zero) if  I<plog> could run your command to completion
+
+=head1 AUTHOR
+
+	Nadim ibn hamouda el Khemir
+	CPAN ID: NKH
+	mailto: nkh@cpan.org
+
+=cut
+
+#----------------------------------------------------------------------------------------
+
+our $VERSION = '0.01' ;
+
+use App::Plog ;
+
+App::Plog::create_blog(@ARGV) ;
+
+exit(0)  ;
+

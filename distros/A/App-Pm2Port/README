@@ -1,0 +1,44 @@
+  new
+  prompt
+    Asks something
+
+  perl_version_parse
+    Args: $version
+
+    Converts perl version number to something understandable by FreeBSD
+
+  get_dependencies
+    Returns FreeBSD-style list of dependencies.
+
+  create_makefile
+    Args: $metafile, $portupload_file, $man1, $man3
+
+  create_config
+    Creates config file for module
+
+  run
+    Makes actually all work
+
+  generate_plist
+    created list of manpages and pg-plist
+
+  suggest_category
+    Tries to find category for module name.
+
+  load_meta
+    Loads META.yml or META.json
+
+NAME
+    App::Pm2Port - Creates FreeBSD port from Perl module
+
+SYNOPSYS
+        cd port-directory
+        pm2port Variable::Eject
+
+LICENSE
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Andrey Kostenko <andrey@kostenko.name>
+

@@ -1,0 +1,51 @@
+Acme-EvilLicense
+
+This module is created for demonstration purposes for a presentation at the
+GoOpen 2011 conference.
+
+The module provides some kick-ass functionality solving world's greatest
+problems, but the license terms are unreasonable and completely unexpected,
+though valid.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Acme::EvilLicense
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Evil Hacker
+
+This program is released under the following license: evil
+
+Evil Hacker grants you a right to install this module and use it for your own
+non-commercial purposes. This module may only be used unmodified. No changes
+are permitted. You may only access the module's functionality using the defined
+API and you may not apply any method of customizing the module's functionality
+at run time.
+
+You are only allowed to install this module from CPAN. All other forms of
+redistribution and installation are prohibited.
+
+For using this great piece of software engineering, you shall pay the licensor
+a fee equal to 0.01 EUR per method invocaiton multiplied by a number of
+employees in your organization benefeting from this module's functionality.
+Monthly usage reports shall be submitted online at <https://evil.example.com/report/submit.sh>
+
+You shall make yourself familiar with the entire text of the license,
+which is available at <https://evil.example.com/code/license.txt>
+
+If you do not agree to the license, you may not use this module.

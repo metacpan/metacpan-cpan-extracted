@@ -1,0 +1,275 @@
+Revision history for Perl module Alien::SDL
+
+Versioning rule: public releases are even numbers, dev releases are odd. (same like perl dist)
+
+TODO
+     - check for available libs when using --with-sdl-config option
+
+1.446 Sat Feb 21 2015
+     - fix build on OS X Mavericks (missing symbol CGDirectPaletteRef) [FROGGS]
+     - build fix on Windows Strawberry Perl 5.20.+ [kmx]
+
+1.444 Wed May 14 2014
+     - check that perl was linked against pthread and do a pthread-less build if not (OpenBSD) [FROGGS]
+     - add patch that replaces $^ in Makefile.in, which can be a problem for BSD's make [FROGGS]
+     - let SDL_Pango.h include ft2build.h, because even when the header file ifdef's out some
+       code that needs it, the source file does not and thus explodes happily. [FROGGS]
+     - add PIC flags to CFLAGS when the compiler can handle it, this is meant to fix
+       an issue on freebsd [FROGGS]
+
+1.442 Tue Apr 22 2014
+     - bump SDL_gfx to 2.0.25 [FROGGS]
+     - fix for building on >=libX11-1.5.99.901 [FROGGS]
+
+1.440 Sun Aug 12 2012
+     - patch for File::Temp->tempfile -> File::Temp::tempfile (#244) [FROGGS]
+
+1.438 Sun Aug 12 2012
+     - added minimum Perl version [jtpalmer]
+     - added release tests to check pod syntax and coverage [jtpalmer]
+     - return ld_shlib_map, ld_shared_libs and ld_paths from config when using script option [jtpalmer]
+     - excluding undef paths from ld_shlib_map and ld_shared_libs [jtpalmer]
+     - changed shlib regex to match libz and libfreetype [jtpalmer]
+     - disabling mmx for SDL_gfx for armv6-unix [jtpalmer]
+     - added bin script to make configuring easier [kthakore]
+     - added CGFloat patch for darwin/SDL_image [FROGGS]
+     - CFLAGS: added several circumstances where we need /usr/X11R7/... [FROGGS]
+     - CFLAGS: removed /usr/pkg/..., that clashed on my netbsd [FROGGS]
+     - CFLAGS: removed duplicate /usr/X11R6/... [FROGGS]
+     - setting LD_LIBRARY_PATH for all BSDs [FROGGS]
+     - added missing space in cflags and ldflags [FROGGS]
+     - adding rpath linker flag for linux and bsd [FROGGS]
+
+1.436 Tue Jun 19 2012
+     - reapplied openbsd-rldflags patch, it got lost during update to SDL-1.2.15 [FROGGS]
+     - fixed SDL dirname during Build when applying patches (was SDL-1.2.14, is SDL-1.2) [FROGGS]
+     - removed cl from cc_re for gcc binary sets, made new binary set for ActivePerl instead [FROGGS]
+     - checking environment on windows when compiler is cl [FROGGS]
+     - using vcvars32.bat to set up env on windows [FROGGS]
+     - cl compiler prints to stdout instead of stderr, displaying these messages [FROGGS]
+     - added libs like ogg to shlib_map, needed for loading these libs at runtime to help msvc [FROGGS]
+     - added patches/SDL_config_win32.h for msvc, because it has no configure [FROGGS]
+     - setting ld_shlib_map for 'already installed'-option too [FROGGS]
+     - msvc binary package contains patched SDL_rwops.h [FROGGS]
+
+1.434 Thu May 31 2012
+     - added compiler checks [FROGGS]
+
+1.432 Wed May 30 2012
+     - added cl to cc_re for binary sets, this way ActivePerl works again [FROGGS]
+     - configure-like appearance, first check, then do [FROGGS]
+     - libSDL is newest one from hg-repo, this should fix the _XGetRequest issue [FROGGS]
+     - hide proxy passwords [FROGGS]
+     - build libogg/libvorbis if its not there [FROGGS]
+     - fixed logic for detecting proxies [FROGGS]
+     - added libs like libSDL 1.2.15, tweaked patches [FROGGS]
+     - fixed bugtracker link [FROGGS]
+
+1.430 Wed Jan 04 2012
+     - readding source build sets that got lost [FROGGS]
+     - adding extra PATH for make command like we do for configure on solaris [FROGGS]
+     - setting LD_LIBRARY_PATH for GNU/kFreeBSD too so libs like SDL_image will find libSDL [FROGGS]
+     - new Win/64bit binaries (from strawberryperl 5.14+) + gccversion detection magic [KMX]
+     - new Win/32bit binaries (the same lib versions as 64bit, set as "secondary" option) [KMX]
+
+1.428 Wed Jul 20 2011
+     - added Capture::Tiny to build_requires [FROGGS]
+     - added search paths for command ar on solaris [FROGGS]
+     - 'movq' bugfix: http://hg.libsdl.org/SDL/rev/32f0f603a0c8 [FROGGS]
+     - added 'RELEASE' to get_header_version (e.g. png.h has it) [FROGGS]
+     - libpng15 bugfix: https://bugs.gentoo.org/show_bug.cgi?id=354675 [FROGGS]
+     - added support for (authenticating) proxies when running from within CPAN shell [FROGGS]
+
+1.427 Sun Jun 18 2011
+     - SDL_Pango needs newer libtool to process ld scripts (like on ubuntu), patch added [FROGGS]
+     - using `uname -a` to detect sparc systems to disable MMX [FROGGS]
+
+1.426 Sun Apr 24 2011
+     - added '--disable-sdltest' to SDL_mixer|ttf|gfx|Pango's configure for darwin [FROGGS]
+     - fixing 'Use of uninitialized value ..' warnings in ACTION_install [kmx]
+     - disabled MMX for SDL_gfx on ARMv5 machines [FROGGS]
+
+1.425 Thu Feb 03 2011
+     - setting --disable-video-x11-xv and -DNO_SHARED_MEMORY when XShm.h is missing #221 [FROGGS]
+
+1.424 Wed Feb 02 2011
+     - adding '--disable-sdltest' to SDL_image's configure for darwin #222 [FROGGS]
+     - added patch for SDL_image/libpng-flags for netbsd #232 [FROGGS]
+
+1.423 Tue Jan 25 2011
+     - now '--with-sdl-config' is the same as '--with-sdl-config=sdl-config' [kmx]
+     - added Build.PL option --with-sdl-config=... [madsen,kmx]
+
+1.422 Wed Jan 19 2011
+     - the same as latest dev release
+     - added paths /usr/pkg/include and /usr/pkg/lib for dragonfly [FROGGS]
+     - patch for SDL's configure script, -Wl,-rpath,LIBDIR for openbsd [FROGGS]
+     - updated check_header() to use gcc on cygwin [FROGGS]
+     - building libjpeg-v8b[FROGGS]
+     - setting cc to gcc on cygwin [FROGGS]
+
+1.421  Sat Oct 30 2010
+     - using LD_LIBRARY_PATH on openbsd [FROGGS]
+
+1.420  Fri Oct 29 2010
+     - bugtracker url changed, shows Alien::SDL only [FROGGS]
+     - disabling mmx for SDL_gfx for alpha-linux [FROGGS]
+
+1.419  Sat Oct 23 2010
+     - test for X11/Xlib.h on darwin, disable X if missing [FROGGS]
+     - extracting sources and running configure again by default when running Build twice [FROGGS]
+     - fixed bug: passing '--without-x' only to package SDL [FROGGS]
+     - added sub check_prereqs_tools, checking for pkg-config to build SDL_Pango [FROGGS]
+     - printing config.log for packages that failed to run configure [FROGGS]
+     - patch for ldconfig on BSD [FROGGS]
+     - experimental test for X11/Xlib.h on darwin, disable X if missing [FROGGS]
+     - disabling any warning for file_find() for perl-5.6.2 [FROGGS]
+     - fixed 'invalid version'-error for libtiff [FROGGS]
+     - experimental test for X11/Xlib.h on darwin [FROGGS]
+     - experimental disabling any warning for file_find() for perl-5.6.2 [FROGGS]
+
+1.418  Thu Oct 14 2010
+     - removing SDL_net header check from tests [FROGGS]
+     - passing -L/usr/X11R6/lib -I/usr/X11R6/include to all SDL* libs [FROGGS]
+
+1.417  Wed Oct 13 2010
+     - Searching for libs/headers in /usr/X11R6/lib+include [FROGGS]
+     - Skipping build of zlib in case its already there (fixes OpenBSD unknown-reports) [FROGGS]
+     - Skipping SDL_mixer if no GNU Make present [FROGGS]
+
+1.416  Tue Oct 07 2010
+     - Added missing patch files [FROGGS]
+
+1.415  Tue Oct 07 2010
+     - Using newer config tools for Pango (config.guess, config.sub, install.sh) [FROGGS]
+
+1.414  Tue Sep 28 2010
+     - new Win64 binaries [kmx]
+     - new repo URL http://github.com/PerlGameDev/Alien-SDL [kmx]
+     - Output of header testing is a one-liner now #203 [FROGGS]
+     - Removed SDL_net from build system as it isnt needed [FROGGS]
+
+1.413  Fri Aug 06 2010
+     - Searching for lib<xxx>.dll.a libs (cygwin needs this) [kmx]
+     - New src build set: SDL-1.2.14 & co. (builds only SDL+SDL_*) [kmx]
+     - Using File::Fetch 0.24 [FROGGS]
+     - Fixed path of libpng-1.4.1 (has changed due to release of libpng-1.5) [FROGGS]
+     - Added fixes for fink and get_path uses in Mac [kthakore]
+
+1.412  Mon July 19 2010
+     - Searching for dynamic and static libs [FROGGS]
+
+1.411  Fri July 16 2010
+     - Cygwin fix [kmx, FROGGS]
+
+1.410  Mon July 12 2010
+     - SDL_ttf 2.0.10 is released, changed url [FROGGS]
+
+1.409  Fri July 09 2010
+     - Fixed regex for mmx disable
+
+1.408  Thr July 01 2010 -Yay Canada Day!
+     - Messed up release version
+     - skip building libpng in case it is already installed [#129] [FROGGS]
+
+1.407  Thu June 30 2010
+     - Confirm archname as 64 before using /usr/lib64 as a ld path [kthakore]
+
+1.406  Sun June 13 2010
+     - Added conditional ld path check for 64 bit libraries
+
+1.405  Wed June 2nd 2010
+     - searching more ld paths for libs [kthakore] {ticket #153}
+     - removes old share dirs installs of Alien [kthakore]
+     - searching for .dylib's, .so's and .bundle's on mac [FROGGS]
+
+1.404  Thu May 13 2010
+     - added new binaries for Win64 with fb/pango patch [kmx]
+
+1.403  Sat May 01 2010
+     - added Text::Patch to configure_requires [FROGGS]
+
+1.402  Fri Apr 30 2010
+     - header tests: stdio.h is only included on windows boxes [#127] [FROGGS]
+     - disabling audio support on solaris in case sys/audioio.h is missing [#125] [FROGGS]
+     - using Text::Patch instead of patch-command [#125] [FROGGS]
+     - added another buildset for BSD's (without TTF/freetype) [#126] [FROGGS]
+
+1.401  Wed Apr 28 2010
+     - print chosen build-option when calling ./Build (for cpantesters reports) [FROGGS]
+     - Build-script is not created when choosing quit [FROGGS]
+     - there should be no cpantester result (NA/UNKNOWN) sent when choosing quit [kmx]
+
+1.4  Tue Apr 27 2010
+     - alternative locations/hosts for fetching libs [FROGGS]
+     - reenabling option #1 (using already installed libs) [FROGGS]
+
+1.3  Fri Apr 23 2010
+     - additional libs can be specyfied via Alien::SDL->config('libs', [-lAdd_Lib]) [FROGGS]
+     - checking for required shared libs, disabling options if missing [FROGGS]
+     - png, jpeg and tiff are build always [FROGGS]
+     - building zlib-1.2.5 instead of 1.2.4 [FROGGS]
+     - making the RECOMMENDED option default [FROGGS]
+
+1.2
+     - build_requires fixed (now contains also modules needed for ./Build test)
+     - Win32 patch - proper handling of spaces in dirname [FROGGS]
+     - Better detection of patch utility (now works with old patch on bsd systems) [kmx]
+     - GNU make autodetection (on bsd systems make!=GNU-make) [kmx]
+     - SDL_Pango special patch now defines SDL_PANGO_FB [kthakore]
+     - more diagnostics in t/001_load.t
+     - improved patching mechanism (better CRLF/LF handling) [FROGGS]
+     - Win/32bit binaries (with SDL_Pango patch) [FROGGS]
+     - MacOSx file find bug fixed
+
+1.1
+     - Powerpc fixes [ioanrogers]
+     - fix for many failing MacOS CPAN tester reports [kmx]
+     - updated packages (zlib-1.2.4, jpeg-8a, libpng-1.4.1, freetype-2.3.12) in src build [kmx]
+     - new Win32 binaries by FROGGS (now works well on WinXP & Win7)
+     - typo fixes [dorkfish]
+
+1.0
+     - TODO for 1.0 release has been met so incrementing
+
+0.9.1
+     - extended Windows/32bit binaries made a default option
+     - additional src build set added (no preinstalled jpeg, freetype2, png required)
+     - cygwin related patches [http://rt.cpan.org/Ticket/Display.html?id=55202]
+
+0.9
+     - An updated windows pack [kmx]
+     - Dependencies of SHA fixed [kmx]
+
+0.8.2
+     - Local sharedir building [kmx, FROGGS]
+     - 64bit building [kthakore, kmx]
+     - Darwin testing [Mike Stok, Stuart Watt, Chas Owens] and fixing [kthakore, kmx]
+     - Dependencies fixes [kmx]
+
+
+0.8.1
+     - Quick fix for follow_skip in File::Find, and test numbers
+
+0.8.0
+     - Complete redesign by kmx, completely new interface
+     - Fixed Bug on File::Find usage to get headers
+0.7.8
+     - Get and compile latest code for SDL, gfx, image, mixer, ttf and net
+
+0.7.6
+     - check if make failed or passed
+
+0.06.1 Sat Sept 14 2009
+     - Fixed a stupid mistake
+0.06 Fri Sept 18 2009
+     - Added File::Fetch to inc
+     - Added File::Spec::Unix to inc
+     - Added IPC::cmd to inc
+     - Added Archive::Extract to inc
+
+0.02 Fri Aug  7 2009
+    - Updated perlDoc
+
+0.01 Thu Aug  6 2009
+    - original version; created by ExtUtils::ModuleMaker 0.51

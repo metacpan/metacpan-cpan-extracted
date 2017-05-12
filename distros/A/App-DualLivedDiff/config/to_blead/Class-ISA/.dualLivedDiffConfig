@@ -1,0 +1,7 @@
+---
+files:
+  lib/Class/ISA.pm: lib/Class/ISA.pm
+  ChangeLog: lib/Class/ISA/ChangeLog 
+dirs-recursive:
+  t/: lib/Class/ISA/t/
+

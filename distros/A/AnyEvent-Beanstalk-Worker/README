@@ -1,0 +1,29 @@
+AnyEvent-Beanstalk-Worker version
+=================================
+
+AnyEvent::Beanstalk::Worker is a finite state automaton qua
+general-purpose beanstalkd client.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   BEANSTALKD_EXE=/path/to/beanstalkd make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+AnyEvent
+AnyEvent::Beanstalk
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Scott Wiersdorf
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.3 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,6 @@
+Revision history for App::loggrep
+
+0.002     2014-11-03 09:29:17-05:00 America/New_York
+ * fixed --separator bug
+
+0.001     2014-11-02 12:45:16-05:00 America/New_York

@@ -1,0 +1,19 @@
+<!-- FOOTER -->
+<div class="padder"></div>
+
+<div class="footer">
+
+<div id="footer" class="container" role="contentinfo">
+    <div class="footer-box">           
+        <div class="row">
+            <div class="span12">
+                <div class="copyright align_center">
+                &copy; 2012 fix&bullet;punkt GmbH · Laufertorgraben 2 · 90489 Nürnberg · Germany · www.fixpunkt.de 
+                </div>
+            </div>
+        </div>    
+    </div>
+</div>
+
+</div>
+<!-- END FOOTER -->

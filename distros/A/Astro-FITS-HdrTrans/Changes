@@ -1,0 +1,71 @@
+Revision history for Astro::FITS::HdrTrans
+
+1.59 2016-10-21
+
+    - Add translation of REFERENCE_LOCATION for ACSIS.
+
+1.58 2015-03-08
+
+    - SEEING for JCMT is now average of SEEINGST and SEEINGEN.
+    - Add translation of SCAN_PAT header for JCMT.
+    - Add translations for species/molecule and transition for ACSIS.
+
+1.57 2015-03-06
+
+    - Add support for more LCOGT instruments (Tim Lister).
+    - Avoid NaN values for LCOGT (Tim Lister).
+
+1.56 2014-07-16
+
+    - For CGS4Old read INTTYPE if MODE is not present.
+    - Add rotation for IRCAM.
+
+1.55 2013-05-08
+
+    - Updates to some LCOGT telescope translations (Tim Lister).
+    - Added AMBIENT_TEMPERATURE for SCUBA-2.
+    - No longer check OBSID for ACSIS.
+
+1.54 2012-07-13
+
+    - Update SCUBA-2 base coordinates estimate so that it can
+      work with subheaders and missing start azel position.
+
+1.53 2012-06-19
+
+    - The ACSIS test should skip if Starlink::AST is missing.
+
+1.52 2012-06-19
+
+    - Add LCOGT instruments (thanks to Tim Lister).
+    - Added OBSERVATION_ID_SUBSYSTEM
+    - Many improvements to JCMT translations.
+    - Astro::SLA is now only required for NIRI translations.
+
+1.51 2011-01-04
+
+    - Use Module::Build.
+    - Minor fix for polarimeter recipe in ACSIS.
+
+1.50 2010-08-26
+
+    - Includes support for SCUBA-2 and many fixes for ACSIS.
+
+0.05 2006-04-11
+
+    - Major rewrite of internals.
+    - Supports all UKIRT and JCMT instruments.
+
+0.03 2005-03-29
+
+    - Licence should have been GPL.
+
+0.02 2003-09-16
+
+    - Change licence in README to be same as Perl.
+    - Add copyright statement.
+    - Add requirement on Test::More and Time::Piece to Makefile.PL.
+
+0.01 2003-09-15
+
+    - Initial test release to CPAN.

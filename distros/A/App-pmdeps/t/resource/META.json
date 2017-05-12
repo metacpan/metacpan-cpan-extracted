@@ -1,0 +1,74 @@
+{
+   "abstract" : "It's new $module",
+   "author" : [
+      "moznion C<< moznion@gmail.com >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.3, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-pmdeps",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Furl" : "2.16",
+            "Getopt::Long" : "2.39",
+            "JSON" : "2.59",
+            "Module::CoreList" : "2.91",
+            "perl" : "5.008001"
+         },
+         "recommends" : {
+             "Acme" : "0"
+         },
+         "suggests" : {
+             "Acme::Anything" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+             "Module::Build" : "0.4005"
+         },
+         "suggests" : {
+             "Acme::Buffy" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+             "Test::Perl::Critic" : "0.4005"
+         }
+      }
+   },
+   "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/moznion/pm-deps/issues"
+      },
+      "homepage" : "https://github.com/moznion/pm-deps",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/moznion/pm-deps.git",
+         "web" : "https://github.com/moznion/pm-deps"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "moznion <moznion@gmail.com>"
+   ]
+}

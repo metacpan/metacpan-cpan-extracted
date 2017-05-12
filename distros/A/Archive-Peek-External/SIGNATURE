@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f57d8b617225164728983221ca76b6ff2535ff46 Build.PL
+SHA1 cd90f85e5e8415dd880288e6f67b7164406dd841 CHANGES
+SHA1 6e0ef6fd898cfeca712579753b0a69161dbabde9 LICENSE
+SHA1 b6c10fcee43a0b5234e37a48b1d9a03543f5ce05 MANIFEST
+SHA1 2d378332d52b59e7a88eeb5a2a5f499548c4902c META.json
+SHA1 f62addc3ee3055462d147b11bca55e80a67a2cdc META.yml
+SHA1 f103251efaabb9be7a3afc176a989aef8634208d README
+SHA1 cb675d1864e65e14edf642b109e978a0f9eabe8f lib/Archive/Peek/External.pm
+SHA1 0615b7dc089d3baa9033330d6440284ec623c85c lib/Archive/Peek/External/Tar.pm
+SHA1 ba43436c006fa3ddcf1871cb27c8ceadfc1d8f7e lib/Archive/Peek/External/Zip.pm
+SHA1 d2565abae28cda3ac37b79cc38ac780870224f63 t/archive.tar.bz2
+SHA1 bb676bad66d662bf721423172141552ed3f5510b t/archive.tgz
+SHA1 90aa2f4056bba3c375dbbf0dd11b2597d3a0ae87 t/archive.zip
+SHA1 cc0afecfd4e6d03574131fe90200652ddf0fb752 t/pod.t
+SHA1 57c4ca7dd784f4331b9780a42be64eb00ea75ade t/simple.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk6NbPsACgkQnvdMljFk9hWt+gCdFjO1oAKTajkrTXnndjrLfs3X
+XSsAmgLax+o5jj8C1jTN7P6x5fkV81GJ
+=2Ref
+-----END PGP SIGNATURE-----

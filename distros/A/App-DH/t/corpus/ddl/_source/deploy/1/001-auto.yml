@@ -1,0 +1,59 @@
+---
+schema:
+  procedures: {}
+  tables:
+    kitten:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - kitten_id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+      fields:
+        kitten_id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: kitten_id
+          order: 1
+          size:
+            - 0
+        name:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: name
+          order: 2
+          size:
+            - 0
+      indices: []
+      name: kitten
+      options: []
+      order: 1
+  triggers: {}
+  views: {}
+translator:
+  add_drop_table: 0
+  filename: ~
+  no_comments: 0
+  parser_args:
+    sources:
+      - Kitten
+  parser_type: SQL::Translator::Parser::DBIx::Class
+  producer_args: {}
+  producer_type: SQL::Translator::Producer::YAML
+  show_warnings: 0
+  trace: 0
+  version: 0.11021

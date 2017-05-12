@@ -1,0 +1,47 @@
+[% # config/main
+   #
+
+   title = "App::AutoCRUD sample page";
+   base   = c.base;
+   dsbase = base _ c.datasource.name _ "/"; # "datasource" base
+
+   page.head_fragments = [];
+   page.linked_scripts = [];
+   page.linked_styles  = [];
+
+   # Wrappers for items to be pushed into head part from component templates.
+   # Usage: put local script inside directives "WRAPPER local_script" ... "END"
+
+   BLOCK head;
+     page.head_fragments.push(content);
+   END; # BLOCK 
+
+   BLOCK linked_script;
+     page.linked_scripts.push(content);
+   END; # BLOCK 
+
+   BLOCK linked_style;
+     page.linked_styles.push(content);
+   END; # BLOCK 
+
+
+~%]
+
+
+[%# standard scripts and styles to load in all pages %]
+
+[%~ WRAPPER linked_style %][% base %]gvascript/GvaScript.css[% END ~%]
+[%~ WRAPPER linked_style %][% base %]static/css/styles.css[% END ~%]
+
+[%~ WRAPPER linked_script %][% base %]gvascript/prototype.js[% END ~%]
+[%~ WRAPPER linked_script %][% base %]gvascript/GvaScript.js[% END ~%]
+
+[%~ WRAPPER head %]
+<style>
+  .footer        { width: 100%; text-align: right; font-size: 70%}
+  .TN_label      { width: 25%; display: inline-block }
+  .after_label   { max-width: 65%; vertical-align: top; display: inline-block }
+  .actions       { float: right; text-align: right; background-color: LightCyan;
+                   margin-left: 1em; margin-top: 1em; padding-left: 0.5em }
+</style>
+[%  END; # WRAPPER  %]

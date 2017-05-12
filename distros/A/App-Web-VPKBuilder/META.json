@@ -1,0 +1,65 @@
+{
+   "abstract" : "Mix & match Source engine game mods",
+   "author" : [
+      "Marius Gavrilescu <marius@ieval.ro>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Web-VPKBuilder",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Diver" : "0",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Slurp" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "HTML::Element" : "0",
+            "HTML::TreeBuilder" : "0",
+            "Hash::Merge" : "0",
+            "IO::Compress::Zip" : "2.039",
+            "List::MoreUtils" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Component" : "0",
+            "Plack::Request" : "0",
+            "Sort::ByExample" : "0",
+            "YAML" : "0",
+            "perl" : "5.014000",
+            "sigtrap" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://git.ieval.ro/?p=app-web-vpkbuilder.git"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

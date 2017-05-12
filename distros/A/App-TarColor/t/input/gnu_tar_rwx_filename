@@ -1,0 +1,8 @@
+-rwxr-xr-x marca/CHEGG\domain users 0 2012-01-15 09:41 09
+-rwxr-xr-x marca/CHEGG\domain users 0 2012-01-15 09:41 Jan
+-rwxr-xr-x marca/admin              0 2012-01-15 10:25 Jan2
+-rw-r--r-- marca/admin              0 2012-01-15 10:27 filename with spaces
+-rwxr-xr-x marca/CHEGG\domain users 0 2012-01-15 09:31 rwx
+lrwxr-xr-x marca/CHEGG\domain users 0 2012-01-15 13:21 symlink with spaces -> filename with spaces
+-rwxr-xr-x marca/CHEGG\domain users 0 2012-01-15 09:39 users
+lrwxr-xr-x marca/CHEGG\domain users 0 2012-01-15 09:33 w -> rwx

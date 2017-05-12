@@ -1,0 +1,48 @@
+{
+   "abstract" : "Evented promises",
+   "author" : [
+      "Anthony Johnson <aj@ohess.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132661",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-Promise",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Carp" : "0",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "AnyEvent::Promise" : {
+         "file" : "lib/AnyEvent/Promise.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "0.02"
+}

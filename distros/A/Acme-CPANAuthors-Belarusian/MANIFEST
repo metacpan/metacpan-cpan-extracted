@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+t/00-load.t
+lib/Acme/CPANAuthors/Belarusian.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

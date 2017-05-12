@@ -1,0 +1,16 @@
+Apache::AuthenPasswdSrv Version 0.01 (Alpha Release)
+
+Written by Jeffrey Hulten (jeffh@premier1.net)
+
+This is version 0.01 of a mod_perl Authentication handler that checks
+user credentials (username and password) against a UNIX domain socket
+server.  There is a sample server included (passswd_srv.pl) that checks
+username and password against an NIS database using Net::NIS and ypmatch.
+
+This release is ALPHA.  The documentation is lacking, the code needs to be 
+modularized, but the module and server both run rather well.  
+
+If you have any questions, comments or suggestions, please email me at 
+jeffh@premier1.net.
+
+

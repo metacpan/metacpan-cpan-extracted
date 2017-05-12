@@ -1,0 +1,87 @@
+NAME
+    Apache2::WebApp::Plugin::DBI - Database interface wrapper
+
+SYNOPSIS
+      my $obj = $c->plugin('DBI')->method( ... );     # Apache2::WebApp::Plugin::DBI->method()
+
+        or
+
+      $c->plugin('DBI')->method( ... );
+
+DESCRIPTION
+    A database independent interface that gives your application universal
+    support across many databases including MySQL, PostGRe, and Oracle. Also
+    supports many common flat file formats.
+
+PREREQUISITES
+    This package is part of a larger distribution and was NOT intended to be
+    used directly. In order for this plugin to work properly, the following
+    packages must be installed:
+
+      Apache2::WebApp
+      Apache::DBI
+      DBI
+      Params::Validate
+
+INSTALLATION
+    From source:
+
+      $ tar xfz Apache2-WebApp-Plugin-DBI-0.X.X.tar.gz
+      $ perl MakeFile.PL PREFIX=~/path/to/custom/dir LIB=~/path/to/custom/lib
+      $ make
+      $ make test
+      $ make install
+
+    Perl one liner using CPAN.pm:
+
+      perl -MCPAN -e 'install Apache2::WebApp::Plugin::DBI'
+
+    Use of CPAN.pm in interactive mode:
+
+      $ perl -MCPAN -e shell
+      cpan> install Apache2::WebApp::Plugin::DBI
+      cpan> quit
+
+    Just like the manual installation of Perl modules, the user may need
+    root access during this process to insure write permission is allowed
+    within the installation directory.
+
+CONFIGURATION
+    Unless it already exists, add the following to your projects
+    *webapp.conf*
+
+      [database]
+      driver      = mysql
+      host        = localhost
+      name        = database
+      user        = foo
+      password    = bar
+      auto_commit = 0
+
+OBJECT METHODS
+  connect
+    Make a new database connection.
+
+      my $dbh = $c->plugin('DBH')->connect({
+          driver    => 'mysql',
+          host      => 'localhost',
+          name      => 'database',
+          user      => 'bar',
+          password  => 'baz',
+          commit    => 1 || 0,
+        });
+
+      my $sth = $dbh->prepare("SELECT * FR..");
+
+SEE ALSO
+    Apache2::WebApp, Apache2::WebApp::Plugin, Apache::DBI, DBI
+
+AUTHOR
+    Marc S. Brooks, <mbrooks@cpan.org> - <http://mbrooks.info>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://dev.perl.org/licenses/artistic.html>
+

@@ -1,0 +1,23 @@
+____________________________________________________________________________
+[  2690] By: autrijus                              on 2002/12/12  06:47:15
+        Log: * This be 0.02.
+	   ! HanConvert.pm
+____________________________________________________________________________
+[  2689] By: autrijus                              on 2002/12/12  06:40:06
+        Log: * added proper charset detection and rewriting.
+	   ! HanConvert.pm
+____________________________________________________________________________
+[  2679] By: autrijus                              on 2002/12/11  17:08:05
+        Log: * abigail hinted us toward Accept-Charset.
+	   ! HanConvert.pm
+____________________________________________________________________________
+[  2678] By: autrijus                              on 2002/12/11  17:07:48
+        Log: * changes and signatures.	
+	   + Changes SIGNATURE
+____________________________________________________________________________
+[  2677] By: autrijus                              on 2002/12/11  16:52:29
+        Log: * Apache::Filter::HanConvert 0.01, an Apache2 module
+             that does intelligent simp/trad Chinese handling
+             and recoding.
+	   + HanConvert.pm MANIFEST Makefile.PL README
+	   + t/0-signature.t t/1-basic.t

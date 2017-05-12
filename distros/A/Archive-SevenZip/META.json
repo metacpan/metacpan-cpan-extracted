@@ -1,0 +1,31 @@
+{
+   "abstract" : "Read/write 7z , zip , ISO9960 and other archives",
+   "author" : [
+      "Max Maischein <corion@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Archive-SevenZip",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Corion/archive-sevenzip.git",
+         "web" : "https://github.com/Corion/archive-sevenzip"
+      }
+   },
+   "version" : "0.06"
+}

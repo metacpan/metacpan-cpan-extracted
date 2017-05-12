@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Acme/CPANAuthors/Icelandic.pm
+t/00_compile.t
+t/release-pod-syntax.t
+xt/90_pod.t
+xt/91_pod_coverage.t

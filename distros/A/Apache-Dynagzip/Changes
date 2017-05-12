@@ -1,0 +1,101 @@
+Revision history for Apache::Dynagzip
+
+0.16  Sat Oct 09 19:30:00 2004
+	- bugfix. Content-Type was overwritten to default text/html during the streaming of a static
+	  file because $r->header_out('Content-Type') was not set, however $r->content_type is set
+	  properly in PerlLibTreeTrans URI_Translation_Handler. Fixed in two places.
+	- documentation was lightly edited, especially regarding the details of module installation
+	  and appropriate mod_perl configuration. Thanks to Kevin Austin for the hints.
+	- README was reformatted back to plain text.
+	- META.yml was created manually and added to MANIFEST.
+
+0.15  Sun May 02 15:11:00 2004
+	- clean up: Dan Kubb has found some inconsistences in implementation of UseCGIHeadersFromScript
+	  within the Filter chain. Documentation and the code were cleaned up in order to make sure
+	  that UseCGIHeadersFromScript does not affect functionality inside the  Filter chain.
+	  23843 May 11 00:28 Apache-Dynagzip-0.15.tar.gz
+
+0.14  Sat Apr 24 22:50:00 2004
+	- documentation was edited in order to make it more clear, especially
+	  regarding previous code changes.
+	  23642 Apr 30 21:15 Apache-Dynagzip-0.14.tar.gz
+
+0.13  Mon Apr 05 22:40:00 2004
+	- bugfix. Richard Chen discovered the unconditional retrievement of HTTP headers
+	  inside the branch of uncompressed response over HTTP/1.1 for filter chain. The same
+	  bug appears inside the branch of uncompressed response over HTTP/1.0. Fixed now.
+	  31466 Apr  6 00:01 Apache-Dynagzip-0.13.tar.gz
+
+0.12  Mon Mar 15 21:15:00 2004
+	- log the amount of outgoing data. Version to test Igor Jovanovic's issue.
+	  31426 Mar 15 21:33 Apache-Dynagzip-0.12.tar.gz
+
+0.11  Mon Jul 21 11:00:00 2003
+	- bugfix. It was noticed that Apache::Dynagzip in some cases overwrites the Content-Type set
+	  by the earlier filter. Thanks to John Siracusa for the hint. This was fixed to "never
+	  overwrite the existent outgoing Content-Type".
+	  31136 Jul 21  2003 Apache-Dynagzip-0.11.tar.gz
+
+0.10  Fri Jul 18 23:30:00 2003
+	- Rob Bloodgood and Damyan Ivanov complained about "uninitialized value" warnings from unused
+	  HTTP headers, and about pack mode "c", which generated warnings on their systems (running -w).
+	  I failed to reproduce the effect of pack mode, but decided to change the mode to "C"
+	  because it has been reported as a clean solution for both Rob and Damyan from one side,
+	  and this should not effect the packed code (as I understand it) from the other side.
+	  "Uninitialized value" warnings were blocked in accordance with the patch provided by Rob Bloodgood.
+	  All changes were manually double-checked with the patch provided by Damyan Ivanov.
+	- partial code revision has been done in order to prepare the further structural changes.
+	  30927 Jul 20 01:09 Apache-Dynagzip-0.10.tar.gz
+
+0.09  Sun Jan 05 01:45:00 2003
+	- Vlad Jebelev's patch was applied in order to serve possible dynamic Apache downgrade to HTTP/1.0
+	  (especially processing MSIE requests over SSL).
+	- documentation was edited.
+	  30564 Jan  5 02:45 Apache-Dynagzip-0.09.tar.gz
+
+0.08  Sat Dec 07 23:15:00 2002
+	- bugfix. The bug was affecting the transmissions of plain static files only
+	  when gzip compression is turned off and light compression is turned on.
+	  30155 Dec  8 00:24 Apache-Dynagzip-0.08.tar.gz
+	  
+0.07  Sun Aug 11 14:58:00 2002
+	- advanced control over the client/proxy cache is provided vith Vary extra value
+	  optionally inputed from the configuration file.
+	- documentation is edited.
+	  29819 Oct  6 14:16 Apache-Dynagzip-0.07.tar.gz
+
+0.06  Mon Jun 24 13:05:00 2002
+	- HTTP/1.0 bug is fixed. No chunks for HTTP/1.0 since now.
+	  Just no Content-Length, and Connection: close instead.
+	  gzip compression is provided for HTTP/1.0 in accordance with Accept-Encoding.
+	- light compression exception for <PRE>...</PRE> tag is implemented.
+	- documentation is edited appropriately.
+	  26322 Jul 24 16:17 Apache-Dynagzip-0.06.tar.gz
+
+0.05  Sat Jun 15 18:00:00 2002
+	- Makefile.PL is fixed in order to survive CPAN tests
+	  25110 Jun 15 18:28 Apache-Dynagzip-0.05.tar.gz
+
+0.04  Mon Jun 03 14:00:00 2002
+	- README is updated.
+	- Some typos in main doc were fixed.
+	  24939 Jun  4 14:07 Apache-Dynagzip-0.04.tar.gz
+
+0.03  Sun May 26 14:26:00 2002
+	- fundamental revision of the code to avoid possible copyright questions from Outlook Technologies, Inc.
+	  My own decision to publish the code on CPAN could never be considered an any kind of competition with OLT
+	  business, since my layoff clearly demonstrates the fact, that OLT has no business interests
+	  in this market of products and services, and does not plan to work on this market in future.
+	- documentation is edited appropriately.
+	  23002 Jun  3 12:17 Apache-Dynagzip-0.03.tar.gz
+
+0.02  Fri Mar 22 12:07
+	- documentation is edited - thanks to Tom Evans <tevans@outlook.net> for README Abstract.
+	  11169 Apr 27 13:16 Apache-Dynagzip-0.02.tar.gz
+
+0.01  Mon Jan 14 10:31:52 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Apache::Dynagzip
+	- original code is created.
+	  10312 Mar 18 23:20 Apache-Dynagzip-0.01.tar.gz
+

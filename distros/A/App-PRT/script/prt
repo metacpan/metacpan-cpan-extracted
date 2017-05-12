@@ -1,0 +1,100 @@
+#!perl
+
+use strict;
+use warnings;
+use App::PRT::CLI;
+
+my $cli = App::PRT::CLI->new;
+$cli->set_io(*STDIN, *STDOUT);
+$cli->parse(@ARGV);
+$cli->run;
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+prt - Command line frontend of App::PRT
+
+=head1 SYNOPSIS
+
+    $ prt <command> <args>
+    $ prt <command> <args> <files>
+
+=head1 DESCRIPTION
+
+prt is the command line frontend of L<App::PRT>.
+
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item * replace_token
+
+Replace C<foo> token with C<bar>.
+
+    prt replace_token foo bar
+
+Replace C<foo> token with C<bar> but target statements must have C<bazz> token.
+
+    prt replace_token foo bar --in-statement bazz
+
+=item * rename_class
+
+Rename C<Foo> class to C<Bar> class.
+
+    prt rename_class Foo Bar
+
+=item * rename_namespace
+
+Rename C<Foo> and C<Foo::*> classes to C<Bar> and C<Bar::*> classes.
+
+    prt rename_namespace Foo Bar
+
+=item * delete_method
+
+Delete C<eat> method from C<Food> class.
+
+    prt delete_method Food eat
+
+=item * move_class_method
+
+Move C<method> method in C<Class> class to C<another_method> method in C<AnotherClass>.
+C<Class>'s including packages are copied to C<AnotherClass>.
+
+    prt move_class_method 'Class#method' 'AnotherClass#another_method'
+
+=item * introduce_variables
+
+Print the variables in the source code. This command accepts input from C<STDIN>.
+
+    prt introduce_variables a.pl
+    cat a.pl | prt introduce_variables
+    pbpaste | prt introduce_variables
+
+=back
+
+=head1 TARGET FILES
+
+You can specify the target files to refactor.
+
+    prt replace_token foo bar lib/**/**.pm t/*.t # Refactor Perl modules in lib/ and test files in t/
+
+Without target files, C<App::PRT> collects source codes in your project automatically.
+C<App::PRT> searches C<cpanfile> to detect project root directory.
+When executed in git repository, All files in the repository are used.
+
+    prt replace_token foo bar                    # Refactor the project in current working directory
+
+=head1 LICENSE
+
+Copyright (C) hitode909.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+hitode909 E<lt>hitode909@gmail.comE<gt>
+
+=cut

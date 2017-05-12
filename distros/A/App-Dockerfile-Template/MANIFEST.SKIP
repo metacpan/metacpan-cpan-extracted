@@ -1,0 +1,15 @@
+local/
+tools/
+.+\.swp
+\*\~
+\.prove/
+perltidy.LOG
+perltidy.ERR
+.DS_Store
+.vagrant
+Vagrantfile
+.perl-version
+dist.ini
+cpanfile.*
+App-Dockerfile-Template-.*
+cover_db

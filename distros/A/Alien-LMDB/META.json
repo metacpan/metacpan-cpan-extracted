@@ -1,0 +1,54 @@
+{
+   "abstract" : "Build and install the LMDB embedded database",
+   "author" : [
+      "Doug Hoyte <doug@hcsw.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-LMDB",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::gmake" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "File::ShareDir" : "1.00",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::LMDB" : {
+         "file" : "lib/Alien/LMDB.pm",
+         "version" : "0.103"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hoytech/Alien-LMDB/issues"
+      },
+      "homepage" : "https://github.com/hoytech/Alien-LMDB",
+      "repository" : {
+         "url" : "git://github.com/hoytech/Alien-LMDB.git"
+      }
+   },
+   "version" : "0.103",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

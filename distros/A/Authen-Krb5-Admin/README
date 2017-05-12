@@ -1,0 +1,70 @@
+
+Authen::Krb5::Admin is an object-oriented interface to the Kerberos 5
+admin server.  Currently only MIT KDCs are supported, but the author
+envisions seamless integration with other KDCs.
+
+
+PREREQUISITES
+
+Authen::Krb5::Admin requires Perl 5.005 or greater and Jeff Horwitz's
+Authen::Krb5 module from CPAN.
+
+
+INSTALLATION
+
+To install Authen::Krb5::Admin without testing, run the standard
+sequence:
+
+	perl Makefile.PL
+	make
+	make install
+
+The first step will prompt you for a principal with administrative
+privileges on the KDC for running the test suite.  Re-run this step to
+change which principal to use.
+
+The build script will attempt to use the krb5-config tool to discover
+the location of your Kerberos installation. This tool is part of the
+krb5-devel package on Redhat and Fedora systems and is in the
+libkrb5-dev package on Debian and Ubuntu systems. If it is not located
+in /usr/local/bin/krb5-config or /usr/bin/krb5-config you can specify
+the location using the KRB5_CONFTOOL environment variable.
+
+If you have a non-standard installation you can override the following
+locations by setting environment variables before running the
+Makefile.PL script. The PREFIX path is found by using the krb5-config
+tool.
+
+   * KRB5_BINDIR - PREFIX/bin - Kerberos binaries
+   * KRB5_LIBDIR - PREFIX/lib - Kerberos libraries
+   * KRB5_INCDIR - PREFIX/include - Kerberos headers
+
+Currently the install scripts do NOT correctly build for x86_64
+systems where the libraries are installed in /usr/lib64 (e.g. Redhat
+and Fedora). The workaround is to set the KRB5_LIBDIR environment
+variable before running the Makefile.PL script, e.g.
+
+export KRB5_LIBDIR=/usr/lib64
+
+This will be corrected in a subsequent release.
+
+TESTING
+
+To run the test suite as part of the install, use
+
+	perl Makefile.PL
+	make test
+	make install
+
+This step requires administrative access to the KDC by the principal
+specified in the first step.  It will create a principal, by default
+"perl_test", which should NOT already exist on the KDC.  If you
+already have a principal called perl_test, change Makefile.PL to use a
+different test principal, and start over.
+
+
+Stephen Quinney <squinney@inf.ed.ac.uk>
+University of Edinburgh School of Informatics
+
+Andrew J. Korty <ajk@iu.edu>
+Indiana University

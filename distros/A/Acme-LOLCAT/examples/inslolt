@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib qw'../lib lib';
+
+use Acme::LOLCAT;
+
+print translate( prebuilt_insult() ), "\n";
+
+sub prebuilt_insult {
+  my @insults = (
+  "English is your second language, isn't it? You don't have a first.",
+  "Just when I think, \"Surely this person has reached and encapsulates the limits of Internet tedium\" you go and push the boundary even further.",
+  "I refer to your latest discharge of plebeian verbiage; in which, you have proven, once again, that there is no such thing as unutterable nonsense.",
+  "Just when I think I've read the stupidest thing ever, you go and say something else",
+  "Thank you! We're all refreshed and challenged by your unique point of view, you ridiculous little carnival freak.",
+  "Is there a gibberish translator in the house? I can't make head nor nail of that uber-babble you flung onto the screen during your latest spasmodic seizure.",
+  "I see that you are fluent in Gibbering Moronese. Unfortunately, I'm not. You generate more waffle than the waffle making machine in a waffle factory.",
+  "Sorry. I don't speak retardese. Can you get someone to translate into meaningful English before you spew noise from your mouth, please?",
+  "Do you speak any language that non-gibbering idiots can understand?",
+  "Congratulations! You have just proved the theory that there is no limit to human stupidity.",
+  "It sounds like English; it even looks like English, but I can't understand a word you're blabbering.",
+  "The Anti-Moron software on my PC went crazy when I started to read what you just said",
+  "You read like a gimpzoid teenager splashing spit onto the monitor. Don't you ever have a point beyond giving your fingers some exercise by dancing them randomly over the keyboard?",
+  "Keep typing. Maybe, someday, you'll randomly type something semi-intelligent.",
+  "When I want your monkey-brained opinion I'll rattle your cage, okay?",
+  "You amaze me! I didn't think it was possible for one person to possess such a vast reservoir of undiluted gibberish!",
+  "If there's an idea in your head, it's in solitary confinement.",
+  "I used to think that you were a gibbering idiot. Now, after reading your latest statement, I have a much lower opinion of you.",
+  "I don't know what makes you such a worthless person, but it really works!",
+  "You would be out of your depth in a parking lot puddle.",
+  "I don't think you are a fool after reading what you say, but what's my opinion compared to that of thousands of others?",
+  "It seems your fingers not only did your typing, but did your thinking too. Have you considered suing your brain for non-support?",
+  "Are you normally this dumb or are you just having a blonde moment?",
+  "Trying to get something of value out of what you say is like trying to squeeze orange juice out of an apple.",
+  "I suppose I should have some sympathy for your handicap. You are obviously paralyzed from the neck up.",
+  "Thanks for your contribution, but if I had wanted to hear from somebody with your IQ, I'd be at my local supermarket talking to the vegetables.",
+  "Why don't you shrink your head and use it as a paperweight? It's not much use for writing anything intelligent with, that's for sure.",
+  "It's just as well you can type, for if you had to speak your mind, you'd be speechless.",
+  "Clearly, you have lost your fingertip grip on reality and have descended into an abyss of irreversible lunacy.",
+  "If brains were gasoline, you wouldn't have enough to run an ant's go-kart around the inside of a donut.",
+  "If brains were dynamite, you wouldn't have enough to blow the kneecap off a flea.",
+  "If your brain matter was axle grease, there wouldn't be enough in your head to grease the dynamo on a lightening bug's ass.",
+  "Here's a tip: no one will ever know that you've had a lobotomy if you wear a wig to hide to the scars; stop spewing your drivel on irc, and learn to control the slobbering.",
+  "If brains were gasoline, you wouldn't have enough to drive an ant's Go-cart around the inside of a bottle cap."
+  );
+  return $insults[ rand @insults ];
+}

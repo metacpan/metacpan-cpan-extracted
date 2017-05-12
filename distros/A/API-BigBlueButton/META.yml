@@ -1,0 +1,54 @@
+---
+abstract: 'client for BigBlueButton API'
+author:
+  - 'Alexander Ruzhnikov <a.ruzhnikov@reg.ru>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.15.2, CPAN::Meta::Converter version 2.131560'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: API-BigBlueButton
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  API::BigBlueButton:
+    file: lib/API/BigBlueButton.pm
+    version: 0.013
+  API::BigBlueButton::Requests:
+    file: lib/API/BigBlueButton/Requests.pm
+    version: 0.013
+  API::BigBlueButton::Response:
+    file: lib/API/BigBlueButton/Response.pm
+    version: 0.013
+requires:
+  Carp: 0
+  Digest::SHA1: 0
+  LWP::UserAgent: 6.05
+  XML::Fast: 0
+  base: 0
+  constant: 0
+  perl: 5.008008
+resources:
+  bugtracker: https://github.com/regru/API-BigBlueButton/issues
+  homepage: https://github.com/regru/API-BigBlueButton
+  repository: git://github.com/regru/API-BigBlueButton.git
+version: 0.013
+x_authority: cpan:BCDE
+x_contributors:
+  - 'Alexander Ruzhnikov <ruzhnikov85@gmail.com>'
+  - 'Alexander Ruzhnikov <a.ruznikov@reg.ru>'

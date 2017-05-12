@@ -1,0 +1,18 @@
+[% META title = "VIEW NEWS" %]
+<p>
+<table >
+	<!--<tr align="left">
+		<th>ID</th><th>TITLE</th> <th>RELEASE DATE</th>
+	</tr>-->
+	[% WHILE (new = news.next) %]
+	<tr style="background-color: rgb(51, 153, 153); color: white;">
+		<td>[% new.id%]</td>
+		<td>[% new.title %]</td>
+		<td>[% new.release_date%]</td>		
+	</tr>
+	<tr>
+		<td colspan=3>[% new.content %]</td>
+	</tr>
+	[% END %]
+</table>
+</p>

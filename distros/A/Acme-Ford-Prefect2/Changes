@@ -1,0 +1,19 @@
+Revision history for Acme-Ford-Prefect2
+
+0.3200    2017-03-29 14:40:23 -0400
+  - Require Acme::Alien::DontPanic2 0.3200 (Alien::Build 0.32 AlienBuild::MB 0.02)
+
+0.2100    2017-03-06 00:28:05 -0500
+  - Require Acme::Alien::DontPanic2 0.2100 (Alien::Build 0.21)
+
+0.1900    2017-03-02 06:45:50 +1100
+  - Require Acme::Alien::DontPanic2 0.1100 (Alien::Build 0.19)
+
+0.1100    2017-02-08 08:04:50 -0500
+  - Require Acme::Alien::DontPanic2 0.1100 (Alien::Build 0.11)
+
+0.0800    2017-02-04 11:51:27 -0500
+  - Require Acme::Alien::DontPanic2 0.0800 (Alien::Build 0.08)
+
+0.0500    2017-02-02 13:39:36 -0500
+  - Forked from the original Acme::Ford::Prefect

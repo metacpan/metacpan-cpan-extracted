@@ -1,0 +1,25 @@
+Apache::Session::Counted has a radical different worldview than the
+rest of the Apache::Session modules. In short the advantages are:
+
+    automatic lazy cleanup
+    keeping track of transactions ("backbutton supported")
+
+The disadvantages are:
+
+    less stable code (pre-alpha)
+    less supported code (future of maintainance unclear)
+
+The reason why I developed this module is that it was already
+(unpublished) working code before Apache::Session appeared on the
+stage. I found it tempting to fit my code to Jeffrey's clean generic
+module.
+
+I'm publishing it because I see that the two advantages above still
+seem to be unique in the crowd of alternatives.
+
+Please consult the ChangeLog file for further information about the
+status of the module and the manpage for documentation of how it's
+supposed to work.
+
+Berlin, 2000-09-01
+andreas koenig

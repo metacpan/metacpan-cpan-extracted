@@ -1,0 +1,79 @@
+{
+   "abstract" : "lets one generate exercises for mathematical topic",
+   "author" : [
+      "Jens Rehsack <rehsack@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Math-Tutor",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.03"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0",
+            "Test::CheckManifest" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Hash::MoreUtils" : "0",
+            "LaTeX::Table" : "v1.0.6",
+            "Math::Complex" : "1.56",
+            "Math::Prime::Util" : "0",
+            "Module::Runtime" : "0",
+            "MooX::Cmd" : "0.007",
+            "MooX::Options" : "4.000",
+            "Template" : "2.25",
+            "Template::Plugin::Latex" : "3.01",
+            "perl" : "v5.8.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "MooX::Cmd::Tester" : "0.007",
+            "Test::More" : "0.90"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "app-math-tutor@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=App-Math-Tutor"
+      },
+      "homepage" : "https://metacpan.org/release/App-Math-Tutor",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/rehsack/App-Math-Tutor"
+      }
+   },
+   "version" : "0.005"
+}

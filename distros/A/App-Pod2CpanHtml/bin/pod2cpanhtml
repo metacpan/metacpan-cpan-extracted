@@ -1,0 +1,142 @@
+#!/usr/bin/perl -w
+
+###############################################################################
+#
+# pod2cpanhtml - A utility to convert Pod to search.cpan.org style HTML.
+#
+# reverse('©'), November 2009, John McNamara, jmcnamara@cpan.org
+#
+# Documentation after __END__
+#
+
+use strict;
+use App::Pod2CpanHtml;
+use Getopt::Long;
+use Pod::Usage;
+
+my $man      = 0;
+my $help     = 0;
+my $whine    = 1;
+my $errata   = 1;
+my $complain = 0;
+my $index    = 1;
+my $version  = 0;
+
+GetOptions(
+    'help|?'    => \$help,
+    'man'       => \$man,
+    'whine!'    => \$whine,
+    'errata!'   => \$errata,
+    'complain!' => \$complain,
+    'index|i!'  => \$index,
+    'version|v' => \$version,
+) or pod2usage(2);
+
+die "pod2cpanhtml, version $App::Pod2CpanHtml::VERSION\n" if $version;
+
+pod2usage(1) if $help;
+pod2usage( -verbose => 2 ) if $man;
+
+# From the Pod::Usage pod:
+pod2usage() if @ARGV == 0 && -t STDIN;
+
+my $parser = App::Pod2CpanHtml->new();
+
+if ( defined $ARGV[0] ) {
+    open IN, $ARGV[0] or die "Couldn't open $ARGV[0]: $!\n";
+}
+else {
+    *IN = *STDIN;
+}
+
+if ( defined $ARGV[1] ) {
+    open OUT, ">$ARGV[1]" or die "Couldn't open $ARGV[1]: $!\n";
+}
+else {
+    *OUT = *STDOUT;
+}
+
+$parser->index($index);
+$parser->output_fh(*OUT);
+$parser->parse_file(*IN);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+pod2cpanhtml - A utility to convert Pod to search.cpan.org style HTML.
+
+=head1 SYNOPSIS
+
+pod2cpanhtml [options] podfile [outfile]
+
+    Options:
+        --index    Generate a HTML index in output doc (the default).
+        --help     Print a brief help message.
+        --man      Print the full manpage.
+        --version  Print the version of the program.
+        --errata   Flag any Pod errors at the end of the doc (the default).
+
+    Example:
+        pod2cpanhtml SomeModule.pm > some_module.html
+
+=head1 DESCRIPTION
+
+This program is used for converting Pod documents to L<http://search.cpan.org/> style HTML.
+
+Pod is Perl's I<Plain Old Documentation> format, see L<perlpod>.
+
+The C<pod2cpanhtml> utility produces HTML output similar to search.cpan.org by using the same conversion module, L<Pod::Simple::HTML> and the same CSS, L<http://search.cpan.org/s/style.css>.
+
+It should be noted that this utility isn't the actual program used to create the HTML for seach.cpan.org. However, the output should visually be the same.
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<podfile>
+
+The input file that contains the Pod file to be converted.
+
+=item B<outfile>
+
+The converted output file in HTML format. Defaults to stdout if not specified.
+
+=item B<--index or -i>
+
+Generate a HTML index in the output document. This is the default. To turn the index off use C<--no-index> or C<-no-i>.
+
+=item B<--help or -h>
+
+Print a brief help message and exit.
+
+=item B<--man or -m>
+
+Prints the manpage and exit.
+
+=item B<--version or -v>
+
+Prints the version of the program.
+
+=item B<--errata or -e>
+
+Generate a "Pod Errors" section at the end of the document if there are Pod errors. This is the default. To turn this feature off use C<--no-errata> or C<-no-e>. Equivalent to the L<Pod::Simple> C<no_errata_section()> method.
+
+=back
+
+
+=head1 AUTHOR
+
+John McNamara jmcnamara@cpan.org
+
+
+=head1 COPYRIGHT
+
+© MMIX, John McNamara.
+
+All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.
+
+=cut

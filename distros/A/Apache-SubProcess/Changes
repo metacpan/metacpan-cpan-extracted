@@ -1,0 +1,7 @@
+=item 0.03 - October 29, 2001
+
+added cleanup_for_exec() method
+
+=item 0.02 - November 23, 1999
+
+first release

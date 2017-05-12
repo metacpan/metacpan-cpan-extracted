@@ -1,0 +1,8 @@
+^MYMETA.json$
+^MYMETA.yml$
+^Build$
+^.git
+^_build
+^blib
+^.*\.bak$
+^t/file[12]\.txt\..*

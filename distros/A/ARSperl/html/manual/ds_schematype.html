@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - Schema Type</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H2>Schema Type Structure</H2>
+
+This HASH structure is returned as part of the 
+<a href="ds_schema.html">HASH structure</a>
+returned by function 
+<A href="ars_GetSchema.html">ars_GetSchema</a>.
+
+<PRE>
+{
+ "schemaType"            =&gt; one of <B>view</b> or <b>join</b>
+ 
+ <I>if <b>view</b> then these keys are defined:</I>
+
+ "tableName"             =&gt; string
+ "keyField"              =&gt; string
+ "viewQual"              =&gt; string
+
+ <I>if <b>join</b> then these keys are defined:</I>
+
+ "memberA"               =&gt; string
+ "memberB"               =&gt; string
+ "joinQual"              =&gt; ARQualifierStructPtr 
+ "option"                =&gt; integer (bitfield)
+}
+
+<P>
+
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 4th July 2000 by jcmurphy@arsperl.org
+</address>
+</BODY>
+</HTML>

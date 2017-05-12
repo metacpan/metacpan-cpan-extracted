@@ -1,0 +1,119 @@
+#!/opt/perl/bin/perl
+use strict;
+use utf8;
+use AnyEvent;
+use AnyEvent::XMPP::Client;
+use AnyEvent::XMPP::Ext::Disco;
+use AnyEvent::XMPP::Ext::DataForm;
+use AnyEvent::XMPP::Ext::Version;
+use AnyEvent::XMPP::Namespaces qw/xmpp_ns/;
+
+binmode STDOUT, ":utf8";
+
+my ($jid, $pw, $discodest, $disconode) = @ARGV;
+
+unless (@ARGV >= 3) {
+   warn "usage: disco_info <jid> <password> <disco-request-destination-jid> [<disco-node>]\n";
+   exit;
+}
+
+my $j     = AnyEvent->condvar;
+my $cl    = AnyEvent::XMPP::Client->new (debug => 1);
+my $disco = AnyEvent::XMPP::Ext::Disco->new;
+my $version = AnyEvent::XMPP::Ext::Version->new;
+$cl->add_extension ($disco);
+$cl->add_extension ($version);
+
+$cl->set_presence ('away', 'I\'m a bot now.', -1);
+
+$cl->add_account ($jid, $pw);
+warn "connecting to $jid...\n";
+
+my ($gitems, $ginfo, $gvers);
+
+$cl->reg_cb (
+   session_ready => sub {
+      my ($cl, $acc) = @_;
+      my $con = $acc->connection;
+      my $cnt = 0;
+      warn "session ready for $jid!\n";
+
+      $disco->request_items ($con, $discodest, $disconode, sub {
+         my ($disco, $items, $error) = @_;
+         if ($error) {
+            warn "DISCO ITEM ERROR: " . $error->string . "\n";
+         } else {
+            $gitems = $items;
+         }
+         $cnt++; $j->broadcast if $cnt > 1;
+      });
+
+      $disco->request_info ($con, $discodest, $disconode, sub {
+         my ($disco, $info, $error) = @_;
+         if ($error) {
+            warn "DISCO INFO ERROR: " . $error->string . "\n";
+            $cnt++; $j->broadcast if $cnt > 1;
+         } else {
+            $ginfo = $info;
+
+            if ($info->features->{xmpp_ns ('version')}) {
+               $version->request_version ($con, $discodest, sub {
+                  my ($vers, $err) = @_;
+                  $gvers = $vers;
+                  if ($err) {
+                     warn "VERSION ERROR: " . $err->string . "\n";
+                  }
+                  $cnt++; $j->broadcast if $cnt > 1;
+               });
+            } else {
+               $cnt++; $j->broadcast if $cnt > 1;
+            }
+         }
+      });
+   },
+   error => sub {
+      my ($cl, $acc, $error) = @_;
+      warn "ERROR: ".$error->string."\n";
+   },
+   disconnect => sub {
+      warn "DISCON[@_]\n";
+      $j->broadcast;
+   },
+);
+
+$cl->start;
+
+$j->wait;
+
+if ($gvers) {
+   printf "version: %s\t%s\t%s\n", $gvers->{name}, $gvers->{version}, $gvers->{os}
+}
+if ($ginfo) {
+   print "info: " . $ginfo->jid . "\n";
+
+   for (sort { $a->{category}.$a->{type} cmp $b->{category}.$b->{type} }
+           $ginfo->identities)
+   {
+      print "id: $_->{category}/$_->{type}: $_->{name}\n";
+   }
+
+   for (sort keys %{$ginfo->features}) {
+      print "feature: $_\n";
+   }
+
+   if (my ($f) = $ginfo->xml_node->find_all ([qw/data_form x/])) {
+      my $form = AnyEvent::XMPP::Ext::DataForm->new;
+      $form->from_node ($f);
+      print "form: " . $form->as_debug_string . "\n";
+   }
+
+}
+if ($gitems) {
+   print "items: " . $gitems->jid . "\n";
+
+   for ($gitems->items) {
+      print "item: $_->{jid}\n";
+      if (defined $_->{node}) { print "\tnode: $_->{node}\n" }
+      if (defined $_->{name}) { print "\tname: $_->{name}\n" }
+   }
+}

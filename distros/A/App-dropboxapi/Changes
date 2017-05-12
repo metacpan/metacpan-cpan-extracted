@@ -1,0 +1,101 @@
+Revision history for dropbox-api
+
+2.12 2017-02-07T09:23:46Z
+        - fix typo
+        - use upload_session
+
+2.11 2017-01-01T18:58:11Z
+        - parse_datetime is %Y-%m-%dT%TZ
+        - format_datetime is %Y-%m-%dT%T
+
+2.10 2017-01-01T15:58:01Z
+        - Add Z for strformat
+
+2.09 2016-07-18T10:12:03Z
+        - Fix bug `sync dropbox: ~/Dropbox`
+
+2.08 2016-07-18T10:00:42Z
+        - Fix bug `sync dropbox:/ ~/Dropbox/`
+
+2.07 2016-07-14T12:12:15Z
+        - Add sync file `sync dropbox:/file.txt ~/Dropbox/` `sync ~/file.txt dropbox:/Dropbox/`
+
+2.06 2016-07-14T08:12:56Z
+        - Fix bug `sync dropbox:/ ~/Dropbox/`
+
+2.05 2016-07-12T11:58:23Z
+        - Fix bug path_lower has upper case
+
+2.04 2016-07-12T11:30:53Z
+        - Add `du` command
+
+2.03 2016-07-11T16:13:38Z
+        - Support `ls /` and `find /`
+
+2.02 2016-07-11T15:00:38Z
+        - Update cpanfile
+
+2.01 2016-07-11T13:17:43Z
+        - Fix typo and misspell.
+        - Add `-s` option documented.
+        - Fix setup example.
+        Thanks mathstuf
+
+2.00 2016-07-11T11:06:31Z
+        - Migration API v2
+
+1.17    Jun 18, 2014
+        - fix bug `next` => `return`
+
+1.16    Jun 10, 2014
+        - fix bug `next` => `return`
+
+1.15    Feb 18, 2013
+        - catch open error
+
+1.14    Oct  2, 2013
+        - added LICENSE, README.md, cpanfile
+
+1.13    Jul  8, 2013
+        - Remove interpolation in printf format arguments. (thefloweringash)
+        - Ignore stty errors when stdin isn't a terminal. (thefloweringash)
+
+1.12    Jun 21, 2013
+        - Dropbox are case insensitive. (zenoamaro)
+
+1.11    Jun 20, 2013
+        - Dropbox are case insensitive.
+
+1.10    Jun 20, 2013
+        - Use lowercase for HTTP_PROXY envvar (mathstuf)
+
+1.09    Jan  8, 2013
+        - fix "list" and "find" utf8 path bug.
+
+1.08    Jan  8, 2013
+        - added print option. ( %R ... rev, %c %Ck ... client_mtime )
+        - fix print option bug.
+
+1.07    Jan  8, 2013
+        - binmode STDERR, ":utf8"
+
+1.06    Jan  8, 2013
+        - added -e option, it is "HTTP_PROXY" and "NO_PROXY" environment variable support.
+        - fix UTF-8-mac filename bug
+
+1.05    Aug 28, 2012
+        - added ProgressBar. ( need -v option )
+
+1.04    Aug 27, 2012
+        - large file support. ( over 150 MB )
+
+1.03    Aug 14, 2012
+        - set modification time.
+        - support windows homepath.
+
+1.02    Jan 10, 2012
+        - added Exception handling
+
+1.01    Apr 5, 2012
+        - added sub command uid (sylvainfilteau)
+        - added upload-to-dropbox command (sylvainfilteau)

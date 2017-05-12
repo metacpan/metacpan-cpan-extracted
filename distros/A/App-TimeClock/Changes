@@ -1,0 +1,55 @@
+Revision history for App-TimeClock
+
+0.01    2012-03-15 22:20
+        First version, released on an unsuspecting world.
+
+0.02    2012-03-16 11:07
+        Added description of .timelogrc configuration file.
+        Fixed a few links in the documentation.
+
+0.03    2012-03-16 16:02
+        ConsolePrinter: Added a blank line before printing the header.
+        timeclock.pl: Added --version option that will print the version number.
+        Switched to GPL v3.
+        Updated documentation.
+
+0.04    2012-11-28 10:33
+        ConsolePrinter: Fixed bug that would cause columns not to align when task descriptions contained utf8 characters.
+        ConsolePrinter: Fixed divions by zero bug (if worked less that a day).
+        Build.PL: Fixed license value in Build file.
+        Added more test files.
+
+0.05    2012-11-28 11:43
+        DailyReport: The timelog file is now read as utf8
+
+0.06    2012-12-11 09:42
+        DailyReport: Now shows current (or dangling) projects and projects crossing midnight.
+        Added tests of the console reports.
+
+0.07    2012-12-13 10:58
+        Removed dependency on Time::Piece, making us compatible with older versions of Perl.
+        Updated to GPL v3 in source files. 
+        Fixed a few typos in the documentation.
+
+0.08    2013-03-09 21:32
+        Version and copyright information now prints correctly using UTF-8.
+        Now supports DOS formatted timelogs (CR+NL) even on Linux/Unix and vice versa.
+        Changed from RT to GitHub for issue tracking.
+
+0.09   2013-03-11 08:53
+       Included test file which was forgotten in previous release.
+       Updated copyright year in main documentation.
+
+0.10   2015-09-07 22:21
+       Fixed Issue #13 by accepting all codes: b, h, i, o and O.
+       Note that codes b and h will just be skipped and O will be treated as o.
+
+0.11   2016-12-30 10:18
+       Fixed Issue #16 by supporting new default location of the timelog file in Emacs 25.
+
+0.12   2017-01-02 10:28
+       Fixed Issue #17 concerning unit tests failing when locale is not en_US.UTF-8
+
+0.13   2017-01-04 11:14
+       Fixed Issue #18 by implementing support for perl version pre 5.10. Also all CPAN Testers tests sould be green.
+       Fixed Issue #20 by adding use strict/warnings, this should remove all Kwalitee issues.

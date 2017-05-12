@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <link href="../../test.css" rel="stylesheet" type="text/css">
+  <link href="../../images/GvaScript.css" rel="stylesheet" type="text/css">
+  <script src="../../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+
+  <style type="text/css">
+  label {
+    display: block;
+    padding: 2px;
+    color: #aaa;
+    font-weight: bold;
+  }
+  input, textarea {
+    border: 1px solid #ddd;
+    padding: 2px;
+  }
+  textarea {
+    width: 350px;
+    height: 50px;
+    overflow: auto;
+  }
+  </style>
+  
+</head>
+
+<body>
+<h1>Custom Buttons</h1>
+
+<div class="content">
+
+  <form id="my_book" onsubmit="alert('form.submit');return false;">
+
+    <h2>Book</h2>
+    
+    <div class="header">
+
+      <div>
+        <label>Title</label>
+        <input type="text" name="book.TITLE" autofocus/>
+      </div>
+      <div>
+        <label>Description</label>
+        <textarea name="book.DESCRIPTION"></textarea>
+      </div>
+
+    </div>
+    <div id="buttons_placeholder"></div>
+  </form>
+
+</div>
+
+</body>
+
+  <script type="text/javascript">
+    new GvaScript.CustomButtons.ActionsBar('buttons_placeholder', {
+      selectfirst: true,
+      actions: [
+          {
+              label: 'Submit Form',
+              type: 'submit'
+          },
+          {
+              label: 'Reset Form',
+              type: 'reset'
+          },
+          {
+              id: 'hello_kitty',
+              label: 'Custom Action',
+              type: 'button',
+              callback: function(event) {
+                alert('Custom Action clicked!');
+              }
+          }
+      ]
+    });
+  </script>
+
+</html>

@@ -1,0 +1,478 @@
+=head1 NAME
+
+ASNMTAP::Asnmtap::Plugins::Modem is a Perl module that provides Modem functions used by ASNMTAP-based plugins.
+
+=head1 SYNOPSIS
+
+=over 4
+
+=item modem
+
+ use ASNMTAP::Asnmtap::Plugins::Modem v3.002.003;
+ use ASNMTAP::Asnmtap::Plugins::Modem qw(&get_modem_request);
+
+ my $returnCode = get_modem_request (
+   asnmtapInherited => \$objectPlugins,
+   phonenumber      => $phonenumber,
+   port             => $port,
+   baudrate         => $baud,
+   logtype          => 'file',
+   loglevel         => $loglevel
+ );
+
+=item RAS
+
+ use ASNMTAP::Asnmtap::Plugins::Modem v3.002.003;
+ use ASNMTAP::Asnmtap::Plugins::Modem qw(&get_modem_request);
+
+ my $returnCode = get_modem_request (
+   asnmtapInherited => \$objectPlugins,
+   phonenumber      => $phonenumber,
+   phonebook        => 'ASNMTAP',
+   port             => $port,
+   baudrate         => $baud,
+   defaultGateway   => '192.168.123.254',
+   defaultInterface => 'eth0',
+   logtype          => 'file',
+   loglevel         => $loglevel
+ );
+
+=back
+
+=head1 Description
+
+For testing modem and/or dial up (PPP/RAS) connections.
+
+=head2 Device::Modem based functions.
+
+Device::Modem is a Perl extension to talk to modem devices connected via serial port.
+
+Device::Modem class implements basic AT (Hayes) compliant device abstraction.
+
+=over 4
+
+=item get_modem_request()
+
+...
+
+=over 4
+
+=item asnmtapInherited
+
+A required reference to an ASNMTAP::Asnmtap::Plugins or ASNMTAP::Asnmtap::Plugins::Nagios subclass
+
+Through this way of working we inherited the command line option I<--debug>.
+
+=item custom
+
+optional, is an reference to your own custom defined function
+
+=over 4
+
+=item $asnmtapInherited
+
+A required reference to an ASNMTAP::Asnmtap::Plugins or ASNMTAP::Asnmtap::Plugins::Nagios subclass
+
+Through this way of working we inherited the command line option I<--debug>.
+
+=item $parms
+
+a reference to the get_modem_request () parameters
+
+=item $modem
+
+the MODEM object provides a reference to the currently used Device::Modem object
+
+=item $ok
+
+the latesd $ok status for dial() from Device::Modem
+
+returns only success of connection. If modem answer contains C<CONNECT> string, it returns successful state, else false value is returned.
+
+=item $answer
+
+the latesd $answer (OK, RING, NO CARRIER, ERROR, NO DIALTONE, BUSY or undef) status from Device::Modem
+
+ OK         : Command executed without errors
+ RING       : Detected phone ring
+ NO CARRIER : Link not established or disconnected
+ ERROR      : Invalid command or command line too long
+ NO DIALTONE: No dial tone, dialing not possible or wrong mode
+ BUSY       : Remote terminal busy
+
+returns the exact modem answer in the C<$answer> scalar. C<$answer> typically can contain strings like C<CONNECT 19200> or C<NO CARRIER>, C<BUSY>, ... all standard modem answers to a dial command.
+
+=over 4
+
+=item SKIP HANGUP
+
+in a custom function you can set $$answer to 'SKIP HANGUP' for skipping the function $modem->hangup() on exit, needed for some PABX.
+
+ sub actionOnModemResponse {
+   my ($asnmtapInherited, $parms, $modem, $ok, $answer, $not_connected_guess, $arguments) = @_;
+
+   my $debug = $asnmtapInherited->getOptionsValue ('debug');
+
+   print 'ASNMTAP::Asnmtap::Plugins::Modem::get_modem_request::actionOnModemResponse: ', $asnmtapInherited->programDescription (), "\n" if ( $debug );
+
+   unless ( $$ok ) {
+     my $ATDT = 'ATDT'. $$parms{phonenumber};
+     my $busy = ( $$answer eq $ATDT ? 1 : ( $$answer =~ /^$ATDT\s*(?:BUSY)?\s*$/ ? 2 : 0 ) );
+
+     if ( $busy ) {
+       $$answer = 'SKIP HANGUP' if ( $busy == 2 );
+       print "OK: BUSY\n" if ($debug);
+       $$ok = 1;
+     } else {
+       print "NOK: BUSY\n" if ($debug);
+       $$not_connected_guess++;
+       $asnmtapInherited->pluginValues ( { stateValue => $ERRORS{UNKNOWN}, alert => "Cannot dial [". $$parms{phonenumber} ."], answer: BUSY" }, $TYPE{APPEND} );
+     }
+   }
+
+   return ( ( $$ok and ! $$not_connected_guess ) ? $ERRORS{OK} : $ERRORS{UNKNOWN} ); 
+ }
+
+=back
+
+=item $not_connected_guess
+
+default 0, everytime there is a problem we do $not_connected_guess++
+
+=back
+
+ sub actionOnModemResponse {
+   my ($asnmtapInherited, $parms, $modem, $ok, $answer, $not_connected_guess) = @_;
+   return ($returnCode);
+ }
+
+and now with customArguments:
+
+ sub actionOnModemResponse {
+   my ($asnmtapInherited, $parms, $modem, $ok, $answer, $not_connected_guess, $arguments) = @_;
+   return ($returnCode);
+ }
+
+=item customArguments
+
+optional, when you need to pass parameters to your own custom defined function, this can be done with customArguments.
+
+ customArguments: SCALAR, ARRAY, HASH,
+                  REF SCALAR, REF ARRAY, REF HASH
+
+=back
+
+=item windows
+
+optional, scalar value 1 means force to be threated as Windows, 0 if under Linux or some kind of unix machine and undef means that we detect it automatically for you.
+
+=item phonenumber
+
+required, scalar [.0-9]
+
+=item port
+
+port where the modem connects to
+
+if under Linux or some kind of unix machine: /dev/ttyS0, /dev/ttyS1, /dev/ttyS2 or /dev/ttyS3 or windows: com1, com2, com3 or com4
+
+required, scalar, default /dev/ttyS0
+
+=item baudrate
+
+controls the speed of serial communications. However, here you can supply a custom value. Common speed values: 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200.
+
+optional, scalar, default 19200
+
+=item databits
+
+this tells how many bits your data word is composed of.
+
+optional, scalar, between 5 and 8, default 8
+
+=item initString
+
+custom initialization string can be supplied instead of the built-in one
+
+optional, scalar, default H0 Z S7=45 S0=0 Q0 V1 E0 &C0 X4
+
+=item parity
+
+controls how parity bit is generated and checked.
+
+optional, scalar, can be even, odd or none, default none
+
+=item stopbits
+
+tells how many bits are used to identify the end of a data word.
+
+optional, scalar, default 1
+
+=item timeout
+
+expressed in seconds. After that time, answer returns result also if nothing has been received
+
+optional, scalar, default 30
+
+=item phonebook
+
+when specified, the it means the phonebook name for the Windows RAS connection or if under Linux or some kind of unix machine it means the name for the pppd call connection
+
+optional, scalar, default undef
+
+=item username
+
+the username for the Linux or some kind of unix machine PPP- or Windows RAS connection
+
+optional, scalar, default undef
+
+=item password
+
+the password for the Windows RAS connection
+
+optional, scalar, default undef
+
+=item defaultGateway
+
+if under Linux or some kind of unix machine it means the default gateway
+
+optional, scalar, default undef
+
+=item defaultInterface
+
+if under Linux or some kind of unix machine it means the default network interface
+
+optional, scalar, default undef
+
+=item defaultDelete
+
+if under Linux or some kind of unix machine it means to delete the default gateway
+
+optional, scalar, default 1
+
+=item pppInterface
+
+the name from the ppp interface
+
+optional, scalar, can be ppp0, ppp1, ppp2 or ppp3, default ppp0
+
+=item pppTimeout
+
+timeout for when it is not possible to setup an ppp connection
+
+optional, scalar, default 60
+
+=item pppPath
+
+path where the ppp config is located
+
+optional, scalar, default /etc/ppp
+
+=item logtype
+
+optional, scalar, can be file or syslog, default syslog
+
+when specified file the log can be found at $LOGPATH, where the filename is the name from the plugin with the extension .log
+
+=item loglevel
+
+default logging level.
+
+optional, scalar, One of (order of decrescent verbosity): debug, info, notice, warning, err, crit, alert or emerg, default emerg
+
+=back
+
+=head1 ppp
+
+More information can found at: http://www.samba.org/ppp/
+
+=over 4
+
+=item install ppp
+
+=over 4
+
+=item cygwin
+
+...
+
+=item linux
+
+More information can found at: http://axion.physics.ubc.ca/ppp-linux.html
+
+ yum install ppp
+
+=item solaris
+
+...
+
+=back
+
+=item Message Logging
+
+ Edit /etc/syslog.conf and add the lines
+ local2.*                                /var/log/ppp
+ daemon.*                                /var/log/ppp
+
+ /etc/init.d/syslog restart
+
+ you can debug pppd now with:
+ tail -f /var/log/ppp
+
+=item No Default Route
+
+ /sbin/route -n
+ Kernel IP routing table
+ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+ 192.168.123.0   0.0.0.0         255.255.255.0   U     0      0        0 eth0
+ 0.0.0.0         192.168.123.254 0.0.0.0         UG    0      0        0 eth0
+
+ If there is such a default route (line starting with 0.0.0.0), and you want the ppp interface to be your default route, (the usual situation), run /sbin/route del default
+
+=item Immediate PPP
+
+ more /etc/ppp/peers/ASNMTAP
+ hide-password
+ noauth
+ noipdefault
+ remotename ASNMTAP
+ ipparam ASNMTAP
+ usepeerdns
+
+ more /etc/ppp/pap-secrets
+ userASNMTAP ASNMTAP pwdASNMTAP
+
+ /usr/sbin/pppd /dev/ttyS1 115200 debug user userASNMTAP call ASNMTAP connect "/usr/sbin/chat -v ABORT BUSY ABORT 'NO CARRIER' ABORT VOICE ABORT 'NO DIALTONE' ABORT 'NO DIAL TONE' ABORT 'NO ANSWER' ABORT DELAYED '' ATZ OK AT OK ATDT070223326 CONNECT '\d\c'" defaultroute
+
+=item Are you connected
+
+ You are now, I hope, connected via ppp. The /var/log/ppp file should have a line like
+   Connect: ppp0 <--> /dev/ttyS1
+ 1 Now, run
+
+=item Known problems
+
+ modprobe: modprobe: Can't locate module ppp-compress
+
+=item Connected
+
+ At this point you should be connected. You should see lines like
+ - Feb 19 14:54:50 wormhole pppd[905]: local IP address 80.158.214.249
+ - Feb 19 14:54:50 wormhole pppd[905]: remote IP address 80.158.214.243
+ in /var/log/ppp. (The above two lines are from my own system. The addresses, names, dates and times will vary for yours, but the form should be the same.)
+
+=item Testing Connection
+
+ First try to ping the address of the remote host. In /var/log/ppp there will be two lines that look like
+ - Feb 19 12:52:21 ppptest pppd[27378]: local IP address 80.158.214.249
+ - Feb 19 12:52:21 ppptest pppd[27378]: remote IP address 80.158.214.243
+ (Note that these are for a particular connection on my system. The numbers will differ on yours) These two lines give your and the remote computer's IP numbers for the duration of the connection. (They may well change the next time you connect.)
+
+ Again run
+   /sbin/route -n
+ and look for an entry in which the first entry is that remote IP address, and the last entry is ppp0. It must be there for the connection to work.
+
+ Then do
+   ping <remoteIPnumber>
+ eg in the above case this would be
+   ping 80.158.214.249
+ You should get back a sequence of lines about one every second. This shows that your connection to that remote host is OK, and that you have a connection to it. Type ^C (control-C) to stop ping. (Sometimes the remoteIPnumber does not respond to pings because of the way the ISP has set it up. Do not worry yet unless you get a Network or Host unreachable message.)
+
+ Now, look at those lines that you added to /etc/resolv.conf back at the beginning of this script. Do
+   ping <nameserverIP>
+ where the entry in /etc/resolv.conf was
+   nameserver <nameserverIP>
+ Again you should get a series of responses. If you do not, they may not support ping on those machines. However, if you get a response saying that the host or network is unreachable, there is definitely something wrong, either with your setup or with the nameserver address they gave you.
+
+ Now try
+   ping 180.158.214.243
+ (Using that actual number) which should work (unless of course there is something wrong with my machine. In which case try other IP numbers.) If none of these work, then there is some problem with your connection (eg default route problems).
+
+ Now try pinging some name, eg.,
+   ping www.citap.com
+ (which is the location where this page is kept). The key thing is that ping reports back on its first line with the IP address of axion. If it did so, it means your nameserver is working. If the previous one worked, but this one does not, then you either forgot to follow the initial instructions on this page about setting up the file /etc/resolv.conf, or your ISP has nameserver problems. Try a few more names of machines that you know. If all of these tests have passed, try running Netscape and connecting to some page. Everything, I hope, now works.
+
+ If not, collect all of the details you can (eg the output in /var/log/ppp-- making sure that you remove your passwords from that file) and ask for help in comp.os.linux.networking, alt.os.linux.dial-up, or alt.comp.linux.isp. As politeness, look in the archives on www.dejanews.com since your problem may already have been answered ( many times). When you ask for help or search, make your subject and description as specific as possible. 'Nothing works' as a symptom is very very hard for anyone to suggest fixes for.
+
+=item Stopping PPP
+
+ To stop the connection, use the command killall pppd
+
+=back
+
+=head1 EXPORT
+
+=head2 TAGS
+
+=over 4
+
+=item *
+
+ALL
+
+ &get_modem_request
+
+=back
+
+=head1 AUTHOR
+
+Alex Peeters [alex.peeters@citap.be]
+
+=head1 SEE ALSO
+
+ASNMTAP::Asnmtap, ASNMTAP::Asnmtap::Plugins
+
+ check_template-modem.pl
+ check_template-ras.pl
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item All
+
+ IO::Handle
+ Device::Modem
+
+=item Linux or some kind of unix machine
+
+ Device::SerialPort
+ Net::Ifconfig::Wrapper
+
+=item Windows
+
+ Win32::SerialPort
+ Win32::API
+ Win32::RASE
+
+=back
+
+=head1 COPYRIGHT NOTICE
+
+(c) Copyright 2000-2011 by Alex Peeters [alex.peeters@citap.be],
+                        All Rights Reserved.
+
+ASNMTAP is based on 'Process System daemons v1.60.17-01', Alex Peeters [alex.peeters@citap.be]
+
+ Purpose: CronTab (CT, sysdCT),
+          Disk Filesystem monitoring (DF, sysdDF),
+          Intrusion Detection for FW-1 (ID, sysdID)
+          Process System daemons (PS, sysdPS),
+          Reachability of Remote Hosts on a network (RH, sysdRH),
+          Rotate Logfiles (system activity files) (RL),
+          Remote Socket monitoring (RS, sysdRS),
+          System Activity monitoring (SA, sysdSA).
+
+'Process System daemons' is based on 'sysdaemon 1.60' written by Trans-Euro I.T Ltd
+
+=head1 LICENSE
+
+This ASNMTAP CPAN library and Plugin templates are free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+The other parts of ASNMTAP may be used and modified free of charge by anyone so long as this copyright notice and the comments above remain intact. By using this code you agree to indemnify Alex Peeters from any liability that might arise from it's use.
+
+Selling the code for this program without prior written consent is expressly forbidden. In other words, please ask first before you try and make money off of my program.
+
+Obtain permission before redistributing this software over the Internet or in any other medium. In all cases copyright and header must remain intact.
+
+=cut

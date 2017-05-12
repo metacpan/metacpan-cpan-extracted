@@ -1,0 +1,6 @@
+Revision history for Perl extension Algorithm::BellmanFord.
+
+0.01  Fri Aug  5 20:17:25 2011
+	- original version; created by h2xs 1.23 with options
+		-X -n Algorithm::BellmanFord
+

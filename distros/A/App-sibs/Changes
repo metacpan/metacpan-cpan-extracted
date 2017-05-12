@@ -1,0 +1,31 @@
+Revision history for perl distribution App-sibs
+
+0.17 2015-05-11T18:25:06+0200
+ - Add support for running backup locally
+
+0.16 2014-09-30T22:19:43Z
+ - Made ssh-keygen a lot safer
+
+0.15 2014-04-13T18:07:28Z
+ - Add "version" action
+
+0.14 2014-04-13T18:04:32Z
+ - Will touch backup directory afterwards for correct timestamp.
+ - Will remove destination directory to avoid old junk
+ - Add support for custom backup directory name. Example: $(sibs --format
+   %H:%M:%S)
+
+0.13 2013-10-31T20:09:36Z
+ - Fix missing dep: URI
+
+0.12 2013-10-26T16:39:04Z
+ - Fix ssh_dir initialization
+
+0.11 2013-10-26T16:34:55Z
+ - Fix $ENV{HOME} in unittests
+
+0.10 2013-10-24T20:06:03Z
+ - Can create ssh key
+ - Can create config file
+ - Can run backup
+

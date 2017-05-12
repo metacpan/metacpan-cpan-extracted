@@ -1,0 +1,323 @@
+---
+abstract: 'Extensible multi-protocol S-Expression chatbot.'
+author:
+  - 'Jon Sime <jonsime@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-RoboBot
+requires:
+  Acme::Zalgo: '0'
+  AnyEvent: '0'
+  AnyEvent::IRC::Client: '0'
+  AnyEvent::Mattermost: '0'
+  AnyEvent::SlackRTM: '0'
+  App::Sqitch: '0'
+  Clone: '0'
+  Config::Any::Merge: '0'
+  Config::General: '0'
+  DBD::Pg: '0'
+  DBIx::DataStore: '0'
+  Data::Dumper: '0'
+  DateTime: '0'
+  DateTime::Format::Pg: '0'
+  EV: '0'
+  Exporter::Easy: '0'
+  File::HomeDir: '0'
+  File::ShareDir: '0'
+  FileHandle: '0'
+  Getopt::Long::Descriptive: '0'
+  HTML::TreeBuilder::LibXML: '0'
+  HTML::TreeBuilder::XPath: '0'
+  HTTP::Request: '0'
+  IPC::Open2: '0'
+  JSON: '0'
+  JSON::Path: '0'
+  LWP::Protocol::https: '0'
+  LWP::Simple: '0'
+  LWP::UserAgent: '0'
+  Lingua::EN::Tagger: '0'
+  List::Util: '0'
+  Log::Dispatch::Screen: '0'
+  Log::Log4perl: '0'
+  Log::Log4perl::Appender::Screen: '0'
+  Module::Loaded: '0'
+  Module::Pluggable::Object: '0'
+  Moose: '0'
+  MooseX::ClassAttribute: '0'
+  MooseX::SetOnce: '0'
+  Number::Format: '0'
+  Pod::Simple::SimpleTree: '0'
+  Scalar::Util: '0'
+  Term::ExtendedColor: '0'
+  Text::Aspell: '0'
+  Text::Levenshtein: '0'
+  Text::Wrap: '0'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  URI::Find: '0'
+  URI::QueryParam: '0'
+  XML::LibXML: '0'
+  namespace::autoclean: '0'
+  perl: v5.20.0
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/jsime/robobot/issues
+  homepage: https://github.com/jsime/robobot
+  repository: https://github.com/jsime/robobot.git
+version: '4.004'
+x_Dist_Zilla:
+  perl:
+    version: '5.020002'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename: []
+          exclude_match: []
+          follow_symlinks: 0
+          include_dotfiles: 0
+          prefix: ''
+          prune_directory: []
+          root: .
+      name: '@Basic/GatherDir'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Basic/PruneCruft'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Basic/ManifestSkip'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Basic/MetaYAML'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Basic/License'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Basic/Readme'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Basic/ExtraTests'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Basic/ExecDir'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Basic/ShareDir'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Basic/MakeMaker'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Basic/Manifest'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Basic/TestRelease'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Basic/ConfirmRelease'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Basic/UploadToCPAN'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: GithubMeta
+      version: '0.54'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: RuntimeRequires
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      config:
+        Dist::Zilla::Plugin::Git::NextVersion:
+          first_version: '4.001'
+          version_by_branch: 0
+          version_regexp: (?^:^v(.+)$)
+        Dist::Zilla::Role::Git::Repo:
+          'git --version': 2.7.4
+          repo_root: .
+      name: Git::NextVersion
+      version: '2.041'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: PkgVersion
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: MetaJSON
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::Test::ChangesHasContent
+      name: Test::ChangesHasContent
+      version: '0.010'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: PodSyntaxTests
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::Test::ReportPrereqs
+      name: Test::ReportPrereqs
+      version: '0.025'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: TestRelease
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: ConfirmRelease
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      config:
+        Dist::Zilla::Plugin::Git::Check:
+          untracked_files: die
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          'git --version': 2.7.4
+          repo_root: .
+      name: '@Git/Check'
+      version: '2.041'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: v%v%n%n%c
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          'git --version': 2.7.4
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Git/Commit'
+      version: '2.041'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: Changes
+          signed: 0
+          tag: v4.004
+          tag_format: v%v
+          tag_message: v%v
+        Dist::Zilla::Role::Git::Repo:
+          'git --version': 2.7.4
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Git/Tag'
+      version: '2.041'
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      config:
+        Dist::Zilla::Plugin::Git::Push:
+          push_to:
+            - origin
+          remotes_must_exist: 1
+        Dist::Zilla::Role::Git::Repo:
+          'git --version': 2.7.4
+          repo_root: .
+      name: '@Git/Push'
+      version: '2.041'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '6.008'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '6.008'
+x_serialization_backend: 'YAML::Tiny version 1.69'

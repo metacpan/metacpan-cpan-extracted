@@ -1,0 +1,17 @@
+Revision history for App::Stopwatch
+
+1.0.0   2014-07-16
+        [Major]
+        * First public release
+
+1.1.0   2014-07-24
+        [Minor]
+        * Script can be used as a timer with new `--run` option
+        * Added `--help` option
+
+1.2.0   2014-09-09
+        [Minor]
+        * Added link to App::stopw in POD
+
+        [Patch]
+        * Fixing url markup in POD

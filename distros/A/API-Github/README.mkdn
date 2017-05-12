@@ -1,0 +1,320 @@
+# NAME
+
+API::Github - Github.com API Client
+
+# VERSION
+
+version 0.06
+
+# SYNOPSIS
+
+    use API::Github;
+
+    my $github = API::Github->new(
+        username   => 'USERNAME',
+        token      => 'TOKEN',
+        identifier => 'APPLICATION NAME',
+    );
+
+    $github->debug(1);
+    $github->fatal(1);
+
+    my $user = $github->users('h@x0r');
+    my $results = $user->fetch;
+
+    # after some introspection
+
+    $user->update( ... );
+
+# DESCRIPTION
+
+This distribution provides an object-oriented thin-client library for
+interacting with the Github ([http://github.com](http://github.com)) API. For usage and
+documentation information visit [https://developer.github.com/v3](https://developer.github.com/v3).
+API::Github is derived from [API::Client](https://metacpan.org/pod/API::Client) and inherits all of it's
+functionality. Please read the documentation for API::Client for more usage
+information.
+
+# ATTRIBUTES
+
+## identifier
+
+    $github->identifier;
+    $github->identifier('IDENTIFIER');
+
+The identifier attribute should be set to a string that identifies your
+application.
+
+## token
+
+    $github->token;
+    $github->token('TOKEN');
+
+The token attribute should be set to the API user's personal access token.
+
+## username
+
+    $github->username;
+    $github->username('USERNAME');
+
+The username attribute should be set to the API user's username.
+
+## debug
+
+    $github->debug;
+    $github->debug(1);
+
+The debug attribute if true prints HTTP requests and responses to standard out.
+
+## fatal
+
+    $github->fatal;
+    $github->fatal(1);
+
+The fatal attribute if true promotes 4xx and 5xx server response codes to
+exceptions, a [API::Client::Exception](https://metacpan.org/pod/API::Client::Exception) object.
+
+## retries
+
+    $github->retries;
+    $github->retries(10);
+
+The retries attribute determines how many times an HTTP request should be
+retried if a 4xx or 5xx response is received. This attribute defaults to 0.
+
+## timeout
+
+    $github->timeout;
+    $github->timeout(5);
+
+The timeout attribute determines how long an HTTP connection should be kept
+alive. This attribute defaults to 10.
+
+## url
+
+    $github->url;
+    $github->url(Mojo::URL->new('https://api.github.com'));
+
+The url attribute set the base/pre-configured URL object that will be used in
+all HTTP requests. This attribute expects a [Mojo::URL](https://metacpan.org/pod/Mojo::URL) object.
+
+## user\_agent
+
+    $github->user_agent;
+    $github->user_agent(Mojo::UserAgent->new);
+
+The user\_agent attribute set the pre-configured UserAgent object that will be
+used in all HTTP requests. This attribute expects a [Mojo::UserAgent](https://metacpan.org/pod/Mojo::UserAgent) object.
+
+# METHODS
+
+## action
+
+    my $result = $github->action($verb, %args);
+
+    # e.g.
+
+    $github->action('head', %args);    # HEAD request
+    $github->action('options', %args); # OPTIONS request
+    $github->action('patch', %args);   # PATCH request
+
+The action method issues a request to the API resource represented by the
+object. The first parameter will be used as the HTTP request method. The
+arguments, expected to be a list of key/value pairs, will be included in the
+request if the key is either `data` or `query`.
+
+## create
+
+    my $results = $github->create(%args);
+
+    # or
+
+    $github->POST(%args);
+
+The create method issues a `POST` request to the API resource represented by
+the object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+## delete
+
+    my $results = $github->delete(%args);
+
+    # or
+
+    $github->DELETE(%args);
+
+The delete method issues a `DELETE` request to the API resource represented by
+the object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+## fetch
+
+    my $results = $github->fetch(%args);
+
+    # or
+
+    $github->GET(%args);
+
+The fetch method issues a `GET` request to the API resource represented by the
+object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+## update
+
+    my $results = $github->update(%args);
+
+    # or
+
+    $github->PUT(%args);
+
+The update method issues a `PUT` request to the API resource represented by
+the object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+# RESOURCES
+
+## emojis
+
+    $github->emojis;
+
+The emojis method returns a new instance representative of the API
+_emojis_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://developer.github.com/v3/emojis](https://developer.github.com/v3/emojis).
+
+## events
+
+    $github->events;
+
+The events method returns a new instance representative of the API
+_events_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://developer.github.com/v3/activity/events](https://developer.github.com/v3/activity/events).
+
+## feeds
+
+    $github->feeds;
+
+The feeds method returns a new instance representative of the API
+_feeds_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://developer.github.com/v3/activity/feeds](https://developer.github.com/v3/activity/feeds).
+
+## gists
+
+    $github->gists;
+
+The gists method returns a new instance representative of the API
+_gists_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://developer.github.com/v3/gists](https://developer.github.com/v3/gists).
+
+## gitignore
+
+    $github->gitignore;
+
+The gitignore method returns a new instance representative of the API
+_gitignore_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://developer.github.com/v3/gitignore](https://developer.github.com/v3/gitignore).
+
+## issues
+
+    $github->issues;
+
+The issues method returns a new instance representative of the API
+_issues_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://developer.github.com/v3/issues](https://developer.github.com/v3/issues).
+
+## licenses
+
+    $github->licenses;
+
+The licenses method returns a new instance representative of the API
+_licenses_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://developer.github.com/v3/licenses](https://developer.github.com/v3/licenses).
+
+## markdown
+
+    $github->markdown;
+
+The markdown method returns a new instance representative of the API
+_markdown_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://developer.github.com/v3/markdown](https://developer.github.com/v3/markdown).
+
+## meta
+
+    $github->meta;
+
+The meta method returns a new instance representative of the API
+_meta_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://developer.github.com/v3/meta](https://developer.github.com/v3/meta).
+
+## notifications
+
+    $github->notifications;
+
+The notifications method returns a new instance representative of the API
+_notifications_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://developer.github.com/v3/activity/notifications](https://developer.github.com/v3/activity/notifications).
+
+## orgs
+
+    $github->orgs;
+
+The orgs method returns a new instance representative of the API
+_orgs_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://developer.github.com/v3/orgs](https://developer.github.com/v3/orgs).
+
+## rate\_limit
+
+    $github->rate_limit;
+
+The rate\_limit method returns a new instance representative of the API
+_rate\_limit_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://developer.github.com/v3/rate\_limit](https://developer.github.com/v3/rate_limit).
+
+## repos
+
+    $github->repos;
+
+The repos method returns a new instance representative of the API
+_repos_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://developer.github.com/v3/repos](https://developer.github.com/v3/repos).
+
+## search
+
+    $github->search;
+
+The search method returns a new instance representative of the API
+_search_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://developer.github.com/v3/search](https://developer.github.com/v3/search).
+
+## users
+
+    $github->users;
+
+The users method returns a new instance representative of the API
+_users_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://developer.github.com/v3/users](https://developer.github.com/v3/users).
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

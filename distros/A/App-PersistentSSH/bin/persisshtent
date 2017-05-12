@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::PersistentSSH;
+
+App::PersistentSSH->new_with_options->run;
+

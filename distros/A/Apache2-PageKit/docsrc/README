@@ -1,0 +1,12 @@
+These docs are available in HTML format form:
+
+http://www.pagekit.org/guide
+
+To compile the source into HTML, download Saxon, J2DK 1.3, and Norman
+Walsh's DocBook XSL stylesheets from:
+
+http://www.nwalsh.com/docbook/xsl/
+
+Then run
+
+java -cp /home/tjmather/saxon com.icl.saxon.StyleSheet ../docsrc/manual.xml ../../docbook_xsl/html/chunk.xsl > index.html

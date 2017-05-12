@@ -1,0 +1,18 @@
+[% META title = 'VPN Certificate Generation' -%]
+    
+    <form method="post" action="/ca/template/vpn/certify/bundle.pem">
+    <table>
+   	<tr><td>Type :</td>
+      <td>
+      	<select name="template">
+      		<option value="VPN1">VPN nodes (OpenBSD IPSEC)</option>
+      		<option value="OpenVPNServer">OpenVPN server</option>
+	      	<option value="OpenVPNClient">OpenVPN client</option>
+    	</select>
+      </td></tr>
+		<tr><td>DNS (for servers):</td><td><input type="text" name="dns"></td></tr>
+		<tr><td>Clients (for clients):</td><td><input type="text" name="email"></td></tr>
+      <tr><td colspan=2><input type="submit" name="Submit" value="Issue"></td></tr>
+    </table>
+
+    </form>

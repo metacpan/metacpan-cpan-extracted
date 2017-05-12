@@ -1,0 +1,8 @@
+
+* Add subclassable cache filename generator function.
+  Write a couple of methods of hashing the URL and query args
+  Make it customizable via httpd.conf
+
+* Double check if we have race conditions when the content is being
+  regenerated..  consider locking to a single writer..
+

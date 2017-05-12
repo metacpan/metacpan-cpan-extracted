@@ -1,0 +1,194 @@
+#!perl
+
+use strict;
+use warnings;
+use IO::Socket;
+use Getopt::Long qw(:config posix_default no_ignore_case gnu_compat bundling);
+use Pod::Usage qw(pod2usage);
+
+use App::RedisTop::Component::Time;
+use App::RedisTop::Component::CPU;
+use App::RedisTop::Component::Memory;
+use App::RedisTop::Component::MemoryPer;
+use App::RedisTop::Component::Connection;
+use App::RedisTop::Component::ConnectionPer;
+use App::RedisTop::Component::Save;
+use App::RedisTop::Component::Command;
+use App::RedisTop::Component::Slowlog;
+use App::RedisTop::Component::DB;
+
+#################################
+# main
+#################################
+package main;
+
+my %groups = (
+    time      => { class => App::RedisTop::Component::Time->new(),          sort => 1, },
+    cpu       => { class => App::RedisTop::Component::CPU->new(),           sort => 2, },
+    memory    => { class => App::RedisTop::Component::Memory->new(),        sort => 3, },
+    memoryper => { class => App::RedisTop::Component::MemoryPer->new(),     sort => 4, },
+    conn      => { class => App::RedisTop::Component::Connection->new(),    sort => 5, },
+    connper   => { class => App::RedisTop::Component::ConnectionPer->new(), sort => 6, },
+    save      => { class => App::RedisTop::Component::Save->new(),          sort => 7, },
+    command   => { class => App::RedisTop::Component::Command->new(),       sort => 8, },
+    slowlog   => { class => App::RedisTop::Component::Slowlog->new(),       sort => 9, },
+    db        => { class => App::RedisTop::Component::DB->new(dbid => 0),   sort => 10, },
+);
+
+sub main {
+    my $opt = +{};
+
+    GetOptions(
+        't|time'        => \$opt->{time},
+        'c|cpu'         => \$opt->{cpu},
+        'M|memory'      => \$opt->{memory},
+        'm|memoryper'   => \$opt->{memoryper},
+        'n|conn'        => \$opt->{conn},
+        'o|connper'     => \$opt->{connper},
+        's|save'        => \$opt->{save},
+        'C|command'     => \$opt->{command},
+        'l|slowlog'     => \$opt->{slowlog},
+        'd|db'          => \$opt->{db},
+        'i|instances=s' => \$opt->{instances},
+        'sleep=i'       => \$opt->{sleep},
+        'nocolor'       => \$opt->{nocolor},
+        'h|help'        => \$opt->{help},
+    );
+
+    pod2usage 1 if $opt->{help};
+
+    my $sleep     = $opt->{sleep} || 3;
+    my @instances = ($opt->{instances}) ? split(/,/, $opt->{instances}) : ('127.0.0.1:6379');
+    $ENV{ANSI_COLORS_DISABLED} = 1 if $opt->{nocolor};
+
+    # group specified
+    my @sp_groups;
+    for my $key (sort{ $groups{$a}->{'sort'} <=> $groups{$b}->{'sort'}} keys %groups) {
+        push @sp_groups, $groups{$key}->{class} if $opt->{$key};
+    }
+
+    # default
+    if(scalar @sp_groups == 0) {
+        push @sp_groups, $groups{$_}->{class} for qw/cpu memory conn save command db/;
+    }
+
+    my $perform = do {
+        if ($0 =~ /-stat/) {
+            require App::RedisTop::PerformStat;
+            App::RedisTop::PerformStat->new(
+                groups    => \@sp_groups,
+                instances => \@instances,
+            );
+        } else {
+            require App::RedisTop::Perform;
+            App::RedisTop::Perform->new(
+                groups    => \@sp_groups,
+                instances => \@instances,
+            );
+        }
+    };
+    while(1) {
+        $perform->run;
+        sleep($sleep);
+    }
+}
+
+main();
+
+__END__
+
+=head1 NAME
+
+redis-top - Redis resource statistics tool.
+
+=head1 DESCRIPTION
+
+Redis resource statistics tool.
+
+=head1 USAGE
+
+redis-top [options]
+redis-stat [options]
+
+=head2 Example
+
+=over 4
+
+=item redis-top -i 127.0.0.1:6379,127.0.0.1:6380,127.0.0.1:6381,127.0.0.1:6382
+
+=item redis-top --sleep 1 --nocolor --cpu --memory --db
+
+=item redis-top --cpu --memory --conn --save --command --db  # default
+
+=item redis-top -cMnsCdmolt  # full
+
+=back
+
+=head1 OPTIONS
+
+=head2 GROUP OPTIONS
+
+=over 4
+
+=item -c,--cpu
+
+enable cpu stats
+
+=item -M,--memory
+
+enable memory stats
+
+=item -m,--memoryper
+
+enable used_memory/maxmemory stats
+
+=item -n,--conn
+
+enable connection stats
+
+=item -o,--connper
+
+enable connected_clients/maxclients stats
+
+=item -s,--save
+
+enable save stats
+
+=item -C,--command
+
+enable command stats
+
+=item -l,--slowlog
+
+enable slowlog stats
+
+=item -d,--db
+
+enable db stats (default:db0 stats)
+
+=item -t,--time
+
+enable time output
+
+=back
+
+=head2 GLOBAL OPTIONS
+
+=over 4
+
+=item --sleep
+
+sleep time (default:3)
+
+=item --nocolor
+
+disable colors
+
+=item -h --help
+
+show help
+
+=back
+
+=cut
+

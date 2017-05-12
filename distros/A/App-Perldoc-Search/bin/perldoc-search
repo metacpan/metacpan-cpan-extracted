@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+require App::Perldoc::Search;
+App::Perldoc::Search->run( @ARGV );
+exit;
+
+__END__
+
+=head1 NAME
+
+perldoc-search - Searches perl documentation
+
+=head1 VERSION
+
+version 0.11
+
+=head1 SYNOPSIS
+
+Search for things documenting C<add_build_element>:
+
+  perldoc-search add_build_element
+
+Results
+
+  perltoc - perl documentation table of contents
+  Module::Build::API - API Reference for Module Authors
+  Module::Build::Cookbook - Examples of Module::Build Usage
+
+Search only some directories or files:
+
+  perldoc-search add_build_element Some/File.pm A/Directory/
+
+=head1 DESCRIPTION
+
+App::Perldoc::Search searches your perl documentation files for
+matches and displays the result to STDOUT.
+
+=head1 OPTIONS
+
+=over
+
+=item -G REGEXP
+
+Matches file names to search. Default is to search all .pod, .pm, .pmc files.
+
+=item -l
+
+Lists matched file names.
+
+=item --help
+
+Displays this documentation
+
+=item --slow
+
+Do a slower search which parses embedded documentation to reject false
+positives and more accurately extract the document's title.
+
+=back
+
+=head1 SEE ALSO
+
+L<perldoc>, apropos, L<perltoc>, L<App::Perldoc::Search>
+
+=cut

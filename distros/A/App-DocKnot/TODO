@@ -1,0 +1,68 @@
+                            DocKnot To-Do List
+
+This file contains loose development notes for the current state of this
+project.
+
+Metadata required for README files:
+
+* Authors
+* How to list me as maintainer
+* Dates and holders of copyright
+* License summary for top of README
+* One-line description
+* Blurb
+* Long description
+* Requirements
+* Test requirements
+* Whether to mention maintainer tests
+* Hacking requirements
+* Install instructions (possibly move to a separate file)
+* Install boilerplate for Kerberos, --enable-reduced-depends
+* Configuration instructions
+* Optional sections
+* Home page
+* Git repository
+* Bug tracking (GitHub, CPAN, internal JIRA)
+* Stanford support information
+* Thanks
+* License summary
+* Pointers to long licenses
+
+Metadata required for web pages:
+
+* Short description for index
+* Category (obsolete packages have their pages manually maintained)
+* Quote
+* Description
+* Download URL pattern
+* Version name
+* Archive link
+* List of documentation by category for sidebar
+* Ohloh URL
+* Debian PTS URL
+* Bug tracking URL
+* Debian package information (history, package names, etc.)
+* Requirements
+* Full list of documentation by category
+* License summary
+* Security advisory links
+* Cut-off version with security issues
+* Whether there are xz releases (or fix release to always make them)
+
+Metadata required for release:
+
+* Path to Git repository
+* Path to AFS publication directory (from URL?)
+* GPG key IDs for package signing
+* License overrides for build-license
+* Default license for build-license
+
+Overall design:
+
+* Directory of metadata in each project
+* Include the metadata in the distribution as source
+* Add README file to the metadata directory explaining it
+* properties.json file with main information
+* docs.json with all docs, whether to link in sidebar
+* Separate files for text components
+* Use *.txt or *.th extensions to distinguish markup language

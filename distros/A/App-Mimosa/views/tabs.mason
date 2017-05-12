@@ -1,0 +1,48 @@
+<%args>
+    $admin => 0
+    $sequence_data_dir
+</%args>
+<%perl>
+    my $input_length = length($sequence_data_dir) + 3;
+</%perl>
+<div id="t2_content" style="" class="x-hide-display">
+<form>
+Sequence data directory: <input type="text" value="<% $sequence_data_dir %>" size="<% $input_length %>">
+</form>
+</div>
+
+<div id="t3_content" style="" class="x-hide-display">
+<p>
+<a href="https://gmod.github.com/mimosa">Mimosa</a> is powered by many pieces of <a href="http://fsf.org">Free</a> and Open Source software.
+</p>
+
+<p>
+Here is a list of those that it relies on most:
+</p>
+
+<ul>
+<li><a href="http://perl.org/">Perl</a></li>
+<li><a href="http://bioperl.org/">BioPerl</a></li>
+<li><a href="http://jquery.org">jQuery 1.4.2 (bundled)</a></li>
+<li><a href="http://dev.sencha.com/deploy/ext-3.3.1/docs/">ExtJS 3.3.1 (bundled)</a></li>
+<li><a href="http://iinteractive.com/moose/">Moose</a></li>
+<li><a href="http://catalystframework.org">Catalyst</a></li>
+</ul>
+
+<p>
+You can see a detailed list of our Perl dependencies in our <a href="https://github.com/GMOD/mimosa/blob/master/Build.PL">Build.PL</a>
+</p>
+<p>
+    Mimosa is also designed to interoperate with the <a href="http://www.gmod.org">Generic Model Organism Database (GMOD)</a> <a href="http://www.gmod.org/wiki/Chado">Chado</a> database schema. This means that you can deploy a Mimosa schema into a Chado schema, which allows Mimosa to use the various organisms and sequences stored in Chado.
+</p>
+
+</div>
+
+
+
+% if ($admin) {
+<div id="t4_content" style="" class="x-hide-display">
+<h1>Admin</h1>
+<a href="/autocrud/bcs/mimosa_sequence_set">Edit Sequence Sets</a>
+</div>
+% }

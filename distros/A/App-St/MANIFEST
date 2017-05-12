@@ -1,0 +1,19 @@
+Changelog
+INSTALL
+lib/App/St.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+script/st
+t/01-use.t
+t/02-new.t
+t/03-validate.t
+t/04-process.t
+t/05-basic-stats.t
+t/05-format.t
+t/06-percentile.t
+t/06-quantiles.t
+t/07-result.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

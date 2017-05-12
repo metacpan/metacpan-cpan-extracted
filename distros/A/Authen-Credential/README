@@ -1,0 +1,47 @@
+Authen-Credential
+
+This module offers abstractions of credentials, i.e. something that
+can be used to authenticate. It allows the creation and manipulation of
+credentials. In particular, it defines a standard string representation
+(so that credentials can be given to external programs as command line
+options), a standard structured representation (so that credentials can
+be stored in structured configuration files or using JSON) and
+"preparators" that can transform credentials into ready-to-use data for
+well known targets.
+
+Different authentication schemes (aka credential types) are supported.
+This package currently supports "none", "plain" and "x509" but others
+can be added by providing the supporting code in a separate module.
+
+A Python implementation of the same credential abstractions is available
+at https://github.com/cern-mig/python-auth-credential so credentials can
+be shared between different programming languages.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Authen::Credential
+    perldoc Authen::Credential::none
+    perldoc Authen::Credential::plain
+    perldoc Authen::Credential::x509
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) CERN 2011-2015
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

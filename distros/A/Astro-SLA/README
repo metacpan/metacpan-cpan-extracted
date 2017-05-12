@@ -1,0 +1,247 @@
+Astro::SLA -- interface to C or Fortran SLALIB library
+==========
+
+This module provides an interface layer to the C or Fortran version of
+the SLALIB library.  From the abstract of the SLALIB manual (written
+by Pat Wallace):
+
+   "SLALIB is a library used by writers of positional-astronomy
+   applications. Most of the 171 routines are concerned with
+   astronomical position and time, but a number have wider
+   trigonometrical, numerical or general applications."
+
+An example program, stime, is provided. This simply reports the
+current time (modified Julian day and local sidereal time for the JCMT).
+
+Requirements:
+-------------
+
+This module requires either the C or Fortran version of the SLALIB
+library written by Pat Wallace.
+
+This module has been tested with the Starlink Fortran library v2.5
+(released 2005), the current Starlink release (kapuahi),
+and 2008 releases of the C library. It should work
+fine with older versions (up to 2002).
+
+If you are working with orbital elements you need a version of the
+library released sometime in 2002. Improvements in mid-2005 to
+the accuracy of the calculations for moving sources (comets and
+asteroids) means that not all the tests will pass for the orbital
+elements tests if you are using a relatively old Slalib.
+
+You must have either the C version of the library or the Starlink
+Fortran version of the library in order to build this module.
+
+The Fortran version of SLALIB is available from Starlink under the
+GPL. You can download it from Starlink (http://www.starlink.ac.uk).
+
+Please contact Pat Wallace (ptw@tpsoft.demon.co.uk) for details of how
+to obtain the (proprietary) C SLALIB library.
+
+A C compiler is required - this is an XS module. A Fortran compiler (such
+as gfortran) is required if you are building against the Fortran library [or
+at least the Fortran runtime libraries].
+
+This module has been tested on linux and Mac OS X but should be fairly
+portable.
+
+For a self-contained reimplementation of the SLA library written in C
+and based on top of SOFA consider using the Astro::PAL CPAN module. This
+module has a lot of the commonly used SLA API implemented and uses a
+similar API.
+
+Installation:
+-------------
+
+ - Edit the Build.PL so that the location of the SLA
+   library and include files are correct [see variables $sla_lib and
+   $sla_inc] or else use the $SLA_ROOT environment variable. By
+   default the module attempts to find the Starlink
+   installation and then falls back to assuming the C version is
+   installed. Change the value of $use_fortran if you know you are
+   using an explicit C or Fortran version.
+
+   It is assumed the C library is available from /usr/local/lib by default.
+
+   The includes files, slalib.h, should be available
+   in the default path. If they are somewhere else the Build.PL
+   should be edited to reflect this location. For example,
+   change the line
+
+     my $sla_inc => '',
+
+   to
+
+     my $sla_inc => '-I/home/me/include',
+
+   to pick them up from /home/me/include
+
+Then:
+
+  % perl Build.PL
+  % ./Build
+  % ./Build test
+  % ./Build install
+
+The tests only test part of the build. Some functions remain untested.
+In particular orbital element support will not be very good unless you
+have a modern installation of SLALIB (sometime from 2002).
+
+See Astro::Coords for a general object-oriented wrapper around Astro::PAL.
+
+Documentation:
+--------------
+
+The module provides documentation on how to use the perl interface
+to SLALIB. It does not contain information on how to use
+SLALIB itself. For more information on SLALIB see:
+
+  http://www.starlink.ac.uk/star/docs/sun67.htx/sun67.html
+
+
+Copyright
+---------
+
+Copyright (C) 2007, 2010, 2012, 2013 Tim Jenness and the Science and Technology Facilities
+Council. Copyright (C) 1998-2005 Tim Jenness and the Particle Physics and
+Astronomy Research Council.  All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+
+The SLALIB library (C version) is proprietary.  Please contact Patrick
+Wallace (ptw@tpsoft.demon.co.uk) if you would like to obtain a copy.
+
+The Starlink SLALIB library (Fortran) is available from Starlink
+under the GPL.
+
+The array handling code was written by Karl Glazebrook.
+
+
+Changes
+-------
+
+See the ChangeLog file for a full list of changes.
+
+Changes for release 1.03
+
+  - Add rpath hack to linker. MakeMaker includes this automatically
+    but Module::Build does not.
+
+Changes for release 1.02
+
+  - Add ExtUtils::F77 as a configure dependency. This fixes a problem with
+    CPAN tools running Build.PL, finding ExtUtils::F77 is required, installing
+    it and not re-running Build.PL.
+
+Changes for release 1.01:
+
+  - Understand that modern Fortran SLA requires CNF.
+
+  - Specify a minimum Module::Build version.
+
+  - Now understands $STARLINK_DIR and uses it when Starlink::Config
+    is not available.
+
+  - Now understands $SLA_ROOT environment variable to allow the
+    location of the C sla library to be specified externally through
+    the environment.
+
+Changes for release 1.00:
+
+  - Use Module::Build
+
+  - Fix slaIntin when using the Fortran library
+
+  - Minor compiler warnings fixed and removedsome OUTPUT sections that
+    were not needed.
+
+Changes for release 0.99:
+
+  - slaObs can now be called with a constant string (required by
+    Astro::Telescope).
+
+  - Added slaIntin (for completeness)
+
+  - The tests have been updated considerably. All the examples
+    from the slalib documentation are now included in the test suite.
+
+  - Test::More is now required for the tests.
+
+  - stime has added arguments (-epoch, -h and -man)
+
+Changes for release 0.98:
+
+  - Missed two "Perl_croak + threading errors"
+
+Changes for release 0.97:
+
+  - Addition of a test for cometary ephemerides
+
+  - A fix to the slaOap function when using the Fortran bindings
+
+  - Fix for building with a thread-enabled perl, although slalib
+    is not proven to be thread safe.
+
+Changes for release 0.96:
+
+  - Now includes Fortran support
+
+  - Add slaPertel and slaPertue
+
+  - Fix slaOap
+
+Changes for release 0.95:
+
+  - Fix bug in slaPlante (it simply didn't work)
+
+Changes for release 0.94:
+
+  - Fix bug in slaPreces and add new test for it.
+
+Changes for release (0.93):
+
+  - New utility 'stime' for printing the current time, MJD and LST
+
+  - Add ut2lst_tel command (this was in the docs but not present)
+
+  - Fix bug in slaEg50 (thanks to Chris Phillips)
+
+  - Fix segmentation violation in certain uses of the slaObs
+    command on linux.
+
+  - Should now compile cleanly on perl 5.6.0 (now uses PL_na symbols
+    in XS layer)
+
+  - slightly improved test suite.
+
+Changes for release 0.92:
+
+  - Export all single precision aliases
+
+  - Export slaDvxv
+
+  - Fix compiler warnings (thanks to Chris Phillips <phillips@jive.nfra.nl>
+    for a patch).
+
+Changes for release 0.91:
+
+  - Add DR2S, DR2H and slaEcleq to the export list.
+
+  - Fix argument order of slaEqgal and slaSupgal
+        [patch supplied by Tim Kimball (kimball@stsci.edu)]
+
+  - Allow use of single precision names as aliases to double precision
+    commands.

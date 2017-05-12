@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/Attribute/GlobalEnable.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-nothing.t
+t/01-Debug_1.t
+t/02-Debug_2.t
+t/03-Debug_4.t
+t/04-Debug-Package.t
+t/05-Debug-sub.t
+t/06-Flag_1.t
+t/07-Flag_2.t
+t/08-Bench_1.t
+t/09-Bench_5.t
+t/10-No_Debug.t
+t/lib/Attribute/GlobalEnable/TestModule.pm

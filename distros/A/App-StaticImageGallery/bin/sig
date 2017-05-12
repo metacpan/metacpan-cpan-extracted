@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+package
+  sig;
+
+use App::StaticImageGallery;
+my $sig = App::StaticImageGallery->new_with_options();
+$sig->run();
+__END__
+
+=head1 NAME
+
+sig
+
+=head1 VERSION
+
+version 0.002
+
+=head1 AUTHOR
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010 Robert Bohne.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=head1 AUTHOR
+
+Robert Bohne, C<< <rbo at cpan.org> >>

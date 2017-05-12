@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 7b041ffba1d9da3d5c9b6ea201979ff2eb6191d9 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 951553f43ad519ff40c583012a7db84465a19147 Changes
+SHA1 ed9ed5c43c60bfd6d98727aff3551cb8638d85c6 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 2caae4cb7e6eb1f9b1fb38de4d2316b28a497273 MANIFEST
+SHA1 423f585cd022ad2c3347d7cdfc62ce12757f700d META.json
+SHA1 c33879a55fb47d3ec44b70fab07d8b8b110b7f53 META.yml
+SHA1 c68f92e41088d95418637ca48ebdaf34a2097478 Makefile.PL
+SHA1 6b9d1e27846a109c08abbd35a212bacf5aa8c42e README
+SHA1 51599c143d84e9083cc5f7686322976d6ea37417 dist.ini
+SHA1 fc1aba39c7666c0846435f6f20adb70eb7867f1d doap.ttl
+SHA1 3e21f4e6e13f493ef83cbcce28e459adc852aed7 lib/Alt/common/sense/TOBYINK.pm
+SHA1 219f59b64e269ec2461029ae56976d3f2fe6c5f7 lib/common/sense.pm
+SHA1 0549554bb2b549a311022f0747dc3f361c4d6ea6 t/01basic.t
+SHA1 f9d4b53fffe5dba4cecea7bd6cb59ade2cb69d62 t/02arch.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlOK2F8ACgkQzr+BKGoqfTkvLQCfZBYxZl8etwpenc3A0NLvy9qG
+m8QAn1hyi36Pik1K4EYUJT7o2FVBZW+H
+=8XsT
+-----END PGP SIGNATURE-----

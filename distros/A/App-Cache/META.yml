@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               App-Cache
+version:            0.37
+abstract:           Easy application-level caching
+author:
+    - Leon Brocard <acme@astray.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Accessor::Chained::Fast:  0
+    File::Find::Rule:     0
+    File::HomeDir:        0
+    File::stat:           0
+    HTTP::Cookies:        0
+    LWP::UserAgent:       0
+    Path::Class:          0
+    Storable:             0
+    Test::More:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,33 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "TFA Fruit Circles",
+            "percentage" : "4"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Berry Crunch",
+            "percentage" : "2"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Bavarian Cream",
+            "percentage" : "2"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Marshmallow",
+            "percentage" : "2"
+         }
+      ],
+      "target_pg" : "30",
+      "base_nic_per_ml" : 100,
+      "base_nic_type" : "PG",
+      "target_quantity" : "90",
+      "target_nic_per_ml" : "3",
+      "target_vg" : 70,
+      "notes" : []
+   }
+}

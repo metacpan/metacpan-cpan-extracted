@@ -1,0 +1,28 @@
+Revision history for Perl extension XML::Atom::Feed::Javascript
+
+0.5	Fri Nov 26, 2004 09:30:44 AM
+	- updated to work with the latest XML::Atom
+	- made asJavascript( $max ) actually work
+	- increased test coverage
+
+0.4	Mon Apr 26, 2004 09:07:33 AM
+	- fixed t/network.t to use XML::Atom::Client instead of the 
+	  deprecated XML::Atom::API.
+
+0.3     Tue Jan 20, 2004 08:57:12 AM
+        - updated to work with XML::Atom v0.05
+        - removed use of description option in asJavascript() which wasn't
+          documented, and is of limited utility since you can only use it 
+          when also passing in a max entry limit...and you can just turn off
+          the description with your stylesheet :)
+
+0.21	Fri Dec 18, 2003 15:20:00 PM
+	- improved documentation 
+
+0.2	Fri Dec 18, 2003 10:18:03 AM
+	- improved documentation
+
+0.1	Fri Dec 11, 2003 10:18:03 AM
+	- initial version
+
+

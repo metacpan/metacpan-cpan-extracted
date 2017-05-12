@@ -1,0 +1,26 @@
+---
+abstract: 'a prove plugin to set environment variables'
+author:
+  - 'Dagfinn Ilmari Mannsåker <ilmari@photobox.com>;'
+build_requires:
+  App::Prove: 0
+  Capture::Tiny: 0.12
+  Test::Fatal: 0
+  Test::More: 0
+  ok: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Prove-Plugin-SetEnv
+requires:
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/ilmari/App-Prove-Plugin-SetEnv
+  repository: https://github.com/ilmari/App-Prove-Plugin-SetEnv.git
+version: 0.001

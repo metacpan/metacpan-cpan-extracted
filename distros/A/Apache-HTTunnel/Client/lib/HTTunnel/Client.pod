@@ -1,0 +1,167 @@
+=head1 NAME
+
+HTTunnel::Client - Client class for Apache::HTTunnel
+
+
+=head1 SYNOPSIS
+
+  my $hc = new HTTunnel::Client("http://localhost/httunnel") ;
+  $hc->connect('tcp', $some_host, $some_port) ;
+
+  $hc->print('some request') ;
+  my $some_response = $hc->read(1024) ;
+
+  $ch->close() ;
+ 
+=head1 DESCRIPTION
+
+C<HTTunnel::Client> is the client class to C<Apache::HTTunnel>. It allows
+the creation of a network connection tunnelled through HTTP. All data sent
+and received during this connection will be transported inside normal HTTP
+requests.
+
+C<HTTunnel::Client> extends C<LWP::UserAgent>, so all C<LWP::UserAgent>
+methods are available through C<HTTunnel::Client>.
+
+
+=head1 CONSTRUCTORS
+
+=over 4
+
+=item new ( URL, [ARGS] )
+
+Creates an C<HTTunnel::Client> object that will use C<URL> to contact
+the C<Apache::HTTunnel> server. C<ARGS> are is passed directly to the
+C<LWP::UserAgent> constructor.
+
+=back
+
+
+=head1 METHODS
+
+=over 4
+
+=item connect ( PROTO, HOST, PORT, [TIMEOUT] )
+
+Asks the C<Apache::HTTunnel> server to establish a connection of protocol
+C<PROTO> to C<HOST>:C<PORT>. An exception is thrown if an error occurs.
+
+Accepted values for C<PROTO> are 'tcp' and 'udp'.
+
+=item print ( DATA )
+
+Asks the C<Apache::HTTunnel> server to write C<DATA> to the established 
+remote connection. An exception is thrown if an error occurs.
+
+C<DATA> can be a scalar or a list, in which case the list items are 
+concatenated together.
+
+=item read ( LEN, [TIMEOUT], [LIFELINE], [LIFELINE_CUT_ACTION] )
+
+Asks the C<Apache::HTTunnel> server to read up to C<LEN> bytes from
+the established remote connection. An exception is thrown if an error occurs.
+
+When trying to read, C<HTTunnel::Client> will establish an HTTP connection
+to the C<Apache::HTTunnel> server asking that C<LEN> bytes be read. If no 
+data is available after C<TIMEOUT> seconds (the default value is 15 seconds),
+the HTTP connection is closed by the server and the C<read> method will establish
+a new one. This will go on until some data or EOF is returned.
+
+Therefore C<read> will return only when some (or no more) data is available
+to be read (like the regular L<read>).
+
+C<LIFELINE> can be any valid filehandle from which one can read. If used, 
+C<read> will interrupt its connection loop and execute  C<LIFELINE_CUT_ACTION> 
+when data (or EOF) is available to be read from C<LIFELINE>. It will then
+return undef.
+
+C<LIFELINE_CUT_ACTION> wust be a CODE ref. The default value is 
+
+  sub {die("lifeline cut\n")}
+
+These features can be used if you want fork and to start a process that 
+does nothing but reads and returns the data via a pipe. You can then use 
+a second pipe to make sure the reader process terminates when the master 
+process terminates.
+
+Here is an example:
+
+  my $lifeline = new IO::Pipe() ;
+  my $reader = new IO::Pipe() ;
+  my $pid = fork() ;
+  if ($pid){
+    $reader->reader() ;
+    $lifeline->writer() ;
+	
+    # Read data from $reader...
+  }
+  else {
+    $reader->writer() ;
+    $reader->autoflush(1) ;
+    $lifeline->reader() ;
+
+    while (1){
+      my $data = $hc->read(1024, 15, $lifeline, sub {exit()}) ;
+      exit() unless defined($data) ;
+      print $reader $data ;
+    }
+  }
+
+
+=item close ( )
+
+Asks the C<Apache::HTTunnel> server to close a previously established 
+connection.
+
+=item get_peer_info ( )
+
+The C<get_peer_info> method returns information about the remote connection.
+A string containing the IP address and port number, separated by a colon (:) 
+is returned. This method can be useful with UDP connections to validate the 
+sender of each packet.
+
+=item request_callback ( REQUEST )
+
+The C<request_callback> method is a callback method that can be used to 
+access the C<HTTP::Request> object just before it is sent. The default 
+implementation does nothing.
+
+=item response_callback ( RESPONSE )
+
+The C<response_callback> method is a callback method that can be used to 
+access the C<HTTP::Response> object just after it is received. The default 
+implementation does nothing.
+
+=back
+
+
+=head1 JAVA CLIENT
+
+For those who might be interested, there is a Java version of 
+L<HTTunnel::Client> included in the distribution. The API is
+the basically the same.
+
+
+=head1 BUGS
+
+I'm sure there are some in there :)
+
+
+=head1 SEE ALSO
+
+L<LWP::UserAgent>
+
+
+=head1 AUTHOR
+
+Patrick LeBoutillier, E<lt>patl@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005 by Patrick LeBoutillier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

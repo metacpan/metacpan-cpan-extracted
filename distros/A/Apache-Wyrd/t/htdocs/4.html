@@ -1,0 +1,93 @@
+<TESTCLIENT::Form>
+<TESTCLIENT::Form::Template name="test">
+<TESTCLIENT::Input name="texttest" type="text" default="testing text" /><BR>
+<TESTCLIENT::Input::Set name="radiotest" type="radiobuttons" default="option1" sort="name">
+	<TESTCLIENT::Input::Opt name="option1" value="Option One" />
+	<TESTCLIENT::Input::Opt name="option2" value="Option Two" />
+	<TESTCLIENT::Input::Opt name="option3" value="Option Three" />
+	<TESTCLIENT::Input::Opt name="option4" value="Option Four" />
+</TESTCLIENT::Input::Set><BR>
+<TESTCLIENT::Input::Set name="selecttest" type="selection" default="option1,option3" sort="name">
+	<TESTCLIENT::Input::Opt name="option1" value="Option One" />
+	<TESTCLIENT::Input::Opt name="option2" value="Option Two" />
+	<TESTCLIENT::Input::Opt name="option3" value="Option Three" />
+	<TESTCLIENT::Input::Opt name="option4" value="Option Four" />
+</TESTCLIENT::Input::Set><BR>
+<TESTCLIENT::Input::Set name="checkboxtest" type="checkboxes" default="option2,option4" sort="name">
+	<TESTCLIENT::Input::Opt name="option1" value="Option One" />
+	<TESTCLIENT::Input::Opt name="option2" value="Option Two" />
+	<TESTCLIENT::Input::Opt name="option3" value="Option Three" />
+	<TESTCLIENT::Input::Opt name="option4" value="Option Four" />
+</TESTCLIENT::Input::Set><BR>
+<TESTCLIENT::Input::Set name="pulldowntest" type="pulldown" default="option3" sort="name">
+	<TESTCLIENT::Input::Opt name="option1" value="Option One" />
+	<TESTCLIENT::Input::Opt name="option2" value="Option Two" />
+	<TESTCLIENT::Input::Opt name="option3" value="Option Three" />
+	<TESTCLIENT::Input::Opt name="option4" value="Option Four" />
+</TESTCLIENT::Input::Set><BR>
+<input type="submit">
+</TESTCLIENT::Form::Template>
+<TESTCLIENT::Form::Template name="test2">
+<TESTCLIENT::Input name="texttest" type="text" default="testing text" /><BR>
+<TESTCLIENT::Input::Set name="radiotest" type="radiobuttons" default="option1" sort="name">
+	<TESTCLIENT::Input::Opt name="option1" value="Option One" />
+	<TESTCLIENT::Input::Opt name="option2" value="Option Two" />
+	<TESTCLIENT::Input::Opt name="option3" value="Option Three" />
+	<TESTCLIENT::Input::Opt name="option4" value="Option Four" />
+</TESTCLIENT::Input::Set><BR>
+<TESTCLIENT::Input::Set name="selecttest" type="selection" default="option1,option3" sort="name">
+	<TESTCLIENT::Input::Opt name="option1" value="Option One" />
+	<TESTCLIENT::Input::Opt name="option2" value="Option Two" />
+	<TESTCLIENT::Input::Opt name="option3" value="Option Three" />
+	<TESTCLIENT::Input::Opt name="option4" value="Option Four" />
+</TESTCLIENT::Input::Set><BR>
+<TESTCLIENT::Input::Set name="checkboxtest" type="checkboxes" sort="name">
+	<TESTCLIENT::Input::Opt name="option1" value="Option One" />
+	<TESTCLIENT::Input::Opt name="option2" value="Option Two" />
+	<TESTCLIENT::Input::Opt name="option3" value="Option Three" />
+	<TESTCLIENT::Input::Opt name="option4" value="Option Four" />
+</TESTCLIENT::Input::Set><BR>
+<TESTCLIENT::Input::Set name="pulldowntest" type="pulldown" default="option3" sort="name">
+	<TESTCLIENT::Input::Opt name="option1" value="Option One" />
+	<TESTCLIENT::Input::Opt name="option2" value="Option Two" />
+	<TESTCLIENT::Input::Opt name="option3" value="Option Three" />
+	<TESTCLIENT::Input::Opt name="option4" value="Option Four" />
+</TESTCLIENT::Input::Set><BR>
+<input type="submit">
+</TESTCLIENT::Form::Template>
+<TESTCLIENT::Form::Template name="test3">
+<TESTCLIENT::Input name="texttest" type="text" default="testing text" /><BR>
+<TESTCLIENT::Input::Set name="radiotest" type="radiobuttons" default="option1" sort="name">
+	<TESTCLIENT::Input::Opt name="option1" value="Option One" />
+	<TESTCLIENT::Input::Opt name="option2" value="Option Two" />
+	<TESTCLIENT::Input::Opt name="option3" value="Option Three" />
+	<TESTCLIENT::Input::Opt name="option4" value="Option Four" />
+</TESTCLIENT::Input::Set><BR>
+<TESTCLIENT::Input::Set name="selecttest" type="selection" default="option1,option3" sort="name">
+	<TESTCLIENT::Input::Opt name="option1" value="Option One" />
+	<TESTCLIENT::Input::Opt name="option2" value="Option Two" />
+	<TESTCLIENT::Input::Opt name="option3" value="Option Three" />
+	<TESTCLIENT::Input::Opt name="option4" value="Option Four" />
+</TESTCLIENT::Input::Set><BR>
+<TESTCLIENT::Input::Set name="checkboxtest" type="checkboxes" sort="name">
+	<TESTCLIENT::Input::Opt name="option1" value="Option One" />
+	<TESTCLIENT::Input::Opt name="option2" value="Option Two" />
+	<TESTCLIENT::Input::Opt name="option3" value="Option Three" />
+	<TESTCLIENT::Input::Opt name="option4" value="Option Four" />
+</TESTCLIENT::Input::Set><BR>
+<TESTCLIENT::Input::Set name="pulldowntest" type="pulldown" default="option3" sort="name">
+	<TESTCLIENT::Input::Opt name="option1" value="Option One" />
+	<TESTCLIENT::Input::Opt name="option2" value="Option Two" />
+	<TESTCLIENT::Input::Opt name="option3" value="Option Three" />
+	<TESTCLIENT::Input::Opt name="option4" value="Option Four" />
+</TESTCLIENT::Input::Set><BR>
+<input type="submit">
+</TESTCLIENT::Form::Template>
+<TESTCLIENT::Form::Template name="final">
+Finished.<BR>
+text input test value: $:textest
+checkbox test value: $:checkboxtest
+selections test value: $:selecttest
+pulldown test value: $:pulldowntest
+</TESTCLIENT::Form::Template>
+</TESTCLIENT::Form>

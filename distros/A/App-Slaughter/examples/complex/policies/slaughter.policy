@@ -1,0 +1,13 @@
+#
+# Ensure that slaughter is invoked every hour upon each managed system.
+#
+# This is deliberately not setup in the package.
+#
+#
+
+if ( ( -x "/sbin/slaughter" ) &&
+     ( ! -e "/etc/cron.hourly/slaughter" ) )
+{
+
+    RunCommand( Cmd =>  "ln -s /sbin/slaughter /etc/cron.hourly/slaughter" );
+}

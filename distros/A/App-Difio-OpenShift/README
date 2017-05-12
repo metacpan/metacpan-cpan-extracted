@@ -1,0 +1,49 @@
+App-Difio-OpenShift
+=====================
+
+Difio registration agent for OpenShift / Perl applications
+
+This module compiles a list of locally installed Perl distributions and sends it to
+http://www.dif.io where you check your application statistics and available updates.
+
+INSTALLATION
+
+To register your OpenShift Perl application to Difio do the following:
+
+1) Create a Perl application on OpenShift:
+
+    rhc-create-app -a myapp -t perl-5.10
+
+2) Add a dependency in your deplist.txt file
+
+    cd ./myapp/
+    echo "App::Difio::OpenShift" >> deplist.txt
+
+3) Set your userID in the ./data/DIFIO_SETTINGS file
+
+    echo "export DIFIO_USER_ID=YourUserID"  > ./data/DIFIO_SETTINGS
+
+4) Enable the registration script in .openshift/action_hooks/post_deploy
+
+    source $OPENSHIFT_REPO_DIR/data/DIFIO_SETTINGS
+    export PERL5LIB=$OPENSHIFT_GEAR_DIR/perl5lib/lib/perl5/
+    $OPENSHIFT_GEAR_DIR/perl5lib/lib/perl5/App/Difio/OpenShift.pm
+
+5) Commit your changes
+
+        git add .
+        git commit -m "enable Difio registration"
+
+6) Then push your application to OpenShift
+
+    git push
+
+That's it, you can now check your application statistics at
+<http://www.dif.io>
+
+
+COPYRIGHT AND LICENCE
+
+ Copyright (C) 2012 by Alexander Todorov <atodorov@nospam.dif.io>
+
+ This module is free software and is published under the same terms as Perl itself.

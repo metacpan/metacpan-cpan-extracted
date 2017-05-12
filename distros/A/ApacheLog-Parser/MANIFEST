@@ -1,0 +1,15 @@
+bin/cron.loghack
+bin/loghack
+Build.PL
+Changes
+examples/dirty_rows.pl
+examples/report_check.pl
+examples/skip_audit.pl
+lib/ApacheLog/Parser.pm
+lib/ApacheLog/Parser/Report.pm
+lib/ApacheLog/Parser/SkipList.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t

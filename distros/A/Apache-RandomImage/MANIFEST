@@ -1,0 +1,20 @@
+.cvsignore
+.project
+Build.PL
+Changes
+examples/random-image.conf
+lib/Apache/RandomImage.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/distribution.t
+t/perlcritic.t
+t/perlcriticrc
+t/perltidy.conf
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+t/signature.t
+SIGNATURE    Added here by Module::Build

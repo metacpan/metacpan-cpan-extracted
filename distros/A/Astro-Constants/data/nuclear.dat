@@ -1,0 +1,26 @@
+# nuclear.dat
+#
+# Format: variable<tab>description<tab>CGS value<tab>MKS value
+#    or   variable<tab>description<tab>value
+#
+A_me	ELECTRON_MASS	mass of electron	9.10938356e-28	9.10938356e-31	1.2e-8
+A_mp	PROTON_MASS	mass of proton	1.672621898e-24	1.672621898e-27	1.2e-8
+A_amu	ATOMIC_MASS_UNIT	atomic mass unit	1.660539040e-24	1.660539040e-27	1.2e-8
+A_eV	ELECTRON_VOLT	electron volt	1.6021766208e-12	1.6021766208e-19	6.1e-9
+A_h	PLANCK	Planck constant	6.626070040e-27	6.626070040e-34	1.2e-8
+A_hbar	HBAR	Planck's constant /2pi	1.054571800e-27	1.054571800e-34	1.2e-8
+A_e	ELECTRON_CHARGE	electron charge (defined positive)	4.8032046729e-10 4.8032e-10	1.6021766208e-19	6.1e-9
+A_sigma	STEFAN_BOLTZMANN	Stefan-Boltzmann constant	5.670367e-5	5.670367e-8	2.3e-6
+A_mn	NEUTRON_MASS	neutron mass	1.674927471e-24	1.674927471e-27	1.2e-8
+# hydrogen mass from Google (ughh) at 1.00794 amu
+A_mH	HYDROGEN_MASS	mass of Hydrogen atom	1.67372e-24	1.67372e-27 1e-5
+A_AA	ANGSTROM	Angstrom	1e-8	1e-10	0
+A_arad	A_RAD	radiation density constant	7.565723e-15	7.565723e-16	2.3e-6
+A_sigmaT	THOMSON_XSECTION	Thomson cross-section	6.6524587158e-25	6.6524587158e-29	1.4e-9
+A_re	ELECTRON_RADIUS	classical electron radius	2.8179403227e-13	2.8179403227e-15	6.8e-10
+A_a0	BOHR_RADIUS	Bohr radius	5.2917721067e-9	5.2917721067e-11	2.3e-10
+A_Wien	WIEN	Wien wavelength displacement law constant	2.8977729e-1	2.8977729e-3	5.7e-7
+A_alpha	ALPHA	fine structure constant	7.2973525664e-3	7.2973525664e-3	2.3e-10
+A_Z0	VACUUM_IMPEDANCE	characteristic impedance of vacuum	376.730313461	1e-50
+A_eps0	PERMITIV_FREE_SPACE	permittivity of free space	1	8.854187817e-12	1e-30
+A_mu0	PERMEABL_FREE_SPACE	permeability of free space	1	1.2566370614e-6	1e-10

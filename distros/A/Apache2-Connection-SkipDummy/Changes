@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache2-Connection-SkipDummy.
+
+0.01  Sun May 23 15:17:20 2010
+	- original version; created by h2xs 1.23 with options
+		-X Apache2-Connection-SkipDummy
+

@@ -1,0 +1,36 @@
+Revision history for App-moduleshere
+
+0.08   2011-04-27 13:55:55 CST
+
+    Add --dry-run cmd option
+
+0.07   2010-09-28 09:20:17 CST
+
+    code tweak
+
+0.06   2010-09-27 19:28:21 CST
+
+    Add -r cmd option to copy modules and modules under them, e.g. 
+        "-r Carp" will copy both Carp.pm and Carp/Heavy.pm
+
+0.05   2010-04-25 08:28:41 CST
+
+    Add -l cmd option to set the destination directory
+
+0.04   2010-04-25 07:37:46 CST
+
+    Warn if we want a directory but get a plain file.
+    Warn without a line number to make the output clean.
+    Message tweak a bit
+
+0.03   2010-04-24 07:38:53 CST
+
+    In tests, call `mhere' using $^X
+
+0.02   2010-04-24 06:07:05 CST
+
+    Don't copy if the source and destination have the same path.
+
+0.01   2010-04-24 03:19:43 CST
+    Initial release.
+

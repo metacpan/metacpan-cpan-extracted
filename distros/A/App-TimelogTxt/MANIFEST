@@ -1,0 +1,28 @@
+.gitignore
+bin/timelog
+Changes
+lib/App/TimelogTxt.pm
+lib/App/TimelogTxt/Day.pm
+lib/App/TimelogTxt/Event.pm
+lib/App/TimelogTxt/File.pm
+lib/App/TimelogTxt/Format.pod
+lib/App/TimelogTxt/Manual.pod
+lib/App/TimelogTxt/Stack.pm
+lib/App/TimelogTxt/Tutorial.pod
+lib/App/TimelogTxt/Utils.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00.load.t
+t/day.t
+t/event.t
+t/file.t
+t/utils.t
+xt/critic.t
+xt/hasversion.t
+xt/minimumversion.t
+xt/pod.t
+xt/podcoverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

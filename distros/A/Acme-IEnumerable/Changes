@@ -1,0 +1,19 @@
+Revision history for Perl extension Acme::IEnumerable.
+
+v0.6 May 2013
+  - Comment out ... usage to support v5.10
+
+v0.5 May 2013
+  - Instead of requiring v5.16 require v5.10
+
+v0.4 May 2013
+  - Fixed bug in group_by, wrong base class for IGrouping
+
+v0.3 May 2013
+  - Fixed bug in Acme::IEnumerable::List::reverse
+
+v0.2 May 2013
+  - Fixed file permission problems
+
+v0.1 Apr 2013
+  - Initial Release.

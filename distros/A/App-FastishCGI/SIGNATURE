@@ -1,0 +1,73 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 9acd5f1deb7b006a1e5c67649e3b70bc783a60a8 Build.PL
+SHA1 b0e68332737610aa3ca59d6eecd924a171ceafd3 Changes
+SHA1 a1ab3620bf8ebcb1c939621980cbdc79d3d943eb LICENSE
+SHA1 054c599b0dd347f7e368167c546926fdc5a91768 MANIFEST
+SHA1 e33e1d4de2e8efbe659c4022129512c2923a4595 META.json
+SHA1 d7eaa9af2ebdc97900ff89430927c1494d880be1 README.mkdn
+SHA1 3ac2e7b9f9a20dd0b924b8d25f923d5c9a3dfe7b bin/fastishcgi
+SHA1 a653ed22df17bada32ea7433656bd0af8329db50 debian/changelog
+SHA1 136571b41aa14adc10c5f3c987d43c02c8f5d498 debian/compat
+SHA1 e282db2c27f7df34decd934033df54562c789342 debian/control
+SHA1 2eb8c3782beebf65f901130bfe98aaa080f6c185 debian/copyright
+SHA1 6d2bae436c91a3e42826f17965ec4a97c3a019ee debian/fastishcgi.dirs
+SHA1 7735a08798db9e5a89f66168efc1f4dc3990c24e debian/fastishcgi.install
+SHA1 5f6760c832506a7214040149922eca574c218d4c debian/rules
+SHA1 f8738a6566306ae25f93456a019426af51ccc827 debian/source/format
+SHA1 a5359c00e3fdf9b1a3ab4928fd373dcfe7f1327f debian/watch
+SHA1 de61833938fb3f8abe62244ad18de6cc433f9a44 dist.ini
+SHA1 fb27b9c3f5b40a08667e67bf6a40653344010d78 examples/fastishcgi.service
+SHA1 8571051b244d35689375bda6fbf896bbfe5016ca lib/App/FastishCGI.pm
+SHA1 32e255a6b2ef71ab742839e73c228d893bc93fe6 t/00-compile.t
+SHA1 9e593fc8a0b8549f315b24615c559dc688388a3c t/www/chart.cgi
+SHA1 c8dc7b3b41131707f1e750c44c71ead55b7613be t/www/env.cgi
+SHA1 60d2ee37a66d9eb7f60aeb39f652637cea981b43 t/www/error.cgi
+SHA1 5f2f559407958a851c7d2f01742afa0f9a8e56c2 t/www/index.html
+SHA1 0bc7c5e72e129cae16af004bd03cbe684c65165a t/www/multi.html
+SHA1 e4565c271ecea4d559a29606d18670611580eed6 t/www/post.cgi
+SHA1 42c326ae3338fe498bd7ccecc0980474e9de1a44 t/www/post.html
+SHA1 1a12a61c50a7173bf3b8e297b1cd66ba948da223 t/www/timeout.cgi
+SHA1 5ed15a5a4566bbe19b445b3c969b26ab349510fc weaver.ini
+SHA1 b0f2ac0b28f663d98de8369e26c2dc3fd3d4e52d xt/author/critic.t
+SHA1 bd9126cb8a3bb757c98c9bbbc1bbbae23e232c8c xt/author/pod-spell.t
+SHA1 e3094e32340a9a0dcb90d91b77d66e61cbf7fa14 xt/perlcriticrc
+SHA1 ff40a14d2d4b2fb9b93bf1324632dc9b4efafacc xt/perltidyrc
+SHA1 28ef20a73b7cf9b85585e2b7db6fc80424289134 xt/release/cpan-changes.t
+SHA1 f1df216d28e5f464bc6b68faf0b85cc0e38c7246 xt/release/kwalitee.t
+SHA1 7b52b909acf6cd52733f8f226f92147ed76a2717 xt/release/meta-json.t
+SHA1 e9a889d6b725ee070e06aae1a8ad544495322cb2 xt/release/pod-coverage.t
+SHA1 6c997f10467a193f295d4343fbd9dae699414253 xt/release/pod-linkcheck.t
+SHA1 7c4d18e54e391b89f7f983bc902c2037c50ce9f7 xt/release/pod-no404s.t
+SHA1 9934d36e45e1143c1a54658bc48872e0591af41b xt/release/pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBCgAGBQJPDyxUAAoJEOpmRc2kYGBPOn8P/2S14GsPklF/vQ/zrWJ6qb3/
+N/0SIoqwvInSt1J43d1VDQW9+7MswWv1lrcEu7P2MDMwkF2ds41XxdY/rZ8bnVWZ
+ulIoqI4rdBS2hzmcuyMRvXeoME40EIfcC3wcj5vP7WfyVPYgHSMvQbk1xBLZdLci
+t4hDq9E2q9/aM3QEYnWcq/f52GJaCq4jLl5dkJQsC2ixrtuzesARVYj+ICtTRI/x
+s1plNEARm5jnxHbCE9eUVJjjyDLKQbg1krM1LsDzdWHjIxHuY2cEr6H39sVu+hSr
+hVbQLnRuuF4FnU16YmZDOWSGS8kSgygZPn78HnWBItS+pAsITfKEiUHTapuMeYVd
+eaIMWlOlSnHZtGW3j/9irsAPCajgfwSLWs4dOY4avpPSv0+sNKyF/5EoAMQNJlPc
+waYpysS5OfrXR4HWipVViCwDIuJ147LJtzwa1TYhqTy+n6bbhxi31E0wITKKRq33
+Uj33W57s2I2053glktrRhNGBW8qCab98Q/e1W0qrcr0lAGsrnE9u7/n2uTQsfGVQ
+zbk48w5FiIZPwN64BvXmw8y7OMBf1Huvr35wQbwNSq/rpd70189yGG1tzymV6MoG
+dSNtZJBJnxEz9FiBAqG+VdjSS59Bhzz03KmkKO91DH1WZQcjjQEzpku29sOYKtDe
+eqQm7d7YHlYpSMd+qM1f
+=yTeP
+-----END PGP SIGNATURE-----

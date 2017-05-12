@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache2::S3.
+
+0.01  Tue Sep 11 08:04:48 2007
+	- original version; created by h2xs 1.23 with options
+		-X -b 5.6.0 -e -n Apache2::S3
+

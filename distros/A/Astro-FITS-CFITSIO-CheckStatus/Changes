@@ -1,0 +1,18 @@
+Revision history for Perl extension Astro::FITS::CFITSIO::CheckStatus.
+
+
+0.03  Mon Apr  5 11:49:03 EDT 2004	
+      - the status variable can be used to provide an additional error
+        message to be reported.
+
+      - more class methods available, e.g. to change croak method
+		
+0.02  Fri Mar 12 11:00:39 EST 2004
+      - added documentation(!), ability to provide a user specified
+	subroutine to call instead of Carp::croak, so can use
+        e.g. Log::Log4perl's logcroak
+
+0.01  Mon Jul 28 10:37:10 2003
+      - original version; created by h2xs 1.21 with options
+	-AXc -n Astro::FITS::CFITSIO::CheckStatus
+

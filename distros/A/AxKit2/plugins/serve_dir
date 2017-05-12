@@ -1,0 +1,259 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+=head1 NAME
+
+serve_file - Plugin for serving directories
+
+=head1 SYNOPSIS
+
+  Plugin serve_dir
+
+=head1 DESCRIPTION
+
+This module attempts to replicate Apache's mod_autoindex.
+
+=head1 CONFIG
+
+None.
+
+=cut
+
+use AxKit2::Utils qw(http_date);
+
+sub conf_IndexOrderDefault;
+
+sub hook_response {
+    my ($self, $hd) = @_;
+    
+    my $ct = $hd->mime_type;
+    my $client = $self->client;
+    
+    # don't serve any dirs with path_info
+    return DECLINED if $client->headers_in->path_info;
+    
+    unless ($hd->request_method eq 'GET' || $hd->request_method eq 'HEAD') {
+        return DECLINED;
+    }
+    
+    # and once we have it, start serving
+    $self->client->watch_read(0);
+    
+    my $file = $hd->filename;
+    my $uri  = $hd->request_uri;
+    $uri =~ s/\?.*$//;
+    $uri =~ s/\/$//;
+    my $parent = $uri;
+    $parent =~ s/[^\/]*$//;
+    
+    $uri = '/' unless length($uri);
+    
+    $self->log(LOGINFO, "Attempting to serve dir: $file");
+    if (!-d $file) {
+        return DECLINED;
+    }
+    my $mtime = http_date((stat(_))[9]);
+    
+    if (!opendir(DIR, $file)) {
+        $self->log(LOGERROR, "opendir($file) failed: $!");
+        return FORBIDDEN;
+    }
+    
+    $client->headers_out->header('Content-Type', "text/html");
+    $client->headers_out->header("Last-Modified", $mtime);
+    $client->send_http_headers;
+    
+    return OK if $hd->request_method eq 'HEAD';
+    
+    my ($direction, $key) = $self->config('IndexOrderDefault');
+    $direction ||= 'Ascending';
+    $key       ||= 'Name';
+    $direction =~ s/^(.).*$/\U$1/;
+    $key       =~ s/^(.).*$/\U$1/;
+    my $qs = $self->client->headers_in->request_uri;
+    if ($qs =~ /\?([NMDS])=([AD])$/) {
+        $key = $1;
+        $direction = $1;
+    }
+    
+    my @files = $self->sort_files($direction, $key, $file, readdir(DIR));
+    closedir(DIR);
+    
+    my $output = <<EOT;
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+ <HEAD>
+  <TITLE>Index of $uri</TITLE>
+ </HEAD>
+ <BODY>
+<H1>Index of $uri</H1>
+<TABLE WIDTH="100%">
+<TR style="border-bottom: 1px;">
+<TH><!-- Icon --></TH>
+EOT
+    
+    $output .= '<TH><A HREF="?N=' .
+        ( ($key eq 'N' && $direction eq 'A') ? 'A' : 'D' ) .
+        '">Name</A></TH>';
+    $output .= '<TH><A HREF="?M=' .
+        ( ($key eq 'M' && $direction eq 'A') ? 'A' : 'D' ) .
+        '">Last modified</A></TH>';
+    $output .= '<TH><A HREF="?S=' .
+        ( ($key eq 'S' && $direction eq 'A') ? 'A' : 'D' ) .
+        '">Size</A></TH>';
+    $output .= '<TH><A HREF="?D=' .
+        ( ($key eq 'D' && $direction eq 'A') ? 'A' : 'D' ) .
+        '">Description</A></TH>';
+    $output .= "</TR>\n";
+    
+    if ($parent) {
+        my $pfile = $file;
+        $pfile =~ s/[^\/]*$//;
+        my ($parent_details) = $self->augment($pfile, '..');
+        $parent_details->[0] = $parent;
+        $self->add_output(\$output, $parent_details, 1);
+    }
+    
+    for my $file (@files) {
+        $self->add_output(\$output, $file);
+    }
+    
+    $output .= "</TABLE></BODY></HTML>\n";
+    
+    $client->write(\$output);
+    
+    return OK;
+}
+
+use AxKit2::Utils qw(xml_escape uri_encode);
+
+sub add_output {
+    my ($self, $bref, $file, $is_parent) = @_;
+    
+    my $name = $is_parent ? 'Parent Directory' : $file->[0];
+    
+    $$bref .= "<TR><TD><IMG SRC=\"" . $self->icon($file) . 
+            "\" ALT=\"[" . $self->alt_text($file) . "]\"></TD>
+            <TD><A HREF=\"" . xml_escape(uri_encode($file->[0])) . "\">" .  xml_escape($name) . "</A></TD>
+            <TD>" . format_date($file->[1]) . "</TD>
+            <TD>" . ($file->[4] ? '-' : format_size($file->[2])) . "</TD>
+            <TD>$file->[3]</TD>
+            </TR>";
+}
+
+use POSIX ();
+
+sub format_date {
+    my $time = shift;
+    return POSIX::strftime("%d-%b-%Y %H:%M", gmtime($time));
+}
+
+sub alt_text {
+    my $self = shift;
+    my $file = shift;
+    
+    return "DIR" if $file->[4];
+    return "   ";
+}
+
+sub format_size {
+    my $bytes = shift;
+    
+    return 0 if $bytes == 0;
+    
+    my $block_size = 1024;
+    my $idx = 0;
+    while ($bytes > $block_size) {
+        $idx++;
+        $bytes /= $block_size;
+    }
+    return $bytes . ('', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')[$idx];
+}
+
+sub icon {
+    my ($self, $file) = @_;
+    
+    if ($file->[4]) {
+        # directory
+        return "/icons/folder.gif";
+    }
+    else {
+        # lookup ext...
+        return "/icons/unknown.gif";
+    }
+}
+
+# return a sorted, augmented file list.
+sub sort_files {
+    my $self = shift;
+    my $direction = shift;
+    my $key = shift;
+    my $dir = shift;
+    
+    my $reverse = ($direction eq 'D') ? sub { reverse(@_) } : sub { @_ };
+    
+    if ($key eq 'N') {
+        return $reverse->( sort { $a->[0] cmp $b->[0] } $self->augment($dir, @_) );
+    }
+    if ($key eq 'M') {
+        return $reverse->(
+            sort { $a->[1] <=> $b->[1] || $a->[0] cmp $b->[0] } $self->augment($dir, @_)
+            );
+    }
+    if ($key eq 'S') {
+        return $reverse->(
+            sort { $a->[2] <=> $b->[2] || $a->[0] cmp $b->[0] } $self->augment($dir, @_)
+            );
+    }
+    if ($key eq 'D') {
+        return $reverse->(
+            sort { $a->[3] cmp $b->[3] || $a->[0] cmp $b->[0] } $self->augment($dir, @_)
+            );
+    }
+}
+
+use File::Spec::Functions qw(catfile);
+
+sub augment {
+    my $self = shift;
+    my $dir  = shift;
+    
+    if (@_ == 1 && $_[0] eq '..') {
+        stat($dir);
+        return [ '..', (stat(_))[9], -s _, $self->describe('..'), -d _ ];
+    }
+    
+    return 
+        map { my $f = catfile($dir, $_); stat($f);
+              [ $_, (stat(_))[9], -s _, $self->describe($f), -d _ ]; }
+        grep { !/^\./ } 
+        grep { !$self->ignored($_) } @_;
+}
+
+sub ignored {
+    my ($self, $file) = @_;
+    
+    # TODO: Decide what files are ignored.
+    return 0;
+}
+
+sub describe {
+    my ($self, $file) = @_;
+    
+    # TODO: add file descriptions
+    return "";
+}

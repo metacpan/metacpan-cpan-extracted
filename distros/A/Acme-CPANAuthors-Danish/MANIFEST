@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+dist.ini
+lib/Acme/CPANAuthors/Danish.pm
+t/00-compile.t
+t/basic.t
+xt/release/distmeta.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t
+xt/release/portability.t

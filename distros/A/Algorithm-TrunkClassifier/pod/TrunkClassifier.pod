@@ -1,0 +1,447 @@
+=head1 NAME
+
+Algorithm::TrunkClassifier - Implementation of the Decision Trunk Classifier algorithm
+
+=head1 SYNOPSIS
+
+  use Algorithm::TrunkClassifier qw(runClassifier);
+
+=head1 DESCRIPTION
+
+This module contains the implementation of the Decision Trunk Classifier. The algorithm
+can be used to perform binary classification on numeric data, e.g. the result of a
+gene expression profiling experiment. Classification is based on so-called decision
+trunks, which consist of a sequence of decision levels, represented as nodes in the
+trunk. For each decision level, a probe is selected from the input data, and two decision
+threshold are calculated. These threshold are associated to two outgoing edges from
+the decision level. One edge represents the first class and the other edge represents
+the second class.
+
+During classification, the decision levels of a trunk are considered one at a time. To
+classify a sample, its expression of the probe at the decision level is compared to the
+thresholds of outgoing edges. If the expression is less than the first threshold,
+class1 is assigned to the sample. If, on the other hand, the expression is greater than
+the second threshold, class2 is assigned to the sample. In the case expression is
+in-between the thresholds, the algorithm proceeds to the next decision level of the
+trunk.
+
+By default, classification is done by leave-one-out cross validation (LOOCV) meaning
+that a single sample is used as test set, while the remaining samples are used to build
+the classifier. This is done for every sample in the input dataset. See the the algorithm
+publication for more details. A PubMed link can be found in L</"SEE ALSO">.
+
+=head2 ARGUMENTS
+
+Following installation, the algorithm can be run from the terminal using the
+run_classifier.pl script supplied in the t/ folder. The command should be in this form
+
+C<perl run_classifier.pl [Options] [Input data file]>
+
+=head3 INPUT DATA FILE
+
+The last argument must be the name of the input data file containing the expression
+data in table format, where columns are tab-separated. The first row must contains
+column names and the first column must contain row names. Samples need to be given in
+columns and probes/attributes in rows. Before the name of the input data file, a number of
+optional arguments may be given, see L</"OPTIONS"> below. A data file containing random data
+is provided in the t/ folder.
+
+=head3 META DATA
+
+At the top of the input data file, before the expression data table, an number of meta data
+rows starting with # can be given. The purpose of these rows is to tell the algorithm
+what classification variables that are defined for the data and what classes the samples
+belong to. The classification variable is the name of the property by which the samples
+are divided into two groups. For example, if the samples should be classified as either
+early or late stage cancer, the name of the classification variable would be STAGE.
+
+Classification variables are defined on rows starting with #CLASSVAR, followed by the
+name of the variable and the two class labels.
+
+#CLASSVAR name classLabel1 classLabel2
+
+Class labels (e.g. EARLY and LATE) are assigned to samples on rows staring with #CLASSMEM,
+followed by the name of the classification variable and the class labels for all samples.
+
+#CLASSMEM name sampleOneClass sampleTwoClass sampleThreeClass ...
+
+Since this would be very tedious to fill in manually for large datasets, the algorithm
+accepts a supplementary file with class information for all samples. See the C<-s value>
+option below. An example of a supplementary file is given in the t/ folder.
+
+An example of meta rows for the classification variable STAGE in a dataset with five
+samples is
+
+#CLASSVAR STAGE EARLY LATE
+#CLASSMEM STAGE LATE LATE EARLY LATE EARLY
+
+=head3 OPTIONS
+
+=over 4
+
+=item C<-p value>
+
+By default, the algorithm trains and classifies one dataset using leave-one-out cross
+validation. Two other classification procedures are supported: split-sample and dual
+datasets. The split-sample procedure causes the input dataset to be split into two
+sets, a training set and a test set. Trunks are built using the training set and
+classification is done only on the test set. It is also possible to supply two datasets.
+The input data file (final command line argument) is then used as training set and the
+second dataset as test set. Thus the value for the -c option should be C<loocv>, for 
+leave-one-out cross validation, C<split> for split-sample procedure, or C<dual> when
+using two datasets.
+
+=item C<-e value>
+
+The percentage of samples in the input data file that should be used as test set when
+using C<-p split>. Must be from 1 to 99. Default is 20.
+
+=item C<-t value>
+
+The name of the testset data file when using the C<-p dual> option.
+
+=item C<-c value>
+
+The value should be the name of the classification variable to use. Default is TISSUE.
+
+=item C<-o value>
+
+The value should be the name of the output folder. Created if it does not exist in the
+current directory. Default is current directory.
+
+=item C<-l value>
+
+By default, the algorithm selects the number of decision levels to use for
+classification. To override this, supply the -l option and an integer from 1 to 5. This
+will force the algorithm to use that number of decision levels.
+
+=item C<-i value>
+
+This option can be used to inspect the dataset without running the classifier.
+The option takes one of three possible values: C<samples>, C<probes> or C<classes>.
+
+samples: prints the number of samples in each class for the classification variable
+probes:  prints the number of probes in the dataset
+classes: prints all classification variables in the meta data
+
+=item C<-s value>
+
+Name of a supplementary file containing class information for the samples in the
+dataset. The contents should be in table format with columns being tab-separated. The
+first row needs to contain column names and the first column should contain sample
+names. The second and subsequent columns can contain class information, with the name
+of the classification variable given as the column name, followed by class labels
+on the rows starting with sample names. Examples of classification variables are STAGE,
+GRADE and HISTOLOGY. Class labels could be EARLY and LATE for STAGE, or LOW and HIGH
+for GRADE. The format of the file is illustrated here.
+
+  Samples	ClassVar1	ClassVar2
+  sample1	classLabel1	classLabel3
+  sample2	classLabel1	classLabel4
+  sample3	classLabel2	classLabel3
+  sample4	classLabel1	classLabel4
+  sample5	classLabel2	classLabel4
+
+When this option is given, the algorithm first processes the supplementary file and
+writes a new data file containing meta data. This data file is then used as input.
+
+Note: If the C<-p dual> option is used, two datasets must be supplied. In this case the
+supplementary file needs to contain the class information of all samples in both datasets.
+
+=item C<-v>
+
+This option makes the algorithm report its progress to the terminal during a run.
+
+=item C<-u>
+
+This option circumvents selection of decision levels and makes the algorithm use trunks
+with 1, 2, 3, 4 and 5 decision levels during classification.
+
+=item C<-h>
+
+This option causes argument documentation to be printed to the terminal.
+
+=back
+
+=head2 OUTPUT
+
+The algorithm produces five files as output: F<performance.txt>, F<loo_trunks.txt>,
+F<cts_trunks>, F<class_report.txt> and F<log.txt>. The classification accuracy
+can be found in F<performance.txt>. In case of leave-one-out cross validation, the
+accuracy for each fold is reported along with the average accuracy across all folds.
+Since the test set consists of one sample, the accuracy of one LOOCV fold is either
+0 % (wrong) or 100 % (correct). For split-sample and dual datasets classification, only
+the average accuracy is reported since there is only one test set.
+
+The F<loo_trunks.txt> file contains the decision trunks resulting from leave-one-out
+training on the training set. Since the training set is different in each fold,
+different probes may be selected in the trunks. The decision levels of a trunk are shown
+in order starting with the first level at the top. Each level consists of two rows:
+the first row shows the name of the probe and the second row contains the decision
+thresholds and the associated class labels. An illustration of a decision trunk with
+three levels is shown here
+
+              Probe X
+  <= A (class1)     > B (class2)
+  
+              Probe Y
+  <= C (class1)     > D (class2)
+  
+              Probe Z
+  <= E (class1)     > F (class2)
+
+Classification of a sample I<S> using this decision trunk would proceed as follows.
+
+Compare the expression of probe I<X> in sample I<S> with thresholds I<A> and I<B>. If
+the expression is less than I<A>, the sample is classified as I<class1>. If the
+expression is greater than I<B>, the sample is classified as I<class2>. If the expression
+is in-between I<A> and I<B>, the algorithm proceeds to the next decision level. This
+continues until the last level, where the thresholds I<E> and I<F> are equal, meaning
+that sample I<S> is guaranteed to be classified as either I<class1> or I<class2>.
+
+The F<cts_trunks.txt> file contains decision trunks built using the complete training set.
+
+The classification of each sample can be found in the F<class_report.txt> file. The rows
+in this file start with a sample name, followed by "in X-class". X is the level in the
+decision trunk where the sample was classified, and class is the class label assigned to
+the sample.
+
+The F<log.txt> file gives a summary of the classifier run. The information given includes
+the name of the input data file, the name of the test data file (if any), the name of
+the classification procedure, the split-sample percentage (if any), number of decision
+levels used for classification, the name of the classification variable, the sizes of
+class1 and class2 in the training and test set respectively, and the version of the algorithm.
+
+In case the C<-u> option is used, the output files will contain the results from using
+decision trunks with 1, 2, 3, 4 and 5 levels.
+
+=head2 EXAMPLE
+
+To provide an easy way of testing the algorithm, the t/ folder contains two test files.
+The F<test_data.txt> contains a random dataset with 200 samples and 1000 probes. This set
+has been generated such that the first 100 samples (healthy) have a mean gene expression
+of 0 and standard deviation of 0.5 (normal distribution) for all genes, while the remaining
+100 samples (malignant) have a mean of 1 and standard deviation of 0.5. The F<test_supp.txt>
+is a supplementary file containing the class information associated to the random dataset.
+To run the algorithm with this dataset, use the following command.
+
+C<perl run_classifier.pl -v -o test_set_tissue -s test_supp.txt test_data.txt>
+
+Since a supplementary file is given, a new data file with class information will be
+written. Following this, the algorithm will build decision trunks and determine how many
+decision levels to use for classification. Finally, LOOCV will be performed using the
+selected trunks and output written. If no classification variable is explicitly given,
+the algorithm will default to TISSUE. For the random dataset, this variable states if the
+sample comes from healthy tissue or from a tumor. The supplementary file labels healthy
+samples as T_HEALTHY and tumor samples as T_MALIGN. By looking in the supplementary file
+it can also be seen that the random dataset comes with a second classification variable:
+GRADE. This variable states if the tumor samples comes from an low- or high-state tumor.
+This is indicated by G_LOW and G_HIGH. Since the healthy samples do not come from tumors,
+they do not have GRADE classes. To indicate this, #NA is used. The #NA symbol is
+interpreted by the algorithm as a null class, causing the sample to be excluded if GRADE
+is given as the classification variable. To test this, use the following command.
+
+C<perl run_classifier.pl -v -c GRADE -o test_set_stage -s test_supp.txt test_data.txt>
+
+By comparing the output files, differences can be seen in how many folds of LOOCV has
+been carried out, and in what probes where selected for the decision trunks. The log
+file will also reflect that a different classification variable was used. Accuracy will
+be good when classifying TISSUE, because the healthy and tumor samples have sufficiently
+different gene expression values. For GRADE, however, all tumor samples have the same mean
+and standard deviation, so the algorithm is not able to separate them.
+
+=head2 WARNINGS AND ERROR MESSAGES
+
+If an invalid argument is given, or if there is something wrong with the input data file
+or supplementary file, the algorithm will output a warning or error message. Warnings
+will not prevent the algorithm from running, but errors will. Here is a list of all
+warnings/errors and how to interpret them
+
+=head3 WARNINGS
+
+=over 4
+
+=item No classification variable names found in supplementary file
+
+Indicates that the supplementary file has less than two columns. The algorithm expects the
+first column to contain sample names and the following columns to contain class labels of
+samples. The first row in the file must contain the names of the columns. For column 2, 3
+and so on, the column name should be the classification variable name.
+
+=item Missing class in supplmentary file at line I<index>, replacing with #NA
+
+Indicates that a class label is missing on line I<index>. The missing label is
+replaced with #NA, the symbol for the null class.
+
+=item No sample classes found in supplementary file
+
+Indicates that no class labels (rows) were found in the supplementary file.
+
+=item Sample I<sampleName> has no I<classVar> class in supplementary file
+
+Indicates that sample I<sampleName> in the input/testset data file is missing a class
+label for I<classVar> in the supplementary file. The sample's class label becomes #NA.
+
+=item CLASSVAR name missing in meta data of input/testset data file
+
+Indicates that a meta data row (starting with #CLASSVAR) is missing the I<name> value.
+The expected format is
+
+#CLASSVAR name classLabel1 classLabel2
+
+=item CLASSVAR class labels for I<classVar> missing in meta data of input/testset data file
+
+Indicates that a meta data row (starting with #CLASSVAR) is missing one/both the I<classLabel>
+values.
+
+=item CLASSMEM name missing in meta data of input/testset data file
+
+Indicates that a meta data row (starting with #CLASSMEM) is missing the I<name> value.
+The expected format is
+
+#CLASSVAR name sampleOneClass sampleTwoClass sampleThreeClass ...
+
+=item Duplicate sample name I<sampleName> at positions I<pos1> and I<pos2> in input/testset data file
+
+Indicates that two samples names in the input or testset data file are identical. This
+does not affect classification.
+
+=item Missing/invalid value I<value> in input/testset data file at probe I<index>
+
+Indicates that an expression value for probe I<index> is missing.
+
+=item Supplied level is to high, using trunks with I<level> level(s) instead
+
+Indicates that the number of levels given to the C<-l> argument was to high. This can
+happen when there are not enough samples to create five levels in a trunk. If 4 is given
+to the C<-l> argument but only two levels could be created, the algorithm will use two
+levels instead.
+
+=back
+
+=head3 ERRORS
+
+=over 4
+
+=item Unrecognized command I<com>
+
+Indicates that the command line option I<com> was not recognized as a valid command.
+
+=item Invalid argument I<arg> to I<com>
+
+Indicates that command line option I<com> did not accept I<arg> as an argument.
+
+=item Missing argument for command I<com>
+
+Indicates that command line option I<com> requires an argument but none was supplied.
+
+=item Input data file not supplied
+
+Indicates that an input data file (final command line argument) was not supplied.
+
+=item Command line option -t must be given when -p dual is used
+
+Indicates that the -t command line option for supplying a test dataset is missing. This
+must be given when -p dual is used.
+
+=item Unable to open supplementary file I<filename>
+
+Indicates that the file I<filename> given as argument to the C<-s> option was not readable.
+
+=item Wrong number of columns in supplmentary file at line I<index>
+
+Indicates that the number of columns at line I<index> differs from the number of
+column names on the first row. The first row defines the correct number of columns, and
+every subsequent row must have the same number of columns.
+
+=item Missing sample name in supplmentary file at line I<index>
+
+Indicates that the sample name (first column) is missing on line I<index>.
+
+=item Class variable I<classVar> in supplementary file does not have two classes
+
+Indicates that the class variable column with name I<classVar> contains fewer/more than
+two different class labels. Since the algorithm has been designed to only handle binary
+classification, a classification variable is only allowed to have two class labels.
+
+=item Unable to open input/testset data file I<filename>
+
+Indicates that the input/testset data file I<filename> was not readable. The input data
+file must be given as the last command line argument. A testset data file must be
+supplied using the -t option when the C<-p dual> option is used.
+
+=item Unable to create new data file I<filename>
+
+Indicates that the new input data file with meta data could not be written.
+
+=item No samples in input/testset data file
+
+Indicates that the input/testset data file, which is supposed to contain the expression data table,
+does not contain any sample columns.
+
+=item CLASSVAR class label equals NULL CLASS in input/testset data file
+
+Indicates that one of the I<classLabel> values for a #CLASSVAR meta data row is equal
+to the null class symbol #NA. The I<classLabel> values are the class labels for the
+classification variable and cannot be equal to #NA, because this symbol is reserved as
+a null class symbol.
+
+=item Missing meta data for classification variable I<classVar> in input/testset data file
+
+Indicates that the classification variable name given to the -c option is missing in
+the meta data of the input or testset data file.
+
+=item CLASSMEM vector for I<classVar> and sample vector have different lengths in input/testset data file
+
+Indicates that the number of class labels on the #CLASSMEM row for I<classVar> is
+different from the number of samples in the input or testset data file.
+
+=item Invalid class label in I<classVar> CLASSMEM vector in input/testset data file
+
+Indicates that one or more class labels on the #CLASSMEM row for I<classVar> are
+invalid. Valid class labels are those given on the #CLASSVAR row for I<classVar> and
+the null class symbol #NA.
+
+=item Class I<classLabel> for classification variable I<classVar> has zero members in input/testset data file
+
+Indicates that no samples have the class label I<classLabel> for classification
+variable I<classVar>. This means that classification cannot be carried out, since all
+samples belong to the same class.
+
+=item Wrong number of columns in input/testset data file at probe I<index>
+
+Indicates that a probe row in the input or testset data file has wrong number of columns with respect
+to the number of samples.
+
+=item Probe C<probename> in input data file not found in testset data file
+
+Indicates that a probe in the input data file is missing in the testset. For classification
+to be carried out using two datasets, all probes in the input data file must be present
+in the testset.
+
+=item Unable to create output file
+
+Indicates that output files were not writable in the output folder.
+
+=back
+
+=head1 SEE ALSO
+
+The publication describing the algorithm can be found in PubMed by this link:
+L<http://www.ncbi.nlm.nih.gov/pubmed?Db=pubmed&Cmd=DetailsSearch&Term=23467331%5Buid%5D>
+
+=head1 EXPORT
+
+None by default. The runClassifier subroutine is exported on request.
+
+=head1 AUTHOR
+
+Benjamin Ulfenborg, E<lt>wolftower85@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Benjamin Ulfenborg
+
+This module is free to use, modify and redistribute for academic purposes.
+
+=cut

@@ -1,0 +1,19 @@
+# configuration file for Dancer1
+
+logger: "console"
+log: "core"
+warnings: 1
+show_errors: 1
+auto_reload: 0
+
+content_location: content
+
+session: "YAML"
+
+template: "template_toolkit"
+
+engines:
+ template_toolkit:
+    encoding:  'utf8'
+    start_tag: '[%'
+    end_tag:   '%]'

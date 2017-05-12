@@ -1,0 +1,78 @@
+#!/usr/bin/env perl
+# PODNAME: codefork
+# ABSTRACT: Worlds dumbest code forker
+
+use strict;
+use warnings;
+use FindBin;
+use lib $FindBin::Dir . "/../lib";
+use App::codefork;
+
+App::codefork->new_with_options(
+  config => (shift @ARGV)
+);
+
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+codefork - Worlds dumbest code forker
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+  codefork fork.conf # changes files in the current directory and down under
+
+Sample fork.conf
+
+  HomeHive|AqHive
+  homehive|aqhive
+  hh%ah
+
+=head1 DESCRIPTION
+
+Modifies filename and file content, doesn't care about filetypes.
+
+=encoding utf8
+
+=head1 CONFIG
+
+=head2 |
+
+Ends up as s/$from/$to/g
+
+=head2 %
+
+Ends up as s/([^A-Za-z0-9]+)$from([^A-Za-z0-9]+)/$1$to$2/g
+
+=head1 SUPPORT
+
+Repository
+
+  https://github.com/Getty/p5-app-codefork
+  Pull request and additional contributors are welcome
+
+Issue Tracker
+
+  https://github.com/Getty/p5-app-codefork/issues
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudss.us>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

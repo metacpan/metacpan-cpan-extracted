@@ -1,0 +1,152 @@
+NAME
+    App::MyPerl - Your very own set of perl defaults, on a global or per
+    project basis
+
+SYNOPSIS
+      # .myperl/modules
+      v5.14
+      strictures
+      autodie=:all
+
+      $ myperl bin/some-script
+
+    Runs some-script with the following already loaded
+
+      use v5.14;
+      use strictures;
+      use autodie qw(:all);
+
+    and through the magic of lib::with::preamble, "lib/" and "t/lib/" are
+    already in @INC but files loaded from there will behave as if they had
+    those lines in them, too.
+
+    It is possible to add global defaults, to all scripts and all "myperl"
+    projects with "~/.myperl/defaults/modules" and
+    "~/.myperl/always/modules"
+
+DESCRIPTION
+    A ".pm or .pl" file usually requires some preamble to get some defaults
+    right.
+
+      # important ones
+      use strict;
+      use warnings;
+
+      # good
+      use autodie qw(:all);
+
+      # better exceptions
+      use Try::Tiny;
+      use Carp;
+
+    On top of that you might find Scalar::Util, List::Util useful all over
+    your code.
+
+    "myperl" allows you define this boilerplate once and for all, while
+    maintaining compatiability with existing code.
+
+TUTORIAL
+    If there is no "export MYPERL_HOME="~/.perl_defaults"", "~/.myperl" is
+    by default read for global defaults.
+
+      # ~/.myperl/always/modules
+      strictures
+      autodie=:all
+
+      # ~/.myperl/defaults/modules
+      v5.14
+
+      # ~/some_scripts/script.pl
+      say "Hello World"
+
+    The syntax for the modules file is,
+
+    *   "comment" -- # comment
+
+    *   "empty space"
+
+    *   "Foo=bar,qux,baz" -- This translates to "use Foo qw(bar, qux, baz)"
+
+    *   "-Foo=bar,qux,baz" -- This translates to "no Foo qw(bar, qux, baz)"
+
+    Now,
+
+      $ myperl ~/some_scripts/script.pl
+
+    will print "Hello World".
+
+    Let's say you are working on a typical Perl module like,
+
+      .myperl/
+      lib/
+      t/
+      bin/
+      README
+      LICENSE
+      Makefile.PL
+      ...
+
+    Now,
+
+      $ cd $project_dir; myperl bin/app.pl
+
+    will configure perl in such a way that "lib/**" and "t/lib/**", will all
+    have the preamble defined in ".myperl/modules" and
+    "~/.myperl/always/modules" thanks to the import hooks in
+    lib::with::preamble.
+
+    If you don't have a ".myperl/modules", myperl will use
+    "~/.myperl/defaults/modules" in place of it.
+
+    You can configure the directory "$project_dir/.myperl" with "export
+    MYPERL_CONFIG".
+
+    Running tests,
+
+      $ myprove t/foo.t
+
+    And in your "Makefile.PL" -
+
+      sub MY::postamble {
+        q{distdir: myperl_rewrite
+      myperl_rewrite: create_distdir
+            myperl-rewrite $(DISTVNAME)
+      };
+      }
+
+    (warning: this is make - so the indent for the "myperl-rewrite" line
+    needs to be a hard tab)
+
+    to have the defaults added to the top of ".pm, .t and bin/*" files in
+    your dist when it's built for CPAN.
+
+    Sometimes though, you want a module to be used during development, but
+    not written into the final dist. A good case for this is "indirect".
+
+    For this, add "-indirect" in "$project_dir/.myperl/dev-modules".
+
+    To specify modules loaded only into the top level script, prepend
+    "script-" to the file name - so "$project_dir/.myperl/script-modules"
+    specifies modules only used for the top level script, and
+    "script-dev-modules" the same but not rewritten onto scripts when
+    myperl-rewrite is invoked.
+
+    And lastly, you can add "if::minus_e=Some::Module" in
+    "$MYPERL_HOME/defaults/script-dev-modules" for having "Some::Module"
+    conveniently preloaded for <myperl -e '...'> oneliners - see if::minus_e
+    for how this behaves in detail.
+
+AUTHOR
+    mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
+
+CONTRIBUTORS
+    mucker - (cpan:MUCKER) <mukcer@gmx.com>
+
+COPYRIGHT
+    Copyright (c) 2013 the App::MyPerl "AUTHOR" and "CONTRIBUTORS" as listed
+    above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

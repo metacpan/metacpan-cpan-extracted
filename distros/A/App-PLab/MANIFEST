@@ -1,0 +1,25 @@
+Changes
+lib/App/PLab/ButtonGlyphs.pm
+lib/App/PLab/ButtonGlyphs.gif
+lib/App/PLab/ImageApp.pm
+lib/App/PLab/Calibrations.pm
+lib/App/PLab/ImageAppGlyphs.pm
+lib/App/PLab/ImageApp.gif
+lib/App/PLab/prlens.fm
+bin/ManCen
+bin/MorphometryI
+bin/PrLenS
+bin/PrAverB
+bin/morec2
+bin/select_button_glyph
+lib/App/PLab.pm
+lib/App/PLab/bigview.gif
+lib/App/PLab/mIc1.gif
+lib/App/PLab/mIc2.gif
+lib/App/PLab/index.pod
+lib/App/PLab/ManCen.pod
+lib/App/PLab/MorphometryI.pod
+MANIFEST
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

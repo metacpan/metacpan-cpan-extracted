@@ -1,0 +1,13 @@
+Acme::Wabby - Create semi-random sentences based upon a body of text.
+===============================================================
+
+This module is used to create semi-random sentences based on a body of text.
+It uses a markov-like method of storing probabilities of word transitions.
+It is good for annoying people on IRC, AIM, or other such fun mediums.
+
+See perldoc Acme::Wabby for code examples and a longer description.
+
+Wabby was implemented by Nathan Poznick <kraken@wang-fu.org>.  Send comments,
+suggestions, bug reports, or anything else to him.
+
+This code is distributed under the GPLv2.  See COPYING for details.

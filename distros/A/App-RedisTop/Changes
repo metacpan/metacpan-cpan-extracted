@@ -1,0 +1,24 @@
+Revision history for Perl extension App::RedisTop.
+
+0.03  2014/07/02
+  - Add Time group
+  - Add redis-stat command (@hirose31)
+  - Add Slowlog group
+  - Add UsedMemory / MaxMemory
+  - Add Connection / MaxClient
+
+0.02  2013/03/21
+  - Fix test failure.
+
+0.01  2013/03/12
+  - Fix printing is out of position after refreshing.
+  - Friendly error message.
+  - change the classname.
+  - use increased value/sec for cpu, conn, command (@fujiwara)
+  - Support info item name which changed in Redis 2.6 (@hirose31)
+  - Add mem_fragmentation_ratio into Memory group (@hirose31)
+
+0.00  2013/03/08
+  - original version; created by h2xs 1.23 with options
+    -AX -n App::RedisTop
+

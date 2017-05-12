@@ -1,0 +1,67 @@
+{
+   "abstract" : "Extensible Static Site Generator.",
+   "author" : [
+      "Steve Kemp <steve@steve.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Templer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "0",
+            "HTML::Template" : "0",
+            "Image::Size" : "0",
+            "Module::Pluggable" : "0",
+            "Redis" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Strict" : "0",
+            "Text::Markdown" : "0",
+            "Text::Template" : "0",
+            "Text::Textile" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skx/templer/issues"
+      },
+      "homepage" : "https://github.com/skx/templer/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/skx/templer.git"
+      },
+      "x_GitMirror" : "http://git.steve.org.uk/skx/templer"
+   },
+   "version" : "1.2"
+}

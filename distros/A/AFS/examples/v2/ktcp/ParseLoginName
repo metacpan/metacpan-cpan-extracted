@@ -1,0 +1,17 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::KTC_PRINCIPAL;
+
+die "Usage: $0 name\n" if ($#ARGV != 0);
+
+my $login = shift;
+
+my ($name, $inst, $cell) = AFS::KTC_PRINCIPAL->ParseLoginName($login);
+print "AFS::CODE = $AFS::CODE (",$AFS::CODE+0,")\n";
+print "name      = ", $name, "\n";
+print "instance  = ", $inst, "\n";
+print "cell      = ", $cell, "\n\n";

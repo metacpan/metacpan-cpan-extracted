@@ -1,0 +1,43 @@
+clear
+power on
+regs
+
+# Carry Flag Case -------------------
+memset 00be 2b
+
+op a2 55
+op e4 be
+
+# Should be: IX=55, C=1, Z=0, S=0
+test ix = 55
+test c = 1
+test z = 0
+test s = 0
+
+# Zero Flag Case --------------------
+power on
+memset 00be 55
+
+op a2 55
+op e4 be
+
+# Should be: IX=55, C=1, Z=1, S=0
+test ix = 55
+test c = 1
+test z = 1
+test s = 0
+
+# Negative Flag Case ----------------
+power on
+memset 00be 55
+
+op a2 35
+op e4 be
+
+# Should be: IX=35, C=0, Z=0, S=1
+test ix = 35
+test c = 0
+test z = 0
+test s = 1
+
+save verify_E4.txt

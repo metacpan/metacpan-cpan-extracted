@@ -1,0 +1,13 @@
+Revision history for Auth-ActiveDirectory
+
+0.01    28.12.2016
+        First version, released on an unsuspecting world.
+
+0.02    17.03.2017
+
+    [ BUG FIXES ]
+    * GH #1: Fix add an extra error_message sub so if something is
+      going wrong then it's stored in _error_message callable with
+      $obj->error_message()
+         Thanks to sonntagd
+    * security fix don't log pass on error

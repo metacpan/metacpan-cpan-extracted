@@ -1,0 +1,21 @@
+Revision history for Perl module App::PAUSE::CheckPerms
+
+0.05 2016-04-21 NEILB
+    - PAUSE::Packages has changed the next method to next_release
+      on the release iterator. NEWELLC++
+      Bumped the min version of PAUSE::Packages required.
+
+0.04 2015-07-02 NEILB
+    - Added [MetaJSON] so the release will contain META.json.
+
+0.03 2014-01-24
+    - Added "use 5.010", as we're using PAUSE::Permissions, and that
+      requires 5.10.0, so therefore we do.
+
+0.02 2013-12-06
+    - Added link to MIYAGAWA's App::PAUSE::Comaint module (and comaint script)
+    - Added Changes file
+
+0.01 2013-12-05
+    - First release to CPAN
+

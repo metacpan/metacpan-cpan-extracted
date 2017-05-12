@@ -1,0 +1,13 @@
+Revision history for App-UuidUtils
+
+0.02    2015-09-27 (PERLANCAR)
+
+	- [ux] Give positional argument for 'num', for convenience.
+
+        - Rebuild with updated DZP:GenPericmdCompleterScript which dumps
+          coderefs more compatibly with older perls [CT].
+
+
+0.01    2015-08-31 (PERLANCAR)
+
+        - First release.

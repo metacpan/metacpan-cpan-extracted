@@ -1,0 +1,14 @@
+Apache-Test/lib/Apache/TestCharset.pm
+Apache-Test/lib/Apache/TestCharsetModify.pm
+Changes
+DefaultCharset.xs
+MANIFEST			This list of files
+Makefile.PL
+README
+lib/Apache/DefaultCharset.pm
+t/00_compile.t
+t/01_get.t
+t/02_set.t
+t/TEST.PL
+t/conf/extra.conf.in
+typemap

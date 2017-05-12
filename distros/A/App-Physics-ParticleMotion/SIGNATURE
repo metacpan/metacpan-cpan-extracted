@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.50.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e4dc4899de57c480cb06052b38a40c7ccf76e8ac Build.PL
+SHA1 44df45c48fa2b51f48bc867dfb03b5f4218e8c77 Changes
+SHA1 006fa1ed0feb06cef0761bbcce4d35b43743b0b0 MANIFEST
+SHA1 c1ccc5c67662070dbd239cf6bf0c84530276306b META.yml
+SHA1 e2cc99cc34693b2e72fc40e4dbf5eb5cfa14c65c Makefile.PL
+SHA1 9305d9bc46abdf83e64d9e7bc01a57c0550b502d README
+SHA1 075ef51e9cf931bb7d1b1285868c6309c63a16e3 bin/tk-motion.pl
+SHA1 0e400d35c7186929f21bcd064d84ba7e5b8d10f1 eg/ex1.ini
+SHA1 7fb8ae84367d454c4fee5ae39a2d1ddf983c3070 eg/ex1mini.ini
+SHA1 37008ba80e2356df294857bb3f2c61fdd9381786 eg/ex2.ini
+SHA1 d4aecb1f03ad08d99e4fb909206cde4203c50846 eg/ex3.ini
+SHA1 2c3192b6aa6e7734c23c1b5472d39382a44948db eg/ex4.ini
+SHA1 29b95ab4810433dd154de2753163390299ce5242 eg/ex5.ini
+SHA1 b44d7e856ab0a4ccc1cea6fecef61fc41f022865 eg/ex5f.ini
+SHA1 be64475853fc4c46c634f0d145ccd8a9a773bfe0 eg/ex6.ini
+SHA1 b6237e5768aa7e1537b892e8accab2ca4785bfec eg/ex7.ini
+SHA1 96e0e61f091210cc8b00f55b1e91e533ff4d0ebf eg/ex7f.ini
+SHA1 c17aa7cd9eea20f606dbce82fb81ef33e5dcbde1 lib/App/Physics/ParticleMotion.pm
+SHA1 bb0da54f2b3f2d7955baa41ee458cb3d1887f475 t/00pod.t
+SHA1 2db32c1aac44c2e41530ea63431166d91bd458bf t/00podcover.t
+SHA1 c04c7142318e1f4ea74702ea837956865348153c t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.0 (GNU/Linux)
+
+iD8DBQFDnHXvZCuimE51gxcRApGjAJ95Ytfn4w4FfDRhqgz2BCaGY7jIJwCfaTxt
+aVoQ4q5uazrP1wpkHPdVgZQ=
+=rSg5
+-----END PGP SIGNATURE-----

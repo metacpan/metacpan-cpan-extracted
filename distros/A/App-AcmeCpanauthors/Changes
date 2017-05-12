@@ -1,0 +1,11 @@
+Revision history for App-AcmeCpanauthors
+
+0.002   2016-10-01 (PERLANCAR)
+
+	- [ux] In tab completion, also exclude Acme::CPANAuthors modules
+	  that do not contain authors list.
+
+
+0.001   2016-10-01 (PERLANCAR)
+
+        - First release.

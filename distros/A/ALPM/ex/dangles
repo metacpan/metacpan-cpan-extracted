@@ -1,0 +1,20 @@
+#!/usr/bin/perl -s
+##
+# Prints local packages which are not required by any other local package.
+# Pass the -i switch to only print implicitly installed packages.
+# Pass the -e switch to only print explicitly installed packages.
+# Pass neither to print both.
+
+use ALPM::Conf qw(/etc/pacman.conf);
+
+die q{You can't use both -i and -e} if $i && $e;
+
+for my $pkg ($alpm->localdb->pkgs){
+    next if(@{$pkg->requiredby} > 0);
+    if($i || $e){
+        next if($pkg->reason ne ($i ? 'implicit' : 'explicit'));
+    }
+    push @dangles, $pkg->name;
+}
+
+print map { "$_\n" } sort @dangles;

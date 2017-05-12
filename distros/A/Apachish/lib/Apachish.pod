@@ -1,0 +1,148 @@
+
+# ABSTRACT: Apachish configuration format specification
+#PODNAME: Apachish
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Apachish - Apachish configuration format specification
+
+=head1 VERSION
+
+This document describes version 0.9.0 of Apachish (from Perl distribution Apachish), released on 2015-12-11.
+
+=head1 SPECIFICATION VERSION
+
+0.9
+
+=head1 STATUS
+
+Specification is still rather in flux. Backwards compatibility is not guaranteed
+between 0.9.x releases.
+
+=head1 ABSTRACT
+
+Apachish is a configuration file format that is mostly compatible with the
+Apache webserver's file format.
+
+=head1 NOTATION
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in RFC 2119.
+
+=head1 RATIONALE
+
+Apachish is the configuration format to complement L<IOD> and is meant for
+configuration that needs to be nested. The main goal, like C<IOD>, is to make it
+easy to have a round-trip parser/writer for it. That way, the configuration can
+be written/modified by software without destroying formatting/comments.
+
+=head1 SPECIFICATION
+
+A configuration is a text file containing a sequence of lines. Encoding MUST be
+UTF-8. Each line is either a blank line, a comment line, a directive line, open
+context line, or close context line. Parsing is done line-by-line and in a
+single pass.
+
+A context surrounds directives and can also contain subcontext in a tree-like
+fashion. Contexts cannot overlap one another.
+
+=head2 Blank line
+
+A blank line is a line containing zero or more whitespaces only. It is ignored.
+
+=head2 Comment line
+
+A comment line begins with C<#> as it's first nonblank character.
+
+ <ws>* |"#" <COMMENT>
+
+Examples:
+
+ # this is a comment
+
+=head2 Directive line
+
+ <ws>* <NAME> (<ws>+ <ARGUMENT>)+
+
+C<NAME> can only contain alphanumeric (A-Z, a-z, 0-9) characters or underscores.
+Arguments is a sequence of one or more non-whitespace characters except double
+quotes. Arguments can contain whitespace if it is quoted. They can also contain
+double quotes using escaping with backslash (C<\>). A literal backslash is
+written using C<\\>. To express an empty argument, you also use double quotes.
+
+Unlike in Apache, currently a directive line cannot be continued to another line
+using backslash.
+
+A directive line cannot contain comments.
+
+Examples:
+
+ Foo arg1 arg2 "arg3 contains spaces, \"quotes\", and backslash \\"
+ Bar ""
+
+Directives in configuration are case-insensitive, but the arguments are
+case-sensitive.
+
+=head2 Open context line
+
+ <ws>* "<" <NAME> (<ws>+ <ARGUMENT>)* ">"
+
+C<NAME> can only contain alphanumeric (A-Z, a-z, 0-9) characters or underscores.
+Arguments are also like in directive names except they also cannot contain
+closing bracket (C<< > >>) characters unless they are quoted.
+
+Examples:
+
+ <Context1>
+ <Context1 ~arg1>
+ <Context1 "arg1>">
+
+Context names are case-insensitive, but its arguments are case-sensitive.
+
+=head2 Close context line
+
+ <ws>* "</" <NAME> ">"
+
+Examples:
+
+ </Context1>
+
+=head1 SEE ALSO
+
+An alternative format for simpler/flat configuration: L<IOD>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Apachish>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Apachish>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Apachish>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

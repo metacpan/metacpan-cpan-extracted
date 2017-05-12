@@ -1,0 +1,55 @@
+---
+abstract: 'Build DocBook/XML files.'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Test::Trap: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - automation
+  - convert
+  - docbook
+  - html
+  - pdf
+  - postscript
+  - script
+  - scripts
+  - sgml
+  - xhtml
+  - xml
+  - xsl-fo
+  - xslt
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-XML-DocBook-Builder
+provides:
+  App::XML::DocBook::Builder:
+    file: lib/App/XML/DocBook/Builder.pm
+    version: '0.0404'
+  App::XML::DocBook::Docmake:
+    file: lib/App/XML/DocBook/Docmake.pm
+    version: '0.0404'
+  App::XML::DocBook::Docmake::CmdComponent:
+    file: lib/App/XML/DocBook/Docmake.pm
+requires:
+  Class::Accessor: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  Getopt::Long: '2.37'
+  Pod::Usage: '0'
+  parent: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: http://www.shlomifish.org/open-source/projects/docmake/
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: http://bitbucket.org/shlomif/docmake
+version: '0.0404'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

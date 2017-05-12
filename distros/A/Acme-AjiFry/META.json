@@ -1,0 +1,88 @@
+{
+   "abstract" : "AjiFry Language (ã¢ã¸ãã©ã¤èª) Translator",
+   "author" : [
+      "moznion  C<< <moznion[at]gmail.com> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.4.4",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-AjiFry",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Compare" : "1.1005",
+            "File::Copy" : "2.13",
+            "File::Spec::Functions" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.4003"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "2.39",
+            "Filter::Simple" : "0.84",
+            "List::Util" : "1.22",
+            "perl" : "5.008009"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::AjiFry" : {
+         "file" : "lib/Acme/AjiFry.pm",
+         "version" : "0.09"
+      },
+      "Acme::AjiFry::EN" : {
+         "file" : "lib/Acme/AjiFry/EN.pm"
+      },
+      "Acme::AjiFry::Perl" : {
+         "file" : "lib/Acme/AjiFry/Perl.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/moznion/Acme--AjiFry/issues"
+      },
+      "homepage" : "https://github.com/moznion/Acme--AjiFry",
+      "repository" : {
+         "url" : "git://github.com/moznion/Acme--AjiFry.git",
+         "web" : "https://github.com/moznion/Acme--AjiFry"
+      }
+   },
+   "version" : "0.09",
+   "x_contributors" : [
+      "papix <papix2011@gmail.com>",
+      "papix <mail@papix.net>",
+      "moznion <moznion@gmail.com>"
+   ]
+}

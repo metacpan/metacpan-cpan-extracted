@@ -1,0 +1,125 @@
+head	1.5;
+access;
+symbols;
+locks;
+comment	@# @;
+
+
+1.5
+date	2007.12.08.03.23.43;	author atobey;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2002.07.31.16.43.31;	author Administrator;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2002.07.30.20.31.58;	author Administrator;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2002.07.30.20.15.39;	author Administrator;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2001.06.19.19.44.13;	author root;	state Exp;
+branches;
+next	;
+
+
+desc
+@Created
+@
+
+
+1.5
+log
+@updated
+@
+text
+@# $Id: Changes,v 1.4 2002/07/31 16:43:31 Administrator Exp $
+
+Revision history for Perl extension Apache::AuthenSecurID.
+
+
+0.01  Tue Nov 5 14:11:38 2000
+	- original version; created by db
+0.02  Fri Jan 5 18:09:10 2001
+	- changes to use cookies 
+0.03  Mon Jun 18 21:32:55 2001
+	- major overhaul 
+	- created single threaded ace auth server 
+	- create Auth handler instead of using basic auth 
+	- started using blowfish 
+	- better documentation 
+0.04  Mon Jul 31 16:05:00 2002
+	- fixed typo in docs
+	- added PerlModule in httpd.conf in docs
+	- fixed small scope bug
+	- changes colors so they are no longer awful
+0.05  Fri Dec 07 18:55:00 2007 <tobert@@gmail.com>
+    - ported to mod_perl2
+    - renamed to Apache2::AuthenSecurID
+    - perltidy
+    - updated most HTML to use something closer to XHTML
+    - made ace_initd configured via command line rather than file
+        - modifies its own name to hide the secret from ps
+    - added daemonizing code to ace_initd
+    - added --listen option to ace_initd
+
+@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@d1 1
+a1 1
+# $Id: Changes,v 1.3 2002/07/30 20:31:58 Administrator Exp $
+d21 9
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d1 1
+a1 1
+# $Id: Changes,v 1.2 2002/07/30 20:15:39 Administrator Exp $
+d16 1
+a16 1
+0.04  Mon Jul 30 16:05:00 2002
+d18 1
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d1 1
+a1 1
+# $Id: Changes,v 1.1 2001/06/19 19:44:13 root Exp $
+d19 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 1
+# $Id: Changes,v 1.1 2001/01/18 20:50:27 root Exp $
+d16 3
+@

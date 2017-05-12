@@ -1,0 +1,454 @@
+
+[TODO]
+  - Convert internal representation of http request and response to PSGI.
+
+[CHANGELOG]
+
+2012-05-07    1.087
+  - Marking ASP4 and its entire ecosystem "DEPRECATED" until further notice.
+
+2012-03-01    1.086
+  - Use of $api->get within a handler is disabled at this time.
+
+2012-02-24    1.085
+  - Fixed ASP4::UserAgent to take advantage of new subrequest option.
+  - Use of the ASP4::API within an existing asp script, handler or request filter
+    is fully-functional now.  Before, the behavior was unpredictable.
+
+2012-02-24    1.084
+  - The Response->Redirect hack has been removed.
+  - Added concept of 'context->is_subrequest'
+    - this simplifies things a great deal.
+    - ->is_subrequest means that a subrequest context will not clobber ->current.
+
+2012-02-24    1.083
+  - A wild Meta.json appeared in 1.082!
+
+2012-02-24    1.082
+  - Response->Redirect after Response->TrapInclude was causing the redirect to fail.
+  - This release introduces a hack to fix it, by writing a meta tag to the client.
+
+2012-02-13    1.081
+  - Updated logging of errors so that it outputs something interesting, instead
+    of a blank line.
+  - Running under mod_perl should now correctly support full RESTful interfaces.
+
+2012-02-12    1.080
+  - Added support for multiple external "routes.json" files.
+
+2012-02-07    1.079
+  - Errors output to the stderr are now derived directly from $@ not from any
+    parsed version of it.
+
+2012-02-02    1.078
+  - Fixed installation problem that came up in v1.075 
+    (compilation root was missing leading forward slash on non-windows systems).
+
+2012-02-01    1.077
+  - Loath to add a mime-types-all-knowing dependency, we have a small list of
+    common mime-types (html, css, js, etc).
+  - Added mime for html and svg.
+
+2012-02-01    1.076
+  - Now, the 'content-type' header is set correctly for ASP4::UserAgent responses.
+  - Works correctly under ASP4::PSGI (images, css, javascript all show up).
+
+2012-02-01    1.075
+  - Now, works on Windows!
+  - eric.hayes++
+
+2012-01-30    1.074
+  - Explicit calls to $Session->save() are no longer necessary.
+
+2012-01-23    1.073
+  - Added $Request->Header($name)
+    (Somehow we've gotten along all this time without it.)
+
+2012-01-23    1.072
+  - More tweaks on ASP4::SessionStateManager's default internal behavior
+    has resulted in some more-than-modest performance gains.
+  - Disabling session-state can result in 630 requests/second on a simple 
+    master/child "content" page, and 475 requests/second on a page that
+    includes reading data from a database (using Class::DBI::Lite of course).
+    * Results from `ab` on a Dell E6510 (quad-dual-core-i7, 8GB RAM, Ubuntu 10.10)
+
+2012-01-22    1.071
+  - ASP4::HTTPContext now triggers the SessionStateManager's save() method
+    when the context is DESTROY'd.
+
+2012-01-22    1.070
+  - No longer check session's last-mod when deciding whether or not to save 
+    session state at the end of a request.
+
+2011-12-11    1.069
+  - Fixed META.yml to show the correct github url.
+
+2011-12-10    1.068
+  - ASP4 is now hosted on github. https://github.com/jdrago999/ASP4
+
+2011-12-01    1.067
+  - ASP4::GlobalASA is completely deprecated.
+  - ASP4::ErrorHandler contained a bug (cannot find method 'context').  Thanks
+    to ray.baksh++ for discovering it.
+
+2011-11-16    1.066
+  - Fixed a POD error in ASP4::ErrorHandler::Remote.
+  - ASP4::ErrorHandler::Remote now correctly clones the error object before POSTing it.
+
+2011-11-15    1.065
+  - Documented asp4-prep and asp4-deploy.  These are deployment tools for ASP4 apps.
+  - Other POD updates here and there.
+
+2011-11-15    1.064
+  - 1.063 was broken - please upgrade.
+
+2011-11-15    1.063
+  - Stealth-mode ASP4::ErrorHandler::Remote will send your error messages to a
+    remote server via http.
+  - Added ASP4::Error
+  - Refactored ASP4::ErrorHandler to be more easily sub-classable.
+  - GlobalASA is now officially removed.
+
+2011-11-13    1.062
+  - The httpd.conf produced by asphelper had an incorrect DocumentRoot.  Fixed now.
+
+2011-11-07    1.061
+  - asphelper now creates new ASP4 apps using the proper structure.
+
+2011-11-06    1.060
+  - $Response->Include on a missing file will no longer result in a 404 on the
+    calling file.  This goes for $Response->TrapInclude as well as <!-- #include virtual="..." -->
+
+2011-11-05    1.059
+  - ASP4::API:
+    - No longer have to do this:
+      use ASP4::API;
+      my $api; BEGIN { $api = ASP4::API->new }
+      # Now load classes:
+      use MyApp::Foo;
+    - You can do this instead:
+      use ASP4::API;
+      use MyApp::Foo;
+      my $api = ASP4::API->new;
+    - Also no need for BEGIN { ASP4::API->init }
+  - Added requirement Data::Properties::JSON.
+    - JSON is a better format for test fixtures.
+    - YAML can still be used.
+
+2011-10-31    1.058
+  - Added experimental deployment tools `asp4-prep` and `asp4-deploy`.
+    * asp4-prep does an `svn export` and then gzips the folder and prints the *.tar.gz filename.
+    * asp4-deploy decompresses the *.tar.gz, creates a symbolic link 'deploying'
+      to the new folder, copies the existing config files from latest/*/conf/* 
+      (if it exists) or copies conf/*.template config files and renames them without
+      the *.template suffix.  If a 'latest/*' folder was found, asp4-deploy will
+      run any unit tests found.  If all tests pass, then 'deploying' is removed
+      and 'latest' is changed to point to the new folder.
+  - TODO: Add POD for asp4-prep and asp4-deploy.  This is delayed until it's proven
+    that this is the correct way for onesie-twosie deployments.
+
+2011-10-04    1.057
+  - Renamed @AppRoot@ macro to @ProjectRoot@ to avoid confusion with $Config->web->application_root
+  - Adjusted package declarations in some "stealth-mode" pm files because they have no POD yet.
+
+2011-10-03    1.056
+  - Updated asphelper to include directives that disable mod_deflate and Apache2::Reload
+    for ASP4 websites. RayBaksh++
+  - This fixes the dreaded "This website uses an invalid form of compression" error
+    that you may have gotten after trying to $Response->Status(404) within an asp script.
+  - Added in-memory mock sessionstate handler for faster testing and easier installation.
+
+2011-09-22    1.055
+  - Giving credit where credit is due :-)
+  - Erikdj++
+  - Added *experimental* memcached session storage backend.
+
+2011-09-20    1.054
+  - Added @AppRoot@ macro for asp4-config.json.  It is 1 folder "up" from @ServerRoot@.
+  - If your @ServerRoot@ is:
+      /home/bart/Projects/facebook/www
+    Then your @AppRoot@ is:
+      /home/bart/Projects/facebook
+  - Erikdj pointed out the need for the @AppRoot@ macro and suggested the (excellent) name.  Thanks Erik!
+
+2011-09-19    1.053
+  - Updated asphelper script to genenrate sample app conforming to new App::db::*
+    root namespace.
+
+2011-09-19    1.052
+[Bug Fixes]
+  - Blank lines in asp4-config.json no longer causes an exception to be thrown.
+  - Update documentation to reflect preference change from app::* to App::db::*
+    root namespace for database classes.
+
+2011-08-14    1.051
+[Bug Fixes]
+  - 'Redirect Loop' fixed!  Under mod_perl, $context->send_headers() was not 
+    called for non-200 http responses.
+    Now it is.
+    This means that if you had `return $Response->Redirect("/foo/")` in a RequestFilter
+    you may have gotten a "redirect loop" because although the '301 Moved' status
+    was set, the `location: /foo/` header was *not* set.  This would result in
+    a redirect loop.
+
+2011-07-11    v1.050
+[Bug Fixes]
+  - v1.049 Caused script execution to cease after any $Response->Include or ssi
+    include finished.
+  - Upgrade required if you know what's good for you.
+
+
+2011-07-09    v1.049
+[Bug Fixes]
+  - v1.048 broke session cookies.
+  - Upgrade to v1.049 (quick).
+
+2011-07-07    v1.048
+[Bug Fixes]
+  - <% $Response->Status(404); return $Response->End; %> DID NOT WORK.
+    Instead it continued processing other ContentPlaceHolders.  Now we check
+    to see if $Response->End was called before we process anything else.
+  - Still getting some "Content encoding error" messages from FF/Chrome/MSIE but
+    we're almost there.
+
+2011-05-19    v1.047
+[Bug Fixes]
+  - $Response->Expires("30M") wasn't documented.  Now it is.
+  - $Response->Expires wasn't working properly.  Now it is. (Always ended up with pre-epoch expiration times).
+
+2011-05-03    v1.046
+[Bug Fixes]
+  - $Response->Redirect(...) wasn't returning '301' - now it does.
+
+2011-05-03    v1.045
+[Bug Fixes]
+  - Actually it turned out that setting $Session->is_read_only(1) *DID* prevent
+    $Session->save() from working.  This is now fixed to match the documentation.
+
+2011-05-01    v1.044
+
+[Bug Fixes]
+  - ASP4::ModPerl now does the Right Thing when a non-200 response is encountered.
+    - 500 response does not result in an "encoding error" in firefox.
+    - 200 (or 0 response) does the right thing.
+    - non-200 (and non-500) response does the right thing (eg: 401)
+  - ASP4::SessionStateManager now checks $s->is_changed *before* checking $s->{__lastMod} date
+    before deciding whether is should persist its changes in ->save().
+
+[New Features]
+  - $Session->is_read_only(1) is new.  Setting it to a true value (eg: 1) will prevent
+    the default behavior of calling $Session->save() at the end of each successful request.
+
+2011-04-08    v1.043
+  - Documentation overhaul.
+
+2011-03-23    v1.042
+  - Fixed sporadic error in master pages that looks like this:
+    Can't call method "Write" on an undefined value at /tmp/PAGE_CACHE/BStat/_masters_global_asp.pm line 1.
+  - Apparently $s->init_asp_objects($context) was not getting called before the 
+    master page's run() method was called, resulting in a call to $Response->Write(...)
+    before $Response had been initialized.
+
+2010-11-11    v1.041
+  - ASP4::UserAgent calls all cleanup handlers registered via $Server->RegisterCleanup(sub { }, @args)
+    at the end of each request, not when the ASP4::Mock::Pool object's DESTROY method is called.
+    This fixes a condition which caused conflict when a Class::DBI::Lite ORM is
+    used and the ASP4 application is executed via the `asp4` helper script.
+
+2010-10-25    v1.040
+  - 1.039 introduced a bug that could cause session-id conflicts in the asp_sessions table.
+  - This release fixes that bug.
+
+2010-10-25    v1.039
+  - Session expiration now happens exclusively on the server, not as the 
+    result of an expiring session cookie.
+
+2010-10-21    v1.038
+  - Another stab at getting http response codes right for errors.
+
+2010-09-25    v1.037
+  - Added a couple tweaks here and there to make ASP4 run on Windows a little easier:
+    * $Config->web->page_cache_root now does the Right Thing on linux & win32.
+    * $Config->web->page_cache_root is automatically created if it does not exist.
+
+2010-09-21    v1.036
+  - Added ASP4::StaticHandler to process requests for static files - like images, css, etc.
+
+2010-09-17    v1.035
+  - It turns out that if you close the client socket, some browsers complain (Chrome).
+    Upgrade recommended.
+
+2010-09-17    v1.034
+  - Non-2xx responses are more returned more correctly, albeit with empty bodies.
+  - HTTPHandler now caches the @ISA tree in RAM, offering a slight performance boost.
+  - Added missing '$r->headers_in' method to ASP4::Mock::RequestRec.
+
+2010-05-26    v1.033
+  - Fixed more issues related to running multiple web applications under different
+    VirutalHosts on the same server.  This time related to how Filters and Handlers
+    are cached - now not only by URL but also by $ENV{DOCUMENT_ROOT}.
+
+2010-05-20    v1.032
+  - Fixed several issues related to running multiple web applications under different
+    VirtualHosts on the same server.
+
+2010-05-19    v1.031
+  - Migrated from Ima::DBI to Ima::DBI::Contextual.
+
+2010-05-18    v1.030
+  - $ENV{HTTP_HOST} is set to $r->hostname or $ENV{DOCUMENT_ROOT} in ASP4::ModPerl and ASP4::UserAgent, respectively.
+
+2010-04-18    v1.029
+  - The document root was not always set properly in some very, very strange
+    circumstances.
+  - Upgrade recommended.
+
+2010-04-18    v1.028
+  - $Request->Reroute($uri) no longer changes $ENV{REQUEST_URI} to $uri.
+
+2010-04-15    v1.027
+  - ASP4::Request was not properly URLDecoding parameters.  Now it does.
+
+2010-04-13    v1.026
+  - Now both POST'ed and GET'ed parameters are added to $Form.  This means that if
+    you...
+    <form action="/page/?foo=abc" method="post"><input name="bar" value="123" /></form>
+    ...both foo=abc and bar=123 will be in $Form.  Before this update, only bar=123 would
+    be there, and foo=abc would be lost.
+
+2010-04-06    v1.025
+  - If Router::Generic is installed, ASP4::ConfigNode::Web will create $Config->web->router
+    based on the "routes" segment of asp4-config.json.
+  - No documentation about this yet.
+
+2010-03-22    v1.024
+  - $Request->Reroute() with additional querystring parameters was not adding
+    those extra parameters to $Form.  Now it does.
+
+2010-03-08    v1.023
+  - ASP4::HTTPContext now checks to see if any RequestFilters match a uri before
+    returning a 404.  This is helpful for SEO optimizations.
+  - New feature: $Request->Reroute("/new-uri/?foo=bar")
+    * Also very useful for SEO.
+
+2010-03-08    v1.022
+  - asphelper's final instructions are now more clear and concise.
+  - Fixes a bug that caused active sessions to timeout as though inactive simply
+    because they were not changed before the timeout occurred.  Now, $Session->save()
+    checks to see if it's been more than 60 seconds since the last time the __lastMod
+    was changed - and if it has been more than 60 seconds, the session is saved
+    and the __lastMod value is updated to time() - thus preventing expiry of 
+    active sessions.
+
+2010-03-08    v1.021
+  - Removed a warning that popped up now and then about the use of an uninitialized value.
+  - Added a more informative "Yay you're finished!" message after running asphelper.
+
+2010-03-04    v1.020
+  - Now asphelper will output sbin/ddl.sql, which contains the structure of the 
+    asp_sessions database table.  This is a handy place to start describing the
+    database structure of a web application.
+  - If $Config->web->data_connections->session->session_timeout is set to '*' then
+    the session lasts as long as the browser keeps the cookie around.
+  - 20% performance increase by using Cwd::fastcwd() instead of Cwd::cwd() and a
+    few other minor tweaks.
+
+2010-03-02    v1.019
+  - Fixed a bug in asphelper that caused some problems creating a skeleton website.
+
+2010-03-01    v1.018
+  - Updated asphelper script so that the POD on CPAN is not contaminated with POD
+    from within one of the modules that asphelper generates.
+  - Now asphelper will not create a Class::DBI::Lite model class unless 
+    Class::DBI::Lite is installed.
+
+2010-03-01    v1.017
+  - Updated asphelper script to only accept options on the command-line, like "normal" scripts.
+
+2010-02-28    v1.016
+  - A vestigial "use encoding 'utf8'" was removed from ASP4::Server.
+  - It was causing Apache to segfault on ubuntu 9.10.
+
+2010-02-19    v1.015
+  - Hostnames like http://myapplication/ were not setting session cookies properly.
+  - $Config->data_connections->session->cookie_domain should set to "*" in these cases.
+  - $Response->SetCookie accepts the "*" value for domain also.
+  - The result is that no "domain=xyz" attribute is given to these cookies.
+
+2010-02-18    v1.014
+  - $Response->ContentType now functions correctly.
+  - Upgrade mandatory!
+
+2010-02-18    v1.013
+  - ASP4::HandlerResolver was not properly remembering timestamps on handler files.
+    This resulted in unnecessary reloads of handlers that had not been changed.
+
+2010-02-18    v1.012
+  - MANIFEST was missing a few files that caused tests to fail.
+
+2010-02-17    v1.011
+  ! Upgrade Recommended !
+  - $Response->SetCookie and $Response->ContentType were not functioning properly.
+  - Added new method $Response->SetHeader.
+
+2010-02-10    v1.010
+  ! UPGRADE *SERIOUSLY* RECOMMENDED !
+  - In an environment with multiple VirtualHosts running ASP4 web applications,
+    ASP4::HandlerResolver's %HandlerCache and %FileTimes hashes were shared between
+    all VirtualHosts.  This means that if you had 2 web apps (Foo and Bar) then
+    "/index.asp" on "Foo" might get handled by "Bar::_index_asp" or vice versa.
+
+2010-02-08    v1.009
+  ! Upgrade Recommended !
+  - ASP4::ModPerl sets $ENV{DOCUMENT_ROOT} = $r->document_root before doing 
+    anything else.
+  - The scaffold website output by 'asphelper' had some minor bugs:
+      * email was sometimes referred to as email_address
+      * The error message for the 'message' field was displaying the wrong error.
+
+2010-02-07    v1.008
+  - Multi-value form parameters (eg 3 checkboxes with the same name) will now
+    *correctly* appear as an arrayref in $Form, instead of 3 values joined with
+    a null byte.
+
+2010-01-31    v1.007
+  - $FileUpload->SaveAs("/path/to/file.txt") will now create "/path" and "/path/to"
+    before writing "/path/to/file.txt".
+
+2010-01-27    v1.006
+  - Sometimes changes in MasterPages are not immediately reflected in child pages.
+    This release attempts to correct this bug.
+
+2010-01-25    v1.005
+  - Request Filters were not always matching properly
+    because of a regexp bug in ASP4::FilterResolver.
+
+2010-01-22    v1.004
+  - $ENV{REQUEST_URI} was not getting set properly - this is now fixed.
+
+2009-12-22    v1.003
+  - $ENV{HTTP_REFERER} can be set and preserved properly.
+  - conf/asp4-config.json will be reloaded if it is modified.  This means that
+    the server does not have to be restarted for changes to asp4-config.json 
+    to take effect.
+  - Added ASP4::TransHandler
+
+2009-12-17    v1.002
+  - %ENV is no longer clobbered by ASP4::UserAgent.
+
+2009-12-16    v1.001
+  - Fixed a bug that prevented ASP4 for reliably detecting when an ASP script
+    had been updated.
+
+2009-12-15    v1.000
+  - Ready for production use.
+
+2009-12-14    v0.001_03 .. v0.001_05
+  - Just getting the Makefile.PL prerequisites correct.
+
+2009-12-13    v0.001_02
+  - Added POD.
+
+2009-12-13    v0.001_01
+  * Initial release
+

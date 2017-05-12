@@ -1,0 +1,26 @@
+---
+abstract: 'Add GA code to served HTML document'
+author:
+  - 'Lubomir Rintel <lkundrak@v3.sk>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Apache2-Filter-GoogleAnalytics
+provides:
+  Apache2::Filter::GoogleAnalytics:
+    file: lib/Apache2/Filter/GoogleAnalytics.pm
+    version: 1.01
+requires:
+  APR::Table: 0
+  Apache2::Const: 0
+  Apache2::Filter: 0
+  Apache2::Module: 0
+  Apache2::RequestRec: 0
+  HTML::Parser: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.01

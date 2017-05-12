@@ -1,0 +1,11 @@
+--- include/wx/filefn.h	Fri Sep 04 06:51:54 2009
++++ include/wx/filefn.h	Wed Mar 10 21:41:47 2010
+@@ -203,7 +203,7 @@
+     // to avoid using them as they're not present in earlier versions and
+     // always using the native functions spelling is easier than testing for
+     // the versions
+-    #if defined(__BORLANDC__) || defined(__DMC__) || defined(__WATCOMC__) || defined(__MINGW64__)
++    #if defined(__BORLANDC__) || defined(__DMC__) || defined(__WATCOMC__)
+         #define wxPOSIX_IDENT(func)    ::func
+     #else // by default assume MSVC-compatible names
+         #define wxPOSIX_IDENT(func)    _ ## func

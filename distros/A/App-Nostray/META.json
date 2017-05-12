@@ -1,0 +1,48 @@
+{
+   "abstract" : "Detect and eliminate stray commas in Javascript source files",
+   "author" : [
+      "Michael Langner <mila@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Nostray",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Next" : "0",
+            "File::Slurp" : "0",
+            "Getopt::Std" : "0",
+            "JSON" : "0",
+            "JavaScript::V8" : "0",
+            "vars" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cpan-mila/perl-app-nostray.git",
+         "web" : "https://github.com/cpan-mila/perl-app-nostray"
+      }
+   },
+   "version" : "1.01"
+}
+

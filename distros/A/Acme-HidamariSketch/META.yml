@@ -1,0 +1,73 @@
+---
+abstract: 'This module of the Hidamalar, by the Hidamalar, for the Hidamalar.'
+author:
+  - 'This library is free software; you can redistribute it and/or modify'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-HidamariSketch
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::HidamariSketch:
+    file: lib/Acme/HidamariSketch.pm
+    version: '0.05'
+  Acme::HidamariSketch::Apartment:
+    file: lib/Acme/HidamariSketch/Apartment.pm
+    version: '0.05'
+  Acme::HidamariSketch::Base:
+    file: lib/Acme/HidamariSketch/Base.pm
+    version: '0.05'
+  Acme::HidamariSketch::Hiro:
+    file: lib/Acme/HidamariSketch/Hiro.pm
+    version: '0.05'
+  Acme::HidamariSketch::Matsuri:
+    file: lib/Acme/HidamariSketch/Matsuri.pm
+    version: '0.05'
+  Acme::HidamariSketch::Misato:
+    file: lib/Acme/HidamariSketch/Misato.pm
+    version: '0.05'
+  Acme::HidamariSketch::Miyako:
+    file: lib/Acme/HidamariSketch/Miyako.pm
+    version: '0.05'
+  Acme::HidamariSketch::Nazuna:
+    file: lib/Acme/HidamariSketch/Nazuna.pm
+    version: '0.05'
+  Acme::HidamariSketch::Nori:
+    file: lib/Acme/HidamariSketch/Nori.pm
+    version: '0.05'
+  Acme::HidamariSketch::Riri:
+    file: lib/Acme/HidamariSketch/Riri.pm
+    version: '0.05'
+  Acme::HidamariSketch::Sae:
+    file: lib/Acme/HidamariSketch/Sae.pm
+    version: '0.05'
+  Acme::HidamariSketch::Yuno:
+    file: lib/Acme/HidamariSketch/Yuno.pm
+    version: '0.05'
+requires:
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/akihiro0228/Acme-HidamariSketch/issues
+  homepage: https://github.com/akihiro0228/Acme-HidamariSketch
+  repository: https://github.com/akihiro0228/Acme-HidamariSketch
+version: '0.05'
+x_contributors:
+  - 'akihiro_0228 <nano.universe.0228@gmail.com>'

@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache-SessionX
+version:      2.01
+version_from: SessionX.pm
+installdirs:  site
+requires:
+    Apache::Session:               1.53
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

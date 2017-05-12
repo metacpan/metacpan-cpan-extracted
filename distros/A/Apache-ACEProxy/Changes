@@ -1,0 +1,15 @@
+Revision history for Perl extension Apache::ACEProxy.
+
+0.04  Tue Mar 12 20:30:30 JST 2002
+	- fixed bug of multiple headers with the same name
+
+0.03  Tue Sep 18 05:05:04 JST 2001
+	- forgot to update MANIFEST
+
+0.02  Tue Sep 18 05:00:59 JST 2001
+	* added SJIS_RACE implementation
+	- rename RACE to UTF8_RACE
+	- documentation improved
+
+0.01  Sun Aug 19 08:11:43 2001
+	- original version; created by h2xs 1.19

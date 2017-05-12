@@ -1,0 +1,108 @@
+#!/usr/bin/env perl
+
+# Pragmas.
+use strict;
+use warnings;
+
+# Modules.
+use App::Pod::Example;
+
+# Version.
+our $VERSION = 0.16;
+
+# Run.
+App::Pod::Example->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+pod-example - Script to print or run of example from documentation.
+
+=head1 SYNOPSIS
+
+ pod-example [-d flag] [-e] [-h] [-n number] [-p] [-r] [-s section] [--version] pod_file_or_module [argument ..]
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-d flag>
+
+ Turn debug (0/1).
+ Default value is 1.
+
+=item * C<-e>
+
+ Enumerate lines. Only for print mode.
+
+=item * C<-h>
+
+ Print help.
+
+=item * C<-n number>
+
+ Number of example.
+ Default value is nothing.
+
+=item * C<-p>
+
+ Print example.
+
+=item * C<-r>
+
+ Run example.
+
+=item * C<-s section>
+
+ Use section.
+ Default value is EXAMPLE.
+
+=item * C<--version>
+
+ Print version of script.
+
+=item * C<pod_file_or_module>
+
+ Perl POD file or module.
+
+=item * C<argument ..>
+
+ Example arguments.
+
+=back
+
+=head1 EXAMPLE
+
+ pod-example -p -r Class::Utils
+
+=head1 REPOSITORY
+
+L<https://github.com/tupinek/App-Pod-Example>
+
+=head1 AUTHOR
+
+Michal Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+ © 2011-2015 Michal Špaček
+ BSD 2-Clause License
+
+=head1 VERSION
+
+0.16
+
+=cut

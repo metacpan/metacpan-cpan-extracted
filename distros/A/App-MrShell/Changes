@@ -1,0 +1,75 @@
+2.0207: Fri Jan 08 2010
+   - Dennis Boone was kind enough to not only point out a serious
+     bug in the ssh command token processing, but find and fix
+     it (http://is.gd/5UxgX).  Thanks!!
+
+2.0205: Wed Jul 08 2009
+   - Doc bugs (very indirectly) found by Hans Dieter Pearcey
+   - added perl critic and Test::Pod
+   - fix bugs (as in wrongful code execution) found by critic.t
+   - fixed many punctuation problems found by critic.t
+
+2.0203: Tue May 12 10:36:26 EDT 2009
+   - added a way to subtract hosts from the host list
+
+2.0201: Sat May  9 08:32:25 EDT 2009
+   - why show the command number in the output?
+
+2.0200: Fri May  8 17:24:06 EDT 2009
+   - added the conditional argument processing and username
+     splitting for non-routed cases
+   - added an experimental recursive group replacer, so @all =
+     @dt @us will work
+   - improved group arg processing, requires further testing and
+     documentation
+
+2.0100: Fri May  8 10:19:49 EDT 2009
+   - redid the command splitter so it can handle things like perl
+     (see t/06)
+
+2.0100: Fri May  8 06:49:13 EDT 2009
+   - added -g to list groups, found I was vimming my mrshrc quite
+     often
+
+2.0000: Sat May  2 17:30:02 EDT 2009
+   - not ready to release yet, ... I keep adding things.
+   - added more docs to mrsh, fixed sigchild handling
+
+2.0000: Sat May  2 16:49:19 EDT 2009
+   - Turn early non-H group arguments into -H options
+     automagically
+   - I think this is ready for public consumption.  I'm going to
+     install it and fart around with it a little first though.
+
+2.0000: Sat May  2 09:23:09 EDT 2009
+   - docs for mrsh
+   - docs for App::MrShell
+
+2.0000: Sat May  2 07:36:41 EDT 2009
+   - hooray, I got the host routing stuff to actually work.  I
+     proved it out on a test, but it wasn't terribly convincing.
+     Then I used this: mrsh -H 'corky!wisp!corky!razor!webserver'
+     'touch /tmp/holy\ shit' The escapes for that are tricky to
+     get right, but it *is* possible.
+
+2.0000: Wed Apr 29 21:54:02 EDT 2009
+   - added all kinds of bells and whistles (ok, bugfixes)
+   - made the t/05 meaningful
+   - convinced MrShell to allow commands with various subst vars
+   - made the t/05 test *portable*, rather than using external
+     linux commands
+
+2.0000: Wed Apr 29 21:33:06 EDT 2009
+   - This is practically a finished product.
+   - It works on multiple hosts.
+   - There are tests.
+   - There's logging.
+   - There's config files...
+   - it still lacks host+host routing and
+   - documentation
+
+2.0: Wed Apr 29 07:16:19 EDT 2009
+   - got this more or less working, building some tests
+
+2.0: Mon Apr 27 14:35:30 2009 -0400
+   - probably going to resurrect Mr. Shell

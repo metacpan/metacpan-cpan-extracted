@@ -1,0 +1,49 @@
+Revision history for App-Addex-AddressBook-Apple
+
+0.018     2013-11-19 23:15:53 America/New_York
+          make note of AppleScript more noisy; update repo link
+
+0.017     2013-06-19 19:15:17 America/New_York
+          point to AppleScript replacement; update bugtracker, etc.
+
+0.016     2009-07-08
+          documentation tweak: mention the gluemac program (thanks, Kevin
+          Falcone)
+
+0.015     2009-01-16
+          dist repair; do not self-package
+
+0.014     2009-01-16
+          add repo to metadata
+
+0.013     2008-10-27
+          fix packaging. again.
+
+0.012     2008-05-27
+          fix packaging
+
+0.009     2008-04-12
+          convert MacRoman strings; possibly weird for other strings
+
+0.008     2008-02-17
+          silence a spurious warning in default_email code
+
+0.007     2008-02-17
+          actually respect default_email, some minor refactoring
+
+0.006     2008-01-07
+          the default_email field now allows selection from multiple addrs
+
+0.005     2007-09-21
+          use the App::Addex::Entry::EmailAddress class
+
+0.004     2007-05-10
+          if possible, use the first name, middle name, etc. fields
+          this prevents problems with the "name" property being in an odd order
+
+0.003     2007-05-07
+          documentation fix
+
+0.002     2007-04-07
+          severed from App-Addex
+          now returns App::Addex::Entry objects

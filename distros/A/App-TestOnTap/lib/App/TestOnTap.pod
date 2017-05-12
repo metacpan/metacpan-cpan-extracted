@@ -1,0 +1,864 @@
+=head1 NAME
+
+App::TestOnTap - Test driver
+
+Run a suite of test 'executables' in a directory tree, summarize
+their TAP output and optionally save the aggregated results for later processing.
+
+=head1 VERSION
+
+Version 0.032
+
+=head1 SYNOPSIS
+
+  # Normally run 'testontap' from a shell prompt:
+  #
+  testontap --jobs 10 path/to/suite/root
+
+=head1 OVERVIEW
+
+B<NOTE: THIS IS CURRENTLY CONSIDERED TO BE IN BETA STATE. IT MAY CHANGE IN INCOMPATIBLE WAYS BEFORE THE 1.000 RELEASE.>
+
+This package is an application, generally intended to be run from a command line.
+
+The purpose of the application is to act as a "driver", in terms of automatically executing arbitrary test scripts/executables
+(the "test suite") which in turn perform tests against whatever they're written to test (the "system under test", "SUT").
+As such, the application has no idea what the tests actually do, it is only concerned about receiving TAP data back.
+
+To help make the test suite comparatively easy to write and maintain, tests will be autodiscovered in it, based on a test suite
+configuration, and also, using rules in this configuration, enable control of the execution order of the tests.
+
+Finally, it can optionally aggregate all TAP data into a defined format (e.g. a directory tree or
+directly to an archive) for later evaluation or other handling elsewhere (e.g. into a database with a custom UI on top).  
+
+So, summarizing this into a simple list of general requirements:
+
+=over
+
+=item * B<Scalable and easy to create small or large test suites.>
+
+Test suites could be small, developer oriented with just a few basic smoke-test scripts for quick system- or unit-testing during
+development, all the way to an enormous number of executables in a test suite for lengthy and in depth system-testing of a deployed system.
+Therefore the test suite should be easy to set up as an arbitrarily complex directory structure.
+
+Preferably, writing a new test should require focusing almost entirely on the complexities of the test itself (which can certainly
+have its own challenges!) rather than how it should fit into the suite, at least at first. Thus, it's beneficial if there by default
+is no particular administration around a given test - just create the test script and it's automatically found and run.
+
+=item * B<Allow tests to run in a defined order, including when running in parallel.>
+
+In many cases, the time it takes to run a test suite is pretty much irrelevant, perhaps because it's fairly seldomly used and run only at night
+or simply because the tests are few and/or very quick. In these situations, it's ok to have the test driver run the tests in basically
+any order (currently, simple alphabetic order is used).
+
+However, it may turn out that tests can be parallelized. In the best case, no test is dependent on another, so any amount of parallelization
+will work (given what a specific host can comfortably handle). In more complex cases, tests may depend on others in various ways so a
+mechanism is needed to express such dependencies, allowing the driver to schedule test scripts appropriately whether the tests are run
+one at a time or using 'n' possible parallel slots.  
+
+=item * B<Handle result aggregation for entire test suite, with optional persistence of this data.>
+
+In a typical smoke-test test suite used during development, it's probably enough to just rely on eyeballing the test result, so it's
+enough with simple console based output on which tests worked and which ones failed (including which individual micro-tests failed).
+
+For something like automated daily system tests however, it's typically important to retain the results for perusal later. In more
+advanced scenarios, such persisted results could be used to build a history of test results, for example measuring trends over the past
+months, creating graphs of data or similar. For this reason, it is useful if the test results can be packaged in a practical format, e.g.
+as an archive.
+ 
+=item * B<Very loose coupling between this application and test suite, system under test and other variables.>
+
+The implementation of the driver should have very little to do with how the tests or the SUT is implemented, or what or how
+they perform their stuff. 
+
+=item * B<Language and platform agnostic.>
+
+Assuming the SUT and/or tests (perhaps exercising the SUT in a remote manner) can run on several platforms, the test driver 
+should also run on the same platforms. Further, consistent with the previous point about loose coupling, the tests and SUT should
+be possible to implement in whatever language is most convenient.
+
+=back
+
+=head2 FULFILLING REQUIREMENTS
+
+This application tries to satisfy the above requirements. It provides one cornerstone of what I see as the minimum triplet
+of independent parts needed to run tests:
+
+=over
+
+=item 1. The tool/framework that can bring these two together.
+
+=item 2. The tests that can exercise the product.
+
+=item 3. The product that will be tested (the SUT - "System under test").
+
+=back
+
+Thus, this application provides the first building block in this list. As discussed, it is not really concerned with what the tested
+product is, nor how the tests exercise it, only how the tests report results.
+
+Each of these parts generally has its own CM and lifecycle need, and may each contain problems that need to be
+fixed - i.e. when a test fails, it's not necessarily the product that is faulty, the tests or the tool may be
+too, and so any of them may need adjustment without touching the others. Thus, it for example allows us to use any given version of
+tests and run them against a range of product versions, say, for finding regression problems.
+
+In practice you may find you need even more parts to complete a full test environment, so unless you hardcode such things
+in the tests themselves, this application is open enough for you to pass in a number of variable parts - examples would be selecting
+several different JDK versions, or perhaps different incarnations of a database. 
+
+The core mechanism is to use TAP (e.g. "Test Anything Protocol" as defined by L<http://testanything.org>) as the coupling
+between test executables and the application as the test driver, e.g. very similar to when writing regular Perl module tests.
+To implement this, the standard "Test::*" and "TAP::*" families of test modules are used, but with the necessary packaging
+to provide for the other requirements. Since the interface is 'TAP', any language can be used to write the tests.
+
+The definition of a "test suite" includes a configuration file which allows the test suite to directly define which parts of the directory
+tree should not be scanned for possible tests, how to map "test executables" to how to execute them, as well as a dependency description mechanism
+for describing required dependencies between tests.
+
+=head1 THE TEST SUITE
+
+A test suite is basically very simple: it's a directory. To be minimally useful, it needs to contain a single file
+named with an extension defined in the default "exec mapping" (see more about defaults in L<configs execmap section|"THE SUITE CONFIG">).
+
+So, assuming this:
+
+  foo/
+  -- bar/
+  -- -- simple_suite/
+  -- -- -- mytest.pl
+
+Nothing more is necessary. By running "testontap foo/bar/simple_suite", it will find
+and execute the file as "perl mytest.pl", passing a small number of environment variables with information on, for
+example, a temporary directory it can use if necessary. If any extra command line args had been given
+they would also be transmitted to the test for it to use in any way it likes. As long as mytest.pl
+reports test progress using TAP, all is well. At this point, any number of other scripts can be added,
+including organizing them in whatever structure makes sense for you.
+
+However, the test suite should preferably as soon as possible be given a config file in the root of the suite.
+
+=head2 THE SUITE CONFIG
+
+A test suite is configured by putting the file F<config.testontap> in the root of the suite. It is
+technically optional, as the only required part (test id) will be generated for each run.
+However, while this can be useful just to try things out, it makes it impossible to use any persisted
+results properly, and obviously will make some functionality unavailable, so it quickly becomes desirable
+to put one in.
+
+The standard module used for reading this file is L<Config::Std>, please consult this module for
+general information on the format. In particular, some keys allows multi-line and/or multi-part values.
+
+Also, in several places this file can contain queries (e.g. to select tests) using a query format as
+described in L<Grep::Query>. Notable here is that queries operate on paths inside the suite, so those
+are defined as simply the relative path of the file from the root of the suite, and always using '/' as a path
+delimiter on all platforms. Directories will be suffixed with a '/'.
+
+Generally, this file should at a minimum always contain a line of "id = <UUID>". In fact, if no config file is
+present, a warning will be displayed to the effect that a newly generated id will be used for each run. See below.  
+
+Empty lines are ignored, and comments can be made by starting the line with '#'.
+
+The following keys/sections are valid:
+
+=over
+
+=item B<id>
+
+This is required and must be set to an UUID.
+
+It will be used to mark results with and thus can be used to distinguish persisted results from different
+suites. Hence, you should obviously not reuse an id already used for another suite! It is however expected
+that something processing such results are aware that a suite most likely will change during its lifetime.
+
+Unless you have any other tool to generate an UUID with, a tip is to run the suite once without a config file and
+then cut and paste the generated id.
+
+Example:
+
+  id = 61d4c8c3-c827-11e6-a3f8-bea3de08f558
+
+=item B<skip>
+
+This is optional. The value is a L<Grep::Query> expression, and can be multi-line/part for readability.
+
+If not present, all files/parts of the tree are included/searched for matches given extensions in
+the "exec mapping" (see below)).
+
+This is useful for excluding parts of the suite tree, e.g. parts which are merely data to be used by the tests and
+that may contain files with extensions that would otherwise be mistaken for active tests.
+
+As the suite is scanned for tests, paths will be tested against the query, and if matching, will be pruned
+completely from the set of possible tests. In particular, not selecting a directory will prune the entire subtree.
+
+Example:
+
+  skip = eq(unfinished_test.pl) or regexp{^(.*/)?_data/$}
+  
+This would avoid the 'unfinished_test.pl' file and contents of any '_data' directories at any level of the suite.
+ 
+=item B<parallelizable>
+
+This is optional, but necessary if parallelization using the '--jobs' flag is to be effective (a warning will be generated
+if the user requests a --jobs value greater than one, but no parallelizable rule is present).
+The value is a L<Grep::Query> expression, and can be multi-line/part for readability.
+
+If not given, it effectively defaults to forcing all tests to run serially, on the theory that a test not written
+with the understanding that it could be run in parallel with other tests might end up producing weird results. Hence,
+it forces the test suite developer to think about this and knowingly turn on parallelizability.
+
+As tests are evaluated as being ready to run, the names will also be matched against the query to evaluate for being
+allowed to run in parallel. Note that at this point, it will always be files, never directories.
+
+Also note that tests may also be subject to dependency rules (see below), which may or may not impact the ability for
+them to run in parallel with anything else. 
+
+Examples:
+
+  parallelizable = regexp(.*)
+  
+In one stroke, this will allow all tests to be parallelizable. Obviously, using 'not' in front, will create a query
+that ends up acting as the default, i.e. tests are never parallelizable (but it will shut up the --jobs warning). 
+
+  parallelizable = not eq(some/path/lonely_test.pl) or not eq(another/path/singleton.pl)
+  
+E.g. all tests are possible to run in parallel except two special ones.
+
+=item B<order>
+
+This is optional, and sets the default ordering strategy for the suite. It may be overridden by the commandline
+C<--order> flag.
+
+If not given, the default commandline setting applies (C<none>).
+
+=item B<[EXECMAP]> (section)
+
+This section is optional, but recommended. It details how to decide which files are tests and how they should be executed. 
+Note that there is also possible to pass a file with this section manually using the '--execmap' option, in order
+to override or complement any defined execmap.
+
+The section should contain matched pairs of key/values named C<matchI<n>> and C<cmdI<n>>, where the C<match> part defines
+a L<Grep::Query> expression to match to test names, and the C<cmd> part defines the command line to use for matching tests.
+The numbering defines the match order, i.e. tests will be checked for matches in ascending numerical order. 
+
+The C<cmd> value may be in multi-line/part format, which is required if the command contains
+whitespace in the individual parts. A plain string will be split on space in order to separate the command into
+parts.
+
+Example:
+
+  [EXECMAP]
+  match1 = regexp/\.(t|pl)$/
+  cmd1 = perl
+  match2 = regexp(\.jar$)
+  cmd2 = java
+       = -jar
+  # in this case, could also have been written simpler as 'cmd2 = java -jar'
+  
+This means that any files found with the extensions 'pl' or 't' will be run by 'perl <file>' and that any 'jar' files
+will be run by 'java -jar <file>'. Any other files will be ignored.
+
+If no "EXECMAP" section is present, a default one will be used, equivalent to this for this release:
+
+  [EXECMAP]
+  match1 = regexp[\.(t|pl)$]
+  cmd1 = perl
+  match2 = regexp[\.py$]
+  cmd2 = python
+  match3 = regexp[\.jar$]
+  cmd3 = java
+       = -jar
+  match4 = regexp[\.(groovy|gsh|gvy|gy)$]
+  cmd4 = groovy
+  # only on windows
+    match5 = regexp[\.(bat|cmd)$]
+    cmd5 = cmd.exe
+         = /c
+  # only on unix/linux
+    match5 = regexp[\.sh$]
+    cmd5 = /bin/sh
+
+While useful in the early stages for quickly getting started, good form is to ensure the execmap is explicitly 
+defined in the configuration, avoiding surprises if other extensions are added to the default, and also to use
+the "skip" key to ensure only expected files are selected as tests.
+
+=item B<[DEPENDENCY E<lt>nameE<gt>]> (section)
+
+Sections like these are optional. There can be many with different names (the names have no internal meaning beyond
+helping when reporting problems with dependencies).
+
+Each section describes dependencies between one or more tests on one or more other tests; it will ensure that any dependencies
+are executed first. This can be utilized for example by having a test that ensures a database is set up in a specific manner
+before proceeding.
+
+Note that any given test can be selected by multiple dependency sections, in either match/dependson, and this will ultimately
+create a dependency graph. However, it must result in a "DAG", no cycles are allowed.
+
+A dependency section has two required key/value pairs:
+
+=over
+
+=item B<match>
+
+This is required. The value is a L<Grep::Query> expression, and can be multi-line/part for readability.
+
+It must select one or more tests that will be dependent on tests selected by the "dependson" key.
+
+=item B<dependson>
+
+This is required. The value is a L<Grep::Query> expression, and can be multi-line/part for readability.
+
+It must select one or more tests that must be run before the tests selected by the "match" key.
+
+=back
+
+Example:
+
+  [DEPENDENCY All depends on init]
+  match = not eq(init.pl)
+  dependson = eq(init.pl)
+  
+  [DEPENDENCY File handling]
+  match = regexp(^filehandl/)
+  dependson = eq(basic_file_handling_setup.pl)
+  
+  [DEPENDENCY Picture processing]
+  match = regexp(^picproc/)
+  dependson = eq(basic_picture_processing_setup.pl)
+  
+The three separate rules will together create a dependency tree between tests. The first is basically simple: all tests are dependent
+on the 'init.pl' test (except itself, obviously). The effect is that init.pl will run to completion first before any other test may start.
+This will be true regardless of if parallelization is in effect or not.
+
+Further, the next two rules ensure that the two different 'basic_...' tests run after that. They are independent, so they can run in parallel.
+As they complete, all tests under 'filehandl/' and 'picproc/' are released for running, and again, all of them are independent and can run in
+parallel.
+
+Again, beyond obeying the dependencies, exactly which test(s) will run in what order are ultimately dependent on many other factors such as the
+'parallelizability' of a given test, how many job slots are available, exactly how the TAP harness implementation handles parallelization and
+how capable it is etc.   
+
+=back 
+
+=head2 PARAMETER PASSING
+
+Most test suites will need some kind of outside input when running. There are two main sources:
+
+=over
+
+=item 1. The user (or automation) may need/want to pass various information to the tests
+
+Examples of this is simply to allow the tests to be flexible. The most obvious example is that they need information on
+where/how to access the SUT or similar. While it could be hardcoded into the suite in some manner, it may make sense to
+make this information into something that is passed by the user when starting the suite, thus allowing the user to 
+point to several different SUT's using the same test suite and evaluate the behavior of each.
+
+To accomplish this, the recommended way is to simply pass this information along on the command line, for example:
+
+  testontap --jobs 3 some/path/to/fancysuite SUT=xyz VERSION=BETA2 "my sample test run"
+  
+The parameters after the suite path is not processed by testontap in any way but will all be passed as command line arguments
+to each test.
+
+As the tests can interpret the args on the command line in any manner they choose, for more advanced requirements consider
+using a suitable file format to pass in your humongous and/or complex set of params and just pass the file name.
+
+=item 2. The driver application needs to pass some context information to the tests
+ 
+As the driver controls the tests, it also controls various disk locations which the tests are expected to use for temporary
+needs as well as some data it wants to persist. By following these pointers, the driver may package the data cleanly and
+finally clean up after completion. 
+
+The driver communicates this type of information using environment variables (prefixed by 'TESTONTAP_'):
+
+=over
+
+=item * TESTONTAP_SUITE_DIR
+
+The path to the root directory of the suite. It may assist tests in navigating the suite.
+
+=item * TESTONTAP_TMP_DIR
+
+This variable holds an existing directory path, and is free for the tests to use for whatever reason. Note that it
+will be the same for all tests in the suite and empty when the first test runs, but will not be touched until all tests have
+finished - hence, it can be used to pass information between tests in the suite (however, consider parallelization issues if
+this is used).
+
+When all tests are concluded, it will be removed; no data in it will be persisted.
+
+=item * TESTONTAP_PRIVATE_DIR
+
+This variable holds an existing directory path, and is free for the tests to use for whatever reason similar to the above
+temporary directory. The difference is that files/directories in here will be persisted along with the general results. 
+
+When all tests are concluded, data in it will be persisted before it is removed. 
+
+=back
+ 
+=back
+
+=head2 PERSISTED RESULT
+
+The results can be persisted as either a plain directory tree or a zip archive. The naming will consist of the test suite
+name, the timestamp when the test was run and a 'run id' (an UUID, generated for each test run). If it's an archive file
+it will be suffixed with '.zip'. See L<command line options and arguments|App::TestOnTap::Args> for details on how to control this using '--archive'
+and '--savedirectory'.
+
+The saved results are actually a part of the 'work directory', the place where all files are managed until they're saved.
+This includes, among other things, the temporary directory used for L</"TESTONTAP_TMP_DIR"> and may therefore sometimes
+be useful in debugging. It is normally a temporary location and automatically cleaned away, but by using the '--workdirectory'
+option, it will remain after completion so you may examine it.
+
+Example:
+
+  testontap some/path/to/fancysuite
+  
+This will only run the suite, but will not persist any results.
+
+  testontap --archive some/path/to/fancysuite
+  
+This will persist the test results as the file F<fancysuite.20161227T103707Z.6a00a78d-cc20-11e6-bceb-fc7c2814a673.zip> in the
+current directory.
+
+  testontap --archive --savedirectory /tmp some/path/to/fancysuite
+
+This will persist the test results as the file F<fancysuite.20161227T103707Z.6a00a78d-cc20-11e6-bceb-fc7c2814a673.zip> in the
+/tmp directory.
+
+  testontap --savedirectory /tmp some/path/to/fancysuite
+
+This will persist the test results as the directory F<fancysuite.20161227T103707Z.6a00a78d-cc20-11e6-bceb-fc7c2814a673> in the
+/tmp directory.
+
+Note that for the zip file, it will internally contain a root directory with the same name.
+
+=head3 FORMAT
+
+Assuming a test suite looking like below, and also assume this suite will generate a private persistable 'ioperf.xml':
+
+  fancysuite/
+  -- config.testontap
+  -- init.pl
+  -- basic_file_handling_setup.pl
+  -- basic_picture_processing_setup.pl
+  -- filehandl/
+  -- -- fh1.pl
+  -- -- fh2.pl
+  -- picproc/
+  -- -- pp1.pl
+  -- -- pp2.pl
+
+Running the suite using:
+
+  testontap --savedirectory /tmp fancysuite
+  
+The test suite result tree in /tmp will look like this:
+
+  fancysuite.20161227T103707Z.6a00a78d-cc20-11e6-bceb-fc7c2814a673
+  -- env.json
+  -- meta.json
+  -- summary.json
+  -- testinfo.json
+  -- private/
+  -- -- ioperf.xml
+  -- result/
+  -- -- init.pl.json
+  -- -- basic_file_handling_setup.pl.json
+  -- -- basic_picture_processing_setup.pl.json
+  -- -- filehandl/
+  -- -- -- fh1.pl.json
+  -- -- -- fh2.pl.json
+  -- -- picproc/
+  -- -- -- pp1.pl.json
+  -- -- -- pp2.pl.json
+  -- tap/
+  -- -- init.pl.tap
+  -- -- basic_file_handling_setup.pl.tap
+  -- -- basic_picture_processing_setup.pl.tap
+  -- -- filehandl/
+  -- -- -- fh1.pl.tap
+  -- -- -- fh2.pl.tap
+  -- -- picproc/
+  -- -- -- pp1.pl.tap
+  -- -- -- pp2.pl.tap
+
+All 'json' files are in UTF-8.
+
+The described format version here is '0.1', and is indicated in the meta-data below (as format => major, minor).
+
+=over
+
+=item * env.json
+
+This contains a dump of the enviroment when the suite was run, as key/value pairs.
+
+=item * meta.json
+
+This contains general information about the test run.
+
+=over
+
+=item * dollar0 (string)
+
+The full path of $0.
+
+=item * argv (list of strings)
+
+The arguments given on the command line and passed to the tests.
+
+=item * begin (string)
+
+The moment when the test run started, as a UTC timestamp in ISO8601 format.
+
+=item * defines (key/value pairs)
+
+Any defines given when invoking the testontap command.
+
+=item * elapsed (key/value pairs)
+
+CPU and real clock values for the run:
+
+=over
+
+=item * cpu (number)
+
+Used total CPU time.
+
+=item * real (number)
+
+Real elapsed time "wallclock seconds".
+
+=item * str (string)
+
+Elapsed time in display form.
+
+=back
+
+=item * end (string)
+
+The moment when the test run ended, as a UTC timestamp in ISO8601 format.
+
+=item * format (key/value pairs)
+
+The format version of this result tree. If any changes are made, this will be updated and
+changes documented. 
+
+=over
+
+=item * major (number)
+
+Incremented for incompatible changes, e.g. removal of a file, changed semantics etc.
+
+=item * minor (number)
+
+Incremented for backwards compatible changes, e.g. the addition of a new file, key/value pair etc.
+
+=back
+
+=item * host (string)
+
+The FQDN for the host where the test was run.
+
+=item * jobs (number)
+
+The job slots used when the test was run.
+
+=item * order (string)
+
+The name of the order strategy used.
+
+May in rare instances be a null value, e.g. for a suite with no tests.
+
+=item * platform (string)
+
+The platform of the host where the test was run.
+
+=item * runid (string)
+
+The UUID for the test run (generated every time).
+
+=item * suiteid (string)
+
+The UUID for the test suite (as defined in the suite configuration).
+
+=item * suitename (string)
+
+The name of the suite, defined as the name of the directory.
+
+=item * uname (list of strings)
+
+Data from the uname() function.
+
+=item * user (string)
+
+The name of the user that ran the test.
+
+=back 
+
+=item * testinfo.json
+
+This holds various information about tests found and acted upon.
+
+=over
+
+=item * commandlines (key/value pairs)
+
+Test names as keys with values being the command line used to run them.
+
+=item * dispensedorder (list of strings)
+
+Test names in the order they were dispensed to the scheduler.
+
+Note that this list may not have all 'found' tests due to a commandline C<--skip/--include> rule.
+
+=item * found (list of strings)
+
+Test names in the order they were found during scan.
+
+=item * fullgraph (key/value pairs)
+
+Test names as keys, with values being lists of its dependencies. 
+
+=item * prunedgraph (key/value pairs)
+
+Test names as keys, with values being lists of its dependencies, but after any
+commandline C<--skip/--include> rules has been applied to give the actual dependencies.
+
+Note that this is a null value if the 'pruned' list of tests is the same as the starting list, i.e.
+the pruned graph would be the same as the full graph.
+
+=back
+
+=item * summary.json
+
+This holds a summary of the entire test suite, with information coming from the aggregator (see L<TAP::Parser::Aggregator>).
+
+=over
+
+=item * all_passed (0 or 1)
+
+True (1) if all tests passed.
+
+=item * failed (list)
+
+Tests that failed.
+
+=item * parse_errors (list)
+
+Tests generating invalid TAP.
+
+=item * passed (list)
+
+Tests that passed.
+
+=item * planned (list)
+
+Tests planned to run.
+
+=item * skipped (list)
+
+Tests skipping microtests.
+
+=item * status (PASS or FAIL)
+
+Overall status.
+
+=item * todo (list)
+
+Tests having TODO's.
+
+=item * todo_passed (list)
+
+Tests with TODO's that unexpectedly passed.
+
+=back
+
+=item * private/
+
+Any files in this directory are written by the test suite and is thus fully defined by the suite itself.
+
+=item * result/
+
+The structure below this directory mimics the structure in the suite. Every test is represented by
+a file with the extension '.json', i.e. a JSON file of key/value pairs of data about the microtests
+in the test.
+
+=over
+
+=item * actual_failed (list)
+
+The microtests that failed regardless of if they we're TODO's.
+
+=item * actual_passed (list)
+
+The microtests that passed regardless of if they we're TODO's.
+
+=item * end_time (string)
+
+The moment when the test ended, as a UTC timestamp in ISO8601 format (in high resolution time, if
+available).
+
+=item * exit (number)
+
+The exit code from the test.
+
+=item * failed (list)
+
+The microtests that failed, but if it was a TODO, it isn't counted.
+
+=item * has_problems (0 or 1)
+
+True (1) if there are any problems with this test.
+
+=item * is_good_plan (0 or 1)
+
+True (1) if the plan corresponded to the number of microtests.
+
+=item * parse_errors (list)
+
+Lists of microtests that generated erroneous TAP.
+
+=item * passed (list)
+
+The microtests that passed, even if it is a failing TODO.
+
+=item * plan (list)
+
+The test plan.
+
+=item * skip_all (0 or string)
+
+True (reason string) if skipping everything.
+
+=item * skipped (list)
+
+Individual microtests skipped.
+
+=item * start_time (string)
+
+The moment when the test started, as a UTC timestamp in ISO8601 format (in high resolution time, if
+available).
+
+=item * tests_planned (number)
+
+The number of microtests planned.
+
+=item * tests_run (number)
+
+The number of microtests run.
+
+=item * todo (list)
+
+Microtests with TODO directives.
+
+=item * todo_passed (list)
+
+The microtests with TODO directives passing.
+
+=item * version (number)
+
+The TAP version detected.
+
+=back
+
+=item * tap/
+
+The structure below this directory mimics the structure in the suite. Every test run is represented by
+a file with the extension '.tap', and is the actual output given by the test (which ought to be
+TAP, but in case of a broken test or an executable mistaken for a test, may show non-existent
+or broken TAP, and if so, should show up with parse errors in the summary).
+
+=back
+
+=head1 EXTRAS
+
+Review the 'extras' directory in the distribution for some examples, specifically Java code
+to help generate TAP streams, either directly or together with JUnit.
+
+=head1 AUTHOR
+
+Kenneth Olwing, C<< <knth at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-app-testontap at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-TestOnTap>. I will be
+notified, and then you'll automatically be notified of progress on your bug as
+I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc App::TestOnTap
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-TestOnTap>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/App-TestOnTap>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/App-TestOnTap>
+
+=item * Search CPAN
+
+L<http://metacpan.org/dist/App-TestOnTap/>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+I thank my family for putting up with me!
+
+=head1 REPOSITORY
+
+L<https://github.com/kenneth-olwing/App-TestOnTap>.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2017 Kenneth Olwing.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut

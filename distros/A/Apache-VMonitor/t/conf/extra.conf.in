@@ -1,0 +1,13 @@
+# make sure that we test under Taint + warnings mode
+<IfDefine MODPERL2>
+    PerlSwitches -wT
+</IfDefine>
+<IfDefine !MODPERL2>
+    PerlTaintCheck On
+    PerlWarn      On
+</IfDefine>
+
+#PerlSwitches -Dm
+
+
+

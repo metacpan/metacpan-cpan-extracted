@@ -1,0 +1,68 @@
+{
+   "abstract" : "Web server and CLI to display PAUSE package list in previous time",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.035, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-PAUSE-TimeMachine",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::pushd" : "0",
+            "IO::Compress::Gzip" : "0",
+            "IPC::Run" : "0",
+            "Plack" : "1.0",
+            "Pod::Usage" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/miyagawa/App-PAUSE-TimeMachine/issues"
+      },
+      "homepage" : "https://github.com/miyagawa/App-PAUSE-TimeMachine",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/miyagawa/App-PAUSE-TimeMachine.git",
+         "web" : "https://github.com/miyagawa/App-PAUSE-TimeMachine"
+      }
+   },
+   "version" : "0.05"
+}
+

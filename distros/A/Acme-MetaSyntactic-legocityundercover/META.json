@@ -1,0 +1,61 @@
+{
+   "abstract" : "LEGO City Undercover theme",
+   "author" : [
+      "Chris Williams"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-MetaSyntactic-legocityundercover",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::MetaSyntactic" : "0",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::MetaSyntactic::List" : "1.001",
+            "perl" : "v5.6.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/acme-metasyntactic-legocityundercover",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/acme-metasyntactic-legocityundercover.git",
+         "web" : "https://github.com/bingos/acme-metasyntactic-legocityundercover"
+      }
+   },
+   "version" : "0.02"
+}
+

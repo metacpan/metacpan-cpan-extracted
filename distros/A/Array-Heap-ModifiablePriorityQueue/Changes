@@ -1,0 +1,11 @@
+Revision history for Perl module Array::Heap::ModifiablePriorityQueue
+
+1.10 Mon Jul 13 00:22:33 2015
+    - added ::PriorityQueue::* modules
+
+1.01 Fri Jul 10 16:21:39 2015
+    - added weight() and items() methods
+
+1.0 Mon May 25 12:58:31 2015
+    - original version; created by ExtUtils::ModuleMaker 0.54
+

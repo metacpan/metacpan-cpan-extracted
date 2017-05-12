@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+  <testsuite name ="be.asnmtap.common.businessservices.service.TestAsnmtapServiceRemote" tests="2" failures="1" errors="1" time="0.183">
+    <testcase name="testHeavyLoad1" time ="0.075">
+	  <failure message="Service exception : Exception with tuxedocode -6001 - Cannot get a TUXEDO session - No session available" type="junit.framework.AssertionFailedError">
+	   junit.framework.AssertionFailedError: ...
+      </failure>
+    </testcase>
+    <testcase name="testHeavyLoad2" time="0.05">
+      <error message="Exception with tuxedocode -6001 - Cannot get a TUXEDO session - No session available" type ="be.Asnmtap.common.businessservices.exceptions.AsnmtapServiceException">
+	    be.Asnmtap.common.businessservices.exceptions.AsnmtapServiceException: ...
+      </error>
+    </testcase>
+  </testsuite>
+</testsuites>
+

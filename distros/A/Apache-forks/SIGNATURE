@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 690d29bc0f985cbf075110511beaa90ec03880eb CHANGES
+SHA1 9245852dd4682f2e22a5fed821db88fe5b665292 MANIFEST
+SHA1 be47f6fa58da2b2390a25a50e25e5f2e6817c6c4 META.yml
+SHA1 e98b49ee9fca8601526056745ae00aaa55e66992 Makefile.PL
+SHA1 3e87115e345204d5b53a99d5d09b5ab3fb222f77 README
+SHA1 fe09a032514b7b9e89dfd99313dff09804389e50 eg/mycache.pm
+SHA1 0e33e75d5efd9b1eeaa6d9499847404348fa3ad0 eg/printenv.cgi
+SHA1 ff6c5f2a506df194cb00cd278ee5b70378b5fe00 eg/startup.pl
+SHA1 455ce5ecfb0dc772d0a83cd896b7aeec4c542121 lib/Apache/forks.pm
+SHA1 6a216e984e60cc0f9eec91e58bafa37fff757d12 lib/Apache/forks/BerkeleyDB.pm
+SHA1 1b53e2179ffbf9002a9c45f3fae63727e64d11a6 lib/Apache/forks/Common.pm
+SHA1 a957cb346ccfa7a8f4d302468427de9ee59ff876 t/00_signature.t
+SHA1 985d1010809d585d8a2c7ee2bcf6416b36ecf6ad t/01_load.t
+SHA1 60c6c27afcb8bbe875413ac8513ddf04ff5ef995 t/02_load_bdb.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (Cygwin)
+
+iD8DBQFHitSQQwn7DcpJEO4RAiYmAJ4xArRcYtYX1iKu56qUZi8/YJ9E1gCgl9Hj
+forwDLGz3udYh4hfcTu9G5Y=
+=+qHN
+-----END PGP SIGNATURE-----

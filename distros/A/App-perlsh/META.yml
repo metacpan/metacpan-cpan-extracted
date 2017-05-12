@@ -1,0 +1,28 @@
+---
+abstract: 'a simple F<perl> REPL based on C<Lexical::Persistence>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-perlsh
+provides:
+  App::perlsh:
+    file: lib/App/perlsh.pm
+    version: '0.01'
+requires:
+  Getopt::Long: '0'
+  Lexical::Persistence: '0.98'
+  List::Util: '0'
+  Term::ReadLine: '0'
+  Term::Size: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'

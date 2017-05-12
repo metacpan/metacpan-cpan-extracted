@@ -1,0 +1,76 @@
+#!/opt/perl/bin/perl
+use strict;
+use utf8;
+use AnyEvent;
+use AnyEvent::XMPP::Client;
+use AnyEvent::XMPP::Ext::Disco;
+use AnyEvent::XMPP::Ext::Version;
+use AnyEvent::XMPP::Namespaces qw/xmpp_ns/;
+
+my @msgs;
+
+sub read_messages {
+   my ($msgs_file) = @_;
+   open my $f, $msgs_file
+      or die "Couldn't open messages file: '$msgs_file'\n";
+   (@msgs) = map { chomp; $_ } <$f>;
+   close $f;
+}
+
+binmode STDOUT, ":utf8";
+
+my ($jid, $pw, $inputfile) = @ARGV;
+
+unless (@ARGV >= 3) {
+   warn "usage: talkbot <jid> <password> <talkfile>\n";
+   exit;
+}
+
+read_messages ($inputfile);
+
+my $j       = AnyEvent->condvar;
+my $cl      = AnyEvent::XMPP::Client->new (debug => 1);
+my $disco   = AnyEvent::XMPP::Ext::Disco->new;
+my $version = AnyEvent::XMPP::Ext::Version->new;
+
+$cl->add_extension ($disco);
+$cl->add_extension ($version);
+
+$cl->set_presence (undef, 'I\'m a talking bot.', 1);
+
+$cl->add_account ($jid, $pw);
+warn "connecting to $jid...\n";
+
+$cl->reg_cb (
+   session_ready => sub {
+      my ($cl, $acc) = @_;
+      warn "connected!\n";
+   },
+   message => sub {
+      my ($cl, $acc, $msg) = @_;
+      my $talkmsg = $msgs[int (rand (@msgs))];
+      my $repl = $msg->make_reply;
+      $repl->add_body ("You said '".$msg->any_body."' but... " . $talkmsg);
+      warn "Got message: '".$msg->any_body."' from ".$msg->from."\n";
+      warn "Answered: $talkmsg\n";
+      $repl->send;
+   },
+   contact_request_subscribe => sub {
+      my ($cl, $acc, $roster, $contact) = @_;
+      $contact->send_subscribed;
+      warn "Subscribed to ".$contact->jid."\n";
+   },
+   error => sub {
+      my ($cl, $acc, $error) = @_;
+      warn "Error encountered: ".$error->string."\n";
+      $j->broadcast;
+   },
+   disconnect => sub {
+      warn "Got disconnected: [@_]\n";
+      $j->broadcast;
+   },
+);
+
+$cl->start;
+
+$j->wait;

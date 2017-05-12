@@ -1,0 +1,36 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::Kwalitee' => '1.21'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'Cpanel::JSON::XS' => '3.0115'
+                                      },
+                      'requires' => {
+                                      'Data::Dumper' => '2.154',
+                                      'JSON::MaybeXS' => '1.003003',
+                                      'YAML::Tiny' => '1.62',
+                                      'perl' => '5.008'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::Is' => '20140823.1',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

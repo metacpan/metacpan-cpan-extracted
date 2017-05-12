@@ -1,0 +1,70 @@
+[% USE date ( format = '%l o\'clock %p on %A, %e %B, %Y' locale = 'en_GB') %]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-type" content="text/html; charset=[% settings.charset %]" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>[% page.title %]</title>
+  [%- FOREACH stylesheet IN site.css -%]
+  [%- IF stylesheet.match('\/\/') -%]
+  <link rel="stylesheet" href="[% stylesheet %]" />
+  [%- ELSE =%]
+  <link rel="stylesheet" href="[% request.uri_base %]/css/[% stylesheet %].css" />
+  [%- END -%]
+  [%- END -%]
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+
+<div class="container">
+
+[% IF site.title %]
+<header class="page-header">
+  <h2>
+    <a href="/">[% site.title %]</a>
+    [% IF site.subtitle %]
+      <small>[% site.subtitle %]</small>
+    [% END %]
+  </h2>
+</header>
+[% END %]
+
+[% IF site.nav_links %]
+<nav>
+  <ul class="nav nav-pills">
+    [% FOREACH nav_link IN site.nav_links %]
+    <li role="presentation"><a href="[% nav_link.href | html %]" [% IF nav_link.href.match("(https?:)?//") %]target="_blank"[% END %]>[% nav_link.text | html %]</a></li>
+    [% END %]
+  </ul>
+</nav>
+[% END %]
+
+[% content %]
+
+<footer class="page-footer">
+  <hr/>
+  <p>
+    Served a little after <time>[% date.format | html %]</time>
+  </p>
+  <p>
+    Powered by <a href="http://perldancer.org/">Dancer</a> [% dancer_version %] with <a href="http://github.com/pdl/Articulate" title="Articulate, a Content Management Service written in Perl">Articulate</a>.
+  </p>
+</footer>
+
+</div>
+
+[%- FOREACH script IN site.js -%]
+  [%- IF script.match('\/\/') -%]
+  <script type="text/javascript" src="[% script %]"></script>
+  [%- ELSE =%]
+  <script type="text/javascript" src="[% request.uri_base %]/javascripts/[% script %].js"></script>
+  [%- END -%]
+[%- END -%]
+</body>
+</html>

@@ -1,0 +1,39 @@
+requires "File::ShareDir" => "0";
+requires "File::Which" => "0";
+requires "JSON::PP" => "0";
+requires "perl" => "5.010";
+
+on 'build' => sub {
+  requires "Archive::Extract" => "0.48";
+  requires "HTTP::Tiny" => "0";
+  requires "IO::Uncompress::UnXz" => "0";
+  requires "JSON::PP" => "0";
+};
+
+on 'test' => sub {
+  requires "Test2::Suite" => "0.000030";
+  requires "Test::Alien" => "0.09";
+  requires "Test::More" => "0.94";
+  requires "perl" => "5.010";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "File::ShareDir::Install" => "0.06";
+  requires "perl" => "5.004";
+};
+
+on 'develop' => sub {
+  requires "FindBin" => "0";
+  requires "Test::CPAN::Changes" => "0";
+  requires "Test::EOL" => "0";
+  requires "Test::Fixme" => "0.07";
+  requires "Test::More" => "0.94";
+  requires "Test::NoTabs" => "0";
+  requires "Test::Pod" => "0";
+  requires "Test::Pod::Coverage" => "0";
+  requires "Test::Pod::Spelling::CommonMistakes" => "0";
+  requires "Test::Spelling" => "0";
+  requires "Test::Strict" => "0";
+  requires "YAML" => "0";
+};

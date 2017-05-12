@@ -1,0 +1,17 @@
+lib/Apache2/Filter/HTTPHeadersFixup.pm
+Makefile.PL
+MANIFEST
+Changes
+TODO
+t/conf/extra.conf.in
+t/conf/modperl_extra.pl
+t/manip/in_append.t
+t/manip/in_modify.t
+t/manip/out_append.t
+t/manip/out_modify.t
+t/response/TestManip/in_append.pm
+t/response/TestManip/in_modify.pm
+t/response/TestManip/out_append.pm
+t/response/TestManip/out_modify.pm
+t/TEST.PL
+META.yml                                 Module meta-data (added by MakeMaker)

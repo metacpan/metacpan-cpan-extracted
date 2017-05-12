@@ -1,0 +1,204 @@
+NAME
+    Authen::ModAuthPubTkt - Generate Tickets (Signed HTTP Cookies) for
+    mod_auth_pubtkt protected websites.
+
+VERSION
+    version 0.1.1
+
+SYNOPSIS
+    On the command-line, generate the public + private keys: (More details
+    available at <https://neon1.net/mod_auth_pubtkt/install.html>)
+
+            $ openssl genrsa -out key.priv.pem 1024
+            $ openssl rsa -in key.priv.pem -out key.pub.pem -pubout
+
+    Then in your perl script (which is probably the your custom login
+    website), use the following code to issue tickets:
+
+            use Authen::ModAuthPubTkt;
+
+            my $ticket = pubtkt_generate(
+                    privatekey => "key.priv.pem",
+                    keytype    => "rsa",
+                    clientip   => undef,  # or a valid IP address
+                    userid     => "102",  # or any ID that makes sense to your application, e.g. email
+                    validuntil => time() + 86400, # valid for one day
+                    graceperiod=> 3600,   # grace period of an hour
+                    tokens     => undef,  # comma separated string of tokens.
+                    userdata   => undef   # any application specific data to pass.
+            );
+
+            ## $ticket string will look something like:
+            ## "uid=102;validuntil=1337899939;graceperiod=1337896339;tokens=;udata=;sig=h5qR" \
+            ## "yZZDl8PfW8wNxPYkcOMlAxtWuEyU5bNAwEFT9lztN3I7V13SaGOHl+U6wB+aMkvvLQiaAfD2xF/Hl" \
+            ## "+QmLDEvpywp98+5nRS+GeihXTvEMRaA4YVyxb4NnZujCZgX8IBhP6XBlw3s7180jxE9I8DoDV8bDV" \
+            ## "k/2em7yMEzLns="
+
+    To verify a ticket, use the following code:
+
+            my $ok = pubtkt_verify (
+                    publickey => "key.pub.pem",
+                    keytype   => "rsa",
+                    ticket    => $ticket
+            );
+            die "Ticket verification failed.\n" if not $ok;
+
+    To extract items from a ticket, use the following code:
+
+            my %items = pubtkt_parse($ticket);
+
+            ## %items will be something like:
+            ## {
+            ##    'uid' => 102,
+            ##    'validuntil' => 1337899939,
+            ##    'graceperiod => 1337896339,
+            ##    'tokens' => "",
+            ##    'udata'  => "",
+            ##    'sig'    => 'h5qRyZZDl8PfW8wNxPYkcOMlAxtWuEyU5bNAwEFT9lztN3 (....)'
+            ## }
+
+    Also, a command-line utility ("mod_auth_pubtkt.pl") will be installed,
+    and can be used to generate/verify keys:
+
+            $ mod_auth_pubtkt.pl --generate --private-key key.priv.pem --rsa
+            $ mod_auth_pubtkt.pl --verify --public-key key.pub.pem --rsa
+            $ mod_autH_pubtkt.pl --help
+
+DESCRIPTION
+    This module generates and verify a mod_auth_pubtkt-compatible ticket
+    string, which should be used as a cookie with the rest of the
+    mod_auth_pubtkt ( <https://neon1.net/mod_auth_pubtkt/> ) system.
+
+   Common scenario:
+    1. On the login server side, write perl code to authenticate users
+    (using Apache's authenetication, LDAP, DB, etc.).
+    2. Once the user is authenticated, call "pubtkt_generate" to generate a
+    ticket, and send it back to the user as a cookie.
+    3. Redirect the user back to the server he/she came from.
+
+Working Example
+    A working (but minimal) perl login example is available at
+    <https://github.com/manuelkasper/mod_auth_pubtkt/blob/master/perl-login/
+    minimal_cgi/login.pl>
+
+METHODS
+  pubtkt_generate
+    Generates a signed ticket.
+
+    If successful, returns a signed ticket string (to be sent back to the
+    user as a cookie).
+
+    On any failure (bad key, failure to run "openssl", etc.) returns
+    "undef".
+
+    Accepts a hash of parameters:
+
+    privatekey
+        String containing the private key filename (full path). The key can
+        be either DSA or RSA key (see keytype).
+
+    keytype
+        either "rsa" or "dsa" - depending on how you created the
+        private/public key files.
+
+    userid
+        String containing the user ID. No specific format is enforced: can
+        by a number, a string, an email address, etc. It will be encoded as
+        "uid=XXXX" in the signed ticket.
+
+    validuntil
+        Numeric value, containing the validity period, in seconds since
+        epoch (use "time()" function).
+
+    graceperiod
+        Optional. Numeric value. If given, will be added to the signed
+        ticket string.
+
+    clientip
+        Optional. A string with an IP address. If given. will be added to
+        the signed ticket string.
+
+    token
+        Optional. Any textual string. If given. will be added to the signed
+        ticket string.
+
+    userdata
+        Optional. Any textual string. If given. will be added to the signed
+        ticket string.
+
+  pubtkt_verify
+    Verifies a signed ticket string.
+
+    If successful (i.e. the ticket's signature is valid), returns TRUE (=1).
+
+    On any failure (bad key, failure to run "openssl", etc.) returns
+    "undef".
+
+    NOTE: This function checks ONLY THE SIGNATURE, based on the public key
+    file. It is the caller's resposibility to check the expiration date.
+    That is: The function will return TRUE if the ticket is properly signed,
+    but possibly expired.
+
+    Accepts a hash of parameters:
+
+    publickey
+        String containing the public key filename (full path). The key can
+        be either DSA or RSA key (see keytype).
+
+    keytype
+        either "rsa" or "dsa" - depending on how you created the
+        private/public key files.
+
+    ticket
+        The string of the ticket (such as returned by "pubtkt_generate").
+
+  pubtkt_parse($ticket)
+    Utility function to parse a ticket string into a Perl hash.
+
+    NOTE: No validation is performed. The given ticket might be expired, or
+    even forged.
+
+PREREQUISITES
+    openssl must be installed (and available on the $PATH).
+
+    IPC::Run3 is required to run the openssl executables.
+
+BUGS
+    Probably many.
+
+TODO
+    Use Perl's Crypt::OpenSSL::RSA and Crypt::OpenSSL::DSA instead of the
+    running "openssl" executable.
+
+    Don't assume "openssl" binary is on the $PATH.
+
+    Refactor into OO interface.
+
+LICENSE
+    Copyright (C) 2012 A. Gordon ( gordon at cshl dot edu ).
+
+    Apache License, same as the rest of mod_auth_pubtkt
+
+AUTHORS
+    A. Gordon, heavily based on the PHP code from mod_auth_pubtkt.
+
+SEE ALSO
+    ModAuthPubTkt main website: <https://neon1.net/mod_auth_pubtkt/>
+
+    ModAuthPubTkt github repository:
+    <https://github.com/manuelkasper/mod_auth_pubtkt>
+
+    This module's github repository:
+    <https://github.com/agordon/Authen-ModAuthPubTkt>
+
+    Examples in the "./eg" directory:
+
+    generate_rsa_keys.sh
+        Generates a pair of RSA key files.
+
+    generate_dsa_keys.sh
+        Generates a pair of DSA key files.
+
+    mod_auth_pubtkt.pl
+        A command-line utility to generate/verify tickets.
+

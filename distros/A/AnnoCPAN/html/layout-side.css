@@ -1,0 +1,30 @@
+.para, h1, h2, h3, h4, h5, h6, ul, li, .content {
+    clear: both;
+}
+
+.content { 
+    float: left;
+    margin: 0 -22em 1em 0;
+    width: 100%;
+    /* border: 1px solid red; */
+}
+
+#pod2html .content p, #pod2html .content div {
+    margin-right: 22em;
+    /* border: 1px solid green; */
+}
+
+.para { 
+    /* border: 2px solid blue; */
+    height: 1em;
+}
+
+#pod2html li.star {
+    height: 20px;
+}
+
+div.noteblock {
+    width: 25em;
+    float: right;
+    margin: 0 0 1em 0;
+}

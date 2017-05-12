@@ -1,0 +1,36 @@
+AxKit Session taglib, based on the Cocoon2 Session taglib specification which
+can be found at http://xml.apache.org/cocoon2/userdocs/xsp/session.html
+
+QUICK START:
+
+1) Install.
+perl Makefile.PL && make && make test && make install
+
+2) Add the following to your httpd.conf:
+
+  AxAddPlugin    Apache::AxKit::Plugin::BasicSession
+  AxAddPlugin    Apache::AxKit::Plugin::AddXSLParams::BasicSession
+  AxAddXSPTaglib AxKit::XSP::BasicSession
+  PerlSetVar BasicSessionDataStore "File"
+  PerlSetVar BasicSessionArgs      "Directory => /tmp/sessions"
+
+3) Add the BasicSession namespace to your XSP pages
+
+  xmlns:session="http://www.axkit.org/2002/XSP/BasicSession"
+
+4) Optional: Add the following to your XSL stylesheets for every session key
+you want accessible in your stylesheets:
+
+  <xsl:param name="session.keys.KEYNAME"/>
+
+where KEYNAME is the name for your session key.
+
+EXAMPLE:
+
+See the "example.xsp" page in the root of this distribution.
+
+AUTHORS
+
+Most of the code is written by Mike Nachbaur, with some contributions
+from Mark A. Hershberger. Currently, the module is being maintained by
+Kjetil Kjernsmo, kjetilk@cpan.org.

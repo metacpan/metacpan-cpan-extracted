@@ -1,0 +1,60 @@
+==================================================
+Changes from 2013-06-18 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.01 at 2014-06-18 19:02:45 +0000
+-----------------------------------------
+
+  Change: 971f338b5c128ef2e99f54ce3e9bed2596eca3ca
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2014-06-18 21:01:19 +0000
+
+    Ready for releasing, removed MIT license file from REPO, we will go
+    for Perl 5 license. 
+
+  Change: e2380219dc5e6823de11d87acb9b2d72f84195be
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2014-06-18 20:59:30 +0000
+
+    Updated error message for non-supported commands in HPGL file 
+
+  Change: 5d751ace73ff5c704f4d0f05b77f53fcb87e8246
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2014-06-18 20:57:27 +0000
+
+    Merge branch 'master' of github.com:hollie/app-hpgl2cadsoft-perl 
+
+  Change: e399bb424188f3c8f9d1b6df20d40c23486911ed
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2014-06-18 20:56:41 +0000
+
+    First basic working binary ready for release 
+
+  Change: 1be7c667e4014ef924cdf9a7a695330c4115f1af
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2014-06-18 20:19:52 +0000
+
+    Initial commit 
+
+  Change: 3e2a1023796598d41d95a492b6946c07add568b2
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2014-06-18 19:08:29 +0000
+
+    Added program and further documented the module 
+
+  Change: d81de9c9edaa669a19ebf0eaf7c0b9de6c47080e
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2014-06-17 23:02:48 +0000
+
+    Added Eclipse settings for EPIC 
+
+  Change: d301d7e88ee8e237323afd15055a1e2a3eceebb0
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2014-06-17 23:02:17 +0000
+
+    Initial functional commit, basic tests are running 
+
+================
+End of releases.
+================

@@ -1,0 +1,12 @@
+Changes
+lib/AI/ParticleSwarmOptimization.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+Samples/PSOPlatTest.pl
+Samples/PSOTest.pl
+t/01_pso_oo.t
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

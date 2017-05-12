@@ -1,0 +1,17 @@
+This module is an example of how to build testing modules with
+Test::Builder and how to test them with Test::Builder::Tester.
+
+You probably don't want to install it, it does nothing useful.
+However, the code is heavly commented, and I hope that reading it you
+should gain some understanding of how these things can be done.
+
+If for some mad reason you *do* want to install it, simply do:
+
+  perl Makefile.PL
+  make
+  make test
+  make install  # as root
+
+You may have to use your local version of "make" to install - for
+example on MS Windows you'll want to download Microsoft's "nmake"
+utility.

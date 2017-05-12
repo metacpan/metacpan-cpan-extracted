@@ -1,0 +1,35 @@
+{
+'UUID' => undef,
+'TYPE' => 'requirement',
+'ABSTRACTION_LEVEL' => 'system', # 'architecture', 'system', 'module', 'none'
+'ORIGINS' => [],
+
+'CREATORS' => ['nadim'],
+
+'CATEGORIES' => [ ],
+'NAME' => 'free_form_template',
+
+'DESCRIPTION' => '',
+'LONG_DESCRIPTION' => '',
+'RATIONALE' => 'Very important, please fill',
+'FIT_CRITERIA' => '',
+
+'SATISFACTION' => 'undef', # [1-5] 1 = user doesn't really care .. 5 = user will be very satisfied if implemented
+'DISSATISFACTION' => 'undef', # [1-5] 1 = user doesn't really care .. 5 = user will be very displeased if not implemented
+
+'DOCUMENTATION_LINKS' => 
+	[
+	],
+
+'RELATED_REQUIREMENTS' => 
+	[
+	],
+
+'SUB_REQUIREMENTS' => 
+	[
+	],
+
+'REVIEWED' => 0,
+'IMPLEMENTATION_STATE' => undef,
+'IMPLEMENTATION_PRIORITY' => undef
+};

@@ -1,0 +1,118 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my $listen  = ':443';
+my $backend = '127.0.0.1:8080';
+my $backlog;
+my $cert_file;
+my $cert_password;
+my $key_file;
+my $method = 'any';
+my $cipher_list;
+my $protocol;
+my $user;
+my $group;
+my $log_file;
+my $debug;
+my $daemonize;
+my $pid_file;
+my $help;
+
+GetOptions(
+    "listen=s"        => \$listen,
+    "backend=s"       => \$backend,
+    "backlog=s"       => \$backlog,
+    "debug"           => \$debug,
+    "cert_file=s"     => \$cert_file,
+    "cert_password:s" => \$cert_password,
+    "key_file=s"      => \$key_file,
+    "method=s"        => \$method,
+    "cipher_list=s"   => \$cipher_list,
+    "protocol=s"      => \$protocol,
+    "user=s"          => \$user,
+    "group=s"         => \$group,
+    "log_file=s"      => \$log_file,
+    "daemonize"       => \$daemonize,
+    "pid_file=s"      => \$pid_file,
+    "help|?"          => \$help
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+
+if ($debug) {
+    $ENV{APP_TLSME_DEBUG} = 1;
+}
+
+require App::TLSMe;
+App::TLSMe->new(
+    listen        => $listen,
+    backend       => $backend,
+    backlog       => $backlog,
+    cert_file     => $cert_file,
+    cert_password => $cert_password,
+    key_file      => $key_file,
+    method        => $method,
+    cipher_list   => $cipher_list,
+    protocol      => $protocol,
+    user          => $user,
+    group         => $group,
+    log_file      => $log_file,
+    daemonize     => $daemonize,
+    pid_file      => $pid_file
+)->run;
+
+__END__
+
+=head1 NAME
+
+tlsme - TLS/SSL proxy
+
+=head1 SYNOPSIS
+
+tlsme [options]
+
+Options:
+
+    --help            brief help message
+
+    --listen          listen on (default 0.0.0.0:443)
+    --backend         backend address or path to unix socket (default 127.0.0.1:8080)
+
+    --backlog         backlog size (default 128)
+
+    --cert_file       path to certificate file (may contain a private key too)
+    --key_file        path to private key file
+    --cert_password   certificate password (promts unless value provided)
+
+    --method          protocol parser to use ("SSLv2" | "SSLv3" | "TLSv1" | "any")
+    --cipher_list     list of ciphers to use ("AES:ALL:!aNULL:!eNULL:+RC4:@STRENGTH")
+
+    --protocol        underlying protocol ("raw" | "http")
+
+    --user            drop privileges to user (ID or name)
+    --group           drop privileges to group (ID)
+
+    --log_file        path to log file
+    --debug           debug mode
+
+    --daemonize       daemonize (--log_file is required)
+    --pid_file        PID file
+
+When option C<cert_file> is omitted default testing certificate is used.
+
+=head1 DESCRIPTION
+
+TLS/SSL proxy in front of the application creates a transparent encryption
+tunnel.
+
+=head1 HEADERS
+
+When using C<http> protocol HTTP headers C<X-Forwarded-For> and
+C<X-Forwarded-Proto> are added to the requests with corresponding values.
+
+=cut

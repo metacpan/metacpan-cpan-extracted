@@ -1,0 +1,44 @@
+body {
+    color: black;
+}
+
+a.path_link {
+    font-size: large;
+}
+
+a:link, a:visited {
+    color: blue;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+td, th {
+    border-style: solid;
+    border-width: 1;
+    padding: 2;
+    margin: 0;
+    vertical-align: bottom;
+}
+
+th {
+    background-color: #aaaaaa;
+    border-bottom-width: 2;
+}
+
+tr.directory_odd_row, tr.file_odd_row {
+    background-color: #ffff99;
+}
+
+tr.directory_even_row, tr.file_even_row {
+    background-color: #ffffcc;
+}
+
+table {
+    border-style: solid;
+    border-color: black;
+    empty-cells: show;
+    border-spacing: 0;
+}

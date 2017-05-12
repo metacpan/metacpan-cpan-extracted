@@ -1,0 +1,35 @@
+Linux-Distribution version 0.21
+===============================
+
+This is a simple module that tries to detect on what linux distribution we are running by looking
+for release's files in /etc.  It now looks for 'lsb-release' first as that should be the most cor-
+rect and adds ubuntu support.  Secondly, it will look for the distro specific files.
+
+It currently recognizes slackware, debian, suse, fedora, redhat, turbolinux, yellowdog, knoppix,
+mandrake, conectiva, immunix, tinysofa, va-linux, trustix, adamantix, yoper, arch-linux, libranet,
+gentoo, ubuntu, scientific, oracle enterprise linux, and redflag.
+
+It has function to get the version for debian, suse, fedora, redhat, gentoo, slackware, scientific, oracle enterprise linux, redflag and
+ubuntu(lsb). People running unsupported distro's are greatly encouraged to submit patches :-)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module has no dependencies.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Alberto Re <alberto@accidia.net>
+(c) 2008-2012 Alexandr Ciornii <alexchorny@gmail.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.

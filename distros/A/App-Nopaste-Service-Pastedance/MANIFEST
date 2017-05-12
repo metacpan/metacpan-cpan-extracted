@@ -1,0 +1,5 @@
+Build.PL
+lib/App/Nopaste/Service/Pastedance.pm
+MANIFEST			This list of files
+META.yml
+t/pod.t

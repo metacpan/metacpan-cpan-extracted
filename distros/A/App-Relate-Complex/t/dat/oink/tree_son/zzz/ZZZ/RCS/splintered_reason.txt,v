@@ -1,0 +1,27 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2007.06.13.00.25.14;	author doom;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@Tuesday June 12, 2007   5:24 PM
+
+This is a test- I mean, just as test. 
+You know. A test.  That's all. 
+@

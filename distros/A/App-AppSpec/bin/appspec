@@ -1,0 +1,19 @@
+#!perl
+# ABSTRACT: Various utilities for App::Spec files
+# vim:et:sts=4:sws=4:sw=4
+use strict;
+use warnings;
+use 5.010;
+use Data::Dumper;
+
+our $VERSION = '0.002'; # VERSION
+
+use App::Spec;
+use App::AppSpec;
+use File::Share qw/ dist_file /;
+
+my $specfile = dist_file("App-AppSpec", "appspec-spec.yaml");
+my $spec = App::Spec->read($specfile);
+my $run = $spec->runner;
+$run->run;
+

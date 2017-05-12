@@ -1,0 +1,76 @@
+=head1 NAME
+
+App::Prove::Plugin::Idempotent - a prove plugin to keep output TAP reusable
+
+=head1 SYNOPSIS
+
+ prove -P Idempotent t/foo.t
+
+=head1 DESCRIPTION
+
+This plugin tries to keep the verbose output of C<prove> to be the
+same TAP as it consumed. In particular, the final C<ok> line that is
+normally added is left out. Therefore you can reuse the output TAP
+stream and feed it again into a TAP parser.
+
+See the email thread
+L<here|http://www.mail-archive.com/perl-qa@perl.org/msg11830.html> for
+discussion.
+
+=head1 AUTHOR
+
+Steffen Schwigon, C<< <ss5 at renormalist.net> >>
+
+=head1 ACKNOWLEDGEMENTS
+
+The prove plugin code is shamelessly stolen from Steve Purkis'
+L<App::Prove::Plugin::HTML|App::Prove::Plugin::HTML>.
+
+=head1 SEE ALSO
+
+L<prove>, L<App::Prove>
+
+
+=head1 Function documentation
+
+=head2 load
+
+This method is called on loading prove plugin. Here we overwrite the
+C<TAP::Formatter::Session::_make_ok_line> to a no-op.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc App::Prove::Plugin::Idempotent
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT, CPAN's request tracker (report bugs here)
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Prove-Plugin-Idempotent>
+
+=item * AnnoCPAN, Annotated CPAN documentation
+L<http://annocpan.org/dist/App-Prove-Plugin-Idempotent>
+
+=item * CPAN Ratings
+L<http://cpanratings.perl.org/d/App-Prove-Plugin-Idempotent>
+
+=item * Search CPAN
+L<http://search.cpan.org/dist/App-Prove-Plugin-Idempotent/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2011 Steffen Schwigon.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of either: the GNU General Public License as
+published by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

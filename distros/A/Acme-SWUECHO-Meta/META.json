@@ -1,0 +1,69 @@
+{
+   "abstract" : "a set of tool to learn modules.",
+   "author" : [
+      "Hao Wu <echowuhao@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.0, Dist::Zilla version 4.300033, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-SWUECHO-Meta",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.014"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter::Auto" : "0",
+            "PPI" : "0",
+            "Pod::Simple::Search" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/swuecho/meta/issues"
+      },
+      "homepage" : "https://github.com/swuecho/meta",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/swuecho/meta.git",
+         "web" : "https://github.com/swuecho/meta"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Hao <echowuhao@gmail.com>"
+   ]
+}
+

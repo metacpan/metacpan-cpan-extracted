@@ -1,0 +1,35 @@
+bin/db-browser
+Changes
+lib/App/DBBrowser.pm
+lib/App/DBBrowser/Auxil.pm
+lib/App/DBBrowser/CreateTable.pm
+lib/App/DBBrowser/DB.pm
+lib/App/DBBrowser/DB/mysql.pm
+lib/App/DBBrowser/DB/Pg.pm
+lib/App/DBBrowser/DB/SQLite.pm
+lib/App/DBBrowser/DB_Credentials.pm
+lib/App/DBBrowser/Join_Union.pm
+lib/App/DBBrowser/Opt.pm
+lib/App/DBBrowser/Table.pm
+lib/App/DBBrowser/Table/ColFunc.pm
+lib/App/DBBrowser/Table/Insert.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/compile.t
+xt/cntrl_db_browser.t
+xt/Debug.pm
+xt/manifest.t
+xt/perl_minimum_version.t
+xt/pod-coverage.t
+xt/pod.t
+xt/prereqs.t
+xt/spelling.t
+xt/synopsis.t
+xt/version1.t
+xt/version2.t
+xt/whitespaces.t
+xt/year_copyright.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

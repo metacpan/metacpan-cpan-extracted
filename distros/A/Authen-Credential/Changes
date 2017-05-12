@@ -1,0 +1,20 @@
+Revision history for Authen-Credential:
+
+1.1	Thu Feb 19 2015
+	* Authen::Credential::x509 now has a ca_file attribute.
+
+1.0	Mon Feb 25 2013
+	* Promoted to 1.0 after successful testing.
+	* The API is now stable.
+
+0.8	Mon Nov 12 2012
+	* Cleanup code to please Perl::Critic.
+
+0.7	Wed Oct 24 2012
+	* Now using No::Worries.
+
+0.6	Thu May  3 2012
+	* Improved the documentation.
+
+0.5	Wed Nov 23 2011
+	* First version released in CPAN.

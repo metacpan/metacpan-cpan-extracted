@@ -1,0 +1,14 @@
+[Unit]
+Description=Amazon Dash Button
+After=network.target
+
+[Service]
+#EnvironmentFile=-/etc/default/amazon-dash-button.conf
+Type=simple
+ExecStart=/usr/bin/perl /usr/local/Amazon-Dash-Button/examples/mpd.pl
+
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

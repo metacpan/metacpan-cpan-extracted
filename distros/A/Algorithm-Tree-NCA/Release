@@ -1,0 +1,24 @@
+Announcing the release of Perl Module Algorithm::Tree::NCA Version 0.01
+
+Algorithm::Tree::NCA  - Constant-time retrieval of nearest common ancestor
+
+This package provides constant-time retrieval of the Nearest Common
+Ancestor (NCA) of nodes in a tree. The implementation is based on an
+algorithm by Harel and Tarjan which can, after linear-time (and
+linear-space) preprocessing, retrieve the nearest common ancestor of
+two nodes in constant time.
+
+This release also contains a comparison between this algorithm and the
+naive straight-forward implementation of the same algorithm with
+linear complexity but with a low constant factor.
+
+Module Entry
+
+6) Data Types and Data Type Utilities (see also Database Interfaces)
+
+Name               DSLIP Description                                  Info
+------------       ----- -------------------------------------------- ----
+Algorithm::Tree::
+::NCA              RdpOp Constant-time retrieval of nearest common 
+                         ancestor
+

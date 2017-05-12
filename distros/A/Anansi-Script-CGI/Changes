@@ -1,0 +1,9 @@
+Revision history for Perl extension Anansi::Script::CGI.
+
+0.01  Mon May 20 14:53:20 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Anansi::Script::CGI
+0.02  Wed May 22 13:33:03 2013
+	- modified POD
+	- corrected HASH reference deprecations.
+

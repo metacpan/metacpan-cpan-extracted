@@ -1,0 +1,24 @@
+Notes
+=====
+
+
+Not in NIST
+===========
+Parsec
+A_pc    PARSEC  parsec  3.08567758e18   3.08567758e16   0.00000001
+A_msun  SOLAR_MASS  solar mass  1.99e33 1.99e30 0.01
+A_rsun  SOLAR_RADIUS    solar radius    6.96e10 6.96e8  0.01
+A_AU    ASTRONOMICAL_UNIT   astronomical unit   1.496e13    1.496e11    0.001
+A_ly    LIGHT_YEAR  light year  9.463e17    9.463e15    0.001
+A_Lsun  SOLAR_LUMINOSITY    solar luminosity    3.9e33  3.9e26  0.1
+A_AA    ANGSTROM    Angstrom    1e-8    1e-10   0.1
+A_Jy    JANSKY  Jansky  1e-23   1e-26   0.1
+A_yr    YEAR    year    3.156e7 0.001
+
+
+Need to check
+=============
+HYDROGEN_MASS
+HUBBLE_TIME
+RHO_C
+CMB_TEMPERATURE

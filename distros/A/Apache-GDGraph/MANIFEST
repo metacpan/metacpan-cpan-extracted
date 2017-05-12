@@ -1,0 +1,7 @@
+README
+Changes
+Makefile.PL
+lib/Apache/GD/Graph.pm
+MANIFEST
+t/README
+t/simple_request.t

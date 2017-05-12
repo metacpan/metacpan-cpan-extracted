@@ -1,0 +1,38 @@
+INSTALLATION
+============
+
+If you have root on a Unix system it is enough to run this command:
+
+    % cpan Acme::Pythonic
+
+To install this module from the tarball type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install (normally requires root)
+
+
+DEPENDENCIES
+============
+
+This module requires Filter::Simple and Test::More, which are already
+included in recent perls.
+
+
+DOCUMENTATION
+=============
+
+Documentation is available the standard way:
+
+    perldoc Acme::Pythonic
+
+
+COPYRIGHT AND LICENSE
+=====================
+
+Copyright (C) 2004-2012 by Xavier Noria.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.

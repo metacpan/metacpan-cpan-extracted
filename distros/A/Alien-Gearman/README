@@ -1,0 +1,30 @@
+NAME
+    Alien::Gearman - Wrapper for installing libgearman v0.11
+
+DESCRIPTION
+    Alien::Gearman is a wrapper to install libgearman library. Modules that
+    depend on libgearman can depend on Alien::Gearman and use the CPAN shell
+    to install it for you.
+
+    Win32 is currently not supported, please help supporting it if you're
+    interested.
+
+AUTHOR
+    Johannes Plunien <plu@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2009 by Johannes Plunien
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    *   Alien
+
+    *   Gearman::XS
+
+    *   <http://www.gearman.org/>
+
+REPOSITORY
+    <http://github.com/plu/alien-gearman/>
+

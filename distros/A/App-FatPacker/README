@@ -1,0 +1,69 @@
+NAME
+    App::FatPacker - pack your dependencies onto your script file
+
+SYNOPSIS
+      $ fatpack pack myscript.pl >myscript.packed.pl
+
+    Or, with more step-by-step control:
+
+      $ fatpack trace myscript.pl
+      $ fatpack packlists-for `cat fatpacker.trace` >packlists
+      $ fatpack tree `cat packlists`
+      $ fatpack file myscript.pl >myscript.packed.pl
+
+    See the documentation for the fatpack script itself for more
+    information.
+
+    The programmatic API for this code is not yet fully decided, hence the
+    0.x release version. Expect that to be cleaned up for 1.0.
+
+SEE ALSO
+    article for Perl Advent 2012
+    <http://www.perladvent.org/2012/2012-12-14.html>
+
+SUPPORT
+    Bugs may be submitted through the RT bug tracker
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-FatPacker> (or
+    bug-App-FatPacker@rt.cpan.org <mailto:bug-App-FatPacker@rt.cpan.org>).
+
+    You can normally also obtain assistance on irc, in #toolchain on
+    irc.perl.org.
+
+AUTHOR
+    Matt S. Trout (mst) <mst@shadowcat.co.uk>
+
+  CONTRIBUTORS
+    miyagawa - Tatsuhiko Miyagawa (cpan:MIYAGAWA) <miyagawa@bulknews.net>
+
+    tokuhirom - MATSUNO★Tokuhiro (cpan:TOKUHIROM) <tokuhirom@gmail.com>
+
+    dg - David Leadbeater (cpan:DGL) <dgl@dgl.cx>
+
+    gugod - 劉康民 (cpan:GUGOD) <gugod@cpan.org>
+
+    t0m - Tomas Doran (cpan:BOBTFISH) <bobtfish@bobtfish.net>
+
+    sawyer - Sawyer X (cpan:XSAWYERX) <xsawyerx@cpan.org>
+
+    ether - Karen Etheridge (cpan:ETHER) <ether@cpan.org>
+
+    Mithaldu - Christian Walde (cpan:MITHALDU)
+    <walde.christian@googlemail.com>
+
+    dolmen - Olivier Mengué (cpan:DOLMEN) <dolmen@cpan.org>
+
+    djerius - Diab Jerius (cpan:DJERIUS) <djerius@cpan.org>
+
+    haarg - Graham Knop (cpan:HAARG> <haarg@haarg.org>
+
+    Many more people are probably owed thanks for ideas. Yet another doc nit
+    to fix.
+
+COPYRIGHT
+    Copyright (c) 2010 the App::FatPacker "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

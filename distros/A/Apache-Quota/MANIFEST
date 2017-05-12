@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Apache/Quota.pm
+lib/Apache/Quota/BerkeleyDB.pm
+lib/Apache/Quota/DB_File/Lock.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/01-basic.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+SIGNATURE    Added here by Module::Build

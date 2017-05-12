@@ -1,0 +1,51 @@
+{
+   "abstract" : "Alien package for the LIBSVM library",
+   "author" : [
+      "Zakariyya Mughal <zmughal@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-LIBSVM",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0.002",
+            "File::ShareDir" : "1.03",
+            "File::chmod" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.002",
+            "File::ShareDir" : "1.03",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/EntropyOrg/p5-Alien-LIBSVM",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/EntropyOrg/p5-Alien-LIBSVM.git",
+         "web" : "https://github.com/EntropyOrg/p5-Alien-LIBSVM"
+      }
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0211"
+}
+

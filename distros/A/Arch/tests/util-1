@@ -1,0 +1,95 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Util file-system related functions.
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More tests => 49;
+use_ok("Arch::Util");
+use_ok("Arch::TempFiles");
+
+my $tmp = Arch::TempFiles->new;
+my $dir = $tmp->dir;
+die "Internal: Arch::TempFiles::dir didn't create dir\n" unless $dir && -d $dir;
+
+$ENV{HOME} = $dir;
+
+sub run_func (@) {
+	my $func = shift;
+	my $cmd = "$func(" . join(", ", map { ref($_) || "scalar" } @_) . ")";
+	$func = "Arch::Util::$func";
+	my $i = -1;
+	my $args = join(", ", map { $i++; "\$_[$i]" } @_);
+	my ($result_assign, $result, @result) = ("");
+	if (defined wantarray && !wantarray) {
+		$result_assign = '$result = ';
+		$cmd .= " (scalar context)";
+	} elsif (wantarray) {
+		$result_assign = '@result = ';
+		$cmd .= " (list context)";
+	}
+	eval "$result_assign$func($args);";
+	if ($@) {
+		fail($cmd . ": $@");
+	} else {
+		pass($cmd);
+	}
+	return unless defined wantarray;
+	return wantarray? @result: $result;
+}
+
+my @contents = (
+	"",
+	"This is a short file.\nReally short.\n",
+	"\n" . ("\0" x 100) . "\n" . ("\t" x 100) . "\n" . (" " x 100),
+);
+
+my $i = 0;
+foreach my $content (@contents) {
+	my @lines = split("\n", $content);
+	my $file = "$dir/file" . ++$i;
+
+	# save_file
+	run_func("save_file", $file, $content);
+	ok(-f $file,                   "stat created file $file");
+	is(-s $file, length($content), "stat file size");
+	open(IN, "<$file") || warn "Can't read $file, expect failures\n";
+	my $content2 = join("", <IN>);
+	close IN;
+	is($content2, $content,        "compare saved content");
+
+	# load_file
+	my $content3 = run_func("load_file", $file);
+	is($content3, $content,        "compare loaded content");
+#	my @lines2 = run_func("load_file", $file);
+#	is_deeply(\@lines2, \@lines,   "compare loaded lines");
+	my ($content4, @lines3);
+	run_func("load_file", $file, \$content4);
+	is($content4, $content,        "compare loaded content ref");
+	run_func("load_file", $file, \@lines3);
+	is_deeply(\@lines3, \@lines,   "compare loaded lines ref");
+}
+
+is(undef, eval { load_file("$dir/unexisting"); 1 }, "check unexisting load");
+
+# copy_dir
+my $dir2 = $tmp->dir_name;
+run_func("copy_dir", $dir, $dir2);
+ok(-d $dir2, "stat copied directory");
+ok(-f "$dir2/file$_", "stat copied file$_") foreach 1 .. @contents;
+
+# remove_dir
+run_func("remove_dir", $dir2);
+ok(!-d $dir2, "stat removed directory");
+
+# setup_config_dir
+my $dir3 = run_func("setup_config_dir", undef, "archmage", "spells");
+is($dir3, "$dir/.arch-magic/archmage/spells", "check setup'd config dir");
+ok(-d $dir3, "stat $dir3");
+my $dir4 = run_func("setup_config_dir", undef, "archmage");
+is($dir4, "$dir/.arch-magic/archmage", "check setup'd config dir");
+ok(-d $dir4, "stat $dir4");
+my $dir5 = run_func("setup_config_dir", $dir4, 1, 2, 3);
+is($dir5, "$dir4/1/2/3", "check setup'd config dir");
+ok(-d $dir5, "stat $dir5");

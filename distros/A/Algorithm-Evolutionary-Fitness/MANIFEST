@@ -1,0 +1,35 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+TODO.md
+lib/Algorithm/Evolutionary/Fitness.pm
+lib/Algorithm/Evolutionary/Fitness/Any.pm
+lib/Algorithm/Evolutionary/Fitness/String.pm
+lib/Algorithm/Evolutionary/Fitness/MMDP.pm
+lib/Algorithm/Evolutionary/Fitness/P_Peaks.pm
+lib/Algorithm/Evolutionary/Fitness/wP_Peaks.pm
+lib/Algorithm/Evolutionary/Fitness/Knapsack.pm
+lib/Algorithm/Evolutionary/Fitness/ONEMAX.pm
+lib/Algorithm/Evolutionary/Fitness/Royal_Road.pm
+lib/Algorithm/Evolutionary/Fitness/ECC.pm
+lib/Algorithm/Evolutionary/Fitness/Trap.pm
+lib/Algorithm/Evolutionary/Fitness/ZDT1.pm
+lib/Algorithm/Evolutionary/Fitness/Rastrigin.pm
+t/00-load.t
+t/01-onemax.t
+t/02-trap.t
+t/0300-ppeaks.t
+t/0301-wppeaks.t
+t/0302-knapsack.t
+t/0304-royalroad.t
+t/0305-ecc.t
+t/0306-any.t
+t/0307-rastrigin.t
+t/0307-zdt1.t
+t/0333-mmdp.t
+
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

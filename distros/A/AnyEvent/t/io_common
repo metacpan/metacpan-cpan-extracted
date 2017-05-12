@@ -1,0 +1,99 @@
+#! perl
+
+$| = 1;
+
+# not tested: symlink, readlink, link, utime, chown, chmod
+
+BEGIN {
+   print "1..37\n";
+   print "ok 1 # MODEL=$AnyEvent::IO::MODEL\n";
+}
+use AnyEvent;
+use AnyEvent::IO qw(:DEFAULT :flags);
+BEGIN {
+   print "ok 2 # MODEL=$AnyEvent::IO::MODEL\n";
+}
+
+our $t = 3;
+
+sub t {
+   my $ok = shift;
+   my $f = "aio_" . shift;
+   $f->(@_, my $cv = AE::cv);
+   my @res = $cv->recv;
+
+   print !@res != !$ok ? "not " : "", "ok ", $t++, " # $f (@_) = (@res)\n";
+
+   wantarray ? @res : $res[0]
+}
+
+use File::Spec;
+
+our $TMP = File::Spec->tmpdir;
+our $DIR = "$TMP/ae_io_testdir_$$~";
+
+t 1, mkdir => $DIR, 0777
+   or do { print "Bail out! Cannot mkdir $DIR, skipping test.\n"; exit 0 };
+t 0, mkdir => $DIR, 0777;
+
+#############################################################################
+# create file
+
+my $fh = t 1, open => "$DIR/test", O_CREAT | O_EXCL | O_WRONLY, 0666;
+         t 0, open => "$DIR/test", O_CREAT | O_EXCL | O_WRONLY, 0666;
+
+t 0, rmdir => $DIR;
+
+t 1, write => $fh, "tes--";
+t 1, write => $fh, "test2";
+t 1, write => $fh, "";
+
+t 1, seek  => $fh, 3, 0;
+t 1, write => $fh, "t1";
+
+#t 1, truncate => $fh, 5+5; # not available on windows
+
+t 1, stat => $fh;
+print -s _ != 10 ? "not " : "", "ok ", $t++, " # stat size\n";
+
+t 1, close => $fh;
+
+t 1, stat => "$DIR/test";
+print -s _ != 10 ? "not " : "", "ok ", $t++, " # stat size (", -s _,")\n";
+
+t 1, lstat => "$DIR/test";
+print -s _ != 10 ? "not " : "", "ok ", $t++, " # lstat size\n";
+
+t 1, rename => "$DIR/test", "$DIR/test2";
+
+#############################################################################
+# test dir
+
+t 0, readdir => "$DIR/nonexistent";
+my $res = t 1, readdir => $DIR;
+print @$res != 1           ? "not " : "", "ok ", $t++, " # res count\n";
+print $res->[0] ne "test2" ? "not " : "", "ok ", $t++, " # res data (@$res)\n";
+
+#############################################################################
+# test file
+
+$fh = t 1, open => "$DIR/test2", O_RDONLY, 0;
+
+print +(t 1, read => $fh, 6) ne "test1t" ? "not " : "", "ok ", $t++, " # read 6\n";
+print +(t 1, read => $fh, 7) ne "est2"   ? "not " : "", "ok ", $t++, " # read 7\n";
+print +(t 1, read => $fh, 8) ne ""       ? "not " : "", "ok ", $t++, " # read 8\n";
+
+t 1, close => $fh;
+
+print +(t 1, load => "$DIR/test2") ne "test1test2" ? "not " : "", "ok ", $t++, " # load\n";
+
+#############################################################################
+# cleanup
+
+t 0, unlink => "$DIR/test";
+t 1, unlink => "$DIR/test2";
+
+t 1, rmdir => $DIR;
+
+1
+

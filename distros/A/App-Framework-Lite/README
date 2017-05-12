@@ -1,0 +1,48 @@
+App-Framework-Lite
+
+A (lighter) framework for making script development simpler. The framework does all of the common jobs for you, you just concentrate
+on writing the application itself.
+
+Also provides the facility to embed itself into a script to create a stand-alone version that can be distributed.
+
+In other word, this modules provides the basic facilities of App::Framework, but in a more compact manner that can also be wrapped up
+into a single-file script.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::Framework::Lite
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Framework-Lite
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-Framework-Lite
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-Framework-Lite
+
+    Search CPAN
+        http://search.cpan.org/dist/App-Framework-Lite/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Steve Price
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

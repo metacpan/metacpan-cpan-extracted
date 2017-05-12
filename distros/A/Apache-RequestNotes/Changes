@@ -1,0 +1,54 @@
+Revision history for Perl extension Apache::RequestNotes.
+
+0.01  Tue Mar 14 09:22:17 2000
+	- original version; created by h2xs 1.19
+        - many kudos and gratitude to those who offered
+          their suggestions and improvements prior to
+          the first release:
+            Matt Sergeant
+            G.W. Haywood
+            Christian Gilmore
+            Philippe M. Chiasson
+            Tobias Hoellrich
+            Ken Y. Clark
+
+0.02  3.15.2000
+	- extended interface to return a reference to 
+          an Apache::Table object for $input.  This allows
+          for multi-keyed form data.
+          thanks to Doug MacEachern and Matt Sergeant for
+          their tips and efforts.
+        - replaced pnotes('PARSE_ERROR') with 
+          $Apache::RequestNotes::err
+        - updated pod
+
+0.03  4.19.2000
+        - only add COOKIES pnotes if there are cookies to add
+        - changed parsing error log message to error from warn
+        - minor pod changes
+
+0.04  05.04.2000
+        - added Apache::Upload array to $r->pnotes('UPLOADS')
+          thanks to Kip Cranford for extensive testing
+        - added DisableUploads directive
+        - pod changes to reflect new functionality
+        - documented $Apache::RequestNotes:err
+        - moved cookie parsing to before form data parsing
+          so cookie data will be available even if the form
+          data runs into trouble
+        - documented that RequestNotes can run in phases other
+          than init
+        - documented that using RequestNotes then trying to 
+          use Apache::Request or CGI.pm to get to POSTed data
+          is both redundant and problematic.
+
+0.05  05.15.2000
+        - updated README to be consistent with perldoc (whoops)
+        - corrected installation to install to a versioned
+          directory (whoops)
+
+0.06  12.27.2000
+        - changed Apache::Request->new() call to instance()
+        - documented availability of Apache::Request->instance() 
+        - initialized Apache::RequestNotes::err properly
+        - minor pod changes

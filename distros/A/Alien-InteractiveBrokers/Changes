@@ -1,0 +1,43 @@
+Revision history for Alien-InteractiveBrokers
+------------------------------------------------------------
+Legend:
+BUG:    An actual found or reported bug fix.
+FIX:    Change toward correct behavior, but unreported.
+NEW:    New, previously non-existent feature.
+CHG:    Change in behavior.
+API:    Change in user-facing API (hopefully rare).
+DOC:    Changes to documentation.
+------------------------------------------------------------
+
+9.6602   2011-04-30
+         FIX: Fixed test path issue noticed under Strawberry Perl 5.14.2.0
+
+9.6601   2011-04-29
+         NEW: Added support for IB API v9.66 - v9.67
+         CHG: Default installed version is now IB API v9.66
+
+9.6404   2011-xxxxx
+         API: include() now returns $scalar or @array depending on context
+         FIX: Crossported verbose HTTP::Tiny output from Alien::SWIG
+         FIX: Crossported deletion of Pod::Usage deps from Alien::SWIG
+         FIX: Minor paste/newline issue in A::IB.pm
+         FIX: Expunged Config.pm from everything.
+         CHG: Added caching to A::IB class/object
+         NEW: More rigorous testing for A::IB object correctness
+         NEW: Tests for ibapi-config runnability and output correctness
+         FIX: ibapi-config wasn't outputting -I paths correctly
+         FIX: %INC handling more portable
+
+9.6403   2011-01-28
+         First production CPAN release for IB API 9.64
+         DOC: Minor documentation tweaks
+         FIX: Versioning scheme will change from here on.
+
+9.64_02  2011-01-25     (developer release)
+         DOC: Fixing documentation bugs seen on CPAN from 9.64_01
+
+9.64_01  2011-01-24     (developer release)
+         Main module should be complete
+         Prepped for releasing to CPAN for cpantesters feedback
+
+# END

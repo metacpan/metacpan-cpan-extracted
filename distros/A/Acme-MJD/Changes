@@ -1,0 +1,8 @@
+Revision history for Perl module Acme::MJD
+
+0.02 Mon Nov  3 04:46:21 2003
+    - and yes, typos do occur (66)
+
+0.01 Sun Aug 24 02:35:38 2003
+	- original version; created by ExtUtils::ModuleMaker 0.32
+    - subsequently massaged into what you see now

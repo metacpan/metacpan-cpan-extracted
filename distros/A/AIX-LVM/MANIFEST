@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/AIX-LVM.t
+lib/AIX/LVM.pm
+META.yml                                 Module meta-data (added by MakeMaker)

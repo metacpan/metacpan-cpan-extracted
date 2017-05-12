@@ -1,0 +1,4 @@
+type: sbuild
+architecture: i386
+distribution: etch-opera
+distribution_aliases: [etch, unstable]

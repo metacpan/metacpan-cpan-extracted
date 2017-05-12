@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache-LangURI
+version:      0.19
+version_from: LangURI.pm
+installdirs:  site
+requires:
+    Locale::Country:               2.06
+    Locale::Language:              2.02
+    mod_perl:                      1.24_01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

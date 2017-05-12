@@ -1,0 +1,4 @@
+lexer.o: lexer.c compiler.h ../include/amd.h parser.h
+parser.o: parser.c compiler.h ../include/amd.h
+utils.o: utils.c compiler.h ../include/amd.h
+Compiler.o: Compiler.c compiler.h ../include/amd.h parser.h

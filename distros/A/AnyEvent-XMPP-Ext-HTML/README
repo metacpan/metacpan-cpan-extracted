@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution AnyEvent-XMPP-Ext-HTML,
+version 0.02:
+
+  XEP-0071: XHTML-IM (Version 1.5) for AnyEvent::XMPP
+
+This software is copyright (c) 2013 by Charles McGarvey.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

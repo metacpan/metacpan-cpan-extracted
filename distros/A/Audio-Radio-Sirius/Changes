@@ -1,0 +1,23 @@
+Revision history for Audio-Radio-Sirius
+
+0.03	06-November-2005 11:00 PM
+	Fixed some compatibility issues with Device::SerialPort.
+
+0.02	04-November-2005 11:03 PM
+	Implemented $tuner->set_callback.  Notification is now provided for channel updates.
+	More callbacks to come.
+
+	New internal read routine.  This (along with a changed monitor method) pretty much
+	eliminated the duplicate updates from the tuner.  They have to be ack'd quick.
+	The monitor routine now spins 20 times per second (although the parameter is still in
+	seconds).  The effect on CPU utilization seems negligible.
+
+	Tests added for a few items.
+
+	New internal read routine should actually work on Linux systems, unlike the old scheme.
+
+	Build file now builds Makefile.PL as well for legacy CPAN compatibility.
+
+0.01    31-October-2005 2:57 AM
+        First version, released on an unsuspecting world.
+

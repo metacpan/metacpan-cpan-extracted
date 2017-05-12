@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+dist.ini
+lib/App/Goto/Amazon.pm
+script/ssa
+ssa.example
+t/basic.t
+t/release-pod-syntax.t

@@ -1,0 +1,348 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">new</a></li>
+      <li><a href="#get_list">get_list</a></li>
+      <li><a href="#get_SQL">get_SQL</a></li>
+      <li><a href="#get_data_by_label">get_data_by_label</a></li>
+      <li><a href="#get_fields">get_fields</a></li>
+      <li><a href="#set_max_entries">set_max_entries</a></li>
+    </ul>
+  </li>
+  <li><a href="#PRIVATE-METHODS">PRIVATE METHODS</a>
+    <ul>
+      <li><a href="#init">_init</a></li>
+      <li><a href="#load_qualifier">_load_qualifier</a></li>
+      <li><a href="#DESTROY">DESTROY</a></li>
+      <li><a href="#check_initialised">_check_initialised</a></li>
+      <li><a href="#reset_max_entries">_reset_max_entries</a></li>
+    </ul>
+  </li>
+  <li><a href="#TODO">TODO</a></li>
+  <li><a href="#TOOLS">TOOLS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>ARS::Simple - The great new ARS::Simple!</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 0.01</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>A simple interface to Remedy ARSystem utilising the ARSperl API interface:</p>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">ARS::Simple</span><span class="operator">;</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$ar</span> <span class="operator">=</span> <span class="variable">ARS::Simple</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="operator">{</span>
+     <span class="string">server</span>   <span class="operator">=&gt;</span> <span class="string">'my_remedy_server'</span><span class="operator">,</span>
+     <span class="string">user</span>     <span class="operator">=&gt;</span> <span class="string">'admin'</span><span class="operator">,</span>
+     <span class="string">password</span> <span class="operator">=&gt;</span> <span class="string">'admin'</span><span class="operator">,</span>
+     <span class="operator">}</span><span class="operator">);</span>
+ 
+ <span class="comment"># Get the Entry-ID/Request-ID for all User's with Login starting with 'g'</span>
+ <span class="comment"># Here $eid is any array reference of entry-id/request-id values</span>
+ <span class="keyword">my</span> <span class="variable">$eid</span> <span class="operator">=</span> <span class="variable">$ar</span><span class="operator">-&gt;</span><span class="variable">get_list</span><span class="operator">(</span><span class="operator">{</span>
+     <span class="string">form</span>  <span class="operator">=&gt;</span> <span class="string">'User'</span><span class="operator">,</span>
+     <span class="string">query</span> <span class="operator">=&gt;</span> <span class="string">qq{'Login' LIKE "g%"}</span><span class="operator">,</span>
+     <span class="operator">}</span><span class="operator">);</span>
+ <span class="keyword">print</span> <span class="variable">Data::Dumper</span><span class="operator">-&gt;</span><span class="variable">Dump</span><span class="operator">(</span><span class="operator">[</span><span class="variable">$eid</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">'eid'</span><span class="operator">]</span><span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+ 
+ <span class="comment"># Get data from a form, based on a query (as you would use in the User Tool)</span>
+ <span class="keyword">my</span> <span class="variable">%lfid</span> <span class="operator">=</span> <span class="operator">();</span>
+ <span class="keyword">my</span> <span class="variable">$form</span>  <span class="operator">=</span> <span class="string">'User'</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$query</span> <span class="operator">=</span> <span class="string">qq('FID' = "value")</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">$ar</span><span class="operator">-&gt;</span><span class="variable">get_data_by_label</span><span class="operator">(</span><span class="operator">{</span>
+ <span class="string">form</span>  <span class="operator">=&gt;</span> <span class="variable">$form</span><span class="operator">,</span>
+ <span class="string">query</span> <span class="operator">=&gt;</span> <span class="variable">$query</span><span class="operator">,</span>
+ <span class="string">lfid</span>  <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="variable">label1</span><span class="operator">,</span> <span class="variable">fid1</span><span class="operator">,</span> <span class="variable">label2</span><span class="operator">,</span> <span class="variable">fid2</span><span class="operator">,</span> <span class="operator">...</span><span class="operator">}</span><span class="operator">,</span>
+ <span class="operator">}</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">new</h2>
+
+<p>Constructor for ARS::Simple. There are three required arguments:</p>
+
+<dl>
+
+<dt id="server">server</dt>
+<dd>
+
+<p>The name (or possibly IP Address) of the Remedy ARSystem server you wish to connect to.</p>
+
+</dd>
+<dt id="user">user</dt>
+<dd>
+
+<p>The user you wish to connect as (this is often a user with administrator privilages). Note that while this is a required argument, it may be supplied via the configuration file to avoid lots of scripts with the user (and password) in them (less to change, not on display so safer).</p>
+
+</dd>
+<dt id="password">password</dt>
+<dd>
+
+<p>The password to the user you wish to connect as. This may come from the configuration file if set.</p>
+
+</dd>
+</dl>
+
+<p>There are a number of optional arguments, they are:</p>
+
+<dl>
+
+<dt id="max_returns">max_returns</dt>
+<dd>
+
+<p>Set a limit on how many items may be returned from certain calls. Setting this value to 0 sets unlimited returns. This parameter can also be set on individual calls. <b>Note:</b> This is a system wide configuration change and requires administrator privilages on user.</p>
+
+<p><b>Note: You should not use a value less than the default system value for this field or you may impact normal operation of your system</b></p>
+
+<p>Example usage:</p>
+
+<pre><code> reset_limit =&gt; 0, # unlimited returns</code></pre>
+
+</dd>
+<dt id="reset_limit">reset_limit</dt>
+<dd>
+
+<p>Once max_returns is used, reset_limit, if set will return the server to nominated max_returns limit (eg 3000), thereby limiting the possible impact on the system of having max_returns set to a high value (eg 0).</p>
+
+<p>Example usage:</p>
+
+<pre><code> reset_limit =&gt; 3000, # max returns back to a suitable maximum of 3000</code></pre>
+
+</dd>
+<dt id="ars_debug">ars_debug</dt>
+<dd>
+
+<p>Turn on, if true (1), the ARSperl debugging output. Not something you would normally use.</p>
+
+</dd>
+<dt id="log">log</dt>
+<dd>
+
+<p>Pass a object to use to log erros/information to a log file. The log object is expected to have methods <i>exp</i> and <i>msg</i> as per the File::Log object.</p>
+
+</dd>
+</dl>
+
+<p>Sample invocation with ALL parameters:</p>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">ARS::Simple</span><span class="operator">;</span>
+ <span class="keyword">use</span> <span class="variable">File::Log</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$log</span> <span class="operator">=</span> <span class="variable">File::Log</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+ <span class="keyword">my</span> <span class="variable">$ars</span> <span class="operator">=</span> <span class="variable">ARS::Simple</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="operator">{</span>
+     <span class="string">server</span>      <span class="operator">=&gt;</span> <span class="string">'my_server'</span><span class="operator">,</span>
+     <span class="string">user</span>        <span class="operator">=&gt;</span> <span class="string">'some_admin'</span><span class="operator">,</span>
+     <span class="string">password</span>    <span class="operator">=&gt;</span> <span class="string">'password_for_some_admin'</span><span class="operator">,</span>
+     <span class="string">log</span>         <span class="operator">=&gt;</span> <span class="variable">$log</span><span class="operator">,</span>
+     <span class="string">max_returns</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span>    <span class="comment"># allow unlimited returns</span>
+     <span class="string">reset_limit</span> <span class="operator">=&gt;</span> <span class="number">3000</span><span class="operator">,</span> <span class="comment"># reset to a suitable limit after each call using max_returns</span>
+     <span class="string">ars_debug</span>   <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>    <span class="comment"># get a whole lot of debugging information (you real should not need)</span>
+     <span class="operator">}</span><span class="operator">);</span>
+</code></pre>
+
+<h2 id="get_list">get_list</h2>
+
+<p>Method to return an array reference of Entry-Id values for a form. Arguments are passed as an hash reference, with two required parameters, eg:</p>
+
+<pre><code> <span class="comment"># Get theEntry-Id's for all records in the 'User' form.</span>
+ <span class="keyword">my</span> <span class="variable">$eids</span> <span class="operator">=</span> <span class="variable">$ars</span><span class="operator">-&gt;</span><span class="variable">get_list</span><span class="operator">(</span><span class="operator">{</span> <span class="string">form</span> <span class="operator">=&gt;</span> <span class="string">'User'</span><span class="operator">,</span> <span class="string">query</span> <span class="operator">=&gt;</span> <span class="string">'1 = 1'</span> <span class="operator">}</span><span class="operator">);</span>
+</code></pre>
+
+<p>The query parameter can be the same format as you would use in the &#39;User Tool&#39; to query a form, however we recommend the use of field ID&#39;s (FID) rather than the default field name as they may change. I prefer to define a hash of the forms lables and FID&#39;s so that can be used to better document your code, eg</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">%user</span> <span class="operator">=</span> <span class="operator">(</span> <span class="string">UserID</span> <span class="operator">=&gt;</span> <span class="number">101</span><span class="operator">,</span> <span class="string">UserName</span> <span class="operator">=&gt;</span> <span class="number">102</span> <span class="operator">);</span>
+</code></pre>
+
+<p>the a query could be something like</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$query</span> <span class="operator">=</span> <span class="string">qq{ '</span><span class="variable">$user</span><span class="string">{UserID}' LIKE "g%" }</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$eids</span> <span class="operator">=</span> <span class="variable">$ars</span><span class="operator">-&gt;</span><span class="variable">get_list</span><span class="operator">(</span><span class="operator">{</span> <span class="string">form</span> <span class="operator">=&gt;</span> <span class="string">'User'</span><span class="operator">,</span> <span class="string">query</span> <span class="operator">=&gt;</span> <span class="variable">$query</span> <span class="operator">}</span><span class="operator">);</span>
+</code></pre>
+
+<h2 id="get_SQL">get_SQL</h2>
+
+<p>Run direct SQL on your server, there is only one required argument, the sql, you may optionally set the max_returns value.</p>
+
+<p>The names of the fields can be found from the Admin Tool, under the database tab for a form. This will be the name of the field used in the database view of the Remedy form. <b>Note</b> you do need to replace spaces with and underscore &#39;_&#39; character.</p>
+
+<p>Example method call:</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">$ars</span><span class="operator">-&gt;</span><span class="variable">get_SQL</span><span class="operator">(</span><span class="operator">{</span>
+     <span class="string">sql</span> <span class="operator">=&gt;</span> <span class="string">q{select Login_name, Full_Name from User_X where Login_name like 'g%' order by Login_name}</span><span class="operator">,</span>
+     <span class="string">max_returns</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span>
+     <span class="operator">}</span><span class="operator">);</span>
+</code></pre>
+
+<p>The return is a hash reference with two keys, numMatches and rows, example:</p>
+
+<pre><code> <span class="variable">$data</span> <span class="operator">=</span> <span class="operator">{</span>
+     <span class="variable">numMatches</span> <span class="operator">=</span> <span class="operator">&gt;</span> <span class="number">2</span><span class="operator">,</span>
+     <span class="string">rows</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+        <span class="string">'greg'</span><span class="operator">,</span> <span class="string">'Greg George'</span><span class="operator">,</span>
+        <span class="string">'geoff'</span><span class="operator">,</span> <span class="string">'Geoffery Wallace'</span><span class="operator">,</span>
+     <span class="operator">]</span>
+ <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="get_data_by_label">get_data_by_label</h2>
+
+<p>Query a form and get the data back as a hash reference where the keys are the Entry-Id&#39;s for the records matched by the query and the value is a hash reference to the fields you requested where the keys are the field names you used and the value are the values.</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$form</span>  <span class="operator">=</span> <span class="string">'form'</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$query</span> <span class="operator">=</span> <span class="string">qq('FID' = "value")</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">$ar</span><span class="operator">-&gt;</span><span class="variable">get_data_by_label</span><span class="operator">(</span><span class="operator">{</span>
+     <span class="string">form</span>  <span class="operator">=&gt;</span> <span class="variable">$form</span><span class="operator">,</span>
+     <span class="string">query</span> <span class="operator">=&gt;</span> <span class="variable">$query</span><span class="operator">,</span>
+     <span class="string">lfid</span>  <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="variable">label1</span><span class="operator">,</span> <span class="variable">fid1</span><span class="operator">,</span> <span class="variable">label2</span><span class="operator">,</span> <span class="variable">fid2</span><span class="operator">,</span> <span class="operator">...</span><span class="operator">}</span><span class="operator">,</span>
+     <span class="operator">}</span><span class="operator">);</span>
+ 
+ <span class="variable">$data</span> <span class="operator">=</span> <span class="operator">{</span>
+     <span class="variable">eID1</span><span class="operator">,</span> <span class="operator">{</span><span class="string">Label1</span> <span class="operator">=&gt;</span> <span class="variable">value1</span><span class="operator">,</span> <span class="string">Label2</span> <span class="operator">=&gt;</span> <span class="variable">value2</span><span class="operator">,</span> <span class="operator">...</span><span class="operator">}</span><span class="operator">,</span>
+     <span class="variable">eID2</span><span class="operator">,</span> <span class="operator">{</span><span class="string">Label1</span> <span class="operator">=&gt;</span> <span class="variable">value1</span><span class="operator">,</span> <span class="string">Label2</span> <span class="operator">=&gt;</span> <span class="variable">value2</span><span class="operator">,</span> <span class="operator">...</span><span class="operator">}</span><span class="operator">,</span>
+     <span class="operator">...</span>
+     <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="get_fields">get_fields</h2>
+
+<p>get_fields has a required argument, the form you require the field details for. The returned hash reference is the result of a call to ars_GetFieldTable, the keys are the field names and the values are the field ids (fid).</p>
+
+<h2 id="set_max_entries">set_max_entries</h2>
+
+<p>This requires that the &#39;user&#39; has administrator access. This allows the overriding of the <b>system wide</b> maximum rows returned setting AR_SERVER_INFO_MAX_ENTRIES, setting this to zero (0) will allow unlimited returns.</p>
+
+<p><b>Beware of setting this to a small value, it is system wide and could have a major impact on your system</b></p>
+
+<h1 id="PRIVATE-METHODS">PRIVATE METHODS</h1>
+
+<h2 id="init">_init</h2>
+
+<p>Initialisation for new</p>
+
+<h2 id="load_qualifier">_load_qualifier</h2>
+
+<h2 id="DESTROY">DESTROY</h2>
+
+<p>Log out from ARSystem</p>
+
+<h2 id="check_initialised">_check_initialised</h2>
+
+<p>Check to insure that there is a connection to Remedy ARSystem. Returns true if connected.</p>
+
+<h2 id="reset_max_entries">_reset_max_entries</h2>
+
+<p>If set, returns the the system wide AR_SERVER_INFO_MAX_ENTRIES back to a suitable value (eg 3000). This required the &#39;user&#39; has administrator access</p>
+
+<h1 id="TODO">TODO</h1>
+
+<p>Add in the tools below.</p>
+
+<p>Add in further methods to make life easier and your code more readable</p>
+
+<h1 id="TOOLS">TOOLS</h1>
+
+<p><b>NOT DONE YET</b></p>
+
+<p>The lfid array used by the get_data_by_label() method required that a hash is defined which describes the field lables (names) you want to use mapped to the field ID (FID). The encluded script will construct such a hash for all relavent fields. You might like to edit this down to only those fields you really need thereby reducing the amount of data returned.</p>
+
+<p>There is a win32 version of this which copies the data to your clipboard, to make your life easier.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Greg George, <code>&lt;gng at cpan.org&gt;</code></p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-ars-simple at rt.cpan.org</code>, or through the web interface at <a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ARS-Simple">http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ARS-Simple</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc ARS::Simple</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>RT: CPAN&#39;s request tracker (report bugs here)</p>
+
+<p><a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=ARS-Simple">http://rt.cpan.org/NoAuth/Bugs.html?Dist=ARS-Simple</a></p>
+
+</li>
+<li><p>AnnoCPAN: Annotated CPAN documentation</p>
+
+<p><a href="http://annocpan.org/dist/ARS-Simple">http://annocpan.org/dist/ARS-Simple</a></p>
+
+</li>
+<li><p>CPAN Ratings</p>
+
+<p><a href="http://cpanratings.perl.org/d/ARS-Simple">http://cpanratings.perl.org/d/ARS-Simple</a></p>
+
+</li>
+<li><p>Search CPAN</p>
+
+<p><a href="http://search.cpan.org/dist/ARS-Simple/">http://search.cpan.org/dist/ARS-Simple/</a></p>
+
+</li>
+</ul>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>This module relies on the ARSperl module and the fantastic effort by Jeff.C.Murphy and J.W.Murphy to write keep ARSperl current over so many years.</p>
+
+<pre><code> See http://arsperl.sourceforge.net/ for more details.
+ and https://metacpan.org/release/ARSperl</code></pre>
+
+<p>Remedy Corporation (long since gone) for making the ARSystem C API available thereby allowing ARSperl and this module possible</p>
+
+<h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
+
+<p>Copyright 2013 Greg George.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:</p>
+
+<p><a href="http://www.perlfoundation.org/artistic_license_2_0">http://www.perlfoundation.org/artistic_license_2_0</a></p>
+
+<p>Any use, modification, and distribution of the Standard or Modified Versions is governed by this Artistic License. By using, modifying or distributing the Package, you accept this license. Do not use, modify, or distribute the Package, if you do not accept this license.</p>
+
+<p>If your Modified Version has been derived from a Modified Version made by someone other than you, you are nevertheless required to ensure that your Modified Version complies with the requirements of this license.</p>
+
+<p>This license does not grant you the right to use any trademark, service mark, tradename, or logo of the Copyright Holder.</p>
+
+<p>This license includes the non-exclusive, worldwide, free-of-charge patent license to make, have made, use, offer to sell, sell, import and otherwise transfer the Package with respect to any patent claims licensable by the Copyright Holder that are necessarily infringed by the Package. If you institute patent litigation (including a cross-claim or counterclaim) against any party alleging that the Package constitutes direct or contributory patent infringement, then this Artistic License to you shall terminate on the date that such litigation is filed.</p>
+
+<p>Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS &quot;AS IS&#39; AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,81 @@
+#!/bin/bash
+# A very basic start-stop script, see also:
+# http://dev.catalystframework.org/wiki/gettingstarted/howtos/deploy/lighttpd_fastcgi
+
+APP_PID_FILE="/home/rob/develop/App-ForExample/Eg/eg-fastcgi.pid"
+APP_HOME="/home/rob/develop/App-ForExample/Eg"
+APP_NAME="eg"
+APP_PACKAGE="Eg"
+APP_ERROR_LOG="/home/rob/develop/App-ForExample/Eg/log/`basename $APP_PID_FILE-error.log`"
+
+case "$1" in
+    start)
+        echo -n "Starting $APP_NAME ($APP_PACKAGE) in $APP_HOME..."
+
+        if [ -r $APP_PID_FILE ]; then
+            echo " $APP_NAME is already running"
+            echo "Already started"
+            exit -1
+        fi
+    
+        cd $APP_HOME
+        /home/rob/develop/App-ForExample/Eg/script/eg_fastcgi.pl -l /tmp/eg.socket -n 5 -p $APP_PID_FILE -keeperr 2>>$APP_ERROR_LOG &
+
+        # Wait for the application to start
+        TIMEOUT=10; while [ ! -r $APP_PID_FILE ]; do
+            echo -n '.'; sleep 1; TIMEOUT=$[$TIMEOUT - 1]
+            if [ $TIMEOUT = 0 ]; then
+                echo " NOT starting? (timeout)"; exit -1
+            fi
+        done
+        echo "done"
+        PID=`cat "$APP_PID_FILE"`
+        echo "Started $APP_NAME ($APP_PACKAGE) (process $PID)"
+    ;;
+    stop)
+        echo -n "Stopping $APP_NAME ($APP_PACKAGE)... "
+
+        if [ -s "$APP_PID_FILE" ]; then
+            PID=`cat "$APP_PID_FILE"`
+            echo -n "Killing process $PID... "
+            kill $PID
+            echo -n "done. Wating for $APP_PID_FILE to be culled..."
+            TIMEOUT=10; while [ -r $APP_PID_FILE ]; do
+                echo -n '.'; sleep 1; TIMEOUT=$[$TIMEOUT - 1]
+                if [ $TIMEOUT = 0 ]; then
+                    echo " NOT stopping? (timeout)"; exit -1
+                fi
+            done
+            echo "done"
+            echo "Stopped $APP_NAME ($APP_PACKAGE)"
+        else 
+            echo "$APP_NAME is not running"
+            echo "Already stopped"
+            exit -1
+        fi
+    ;;
+    restart)
+        $0 stop
+        sleep 2
+        $0 start
+    ;;
+    status|about)
+        
+        echo    "Status for $APP_NAME ($APP_PACKAGE)"
+        echo    "   home: $APP_HOME"
+        echo    "   log: $APP_ERROR_LOG"
+        echo -n "   pid: "
+        if [ -s "$APP_PID_FILE" ]; then
+            PID=`cat "$APP_PID_FILE"`
+            echo -n $PID
+        else 
+            echo -n " -"
+        fi
+        echo " ($APP_PID_FILE)"
+    ;;
+    *)
+        echo "Don't understand \"$1\" ($*)"
+        echo "Usage: $0 { start | stop | restart | status }"
+        exit -1
+    ;;
+esac

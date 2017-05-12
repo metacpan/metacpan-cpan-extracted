@@ -1,0 +1,11 @@
+Revision history for Perl extension App::ErrorCalculator.
+
+1.02  Mon Jun 24 00:56 2008
+        - More dependencies.
+
+1.01  Mon May 23 18:40 2006
+	- Fixed missing dependencies.
+
+1.00  Fri Apr 21 20:29 2006
+	- original version as uploaded to CPAN
+

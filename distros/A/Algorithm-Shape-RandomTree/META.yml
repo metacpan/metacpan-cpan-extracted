@@ -1,0 +1,28 @@
+---
+abstract: "Create an object representing a procedural, editable, randomized plant shape that\ncan be rendered graphically by other modules."
+author:
+  - 'Tamir Lousky <tlousky@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Algorithm-Shape-RandomTree
+provides:
+  Algorithm::Shape::RandomTree:
+    file: lib/Algorithm/Shape/RandomTree.pm
+    version: 0.01
+  Algorithm::Shape::RandomTree::Branch:
+    file: lib/Algorithm/Shape/RandomTree/Branch.pm
+  Algorithm::Shape::RandomTree::Branch::Point:
+    file: lib/Algorithm/Shape/RandomTree/Branch/Point.pm
+requires:
+  Moose: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

@@ -1,0 +1,63 @@
+{
+   "abstract" : "Provide an interface to RGSS (ruby game scripting system) archive files.",
+   "author" : [
+      "Zejun Wu <watashi@watashi.ws>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Archive-Rgssad",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::String" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "Getopt::Long" : "0",
+            "IO::File" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "Archive::Rgss3a" : {
+         "file" : "lib/Archive/Rgss3a.pm",
+         "version" : "0.11"
+      },
+      "Archive::Rgssad" : {
+         "file" : "lib/Archive/Rgssad.pm",
+         "version" : "0.11"
+      },
+      "Archive::Rgssad::Entry" : {
+         "file" : "lib/Archive/Rgssad/Entry.pm",
+         "version" : "0.1"
+      },
+      "Archive::Rgssad::Keygen" : {
+         "file" : "lib/Archive/Rgssad/Keygen.pm",
+         "version" : "0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.11"
+}

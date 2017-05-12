@@ -1,0 +1,139 @@
+2013-01-14  Pete Ratzlaff  <rpete@legs.cfa.harvard.edu>
+
+	* LibWCS.PM: $VERSION = '0.94'
+	
+	* LibWCS.xs: removed actread, actrnum, uacread, uacrnum, ujcread,
+	ujcrnum, tabread is reworked but completely untested, tabrnum
+	needs to be redone as well
+
+	* Makefile.PL: pkgconfig detection from Diab Jerius
+
+2010-11-30  Diab Jerius  <dj@macabre.cfa.harvard.edu>
+
+	* LibWCS.PM: $VERSION = '0.93'
+
+	* LibWCS.xs, LibWCS.pm: upgraded to libwcs v 3.8.1, added new
+	functions ang2hr, ang2deg, deg2ang, hr2ang, jd2mst2, mjd2mst
+
+2010-11-30  Diab Jerius  <dj@macabre.cfa.harvard.edu>
+
+	* LibWCS.PM: $VERSION = '0.92'
+
+	* typemap, util.c: modernize code to check for undefined values;
+	old code fails on newer perls in certain cases
+
+	* Makefile.PL: add new configure options to allow different roots
+	for libs and includes for libwcs
+
+2007-04-06  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* LibWCS.pm: $VERSION = '0.91'
+
+	* LibWCS.xs: lots of changes to make everything compatible with
+	wcstools 3.6.8
+
+2003-09-18  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* LibWCS.xs: lots of bugs uncovered and hopefully fixed due to
+	prototype checking.
+
+	* wcsdecl.h: added to fill in lack of declaraction in libwcs headers
+
+2003-09-04  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* $VERSION = '0.90', uploaded to CPAN.
+
+	* Added README, LICENSE, INSTALL.
+
+2003-09-03  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Added Diab's implementations of lots of new routines and bug
+	fixes from his "0.30" version. Name changed to Astro::WCS::LibWCS
+	in preparation for CPAN upload.
+
+2003-07-07  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* LibWCS.pm: $VERSION = '0.23';
+
+	* LibWCS.xs: tnxdestroy() is now tnxclose() in wcstools-3.4.0
+
+2001-11-07  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Added WCSPtr methods xref, yref, xrefpix, yrefpix, xinc, yinc.
+	These are all members of the WorldCoord struct in libwcs.
+
+2001-07-26  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* tabline() becomes gettabline() for wcstools-3.0
+
+2001-07-05  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* $VERSION = '0.22';
+
+2001-03-01  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Lots of return values fixed.
+
+	* setrefcat() removed in wsctools-2.9.1
+
+2000-08-24  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* $VERSION = '0.21';
+
+2000-08-02  Diab Jarius  <dj@head-cfa.harvard.edu>
+
+	* Updated for wcstools 2.8.3: getltime()/getutime() removed, added new
+	routines in dateutil.c of libwcs.
+	
+	* Fixed bugs in t/dateutil.t
+
+2000-08-02  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Changes for 5.6.0 symbols, minor doc updates.
+
+2000-03-03  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Removed dint(), dmod().
+
+1999-12-07  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Minor changes in Makefile.PL, t/dateutil.t.
+
+1999-12-06  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Added test script for date utilities. Needs work.
+
+1999-12-06  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Added routines in findstar.c, rest of routines in hput.c,
+	imsetwcs.c, matchstar.c, sortstar.c, some of fitsfile.c.
+	* New test setup with 't' directory.
+
+1999-12-04  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Added routines in dsspos.c, platepos.c, tnxpos.c, worldpos.c, some
+	routines from hput.c, actread.c, tabread.c, uacread.c, ujcread,
+	catutil.c (minus token routines), dateutil.c.
+
+	* Fixed setwcserr(), now works properly.
+
+1999-12-03  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Added wscfree() to WCSPtr namespace.
+
+1999-11-17  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Added routines in wcscon.c and hget.c
+
+1999-11-15  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Changed classname WorldCoorPtr to WCSPtr.
+
+1999-11-14  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Useable version, implementing all functions in wcsinit.c and wcs.c.
+
+1999-11-12  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* original version; created by h2xs 1.19
+

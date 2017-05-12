@@ -1,0 +1,30 @@
+---
+abstract: 'basic authentication with Authen::Passphrase'
+author:
+  - 'Marius Gavrilescu <marius@ieval.ro>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache2-Authen-Passphrase
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Apache2::RequestRec: '0'
+requires:
+  Authen::Passphrase: '0'
+  Authen::Passphrase::BlowfishCrypt: '0'
+  IO::Prompter: '0'
+  YAML::Any: '0'
+  perl: '5.014000'
+resources:
+  repository: https://git.ieval.ro/?p=apache2-authen-passphrase.git
+version: 0.002002

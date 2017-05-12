@@ -1,0 +1,35 @@
+Apache-FastForward version 0.01
+===============================
+
+The module is part of the FastForward project, which aim is to allow 
+fast development of web based spreadsheet applications. Apache::FastForward 
+implements receiving CSV formatted date by the POST request and their 
+convenient manipulation on the server site. It solves similar problems 
+as FORMS in the html. Apache::FastForward inherits from the Apache module.
+For more details please see http://fastforward.sourceforge.net . 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+    Text::CSV_XS
+    Encode
+    Apache
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2006 Jerzy Wachowiak <jwach@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the Apache 2.0 license attached to the module.
+
+

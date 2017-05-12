@@ -1,0 +1,79 @@
+{
+   "abstract" : "Simple to use and highly available",
+   "author" : [
+      "Eric Johnson <eric.git@iijo.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amazon-DynamoDB-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Amazon::DynamoDB" : "0",
+            "Carp" : "0",
+            "DDP" : "0",
+            "JSON::XS" : "0",
+            "Moo" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Amazon::DynamoDB::Simple" : {
+         "file" : "lib/Amazon/DynamoDB/Simple.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kablamo/Amazon-DynamoDB-Simple/issues"
+      },
+      "homepage" : "https://github.com/kablamo/Amazon-DynamoDB-Simple",
+      "repository" : {
+         "url" : "git://github.com/kablamo/Amazon-DynamoDB-Simple.git",
+         "web" : "https://github.com/kablamo/Amazon-DynamoDB-Simple"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:KABLAMO"
+}

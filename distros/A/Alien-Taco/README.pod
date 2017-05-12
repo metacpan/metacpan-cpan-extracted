@@ -1,0 +1,142 @@
+=head1 Taco Module for Perl
+
+=head2 Introduction
+
+Taco is a system for bridging between scripting languages.
+Its goal is to allow you to call routines written for one language from
+another.
+It does this by running the second language interpreter in a sub-process,
+and passing messages about actions to be performed inside that interpreter.
+
+In principle, to interface scripting languages it might be preferable
+to embed the interpreter for one as an extension of the other.
+However this might not be convenient or possible,
+and would need to be repeated for each combination of languages.
+Instead Taco only requires a "client" module and "server" script
+for each language, which should be straightforward to install,
+and its messages are designed to be generic so that they
+can be used between any combination of languages.
+
+For more information about Taco, please see the
+L<Taco Homepage|http://grahambell.github.io/taco/>.
+
+=head2 Examples
+
+Here are a few examples of the types of things which can be done
+with Taco:
+
+=over 4
+
+=item Calling a Function
+
+In this example, the Python C<numpy.median> function is
+used to calculate the median of an array of numbers.
+The answer is returned to the Perl script.
+
+    use Alien::Taco;
+    my $taco = new Alien::Taco(lang => 'python');
+    $taco->import_module('numpy');
+
+    my @array = (1, 2, 4, 8);
+
+    print $taco->call_function('numpy.median', args => [\@array]);
+
+
+I<Output:> 3
+
+Instantiating a C<Alien::Taco> object starts a sub-process running
+a "server" script, in this case in Python.
+This script then handles the instructions to import a module
+and call a function.
+
+=item Working with Objects
+
+References to objects are returned as instances of the
+C<Alien::Taco::Object> class:
+
+    $taco->import_module('datetime', args => ['datetime']);
+    my $dt = $taco->construct_object('datetime', args => [2014, 4, 1]);
+    print $dt;
+
+I<Output:> Alien::Taco::Object=HASH(0x.......)
+
+The actual object is cached by the server script,
+and the reference can be used to interact with it.
+
+    print $dt->call_method('isoweekday');
+
+I<Output:> 2
+
+=item Handling Exceptions
+
+Exceptions which occur while the server is processing an
+instruction are caught and re-raised by the Perl module.
+
+    $dt->call_method('replace', kwargs => {month => 13});
+
+I<Exits with:> received exception: exception caught: month must be in 1..12
+
+=back
+
+=head2 Installation
+
+This module can be installed, including basic unit tests, as follows:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=head3 Integration Tests
+
+This package also includes integration tests which test the complete
+Taco system.
+These tests can be found in the F<ti-*> directories.
+
+=over 4
+
+=item Perl
+
+The test using a Perl "server" can be run directly from this package:
+
+    ./Build tiperl
+
+=item Other Languages
+
+The following tests require a Taco "server" script for the corresponding
+language to already be installed in the search path:
+
+=over 4
+
+=item Python
+
+    ./Build tipython
+
+=back
+
+=back
+
+=head2 License
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=head2 Additional Links
+
+=over 4
+
+=item L<Repository at GitHub|https://github.com/grahambell/taco-perl>
+
+=item L<Taco Homepage|http://grahambell.github.io/taco/>
+
+=back

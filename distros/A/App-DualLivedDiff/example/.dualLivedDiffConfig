@@ -1,0 +1,9 @@
+---
+files:
+  lib/Filter/Simple.pm: lib/Filter/Simple.pm
+  Changes: lib/Filter/Simple/Changes
+dirs-flat:
+  t/: lib/Filter/Simple/t/
+dirs-recursive:
+  t/lib/Filter/Simple/: t/lib/Filter/Simple/
+

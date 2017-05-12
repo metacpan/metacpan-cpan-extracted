@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# PODNAME: dbiloader
+# ABSTRACT: A tiny script to load CSV/TSV contents into a database table via DBI
+our $VERSION = 'v0.0.2'; # VERSION
+
+use App::DBI::Loader;
+
+App::DBI::Loader->run(@ARGV);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+dbiloader - A tiny script to load CSV/TSV contents into a database table via DBI
+
+=head1 VERSION
+
+version v0.0.2
+
+=head1 SYNOPSIS
+
+dbiloader C<-h>
+
+dbiloader [C<-c>] [C<-t E<lt>separatorE<gt>>] [C<-u E<lt>usernameE<gt>>] [C<-p E<lt>passwordE<gt>>] C<E<lt>connectionE<gt>> C<E<lt>tableE<gt>> [C<E<lt>schemaE<gt>>] [C<E<lt>filesE<gt>>...]
+
+  # Read TSV and load into mytable in SQLite database t.db
+  dbiloader -t '\t' dbi:SQLite:t.db mytable data.txt
+
+  # Clear mytable, read CSV (default), and load into mytable in SQLite database t.db
+  dbiloader -c dbi:SQLite:t.db mytable data.txt
+
+  # Drop mytalbe if exists, create mytable, read CSV (default), and load into mytable in SQLite database t.db
+  dbiloader dbi:SQLite:t.db mytable '(key INTEGER PRIMARY KEY, value INTEGER)' data.txt
+
+=head1 DESCRIPTION
+
+TSV/CSV is a friend of text processing. RDBMS/SQL is a friend of analyzing data.
+I quite often create a working table from a TSV/CSV file. This tiny script is created for the purpose.
+By this script, CSV/TSV contents are loaded into a database table via DBI.
+
+=head1 OPTIONS
+
+=head2 C<-h>
+
+Show POD help.
+
+=head2 C<-t E<lt>separatorE<gt>>
+
+Specify field separator. Defaults to ',' (a comma). This is passed to split.
+NOTE that field separation is currently done by just a C<split>. Thus, quoting is not correctly handled.
+
+=head2 C<-c>
+
+Clear the specified table before contents loading.
+
+=head2 C<-u E<lt>usernameE<gt>>
+
+Specify username.
+
+=head2 C<-p E<lt>passwordE<gt>>
+
+Specify password.
+
+=head2 C<E<lt>connectionE<gt>>
+
+Specify DBI connection string.
+
+=head2 C<E<lt>tableE<gt>>
+
+Specify table name.
+
+=head2 C<E<lt>schemaE<gt>>
+
+Specify table schema optionally. This is appended to 'CREATE TABLE <table>' SQL.  Expected to be as C<\(.*\)>.
+
+=head2 C<E<lt>filesE<gt>>...
+
+Specify CSV/TSV files. If omitted or '-' is specified, STDIN is used.
+
+=for getopt 'h'
+
+=for getopt 't:'
+
+=for getopt 'c'
+
+=for getopt 'u:'
+
+=for getopt 'p:'
+
+=head1 AUTHOR
+
+Yasutaka ATARASHI <yakex@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Yasutaka ATARASHI.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

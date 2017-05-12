@@ -1,0 +1,123 @@
+Revision history for Perl extension Authen::PAM.
+
+0.16  2005-Sep-20
+	- export the PAM_BINARY_PROMPT message type
+	- minor fix in the configure script for testing DL_LOAD_FLAGS
+	- added an entry in the FAQ about PAM_AUTHTOK and PAM_OLDAUTHTOK
+	- some code cleanup by Alexey Tourbin
+	- changed the typemap of pam_handle_t* to T_PTRREF;
+	  this should fix warnings and some segmentation faults when using
+	  64-bit ints (thanks to Walter Vaughan)
+	- restored test 11 for the object oriented interface
+
+0.15  2004-Nov-8
+	- small changes to the FAQ
+	- fixed pam_start to pass NULL to PAM if no user is given
+	  (thanks to Angus Lees)
+	- the test script will die if it cannot find a tty
+	- if the test script cannot obtain the username it will force PAM to
+	  ask for it
+	- removed some trivial tests
+	- the user can now abort the conversation function by returning
+	  some error code (thanks to Penelope Fudd)
+
+0.14  2003-Jan-22
+	- upgraded to autoconf 2.53 and did a major rewrite of the 
+	  configure script 
+	- the changes in the autoconf scripts in the last version
+	  had a bug which would prevent correct configuration if
+	  a config.cache file exists, e.g if you run ./configure twice
+	- added a test for pam_appl.h in the configure script
+	- added support for PAM on Darwin and Mac OS X (thanks to
+	  David Wheeler)
+	- preliminary support for HP-UX 11.0
+	- fixed parsing of -D arguments on the command line (thanks to
+	  Jens Rehsack)
+
+0.13  2002-Feb-25
+	- the test script returns the number of failed tests (except test 10)
+	  so that 'make test' can fail
+	- fixed the code for loading constant symbols on systems with
+	  non-english system locale (thanks to Andrzej Kukula)
+	- better test for pam_strerror (thanks to Dag-Erling Smorgrav)
+	- support for OpenPAM (thanks to Dag-Erling Smorgrav)
+
+0.12  2001-Jul-10
+	- some simplifications of the configure script
+	- the format of the conversation messages seems to be different
+	  on Solaris and Linux-PAM and I tried to accomodate for this
+	- a number of PAM error codes were not exported
+
+0.11  2000-Dec-06
+	- reorganized the PAM.xs for easier support of callback functions
+	- added support for user (perl) defined fail_delay function
+	- the pam_fail_delay function was not exported
+	- fixed a bug when calling pam_set_item($pamh, PAM_CONV_FUNC, ...)
+	- the PAM.xs now compiles on perl 5.6 (thanks to Roland Pope) 
+ 	- the compiler can be changed by setting the environment variable
+	  CC before calling 'perl Makefile.PL'
+
+0.10  2000-May-02
+	- fixed some small problems with the constructor 'new'
+	  (thanks to <wil at langford.net>)
+	- added a FAQ file
+	- added PAM_CONV_AGAIN and PAM_INCOMPLETE constants from the
+	  new versions of the Linux PAM library
+
+0.09  2000-Feb-03
+	- fixed a bug in PAM.xs when more than one messages are given
+	  to the conversation function (thanks to Oleg Bulavsky)
+	- small changes to the test script
+	- several old constant symbols are exported only on request;
+	  also created two tags :constants and :functions for easier
+ 	  exporting only some of the symbols
+
+0.08  1999-Sep-13
+	- fixed a bug when returning empty strings from the conversation 
+	  function (thanks to Eric Einhorn)
+
+0.07  1999-Jun-08
+	- the test script now gets the user name from the real user id
+	- restored back the file Makefile.PL and modified the configuration 
+	  process so that the module is now build in the standard way
+	- added a dummy file d/PAM.pm so that CPAN can find the version
+	  number and the docs (thanks to Graham Barr)
+
+0.06  1999-May-19
+	- the test script now passes to pam the current tty which is needed
+	  by some authentication modules (e.g. pam_securetty)
+	- some of the test programs in configure need to be linked with -ldl
+	  under Linux
+	- the default converstation function now uses termios functions to
+	  turn off the echo (thanks to Charlie Brady)
+
+0.05  1999-Mar-23
+	- the package is now configured with a `configure' script
+	- the module can now be used with FreeBSD 3.1 PAM library
+	  (thanks to Adrian Pavlykevych)
+	- removed the PAM_AUTHTOK and PAM_OLDAUTHTOK constants because they
+	  can be used only by modules
+	- the test script now returns the pam error code for tests which fail
+
+0.04  1998-Oct-30
+	- in the previous version the HAVE_PAM_ENV_FUNCTIONS was incorrectly 
+	  commented by default
+	- added a workaround for a bug in the solaris 2.6 pam library
+	  (tanks to Dawn Whiteside)
+	- the distribution now includes the xsubpp patch
+	- added a call to the pam_authenticate function to the test program
+
+0.03  1998-Oct-06
+	- added support for the earlier versions of Linux-PAM without env 
+	  functions (those before version 0.54)
+	- fixed some compiler warnings
+
+0.02  1998-Jun-09
+	- the module is now compatible with Solaris 2.6 PAM library
+	  (thanks to Lupe Christoph)
+	- added object oriented interface
+	- added default value for $flags argument for most of the functions
+
+0.01  1998-May-18
+	- original version; created by h2xs 1.18
+

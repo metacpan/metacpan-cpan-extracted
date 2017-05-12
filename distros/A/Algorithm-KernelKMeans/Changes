@@ -1,0 +1,12 @@
+Revision history for Perl extension Algorithm::KernelKMeans
+
+0.03  2010-11-10
+    - IMCOMPATIBLE CHANGE: Now all vectors represented as a hashref
+    - Removed generate_polynominal_kernel()'s default parameters
+
+0.02  2010-11-04
+    - Kernel matrix is manually specifiable
+    - Separation of implementation
+
+0.01  2010-10-20
+    - Original version

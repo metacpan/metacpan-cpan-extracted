@@ -1,0 +1,25 @@
+Acme-Perl-Consensual
+====================
+
+Created:      2012-07-01
+Home page:    <https://metacpan.org/release/Acme-Perl-Consensual>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Acme-Perl-Consensual>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.002  2013-05-18
+
+ - (Bugfix) LC_ALL is supposed to override all other LC_* variables.
+   ++$MAUKE
+ - (Update) perlhist data includes up to 5.18.0.
+
+0.001  2012-07-30  # first public release
+
+ - (Update) perlhist data includes some 5.17.x release dates.
+
+0.000_02  2012-07-26
+
+ - Bundle perlhist info in __DATA__.
+
+0.000_01  2012-07-05  # Preview release
+
+

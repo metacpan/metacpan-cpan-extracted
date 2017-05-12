@@ -1,0 +1,15 @@
+---
+doom_filter:
+  description: 'The usual file filtering - skips "old", "bak", emacs backups, etc'
+  search_terms:
+    - '~$'
+    - /\#
+    - ',v$'
+    - \.elc$
+    - \bold
+    - \bOld
+    - \bOLD
+    - bak$
+    - Bak$
+    - BAK$
+  type: skip_any

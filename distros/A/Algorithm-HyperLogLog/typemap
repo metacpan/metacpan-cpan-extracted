@@ -1,0 +1,13 @@
+HLL	T_PTROBJ_HLL
+uint32_t	T_UV
+
+################################################################
+INPUT
+
+T_PTROBJ_HLL
+	$var = GET_HLLPTR($arg); 
+
+OUTPUT
+
+T_PTROBJ_HLL
+	sv_setref_pv($arg, klass, (void*)$var);

@@ -1,0 +1,72 @@
+Revision history for Perl extension Apache::Geo::IP.
+
+1.99 April 23, 2009
+  - Require Geo::IP
+  - remove Apache::Geo::IP::Record and Apache2::Geo::IP::Record, as they're
+    now supplied through Geo::IP
+  - exit Makefile.PL if mod_perl isn't found, to try to make CPAN testers happy
+  - add Apache directive to handle a robots.txt in automatic redirection
+  - add Apache directive to use the X-Forwarded-For header, if present, to
+    try to infer originating IP address; this is useful for clients using
+    a proxy or load balancer
+  - *incompatible change*: the GeoIPDefault Apache directive now specifies
+    the default url to use in automatic redirection, not the default country
+
+1.63 March 26, 2007
+  - update C library files to GeoIP-1.4.2
+  - use mod_perl2, rather than mod_perl, in Apache2 test
+
+1.62 Thu, May 12 2005
+  - update C library files to GeoIP-1.3.8
+  - rename the mod_perl 2 modules from Apache::* to Apache2::*,
+    and adjust to use the new namespace of mod_perl-2
+
+1.52 Mon Sep 13 16:36:00 2004
+  - in mp2 Apache::Geo::Mirror, fix bug when host mirror chosen
+    didn't have a path after the hostname
+  - in Mirror.pm, use the left-most ip address in the
+    X-Forwarded-For header for the host name, if defined,
+    rather than the right one, in cases more than one
+    is present. Also, ignore cases when 127.0.0.1 is used.
+
+1.51 Thu Sep 8 16:36:00 2004
+  - fix bug in mp2 auto-redirect handler in Mirror.pm to
+    remove the port number before redirecting
+
+1.5 Wed Sep 08 22:13:00 2004
+  - upgrade to GeoIP-1.3.6
+  - get rid of warning in Mirror.pm when a country's
+    latitude and longitude aren't available
+  - simplify test suite
+
+1.4 Sun Dec 07 15:13:00 2003
+
+  - for mp2, need Apache::Connection in Apache::Geo::IP
+    [Enrico Sorcinelli]
+  - upgrade libGeo.[ch] and libGeoIPCity.[ch] to
+    GeoIP-1.3.1
+
+1.215 Sat Sep 27 20:05:00 2003
+
+  - ensure GEOIP flags are numeric
+  - allow multiple automatic mirror configurations
+
+1.21 Sun Sep 01 19:04:00 2003
+
+  - update to version 1.21 of Geo::IP
+  - fix warning in Mirror.pm
+
+1.13 Wed Mar 11 11:41:00 2003
+
+  - update libGeoIP.c and libGeoIPCity.c
+  - fix tests
+  - load relevant Apache::* modules for mod_perl 2 version
+
+1.12 Wed Dec 12 11:42:48 2002
+
+  - update to sync with Geo::IP version 1.11, including City interface
+
+0.26 Tue Oct 15 12:42:48 2002
+
+  - original version
+

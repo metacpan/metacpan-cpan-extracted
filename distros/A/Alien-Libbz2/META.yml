@@ -1,0 +1,36 @@
+---
+abstract: 'Build and make available bz2'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Alien::Build: '0.19'
+  Alien::Build::MM: '0.19'
+  ExtUtils::MakeMaker: '6.52'
+  Test2::Suite: '0.000060'
+  Test::Alien: '0.12'
+  Test::More: '0.94'
+  perl: '5.008001'
+configure_requires:
+  Alien::Build: '0.19'
+  Alien::Build::MM: '0.19'
+  ExtUtils::CBuilder: '0'
+  ExtUtils::MakeMaker: '6.52'
+  IPC::Cmd: '0'
+  perl: '5.008001'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Libbz2
+requires:
+  Alien::Base: '0.036'
+  perl: '5.008001'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/Perl5-Alien/Alien-Libbz2/issues
+  homepage: https://metacpan.org/pod/Alien::Libbz2
+  repository: git://github.com/Perl5-Alien/Alien-Libbz2.git
+version: '0.22'
+x_serialization_backend: 'YAML::Tiny version 1.70'

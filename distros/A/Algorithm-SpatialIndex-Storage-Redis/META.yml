@@ -1,0 +1,27 @@
+---
+abstract: 'Redis storage backend'
+author:
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Algorithm-SpatialIndex-Storage-Redis
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Algorithm::SpatialIndex: 0
+  JSON: 0
+  Redis: 0
+  Scalar::Util: 0
+  Sereal::Decoder: 0.36
+  Sereal::Encoder: 0.36
+version: 0.01

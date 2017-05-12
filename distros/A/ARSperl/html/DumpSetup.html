@@ -1,0 +1,41 @@
+<HTML>
+ <HEAD> 
+  <TITLE>ARSperl Utilities: DumpSetup.pl</TITLE>
+ </HEAD> 
+ <BODY BGCOLOR="#FFFFFF">
+ <H2>DumpSetup.pl</H2>
+
+ <H3> Purpose </H3>
+
+ This utility helps you maintain backup copies of your ARS definitions
+ (but not table data). It accomplishes this by exporting all of the
+ definitions to text files and then "checking them in" to an RCS system.
+ In this fashion, no additional diskspace is used for maintaining backup
+ copies unless there is a change to the definition file. 
+
+ <H3> Ancillary Utilities </H3>
+
+ RCS. See GNU FTP Site <A HREF="ftp://prep.ai.mit.edu/pub/gnu/">prep.ai.mit.edu</A>
+
+ <H3> Author </H3>
+ Joel Murphy<BR>
+ <A HREF="mailto:jmurphy@acsu.buffalo.edu">jmurphy@acsu.buffalo.edu</A>
+
+ <H3> Usage </H3>
+
+ <PRE>
+ EXAMPLE
+    Dump_Setup.pl [username] [password] [path]
+
+ DESCRIPTION
+    Log onto the server and export all schemas, filters, etc. Check them
+    into RCS to maintain revision history.
+ 
+ NOTES
+    This might require special permission for the username you login as
+ </PRE>
+
+ <HR>
+ <A HREF="mailto:arsperl@arsperl.org">arsperl@arsperl.org</A>
+ </BODY>
+</HTML>

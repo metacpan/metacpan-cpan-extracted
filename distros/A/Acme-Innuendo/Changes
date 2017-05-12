@@ -1,0 +1,17 @@
+Revision history for Perl extension Acme::Innuendo.
+
+0.03  Fri Apr 09 15:10:00 2010
+	- maintenance taken over by Rene Schickbauer
+    - Changed build system back to Makefile.PL only for
+      easier integration into my tool chains
+    - Added some self tests
+
+0.02    Wed Jul  7
+	- added Build.PL
+	- added SEE ALSO section for links to serious applications
+	- special_place can accept a module name as an argument
+
+0.01    Thu Jun 17 05:24:07 2004
+	- original version; created by h2xs 1.23 with options
+		-A -B -X -n Acme::Innuendo -b 5.6.1 -O
+

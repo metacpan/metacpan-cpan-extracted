@@ -1,0 +1,121 @@
+Revision history for App-Zapzi
+
+0.017     2015-03-15 10:42:59+07:00 Asia/Bangkok
+
+  * Skip tests that require Internet connectivity
+
+0.016     2015-03-14 10:35:35+07:00 Asia/Bangkok
+
+  * 'zapzi add -' will read a list of articles to add from standard input
+  * Request data fetched via HTTP not to be compressed
+  * Better error handling if HTML document has no extractable text
+  * Fixes to tests and dist.ini
+
+0.015     2014-08-16 12:42:29+07:00 Asia/Bangkok
+
+  * Option to deactivate links when using HTMLExtractMain transformer
+  * Identify .txt files as text correctly
+  * (#1) Moved file slurp and other file operations to Path::Tiny
+
+0.014     2014-05-10 18:35:44+07:00 Asia/Bangkok
+
+  * Removed requirement for GD module and system library
+  * Remove iframe tags when using HTML based transformers
+  * Improved error reporting for transformers
+
+0.013     2014-03-05 20:29:23+07:00 Asia/Bangkok
+
+  * Remove font tag attributes when using HTMLExtractMain transformer
+  * Ignore errors from Text::Markdown about matching braces as can
+    continue anyway
+  * Validate article IDs passed in to command line
+
+0.012     2013-10-29 15:09:24 Asia/Hong_Kong
+
+  * Added distributors to deliver eBooks after publication
+  * Copy distributor - copies file to another directory eg an eReader
+    connected via USB cable
+  * Script distributor - runs a script with the eBook as parameter
+  * Email distributor - send eBook as attachment to an email address,
+    eg to the Kindle personal documents service
+
+0.011     2013-10-07 15:54:47 Asia/Hong_Kong
+
+  * Added article move command and documented delete command
+  * Set and get config variables from command line application
+  * Prompt for user config options on first initialisation
+  * Config variable 'publish_format' sets the default eBook format
+  * Config variable 'publish_encoding' sets the default eBook encoding
+  * Validate arguments to publish command
+
+0.010     2013-09-18 15:13:25 Asia/Hong_Kong
+
+  * Support for creating EPUB and HTML format eBooks
+  * Encoding options for publishing to each format
+  * Don't add a page break to MOBI publications after the last article
+
+0.009     2013-08-24 19:46:48 Asia/Hong_Kong
+
+  * Save source of article when capturing it
+  * Show a more detailed listing of articles with 'zapzi ls -l'
+  * Allow 'zapzi add show' to add an article and immediately show it
+  * Skip URL tests if no internet connection
+
+0.008     2013-08-16 18:35:49 Asia/Hong_Kong
+
+  * Bugfix for perl < 5.14
+
+0.007     2013-08-16 16:43:31 Asia/Hong_Kong
+
+  * Added POD format (by file or module name) for input articles
+  * View captured articles in broswer using 'zapzi show'
+  * The command to send captured articles to stdout is now 'zapzi export'
+  * Updated article fetch tests
+  * Added Config helper module
+
+0.006     2013-08-06 15:30:06 Asia/Hong_Kong
+
+  * Added HTML transformer for use when HTMLExtractMain does not give
+    desired output
+  * Added -t command line switch to allow selection of transformers
+  * Use UTF-8 to encode MOBI files
+  * Bugfix for article test
+  * Set Moo version dependency
+  * Handle HTML fragments as HTML in files
+  * Bugfix for HTML articles with no title
+  * Handle HTML pages with two title tags and extra whitespace
+  * Format title for text with leading whitespace and long lines
+  * Added config table plus support for schema versioning and upgrades
+
+0.005     2013-07-12 22:42:11 Asia/Hong_Kong
+
+  * Better validation of URLs
+  * Handle UTF-8 text correctly
+  * --noarchive option to publish command
+  * Correct HTML when using show command
+  * Use plugins for FetchArticle
+  * Improve test coverage
+
+0.004     2013-07-09 15:10:08 Asia/Hong_Kong
+
+  * Added command aliases md, rd and cat
+  * Update installation instructions
+  * Set explicit version dependencies for modules
+  * Use roles and plugins in Transform module
+
+0.003     2013-07-08 23:02:34 Asia/Hong_Kong
+
+  * Update READMEs
+  * Make implicit dependency on DateTime::Format::SQLite
+  * Set error attribute correctly
+
+0.002     2013-07-08 15:40:37 Asia/Hong_Kong
+
+  * --version command line option
+  * Handle HTML entities in article titles correctly
+  * Use an in-memory SQLite database to speed up testing
+  * Tidy up class access
+
+0.001     2013-07-07 22:18:51 Asia/Hong_Kong
+
+  * Initial version

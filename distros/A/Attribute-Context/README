@@ -1,0 +1,48 @@
+Attribute-Context version 0.03
+==============================
+
+Attributes that handle subroutine return values based upon context.
+
+For example, instead of having this at the end of a sub:
+
+ sub foo {
+     # do stuff
+     return wantarray
+        ? @results
+        : defined wantarray
+            ? \@results
+            : die "Don't call me in void context!";
+ }
+
+You can now do:
+
+ sub foo : Arrayref(NOVOID) {
+     # do stuff
+     return @results;
+ }
+
+See POD and tests for full details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Attribute::Handlers
+  Test::Exception
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 by Curtis "Ovid"  Poe
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.

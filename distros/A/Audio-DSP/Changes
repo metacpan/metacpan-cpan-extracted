@@ -1,0 +1,42 @@
+Revision history for Perl extension Audio::DSP.
+
+0.01  Tue Aug 10 18:11:57 1999
+	- original version; created by h2xs 1.18
+
+0.02  Mon Sep 11 00:00:00 2000
+        - added several new methods:
+            - Opening/closing device
+                - open
+            - Direct read/write to device
+                - dread
+                - dwrite
+            - I/O Control
+                - channels
+                - setduplex
+                - setfmt
+                - speed
+
+        - The following methods are now deprecated:
+            - getformat
+            - queryformat
+            - setchannels
+            - setdevice
+            - setformat
+            - setrate
+
+        - The following sample-format constants are now exported on use:
+            - AFMT_MU_LAW
+            - AFMT_A_LAW
+            - AFMT_IMA_ADPCM
+            - AFMT_U8
+            - AFMT_S16_LE
+            - AFMT_S16_BE
+            - AFMT_S8
+            - AFMT_U16_LE
+            - AFMT_U16_BE
+            - AFMT_MPEG
+
+        Consequently, the 'format' parameter in the init() method should be
+        passed in constant rather than string form (string form is deprecated).
+        On a similar note, the open flag should be passed as a Fcntl.pm
+        constant rather than a string (also deprecated).

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>(<: $length :>) <: $filename :></title>
+    <link href="/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="content"><: $content :></div>
+      <div id="footer"><: $length :> chars</div>
+    </div>
+  </body>
+</html>

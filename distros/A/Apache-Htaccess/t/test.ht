@@ -1,0 +1,12 @@
+AuthUserFile /home/thesite/.htpasswd
+AuthGroupFile /dev/null
+AuthName ByPassword
+AuthType Basic
+<Limit GET POST>
+require user foo
+require user bar
+require user baz
+</Limit>
+Zero 0
+One 1
+Undef

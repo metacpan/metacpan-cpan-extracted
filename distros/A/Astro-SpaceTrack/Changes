@@ -1,0 +1,1069 @@
+0.098		2017-03-15	T. R. Wyant
+    Move SpaceTrack script from bin/ to script/
+
+    Don't 'use Exporter qw{ import };'. Instead, subclass Exporter.
+
+    eval() autoflush() in test routines, requiring 'IO::Handle' first.
+
+0.097		2017-02-09	T. R. Wyant
+  Add Celestrak catalogs 'iridium-NEXT' and 'ses'.
+
+0.096		2017-01-15	T. R. Wyant
+  Ditch 'use base'.
+    Astro::SpaceTrack is no longer a subclass of Exporter. Instead
+    import() was imported into its name space.
+    In the case of the inc/ files, 'use base' was replaced by a 'use' of
+    the appropriate module, followed by assignment to @ISA.
+
+  Have relevant author tests use identity file.
+
+  Document the use of environment variable CI_GPG to get gpg2 even
+    though gpg is also installed.
+
+0.095		2016-11-07	T. R. Wyant
+  Support Config::Identity file. Both the file and Config::Identity are
+    optional. The file name is spacetrack.id (MSWin32 and VMS) or
+    .spacetrack-identity (anything else) in the user's home directory.
+    The file itself can be GnuPG encrypted.
+
+  Rod Sladen Iridium status update.
+
+0.094		2016-08-07	T. R. Wyant
+  Implement Kelso Iridium status '[B]' as spare, and implement all
+    other status codes documented on the Celestrak web site.
+
+  Update copyright date returned by banner().
+
+0.093		2016-01-20	T. R. Wyant
+  Make t/query_iridium_status_*.t skip rather than fail if the server is
+    unavailable.
+
+  Add GitHub repository to metadata.
+
+0.092		2015-05-27	T. R. Wyant
+  Add new Space Track catalog "files" (canned queries, really). These
+    are:
+        medium_earth_orbit
+        low_earth_orbit
+        highly_elliptical
+
+0.091		2015-04-15	T. R. Wyant
+  Add dependency on Mozilla::CA in hope to quash some of the CPAN
+    testers CERT errors.
+
+  Simplify the -last5 handling code. Rather than defaulting it and then
+    removing it if unneeded, just insert it only if the query class ends
+    up being 'tle_latest'.
+
+  Fix a problem with bad Space Track queries being generated under
+    certain circumstances if TLE data were being requested and class
+    'tle' (rather than 'tle_latest') was being used to satisfy them. The
+    problem seems to have been the leakage of extraneous data from the
+    -last5 option (even if defaulted) into the REST query.
+    Thanks to Vidar Tyldum for finding this rather abstruse problem and
+    running it to ground.
+
+0.090		2015-02-11	T. R. Wyant
+  Add CPF data to celestrak_supplemental().
+
+0.089		2015-01-06	T. R. Wyant
+  Supply missing initialization in JSON code. This was a problem only
+    if no data were returned, and maybe then only under restricted and
+    poorly-understood corcumstances.
+
+  Fix warnings in McCants' Iridium status code under Perl 5.21.7 and up.
+    With this Perl, sprintf() started complaining about extraneous
+    arguments.
+
+  Add new spacetrack() catalogs bright_geosynchronous, human_spaceflight
+    and well_tracked_objects. The first two correspond to Space Track
+    curated queries; the last does not, but is based on their Face Book
+    entry for December 3 2014, and represents objects that can not be
+    assigned to a country or launch site.
+
+  Fix option hash validation warning in spacetrack(). This affected
+    catalog 'payload'.
+
+  Fix exception in names() when an unsupported argument is passed. The
+    desired functionality was to return a 404 error, which is now
+    implememted and documented.
+
+  Change verify_hostname default back to true, since it appears that
+    Perl is accepting Mike McCants' Cert again.
+
+0.088		2014-08-31	T. R. Wyant
+  Properly apply Space Track default fetch options when the options were
+    passed to a Space Track search method in a hash reference, rather
+    than command-line style.
+
+0.087		2014-08-29	T. R. Wyant
+  Use global variable $SPACETRACK_DELAY_SECONDS to control the delay
+    between Space Track queries. This is initialized from environment
+    variable SPACETRACK_DELAY_SECONDS if it is true; otherwise it is
+    initialized to 3.
+
+  Throttle Space Track queries to 1 every 3 seconds.  Space Track
+    announced August 19 2014 that they intend to throttle queries to
+    less than 20 per minute per user as of September 22 2014.  They seem
+    to have jumped the gun though, since throttling seems necessary now.
+
+  Remove all RCS-specific functionality.  This includes making -rcs do
+    nothing. On August 18 2014 Space Track started returning 0 for RCS,
+    instead going for "small," "medium," and "large" in a new JSON
+    field.  The -rcs option is now deprecated, and being put through the
+    usual deprecation cycle.
+
+  Set default value of verify_hostname attribute to false. This is
+    because Perl does not accept Mike McCants' GoDaddy certificate. The
+    default can be overridden using environment variable
+    SPACETRACK_VERIFY_HOSTNAME if it is defined.
+
+  Remove all references to obsolete spacetrack() canned queries
+    full_fast and geosynchronous_fast in the documentation. The queries
+    themselves are long gone.
+
+  Prepare for removal of the RCSVALUE datum in Space Track's satcat
+    data, which is announced for August 18 2014.
+
+  Add 'prompt' attribute.
+
+  Add ISS data to celestrak_supplemental.
+
+  Support the various Space Track data formats. This involves providing
+    a -format option, with values corresponding to the Space Track
+    formats, plus 'legacy' (the default) to provide what is essentially
+    the Version 1 data format. The old -json option is equivalent to
+    -format json.
+
+0.086		2014-04-26	T. R. Wyant
+  Eliminate ugly warning generated when searching Space Track if
+    -start_epoch or -end_epoch options are specified.
+
+  Eliminate use of each() built-in.
+
+0.085		2014-03-20	T. R. Wyant
+  When mccants() and friends return data from cache, fabricate
+    Last-Modified header with file modification date.
+
+  Bypass mccants() cache test for installation, since it seems to fail
+    sporadically, and the data appear to be unaffected.
+
+  Try to address test failures in mccants() under older Windows (plus
+    one under FreeBSD) due to unseekability of the handle produced by
+    open my $fh, '+<', \( $resp->content() );
+
+  Fix problem in the login() method detecting a Space Track login
+    failure.
+
+  Add method mccants() to access TLE, magnitude, and RCS data mainteined
+    by Mike McCants on his web site. Because these do not get updated
+    that often, there is a 'file' option which, if specified, caches the
+    results and fetches them from the web only if the cache is stale.
+
+  Add 'file' option (as above) to amsat() and celestrak_supplemental().
+
+  Add cache_hit() and associated machinery to determine whether
+    information came from the web or from a file.
+
+  Add information on celestrak() catalog 'argos'.
+
+  Factor the query tests into multiple files, so they can run in
+    parallel.
+
+0.084		2014-01-01	T, R, Wyant
+  Have celestrak() and celestrak_supplemental() return error status if
+    the argument is undefined.
+
+  Drop deprecated spacetrack() catalogs full_fast and
+    geosynchronous_fast.
+
+  Add celestrak_supplemental() catalog 'ses'.
+
+  Remove support for environment variables SPACETRACK_REST_RANGE_OPERATOR
+    and SPACETRACK_REST_FRACTIONAL_DATE.
+
+0.083		2013-11-23	T. R. Wyant
+  Add Space Track search option -comment. This adds the Comment field to
+    the satcat results returned by the search_* methods.
+
+0.082		2013-11-08	T. R. Wyant
+  Use O-O version of Getopt::Long to parse command-style options, to
+    prevent configuration leaking in (or out). This requires
+    Getopt::Long 2.39.
+
+  Validate options passed as a hash reference, at least for unexpected
+    keys. The previous version simply ignored these, but I decided I
+    wanted feedback to the caller. It is a warning for now, but will
+    eventually become fatal.
+
+  Environment variable SPACETRACK_SKIP_OPTION_HASH_VALIDATION can be set
+    to suppress the warning.
+
+0.081		2013-10-21	T. R. Wyant
+  Add object status 'TBA' (added by Space Track October 1 2013). This
+    _should_ only affect the -exclude option.
+
+  Delete commented-out code that goes back to the v1 interface.
+
+  Build queries using standard names and data represenations, rather
+    than Space-Track-specific ones. This change _should_ not affect the
+    user.
+
+0.080		2013-10-05	T. R. Wyant
+  Correct failures in t/query.t due to incorrect URL being used to see
+    if Mike McCants' web site is actually available.
+
+0.079		2013-10-02	T. R. Wyant
+  Try to handle failures due to the U. S. government shutdown so that
+    they do not cause test failures. They're still errors, though, just
+    forced to 402 Payment required.
+
+0.078		2013-09-28	T. R. Wyant
+  Fix attempt to modify read-only variable in t/query.t.
+
+  Strip out all code that refers to version 1 of the Space Track API.
+
+  Remove all reference to the Celestrak 'sts' catalog or the Human
+    Spaceflight 'shuttle' catalog.
+
+  Silence uninitialized value warning in t/spacetrack_request.t under
+    older Perls.
+
+0.077		2013-07-15	T. R. Wyant
+  Make it an error to set space_track_version to 1. Eliminate all
+    documentation of the version 1 API, and make version 2 documentaion
+    not refer to API version. Code for the version 1 API will be removed
+    in subsequent releases.
+
+0.076		2013-07-01	T. R. Wyant
+  Deprecated spacetrack() queries (the *_fast ones) become fatal.
+
+  Document intent to remove support for environment variables
+    SPACETRACK_REST_RANGE_OPERATOR and SPACETRACK_REST_FRACTIONAL_DATE
+    in the first release after January 1 2014.
+
+  Install the SpaceTrack script by default.
+
+  Eliminate prompting for whether to install SpaceTrack. The -y and -n
+    options are still available.
+
+  Move the SpaceTrackTk script to the eg/ directory.
+
+  Eliminate Win32 and VMS specific code in the installers.
+
+  Document the desupport of the Space Track version 1 interface as of
+    this release.
+
+  No longer test version 1 of the Space Track interface, since it is
+    scheduled to stop working.
+
+0.075		2013-06-14	T. R. Wyant
+  Document that the Space Track version 1 API will be shut down July 16
+    2013.
+
+  Emit a warning any time the space_track_version attribute is set to 1.
+    This warning can not be suppressed by 'no warnings qw{ deprecated }'.
+
+  Add Beidou navigation satellites to the list of named element sets
+    available via the celestrak() method.
+
+0.074		2013-05-12	T. R. Wyant
+  Make the value returned by launch_sites( { json => 1 } ) under the v2
+    interface conform to the documentation. I was really sloppy with
+    this and returned the raw JSON (which was an array ref) when the
+    docs called for (and I really wanted) the JSON for a hash ref.
+
+0.073		2013-02-21	T. R. Wyant
+  Move Space Track REST interface to production web site.
+
+  Deprecate the version 1 Space Track interface.
+
+0.072		2013-02-17	T. R. Wyant
+  Make default value of space_track_version attribute 2.
+
+0.071		2013-02-16	T. R. Wyant
+  Attempts to retrieve Space Shuttle data (via celestrak('sts') or
+    spaceflight('shuttle') now cause exceptions. Retrieval of historical
+    data from Space Track should still work as before.
+
+  Convert the REST version of the launch_sites() method to use the new
+    launch_site data instead of canned data.
+
+  Space Track dropped RCSSOURCE from class satcat of the REST interface.
+    This revision eliminates all references to this field.
+
+0.070		2012-12-26	T. R. Wyant
+  Add notification that I plan to change the way Makefile.PL and
+    Build.PL decide whether to install executables July 1 2013.
+
+  Add method favorite() to access the Space Track 'Favorites'
+    functionality. This only works for the Space Track version 2
+    interface.
+
+  Add to the spacetrack() method for version 2 of the interface those
+    bulk data catalogs which are represented by 'Global Favorites'.
+
+  Add 'YUN' (Yunsong, DPRK) to hard-coded list of launch sites returned
+    by the Space Track REST interface.
+
+  Re-instate the use of hour, minute, and second spacifications in
+    -start_epoch and -end_epoch for the Space Track REST interface.
+
+  Go back to using OID ranges in the retrieve() method if the Space
+    Track REST interface is being used.
+
+  Document environment varoables SPACETRACK_REST_RANGE_OPERATOR and
+    SPACETRACK_REST_FRACTIONAL_DATE, so users can get themselves going
+    again if there are further glitches in the related functionality.
+
+  Add method celestrak_supplemental() to retrieve the supplemental TLEs
+    not derived from SpaceTrack.
+
+  Correct bug in celestrak() method, in which the Space Track REST
+    options were being parsed when they should not have been. This was
+    really two bugs: use of get() rather than getv() to check the Space
+    Track version, and failure to check the 'direct' attribute.
+
+0.069		2012-11-09	T. R. Wyant
+  Do not pass the time portion of a date/time query to the Space Track
+    REST interface, since it seems not to handle it (though I thought it
+    did at one time).
+
+0.068		2012-10-26	T. R. Wyant
+  Retract use of ranges when fetching from Space Track REST interface by
+    OID, since it appears this is not stable yet.
+
+0.067		2012-10-25	T. R. Wyant
+  Document a new Celestrak "direct-fetch only" data set, 2012-044, which
+    represents the explosion of a Breeze-M upper stage (2012-044C) on
+    October 16 2012.
+
+  Re-instate the use of ranges when fetching a number of OIDs via the
+    Space Track REST interface, since they are supported now.
+
+  Fix bug that allowed Kelso's Iridium status to "bleed through" into
+    the McCants status data.
+
+0.066		2012-10-15	T. R. Wyant
+  Add methods country_names() and launch_sites(), to return the
+    expansions of the relevant abbreviations in either tabular form or
+    JSON. Under space_track_version == 2, launch_sites() is hard-coded,
+    since this information is not available under the REST interface.
+
+  The box_score() method now takes option -json, to return the data in
+    JSON format. If space_track_version == 1, the JSON is made up from
+    the tabular data.
+
+0.065		2012-10-09	T. R. Wyant
+  Retract the merging of names from observing lists (in celestrak() and
+    file()) in REST queries, since we can now get them direct from the
+    REST interface in all cases. This was introduced in 0.062, with the
+    statement that it was temporary.
+
+  Don't use OID ranges in REST queries, since they do not work in
+    combination with comma-separated lists.
+
+  Change the size of a retrieve() batch to 200, since larger queries
+    seem to be faster.
+
+  Add method update(). This works with the REST interface only, and
+    therefore ignores the space_track_version setting. It takes as its
+    argument the name of a JSON file containing TLE data, and updates it
+    using '/FILE/>...'. The return is whatever format you want.
+
+  Make the REST options work with the spacetrack() method.
+
+  Enable the -sort and -descending options on REST queries. These were
+    previously hard-wired (to -sort epoch -descending) because of
+    problems early in the beta, which seem to be solved.
+
+  Recode the REST versions of spacetrack( 'full' ) and spacetrack(
+    'geosynchronous' ) to go through class satcat to eliminate bodies
+    that have decayed. Provide 'full_fast' and 'geosynchronous_fast' for
+    those who like to live dangerously. The last two are considered
+    experimental, and may be retracted.
+
+  Get the object name from field OBJECT_NAME when using the Space Track
+    REST interface, in all cases.
+
+  Make use of the new TLE_LINE0 field in the tle and tle_latest classes
+    to have the version 2 retrieve() method return common names.
+
+  INCOMPATIBLE CHANGE: In JSON output, the object name is now in field
+    OBJECT_NAME. Previously there was no object name in the tle data,
+    and I was hammering it into field SATNAME, since that is where it
+    was in the satcat data.
+
+  Give spacetrack_query_v2() the ability to add header pragmas if it
+    discovers it was called from outside the Astro::SpaceTrack name
+    space.  It adds 'spacetrack-type = modeldef' if the query is
+    'basicspacedata => "modeldef"', and 'spacetrack-type = orbit' if the
+    query is 'basicspacedata => "query", class => 'tle'" or '... class
+    => "tle_latest"'.
+
+  Change attribute verify_hostname's default value to true again, since
+    Space Track says they have their act together.
+
+  Correct documented name of class used to retrieve current TLE data
+    using the Space Track REST interface. It's 'tle_latest', not
+    'tle_current'.
+
+0.064		2012-09-05	T. R. Wyant
+  Add REST support for as many of the spacetrack() bulk data sets as I
+    can figure out. The analysis is in Astro::SpaceTrack::BulkData.
+
+  The default -status for a REST query is now 'onorbit'. The default for
+    version 1 queries remains 'all'.
+
+  Space Track REST queries now use the 'tle_latest' class unless
+    historical data are needed, as indicated by use of -start_epoch,
+    -end_epoch, -since_file, or some -status other than 'onorbit'.
+
+  Add 'time' and 'olist' meta-commands to the shell() method. The latter
+    is experimental, and may go away.
+
+  Eliminate superfluous REST queries issued by search_name() and
+    search_oid(). These were introduced in 0.060_07.
+
+  Suppress appending of '--rcs' to the common name by the REST interface
+    when RCSVALUE is null.
+
+  Fix problem with merging names from an observing list into JSON REST
+    data.
+
+0.063		2012-08-29	T. R. Wyant
+  Imposed Space Track REST cookie expiration of an hour. The cookie
+    appears to come with no expiration, but the docs say it's only good
+    for about 2 hours.
+
+  Followed change to representation if International Launch Designator
+    (INTLDES) in Space Track REST class tle. It was yyyy-lllp, but is
+    now yylllp, just like Space Track version 1.
+
+0.062		2012-08-25	T. R. Wyant
+  Fix the joining of JSON data when one of the lists is empty.
+
+  Have the celestrak() and file() methods supply common names from their
+    sources if the with_name attribute is true and the
+    space_track_version attribute is 2. This functionality will be
+    retracted when (and if) the Space Track REST interface becomes
+    capable of supplying NASA-format TLEs.
+
+  Document the fact that Space Track has deprecated bulk data downloads,
+    and plans to remove them in October 2012. This will break the
+    spacetrack() method.
+
+  Use more recent datas for launch date and historical query tests in
+    t/query.t, since it seems that Space Track purged the version 2 TLE
+    database on August 24 2012.
+
+0.061		2012-08-15	T. R. Wyant
+  Reinstate the headings returned by -notle searches done with
+    space_track_version set to 1. These were lost in version 0.060_09.
+
+  When the space_track_version attribute is 2, implement the -exclude
+    search option in terms of the OBJECT_TYPE field rather than by
+    simulating the version 1 exclusion rules in the client. This can
+    mean different search results depending on the interface used (e.g.
+    Westford needles are debris under v1, but payload under v2), but
+    since the change seems to be deliberate on the part of Space Track,
+    I am following it.
+
+0.060_12	2012-08-07	T. R. Wyant
+  Turn on autoflush in t/query.t to try to prevent overwriting of
+    prompt.
+
+  Have the REST version of retrieve() issue multiple queries if the
+    number of OIDs is over 50.
+
+  Add the ability to handle OID ranges to the REST versions of
+    retrieve() and search_oid().
+
+  Have the output of names( 'spacetrack' ) depend on the value of the
+    space_track_version attribute.
+
+  Have the shell() method extract redirections from the command line
+    before un-quoting and un-escaping the data, so that we have a way to
+    force something that looks like a redirection to be taken as an
+    argument.
+
+  Add ':' to the list of 'safe' characters when URI-escaping arguments
+    to the Space Track REST interface. Percent-encoded colons seemed to
+    stop working some time between 13:15 and 19:15 GMT on July 27 2012.
+    Un-encoded colons go through fine.
+
+  Accept ':' as well as '/' as punctuation between username and password
+    in environment variable SPACETRACK_USER.
+
+  Have t/query.t try to load Term::ReadKey. If successful, it uses it to
+    turn off password echoing. If not successful, it adds '(ECHOED)' to
+    the prompt.
+
+  Fix problem associating RCS data with TLEs when using version 1 of the
+    Space Track interface and the OID in the search results is less than
+    five digits.
+
+  Change default value of verify_hostname attribute to false. And about
+    time.
+
+  Add attribute 'pretty' to reqest that JSON text (and potentially
+    others) be pretty-formatted.
+
+  Expose the name of the Space Track session cookie as an attribute.
+    This is one of those attributes which have distinct values for each
+    value of space_track_version.
+
+  Have the parser for the retrieve() -start_epoch and -end_epoch options
+    accept time of day as well as just date. Pass time of day to the
+    server when using the Space Track REST interface.
+
+  Further deprecate celestrak( 'sts' ) and spaceflight( 'shuttle' ) so
+    that they give a warning every time they are used.
+
+  If both -json and -rcs are in effect, return RCSSOURCE as well as
+    RCSVALUE.
+
+  Have the attribute_names() method take account of the fact that the
+    'cookie_expires' attribute does not exist if the space_track_version
+    attribute is set to 2.
+
+  Ignore the -sort and -descending retrieve() options when using the
+    Space Track REST interface. As things now stand, I have to force the
+    equivalent of -sort=epoch -descending when retrieve()-ing multiple
+    OIDs to get sane results.
+
+  Add a -json retrieve() option, valid only if the REST interface is in
+    use. This also works with celestrak() and file() if the
+    space_track_version attribute is 2, but with celestrak() the usual
+    restrictions on retrieve() options apply.
+
+  Retrieve TLEs for multiple OIDs in a single call to the Space Track
+    REST interface.
+
+  Require HTTP::Status 6.03, because I can't forebear to use the
+    "teapot" status for testing purposes.
+
+  Expose spacetrack_query_v2(), which is our lowest-level interface to
+    Space Track version 2.
+
+  Use JSON rather than YAML for serialization in (e.g.)
+    t/spacetrack_request.t, since the former is now a requirement, but
+    the latter never was.
+
+  Bit-mapped the unsupported dump_headers attribute.
+
+  Eliminated the unsupported debug_url attribute.
+
+  Implement epoch selection of TLEs via the Space Track REST interface.
+
+  Run all the Space Track REST arguments through URI::Escape, which has
+    been added as a requirement.
+
+  Try to detect Space Track login failure due to a host verification
+    problem, and recommend setting the verify_hostname attribute false.
+
+  Correct erroneous skip() outside SKIP: block in t/query.t.
+
+  Add JSON as dependency. It's used by the Space Track V2 interface.
+
+  Provide access to Space Track v2 REST interface, which is currently in
+    beta. This involves adding attribute space_track_version. Attributes
+    cookie_expires, domain_space_track, and session_cookie now have
+    separate values for each possible value of space_track_version.
+    Due to limitations of the version 2 interface, bulk data downloads
+    throw an exception, and the with_name attribute is ignored by
+    retrieve().
+
+  Add a logout() method, which deletes all the session cookies. I
+    considered having it only delete the session cookie for the current
+    space_track_version, but decided that this was too confusing.
+
+  Fix problem with Astro::SpaceTrack file() method passing its options
+    hash to the retrieve() method as an OID. This was probably
+    introduced in version 0.020.
+
+  Bump Test::More requirement from 0.88 to 0.96 so I can do subtests.
+
+  Add method content_interface, which returns the version of the Space
+    Track interface use to fetch the data. If Space Track was not
+    involved, returns undef.
+
+  Add verify_hostname option to SpaceTrackTk settings window. Add
+    'Settings ...' button to login screen.
+
+0.060		2012-06-09	T. R. Wyant
+  Add Astro::SpaceTrack attribute verify_hostname. This controls the
+    corresponding SSL option for LWP::UserAgent. By default it is true,
+    but can be made false to deal with invalid (or at least
+    unrecognized) certificates,
+
+0.059		2012-06-02	T. R. Wyant
+  Get rid of YAML::Any in favor of YAML. They are both in the same
+    distro, and YAML does not suffer from deprecation warnings.
+
+0.058		2012-02-22	T. R. Wyant
+  Use GET rather than POST to implement Astro::SpaceTrack box_score(),
+    since 'POST' gives undefined errors during testing. Sometimes.
+
+0.057		2012-01-22	T. R. Wyant
+  Further deprecate the Astro::SpaceTrack celestrak( 'sts' ) and
+    spaceflight( 'shuttle' ) functionality by having them display a
+    warning on first use. The next step (warning on every use) will be
+    taken on or after July 22 2012.
+
+  Expand ranges passed to the search_oid() method, since the Space Track
+    API does not support them.
+
+  Bring Changes file into compliance with Test::CPAN::Changes. Add
+    author test xt/author/changes.t to be sure it remains so.
+
+0.056		2011-12-18	T. R. Wyant
+    Validate search options -exclude and -status even if they come in
+	through the API in a hash, not just if they come in as
+	command-line-style arguments.
+
+0.055		2011-11-28	T. R. Wyant
+    Update copy of GNU GPL in LICENSES/Copying to have current FSF
+        address.
+
+    Require Test::More 0.88 for testing.
+
+    Remove the Space Shuttle option from the SpaceTrackTk 'Human Space
+        Flight' dialog.
+
+0.054		2011-07-21	T. R. Wyant
+    With the end of the U.S. Space Shuttle program, deprecate the
+        celestrak() 'sts' catalog and the spaceflight() 'SHUTTLE'
+	argument. The latter now does nothing, so we will not get 404
+	errors when the web page goes away.
+
+0.053		2011-07-04	T. R. Wyant
+    Correct the URL for Mike McCants' Iridium status web page.
+
+0.052		2011-04-12	T. R. Wyant
+    Add attribute scheme_space_track_attribute, defaulting to 'https'.
+	Also added LWP::Protocol::https as a dependency. Both in
+	response to USSTRATCOM going to a secure server some time in the
+	last 24 hours. Thanks to Thomas Wehr for diagnosing this, and
+	reporting both problem and solution.
+
+0.051		2011-02-10	T. R. Wyant
+    Correct check for non-existent attribute in Astro::SpaceTrack getv()
+	method.
+
+    Update documentation of Mike McCants' status codes.
+
+0.050		2010-10-12	T. R. Wyant
+    _Really_ properly default the 'sort' retrieve option. Honest.
+
+0.049		2010-09-26	T. R. Wyant
+    Properly default the 'sort' retrieve option when options are
+	specified as a hash reference rather than as command-style
+	options.
+
+0.048		2010-09-18	T. R. Wyant
+    Correct skip counts in t/query.t. Add xt/author/query_skip_sites.t
+        to try to ensure they don't get out of whack again.
+
+0.047		2010-09-17	T. R. Wyant
+    Add Astro::SpaceTrack method getv() to do what get() should have
+	done -- return the attribute value without wrapping it in an
+	HTTP::Response object.
+
+    Add the -rcs option to the Astro::SpaceTrack search_*() methods, to
+	request that the radar cross-section data be hacked into the
+	name line of the TLE, in the same way that the effective date is
+	for Human Space Flight TLEs.
+
+    Complete rewrite of SpaceTrackTk, to incorporate all (or at least
+	the great majority) of the modern bells and whistles.
+
+    Update banner text to try to make clear that only Space Track
+	requires registration before use.
+
+    Update documentation to show all content_types.
+
+    Drop requirement for Params::Util.
+
+    Require Perl 5.6.2, since that is the earliest version I have  a
+	prayer of actually supporting.
+
+    Move author tests from xt/ to xt/author.
+
+0.046		2010-03-28	T. R. Wyant
+    Add methods search_decay(), search_oid(), and box_score().
+
+    Replace '' with undef in the array returned by the search_* methods
+	in list context. The HTTP::Response returned by these methods
+	is unchanged.
+
+    Add -notle option to the search_* methods. This causes them to
+        return the results of the search, rather than going on to
+	retrieve the TLEs. The results are one entry per line with
+	fields tab-delimited, and whitespace compressed and trimmed
+	front and back. No change in the list returned in list context,
+	except for the whitespace massaging.
+
+0.045		2010-03-01	T. R. Wyant
+    Redo README to be more like the CPAN-recommended organization and
+        contents.
+
+    Move developer tests to xt/, and run them with Build target
+        authortest, supplied by inc/My/Module/Build.pm. The author tests
+        are not supported with make.
+
+    Split off the data acquisition tests from t/basic.t into t/query.t.
+        Both these, plus xt/celestrak_datasets.t and xt/executable.t
+        were rewritten to use Test::More 0.40, which is now required for
+        building (or at least testing!) the package.
+
+    Make some of the tests in t/query.t TODO, since they require
+        historical data, and Space Track seems to have had a database
+        problem.
+
+    Convert all code to the CPAN-recommended license scheme. Update all
+        copyrights while I was at it.
+
+    Make the version of all production code in the package (including
+        Astro::SpaceTrack::Parser, which was previously unversioned) to
+        be the same as the package itself.
+
+    Update the counts for the various debris events that are documented
+        in Astro::SpaceTrack.
+
+0.044		2009-09-03	T. R. Wyant
+    Get rid of YAML dump in Build.PL, that was carelessly left in
+        after I convinced Module::Build not to insert itself as
+        required for configuration (because I also distribute
+        Makefile.PL
+
+0.043		2009-09-01	T. R. Wyant
+    Add the retrieve() options to search_id(), which never had them
+	before.
+
+    Test the request arguments generated for each of the Space Track
+	methods, to try to make sure we do not lose them again.
+
+0.042		2009-08-30	T. R. Wyant
+    Add the retrieve() options back to Space Track search requests.
+	These were lost in version 0.035 when Perl::Critic compliance
+	was added. Thanks to Thomas Wehr for finding this.
+
+0.041		2009-08-18	T. R. Wyant
+    Add ability to parse effective date from NASA Human Spaceflight.
+        Add this to line 0 of the NASA TLE as --effective date_text.
+        This is optional, and done only if '-effective' is passed
+	to the spaceflight() method. The reason this was done was to
+	support the 'effective' attribute of Astro::Coord::ECI::TLE.
+	Thanks to Thomas Wehr for reporting the problem this addresses,
+	and T. S. Kelso for explaining what was needed to fix it.
+
+0.040		2009-04-22	T. R. Wyant
+    Suppress undefined value warnings generated when username and
+	password are set via 'set' rather than via the relevant
+	environment variables when the object is instantiated.
+
+0.039		2009-03-09	T. R. Wyant
+    Document Celestrak 'direct-fetch-only' data sets
+	'cosmos-2251-debris' and 'iridium-33-debris'.
+    Fix 'spaceflight' retrieval test, which failed if all NASA's
+	orbital elements had epochs in the future.
+
+0.038		2009-02-13	T. R. Wyant
+    Correct parsing of Rod Sladen's Iridium status web page to
+	track the way he recorded the demise of Iridium 33.
+
+    Correct '## no critic' entries to put parens around names of
+	policies to be disabled.
+
+    Update t/perlcriticrc.
+
+0.037		2009-01-01	T. R. Wyant
+    Retract copyright year test in t/basic.t
+
+    Update version and copyright in Astro::SpaceTrack. No other
+	changes.
+
+0.036		2008-12-31	T. R. Wyant
+    Revise Celestrak retrieval status check to get (hopefully) a
+	better indication of what happened when retrieval failed.
+
+    Add dependency on Params::Util 0.012; use _INSTANCE from that
+	module, rather than eval{$thing->isa($class)}.
+
+    Use IO::File rather than FileHandle to open files.
+
+    Include t/critic.t (Test::Perl::Critic) and t/perlcriticrc
+	in distribution, but only test if environment variable
+	DEVELOPER_TEST is true.
+
+    Remove '## no critic' flags in code, which are not needed at
+	the desired severity (--stern) if run with the distributed
+	t/perlcriticrc file.
+
+0.035		2008-12-23	T. R. Wyant
+    When using Rod Sladen's data for Iridium status, mark all
+	'failed' iridiums as tumbling, whether or not there is
+	a 't' next to their numbers. This makes the Sladen data
+	consistent with Mike McCants' (as of 22-Dec-2008) and
+	T. S. Kelso's.
+
+    Bring all code up to perlcritic --stern (sometimes by
+	declaring exceptions)
+
+    Restructure Build.PL and Makefile.PL to better accomodate
+	the installed version of Module::Build or
+	ExtUtils::MakeMaker.
+
+    Add minimum Perl version to 'requires' key in Build.PL.
+	Not done in Makefile.PL because ExtUtils::MakeMaker
+	does not seem to like it.
+
+    Include t/celestrak_datasets.t, t/executable.t,
+	t/iridium_status.t, t/manifest.t, and
+	t/spacetrack_datasets.t in distribution, but only run
+	them if environment variable DEVELOPER_TEST is true.
+
+    Move changes from Astro::SpaceTrack pod to Changes file.
+
+    t/basic.t will now display net errors where generated and
+	(hopefully) appropriate.
+
+0.034		2008-11-24	T. R. Wyant
+    Eliminate use of UNIVERSAL::isa as a function.
+
+    Add 'Pragma spacetrack-source = ' header to all methods
+	that return TLEs or Iridium status, saying where
+	the data came from.
+
+    Add content_source() method to access spacetrack-source
+	header.
+
+    Try for less bad test coverage. Good coverage awaits a
+	rewrite of the shell() method.
+
+0.033		2008-09-30	T. R. Wyant
+    Fix Build.PL -y (and -n)
+
+    Add iridium_status('sladen') to scrape Rod Sladen's Iridium
+	Constallation Status web page.
+
+    Add attribute 'url_iridium_status_sladen'.
+
+0.032		2008-07-06	T. R. Wyant
+    More graceful failure when unable to parse Space Track data.
+
+0.031		2007-12-21	T. R. Wyant
+    Fix embedded modifier bug, exposed by the fixing of the
+	corresponding Perl bug (id=22354) in 5.10.0 -- or 5.9.0
+	actually. Thanks to Andy Lester's article:
+	http://perlbuzz.com/mechanix/2007/12/code-broken-by-regex-fixes-in.html
+	which tipped me off before I had to discover the problem
+	for myself.
+
+    Fixed dependencies in Makefile.PL and Build.PL.
+
+    Went back to prompting for executables in Makefile.PL and
+	Build.PL, as a way to handle apparant ActiveState build
+	failure because both they and I were running pl2bat.bat.
+
+    Enhance ExtUtils::MakeMaker version detection in Makefile.PL,
+	since ActiveState is apparantly deploying a Perl 5.10
+	with a development version of that module.
+
+0.030		2007-10-24	T. R. Wyant
+    Add Celestrak 'sts' data set name to catalog.
+
+    Different error text for data sets in catalog but 404 and data sets
+	not in catalog and 404.
+
+0.029		2007-10-13	T. R. Wyant
+    Add Celestrak galileo and sbas data set names to catalog.
+
+    Document celestrak data set names, or at least how to get them and
+	in general how they are formed.
+
+    Trap and error out on invalid spacetrack() data set numbers.
+
+    Add data set numbers to spacetrack() help.
+
+    Document how to get the current spacetrack data set names and
+	numbers, and what happens if they renumber.
+
+    Trap case where 'get' is called without an argument.
+
+    Have 'shell' method interpret 'show' as 'get', and special-case
+	'get' without arguments to display all attributes. Document
+	this.
+
+0.028		2007-05-15	T. R. Wyant
+   Interpret missing spacetrack() catalog as a failure,
+     even though the request succeeds.
+
+   Ditto missing Space Track retrieve() data.
+
+   Add 'fallback' attribute to cause celestrak() to fall
+     back to using Celestrak data if Space Track data
+     are not available.
+
+   Clear session cookie when username or password change.
+
+0.027		2007-01-30	T. R. Wyant
+   Add ability to search by on-orbit status ('onorbit',
+     'decayed', or 'all'), and to exclude 'debris' and
+     'rocket' (bodies).
+
+   Tweak docs.
+
+   Update copyright.
+
+0.026		2006-11-06	T. R. Wyant
+   New location for Mike McCants' Iridium status page.
+
+   New attributes url_iridium_status_kelso and
+     url_iridium_status_mccants so users are not dead
+     in the water if this happens again.
+
+0.025		2006-10-19	T. R. Wyant
+   Recognize new Kelso Iridium status '[+]' = working.
+
+   Make Makefile.PL not run Build.PL with old MakeMaker.
+
+   Retract kluge to Build.PL, which is no longer needed.
+
+0.024		2006-09-12	T. R. Wyant
+   No substantive changes to this module, but retracted
+     t/pod_spelling.t, and tried to make Build.PL work with
+     ActiveState's build system.
+
+0.023		2006-09-08	T. R. Wyant
+   Added spaceflight() pseudo-catalogs 'iss' and 'station'.
+
+   Have spaceflight() return NO_RECORDS on failure, not
+     NO_CAT_ID.
+
+   Have attribute_names() return list ref in scalar context.
+
+   Add attribute iridium_status_format; have iridium_status()
+     use this to decide who to access and what format to
+     return, including support for the new Celestrak status
+     information.
+
+   Have iridium_status() return parsed data with 'portable'
+     status if called in list context.
+
+0.022		2006-07-20	T. R. Wyant
+   Documentation corrections.
+
+0.021		2006-07-13	T. R. Wyant
+  Add -all qualifier to spaceflight().
+
+  Add search_date().
+
+0.020		2006-07-01	T. R. Wyant
+  Add the retrieve() qualifiers to spaceflight().
+
+  Add the attribute_names() method.
+
+  Tweak docs, correct spelling.
+
+0.019		2006-06-11	T. R. Wyant
+  Added the retrieve() options to celestrak() and file().
+
+0.018		2006-05-30	T. R. Wyant
+  Added amsat() method.
+
+0.017		2006-04-27	T. R. Wyant
+  Added retrieve() options.
+
+0.016		2006-02-11	T. R. Wyant
+  Added content types 'help' and 'get', so -filter
+    does not supress output.
+
+  Added iridium_status, & content type 'iridium-status'.
+
+0.015		2006-02-01	T. R. Wyant
+  Added webcmd attribute, and use it in help().
+
+0.014		2006-01-28	T. R. Wyant
+  Added filter attribute.
+
+  Jocky the Term::ReadLine code yet again.
+
+0.013		2005-11-21	T. R. Wyant
+  Added spaceflight() method.
+
+  Added "All rights reserved." to banner() output.
+
+  Spiffed up the documentation.
+
+0.012		2005-11-04	T. R. Wyant
+  Added support for number ranges in retrieve(), to
+    track support for these on www.space-track.org.
+
+  Added max_range attribute for sanity checking.
+
+0.011		2005-10-30	T. R. Wyant
+  Added 'Pragma: spacetrack-type = orbit' header to
+    the response for those methods that return orbital
+    elements, if the request in fact succeeded.
+
+  Added content_type() method to check for the above.
+
+  Played the CPANTS game.
+
+  Added "All rights reserved." to copyright statement.
+
+0.010		2005-10-14	T. R. Wyant
+  Added the 'direct' attribute, to fetch elements
+    directly from celestrak. And about time, too.
+
+0.009		2005-09-17	T. R. Wyant
+  Only require Term::ReadLine and create interface if
+    the shell() method actually called.
+
+0.008		2005-07-19	T. R. Wyant
+  Consolidate dump code.
+
+  Have file() method take open handle as arg.
+
+  Modify cookie check.
+
+  Add mutator, accessor for cookie_expires,
+    session_cookie.
+
+0.007		2005-04-15	T. R. Wyant
+  Document attributes (under set() method)
+
+  Have login return actual failure on HTTP error. Used
+    to return 401 any time we did not get the cookie.
+
+0.006		2005-04-08	T. R. Wyant
+  Added search_id method.
+
+  Made specimen scripts into installable executables.
+
+  Add pseudo-tilde expansion to shell method.
+
+0.005		2005-04-02	T. R. Wyant
+  Proofread and correct POD.
+
+0.004		2005-03-30	T. R. Wyant
+  Added file() method, for local observing lists.
+
+  Changed Content-Type header of spacetrack () response
+    to text/plain. Used to be text/text.
+
+  Manufactured pristine HTTP::Response for successsful
+    login call.
+
+  Added source method, for passing the contents of a file
+    to the shell method
+
+  Skip username and password prompts, and login and
+    retrieval tests if environment variable
+    AUTOMATED_TESTING is true and environment variable
+    SPACETRACK_USER is undefined.
+
+0.003		2005-03-26	T. R. Wyant
+  Initial release to CPAN.

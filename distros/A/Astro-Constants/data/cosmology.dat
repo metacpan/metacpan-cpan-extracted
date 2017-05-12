@@ -1,0 +1,28 @@
+# cosmology.dat
+#
+# Format: variable<tab>description<tab>CGS value<tab>MKS value
+#    or   variable<tab>description<tab>value
+#
+# CMB temperature http://wmap.gsfc.nasa.gov/universe/bb_cosmo_fluct.html
+#
+A_c	LIGHT_SPEED	speed of light in a vacuum	2.99792458e10	2.99792458e8	0
+A_G	GRAVITATIONAL	universal gravitational constant	6.67408e-8	6.67408e-11	4.7e-5
+A_h	PLANCK	Planck constant	6.626070040e-27	6.626070040e-34	1.2e-8
+A_hbar	HBAR	Planck's constant /2pi	1.054571800e-27	1.054571800e-34	1.2e-8
+A_sigma	STEFAN_BOLTZMANN	Stefan-Boltzmann constant	5.670367e-5	5.670367e-8	2.3e-6
+A_pc	PARSEC	parsec	3.08567758149e18	3.08567758149e16	1e-11
+A_AU	ASTRONOMICAL_UNIT	astronomical unit	1.496e13	149_597_870_700	0
+A_msun	SOLAR_MASS	solar mass	1.9885e33	1.9885e30	5e-5
+A_ly	LIGHT_YEAR	light year	9.4607304725808e17	9_460_730_472_580_800	0
+A_Lsun	SOLAR_LUMINOSITY	solar luminosity	3.846e33	3.846e26	0.0003
+A_Jy	JANSKY	Jansky	1e-23	1e-26	0.1
+A_rhoc	RHO_C	critical density /h^2	1.8791e-29	1.8791e-26	0.0001
+A_arad	A_RAD	radiation density constant	7.565723e-15	7.565723e-16	2.3e-6
+A_Wien	WIEN	Wien wavelength displacement law constant	2.8977729e-1	2.8977729e-3	5.7e-7
+A_alpha	ALPHA	fine structure constant	7.2973525664e-3	7.2973525664e-3	2.3e-10
+A_Z0	VACUUM_IMPEDANCE	characteristic impedance of vacuum	376.730313461	1e-50
+A_yr	YEAR	year	31_557_600	0
+A_tH	HUBBLE_TIME	Hubble time *h	3.0853056e17	0.0000001
+A_TCMB	CMB_TEMPERATURE	cosmic microwave background temperature	2.725	0.0007
+A_Vsun	SOLAR_V_MAG	solar V magnitude	-26.74	0.0004
+A_MVsun	SOLAR_V_ABS_MAG	solar absolute V magnitude	4.83	0.002

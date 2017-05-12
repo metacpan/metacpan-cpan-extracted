@@ -1,0 +1,14 @@
+
+{
+  'db_connect' => [
+                    'DBI:Pg:host=127.0.0.1 port=5432 dbname=aprojo',
+                    'aprojo',
+                    'db_user_secret',
+                    {
+                      PrintError => 1, AutoCommit => 1, RaiseError => 1, pg_enable_utf8 => 1,
+                    }
+                  ],
+  'db_schema' => 'AproJo::DB::Schema',
+  'secret' => 'app_secret'
+}
+

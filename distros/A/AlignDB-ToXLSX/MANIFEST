@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/AlignDB/ToXLSX.pm
+minil.toml
+t/00-load.t
+t/01-row.t
+t/02-column.t
+t/03-write_sql.t
+t/04-write_sql_dd.t
+t/90-sql_utils.t
+t/isw.csv
+META.yml
+MANIFEST

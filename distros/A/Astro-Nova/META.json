@@ -1,0 +1,80 @@
+{
+   "abstract" : "Perl interface to libnova",
+   "author" : [
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4008, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Astro-Nova",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Cwd" : "0",
+            "ExtUtils::CBuilder" : "0.15",
+            "ExtUtils::ParseXS" : "3.05",
+            "Module::Build" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Module::Build" : "0",
+            "lib" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "File::Spec" : "0",
+            "XSLoader" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Astro::Nova" : {
+         "file" : "lib/Astro/Nova.pm",
+         "version" : "0.07"
+      },
+      "Astro::Nova::DMS" : {
+         "file" : "lib/Astro/Nova/DMS.pm",
+         "version" : 0
+      },
+      "Astro::Nova::EquPosn" : {
+         "file" : "lib/Astro/Nova/EquPosn.pm",
+         "version" : 0
+      },
+      "Astro::Nova::GalPosn" : {
+         "file" : "lib/Astro/Nova/GalPosn.pm",
+         "version" : 0
+      },
+      "Astro::Nova::HMS" : {
+         "file" : "lib/Astro/Nova/HMS.pm",
+         "version" : 0
+      },
+      "Astro::Nova::LnLatPosn" : {
+         "file" : "lib/Astro/Nova/LnLatPosn.pm",
+         "version" : 0
+      },
+      "Astro::Nova::ZoneDate" : {
+         "file" : "lib/Astro/Nova/ZoneDate.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.07"
+}

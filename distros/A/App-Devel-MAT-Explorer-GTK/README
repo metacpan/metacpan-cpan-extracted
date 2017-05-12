@@ -1,0 +1,21 @@
+NAME
+
+    App::Devel::MAT::Explorer::GTK - GTK-based interactive explorer for
+    Devel::MAT
+
+INSTALLATION
+
+ SVG Loading
+
+    If running this program produces errors similar to
+
+       Couldn't recognize the image file format for file '.../Devel-MAT-UI/icons/refs-All.svg'
+       at .../App/Devel/MAT/Explorer/GTK/Resources.pm line 61.
+
+    this is likely because gdk-pixbuf does not have an image loader for the
+    SVG format. This is probably fixed by installing librsvg2, for example
+
+       $ apt-get install librsvg2-2
+       $ pkg install librsvg2
+       etc...
+

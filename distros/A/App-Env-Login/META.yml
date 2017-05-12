@@ -1,0 +1,31 @@
+---
+abstract: 'An App::Env application module which returns the login environment'
+author:
+  - 'The Smithsonian Astrophysical Observatory'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  Test::More: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  ExtUtils::MakeMaker: '6.36'
+dynamic_config: '0'
+generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Env-Login
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  App::Env: '0'
+  Shell::GetEnv: 0.08_04
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env-Login
+  license: http://www.gnu.org/licenses/gpl-3.0.html
+  repository: https://github.com/djerius/app-env-login
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

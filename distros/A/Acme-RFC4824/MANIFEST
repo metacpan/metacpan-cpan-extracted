@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Acme/RFC4824.pm
+t/00-load.t
+t/01-encode_decode.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+examples/ipsfss_receive.pl
+examples/ipsfss_send.pl
+META.yml                                 Module meta-data (added by MakeMaker)

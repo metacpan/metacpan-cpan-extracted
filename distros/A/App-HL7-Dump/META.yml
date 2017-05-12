@@ -1,0 +1,40 @@
+---
+abstract: 'Base class for hl7dump script.'
+author:
+  - 'Michal Spacek <skim@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-HL7-Dump
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+recommends:
+  Term::ANSIColor: 0
+requires:
+  Class::Utils: 0.03
+  English: 0
+  Error::Pure: 0.15
+  Getopt::Std: 0
+  Net::HL7::Message: 0
+  Perl6::Slurp: 0
+  perl: 5.6.0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-HL7-Dump
+  homepage: https://github.com/tupinek/App-HL7-Dump
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/tupinek/App-HL7-Dump
+version: '0.02'

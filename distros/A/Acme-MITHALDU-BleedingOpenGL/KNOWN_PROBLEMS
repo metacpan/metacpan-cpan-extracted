@@ -1,0 +1,61 @@
+* Does not support dynamic detection of OpenGL API support
+  and does not have bindings for modern OpenGL API since
+  approximately version 2.0
+
+* No way to specify/override the compile and link
+  options which causes problems on systems with multiple
+  OpenGL libraries installed (e.g., 32-bit and 64-bit).
+
+* Build may not complete if you do not have the
+  required FreeGLUT or Apple GLUT (on Mac OS X systems).
+
+* ActiveState automated PPM builds currently fail due to
+  what appears to be interface detection failures in their
+  build environment.  You'll need to use another PPM site
+  or build your own OpenGL: (1) install ASPerl on your
+  system, (2) do ppm install MinGW to get the compile
+  environment, (3) cpan -i OpenGL, and you should be done!
+
+* The build may fail if your FreeGLUT installation uses
+  freeglut.h as the name of its include file.  This may
+  happen if you have both original GLUT and FreeGLUT on
+  the same system.  Edit the Makefile produced and add
+  -DHAVE_FREEGLUT_H to the DEFINE = line and things may
+  compile then.
+
+* Configuration and compiling requires an active OpenGL
+  context on non-win32 systems (e.g. a display)
+
+* The calling interfaces for OpenGL, GLU, GLUT, GLX, X11,
+  and the perl module routines (names beginning with glp)
+  are in a state of flux and may not be in sync with the
+  current API documentation.
+
+* Too many "extra" variants of standard OpenGL functions.
+  Implementation progress with PDL has suggested a way
+  to simplify the bindings a la OpenGL::Simple.  TBD.
+
+* examples/planets:  works but has visual artifacts
+  examples/tk_steal: runs but maybe not correctly 
+
+*  Examples using GLX calls need to be ported to GLUT
+
+* Some of the functions taking pointer type arguments
+  have inconsistent usage for the gl*_p() variants:
+
+    glBufferDataARB_p(target,oga,usage)
+    glBufferSubDataARB_p(target,offset,oga)
+    glColorPointer_p(size, oga)
+    glEdgeFlagPointer_p(oga)
+    glIndexPointerEXT_p(oga)
+    glIndexPointer_p(oga)
+    glNormalPointerEXT_p(oga)
+    glNormalPointer_p(oga)
+    glTexCoordPointerEXT_p(size, oga)
+    glTexCoordPointer_p(size, oga)
+    glVertexPointerEXT_p(size, oga)
+    glVertexPointer_p(size, oga)
+
+* OpenGL::RPN operations can segfault.  Work is underway
+  to debug the stack issues which appear to be the root
+  cause.

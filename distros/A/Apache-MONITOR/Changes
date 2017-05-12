@@ -1,0 +1,9 @@
+Revision history for Perl extension Apache::MONITOR.
+
+0.01  Sat Dec 27 15:31:23 2003
+	- original version; created by h2xs 1.20 with options
+		-X -n Apache::MONITOR
+
+	- put together the basic functionality
+
+

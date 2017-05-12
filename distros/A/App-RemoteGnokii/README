@@ -1,0 +1,34 @@
+App-RemoteGnokii version 0.001
+==============================
+
+RemoteGnokii is a set of scripts that add networking to gnokii-smsd.
+With them, all messages received are forwarded to a given phone
+number, and messages can be sent via the HTTP gateway provided by
+RemoteGnokii.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ * Config::Any
+ * File::Slurp
+ * File::Which
+ * Plack::Request
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Marius Gavrilescu
+
+This library is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.

@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+use 5.006;
+use strict;
+use warnings;
+
+package    #  hide me
+  App::colourhexdump::stub;
+
+our $VERSION = '1.000003';
+
+# ABSTRACT: Command line stub for App::colourhexdump
+# PODNAME: colourhexdump
+
+our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
+use App::colourhexdump;
+
+App::colourhexdump->new_with_options()->run();
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+colourhexdump - Command line stub for App::colourhexdump
+
+=head1 VERSION
+
+version 1.000003
+
+=head1 AUTHOR
+
+Kent Fredric <kentnl@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric <kentnl@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

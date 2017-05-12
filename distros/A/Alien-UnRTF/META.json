@@ -1,0 +1,52 @@
+{
+   "abstract" : "Build and make available the unrtf tool",
+   "author" : [
+      "Joenio Costa <joenio@joenio.me>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-UnRTF",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Autotools" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0",
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "File::ShareDir" : "1.00"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::UnRTF" : {
+         "file" : "lib/Alien/UnRTF.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/joenio/p5-alien-unrtf"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

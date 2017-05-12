@@ -1,0 +1,46 @@
+# -*- Mode: Perl -*-
+
+ABSV_UINT     T_UINT
+
+######################################################################
+# perl->C
+INPUT
+
+T_INT
+  {
+      $var = SvIV($arg);
+  }
+
+T_UINT
+  {
+      $var = SvUV($arg);
+  }
+
+T_FLOAT
+  {
+      $var = SvNV($arg);
+  }
+
+######################################################################
+# C->perl
+OUTPUT
+
+T_CHAR
+  {
+      sv_setpvn($arg,&$var,1);
+  }
+
+T_INT
+  {
+      sv_setiv($arg,$var);
+  }
+
+T_UINT
+  {
+      sv_setuv($arg,$var);
+  }
+
+T_FLOAT
+  {
+      sv_setnv($arg,$var);
+  }

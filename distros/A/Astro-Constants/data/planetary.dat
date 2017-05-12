@@ -1,0 +1,31 @@
+# astroconst.dat
+#   v2.3, 3 June 2002
+#   Jeremy Bailin (jbailin@as.arizona.edu)
+#
+# Format: variable<tab>description<tab>CGS value<tab>MKS value
+#    or   variable<tab>description<tab>value
+#
+# solar/earth/lunar data http://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html
+#
+A_G	GRAVITATIONAL	universal gravitational constant	6.67408e-8	6.67408e-11	4.7e-5
+A_pc	PARSEC	parsec	3.08567758149e18	3.08567758149e16	1e-11
+A_AU	ASTRONOMICAL_UNIT	astronomical unit	1.496e13	149_597_870_700	0
+A_msun	SOLAR_MASS	solar mass	1.9885e33	1.9885e30	5e-5
+A_rsun	SOLAR_RADIUS	solar radius	6.96e10	6.96e8	0.002
+A_ly	LIGHT_YEAR	light year	9.4607304725808e17	9_460_730_472_580_800	0
+A_Lsun	SOLAR_LUMINOSITY	solar luminosity	3.846e33	3.846e26	0.0003
+A_mearth	EARTH_MASS	mass of Earth	5.9726e27	5.9726e24	1.7e-5
+A_rearth	EARTH_RADIUS	radius of Earth	6.371e8	6.371e6	0.0002
+A_Wien	WIEN	Wien wavelength displacement law constant	2.8977729e-1	2.8977729e-3	5.7e-7
+# effective surface temperature 
+A_Tsun	SOLAR_TEMPERATURE	surface temperature of sun	5778	0.0002
+A_dsun	SOLAR_DENSITY	mean solar density	1.408	1408	0.001
+A_dearth	EARTH_DENSITY	mean Earth density	5.514	5514	0.0002
+A_gsun	SOLAR_GRAVITY	solar surface gravity	27400	274.0	0.0004
+A_gearth	EARTH_GRAVITY	Earth surface gravity	978	9.78	0.001
+A_Vsun	SOLAR_V_MAG	solar V magnitude	-26.74	0.0004
+A_MVsun	SOLAR_V_ABS_MAG	solar absolute V magnitude	4.83	0.002
+A_rmoon	LUNAR_RADIUS	lunar radius	1.7381e8	1.7381e6	6e-5
+A_mmoon	LUNAR_MASS	lunar mass	7.342e25	7.342e22	0.0002
+A_amoon	LUNAR_SM_AXIS	lunar orbital semi-major axis	3.844e10	3.844e8	0.0003
+A_emoon	LUNAR_ECCENTRICITY	lunar orbital eccentricity	0.0549	0.002

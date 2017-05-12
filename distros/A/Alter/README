@@ -1,0 +1,328 @@
+NAME
+    Alter - *Alter Ego* Objects
+
+  Synopsis
+      package MyClass;
+      use Alter ego => {}; # Alter ego of type hash
+
+      # Put data in it
+      my $obj = \ do { my $o };
+      ego( $obj)->{a} = 1;
+      ego( $obj)->{b} = 2;
+
+      # Retrieve it again
+      print ego( $obj)->{ b}, "\n"; # prints 2
+
+      package OtherClass;
+      defined( ego $obj) or die; # dies, OtherClass hasn't set an alter ego
+
+      # Direct access to the corona of alter egos
+      my $crown = Alter::corona $obj;
+
+  Functions
+   Basic Functions
+    The functions described here accept a first argument named $obj. Despite
+    the name, $obj can be any reference, it doesn't *have* to be blessed
+    (though it usually will be). It is a fatal error if it is not a
+    reference or if the reference points to a read-only value.
+
+    "ego($obj)"
+        Retrieves the class-specific *alter ego* assigned to $obj by
+        "alter()" or by autovivification if that is enabled. If neither is
+        the case, an undefined value is returned. The class is the package
+        into which the call to "ego()" is compiled.
+
+    "alter($obj, $val)"
+        Assigns $val to the reference $obj as an *alter ego* for the
+        caller's class. The class is the package into which the call to
+        "alter" is compiled. Returns $obj (*not* the value assigned).
+
+    "Alter::corona( $obj)"
+        Direct access to the *corona* of *alter ego*'s of $obj. The corona
+        is a hash keyed by class name in which the alter ego's of an object
+        are stored. Unlike "alter()" and "ego()", this function is not
+        caller-sensitive. Returns a reference to the corona hash, which is
+        created if necessary. This function is not exported, if needed it
+        must be called fully qualified.
+
+    "Alter::is_xs"
+        Returns a true value if the XS implementation of "Alter" is active,
+        false if the pure Perl fallback is in place.
+
+   Autovivification
+    You can set one of the types "SCALAR", "ARRAY", "HASH" or "GLOB" for
+    autovivification of the alter ego. This is done by specifying the type
+    in a "use" statement, as in
+
+        package MyClass;
+        use Alter 'ARRAY';
+
+    If the "ego()" function is later called from "MyClass" before an alter
+    ego has been specified using "alter()", a new *array reference* will be
+    created and returned. Autovivification happens only once per class and
+    object. (You would have to delete the class entry from the object's
+    corona to make it happen again.)
+
+    The type specification can also be a referece of the appropriate type,
+    so "[]" can be used for "ARRAY" and "{}" for "HASH" (globrefs and scalar
+    refs can also be used, but are less attractive).
+
+    Type specification can be combined with function imports. Thus
+
+        package MyClass;
+        use Alter ego => {};
+
+    imports the "ego()" function and specifies a hash tape for
+    autovivification. With autovivification you will usually not need to
+    import the "alter" function at all.
+
+    Specifying "NOAUTO" in place of a type specification switches
+    autovivification off for the current class. This is also the default.
+
+   Serialization Support
+    Serialization is supported for human inspection in "Data::Dumper" style
+    and for disk storage and cloning in "Storable" style.
+
+    For "Data::Dumper" support "Alter" provides the class "Alter::Dumper"
+    for use as a base class, which contains the single method "Dumper".
+    "Dumper" returns a string that represents a hash in "Data::Dumper"
+    format. The hash shows all *alter ego*s that have been created for the
+    object, keyed by class. An additional key "(body)" (which can't be a
+    class name) holds the actual body of the object. Formatting- and other
+    options of "Data::Dumper" will change the appearance of the dump string,
+    with the exception of $Data::Dumper::Purity, which will always be 1.
+    "Dumper" can also be imported from "Alter" directly.
+
+    Note that "eval()"-ing a dump string will *not* restore the object, but
+    rather create a hash as described. Re-creation of an object is only
+    available through "Storable".
+
+    For "Storable" support the class "Alter::Storable" is provided with the
+    methods "STORABLE_freeze", "STORABLE_thaw" and "STORABLE_attach". The
+    three functions are also exported by "Alter" Their interaction with
+    "Storable" is described there.
+
+    Inheriting these methods allows "Storable"'s own functions "freeze()"
+    and "thaw()" to save and restore an object's *alter ego*s along with the
+    actual object body. Other "Storable" functions, like "store", "nstore",
+    "retrieve", etc. also become Alter-aware. There is one exception.
+    "Storable::dclone" cannot be used on "Alter"-based objects. To clone an
+    "Alter"-based object, "Storable::thaw(Storable::freeze($obj)" must be
+    called explicitly.
+
+    Per default, both "Alter::Dumper" and "Alter::Storable" are made base
+    classes of the current class (if necessary) by "use Alter". If the
+    function "Dumper" is imported, or if "-dumper" is specified,
+    "Alter::Dumper" is not made a base class. If any of the functions
+    "STORABLE_freeze", "STORABLE_thaw" or "STORABLE_attach" is imported, or
+    if "-storable" is specified, "Alter::Storable" is not made a base class.
+
+   Fallback Perl Implementation
+    "Alter" is properly an XS module and a suitable C compiler is required
+    to build it. If compilation isn't possible, the XS part is replaced with
+    a *pure Perl* implementation "Alter::AlterXS_in_perl". That happens
+    automatically at load time when loading the XS part fails. The boolean
+    function "Alter::is_xs" tells (in the obvious way) which implementation
+    is active. If, for some reason, you want to run the Perl fallback when
+    the XS version is available, set the environment variable
+    "PERL_ALTER_NO_XS" to a true value before "Alter" is loaded.
+
+    This fallback is not a full replacement for the XS implementation.
+    Besides being markedly slower, it lacks key features in that it is *not*
+    automatically garbage-collected and *not* thread-safe. Instead,
+    "Alter::AlterXS_in_perl" provides a "CLONE" method for thread safety and
+    a universal destructor "Alter::Destructor::DESTROY" for garbage
+    collection. A class that uses the pure Perl implementation of "Alter"
+    will obtain this destructor through inheritance (unless "-destroy" is
+    specified with the "use" statement). So at the surface thread-safety and
+    garbage-collection are retained. However, if you want to add your own
+    destructor to a class, you must make sure that both (all) destructors
+    are called as needed. Perl only calls the first one it meets on the @ISA
+    tree and that's it.
+
+    Otherwise the fallback implementation works like the original. If
+    compilation has problems, it should allow you to run test cases to help
+    decide if it's worth trying. To make sure that production code doesn't
+    inadvertently run with the Perl implementation
+
+      Alter::is_xs or die "XS implementation of Alter required";
+
+    can be used.
+
+  Exports
+    None by default, "alter()" and "ego()" upon request. Further available
+    are "STORABLE_freeze", "STORABLE_thaw" and "STORABLE_attach" as well as
+    "Dumper". ":all" imports all these functions.
+
+  Environment
+    The environment variable "PERL_ALTER_NO_XS" is inspected once at load
+    time to decide whether to load the XS version of "Alter" or the pure
+    Perl fallback. At run time it has no effect.
+
+  Description
+    The "Alter" module is meant to facilitate the creation of classes that
+    support *black-box inheritance*, which is to say that an "Alter" based
+    class can be a parent class for *any other* class, whether itself
+    "Alter" based or not. Inside-out classes also have that property.
+    "Alter" is thus an alternative to the *inside-out* technique of class
+    construction. In some respects, "Alter" objects are easier to handle.
+
+    Alter objects support the same data model as traditional Perl objects.
+    To each class, an Alter object presents an arbitrary reference, the
+    object's *alter ego*. The type of reference and how it is used are the
+    entirely the class's business. In particular, the common practice of
+    using a hash whose keys represent object fields still applies, only each
+    class sees its individual hash.
+
+    "Alter" based objects are garbage-collected and thread-safe without
+    additional measures.
+
+    "Alter" also supports "Data::Dumper" and "Storable" in a generic way, so
+    that "Alter" based objects can be easily be viewed and made persistent
+    (within the limitations of the respective modules).
+
+    "Alter" works by giving every object a class-specific *alter ego*, which
+    can be any scalar, for its (the classe's) specific needs for data
+    storage. The alter ego is set by the "alter()" function (or by
+    autovivification), usually once per class and object at initialization
+    time. It is retrieved by the "ego()" function in terms of which a class
+    will define its accessors.
+
+    That works by magically (in the technical sense of "PERL_MAGIC_ext")
+    assigning a hash keyed by classname, the *corona*, to every object that
+    takes part in the game. The corona holds the individual alter ego's for
+    each class. It is created when needed and stays with an object for its
+    lifetime. It is subject to garbage collection when the object goes out
+    of scope. Normally the corona is invisible to the user, but the
+    "Alter::corona()" function (not exported) allows direct access if
+    needed.
+
+  Example
+    The example first shows how a class "Name" is built from two classes
+    "First" and "Last" which implement the first and last names separately.
+    "First" treats its objects as hashes whereas "Last" uses them as arrays.
+    Nevertheless, the code in "Name" that joins the two classes via
+    subclassing is straightforward.
+
+    The second part of the example shows that "Alter" classes actually
+    support black-box inheritance. Here, we use an object of class
+    "IO::File" as the "carrier" object. This must be a globref to work. This
+    object can be initialized to the class "Name", which in part sees it as
+    a hash, in another part as an array. Methods of both classes now work on
+    the object.
+
+        #!/usr/local/bin/perl
+        use strict; use warnings; $| = 1;
+
+        # Show that class Name works
+        my $prof = Name->new( qw( Albert Einstein));
+        print $prof->fname, "\n";
+        print $prof->lname, "\n";
+        print $prof->name, "\n";
+
+
+        # Share an object with a foreign class
+        {
+            package Named::Handle;
+            use base 'IO::File';
+            push our @ISA, qw( Name);
+
+            sub new {
+                my $class = shift;
+                my ( $file, $first, $last) = @_;
+                $class->IO::File::new( $file)->init( $first, $last);
+            }
+
+            sub init {
+                my $nh = shift;
+                $nh->Name::init( @_);
+            }
+        }
+
+        my $nh = Named::Handle->new( '/dev/null', 'Bit', 'Bucket');
+        print "okay, at eof\n" if $nh->eof; # IO::File methods work
+        print $nh->name, "\n";      # ...as do Name methods
+
+        exit;
+
+        #######################################################################
+
+        {
+            package First;
+            use Alter qw( alter ego);
+
+            sub new {
+                my $class = shift;
+                bless( \ my $o, $class)->init( @_);
+            }
+
+            sub init {
+                my $f = shift;
+                alter $f, { name => shift };
+                $f;
+            }
+
+            sub fname {
+                my $h = ego shift;
+                @_ ? $h->{ name} = shift : $h->{ name};
+            }
+        }
+
+        {
+            package Last;
+            use Alter qw( alter ego);
+
+            sub new {
+                my $class = shift;
+                bless( \ my $o, $class)->init( @_);
+            }
+
+            sub init {
+                my $l = shift;
+                alter $l, [ shift];
+                $l;
+            }
+
+            sub lname {
+                my $l = ego( shift);
+                @_ ? $l->[ 0] = shift : $l->[ 0];
+            }
+        }
+
+        {
+            package Name;
+            use base 'First';
+            use base 'Last';
+
+            sub init {
+                my $n = shift;
+                $n->First::init( shift);
+                $n->Last::init( shift);
+            }
+
+            sub name {
+                my $n = shift;
+                join ' ' => $n->fname, $n->lname;
+            }
+        }
+
+        __END__
+
+  Thanks
+    Thanks to Abigail who invented the inside-out technique, showhing *what*
+    the problem is with Perl inheritance and *how* it could be overcome with
+    just a little stroke of genius.
+
+    Thanks also to Jerry Hedden for making me aware of the possibilities of
+    "ext" magic on which this implementation of "Alter" is built.
+
+Author
+    Anno Siegel, <anno4000@zrz.tu-berlin.de>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by Anno Siegel
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.7 or, at
+    your option, any later version of Perl 5 you may have available.
+

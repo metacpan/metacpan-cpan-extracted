@@ -1,0 +1,25 @@
+Revision history for Perl extension Amon2-Web-Dispatcher-RouterSimple-Extended
+
+0.05.01
+
+    - remove Build.PL
+
+0.05
+ 
+    - fixed typo. thanks @zakame
+
+0.04
+
+    - edited pod & 'Test::Requires' append to cpanfile
+
+0.03
+
+    - fixed get/post/put/delete functions and set $submap for instance caching
+
+0.02
+
+    - refactored by tokuhirom
+
+0.01
+
+    - original version

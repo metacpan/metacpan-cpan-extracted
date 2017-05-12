@@ -1,0 +1,401 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+BEGIN {
+  package Pod::SpellChecker::Stripper;
+  $INC{'Pod/SpellChecker/Stripper.pm'} = __FILE__;
+
+  use Exporter;
+  *import = \&Exporter::import;
+
+  our @EXPORT_OK = qw(strip_code strip_pod strip_html);
+
+  sub strip_code {
+    my ($source) = @_;
+
+    my $out = '';
+    while ($source =~ /\G(.*?)(^=\w+.*?(?:^=cut\n|\z))?/gms) {
+      my ($code, $pod) = ($1, $2);
+      $code =~ s/\S/ /g;
+      $out .= $code . (defined $pod ? $pod : '');
+    }
+    return strip_pod($out);
+  }
+
+  sub strip_pod {
+    my ($pod) = @_;
+    my @stopwords;
+    my @languages;
+
+    $pod =~ s{^(=begin\s+(\S+).*\n)([\s\S]*?)(^=end\s+\2)|^(=for\s+(\S+))([\s\S]*?)(\n\n)}{
+      my $pre = $1 || $5;
+      my $type = $2 || $6;
+      my $inner = $3 || $7;
+      my $post = $4 || $8;
+      my $process = substr($type, 0, 1) eq ':' and substr($type, 0, 1, '');
+
+      $pre =~ s/\S/ /g;
+      $post =~ s/\S/ /g;
+      my $out = $pre;
+      if ($process) {
+        ($inner, my $stop, my $lang) = strip_pod($inner);
+        push @stopwords, @$stop;
+        push @languages, @$lang;
+      }
+
+      if ($type eq 'html') {
+        $out .= strip_html($inner);
+      }
+      elsif ($type eq 'stopwords') {
+        push @stopwords, $inner =~ /(\S+)/g;
+        $out .= ' ' x length $inner;
+      }
+      elsif ($type =~ /^lang(uage)?s?$/) {
+        push @languages, $inner =~ /(\S+)/g;
+        $out .= ' ' x length $inner;
+      }
+      else {
+        $out .= $inner;
+      }
+      $out .= $post;
+      $out;
+    }mge;
+    $pod =~ s/^(=(?:encoding|begin|end)\b.*)(?=\n)/' ' x length $1/mge;
+    $pod =~ s/^(=\w+)/' ' x length $1/mge;
+    $pod =~ s{([A-Z])(?:<<<<(\s+.*?\s+)>>>>|<<<(\s+.*?\s+)>>>|<<(\s+.*?\s+)>>|<(.*?)>)}{
+      my $code = $1;
+      my ($inner, $pad) = $2 ? ( $2, 4 )
+                        : $3 ? ( $3, 3 )
+                        : $4 ? ( $4, 2 )
+                             : ( $5, 1 );
+      my $out = ' ' x ($pad + 1);
+      if ($code eq 'I' || $code eq 'B' || $code eq 'S') {
+        #ok 
+      }
+      elsif ($code eq 'L' && $inner =~ /\|/) {
+        my ($label, $rest) = $inner =~ m{\A(.*?)(\|.*?)\z}s;
+        $rest =~ s/\S/ /g;
+        $inner = $label . $rest;
+      }
+      else {
+        $inner =~ s/\S/ /g;
+      }
+      $out .= $inner . (' ' x $pad);
+    }sge;
+
+    $pod =~ s{(^\n(?:[ \t].*\n*)+\n)}{
+      my $verbatim = $1;
+      $verbatim =~ s/\S/ /g;
+      $verbatim;
+    }meg;
+
+    $pod =~ s{\b([A-Za-z][A-Za-z0-9_]*(?:::[A-Za-z][A-Za-z0-9_]*)+)\b}{
+      ' ' x length($1)
+    }eg;
+
+    $pod =~ s{([^\w\s]+)(\s)}{
+      (' ' x length($1)) . $2
+    }eg;
+
+    return ($pod, \@stopwords, \@languages);
+  }
+
+  sub strip_html {
+    my $html = shift;
+    $html =~ s{(<script\b[^>]*>.*?</script>)}{' ' x length $1}sge;
+    $html =~ s/(<[^>]+>)/' ' x length $1/ge;
+    $html =~ s/(&(?:#\d+|\w+);)/' ' x length $1/ge;
+    $html;
+  }
+}
+
+BEGIN {
+  package Pod::SpellChecker;
+  our $VERSION = '0.001004';
+  $VERSION =~ tr/_//d;
+  use IPC::Open2 qw(open2);
+  use Pod::SpellChecker::Stripper qw(strip_code);
+
+  sub new {
+    my $class = shift;
+    my $self = bless {@_}, $class;
+  }
+
+  sub dictionary { $_[0]{dictionary} }
+  sub backup     { $_[0]{backup} }
+
+  sub check_file {
+    my ($self, $file) = @_;
+    open my $in, '<', $file
+      or die "Can't open $file: $!";
+
+    my $source = do { local $/; <$in> };
+    close $in;
+
+    my $checked = $self->check_pod($source);
+
+    my $outfile = "$file.$$";
+    open my $out, '>', $outfile
+      or die "Can't open $outfile: $!";
+
+    print { $out } $checked;
+
+    close $out;
+
+    if ($self->backup) {
+      rename $file, "$file.bak"
+        or die "unable to create backup file for $file!: $!";
+    }
+
+    rename $outfile, $file;
+  }
+
+  sub check_pod {
+    my ($self, $pod) = @_;
+
+    my ($check, $stopwords, $languages) = strip_code($pod);
+    $self->spellcheck(
+      source => $pod,
+      check => $check,
+      stopwords => $stopwords,
+      languages => $languages,
+    );
+  }
+
+  sub spellcheck {
+    my ($self, %args) = @_;
+    my $source    = $args{source}
+      or die "no source provided!";
+    my $check     = $args{check} || $source;
+    my $stopwords = $args{stopwords} || [];
+    my $languages = $args{languages} || [];
+
+    my $dictionary = join(',', @$languages, @{$self->dictionary||[]}) || 'en_US';
+
+    my %stopwords;
+    @stopwords{@$stopwords} = (1) x @$stopwords;
+
+    my @command = (qw(hunspell -a -d), $dictionary);
+    my $pid = open2(my $out, my $in, @command)
+      or die "Unable to run hunspell";
+    readline $out;
+    { my $oldfh = select($in); $| = 1; select($oldfh); }
+    local $| = 1;
+    print { $in } "!\n"; # terse mode
+
+    my $pos = 0;
+    while ($check =~ m/\G(.*(?:\n|\z))/g) {
+      my $line = $1;
+      my $line_length = length($line);
+      $line =~ s/\n*$//;
+      print { $in } " " . $line . "\n";
+      my $line_offset = 0;
+      WORD: while (my $spell_line = <$out>) {
+        chomp $spell_line;
+        if ($spell_line eq '') {
+          last;
+        }
+        # correct spelling
+        elsif ($spell_line eq '*') {
+          next;
+        }
+        # correct compound spelling
+        elsif ($spell_line eq '-') {
+          next;
+        }
+        # correct root
+        elsif ($spell_line =~ /^\+ /) {
+          next;
+        }
+
+        my $word;
+        my $offset;
+        my $count;
+        my @words;
+
+        if ($spell_line =~ /^& (\S+) ([0-9]+) ([0-9]+): (.*)/) {
+          ($word, $count, $offset, my $words) = ($1, $2, $3, $4);
+          @words = split /, /, $words;
+        }
+        elsif ($spell_line =~ /^# (\S+) ([0-9]+)/) {
+          ($word, $offset) = ($1, $2);
+        }
+        else {
+          warn "unknown output: $spell_line\n";
+          next;
+        }
+        $offset--; # from extra space
+        $offset += $line_offset;
+
+        if ($stopwords{$word}) {
+          print { $in } "\@$word\n";
+          next;
+        }
+
+        my $show = substr($source, $pos, length($line) + $line_offset);
+        substr($show, $offset + length($word), 0, "\033[0m");
+        substr($show, $offset, 0, "\033[31m");
+        print $show . "\n";
+
+        PROMPT: for(;;) {
+          {
+            local $| = 1;
+            print join('  ', map { "$_) $words[$_]" } 0 .. $#words) . "\n"
+              if @words;
+            print "(e)dit (s)kip (a)accept (A)dd (U)-Add lowercase (n)ext file (q)uit";
+            print " (0-$#words) replace"
+              if @words;
+            print ": ";
+          }
+          my $answer = readline STDIN;
+          chomp $answer;
+          my $new_word;
+          if ($answer eq 'e') {
+            {
+              local $| = 1;
+              print "edit: ";
+            }
+            $new_word = readline STDIN;
+            chomp $new_word;
+          }
+          elsif ($answer eq 's' || $answer eq ' ' || $answer eq '') {
+            next WORD;
+          }
+          elsif ($answer eq 'a') {
+            print { $in } "\@$word\n";
+            next WORD;
+          }
+          elsif ($answer eq 'A') {
+            print { $in } "*$word\n#\n";
+            next WORD;
+          }
+          elsif ($answer eq 'U') {
+            print { $in } "&$word\n#\n";
+            next WORD;
+          }
+          elsif ($answer eq 'n') {
+            return $source;
+          }
+          elsif ($answer eq 'q') {
+            exit;
+          }
+          elsif ($answer =~ /^[0-9]+$/) {
+            $new_word = $words[$answer];
+          }
+          else {
+            next PROMPT;
+          }
+
+          substr($source, $pos + $offset, length($word), $new_word);
+
+          $line_offset += length($new_word) - length($word);
+
+          next WORD;
+        }
+      }
+      $pos += $line_offset + $line_length;
+    }
+
+    close $in;
+    close $out;
+    kill 2, $pid;
+
+    return $source;
+  }
+}
+
+{
+  use Getopt::Long qw(:config gnu_getopt no_auto_abbrev no_ignore_case);
+
+  GetOptions(
+    'd|dictionary=s@' => \(my $dictionary),
+    'b|backup'        => \(my $backup),
+    'h|help'          => sub {
+      require Pod::Usage;
+      Pod::Usage::pod2usage(-exitval => 0, -verbose => 1);
+    },
+    'V|version'      => sub {
+      print "podispell version $Pod::SpellChecker::VERSION\n";
+      exit 0;
+    },
+  ) or exit 1;
+
+  my $speller = Pod::SpellChecker->new(
+    ($dictionary ? ( dictionary => $dictionary ) : ()),
+    ($backup     ? ( backup     => $backup     ) : ()),
+  );
+
+  if (!@ARGV) {
+    die "no files specified!\n";
+  }
+
+  for my $file (@ARGV) {
+    $speller->check_file($file);
+  }
+}
+
+__END__
+
+=for stopwords
+podispell ispell haarg Knop cpan HAARG perl
+
+=head1 NAME
+
+podispell - Interactive Pod spell checker
+
+=head1 SYNOPSIS
+
+  podispell [ -d <dictionary> ] [ -b ] lib/My/Library.pm lib/My/SecondLibrary.pm
+
+=head1 DESCRIPTION
+
+This is an interactive Pod spell checker, modeled after the ispell interface.
+It will prompt for corrections on any spelling mistakes it finds, and overwrite
+the original file when complete.
+
+Requires C<hunspell>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<-d> C<--dictionary>
+
+Sets the dictionary to use.  Defaults to 'C<en_US>'.  Can be specified multiple
+times.
+
+=item C<-b> C<--backup>
+
+Keep backup files.  A copy of the file will be saved with a C<.bak> extension
+before being modified.
+
+=item C<-h> C<--help>
+
+Display this help text.
+
+=item C<-V> C<--version>
+
+Display the version number.
+
+=back
+
+=head1 AUTHOR
+
+haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+=head1 CONTRIBUTORS
+
+None yet.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015-2015 the podispell L</AUTHOR> and L</CONTRIBUTORS>
+as listed above.
+
+=head1 LICENSE
+
+This library is free software and may be distributed under the same terms
+as perl itself. See L<http://dev.perl.org/licenses/>.
+
+=cut

@@ -1,0 +1,106 @@
+[%- USE YMD = date(format="%Y-%m-%d", gmt=1); -%]
+[%- USE YMD_HMS = date(format="%Y-%m-%d %H:%M:%S", gmt=1); -%]
+
+[%- MACRO link_distver(distver) BLOCK -%]
+    <a href="[% root_uri_rel %]/~[% distver.pause_id %]/[% distver.distver %]">[% distver.distver %]</a> 
+[%- END -%]
+
+[%- MACRO link_dist(dist) BLOCK -%]
+    <a href="[% root_uri_rel %]/dist/[% dist.name %]">[% dist.name %]</a> 
+[%- END -%]
+
+[%- MACRO link_dist_latest(dist) BLOCK -%]
+    <a href="[% root_uri_rel %]/dist/[% dist.name %]?latest=1">[% dist.name %]</a>[%- END -%]
+
+[%- MACRO link_dist_pod_latest(dist,pod) BLOCK -%]
+    <a href="[% root_uri_rel %]/dist/[% dist.name %]/[% pod.path %]?latest=1">[% pod.name %]</a>[%- END -%]
+
+[%- MACRO link_dist_name(name) BLOCK -%]
+    <a href="[% root_uri_rel %]/dist/[% name %]?latest=1">[% name %]</a>
+[%- END -%]
+
+[%- MACRO link_author(author) BLOCK -%]
+    <a href="[% root_uri_rel %]/~[% author %]">[% author %]</a> 
+[%- END -%]
+
+[%- MACRO link_podver(podver) BLOCK -%]
+    <a href="[% root_uri_rel %]/~[% podver.distver.pause_id %]/[% podver.distver.distver %]/[% podver.path %]">[% podver.pod.name %]</a>
+[%- END -%]
+
+[%- MACRO podver_uri(podver) BLOCK -%]
+    [% root_uri_rel %]/~[% podver.distver.pause_id %]/[% podver.distver.distver %]/[% podver.path %]
+[%- END -%]
+
+[%- MACRO link_pod(pod) BLOCK -%]
+    <a href="[% root_uri_rel %]/pod/[% pod.name %]">[% pod.name %]</a>
+[%- END -%]
+
+[%- MACRO link_perldoc(pod) BLOCK -%]
+    <a href="[% root_uri_rel %]/perldoc?[% pod.name %]">[% pod.name %]</a>
+[%- END -%]
+
+[%- MACRO link_perldoc_name(name) BLOCK -%]
+    <a href="[% root_uri_rel %]/perldoc?[% name %]">[% name %]</a>
+[%- END -%]
+
+[%- MACRO link_user(user) BLOCK -%]
+    <a href="[% root_uri_rel %]/user/[% user.username %]">[% user.username %]</a> 
+[%- END -%]
+
+[%- MACRO link_podver_search_cpan_org(podver) BLOCK -%]
+    <a href="http://search.cpan.org/~[% podver.distver.pause_id %]/[% podver.distver.distver %]/[% podver.path %]">search.cpan.org</a>
+[%- END -%]
+
+[%- MACRO link_podver_kobes(podver) BLOCK -%]
+    <a href="http://cpan.uwinnipeg.ca/htdocs/[% podver.distver.dist.name %]/[% podver.pod.name.replace('::', '/') %].html">Kobes search</a>
+[%- END -%]
+
+[%- MACRO link_distver_search_cpan_org(distver) BLOCK -%]
+    <a href="http://search.cpan.org/~[% distver.pause_id %]/[% distver.distver %]">search.cpan.org</a>
+[%- END -%]
+
+[%- MACRO link_dist_search_cpan_org(dist) BLOCK -%]
+    <a href="http://search.cpan.org/dist/[% dist.name %]">search.cpan.org</a>
+[%- END -%]
+
+[%- MACRO link_distver_download(distver) BLOCK -%]
+    <a href="http://search.cpan.org/CPAN/[% distver.path %]">Download</a>
+[%- END -%]
+
+[%- MACRO link_distver_cpanforum(distver) BLOCK -%]
+    <a href="http://www.cpanforum.com/dist/[% distver.dist.name %]">CPAN::Forum</a>
+[%- END -%]
+
+[%- MACRO link_distver_kobes(distver) BLOCK -%]
+    <a href="http://cpan.uwinnipeg.ca/dist/[% distver.dist.name %]">Kobes search</a>
+[%- END -%]
+
+[%- MACRO link_distver_cpanratings(distver) BLOCK -%]
+    <a href="http://cpanratings.perl.org/d/[% distver.dist.name %]">CPANRatings</a>
+[%- END -%]
+
+[%- MACRO link_distver_rt(distver) BLOCK -%]
+    <a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=[% distver.dist.name %]">rt.cpan.org</a>
+[%- END -%]
+
+[%- MACRO link_distver_cpantesters(distver) BLOCK -%]
+    <a href="http://testers.cpan.org/show/[% distver.dist.name %].html">cpantesters</a>
+[%- END -%]
+
+[%- MACRO link_author_cpantesters(author) BLOCK -%]
+    <a href="http://testers.cpan.org/author/[% author %].html">cpantesters</a>
+[%- END -%]
+
+[%- MACRO link_author_search_cpan_org(author) BLOCK -%]
+    <a href="http://search.cpan.org/~[% author %]">search.cpan.org</a>
+[%- END -%]
+
+[%- MACRO link_author_kobes(author) BLOCK -%]
+    <a href="http://cpan.uwinnipeg.ca/~[% author %]">Kobes search</a>
+[%- END -%]
+
+[%- MACRO rating(dist) BLOCK -%]
+    [% IF dist.review_count > 0; SET stars = dist.stars %]
+    <a href="http://cpanratings.perl.org/dist/[% dist.name %]"><img src="[% img_root %]/stars-[% stars %].0.png" alt="Rating: [% stars %] stars" title="[% dist.rating5 %]/5 from [% dist.review_count %] reviews; click to read or write reviews"></a>
+    [% END %]
+[%- END -%]

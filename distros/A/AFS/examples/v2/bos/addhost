@@ -1,0 +1,31 @@
+#!/usr/local/bin/perl
+
+use v5.10.0;
+use blib;
+use strict;
+use warnings;
+
+use AFS::BOS;
+use Scalar::Util qw(looks_like_number);
+
+my (@hosts, $host, $clone, $server, $cellname, $bos);
+
+die "Usage: $0 host clone server [cell]\n" if $#ARGV < 1;
+
+$host     = shift;
+$clone    = shift;
+$server   = shift;
+$cellname = shift // '';
+
+if (defined $clone and !looks_like_number($clone)) { warn "$0: CLONE is not an INTEGER ...\n"; }
+else                                                   { $clone = int($clone); }
+
+if ($cellname) { $bos = AFS::BOS->new($server, 0, 0, $cellname); }
+else           { $bos = AFS::BOS->new($server); }
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+@hosts = split (/ /, $host);
+my $ok = $bos->addhost(\@hosts, $clone);
+print "Error Code: $AFS::CODE\n" if ($AFS::CODE);
+
+$bos->DESTROY;

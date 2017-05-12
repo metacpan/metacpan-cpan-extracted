@@ -1,0 +1,9 @@
+libCorlate.a
+------------
+
+To create the libCorlate.a library needed by the module you should build
+the library as follows
+
+ f95 -c -C define_star.f90 radec2rad.f90 cluster_match_subs.f90 corlate.f90
+ rm *.mod
+ ar -r libCorlate.a *.o

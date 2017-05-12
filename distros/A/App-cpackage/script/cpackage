@@ -1,0 +1,80 @@
+#! /usr/bin/env perl
+
+use strict;
+use warnings;
+use App::cpackage;
+
+App::cpackage->run();
+
+=head1 NAME
+
+cpackage - Create installation packages from CPAN modules
+
+=head1 SYNOPSYS
+
+ cpackage My::CPAN::Module
+ cpackage --mirror http://cpan.local --mirror-only My::Private::Module
+
+=head1 DESCRIPTION
+
+B<cpackage> builds installation packages from CPAN modules, containing all
+dependencies and an F<install.pl> script. Running F<install.pl> will install
+the module (and dependencies) without requiring Internet access or a configured
+CPAN client on the target machine.
+
+=head2 Usage
+
+To create an installer from a CPAN module, run the command:
+
+ cpackage My::CPAN::Module
+
+B<cpackage> will use L<cpanm> to download the module and its dependencies - these
+files will be placed in the F<packages/> directory. Your currently installed
+version of L<cpanm> will be copied and bundled into the F<bin/> directory.
+
+Finally an F<install.pl> file will be written - running this script will install
+the module together with its dependencies.
+
+All files will be written to the current working directory.
+
+=head2 Using your own CPAN mirror
+
+B<cpackage> accepts the same command-line options as L<cpanm>, so you can use it
+to build an installer from your own private CPAN or DarkPAN mirror.
+
+ cpackage --mirror http://my.cpan --mirror-only My::Private::Module
+
+If you have a DarkPAN mirror set up (e.g. using CPAN::Mini::Inject) you can create
+installers that contain a mix of private code and public CPAN code with full
+dependency resolution between the two.
+
+=head2 Running the installer
+
+To run the generated installer script, use the command:
+
+ perl install.pl
+
+Because the installer uses the bundled copy of L<cpanm>, you can also give any of
+L<cpanm>'s standard options, e.g.
+
+ perl install.pl --sudo
+
+=head1 SEE ALSO
+
+L<App::cpanminus>
+
+=head1 AUTHOR
+
+Jon Allen (JJ) <jj@jonallen.info>
+
+=head1 LICENSE
+
+Copyright 2011 Jon Allen (JJ).
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

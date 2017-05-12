@@ -1,0 +1,216 @@
+<%
+
+# Copyright (c) 2003 Nik Clayton
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+# 
+# $Id: extractimageinfo.xps,v 1.10 2004/02/26 11:58:50 nik Exp $
+ 
+# Check the cache directory for each image.  If we've got cached meta data
+# for the image, and it's valid, then do nothing.  Otherwise, extract the
+# data from the image and store it in the image's cache directory.
+
+use strict;
+
+use File::Path;
+use Image::Info qw(image_info);
+use Data::Dumper;
+use RDF::Core;
+use RDF::Core::Storage::Memory;
+use RDF::Core::Model;
+use RDF::Core::Resource;
+use RDF::Core::Literal;
+use RDF::Core::Statement;
+use RDF::Core::Model::Serializer;
+
+my $cache_dir = $r->dir_config('GalleryCache');
+
+my($path, $filename, $uri, $cache_path, $imagemodtime, $metafile);
+
+foreach my $image (findnodes('//image')) {
+    $path = findvalue('dirpath', $image);
+    $filename = findvalue('filename', $image);
+
+    $uri = join('/', 
+        map { findvalue('text()', $_) } 
+              findnodes('uri/component/u', $image));
+
+    $imagemodtime = findvalue('modified', $image)->value();
+    
+    $cache_path = "$cache_dir/$path/$filename";
+
+    if(! -d $cache_path) {
+#        $r->log_error("Need to make $cache_path");
+        mkpath($cache_path);
+    }
+
+    $metafile = "$cache_path/imageinfo.rdf";
+
+#    $r->log_error("metafile: $metafile");
+#    my $f_meta = -f $metafile;
+#    my $z_meta = -z $metafile;
+#    my $s_meta = (stat($metafile))[9];
+
+#    $r->log_error("f: $f_meta, z: $z_meta, mod: $imagemodtime, s: $s_meta");
+
+    if(! -f $metafile || -z $metafile 
+       || ($imagemodtime > (stat($metafile))[9])) {
+
+#        $r->log_error("Generating $metafile");
+        my $info = {};
+        $info->{imageinfo} = image_info("$path/$filename");
+
+        if(! $info->{error}) {
+            # Work out the width/height ratio, and calculate
+            # what the generated thumbnail dimensions will be
+            my($w, $h) = ($info->{imageinfo}{width}, 
+		          $info->{imageinfo}{height});
+            my $larger = $w > $h ? $w : $h;
+            $info->{thumbs}{thumb} = [];
+            foreach my $size (split(/ +/, $r->dir_config('GallerySizes'))) {
+                next if $size eq 'full';
+                my $sf = $size / $larger;
+                push @{$info->{thumbs}{thumb}}, 
+                    { filename => "$size.jpg",
+                             width => int($w * $sf),
+                             height => int($h * $sf),
+                             size => $size,
+                    };
+            }
+
+#            $r->log_error('Extracted the image info');
+
+	    # Sanitise the data in $info->{imageinfo}
+            foreach (keys %{$info->{imageinfo}}) {
+                # Keys that start 'App' seem to more trouble than they're 
+		# worth, containing all sorts of odd crud.  Just delete them.
+                delete $info->{imageinfo}{$_} and next
+                       if $_ =~ /^App/;
+
+                # Delete keys which contain non-printable data
+                delete $info->{imageinfo}{$_} and next 
+                       if $info->{imageinfo}{$_} =~ /[^[:print:]]/;
+
+                # Delete keys that are ARRAY or HASH refs, they don't 
+		# get serialised properly
+                delete $info->{imageinfo}{$_} and next 
+                       if ref($info->{imageinfo}{$_}) eq 'ARRAY'
+                       or ref($info->{imageinfo}{$_}) eq 'HASH';
+
+                # The value might be an object that knows how to stringify
+		# itself.  Give it the chance to do so.
+                $info->{imageinfo}{$_} = 
+                       "$info->{imageinfo}{$_}";
+            }
+#            $r->log_error(Dumper($info));
+
+            open(F, "> $metafile") or die;
+            my $stor = new RDF::Core::Storage::Memory;
+            my $model = new RDF::Core::Model(Storage => $stor);
+            my $subject = new RDF::Core::Resource("/$uri/$filename");
+	    my $predicate;
+	    my $object;
+	    my $statement;
+
+            my($inf, $ns);
+
+	    my %ns = ( image_info => 'http://www.cpan.org/authors/id/G/GA/GAAS/#',
+		       exif       => 'http://impressive.net/people/gerald/2001/exif#',
+		       aag        => 'http://search.cpan.org/~nikc/AxKit-App-Gallery/xml#',
+		       dc         => 'http://dublincore.org/documents/2003/02/04/dces/',
+                       foaf       => 'http://xmlns.com/foaf/0.1/'
+                );
+
+            # Convert the Image::Info data to RDF.
+            foreach (keys %{$info->{imageinfo}}) {
+                # Lower case keys are generic image info,
+                # keys that start uppercase are EXIF
+                if($_ =~ /^[a-z]/) {
+                    $ns = $ns{'image_info'};
+                } else {
+                    $ns = $ns{'exif'};
+                }
+
+                $predicate = $subject->new($ns, $_);
+		$object = new RDF::Core::Literal($info->{imageinfo}{$_});
+
+		$statement = new RDF::Core::Statement($subject, $predicate, 
+						      $object);
+
+		$model->addStmt($statement);
+            }
+
+            # Link in each thumbnail as a FOAF thumbnail
+            my $foaf = $subject->new($ns{'foaf'}, 'thumbnail');
+            foreach my $thumb (@{$info->{thumbs}{thumb}}) {
+                my $size = $thumb->{size};
+                $model->addStmt(new RDF::Core::Statement($subject, $foaf, new RDF::Core::Resource("/$uri/$filename?size=$size")));
+            }
+
+            # Convert the thumbnail data to RDF
+            foreach my $thumb (@{$info->{thumbs}{thumb}}) {
+                my $size = $thumb->{size};
+                $subject = new RDF::Core::Resource("/$uri/$filename?size=$size");
+
+                foreach (qw(height width)) {
+                    $predicate = $subject->new($ns{'image_info'}, $_);
+		    $object = new RDF::Core::Literal($thumb->{$_});
+		    $statement = new RDF::Core::Statement($subject, 
+						          $predicate, $object);
+                    $model->addStmt($statement);
+                }
+
+                # Use my namespace for the thumbnail's size
+                foreach (qw(size)) {
+                    $predicate = $subject->new($ns{'aag'}, $_);
+		    $object = new RDF::Core::Literal($thumb->{$_});
+		    $statement = new RDF::Core::Statement($subject, 
+							  $predicate, $object);
+                    $model->addStmt($statement);
+                }            
+
+                # Use 'dc:title' for the thumbnail's filename.
+                #
+                # XXX This strikes me as being horribly wrong...
+                foreach (qw(filename)) {
+                    $predicate = $subject->new($ns{'dc'}, 'title');
+		    $object = new RDF::Core::Literal($thumb->{$_});
+		    $statement = new RDF::Core::Statement($subject,
+							  $predicate, $object);
+
+                    $model->addStmt($statement);
+                }            
+
+            }
+
+            my $ser = new RDF::Core::Model::Serializer(Model => $model, 
+						       Output => \*F);
+            $ser->serialize();
+            close(F);
+        }
+    }
+}
+    
+print apply_templates();
+
+%>

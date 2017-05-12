@@ -1,0 +1,10 @@
+CHANGES
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Acme/Addslashes.pm
+t/001_basics.t
+t/002_features.t

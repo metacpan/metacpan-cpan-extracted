@@ -1,0 +1,114 @@
+Revision history for AWS::CLIWrapper
+
+1.12  2017-01-12
+    [IMPROVEMENTS]
+        - Make AWS::CLIWrapper take explicit awscli executable path (PR #12 by @aereal)
+
+1.11  2016-12-01
+    [IMPROVEMENTS]
+        - Add servics with aws-cli/1.11.23
+
+1.10  2016-03-15
+    [IMPROVEMENTS]
+        - Specified min perl version both in module and dist metadata
+        - Added github repo to dist metadata
+        - Add servics with aws-cli/1.10.9 (PR #11 by @mithun)
+
+1.09  2015-10-02
+    [IMPROVEMENTS]
+        - Support ec2 wait (PR #9 by @negachov)
+
+1.08  2015-08-19
+    [IMPROVEMENTS]
+        - write stdout/stderr message in debug mode (PR #8 by @limitusus)
+
+1.07  2015-07-21
+    [IMPROVEMENTS]
+        - Don't execute aws command in load phase
+
+1.06  2014-11-25
+    [IMPROVEMENTS]
+        - s3 OPERATION can take --include or --exclude option multiple times
+
+1.05  2014-09-29
+    [DOCUMENTATION]
+        - Added LFMF details! (PR #7)
+
+1.04  2014-08-21
+    [IMPROVEMENTS]
+        - Add some services (cloudsearch, cloudsearchdomain, cloudtrail, cognito_identity, cognito_sync, configure, datapipeline, emr, kinesis, logs, route53domains) with aws-cli/1.4.2
+
+1.03  2014-02-27
+    [BUG FIXES]
+        - Escape all arguments before execute by IPC::Cmd
+          (Suggested by: @Yuryu #4)
+        - Fix bug in passing operation to s3 or s3api for compatibility old aws-cli
+
+1.02  2014-02-25
+    [DOCUMENTATION]
+        - Update the POD to include a special case for the s3 OPERATION.
+          (Thanks: @Yuryu)
+
+1.01  2013-12-04
+    [NEW FEATURES]
+        - Support 3 or more parameters for s3
+          eg: s3 sync from to
+
+1.00  2013-09-06
+    [NEW FEATURES]
+        - Officially AWS::CLIWrapper supports awscli/1.0.0
+    [INCOMPATIBLE CHANGES]
+        - There are several incompatible changes in between old and
+          new awscli. AWS::CLIWrapper supports scripts written for old
+          awscli syntax as much as possible. Don't blame me... :p
+        - awscli >= 0.14.0 requires upper-case parameters "Key",
+          "Values", "Value", "Name" in such --filter. But < 1.14.0
+          requires lower-case parameters "key", "values", "value",
+         "name". So AWS::CLIWrapper converts upper/lower-case by
+         version of awscli.
+        - awscli >= 0.14.0 requires --count pramter in ec2
+          run-instances, but < 0.14.0 requires --min-count and
+          --max-count. So AWS::CLIWrapper converts these parameters by
+          version of awscli
+        - awscli >= 0.15.0 changed "s3" to "s3api" and "s3" became
+          another command... So AWS::CLIWrapper calls "s3api"
+          internally instead of "s3" if awscli >= 0.15.0 and
+          subcommand seems to old "s3"'s one(--list-buckets,
+          --put-object and so on), and calls "s3" instead of "s3api"
+          if awscli < 0.15.0.
+        - I gave up to work around incompatible changes in type of
+          returned data structure. For example, awscli 1.0.0
+          "elb describe-load-balancers" returns hash, on the other
+          hand, awscli 0.9.3 returns list. Please upgrade awscli
+          carefully.
+
+0.09  2013-09-02
+  * Update document on nofork and timeout (thanks @mschrader)
+  * Add some methods for aws-cli/0.16.0
+
+0.08  2013-07-05
+  * Potential 'nofork' option to allow calling IPC::Cmd::run vs. run_forked (issue #1, thanks @mschrader)
+
+0.07  2013-06-19
+  * Add "output_file" key name of parameter for aws s3 get-object
+  * Enable to specify timeout before aborting "aws" command
+
+0.06  2013-06-12
+  * Add some methods for aws-cli/0.12.0
+  * Fix died when failed to parse result as JSON (aws s3)
+
+0.05  2013-05-01
+  * Add some methods for latest awscli (0.9.2)
+
+0.04  2013-04-30
+  * Adjust $Error for incompatible changes of aws-cli/botocore
+
+0.03  2013-03-11
+  * Add $AWS::CLIWrapper::true and $AWS::CLIWrapper::false for boolean parameter
+
+0.02  2013-01-24
+  * Support parameter: structure in list
+
+0.01  2013-01-21
+  * Initial version
+

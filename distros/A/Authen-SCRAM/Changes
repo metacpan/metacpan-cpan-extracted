@@ -1,0 +1,43 @@
+Revision history for Authen-SCRAM
+
+0.005     2014-10-15 17:30:07-04:00 America/New_York
+
+    [Fixed]
+
+    - Prevent test failures due to warnings in other modules
+      (which we can't control)
+
+0.004     2014-10-14 11:45:09-04:00 America/New_York
+
+    [Fixed]
+
+    - Fixed warnings from length() on Perls before 5.12
+
+    [Prereqs]
+
+    - Bumped Moo prereq to 1.001000 for non-ref default value support
+
+0.003     2014-10-07 22:05:31-04:00 America/New_York
+
+    [Added]
+
+    - Added 'skip_saslprep' attribute, in case applications insist on
+      deviating from RFC 5802 in this regard
+
+0.002     2014-10-06 12:09:01-04:00 America/New_York
+
+    [Fixed]
+
+    - Fixed handling of character encodings for non-ASCII characters in
+      usernames and passwords
+
+    [Documented]
+
+    - Clarified that all inputs/outputs are expected to be character
+      strings and that users are responsible for UTF-8 encoding/decoding
+      during transmission and reception
+
+0.001     2014-10-04 13:25:37-04:00 America/New_York
+
+    - First release
+

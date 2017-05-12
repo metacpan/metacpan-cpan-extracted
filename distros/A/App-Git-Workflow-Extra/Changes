@@ -1,0 +1,48 @@
+Revision history for module
+
+0.3   2015-08-25
+        Updating for release of version 0.3
+        Removed creation of makefile (Ivan Wills)
+
+0.2   2015-07-29
+        Updating for release of version 0.2
+        Added missing depencency (Ivan Wills)
+
+0.1     2014-10-26
+        Added better docs (Ivan Wills)
+        Improved the readme (Ivan Wills)
+        Fixed ignores (Ivan Wills)
+        Added new dependency (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+        Added META.json to manifest (Ivan Wills)
+        Added stop words (Ivan Wills)
+        removed boiler plate from POD (Ivan Wills)
+        Removed version dependency (Ivan Wills)
+        Fixed load test (Ivan Wills)
+        Updated boilerplate test to latest version (Ivan Wills)
+        Updated dependencies (Ivan Wills)
+        Cleaned up base file (Ivan Wills)
+        Converted to a wrapper of other individual extra commands (Ivan Wills)
+        Added tags (Ivan Wills)
+        Removed unused module (Ivan Wills)
+        Fixed executable bits (Ivan Wills)
+        New file on things I wish to do (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Added more tests to increase coverage (Ivan Wills)
+        Added method description (Ivan Wills)
+        Got test working (Ivan Wills)
+        Fixed dependencies (Ivan Wills)
+        Starting to fix tests (Ivan Wills)
+        Stop reporting if no tags found and --quiet (Ivan Wills)
+        Fixed changes (Ivan Wills)
+        Updated boilerplait test (Ivan Wills)
+        Cleaned up some documentation (Ivan Wills)
+        Got basic code working (Ivan Wills)
+        Updated documentation (Ivan Wills)
+        Renamed to POD (Ivan Wills)
+        Fixed version from (Ivan Wills)
+        Implemented getting newest tag (Ivan Wills)
+        added test (Ivan Wills)
+        Thinking of what to do (Ivan Wills)
+        Starting to work on the files (Ivan Wills)
+        Initial commit (Ivan Wills)

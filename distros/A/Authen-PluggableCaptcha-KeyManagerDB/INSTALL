@@ -1,0 +1,35 @@
+Sample External KeyManager for Authen Pluggable Captcha
+
+This code requires Rose::DB::Object to run, but it could be implemented in a non-rose manner
+
+postgres=# create user keymanager with password 'keymanager';
+CREATE ROLE
+postgres=# create database keymanager with owner = keymanager ENCODING = 'UTF8' TABLESPACE = pg_default;
+CREATE DATABASE
+
+
+create table captcha_key ( 
+	id bigserial primary key , 
+	hex_id char(32) not null,
+	is_valid boolean default true,
+	timestamp_created timestamp not null,
+	ip_created varchar(15) null,
+	timestamp_used timestamp null,
+	ip_used varchar(15) null
+);
+
+connect args are in 
+
+	Authen::PluggableCaptcha::KeyManagerDB::RoseDB
+
+overrides are via the following envelope args
+
+$ENV{'Authen::PluggableCaptcha::KeyManagerDB::RoseDB::driver'}= 'Pg';
+$ENV{'Authen::PluggableCaptcha::KeyManagerDB::RoseDB::database'}= 'keymanager';
+$ENV{'Authen::PluggableCaptcha::KeyManagerDB::RoseDB::host'}= 'localhost';
+$ENV{'Authen::PluggableCaptcha::KeyManagerDB::RoseDB::username'}= 'keymanager';
+$ENV{'Authen::PluggableCaptcha::KeyManagerDB::RoseDB::password'}= 'keymanager';
+
+
+
+

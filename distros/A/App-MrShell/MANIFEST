@@ -1,0 +1,19 @@
+.perlcriticrc
+Changes
+MANIFEST
+Makefile.PL
+MrShell.pm
+README
+lib/App/MrShell.pod
+make_par.sh
+mrsh
+t/01_load.t
+t/05_touch_things.t
+t/06_touch_things_w_mrsh.t
+t/07_host_routing.t
+t/07_host_routing_escapes.t
+t/09_simplest_usersubst.t
+t/10_routed_usersubst.t
+t/critic.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

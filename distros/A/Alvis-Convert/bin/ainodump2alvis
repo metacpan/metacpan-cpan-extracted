@@ -1,0 +1,189 @@
+#!/usr/bin/perl -w
+
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Pod::Usage;
+
+use Alvis::Convert;
+
+use strict;
+
+my $PrintManual=0;
+my $PrintHelp=0;
+my $Warnings=1;
+my $AinoSuffix='ainodump';
+my $ODir='.';  
+my $NPerOurDir=1000;
+my $IncOrigDoc=1;
+
+GetOptions('help|?'=>\$PrintHelp, 
+	   'man'=>\$PrintManual,
+	   'warnings!'=>\$Warnings,
+	   'ainodump-ext=s'=>\$AinoSuffix,
+	   'out-dir=s'=>\$ODir,
+	   'N-per-out-dir=s'=>\$NPerOurDir,
+	   'original!'=>\$IncOrigDoc) or 
+    pod2usage(2);
+pod2usage(1) if $PrintHelp;
+pod2usage(-exitstatus => 0, -verbose => 2) if $PrintManual;
+pod2usage(1) if (@ARGV!=1);
+
+my $SDir=shift @ARGV;
+
+$|=1;
+
+my $C=Alvis::Convert->new(outputRootDir=>$ODir,
+			  outputNPerSubdir=>$NPerOurDir,
+			  outputAtSameLocation=>0,
+			  includeOriginalDocument=>$IncOrigDoc,
+			  ainodumpWarnings=>$Warnings);
+
+my %Seen;
+$C->init_output();
+if (!&_convert_collection($SDir,{ainoSuffix=>$AinoSuffix}))
+{
+    die("Conversion failed. " . $C->errmsg());
+}
+
+
+sub _parse_entries
+{
+    my $entries=shift;
+    my $options=shift;
+    my $aino_entries=shift;
+    
+    for my $e (@$entries)
+    {
+	if ($Seen{$e})
+	{
+	    next;
+	}
+	
+	$Seen{$e}=1;
+	if (-d $e)
+	{
+	    my @entries=glob("$e/*");;
+	    &_parse_entries(\@entries,$options,$aino_entries);
+	    next;
+	}
+
+	my ($basename,$suffix);
+	if ($e=~/^(.*)\.([^\.]+)$/)
+	{
+	    $basename=$1;
+	    $suffix=$2;
+	}
+	else
+	{
+	    warn "Skipping non-suffixed non-directory entry \"$e\"." if 
+		$Warnings;
+	    next;
+	}
+	
+	if ($suffix eq $options->{ainoSuffix})
+	{
+	    $aino_entries->{$basename}{ainoF}=$e;
+	}
+    }
+}
+
+sub _convert_collection
+{
+    my $root_dir=shift;
+    my $options=shift;
+
+    my @entries=glob("$root_dir/*");
+    my %dump_entries=();
+    %Seen=();
+    print "Parsing the source directory entries...\r";
+    &_parse_entries(\@entries,$options,\%dump_entries);	
+    print "                                       \r";
+
+    for my $base_name (keys %dump_entries)
+    {
+	if (!exists($dump_entries{$base_name}{ainoF}))
+	{
+	     warn "Internal inconsistency: No ainodump " .
+		 "file for basename \"$base_name\"." if 
+		$Warnings;
+	     next;
+	}
+
+	if (!$C->ainodump($dump_entries{$base_name}{ainoF}))
+	{
+	    warn "Obtaining the Alvis version of the " .
+		"ainodump file \"$dump_entries{$base_name}{ainoF}\" " .
+		"failed. " . $C->errmsg() if 
+		$Warnings;
+	    $C->clearerr();
+	    next;
+	}
+    }
+
+    return 1;
+}
+
+__END__
+
+=head1 NAME
+    
+    html2alvis.pl - HTML to Alvis XML converter
+    
+=head1 SYNOPSIS
+    
+    ainodump2alvis.pl [options] [source directory ...]
+
+  Options:
+
+    --ainodump-ext       ainodump file identifying filename extension
+    --out-dir            output directory
+    --N-per-out-dir      # of records per output directory
+    --[no]original       include original document?
+    --help               brief help message
+    --man                full documentation
+    --[no]warnings       warnings output flag
+    
+=head1 OPTIONS
+    
+=over 8
+
+=item B<--ainodump-ext>
+
+    Sets the ainodump file identifying filename extension. 
+    Default value: 'ainodump'.
+
+=item B<--out-dir>
+
+    Sets the output directory. Default value: '.'.
+
+=item B<--N-per-out-dir>
+
+    Sets the # of records per output directory. Default value: 1000.
+
+=item B<--[no]original>
+
+    Shall the original document be included in the output? Default
+    value: yes.
+
+=item B<--help>
+
+    Prints a brief help message and exits.
+
+=item B<--man>
+
+    Prints the manual page and exits.
+
+=item B<--[no]warnings>
+
+    Output (or suppress) warnings. Default value: yes.
+
+=back
+
+=head1 DESCRIPTION
+
+    Goes recursively through the files under the source directory
+    and converts them to Alvis XML files.   
+    
+=cut
+
+

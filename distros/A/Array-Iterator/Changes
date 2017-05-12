@@ -1,0 +1,104 @@
+Revision history for Perl extension Array-Iterator
+
+0.11     2013-09-18 (SHARYANTO)
+
+         - No functional changes. Rerelease due to inclusion of unneeded files
+           (steven--).
+
+
+0.10     2013-09-18 (SHARYANTO)
+
+         - No functional changes. Apply spelling patch from Debian maintainer
+           Gregor Herman [RT#88745].
+
+
+0.09     2013-08-22 (SHARYANTO)
+
+         - No functional changes. Reformat Changes to be more conformant to
+           CPAN::Changes::Spec (thanks Neil Bowers).
+
+
+0.08     2012-03-28 (SHARYANTO)
+
+         - peek(), look_back(), has_next(), has_previous() now accept optional
+           integer argument for arbitrary lookup, e.g. peek(2) looks at the next
+           next item, peek(1) is the same as peek() (implemented by Alexey
+           Surikov, github#2).
+
+
+0.07     2011-09-09 (SHARYANTO)
+
+         - Take over maintenance from Stevan Little.
+
+         - Now uses Dist::Zilla and git.
+
+         - Add lowercase method name aliases (has_next() as well as hasNext(),
+           etc). The lowercase method names are now the documented ones.
+
+         - Add iterated() to check whether an iteration has been done (i.e.
+           next(), or get_next(), or previous(), etc has been called).
+
+
+0.06     2005-07-08 (STEVAN)
+
+         - Fixed bug in Array::Iterator::peek(). Thanks to Hugo Cornelis for
+           pointing it out
+
+         - added tests for this
+
+         - Added patch from Phillip Moore to support *single element iteration*
+           using the hash-ref constructor option. - added tests and docs for
+           this (also from Phillip :)
+
+
+0.05     2004-07-15 (STEVAN)
+
+         - added a getLegnth method and tested it
+
+         - changed how currentIndex deals with index of 0, it now does it
+           correctly.
+
+         - made current use currentIndex to get the current index
+
+         - made Array::Iterator more subclass friendly by adding some
+           'protected' methods to access some fields with
+
+         - added some subclasses: Array::Iterator::BiDirectional,
+           Array::Iterator::Circular, Array::Iterator::Reusable
+
+         - created tests for all these new modules
+
+
+0.04     2004-05-06 (STEVAN)
+
+         - Changed current and currentIndex to refer to the same value (and
+           index) of the last item dispensed by the next method. This is more in
+           line with what they should do. Prior to this version they returned
+           the current index which was actually the one past the last call to
+           next.
+
+         - tested these changes and altered tests which used the old versions.
+
+         - updated documentation to reflect change
+
+
+0.03     2004-05-02 (STEVAN)
+
+         - Added currentIndex method, and added tests for it.
+
+         - Added getNext method and added tests for it.
+
+         - altered the behavior of peek to not throw an exception.
+
+         - updated all documentation.
+
+
+0.02     2004-04-12 (STEVAN)
+
+         - error in the Makefile.PL file, no changes on this release
+
+
+0.01     2004-03-17 (STEVAN)
+
+         - original version; created by h2xs 1.22 with options -X -n
+           Array::Iterator

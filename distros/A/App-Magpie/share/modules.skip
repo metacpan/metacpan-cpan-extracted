@@ -1,0 +1,45 @@
+# vim: set textwidth=
+# One line per pattern, following the scheme:
+#
+#       module ; new version ; reason
+#
+# Regex comparison with module field, then regex comparison with version
+# field. Note that regex is anchored autoamtically with ^ and $. Empty
+# version always match (eg, equivalent to .*).
+#
+Bio::Root::RootI                      ; 1.006001    ;
+Config::Augeas                        ; 0.903       ; need a recent libaugeas
+Crypt::OpenSSL::X509                  ; 1.70        ; cpanplus lost with version (really 1.7.1 upstream)
+DBIx::Class::Schema::Loader           ; 0.07033     ; broken upstream: rt#77628
+Devel::Trepan::DB::LineCache          ; 1.0000      ; cpanplus confused
+Dist::Zilla::PluginBundle::FAYLAND    ; 0.07        ; non-existant prereq, https://rt.cpan.org/Public/Bug/Display.html?id=66171
+Dist::Zilla::Plugin::PodLoom          ; 5.0000      ; broken upstream https://rt.cpan.org/Public/Bug/Display.html?id=90330
+Dist::Zilla::Plugin::ProgCriticTests  ; 1.11175     ; broken upstream
+File::MimeInfo::Rox                   ; 0.20        ; upstream version mismatch
+Find::Lib                             ; 1.02        ; symlink test fail, https://rt.cpan.org/Ticket/Display.html?id=69019
+Fuse                                  ; 0.1600      ; 0.16.1 not indexed on cpan
+Getopt::Lucid                         ; 0.19        ; unparsable version in current version 0.19
+HTML::Table                           ; 2.08        ; 2.08a shipped
+HTML::Tidy                            ; 1.52        ; broken upstream
+Inline                                ; 0.48        ; taint test fail, https://rt.cpan.org/Ticket/Display.html?id=65703
+IO::Async                             ; 0.41        ; stream-4encoding.t test fail, https://rt.cpan.org/Ticket/Display.html?id=69020
+Lingua::Features                      ; 0.3         ; cpanplus lost with version
+Linux::Prctl                          ; 1.005       ; rt#79909
+Makefile::AST                         ; 0.215       ; https://rt.cpan.org/Ticket/Display.html?id=77738 / https://rt.cpan.org/Ticket/Display.html?id=77737
+Module::Depends                       ; 0.16        ; https://rt.cpan.org/Public/Bug/Display.html?id=37051
+Module::Signature                     ; 999.00      ; bogus version
+MojoMojo                              ; 1.06        ; rt#79879, rt#79880
+Net::FTP::Common                      ; 7.00        ;
+Net::Libdnet                          ; 0.95        ; 0.95 broken upstream
+Number::Phone::StubCountry::UY        ; 1.201201    ; cpanplus confused
+Parse::RecDescent::FAQ::Original      ; 6.00        ; original faq
+PDL::IO::NDF                          ; 1.04        ; bad version upgrade
+Psh                                   ; 1.8         ; bad version upgrade, https://rt.cpan.org/Public/Bug/Display.html?id=53253
+Switch                                ; 2.16        ; cpanplus lost with version
+Syntax::Highlight::Perl6              ; 0.85        ; broken upstream
+Tie::Watch                            ; 1.301       ; now in its own dist, https://rt.cpan.org/Ticket/Display.html?id=66249
+Tk::ColorEditor                       ; 4.012       ; cpanplus lost with version (not a new tk version)
+urpm::.*                              ;             ; rpm toolchain
+WebFetch                              ; 0.13        ; broken upstream
+XML::Grove                            ; 0.46        ; already at this version
+XML::TreeBuilder                      ; 3.09        ; we're shipping 4.0.0

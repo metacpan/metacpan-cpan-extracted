@@ -1,0 +1,154 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - ars_MergeEntry</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_MergeEntry(ctrl, schema, mergeType, ...)</CODE></H2>
+
+	Merge an entry into the schema. This routine allows you to
+	arbitrarily alter fields (diary, entry-id, etc) that would
+	otherwise be difficult or impossible to alter. All it requires
+	is permissions to write to the particular field that you wish
+	to alter. The ellipses represent alternating fieldId/fieldValue
+	pairs.
+
+
+<P>
+There are three conditions to detect after ars_MergeEntry(...).  
+
+<ol>
+<li> A non-null value returned means that a new entry was created.
+
+<li> A null value returned, plus $ars_errstr empty, means that an existing
+   entry was replaced.
+
+<li> A null value returned, plus $ars_errstr non-empty, means there was some
+   error.
+</oL>
+
+Here's some sample code that demonstrates how to evaluate the outcome of
+	this function:
+<PRE>
+foreach $RPTID (sort keys %RPTEntryList) {
+        undef @Report;
+        ( @Report = ars_GetEntry($ctrl1, $ISS_RPT_SCHEMA, $RPTID) )
+                || arsdie("GetEntry $RPTID");
+        if ( $ret = ars_MergeEntry($ctrl2, $ISS_RPT_SCHEMA,
+                                   3075, @Report) ) {
+                print "$RPTID -&gt; new $ret\n";
+        } else {
+                arsdie("MergeEntry $RPTID $ret") if $ars_errstr;
+                print "$RPTID replaced\n";
+        }
+}
+</PRE>
+
+Note the value "3075" for mergeType.  That translates to<P>
+<PRE>
+           2048: skip field pattern checking
+           1024: allow NULL in required fields
+         +    3: delete existing entry and create new in its place
+         -------
+           3075
+</PRE>
+<P>
+
+      <DL>
+         <DT><B>On success</B><DD>
+		If a NEW entry was created: returns the entry-id of the merged entry.<BR>
+		If an EXISTING entry was over-written: returns "" and <code>$ars_errstr</code> will be "" (or, more correctly, <code>%ARS::ars_errhash</code> will not contain any FATAL or ERROR messages - but might contains WARNINGs or NOTICEs). <BR>
+		Note that this is how the C API behaves - this isn't something
+		that is unique to ARSperl. <BR>
+                <a href="#example">See examples below.</a>
+         <DT><B>On failure</B><DD>
+                Returns "" (an empty string) and sets <code>$ars_errstr</code>
+      </DL>
+
+      <P><a name="example">Example:</a><P>
+
+      <PRE>
+	# note that "4" means "overwrite existing"
+	$a = ars_MergeEntry($ctrl, "HD:HelpDesk", 4, 
+		   1 , "00000000012345",
+		   2 , "FOOBAR");
+	if(($a eq "") && ($ars_errstr eq "")) {
+		print "entry successfully over-written\n";
+	} 
+	else {
+		print "failed to merge - $ars_errstr\n";
+	}
+      </PRE>
+
+	<hr width="10%">
+
+      <PRE>
+
+	# note that "2" means "create a new entry"
+	$a = ars_MergeEntry($ctrl, "HD:HelpDesk", 2, 
+		            2 , "FOOBAR");
+	if(($a ne "") && ($ars_errstr eq "")) {
+		print "entry successfully created - $a\n";
+	} 
+	else {
+		print "failed to merge - $ars_errstr\n";
+	}
+      </PRE>
+
+      <P>Notes<P>
+	<B>Note</B>: If you try to merge a diary field (to alter existing
+	diary entries) you need to pass the <I>encoded</I> diary to this
+	routine. See <A HREF="ars_EncodeDiary.html">ars_EncodeDiary</A>.
+	<P>
+	<code>mergeType</code> defines how the merge will happen if special
+	field (ie. Entry-Id) already exists:
+	<P>
+	<TABLE BORDER=1>
+	<TR>
+		<TH>Code</TH><TH>Meaning</TH>
+	</TR>
+	<TR>
+		<TD>1</TD><TD>Generate an error</TD>
+	</TR>
+	<TR>
+		<TD>2</TD><TD>Create a new entry with a new entry id</TD>
+	</TR>
+	<TR>
+		<TD>3</TD><TD>Delete the existing entry and create a new on in its place</TD>
+	</TR>
+	<TR>
+		<TD>4</TD><TD>Update fields specified in the fieldlist in existing entry</TD>
+	</TR>
+	<TR>
+		<TD>5</TD><TD>Generate a new entry id for all entries</TD>
+	</TR>
+	<TR>
+		<TD>1024+num above</TD><TD>Allow NULL in required fields (not applicable for Submitter,
+		Status or Short-Description)</TD>
+	</TR>
+	<TR>
+		<TD>2048+num above</TD><TD>Skip field pattern checking</TD>
+	</TR>	
+	<TR>
+		<TD>4096+num above</TD><TD>Ignore filter processing</TD>
+	</TR>	
+	</TABLE>
+	<P>
+	Refer to the Remedy Programmers Manual for further details.
+		      <P>
+        <a href="OO/form.html#merge">The Object Oriented ARSperl layer
+			  tries to be a little easier to use.</a>
+<P>
+<I>ars_MergeEntry was introduced in version 1.46 of ARSperl</I>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 20-Aug-2010 by tstapff<BR>
+&#169; J.C.Murphy, J.W.Murphy, T.Stapff 1997-2010 arsperl@arsperl.org
+</address>
+</BODY>
+</HTML>

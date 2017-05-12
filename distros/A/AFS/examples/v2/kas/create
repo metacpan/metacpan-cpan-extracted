@@ -1,0 +1,35 @@
+#!/usr/local/bin/perl
+
+use blib;
+use AFS::KAS;
+use AFS::KTC_PRINCIPAL;
+use AFS::KTC_TOKEN;
+use AFS::KTC_EKEY;
+use AFS qw(checkafs raise_exception);
+
+die "Usage: admin user \n" if ($#ARGV != 1);
+
+raise_exception(1);
+
+my $admin = AFS::KTC_PRINCIPAL->new(shift);
+my $user  = AFS::KTC_PRINCIPAL->new(shift);
+my $key   = AFS::KTC_EKEY->ReadPassword($admin->principal . "'s Password:");
+my $nkey =  AFS::KTC_EKEY->ReadPassword($user->principal . "'s Password:");
+
+my $reason = '';
+my $token = AFS::KTC_TOKEN->GetAdminToken($admin, $key, 300, 1, $reason);
+if ($reason) { print "reason = $reason\n"; }
+checkafs('AdminToken');
+
+my $kas = AFS::KAS->AuthServerConn($token, &AFS::KA_MAINTENANCE_SERVICE);
+checkafs('AuthServerConn');
+#my $ok = $kas->create($user->name, $user->instance, $nkey);
+my $ok = $kas->KAM_CreateUser($user->name, $user->instance, $nkey);
+printf("KAS created: %s \n", $ok ? 'yes' : 'no');
+checkafs('Create');
+
+my $entry = $kas->getentry($user->name, $user->instance);
+print "\n\nUser data for ", $user->name, $user->instance, ": \n";
+foreach my $tp_key (sort keys %$entry) {
+    printf("%20s  %s\n",$tp_key, $$entry{$tp_key});
+}

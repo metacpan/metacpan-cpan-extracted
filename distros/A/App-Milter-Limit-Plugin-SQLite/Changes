@@ -1,0 +1,9 @@
+Revision history for App::Milter::Limit::Plugin::SQLite
+
+0.51  2010-03-30
+    - dzil: use my @MSCHOUT plugin bundle
+    - fix t/compile.t: was loading BerkeleyDB plugin instead
+    - add signature test
+
+0.50      2010-03-29 13:27:14 America/Chicago
+    - initial release

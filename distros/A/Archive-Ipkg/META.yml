@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Archive-Ipkg
+version:             0.04
+abstract:            Module for manipulation of iPKG archives
+license:             perl
+author:              
+    - Christian Renz <crenz@web42.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Archive::Tar:                  0.072
+    Compress::Zlib:                0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

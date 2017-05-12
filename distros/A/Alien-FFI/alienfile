@@ -1,0 +1,116 @@
+use alienfile;
+use Config;
+use Text::ParseWords qw( shellwords );
+
+# this alienfile requires Alien::Build 0.26 for features and bugfixes
+
+plugin 'PkgConfig' => 'libffi';
+
+share {
+
+  plugin Download => (
+    url     => 'ftp://sourceware.org/pub/libffi/',
+    version => qr/^libffi-([0-9\.]+)\.tar\.gz$/,
+  );
+  
+  plugin Extract => 'tar.gz';
+  
+  plugin 'Build::Autoconf' => ();
+
+  my $configure = '--disable-shared --enable-static --disable-builddir';
+
+  
+  if($^O eq 'MSWin32')
+  {
+    my $bits = $Config{archname} =~ /^MSWin32-x64/ ? 64 : 32;
+  
+    $configure .= ' --build=x86_64-pc-mingw64' if $bits == 64;
+    
+    if(meta->prop->{platform}->{compiler_type} eq 'microsoft')
+    {
+      # Visual C++ is "special"
+      $configure .= ' LD=link CPP="cl -nologo -EP"';
+      
+      if($bits == 64)
+      { $configure .= ' CC="%{cwd}/msvcc.sh -m64"' }
+      else
+      { $configure .= ' CC=%{cwd}/msvcc.sh'        }
+
+      # 3.2.x broke Visual C++ for some reason.
+      # hopefully 3.3.x or 4.x will fix it.
+      # otherwise this will start failing again
+      meta->around_hook( prefer => sub {
+        my $orig = shift;
+
+        my $ret = $orig->(@_);
+    
+        $ret->{list} = [
+          grep { $_->{version} ne '3.2' }
+          grep { $_->{version} !~ /^3\.2\./ }
+          @{ $ret->{list} }  
+        ];
+
+        $ret;
+      });
+      
+      requires 'Path::Tiny' => '0.077';
+      patch sub {
+        my($build) = @_;
+        my $libffi_pc = Path::Tiny->new('libffi.pc.in');
+        if(-f $libffi_pc)
+        {
+          # I think the actual error is somewhere other
+          # than the .pc file, but this works around it
+          # at least in the way that we use it.
+          $build->log('edit libffi.pc.in');
+          $libffi_pc->copy('libffi.pc.in.orig');
+          $libffi_pc->edit_lines(sub {
+            s/^toolexeclibdir=.*$/toolexeclibdir=\${libdir\}/;
+          });
+        }
+      };
+      
+      meta->after_hook( gather_share => sub {
+        my($build) = @_;
+        $build->runtime_prop->{$_} .= " -DFFI_BUILDING" for qw( cflags cflags_static );
+        $build->runtime_prop->{$_} =~ s{-L}{-LIBPATH:}g for qw( libs libs_static );
+        $build->runtime_prop->{$_} =~ s{-l([A-Za-z]+)}{$1.LIB}g for qw( libs libs_static );
+      });
+    }
+  }
+
+  if($^O eq 'darwin')
+  {
+    my @ldflags = shellwords $Config{ldflags};
+    my @arch;
+    while(@ldflags)
+    {
+      my $arg = shift @ldflags;
+      next unless $arg eq "-arch";
+      push @arch, $arg, shift @ldflags;
+    }
+    if(@arch)
+    {
+      $configure .= " LDFLAGS='@arch'";
+      $configure .= " CFLAGS='@arch'";
+    }
+  }
+  
+  if($^O eq 'openbsd')
+  {
+    unless($Config{usethreads})
+    {
+      meta->after_hook( gather_share => sub {
+        my($build) = @_;
+        $build->runtime_prop->{$_} .= " /usr/lib/libpthread.a" for qw( libs libs_static );
+      });
+    }
+  }
+
+  build [
+    "%{configure} $configure",
+    '%{make}',
+    '%{make} install',
+  ];
+
+};

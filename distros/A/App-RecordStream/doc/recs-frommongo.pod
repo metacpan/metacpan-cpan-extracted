@@ -1,0 +1,43 @@
+=head1 NAME
+
+recs-frommongo
+
+=head1 recs-frommongo --help-all
+
+ recs-frommongo --host user:pass@URI --name DB_NAME --collection COLLECTION --query QUERY
+    Generate records from a MongoDB query.
+ 
+ Arguments:
+    --host <HOST_URI>               URI for your mongo instance, may include
+                                    user:pass@URI
+    --user <USER>                   User to authenticate as.
+    --password <PASSWORD>           Password for --user
+    --name <DB_NAME>                Name of database to connect to
+    --collection <COLLECTION_NAME>  Name of collection to query against
+    --query <QUERY>                 JSON query string to run against the --
+                                    collection
+    --filename-key|fk <keyspec>     Add a key with the source filename (if no
+                                    filename is applicable will put NONE)
+ 
+   Help Options:
+       --help  This help screen
+ 
+ Examples:
+   Make a query against mongo hq
+     recs-frommongo --host mongodb://user:pass@dharma.mongohq.com:10069 --name my_app --collection my_collection --query '{doc_key: {$not: {$size: 0}}}'
+
+=head1 SEE ALSO
+
+=over
+
+=item * See L<App::RecordStream> for an overview of the scripts and the system
+
+=item * Run C<recs examples> or see L<App::RecordStream::Manual::Examples> for a set of simple recs examples
+
+=item * Run C<recs story> or see L<App::RecordStream::Manual::Story> for a humorous introduction to RecordStream
+
+=item * Every command has a C<--help> mode available to print out usage and
+examples for the particular command, just like the output above.
+
+=back
+

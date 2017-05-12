@@ -1,0 +1,9 @@
+Revision history for Acme-MetaSyntactic-morning_musume
+
+1.000 Sam Oct 10 2012
+        - First release (of my first module)
+1.001 Wed Oct 17 2012
+        - Fix pod and readme
+1.002 Wed Jun 16 2013
+        - Fix missing dependancies (at last)
+

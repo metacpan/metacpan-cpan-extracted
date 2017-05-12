@@ -1,0 +1,3 @@
+               Rate is_gaijiB is_gaijiA
+is_gaijiB  420102/s        --      -74%
+is_gaijiA 1607776/s      283%        --

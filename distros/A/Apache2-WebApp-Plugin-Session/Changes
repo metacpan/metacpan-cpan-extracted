@@ -1,0 +1,16 @@
+Revision history for Perl module Apache2::WebApp::Plugin::Session
+
+0.14
+    - Migrated project SCM and code repository to Google Project hosting.
+    - Updated POD and README artistic license URL in COPYRIGHT clause.
+    - Changed each module version so that I can verify that the PAUSE packager/uploader script works as expected.
+    - Updated license field in META.yml to fix 'License Unknown' issue on CPAN
+    - Updated PREREQ_PM module versions in Makefile.PL
+    - Updated module versions in META.yml requires field.
+
+0.15
+    - Added $(PREFIX) in Makefile.PL to build script template install path.
+
+0.16
+    - Updated POD and README
+    - Updated package Apache2::WebApp minimum version dependencies.

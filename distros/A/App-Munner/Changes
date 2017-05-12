@@ -1,0 +1,37 @@
+2015-01-27 - 1.01
+    + Tidy code to init the child leash
+
+2015-01-26 - 1.00
+    + Optionally using Process::Child::Leash to make sure the remain children processes are all terminated.
+
+2015-01-18 - 0.57
+    + Let user to set timeout to the process
+
+2014-10-30 - 0.56
+    + Use environment variable to override PID_FILE, ERROR_LOG and ACCESS_LOG
+    + bugfix
+
+2014-07-08 - 0.55
+    + Set environment variable USER to chown the running process
+    + Set environment variable PID_FILE to specify the pid file location as well as ACCESS_LOG and ERROR_LOG
+    + Set environment variable TERMINAL to leave TTY / PTTY on at the background
+
+2014-05-25 - 0.5
+    + Added stop / start / restart / graceful etc...
+
+2014-05-24 - 0.4
+    + inject environment variables
+    + can run at non stop mode either sleep or pause
+    + start apps in a group
+    + start groups in a group
+    - fix issue of ctrl-c
+    ? (skip 0.3 because PAUSE thinks v0.2 is bigger than v0.3.0)
+
+2014-05-20 - 0.3.0
+    - Bugfix base dir
+
+2014-05-19 - 0.2
+    - POD Tidy
+
+2014-05-19 - 0.1
+    + First version

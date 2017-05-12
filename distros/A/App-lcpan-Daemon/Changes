@@ -1,0 +1,21 @@
+Revision history for App-lcpan-Daemon
+
+0.03    2016-01-17 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with Pod::Weaver::Plugin::PERLANCAR::SortSections to
+          fix ordering of POD sections.
+
+
+0.02    2016-01-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add prereq to Perinci::Access::HTTP::Server dist for the PSGI
+	  app.
+
+
+0.01    2016-01-16 (PERLANCAR)
+
+        - First version.

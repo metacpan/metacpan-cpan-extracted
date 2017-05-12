@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+
+use AddressBook;
+
+$ldap=AddressBook->new(source => "LDAP:localhost"
+		       ) || die;
+
+$pilot=AddressBook->new(source => "PDB",
+			port=>"/dev/pilot",
+		        config=>$ldap->{config},	
+			);
+
+AddressBook::sync(master=>$ldap,slave=>$pilot,debug=>1);

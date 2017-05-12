@@ -1,0 +1,96 @@
+===== version history for Any::Daemon::HTTP
+
+version 0.26: Mon Sep 19 23:18:38 CEST 2016
+
+	Fixes:
+	- include examples in the manual-pages
+
+	Improvements:
+	- multi-proxy
+	- ::VirtualHost::new(aliases) value 'AUTO'
+
+version 0.25: Tue Apr 15 08:49:00 CEST 2014
+
+	Fixes:
+	- deadline passed log showed '0' seconds passed
+	- changes in LogReport [cpantesters]
+
+	Improvements:
+	- changed documentation style
+	- wait upto 30 seconds when the socket is still in use.
+
+version 0.24: Sun Jan  5 17:38:19 CET 2014
+
+	Changes:
+	- removed ::HTTP::new(use_ssl), now detected from portnumber
+	- move to Log::Report 1.00
+	- use IO::Socket::IP, to support IPv6
+
+	Fixes:
+	- no warning when request does not have Host
+	- show destination and owner of symlinks
+	- vhost not finding directory.
+	  rt.cpan.org#91672 [Kenney Westerhof]
+
+	Improvements:	
+	- ::Directory make charset configurable.
+	- minor cleanups after demo at Perl Mongers A'dam meeting
+	- now multiple ports possible
+	- deprecate ::HTTP::new(host) and ::new(socket) for new option
+	  new(listen).
+	- add ::HTTP::run(max_conn_per_child)
+	- extracted ::HTTP::Source as base from ::HTTP::Directory
+	- add ::HTTP::Proxy
+	- ::Directory and ::Proxy objects share the "sources" path
+	  mapping.
+
+version 0.23: Thu Nov 28 15:36:45 CET 2013
+	Improvement:
+	- move towards POSIX::1003
+
+version 0.22: Mon Oct 28 10:18:38 CET 2013
+	Fixes:
+	- socket listens only on tcp
+	- return HTTP_NO_CONTENT if the handler does not return anything
+
+	Improvements:
+	- show example how to create a Template::Toolkit handler.
+	- ::HTTP::new(vhost_class)
+	- support etag and modified testing on static files
+	- put connection info in the ps output
+	- cache-control dynamic data via md5
+	- feature and limitation description for this server
+	- remove unused "allow" in vhost
+
+version 0.21: Tue Oct 15 12:20:59 CEST 2013
+	Changes:
+	- handlers are called with $vhost as first parameter, which is more
+	  natural: they are defined in the VirtualHost object.
+	- group peer information in ::Session
+	- rewrite routine gets $vhost as first parameter
+
+	Fixes:
+	- on error, fill the response content with some text, otherwise
+	  browsers will not show it.
+	- addVirtualHost with only a PACKAGE is useless
+
+	Improvements:
+	- considerably more docs.
+	- fixes in handler parameter checking.
+	- add ::VirtualHost::addHandlers() as alternive to ::addHandler()
+	- ::Directory(location) can be relative (to cwd)
+	- ::HTTP::new(on_error)
+	- handlers can be called as method name
+	- ::HTTP::new(session_class)
+	- ::Directory(rewrite) can now have METHOD and HASH parameters
+	- ::VirtualHost::redirect()
+	- ::VirtualHost::new(redirect) and mustRedirect()
+
+version 0.20: Fri Oct 11 12:34:41 CEST 2013
+	Changes:
+	- major rewrite, most existing code will still work.
+	  Much of the code has been taken from HTTP::Server::*, but then
+	  for a non-multiplexing server core.
+
+version 0.10: Tue Jul  9 17:42:29 CEST 2013
+	- initial release (the main components of the code are much older)

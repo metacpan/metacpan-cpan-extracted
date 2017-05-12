@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+
+package Anything::But::Main::Just::To::See::If::It::Works;
+
+use lib qw(../lib lib);
+
+use strict;
+use warnings;
+
+$| = 1;
+
+use Assert::Conditional qw(:all)   => -if => 1;  
+use Assert::Conditional qw(:argc)  => -if => 0;  
+
+my $data = <DATA>;
+assert_bytes($data);
+my ($i, $j) = (25, 624);
+assert_numeric($_) for $i, $j;
+my $a = check(1 .. 1+int(rand 3));
+exit(0);
+
+sub check {
+    assert_nonlist_context();
+    assert_argc();        
+    assert_argc(37);
+    assert_argc_min(37);
+    my @args = @_;
+    print "check function called with @args\n";
+    assert_open_handle(*DATA);
+    assert_happy_code   {$i < $j};
+    assert_happy_code   {$i > $j};
+    assert_unhappy_code {$i < $j};
+    assert_unhappy_code {$i > $j};
+    check_args(4, 2);
+    assert_array_length(@_);
+    assert_array_length(@_, 11);
+    assert_argc_minmax(-54, 10);
+    assert_unhappy_code(sub {$i < $j});
+    assert_array_length_min(@_ => 20);
+    assert_class_method();
+    assert_void_context();
+    assert_list_context();
+    assert_nonlist_context();
+    assert_scalar_context();
+    assert_nonvoid_context();
+    assert_in_numeric_range($i, 10, 30);
+    assert_unhappy_code(\&check_args);
+    return undef;
+}
+
+sub check_args {
+    print "checking args for oddity\n";
+    assert_odd_number(int(rand(10)));
+}
+
+__DATA__
+stuff

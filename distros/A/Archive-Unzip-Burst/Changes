@@ -1,0 +1,41 @@
+Revision history for Perl extension Archive::Unzip::Burst.
+
+0.08 2016-05-08
+	- release with Changes
+
+0.07 2016-05-08
+	- reinstate -I in Makefile.PL but only Win32
+        - try supporting Darwin
+
+0.06 2016-05-07
+	- remove unnecessary -I from Makefile.PL
+
+0.05 2016-05-02
+	- set $osobjext in os fallback (from Slaven Rezic)
+
+0.04 2016-05-01
+	- update Makefile.PL for XSMULTI EUMM version (7.14)
+
+0.03   Thu Jan 15 02:13:23 GMT 2015
+        - Update unzip version to 6.0
+        - Rewrote build system to eliminate misuse of "static" target in res
+        - Squashed directory structure to eliminate "res" directory
+        - Make work seamlessly on Win32
+        - Add metadata so CPAN knows where git repo etc are
+
+0.02_2 Fri May 16 13:58 2008
+        - Mark Dootson supplied a potential fix to make this module work
+          on Windows.
+
+0.02_1 Wed Sep 05 17:20 2007
+        - Experimental change to Makefile.PL: Add an explicit mention of
+          LD_LIBRARY_PATH and the local unzip src directory. Perhaps
+          that might fix the failures related to lacking a -lunzip.
+
+0.02   Thu Aug 30 11:20 2007
+	- Fixed some packaging problems. (By default, MakeMaker
+          removes all Makefiles from MANIFEST. Tsk.)
+
+0.01   Sun Jul 29 16:45 2007
+	- original version as uploaded to CPAN
+

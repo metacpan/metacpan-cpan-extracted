@@ -1,0 +1,19 @@
+NAME
+    API::Handle
+
+VERSION
+    version 0.02
+
+   _tied
+    Recursively tie \[ key => $val, key => $val, ... ] data to create
+    preserved-order hashes ( needed for SOAP ).
+
+AUTHOR
+    Nour Sharabash <amirite@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Nour Sharabash.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: /local/CPAN/AxKit-XSP-L10N/t/htdocs/axkit/translate_bad_base.xsp 1396 2005-03-25T03:58:41.995755Z claco  $ -->
+<xsp:page xmlns:xsp="http://apache.org/xsp/core/v1"
+	xmlns:l10n="http://today.icantfocus.com/CPAN/AxKit/XSP/L10N"
+>
+	<body>
+		<en><l10n:translate base="Bogus::L10N" lang="en" value="Language"/></en>
+		<fr><l10n:translate base="Bogus::L10N" lang="fr" value="Language"/></fr>
+	</body>
+</xsp:page>

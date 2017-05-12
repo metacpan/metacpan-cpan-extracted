@@ -1,0 +1,24 @@
+bin/grepl
+Build.PL
+Changes
+lib/App/Grepl.pm
+lib/App/Grepl/Base.pm
+lib/App/Grepl/Results.pm
+lib/App/Grepl/Results/Token.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/10-exceptions.t
+t/20-results.t
+t/30-dir.t
+t/40-files.t
+t/50-sanity.t
+t/boilerplate.t
+t/lib/aliased.pm
+t/lib/Grepl/PodAndComments.pm
+t/lib/quotes/quote1.pl
+t/lib/ruby.rb
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,21 @@
+#################################################
+#      ALVIS Initialised parameters
+#  Auto-generated from alvisConf.xml
+#  Do not change.
+#################################################
+
+YAZ_PORT=8084 
+
+export YAZ_PORT 
+
+#################################################
+#      RUNTIME PARAMETERS
+#  Only used during runtime.  Change and
+#  they will take affect next time servers are restarted.
+#################################################
+
+#  Query filter configuration.
+#  Text fields to search for all text searches
+QF_TEXT="text dc.title anchortext"
+QF_PORT=9084
+

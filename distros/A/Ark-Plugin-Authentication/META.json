@@ -1,0 +1,112 @@
+{
+   "abstract" : "Ark plugins for authentications",
+   "author" : [
+      "Daisuke Murase <typester@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.9.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ark-Plugin-Authentication",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Ark" : "0",
+            "LWPx::ParanoidAgent" : "0",
+            "Net::OpenID::Consumer" : "0",
+            "OAuth::Lite" : "0",
+            "perl" : "5.008001"
+         },
+         "suggests" : {
+            "DBIx::Class" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::SHA1" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Ark::Plugin::Authentication" : {
+         "file" : "lib/Ark/Plugin/Authentication.pm",
+         "version" : "0.01"
+      },
+      "Ark::Plugin::Authentication::Backend" : {
+         "file" : "lib/Ark/Plugin/Authentication/Backend.pm"
+      },
+      "Ark::Plugin::Authentication::Credential::OpenID" : {
+         "file" : "lib/Ark/Plugin/Authentication/Credential/OpenID.pm"
+      },
+      "Ark::Plugin::Authentication::Credential::Password" : {
+         "file" : "lib/Ark/Plugin/Authentication/Credential/Password.pm"
+      },
+      "Ark::Plugin::Authentication::Credential::Twitter" : {
+         "file" : "lib/Ark/Plugin/Authentication/Credential/Twitter.pm"
+      },
+      "Ark::Plugin::Authentication::Store::DBIx::Class" : {
+         "file" : "lib/Ark/Plugin/Authentication/Store/DBIx/Class.pm"
+      },
+      "Ark::Plugin::Authentication::Store::Minimal" : {
+         "file" : "lib/Ark/Plugin/Authentication/Store/Minimal.pm"
+      },
+      "Ark::Plugin::Authentication::Store::Model" : {
+         "file" : "lib/Ark/Plugin/Authentication/Store/Model.pm"
+      },
+      "Ark::Plugin::Authentication::Store::Null" : {
+         "file" : "lib/Ark/Plugin/Authentication/Store/Null.pm"
+      },
+      "Ark::Plugin::Authentication::User" : {
+         "file" : "lib/Ark/Plugin/Authentication/User.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ark-framework/Ark-Plugin-Authentication/issues"
+      },
+      "homepage" : "https://github.com/ark-framework/Ark-Plugin-Authentication",
+      "repository" : {
+         "url" : "git://github.com/ark-framework/Ark-Plugin-Authentication.git",
+         "web" : "https://github.com/ark-framework/Ark-Plugin-Authentication"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Songmu <y.songmu@gmail.com>"
+   ]
+}

@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 527920256763f409e1349e2227df49de07d12f67 Changes
+SHA1 88776391b0d31f6997d954f383bbc31e42d2a4cf INSTALL
+SHA1 6b50b30fa6f8d063d96e32c9a81f3f82328925f7 LICENSE
+SHA1 1037ba272ce25c67907cc7ba2b634a9f194f2a45 MANIFEST
+SHA1 020e40849ddd51b8bbcdec7b1d759445ff3edc66 META.json
+SHA1 396e79f578d2112a72566f6ac821c2209bcb7391 META.yml
+SHA1 6a49f571f0e3cf9dcac56e420b9f74a53438c38c Makefile.PL
+SHA1 1908e0edc6fe44799dcc838abd40964cbb04e345 README
+SHA1 3847b612fb5ad718dabe47738a8e2a1b396389b9 bin/mirai
+SHA1 343aa3c89a8fb4c8f67b8b6de5965666763ce7c0 bin/mirai-trace
+SHA1 5bf2c4e21e5df981c166921b20a777be53b90942 cpanfile
+SHA1 15868ed04876ac51f0e81d91def1824606383509 dist.ini
+SHA1 7c5e302d969f92e1961e3cc3572fe88bf43f1f7b examples/example.pl
+SHA1 95cb0f2841c952be40809eedb24ed8dd952c0c00 examples/simple-trace.pl
+SHA1 bb70dfd4bbabb82eb2bc4c841494107c73581794 lib/App/mirai.pm
+SHA1 eca9078813ea95b120ec75a0f26159e2e934c5f2 lib/App/mirai/Future.pm
+SHA1 74f33c0b1458a8603b54334b34e16f71ca20ea74 lib/App/mirai/FutureProxy.pm
+SHA1 81282c138afcda10dbba231c66827b38efdf771a lib/App/mirai/Subprocess.pm
+SHA1 a1b06937158bf60aaf6c42b5a9ef73acb0ea4806 lib/App/mirai/Tickit.pm
+SHA1 a31c202565e3c7db1ab2200f1f5a8ac9b7bd1f8f lib/App/mirai/Tickit/TabRibbon.pm
+SHA1 7523878641b83e8a59b693e65aa04cd0f416f288 lib/App/mirai/Tickit/TabRibbon.pod
+SHA1 f71e416e183e4cfddaddcf8ccfdae48d33748bdb lib/App/mirai/Tickit/Widget/Logo.pm
+SHA1 db4df1f65dd58b4419147404e92a8bb8d2272e98 lib/App/mirai/Tickit/Widget/Logo.pod
+SHA1 d3dcd146e9d22b0d39bc31cff6c9b4ac56fff98f lib/App/mirai/Watcher.pm
+SHA1 3b601858c0379fcf616413f5cd7c57cadf9b76ba lib/App/mirai/Watcher.pod
+SHA1 e875d5b24d924d8a40cb350b9ba8b1ae8b1a47cb lib/irai.pm
+SHA1 51b9325dbe58a7a60c745bc270e63a43caed984d share/default.style
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 0ae698e42f311273d434d5e909bf763238714bb9 t/00-compile.t
+SHA1 a69f08aa1bfa73743ec993cb951fefb08c596fe2 t/000-report-versions-tiny.t
+SHA1 f80a7981b3218c9370c7a8fa4e2d7bb6a7937bcc t/patched.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 1294a6710ea8e2626e43722e50111bf872668316 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJUzliXAAoJEFKElMNpjtyDka8IAK43DSjTZFtgmHO+yCVMUkOB
+4x0gA4IR5w8EeXLHoIjMmQ3Mury7B0MWa6W306g/Vf4Ry1iu6+bdJQLdZZCp6ZPT
+bZMCpRvFarXNCXg4S5KT9lG3YdDRra5PYGyqGuuM93O/USEoAkkIBNLGXEhmM8qv
+30DV7vfoh1OH5dz+kQ9FRo82So0vAYfpZt7Cm5Qybd4ODI3VY7Dn5zhFkfhhMkYI
+gUEqPBewy1U6qTCSuX6vY62wa9P47RP2pe6/OmdF+hQtEKlscMLbamQ5AIOGkSVk
+YMT8+yO1g9gJTk1xJ9rcjplAe2zfFu2D6FoKBgmFrv6IU16B2FJ/mvp3J+k7B0g=
+=QqZe
+-----END PGP SIGNATURE-----

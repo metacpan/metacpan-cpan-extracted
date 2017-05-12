@@ -1,0 +1,252 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#ABSTRACT">ABSTRACT</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#Benefits">Benefits</a>
+    <ul>
+      <li><a href="#GLOBAL-OPTIONS">GLOBAL OPTIONS</a></li>
+      <li><a href="#SUBCOMMANDS">SUBCOMMANDS</a>
+        <ul>
+          <li><a href="#branch">branch</a></li>
+          <li><a href="#clean">clean</a></li>
+          <li><a href="#clone">clone</a></li>
+          <li><a href="#commit">commit</a></li>
+          <li><a href="#fetch">fetch</a></li>
+          <li><a href="#init">init</a></li>
+          <li><a href="#pull">pull</a></li>
+          <li><a href="#push">push</a></li>
+          <li><a href="#status">status</a></li>
+          <li><a href="#version">version</a></li>
+          <li><a href="#help">help</a></li>
+          <li><a href="#meta">_meta</a></li>
+          <li><a href="#meta-completion">_meta completion</a></li>
+          <li><a href="#meta-completion-generate">_meta completion generate</a></li>
+          <li><a href="#meta-pod">_meta pod</a></li>
+          <li><a href="#meta-pod-generate">_meta pod generate</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>subrepo - Git Submodule Alternative</p>
+
+<h1 id="ABSTRACT">ABSTRACT</h1>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is just an example for generating completion for an existing command, <a href="https://github.com/ingydotnet/git-subrepo">https://github.com/ingydotnet/git-subrepo</a></p>
+
+<p>This git command &quot;clones&quot; an external git repo into a subdirectory of your repo. Later on, upstream changes can be pulled in, and local changes can be pushed back. Simple.</p>
+
+<h1 id="Benefits">Benefits</h1>
+
+<p>This command is an improvement from <code>git-submodule</code> and <code>git-subtree</code>; two other git commands with similar goals, but various problems.</p>
+
+<h2 id="GLOBAL-OPTIONS">GLOBAL OPTIONS</h2>
+
+<pre><code>    --help -h    Show command help (flag)</code></pre>
+
+<h2 id="SUBCOMMANDS">SUBCOMMANDS</h2>
+
+<h3 id="branch">branch</h3>
+
+<pre><code>    subrepo  branch [options] [&lt;subrepo&gt;]</code></pre>
+
+<p>Create a branch with local subrepo commits since last pull.</p>
+
+<p>Options:</p>
+
+<pre><code>    --all    All subrepos (flag)</code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    subrepo    Subrepo</code></pre>
+
+<h3 id="clean">clean</h3>
+
+<pre><code>    subrepo  clean [options] [&lt;subrepo&gt;]</code></pre>
+
+<p>Remove artifacts created by <code>fetch</code> and <code>branch</code> commands.</p>
+
+<p>Options:</p>
+
+<pre><code>    --all    All subrepos (flag)</code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    subrepo    Subrepo</code></pre>
+
+<h3 id="clone">clone</h3>
+
+<pre><code>    subrepo  clone [options] &lt;repository&gt; [&lt;subdir&gt;]</code></pre>
+
+<p>Add a repository as a subrepo in a subdir of your repository.</p>
+
+<p>Options:</p>
+
+<pre><code>    --branch -b    Upstream branch                                        
+    --force -f     reclone (completely replace) an existing subdir. (flag)</code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    repository  *  
+    subdir         </code></pre>
+
+<h3 id="commit">commit</h3>
+
+<pre><code>    subrepo  commit &lt;subrepo&gt; [&lt;subreporef&gt;]</code></pre>
+
+<p>Add subrepo branch to current history as a single commit.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    subrepo     *  Subrepo    
+    subreporef     Subrepo ref</code></pre>
+
+<h3 id="fetch">fetch</h3>
+
+<pre><code>    subrepo  fetch [options] [&lt;subrepo&gt;]</code></pre>
+
+<p>Fetch the remote/upstream content for a subrepo.</p>
+
+<p>Options:</p>
+
+<pre><code>    --all    All subrepos (flag)</code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    subrepo    Subrepo</code></pre>
+
+<h3 id="init">init</h3>
+
+<pre><code>    subrepo  init [options] &lt;subdir&gt;</code></pre>
+
+<p>Turn an existing subdirectory into a subrepo.</p>
+
+<p>Options:</p>
+
+<pre><code>    --remote -r    Specify remote repository
+    --branch -b    Upstream branch          </code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    subdir  *  </code></pre>
+
+<h3 id="pull">pull</h3>
+
+<pre><code>    subrepo  pull [options] [&lt;subrepo&gt;]</code></pre>
+
+<p>Update the subrepo subdir with the latest upstream changes.</p>
+
+<p>Options:</p>
+
+<pre><code>    --all          All subrepos (flag)      
+    --branch -b    Upstream branch          
+    --remote -r    Specify remote repository
+    --update -u    update                   </code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    subrepo    Subrepo</code></pre>
+
+<h3 id="push">push</h3>
+
+<pre><code>    subrepo  push [options] [&lt;subrepo&gt;]</code></pre>
+
+<p>Push a properly merged subrepo branch back upstream.</p>
+
+<p>Options:</p>
+
+<pre><code>    --all          All subrepos (flag)      
+    --branch -b    Upstream branch          
+    --remote -r    Specify remote repository
+    --update -u    update                   </code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    subrepo    Subrepo</code></pre>
+
+<h3 id="status">status</h3>
+
+<pre><code>    subrepo  status [options] [&lt;subrepo&gt;]</code></pre>
+
+<p>Get the status of a subrepo.</p>
+
+<p>Options:</p>
+
+<pre><code>    --quiet -q    Just print names</code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    subrepo    Subrepo</code></pre>
+
+<h3 id="version">version</h3>
+
+<pre><code>    subrepo  version</code></pre>
+
+<p>display version information about git-subrepo</p>
+
+<h3 id="help">help</h3>
+
+<pre><code>    subrepo  help &lt;subcommands&gt;</code></pre>
+
+<p>Same as <code>git help subrepo</code></p>
+
+<h3 id="meta">_meta</h3>
+
+<pre><code>    subrepo  _meta &lt;subcommands&gt;</code></pre>
+
+<p>Information and utilities for this app</p>
+
+<h3 id="meta-completion">_meta completion</h3>
+
+<pre><code>    subrepo _meta completion &lt;subcommands&gt;</code></pre>
+
+<p>Shell completion functions</p>
+
+<h3 id="meta-completion-generate">_meta completion generate</h3>
+
+<pre><code>    subrepo _meta completion generate [options]</code></pre>
+
+<p>Generate self completion</p>
+
+<p>Options:</p>
+
+<pre><code>    --name    name of the program (optional, override name in spec)
+    --zsh     for zsh (flag)                                       
+    --bash    for bash (flag)                                      </code></pre>
+
+<h3 id="meta-pod">_meta pod</h3>
+
+<pre><code>    subrepo _meta pod &lt;subcommands&gt;</code></pre>
+
+<p>Pod documentation</p>
+
+<h3 id="meta-pod-generate">_meta pod generate</h3>
+
+<pre><code>    subrepo _meta pod generate</code></pre>
+
+<p>Generate self pod</p>
+
+
+</body>
+
+</html>
+
+

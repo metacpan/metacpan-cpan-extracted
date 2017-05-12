@@ -1,0 +1,83 @@
+{
+   "abstract" : "A wrapper for installing the SVN Perl bindings",
+   "author" : [
+      "Michael G Schwern <schwern@pobox.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-SVN",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "src"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31",
+            "Module::Build" : "0.28",
+            "Test::More" : "0.40"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.8.0",
+            "version" : "0.70"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::SVN" : {
+         "file" : "lib/Alien/SVN.pm",
+         "version" : "v1.8.11.0"
+      },
+      "SVN::Base" : {
+         "file" : "src/subversion/subversion/bindings/swig/perl/native/Base.pm"
+      },
+      "SVN::Client" : {
+         "file" : "src/subversion/subversion/bindings/swig/perl/native/Client.pm"
+      },
+      "SVN::Core" : {
+         "file" : "src/subversion/subversion/bindings/swig/perl/native/Core.pm",
+         "version" : "v1.8.11"
+      },
+      "SVN::Delta" : {
+         "file" : "src/subversion/subversion/bindings/swig/perl/native/Delta.pm"
+      },
+      "SVN::Fs" : {
+         "file" : "src/subversion/subversion/bindings/swig/perl/native/Fs.pm"
+      },
+      "SVN::Ra" : {
+         "file" : "src/subversion/subversion/bindings/swig/perl/native/Ra.pm"
+      },
+      "SVN::Repos" : {
+         "file" : "src/subversion/subversion/bindings/swig/perl/native/Repos.pm"
+      },
+      "SVN::Wc" : {
+         "file" : "src/subversion/subversion/bindings/swig/perl/native/Wc.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/evalEmpire/Alien-SVN/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/evalEmpire/Alien-SVN/"
+      }
+   },
+   "version" : "v1.8.11.0"
+}

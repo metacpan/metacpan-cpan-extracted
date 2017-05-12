@@ -1,0 +1,30 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "TFA Blueberry Candy",
+            "percentage" : "8"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Blueberry Extra",
+            "percentage" : "4"
+         },
+         {
+            "type" : "PG",
+            "tag" : "E.M.",
+            "percentage" : "1"
+         }
+      ],
+      "target_pg" : 45,
+      "base_nic_per_ml" : 100,
+      "base_nic_type" : "PG",
+      "target_quantity" : "10",
+      "target_nic_per_ml" : "12",
+      "target_vg" : 55,
+      "notes" : [
+         "Not bad, try a little ethyl maltol next time."
+      ]
+   }
+}

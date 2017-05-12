@@ -1,0 +1,34 @@
+NAME
+    Apache2::Filter::GoogleAnalytics - Add GA code to served HTML document
+
+SYNOPSIS
+      PerlLoadModule Apache2::Filter::GoogleAnalytics
+      <Location /to-analyze>
+              WebPropertyID UA-80868086-2
+              PerlOutputFilterHandler Apache2::Filter::GoogleAnalytics
+      </Location>
+
+DESCRIPTION
+    This module transparently adds a Google Analytics service scriptlet to
+    each HTML document that Apache httpd serves. It behaves asynchronous
+    pass-thru filter, thus its impact on performance is minimal.
+
+OPTIONS
+    WebPropertyID
+        A Web Property ID obtained from Google. It can be specified both
+        globally and per-resource basis.
+
+SEE ALSO
+    HTML::Parser, Apache2::Filter.
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Lubomir Rintel, "<lkundrak@v3.sk>"
+
+    The code is hosted on GitHub
+    <https://github.com/lkundrak/perl-Apache2-Filter-GoogleAnalytics> Bug
+    fixes and feature enhancements are always welcome.
+

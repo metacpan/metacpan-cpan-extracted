@@ -1,0 +1,36 @@
+Revision history for App-diffdir
+
+0.5   2016-06-19
+        Updating for release of version 0.5
+        Added Moo dependency (Ivan Wills)
+        Moving logic into module (Ivan Wills)
+        Updated config files (Ivan Wills)
+        Updated config files (Ivan Wills)
+        LICENSE update (Ivan Wills)
+
+0.4   2015-08-10
+        Updating for release of version 0.4
+        Removed creation of makefile (Ivan Wills)
+
+0.3   2015-07-10
+        Updating for release of version 0.3
+        Converted to Path::Tiny (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.2   2015-06-30
+        Updating for release of version 0.2
+        Removed unneeded tag (Ivan Wills)
+
+0.1     2015-04-05
+        Updated dependencies (Ivan Wills)
+        Changed version number (Ivan Wills)
+        Made load test better (Ivan Wills)
+        Added stop words (Ivan Wills)
+        Fixed MANIFEST and LICENSE (Ivan Wills)
+        Fixed POD (Ivan Wills)
+        Fixed test (Ivan Wills)
+        Added date (Ivan Wills)
+        Added POD format (Ivan Wills)
+        Moved README format to POD (Ivan Wills)
+        Added real file (Ivan Wills)
+        Initial commit (Ivan Wills)

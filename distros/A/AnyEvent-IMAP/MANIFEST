@@ -1,0 +1,21 @@
+Build.PL
+Changes
+example/demo.pl
+lib/AnyEvent/IMAP.pm
+lib/Mail/IMAP/Address.pm
+lib/Mail/IMAP/Envelope.pm
+lib/Mail/IMAP/Util.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00_compile.t
+t/01_envelope.t
+t/02_can.t
+xt/01_podspell.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/04_minimum_version.t
+xt/05_cpan_meta.t
+xt/06_meta_author.t

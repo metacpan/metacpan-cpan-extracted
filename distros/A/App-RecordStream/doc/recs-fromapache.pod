@@ -1,0 +1,53 @@
+=head1 NAME
+
+recs-fromapache
+
+=head1 recs-fromapache --help-all
+
+ Usage: recs-fromapache <args>
+    Each line of input (or lines of <files>) is parse by Apache::Log::Parser to
+    produce an output record.
+ 
+ Arguments:
+    --fast                       'fast' parser works relatively fast. It can
+                                 process only 'common', 'combined' and custom
+                                 styles with compatibility with 'common', and
+                                 cannot work with backslash-quoted double-quotes
+                                 in fields. (This is the default)
+    --strict                     'strict' parser works relatively slow. It can
+                                 process any style format logs, with
+                                 specification about separator, and checker for
+                                 perfection. It can also process backslash-quoted
+                                 double-quotes properly.
+    --verbose                    Verbose output.
+    --woothee                    Each agent field of records is parse by Woothee
+                                 to produce woothee field.
+    --filename-key|fk <keyspec>  Add a key with the source filename (if no
+                                 filename is applicable will put NONE)
+ 
+   Help Options:
+       --help  This help screen
+ 
+ Examples:
+    Get records from typical apache log
+       recs-fromapache < /var/log/httpd-access.log
+    A more detailed how to use (See perldoc Apache::Log::Parser)
+       recs-fromapache --strict '[qw(combined common vhost_common)]' < /var/log/httpd-access.log
+    Get records except access of crawler
+       recs-fromapache --woothee < /var/log/httpd-access.log | recs-grep '$r->{woothee}{category} ne "crawler"'
+
+=head1 SEE ALSO
+
+=over
+
+=item * See L<App::RecordStream> for an overview of the scripts and the system
+
+=item * Run C<recs examples> or see L<App::RecordStream::Manual::Examples> for a set of simple recs examples
+
+=item * Run C<recs story> or see L<App::RecordStream::Manual::Story> for a humorous introduction to RecordStream
+
+=item * Every command has a C<--help> mode available to print out usage and
+examples for the particular command, just like the output above.
+
+=back
+

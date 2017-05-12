@@ -1,0 +1,65 @@
+? my $app = shift;
+
+<div id="help" style="display:none">
+  <h1>Alice Help</h1>
+  <div id="helpclose">close</div>
+  <div id="topics">
+    <dl>
+      <h2>Commands</h2>
+      <? for my $command ($app->commands) { ?>
+        <? next unless $command->{eg} and $command->{desc}; ?>
+        <dt><?= $command->{eg} ?></dt>
+        <dd><?= $command->{desc} ?></dd>
+      <? } ?>
+    </dl>
+    <dl id="shortcuts">
+      <h2>Shortcuts</h2>
+      <dt>Tab</dt>
+      <dd>Cycle to next nick completion</dd>
+      <dt>[Mod1] K</dt>
+      <dd>Clear current tab</dd>
+      <dt>[Mod1] B</dt>
+      <dd>Bold selection</dd>
+      <dt>[Mod1] I</dt>
+      <dd>Italicize selection</dd>
+      <dt>[Mod1] U</dt>
+      <dd>Underline selection</dd>
+      <dt>[Mod1] ← &nbsp;or&nbsp; [Mod1] [Shift] H</dt>
+      <dd>Previous tab</dd>
+      <dt>[Mod1] → &nbsp;or&nbsp; [Mod1] [Shift] L</dt>
+      <dd>Next tab</dd>
+      <dt>[Mod1] [Shift] U</dt>
+      <dd>Next unread tab</dd>
+      <dt>[Meta] [Up]</dt>
+      <dd>Cycle through previous message</dd>
+      <dt>[Meta] [Down]</dt>
+      <dd>Cycle to next message</dd>
+      <dt>[Meta] [Return]</dt>
+      <dd>Insert a newline</dd>
+      <dt >[Mod1] [Shift] M</dt>
+      <dd>Mark all tabs as read</dd>
+      <dt>[Mod1] [Shift] J</dt>
+      <dd>Jump to bottom of tab</dd>
+      <dt>[Mod1] [Shift] K</dt>
+      <dd>Toggle nick overlay above avatars</dd>
+    </dl>
+    <script type="text/javascript">
+      var isMac = navigator.platform.match(/mac/i);
+      var modmap = {
+        "[Meta]":   isMac ? "⌥" : "&lt;Alt&gt;",
+        "[Mod1]":   isMac ? "⌘" : "&lt;Ctrl&gt;",
+        "[Shift]":  isMac ? "⇧" : "&lt;Shift&gt;",
+        "[Up]":     isMac ? "↑" : "&lt;Up&gt;",
+        "[Down]":   isMac ? "↓" : "&lt;Down&gt;",
+        "[Return]": isMac ? "↵" : "&lt;Return&gt;",
+      };
+      $('shortcuts').select("dt").each(function(dt) {
+        var terms = dt.innerHTML.split(" ");
+        terms = terms.map(function(term) {
+          return modmap[term] ? modmap[term] : term;  
+        });
+        dt.innerHTML = terms.join(isMac ? "" : " ");
+      });
+    </script>
+  </div>
+</div>

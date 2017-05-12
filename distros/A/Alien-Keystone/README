@@ -1,0 +1,67 @@
+NAME
+
+    Alien::Keystone - Perl extension to install Keystone-Engine from
+    www.keystone-engine.org
+
+SYNOPSIS
+
+    Alien::Keystone is a perl module that enables the installation of the
+    open source disassembly library Keystone-Engine from
+    http://www.keystone-engine.org on the system or locate the existing
+    installation if any. It is currently setup to look for the Github
+    master.
+
+    You can use it in the Build.PL file if you're using Module::Build or
+    Makefile.PL file if you're using ExtUtils::MakeMaker.
+
+                use Alien::Keystone;
+                # ...
+                my $keystone= Alien::Keystone->new;
+                my $build = Module::Build->new(
+                    ...
+                    extra_compiler_flags => $keystone->cflags(),
+                    extra_linker_flags => $keystone->libs(),
+                    ...
+                );
+
+VERSION
+
+    0.03
+
+METHODS
+
+    new
+
+      Creates the object. Refer Alien::Base for more information.
+
+    cflags
+
+      This method provides the compiler flags needed to use the library on
+      the system.
+
+    libs
+
+      This method provides the linker flags needed to use the library on
+      the system.
+
+SEE ALSO
+
+    Alien::Base
+
+AUTHORS
+
+    Vikas N Kumar <vikas@cpan.org>
+
+REPOSITORY
+
+    https://github.com/selectiveintellect/p5-alien-keystone.git
+
+COPYRIGHT
+
+    Copyright (C) 2016. Selective Intellect LLC
+    <github@selectiveintellect.com>. All Rights Reserved.
+
+LICENSE
+
+    This is free software under the MIT license.
+

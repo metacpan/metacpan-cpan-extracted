@@ -1,0 +1,13 @@
+Changes
+lib/Array/Shuffle.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+samples/benchmark.pl
+Shuffle.xs
+t/Array-Shuffle.t
+t/pods.t
+samples/stats.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

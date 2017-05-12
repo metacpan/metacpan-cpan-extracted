@@ -1,0 +1,84 @@
+{
+   "abstract" : "IRC bot for LLEval",
+   "author" : [
+      "Songmu <y.songmu@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v1.0.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-LLEvalBot",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "2.39",
+            "LLEval" : "0",
+            "Mouse" : "0",
+            "Pod::Usage" : "0",
+            "UnazuSan" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exit" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::LLEvalBot" : {
+         "file" : "lib/App/LLEvalBot.pm",
+         "version" : "0.01"
+      },
+      "App::LLEvalBot::CLI" : {
+         "file" : "lib/App/LLEvalBot/CLI.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Songmu/p5-App-LLEvalBot/issues"
+      },
+      "homepage" : "https://github.com/Songmu/p5-App-LLEvalBot",
+      "repository" : {
+         "url" : "git://github.com/Songmu/p5-App-LLEvalBot.git",
+         "web" : "https://github.com/Songmu/p5-App-LLEvalBot"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:SONGMU"
+}

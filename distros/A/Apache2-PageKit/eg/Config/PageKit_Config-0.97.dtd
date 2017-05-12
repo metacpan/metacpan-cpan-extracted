@@ -1,0 +1,38 @@
+<!ELEMENT CONFIG (GLOBAL,SERVERS,PAGES)>
+<!ELEMENT GLOBAL EMPTY>
+<!ATTLIST GLOBAL
+	cache_dir			CDATA	#IMPLIED
+	cookies_not_set_page		CDATA	#IMPLIED
+	default_lang			CDATA	"en"
+	default_page			CDATA	"index"
+	login_page			CDATA	"login"
+	not_found_page			CDATA	#IMPLIED
+	model_base_class		CDATA	"MyPageKit::Common"
+	model_dispatch_prefix		CDATA	"MyPageKit::MyModel"
+	post_max			CDATA	"100000000"
+	recent_login_timeout		CDATA	"3600"
+	request_param_in_tmpl		CDATA	"no"
+	session_expires			CDATA	#IMPLIED
+	uri_prefix			CDATA	#IMPLIED
+	verify_page			CDATA	#IMPLIED>
+<!ELEMENT SERVERS (SERVER)*>
+<!ELEMENT SERVER EMPTY>
+<!ATTLIST SERVER
+	id			CDATA	"Default"
+	can_edit		(yes|no)	"no"
+	cookie_domain		NMTOKENS	#IMPLIED
+	files_match		CDATA	#IMPLIED
+	html_clean_level	(0|1|2|3|4|5|6|7|8|9)	"9"
+	reload			(yes|no)	"no">
+<!ELEMENT PAGES (PAGE)*>
+<!ELEMENT PAGE EMPTY>
+<!ATTLIST PAGE
+        id                 ID      #REQUIRED
+        browser_cache           CDATA   #IMPLIED
+	fill_in_form		(yes|no)	"yes"
+        internal_title          CDATA   #IMPLIED
+	request_param_in_tmpl	CDATA	#IMPLIED
+        require_login           CDATA   #IMPLIED
+        template_cache		CDATA   #IMPLIED
+        use_template            CDATA   #IMPLIED
+        uri_match		CDATA   #IMPLIED>

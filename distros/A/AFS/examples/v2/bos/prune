@@ -1,0 +1,47 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::BOS;
+
+my ($server, $cellname, $bos, $what, $ok);
+
+die "Usage: $0 server [cell] all | bak | old | core\n" if $#ARGV < 0;
+
+my $nargs = $#ARGV;
+$server   = shift;
+$cellname = shift if $nargs == 2;
+$what     = shift if $nargs >  0;
+
+$what = '' unless $what;
+
+if ($cellname) { $bos = AFS::BOS->new($server, 0, 0, $cellname); }
+else           { $bos = AFS::BOS->new($server); }
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+if ($what eq 'all') {
+    # warn "prune all \n";
+    $ok = $bos->prune(1);      # delete ALL (.BAK, .OLD, CORE) files
+}
+elsif ($what eq 'bak') {
+    # warn "prune bak \n";
+    $ok = $bos->prune(0, 1);    # delete .BAK files
+}
+elsif ($what eq 'old') {
+    # warn "prune old \n";
+    $ok = $bos->prune(0, 0, 1);    # delete .OLD files
+}
+elsif ($what eq 'core') {
+    # warn "prune core \n";
+    $ok = $bos->prune(0, 0, 0, 1);    # delete CORE files
+}
+else {
+    # warn "prune nothing \n";
+    $ok = $bos->prune;      # nothing specified ... give error message
+}
+print "Error Code: $AFS::CODE\n" if ($AFS::CODE);
+#print "Status: $ok \n";
+
+$bos->DESTROY;

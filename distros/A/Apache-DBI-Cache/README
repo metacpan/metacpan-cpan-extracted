@@ -1,0 +1,407 @@
+NAME
+    Apache::DBI::Cache - a DBI connection cache
+
+SYNOPSIS
+      use Apache::DBI::Cache debug=>3, bdb_env=>'/tmp/tmp',
+                             plugin=>'Apache::DBI::Cache::mysql',
+                             plugin=>['DBM', sub {...}, sub {...}],
+                             ...;
+
+INSTALLATION
+    This installs 2 modules "Apache::DBI::Cache" und
+    "Apache::DBI::Cache::mysql".
+
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+  Testing
+   MySQL
+    Since Apache::DBI::Cache::mysql depends on MySQL you need 2 databases on
+    the same DB server listening on port 3306 to test it. Nothing will be
+    written to them. Only connections are established and the "SHOW
+    PROCESSLIST" command is executed.
+
+    The connection parameters are passed to the test as environment
+    variables. If you do not want to test it leave them empty and the plugin
+    test ("t/100mysql") is silently skipped.
+
+    These environment variables are used:
+
+    MYSQL1, MYSQL2
+        the 2 database names
+
+    MYSQL_HOST
+        the database host. If omitted "localhost" is used.
+
+    MYSQL_USER, MYSQL_PASSWD
+        you credentials.
+
+    My "make test" command looks like:
+
+     MYSQL1=dbitest1 MYSQL2=dbitest2 make test
+
+   BerkeleyDB
+    If "BerkeleyDB" is not available a few tests are skipped.
+
+DEPENDENCIES
+    BerkeleyDB is used if installed to make DBI handle statistics visible
+    for the whole Apache process group instead of a single process.
+
+    DBI 1.37
+
+    perl 5.8.0
+
+DESCRIPTION
+    This module is an alternative to the famous Apache::DBI module. As
+    Apache::DBI it provides persistent DBI connections.
+
+    It can be used with mod_perl1, mod_perl2 and even standalone.
+
+  WHY ANOTHER MODULE FOR THE SAME?
+    Apache::DBI has a number of limitations. Firstly, it is not possible to
+    get multiple connections with the same parameters. A common scenario for
+    example is to use one connection to perform transactions and another to
+    perform simple lookups in the same database. With Apache::DBI it is very
+    likely to get the same connection if you mean to use different.
+
+    With Apache::DBI all connections are reset at end of a request.
+
+    Apache::DBI does not regard database specific functions to cache handles
+    more aggressively. For example a mysql DSN can look like
+
+     dbi:mysql:test:localhost:3306
+
+    or
+
+     dbi:mysql:host=localhost;db=test
+
+    Both point to the same database but for Apache::DBI they are different.
+    Apache::DBI::Cache recognizes these two by means of a *mysql* plugin.
+
+    The plugin even recognizes connections to different databases on the
+    same mysql server as the same connection and issues a "USE database"
+    command before returning the actual handle to the user. Hence, with
+    Apache::DBI::Cache many the overall number of connections to a DB server
+    can be dramatically reduced.
+
+  HOW DOES IT WORK?
+    To decide whether to use Apache::DBI::Cache or not it is essential to
+    know how it works. As with Apache::DBI Apache::DBI::Cache uses a hook
+    provided by the DBI module to intercept "DBI->connect()" calls. Also do
+    Apache::DBI::Cache maintain a cache of active handles.
+
+    When a new connection is requested and the cache is empty a new
+    connection is established and returned to the user. At this point it is
+    not cached at all. Here Apache::DBI::Cache differs from Apache::DBI.
+
+    Later either "disconnect" is called on the handle or it simply goes out
+    of scope and the garbage collector calls a "DESTROY" method if provided.
+    Both events are intercepted by Apache::DBI::Cache. Only then the handle
+    is put in the cache.
+
+    This means a handle is never really disconnected. "$dbh->{Active}" will
+    always return true no matter how often "disconnect" is called. Further,
+    you can prevent a handle from getting reused by simply not forgetting
+    it.
+
+  USAGE
+    Different to Apache::DBI Apache::DBI::Cache must be "use"ed not
+    "require"ed. That means it's "import" function must be called.
+
+    When used with mod_perl (versions 1.x or 2.x) this is best done in a
+    "startup.pl" or in a "<Perl>" section in the "httpd.conf". See mod_perl
+    documentation for more information.
+
+    Thereafter, "DBI->connect" is called as usual. No special treatment is
+    needed.
+
+    When Apache::Status or Apache2::Status is used Apache::DBI::Cache
+    provides an extra menu item to show statistics on handles. The loading
+    order of the Apache::Status and Apache::DBI::Cache is irrelevant.
+
+  FUNCTIONS
+    import - "use" parameter
+        Parameters to the "use" statement are given in a "key => value"
+        fashion.
+
+         use Apache::DBI::Cache debug=>3, logger=>sub {...},
+                                plugin=>['driver', sub {}, sub {}],
+                                plugin=>'Apache::DBI::Cache::mysql',
+                                use_bdb=>1,
+                                bdb_env=>'/tmp/mybdbenv',
+                                bdb_memcache=>20*1024,
+                                ...;
+
+        * plugin
+          loads a plugin, see also "PLUGINS" below. The plugin can be
+          specified as a 3-element array or by name. In the second case the
+          "import" simply "use"s the module. This option can be given
+          multiple times.
+
+        * use_bdb, bdb_env and bdb_memcache
+          Apache::DBI::Cache can use BerleleyDB as a shared memory
+          implementation to maintain statistics for a group of processes
+          instead of a single process.
+
+          "use_bdb" specify whether to use BerkeleyDB or not. If ommitted
+          Apache::DBI::Cache will try to load and use BerkeleyDB. If that
+          fails it silently provides per process statistics. If "use_bdb" is
+          true Apache::DBI::Cache dies if it cannot use BerkeleyDB. If
+          "use_bdb" is false per process statistics are maintained and
+          BerkeleyDB is not used.
+
+          "bdb_env" specifies a path to a directory where BerkeleyDB can put
+          it's temporary files. If omitted "/tmp/Apache::DBI::Cache" is
+          used. The parent directory of this directory must exists and be
+          writeable.
+
+          "bdb_memcache" specifies the size of the shared memory segment
+          that is allocated by BerkeleyDB. Depending on the number of
+          handles in your configuration a few kilobytes are enough. If
+          omitted 20 kB are used.
+
+          "bdb_env" and "bdb_memcache" can also be specified by the
+          "APACHE_DBI_CACHE_ENVPATH" and "APACHE_DBI_CACHE_CACHESIZE"
+          environment variables.
+
+        * debug
+          set a debug level. Under mod_perl this is almost irrelevant, see
+          "logger" below.
+
+        * logger
+          here a logger function can be specified. It is called with the
+          message verbosity level as the first parameter. The remaining
+          parameters are concatenated to build the actual message.
+
+          Currently there are 2 verbosity levels used 1 and 2. 0 is reserved
+          for real errors. 1 mentions that the module has been initialized.
+          2 rattle off normal processing messages.
+
+          Apache::DBI::Cache provides 2 logger functions. One is controlled
+          by the "debug" level setting (see above). A message is printed to
+          STDERR if it's level is equal or greater the current debug level.
+
+          The other logger is used when running under mod_perl. It is mainly
+          controlled by the Apache "LogLevel" setting. Messages at level 0
+          are printed as "$log->error", level 1 as "$log->info" and level 2
+          as "$log->debug". For level 2 messages additionally the current
+          debug level is checked to be greater or equal 2.
+
+        * delimiter
+          Here the internal key delimiter can be changed. It defaults to
+          "\1". Changing it is necessary only when your DSN, username or
+          password contain it or to provide more readable debugging
+          messages.
+
+    statistics
+        returns a reference to the statistics hash. If BerkeleyDB is used it
+        is tied to BerkeleyDB::Btree.
+
+    statistics_as_html
+        returns a reference to an array of HTML fragments. If mod_perl and
+        Apache::Status or Apache::Status2 is used the output of this
+        function is shown under http://HOST/STATUS/URI?DBI_conn.
+
+    plugin( 'name', \&mangle, \&setup )
+        installs a new plugin, see "PLUGINS" below. If a plugin for the
+        specified database type was already installed it is returned as a
+        2-element list:
+
+         ($old_mangle, $old_setup)=
+           plugin( 'name', \&new_mangle, \&new_setup );
+
+        If called with an name only the current plugin is returned:
+
+         ($old_mangle, $old_setup)=plugin( 'name' );
+
+        To delete a plugin call
+
+         ($old_mangle, $old_setup)=plugin( 'name', undef, undef );
+
+    connect_on_init
+        call this function multiple times with parameters you would pass to
+        "DBI->connect" before calling "Apache::DBI::Cache::init", i.e. in
+        your "startup.pl". Then "init" will establish all these connections.
+
+    init
+        This function is called once per child process to initialize
+        Apache::DBI::Cache. If mod_perl is used this is done automatically
+        in a PerlChildInitHandler
+
+    finish
+        This function must be called before a process is going to terminate.
+        Under mod_perl it is automatically called in a PerlChildExitHandler.
+
+        As of version 0.08 calling this function is optional.
+
+    undef_at_request_cleanup( \$dbh1, \$dbh2, ... )
+        When an application uses global variables to store handles they
+        probably won't be reused because a global variable is ..., well
+        global. This can be fixed by explicitly undefining these handles at
+        request cleanup or by using this function. It simply collects all
+        handle references passed in between 2 calls to
+        "Apache::DBI::Cache::request_cleanup". When
+        "Apache::DBI::Cache::request_cleanup" is called all these handles
+        are undefined. The first call to this function during a request
+        cycle installs "Apache::DBI::Cache::request_cleanup" as
+        PerlCleanupHandler.
+
+        With mod_perl2 this requires the PerlOption "GlobalRequest" to be
+        set:
+
+         PerlOption +GlobalRequest
+
+        in your httpd.conf.
+
+    request_cleanup
+        This is the PerlCleanupHandler. If Apache::DBI::Cache is used
+        standalone the application can call it from time to time.
+
+  EXPORT
+    Nothing.
+
+DBI SUBCLASSING
+    For a module like Apache::DBI::Cache it is complicated to cope with DBI
+    subclasses. There are 2 problems to solve. First, make sure that our
+    "disconnect" and "DESTROY" methods are called instead of the original.
+    Apache::DBI::Cache solves this problem by inserting its own methods into
+    the foreign class.
+
+    Hence, if a subclass provides "disconnect" and "DESTROY" methods they
+    will never be called. This is ugly but works in most cases.
+
+    To insert our methods into the subclass we need to know its name. This
+    is the second problem. To create a subclassed DBI handle one calls
+    either
+
+     DBI->connect( $dsn, $user, $passwd, {RootClass=>SUBCLASS} );
+
+    or
+
+     SUBCLASS->connect( $dsn, $user, $passwd, {} );
+
+    The first case is simple since the attribute hash is passed to our
+    connect method. Unfortunately, the second case is not simple since
+    "SUBCLASS" is known only by "DBI::connect". This is solved by searching
+    the current call stack for the DBI::connect call. Then we use its first
+    parameter.
+
+    That works for me but is even uglier. If you encounter problems don't
+    hesitate to mail me.
+
+Class::DBI and Ima::DBI
+    To make "Class::DBI" or "Ima::DBI" work with "Apache::DBI::Cache" see
+    Apache::DBI::Cache::ImaDBI.
+
+PLUGINS
+    Plugins are used to modify the caching for certain database types. They
+    can change the caching key, issue database commands just before a handle
+    is returned to the user or prevent handle caching entirely for a
+    database type.
+
+    There can only be one plugin per database type at a time.
+
+    A plugin registers itself by calling "Apache::DBI::Cache::plugin"
+    passing 3 parameters. The first parameter is simply the name of the
+    database type. It matches the DBI driver name. Thus, a MySQL plugin
+    passes the string "mysql" since the corresponding DBI driver is named
+    "DBD::mysql". Whereas a PostgreSQL plugin passes either "Pg" or "PgPP"
+    depending on the driver actually used.
+
+    The 2nd and 3rd parameters are CODE references that are called just
+    before a connection is chosen from the cache or newly established and
+    after the connection is made just before it is returned to the caller.
+    The first function can mangle the connection parameters the second
+    perform additional setup steps. Further, I will call them *mangle* and
+    *setup*.
+
+    Thus, a plugin is registered this way:
+
+     Apache::DBI::Cache::plugin('Name', \&mangle, \&setup);
+
+    Normally, it is implemented as a separate module according to the
+    following template, see Apache::DBI::Cache::mysql for example:
+
+     package Apache::DBI::Cache::DRIVER;
+
+     use strict;
+
+     BEGIN {
+       die "Please load Apache::DBI::Cache before"
+         unless defined &Apache::DBI::Cache::plugin;
+
+       ...
+
+       Apache::DBI::Cache::plugin
+           (
+            'DRIVER',
+            sub {},
+            sub {}
+           );
+     }
+
+     1;
+
+  Calling Conventions
+    * mangle
+       ($dsn, $user, $passwd, $attr, $ctx, $nocache)=
+          mangle($dsn, $user, $passwd, $attr);
+
+      *mangle* is called with almost the same parameters as the original
+      call to "DBI->connect". The "dbi:DRIVER:" prefix is stripped from the
+      DSN. It is expected to return similar values plus an arbitrary context
+      that is later passed to *setup* and an optional "nocache" flag.
+
+      If $nocache is true or *mangle* returns an empty list a new connection
+      is made and the handle is directly passed to the caller without
+      further processing. Also *setup* will not be called. Such a handle
+      will not be cached on "disconnect" or "DESTROY".
+
+      *mangle* can change all parameters. The MySQL plugin for example
+      deletes the actual database name from the DSN, reformats it according
+      to a standard format and adds the standard port if it is omitted. The
+      database is put in the context.
+
+    * setup
+       $rc=setup($dbh, $dsn, $user, $passwd, $attr, $ctx);
+
+      The *setup* function performs additional setup steps on $dbh. The
+      MySQL plugin for example issues a "USE database" command using the
+      database from the context.
+
+      A connection is considered dead if *setup* returns false.
+
+TODO
+    * periodically ping all cached handles
+    * correct statistics when a process is finishes without calling
+    "finish()"
+    * redirect BerkeleyDB errors to logger
+
+SEE ALSO
+    Apache::DBI::Cache::mysql
+    Apache::DBI
+
+AUTHOR
+    Torsten Foertsch, <torsten.foertsch@gmx.net>
+
+    With suggestions from
+
+        Andreas Nolte < andreas dot nolte at bertelsmann dot de >
+
+        Dietmar Hanisch < dietmar dot hanisch at bertelsmann dot de > and
+
+        Ewald Hinrichs < ewald dot hinrichs at bertelsmann dot de >
+
+SPONSORING
+    Sincere thanks to Arvato Direct Services (http://www.arvato.com/) for
+    sponsoring this module and providing a test platform with several
+    thousand DBI connections.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005-2006 by Torsten Foertsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

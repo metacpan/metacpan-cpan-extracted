@@ -1,0 +1,146 @@
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" media="all" href="http://dev.perl.org/perl-styles.css"
+<link rel="Stylesheet" type="text/css" media="all" href="http://la.pm.org/headers.css"
+</head>
+<body>
+    <center>
+    </center>
+
+[% IF m.show_news -%]
+<h2> News </h2>
+<dl>
+    [% IF m.open_call -%]
+        <dt><b>Open Call for Presenters</b></dt>
+        <dd> What have you done recently with Perl?  Come tell your friends and let us all learn together!</dd>
+        <br>
+    [% END %]
+</dl>
+[% END %]
+
+<h2>Upcoming Events</h2>
+<h3>our next meeting</h3>
+<table>
+    <tr><td> What:  </td><td> Perl Monger Meeting!</td></tr>
+    <tr><td> When:  </td><td> 7-9pm</td></tr>
+    <tr><td> Date:  </td><td> [% m.ds_std %]</td></tr>
+    <tr><td> Where: </td><td> [% l.address %]</td></tr>
+    <tr><td> Theme: </td><td> Perl!</td></tr>
+    <tr><td> Refreshments: </td><td> We hope!</td></tr>
+    <tr><td> RSVP:  </td><td> Responses always appreciated.</td></tr>
+</table>
+<p>
+
+[% IF m.presentations -%]
+    <h4>Presentations:</h4>
+    <ol>
+        [%- FOREACH talk IN m.presentations %]
+            [%- speaker = presenter.${talk.presenter} -%]
+            <li>[% speaker.name %]: <i>[% talk.title -%]</i>
+            [% IF talk.abstract -%]
+                <br>Abstract: [% talk.abstract %]
+            [%- END %]
+            [%- IF talk.links -%]
+                <br>
+                [%- FOREACH l IN talk.links %]
+                    <a target='_NEW' href=[% l.url %]>[% l.name %]</a>
+                [%- END -%]
+            [%- END -%]
+            </li>
+        [%- END %]
+    </ol>
+[% END -%]
+
+[%- USE Gravatar (
+    default => 'wavatar',
+    size    => 60 ,
+    rating  => 'R',
+) -%]
+[%- USE CPAN = format( "%s@cpan.org") %]
+[% IF m.presentations -%]
+    <h4>About our speakers:</h4>
+    [% FOREACH talk IN m.presentations -%]
+        [%- speaker = presenter.${talk.presenter} -%]
+        [%- seen = {}; %]
+        [%- IF speaker.name && !seen.${speaker} -%]
+            [%- email = speaker.email or CPAN(speaker.cpan) -%]
+            [%- IF speaker.cpan -%]
+                <img src = "[% Gravatar( email => email) | html %]" >
+            [% END -%]
+            [%- IF speaker.url %]
+                <a href=[% speaker.url %] >[% speaker.name %]</a>
+            [%- ELSE %]
+                [% speaker.name %]
+            [%- END -%]
+            [% speaker.description -%]
+            [% IF (speaker.cpan || speaker.github) %]
+            [%- IF speaker.cpan -%] [ <a href=http://search.cpan.org/~[% speaker.cpan %]>[%# speaker.cpan %]cpan</a> ] [% END -%]
+            [%- IF speaker.github -%] [ <a href=http://github.com/[% speaker.github %]>[%# speaker.github %]github</a> ] [% END -%]
+            [% END %]
+            <p>
+        [%- END -%]
+    [%- END -%]
+[% END %]
+
+<h4>About your host:</h4>
+<ul>
+    <li>Blurb about our host!</li>
+</ul>
+<p>
+See you at 7 on [% m.event_date_pretty %]!
+<p>
+
+<h2>Mailing List</h2>
+
+<p style="text-align: center;" align="center">
+You can subscribe to our mailing list by sending a message
+containing only the word 'subscribe' to<br>
+
+<tt>GROUPNAME-pm-request<!-- yes, this is a comment -->@mail.pm.org</tt>
+<p>
+
+
+<h2> Previous Talks </h2>
+[%- USE old_date = DateTime( year=2010, month=11, day=17) -%]
+[% IF meetings %]
+[%- USE String.Compare(old_date.ymd) -%]
+<ul>
+    [%- FOREACH m IN meetings %]
+        [% LAST IF !String.Compare.compare( m.dt.ymd ) %]
+        [%- FOREACH talk IN m.presentations %]
+            [%- speaker = presenter.${talk.presenter} %]
+    <li><big>[% m.ds1 %]:
+    [% IF speaker.url -%]
+      <a href=[% speaker.url %]>[% speaker.name %]</a>
+    [% ELSE -%]
+      [% speaker.name %]
+    [% END -%] : [% talk.title %].</big>
+            [%- IF talk.links -%]
+                =>
+                [%- FOREACH l IN talk.links %]
+                    <a target='_NEW' href=[% l.url %]>[% l.name %]</a>
+                [%- END -%]
+            [%- END -%]
+        [% END %]
+    [%- IF 0 and speaker.cpan -%]
+        [%- email = CPAN(speaker.cpan) -%]
+        <a href="http://metacpan.org/author/[% speaker.cpan %]"><img src = "[% Gravatar( email => email) | html %]" ></a>
+    [% END -%]
+    [%- END -%]
+[%- END -%]
+</ul>
+
+<p>
+
+<h2 >Neighbor Groups</h2>
+
+      <ul type="disc">
+        <li><a href="http://la.pm.org">Los Angeles Perl Mongers</a></li>
+    </ul>
+    <hr>
+    Questions?  Join the mailing list, or contact <tt><b>GROUPNAME-pm-admins@<!-- yes, this is another comment -->mail.pm.org</b></tt>
+<hr>
+<script language="JavaScript" src="http://www.perl.org/misc/site-sponsor-js.html"></script>
+The camel image is a registered trademark of O'Reilly Media, Inc.  Used with permission.
+</body>
+</html>

@@ -1,0 +1,10 @@
+
+* Windows build is a bit tricky
+* Error handling is not optimal yet
+* in-memory streams (and also duplicating of streams) is missing
+* the 3D sound support does not yet work fully
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

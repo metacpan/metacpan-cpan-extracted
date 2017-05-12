@@ -1,0 +1,124 @@
+NAME
+    App::Stash - persistent application data storage
+
+SYNOPSIS
+        use App::Stash;
+        $stash = App::Stash->new({application => "test"});
+        $stash->data->{'test'} = 1;
+        $stash->d->{'test'} = 1;
+
+    after new run:
+
+        use App::Stash;
+        $s=App::Stash->new({application => "test"});
+        print $s->data->{'test'}, "\n";
+        print $s->dao->test, "\n";
+
+WARNING
+    experimental, use on your own risk :-)
+
+DESCRIPTION
+    The purpose of the module is to transparently save stash data
+    (structure) across application (script) execution. The save is done in
+    DESTROY method. This has certain limitations. Basically make sure you
+    never store object in the data as this one may get destroyed before
+    App::Stash object does.
+
+    The module+style is inspired by App::Cache. Unlike App::Cache it uses
+    JSON::Util for storage and not Storable. The stash is saved to
+    $HOME/.app-name/stash.json. It is in the "pretty" format so it should be
+    easy to read and edit. I wanted to go with Storable but using it in
+    DESTROY method causes `Segmentation fault' on my Perl.
+
+    Warn: no file locking in place, use Proc::PID::File or similar to have
+    just one instance of program running or send a wish list bug report and
+    wait for implementation of stash file locking. :)
+
+PROPERTIES
+        application
+        directory
+        stash_filename
+
+    See App::Cache for a description of `application' and `directory'.
+    `stash_filename' is the full path to the file where stash data will be
+    stored. All three are optional.
+
+METHODS
+  new()
+    Object constructor.
+
+  d
+    Shortcut for data.
+
+  data
+    Returns reference to the stash data.
+
+  dao()
+    Returns data passed to Data::AsObject. So basically the data structure
+    becomes an object. See Data::AsObject for details.
+
+    Note: Data::AsObject is not compile time dependency. It will be used if
+    installed. If not the exception will be thrown only when calling dao. So
+    if you plan to use it, make it a dependency of your module/program.
+
+  clear
+    Will delete stash data and remove the file with the stash data from the
+    disk.
+
+  load
+    Load stash data from disk. Called automatically by first call to data.
+    Can be used to revert current stash data to the state before current
+    execution.
+
+  save
+    Save stash data to disk - $HOME/.app-name/stash.json. Called
+    automatically via DESTROY method when App::Stash object is going to be
+    destroyed.
+
+    Will throw an exception if the file save fails.
+
+  DESTROY
+    Calls save and prints warning if it fails.
+
+SEE ALSO
+    App::Cache
+
+AUTHOR
+    Jozef Kutej, `<jkutej at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-app-stash at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Stash. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc App::Stash
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Stash
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/App-Stash
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/App-Stash
+
+    * Search CPAN
+        http://search.cpan.org/dist/App-Stash/
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Jozef Kutej.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

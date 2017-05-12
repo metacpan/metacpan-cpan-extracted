@@ -1,0 +1,26 @@
+
+libjio - A library for Journaled I/O
+------------------------------------
+
+libjio is a simple userspace library to do journaled, transaction-oriented
+I/O.
+
+It provides a transaction API to commit and rollback transactions, and on top
+of that a unix-alike set of functions to perform most regular operations (ie.
+open, read, write, etc.).
+
+The library guarantees file integrity even after unexpected crashes, never
+leaving your files in an inconsistent state.
+
+You can find more detailed documents, including the programmer's guide, in the
+doc/ directory, and the manpage in the libjio/ directory.
+
+
+To see how to install it, please read the INSTALL file.
+
+It is in the public domain, see the LICENSE file for more details.
+
+Comments and patches are always welcome; please send them to
+albertito@blitiri.com.ar.
+
+

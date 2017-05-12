@@ -1,0 +1,67 @@
+Revision history for App::Dest
+
+1.16      2017-03-04 09:19:28-08:00 America/Los_Angeles
+        - POD improvements and extentions
+        - Add test coverage for writewatch
+
+1.15      2017-02-24 12:44:17-08:00 America/Los_Angeles
+        - Support for non-root directory execution
+        - dest.wrap operational from non-root execution paths
+        - Replace use of eval with Try::Tiny
+        - Add "writewatch" option to create watch file
+        - Report reasonable errors in various states; allow warnings to continue
+        - Print at least something instead of an error on VERSION request
+        - Travis CI, Dist::Zilla, and minimum version OCD updates
+        - Minor documentation improvements
+
+1.14      2015-11-19 15:50:04-08:00 America/Los_Angeles
+        - Action scripts can have extensions
+        - Loads of test coverage improvments, up to >80% now
+        - Require Perl 5.16 minimum version
+        - No longer need to be in project root dir to run dest
+        - On fail of any action, stop immediately and don't update state
+
+1.13      2015-09-06 21:00:46-07:00 America/Los_Angeles
+        - Bug fix for dest.watch adding files to watch list
+
+1.12      2015-09-04 17:23:55-07:00 America/Los_Angeles
+        - Support for dest.watch file; slightly better test coverage
+
+1.11      2015-09-02 20:25:36-07:00 America/Los_Angeles
+        - Fix for "update" without path params
+
+1.10      2015-01-29 20:40:59-08:00 America/Los_Angeles
+        - Documentation (links) error fix
+
+1.09      2015-01-29 20:34:49-08:00 America/Los_Angeles
+        - Implementing use of Dist::Zilla.
+
+1.08      Thu Sep 25 09:35:22 PDT 2014
+        - Some OCD, and added TravisCI and Coveralls.
+
+1.07      Fri Jul 25 11:22:14 PDT 2014
+        - Update can now be limited by specifying a target directory set
+
+1.06      Thu Jul 24 15:59:31 PDT 2014
+        - Changed the name of project so people can pronounce it easier
+
+1.05      Mon Nov  4 14:01:28 PST 2013
+        - Fixed dependency error
+
+1.04      Fri Oct 25 14:09:36 PDT 2013
+        - Added "diff" action
+        - "status" action improvements
+        - Fixed some minors bugs here and there
+
+1.03      Wed Oct  2 12:38:51 PDT 2013
+        - Fixed to bug where "add" results in a pre-deployed state
+        - Pre-deployed state error reporting improved
+        - Added helper commands: rm, revdeploy
+
+1.02      Fri Sep  6 14:09:05 PDT 2013
+        - Added the redeploy feature
+        - Expanded list functionality to include list all actions
+        - Fixed preinstall and dependency trees for deploy and revert
+
+1.01      Fri Aug 30 10:27:20 PDT 2013
+        - First version, released on an unsuspecting world.

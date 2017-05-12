@@ -1,0 +1,36 @@
+apache-auth-userdb-perl (0.120) unstable; urgency=low
+
+  Debian:
+  * Renamed source package to apache-auth-userdb-perl
+    (was: libapache-auth-userdb-perl).
+  * Standards-Version: 3.7.2 (was: 3.6.1)
+  * Raised build dependency and compatibility level on debhelper to version 5
+    (was: 4.0.2).
+  * Tweaked other build dependencies.
+  * Depends: perl (>= 5.6) (was: ${perl:Depends})
+  * Slightly tweaked package description.
+  * debian/copyright: Refer to GPL-2 rather than GPL license file.
+  * debian/rules: Minor tweaks.
+
+  Apache::Auth::UserDB:
+  + Added support for overwriting user DB files in-place as opposed to writing
+    a new file and renaming it over the old one.  This way file ownership and
+    permissions can be preserved.
+  * Turned global constants into object methods, thereby improving mod_perl
+    compatibility.
+  * Use version module.
+
+ -- Julian Mehnle <julian@mehnle.net>  Tue, 18 Sep 2007 00:34:13 +0000
+
+libapache-auth-userdb-perl (0.11) unstable; urgency=low
+
+  * Initial Debian release (no other changes).
+
+ -- Julian Mehnle <julian@mehnle.net>  Tue, 21 Sep 2004 01:45:33 +0200
+
+libapache-auth-userdb-perl (0.10) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Julian Mehnle <julian@mehnle.net>  Mon, 20 Sep 2004 01:12:36 +0200
+

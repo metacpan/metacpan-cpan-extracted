@@ -1,0 +1,35 @@
+Revision history for Perl module Alien
+
+0.94      2017-03-10 11:08:52 -0500
+  - Add references to alienfile + Alien::Build
+  - Migrate to Dist::Zilla
+
+0.93 Mon Sep 14, 2015
+  - Completely restored the original text for "ORIGINAL MANIFESTO".
+    I removed the reference to Module::Build (MB), as it is not well
+    regarded by the Perl toolchain developers.  Although not intended by
+    me, it was suggested that it could seem a little sneaky.  Instead I
+    have restored the original text in that section, and added a caveat
+    that MB seems to work well for Alien distrobutions, but is no longer
+    universally preferred to ExtUtils::MakeMaker (EUMM).
+  - Added another caveat about Windows and Alien::MSYS
+  - Made some grammar tweaks/fixes that were apparent when I read the
+    documentation out loud.
+
+0.92 Wed Sep 10 2015
+  - Update documentation to reflect the past decade of actual
+    Alien development.
+  - Include links to #native IRC channel and Alien::Base mailing list
+  - Remove dependency on Module::Build and Test::Pod.  This dist
+    now has no non-core dependencies.
+
+0.91 Mon Oct 13 16:39:22 BST 2003
+  - Minor documentation nit from Rocco Caputo <troc@netrus.net>
+  - META.yml file was not synchronized with the Build.PL
+  - Added NINJA file.
+  - Spelling fixes from Leon Brocard <lbrocard@fotango.com>
+
+0.9 Mon Oct 13 10:59:48 2003
+  - original version; created by ExtUtils::ModuleMaker 0.32
+
+

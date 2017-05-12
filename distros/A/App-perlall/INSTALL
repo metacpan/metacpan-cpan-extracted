@@ -1,0 +1,70 @@
+prereq's: perl, make, git, sh, patch
+====================================
+
+perl Makefile.PL
+make
+make test
+
+with sudo:
+=========
+
+sudo make install
+test -f ~/.perlall || cp .perlall ~/
+sudo mkdir -p /usr/src/perl/blead/perl-git
+sudo chown $USER -R /usr/src/perl
+cd /usr/src/perl/blead/
+
+as root:
+=========
+
+make install
+test -f ~/.perlall || cp .perlall ~/
+mkdir -p /usr/src/perl/blead/perl-git
+cd /usr/src/perl/blead/
+
+without sudo (local as with perlbrew)
+=====================================
+
+cp script/perlall ~/bin/perlall
+# ensure that $HOME/bin is in your $PATH. better then ~/perl5/bin
+test -f ~/.perlall || cp .perlall ~/
+cd ~
+mkdir -p ~/perl5/src/perl-git
+
+sed -i "s,/usr/src/perl/blead/perl-git,$HOME/perl5/src/perl-git," .perlall
+sed -i "s,# PERLALL_PREFIX=~/perl5/$,PERLALL_PREFIX=$HOME/perl5," .perlall
+sed -i "s,# PERLALL_BUILDROOT=~/perl5/src$,PERLALL_BUILDROOT=$HOME/perl5/src," .perlall
+sed -i "s,# PERLALL_BINDIR=~/perl5/bin$,PERLALL_BINDIR=$HOME/perl5/bin," .perlall
+cd ~/perl5/src/
+
+for all three variants:
+======================
+
+git clone git://perl5.git.perl.org/perl.git perl-git
+# better start with the older perls, because your inc_version path will get messed up
+perlall -v build --force 5.6.2d-nt
+perlall -v build --force 5.8.4d-nt
+perlall -v build --force 5.8.5d-nt
+perlall -v build --force 5.8.8d-nt
+perlall -v build --force 5.8.9d-nt
+perlall -v build --force 5.10.1d-nt
+perlall -v build --force 5.12.4d-nt
+perlall -v build --force 5.14.2d-nt
+perlall -v build --force bleadd --link
+
+perlall init
+
+win32
+=====
+You will need cygwin for git and have c:\cygwin\bin in your PATH
+There are 4 major variants:
+* strawberry perl - stripped mingw with cmd.exe. build from win32\
+* msys - bash, for cross-compiling to mingw
+  needs mingw-get install msys-dvlpr
+* mingw - bash, can use perlall, but perlall build not possible
+* activeperl - cmd.exe with MSVC. build from win32\
+
+All 4 variants are still in work. 
+msys being the easiest and most attractive, to be able to compile your mingw perl 
+in a sane environment, and strawberry perl the most common.
+msys is not even mentioned in perl core, but support is easy to add to Configure.

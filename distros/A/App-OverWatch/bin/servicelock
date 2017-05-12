@@ -1,0 +1,280 @@
+#!/usr/bin/env perl
+#
+# PODNAME: servicelock
+# ABSTRACT: Interface to App::OverWatch DB locks
+#
+use strict;
+use warnings;
+
+use App::OverWatch;
+use App::OverWatch::ServiceLock;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my $Options = {
+    config        => undef,
+
+    check         => 0,
+    create_lock   => 0,
+    create_table  => 0,
+    force_unlock  => 0,
+    list          => 0,
+    lock          => 0,
+    print         => 0,
+    unlock        => 0,
+    update        => 0,
+    print         => 0,
+
+    worker        => undef,
+    text          => undef,
+    system        => undef,
+    expiry        => undef,
+
+    help          => 0,
+    verbose       => 0,
+};
+
+GetOptions($Options,
+           qw( config=s
+               check create_lock create_table force_unlock list lock print unlock update
+               system=s worker=s text=s expiry=s
+               help verbose
+         )) or die "Bad options\n";
+
+pod2usage({
+    -exitval => 0,
+    -verbose => 2,
+})
+    if ($Options->{help});
+
+my $OverWatch = App::OverWatch->new();
+
+$OverWatch->load_config($Options->{config});
+
+my %commands = (
+    check        => \&do_check,
+    create_lock  => \&do_create_lock,
+    create_table => \&do_create_table,
+    force_unlock => \&do_force_unlock,
+    list         => \&do_list,
+    lock         => \&do_lock,
+    print        => \&do_print,
+    unlock       => \&do_unlock,
+    update       => \&do_update,
+);
+
+my $rh_required_options = {
+    check        => [ qw( system ) ],
+    create_lock  => [ qw( system ) ],
+    create_table => [ ],
+    force_unlock => [ qw( system ) ],
+    list         => [ ],
+    lock         => [ qw( system worker text ) ],
+    print        => [ qw( system ) ],
+    unlock       => [ qw( system worker ) ],
+    update       => [ qw( system worker text ) ],
+};
+
+my $cmd = $OverWatch->check_options({
+    options          => $Options,
+    valid_commands   => [ keys %commands ],
+    required_options => $rh_required_options,
+});
+
+my $ServiceLock = $OverWatch->servicelock();
+
+$commands{$cmd}->();
+exit(0);
+
+sub do_check {
+    my $Lock = $ServiceLock->get_lock({
+        system => $Options->{system},
+    });
+    exit(0) if ($Lock->is_locked());
+    exit(1);
+}
+
+sub do_create_lock {
+    my $system = $Options->{system};
+    if ($ServiceLock->create_lock({
+        system => $system,
+    })) {
+        print "Created lock '$system'\n";
+    }
+}
+
+sub do_create_table {
+    if ($ServiceLock->create_table()) {
+        print "Created table for ServiceLock.\n";
+    }
+}
+
+sub do_force_unlock {
+    my $system = $Options->{system};
+    my $Lock = $ServiceLock->get_lock({
+        system => $system,
+    });
+
+    die "Error: Lock '$system' is not currently locked!\n"
+        if (!$Lock->is_locked());
+
+    if ($ServiceLock->force_unlock({
+        system => $system,
+    })) {
+        print "Force unlocked '$system'\n";
+    }
+}
+
+sub do_list {
+    my @Locks = $ServiceLock->get_all_locks();
+    foreach my $Lock (@Locks) {
+        $Lock->print();
+        print "\n";
+    }
+}
+
+sub do_lock {
+    my $system = $Options->{system};
+    if ($ServiceLock->try_lock({
+        system => $system,
+        worker => $Options->{worker},
+        text   => $Options->{text},
+        expiry => $Options->{expiry},
+    })) {
+        print "Locked '$system'\n";
+    } else {
+        die "Could not lock '$system'\n";
+    }
+}
+
+sub do_print {
+    my $Lock = $ServiceLock->get_lock({
+        system => $Options->{system},
+    });
+    $Lock->print();
+}
+
+sub do_unlock {
+    my $system = $Options->{system};
+    if ($ServiceLock->try_unlock({
+        system => $system,
+        worker => $Options->{worker},
+    })) {
+        print "Unlocked '$system'\n";
+    } else {
+        die "Could not unlock '$system'\n";
+    }
+}
+
+sub do_update {
+    my $system = $Options->{system};
+    if ($ServiceLock->try_update({
+        system => $system,
+        worker => $Options->{worker},
+        text   => $Options->{text},
+        expiry => $Options->{expiry},
+    })) {
+        print "Updated lock on '$system'\n";
+    } else {
+        die "Could not update lock on '$system'\n";
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+servicelock - Interface to App::OverWatch DB locks
+
+=head1 VERSION
+
+version 0.1
+
+=head1 SYNOPSIS
+
+  servicelock [OPTIONS] COMMAND
+
+  Commands:
+
+    --check
+    --create_lock
+    --create_table
+    --force_unlock
+    --list
+    --lock
+    --print
+    --unlock
+    --update
+
+  Options:
+
+    --system
+    --worker
+    --text
+    --expiry
+    --help
+    --verbose
+
+=head1 DESCRIPTION
+
+servicelock is used to create and manipulate locks in a backend database. It
+provides a simple example interface to the Perl App::OverWatch::ServiceLock
+module.
+
+=head1 EXAMPLE
+
+Create the ServiceLock table 'servicelocks':
+
+  # servicelock --create_table
+
+Create a lock named 'global':
+
+  # servicelock --create_lock --system global
+
+Check whether 'global' is locked (flagged by exit status):
+
+  # servicelock --check --system global
+
+Attempt to lock the 'global' lock:
+
+  # servicelock --lock --system global --worker myworkerid --text 'testing lock'
+
+  # servicelock --lock --system global --worker myworkerid --text 'testing lock' --expiry 60
+
+Unlock:
+
+  # servicelock --unlock --system global --worker myworkerid
+
+Force an unlock
+
+  # servicelock --force_unlock --system global
+
+Print details about a lock:
+
+  # servicelock --print --system global
+
+List all available locks:
+
+  # servicelock --list
+
+=head1 SEE ALSO
+
+L<notify>, L<eventlog>
+
+=head1 AUTHOR
+
+Chris Hughes <chrisjh@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Chris Hughes.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,21 @@
+Changes
+MANIFEST
+Makefile.PL
+TacacsPlus.pm
+TacacsPlus.xs
+test.pl
+README
+tacpluslib/Makefile.PL      
+tacpluslib/encrypt.c        
+tacpluslib/expire.h         
+tacpluslib/md5.c            
+tacpluslib/md5.h            
+tacpluslib/parse.h          
+tacpluslib/regexp.h         
+tacpluslib/regmagic.h       
+tacpluslib/tac_client.c     
+tacpluslib/tac_plus.h       
+tacpluslib/tacplus_client.h 
+tacpluslib/utils.c          
+
+META.yml                                 Module meta-data (added by MakeMaker)

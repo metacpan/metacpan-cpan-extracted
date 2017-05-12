@@ -1,0 +1,48 @@
+{
+   "abstract" : "A Simple limitable FIFO array, with sum and average methods",
+   "author" : [
+      "Dan Burke <dburke@addictmud.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Array-FIFO",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "0",
+            "Moose" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::Spec" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/dwburke/perl-Array-FIFO",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dwburke/perl-Array-FIFO.git",
+         "web" : "https://github.com/dwburke/perl-Array-FIFO"
+      }
+   },
+   "version" : "0.10"
+}
+

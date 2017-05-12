@@ -1,0 +1,150 @@
+#!perl
+use strict;
+use warnings;
+use 5.008001;
+
+use App::WithSound;
+use File::Spec::Functions qw/catfile/;
+
+my $rc_file_path = catfile( $ENV{HOME}, '.with-soundrc');
+my $retval = App::WithSound->new($rc_file_path, \%ENV )->run(@ARGV);
+exit($retval);
+
+__END__
+
+=for stopwords papix
+
+=encoding utf8
+
+=head1 NAME
+
+with-sound - Command executor with sound
+
+
+=head1 VERSION
+
+This document describes with-sound version 1.2.1
+
+
+=head1 SYNOPSIS
+
+    $ with-sound [command] ([argument(s)])
+
+    # e.g.
+    #    $ with-sound prove t/
+
+
+=head1 DESCRIPTION
+
+with-sound is the command executor with sound (now with-sound can play the MP3 file only).
+
+If exit-status of the command is success, it playbacks the sound of success.
+Else, it plays sound of failure. And this application also can play the sound during executing the command.
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+App::WithSound requires a resource file as '.with-soundrc' on your home directory.
+This resource file specifies the path to sound files. Like so:
+
+    SUCCESS=~/Music/success.mp3
+    FAILURE=~/Music/failure.mp3
+    RUNNING=~/Music/running.mp3
+
+If you want to play the different sound corresponded to discrete command, please use section notation as the following.
+
+    [prove]
+    SUCCESS=~/Music/success_prove.mp3
+    FAILURE=~/Music/failure_prove.mp3
+    RUNNING=~/Music/running_prove.mp3
+
+In case of the above example, configured sounds will be played if you execute 'prove'.
+And if other commands are executed, this application uses default settings.
+("Default settings" means settings that is not specified by section)
+
+You also can specify the paths by environment variables $ENV{'WITH_SOUND_SUCCESS'}, $ENV{'WITH_SOUND_FAILURE'}
+and $ENV{'WITH_SOUND_RUNNING'}.
+
+If the file paths are set by both environment variables and a configuration file,
+the environment variables are prior to the configuration file.
+
+These sound file settings are optional. You do not have to fill the all of settings.
+with-sound will ignore playing sound if the sound file is not specified.
+
+This module also requires "mpg123" or "mpg321" or "afplay" so please install it before use this application ("afplay" is pre-installed if you are using Mac OS X).
+
+Please refer to the following:
+
+L<http://www.mpg123.de/index.shtml>
+
+L<http://mpg321.sourceforge.net/>
+
+
+=head1 DEPENDENCIES
+
+Config::Simple (version 4.58 or later)
+
+File::Spec::Functions (version 3.40 or later)
+
+File::Path::Expand (version 1.02 or later)
+
+File::Which (version 1.09 or later)
+
+Test::Warn (version 0.24 or later)
+
+Test::MockObject::Extends (version 1.20120301 or later)
+
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-app-withsound@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+
+=head1 AUTHOR
+
+moznion  C<< <moznion@gmail.com> >>
+
+Shinpei Maruyama C<< <shinpeim[at]gmail.com> >>
+
+
+=head1 CONTRIBUTOR
+
+Syohei YOSHIDA C<< <syohex[at]gmail.com> >>
+
+papix C<< <mail[at]papix.net> >>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2013, moznion C<< <moznion@gmail.com> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

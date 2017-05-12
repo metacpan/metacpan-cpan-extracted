@@ -1,0 +1,94 @@
+#
+# $Id: CONFIG,v 7.1 2004/01/13 19:01:10 wpm Exp $
+#
+# (c) 2003-2004 Morgan Stanley and Co.
+# See ..../src/LICENSE for terms of distribution.
+#
+
+#
+# The name of the AFS cell in which the tests will be performed.
+#
+AFS_COMMAND_CELLNAME		= your.cell.name
+
+#
+# This prefix will be used to create and remove a few volumes during
+# the tests.  Anything left over after the tests complete can be
+# removed.  Note that a successful test run should remove them, but a
+# failed test run can leave them behind.
+#
+AFS_COMMAND_VOLNAME_PREFIX	= afscmd.
+
+#
+# Two fileserver:/partition names in which to create volumes.  These
+# must be in the same AFS cell as specified at the top of this file.
+#
+AFS_COMMAND_PARTITION_LIST	= server1:/vicepa server2:/vicepb
+
+#
+# The bos tests need the name of a database server to work with.
+#
+AFS_COMMAND_DBSERVER		= dbserver1
+
+#
+# We need a valid pathname (directory) in AFS that we can abuse (that
+# is, we will be hacking the ACL on this directory, and a few other
+# intrusive things, to test the FS API).  This directory must be in a
+# RW volume, and system:administratoirs must have write access to it.
+#
+AFS_COMMAND_PATHNAME_AFS	= /afs/your.cell.name/home/you/hackmebaby
+
+#
+# We will need to create a pts group and user, and if these names are
+# already taken, then change these lines.  The code will *remove* them
+# when its done.
+#
+AFS_COMMAND_PTS_GROUP		= afscmdgroup
+AFS_COMMAND_PTS_USER		= afscmduser
+
+#
+# If the AFS client on which the tests run does NOT match that
+# specified above, then the pts group/user we create will NOT be
+# visible to the fs setacl command.  Therefore, we need the name of an
+# existing pts user or group to use for that test.
+#
+# Yes, I promise the tests will NOT remove this one, 'cause I did
+# all the tests using my own ID. ;-)
+#
+AFS_COMMAND_PTS_EXISTING	= wpm
+
+#
+# If you don't have either gzip/gunzip, of bzip2/bunzip2, then comment
+# the appropriate line to disable the tests using these compression
+# utilities.  Then, go download the source and compile them, because
+# you shouldn't be without something so basic.
+#
+AFS_COMMAND_GZIP_ENABLED	= 1
+AFS_COMMAND_BZIP2_ENABLED	= 1
+
+#
+# Change this, if you want to scribble temporary files elsewhere.  You
+# probably don't...
+#
+AFS_COMMAND_TMP_ROOT		= /var/tmp
+
+#
+# This parameter is used to test the output filter mechanism for vos
+# dump and restore.  Obviously, 'cat' is very boring, but we just need
+# something in the pipeline that reads from stdin and writes to
+# stdout, and it can't break the volume dump format that passes
+# through it.
+#
+# Tweak this at your own peril.
+#
+AFS_COMMAND_DUMP_FILTER		= cat
+AFS_COMMAND_RESTORE_FILTER	= cat
+
+#
+# By default, we'll get the AFS commands from your PATH, but you can
+# test with explicit versions by specifying these variables.
+#
+#AFS_COMMAND_BINARY_VOS		= /some/path/to/vos
+#AFS_COMMAND_BINARY_BOS		= /some/path/to/bos
+#AFS_COMMAND_BINARY_PTS		= /some/path/to/pts
+#AFS_COMMAND_BINARY_FS		= /some/path/to/fs
+

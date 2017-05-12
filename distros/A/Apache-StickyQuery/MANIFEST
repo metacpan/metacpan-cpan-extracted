@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Apache/StickyQuery.pm
+t/00_sticky.t

@@ -1,0 +1,6 @@
+Revision history for Perl extension ChmFile.
+
+0.01  Thu Mar 24 20:38:32 2005
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n ChmFile
+

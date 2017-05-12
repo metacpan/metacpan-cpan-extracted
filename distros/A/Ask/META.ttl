@@ -1,0 +1,274 @@
+@prefix cpan:  <http://purl.org/NET/cpan-uri/person/> .
+@prefix cpant: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix dcs:   <http://ontologi.es/doap-changeset#> .
+@prefix dist:  <http://purl.org/NET/cpan-uri/dist/Ask/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix nfo:   <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+dist:project
+	a                 doap:Project;
+	doap:name         "Ask";
+	cpant:perl_version_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Ask";
+		nfo:fileName "lib/Ask.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	cpant:readme_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Ask";
+		nfo:fileName "lib/Ask.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	cpant:recommends  "File::Which"^^cpant:dsWithoutVersion;
+	cpant:recommends  "Gtk2"^^cpant:dsWithoutVersion;
+	cpant:recommends  "System::Command"^^cpant:dsWithoutVersion;
+	cpant:recommends  "Tk"^^cpant:dsWithoutVersion;
+	cpant:recommends  "Wx"^^cpant:dsWithoutVersion;
+	cpant:requires    "Lingua::Boolean::Tiny 0.003"^^cpant:dsWithVersion;
+	cpant:requires    "Module::Runtime"^^cpant:dsWithoutVersion;
+	cpant:requires    "Moo 1.000006"^^cpant:dsWithVersion;
+	cpant:requires    "Sub::Exporter::Progressive"^^cpant:dsWithoutVersion;
+	cpant:requires    "namespace::sweep 0.006"^^cpant:dsWithVersion;
+	cpant:test_requires "Test::More 0.61"^^cpant:dsWithVersion;
+	cpant:version_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Ask";
+		nfo:fileName "lib/Ask.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	dc:contributor    cpan:tobyink;
+	doap:bug-database <http://rt.cpan.org/Dist/Display.html?Queue=Ask>;
+	doap:created      "2012-11-28"^^xsd:date;
+	doap:developer    cpan:tobyink;
+	doap:download-page <https://metacpan.org/release/Ask>;
+	doap:homepage     <https://metacpan.org/release/Ask>;
+	doap:license      <http://dev.perl.org/licenses/>;
+	doap:maintainer   cpan:tobyink;
+	doap:programming-language "Perl";
+	doap:release      dist:v_0-000_01;
+	doap:release      dist:v_0-000_02;
+	doap:release      dist:v_0-001;
+	doap:release      dist:v_0-002;
+	doap:release      dist:v_0-003;
+	doap:release      dist:v_0-004;
+	doap:release      dist:v_0-005;
+	doap:release      dist:v_0-006;
+	doap:release      dist:v_0-007;
+	doap:repository   [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-ask>;
+	];
+	doap:shortdesc    "ask your users about stuff".
+
+dist:v_0-000_01
+	a                 cpant:DeveloperRelease;
+	a                 doap:Version;
+	rdfs:label        "Developer preview";
+	dc:identifier     "Ask-0.000_01"^^xsd:string;
+	dc:issued         "2012-12-01"^^xsd:date;
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.000_01.tar.gz>;
+	doap:revision     "0.000_01"^^xsd:string.
+
+dist:v_0-000_02
+	a                 cpant:DeveloperRelease;
+	a                 doap:Version;
+	rdfs:label        "Developer preview II";
+	dc:identifier     "Ask-0.000_02"^^xsd:string;
+	dc:issued         "2012-12-03"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [ a dcs:Addition; rdfs:label "Ask::Tk" ];
+		dcs:item [ a dcs:Packaging; rdfs:label "Fix repo link." ];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.000_02.tar.gz>;
+	doap:revision     "0.000_02"^^xsd:string.
+
+dist:v_0-001
+	a                 doap:Version;
+	rdfs:label        "Initial release";
+	dc:identifier     "Ask-0.001"^^xsd:string;
+	dc:issued         "2012-12-03"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Documentation;
+			rdfs:label "Document Ask::Tk.";
+		];
+		dcs:item [
+			a dcs:Documentation;
+			rdfs:label "Document Ask::Callback.";
+		];
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "Respect PERL_ASK_BACKEND environment variable.";
+		];
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "Allow functions to be exported via Sub::Exporter::Progressive.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.001.tar.gz>;
+	doap:revision     "0.001"^^xsd:string.
+
+dist:v_0-002
+	a                 doap:Version;
+	dc:identifier     "Ask-0.002"^^xsd:string;
+	dc:issued         "2012-12-11"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Packaging;
+			rdfs:label "Require at least version 0.006 of namespace::sweep.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.002.tar.gz>;
+	doap:revision     "0.002"^^xsd:string.
+
+dist:v_0-003
+	a                 doap:Version;
+	dc:identifier     "Ask-0.003"^^xsd:string;
+	dc:issued         "2013-01-13"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [ a dcs:Addition; rdfs:label "Ask::Gtk" ];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.003.tar.gz>;
+	doap:revision     "0.003"^^xsd:string.
+
+dist:v_0-004
+	a                 doap:Version;
+	dc:identifier     "Ask-0.004"^^xsd:string;
+	dc:issued         "2013-01-14"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "New API method: multiple_choice";
+		];
+		dcs:item [
+			a dcs:Bugfix;
+			rdfs:label "Correctly destroy no longer used Tk::MainWindow objects created in info, warning, question and file_selection methods.";
+		];
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "Ask::Wx - does not yet support multi file selection dialog.";
+		];
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "New API method: single_choice";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.004.tar.gz>;
+	doap:revision     "0.004"^^xsd:string.
+
+dist:v_0-005
+	a                 doap:Version;
+	dc:identifier     "Ask-0.005"^^xsd:string;
+	dc:issued         "2013-01-16"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "New (internal) API method: quality";
+		];
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "New (internal) API method: is_usable";
+		];
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "Saner implementation of Ask->detect, using Module::Pluggable.";
+		];
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "Ask::Fallback backend, which kicks in if $ENV{AUTOMATED_TESTING} or $ENV{PERL_MM_USE_DEFAULT}.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.005.tar.gz>;
+	doap:revision     "0.005"^^xsd:string.
+
+dist:v_0-006
+	a                 doap:Version;
+	dc:identifier     "Ask-0.006"^^xsd:string;
+	dc:issued         "2013-01-16"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "XML address book example script.";
+		];
+		dcs:item [
+			a dcs:Documentation;
+			rdfs:label "Corrections in Ask::Wx pod.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.006.tar.gz>;
+	doap:revision     "0.006"^^xsd:string.
+
+dist:v_0-007
+	a                 doap:Version;
+	dc:identifier     "Ask-0.007"^^xsd:string;
+	dc:issued         "2013-06-18"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [ a dcs:Addition; rdfs:label "AskX::AutoLang." ];
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "Use POSIX.pm to switch off terminal echo instead of Term::ReadKey.";
+			dcs:blame cpan:haarg;
+		];
+		dcs:item [
+			a dcs:Bugfix;
+			a dcs:Update;
+			rdfs:label "Bumped Moo version requirement to 1.000006.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-ask/issues/1>;
+			dcs:thanks cpan:jberger;
+		];
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "Add a 'lang' option; use Lingua::Boolean::Tiny to process it.";
+			dcs:thanks cpan:daxim;
+			rdfs:comment "The beginning of the long i18n journey.";
+			rdfs:seeAlso <https://rt.cpan.org/Ticket/Display.html?id=82925>;
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.007.tar.gz>;
+	doap:revision     "0.007"^^xsd:string.
+
+cpan:daxim
+	a                 foaf:Person;
+	foaf:name         "Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯";
+	foaf:nick         "DAXIM";
+	foaf:page         <https://metacpan.org/author/DAXIM>.
+
+cpan:haarg
+	a                 foaf:Person;
+	foaf:name         "Graham Knop";
+	foaf:nick         "HAARG";
+	foaf:page         <https://metacpan.org/author/HAARG>.
+
+cpan:jberger
+	a                 foaf:Person;
+	foaf:name         "Joel Berger";
+	foaf:nick         "JBERGER";
+	foaf:page         <https://metacpan.org/author/JBERGER>.
+
+cpan:tobyink
+	a                 foaf:Person;
+	foaf:name         "Toby Inkster";
+	foaf:mbox         <mailto:tobyink@cpan.org>;
+	foaf:nick         "TOBYINK";
+	foaf:page         <https://metacpan.org/author/TOBYINK>.
+
+<http://dev.perl.org/licenses/>
+	dc:title          "the same terms as the perl 5 programming language system itself".
+

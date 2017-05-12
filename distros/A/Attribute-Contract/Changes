@@ -1,0 +1,14 @@
+Revision history for perl module Attribute::Contract
+
+0.05 2014-01-07T20:25:29Z
+
+ - Just meta files update
+
+0.04 2013-06-21T08:00:02Z
+
+ - Make test less brittle
+
+0.03 2013-06-12T09:38:42Z
+
+ - Use cpanfile
+ - Use Type::Tiny

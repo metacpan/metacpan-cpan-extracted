@@ -1,0 +1,116 @@
+#!/usr/bin/env perl
+#PODNAME: chorus
+#ABSTRACT: turn markdown documents into web-based slidedecks
+
+
+use strict;
+use warnings;
+
+use 5.10.0;
+
+use File::ShareDir::Tarball;
+use Getopt::Long;
+use Path::Tiny;
+use Plack::Loader;
+
+require Dancer;
+
+%::options = (
+    port   => 3000,
+    public => './public',
+);
+
+GetOptions( \%::options, 
+    'appdir=s',
+    'port=i',
+    'dev!',
+    'public=s',
+);
+
+die "usage: $0 <slides.mkd>\n" unless @ARGV == 1;
+my $prez = shift;
+
+die "file '$prez' not found\n" unless -f $prez;
+
+$::options{appdir} &&= path($::options{appdir})->absolute;
+
+$ENV{DANCER_APPDIR} = $::options{appdir} ||
+    File::ShareDir::Tarball::dist_dir( 'App-Chorus' );
+
+say "using appdir '$ENV{DANCER_APPDIR}'";
+
+Dancer->import;
+
+Dancer::set( 'port' => $::options{port} );
+if ( my $public = $::options{public} ){
+    $public = Path::Tiny::path($public)->absolute;
+    $App::Chorus::local_public = $public;
+}
+
+Dancer::load_app( 'App::Chorus', settings => {
+    logger => 'console',
+    log_level => 'debug',
+    presentation => $prez,
+    serializer => 'JSON',
+});
+
+Dancer::dance() if $::options{dev};
+
+$ENV{PLACK_ENV} = 'PSGI';
+
+Plack::Loader->load('Twiggy', port => $::options{port} )->run(Dancer::dance());
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+chorus - turn markdown documents into web-based slidedecks
+
+=head1 VERSION
+
+version 1.1.0
+
+=head1 SYNOPSIS
+
+    $ chorus presentation.markdown
+    <presentation is now accessible on the local machine on port 3000>
+
+=head1 DESCRIPTION
+
+C<chorus> takes a markdown document and turns it into a 
+web-based presentation.
+
+Note: the application is still in early alpha. See L<http://techblog.babyl.ca/entry/chorus> 
+for informations about the original incarnation of the application.
+
+=head1 COMMAND-LINE ARGUMENTS
+
+=head2 --port $port
+
+On which port the application will run. Defaults to I<3000>.
+
+=head2 --dev
+
+Launch the application as a Dancer standalone dev instance.
+
+=head2 --public $directory
+
+Directory where the public files (images, css, js, etc)
+are kept. Defaults to I<./public>.
+
+=head1 AUTHOR
+
+Yanick Champoux <yanick@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

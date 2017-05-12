@@ -1,0 +1,44 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::VLDB;
+
+my ($vldb, $vol);
+
+die "Usage: $0 volume \n" if $#ARGV != 0;
+
+$vol = shift;
+
+$vldb = AFS::VLDB->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+my $vldblist = $vldb->listvldbentry($vol);
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+print_vldblist($vldblist);
+
+sub print_vldblist {
+    my ($vldblist) = @_;
+
+    foreach my $val (keys %$vldblist) {
+        print "Key: $val\n";
+        foreach my $ent (keys %{$vldblist->{$val}}) {
+            if ($ent eq 'server') {
+                my $i = 1;
+                foreach my $srv (@{$vldblist->{$val}->{$ent}}) {
+                    print "\tServer number $i:\n";
+                    $i++;
+                    foreach my $s (keys %{$srv}) {
+                        print "\t\tKey: $s, Value: $srv->{$s}\n";
+                    }
+                }
+            }
+            else {
+                print "\tKey: $ent, Value: $vldblist->{$val}->{$ent}\n";
+            }
+        }
+    }
+}

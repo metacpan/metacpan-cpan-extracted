@@ -1,0 +1,317 @@
+#!/usr/bin/perl -I /data/apache/lib/perl
+
+=pod ###########################################################################
+
+=head1 NAME
+
+voodoo-control - install / upgrade 
+
+=head1 SYNOPSIS
+
+FIXME: Add documentation
+
+=cut ###########################################################################
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Data::Dumper;
+
+# turn off buffered output
+$| = 1;
+
+my %options = (
+	'verbose' => 0,
+	'ignore'  => 0,
+	'pretend' => 0
+);
+
+GetOptions(
+	\%options,
+	'pretend!',
+	'ignore!',
+	'verbose|v:i',
+	'dbhost|h:s',
+	'dbname|n:s',
+	'dbuser|u:s',
+	'dbpass|p:s',
+	'dbroot|r:s',
+);
+
+my %COMMANDS = (
+	'install'    => \&install,
+	'update'     => \&update,
+	'showconfig' => \&showconfig,
+	'setconfig'  => \&setconfig,
+	'newapp'     => \&newapp,
+	'newmodule'  => \&newmodule,
+	'probetable' => \&probetable,
+	'markupdatesapplied' => \&markupdatesapplied,
+);
+
+my $command = shift @ARGV;
+
+if (defined($COMMANDS{$command})) {
+	$COMMANDS{$command}->(%options);
+}
+else {
+	show_usage();
+}
+
+sub install {
+	my %options = @_;
+
+	my $target = shift @ARGV;
+
+	# use these on demand.  This has two benefits.
+	# a) We don't spend time using in stuff we don't need.
+	# b) This program will still run even if these fail to load because of bad configuration.
+	# c) This allows this program to be used to fix the broken configuration.
+	load_mod("Apache::Voodoo::Install::Distribution");
+	load_mod("Apache::Voodoo::Install::Updater");
+
+	################################################################################
+	# make sure this file exists and that the name follows the correct format
+	################################################################################
+	my $distro = Apache::Voodoo::Install::Distribution->new('distribution' => $target, %options);
+
+	$distro->do_install();
+
+	my $app_name = $distro->app_name();
+
+	my $updater = Apache::Voodoo::Install::Updater->new('app_name' => $app_name, %options);
+
+	if ($distro->existing()) {
+		$updater->do_update();
+	}
+	else {
+		$updater->do_new_install();
+	}
+}
+
+sub update {
+	my %options = @_;
+
+	my $app_name = shift @ARGV;
+	assert_app_name($app_name);
+
+	load_mod("Apache::Voodoo::Install::Updater");
+
+	my $updater = Apache::Voodoo::Install::Updater->new('app_name' => $app_name, %options);
+
+	$updater->do_update();
+	do_post(app_name => $app_name, %options);
+}
+
+sub markupdatesapplied {
+	my %options = @_;
+
+	my $app_name = shift @ARGV;
+	assert_app_name($app_name);
+
+	load_mod("Apache::Voodoo::Install::Updater");
+
+	my $updater = Apache::Voodoo::Install::Updater->new('app_name' => $app_name, %options);
+
+	$updater->mark_updates_applied();
+}
+
+sub showconfig {
+	load_mod("Apache::Voodoo::Constants");
+
+	my $cnf = Apache::Voodoo::Constants->new();
+
+	print " Apache Prefix Path: ", $cnf->prefix(),"\n";
+	print "   App Install Path: ", $cnf->install_path(),"\n";
+	print "       Session Path: ", $cnf->session_path(),"\n";
+	print "   Config File Path: ", $cnf->conf_path(),"\n";
+	print "   Config File Name: ", $cnf->conf_file(),"\n";
+	print "   Update File Path: ", $cnf->updates_path(),"\n";
+	print " Template File Path: ", $cnf->tmpl_path(),"\n";
+	print "   Perl Module Path: ", $cnf->code_path(),"\n";
+	print "         Apache UID: ", $cnf->apache_uid(),"\n";
+	print "         Apache GID: ", $cnf->apache_gid(),"\n";
+	print "Debug DB Connection: ", $cnf->debug_dbd()->[0],"\n";
+	print "  Debug DB Username: ", $cnf->debug_dbd()->[1],"\n";
+	print "  Debug DB Password: ", $cnf->debug_dbd()->[2],"\n";
+	print "     Debug URL Path: ", $cnf->debug_path(),"\n";
+	print "\n";
+	print "Config settings stored in: ", $INC{'Apache/Voodoo/MyConfig.pm'},"\n";
+	exit 0;	
+}
+
+sub setconfig {
+	my %options = @_;
+
+	my $cnf = {};
+
+	eval "use Apache::Voodoo::MyConfig;";
+	unless ($@) {
+		# There is one, so we'll use the settings in it as the default
+		if (ref($Apache::Voodoo::MyConfig::Config) eq "HASH") {
+			$cnf = $Apache::Voodoo::MyConfig::Config;
+		}
+	}
+
+	load_mod("Apache::Voodoo::Install::Config");
+
+	my $cfg = Apache::Voodoo::Install::Config->new(%{$cnf});
+
+	$cfg->do_config_setup($options{pretend});
+}
+
+sub newapp {
+	my %options = @_;
+
+	my $app_name = shift @ARGV;
+	assert_app_name($app_name);
+
+	load_mod("Apache::Voodoo::Scaffold::NewApplication");
+
+	my $newapp = Apache::Voodoo::Scaffold::NewApplication->new('app_name' => $app_name, %options);
+
+	if ($newapp->already_exists()) {
+		print "An application with this name already exists.\n";
+		print "Are you sure you want to replace it with a new blank application?\n";
+		print "[y/N]?";
+		my $answer = <STDIN>;
+		if ($answer =~ /^y/) {
+			$newapp->delete_existing();
+		}
+		else {
+			exit;
+		}
+	}
+	$newapp->create();
+}
+
+sub newmodule {
+	my %options = @_;
+
+	my $app_name = shift @ARGV;
+	assert_app_name($app_name);
+
+	my $mod_name = shift @ARGV;
+	assert_mod_name($mod_name);
+
+	load_mod("Apache::Voodoo::Scaffold::NewModule");
+
+	my $newmod = Apache::Voodoo::Scaffold::NewModule->new('app_name' => $app_name, mod_name => $mod_name, %options);
+
+	if ($newmod->already_exists()) {
+		print "An module with this name already exists.\n";
+		print "Are you sure you want to replace it with a new blank module?\n";
+		print "[y/N]?";
+		my $answer = <STDIN>;
+		if ($answer =~ /^y/) {
+			$newmod->delete_existing();
+		}
+		else {
+			exit;
+		}
+	}
+	$newmod->create();
+}
+
+sub probetable {
+	my %options = @_;
+
+	my $app_name = shift @ARGV;
+	assert_app_name($app_name);
+
+	my $mod_name = shift @ARGV;
+	assert_mod_name($mod_name);
+
+	load_mod("Apache::Voodoo::Scaffold::NewModule");
+
+	my $newmod = Apache::Voodoo::Scaffold::NewModule->new('app_name' => $app_name, mod_name => $mod_name, %options);
+
+	if ($newmod->already_exists()) {
+		print "An module with this name already exists.\n";
+		print "Are you sure you want to replace it with a new blank module?\n";
+		print "[y/N]?";
+		my $answer = <STDIN>;
+		if ($answer =~ /^y/) {
+			$newmod->delete_existing();
+		}
+		else {
+			exit;
+		}
+	}
+	$newmod->create();
+}
+
+sub do_post {
+	my %options = @_;
+
+	load_mod("Apache::Voodoo::Install::Post");
+
+	my $post = Apache::Voodoo::Install::Post->new(%options);
+
+	$post->do_setup_checks();
+}
+	
+sub show_usage {
+	print "\nAutomated install / upgrade for Apache::Voodoo based applications.\n\n";
+	print "Usage: voodoo-control [options] [command]\n";
+	print "Commands:\n";
+	print "    install \"installfile\" Install the given application.\n";
+	print "    update \"app name\"     Run the update steps on an already installed application.\n";
+	print "    showconfig            Show global configuration settings.\n";
+	print "    setconfig             Change global configuration settings.\n";
+	print "    anything else         Show this help message.\n";
+	print "Options:\n";
+	print "    --pretend    Step through operations.  Don't actually do anything\n";
+	print "    -h --dbhost  Override database host name in config files\n";
+	print "    -n --dbname  Override database name in conf files\n";
+	print "    -u --dbuser  Override database username in conf files\n";
+	print "    -p --dbpass  Override database password in conf files\n";
+	print "    -r --dbroot  Database root password\n";
+	print "    -v number    Increase verbosity \n";
+	print "\n";
+	print "Expert Options: (Useful in a development environment; dangerous in a production environment.)\n";
+	print "    --ignore           Causes errors in the update command files to be ignored\n";
+	print "    markupdatesapplied Makes the system believe all the update have been applied,\n";
+	print "                       doesn't acutally process them.\n";
+	print "\n";
+	exit;
+}
+
+sub load_mod {
+	my $mod = shift;
+	eval "use $mod;";
+	if ($@) { die $@; }
+}
+
+sub assert_app_name {
+	my $app_name = shift;
+	unless ($app_name =~ /^[a-z]\w*$/i) {
+		print "Invalid application name.  Valid names must begin with a letter and only contain letters, numbers and _\n";
+		exit;
+	}
+}
+
+sub assert_mod_name {
+	my $mod_name = shift;
+	unless ($mod_name =~ /^[a-z]\w*(::[a-z]\w*)*$/i) {
+		print "Invalid module name.  Modules must follow Perl's module naming convention\n";
+		exit;
+	}
+}
+
+=pod ################################################################################
+
+=head1 AUTHOR
+
+Maverick, /\/\averick@smurfbaneDOTorg
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005 Steven Edwards.  All rights reserved.
+
+You may use and distribute Voodoo under the terms described in the LICENSE file include
+in this package or L<Apache::Voodoo::license>.  The summary is it's a legalese version
+of the Artistic License :)
+
+=cut ################################################################################

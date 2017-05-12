@@ -1,0 +1,37 @@
+Revision history for App-Timestamper
+
+v0.0.7      2015-09-28
+    - Set the minimal perl version to 5.14.x due to failing tests in ancient
+    perl versions.
+        - I'm sorry it has come to this.
+        - Thanks to Nigel Horne for his cooperation with diagnosing
+        a CPAN Testers failure in perl-5.8.8.
+
+v0.0.6      2015-09-26
+    - Add t/pod-sanity.t for testing that some strings occur in the POD.
+    - Add META.json.
+        - Thanks to ETHER.
+
+v0.0.5      2015-09-23
+    - Add a call to “STDOUT->autoflush(1)” in one place.
+        - This is so the output will be available immediately.
+
+v0.0.4      2015-09-19
+    - Add “./contrib/ts-format”.
+        - See the “Common Requests” section of the POD.
+        - https://rt.cpan.org/Public/Bug/Display.html?id=106258
+    - Happy Talk Like a Pirate Day - Arrrrrrrrrr!
+    - Happy Software Freedom Day.
+
+v0.0.3      2015-07-28
+    - Add a prereq on Getopt::Long 2.36 by fixing the "use" line.
+        - Thanks to this CPAN Testers report:
+            - http://www.cpantesters.org/cpan/report/8dfa015a-3410-11e5-9808-9febf015f39b
+        - Thanks to Altreus from irc.perl.org for some insights.
+
+v0.0.2      2015-07-26
+    - Implement better granularity for the time stamps.
+    - Add some explanation for possible use cases for the program.
+
+v0.0.1      2015-07-05
+    - First version, released on an unsuspecting world

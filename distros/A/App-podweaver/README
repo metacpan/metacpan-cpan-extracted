@@ -1,0 +1,83 @@
+NAME
+    App::podweaver - Run Pod::Weaver on the files within a distribution.
+
+VERSION
+    version 1.00
+
+SYNOPSIS
+    App::podweaver provides a mechanism to run Pod::Weaver over the files
+    within a distribution, without needing to use Dist::Zilla.
+
+    Where Dist::Zilla works on a copy of your source code, App::podweaver is
+    intended to modify your source code directly, and as such it is highly
+    recommended that you use the
+    Pod::Weaver::PluginBundle::ReplaceBoilerplate plugin bundle so that you
+    over-write existing POD sections, instead of the default Pod::Weaver
+    behaviour of repeatedly appending.
+
+    You can configure the Pod::Weaver invocation by providinng a
+    `weaver.ini' file in the root directory of your distribution.
+
+INSTALLATION
+    To install this module, run the following commands:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+BOOTSTRAPPING WITH META.json/META.yml
+    Since the META.json/yml file is often generated with an abstract
+    extracted from the POD, and App::podweaver expects a valid META file for
+    some of the information to insert into the POD, there's a
+    chicken-and-egg situation on the first invocation of either.
+
+    Running App::podweaver first should produce a POD with an abstract line
+    populated from your `# ABSTRACT:' header, but without additional
+    sections like version and authors. You can then generate your META file
+    as per usual, and then run App::podweaver again to produce the missing
+    sections:
+
+      $ ./Build distmeta
+      Creating META.yml
+      ERROR: Missing required field 'dist_abstract' for metafile
+      $ podweaver -v
+      No META.json or META.yml file found, are you running in a distribution directory?
+      Processing lib/App/podweaver.pm
+      $ ./Build distmeta
+      Creating META.yml
+      $ podweaver -v
+      Processing lib/App/podweaver.pm
+
+    This should only be neccessary on newly created distributions as both
+    the META and the neccessary POD abstract should be present subsequently.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc App::podweaver
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-podweaver
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/App-podweaver
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/App-podweaver
+
+    * Search CPAN
+        http://search.cpan.org/dist/App-podweaver/
+
+AUTHOR
+    Sam Graham <libapp-podweaver-perl BLAHBLAH illusori.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010-2011 by Sam Graham
+    <libapp-podweaver-perl BLAHBLAH illusori.co.uk>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

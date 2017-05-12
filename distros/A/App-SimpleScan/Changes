@@ -1,0 +1,336 @@
+Revision history for App-SimpleScan
+3.01  Tue Jun  8 14:49:48 PDT 2010
+	- Revamped cookbook to make it much more useful.
+
+3.00  Mon Jun  7 18:13:41 PDT 2010
+	- Completely revamped simple_report to us TAP::Harness
+	  instead of Test::Harness. Output is the same, but now
+	  we're using a much better TAP parsing engine.
+	- Cleaned up test dependent on external sites that 
+	  had changed their HTML, moved it to xt/
+        - Various minor changes to support temp plugin used in tests
+	- No actual changes to App::SimpleScan, but it's the module
+	  we get our version from.
+
+2.02  Thu Sep 28 13:25:20 PDT 2006
+	- longstanding bug with quoted strings containing backslashes
+	  finally detected in the field and fixed. Strings like 
+          'I am quoted\\.' would stack an extra '\\.' due to a 
+	  group inside the quote-matching regexes that should have
+	  been non-capturing.
+
+2.01  Tue Sep 26 11:26:49 PDT 2006
+	- Missing PREREQ for Clone added
+
+2.00  Wed Sep 20 14:06:09 PDT 2006
+	- First refactoring: substitution engine extracted
+	  -- Added App::SimpleScan::Substitution and
+	           App::SimpleScan::Substitution::Lines
+          -- Added associated tests
+          -- Variables now substitute in the order you specified, rather
+	     than in alphabetical order
+          -- Dependencies and substitutions are now handled by
+	     completely separate sections of code
+          -- "cross-product" bugs (caused by resubstitution of an
+             already-resolved variable) have been fixed. This was
+             the problem which led to the refactoring effort.
+
+1.23  Thu Aug 31 13:10:02 PDT 2006
+	- fix for "Use of uninitialized value in join or string" error in 
+	  App::SimpleScan::TestSpec -  added explicit check for malformed URL 
+	  schemes. This often happens when one of the '%' signs is left off a 
+	  pragma.
+
+1.22  Wed Aug 30 17:10:33 PDT 2006
+	- fix double-quote expansion to work as expected
+	  (variables inside double-quotes are now expanded, and *all*
+          of the possible values of the expression are returned).
+
+1.21  Thu Aug 24 17:07:20 PDT 2006
+	- enable dynamic creation of variable *names*
+          %%foo bar baz
+          %%<foo>_value "is <foo>"
+          
+          # Defines <bar_value> as "is bar" and <baz_value> as "is baz"
+
+1.20  Wed Aug 23 13:58:31 PDT 2006
+	- worked out the funky kinks in nested substitutions by a major 
+	  simplification of the substitution logic. 
+	- dependency logic now *only* worries about keeping loops out of
+	  dependencies; substitution handles all the discovery and resolution
+	  of dependent variables.
+	- removed several methods that are no longer needed (in particular,
+	  _all_dependencies)
+
+1.19  Fri Aug 18 15:34:55 PDT 2006
+	- Support for variable substitutions inside variables themselves;
+	  allows variable names to be constructed dynamically.
+
+1.18  Thu Aug 17 13:37:48 PDT 2006
+	- *Always* give us the syntax warning when we have a bad input line.
+
+1.17  Wed Aug  9 12:37:35 PDT 2006
+	- Fixed subtle bug in expand_backticked: if the characters 'tr' 
+          (unquoted) appeared in a variable definition, expand_backticked
+          parsed this as beginning a tr/.../. Threw out Text::Balanced and
+	  used a pattern from Friedl to do the job instead. Bonus: speed gain!
+        - Made simple_scan always stack a failing test if it encountered
+	  a bad line.
+	- (Finally!) Complete overhaul of dependencies to use Graph.pm, thereby
+	  making it easy to streamline the substitution calculations for cases
+	  where you have many variables, but are only substituting in one or
+	  two. The new code eliminates checks on the variables you don't care
+	  about, radically speeding up this case.
+
+1.16  Fri Jul 28 11:15:06 PDT 2006
+	- Add input hook support for include-style plugins
+	- move init() call for plugins to _load_plugins. init()
+	  was called only if the plugin installed pragmas, which 
+	  is non-intuitive.
+	- Reorder operations in new() so that the object is filled in
+	  as much as possible before loading and initializing plugins.
+
+1.15  Wed Jul 19 16:24:42 PDT 2006
+	- reorder the creation of the test boilerplate to avoid 
+	  ordering errors with the new Include plugin
+
+1.14  Mon Jul 17 16:56:52 PDT 2006
+	- changes to conform to Perl::Critic recommendations
+
+1.13  Wed Jul 12 11:52:33 PDT 2006
+	- contributed fix: allow non-http URLs to be tested
+	  (from bbking@checkfree.com)
+	- Clarified App::SimpleScan docs: this is not useful to
+	  read if you want to run simple_scan; only useful if
+	  you're subclassing this class (or writing your own app)
+	- Addded PLUGINS section to simple_scan doc.
+
+1.12  Wed Jul  5 12:40:18 PDT 2006
+        - fixed pattern interpolation into the comment section of
+	  the generated code so Perl wouldn't complain about bad
+	  character escapes in the string.
+
+1.11  Fri Jun 23 17:41:22 PDT 2006
+	- expand_backticked was changed to a method to allow it
+	  to more easily emit warnings for mismatched quotes.
+	- mismatched quotes are now explicitly diagnosed. Formerly,
+	  there'd be a !!THISISGARBAGE!! in the output. Not right.
+
+1.10  Fri Jun 23 12:53:33 PDT 2006
+	- Unicode works!
+  	  - accented character tests gone. 
+	  - Non-Latin test patches welcome.
+
+1.09  Mon Jun 19 12:07:25 PDT 2006
+	- Add test run status reporting to simple_report -status
+
+1.08  Thu Jun  8 16:35:15 PDT 2006
+	- Fix Makefile.PL so simple_report gets installed.
+
+1.07  Wed May 31 16:53:06 PDT 2006
+	- Changed simple_report to send the status messages (x% done)
+	  to STDERR
+
+1.06  Tue May  2 15:31:41 PDT 2006
+ 	- Changed status reporting leader chars to make them easier to spot
+	  (and strip out)
+	- removed "Running" status - that's what 'ok'/'not ok' is for
+
+1.05  Fri Apr 28 17:00:27 PDT 2006
+	- added --status and tests for it
+
+1.04  Thu Apr 27 17:17:04 PDT 2006
+	- fixed tests failing on Solaris (left off specific
+	  path to simple_scan - d'oh!)
+
+1.03  Tue Apr 11 14:17:13 PDT 2006
+	- mysterious 08cache.t test failure solved!
+	- began work on substitution optimization
+	- suppressed (finally) the Text::Balanced warnings
+
+1.02  Mon Apr 10 09:51:38 PDT 2006
+	- Initial upload failed; trying again
+
+1.01  Fri Mar 31 13:06:43 PST 2006
+	- Changed shebang line to use /usr/bin/env
+	  (not /home/y, d'oh).
+
+1.00  Fri Mar 17 12:25:43 PST 2006
+	- New interfaces deserve a full version update.
+	- current_line method added to allow plugins to
+	  spy on the input line if they want to.
+	- All plugins now converted to use output filters
+	  instead of hooking stack_test.
+        - More documentation of the base simple_scan 
+          program.
+
+0.34  Mon Mar 13 16:21:56 PST 2006
+	- totally reorganized variable substitution to fix
+	  nested variable substitution problems; variable
+	  substitution now returns only the unique tests
+	  generated by substituting variables
+	- replace per_test with a more flexible filtering
+	  architecture
+	- dependencies code still under development, so
+	  it's still possible to set up an infinite 
+          substitution loop, like
+             %%foo <bar>
+             %%bar <foo>
+             <foo>
+	  To be fixed in an upcoming release.
+
+0.33  Thu Mar  2 13:57:46 PST 2006
+	- expose expand_backticked method
+	- reorganize module documentation
+
+0.32  Wed Feb 22 15:47:10 PST 2006
+	- Add input queue manipulation to set up for macro-like
+	  pragmas and simpler input handling for test spec
+	  expansion
+	- internal topological sort to resolve possible
+	  circular dependencies:
+	    %%foo this is <bar>
+            %%bar this is <foo>
+        - Add code to save current test spec (useful if 
+          an overridden method needs to see the current spec)
+
+0.31  Mon Feb 13 13:02:04 PST 2006
+	- document that %ENV variables work in substitution pragmas
+
+0.30  Fri Feb 10 15:32:13 PST 2006
+	- Change all test and code stacking in App::SimpleScan::Testspec
+	  to use stack_test and stack_code so this is consistent
+          across core code and plugins.
+
+0.29  Mon Feb  6 16:20:09 PST 2006
+        - expanded plugin documentation
+	- expanded tests to match new docs
+
+0.28  Mon Feb  6 12:18:21 PST 2006
+	- fixed missing default agent_alias
+
+0.27  Thu Jan 26 12:49:14 PST 2006
+	- added simple_report to this distribution
+
+0.26  Thu Jan 12 12:05:05 PST 2006
+	- added support for backticked and quoted substitutions
+
+0.25  (unreleased)
+	- added --no_agent command line option
+
+0.24  (unreleased) 
+
+0.23  Tue Dec  6 17:10:59 PST 2005
+	- Reordered code generation so that per_test
+	  plugin code gets called every time a test is stacked
+        - Added test plugin (t/lib/App/SimpleScan/Plugin/Test_Expand)
+	  to properly test substitution expansion
+	- Added substitution expansion test to fix a bug
+	  that emitted per_test code only for the last test in
+	  a set that was created by substitution expansion
+
+0.22  Mon Nov 28 11:01:37 2005
+	- Missing prereqs in Makefile.PL corrected
+
+0.21  Mon Nov 21 17:14:07 2005
+	- Move test count initialization to prevent an 
+	  uninitialized variable warning if a test is stacked by
+	  a plugin during the options processing phase. (Is that
+	  a specific enough bug or what?)
+
+0.20  Mon Nov 21 17:03:24 2005
+  	- Move pragma installation earlier so plugins can find pragma
+	processors
+
+0.19  Mon Nov 21 16:09:28 2005 
+	- Expose the pragma() method for use by plugins
+
+0.18  Mon Nov 21 14:25:24 2005
+	- Made sure that validate_options gets the App::SimpleScan 
+	  object
+
+0.17  Fri Nov 18 18:10:34 2005
+	- Added conditional callback to validate_options()
+	  in plugins; allows plugins to make sure that 
+	  command-line option values are indeed valid.
+
+0.16  Fri Nov 18 17:29:12 2005
+	- Moved plugin loading into separate private method
+	- made stack_tests and stack_code public methods
+	  since they were being used publically anyway
+	- aliased to _stack_code and _stack_tests until all
+	  plugins have time to catch up
+
+0.15  Fri Nov 18 13:39:34 2005
+	- Changed the per_test call in App::SimpleScan::Testspec
+	  to stack the code *after* the generated test. Note that
+	  if a per_test plugin really needs to stack code before
+          generated tests by calling _stack_code.
+
+0.14  Fri Nov 18 11:59:58 2005
+	- fixed plugin code to only call pragmas() if the plugin
+	  can('pragmas'); allows development of options-only plugins
+
+0.13  Thu Nov 17 17:52:43 2005
+	- added --autocache option: turn on caching at the beginning
+	  of a run
+
+0.12  Tue Nov  8 11:28:14 2005 
+	- More changes for accented characters. Now handles either
+          UTF-8 or Latin-1. 
+	- Eliminated double fetch for accented character tests.
+
+0.11  Wed Oct 26 16:15:52 2005
+	- Temporary fix for TODO test until I can figure out
+	  why I need to do it at the moment.
+
+0.10  Wed Oct 26 15:29:17 2005
+	- Extracted execution of tests into execute() method - 
+	  this will allow plugins to override the simple 'eval'
+	  with something more interesting
+	- fix a quoting error in TY and TN tests
+
+0.09  Wed Oct 26 14:48:27 2005
+	- Added --define, --override, --defer, and --debug switches
+	- debug is pretty preliminary, but the methods are there now
+	- can now define substitutions on the command line, and 
+	  choose to have them override or defer to substitutions
+	  in input files
+
+0.08  Wed Oct 26 11:37:45 2005
+	- Added _delete_substitution to support the %%forget pragma.
+
+0.07  Tue Oct 25 14:37:00 2005
+	- Changed match for accented characters to .*? instead
+	  of . to make it work consistently on 5.6
+
+0.06  Mon Oct 24 16:24:20 2005
+	- fixed "@accents" vs. "$accent[...}" in generated code
+
+0.05  Mon Oct 24 15:55:58 2005
+	- Added a missing semicolon on the generated code for the
+	  accent extraction line. 
+
+0.04  Mon Oct 24 14:42:38 2005
+	- changed 8-bit-character checks; test process seems to nuke
+	  the $1, $2, etc. variables, so I can't check them back in
+	  the tests itself. Now done via an array of matched-out 
+	  characters.
+	- Systematized test counting to make sure counts were right
+	- Tests now "use strict;"
+	- Regex flags handled properly
+	- _regex_render added to centralize regex fixups
+	- Removed duplicate bottm-out test in substitution recursion
+	- Updated tests
+
+0.03  Wed Oct 19 12:22:18 2005
+	- altered test spec parsing to properly handle missing comments
+	- added tests for this code
+
+0.02  Wed Oct 12 13:55:39 2005
+	- Fixed accented character cleanup - wasn't using the
+          cleaned-up version of the regex
+
+0.01  Fri Sep 16 11:49:25 2005
+	- Initial release.
+

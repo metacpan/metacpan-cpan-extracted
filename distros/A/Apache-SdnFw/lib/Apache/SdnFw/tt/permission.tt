@@ -1,0 +1,62 @@
+[% s.add_js('check') %]
+<script>
+function kcheck (str,value) {
+	var r = new RegExp('f:\\d+:' + str);
+	var f = document.form;
+	for (var i = 0; i < f.elements.length; i++) {
+		if (f.elements[i].type == 'checkbox' && r.test(f.elements[i].name) ) {
+			f.elements[i].checked=value;
+		}
+	}
+}
+</script>
+<form method="POST" action="[% s.ubase %]/[% s.object %]/permission" name="form">
+[% s.html_hidden('update',1) %]
+[% s.html_hidden('return',s.in.return) %]
+[% s.html_hidden('return_args',s.in.return_args) %]
+<div class="floatleft">
+<table>
+	<caption>Manage Access to&nbsp;[% s.object %]&nbsp;Object</caption>
+	<thead>
+	<tr>
+		<th>&nbsp;</th>
+		<th>Everyone</th>
+		<th>&nbsp;</th>
+[% FOREACH g IN groups %]
+		<th><a href="[% s.ubase %]/group/display?group_id=[% g.group_id %]">[% g.name %]</a></th>
+[% END %]
+	</tr>
+	<tr>
+		<th class='shead'>&nbsp;</th>
+		<th class='shead'>
+		<a href="#" onClick="javascript: check('f:all',true); return false;" class="action">All</a>
+		<a href="#" onClick="javascript: check('f:all',false); return false;" class="action">None</a>
+		</th>
+		<th class='shead'>&nbsp;</th>
+[% FOREACH g IN groups %]
+		<th class='shead'>
+		<a href="#" onClick="javascript: check('f:[% g.group_id %]',true); return false;" class="action">All</a>
+		<a href="#" onClick="javascript: check('f:[% g.group_id %]',false); return false;" class="action">None</a>
+		</th>
+[% END %]
+	</tr>
+	</thead>
+	<tbody>
+[% FOREACH f IN s.o.functions %]
+	<tr>
+		<td>[% f.value %]</td>
+		<td>[% IF s.o.limit_everyone.defined(f.key) %]&nbsp;[% ELSE %]<input type="checkbox" value="1" name="f:all:[% f.key %][% IF existing.${f.key}.gids == '' %]" checked>[% ELSE %]">[% END %][% END %]</td>
+		<th class='shead'>
+		<a href="#" onClick="javascript: kcheck('[% f.key %]',true); return false;" class="action">All</a>
+		<a href="#" onClick="javascript: kcheck('[% f.key %]',false); return false;" class="action">None</a>
+		</th>
+	[% FOREACH g IN groups %]
+		<td><input type="checkbox" value="1" name="f:[% g.group_id %]:[% f.key %][% IF existing.${f.key}.groupids.${g.group_id} == g.group_id %]" checked>[% ELSE %]">[% END %]</td>
+	[% END %]
+	</tr>
+[% END %]
+	</tbody>
+</table>
+<input type="submit" value="Save">
+</div>
+</form>

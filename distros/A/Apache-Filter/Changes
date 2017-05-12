@@ -1,0 +1,216 @@
+Version: 1.024  Sat Sep 24 21:56:42 CDT 2005
+
+ - Fixed a bug that probably only I would ever see - when running the
+   "disttest" action, it was actually using the server configuration
+   from the top-level distribution directory, not the dist-dir
+   directory.
+
+ - For some reason all the files in the tarball of 1.023 looks like
+   they're read-only and non-executable, which causes lots of tests to
+   fail (e.g. those trying to execute CGI-style scripts).  I'm
+   re-releasing what looks like correct permissions. [Spotted by Tom
+   Kirkpatrick]
+
+Version: 1.023  Mon Jun  6 06:05:44 CDT 2005
+
+ - Fixed a testing bug under (certain versions of?) Mac OS X, in which
+   none of the pages in t/real.t would generate any output. [Peter
+   Farmer]
+
+Version: 1.022  Fri Jan 31 14:00:48 CST 2003
+
+ - Now can be installed using either Module::Build or
+   ExtUtils::MakeMaker.  
+
+ - Simplified a few of the TIEHANDLE code chunks that used substr() to
+   manipulate saved filehandle data.
+
+Version: 1.021   Fri Dec 27 10:13:23 CST 2002
+
+ - The test suite now provides a bit more useful information upon
+   failure and uses Test.pm to generate its output.
+
+ - Avoid an "undefined value" warning in READLINE() method [Dave
+   Rolsky]
+
+ - If the initial $r isn't an Apache object (could be Apache::Request
+   or a subclass of Apache), make an on-the-fly subclass of whatever
+   it is. [Dave Rolsky]
+
+Version: 1.020  Date: Mon Nov 11 17:11:31 AEST 2002
+   Fixed the Apache::PerlRunFilter module, which was missing a call to
+   filter_register(). [Ruslan U. Zakirov, Oleh Khoma]
+
+   Minor regex speedup in READLINE() method of filehandle.
+
+   Correct doc bug about Filter2 and Filter3.
+
+   Add Apache::HTML::ClassParser to list of filter-aware modules.
+
+
+Version: 1.019  Date: 2001/08/29 13:48:56
+   Added a FILENO stub, which fixes a compatibility problem with
+   Apache::Compress.
+   
+   Moved the Apache::Compress-related tests into their own subtest, so it
+   can be skipped if the user doesn't have Apache::Compress installed.
+   
+   'Changes' file isn't auto-generated from CVS anymore.
+
+
+Version: 1.018  Date: 2001/04/08 07:30:13
+   Some fixes for the 'perl Makefile.PL' and 'make test' stages.  Fixes a
+   problem for those who want to skip testing with a real httpd, and
+   properly removes quotation marks from 'LoadModule' directives when
+   building httpd.conf to use during 'make test'.
+   
+   No changes were made to the actual Apache::Filter code, just stuff in
+   the test suite.
+
+
+Version: 1.017  Date: 2001/04/06 21:34:28
+   Fixed a filehandle bug in which send_fd() would complain about a 'Bad
+   filehandle'.  Occurred most often with Apache::Compress.
+   
+   Added a couple of tests to properly exercise the send_fd() method.
+
+
+Version: 1.016  Date: 2000/12/20 03:43:44
+   Noted dependency on mod_perl 1.24_01.
+
+
+Version: 1.015  Date: 2000/12/20 03:01:57
+   Fixed a bug in Apache::RegistryFilter that caused a crash when
+   handler() was called as a function instead of a method.
+   [thumper@bsi.menlo-park.ca.us]
+
+
+Version: 1.014  Date: 2000/11/06 20:41:00
+   Previous filters can set content-type via
+   $r->send_http_header('text/blah'), and the value they set will be used
+   as the default for subsequent filters.  [gyoung@laserlink.net (Geoffrey Young)]
+   
+   Content-length wasn't being set correctly in send_http_header().  Fixed.
+   
+   My patches to Apache::PerlRun, Apache::RegistryBB, and
+   Apache::RegistryNG have been applied to the main mod_perl source tree,
+   so I'm no longer distributing them with Apache::Filter.
+
+
+Version: 1.013  Date: 2000/11/05 04:37:10
+   Cleaned up new implementation begun in 1.012.  Revised documentation
+   accordingly.
+   
+   Added overloaded method for $r->print().
+
+
+Version: 1.012  Date: 2000/09/07 05:17:27
+   (not released publically)
+   
+   Major reorganization of code in Apache::Filter.  Now Apache::Filter is
+   a subclass of Apache, which allows much smoother overriding of the
+   functionality that needs to be changed for filtering.  In particular,
+   send_http_headers() and send_fd() behave well now.
+   
+   Added new filter_register() method, which must always be called.
+   filter_input() isn't necessary anymore when you don't actually need
+   the input filehandle it returns.
+
+
+Version: 1.011  Date: 2000/06/24 23:38:21
+   Fixed a bug in which Apache::RegistryFilter wasn't properly
+   registering itself with Apache::Filter on the 2nd, 3rd, etc. times a
+   script gets run.  tbrown@baremetal.com (Tom Brown) found the bug.
+   
+   Fixed the POD in Apache::RegistryFilter, which was slightly malformed.
+   gyoung@laserlink.net (Geoffrey Young) found it.
+   
+   During 'make test', the error log won't be removed, so you can examine
+   it even if there were no failures.
+
+
+Version: 1.010  Date: 2000/06/17 18:26:05
+   Apache::RegistryFilter now overrides Apache's header-sending routines
+   with no-ops, so that you may leave header-sending calls in your
+   Registry scripts.  This means you can use the same code under
+   Apache::Registry and Apache::RegistryFilter.
+   
+   Added a test to make sure the above header-overriding works properly.
+   
+   Added lots of insane crap to the 'make test' phase to support apaches
+   built with --enable-shared=max or any DSOs.  [caelum@debian.org
+   (Rafael Kitover)]
+   
+   During 'perl Makefile.PL', search around for copies of apache to use
+   during 'make test'.  Also default to user 'nobody' if the current user
+   is root.  [caelum@debian.org (Rafael Kitover)]
+   
+   Added Apache::SimpleReplace to list of Filter-aware handlers.
+   [gyoung@laserlink.net (Geoffrey Young)]
+   
+   Changed <\Files> to </Files> in documentation. [sbekman@stason.org (Stas Bekman)]
+
+
+Version: 1.009  Date: 2000/05/27 14:00:58
+   Added the Apache::Final class, which catches the first output that the
+   last filter in the chain attempts to send to the browser.  We then
+   send the proper headers and immediately step out of the way, putting a
+   direct connection between the browser and the code sending the data.
+   [gyoung@laserlink.net (Geoffrey Young)]
+   
+   Sped up the PRINT method a little bit by eliminating a temporary
+   variable.
+   
+   Removed a superfluous semicolon in the documentation.
+   [sbekman@stason.org (Stas Bekman)]
+
+
+Version: 1.008  Date: 2000/04/13 00:53:53
+   Added the Apache::RegistryFilter module, which provides support for
+   Registry scripts in a Filter chain.
+   
+   Fixed up the Makefile.PL file a bit.
+
+
+Version: 1.007  Date: 2000/03/24 15:03:14
+   Changed several $r->filename instances to $r->finfo.  This will speed
+   up operation.  I did this once in the past, but had to change it back
+   to $r->filename because $r->finfo wasn't working right.  mod_perl
+   version 1.18 claims to have fixed the problems, so I'm changing it
+   forth again.
+   
+   Fixed a run-time server error that occurs when the input filename
+   doesn't exist.  [gyoung@laserlink.net (Geoffrey Young)]
+
+
+Version: 1.006  Date: 2000/01/29 17:54:44
+   Added 'handle' parameter to filter_input().
+   [Vegard.Vesterheim@runit.sintef.no (Vegard Vesterheim)]
+   
+   If $r->filename can't be opened, we no longer abort halfway through
+   filter_input().  Just return an undef filehandle at the end.
+   [gozer@hbesoftware.com (Philippe M. Chiasson)]
+
+
+Version: 1.005  Date: 1999/10/17 15:59:23
+   No changes - version bump to update the README file.
+
+
+Version: 1.004  Date: 1999/10/17 15:47:27
+   Fixed a problem that prevented proper functioning when Perl is
+   compiled with sfio instead of stdio.  Should work properly now.
+
+
+Version: 1.003  Date: 1999/09/12 03:25:45
+   Forgot to replace Doug's PerlRun documentation with my
+   PerlRunFilter documentation in the last release, so I did it now.
+
+
+Version: 1.002  Date: 1999/09/12 02:22:47
+   Added $VERSION stuff to integrate with CVS.
+
+
+Version: 1.001  Date: 1999/09/12 02:17:10
+   Added files to CVS
+
+

@@ -1,0 +1,14 @@
+TYPEMAP
+struct authensasl *	AuthenSASLtype
+
+INPUT
+AuthenSASLtype
+  if ((SvTYPE($arg) != SVt_RV) && (SvTYPE($arg) != SVt_PVMG)) {
+    printf(\"First parameter was not a reference. It was type %d\\n\", SvTYPE($arg));
+    XSRETURN(0);
+  }
+  $var = (struct authensasl *)SvIV(SvRV($arg));
+
+OUTPUT
+AuthenSASLtype
+  sv_setref_iv($arg, "Authen::SASL::Cyrus", (int)$var);

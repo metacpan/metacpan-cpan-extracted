@@ -1,0 +1,101 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+
+use Getopt::Long;
+use aliased 'AI::Evolve::Befunge::Population' => 'Population';
+use AI::Evolve::Befunge::Util;
+
+=head1 NAME
+
+    evolve - board game frontend to AI::Evolve::Befunge
+
+
+=head1 SYNOPSIS
+
+    evolve [-q|v|d] [-h host] [savefile]
+
+
+=head1 DESCRIPTION
+
+This script is a frontend to the AI::Evolve::Befunge genetic
+algorithm.  It sets up a board game instance, possibly loading
+previous genetic data from a savefile (if given on the command line),
+and starts running a new generation.
+
+It will run until it is killed.
+
+
+=head1 COMMAND LINE ARGUMENTS
+
+=head2 -q, --quiet
+
+Enable quiet mode.  This will reduce the amount of output.
+
+
+=head2 -v, --verbose
+
+Enable verbose mode.  This will increase the amount of output.
+
+
+=head2 -d, --debug
+
+Enable debug mode.  This will increase the amount of output.
+
+
+=head2 -h <hostname>, --hostname=<hostname>
+
+Set the hostname to the specified value.  The default is to use the
+output of the "hostname" shell command.
+
+
+=head2 <savefile>
+
+If specified, previous genetic data is read from this file.  You can
+easily "fork" an existing population on a new host by reading its
+savefile.
+
+
+=cut
+
+# default command line options
+my $debug    = 0;
+my $quiet    = 0;
+my $verbose  = 0;
+my $help     = 0;
+my $hostname = undef;
+
+die("Usage: $0 [-q|v|d] [-h host] [-c num] [savefile]\n") unless GetOptions(
+    'debug'      => \$debug,
+    'quiet'      => \$quiet,
+    'verbose'    => \$verbose,
+    'help'       => \$help,
+    'hostname=s' => \$hostname,
+);
+
+exec("perldoc $0") if $help;
+
+my $savefile = shift;
+
+push_debug  ($debug);
+push_quiet  ($quiet);
+push_verbose($verbose);
+
+my %population_args;
+
+$population_args{Host} = "$hostname" if defined $hostname;
+
+my $population;
+if(defined($savefile)) {
+    $population = Population->load($savefile);
+} else {
+    $population = Population->new(%population_args);
+}
+
+for(my $gen = $population->generation(); ; $gen++) {
+    $population->generation($gen);
+    $population->breed();
+    $population->fight();
+    $population->save();
+    $population->migrate();
+}

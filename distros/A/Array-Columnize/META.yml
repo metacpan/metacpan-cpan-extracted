@@ -1,0 +1,28 @@
+---
+abstract: 'Format an Array as an Array of String aligned in columns.'
+author:
+  - 'Rocky Bernstein <rocky@cpan.org>'
+build_requires:
+  Test::More: 0.81
+configure_requires:
+  Module::Build: 0
+  perl: 5.006001
+  rlib: 0.02
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Array-Columnize
+provides:
+  Array::Columnize:
+    file: lib/Array/Columnize.pm
+    version: 1.04
+requires:
+  version: 0
+resources:
+  bugtracker: https://github.com/rocky/Perl-Array-Columnize/issues
+  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
+  repository: http://github.com/rocky/Perl-Array-Columnize
+version: 1.04

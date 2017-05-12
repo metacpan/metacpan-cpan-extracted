@@ -1,0 +1,10 @@
+Revision history for Acme-CPANLists-Import-RSAVAGE
+
+0.02    2016-02-21 (PERLANCAR)
+
+	- [Bugfix] Fix package name & abstract (copy-paste mistake).
+
+
+0.01    2016-02-21 (PERLANCAR)
+
+        - First release.

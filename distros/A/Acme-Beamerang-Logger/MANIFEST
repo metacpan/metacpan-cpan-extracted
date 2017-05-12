@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+lib/Acme/Beamerang/Logger.pm
+metamerge.json
+t/basic-noacme.t
+t/basic-nobeamerang.t
+t/basic-short.t
+t/basic.t

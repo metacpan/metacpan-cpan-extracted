@@ -1,0 +1,25 @@
+Apache::VMonitor 2.x works with both mod_perl (Apache 1.x) and mod_perl2 (Apache 2.x).
+
+To build:
+
+  % perl Makefile.PL 
+  % make
+  % make test
+  % make install
+
+It should auto-detect which version you have and where your httpd is installed. If 
+this does not work, you need to specify the location of your apache binary as
+follows:
+
+  % perl Makefile.PL -httpd <path to httpd>
+
+If you have both installed you need to decide which version of mod_perl to build
+it for.
+
+  % perl Makefile.PL MOD_PERL=1
+
+or 
+
+  % perl Makefile.PL MOD_PERL=2
+
+

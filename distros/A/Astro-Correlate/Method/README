@@ -1,0 +1,31 @@
+This README contains information on writing your own correlation method for
+use with the Astro::Correlate Perl module.
+
+The basic infrastructure you need is a correlate() method that accepts two
+Astro::Catalog objects as parameters. The two output catalogues are
+Astro::Catalog objects that contain Astro::Catalog::Item objects with the same
+IDs as the input catalogues. For example, if an object in the first catalogue
+with an ID of 1 matches with an object in the second catalogue with an ID of
+2, then the first returned catalogue will contain the object with an ID of 1
+and the second will contain the object with an ID of 2.
+
+IDs must be maintained between the input and output catalogues. This allows
+the user to perform further operations on the matched items after the
+correlation takes place.
+
+Be careful not to modify the input catalogues, as they're passed by
+reference. It's probably safest to take a deep clone of each catalogue using
+the dclose() method in Storable.
+
+Typically, your matching program won't take input data in a format known to
+Astro::Catalog, so you will probably need to write a corresponding
+Astro::Catalog::IO class.
+
+The best way to go about creating your own correlation method is to look at
+the pre-existing methods (FINDOFF and RITMatch), and go from there. Both of
+these methods have corresponding Astro::Catalog::IO classes that you can also
+examine for writing that class.
+
+Any questions should go to Brad Cavanagh at brad.cavanagh@gmail.com.
+
+Happy correlating!

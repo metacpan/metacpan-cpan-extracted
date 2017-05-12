@@ -1,0 +1,12 @@
+#!/usr/local/bin/perl -w
+
+eval 'exec /usr/local/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+eval 'exec /usr/local/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+use File::Spec::Functions;
+
+print catdir qw(t testmod) if $ARGV[0] eq '-q';
+exit;

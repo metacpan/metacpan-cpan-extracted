@@ -1,0 +1,9 @@
+Changes
+lib/AutoXS.pm
+lib/AutoXS/Accessor.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/AutoXS.t
+META.yml                                 Module meta-data (added by MakeMaker)

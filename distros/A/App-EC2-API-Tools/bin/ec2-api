@@ -1,0 +1,110 @@
+#!/bin/bash
+export action=$1
+export script=$2
+export EC2_HOME=/usr/local/ec2-api-tools
+
+find_script() {
+    cd $EC2_HOME;
+
+    if [ "$script" = "" ]; then
+        ls bin | grep -v .cmd;
+        exit 1;
+    fi
+
+    if [ ! -f "bin/$script" ]; then
+        cd bin;
+        perl -e '$script=shift; $script=~s/^ec2-?//; grep {system "ls *$_*|grep -v .cmd"} split /-/, $script' $script
+        exit 1;
+    fi
+}
+
+if [ "$action" = "help" ]; then
+    if [ "$script" = "" ]; then
+        perldoc App::EC2::API::Tools;
+        exit 1;
+    fi
+
+    find_script;
+
+    echo "Please read - http://docs.aws.amazon.com/search/doc-search.html?searchPath=documentation-guide&x=5&y=16&this_doc_product=Amazon+Elastic+Compute+Cloud&this_doc_guide=CLI+Reference&doc_locale=en_us#facet_doc_product=Amazon%20Elastic%20Compute%20Cloud&facet_doc_guide=CLI%20Reference&searchQuery=$script"
+
+    exit;
+fi;
+
+if [ "$action" = "exec" ]; then
+    export JAVA_BIN=$(which java)
+
+    if [ "$JAVA_BIN" = "" ]; then
+        echo "Please install java";
+        echo "$0 install java";
+        exit 1;
+    fi
+
+    export JAVA_HOME=$(perl -e 'use Path::Class;print dir(file(shift)->dir)->parent' $(readlink $(readlink $JAVA_BIN)))
+
+    if [ ! -d $EC2_HOME ]; then
+        echo "Please install ec2-api-tool";
+        echo "$0 install ec2-api-tool";
+        exit 1;
+    fi
+
+    find_script;
+
+    exec bin/$script ${@:3}
+fi
+
+install_ec2() {
+    if [ ! -d $EC2_HOME ]; then
+        sudo mkdir $EC2_HOME;
+    fi;
+    wget -cO /tmp/ec2-api-tools.zip http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip;
+    cd /tmp;
+    unzip ec2-api-tools.zip;
+    rm ec2-api-tools.zip;
+    cd ec2-api-tools-*;
+    sudo mv * $EC2_HOME;
+}
+
+install_java() {
+    sudo apt-get install software-properties-common python-software-properties -y;
+    sudo add-apt-repository ppa:webupd8team/java;
+    sudo apt-get update;
+    sudo apt-get install oracle-java7-installer -y;
+}
+
+if [ "$action" = "install" ]; then
+    if [ "$script" = "ec2-api-tool" ]; then
+        if [ -d "$EC2_HOME" ]; then
+            echo "ec2 tools is installed";
+            exit 1;
+        fi;
+        install_ec2;
+    fi;
+
+    if [ "$script" = "java" ]; then
+        install_java;
+    fi;
+
+    exit;
+fi;
+
+if [ "$action" = "upgrade" ]; then
+    if [ "$script" = "ec2-api-tool" ]; then
+        install_ec2;
+    fi;
+
+    if [ "$script" = "java" ]; then
+        install_java;
+    fi;
+
+    exit;
+fi;
+
+if [ "$action" = "setup" ]; then
+    install_java;
+    install_ec2;
+fi
+
+echo "$0 [exec|setup|install|upgrade|help] [ec2-app]";
+echo "version:" $(perl -e 'eval {use App::EC2::API::Tools}; print $App::EC2::API::Tools::VERSION')
+exit 1;

@@ -1,0 +1,38 @@
+---
+abstract: 'Provide an interface to RGSS (ruby game scripting system) archive files.'
+author:
+  - 'Zejun Wu <watashi@watashi.ws>'
+build_requires:
+  IO::String: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Archive-Rgssad
+provides:
+  Archive::Rgss3a:
+    file: lib/Archive/Rgss3a.pm
+    version: 0.11
+  Archive::Rgssad:
+    file: lib/Archive/Rgssad.pm
+    version: 0.11
+  Archive::Rgssad::Entry:
+    file: lib/Archive/Rgssad/Entry.pm
+    version: 0.1
+  Archive::Rgssad::Keygen:
+    file: lib/Archive/Rgssad/Keygen.pm
+    version: 0.1
+requires:
+  File::Basename: 0
+  File::Path: 0
+  Getopt::Long: 0
+  IO::File: 0
+  perl: 5.01
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.11

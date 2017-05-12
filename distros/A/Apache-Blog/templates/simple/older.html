@@ -1,0 +1,18 @@
+<html>
+<head>
+<title>my diary...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<!-- very simple stuff here -->
+
+<tmpl_loop older_entries>
+<li><tmpl_var date> - <a href="<tmpl_var escape=url name=filename>"><tmpl_var escape=html name=short_name></a> (<tmpl_var wc> words)
+</tmpl_loop>
+</ul>
+		
+</p>
+<hr>
+<p><tmpl_var total_words> words total in this diary</p>
+
+</body>
+</html>

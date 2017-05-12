@@ -1,0 +1,21 @@
+Revision history for Alien-Microsoft-Outlook
+
+0.06     30 Dec 14
+         Upgrade 0.03_002 to 0.06. Releases 0.04 and 0.05 were aborted
+         due to problems with MakeMaker.
+         
+0.03_002 16 Aug 14
+         More work on Kwalitee.
+         
+0.03_001 09 Aug 14
+         Added META.yml. Improved Kwalitee score.
+
+0.03    11 Jan 13
+        Error in 00-load.t.
+        
+0.02    21 Dec 13
+        Pod coverage was picking up all sorts of OLE methods. Added a regex to restrict it.
+        
+0.01    15 Dec 13
+        First version, released on an unsuspecting world.
+

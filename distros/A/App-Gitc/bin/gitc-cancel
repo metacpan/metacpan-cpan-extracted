@@ -1,0 +1,137 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-cancel
+# ABSTRACT: Cancel a changeset
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    changeset_merged_to
+    confirm
+    current_branch
+    git
+    guarantee_a_clean_working_directory
+    meta_data_rm_all
+    remote_branch_exists
+);
+use App::Gitc::Reversible;
+use Getopt::Long;
+
+our $changeset = current_branch();
+die "You may not cancel your master branch" if $changeset eq 'master';
+
+my $arg = shift;
+die "gitc cancel does not take any args (it cancels the CURRENT changeset)\n"
+    if $arg and $arg ne $changeset;
+
+our $force = 0;
+GetOptions( 'force' => \$force );
+should_we_really_cancel();
+
+my $stash;
+reversibly {
+    failure_warning "\nStopping gitc cancel\n";
+
+    $stash = guarantee_a_clean_working_directory();
+    to_undo { git "stash apply $stash" if $stash; $stash = undef };
+
+    # delete the 'pu' branch on origin (if it exists)
+    if ( remote_branch_exists("pu/$changeset") ) {
+        git "push origin :pu/$changeset";
+        to_undo { git "push origin $changeset:pu/$changeset" };
+    }
+
+    # delete the local branch
+    my $head = git "rev-parse $changeset";
+    git "checkout master";
+    to_undo {
+        git "checkout -f $changeset";
+        git "reset --hard $changeset";
+    };
+    git "branch -D $changeset";
+    to_undo { git "branch $changeset $head" };
+
+    # delete all changeset meta data
+    meta_data_rm_all($changeset);
+};
+
+# reinstate any changes present when we started
+git "stash apply $stash" if $stash;
+
+
+####################### helper subroutines  ########################
+
+sub should_we_really_cancel {
+    our $force;
+    return if $force;
+
+    our $changeset;
+    my ( $ok, $reason ) = is_ok_to_cancel();
+    die   "Refusing to cancel because '$reason'.\n"
+        . "Perhaps you really want to delete this Git branch\n"
+        . "with something like:\n"
+        . "\n"
+        . "  git checkout master\n"
+        . "  git branch -D $changeset\n"
+        . "\n"
+        . "However, if you really know what you're doing, you can use\n"
+        . "the --force option to cancel anyway.\n"
+        if !$ok;
+
+    warn "--------------------------------\n";
+    warn "Preparing to delete $changeset. \n";
+    warn "THIS OPERATION CANNOT BE UNDONE!\n";
+    warn "--------------------------------\n";
+    return confirm("Permanently delete changeset $changeset?")
+        || die "Working copy and changeset left intact.\n";
+}
+
+sub is_ok_to_cancel {
+    our $changeset;
+    return ( 0, "This changeset has already been merged" )
+        if changeset_merged_to($changeset);
+    return 1;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-cancel - Cancel a changeset
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

@@ -1,0 +1,24 @@
+---
+abstract: 'crawler test using Jungle'
+author:
+  - 'Hernan Lopes'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.58, CPAN::Meta::Converter version 2.110930001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Jungle-CrawlerExample
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Jungle: 0
+  Moose: 0.44
+  Test::Simple: 0.44
+version: 0.01

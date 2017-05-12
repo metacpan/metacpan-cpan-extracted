@@ -1,0 +1,30 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "TFA Marshmallow",
+            "percentage" : "2"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Blueberry Extra",
+            "percentage" : "3"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Vanillin",
+            "percentage" : "3"
+         }
+      ],
+      "target_pg" : "30",
+      "base_nic_per_ml" : 100,
+      "base_nic_type" : "PG",
+      "target_quantity" : "120",
+      "target_nic_per_ml" : "3",
+      "target_vg" : 70,
+      "notes" : [
+         "Ended up adding a dash of Sweet Cream and a few drops of Circus Cotton Candy"
+      ]
+   }
+}

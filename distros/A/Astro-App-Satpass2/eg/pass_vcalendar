@@ -1,0 +1,69 @@
+# Astro::App::Satpass2 source file. Invoke as (e.g.)
+# satpass2> source eg/pass_vcalendar
+#
+# Do satellite pass calculations, displaying the results in vCalendar
+# format. The output may be redirected to a .vcal file. The start and
+# end dates for the pass calculation can be passed as arguments to the
+# 'source' statement, and default to 'today noon' and '+8' respectively.
+# This whole thing (less the comments) could be wrapped up as a macro
+# if desired.
+
+#	CAVEAT: My ancient Palm desktop software appears not to properly
+#	handle the switch between normal and daylight-saving  time
+#	(a.k.a. summer time), in that predictions made before the switch
+#	for events after the switch get assigned the wrong time, even
+#	though the UT event time is correct in the emitted file. I have
+#	not changed the event times to local time eg/flare_vcalendar
+#	because the vcalendar standard specifies UT.
+
+localize formatter
+
+# We intend to use date(units='z') to format the event begin and end. We
+# truncate the time to the previous minute.
+
+formatter date_format %Y%m%dT%H%M00Z
+
+# We intend to use time() to format the individual event times.
+
+formatter time_format %I:%M:%S
+
+# The individual pass events get concatenated to the summary, with no newline.
+
+formatter template pass <<'EOD'
+BEGIN:VCALENDAR
+[%- FOR pass IN data %]
+[%- events = pass.events %]
+[%- CALL events.fixed_width( 0 ) %]
+[%- first = events.first %]
+[%- punct = ' -' %]
+BEGIN:VEVENT
+DTSTART:[% first.date( units = 'zulu' ) %]
+DALARM:[% first.date( delta = -360, units = 'zulu' ) %]
+DALARM:[% first.date( delta = -60, units = 'zulu' ) %]
+SUMMARY:[% first.name %]
+    [%- FOREACH evt IN events %][% punct %]
+	[%- evt_name = evt.event %]
+	[%- end_date = evt.date( delta = 30, units = 'z' ) %]
+	[%= evt_name %]
+	[%- IF 'apls' == evt_name %]
+            [%- appulse = evt.appulse %]
+            [%= appulse.angle %]
+	    [%= appulse.name %]
+	[%- END %]
+	[%= evt.time %] Az
+	[%= evt.azimuth( places = 0, bearing = 2 ) %]
+	[%- IF 'rise' != evt_name and 'set' != evt_name %] Ele
+	    [%= evt.elevation( places = 0 ) %]
+	[%- END %]
+        [%- punct = ';' %]
+    [%- END %]
+DTEND:[% end_date %]
+END:VEVENT
+[%- END %]
+END:VCALENDAR
+EOD
+
+# Do the pass calculation. I do not know that the vcal format requires
+# the data to be chronological, but ...
+
+pass -chronological "${1:-today noon}" "${2:-+8}"

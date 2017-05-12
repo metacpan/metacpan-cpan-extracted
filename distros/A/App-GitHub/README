@@ -1,0 +1,78 @@
+NAME
+    App::GitHub - GitHub Command Tools
+
+VERSION
+    version 1.0.1
+
+SYNOPSIS
+        $ github.pl
+
+         command   argument          description
+         repo      :user :repo       set owner/repo, eg: 'fayland perl-app-github'
+         login     :login :pass      authenticated as :login
+         loadcfg                     authed by git config --global github.user|pass
+         ?,h                         help
+         q,exit,quit                 exit
+    
+        Repos
+         r.show                      more in-depth information for the :repo
+         r.list                      list out all the repositories for the :user
+         r.watch                     watch repositories (auth required)
+         r.unwatch                   unwatch repositories (auth required)
+         r.fork                      fork a repository (auth required)
+         r.create                    create a new repository (auth required)
+         r.set_private               set a public repo private (auth required)
+         r.set_public                set a private repo public (auth required)
+         r.commit    :sha1           show a specific commit
+    
+        Issues
+         i.list    open|closed       see a list of issues for a project
+         i.view    :number           get data on an individual issue by number
+         i.open                      open a new issue (auth required)
+         i.close   :number           close an issue (auth required)
+         i.reopen  :number           reopen an issue (auth required)
+         i.edit    :number           edit an issue (auth required)
+         i.comment :number
+         i.label   add|del :num :label
+                                     add/remove a label (auth required)
+    
+        Users
+         u.show                      get extended information on user
+         u.update                    update your users info (auth required)
+         u.followers
+         u.following
+         u.follow  :user             follow :user (auth required)
+         u.unfollow :user            unfollow :user (auth required)
+         u.pub_keys                  Public Key Management (auth required)
+         u.pub_keys.add
+         u.pub_keys.del :number
+    
+        Objects
+         o.tree    :tree_sha1        get the contents of a tree by tree sha
+         o.trees   :tree_sha1        get the contents of a tree by tree sha and recursively descend down the tree
+         o.blob    :sha1             get the data of a blob (tree, file or commits)
+    
+        Others
+         r.show    :user :repo       more in-depth information for a repository
+         r.list    :user             list out all the repositories for a user
+         u.show    :user             get extended information on :user
+
+DESCRIPTION
+    A command-line wrapper for Net::GitHub
+
+    Repository: <http://github.com/worr/perl-app-github/tree/master>
+
+SEE ALSO
+    Net::GitHub
+
+AUTHORS
+    *   Fayland Lam <fayland@gmail.com>
+
+    *   William Orr <will@worrbase.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Fayland Lam.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

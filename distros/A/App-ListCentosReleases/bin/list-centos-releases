@@ -1,0 +1,1452 @@
+#!perl
+
+# Note: This script is a CLI interface to Riap function /CentOS/Releases/list_centos_releases
+# and generated automatically using App::GenPericmdScript version 0.21
+
+our $DATE = '2015-10-06'; # DATE
+our $DIST = 'App-ListCentosReleases'; # DIST
+our $VERSION = '0.01'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => "/CentOS/Releases/list_centos_releases",
+    program_name => "list-centos-releases",
+)->run;
+
+# ABSTRACT: CentOS releases
+# PODNAME: list-centos-releases
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-centos-releases - CentOS releases
+
+=head1 VERSION
+
+This document describes version 0.01 of list-centos-releases (from Perl distribution App-ListCentosReleases), released on 2015-10-06.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % list-centos-releases [options] [query]
+
+=head1 DESCRIPTION
+
+REPLACE ME
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for apache_httpd_version options
+
+=over
+
+=item B<--apache-httpd-version-contains>=I<s>
+
+Only return records where the 'apache_httpd_version' field contains specified text.
+
+=item B<--apache-httpd-version-in-json>=I<s>
+
+Only return records where the 'apache_httpd_version' field is in the specified values (JSON-encoded).
+
+See C<--apache-httpd-version-in>.
+
+=item B<--apache-httpd-version-in>=I<s@>
+
+Only return records where the 'apache_httpd_version' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--apache-httpd-version-is>=I<s>
+
+Only return records where the 'apache_httpd_version' field equals specified value.
+
+=item B<--apache-httpd-version-isnt>=I<s>
+
+Only return records where the 'apache_httpd_version' field does not equal specified value.
+
+=item B<--apache-httpd-version-max>=I<s>
+
+Only return records where the 'apache_httpd_version' field is less than or equal to specified value.
+
+=item B<--apache-httpd-version-min>=I<s>
+
+Only return records where the 'apache_httpd_version' field is greater than or equal to specified value.
+
+=item B<--apache-httpd-version-not-contains>=I<s>
+
+Only return records where the 'apache_httpd_version' field does not contain specified text.
+
+=item B<--apache-httpd-version-not-in-json>=I<s>
+
+Only return records where the 'apache_httpd_version' field is not in the specified values (JSON-encoded).
+
+See C<--apache-httpd-version-not-in>.
+
+=item B<--apache-httpd-version-not-in>=I<s@>
+
+Only return records where the 'apache_httpd_version' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--apache-httpd-version-xmax>=I<s>
+
+Only return records where the 'apache_httpd_version' field is less than specified value.
+
+=item B<--apache-httpd-version-xmin>=I<s>
+
+Only return records where the 'apache_httpd_version' field is greater than specified value.
+
+=item B<--apache-httpd-version>=I<s>
+
+Only return records where the 'apache_httpd_version' field equals specified value.
+
+=back
+
+=head2 Filtering for bash_version options
+
+=over
+
+=item B<--bash-version-contains>=I<s>
+
+Only return records where the 'bash_version' field contains specified text.
+
+=item B<--bash-version-in-json>=I<s>
+
+Only return records where the 'bash_version' field is in the specified values (JSON-encoded).
+
+See C<--bash-version-in>.
+
+=item B<--bash-version-in>=I<s@>
+
+Only return records where the 'bash_version' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--bash-version-is>=I<s>
+
+Only return records where the 'bash_version' field equals specified value.
+
+=item B<--bash-version-isnt>=I<s>
+
+Only return records where the 'bash_version' field does not equal specified value.
+
+=item B<--bash-version-max>=I<s>
+
+Only return records where the 'bash_version' field is less than or equal to specified value.
+
+=item B<--bash-version-min>=I<s>
+
+Only return records where the 'bash_version' field is greater than or equal to specified value.
+
+=item B<--bash-version-not-contains>=I<s>
+
+Only return records where the 'bash_version' field does not contain specified text.
+
+=item B<--bash-version-not-in-json>=I<s>
+
+Only return records where the 'bash_version' field is not in the specified values (JSON-encoded).
+
+See C<--bash-version-not-in>.
+
+=item B<--bash-version-not-in>=I<s@>
+
+Only return records where the 'bash_version' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--bash-version-xmax>=I<s>
+
+Only return records where the 'bash_version' field is less than specified value.
+
+=item B<--bash-version-xmin>=I<s>
+
+Only return records where the 'bash_version' field is greater than specified value.
+
+=item B<--bash-version>=I<s>
+
+Only return records where the 'bash_version' field equals specified value.
+
+=back
+
+=head2 Filtering for code_name options
+
+=over
+
+=item B<--code-name-contains>=I<s>
+
+Only return records where the 'code_name' field contains specified text.
+
+=item B<--code-name-in-json>=I<s>
+
+Only return records where the 'code_name' field is in the specified values (JSON-encoded).
+
+See C<--code-name-in>.
+
+=item B<--code-name-in>=I<s@>
+
+Only return records where the 'code_name' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--code-name-is>=I<s>
+
+Only return records where the 'code_name' field equals specified value.
+
+=item B<--code-name-isnt>=I<s>
+
+Only return records where the 'code_name' field does not equal specified value.
+
+=item B<--code-name-max>=I<s>
+
+Only return records where the 'code_name' field is less than or equal to specified value.
+
+=item B<--code-name-min>=I<s>
+
+Only return records where the 'code_name' field is greater than or equal to specified value.
+
+=item B<--code-name-not-contains>=I<s>
+
+Only return records where the 'code_name' field does not contain specified text.
+
+=item B<--code-name-not-in-json>=I<s>
+
+Only return records where the 'code_name' field is not in the specified values (JSON-encoded).
+
+See C<--code-name-not-in>.
+
+=item B<--code-name-not-in>=I<s@>
+
+Only return records where the 'code_name' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--code-name-xmax>=I<s>
+
+Only return records where the 'code_name' field is less than specified value.
+
+=item B<--code-name-xmin>=I<s>
+
+Only return records where the 'code_name' field is greater than specified value.
+
+=item B<--code-name>=I<s>
+
+Only return records where the 'code_name' field equals specified value.
+
+=back
+
+=head2 Filtering for eoldate options
+
+=over
+
+=item B<--eoldate-in-json>=I<s>
+
+Only return records where the 'eoldate' field is in the specified values (JSON-encoded).
+
+See C<--eoldate-in>.
+
+=item B<--eoldate-in>=I<s@>
+
+Only return records where the 'eoldate' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--eoldate-is>=I<s>
+
+Only return records where the 'eoldate' field equals specified value.
+
+=item B<--eoldate-isnt>=I<s>
+
+Only return records where the 'eoldate' field does not equal specified value.
+
+=item B<--eoldate-max>=I<s>
+
+Only return records where the 'eoldate' field is less than or equal to specified value.
+
+=item B<--eoldate-min>=I<s>
+
+Only return records where the 'eoldate' field is greater than or equal to specified value.
+
+=item B<--eoldate-not-in-json>=I<s>
+
+Only return records where the 'eoldate' field is not in the specified values (JSON-encoded).
+
+See C<--eoldate-not-in>.
+
+=item B<--eoldate-not-in>=I<s@>
+
+Only return records where the 'eoldate' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--eoldate-xmax>=I<s>
+
+Only return records where the 'eoldate' field is less than specified value.
+
+=item B<--eoldate-xmin>=I<s>
+
+Only return records where the 'eoldate' field is greater than specified value.
+
+=item B<--eoldate>=I<s>
+
+Only return records where the 'eoldate' field equals specified value.
+
+=back
+
+=head2 Filtering for linux_version options
+
+=over
+
+=item B<--linux-version-contains>=I<s>
+
+Only return records where the 'linux_version' field contains specified text.
+
+=item B<--linux-version-in-json>=I<s>
+
+Only return records where the 'linux_version' field is in the specified values (JSON-encoded).
+
+See C<--linux-version-in>.
+
+=item B<--linux-version-in>=I<s@>
+
+Only return records where the 'linux_version' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--linux-version-is>=I<s>
+
+Only return records where the 'linux_version' field equals specified value.
+
+=item B<--linux-version-isnt>=I<s>
+
+Only return records where the 'linux_version' field does not equal specified value.
+
+=item B<--linux-version-max>=I<s>
+
+Only return records where the 'linux_version' field is less than or equal to specified value.
+
+=item B<--linux-version-min>=I<s>
+
+Only return records where the 'linux_version' field is greater than or equal to specified value.
+
+=item B<--linux-version-not-contains>=I<s>
+
+Only return records where the 'linux_version' field does not contain specified text.
+
+=item B<--linux-version-not-in-json>=I<s>
+
+Only return records where the 'linux_version' field is not in the specified values (JSON-encoded).
+
+See C<--linux-version-not-in>.
+
+=item B<--linux-version-not-in>=I<s@>
+
+Only return records where the 'linux_version' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--linux-version-xmax>=I<s>
+
+Only return records where the 'linux_version' field is less than specified value.
+
+=item B<--linux-version-xmin>=I<s>
+
+Only return records where the 'linux_version' field is greater than specified value.
+
+=item B<--linux-version>=I<s>
+
+Only return records where the 'linux_version' field equals specified value.
+
+=back
+
+=head2 Filtering for mariadb_version options
+
+=over
+
+=item B<--mariadb-version-contains>=I<s>
+
+Only return records where the 'mariadb_version' field contains specified text.
+
+=item B<--mariadb-version-in-json>=I<s>
+
+Only return records where the 'mariadb_version' field is in the specified values (JSON-encoded).
+
+See C<--mariadb-version-in>.
+
+=item B<--mariadb-version-in>=I<s@>
+
+Only return records where the 'mariadb_version' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--mariadb-version-is>=I<s>
+
+Only return records where the 'mariadb_version' field equals specified value.
+
+=item B<--mariadb-version-isnt>=I<s>
+
+Only return records where the 'mariadb_version' field does not equal specified value.
+
+=item B<--mariadb-version-max>=I<s>
+
+Only return records where the 'mariadb_version' field is less than or equal to specified value.
+
+=item B<--mariadb-version-min>=I<s>
+
+Only return records where the 'mariadb_version' field is greater than or equal to specified value.
+
+=item B<--mariadb-version-not-contains>=I<s>
+
+Only return records where the 'mariadb_version' field does not contain specified text.
+
+=item B<--mariadb-version-not-in-json>=I<s>
+
+Only return records where the 'mariadb_version' field is not in the specified values (JSON-encoded).
+
+See C<--mariadb-version-not-in>.
+
+=item B<--mariadb-version-not-in>=I<s@>
+
+Only return records where the 'mariadb_version' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--mariadb-version-xmax>=I<s>
+
+Only return records where the 'mariadb_version' field is less than specified value.
+
+=item B<--mariadb-version-xmin>=I<s>
+
+Only return records where the 'mariadb_version' field is greater than specified value.
+
+=item B<--mariadb-version>=I<s>
+
+Only return records where the 'mariadb_version' field equals specified value.
+
+=back
+
+=head2 Filtering for mysql_version options
+
+=over
+
+=item B<--mysql-version-contains>=I<s>
+
+Only return records where the 'mysql_version' field contains specified text.
+
+=item B<--mysql-version-in-json>=I<s>
+
+Only return records where the 'mysql_version' field is in the specified values (JSON-encoded).
+
+See C<--mysql-version-in>.
+
+=item B<--mysql-version-in>=I<s@>
+
+Only return records where the 'mysql_version' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--mysql-version-is>=I<s>
+
+Only return records where the 'mysql_version' field equals specified value.
+
+=item B<--mysql-version-isnt>=I<s>
+
+Only return records where the 'mysql_version' field does not equal specified value.
+
+=item B<--mysql-version-max>=I<s>
+
+Only return records where the 'mysql_version' field is less than or equal to specified value.
+
+=item B<--mysql-version-min>=I<s>
+
+Only return records where the 'mysql_version' field is greater than or equal to specified value.
+
+=item B<--mysql-version-not-contains>=I<s>
+
+Only return records where the 'mysql_version' field does not contain specified text.
+
+=item B<--mysql-version-not-in-json>=I<s>
+
+Only return records where the 'mysql_version' field is not in the specified values (JSON-encoded).
+
+See C<--mysql-version-not-in>.
+
+=item B<--mysql-version-not-in>=I<s@>
+
+Only return records where the 'mysql_version' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--mysql-version-xmax>=I<s>
+
+Only return records where the 'mysql_version' field is less than specified value.
+
+=item B<--mysql-version-xmin>=I<s>
+
+Only return records where the 'mysql_version' field is greater than specified value.
+
+=item B<--mysql-version>=I<s>
+
+Only return records where the 'mysql_version' field equals specified value.
+
+=back
+
+=head2 Filtering for nginx_version options
+
+=over
+
+=item B<--nginx-version-contains>=I<s>
+
+Only return records where the 'nginx_version' field contains specified text.
+
+=item B<--nginx-version-in-json>=I<s>
+
+Only return records where the 'nginx_version' field is in the specified values (JSON-encoded).
+
+See C<--nginx-version-in>.
+
+=item B<--nginx-version-in>=I<s@>
+
+Only return records where the 'nginx_version' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--nginx-version-is>=I<s>
+
+Only return records where the 'nginx_version' field equals specified value.
+
+=item B<--nginx-version-isnt>=I<s>
+
+Only return records where the 'nginx_version' field does not equal specified value.
+
+=item B<--nginx-version-max>=I<s>
+
+Only return records where the 'nginx_version' field is less than or equal to specified value.
+
+=item B<--nginx-version-min>=I<s>
+
+Only return records where the 'nginx_version' field is greater than or equal to specified value.
+
+=item B<--nginx-version-not-contains>=I<s>
+
+Only return records where the 'nginx_version' field does not contain specified text.
+
+=item B<--nginx-version-not-in-json>=I<s>
+
+Only return records where the 'nginx_version' field is not in the specified values (JSON-encoded).
+
+See C<--nginx-version-not-in>.
+
+=item B<--nginx-version-not-in>=I<s@>
+
+Only return records where the 'nginx_version' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--nginx-version-xmax>=I<s>
+
+Only return records where the 'nginx_version' field is less than specified value.
+
+=item B<--nginx-version-xmin>=I<s>
+
+Only return records where the 'nginx_version' field is greater than specified value.
+
+=item B<--nginx-version>=I<s>
+
+Only return records where the 'nginx_version' field equals specified value.
+
+=back
+
+=head2 Filtering for perl_version options
+
+=over
+
+=item B<--perl-version-contains>=I<s>
+
+Only return records where the 'perl_version' field contains specified text.
+
+=item B<--perl-version-in-json>=I<s>
+
+Only return records where the 'perl_version' field is in the specified values (JSON-encoded).
+
+See C<--perl-version-in>.
+
+=item B<--perl-version-in>=I<s@>
+
+Only return records where the 'perl_version' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--perl-version-is>=I<s>
+
+Only return records where the 'perl_version' field equals specified value.
+
+=item B<--perl-version-isnt>=I<s>
+
+Only return records where the 'perl_version' field does not equal specified value.
+
+=item B<--perl-version-max>=I<s>
+
+Only return records where the 'perl_version' field is less than or equal to specified value.
+
+=item B<--perl-version-min>=I<s>
+
+Only return records where the 'perl_version' field is greater than or equal to specified value.
+
+=item B<--perl-version-not-contains>=I<s>
+
+Only return records where the 'perl_version' field does not contain specified text.
+
+=item B<--perl-version-not-in-json>=I<s>
+
+Only return records where the 'perl_version' field is not in the specified values (JSON-encoded).
+
+See C<--perl-version-not-in>.
+
+=item B<--perl-version-not-in>=I<s@>
+
+Only return records where the 'perl_version' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--perl-version-xmax>=I<s>
+
+Only return records where the 'perl_version' field is less than specified value.
+
+=item B<--perl-version-xmin>=I<s>
+
+Only return records where the 'perl_version' field is greater than specified value.
+
+=item B<--perl-version>=I<s>
+
+Only return records where the 'perl_version' field equals specified value.
+
+=back
+
+=head2 Filtering for php_version options
+
+=over
+
+=item B<--php-version-contains>=I<s>
+
+Only return records where the 'php_version' field contains specified text.
+
+=item B<--php-version-in-json>=I<s>
+
+Only return records where the 'php_version' field is in the specified values (JSON-encoded).
+
+See C<--php-version-in>.
+
+=item B<--php-version-in>=I<s@>
+
+Only return records where the 'php_version' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--php-version-is>=I<s>
+
+Only return records where the 'php_version' field equals specified value.
+
+=item B<--php-version-isnt>=I<s>
+
+Only return records where the 'php_version' field does not equal specified value.
+
+=item B<--php-version-max>=I<s>
+
+Only return records where the 'php_version' field is less than or equal to specified value.
+
+=item B<--php-version-min>=I<s>
+
+Only return records where the 'php_version' field is greater than or equal to specified value.
+
+=item B<--php-version-not-contains>=I<s>
+
+Only return records where the 'php_version' field does not contain specified text.
+
+=item B<--php-version-not-in-json>=I<s>
+
+Only return records where the 'php_version' field is not in the specified values (JSON-encoded).
+
+See C<--php-version-not-in>.
+
+=item B<--php-version-not-in>=I<s@>
+
+Only return records where the 'php_version' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--php-version-xmax>=I<s>
+
+Only return records where the 'php_version' field is less than specified value.
+
+=item B<--php-version-xmin>=I<s>
+
+Only return records where the 'php_version' field is greater than specified value.
+
+=item B<--php-version>=I<s>
+
+Only return records where the 'php_version' field equals specified value.
+
+=back
+
+=head2 Filtering for postgresql_version options
+
+=over
+
+=item B<--postgresql-version-contains>=I<s>
+
+Only return records where the 'postgresql_version' field contains specified text.
+
+=item B<--postgresql-version-in-json>=I<s>
+
+Only return records where the 'postgresql_version' field is in the specified values (JSON-encoded).
+
+See C<--postgresql-version-in>.
+
+=item B<--postgresql-version-in>=I<s@>
+
+Only return records where the 'postgresql_version' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--postgresql-version-is>=I<s>
+
+Only return records where the 'postgresql_version' field equals specified value.
+
+=item B<--postgresql-version-isnt>=I<s>
+
+Only return records where the 'postgresql_version' field does not equal specified value.
+
+=item B<--postgresql-version-max>=I<s>
+
+Only return records where the 'postgresql_version' field is less than or equal to specified value.
+
+=item B<--postgresql-version-min>=I<s>
+
+Only return records where the 'postgresql_version' field is greater than or equal to specified value.
+
+=item B<--postgresql-version-not-contains>=I<s>
+
+Only return records where the 'postgresql_version' field does not contain specified text.
+
+=item B<--postgresql-version-not-in-json>=I<s>
+
+Only return records where the 'postgresql_version' field is not in the specified values (JSON-encoded).
+
+See C<--postgresql-version-not-in>.
+
+=item B<--postgresql-version-not-in>=I<s@>
+
+Only return records where the 'postgresql_version' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--postgresql-version-xmax>=I<s>
+
+Only return records where the 'postgresql_version' field is less than specified value.
+
+=item B<--postgresql-version-xmin>=I<s>
+
+Only return records where the 'postgresql_version' field is greater than specified value.
+
+=item B<--postgresql-version>=I<s>
+
+Only return records where the 'postgresql_version' field equals specified value.
+
+=back
+
+=head2 Filtering for python_version options
+
+=over
+
+=item B<--python-version-contains>=I<s>
+
+Only return records where the 'python_version' field contains specified text.
+
+=item B<--python-version-in-json>=I<s>
+
+Only return records where the 'python_version' field is in the specified values (JSON-encoded).
+
+See C<--python-version-in>.
+
+=item B<--python-version-in>=I<s@>
+
+Only return records where the 'python_version' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--python-version-is>=I<s>
+
+Only return records where the 'python_version' field equals specified value.
+
+=item B<--python-version-isnt>=I<s>
+
+Only return records where the 'python_version' field does not equal specified value.
+
+=item B<--python-version-max>=I<s>
+
+Only return records where the 'python_version' field is less than or equal to specified value.
+
+=item B<--python-version-min>=I<s>
+
+Only return records where the 'python_version' field is greater than or equal to specified value.
+
+=item B<--python-version-not-contains>=I<s>
+
+Only return records where the 'python_version' field does not contain specified text.
+
+=item B<--python-version-not-in-json>=I<s>
+
+Only return records where the 'python_version' field is not in the specified values (JSON-encoded).
+
+See C<--python-version-not-in>.
+
+=item B<--python-version-not-in>=I<s@>
+
+Only return records where the 'python_version' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--python-version-xmax>=I<s>
+
+Only return records where the 'python_version' field is less than specified value.
+
+=item B<--python-version-xmin>=I<s>
+
+Only return records where the 'python_version' field is greater than specified value.
+
+=item B<--python-version>=I<s>
+
+Only return records where the 'python_version' field equals specified value.
+
+=back
+
+=head2 Filtering for reldate options
+
+=over
+
+=item B<--reldate-in-json>=I<s>
+
+Only return records where the 'reldate' field is in the specified values (JSON-encoded).
+
+See C<--reldate-in>.
+
+=item B<--reldate-in>=I<s@>
+
+Only return records where the 'reldate' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--reldate-is>=I<s>
+
+Only return records where the 'reldate' field equals specified value.
+
+=item B<--reldate-isnt>=I<s>
+
+Only return records where the 'reldate' field does not equal specified value.
+
+=item B<--reldate-max>=I<s>
+
+Only return records where the 'reldate' field is less than or equal to specified value.
+
+=item B<--reldate-min>=I<s>
+
+Only return records where the 'reldate' field is greater than or equal to specified value.
+
+=item B<--reldate-not-in-json>=I<s>
+
+Only return records where the 'reldate' field is not in the specified values (JSON-encoded).
+
+See C<--reldate-not-in>.
+
+=item B<--reldate-not-in>=I<s@>
+
+Only return records where the 'reldate' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--reldate-xmax>=I<s>
+
+Only return records where the 'reldate' field is less than specified value.
+
+=item B<--reldate-xmin>=I<s>
+
+Only return records where the 'reldate' field is greater than specified value.
+
+=item B<--reldate>=I<s>
+
+Only return records where the 'reldate' field equals specified value.
+
+=back
+
+=head2 Filtering for ruby_version options
+
+=over
+
+=item B<--ruby-version-contains>=I<s>
+
+Only return records where the 'ruby_version' field contains specified text.
+
+=item B<--ruby-version-in-json>=I<s>
+
+Only return records where the 'ruby_version' field is in the specified values (JSON-encoded).
+
+See C<--ruby-version-in>.
+
+=item B<--ruby-version-in>=I<s@>
+
+Only return records where the 'ruby_version' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--ruby-version-is>=I<s>
+
+Only return records where the 'ruby_version' field equals specified value.
+
+=item B<--ruby-version-isnt>=I<s>
+
+Only return records where the 'ruby_version' field does not equal specified value.
+
+=item B<--ruby-version-max>=I<s>
+
+Only return records where the 'ruby_version' field is less than or equal to specified value.
+
+=item B<--ruby-version-min>=I<s>
+
+Only return records where the 'ruby_version' field is greater than or equal to specified value.
+
+=item B<--ruby-version-not-contains>=I<s>
+
+Only return records where the 'ruby_version' field does not contain specified text.
+
+=item B<--ruby-version-not-in-json>=I<s>
+
+Only return records where the 'ruby_version' field is not in the specified values (JSON-encoded).
+
+See C<--ruby-version-not-in>.
+
+=item B<--ruby-version-not-in>=I<s@>
+
+Only return records where the 'ruby_version' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--ruby-version-xmax>=I<s>
+
+Only return records where the 'ruby_version' field is less than specified value.
+
+=item B<--ruby-version-xmin>=I<s>
+
+Only return records where the 'ruby_version' field is greater than specified value.
+
+=item B<--ruby-version>=I<s>
+
+Only return records where the 'ruby_version' field equals specified value.
+
+=back
+
+=head2 Filtering for version options
+
+=over
+
+=item B<--version-arg>=I<s>
+
+Only return records where the 'version' field equals specified value.
+
+=item B<--version-contains>=I<s>
+
+Only return records where the 'version' field contains specified text.
+
+=item B<--version-in-json>=I<s>
+
+Only return records where the 'version' field is in the specified values (JSON-encoded).
+
+See C<--version-in>.
+
+=item B<--version-in>=I<s@>
+
+Only return records where the 'version' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--version-is>=I<s>
+
+Only return records where the 'version' field equals specified value.
+
+=item B<--version-isnt>=I<s>
+
+Only return records where the 'version' field does not equal specified value.
+
+=item B<--version-max>=I<s>
+
+Only return records where the 'version' field is less than or equal to specified value.
+
+=item B<--version-min>=I<s>
+
+Only return records where the 'version' field is greater than or equal to specified value.
+
+=item B<--version-not-contains>=I<s>
+
+Only return records where the 'version' field does not contain specified text.
+
+=item B<--version-not-in-json>=I<s>
+
+Only return records where the 'version' field is not in the specified values (JSON-encoded).
+
+See C<--version-not-in>.
+
+=item B<--version-not-in>=I<s@>
+
+Only return records where the 'version' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--version-xmax>=I<s>
+
+Only return records where the 'version' field is less than specified value.
+
+=item B<--version-xmin>=I<s>
+
+Only return records where the 'version' field is greater than specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--query>=I<s>, B<-q>
+
+Search.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort>=I<s>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<i>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<i>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-centos-releases list-centos-releases
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-centos-releases 'p/*/`list-centos-releases`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 ENVIRONMENT
+
+=head2 LIST_CENTOS_RELEASES_OPT => str
+
+Specify additional command-line options
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at C<~/.config/list-centos-releases.conf>, C<~/list-centos-releases.conf> or C</etc/list-centos-releases.conf> (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features. 
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+List of available configuration parameters:
+
+ apache_httpd_version (see --apache-httpd-version)
+ apache_httpd_version.contains (see --apache-httpd-version-contains)
+ apache_httpd_version.in (see --apache-httpd-version-in)
+ apache_httpd_version.is (see --apache-httpd-version-is)
+ apache_httpd_version.isnt (see --apache-httpd-version-isnt)
+ apache_httpd_version.max (see --apache-httpd-version-max)
+ apache_httpd_version.min (see --apache-httpd-version-min)
+ apache_httpd_version.not_contains (see --apache-httpd-version-not-contains)
+ apache_httpd_version.not_in (see --apache-httpd-version-not-in)
+ apache_httpd_version.xmax (see --apache-httpd-version-xmax)
+ apache_httpd_version.xmin (see --apache-httpd-version-xmin)
+ bash_version (see --bash-version)
+ bash_version.contains (see --bash-version-contains)
+ bash_version.in (see --bash-version-in)
+ bash_version.is (see --bash-version-is)
+ bash_version.isnt (see --bash-version-isnt)
+ bash_version.max (see --bash-version-max)
+ bash_version.min (see --bash-version-min)
+ bash_version.not_contains (see --bash-version-not-contains)
+ bash_version.not_in (see --bash-version-not-in)
+ bash_version.xmax (see --bash-version-xmax)
+ bash_version.xmin (see --bash-version-xmin)
+ code_name (see --code-name)
+ code_name.contains (see --code-name-contains)
+ code_name.in (see --code-name-in)
+ code_name.is (see --code-name-is)
+ code_name.isnt (see --code-name-isnt)
+ code_name.max (see --code-name-max)
+ code_name.min (see --code-name-min)
+ code_name.not_contains (see --code-name-not-contains)
+ code_name.not_in (see --code-name-not-in)
+ code_name.xmax (see --code-name-xmax)
+ code_name.xmin (see --code-name-xmin)
+ detail (see --detail)
+ eoldate (see --eoldate)
+ eoldate.in (see --eoldate-in)
+ eoldate.is (see --eoldate-is)
+ eoldate.isnt (see --eoldate-isnt)
+ eoldate.max (see --eoldate-max)
+ eoldate.min (see --eoldate-min)
+ eoldate.not_in (see --eoldate-not-in)
+ eoldate.xmax (see --eoldate-xmax)
+ eoldate.xmin (see --eoldate-xmin)
+ fields (see --field)
+ format (see --format)
+ linux_version (see --linux-version)
+ linux_version.contains (see --linux-version-contains)
+ linux_version.in (see --linux-version-in)
+ linux_version.is (see --linux-version-is)
+ linux_version.isnt (see --linux-version-isnt)
+ linux_version.max (see --linux-version-max)
+ linux_version.min (see --linux-version-min)
+ linux_version.not_contains (see --linux-version-not-contains)
+ linux_version.not_in (see --linux-version-not-in)
+ linux_version.xmax (see --linux-version-xmax)
+ linux_version.xmin (see --linux-version-xmin)
+ mariadb_version (see --mariadb-version)
+ mariadb_version.contains (see --mariadb-version-contains)
+ mariadb_version.in (see --mariadb-version-in)
+ mariadb_version.is (see --mariadb-version-is)
+ mariadb_version.isnt (see --mariadb-version-isnt)
+ mariadb_version.max (see --mariadb-version-max)
+ mariadb_version.min (see --mariadb-version-min)
+ mariadb_version.not_contains (see --mariadb-version-not-contains)
+ mariadb_version.not_in (see --mariadb-version-not-in)
+ mariadb_version.xmax (see --mariadb-version-xmax)
+ mariadb_version.xmin (see --mariadb-version-xmin)
+ mysql_version (see --mysql-version)
+ mysql_version.contains (see --mysql-version-contains)
+ mysql_version.in (see --mysql-version-in)
+ mysql_version.is (see --mysql-version-is)
+ mysql_version.isnt (see --mysql-version-isnt)
+ mysql_version.max (see --mysql-version-max)
+ mysql_version.min (see --mysql-version-min)
+ mysql_version.not_contains (see --mysql-version-not-contains)
+ mysql_version.not_in (see --mysql-version-not-in)
+ mysql_version.xmax (see --mysql-version-xmax)
+ mysql_version.xmin (see --mysql-version-xmin)
+ naked_res (see --naked-res)
+ nginx_version (see --nginx-version)
+ nginx_version.contains (see --nginx-version-contains)
+ nginx_version.in (see --nginx-version-in)
+ nginx_version.is (see --nginx-version-is)
+ nginx_version.isnt (see --nginx-version-isnt)
+ nginx_version.max (see --nginx-version-max)
+ nginx_version.min (see --nginx-version-min)
+ nginx_version.not_contains (see --nginx-version-not-contains)
+ nginx_version.not_in (see --nginx-version-not-in)
+ nginx_version.xmax (see --nginx-version-xmax)
+ nginx_version.xmin (see --nginx-version-xmin)
+ perl_version (see --perl-version)
+ perl_version.contains (see --perl-version-contains)
+ perl_version.in (see --perl-version-in)
+ perl_version.is (see --perl-version-is)
+ perl_version.isnt (see --perl-version-isnt)
+ perl_version.max (see --perl-version-max)
+ perl_version.min (see --perl-version-min)
+ perl_version.not_contains (see --perl-version-not-contains)
+ perl_version.not_in (see --perl-version-not-in)
+ perl_version.xmax (see --perl-version-xmax)
+ perl_version.xmin (see --perl-version-xmin)
+ php_version (see --php-version)
+ php_version.contains (see --php-version-contains)
+ php_version.in (see --php-version-in)
+ php_version.is (see --php-version-is)
+ php_version.isnt (see --php-version-isnt)
+ php_version.max (see --php-version-max)
+ php_version.min (see --php-version-min)
+ php_version.not_contains (see --php-version-not-contains)
+ php_version.not_in (see --php-version-not-in)
+ php_version.xmax (see --php-version-xmax)
+ php_version.xmin (see --php-version-xmin)
+ postgresql_version (see --postgresql-version)
+ postgresql_version.contains (see --postgresql-version-contains)
+ postgresql_version.in (see --postgresql-version-in)
+ postgresql_version.is (see --postgresql-version-is)
+ postgresql_version.isnt (see --postgresql-version-isnt)
+ postgresql_version.max (see --postgresql-version-max)
+ postgresql_version.min (see --postgresql-version-min)
+ postgresql_version.not_contains (see --postgresql-version-not-contains)
+ postgresql_version.not_in (see --postgresql-version-not-in)
+ postgresql_version.xmax (see --postgresql-version-xmax)
+ postgresql_version.xmin (see --postgresql-version-xmin)
+ python_version (see --python-version)
+ python_version.contains (see --python-version-contains)
+ python_version.in (see --python-version-in)
+ python_version.is (see --python-version-is)
+ python_version.isnt (see --python-version-isnt)
+ python_version.max (see --python-version-max)
+ python_version.min (see --python-version-min)
+ python_version.not_contains (see --python-version-not-contains)
+ python_version.not_in (see --python-version-not-in)
+ python_version.xmax (see --python-version-xmax)
+ python_version.xmin (see --python-version-xmin)
+ query (see --query)
+ random (see --random)
+ reldate (see --reldate)
+ reldate.in (see --reldate-in)
+ reldate.is (see --reldate-is)
+ reldate.isnt (see --reldate-isnt)
+ reldate.max (see --reldate-max)
+ reldate.min (see --reldate-min)
+ reldate.not_in (see --reldate-not-in)
+ reldate.xmax (see --reldate-xmax)
+ reldate.xmin (see --reldate-xmin)
+ result_limit (see --result-limit)
+ result_start (see --result-start)
+ ruby_version (see --ruby-version)
+ ruby_version.contains (see --ruby-version-contains)
+ ruby_version.in (see --ruby-version-in)
+ ruby_version.is (see --ruby-version-is)
+ ruby_version.isnt (see --ruby-version-isnt)
+ ruby_version.max (see --ruby-version-max)
+ ruby_version.min (see --ruby-version-min)
+ ruby_version.not_contains (see --ruby-version-not-contains)
+ ruby_version.not_in (see --ruby-version-not-in)
+ ruby_version.xmax (see --ruby-version-xmax)
+ ruby_version.xmin (see --ruby-version-xmin)
+ sort (see --sort)
+ version (see --version-arg)
+ version.contains (see --version-contains)
+ version.in (see --version-in)
+ version.is (see --version-is)
+ version.isnt (see --version-isnt)
+ version.max (see --version-max)
+ version.min (see --version-min)
+ version.not_contains (see --version-not-contains)
+ version.not_in (see --version-not-in)
+ version.xmax (see --version-xmax)
+ version.xmin (see --version-xmin)
+ with_field_names (see --with-field-names)
+
+=head1 FILES
+
+~/.config/list-centos-releases.conf
+
+~/list-centos-releases.conf
+
+/etc/list-centos-releases.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ListCentosReleases>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ListCentOSReleases>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListCentosReleases>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

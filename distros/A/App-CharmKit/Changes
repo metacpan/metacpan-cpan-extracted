@@ -1,0 +1,59 @@
+Revision history for App-CharmKit
+
+2.07      2016-11-17 23:07:57-05:00 America/New_York
+  - add Module::Runtime dep for loading plugins
+
+2.06      2016-11-17 09:28:29-05:00 America/New_York
+  - fix charm linter
+  - add simple plugin support
+  - add true, autobox, and autobox::Core deps
+
+2.05      2016-11-16 22:32:29-05:00 America/New_York
+  - Rename Override to HookUtil
+  - Do not import packages prior to inclusion to charm package
+
+2.04      2016-11-09 09:53:22-05:00 America/New_York
+  - Switch to dzil
+
+2.03 2016-10-31
+  - Add additional routines for getting juju resources,
+    status, and unit information.
+
+2.02 2016-10-28
+  - Import strftime
+
+2.01 2016-10-28
+  - Add more Rex modules
+
+2.00 2016-10-27
+  - Reduce deps that were not in use
+  - Reworked all commands to use Rex's support
+  - New release to account for breaking changes
+
+1.14 2016-10-27
+  - Import Rex for cleaner charm commands
+
+1.13 2016-10-26
+  - Update version to resemble whats in perlmodestyle
+  - Add sh2 routine to return Capture::Tiny
+
+1.0.12 2016-10-26
+  - Enable Smart comments
+  - Add CONFIGURES_REQUIRES on File::ShareDir::Install
+
+1.0.11 2016-10-26
+  - Make sh take a string, die on error
+  - Condense library, remove unimportant commands
+  - Reduce dependencies more
+
+1.0.10 2016-10-25
+  - Fix license (GH: #5 FROM: Mohammad S Anwa)
+  - Rename call to execute to shorter 'sh'
+  - Enable experimental signatures
+
+1.0.9 2016-10-25
+  - Slim down build tools
+  - Remove useless calls
+  - Slim down package deps
+  - Remove unneeded test
+  - Update manual

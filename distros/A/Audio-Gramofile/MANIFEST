@@ -1,0 +1,12 @@
+Changes
+Gramofile.pm
+Gramofile.xs
+Makefile.PL
+MANIFEST
+ppport.h
+gramofile.h
+README
+typemap
+t/1.t
+examples/process_wav.pl
+META.yml                                 Module meta-data (added by MakeMaker)

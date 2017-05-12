@@ -1,0 +1,16 @@
+<project name="TAPGenerator" default="build">
+
+	<property name="buildroot" location="build"/>
+	<property name="classesroot" location="${buildroot}/classes"/>
+	
+	<target name="build">
+		<mkdir dir="${classesroot}"/>
+		<javac srcdir="src/main/java" destdir="${classesroot}" includeantruntime="false"/>
+		<jar destfile="${buildroot}/TAPGenerator.jar" basedir="${classesroot}"/>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${buildroot}"/>
+	</target>
+	
+</project>

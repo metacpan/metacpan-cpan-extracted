@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ed0dd3f852d94faeef9497da43c28919f871db21 CONTRIBUTORS
+SHA1 dc144049bb6da2e1c923bdb221efa3340846066e Changes
+SHA1 aafef7efd5e9bbc5bb597870f6bf837cf22f7892 LICENSE
+SHA1 de6f714f2afff642db9fb1a0e8691cb28bf988f1 MANIFEST
+SHA1 bb23e79cd61c036c9c7124f1c0826b0f02ceec07 META.yml
+SHA1 55c198cb0582a102fce0ca2507a6c442d19f3deb Makefile.PL
+SHA1 61cb135709205320d9e9a51659bae031552151dd README
+SHA1 4f83d3110663b5a68400ea25ff71629575e16ea6 dist.ini
+SHA1 eb15a901bcc075fea532b150f9843346bd572c4e lib/AnyEvent/Proc.pm
+SHA1 68ecfdad919b1af42ad72649936d428d021ae03c t/000-simple.t
+SHA1 a4c2d088d6b525744d4a94a6da6f33192770cf71 t/001-ttl.t
+SHA1 d72b42adcddbf1eb122779b3fd6cf5bdc83dbc51 t/002-on_exit.t
+SHA1 bb106df0e748135c56e33f7eb6bf8cff713fbf7b t/003-finish.t
+SHA1 4ac029a4cc33c803e7cde494aa825adbae466483 t/004-timeout.t
+SHA1 f69c8942176e84d2e714d930edb28c65d4b8c465 t/005-to_scalar.t
+SHA1 38a4704668d022c82304a14b470944b7793b9f63 t/006-pipe.t
+SHA1 fc8818707b1b8f50050535c9764ed3d41ac8459e t/007-run.t
+SHA1 017ee53194757d2e5ec19ca29e82800da8055ec9 t/008-pull.t
+SHA1 91d5ac39e2cc6cd636798a179ed534b241e72cac t/009-extrafd.t
+SHA1 f214de96cfe8b70da71201ab8859bb32cbdafe1d t/author-critic.t
+SHA1 1bf69b71b924777ef46b198af9435e8381149fc7 t/release-cpan-changes.t
+SHA1 bdd52baa1a968cc0e1a577a7b073f046d563a317 t/release-kwalitee.t
+SHA1 ca37d7b91c2299a98877a6f36d3fab51e8dd906f t/release-pod-coverage.t
+SHA1 e7fc4d8f3f29ee522cb53914648393524fc7a6d4 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+Comment: GPGTools - http://gpgtools.org
+
+iQIcBAEBAgAGBQJUiEhQAAoJEHwWRyBU62lq8d0P/jl4436WJG/9yvjTtlpvpWlq
+ZbR/RDDQ6cTZr6z180HauDY/YB+AY957lUjeVZc+TARuetfnPRGcYxaeMRXVhEsp
+gGrNFE7xqrtWNjGUs8xumvYUIdri58d1kCOWJcCnLBSGuznjCH1ZMNiRPkZmLgSk
+dk/6eBTbkHoKvkNPnqOrr0tpfeFs+Kv6wfesFg0JhRAbp+vsvdvKmhO2DXYs7wU0
+6Y6dIpaehpc77HUXyFUYC39d1VfiSTQNc1q5KaGXWuJHbuu4NoFKnxKchinMvcjI
+EpzltQ8uKPwRcNcSGeXc2E6HE1oaw58LDb3o4sfAbHnbPqi47XwnB5LebsDdXEQN
+cZQBmdJwAAwewGLyNNXB12oiZi3f8wXXqLF3Hw31mOnFTjLzt0zmaZkDGPYVQlj/
+SqQtuw9Wrw3hV2RVeosREA4Mq3ZAA3KiyRJwNXphrlFPKEYF/tIYe4Fguqu6S0tA
+IHj1NXd6wGrgrvJ6ads8NavZ+01+hQ1P4eFpPGb098RPB7tgVL4STDgDTIxDQEDs
+BUFDrXH5s6qBZk0KqdQta/NxkzcgD3BvR+0N2CA5CwZuCyQDHSQg3/emFDzVn8Ub
+SCcGdlj2xfjrlfma6iWnQb8CYyhvt+ew2w1Zl3XjYo8NFXW+qdrmLoAhGn5lHWJg
+B8tcSGUl5Y2dE6eDzRSz
+=DtIJ
+-----END PGP SIGNATURE-----

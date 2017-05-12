@@ -1,0 +1,40 @@
+---
+abstract: 'Framework to intelligently manage many parallel tasks'
+author:
+  - 'Dana M. Diederich <dana@realms.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-MultiModule
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Digest::MD5: 0
+  Getopt::Std: 0
+  IPC::Transit: 0
+  IPC::Transit::Router: 0
+  Message::Match: 0
+  Message::Transform: 0
+  POE: 0
+  POSIX: 0
+  PadWalker: 0
+  Sereal::Decoder: 0
+  Sereal::Encoder: 0
+  Storable: 0
+  Test::More: 0
+  lib: 0
+  parent: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dana/perl-App-MultiModule/issues
+  homepage: https://github.com/dana/perl-App-MultiModule
+  repository: https://github.com/dana/perl-App-MultiModule.git
+version: 1.143160

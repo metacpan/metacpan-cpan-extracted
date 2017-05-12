@@ -1,0 +1,9 @@
+BUILDING
+
+    The meat of CmdDirs is contained in lib, nice and OOey.  For the comand line
+    app, build/cmddirs.PL is the basis, and it fatpacked by build/build.PL
+    creating cmddirs.  To build, just run build/build.PL.
+
+TESTING
+
+    Just run `prove -l` from the root dir

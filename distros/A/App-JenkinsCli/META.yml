@@ -1,0 +1,37 @@
+---
+abstract: 'Command line tool for interacting with Jenkins'
+author:
+  - 'Ivan Wills <ivan.wills@gmail.com>'
+build_requires:
+  Test::More: '0'
+  Test::Warnings: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-JenkinsCli
+provides:
+  App::JenkinsCli:
+    file: lib/App/JenkinsCli.pm
+    version: '0.008'
+requires:
+  DateTime: '0'
+  File::ShareDir: '1.00'
+  Getopt::Alt: v0.3.8
+  Jenkins::API: '0.11'
+  Moo: '2.0'
+  Path::Tiny: '0.076'
+  XML::LibXML: '2.0'
+  XML::LibXSLT: '1.90'
+  XML::Simple: '2.22'
+  perl: '5.010'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::JenkinsCli
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ivanwills/App-jenkins-cli.git
+version: '0.008'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

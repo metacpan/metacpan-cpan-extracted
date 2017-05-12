@@ -1,0 +1,18 @@
+Revision history for Perl extension Anansi::Component.
+
+0.01  Fri Apr 12 00:47:01 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Anansi::Component
+0.02  Mon May 20 11:01:34 2013
+	- modified the POD.
+	- corrected HASH reference deprecations.
+0.03  Sat May 25 02:29:52 2013
+        - modified the POD.
+0.04  Sat May 25 07:54:36 2013
+	- modified the POD to reflect more concise examples and include method parameter.
+0.05  Wed May 29 13:25:50 2013
+	- made the POD more interactive.
+0.06  Fri May 31 15:42:07 2013
+	- modified the POD.
+0.07  Fri Aug 09 14:35:56 2013
+	- modified the POD to accommodate changes to "Anansi::Class".

@@ -1,0 +1,33 @@
+INSTALLATION
+
+o perl Makefile.PL
+  Options
+    --no_graph : exclude revision history graphing
+
+o make
+
+o make install
+
+QUICKSTART
+
+See the sample httpd.conf in the same directory as CVS.pm, slap it into your
+real httpd.conf, replace /usr/local/CVS with your CVSROOT, copy apache_cvs.css
+to your DocumentRoot, restart Apache.
+
+DOCUMENTATION
+
+If Apache::CVS is already installed
+	perldoc Apache::CVS
+Otherwise be the same directory as CVS.pm and
+	perldoc CVS
+
+CONTRIBUTORS (patches, etc.)
+    o Steve Fink <steve@fink.com>
+
+    o PODMASTER <PODMASTER@cpan.org>
+    o Briac Pilpre <briac@pilpre.com>
+
+COPYRIGHT
+	2000-2002 John Barbee. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

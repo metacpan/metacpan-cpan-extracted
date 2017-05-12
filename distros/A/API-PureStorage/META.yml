@@ -1,0 +1,26 @@
+---
+abstract: 'API Wrapper for Pure Storage devices.'
+author:
+  - 'Phil Pollard <bennie@cpan.org>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: API-PureStorage
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+provides:
+  API::PureStorage:
+    file: lib/API/PureStorage.pm
+    version: '0.03'
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=API-PureStorage
+  repository: git://github.com/bennie/perl-API-PureStorage.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

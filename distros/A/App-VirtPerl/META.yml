@@ -1,0 +1,26 @@
+---
+abstract: 'Lightweight Perl Environments'
+author:
+  - 'Chris Reinhardt <crein@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-VirtPerl
+requires:
+  App::cpanminus: '0'
+  File::Path: '2.00'
+  JSON: '0'
+  lib: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/ctriv/perl-App-VirtPerl
+  repository: https://github.com/ctriv/perl-App-VirtPerl.git
+version: '0.1'

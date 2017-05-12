@@ -1,0 +1,58 @@
+AxKit::App::Gallery
+===================
+
+$Id: README,v 1.3 2004/02/26 18:02:05 nik Exp $
+
+This is an AxKit based image gallery, using XSLT and XPathScript.  Directory
+hierarchies of images can be placed online with minimal effort.  To see
+an example of AxKit::App::Gallery in use, go to
+
+    http://jc.ngo.org.uk/pics/
+
+See the INSTALL document for notes on installing AxKit::App::Gallery and
+its dependencies.
+
+After installing AxKit::App::Gallery;
+
+  * Identify the root directory of your image collection.  For example,
+    /usr/local/pictures.
+
+  * Create a directory to store the stylesheets (XSLT and XPathScript) that
+    do the bulk of the transformation.  E.g., /usr/local/share/ax-app-gallery.
+    Copy the contents of the stylesheets/ directory here
+
+        mkdir /usr/local/share/ax-app-gallery
+        cp stylesheets/* /usr/local/share/ax-app-gallery
+
+  * Edit proofsheet2html.xsl and imagesheet2html.xsl.  These both contain
+    a statement that looks like this:
+
+        <xsl:include href="file:///home/nik/Local-CVS/CPAN/AxKit::App::Gallery/src/stylesheets/breadcrumb.xsl"/>
+
+    Adjust the path to reflect the full path to the file breadcrumb.xsl on
+    your system.  Unfortunately, this is a side effect of interactions 
+    between specific versions of XML::LibXML, XML::LibXSLT, and libxml.
+
+    Future versions will hopefully fix this bug.
+
+  * Integrate the contents of httpd/httpd.conf into your Apache configuration
+    file.  See the comments in that file for more details.
+
+  * Restart the webserver
+
+  * As part of the httpd.conf integration you should have created a URL on
+    your website that maps back to the root directory of your image 
+    collection (/usr/local/pictures, or whatever you called it).  Point
+    a web browser at this URL.
+
+    You should be rewarded with a page listing the subdirectories as links.
+    Any images in this root directory should also be present as thumbnails.
+    
+    Clicking on a subdirectory should show you the images and subdirectories
+    it contains.  Clicking on an image should show you a larger version of
+    that image, some information about it, and links to view larger or 
+    smaller versions of the image.
+
+See the documentation in AxKit::App::Gallery for detailed configuration
+information, author contact details, and troubleshooting/debugging
+recommendations.

@@ -1,0 +1,16 @@
+arrays.c
+arrays.h
+Changes
+const-c.inc
+const-xs.inc
+fallback/const-c.inc
+fallback/const-xs.inc
+GSM.xs
+lib/Audio/GSM.pm
+Makefile.PL
+MANIFEST
+ppport.h
+t/Audio-GSM.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

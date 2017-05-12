@@ -1,0 +1,24 @@
+
+It's alive!  It's Aliiiive!
+
+Is it an array, or is it a hash?  Neither!  Both!  It's a disgusting
+frankenstein's monster made by sewing together bits and pieces of
+arrays and hashes into a monstrous and unholy creation!
+
+What does it do?  It manufactures an object that can be used as either
+an array reference or a hash reference.
+
+Why would you ever want such a thing?  Well, it's the natural way to
+present an ordered hash.  You could then use $orderedhash->[7] to get
+item number seven, or $orderedhash->{key} to get the item with the
+specified key.
+
+Or for example you could have an object that represents a directory.
+$dir->[3] gets the name of file number 3 from the directory, so it is
+easy to iterate over the files in the directory, and $dir->{name} gets
+the stat information for the file named `$name'.  The test.pl file has
+a demonstration of how to do this.
+
+Discovery of how this works is left as an exercise for the reader.  
+
+

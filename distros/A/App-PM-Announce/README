@@ -1,0 +1,85 @@
+NAME
+    App::PM::Announce - Announce your PM meeting via Meetup and LinkedIn
+
+VERSION
+    Version 0.025
+
+SYNOPSIS
+        # Initialize and edit the config (only need to do this once)
+        pm-announce config edit
+        
+    # Generate a template for the event
+        pm-announce template > event.txt
+
+        # Edit event.txt with your editor of choice...
+
+        # Announce the event
+        pm-announce announce < event.txt
+
+DESCRIPTION
+    App::PM::Announce is a tool for creating and advertising PM meetings (on
+    Meetup, LinkedIn, and blog software)
+
+                -v, -d,  --verbose  Debugging mode. Be verbose when reporting
+                -h, -?,  --help     This help screen
+
+            config              Check the config file ($HOME/.app-pm-announce/config)
+
+            config edit             Edit the config file using $EDITOR
+
+            history                 Show announcement history
+
+            history <query>         Show announcement history for event <query>, where <query> should be enough of the uuid to be unambiguous
+
+            template                Print out a template to be used for input to the 'announce' command
+
+                --image <image>     Attach <image> (can be either a local file or remote URL) to the Meetup event
+
+            announce                Read STDIN for the event information and make a post for each feed
+
+                -n, --dry-run       Don't actually login and announce, just show what would be done
+
+            test                    Post a bogus event to a test meetup account, test linkedin account, and test greymatter account
+
+            help                    This help screen
+
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-app-pm-announce at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-PM-Announce>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc App::PM::Announce
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-PM-Announce>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/App-PM-Announce>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/App-PM-Announce>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/App-PM-Announce/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

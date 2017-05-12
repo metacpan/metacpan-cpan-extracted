@@ -1,0 +1,51 @@
+---
+names:
+- firstname: Affe
+  lastname: Zomtec
+- firstname: Tiger
+  lastname: Loewe
+- firstname: Birne
+  lastname: Dingens
+metadata:
+  Eric: The flat one from the 90s
+  Affe:
+    size: average
+    coolness: big
+  Zomtec:
+    size: average
+    coolness: bit anachronistic
+  Birne:
+    - bissel
+    - hinterher
+    - manchmal
+reports:
+- 
+  - "line A-1"
+  - "line A-2"
+  - "line A-3"
+  - "line A-4"
+  - "line A-5"
+- 
+  - "line B-1"
+  - "line B-2"
+  - "line B-3"
+  - "line B-4"
+- 
+  - "line C-1"
+  - "line C-2"
+  - "line C-3"
+- Affe: amazing moves in the jungle
+  Zomtec: slow talking speed
+  Birne: unexpected in many respects
+- "single report string"
+
+UnsupportedInnermostHash:
+  Nesting:
+    Level:
+      foo: 111
+      bar: 222
+UnsupportedInnermostArray:
+  Nesting:
+    Level:
+      - foo
+      - bar

@@ -1,0 +1,648 @@
+
+
+<html>
+<head>
+<title>Apache::ASP::Events</title>
+
+
+
+<style type="text/css">
+<!--
+      td {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      font {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      .title {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 16px}
+
+
+
+
+-->
+</style>
+
+
+</head>
+<body bgcolor=black link=#063678 alink=#ff5599 vlink=#993399
+marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
+
+
+
+
+<center>
+<table border=0 cellpadding=0 width=99% cellspacing=8>
+<tr><td align=center>
+
+<table border=0 cellpadding=3 width=100% cellspacing=0>
+<tr bgcolor=#063678>
+<td>
+	<table border=0 cellpadding=1 cellspacing=0 width=100%>
+	<tr>
+	<td><img border=0 src=asptitlelogo.gif alt="Apache::ASP" width=267 height=44 ></td>	
+	
+		<td align=right></td>
+	
+	</tr>
+	</table>
+</td>
+</tr>
+<tr>
+  <td bgcolor=#005196 align=center>
+    <b>
+    <font color=#ffffff>&lt;% Web Applications with Apache &amp; mod_perl %&gt;</font>  
+    </b>
+  </td>
+</tr>
+</table>
+
+
+<table border=0 cellpadding=10 cellspacing=0 width=100% bgcolor=#005196>
+<tr>
+<td valign=top width=120 bgcolor=#005196>
+    
+        <table cellpadding=5 cellspacing=0 border=1 bgcolor=white><tr><td>
+
+	<table border=0 cellpadding=0 cellspacing=0 width=105 bgcolor=white>
+	
+	
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="index.html" style="text-decoration:none"><font color=#063678>INTRO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="install.html" style="text-decoration:none"><font color=#063678>INSTALL</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="config.html" style="text-decoration:none"><font color=#063678>CONFIG</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="syntax.html" style="text-decoration:none"><font color=#063678>SYNTAX</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>%</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><font color=#993399>EVENTS</font></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="objects.html" style="text-decoration:none"><font color=#063678>OBJECTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="ssi.html" style="text-decoration:none"><font color=#063678>SSI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sessions.html" style="text-decoration:none"><font color=#063678>SESSIONS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="xml.html" style="text-decoration:none"><font color=#063678>XML/XSLT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="cgi.html" style="text-decoration:none"><font color=#063678>CGI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="perlscript.html" style="text-decoration:none"><font color=#063678>PERLSCRIPT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="style.html" style="text-decoration:none"><font color=#063678>STYLE GUIDE</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="faq.html" style="text-decoration:none"><font color=#063678>FAQ</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="tuning.html" style="text-decoration:none"><font color=#063678>TUNING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="kudos.html" style="text-decoration:none"><font color=#063678>CREDITS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="support.html" style="text-decoration:none"><font color=#063678>SUPPORT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sites.html" style="text-decoration:none"><font color=#063678>SITES USING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="testimonials.html" style="text-decoration:none"><font color=#063678>TESTIMONIALS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="resources.html" style="text-decoration:none"><font color=#063678>RESOURCES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="todo.html" style="text-decoration:none"><font color=#063678>TODO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="changes.html" style="text-decoration:none"><font color=#063678>CHANGES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="license.html" style="text-decoration:none"><font color=#063678>LICENSE</font></a></nobr></b></font></td>		
+
+		</tr>
+		<tr><td colspan=2><hr size=1></td></tr>
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="eg/index.html" style="text-decoration:none"><font color=#063678>EXAMPLES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+	</table>
+
+	</td></tr>
+	</table>
+
+		<br>
+		<center>
+		<a href=http://www.apache-asp.org/><img src="powered_by_apache_asp.jpg" width="88" height="31" alt="Powered by Apache::ASP" border="0"></a>
+		<br>
+		<a href=http://perl.apache.org><img src="powered_by_modperl.gif" width="88" height="31" alt="Powered by ModPerl and Apache" border="0"></a>
+		<br>
+		<a href=http://www.perl.com><img src="rectangle_power_perl.gif" width="88" height="31" alt="Powered by Perl" border="0"></a>
+		</center>
+
+</center>
+
+</td>
+
+
+
+<td valign=top bgcolor=white>
+<font size=+0 face=verdana,arial>
+
+<font face=verdana><font class=title size=+1 color=#555555><b>EVENTS</b></font>
+</font>
+
+	<hr size=1>
+	<table width=100% border=0 cellpadding=1 cellspacing=3>
+	<tr>
+	<td valign=top><font face="lucida console" size=-1>
+	
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Overview>Overview</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Script_OnPar383e5cdf>Script_OnParse</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Script_OnSta6a4cfa7f>Script_OnStart & Script_OnEnd</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Application_61345d1d>Application_OnStart</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Session_OnSt3cfacd72>Session_OnStart</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Application_4bca009c>Application_OnEnd</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Session_OnEne9575396>Session_OnEnd</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Server_OnSta0d174f59>Server_OnStart ( pseudo-event )</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Script_OnFludc73a8d8>Script_OnFlush</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#mod_perl%20han02da5c9c>mod_perl handlers</a>
+			</font>
+			</td>
+							
+		</tr>
+			
+	</table>
+	<hr size=1>
+	<p>
+
+	<p>
+	<a name=Overview></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Overview</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>The ASP platform allows developers to create Web Applications.
+In fulfillment of real software requirements, ASP allows 
+event-triggered actions to be taken, which are defined in
+a global.asa file.  The global.asa file resides in the 
+Global directory, defined as a config option, and may
+define the following actions:
+<font face="courier new" size=3><pre>
+	Action			Event
+	------			------
+        Script_OnStart *	Beginning of Script execution
+        Script_OnEnd *		End of Script execution
+        Script_OnFlush *	Before $Response being flushed to client.
+        Script_OnParse *        Before script compilation
+	Application_OnStart	Beginning of Application
+	Application_OnEnd	End of Application
+	Session_OnStart		Beginning of user Session.
+	Session_OnEnd		End of user Session.
+
+  * These are API extensions that are not portable, but were
+    added because they are incredibly useful
+</pre></font>These actions must be defined in the $Global/global.asa file
+as subroutines, for example:
+<font face="courier new" size=3><pre>
+  sub Session_OnStart {
+      $Application-&gt;{$Session-&gt;SessionID()} = started;
+  }
+</pre></font>Sessions are easy to understand.  When visiting a page in a
+web application, each user has one unique $Session.  This 
+session expires, after which the user will have a new
+$Session upon revisiting.
+<font face="courier new" size=3><pre>
+</pre></font>A web application starts when the user visits a page in that
+application, and has a new $Session created.  Right before
+the first $Session is created, the $Application is created.
+When the last user $Session expires, that $Application 
+expires also.  For some web applications that are always busy,
+the Application_OnEnd event may never occur.</font>
+	
+	<p>
+	<a name=Script_OnSta6a4cfa7f></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Script_OnStart & Script_OnEnd</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>The script events are used to run any code for all scripts
+in an application defined by a global.asa.  Often, you would
+like to run the same code for every script, which you would
+otherwise have to add by hand, or add with a file include,
+but with these events, just add your code to the global.asa,
+and it will be run.  
+<font face="courier new" size=3><pre>
+</pre></font>There is one caveat.  Code in Script_OnEnd is not guaranteed 
+to be run when $Response-&gt;End() is called, since the program
+execution ends immediately at this event.  To always run critical
+code, use the API extension:
+<font face="courier new" size=3><pre>
+	$Server-&gt;RegisterCleanup()
+</pre></font>
+	
+	<p>
+	<a name=Session_OnSt3cfacd72></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Session_OnStart</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Triggered by the beginning of a user&#39;s session, Session_OnStart
+gets run before the user&#39;s executing script, and if the same
+session recently timed out, after the session&#39;s triggered Session_OnEnd.
+<font face="courier new" size=3><pre>
+</pre></font>The Session_OnStart is particularly useful for caching database data,
+and avoids having the caching handled by clumsy code inserted into
+each script being executed.</font>
+	
+	<p>
+	<a name=Session_OnEne9575396></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Session_OnEnd</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Triggered by a user session ending, Session_OnEnd can be useful
+for cleaning up and analyzing user data accumulated during a session.
+<font face="courier new" size=3><pre>
+</pre></font>Sessions end when the session timeout expires, and the StateManager
+performs session cleanup.  The timing of the Session_OnEnd does not
+occur immediately after the session times out, but when the first 
+script runs after the session expires, and the StateManager allows
+for that session to be cleaned up.  
+<font face="courier new" size=3><pre>
+</pre></font>So on a busy site with default SessionTimeout (20 minutes) and 
+StateManager (10 times) settings, the Session_OnEnd for a particular 
+session should be run near 22 minutes past the last activity that Session saw.
+A site infrequently visited will only have the Session_OnEnd run
+when a subsequent visit occurs, and theoretically the last session
+of an application ever run will never have its Session_OnEnd run.
+<font face="courier new" size=3><pre>
+</pre></font>Thus I would not put anything mission-critical in the Session_OnEnd,
+just stuff that would be nice to run whenever it gets run.</font>
+	
+	<p>
+	<a name=Script_OnFludc73a8d8></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Script_OnFlush</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>API extension. This event will be called prior to flushing
+the $Response buffer to the web client.  At this time,
+the $Response-&gt;{BinaryRef} buffer reference may be used to modify 
+the buffered output at runtime to apply global changes to scripts 
+output without having to modify all the scripts.
+<font face="courier new" size=3><pre>
+ sub Script_OnFlush {
+   my $ref = $Response-&gt;{BinaryRef};
+   $$ref =~ s/\s+/ /sg; # to strip extra white space
+ }
+</pre></font>Check out the <a href=eg/global.asa>./site/eg/global.asa</a> for an example of its use.</font>
+	
+	<p>
+	<a name=Script_OnPar383e5cdf></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Script_OnParse</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>This event allows one to set up a source filter on the script text,
+allowing one to change the script on the fly before the compilation
+stage occurs.  The script text is available in the $Server-&gt;{ScriptRef}
+scalar reference, and can be accessed like so:
+<font face="courier new" size=3><pre>
+ sub Script_OnParse {
+   my $code = $Server-&gt;{ScriptRef}
+   $$code .= &quot; ADDED SOMETHING &quot;;
+ }
+</pre></font>
+	
+	<p>
+	<a name=Application_61345d1d></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Application_OnStart</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>This event marks the beginning of an ASP application, and 
+is run just before the Session_OnStart of the first Session
+of an application.  This event is useful to load up
+$Application with data that will be used in all user sessions.</font>
+	
+	<p>
+	<a name=Application_4bca009c></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Application_OnEnd</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>The end of the application is marked by this event, which
+is run after the last user session has timed out for a 
+given ASP application.</font>
+	
+	<p>
+	<a name=Server_OnSta0d174f59></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Server_OnStart ( pseudo-event )</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Some might want something like a Server_OnStart event, where
+some code gets runs when the web server starts.  In <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a>,
+this is easy to achieve outside of the scope of an ASP
+application, by putting some initialization code into
+a &lt;Perl&gt; section in the httpd.conf file.  Initializations
+that you would like to be shared with the child httpds are
+particularly useful, one such being the Apache::ASP-&gt;Loader() 
+routine which you can read more about in the <a href=tuning.html><font size=-1 face=verdana><b>TUNING</b></font></a> section -
+Precompile Scripts subsection. It is could be called like:
+<font face="courier new" size=3><pre>
+  # httpd.conf
+  &lt;Perl&gt;
+     Apache::ASP-&gt;Loader($path, $pattern, %config)
+  &lt;/Perl&gt;
+</pre></font>So a &lt;Perl&gt; section is your Server_OnStart routine!</font>
+	
+	<p>
+	<a name=mod_perl%20han02da5c9c></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>mod_perl handlers</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>If one wants to extend one&#39;s environment with <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a>
+handlers, Apache::ASP does not stop this.  Basic
+use of Apache::ASP in fact only involves the content
+handler phase of mod_perl&#39;s PerlHandler, like
+<font face="courier new" size=3><pre>
+  SetHandler perl-script
+  PerlModule Apache::ASP
+  PerlHandler Apache::ASP 
+</pre></font>But mod_perl allows for direct access to many more
+Apache event stages, for full list try &quot;perldoc mod_perl&quot;
+or buy the mod_perl Eagle book.  Some commonly used ones are:
+<font face="courier new" size=3><pre>
+  PerlInitHandler
+  PerlTransHandler
+  PerlFixupHandler
+  PerlHandler
+  PerlLogHandler
+  PerlCleanupHandler
+</pre></font>For straight Apache::ASP programming, there are some 
+equivalents, say Script_OnStart event instead of Init/Fixup
+stages, or $Server-&gt;RegisterCleanup() for Log/Cleanup stages,
+but you can do things in the mod_perl handlers that you 
+cannot do in Apache::ASP, especially if you want to handle
+all files globally, and not just ASP scripts.
+<font face="courier new" size=3><pre>
+</pre></font>For many Apache::* modules for use with mod_perl, of which
+Apache::ASP is just one, check out
+<a href=http://perl.apache.org/src/apache-modlist.html>http://perl.apache.org/src/apache-modlist.html</a>
+<font face="courier new" size=3><pre>
+</pre></font>To gain access to the ASP objects like $Session outside
+in a non-PerlHandler mod_perl handler, you may use this API:
+<font face="courier new" size=3><pre>  
+  my $ASP = Apache::ASP-&gt;new($r); # $r is Apache-&gt;request object
+</pre></font>as in this possible Authen handler:
+<font face="courier new" size=3><pre>
+  &lt;Perl&gt;
+    use Apache::ASP;
+    sub My::Auth::handler {
+      my $r = shift;
+      my $ASP = Apache::ASP-&gt;new($r) 
+      my $Session = $ASP-&gt;Session;
+    }
+  &lt;/Perl&gt;
+</pre></font>Here are some examples of do-it-yourself mod_perl
+handler programming...
+<font face="courier new" size=3><pre>
+ === Forbid Bad HSlide User Agent ===
+
+ # httpd.conf
+ PerlAccessHandler My::Access
+ &lt;Perl&gt;
+   sub My::Access::handler {
+     my $r = shift;
+     if($r-&gt;headers_in-&gt;{&#39;USER_AGENT&#39;} =~ /HSlide/) {
+	 403;
+     } else {
+	 200;
+     }
+   }
+ &lt;/Perl&gt;
+
+ === Runtime Path Parsing ===
+</pre></font>This example shows how one might take an arbitrary
+URL path /$path/$file.asp, and turn that into a runtime 
+config for your site, so your scripts get executed
+always in your sites DocumentRoot.
+<font face="courier new" size=3><pre>
+ INPUT URL /SomeCategory/
+ OUTPUT
+  Script: index.asp
+  $Server-&gt;Config(&#39;PATH&#39;) eq &#39;/SomeCategory&#39;
+
+ INPUT URL /SomeCategory/index.asp
+ OUTPUT
+  Script: index.asp
+  $Server-&gt;Config(&#39;PATH&#39;) eq &#39;/SomeCategory&#39;
+
+ INPUT URI /index.asp
+ OUTPUT
+  Script: index.asp
+  $Server-&gt;Config(&#39;PATH&#39;) eq &#39;&#39;
+
+ # httpd.conf
+ PerlTransHandler My::Init
+ use lib qw( $custom_perllib );
+
+ # $custom_perllib/My/Init.pm
+ package My::Init;
+ use strict;
+ use Apache::Constants qw(:common);
+ sub handler {
+    my $r = shift;
+
+    my $uri = $r-&gt;uri || &#39;/&#39;;
+    unless($uri =~ m|^(.*)(/([^/.]+\.[\w]+)?)$|i) {
+	warn(&quot;can&#39;t parse uri $uri&quot;);
+	return DECLINED;
+    }
+    $uri = $2;
+    my $PATH = $1 || &#39;&#39;;
+    $r-&gt;dir_config(&#39;PATH&#39;, $PATH);
+
+    if($uri eq &#39;/&#39;) {
+	$uri = &#39;/index.asp&#39;;
+    }
+
+    $r-&gt;uri($uri);
+    $r-&gt;filename($r-&gt;document_root.$uri);
+
+    DECLINED;
+ }
+
+ 1;
+</pre></font>
+	
+
+</font>
+</td>
+
+<td bgcolor=white valign=top>
+&nbsp;
+</td>
+
+</tr>
+<tr bgcolor=#063678>
+	<td colspan=3 align=center width=80%>
+	<font face=verdana color=white size=-1>
+	Copyright &copy; 1998-2008,
+	<a href=http://www.chamas.com><font color=white>Chamas Enterprises Inc.</font></a>
+	</font>
+	</td>
+</tr>
+</table>
+
+</td></tr>
+</table>
+</center>
+
+</body>
+</html>

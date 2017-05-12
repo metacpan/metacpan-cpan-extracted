@@ -1,0 +1,74 @@
+{
+   "abstract" : "Convert cpan distribution from BackPAN to a git repository",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-cpangitify",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Git::Wrapper" : "0",
+            "Module::Build" : "0.28",
+            "Sort::Versions" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "PerlX::Maybe::XS" : "0"
+         },
+         "requires" : {
+            "Archive::Extract" : "0",
+            "CPAN::ReleaseHistory" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::chdir" : "0",
+            "Git::Wrapper" : "0",
+            "HTTP::Tiny" : "0",
+            "IPC::System::Simple" : "0",
+            "JSON::PP" : "0",
+            "Path::Class" : "0.26",
+            "PerlX::Maybe" : "0.003",
+            "URI" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "File::HomeDir" : "0.91",
+            "HTTP::Date" : "0",
+            "Test::More" : "0.94",
+            "URI::file" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/App-cpangitify/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/App-cpangitify",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/App-cpangitify.git",
+         "web" : "https://github.com/plicease/App-cpangitify"
+      }
+   },
+   "version" : "0.12"
+}
+

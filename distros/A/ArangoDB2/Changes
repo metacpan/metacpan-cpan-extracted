@@ -1,0 +1,42 @@
+Revision history for ArangoDB2
+
+0.11    2014-11-11
+    * Add WWW::Curl based HTTP backend
+
+0.10    2014-11-04
+    * Add support for authentication
+    * Add support for admin API methods
+    * Change all `patch` method names to `update`
+
+0.09    2014-11-04
+    * Add support for endpoint API methods
+
+0.08    2014-11-04
+    * Add support for user API methods
+
+0.07    2014-11-04
+    * Add support for replication API methods
+
+0.06    2014-11-04
+    * Add support for traversal API methods
+
+0.05    2014-11-04
+    * Add support for transaction API methods
+    * Add support for graph API methods
+    * major refactor and cleanup
+
+0.04    2014-11-01
+
+    * Add support for index API methods
+
+0.03    2014-11-01
+
+    * Add support for query/cursor API methods
+
+0.02    2014-10-31
+
+    * Add support for edge API methods
+
+0.01    2014-10-31
+
+    * Initial Release

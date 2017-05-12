@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+# minstren - check/generate minimum cipher strengths for current openssl
+#
+# $Id: minstren,v 1.2 2002/04/21 06:27:07 pliam Exp $
+#
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# minstren
+# Copyright (c) 2001, 2002 John Pliam (pliam@atbash.com)
+# This is open-source software.
+# See file 'COPYING' in original distribution for complete details.
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+use Getopt::Std;
+use Data::Dumper;
+
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Terse = 1;
+
+$usage = "usage: $0 [-c <cipher_string>]\n";
+getopts('c:') || die $usage;
+
+$ciphercmd =  '/usr/bin/openssl ciphers -v';
+
+# common exclusion tags for SSLCipherSuite
+@nots = qw(ADH EXP EXP56 DES LOW MEDIUM SSLv2 RC4);
+
+# form typical cipher suites
+@ciph = qw(ALL);
+for $i (1..scalar(@nots)) { # add increasing exclusion
+	@n = @nots;
+	push(@ciph, sprintf("ALL:!%s", join(':!', splice(@n, 0, $i))));
+}
+
+# but ...
+if ($opt_c) { @ciph = ($opt_c); }
+
+for $ciph (@ciph) {
+	open(OPENSSL, "$ciphercmd '$ciph' |") 
+		|| die "Cannot run openssl ciphers.\n";
+	$min = 2048;
+	while (<OPENSSL>) {
+		next unless /Enc=[^\(]+\(([^\)]+)\)/;
+		$min = ($1 < $min) ? $1 : $min;
+	}
+	close(OPENSSL);
+	$stren->{$ciph} = $min;
+}
+
+print Dumper($stren);

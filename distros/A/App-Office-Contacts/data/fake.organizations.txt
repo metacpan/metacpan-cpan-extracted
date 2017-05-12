@@ -1,0 +1,3 @@
+visibility_id, communication_type_id, creator_id, deleted, facebook_tag, twitter_tag, role_id, homepage, name
+2, 2, 0, 0, n/a, n/a, 5, http://savage.net.au/, Savage Software Pty Ltd
+2, 2, 0, 0, n/a, n/a, 5, http://megacorp.net.au/, MégaCorp Pty Ltd

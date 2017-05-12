@@ -1,0 +1,7 @@
+Example scripts are in the example subdirectory.
+
+* login_form.cgi - a simple login page
+
+* login.cgi - a login script that verifies the username and passwords
+  are correct and then sets the appropriate cookie using the
+  Apache::Authen::Generic module.

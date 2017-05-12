@@ -1,0 +1,122 @@
+#!/usr/bin/env perl
+
+# Analyze a subversion dump, and produce an XML file describing the
+# repository's structure over time.
+
+use warnings;
+use strict;
+use lib qw(./lib);
+
+use Getopt::Long;
+use SVN::Dump::Analyzer;
+
+my ($dump_file_name, $db_file_name);
+my ($verbose, $help) = (0, 0);
+
+my $getopt_okay = GetOptions(
+	'dump=s',       \$dump_file_name,
+	'db=s',         \$db_file_name,
+	'verbose',      \$verbose,
+	'help',         \$help,
+);
+
+if ($help or !$getopt_okay) {
+	die(
+		"$0 usage:\n",
+		"  --dump=FILENAME     location of svn dump file to replay\n",
+		"  --db=FILENAME       location of a SQLite database to create\n",
+		"  --verbose           explain what's happening in great detail\n",
+		"  --help              you're soaking in it.\n",
+	);
+}
+
+die "$0: --dump=FILENAME required\n" unless (
+	defined $dump_file_name and length $dump_file_name
+);
+
+if ($dump_file_name ne '-') {
+	die "$0: --dump path ($dump_file_name) doesn't exist\n" unless (
+		-e $dump_file_name
+	);
+	die "$0: --dump path ($dump_file_name) must be a file\n" unless (
+		-f $dump_file_name
+	);
+}
+
+die "$0: --db=FILENAME required\n" unless (
+	defined $db_file_name and length $db_file_name
+);
+
+die "$0: --db path ($db_file_name) must not exist\n" if -e $db_file_name;
+
+# Analyze the SVN dump.
+
+my $analyzer = SVN::Dump::Analyzer->new(
+	svn_dump_filename => $dump_file_name,
+	verbose           => $verbose,
+	db_file_name      => $db_file_name,
+);
+
+$analyzer->walk();
+exit;
+
+__END__
+
+=head1 NAME
+
+snanalyze - analyze a Subversion dump and index important paths and revisions
+
+=head1 SYNOPSIS
+
+	snanalyze --dump project.svndump --db index.sqlite3 --verbose
+
+=head1 DESCRIPTION
+
+snanalyze combs through a Subversion dump for events that may define
+tags and branches.  It generates an index database with information
+aobut paths, revisions and copies that may be useful to other programs
+in the Snerp Vortex toolbox.
+
+Subversion dumps are create by svnadmin(1).  Really large dumps may be
+abbreviated usng the snub(1) tool, which is part of Snerp Vortex.
+
+=head1 USAGE
+
+=head2 --dump SVN_DUMP_FILENAME
+
+The location of the Subversion dump to analyze.  Required since
+nothing can be done without one.
+
+=head2 --db DB_FILENAME
+
+The location of the SQLite database to hold the index.  Required.
+
+=head2 --verbose
+
+Turn on excessive output for debugging.
+
+=head1 SEE ALSO
+
+L<App::SnerpVortex> - Main documentation for Snerp Vortex.
+
+L<SVN::Dump> - Subversion dumps are parsed by SVN::Dump.
+
+snassign-auto - Automatically assign tags and branches to a snanalyze
+index.
+
+snassign-gui - Graphical snanalyze index browser.  Future plans will
+allow users to assign branches and tags by hand.  Requires Gtk.
+
+snauthors - Extract a basic authors.txt file from a Subversion dump.
+
+snerp - Convert a Subversion repository to a flat filesystem or Git.
+Uses the snanalyze index, with help from the snassign tools, to
+intelligently branch and tag as it goes.
+
+=head1 AUTHORS AND LICENSE
+
+Snerp Vortex is Copyright 2010 by Rocco Caputo and contributors.
+
+It is released under the same terms as Perl itself.
+
+=cut

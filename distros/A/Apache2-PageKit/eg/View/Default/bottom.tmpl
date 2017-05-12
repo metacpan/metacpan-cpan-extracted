@@ -1,0 +1,23 @@
+<p>
+  <PKIT_COMPONENT NAME="/begin_cell">
+  Standard View - <a href="<PKIT_SELFURL>pkit_view=print">Printable View</a>
+  <PKIT_COMPONENT NAME="/end_cell">
+
+  <PKIT_COMPONENT NAME="/begin_cell">
+   Turn Online Editing
+   <MODEL_IF NAME="pkit_admin">
+    On - <a href="<PKIT_SELFURL exclude="pkit_admin">pkit_admin=off">Off</a>
+   <MODEL_ELSE>
+    <a href="<PKIT_SELFURL exclude="pkit_admin">pkit_admin=on">On</a> - Off
+   </MODEL_IF>
+  <PKIT_COMPONENT NAME="/end_cell">
+
+<MODEL_IF NAME="pkit_user">
+<p>
+  <PKIT_COMPONENT NAME="/begin_cell">
+  You are logged in as <b><MODEL_VAR NAME="pkit_login"></b>.  You may
+  <a href="<PKIT_SELFURL>pkit_logout=1">Log Out</a>.
+  <PKIT_COMPONENT NAME="/end_cell">
+</MODEL_IF>
+</body>
+</html>

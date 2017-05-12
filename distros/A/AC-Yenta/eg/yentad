@@ -1,0 +1,31 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+#
+# example yenta daemon
+
+use Getopt::Std;
+use AC::Yenta::D;
+use strict;
+
+my @saved_argv = @ARGV;
+my %OPT;
+
+getopts('c:dfp:', \%OPT) || die "usage...\n";
+    # -c config file
+    # -d    enable all debugging
+    # -f    foreground
+    # -p port
+
+
+my $y = AC::Yenta::D->new(
+    class_myself	=> 'My::Code::MySelf',
+   );
+
+
+$y->daemon( $OPT{c}, {
+    argv	=> \@saved_argv,
+    foreground	=> $OPT{f},
+    debugall	=> $OPT{d},
+    port	=> $OPT{p},
+} );
+

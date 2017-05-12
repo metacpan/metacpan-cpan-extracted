@@ -1,0 +1,57 @@
+Revision history for AnyEvent::RipeRedis::Cluster.
+
+0.26 Wed Mar 22 17:52:20 MSK 2017
+  - Changed versions of some required modules.
+  - README.pod replaced by README.md.
+
+0.24 Wed Mar 15 12:21:04 MSK 2017
+  - Changes in POD
+  - Tests improved
+
+0.22 Fri Mar 3 12:54:03 MSK 2017
+  - Parameter "allow_slaves" now is off by default.
+  - Bugfix: the client was connecting to slave nodes when updating the cluster
+    map even if "allow_slaves" was off.
+
+0.20 Thu Mar 2 16:01:07 MSK 2017
+  - Connection to nodes become lazy. Also client do not connects to slave nodes
+    if "allow_slaves" is off.
+
+0.18 Sat Feb 25 17:05:19 MSK 2017
+  - Changed transaction logic. Now to perform transaction is necessary to get
+    master node using "nodes" method.
+  - Improved cluster discovery logic.
+  - Fixed logic for commands without keys.
+  - Added README.pod file instead of README file.
+
+0.16 Sat Jan 28 19:24:35 MSK 2017
+  - Fixes in POD.
+
+0.14 Sat Jan 28 19:11:37 MSK 2017
+  - Added method "nodes".
+  - Light refactoring and fixes in POD.
+
+0.12 Thu Dec 29 15:16:35 MSK 2016
+  - Fixed typo in POD.
+
+0.10 Sun Nov 20 19:48:30 MSK 2016
+  - Fixes in POD.
+  - Fixes in tests.
+  - Fixes in example script.
+  - Cosmetic changes in code.
+
+0.08 Fri Sep 2 18:17:52 MSK 2016
+  - "min_reconnect_interval" renamed to "reconnect_interval"
+
+0.06 Fri Sep 2 08:20:10 MSK 2016
+  - Improved command routing and transaction handling.
+  - Added public function "hash_slot()".
+  - Service functions now can be imported.
+  - Fixed transfer of parameters to AnyEvent::RipeRedis.
+
+0.04 Tue Aug 30 19:57:40 MSK 2016
+  - Tests improved.
+  - Minor changes in POD.
+
+0.02 Tue Aug 30 11:00:00 MSK 2016
+  - First release.

@@ -1,0 +1,115 @@
+<HTML>
+ <HEAD> 
+  <TITLE>ARSperl Utilities: WhoUsesIt</TITLE>
+ </HEAD> 
+ <BODY BGCOLOR="#FFFFFF">
+ <H2>WhoUsesIt</H2>
+
+ <H3> Purpose </H3>
+ This utility helps you figure out what schemas use a particular filter, active
+ link, menu, etc. It also will tell you what filters call a particular external
+ process or tell you what menus reference a particular file.
+ <P> This is fairly useful if you come across a file and are unsure whether
+ or not a filter or menu depends on it. 
+
+ <H3> Author </H3>
+ Jeff Murphy<BR>
+ <A HREF="mailto:jcmurphy@arsperl.org">jcmurphy@arsperl.org</A>
+
+ <H3> Usage </H3>
+
+ <PRE>
+ USAGE
+   WhoUsesIt.pl [-v] [-h] [-s schema] [-a | -f | -m | -e | -p | -M [name]] 
+                [username] [password]
+
+ DESCRIPTION
+   Search all schemas and determine who uses the specified active link,
+   filter, menu or escalation. 
+
+   -a   list all schemas that use this active link
+   -f   .. this filter
+   -m   .. this menu
+   -e   .. this escalation
+   -M   list all menus that use this file
+   -p   list all filters that call this process
+   -s   specify a specific schema to search
+   -v   verbose output
+   -h   get help on usage
+ </PRE>
+
+ <H3> Examples </H3>
+
+<B> First we'll see who is calling a particular external process. This is a 
+ substring match, so the file name of the process need only <I>contain</I>
+ the characters "mail_ip" to match. </B>
+
+<PRE>
+% ./WhoUsesIt.pl -p mail_ip
+Username: jcmurphy
+Password: 
+Searching for filters that call "mail_ip"...
+        PT-Mail IP List
+        SM-Mail IP List
+        TS-PTA-Mail_IP_List
+        TS-PTA-Mail_IP_List-OLD
+</PRE>
+
+<B> If we use the <CODE>-v</CODE> flag, we can see exactly where the external
+ program is located.</B>
+
+<PRE>
+% ./WhoUsesIt.pl -p mail_ip -v
+Username: jcmurphy
+Password: 
+Searching for filters that call "mail_ip"...
+        PT-Mail IP List
+                /usr/ars/c/PT/pt_mail_ip_list.pl "$536870913$" "$1$" 
+        SM-Mail IP List
+                /usr/ars/c/SM/sm_mail_ip_list "$1$" "$-1$" 
+        TS-PTA-Mail_IP_List
+                /usr/ars/c/ts_mail_ip_list.pl "$536870913$" "$-1$" "$1$" 2&#62;&1 
+        TS-PTA-Mail_IP_List-OLD
+                /usr/ars/c/ts_mail_ip_list "$536870913$" "$-1$" "$1$" 
+</PRE>
+
+<B>Now we can track down what schema uses the particular filter without going into
+the ARAdmin tool.</B>
+
+<PRE>
+% ./WhoUsesIt.pl -f "PT-Mail IP List"
+Username: jcmurphy
+Password: 
+Searching for Filter "PT-Mail IP List" in Schema ".*" ...
+        PT-Appends
+                PT-Mail IP List
+</PRE>
+
+<B>Next, we can see all the filters that the schema uses.</B>
+
+<PRE>
+% ./WhoUsesIt.pl -s "PT-Appends" -f .\*
+Username: jcmurphy
+Password: 
+Searching for Filter ".*" in Schema "PT-Appends" ...
+        PT-Appends
+                PT-Mail IP List
+                PT-Appends-SetSubNTime
+                PT-Appends-BadPNum
+        TS-PT-Appends
+                TS-PTA-BadItemNo
+                TS-PTA-Mail_IP_List-OLD
+                TS-PTA-SetViewers
+                TS-PTA-ChangeAppender
+                TS-PTA-BadAssignee
+                TS-PTA-Mail_to_IP_Flag-1
+                TS-PTA-Entity-Code-2
+                TS-PTA-ActionDate
+                TS-PTA-Entity-Code-1
+                TS-PTA-Mail_IP_List
+</PRE>
+
+ <HR>
+ <A HREF="mailto:arsperl@arsperl.org">arsperl@arsperl.org</A>
+ </BODY>
+</HTML>

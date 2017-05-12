@@ -1,0 +1,32 @@
+# @(#)SOLARIS_4_NEW_DEF	1.1  4/11/95 
+
+#################################################################
+############### acedb: R.Durbin and J.Thierry-Mieg ##############
+############### wmake/SOLARIS_4_OPT  April-15-1995 ##############
+#################################################################
+
+#################################################################
+########## Machine dependant compiler modification ##############
+########### for the Solaris OS                 ##################
+#################################################################
+########### This file is included by wmake/truemake #############
+######  Edit this file to adapt the ACeDB to a new machine ######
+#####   following the explanations given in wmake/truemake  #####
+#################################################################
+
+NAME = SOLARIS
+COMPILER = cc -xO4 -I/usr/openwin/include -DNO_LEFT_CASTING -DACEDB4
+LINKER = cc -L/usr/openwin/lib -R/usr/openwin/lib
+
+# -DWCS causes a problem, class versus Xlib.h
+LIBS = -lm  -lnsl -lsocket -lmalloc
+RANLIB_NEEDED = false
+AR_OPTIONS = ru
+RPCGEN_FLAGS = -b -I -K -1
+
+# -DWCS causes a problem, class versus Xlib.h
+# nsl is the rpc library 
+
+
+#################################################################
+#################################################################

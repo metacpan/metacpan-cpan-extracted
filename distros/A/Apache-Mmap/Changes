@@ -1,0 +1,34 @@
+Tue Aug 26 01:20:28 1997  Fletch  <lemur1@mindspring.com>
+
+0.05  Tue Sep  9 00:35:54 EDT 1997
+	- Moved everything from under plain RCS to CVS for better 
+	  release management.
+	- Upgraded my copy of perl 5.004_04.
+	- Fixed typo in eg/bench.pl (forgot a ',').
+	- Fixed typo in eg/bench2.pl and made it take # of test from
+	  command line.
+	- Added code to make Apache::Mmap::TIEHANDLE call the 
+	  Apache::Mmap::Handler::TIEHANDLE sub.  Had to hardcode
+	  the class in Apache::Mmap::Handler::TIEHANDLE to 
+	  'Apache::Mmap::Handler' rather than use what gets passed
+	  in by tie.
+	- Added eg/MmapHandler.pm example PerlHandler.  
+	- Added warning about mapping offsets on page boundaries on
+	  some platforms (Solaris at least) thanks to mail from Evan
+ 	  Champion.
+	
+0.04  Fri Aug 29 00:33:47 EDT 1997
+	- Added Apache::Mmap::Handler which profides TIEHANDLE
+	  interface to a mapped file.
+
+0.03  Wed Aug 27 14:34:42 EDT 1997
+	- Actual First public release. :)  
+	- Added a SIGBUS handler to test scripts.  
+	- Added README.  Expanded documentation in Mmap.pm.
+
+0.02  Tue Aug 26 01:20:45 EDT 1997
+	- First public release.
+
+0.01  Sat Aug 23 02:41:11 1997
+	- original version; created by h2xs 1.18
+

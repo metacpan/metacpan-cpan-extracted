@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+# PODNAME: pmdir
+# ABSTRACT: Shows the directory of a Perl module
+
+$|=1;
+
+use strict;
+use warnings;
+use App::pmdir;
+use Cwd;
+
+for (@ARGV) {
+  print(( App::pmdir::pmdir($_) || '.' )."\n");
+}
+
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+pmdir - Shows the directory of a Perl module
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+  bash$ cd $( pmdir Moose )
+
+=head1 DESCRIPTION
+
+B<pmdir> gives back the directory where the Perl Module is located, or it
+will just return B<.>, so that your directory will not be changed, if used
+in combination with B<cd>.
+
+=head1 SUPPORT
+
+IRC
+
+  Join #sycontent on irc.perl.org. Highlight Getty for fast reaction :).
+
+Repository
+
+  https://github.com/Getty/p5-app-pmdir
+  Pull request and additional contributors are welcome
+
+Issue Tracker
+
+  https://github.com/Getty/p5-app-pmdir/issues
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudss.us>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,82 @@
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use strict;
+use warnings;
+use File::Basename;
+use App::Caoliu;
+use Mojo::Log;
+use App::Caoliu::Utils 'dumper';
+use 5.010;
+use Getopt::Long;
+
+my $usage = <<EOF;
+$0 -c wuma -d . -v
+    -c category of 1024,if you want to add multi-category,like this:wuma,youma
+    -v verbose output
+    -p proxy,like go agent: 127.0.0.1:8087,default null
+    -i img option,set this will download the preview_imgs
+    -h display helps
+    -d the resource save dir,default to current path
+EOF
+
+my ( $category, $dir, $verbose, $log_path, $help, $image, $link, $proxy );
+
+GetOptions(
+    "category|c=s"  => \$category,
+    "directory|d=s" => \$dir,
+    "verbose|v"     => \$verbose,
+    "help|h"        => \$help,
+    "img|i"         => \$image,
+    "l|link=s"      => \$link,
+    "proxy|p=s"     => \$proxy,
+) or die $usage;
+
+if ($help) {
+    print $usage;
+    exit;
+}
+my @finds = grep { /wuma|youma|oumei/ } split( ',', $category ) if $category;
+my $c = App::Caoliu->new(proxy => '127.0.0.1:8087');
+if ($proxy) { $c->downloader->ua->http_proxy('http://sri:secret@'.$proxy) }
+if (@finds) { $c->category( [@finds] ); }
+if ($dir)   { $c->target($dir); }
+if ($verbose) {
+    $c->log->path('');
+    $c->log->level('debug');
+}
+else {
+    $c->log->level('info');
+}
+if ($link) {
+    my $post_href =
+      $c->parser->parse_post( $c->downloader->ua->get($link)->res->body );
+    say dumper($post_href) ;
+    my $file = $c->downloader->download_torrent( $post_href->{rmdown_link},
+        $c->target, { md5_dir => 0 } );
+    say dumper($post_href) if $verbose;
+    print "get $file success!\n";
+    exit;
+}
+if ( not @finds ) {
+    die "we now only support wuma,youma,oumei\n";
+}
+$c->log->debug( "I want to reap" . dumper( $c->category ) );
+my @posts = $c->reap;
+
+# if you want to see the image,just download image here
+if ($image) {
+    for (@posts) {
+        if ( $_->{bt} ) {
+            $c->downloader->download_image(
+                path => dirname( $_->{bt} ),
+                imgs => $_->{preview_imgs}
+            );
+        }
+    }
+}
+$c->log->debug( "got all file:" . dumper( \@posts ) );
+exit 0;
+__END__
+=pod
+=cut
+

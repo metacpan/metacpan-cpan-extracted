@@ -1,0 +1,17 @@
+PerlSwitches -I/home/rob/develop/App-ForExample/Eg/lib
+PerlModule Eg
+
+<VirtualHost *:80>
+
+    ServerName eg.localhost
+    ServerAlias www.eg.localhost
+
+    CustomLog "|/usr/bin/cronolog /home/rob/develop/App-ForExample/Eg/log/apache2-eg.localhost-%Y-%m.access.log -S /home/rob/develop/App-ForExample/Eg/log/apache2-eg.localhost.access.log" combined
+    ErrorLog "|/usr/bin/cronolog /home/rob/develop/App-ForExample/Eg/log/apache2-eg.localhost-%Y-%m.error.log -S /home/rob/develop/App-ForExample/Eg/log/apache2-eg.localhost.error.log"
+
+    <Location "">
+        SetHandler          modperl
+        PerlResponseHandler Eg
+    </Location>
+
+</VirtualHost>

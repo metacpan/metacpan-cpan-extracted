@@ -1,0 +1,156 @@
+=pod
+
+=begin html
+
+<a href="https://travis-ci.org/ivanwills/App-PS1"><img src="https://travis-ci.org/ivanwills/App-PS1.png" alt="App-PS1"></a>
+<a href="https://coveralls.io/r/ivanwills/App-PS1?branch=master"><img src="https://coveralls.io/repos/ivanwills/App-PS1/badge.svg?branch=master" alt="Coverage Status" /></a>
+
+=end html
+
+=head1 App-PS1
+
+Sick of the boring BASH shell command prompt, want more information displayedi
+L<App-PS1> does this.
+
+It provides a nice way of addind a line sepperator for your prompt which you
+can fill with various peices of information like the directory, status of the
+last command and more.
+
+The C<app-ps1> command displays the elements put into either C<$APP_PS1>
+environment variable or passed with C<--ps1> parameter. The elements are
+all calculated and if one more more has no content (eg branch, perl, node
+or ruby) it is removed and all the rest are show. If there is too much to
+display on the line (requires L<Term::Size::Any> or C<$PS1_COLS> environment
+variable to be set) the elements from the right are dropped until the line
+would fit.
+
+=head1 Examples
+
+   # in your ~/.bashrc file
+   export APP_PS1='face;branch;date;direcory;perl;node;ruby;uptime'
+   export PS1="\[\`app-ps1 -e\$?\`\]\n\u@\h \\\$ "
+
+Basic:
+
+=begin html
+
+<img src="https://ivanwills.github.io/App-PS1/img/ps1.png" alt="">
+
+=end html
+
+After running C<$ perlbrew use perl-bleed>
+
+=begin html
+
+<img src="https://ivanwills.github.io/App-PS1/img/ps1-perlbrew.png" alt="" />
+
+=end html
+
+After running C<$ nvm use v0.12.4>
+
+=begin html
+
+<img src="https://ivanwills.github.io/App-PS1/img/ps1-node.png" alt="" />
+
+=end html
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+Lots of environment variables are used to configure the command prompt
+
+=over 4
+
+=item C<$APP_PS1>
+
+Sets the elements to be displayed (overridden by C<--ps1>)
+
+Default 'face;branch;date;directory;uptime',
+
+=item C<$APP_PS1_THEME>
+
+Sets the colour theme for the prompt
+
+=over 4
+
+=item *
+
+default
+
+=item *
+
+green
+
+=item *
+
+blue
+
+=back
+
+Default 'default',
+
+=item C<$PS1_COLS>
+
+If L<Term::Size::Any> is not installed you can configure the width of your
+screen by setting this parameter.
+
+Default 90,
+
+=item C<$UNICODE_UNSAFE>
+
+If set to a true value this will allow UTF8 characters to be used displaying
+the prompt
+
+Default not set
+
+=item C<$APP_PS1_BACKGROUND>
+
+Set the line's background colour
+
+Default 52
+
+=back
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::PS1
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-PS1
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-PS1
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-PS1
+
+    Search CPAN
+        http://search.cpan.org/dist/App-PS1/
+
+    Source Code
+        git://github.com/ivanwills/App-PS1.git
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2014 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

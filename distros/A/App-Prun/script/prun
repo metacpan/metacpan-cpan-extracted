@@ -1,0 +1,129 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use Parallel::ForkManager;
+use App::Prun;
+use Getopt::Long;
+use File::Spec;
+
+my $me = (File::Spec->splitpath($0))[2];
+my $def_processes = get_parallel(2);
+
+exit main();
+
+sub usage {
+    print <<EOT;
+$me v$App::Prun::VERSION - run commands in parallel
+
+usage: $me [OPTIONS] [FILE]...
+
+Run commands, one per line, from either FILEs or stdin if no FILEs specified.
+
+Up to the defined number (-p) of commands will be run in parallel by forking
+and running a shell for each one.
+
+Each command is passed to perl's system() function to be executed. system() 
+may use your system's shell to run the command. See perldoc -f system.
+
+If --exit-on-failure is specified, and a command exits with a failed status, 
+$me will wait for any running children to complete then exit with an error
+without running any more commands.
+
+OPTIONS
+  -e, --exit-on-failure  exit the first time a command returns a failed status
+  -h, -?, --help         display this help
+  -p, --processes=<num>  run up to num processes at once (default: $def_processes)
+  -r  --report-failed    print a message to STDERR for each command that fails
+  -V, --version          print version and exit
+
+NOTES
+  Embedded newlines in any command will break this script as it stupidly
+  treats each line as a command without any special parsing.
+
+  Empty lines and comments (lines beginning with '#') are ignored.
+
+EXAMPLES
+  # Run tkprof against all .trc files in the current directory, run 32
+  # of them at a time.
+  for F in *.trc; do echo "tkprof \$F \${F%trc}txt"; done | $me -p 32
+
+  # Run all commands in a file (command_file), one line at a time.  Run
+  # the default number of processes in parallel ($def_processes).
+  # Ignore any failed processes, but do report to STDOUT any that fail.
+  $me -r command_file
+EOT
+    exit 1;
+}
+
+#
+# Try to find the number of CPUs on the system
+#
+sub get_parallel {
+    my $def_parallel = shift;
+    my $ret;
+
+    eval { require Sys::CPU };
+    unless ($@) {
+        $ret = Sys::CPU::cpu_count();
+        return $ret if $ret;
+    }
+
+    no warnings;
+    $ret = `nproc 2>/dev/null`;
+    use warnings;
+    if (defined $ret) {
+        chomp $ret;
+
+    } else {
+        open my $fh, '<', '/proc/cpuinfo' or return $def_parallel;
+        $ret = 0;
+        while (<$fh>) {
+            ++$ret if /^processor\s*:\s*[0-9]+/;
+        }
+        close $fh;
+    }
+
+    $ret && $ret > 0 ? $ret : $def_parallel;
+}
+
+sub get_opts {
+    my %opts;
+
+    Getopt::Long::Configure('bundling');
+
+    GetOptions (\%opts,
+                'exit_on_failure|exit-on-failure|e',
+                'help|h|?',
+                'processes|p=i',
+                'report_failed|report-failed|r',
+                'test_dump|test-dump',
+                'version|V',
+               ) or usage();
+
+    if ($opts{version}) {
+        print "$me v$App::Prun::VERSION\n";
+        exit 0;
+    }
+
+    usage() if $opts{help};
+
+    $opts{processes} //= $def_processes;
+
+    %opts;
+}
+
+sub main {
+    my %opts = get_opts();
+
+    my $ar = App::Prun->new(
+        pm => Parallel::ForkManager->new($opts{processes}),
+        report_failed_procs => $opts{report_failed},
+        exit_on_failed_proc => $opts{exit_on_failure},
+    );
+
+    $ar->_test_dump if $opts{test_dump};
+    
+    $ar->run_command($_) while (<>);
+    $ar->done;
+}

@@ -1,0 +1,19 @@
+This distribution contains the code that I desribed in my talk about
+
+  Seamless Publishing on the Web
+
+on the O'Reilly Perl Conference, 2.0, on August 20th, 1998. The slides
+of the talk are in the directory perl-conf-1998.
+
+Code is not polished and catastrophically underdocumented, but several
+people at the conference have expressed urgent desire for an upload,
+so please be patient if you can't use it, look into the code or wait
+until I come around to write some docu.
+
+If you are clueful enough to understand the code, please consider
+taking over the whole module/application. It's mainly a proof of
+concept implementation and it works fine for us. So I probably won't
+be able to support it as much as I would like.
+
+Enjoy,
+andreas koenig

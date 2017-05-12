@@ -1,0 +1,17 @@
+TYPEMAP
+ARControlStruct *	T_PTROBJ
+ARQualifierStruct *	T_PTROBJ
+ARPropList *		T_PTROBJ
+ARInternalId		T_IV
+ARBoolean		T_IV
+ARTimestamp		T_IV
+NTBoolean		T_IV
+NTPortAddr		T_IV
+ARAccessNameType	T_CAR
+ARNameType		T_CAR
+ARServerNameType	T_CAR
+
+INPUT
+T_CAR
+	strncpy($var, SvPV($arg, PL_na), sizeof($type))
+

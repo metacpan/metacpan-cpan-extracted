@@ -1,0 +1,58 @@
+Welcome to Audio::DB
+
+Overview:
+Audio::DB lets you quickly build and query relational 
+databases of audio collections.  It currently supports
+MySQL and SQL lite databases.  Let me know if you are
+interested in adding support for other databases. The schema
+is complete and robust and can easily be extended.
+
+For more information on the API see:
+
+  % perldoc Audio::DB
+
+Building databases:
+Audio::DB can build databases from ID3 meta tags, from
+custom tab-separated flat files, or from XMLized files
+such as those created by iTunes.  Note that due to my
+own needs and usage, creating databases from flat or
+xml-ized files is the most robust approach. If you'd like
+to test / debug creating libraries directly from tags,
+please let me know.
+
+For more information on the schema see
+
+  % perldoc Audio::DB::Adaptor::dbi::mysql
+
+Querying and reports:
+Want to find artists that fall in more than one genre?  
+Would you like to see the distribution of your collection by 
+year (as  a purty GD-generate histogram)?  No problem! 
+Audio::DB includes a number of report generating modules
+for querying and fetching statistics on your collection.
+
+For more information see:
+
+  % perldoc Audio::DB::Reports
+  % perldoc Audio::DB::Query
+
+Web-based visualization:
+Audio::DB has a rudimentary web-based interface.
+
+
+Quick Start
+-----------
+You know the drill.
+
+ % perl Makefile.PL
+ % make
+ % sudo make install 
+
+See the scripts in bin/ for some examples on building and
+querying your collection.
+
+
+Happy listening!
+
+Todd Harris
+harris@cshledu

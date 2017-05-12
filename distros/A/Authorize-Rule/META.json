@@ -1,0 +1,71 @@
+{
+   "abstract" : "Rule-based authorization mechanism",
+   "author" : [
+      "Sawyer X <xsawyerx@cpan.org>",
+      "Mickey Nasriachi <mickey@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Authorize-Rule",
+   "no_index" : {
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/xsawyerx/authorize-rule/issues"
+      },
+      "repository" : {
+         "url" : "http://github.com/xsawyerx/authorize-rule"
+      }
+   },
+   "version" : "0.009",
+   "x_serialization_backend" : "JSON::XS version 3.01"
+}
+

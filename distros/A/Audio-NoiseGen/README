@@ -1,0 +1,38 @@
+This is some fun I'm having at generating sound with perl.
+
+------
+
+When it comes down to it, digital sound can be represented as a
+series of floating numbers from -1 to 1. These correspond to the
+physical position of your speaker. Quite literally, -1 is when your
+speaker is pulled in on itself, 1 is when it is pushed out as far as
+it will go, and 0 is when it is in the middle.
+
+Each of these numbers is called a "sample". Since it is represented
+as a digital floating point it has a fixed number of bits. Old
+nintendos were 8-bit, for example. I typically work with 32-bit.
+
+The speed that you send these samples to a speaker is the "sample
+rate". For example, a CD uses 44,100 samples per second.
+
+So what we have to do is simple! Just generate these numbers and
+shove them out to the speaker at the correct speed.
+
+I'm using Audio::PortAudio which makes this easy, as far as the
+speed goes. If I send it numbers too fast then it will block me from
+sending more until it is ready. If I send them too slow, however, I
+just get nasty noise from my speakers :)
+
+So now we need to figure out what samples to send.
+
+The basic concept is that of "unit generators", which are pretty
+much the foundation for how digital sound was originally created,
+and how it is often still created. The idea is to make a function,
+so that each time you call the function you get the next sample.
+
+But to make them more interesting, you "instantiate" each generator
+by calling a function, which returns the generator. This initial
+call can have all sorts of parameters and such.
+
+...
+

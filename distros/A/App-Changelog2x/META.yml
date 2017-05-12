@@ -1,0 +1,33 @@
+---
+name: App-Changelog2x
+version: 0.11
+author:
+  - 'Randy J. Ray <rjray@blackperl.com>'
+abstract: A script to generate XHTML and text from ChangeLogML XML
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Module::Build: 0.28
+  Test::More: 0.80
+requires:
+  DateTime: 0.45
+  DateTime::Format::ISO8601: 0.06
+  Exporter: 5.57
+  File::Spec: 0.8
+  XML::LibXML: 1.60
+  XML::LibXSLT: 1.60
+  perl: 5.008
+recommends:
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  Module::Build: 0.34
+provides:
+  App::Changelog2x:
+    file: lib/App/Changelog2x.pm
+    version: 0.11
+generated_by: Module::Build version 0.34
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

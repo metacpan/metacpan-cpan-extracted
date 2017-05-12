@@ -1,0 +1,6 @@
+{
+    "patches": [
+        { "id":"sakila", "file": "patches/sakila1.sql"},
+        { "id":"sakila_more", "file": "patches/sakila2.sql" }
+    ]
+}

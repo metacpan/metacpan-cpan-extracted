@@ -1,0 +1,394 @@
+#!/usr/bin/env perl
+use 5.010001;
+use warnings;
+use strict;
+
+our $VERSION = 'v1.0.0';
+
+use File::Temp qw( tempdir );
+use Getopt::Long qw(:config bundling);
+
+## no critic (ProhibitLeadingZeros)
+use constant MODE_SOCK  => 0140000;
+use constant MODE_LINK  => 0120000;
+use constant MODE_REG   => 0100000;
+use constant MODE_BLK   => 0060000;
+use constant MODE_DIR   => 0040000;
+use constant MODE_CHR   => 0020000;
+use constant MODE_FIFO  => 0010000;
+
+use constant PERM_FILE  => 0666 & ~ umask;
+use constant PERM_DIR   => 0777 & ~ umask;
+use constant PERM_ALL   => 07777;
+## use critic (ProhibitLeadingZeros)
+## no critic (RequireCarping)
+
+use constant USAGE => <<"EOUSAGE";
+Usage: $0 [options] /dir1 /dir2
+ -o, --output=pathname      Output differences to files with names starting
+                            with "pathname" (use "powerdiff" by default).
+ -f, --exclude-from=file    File with perl regexes to exclude from diff (one
+                            regex per line).
+ -x, --exclude=regex        Perl regex to exclude from diff (this option can
+                            be used multiple times).
+ -h, --help                 Show this screen.
+     --version              Show version and exit.
+
+Will prepare diff between given two directories and store in up to 4 files:
+    powerdiff.pre.sh
+    powerdiff.patch
+    powerdiff.tgz
+    powerdiff.post.sh
+EOUSAGE
+
+my (@SH_POST, @SH_PRE, @REGULAR, @TAR);
+my $EXCLUDE;
+
+main() if !caller;
+
+
+sub main { ## no critic (ProhibitExcessComplexity)
+    my $output = 'powerdiff';
+    my (@exclude, $exclude_from);
+    GetOptions(
+        'output|o=s'        => \$output,
+        'exclude-from|f=s'  => \$exclude_from,
+        'exclude|x=s'       => \@exclude,
+        'help|h'            => sub { warn USAGE; exit 1 },
+        'version'           => sub { warn "powerdiff $VERSION\n"; exit 1 },
+    ) and @ARGV == 2 or die USAGE;
+    my ($dir1, $dir2) = @ARGV;
+    die "not a directory: $_\n" for grep {!-d} $dir1, $dir2;    ## no critic (ProhibitPostfixControls)
+    chomp(my $cwd = `pwd`);
+    $dir1 = "$cwd/$dir1" if $dir1 !~ m{\A/}xms;                 ## no critic (ProhibitPostfixControls)
+    $dir2 = "$cwd/$dir2" if $dir2 !~ m{\A/}xms;                 ## no critic (ProhibitPostfixControls)
+    if (defined $exclude_from) {
+        open my $f, '<', $exclude_from or die "can't open '$exclude_from': $!\n";
+        chomp(my @regex = <$f>);
+        close $f or die "close: $!";
+        push @exclude, @regex;
+    }
+
+    $EXCLUDE = join q{|}, qr/\A\z/ms, map {qr/$_/xms} grep {$_ ne q{}} @exclude; ## no critic (ProhibitFixedStringMatches)
+
+    my ($f1, $f2) = (load_dir($dir1, q{.}), load_dir($dir2, q{.}));
+    diff_dir(q{.}, $f1, $f2);
+
+    my $dir4diff = tempdir( CLEANUP => 1 );
+    mkdir "$dir4diff/old" or die "mkdir: $!";
+    mkdir "$dir4diff/new" or die "mkdir: $!";
+    my %seendir = (q{.} => 1);
+    for my $path (@REGULAR) {
+        while ($path =~ m{\A(.*\G[^/]+)/}xmsg) {
+            next if $seendir{$1}++;
+            mkdir "$dir4diff/old/$1" or die "mkdir: $!";
+            mkdir "$dir4diff/new/$1" or die "mkdir: $!";
+        }
+        if (-f "$dir1/$path" && ! -l "$dir1/$path") {
+            symlink "$dir1/$path", "$dir4diff/old/$path" or die "symlink: $!";
+        }
+        if (-f "$dir2/$path" && ! -l "$dir2/$path") {
+            symlink "$dir2/$path", "$dir4diff/new/$path" or die "symlink: $!";
+        }
+    }
+    my $patch = `cd \Q$dir4diff\E; LANG= diff -uNr old new`;
+    while ($patch =~ s/^([^d@\\ +-][^\n]*)\n//ms) {
+        my $msg = $1;
+        if ($msg =~ /\bFiles old\/[^\n]* and new(\/[^\n]*) differ\z/ims) {
+            push @TAR, $1;
+        }
+        else {
+            warn "WARNING: $msg\n";
+        }
+    }
+
+    for my $ext (qw( pre.sh post.sh patch tgz )) {
+        unlink "$output.$ext";
+    }
+    if (@SH_PRE) {
+        output("$output.pre.sh",  join q{}, map {"$_\n"} '#!/bin/sh', @SH_PRE);
+    }
+    if (@SH_POST) {
+        output("$output.post.sh", join q{}, map {"$_\n"} '#!/bin/sh', @SH_POST);
+    }
+    if ($patch ne q{}) {
+        output("$output.patch", $patch);
+    }
+    if (@TAR) {
+        my $TAR = (grep {-x "$_/gtar"} split /:/ms, $ENV{PATH}) ? 'gtar' : 'tar';
+        system $TAR, 'czf', "$output.tgz", '-C', $dir2, map { substr $_, 1 } @TAR;
+    }
+    return;
+}
+
+sub output {
+    my ($file, $data) = @_;
+    open my $f, '>', $file or die "open $file: $!";
+    print {$f} $data;
+    close $f or die "close: $!";
+    return;
+}
+
+sub change_mode {
+    my ($dir, $name, $m1, $m2) = @_;
+    my $pathname = quote_path("$dir/$name");
+    if (($m1 & PERM_ALL) != ($m2 & PERM_ALL)) {
+        my $prev  = sprintf '%04o', $m1 & PERM_ALL;
+        my $perms = sprintf '%04o', $m2 & PERM_ALL;    # TODO use text form?
+        my $m = $m2 & ~PERM_ALL;
+        if ($m == MODE_DIR) {
+            push @SH_POST, "chmod $perms $pathname/  # was $prev";
+        }
+        elsif ($m == MODE_FIFO || $m == MODE_REG) {
+            push @SH_POST, "chmod $perms $pathname   # was $prev";
+        }
+    }
+    return;
+}
+
+sub add {
+    my ($dir, $name, $n) = @_;
+    my $pathname = quote_path("$dir/$name");
+    my $m = $n->{mode} & ~PERM_ALL;
+    warn "add: $dir/$name mode=$m\n";
+    if ($m == MODE_DIR) {
+        push @SH_PRE, "mkdir $pathname/";
+        diff_dir("$dir/$name", {}, $n->{dir});
+    }
+    elsif ($m == MODE_FIFO) {
+        push @SH_PRE, "mkfifo $pathname";
+    }
+    elsif ($m == MODE_LINK) {
+        my $to = quote_path($n->{link});
+        push @SH_PRE, "ln -s $to $pathname";
+    }
+    elsif ($m == MODE_REG) {
+        if ($n->{size} == 0) {
+            push @SH_PRE, "touch $pathname";
+        }
+        else {
+            push @REGULAR, "$dir/$name";
+        }
+    }
+    # WARNING   if different systems has different umask setting this may
+    #           result in different permissions after applying patch
+    # WARNING   change_mode() will be called even for ignored file types
+    change_mode($dir, $name, $m == MODE_DIR ? PERM_DIR : PERM_FILE, $n->{mode});
+    # ignored: MODE_BLK, MODE_CHR, MODE_SOCK
+    return;
+}
+
+sub del {
+    my ($dir, $name, $n) = @_;
+    my $pathname = quote_path("$dir/$name");
+    my $m = $n->{mode} & ~PERM_ALL;
+    if ($m == MODE_DIR) {
+        push @SH_PRE, "rm -rf $pathname/";
+    }
+    elsif ($m == MODE_LINK || $m == MODE_FIFO || $m == MODE_REG) {
+        push @SH_PRE, "rm -f $pathname";
+    }
+    # ignored: MODE_BLK, MODE_CHR, MODE_SOCK
+    return;
+}
+
+sub mod {
+    my ($dir, $name, $n1, $n2) = @_;
+    my $pathname = quote_path("$dir/$name");
+    my $m = $n1->{mode} & ~PERM_ALL;
+    if ($m == MODE_DIR) {
+        diff_dir("$dir/$name", $n1->{dir}, $n2->{dir});
+    }
+    elsif ($m == MODE_LINK) {
+        if ($n1->{link} ne $n2->{link}) {
+            my $to = quote_path($n2->{link});
+            push @SH_PRE, "ln -nfs $to $pathname";
+        }
+    }
+    elsif ($m == MODE_REG) {
+        push @REGULAR, "$dir/$name";
+    }
+    elsif ($m == MODE_FIFO) {
+        # do nothing
+    }
+    # WARNING   change_mode() will be called even for ignored file types
+    change_mode($dir, $name, $n1->{mode}, $n2->{mode});
+    # ignored: MODE_BLK, MODE_CHR, MODE_SOCK
+    return;
+}
+
+sub diff_dir {
+    my ($dir, $f1, $f2) = @_;
+    my %names = map {$_=>1} keys %{$f1}, keys %{$f2};
+    for my $name (keys %names) {
+        my $n1 = $f1->{$name};
+        my $n2 = $f2->{$name};
+        if (!defined $n1) {
+            add($dir, $name, $n2);
+        }
+        elsif (!defined $n2) {
+            del($dir, $name, $n1);
+        }
+        else {
+            if ($n1->{mode} >> 12 == $n2->{mode} >> 12) { ## no critic (ProhibitMagicNumbers)
+                mod($dir, $name, $n1, $n2);
+            }
+            else {
+                del($dir, $name, $n1);
+                add($dir, $name, $n2);
+            }
+        }
+    }
+    return;
+}
+
+sub load_dir {
+    my ($dir, $reldir) = @_;
+    my %f;
+    if (!opendir my $d, $dir) {
+        warn "can't open dir '$dir': $!";
+    }
+    else {
+        for my $name (readdir $d) {
+            next if $name eq q{.} || $name eq q{..};
+            my $path = "$dir/$name";
+            my $relpath = "$reldir/$name";
+            next if $relpath =~ /$EXCLUDE/mso;
+            my $f = $f{$name} = {};
+
+            # sockets not supported
+            # hard links not supported
+            # device files not supported
+            # user/group not supported
+            # atime/mtime not supported
+            # extended attributes not supported
+            # acl not supported
+            @{$f}{'mode','size'} = (lstat $path)[2,7]; ## no critic (ProhibitMagicNumbers)
+            my $m = $f->{mode} & ~PERM_ALL;
+            if ($m == MODE_DIR) {
+                $f->{dir} = load_dir($path, $relpath);
+            }
+            elsif ($m == MODE_LINK) {
+                $f->{link} = readlink $path;
+                die "readlink: $!" if !defined $f->{link};
+            }
+        }
+        closedir $d or die "closedir: $!";
+    }
+    return \%f;
+}
+
+sub quote_path {
+    my ($path) = @_;
+    $path = quotemeta $path;
+    $path =~ s{\\([/,._-])}{$1}xmsg;    # unquote safe chars for readability
+    return $path;
+}
+
+
+1;
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+powerdiff - Prepare a diff between two given directories
+
+
+=head1 SYNOPSIS
+
+  powerdiff [options] /dir1 /dir2
+
+
+=head1 DESCRIPTION
+
+Will prepare a diff between two given directories and store in up to 4 files:
+
+    powerdiff.pre.sh
+    powerdiff.patch
+    powerdiff.tgz
+    powerdiff.post.sh
+
+This combination of files allows to store differences in any possible
+directory content in ease to review and apply format.
+
+This tool was designed to support any possible file/dir attributes - empty
+files and directories, their permissions, special files like fifo, etc.
+
+
+=head1 OPTIONS
+
+  -o, --output=pathname      Output differences to files with names starting
+                             with "pathname" (use "powerdiff" by default).
+  -f, --exclude-from=file    File with perl regexes to exclude from diff (one
+                             regex per line).
+  -x, --exclude=regex        Perl regex to exclude from diff (this option can
+                             be used multiple times).
+  -h, --help                 Show this screen.
+      --version              Show version and exit.
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/powerdiff/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/powerdiff>
+
+    git clone https://github.com/powerman/powerdiff.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=App-powerdiff>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/App-powerdiff>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/App-powerdiff>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=App-powerdiff>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/App-powerdiff>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros E<lt>powerman@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2009-2013 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+
+=head1 SEE ALSO
+
+
+=cut

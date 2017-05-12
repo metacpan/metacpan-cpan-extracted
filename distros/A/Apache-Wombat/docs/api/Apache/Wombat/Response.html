@@ -1,0 +1,195 @@
+<HTML>
+<HEAD>
+<TITLE>Apache::Wombat::Response - Apache connector response class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#package methods">PACKAGE METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Apache::Wombat::Response - Apache connector response class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Apache connector response class. Extends
+<STRONG>Wombat::Connector::HttpResponseBase</STRONG>. Overrides many superclass
+methods to delegate to an underlying <STRONG>Apache::Request</STRONG> instance.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new($apr)</CODE></A></STRONG><BR>
+<DD>
+Create and return an instance, initializing fields to default values.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24apr">$apr</A></STRONG><BR>
+<DD>
+a <STRONG>Apache::Request</STRONG> instance representing the Apache request record
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_addDateHeader">addDateHeader($name, $date)</A></STRONG><BR>
+<DD>
+Add a date value for the named response header to the <STRONG>Apache</STRONG>
+headers_out table.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24name">$name</A></STRONG><BR>
+<DD>
+the name of the response header
+<P></P>
+<DT><STRONG><A NAME="item_%24date">$date</A></STRONG><BR>
+<DD>
+the additional header value, as the number of seconds since the epoch
+<P></P></DL>
+<DT><STRONG><A NAME="item_setDateHeader">setDateHeader($name, $date)</A></STRONG><BR>
+<DD>
+Set the date value for the named response header in the <STRONG>Apache</STRONG>
+headers_out table.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name of the header
+<P></P>
+<DT><STRONG>$date</STRONG><BR>
+<DD>
+the header value, as the number of seconds since the epoch
+<P></P></DL>
+<DT><STRONG><A NAME="item_addHeader">addHeader($name, $value)</A></STRONG><BR>
+<DD>
+Add a value for the named response header to the <STRONG>Apache</STRONG> headers_out
+table.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the parameter name
+<P></P>
+<DT><STRONG><A NAME="item_%24value">$value</A></STRONG><BR>
+<DD>
+the parameter value, scalar
+<P></P></DL>
+<DT><STRONG><A NAME="item_getHeader"><CODE>getHeader($name)</CODE></A></STRONG><BR>
+<DD>
+Return the first value for the named response header from the Apache
+headers_out table.
+<P></P>
+<DT><STRONG><A NAME="item_getHeaderNames"><CODE>getHeaderNames()</CODE></A></STRONG><BR>
+<DD>
+Return the names of all the response headers from the <STRONG>Apache</STRONG>
+headers_out table.
+<P></P>
+<DT><STRONG><A NAME="item_getHeaders"><CODE>getHeaders($name)</CODE></A></STRONG><BR>
+<DD>
+Return the list of values for the named response header from the
+Apache headers_out table.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the header name
+<P></P></DL>
+<DT><STRONG><A NAME="item_setHeader">setHeader($name, $value)</A></STRONG><BR>
+<DD>
+Set the value for the named response header in the <STRONG>Apache</STRONG>
+headers_out table.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name of the response header
+<P></P>
+<DT><STRONG>$value</STRONG><BR>
+<DD>
+the header value
+<P></P></DL>
+<DT><STRONG><A NAME="item_clearHeaders"><CODE>clearHeaders()</CODE></A></STRONG><BR>
+<DD>
+Unset all response headers from the <STRONG>Apache</STRONG> headers_out table.
+<P></P>
+<DT><STRONG><A NAME="item_getStatus"><CODE>getStatus()</CODE></A></STRONG><BR>
+<DD>
+Return the HTTP status code for this Response.
+<P></P>
+<DT><STRONG><A NAME="item_setStatus"><CODE>setStatus($code)</CODE></A></STRONG><BR>
+<DD>
+Set the status code for this response.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24code">$code</A></STRONG><BR>
+<DD>
+the HTTP status code
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="package methods">PACKAGE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_sendHeaders"><CODE>sendHeaders()</CODE></A></STRONG><BR>
+<DD>
+Direct Apache API to send a response header, committing the
+response. Usually doesn't need to be called by other classes, but will
+be called the first time the buffer is flushed.
+<P></P>
+<DT><STRONG><A NAME="item_getRequestRec"><CODE>getRequestRec()</CODE></A></STRONG><BR>
+<DD>
+Return the Apache request record for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_setRequestRec"><CODE>setRequestRec($apr)</CODE></A></STRONG><BR>
+<DD>
+Set the Apache request record for this Request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$apr</STRONG><BR>
+<DD>
+the <STRONG>Apache::Request</STRONG> instance
+<P></P></DL>
+<DT><STRONG><A NAME="item_recycle"><CODE>recycle()</CODE></A></STRONG><BR>
+<DD>
+Release all object references and initialize instances variables in
+preparation for use or reuse of this object.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><EM>Apache</EM>,
+<A HREF="../../../api/Apache/Request.html">the Apache::Request manpage</A>,
+<A HREF="../../../api/Apache/Table.html">the Apache::Table manpage</A>,
+<A HREF="../../../api/Apache/Util.html">the Apache::Util manpage</A>,
+<A HREF="../../../api/Wombat/Connector/HttpResponseBase.html">the Wombat::Connector::HttpResponseBase manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

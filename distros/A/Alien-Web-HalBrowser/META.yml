@@ -1,0 +1,24 @@
+---
+abstract: 'Perl distribution for hal-browser sources'
+author:
+  - 'Mike Kelly'
+  - 'Henry Van Styn <vanstyn@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  File::ShareDir::Install: 0.06
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-Web-HalBrowser
+requires:
+  Alien::Web: 1.0
+  parent: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://github.com/vanstyn/Alien-Web-HalBrowser.git
+version: 1.0

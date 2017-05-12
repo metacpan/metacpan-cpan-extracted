@@ -1,0 +1,121 @@
+---
+abstract: A persistence framework for session data
+author:
+  - 'Casey West <casey[at]geeknest.com>'
+build_requires:
+  Test::Deep: 0.082
+  Test::Exception: 0.15
+  Test::More: 0.47
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.131490'
+keywords:
+  - CGI
+  - session
+  - web
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Apache-Session
+provides:
+  Apache::Session:
+    file: lib/Apache/Session.pm
+    version: 1.93
+  Apache::Session::DB_File:
+    file: lib/Apache/Session/DB_File.pm
+    version: 1.01
+  Apache::Session::File:
+    file: lib/Apache/Session/File.pm
+    version: 1.54
+  Apache::Session::Flex:
+    file: lib/Apache/Session/Flex.pm
+    version: 1.01
+  Apache::Session::Generate::MD5:
+    file: lib/Apache/Session/Generate/MD5.pm
+    version: 2.12
+  Apache::Session::Generate::ModUniqueId:
+    file: lib/Apache/Session/Generate/ModUniqueId.pm
+    version: 0.02
+  Apache::Session::Generate::ModUsertrack:
+    file: lib/Apache/Session/Generate/ModUsertrack.pm
+    version: 0.02
+  Apache::Session::Informix:
+    file: lib/Apache/Session/Informix.pm
+    version: 1.01
+  Apache::Session::Lock::File:
+    file: lib/Apache/Session/Lock/File.pm
+    version: 1.04
+  Apache::Session::Lock::MySQL:
+    file: lib/Apache/Session/Lock/MySQL.pm
+    version: 1.01
+  Apache::Session::Lock::Null:
+    file: lib/Apache/Session/Lock/Null.pm
+    version: 1.01
+  Apache::Session::Lock::Semaphore:
+    file: lib/Apache/Session/Lock/Semaphore.pm
+    version: 1.04
+  Apache::Session::Lock::Sybase:
+    file: lib/Apache/Session/Lock/Sybase.pm
+    version: 1.00
+  Apache::Session::MySQL:
+    file: lib/Apache/Session/MySQL.pm
+    version: 1.01
+  Apache::Session::MySQL::NoLock:
+    file: lib/Apache/Session/MySQL/NoLock.pm
+    version: 0.01
+  Apache::Session::Oracle:
+    file: lib/Apache/Session/Oracle.pm
+    version: 1.01
+  Apache::Session::Postgres:
+    file: lib/Apache/Session/Postgres.pm
+    version: 1.01
+  Apache::Session::Serialize::Base64:
+    file: lib/Apache/Session/Serialize/Base64.pm
+    version: 1.01
+  Apache::Session::Serialize::Storable:
+    file: lib/Apache/Session/Serialize/Storable.pm
+    version: 1.01
+  Apache::Session::Serialize::Sybase:
+    file: lib/Apache/Session/Serialize/Sybase.pm
+    version: 1.00
+  Apache::Session::Serialize::UUEncode:
+    file: lib/Apache/Session/Serialize/UUEncode.pm
+    version: 1.01
+  Apache::Session::Store::DBI:
+    file: lib/Apache/Session/Store/DBI.pm
+    version: 1.02
+  Apache::Session::Store::DB_File:
+    file: lib/Apache/Session/Store/DB_File.pm
+    version: 1.01
+  Apache::Session::Store::File:
+    file: lib/Apache/Session/Store/File.pm
+    version: 1.04
+  Apache::Session::Store::Informix:
+    file: lib/Apache/Session/Store/Informix.pm
+    version: 1.02
+  Apache::Session::Store::MySQL:
+    file: lib/Apache/Session/Store/MySQL.pm
+    version: 1.04
+  Apache::Session::Store::Oracle:
+    file: lib/Apache/Session/Store/Oracle.pm
+    version: 1.10
+  Apache::Session::Store::Postgres:
+    file: lib/Apache/Session/Store/Postgres.pm
+    version: 1.03
+  Apache::Session::Store::Sybase:
+    file: lib/Apache/Session/Store/Sybase.pm
+    version: 1.01
+  Apache::Session::Sybase:
+    file: lib/Apache/Session/Sybase.pm
+    version: 1.00
+requires:
+  Digest::MD5: 0
+  File::Temp: 0
+  IO::File: 0
+  Storable: 0.6
+  constant: 0
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/chorny/Apache-Session
+version: 1.93

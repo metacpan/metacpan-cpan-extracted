@@ -1,0 +1,37 @@
+---
+abstract: 'Alien module for gputils from http://gputils.sourceforge.net'
+author:
+  - 'Vikas N. Kumar <vikas@cpan.org>'
+build_requires:
+  Alien::Base::ModuleBuild: '0.006'
+  Alien::bison: '0'
+  Capture::Tiny: '0'
+  Module::Build: '0'
+  Test::More: '0'
+configure_requires:
+  Alien::Base: '0.006'
+  Alien::Base::ModuleBuild: '0.006'
+  Alien::bison: '0'
+  Capture::Tiny: '0'
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4207, CPAN::Meta::Converter version 2.143240'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-gputils
+provides:
+  Alien::gputils:
+    file: lib/Alien/gputils.pm
+    version: '0.08'
+requires:
+  Alien::Base: '0.006'
+  File::ShareDir: '1.00'
+  File::Spec: '0'
+  File::Which: '0'
+resources:
+  bugtracker: https://github.com/selectiveintellect/p5-alien-gputils/issues
+  license: http://www.apache.org/licenses/LICENSE-1.1
+  repository: https://github.com/selectiveintellect/p5-alien-gputils
+version: '0.08'

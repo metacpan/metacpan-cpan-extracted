@@ -1,0 +1,29 @@
+Revision history for Acme-MetaSyntactic-buzzwords
+
+High-level changelog
+====================
+
+1.0x  module readyness
+0.0x  initial releases
+
+
+Low-level changelog
+===================
+
+1.00 Mon Nov 26 13:51:52 CET 2007
+ - new test file for kwalitee
+ - kwalitee/cpants release
+
+**
+
+0.03 Thu Aug  9 17:52:17 CEST 2007
+ - fixed typo caught by rgs
+
+0.02 Thu Aug  9 11:38:36 CEST 2007
+ - pod complete
+ - real buzzwords taken from http://en.wikipedia.org/wiki/List_of_buzzwords
+ - theme now complete waiting for review before hitting 1.0
+
+0.01 Thu Aug  9 11:00:39 CEST 2007
+ - initial release
+

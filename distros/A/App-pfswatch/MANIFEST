@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+bin/pfswatch
+cpanfile
+lib/App/pfswatch.pm
+minil.toml
+t/00_compile.t
+t/01_parse_argv.t
+t/02_ignored_pattern.t
+t/03_new.t
+META.yml
+MANIFEST

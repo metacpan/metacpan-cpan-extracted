@@ -1,0 +1,31 @@
+[%# Astro::App::Satpass2 template to render TLE data in a format
+    appropriate for loading into Stellarium planetarium software. To
+    use, load the TLE data, then do
+
+    satpass2> formatter format eg/tle_stellarium.tt
+
+    -%]
+[% UNLESS data %]
+    [%- SET data = sp.tle( arg ) %]
+[%- END -%]
+{
+	"creator": "[% provider %]",
+	"hintColor": [0.4, 0.4, 0.4],
+	"satellites":
+	{
+[% FOREACH item IN data %][% prefix %]
+		[%- tle = item.tle.split( "\n" ) %]
+		"[% item.name( missing = 'oid', width = '' ) %]":
+		{
+			"comms": [],
+			"groups": [],
+			"hintColor": [0.3, 0.2, 0],
+			"orbitVisible": false,
+			"tle1": "[% tle.-2 %]",
+			"tle2": "[% tle.-1 %]",
+			"visible": true
+		}
+[%- prefix = ',' %][% END %]
+	},
+	"shortName": "satellite orbital data"
+}

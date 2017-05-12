@@ -1,0 +1,4 @@
+#severity    = brutal
+exclude	    = TestingAndDebugging::RequireUseStrict
+# RequireUseStrict is a good policy, but sadly it doesn't play well with
+# dzil's Pod::Weaver plugin.

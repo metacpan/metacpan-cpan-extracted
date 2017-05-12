@@ -1,0 +1,35 @@
+---
+abstract: 'Command-Line Shared Password Store'
+author:
+  - 'Oliver Gorwits <oliver@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-passmanager
+requires:
+  Curses: 0
+  Curses::UI: 0
+  File::Path: 0
+  Git::Wrapper: 0
+  GnuPG::Interface: 0
+  IO::File: 0
+  IO::Handle: 0
+  Moose: 0
+  Moose::Role: 0
+  MooseX::App::Cmd: 0
+  MooseX::App::Cmd::Command: 0
+  Scalar::Util: 0
+  XML::Simple: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-passmanager
+  homepage: https://github.com/ollyg/App-passmanager/wiki
+  repository: git://github.com/ollyg/App-passmanager.git
+version: 1.113580

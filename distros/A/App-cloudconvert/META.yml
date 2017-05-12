@@ -1,0 +1,37 @@
+---
+abstract: 'Convert files via cloudconvert.org'
+author:
+  - 'Jakob Voß <jakob.voss@gbv.de>'
+build_requires:
+  Test::More: 0.96
+configure_requires:
+  Module::Build::Tiny: 0.038
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-cloudconvert
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Getopt::Long: 0
+  HTTP::Request::Common: 0
+  JSON::PP: 0
+  LWP: 0
+  Pod::Usage: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/nichtich/App-cloudconvert/issues
+  homepage: https://github.com/nichtich/App-cloudconvert
+  repository: https://github.com/nichtich/App-cloudconvert.git
+version: 0.01
+x_contributors:
+  - 'Jakob Voss <voss@gbv.de>'

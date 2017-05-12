@@ -1,0 +1,15 @@
+Revision history for Perl module Acme::Incorporated
+
+1.00 Wed Jul  6 00:48:23 UTC 2005
+	- run the percentage tests a few more times to shake out randomness bugs
+	- improved kwalitee
+	- checked coverage
+	- added a few more jokes in the documentation
+	- make a traditional Makefile.PL
+	- bumped up version number
+
+0.10 Fri Jun 20 05:41:30 GMT 2003
+	- renamed to Acme::Incorporated
+
+0.01 Wed Jun 18 21:31:22 2003
+	- original version; created by ExtUtils::ModuleMaker 0.32

@@ -1,0 +1,55 @@
+App::yajg - yet another json grep
+=================================
+
+Description
+-----------
+
+Simple grep and pretty output for json in each files or standard input.
+
+Requirements
+------------
+
+perl v5.14 or higher
+
+JSON <https://metacpan.org/pod/JSON>
+
+For the pretty output type 'ddp' you need to install the Data::Printer
+<https://metacpan.org/pod/Data::Printer>
+
+For colored 'json' and 'perl' output types you need to install the highlight
+<http://www.andre-simon.de/>
+
+For output type 'yaml' you need to install the YAML
+<https://metacpan.org/pod/YAML>
+
+Installation
+------------
+
+via cpan:
+
+  cpan App::yajg
+
+via cpan-minus:
+
+  cpanm App::yajg
+
+or
+
+  curl -L https://cpanmin.us | perl - App::yajg
+
+Manual:
+
+  perl Makefile.PL # PREFIX=/prefix/to/install/
+  make
+  make install
+
+LICENSE AND COPYRIGHT
+---------------------
+Copyright 2017 Grigoriy Koudrenko "<gragory.mail@gmail.com>".
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See perlartistic.
+
+The full text of the license can be found in the LICENSE file included with
+this program.
+

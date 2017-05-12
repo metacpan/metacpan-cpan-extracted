@@ -1,0 +1,89 @@
+NAME
+    Archive::Extract::Libarchive - A generic archive extracting mechanism
+    (using libarchive)
+
+SYNOPSIS
+      use Archive::Extract::Libarchive;
+
+      # build an Archive::Extract object
+      my $ae = Archive::Extract::Libarchive->new( archive => 'foo.tgz' );
+
+      # extract to cwd()
+      my $ok = $ae->extract;
+
+      # extract to /tmp
+      my $ok = $ae->extract( to => '/tmp' );
+
+      # what if something went wrong?
+      my $ok = $ae->extract or die $ae->error;
+    
+      # files from the archive
+      my $files   = $ae->files;
+
+      # dir that was extracted to
+      my $outdir  = $ae->extract_path;
+    
+      # absolute path to the archive you provided
+      $ae->archive;
+
+DESCRIPTION
+    Archive::Extract is a generic archive extraction mechanism. This module
+    has a similar interface to Archive::Extract, but instead of using Perl
+    modules and external commands, it uses the libarchive C libary
+    (<http://code.google.com/p/libarchive/>), which you must have installed
+    (libarchive-dev package for Debian/Ubuntu). It supports many different
+    archive formats and compression algorithms and is fast.
+
+    For example, unpacking the whole of CPAN using this module is about ten
+    times faster than using Archive::Extract.
+
+METHODS
+  $ae = Archive::Extract::Libarchive->new(archive => '/path/to/archive')
+    Creates a new "Archive::Extract::Libarchive" object based on the archive
+    file you passed it.
+
+  $ae->extract( [to => '/output/path'] )
+    Extracts the archive represented by the "Archive::Extract::Libarchive"
+    object to the path of your choice as specified by the "to" argument.
+    Defaults to "cwd()".
+
+    It will return true on success, and false on failure.
+
+    On success, it will also set the follow attributes in the object:
+
+    $ae->extract_path
+        This is the directory that the files where extracted to.
+
+    $ae->files
+        This is an array ref with the paths of all the files in the archive,
+        relative to the "to" argument you specified. To get the full path to
+        an extracted file, you would use:
+
+          File::Spec->catfile( $to, $ae->files->[0] );
+
+ACCESSORS
+  $ae->error()
+    Returns the last encountered error as string.
+
+  $ae->extract_path
+    This is the directory the archive got extracted to. See "extract()" for
+    details.
+
+  $ae->files
+    This is an array ref holding all the paths from the archive. See
+    "extract()" for details.
+
+  $ae->archive
+    This is the full path to the archive file represented by this
+    "Archive::Extract::Libarchive" object.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2011, Leon Brocard.
+
+LICENSE
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

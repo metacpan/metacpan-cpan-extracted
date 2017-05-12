@@ -1,0 +1,45 @@
+
+	Mixer - Perl extension for Sound Mixer control
+        ==============================================
+
+       Library to query / set various sound mixer parameters.
+
+       This is just a very simple Perl interface which allows to
+       set various sound mixer parameters. The most important
+       probably 'vol' (volume). The list of all mixer parameters
+       can be obtained using get_mixer_params() function.
+
+       Library includes application volume.pl, which is a simple
+       Perl/Tk volume control application.
+
+Installation
+============
+    The installation of Mixer module is the same as you would install
+ any perl module library, by running these commands:
+
+perl Makefile.PL
+make
+make test
+make install
+
+Platforms
+=========
+Linux
+
+Documentation
+=============
+See POD doumentation in Mixer.pm (after installation, just use perldoc Mixer).
+
+Questions, bug reports, useful code bits, and suggestions 
+should just be sent to me at sergey@sergey.com
+
+
+Availability
+============
+The latest version can be found on http://www.sergey.com/soft/Mixer/
+
+
+Copyright
+=========
+Copyright 2001 by Sergey Gribov <sergey@sergey.com>, all rights reserved.
+

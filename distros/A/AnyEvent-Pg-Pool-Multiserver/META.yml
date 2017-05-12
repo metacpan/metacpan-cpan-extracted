@@ -1,0 +1,26 @@
+---
+abstract: 'Asyncronious multiserver requests to Postgresql with AnyEvent::Pg'
+author:
+  - 'Andrey Kuzmin <kak-tus@mail.ru>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Pg-Pool-Multiserver
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '7.07'
+  AnyEvent::Pg::Pool: '0.14'
+  Class::XSAccessor: '1.19'
+  Future: '0.27'
+  Params::Validate: '1.10'
+version: '0.4'

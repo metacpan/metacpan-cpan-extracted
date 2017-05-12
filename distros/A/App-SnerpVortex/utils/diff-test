@@ -1,0 +1,12 @@
+# Diff the replay vs. a svn checkout.
+
+diff -r \
+../poe-svn-checkout /Volumes/snerp-vortex-workspace/poe-git-replay |
+grep -v '\$Id' |
+grep -v ': \.svn' |
+grep -v '^[0-9]*c[0-9]*$' |
+grep -v '^---$' |
+grep -v '^diff' |
+grep -v '\$Revision' |
+grep -v '\$Date' |
+head

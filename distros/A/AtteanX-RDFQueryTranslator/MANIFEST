@@ -1,0 +1,24 @@
+.travis.yml
+Changes
+inc/Module/Install.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/DOAPChangeSets.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/AtteanX/RDFQueryTranslator.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+meta/changes.ttl
+README.md
+t/00.load.t
+t/translate.t
+xt/pod-coverage.t
+xt/pod.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

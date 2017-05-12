@@ -1,0 +1,28 @@
+3.0.6 - 21st February 2016
+    * Policies are isolated from each-other by being wrapped in braces.
+	* Additional test-case coverage to validate the above.
+
+3.0.5 - 18th April 2015
+    * Add "App::Slaughter" module to claim the CPAN namespace.
+
+3.0.4 - 28th October 2014
+    * Prevent multiple simultaneous runs.
+
+3.0.3 - 24th October 2014
+    * Updated MANIFEST to be current.
+	* Updated POD for many modules.
+
+3.0.2 - 23rd October 2014
+    * Significant POD fixes and updates.
+	* Minor changes to Slaughter::Private module to make it a real module.
+	* Added LICENSE
+	* Added version number in our modules.
+
+3.0.1 - 19th October 2014
+	* Fail cleanly if the transport isn't loaded.
+	* Removed sample Apache module.
+	* Minor POD updates to fix warnings/errors.
+	* Add Mojo::UserAgent as explicit dependency.
+
+3.0.0 - 18th October 2014
+	* Initial upload to CPAN.

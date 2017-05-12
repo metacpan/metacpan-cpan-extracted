@@ -1,0 +1,30 @@
+Revision history for Perl extension App::Perldoc::Search at
+http://github.com/jbenjore/App-Perldoc-Search/commits/master.
+
+0.11
+c5d65a2 Hypothetically, work better on Windows
+3a9fa49 Search for documentation more aggressively
+042d896 Case fold input
+3245d9b Avoid explosions with File::Find follow_skip => 2
+
+0.05  Sun Jun 28 15:35:00 2009
+a6c8a88e119f6632bcc3efd9c38cca216979f550 0.05
+8b0ba9c0d5b082c6386ac6c10604e22123d0dadf Check for perdoc-search exit code
+
+0.04  Sun Jun 28 09:04:00 2009
+82049ab4bf58c90e8de2ca144ba5b3d8cc6438a6 Update Changes
+7f9c4f1033e7f7601f4520b6fd998fed43460346 Move scripts/ to script/ at Shlomi Fish's advice to get search.cpan.org to index the script
+
+0.03  Sat Jun 27 12:49:00 2009
+2c9629d437bcfad319371a5f3134cabf5e2bfaf5 Update Changes
+e9346b9cef1d6ce947b478e01b1b20b0d1fb3317 0.03
+35853a9fca807b78c5740d3a12a48817a4043ab9 Don't depend on parent, do ISA manually
+
+0.02  Sat Jun 27 08:33:00 2009
+f5ded15fcd3dd50c75b48a475ce14d65f8487a45 0.02
+e76962af5fe735775a3d6f31496604f9d245ade9 Updating changelog
+304a4464b38b71f10f34c8866da7e3bab1369d3e Clean up dependency list
+
+0.01  Fri Jun 26 01:10:54 2009
+9e60c318ebd5543bb342725f7f4834b2502e65f5 Add META.yml
+c69869d09c07115b04120ce0d294011940d76321 0.01

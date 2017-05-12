@@ -1,0 +1,8 @@
+Revision history for Authen-GoogleAccount
+
+0.02    2006/01/10
+        LIMITATIONS were removed and you can get unique key of GoogleAccount.
+        
+
+0.01    2006/01/06
+        First version, released on an unsuspecting world.

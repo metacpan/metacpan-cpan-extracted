@@ -1,0 +1,52 @@
+Acme::Currency version 1.00
+===========================
+
+Why confine yourself to using the American Dollar as scalar-context
+sigil? There's a few currencies out there and in the age of
+internationalization and Unicode, there is no reason not to use them
+for our evil purposes.
+
+This module uses a source filter to replace every occurrance of a given string
+in the source code with the $-sigil. That means using the @ in place of the
+Yen symbol should yield interesting arrays. (Or none at that.)
+
+By default, using Acme::Currency will use the € character as the scalar sigil.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+On platforms that don't support the "./" notation, that would be:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+If you wish, you may use the old MakeMaker style instead:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  Filter::Simple
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+Copyright 2003-2005 by Steffen Mueller.
+
+Author can be reached at currency-module at steffen-mueller dot net.

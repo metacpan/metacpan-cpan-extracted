@@ -1,0 +1,42 @@
+#! /usr/bin/perl -w
+use Acme::Filter::Kenny;
+
+fmffmmmpp fmmfmppffmffmmffmp;
+fmffmmmpp fppmmmpffpppmffpppmfmfmm;
+
+pfmpffmffpppfmp "fmffmmmpp Mmmmmfppmmpp::Mpfmffpmffmpmpppff::Pmpmppppppppffm;\ppp";
+fppmfpmffpmfmpp (<FmmFmpMpmMffPpp>) {
+	pfmpffmffpppfmp Mmmmmfppmmpp::Mpfmffpmffmpmpppff::Pmpmppppppppffm::PmpmppppppppffmMfffmp ($_);
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+kennyfy - Translates its standard input to kenny-speak
+
+=head1 SYNOPSIS
+
+  kennyfy <script.pl >script-kenny.pl
+
+=head1 DESCRIPTION
+
+This little tool takes a Perl script on its standard input, and
+outputs code that is translated to Kenny-speak, yet still able to run
+(it will use Acme::Filter::Kenny to accomplish this).
+
+=head1 AUTHOR
+
+Gergely Nagy, algernon@bonehunter.rulez.org
+
+Based on Jan-Pieter Cornets signature version.
+
+=head1 SEE ALSO
+
+Acme::Filter::Kenny
+
+=cut
+
+# arch-tag: 5848aaec-74e8-43dc-b26e-0430157d2ad2

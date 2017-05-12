@@ -1,0 +1,3 @@
+- Quando inicia com '  <tr>' da pau
+- Permitir [% IF x == "acento e &aa;" %]
+- Permitir [%END%]

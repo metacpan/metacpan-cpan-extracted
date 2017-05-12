@@ -1,0 +1,33 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::BOS;
+
+my ($server, $cellname, $bos);
+
+die "Usage: $0 server [cell]\n" if $#ARGV < 0;
+
+$server   = shift;
+$cellname = shift;
+
+if ($cellname) { $bos = AFS::BOS->new($server, 0, 0, $cellname); }
+else           { $bos = AFS::BOS->new($server); }
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+my ($cell, $hostlist) = $bos->listhosts;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+if (defined $cell) { print "Cell name is $cell\n"; }
+
+if (defined $$hostlist[0]) {
+    my $i = 1;
+    foreach (@$hostlist) {
+        print "\tHost $i is $_ \n";
+        $i++;
+    }
+}
+
+$bos->DESTROY;

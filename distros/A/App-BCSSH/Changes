@@ -1,0 +1,18 @@
+0.002002 - 2013-04-29
+ - fix bad regex
+
+0.002001 - 2013-04-21
+ - Fixed prerequisites
+
+0.002000 - 2013-04-14
+ - added App::BCSSH::Inline to make plugins easier to write
+ - better error message when there is no ssh connection
+ - fix plugin loading location
+ - improved documentation
+ - App::BCSSH::Client is a normal role instead of a Package::Variant
+ - make scp command configurable
+ - fix raw socket handling
+ - handler names are used directly without lower casing
+
+0.001000 - 2013-04-09
+ - initial release

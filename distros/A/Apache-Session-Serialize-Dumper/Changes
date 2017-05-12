@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache::Session::Serialize::Dumper.
+
+0.01  Wed Jan  2 22:44:35 2002
+	- original version; created by h2xs 1.20 with options
+		-AX -n Apache::Session::Serialize::Dumper
+

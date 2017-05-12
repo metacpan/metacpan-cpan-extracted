@@ -1,0 +1,27 @@
+{
+  "prereqs": {
+    "runtime": {
+      "requires": {
+        "Log::Contextual":                    "0",
+        "Log::Contextual::WarnLogger::Fancy": "0.002000",
+        "perl":                               "5.006"
+      }
+    },
+    "test": {
+      "requires": {
+        "Test::More":       "0.88",
+        "Term::ANSIColor":  "2.01"
+      }
+    }
+  },
+  "resources": {
+    "bugtracker": {
+      "web":  "https://github.com/kentnl/Acme-Beamerang-Logger/issues"
+    },
+    "repository": {
+      "type": "git",
+      "url":  "https://github.com/kentnl/Acme-Beamerang-Logger",
+      "web":  "https://github.com/kentnl/Acme-Beamerang-Logger"
+    }
+  }
+}

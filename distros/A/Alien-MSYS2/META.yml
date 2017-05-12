@@ -1,0 +1,34 @@
+---
+abstract: 'Tools required for autogen scripts in Windows (MSYS2)'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Archive::Extract: '0.48'
+  HTTP::Tiny: '0'
+  IO::Uncompress::UnXz: '0'
+  JSON::PP: '0'
+  Test2::Suite: '0.000030'
+  Test::Alien: '0.09'
+  Test::More: '0.94'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+  perl: '5.004'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-MSYS2
+requires:
+  File::ShareDir: '0'
+  File::Which: '0'
+  JSON::PP: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/plicease/Alien-MSYS2/issues
+  homepage: https://metacpan.org/pod/Alien::MSYS2
+  repository: git://github.com/plicease/Alien-MSYS2.git
+version: '0.02'

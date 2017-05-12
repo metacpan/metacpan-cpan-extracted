@@ -1,0 +1,58 @@
+#!perl
+
+use strict;
+use warnings;
+
+use 5.008001;
+
+use App::GitGrepPerlStatement;
+
+App::GitGrepPerlStatement->run(@ARGV);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+git-grep-perl-statement - Perl statement finder
+
+=head1 SYNOPSIS
+
+Find statements which contains C<$self>
+
+    $ git grep-perl-statement '$self'
+    $ git grep-perl-statement '$self' lib/
+
+=head1 DESCRIPTION
+
+git-grep-perl-statement is the git-grep for perl.
+
+Ordinary C<git-grep '$self'> matches C<$selfie> or C<"$self">. git-grep-perl-statement matches only C<$self>.
+
+Ordinary git-grep shows matched line. git-grep-per-statement shows matched statement.
+
+=head1 EXAMPLES
+
+    % git grep-perl-statement colored
+    git-grep-perl-statement:61
+    colored($self->highlight_style, $_);
+    git-grep-perl-statement:85
+    say colored(
+        ['bold'],
+        "@{[ $file ]}:@{[ $_->line_number ]}"
+    );
+
+=head1 LICENSE
+
+Copyright (C) hitode909.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+hitode909 E<lt>hitode909@gmail.comE<gt>
+
+=cut
+

@@ -1,0 +1,7 @@
+[database]
+#driver             = [% database_driver || 'mysql'     %]
+#host               = [% database_host   || 'localhost' %]
+#name               = [% database_name %]
+#user               = [% database_user %]
+#password           = [% database_password %]
+#auto_commit        = [% database_auto_commit || 1 %]

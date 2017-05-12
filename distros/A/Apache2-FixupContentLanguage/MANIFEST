@@ -1,0 +1,15 @@
+Changes
+lib/Apache2/FixupContentLanguage.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/htdocs/foo.html.fr
+t/conf/extra.last.conf.in
+t/response/Does_It_Work.pm
+t/00-load.t
+t/pod.t
+t/TEST.PL
+t/TEST
+t/pod-coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,99 @@
+Revision history for Perl extension AnyEvent::MPRPC
+
+0.20 2013-02-01T21:28:13
+
+    - Add 2 callbacks (before/after_connect) and 1 option (connect_timeout)
+      (hirose31)
+
+0.19
+
+    - Split AnyEvent::MessagePack to it's own distribution.
+      (tokuhirom)
+
+0.18
+
+    - AnyEvent::MPRPC::Client 'call' method can take scalar as RPC parameters
+      (It has been able to take only ArrayRef).
+
+0.17
+
+    commit 4f6db620d1b0b86f776946f4d8688dc9fc69c966
+    Author: Maxime Soulé <btik-git@scoubidou.com>
+    Date:   Mon Jul 30 10:17:51 2012 +0200
+
+        A read_type AnyEvent handler must call the callback only once per
+        call, else one have a risk of memleak by pushing/shifting too many
+        "read" callbacks in the read queue.
+        And so each read callback should re-arm itself (if needed) in the read
+        queue. Using on_read callback to do that is a mistake, as on_read can
+        be called several times before a complete messagepack packet is
+        received.
+
+0.16
+
+    - Fixes RT#74518: issue
+    Bug #74518 for AnyEvent-MPRPC: AnyEvent::MessagePack read type corrupts responses
+    (fixed By Max++, and reported by asguthrie++)
+
+0.15
+
+    - use Data::MessagePack::Stream instead!
+
+0.14
+
+    - Handle bogus data the right way instead throwing an exception...
+      ( maxatome++)
+
+0.13
+
+    - added on_accept, on_dispatch(Tobias Nissen)
+
+0.11
+
+    - modernized packaging
+
+0.10 2011-08-08 10:49:46
+
+    - Ensure MsgId to be an integer as the MPRPC specification says
+      (thanks to @heavenshell for reporting it)
+
+0.09
+
+    - depended on latest D::MP
+    - save return value of tcp_server().
+      IT MAY INCOMPATBILE CHANGE.
+
+0.08
+
+    - depend to latest Data::MessagePack
+    - added test case for D::MP pp mode
+    - remove depency on Test::Base
+
+0.07
+
+    - added on_connect callback for AnyEvent::MPRPC::Client.
+    - doc fix
+
+0.06
+
+    - bug fix: handle multiple requests
+
+0.05
+
+    - fixed packaging issue
+
+0.04
+
+    - fixed deps. RT#50463
+      (reported by andk++)
+
+0.03
+
+    - oops. $msgid should be IV.
+      Perl type system is ...
+
+0.02
+    - oops
+
+0.01    Wed Jul 15 14:38:45 2009
+        - original version

@@ -1,0 +1,88 @@
+<div class="floatleft">
+<table>
+	<caption>Pages - Count</caption>
+	<thead>
+		<tr>
+			<th>URL</th>
+			<th class="n">Count</th>
+			<th class="n">Avg Time</th>
+		</tr>
+	</thead>
+	<tbody>
+[% FOREACH k IN hash.page.count %]
+		<tr>
+			<td>[% k %]</td>
+			<td class="n">[% xml.page.${k}.count %]</td>
+			<td class="n">[% xml.page.${k}.avg %]</td>
+		</tr>
+[% END %]
+	</tbody>
+</table>
+<table>
+	<caption>Pages - Speed</caption>
+	<thead>
+		<tr>
+			<th>URL</th>
+			<th class="n">Count</th>
+			<th class="n">Avg Time</th>
+		</tr>
+	</thead>
+	<tbody>
+[% FOREACH k IN hash.page.avg %]
+		<tr>
+			<td>[% k %]</td>
+			<td class="n">[% xml.page.${k}.count %]</td>
+			<td class="n">[% xml.page.${k}.avg %]</td>
+		</tr>
+[% END %]
+	</tbody>
+</table>
+</div>
+<div class="floatleft">
+<table>
+	<caption>Queries - Count</caption>
+	<thead>
+		<tr>
+			<th>Code</th>
+			<th class="n">Count</th>
+			<th class="n">Avg</th>
+			<th class="n">Min</th>
+			<th class="n">Max</th>
+		</tr>
+	</thead>
+	<tbody>
+[% FOREACH k IN hash.code.count %]
+		<tr>
+			<td>[% k %]</td>
+			<td class="n">[% xml.code.${k}.count %]</td>
+			<td class="n">[% xml.code.${k}.avg %]</td>
+			<td class="n">[% xml.code.${k}.min %]</td>
+			<td class="n">[% xml.code.${k}.max %]</td>
+		</tr>
+[% END %]
+	</tbody>
+</table>
+<table>
+	<caption>Queries - Speed</caption>
+	<thead>
+		<tr>
+			<th>Code</th>
+			<th class="n">Count</th>
+			<th class="n">Avg</th>
+			<th class="n">Min</th>
+			<th class="n">Max</th>
+		</tr>
+	</thead>
+	<tbody>
+[% FOREACH k IN hash.code.avg %]
+		<tr>
+			<td>[% k %]</td>
+			<td class="n">[% xml.code.${k}.count %]</td>
+			<td class="n">[% xml.code.${k}.avg %]</td>
+			<td class="n">[% xml.code.${k}.min %]</td>
+			<td class="n">[% xml.code.${k}.max %]</td>
+		</tr>
+[% END %]
+	</tbody>
+</table>
+</div>

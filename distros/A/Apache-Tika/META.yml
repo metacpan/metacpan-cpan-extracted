@@ -1,0 +1,32 @@
+---
+abstract: 'A Perl interface to the Apache Tika api'
+author:
+  - 'Gerard Ribugent Navarro'
+  - ribugent@cpan.org
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Compile: v1.1.0
+  Test::Pod: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache-Tika
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '0'
+  JSON::MaybeXS: '0'
+  LWP::UserAgent: '0'
+resources:
+  bugtracker: https://github.com/ribugent/perl-apache-tika/issues
+  homepage: https://github.com/ribugent/perl-apache-tika
+  repository: git://github.com/ribugent/perl-apache-tika.git
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

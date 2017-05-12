@@ -1,0 +1,21 @@
+Revision history for Amon2-Plugin-Web-L10N
+
+v0.1.4  2013-05-23 17:18:02 JST
+        - add po_file_langs option
+        - add Amon2 context method document
+        - remove $c->l10n method
+        - fixed #1 Undeclared dependency on Locale::Maketext::Lexicon
+
+v0.1.3  2013-05-09 16:51:01 JST
+        - reduce the dependence module of default
+        - brush up to amon2-xgettext.pl
+        - added to more tips for documentation
+
+v0.1.1  2013-05-08 22:02:00 JST
+        - add lexicon_options option
+        - changed to default of Locale::Maketext::Lexicon is _auto => 1
+        - CLI safety and friendly
+        - detection objects cache
+
+v0.1.0  2013-05-08 21:03:06 JST
+        - Initial release

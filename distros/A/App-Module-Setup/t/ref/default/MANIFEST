@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/App/Module/Setup.pm
+t/00-load.t

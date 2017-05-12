@@ -1,0 +1,7 @@
+name = "App-mimi"
+# badges = ["travis"]
+authority="cpan:VTI"
+
+module_maker="ModuleBuildTiny"
+
+readme_from="script/mimi"

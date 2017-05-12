@@ -1,0 +1,133 @@
+==================================================
+Changes from 2016-03-21 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.12 at 2017-03-21 19:54:14 +0000
+-----------------------------------------
+
+  Change: aac6a95f75c94faa105ad697e7b6445e0ff9d4d5
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2017-03-21 13:48:31 +0000
+
+    Token auto-refresh implemented for all http methods 
+
+  Change: 73aa93b390966dd79c8571fcab975176f98550c2
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2017-03-21 11:54:59 +0000
+
+    Added build_http_transaction and simplified api_query method 
+
+  Change: 1256e451f223f71d63fb4f9374963d9e21b8b676
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2017-03-21 02:41:11 +0000
+
+    Added build_headers() function 
+
+  Change: d68b6cc6fcbf2e1d975f4dd4347a87588af2524f
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2017-03-21 02:16:47 +0000
+
+    Saving changes 
+
+  Change: c8f5f6d63a9966f40d46bf93b37d504fa6de825e
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2017-03-21 02:10:40 +0000
+
+    Dirty implementation for GET method 
+
+  Change: 86cbb1dd544d4f9f1fc0964d3de56fb255aa12e6
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2017-03-20 23:53:38 +0000
+
+    Fixed bug in documentation 
+
+  Change: 508bf313e3992599e809268184a7bda63e644267
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2017-03-19 18:53:53 +0000
+
+    Fixed issue #6 
+
+  Change: 54dbf7edddcbad643bf9b1d49a08632bbf568eb1
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2017-02-13 14:11:24 +0000
+
+    Merge pull request #5 from denis-it/master
+
+    support of http delete method implemented 
+
+  Change: f8bb5f8c7fce585ac75966b4cbec0bc3cdcfbec9
+  Author: Denis T <dev@denis-it.com>
+  Date : 2017-02-10 00:02:52 +0000
+
+    support of http delete method implemented 
+
+  Change: 67d9a950df7b4d0605ebfac2bd758e28d9fed420
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2016-12-29 13:37:46 +0000
+
+    Fixed issue #4: use kid_keys options. RTFM everytime :) 
+
+-----------------------------------------
+version 0.07 at 2016-11-12 21:07:50 +0000
+-----------------------------------------
+
+  Change: 4ae5b37397a5d65c6490fcc2ef82f9615efdf2f4
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2016-11-13 00:07:50 +0000
+
+    Fixed issue #1 - via temp variable 
+
+  Change: 30363346ea26fc8f0512316705bc995be7838c80
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2016-11-12 23:53:31 +0000
+
+    Added events_list method to GCal.pm 
+
+-----------------------------------------
+version 0.06 at 2016-11-11 23:42:23 +0000
+-----------------------------------------
+
+  Change: c248eaf765d7700890f59b16972289be2bfc27eb
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2016-11-12 02:42:23 +0000
+
+    Added goauth CLI tool 
+
+  Change: 51d47620e703e493adfa3910e6bbdd5a83b3595d
+  Author: Pavel Serikov <pavel@serikov.xyz>
+  Date : 2016-11-10 18:10:50 +0000
+
+    Added auto-generation of correct Readme.md 
+
+  Change: aad0108940e2afef2e89c974fb2393a780a5ac6e
+  Author: Pavel Serikov <pavel@serikov.xyz>
+  Date : 2016-11-10 13:24:57 +0000
+
+    Add meta.json and auto github repo info in meta.json 
+
+  Change: ff9beb18f4b1c1e3620e8f8d910db4b3bbef2d80
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2016-11-10 01:19:34 +0000
+
+    Added some documentation 
+
+  Change: 649cb5b63728f7db308315c76e19dcc9513b2a6a
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2016-11-10 00:59:27 +0000
+
+    Attempt to add documentation 
+
+-----------------------------------------
+version 0.01 at 2016-11-09 21:12:41 +0000
+-----------------------------------------
+
+  Change: f5d8381595fba4125b69b141f93bc768218f4246
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2016-11-10 00:12:41 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

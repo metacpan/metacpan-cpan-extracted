@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+scrolly
+lib/Acme/Curses/Marquee.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

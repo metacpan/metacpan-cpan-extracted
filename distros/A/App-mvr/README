@@ -1,0 +1,57 @@
+NAME
+    App::mvr - like mv, but clever
+
+VERSION
+    version 0.005
+
+FUNCTIONS
+  mvr
+    Rename SOURCE to DEST, or move SOURCE(S) to DIRECTORY.
+
+        mvr( source => 'file.txt', dest => '~/Documents' );         # move file.txt into ~/Documents
+        mvr( source => 'file.txt', dest => '~/Documents/notes.txt );# move to specified name
+        mvr( source => [map "$_.txt", qw/a b c/], dest => '~' );    # move multiple files into ~/
+
+    Parameters are key-value pairs:
+
+    source
+        An arrayref of source files, or a single scalar if you have only one
+        file.
+
+    dest
+        The target pathname. If this is a directory, file(s) will be moved
+        into it - or an exception will be raised if the directory doesn't
+        exist.
+
+    deduplicate
+        Check if files are the same whenever there is a name conflict. If
+        they are the same, then just remove the source file instead of
+        adding another copy to the destination.
+
+    This function is not exported by default.
+
+AVAILABILITY
+    The project homepage is <http://metacpan.org/release/App-mvr/>.
+
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see <https://metacpan.org/module/App::mvr/>.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/doherty/App-mvr> and may be cloned from
+    <git://github.com/doherty/App-mvr.git>
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at <https://github.com/doherty/App-mvr/issues>.
+
+AUTHOR
+    Mike Doherty <doherty@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Mike Doherty.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

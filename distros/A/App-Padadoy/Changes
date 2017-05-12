@@ -1,0 +1,9 @@
+0.125     2012-05-08
+    Moved git hooks to Perl module
+    Use YAML for config files
+
+0.122     2012-04-16
+    Renamed to App::Padadoy
+
+0.121     2012-04-16
+    Minor cleanup of dist.ini and typos

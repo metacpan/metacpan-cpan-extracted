@@ -1,0 +1,54 @@
+CHANGES
+-------
+
+  0.010 10 April 2017
+  
+      * Makefile.PL
+        #120084: Need Fix for Makefile.PL depending on . in @INC
+
+      * added autoflush option.
+      
+      * croak if attempt to freeze/thaw SimpleZip object 
+      
+  0.009 17 February 2013
+  
+      * added addFileHandle method.
+      
+      * beefed up addMember
+  
+  0.008 7 January 2013
+  
+      * Fixes to allow disabling of CanonicalName
+
+      * Document how to use File::Find to zip a directory tree.
+    
+  0.007 17 December 2012
+  
+      * Removed non-ASIII char that triggered failure in t/999pod.t.
+    
+  0.006 10 December 2012
+
+      * Added openMember to allow filehandle access to writing zip files.
+      
+      * Added Encode option.
+      
+  0.005 10 November 2012
+
+      * Performance improvements.
+      
+  0.004 11 August 2012
+
+      * Force binmode for input file.
+
+  0.003 1 May 2012
+
+      * Made 'Name' option mandatory with addString.
+
+  0.002 26 April 2012
+
+      * Fixed issue with Makefile.PL & version dependencies.
+
+  0.001 26 April 2012
+
+      * First Release
+

@@ -1,0 +1,16 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'nettle';
+
+share {
+
+  plugin Download => (
+    url     => 'https://ftp.gnu.org/gnu/nettle/',
+    version => qr/^nettle-([0-9\.]+)\.tar\.gz$/,
+  );
+
+  plugin Extract => 'tar.gz';
+
+  plugin 'Build::Autoconf' => ();
+
+};

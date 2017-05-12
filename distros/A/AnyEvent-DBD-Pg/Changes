@@ -1,0 +1,12 @@
+Revision history for AnyEvent-DBI-Pg
+
+0.03    2010-11-30
+        - Fix tests (remove NoWarnings)
+        - Lower perl version requirement
+
+0.02    2010-11-27
+        Fix tests
+
+0.01    2010-11-27
+        First version, released on an unsuspecting world.
+

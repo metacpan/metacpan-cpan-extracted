@@ -1,0 +1,30 @@
+NAME
+    AnyEvent::BDB - truly asynchronous berkeley db access
+
+SYNOPSIS
+       use AnyEvent::BDB;
+       use BDB;
+
+       # can now use any of the requests your BDB module supports
+       # as long as you use an event loop supported by AnyEvent.
+
+DESCRIPTION
+    This module is an AnyEvent user, you need to make sure that you use and
+    run a supported event loop.
+
+    Loading this module will install the necessary magic to seamlessly
+    integrate BDB into AnyEvent, i.e. you no longer need to concern yourself
+    with calling "BDB::poll_cb" or any of that stuff (you still can, but
+    this module will do it in case you don't).
+
+    The AnyEvent watcher can be disabled by executing "undef
+    $AnyEvent::BDB::WATCHER". Please notify the author of when and why you
+    think this was necessary.
+
+SEE ALSO
+    AnyEvent, Coro::BDB (for a more natural syntax).
+
+AUTHOR
+     Marc Lehmann <schmorp@schmorp.de>
+     http://home.schmorp.de/
+

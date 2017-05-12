@@ -1,0 +1,68 @@
+{
+   "abstract" : "An interpreter for the Chef programming language",
+   "author" : [
+      "Marc-Philip Werner <mpw96@gmx.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Chef",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::Pod" : "1.0",
+            "Test::Pod::Coverage" : "1.0"
+         },
+         "requires" : {
+            "File::Temp" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Chef" : {
+         "file" : "lib/Acme/Chef.pm",
+         "version" : "1.03"
+      },
+      "Acme::Chef::Container" : {
+         "file" : "lib/Acme/Chef/Container.pm",
+         "version" : "1.00"
+      },
+      "Acme::Chef::Ingredient" : {
+         "file" : "lib/Acme/Chef/Ingredient.pm",
+         "version" : "1.00"
+      },
+      "Acme::Chef::Recipe" : {
+         "file" : "lib/Acme/Chef/Recipe.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mpw96/perl-Acme-Chef/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/mpw96/perl-Acme-Chef"
+      }
+   },
+   "version" : "1.03"
+}

@@ -1,0 +1,179 @@
+=head1 NAME
+
+Apache2::Translation::Admin - A WEB interface for Apache2::Translation
+
+=head1 SYNOPSIS
+
+  PerlModule Apache2::Translation::Admin
+
+  <Location /-/transadm/>
+    SetHandler modperl
+    PerlResponseHandler Apache2::Translation::Admin
+  </Location>
+
+  or
+
+  <Perl>
+    $My::Transadmin=
+      Apache2::Translation::Admin->new(...);
+  </Perl>
+
+  <Location /-/transadm/>
+    SetHandler modperl
+    PerlResponseHandler $My::Transadmin->handler
+  </Location>
+
+=head1 DESCRIPTION
+
+This module implements a WEB application to manage C<Apache2::Translation>
+rulesets. Get it running, then read on how to use it.
+
+NOTE: the configured location must be called with a trailing slash
+or C</index.html>.
+
+=head1 CONFIGURATION
+
+There are 2 ways of configuration. The simplest is just to declare
+the module as handler for a certain location. In this case the translation
+provider used for the current server (or virtual server) is used to read
+and store rules.
+
+The second way involves creation of an C<Apache2::Translation::Admin> object
+in a C<E<lt>PerlE<gt>> section and declaring C<$object-E<gt>handler> as
+C<PerlResponseHandler>. In this case you can specify the translation provider
+directly. You even don't need to run C<Apache2::Translation> as
+C<PerlTransHandler>.
+
+=head2 Object Creation
+
+=over 4
+
+=item B<new(provider=E<gt>$provider)>
+
+The provider is created separately and passed to the constructor method.
+
+=item B<new(provider_url=E<gt>$url)>
+
+specify an URL where a C<Apache2::Translation::Config> handler listens.
+
+=item B<new(provider_spec=E<gt>[@params])>
+
+specify a provider as C<'File', ConfigFile=E<gt>'/path/to/config/file'> or
+similar.
+
+=back
+
+=head1 USAGE
+
+With an empty ruleset you'll see just the 3 headlines
+
+  PREPREOCESS PHASE
+  PROCESS PHASE
+  SUBROUTINES
+
+with arrow images on the left.
+
+Click on one of these arrows to create a new block list.
+
+Now edit the C<Key>, C<Uri> and C<Action> fields. A symbol showing a discette
+will appear. You can save the block list by clicking on it. When a block list
+is saved the discette disappears but a new symbol allowing you to reload the
+current block list from the provider appears. Try to click on it.
+
+Maybe you have already noticed the symbol on the left end of a block list
+header that animates the process of opening, saving and reloading a block
+list from the provider. By clicking on it you can close or open a block list.
+For a closed block list only the header is shown.
+
+By now you have a block list consisting of one block group with one block.
+Click now on one of the single arrows on the right side of an action element.
+It creates more action blocks in the same block group. All blocks of a block
+group have the same block number. You can identify them by their border color.
+All consecutive actions with the same border color are in the same block
+group. The order of the blocks is determined by the order in which they
+appear on the screen.
+
+Now please click on one of the double arrows. They create new block groups.
+Hence their border color and block number are different. There are
+3 colors used light green, light red and light blue.
+
+The red cross on the right side of an action deletes it.
+
+When a block list is saved empty actions are purged.
+
+The action field itself is divided into 2 text areas. The left one holds the
+action text, e.g.:
+
+  Do: warn "here I am"
+
+The right one holds a comment, e.g.
+
+  Transadmins "hello world!"
+
+The comment field is shown only if the provider supports notes.
+
+The lower border of each action block is a little broader. It can be used to
+resize the action element.
+
+=head2 Keyboard Shortcuts
+
+There are defined a few keyboard shortcuts:
+
+=over 4
+
+=item * Ctrl-s
+
+save the block list with the focus.
+
+=item * Ctrl-Shift-c
+
+close the block list with the focus.
+
+=item * Ctrl-Shift-d
+
+delete the action element with the focus.
+
+=item * Ctrl-Shift-u
+
+reload the block list with the focus.
+
+=item * Ctrl-E<gt>
+
+=item * Ctrl-E<lt>
+
+create a new block in the current block group above or below the current
+block.
+
+=item * Ctrl-Shift-E<gt>
+
+=item * Ctrl-Shift-E<lt>
+
+create a new block group below or above the current block group.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Apache2::Translation>
+
+=back
+
+=head1 AUTHOR
+
+Torsten Foertsch, E<lt>torsten.foertsch@gmx.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2008 by Torsten Foertsch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+
+# Local Variables:
+# mode: perl
+# End:

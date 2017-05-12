@@ -1,0 +1,165 @@
+NAME
+    Apache::AxKit::Plugin::AddXSLParams::Request - Provides a way to pass
+    info from the Apache::Request to XSLT params
+
+SYNOPSIS
+      # in httpd.conf or .htaccess
+      AxAddPlugin Apache::AxKit::Plugin::AddXSLParams::Request
+      PerlSetVar AxAddXSLParamGroups "Request-Common HTTPHeaders"
+
+DESCRIPTION
+    A strong contender for longest package name of the year,
+    Apache::AxKit::Plugin::AddXSLParams::Request offers a way to make
+    information about the current client request (cookies, headers, uri
+    info) available as params within XSLT stylesheets.
+
+CONFIGURATION
+    This plugin is added to the request cycle by using the AxAddPlugin
+    directive.
+
+      AxAddPlugin Apache::AxKit::Plugin::AddXSLParams::Request
+  
+    This package introduces the AxAddXSLParamGroups config option, which
+    takes a space-seperated list of 'tags' (see PARAM GROUPS below) that are
+    used to add groups of related information to the param list. Note that
+    this is *not* a first-class config directive and must be added via
+    PerlSetVar:
+
+      PerlSetVar AxAddXSLParamGroups "List Of Groups"
+
+PARAM GROUPS
+    In an effort to provide an easy-to-setup way to make external data->XSL
+    param mapping work while letting folks choose only the types of info
+    that they are interested in, sets of related information are grouped
+    with an identifying 'tag'. This tag is passed in via the
+    AxAddXSLParamGroups config directive which is used to determine which
+    groups of info will be passed along as params. For example:
+
+      AxAddXSLParamGroups "Request-Common HTTPHeaders VerboseURI"
+
+    will configure this package to include the sets of data identified by
+    the Request-Common, HTTPHeaders, and VerboseURI tags.
+
+    The param groups that this package implements are detailed below.
+
+Request-Common
+    A minimal set of common parameters extracted from the request instance.
+
+    Param Prefix: request.*
+
+    Implemented Fields:
+
+    * uri
+        The full URI of the current request.
+
+    * method
+        The request method (POST, GET, etc.).
+
+    * path_info
+        Additional path information.
+
+    * filename
+        The file name associated with the current request.
+
+    Examples:
+
+      <xsl:param name="request.method"/>
+      <xsl:param name="request.uri"/>
+      <xsl:param name="request.path_info"/>
+      <xsl:param name="request.filename"/>
+  
+HTTPHeaders
+    Provides access to HTTP headers sent by the client.
+
+    Param Prefix: request.headers.*
+
+    Implemented Fields:
+
+    The headers sent during a request vary somewhat from client to client;
+    this group will contain *all* the headers returned by the request
+    object's headers_in() method using the convention:
+    request.headers.*fieldname* where *fieldname* is name of the given HTTP
+    header field, forced to lower case.
+
+    If any HTTP Cookies are found in the headers, they will be parsed and
+    values available as XSLT params using the naming convention:
+    request.cookies.*yourcookiename*. See the Cookies group below for an
+    alternative way to access cookies.
+
+    More common headers include:
+
+    * accept
+    * content-type
+    * accept-charset
+    * accept-encoding
+    * accept-language
+    * connection
+    * host
+    * pragma
+    * user-agent
+    * from
+    * referer
+
+    Examples:
+
+      <xsl:param name="request.headers.accept-language"/>
+      <xsl:param name="request.headers.host"/>
+      <xsl:param name="request.headers.user-agent"/>
+      <xsl:param name="request.headers.referer"/>
+
+Cookies
+    Provides an *alternative* way to access the HTTP Cookies header for
+    those folks that want to get at the cookie data but don't want to pull
+    in all of the other HTTP headers.
+
+    Param Prefix: request.cookies.*
+
+    Implemented Fields:
+
+    Cookie values are made available as params using the convention:
+    request.cookies.*yourcookiename*
+
+    Examples:
+
+      <xsl:param name="request.cookies.oreo"/>
+      <xsl:param name="request.cookies.chocolate-chip"/>
+      <xsl:param name="request.cookies.fortune"/>
+
+VerboseURI
+    Offers fine-grained access to the URI requested (via Apache::URI's
+    parse_uri() method.
+
+    Param Prefix: request.uri.*
+
+    Implemented Fields:
+
+    * scheme
+    * hostinfo
+    * user
+    * password
+    * hostname
+    * port
+    * path
+    * rpath
+    * query
+    * fragment
+
+    Examples:
+
+      <xsl:param name="request.uri.path"/>
+      <xsl:param name="request.uri.scheme"/>
+      <xsl:param name="request.uri.port"/>
+
+DEPENDENCIES
+    * libapreq
+    * Apache::Request
+    * Apache::Cookie
+    * Apache::URI
+    * AxKit (1.5 or greater)
+
+AUTHOR
+    Kip Hampton, khampton@totalcinema.com
+
+SEE ALSO
+    AxKit, Apache::Request, libapreq, Apache::Cookie, Apache::URI
+

@@ -1,0 +1,38 @@
+Revision history for Attribute-Storage
+
+0.09    2014/05/12 16:06:20
+        [CHANGES]
+         * Added apply_subattrs and find_subs_with_attr; useful copies from
+           Circle code
+
+0.08    BUGFIXES:
+         * Ensure that dynamic late application using attributes->import
+           works, even from other packages
+         * Ensure that multi-line attribute definitions work
+
+0.07    CHANGES:
+         * Implement NAME attribute flag; allows attribute handling functions
+           to know the name of the function they are being applied to
+
+0.06    CHANGES:
+         * Implement MULTI attribute flag; allows attributes to be invoked
+           multiple times per marked sub
+
+0.05    CHANGES:
+         * Use XSLoader instead of DynaLoader
+
+0.04    BUGFIXES:
+         * Need to use Module::Build to build it now, generate a 'small'
+           Makefile.PL rather than 'traditional'
+
+0.03    CHANGES:
+         * Use Magic to implement value storage behind CVs so that destruction
+           correctly frees old values on code reload or dropping anonymous
+           subs
+
+0.02    CHANGES:
+         * Allow RAWDATA for unparsed attributes
+         * Various updates to keep CPANTS happy
+
+0.01    First version, released on an unsuspecting world.
+

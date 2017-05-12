@@ -1,0 +1,14 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.mkdn
+bin/mkfeyorm.pl
+dist.ini
+lib/App/mkfeyorm.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+weaver.ini

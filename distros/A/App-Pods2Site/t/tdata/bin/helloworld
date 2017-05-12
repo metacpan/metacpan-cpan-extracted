@@ -1,0 +1,13 @@
+#! perl
+print "Hello world!\n";
+__END__
+
+=head1 NAME
+
+helloworld
+
+=head2 SYNOPSIS
+
+A test script.
+
+=cut

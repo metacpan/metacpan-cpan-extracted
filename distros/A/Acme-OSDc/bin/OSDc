@@ -1,0 +1,26 @@
+#!/usr/bin/perl -ws
+# Based upon 'ook' Jarkko Hietaniemi
+
+use strict;
+use vars qw($S $l $O);
+
+use Acme::OSDc;
+my $Ook = Acme::OSDc->new;
+my $OOK = $Ook->compile(@ARGV);
+
+if ($O) {
+    $OOK = $Ook->optimise($OOK);
+}
+
+if ($S) {
+    print $OOK;
+} else {
+    eval $OOK;
+}
+
+print "\n" if $l;
+
+exit(0);
+
+
+

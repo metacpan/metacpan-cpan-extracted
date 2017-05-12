@@ -1,0 +1,16 @@
+#!/bin/bash
+IFS_BAK=$IFS;
+IFS=$'\n';
+
+mkdir -p /tmp/test/pages;
+pdftotext "$1" "$2";
+#pdftohtml -i "$1" "$2.html";
+#mv "$2" /tmp/test/pages;
+#mv "$2.*.html" /tmp/test/pages;
+#mv "$2.*.png" /tmp/test/pages;
+#mv "$2.*.jpg" /tmp/test/pages;
+
+FROM="$1"
+TO="$2"
+
+#awk '/MARKER/{n++}{print > ".out" n }' "$TO.txt";

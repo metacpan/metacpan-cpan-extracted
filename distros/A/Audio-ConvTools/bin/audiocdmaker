@@ -1,0 +1,307 @@
+#!/usr/bin/perl
+
+################################################################################
+# Make audio CD from audio files (ogg, mp3 and wav)                            #
+#                                                                              #
+# Copyright (C) 2006 Michael Hooreman <michael_AT_mijoweb_DOT_net>             #
+################################################################################
+
+#$Id: audiocdmaker,v 1.4 2006-10-28 10:24:21 michael Exp $
+
+=head1 NAME
+
+audiocdmaker - Make audio CD from audio files
+
+The resulting CD will have his track in the same order than the arguments.
+
+=head1 SYNOPSIS
+
+ audiocdmaker [--help] --device device --speed speed file1 [file2 [...]]
+
+ --device: CD Burner device
+ --speed : Speed of burning
+
+ example:
+   audiocdmaker --device /dev/cdrom-hdc --speed 20 tr1.mp3 tr2.ogg tr3.wav
+
+=head1 DESCRIPTION
+
+C<audiocdmaker> Burns an audio CD from audio Ogg Vorbis, MPEG III and Wav
+files.
+
+=head2 PROGRAMS USED
+
+To do the conversions, this program uses the following linux programs:
+
+=over
+
+=item *
+
+mpg321, tested with version 0.2.10
+
+=item *
+
+oggdec, tested with version 1.0.1
+
+=back
+
+To prepare tracks and burn, this program uses:
+
+=over
+
+=item *
+
+sox, tested with version 12.17.9
+
+=item *
+
+normalize, tested with version 0.7.6
+
+=back
+
+To burn, this program uses:
+
+=over
+
+=item *
+
+cdrecord, tested with version 2.01.01
+
+=back
+
+=cut
+
+=head1 SEE ALSO
+
+L<Audio::ConvTools>
+
+=head1 AUTHOR
+
+Michael Hooreman C<< <mhooreman at skynet.be> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-audioconv-tools at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Audio-ConvTools>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Audio::ConvTools
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Audio-ConvTools>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Audio-ConvTools>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Audio-ConvTools>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Audio-ConvTools>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Michael Hooreman, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+use strict;
+use warnings;
+
+BEGIN {
+	use FindBin;
+	use lib "$FindBin::Bin/../lib/"; #usefull if running in the package (developpement)
+}
+
+use Getopt::Long;
+use Pod::Usage;
+use File::NCopy;
+use Audio::ConvTools qw/:DEFAULT :Log :Tmp/;
+
+my $VERSION = Audio::ConvTools::getVersion();
+
+my @listFiles;
+my $device;
+my $speed;
+
+sub parseCmdline()
+{
+	my $helpOpt;
+	my $inFmt;
+	my $outFmt;
+
+	#reading the options
+	GetOptions(
+		"help"     => \$helpOpt,
+		"device:s" => \$device,
+		"speed:i"  => \$speed
+	) or pod2usage(1);
+	$helpOpt and pod2usage(0);
+	$device or pod2usage(1);
+	$speed  or pod2usage(1);
+
+	#the @ARGV was shifted for each option
+	$#ARGV>=0 or pod2usage(1);
+	@listFiles = map { {file=>$_,} } @ARGV;
+}
+
+sub copyWav($$)
+{
+	my ($src, $dst) = @_;
+	my $copyer = new File::NCopy('preserve'=>1);
+	$copyer->copy($src, $dst) or do {
+		errMsg("Cannot copy $src to $dst: $!");
+		return 0;
+	};
+	return 1;
+}
+
+sub analyseFilesExtensions()
+{
+	logMsg("Analysing files types");
+	foreach my $f (@listFiles) {
+		if ($f->{file} =~ /^(.*)\.mp3$/i) {
+			$f->{toWav} = \&mp32wav;
+			next;
+		}
+		if ($f->{file} =~ /^(.*)\.ogg$/i) {
+			$f->{toWav} = \&ogg2wav;
+			next;
+		}
+		if ($f->{file} =~ /^(.*)\.wav$/i) {
+			$f->{toWav} = \&copyWav;
+			next;
+		}
+		errMsg("Not managed extension for $f");
+		pod2usage(1);
+	};
+}
+
+sub showCopyrights()
+{
+	print "audiocdmaker $VERSION - Make audio CD from audio files$/";
+	print $/;
+	print "Copyright (C) 2006 Michael Hooreman <michael_AT_mijoweb_DOT_net>$/";
+	print "Licensed under the terms of the GNU General Public Licence$/";
+	print $/;
+}
+
+sub prepareAndBurn()
+{
+	logMsg("Processing");
+	my @normalized = ();
+	push @normalized, makeSampledWav($_) foreach (@listFiles);
+	my $files = join " ", map {"$_"} @normalized;
+	my $status;
+	$status = normalizeFiles($files);
+	burnCd($files) if $status;
+	destroyTmpFile(\$_) foreach @normalized;
+	return $status;
+}
+
+sub burnCd($)
+{
+	my $files = shift;
+	logMsg("Burning CD");
+	if (system("cdrecord speed=$speed dev=$device -pad -audio $files")) {
+		errMsg("Cannot burn");
+		return 0;
+	}
+	return 1;
+}
+
+sub normalizeFiles($)
+{
+	my $files = shift;
+	logMsg("Normalizing tracks");
+	if (system("normalize -m $files")) {
+		errMsg("Cannot normalize files");
+		return 0;
+	}
+	return 1;
+}
+
+sub resample($)
+#resample a wav file to 44100 Hz
+{
+	my $file = shift;
+	my $tmp = getTmpFile('.wav');
+	my $tmpName = $tmp."";
+
+	logMsg("Resampling $file to 44100 Hz");
+
+	#we make a temp file who is a copy of the input,
+	#and then we remove the input
+	copyWav($file, $tmpName) or do {
+		errMsg("Cannot copy input wav");
+		return 0;
+	};
+	unlink($file) or do {
+		errMsg("Cannot remove old input file: $!");
+		return 0;
+	};
+
+	if (system("sox $tmpName -r 44100 -c 2 $file")) {
+		errMsg("Cannot resample $file");
+		return 0;
+	}
+
+	destroyTmpFile(\$tmp);
+
+	return 1;
+}
+
+sub makeSampledWav($)
+{
+	my $in = shift;
+	my $out = getTmpFile('.wav');
+	my $toWav = $in->{toWav};
+	my $inFile = $in->{file};
+	my $outFile = $out.""; #this is a File::Tmp=>textual context=file name
+	logMsg("Making samled file from $inFile");
+	&$toWav($inFile, $outFile) or exit(1);
+	resample($outFile) or exit(1);
+	return $out;
+}
+
+showCopyrights();
+parseCmdline();
+analyseFilesExtensions();
+exit(100) unless prepareAndBurn();
+
+__END__
+
+#$Log: audiocdmaker,v $
+#Revision 1.4  2006-10-28 10:24:21  michael
+#Updated my email address.
+#Changed to version 0.08
+#
+#Revision 1.3  2006-08-18 12:50:12  mhoo
+#module is now Audio::ConvTool
+#switched to version 0.06
+#
+#Revision 1.2  2006/08/18 12:28:28  mhoo
+#AudioConvTools becomes Audio::ConvTools
+#switched to v0.4
+#
+#Revision 1.1.1.2  2006/08/18 11:46:28  mhoo
+#Version 0.9 Ready for CPAN
+#
+

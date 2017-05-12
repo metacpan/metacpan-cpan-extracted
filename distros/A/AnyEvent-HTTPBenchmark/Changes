@@ -1,0 +1,22 @@
+0.09
+	-adding DNS caching
+0.08
+	-more help 
+0.07
+	-adding the missing benchmark.pl  
+	-rechange the verboser flag to -verbose
+	-delete some obsolete things
+0.06
+	-more help
+0.05 
+	-adding help
+	-try to curve dns caching problem :)
+0.04
+	-remove the -file param releted code.
+	-change the all say to perl due the perl 5.8.x(really because this version is using be RHEL/CentOS )
+0.03 
+	-adding the command line args. ( -url , -c , -n , -debug , -file, -proxy , useragent ) 
+0.02
+	-add some stats output + small code refactoring
+0.01
+	-first public release

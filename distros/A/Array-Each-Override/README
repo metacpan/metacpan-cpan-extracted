@@ -1,0 +1,22 @@
+NAME
+    Array::Each::Override - "each" for iterating over an array's keys and
+    values
+
+SYNOPSIS
+        use Array::Each::Override;
+
+        my @array = get_data();
+        while (my ($i, $val) = each @array) {
+            print "Position $i contains: $val\n";
+        }
+
+AUTHOR
+    Aaron Crane <arc@cpan.org>
+
+COPYRIGHT
+    Copyright 2007 Aaron Crane.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the Artistic License, or (at your option) under the
+    terms of the GNU General Public License version 2.
+

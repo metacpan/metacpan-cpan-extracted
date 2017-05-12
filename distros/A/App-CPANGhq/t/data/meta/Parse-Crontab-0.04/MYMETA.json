@@ -1,0 +1,8 @@
+{
+    "version": "0.04",
+    "resources": {
+        "repository": {
+            "url": "dummy"
+        }
+    }
+}

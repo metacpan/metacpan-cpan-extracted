@@ -1,0 +1,40 @@
+App::XML::DocBook::Builder
+
+This module can be used to generate makefile templates for building
+DocBook/XML files.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc App::DocBook::XML::Builder
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/App::DocBook::XML::Builder
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::DocBook::XML::Builder
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/App::DocBook::XML::Builder
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/App::DocBook::XML::Builder
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Shlomi Fish
+
+This program is released under the following license: bsd

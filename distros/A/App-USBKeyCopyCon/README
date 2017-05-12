@@ -1,0 +1,47 @@
+
+App::USBKeyCopyCon is a GTK application for bulk copying USB flash drives
+(storage devices).  The application was developed to run on Linux and is
+probably not particularly portable to other platforms.
+
+The application itself is pure Perl but it relies on a number of binary
+modules.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::USBKeyCopyCon
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-USBKeyCopyCon
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-USBKeyCopyCon
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-USBKeyCopyCon
+
+    Search CPAN
+        http://search.cpan.org/dist/App-USBKeyCopyCon
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Grant McLean
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

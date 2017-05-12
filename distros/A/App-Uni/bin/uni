@@ -1,0 +1,213 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+# PODNAME: uni
+# ABSTRACT: command-line utility to find or display Unicode characters
+
+use App::Uni;
+use Encode qw(decode);
+
+binmode STDOUT, ':encoding(utf-8)';
+
+@ARGV = map {; decode('UTF-8', $_) } @ARGV;
+
+App::Uni->run(@ARGV);
+
+#pod =head1 DESCRIPTION
+#pod
+#pod   $ uni ☺
+#pod   263A ☺ WHITE SMILING FACE
+#pod
+#pod   # Only on Perl 5.14+
+#pod   $ uni wry
+#pod   1F63C <U+1F63C> CAT FACE WITH WRY SMILE
+#pod
+#pod F<uni> has several modes of operation:
+#pod
+#pod =head2 DWIM Mode
+#pod
+#pod By default, F<uni> will interpret your arguments usefully.  If the only
+#pod argument is a single character, it will be looked up.  Otherwise, it will work
+#pod in name search mode, with the exception that search terms comprised entirely
+#pod of hex digits are allowed to match against the codepoint's numeric value.
+#pod
+#pod =head2 Single Character Mode
+#pod
+#pod   $ uni -s SINGLE-CHAR
+#pod
+#pod This will print out the name and codepoint of the character.
+#pod
+#pod   $ uni -s ¿
+#pod   ¿ - U+000BF - INVERTED QUESTION MARK
+#pod
+#pod =head2 Name Search Mode
+#pod
+#pod   $ uni -n SOME /SEARCH/ TERMS
+#pod
+#pod This one will look for codepoints where each term appears as a (\b-bounded)
+#pod word in the name. If the term is bounded by slashes, it's treated as a regular
+#pod expression and is used to filter candidate codepoints by name.
+#pod
+#pod   $ uni -n roman five
+#pod   Ⅴ - U+02164 - ROMAN NUMERAL FIVE
+#pod   Ⅾ - U+0216E - ROMAN NUMERAL FIVE HUNDRED
+#pod   ⅴ - U+02174 - SMALL ROMAN NUMERAL FIVE
+#pod   ⅾ - U+0217E - SMALL ROMAN NUMERAL FIVE HUNDRED
+#pod   ↁ - U+02181 - ROMAN NUMERAL FIVE THOUSAND
+#pod
+#pod =head2 String Decomposition
+#pod
+#pod   $ uni -c SOME STRINGS
+#pod
+#pod This prints out the codepoints in each string, with a blank line between each
+#pod argument's codepoints.
+#pod
+#pod   $ uni -c Hey リコ
+#pod   H - U+00048 - LATIN CAPITAL LETTER H
+#pod   e - U+00065 - LATIN SMALL LETTER E
+#pod   y - U+00079 - LATIN SMALL LETTER Y
+#pod
+#pod   リ- U+030EA - KATAKANA LETTER RI
+#pod   コ- U+030B3 - KATAKANA LETTER KO
+#pod
+#pod =head2 Lookup By Codepoint
+#pod
+#pod   $ uni -u NUMBERS IN HEX
+#pod
+#pod This prints out the codepoint for each given hex value.
+#pod
+#pod   $ uni -u FF 1FF 10FF
+#pod   ÿ - U+000FF - LATIN SMALL LETTER Y WITH DIAERESIS
+#pod   ǿ - U+001FF - LATIN SMALL LETTER O WITH STROKE AND ACUTE
+#pod   ჿ - U+010FF - GEORGIAN LETTER LABIAL SIGN
+#pod
+#pod =head1 NOTES
+#pod
+#pod If you'd like to search for Emojis in Unicode 6.0, please upgrade to Perl 5.14!
+#pod
+#pod =head1 ACKNOWLEDGEMENTS
+#pod
+#pod This is a re-implementation of a program written by Audrey Tang in Taiwan.  I
+#pod used that program for years before deciding I wanted to add a few features,
+#pod which I did by rewriting from scratch.
+#pod
+#pod That program, in turn, was a re-implementation of a same-named program Larry
+#pod copied to me, which accompanied Audrey for years.  However, that program was
+#pod lost during a hard disk failure, so she coded it up from memory.
+#pod
+#pod Thank-you, Larry, for everything. ♡
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+uni - command-line utility to find or display Unicode characters
+
+=head1 VERSION
+
+version 9.003
+
+=head1 DESCRIPTION
+
+  $ uni ☺
+  263A ☺ WHITE SMILING FACE
+
+  # Only on Perl 5.14+
+  $ uni wry
+  1F63C <U+1F63C> CAT FACE WITH WRY SMILE
+
+F<uni> has several modes of operation:
+
+=head2 DWIM Mode
+
+By default, F<uni> will interpret your arguments usefully.  If the only
+argument is a single character, it will be looked up.  Otherwise, it will work
+in name search mode, with the exception that search terms comprised entirely
+of hex digits are allowed to match against the codepoint's numeric value.
+
+=head2 Single Character Mode
+
+  $ uni -s SINGLE-CHAR
+
+This will print out the name and codepoint of the character.
+
+  $ uni -s ¿
+  ¿ - U+000BF - INVERTED QUESTION MARK
+
+=head2 Name Search Mode
+
+  $ uni -n SOME /SEARCH/ TERMS
+
+This one will look for codepoints where each term appears as a (\b-bounded)
+word in the name. If the term is bounded by slashes, it's treated as a regular
+expression and is used to filter candidate codepoints by name.
+
+  $ uni -n roman five
+  Ⅴ - U+02164 - ROMAN NUMERAL FIVE
+  Ⅾ - U+0216E - ROMAN NUMERAL FIVE HUNDRED
+  ⅴ - U+02174 - SMALL ROMAN NUMERAL FIVE
+  ⅾ - U+0217E - SMALL ROMAN NUMERAL FIVE HUNDRED
+  ↁ - U+02181 - ROMAN NUMERAL FIVE THOUSAND
+
+=head2 String Decomposition
+
+  $ uni -c SOME STRINGS
+
+This prints out the codepoints in each string, with a blank line between each
+argument's codepoints.
+
+  $ uni -c Hey リコ
+  H - U+00048 - LATIN CAPITAL LETTER H
+  e - U+00065 - LATIN SMALL LETTER E
+  y - U+00079 - LATIN SMALL LETTER Y
+
+  リ- U+030EA - KATAKANA LETTER RI
+  コ- U+030B3 - KATAKANA LETTER KO
+
+=head2 Lookup By Codepoint
+
+  $ uni -u NUMBERS IN HEX
+
+This prints out the codepoint for each given hex value.
+
+  $ uni -u FF 1FF 10FF
+  ÿ - U+000FF - LATIN SMALL LETTER Y WITH DIAERESIS
+  ǿ - U+001FF - LATIN SMALL LETTER O WITH STROKE AND ACUTE
+  ჿ - U+010FF - GEORGIAN LETTER LABIAL SIGN
+
+=head1 NOTES
+
+If you'd like to search for Emojis in Unicode 6.0, please upgrade to Perl 5.14!
+
+=head1 ACKNOWLEDGEMENTS
+
+This is a re-implementation of a program written by Audrey Tang in Taiwan.  I
+used that program for years before deciding I wanted to add a few features,
+which I did by rewriting from scratch.
+
+That program, in turn, was a re-implementation of a same-named program Larry
+copied to me, which accompanied Audrey for years.  However, that program was
+lost during a hard disk failure, so she coded it up from memory.
+
+Thank-you, Larry, for everything. ♡
+
+=head1 AUTHOR
+
+Ricardo Signes <rjbs@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+
+Ricardo Signes has dedicated the work to the Commons by waiving all of his
+or her rights to the work worldwide under copyright law and all related or
+neighboring legal rights he or she had in the work, to the extent allowable by
+law.
+
+Works under CC0 do not require attribution. When citing the work, you should
+not imply endorsement by the author.
+
+=cut

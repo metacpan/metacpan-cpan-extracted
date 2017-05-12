@@ -1,0 +1,59 @@
+{
+   "abstract" : "The Amon2 Plugin for detecting the User Agent by Woothee",
+   "author" : [
+      "Dai Okabayashi <bayashi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amon2-Plugin-Web-Woothee",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Requires" : "0.06",
+            "Test::WWW::Mechanize::PSGI" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Amon2" : "0",
+            "Woothee" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Amon2::Plugin::Web::Woothee" : {
+         "file" : "lib/Amon2/Plugin/Web/Woothee.pm",
+         "version" : "0.02"
+      },
+      "Amon2::Plugin::Web::Woothee::Object" : {
+         "file" : "lib/Amon2/Plugin/Web/Woothee.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/bayashi/Amon2-Plugin-Web-Woothee/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/bayashi/Amon2-Plugin-Web-Woothee"
+      }
+   },
+   "version" : "0.02"
+}

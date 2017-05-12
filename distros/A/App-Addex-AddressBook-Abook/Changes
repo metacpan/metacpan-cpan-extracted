@@ -1,0 +1,26 @@
+Revision history for App-Addex-AddressBook-Abook
+
+0.008     2013-11-19 23:14:17 America/New_York
+          fix repository links
+
+0.007     2013-06-19 19:10:14 America/New_York
+          repackage, update bugtracker, etc.
+
+0.006     2009-07-08
+          restore to cpan! oops!
+
+0.005     2009-01-16
+          update packaging; repo link, etc
+
+0.004     2007-11-19
+          refresh Module::Install
+          update required version of Config::INI::Reader
+
+0.003     2007-05-11
+          use App::Addex::Entry::EmailAddress
+
+0.002     2007-05-11
+          use App::Addex::Entry::EmailAddress
+
+0.001     2007-05-09
+          first release

@@ -1,0 +1,9 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::Utils qw (get_syslib_version);
+
+print 'AFS Syslib Version = ', get_syslib_version, "\n";

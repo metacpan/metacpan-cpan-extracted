@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution ARGV-Abs,
+version 1.01:
+
+  Transform paths in @ARGV to absolute paths
+
+This software is copyright (c) 2011 by Olivier Mengué.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

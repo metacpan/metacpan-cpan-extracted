@@ -1,0 +1,102 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+=head1 NAME
+
+typeless_uri - convert typeless URIs (URIs without extension) to working file references
+
+=head1 SYNOPSIS
+
+  # uri_to_file must go first.
+  Plugin uri_to_file
+  Plugin typeless_uri
+  
+  # required
+  DirectoryIndex index
+  # optionally
+  URIExtensions html xhtml xsp
+
+=head1 DESCRIPTION
+
+This plugin provides the filename for a given URI. It supplements uri_to_file and
+provides typeless URIs, i.e. URIs that do not contain a file extension.
+
+See L<http://www.w3.org/Provider/Style/URI> for a discussion of why this is a Good Thing (TM).
+
+It works by trying several extensions on the given URI until the resulting file exists.
+
+=head1 CONFIG
+
+=head2 URIExtensions STRINGLIST
+
+A list of file extensions to try in sequence not including the leading dot.
+
+=head1 TODO
+
+Content Negotiation should be investigated for another level of flexibility.
+
+=cut
+
+use File::Spec::Functions qw(canonpath catfile);
+use constant EXTENSIONS => [
+    'xhtml',
+    'html',
+    'xsp',
+    'pl',
+    'cgi',
+];
+
+sub init {
+    my $self = shift;
+    $self->register_config('URIExtensions', sub { $self->set_uriextensions(@_) });
+}
+
+sub set_uriextensions {
+    my ($self, $config, $value) = @_;
+    $config->notes($self->plugin_name.'::extensions', [ split(/\s+/,$value) ]);
+}
+
+sub try_extensions {
+}
+
+sub hook_uri_translation {
+    my ($self, $hd, $uri) = @_;
+
+    my $file = $hd->filename;
+    return DECLINED if -f $file;
+
+    do {
+        $file = canonpath(catfile($file,$self->config->notes('uri_to_file::dirindex')))
+            if -d _ && !$self->client->notes('need_redirect');
+        $self->log(LOGINFO, "typeless: $uri -> $file.*");
+
+        my $extensions = $self->config('extensions') || EXTENSIONS;
+        for my $extension (@$extensions) {
+            if (-f $file.'.'.$extension) {
+                $hd->filename($file.'.'.$extension);
+                $self->log(LOGDEBUG, "Translated $uri to ". $hd->filename);
+                $self->client->notes('need_redirect', 0);
+                return DECLINED;
+            }
+        }
+
+        return DECLINED if ! -d $file || $self->client->notes('need_redirect');
+        $file = canonpath(catfile($file,$self->config->notes('uri_to_file::dirindex')));
+    } while (1);
+
+    return DECLINED;
+}

@@ -1,0 +1,163 @@
+=head1 NAME
+
+App::Pods2Site - converting pods to HTML site
+
+Find all pods and convert them to linked HTML pages, and add some extra parts on top to bind them together
+as a simple documentation site for your Perl installation.
+
+=head1 VERSION
+
+Version 0.010
+
+=head1 SYNOPSIS
+
+  # Normally run 'pods2site' from a shell prompt to create or update:
+  #
+  pods2site /path/to/site
+
+=head1 OVERVIEW
+
+This package is an application, generally intended to be run from a command line.
+
+It was inspired by the HTML documentation present in an ActivePerl installation, and which was
+updatable by using the 'ap-update-html' application after new modules had been installed.
+
+As I also use other Perl distributions on both Windows and Linux, I felt the need to have a simple way
+to generate something similar anywhere. Hence, this tool which generates a no-frills site similarly looking.
+
+In short, this application will by default create a simple site based on all pods found in the distribution it's installed
+in. As modules are updated/installed in the distribution, the application can be run again and efficiently update
+the documentation site.
+
+However, it also allows you to search arbitrary locations for pods, as well as cherrypick among the found pods and
+skip ones of no interest to you.
+
+=head1 FUNCTION
+
+The overall function is simple:
+
+Use the L<Config> module in the running Perl to find all pods, convert them using L<Pod::Html> and lastly, generate an index page
+as well as a TOC and tie it all together. Point a browser at F<index.html> and you're good to go.
+
+At any time, the command can be run again, and this time it will reuse the same options as before and update the site if any pods
+are new or newer than the corresponding HTML file.
+
+Taking a cue from the ActivePerl way of collecting the pods, pods are divided in 4 categories. The rules for doing this are fairly
+simpleminded and heuristic though, so occasionally you may find a module that doesn't really conform to the categorization. Sorry.
+
+Further, you may miss documentation for scripts or modules you know are there - this typically means that they don't contain any POD
+text. Talk to the module author.
+
+Lastly, due to how L<Pod::HTML> sometimes seem to reason on how links should be fulfilled, they may not necessarily go where you
+expect.
+
+=over
+
+=item * Core
+
+This group, as far as I can surmise, are found as pod files in the lib 'pods' directory and named 'perl...'. Technically, this means that they should
+be named as 'pods::perlxxx', but as many modules and other pods use links with just 'perlxxx', behind the scenes they are set up to be found in the root also.
+
+=item * Scripts
+
+This group is found in the bin directories (e.g. the F<pods2site> command itself).
+
+=item * Pragmas
+
+Defined as modules with a (top-level) name starting with a lowercase a-z, such as 'attributes' but also 'autodie::Scope::Guard'.
+
+=item * Modules
+
+Everything else.
+
+=back
+
+=head1 AUTHOR
+
+Kenneth Olwing, C<< <knth at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-app-pods2site at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Pods2Site>. I will be
+notified, and then you'll automatically be notified of progress on your bug as
+I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc App::Pods2Site
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Pods2Site>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/App-Pods2Site>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/App-Pods2Site>
+
+=item * Search CPAN
+
+L<http://metacpan.org/dist/App-Pods2Site/>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+I thank my family for putting up with me!
+
+=head1 REPOSITORY
+
+L<https://github.com/kenneth-olwing/App-Pods2Site>.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2017 Kenneth Olwing.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut

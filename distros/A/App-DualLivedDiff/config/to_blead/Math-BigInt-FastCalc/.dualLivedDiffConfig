@@ -1,0 +1,9 @@
+---
+files:
+  lib/Math/BigInt/FastCalc.pm: ext/Math-BigInt-FastCalc/FastCalc.pm
+  FastCalc.xs: ext/Math-BigInt-FastCalc/FastCalc.xs
+  Makefile.PL: ext/Math-BigInt-FastCalc/Makefile.PL
+dirs-recursive:
+  t/: ext/Math-BigInt-FastCalc/t/
+exclude-regexes:
+  - '^(?:\.?/)?t/pod(?:_cov)?\.t$'

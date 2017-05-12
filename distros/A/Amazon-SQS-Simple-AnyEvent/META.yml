@@ -1,0 +1,25 @@
+---
+abstract: "A non-blocking API to Amazon's SQS"
+author:
+  - 'Jeffrey Ryan Thalhammer <jeff@thaljef.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amazon-SQS-Simple-AnyEvent
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Amazon::SQS::Simple: '2.04'
+  AnyEvent::HTTP: '0'
+  Test::More: '0'
+  XML::Simple: '0'
+version: '0.02'

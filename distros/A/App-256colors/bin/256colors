@@ -1,0 +1,75 @@
+#!/usr/bin/env perl
+
+# PODNAME: 256colors - Pretty print integer and hex (rgb) color codes
+
+use strict;
+use warnings;
+use v5.10;
+
+use IPC::System::Simple qw(capture);
+use Color::ANSI::Util qw(ansi256_to_rgb);
+
+my $maxcount = capture q(tput cols);
+my $margin   = 15;
+
+open my $less_pipe, "|-", "less -FRX" or die $!;
+
+my $outcount;
+for my $intcolor (0..255) {
+    printf $less_pipe "\e[1;38;5;${intcolor}m%03d\e[0m ", $intcolor;
+    $outcount += 5;
+
+    my $hexcolor = ansi256_to_rgb($intcolor);
+    printf $less_pipe "(\e[1;38;5;${intcolor}m%s\e[0m)  ", "#$hexcolor";
+    $outcount += 10;
+
+    if ( $outcount >= $maxcount-$margin ) {
+        print $less_pipe "\n";
+        $outcount = 0;
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+256colors - Pretty print integer and hex (rgb) color codes
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+    $ 256colors
+
+=head1 SCREENSHOT
+
+=for HTML <p><img src="http://i.imgur.com/lTMSTgi.png" /></p>
+
+L<http://imgur.com/lTMSTgi>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Color::ANSI::Util>
+
+=back
+
+=head1 AUTHOR
+
+Dylan Cali <calid1984@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Dylan Cali.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

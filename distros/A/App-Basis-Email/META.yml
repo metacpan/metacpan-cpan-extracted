@@ -1,0 +1,32 @@
+---
+abstract: 'Adding a simple way to send text and html/markdown emails'
+author:
+  - 'Kevin Mulholland <moodfarm@cpan.org>'
+build_requires:
+  File::Slurp: 0
+  Test::More: 0
+  perl: v5.12.0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Basis-Email
+requires:
+  Email::MIME::CreateHTML: 0
+  Email::Sender::Simple: 0
+  Email::Sender::Transport::SMTP: 0
+  Email::Sender::Transport::Sendmail: 0
+  HTML::Restrict: 0
+  Moo: 0
+  Text::Markdown: 0
+  Try::Tiny: 0
+  perl: v5.12.0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/27escape/App-Basis-Email.git
+version: 0.3

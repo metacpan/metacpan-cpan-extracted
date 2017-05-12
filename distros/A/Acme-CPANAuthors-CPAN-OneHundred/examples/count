@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+use strict;
+use Acme::CPANAuthors;
+
+my $authors  = Acme::CPANAuthors->new("CPANs::/OneHundred");
+my $number   = $authors->count;
+
+print "$number CPAN authors 100 or distributions on CPAN\n";

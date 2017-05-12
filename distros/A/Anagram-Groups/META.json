@@ -1,0 +1,41 @@
+{
+   "abstract" : "The great new Anagram::Groups which will show us all the anagrams for the given array of strings!",
+   "author" : [
+      "isunix <isunix1989@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Anagram-Groups",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Anagram::Groups" : {
+         "file" : "lib/Anagram/Groups.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "0.02"
+}

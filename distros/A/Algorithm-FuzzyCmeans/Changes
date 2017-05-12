@@ -1,0 +1,8 @@
+Revision history for Perl extension Algorithm::FuzzyCmeans
+
+0.02    Fri Oct 16 11:27:00 2009
+        - declare the dependency on constant explicity
+        for old version of constants.pm (< ver.1.03)
+
+0.01    Fri Oct  2 16:01:05 2009
+        - original version

@@ -1,0 +1,50 @@
+Revision history for App-FatPackUtils
+
+0.08    2016-12-29 (PERLANCAR)
+
+	- Add utility: update-fatpack-snippets.
+
+
+0.07    2016-02-06 (PERLANCAR)
+
+	- [Bugfix] fatpack-info: file_size information was broken.
+
+
+0.06    2016-02-06 (PERLANCAR)
+
+	- fatpack-info: Now can search script in PATH.
+
+	- fatpack-info: Add option --show-module-version (-V).
+
+
+0.05    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+
+0.04    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.03    2015-07-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update mention (fatten renamed to depak).
+
+
+0.02    2015-06-17 (PERLANCAR)
+
+	- Add script: fatpack-modules.
+
+
+0.01    2015-04-16 (PERLANCAR)
+
+        - First release.

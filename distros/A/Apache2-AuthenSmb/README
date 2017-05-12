@@ -1,0 +1,109 @@
+NAME
+    Apache2::AuthenSMB - mod_perl NT Authentication module
+
+SYNOPSIS
+
+    <Directory /foo/bar>
+    # This is the standard authentication stuff
+    AuthName "Foo Bar Authentication"
+    AuthType Basic
+
+    # Variables you need to set, you must set at least
+    # the myPDC variable, the DOMAIN defaults to WORKGROUP
+    PerlSetVar myPDC workgroup-pdc
+    PerlSetVar myBDC workgroup-bdc
+    PerlSetVar myDOMAIN WORKGROUP
+
+    # Optional Variables
+    PerlSetVar groupFile /path/to/htgroups
+    # Set the format of the username to check against
+    # defaults to username
+    PerlSetVar authzUsername username or domain\username
+
+    PerlAuthenHandler Apache2::AuthenSmb
+
+    # Standard require stuff, only user and
+    # valid-user work currently
+    require valid-user
+
+    # Optional, reqires that you have Apache::Htgroup
+    # require group groupname
+    </Directory>
+
+    These directives can be used in a .htaccess file as well.
+
+    If you wish to use your own PerlAuthzHandler then the require
+    directive should follow whatever handler you use.
+
+
+DESCRIPTION
+    This perl module is designed to work with mod_perl and the
+    Authen::Smb module by Patrick Michael Kane (See CPAN). You need
+    to set your PDC, BDC, and NT domain name for the script to
+    function properly. You MUST set a PDC, if no BDC is set it
+    defaults to the PDC, if no DOMAIN is set it defaults to
+    WORKGROUP.
+
+    Users can also specify the Windows Domain name along with the username
+    when authenticating using the format: C<Domain\Username>. The Domain
+    specified will override the domain name set in the myDOMAIN
+    configuration setting.
+
+    PerlSetVar myPDC
+
+    Set to the FQDN or IP Address of your Primary Domain Controller
+
+    PerlSetVar my BDC
+
+    Set to the FQDN or IP Address of your Backup Domain Controller
+
+    PerlSetVar myDOMAIN
+
+    Set this to the Domain Name
+
+    PerlSetVar groupFile
+
+    Set this to the path of the htgroup file you wish this module
+    to check in.  It allows you to specify your users in groups
+    found on the web server, as opposed to groups within Active
+    Directory, etc.
+
+    PerlSetVar authzUsername
+
+    Set this to "username" or "domain\username" depending on your preference.
+    (This simply formats the input username to allowing checking the username
+    as "domain\username" or "username".)  For example:
+
+    # speeves is a DOMAIN user of DOMAIN
+    domain\username =>  DOMAIN\speeves
+
+    # speeves is a DOMAIN user of DOMAIN,
+    # but the server administrator wants to
+    # check this user against groups in the
+    # htgroup file as:
+
+    # groupname: speeves userA userB
+
+    username => speeves
+
+    If you allow users to use B<Domain\Username> and restrict access
+    using the C<require user username> or C<require group groupname> make
+    sure to set the username with the domain included. The authorization
+    phase will be looking for C<Domain\Username> string.
+
+    Example: require user mydomain\ramirezc
+
+NOTE
+    If you are using this module please let me know, I'm curious how
+    many people there are that need this type of functionality.
+
+AUTHOR
+    Michael Parker <parkerm@pobox.com>
+    Ported by Shannon Eric Peevey <speeves@erikin.com>
+
+COPYRIGHT
+    Copyright (c) 1998 Michael Parker, Tandem Computers.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+

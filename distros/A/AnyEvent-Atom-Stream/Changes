@@ -1,0 +1,7 @@
+Revision history for Perl extension AnyEvent::Atom::Stream
+
+0.02  Thu Jul 16 21:21:18 PDT 2009
+        - Simplify AnyEvent::HTTP usage using on_body (Thanks to typester)
+
+0.01  Thu Jul 16 18:51:17 2009
+        - original version

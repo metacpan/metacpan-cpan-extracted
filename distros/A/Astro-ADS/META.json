@@ -1,0 +1,44 @@
+{
+   "abstract" : "Module designed to query the ADS",
+   "author" : [
+      "Alasdair Allan <aa@astro.ex.ac.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Astro-ADS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP" : "5.53",
+            "Net::Domain" : "2.13",
+            "Pod::Usage" : "1.14",
+            "Test::More" : "0.65"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.26"
+}

@@ -1,0 +1,4 @@
+name
+All entities
+Organizations
+People

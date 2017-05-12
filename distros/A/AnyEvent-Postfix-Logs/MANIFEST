@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/AnyEvent/Postfix/Logs.pm
+examples/watch_logs.pl
+t/00-load.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

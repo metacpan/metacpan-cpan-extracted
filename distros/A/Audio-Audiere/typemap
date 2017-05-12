@@ -1,0 +1,9 @@
+
+/* typemap */
+AudioDevicePtr*		T_PTROBJ
+OutputStreamPtr*	T_PTROBJ
+
+/* for Perl 5.6.x */
+const char *	T_PV
+float		T_FLOAT
+double		T_DOUBLE

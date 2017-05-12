@@ -1,0 +1,114 @@
+Revision history for Perl extension Apache::GD::Graph.
+
+0.96	Tue Apr  8 19:34:59 PDT 2003
+	- Fixed another reported error in the test, would have been simpler to
+	  not write one in the first place.
+	- Fixed a bug where the module was trying to delete IO::File objects
+	  instead of the underlying file names.
+
+0.95	Mon Apr  7 15:06:53 PDT 2003
+	- Fixed a possible misreading of the CacheSize parameter reported by
+	  CPAN testers.
+
+0.94	Thu Apr  3 21:06:14 PST 2003
+	- Added compatibility with mod_perl for Apache2.
+	- Made test skip in Apache2 (too lazy to fix it right now).
+
+0.93	Sat Nov 17 14:59:03 PST 2001
+	- Added relative path support for files/fonts etc. So that things like
+	  ../fonts/arial.ttf will resolve relative to DocumentRoot. Or
+	  to_file=../images/foo.png, etc.. Thanks to Joseph Pepin for the
+	  suggestion.
+	- Boxed captions in plain/dashed/dotted/whatever style.
+	- Support builtin GD fonts Like gdSmallFont.
+	- Cleaner code and misc. minor bugs fixed.
+
+0.92	Tue Apr 24 11:36:19 PDT 2001
+	- Previous versions couldn't handle more than 9 arguments because of a
+	  silly string increment bug :) Thanks to Drew Degentesh for pointing
+	  this out.
+
+0.91	Tue Feb  6 16:37:56 PST 2001
+	- Added a background_image option to make it simpler to add background
+	  images to graphs.
+	- Added no_axes parameter.
+	- Added PerlSetVar TTFFontPath to set the path to search for True Type
+	  fonts in GD::Text, and consequently any font related methods in
+	  GD::Graph.
+	- Fixed another minor caching snafu (PerlSetVar CacheSize 0 still
+	  checked for cached images).
+	- Expanded pod docs a bit.
+	- Fixed exceptions, for the last time I hope.
+	- Added support for captions at arbitrary locations in the graph, with
+	  any font.
+
+0.9	Tue Oct 17 11:38:53 PDT 2000
+	- Added a list type () for set_XXX methods. Eg. legend=(mon,tue,wed)
+	  will now work.
+	- Now support x-www-form-urlencoded data sent via a POST request.
+	- Added a to_file parameter, if set the generated graph will be saved
+	  to the destination file on the server.
+
+0.8	Mon Oct  9 22:44:05 PDT 2000
+	- Since 0.7, the default for the X axis is to NOT have any labels.
+	- The "expires" parameter didn't really work, fixed.
+	- The parameter cache=0 in the query string still hit the cache if the
+	  image was already there, fixed.
+	- Was checking for "Accepts" header, when needed to check for "Accept"
+	  header.
+	- Now checking for set_XXX methods as options, so methods like
+	  set_legend(), set_font(), etc will work.
+
+0.7	Wed Sep 14 18:47:27 PDT 2000
+	- Added support for image types other than png via PerlSetVar
+	  ImageType, and the image_type parameter, and via Accepts header
+	  (Thanks to Scott Holdren for the idea and patch.)
+	- Better parsing. Empty values in arrays (like [,foo,bar,,]) will work,
+	  as well as quoted strings. (Thanks to Scott Holdren for the former.)
+	- New argument "expires" allows configuration of Expires header on a
+	  request basis.
+	- New argument "cache" allows requests to not use the server-side
+	  cache.
+	- Improved error handling again.
+	- Now know how to make graphs without axes, see man page.
+
+0.6	Mon Sep  4 15:16:01 PDT 2000
+	- Got rid of all cache handling code and now using File::Cache, as I
+	  should have done in the first place.
+	- PerlSetVar CacheDir is gone (File::Cache uses its own).
+	- PerlSetVar CacheSize added (size in bytes).
+
+0.5	Sat Sep  2 21:48:18 PDT 2000
+	- Fixes from Vivek Khera
+		- Didn't create directory correctly on BSD.
+		- Use File::Path::mkpath to create directory and untaints graph
+		  type so that module is taint safe.
+		- Foreach loop syntax didn't work with 5.004.
+	- Fixed error handling again, now one eval block wrapping handler.
+	- Added PerlSetVar CacheDir and PerlSetVar Expires to control the
+	  server side cache directory and value of the Expires header in days,
+	  respectively.
+	- Deletes retrieved files after itself.
+	- Beginnings of a better test suite.
+	- Just run pod2text on the module to create README, as opposed to not
+	  having a README I guess.
+
+
+0.4	Thu Aug 17 15:57:30 PDT 2000
+	- Changed list of values syntax from 1,2,3... to [1,2,3]. Supports
+	  arrays for all GD::Graph options as well as hashes, urls and undef,
+	  see man page.
+	- Added better error handling.
+	- Caches under /var/cache/Apache::GD::Graph instead of /tmp/graph-<pid>
+	  which was kinda silly.
+
+0.3	Thu Aug  3 15:30:03 PDT 2000
+	- Plots y values for any number of arrays (I misunderstood the
+	  GD::Graph manpage). Fixed syntax and documentation to reflect this.
+
+0.2	Wed Aug  2	    2000
+	- Fixed ABSTRACT in Makefile.PL and MANIFEST.
+
+0.1	Tue Aug  1 15:40:42 2000
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Apache::GD::Graph

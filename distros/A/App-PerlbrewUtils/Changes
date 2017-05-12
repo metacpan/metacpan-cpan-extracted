@@ -1,0 +1,30 @@
+Revision history for App-PerlbrewUtils
+
+0.04    2016-06-02 (PERLANCAR)
+
+        - Add option: --exclude-dev.
+
+        - Add utility: clean-site-lib.
+
+
+0.03    2016-03-17 (PERLANCAR)
+
+        - list-more: Add columns threads, multiplicity, longdouble, is_current.
+
+        - module-version: Add column has_module.
+
+        - [doc] Add description to each command.
+
+
+0.02    2016-03-17 (PERLANCAR)
+
+	- Add common filtering options: --include, --exclude,
+	  --include-version, --exclude-version, --min-version,
+	  --max-version, --xmin-version, --xmax-version.
+
+	- list-more: Add columns num_core_modules, num_noncore_modules.
+
+
+0.01    2016-03-17 (PERLANCAR)
+
+        - First release.

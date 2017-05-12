@@ -1,0 +1,14 @@
+Revision history for Perl extension Algorithm-Dependency-Objects.
+
+0.04
+	- Refactor to make subclassing easier and code more readable
+
+0.03
+	- missing dep
+
+0.02
+	- Fixed META.yml file by rewriting prereqs
+
+0.01
+    - module created
+

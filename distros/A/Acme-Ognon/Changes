@@ -1,0 +1,26 @@
+Revision history for Acme::Ognon
+
+1990.8 2016-03-27
+    - remove use feature in test
+
+1990.7 2016-03-26
+    - replace use of Test::Most with Test::More
+
+1990.6 2016-03-25
+    - fix Makefile.PL links
+
+1990.5 2016-03-23
+	- ajouter t/ dans le MANIFEST
+    - resolve #3 L'Académie française est opposée à la réforme !
+
+1990.4 2016-02-14
+	- corrections, merci ericguirbal
+
+1990.3 2016-02-09
+	- corrections, merci Laurent
+
+1990.2 2016-02-06
+	- version deuxième
+
+1990.1 2016-02-05
+	- version première

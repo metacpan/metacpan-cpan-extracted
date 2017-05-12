@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Apache-VMonitor
+version:            2.07
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Apache::Scoreboard:  2.08
+    Apache::Test:        1.15
+    GTop:                0.12
+    mod_perl2:           2.0
+    Template:            2.0
+    Time::HiRes:         1.19
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

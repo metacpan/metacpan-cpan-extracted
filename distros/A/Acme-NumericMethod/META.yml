@@ -1,0 +1,16 @@
+abstract: I know numeric methods
+author: Kang-min Liu <gugod@gugod.org>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Acme-NumericMethod
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Lingua::EN::Words2Nums: 0
+  perl: 5.8.8
+version: 0.04

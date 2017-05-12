@@ -1,0 +1,188 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# PODNAME: count
+# ABSTRACT: Counting utility for a file consisting of the fixed number of fields like CSV
+our $VERSION = 'v0.1.1'; # VERSION
+
+use App::count;
+
+App::count->run(@ARGV);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+count - Counting utility for a file consisting of the fixed number of fields like CSV
+
+=head1 VERSION
+
+version v0.1.1
+
+=head1 SYNOPSIS
+
+count C<-h>
+
+count C<--help>
+
+count [C<-g>|C<--group> E<lt>columnsE<gt>] [C<-c>|C<--count>] [C<-s>|C<--sum> E<lt>columnsE<gt>] [C<--min> E<lt>columnsE<gt>] [C<--max> E<lt>columnsE<gt>] [C<--avg>|C<--ave> E<lt>columnsE<gt>] [C<-m>|C<--map> E<lt>mapE<gt>] [C<-M>|C<--map-file> E<lt>filenameE<gt>] [C<-r>|C<--reorder> E<lt>orderE<gt>] [C<-t>|C<--delimiter> E<lt>delimiterE<gt>] C<files>...
+
+  # show brief instruction
+  count -h
+
+  # show POD
+  count --help
+
+  # count the number of records grouping by the column 1 and 2
+  # The column number is 1-origin
+  count -g 1,2 file
+
+  # count the sum of the column 3 grouping by the column 1 and 2
+  # field delimiter is ','
+  count -g 1 -g 2 -s 3 -t ',' file
+
+  # Ouput min,max,average of the column 2 and the column 3 grouping by the column 1
+  count -g 1 --min 2 --max 2 --avg 2 --min 3 --max 3 --avg 3
+
+  # All columns are kept and lookuped value of column 1 from foomap in map.yaml is appended, then moved to the first column
+  count -g '*' -M map.yaml -m 1,foomap -r -1
+
+=head1 DESCRIPTION
+
+I has written a oneliner like the following repeatedly and repeatedly, to make some statistics.
+
+  perl -e 'while(<>) { @t = split /\t/; ++$c{$t[0]}; } foreach my $k (keys %c) { print "$k,$c{$k}\n" }'
+
+Yes, we can write as the following making use of command line option.
+
+  perl -an -F "\t" -e '++$c{$F[0]} END { foreach my $k (keys %c) { print "$k,$c{$k}\n" }'
+
+This is still verbose in contrast with doing. By this script, you can write as the following. Please NOTE that the number is 1-origin.
+
+  count -g 1 -t "\t"
+
+Conforming to Unix philosophy, this scirpt does NOT have configurable sort functionality.
+If you want it, you can use C<sort> command.
+
+  count -g 1 -t "\t" | sort -k n1
+
+=head1 OPTIONS
+
+=head2 C<-h>
+
+Show brief instruction.
+
+=head2 C<--help>
+
+Show this POD.
+
+=head2 C<-g>|C<--group> E<lt>columnsE<gt>
+
+Specify group columns like GROUP BY in SQL.
+You can specify multiple times and/or as comma separated numbers.
+
+Specifying a char '*' only means all fields are used as a group.
+If there are 3 fields in a row, C<-g *> means C<-g 1,2,3>.
+
+=head2 C<-c>|C<--count>
+
+Output the number of records. If no other output option is specified, process as if this option is specified.
+
+=head2 C<-s>|C<--sum> E<lt>columnsE<gt>
+
+Output the sum of the specified column.
+You can specify multiple times and/or as comma separated numbers.
+
+=head2 C<--min> E<lt>columnsE<gt>
+
+Output the minimum value of the specified column.
+You can specify multiple times and/or as comma separated numbers.
+
+=head2 C<--max> E<lt>columnsE<gt>
+
+Output the maximum value of the specified column.
+You can specify multiple times and/or as comma separated numbers.
+
+=head2 C<--avg>|C<--ave> E<lt>columnsE<gt>
+
+Output the average of the specified column.
+You can specify multiple times and/or as comma separated numbers.
+
+=head2 C<-m>|C<--map> E<lt>mapE<gt>
+
+Output mapped value of the specified column by the specified mapping key.
+Argument is a list of key and column like.
+
+  -m 0,class,1,subclass
+
+=head2 C<-M>|C<--map-file> E<lt>filenameE<gt>
+
+Specify map file used by -m option. The map file is YAML file having the following structure.
+
+  <key1>:
+    <number11>: <value11>
+    <number12>: <value12>
+  <key2>:
+    <number21>: <value21>
+    <number22>: <value22>
+
+=head2 C<-r>|C<--reorder> E<lt>reorderE<gt>
+
+Specify column reorder as a comma separated integer list.
+C<5,4,3,2,1> means order from the 5th column to the 1st ciolumn.
+Any omitted indices are filled with unsed indices so far. Negative numbers are treated as indices relatve to the last column.
+Trailing repeated commas can be omitted.
+Thus, C<,3,2> is treated as if C<1,3,2,4,5,...> is specified and specifying just C<-1> means 1-step right rotation that is the last column moves to the first column.
+
+This option is in effect at the last stage of the process wherever it is specified.
+
+=head2 C<-t>|C<--delimiter> E<lt>delimiterE<gt>
+
+Specify field separator character. The character is used by both of input and output. Perl's escape such as '\x0D' is available. So, you need to care about escape. For example, if you want to use a backslash as a delimiter, you need to specify as '\\'.
+
+If omitted, the special rule is applied: /\s+/ is used for an input separator and '\t' is used for an output separator.
+
+=head2 C<files>...
+
+Input files. If no files are specified, read from STDIN.
+
+=for getopt 'h'
+
+=for getopt 'help'
+
+=for getopt 'g|group=s@'
+
+=for getopt 'c|count'
+
+=for getopt 'sum|s=s@'
+
+=for getopt 'min=s@'
+
+=for getopt 'max=s@'
+
+=for getopt 'avg|ave=s@'
+
+=for getopt 'map|m=s@'
+
+=for getopt 'M|map-file=s'
+
+=for getopt 'r|reorder=s'
+
+=for getopt 't|delimiter=s'
+
+=head1 AUTHOR
+
+Yasutaka ATARASHI <yakex@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Yasutaka ATARASHI.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

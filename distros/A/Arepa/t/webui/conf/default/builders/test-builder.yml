@@ -1,0 +1,6 @@
+type: sbuildfake
+results_from: t/webui/conf/default/fixtures/test-builder
+architecture: i386
+architecture_all: 1
+distribution: mylenny
+distribution_aliases: [lenny, unstable]

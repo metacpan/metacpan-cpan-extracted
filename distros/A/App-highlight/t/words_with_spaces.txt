@@ -1,0 +1,8 @@
+test
+test with spaces
+test with spaces on the end    
+just spaces on the next line
+        
+empty line next
+
+end of test

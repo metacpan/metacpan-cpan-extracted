@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache-AuthzLDAP
+version:      1.11
+version_from: AuthzLDAP.pm
+installdirs:  site
+requires:
+    Apache:                        1.26
+    Apache::Log:                   1.01
+    Net::LDAP:                     0.25
+    Text::ParseWords:              3.2
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

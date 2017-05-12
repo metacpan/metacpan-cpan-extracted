@@ -1,0 +1,32 @@
+---
+abstract: "tap the \"hakushu\" (like!) button for YAPC::Asia 2012, LTthon"
+author:
+  - '<<YOUR NAME HERE>> <<<YOUR EMAIL ADDRESS HERE>>>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.88
+  Test::Requires: 0.06
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Acme::YAPC::Asia::2012::LTthon::Hakushu
+name: Acme-YAPC-Asia-2012-LTthon-Hakushu
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Furl: 0
+  parent: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/gfx/p5-YAPC-Asia-2012-LTthon-Hakushu.git
+version: 0.03

@@ -1,0 +1,18 @@
+README
+MANIFEST
+Makefile.PL
+GPL
+ChangeLog
+Constants/Makefile.PL
+Constants/Constants.pm
+Parse/Makefile.PL
+Parse/Parse.pm
+Util/Makefile.PL
+Util/Util.pm
+Util/SWIFT/Makefile.PL
+Util/SWIFT/SWIFT.pm
+t/constants.t
+t/parse.t
+t/util.t
+t/util_swift.t
+META.yml                                 Module meta-data (added by MakeMaker)

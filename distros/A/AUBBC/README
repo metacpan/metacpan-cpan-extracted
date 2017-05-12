@@ -1,0 +1,983 @@
+
+=head1 NAME
+
+AUBBC
+
+=head1 SYNOPSIS
+
+  use AUBBC;
+  my $aubbc = AUBBC->new();
+
+  my $message = 'Lets [b]Bold in HTML[/b]';
+
+  print $aubbc->do_all_ubbc($message);
+
+=head1 ABSTRACT
+
+Advanced Universal Bulletin Board Code a Perl BBcode API
+
+=head1 DESCRIPTION
+
+AUBBC is a object oriented BBcode API designed as a developers tool for themes, wiki's, forums and other BBcode to HTML Parser needs.
+
+Features:
+
+1) Massive amount of supported tags.
+
+2) Build your own tags to add custom made tags.
+
+3) Full XSS Security for supported tags.
+
+4) High Speed Parser
+
+5) Assign security levels for links, images, build and code tags.
+
+6) Protection for emails to hide them from harvesters.
+
+7) Code download for code tags
+
+8) Perl code highlighter in the code tags
+
+9) Fully customizable settings.
+
+The advantage of using this BBcode is to have the piece of mind of using a secure program,
+to restrict the usage of HTML/XHTML elements and to make formatting of posts easy to people that have no HTML/XHTML skill.
+Most sites that use these tags show a list of them and/or easy way to insert the tags to the form field by the user.
+
+The [c] or code tags can highlight Perl code, highlighting the Perl code with CSS in HTML/XHTML,
+and in the examples folder the tag_list.cgi file has a CSS code you could work from and now a setting to change to a costume highlighter function.
+This module addresses many security issues the BBcode tags may have mainly cross site script also known as XSS.
+Each message is escaped before it gets returned if script_escape is Enabled and checked for many types of security problems before that tag converts to HTML/XHTML.
+The script_escape setting and method also converts the &#39; sign so the text can be stored in a SQL back-end.
+Most of the free web portals use the &#124; sign as the delimiter for the flat file database, the script_escape setting and method also converts that sign so the structure of the database is retained.
+
+Allows easy conversion to HTML and XHTML, existing tags will convert to the HTML type set.
+
+If there isn't a popular tag available this module provides a method to "Build your own tags" custom tags can help link to parts of the current web page, other web pages and add other HTML elements.
+
+=head1 Security
+
+Security advice to ensure the proper usage of this module.
+
+=head2 Database Manipulation
+
+The default settings of AUBBC.pm is not good for most forums, blogs, wiki's and bulletin boards
+because by default AUBBC should work and be secure. The other reason is these programs will want some
+of the user input editable and portable.
+
+For editing and portability purposes you would want to retain the tags or user input as they typed it,
+but always use the script_escape before saving to a back-end. This will allow you to change the settings
+of AUBBC on the fly so the tags remain portable to setting changes.
+The script_escape filter is vital to security for many reasons and provides a standard format for other
+methods of AUBBC. There is a file in the examples folder called Database_Manipulation.pm that try's to explain what settings
+to change and how to stay safe.
+
+=head2 Mixing HTML and BBcode
+
+Since the script_escape method will disable HTML and JavaScript, I came up with a way
+to mix the two. The recommended use of mixing is for Administrator's of the program only,
+because giving anyone the ability to post unfiltered codes is just wrong.
+
+The mixing method is good for themes, information pages and wiki's just to name a few.
+
+for some tags when script_escape is disabled you can just run do_all_ubbc on variables with HTML mixed
+with BBcode and it will work because those tags didn't need the script_escape method to make them work,
+but for other tags the script_escape method is needed.
+So this is where my solution comes in.
+see Mixing_HTML_and_BBcode.pm file in the examples folder
+
+=head2 Build your own tags
+
+When adding a custom tag you will have to remember that the methods for building
+custom tags try's to secure the tags. But it can not be 100% secure without
+the developer of the tag knowing if and what security issues the new tag may have.
+
+The adding method restricts characters from being used in some variables of
+the tags, like name and pattern.
+
+See the other "Build your own tags" for usage
+
+=head2 XSS protection and settings
+
+The script_escape filter will disable XSS so the text of the code can be seen in
+HTML/XHTML and the XSS code will not work in anyway.
+Some parts use standard requirements allowing only these linking path formats:
+
+ protocal://location/web/path/or/file
+ /local/web/path/or/file
+
+There are some uncontrollable security issues with allowing images [img] and link [url] auto-link tags,
+you can disable [img] tags by setting "no_img => 1," to 1 as shown.
+Security issues with the [url] and auto-link tags is not as bad since you have to click it to
+get to the risky web site, unlike an image loading.
+
+=head2 FYI
+
+XHTML has better JavaScript security standards then HTML.
+Developers can also use cookies with "httponly" flags to disable JavaScript from
+reading that cookie, but the browsers must support it.
+XSS, browser hijacking and other security risks can change by settings, browser vendors and program versions.
+
+=head1 Tag Security Access
+
+New to v4.05. Assign security levels for links, images, build and code tags.
+Default settings allows all tags to be seen so there would be no changes needed
+if you just wanted the latest version and not use this method yet.
+
+This method works with your current authentication and will be explained more later.
+
+Note: The smilies is not controled by this security.
+
+=head2 User Security Levels
+
+Default security levels are from low to high!!!
+
+        # The array numbers >>:    0        1         2             3
+        $aubbc->security_levels('Guest', 'User', 'Moderator','Administrator')
+
+1) The security levels array needs to have the security levels from low to high in it!!
+
+2) The names must be spelled the same as the name passed to method user_level();
+
+3) Security access is determined by low to high numbers and with the default Guest
+will be number/level 0 in the array. if the links was set for User
+the links level will have to be 1 = User making any lower level unable to
+see any bbcode links but, the Administrator would still see all.
+
+=head2 Tag Security Levels
+
+To change the security level of links, images and code use this method this way:
+
+        $aubbc->tag_security(
+                code         => { level => 0, text => 'register to see this', },
+                img          => { level => 0, text => 'register to see this', },
+                url          => { level => 0, text => 'register to see this', },
+        );
+
+level - the array number of the security level
+
+text  - the text or HTML to show if user has no access
+
+Build your own tags has 2 new variables now:
+
+  $aubbc->add_build_tag(
+        name     => 'ok',
+        pattern  => 'l,s',
+        type     => 1,
+        function => 'My_Message::check_ok_tag',
+        level    => 3,
+        error    => 'register to see this',
+        );
+
+level - the array number of the security level
+
+error - the text or HTML to show if user has no access
+
+For the build tags leaving the variables blank will default level to 0 and
+error to the $AUBBC::BAD_MESSAGE string.
+
+=head2 User Access
+
+This method receives the current users security level name from the web application.
+
+        $aubbc->user_level('Administrator');
+
+If you are using the tag security you will want to set the user_level after the user
+was authenticated by the web application and before do_all_ubbc is used.
+
+=head1 Settings
+
+These settings effect a large part of what the do_all_ubbc method can do and what other
+methods can do in do_all_ubbc. some settings are used in many methods
+
+=head2 $aubbc->settings();
+
+This is the method to change them when needed.
+
+     $aubbc->settings(
+        aubbc => 1,
+        utf => 1,
+        smileys => 1,
+        highlight => 1,
+        # est.....
+      );
+
+=head2 aubbc
+
+Enable or Disable Main AUBBC Tags Default 1 is Enabled, 0 is Disable.
+
+=head2 utf
+
+Enable or Disable UTF Tags Default 1 is Enabled, 0 is Disable.
+
+=head2 smileys
+
+Enable or Disable Smiley Tags Default 1 is Enabled, 0 is Disable.
+
+=head2 highlight
+
+Enable or Disable Code Highlight Default 1 is Enabled, 0 is Disable.
+
+=head2 highlight_function
+
+This can replace the highlighter of AUBBC with a custome one
+
+must provide the text name of the pre-defined subroutine that receives the code
+tags text and returns the highlighted text.
+
+=head2 no_bypass
+
+Enable or Disable User Tags for bypassing hole tag sets Default 0 is Disable, 1 is Enabled.
+Bypass tag must be at the very beginning of the message!!!!
+Must also be in the order of the "Bypass Tag list:" but not on a new line \n
+and if #none is used the other bypass tags will not be removed.
+
+Bypass Tag list:
+
+        #none
+        #noaubbc
+        #nobuild
+        #noutf
+        #nosmileys
+
+=head2 for_links
+
+ Enable or Disable Tags for Links Default 0 is Disable, 1 is Enabled.
+
+ Some AUBBC Tags are not good to use in a link like other links.
+
+ If Enabled will only use the UTF and Smiley tags.
+
+=head2 aubbc_escape
+
+Enable or Disable AUBBC Tag Escape Default 1 is Enabled, 0 is Disable.
+
+Escaping a Tag:
+
+        [b]Stuff[/b] # Normal Tag Bold
+        [b]]Stuff[/b]] # Escaped Tag Bold
+        [[b]Stuff[[/b] # Escaped Tag Bold
+        [[b]]Stuff[[/b]] # Escaped Tag Bold
+
+ Small Bug if Enabled:
+
+ Any use of ]] will equal ] and any [[ will equal [
+
+=head2 no_img
+
+Enable or Disable the [img] tags Default 0 allows the tags and 1 will just not
+convert the tag.
+
+There are some uncontrollable security issues with allowing anyone to post
+an image link.
+
+=head2 icon_image
+
+Enable or Disable Custom Image Size Default 1 is Enabled, 0 is Disable.
+
+If enabled will use the values from image_hight and image_width
+
+in all Image Tags [img]/images/large_pic.gif[/img]
+
+=head2 image_hight
+
+The Default Image height is 60px.
+
+Only used when icon_image is Enabled.
+
+=head2 image_width
+
+The Default Image width is 90px.
+
+Only used when icon_image is Enabled.
+
+=head2 image_border
+
+Enable or Disable Image Border Default 0 is Disable, 1 is Enabled.
+
+=head2 image_wrap
+
+Enable or Disable Image wrap Default 1 is Enabled, 0 is Disable.
+
+Enabled will add a space after each image & smiley's.
+
+=head2 href_target
+
+ Enable or Disable href target Default 0 is Disable, 1 is Enabled.
+
+ Enabled will add target="_blank" to all href's.
+
+=head2 images_url
+
+Default is blank.
+
+This is the link to your images folder and is only used for Smilies.
+
+ For the smileis to work you must provide a URL.
+
+example:
+
+ smilies must be in /smilies folder
+
+the images_url link must have the /smilies folder in it and not point directly to /smilies.
+
+=head2 html_type
+
+Default is 'html' and the only other support is 'xhtml'
+
+=head2 fix_amp
+
+Default is 1 Enabled and the only other setting is 0 to Disable.
+This setting finds all the & that need to covert to the amp; html code name
+so the w3c xhtml validation checks ok.
+
+=head2 line_break
+
+Enable line_break "<br>\n" Default 1 , 2 is for the "<br>" older style
+that has no new line, 0 is Disable.
+
+This will turn any new line \n to the HTML line break <br>\n or <br> by the script_escape method and the other way around
+with the html_to_text method.
+
+=head2 code_class
+
+Default is '' and this allows a custom class, style and/or JavaScript to be used in any of the [code] [c] tags.
+
+must have a space before the text.
+
+example:
+
+ code_class => ' class="quote"',
+
+ code_class => ' class="quote" onclick="....."',
+
+=head2 code_extra
+
+Default is '' and this is for a custom message, code, image, est.. to be used after the [code] [c] tags.
+
+example:
+
+ code_extra => 'Codes may not reflect what is in the current version.',
+
+ code_extra => '<div style="clear: left"> </div>',
+
+=head2 code_download
+
+Default is '^Download above code^' this message will
+be the links name. the link will open a JavaScript popup window and write the
+code in it to be copyed or printed. A new JavaScript function was
+added to the js_print method called MyCodePrint.
+
+To turn off set this to ''
+
+example:
+
+ code_download => 'Click here to get above code.',
+
+ code_download => '',
+
+=head2 href_class
+
+Default is '' and this allows a custom class, style and/or JavaScript to be used in the [url] tags.
+
+must have a space before the text.
+
+example:
+
+ href_class => ' class="url"',
+ href_class => ' class="url" onclick="....."',
+
+=head2 quote_class
+
+Default is '' and this allows a custom class, style and/or JavaScript to be used in the [quote] tags.
+
+must have a space before the text.
+
+example:
+
+  quote_class => ' class="quote"',
+  quote_class => ' class="quote" onclick="....."',
+
+=head2 quote_extra
+
+Default is '' and this is for a custom message, code, image, est.. to be used after a [quote] tags.
+
+example:
+
+  quote_extra => 'QUOTES AND SAYINGS DISPLAYED ON THIS BLOG ARE NOT WRITTEN BY THE AUTHOR OF THE BLOG.',
+  quote_extra => '<div style="clear: left"> </div>',
+
+=head2 script_escape
+
+This will turn on or off the sanitizer/escape security for the hole message.
+
+Default is 1 on and 0 for Disable.
+
+Notes: 1)The code highlighter works best with an escaped character format like the
+script_escape => 1 setting can provide.
+
+2) If this setting is disabled and a character escaping method or security filter is not used
+can result is a security compromise of the AUBBC tags.
+
+3) if Disabled the method "$message = $aubbc->script_escape($message);" can be used on the message as needed before do_all_ubbc() is called.
+
+
+=head2 protect_email
+
+Default is 1 and other possible values are (0, 2, 3, 4).
+
+Can add a protection to hide emails in the [email] tag from email harvesters.
+
+
+Not 100% fool proof.
+
+        0 - has no type of protection.
+
+
+        1 - uses unicode type protection.
+
+
+        2 - Javascript and unicode type protection.
+
+
+        3 - Javascript and unicode type protection.
+
+
+        4 - Javascript encryption
+
+The settings 2, 3 and 4 require the JavaScript function in the js_print method of
+this module. js_print can be used directly and it will print out the proper file
+headers for a browser to know its a JavaScript file.
+
+=head2 email_message
+
+When the protect_email setting is 2, 3 or 4 it will display this message as the link name.
+Default message is '&#67;&#111;&#110;&#116;&#97;&#99;&#116;&#32;&#69;&#109;&#97;&#105;&#108;'
+and that say's 'Contact Email'.
+
+=head2 highlight_class#
+
+This is for using your own class or font color for the code highlighter.
+
+example:
+
+        highlight_class1 => ' class="highlightclass1"',
+
+highlight_class1 = String quote
+
+highlight_class2 = Comment's
+
+highlight_class3 = String quote
+
+highlight_class4 = String quote
+
+highlight_class5 = Number's
+
+highlight_class6 = Operator, Function and other Name's
+
+highlight_class7 = Variables
+
+highlight_class8 = defining subroutine
+
+highlight_class9 = using subroutine
+
+=head1 Smilies Settings
+
+These are the settings for using custom smilies.
+
+Note: There are no Built-in smilies.
+
+=head2 $aubbc->smiley_hash();
+
+This is how you import your custom smilies hash.
+
+example:
+
+  use AUBBC;
+  my $aubbc = AUBBC->new();
+  my %smiley = (lol => 'lol.gif');
+  $aubbc->smiley_hash(%smiley);
+
+The way you use this smiley is [lol]
+
+Must have the images_url set to the proper location.
+
+images_url/smilies/lol.gif
+
+=head1 Build your own tags
+
+These are the settings and methods for using custom tags.
+
+=head2 $aubbc->add_build_tag(name=>'stuff', pattern=>'stuff' , type=>'stuff', function=>'stuff',...);
+
+name - will be the tags name and is limited to a-z 0-9 - _
+
+pattern - limited to 'all' or 'l,n,-,:,_,s'
+
+    'all' = anything but [ or ]
+    'l' = 'a-z'
+    'n' = '0-9'
+    's' = ' '
+    '-' = '-'
+    ':' = ':'
+    '_' = '_'
+
+type - 1 is style [name://pattern], 2 is style [name]pattern[/name], 3 is style [name],
+the next setting for type the function will not be used to run Perl subroutines and
+will replace the text with what text is defined in the function setting, the setting is
+type 4 this will use style [name] but will work different then the other built settings
+see function below on how type 4 works
+
+function - a pre-defined subroutine that receives the matched pattern, tag name and returns what you want,
+unless type is set to 4 then it will replace the tag with what text is in the function.
+
+   Note: if the function returns undefined, '' or 0 the tag will not be changed.
+
+level - the array number of the security level
+
+error - the text or HTML to show if user has no access
+
+        Note: For the build tags leaving the variables blank will default level to 0 and
+        error to the $AUBBC::BAD_MESSAGE string.
+
+Usage:
+
+  package My_Message;
+
+  use AUBBC;
+  my $aubbc = AUBBC->new();
+
+  $aubbc->add_build_tag(
+        name     => 'ok',
+        pattern  => 'l,s',
+        type     => 1,
+        function => 'My_Message::check_ok_tag',
+        );
+  $aubbc->add_build_tag(
+        name     => 'ip',
+        pattern  => '',
+        type     => 3,
+        function => 'My_Message::get_some_tag',
+        );
+  $aubbc->add_build_tag(
+        name     => 'agent',
+        pattern  => '',
+        type     => 3,
+        function => 'My_Message::get_some_tag',
+        );
+  $aubbc->add_build_tag(
+        name     => 'hello',
+        pattern  => '',
+        type     => 4,
+        function => 'Hello World!',
+        );
+  my $message = '[ok://test me] [ok://test other] [ok://n0 w00rk] [ip] [agent] [hello]';
+
+  $message = $aubbc->do_all_ubbc($message);
+
+  print $message;
+
+  sub check_ok_tag {
+  my ($tag_name, $text_from_AUBBC) = @_;
+
+   if ($text_from_AUBBC eq 'test me') {
+        return 'Works Good 1';
+        }
+         else {
+               return 'Works Good 2';
+               }
+  }
+
+  sub get_some_tag {
+  my ($tag_name, $text_from_AUBBC) = @_;
+  $tag_name = lc($tag_name);
+  $text_from_AUBBC = $ENV{'REMOTE_ADDR'} if ($tag_name eq 'ip');
+  $text_from_AUBBC = $aubbc->script_escape($ENV{'HTTP_USER_AGENT'}) if ($tag_name eq 'agent');
+  return $text_from_AUBBC;
+  }
+
+  1;
+
+=head2 $aubbc->remove_build_tag($name, $option);
+
+There are two ways to use this.
+
+1) Remove a single built tag: $aubbc->remove_build_tag($name);
+
+2) Remove all built tags: $aubbc->remove_build_tag('', 1);
+
+=head1 Error Message
+
+=head2 $AUBBC::BAD_MESSAGE
+
+Default message is 'Unathorized', this message is used when the code finds bad characters in [email] or [img] tags.
+
+Usage of this setting:
+
+  use AUBBC;
+  $AUBBC::BAD_MESSAGE = 'Unauthorized use of characters or pattern in this tag.';
+  # est...
+
+=head2 $aubbc->aubbc_error();
+
+There are two errors for add_build_tag that would die if the wrong input was given
+when adding a build tag. The error message will now be stored in this method during
+the instance and any new tag that had an error will not be processed.
+
+Since there is only two errors for add_build_tag you can check this method after
+all new tags have been added. All errors stack in this method and are seperaited
+by a \n newline.
+
+Usage:
+
+        $aubbc->aubbc_error('Insert Your Error'); # Add an error
+
+        print $aubbc->aubbc_error();
+
+        die $aubbc->aubbc_error() if $aubbc->aubbc_error();
+
+=head1 Memoize
+
+This setting can turn AUBBC's usage of Memoize on or off.
+
+=head2 $AUBBC::MEMOIZE
+
+Default setting 1 will check if it needs to load Memoize, if loaded then load the sub's that need the speed.
+
+Setting 0 will not use Memoize.
+
+Usage of this setting:
+
+  use Memoize;
+  # do other stuff...
+
+  use AUBBC;
+
+  # AUBBC will detect that Memoize was loaded
+  # and just load the sub's that need the speed.
+  my $aubbc = AUBBC->new();
+
+  # est...
+
+=head1 Debug
+
+The Debug setting will send a lot of messages to warn and is not recommended to leave on all the time.
+
+=head2 $AUBBC::DEBUG_AUBBC
+
+Default is '' off, and Enabled is 1.
+
+Usage of this setting:
+
+  use AUBBC;
+  $AUBBC::DEBUG_AUBBC = 1;
+  # est...
+
+=head1 Version
+
+Returns the current version of the module.
+
+=head2 $aubbc->version();
+
+
+ Usage:
+
+  use AUBBC;
+  my $aubbc = AUBBC->new();
+
+  my $Current_Version = $aubbc->version();
+
+  print $Current_Version;
+
+
+=head1 Bugs and Reports
+
+Please report anything you think is a bug to bug-AUBBC [at] rt.cpan.org or shakaflex [at] gmail.com
+
+=head1 History
+
+v4.06 - 04/12/2011
+
+Fixed - The hash for tag_security() needed the images and link renamed to a tag
+name being used. Changed the image name to img and the link to url. Read
+"Tag Security Levels" for more info.
+
+Fixed - security for links was in method make_link and was causing an access issue
+if used outside of the module. Made a new method to check link access now the
+make_link method could be used outside of the module without the security access
+in it, as intended.
+
+Changed - forgot to say in version 4.05 that I changed the aubbc_error so a new line
+will be added after each inserted error.
+
+
+v4.05 - 04/05/2011
+
+Addition - Assign security levels for links, images, built and code tags.
+New subroutine names: security_levels, user_level, tag_security, check_access
+
+Changed - The default value for $AUBBC::BAD_MESSAGE is now 'Unathorized'
+
+v4.04 - 02/05/2011
+
+Fixed - Bug with quote tag, needed to convert all its tags.
+
+v4.03 - 02/03/2011
+
+Addition - New Object method aubbc_error . Developers can now controle if or when
+to handle errors, see the POD 'Error Message' for usage.
+
+Fixed - All built-in tags only convert balanced tags so no unbalanced HTML can
+be produced
+
+Fixed - Bug in code_highlight a highlight regex needed to be changed after
+version 4.01 to support the Parser style.
+
+Improvement - Small restructure of add_build_tag and change the 'all' setting
+of 'pattern' to allow more.
+
+v4.02 - 11/28/2010
+
+Fixed - The element ID for the code download started at 1 for every instance this
+will force the browser to take priority to load the first ID it reads. The fix
+starts the counter at 'time.$$.000' to try to produce a more unique ID for each
+instance.
+
+Fixed - under the code tag in do_ubbc line " $do_f[8] = '' if $do_f[8]; "
+should have been $do_f[9] = '' if $do_f[9];
+
+v4.01 - 11/08/2010
+
+Fixed - Bug that converts the true text typed to the HTML code name.
+All parts of the module where effected by this bug, in the code tag if the
+author ment & #59 ; it would show ; . This also caused a long standing bug with
+typing any HTML code name and saving it to a backend.
+this fix removes the HTML code name regex in do_unicode and had to add/move two
+filters in "script_escape to conver the & to an amp and ; to #59;" and
+"html_to_text to conver amp to & and #59 to ;". This fix also helped in allowing
+the regex's for highlighting subroutines to be made.
+
+Fixed - had to add a null byte marker to escape_aubbc so the code tag's
+highlighter can detect the escaped character and change it back. In do_all_ubbc
+All markers get removed before the message is returned because FireFox can see
+the null bytes as an error.
+
+Addition - Perl subroutine highlighting for the code tag highlighter. Had a
+problem making this till this version because a HTML code name can look like
+&TheName; and a Perl subroutine looked the same till ; got converted.
+
+Addition - AUBBC::make_image($align,$src,$width,$height,$alt) this is useful enough
+to mention once.
+
+v4.00 - 11/02/2010
+
+Addition - New feature to the code tags aubbc_setting code_download.
+the default setting for code_download is '^Download above code^' this message will
+be the links name. the link will open a JavaScript pop-up window and write the
+code in it to be copied or printed to a printer. A new JavaScript function was
+added to the js_print method called MyCodePrint. JavaScript makes this feature
+portable and dynamic. the link for code_download is added after the code_extra
+setting so a disclaimer can be added before the code_download link
+
+Addition - $AUBBC::MEMOIZE This setting can turn AUBBC's usage of Memoize on or off.
+Default setting 1 will check if it needs to load Memoize, if loaded then load the sub's that need the speed.
+Setting 0 will not use Memoize.
+
+Addition - AUBBC::make_link($link,$name,$javascript,$target) this is useful enough
+to mention once.
+
+Improvement - After lots of testing I have removed all /o in the regex. One main
+reason is Memoize provides enough speed.
+
+v3.13 - 09/30/2010
+
+Addition - do_ubbc New built-in tag [list][*=1]... [*]... [/list], This will
+follow XHTML or HTML Transitional element style and XHTML or HTML Strict will not
+support the elements that tag [*=1] in the [list] will produce
+(use the other enumerated List Block tags for XHTML or HTML Strict).
+
+Addition - do_ubbc New built-in tag [em]Hello[/em]
+
+Addition - New value for setting line_break 2 for old <br style. This effects script_escape.
+
+Addition - This module now uses Memoize for a massive speed improvement.
+If you thought it was fast before, I hope your sitting down when you bench this version. LOL
+
+Addition - added setting highlight_function to replace the highlighting method
+of AUBBC with a costume one.
+
+Fixed - in do_ubbc the line breaks was invalidating HTML for List Block elements
+
+Improvement - in do_all_ubbc changed defining $msg each time. there could have
+been a bug in past versions if an undefined variable was used after a defined message was
+converted. was going to allow do_all_ubbc to pass the last message but decided
+other people may see that as a bug.
+
+Improvement - in do_all_ubbc moved if $do_flag[4] for no_bypass to a better spot
+
+Improvement - in do_all_ubbc moved if for for_links to a better spot
+
+Improvement - changed tags left,right and center to only convert balanced tags
+
+v3.00 - 09/14/2010
+
+Improvement - made it balls to the wall faster.
+
+v2.21 - 09/09/2010 16:32:34
+
+Fixed -  -withoutworldwriteables, bug with making an archive on windows to PAUSE.
+
+v2.20 - 09/08/2010 19:40:55
+
+Addition - in examples folder there is a bench.pl to test the speed and support
+of all the Perl BBcode modules. BBCode::Parser Parse::BBCode HTML::BBCode HTML::BBReverse
+
+Fixed - fixed a line break and new line sandbox bug
+
+Improvement - Massive speed improvement to the hole module and no features lost.
+changed new for faster loading, the module uses vars for some variables,
+re-spaced the hole code.
+
+v2.10 - 08/31/2010 11:17:13
+
+Addition - adding type 4 to add_build_tag this will use style 3 but will work
+different then the other built functions. Type 4 will print the text defined in
+function and not point to a defined Perl subroutine.
+
+Addition - added line_break setting to have control over the script_escape and
+html_to_text methods converting html line break <br> and new line \n
+
+Addition - added fix_amp this setting finds all the & that need to covert to the amp; html code name
+so the w3c xhtml validation checks ok.
+
+Addition - added no_img this setting will allow some control for using [img] tags
+for security reasons
+
+Fixed - bug in settings_prep when a setting gets changed html_type could change
+
+Fixed - Better support for XHTML 1.0 Strict for some tags having issues in do_ubbc
+
+Fixed - in do_ubbc the [url] tag produces a bug if a link is used as a name
+the fix converts the period and/or colon of the name so its not seen as a new
+link.
+
+Improvement - in do_unicode removed then changed the two regexs to do a 3 in 1 filter.
+
+Improvement - in html_to_text added a code to fix a <br> bug if ppl use html or xhtml line break.
+
+Improvement - moved the pattern building code from do_build_tag to add_build_tag
+so it only runs one time
+
+Improvement - in add_build_tag using a hash array to store the build tag data so
+there is no need to use split in do_build_tag
+
+Improvement - in do_all_ubbc moved script_escape to a location where one call
+to the function is needed
+
+Improvement - in do_all_ubbc added check for undefined "$message" variable
+
+Improvement - in script_escape added check for undefined "$text" variable
+
+Improvement - in html_to_text added check for undefined "$html" variable
+
+Improvement - in escape_aubbc converting the brackets one time with the html
+code name so the filter will only need to run one time in do_all_ubbc. This
+also fixes one bug in escape_aubbc
+
+Removed - In script_escape removed the \cM regex, it is very rare that anyone will need
+it so it wont be missed.
+
+
+v2.0 - 10/07/2008 13:52:11
+
+Fixed single tag [name] for build tags
+
+Changed the regex in plain URL's
+
+Removed bad patter setting and now using a more standard way to detect bad image tags
+
+Fixed dynamic view in XHTML for the protect email method.
+
+Added js_print method which will print out the javascript needed for the new protect email method
+
+Added values for the code highlighter so it can support CSS classes
+
+Added highlighting of variables and changed 2 quote regex to allow multi line quotes
+
+and a few other things that make this 2.0
+
+v1.30 - 09/08/2008 14:12:10
+
+Fixed the function check in add_build_tag(), when the 1.20 changes where made this check was neglected
+
+Edited add_build_tag() Error messages, hopefully they make more sense.
+
+Now add_build_tag() name allows - and _ in it.
+
+v1.20 - 09/07/2008 09:23:09
+
+Fixed bug that bypassed utf tag converter if square bracket wasn't detected
+
+Fixed Makefile.PL
+
+v1.10 - 09/02/2008 09:49:46
+
+Added two more tags [big]..[/big] and [small]..[/small].
+
+Removed utf tag style [ux23] and [u://0931] to make more tag names available.
+
+Changed add_build_tag() to use hash variable, see "Build your own tags" for the new style.
+
+Changed the way functions should work for built tags, the custom function for built tags will receive the tag name and data of the tag. This is so one function can handle many tags.
+
+Removed other site tags and setting other_sites_pattern, an example of them are in "Build your own tags"
+
+Removed [time] tag, example in "Build your own tags".
+
+Email now allows names with & sign
+
+Now every message that is passed to do_all_ubbc() gets escaped before being returned if script_escape is Enabled.
+
+All tags in %AUBBC_TAGS will only convert if lowercase.
+
+"new" now uses the most standard referenced object method.
+
+Removed DOS_prevent() method, since the script has been tested more and was causing a timing problem.
+
+Removed [cd]#code[/cd] code tag, which had no code_class or code_extra.
+
+Commented bad_pattern check for [email] tags, this security check is not needed because the next line will take care of all email tag security.
+
+Added missing $AUBBC{image_border}, $AUBBC{html_type} and $AUBBC{image_wrap} to the none icon image.
+
+Changed names of left and right align images to [left_img]..[/img] and [right_img]..[/img], also updated examples to show tags.
+
+Added missing $AUBBC{html_type} to quote, code tags and code_highlight function.
+
+v1.0 01/20/2008 08:46:08
+
+Released.
+
+=head1 COPYLEFT
+
+AUBBC.pm, v4.06 - 04/12/2011 By: N.K.A.
+
+Advanced Universal Bulletin Board Code a Perl BBcode API
+
+shakaflex [at] gmail.com
+
+http://search.cpan.org/~sflex/
+
+http://aubbc.googlecode.com/
+
+Development Notes: Highlighting functions list and tags/commands for more
+language highlighters. Ideas make some new tags like [perl] or have a command in the code
+tag like [code]perl:$some ='perl';[/code] with a default highlighting method if
+a command was not used. Then highlighting of many types of code could be allowed
+even markup like HTML.
+
+Notes: This code has a lot of settings and works good
+with most default settings see the POD and example files
+in the archive for usage.
+
+=cut

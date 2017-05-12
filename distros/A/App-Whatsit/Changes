@@ -1,0 +1,4 @@
+Revision history for App-Whatsit
+
+0.0.1     2011-05-06 12:27:57 America/Los_Angeles
+	Basic functionality for determining version and path of a perl module.

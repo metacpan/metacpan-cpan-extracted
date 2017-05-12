@@ -1,0 +1,31 @@
+---
+abstract: 'Speak with the getambassador.com API v2'
+author:
+  - 'Dreamhost <dev-notify@hq.newdream.net>'
+build_requires:
+  Test2::Bundle::Extended: '0'
+  Test2::Tools::Spec: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ambassador-API-V2
+requires:
+  Carp: '0'
+  HTTP::Tiny: '0'
+  JSON::MaybeXS: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Types::Standard: '0'
+  URI: '0'
+  overload: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/dreamhost/Ambassador-API-V2/issues
+  repository: https://github.com/dreamhost/Ambassador-API-V2
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.69'

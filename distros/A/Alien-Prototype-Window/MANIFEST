@@ -1,0 +1,15 @@
+Build.PL
+Makefile.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README.txt
+bin/prototype-window-install
+inc/MY/Build.pm
+lib/Alien/Prototype/Window.pm
+t/01-loads.t
+t/02-install.t
+t/pod.t
+t/pod-coverage.t
+windows_js_1.3.zip

@@ -1,0 +1,23 @@
+---
+abstract: 'A wrapper for installing the Judy library'
+author:
+  - 'Josh Jore <jjore@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-Judy
+requires:
+  Config: 0
+  Cwd: 0
+  DynaLoader: 0
+  File::Spec: 0
+  Sub::Exporter: 0
+  vars: 0
+version: 0.27

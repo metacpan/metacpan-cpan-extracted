@@ -1,0 +1,156 @@
+#!/usr/bin/perl
+
+# ABSTRACT: simple example script to read from a Current Cost monitor
+# PODNAME: anyevent-current-cost-reader
+
+
+use warnings;
+use strict;
+use Device::CurrentCost::Constants;
+use AnyEvent::CurrentCost;
+use Getopt::Long;
+use Pod::Usage;
+use List::Util qw/max/;
+
+my $help;
+my $man;
+my $verbose = 0;
+my $history = 0;
+my %args;
+GetOptions('help|?' => \$help,
+           'man' => \$man,
+           'verbose+' => \$verbose,
+           'history+' => \$history,
+           'classic' => sub { $args{type} = CURRENT_COST_CLASSIC },
+          ) or pod2usage(2);
+pod2usage(1) if ($help);
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+my $device = shift || pod2usage({ -message => 'A device parameter is required',
+                                  -exitval => 2 });
+
+$|=1; # don't buffer output
+
+$args{history_callback} = \&history_callback if ($history);
+my $cc =
+  AnyEvent::CurrentCost->new(device => $device, %args,
+    on_error => sub {
+      my ($fatal, $err) = @_;
+      if ($fatal) {
+        die $err, "\n";
+      } else {
+        warn $err, "\n";
+      }
+    },
+    callback => sub {
+      my ($msg) = @_;
+      if ($verbose == 0) {
+        $msg->has_readings or return;
+        print $msg->value, ' ', $msg->units, "\n";
+      } elsif ($verbose == 1) {
+        $msg->has_readings or return;
+        print 'Total: ', $msg->value, ' ', $msg->units, "\n";
+        foreach my $phase (1..3) {
+          print 'Phase ', $phase, ': ',
+            $msg->value($phase), " ", $msg->units, "\n";
+        }
+      } else {
+        print $msg->summary,"\n";
+      }
+    });
+
+AnyEvent->condvar->recv;
+
+sub history_callback {
+  my ($sensor, $interval, $data) = @_;
+  my $max = 0;
+  my @rows = ();
+  foreach my $ago (sort { $a <=> $b } keys %{$data}) {
+    $max = max($max, $data->{$ago});
+    push @rows, [ $ago, $data->{$ago} ];
+  }
+  return if ($max == 0);
+  print "History: $sensor $interval ", scalar @rows, "\n";
+  foreach my $row (@rows) {
+    printf "  %3d %12.5f %-50s\n", @$row, bar($row->[1], $max, 50);
+  }
+}
+
+sub bar {
+  my ($val, $max, $chars) = @_;
+  return '#' x int(.5 + (($val/$max) * $chars));
+}
+
+
+__END__
+=pod
+
+=head1 NAME
+
+anyevent-current-cost-reader - simple example script to read from a Current Cost monitor
+
+=head1 VERSION
+
+version 1.130190
+
+=head1 SYNOPSIS
+
+  anyevent-current-cost-reader [options] device
+
+  # read from the USB tty device of Current Cost monitor
+  anyevent-current-cost-reader --classic /dev/ttyUSB0
+
+  # read from the USB tty device of an older Classic Current Cost monitor
+  anyevent-current-cost-reader --classic /dev/ttyUSB0
+
+  # read from saved log file
+  anyevent-current-cost-reader cc128.log
+
+  # read from saved log file of an older Classic Current Cost monitor
+  anyevent-current-cost-reader --classic classic.log
+
+=head1 DESCRIPTION
+
+This script is an example of the usage of the L<AnyEvent::CurrentCost>
+API.  It simply writes a summary of the received data to stdout.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-help>
+
+Print a brief help message.
+
+=item B<-man>
+
+Print the manual page.
+
+=item B<-verbose>
+
+Make output more verbose.
+
+=item B<-history>
+
+Display completed history records when available.
+
+=back
+
+=head1 SEE ALSO
+
+L<Device::CurrentCost>
+
+Current Cost website: http://www.currentcost.com/
+
+=head1 AUTHOR
+
+Mark Hindess <soft-cpan@temporalanomaly.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Mark Hindess.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

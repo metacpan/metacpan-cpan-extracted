@@ -1,0 +1,28 @@
+Revision history for Acme-LookOfDisapproval
+
+0.006     2013-11-29 18:22:26Z
+          - Acme::ಠ_ಠ is back, with a lot of convoluted hoop-jumping to bypass
+            various broken bits of the toolchain (see git commit for details)
+
+0.005     2013-10-26 05:02:09Z (Karen Etheridge)
+          - now packaging with Dist::Zilla 5.0
+            - required removing Acme::ಠ_ಠ, pending resolution of issues in
+              PPI, Module::Runtime and Params::Util
+            - required removing minimum version and pod coverage tests, pending
+              resolution of issues in Test::Pod::Coverage and PPI
+
+0.004     2013-06-30
+          - more metadata added, including git repository and bugtracker
+            location
+          - compilation test fixed (see perl RT#118707)
+
+0.003     2013-06-26
+          - minimum perl version bumped to 5.16.0 (see
+            https://metacpan.org/module/perl5160delta#Unicode-Symbol-Names)
+
+0.002     2013-06-22
+          - add missing prereqs to metadata
+
+0.001     2013-06-21
+          - Initial release.
+

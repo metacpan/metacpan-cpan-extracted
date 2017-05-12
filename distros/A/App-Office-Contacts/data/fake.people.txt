@@ -1,0 +1,4 @@
+visibility_id, communication_type_id, creator_id, deleted, facebook_tag, gender_id, role_id, title_id, twitter_tag, date_of_birth, given_names, homepage, name, preferred_name, surname
+2, 2, 0, 0, n/a, 3, 4, 2, n/a, 1950-06-21, Ron, http://savage.net.au/, Ron Savage, Ron, Savage
+1, 4, 0, 0, n/a, 2, 3, 4, n/a, 1989-07-06, Zoe, http://zephyr.net.au/, Zoe Savage, Zoe, Savage
+2, 2, 0, 0, n/a, 3, 4, 2, n/a, 1999-09-09, Léon, http://astray.com, Léon Brocard, Léon, Brocard

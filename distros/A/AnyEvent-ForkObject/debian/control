@@ -1,0 +1,20 @@
+Source: libanyevent-forkobject-perl
+Section: perl
+Homepage: http://search.cpan.org/perldoc?AnyEvent::ForkObject
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+VCS-Browser: http://git.uvw.ru/?p=anyevent-forkobject;a=summary
+Build-Depends: debhelper (>= 7), cdbs,
+    libanyevent-tools-perl,
+    libdevel-globaldestruction-perl,
+    libanyevent-serialize-perl
+Standards-Version: 3.9.1
+Priority: extra
+
+Package: libanyevent-forkobject-perl
+Depends: ${perl:Depends}, ${misc:Depends},
+    libanyevent-tools-perl,
+    libanyevent-serialize-perl,
+    libdevel-globaldestruction-perl
+Architecture: all
+Description: fork jail for AnyEvent
+ The module provides non-blocking interface for perl objects.

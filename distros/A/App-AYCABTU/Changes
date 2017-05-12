@@ -1,0 +1,42 @@
+0.13 Sat Aug 16 15:46:02 PDT 2014
+ - Remove versions from module use
+
+0.12 Sat Aug 16 13:19:52 PDT 2014
+ - Some doc fixes. mst++ for reals this time.
+
+0.11 Sat Aug 16 13:14:27 PDT 2014
+ - Fix Meta homepage. mst++
+
+0.10 Sat Aug 16 10:47:40 PDT 2014
+ - Meta 0.0.2
+
+0.09 Fri Aug 15 18:02:47 PDT 2014
+ - Remove t/_
+
+0.08 Fri Aug 15 15:39:33 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.07 Fri Aug  8 11:50:03 PDT 2014
+ - Swith hashbangs to `/usr/bin/env perl`
+
+0.06 Sat Aug  2 10:03:19 PDT 2014
+ - Fix Copyright years.
+
+0.05 Sat Jul 26 22:04:46 PDT 2014
+ - Switch to Zilla-Dist
+
+0.04 Mon Jun  6 00:15:51 EST 2011
+ - Allow single numbers for selection
+ - Switch to Module::Package and Mouse.
+
+0.03 Thu Nov 18 22:31:39 PST 2010
+ - Glob together multiple config files.
+
+0.02 Tue Oct  5 21:30:41 PDT 2010
+ - Add git clone support
+ - Add names selection
+
+0.01 Sat Sep 18 00:36:35 PDT 2010
+ - Initial version.
+

@@ -1,0 +1,108 @@
+Revision history for Perl extension Archive-Builder
+
+1.16 Wed Feb 23 2011
+	- Added missing requires_from statement to Makefile.PL
+	- Files are now added to archives with 0644 mode instead of allowing
+	  the defaults to introduce world-writable files.
+	- Added support for retaining the executable bit in the archives by
+	  writing them with 0755 mode.
+
+1.15 Wed Feb 23 2011
+	- Updating to Module::Install::DSL 1.00
+	- Removing Test::ClassAPI test to reduce dependencies
+	- Call ->clear after Archive::Tar->write to free memory
+
+1.14 Thu  3 Jul 2008
+	- No functional changes.
+	- Updating to Module::Install 0.76.
+	- Fixing CPANTS complaint about broken META.yml.
+
+1.13 Mon 22 Oct 2007
+	- No functional changes.
+	- Incremental release to get a newer set of AUTOMATED_TESTING tests
+
+1.12 Fri  3 Aug 2007
+	- Fixing a small bug in archive file generation (Jeffery Candiloro)
+
+1.11 Tue  8 May 2007
+	- Adding a test to verify the file sorted works implemented
+	  in the previous version works as expected.
+	- No functional changes.
+
+1.10 Fri  4 May 2007
+	- Due to the fixing of some fairly major issues that caused
+	  compatibility issues, it is STRONGLY recommended that this release
+	  be used as the the mimumum dependency for code using this module.
+	- Paths are unix paths, use File::Spec::Unix when working with them
+	- Archive::Builder installs on Win32 now.
+	- Archives are always built with the files in sorted order,
+	  so that Archive::Extract won't get confused about the extract_path
+
+1.08 Tue 20 Feb 2007
+	- Improve error message on content generation failure
+
+1.07 Tue 15 Feb 2007
+	- Upgrading to Module::Install 0.64
+	- Upgraded from IO::Scalar to IO::String
+	- Bumping dependencies to counter various problems
+	- Fix test 06_archives.t so it won't fail due to missing dependencies (Gabor Szabo)
+
+1.06 Fri 21 Apr 2006
+	- No functional changes
+	- Removed the use of UNIVERSAL::isa and UNIVERSAL::can
+	- Moved from old CVS to new SVN repository
+	- Ported installer to use Module::Install 0.62
+
+1.05 Tue Feb 15 2005
+	- Removing braindead pass-through Build.PL file
+
+1.04 Thu Oct  7 2004
+	- Added Archive::Builder::files object method
+
+1.03 Sun Sep  5 2004
+	- Fixed dependencies to force upgrade of modules needed for tests
+	  to pass.
+
+1.02 Sun Sep  5 2004
+	- Added the Archive::Builder::new_sections instance method
+	- Brought crusty test scripts up to date with current style
+
+1.01 Tue Apr 24 2004
+	- Fixed a bug in file-type support detection in Archive::Builder::Archive
+	- Turned on warnings for all tests, which would have caught it earlier
+	- Fixed several other warnings ( which were harmless )
+	- Increased module version requirements for some modules to cover
+	  potentially critical race conditions, and increase speed.
+
+1.0  Tue Dec  2 2003
+	- 0.9 introduced a bug in Archive::Builder::File->binary.
+	  Fixed the bug, and added a regression test for the bug.
+
+0.9  Tue Dec  2 2003
+	- Some zipping code has gotten more efficient.
+	  Reduced size of expected size in tests to match.
+	- Did some minor code refactoring to make the memory load
+	  size a little smaller. Saved a couple of K
+	- Allow the special case of Section path '.'
+	- Did some cleaning of the POD to match new prefered style.
+
+0.8  Thu Jul 17 15:20:02 2003
+	- Added ->reset method to flush generated file contents, 
+	  so they can be generated again if needed.
+
+0.7  Tue Jul  1 12:40:12 2003
+	- Prevent generated binary files from being broken
+
+0.6  Fri Jun 27 19:41:43 2003
+	- Made File->save actually set executable if needed
+
+0.4  Sun Dec 15 08:54:10 2002
+	- Everything should finally work, be tested, and be documented
+
+0.2  Tue Dec 10 11:57:55 2002
+	- Change name from Archive::Generator to Archive::Builder
+	- Changed most of the method names
+	- Added Archive::Builder::Archive to represent the actual archive
+
+0.1  Thu Dec 06 16:50:23 2002
+	- original version

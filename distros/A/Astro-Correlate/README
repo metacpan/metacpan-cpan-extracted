@@ -1,0 +1,32 @@
+Astro::Correlate - correlate astronomical catalogues
+
+This is release v0.01 of Astro::Correlate. This module can be used to
+correlate two catalogues, comparing them to determine which items are
+common between the two based on X and Y positions.
+
+INSTALLATION
+
+ % perl Makefile.PL
+ % make
+ % make test
+ % make install
+
+REQUIREMENTS
+
+The base module has no specific requirements.
+
+Astro::Correlate::Method::FINDOFF requires Starlink Perl infrastructure,
+specifically the Starlink::ADAM, Starlink::AMS::Init, Starlink::AMS::Task,
+Starlink::Config, and Starlink::EMS modules. For more information, see
+http://www.starlink.ac.uk/
+
+Astro::Correlate::Method::RITMatch requires File::SearchPath, available from
+CPAN. It also requires the 'match' binary, which can be downloaded from
+http://spiff.rit.edu/match/
+
+AUTHOR
+
+Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+Copyright (C) 2005-2006 UK Particle Physics and Astronomy Research
+Council. All Rights Reserved.

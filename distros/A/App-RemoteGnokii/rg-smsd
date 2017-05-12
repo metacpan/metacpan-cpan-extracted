@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+use v5.14;
+use warnings;
+
+use App::RemoteGnokii;
+use File::Which;
+
+my $spool = App::RemoteGnokii::cfg 'spool';
+my $action = which 'rg-action' or die 'Cannot find rg-action in PATH';
+
+exec 'smsd', -m => 'file', -u => $action, -c => $spool, @ARGV;
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+rg-smsd - Start smsd with RemoteGnokii arguments
+
+=head1 SYNOPSIS
+
+  rg-smsd
+  rg-smsd -i 5
+
+=head1 DESCRIPTION
+
+This convenience script starts gnokii-smsd with rg-action and the configured spool directory. Extra arguments are passed to smsd.
+
+=head1 ENVIRONMENT
+
+=over
+
+=item RGCONF
+
+The basename of the configuration file. For example, if the configuration file is '/srv/rg/config.yml', RGCONF should be set to '/srv/rg/config'. Defaults to '/etc/rg'.
+
+=back
+
+=head1 AUTHOR
+
+Marius Gavrilescu E<lt>marius@ieval.roE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Marius Gavrilescu
+
+This library is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+
+=cut

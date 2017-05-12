@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution ARGV-URL,
+version 0.93:
+
+  Wrap URLs from @ARGV for fetching and content consumption with <>
+
+This software is copyright (c) 2011 by Olivier Mengué.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

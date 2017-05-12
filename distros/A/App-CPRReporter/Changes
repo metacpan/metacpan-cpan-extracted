@@ -1,0 +1,92 @@
+==================================================
+Changes from 2013-09-08 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.03 at 2014-09-08 18:53:16 +0000
+-----------------------------------------
+
+  Change: bfcb5f0241f86e68c825cfddf2ef21b7ec0cf039
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2014-09-08 20:49:12 +0000
+
+    Skip empty lines in Excel input, ensure new Dist::Zilla packs test
+    data well 
+
+  Change: 9994088bba896b5795ba4beb0dea565e77a5af75
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2014-09-08 20:37:45 +0000
+
+    Ensure to handle empty rows correctly 
+
+  Change: c747b709c5a5cfc6bdf73c07fb48f1e5156c1240
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-07-24 09:51:07 +0000
+
+    Fixes to ensure testing works fine on Perl 5.12, extended
+    documentation. Thanks to andk for reporting issue #1 
+
+  Change: ca92868e6dfa58ad5d4f1e7da2284776ad3feddd
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-06-23 20:21:49 +0000
+
+    Updated README.md for the master branch 
+
+  Change: 8e2542b5e84d147e7494282527ddac3eb51277af
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-06-23 20:19:21 +0000
+
+    Final preparations before first release 
+
+  Change: cc2fd2d7a19da545aa79a3e298b98def46324630
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-06-23 19:48:27 +0000
+
+    Initial version passes release testing, added some extra name
+    matching rules. 
+
+  Change: 93ffcb0dfa7a83f9e82dca699bd840cc676d8cd5
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-06-17 20:18:11 +0000
+
+    Added fuzzy match on employee names 
+
+  Change: 6187f14d0f7a1fabf03a5c55127751a38e7eb51a
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-06-17 20:17:47 +0000
+
+    Removed overly strict Perl version requirement 
+
+  Change: 11ed25cbc6d6648d8a9e49df1819b3e15c56efc1
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-06-16 22:29:40 +0000
+
+    Update README.md 
+
+  Change: b22c04434759849d65cc66b6e104a38bf91c9139
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-06-16 22:28:32 +0000
+
+    Added example application 
+
+  Change: 650d5812aad631c15e7c4519c2843b849694bda2
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-06-16 22:26:24 +0000
+
+    Merge remote-tracking branch 'origin/master' 
+
+  Change: 483e81fed1a6f3f7c78f32050bfc1794eb4240b0
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-06-16 22:26:11 +0000
+
+    Initial commit 
+
+  Change: 2d6a8cd816c2268608a8461a1ece33220649334d
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-06-16 13:24:53 +0000
+
+    Initial commit 
+
+================================================
+Plus 2 releases after 2013-09-08 00:00:00 +0000.
+================================================

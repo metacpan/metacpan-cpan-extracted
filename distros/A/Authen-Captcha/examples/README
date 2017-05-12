@@ -1,0 +1,26 @@
+This is the readme file for the example scripts.
+
+wwwtest.cgi 
+-----------
+Functional as a cgi-script or in a mod_perl setup.
+To install (on a machine with Authen::Captcha installed):
+- copy it to your cgi-bin
+- modify permissions so that it is executable:
+	chmod a+rx wwwtest.cgi
+- edit the script, setting the variables at it's top to
+  appropriate values:
+	$output_dir : should be set to a directory that is within your
+	              DocumentRoot. This directory must be writable by
+	              the web server user, eg:
+	              chgrp apache /var/www/html/captcha
+	              chmod g+rwx /var/www/html/captcha
+	$www_output_dir : should be set to where the $output_dir maps 
+	                  to the outside world. In the above example,
+	                  if /var/www/html is the DocumentRoot, 
+	                  $www_output_dir should be set to '/captcha'
+	$db_dir : should be set to a directory that is NOT accessable
+	          from the web, and is writable by the web server user.
+	$num_of_characters : controls how many characters will be displayed
+	                     in the resulting Captcha.
+- Pull up the script in a browser, and test it. If it doesn't work,
+  check your web server log files.

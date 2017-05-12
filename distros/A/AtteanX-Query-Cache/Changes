@@ -1,0 +1,17 @@
+AtteanX-Query-Cache
+===================
+
+Created:      2015-06-11
+Home page:    <https://metacpan.org/release/AtteanX-Query-Cache>
+Bug tracker:  <https://github.com/kjetilk/p5-atteanx-query-cache/issues>
+Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
+
+0.002	2016-05-15	Code quality improvements
+
+0.001_04	2016-04-13	First release of complete system
+
+0.001_03	2016-03-07	Smaller fixes
+
+0.001_02	2016-02-20	Current test suite passes alpha release
+
+0.001_01	2016-02-17	Initial alpha release

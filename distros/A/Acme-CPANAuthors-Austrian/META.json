@@ -1,0 +1,73 @@
+{
+   "abstract" : "We are Austrian CPAN authors",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>",
+      "Philipp Gortan <gortan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-CPANAuthors-Austrian",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::CPANAuthors::Register" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Acme::CPANAuthors" : "0",
+            "Carp" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Scalar::Util" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::CPANAuthors::Austrian" : {
+         "file" : "lib/Acme/CPANAuthors/Austrian.pm",
+         "version" : "1.131810"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-acme-cpanauthors-austrian at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANAuthors-Austrian"
+      },
+      "homepage" : "http://search.cpan.org/dist/Acme-CPANAuthors-Austrian/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mephinet/Acme-CPANAuthors-Austrian.git",
+         "web" : "https://github.com/mephinet/Acme-CPANAuthors-Austrian"
+      }
+   },
+   "version" : "1.131810"
+}
+

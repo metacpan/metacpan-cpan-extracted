@@ -1,0 +1,53 @@
+
+=pod
+
+=head1 NAME
+
+Apache2::ASP::Manual::CrashCourse - Learn Apache2::ASP in 10 minutes.
+
+=head1 DESCRIPTION
+
+This is a brief overview of L<Apache2::ASP> and how to use it.
+
+=head1 Apache2::ASP OBJECTS
+
+=head2 $Request
+
+An instance of L<Apache2::ASP::Request>.  It provides an object-oriented 
+interface to the incoming request, including file uploads.
+
+=head2 $Response
+
+An instance of L<Apache2::ASP::Response>.  It provides an object-oriented
+interface to the outgoing server response.
+
+=head2 $Form
+
+A simple hashref of both querystring and form variables, it is a shortcut to 
+$Request->Form.
+
+=head2 $Session
+
+An instance of a subclass of L<Apache2::ASP::SessionStateManager>.  It is a
+database-persisted hash of values that are unique on a per-user-session basis.
+
+=head2 $Application
+
+An instance of a subclass of L<Apache2::ASP::ApplicationStateManager>.  It is a
+database-persisted hash of values that are unique on a per-application basis.
+
+=head2 $Server
+
+An instance of L<Apache2::ASP::Server>.  Provides some helper functions.
+
+=head2 $Config
+
+An instance of L<Apache2::ASP::Config>.  Provides a single point of configuration
+for your application as a whole.
+
+=head2 $Stash
+
+A simple hashref that is globally available throughout the entire request.
+
+=cut
+

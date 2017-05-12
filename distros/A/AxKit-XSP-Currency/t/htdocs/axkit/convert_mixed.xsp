@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: /local/CPAN/AxKit-XSP-Currency/t/htdocs/axkit/convert_mixed.xsp 1456 2005-03-11T01:04:01.341817Z claco  $ -->
+<xsp:page xmlns:xsp="http://apache.org/xsp/core/v1"
+	xmlns:currency="http://today.icantfocus.com/CPAN/AxKit/XSP/Currency"
+>
+	<body>
+		<price>
+			<currency:convert from="USD">
+				<currency:price>10.5</currency:price>
+				<currency:to>JPY</currency:to>
+			</currency:convert>
+		</price>
+	</body>
+</xsp:page>

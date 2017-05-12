@@ -1,0 +1,399 @@
+diff -u ./dav_dyn.c /usr/msrc/cvs/mod_dav/dav_dyn.c
+--- ./dav_dyn.c	Tue Oct 17 03:20:45 2000
++++ /usr/msrc/cvs/mod_dav/dav_dyn.c	Tue Mar 19 09:52:34 2002
+@@ -107,15 +107,34 @@
+     const dav_dyn_module *mod;
+ } dav_dyn_module_spec;
+ 
+-static const dav_dyn_module_spec specs[] =
++/* static const dav_dyn_module_spec specs[] = */
++static dav_dyn_module_spec specs[] =
+ {
+     { "filesystem", &dav_dyn_module_default },
+ 
+     /* third party modules are inserted here */
+ 
+-    { NULL }
++    { NULL, NULL },
++    { NULL, NULL },
++    { NULL, NULL },
++    { NULL, NULL },
+ };
+ 
++int dav_dyn_module_add(pool *p, const char *name, const dav_dyn_module *mod)
++{
++    dav_dyn_module_spec * spec ;
++
++    for (spec = (dav_dyn_module_spec *)specs; spec->name != NULL; ++spec)
++	;
++
++    spec -> name = ap_pstrdup(p, name) ;
++    spec -> mod = mod ;
++
++    if (dav_loaded_modules)
++	dav_process_module(p, mod) ;
++    
++    return 0;
++}
+ 
+ int dav_load_module(const char *name, const char *module_sym,
+ 		    const char *filename)
+diff -u ./dav_fs_dbm.c /usr/msrc/cvs/mod_dav/dav_fs_dbm.c
+--- ./dav_fs_dbm.c	Wed Mar  1 12:10:39 2000
++++ /usr/msrc/cvs/mod_dav/dav_fs_dbm.c	Fri Mar 15 05:56:45 2002
+@@ -49,7 +49,7 @@
+ #define DAV_DBM_FIRSTKEY(f)	gdbm_firstkey(f)
+ #define DAV_DBM_NEXTKEY(f, k)	gdbm_nextkey((f), (k))
+ #define DAV_DBM_CLEARERR(f)	if (0) ; else	/* stop "no effect" warning */
+-#define DAV_DBM_FREEDATUM(f, d)	((d).dptr ? free((d).dptr) : 0)
++#define DAV_DBM_FREEDATUM(f, d)	if ((d).dptr) free((d).dptr)
+ 
+ #else
+ 
+diff -u ./dav_fs_repos.c /usr/msrc/cvs/mod_dav/dav_fs_repos.c
+--- ./dav_fs_repos.c	Mon Nov  5 06:20:32 2001
++++ /usr/msrc/cvs/mod_dav/dav_fs_repos.c	Fri Mar 15 05:56:46 2002
+@@ -18,8 +18,6 @@
+ ** mod_dav into repository-independent and provider modules.
+ */
+ 
+-#include <string.h>
+-
+ #include "httpd.h"
+ #include "http_log.h"
+ #include "http_protocol.h"	/* for ap_set_* (in dav_fs_set_headers) */
+@@ -1316,7 +1314,7 @@
+ /* ### move this to dav_util? */
+ /* Walk recursively down through directories, *
+  * including lock-null resources as we go.    */
+-dav_error * dav_fs_walker(dav_fs_walker_context *fsctx, int depth)
++static dav_error * dav_fs_walker(dav_fs_walker_context *fsctx, int depth)
+ {
+     dav_error *err = NULL;
+     dav_walker_ctx *wctx = fsctx->wctx;
+diff -u ./dav_opaquelock.c /usr/msrc/cvs/mod_dav/dav_opaquelock.c
+--- ./dav_opaquelock.c	Tue Oct 17 10:50:44 2000
++++ /usr/msrc/cvs/mod_dav/dav_opaquelock.c	Fri Mar 15 05:56:47 2002
+@@ -116,10 +116,10 @@
+ }
+ 
+ /* convert a pair of hex digits to an integer value [0,255] */
+-static int dav_parse_hexpair(const char *s)
++static unsigned int dav_parse_hexpair(const char *s)
+ {
+-    int result;
+-    int temp;
++    unsigned int result;
++    unsigned int temp;
+ 
+ #ifdef CHARSET_EBCDIC
+     ebcdic2ascii(s, s, 2);
+diff -u ./dav_props.c /usr/msrc/cvs/mod_dav/dav_props.c
+--- ./dav_props.c	Mon Nov  5 08:08:21 2001
++++ /usr/msrc/cvs/mod_dav/dav_props.c	Fri Mar 15 05:56:47 2002
+@@ -821,7 +821,7 @@
+     return key;
+ }
+ 
+-dav_error *dav_really_open_db(dav_propdb *propdb, int ro)
++static dav_error *dav_really_open_db(dav_propdb *propdb, int ro)
+ {
+     dav_error *err;
+     dav_datum key;
+diff -u ./mod_dav.c /usr/msrc/cvs/mod_dav/mod_dav.c
+--- ./mod_dav.c	Sun Sep 23 00:22:39 2001
++++ /usr/msrc/cvs/mod_dav/mod_dav.c	Fri Mar 15 23:45:29 2002
+@@ -764,7 +764,7 @@
+ }
+ 
+ /* resolve a request URI to a resource descriptor */
+-static int dav_get_resource(request_rec *r, dav_resource **res_p)
++/* ### static */ int dav_get_resource(request_rec *r, dav_resource **res_p)
+ {
+     dav_dir_conf *conf;
+     const dav_hooks_repository *repos_hooks;
+@@ -794,7 +794,7 @@
+     return OK;
+ }
+ 
+-static dav_error * dav_open_lockdb(request_rec *r, int ro, dav_lockdb **lockdb)
++/* ### static */ dav_error * dav_open_lockdb(request_rec *r, int ro, dav_lockdb **lockdb)
+ {
+     const dav_hooks_locks *hooks = DAV_GET_HOOKS_LOCKS(r);
+ 
+@@ -1919,20 +1919,132 @@
+     return 0;
+ }
+ 
++/* process PROPPATCH  */
++int dav_proppatch(request_rec *r, dav_resource *resource, dav_xml_doc *doc, dav_text **propstat_text_ptr)
++{
++    dav_error *err;
++    int result;
++    dav_xml_elem *child;
++    dav_propdb *propdb;
++    int failure = 0;
++    dav_text *propstat_text;
++    array_header *ctx_list;
++    dav_prop_ctx *ctx;
++    
++    *propstat_text_ptr = NULL ;
++    
++    if (doc == NULL || !dav_validate_root(doc, "propertyupdate")) {
++	/* This supplies additional information for the default message. */
++	ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, r,
++		      "The request body does not contain "
++		      "a \"propertyupdate\" element.");
++	return HTTP_BAD_REQUEST;
++    }
++
++    /* Check If-Headers and existing locks */
++    /* Note: depth == 0. Implies no need for a multistatus response. */
++    if ((err = dav_validate_request(r, resource, 0, NULL, NULL,
++				    DAV_VALIDATE_RESOURCE, NULL)) != NULL) {
++	/* ### add a higher-level description? */
++	return dav_handle_err(r, err, NULL);
++    }
++
++    if ((err = dav_open_propdb(r, NULL, resource, 0, doc->namespaces,
++			       &propdb)) != NULL) {
++	err = dav_push_error(r->pool, HTTP_INTERNAL_SERVER_ERROR, 0,
++			     ap_psprintf(r->pool,
++					 "Could not open the property "
++					 "database for %s.",
++					 ap_escape_html(r->pool, r->uri)),
++			     err);
++	return dav_handle_err(r, err, NULL);
++    }
++    /* ### what to do about closing the propdb on server failure? */
++
++    /* ### validate "live" properties */
++
++    /* set up an array to hold property operation contexts */
++    ctx_list = ap_make_array(r->pool, 10, sizeof(dav_prop_ctx));
++
++    /* do a first pass to ensure that all "remove" properties exist */
++    for (child = doc->root->first_child; child; child = child->next) {
++	int is_remove;
++	dav_xml_elem *prop_group;
++	dav_xml_elem *one_prop;
++
++	/* Ignore children that are not set/remove */
++	if (child->ns != DAV_NS_DAV_ID
++	    || (!(is_remove = strcmp(child->name, "remove") == 0)
++		&& strcmp(child->name, "set") != 0)) {
++	    continue;
++	}
++
++	/* make sure that a "prop" child exists for set/remove */
++	if ((prop_group = dav_find_child(child, "prop")) == NULL) {
++	    dav_close_propdb(propdb);
++
++	    /* This supplies additional information for the default message. */
++	    ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, r,
++			  "A \"prop\" element is missing inside "
++			  "the propertyupdate command.");
++	    return HTTP_BAD_REQUEST;
++	}
++
++	for (one_prop = prop_group->first_child; one_prop;
++	     one_prop = one_prop->next) {
++
++	    ctx = (dav_prop_ctx *)ap_push_array(ctx_list);
++	    ctx->propdb = propdb;
++	    ctx->operation = is_remove ? DAV_PROP_OP_DELETE : DAV_PROP_OP_SET;
++	    ctx->prop = one_prop;
++
++            ctx->r = r;         /* for later use by dav_prop_log_errors() */
++
++	    dav_prop_validate(ctx);
++
++	    if ( DAV_PROP_CTX_HAS_ERR(*ctx) ) {
++		failure = 1;
++	    }
++	}
++    }
++
++    /* ### should test that we found at least one set/remove */
++
++    /* execute all of the operations */
++    if (!failure && dav_process_ctx_list(dav_prop_exec, ctx_list, 1, 0)) {
++	failure = 1;
++    }
++
++    /* generate a failure/success response */
++    if (failure) {
++	(void)dav_process_ctx_list(dav_prop_rollback, ctx_list, 0, 1);
++	propstat_text = dav_failed_proppatch(r->pool, ctx_list);
++    }
++    else {
++	(void)dav_process_ctx_list(dav_prop_commit, ctx_list, 0, 0);
++	propstat_text = dav_success_proppatch(r->pool, ctx_list);
++    }
++
++    /* make sure this gets closed! */
++    dav_close_propdb(propdb);
++
++    /* log any errors that occurred */
++    (void)dav_process_ctx_list(dav_prop_log_errors, ctx_list, 0, 0);
++
++    *propstat_text_ptr = propstat_text;
++
++    return OK ;
++}
++
++
+ /* handle the PROPPATCH method */
+ static int dav_method_proppatch(request_rec *r)
+ {
+-    dav_error *err;
+     dav_resource *resource;
+     int result;
+     dav_xml_doc *doc;
+-    dav_xml_elem *child;
+-    dav_propdb *propdb;
+-    int failure = 0;
+     dav_response resp = { 0 };
+     dav_text *propstat_text;
+-    array_header *ctx_list;
+-    dav_prop_ctx *ctx;
+ 
+     /* Ask repository module to resolve the resource */
+     result = dav_get_resource(r, &resource);
+@@ -1948,103 +2060,9 @@
+     }
+     /* note: doc == NULL if no request body */
+ 
+-    if (doc == NULL || !dav_validate_root(doc, "propertyupdate")) {
+-	/* This supplies additional information for the default message. */
+-	ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, r,
+-		      "The request body does not contain "
+-		      "a \"propertyupdate\" element.");
+-	return HTTP_BAD_REQUEST;
+-    }
+-
+-    /* Check If-Headers and existing locks */
+-    /* Note: depth == 0. Implies no need for a multistatus response. */
+-    if ((err = dav_validate_request(r, resource, 0, NULL, NULL,
+-				    DAV_VALIDATE_RESOURCE, NULL)) != NULL) {
+-	/* ### add a higher-level description? */
+-	return dav_handle_err(r, err, NULL);
+-    }
+-
+-    if ((err = dav_open_propdb(r, NULL, resource, 0, doc->namespaces,
+-			       &propdb)) != NULL) {
+-	err = dav_push_error(r->pool, HTTP_INTERNAL_SERVER_ERROR, 0,
+-			     ap_psprintf(r->pool,
+-					 "Could not open the property "
+-					 "database for %s.",
+-					 ap_escape_html(r->pool, r->uri)),
+-			     err);
+-	return dav_handle_err(r, err, NULL);
+-    }
+-    /* ### what to do about closing the propdb on server failure? */
+-
+-    /* ### validate "live" properties */
+-
+-    /* set up an array to hold property operation contexts */
+-    ctx_list = ap_make_array(r->pool, 10, sizeof(dav_prop_ctx));
+-
+-    /* do a first pass to ensure that all "remove" properties exist */
+-    for (child = doc->root->first_child; child; child = child->next) {
+-	int is_remove;
+-	dav_xml_elem *prop_group;
+-	dav_xml_elem *one_prop;
+-
+-	/* Ignore children that are not set/remove */
+-	if (child->ns != DAV_NS_DAV_ID
+-	    || (!(is_remove = strcmp(child->name, "remove") == 0)
+-		&& strcmp(child->name, "set") != 0)) {
+-	    continue;
+-	}
+-
+-	/* make sure that a "prop" child exists for set/remove */
+-	if ((prop_group = dav_find_child(child, "prop")) == NULL) {
+-	    dav_close_propdb(propdb);
+-
+-	    /* This supplies additional information for the default message. */
+-	    ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, r,
+-			  "A \"prop\" element is missing inside "
+-			  "the propertyupdate command.");
+-	    return HTTP_BAD_REQUEST;
+-	}
+-
+-	for (one_prop = prop_group->first_child; one_prop;
+-	     one_prop = one_prop->next) {
+-
+-	    ctx = (dav_prop_ctx *)ap_push_array(ctx_list);
+-	    ctx->propdb = propdb;
+-	    ctx->operation = is_remove ? DAV_PROP_OP_DELETE : DAV_PROP_OP_SET;
+-	    ctx->prop = one_prop;
+-
+-            ctx->r = r;         /* for later use by dav_prop_log_errors() */
+-
+-	    dav_prop_validate(ctx);
+-
+-	    if ( DAV_PROP_CTX_HAS_ERR(*ctx) ) {
+-		failure = 1;
+-	    }
+-	}
+-    }
+-
+-    /* ### should test that we found at least one set/remove */
+-
+-    /* execute all of the operations */
+-    if (!failure && dav_process_ctx_list(dav_prop_exec, ctx_list, 1, 0)) {
+-	failure = 1;
+-    }
+-
+-    /* generate a failure/success response */
+-    if (failure) {
+-	(void)dav_process_ctx_list(dav_prop_rollback, ctx_list, 0, 1);
+-	propstat_text = dav_failed_proppatch(r->pool, ctx_list);
+-    }
+-    else {
+-	(void)dav_process_ctx_list(dav_prop_commit, ctx_list, 0, 0);
+-	propstat_text = dav_success_proppatch(r->pool, ctx_list);
+-    }
+-
+-    /* make sure this gets closed! */
+-    dav_close_propdb(propdb);
+-
+-    /* log any errors that occurred */
+-    (void)dav_process_ctx_list(dav_prop_log_errors, ctx_list, 0, 0);
++
++    if ((result = dav_proppatch (r, resource, doc, &propstat_text)) != OK)
++        return result ;
+ 
+     resp.href = resource->uri;
+ 
+diff -u ./mod_dav.h /usr/msrc/cvs/mod_dav/mod_dav.h
+--- ./mod_dav.h	Mon Nov  5 12:52:21 2001
++++ /usr/msrc/cvs/mod_dav/mod_dav.h	Fri Mar 15 06:11:29 2002
+@@ -26,7 +26,7 @@
+ #include "httpd.h"
+ 
+ 
+-#define DAV_VERSION		"1.0.3"
++#define DAV_VERSION		"1.0.4-dev"
+ 
+ #define DAV_XML_HEADER		"<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+ #define DAV_XML_CONTENT_TYPE	"text/xml; charset=\"utf-8\""
+@@ -1804,6 +1804,15 @@
+ /* return the text for a given HTTP status code. */
+ const char * dav_lookup_status(int status);
+ 
++
++/* resolve a request URI to a resource descriptor */
++int dav_get_resource(request_rec *r, dav_resource **res_p) ;
++
++dav_error * dav_open_lockdb(request_rec *r, int ro, dav_lockdb **lockdb) ;
++
++int dav_dyn_module_add(pool *p, const char *name, const dav_dyn_module *mod) ;
++
++int dav_proppatch(request_rec *r, dav_resource *resource, dav_xml_doc *doc, dav_text **propstat_text_ptr) ;
+ 
+ #ifdef __cplusplus
+ }
+Common subdirectories: ./sdbm and /usr/msrc/cvs/mod_dav/sdbm
+Common subdirectories: ./util and /usr/msrc/cvs/mod_dav/util

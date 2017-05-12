@@ -1,0 +1,195 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use App::Tel;
+use Getopt::Long qw (:config pass_through);
+use Getopt::Std;
+use Pod::Usage;
+use v5.10;
+
+__PACKAGE__->main() unless caller;
+
+=head1 NAME
+
+tel - script for router logins
+
+=head1 SYNOPSIS
+
+tel gw1-my-device gw2-my-device ...
+
+Options:
+    -h          help message
+    -l          logging
+    -d          debug mode
+    -v          version
+    -p          connection port
+    -P          override profile
+    -m          connection method
+    -x          run script file
+    -c          run commands
+    -a          auto commands
+    -t          sets the timeout
+    -s          sleep between commands
+    -4          force IPv4 connection
+    -6          force IPv6 connection
+
+=head1 OPTIONS
+
+=over 4
+
+=item -c
+
+Runs a series of commands that are separated by semicolons.
+
+Example: tel -c "show ver; sh run" gw1-my-device
+
+=item -l
+
+Enables logging to a file /tmp/gw1-my-device.log.
+
+Example: tel -l gw1-my-device
+
+=item -d
+
+Enables debugging, which will warn you if some of the runtime modules fail to
+load.
+
+Example: tel -d gw1-my-device
+
+=item -x or --xscript
+
+Runs a command-file file, which is a list of commands for the device.  Can be
+specified multiple times to run multiple scripts.
+
+If you need to use a newline in the script to get through a prompt then you
+can use \r.  An example of this might be "reload\ry"
+
+Example: tel -x changes.txt gw1-my-device
+
+=item -a
+
+Specify auto commands to run.  This overrides any commands loaded from profiles
+and is used for all devices during the session.
+
+Example: tel -a "sh run int vlan35; conf t" gw1-my-device
+
+=item -p
+
+Specify connection port.  This overrides any specific port in loaded profiles
+and is used for all devices during the session.
+
+Example: tel -p 22 gw1-my-devices
+
+=item -P or --profile
+
+Override the loaded profiles with another defined in telrc.  This is useful if
+you're logging into the IP of a server rather than using the DNS name.
+
+Example: tel -P zhone 10.9.9.9
+
+=item -A
+
+This overrides the profile after you've logged into the server.  You might
+need this if you're logging into an out of band server made by one vendor to
+access the console of a device made by another vendor.
+
+Example: tel -A zhone oob-test-lab:2004
+
+=item -m
+
+Specify connection method.  This overrides specific methods in loaded profiles
+and is used for all devices during the session.
+
+Example: tel -m ssh gw1-my-devices
+
+=item -t
+
+Specify timeout in seconds.  The default is 90 seconds.  This overrides
+specific methods in loaded profiles and is used for all devices during the
+session.
+
+Example: tel -t 30 gw1-my-devices
+
+=item -s
+
+Specify timeout in seconds to sleep between commands.  This only applies to
+commands specified for -x, -c or -a.  This will use Time::HiRes if it's
+installed for sub-second sleep values like 0.5.
+
+Example: tel -s 3 -x myfile.txt gw1-my-devices
+
+=item -S
+
+Specify timeout in seconds to sleep between commands.  This applies to
+interactive sessions as well as login commands.  This will use Time::HiRes
+if it's installed for sub-second sleep values like 0.5.
+
+If both -S and -s are set, then -S overwrites the value of -s.
+
+Example: tel -S 3 gw1-my-devices
+
+=item -4 or -6
+
+Force the connection to only use IPv4 or IPv6.
+
+Example: tel -4 gw1-my-device
+
+=item -v
+
+Print the version information
+
+Example: tel -v
+
+=back
+
+=cut
+
+=head1 SUBROUTINES
+
+=cut
+
+sub main {
+
+    my %opts;
+    GetOptions("xscript=s@" => \$opts{x}, 'profile=s' => \$opts{P});
+    getopts('46vhlda:c:t:m:p:P:A:s:S:', \%opts);
+    $opts{s}=$opts{S} || $opts{s};
+
+    my $self = App::Tel->new(opts => \%opts);
+    $self->load_config();
+
+    say VERSION_MESSAGE() if ($opts{v});
+    die HELP_MESSAGE() if ($opts{h});
+    die pod2usage() if (!scalar @ARGV && !scalar keys %opts);
+
+    # override process name to make it easy to kill
+    # this needs to happen after pod2usage/HELP MESSAGE
+    $0 = 'tel ' . join(' ', @ARGV);
+
+    for (@ARGV) {
+        $self->go($_);
+    }
+}
+=head2 HELP_MESSAGE
+
+Boilerplate routine for Getopt::Std
+
+=cut
+
+sub HELP_MESSAGE {
+    pod2usage( -verbose => 1 );
+}
+
+=head2 VERSION_MESSAGE
+
+Boilerplate routine for Getopt::Std
+
+=cut
+
+sub VERSION_MESSAGE {
+    "tel version " . $App::Tel::VERSION;
+}
+
+
+1;

@@ -1,0 +1,167 @@
+# source
+#   data_file:		cts.fits
+#   interval:		energy=350:500
+#   arcsec/pixel:	0.492
+#   exp_correction:	expmap.fits
+# background
+#   data_file:		cts.fits
+#   interval:		energy=350:500
+#   arcsec/pixel:	0.492
+#   exp_correction:	expmap.fits
+# column units
+#   area:		arcsec**2
+#   surf_bri:		cnts/arcsec**2/expval
+#   surf_err:		cnts/arcsec**2/expval
+
+# background-subtracted results
+ reg   net_counts     error   background    berror      area  surf_bri  surf_err
+---- ------------ --------- ------------ --------- --------- --------- ---------
+   1      178.216    13.418        1.784     0.213     55.92     0.000     0.000
+   2      461.625    21.620        5.375     0.642    168.48     0.000     0.000
+   3     2267.072    47.719        8.928     1.067    279.83     0.000     0.000
+   4     2430.381    49.450       12.619     1.508    395.53     0.000     0.000
+   5      707.892    26.976       16.108     1.925    504.95     0.000     0.000
+
+
+# source_region(s):
+# # Region file format: DS9 version 4.0
+# # Filename: /data/mimir3/gaetz/reproj.cxo.e0102/imgcorr/bin1/0.481-0.614/5124/obs5124_O7Hea_bin1_img_S3.fits
+# global color=green font="helvetica 10 normal" select=1 highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source
+# physical
+# ellipse(4093.5,4095.5,0,0,8.2,9,16.4,18,24.6,27,32.8,36,41,45,20)
+
+# source_data
+ reg       counts    pixels   avg_exp
+---- ------------ --------- ---------
+   1      180.000       231 1279842.077
+   2      467.000       696 1279745.292
+   3     2276.000      1156 1279787.328
+   4     2443.000      1634 1279767.291
+   5      724.000      2086 1279632.319
+
+
+# background_region(s)
+# # Region file format: DS9 version 4.0
+# # Filename: /data/mimir3/gaetz/reproj.cxo.e0102/imgcorr/bin1/0.481-0.614/5124/obs5124_O7Hea_bin1_img_S3.fits
+# global color=green font="helvetica 10 normal" select=1 highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source
+# physical
+# box(4095,4095.5,125,124,0)
+# -circle(4093.5,4095.5,45.233081)
+
+# background_data
+ reg       counts    pixels   avg_exp
+---- ------------ --------- ---------
+all        70.000      9067 1279378.579
+
+
+# source
+#   data_file:		cts.fits
+#   interval:		energy=500:1000
+#   arcsec/pixel:	0.492
+#   exp_correction:	expmap.fits
+# background
+#   data_file:		cts.fits
+#   interval:		energy=500:1000
+#   arcsec/pixel:	0.492
+#   exp_correction:	expmap.fits
+# column units
+#   area:		arcsec**2
+#   surf_bri:		cnts/arcsec**2/expval
+#   surf_err:		cnts/arcsec**2/expval
+
+# background-subtracted results
+ reg   net_counts     error   background    berror      area  surf_bri  surf_err
+---- ------------ --------- ------------ --------- --------- --------- ---------
+   1        0.000     0.000        0.000     0.000     55.92     0.000     0.000
+   2        0.000     0.000        0.000     0.000    168.48     0.000     0.000
+   3        0.000     0.000        0.000     0.000    279.83     0.000     0.000
+   4        0.000     0.000        0.000     0.000    395.53     0.000     0.000
+   5        0.000     0.000        0.000     0.000    504.95     0.000     0.000
+
+
+# source_region(s):
+# # Region file format: DS9 version 4.0
+# # Filename: /data/mimir3/gaetz/reproj.cxo.e0102/imgcorr/bin1/0.481-0.614/5124/obs5124_O7Hea_bin1_img_S3.fits
+# global color=green font="helvetica 10 normal" select=1 highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source
+# physical
+# ellipse(4093.5,4095.5,0,0,8.2,9,16.4,18,24.6,27,32.8,36,41,45,20)
+
+# source_data
+ reg       counts    pixels   avg_exp
+---- ------------ --------- ---------
+   1        0.000       231 1279842.077
+   2        0.000       696 1279745.292
+   3        0.000      1156 1279787.328
+   4        0.000      1634 1279767.291
+   5        0.000      2086 1279632.319
+
+
+# background_region(s)
+# # Region file format: DS9 version 4.0
+# # Filename: /data/mimir3/gaetz/reproj.cxo.e0102/imgcorr/bin1/0.481-0.614/5124/obs5124_O7Hea_bin1_img_S3.fits
+# global color=green font="helvetica 10 normal" select=1 highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source
+# physical
+# box(4095,4095.5,125,124,0)
+# -circle(4093.5,4095.5,45.233081)
+
+# background_data
+ reg       counts    pixels   avg_exp
+---- ------------ --------- ---------
+all         0.000      9067 1279378.579
+
+
+# source
+#   data_file:		cts.fits
+#   interval:		energy=1000:2000
+#   arcsec/pixel:	0.492
+#   exp_correction:	expmap.fits
+# background
+#   data_file:		cts.fits
+#   interval:		energy=1000:2000
+#   arcsec/pixel:	0.492
+#   exp_correction:	expmap.fits
+# column units
+#   area:		arcsec**2
+#   surf_bri:		cnts/arcsec**2/expval
+#   surf_err:		cnts/arcsec**2/expval
+
+# background-subtracted results
+ reg   net_counts     error   background    berror      area  surf_bri  surf_err
+---- ------------ --------- ------------ --------- --------- --------- ---------
+   1        0.000     0.000        0.000     0.000     55.92     0.000     0.000
+   2        0.000     0.000        0.000     0.000    168.48     0.000     0.000
+   3        0.000     0.000        0.000     0.000    279.83     0.000     0.000
+   4        0.000     0.000        0.000     0.000    395.53     0.000     0.000
+   5        0.000     0.000        0.000     0.000    504.95     0.000     0.000
+
+
+# source_region(s):
+# # Region file format: DS9 version 4.0
+# # Filename: /data/mimir3/gaetz/reproj.cxo.e0102/imgcorr/bin1/0.481-0.614/5124/obs5124_O7Hea_bin1_img_S3.fits
+# global color=green font="helvetica 10 normal" select=1 highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source
+# physical
+# ellipse(4093.5,4095.5,0,0,8.2,9,16.4,18,24.6,27,32.8,36,41,45,20)
+
+# source_data
+ reg       counts    pixels   avg_exp
+---- ------------ --------- ---------
+   1        0.000       231 1279842.077
+   2        0.000       696 1279745.292
+   3        0.000      1156 1279787.328
+   4        0.000      1634 1279767.291
+   5        0.000      2086 1279632.319
+
+
+# background_region(s)
+# # Region file format: DS9 version 4.0
+# # Filename: /data/mimir3/gaetz/reproj.cxo.e0102/imgcorr/bin1/0.481-0.614/5124/obs5124_O7Hea_bin1_img_S3.fits
+# global color=green font="helvetica 10 normal" select=1 highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source
+# physical
+# box(4095,4095.5,125,124,0)
+# -circle(4093.5,4095.5,45.233081)
+
+# background_data
+ reg       counts    pixels   avg_exp
+---- ------------ --------- ---------
+all         0.000      9067 1279378.579
+

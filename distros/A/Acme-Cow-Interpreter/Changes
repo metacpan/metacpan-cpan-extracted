@@ -1,0 +1,5 @@
+Revision history for Perl extension Acme::Cow.
+
+0.01  Fri Feb 29 14:48:49 2008
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Acme::Cow::Interpreter

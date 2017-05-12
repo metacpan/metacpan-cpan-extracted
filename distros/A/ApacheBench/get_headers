@@ -1,0 +1,16 @@
+#!/usr/bin/perl -w
+#
+# This is a simple script which uses ApacheBench to read the full
+# HTTP headers returned by the server from a given URL
+#
+die "usage: $0 http://url/" unless $ARGV[0];
+use HTTPD::Bench::ApacheBench;
+my $b = HTTPD::Bench::ApacheBench->new;
+my $run1 = HTTPD::Bench::ApacheBench::Run->new({ urls => [$ARGV[0]] });
+
+$b->add_run($run1);
+$b->memory(2);
+my $ro = $b->execute;
+print join("\n\n", map {
+    $run1->urls->[$_].":\n".$run1->response_headers->[$_]
+} 0..$#{$run1->urls});

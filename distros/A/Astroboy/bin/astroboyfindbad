@@ -1,0 +1,161 @@
+#!/usr/bin/perl
+use strict;
+use vars qw($VERSION $astro);
+use Getopt::Std::Strict 'dhvsbgG';
+use Cwd;
+use Astroboy;
+use Carp;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.7 $ =~ /(\d+)/g;
+
+Init();
+
+
+@ARGV and scalar @ARGV or die("missing arguments\n");
+
+my ($bad,$total)=(0,0);
+
+
+DIR: for my $dir (@ARGV){
+
+   my $abs_dir = Cwd::abs_path($dir) 
+      or warn("not on disk? cant resolve '$dir'") 
+      and next DIR;
+
+   -d $abs_dir 
+      or warn("Not dir '$abs_dir") 
+      and next DIR;
+
+   my @all = split(/\n/, `find "$abs_dir" -iname "*mp3" -type f`);
+
+   @all and scalar @all 
+      or debug("no mp3 files in $abs_dir")
+      and next DIR;
+
+
+   SONG: for my $abs_path (@all){
+      $total++;
+      my($artist,$album,$song)= _artist_album_song($abs_path);
+
+      #hackish
+      if (!$artist and ( $opt_g or $opt_G)){
+         my $guess= $astro->artist_guess($abs_path);
+         if ($guess){
+            print STDERR "[artist guess : $guess] ";
+            if ($opt_G and $guess=~/\w/){
+               
+               $artist = $guess;
+               `id3tag --artist="$artist" "$abs_path"`;
+               print STDERR  "[committed] ";           
+
+            }
+         }
+      }
+
+
+         
+      
+      my @missing;
+
+      $artist or push @missing, 'artist';
+      $album  or push @missing, 'album';
+      $song or push @missing, 'song' if $opt_s;
+
+      @missing and scalar @missing or next SONG;
+
+      $bad++;
+      
+      print "$abs_path\n";
+
+
+      print STDERR "# @missing\n\n" if $opt_b;
+
+
+
+   }
+
+}
+
+debug("bad: $bad/$total");
+
+exit;
+
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+sub debug { print STDERR "$0, @_\n" if $opt_d; 1 }
+
+
+
+
+
+sub _artist_album_song {
+   my $abs = shift;
+   $abs or croak("missing arg");
+   -f $abs or warn("not on disk: $abs") and return;
+
+
+   # any tags
+   my($artist,$album,$song);
+
+   my $out = `id3info "$abs"`;
+   $? and die("error id3info $abs , $?");
+
+
+   if( $out=~/TPE1.+\:(.+)\n/ ){
+      $artist = $1;
+      $artist=~s/^\s+|\s+$//g;
+   }
+   if ($out=~/TALB.+\:(.+)\n/ ){
+      $album = $1;
+      $album=~s/^\s+|\s+$//g;
+   }
+   if ($out=~/TIT2.+\:(.+)\n/ ){
+      $song = $1;
+      $song=~s/^\s+|\s+$//g;
+   }
+
+   #debug("$abs: [$artist, $album, $song]");
+
+   return ($artist, $album, $song);
+}
+
+
+
+
+sub usage {
+   qq{$0 - find mp3 files missing artist and or album id3 tag
+
+OPTIONS
+
+   -d          debug on
+   -h          help
+   -v          version and exit
+   -s          also show which are missing song id3 tag
+   -b          verbose, show what is missing
+   -g          guess artist if missing from id3 tag
+   -G          guess artist if missing from id3 tag and save
+
+EXAMPLES
+
+   $0 ~/music/incoming
+
+AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+SEE ALSO
+
+Astroboy - parent package
+
+}}
+
+
+sub Init {
+   $opt_h and print usage() and exit;
+   $opt_v and print $VERSION and exit;
+   $astro = Astroboy->new;
+}
+
+

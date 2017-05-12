@@ -1,0 +1,15 @@
+ChangeLog
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+TODO
+bin/tfind
+dist.ini
+lib/App/tfind.pm
+t/00-compile.t
+t/000-report-versions-tiny.t
+t/basic.t
+t/release-unused-vars.t

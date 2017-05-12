@@ -1,0 +1,76 @@
+Revision history for Acme-HTTP
+
+0.10 - 2014-12-28T09:24:30+01:00
+
+  [DOCUMENTATION]
+
+  - Migrate to Dist::Zilla
+
+0.09 - 2014-09-07T18:34:12+01:00
+
+  [DOCUMENTATION]
+
+  - Add a .gitignore file
+
+  - Changelog dates are better written as YYYY.MM.DD and probably ordered in
+    the other, descending, direction
+    Remark: I have decided to follow the ISO 8601 standard at
+    http://www.w3.org/TR/NOTE-datetime
+
+  - Just use a Makefile.PL and not a Build.PL the latter does not have any
+    added value any more
+
+  - In Makefile.PL ==> meta files link to repository
+
+0.08 - 2014-08-22T16:00:00+01:00
+
+  [DOCUMENTATION]
+
+  - Fix some minor formatting in the documentation
+
+0.07 - 2014-08-22T14:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - Make Acme::HTTP require Net::HTTP/S::NB dynamically
+
+0.06 - 2014-08-22T12:00:00+01:00
+
+  [REFACTORING]
+
+  - Refactor Acme::HTTP, make new return a correctly blessed Acme::HTTP object
+    Data abstraction, hide package variables (such as $Acme::HTTP::Code) using
+    getter and setter subroutines
+
+0.05 - 2014-08-21T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - Replace Net::HTTP  by Net::HTTP::NB
+    Replace Net::HTTPS by Net::HTTPS::NB
+
+0.04 - 2014-08-20T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - Allow for flexible Max Iterations
+
+0.03 - 2014-08-19T12:00:00+01:00
+
+  [DOCUMENTATION]
+
+  - Add two more dependencies
+    IO::Socket::SSL
+    Net::SSL
+
+0.02 - 2014-08-18T12:00:00+01:00
+
+  [DOCUMENTATION]
+
+  - Fix some minor problems in the documentation.
+
+0.01 - 2014-08-17T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - First version, released on an unsuspecting world.

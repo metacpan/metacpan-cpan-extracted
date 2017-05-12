@@ -1,0 +1,80 @@
+<div class="fetch">
+[%- counter=q.param('counter') %]
+[%- classes=['tdc1', 'tdc2', 'tdc3'] %]
+[%- nclasses=3 %]
+[%- class=-1 %]
+	<form id="form[% counter %]"
+    	  onsubmit="return false;"
+		  ADM_COUNTER="[% counter %]"
+		  ADM_NBLOCKS="[% BL.size %]">
+		<table[% tab_extra_style %] class="tdc">
+			<tr>
+				<td class="tdcol1">New Key:</td>
+				<td class="tdcol2">
+					<input type="text" name="newkey" id="key[% counter %]" value="[% key | html %]">
+				</td>
+			</tr>
+			[%- IF uri==":PRE:" or uri==":LOOKUPFILE:" %]
+			<input type="hidden" name="newuri" id="uri[% counter %]" value="[% uri | html %]">
+			[% ELSE %]
+			<tr>
+				<td class="tdcol1">New Uri:</td>
+				<td class="tdcol2">
+					<input type="text" name="newuri" id="uri[% counter %]" value="[% uri | html %]">
+				</td>
+			</tr>
+			[% END %]
+			<tr><th colspan="2"><br>Action</th></tr>
+			[%- FOREACH l=BL %]
+				[%- FOREACH a=l.a %]
+					[%- IF loop.first %]
+						[%- class=(class + 1) % nclasses %]
+					[%- END %]
+			<tr class="tdc">
+				<td ADM_BLOCK="[% l.b | html %]" ADM_ORDER="[% a.o | html %]" ADM_ID="[% a.id | html %]"
+					colspan="2" class="[% classes.$class %]">
+					<input type="hidden" name="ysize">
+		            <table class="inner_tdc"[% a.extra_style %]>
+		                <tr class="inner_tdc">
+                            <td class="fetch_ta">
+			                    <textarea class="fetch_ta" wrap="off"
+				                          title="action field">[% a.a | html %]</textarea>
+			                </td>
+					[%- IF I.provider.can_notes %]
+                            <td class="comment_ta">
+			                    <textarea class="comment_ta" wrap="word"
+				                          title="comment field">[% a.c | html %]</textarea>
+                            </td>
+					[%- END %]
+                        </tr>
+                    </table>
+				</td>
+				<td class="control">
+					&nbsp;<a href="#" onclick="return xinsert(this, -1);"
+							 title="new action above"><img src="1uparrow.gif"></a>
+					<br>
+					&nbsp;<a href="#" onclick="return xinsert(this, 1);"
+							 title="new action below"><img src="1downarrow.gif"></a>
+				</td>
+				<td class="control">
+					&nbsp;<a href="#" onclick="return xbinsert(this, -1);"
+							 title="new block above"><img src="2uparrow.gif"></a>
+					<br>
+					&nbsp;<a href="#" onclick="return xbinsert(this, 1);"
+							 title="new block below"><img src="2downarrow.gif"></a>
+				</td>
+				<td class="control">
+					&nbsp;<a href="#" onclick="return xdelete(this, 1);"
+							 title="delete action"><img src="delete.gif"></a>
+				</td>
+			</tr>
+				[%- END %]
+			[%- END %]
+		</table>
+	</form>
+</div>
+[%#
+Local Variables:
+tab-width: 4
+End:
+%]

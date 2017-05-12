@@ -1,0 +1,28 @@
+---
+name: Audio-Ofa-Util
+version: 0.04
+author:
+  - 'Christoph Bussenius <pepe@cpan.org>'
+abstract: Audio metadata lookup by fingerprint
+license: gpl
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+requires:
+  Audio::Extract::PCM: 0.02
+  Audio::Ofa: 0
+  Class::Accessor: 0
+  WebService::MusicBrainz: 0
+  XML::LibXML: 1.69
+  XML::Simple: 0
+  perl: 5.006_00
+build_requires:
+  Module::Build: 0
+  Test::More: 0
+provides:
+  Audio::Ofa::Util:
+    file: lib/Audio/Ofa/Util.pm
+    version: 0.04
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

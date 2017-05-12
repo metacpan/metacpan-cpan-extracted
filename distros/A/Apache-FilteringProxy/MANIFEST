@@ -1,0 +1,8 @@
+README
+lib/Apache/FilteringProxy.pm
+Makefile.PL
+MANIFEST
+LICENSE
+Changes
+t/00basic.t
+Apache-FilteringProxy.spec

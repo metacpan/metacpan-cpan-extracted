@@ -1,0 +1,73 @@
+NAME
+    Aspect::Library::Trace - Aspect-oriented function call tracing
+
+SYNOPSIS
+      use Aspect;
+      use Aspect::Library::Trace;
+      
+  aspect Trace => call qr/^Foo::/;
+      
+  Foo::foo1
+        Foo::foo2
+          Foo::foo3
+      Foo::foo2
+        Foo::foo3
+      Foo::foo2
+        Foo::foo3
+
+DESCRIPTION
+    Aspect Oriented Programming is a programming paradigm that increases
+    modularity by enabling improved separation of concerns.
+
+    It is most useful when dealing with cross-cutting concerns that would
+    otherwise require code to be scattered around in many places.
+
+    Aspect::Library::Trace is an Aspect library that implements nested
+    functional call tracing, in the style formerly offered by the "dprofpp
+    -T" command provided by Devel::DProf (before that module became
+    unusable).
+
+  Conventional Usage
+    The basic usage is very simple, just create an "Trace" aspect as shown
+    in the "SYNOPSIS".
+
+    Load Aspect, then Aspect::Library::Trace, then create the aspect using
+    the "aspect" function.
+
+    Any calls to functions described in the pointcut will be printed to
+    "STDERR". Nesting is indicated via indenting.
+
+    Because the depth is tracked at a per-Aspect level, you should avoid
+    creating more than one trace Aspect or the indenting levels will be
+    mixed up and the output will become largely meaningless.
+
+  Import Usage
+    For even more convenience (and even less typing) you can use the
+    following shorthand 1-line form.
+
+      use Aspect::Library::Trace qr/^Module::/;
+
+    When used this way, you also don't need to "use Aspect".
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Aspect-Library-Trace>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    Aspect
+
+COPYRIGHT
+    Copyright 2009 - 2011 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

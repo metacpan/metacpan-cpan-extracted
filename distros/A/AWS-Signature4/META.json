@@ -1,0 +1,45 @@
+{
+   "abstract" : "Create a version4 signature for Amazon Web Services",
+   "author" : [
+      "Lincoln Stein <lincoln.stein@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AWS-Signature4",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4205"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Parse" : "0",
+            "Digest::SHA" : "5.47",
+            "LWP" : "5.835",
+            "URI" : "1.59",
+            "URI::QueryParam" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "AWS::Signature4" : {
+         "file" : "lib/AWS/Signature4.pm",
+         "version" : "1.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.02"
+}

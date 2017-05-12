@@ -1,0 +1,124 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long qw(:config autohelp no_ignore_case bundling);
+
+my %args;
+my $success = GetOptions(
+    'c|check'        => \$args{check_cfg},
+    'f|config=s'     => \$args{cfg_file},
+    'v|verbose'      => \$args{verbose},
+    't|trace'        => \$args{trace},
+    'd|daemonize'    => \$args{daemonize},
+    'b|no-color'     => \$args{no_color},
+    'L|list-plugins' => \$args{list_plugins},
+    'i|interactive'  => \$args{interactive},
+
+    'V|version'      => sub {
+        require App::Pocosi;
+        no strict 'vars';
+        my $version = defined $App::Pocosi::VERSION
+            ? $App::Pocosi::VERSION
+            : 'dev-git';
+        print "Version $version\n";
+        exit;
+    },
+);
+
+if (!$success || @ARGV) {
+    warn "Unrecognized arguments: @ARGV\n" if @ARGV;
+    require Pod::Usage;
+    Pod::Usage::pod2usage();
+}
+
+my $procname = 'pocosi';
+$0 = $procname;
+if ($] < 5.013000 && $^O eq 'linux') {
+    local $@;
+    eval {
+        require Sys::Prctl;
+        Sys::Prctl::prctl_name($procname);
+    };
+}
+
+my $config;
+if ($args{cfg_file} =~ /\.ya?ml$/i) {
+    require YAML::XS;
+    YAML::XS->import('LoadFile');
+
+    eval { $config = LoadFile($args{cfg_file}) };
+
+    if ($@) {
+        chomp $@;
+        die "Failed to read YAML data from $args{cfg_file}: $@\n"
+    }
+    if (ref $config ne 'HASH') {
+        die "YAML data in $args{cfg_file} should be a hash\n";
+    }
+}
+elsif ($args{cfg_file} =~ /\.json$/i) {
+    require JSON::XS;
+    JSON::XS->import('decode_json');
+
+    open my $fh, '<', $args{cfg_file} or die "Can't open $args{cfg_file}: $!\n";
+    my $json = do { local $/; <$fh> };
+
+    eval { $config = decode_json($json) };
+    if ($@) {
+        chomp $@;
+        die "Failed to read JSON data from $args{cfg_file}: $@\n"
+    }
+    if (ref $config ne 'HASH') {
+        die "JSON data in $args{cfg_file} be a hash\n";
+    }
+}
+else {
+    die "Config file format not supported, it must be YAML or JSON\n";
+}
+
+require App::Pocosi;
+App::Pocosi->new(
+    cfg => $config,
+    (map {
+        defined $args{$_} ? ($_ => $args{$_}) : ()
+    } qw(check_cfg daemonize verbose trace no_color list_plugins interactive))
+)->run();
+
+=encoding utf8
+
+=head1 NAME
+
+pocosi - A command line tool for launching a POE::Component::Server::IRC instance
+
+=head1 SYNOPSIS
+
+B<pocosi> <options>
+
+ Options:
+   -f FOO, --config FOO         Use config file FOO (required)
+   -c, --check                  Check if config is valid and code compiles
+   -d, --daemonize              Run in the background
+   -v, --verbose                Show IRCd protocol messages
+   -t, --trace                  Show all IRCd events
+   -L, --list-plugins           List available plugins
+   -b, --no-color               Don't use terminal colors
+   -i, --interactive            Interactive mode (type 'help' for help)
+   -V, --version                Print version
+   -h, --help                   Print this usage message
+
+For documentation of the configuration file, do "perldoc
+L<App::Pocosi|App::Pocosi>".
+
+=head1 AUTHOR
+
+Hinrik E<Ouml>rn SigurE<eth>sson, hinrik.sig@gmail.com
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2011 Hinrik E<Ouml>rn SigurE<eth>sson
+
+This program is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

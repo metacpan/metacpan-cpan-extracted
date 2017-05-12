@@ -1,0 +1,49 @@
+---
+abstract: 'Create xlsx files from arrays or SQL queries.'
+author:
+  - 'Qiang Wang <wang-q@outlook.com>'
+build_requires:
+  Archive::Zip: '0'
+  DBD::CSV: '0'
+  DBI: '0'
+  Path::Tiny: '0.076'
+  Spreadsheet::XLSX: '0.15'
+  Test::More: '0.88'
+  Tie::IxHash: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AlignDB-ToXLSX
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  AlignDB::ToXLSX:
+    file: lib/AlignDB/ToXLSX.pm
+    version: v1.2.1
+requires:
+  Chart::Math::Axis: '0'
+  Excel::Writer::XLSX: '0.95'
+  List::MoreUtils: '0'
+  Moose: '0'
+  Statistics::Descriptive: '0'
+  YAML::Syck: '1.29'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/wang-q/AlignDB-ToXLSX/issues
+  homepage: https://github.com/wang-q/AlignDB-ToXLSX
+  repository: git://github.com/wang-q/AlignDB-ToXLSX.git
+version: 1.2.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

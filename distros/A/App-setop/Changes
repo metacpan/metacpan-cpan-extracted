@@ -1,0 +1,77 @@
+Revision history for App-setop
+
+0.11    2016-09-26 (PERLANCAR)
+
+	- Add operation: cross.
+
+
+0.10    2015-11-13 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Fix typos/wording.
+
+	- [doc] Mention Array::Utils & Set::Scalar.
+
+
+0.09    2015-01-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add examples in Synopsis.
+
+
+0.08    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.07    2014-07-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Minor POD tweaks.
+
+
+0.06    2014-07-17 (SHARYANTO)
+
+        - Add option: --ignore-case, -i.
+
+        - Add option: --ignore-all-space, -w.
+
+        - Add option: --version, -v.
+
+
+0.05    2014-07-16 (SHARYANTO)
+
+        - No functional changes.
+
+        - Add some missing notes in POD.
+
+
+0.04    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.03    2014-04-06 (SHARYANTO)
+
+        - No functional changes.
+
+        - [dist] Specify minimum version of IPC::Cmd that has run_forked() [CT].
+
+
+0.02    2014-04-04 (SHARYANTO)
+
+        - No functional changes.
+
+        - Update POD.
+
+
+0.01    2014-04-04 (SHARYANTO)
+
+        - First release.

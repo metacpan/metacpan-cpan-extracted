@@ -1,0 +1,6 @@
+#!/bin/bash
+####################################################
+# Upload a file to dropbox and output public address
+
+
+dropbox-api put $1 dropbox:/Public/ -P

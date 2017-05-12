@@ -1,0 +1,52 @@
+{
+   "abstract" : "All your math are belong to us!",
+   "author" : [
+      "Joel Berger"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Pod-MathJax",
+   "no_index" : {
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.8.0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Pod::MathJax" : {
+         "file" : "lib/Acme/Pod/MathJax.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Acme-Pod-MathJax/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/Acme-Pod-MathJax"
+      }
+   },
+   "version" : "0.03"
+}

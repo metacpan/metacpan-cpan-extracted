@@ -1,0 +1,35 @@
+Revision history for App-Sky
+
+v0.2.1      2014-10-17
+    - Document the "up-r" command.
+
+v0.2.0      2014-10-16
+    - Add the "up-r" sub-command to upload sub-dirs.
+
+v0.0.7      2014-02-02
+    - Fix the =encoding directives globally.
+        - Single UTF-8 one.
+
+v0.0.6      2013-06-04
+    - Made minimal version of perl 5.010 due to use of defined-or.
+        - it failed on perl-5.8.9.
+
+v0.0.5      2013-06-02
+    - Remove *~ files from the distribution.
+        - Thanks to Kharec for noticing and reporting.
+
+v0.0.4      2013-06-02
+    - Extract the lib/App/Sky/Config/Validate.pm class.
+    - Some tests for it in t/config-validate.t .
+
+v0.0.3      2013-06-02
+    - Add MooX::late to the pre-requisites.
+        - There were test failures:
+        - http://www.cpantesters.org/cpan/report/9b18aeb8-ca27-11e2-82d6-3b44989cd64d
+
+v0.0.2      2013-05-31
+    - Add scripts/bump-version-number.pl .
+    - Correct the links in the resources and pages to the repositories/etc.
+
+v0.0.1      2013-05-31
+    - First version, released on an unsuspecting world

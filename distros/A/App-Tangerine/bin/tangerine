@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use App::Tangerine;
+
+App::Tangerine->run;
+
+=encoding utf8
+
+=head1 NAME
+
+tangerine - Perl dependency metadata tool
+
+=head1 SYNOPSIS
+
+tangerine [options] <files or directories>
+
+=head1 DESCRIPTION
+
+This utility attempts to examine and analyze perl files, directories or
+perl distribution archives, reporting provided modules, and compile-time
+and run-time depencies.
+
+In the B<diff> mode it reports differences between two directories or
+perl distribution archives.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--all|-a>
+
+Examine all recursively discovered files.  By default, only perl files
+are considered.
+
+=item B<--compact|-c>
+
+Do not list dependencies provides by the examined set.
+
+=item B<--diff|-d FOO BAR>
+
+Examine I<FOO> and I<BAR> and report metadata differences, ignoring
+line numbers.  These can be directories or distribution tarballs.
+
+=item B<--files|-f>
+
+Report findings per file instead of per module.  This option has no
+effect with B<--compact>.
+
+=item B<--jobs|-j NUM>
+
+Defines the number of workers used for parallel processing.  By default,
+the optimal number of workers is determined automatically.
+
+=item B<--help|-h>
+
+Display this help.
+
+=item B<--mode|-m MODE>
+
+Only look for this specific  metadata.  Valid options are I<compile>
+(modules required at compile time), I<runtime> (modules required at
+runtime), I<package> (modules provided) and I<all>.  For backwards
+compatibility, I<p|prov>, I<r|req> and I<u|use> are also understood.
+This option is automatically set to I<all> if B<--compact> is also
+used.  Defaults to I<all>.
+
+=item B<--verbose|-v>
+
+Be a little more verbose where it makes sense.
+
+=back
+
+=head1 EXAMPLES
+
+    tangerine -c Makefile.PL lib/ t/
+    tangerine --mode=compile inc/
+    tangerine -d Foo-0.01.tar.gz Foo-0.02.tar.gz
+
+=head1 AUTHOR AND LICENSE
+
+Copyright (c) 2014-2015 Petr Šabata <contyk@redhat.com>
+
+See the LICENSE files for licensing details.

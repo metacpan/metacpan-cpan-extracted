@@ -1,0 +1,205 @@
+2010-12-30  Tim Jenness  <tjenness@cpan.org>
+
+	---- V1.00 CPAN ----
+
+	* lib/Astro/SLA.pm: Tweak DynaLoader/Exporter usage
+
+	* Build.PL: Use Module::Build
+
+2007-07-24  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.xs: Fix slaIntin issues for Fortran vs C interface. Tidy up
+	slaIntin test.
+
+	* SLA.xs: Remove some unnecessary OUTPUT sections.
+
+2005-09-22  Tim Jenness  <tjenness@cpan.org>
+
+	---- V0.99 CPAN ---
+
+2005-09-02  Tim Jenness  <tjenness@cpan.org>
+
+	* t/mjd.t: Switch to Test::More
+
+	* t/preces.t: Switch to Test::More
+
+	* t/slaObs.t: Switch to Test::More
+
+	* t/fk4to5.t: Switch to Test::More
+
+	* t/comet.t: Add 3200 Phaethon torture test and switch to Test::More
+
+2004-02-03  Tim Jenness  <tjenness@cpan.org>
+
+	* stime: Tidy up. Add -epoch, -h and -man options.
+
+	* SLA.pm (ut2lst): Tidy up.
+
+2004-02-01  Tim Jenness  <tjenness@cpan.org>
+
+	* t/sun67.t: Add 70 new tests based on the examples in SUN/67
+
+2004-01-31  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.xs: Mods for slaObs update. Added support for slaIntin
+
+	* SLA.pm (slaObs): Can now be called with a constant string as
+	second argument. [also modified slaObs.t to match]
+
+2003-10-22  Tim Jenness  <tjenness@cpan.org>
+
+	--- VERSION 0.98 on CPAN ---
+
+2003-09-04  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.xs: Missed two Perl_croaks that only occur when linking
+	against the C version of SLA.
+
+2003-08-18  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.pm: Release Version 0.97 on CPAN
+
+2003-07-14  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.xs: Need to add aTHX_ for Perl_croak to work with threads
+
+2003-07-03  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.xs: Fix error in slaOap fortran interface. This was breaking
+	the comet test. Does not affect the C version.
+
+2003-07-02  Tim Jenness  <tjenness@cpan.org>
+
+	* t/comet.t: Add a test for perturbation of orbital elements since
+	that is key functionality for some users.
+
+2002-09-15  Tim Jenness  <tjenness@cpan.org>
+
+	--- VERSION 0.96 on CPAN ---
+
+	* SLA.pm: Announce Fortran version support in documentation
+
+2002-09-15  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.xs: Add full support for Fortran version of SLALIB
+
+2002-08-15  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.xs: Fix argument list for slaOap
+
+
+2002-08-11  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.xs: Add slaPertel and slaPertue
+
+2002-05-24  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.pm: Make release 0.95
+
+2002-04-12  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.xs: slaPlante had wrong calling arguments
+
+2001-04-24  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.xs: update copyright
+
+	* MANIFEST: Add t/preces.t
+
+	* README: Tweak for 0.94
+
+	* SLA.pm: Version 0.94. Update copyright.
+
+2000-11-21  Tim Jenness  <tjenness@cpan.org>
+
+	* t/preces.t: Add test for slaPreces
+
+	* SLA.xs: slaPreces - the ra and dec variables are input and
+	output not just output.
+
+	* t/fk4to5.t: Use Test module
+
+2000-04-11  Tim Jenness  <tjenness@cpan.org>
+
+	* t/fk4to5.t: Improve the test (and fix btoj for -00 decs)
+	(btoj): dont use abs($d), multiply by dsign instead.
+
+2000-03-28  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.pm (ut2lst_tel): Add missing command
+
+	* t/mjd.t: Add new test
+
+	* Makefile.PL: Add Test prerequisite
+
+	* SLA.pm: Increase version number to 0.93
+
+	* t/slaObs.t: Add new test.
+
+	* SLA.xs: Rename slaObs to _slaObs and call from perl layer
+
+	* SLA.pm (slaObs): Add perl layer to translate undef to '' to
+	prevent segmentation violation occurring on my linux system.
+
+	* stime: Add example program
+
+        * SLA.pm (lstnow_tel): Trap for unknown telescopes.
+
+2000-03-24  Tim Jenness  <tjenness@cpan.org>
+
+	* arrays.c: Use PL_na symbols rather than na
+
+2000-02-14  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.xs: Apply patch to slaEg50 thanks to Chris Phillips.
+
+1999-10-11  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.pm: Version number now 0.92
+
+	* SLA.pm: Export single precisions commands. Export slaDvxv.
+	Update documentation to reflect the exportable commands rather
+	than the initial list.
+
+	* SLA.xs: Fix compiler warnings by using void* (patch supplied by
+	Chris Phillips <phillips@jive.nfra.nl>)
+
+1999-08-03  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.pm: Version now 0.91
+
+	* SLA.xs: Apply patch for slaEqgal and slaSupgal supplied by
+	Tim Kimball (kimball@stsci.edu)
+	Allow use of single precision names as aliases to double precision
+	commands.
+	Remove use of static char.
+
+	* SLA.pm: Add DR2S and DR2H to the export list.
+
+1999-05-17  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.pm: Version now 0.90 in preparation for CPAN release.
+
+1999-03-12  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.pm: Up version number to 0.11
+
+	* SLA.xs: slaDmoon fixed - double not float
+
+1998-06-02  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.pm: Complete 99% + add lst routines
+
+	* SLA.xs: Complete 99%
+
+
+1998-05-27  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.xs (slaDd2tf): Add slaDd2tf and slaDjcl
+
+1998-04-01  Tim Jenness  <tjenness@cpan.org>
+
+	* SLA.pm: Added slaPreces
+
+	* SLA.xs (slaPreces): Added slaPreces
+

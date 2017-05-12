@@ -1,0 +1,16 @@
+'Activator::Registry':
+  'Activator::Dictionary':
+    dict_tables: [ t1, t2 ]
+    db_alias: 'test'
+    default_lang:  'en'
+    default_realm: 'dtest'
+
+  'Activator::DB':
+    default:
+      connection: test
+    connections:
+      test:
+        user: act_dict_user
+        pass: act_dict_pass
+        dsn: 'DBI:mysql:act_dict_test:localhost'
+

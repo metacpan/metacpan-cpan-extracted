@@ -1,0 +1,16 @@
+in no particular order
+----------------------
+
+possibly integrate with adb for more seamless search/push/pull
+
+ability to rebase from ./apps to /some/other/blah on local fs
+
+t/ tests with an example data file
+
+distribute to windows
+  req. non cygwin environment / possibly non perl env
+  -look into fatpacking (ex. cpanm)
+  -PAR
+
+support encryption
+support non-compressed files

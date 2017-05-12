@@ -1,0 +1,14 @@
+<title>Mowyw example: page foo1</title>
+[% include head2 %]
+
+<h2>foo2 is another sub item of foo</h2>
+
+<p>And now I'm running out of ideas what to write</p>
+
+<p>New style markup (if you don't see anything it means all works fine):
+	[% setvar mytest <p>All worked fine!</p> %]</p>
+[% readvar mytest %]
+
+</div>
+
+[%menu nav foo foo2%]

@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Alvis-QueryFilter
+version:      0.3
+version_from: lib/Alvis/QueryFilter.pm
+installdirs:  site
+requires:
+    CQL::Parser:                   0
+    Data::Dumper:                  0
+    HTTP::Daemon:                  0
+    HTTP::Response:                0
+    HTTP::Status:                  0
+    LWP::UserAgent:                0
+    Test::Simple:                  0.44
+    URI::Escape:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

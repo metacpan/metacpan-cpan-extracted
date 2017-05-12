@@ -1,0 +1,49 @@
+Authen::Krb5::KDB is a set of perl modules to read and parse Kerberos
+V5 dump files.  Currently it supports Version 3, 4 and 5 dump files.
+
+While I want to add new features to these modules, I think the
+interface is fairly stable.  Therefore will be the last alpha release
+unless I hear of any problems with or suggestions to change the
+interface.
+If you have any suggestions, problems, or comments please email me at
+the address below.
+
+
+You install the library by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+This assumes that you've installed the kerberos program kdb5_util in
+the standard location of /usr/local/sbin.  If you have installed it in
+a non-standard location like /usr/local/krb5/sbin, then use the
+KDB5_UTIL_PATH argument to Makefile.PL as follows:
+
+   perl Makefile.PL KDB5_UTIL_PATH=/usr/local/krb5/sbin
+
+ 
+The module KDB_H.pm is generated via the script gen_kdb_h.plx but
+since it requires the Kerberos sources to be available it's not run
+automatically from the Makefile.  The module in this distribution is
+build from Kerberos Version 1.2.4 and should work on any older
+versions.  If you want to rebuild the KDB_H.pm module, run the
+following command with the appropriate path to your Kerberos sources:
+
+   perl gen_kdb_h.plx /my/sources/krb5-1.2.4/src
+
+
+The following modules are required:
+
+   Carp
+   POSIX
+
+
+Please report any bugs/suggestions to <steiner@bakerst.rutgers.edu>
+
+Copyright (c) 2002 David K. Steiner.  All rights reserved.  
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

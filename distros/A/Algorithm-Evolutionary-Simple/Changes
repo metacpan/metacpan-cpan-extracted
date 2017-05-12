@@ -1,0 +1,30 @@
+2016-03-23  JJ Merelo  <jmerelo@flash>
+
+	* lib/Algorithm/Evolutionary/Simple.pm: just a few test changes to bump up version. Adds also exception test.
+
+2012-03-27  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* script/simple-EA.pl: Used the wrong file for this, so I changed
+	the good one, this one. Changed a bit docs, too.
+
+	* lib/Algorithm/Evolutionary/Simple.pm
+	(get_pool_binary_tournament): Added binary tournament, a less
+	greedy way of selection which seems to work a bit better and is a
+	bit faster.
+	
+
+2011-12-06  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/Evolutionary/Simple.pm (single_generation):
+	Changing documentation and adding a rather useless
+	single_generation 
+
+2011-11-06  Juan J. Merelo  <jmerelo@sheldon>
+
+	* MANIFEST: Taking out unneeded files, and putting in those needed 
+
+Revision history for Algorithm-Evolutionary-Simple
+
+0.0.1  Thu Nov  3 19:22:26 2011
+       Initial release.
+

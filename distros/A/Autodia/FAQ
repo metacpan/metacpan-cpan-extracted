@@ -1,0 +1,56 @@
+The AutoDIAL FAQ
+
+An uptodate copy of this document can be
+found at http://www.aarontrevena.co.uk/opensource/autodia/faq.txt
+
+Q: Why is autodia. not processing my file
+A: Have you used the -i option, if not try 
+   autodia -i filename or
+   autodia -i "filea fileb filec"
+
+Q: I get a "can't locate Template.pm in @INC" error mesage or similar
+A: It is likely that you don't have template toolkit installed, it is not
+part of the perl core libraries, but is available through CPAN as
+Template.
+
+Q: Why does only the first file get processed?
+A: If you are entering the filenames as -i filename filename rather than -i "filename
+filename" only the first will be processed. If you aren't using any other
+options than -i it would probably be easier to just use 'autodia filename
+filename'.
+
+Q: When I use the -O option I get stuff mixed in with my xml, how do I stop that
+happening?
+A: When using -O, the usual messages are output to STDOUT, as well as the xml - but the
+xml will not contain any messages it can be used as is. To stop any output to STDOUT
+other than the dia xml use the -S option which suppresses messages. 
+
+Q: Why does my option get ignored?
+A: If you don't use the -i option to specify which file to use autodial just takes the
+argument as a list of files to use and ignores any options.
+
+Q: How do I make autodia handle my preferred language?
+A: Read the guide to creating your own handler in the DEVELOP file.
+
+Q: Why does it take so long?
+A: AutoDia does all kinds of strange things and has been designed for
+clarity and reliability rather than speed - for an idea of how long things
+should take see the benchmarks in README and DEVELOP.
+
+Q: Why didn't you do this in C (or java or python)?
+A: Because it is so much easier in perl. Perl is good for parsing text and
+also interfaces very well with databases and other sources of data making
+it the prime choice of language for this task.
+
+Q: Why don't you do this for Visio
+A: i) Because Visio *STILL* uses proprietary formats and requires lots of
+NDAs and license fees to be able to integrate with.
+   ii) Because Dia is used by perl developers more than Visio.
+   iii) Because Visio is Proprietary and Dia is free software, I want to
+Dia to be better and more popular than Visio and I hope this helps.
+
+Q: Why is AutoDia so rubbish.
+A: Because Trelane told me to 'just release it'.
+
+Any corrections or contributions to the faq should be mailed to me at
+aaron.trevena@gmail.com

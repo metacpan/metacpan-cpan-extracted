@@ -1,0 +1,30 @@
+---
+abstract: 'a Pure Perl HTTP proxy server'
+author:
+  - 'Piotr Roszatycki <dexter@cpan.org>'
+build_requires:
+  Test::More: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-PureProxy
+provides:
+  App::PureProxy:
+    file: lib/App/PureProxy.pm
+    version: '0.0100'
+recommends:
+  Plack::Middleware::TrafficLog: '0'
+requires:
+  Plack::App::Proxy::Backend::HTTP::Tiny: '0'
+  Plack::Middleware::Proxy::Connect::IO: '0'
+  Plack::Middleware::Proxy::Requests: '0'
+  Starlight: '0'
+  perl: '5.008'
+resources:
+  bugtracker: http://github.com/dex4er/PureProxy/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/dex4er/PureProxy
+version: '0.0100'

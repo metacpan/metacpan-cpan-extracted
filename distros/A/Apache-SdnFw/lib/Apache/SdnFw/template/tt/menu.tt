@@ -1,0 +1,46 @@
+<div id="menu">
+	<div id="menu_actions">
+		<ul>
+			<li><b>SITENAME</b></li>
+			<li><a href="[% s.ubase %]">Home</a></li>
+[% FOREACH l IN s.tabs %]
+			[% s.add_tab(l.code,l.name) %]
+[% END %]
+		</ul>
+	</div>
+	<div id="menu_user_loc" style="clear: both; float: left;">
+		<a href="[% s.ubase %]/me"><b>[% s.employee.name %]</b></a>
+		<span style="font-size: 10px;">[% s.datetime.nice %]</span> 
+		<a href="[% s.ubase %]/logout" class="action">logout</a>
+[% IF s.env.DEV %]<span style="color: #fff; background-color: #F00; text-decoration: blink;">DEV</span>[% END %]
+	</div>
+	<div id="menu_bottom"></div>
+</div>
+[% IF s.actions %]
+<div id="action">
+	<ul>
+		<li style="text-transform: capitalize;"><b>[% s.object %]</b></li>
+[% FOREACH a IN s.actions %]
+	[% IF a.url %]
+		<li><a href="[% a.url %]" class="[% a.class || 'action' %]">[% a.title %]</a></li>
+	[% ELSIF a.title %]
+		<li[% IF a.class %] class="[% a.class %]"[% END %]>[% a.title %]</li>
+	[% END %]
+[% END %]
+	</ul>
+</div>
+[% END %]
+[% IF s.buckets %]
+<div id="bucket_top" style="clear: both;"></div>
+<div id="buckets">
+	<ul>
+		<li class="titlebucket"><b>[% s.bucket_title || s.object %] Buckets</b></li>
+[% FOREACH b IN s.buckets %]
+		<li class="[% b.class %]"><a href="[% b.url %]">[% b.title %]</a>[% IF s.bucket_count.${b.id} %] ([% s.bucket_count.${b.id} %])[% END %]</li>
+[% END %]
+	</ul>
+</div>
+<div id="bucket_bottom"></div>
+[% ELSE %]
+<div id="action_bottom" style="clear: both;"></div>
+[% END %]

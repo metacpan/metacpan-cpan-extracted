@@ -1,0 +1,128 @@
+[% WRAPPER wrapper.tt2 page_title='Search Results' %]
+
+	<h1>
+		Audit :: Search Results
+	</h1>
+
+	<p>&nbsp;</p>
+
+	[% IF need_at_least_one_criteria %]
+		<p>
+			Please select at least one criteria to search on.
+		</p>
+	[% ELSE %]
+		<style type="text/css">
+			@import "css/results.css";
+		</style>
+
+		<script type="text/javascript" src="js/results.js"></script>
+
+		<p>
+			Found: [% found %] results.
+			<a href="[% refine_url %]">Refine search results</a>
+			-
+			<a id="toggle_all">Toggle all</a>
+		</p>
+		<p>&nbsp;</p>
+
+		<table cellspacing="0" cellpadding="4" align="center" id="results">
+			<thead>
+				<tr bgcolor="lightgrey">
+					<th width="50">
+						ID
+					</th>
+					<th width="120">
+						Date
+					</th>
+					<th width="120">
+						Event
+					</th>
+					<th width="120">
+						Subject Type
+					</th>
+					<th width="75">
+						Subject ID
+					</th>
+					<th>
+						Diff
+					</th>
+					<th>
+						Context
+					</th>
+					<th width="100">
+						Account<br/>Logged In
+					</th>
+					<th width="100">
+						Account<br/>Affected
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				[%
+					i = 0;
+					USE audit;
+					FOREACH result IN audit.format_results( results );
+						i = i + 1;
+						IF i % 2;
+							class = 'odd';
+						ELSE;
+							class = 'even';
+						END;
+				%]
+					<tr class="[% class %]">
+						<td>
+							[% result.audit_event_id %]
+						</td>
+						<td>
+							[% result.event_time_formatted %]
+						</td>
+						<td>
+							[% result.event %]
+						</td>
+						<td>
+							[% result.subject_type %]
+						</td>
+						<td>
+							[% result.subject_id %]
+						</td>
+						<td class="code">
+							[% IF result.diff != '' %]
+								<a href="Javascript:return;">(toggle)</a>
+								<div>
+									[% result.diff_formatted %]
+								</div>
+							[% ELSE %]
+								-
+							[% END %]
+						</td>
+						<td class="code">
+							[% IF result.information != '' %]
+								<a href="Javascript:return;">(toggle)</a>
+								<div>
+									[% result.information_formatted %]
+								</div>
+							[% ELSE %]
+								-
+							[% END %]
+						</td>
+						<td>
+							[% IF result.logged_in_account_id != '' %]
+								[% result.logged_in_account_id %]
+							[% ELSE %]
+								-
+							[% END %]
+						</td>
+						<td>
+							[% IF result.affected_account_id != '' %]
+								[% result.affected_account_id %]
+							[% ELSE %]
+								-
+							[% END %]
+						</td>
+					</tr>
+				[% END %]
+			</tbody>
+		</table>
+	[% END %]
+
+[% END %]

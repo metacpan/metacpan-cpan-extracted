@@ -1,0 +1,6 @@
+# d8
+
+AuthType auth-any
+Require valid-user
+Require session
+

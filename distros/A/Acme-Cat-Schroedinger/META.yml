@@ -1,0 +1,24 @@
+---
+abstract: 'objects whose behaviour is determined by attempts to inspect or interact with it.'
+author:
+  - 'Daniel Perrett <perrettdl@googlemail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4004, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Cat-Schroedinger
+provides:
+  Acme::Cat::Schroedinger:
+    file: lib/Acme/Cat/Schroedinger.pm
+    version: 1
+requires:
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1

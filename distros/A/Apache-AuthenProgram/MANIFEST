@@ -1,0 +1,9 @@
+AuthenProgram.pm
+Changes
+examples/filelogon
+examples/oralogon
+examples/smblogon
+MANIFEST
+Makefile.PL
+README
+test.pl

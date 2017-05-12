@@ -1,0 +1,63 @@
+# NAME
+
+App::FastishCGI - provide CGI support to webservers which don't have it
+
+# VERSION
+
+version 0.002
+
+# INSTALLATION 
+
+- Normally, via CPAN, or
+- Debian sid packages available at [https://github.com/ioanrogers/App-FastishCGI/downloads](https://github.com/ioanrogers/App-FastishCGI/downloads)
+
+# USAGE
+
+## RUNNING
+
+    $ fastishcgi -s /var/run/fastishcgi.sock
+
+Try `--options` for more options.
+
+A systemd service file is provided in the examples folder.
+
+# NGINX CONFIGURATION:
+
+    server {
+        listen  0.0.0.0:80 default;
+        root /usr/lib/cgi-bin/;
+        location ~ /(.*\.cgi) {
+            fastcgi_pass unix:/var/run/fastishcgi.sock;
+            #fastcgi_pass 127.0.0.1:4001;
+            include fastcgi_params;
+            #fastcgi_param SCRIPT_FILENAME /usr/lib/cgi-bin/$1;
+        }
+     }
+
+# SEE ALSO
+
+Originally based on [NginxSimpleCGI](http://wiki.nginx.org/NginxSimpleCGI)
+
+# BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests through the web interface at
+[https://github.com/ioanrogers/App-FastishCGI/issues](https://github.com/ioanrogers/App-FastishCGI/issues).
+
+# SOURCE
+
+The development version is on github at [http://github.com/ioanrogers/App-FastishCGI](http://github.com/ioanrogers/App-FastishCGI)
+and may be cloned from [git://github.com/ioanrogers/App-FastishCGI.git](git://github.com/ioanrogers/App-FastishCGI.git)
+
+# AUTHOR
+
+Ioan Rogers <ioan.rogers@gmail.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Ioan Rogers.
+
+This is free software, licensed under:
+
+    The Artistic License 2.0 (GPL Compatible)

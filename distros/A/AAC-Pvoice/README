@@ -1,0 +1,22 @@
+AAC::Pvoice README
+
+As of version 0.5, these modules should be able to run on all platforms
+supported by Device::ParallelPort. This dependency has to do with AAC::Pvoice::Input, which
+needs to be able to poll the parallel port in case it needs to communicate
+with the 'Adremo' electrical wheelchair. For this I'm  using
+Device::ParallelPort, which has drivers for Linux and Win32.
+
+As of version 0.6 the modules allow you to use your application in
+One or Two-button mode. See the documentation of AAC::Pvoice::Input for details.
+
+As of version 0.9 you need Image::Magick.
+
+At the very least you should be able to use this set of instructions
+to install the module...
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

@@ -1,0 +1,83 @@
+NAME
+    Acme::Terror::AU - Fetch the current AU terror alert level
+
+SYNOPSIS
+      use Acme::Terror::AU;
+      my $t = Acme::Terror::AU->new();  # create new Acme::Terror::AU object
+
+      my $level = $t->fetch;
+      print "Current terror alert level is: $level\n";
+
+DESCRIPTION
+    Gets the currrent terrorist threat level in Australia.
+
+    The levels are either...
+
+     CRITICAL    - an attack is expected imminently 
+     SEVERE      - an attack is likely
+     SUBSTANTIAL - an attack is a strong possibility
+     MODERATE    - an attack is possible but not likely
+     LOW         - an attack is unlikely
+     UNKNOWN     - cannot determine threat level
+
+    HOWEVER, as the government has repeatedly stated that they think
+    triggering various security events off a single level system would be
+    damage flexibiliy by oversimplifying the situation, and in any case, why
+    on earth should they let the terrorists see what their alert status is.
+
+    And so this module never returns any of the above status, and instead
+    always returns UNKNOWN. :)
+
+    This module aims to be compatible with the US version Acme::Terror and
+    the UK version Acme::Terror::UK.
+
+METHODS
+  new()
+      use Acme::Terror::AU
+      my $t = Acme::Terror::AU->new(); 
+
+    Create a new instance of the Acme::Terror::AU class.
+
+  fetch()
+      my $threat_level_string = $t->fetch();
+      print $threat_level_string;
+
+    Return the current threat level as a string.
+
+  level()
+      my $level = $t->level();
+      if ($level == Acme::Terror::AU::CRITICAL) {
+        print "Help, we're all going to die!\n";
+      }
+
+    Return the level of the current terrorist threat as a comparable value.
+
+    The values to compare against are,
+
+      Acme::Terror::AU::CRITICAL
+      Acme::Terror::AU::SEVERE
+      Acme::Terror::AU::SUBSTANTIAL
+      Acme::Terror::AU::MODERATE
+      Acme::Terror::AU::LOW
+
+    If it can't retrieve the current level, it will return
+
+      Acme::Terror::AU::UNKNOWN
+
+BUGS
+    This module may become buggy if Australia develops a simple public and
+    level-based terror alert system, like the ones the US and UK have.
+
+SEE ALSO
+    Acme::Terror, Acme::Terror::UK
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 Adam Kennedy.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.7 or, at
+    your option, any later version of Perl 5 you may have available.
+

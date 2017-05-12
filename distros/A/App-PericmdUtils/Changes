@@ -1,0 +1,22 @@
+0.04    2017-01-13 (PERLANCAR)
+
+	- Add utility: gen-pod-for-pericmd-script.
+
+
+0.03    2017-01-09 (PERLANCAR)
+
+        - Adjust to Perinci::CmdLine::Util 0.12 & Perinci::CmdLine::Dump 0.07
+          (renamed functions).
+
+
+0.02    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD rendering.
+
+
+0.01    2015-07-30 (PERLANCAR)
+
+        - First release, merged from App-DumpPericmdScript &
+          App-DetectPericmdScript.

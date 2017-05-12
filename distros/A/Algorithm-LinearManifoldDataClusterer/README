@@ -1,0 +1,39 @@
+                     README
+
+
+Algorithm::LinearManifoldDataClusterer is a perl5 module for
+clustering numerical data that resides on a low-dimensional
+manifold in an otherwise high-dimensional measurement space.
+
+The required modules are:
+
+    List::Util
+    File::Basename
+    Math::Random
+    Graphics::GnuplotIF
+    Math::GSL::Matrix
+    POSIX
+
+For installation, do the usual
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+if you have root access.  If not, 
+
+    perl Makefile.PL prefix=/some/other/directory/
+    make
+    make test
+    make install
+
+Contact:
+
+Avinash Kak  
+
+email: kak@purdue.edu
+
+Please place the string "LinearManifoldDataClusterer" in the
+subject line if you wish to write to the author.  Any
+feedback regarding this module would be highly appreciated.

@@ -1,0 +1,31 @@
+Revision history for perl distribution App-screenorama
+
+0.06 2015-08-10T08:20:50+0200
+ - Fix setting "program" from config file
+ - Will escape "<" before printing to web
+ - Capture keypress through input field, allowing copy/paste and touch support
+
+0.05 2015-05-04T07:55:24+0200
+ - PAUSE indexer failed.
+
+0.04 2015-05-03T23:44:24+0200
+ - Add support for reading parameters from app->config
+ - Add exit status to browser
+ - Add support for "\b \b" (backspace)
+ - Match more color codes
+ - Fix tabular/multiple spaces output
+ - Fix parsing @ARGV
+
+0.03 2015-05-03T20:37:57+0200
+ - Add support for backspace
+ - Add support for "clear screen" shell command
+ - Fix failing javascript when "cursor" was not present in DOM
+ - Remove running command from markup
+ - Will keep websocket alive from client
+
+0.02 2014-01-22T20:01:07Z
+ - Fix pod
+
+0.01 2014-01-21T20:56:48Z
+ - Started project
+

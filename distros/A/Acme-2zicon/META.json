@@ -1,0 +1,115 @@
+{
+   "abstract" : "It's new $module",
+   "author" : [
+      "catatsuy <catatsuy@catatsuy.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-2zicon",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "DateTime" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::2zicon" : {
+         "file" : "lib/Acme/2zicon.pm",
+         "version" : "0.7"
+      },
+      "Acme::2zicon::Base" : {
+         "file" : "lib/Acme/2zicon/Base.pm",
+         "version" : "0.7"
+      },
+      "Acme::2zicon::MatobaKarin" : {
+         "file" : "lib/Acme/2zicon/MatobaKarin.pm",
+         "version" : "0.7"
+      },
+      "Acme::2zicon::NakamuraAkari" : {
+         "file" : "lib/Acme/2zicon/NakamuraAkari.pm",
+         "version" : "0.7"
+      },
+      "Acme::2zicon::NemotoNagi" : {
+         "file" : "lib/Acme/2zicon/NemotoNagi.pm",
+         "version" : "0.7"
+      },
+      "Acme::2zicon::OkumuraNonoka" : {
+         "file" : "lib/Acme/2zicon/OkumuraNonoka.pm",
+         "version" : "0.7"
+      },
+      "Acme::2zicon::OtsukaMiyu" : {
+         "file" : "lib/Acme/2zicon/OtsukaMiyu.pm",
+         "version" : "0.7"
+      },
+      "Acme::2zicon::ShigematsuYuka" : {
+         "file" : "lib/Acme/2zicon/ShigematsuYuka.pm",
+         "version" : "0.7"
+      },
+      "Acme::2zicon::SuyamaEmiri" : {
+         "file" : "lib/Acme/2zicon/SuyamaEmiri.pm",
+         "version" : "0.7"
+      },
+      "Acme::2zicon::TsurumiMoe" : {
+         "file" : "lib/Acme/2zicon/TsurumiMoe.pm",
+         "version" : "0.7"
+      },
+      "Acme::2zicon::YamatoAo" : {
+         "file" : "lib/Acme/2zicon/YamatoAo.pm",
+         "version" : "0.7"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/catatsuy/acme-2zicon/issues"
+      },
+      "homepage" : "https://github.com/catatsuy/acme-2zicon",
+      "repository" : {
+         "url" : "git://github.com/catatsuy/acme-2zicon.git",
+         "web" : "https://github.com/catatsuy/acme-2zicon"
+      }
+   },
+   "version" : "0.7",
+   "x_authority" : "cpan:CATATSUY"
+}

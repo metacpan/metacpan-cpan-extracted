@@ -1,0 +1,9 @@
+[TestingAndDebugging::RequireUseStrict]
+severity=5
+
+[TestingAndDebugging::RequireUseWarnings]
+severity=5
+
+[Bangs::ProhibitFlagComments]
+severity=5
+

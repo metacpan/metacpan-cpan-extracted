@@ -1,0 +1,9 @@
+Revision history for App-Nopaste-Service-PastebinComAPI
+
+1.002   2014-01-17
+        - Fixed a bug that would likely cause this service to be
+          not found as available
+
+1.001   2014-01-08
+        - First version, released on an unsuspecting world.
+

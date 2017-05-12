@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Acme-RemoteINC
+version:             0.15
+abstract:            Slowest Possible Module Loading
+license:             perl
+author:              
+    - William Hererra (whererra@skylightview.com)
+generated_by:        ExtUtils::MakeMaker version 6.42_01
+distribution_type:   module
+requires:     
+    File::Temp:                    0
+    Net::FTP:                      0
+    Test::Simple:                  0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,23 @@
+App::Modular is a framework to write modular applications in Perl
+######################################################################
+## File: $Id: README,v 0.1.2 2005/05/24 00:55 bcevc $
+######################################################################
+
+
+It aims to provide a framework which should it make very easy to 
+programs to create any kind of modular program. In other words, this 
+should enable you to have an application with plugins.
+
+It supports:
+  - module dependency solving
+  - autoloading of modules
+  - event handling (implemented as a contributed App::Modular module)
+
+See the man page for more details.
+
+Installation
+############
+Installation works as usually:
+  $ perl Makefile.PL
+  $ make all test
+  $ sudo make install

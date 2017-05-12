@@ -1,0 +1,10 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Apache2/AuthzNIS.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml

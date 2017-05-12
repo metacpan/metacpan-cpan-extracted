@@ -1,0 +1,100 @@
+#!perl
+
+# FRAGMENT id=shcompgen-hint command=tabify
+
+our $DATE = '2015-01-31'; # DATE
+our $VERSION = '0.01'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use App::tabify;
+
+App::tabify::parse_cmdline();
+App::tabify::run('tabify');
+
+1;
+# ABSTRACT: Convert spaces to tabs
+# PODNAME: tabify
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tabify - Convert spaces to tabs
+
+=head1 VERSION
+
+This document describes version 0.01 of tabify (from Perl distribution App-tabify), released on 2015-01-31.
+
+=head1 SYNOPSIS
+
+ tabify [OPTION]... <FILES...>
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+=over
+
+=item * --tab-width=i, -w (default: 8)
+
+Set tab width.
+
+=item * --(no)indent-only
+
+Not yet implemented.
+
+By default C<tabify> will only convert spaces at the beginning of lines
+(indentation spaces). Use C<--noindent-only>) to replace multiple spaces to tabs
+even though they are not at the beginning of lines.
+
+=back
+
+=head1 EXIT CODES
+
+0 on success.
+
+255 on I/O error.
+
+99 on command-line options error.
+
+=head1 FAQ
+
+=head1 SEE ALSO
+
+L<untabify>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-tabify>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-tabify>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-tabify>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,38 @@
+NAME
+    App::pmodinfo - Perl module info command line.
+
+VERSION
+    version 0.10
+
+DESCRIPTION
+    pmodinfo extracts information from the perl modules given the command
+    line, usign Module::Metadata, Module::CoreList, Module::Build,
+    Parse::CPAN::Meta and ExtUtils::Installed.
+
+    I don't want to use more "perl -MModule\ 999".
+
+    See pmodinfo for more information.
+
+DEVELOPMENT
+    App::modinfo is a open source project for everyone to participate. The
+    code repository is located on github. Feel free to send a bug report or
+    a pull request.
+
+    <http://www.github.com/maluco/App-pmodinfo>
+
+SEE ALSO
+    Module::Metadata, Module::CoreList, Module::Build, Parse::CPAN::Meta,
+    ExtUtils::Installed.
+
+ACKNOWLEDGE
+    cpanminus, for the check_module, prompt function and inspiration. :-)
+
+AUTHOR
+    Thiago Rondon <thiago@nsms.com.br>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Thiago Rondon.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

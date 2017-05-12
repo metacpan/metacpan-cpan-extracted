@@ -1,0 +1,2 @@
+TYPEMAP
+Apache::LogFile		T_PTROBJ

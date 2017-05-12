@@ -1,0 +1,255 @@
+#!perl 
+use strict;
+use warnings;
+use Acme::MetaSyntactic;
+use Getopt::Long;
+
+my $usage = << 'EOT';
+Usage: meta [ options ] theme [ count ]
+Available options:
+  --help            : print this message and exit
+  --whitespace|--ws : return metasyntactical names separated by whitespace
+  --version         : print version information and exit
+  --themes          : print the list of themes and exit
+  --remote          : fetch the remote list (if available) and print it
+  --check           : fetch the remote list and print differences with current
+  --category <name> : category
+  --sources         : return the sources (if any) of the remote list
+EOT
+
+my %conf = ( whitespace => 0, category => '' );
+GetOptions( \%conf, "whitespace|ws!", "version", "themes", "help", "remote",
+                    "check", "category=s", "sources" )
+  or die $usage;
+
+# find out the theme name
+my $theme = shift || $Acme::MetaSyntactic::Theme;
+if (!length $conf{category} && $theme =~ m{^([^/]+)/(.*)}s) {
+    $theme          = $1;
+    $conf{category} = $2;
+}
+die "Theme '$theme' does not exist!\n"
+  . "Available themes: @{[ Acme::MetaSyntactic->themes ]}\n"
+  unless Acme::MetaSyntactic->has_theme( $theme );
+
+my $module = "Acme::MetaSyntactic::$theme";
+
+# load the remote theme if needed
+if ( $conf{remote} || $conf{check} || $conf{sources}) {
+    eval "require $module; 1;" or die $@;
+    die "Theme '$theme' is not updatable!\n"
+        unless $module->has_remotelist();
+}
+
+# informative options
+print STDERR
+"meta, a simple front-end to Acme::MetaSyntactic version $Acme::MetaSyntactic::VERSION\n"
+  if $conf{version};
+print STDERR $usage if $conf{help};
+print map "$_\n", Acme::MetaSyntactic->themes if $conf{themes};
+if ( $conf{sources} ) {
+    my @sources = $module->sources( $conf{category} );
+    print map "$_\n", @sources;
+}
+exit if $conf{themes} || $conf{version} || $conf{help} || $conf{sources};
+
+# real processing starts here
+$\ = $/;
+my $sep = $conf{whitespace} ? ' ' : $\;
+
+my $meta = Acme::MetaSyntactic->new( $theme, category => $conf{category} );
+
+my (@remote, @local);
+@remote = $module->remote_list( $conf{category} )
+    if $conf{remote} || $conf{check};
+if ( !$conf{remote} ) {
+    my $count = shift;
+    $count = 1 unless defined $count;
+    $count = 0 if $conf{check};
+    @local = $meta->name($count);
+}
+if ( $conf{check} ) {
+    my %seen;
+    $seen{$_}++ for @remote;
+    $seen{$_}-- for @local;
+    foreach my $key ( sort keys %seen ) {
+        next unless $seen{$key};
+        print $seen{$key} > 0 ? "+ $key" : "- $key";
+    }
+}
+else {
+    print join $sep, @local, @remote;
+}
+
+__END__
+
+=head1 NAME
+
+meta - A simple front-end to Acme::MetaSyntactic
+
+=head1 SYNOPSIS
+
+B<meta> [ I<--whitespace|ws> ] [ I<--help> ] [ I<--version> ] [ I<--remote> ] [ I<--check> ] [ I<--sources> ] [ I<--category category> ]  I<theme>[I</category>] [ I<count> ]
+
+=head1 DESCRIPTION
+
+B<meta> is a simple front-end to Acme::MetaSyntactic.
+
+A few examples should make it easy to understand what it does and how
+it works:
+
+    $ meta
+    baz
+    $ meta batman
+    powie
+    $ meta donmartin 3
+    kloong
+    thoof_foing
+    weeooweeeoooo
+    $ meta -ws browser 4
+    arachne netscape voyager w3m
+
+In short, the default theme is C<foo>, the default count is 1, the default
+separator is C<$/>, but you can replace it by whitespace with I<--ws>.
+
+=head1 COMMAND-LINE OPTIONS
+
+The following command-line options are available:
+
+=head2 Metasyntactic options
+
+=over 4
+
+=item I<--whitespace>, I<--ws>
+
+Print all items on a single line, separated by space.
+
+=item I<--remote>
+
+Fetch the remote list (if available) and print it.
+
+=item I<--check>
+
+Fetch the remote list (if available) and print only the differences betwen
+the current list and the remote list (items are prefixed by C<+> and C<->).
+
+Option added by Abigail.
+
+The output of this option is affected by the I<--whitespace> option.
+
+=item I<--category> category
+
+Only select items in the given category (for C<Acme::MetaSyntactic::MultiList>
+subclasses). If not given, use the default category.
+
+Silently fallbacks to the default if the category doesn't exist.
+
+Another way to ask for a specific category is to skip the I<--category>
+option and directly ask for C<theme/category>. Note that you cannot use
+both calling conventions simultaneously.
+
+=back
+
+=head2 Informative options
+
+The program will exit if any of these options is selected.
+However, these options can be combined.
+
+=over 4
+
+=item I<--themes>
+
+Print the list of available themes.
+
+=item I<--sources>
+
+Print the URLs used by a remote list.
+
+=item I<--version>
+
+Print version information.
+
+=item I<--help>
+
+Print a short help message.
+
+=back
+
+=head1 SUCCESS STORIES
+
+B<meta> is the script of choice for a new generation of hackers.
+Here are a few comments from satisfied users:
+
+=over 4
+
+=item *
+
+I<C<Acme::MetaSyntactic> makes me more productive when I have to write
+regression tests for my Perl modules. No more do I spend time looking
+for variable names! It simply changed my life.>
+
+-- Rafael Garcia-Suarez, pumpking,
+used AMS when writing tests for C<Sub::Identify>.
+
+=item *
+
+I<C<Acme::MetaSyntactic> gave names for regression tests in the Perl core>
+
+See L<https://github.com/Perl/perl5/commit/adc51b978ed1b2e9d4512c9bfa80386ac917d05a>.
+
+=item *
+
+I<Your module has been a wonderful timesaver for me. How much time I used to
+spend on thinking about good and meaningful variable names, and now I have
+them at the snap of a finger!>
+
+-- Gisbert W. Selke
+
+=item *
+
+[...] I<with the help of Acme::MetaSyntatic I’ve been able to do some
+rudimentary code generation techniques that save me a lot of time without
+much outlay.>
+
+-- Mark Fowler
+
+L<http://blog.twoshortplanks.com/2010/07/03/holy_acceleration/>
+
+=item *
+
+I<When writing example applications, I almost always use variable
+names such as foo and bar. This gets boring, and it easily confuse the
+reader. Especially when I need to use more variables.>
+
+-- Gabor Szabo
+
+L<http://perlmaven.com/acme-metasyntactic>
+
+=back
+
+=head1 EXAMPLES OF USE
+
+Ever needed to debug with the help of a few C<print()> statements?
+Simply map some keystrokes to insert a warning where you want it.
+With B<meta>, you will never need to think about what write in the
+string argument:
+
+    nmap _wa :r!meta donmartin<CR>iwarn"<Esc>A";<Esc>==
+
+(This mapping kindly given by Rafael Garcia-Suarez.)
+
+=head1 AUTHOR
+
+Philippe "BooK" Bruhat, C<< <book@cpan.org> >>.
+
+=head1 COPYRIGHT
+
+Copyright 2005-2006 Philippe 'BooK' Bruhat, All Rights Reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

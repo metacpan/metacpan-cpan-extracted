@@ -1,0 +1,25 @@
+Acme/please version 0.01
+========================
+
+exports a variable $please to the callers space, which will
+randomly evaluate to the empty string three quarters of the time
+and to "please" the rest.
+
+tie options exist to tweak the fraction of time it says please,
+and also what language it says please in.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 David L. Nicol
+released AL/GPL and I hope this amuses you
+

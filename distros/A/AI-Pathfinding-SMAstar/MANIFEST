@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/AI-Pathfinding-SMAstar.t
+t/test8.lst
+lib/AI/Pathfinding/SMAstar.pm
+lib/AI/Pathfinding/SMAstar/Path.pm
+lib/AI/Pathfinding/SMAstar/AVLQueue.pm
+lib/AI/Pathfinding/SMAstar/PairObj.pm
+lib/AI/Pathfinding/SMAstar/PriorityQueue.pm
+lib/AI/Pathfinding/SMAstar/TreeOfQueues.pm
+lib/AI/Pathfinding/SMAstar/Examples/PalUtils.pm
+lib/AI/Pathfinding/SMAstar/Examples/WordObj.pm
+lib/AI/Pathfinding/SMAstar/Examples/Phrase.pm
+META.yml                                 Module meta-data (added by MakeMaker)

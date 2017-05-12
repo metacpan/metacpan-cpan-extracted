@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/whatsit
+dist.ini
+lib/App/Whatsit.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/whatsit.t

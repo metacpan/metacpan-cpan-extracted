@@ -1,0 +1,13 @@
+SYNOPSIS
+
+     % perl -MAcme::MetaSyntactic=dangdut -le 'print metaname'
+     rhoma
+    
+     % meta dangdut 2
+     gotik
+     cita
+
+SEE ALSO
+
+    Acme::MetaSyntactic
+

@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 77a268183754502f6b4498c95ed12a9627c91df6 COPYRIGHT
+SHA1 540e627824058dc4b3f75009923f7af8f8e388c8 CREDITS
+SHA1 2b8691a399a28a508dd4a4841915644bb8627cbc Changes
+SHA1 6302385cb2daac517c162e330e53ad70d929f61d FAQ
+SHA1 42a75f67bd3bb6cea6aadc6828b06c2f73d6b27c INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 c0b598ea4d6ae17ef5f2b133ec274f57429fc067 MANIFEST
+SHA1 6caa0cdb44d5e179e1208b76e8f6c4fa8df6576b META.json
+SHA1 c311f69b5d5b381a1611d36486757396ac39744b META.yml
+SHA1 339175b500e1f9870745686ef191057a1b0331ea Makefile.PL
+SHA1 b60d8605d359c38f27c0c548986477428ea6f4b5 README
+SHA1 8fba8fee3eeb64a4b4c7cd1a74f72d0d912e2487 dist.ini
+SHA1 1059351939004bd7ab1f76fce19c8a2ceb4ad8e7 doap.ttl
+SHA1 39da7efa94b41d162ae3cd1fab8f7f027b28cd52 foo.pl
+SHA1 60ffe83a18708c1bc265d12f55862e15420e8272 foo2.pl
+SHA1 40de84e2f57f1e25c288e3ec4edb2df863993736 lib/Acme/RunDoc.pm
+SHA1 9bf4d9fcc91d8068221092863e6af12ca7a0dc89 lib/icrosoft/Word.pm
+SHA1 ea1fc9573957d6e537b3c5441dcf4e9f4ed6c1e6 p5-acme-rundoc/.hg/00changelog.i
+SHA1 843c4a11660fe38ea61e6960a29d4f4796da6488 p5-acme-rundoc/.hg/branch
+SHA1 b80de5d138758541c5f05265ad144ab9fa86d1db p5-acme-rundoc/.hg/dirstate
+SHA1 bca89dd7d40caa27211a126db10c93b36106279a p5-acme-rundoc/.hg/hgrc
+SHA1 0a0ae9deef3b02fc7408f2b38eab6a9b114acb45 p5-acme-rundoc/.hg/requires
+SHA1 1c01f665edaaebb987c0227e1fb7982e0b85b36c t/01basic.t
+SHA1 237f3f1f779f6e4e7e40402513a28bde86d99b43 t/02do.t
+SHA1 b70bb04a178b1722d7d913269144b4776db69bb1 t/03use.t
+SHA1 241313f71b575563e7ba015d2221c45d7cd5b43b t/Local/TestModule.docm
+SHA1 a8b5add4bec05c5db36f74170345522e6e135443 t/test-file.doc
+SHA1 f982855aa841f0446ce5bb00ac514f874195c6a6 word-examples/helloworld.doc
+SHA1 8f67db7baf3475f8ec5497201781f5e4f1235228 word-lib/Hello/World.docm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQRdUQACgkQzr+BKGoqfTn79gCfeKa4ZxgrQr9t81j5TOQVFtmu
+iZUAoJ1IhseN0AtJSVCXCXpYtOW9giIw
+=JDRI
+-----END PGP SIGNATURE-----

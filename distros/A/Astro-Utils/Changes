@@ -1,0 +1,7 @@
+Revision history for Astro::Utils
+
+0.02  Tue Feb 02 10:10:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+
+0.01  Sat Apr 11 01:00:00 2015
+      - Module Created.

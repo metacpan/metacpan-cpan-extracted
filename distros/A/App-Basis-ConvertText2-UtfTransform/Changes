@@ -1,0 +1,14 @@
+0.4.0  2014-05-28
+  * updating tests to test separate smiles and reflect proper formatting ability
+0.3.0 2014-05-28
+  * seperating out smilies to their own function
+  * adding proper POD
+0.2.0 2014-05-21
+  * adding smilies,and script
+  * removing mirror, fixing flip and bubbles
+0.1.1 2014-05-21
+  * adding bin/utftx 
+0.1.0 2014-05-21
+  * first release
+  * mirror/flip/tiny do not work yet, I need the correct codes
+

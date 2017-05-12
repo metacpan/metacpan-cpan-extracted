@@ -1,0 +1,142 @@
+Revision history for App-BencherUtils
+
+0.19    2016-10-27 (PERLANCAR)
+
+	- Add utility: bencher-module-startup-overhead.
+
+	- Tweak Rinci metadata: give summary to format-bencher-result.
+
+	- list-bencher-scenario-modules: Add result field
+	  'participant_types'.
+
+
+0.18    2016-10-20 (PERLANCAR)
+
+        - list-bencher-scenario-modules: Accept --detail (-l) to show detail of
+          each scenario module.
+
+
+0.17    2016-07-13 (PERLANCAR)
+
+	- Add utility: chart-bencher-result.
+
+
+0.16    2016-07-13 (PERLANCAR)
+
+	- Add utility: format-bencher-result.
+
+
+0.15    2016-06-26 (PERLANCAR)
+
+	- Avoid a couple more of undef warnings when a bench result doesn't
+	  have meta (cpu).
+
+
+0.14    2016-06-23 (PERLANCAR)
+
+	- cleanup-old-bencher-results: add --num-keep option.
+
+	- cleanup-old-bencher-results: return a detailed result and warn on
+	  unlink failure.
+
+	- Avoid 'once' warning.
+
+
+0.13    2016-06-23 (PERLANCAR)
+
+	- Add utility: cleanup-old-bencher-results.
+
+
+0.12    2016-05-24 (PERLANCAR)
+
+	- [Removed] Remove bencher-all and bencher-all-under-lib, now that
+	  bencher can also save result to JSON file (--save-result),
+	  bencher-all* can be replaced with a single loop over bencher.
+
+	- Enable utf8 output to avoid 'Wide character in print'.
+
+	- Add CLI: list-bencher-scenario-modules.
+
+	- [Bugfix] We should clean first, then encode to JSON.
+
+
+0.11    2016-03-15 (PERLANCAR)
+
+	- Adjust to Bencher 0.38 (backend split to Bencher::Backend).
+
+
+0.10    2016-03-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace JSON with JSON::MaybeXS.
+
+
+0.09    2016-01-22 (PERLANCAR)
+
+	- [Bugfix] list-bencher-results: Forgot to adjust to Bencher 0.30+
+	  (format_result() now returns formatted string) causing --fmt to
+	  break.
+
+
+0.08    2016-01-22 (PERLANCAR)
+
+	- [Bugfix] Forgot to pass note to bencher, derp.
+
+
+0.07    2016-01-22 (PERLANCAR)
+
+	- bencher-all: Add option --note (passed to bencher).
+
+
+0.06    2016-01-21 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD (related to multiple config filenames).
+
+
+0.05    2016-01-20 (PERLANCAR)
+
+	- Clean JSON so it's safe to write to file.
+
+	- list-bencher-reulsts: Add a couple of examples.
+
+
+0.04    2016-01-11 (PERLANCAR)
+
+	- list-bencher-results: Add option --latest (and --no-latest too).
+
+	- Normalize Module/SubModule into Module::SubModule.
+
+
+0.03    2016-01-08 (PERLANCAR)
+
+	- Rename module/dist from App-BencherAll to App-BencherUtils.
+
+        - Add script: list-bencher-results.
+
+	- [Incompatible change] option 'log_dir' is now renamed to
+          'results_dir'.
+
+	- Add option --precision-limit (passed to bencher).
+
+	- [Bugfix] Reorder: we now bench first to let all the hooks
+	  properly executed the first time.
+
+	- [ux] bencher-all*: Add completion for --include & --exclude.
+
+
+0.02    2016-01-07 (PERLANCAR)
+
+        - Trap when bencher dies, so we can continue to the next scenario.
+
+        - [build] Rebuild with updated DZP:GenPericmdScript which now properly
+          adds prereq to Log::Any.
+
+        - Other small fixes.
+
+
+0.01    2016-01-07 (PERLANCAR)
+
+        - First release.

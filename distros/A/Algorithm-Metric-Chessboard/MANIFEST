@@ -1,0 +1,14 @@
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Algorithm/Metric/Chessboard.pm
+lib/Algorithm/Metric/Chessboard/Journey.pm
+lib/Algorithm/Metric/Chessboard/Wormhole.pm
+t/01_load.t
+t/02_wormhole.t
+t/03_journey.t
+t/04_grid.t
+t/10_nearest_wormhole.t
+t/11_shortest_journey.t
+

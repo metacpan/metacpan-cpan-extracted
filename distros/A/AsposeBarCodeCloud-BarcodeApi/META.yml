@@ -1,0 +1,104 @@
+---
+abstract: 'Aspose.BarCode Cloud SDK for Perl'
+author:
+  - 'Farooq Sheikh <support@aspose.com>'
+build_requires:
+  Test::More: '0.10'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AsposeBarCodeCloud-BarcodeApi
+provides:
+  AsposeBarCodeCloud::ApiClient:
+    file: lib/AsposeBarCodeCloud/ApiClient.pm
+  AsposeBarCodeCloud::BarcodeApi:
+    file: lib/AsposeBarCodeCloud/BarcodeApi.pm
+    version: '1.02'
+  AsposeBarCodeCloud::Configuration:
+    file: lib/AsposeBarCodeCloud/Configuration.pm
+  AsposeBarCodeCloud::Object::Barcode:
+    file: lib/AsposeBarCodeCloud/Object/Barcode.pm
+  AsposeBarCodeCloud::Object::BarcodeBuilder:
+    file: lib/AsposeBarCodeCloud/Object/BarcodeBuilder.pm
+  AsposeBarCodeCloud::Object::BarcodeBuildersList:
+    file: lib/AsposeBarCodeCloud/Object/BarcodeBuildersList.pm
+  AsposeBarCodeCloud::Object::BarcodeReader:
+    file: lib/AsposeBarCodeCloud/Object/BarcodeReader.pm
+  AsposeBarCodeCloud::Object::BarcodeResponseList:
+    file: lib/AsposeBarCodeCloud/Object/BarcodeResponseList.pm
+  AsposeBarCodeCloud::Object::BaseObject:
+    file: lib/AsposeBarCodeCloud/Object/BaseObject.pm
+  AsposeBarCodeCloud::Object::BinarizationHints:
+    file: lib/AsposeBarCodeCloud/Object/BinarizationHints.pm
+  AsposeBarCodeCloud::Object::ChecksumValidation:
+    file: lib/AsposeBarCodeCloud/Object/ChecksumValidation.pm
+  AsposeBarCodeCloud::Object::HttpResponseMessage:
+    file: lib/AsposeBarCodeCloud/Object/HttpResponseMessage.pm
+  AsposeBarCodeCloud::Object::HttpStatusCode:
+    file: lib/AsposeBarCodeCloud/Object/HttpStatusCode.pm
+  AsposeBarCodeCloud::Object::LineNumberRestartMode:
+    file: lib/AsposeBarCodeCloud/Object/LineNumberRestartMode.pm
+  AsposeBarCodeCloud::Object::Margins:
+    file: lib/AsposeBarCodeCloud/Object/Margins.pm
+  AsposeBarCodeCloud::Object::NumberStyle:
+    file: lib/AsposeBarCodeCloud/Object/NumberStyle.pm
+  AsposeBarCodeCloud::Object::Orientation:
+    file: lib/AsposeBarCodeCloud/Object/Orientation.pm
+  AsposeBarCodeCloud::Object::PageBorderAppliesTo:
+    file: lib/AsposeBarCodeCloud/Object/PageBorderAppliesTo.pm
+  AsposeBarCodeCloud::Object::PageBorderDistanceFrom:
+    file: lib/AsposeBarCodeCloud/Object/PageBorderDistanceFrom.pm
+  AsposeBarCodeCloud::Object::PageVerticalAlignment:
+    file: lib/AsposeBarCodeCloud/Object/PageVerticalAlignment.pm
+  AsposeBarCodeCloud::Object::PaperSize:
+    file: lib/AsposeBarCodeCloud/Object/PaperSize.pm
+  AsposeBarCodeCloud::Object::ReportType:
+    file: lib/AsposeBarCodeCloud/Object/ReportType.pm
+  AsposeBarCodeCloud::Object::Resolution:
+    file: lib/AsposeBarCodeCloud/Object/Resolution.pm
+  AsposeBarCodeCloud::Object::ResponseMessage:
+    file: lib/AsposeBarCodeCloud/Object/ResponseMessage.pm
+  AsposeBarCodeCloud::Object::SaaSposeResponse:
+    file: lib/AsposeBarCodeCloud/Object/SaaSposeResponse.pm
+  AsposeBarCodeCloud::Object::SectionStart:
+    file: lib/AsposeBarCodeCloud/Object/SectionStart.pm
+  AsposeBarCodeCloud::Object::StyleIdentifier:
+    file: lib/AsposeBarCodeCloud/Object/StyleIdentifier.pm
+  AsposeBarCodeCloud::Object::TextEffect:
+    file: lib/AsposeBarCodeCloud/Object/TextEffect.pm
+  AsposeBarCodeCloud::Object::Underline:
+    file: lib/AsposeBarCodeCloud/Object/Underline.pm
+requires:
+  AsposeStorageCloud::StorageApi: '0'
+  Carp: '0'
+  Data::Dumper: '0'
+  Date::Parse: '0'
+  DateTime: '0'
+  Digest::HMAC_SHA1: '0'
+  Exporter: '0'
+  File::Slurp: '0'
+  HTTP::Headers: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Response: '0'
+  HTTP::Status: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Log::Any: '0'
+  MIME::Base64: '0'
+  Module::Runtime: '0'
+  Scalar::Util: '0'
+  Test::Exception: '0'
+  URI::Escape: '0'
+  URI::Query: '0'
+  perl: v5.6.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: '1.02'

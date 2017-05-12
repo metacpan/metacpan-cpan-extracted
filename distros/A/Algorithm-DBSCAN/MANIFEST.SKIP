@@ -1,0 +1,14 @@
+.git
+.gitignore
+.perltidyrc
+.perlcriticrc
+.travis.yml
+MYMETA.json
+MYMETA.yml
+pm_to_blib
+ignore.txt
+^Makefile$
+^blib
+.tar.gz$
+.bak$
+~$

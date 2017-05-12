@@ -1,0 +1,6 @@
+MANIFEST			This list of files
+Makefile.PL
+README
+examples/easy.pl
+lib/Acme/Palindrome.pm
+t/0use.t

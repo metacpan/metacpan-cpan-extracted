@@ -1,0 +1,21 @@
+Revision history for Perl extension AnyEvent::ClickHouse.
+
+0.01  Mon Oct  3 16:57:07 2016
+      - original version; created by h2xs 1.23
+    First version.
+
+0.021 Wed Okt 12 2016
+    Second version;
+      - add URI
+
+0.022 Thu Okt 13 2016
+      - bug fix in test script
+      - updated pod documentation
+
+0.03  Fri Okt 14 2016
+    Third version;
+     - bug fix
+     - updated pod documentation
+
+0.031 Mon Okt 24 2016
+     - updated pod documentation

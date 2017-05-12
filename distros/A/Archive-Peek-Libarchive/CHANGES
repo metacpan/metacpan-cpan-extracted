@@ -1,0 +1,11 @@
+Revision history for Perl module Archive::Peek::Libarchive:
+
+0.37 Sun Oct  9 10:53:13 BST 2011
+     - add iterate method
+     - add search_cpan.pl example
+
+0.36 Fri Oct  7 12:30:16 BST 2011
+     - minor documentation fix (spotted by Claes Jakobsson)
+
+0.35 Fri Oct  7 12:13:14 BST 2011
+     - initial release

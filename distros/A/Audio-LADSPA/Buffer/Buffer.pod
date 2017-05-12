@@ -1,0 +1,189 @@
+# Audio::LADSPA perl modules for interfacing with LADSPA plugins
+# Copyright (C) 2003  Joost Diepenmaat.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# See the COPYING file for more information.
+
+=pod
+
+=head1 NAME
+
+Audio::LADSPA::Buffer
+
+=head1 SYNOPSIS
+
+    use Audio::LADSPA;
+
+    my $buffer = Audio::LADSPA::Buffer->new($size);
+
+    $plugin->connect('Port name' => $buffer);
+    
+    $buffer->set( @values );
+
+    # or get a buffer from a plugin..
+
+    $buffer2 = $plugin->get_buffer('Other port');
+
+    # make audio buffer louder
+    
+    $buffer *= 2;
+
+=head1 DESCRIPTION
+
+Audio::LADSPA::Buffer objects implement the connections between Audio::LADSA::Plugin objects.
+You can set up the buffer, and let some plugin write to it, while others read from it, or
+read from or write to it yourself.
+
+There is no real difference between audio and control buffers, except that control buffers have
+a size of 1 sample *) and audio buffers are usually bigger.
+
+*) Samples in LADSPA are implemented as native C<float>s. 
+
+=head1 Methods
+
+=head2 new
+
+ my $buffer = Audio::LADSPA::Buffer->new( $size );
+
+Contstructs a buffer of $size samples. Failure to allocate the buffer will result in an exception.
+
+=head2 set_1
+
+ $buffer->set_1($value);
+
+Set the first sample in the buffer to value $value. This method can only be used on buffers
+of size 1 (usually control buffers), to avoid confusion and nasty sound effects.
+
+=head2 get_1
+
+ my $value = $buffer->get_1();
+
+Gets the first sample from a buffer. This method can only be used on buffers of size 1.
+
+Will return C<undef> if the buffer is not filled yet.
+
+=head2 set_list
+
+ $buffer->set_list( @values );
+
+Fill the buffer with some values. Useful when you are generating data with some pure
+perl functions. Otherwise use L</set_raw> for best performance.
+
+Trying to write more samples than the buffer size specified in the constructor will
+result in an exception.
+
+=head2 get_list
+
+ my @values = $buffer->get_list();
+
+Returns perl-friendly representation of the buffer. Returns an empty list if
+if the buffer is not filled. Note that it will B<not>
+nessicarily return the total buffer content, only the data that was last written to 
+it. Use L</get_raw> for best performance.
+
+=head2 get
+
+ my @values = $buffer->get();
+ my $value  = $buffer->get();
+
+Calls C<< $buffer->get_list() >> in list context, calls C<< $buffer->get_1() >> otherwise.
+
+=head2 set
+
+ $buffer->set( @values );
+ $buffer->set( $value );
+
+Calls C<< $buffer->set_list( @values ) >> when called with more than 1 argument,
+calls C<< $buffer->set_1( $value ) >> otherwise.
+
+=head2 set_raw
+
+ $buffer->set_raw($packed_string);
+
+Fills the buffer with packed C<floats>. This is the internal data type for LADSPA, so you
+can save some processing time by using this method instead of the other C<get_*> methods.
+
+Trying to write more samples than the buffer size will result in an exception.
+
+=head2 get_raw
+
+ my $packed_string = $buffer->get_raw();
+
+Get the buffer data unconverted. Whatever your machine thinks a C<float> array
+looks like, dumped into a perl string. This is the LADSPA internal data format: fast,
+reasonably high resolution and I<very> non-portable.
+
+=head2 set_words
+
+ $buffer->set_words($packed_string, $amp);
+
+Get the buffer data as a packed string of I<little-endian words>. This is useful for reading
+from WAV audio files, maybe for reading from audio devices and probably not much else.
+
+$amp is the multiplication factor for the buffer data; many LADSPA plugins assume range
+of 1 .. -1, which integers represent rather badly, so you can have them multiplied
+first. You can leave out the $amp parameter or set it to 0 to ignore it.
+
+=head2 get_words
+
+ my $packed_string = $buffer->get_words($amp);
+
+Get the buffer data as a packed string of I<little-endian words>. This is useful for writing
+WAV audio files, maybe for writing to some audio devices and probably not much else.
+
+$amp is the multiplication factor for the buffer data; many LADSPA plugins assume range
+of 1 .. -1, which is not very useful converted to integers, so you can have them multiplied
+first. Leave out the $amp parameter or set it to 0 to ignore it.
+
+=head2 filled
+
+ my $current_fill = $buffer->filled;
+
+Returns the number of samples last written to the buffer, which is how many samples you will
+get back from the C<get_*> methods. 
+
+=head1 Buffer Volume adjustment 
+
+For convinience, the Audio::LADSPA::Buffer objects gain be 'gained' by using the following operators:
+
+=head2 '*'
+
+ my $louder_or_softer_buffer = $original_buffer * $gain;
+
+Create a $louder_or_softer_buffer with all samples from the $original_buffer multiplied by $gain.
+
+This method is less efficient than using the C<*=> operator described below, because it has to allocate
+new memory for the new buffer.
+
+=head2 '*='
+
+ $buffer *= $gain;
+
+Modify the content of $buffer; multiply all samples by $gain. Should be more efficient than C<*>
+
+=head1 SEE ALSO
+
+L<Audio::LADSPA> etc. and L<perlfunc/pack>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2003 - 2005 Joost Diepenmaat <jdiepen AT cpan.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+

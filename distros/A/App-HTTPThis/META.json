@@ -1,0 +1,42 @@
+{
+   "abstract" : "Export the current directory over HTTP",
+   "author" : [
+      "Pedro Melo <melo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-HTTPThis",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : 0,
+            "Net::Rendezvous::Publish" : "0.04",
+            "Plack::App::Directory" : 0,
+            "Plack::Runner" : 0,
+            "Pod::Usage" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/melo/app-httpthis.git",
+         "web" : "http://github.com/melo/app-httpthis/"
+      }
+   },
+   "version" : "0.002"
+}
+

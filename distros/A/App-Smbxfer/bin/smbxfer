@@ -1,0 +1,6 @@
+#! /usr/bin/perl
+
+use strict;
+
+use App::Smbxfer;
+App::Smbxfer::run(@ARGV);

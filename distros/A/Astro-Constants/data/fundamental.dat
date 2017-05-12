@@ -1,0 +1,20 @@
+# fundamental.dat
+# 	values updated from NIST website
+#
+# Format: variable<tab>description<tab>CGS value<tab>MKS value
+#    or   variable<tab>description<tab>value
+#
+A_c	LIGHT_SPEED	speed of light in a vacuum	2.99792458e10	2.99792458e8	0
+A_k	BOLTZMANN	Boltzmann's constant	1.38064852e-16	1.38064852e-23	5.7e-7
+A_G	GRAVITATIONAL	universal gravitational constant	6.67408e-8	6.67408e-11	4.7e-5
+A_eV	ELECTRON_VOLT	electron volt	1.6021766208e-12	1.6021766208e-19	6.1e-9
+A_h	PLANCK	Planck constant	6.626070040e-27	6.626070040e-34	1.2e-8
+A_hbar	HBAR	Planck's constant /2pi	1.054571800e-27	1.054571800e-34	1.2e-8
+A_e	ELECTRON_CHARGE	electron charge (defined positive)	4.8032046729e-10 4.8032e-10	1.6021766208e-19	6.1e-9
+A_sigma	STEFAN_BOLTZMANN	Stefan-Boltzmann constant	5.670367e-5	5.670367e-8	2.3e-6
+A_arad	A_RAD	radiation density constant	7.565723e-15	7.565723e-16	2.3e-6
+A_Wien	WIEN	Wien wavelength displacement law constant	2.8977729e-1	2.8977729e-3	5.7e-7
+A_alpha	ALPHA	fine structure constant	7.2973525664e-3	7.2973525664e-3	2.3e-10
+A_Z0	VACUUM_IMPEDANCE	characteristic impedance of vacuum	376.730313461	1e-50
+A_eps0	PERMITIV_FREE_SPACE	permittivity of free space	1	8.854187817e-12	1e-30
+A_mu0	PERMEABL_FREE_SPACE	permeability of free space	1	1.2566370614e-6	1e-10

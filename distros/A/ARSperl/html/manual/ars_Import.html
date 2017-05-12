@@ -1,0 +1,87 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - ars_Import</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_Import(ctrl, importOption, importBuf, type, name, ...)</CODE></H2>
+
+	Import objects of type <CODE>type</CODE> and name <CODE>name</CODE>
+	from the importBuf.
+
+      <DL>
+         <DT><B>On success</B><DD>
+		Returns 1.
+         <DT><B>On failure</B><DD>
+                Returns 0.
+      </DL>
+
+      <P>Example:
+
+      <PRE>
+        $buf = `cat /tmp/importfile.arx`;
+	($a = ars_Import($ctrl, 
+			 &ARS::AR_IMPORT_OPT_CREATE,
+                         $buf, "Schema", "HD:HelpDesk", 
+			 "Active_Link", "AL-FooBar")) || 
+		die "$ars_errstr";
+      </PRE>
+
+	<P>
+	<code>importOption</code> is one of:<P>
+	<blockquote>
+		&ARS::AR_IMPORT_OPT_CREATE <BR>
+		&ARS::AR_IMPORT_OPT_OVERWRITE <BR>
+	</blockquote>
+	When compiling against an API version previous to 4.5, this
+	option has no effect on the import operation but must still
+	be specified. When compiled against an API version greater
+	or equal to 4.5, this option specifies what to do if the 
+	object already exists (generate an error, or overwrite the
+	existing object).
+	<P>
+
+	The above example will read an AR Export file (text file) into 
+	a scalar and will import Schemas and Active Links from that file
+	into the ARSystem. Other object types are:
+	<UL>
+<LI> "schema" 
+<LI> "schema_defn" 
+<LI> "schema_view" 
+<LI> "schema_mail" 
+<LI> "filter" 
+<LI> "active_link" 
+<LI> "admin_ext" 
+<LI> "char_menu" 
+<LI> "escalation" 
+<LI> "dist_map" 
+<LI> "schema_view_min" 
+<LI> "container" 
+<LI> "dist_pool" 
+<LI> "schema_view_2" 
+	</UL>
+
+	<P>
+        
+	Note that note all of the above types are available in earlier 
+	versions of ARSystem. The above list is valid as of ARSystem v4.5. <P>
+	It's recommended that if you want to import schema definitions you
+	should use "<code>schema</code>" and not use the other 
+	<code>schema_*</code> types. <P> If you are curious about what
+	non-obvious types are used for, you should read the 
+	<U>ARSystem Programmers Manual</U>.
+	<P>
+
+<I>ars_Import was introduced in version 1.3 of ARSperl</I>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 7th July 2000 by jcmurphy@arsperl.org<BR>
+&#169; J.C.Murphy, J.W.Murphy 1997 arsperl@arsperl.org
+</address>
+</BODY>
+</HTML>

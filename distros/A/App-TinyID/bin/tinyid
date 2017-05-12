@@ -1,0 +1,61 @@
+#!perl
+
+#PODNAME: tinyid
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use Integer::Tiny;
+use Scalar::Util qw(looks_like_number);
+
+my ($text, $decode, $encode);
+
+# note, that you cannot have duplicate characters. Only single unique char.
+my $key = "WEl0v3you";
+
+GetOptions('text=s' => \$text,
+		   'key=s' => \$key,
+		   'decode' => \$decode,
+		   'encode' => \$encode
+) or die 'Error in command line arguments';
+
+my $it = Integer::Tiny->new($key);
+
+if (defined ($encode) && looks_like_number($encode)) {
+	print $it->encrypt($text) . "\n";
+}
+
+elsif (defined($decode)) {
+	print $it->decrypt($text) . "\n";
+}
+
+else {
+	die "Error occured. The program is not supplied with -e or -d arguments.";
+	exit 1;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tinyid
+
+=head1 VERSION
+
+version 0.1.1
+
+=head1 AUTHOR
+
+faraco <skelic3@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by faraco.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

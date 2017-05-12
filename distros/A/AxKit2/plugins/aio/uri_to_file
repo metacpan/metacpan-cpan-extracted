@@ -1,0 +1,185 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+=head1 NAME
+
+uri_to_file - Convert URIs to filenames, and  other critical stuff
+
+=head1 SYNOPSIS
+
+  Plugin uri_to_file
+  
+  # optionally:
+  DirectoryIndex index.html
+
+=head1 DESCRIPTION
+
+This plugin provides the filename for a given URI. It is absolutely required
+that you load this plugin if you wish to serve files off the filesystem, or else
+re-implement its functionality somehow.
+
+It also splits off the path_info off the URI, provides a redirect when a
+directory without a "/" is requested, and implements C<DirectoryIndex> (see below).
+
+=head1 CONFIG
+
+=head2 DirectoryIndex STRING
+
+A filename to append to directory requests. If the file exists then it will be
+the filename used instead of the directory itself.
+
+=cut
+
+use File::Spec::Functions qw(canonpath catfile splitdir catdir splitpath catpath);
+use AxKit2::Utils qw(uri_decode);
+
+sub register {
+    my $self = shift;
+    $self->register_hook('uri_translation' => 'hook_uri_translation1');
+    $self->register_hook('uri_translation' => 'hook_uri_translation2');
+}
+
+sub init {
+    my $self = shift;
+    $self->register_config('DirectoryIndex', sub { $self->set_dirindex(@_) });
+}
+
+sub set_dirindex {
+    my ($self, $config, $value) = @_;
+    my $key = $self->plugin_name . '::dirindex';
+    $config->notes($key, $value);
+}
+
+sub hook_uri_translation1 {
+    my ($self, $hd, $uri) = @_;
+    
+    $self->log(LOGINFO, "translate: $uri");
+    
+    $uri =~ s/\?.*//;
+    my $original_uri = $uri;
+    
+    $uri = uri_decode($uri);
+    
+    if ($uri =~ /\.\./) {
+        return BAD_REQUEST;
+    }
+    
+    my $root = $self->config->path;
+    
+    $uri =~ s/^\Q$root// || die "$uri did not match config path $root";
+    
+    my ($volume, $dir, $file) = splitpath($self->config->docroot, 1);
+    my @path = (splitdir($dir),split(/\//,$uri));
+
+    my $i = -1;
+
+    # save these so they get locked in for the closure.
+    my $client   = $self->client;
+    my $config   = $self->config;
+    my $dirindex = $self->config('dirindex');
+
+# $self->log(LOGCRIT, __LINE__ . " ...");
+    IO::AIO::aio_stat(catpath($volume,catdir(@path),''), sub {
+        if (-d _) {
+            $i = @path-1;
+            if ($original_uri =~ m/\/$/) {
+                if (defined $dirindex) {
+                    my $filepath = catpath($volume, catdir(@path), $dirindex);
+                    IO::AIO::aio_stat($filepath, sub {
+                        if (-f _) {
+                            push @path, $dirindex;
+                        }
+                        $self->setup_paths($hd, $volume, \@path, $i, $uri, $original_uri);
+                        return $client->finish_continuation;
+                    });
+                }
+            }
+            else {
+                $client->notes('need_redirect', 1);
+                $self->setup_paths($hd, $volume, \@path, $i, $uri, $original_uri);
+                return $client->finish_continuation;
+            }
+        }
+        else {
+            my $path = '';
+            my $sub;
+            $i = $#path;
+            $sub = sub {
+                if ($i == 0) {
+                    $self->setup_paths($hd, $volume, \@path, $i, $uri, $original_uri);
+                    return $client->finish_continuation;
+                }
+                if ($path && -e _) {
+                    # entity exists
+                    $i++ if -d _;
+                    $self->setup_paths($hd, $volume, \@path, $i, $uri, $original_uri);
+                    return $client->finish_continuation;
+                }
+                $i--;
+                $path = catdir(@path[0..$i+1]);
+                IO::AIO::aio_stat(catpath($volume, $path, ''), $sub);
+            };
+            $sub->();
+        }
+    });
+    
+    return CONTINUATION;
+}
+
+sub setup_paths {
+    my $self = shift;
+    my ($hd, $volume, $paths, $i, $uri, $original_uri) = @_;
+    
+    $hd->filename(
+        canonpath(
+            catpath(
+                $volume,
+                catdir( @{$paths}[0..$i]), ($i+1 < @$paths ? @{$paths}[$i+1] : '' )
+            )
+        )
+    );
+    $hd->path_info(join("/", '', @{$paths}[($i+2) .. $#$paths]));
+    $hd->request_uri(substr($original_uri, 0, - length($hd->path_info)))
+        if length($hd->path_info);
+    $self->log(LOGDEBUG, "Translated $uri to " . $hd->filename . 
+        " (request uri: " . $hd->request_uri . ", path info: " . $hd->path_info . ")");
+}
+
+sub hook_uri_translation2 {
+    my $self = shift;
+    return DECLINED;
+}
+
+# fixup directory requests to have a / on the end.
+sub hook_fixup {
+    my $self = shift;
+    
+    return DECLINED unless $self->client->notes('need_redirect');
+    
+    my $uri = $self->client->headers_in->request_uri;
+    
+    no warnings 'uninitialized';
+    
+    if ($uri =~ s/^([^\?]*)(?<!\/)(\?.*)?$/$1\/$2/) {
+        # send redirect
+        $self->log(LOGINFO, "redirect to $uri");
+        $self->client->headers_out->header('Location', "http://".$self->client->headers_in->header('Host').$uri);
+        return REDIRECT;
+    }
+    # the above string replace should always succeed
+    return SERVER_ERROR;
+}

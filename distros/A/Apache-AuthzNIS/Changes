@@ -1,0 +1,9 @@
+Revision history for Perl extension Apache::AuthzNIS.
+
+0.11  Fri Aug 01 23:06 2003
+	- Ported to work with both versions of modperl
+	- Changed Makefile.PL to use ExtUtils::AutoInstall
+	- Added test.pl file for 'make test'
+ 
+0.10  Sun Oct 25 23:06 1998
+	- First Beta Release

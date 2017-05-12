@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Acme::Archive::Mbox;
+use File::Spec;
+use File::Slurp;
+use File::Path qw(mkpath);
+
+print "$0 archive.mbox dir/\n" and exit unless @ARGV == 2;
+my $archivename = shift @ARGV;
+my $rootdir = shift @ARGV;
+
+my $archive = Acme::Archive::Mbox->new();
+$archive->read($archivename);
+for my $file ($archive->get_files()) {
+    my $name = File::Spec->canonpath($file->name());
+    die "Absolute path, refusing to extract: $name\n" if (File::Spec->file_name_is_absolute($name));
+
+    my (undef, $dirs, $filename) = File::Spec->splitpath($name);
+    my @parts = File::Spec->splitdir($dirs);
+    push @parts, $filename;
+    die "Directory traversal attempted: $name\n" unless (File::Spec->no_upwards(@parts) == @parts);
+  
+    mkpath(File::Spec->catdir($rootdir, $dirs)); 
+    my $writename = File::Spec->catfile($rootdir, $dirs, $filename);
+    
+    write_file($writename, {binmode => ':raw'}, $file->contents );
+
+    chmod $file->mode, $writename or warn "$0: chmod $writename: $!\n";
+    if ($> == 0) {
+        chown $file->uid, $file->gid, $writename or warn "$0: chown $writename: $!\n";
+    }
+}
+
+=head1 NAME
+
+mboxextract - extract mbox archive
+
+=head1 USAGE
+
+mboxify archive.mbox root_directory
+
+Files will be extracted to root_directory, overwriting any files by the
+same name.  (root_directory may be '.')
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 BUGS
+
+=over 4
+
+=item Currently mtime is ignored
+
+=back
+
+=cut

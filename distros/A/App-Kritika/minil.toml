@@ -1,0 +1,6 @@
+name = "App-Kritika"
+authority="cpan:VTI"
+
+module_maker="ModuleBuildTiny"
+
+readme_from="script/kritika"

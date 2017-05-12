@@ -1,0 +1,15 @@
+---
+name: Authen-Simple-Passwd
+version: 0.6
+author:
+  - 'Christian Hansen C<ch@ngmedia.com>'
+abstract: Simple Passwd authentication
+license: perl
+requires:
+  Authen::Simple: 0.3
+  IO::File: 0
+provides:
+  Authen::Simple::Passwd:
+    file: lib/Authen/Simple/Passwd.pm
+    version: 0.6
+generated_by: Module::Build version 0.2611

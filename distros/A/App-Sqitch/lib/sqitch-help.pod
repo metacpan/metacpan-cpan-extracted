@@ -1,0 +1,35 @@
+=head1 Name
+
+sqitch-help - Display help for Sqitch and Sqitch commands
+
+=head1 Synopsis
+
+  sqitch help [COMMAND]
+  sqitch help --guide
+
+=head1 Description
+
+With no options and no C<COMMAND> given, the synopsis of the C<sqitch> options
+and a list of the most commonly used Sqitch commands will be displayed.
+
+If the option C<--guide> or C<-g> is given, then a list of Sqitch guides will
+be displayed
+
+If a Sqitch command is named, the documentation for that command will be
+displayed.
+
+=head1 Options
+
+=over
+
+=item C<-g>
+
+=item C<--guide>
+
+Prints a list of available Sqitch guides.
+
+=back
+
+=head1 Sqitch
+
+Part of the L<sqitch> suite.

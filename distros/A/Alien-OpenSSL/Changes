@@ -1,0 +1,30 @@
+Changes for Alien::OpenSSL
+
+* 0.09
+- require higher Alien::Base version due to test bug
+- fix a test for windows
+
+* 0.08
+- fix for Activestate & Strawberry perls (by Salvador Fandiño)
+
+* 0.07
+- fix build on FreeBSD 10 and other systems that do not have gcc
+
+* 0.06
+- add signature
+
+* 0.05
+- do not install doc, this lead to problems on some systems. Thanks, plicease
+
+* 0.04
+- remove workarounds for Alien::Base pre 0.03 and make work with
+  current OpenSSL versions
+
+* 0.03
+- only install software and skip docs. Is faster and prevents problems.
+
+* 0.02
+- also build shared library (it is not really of much use without them...)
+
+* 0.01
+- initial version

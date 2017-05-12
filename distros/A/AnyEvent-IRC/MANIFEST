@@ -1,0 +1,19 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+lib/AnyEvent/IRC.pm
+lib/AnyEvent/IRC/Util.pm
+lib/AnyEvent/IRC/Client.pm
+lib/AnyEvent/IRC/Connection.pm
+samples/test_connect
+samples/notify
+samples/anyeventirccl
+samples/debug_console
+samples/version_dump
+samples/anyeventirc
+samples/dcc
+t/00_load.t
+t/01_util.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

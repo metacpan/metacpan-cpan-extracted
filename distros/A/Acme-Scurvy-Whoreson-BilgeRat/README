@@ -1,0 +1,15 @@
+In honour of International Talk Like A Pirate Day, this module generates
+piratical insults.  It can also generate insults in any other language
+by using pluggable back-ends.
+
+This is an insult generator.  It generates insults.  It says rude things
+even if you don't use it properly.  Humourless prudes may prefer Acme::Pony.
+
+To install, do the usual:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You may use, modify and distribute this code under the same terms as you
+may use, modify and distribute perl itself.

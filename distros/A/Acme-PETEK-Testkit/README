@@ -1,0 +1,32 @@
+Acme-PETEK-Testkit
+
+This module was created for use in the Tester's Toolkit presentation,
+originally done by PETEK at YAPC::NA 2005 in Toronto.
+
+The slides are available at http://www.bsod.net/~petek/slides/.
+
+INSTALLATION
+
+Don't.  This module is meant to be a collection of sample code, and not
+for day-to-day use.  It's meant to be downloaded, unpacked and inspected,
+but not installed.
+
+If you insist, however:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Pete Krawczyk
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+This library has also been released under a Creative Commons license
+at the request of the YAPC::NA 2005 organizers. See
+http://creativecommons.org/licenses/by/2.0/ca/ for more information;
+in short, please give credit to the author should you use this code
+elsewhere.

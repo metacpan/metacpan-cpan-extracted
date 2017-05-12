@@ -1,0 +1,27 @@
+---
+abstract: 'A multi-server client for speaking to App::Cerebrus'
+author:
+  - 'Clinton Gormley <drtech@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Cerberus-client
+requires:
+  Any::URI::Escape: 0
+  Carp: 0
+  HTTP::Tiny: 0
+  JSON: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/clintongormley/App-Cerberus-Client/issues
+  repository: git://github.com/clintongormley/App-Cerberus-Client.git
+version: 0.08

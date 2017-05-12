@@ -1,0 +1,207 @@
+Revision history for AnyEvent::MP
+
+TODO: testsuite
+TODO: intro: maybe simple job pool example?
+TODO: intro: mention watchdog...
+TODO: maybe disbale warnings by default?
+
+faq: can't se anything
+faq: all is asynch
+faq: how to interface to non-perl nodes?
+
+1.30 Thu Jun 30 11:30:39 CEST 2011
+	- connection errors at the right time would kill node
+          connections in a bad way (patch by Malcolm Studd).
+
+1.29 Fri May  7 20:13:39 CEST 2010
+	- codename "Sadrak".
+        - fix error in callback at AnyEvent/MP/Global.pm line 339
+          (found by Sadrak).
+	- listener-less nodes had trouble sending keepalive
+          messages on write timeouts (found by Sadrak).
+        - the monitor guard could cause a memleak due
+          to autovivification if a mon was cleared after
+          the port was gone (analysed by Sadrak).
+        - do not overwrite the config file if we couldn't read it
+          for some reason (lesson demonstrated by Sadrak).
+
+1.28 Thu Apr  1 21:23:54 CEST 2010
+	- accepted connections didn't correctly set up the SRCNODE
+          in some cases, leading to intra-node messages (such as monitoring)
+          to fail silently (great testcase by Sadrak).
+
+1.27 Sat Mar 20 21:11:16 CET 2010
+	- avoid exceptions in the transport code if the connection
+          fails during TLS negotiation.
+        - delay new address broadcasts in seednodes, to reduce the
+          likelyhood of nodes connecting at the same time, leading to
+          message loss.
+        - improve general message passing efficiency by 8%, and special
+          case json framing for a 50% speed increase.
+	- add hints how to interface to aemp nodes from other programming
+          languages using the aemp protocol in AnyEvent::MP::Transport
+          (it can really be quite simple).
+        - handle unsupported remote framings more gracefully.
+
+1.26 Wed Dec 30 16:48:37 CET 2009
+	- INCOMPATIBLE CHANGE: the high-level node protocol changed,
+          all nodes need to upgrade.
+	- remote kil's did not work (reported by Eugene Grigoriev).
+        - documented monitor_timeout, connect_interval, auth_offer,
+          auth_accept, framing_format, autocork and nodelay options
+          and make them configurable via bin/aemp.
+        - some doc updates.
+        - remote kil's were not synchronous to message sends which affected
+          nobody, as remote kils were broken.
+        - remote mon/unmonitor requests were not synchronous to message
+          sends either sometimes, although it likely didnt matter.
+
+1.24 Wed Dec  9 14:59:52 CET 2009
+	- codename "the foul egg".
+	- increased "unmonitored local port died" message level to 2, so
+          it is displayed by default now.
+        - generate random seed at configure time, not module loading time,
+          so fork&configure works as expected.
+        - decreased "seed"-related message priority in Global from 0 (d'oh)
+          to 9, as they are not signifcant.
+	- new experimental module AnyEvent::MP::DataConn to establish
+          additional data connections between nodes.
+        - bin/aemp now loads AnyEvent::Watchdog::Util before trying
+          to call restart.
+        - bin/aemp setcert didn't properly handle the filename argument.
+        - removed empty and unused timeout= parameter from protocol greeting.
+
+1.23 Fri Nov  6 18:46:26 CET 2009
+        - listener-less nodes were misinformed by their masters about
+          the location of new nodes, and therefore didn't connect
+          properly in all cases.
+        - messages send during node-up processing could sometimes get lost,
+          which would hamper global's ability to mesh the network.
+        - fixed AnyEvent::MP::Global::grp_reg to return a guard also
+          in scalar context.
+        - fixed AnyEvent::MP::Kernel::mon_nodes to return a guard also
+          in scalar context.
+        - try to improve error reporting when automatically loading
+          a function - being unable to load a module will now
+          stop the process and report the error.
+
+1.22 Sat Oct 17 03:41:47 CEST 2009
+	- fix two rcv-bugs: after adding a tagged rcv, the default
+          callback would not be used or changed anymore (reported
+          by Felix Antonius Wilhelm Ostmann, with apologies for
+          taking so long to releae the fix).
+	- added Coro::MP introduction to AnyEvent::MP::Intro.
+	- add peval function.
+
+1.21 Mon Oct  5 21:58:36 CEST 2009
+	- always delay kil messages.
+        - remote monitor requests were never cleaned up (found by
+          Sadrak and analysed by elmex).
+        - move $VERSION to AnyEvent::MP and AnyEvent::MP only.
+
+1.2  Thu Oct  1 22:59:35 CEST 2009
+        - fix a rather big bug where message processing could be
+          inhibited completely.
+	- grp_mon could not return a guard due to a typo.
+	- implement primitive aemp shell.
+        - do not use bound address as listen length (reported by
+          Felix Antonius Wilhelm Ostman).
+        - no longer export an undefined "reg" function from AE::MP.
+        - the mon_guard return value no longer keeps an additional
+          reference to the passed refs.
+
+1.1  Fri Sep 11 04:34:03 CEST 2009
+	- bumped the transport protocol to version 1 - sorry, but there
+          were too many bugfixes/changes.
+	- new function AnyEvent::MP::cal for simple rpc.
+	- renamed AnyEvent::MP::Global functions to grp_reg|get|mon.
+        - implemented monitoring for Global groups.
+	- removed all userspace time-outs from the transport, instead
+          rely on tcp retransmit timeouts and tcp keepalive.
+	- spawn now delays spawns on the local node artificially, so
+          it can return before invoking the init function.
+        - break endless recursion between ping-pong ports on the local
+          node after ~50 iterations.
+        - support JSON-encoded aemp arguments.
+        - added aemp restart.
+        - support for starting init functions with parameters added.
+        - data_format, auth_offer and auth_accept are now configurable, albeit
+          not documented.
+        - new service: AnyEvent::MP::LogCatcher.
+        - rely on perl srand'ing better than we could.
+        - try to backport to 5.8.2, unfortunately, recursive dependencies
+          rely on Module::Build, which fails at 5.8.7, so YMMV.
+        - use a vastly different reseeding strategy.
+        - use seed nodes to notify nodes about new nodes.
+        - in the case where a ndoe learns new addresses after it tried
+          connecting, prefer the new addrseses over the old ones.
+
+1.0  Wed Sep  2 20:40:43 CEST 2009
+	- randomise more connection times, but reduce delay to 0.2s (seeds)
+          and 0.05s (normal connects).
+        - upgrade to and require AnyEvent::Watchdog 1.0.
+
+0.95 Mon Aug 31 22:03:55 CEST 2009
+	- tutorial finally covers all the basics, maybe not optimally, but it
+          is covered.
+	- rename initialise_node to configure and accepts key => value
+          pairs for configuration.
+	- give aemp a full manpage.
+	- bin/aemp now expects comma-separated lists and supports multiple
+          subcommands.
+        - new aemp eval subcommand.
+        - new aemp parent subcommand.
+        - nodes get freed when no longer needed.
+        - support "*" hostname to specify all local interface addresses
+          (without localhost etc.).
+        - support "*" port to specify a dynamically-assigned port (which
+          is the default now).
+        - fix per-transport memory leak.
+
+0.9  Sat Aug 29 18:47:45 CEST 2009
+	- tutorial was updated to reflect the current API, but
+          does not touch monitoring yet.
+	- got rid of noderefs and slave nodes entirely, introduce
+          free-text node identifiers and anonymous nodes.
+        - document security issues with tls_anon method and introduce
+          optional tls_md6_64_256 method.
+
+0.8  Wed Aug 19 07:54:50 CEST 2009
+	- added AnyEvent::MP::Global service.
+	- support "package::" names as service names.
+        - many, many, many bugfixes and tweaks.
+
+0.7  Sat Aug 15 01:18:51 CEST 2009
+	- sorry, another major API simplification.
+	- greatly improved aemp configuration abilities.
+        - introduced profile management.
+        - updated exmaples in eg/.
+        - added Kernel::snd_to_func.
+
+0.6  Thu Aug 13 03:15:05 CEST 2009
+	- do away with .aemp-secret and use .perl-anyevent-mp as json config
+          file.
+        - introduce bin/aemp to configure nodes.
+        - too many changes to describe.
+
+0.4  Sun Aug  9 18:05:49 CEST 2009
+	- API should now be really stable :)
+	- distinguish between resolved and unresolved noderefs.
+	- certificates in .aemp-secret are now supported.
+        - change port creation semantics.
+        - replace become_xxx by initialise_node.
+        - implement AE::MP::spawn.
+        - implement transport timeouts, monitoring, reconnecting.
+        - simplify and partially document the transport protocol.
+
+0.1  Tue Aug  4 23:07:11 CEST 2009
+	- AnyEvent::MP API should be mostly stable by now.
+
+0.02 Sun Aug  2 17:46:43 CEST 2009
+	- design has stabilised a bit, sitll unusable.
+
+0.01 Sat Aug  1 11:43:31 CEST 2009
+	- dummy upload to reserve namespace on CPAN.
+
+0.0  Thu Jul 30 06:10:15 CEST 2009
+	- original version, an AnyEvent::AIO clone.

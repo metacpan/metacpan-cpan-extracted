@@ -1,0 +1,17 @@
+clear
+power on
+regs
+
+# this instruction is 6502 compatible but not 
+# supported by the NES
+op f8
+
+# D flag should now be 1
+test d = 1
+
+op d8
+
+# D flag should now be 0 again
+test d = 0
+
+save verify_D8.txt

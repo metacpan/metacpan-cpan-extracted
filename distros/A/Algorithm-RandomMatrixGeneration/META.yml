@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Algorithm-RandomMatrixGeneration
+version:             0.06
+abstract:            Generate internal cell values for a matrix given fixed marginal totals.  
+license:             gpl
+author:              
+    - Anagha Kulkarni <anaghak at cs.cmu.edu>, Ted Pedersen <tpederse at d.umn.edu>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Math::BigFloat:                1.58
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

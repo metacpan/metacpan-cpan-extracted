@@ -1,0 +1,87 @@
+#!/usr/bin/perl -wT
+use v5.14;
+
+use App::Devbot;
+
+App::Devbot->run;
+
+__END__
+
+=head1 NAME
+
+devbot - IRC bot which helps development
+
+=head1 SYNOPSIS
+
+    # devbot will connect to OFTC with SSL, join #mychan and log everything there. Its nickname will be 'devbot'.
+    devbot --channel "#mychan"
+
+    # devbot will connect to Freenode without SSL, join #asd and #qwe, and log everything there. Its nickname will be 'loggerbot'.
+    devbot --nick loggerbot --server chat.freenode.net --port 6667 --no-ssl --channel "#asd" --channel "#qwe"
+
+    # devbot will identify to NickServ with password 'passWORD123', join #bestchan on OFTC and store files sent by channel users.
+    devbot --nick mybot --password passWORD123 --channel '#bestchan' --no-log --store-files
+
+=head1 DESCRIPTION
+
+devbot is an IRC bot which helps developers collaborate.
+
+Right now, it only does channel logging and file storage. It might do more in the future.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--nick> I<nickname>
+
+The nickname of devbot. Defaults to devbot.
+
+=item B<--password> I<password>
+
+If supplied, identify to NickServ with this password
+
+=item B<--server> I<hostname>
+
+The server to connect to. Defaults to irc.oftc.net.
+
+=item B<--port> I<port>
+
+The port to connect to. Defaults to 6697.
+
+=item B<--ssl>, B<--no-ssl>
+
+B<--ssl> enables connecting to the server with SSL, B<--no-ssl> disables this. Defaults to B<--ssl>.
+
+=item B<--channel> I<channel>
+
+Makes devbot connect to I<channel>. Can be supplied multiple times for multiple channels. Has no default value.
+
+=item B<--log>, B<--no-log>
+
+B<--log> enables logging events to 'logs/I<CHANNEL>/I<DATE>.txt'. B<--no-log> disables logging. Defaults to B<--log>.
+
+=item B<--store-files>, B<--no-store-files>
+
+B<--store-files> enables storing files received via DCC to 'files/I<FILENAME>'. Files are only accepted if the sender and devbot share a channel. B<Only use when all channel users are trusted>. B<--no-store-files> disables storing files. Defaults to <--no-store-files>.
+
+=item B<--trace>, B<--no-trace>
+
+B<--trace> enables POE::Component::IRC::State tracing. Useful for debugging. B<--no-trace> disables tracing. Defaults to B<--no-trace>.
+
+=back
+
+=head1 CAVEATS
+
+As stated above, the B<--store-files> option should only be used on private channels where every user is trusted.
+
+=head1 AUTHOR
+
+Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.

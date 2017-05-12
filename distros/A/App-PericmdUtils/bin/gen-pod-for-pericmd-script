@@ -1,0 +1,283 @@
+#!perl
+
+# Note: This script is a CLI  for Riap function /Perinci/CmdLine/POD/gen_pod_for_pericmd_script
+# and generated automatically using Perinci::CmdLine::Gen version 0.43
+
+our $DATE = '2017-01-13'; # DATE
+our $DIST = 'App-PericmdUtils'; # DIST
+our $VERSION = '0.04'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => "/Perinci/CmdLine/POD/gen_pod_for_pericmd_script",
+    program_name => "gen-pod-for-pericmd-script",
+)->run;
+
+# ABSTRACT: Generate POD for Perinci::CmdLine-based CLI script
+# PODNAME: gen-pod-for-pericmd-script
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+gen-pod-for-pericmd-script - Generate POD for Perinci::CmdLine-based CLI script
+
+=head1 VERSION
+
+This document describes version 0.04 of gen-pod-for-pericmd-script (from Perl distribution App-PericmdUtils), released on 2017-01-13.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % gen-pod-for-pericmd-script [options]
+
+=head1 DESCRIPTION
+
+This utility can accept either a path to a L<Perinci::CmdLine>-based CLI
+script, upon which the arguments to Perinci::CmdLine constructor will be
+extracted using a script dumper (L<Perinci::CmdLine::Dump>), or a set of
+arguments to specify Perinci::CmdLine constructor arguments directly (e.g.
+C<url>, C<summary>, C<subcommands>, etc).
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--completer-script>=I<s>
+
+Script name for shell completion.
+
+A special value of `:self` means this script can complete itself.
+
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Input options
+
+=over
+
+=item B<--common-opts-json>=I<s>
+
+See C<--common-opts>.
+
+=item B<--common-opts>=I<s>
+
+=item B<--config-dirs-json>=I<s>
+
+See C<--config-dirs>.
+
+=item B<--config-dirs>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--config-filename-json>=I<s>
+
+See C<--config-filename>.
+
+=item B<--config-filename>=I<s>
+
+=item B<--default-subcommand>=I<s>
+
+=item B<--env-name>=I<s>
+
+=item B<--per-arg-json>
+
+=item B<--per-arg-yaml>
+
+=item B<--program-name>=I<s>
+
+=item B<--read-config>
+
+=item B<--read-env>
+
+=item B<--script>=I<s>
+
+Path to script.
+
+=item B<--subcommands-json>=I<s>
+
+See C<--subcommands>.
+
+=item B<--subcommands>=I<s>
+
+=item B<--summary>=I<s>
+
+=item B<--url>=I<s>
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/gen-pod-for-pericmd-script.conf>, F<~/gen-pod-for-pericmd-script.conf>, or F</etc/gen-pod-for-pericmd-script.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ common_opts (see --common-opts)
+ completer_script (see --completer-script)
+ config_dirs (see --config-dirs)
+ config_filename (see --config-filename)
+ default_subcommand (see --default-subcommand)
+ env_name (see --env-name)
+ format (see --format)
+ naked_res (see --naked-res)
+ per_arg_json (see --per-arg-json)
+ per_arg_yaml (see --per-arg-yaml)
+ program_name (see --program-name)
+ read_config (see --read-config)
+ read_env (see --read-env)
+ script (see --script)
+ subcommands (see --subcommands)
+ summary (see --summary)
+ url (see --url)
+
+=head1 ENVIRONMENT
+
+=head2 GEN_POD_FOR_PERICMD_SCRIPT_OPT => str
+
+Specify additional command-line options
+
+=head1 FILES
+
+~/.config/gen-pod-for-pericmd-script.conf
+
+~/gen-pod-for-pericmd-script.conf
+
+/etc/gen-pod-for-pericmd-script.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-PericmdUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-PericmdUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PericmdUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,8 @@
+name = "App-cpanmw"
+# badges = ["travis"]
+authority="cpan:KPEE"
+
+module_maker="ModuleBuildTiny"
+
+[FileGatherer]
+exclude=['^.*\.bat$','minil\.toml']

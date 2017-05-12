@@ -1,0 +1,72 @@
+Alvis-Convert version 0.4
+================================
+
+This is a module collecting Alvis XML format conversion methods for any 
+number of source formats.
+
+Contains these conversion scripts:
+
+    alvis_wikipedia_add_cats
+    news_xml2alvis
+    wikipedia2alvis
+    html2alvis
+    html2plain
+    ainodump2alvis
+    alvisDecollect
+    alvisXMLmerge
+    alvisXMLsplit
+    alvisXMLjoin
+    alvisXSL
+    alvisSource
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Data::Dumper
+   Storable
+   Encode
+   Encode::Guess
+   XML::LibXML
+   Compress::Zlib
+   HTML::Encoding
+   File::Type
+   File::Find
+   Parse::MediaWikiDump
+   Digest::MD5
+   MIME::Base64
+   Time::Simple
+   Carp
+   Cwd
+
+Additionally, the scripts in bin/ require:
+
+   File::Copy
+   File::Path
+   Getopt::Long
+   IO::Handle
+   Pod::Usage
+   POSIX
+   Time::HiRes
+   Alvis::Pipeline
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 by Kimmo Valtonen, Wray Buntine and Vladimir Poroshin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

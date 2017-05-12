@@ -1,0 +1,11 @@
+textarea.fetch_ta {
+  height: expression( ie_height(this) );
+  margin-bottom: 4px;
+  overflow: auto;
+}
+
+textarea.comment_ta {
+  height: expression( ie_height(this) );
+  margin-bottom: 4px;
+  overflow: auto;
+}

@@ -1,0 +1,132 @@
+#!/usr/bin/env perl
+
+package    ## Hide from PAUSE and Dist::Zilla
+  svd;
+
+use strict;
+use warnings;
+
+use Getopt::Std;
+use YAML::Tiny;
+use App::Sv;
+
+# ABSTRACT: Supervisor daemon for App::Sv 
+# VERSION
+# AUTHORITY
+
+my %opt;
+getopts('dc:', \%opt);
+
+my $cf;
+my $conf;
+
+# read config
+$cf = $opt{c} ? $opt{c}
+	: $ENV{SV_CONF} ? $ENV{SV_CONF}
+	: $ENV{SV_HOME} ? "$ENV{SV_HOME}/sv.yml"
+	: "$ENV{HOME}/.sv/sv.yml";
+die "No config file found" unless -f $cf;
+my $yt = YAML::Tiny->new();
+$conf = $yt->read($cf) or die "Cannot open config file \'$cf\': $!";
+$conf = $conf->[0];
+
+# daemonize
+if ($opt{d} || $conf->{global}->{daemon}) {
+	open(STDIN, "</dev/null");
+	open(STDOUT, "+>/dev/null");
+	my $pid = fork();
+	exit 0 if $pid;
+}
+
+my $s = App::Sv->new($conf);
+$s->run;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+svd - Supervisor daemon for App::Sv
+
+=head1 SYNOPSIS
+
+    # Read commands from a config file
+    $ cat sv.yml
+    ---
+    global:
+      listen: unix/:/tmp/sv.sock
+      daemon: 0
+      umask: 077
+    run:
+      x: 'plackup -p 3010 ./sites/x/app.psgi'
+      y:
+        cmd: 'plackup -p 3011 ./sites/y/app.psgi'
+        start_retries: 5
+        restart_delay: 1
+        umask: 027
+        user: www
+        group: www
+        
+    $ svd -c sv.yml
+    
+=head1 DESCRIPTION
+
+The C<svd> command is a supervisor daemon for App::Sv.
+
+It reads a list of commands to execute from a YAML config file and starts each
+one, and then monitors their execution. If one of the program dies, the
+supervisor will restart it after a preset delay.
+
+You can restart the supervised process with C<< Ctrl-C >>. If you hit
+C<< Ctrl-C >> again before the supervised process restart, the supervisor will
+exit. This allows you to use one tap of C<< Ctrl-C >> to restart, and a
+double tap to exit.
+
+
+=head1 ARGUMENTS
+
+The script accepts no arguments on the command line.
+
+
+=head1 OPTIONS
+
+The script accept the follwoing command line options.
+
+=over 4
+
+=item -c config_file
+
+Specify the configuration file to read. If this isn't specified, the script
+searches $ENV{SV_CONFIG}, $ENV{SV_HOME}/sv.yml and $ENV{HOME}/.sv/sv.yml or
+dies upon failure to find a valid configuration file in one of those places.
+
+=item -d
+
+Run as a daemon. This can be also specified in the global section of the
+configuration file via the daemon option (boolean).
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item SV_DEBUG 
+
+If set to a true value, the supervisor will show debug information.
+
+=item SV_HOME
+
+Specifies the default home directory where C<svd> searches for the config
+file.
+
+=item SV_CONF
+
+The config file for the supervisor.
+
+=back
+
+=head1 SEE ALSO
+
+L<App::Sv>

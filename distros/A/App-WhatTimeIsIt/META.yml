@@ -1,0 +1,30 @@
+---
+abstract: Now?
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-WhatTimeIsIt
+provides:
+  App::WhatTimeIsIt:
+    file: lib/App/WhatTimeIsIt.pm
+    version: 0.01
+requires:
+  Config::CmdRC: 0.06
+  Docopt: 0.03
+  POSIX: 0
+  Time::Local: 0
+  perl: 5.008005
+resources:
+  bugtracker: http://github.com/bayashi/App-WhatTimeIsIt/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/App-WhatTimeIsIt
+version: 0.01

@@ -1,0 +1,33 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "Sour",
+            "percentage" : "0.5"
+         },
+         {
+            "type" : "PG",
+            "tag" : "E.M.",
+            "percentage" : "0.5"
+         },
+         {
+            "type" : "PG",
+            "tag" : "CAP Double Watermelon",
+            "percentage" : "5"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Dragonfruit",
+            "percentage" : "2"
+         }
+      ],
+      "target_pg" : "20",
+      "base_nic_per_ml" : 100,
+      "base_nic_type" : "PG",
+      "target_quantity" : "160",
+      "target_nic_per_ml" : "6",
+      "target_vg" : 80,
+      "notes" : []
+   }
+}

@@ -1,0 +1,215 @@
+#!/usr/bin/env perl
+
+package main;
+$main::VERSION = 'v0.9.10';
+#  PODNAME: ppp
+# ABSTRACT: Preprocess Pandoc before Processing Pandoc
+
+use v5.14;
+use strict;
+use warnings;
+use File::Spec;
+use File::Temp 'tempdir';
+use File::Path 'make_path';
+
+# configuration set as --key value at command line or as key=value from file
+our %config;
+our ($img, $log);
+
+# load configuration from file in current directory if given
+{
+    if (local @ARGV = grep { -e $_ } qw(.ppprc ppp.conf)) {
+        while (<>) { # parse simple "key = value" pairs
+            $config{$1} = $2 if /^\s*(\w+)\s*=\s*(.*?)\s*$/;
+        }
+    }
+}
+
+# parse command line options
+while (@ARGV) {
+    last unless $ARGV[0] =~ /^--(\w*)$/; # --key
+    last unless length($1);              # "--" stops option parsing
+    shift @ARGV;
+    $config{$1} = (@ARGV && $ARGV[0] !~ /^--(\w*)$/)
+                ? shift @ARGV : 1;       # --key  or --key value
+}
+
+# register known options as global variables
+{
+    no strict 'refs';
+    for my $name (qw(img log)) {
+        $$name = $config{$name} if defined $config{$name};
+    }
+}
+
+create_directories($img, $log);
+
+state $fileno = 0;
+state $outfile;
+state $format;
+state @children;
+state %attributes;
+state $imgdir = defined $img ? $img : tempdir('ppp-render-XXXXX', CLEANUP => 0, TMPDIR => 1);
+state $logdir = defined $log ? $log : tempdir('ppp-log-XXXXX'   , CLEANUP => 0, TMPDIR => 1);
+
+MAIN: {
+  while(<>) {
+    if ( (my $start = /^~{3,}\s*\{.*?(?<format>rdfdot|ditaa|dot|neato|yuml|plantuml)(?<attributes>.*)\}.*/) ... (my $end = /^~{3,}\s*$/) ) {
+        $start ? begin_ppp() : $end ? end_ppp() : print {$outfile} $_
+    } else {
+      print
+    }
+  }
+}
+
+SUBS: {
+  sub begin_ppp {
+    $fileno++;
+    $format = $+{format};
+    $attributes{$fileno.$format} = $+{attributes};
+    open $outfile, '>', "$imgdir/image-$fileno.$format"
+  }
+
+  sub render {
+    my ($format, $fileno, %attrs) = @_;
+    my $cmd = '';
+
+    $format =~ /^ditaa$/ and
+      $cmd = "ditaa"
+           . " @{[exists $attrs{'rounded-corners'} ? '--round-corners ' : ' ']}"
+           . " @{[exists $attrs{'no-shadows'}      ? '--no-shadows '    : ' ']}"
+           . " @{[exists $attrs{'no-separation'}   ? '--no-separation ' : ' ']}"
+           . " @{[exists $attrs{'no-antialias'}    ? '--no-antialias '  : ' ']}"
+           . " $imgdir/image-$fileno.$format $imgdir/image-$fileno.png"
+           . " 2>&1 >>$logdir/ditaa.log";
+
+    $format =~ /^rdfdot$/ and
+      $cmd = "rdfdot"
+           . " -ttl"
+           . " $imgdir/image-$fileno.$format $imgdir/image-$fileno.svg"
+           . " 2>&1 >>$logdir/rdfdot.log";
+
+    $format =~ /^dot$/ and
+      $cmd = "dot"
+           . " -Tsvg"
+           . " -o $imgdir/image-$fileno.svg $imgdir/image-$fileno.$format"
+           . " 2>&1 >>$logdir/dot.log";
+
+    $format =~ /^neato$/ and
+      $cmd = "neato"
+           . " -Tsvg "
+           . " -o $imgdir/image-$fileno.svg $imgdir/image-$fileno.$format "
+           . " 2>&1 >>$logdir/neato.log";
+
+    $format =~ /^yuml$/ and
+      $cmd = "yuml "
+           . " --format svg"
+           . " --type  @{[exists $attrs{type}      ? $attrs{type}     : 'class']}"
+           . " --style @{[exists $attrs{style}     ? $attrs{style}    : 'nofunky']}"
+           . " --dir   @{[exists $attrs{direction} ? $attrs{direction}: 'LR']}"
+           . " --in $imgdir/image-$fileno.$format --out $imgdir/image-$fileno.svg"
+           . " 2>&1 >>$logdir/yuml.log";
+
+    $format =~ /^plantuml$/ and
+      $cmd = "plantuml"
+           . " -tsvg "
+           . " -charset UTF-8"
+           . " $imgdir/image-$fileno.$format"
+           . " 2>&1 >>$logdir/plantuml.log";
+
+    ### $cmd
+    system($cmd);
+
+  }
+  sub scale {
+    my ($format, $fileno, %attrs) = @_;
+    my $cmd = '';
+
+    # TODO: These two formats should get svg support
+    if ($format =~ /^(ditaa)$/) {
+      $cmd = "mogrify"
+           . " -scale @{[exists $attrs{scale} ? $attrs{scale} : '100%']}"
+           . " $imgdir/image-$fileno.png"
+           . " 2>&1 >>$logdir/mogrify.log";
+    } else {
+      my $scale = exists $attrs{scale} ? do { $_ = $attrs{scale}; s/%//; $_/100 }: 1.0;
+      $cmd = "rsvg-convert"
+           . " --zoom $scale"
+           . " --format png"
+           . " --output $imgdir/image-$fileno.png"
+           . " $imgdir/image-$fileno.svg"
+           . " 2>&1 >>$logdir/plantuml.log";
+    };
+    ### $cmd
+    system($cmd);
+  }
+
+  sub end_ppp {
+    close $outfile;
+
+    my %attrs = map { /(.+?)=(["']?.+["']?)/ ? ($1 => $2) : ($_ => 1) } split /\s+\./, $attributes{$fileno.$format};
+    if( my $child = fork == 0 ) {
+       push @children, $child;
+       render($format, $fileno, %attrs);
+       scale($format, $fileno, %attrs);
+       exit 0;
+    }
+
+    $format =
+      "![" . (exists $attrs{title} ? $attrs{title} : '' )
+           . (exists $attrs{label} ? "\\label{$attrs{label}}" : '' ).
+      "]"  .
+      "($imgdir/image-$fileno.png)" .
+      (exists $attrs{inline} ? '\\ ' : '')
+    ;
+    say STDOUT $format;
+    $format = '';
+  }
+
+  sub create_directories {
+    for (@_) {
+      if (defined $_) {
+        unless (-d $_) {
+          make_path $_ or die "Failed to create path: $_";
+        }
+      }
+    }
+  }
+}
+
+END {
+  while (1) {
+    my $child = waitpid(-1, 0);
+    exit 0 if $child == -1;       # No more outstanding children
+  }
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ppp - Preprocess Pandoc before Processing Pandoc
+
+=head1 VERSION
+
+version v0.9.10
+
+=head1 AUTHOR
+
+DBR <dbr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by DBR.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
+=cut

@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Collection>
+    <title>Astro::Constants</title>
+    <description>Physical constants for astronomy for use in Astro::Constants v0.10</description>
+    <timestamp>Wed Feb 10 11:59:31 2016</timestamp>
+    <version>v0.10</version>
+    <source>2014 CODATA</source>
+    <link href="http://metacpan.org/pod/Astro::Constants" />
+    <items>
+        <PhysicalConstant>
+            <name type="long">LIGHT_SPEED</name>
+            <name type="short">A_c</name>
+            <alternateName />
+            <description>speed of light in a vacuum</description>
+            <value system="MKS">2.99792458e8</value>
+            <value system="CGS">2.99792458e10</value>
+            <uncertainty type="relative">0</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?c" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">GRAVITATIONAL</name>
+            <name type="short">A_G</name>
+            <alternateName />
+            <description>universal gravitational constant</description>
+            <value system="MKS">6.67408e-11</value>
+            <value system="CGS">6.67408e-8</value>
+            <uncertainty type="relative">4.7e-5</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?G" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">PLANCK</name>
+            <name type="short">A_h</name>
+            <alternateName />
+            <description>Planck constant</description>
+            <value system="MKS">6.626070040e-34</value>
+            <value system="CGS">6.626070040e-27</value>
+            <uncertainty type="relative">1.2e-8</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?h" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">HBAR</name>
+            <name type="short">A_hbar</name>
+            <alternateName />
+            <description>Planck's constant /2pi</description>
+            <value system="MKS">1.054571800e-34</value>
+            <value system="CGS">1.054571800e-27</value>
+            <uncertainty type="relative">1.2e-8</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?hbar" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">STEFAN_BOLTZMANN</name>
+            <name type="short">A_sigma</name>
+            <alternateName />
+            <description>Stefan-Boltzmann constant</description>
+            <value system="MKS">5.670367e-8</value>
+            <value system="CGS">5.670367e-5</value>
+            <uncertainty type="relative">2.3e-6</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?sigma" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">PARSEC</name>
+            <name type="short">A_pc</name>
+            <alternateName />
+            <description>parsec</description>
+            <value system="MKS">3.08567758149e16</value>
+            <value system="CGS">3.08567758149e18</value>
+            <uncertainty type="relative">1e-11</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?pc" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">ASTRONOMICAL_UNIT</name>
+            <name type="short">A_AU</name>
+            <alternateName />
+            <description>astronomical unit</description>
+            <value system="MKS">149_597_870_700</value>
+            <value system="CGS">1.496e13</value>
+            <uncertainty type="relative">0</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?AU" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">SOLAR_MASS</name>
+            <name type="short">A_msun</name>
+            <alternateName />
+            <description>solar mass</description>
+            <value system="MKS">1.9885e30</value>
+            <value system="CGS">1.9885e33</value>
+            <uncertainty type="relative">5e-5</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?msun" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">LIGHT_YEAR</name>
+            <name type="short">A_ly</name>
+            <alternateName />
+            <description>light year</description>
+            <value system="MKS">9_460_730_472_580_800</value>
+            <value system="CGS">9.4607304725808e17</value>
+            <uncertainty type="relative">0</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?ly" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">SOLAR_LUMINOSITY</name>
+            <name type="short">A_Lsun</name>
+            <alternateName />
+            <description>solar luminosity</description>
+            <value system="MKS">3.846e26</value>
+            <value system="CGS">3.846e33</value>
+            <uncertainty type="relative">0.0003</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?Lsun" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">JANSKY</name>
+            <name type="short">A_Jy</name>
+            <alternateName />
+            <description>Jansky</description>
+            <value system="MKS">1e-26</value>
+            <value system="CGS">1e-23</value>
+            <uncertainty type="relative">0.1</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?Jy" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">RHO_C</name>
+            <name type="short">A_rhoc</name>
+            <alternateName />
+            <description>critical density /h^2</description>
+            <value system="MKS">1.8791e-26</value>
+            <value system="CGS">1.8791e-29</value>
+            <uncertainty type="relative">0.0001</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?rhoc" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">A_RAD</name>
+            <name type="short">A_arad</name>
+            <alternateName />
+            <description>radiation density constant</description>
+            <value system="MKS">7.565723e-16</value>
+            <value system="CGS">7.565723e-15</value>
+            <uncertainty type="relative">2.3e-6</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?arad" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">WIEN</name>
+            <name type="short">A_Wien</name>
+            <alternateName />
+            <description>Wien wavelength displacement law constant</description>
+            <value system="MKS">2.8977729e-3</value>
+            <value system="CGS">2.8977729e-1</value>
+            <uncertainty type="relative">5.7e-7</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?Wien" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">ALPHA</name>
+            <name type="short">A_alpha</name>
+            <alternateName />
+            <description>fine structure constant</description>
+            <value system="MKS">7.2973525664e-3</value>
+            <value system="CGS">7.2973525664e-3</value>
+            <uncertainty type="relative">2.3e-10</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?alpha" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">VACUUM_IMPEDANCE</name>
+            <name type="short">A_Z0</name>
+            <alternateName />
+            <description>characteristic impedance of vacuum</description>
+            <value>376.730313461</value>
+            <uncertainty type="relative">1e-50</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?Z0" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">YEAR</name>
+            <name type="short">A_yr</name>
+            <alternateName />
+            <description>year</description>
+            <value>31_557_600</value>
+            <uncertainty type="relative">0</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?yr" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">HUBBLE_TIME</name>
+            <name type="short">A_tH</name>
+            <alternateName />
+            <description>Hubble time *h</description>
+            <value>3.0853056e17</value>
+            <uncertainty type="relative">0.0000001</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?tH" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">CMB_TEMPERATURE</name>
+            <name type="short">A_TCMB</name>
+            <alternateName />
+            <description>cosmic microwave background temperature</description>
+            <value>2.725</value>
+            <uncertainty type="relative">0.0007</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?TCMB" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">SOLAR_V_MAG</name>
+            <name type="short">A_Vsun</name>
+            <alternateName />
+            <description>solar V magnitude</description>
+            <value>-26.74</value>
+            <uncertainty type="relative">0.0004</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?Vsun" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">SOLAR_V_ABS_MAG</name>
+            <name type="short">A_MVsun</name>
+            <alternateName />
+            <description>solar absolute V magnitude</description>
+            <value>4.83</value>
+            <uncertainty type="relative">0.002</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?MVsun" />
+            <categoryList>
+                <category>cosmology</category>
+            </categoryList>
+        </PhysicalConstant>
+    </items>
+</Collection>

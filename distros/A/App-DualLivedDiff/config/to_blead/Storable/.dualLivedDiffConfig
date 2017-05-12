@@ -1,0 +1,10 @@
+---
+exclude-regexes:
+  - '^(?:\.?/)?t/Test/'
+  - '^(?:\.?/)?META.yml$'
+  - '^(?:\.?/)?MANIFEST$'
+  - '^(?:\.?/)?ppport\.h$'
+base-path-in-blead: ext/Storable
+dirs-recursive:
+  .: .
+

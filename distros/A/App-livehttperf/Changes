@@ -1,0 +1,14 @@
+Revision history for App-livehttperf
+
+0.03   2012-05-10 22:49:35
+    Start the clock at the beggining of run_tests()
+    Remove limit of parsed records
+
+0.02   2012-05-09 22:06:09
+    Log response outside of eval
+    Fix references to $VERSION
+    Fix option parsing check
+
+0.01        Thu May  3 00:41:04 2012
+            First version
+

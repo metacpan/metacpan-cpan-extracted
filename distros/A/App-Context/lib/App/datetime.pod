@@ -1,0 +1,267 @@
+#!perl -w
+# run this document through perl to check its syntax
+use Pod::Checker;
+podchecker(\*DATA);
+__END__
+
+=head1 NAME
+
+App::datetime - Date and Time Considerations
+
+=head1 INTRODUCTION
+
+Most Enterprise development includes processing of dates and times.
+There are many date and time modules on CPAN, and choosing the right
+one can be confusing.
+There are no special perl data types for dates and times,
+so some direction is needed.
+
+The short answer is that we recommend the following
+for most common date and time operations.
+
+ Class::Date
+ Class::Date::Rel
+
+However, other modules are appropriate in certain circumstances.
+So for the longer answer, read on.
+
+=head1 PERL 5 LANGUAGE SUPPORT
+
+The native Perl 5 datetime type is an integer.
+It is not different from other integers in any way other than
+how it is used.
+It represents the number of non-leap seconds since 
+January 1, 1970 UTC (the "Epoch" at GMT).  The following internal
+Perl function gets the current time.
+
+ $current_time = time;
+ $current_time = time();
+
+Other Perl functions that return this "datetime" integer are
+
+ ($dev, $ino, $mode, $nlink, $uid, $gid, $redev, $size,
+  $atime, $mtime, $ctime, $blksize, $blocks) = stat($filename);
+ ($dev, $ino, $mode, $nlink, $uid, $gid, $redev, $size,
+  $atime, $mtime, $ctime, $blksize, $blocks) = lstat($filename);
+
+where $atime, $mtime, and $ctime are the same kind of integers,
+representing the access time, modification time, and change time
+of a file.
+
+These $time values may be converted to human-readable
+form using the following internal perl functions.
+(See the "perlfunc" man page for more information.)
+
+ ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = gmtime($time);
+ ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($time);
+
+Furthermore, the current time zone needs to be accessed through
+the environment variable, "TZ".
+
+ $timezone = $ENV{TZ};
+
+This leaves the Perl developer with lots of work to do in order to
+process dates.
+
+=over
+
+=item * Formatting dates for output
+
+=item * Parsing dates on input
+
+=item * Comparing dates
+
+=item * Date math (addition, subtraction)
+
+=item * Other calendar-specific functions (i.e. holidays, days of week, etc)
+
+=back
+
+Numerous modules have been posted to CPAN allowing the Perl developer
+to accomplish these tasks.
+However, they have pros and cons related to the
+following features.
+
+=over
+
+=item * Internationalization
+
+=item * Speed
+
+=item * Portability
+
+=item * Ranges of Dates Supported
+
+=item * Compliance with Perl Styleguide (function naming)
+
+=back
+
+=head1 FUNCTIONAL SOLUTIONS
+
+Modules exist to allow you to process integers like those
+returned by the time() function.  They do not create "date" objects
+with methods.  They simply provide functions that allow you do the
+required tasks. 
+
+=head2 Date::Parse, Date::Format
+
+ http://search.cpan.org/search?module=Date::Parse
+ http://search.cpan.org/search?module=Date::Format
+
+
+Very simple, clean functions for parsing text dates and formatting
+them for output in a variety of ways.  The fact that these modules
+work with integers implies that you can do date comparisons and
+some degree of date math simply ($tomorrow = $today + 24*60*60;).
+(Beware of date math across days that change to or from daylight
+saving time.)
+
+ * Parses many different formats of dates
+ * Flexible formatting using POSIX strftime() format specifiers.
+ * Limited internationalization support.
+ * Limited date math support.
+ * Unknown support for dates outside [1970-2038]
+
+=head2 Date::Calc
+
+ http://search.cpan.org/search?module=Date::Calc
+
+Powerful, fast manipulation of dates.
+
+ * No explicit support for parsing or formatting dates.
+ * Non-perlstyle function names (internal caps, as in Add_Delta_YMD())
+ * Powerful, fast support for date math
+ * Support for all A.D. dates [1-9999]
+
+=head2 Date::Manip
+
+ http://search.cpan.org/search?module=Date::Manip
+
+The most powerful and slowest (all perl, large)
+of date manipulation packages.
+Includes many obscure calendar-related functions.
+
+ * Powerful parsing many different formats of dates
+ * No explicit support for or formatting dates.
+ * Non-perlstyle function names (internal caps, as in ParseDate())
+ * Powerful support for date math (but slower than Date::Calc)
+ * Support for all A.D. dates [1-9999]
+ * Function support for holidays, business days, etc.
+
+=head2 HTTP::Date
+
+ http://search.cpan.org/search?module=HTTP::Date
+
+This module is part of the larger libwww-perl bundle.
+It seems to parse a wider variety of dates than Date::Parse,
+but it is focused on those date formats which occur in HTTP headers.
+It only formats dates in the format preferred by HTTP headers.
+
+=head2 Time::HiRes
+
+ http://search.cpan.org/search?module=Time::HiRes
+
+Completely separate from the modules above, which deal with dates,
+there is sometimes a need to deal with times at the sub-second
+level.  Time::HiRes works in seconds and milliseconds.
+It is particularly useful in timing sections of code.
+
+=head1 OBJECT-ORIENTED SOLUTIONS
+
+An alternative to the functional solutions described above is an
+object-oriented solution that involves creating and manipulating
+true "datetime" objects.
+
+=head2 DateTime
+
+ http://datetime.perl.org/
+ http://datetime.perl.org/modules.html
+ http://search.cpan.org/~drolsky/DateTime/
+ http://search.cpan.org/~drolsky/DateTime/lib/DateTime.pm
+
+The latest significant entrant (and quite promising) in the perl
+date/time area is Datetime.pm.  It attempts to be the definitive
+date/time module for perl, building on the work of Time::Piece
+and Class::Date. 
+
+Furthermore, the DateTime module is not alone.  Rather, it is
+part of a project where many date/time developers collaborate
+for an entire framework of date/time modules.
+
+ * OO interface
+ * Parsing of dates provided by DateTime::Format::* modules
+ * Flexible formatting using POSIX strftime() format specifiers.
+   (formatting done automatically during object stringification)
+ * Limited internationalization support.
+ * Good date math support.
+ * Unknown support for dates outside [1970-2038]
+ * Moderate support on Win32 platform.
+
+=head2 Time::Piece [Time::Object, Time::Seconds]
+
+ http://search.cpan.org/search?module=Time::Object
+
+On the perl5-porters mailing
+Larry Wall described some thoughts on how dates and times might become part
+of the Perl language and sketched out an object-oriented interface.
+
+ http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2000-01/msg00241.html
+
+This interface was implemented in the Time::Piece package.
+
+ * OO interface
+ * No explicit support for parsing dates.
+ * Flexible formatting using POSIX strftime() format specifiers.
+ * Limited internationalization support.
+ * Limited date math support.
+ * Unknown support for dates outside [1970-2038]
+ * Unsupported on Win32 platform.
+
+=head2 Class::Date, Class::Date::Rel
+
+ http://search.cpan.org/search?module=Class::Date
+
+This class started with Time::Object and was enhanced.
+
+ * Some native support for parsing dates.
+ * Uses Date::Parse internally for extended date parsing
+ * Better date math support.
+ * Supported on Win32 platform.
+
+=head2 Date::Simple
+
+ http://search.cpan.org/search?module=Date::Simple
+
+This is a simple, object-oriented class that deals with
+dates only (not times at all).
+
+=head2 Date::Calc::Object
+
+ http://search.cpan.org/search?module=Date::Calc::Object
+
+Date::Calc has an object-oriented interface.
+
+=head1 FURTHER RESEARCH
+
+For further research on Date and Time modules in Perl, you can
+subscribe to the datetime@perl.org mailing list.
+
+ http://lists.perl.org/showlist.cgi?name=datetime
+
+You can read up on future directions
+for Perl and date/time support here.
+
+ http://nntp.perl.org/group/perl.perl6.language.datetime
+
+You can also start up the CPAN shell and look for other
+Date and Time modules.
+
+ perl -MCPAN -e shell
+ i /Date/
+ i /Time/
+
+Be warned. You may likely be overwhelmed. (That's why this
+document was written.)
+
+=cut
+

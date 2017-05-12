@@ -1,0 +1,14 @@
+Changes
+lib/Algorithm/Diff.pm       Algorithm::Diff perl module
+lib/Algorithm/DiffOld.pm    Algorithm::Diff perl module with old behavior
+Makefile.PL
+MANIFEST
+README
+t/base.t                    Basic test script
+t/oo.t                      OO interface test script
+cdiff.pl                    Context diff utility
+diff.pl                     Simple Unix diff utility written in Perl
+diffnew.pl                  Full-featured Unix diff utility written in Perl
+htmldiff.pl                 Sample using traverse_sequences
+META.yml                    Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

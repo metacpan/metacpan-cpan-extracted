@@ -1,0 +1,7 @@
+Revision history for Perl extension AnyEvent::DBI::Abstract::Limit
+
+0.02    Sun Jun 12 12:56:00 2011
+        - publish to cpan
+
+0.01    Tue Sep  7 19:33:22 2010
+        - original version

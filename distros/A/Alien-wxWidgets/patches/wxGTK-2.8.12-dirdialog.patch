@@ -1,0 +1,39 @@
+Index: /wxWidgets/branches/WX_2_8_BRANCH/src/gtk/dirdlg.cpp
+===================================================================
+--- /wxWidgets/branches/WX_2_8_BRANCH/src/gtk/dirdlg.cpp (revision 63600)
++++ /wxWidgets/branches/WX_2_8_BRANCH/src/gtk/dirdlg.cpp (revision 72781)
+@@ -96,4 +96,5 @@
+                         const wxPoint& pos, const wxSize& sz,
+                         const wxString& name)
++    : m_selectedDirectory(defaultPath)
+ {
+     if (!gtk_check_version(2,4,0))
+@@ -153,5 +154,9 @@
+ {
+     if (!gtk_check_version(2,4,0))
++    {
++        wxGtkString str(gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(m_widget)));
++        m_selectedDirectory = wxString::FromUTF8(str);
+         EndDialog(wxID_OK);
++    }
+     else
+         wxGenericDirDialog::OnOK( event );
+@@ -200,6 +205,5 @@
+     if (!gtk_check_version(2,4,0))
+     {
+-        wxGtkString str(gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(m_widget)));
+-        return wxString::FromUTF8(str);
++        return m_selectedDirectory;
+     }
+ 
+Index: /wxWidgets/branches/WX_2_8_BRANCH/include/wx/gtk/dirdlg.h
+===================================================================
+--- /wxWidgets/branches/WX_2_8_BRANCH/include/wx/gtk/dirdlg.h (revision 39402)
++++ /wxWidgets/branches/WX_2_8_BRANCH/include/wx/gtk/dirdlg.h (revision 72781)
+@@ -51,4 +51,6 @@
+ 
+ private:
++    wxString m_selectedDirectory;
++
+     DECLARE_DYNAMIC_CLASS(wxDirDialog)
+     DECLARE_EVENT_TABLE()

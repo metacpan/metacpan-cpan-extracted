@@ -1,0 +1,22 @@
+#
+# = Class: [% name %]::install
+#
+# Class to install [% package %].
+#
+# == Parameters
+# <tt>ensure</tt>:: Ensure that the package is either <code>present</code> or
+#                   <code>absent</code>.
+# <tt>package</tt>:: Name of the package.
+#
+class [% name %]::install (
+    $ensure  = hiera('[% name %]::install::ensure', 'present'),
+    $package = hiera('[% name %]::install::package', $[% nameparts.0 %]::params::[% subnamepartsjoined %]_package),
+) {
+    if $package {
+        package {
+            $package:
+                ensure => $ensure,
+            ;
+        }
+    }
+}

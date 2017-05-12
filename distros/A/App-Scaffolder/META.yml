@@ -1,0 +1,46 @@
+---
+abstract: 'Application for scaffolding using templates'
+author:
+  - 'Manfred Stock <mstock@cpan.org>'
+build_requires:
+  App::Cmd::Tester: 0
+  Directory::Scratch: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::Class: 0
+  Test::Exception: 0
+  Test::File: 0
+  Test::File::ShareDir: 0
+  Test::More: 0.88
+  parent: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Scaffolder
+no_index:
+  file:
+    - perlcritic.rc
+requires:
+  App::Cmd::Setup: 0
+  Carp: 0
+  Config: 0
+  File::HomeDir: 0.93
+  File::ShareDir: 0
+  File::Spec: 0
+  MRO::Compat: 0
+  Path::Class: 0.17
+  Path::Class::Dir: 0
+  Path::Class::File: 0
+  Scalar::Util: 0
+  Template: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/mstock/App-Scaffolder.git
+version: 0.002000

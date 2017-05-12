@@ -1,0 +1,117 @@
+  <td colspan="2">
+
+<div class="middle">
+
+<form action="add_relationship_2<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+<input type="hidden" name="schema" value="<% $s->name %>">
+<input type="hidden" name="table_from" value="<% $t_from->name %>">
+<input type="hidden" name="table_to" value="<% $t_to->name %>">
+<table width="100%" cellspacing="5">
+ <tr valign="top">
+  <td>
+   <h3>Table: <% $t_from->name %></h3>
+  </td>
+  <td>
+   <h3>Cardinality</h3>
+  </td>
+  <td>
+   <h3>Table: <% $t_to->name %></h3>
+  </td>
+ </tr>
+ <tr valign="top">
+  <td>
+% foreach my $c (@columns_from) {
+   <input type="hidden" name="columns_from" value="<% $c %>">
+   <% $c %><br>
+% }
+   <select name="columns_from">
+    <option value="">Let Alzabo choose</option>
+% foreach my $c ($t_from->columns) {
+%   next if grep { $_ eq $c->name } @columns_from;
+    <option value="<% $c->name %>"<% eval { $t_to->column( $c->name ) } ? ' selected' : '' %>><% $c->name %></option>
+% }
+   </select>
+   <br>
+   Is dependent on <% $t_to->name %>?
+   <input type="checkbox" name="from_is_dependent" value="1" <% $from_is_dependent && 'checked' %>>
+  </td>
+  <td nowrap="1">
+   <select name="cardinality_from">
+% foreach my $cf (@cardinality) {
+    <option value="<% $cf   %>"<% $cardinality_from eq $cf && ' selected' %>><% $cf %></option>
+% }
+   </select>
+  ..
+   <select name="cardinality_to">
+% foreach my $ct (@cardinality) {
+    <option value="<% $ct %>"<% $cardinality_to eq $ct && ' selected' %>><% $ct %></option>
+% }
+   </select>
+  </td>
+  <td>
+% foreach my $c (@columns_to) {
+   <input type="hidden" name="columns_to" value="<% $c %>">
+   <% $c %><br>
+% }
+   <select name="columns_to">
+    <option value="">Let Alzabo choose</option>
+% foreach my $c ($t_to->columns) {
+%   next if grep { $_ eq $c->name } @columns_to;
+    <option value="<% $c->name %>"><% $c->name %></option>
+% }
+   </select>
+   <br>
+   Is dependent on <% $t_from->name %>?
+   <input type="checkbox" name="to_is_dependent" value="1" <% $to_is_dependent && 'checked' %>>
+  </td>
+ </tr>
+ <tr valign="top">
+  <td colspan="3">Comment:</td>
+ </tr>
+ <tr valign="top">
+  <td colspan="3">
+   <textarea name="comment" rows="4" cols="40"></textarea>
+  </td>
+ </tr>
+% if ( @columns_from < $t_from->columns - 1 && @columns_to < $t_to->columns - 1) {
+ <tr valign="top">
+  <td colspan="3">
+   <input type="submit" name="more" value="Add More Columns">
+  </td>
+ </tr>
+% }
+ <tr valign="top">
+  <td colspan="3">
+   <input type="submit" name="submit" value="Submit">
+  </td>
+ </tr>
+</table> 
+</form>
+
+  </td>
+
+<%args>
+$s
+$table_from
+$table_to
+$cardinality_from => '0'
+$cardinality_to => '1'
+$from_is_dependent => 1
+$to_is_dependent => 0
+@columns_from => ()
+@columns_to => ()
+</%args>
+
+<%init>
+my ($t_from, $t_to);
+eval
+{
+    $t_from = $s->table($table_from);
+    $t_to = $s->table($table_to);
+};
+
+@columns_from = () unless grep { length } @columns_from;
+@columns_to   = () unless grep { length } @columns_to;
+
+my @cardinality = qw(1 n);
+</%init>

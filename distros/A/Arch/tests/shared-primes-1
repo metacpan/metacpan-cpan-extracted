@@ -1,0 +1,84 @@
+#!/usr/bin/perl -w
+
+# The script calculates primes using Arch::SharedIndex package.
+# It creates multiple processes that all modify the same index.
+# Some quirks are created on purpose to fully test the package.
+
+use FindBin qw($Bin);
+use lib "$Bin/../perllib";
+
+my $auto_test = !@ARGV;
+my $max_multiplier = shift || 10;
+my $max_prime = $max_multiplier * $max_multiplier;
+
+use Test::More tests => @ARGV? 2: 9;
+use_ok("Arch::SharedIndex");
+
+my $file_name = "/tmp/shared-primes-1-$$";
+my $shared_index = Arch::SharedIndex->new(
+	max_size => $max_prime,
+	can_create => 1,
+	file => $file_name,
+);
+is(ref($shared_index), 'Arch::SharedIndex', "create index to calculate primes");
+
+# populate the index with all candidates (value 1 means prime)
+$shared_index->store(map { $_ => 0 } 2 .. $max_prime);
+$shared_index->store(map { $_ => 1 } 2 .. $max_prime);
+
+for (my $num = 3; $num <= $max_multiplier; $num += 2) {
+	my $is_parent = fork();
+	next if $is_parent;
+	die "Can't fork: $!\n" unless defined $is_parent;
+
+	# in child, dismiss all multiples of $num
+	my %multiples = map { $_ * $num => 1 } 2 .. int($max_prime / $num);
+
+	# delete all *5 numbers from the index
+	if ($num == 5) {
+		$shared_index->filter(sub { $multiples{$_[0]} });
+		exit 0;
+	}
+	$shared_index->update(0, sub { $multiples{$_[0]} });
+	exit 0;
+}
+
+# delete all even numbers from the index
+$shared_index->delete(map { $_ * 2 } 2 .. int($max_prime / 2));
+
+# wait for children
+while (wait() > 0) {}
+
+my @keys = $shared_index->keys;
+my @values1 = $shared_index->values;
+my @values2 = $shared_index->fetch(@keys);
+my @primes = sort { $a <=> $b } $shared_index->grep;
+
+my $num_keys = @keys;
+my $num_values1 = @values1;
+my $num_values2 = @values2;
+my $values1_str = join('', @values1);
+my $values2_str = join('', @values2);
+my $num_primes = @primes;
+my $primes_str = join(', ', @primes);
+
+if ($auto_test) {
+	my $exp_num_keys = 41;
+	my $exp_values_str = "11110111101011010111001011010110101010010";
+	my $exp_num_primes = 25;
+	my $exp_primes_str = "2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97";
+	is($num_keys, $exp_num_keys, "verify num_keys (odd non *5 numbers)");
+	is($num_values1, $exp_num_keys, "verify number of values (1)");
+	is($values1_str, $exp_values_str, "verify values (1)");
+	is($num_values1, $exp_num_keys, "verify number of values (2)");
+	is($values2_str, $exp_values_str, "verify values (2)");
+	is($num_primes, $exp_num_primes, "verify number of primes");
+	is($primes_str, $exp_primes_str, "verify primes");
+} else {
+	printf "Number of keys (odd non *5 numbers): %d\n", $num_keys;
+	printf "Values (1-st): %d - %s\n", $num_values1, $values1_str;
+	printf "Values (2-nd): %d - %s\n", $num_values2, $values2_str;
+	printf "Primes: %d - %s\n", $num_primes, $primes_str;
+}
+
+unlink($file_name);

@@ -1,0 +1,28 @@
+html, body{
+	background-color: black;
+	color: white;
+}
+
+table, tr, td, th{
+	border-collapse: collapse;
+	text-align: center;
+	border: thin dotted white;
+	padding: 0.1em;
+}
+
+table{
+	width: 98%;
+	margin: 1%
+}
+
+a:link, a:visited{
+	color: white;
+}
+
+tbody > tr:nth-child(odd){
+	background-color: #222;
+}
+
+#player {
+	text-align: center;
+}

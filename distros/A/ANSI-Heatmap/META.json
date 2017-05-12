@@ -1,0 +1,50 @@
+{
+   "abstract" : "Render heatmaps to your terminal",
+   "author" : [
+      "Richard Harris <richardjharris@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ANSI-Heatmap",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/richardjharris/ANSI-Heatmap/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/richardjharris/ANSI-Heatmap"
+      }
+   },
+   "version" : "0.3"
+}

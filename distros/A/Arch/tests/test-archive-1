@@ -1,0 +1,76 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Test::Archive methods.
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More;
+use Arch::Util qw(is_tla_functional);
+
+plan skip_all => "No functional arch backend" unless is_tla_functional;
+plan tests => 17;
+
+use_ok("Arch::Test::Framework");
+
+my $fw = Arch::Test::Framework->new();
+isa_ok($fw, 'Arch::Test::Framework', 'environment');
+
+my $ar1 = $fw->make_archive('ex@amp.le');
+
+my $name_str  = 'cat--bra--ver';
+my @name_list = qw(cat bra ver);
+
+ok(
+	eq_array(
+		[$ar1->split_arch_name($name_str, 4)],
+		[@name_list]
+	),
+	'split_arch_name works'
+);
+
+is(
+	$ar1->join_arch_name(@name_list),
+	$name_str,
+	'join_arch_name works'
+);
+
+my $cat = $ar1->make_category();
+my $bra = $ar1->make_branch();
+my $ver = $ar1->make_version();
+
+my @cat = $ar1->split_arch_name($cat, 1);
+my @bra = $ar1->split_arch_name($bra, 2);
+my @ver = $ar1->split_arch_name($ver, 3);
+
+is(scalar @cat, 1,                 'make_category creates category');
+is(scalar @bra, 2,                 'make_branch creates branch');
+is(scalar @ver, 3,                 'make_version creates version');
+
+$bra = $ar1->make_branch($cat);
+$ver = $ar1->make_version($bra);
+
+@bra = $ar1->split_arch_name($bra, 2);
+@ver = $ar1->split_arch_name($ver, 3);
+
+is(scalar @bra, 2,                 'make_branch creates branch with prefix');
+is(scalar @ver, 3,                 'make_version creates version with prefix');
+
+ok(eq_array([@bra[0..0]], [@cat]), 'branch is in category');
+ok(eq_array([@ver[0..1]], [@bra]), 'version is in branch');
+
+my $cat2 = $ar1->make_category();
+my $bra2 = $ar1->make_branch($cat);
+my $ver2 = $ar1->make_version($bra);
+
+isnt($cat, $cat2, 'make_category generates unique identifier');
+isnt($bra, $bra2, 'make_branch generates unique identifier');
+isnt($ver, $ver2, 'make_version generates unique identifier');
+
+my $cat3 = $ar1->make_category('C');
+my $bra3 = $ar1->make_branch('C--B');
+my $ver3 = $ar1->make_version('C--B--0');
+
+is($cat3, 'ex@amp.le/C',       'make_category respects parameter');
+is($bra3, 'ex@amp.le/C--B',    'make_branch respects parameter');
+is($ver3, 'ex@amp.le/C--B--0', 'make_version respects parameter');

@@ -1,0 +1,6 @@
+ 
+nadim@naquadim Arch (master)$ ./Build ; perl -Mblib scripts/ra_show_flat.pl --master_categories_file scripts/templates/master_categories.pl --master_template_file scripts/templates/master_template.pl --include_not_found --include_statistics --show_abstraction_level --include_description_data --include_categories --include_type requirement --include_loaded_from --keep_abstraction_level architecture --keep_abstraction_level system test_requirements test_requirements2 > xxx.html
+
+nadim@naquadim Arch (master)$ ./Build ; perl -Mblib scripts/ra_show.pl --include_not_found --include_statistics --format text  --show_abstraction_level --include_description_data --include_categories --include_type requirement --include_loaded_from --master_categories_file scripts/templates/master_categories.pl --master_template_file scripts/templates/master_template.pl test_requirements test_requirements2             
+
+

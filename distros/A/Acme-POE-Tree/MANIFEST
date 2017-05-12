@@ -1,0 +1,7 @@
+CHANGES
+lib/Acme/POE/Tree.pm
+Makefile.PL
+MANIFEST
+README
+t/01_basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

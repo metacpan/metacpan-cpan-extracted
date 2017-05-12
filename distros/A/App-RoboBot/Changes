@@ -1,0 +1,32 @@
+Revision history for App-RoboBot
+
+4.004     2017-03-19
+  - Added karma-losers to social.karma module.
+  - Fix bot.logging to properly log outgoing messages even for non-channel
+    messages or when channel logging is disabled (a slight misnomer here, since
+    channel logging refers to whether chat history is available to members of
+    the channel, as opposed to whether Log4Perl facilities receive the events).
+  - Fix a couple missing dependencies by manually listing them in dist.ini.
+  - Modified (help <function>) use to use RoboBot::Doc instead of plugin
+    metadata to pave way for more consistent and easily maintained docs.
+  - Added clear-skills function to social.skills module.
+  - Added bot.irc module with irc-kick and irc-mode functions.
+  - Removed api.taskman module.
+
+4.003     2017-01-27
+  - Introduction of Log4perl logging abstraction and a plethora of logging
+    statements sprinkled throughout codebase.
+  - Updated example configuration with Log4Perl sample.
+  - Additional command line options for bin/robobot (version and location of
+    application share/ directory).
+  - Documentation additions.
+
+4.002     2016-12-11
+  - Corrected a dependency mistake that prevented installation for many
+    common environments.
+  - Added a sample Vagrantfile to the distribution's share/ directory.
+  - Significant additions to documentation.
+  - Strict/warnings pragmas added to test mocking. <Mohammad S. Anwar>
+
+4.001     2016-12-01
+  - Initial public CPAN release.

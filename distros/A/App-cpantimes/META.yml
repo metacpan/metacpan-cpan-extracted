@@ -1,0 +1,27 @@
+---
+abstract: 'Get, unpack, build, install and report on modules from CPAN.'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-cpantimes
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::Install: 1.46
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.36
+resources:
+  bugtracker: https://rt.cpan.org/Ticket/Create.html?Queue=App-cpantimes
+  repository: https://bitbucket.org/tobyink/p5-app-cpantimes
+version: 1.502101

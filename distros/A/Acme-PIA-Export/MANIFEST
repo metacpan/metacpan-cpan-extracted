@@ -1,0 +1,10 @@
+Export.pm			Module file
+INSTALL				Installation documentation
+Makefile.PL			Makefile generator
+MANIFEST			This list of files
+README
+install.cmd			Simple shortcut batch file to make & install the module on Win32
+install.sh			Simple shortcut bash file to make & install the module on Unix/Linux/cygwin
+Acme-PIA-Export-0.019.html	HTML documentation for this module generated with pod2html
+t/001_load.t			Test if module can be loaded
+META.yml                                 Module meta-data (added by MakeMaker)

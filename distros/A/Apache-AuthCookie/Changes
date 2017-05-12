@@ -1,0 +1,457 @@
+Revision history for Apache::AuthCookie
+
+3.26  2016-09-30
+   - remove unused module Apache::AuthCookie::Autobox from dist
+   - remove CGI.pm dependency.  CGI.pm has been removed from perl core, which
+     was the primary reason we used it in the first place.  Replaced with
+     dependency on lighter weight set of three modules:
+
+        * HTTP::Body
+        * WWW::Form::UrlEncoded
+        * Hash::MultiValue
+
+     Also recommended (but not required) is WWW::Form::UrlEncoded::XS
+   - Add optional support for charset encoding.  If you have something like
+
+        PerlSetVar MyAuthNameEncoding UTF-8
+
+     Then AuthCookie with now automatically decode parameters using the given
+     encoding now. AuthCookie params() data will be decoded automatically if
+     this is on.  See details in AuthCookie module documentation.  In addition
+     r->user will be encoded (using byte semantics) using this encoding. 
+
+     ***** IMPORTANT *****
+     If you turn this on, this could break your code.  r->user() will now be
+     byte encoded using the given encoding.  If you use usernames that contain
+     non-ascii characters you either need to use decoded_user(), or decode
+     r->user() yourself in your subclasses.
+
+     See the AuthCookie docs for more details.
+   - add optional support for decoding httpd.conf requires directives. This is
+     enabled with a RequiresEncoding setting:
+
+        PerlSetVar MyAuthNameRequiresEncoding UTF-8
+
+     Then decoded_requires($r) will return the decoded value of $r->requires
+     You only need this if you have non-ascii characters in your requires
+     directives such as:
+
+        Requires user programmør
+
+   - add decoded_user($r) method to get the value of r->user decoded using
+     character semantics instead of bytes.  Due to the fact that r->user is a C
+     API method we cannot get character semantics on r->user directly.  If no
+     Encoding directive is in effect, then this is the same as r->user.
+   - add encoding($r): string which returns the value of the Encoding directive
+     that is in effect for the current request.
+
+3.25  2016-08-30
+   - 2.4: fix POD typo and add missing ABSTRACT
+   - reorganize real.t tests into subtests
+   - make sure signature test ignores generated files
+   - remove autobox dependency
+   - fix authenticate so that r->user is copied from r->main on subrequests.
+     Previously this was only done for internal redirects (r->prev is defined).
+     This fixes DirectoryIndexes on AuthCookie enabled directories under apache
+     2.4.
+
+3.24  2016-01-13
+   - Update Apache 2.4 README, flesh out guts of Authz Provider notes.
+   - Improve Apache 2.4 README's AuthzProvider documentation
+   - Add POD to Apache2_4::AuthCookie
+   - Add FAQ to Apache2_4::AuthCookie documenation
+   - 2.4: document that PerlAddAuthzProvider is only needed for *custom* Requires directives.
+   - 2.4: make authz_handler recognize multiple usernames in the directive like
+     mod_authz_user does.
+   - add test case for internal authz_handler
+   - explicitly require Apache::Test 1.39 so that APACHE2_4 defines are set
+
+3.23  2015-09-10
+   - Improve CGI mode param() handling to avoi CGI.pm's "param() called in list context" warning.
+   - add support for Apache 2.4 via mod_perl 1.09.
+     ***** IMPORTANT *****
+     Apache 2.4 has a *VERY* different API for authentication.  You will need
+     to port your subclass and configuration over to the Apache 2.4 API in
+     order to use Apache 2.4!  Please be sure to read README.apache-2.4.pod for
+     porting instructions!
+
+3.22  2014-05-07
+
+3.21  2014-05-07
+   - Bad release - deleted
+
+3.20  2013-12-09
+   - login_form: return OK for mobile IE 10, which also ignores content for
+     FORBIDDEN response.
+   - test .pl registry scripts: do not try to load mod_perl.pm
+   - escape html tags in destination.
+   - fix abstract in FAQ pod.
+
+3.19  2012-12-28
+   - split out CGI data handling into ::AuthCookie::Params modules
+   - use Apache::Request/Apache2::Request from libapreq if available. Otherwise,
+     fall back to CGI.pm for handling CGI data.
+   - improve "removed cookie" debug log message
+   - add dependencies: autobox, Class::Load
+   - allow username to be '0'
+   - login_form: return OK for SymbianOS, which ignores content for FORBIDDEN responses.
+   - add login_form_status() to override HTTP status returned by login form
+   - recognize_user: return DECLINED if user is not recognized
+
+3.18  2011-01-24
+   - remove 3.17's test skip hacks, and bump Apache::Test prerequisite to v1.35
+     which fixes this issue.
+   - fix MANIFEST.SKIP to ignore generated t/conf/mime.types
+   - remove dist.ini, weaver.ini from dists
+   - fixed t/real.t to use correct -withtestmore import syntax
+   - rename sample authcookie handlers to Sample::Apache and Sample::Apache2
+     namespaces
+
+3.17  2011-01-19
+   - skip the test suite if running as root.  Apache::Test 1.34 fails the test
+     suite if running as root instead of skipping it.  By skipping, AuthCookie can
+     be installed via CPAN.pm as root.
+
+3.16  2011-01-19
+   - require Apache::Test 1.32 - fixes ubuntu build issue
+   - remove mod_perl/mod_perl2 related prereq's from META.yml.  The correct mod
+     perl version is not known until Makefile.PL is run.  CPAN.pm should not
+     try to install either one until it is known which one is appropriate.
+     (RT 64926)
+
+3.15  2010-08-27
+   - enable Dist::Zilla Manifest plugin
+   - add FAQ
+   - add FAQ entry on how to protect an entire site/document root
+   - recognize_user: return DECLINED if user is already set
+   - refactor P3P header generation into send_p3p($r) so subclasses can overload it
+
+3.14  2010-04-12
+   - MP2: doc updates: remove beta warnings, change Apache::AuthCookie to
+     Apache2::Authcookie where appopriate.
+   - docs: change my email to my cpan address
+   - docs: remove POST limitations reference (handled by POST to GET conversion)
+   - sign dist with Module::Signature
+   - add signature test
+   - MP1: perltidy Apache::AuthCookie sources.
+   - update mod_perl2 prereq version (still 2.0.0 RC5, but version number was
+     incorrect in Makefile.PL)
+   - use Dist::Zilla for building the dist
+
+3.13  2010-04-12
+   - removed: bad dist
+
+Version: 3.12
+   - Makefile.PL If no mod_perl version is found, just require mod_perl2.
+     This makes sure that CPAN testers will get the right dependencies.
+     way. Also set up PREREQ_PM properly for mod_perl version 1.
+
+Version: 3.11
+   - Fix tiny pod doc error.
+   - Escape CR and LF in 'destination' field to prevent possible XSS attack
+     [Steffen Schwigon]
+
+Version: 3.10
+   - Bug Fix: when copying user from prev request, check that $r->prev
+     is defined, not just that $r->is_initial_request is true.
+
+Version: 3.09
+   - POD doc fixes.
+   - MP2: remove _check_request_req() - this was only necessary when
+     running under both MP1 and MP2.  Package name change eliminates the
+     need for this.
+   - test suite converted to Test::More style test suites.
+   - descriptive test descriptions added
+   - make login() stash credentials in $r->pnotes("${AuthName}Creds") so
+     that the login form can access the user-supplied credentials if the
+     login fails.
+   - bug fix: use of Apache2::URI::unescape_url() does not handle
+     '+' to ' ' conversion.  This caused problems for credentials
+     that contain spaces.
+   - MP2: remove mod_perl features from "use mod_perl2" line. This is 
+     no longer supported by mod_perl2.
+   - MP2: _get_form_data() - switch to CGI.pm to handle form data (fixes
+     several form data handling bugs)
+   - In a subrequest, copy $r->prev->user to $r->user (or r->connection->user 
+     for MP1).
+   - remove Apache2::AuthCookie::Util - no longer necessary
+   - multi-valued form fields are now handled properly in POST -> GET conversion
+   - MP2: require CGI.pm 3.12 or later
+
+Version: 3.08
+   - fix "authorize user" error log that was missing a debug level check
+     (thanks Barry)
+   - fix test cases 3, 6, 18 for Win32
+   - clean up t/real.t
+
+Version: 3.07
+ *** mod_perl2 users: THIS RELEASE IS INCOMPATIBLE WITH PAST RELEASES    ***
+ *** If you are running mod_perl2, you must update to at least           ***
+ *** mod_perl 2.0.0 RC5.  The mod_perl2 version of AuthCookie has been   ***
+ *** renamed to Apache2::AuthCookie                                      ***
+  ** MP2: RENAME AuthCookie.pm.mp2 to Apache2::AuthCookie.
+   - MP2: Update module, and tests for mod_perl 2.0.0 RC5.  mod_perl2 users
+     MUST use Apache2::AuthCookie now.
+   - Require Apache::Test 1.22
+   - Add support for ${auth_name}SessionTimeout configuration paramter
+     which will re-issue the ticket with the expires parameter set to the
+     value of this configuration setting for each request.  This is useful for
+     idle-timeout.
+   - POD fixes.
+   - MP2: fix uninitialized warnings if no POST/GET data (RT 11371)
+   - make sure recognize_user() returns an Apache constant in all cases.
+     Returns DECLINED in cases where we were returning undef before.
+     (Thanks Vivek)
+   - Add support for MS HttpOnly cookie property.
+
+Version: 3.06
+  ** BUG FIX: AuthNameSatisfy (Any|All) directives were broken. AuthCookie
+     was using AuthCookieSatisfy rather than ${auth_name}Satisfy.  If you
+     used this feature and had an "AuthCookieSatisfy" directive in your
+     config file, you MUST change this to ${auth_name}Satisfy.
+     E.g.: "WhateverSatisfy All"
+   - created better test cases for AuthNameSatisfy directives.
+   - when redirecting, set Location with headers_out() not err_headers_out().
+     apache prefers Location in headers_out, even if the status code is not
+     200.
+   - MP2: Apache::unescape_url() -> Apache::URI::unescape_url()
+   - check for mod_perl 1.9913 or later for Apache::URI (Frederick Moyer)
+   - Remove set status in login.pl which caused malformed custom error
+     document (Frederick Moyer)
+   - Add support for ${auth_name}CookieName to change the name of the cookie
+     used for each auth name.  Default remains ${auth_name}_${auth_type} if
+     not set.
+   - make some debug log_error() calls conditional on $debug
+
+Version: 3.05
+   - Fix POD documentation bug (thanks Steve van der Burg)
+   - login(): set Location header with err_headers_out rather than headers_out
+     (Casey West)
+   - put cookie removal code in remove_cookie() method, put cache handling
+     code in handle_cache() (Mark A. Hershberger)
+   - reorganized tree to support multiple mod_perl versions.
+   - rewrote tests to use Apache::Test framework from CPAN.
+   - fix POD errors in authorize() documentation.
+   - initial support for mod_perl version 2
+   - mp2: check for Apache::RequestRec arg so that unported subclasses
+     throw exceptions.
+
+Version: 3.04
+   - add _convert_to_get() to login_form(), and make POST -> GET conversion
+     skip credentials and destination data so only extra data is copied. This 
+     ensures that "destination" wont contain the login data.
+
+Version: 3.03
+   - various POD typos fixed (Eric Cholet)
+   - Add support for ${AuthName}P3P which will set up a P3P header that will
+     be sent with the cookie.
+   - fix undefined warning in _convert_to_get (David K Trudgett)
+   - fix potential cookie clobbering if cookie was set in earlier handler
+     phase in send_cookie() (Carlyn Hicks).
+   - various undefined value warnings eliminated
+
+Version: 3.02
+   - Add support for AuthNameSatisfy directive (can be Any/All, default: Any)
+   - Move cookie path setting into get_cookie_path() so that users can
+     overload this function if they desire (Thanks Raj Chandran)
+   - POST -> GET conversion was broken (r->content called twice). Fixed.
+
+Version: 3.01
+   - adopted support for custom_errors() hook from michael@bizsystems.com.
+   - Fixed incorrect documentation in authorize() (thanks to David Young).
+   - login() handler changes:
+       o if "destination" isnt in posted data, set AuthCookieReason to 
+         no_cookie and return to login_form (previously just returned
+         SERVER_ERROR).
+       o if authen_cred() returns false, set AuthCookieReason to
+         bad_credentials and return to the login form.
+       o try to handle POST -> GET conversion.
+   - CGI::Util dependency removed (these are internal subroutines for CGI.pm)
+   - ${AuthName}Path will default to "/" if it is not specified (MSIE 6.0
+     wont set cookies without path)
+   - fix login() handler change so that destination doesnt get lost on
+     subsequent login attempts (thanks Phillip Molter)
+
+Version: 3.00
+   - New maintiner: Michael Schout <mschout@gkg.net>
+   - changed to hard coded $VERSION rather than RCS Revision style.
+   - Revamped testing code to use Apache::test (with minor mods).
+   - Added support for ${AuthName}Expires parameter that can be used
+     to make your cookie persistent.
+   - CGI::Util is now used for parsing the "Expires" parameter. If you are 
+     missing this package, you probably need to upgrade your CGI.pm package.
+
+Version: 2.011  Date: 2000/06/17 08:01:19
+   Several people have requested a mechanism for the login script to be
+   able to tell the difference between a failed login and a first attempt
+   at a login.  Typically one can figure this out by whether a cookie has
+   been sent or not, so I've put some information to that effect in
+   $r->prev->subprocess_env().  See the login script docs for specifics.
+   
+   I also cleaned up the documentation for the login script.
+
+
+Version: 2.010  Date: 2000/06/17 01:37:16
+   (merged changes from sub-releases into main CVS branch.  Been living
+   in CVS hell.  My CVS-hubris got the better of me, tried to do things
+   with tags & soforth and wound up severely confused.  Thus the version
+   numbers jumped a bit.)
+   
+   Made some minor documentation updates.
+
+
+Version: 2.009  Date: 2000/06/14 15:54:00
+   *** empty log message ***
+
+
+Version: 2.008  Date: 2000/06/14 15:36:12
+   Instead of replacing the Set-Cookie header when we set the cookie, add
+   to it.  This means we won't clobber other folks' unrelated cookies
+   when we set ours.  It also means you need at least mod_perl version
+   1.24 (I think).  [rlocke@infiniteinfo.com (Robert Locke)]
+
+
+Version: 2.007.002.001  Date: 2000/05/14 18:06:30
+   Added a PerlSetVar *Cache parameter that you can set to a true value
+   to allow cacheing.  Also removed cache control from regular requests -
+   cacheing still happens on login & logout.  [asparks@cpd.harris.com
+   (Alan Sparks) and dtaylor@vialogix.com (Drew Taylor)]
+   
+   Split off the login-form-displaying code into its own method, called
+   login_form().  Can be overridden in subclasses.  The default method
+   uses $r->custom_response() to display the login. [richter@ecos.de
+   (Gerald Richter)]
+   
+   Added documentation for the send_cookie() method.
+
+
+Version: 2.007.001.001  Date: 2000/04/29 20:03:51
+   Created the send_cookie() method, which just creates the cookie and
+   calls $r->err_header_out to send it to the browser.  It is
+   occasionally useful to override this method if you need to change the
+   value of the cookie before sending it out (for instance, to update a
+   timestamp).  [mschout@gkg.net (Michael J Schout)]
+   
+   Changed the _cookie_string() method to cookie_string().
+   
+   Added a PerlSetVar configuration directive "{YourAuth}Secure" which
+   will secure cookies (i.e. only send them over a secure connection).
+   [mschout@gkg.net (Michael J Schout)]
+
+
+Version: 2.007  Date: 2000/04/15 15:27:02
+   branches:  2.7.1;  2.7.2;
+   If the browser sends a cookie but it's not one related to our
+   authentication, we formerly sent a blank cookie to the authentication
+   methods.  Now we act as if no cookie was sent.
+   [asparks@cpd.harris.com (Alan Sparks)]
+   
+   Fixed a server error that occurred when a certain user was required,
+   but a different valid user was logged in.
+   [efujii@miis.edu (Eduardo Fujii)]
+   
+   Added a couple more debug statements that can help figure out what's
+   happening when your auth isn't working.
+   
+   Improved some of the docs.
+   
+   Added some tricks to Makefile.PL to make my life easier.
+   
+   Changed the action of the example login forms from LOGIN to /LOGIN.
+   [michael@bizsystems.com (Michael)]
+
+
+Version: 2.006  Date: 2000/03/26 18:28:32
+   Added the key() method, which will return the user's current session
+   key, if any.  This can be handy inside a method that implements a
+   C<require> directive check (like the C<species> method discussed
+   above) if you put any extra information like clearances or whatever
+   into the session key.
+   
+   Added method-by-method documentation for each method in AuthCookie.
+
+
+Version: 2.005  Date: 2000/03/24 15:20:30
+   Removed the deprecated methods ->authen and ->authz.  If you have
+   configurations that use these methods, you must change to the newer
+   ->authenticate and ->authorize methods.
+   
+   Changed a couple of 'Sample's in the documentation to
+   'Sample::AuthCookieHandler'.  [asparks@cpd.harris.com (Alan Sparks)]
+
+
+Version: 2.004  Date: 2000/03/15 20:53:20
+   Added documentation about the ability to set cookie domains.  That
+   ability actually appeared in 2.002, but I forgot to document it or add
+   notes to the Changes file.
+
+
+Version: 2.003  Date: 2000/03/14 21:08:02
+   Now returns FORBIDDEN instead of AUTH_REQUIRED when authorization
+   fails or when a user tries to access a protected doc.
+
+
+Version: 2.002  Date: 2000/03/14 17:46:42
+   Added an internal _cookie_string method that helps construct cookie
+   strings.  This shouldn't change any functionality, but makes my job
+   easier.
+   
+   Added a couple of Makefile.PL questions that set the user & group
+   tests should run under.
+
+
+Version: 2.001  Date: 2000/02/11 04:46:59
+   The login forms may now use the POST method instead of the GET method.
+   This is a big deal, because with GET the user's credentials get logged
+   to access logs, they remain in the user's browser history, and so on.
+   Thanks to cholet@logilune.com (Eric Cholet) for the patch and prodding.
+   
+   There is now a proper test suite, which will fire up an httpd and make
+   requests of it.  The test code is adapted from Eric's old example
+   (eg/) suite.
+   
+   I've added a logout() method to help unset cookies.  The example
+   logout.pl now uses logout().  Thanks to Aaron Ross
+   (ross@mathforum.com).
+
+
+Version: 2.000  Date: 2000/02/02 13:18:23
+   First released version, bumped up revision number to 2.0
+   
+   Created indentify() and authorize() methods to replace authen() and
+   authz().  authen() and authz() are now deprecated and will disappear
+   in a later version.
+   
+   AuthType can now contain colons [adi@certsite.com (Adi)]
+   
+   Nonexistent method calls (via 'require' directive) are no longer
+   shielded in authorization stage - if it fails it fails, and you get a
+   server error.
+   
+   Multiple 'require' directives should work now - previously only the
+   first directive was respected.
+   
+   Changed lots of documentation to reflect the above interface changes.
+
+
+Version: 1.002  Date: 2000/01/27 22:07:13
+     - Now owned by Ken Williams (ken@forum.swarthmore.edu)
+   
+     - Created indentify() and authorize() methods to replace authen()
+       and authz().  authen() and authz() are now deprecated and will
+       disappear in a later version.
+   
+     - AuthType can now contain colons [adi@certsite.com (Adi)]
+   
+     - Nonexistent method calls (via 'require' directive) are no longer
+       shielded in authorization stage - if it fails it fails, and you
+       get a server error.
+   
+     - Multiple 'require' directives should work now - previously only
+       the first directive was respected.
+
+
+Version: 1.001  Date: 2000/01/25 01:21:05
+   Eric's original version from CPAN
+
+

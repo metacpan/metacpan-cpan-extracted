@@ -1,0 +1,81 @@
+{
+   "abstract" : "Application for scaffolding using templates",
+   "author" : [
+      "Manfred Stock <mstock@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Scaffolder",
+   "no_index" : {
+      "file" : [
+         "perlcritic.rc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd::Setup" : "0",
+            "Carp" : "0",
+            "Config" : "0",
+            "File::HomeDir" : "0.93",
+            "File::ShareDir" : "0",
+            "File::Spec" : "0",
+            "MRO::Compat" : "0",
+            "Path::Class" : "0.17",
+            "Path::Class::Dir" : "0",
+            "Path::Class::File" : "0",
+            "Scalar::Util" : "0",
+            "Template" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "App::Cmd::Tester" : "0",
+            "Directory::Scratch" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::Class" : "0",
+            "Test::Exception" : "0",
+            "Test::File" : "0",
+            "Test::File::ShareDir" : "0",
+            "Test::More" : "0.88",
+            "parent" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mstock/App-Scaffolder.git",
+         "web" : "https://github.com/mstock/App-Scaffolder"
+      }
+   },
+   "version" : "0.002000"
+}
+

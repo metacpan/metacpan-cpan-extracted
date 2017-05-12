@@ -1,0 +1,40 @@
+use alienfile;
+
+# see xz.alienfile for a more reliable and portable
+# example that uses plugins.
+
+# Use pkg-config to check if the library exists.
+# also, use which to check that the xz command is
+# in the path.
+probe [ 
+  'pkg-config --exists liblzma',
+  'which xz',
+];
+
+share {
+
+  # the first one which succeeds will be used
+  download [ 'wget http://tukaani.org/xz/xz-5.2.3.tar.gz' ];
+  download [ 'curl -O http://tukaani.org/xz/xz-5.2.3.tar.gz' ];
+
+  # use tar to extract the tarball
+  extract [ 'tar zxf %{.install.download}' ];
+  
+  # use the standard build process
+  build [
+    './configure --prefix=%{.install.prefix} --disable-shared',
+    '%{make}',
+    '%{make} install',
+  ];
+
+};
+
+# You can specify individual gather steps in share {} or
+# sys {} too, but for many cases the same procedure can
+# be used for both.
+gather [
+  # store the (chomped) output into the appropriate runtime properties
+  [ 'pkg-config', '--modversion', 'liblzma', \'%{.runtime.version}' ],
+  [ 'pkg-config', '--cflags',     'liblzma', \'%{.runtime.cflags}'  ],
+  [ 'pkg-config', '--libs',       'liblzma', \'%{.runtime.libs}'    ],
+];

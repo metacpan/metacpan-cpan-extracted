@@ -1,0 +1,2 @@
+mojo get "https://www.google.com/search?q="$1"&tbm=nws&aqs=chrome..69i57j69i60.211j0j1&sourceid=chrome&es_sm=122&ie=UTF-8" a attr href | egrep "^\/url" | sed -s "s/^.*.q=http/http/" | sed -s "s/\&sa=.*$//"| grep -v google
+

@@ -1,0 +1,23 @@
+#!/usr/bin/perl -w
+use strict;
+#use App::Modular::Module;
+
+package App::Modular::Module::Printer;
+
+#use App::Modular;
+use base qw(App::Modular::Module);
+my $module_name = "Printer";
+
+sub printer { 
+   shift;
+   App::Modular->instance()->mlog(99, "printer printing!");
+   print(join ' ', @_); 
+};
+
+sub string {
+   shift;
+   App::Modular->instance()->mlog(99, "printer creating a string!");
+   return (join ' ', @_);
+};
+
+1;

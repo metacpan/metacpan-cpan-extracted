@@ -1,0 +1,45 @@
+#! /usr/bin/env perl
+use strict;
+use warnings;
+
+use App::MediaWiki2Git;
+use Pod::Usage;
+
+pod2usage(-verbose => 2) if @ARGV;
+my $m2g = App::MediaWiki2Git->new;
+$m2g->go;
+
+=head1 NAME
+
+mw2git - MediaWiki2Git script
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+ cd prepared_directory
+ mw2git
+
+=head1 DESCRIPTION
+
+This script calls L<App::MediaWiki2Git>.  That module contains the
+detailed documentation.
+
+It runs in the current directory, which requires setting up with a
+configuration file and a Git repository.
+
+There are no options.
+
+
+=head1 AUTHOR
+
+Copyright (C) 2011 Genome Research Limited
+
+Author Matthew Astley L<mca@sanger.ac.uk>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,5 @@
+5   - Add version number
+4   - Switch the logic around to be properly grep-like
+3   - Ensure an arrayref is always returned, even if there's nothing in it
+2   - Minor updates to clean up code & tests
+1   - First version of a grep-alike that returns its filtered-out values

@@ -1,0 +1,13 @@
+<div class="login">
+<form method="POST" action="[% s.uri %]">
+<h1>Login to [% s.o.interface %] interface</h1>
+[% IF s.error.login %]
+<div class="error">[% s.error.login %]</div>
+[% END %]
+<b>Email Address</b><br>
+<input name="interface_email" value="[% s.in.interface_email %]"><br>
+<b>Password</b><br>
+<input type="password" name="interface_password" value=""><br>
+<input type="submit" value="Login">
+</form>
+</div>

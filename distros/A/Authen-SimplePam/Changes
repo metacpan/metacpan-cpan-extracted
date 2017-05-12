@@ -1,0 +1,5 @@
+Revision history for Perl extension Authen::SimplePam.
+
+0.1.24  Mon 22 Jun 2002
+ - Initial release with user authentication functions.
+

@@ -1,0 +1,294 @@
+=head1 NAME
+
+App::TestOnTap::Args
+
+Commandline options and arguments understood for TestOnTap processing
+
+=head1 SYNOPSIS
+
+ testontap
+ 	[ @argfile ] # I<see 'EXPANDING FILES IN ARGUMENT LIST' below for details> 
+    [
+        --usage | -?
+            |
+        --help | -h
+            |
+        --manual
+            |
+        --version
+    ]
+    [ -v | --verbose [ -v ... ] ]
+    [ --workdirectory <path> ]
+    [ { --skip || --include } <query> ]
+    [ --jobs <n> ]
+    [ --order <strategy> ]
+    [ --timer ]
+    [ --no-harness ]
+    [ --execmap <mapfile> ]
+    [ --archive ]
+    [ --savedirectory <path> ]
+    [ --define | -D <key>=<value> [ --define ... ] ]
+    <suitepath>
+    [<suiteargs> ...]  
+
+=head1 OPTIONS AND ARGUMENTS
+
+All options can be abbreviated, as long as they are unambiguous. Option matching is case
+sensitive. Forcibly end option parsing using '--'.
+
+=head3 EXPANDING FILES IN ARGUMENT LIST
+
+The command line may at any place contain arguments of the form F<@filename>, which means that the F<filename>
+will be read for arguments to insert in place. This will help if the command line is very long or is just nicely
+persisted for reuse.
+
+Further, this will work recursively, i.e. any resulting argument of the same form, will be read. If the filename
+is relative, it's assumed relative to the directory the previous file was in.
+
+The example command line C<testontap --verbose @myargs --jobs 10 @moreargs> will be expanded by reading the F<myargs>
+and F<moreargs> files (in the current directory, obviously). The read files may contain a line of
+C<@/some/path/to/globalargs>, and assuming that file in turn contains C<@extraargs>,
+that file is expected to exist as F</some/path/to/extraargs>.
+
+Note that the file is line-oriented - each line in such a file will become a B<single> argument. No whitespace
+splitting inside each value will occur, but some rules apply:
+
+=over
+
+=item * Environment variable expansion
+
+Any construction of the form C<${name}> will be assumed to be a reference to the environment variable
+'name', and the contents of it will be inserted in place. If the environment variable doesn't exist
+it is an error.
+
+=item * Line continuation
+
+To avoid physical lines in the file to be extremely long, it can be continued on the next
+physical (to any length) by ending the line with a backslash (\).
+
+  Example:
+    fee \
+    fie \
+    foo
+
+Will become the argument 'fee fie foo'.
+
+=item * Comments
+
+Any line (after completed line continuation and not counting inital whitespace) having
+a '#' as the first character, will be ignored as being a comment.
+
+=item * Trimming
+
+Any beginning and ending whitespace will be trimmed away.
+
+=item * Empty lines
+
+Any empty line will be ignored.
+ 
+=back
+
+=over
+
+=item B<INFORMATION OPTIONS>
+
+If any of these options are given, the rest of the command line is ignored.
+
+If multiple of these options are given only one will be acted on, in the order
+I<--manual>, I<--help>, I<--usage> and I<--version>.
+
+=over
+
+=item B<--usage> | B<-?>
+
+Displays basic usage information.
+
+=item B<--help>
+
+Displays usage and help with options/arguments.
+
+=item B<--manual>
+
+Displays the full manual page.
+
+=item B<--version>
+
+Displays the script name and version information.
+
+=back
+
+=item B<-v>, B<--verbose>
+
+By default, the output will be regular test output after consuming TAP (e.g. timings, ok/fail messages, summary etc).
+
+Using this option allows the pass through of more verbose output from the tests themselves.
+
+To up verbosity, add one or more verbose flags (bundling for singlecharacter options is on, so '-vvv' is the same as
+'-v -v -v'). Currently, up to verbosity level 1 is used.
+
+=item B<--workdirectory E<lt>pathE<gt>>
+
+By default, a temporary directory is created to hold the data produced by the tests and is automatically
+removed when the run is complete.
+
+Use this option if you want to keep the work dir after completion (for debugging/perusal/whatever).
+The path must not exist beforehand.
+
+For details of the work directory, see the L<manual regarding 'persisted results'|App::TestOnTap/"PERSISTED RESULT">.
+
+=item B<--skip E<lt>queryE<gt>> or B<--include E<lt>queryE<gt>> 
+
+Note: the --skip and --include flags are mutually exclusive - simply choose the one that is
+easiest to express your intention with.
+
+By default, all tests will be run (subject to selection by the C<execmap> in effect and the internally configured skip).
+
+By providing a I<query>, a subset of those tests can be skipped/included. However, be aware that the B<actual> tests selected
+are also subject to any dependencies declared between tests - e.g. a query skipping test Z will still 
+select test Z if there is a Y => Z dependency in the config.
+
+For more on selecting tests, also see the L<manual regarding the 'skip' config setting|App::TestOnTap/"THE SUITE CONFIG">.
+
+=item B<--jobs E<lt>nE<gt>>
+
+By default, tests will run in sequence, governed by any dependencies, and sorted alphabetically. Also by
+default, they will always run serially.
+
+By setting this option to a value higher than 1 allowing a maximum of I<n> jobs to execute concurrently.
+However, for this to take effect, a C<parallelizable> rule must be in the suite configuration in order to
+select which tests actually can run in parallel
+
+The B<actual> amount of concurrently executing jobs are then subject to limiting factors, such as dependencies and
+the parallelizability of a given test.
+
+For more on parallelization, see the L<manual regarding the 'parallelizable' config setting|App::TestOnTap/"THE SUITE CONFIG">.
+
+=item B<--order E<lt>strategyE<gt>>
+
+Setting a strategy controls the ordering of the tests.
+
+However, note that the actual order of tests are primarily controlled by dependencies and possibly
+the parallelizability of any given test. Thus, the order strategy is only relevant
+when there are multiple tests to choose from during evaluation of 'next available test(s)'.
+
+The default strategy is 'none', but the default for a given suite may also be set in its configuration.
+
+=over
+
+=item * C<none>
+
+This is the default strategy and the resulting order depends on internal implementation details.
+It may or may not look random, but for a guaranteed randomization, use the C<random> strategy.
+
+=item * C<alphabetic> or C<ralphabetic>
+
+This strategy simply uses an alphabetic sort on test names. Thus, this results in the order
+'sm1', 'sm10', 'sm2' etc.
+
+Adding the initial C<r> causes the order to be reversed.  
+
+=item * C<natural> or C<rnatural>
+
+This strategy makes a best effort to take numbering into account when sorting. It is basically alphabetic,
+but takes embedded numbers into account if possible. Thus, this results in the order
+'sm1', 'sm2', 'sm10' etc.
+
+Adding the initial C<r> causes the order to be reversed.  
+
+=item * random
+
+This will explicitly shuffle the order randomly.
+
+=back
+
+=item B<--timer>
+
+This turns on the display of timing information for tests when running.
+
+Note that the information is always present in persisted results, this just controls the display when running a suite. 
+
+=item B<--no-harness>
+
+This turns on a special mode where tests are run with no capture and parsing of
+output. Printouts go directly to stdout/err, and stdin is active.
+
+This can be convenient to directly see the TAP (or other) output which can be handy
+for debugging the tests themselves. Also, since stdin should work normally, using an
+execmap that starts the test in debug mode enables them to run under a real debugger.
+
+ Example execmap file 'debug.execmap':
+ 
+ [EXECMAP]
+ match1 = eq(some/test.pl)
+ cmd1 = perl -d
+
+and run with:
+
+ testontap --no-harness --execmap debug.execmap some/path/to/suite
+ 
+would start the some/test.pl file under the Perl debugger.
+
+Note that this renders several options and mechanisms useless:
+for example C<--verbose>, C<--jobs>, C<--timer>. Also, the work directory
+will miss most of the data normally seen, such as TAP output, aggregated
+test results etc. 
+
+=item B<--execmap E<lt>mapfileE<gt>>
+
+By default, the test suite will be searched for 'executables' based on the exec map defined in the suite, or
+a built in default if none defined.
+
+This option allows overriding the choices of the suite/internal exec map.
+
+For more on execmaps, see the L<manual regarding the 'execmap section' config setting|App::TestOnTap/"THE SUITE CONFIG">.
+
+=item B<--archive>, B<--savedirectory E<lt>pathE<gt>> 
+
+By default, the results of a test run are not saved.
+
+By providing either or both of these options, results may be saved as either a ready-made archive
+or a regular directory. The name of the saved file/directory will be named using the basename of the
+suite plus a timestamp and the run id, which together should be entirely unique.
+
+Giving only C<--archive>, the result will be saved as an archive in the current directory.
+
+Giving C<--archive --savedirectory some/path> together, the result will be saved as an archive
+in the directory some/path (the directory may or may not exist beforehand).
+ 
+Giving only C<--savedirectory some/path>, the result archive will be a regular subdirectory in the
+directory some/path (the directory may or may not exist beforehand).
+
+For details of saved results, see the L<manual regarding 'persisted results'|App::TestOnTap/"PERSISTED RESULT">.
+
+=item B<--define E<lt>keyE<gt>=E<lt>valueE<gt>>
+
+The function of this option is to make it possible to pass on arbitrary key/value pairs to a saved result
+in order to later enable various types of differentiation to be made when processing the saved result.
+The defines are not made available to tests.
+
+Can be given multiple times.
+
+=item B<suitepath>
+
+This is the path to the root directory of the suite, or to a zip archive containing a suite.
+
+If it is a zip archive, the archive must contain only a directory at the zip root, and a valid
+I<testontap configuration> file in that directory. It will be unpacked to a temporary location
+before being executed and cleaned up after. 
+ 
+For details on test suites, see the L<manual|App::TestOnTap/"THE TEST SUITE">.
+
+=item B<suiteargs ...>
+
+Any arguments can be passed, and they will just be passed on as-is to the tests when they start.
+
+For details, see the L<manual on parameter passing|App::TestOnTap/"PARAMETER PASSING">.
+
+=back
+
+=head1 MORE HELP
+
+For full information on TestOnTap, see the L<manual|App::TestOnTap>, or use I<--manual>
+or run I<perldoc App::TestOnTap> to see the manual page.
+
+=cut

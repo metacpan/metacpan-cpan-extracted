@@ -1,0 +1,21 @@
+Revision history for Perl extension AnyEvent::Fork::Pool
+
+TODO: AE::log
+
+1.2   Mon Oct 27 22:17:25 CET 2014
+	- INCOMPATIBLE CHANGE: remove dependency on, and autoloading
+          of AnyEvent::Fork.
+        - do not call Array::Heap::adjust_heap_idx with out of bound
+          array index on destroy, use a gentler way to shut down
+          (reported by Robert Schmidt).
+
+1.1   Sun Apr 28 16:18:57 CEST 2013
+        - works with AnyEvent::Fork::Remote (no changes were needed).
+	- new function: AnyEvent::Fork::Pool::ncpu.
+
+0.1   Sun Apr 21 14:27:57 CEST 2013
+	- first release.
+
+0.00  Thu Apr 18 15:41:09 CEST 2013
+	- post planning, pre writing.
+

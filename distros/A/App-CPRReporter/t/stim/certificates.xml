@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<provider version="3.3.1" >
+	<user login="laerdal2" uid="laerdal2+st" program="st" givenname="Three" familyname="User" email="user.three@example.com" name="Three User">
+		<course name="Resusci Anne Skills Station" year="2012" month="10" day="3" signature="5qr759sey34pyf9gdyj7fqryzaxe5xza7md7rcting" serial="-34982" givenname="Three" familyname="User">
+			
+		</course>
+	</user>
+	<user login="03432" uid="03432+st" program="st" givenname="Four" familyname="User" email="userfour@example.com" name="Four User">
+		<course name="Resusci Anne Skills Station" year="2012" month="10" day="10" signature="358i4giepain56z4m44433pmwbxhus6w6n2xc2sbqp" serial="-34982" givenname="Four" familyname="User">
+			
+		</course>
+	</user>
+	<user givenname="Zjuul" familyname="Cesar" login="bliebelblabbel"></user>
+	<user login="532" uid="532+st" program="st" givenname="One" familyname="User" email="user_one@example.com" name="One User" />
+	<user login="4521" uid="4521+st" program="st" givenname="Two" familyname="User" email="user.two@example.com" name="Two User" />
+</provider>

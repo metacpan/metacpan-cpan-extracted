@@ -1,0 +1,13 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+eg/colour_swatches.pl
+eg/swatches.html
+lib/Acme/Tango.pm
+t/010_color_tests_010_basic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

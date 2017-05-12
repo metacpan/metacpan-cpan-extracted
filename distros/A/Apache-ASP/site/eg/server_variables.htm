@@ -1,0 +1,29 @@
+#!/usr/bin/perl /usr/bin/asp-perl
+
+<!--#include file=header.inc-->
+<center>
+<table border=1>
+<tr><th colspan=2>Server Variables / CGI Environment</th></tr>
+
+<!--	
+	Please note that under normal ASP, Collections, as objects
+	like ServerVariables are referred to, do not have iterators
+	through their members.  Being able to do this is not 
+	something that PerlScript nor VBScript support, so 
+	use the iterators at your own risk!
+-->
+
+<% for(sort keys %{$Request->ServerVariables()}) { 
+	# don't want to show too much about my demo server
+	# comment this line out if you want to see all of %ENV
+	next unless ($_ =~ /^(HTTP_)/);
+	%>
+
+	<tr>
+		<td><tt><%=$_%></tt> </td>
+		<td><tt><%=$Request->ServerVariables($_)%> </tt></td>
+	</tr>
+<% } %>
+</table>
+</center>
+<!--#include file=footer.inc-->

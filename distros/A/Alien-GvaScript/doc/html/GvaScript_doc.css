@@ -1,0 +1,83 @@
+BODY, TD {
+  font-family: Verdana, Arial, Helvetica;
+  font-size: 85%;
+  background-color: #f5f5f5;
+  color: #333;
+}
+TABLE {
+  border-collapse: collapse;
+}
+TD {
+  border: 1px solid #888;
+  padding: 6px;
+}
+H1, H2, H3, H4, H5, H6 {
+  display:inline;
+  color: navy;
+}
+h1 {color: #a00;}
+PRE {
+  background: #eee;
+  border: 1px solid #888;
+  padding: 4px;
+}
+CODE {
+  background: #eee;
+  border: 1px solid #888;
+  padding: 1px;
+}
+.TN_node { 
+  display : block;
+}
+
+/* node content is 15px more on the right than the node itself */
+.TN_content {  
+  display : block;
+  margin: 0;
+  margin-left: 15px;
+}
+
+/* labels are clickable */
+.TN_label {
+  display: -moz-inline-box;
+  cursor: pointer;
+}
+
+
+/* buttons in front of each node label */
+.TN_button { 
+  background-image: url(minus.gif);
+  background-repeat : no-repeat;
+  background-position : center left;
+  width: 15px;
+  padding-right: 15px;
+  cursor: pointer;
+ }
+
+
+/* how to highlight the current selected node */
+.TN_selected {
+  background-color: #e0e3ef;
+}
+
+
+/* class to implement pseudo-hover on node labels */
+.TN_mouse { 
+  text-decoration: underline;
+}
+
+/* when a node is closed, the button icon becomes a 'plus', and 
+   the content is hidden */
+.TN_closed .TN_button {
+  background-image: url(plus.gif);
+}
+
+.TN_closed .TN_content {
+  display : none;
+}
+
+/* leaf nodes have a single icon 'dot' */
+.TN_leaf .TN_button { 
+  background-image: url(dot.gif);
+  cursor: default;
+}

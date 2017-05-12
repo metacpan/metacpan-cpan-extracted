@@ -1,0 +1,25 @@
+#severity = 2
+#top = 5
+exclude = ControlStructures::ProhibitPostfixControls
+#[-ControlStructures::ProhibitPostfixControls]
+[-CodeLayout::RequireASCII]
+[-Editor::RequireEmacsFileVariables]
+[-Modules::PerlMinimumVersion]
+[-Modules::RequirePerlVersion]
+[-Bangs::ProhibitCommentedOutCode]
+[-Bangs::ProhibitFlagComments]
+[-Bangs::ProhibitNoPlan]
+[-Bangs::ProhibitNumberedNames]
+[-Bangs::ProhibitRefProtoOrProto]
+[-Bangs::ProhibitVagueNames]
+[-Lax::ProhibitEmptyQuotes::ExceptAsFallback]
+[-Lax::ProhibitStringyEval::ExceptForRequire]
+[-Lax::RequireEndWithTrueConst]
+[-Lax::RequireExplicitPackage::ExceptForPragmata]
+
+#[ControlStructures::ProhibitPostfixControls]
+#severity = 4
+#allow = if unless
+
+#[Documentation::RequirePodSections]
+#lib_sections = NAME | SYNOPSIS | DESCRIPTION | BUGS AND LIMITATIONS | AUTHOR

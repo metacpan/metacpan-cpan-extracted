@@ -1,0 +1,40 @@
+$Id: /local/CPAN/Apache-AxKit-Language-XSP-ObjectTaglib/Changes 1518 2008-03-08T22:17:31.628142Z claco  $
+Revision history for Perl module Apache::AxKit::Language::XSP::ObjectTaglib
+
+0.09000 Sat Mar 8 17:12:45 2008
+    - Converted to Module::Install
+
+0.08 Mon Mar 21 19:22:37 2005
+    - Added Test::Strict warnings_ok tests
+
+0.07 Mon Mar 14 21:43:26 2005
+    - Added Test::Strict tests
+
+0.06 Sat Mar 05 12:39:24 2005
+    - Removed undeed extra.conf.in junk
+
+0.05 Sat Mar 05 12:11:01 2005
+    - Added README To make CPANTS happy. :-)
+    - Various pod cleanups and corrections
+    - Makefile.PL and extra.conf.in now use IfDefine to die gracefully
+
+0.04 Thur Feb 03 19:28:43 2005
+    - Converted from CVS to Subversion
+    - Changed Id tags to make SVN happy
+    - Added META.yml and NO_META
+    - Added MANIFEST.SKIP
+
+0.03 Sun Nov 28 22:37:05 2004
+    - Added Test::Pod and Test::Pod::Coverage tests
+    - Added Demo tablig with supporting demo class objects
+    - Added Apache::Test -> Axkit Taglib tests with demo Taglib
+    - Added AxKit::Debug logging
+
+0.02 Sat Nov 20 20:51:07 2004
+    - Converted to ExtUtils::ModuleMaker directory structure
+    - Updated contact information
+    - Added basic Test::More tests
+
+0.01  Thu May 16 12:22:50 2002
+    - original version; created by h2xs 1.21 with options
+        -AX -n Apache::AxKit::Language::XSP::ObjectTaglib

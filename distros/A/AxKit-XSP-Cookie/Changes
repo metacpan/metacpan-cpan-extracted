@@ -1,0 +1,13 @@
+Revision history for Perl extension AxKit::XSP::Cookie.
+
+1.41
+    - Doug Wilson <dougw@cpan.org> found a bug which Robin Berjon <robin@knowscape.com>
+      fixed. In fact, the previous item in the log never happened, only the version 
+      number was changed :)
+
+1.4
+    - Updated to AxKit 1.4's API
+
+1.00  Wed Mar 28 08:33:48 2001
+	- inital public release
+

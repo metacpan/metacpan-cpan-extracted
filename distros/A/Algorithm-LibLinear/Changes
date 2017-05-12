@@ -1,0 +1,67 @@
+Revision history for Perl extension Algorithm::LibLinear
+
+0.17    Thu Apr 13 2017
+        - Bundle LIBLINEAR 2.11.
+
+0.16    Tue Sep 30 2015
+        - Bundle LIBLINEAR 2.1.
+
+0.15    Fri Jul 10 2015
+        - Bundle LIBLINEAR 2.01, which fixes memory leak and a bug.
+
+0.14    Mon Jul 6 2015
+        - Fix uninitialized struct bug.
+        - Use Test::Deep for comparing floating point numbers.
+
+0.13    Wed Jul 1 2015
+        - Bundle LIBLINEAR 2.0.
+        - Switch installer from Module::Install to Module::Build.
+        - Algorithm::LibLinear: Add find_cost_parameter() method.
+
+0.12    Sat Nov 1 2014
+        - Fix test failures when using Test::Simple version 1.301001_062+.
+          Thanks Chad Granum and Graham Knop.
+
+0.11    Tue Oct 28 2014
+        - Bundle LIBLINEAR 1.95.
+        - Algorithm::LibLinear: Add "bias" optional costructor parameter.
+        - Algorithm::LibLinaer::Model: Add bias() and coefficient() accessors.
+
+0.10    Fri Mar 21 2014
+        - Fix module dependency.
+        - Minor documentation update.
+
+0.09    Tue Jan 7 2014
+        - Remove APIs deprecated in version 0.07.
+
+0.08    Tue Nov 26 2013
+        - Bundle LIBLINEAR 1.94, which fixes memory leak.
+
+0.07    Thu Oct 1 2013
+        - Introduce Algorithm::LibLinear::FeatureScaling class that replaces
+          Algorithm::LibLinear::ScalingParameter. The ScalingParameter class
+          and Algorithm::LibLinear::DataSet->scale() method are now deprecated
+          and will be removed from the near future release.
+
+0.06    Mon Jun 3 2013
+        - Fix that predict() rounds result value even when the model is trained
+          for regression.
+        - predict_probability() now returns empty array when given model is not
+          for logistic regression-based classification.
+
+0.05    Sat Jun 1 2013
+        - Fix incorrect behaviour of predict_values() due to my
+          misunderstanding.
+        - Relax type checking to not raise error on regression problem.
+
+0.04    Sun May 19 2013
+        - Fix incorrect sparse vector scaling.
+
+0.03    Fri May 3 2013
+        - Fix a test to pass on environment which is long double enabled.
+
+0.02    Sat Mar 10 2013
+        - Release for CPAN.
+
+0.01    Tue Feb 26 2013
+        - Original version

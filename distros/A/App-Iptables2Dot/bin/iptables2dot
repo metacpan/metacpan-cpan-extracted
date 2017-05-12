@@ -1,0 +1,188 @@
+#!/usr/bin/perl
+use 5.010;
+use strict;
+use warnings;
+
+use version; our $VERSION = qv('v0.2.4');
+
+use App::Iptables2Dot;
+use Getopt::Long;
+use Pod::Usage;
+
+my %opt = (
+    tables => 'filter',
+    showrules => 1,
+);
+my @optdefs = qw(
+    help|?  manual
+    add-optdef=s@
+    tables=s
+    edgelabel
+    omittargets=s
+    showrules!
+    showunusednodes!
+);
+
+GetOptions(\%opt, @optdefs)
+  or pod2usage(2);
+
+pod2usage(-exitval => 0, -verbose => 1, -input => \*DATA) if ($opt{help});
+pod2usage(-exitval => 0, -verbose => 2, -input => \*DATA) if ($opt{manual});
+
+if (my $optdefs = $opt{'add-optdef'}) {
+    foreach my $optdef (@$optdefs) {
+        App::Iptables2Dot::add_optdef($optdef);
+    }
+}
+
+my $i2d = new App::Iptables2Dot();
+
+if (scalar @ARGV) {
+    if (open(my $input,'<',$ARGV[0])) {
+        $i2d->read_iptables($input);
+        close $input;
+    }
+    else {
+        die "can't open file `$ARGV[0]` to read iptables-save output";
+    }
+}
+else {
+    $i2d->read_iptables(\*STDIN);
+}
+
+print $i2d->dot_graph(\%opt,split ',', $opt{tables});
+
+__END__
+
+=head1 NAME
+
+iptables2dot - turn iptables-save output into graphs for GraphViz
+
+=head1 SYNOPSIS
+
+ iptables2dot [options] [iptables-save-output-file]
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<< --help >>
+
+Print a brief help message and exit.
+
+=item B<< --manual >>
+
+Print the manual page and exit.
+
+=item B<< --add-optdef optdef >>
+
+Provide an option definition for an iptables option that is unknown to the rule
+parser from L<App::Iptables2Dot>.
+
+If the program dies with the message
+I<unknown argument in rule: --unknown-opt arg>, you could run it like this:
+
+ iptables2dot --add-optdef unknown-opt=s iptables-save-output
+
+This may allow you to finish your analysis of iptables-save-output-file
+without having to modify the module source in I<lib/App/Iptables2Dot.pm>.
+Look at L<App::Iptables2Dot> for further information.
+
+=item B<< --edgelabel >>
+
+Provide labels at the edge showing the input or output device for a jump rule.
+
+=item B<< --omittargets targetlist >>
+
+Omit some jump targets in the I<dot> graph when given together with
+C<--showrules>. Multiple targets are separated by comma.
+
+=item B<< --showrules/--noshowrules >>
+
+Show/don't show the rules for the chains. Default is C<--showrules>.
+
+=item B<< --showunusednodes/--noshowunusednodes >>
+
+Show/don't show chains without jumps to other chains. Default is
+C<--noshowunusednodes>.
+
+=item B<< --tables tablelist >>
+
+Only print the tables given in I<< tablelist >>.
+The tables in I<< tablelist >> are separated by comma.
+
+Possible tables are C<< nat >>, C<< raw >>, C<< mangle >> and C<< filter >>.
+Defaults to table C<< filter >>.
+
+=back
+
+=head1 DESCRIPTION
+
+This program takes the output from the command C<< iptables-save >> on Linux
+and turns into input suitable for the C<< dot >> program from GraphViz.
+
+It takes the output form C<< iptables-save >> either from standard input
+(STDIN) or from a text file whose name was given on the command line.
+
+It writes the graph description for the C<< dot >> program to standard output
+(STDOUT).
+
+The main purpose of this program is to get an overview of a
+given iptables configuration and understand the possible jumps between
+different chains in the tables.
+I usually make a printout of the graph for the different tables and have it
+at hand when studying the rules.
+
+The typical workflow is:
+
+ $ sudo iptables-save \
+   | iptables2dot -noshowrules -table filter \
+   > iptables-filter-overview.dot
+ $ dot -Tpdf iptables-filter-overview.dot -o iptables-filter-overview.pdf
+
+Although it is possible to make a detailed graph of an iptables
+configuration containing all rules, I wouldn't recommend this in most cases.
+
+In those configurations, where you would need the graph to comprehend the
+rules, the resulting graph would be a mess.
+
+When the graph looks neat and is legible on A4 paper, you would probably
+understand the configuration without it. 
+But it could be handy to explain the rules to someone else, following
+them with a pencil or your finger.
+
+You would do this to get a detailed graph:
+
+ $ sudo iptables-save \
+   | iptables2dot -edgelabel -table filter \
+   > iptables-filter.dot
+ $ dot -Tpdf iptables-filter.dot -o iptables-filter.pdf
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item C<< unknown argument in rule: %s >>
+
+The program will die with this message showing the rule for
+I<iptables-save> that contained an unknown option.
+
+Since the rules are parsed by C<GetOptionsFromString()> from module
+I<Getopt::Long>, you may workaround this by adding the unknown option to the
+array C<@optdefs> at the top of F<Apt/Iptables2Dot.pm>. After that please file
+a bug at L<https://rt.cpan.org/> or send me a notice at L<mamawe@cpan.org>
+to have it fixed in one of the next releases of this distribution.
+
+Alternatively you may want to use the program like this
+
+ iptables2dot --add-optdef unknown-opt=s ...
+
+if the program dies with message
+I<unknown argument in rule: --unknown-opt arg ...> and you don't want to touch
+the library file I<Apt/Iptables2Dot.pm>.
+
+=back
+
+=head1 AUTHOR
+
+Mathias Weidner <mamawe@cpan.org>

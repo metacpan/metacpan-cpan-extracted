@@ -1,0 +1,91 @@
+#!/usr/bin/env perl
+
+package    ## Hide from PAUSE and Dist::Zilla
+  supervise_me;
+
+use strict;
+use warnings;
+use App::SuperviseMe;
+
+# ABSTRACT: supervises a list of commands
+our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:MELO'; # AUTHORITY
+
+App::SuperviseMe->new_from_options->run;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=for :stopwords Pedro Melo ACKNOWLEDGEMENTS
+
+=head1 NAME
+
+supervise_me - supervises a list of commands
+
+=head1 VERSION
+
+version 0.004
+
+=head1 SYNOPSIS
+
+    # Read commands to keep up from STDIN
+    $ supervise_me
+    Enter commands to supervise, one per line
+    plackup -p 3010 ./sites/x/app.psgi
+    plackup -p 3011 ./sites/y/app.psgi
+    ^D
+
+    # Script it
+    $ cat script.me
+    plackup -p 3010 ./sites/x/app.psgi
+    plackup -p 3011 ./sites/y/app.psgi
+    $ supervise_me < script.me
+
+=head1 DESCRIPTION
+
+The C<supervise_me> command is a simple supervisor for multiple process.
+
+It reads a list of commands to execute from C<< STDIN >> and starts each one,
+and then monitors their execution. If one of the program dies, the supervisor
+will restart it after a small 1 second pause.
+
+You can restart the supervised process with C<< Ctrl-C >>. If you hit
+C<< Ctrl-C >> again before the supervised process restart, the supervisor will
+exit. This allows you to use one tap of C<< Ctrl-C >> to restart, and a
+double tap to exit.
+
+=encoding utf8
+
+=head1 ARGUMENTS
+
+The script accepts no arguments on the command line.
+
+=head1 OPTIONS
+
+The script doesn't have any command line options.
+
+=head1 ENVIRONMENT
+
+You can set the C<SUPERVISE_ME_DEBUG> environment variable to 1 to show
+debug information about the internal workings of the supervisor.
+
+=head1 SEE ALSO
+
+L<App::SuperviseMe>
+
+=head1 AUTHOR
+
+Pedro Melo <melo@simplicidade.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by Pedro Melo.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

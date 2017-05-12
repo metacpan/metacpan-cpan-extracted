@@ -1,0 +1,36 @@
+Revision history for Acme-CPANAuthors-InMemoriam
+================================================
+
+1.05    2015-05-11
+        - added Brian McCauley (NOBULL) (notified and confirmed by Barbie). My
+          friend, colleague and fellow Birmingham Perl Monger. Farewell Brian.
+
+1.04    2014-08-21
+        - added James Aitken (JAITKEN) (notified by Karen Etheridge, confirmed
+          by  Yanick Champoux).
+        - fixed license fields in META.json to be lists.
+        - extended test suite.
+
+1.03    2014-07-09
+        - added Sugiyama-san (SUGMAK) (notified by Ishigaki-san, confirmed by 
+          Miyagawa-san).
+
+1.02    2014-05-13
+        - Sadly adding Christian Karg. (notified by Wendy & Liz, confirmed by 
+          Marc Kerr).
+        - reorganisation of POD (suggested by Gabor Szabo).
+        - added Tad McClellan and Vahe Sarkissian (notifed by BooK).
+
+1.01    2014-05-02
+        - fixed distribution name in META.
+        - added LICENSE file.
+        - Farewell Andrew, it was a pleasure knowing you.
+
+1.00    2014-01-12
+        - added AMORETTE (thanks to ETHER).
+
+0.02    2013-12-22
+        - amended skip in test file.
+
+0.01    2013-12-08
+        - First version, released in honour of our fallen heroes.

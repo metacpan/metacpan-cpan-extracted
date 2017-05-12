@@ -1,0 +1,57 @@
+{
+   "abstract" : "show the Perl metrics",
+   "author" : [
+      "Dai Okabayashi <bayashi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-plmetrics",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Docopt" : "0",
+            "Module::Path" : "0",
+            "Perl::Metrics::Lite" : "0",
+            "Statistics::Swoop" : "0",
+            "Text::ASCIITable" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::plmetrics" : {
+         "file" : "lib/App/plmetrics.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/bayashi/App-plmetrics"
+      }
+   },
+   "version" : "0.06"
+}

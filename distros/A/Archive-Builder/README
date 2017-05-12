@@ -1,0 +1,402 @@
+NAME
+    Archive::Builder - File generation and archiving framework
+
+SYNOPSIS
+      # Make a builder with one section, and some files
+      my $Builder = Archive::Builder->new;
+      my $Section = $Builder->new_section( 'html' );
+      $Section->add_file( 'one.html', 'string', qq~<html><body>
+            Hello World!
+            </body></html>~ );
+      $Section->add_file( 'two.html', 'file', './source/file.html' );
+      $Section->add_file( 'three.html', 'Custom::function', @args );
+
+      # Generate and save to disk
+      $Builder->save( './somewhere' );
+
+      # Create an zip file from it and save it.
+      my $Archive = $Builder->archive( 'zip' ).
+      $Archive->save( 'foo.zip' );
+
+      # Create a tar.gz file of just one section
+      my $Tar = $Section->archive( 'tar.gz' );
+
+DESCRIPTION
+    Perl is often used for applications that generate large numbers of
+    files, and Archive::Builder is designed to assist in these sorts of
+    tasks.
+
+    It provides a framework for defining a set of files, and how they will
+    be generated, and a series of methods for turning them into an Archive
+    of varying types, or saving directly to disk.
+
+  Structure
+    Each "Archive::Builder" object consists of one or more
+    "Archive::Builder::Section"s, which contain one or more
+    "Archive::Builder::File"s. Each of these files know their location
+    within the section, and are given a generation function, with a set of
+    arguments specific to each generator. Some simple generators are
+    provided built-in, or you can provide an function name as the generator.
+
+  Generating Archives
+    Once a Archive::Builder is fully defined, you can "save" it to disk, or
+    get an "archive", containing the generated files, in one of several
+    formats. You can also "save" and get the "archive" any of the individual
+    sections within the builder.
+
+    During the generation process for an entire "Archive::Builder" a
+    subdirectory is created for each section matching the name of the
+    section. So, for a builder with a Section name 'one', containing a
+    single file 'two.txt', and a section 'three', containing files
+    'four.html' and 'five.dat', the following file structure would result
+
+      one/two.txt
+      three/four.html
+      three/five.dat
+
+  Caching
+    Caching is dont of the generated files on a per-file basis. Two calls to
+    the "content()" method of an "Archive::Builder::File" object will only
+    result in the file being generated once, and the same contents returned
+    twice.
+
+  Generation on Demand Caveats
+    During an output action, such as a "save()" or "archive()" method call,
+    the contents of each file are generated only as needed. This means that
+    if the generation of a file fails, an action may have already been taken
+    ( especially in the case of "save()", where you may end up with only
+    part of the files written to disk.
+
+    To avoid this, in most cases you should "test()" the Archive or Section
+    first. This will generate all of the files, and cache them. A "save()"
+    or "archive()" done after this will be done with the cached generated
+    content.
+
+    This should be done whenever you have a large of complex generation
+    tree, that you consider has a non-zero chance of one of the files
+    failing to generate correctly.
+
+METHODS
+    The methods for the three main classes involved in generation trees,
+    "Archive::Builder", "Archive::Builder::Section" and
+    "Archive::Builder::File" are documented below. For the archive handlers
+    the builders generate, see Archive::Builder::Archive. For information on
+    the built-in generators, and how to write your own generators, see
+    Archive::Builder::Generators.
+
+  Common Error Handlers
+    Errors from any object of any type below Archive::Builder are set in the
+    global $Archive::Builder::errstr variable. They can also be retrieved
+    from the "errstr()" method called on any object.
+
+Archive::Builder
+  new
+    The "new()" constructor takes no arguments, and returns a new
+    "Archive::Builder" object.
+
+  add_section $Archive::Builder::Section
+    The "add_section" method takes as an argument an
+    "Archive::Builder::Section" object, and adds it to the builder.
+
+    Returns true if the section is added successfully. Returns "undef" on
+    error, for example if another Section with the same name has already
+    been added.
+
+  new_section $name
+    Creates a new "Archive::Builder::Section" object with the name provided,
+    and immediately adds it to the builder. Returns the Section created.
+
+    Returns the new Section object on success. Returns undef on error.
+
+  new_sections $name [, $name, ... ]
+  new_sections \%names_to_paths
+    Primarily used for initial set up of Builder objects, the "new_sections"
+    method adds a number of sections at the same time.
+
+    It accepts as argument either the names of the section to be created,
+    with the paths of them to be the same as their names, or alternatively,
+    a reference to a HASH with the keys as section names, and the values as
+    section paths.
+
+  section $name
+    Finds and returns a "Archive::Builder::Section" object with the provided
+    name within the builder and returns it. Returns undef if passed name
+    does not exist.
+
+  sections
+    Returns a hash containing all the sections, indexed by name. Returns 0
+    if no sections have been created in the builder.
+
+  section_list
+    Returns all the sections in the builder as a list, sorted by section
+    name. Returns a null list "()" if no sections are defined in the
+    builder.
+
+  remove_section $name
+    Removes a section of a given name from the builder, if it exists.
+    Returns "undef" if no such section exists.
+
+  file_count
+    Returns the total number of files in all sections in the builder
+
+  files
+    Returns a HASH reference containing all of the Achive::Builder::File
+    object in the Archive::Builder, keyed by full path name.
+
+  save $directory
+    Generates the file tree for the entire builder and attempts to save it
+    below a given directory. The passed directory does not have to exist, it
+    will be created on demand.
+
+    Returns true if all files were generated and saved successfully. Returns
+    "undef" if an error occurs, or the directory is bad.
+
+  delete
+    Because of the structure used to support the parent methods, you should
+    probably explicitly delete Builds when you are done with them to avoid
+    memory leaks due to circular dependencies.
+
+    The "delete" method always returns true.
+
+  reset
+    If the contents of any of the files in the Archive::Builder has been
+    generated ( and thus cached ), the "reset" method will remove any cached
+    content from the files, forcing them to be generated again.
+
+    The "reset" method always returns true.
+
+  archive $type
+    Creates a handle to an archive of a specified type related to the
+    builder. Types can only be used if the modules that support them are
+    installed. The following types are supported, and their prerequisites
+    are listed.
+
+      zip    - Archive::Zip
+      tar    - Archive::Tar
+      tar.gz - Archive::Tar
+      tgz    - Archive::Tar
+
+    The tar.gz and tgz are aliases that produce the same thing with a
+    different file extension.
+
+    The "archive" method only returns a "Archive::Builder::Archive" handle
+    to the object, not the object itself. Also, the files are not generated
+    at the time that the archive is created, so generation errors cannot be
+    guarenteed to have occurred by this time.
+
+    To save or otherwise act on the archive, see the
+    Archive::Builder::Archive section below.
+
+Archive::Builder::Section
+  new name
+    Creates a new "Archive::Builder::Section" object of a given name.
+    Although meant to be used in an "Archive::Builder" object, they can
+    still be used effectively standalone, as they have both "save" and
+    "archive" methods.
+
+    Returns undef is an invalid section name is given. A section name must
+    contain only word ( \w ) characters and be 1 to 31 characters long.
+
+    As a side note, the reason that Sections exist at all is so that
+    Builders can be defined containing multiple sections, where the sections
+    will be saved to different locations, but should still be passed around
+    as a single entity.
+
+  name
+    Returns the name of the Section.
+
+  path [ path ]
+    When used within the context of a Builder object, and set to the same
+    value as the section's name by default, this method returns the path
+    below the Builder root that will be used, or if passed a relative path,
+    will set the path to a new value. You are not likely to need this, as in
+    general, the same value will suffice for both the name and path.
+
+  Builder
+    If the Section has been added to a Builder, the "Builder" method will
+    return it.
+
+    Returns a "Archive::Builder" object if added, or "undef" if not.
+
+  add_file $Archive::Builder::File
+    Adds an existing "Archive::Builder::File" object to the section.
+
+    Returns true on success. Returns "undef" on error, or if the path of the
+    file clashes with an existing file in the Section.
+
+    This could happen if you try to add a file with the same name, of if
+    your path contains a directory that is already in the Section as a file.
+    For example, the two files could not exist in the same Section.
+
+      first/second
+      first/second/third
+
+    Creation of the directory first/second would be blocked by the existing
+    file first/second ( or vica versa ). This issue is caught for you now,
+    rather than wait until we are halfway through writing the files to disk
+    to find out.
+
+  new_file $path, $generator [, @arguments ]
+    Creates a new file, using the arguments provided, and immediately adds
+    it to the current section. See the "new" method for
+    Archive::Builder::File below for more details on the arguments.
+
+    Returns true if the file is created and added successfuly. Returns
+    "undef" if an error occurs during either the creation or addition of the
+    file.
+
+  file $path
+    Finds the "Archive::Builder::File" object with the given path and
+    returns it. Returns undef if no such file exists.
+
+  files
+    Returns a reference to a hash containing all of the files objects, keyed
+    by their paths. Returns 0 if no files exist within the section.
+
+  file_list
+    Returns a list of all the file objects, sorted by path. Returns a null
+    array "()" if no files exist within the section.
+
+  remove_file $path
+    Removes the file object with the given path from the section. Returns
+    "undef" if no such path exists within the section.
+
+  file_count
+    Returns the number of files contained in the section
+
+  save $directory
+    The "save()" method works the same as the "Archive::Builder" "save"
+    method, generating the files and saving them below the directory
+    provided. Again, the directory is created on demand.
+
+    Returns "undef" if an error during generation or saving occurs.
+
+  delete
+    The "delete" method deletes a Section, removing it from its parent
+    Builder if applicable, and removing all child Files from the Section.
+
+    The "delete" method always returns true.
+
+  reset
+    If the contents of any of the files in the Section has been generated (
+    and thus cached ), the "reset" method will remove any cached content
+    from the files, forcing them to be generated again.
+
+    The "reset" method always returns true.
+
+  archive $type
+    As for the "Archive::Builder" "acrhive" method, creates an archive
+    handle of the given type. Returns a "Archive::Builder::Archive" object
+    on success. Returns "undef" on error.
+
+Archive::Builder::File
+  new $path, $generator [, @arguments ]
+    Creates a new "Archive::Builder::File" object and returns it. This
+    method is not normally used directly, with the
+    "Archive::Builder::Section" method "new_file()" being more typically
+    used.
+
+    The path argument should be a valid looking relative path. That is, it
+    cannot start with /. For safety, the use of escaping slashes and
+    relative '..' paths are restricted for safety.
+
+    The generator should be a string containing the name of the function to
+    be used to generate the file contents. A check will be done to ensure
+    that the module containing the function is installed, although the
+    existance of the function itself will not be tested. For example, for
+    the generator function "Foo::Bar::makeme", a test to make sure
+    "Foo::Bar" is installed will be done.
+
+    To specify a function in the the main package ( say in a script ), the
+    format "main::function" MUST be used. A generator value that does not
+    contain a package seperator will be assumed to be one of the default
+    generators. The list of default generators, and instructions on how to
+    write your own generators, are in the Archive::Builder::Generators
+    documentation.
+
+    Anything passed after the generator are assumed to be arguments to the
+    generator function, and will be stored and passed as needed. Note that
+    the arguments are not copied or cloned, so any objects passed as
+    arguments and later modified, will be generated using the modified
+    values. This is considered a feature. If you need to freeze a copy of
+    the object for the generation, you are recommended to Clone it before
+    passing.
+
+  path
+    Returns the path for the file. This cannot be changed after creation.
+
+  generator
+    Returns the generator for the file. This cannot be changed after
+    creation
+
+  arguments
+    Returns a reference to an array containing the arguments to be passed to
+    the generator, or 0 if there are no arguments. The list of arguments
+    cannot be changed after creation ( although of course objects passed can
+    be changed outside the scope of this API ).
+
+  binary
+    This method will analyse the file contents ( generating if needed ) to
+    determine if the file is a binary file. While not 100% accurate, it
+    should be good enough for most situations.
+
+  executable
+    Calling this method will add a hint to the file that it should be
+    considered as an executable file, should the need arise. This is most
+    likely used in situations where permissions need to be set after
+    generation.
+
+  Section
+    If added to a Section, the "Section" method returns the Section to which
+    we have been added.
+
+    Returns a Archive::Builder::Section object if the File is added to one,
+    or "undef" if not.
+
+  contents
+    Generates and returns the contents of the file as a scalar reference.
+    Returns "undef" if a generation error occurs.
+
+  save $filename
+    Bypassing the normal generation process and path name, the "save" method
+    allows you to generate a single file object and save it to a specific
+    filename. Any directories need to write the file will be created on
+    demand. Returns "undef" if a generation permissions error occurs.
+
+  delete
+    If added to a Section, the "delete" method allows us to remove and
+    delete the file from the parent Section. Always returns true.
+
+  reset
+    If the file has been generated ( and thus cached ), the "reset" method
+    will remove any cached content from the files, forcing it to be
+    generated again.
+
+    The "reset" method always returns true.
+
+TODO
+    Better control over caching, more archive types, pre-generation testing.
+
+SUPPORT
+    Bugs should always be submitted via the CPAN bug tracker.
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Archive-Builder>
+
+    For other issues, contact the maintainer.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    Archive::Builder::Archive, Archive::Builder::Generators, Archive::Tar,
+    Archive::Zip.
+
+COPYRIGHT
+    Copyright 2002 - 2011 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

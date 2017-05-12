@@ -1,0 +1,29 @@
+Acme-Curses-Marquee
+
+This module implements a big, stupid, OO, curses-based, scrolling
+marquee. Woooo!
+
+Check out the included 'scrolly' test script, which has 2 independent
+marquees to play with, if you'd like to see A::C::M in action before
+installing the module (but don't set a font before setting some text
+on a marquee).
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+You'll also be needing a copy of figlet in your path.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Shawn Boyette
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

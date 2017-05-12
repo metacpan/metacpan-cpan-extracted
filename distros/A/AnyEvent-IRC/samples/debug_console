@@ -1,0 +1,90 @@
+#!/usr/bin/env perl
+# This is a simple script that connects stdin/stdout with a client
+# connection to an irc server. the command line arguments are:
+#
+# $ ./debug_console <nick> <server> <port>
+#
+use common::sense;
+use IO::Handle;
+use AnyEvent;
+use AnyEvent::IRC::Client;
+use AnyEvent::IRC::Util qw/mk_msg parse_irc_msg encode_ctcp/;
+use Data::Dumper;
+
+my ($nick, $server, $port) = @ARGV;
+
+my $c = AnyEvent->condvar;
+my $stdout = AnyEvent::Handle->new (fh => \*STDOUT);
+my $con = new AnyEvent::IRC::Client;
+
+$con->reg_cb (
+   connect => sub {
+      my ($con, $err) = @_;
+
+      if (defined $err) {
+         warn "Couldn't connect: $err\n";
+         $c->broadcast;
+      } else {
+         $stdout->push_write ("Connected!\n");
+      }
+
+      $con->register ($nick, $nick, $nick);
+   },
+   debug_recv => sub {
+      my ($con, $msg) = @_;
+      $stdout->push_write (
+         "< "
+         . mk_msg ($msg->{prefix}, $msg->{command}, @{$msg->{params}})
+         . "\n"
+      );
+   },
+   debug_send => sub {
+      my ($con, @msg) = @_;
+      $stdout->push_write (
+         "> " . mk_msg (undef, @msg) . "\n"
+      );
+   },
+   registered => sub {
+      my ($con) = @_;
+
+      my $stdin;
+      $stdin = AnyEvent::Handle->new (
+         fh => \*STDIN,
+         on_eof => sub {
+            warn "EOF on STDIN, disconnecting...\n";
+            $con->disconnect ("Console EOF");
+         },
+         on_error => sub {
+            warn "Error on STDIN: $!\n";
+         },
+         on_read => sub {
+            $stdin->push_read (line => sub {
+               my ($stdin, $line) = @_;
+
+               if ($line =~ /^!/) {
+                  my $r = eval $line;
+                  if ($@) {
+                     warn "eval error: $@\n";
+                  } else {
+                     $Data::Dumper::Terse = 1;
+                     $stdout->push_write ("result: " . Data::Dumper::Dumper ($r));
+                  }
+               } else {
+                  my $msg = parse_irc_msg ($line);
+                  $con->send_msg ($msg->{command}, @{$msg->{params}});
+               }
+            });
+         }
+      );
+   },
+   disconnect => sub {
+      warn "disconnect: $_[1]!\n";
+      $c->broadcast
+   },
+);
+
+$con->ctcp_auto_reply ('VERSION', ['VERSION', 'DebugConsole:0.1:Perl']);
+
+$con->connect ($server, $port || 6667);
+
+$c->wait;

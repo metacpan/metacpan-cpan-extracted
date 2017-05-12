@@ -1,0 +1,24 @@
+Apache::MONITOR
+===============
+
+This module implements the HTTP MONITOR extension method.
+
+See perldoc lib/Apache/MONITOR.pm for further documentation.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003,2004 Jan Algermissen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

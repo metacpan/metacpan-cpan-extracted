@@ -1,0 +1,33 @@
+Revision history for AnyEvent-Finger
+
+0.10      2015-03-18 02:16:24 -0400
+  - Documentation improvements
+
+0.09      2014-04-08 14:38:42 -0400
+  - Support for Perl 5.8
+
+0.08      2013-10-06 01:15:35 -0400
+  - documentation tweaks
+
+0.07      2013-03-20 18:24:30 America/New_York
+  - fixup meta resources
+
+0.06      2013-03-20 17:48:44 America/New_York
+  - documentation updates
+
+0.05      2013-02-09 18:46:53 America/New_York
+  - documentation tweaks
+
+0.04      2013-02-09 17:00:20 America/New_York
+  - minor inheritence tweak
+
+0.03      2013-02-09 09:22:11 America/New_York
+  - pass $server object into on_bind first argument
+
+0.02      2013-02-09 09:13:27 America/New_York
+  - create on_bind callback on server for when port # is not known in advance
+  - don't use Condvar#recv from AnyEvent::Finger::Server as it may not be
+    supported by the AnyEvent implementation
+
+0.01      2013-01-22 10:50:03 America/New_York
+  - initial version

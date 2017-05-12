@@ -1,0 +1,32 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+
+# Copyright (c) 2009 AdCopy
+# Author: Jeff Weisberg
+# Created: 2009-Apr-01 12:17 (EDT)
+# Function: put example
+#
+# $Id$
+
+use AC::Yenta::Client;
+use Time::HiRes 'time';
+use JSON;
+use strict;
+
+
+my $ys = AC::Yenta::Client->new( debug => sub{ print STDERR @_, "\n"; });
+
+
+my $key = 'YX3jSXD3CBRUDABm';
+
+my $res = $ys->distribute(
+    # map, key, version, data
+    'mymap', $key, timet_to_yenta_version(time()),
+    encode_json( {
+        url_id	=> $key,
+        url	=> 'http://www.example.com',
+        acc_id	=> 'C9TdSgbUCBRUCABG',
+        format	=> 'html',
+    }),
+   );
+

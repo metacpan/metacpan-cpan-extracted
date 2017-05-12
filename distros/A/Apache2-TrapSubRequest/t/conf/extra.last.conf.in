@@ -1,0 +1,6 @@
+LoadModule negotiation_module @src_dir@/mod_negotiation.so
+
+<Directory @DocumentRoot@>
+Options Indexes MultiViews
+#DirectoryIndex index.html
+</Directory>

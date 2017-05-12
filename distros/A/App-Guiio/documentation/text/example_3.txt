@@ -1,0 +1,12 @@
+
+
+
+           User code ^            ^ OS code
+                      \          /
+                       \        /
+                        \      /
+           User code <----Mode----->OS code
+                        /      \
+                       /        \
+                      /          \
+          User code  v            v OS code

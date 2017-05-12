@@ -1,0 +1,278 @@
+
+                        CHANGELOG for Crypt::RSA
+
+--------------------------------------------------------------------------
+
+
+1.98                                                          Jul 08, 2008
+
+ * Precedence bug in Public::write() and Private::write()
+   (http://rt.cpan.org/Public/Bug/Display.html?id=37489)
+   Thanks to HRAFNKELL for reporting this!
+
+1.96                                                          Jul 06, 2008
+
+ * Set the version numbers in modules to $Crypt::RSA::Version::VERSIOn 
+
+1.95                                                          Jul 06, 2008
+
+ * Remove STDERR error output in Crypt::RSA::SS::PSS.
+   (http://rt.cpan.org/Public/Bug/Display.html?id=29048)
+
+ * Allow symmetric cipher specification in Crypt::RSA::Key.
+   (http://rt.cpan.org/Public/Bug/Display.html?id=27929)
+
+ * Fix bug in AUTOLOAD. 
+   (http://rt.cpan.org/Public/Bug/Display.html?id=26028)
+
+ * Use Module::Install instead of ExtUtils::MakeMaker
+
+ * Consolidate versioning to module version in Crypt::RSA::Version 
+   (which is the reason for the version # jump)
+
+ * "use base" instead of @ISA 
+
+ * "use FindBin" instead of the literal "lib" - this is safer.
+
+
+1.58                                                          Dec 21, 2006
+
+ * We turn on binmode() on filehandles when reading and writing
+   keys from disk, so allow safe exchange of SSH private keys
+   from Windows and *nix systems. Thanks to Ulisses Gomes
+   <ulisses@ibiz.com.br> for pointing this out.
+
+ * Include a copy of the GPL in the distribution. This addresses
+   bug #18771. (http://rt.cpan.org/Public/Bug/Display.html?id=18771)
+
+ * Removed warnings from t/15-benchmark.t
+
+1.57                                                          Oct 20, 2005
+
+ * Updated POD documentation and added POD syntax and coverage
+   tests using Test::Pod and Pod::Coverage.
+
+1.56                                                         July 05, 2005
+
+ * Removed references to the mailing list and added support for
+   an optional commercial license.
+
+1.55                                                     February 18, 2005
+
+ * Fixed a bug ::DataFormat::i2osp(), wherein there was an encoding problem 
+   when the most significant byte is 0x0100. Reported and patched by 
+   <jbarkdull@yahoo.com> <rt.cpan.org: Bug #11495>
+
+ * Fixed warnings in t/15-benchmark.t
+
+1.51                                                     February 25, 2003
+
+ * In Crypt::RSA::encrypt() and decrypt() added a check to ensure the
+   blocksize is greater than 0. Blocksize can be smaller than 0 if the RSA
+   key modulus is too small for a particular encoding.
+
+1.50                                                      January 08, 2003
+
+  * In ::Key::generate() calls to ::Key::Private::write() and
+    ::Key::Public::write() have been fixed.  Thanks to 
+    Lars Rehe <rehe@mail.desy.de> for pointing out this bug.
+
+  * Removed all /home/vipul/PERL/crypt* from @INC from all modules.
+
+  * Fixed version numbers on a few modules, so CPAN correctly reports the
+    newer modules.
+                        
+  * Fixed some documentation typos.
+    
+
+1.48                                                    September 25, 2001
+
+  * POD documentation for ::Key::[Private|Public].
+
+1.47                                                         June 22, 2001
+
+  * ::ES::*::decrypt() won't raise an error when cyphertext is an empty
+    string. Thanks to Roman Semenov for pointing out the bug.
+
+  * Field names Plaintext & Message and Cyphertext & Ciphertext can now be
+    used interchangeably everywhere.
+
+1.46                                                         June 18, 2001
+
+  * encrypt()/decrypt() routines everywhere do a key check before calling
+    octet_len() and die gracefully when passed a bad key. Thanks to
+    Nicolas Huillard for pointing out the bugs.
+
+1.45                                                         June 11, 2001
+
+  * Small fixes in ::Key::Private/Pubic and ::Key::Private pod.  Thanks 
+    to Eric Kolve for pointing out the bugs.
+
+1.44                                                          May 31, 2001
+
+  * Dirty hack to shut off warnings in t/15-benchmark.t
+
+1.43                                                          May 25, 2001
+
+  * Specified the correct version number of Class::Loader in PREREQ_PM
+    hash of Makefile.PL.
+
+  * ::Key loads ::Key::Private and ::Key::Public by default.
+
+1.42                                                          May 24, 2001
+  
+  * Speed optimizations throughout. 
+
+  * Documented Crypt::RSA and Crypt::RSA::Key.
+
+  * ::Key::Private::read() will call reveal() if the password is provided
+    at construction. 
+
+  * Added support for unencrypted keys to ::Key::Private.
+
+  * ::Key::Private does not convert pari2pv at every STORE().
+    Tie::EncryptedHash is created explicitely at hide().
+    
+  * Put together ::Key::Private::SSH from Benjamin Trott's patches and
+    wrote ::Key::Public::SSH. ::Key::Private::SSH's CBC encryption is 
+    not compatible with SSH yet.
+
+  * Documented the Crypt::RSA error handling mechanism in
+    Crypt::RSA::Errorhandler.
+
+  * Encryption schemes, signature schemes and post processors are now
+    loaded at runtime in Crypt::RSA. Suitable values for these can be
+    specified at object construction. Primary reason for this is to
+    interface with modules not included in the Crypt::RSA bundle.
+
+  * Wrote ::Key::Private::check() and ::Key::Public::check(). Key checks
+    happen automagically in ::Primitives.
+
+  * ::Key::generate() computes dp, dq, u (parameters required for
+    decrypting with CRT) and stores them in the private key.
+
+  * Fixed another bug in ::ES::PKCS1v15, where a greedy regex was slurping
+    up part of the plaintext when plaintext had a null character.
+    
+
+1.37                                                        April 17, 2001
+
+  * Moved ::DataFormat::generate_random_octet() to Crypt::Random where it
+    is implemented more efficiently. Modified t/03-random-octet.t to use
+    Crypt::Random. (Crypt::RSA now needs Crypt::Random 1.34+).
+
+  * Fixed a bug in ::ES::PKCS1v15 caused by inclusion of null characters
+    in the padding string. Null chars are used as delimiters in PKCS #1
+    v1.5 encoding. Thanks to Ganèche <gramanoudjame@promonetic.com> 
+    for reporting this bug.
+
+
+1.36                                                        April 10, 2001 
+
+  * Modified Crypt::RSA::encrypt() to return an error when the keysize is
+    too small for use with the selected scheme.
+
+  * Modified Crypt::RSA ::ES::* and ::SS::* to work with keysizes 
+    that are not multiples of 8.
+
+  * Wrote ::DataFormat::octet_len() to computes the octet length of
+    an integer.
+
+  * Wrote exportable ::Debug::debuglevel(). Use debuglevel(1) to turn on
+    debugging.
+
+
+1.34                                                        April 7, 2001 
+
+  * Wrote crypt-rsa-interoperablity.pod that contains the structure for a
+    Crypt::RSA interoperability chart. Added an entry for RSAREF 2.0
+    signatures and encryption
+
+  * Support for decryption using the Chinese Remainder Threorum
+    in ::Primitives::decrypt(). Patch by Benjamin Trott
+    <ben@rhumba.pair.com>
+
+  * Identity is now kept unencrypted in ::Key::Private objects
+
+
+1.33                                                        April 6, 2001
+
+ * Wrote ::SS:PKCS1v15 (that implements PKCS #1 v1.5 signatures) and a test
+   for it (t/14-es-pkcs1v15.t)
+
+ * Renamed ::ES::PKCS1_v1_5 to ::ES::PKCS1v15. The underscores were
+   driving me nuts
+
+ * Wrote ::DataFormat::h2osp() - Hex to Octet String Primitive, that
+   converts hex strings/numbers of arbitrary length into octet strings
+
+ * Couple of small changes to ::Debug::debug()
+
+
+1.32                                                        April 5, 2001
+
+ * Wrote ::ES::PKCS1_v1_5 that implements PKCS #1 v1.5 padded encryption,
+   and a test for it (t/13-es-pkcs1v15.t)
+
+
+1.31                                                        April 3, 2001
+
+ * Renamed ::EME::* to ::ES::*. EME (Encoding Method for encryption) was a
+   leftover from an earlier class framework. Renamed ::SSA::* to ::SS::*,
+   since we might have Signature Schemes without Appendix under ::SS::*
+
+ * Changed `P' (parameterization) in ::ES::OAEP to a null string.
+   Strings encrypted with versions < 1.15 will not decrypt.
+
+ * Added versioning support in ::ES::OAEP. Returns the old
+   parameterization string for version < 1.15. So strings encrypted 
+   with < 1.15 will decrypt!
+
+ * Wrote t/12-versioning.t, with tests for versioning in ::ES::OAEP.
+
+ * Added versioning support in ::SS::PSS.
+
+ * Numerical parameters of ::Key::Public and ::Key::Private can be
+   assigned perl strings, hex strings, or hex numbers.
+
+
+1.30                                                        March 25, 2001 
+
+ * Documented Crypt::RSA methods
+
+ * Added ASCII armour support to Crypt::RSA::encrypt(), decrypt(), sign()
+   and verify() using Convert::ASCII::Armour
+
+ * Crypt::RSA will now work with any encryption/signing scheme as long as
+   they provide the same method interface as Crypt::RSA::EME::OAEP and
+   Crypt::RSA::SSA::PSS
+
+ * Wrote ::EME::OAEP::version() and ::SSA::PSS::version(). The next
+   release will include support for version specific operation in ::EME::*
+   and ::PSS::*
+
+ * Added and corrected documentation for ::EME::OAEP and ::SSA::PSS
+
+
+1.25                                                        March 12, 2001
+
+ * Wrote Crypt::RSA::sign() and Crypt::RSA::verify()
+
+ * Added tests for sign and verify to t/11-wrapper.t
+
+ * Bugfix in Crypt::RSA::EME::OAEP::hash() and mgf()
+     $self was being fed to the digest
+
+ * Bugfix in Crypt::RSA::SSA::PSS::hash() and mgf()
+ 
+
+1.24                                                        March 11, 2001
+
+ * Bug fix in Crypt::RSA::EME::OAEP::decode()
+    newline in plaintext was causing decode() to return error
+
+ * Wrote Crypt::RSA::encrypt() and Crypt:RSA::decrypt()
+
+ * Wrote a test for Crypt::RSA (t/11-wrapper.t)
+
+

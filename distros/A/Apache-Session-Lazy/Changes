@@ -1,0 +1,24 @@
+Revision history for Perl extension Apache::Session::Lazy.
+
+0.05  Sun Feb  2 06:07:33 2003
+	- Added a subroutine that could be overloaded so as to not allowing
+          certain things as the session ID (the tactic of trap-ids could be
+          implemented here.), or Apache::Session interface (only allow
+          Session::MySQL or somat.).
+        - If the tie is called via an eval() function it is now assumed that
+          the user wishes to assess the validity of the session. (this will hurt
+          performance, but the session will be immediately closed after the test
+          so as to remove locks.)
+
+0.04  Sun Jan  5 11:46:23 2003
+	- Made version numbers all the same :P
+
+0.03  Sun Jan  5 11:46:23 2003
+	- Fixed stupid require error.
+        - Added test for Apache::Session.
+
+0.02  Sun Jan  5 07:26:29 2003
+	- Updated documentation.
+
+0.01  Sat Jan  4 17:23:11 2003
+	- original version;

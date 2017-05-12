@@ -1,0 +1,5 @@
+This is an example of how to use Jungle web spider.
+see ./lib/Acme/Jungle/CrawlerExample.pm 
+and ./lib/NewsSpider/Terra.pm            #this is our spider
+and ./lib/Data/News.pm                   #this is our data handler, will handle extraced data 
+and see the test t/001_load.t            #shows how to start the spidering

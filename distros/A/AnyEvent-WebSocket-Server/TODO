@@ -1,0 +1,12 @@
+Please open an issue on Github if you want me to finish these TODO
+items soon.
+
+https://github.com/debug-ito/AnyEvent-WebSocket-Server
+
+
+- Add "timeout" feature. The timeout is set between the TCP connection
+  establishment and the complete of receiving WebSocket request. The
+  timeout is the defence against the slow-request attack. However that
+  kind of feature should be covered by the front-end Web server like
+  Apache httpd or nginx, so it's not very important for this module.
+

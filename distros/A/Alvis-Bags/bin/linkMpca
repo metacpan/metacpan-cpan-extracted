@@ -1,0 +1,280 @@
+#!/usr/bin/perl -w
+
+use strict;
+use POSIX;
+use IO::Handle; 
+use Getopt::Long;
+use Pod::Usage;
+
+###################### CONFIGURATION #####################
+
+
+############ END CONFIGURATION ######################
+
+#  autoflush
+select((select(STDERR), $| = 1)[0]);
+
+# encoding pragmas follow any includes like "use"
+use encoding 'utf8';
+use open ':utf8';
+
+# build MPCA components, 1 is "no", must be the default 
+my $COMPS = 1; 
+#  number of entries per component per report 
+my $MAXREP = 50; 
+
+my $reporting = 0;
+my $norank = 0;
+my $onerank = 0;
+my $stem = "";
+
+#################################################################
+#
+#  Run
+#
+#################################################################
+
+GetOptions(
+     'man'       => sub {pod2usage(-exitstatus => 0, -verbose => 2)},
+      'onerank' => \$onerank,
+      'norank' => \$norank,
+      'fields=i' => \$MAXREP,
+      'reporting' => \$reporting,
+      'h|help'       => sub {pod2usage(1)}
+);
+
+pod2usage(-message => "ERROR: need number of components and stem")
+      if ( $#ARGV != 1 );
+
+$COMPS = shift();
+$stem = shift();
+
+my $mstem = "$stem$COMPS";
+
+if ( ! -f "$stem.srcpar" ) {
+  print STDERR "Need $stem.srcpar file\n";
+  exit(1);
+}
+if ( $onerank ) {
+  if ( ! -f "$stem.docs" ) {
+    print STDERR "Need $stem.docs file\n";
+    exit(1);
+  }
+  if ( ! -f "$stem.dochash" ) {
+    print STDERR "Need $stem.dochash file\n";
+    exit(1);
+  }
+  print STDERR "\nNow building single rank\n";
+  print STDERR "========================\n";
+  system("mprank -u -h $stem");
+  #  turn off character processing on this since am using unpack()
+  open(INF,'<:bytes',"$stem.onerank");
+  open(INH,"<$stem.dochash");
+  my $buf = ""; 
+  read(INF,$buf,4); 
+  my $I = unpack("i",$buf);
+  my $dhash = "";
+  my $docid = 0;
+  #   the binary read and unpack() combo reads
+  #   entries from an MPCA Vec_t file
+  my %hashrank = ();
+  for (my $i=0; $i<$I; $i++) {
+    read(INF,$buf,4);
+    if ( eof(INH) ) {
+      print STDERR "Too few entries in $stem.dochash for $stem.onerank\n";
+      exit(1);
+    }
+    $_ = <INH>;
+    /^([a-z0-9]+) /i;
+    $hashrank{$1} = unpack("f",$buf)*$I;
+  }
+  if ( ! eof(INH) ) {
+    print STDERR "Too many entries in $stem.dochash for $stem.onerank\n";
+    exit(1);
+  }
+  close(INF);
+  close(INH);
+  #   merge the hashes with the numbers from .docs file
+  open(OUTH,">$stem.ranks");
+  open(INH,"<$stem.docs");
+  while ( ($_=<INH>) ) {
+    my @a = split();
+    my $title = $_;
+    s/^([^ ]+) ([^ ]+) ([^ ]+) ([^ ]+) //;
+    if ( $a[3] =~ /^[0-9A-Fa-f]+$/ && $a[2] =~ /^[0-9A-Fa-f]+$/ ) {
+      if ( ! defined($hashrank{$a[3]}) ) {
+	print STDERR "No matching hash in $stem.docs: $_";
+	exit(1);
+      }
+      print OUTH "$a[0] $hashrank{$a[3]} $title";
+    } else {
+      print STDERR "Bad line in $stem.docs: $_";
+      exit(1);
+    }
+  }
+  close(OUTH);
+  close(INH);
+} elsif ( $reporting == 0 ) {
+  system("sed -e \"s/^maxcomp=.*/maxcomp=$COMPS/\" $stem.srcpar > $mstem.srcpar");
+  system("mpca $mstem open=w run");
+  if ( ! $norank) {
+    system("mprank $mstem");
+  }
+} else {
+  if ( ! -f "$stem.tokens" ) {
+    print STDERR "Need $stem.tokens file\n";
+    exit(1);
+  }
+  if ( ! -f "$stem.docfeats" ) {
+    print STDERR "Need $stem.docfeats file\n";
+    exit(1);
+  }
+  my %featmap = ();
+  my %docfeatmap = ();
+  my %docmap = ();
+  open(WM,"<$stem.tokens");
+  my $line = 0;
+  while ( ($_=<WM>) ) {
+    chomp();
+    $featmap{$line} = $_;
+    $line++;
+  }
+  close(WM);
+  open(WM,"<$stem.docfeats");
+  while ( ($_=<WM>) ) {
+    chomp();
+    my @a = split();
+    $docfeatmap{$a[1]} = $a[0];
+  }
+  close(WM);
+  open(WM,"<$stem.docs");
+  while ( ($_=<WM>) ) {
+    chomp();
+    my @a = split();
+    $docmap{$a[0]} = $a[1];
+  }
+  close(WM);
+  
+  open(WM,"mprep -L $MAXREP,0.00000001 $mstem |");
+  open(WMO,">$mstem.wordmap");
+  while ( ($_=<WM>) ) {
+    chomp();
+    if ( ! /#/ ) {
+      my ($top,$feat,$prob) = split();
+      if ( defined($featmap{$feat}) ) {
+	print WMO "$top $prob $featmap{$feat}\n";
+      } else {
+	print WMO "$top $prob #$feat\n";
+      }
+    }
+  }
+  close(WM);
+  close(WMO);
+  
+  open(WM,"mprep -I $MAXREP,0.00000001 $mstem |");
+  open(WMO,">$mstem.topicmap");
+  while ( ($_=<WM>) ) {
+    chomp();
+    if ( ! /#/ ) {
+      my ($top,$feat,$prob) = split();
+      if ( defined($docmap{$feat}) ) {
+	print WMO "$top $prob $docmap{$feat}\n";
+      }
+    }
+  }
+  close(WM);
+  close(WMO);
+  open(WM,"mprep -J $MAXREP,0.00000001 $mstem |");
+  open(WMO,">$mstem.rankmap");
+  while ( ($_=<WM>) ) {
+    chomp();
+	    if ( ! /#/ ) {
+	      my ($top,$feat,$prob) = split();
+	      if ( defined($docfeatmap{$feat})
+		   && defined($featmap{$docfeatmap{$feat}}) ) {
+		print WMO "$top $prob $featmap{$docfeatmap{$feat}}\n";
+	      }
+	    }
+  }
+  close(WM);
+  close(WMO);
+}
+
+exit 0;
+
+__END__
+
+=head1 NAME
+    
+linkMpca -- default run of MPCA on data from linkBags(1)
+
+=head1 SYNOPSIS
+    
+linkMpca [--fields M|--norank|--onerank|--reporting] K STEM
+
+  Options:
+
+    K                   number of components to use
+    STEM                file stem for linkBags(1) bag
+    --fields M          set the maximum token index to be M
+    --norank            dont do general ranking with the MPCA run
+    --onerank           build a single rank per document only
+    --reporting         build reports only
+    -h, --help          display help message and exit.
+    --man               print man page and exit.
+
+=head1 DESCRIPTION
+
+Builds K components with default mpca and their ranking with mprank
+Requires a basic STEM to exist with .srcpar and bags already created,
+presuably by linkbags(1).  It builds the new model with name STEM plus
+K.  Requires files STEM.tokens, which lists the tokens in number order
+(e.g., 0-th in file has numeric code 0, etc.), one per line.  Also
+requires STEM.docmap file.
+
+Reporting creates three simple text tables:
+   STEM.topicmap  : documents with high component probability
+                 COMP PROBABILITY DOC-URL
+   STEM.rankmap  :  documents with high component-specific pagerank 
+                 COMP PROBABILITY DOC-URL
+   STEM.wordmap  :  tokens (words, URLs, URL+title) frequently
+                on documents for the component
+                 COMP PROBABILITY TOKEN
+
+Onerank option uses "mprank -u -h " to generate the single rank,
+and the output goes to 
+F<STEM.onerank>.
+Print this file with the MPCA pvec utility:
+       /usr/local/share/mpca/scripts/pvec STEM.onerank 
+
+=head1 SEE ALSO
+
+I<linkRedir>(1), 
+I<linkBags>(1), 
+I<linkTables>(1).
+
+=head1 AUTHOR
+
+Wray Buntine
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2006 Wray Buntine
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+=cut
+

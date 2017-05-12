@@ -1,0 +1,16 @@
+abstract: Fetch the current AU terror alert level
+author: 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  File::Spec: 0.80
+  Test::More: 0.47
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: perl
+name: Acme-Terror-AU
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.005
+version: 0.01

@@ -1,0 +1,8 @@
+Revision history for Alien-Build-MB
+
+0.02      2017-03-29 14:29:08 -0400
+  - Respect meta->{arch}
+  - cleanup _alien directory for distclean
+
+0.01      2017-02-02 13:34:58 -0500
+  - initial version

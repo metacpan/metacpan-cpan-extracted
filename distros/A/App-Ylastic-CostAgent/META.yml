@@ -1,0 +1,54 @@
+---
+abstract: 'Perl port of the Ylastic Cost Agent for Amazon Web Services'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  File::Find: 0
+  Test::Fatal: 0
+  Test::More: 0.88
+  Test::Warn: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Ylastic-CostAgent
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  App::Ylastic::CostAgent:
+    file: lib/App/Ylastic/CostAgent.pm
+    version: 0.006
+requires:
+  Archive::Zip: 0
+  Carp: 0
+  Config::Tiny: 0
+  File::Basename: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  Getopt::Lucid: 0
+  IO::Socket::SSL: 0
+  Log::Dispatchouli: 2
+  Mozilla::CA: 0
+  Object::Tiny: 0
+  Pod::Usage: 0
+  Time::Piece: 0
+  Time::Piece::Month: 0
+  WWW::Mechanize: 0
+  autodie: 2.00
+  perl: 5.010
+  utf8: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-Ylastic-CostAgent
+  homepage: http://github.com/dagolden/app-ylastic-costagent/tree
+  repository: git://github.com/dagolden/app-ylastic-costagent.git
+version: 0.006

@@ -1,0 +1,49 @@
+		      -------------------------
+		      Astro::STSDAS::Table V0.1
+		      -------------------------
+
+NAME
+    Astro::STSDAS::Table - access STSDAS format table files
+
+DESCRIPTION
+    Astro::STSDAS::Table is a collection of routines to read STSDAS table
+    files (see <http://stsdas.stsci.edu/STSDAS.html> for more information on
+    the format). Casual users should peruse Astro::STSDAS::Table::Simple.
+
+    Those requiring a more flexible interface may which to use
+    Astro::STSDAS::Table::Binary, which is a subclass of
+    Astro::STSDAS::Table::Base.
+
+    The package currently suffers from the following flaws:
+
+    *       Only binary tables are supported
+
+    *       Tables can only be read.
+
+    *       Reading of column-ordered binary tables is untested.
+
+    *       Reading of binary tables with vector elements is untested.
+
+    *       The test table was written on a big-endian machine, and the
+            tests will therefore fail on little-endian systems.
+
+REQUIREMENTS
+
+    Test::More (v0.42+)
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+LICENSE
+    This software is released under the GNU General Public License. You may
+    find a copy at
+
+       http://www.fsf.org/copyleft/gpl.html
+
+AUTHOR
+    Diab Jerius ( djerius@cpan.org )
+

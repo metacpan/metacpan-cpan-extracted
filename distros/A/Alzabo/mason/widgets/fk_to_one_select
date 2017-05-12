@@ -1,0 +1,78 @@
+<%doc>
+=pod
+
+=head1 NAME
+
+fk_to_one_select
+
+=head1 DESCRIPTION
+
+Given a foreign key and an optional row, this component produces a select
+form element for that relationship.
+
+If a row is given, then its value will be used as the default value
+for the form element.
+
+=head1 PARAMETERS
+
+=over 4
+
+=item * fk (required)
+
+An C<Alzabo::ForeignKey> object representing the relationship.
+
+=item * row (optional)
+
+An Alzabo row object.
+
+=item * class (optional)
+
+This defaults to C<<
+$m->base_comp->attr_if_exists('fk_to_one_select_class_default') >>.
+
+=item * foreign_rows (optional)
+
+This allows you to pre-select the rows in the foreign table that will
+be used for the select options.  Otherwise, the component simple grabs
+all the available rows from the foreign table.
+
+=item * display_column (optional)
+
+This is the column in the foreign table which should be used as the
+visible value of each option.  This defaults to the column involved in
+the foreign key relationship.
+
+=back
+
+=cut
+</%doc>
+<select name="<% $col_from->name | h %>" class="<% $class %>">
+% unless ( $fk->from_is_dependent ) {
+ <option value=""></option>
+% }
+% foreach my $item (@foreign_rows) {
+ <option value="<% $item->select( $col_to->name ) %>" <% defined $current && $item->select( $col_to->name ) == $current ? 'selected="selected"' : '' %>><% $item->select( $display_column->name ) | h %></option>
+% }
+</select>
+<%args>
+$fk
+$row   => undef
+@foreign_rows  => ()
+$class => $m->base_comp->attr_if_exists('fk_to_one_select_class_default')
+$display_column => undef
+</%args>
+<%init>
+# I'm a wuss.  Don't know how to handle this.
+my @col_from = $fk->columns_from;
+return if @col_from > 1;
+
+my $col_from = shift @col_from;
+my $col_to   = $fk->columns_to;
+
+@foreign_rows = $col_to->table->all_rows->all_rows unless @foreign_rows;
+
+my $current;
+$current = $row->select( $col_from->name ) if $row;
+
+$display_column = $col_to unless defined $display_column;
+</%init>

@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:                Acme-EyeDrops
+version:             1.62
+abstract:            Visual Programming in Perl
+license:             perl
+author:
+  - 'Andrew Savige <asavige@cpan.org>'
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+dynamic_config:      0
+requires:
+  Exporter: 0
+  perl: 5.006
+build_requires:
+  Config: 0
+  Test::Pod: 1.12
+  Test::Pod::Coverage: 0.08
+provides:
+  Acme::EyeDrops:
+    file: lib/Acme/EyeDrops.pm
+    version: 1.62
+meta-spec:
+  url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3

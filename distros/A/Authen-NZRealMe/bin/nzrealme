@@ -1,0 +1,273 @@
+#!/usr/bin/perl
+##############################################################################
+#
+# Tools for interacting with the New Zealand RealMe Login service
+# (see: https://www.realme.govt.nz/ ).
+#
+# These tools ARE NOT produced by, nor endorsed by New Zealand Post or the
+# Department of Internal Affairs who jointly operate the RealMe Login service.
+# They are merely an implemention of the published protocols.
+#
+# For more information, see:
+#
+#   nzrealme --help
+#
+
+use strict;
+use warnings;
+
+use Pod::Usage;
+use Getopt::Long qw(GetOptions);
+use Cwd          qw(getcwd);
+
+use Authen::NZRealMe;
+
+my(%opt);
+
+if(!GetOptions(\%opt,
+    'help|?',
+    'version',
+    'conf_dir|conf-dir|c=s',
+    'type|t=s',
+    'allow_create|allow-create',
+    'resolve_flt|resolve-flt',
+    'disable_ssl_verify|disable-ssl-verify',
+    'env=s',
+    'org=s',
+    'org_unit|org-unit=s',
+    'subject_suffix|subject-suffix|subject=s',
+    'domain=s',
+    'to_file|to-file=s',
+    'from_file|from-file=s',
+    'self_signed|self-signed',
+)) {
+    pod2usage(-exitval => 1,  -verbose => 0);
+}
+
+
+if($opt{help} or (@ARGV && $ARGV[0] eq 'help')) {
+    pod2usage(-exitstatus => 0, -verbose => 2);
+}
+
+$ARGV[0] ||= 'version' if $opt{version};
+
+my $start_dir = getcwd();
+eval { Authen::NZRealMe->run_command(\%opt, @ARGV); };
+if($@) {
+    chdir($start_dir);
+    pod2usage(-exitstatus => 1, -verbose => 0, -message => "$@");
+}
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+nzrealme - Tools for interacting with the New Zealand 'RealMe Login' service
+
+=head1 SYNOPSIS
+
+  nzrealme [options] <command> [args ...]
+
+  Commands:
+
+   make-meta   generate XML metadata for your Service Provider (SP)
+   make-certs  generate certificate/key-pair files (see example below)
+   make-bundle generate a zip archive of metadata and certificate files
+   make-req    generate a SAML AuthnRequest, encoded as a URL
+   dump-req    dissect the provided URL and dump the XML
+   resolve     resolve an artifact to an FLT
+   version     print module version number and exit
+   help        detailed help message
+
+  Options:
+
+   --conf-dir <path>  pathname of directory containing metadata & cert files
+   --allow-create     can be used with 'make-req' to allow account creation
+   --type <name>      service type: "login" (default) or "assertion"
+   --env <name>       target environment (must be: 'mts', 'ite' or 'prod')
+   --org <name>       organisation/agency name, e.g.: "Department of Innovation"
+   --org-unit <name>  organisational unit, e.g.: "Innovation Labs"
+   --subject-suffix <detail> additional detail for certificate subject
+   --domain <name>    agency site domain e.g.: innovation.govt.nz
+   --self-signed      make self-signed certificates (not recommended)
+
+=head1 DESCRIPTION
+
+The C<nzrealme> script and related modules from the L<Authen::NZRealMe>
+distribution provide tools for interacting with the New Zealand RealMe Login
+service operated by New Zeand Post and the Department of Internal Affairs.
+These tools ARE NOT produced by nor endorsed by NZPost or DIA.  They are merely
+an implemention of the published protocols.
+
+=head1 COMMANDS
+
+The following commands are available:
+
+=over 4
+
+=item make-certs
+
+Generate two certificate/key pairs - one for signing and one for mutual SSL
+encryption.  This step is not required for integrating with the development
+environment ('MTS') since certficates will be provided to you.  For integration
+with the test environment ('ITE') or with the production environment ('PROD')
+two CSRs (Certificate Signing Requests) will be generated which you will then
+use to get signed certificates issued from an approved CA (Certification
+Authority).
+
+If no further options are provided, you will be prompted for the required
+certificate parameters.  You can specify all the answers on the command-line:
+
+  nzrealme make-certs --conf-dir . --env ite \
+      --org "Department of Innovation" \
+      --org-unit "Innovation Labs" \
+      --domain innovation.govt.nz \
+      --subject-suffix "/L=Wellington/ST=Wellington/C=NZ"
+
+=item make-meta
+
+Generate (or edit) a Service Provider metadata file and save it with a digital
+signature.
+
+=item make-bundle
+
+Create a ZIP file containing the metadata and certificate files needed by
+the Identity Provider.
+
+=item make-req
+
+Generate a URL containing a SAML AuthnRequest.  The C<--type> option should be
+used to generate either a "login" request (the default) or an "assertion"
+request.
+
+Note: By default, an AuthnRequest to the "login" service will have the
+AllowCreate flag set to false (i.e.: the user must already have a RealMe Login
+associated with this SP).  Use C<--allow-create> if you want the request to
+allow a new account and FLT to be created.
+
+=item dump-req <request URL>
+
+Takes a URL containing a SAML AuthnRequest; decodes it; and dumps the XML.  For
+example:
+
+  nzrealme -c /etc/realme-conf make-req | nzrealme -c /etc/realme-conf dump-req
+
+This utility can be used to dump AuthnRequests produced by any SAML
+implementation.
+
+=item resolve <artifact> <request ID>
+
+This command takes two arguments - an artifact (either the whole URL or just
+the SAMLart part from the query string) and the request ID which was output
+from the original 'make-req' command.
+
+The command will decode the SAML artifact; generate a SAML ArtifactResolve
+request; send the request to the IdP using SOAP over the SSL back-channel;
+validate the resulting assertion; and extract the FLT (Federated Logon Tag)
+from the response.
+
+Note: in practice a SAML artifact must be resolved very soon after it is
+generated or it will expire.
+
+=item version
+
+Print version number of L<Authen::NZRealMe> module and exit.
+
+=item help
+
+Display this documentation.
+
+=back
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<< --conf-dir <directory> >> (alias -c)
+
+Specify the path to the directory containing the metadata files and
+certificate/key-pair files for signing requests and encrypting SSL traffic.
+See C<< perldoc Authen::NZRealMe >> for more information about config files.
+
+=item B<< --type <name> >>
+
+Use this option to direct the request to either the "login" service (the
+default) or the "assertion" service to retrieve identity attributes.
+
+=item B<< --env <name> >>
+
+This option can be used with the C<make-certs> command and specifies the
+target environment for the certificates.  Acceptable values are 'mts', 'ite'
+and 'prod'.
+
+If you do not provide any certificate parameters, you will be prompted.
+
+=item B<< --org "<name>" >>
+
+The service provider agency/organisation name which should be used in the
+certificates.
+
+=item B<< --org-unit "<name>" >>
+
+The optional organisational unit name for use in the certificates.
+
+=item B<< --subject-suffix "<detail>" >>
+
+Optional additional details to go on the end of the certificate subject field.
+The CN will be calculated for you based on --domain.  The O and OU will be
+added based on --org and --org-unit.  Prefix each fieldname with a forward
+slash (e.g.: --subject-suffix "/L=Wellington/ST=Wellington/C=NZ").
+Certification Authorities have historically required these location fields when
+signing requests.
+
+=item B<< --self-signed >>
+
+When running the 'make-certs' command this option allows generating self-signed
+certificates rather than generating Certificate Signing Requests (CSRs).  It
+used to be possible to use self-signed certs in the ITE environment (not
+production) but this is no longer the case so this option should probably never
+be used.
+
+=item B<< --disable-ssl-verify >>
+
+When using the C<resolve> command, this option will skip verification of the
+SSL certificate presented by the IdP.  This is useful if you have not yet
+configured the necessary CA certs or if you consider the digital signature on
+the assertion provides sufficient guarantee of authority.
+
+=item B<< --to-file <filename> >>
+
+This option is a debugging aid.  When using the C<resolve> command, this option
+will cause the SAML assertion response from the login or assertion service to
+be saved in a file.
+
+=item B<< --from-file <filename> >>
+
+This option is a debugging aid.  When using the C<resolve> command, instead of
+communicating with the login or assertion service, this option will cause the
+SAML assertion response to be loaded from a file (presumably one created using
+the C<--to-file> option.
+
+=back
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2010-2013 Enrolment Services, New Zealand Electoral Commission
+
+Written by Grant McLean E<lt>grant@catalyst.net.nzE<gt>
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut
+
+
+

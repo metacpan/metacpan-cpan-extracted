@@ -1,0 +1,35 @@
+#! /usr/bin/perl
+
+use warnings; use strict;                           # boring
+use lib qw[ lib ];                                  # boring
+use App::Rad::Plugin::ReadLine::Demo qw[ demo ];    # boring
+use App::Rad qw[ ReadLine ];
+App::Rad->run();
+sub setup {
+    my $c = shift;
+    $c->register_commands( qw[ demo critter_shell ] );
+    $c->register( something => sub {
+            "Helpful things going on: ... done\n"            # boring
+        }, 'helpful things'
+    );
+    $c->register( status => sub {
+            "Deadlines: met\nFinancial: under budget\n"      # boring
+            ."Customers: happy\n"                            # boring
+            ."Pigs     : saddled up and ready for flight\n"  # boring
+        }, 'show current status'
+    );
+    $c->shell_options;
+}
+sub critter_shell : Help('a sub-shell'){
+    my $c=shift;
+    # set up commands to be visible in critter_shell, they will
+    # not be available from the command line
+
+    $c->unregister_command( $_ ) for qw[ something status demo critter_shell ];
+    $c->register( critterfy     => sub {
+            "A critter has been configured for the current user\n" # boring;
+        }, 'setup critter instance for user with given id');
+    $c->register( decritterfy   => sub {}, 'remove a critter, for the user with given id' );
+
+    $c->shell({ ShellPrompt => 'critters> ' });
+}

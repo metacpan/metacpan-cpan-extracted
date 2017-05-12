@@ -1,0 +1,58 @@
+#!perl
+use strict;
+use warnings;
+use App::Toodledo;
+
+my $todo = App::Toodledo->new( app_id => shift||die "Usage: $0 app_id\n" );
+$todo->login_from_rc;
+my @tasks = $todo->get_tasks_with_cache;
+$todo->foreach( \@tasks, \&convert );
+my @saved;
+$todo->edit( @saved ) if @saved;
+
+sub convert
+{
+  my ($self, @args) = @_;
+
+  my $changed;
+  my @tags = $self->tags;
+  for ( @tags )
+  {
+    next unless s/\A([a-z])/\u$1/;  # Yeah, not Unicode-aware
+    $changed++;
+  }
+
+  if ( $changed )
+  {
+    print "Editing '", $self->title, "'\n";
+    $self->tags( @tags );
+    push @saved, $self;
+    if ( @saved > 49 )
+    {
+      $todo->edit( @saved );
+      @saved = ();
+    }
+  }
+}
+
+__END__
+
+=head1 NAME
+
+  title_case_tags - Change lowercase tags to Title Case
+
+=head1 SYNOPSIS
+
+  title_case_tags <app_id>
+
+=head1 DESCRIPTION
+
+I had a lot of tags that were all lowercase, and I decided I wanted them
+to be in title case (initial capital letter).  This program found and
+changed them all.
+
+=head1 AUTHOR
+
+Peter Scott C<cpan at psdt.com>
+
+=cut

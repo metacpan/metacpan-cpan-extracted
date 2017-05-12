@@ -1,0 +1,23 @@
+Acme-SvGROW version 0.01
+========================
+
+increase the memory allocated for the pv "string" side of a perl scalar, using a pure-perl technique.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+pure perl. L-value function requires a perl supporting lvalue subroutines.
+
+COPYRIGHT AND LICENCE
+
+public domain, 2009, David L. Nicol
+
+

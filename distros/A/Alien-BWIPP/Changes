@@ -1,0 +1,44 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Changes - Revision history for Alien-BWIPP
+
+=head2 0.007  2014-08-04
+
+upgrade to barcode writer version 2014-07-30-1
+
+=head2 0.006  2010-07-01
+
+=over
+
+=item upgrade to barcode writer version 2010-06-20, see upstream changes file
+L<http://postscriptbarcode.googlecode.com/svn/trunk/CHANGES>
+
+=item remove undocumented metrics feature, its intent is now handled downstream
+in a better way
+
+=item dependencies are handled for all barcode types
+
+=back
+
+=head2 0.005  2010-01-13
+
+0.003 broke 5.10.1, change work-around to work on both 5.10.0 and 5.10.1
+(thanks, Jozef Kutej)
+
+=head2 0.004  2009-12-11
+
+increase required Module::Build version
+
+=head2 0.003  2009-12-11
+
+work-around for Perl 5.10.0
+
+=head2 0.002  2009-12-10
+
+small Build fix to better enforce the required L<Module::Build> version
+
+=head2 0.001  2009-12-07
+
+Initial release.

@@ -1,0 +1,20 @@
+Revision history for Perl extension AIX::Perfstat.
+
+0.01  Mon Jul 10 15:22:28 2006
+	- original version; created by h2xs 1.23 with options
+	  -A -n AIX::Perfstat
+
+0.02  Thu Jul 20 18:22:52 2006
+	- Added an example Perl script, updated the documentation,
+	and updated the copyright in all the files.
+
+0.03  Fri Jul 28 11:58:53 MDT 2006
+	- Fixed network interface tests. Commented out some tests
+	not working on all AIX. Will look into this later.
+
+0.04  Wed Sep 24 16:55:50 MDT 2008
+	- Added restrictions for OS and perfstat library, so that
+	CPAN Testers don't report failures on unsupported platforms.
+
+0.04.1 Tue Sep 30 09:09:36 MDT 2008
+	- Fix the version number and the changelog.

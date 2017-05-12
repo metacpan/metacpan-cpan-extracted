@@ -1,0 +1,45 @@
+#
+# author Sylvain Afchain (safchain@cloud4pc.com)
+#
+# test of crossfade mixer, usage crossfade.pl <wav> <wav> <wav> > result.raw
+# ex: perl t/crossfade.pl t/1.wav t/starter.wav t/2.wav > result.raw
+#
+
+use  Audio::Stream::Crossfade;
+use IO::File;
+
+my $mixer = new Audio::Stream::Crossfade(duration => 1, silentOut => 0.8, silentIn => 0);
+my $blankDetect = -40;
+
+
+my $wav = new IO::File $ARGV[0];
+
+my $s = 0;
+
+binmode STDOUT, ":raw";
+while (1) {
+	my $pcm;
+
+	sysread ($wav, $pcm, 4096);
+	unless ($pcm) {
+		$mixer->switch;
+		close($wav);
+		warn "Switch";
+		$s++;
+		
+		if ($s == 3) {
+			last;
+		}
+		if ($s == 1) {
+			$wav = new IO::File $ARGV[1];
+		}
+		if ($s == 2) {
+			$wav = new IO::File $ARGV[2];
+		}
+		
+		next;
+	}
+	
+	$pcm = $mixer->mixPcmFrames($pcm);
+	syswrite (STDOUT, $pcm);
+}

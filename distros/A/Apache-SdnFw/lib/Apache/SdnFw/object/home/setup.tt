@@ -1,0 +1,36 @@
+<form method="POST" action="[% s.uof %]">
+<input type="hidden" name="save" value="1">
+<div class="floatleft">
+<table>
+	<caption>Objects</caption>
+	<thead>
+		<tr>
+			<th>Code</th>
+			<th>Category</th>
+			<th>Name</th>
+			<th>Show<br>on<br>Home</th>
+			<th>Show Tab<br>(order)</th>
+			<th>Tab Name</th>
+		</tr>
+	</thead>
+	<tbody>
+[% FOREACH l IN list %]
+		<tr>
+			<td>[% l.code %]</td>
+			<td><select name="[% l.code %]:object_cat_id">
+			<option value=""></option>
+[% FOREACH c IN cats %]
+			<option value="[% c.object_cat_id %]"[% IF c.object_cat_id == l.object_cat_id %] selected[% END %]>[% c.name %]</option>
+[% END %]
+			</select></td>
+			<td><input name="[% l.code %]:name" value="[% l.name %]"></td>
+			<td><input type="checkbox" name="[% l.code %]:home" value="1"[% IF l.home %] checked[% END %]></td>
+			<td><input name="[% l.code %]:tab_order" size="3" value="[% l.tab_order %]"></td>
+			<td><input name="[% l.code %]:tab_name" value="[% l.tab_name %]"></td>
+		</tr>
+[% END %]
+	</tbody>
+</table>
+<input type="submit" value="Save">
+</div>
+</form>

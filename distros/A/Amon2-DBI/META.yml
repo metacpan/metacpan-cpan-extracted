@@ -1,0 +1,57 @@
+---
+abstract: 'Simple DBI wrapper'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amon2-DBI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Amon2::DBI:
+    file: lib/Amon2/DBI.pm
+    version: '0.33'
+  Amon2::DBI::db:
+    file: lib/Amon2/DBI.pm
+  Amon2::DBI::dr:
+    file: lib/Amon2/DBI.pm
+  Amon2::DBI::st:
+    file: lib/Amon2/DBI.pm
+  Amon2::Plugin::DBI:
+    file: lib/Amon2/Plugin/DBI.pm
+requires:
+  Carp::Clan: '0'
+  DBI: '1.616'
+  DBIx::TransactionManager: '1.09'
+  SQL::Interp: '1.10'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Amon2-DBI/issues
+  homepage: https://github.com/tokuhirom/Amon2-DBI
+  repository: git://github.com/tokuhirom/Amon2-DBI.git
+version: '0.33'
+x_contributors:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'makamaka <makamaka.donzoko@gmail.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.017'

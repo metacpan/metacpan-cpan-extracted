@@ -1,0 +1,29 @@
+-*- org -*-
+
+* 0.03 [2011-01-18 Tue]
+** Renamed
+   This module is renamed from Archlinux::Messages to Archlinux::Term.
+   I don't think anyone uses this module anyways so it shouldn't cause
+   any confusion. I have not restarted the version to 0.01.
+** Exported Functions
+   We no longer export all of our functions by default. The module
+   user must now use the ":all" export tag to import all functions.
+** New Change Log
+   I decided to use org-mode for changelogs. I think it will be much
+   better than the antiquated GNU ChangeLog format.
+** New README
+   I rewrote the README using org-mode. The logo at the top was made
+   with figlet.
+
+* 0.02 [2010-04-11 Sun]
+** t/03-noimport.t
+   Created new test.
+** MANIFEST
+   Forgot to add new tests to MANIFEST.  Added
+   01-colors.t and 02-wrap.t.
+** lib/Archlinux/Messages.pm
+   Added links to Archlinux and git repository.
+** Build.PL
+   Added link to repository.
+
+* 0.01 [2010-04-10 Sat]

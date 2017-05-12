@@ -1,0 +1,8 @@
+Revision history for Acme-AlgebraicToRPN
+
+0.01    Jan 29, 2009
+        First version.
+0.02    Mar 10, 2009
+        Somehow, my list of prerequisites got overwritten, causing
+        automatic testing to fail. Ack.
+

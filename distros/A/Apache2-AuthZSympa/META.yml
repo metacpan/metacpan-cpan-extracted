@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               Apache2-AuthZSympa
+version:            0.5.2
+abstract:           Authorization module based on Sympa mailing list server group definition
+author:
+    - Dominique Launay <dominique.launay AT renater.fr>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Apache2::Access:      0
+    Apache2::Log:         0
+    Apache2::RequestRec:  0
+    Apache2::RequestUtil:  0
+    Apache2::Response:    0
+    Apache2::SubRequest:  0
+    Cache::Memcached:     0
+    Digest::MD5:          0
+    mod_perl2:            0
+    Net::LDAP:            0
+    SOAP::Lite:           0
+    Test::More:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

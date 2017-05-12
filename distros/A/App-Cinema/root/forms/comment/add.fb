@@ -1,0 +1,11 @@
+name: comment_add
+method: POST
+fields:
+    desc:
+        label: Comment
+        type:  textarea
+        cols:  60
+        rows:  10
+        required: 1
+submit: Preview, Save
+stylesheet: 1

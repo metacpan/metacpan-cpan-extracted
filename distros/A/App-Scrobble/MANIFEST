@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/scrobble
+dist.ini
+lib/App/Scrobble.pm
+lib/App/Scrobble/Role/WithService.pm
+lib/App/Scrobble/Service/BBC.pm
+lib/App/Scrobble/Service/Mixcloud.pm
+t/author-critic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

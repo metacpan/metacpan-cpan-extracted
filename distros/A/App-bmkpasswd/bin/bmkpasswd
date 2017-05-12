@@ -1,0 +1,178 @@
+#!perl
+use strictures 2;
+
+BEGIN {
+  pop @INC if $INC[-1] eq '.';
+}
+
+use POSIX ();
+
+use IO::Handle;
+
+use App::bmkpasswd -all;
+use Time::HiRes    qw/ gettimeofday tv_interval /;
+use Try::Tiny;
+
+my $type    = 'bcrypt';
+my $bcost   = 8;
+my ($bench, $strong, $check);
+
+use Pod::Usage;
+use Getopt::Long;
+GetOptions(
+
+  'benchmark!'       => \$bench,
+  'strong!'          => \$strong,
+  'check=s'          => \$check,
+  'm|method|type=s'  => \$type,
+  'workcost=s'       => \$bcost,
+
+  'available' => sub {
+    print join("\n", mkpasswd_available), "\n";
+    exit 0
+  },
+  
+  'version' => sub {
+     my $bvers = $App::bmkpasswd::VERSION || '(git)';
+     print(
+           "App::bmkpasswd $bvers\n\n",
+           "  Using Crypt::Eksblowfish::Bcrypt-", 
+            $Crypt::Eksblowfish::Bcrypt::VERSION, "\n",
+     );
+
+     my @avail;
+     push @avail, 'SHA256' if mkpasswd_available('sha256');
+     push @avail, 'SHA512' if mkpasswd_available('sha512');
+     printf '  ' . join(', ', @avail) . " available (via %s)\n",
+      App::bmkpasswd::have_passwd_xs() ? 'Crypt::Passwd::XS' : 'system crypt';
+     
+     exit 0
+   },
+
+  'help'   => sub { pod2usage(0) },
+  'man'    => sub { 
+    pod2usage(-verbose => 2, -noperldoc => 1, -exitval => 0)
+  },
+  'usage'  => sub { pod2usage(2) },
+);
+
+my $pwd;
+if (@ARGV) {
+  $pwd = $ARGV[0];
+} else {
+  my $posix_sucks = $] < 5.010 || $^O eq 'MSWin32';
+  my $term;
+  unless ($posix_sucks) { 
+    $term = try {; POSIX::Termios->new }
+      catch {; $posix_sucks = 1; undef };
+  }
+
+  my $has_readkey; 
+  if ($posix_sucks) {
+    $has_readkey = try {; require Term::ReadKey; 1 };
+    warn 
+       "WARNING: cannot disable terminal echo, password will be visible!\n"
+      ." (Try installing 'Term::ReadKey')\n"
+      unless $has_readkey;
+  }
+
+  # stderr should be unbuffered anyway, but can't hurt?
+  STDERR->autoflush(1); STDOUT->autoflush(1);
+  STDERR->print("Password: ");
+
+  if (!$posix_sucks) {
+    $term->getattr(0);
+    $term->setlflag( $term->getlflag & eval("~POSIX::ECHO") );
+    $term->setattr(0);
+  } elsif ($has_readkey) {
+    Term::ReadKey::ReadMode(2)
+  }
+
+  $pwd = <STDIN>;
+
+  if (!$posix_sucks) {
+    $term->setlflag( $term->getlflag | eval("POSIX::ECHO") );
+    $term->setattr(0);
+  } elsif ($has_readkey) {
+    Term::ReadKey::ReadMode(0)
+  }
+
+  chomp $pwd;
+  STDERR->print("\n");
+}
+
+my $timer = $bench ? [gettimeofday] : ();
+
+if ($check) {
+  if ( passwdcmp($pwd, $check) ) {
+    print "Match\n", "$check\n";
+  } else {
+    exit 1
+  }
+} else {
+  print mkpasswd($pwd, $type, $bcost, $strong)."\n";
+}
+if ($bench) {
+  my $interval = tv_interval($timer);
+  print " bench: $type, time: $interval\n";
+}
+
+__END__
+=pod
+
+=head1 NAME
+
+ bmkpasswd - bcrypt-enabled mkpasswd
+
+=head1 SYNOPSIS
+
+ bmkpasswd [OPTIONS]... [PASSWD]
+
+=head1 OPTIONS
+
+ -m, --method=TYPE  [default: bcrypt]
+     Types:  bcrypt  (recommended; guaranteed available)
+             sha512  (requires recent libc or Crypt::Passwd::XS)
+             sha256  (requires recent libc or Crypt::Passwd::XS)
+ -w, --workcost=NUM Bcrypt work-cost factor; default 08.
+                    Higher is slower. Should be a two-digit power of 2.
+ -c, --check=HASH   Compare password against given HASH
+ -s, --strong       Use strongly-random salt generation
+ -b, --benchmark    Show timers; useful for comparing hash generation
+ --available        List available methods (one per line)
+ --version          Display version information and available methods
+
+If PASSWD is missing, it is prompted for interactively.
+
+=head1 DESCRIPTION
+
+Simple bcrypt-enabled mkpasswd.
+
+While SHA512 isn't a bad choice if you have it, bcrypt has the 
+advantage of including a configurable work cost factor.
+
+A higher work cost factor exponentially increases hashing time, meaning 
+a brute-force attack against stolen hashes can take a B<very> long time.
+
+Salts are randomly generated using L<Bytes::Random::Secure::Tiny>.  Using the
+C<--strong> option requires a reliable source of entropy; if you are
+entropy-starved, try B<haveged>
+(L<http://www.issihosts.com/haveged/downloads.html>), especially on headless
+Linux systems.
+
+See L<App::bmkpasswd> for more details on bcrypt and the inner workings of
+this software.
+
+See L<Crypt::Bcrypt::Easy> if you'd like a simple interface to creating and
+comparing bcrypted passwords from your own modules.
+
+=head1 CAVEATS
+
+Users of C<5.8.x> perls or C<MSWin32> platforms will need L<Term::ReadKey> to
+turn off terminal echo for password prompts.
+
+=head1 AUTHOR
+
+Jon Portnoy <jon@portnoy.me>
+
+=cut

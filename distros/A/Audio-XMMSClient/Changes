@@ -1,0 +1,12 @@
+0.03
+	- Sync with xmms2 HEAD.
+	- Compiles against xmms2 0.2DrJekyll.
+
+0.02
+	- Make subclassing without reblessing possible
+	- Remove the parts of ::Result which were written in Perl
+	- Return undef instead of croaking when a value could not be fetched
+	  from a propdict
+
+0.01
+	- Initial version.

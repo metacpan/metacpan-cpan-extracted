@@ -1,0 +1,34 @@
+NAME
+    cmddirs - perform a command in subdirectories
+
+SYNOPSIS
+    cmddirs [options] command [dir ...]
+
+    If no directories are provided, cmddirs will perform the command in all
+    subdirectories of the current working directory. Only subdirectories
+    appropriate for the given command (e.g. git repositories, if your
+    command -contains the word "git") or the given directory options are
+    acted upon.
+
+    See the man page (-man) for a full list of available directory filters.
+
+OPTIONS
+    -h|help Show help message
+    -m|man Show manpage
+    -a|all Perform command in all directories
+    -q|quiet Don't print out the commands as they're run
+
+FILTERS
+    --git
+    --svn
+
+EXAMPLES
+    Check the status of all Git repos in this directory: gitall.pl "git
+    status"
+
+    Check the status of the Git repos "foo" and "bar" in this directory:
+    gitall.pl "git status" foo bar
+
+AUTHOR
+    Drew Stephens <drew@dinomite.net>
+

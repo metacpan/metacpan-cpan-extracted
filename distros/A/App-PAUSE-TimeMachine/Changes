@@ -1,0 +1,17 @@
+Revision history for App-PAUSE-TimeMachine
+
+0.05  2015-04-17 17:13:15 CEST
+        - Make git_dir an object attribute
+
+0.04  2015-04-17 16:52:04 CEST
+        - fix sync to use pushd
+
+0.03  2015-04-17 15:19:49 CEST
+        - fix the --git-dir usage
+
+0.02  2015-04-17 15:13:18 CEST
+        - documentation change
+        - use --git-dir for old git
+
+0.01  2015-04-17 15:06:19 CEST
+        - Initial release

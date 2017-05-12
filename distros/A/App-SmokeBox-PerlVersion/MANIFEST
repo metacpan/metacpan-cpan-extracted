@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/synposis.pl
+lib/App/SmokeBox/PerlVersion.pm
+t/00-compile.t
+t/01-event.t
+t/02-postback.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

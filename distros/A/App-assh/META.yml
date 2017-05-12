@@ -1,0 +1,42 @@
+---
+abstract: 'A wrapper around autossh.'
+author:
+  - 'DBR <dbr@cpan.org>'
+build_requires:
+  Carp: 0
+  ExtUtils::MakeMaker: 0
+  File::Spec::Functions: 0
+  List::Util: 0
+  Module::Build: 0.3601
+  Scalar::Util: 0
+  Test::CheckDeps: 0.006
+  Test::More: 0.94
+  Test::UseAllModules: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-assh
+provides:
+  App::assh:
+    file: lib/App/assh.pm
+    version: v1.1.2
+requires:
+  FindBin: 0
+  Moo: 0
+  MooX::Options: 0
+  MooX::Types::MooseLike::Base: 0
+  lib: 0
+  methods: 0
+  perl: 5.010
+  strict: 0
+  true: 0
+  warnings: 0
+resources: {}
+version: 1.1.2
+x_authority: cpan:DBR

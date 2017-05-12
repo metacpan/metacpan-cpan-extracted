@@ -1,0 +1,34 @@
+App-Lastmsg version 0.002
+=========================
+
+lastmsg reads your mail folders looking for emails you exchanged with
+a given set of people. Then for each person in the set it prints the
+time you last received an email from or sent an email to them and the
+email address used.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* Config::Auto
+* Date::Parse
+* Email::Folder
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016-2017 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

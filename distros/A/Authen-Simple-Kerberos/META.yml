@@ -1,0 +1,15 @@
+---
+name: Authen-Simple-Kerberos
+version: 0.1
+author:
+  - Christian Hansen C<ch@ngmedia.com>
+abstract: Simple Kerberos authentication
+license: perl
+requires:
+  Authen::Krb5::Simple: 0
+  Authen::Simple: 0
+provides:
+  Authen::Simple::Kerberos:
+    file: lib/Authen/Simple/Kerberos.pm
+    version: 0.1
+generated_by: Module::Build version 0.2611

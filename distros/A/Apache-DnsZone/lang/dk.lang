@@ -1,0 +1,87 @@
+#!/usr/bin/perl -w
+
+# created by thomas@stderr.net (2001/03/23)
+# $Id: dk.lang,v 1.8 2001/04/24 22:15:09 thomas Exp $
+
+use strict;
+
+sub lang () {
+    my %text = ( # ae = &aelig; oe = &oslash; aa = &aring;
+		'SUBMIT'            => 'Send',
+		'CANCEL'            => 'Fortryd', # Annuller?
+		'HELP'              => 'Hj&aelig;lp',
+		'EDIT'              => 'Rediger',
+		'ADD'               => 'Tilf&oslash;j',
+		'REMOVE'            => 'Fjern',
+		'LOCKED'            => 'L&aring;st',
+		'SETTINGS'          => 'Indstillinger',
+		'LIST_DOMAIN'       => 'Dom&aelig;neliste',
+		'LOGOUT'            => 'Log ud',
+		'LANGUAGE'          => 'Sprog',
+		'EMAIL'             => 'E-mail',
+		'NEW_PASSWORD'      => 'Nyt kodeord',
+		'CONFIRM_PASSWORD'  => 'Bekr&aelig;ft kodeord',
+		'AUTH_NS'           => 'Autorativ navneserver',
+		'SERIAL'            => 'L&oslash;benummer',
+		'ADMIN_EMAIL'       => 'Administrativ e-mail',
+		'REFRESH'           => 'Genopfrisknings interval', # ehm
+		'RETRY'             => 'Gentagelses interval',
+		'EXPIRE'            => 'Udl&oslash;bs interval',
+		'TTL'               => 'Levetid',
+		'HOST'              => 'V&aelig;rt',
+		'IP_ADDRESS'        => 'IP adresse',
+		'CNAME'             => 'Kanonisk navn',
+		'MX'                => 'Mail udveksler',
+		'PREFERENCE'        => 'Pr&aelig;ference',
+		'ZONE'              => 'Zone',
+		'NS'                => 'Navneserver',
+		'TXT'               => 'Tekst data',
+		'DNS'               => 'Dom&aelig;ne navne systemet',
+		'SOA'               => 'Start p&aring; autoritet',
+		'PAGE_LIST_DOMAIN'  => 'Dom&aelig;ner administreret med DnsZone',
+		'PAGE_VIEW_DOMAIN'  => 'Oversigt over $domain',
+		'PAGE_HELP'         => 'Hj&aelig;p',
+		'PAGE_SETTINGS'     => '&AElig;ndring af personlige indstillinger',
+		'PAGE_EDIT'         => 'Redigering af $record post under $domain', # post/element?
+		'PAGE_ADD'          => 'Tilf&oslash;jelse af $record post til $domain',
+		'PAGE_DEL'          => 'Sletning af $record post under $domain',
+		'ERROR_CORRECT'     => 'Ret venligst f&oslash;lgende fejl:',
+		'ERROR_DUPLICATE'   => 'Enslydende post eksisterer',
+		'ERROR_IP'          => 'Ukorrekt v&aelig;rdi for IP adresse',
+		'ERROR_HOST'        => 'Ukorrekt v&aelig;rdi for V&aelig;rt',
+		'ERROR_TTL'         => 'Ukorrekt v&aelig;rdi for Levetid',
+		'ERROR_CNAME'       => 'Ukorrekt v&aelig;rdi for Kanonisk navn',
+		'ERROR_MX'          => 'Ukorrekt v&aelig;rdi for Mail udveksler',
+		'ERROR_PREFERENCE'  => 'Ukorrekt v&aelig;rdi for Pr&aelig;ference',
+		'ERROR_ZONE'        => 'Ukorrekt v&aelig;rdi for Zone',
+		'ERROR_NS'          => 'Ukorrekt v&aelig;rdi for Navneeserver',
+		'ERROR_TXT'         => 'Ukorrekt v&aelig;rdi for Tekst data',
+		'ERROR_EMAIL'       => 'Ukorrekt v&aelig;rdi for E-mail',
+		'ERROR_PASSWORD'    => 'Non-matching passwords',
+		'ERROR_ADMIN_EMAIL' => 'Ukorrekt v&aelig;rdi for Administrativ e-mail',
+		'ERROR_REFRESH'     => 'Ukorrekt v&aelig;rdi for Genopfrisknings interval',
+		'ERROR_RETRY'       => 'Ukorrekt v&aelig;rdi for Gentagelses interval',
+		'ERROR_EXPIRE'      => 'Ukorrekt v&aelig;rdi for Udl&oslash;bs interval',
+		'FILLOUT_FIELDS'    => 'Udfyld venligst f&oslash;lgende felter:',
+		'EDIT_FIELDS'       => 'Ret felter:',
+		'DELETE_RECORD'     => 'Du er ved slette f&oslash;lgende post:',
+		'USERNAME'          => 'Brugernavn',
+		'PASSWORD'          => 'Kodeord',
+		'LOGIN_BUTTON'      => 'Log p&aring;',
+		'PAGE_LOGIN'        => 'Log p&aring; siden',
+		'LOGIN_NOTE'        => 'Note: Din browser skal acceptere cookies for du kan logge p&aring;. Du vil blive bedt om at logge ind igen senere.',
+		'IDLE_TIMEOUT'      => 'Logout reason: Idle timeout',
+		'MALFORMED_TICKET'  => 'Logout reason: Ticket malformed',
+		'INVALID_HASH'      => 'Logout reason: Unknown ticket',
+		'EXPIRED_TICKET'    => 'Logout reason: Ticket has expired',
+		'MISSING_SECRET'    => 'Logout reason: Server secret could not be loaded',
+		'TAMPERED_HASH'     => 'Logout reason: Ticket data tampered with',
+		'PASSWORD_CHANGE'   => 'Kodeordet vil kun blive skiftet hvis du indtaster noget i felterne herunder.'
+		);
+    return %text;
+}
+
+1;
+
+
+

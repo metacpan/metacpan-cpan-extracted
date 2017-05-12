@@ -1,0 +1,28 @@
+---
+abstract: "provides 'prefix' filter, which prepends data to lines passed"
+author:
+  - 'joshr <joshr@cpan.org>'
+build_requires:
+  File::Slurp: 0
+  File::Spec::Functions: 0
+  IPC::Run: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Prefix
+requires:
+  File::Basename: 0
+  Getopt::Long: 0
+  List::Util: 0
+  POSIX: 0
+  Sys::Hostname: 0
+  Time::HiRes: 0
+  strict: 0
+  warnings: 0
+version: 0.18

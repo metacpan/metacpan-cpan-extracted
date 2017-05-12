@@ -1,0 +1,117 @@
+TYPEMAP
+awaBool			T_BOOL
+Aw::Admin::AccessControlList 	O_OBJECT
+Aw::Admin::Client	O_OBJECT
+Aw::Admin::LogConfig 	O_OBJECT
+Aw::Admin::TypeDef	O_OBJECT
+Aw::Admin::ServerClient	O_OBJECT
+Aw::Adapter 		O_OBJECT
+Aw::Client 		O_OBJECT
+Aw::ConnectionDescriptor	O_OBJECT
+Aw::Date 		O_OBJECT
+Aw::Error 		O_OBJECT
+Aw::Event 		O_OBJECT
+Aw::EventType 		O_OBJECT
+Aw::Field 		O_OBJECT
+Aw::Filter 		O_OBJECT
+Aw::Format 		O_OBJECT
+Aw::License 		O_OBJECT
+Aw::Log 		O_OBJECT
+Aw::Replies 		O_OBJECT
+Aw::SSLCertificate	O_OBJECT
+Aw::Subscription	O_OBJECT
+Aw::TypeDef	 	O_OBJECT
+Aw::TypeDefCache 	O_OBJECT
+Aw::Util	 	O_OBJECT
+awVector *		T_OBJECT
+float			T_FLOAT
+CORBA::LongLong		T_LONGLONG
+
+Aw::Info		O_HvRV
+
+# uncomment below for HV and AV ref error handling that warns instead of croaks.
+#
+# HV *			T_HvRV
+# AV *			T_AvRV
+
+######################################################################
+OUTPUT
+# The Perl object is blessed into 'CLASS', which should be a
+# char* having the name of the package for the blessing.
+
+O_OBJECT
+	sv_setref_pv( $arg, CLASS, (void*)$var );
+
+T_OBJECT
+    sv_setref_pv( $arg, Nullch, (void*)$var );
+
+T_LONGLONG
+    $arg = ll_from_longlong ($var);
+
+O_HvRV
+    $arg = sv_bless( newRV_noinc((SV*)$var), gv_stashpv(CLASS,1) );
+
+T_HvRV
+    $arg = newRV((SV*)$var);
+
+T_AvRV
+    $arg = newRV((SV*)$var);
+######################################################################
+INPUT
+
+O_OBJECT
+        if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+                $var = ($type)SvIV((SV*)SvRV( $arg ));
+        else{
+                warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+                XSRETURN_UNDEF;
+        }
+
+T_OBJECT
+    if( SvROK($arg) )
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else{
+        warn( \"${Package}::$func_name() -- $var is not an SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+T_LONGLONG
+        $var = SvLLV ($arg)
+
+O_HvRV
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVHV) )
+        $var = (HV*)SvRV( $arg );
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed HV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+#
+#
+# when using the original (supplied/default) perl hash handler use T_HVREF
+# as shown below.  needed because "if (sv_isa($arg, \"${ntype}\"))" in the
+# original definition will bite us.  when using the HV * definition in this
+# file you may want to comment out the below to restore the original behavior 
+# in other XS code using this typemap.
+#
+T_HVREF
+	if( SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVHV) )
+	    $var = (HV*)SvRV($arg);
+	else
+	    croak(\"$var is not of type ${ntype}\")
+
+T_HvRV
+    if( SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVHV) )
+        $var = (HV*)SvRV( $arg );
+    else {
+        warn( \"${Package}::$func_name() -- $var is not an HV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+T_AvRV
+    if( SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVAV) )
+        $var = (HV*)SvRV( $arg );
+    else {
+        warn( \"${Package}::$func_name() -- $var is not an AV reference\" );
+        XSRETURN_UNDEF;
+    }

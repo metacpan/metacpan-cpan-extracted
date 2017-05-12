@@ -1,0 +1,47 @@
+drwxr-xr-x    4 marca    staff          0 Nov 16 23:42 2011, lesspipe-1.72
+-rw-r--r--    1 marca    staff       5406 Nov 16 23:35 2011, lesspipe-1.72/lesspipe.1
+-rwxr-xr-x    1 marca    staff      29149 Nov 16 22:17 2011, lesspipe-1.72/lesspipe.sh.in
+-rw-r--r--    1 marca    staff      11913 Jul 10 04:34 2009, lesspipe-1.72/german.txt
+-rwxr-xr-x    1 marca    staff     199875 Jul 10 04:34 2009, lesspipe-1.72/code2color
+-rw-r--r--    1 marca    staff        524 Nov 16 23:42 2011, lesspipe-1.72/Makefile
+-rwxr-xr-x    1 marca    staff       2187 Jul 15 04:28 2009, lesspipe-1.72/test.pl
+-rw-r--r--    1 marca    staff      17985 Jul 10 04:34 2009, lesspipe-1.72/COPYING
+drwxr-xr-x    2 marca    staff          0 Oct 17 07:31 2011, lesspipe-1.72/testok
+-rw-r--r--    1 marca    staff       1584 Jul 10 04:34 2009, lesspipe-1.72/testok/test.deb
+-rw-r--r--    1 marca    staff       3482 Jul 10 04:34 2009, lesspipe-1.72/testok/a#rtf
+-rw-r--r--    1 marca    staff        188 Jul 10 04:34 2009, lesspipe-1.72/testok/a|b.7za
+-rw-r--r--    1 marca    staff        760 Jul 10 04:34 2009, lesspipe-1.72/testok/README
+-rw-r--r--    1 marca    staff          5 Jul 10 04:34 2009, lesspipe-1.72/testok/a b
+-rw-r--r--    1 marca    staff       1374 Jul 10 04:34 2009, lesspipe-1.72/testok/test.rpm
+-rw-r--r--    1 marca    staff         45 Jul 10 04:34 2009, lesspipe-1.72/testok/perlstorable.gz
+-rw-r--r--    1 marca    staff       1920 Jul 10 04:34 2009, lesspipe-1.72/testok/id3v2.mp3
+-rw-r--r--    1 marca    staff      98304 Jul 10 04:34 2009, lesspipe-1.72/testok/iso.image
+-rw-r--r--    1 marca    staff         33 Jul 10 04:34 2009, lesspipe-1.72/testok/a$b.lz
+-rw-r--r--    1 marca    staff       2092 Jul 10 04:34 2009, lesspipe-1.72/testok/test.mp3
+-rw-r--r--    1 marca    staff         33 Jul 10 04:34 2009, lesspipe-1.72/testok/a\b.lz
+-rw-r--r--    1 marca    staff         35 Jul 10 04:34 2009, lesspipe-1.72/testok/a`data.gz
+-rw-r--r--    1 marca    staff         29 Jul 10 04:34 2009, lesspipe-1.72/testok/a[b.gz
+-rw-r--r--    1 marca    staff        219 Jul 10 04:34 2009, lesspipe-1.72/testok/azip.tlz
+-rw-r--r--    1 marca    staff          5 Jul 10 04:34 2009, lesspipe-1.72/testok/floppy.txt
+-rw-r--r--    1 marca    staff         29 Jul 10 04:34 2009, lesspipe-1.72/testok/a?b.gz
+-rwxr-xr-x    1 marca    staff        146 Jul 10 04:34 2009, lesspipe-1.72/testok/cabinet.cab
+-rw-r--r--    1 marca    staff         29 Jul 10 04:34 2009, lesspipe-1.72/testok/a*b.gz
+-rw-r--r--    1 marca    staff         12 Jul 10 04:34 2009, lesspipe-1.72/testok/test.utf16
+lrwxrwxrwx    1 marca    staff          3 Feb 23 12:32 2012, lesspipe-1.72/testok/symlink -> a b
+-rw-r--r--    1 marca    staff         29 Jul 10 04:34 2009, lesspipe-1.72/testok/a]b.gz
+-rw-r--r--    1 marca    staff        114 Jul 10 04:34 2009, lesspipe-1.72/testok/onefile.7za
+-rw-r--r--    1 marca    staff      20673 Jul 10 04:34 2009, lesspipe-1.72/testok/a b.tgz
+-rw-r--r--    1 marca    staff         83 Jul 10 04:34 2009, lesspipe-1.72/testok/test.rar
+-rw-r--r--    1 marca    staff       2283 Jul 15 04:40 2009, lesspipe-1.72/TESTCMDS
+-rwxr-xr-x    1 marca    staff      11313 Jul 10 04:34 2009, lesspipe-1.72/sxw2txt
+-rwxr-xr-x    1 marca    staff      14527 Oct 17 04:33 2011, lesspipe-1.72/configure
+-rwxr-xr-x    1 marca    staff      23126 Nov 16 23:42 2011, lesspipe-1.72/lesspipe.sh
+-rw-r--r--    1 marca    staff      11190 Nov 16 23:28 2011, lesspipe-1.72/ChangeLog
+drwxr-xr-x    2 marca    staff          0 Nov 16 23:27 2011, lesspipe-1.72/contrib
+-rw-r--r--    1 marca    staff        865 Jul 10 04:34 2009, lesspipe-1.72/contrib/enscript.patch
+-rw-r--r--    1 marca    staff       5733 Jul 10 04:34 2009, lesspipe-1.72/contrib/bsdtar.patch
+-rw-r--r--    1 marca    staff        804 Nov 16 23:27 2011, lesspipe-1.72/contrib/less_wrapper
+-rw-r--r--    1 marca    staff       2870 Jul 10 04:34 2009, lesspipe-1.72/contrib/unused.patch
+-rw-r--r--    1 marca    staff      19268 Nov 17 00:26 2011, lesspipe-1.72/README
+-rw-r--r--    1 marca    staff        701 Jul 10 04:34 2009, lesspipe-1.72/TODO
+-rw-r--r--    1 marca    staff       5563 Apr  6 05:14 2010, lesspipe-1.72/INSTALL

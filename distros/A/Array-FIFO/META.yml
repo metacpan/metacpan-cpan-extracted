@@ -1,0 +1,25 @@
+---
+abstract: 'A Simple limitable FIFO array, with sum and average methods'
+author:
+  - 'Dan Burke <dburke@addictmud.org>'
+build_requires:
+  FindBin: '0'
+  Test::Spec: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Array-FIFO
+requires:
+  List::Util: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
+resources:
+  homepage: https://github.com/dwburke/perl-Array-FIFO
+  repository: https://github.com/dwburke/perl-Array-FIFO.git
+version: '0.10'

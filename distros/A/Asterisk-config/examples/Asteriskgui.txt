@@ -1,0 +1,11 @@
+Asteriskgui.pm is Dahdi::Config::Gen::Asteriskgui . Dahdi is included
+with the dahdi-tools package:
+
+  http://downloads.asterisk.org/pub/telephony/dahdi-tools/
+
+dahdi_genconf will use modules in the namespace Dahdi::Config::Gen to
+generate configuration.
+
+This module deviates from the simple generation method as employed by
+other modules there: it handles more than one files, and it edits them
+rather than generate them.

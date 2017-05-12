@@ -1,0 +1,133 @@
+#!/usr/bin/perl
+
+use 5.010001;
+use strict;
+use warnings;
+
+#use Getopt::Long;
+
+our $VERSION = '0.01'; # VERSION
+
+my $Env;
+my @Cmd;
+
+sub parse_cmdline {
+    #Getopt::Long::Configure("nopass_through");
+    my $usage = <<USAGE;
+Usage:
+  $0 [ENV] [command] [command options ...]
+  $0 --help
+For more details, see the manpage/documentation.
+USAGE
+
+    #my $res = GetOptions(
+    #    'help|h'         => sub { print $usage; exit 0 },
+    #);
+    #exit 99 if !$res;
+
+    # to minimize overhead, we don't use Getopt::Long for now
+    if ($ARGV[0] && ($ARGV[0] eq '--help' || $ARGV[0] eq '-h')) {
+        print $usage; exit 0;
+    }
+
+    do { warn "Environment not specified\n"; exit 99 } unless @ARGV;
+    $Env = shift @ARGV;
+    do { warn "Command not specified\n"; exit 99 } unless @ARGV;
+    @Cmd = @ARGV;
+}
+
+# MAIN
+
+parse_cmdline();
+exec @Cmd if $ENV{$Env};
+
+1;
+# ABSTRACT: Execute command if certain environment variable is true
+# PODNAME: exec-if-env
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+exec-if-env - Execute command if certain environment variable is true
+
+=head1 VERSION
+
+version 0.01
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % exec-if-env RUN somecmd --cmdopt ...
+
+The above will run C<somecmd> only if C<RUN> environment variable is true (with
+the notion of true follows Perl, i.e undefined, C<''>, and C<0> are false and
+the rest are true).
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+=over
+
+=item * --help, -h
+
+=back
+
+=head1 EXIT CODES
+
+99 on command-line options error.
+
+Otherwise exit code from command is returned.
+
+=head1 FAQ
+
+=head2 Couldn't the same thing be accomplished with shell?
+
+Yes, you can also do something like this in bash:
+
+ if [[ "$SOMEENV" == 1 ]]; then somecmd --cmdopt ...; fi
+
+But using this utility is simpler and more portable.
+
+=head1 TODO
+
+=head1 SEE ALSO
+
+L<App::ExecIf>
+
+L<exec-if-not-env>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ExecIf>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-App-ExecIf>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ExecIf>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Steven Haryanto.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

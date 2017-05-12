@@ -1,0 +1,45 @@
+Acme/DeepThoughts version 0.01
+=============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+SYNOPSIS
+        use Acme::DeepThoughts
+        print "Hello world";
+
+DESCRIPTION
+    The first time you run a program under "use Acme::DeepThoughts", the
+    module removes all the unsightly printable characters from your source
+    file. The code continues to work exactly as it did before, but now it
+    contains a *Deep Thought*.
+
+    These deep thoughts were collected from <http://deepthoughts.330.ca/>,
+    which is a site "*dedicated to the quotes that used to appear on the hit
+    TV show, Saturday Night Live (SNL)*."
+
+BUGS
+    Please don't report bugs ;) But if you really really need to, go to
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-DeepThoughts> or send
+    mail to <bug-Acme-DeepThoughts#rt.cpan.org>
+
+AUTHOR
+            D. H. (PODMASTER)
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    Acme::Bushisms, Acme::Bleach,.
+

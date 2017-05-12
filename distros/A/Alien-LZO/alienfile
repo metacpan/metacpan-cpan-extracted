@@ -1,0 +1,44 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'lzo2';
+
+plugin 'Probe::CBuilder' => (
+  libs => '-llzo2',
+  program => q{
+#include <lzo/lzoconf.h>
+#include <lzo/lzo1x.h>
+int main(int argc, char *argv[])
+{
+  if(lzo_init() == LZO_E_OK)
+    return 0;
+  else
+    return 1;
+}
+}
+);
+
+share {
+
+  plugin Download => (
+    url     => 'http://www.oberhumer.com/opensource/lzo/download/',
+    version => qr/^lzo-([0-9\.]+)\.tar\.gz$/,
+  );
+
+  plugin Extract => 'tar.gz';
+
+  requires 'Path::Tiny' => '0.077';
+
+  patch sub {
+    my($build) = @_;
+    my $pc = Path::Tiny->new('lzo2.pc.in');
+    if(-f $pc)
+    {
+      $pc->edit_lines(sub {
+        /^Cflags:/ && s{/lzo$}{};
+      });
+    }
+  };
+
+  plugin 'Build::Autoconf' => ();
+
+};

@@ -1,0 +1,37 @@
+Revision history for App::D
+
+1.0.0   2013-12-10
+        * First public release
+
+1.1.0   2014-01-12
+        [Minor]
+        * Removed ICT timezone
+
+        [Patch]
+        * Fixing bug with getting incorrect months
+
+1.2.0   2014-04-22
+        [Minor]
+        * Color output only when run in terminal
+
+        [Patch]
+        * Fixig bug with incorrect output in the end of month
+        * Added tests
+        * Added .travis.yml
+
+1.3.0   2014-04-23
+        [Minor]
+        * Showing arrow marking currect timezone
+        * A bit of POD with some description
+
+        [Patch]
+        * Correct work with timezones
+
+1.3.1   2014-06-04
+        [Patch]
+        * Fixing bug with incorrect output at 2014-05-31
+        * Fixing xt test
+
+1.3.2   2014-08-02
+        [Patch]
+        * Fixing incorrect output in special cases

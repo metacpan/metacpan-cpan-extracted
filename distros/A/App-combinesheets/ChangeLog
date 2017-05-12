@@ -1,0 +1,80 @@
+2013-06-03  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2.14 released.
+
+	* Moved to the GitHub repository => bugtracker changed
+
+
+2012-06-03  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2.13 started.
+
+2012-03-22  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2.12 released.
+
+2012-03-21  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Replaced `which` by File::Which (which).
+
+2012-03-20  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2.11 released (all tests, finally, passed).
+
+2012-03-19  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2_10 released (still a developement version).
+
+2012-03-18  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2_9 released (tests completely re-created; not anymore
+	calling external Perl script).
+
+	* Fixed the case where App::combinesheets->execute() is called
+	several times.
+
+2012-03-17  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2_8 (still fixing problems with tests)
+
+2012-03-16  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2_7 released (damn, the test is still not running).
+
+2012-03-14  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2.6 released (finally fixed the test, at least I
+	  hope).
+
+2012-03-13  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2.5 released.
+
+2012-03-11  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Development version 0.2_4 released (trying to find out why the
+	CPANTester always fails).
+
+2012-03-10  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Development version 0.2_3 released (trying to find out why the
+	CPANTester always fails).
+
+2012-03-06  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2.2 released.
+
+	* Fixed inputs with duplicated values in matching columns.
+
+2012-03-03  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2.1 released.
+
+2012-02-29  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2.0 released.
+
+2012-02-27  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Packing as an App:: package started.
+

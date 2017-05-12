@@ -1,0 +1,91 @@
+Revision history for App-wordlist
+
+0.25    2016-09-26 (PERLANCAR)
+
+        - Exclude WordList::Base::* and WordList::MetaSyntactic because they are
+          only base classes and not real wordlists.
+
+        - [doc] Add example demonstrating --detail.
+
+
+0.24    2016-04-15 (PERLANCAR)
+
+	- Makes --detail also cause grep result to contain wordlist name.
+
+	- Accept multiple -t & --lang.
+
+
+0.23    2016-04-15 (PERLANCAR)
+
+	- [Bugfix] Fix completion for --lang.
+
+
+0.22    2016-04-15 (PERLANCAR)
+
+	- Add options: --type (-t), --lang.
+
+	- [Bugfix] Fix logic error in doing -L which caused empty result.
+
+
+0.21    2016-02-29 (PERLANCAR)
+
+	- Strip /^WordList::/ in output of -L, like in -l.
+
+	- Adjust to App::lcpan::Call 0.07.
+
+
+0.20    2016-02-06 (PERLANCAR)
+
+	- [build] Rebuild with new App-GenPericmdCompleterScript 0.08 which
+          fixes tab completion (update to Complete::Bash 0.27).
+
+
+0.19    2016-02-05 (PERLANCAR)
+
+	- [Bugfix] decode argument to utf8 to make Unicode grepping work.
+
+
+0.18    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+
+0.17    2016-01-15 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Perinci::CmdLine::Inline (0.33) to
+          produce code that will run on older perls [CT].
+
+        - Add/update examples.
+
+
+0.16    2016-01-14 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix completer script.
+
+
+0.15    2016-01-14 (PERLANCAR)
+
+        - [Bugfix] Enable utf8 output.
+
+        - Switch to Perinci::CmdLine::Inline for faster startup and less
+          dependencies.
+
+
+0.14    2016-01-08 (PERLANCAR)
+
+	- No functional changes.
+
+	- Don't show results in POD (no need, very large).
+
+
+0.13    2016-01-07 (PERLANCAR) (unreleased)
+
+        - First (WordList::*-based) release. The older versions are based on
+          Games::Word::Wordlist::* and is now moved to App-GamesWordlist
+          (games-wordlist).

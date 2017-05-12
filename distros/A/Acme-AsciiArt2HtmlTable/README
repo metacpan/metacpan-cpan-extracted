@@ -1,0 +1,242 @@
+..::Acme::AsciiArt2HtmlTable version 0.01
+=========================================
+
+=head1 NAME
+
+Acme::AsciiArt2HtmlTable - Converts Ascii art to an HTML table
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 SYNOPSIS
+
+    use Acme::AsciiArt2HtmlTable;
+
+    my $table = "ggggggggrrrrrrrrrrrrrr\n" .
+                "ggggggggrrrrrrrrrrrrrr\n" .
+                "ggggggggrrrrrrrrrrrrrr\n" .
+                "ggggggggrrrrrrrrrrrrrr\n" .
+                "ggggggyyyyrrrrrrrrrrrr\n" .
+                "ggggggyyyyrrrrrrrrrrrr\n" .
+                "gggggyyyyyyrrrrrrrrrrr\n" .
+                "gggggyyyyyyrrrrrrrrrrr\n" .
+                "ggggggyyyyrrrrrrrrrrrr\n" .
+                "ggggggyyyyrrrrrrrrrrrr\n" .
+                "ggggggggrrrrrrrrrrrrrr\n" .
+                "ggggggggrrrrrrrrrrrrrr\n" .
+                "ggggggggrrrrrrrrrrrrrr\n" .
+                "ggggggggrrrrrrrrrrrrrr\n" ;
+
+    my $html = aa2ht( { td => { width => 3 , height => 3 } } , $table);
+
+    # $html now holds a table with a color representation of your
+    # ascii art. In this case, the Portuguese flag.
+
+=head1 FUNCTIONS
+
+=head2 aa2ht
+
+Gets ascii text and converts it to an HTML table. This is how it works:
+
+=over 4
+
+=item * each line is a C<tr> element
+
+=item * each letter is a C<td> element
+
+=item * each C<td> has background of a specific color, which is
+defined by the letter that created it
+
+=back
+
+=head3 OPTIONS
+
+You can pass a reference to a hash before the text you want to
+convert.
+
+=head4 id
+
+In order to save space in the output, C<td> and C<tr> elements'
+attributes are not in each element, but rather in a C<style> element.
+
+This causes a problem if you want to put two different outputs with
+different attributes on the same page.
+
+To solve this problem: C<id>.
+
+When creating a table, use the parameter C<id> to make sure it doesn't
+end up mixed up with something else.
+
+  my $html = aa2ht( { 'id' => 'special' } $ascii );
+
+The result will be something like this:
+
+  <style>
+  .special td { width:1; height:1; }
+  .special tr {  }
+  </style>
+  <table class="special" cellspacing="0" cellpadding="0" border="0">
+
+=head4 use-default-colors
+
+If set to a false value, no default mappings are used.
+
+  my $html = aa2ht( { 'use-default-colors' => 0 }, $ascii);
+
+Behind the curtains, there is still a mapping: the default mapping to
+white.
+
+=head4 colors
+
+You can override color definitions or specify your own.
+
+  my $html = aa2ht( { 'colors' => { '@' => 'ffddee',
+                                    'g' => '00ffff' } }, $ascii);
+
+=head4 randomize-new-colors
+
+If set to a true value, letters with no mappings are assigned a
+random one.
+
+  my $html = aa2ht( { 'randomize-new-colors' => 1 }, $ascii);
+
+You might want to remove the default mappings if you're really
+interested in a completely random effect:
+
+  my $html = aa2ht( { 'use-default-colors' => 0,
+                      'randomize-new-colors' => 1 }, $ascii);
+
+You might also want to keep the white space as a white block:
+
+  my $html = aa2ht( { 'use-default-colors' => 0,
+                      'colors' => { ' ' => 'ffffff'},
+                      'randomize-new-colors' => 1 }, $ascii);
+
+=head4 table
+
+With the parameter C<table> you can specify specific values for fields
+like C<border>, C<cellpadding> and C<cellspacing> (all these have
+value "0" by default).
+
+  my $html = aa2ht( { 'table' => { 'border' => '1' } }, $ascii );
+
+These attributes go directly into the C<table> tag.
+
+=head4 tr
+
+With the C<tr> parameter you can specify specific values for C<tr>'s
+attributes.
+
+These attributes go into a C<style> tag. The table class uses that
+style.
+
+=head4 td
+
+With the C<td> parameter you can specify specific values for C<td>'s
+attributes, like C<width> or C<height>.
+
+  my $html = aa2ht( { 'td' => { 'width' => '2px',
+                                'height' => '2px' } }, $ascii);
+
+These attributes go into a C<style> tag. The table class uses that
+style.
+
+=head3 SPECIALS
+
+=head4 optimization
+
+Table optimization, which is disabled by default, uses the C<rowspan>
+and C<colspan> C<td> attributes to save up space.
+
+  my $html = aa2ht( { 'optimization' => 1 }, $ascii );
+
+When the optimization algorithm sees a chance of turning some cells
+into a big one, it does so. It always chooses the biggest area
+possible for optimizing.
+
+If two different areas suitable for optimization starting from a given
+cell are available and both present the same area size, the algorithm
+picks the one that maximizes width.
+
+=head4 default color
+
+By default, an unmapped character is mapped to the default color,
+which is black.
+
+You can override this color by assigning a different mapping to
+"default" with the C<colors> option.
+
+  my $html = aa2ht( { 'colors' => { 'default' => 'ffffff' } }, $ascii);
+
+This, for instance, makes the default color be white, thus making only
+the recognized characters show up colored on the table.
+
+=head1 MAPPINGS ( LETTER -> COLOR )
+
+The following letters are mapped to colors in the following way:
+
+   l          000000   # black
+   b          0000ff   # blue
+   o          a52a2a   # brown
+   g          00ff00   # green
+   a          bebebe   # gray
+   e          bebebe   # grey
+   m          ff00ff   # magenta
+   o          ffa500   # orange
+   p          ffc0cb   # pink
+   u          a020f0   # purple
+   r          ff0000   # red
+   w          ffffff   # white
+   y          ffff00   # yellow
+
+   L          000000   # light black
+   B          add8e6   # lighe blue
+   O          a52a2a   # light brown
+   G          90ee90   # light green
+   A          d3d3d3   # light gray
+   E          d3d3d3   # light grey
+   M          ff00ff   # light magenta
+   O          ffa500   # light orange
+   P          ffb6c1   # light pink
+   U          9370db   # light purple
+   R          cd5c5c   # light red
+   W          ffffff   # light white
+   Y          ffffe0   # light yellow
+
+Spaces are mapped to white:
+
+              ffffff   # white
+
+By default, everything else is mapped to black
+
+  default     000000   # black
+
+=head1 SEE ALSO
+
+The examples/ directory.
+
+=head1 AUTHOR
+
+Jose Castro, C<< <cog@cpan.org> >>
+
+=head1 CAVEATS
+
+If you specify the C<rowspan> or C<colspan> for C<td> elements and you
+also ask for optimization... I don't even want to imagine what will
+happen...
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-acme-tablethis@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.  I will be notified, and then you'll automatically
+be notified of progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2005 Jose Castro, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

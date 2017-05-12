@@ -1,0 +1,17 @@
+abstract: Someone is talking about you
+author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.61
+license: perl
+name: Acme-Sneeze-JP
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Exporter::Lite: 0
+  Scalar::Util: 0
+  perl: 5.8.0
+version: 0.01

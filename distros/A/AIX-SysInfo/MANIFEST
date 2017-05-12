@@ -1,0 +1,7 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+SysInfo.pm
+t/get_sysinfo.t

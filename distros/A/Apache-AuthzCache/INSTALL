@@ -1,0 +1,46 @@
+$Id: INSTALL,v 1.1 2000/09/26 20:11:50 cgilmore Exp $
+
+=head1 NAME
+
+INSTALL - Apache::AuthzCache installation instructions
+
+=head1 DESCRIPTION
+
+How to build, test, configure and install Apache::AuthzCache.pm
+
+=head1 PREREQUISITES
+
+=over 3
+
+=back
+
+=head1 Build and install Apache::AuthzCache.pm
+
+=over 3
+
+In this current directory run:
+
+  perl Makefile.PL
+  make
+  make install
+
+=back
+
+=head1 Testing Apache::AuthzCache.pm
+
+=over 3
+
+At this time, no regression tests are available.
+
+=back
+
+=head1 Notes
+
+=over 3
+
+=back
+ 
+=head1 Support
+
+See the SUPPORT file.
+

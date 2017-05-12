@@ -1,0 +1,83 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+=head1 NAME
+
+parse_post_data - Parse the body of a C<POST> request
+
+=head1 SYNOPSIS
+
+  Plugin parse_post_data
+
+And in your plugin:
+
+  my $value = $client->param('foo');
+
+=head1 DESCRIPTION
+
+By default AxKit2 does not process C<POST> data, leaving this entirely up to
+the plugin to do that if it so requires. This plugin parses C<POST> form data
+and places that data in the client's C<param()> API.
+
+Currently only processes forms of type "application/x-www-form-urlencoded" which
+is the default for HTML forms, but also means that file upload is not yet
+supported.
+
+=head1 CONFIG
+
+None.
+
+=cut
+
+sub hook_body_data {
+    my ($self, $bref) = @_;
+    
+    my $client = $self->client;
+    my $remaining = $client->notes('parse_post_data::bytes_remaining');
+    if (!$remaining) {
+        $remaining = $client->headers_in->header('Content-Length');
+        return DONE unless $remaining;
+    }
+    
+    my $data = $client->notes('parse_post_data::body_data') || '';
+    $data .= $$bref;
+    $remaining -= length($data);
+    $client->notes('parse_post_data::body_data', $data);
+    
+    if (!$remaining) {
+        # parse $data
+        my $ct = $client->headers_in->header('Content-Type');
+        if ($ct eq 'application/x-www-form-urlencoded') {
+            for my $param (split(/[&;]/, $data)) {
+                my ($key, $value) = split(/=/, $param, 2);
+                next unless defined $key && defined $value;
+                $key   =~ tr/+/ /;
+                $key   =~ s/%([0-9a-fA-F]{2})/chr(hex($1))/eg;
+                $value =~ tr/+/ /;
+                $value =~ s/%([0-9a-fA-F]{2})/chr(hex($1))/eg;
+                
+                $client->headers_in->add_param($key, $value);
+            }
+        }
+        else {
+            die "Unhandled form type: $ct";
+        }
+        return DONE;
+    }
+    
+    return DECLINED;
+}

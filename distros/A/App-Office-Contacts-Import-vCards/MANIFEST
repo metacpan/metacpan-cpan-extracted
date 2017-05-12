@@ -1,0 +1,25 @@
+Build.PL
+Changelog.ini
+CHANGES
+htdocs/assets/templates/app/office/contacts/import.vcards.js
+htdocs/assets/templates/app/office/contacts/import.vcards.tmpl
+httpd/cgi-bin/office/import/vcards.cgi
+httpd/cgi-bin/office/import/vcards.psgi
+lib/App/Office/Contacts/Import/vCards.pm
+lib/App/Office/Contacts/Import/vCards/.htoffice.import.vcards.conf
+lib/App/Office/Contacts/Import/vCards/Controller.pm
+lib/App/Office/Contacts/Import/vCards/Controller/Import.pm
+lib/App/Office/Contacts/Import/vCards/Controller/Initialize.pm
+lib/App/Office/Contacts/Import/vCards/Util/Config.pm
+lib/App/Office/Contacts/Import/vCards/Util/vCards.pm
+lib/App/Office/Contacts/Import/vCards/View.pm
+lib/App/Office/Contacts/Import/vCards/View/vCards.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+scripts/test.import.pl
+t/pod.t
+t/test.build.t.slow2run
+t/test.makefile.t.slow2run
+t/test.t

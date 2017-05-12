@@ -1,0 +1,13 @@
+0.003 2016-11-21 20:01:09-0600
+  - Add a configure time dependency on File::chmod. Thanks to @pablrod for the patch!
+    <https://github.com/EntropyOrg/p5-Alien-LIBSVM/pull/3>.
+  - Fix the build on Windows so that it does not need to run `make` since the
+    binaries are already built.
+
+0.002 2016-04-17 13:00:09-0500
+  - Added a minimum version version for Alien::Base `configure_requires`.
+    Thanks to Graham Ollis (PLICEASE++)!
+  - Updated libsvm tarball to v3.21 (released 2015-12-14).
+
+0.001 2015-06-06 02:15:45-0500
+  - first version

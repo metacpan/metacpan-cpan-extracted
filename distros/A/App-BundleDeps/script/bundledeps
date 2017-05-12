@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+use strict;
+use App::BundleDeps;
+use Getopt::Long;
+
+my $bundler = App::BundleDeps->new;
+
+@ARGV = map { /^(-M)(.+)/ ? ($1,$2) : $_ } @ARGV;
+
+my @modules;
+GetOptions(
+    "extlib=s",     sub { $bundler->extlib($_[1]) },
+    "notest!",      sub { $bundler->notest($_[1]) },
+    'M|modules=s@', sub { push @modules, $_[1] },
+);
+
+if (@modules) {
+    $bundler->bundle_modules(@modules);
+} else {
+    $bundler->bundle_from_meta('META.yml');
+}
+
+__END__
+
+=head1 NAME
+
+bundledeps - Frontend for App::BundleDeps
+
+=head1 SYNOPSIS
+
+  # build from META.yml into extlib
+  bundledeps
+
+  # Installs to local::lib path
+  bundledeps --extlib local
+
+  # Install modules
+  bundledeps -MCatalyst -MMoose
+
+=head1 AUTHOR
+
+Tatsuhiko Miyagawa
+
+=head1 SEE ALSO
+
+L<App::BundleDeps>
+
+=cut

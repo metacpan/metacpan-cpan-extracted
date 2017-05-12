@@ -1,0 +1,24 @@
+#!/usr/bin/perl -w
+use strict;
+
+use vars qw($opt_s);
+use Getopt::Std;
+getopts('s:');
+
+use Env qw(PAGER);
+
+use Astro::IRAF::CL;
+
+my $name = $ARGV[0] || die "Usage: irafhelp <help page name>\n";
+
+my $iraf = Astro::IRAF::CL->new(iraf_start => $opt_s);
+
+my @output = $iraf->exec(command => "help $name");
+
+my $pager = $PAGER || 'more';
+
+open(PAGER,"|$pager") || die "Cannot connect to pager $pager: $!\n";
+for (@output){print PAGER $_,"\n"}
+close(PAGER);
+
+exit;

@@ -1,0 +1,39 @@
+SYNOPSIS
+
+    This module is meant to be used only via the included CLI script
+    wp-xmlrpc. If you want to make XML-RPC calls to a WordPress website,
+    you can use XMLRCCP::Lite directly, e.g. to delete a comment with ID
+    13:
+
+     use XMLRPC::Lite;
+     my $call = XMLRPC::Lite->proxy("http://example.org/yourblog")->call(
+         "wp.deleteComment", # method
+         1, # blog ID, usually just set to 1
+         "username",
+         "password",
+         13,
+     );
+     my $fault = $call->fault;
+     if ($fault && $fault->{faultCode}) {
+         die "Can't delete comment: $fault->{faultCode} - $fault->{faultString}";
+     }
+
+    To find the list of available methods and arguments, see the WordPress
+    API reference (see "SEE ALSO").
+
+SEE ALSO
+
+    API reference: https://codex.wordpress.org/XML-RPC_WordPress_API
+
+    Other WordPress API modules on CPAN: WordPress::XMLRPC by Leo Charre (a
+    thin wrapper over XMLRPC::Lite), WordPress::API by Leo Charre (an OO
+    wrapper over WordPress::XMLRPC, but at time of this writing the module
+    has not been updated since 2008/WordPress 2.7 era), WP::API by Dave
+    Rolsky (OO interface, incomplete).
+
+    Other WordPress API CLI on CPAN: wordpress-info,
+    wordpress-upload-media, wordpress-upload-post (from WordPress::CLI
+    distribution, also by Leo Charre).
+
+    XMLRPC::Lite
+

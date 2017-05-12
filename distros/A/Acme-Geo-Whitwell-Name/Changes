@@ -1,0 +1,16 @@
+Revision history for Acme-Geo-Whitwell-Name
+0.04	Sat Feb 26 17:28:11 PST 2011
+	Require Test::Exception to prevent test failures on some platforms
+
+0.03   	Thu Aug 20 22:17:05 PDT 2009
+        Move POD tests to xt/
+        Add demo script
+        Make Test::Exception prereq conditional
+
+0.02    Sun Jan  6 16:03:40 PST 2008
+	Change 'our' to fully-qualified name
+	Add Test::Exception prereq (thank you CPAN Testers)
+
+0.01	Thu Jan  3 16:24:54 PST 2008
+	Initial release (and my first Acme module).
+

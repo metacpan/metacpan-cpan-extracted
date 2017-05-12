@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+# -*- Mode: perl -*-
+# file: model
+
+# do an internal redirect to show the model for selected object
+
+use strict;
+use CGI qw(:standard escape);
+use Ace::Browser::AceSubs;
+use Ace::Browser::TreeSubs;
+
+# get the requested object
+my $object = GetAceObject;
+PrintTop(param('name'),param('class'),"Acedb Schema for Class ".param('class'));
+
+# get its model
+my $db = OpenDatabase;
+my $class = $object->class;
+my ($model) = $db->fetch(Model=>"?$class");
+
+unless ($model) {
+  AceError("No model of type ?$class found");
+  PrintBottom();
+  exit 0;
+}
+
+print_tree($model);
+PrintBottom();
+
+exit 0;
+
+sub print_tree {
+  my $obj = shift;
+  print $obj->asHTML(\&to_href) 
+    || strong('No more text information about this object in the database'),"\n";
+}
+
+# this is cut-and-paste out of etree, but with simplifications
+sub to_href {
+  my $obj = shift;
+
+  unless ($obj->isObject or $obj->isTag) {
+    $obj =~s/\\n/<BR>/g;
+    return ($obj,0);
+  }
+
+  # if we get here, we're dealing with an object or tag
+  my $name = $obj->name;
+
+  # modperl screws up with subroutine references for some reason
+  my $page_name = param('name');
+  my $page_class = param('class');
+  my %squash = map { $_ => 1; } grep($_ ne '',param('squash'));
+  my %expand = map { $_ => 1; } grep($_ ne '',param('expand'));
+
+  my ($n,$c) = (escape($name),escape($obj->class));
+  my ($pn,$pc) = (escape($page_name),escape($page_class));
+  my $cnt = $obj->col;
+
+  my $title = $name;
+  if ($cnt > 1) {
+    if ($squash{$name} || ($cnt > MAXEXPAND && !$expand{$name})) {
+      my $to_squash = join('&squash=',map { escape($_) } grep $name ne $_,keys %squash);
+      my $to_expand = join('&expand=',map { escape($_) } (keys %expand,$name));
+      return (a({-href=>url(-relative=>1,-path_info=>1) 
+		 . "?name=$pn&class=$pc"
+		 . ($to_squash ? "&squash=$to_squash" : '') 
+		 . ($to_expand ? "&expand=$to_expand" : '')
+		 . "#$name",
+		 -name=>"$name",
+		 -target=>"_self"},
+		b(font({-color=>CLOSEDCOLOR},"$title ($cnt)"))),
+	      1);
+    } else {
+      my $to_squash = join('&squash=',map { escape($_) } (keys %squash,$name));
+      my $to_expand = join('&expand=',map { escape($_) } grep $name ne $_,keys %expand);
+      return (a({-href=>url(-relative=>1,-path_info=>1) 
+		 . "?name=$pn&class=$pc"
+		 . ($to_squash ? "&squash=$to_squash" : '') 
+		 . ($to_expand ? "&expand=$to_expand" : '')
+		 . "#$name",
+		 -name=>"$name",
+		 -target=>"_self"},
+		b(font({-color=>OPENCOLOR},"$title"))),
+	      0);
+    }
+  }
+
+  return i($title) if $obj->isComment;
+
+  if ($obj->isObject) {
+      my $href = Object2URL($obj);
+      return (a({ -href=>$href},$title), 0);
+  }
+
+  if ($obj->isTag) {
+    return ("<B>$title</B>",0);
+  }
+  # shouldn't ever get here.
+}
+

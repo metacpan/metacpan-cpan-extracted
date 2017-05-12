@@ -1,0 +1,11 @@
+Revision history for App-depakable
+
+0.002   2016-09-26 (PERLANCAR)
+
+	- [Incompatible change] Rename script from depakable to
+	  module-depakable, add prereq-depakable script.
+
+
+0.001   2016-05-18 (PERLANCAR)
+
+        - First release.

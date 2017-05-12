@@ -1,0 +1,45 @@
+Revision history for App-Kit
+
+0.62  2013-12-17 05:15:32
+    - rt 91462: remove dep that caused circular dep
+    - add _force_new option to db->dbh
+
+0.61  2013-12-15 10 11:38:09
+    - minimum version of YAML::Syck for consistent non-escaping of utf8
+        - remove current escaped utf8 handling since its built into YAML::Syck now
+    - add YAML and JSON tests for handling of unicode strings
+    - correct NS in NAME section of A::K::O::DB
+    - update required ver of String::UnicodeUTF8 to latest Unicode zero padding \x{} version
+    - update required version of Devel::Kit to latest (so that other reqs match)
+
+0.6  2013-11-10 10 18:53:06
+    - Add ex() role
+    - Move RW and RunCom to Util/
+
+0.5  2013-11-09 12:18:17
+    - read/write JSON and YAML
+        - finish db conf file support
+        - config file POD
+    - support custom dbh check to use instead of ping
+
+0.4  2013-11-08 12:23:18
+    - skip tests for non-existant dist on servers where it actually exists
+        - e.g. http://www.cpantesters.org/cpan/report/6cedab46-46a6-11e3-bec8-c5f30fa73a27
+    - made 'warnings enabled' tests work on perl 5.19
+        - e.g. http://www.cpantesters.org/cpan/report/3b25d6d8-46a6-11e3-badc-fde90fa73a27
+    - Add Devel::Kit to deps so its available to us when we're developing
+    - use base64 data in base64 decode test failure for systems that care
+        - avoids needless warning: Premature end of base64 data at t/04.ns.t line 46.
+    - set File::Temp, File::Slurp, and Class::Unload dep version to latest to try to address unreproducible test failures
+        - http://www.cpantesters.org/cpan/report/c81bdc48-47ed-11e3-bf3e-b51f7bc94557
+
+0.3  2013-11-05 22:13:31
+    - add DBD::SQLite to deps (including Perl::DependList comment notation for it to be found)
+    - other dep fixups in prep for Perl-DependList based release testing support
+
+0.2  2013-10-31 08:42:21
+    - add Role::Multiton to deps
+    - fix POD/deps that was autogen'd to refer to external modules
+
+0.1  2013-05-22 21:12:21
+       Initial release.

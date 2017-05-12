@@ -1,0 +1,28 @@
+Revision history for App-EvalServer
+
+0.08  Fri Apr 8 12:30:04 GMT 2011
+    - Skip all tests if JSON::Any fails to load
+
+0.07  Mon Apr 4 20:16:52 GMT 2011
+    - Preserve symlinks in @INC
+
+0.06  Fri Apr 1 23:26:28 GMT 2011
+    - Return an error when a child process dies before returning a result
+
+0.05  Wed Dec 22 15:02:20 GMT 2010
+    - After we daemonize, notify the POE kernel that we have forked
+    - Load File::Glob before evaluating Perl code
+
+0.04  Mon Sep 6 04:49:58 GMT 2010
+    - Shut down gracefully on SIGTERM
+
+0.03  Tue Aug 17 22:50:18 GMT 2010
+    - Make all warnings fatal
+
+0.02  Sat Jul 31 17:51:30 GMT 2010
+    - Document the default value of the 'unsafe' option
+    - If we can't evaluate the code, only deliver an error message
+    - Fix the module name for the PHP backend
+
+0.01  Sat Jul 31 03:21:26 GMT 2010
+    - Initial release

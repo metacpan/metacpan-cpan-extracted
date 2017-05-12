@@ -1,0 +1,109 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-edit
+# ABSTRACT: Edit a changeset
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    git
+    git_fetch_and_clean_up
+    guarantee_a_clean_working_directory
+    is_valid_ref
+    its_for_changeset
+    meta_data_add
+    meta_data_rm
+    remote_branch_exists
+    project_name
+);
+use App::Gitc::Reversible;
+
+my $changeset = shift or die "You must specify a changeset name\n";
+git_fetch_and_clean_up();
+die "There is no remote branch named $changeset\n"
+    if not remote_branch_exists("pu/$changeset");
+
+my $stash;
+reversibly {
+    failure_warning "\nCanceling edit command\n";
+
+    $stash = guarantee_a_clean_working_directory();
+    to_undo { git "stash apply $stash" if $stash; $stash = undef };
+
+    # append edit to meta data
+    my $id = meta_data_add({
+        action    => 'edit',
+        changeset => $changeset,
+    });
+    to_undo { meta_data_rm(id => $id, changeset => $changeset) };
+
+    # delete the 'pu' branch
+    my $ref = is_valid_ref("origin/pu/$changeset");
+    git "push origin :pu/$changeset";
+    to_undo { git "push origin $ref:refs/heads/pu/$changeset" };
+
+    # create a new local branch
+    git "checkout --no-track -b $changeset $ref";
+    return;
+};
+
+# update ITS if possible
+my $its = its_for_changeset($changeset);
+if ($its) {
+    my $its_label = $its->label_issue;
+    print STDERR "Updating $its_label...";
+    my $project = project_name();
+    my $what_happened = $its->transition_state({
+        command   => 'edit',
+        message   => "Edited an existing changeset: $project#$changeset",
+        changeset => $changeset,
+    });
+    print STDERR "done\n";
+    warn $what_happened;
+}
+
+# reinstate any changes present when we started
+git "stash apply $stash" if $stash;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-edit - Edit a changeset
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

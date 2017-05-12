@@ -1,0 +1,70 @@
+Revision history for AnyEvent-Handle-UDP
+
+0.048     2017-01-12 22:32:02+01:00 Europe/Amsterdam
+          - Fixed timeout handling in destroy
+
+0.047     2017-01-11 20:58:03+01:00 Europe/Amsterdam
+          - Fixed error handler
+
+0.046     2017-01-08 15:39:44+01:00 Europe/Amsterdam
+          - Restore fh method
+
+0.045     2016-12-26 19:19:16+01:00 Europe/Amsterdam
+          - Move away from Moo
+
+0.044     2016-07-03 22:43:46+02:00 Europe/Amsterdam
+          - Avoid resending entry if object was destroyed
+
+0.043     2013-10-16 00:35:48 Europe/Amsterdam
+          Rerelease for fixed compile tests
+
+0.042     2013-09-10 21:21:05 Europe/Amsterdam
+          Require Moo 1.001000
+          Allow EINTR in recv
+
+0.041     2013-09-01 12:02:03 Europe/Amsterdam
+          Handle address reuse better
+
+0.040     2013-08-29 13:04:30 Europe/Amsterdam
+          Fix error handling in a number of places
+
+0.039     2013-01-17 16:04:04 Europe/Amsterdam
+          Hopefully really fixed for old perl+old Socket.pm
+          Made connect_to actually work
+
+0.038     2012-12-12 23:19:16 Europe/Amsterdam
+          Fix {,r,w}timeout_reset to actually work
+          Made it work with old perl+old Socket.pm
+          Switch from Test::Exception to Test::Fatal
+
+0.037     2012-11-15 00:29:31 Europe/Amsterdam
+          Handle absence of IPv6 better (hopefully)
+
+0.036     2012-06-06 19:23:18 Europe/Amsterdam
+          Make fh an IO::Socket object
+          Don't insist on port number in tests
+          Refactor bind/connect logic
+
+0.035     2012-05-02 23:15:17 Europe/Amsterdam
+          Make dependency on Sub::Name optional
+          Stop depending on Const::Fast
+
+0.034     2012-04-30 23:42:57 Europe/Amsterdam
+          Make push_send accept an address array too
+          Added support for timeouts
+          Make sure buffers is predefined
+
+0.033     2012-02-19 17:35:10 Europe/Amsterdam
+          Make push_send optionally take a $cv, and only return one if called in non-void context
+          Make resend logica actually work at all
+          Made on_drain more consistent
+          Add autoflush attribute, but no longer autocork by default
+
+0.032     2012-02-14 02:13:50 Europe/Amsterdam
+          Make push_send actually work
+
+0.031     2011-10-14 19:48:19 Europe/Amsterdam
+          Updated version number
+
+0.001     2011-10-14 18:08:41 Europe/Amsterdam
+    -

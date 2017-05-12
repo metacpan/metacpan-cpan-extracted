@@ -1,0 +1,84 @@
+{
+   "abstract" : "Build external dependencies for use in CPAN",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Build",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "example",
+         "maint"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "IPC::Cmd" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.036",
+            "Capture::Tiny" : "0.17",
+            "FFI::CheckLib" : "0.11",
+            "File::chdir" : "0",
+            "IPC::Cmd" : "0",
+            "JSON::PP" : "0",
+            "Module::Load" : "0",
+            "Path::Tiny" : "0.077",
+            "Text::ParseWords" : "3.26",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Suite" : "0.000060",
+            "Test::More" : "0.94",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Alien-Build/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Alien::Build",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Alien-Build.git",
+         "web" : "https://github.com/plicease/Alien-Build"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.36",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+}
+

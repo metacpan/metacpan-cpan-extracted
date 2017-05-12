@@ -1,0 +1,8 @@
+Revision history for Perl extension Apache::Clickable.
+
+0.02  Fri May  3 22:27:43 JST 2002
+	- test tweaks
+
+0.01  Sat Jul  7 13:11:54 2001
+	- original version; created by h2xs 1.19
+

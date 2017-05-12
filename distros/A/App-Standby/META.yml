@@ -1,0 +1,52 @@
+---
+abstract: 'Managing on-call rotation and notification queues'
+author:
+  - 'Dominik Schulz <dominik.schulz@gauner.org>'
+build_requires:
+  File::Temp: 0
+  HTTP::Request::Common: 0
+  Plack::Test: 0
+  Test::MockObject::Universal: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.06
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Standby
+requires:
+  Config::Yak: 0
+  Config::Yak::RequiredConfig: 0
+  DBD::SQLite: 0
+  DBI: 0
+  Data::Pwgen: 0
+  File::ShareDir: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  List::Util: 0
+  Log::Tree: 0
+  Log::Tree::RequiredLogger: 0
+  Module::Pluggable: 0
+  Moose: 0
+  MooseX::App::Cmd: 0
+  MooseX::App::Cmd::Command: 0
+  Pingdom::Client: 0
+  Plack::Builder: 0
+  Plack::Loader: 0
+  Plack::Request: 0
+  Template: 0
+  Try::Tiny: 0
+  URI::Escape: 0
+  feature: 0
+  lib: 0
+  mro: 0
+  namespace::autoclean: 0
+  perl: 5.010_000
+  strict: 0
+  warnings: 0
+version: 0.04
+x_authority: cpan:TEX

@@ -1,0 +1,289 @@
+Revision history for AnyEvent::XMPP:
+
+0.55     Sat, 01 Mar 2014 22:41:30 +0100
+         - Receipts: skip re-send if this jabber account is offline
+         - Bugfix: properly clear the disconnected callback
+         - add repository information to META file
+
+0.54     Wed Dec  5 23:21:03 CET 2012
+         - Add AnyEvent::XMPP::Ext::Receipts for XEP-0184 message receipts
+         - Fix error message "protocol error" when connecting without
+           Net::SSLeay by depending on Net::SSLeay
+         - Bugfix: don’t call ->release on destroyed object
+
+0.53     Wed Oct 10 13:05:08 CEST 2012
+         - Fix send_iq_hook, send_message_hook, send_presence_hook
+         - Enable create_cbs for MUC::Message as well (thanks omega)
+         - switch from Digest::SHA1 to Digest::SHA which is in core
+           (thanks jones)
+         - Fix parser error on auth failure (thanks RHOELZ)
+         - Bugfix: properly set $handled = 1 in IQ handlers
+
+0.52     Fri Aug 14 10:53:23 CEST 2009
+         - fixed a problem in xmpp_datetime_as_timestamp.
+
+0.51     Fri Aug 14 10:53:23 CEST 2009
+         - small uncleanliness fixed in ::Parser.
+         - thanks to mons@cpan.org, who found an incompat.
+           between OE 1.1 and AnyEvent::XMPP (thanks to mons@cpan.org).
+         - added message id and xml_node to IM::Message/Delayed
+           (thanks to mons@cpan.org).
+
+
+0.5 Mon Mar 16 21:13:13 CET 2009
+         - added patch for Ext::Pubsub.
+         - melo fixed some memleaks.
+         - fixed another long time memleak in the parser.
+
+0.4 Sun Feb 15 22:59:38 CET 2009
+         - added a $dont_retrieve_vcard to ::Ext::VCard, to
+           prevent retrieval when session_ready event comes.
+         - implemented support for old-style (tcp port 5223) SSL connections,
+           use the old_style_ssl option for ::Connection to enable TLS handshaking
+           upon TCP connect.
+         - added $message argument to subscription related events. the contents
+           comes from the <status> elements in the presence stanza.
+         - made special contact for keeping track of the presences of our own
+           resources. See ::IM::Roster::get_own_contact() and ::IM::Contact::is_me().
+         - minor fixes in ::Ext::MUC.
+         - added 'stream_version_override' parameter to ::Connection, mostly
+           for testing purposes with ejabberd (to enforce old-jabber-style
+           authentication).
+         - partially reversed a patch w.r.t. hostname usage for SASL mechanism.
+           A flag 'use_host_as_sasl_hostname' is provided for giving the hostname
+           to SASL.
+         - rewrote AnyEvent::XMPP::Ext::MUC a bit and made the API more sane.
+           for example: join_room doesn't take a callback anymore.
+         - added more C<disco_feature> methods to the extensions, so that
+           they can be registered to an ::Ext::Disco extension to display
+           support for certain features.
+         - xmpp_datetime_as_timestamp fixed w.r.t. UTC based timestamps.
+         - added possibility to override iq_xml events, and documented
+           how to overtake handling of message, presence and iq stanzas.
+         - added patch from Pedro Melo to give stanzas sent by a ::Component
+           the right namespace.
+         - added patch from Pedro Melo to fix passing of the host in ::Component.
+
+0.3 Mon Jan 28 23:00:58 CET 2009
+         - fixed a bug in disconnect error reporting.
+         - fixed bad parameter passing of AnyEvent::XMPP::Client to
+           AnyEvent::XMPP::IM::Account, also 'host' is used for overriding
+           the destination host now (and not 'domain', as it was in version
+           0.2).
+         - half fixed RT #42194 (Domain vs. host and GSSAPI),
+           passing the hostname specified by 'host' for ::Connection to
+           Authen::SASL's client_new method.
+         - fixed bug in ::XMPP::Client where remove_account didn't work
+           as expected (and set_accounts).
+
+0.2 Sun Dec 28 15:09:25 CET 2008
+         - Using the better tested AnyEvent::Handle and
+           AnyEvent::Socket for DNS resolution, TCP connect and TLS now.
+         - override_host and override_port have been removed.
+         - weird DNS SRV handling and comments have been removed.
+         - removed blocked_write option and drain function, send_buffer_empty event
+           should be used. blocking behaviour should be emulated with send_buffer_empty
+           at the toplevel of the program.
+         - improved message tracking api in ::IM::Account
+         - added added_account/removed_account events to ::Client
+         - added set_accounts() function to ::Client
+         - removed unneccessary sample (devcl)
+         - renamed module from Net::XMPP2 to AnyEvent::XMPP
+         - minor additions to ::Ext::Pubsub.
+
+0.14 Fri Aug  1 12:13:11 CEST 2008
+         - NOTICE: This is the last release of this module under the name
+                   Net::XMPP2. All further releases will be done under the name
+                   AnyEvent::XMPP!
+         - applied fixes from git://github.com/melo/net--xmpp2.git
+           branch component-reply-with-from.
+         - fixed small bug in simple_component.
+         - fixed a debugging bug in the drain method of SimpleConnection,
+           where the written data wasn't passed to the debugging events.
+         - improved the documentation a bit and fixed typos.
+
+0.13 Tue Apr 15 13:07:02 CEST 2008
+         - added a 'send_buffer_empty' event, to be able to wait
+           for an empty send buffer. and also the C<drain> method, which
+           will block until the send buffer is empty. also added a C<blocking_write>
+           option for L<Net::XMPP2::Connection>.
+         - added a default handler to L<Net::XMPP2::Parser> which
+           recognizes and stores CDATA now correctly, so that it can
+           be retrieved from the nodes structure by the C<as_string> method
+           of L<Net::XMPP2::Node> correctly.
+
+0.12 Fri Apr 11 16:30:40 CEST 2008
+         - API CHANGE: The C<connect> method of L<Net::XMPP2::SimpleConnection>
+           and thus L<Net::XMPP2::Connection> is now non-blocking!
+           IMPORTANT: Please revisit your connection code and adjust accordingly!
+         - improved the documentation w.r.t. event callback arguments a bit
+         - improved the documentation of the send_iq method of Net::XMPP2::Connection
+         - added samples/display_my_avatar
+         - added support for XEP-0054 (vCard) and added a test for it (z_07_vcard.t)
+         - replaced the big and unmaintainable MUC test by some smaller
+           tests.
+         - fixed a bug with disconnect event propagation by Net::XMPP2::Client
+         - added a connect_timeout argument to Net::XMPP2::Connection and
+           added an interface for setting it to ::SimpleConnection.
+         - fixed a serious bug in the split_jid regex, and added a test for
+           split_jid
+         - fixed a few connection error bugs in Net::XMPP2::Client and the
+           SimpleConnection class.
+
+0.11 Fri Mar 21 03:00:58 CET 2008
+         - tweaked tests a bit
+         - and added use strict to some modules
+         - fixed a small oversight in Ext::Version w.r.t. to 'use strict'
+         - added the pod-coverage test
+         - added some more MUC functions (Net::XMPP2::Ext::MUC::Room::get_users)
+         - added nickcollision callback
+         - fixed some errors in the documentation
+         - added a xmpp_datetime_as_timestamp utility function
+         - fixed a minor documentation bug in Net::XMPP2::Client
+         - removed the init method from the public interface and made
+           the stream initiation implicit on connect.
+
+0.10 Wed Dec 12 15:38:58 CET 2007
+         - implemented conversation/chat session tracking,
+           see Net::XMPP2::Client::send_message and
+           Net::XMPP2::IM::Account::send_tracked_message.
+         - fixed a race condition with the account adding routine
+           of Net::XMPP2::Client.
+         - also fixed a small bug in stream initiation, Net::XMPP2 now
+           sends a xml declaration again.
+         - implemented a very old authentication method which makes Net::XMPP2
+           now also work with jabberd 1.4.2. See also the
+           'disable_old_jabber_authentication' option in Net::XMPP2::Connection
+         - fixed cpan bug #29724 (unpacking the tarball on os x works now
+           after renaming devcl -> dev_client).
+         - fixed a bug with handling the is_room query in MUC
+
+0.09 Sun Sep 16 09:25:25 CEST 2007
+         - fixed a small bug important bug in namespace setting when binding
+           a resource. this was a showstopper for eg. jabber.org.
+
+0.08 Sat Sep 15 10:50:00 CEST 2007
+         - fixed glitches in tests
+         - added disco_info example
+         - updated disco_info example, added data form retrieval in disco_info
+         - fixed bug in whitespace ping
+         - added character filter functions for filtering out not-allowed XML
+           chars before sending them to the server. Even though this might be
+           a programmer error and shouldn't probably be handled by Net::XMPP2
+           I added it for convenience. Hopefully noone is confused.
+         - fixed potential bug in ping extension
+         - added a sample bot samples/talkbot
+         - fixed small issue in Writer.pm
+         - added other sample bot samples/talkbot_channel
+         - added sample script to retrieve roster: samples/retrieve_roster
+
+0.07 Tue Aug 14 19:22:11 CEST 2007
+         - implemented whitespace ping and:
+            - XEP-0199 - XMPP Ping
+         - added next_iq_id() method to Net::XMPP2::Connection
+         - additions to Net::XMPP2::Event, you can now implement guards
+           for unregistration of registered event callbacks. You can also
+           remove all callbacks now and event names are case sensitive now.
+         - Net::XMPP2::Client adding already existing accounts
+           now updates them.
+         - further todo items killed for MUC support
+         - implemented mapping of old error codes to the new condition strings
+           and the other way around too in Net::XMPP2::Error::Stanza
+         - fallback namespace function for simxml() is now enabled all the time,
+           now default namespaces are nearly always generated an the namespace of a
+           node fallsback to the parent node if none was supplied.
+         - increased test timeout to 20 secs and offered an environment variable
+           to override it.
+         - the XML writer doesn't write a encoding declaration anymore, for the sake
+           of XMPP.
+
+0.06 Wed Aug  1 15:53:56 CEST 2007
+         - reply_iq_result and reply_iq_error now attach a from attribute themselves.
+         - added general instructions for the test suite which also seems to be
+           useful to test servers :-)
+         - implemented XEP-0092
+         - reviewed the message API a bit, take care
+         - started implementation of MUC (XEP-0045).
+         - added support for:
+            - XEP-0082 - XMPP Date and Time Profiles
+            - XEP-0091 - Delayed Delivery (legacy)
+            - XEP-0203 - Delayed Delivery (new)
+         - reworked subscription system a bit, now you have to subscribe
+           manually by calling the contact's methods yourself.
+         - fixed weirdties with JID prepping
+         - removed to attribute from iq auth get
+         - implemented iq auth (XEP-0078)
+         - fixed some bugs and improved the API a bit
+         - implemented the possibility of intercepting events from the library.
+
+0.05 Fri Jul 27 17:45:16 CEST 2007
+         - fixed destructor problem in disco
+         - disco extension now supports multiple identities
+         - added some unit tests!!!11
+         - improved error reporting a bit of internal exceptions
+         - fixed a bug where empty passwords didn't work
+         - typo bugfix in Net::XMPP2::Ext::Registration::submit_form
+         - lots of documentation bugfixes and also added some
+           more useful examples to the synopsises.
+         - fixed a bug with enabling and disabling multiple features
+           with enable_feature (as Ext::OOB does).
+
+0.04 Thu Jul 26 20:41:57 CEST 2007
+         - actually added event send_stanza_data after documenting it
+         - added samples/simple_register_example
+         - fixed some bugs in Net::XMPP2::Ext::Disco
+         - now really added support for in band registration (XEP-0077)
+         - added support for out of band transfers (XEP-0066)
+
+0.03 Wed Jul 25 12:04:06 CEST 2007
+         - fundamentally changed how events work, it's now less
+           errorprone for the programmer (you don't have to return
+           a true value now all the time and can call $self->unreg_me
+           for unregistering a callback).
+           Because of this change send_*_hook and contact_did_* events
+           have changed their arguments.
+         - implemented SAX event generator for easier integration
+           with other XML libraries and generation of DOM.
+         - added the possibility to completly restore the original
+           XML data from a Net::XMPP2::Node.
+         - implemented the component protocol to establish a component
+           stream with a server.
+         - reordered events a bit so that session_ready comes after
+           roster retrieval (when it is retrieved)
+         - added possibility to set the initial presence priority
+           or prevent sending of initial presence
+           (see Net::XMPP2::IM::Connection).
+         - fixed some minor issue with handling invalid disco results
+         - added send_*_hook event hooks for future extensions
+           like the entity capabilities to be able to add payload
+           to outgoing stanzas
+
+0.02 Wed Jul 11 22:55:56 CEST 2007
+         - added iq_xml event
+         - added development client example in samples/devcl/
+         - added some debugging events: debug_recv, debug_send, send_stanza_data,
+           and recv_stanza_xml.
+         - the error event now also provides error reporting
+           about exceptions (eq. in IQ callbacks, which is certainly
+           useful for development!)
+         - fixed error in binding-handling in case the bind iq gets a timeout
+         - added samples/room_lister* and samples/conference_lister
+         - redesigned disco mechanism a bit
+         - added error collection event for nicer error reporting capabilities
+         - added samples/disco_test
+         - implemented XEP-0004
+         - added samples/limit_searcher
+         - added simxml()
+         - splitting up large packets when writing
+         - fixed bad link in documentation of Net::XMPP2::IM::Connection
+         - added samples/simple_example_1
+         - fixed some typos (thanks to lynx aka carlo)
+
+0.01 Thu Jul  5 19:34:30 CEST 2007
+         - fixed first bugs and tested in daily usage.
+         - implemented XEP-0086
+         - implemented XEP-0030
+         - implemented XEP-0077
+         - implemented 95% of RFC 3921
+         - implemented 95% of RFC 3920
+         - first version, released to an unsuspecting world :-)

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Asterisk-Store-Queue-Member.t
+lib/Asterisk/Store/Queue/Member.pm

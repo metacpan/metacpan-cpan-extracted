@@ -1,0 +1,55 @@
+# NAME
+
+Apache::SiteConfig - Apache site deployment tool
+
+# SYNOPSIS
+
+    use Apache::SiteConfig::Deploy;
+
+    name 'projectA';
+
+    su 'www-data';
+
+    domain 'foo.com';
+
+    domain_alias 'foo.com';
+
+    source git => 'git@git.foo.com:projectA.git',
+           branch => 'master';
+
+    source hg  => 'http://.........';
+
+    # relative web document path of repository
+    webroot 'webroot/';
+
+
+
+Do deploy
+
+    $ perl siteA deploy
+
+Do update
+    
+
+    $ perl siteA update
+
+Clean up
+
+    $ perl siteA clean
+
+
+
+# DESCRIPTION
+
+Apache::SiteConfig is a simple tool for apache website deployment.
+
+# AUTHOR
+
+Yo-An Lin <cornelius.howl {at} gmail.com>
+
+# SEE ALSO
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,51 @@
+Revision history for Array-Find
+
+0.08    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update Rinci metadata to v1.1.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.07    2012-08-02 (SHARYANTO)
+
+        - No functional changes. Replace Sub::Spec with Rinci.
+
+
+0.06    2011-09-15 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Add 'unique' option.
+
+
+0.05    2011-03-08 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Now only return result instead of [status, errmsg, result].
+
+
+0.04    2011-02-21 (SHARYANTO)
+
+        - Remove debugging statement, require newer version of Test::More.
+
+
+0.03    2011-02-19 (SHARYANTO)
+
+        - Fix a couple of bugs in infix and suffix matching.
+
+
+0.02    2011-02-19 (SHARYANTO)
+
+        - All modes 'prefix', 'infix', 'suffix' can be or-combined (e.g.
+          'prefix|infix', 'prefix|infix|suffix').
+
+
+0.01    2011-02-18 (SHARYANTO)
+
+        - First release.

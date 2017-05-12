@@ -1,0 +1,28 @@
+---
+abstract: "Provides an easy-to-use interface for authentication using JA-SIG's Central Authentication Service"
+author:
+  - 'jason hord <pravus@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::MockObject: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: nil
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Authen-CAS-Client
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  LWP: 0
+  URI: 0
+  XML::LibXML: 0
+  perl: 5.6.1
+version: '0.08'

@@ -1,0 +1,31 @@
+ActiveResource
+==============
+
+This module implements
+[ActieResource](http://github.com/rails/rails/tree/master/activeresource)
+in Perl. So youn can use Perl to interact with some Rails web apps.
+
+INSTALLATION
+============
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+============
+
+parent, Class::Accessor::Lvalue, Class::Data::Inheritable, XML::Hash,
+Hash::AsObject, LWP::UserAgent, Lingua::EN::Inflect, URI
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (C) 2010, Kang-min Liu <gugod@gugod.org>
+
+This is free software, licensed under:
+
+    The MIT (X11) License

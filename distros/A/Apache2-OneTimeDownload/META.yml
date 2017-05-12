@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Apache2-OneTimeDownload
+version:            1.01
+abstract:           Tolerant mechanism for expiring downloads
+author:
+    - Stephan Jauernick <stephan@stejau.de>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Apache2::Const:       0
+    Apache2::RequestIO:   0
+    Apache2::RequestRec:  0
+    Apache2::SubRequest:  0
+    APR::Table:           0
+    Digest::MD5:          0.01
+    MLDBM:                0.01
+    Test::More:           0.01
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Anansi-Actor.t
+lib/Anansi/Actor.pm

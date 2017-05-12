@@ -1,0 +1,64 @@
+Revision history for Perl extension Astro::FITS::CFITSIO::Simple.
+
+0.18 Mon Feb 14 14:35:32 EST 2011
+        - add defdtype option
+
+0.17 Wed Dec 29 11:36:35 EST 2010
+	- fix bareword warnings
+
+0.16 Mon Apr 14 15:24:09 EDT 2008
+        - incorrect handling of FITS null values if PDL did not have
+	  bad value support.
+        - added nullval option to rdfits() to allow user control over
+	  null value processing.
+
+0.15 Tue Jan  9 11:52:54 EST 2007
+	- attempting to read zero-row binary tables resulted in PDL errors.
+
+0.14 Mon Aug 22 13:02:02 EDT 2005
+        - forgot to update the README to reflect the patches.
+
+0.13 Mon Aug 22 12:40:59 EDT 2005
+        - It turns out that this module was developed against a
+	  patched, non-distributed version of Astro::FITS::Header 2.8.1
+	  Unfortunately, that version is required for this module
+	  to work.  The patches are available here:
+
+	     https://rt.cpan.org/NoAuth/Bug.html?id=4816
+	     https://rt.cpan.org/NoAuth/Bug.html?id=11722
+
+
+	- minor error formatting output fixes.
+
+
+0.12 Thu May 12 11:45:13 EDT 2005
+
+	- test for inappropriate call in scalar context when reading
+	  multiple columns was broken
+
+0.11 Wed May 11 15:34:55 EDT 2005
+
+	- when processing bit fields as bits (not logicals), the
+	  ENTIRE destination piddle was set to zero, for each chunk, not
+	  just the destination for the current chunk.  this resulted not
+	  only in bogus data, but also slowed things down TREMENDOUSLY.
+
+0.1  Wed May 11 09:26:24 EDT 2005
+	- much improved support for bit fields; now can either
+	  map bit for bit or as logicals
+	- status output
+	- can specify columns to *not* read
+
+0.03  Tue Oct 19 12:33:05 EDT 2004
+        - retinfo=1 resulted in the original, unfiltered data, being
+	  returned 
+
+0.02  Mon Apr 12 18:13:54 EDT 2004
+        - "supports" TULONG and TUINT.  not really. it just points
+	  them at long(), which is wrong.  But, PDL has no uint or
+	  ulong types.
+
+0.01  Mon Mar 22 18:46:21 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n Astro::FITS::CFITSIO::Simple
+

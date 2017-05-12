@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:                App-Relate-Complex
+version:             0.04
+abstract:            backend for "relate" script (filtered locate)
+license:             ~
+author:              
+    - Joseph Brenner <doom@>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Data::Dumper:                  0
+    Env:                           0
+    File::Copy:                    0
+    File::Locate::Harder:          0
+    File::Path:                    0
+    FindBin:                       0
+    Hash::Util:                    0
+    List::Filter:                  0
+    List::Filter::Internal:        0
+    List::Filter::Storage:         0
+    List::Filter::Transform:       0
+    strict:                        0
+    Test::File::Contents:          0
+    Test::More:                    0
+    Test::Trap:                    0
+    warnings:                      0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

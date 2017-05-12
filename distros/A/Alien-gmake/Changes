@@ -1,0 +1,64 @@
+Revision history for Alien-gmake
+
+0.19      2017-03-23 08:06:47 -0400
+  - Remove lingering dependency on Alien::Base::ModuleBuild
+
+0.18      2017-03-22 16:17:11 -0400
+  - Migrate to Alien::Build and alienfile
+
+0.17      2017-01-12 22:11:06 -0500
+  - implicit modification of PATH is now deprecated
+    (see https://metacpan.org/pod/Alien::gmake#CAVEATS for details)
+
+0.16      2017-01-12 16:56:49 -0500
+  - production release identical to 0.15_01
+
+0.15_01   2017-01-12 09:48:32 -0500
+  - Fix build failure when using MSYS sans Alien::MSYS
+
+0.15      2017-01-11 08:50:02 -0500
+  - On Windows (MSWin32), probe for the Gnu Make that comes from
+    Alien::MSYS
+
+0.14      2016-02-05 22:57:59 -0500
+  - Prune experimental t/run.t test
+
+0.12      2016-01-28 21:21:10 -0500
+  - Use Alien::Base::ModuleBuild as configure requires
+    instead of Alien::Base
+
+0.11      2015-09-14 05:21:12 -0400
+  - Fix for helper, which was incorrectly expecting to be
+    called as a class method (eserte++ for reporting GH#1).
+
+0.10      2015-07-13 07:33:41 -0400
+  - Update meta to reflect ownership by Alien::Base team
+
+0.09      2015-07-13 07:31:37 -0400
+  - Provide %{gmake} helper
+  - Require Alien::Base 0.020
+
+0.08      2015-04-22 11:40:06 -0400
+  - Require Alien::Base 0.016 (needed for alien_stage_install)
+
+0.07      2015-04-22 11:23:26 -0400
+  - use alien_stage_install
+
+0.06      2015-01-23 08:02:18 -0500
+  - fix syntax error
+  - remove some core libs as explicit prereqs
+
+0.05      2014-10-14 08:03:07 -0400
+  - fix regression in source code build 0.04
+
+0.04      2014-10-14 07:33:08 -0400
+  - use Alien::Base 0.006
+
+0.03      2014-09-24 13:41:22 -0400
+  - first CPAN release
+
+0.02      2014-09-24 13:33:45 -0400
+  - fixed dependency
+
+0.01      2014-09-24 13:29:15 -0400
+  - initial version

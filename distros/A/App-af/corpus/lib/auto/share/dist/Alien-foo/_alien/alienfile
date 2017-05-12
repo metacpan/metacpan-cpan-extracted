@@ -1,0 +1,2 @@
+use alienfile;
+meta_prop->{one} = 'from class';

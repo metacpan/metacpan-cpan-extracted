@@ -1,0 +1,53 @@
+Apache::AuthCookie is Copyright (C) 2000-2009, Michael Schout.
+
+WHAT IS THIS?
+
+    This package contains the Apache::AuthTicket module and the
+    Apache2::AuthTicket module.  These modules implement a cookie based
+    authentication system similar to the ticket access system described in the
+    mod_perl eagle book.
+
+    Apache::AuthTicket is for mod_perl version 1
+    Apache2::AuthTicket is for mod_perl version 2
+
+HOW DO I INSTALL IT?
+
+    You need perl 5.6.0 or better to install this package.  In addition, you
+    should also have the following packages installed:
+
+        Apache::AuthCookie 2.011 or later.
+        mod_perl 1.22 or later
+        DBI
+        Digest::MD5
+        SQL::Abstract
+
+    All of these modules are available from your favorite CPAN mirror.
+
+    Installation of this module is as usual:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Most of the tests are skipped unless you have DBD::SQLite and Apache::Test
+    installed.  Install those modules from CPAN if you have trouble and want
+    useful output from "make test"
+
+SEE ALSO
+    Apache::AuthCookie, Apache2::AuthCookie
+
+AUTHOR
+    Michael Schout, <mschout@gkg.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2000-2008 by Michael Schout
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either:
+
+    ·   the GNU General Public License as published by the Free Software
+        Foundation; either version 1, or (at your option) any later
+        version, or
+
+    ·   the Artistic License version 2.0.

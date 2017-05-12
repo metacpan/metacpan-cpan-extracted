@@ -1,0 +1,26 @@
+---
+abstract: 'Nothing happens.'
+author:
+  - 'William Woodruff <william@tuffbizz.com>'
+build_requires:
+  Test::More: 0
+  Test::Output: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Xyzzy
+requires:
+  Exporter: 0
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  bugtracker: http://github.com/woodruffw/Acme-Xyzzy/issues
+  homepage: http://metacpan.org/release/Acme-Xyzzy
+  repository: git://github.com/woodruffw/Acme-Xyzzy
+version: 0.001

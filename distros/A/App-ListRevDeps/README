@@ -1,0 +1,21 @@
+SYNOPSIS
+
+     # Use via list-rev-deps CLI script
+
+DESCRIPTION
+
+    Currently uses MetaCPAN API and also scrapes the MetaCPAN website and
+    by default caches results for 24 hours.
+
+ENVIRONMENT
+
+      * LOG_API_RESPONSE (bool)
+
+      If enabled, will log raw API response (at trace level).
+
+SEE ALSO
+
+    App::lcpan indexes CPAN Meta information from releases in your local
+    CPAN mirror, and allows you to query dependencies and reverse
+    dependencies information from the index.
+

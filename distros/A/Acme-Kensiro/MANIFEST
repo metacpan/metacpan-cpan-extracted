@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Acme/Kensiro.pm
+minil.toml
+t/00.load.t
+t/03.code.t
+xt/02_perlcritic.t
+xt/pod.t
+xt/spelling.t
+META.yml
+MANIFEST

@@ -1,0 +1,30 @@
+
+chngpwd is a perl script that allows any user to change anyother users
+password if the user has the other user current password.
+
+It was build with security in mind, so there should not be any security bugs or
+holes opened by it (But you should check by your self before using it).
+
+It requires: Authen::SimplePam and Sys::Syslog (your perl distribution 
+should have it already).
+
+The main use for this is as a wrapper for changing password securily 
+(e.g. from a web interface). So the cgi or whatever is being used doesn't 
+need to deal with this issues (and run the cgi as suid root).
+
+The script is rich in error messages and exit codes, so it is easy to track 
+down errors, misconfiguration and abuses.
+
+Also, on some critical circunstances it will try to mail the admin in a unknown
+event.  Everything that it does is also logged to Syslog.
+
+As it uses PAM to change passwords, it should work on any PAM aware system
+(almost all Linux distributions, Solaris and at some extend HP-UX).
+I just tested it on Linux (Conectiva Linux and Debian btw).
+
+Please use "perldoc chngpwd.pl" for more details before using it.
+
+Bugs, Suggestions, Crictics, Patchs, Security abuses, send to
+Raul Dias <raul@dias.com.br>
+
+

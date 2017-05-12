@@ -1,0 +1,67 @@
+{
+   "abstract" : "a GUI REPL written with Prima for the PDL community.",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Prima-REPL",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "PDL" : "0",
+            "PDL::Graphics::Prima" : "0"
+         },
+         "requires" : {
+            "Prima" : "1.33"
+         }
+      }
+   },
+   "provides" : {
+      "App::Prima::REPL" : {
+         "file" : "lib/App/Prima/REPL.pm",
+         "version" : "0.03"
+      },
+      "PrimaX::InputHistory" : {
+         "file" : "lib/PrimaX/InputHistory.pm",
+         "version" : 0
+      },
+      "PrimaX::InputHistory::Output::Null" : {
+         "file" : "lib/PrimaX/InputHistory.pm",
+         "version" : 0
+      },
+      "PrimaX::InputHistory::Output::StdOut" : {
+         "file" : "lib/PrimaX/InputHistory.pm",
+         "version" : 0
+      },
+      "ih" : {
+         "file" : "lib/PrimaX/InputHistory.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/run4flat/App-Prima-REPL/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/run4flat/App-Prima-REPL"
+      }
+   },
+   "version" : "0.03"
+}

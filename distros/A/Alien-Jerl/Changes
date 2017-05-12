@@ -1,0 +1,15 @@
+1.11
+
+  - Update to jerlr9 / perl 5.18.2
+
+1.10
+
+  - Add in Basic test
+
+1.01 - 1.09
+
+  - Tweaking tests to detect and use Java runtime
+
+1.00
+
+  - First version.

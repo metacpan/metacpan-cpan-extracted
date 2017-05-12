@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/Acme/MetaSyntactic/nethack.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/author/consistent_version_numbers.t
+t/author/copyright.t
+t/author/distribution.t
+t/author/kwalitee.t
+t/author/perlcritic.t
+t/author/perlcriticrc
+t/author/pod_coverage.t
+t/author/pod_spelling.t
+t/author/pod_syntax.t
+t/author/README
+t/use_ok.t

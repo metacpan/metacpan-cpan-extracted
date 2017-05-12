@@ -1,0 +1,29 @@
+* Make sure one can specify more than one URL to download (and assign
+finished segments to the new URLs).
+    * See Planning for that below.
+
+DONE:
+=====
+
+* Make sure that upon receiving a Ctrl+C signal, the program will write
+a continuation spec to a file, which will allow it to resume.
+
+* Make sure that when a connection stalls for too long (reaches 0 KB/s)
+it will be restarted - otherwise sometimes we get 0 KB/s total download speed
+for too long.
+
+* Implement FTP URLs.
+
+Planning for multiple URLs:
+===========================
+
+Each file will contain an array of segments to be downloaded, and they will
+be split.
+
+At any point there are at most $MAX_CONNS connections active - for all files.
+
+Once all segments in the file are finished or get close to be finished, we
+move to the next file.
+
+We keep two indices in the app: $first_active_file_idx and $last_active_file_idx. When a segment gets fully downloaded we go to $first_active_file_idx and find
+a file there.

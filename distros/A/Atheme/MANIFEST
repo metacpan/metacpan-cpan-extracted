@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+ignore.txt
+lib/Atheme.pm
+lib/Atheme/Fault.pm
+t/00-load.t
+t/author-manifest.t
+t/author-noeol.t
+t/author-notabs.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

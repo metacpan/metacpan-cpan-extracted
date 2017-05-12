@@ -1,0 +1,181 @@
+#!/usr/bin/perl
+#
+# Copyright 2014-2016 - Giovanni Simoni
+#
+# This file is part of PFT.
+#
+# PFT is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# PFT is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with PFT.  If not, see <http://www.gnu.org/licenses/>.
+#
+=head1 NAME
+
+pft pub - Publish content
+
+=head1 SYNOPSYS
+
+pft pub
+
+=head1 DESCRIPTION
+
+Publish content (e.g. on a remote webserver).
+
+=head1 OPTIONS
+
+=over
+
+=item --list-required-conf
+
+List available publishing methods and the expected parameters in the
+configuration file.
+
+The output is compatible with the option specification of C<pft init>
+(see the relevant manpage for details).
+
+=item --help | -h
+
+Show this help
+
+=back
+
+=head2 SUPPORTED INSTALLATION METHODS
+
+=over
+
+=item install
+
+Copy the C<build> directory in another part of the filesystem.
+
+This installation method will clear the target directory before reconstructing
+it: any data contained in such directory will be lost. Consider using the
+C<inject> directory for auxiliary files (This topic is covered by C<pft --help>)
+
+=item rsync+ssh
+
+Copy the C<build> directory via RSYNC onto a remote server, using SSH as
+transport protocol.
+
+=back
+
+=cut
+
+use PFT::Tree;
+use PFT::Conf;
+
+use Pod::Usage;
+
+use Encode::Locale;
+use Encode;
+
+use File::Path qw/make_path remove_tree/;
+use File::Copy::Recursive;
+
+use Carp;
+
+use App::PFT;
+use Getopt::Long;
+Getopt::Long::Configure 'bundling';
+
+my %methods = (
+    'rsync+ssh' => \&rsync_ssh,
+    'install'   => \&install,
+);
+
+GetOptions(
+    'list-required-conf' => sub {
+        for my $mname (sort keys %methods) {
+            say STDOUT $mname, ':';
+            say STDOUT "\t--publish-$_" foreach $methods{$mname}->();
+        }
+        exit 0;
+    },
+    'help|h' => sub {
+        pod2usage
+            -exitval => 1,
+            -verbose => 2,
+            -input => App::PFT::help_of 'pub',
+    }
+) or exit 1;
+
+my $tree = eval{ PFT::Tree->new } || do {
+    say STDERR $@ =~ s/ at.*$//rs;
+    exit 3
+};
+
+my $conf = eval{ $tree->conf } || do {
+    say STDERR 'Configuration error: ', $@ =~ s/ at.*$//rs;
+    exit 4
+};
+
+my $method = $methods{$conf->{publish}{method}} || do {
+    say STDERR 'Unknown method ', $conf->{publish}{method};
+    exit 5;
+};
+
+$method->($tree);
+exit 0;
+
+sub check {
+    foreach (@_) {
+        unless(defined $conf->{publish}{$_}) {
+            say STDERR 'Cannot use publish.', $_,
+                ': missing publish.', $_, ' in ',
+                $PFT::Conf::CONF_NAME;
+            exit 6
+        }
+    }
+}
+
+sub rsync_ssh {
+    my $tree = shift;
+
+    defined $tree || return qw/user host path/;
+    check qw/user host path/;
+
+    my $src = File::Spec->catfile($tree->dir_build, '');
+    my $publish = $conf->{publish};
+    my $dst = "$publish->{user}\@$publish->{host}:$publish->{path}";
+    my $port = $publish->{port} || 22;
+
+    local $, = "\n\t";
+    say STDERR 'Sending with RSync', "from $src", "to $dst";
+
+    system('rsync',
+        '-e', "ssh -p $port",
+        '--recursive',
+        '--verbose',
+        '--copy-links',
+        '--times',
+        '--delete',
+        '--human-readable',
+        '--progress',
+        $src, $dst,
+    );
+}
+
+sub install {
+    my $tree = shift;
+
+    defined $tree || return qw/path/;
+    check qw/path/;
+
+    my $dst = File::Spec->rel2abs($conf->{publish}{path}, $tree->dir_base);
+
+    remove_tree $dst, { verbose => 0 };
+    make_path $dst, { verbose => 0 };
+
+    local $File::Copy::Recursive::CopyLink = 0;
+    File::Copy::Recursive::rcopy_glob(
+        encode(locale => File::Spec->catfile($tree->dir_build, '*')),
+        encode(locale => $dst),
+    );
+}

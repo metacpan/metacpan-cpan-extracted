@@ -1,0 +1,16 @@
+.cvsignore
+Changes
+lib/Apache/Session/libmemcached.pm
+lib/Apache/Session/Store/libmemcached.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-cache.t
+t/02-cache.t
+t/03-integration.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/testlib.pl
+META.yml                                 Module meta-data (added by MakeMaker)

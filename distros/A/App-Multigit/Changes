@@ -1,0 +1,96 @@
+0.18      2017-02-10 15:01:38 GMT
+
+    - Added write_config, an exportable function to write the config from a
+      hashref.
+    - Added github example to create mgconfig from github user
+    - Added -o, to not print repo names
+    - Added mg-st for summary of statuses
+    - Added mg-env, currently only supporting PATH and PERL5LIB
+
+0.17      2016-03-29 11:33:31 BST
+
+    - Fixed derp
+    - mg init can now accept .mgconfig from STDIN
+
+0.16      2015-12-10 12:30:21 GMT
+
+    - Readonly repos now produce no output at all if skipped
+    - mg init will now check out repos at the specified branch
+      [ssh://git/repo]
+      branch=feature-branch
+    - Fixed missing help docs
+
+0.15      2015-11-09 14:35:27 GMT
+
+    - Fixed mg-init crashing when creating new .mgconfig from repositories in PWD
+
+0.14      2015-11-06 16:12:48 GMT
+
+    - Removed -R from mg-init - seemed bad on several levels
+    - Renamed --remove-missing to --remove-repos because ambiguity
+    - Error handling when IO::Async::Process itself fails (actually in 0.13 but
+      I forgot)
+    - Replaced LWP::Simple with HTTP::Tiny
+
+0.13      2015-11-06 15:25:18 GMT
+
+    - mg-init has learned new tricks
+      * Clones missing repos
+        * or removes them from config
+      * Can remove repos rather than re-registering them
+      * Accepts file parameter to initialise from
+    - Underlying IO::Async::Process can be told not to chdir
+    - init is now called mkconfig
+    - Added clean_config function, which cleans the config
+
+0.12      2015-10-22 09:30:14 BST
+
+    - Fixed mg-grep reporting an error when nonzero exit code is expected
+
+0.11      2015-09-23 16:04:29 BST
+
+    - Fixed syntax error in mg script
+    - Fixed initing with non-git dirs
+
+0.10      2015-09-22 15:53:11 BST
+
+    - Added support for selection of repos to work against
+    - Added App::Multigit::Script helper module for scripts
+      - Which accepts a list of repos on STDIN to work against
+    - Added mg-grep
+    - All help text is now from Pod::Usage
+
+0.09      2015-09-17 12:41:09 BST
+
+    - Improved docs, which had fallen behind
+    - Created App::Multigit::Future
+    - New -q and -v options to the mg script itself
+    - New `mg root` script
+    - Failed commands now produce failed Futures.
+
+0.08      2015-09-04 10:59:24 BST
+
+    - mg-each now runs the entire command, and no longer assumes git by default
+
+0.07      2015-09-03 17:55:10 BST
+
+    - Remove Config::Any (which was causing problems) in favour of Config::INI
+    - Add understanding of readonly repositories
+
+0.06      2015-09-03 16:16:59 BST
+
+    - Implemented %BEHAVIOUR to control operations
+    - Added options to mg to control %BEHAVIOUR
+
+0.05      2015-09-02 15:44:28 BST
+
+    - Cleaned up the mg script and created mg-init
+    - Actually installed the scripts (requires @Author::DBOOK >= 0.015)
+    - mg-init can now be re-run to catch up with filesystem changes
+
+0.04      2015-09-01 17:40:34 BST
+
+    - Converted to dzil (so now there's Changes)
+    - Added understanding of "base branch"
+    - Added mg-each script
+    - Added exports to clean up scripts

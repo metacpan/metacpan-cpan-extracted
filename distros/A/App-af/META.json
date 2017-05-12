@@ -1,0 +1,89 @@
+{
+   "abstract" : "Command line tool for alienfile",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-af",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "example",
+         "maint"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.038",
+            "Alien::Build" : "0.18",
+            "Capture::Tiny" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::chdir" : "0",
+            "Moose" : "0",
+            "MooseX::Types::Path::Tiny" : "0",
+            "Path::Tiny" : "0",
+            "Shell::Perl" : "0.003",
+            "Text::Table" : "0",
+            "YAML" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Suite" : "0.000060",
+            "Test::Exit" : "0.11",
+            "Test::More" : "0.94",
+            "Test::Script" : "0",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/App-af/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/App::af",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/App-af.git",
+         "web" : "https://github.com/plicease/App-af"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+}
+

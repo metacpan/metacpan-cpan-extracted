@@ -1,0 +1,45 @@
+NAME
+    AnyEvent::Graphite - Non-blocking Graphite (http://graphite.wikidot.com/) client
+
+SYNOPSIS
+    The 'Graphite' tool (http://graphite.wikidot.com) is a really useful way to collect time series information.
+
+    This module is a flexible, event-driven tool to help quickly 'bridge' Graphite with data sources that need polling (or want to asyncronously 'post' to Graphite.)
+
+    A quick example using the included ::SNMPAgent module:
+
+    I have a family of servers running SNMP. I want to collect load information from them.
+
+
+    use AnyEvent::Graphite::SNMPAgent;
+
+    my $agent = AnyEvent::Graphite::SNMPAgent->new(host => "graphite.mydomain.com", interval => 60);
+    my @hosts = get_interesting_hosts();
+
+    for my $host (@hosts) {
+        $agent->add_snmp(
+            oid => '.1.3.6.1.4.1.2021.10.1.5.1',
+            host => $host,
+            graphite_key => "servers.$host.load_1",
+            filter => sub { return $_[0] * 0.01 },
+        );
+    }
+
+    # run forever letting the event loop run
+    AnyEvent->condvar->recv;
+
+    Since that load_1 OID returns an integer load multiplied by 100 (i.e. load of 3.6 == 360), we need to be able to apply scaling functions.
+    That's what the 'filter' callback can do, but it's optional.
+
+    This should work for thousands of hosts and OID's, even if some of them are intermittently unresponsive.
+
+
+INSTALLATION
+
+Pretty standard:  perl Build.PL && ./Build && ./Build test && ./Build install
+
+COPYRIGHT AND LICENCE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

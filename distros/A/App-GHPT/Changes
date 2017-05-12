@@ -1,0 +1,15 @@
+1.000002 2017-05-04
+
+- The "--project" CLI argument is now optional. By default all projects are
+  searched for stories which can be delivered.
+
+
+1.000001 2017-04-26
+
+- Add IPC::System::Simple as a prereq for the benefit of autodie. Reported by
+  Slaven Rezić. RT #121377.
+
+
+1.000000 2017-04-24
+
+- First public release.

@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.35.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d86d46a07ed2324e4f2bc1e0df5517330c021107 Build.PL
+SHA1 8dce57798c24487939b7eb1d7173f60ce3c8353e Changes
+SHA1 95429256413a58684fbc9c0d644c715132f6adff MANIFEST
+SHA1 1ebd2f0a2008546d3fbad5a41ed189d946ed3c4e MANIFEST.SKIP
+SHA1 8d9e03b8b2e564e162e97133c4ca7a1cfaee0f64 META.yml
+SHA1 58514e315cda25821bbee74ed0969c8b7858da5a Makefile.PL
+SHA1 415a20b1a979e22b1a483c246c271a0e19642cf2 README
+SHA1 5e3ae48a991749e03f913dc6d09cb44c25c717c8 debian/changelog
+SHA1 0b2de4bb80fa2754983d96d71b2f7bae332861ce debian/control
+SHA1 852aa2c93cd7fcf0f5110e7b6d56ba72c2198201 debian/copyright
+SHA1 e9df0269ff17651bbf6cde7a2aa8c63fda11877c debian/libacme-brainfck-perl.examples
+SHA1 e836e40794376e45b8c2daeccb6f2a1bf8cec968 debian/rules
+SHA1 e0d67abeef7a35851dbef65a13f80051b2abc7b7 examples/countdown.pl
+SHA1 b2e48e46347f0b9daf4fe0aea4a31c61ce23e264 examples/helloworld.pl
+SHA1 ea3ab39ff65a07d63861a03e7c36b31c0860f440 examples/jabh.pl
+SHA1 77773892a1e0e8db1f886eef11c92ef0296e18a6 examples/math.pl
+SHA1 cf1a131568321693c06f5ab26b6f70a6197b95ca examples/reverse.pl
+SHA1 4c8b9362b8a29d1462fbdd2b7450f9e8296d40de lib/Acme/Brainfuck.pm
+SHA1 0f25a2d86f8f5eda690df8da9964f0b3c3bca15c t/0-signature.t
+SHA1 6dc8f046e103d07cd18fd3e721c98677ae550ba5 t/1.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQFActScogwpTl2CN6gRAjqpAKC2eTqp+s7myAQjs3wz4mP8RUJjsACgmy9R
+Q3ryvjGlibeTgbhbq1gPdLs=
+=I2au
+-----END PGP SIGNATURE-----

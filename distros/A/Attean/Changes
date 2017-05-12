@@ -1,0 +1,425 @@
+Attean
+======
+
+Created:      2014-09-27
+Home page:    <http://search.cpan.org/dist/Attean/>
+Bug tracker:  <https://github.com/kasei/attean/issues>
+
+0.017  2016-06-09
+
+ - (Addition) Port SPARQL-JSON serializer to Attean (#20, #101 from
+   @cakirke).
+ - (Update) Add a .gitignore file (#99 from @cakirke).
+ - (Update) Changed use of binmode to `use open` in attean_parse and
+   attean_query.
+ - (Update) Fix Construct plan string serialization.
+ - (Update) Fix declared arity of various algebra classes.
+ - (Update) Fixed bug in handling of restricted available named graphs
+   during query planning.
+ - (Update) Fixed documentation in Attean::QueryPlanner.
+ - (Update) Improved handling of unexpected EOF in AtteanX::Parser::SPARQL.
+ - (Update) Improved test coverage.
+ - (Update) Improved use of Travis CI (#100 from @cakirke).
+ - (Update) Make parse_term_from_string deprecations noisy.
+ - (Update) Removed default implementation of
+   Attean::API::Plan->plan_as_string.
+ - (Update) Updated SPARQL parser to produce Attean::Algebra::Reduced
+   algebra objects for REDUCED queries.
+ - (Update) Updated required versions of Moo and Test::Modern.
+
+0.016  2016-05-04
+
+ - (Addition) Ported RDF::Trine::Serializer::RDFXML to
+   AtteanX::Serializer::RDFXML (#22).
+ - (Update) Add serialization of SPARQL PREFIX declarations and prefixnames
+   when namespaces are set (#53).
+ - (Update) Added Test::Attean::QuadStore->cleanup_store method.
+ - (Update) Added Test::Attean::StoreCleanup role and added store cleanup
+   to store tests.
+ - (Update) Changed Attean::TriplePattern->as_quadpattern to delegate to
+   Attean::API::TriplePattern->as_quad_pattern.
+ - (Update) Fix overly aggressive code that attempted to turn IRIs into
+   prefix names during Turtle serialization.
+ - (Update) Fixed bug in SPARQL parsing of NIL tokens.
+ - (Update) Fixes to POD, test, and metadata issues reported by
+   jonassmedegaard (#93, #94, #95, #96).
+ - (Update) Improve Attean::SimpleQueryEvaluator to handle updated algebra
+   classes and iterator API.
+ - (Update) Improved test suite (includes #92 from KjetilK, #53).
+ - (Update) Removed AtteanX::RDFQueryTranslator (split into a new package)
+   and all other references to RDF::Query.
+ - (Update) Removed default implementation of Attean::API::Term->ebv (now
+   required of consumers).
+ - (Update) Serialize SPARQL and Turtle namespace declarations in a stable
+   order.
+ - (Update) Updated Attean::API::AbbreviatingParser->base definition to be
+   a consumer of Attean::API::IRI.
+ - (Update) Updated Attean::API::SPARQLSerializable->as_sparql to return a
+   unicode string, not bytes.
+
+0.015  2016-04-09
+
+ - (Update) Fixed metadata used to generate README files.
+
+0.014  2016-04-09
+
+ - (Addition) Add a size estimate attribute to Attean::Plan::Iterator (#90
+   from KjetilK).
+ - (Addition) Added Attean::Plan::Iterator for cases where there is too
+   much data for Attean::Plan::Table (#88).
+ - (Update) Add ability for parsers to construct lazy IRIs.
+ - (Update) Add type checking to serialize_iter_* methods.
+ - (Update) Added Attean::ListIterator->size method (#89).
+ - (Update) Fix cases where result iterators were constructed without a
+   variables list.
+ - (Update) Improve error message generated for some SPARQL syntax errors.
+ - (Update) Update Attean::FunctionExpression to canonicalize ISURI to
+   ISIRI.
+
+0.013  2016-03-19
+
+ - (Addition) Added Attean::API::BulkUpdatableStore role.
+ - (Addition) Added Attean::API::MutableModel->load_urls_into_graph method.
+ - (Addition) Added Attean::API::QuadPattern->as_triple_pattern method.
+ - (Addition) Added Attean::API::TripleOrQuadPattern->parse and
+   AtteanX::Parser::SPARQL->parse_nodes methods (#82).
+ - (Addition) Added Attean::Algebra::Query to indicate a full query trees
+   and aid in serialization (#67).
+ - (Addition) Added AtteanX::SPARQL::Token->integer constructor.
+ - (Addition) Added parsing, algebra, planning, and test support for SPARQL
+   1.1 Updates.
+ - (Update) Add and use Attean::Algebra::Query->subquery flag when
+   appropriate and stop generating needless unary join algebras.
+ - (Update) Add child accessor to Attean::API::UnaryQueryTree.
+ - (Update) Added CONTRIBUTING file.
+ - (Update) Allow producing short blank node labels in attean_query
+   results.
+ - (Update) Check types of invocant and model objects in calls to
+   cost_for_plan planning method (#77).
+ - (Update) Fix Attean::API::IDPJoinPlanner->cost_for_plan to pass the
+   planner object in calls to the model.
+ - (Update) Fix Attean::Algebra::Update->blank_nodes (#70).
+ - (Update) Fix Attean::QueryPlanner active_graphs argument during
+   recursive call to plans_for_algebra.
+ - (Update) Fix lost in-scope variables in aggregation algebra and plans
+   (#78).
+ - (Update) Fix result iterator generation for quad patterns to keep
+   associated variable names.
+ - (Update) Fix serialization of SILENT flag on Service queries.
+ - (Update) Fix sparql_tokens generation for quad patterns to use SPARQL
+   GRAPH syntax, not N-Quads syntax.
+ - (Update) Fixed bug in Attean::Literal that was returning rdf:string
+   instead of rdf:langString for language literals.
+ - (Update) Improve error messages in Attean::CodeIterator and
+   Attean::API::Binding.
+ - (Update) Improve errors and logging in SPARQL parser (#84 from KjetilK).
+ - (Update) Improve handling of utf8 encoding in SPARQL/XML, algebra, and
+   plan serializations.
+ - (Update) Improve temporary variable names in aggregates generated during
+   parsing.
+ - (Update) Improved Attean::Plan::Union to handle plans with zero
+   children.
+ - (Update) Improved error message in query planners (#76 from KjetilK).
+ - (Update) Pass tree depth as argument to algebra_as_string.
+ - (Update) Refactored SPARQL 1.1 test harness into a testing role (#80).
+ - (Update) Update bin/attean_query to allow dryruns to avoid generating
+   query plans when appropriate.
+ - (Update) Updated attean_query to allow updates.
+
+0.012  2016-02-04
+
+ - (Addition) Added Attean::API::TermOrVariable->apply_binding method.
+ - (Addition) Added AtteanX::Store::SimpleTripleStore.
+ - (Update)	Die on attempts to add non-ground triples/quads to stores
+   (#66).
+ - (Update)	Fixed Attean::Algebra::Table to consume
+   Attean::API::NullaryQueryTree instead of Attean::API::UnaryQueryTree.
+ - (Update)	Fixed type checks performed when ATTEAN_TYPECHECK is set.
+ - (Update)	Improve error reporting for unexpected EOF in
+   AtteanX::Parser::SPARQL.
+ - (Update)	Throwing an error when Triple or Quad objects gets passed a
+   variable (#65 from KjetilK).
+ - (Update) Add planning support for DESCRIBE queries (#45).
+ - (Update) Add type checking to store get_triples and get_quads methods
+   (#61).
+ - (Update) Added logging in QueryPlanner and TreeRewriter (#64 from
+   KjetilK).
+ - (Update) Avoid attempting to parse empty XML documents when passed in as
+   a scalar (#60).
+ - (Update) Fix Attean::CodeIterator type checking to handle non-blessed
+   items properly.
+ - (Update) Fix AtteanX::Parser::RDFXML to properly use caller-supplied
+   base IRI.
+ - (Update) Fix algebra generation for describe queries in SPARQL parser.
+ - (Update) Fix bug in Attean::Plan::Aggregate handling of COUNT(*)
+   queries.
+ - (Update) Fix bugs in SPARQL CSV and TSV serializers.
+ - (Update) Fix sparql_tokens generation for integer and datatyped
+   literals.
+ - (Update) Fixed AtteanX::Parser::SPARQL to maintain its URI::NamespaceMap
+   on prefix declarations.
+ - (Update) Improve POD and test coverage (#55; #61 from KjetilK).
+ - (Update) Improve attean_parse and attean_parse including preservation of
+   prefix declarations where possible.
+ - (Update) Improve regex escaping in t/algebra.t to silence warnings in
+   perl 5.22.
+ - (Update) Improve use of SPARQL and Turtle token objects.
+ - (Update) Improved triple model classes to allow adding and droping
+   triple store graphs.
+ - (Update) Merge code paths for canonical NTriples serializer.
+ - (Update) Preserve in-scope variables in result iterators.
+ - (Update) Serialize SPARQL/XML bindings in a stable order.
+ - (Update) Simplify cost estimation code for hash joins in
+   Attean::API::QueryPlanner (#59 from KjetilK).
+ - (Update) Update SPARQL parser to die on unimplemented Update syntax.
+ - (Update) Update SPARQL/HTML serializer to implement
+   AbbreviatingSerializer (#54, #63 from Zoran Varadinsky).
+ - (Update) Update turtle serializer to consume
+   Attean::API::AppendableSerializer.
+ - (Update) Updated prerequisites in Makefile.PL and .travis.yml.
+ - (Update) Use Test::Modern.
+
+0.011  2016-01-16
+
+ - (Addition) Add initial implementation for Attean::MutableTripleModel.
+ - (Addition) Add logging of costs to query planner (#56 from KjetilK).
+ - (Addition) Add use of MooX::Log::Any (from KjetilK).
+ - (Addition) Added
+   Attean::API::Plan->subplans_of_type_are_variable_connected method.
+ - (Addition) Added Attean::API::Plan->children_are_variable_connected.
+ - (Addition) Added AtteanX::Parser::SPARQL->parse convenience method.
+ - (Addition) Added RDF/XML parser tests.
+ - (Addition) Added Turtle serializer.
+ - (Addition) Added exportable quadpattern constructor.
+ - (Addition) Added tests for get_sequence model accessor method (#3).
+ - (Update) Change API for Attean::API::CostPlanner->cost_for_plan to pass
+   in the query planner.
+ - (Update) Fix bug in handling unbound join variables in hash join
+   evaluation.
+ - (Update) Fix use of blank and variable shortcut constructors (#57 from
+   KjetilK).
+ - (Update) Fixed bug in
+   AtteanX::Serializer::SPARQLHTML->serialize_iter_to_bytes.
+ - (Update) Implementation of canonicalize method for triple and quad
+   patterns (#43 from KjetilK).
+ - (Update) Improve Attean::ExistsExpression->as_string.
+ - (Update) Improve cost estimation for cartesian joins in
+   Attean::API::QueryPlanner.
+ - (Update) Improved SPARQL serialization of algebra and expression trees
+   (including #51).
+ - (Update) Improved error handling in Attean::ListIterator->BUILD.
+ - (Update) Improved recognition of invalid aggregation queries.
+ - (Update) Make regexes used for prefixname parsing publicly accessibly.
+ - (Update) Merged shared constants for Turtle and SPARQL tokens.
+ - (Update) Moved subpatterns_of_type from Attean::API::Algebra to
+   Attean::API::DirectedAcyclicGraph.
+ - (Update) Renamed parse_term_from_string methods to parse_term_from_bytes
+   (adding delegating methods that should be decprecated in the future).
+ - (Update) Silence XML::Parser warnings on empty input documents.
+ - (Update) Update AtteanX::Parser::RDFXML to populate a namespace map
+   during parsing.
+ - (Update) Updated Attean::API::CanonicalizingBindingSet to produce the
+   same type of object as are input.
+ - (Update) Updated copyright years.
+
+0.010  2015-12-22
+
+ - (Addition) Add INVOKE function expression to allow representing
+   IRI-defined functions.
+ - (Addition) Added Attean::API::Algebra methods blank_nodes and
+   subpatterns_of_type.
+ - (Addition) Added Attean::API::SimpleCostPlanner.
+ - (Addition) Added Attean::API::UnionScopeVariablesPlan role to handle
+   common computation of in-scope variables (Github issue #38).
+ - (Addition) Added Attean::Algebra::Sequence class.
+ - (Addition) Added AtteanX::API::JoinRotatingPlanner role.
+ - (Addition) Added SPARQL parsing support for RANK operator (Github issue
+   #35).
+ - (Addition) Added initial algebra and plan support for group ranking
+   (Github issue #34).
+ - (Addition) Added simple SPARQL HTML serializer (ported from
+   RDF::Endpoint; Github issue #27).
+ - (Addition) Added simple SPARQL serializer implementation (Github issue
+   #36).
+ - (Update) Added ability to turn some query algebras into SPARQL token
+   interators.
+ - (Update) Compute in-scope variables in Attean::Plan::Quad instead of
+   relying on calling code (Github issue #39).
+ - (Update) Ensure query plan costs are integers, fixing a bug when running
+   on perl with long doubles (#42).
+ - (Update) Fixed attean_query to support custom output serializers.
+ - (Update) Fixed bug in Attean::Algebra::Project->in_scope_variables.
+ - (Update) Fixed bug in t/http-negotiation.t that caused false failures
+   when negotiation led to the Canonical NTriples serializer.
+ - (Update) Fixed mis-named method call in AtteanX::Store::Memory.
+ - (Update) Improve error messages in query planning code (manual patch
+   from #41).
+ - (Update) Improve serializer negotiation to support multiple classes that
+   handle the same media type.
+ - (Update) Ported RDF::Query SPARQL parser to Attean.
+ - (Update) Refactored query planner to separate IDP code from the core
+   planning code.
+ - (Update) Renamed Attean::API::Planner to Attean::API::QueryPlanner and
+   re-organized planning code.
+ - (Update) Update Changes metadata handling to use
+   Module::Instal::DOAPChangeSets (Github issue #25).
+ - (Update) Updated Attean::Algebra::Join to be n-ary, not binary.
+ - (Update) Updated attean_query to use the native SPARQL parser.
+
+0.009  2015-11-04
+
+ - (Addition) Added Attean::API::Result->shared_domain method.
+ - (Update) Improve handling on unicode data in SPARQL TSV parser.
+ - (Update) Improve query planner and plan implementations to support
+   SPARQL 1.1 test suite.
+ - (Update) Removed HeapSort plan implementation and use of Array::Heap due
+   to packaging concerns (issue #32).
+
+0.008  2015-08-18
+
+ - (Addition) Added Attean::API::Plan::Join role.
+ - (Addition) Added apply_triple and apply_quad methods to triple and quad
+   pattern classes to produce Result objects.
+ - (Addition) Added heap sort plan implementation.
+ - (Update) Attean::API::TripleOrQuadPattern constructors accept
+   non-existent parameters (#13).
+ - (Update) Consolidated BUILDARGS handling in
+   Attean::API::TripleOrQuadPattern.
+ - (Update) Moved computation of in_scope_variables from calling code to to
+   Plan class BUILDARGS.
+
+0.007  2015-07-16
+
+ - (Addition) Added Attean::API::Binding->apply_bindings to bind additional
+   variables.
+ - (Addition) Added Attean::API::Binding->is_ground.
+ - (Addition) Added Attean::API::TriplePattern->as_triple,
+   Attean::API::QuadPattern->as_quad.
+ - (Update) Added evaluation support for REGEX functions.
+ - (Update) Fix Attean plugin loading to allow non-plugins nested below the
+   plugin namespace.
+ - (Update) Improve SPARQL serialization for IRIs and triple patterns.
+ - (Update) Improve SPARQL serialization of OPTIONAL and boolean literals.
+ - (Update) POD improvements (PR #15 from Kjetil Kjernsmo).
+
+0.006  2015-06-30
+
+ - (Addition) Added
+   Attean::API::DirectedAcyclicGraph->has_only_subtree_types method.
+ - (Addition) Added Attean->acceptable_parsers method (GH issue #11).
+ - (Addition) Added methods to test terms and variables for common term
+   role consumption.
+ - (Update) Added HSP heuristics to Attean::IDPQueryPlanner (patch from
+   Kjetil Kjernsmo).
+ - (Update) Added documentation (patches from Kjetil Kjernsmo).
+ - (Update) Disable stable sortint in Attean::IDPQueryPlanner where it is
+   unnecessary (patch from Kjetil Kjernsmo).
+ - (Update) Fixed handling of blank nodes in BGPs in
+   Attean::IDPQueryPlanner.
+ - (Update) Updated Attean::IDPQueryPlanner->join_plans API to allow easier
+   extensibility.
+ - (Update) Updated attean_query to use the IDPQueryPlanner.
+
+0.005  2015-05-27
+
+ - (Update) Add initial code to support interesting orders in
+   Attean::IDPQueryPlanner.
+ - (Update) Added Attean::Plan::Unique class.
+ - (Update) Added POD description of each Attean::Plan class.
+ - (Update) Added evaluation support for type checking functions (ISIRI,
+   ISLITERAL, etc.).
+ - (Update) Added planning support for Extend and Ask algebra operations.
+ - (Update) Added planning support for Unique plans for DISTINCT queries
+   which are already ordered.
+ - (Update) Added query planning tests.
+ - (Update) Added use Set::Scalar in lib/Attean/Algebra.pm.
+ - (Update) Allow store-planning of more than just BGPs in
+   Attean::TripleModel.
+ - (Update) Change use of ListIterator to CodeIterator in plan classes that
+   can be pipelined.
+ - (Update) Changed Attean::Plan::Filter to check the EBV of a single,
+   named variable binding.
+ - (Update) Fixed bug in IDPQueryPlanner->cost_for_plan to reflect recently
+   changed Attean::Plan::Quad API.
+ - (Update) Improve propagation of distinct and ordered attributes during
+   query planning.
+ - (Update) Improved query planning.
+ - (Update) Removed references to Attean::QueryEvaluator (obviated by
+   $plan->evaluate).
+ - (Update) Removed unused/unnecessary code and comments.
+ - (Update) Rename Attean::Plan::Distinct to Attean::Plan::HashDistinct
+   (making room for different implementation strategies).
+ - (Update) Renamed Attean::Plan::Filter to Attean::Plan::EBVFilter.
+ - (Update) Simplified implementation of Attean::Plan::Unique.
+ - (Update) Split handling of BGP and GGP join planning in
+   Attean::IDPQueryPlanner for easier subclass overriding.
+ - (Update) Updated Attean::Plan::Quad to consume Attean::API::QuadPattern.
+ - (Update) Updated IDP query planner to produce correct plans for empty
+   BGPs.
+
+0.004  2015-05-18
+
+ - (Addition) Add Attean::ValueExpression->in_scope_variables method.
+ - (Addition) Add initial implementation of Attean::TripleModel.
+ - (Addition) Added Attean::API::Binding->values_consuming_role method.
+ - (Addition) Added Attean::TriplePattern->as_quadpattern method.
+ - (Addition) Added SPARQL CSV and XML serializers.
+ - (Addition) Added Test::Attean roles for caching quadstores.
+ - (Addition) Added Test::Attean::MutableTripleStore.
+ - (Addition) Added an IDP-based query planner and associated classes and
+   roles.
+ - (Addition) Added initial support for representing, translating, and
+   evaluating SERVICE patterns.
+ - (Update) Add SPARQL serialization support for Expression classes.
+ - (Update) Add algebra_as_string methods for some algebra classes missing
+   an implementation.
+ - (Update) Add variables to result iterators.
+ - (Update) Added Math::Cartesian::Product to prerequisite list.
+ - (Update) Added Test::Roo-based store tests.
+ - (Update) Added comments about handling of graphs in
+   Test::Attean::MutableQuadStore.
+ - (Update) Added missing use statements.
+ - (Update) Fix documentation of serialize_iter_to_io method.
+ - (Update) Fixed Attean->get_parser to accept media types with parameters.
+ - (Update) Fixed required version of perl in store test roles to be v5.14.
+ - (Update) Fixed serialization bug in
+   Attean::FunctionExpression->as_sparql.
+ - (Update) Improve SPARQL serialization for projection, slicing, ordering,
+   and distinct/reduced modifiers.
+ - (Update) Improve SPARQL serialization of algebra trees.
+ - (Update) Update Attean::API::Expression to consume
+   Attean::API::UnionScopeVariables.
+ - (Update) Updated AtteanX::Store::Memory to conform to both etag and time
+   caching roles.
+ - (Update) Updated Memory store matching methods to accept node arrays for
+   any quad pattern position.
+
+0.003  2015-02-19
+
+ - (Addition) Added Attean::TreeRewriter class.
+ - (Addition) Added count estimate methods to TripleStore QuadStore roles
+   (in lieu of github pull request #6).
+ - (Addition) Added missing algebra_as_string impelementations in
+   Attean::API::Query and Attean::Algebra.
+ - (Addition) Added tree_attributes methods to tree classes.
+ - (Update) Fixed method name typo in
+   Attean::API::TimeCacheableTripleStore.
+ - (Update) Split Cacheable roles into ETagCacheable and TimeCacheable
+   variants.
+
+0.002  2014-10-15
+
+ - (Addition) Added Attean->negotiate_serializer method.
+ - (Addition) Added POD for many classes and roles.
+ - (Update) Changed media_type attributes to class methods in Serializer
+   classes.
+ - (Update) Moved RDF::Query algebra translator to
+   AtteanX::RDFQueryTranslator.
+ - (Update) Switched from Sub::Name to Sub::Util (github issue #5).
+ - (Update) Updated Attean->get_serializer to support media_type argument.
+ - (Update) Wrap mutating methods in a single bulk-update.
+
+0.001  2014-09-27
+
+ - (Addition) Initial release.
+

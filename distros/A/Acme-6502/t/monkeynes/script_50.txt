@@ -1,0 +1,76 @@
+# *** MODIFIED TEST FROM ORIGINAL MONKEYNES
+# *** Now properly checks negative branching
+clear
+power on
+regs
+
+# Branch instructions cannot be tested using the op
+# command, and are loaded into memory directly and
+# setup to execute with the step command.
+
+# Branch not taken --------------------------------
+regset v 1
+regset pc 9040
+
+# Load op: BVC $40
+memset 9040 50
+memset 9041 40
+
+step
+
+# Should be: PC=9042, cycles=2
+test pc = 9042
+
+# Positive Branch taken to same page --------------
+regset v 0
+regset pc 9040
+
+# Load op: BVC $40
+memset 9040 50
+memset 9041 40
+
+step
+
+# Should be: PC=9082, cycles=3
+test pc = 9082
+
+# Negative Branch taken to same page --------------
+regset v 0
+regset pc 9040
+
+# Load op: BVC $A0
+memset 9040 50
+memset 9041 A0
+
+step
+
+# Should be: PC=8FE2, cycles=3
+test pc = 8FE2
+
+# Positive Branch taken to different page ---------
+regset v 0
+regset pc 90b0
+
+# Load op: BVC $7F
+memset 90b0 50
+memset 90b1 7f
+
+step
+
+# Should be: PC=9131, cycles=4
+test pc = 9131
+
+# Negative Branch taken to different page ---------
+regset v 0
+regset pc 9040
+
+# Load op: BVC $F7
+memset 9040 50
+memset 9041 F7
+
+step
+
+# Should be: PC=9039, cycles=4
+test pc = 9039
+
+save verify_50.txt

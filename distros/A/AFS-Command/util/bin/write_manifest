@@ -1,0 +1,54 @@
+#!/ms/dist/perl5/bin/perl
+#
+# $Id: write_manifest,v 7.1 2004/01/13 19:01:44 wpm Exp $
+#
+# (c) 2003-2004 Morgan Stanley and Co.
+# See ..../src/LICENSE for terms of distribution.
+#
+# This is not used to build the distribution, just to keep that pesky
+# MANIFEST file up to date...
+#
+# To run this, from the top level source directory, ./util/write_manifest
+#
+
+%skip = map { $_ => 1 }
+  qw(
+     .options/rcsMajor
+     .msbaseline
+     .exclude
+    );
+
+warn "Searching source tree for files...\n";
+
+open(FIND,"find . -type f -print |") ||
+  die "Unable to fork find: $!\n";
+
+while ( <FIND> ) {
+    chomp;
+    s|^\./||;
+    next if $skip{$_};
+    next if /~$/;
+    push(@new,$_);
+}
+
+close(FIND) ||
+  die "Error running find: $!\n";
+
+warn "Writing new MANIFEST file...\n";
+
+open(NEW,">MANIFEST.$$") ||
+  die "Unable to open MANIFEST.$$: $!\n";
+foreach ( sort @new ) {
+    print NEW "$_\n";
+}
+close(NEW) ||
+  die "Unable to close MANIFEST.$$: $!\n";
+
+rename("MANIFEST.$$","MANIFEST") ||
+  die "Unable to rename MANIFEST.$$ to MANIFEST: $!\n";
+
+exit 0;
+
+END {
+    unlink "MANIFEST.$$";
+}

@@ -1,0 +1,13 @@
+<!-- BEGIN site/footer -->
+
+<br clear=all>
+<hr>
+
+<div class="footer">
+[% template.name %] / 
+[% USE format; 
+   show_time = format("%0.3f s."); 
+   show_time(c.process_time) %]
+</div>
+
+<!-- END site/footer -->

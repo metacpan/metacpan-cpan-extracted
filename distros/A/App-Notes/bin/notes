@@ -1,0 +1,545 @@
+#!/usr/bin/env perl
+use v5.10;
+use strict;
+use warnings;
+use App::Rad;
+use Capture::Tiny qw( capture );
+use Git::Repository;
+use List::MoreUtils qw( firstidx );
+use Path::Class qw( file dir );
+
+# ABSTRACT: Simple. Git-based. Notes.
+
+sub setup {
+    my ( $c ) = @_;
+    $c->register_commands({
+        add     => 'add a new note, and edit it',
+        append  => 'append to a note',
+        delete  => 'delete the note',
+        edit    => 'edit a note',
+        init    => 'Initiliazie notes (optionally from remote repo)',
+        list    => 'lists id and subject of all notes',
+        rename  => 'rename a note',
+        replace => 'replace the contents of the note ( from STDIN )',
+        show    => 'show the contents of the note',
+        sync    => 'Sync notes with remote (pull + push)',
+    });
+    $c->register_command(mv => \&rename, 'alias for rename');
+}
+
+sub pre_process {
+    my ( $c ) = @_;
+    my $cmd = $c->cmd;
+
+    # If we aren't initializing, check to make sure our notes directory exists
+    if( $cmd ne 'init' ) {
+        if( -d notes_repo() ) {
+            $c->stash->{git} = Git::Repository->new( git_dir => notes_repo() );
+        } else {
+            # We are not initialized
+            die "Notes Directory has not been initialized!\n" .
+                "Run init [remote git repo] to initialize.\n";
+        }
+    }
+
+    return if not $c->is_command($cmd) or $cmd ~~ [qw( help init sync )];
+    sync( $c, pull_only => 1 ) if auto_sync();
+}
+
+sub post_process {
+    my ( $c ) = @_;
+    my $cmd = $c->cmd;
+    if($c->is_command($cmd) and not $cmd ~~ [qw( help init list show sync )]) {
+        sync( $c, push_only => 1 ) if auto_sync();
+    }
+    say $c->output if $c->output;
+}
+
+sub invalid {
+    my ( $c ) = @_;
+    my $cmd = $c->cmd;
+    ($cmd) = grep { /^$cmd/ } $c->commands;
+    $cmd ? $c->execute( $cmd ) : $c->execute( 'help' );
+    return; # This makes the command name not be printed from the last line
+}
+
+App::Rad->run;
+
+# helpers ---------------------------------------------------------------------
+
+sub editor { $ENV{EDITOR} || 'vim' }
+sub notes_dir { dir( $ENV{APP_NOTES_DIR} ) || dir( $ENV{HOME}, '.notes' ) }
+sub notes_repo { file( notes_dir, '.git' ) }
+sub auto_sync {  $ENV{APP_NOTES_AUTOSYNC} // 1 }
+
+sub has_origin {
+    grep { /^origin$/ } split ' ', $_[0]->stash->{git}->run( 'remote' )
+}
+
+sub find_notes {
+    my ( $c, %args ) = @_;
+    my $search = $args{search};
+    my @notes = map file($_), sort {-M $a <=> -M $b} glob file(notes_dir, '*');
+
+    # Filter results if requested
+    if (defined $search) {
+        @notes = grep { $_->basename =~ /$search/i } @notes;
+        # If there is an exact match, make sure it is first
+        my $idx = firstidx { $search eq $_->basename } @notes;
+        unshift @notes, splice @notes, $idx, 1 if $idx > 0;
+    }
+
+    return \@notes;
+}
+
+sub read_stdin { local $/; <STDIN> }
+
+sub check_stdin { ( -t STDIN ) ? 0 : read_stdin() }
+
+sub get_title { join ' ', @ARGV; }
+
+sub get_filename {
+    return undef unless $_[0];
+    ( my $r = $_[0] ) =~ s/ /-/g;
+    return  $r;
+}
+
+sub is_yes { shift ~~ /^y(es)?$/i }
+
+sub edit_file {
+    my ( $c, $file, %args ) = @_;
+
+    $args{check_stdin} //= 1; # Default to check stdin
+    my $verb = ( -e $file->stringify ) ? "Updated " : "Created ";
+
+    my $stdin = $args{check_stdin} ? check_stdin() : 0;
+    if( $stdin ) {
+        open FILE, ( $args{append} ? '>>' : '>' ), $file;
+        print FILE $stdin;
+        close FILE;
+    } else {
+        my $cmd = [ editor(), $file ];
+        # Let them edit the file
+        system join( ' ', @$cmd );
+    }
+
+    # Commit their changes if they wrote the file
+    if ( -e $file ) {
+        my $output = capture {
+            $c->stash->{git}->run( add => $file->stringify );
+            $c->stash->{git}->run( commit => '-m', $verb . $file->basename );
+        };
+    }
+}
+
+# commands --------------------------------------------------------------------
+
+sub add {
+    my ( $c ) = @_;
+    my $title = get_title();
+    die "Need a title!" unless $title;
+
+    my $file = file( notes_dir(), get_filename( $title ) );
+    die "File already exists!" if -e $file;
+
+    edit_file( $c, $file );
+}
+
+sub append {
+    my ( $c ) = @_;
+    my $title = get_title();
+    my $notes = find_notes( $c, search => get_filename( $title ) );
+
+    die "No matching notes found" unless @$notes > 0;
+
+    my $file = $notes->[0];
+    edit_file( $c, $file, append => 1 );
+}
+
+sub delete {
+    my ( $c ) = @_;
+    my $title = get_title();
+    my $notes = find_notes( $c, search => get_filename( $title ) );
+
+    die "No matching note found!" unless @$notes > 0;
+    my $to_rm = $notes->[0];
+
+    print qq(Delete "@{[$to_rm->basename]}" ? );
+    my $res = <STDIN>;
+
+    if( is_yes($res) ) {
+        my $output = capture {
+            my $msg = qq(Removed "$to_rm");
+            $c->stash->{git}->run( rm => "$to_rm" );
+            $c->stash->{git}->run( commit => -m => $msg );
+        };
+    } else {
+        return "Not Removed.";
+    }
+}
+
+sub edit {
+    my ( $c ) = @_;
+    my $title = get_title();
+    my $notes = find_notes( $c, search => get_filename( $title ) );
+
+    die "No matching notes found!" unless @$notes > 0;
+    my $to_edit = $notes->[0];
+
+    edit_file( $c, $to_edit, check_stdin => 0 );
+}
+
+sub init {
+    my ( $c ) = @_;
+
+    die "Notes dir already exists!" if -d notes_dir();
+
+    my $dir = notes_dir();
+    my $repo = $ARGV[0];
+    my $output = capture {
+        if( $repo ) {
+            say "Initializing notes from $repo...";
+            Git::Repository->run( clone => $repo, $dir->stringify );
+        } else {
+            say "Initializing notes ($dir)...";
+            print Git::Repository->run( init => $dir->stringify );
+        }
+    }
+}
+
+sub list {
+    my ( $c ) = @_;
+    my $search = @ARGV > 0 ? join ' ', @ARGV : undef;
+    my $notes = find_notes( $c, search => get_filename( $search ) );
+    say $_->basename for @$notes;
+    return;
+}
+
+sub rename {
+    my ( $c ) = @_;
+    my $cmd = $c->cmd;
+    die "usage: $0 $cmd <orig_name> <new_name>\n" unless @ARGV == 2;
+    my ($orig_name, $new_name) = @ARGV;
+    my $notes = find_notes( $c, search => get_filename( $orig_name ) );
+    die "No such note [$orig_name]" unless @$notes;
+    my ($orig_file, $new_file) = ($notes->[0], get_filename($new_name));
+    print qq(Rename "@{[$orig_file->basename]}" to "$new_name" ? );
+    my $res = <STDIN>;
+    if( is_yes($res) ){
+        $c->stash->{git}->run(mv => "$orig_file" => "$new_file");
+        $c->stash->{git}->run(commit => '-m',
+            "Rename " . $orig_file->basename . " => $new_file");
+    }
+    return;
+}
+
+sub replace {
+    my ( $c ) = @_;
+    my $title = get_title();
+    my $notes = find_notes( $c, search => get_filename( $title ) );
+
+    die "No matching notes found" unless @$notes > 0;
+
+    my $file = $notes->[0];
+    edit_file( $c, $file );
+}
+
+sub show {
+    my ( $c ) = @_;
+    my $title = get_title();
+    my $notes = find_notes( $c, search => get_filename( $title ) );
+
+    die "No matching notes found" unless @$notes > 0;
+
+    system "cat $notes->[0]";
+}
+
+sub sync {
+    my ( $c, %args ) = @_;
+    return unless has_origin( $c );
+
+    my $output = capture {
+        $c->stash->{git}->run( 'pull' ) unless $args{push_only};
+        $c->stash->{git}->run( 'push' ) unless $args{pull_only};
+    };
+    return;
+}
+
+# PODNAME: notes
+
+
+
+__END__
+=pod
+
+=head1 NAME
+
+notes - Simple. Git-based. Notes.
+
+=head1 VERSION
+
+version 0.013
+
+=head1 SYNOPSIS
+
+    Usage: notes command [arguments]
+
+    Available Commands:
+        add     add a new note, and edit it
+        append  append to a note ( from STDIN )
+        delete  delete the note
+        edit    edit a note
+        help    show syntax and available commands
+        init    Initiliazie notes (optionally from remote repo)
+        list    lists id and subject of all notes
+        replace replace the contents of the note ( from STDIN )
+        show    show the contents of the note
+        sync    Sync notes with remote (pull + push)
+
+    # To get started
+    $ notes init
+    # Or, optionally, get started with an existing git repo
+    $ notes init git@gist.github.com:12343.git
+
+    # Create a note and edit it (with $EDITOR, or vim by default)
+    # Note name will be Hello-World
+    $ notes add Hello World
+    # Add another (markdown) note via STDIN
+    $ echo "# Title" | notes add TEST.md
+
+    # List notes
+    $ notes list
+    TEST.md
+    Hello-World
+
+    # List notes w/filter (case-insensitive)
+    $ notes list te
+    TEST.md
+
+    # Create a new note
+    # This will open up your $EDITOR for you to type your note
+    $ notes add groceries
+
+    # Edit a note (finds the most recently edited match, case insensitive)
+    # This will open up the Hello-World note created above
+    $ notes edit hel
+
+    # Will replace the contents of Hello-World with "Hello, World"
+    $ echo "Hello, World" | notes replace hel
+
+    # Will append "END" to Hello-World
+    $ echo "END" | notes append he
+
+    # Sync notes with remote (if your git repo has a remote)
+    $ notes sync
+
+=head1 DESCRIPTION
+
+L<App::Notes> is a very simple command line tool that lets you creat, edit,
+search, and manage simple text-based notes inside of a git repository.
+
+This is very useful for keeping notes in a repository
+(especially a C<gist> on L<GitHub|http://github.com>) that can be sync'ed
+across machines.
+Since it is backed by git, you will have a history of all your changes.
+
+=head1 COMMANDS
+
+=head2 add
+
+    notes add <name>
+    echo hello | notes add <name>
+
+Creates a new note.
+A name argument is required.
+This command will open your C<$EDITOR> (such as vim or emacs) for you to type
+your note.
+When you are done, simply save and quit out of your editor and your note will
+be created.
+If you pipe to STDIN, then your editor will not be opened.
+Your note will be created with the contents from STDIN.
+
+=head2 append
+
+    $ echo bananas | notes append 'Favorite Foods'
+
+Appends the content from STDIN to the given note.
+
+=head2 delete
+
+    $ notes delete foo
+
+=head2 edit
+
+    $ notes edit
+    $ notes edit <name | filter>
+
+Edits the given note.
+This command will open your C<$EDITOR> (such as vim or emacs) for you to edit
+your note.
+Once you are done editing, simply save and quit your editor.
+If called with no arguments, this command will edit your last note.
+
+=head2 init
+
+    $ notes init
+    $ notes init <git url>
+
+Initializes the git repository.
+This must be called once before using this application.
+
+=head2 list
+
+    $ notes list
+    $ notes list <filter>
+
+Lists all of your notes
+
+=head2 replace
+
+    $ echo hola | notes replace hello
+
+Replaces the contents of the given note with the contents from STDIN.
+
+=head2 show
+
+    $ notes show
+    $ notes show <name | filter>
+
+Displays the contents of your note.
+With no arguments, displays the contents of your last note.
+
+=head2 sync
+
+    $ notes sync
+
+Syncs your notes by doing a git pull and push.
+Normally this is not necesary, since by default syncs happen during each
+command.
+You can turn the auto sync off if you set the environment variable
+C<APP_NOTES_AUTOSYNC=0>.
+Then you have to remember to call sync manually.
+
+=head1 PRO TIPS
+
+=over
+
+=item Using a github gist
+
+A recommended way to use this app is with a github gist.
+An advantage of this is that you get a nice user interface for free.
+You can bookmark the gist in your browser and be able to view and edit your
+notes from there if you like.
+To get started, you need a L<github|http://github.com> account.
+Then simply create a new L<gist|https://gist.github.com>.
+It doesn't matter what you name your gist.
+Also, github requires that your gist have some content in the main file.
+Just type something in, it doesn't matter.
+You can choose to create a public or private gist.
+For this application, you most likely will want to create a private gist,
+unless you want to make your notes public.
+Once you have created your gist, copy it's url.
+The url should be displayed at the top and it will be of the form:
+C<git@gist.github.com:12343.git>.
+Then run this on the command line:
+
+    git init <git url>
+
+Now if you run C<notes list> and there should be one note listed.
+This was the file you made when you created your gist.
+Feel free to delete this note if you want.
+Running C<notes add> will add a new note and it will show up in your gist as a
+new file.
+Try adding a note and verify that it shows up in your gist on github.
+Changes you make via the notes tool should show up in your gist and vice versa.
+Have fun!
+
+=item Accessing your last note
+
+If you want to edit your last note, simply call edit with no arguments:
+
+    $ notes edit
+
+To see your last note, simply call show with no arguments:
+
+    $ notes show
+
+=item Syncing
+
+Every time a note is created, modified or removed, L<App::Notes> will commit
+the change to the git repo.
+By default, it will C<pull> before a command executes and C<push> when its done.
+Except on commands where it doesn't make sense.
+For example, a push will not happen after calling C<list> or C<show>.
+To turn this behavior off, set C<APP_NOTES_AUTOSYNC=0>.
+If you do this, make sure to remember to manually call C<notes sync>,
+or your notes will get out of sync.
+
+=item Aliasing
+
+Create a shorter alias for notes, such as n.
+Run C<which notes> on the command line to find the path that notes was
+installed to.
+Then create an alias in your ~/.bashrc:
+
+    alias n=</path/to/notes>
+
+Now you can run notes by just typing n.
+
+=item VimFu
+
+Do some magic with vim.
+Learn about vim filters if you haven't already by running C<:help filter>
+inside of a vim session.
+Once you understand vim filters, start using them to create and edit notes.
+For example, type a note inside of vim.
+Highlight the text you just wrote in visual mode.
+Now type C<!notes add foo> to create a new note named foo with the contents
+you had highlighted.
+
+=GPG Encryption
+
+Want to write notes about super secret stuff that needs to be secure?  It's
+incredibly easy to use vim + L<gnupg.vim|https://github.com/jamessan/vim-gnupg>
+to create and edit encrypted notes.  Just create a note with a C<.gpg> extension
+and the plugin will pick it up.
+
+    notes add super-secret-stuff.gpg
+
+Vim should open up a bottom window where you can enter GPG Recipients
+(via ID, email, name, etc.)i to encrypt the note for.  You can use your own
+key here, and on save, the note will always be encrypted to disk.
+The C<gnupg.vim> also ensures that vim does not write plaintext swap files
+to disk when editing gpg encrypted files.
+
+Go forth and secure your notes!
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+William Wolf <throughnothing@gmail.com>
+
+=item *
+
+Naveed Massjouni <naveedm9@gmail.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+
+William Wolf has dedicated the work to the Commons by waiving all of his
+or her rights to the work worldwide under copyright law and all related or
+neighboring legal rights he or she had in the work, to the extent allowable by
+law.
+
+Works under CC0 do not require attribution. When citing the work, you should
+not imply endorsement by the author.
+
+=cut
+

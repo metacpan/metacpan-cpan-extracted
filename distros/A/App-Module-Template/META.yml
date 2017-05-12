@@ -1,0 +1,32 @@
+---
+abstract: 'Perl module scaffolding with Template Toolkit'
+author:
+  - 'Trevor S. Cornpropst <tscornpropst@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.63'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Module-Template
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Config::General: '0'
+  File::Copy: '0'
+  File::HomeDir: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  Getopt::Std: '0'
+  POSIX: '0'
+  Template: '0'
+  Try::Tiny: '0'
+  perl: '5.016'
+version: '0.11'

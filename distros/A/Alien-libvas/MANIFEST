@@ -1,0 +1,15 @@
+Build.PL
+dist.ini.unused
+lib/Alien/libvas.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README.pod
+t/00-report-buildlog.t
+t/01-report-libtest.t
+t/02-report-prereqs.t
+t/03-query-lib.t
+t/04-init-lib.t
+t/10-use-lib-onself.t
+t/11-use-lib-onchild.t

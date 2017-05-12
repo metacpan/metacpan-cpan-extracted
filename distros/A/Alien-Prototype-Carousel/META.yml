@@ -1,0 +1,22 @@
+---
+name: Alien-Prototype-Carousel
+version: 0.26.3
+author:
+  - Graham TerMarsch (cpan@howlingfrog.com)
+abstract: installing and finding Prototype Carousel component
+license: perl
+resources:
+  license: ~
+requires:
+  Alien::scriptaculous: 0
+  perl: 5.6.0
+build_requires:
+  Test::Exception: 0
+provides:
+  Alien::Prototype::Carousel:
+    file: lib/Alien/Prototype/Carousel.pm
+    version: 0.26.3
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

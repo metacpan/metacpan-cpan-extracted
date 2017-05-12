@@ -1,0 +1,102 @@
+--- #YAML:1.0 !perl/AI::NaiveBayes1
+attributes:
+  - outlook
+  - windy
+  - humidity
+  - temperature
+attvals:
+  humidity:
+    - high
+    - normal
+  outlook:
+    - sunny
+    - overcast
+    - rainy
+  temperature:
+    - hot
+    - mild
+    - cool
+  windy:
+    - FALSE
+    - TRUE
+labels:
+  - play=no
+  - play=yes
+model:
+  condprob:
+    humidity:
+      high:
+        play=no: 0.8
+        play=yes: 0.333333333333333
+      normal:
+        play=no: 0.2
+        play=yes: 0.666666666666667
+    outlook:
+      overcast:
+        play=no: 0
+        play=yes: 0.444444444444444
+      rainy:
+        play=no: 0.4
+        play=yes: 0.333333333333333
+      sunny:
+        play=no: 0.6
+        play=yes: 0.222222222222222
+    temperature:
+      cool:
+        play=no: 0.2
+        play=yes: 0.333333333333333
+      hot:
+        play=no: 0.4
+        play=yes: 0.222222222222222
+      mild:
+        play=no: 0.4
+        play=yes: 0.444444444444444
+    windy:
+      FALSE:
+        play=no: 0.4
+        play=yes: 0.666666666666667
+      TRUE:
+        play=no: 0.6
+        play=yes: 0.333333333333333
+  labelprob:
+    play=no: 0.357142857142857
+    play=yes: 0.642857142857143
+  numerical_attr: {}
+numof_instances: 14
+stat_attributes:
+  humidity:
+    high:
+      play=no: 4
+      play=yes: 3
+    normal:
+      play=no: 1
+      play=yes: 6
+  outlook:
+    overcast:
+      play=yes: 4
+    rainy:
+      play=no: 2
+      play=yes: 3
+    sunny:
+      play=no: 3
+      play=yes: 2
+  temperature:
+    cool:
+      play=no: 1
+      play=yes: 3
+    hot:
+      play=no: 2
+      play=yes: 2
+    mild:
+      play=no: 2
+      play=yes: 4
+  windy:
+    FALSE:
+      play=no: 2
+      play=yes: 6
+    TRUE:
+      play=no: 3
+      play=yes: 3
+stat_labels:
+  play=no: 5
+  play=yes: 9

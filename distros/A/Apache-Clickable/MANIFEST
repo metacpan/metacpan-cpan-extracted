@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Apache/Clickable.pm
+t/00_load.t
+t/01_simple.t
+t/02_target.t
+t/03_email.t
+t/lib/FilterTest.pm
+t/sample.html

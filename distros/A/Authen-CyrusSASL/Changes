@@ -1,0 +1,25 @@
+Revision history for Perl extension Radius.
+
+0.05  Thu May 01 12:08:12 1997
+	- Bugfix to pad passwords up to nearest multiple of 16 (thanks to
+	  "Mark R. Levinson" <mrl@isc.upenn.edu>)
+
+0.04  Mon Mar 31 20:04:33 1997
+	- changed module name to Authen::Radius
+	- added check_pwd() wrapper method (doesn't need a dictionary!) for 
+	  quick & easy username+password verification
+	- added actual timeout test on the IO recv() call
+	- remote socket port now defaults to 1645 if no port is specified and 
+	  there is no 'radius' entry in /etc/services
+	- added documentation on all interface methods (perldoc Authen::Radius)
+
+0.03  Tue Mar 25 19:51:23 1997
+	- added errors
+
+0.02  Mon Mar 24 11:51:23 1997
+	- replaced socket() & family with IO::Socket calls
+	- made new() method accept a single hash instead of multiple scalars
+
+0.01  Sun Mar 23 23:05:23 1997
+	- original version;
+

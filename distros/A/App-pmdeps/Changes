@@ -1,0 +1,10 @@
+Revision history for Perl extension App-pmdeps
+
+0.02 2013-06-23T16:13:22Z
+
+    - add `--without-phase` and `--without-type` options.
+
+0.01 2013-06-18T11:21:25Z
+
+    - original version
+

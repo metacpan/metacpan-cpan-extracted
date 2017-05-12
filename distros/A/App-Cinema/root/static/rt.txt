@@ -1,0 +1,60 @@
+[debug] Loaded plugins:
+.----------------------------------------------------------------------------.
+| Catalyst::Plugin::Authentication  0.10015                                  |
+| Catalyst::Plugin::Authorization::Roles  0.08                               |
+| Catalyst::Plugin::ConfigLoader  0.27                                       |
+| Catalyst::Plugin::Session  0.29                                            |
+| Catalyst::Plugin::Session::State::Cookie  0.17                             |
+| Catalyst::Plugin::Session::Store::FastMmap  0.13                           |
+| Catalyst::Plugin::StackTrace  0.11                                         |
+'----------------------------------------------------------------------------'
+[debug] Loaded components:
+.-----------------------------------------------------------------+----------.
+| Class                                                           | Type     |
++-----------------------------------------------------------------+----------+
+| App::Cinema::Controller::Comment                                | instance |
+| App::Cinema::Controller::Item                                   | instance |
+| App::Cinema::Controller::Menu                                   | instance |
+| App::Cinema::Controller::News                                   | instance |
+| App::Cinema::Controller::Root                                   | instance |
+| App::Cinema::Controller::User                                   | instance |
+| App::Cinema::Model::MD                                          | instance |
+| App::Cinema::Model::MD::Comment                                 | class    |
+| App::Cinema::Model::MD::Event                                   | class    |
+| App::Cinema::Model::MD::Genre                                   | class    |
+| App::Cinema::Model::MD::GenreItems                              | class    |
+| App::Cinema::Model::MD::Item                                    | class    |
+| App::Cinema::Model::MD::News                                    | class    |
+| App::Cinema::Model::MD::Roles                                   | class    |
+| App::Cinema::Model::MD::UserRoles                               | class    |
+| App::Cinema::Model::MD::Users                                   | class    |
+| App::Cinema::View::TT                                           | instance |
+'-----------------------------------------------------------------+----------'
+[debug] Loaded Path actions:
+.-------------------------------------+--------------------------------------.
+| Path                                | Private                              |
++-------------------------------------+--------------------------------------+
+| /                                   | /index                               |
+| /comment                            | /comment/index                       |
+| /comment/add                        | /comment/add                         |
+| /comment/view                       | /comment/view                        |
+| /item/add                           | /item/add                            |
+| /item/checkout_do                   | /item/checkout_do                    |
+| /item/delete_do                     | /item/delete_do                      |
+| /item/detail                        | /item/detail                         |
+| /item/view                          | /item/view                           |
+| /menu/about                         | /menu/about                          |
+| /menu/home                          | /menu/home                           |
+| /menu/howto                         | /menu/howto                          |
+| /menu/search                        | /menu/search                         |
+| /news/add                           | /news/add                            |
+| /news/view                          | /news/view                           |
+| /user/add                           | /user/add                            |
+| /user/captcha                       | /user/captcha                        |
+| /user/delete_do                     | /user/delete_do                      |
+| /user/edit                          | /user/edit                           |
+| /user/history                       | /user/history                        |
+| /user/login                         | /user/login                          |
+| /user/logout                        | /user/logout                         |
+| /user/view                          | /user/view                           |
+'-------------------------------------+--------------------------------------'

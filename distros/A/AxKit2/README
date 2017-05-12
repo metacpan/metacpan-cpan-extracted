@@ -1,0 +1,18 @@
+
+AxKit 2
+=======
+
+First of all, don't try and run the usual perl installation routine of
+"perl Makefile.PL; make; make install". It doesn't work that way (yet). It might
+in the future.
+
+To run AxKit2, extract the archive and enter the directory, and type:
+
+  $ cp etc/axkit.conf.sample etc/axkit.conf
+  $ ./axkit
+
+Then point your browser at http://localhost:8000/
+
+To really get started, install Pod::SAX from CPAN, then uncomment the docs
+section in etc/axkit.conf and restart, click on Docs, and start reading the
+docs.

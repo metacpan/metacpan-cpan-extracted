@@ -1,0 +1,89 @@
+DESCRIPTION
+
+	Apache::AuthCookieDBIRadius is a module that subclasses Apache::AuthCookie 
+	and is designed to be directly used for authentication in a mod_perl 
+	server.
+
+	It allows you to authenticate against a DBI database -OR- your trusted NT domains
+	via a Radius server using a login webpage via AuthCookie.  
+
+	It is a ticket-issuing system that looks up username/passwords in a DBI
+	database using generic SQL and issues MD5-checksummed tickets valid for
+	a configurable time period.  Incoming requests with tickets are
+	checksummed and expire-time checked.
+
+	Upon failure, it then checks a Radius server for authentication.
+	(You do not need to run a Radius server to use this.  Actually, 
+	Radius authentication is commented out by default.  Uncomment the
+	Radius lines in AuthCookieDBIRadius.pm if you intend to use this method
+	along with a DBI database.  Most won't be using this method.  You'll need to 
+	get Radius authentication working first before using AuthCookieDBIRadius.
+	See Apache-AuthenRadius, Authen::Radius and http://www.funk.com/radius/.)
+
+	Included is a sample httpd.conf and login.pl for your review. 
+
+
+AUTHCOOKIE
+
+	Also included is a slightly customized AuthCookie.pm based on AuthCookie 3.0.  
+	Replace with your existing AuthCookie.pm for added customized error messages:
+
+	# Please enter your username and password (default message).
+
+	# Incorrect Password.
+
+	# Incorrect Username (although some say this isn't a good idea, it can 
+	  be easily changed to Incorrect Login for the password and username).
+
+	# ERROR! Your session has expired, or your login does not have the proper 
+	  access level for this webpage.
+
+	# ERROR! Security error. Too many attempts (shared memory remembers how 
+	  many times the user has failed to login, locking them out after	
+	  X times).
+
+	# Internal Server Error (usually from an error in the configuration.
+	  Error number will tell you exactly where you went wrong.) 
+
+	# ERROR! No Password Supplied.
+
+	# ERROR! No Username Supplied.
+
+	# ERROR! Password did not match.
+     
+	# ERROR! Authentication Failure (meaning DBI and Radius failed).
+
+ 
+	Grab $TICKET from the %ENV:
+
+   $TICKET = $ENV{TICKET} || $ENV{REDIRECT_TICKET};
+   @split = split(/:/, $TICKET);
+   # userid:2000-10-04-09-50-14:2000-10-05-09-50-14:y:y:y:y:n:n:n:n:2852b07llladf
+   # 0 = Username
+   # 1 = issue date
+   # 2 = expiration date
+   # 3 = activeuser
+   # 4 = a
+   # 5 = b
+   # 6 = c
+   # 7 = d
+   # 8 = e
+   # 9 = f
+	# 10 = g
+   # 10 = key
+
+	Now you can issue content based on the users access level.
+
+
+
+DEMO
+
+	AuthCookieDBIRadius is currently in production at http://www.s1te.com/secure/. 
+
+
+
+SEE ALSO
+
+	perldoc Apache::AuthCookieDBIRadius
+	Apache::AuthCookie
+	Apache::AuthCookieDBI

@@ -1,0 +1,32 @@
+Revision history for App-MPDJ
+
+1.09  2014-04-21 15:47:40 MST
+        - Change license to MIT
+
+1.08  2014-04-13 07:42:18 MST
+        - Implement configuration files
+
+1.07  2014-03-05 14:29:35 MST
+        - Implement configurable logging, thanks to john-
+        - Handle INT, TERM, HUP signals
+
+1.06  2014-02-13 08:12:17 MST
+        - Implement caching of song information, thanks to john-
+
+1.05  2013-06-28 16:09:48 MST
+        - Switch from Audio::MPD to Net::MPD
+
+1.04  2013-06-12 13:42:58 MST
+        - Parse host options because Audio::MPD doesn't handle them correctly
+
+1.03  2013-04-10 12:31:49 MST
+        - Add call sign injection feature
+
+1.02  2013-04-10 09:53:30 MST
+        - Clean up documentation
+
+1.01  2013-04-10 01:07:29 MST
+        - Use localhost for default connection
+
+1.00  2013-04-10 00:48:52 MST
+        - Initial release

@@ -1,0 +1,72 @@
+NAME
+    Algorithm::EquivalenceSets - Group sets transitively
+
+VERSION
+    version 1.101420
+
+SYNOPSIS
+        use Algorithm::EquivalenceSets;
+
+        my @sets = (
+            [ 'a', 1, 2 ],
+            [ 'b', 3, 4 ],
+            [ 'c', 5    ],
+            [ 'd', 1, 6 ],
+            [ 'e', 3, 6 ],
+            [ 'f', 5, 7 ],
+        );
+
+        my @equiv_sets = equivalence_sets(@sets);
+
+        # @equiv_sets is ([ qw(c f 5 7) ], [ qw(a b d e 1 2 3 4 6) ])
+
+DESCRIPTION
+    This module exports one function, "equivalence_sets()", which takes a
+    list of sets and returns another list of sets whose contents are
+    transitively grouped from the input sets.
+
+    Imagine the input sets to be "[ 1, 2 ]", "[ 3, 4 ]", "[ 5, 6 ]" and "[
+    1, 3, 7 ]". The returned sets would be "[ 1, 2, 3, 4, 7 ]" and "[ 5, 6
+    ]", because "[ 1, 2 ]" and "[ 3, 4 ]" are tied together by "[ 1, 3, 7
+    ]", but "[ 5, 6 ]" stands on its own. So you could say the returned sets
+    represent a kind of transitive union. (Real mathematicians may now flame
+    me about the misuse of terminology.)
+
+    Each set is an array reference. The return sets are given as an array in
+    list context, or as a reference to that array in scalar context.
+
+METHODS
+  equivalence_sets
+    FIXME
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Algorithm-EquivalenceS
+    ets>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Algorithm-EquivalenceSets/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Algorithm-EquivalenceSets/>. Instead of
+    sending patches, please fork this project using the standard git and
+    github infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2007 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

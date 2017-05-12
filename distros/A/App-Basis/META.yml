@@ -1,0 +1,37 @@
+---
+abstract: 'Basis for simple applications'
+author:
+  - 'Kevin Mulholland <moodfarm@cpan.org>'
+build_requires:
+  Test::More: '0'
+  perl: '5.014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Basis
+requires:
+  Digest::MD5: '0'
+  Exporter: '0'
+  File::HomeDir: '0'
+  Getopt::Long: '0'
+  IPC::Cmd: '0'
+  List::Util: '0'
+  Moo: '0'
+  POSIX: '0'
+  Path::Tiny: '0'
+  Try::Tiny: '0'
+  YAML::Tiny::Color: '0'
+  YAML::XS: '0'
+  perl: '5.014'
+  strict: '0'
+  utf8::all: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/27escape/App-Basis.git
+version: '1.2'

@@ -1,0 +1,52 @@
+#!/usr/bin/perl -wT
+use v5.14;
+use strict;
+
+use App::FonBot::Daemon;
+
+App::FonBot::Daemon::run;
+END { App::FonBot::Daemon::finish };
+
+__END__
+
+=head1 NAME
+
+fonbotd - FonBot daemon
+
+=head1 SYNOPSIS
+
+    fonbotd
+
+=head1 DESCRIPTION
+
+FonBot is an Android application that lets users control their phones through the internet or through text messages.
+
+Users can communicate with the applications through Yahoo! Messenger, Jabber and IRC (on the OFTC network). Email support is planned.
+
+This is the FonBot server, a daemon which relays messages between users and their phones.
+
+=head1 AUTHOR
+
+Marius Gavrilescu C<< marius@ieval.ro >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2013 Marius Gavrilescu
+
+This file is part of fonbotd.
+
+fonbotd is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+fonbotd is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with fonbotd.  If not, see <http://www.gnu.org/licenses/>
+
+
+=cut

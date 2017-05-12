@@ -1,0 +1,48 @@
+NAME
+    Acme::Aheui - an aheui interpreter
+
+VERSION
+    Version 0.05
+
+SYNOPSIS
+        use utf8;
+        use Acme::Aheui;
+        my $interpreter = Acme::Aheui->new( source => '아희' );
+        $interpreter->execute();
+
+DESCRIPTION
+    An aheui interpreter.
+
+    See aheui language specification at
+    https://aheui.github.io/specification.en
+
+    Most logic is based on the reference implementation by Puzzlet Chung.
+    (https://github.com/aheui/jsaheui)
+
+PUBLIC METHODS
+  new
+        my $interpreter = Acme::Aheui->new( source => '아희' );
+
+    This method will create and return `Acme::Aheui' object.
+
+  execute
+        $interpreter->execute();
+
+    This method will execute the aheui program and return the exit code. It
+    may use `STDIN' and/or `STDOUT' if the aheui program uses I/O.
+
+INSTALLATION
+    To install this module, run the following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+AUTHOR
+    Rakjin Hwang, `<rakjin@cpan.org>'
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

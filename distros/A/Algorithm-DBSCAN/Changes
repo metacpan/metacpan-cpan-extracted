@@ -1,0 +1,22 @@
+Revision history for Algorithm-DBSCAN
+
+0.07	2016-03-05
+		Don't use ram cache when using external region_index file as this usually means that the index will not fit in ram
+
+0.06	2016-03-03
+		Minor doc and bug fixes
+
+0.05	2016-03-03
+		Fixed DataSet vs Dataset problem
+		
+0.04	2016-03-03
+		Added the UseRegionIndex method
+
+0.03	2016-03-03
+		Fixed MANFEST
+		
+0.02	2016-03-03
+		Fixed documentation
+
+0.01	2016-03-02
+		First version.

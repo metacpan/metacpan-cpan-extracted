@@ -1,0 +1,42 @@
+---
+abstract: 'Perl module for performing paradigm-free evolutionary algorithms. '
+author:
+  - 'JJ Merelo <jj /at/ merelo.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-Evolutionary
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Algorithm::Permute: '0.01'
+  B::Deparse: '0.56'
+  Bit::Vector: '0'
+  Clone: '0.31'
+  GD: '2.17'
+  Math::Random: '0.63'
+  Memoize: '0'
+  Object::Array: '0'
+  Pod::Escapes: '0'
+  Sort::Key: '0'
+  Statistics::Basic: '1.6'
+  String::Random: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Time::HiRes: '0'
+  Tree::DAG_Node: '1.04'
+  XML::Parser: '2.4'
+  XML::Parser::Style::EasyTree: '0'
+  YAML: '0'
+  constant: '0'
+  version: '0'
+version: '0.80'

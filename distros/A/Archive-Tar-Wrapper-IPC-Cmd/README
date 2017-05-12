@@ -1,0 +1,15 @@
+NAME	
+	Archive-Tar-Wrapper minus IPC::Run, IO::Pty
+
+DESCRIPTION
+	Archive::Tar::Wrapper::IPC::CMD is a fork of Michael Schilli's Archive::Tar::Wrapper.
+	Removed: IPC::Run, IO::Pty
+	Added:   IPC::Cmd
+	
+COPYRIGHT AND LICENCE
+	This software is copyright (c) 2012 by Krzysztof Bieszczad.
+
+	This is free software; you can redistribute it and/or modify it under
+	the same terms as the Perl 5 programming language system itself.
+
+

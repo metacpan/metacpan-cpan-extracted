@@ -1,0 +1,64 @@
+NAME
+    Algorithm::Scale2x - Generic implementation of the Scale2x algorithm
+
+SYNOPSIS
+        use Algorithm::Scale2x;
+
+        # optionally exported
+        # use Algorithm::Scale2x qw( scale2x scale3x );
+
+        # To start, you must grab a pixel plus all 8 surrounding pixels
+        my @pixels = $image->get_pixels( $x, $y ); 
+
+        # scale2x - returns a 2x2 grid of scaled pixels
+        my @result2x = Algorithm::Scale2x::scale2x( @pixels );
+
+        # scale3x - returns a 3x3 grid of scaled pixels
+        my @result3x = Algorithm::Scale2x::scale3x( @pixels );
+
+DESCRIPTION
+    This module provides a generic implementation of the Scale2x and Scale3x
+    algorithms. Scale2x is described as:
+
+        ...[a] real-time graphics effect able to increase the size of small bitmaps
+        guessing the missing pixels without interpolating pixels and blurring the images.
+
+METHODS
+  scale2x( @pixels )
+    Given a 3x3 grid of pixels (i.e color index numbers), it will expand the
+    centre pixel into 4 new pixels (i.e. 2x scale).
+
+        +---+---+---+
+        | 0 | 1 | 2 |    +----+----+
+        +---+---+---+    | 4A | 4B |
+        | 3 | 4 | 5 | => +----+----+
+        +---+---+---+    | 4C | 4D |
+        | 6 | 7 | 8 |    +----+----+
+        +---+---+---+
+
+  scale3x( @pixels )
+    Given a 3x3 grid of pixels (i.e color index numbers), it will expand the
+    centre pixel into 9 new pixels (i.e. 3x scale).
+
+        +---+---+---+    +----+----+----+
+        | 0 | 1 | 2 |    | 4A | 4B | 4C |
+        +---+---+---+    +----+----+----+
+        | 3 | 4 | 5 | => | 4D | 4E | 4F |
+        +---+---+---+    +----+----+----+
+        | 6 | 7 | 8 |    | 4G | 4H | 4I |
+        +---+---+---+    +----+----+----+
+
+SEE ALSO
+    *   http://scale2x.sourceforge.net/
+
+    *   http://scale2x.sourceforge.net/algorithm.html
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2007-2009 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

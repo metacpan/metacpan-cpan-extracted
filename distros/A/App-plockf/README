@@ -1,0 +1,9 @@
+The App-plockf distribution provides the "plockf" program, a
+perl port of the FreeBSD utility lockf.
+
+Installation:
+
+	perl Makefile.PL
+	make
+	make test
+	make install

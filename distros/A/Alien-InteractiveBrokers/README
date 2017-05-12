@@ -1,0 +1,81 @@
+Alien-InteractiveBrokers
+
+This module automates the installation of the InteractiveBrokers API files
+and source code, and provides accessor functions to describe its location,
+include paths, etc.
+
+It was developed in conjunction with Finance::InteractiveBrokers::SWIG
+and POE::Component::Client::InteractiveBrokers, as a way of simplifying
+distribution and installation of these needed files.
+
+API VERSION SUPPORT
+
+This module currently supports the following IneractiveBrokers API versions:
+    9.64
+    9.65 (beta)
+    9.66
+    9.67 (beta)
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	./Build
+	./Build test
+	./Build install
+
+BUILD NOTES
+
+If you get notices like the following (only noticed under Cygwin):
+
+    Build: blib/script/ibapi-config: cannot resolve L<POE> in paragraph 53.
+    Build: blib/lib/Alien/InteractiveBrokers.pm: cannot resolve L<Alien> in paragraph 48.
+    Build: blib/lib/Alien/InteractiveBrokers.pm: cannot resolve L<POE> in paragraph 94.
+
+Ignore them.  They are only warnings about cross-referencing documentation
+on the local machine, and they do not affect the actual build.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Alien::InteractiveBrokers
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-InteractiveBrokers
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Alien-InteractiveBrokers
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Alien-InteractiveBrokers
+
+    Search CPAN
+        http://search.cpan.org/dist/Alien-InteractiveBrokers/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2010-2012 Jason McManus
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+The authors are not associated with InteractiveBrokers, and as such, take
+no responsibility or provide no warranty for your use of this module or the
+InteractiveBrokers service.  You do so at your own responsibility.  No
+warranty for any purpose is either expressed or implied by your use of this
+module suite.
+
+The data from InteractiveBrokers are under an entirely separate license that
+varies according to exchange rules, etc.  It is your responsibility to
+follow the InteractiveBrokers and exchange license agreements with the data.
+
+# END

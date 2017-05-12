@@ -1,0 +1,8 @@
+Revision history for Perl extension Acme::Homer
+
+0.0.1  Sat Dec 17 19:17:27 2005
+	- original version; created by h2xs 1.22 with options
+		-AXc -n Acme::Homer
+
+0.0.2  Tue Dec 20 10:13:23 2005
+	- POD fixes and addition of Flanders section

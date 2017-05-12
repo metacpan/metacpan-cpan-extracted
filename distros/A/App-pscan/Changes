@@ -1,0 +1,6 @@
+Revision history for App-pscan
+
+0.02  2014-03-08 16:47:48 CET
+	- Can send payloads to nodes (-p or --payload option)
+	- enhanced output
+	- fixed udp scan stop

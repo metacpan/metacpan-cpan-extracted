@@ -1,0 +1,29 @@
+<!--#if expr=1 -->
+ Hi, should print
+<!--#else -->
+ Shouldn't print
+<!--#endif -->
+
+<!--#if expr=1 -->
+ Hi, should print
+<!--#elif expr=1 -->
+ Shouldn't print
+<!--#else -->
+ Shouldn't print
+<!--#endif -->
+
+<!--#if expr=0 -->
+ Shouldn't print
+<!--#elif expr=1 -->
+ Hi, should print
+<!--#else -->
+ Shouldn't print
+<!--#endif -->
+
+<!--#if expr=0 -->
+ Shouldn't print
+<!--#elif expr=0 -->
+ Shouldn't print
+<!--#else -->
+ Hi, should print
+<!--#endif -->

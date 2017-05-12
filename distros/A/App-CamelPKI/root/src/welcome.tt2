@@ -1,0 +1,20 @@
+[% META title = 'CamelPKI' %]
+<h3>A Perl PKI</h3>
+<p>CamelPKI is a Public Key Infrastructure (PKI) developed with the Catalyst Web framework, and so written in Perl.
+You'll find more info on the code documentation: <a href="http://search.cpan.org/~grm/" title="CPAN">CPAN</a></p>
+
+<h3>Features</h3>
+<p> Regarding some of its capabilities, you can :</p>
+<ul>
+<li>Issue Certificates</li>
+<li>Revoke Certificates<li>
+<li>Manage Certificates Revocation Lists (CRL)<li>
+</ul>
+<p>You are not forced to use the present CA webserver with forms. You can use
+another application (written in PHP or any other language) and communicate with CamelPKI 
+using JSON as CamelPKI is supporting JSON requests.</p>
+
+<h3>Copyright and Licence</h3>
+<p>Copyright 2007 Siemens Business Services S.A.S., all rights reserved.</p>
+<p>CamelPKI is free software; you can redistribute it following the same terms
+as Perl itself.</p>

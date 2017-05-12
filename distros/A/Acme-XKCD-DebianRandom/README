@@ -1,0 +1,7 @@
+Acme-XKCD-DebianRandom version 1.00
+===================================
+
+Implementation of the "secure" Debian non-random number generator
+
+See also:
+http://xkcd.com/221/

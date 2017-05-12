@@ -1,0 +1,45 @@
+---
+abstract: 'search the internet from your terminal'
+author:
+  - 'Ahmad Syaltut <syaltut@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.4004
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4004, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-lookup
+no_index:
+  directory:
+    - etc
+    - t
+provides:
+  App::lookup:
+    file: lib/App/lookup.pm
+    version: 0.06
+requires:
+  Browser::Open: 0
+  Config::Tiny: 0
+  File::Basename: 0
+  File::Spec: 0
+  Getopt::Long: 0
+  IPC::System::Simple: 0
+  List::Util: 0
+  Pod::Usage: 0
+  Text::Abbrev: 0
+  Text::Wrap: 0
+  URI::Encode: 0
+resources:
+  homepage: https://github.com/Syaltut/perl-App-lookup
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/Syaltut/perl-App-lookup.git
+version: 0.06
+x_test_requires:
+  File::Spec: 0
+  FindBin: 0
+  Test::More: 0
+  Test::Output: 0
+  Text::Abbrev: 0

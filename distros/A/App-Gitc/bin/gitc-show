@@ -1,0 +1,102 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-show
+# ABSTRACT: Show a diff of a specified changeset
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    archived_tags
+    branch_point
+    current_branch
+    full_changeset_name
+    git
+    history
+    history_status
+);
+use Getopt::Long qw( :config pass_through );
+
+# should we fetch from the origin?
+my $fetch = 0;
+GetOptions( 'fetch' => \$fetch );
+git "fetch origin" if $fetch;
+
+# verify the changeset name
+my $changeset = shift || current_branch();
+my $history = history($changeset);
+die "There is no changeset named '$changeset'\n" if not @$history;
+
+# validate the changeset status
+my $status = history_status($history);
+die   "Changeset $changeset has status '$status' so the code only\n"
+    . "exists in the developer's personal repository.  If you want\n"
+    . "to see what he's up to, ask him nicely to show you.\n"
+    if $status eq 'open';
+
+# try to find the changeset's branch point
+my $head = full_changeset_name($changeset, missing_ok => 1);
+
+if (not $head)
+{   # if nothing was found, maybe the tags were archived
+    my $tags = archived_tags($changeset);
+    for my $tag (@$tags)
+    {
+        my ($sha, $tag_name) = @$tag;
+        if ($tag_name eq "refs/tags/cs/$changeset/to-master") {
+            exec "git diff @ARGV $sha~1 $sha";
+        }
+    }
+}
+
+die   "I couldn't find a ref for '$changeset'. Maybe you\n"
+    . "need to run\n"
+    . "  gitc show --fetch $changeset\n"
+    . "to make sure that your local copy of the remote repository\n"
+    . "is up to date\n"
+    if not $head;
+my $base = branch_point($head);
+
+exec "git diff @ARGV $base $head";
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-show - Show a diff of a specified changeset
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

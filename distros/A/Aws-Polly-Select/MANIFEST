@@ -1,0 +1,6 @@
+Build.PL
+lib/Aws/Polly/Select.pm
+MANIFEST			This list of files
+test.pl
+META.yml
+META.json

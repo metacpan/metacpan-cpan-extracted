@@ -1,0 +1,102 @@
+#!/usr/bin/perl -w
+
+# The script tests private Arch::Tree functions used for "annotate".
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More tests => 32;
+use_ok("Arch::Tree");
+
+my (@lines, @line_rd_indexes, $skip_linenums);
+
+# ----------------------------------------------------------------------------
+
+$skip_linenums = Arch::Tree::_get_skip_hash_from_linenums("3-5,8", 9);
+is_deeply($skip_linenums, {qw(1 1 2 1 6 1 7 1 9 1)}, "skip_linenums 1");
+
+$skip_linenums = Arch::Tree::_get_skip_hash_from_linenums([ 3..5, 8 ], 9);
+is_deeply($skip_linenums, {qw(1 1 2 1 6 1 7 1 9 1)}, "skip_linenums 2");
+
+$skip_linenums = Arch::Tree::_get_skip_hash_from_linenums({ 3 => 1, 4 => 1, 5 => 1, 8 => 1 }, 9);
+is_deeply($skip_linenums, {qw(1 1 2 1 6 1 7 1 9 1)}, "skip_linenums 3");
+
+$skip_linenums = Arch::Tree::_get_skip_hash_from_linenums("3-5,8", 8);
+is_deeply($skip_linenums, {qw(1 1 2 1 6 1 7 1)},     "skip_linenums 4");
+
+$skip_linenums = Arch::Tree::_get_skip_hash_from_linenums("1,2,3,4", 4);
+is_deeply($skip_linenums, {qw()},                    "skip_linenums 5");
+
+$skip_linenums = Arch::Tree::_get_skip_hash_from_linenums("", 5);
+is_deeply($skip_linenums, {qw(1 1 2 1 3 1 4 1 5 1)}, "skip_linenums 6");
+
+$skip_linenums = Arch::Tree::_get_skip_hash_from_linenums([], 5);
+is_deeply($skip_linenums, {qw(1 1 2 1 3 1 4 1 5 1)}, "skip_linenums 7");
+
+$skip_linenums = Arch::Tree::_get_skip_hash_from_linenums({}, 5);
+is_deeply($skip_linenums, {qw(1 1 2 1 3 1 4 1 5 1)}, "skip_linenums 8");
+
+$skip_linenums = Arch::Tree::_get_skip_hash_from_linenums(undef, 8);
+is_deeply($skip_linenums, {qw()},                    "skip_linenums 9");
+
+$skip_linenums = Arch::Tree::_get_skip_hash_from_linenums("0-10", 5);
+is_deeply($skip_linenums, {qw()},                    "skip_linenums 10");
+
+$skip_linenums = Arch::Tree::_get_skip_hash_from_linenums("-0", 5);
+is_deeply($skip_linenums, {qw()},                    "skip_linenums 11");
+
+$skip_linenums = Arch::Tree::_get_skip_hash_from_linenums("-1,2-2,4-", 5);
+is_deeply($skip_linenums, {qw(3 1)},                 "skip_linenums 12");
+
+$skip_linenums = Arch::Tree::_get_skip_hash_from_linenums("-1,9-", 5);
+is_deeply($skip_linenums, {qw(2 1 3 1 4 1 5 1)},     "skip_linenums 13");
+
+# ----------------------------------------------------------------------------
+
+ok(Arch::Tree::_eq(undef, undef), "eq 1");
+ok(Arch::Tree::_eq(-1, -1),       "eq 2");
+ok(Arch::Tree::_eq(5, 5),         "eq 3");
+ok(!Arch::Tree::_eq(undef, 0),    "eq 4");
+ok(!Arch::Tree::_eq(0, undef),    "eq 5");
+ok(!Arch::Tree::_eq(1, -1),       "eq 6");
+
+# ----------------------------------------------------------------------------
+
+@lines = qw(line1 line2 line3 line4 line5 line6 line7);
+@line_rd_indexes = (4, 4, 2, 1, 1, 1, 2);
+Arch::Tree::_group_annotated_lines(\@lines, \@line_rd_indexes);
+is_deeply(\@lines, [[qw(line1 line2)], [qw(line3)], [qw(line4 line5 line6)], [qw(line7)]], "lines 1");
+is_deeply(\@line_rd_indexes, [4, 2, 1, 2], "line_rd_indexes 1");
+
+@lines = qw();
+@line_rd_indexes = ();
+Arch::Tree::_group_annotated_lines(\@lines, \@line_rd_indexes);
+is_deeply(\@lines, [], "lines 2");
+is_deeply(\@line_rd_indexes, [], "line_rd_indexes 2");
+
+@lines = qw(line1);
+@line_rd_indexes = (1);
+Arch::Tree::_group_annotated_lines(\@lines, \@line_rd_indexes);
+is_deeply(\@lines, [[qw(line1)]], "lines 3");
+is_deeply(\@line_rd_indexes, [1], "line_rd_indexes 3");
+
+@lines = qw(line1 line1);
+@line_rd_indexes = (0, 0);
+Arch::Tree::_group_annotated_lines(\@lines, \@line_rd_indexes);
+is_deeply(\@lines, [[qw(line1 line1)]], "lines 4");
+is_deeply(\@line_rd_indexes, [0], "line_rd_indexes 4");
+
+@lines = qw(line1 line2 line3 line4 line5 line6);
+@line_rd_indexes = (5, 4, 3, 2, 1, 0);
+Arch::Tree::_group_annotated_lines(\@lines, \@line_rd_indexes);
+is_deeply(\@lines, [[qw(line1)], [qw(line2)], [qw(line3)], [qw(line4)], [qw(line5)], [qw(line6)]], "lines 5");
+is_deeply(\@line_rd_indexes, [5, 4, 3, 2, 1, 0], "line_rd_indexes 5");
+
+@lines = qw(line1 line2 line3 line4 line5 line6);
+@line_rd_indexes = (undef, undef, 1, 1, undef, undef);
+Arch::Tree::_group_annotated_lines(\@lines, \@line_rd_indexes);
+is_deeply(\@lines, [[qw(line1 line2)], [qw(line3 line4)], [qw(line5 line6)]], "lines 6");
+is_deeply(\@line_rd_indexes, [undef, 1, undef], "line_rd_indexes 6");
+

@@ -1,0 +1,6 @@
+* Add HTTPS support (https://github.com/frioux/App-Charon/issues/3)
+* Add HTTP Auth support (https://github.com/frioux/App-Charon/issues/1)
+* Add per file url and timeouts (https://github.com/frioux/App-Charon/issues/7)
+* Add admin web interface (https://github.com/frioux/App-Charon/issues/8)
+* Add admin CLI interface (https://github.com/frioux/App-Charon/issues/9)
+* Add config file support (https://github.com/frioux/App-Charon/issues/10)

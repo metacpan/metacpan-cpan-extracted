@@ -1,0 +1,71 @@
+Revision history for Perl extension AxKit::XSP::BasicSession.
+
+0.22	 2004-10-14
+	- Some small clarifications and expensions in the docs.
+	- We now use AxKit::Debug for debug messages, but not very 
+	  consistently...
+
+
+
+0.21	 2004-09-22
+	- A bugfix release. Some new export stuff in the previous
+	release caused some ungrokked errors.
+	- Small documentation corrections and addition.
+	- Added maintainer's PGP-signature.
+	- Added MANIFEST.SKIP.
+
+
+0.20	 2004-09-17
+	 - Added methods to access session contents from Perl.
+	 - Kjetil Kjernsmo takes over maintainance.
+	 - Added a session.id XSLT param.
+
+0.19	 2004-08-19	  
+	 - Updated manifest
+	 - Applied fix from Kjetil Kjernsmo 
+	 (for bug http://rt.cpan.org/NoAuth/Bug.html?id=5212)
+	 - Updated version numbers to be uniform
+
+0.18  Tue Jul  6 10:20:00 PDT 2004
+    - Fixed a stupid comment in the Apache::AxKit::Plugin::BasicSession
+
+0.17  Fri Feb  6 13:46:37 PDT 2004
+    - Added control logic (if/unless, etc)
+    - Added more documentation and comments
+    - Fixed an annoying bug that makes session names "_"
+
+0.16  Tue Sep  9 09:05:48 PDT 2003
+    - Fixed some spelling errors in the POD documentation, as per
+      rt.cpan.org bug #2287
+    - Added Authentication patch contributed from
+      Mark A. Hershberger <mah@everybody.org>
+    - Documentation changes to reflect the new Authentication code
+
+0.15  Thu Nov 14 11:03:48 PST 2001
+    - Fixed cookie handling when dealing with multiple cookies bearing
+      the same name
+
+0.14  Wed Nov 13 13:58:52 PST 2001
+    - Added cookie customization parameters to A:A:P:BasicSession
+    - Changed Apache parameter names to use "BasicSession" to prevent
+      stomping on other session management libraries
+
+0.13  Tue Nov 12 12:45:07 PST 2001
+    - Added Apache::AxKit::Plugin::AddXSLParams::BasicSession
+
+0.12  Mon Oct 28 11:43:33 PST 2001
+    - Changed name to BasicSession and changed the URI
+    - Moved XSP code over to TaglibHelper module
+    - Renamed session plugin to use the Ax 1.6 "Plugin" directory
+    - Removed "pnotes" code, since this was causing problems
+    - Now using global %session and pushed handlers to do cleanup
+    - Fixed Makefile.PL to include all module dependencies
+
+0.11  Fri Nov 30 15:20:22 PST 2001
+    - Fixed the version number (oops)
+    - Fixed whitespace around <name> and <value> tags
+    - Removed <get-last-accessed-date> PerlSetVar flag check
+
+0.01  Fri Nov 23 16:18:12 PST 2001
+    - original version; created by h2xs 1.20
+

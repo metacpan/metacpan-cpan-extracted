@@ -1,0 +1,605 @@
+#!perl
+
+# Note: This script is a CLI interface to Riap function /Android/Releases/list_android_releases
+# and generated automatically using Perinci::CmdLine::Gen version 0.23
+
+our $DATE = '2015-11-06'; # DATE
+our $DIST = 'App-ListAndroidReleases'; # DIST
+our $VERSION = '0.01'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => "/Android/Releases/list_android_releases",
+    program_name => "list-android-releases",
+)->run;
+
+# ABSTRACT: Android releases
+# PODNAME: list-android-releases
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-android-releases - Android releases
+
+=head1 VERSION
+
+This document describes version 0.01 of list-android-releases (from Perl distribution App-ListAndroidReleases), released on 2015-11-06.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % list-android-releases [options] [query]
+
+=head1 DESCRIPTION
+
+REPLACE ME
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for api_level options
+
+=over
+
+=item B<--api-level-in-json>=I<s>
+
+Only return records where the 'api_level' field is in the specified values (JSON-encoded).
+
+See C<--api-level-in>.
+
+=item B<--api-level-in>=I<s@>
+
+Only return records where the 'api_level' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--api-level-is>=I<i>
+
+Only return records where the 'api_level' field equals specified value.
+
+=item B<--api-level-isnt>=I<i>
+
+Only return records where the 'api_level' field does not equal specified value.
+
+=item B<--api-level-max>=I<i>
+
+Only return records where the 'api_level' field is less than or equal to specified value.
+
+=item B<--api-level-min>=I<i>
+
+Only return records where the 'api_level' field is greater than or equal to specified value.
+
+=item B<--api-level-not-in-json>=I<s>
+
+Only return records where the 'api_level' field is not in the specified values (JSON-encoded).
+
+See C<--api-level-not-in>.
+
+=item B<--api-level-not-in>=I<s@>
+
+Only return records where the 'api_level' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--api-level-xmax>=I<i>
+
+Only return records where the 'api_level' field is less than specified value.
+
+=item B<--api-level-xmin>=I<i>
+
+Only return records where the 'api_level' field is greater than specified value.
+
+=item B<--api-level>=I<i>
+
+Only return records where the 'api_level' field equals specified value.
+
+=back
+
+=head2 Filtering for code_name options
+
+=over
+
+=item B<--code-name-contains>=I<s>
+
+Only return records where the 'code_name' field contains specified text.
+
+=item B<--code-name-in-json>=I<s>
+
+Only return records where the 'code_name' field is in the specified values (JSON-encoded).
+
+See C<--code-name-in>.
+
+=item B<--code-name-in>=I<s@>
+
+Only return records where the 'code_name' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--code-name-is>=I<s>
+
+Only return records where the 'code_name' field equals specified value.
+
+=item B<--code-name-isnt>=I<s>
+
+Only return records where the 'code_name' field does not equal specified value.
+
+=item B<--code-name-max>=I<s>
+
+Only return records where the 'code_name' field is less than or equal to specified value.
+
+=item B<--code-name-min>=I<s>
+
+Only return records where the 'code_name' field is greater than or equal to specified value.
+
+=item B<--code-name-not-contains>=I<s>
+
+Only return records where the 'code_name' field does not contain specified text.
+
+=item B<--code-name-not-in-json>=I<s>
+
+Only return records where the 'code_name' field is not in the specified values (JSON-encoded).
+
+See C<--code-name-not-in>.
+
+=item B<--code-name-not-in>=I<s@>
+
+Only return records where the 'code_name' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--code-name-xmax>=I<s>
+
+Only return records where the 'code_name' field is less than specified value.
+
+=item B<--code-name-xmin>=I<s>
+
+Only return records where the 'code_name' field is greater than specified value.
+
+=item B<--code-name>=I<s>
+
+Only return records where the 'code_name' field equals specified value.
+
+=back
+
+=head2 Filtering for reldate options
+
+=over
+
+=item B<--reldate-in-json>=I<s>
+
+Only return records where the 'reldate' field is in the specified values (JSON-encoded).
+
+See C<--reldate-in>.
+
+=item B<--reldate-in>=I<s@>
+
+Only return records where the 'reldate' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--reldate-is>=I<s>
+
+Only return records where the 'reldate' field equals specified value.
+
+=item B<--reldate-isnt>=I<s>
+
+Only return records where the 'reldate' field does not equal specified value.
+
+=item B<--reldate-max>=I<s>
+
+Only return records where the 'reldate' field is less than or equal to specified value.
+
+=item B<--reldate-min>=I<s>
+
+Only return records where the 'reldate' field is greater than or equal to specified value.
+
+=item B<--reldate-not-in-json>=I<s>
+
+Only return records where the 'reldate' field is not in the specified values (JSON-encoded).
+
+See C<--reldate-not-in>.
+
+=item B<--reldate-not-in>=I<s@>
+
+Only return records where the 'reldate' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--reldate-xmax>=I<s>
+
+Only return records where the 'reldate' field is less than specified value.
+
+=item B<--reldate-xmin>=I<s>
+
+Only return records where the 'reldate' field is greater than specified value.
+
+=item B<--reldate>=I<s>
+
+Only return records where the 'reldate' field equals specified value.
+
+=back
+
+=head2 Filtering for version options
+
+=over
+
+=item B<--version-arg>=I<s>
+
+Only return records where the 'version' field equals specified value.
+
+=item B<--version-contains>=I<s>
+
+Only return records where the 'version' field contains specified text.
+
+=item B<--version-in-json>=I<s>
+
+Only return records where the 'version' field is in the specified values (JSON-encoded).
+
+See C<--version-in>.
+
+=item B<--version-in>=I<s@>
+
+Only return records where the 'version' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--version-is>=I<s>
+
+Only return records where the 'version' field equals specified value.
+
+=item B<--version-isnt>=I<s>
+
+Only return records where the 'version' field does not equal specified value.
+
+=item B<--version-max>=I<s>
+
+Only return records where the 'version' field is less than or equal to specified value.
+
+=item B<--version-min>=I<s>
+
+Only return records where the 'version' field is greater than or equal to specified value.
+
+=item B<--version-not-contains>=I<s>
+
+Only return records where the 'version' field does not contain specified text.
+
+=item B<--version-not-in-json>=I<s>
+
+Only return records where the 'version' field is not in the specified values (JSON-encoded).
+
+See C<--version-not-in>.
+
+=item B<--version-not-in>=I<s@>
+
+Only return records where the 'version' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--version-xmax>=I<s>
+
+Only return records where the 'version' field is less than specified value.
+
+=item B<--version-xmin>=I<s>
+
+Only return records where the 'version' field is greater than specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--query>=I<s>, B<-q>
+
+Search.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort>=I<s>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<i>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<i>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-android-releases list-android-releases
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-android-releases 'p/*/`list-android-releases`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 ENVIRONMENT
+
+=head2 LIST_ANDROID_RELEASES_OPT => str
+
+Specify additional command-line options
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at C<~/.config/list-android-releases.conf>, C<~/list-android-releases.conf> or C</etc/list-android-releases.conf> (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features. 
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+List of available configuration parameters:
+
+ api_level (see --api-level)
+ api_level.in (see --api-level-in)
+ api_level.is (see --api-level-is)
+ api_level.isnt (see --api-level-isnt)
+ api_level.max (see --api-level-max)
+ api_level.min (see --api-level-min)
+ api_level.not_in (see --api-level-not-in)
+ api_level.xmax (see --api-level-xmax)
+ api_level.xmin (see --api-level-xmin)
+ code_name (see --code-name)
+ code_name.contains (see --code-name-contains)
+ code_name.in (see --code-name-in)
+ code_name.is (see --code-name-is)
+ code_name.isnt (see --code-name-isnt)
+ code_name.max (see --code-name-max)
+ code_name.min (see --code-name-min)
+ code_name.not_contains (see --code-name-not-contains)
+ code_name.not_in (see --code-name-not-in)
+ code_name.xmax (see --code-name-xmax)
+ code_name.xmin (see --code-name-xmin)
+ detail (see --detail)
+ fields (see --field)
+ format (see --format)
+ naked_res (see --naked-res)
+ query (see --query)
+ random (see --random)
+ reldate (see --reldate)
+ reldate.in (see --reldate-in)
+ reldate.is (see --reldate-is)
+ reldate.isnt (see --reldate-isnt)
+ reldate.max (see --reldate-max)
+ reldate.min (see --reldate-min)
+ reldate.not_in (see --reldate-not-in)
+ reldate.xmax (see --reldate-xmax)
+ reldate.xmin (see --reldate-xmin)
+ result_limit (see --result-limit)
+ result_start (see --result-start)
+ sort (see --sort)
+ version (see --version-arg)
+ version.contains (see --version-contains)
+ version.in (see --version-in)
+ version.is (see --version-is)
+ version.isnt (see --version-isnt)
+ version.max (see --version-max)
+ version.min (see --version-min)
+ version.not_contains (see --version-not-contains)
+ version.not_in (see --version-not-in)
+ version.xmax (see --version-xmax)
+ version.xmin (see --version-xmin)
+ with_field_names (see --with-field-names)
+
+=head1 FILES
+
+~/.config/list-android-releases.conf
+
+~/list-android-releases.conf
+
+/etc/list-android-releases.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ListAndroidReleases>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ListAndroidReleases>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListAndroidReleases>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

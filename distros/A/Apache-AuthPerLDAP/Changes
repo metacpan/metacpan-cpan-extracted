@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache::AuthPerLDAP.
+
+0.5   Wed Apr 21 1999
+	- First Release to CPAN
+	- Does Basic Authentication against external LDAP server using PerLDAP
+

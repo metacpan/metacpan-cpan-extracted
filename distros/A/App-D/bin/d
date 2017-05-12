@@ -1,0 +1,217 @@
+#!/usr/bin/perl
+
+
+# PODNAME: script to show time and month info
+
+
+# common modules
+use strict;
+use warnings FATAL => 'all';
+use utf8;
+use open qw(:std :utf8);
+
+use Carp;
+use Class::Date qw(now gmdate date);
+use Term::ANSIColor qw(colored);
+
+# global vars
+my $true = 1;
+my $false = '';
+
+my %ru_month_names = (
+    1 => 'январь',
+    2 => 'февраль',
+    3 => 'март',
+    4 => 'апрель',
+    5 => 'май',
+    6 => 'июнь',
+    7 => 'июль',
+    8 => 'август',
+    9 => 'сентябрь',
+    10 => 'октябрь',
+    11 => 'ноябрь',
+    12 => 'декабрь',
+);
+
+my @weekdays = qw(Пн Вт Ср Чт Пт Сб Вс);
+
+# subs
+sub print_header {
+    print join(" ", @weekdays) . "\n";
+    return $false;
+}
+
+sub print_month {
+    my (%opts) = @_;
+    my $now = delete $opts{now};
+    my $first_date = (delete $opts{first_date})->strftime('%Y-%m-%d');
+    my $ident = delete $opts{ident};
+    my $moment = date($first_date);
+
+    my $date_start = $moment->month_begin();
+    my $date_end = $moment->month_end();
+
+    my @week;
+
+    my $date = $date_start;
+    my $additional_text = '';
+
+    while ($date <= $date_end) {
+        my $day;
+
+        $day->{number} = $date->day();
+
+        $day->{color} = 'blue' if $day->{number} == 1;
+
+        if (
+            $now->year == $date->year
+            && $now->month == $date->month
+            && $now->day == $date->day
+        ) {
+            $day->{color} = 'red';
+        }
+
+
+        if (($day->{number} == 1)) {
+            push @week, '' foreach 1..get_day_number($date)-1;
+            $additional_text = ' 'x4 . $ru_month_names{$date->month()};
+        }
+
+        if (@week == 7) {
+            print_week(week => \@week, ident => $ident);
+            print $additional_text;
+            $additional_text = '';
+            print "\n";
+            undef @week;
+        }
+
+        if (@week == 0 and $day->{number} == 1) {
+            print "\n";
+        }
+
+        $date += '1D';
+        push @week, $day;
+    }
+
+    print_week(week => \@week, ident => $ident);
+
+    return $false;
+}
+
+sub get_day_number {
+    my ($d) = @_;
+
+    return 7 if $d->wday == 1;
+    return 1 if $d->wday == 2;
+    return 2 if $d->wday == 3;
+    return 3 if $d->wday == 4;
+    return 4 if $d->wday == 5;
+    return 5 if $d->wday == 6;
+    return 6 if $d->wday == 7;
+
+    croak;
+}
+
+sub print_week {
+    my (%opts) = @_;
+    my @week = @{delete $opts{week}};
+    my $ident = delete $opts{ident};
+
+    foreach (@week) {
+        if (ref $_) {
+            my $text = sprintf("%2d", $_->{number});
+
+            if ($_->{color}) {
+                if (-t STDOUT) {
+                    print colored($text, $_->{color}) . " ";
+                } else {
+                    print $text . " ";
+                }
+            } else {
+                print $text . " ";
+            }
+        } elsif ($ident) {
+            print " "x3;
+        }
+    }
+
+    return $false;
+}
+
+sub get_now {
+    return gmdate(time);
+}
+
+# main
+sub main {
+
+    $Class::Date::GMT_TIMEZONE = 'UTC';
+    my $utc_moment = get_now();
+    my $current_moment;
+
+    my @tzs = qw(UTC Europe/Moscow);
+    my $current_tz = 'Europe/Moscow';
+
+    print "\n";
+
+    foreach my $tz (@tzs) {
+        my $this_moment = $utc_moment->to_tz($tz);
+
+        print
+            " "x4
+            . $this_moment->strftime('%Y-%m-%d %H:%M:%S')
+            . " "
+            . $this_moment->tz
+            . ($tz eq $current_tz ? '  <---' : '')
+            . "\n"
+            ;
+
+        if ($tz eq $current_tz) {
+            $current_moment = $this_moment;
+        }
+    }
+
+    print "\n";
+
+    my $prev_month_first_date = (($current_moment->month_begin()) - '1D')->month_begin();
+    my $cur_month_first_date = $current_moment->month_begin();
+    my $next_month_first_date = $current_moment->month_end() + '1D';
+
+    print_header();
+    print_month( first_date => $prev_month_first_date, now => $current_moment, ident => $true );
+    print_month( first_date => $cur_month_first_date, now => $current_moment, ident => $false );
+    print_month( first_date => $next_month_first_date, now => $current_moment, ident => $false );
+    print "\n\n";
+
+}
+main() if not caller;
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+script to show time and month info
+
+=head1 VERSION
+
+version 1.3.2
+
+=head1 DESCRIPTION
+
+=head1 AUTHOR
+
+Ivan Bessarabov <ivan@bessarabov.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Ivan Bessarabov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

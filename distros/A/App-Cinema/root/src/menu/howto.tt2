@@ -1,0 +1,52 @@
+[% META title = 'HOW-TO' %]
+<div id="about" size = "50%">
+Before login, you can 
+<ul>
+<li>view/search MOVIE by title, plot, year</li>
+<li><a href="[% Catalyst.uri_for('/user/add') %]">
+register</a> a new account =&gt; add event</li>
+</ul>
+After login, you can be one or more of the following roles
+<ul>
+<li><b>user:</b></li>
+<ul>
+<li>can be set when you register an account</li>
+<li>can search EVENT by ACTION, DESC </li>
+<li>can edit/deactivate your own account =&gt; add event =&gt; logout</li>
+<li>can checkout MOVIE, but can't delete it =&gt; add event
+, send email to user
+</li>
+<li>can add/view comment</li>
+<li>can ask for a upgrade to 
+[%# IF Catalyst.check_user_roles('user') %]
+<a href="[% Catalyst.uri_for('/menu/email') %]">vipuser</a>
+[%# ELSE %]
+[%# END%]
+ => send email to sysadmin => add event</li>
+</ul>
+<li><b>vipuser:</b></li>
+<ul>
+<li>can obly be activated by sysadmin</li>
+<li>can view/search MYLOG by title, content</li>
+<li>can view source code</li>
+<!--<li>can view Table Schema</li>-->
+<li>can view Runtime Info</li>
+</ul>
+<li><b>admin:</b></li>
+<ul>
+<li>can be set when you register an account
+ => send email to sysadmin => add event</li>
+<li>can add/delete movie created by yourself => add event</li>
+</ul>
+<li><b>sysadmin:</b></li>
+<ul>
+<li>can upgrade account to vipuser but can't edit other info. 
+=&gt; add event =&gt; send email</li>
+<li>can search user by first_name last_name email_address username</li>
+<li>can activate/deactivate user account&nbsp;&nbsp; &nbsp;=&gt; add event</li>
+<li>can delete item&nbsp; =&gt; add event</li>
+<li>can add new log (MyLog)</li>
+</ul>
+</ul>
+<!--<font color=blue>Blue color means "under construction"</font>-->
+</div>

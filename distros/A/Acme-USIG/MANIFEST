@@ -1,0 +1,9 @@
+Build.PL
+Makefile.PL
+Changes
+MANIFEST
+META.yml
+README
+t/01gay.t
+t/02cool.t
+lib/Acme/USIG.pm

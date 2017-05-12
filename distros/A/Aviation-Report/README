@@ -1,0 +1,43 @@
+		       README for Aviation::Report 1.01
+
+	  Decoding Aviation Weather Information with Perl.
+
+     Copyright (c) 1997-98, James Briggs <71022.3700@compuserve.com>
+
+
+Background
+
+    This is the README file for Aviation::Report.
+
+    The current version is 1.01. It was released on Oct 6, 1998.
+    When you find bugs, I'd appreciate a mail message to let me know what's
+    wrong.
+
+    Aviation::Report as been developed and tested on Linux as well as Windows NT
+    using the "native" port of Perl.
+
+    U.S. Aviation METAR, TAF and PIREP textual reports are translated into
+    plain English. Some effort is made to translate the remarks fields
+    of METAR and TAF reports.
+
+Installation
+
+    Installing Aviation::Report is an easy process.
+
+      % perl Makefile.PL
+      % make
+      % make test
+      % make install
+
+Documentation
+
+    The documentation is built-in to the Report module in POD format.
+    You can use any of the pod2* converters to translate it to a more
+    readable format. The three most common formats are 'man', 'html',
+    and 'text'.
+
+See Also
+
+    Jeremy Zawodny has an OO module called METAR.pm that builds an internal
+    data structure of non-remarks tokens.
+

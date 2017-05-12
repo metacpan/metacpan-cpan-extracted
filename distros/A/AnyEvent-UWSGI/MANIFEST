@@ -1,0 +1,9 @@
+Changes
+lib/AnyEvent/UWSGI.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+t/AnyEvent-UWSGI.t
+META.yml                                 Module meta-data (added by MakeMaker)

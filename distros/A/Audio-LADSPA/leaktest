@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+
+use blib;
+use Audio::LADSPA::Network;
+use Audio::LADSPA;
+use Devel::Peek;
+
+use strict;
+$|++;
+
+my $dummy = 1;
+Dump($dummy);
+
+my %tests = (
+    net => sub {
+	my $net = Audio::LADSPA::Network->new(44100);
+	$net->add_plugin( id => 1043);
+    },
+    plugin => sub {
+	my $plugin = Audio::LADSPA->plugin( id => 1043 );
+    },
+    buffers => sub {
+	my  $plugin = Audio::LADSPA->plugin( id => 1043 );
+	Dump($plugin);
+	for ($plugin->ports()) {
+	    Dump($_);
+	    warn "inspecting $_\n";
+	    my $b = $plugin->get_buffer($_);
+	    warn "got buffer";
+	    if ($plugin->get_buffer($_)) {
+		warn "hmmm... port already connected?";
+	    }
+	    else {
+		warn "connecting..";
+		my $buffer = Audio::LADSPA::Buffer->new(100);
+		$plugin->connect($_,$buffer);
+	    }
+	}
+    },
+);
+
+my $test = $tests{ shift() } or die "Usage: $0 [".join('|',sort keys %tests)."]\n";
+
+for (0 .. 100000) {
+    print STDERR "\r$_";
+    $test->();
+}
+while(1) {
+    print "Done, sleeping for 10 seconds";
+    sleep 10;
+}
+
+
+
+

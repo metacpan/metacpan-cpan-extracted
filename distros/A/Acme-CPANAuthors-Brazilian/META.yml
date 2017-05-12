@@ -1,0 +1,28 @@
+---
+abstract: 'We are brazilian CPAN authors'
+author:
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-CPANAuthors-Brazilian
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Acme::CPANAuthors: '0'
+  Test::More: '0.47'
+  perl: '5.008000'
+resources:
+  bugtracker: https://github.com/garu/Acme-CPANAuthors-Brazilian/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/garu/Acme-CPANAuthors-Brazilian
+version: '0.27'

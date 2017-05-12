@@ -1,0 +1,29 @@
+Apache::ChooseLanguage version 1.0
+==================================
+
+Perl extension for accessing different versions of a website based on the user preferred language
+
+It is a translation handler that will recognize the client's browser language preference and/or your language tracking cookie, and present the appropriate server root URL.  In case of doubt (on the first visit), a default "choose" page will be presented to let the user set his preference.  After parsing the request URL, and optionally replacing it by a language specific one, apache's DECLINED value is returned to let the usual translation take place.
+
+This is actually a single module file, packaged for your convenience.  You can "make install" or copy the module file and call it from your server's startup.pl
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module use Apache's modules & CGI::Cookie
+
+COPYRIGHT AND LICENCE
+
+This module is distributed under the same license as Perl itself.
+
+Copyright (C) 2000-2002 Nadeau Consultants
+
+The author can be reached by email at bill@sanac.net
+

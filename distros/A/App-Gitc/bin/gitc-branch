@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-branch
+# ABSTRACT: Manage changeset branches
+our $VERSION = '0.60'; # VERSION
+
+# Hide warnings from ITS/Jira
+
+use App::Gitc::Util qw( its_for_changeset );
+BEGIN {
+    $SIG{'__WARN__'} = sub { }
+}
+
+my @branches = qx{ git branch --no-color };
+
+for my $branch (@branches) {
+    chomp($branch);
+    next
+        if $branch eq 'master'
+            or $branch eq 'prod'
+            or $branch eq 'test'
+            or $branch eq 'stage';
+    my $changeset = $branch;
+    $changeset =~ s/[\* ]//g;
+    $changeset =~ s/[a-z]$//;
+    my $its = its_for_changeset($changeset);
+
+    if ($its and my $issue = $its->get_issue($changeset) ) {
+        $branch .= ': ' . $its->issue_summary($issue);
+    }
+    print "$branch\n";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-branch - Manage changeset branches
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

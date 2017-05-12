@@ -1,0 +1,79 @@
+<%doc>
+=pod
+
+=head1 NAME
+
+edit_field_textarea
+
+=head1 SYNOPSIS
+
+  <& edit_field_textarea, column => $column, row => $row &>
+
+=head1 DESCRIPTION
+
+Given a column and an optional row, this component produces a textarea
+form element for that column.
+
+If a row is given, then its value will be used as the default value
+for the form element.
+
+=head1 PARAMETERS
+
+=over 4
+
+=item * column (required)
+
+An C<Alzabo::Column> object.
+
+=item * row (optional)
+
+An Alzabo row object.
+
+=item * class (optional)
+
+This defaults to C<<
+$m->base_comp->attr_if_exists('textarea_class_default') >>.
+
+=item * rows (optional)
+
+If not given, this defaults to C<<
+$m->base_comp->attr_if_exists('textarea_rows_default') >> if it
+exists, or 4 if it does not.
+
+=item * cols (optional)
+
+If not given, this defaults to C<<
+$m->base_comp->attr_if_exists('textarea_cols_default') >> if it
+exists, or 40 if it does not.
+
+=item * wrap (optional)
+
+If not given, this defaults to C<<
+$m->base_comp->attr_if_exists('textarea_wrap_default') >> if it
+exists, or "multiple" if it does not.
+
+=back
+
+=cut
+</%doc>
+<textarea name="<% $col_name %>" rows="<% $rows %>" cols="<% $cols %>" class="<% $class %>"><% $val | h %></textarea>\
+<%args>
+$row => undef
+$column
+$class => $m->base_comp->attr_if_exists('textarea_class_default') || ''
+$rows  => $m->base_comp->attr_if_exists('textarea_rows_default') || 4
+$cols  => $m->base_comp->attr_if_exists('textarea_cols_default') || 40
+$wrap  => $m->base_comp->attr_if_exists('textarea_wrap_default') || 'multiple'
+</%args>
+<%init>
+my $val;
+
+my $col_name = ref $column ? $column->name : $column;
+
+if (defined $row)
+{
+    $val = $row->select( $col_name );
+}
+
+$val = '' unless defined $val;
+</%init>

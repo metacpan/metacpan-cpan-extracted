@@ -1,0 +1,55 @@
+{
+   "abstract" : "Alien distribution for Raylib",
+   "author" : [
+      "Ahmad Fatoum <athreef@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-raylib",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0.002",
+            "File::ShareDir" : "1.03"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.002",
+            "File::ShareDir" : "1.03",
+            "parent" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Bundle::More" : "0",
+            "Test::Alien" : "0.05"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/athreef/Alien-raylib/issues"
+      },
+      "homepage" : "https://github.com/athreef/Alien-raylib",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/athreef/Alien-raylib.git",
+         "web" : "https://github.com/athreef/Alien-raylib"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

@@ -1,0 +1,57 @@
+{
+   "abstract" : "Download test reports for a CPAN distribution from CPAN Testers",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-cpanreports",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Entities" : "0",
+            "Path::Tiny" : "0",
+            "WWW::Mechanize" : "0",
+            "YAML::XS" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "App::cpanreports" : {
+         "file" : "lib/App/cpanreports.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::cpanreports"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/ivanwills/App-cpan-reports.git"
+      }
+   },
+   "version" : "0.004"
+}

@@ -1,0 +1,11 @@
+<form id="searchform" action="[% root_uri_rel %]/" method="get">
+    <input type="hidden" name="mode" value="search" />
+    <label for="name">Go to</label>
+    <select name="field" class="field">
+        [% FOR field=['Module', 'Distribution', 'Author'] %]
+        <option [% 'selected="selected"' IF param('field') == field %]>[% field %]</option>
+        [% END %]
+    </select>
+    <input type="text" name="name" id="name" class="text" value="[% param('name') %]"/>
+    <input type="submit" />
+</form>

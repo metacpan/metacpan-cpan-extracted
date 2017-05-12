@@ -1,0 +1,10 @@
+\.swp$
+blib/
+Makefile$
+Makefile\.old$
+\.bak$
+pm_to_blib$
+\.git/
+TODO\.md$
+\.tar\.gz$
+MYMETA\.(json|yml)$

@@ -1,0 +1,13 @@
+ACE.pm
+ACE.xs
+Changes
+MANIFEST
+Makefile.PL
+test.pl
+typemap
+sdi.h
+README
+INSTALL
+eg/setpin
+eg/setpin.cgi
+eg/simple-auth

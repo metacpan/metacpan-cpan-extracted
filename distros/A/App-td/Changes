@@ -1,0 +1,56 @@
+Revision history for App-td
+
+0.08    2017-01-01 (PERLANCAR)
+
+	- Add action: rownum-col.
+
+
+0.07    2016-06-26 (PERLANCAR)
+
+        - select: Pass information from input's
+          table.field_{aligns,formats,units}.
+
+        - [build] Rebuild with newer Perinci::Result::Format::Lite which applies
+          table field formats/aligns.
+
+
+0.06    2016-04-15 (PERLANCAR)
+
+        - Rewrite to use Perinci::CmdLine. This increases startup overhead but
+          eases development and enables tab completion.
+
+        - Write description, remove "Early Release" label.
+
+        - Add actions: head, tail, colnames-row, rowcount-row.
+
+        - [Bugfix] Don't write empty table.fields when input does not have table
+          spec.
+
+
+0.05    2016-04-14 (PERLANCAR)
+
+        - Add/implement actions 'info', 'sum', 'sum-row', 'avg', 'avg-row'.
+
+
+0.04    2016-03-09 (PERLANCAR)
+
+	- Replace JSON::XS with Cpanel::JSON::XS.
+
+
+0.03    2015-12-07 (PERLANCAR)
+
+	- No functional changes.
+
+	- Typo.
+
+
+0.02    2015-11-02 (PERLANCAR)
+
+        - Add action: select.
+
+        - [doc] Fix example for sorting rows by descending order (-COLNAME).
+
+
+0.01    2015-09-15 (PERLANCAR)
+
+        - First release.

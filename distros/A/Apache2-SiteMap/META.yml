@@ -1,0 +1,30 @@
+---
+name: Apache2-SiteMap
+version: 0.1
+author:
+  - 'Nick Gerakines <nick@gerakines.net>'
+abstract: Dynamically create Google SiteMap files
+license: perl
+requires:
+  Apache2::Const: 0
+  Apache2::Module: 0
+  Apache2::RequestIO: 0
+  Apache2::RequestRec: 0
+  Apache2::RequestUtil: 0
+  Data::Dumper: 0
+  DirHandle: 0
+  File::Basename: 0
+  WWW::Google::SiteMap: 0
+build_requires:
+  Apache2::Const: 0
+  Apache::Test: 0
+  Apache::TestMB: 0
+  Apache::TestRequest: 0
+  Module::Build: 0
+  Test::Group: 0
+  Test::More: 0
+provides:
+  Apache2::SiteMap:
+    file: lib/Apache2/SiteMap.pm
+    version: 0.1
+generated_by: Module::Build version 0.2612

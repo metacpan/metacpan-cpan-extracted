@@ -1,0 +1,16 @@
+SYNOPSIS
+
+DESCRIPTION
+
+    This distribution comes with the following CLI's from the various
+    Complete::* modules. They are meant for convenient testing of the
+    various complete_* functions on the command-line.
+
+    # INSERT_EXECS_LIST
+
+SEE ALSO
+
+    Complete
+
+    Complete::* modules
+

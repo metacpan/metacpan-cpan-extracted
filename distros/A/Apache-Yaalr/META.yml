@@ -1,0 +1,9 @@
+name:         Apache-Yaalr
+version:      0.03.0
+version_from: lib/Apache/Yaalr.pm
+requires:	
+   File::Find:                   0
+   Test::More:                   0
+
+distribution_type: module
+

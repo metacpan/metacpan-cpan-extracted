@@ -1,0 +1,28 @@
+---
+abstract: 'Adds Server Name Indication (SNI) support to AnyEvent::TLS client.'
+author:
+  - 'Alexander Nalobin <alexander@nalobin.ru>'
+build_requires:
+  AnyEvent::HTTP: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-TLS-SNI
+requires:
+  AnyEvent: '0'
+  AnyEvent::Socket: '0'
+  AnyEvent::TLS: '0'
+  Carp: '0'
+  Net::SSLeay: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/nalobin/AnyEvent-TLS-SNI/issues
+  repository: git://github.com/nalobin/AnyEvent-TLS-SNI.git
+version: '0.04'

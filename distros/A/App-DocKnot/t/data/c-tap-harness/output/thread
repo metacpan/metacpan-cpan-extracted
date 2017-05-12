@@ -1,0 +1,219 @@
+\==[doc]      [2] [\bullet(packed)[\link[\1][\2]]]
+\==[program]  [3]
+    [\tablerow[\1 \version[\2]] [\release[\2]]
+        [\link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+        (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+              [PGP signature])]
+        [\link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+        (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+              [PGP signature])]]
+\==[download] [3]
+    [\1 \version[\2]\break
+     \link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+     (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+           [signature])\break
+     \link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+     (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+           [signature])\break
+    Released \release[\2]]
+
+\heading[C TAP Harness][software]
+
+\h1[C TAP Harness]
+
+\div(sidebar)[
+    \h2[Download]
+
+    \download[C TAP Harness][c-tap-harness]
+        [devel/c-tap-harness-\version[c-tap-harness]]
+
+    \link[https://archives.eyrie.org/software/ARCHIVE/c-tap-harness/]
+         [Archive]
+
+    \h2[Documentation]
+
+    \link[readme.html][General overview] \break
+    \link[news.html][Change summary] \break
+    \link[writing.html][Writing TAP tests] \break
+    \link[runtests.html][runtests manual page]
+
+    \h2[Development]
+
+    \link[todo.html][To-do list] \break
+    \link[https://github.com/rra/c-tap-harness]
+         [GitHub] \break
+    \link[https://github.com/rra/c-tap-harness/issues]
+         [Bug tracker] \break
+    \link[https://git.eyrie.org/?p=devel/c-tap-harness.git]
+         [Git repository] \break
+    \link[https://www.openhub.net/p/c-tap-harness]
+         [Open HUB code analysis]
+]
+
+\h2[Blurb]
+
+C TAP Harness is a pure-C implementation of TAP, the Test Anything
+Protocol.  TAP is the text-based protocol used by Perl's test suite.  This
+package provides a harness similar to Perl's Test::Harness for running
+tests, with some additional features useful for test suites in packages
+that use Autoconf and Automake, and C and shell libraries to make writing
+TAP-compliant test programs easier.
+
+\h2[Description]
+
+This package started as the runtests program I wrote for INN in 2000 to
+serve as the basis for a new test suite using a test protocol similar to
+that used for Perl modules.  When I started maintaining additional C
+packages, I adopted runtests for the test suite driver of those as well,
+resulting in further improvements but also separate copies of the same
+program in different distributions.  The C TAP Harness distribution merges
+all the various versions into a single code base that all my packages can
+pull from.
+
+C TAP Harness provides a full TAP specification driver (apart from a few
+possible edge cases) and has additional special features for supporting
+builds outside the source directory.  It's mostly useful for packages
+using Autoconf and Automake and because it doesn't assume or require Perl.
+
+The runtests program can be built with knowledge of the source and build
+directory and pass that knowledge on to test scripts, and will search for
+test scripts in both the source and build directory.  This makes it easier
+for packages using Autoconf and Automake and supporting out-of-tree builds
+to build some test programs, ship others, and run them all regardless of
+what tree they're in.  It also makes it easier for test cases to find
+their supporting files when they run.
+
+Also included in this package are C and shell libraries that provide
+utility functions for writing test scripts that use TAP to report results.
+The C library also provides a variety of utility functions useful for test
+programs running as part of an Automake-built package: finding test data
+files, creating temporary files, reporting output from external programs
+running in the background, and similar common problems.
+
+\h2[Requirements]
+
+C TAP Harness requires a C compiler to build.  Any ISO C89 or later C
+compiler on a system supporting the Single UNIX Specification, version 3
+(SUSv3) should be sufficient.  This should not be a problem on any modern
+system.  The test suite and shell library require a Bourne-compatible
+shell.  Outside of the test suite, C TAP Harness has no other
+prerequisites or requirements.
+
+To run the test suite, you will need Perl plus the Perl module Test::More,
+which comes with Perl 5.8 or later.  The following additional Perl modules
+will be used by the test suite if present:
+
+\bullet(packed)[Test::Pod]
+\bullet(packed)[Test::Spelling]
+
+All are available on CPAN.  Those tests will be skipped if the modules are
+not available.
+
+To bootstrap from a Git checkout, or if you change the Automake files and
+need to regenerate Makefile.in, you will need Automake 1.11 or later.  For
+bootstrap or if you change configure.ac or any of the m4 files it includes
+and need to regenerate configure or config.h.in, you will need Autoconf
+2.64 or later.  Perl is also required to generate manual pages from a
+fresh Git checkout.
+
+\h2[Download]
+
+The distribution:
+
+\table[][
+    \program[C TAP Harness][c-tap-harness]
+        [devel/c-tap-harness-\version[c-tap-harness]]
+]
+
+An \link[https://archives.eyrie.org/software/ARCHIVE/c-tap-harness/]
+[archive of older releases] is also available.
+
+C TAP Harness is maintained using the Git version control system.  To
+check out the current development tree, see
+\link[https://github.com/rra/c-tap-harness][GitHub] or clone:
+
+\pre[    https://git.eyrie.org/git/devel/c-tap-harness.git]
+
+Pull requests on GitHub are welcome.  You can also
+\link[https://git.eyrie.org/?p=devel/c-tap-harness.git][browse the current
+development source].
+
+\h2[Documentation]
+
+\div(left)[
+    \class(first)[User documentation:]
+
+    \doc[readme.html][README]
+    \doc[news.html][Change summary]
+    \doc[writing.html][Writing TAP tests]
+    \doc[runtests.html][runtests manual page]
+    \doc[license.html][License and copyright]
+
+    Developer documentation:
+
+    \doc[todo.html][To-do list]
+    \doc[https://github.com/rra/c-tap-harness]
+        [GitHub]
+    \doc[https://github.com/rra/c-tap-harness/issues]
+        [Bug tracker]
+    \doc[https://www.openhub.net/p/c-tap-harness]
+        [Open HUB code analysis]
+]
+
+\div(right)[
+    \class(first)[API documentation:]
+
+    \doc[bail.html][bail and sysbail]
+    \doc[bmalloc.html][bmalloc, bcalloc, brealloc, bstrdup, and bstrndup]
+    \doc[breallocarray.html][breallocarray]
+    \doc[diag.html][diag and sysdiag]
+    \doc[diag_file_add.html][diag_file_add and diag_file_remove]
+    \doc[is_int.html][is_bool, is_int, is_double, is_string, and is_hex]
+    \doc[ok.html][ok, okv, and ok_block]
+    \doc[plan.html][plan and plan_lazy]
+    \doc[skip.html][skip and skip_block]
+    \doc[skip_all.html][skip_all]
+    \doc[test_cleanup_register.html][test_cleanup_register]
+    \doc[test_file_path.html][test_file_path and test_file_path_free]
+    \doc[test_tmpdir.html][test_tmpdir and test_tmpdir_free]
+]
+
+\h2(after)[License]
+
+The C TAP Harness package as a whole is covered by the following copyright
+and license:
+
+\block[
+
+    Copyright 2000-2001, 2004, 2006-2016
+        Russ Allbery <eagle@eyrie.org>
+
+    Copyright 2006-2009, 2011-2013
+        The Board of Trustees of the Leland Stanford Junior University
+
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+]
+
+Some individual source files are covered by other, compatible licenses.
+For complete copyright and license information, see the file
+\link[license.html][LICENSE] in the C TAP Harness source distribution.
+
+\signature

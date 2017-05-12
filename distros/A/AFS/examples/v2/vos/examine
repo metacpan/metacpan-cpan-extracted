@@ -1,0 +1,54 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::VLDB;
+use AFS::VOS;
+use Time::localtime;
+
+my ($vos, $vldb, $volume, $vollist, $vldblist);
+
+die "Usage: $0 volume \n" if $#ARGV != 0;
+
+$volume = shift;
+
+$vos = AFS::VOS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+$vollist = $vos->listvolume($volume);
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+$vldb = AFS::VLDB->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+$vldblist = $vldb->listvldbentry($volume);
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+print_vol($vollist);
+print_vldb($vldblist);
+
+sub print_vol {
+    my $vollist = shift;
+
+    print "$vollist->{name} \t$vollist->{volid} $vollist->{type} \t $vollist->{size} K $vollist->{inUse}\n";
+    print "\t$vollist->{server}  $vollist->{partition}\n";
+    print "\tRWrite $vollist->{parentID}  ROnly $vollist->{cloneID} Backup $vollist->{backupID}\n";
+    print "\tMaxQuota    $vollist->{maxquota} K\n";
+    print "\tCreation    ", ctime($vollist->{creationDate}), "\n";
+    print "\tCopy        ", ctime($vollist->{copyDate}), "\n";
+    print "\tBackup      ", ctime($vollist->{backupDate}), "\n";
+    print "\tLast Update ", ctime($vollist->{updateDate}),   "\n";
+    print "\t$vollist->{dayUse} accesses in the past day (i.e., vnode references)\n";
+}
+
+sub print_vldb {
+    my ($vldblist) = @_;
+
+    print "\tRWrite: $vldblist->{$volume}->{RWrite} \n";
+    print "\tnumber of sites -> $vldblist->{$volume}->{nServers}\n";
+    foreach my $srv (@{$vldblist->{$volume}->{server}}) {
+        print "\t\tserver $srv->{name} partition $srv->{partition} $srv->{type} site\n";
+    }
+}

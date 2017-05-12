@@ -1,0 +1,16 @@
+Build.PL
+CHANGES
+lib/Archive/Peek/External.pm
+lib/Archive/Peek/External/Tar.pm
+lib/Archive/Peek/External/Zip.pm
+MANIFEST			This list of files
+META.yml
+README
+t/archive.tar.bz2
+t/archive.tgz
+t/archive.zip
+t/pod.t
+t/simple.t
+LICENSE
+META.json
+SIGNATURE    Added here by Module::Build

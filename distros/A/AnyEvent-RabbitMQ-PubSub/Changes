@@ -1,0 +1,17 @@
+Revision history for Perl extension AnyEvent-RabbitMQ-PubSub
+
+3.1.2 2017-03-17T13:06:26Z
+    - die on on_inactive error
+
+3.1.1 2016-11-01T16:35:28Z
+    - croak on declare/bind errors
+
+3.1.0 2016-10-25T10:43:36Z
+    - ack and reject_and_republish methods in consumer
+
+3.0.2 2016-09-23T13:36:53Z
+    - public release
+
+3.0.1
+    - add to cpanfile Moose requirements (FIX)
+    - Publisher default_headers is Maybe[HashRef]

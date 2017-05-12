@@ -1,0 +1,64 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Inventory methods.
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More;
+use Arch::Util qw(is_tla_functional);
+
+plan skip_all => "No functional arch backend" unless is_tla_functional;
+plan tests => 11;
+
+use_ok("Arch::Inventory");
+use_ok("Arch::Test::Framework");
+
+my $framework = Arch::Test::Framework->new;
+my $archive   = $framework->make_archive;
+my $version   = $archive->make_version;
+my $tree      = Arch::Test::Cases::generate_complex_tree($framework, $version);
+
+
+my $inv = Arch::Inventory->new($tree->root);
+isa_ok($inv, 'Arch::Inventory',  'new inventory');
+is($inv->directory, $tree->root, 'correct root directory');
+
+my $root = $inv->get_root_entry;
+isa_ok($root, 'HASH',                    'root entry');
+is($inv->to_string($root), "T  d \t???", 'correct root entry string');
+is($inv->get_entry(''), $root,           'root entry via ->get_entry');
+
+my @inv_listing = $tree->run_tla('inventory', '-Btspbju', '--kind', '--ids');
+
+my ($ok, $cnt);
+
+$cnt = 0;
+$inv->foreach(sub { ++$cnt });
+is($cnt, scalar @inv_listing + 1, '->foreach count');
+
+$ok = 1;
+foreach my $line (@inv_listing) {
+	my (undef, undef, $path) = split /\s+/, $line;
+	my $entry = $inv->get_entry($path);
+
+	$ok &&= $entry->{path} eq $path;
+}
+ok($ok, 'scalar ->get_entry');
+
+$ok = 1;
+foreach my $line (@inv_listing) {
+	my (undef, undef, $path) = split /\s+/, $line;
+	my $entry = $inv->get_entry(split /\//, $path);
+
+	$ok &&= $entry->{path} eq $path;
+}
+ok($ok, 'list ->get_entry');
+
+ok(
+	eq_set(
+		[split /\n/, $inv->get_listing],
+		[@inv_listing]
+	),
+	'correct inventory listing'
+);

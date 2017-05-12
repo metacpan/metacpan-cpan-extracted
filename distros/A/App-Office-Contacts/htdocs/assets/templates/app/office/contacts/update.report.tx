@@ -1,0 +1,9 @@
+<table align="center">
+<tr><td><div class="blue_centered"><: $message :></div></td></tr>
+: if $error != nil {
+<tr><td><span class="error">Errors:</span></td></tr>
+: for $tr_loop -> $item {
+<tr><td><: $item.td :></td></tr>
+: }
+: }
+</table>

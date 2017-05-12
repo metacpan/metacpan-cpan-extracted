@@ -1,0 +1,39 @@
+---
+abstract: 'Scan git repositories in your workspace for local changes not synced up.'
+author:
+  - 'Guillaume Aubert <aubertg@cpan.org>'
+build_requires:
+  Test::FailWarnings: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-GitWorkspaceScanner
+provides:
+  App::GitWorkspaceScanner:
+    file: lib/App/GitWorkspaceScanner.pm
+    version: v1.1.0
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  Git::Repository: '0'
+  Log::Any: '0'
+  Log::Any::Adapter: '0'
+  Pod::Find: '0'
+  Pod::Usage: '0'
+  Readonly: '0'
+  Try::Tiny: '0'
+  perl: '5.01'
+resources:
+  bugtracker: https://github.com/guillaumeaubert/App-GitWorkspaceScanner/issues
+  homepage: https://metacpan.org/release/App-GitWorkspaceScanner
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/guillaumeaubert/App-GitWorkspaceScanner
+version: v1.1.0

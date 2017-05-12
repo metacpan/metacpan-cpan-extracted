@@ -1,0 +1,96 @@
+NAME
+    AutoCode - Set the coders free and therefore jobless
+
+  Objective
+    This project, and its sibling AutoSQL, is ready to facilitate
+    profesional Perl developers, who write modules not occasionally but
+    everyday, for constructing a comprehensive module architecture from a
+    simple schema/configuration. (To meet this ad slogan, I really try very
+    hard)
+
+    The phylosophy behind it is very simple that human who believes himself
+    intelligent merely need to design the schema, and this project, a piece
+    of code, will generate the code what developers usually composed by
+    themselves tired fingers.
+
+SAMPLE
+    A simple sample as test demo in this distribution is Contact project.
+    The scenario is simple. A normal Person, at our generation, must have
+    first_name and last_name. And optionally he may have a list of aliases
+    and emails. A Email is another class which has one required attribute,
+    address, and one optional, purpose, such as 'office', 'home', 'personal'
+    or 'business'. In civilized Singapore, each resident, whoever is a
+    citizen or working foriegner, has NRIC (National Registration Identity
+    Card), IC for short. A person and a IC are in one-to-one relationship.
+    Since you do not necessarily know about your pal's IC in the social
+    life, this IC can be null sometimes in logic.
+
+  How to defined the schema
+    The above mentioned can be modelled as a Perl hash like,
+
+      package ContactSchema;
+      use strict;
+      use AutoCode::Schema;
+      our @ISA=qw(AutoCode::Schema);
+  
+      our $modules = {
+          Person => {
+              first_name => '$!',
+              last_name => '$!',
+              birthday => '$T2',
+              alias => '@',
+              nric => '$NRIC',
+              email => '@Email',
+          ),
+          NRIC => {
+              no => '$',
+              issue_date => '$'
+          },
+          Email => {
+              address => '$V200!',
+              purpose => '${office, personal}'
+          }
+      };
+  
+      our $plurals = {
+          alias => 'aliases'
+      };
+  
+      sub _initialize {
+          my ($self, @args)=@_;
+          push @args, -modules => $modules;
+          push @args, -plurals => $plurals;
+          $self->SUPER::_initialize(@args);
+      }
+      1;
+
+  How to use the auto-made modules
+    After the schema is fixed, You can use AutoCode::ModuleFactory or
+    AutoCode::ObjectFactory to get the module name or instantiate the
+    objects.
+
+      use ContactSchema;
+  
+      # AutoCode::ModuleFactory
+      use Autocode::ModuleFactory;
+  
+      my $factory=Autocode::ModuleFactory->new(
+          -schema => ContactSchema->new  (-package_prefix => 'MyContact')
+      );
+      my $person_$pkg=$factory->make_virtual_module('Person');
+      my $person = $person_pkg->new(
+          -first_name => 'foo',
+          -last_name => 'bar',
+          -aliases => [qw(foob foobar)]
+      );
+
+      print $person->first_name .' '. $person->last_name ."\n";
+      print join("\t", $person->get_aliases) ."\n";
+  
+      $person->first_name('new name');
+      my @aliases = $person->remove_aliases;
+      $person->add_alias('foofoo');
+  
+AUTHOR
+    Juguang Xiao, juguang at tll.org.sg
+

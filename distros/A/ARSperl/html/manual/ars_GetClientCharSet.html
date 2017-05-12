@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>
+      ARSperl Programmer's Manual
+    </title>
+    <style type="text/css">
+/*<![CDATA[*/
+    dt.c1 {font-weight: bold}
+    /*]]>*/
+/*<![CDATA[*/
+    p.c1 {font-style: italic}
+    /*]]>*/
+    </style>
+  </head>
+  <body>
+    <h2>
+      <code>ars_GetClientCharSet(control)</code>
+    </h2>Retrieves a string that represents the name of the character set the client is using. The
+    API assumes that all character data the client passes it is encoded in this character set, and
+    returns all character data encoded in this character set. If this differs from the server
+    charset (see <a href="ars_GetServerCharSet.html">ars_GetServerCharSet</a>), the API converts
+    the data to the right character set.<br />
+    <dl>
+      <dt class="c1">
+        On success
+      </dt>
+      <dd>
+        Returns a string.
+      </dd>
+      <dt class="c1">
+        On failure
+      </dt>
+      <dd>
+        Returns undef.
+      </dd>
+    </dl>
+    <p>
+      Example:
+    </p>
+    <pre>
+    my $charset = ars_GetClientCharSet($ctrl);<br />        print "This client is using character set $charset\n";<br /> 
+</pre>
+    <p class="c1">
+      ars_GetClientCharSet was introduced in version 1.92 of ARSperl
+    </p>
+    <p>
+      <a href="toc.html">Back to Table of Contents</a>
+    </p>
+    <address>
+      Last changes to this page 30 March 2009 by michiel@beefreeit.nl<br />
+    </address>
+  </body>
+</html>

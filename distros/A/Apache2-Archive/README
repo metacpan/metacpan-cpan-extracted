@@ -1,0 +1,57 @@
+Apache2::Archive
+
+This is a port of Jon Peterson's Apache::Archive module. The port
+was done by David Moreno <david@axiombox.com>.
+
+======================================================================
+
+Old README follows:
+
+
+Apache::Archive v 0.1
+=====================
+
+DESCRIPTION
+-----------
+
+	This is an Apache module designed to be used with the Apache web server
+and the mod_perl environment. It allows Apache to present tar and tar.gz files
+as a menu of their component parts, from which a user may pick and choose the
+elements to view or download.
+
+	The appearance of the menu is fully configurable through templates.
+
+PRE-REQUISITES
+--------------
+
+	To use this module, you will need:
+	Apache, pref v 1.3.6
+	mod_perl, 1.2
+	Archive::Tar 0.2
+	Compress::Zlib
+
+INSTALLATION
+------------
+
+	Install using the normal technique for perl modules:
+
+	> perl Makefile.PL
+	> make
+	> make test
+	> make install
+
+Full documentation on the module is available in POD format within the .pm file.
+
+AUTHOR
+------
+
+	Jon Peterson jon@snowdrift.org
+
+COPYING
+-------
+
+	       Copyright 1998-1999, J. Peterson
+
+       This module is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.     
+

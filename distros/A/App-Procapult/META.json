@@ -1,0 +1,49 @@
+{
+   "abstract" : "Hand cranked process launcher",
+   "author" : [
+      "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Procapult",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Future" : "0.33",
+            "IO::Async" : "0.70",
+            "Moo" : "2",
+            "MooX::Options" : "4",
+            "Object::Tap" : "1",
+            "String::ShellQuote" : "1",
+            "curry" : "1",
+            "perl" : "5.006",
+            "strictures" : "2"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.009001"
+}

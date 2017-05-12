@@ -1,0 +1,8 @@
+# http://module-build.sourceforge.net/META-spec.html
+name:         Algorithm-Line-Bresenham-C
+version:      0.1
+author: LiloHuang
+installdirs:  site
+requires:
+distribution_type: module
+

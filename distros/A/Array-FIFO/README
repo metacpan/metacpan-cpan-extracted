@@ -1,0 +1,102 @@
+NAME
+
+    Array::FIFO - A Simple limitable FIFO array, with sum and average
+    methods
+
+VERSION
+
+    version 0.10
+
+SYNOPSIS
+
+        my $ar = Array::FIFO->new( limit => 12 );
+        $ar->add( 20 );
+        $ar->add( 18 );
+        $ar->add( 22 );
+    
+        say $ar->average;
+
+DESCRIPTION
+
+    Array::FIFO is meant to be a simple limitable array, for storing data
+    in a FIFO manner; with an optional limit to how large the array can
+    get. When the limit is reached, the oldest value is returned by add
+    when new values are added.
+
+    It's intent is for numeric values (i.e. current load of a system), but
+    it should work for other data types if you're not in need of the
+    calculation methods.
+
+    The sum and average methods return the current sum and average of the
+    data as you would expect. It does this on once, then caches the result
+    until the array changes.
+
+METHODS
+
+ new
+
+    limit (optional)
+
+      Numeric value of how large the array is allowed to get. When it
+      reaches limit, every item added causes the oldest item to be removed.
+
+      If no value is passed, there is no max size.
+
+ add
+
+        $ar->add( 99 );
+
+    You can add any type of item to the array; if it's not a number it will
+    be treated as a value of 0 when when calculating sum() and average().
+
+    Returns the oldest element in the array.
+
+ remove
+
+        $ar->remove;
+
+    Remove the oldest item on the array.
+
+ queue
+
+        $ar->queue;
+
+    Reference directly the fifo array.
+
+ size
+
+        $ar->size;
+
+    How many elements are in the array.
+
+ limit
+
+        $ar->limit;
+
+    The maximum size the array is allowed to be.
+
+ sum
+
+        $ar->sum;
+
+    The sum of all numeric elements in the array.
+
+ average
+
+        $ar->average;
+
+    The average of all numeric elements in the array.
+
+AUTHOR
+
+    Dan Burke dburke at addictmud.org
+
+BUGS
+
+    If you encounter any bugs, or have feature requests, please create an
+    issue on github. https://github.com/dwburke/perl-Array-FIFO/issues
+
+LICENSE AND COPYRIGHT
+
+    http://www.perlfoundation.org/artistic_license_2_0
+

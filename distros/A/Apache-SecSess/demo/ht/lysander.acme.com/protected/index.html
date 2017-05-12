@@ -1,0 +1,21 @@
+<& /index.comp, title => 'lysander.acme.com', content => $content &>
+<%init>
+my $content = <<'ENDCONTENT';
+<b>Contratulations!</b> you are now authenticated.<p>
+
+<ul>
+<li> <b>md5</b> - cryptographic checksum
+</ul>
+<pre>
+#!/usr/bin/perl -i09T4C`>_-JXF8NMS^$#)4=@``" 
+@A=unpack N4,unpack u,$^I;sub M{($x=pop)-($m=1+~0)*int$x/$m}sub L{($x=pop)<<(
+$n=pop)|2**$n-1&$x>>32-$n}@L=map{-65+ord}HMRWFJOUELQXGKPVABFABFDH=~/./g;@K=map{
+int abs 2**32*sin$_}1..64;do{$l+=$r=read STDIN,$_,64;$r++,$_.="\x80"if$r<64&&!
+$p++;@W=unpack V16,$_."\0"x7;$W[14]=$l*8if$r<57;($a,$b,$c,$d)=@A;for(0..63){$a=
+M$b+L$L[4*($_>>4)+$_%4],M&{(sub{$b&$c|$d&~$b},sub{$b&$d|$c&~$d},sub{$b^$c^$d},
+sub{$c^($b|~$d)})[$z=$_/16]}+$W[($L[16+$z]+$L[20+$z]*($_%16))%16]+$K[$_]+$a;(
+$a,$b,$c,$d)=($d,$a,$b,$c)}$v='a';@A=map{M$_+${$v++}}@A}while$r>56;print unpack
+H32,pack V4,@A
+</pre>
+ENDCONTENT
+</%init>

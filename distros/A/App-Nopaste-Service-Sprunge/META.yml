@@ -1,0 +1,25 @@
+---
+abstract: 'adds sprunge.us support to App::Nopaste'
+author:
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Nopaste-Service-Sprunge
+requires:
+  App::Nopaste::Service: 0
+  WWW::Pastebin::Sprunge::Create: 0
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/doherty/App-Nopaste-Service-Sprunge/issues
+  repository: git://github.com/doherty/App-Nopaste-Service-Sprunge.git
+version: 0.004

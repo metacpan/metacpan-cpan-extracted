@@ -1,0 +1,38 @@
+---
+abstract: 'Google Authenticator TBOT Abstraction'
+author:
+  - 'Gryphon Shafer <gryphon@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  constant: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Auth-GoogleAuth
+requires:
+  Carp: '0'
+  Class::Accessor: '0'
+  Convert::Base32: '0'
+  Digest::HMAC_SHA1: '0'
+  Math::Random::MT: '0'
+  URI::Escape: '0'
+  base: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/gryphonshafer/Auth-GoogleAuth/issues
+  homepage: https://github.com/gryphonshafer/Auth-GoogleAuth
+  repository: https://github.com/gryphonshafer/Auth-GoogleAuth.git
+version: '1.01'

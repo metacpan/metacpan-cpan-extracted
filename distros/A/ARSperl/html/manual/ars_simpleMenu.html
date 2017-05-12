@@ -1,0 +1,31 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_simpleMenu(menu)</CODE></H2>
+
+      This is a perl routine in the ARS.pm perl module. It is primarily
+      intended to make life a little easier for the Web client demo script.
+      It converts a menu returned by ars_GetCharMenuItems to a single level
+      menu seperating labels with '/'. This was added because of
+      limitations in HTML.<P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              An array of menu items.
+          <DT><B>On failure</B><DD>
+              <CODE>undef</CODE>
+      </DL>
+
+      <P>Example:
+
+      <PRE>
+      @sm = ars_simpleMenu(ars_GetCharMenuItems($ctrl, $menu_name));
+      </PRE>
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

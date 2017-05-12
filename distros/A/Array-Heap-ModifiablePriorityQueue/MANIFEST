@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+Todo
+lib/Array/Heap/ModifiablePriorityQueue.pm
+lib/Array/Heap/PriorityQueue/Compare.pm
+lib/Array/Heap/PriorityQueue/Numeric.pm
+lib/Array/Heap/PriorityQueue/String.pm
+t/mpq.t
+t/pq_cmp.t
+t/pq_num.t
+t/pq_str.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

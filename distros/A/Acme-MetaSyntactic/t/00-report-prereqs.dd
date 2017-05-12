@@ -1,0 +1,48 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'File::Basename' => '0',
+                                      'File::Glob' => '0',
+                                      'File::Spec' => '0',
+                                      'LWP::UserAgent' => '0',
+                                      'List::Util' => '0',
+                                      'Test::Builder::Module' => '0',
+                                      'Win32::Locale' => '0',
+                                      'base' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Cwd' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Find' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Spec::Functions' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'blib' => '1.01',
+                                   'lib' => '0',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

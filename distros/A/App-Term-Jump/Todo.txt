@@ -1,0 +1,11 @@
+#------------------#
+# This is Todo.txt #
+#------------------#
+
+run xt tests
+
+profile code (for fun)
+
+move .git outside the module directory
+
+

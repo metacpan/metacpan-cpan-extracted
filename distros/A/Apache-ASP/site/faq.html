@@ -1,0 +1,784 @@
+
+
+<html>
+<head>
+<title>Apache::ASP::Faq</title>
+
+
+
+<style type="text/css">
+<!--
+      td {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      font {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      .title {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 16px}
+
+
+
+
+-->
+</style>
+
+
+</head>
+<body bgcolor=black link=#063678 alink=#ff5599 vlink=#993399
+marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
+
+
+
+
+<center>
+<table border=0 cellpadding=0 width=99% cellspacing=8>
+<tr><td align=center>
+
+<table border=0 cellpadding=3 width=100% cellspacing=0>
+<tr bgcolor=#063678>
+<td>
+	<table border=0 cellpadding=1 cellspacing=0 width=100%>
+	<tr>
+	<td><img border=0 src=asptitlelogo.gif alt="Apache::ASP" width=267 height=44 ></td>	
+	
+		<td align=right></td>
+	
+	</tr>
+	</table>
+</td>
+</tr>
+<tr>
+  <td bgcolor=#005196 align=center>
+    <b>
+    <font color=#ffffff>&lt;% Web Applications with Apache &amp; mod_perl %&gt;</font>  
+    </b>
+  </td>
+</tr>
+</table>
+
+
+<table border=0 cellpadding=10 cellspacing=0 width=100% bgcolor=#005196>
+<tr>
+<td valign=top width=120 bgcolor=#005196>
+    
+        <table cellpadding=5 cellspacing=0 border=1 bgcolor=white><tr><td>
+
+	<table border=0 cellpadding=0 cellspacing=0 width=105 bgcolor=white>
+	
+	
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="index.html" style="text-decoration:none"><font color=#063678>INTRO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="install.html" style="text-decoration:none"><font color=#063678>INSTALL</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="config.html" style="text-decoration:none"><font color=#063678>CONFIG</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="syntax.html" style="text-decoration:none"><font color=#063678>SYNTAX</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="events.html" style="text-decoration:none"><font color=#063678>EVENTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="objects.html" style="text-decoration:none"><font color=#063678>OBJECTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="ssi.html" style="text-decoration:none"><font color=#063678>SSI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sessions.html" style="text-decoration:none"><font color=#063678>SESSIONS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="xml.html" style="text-decoration:none"><font color=#063678>XML/XSLT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="cgi.html" style="text-decoration:none"><font color=#063678>CGI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="perlscript.html" style="text-decoration:none"><font color=#063678>PERLSCRIPT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="style.html" style="text-decoration:none"><font color=#063678>STYLE GUIDE</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>%</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><font color=#993399>FAQ</font></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="tuning.html" style="text-decoration:none"><font color=#063678>TUNING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="kudos.html" style="text-decoration:none"><font color=#063678>CREDITS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="support.html" style="text-decoration:none"><font color=#063678>SUPPORT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sites.html" style="text-decoration:none"><font color=#063678>SITES USING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="testimonials.html" style="text-decoration:none"><font color=#063678>TESTIMONIALS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="resources.html" style="text-decoration:none"><font color=#063678>RESOURCES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="todo.html" style="text-decoration:none"><font color=#063678>TODO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="changes.html" style="text-decoration:none"><font color=#063678>CHANGES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="license.html" style="text-decoration:none"><font color=#063678>LICENSE</font></a></nobr></b></font></td>		
+
+		</tr>
+		<tr><td colspan=2><hr size=1></td></tr>
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="eg/index.html" style="text-decoration:none"><font color=#063678>EXAMPLES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+	</table>
+
+	</td></tr>
+	</table>
+
+		<br>
+		<center>
+		<a href=http://www.apache-asp.org/><img src="powered_by_apache_asp.jpg" width="88" height="31" alt="Powered by Apache::ASP" border="0"></a>
+		<br>
+		<a href=http://perl.apache.org><img src="powered_by_modperl.gif" width="88" height="31" alt="Powered by ModPerl and Apache" border="0"></a>
+		<br>
+		<a href=http://www.perl.com><img src="rectangle_power_perl.gif" width="88" height="31" alt="Powered by Perl" border="0"></a>
+		</center>
+
+</center>
+
+</td>
+
+
+
+<td valign=top bgcolor=white>
+<font size=+0 face=verdana,arial>
+
+<font face=verdana><font class=title size=+1 color=#555555><b>FAQ</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>The following are some frequently asked questions
+about Apache::ASP.</font>
+
+	<hr size=1>
+	<table width=100% border=0 cellpadding=1 cellspacing=3>
+	<tr>
+	<td valign=top><font face="lucida console" size=-1>
+	
+		<tr>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#Installation><font color=white>Installation</font></a></b></font>
+			</font>
+			</td>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#Development><font color=white>Development</font></a></b></font>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Examples%20donf48a0968>Examples don't work, I see the ASP script in the browser?</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#VBScript%20or%201d28c52b>VBScript or JScript supported?</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Apache%20Expat3f8589db>Apache Expat vs. XML perl parsing causing segfaults, what do I do?</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#How%20is%20datab66fe735a>How is database connectivity handled?</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Why%20do%20varia68e97184>Why do variables retain their values between requests?</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#What%20is%20the%20ffd599fa>What is the best way to debug an ASP application ?</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Apache%20errorf0bcd572>Apache errors on the PerlHandler or PerlModule directives ?</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#How%20are%20file3e89fb5c>How are file uploads handled?</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Error%3A%20no%20reb1d13fcf>Error: no request object (Apache=SCALAR(0x???????):)</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#How%20do%20I%20acc6523fd95>How do I access the ASP Objects in general?</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#I%20am%20getting272ca0df>I am getting a tie or MLDBM / state error message, what do I do?</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Can%20I%20print%2874ba394b>Can I print() in ASP?</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Do%20I%20have%20aca178cfb4>Do I have access to ActiveX objects?</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#Sessions><font color=white>Sessions</font></a></b></font>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#How%20can%20I%20us9eb242f1>How can I use $Session to store complex data structures.</a>
+			</font>
+			</td>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#Support%20and%20b4365dac><font color=white>Support and Production</font></a></b></font>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#How%20can%20I%20ke601a6c31>How can I keep search engine spiders from killing the session manager?</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#How%20do%20I%20get45b324ef>How do I get things I want done?!</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#How%20can%20I%20us50054dc6>How can I use $Session to store a $dbh database handle ?</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#What%20is%20the%20bd2800a9>What is the state of Apache::ASP?  Can I publish a web site on it?</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+		<td>&nbsp;</td>					
+		</tr>
+			
+	</table>
+	<hr size=1>
+	<p>
+
+	<p>
+	<a name=Installation></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Installation</b></font>
+</font>
+	
+	<p>
+	<a name=Examples%20donf48a0968></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>Examples don't work, I see the ASP script in the browser?</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>This is most likely that Apache is not configured to execute
+the Apache::ASP scripts properly.  Check the <a href=install.html><font size=-1 face=verdana><b>INSTALL</b></font></a> QuickStart
+section for more info on how to quickly set up Apache to 
+execute your ASP scripts.</font>
+	
+	<p>
+	<a name=Apache%20Expat3f8589db></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>Apache Expat vs. XML perl parsing causing segfaults, what do I do?</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Make sure to compile apache with expat disabled.  The
+./make_httpd/build_httpds.sh in the distribution will do 
+this for you, with the --disable-rule=EXPAT in particular:
+<font face="courier new" size=3><pre>
+ cd ../$APACHE
+ echo &quot;Building apache ==============================&quot;
+ ./configure \
+    --prefix=/usr/local/apache \
+    --activate-module=src/modules/perl/libperl.a \
+    --enable-module=ssl \
+    --enable-module=proxy \
+    --enable-module=so \
+    --disable-rule=EXPAT
+
+                   ^^^^^
+</pre></font>keywords: segmentation fault, segfault seg fault</font>
+	
+	<p>
+	<a name=Why%20do%20varia68e97184></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>Why do variables retain their values between requests?</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Unless scoped by my() or local(), perl variables in <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a>
+are treated as globals, and values set may persist from one 
+request to another. This can be seen in as simple a script
+as this:
+<font face="courier new" size=3><pre>
+  &lt;HTML&gt;&lt;BODY&gt;
+    $counter++;
+    $Response-&gt;Write(&quot;&lt;BR&gt;Counter: $counter&quot;);
+  &lt;/BODY&gt;&lt;/HTML&gt;
+</pre></font>The value for $counter++ will remain between requests.
+Generally use of globals in this way is a BAD IDEA,
+and you can spare yourself many headaches if do 
+&quot;use strict&quot; perl programming which forces you to 
+explicity declare globals like:
+<font face="courier new" size=3><pre>
+  use vars qw($counter);
+</pre></font>You can make all your Apache::ASP scripts strict by
+default by setting:
+<font face="courier new" size=3><pre>
+  PerlSetVar UseStrict 1
+</pre></font>
+	
+	<p>
+	<a name=Apache%20errorf0bcd572></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>Apache errors on the PerlHandler or PerlModule directives ?</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>You get an error message like this:
+<font face="courier new" size=3><pre>
+ Invalid command &#39;PerlModule&#39;, perhaps mis-spelled or defined by a 
+ module not included in the server configuration.
+</pre></font>You do not have <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a> correctly installed for Apache.  The PerlHandler
+and PerlModule directives in Apache *.conf files are extensions enabled by mod_perl
+and will not work if mod_perl is not correctly installed.
+<font face="courier new" size=3><pre>
+</pre></font>Common user errors are not doing a &#39;make install&#39; for mod_perl, which 
+installs the perl side of mod_perl, and not starting the right httpd
+after building it.  The latter often occurs when you have an old apache
+server without mod_perl, and you have built a new one without copying
+over to its proper location.
+<font face="courier new" size=3><pre>
+</pre></font>To get mod_perl, go to <a href=http://perl.apache.org>http://perl.apache.org</a></font>
+	
+	<p>
+	<a name=Error%3A%20no%20reb1d13fcf></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>Error: no request object (Apache=SCALAR(0x???????):)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Your Apache + <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a> build is not working properly, 
+and is likely a RedHat Linux RPM DSO build.  Make sure
+you statically build your Apache + mod_perl httpd,
+recompiled fresh from the sources.</font>
+	
+	<p>
+	<a name=I%20am%20getting272ca0df></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>I am getting a tie or MLDBM / state error message, what do I do?</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Make sure the web server or you have write access to the eg directory,
+or to the directory specified as Global in the config you are using.
+Default for Global is the directory the script is in (e.g. &#39;.&#39;), but should
+be set to some directory not under the www server document root,
+for security reasons, on a production site.
+<font face="courier new" size=3><pre>
+</pre></font>Usually a 
+<font face="courier new" size=3><pre>
+ chmod -R -0777 eg
+</pre></font>will take care of the write access issue for initial testing purposes.
+<font face="courier new" size=3><pre>
+</pre></font>Failing write access being the problem, try upgrading your version
+of Data::Dumper and MLDBM, which are the modules used to write the 
+state files.</font>
+	
+	<p>
+	<a name=Sessions></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Sessions</b></font>
+</font>
+	
+	<p>
+	<a name=How%20can%20I%20us9eb242f1></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>How can I use $Session to store complex data structures.</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Very carefully.  Please read the $Session documentation in 
+the <a href=objects.html><font size=-1 face=verdana><b>OBJECTS</b></font></a> section.  You can store very complex objects
+in $Session, but you have to understand the limits, and 
+the syntax that must be used to make this happen.
+<font face="courier new" size=3><pre>
+</pre></font>In particular, stay away from statements that that have 
+more than one level of indirection on the left side of
+an assignment like:
+<font face="courier new" size=3><pre>
+  $Session-&gt;{complex}{object} = $data;
+</pre></font>
+	
+	<p>
+	<a name=How%20can%20I%20ke601a6c31></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>How can I keep search engine spiders from killing the session manager?</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>If you want to disallow session creation for certain non web 
+browser user agents, like search engine spiders, you can use a <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a>
+PerlInitHandler like this to set configuration variables at runtime:
+<font face="courier new" size=3><pre>
+ # put the following code into httpd.conf and stop/start apache server
+ PerlInitHandler My::InitHandler
+
+ &lt;Perl&gt;
+
+  package My::InitHandler;
+  use Apache;
+
+  sub handler {
+    my $r = shift; # get the Apache request object
+
+    # if not a Mozilla User Agent, then disable sessions explicitly
+    unless($r-&gt;headers_in(&#39;User-Agent&#39;) =~ /^Mozilla/) {
+       $r-&gt;dir_config(&#39;AllowSessionState&#39;, &#39;Off&#39;);
+    }
+
+    return 200; # return OK mod_perl status code
+  }
+
+  1;
+
+ &lt;/Perl&gt;
+</pre></font>This will configure your environment before Apache::ASP executes
+and sees the configuration settings.  You can use the mod_perl
+API in this way to configure Apache::ASP at runtime.
+<font face="courier new" size=3><pre>
+</pre></font>Note that the Session Manager is very robust on its own, and denial
+of service attacks of the types that spiders and other web bots 
+normally execute are not likely to affect the Session Manager significantly.</font>
+	
+	<p>
+	<a name=How%20can%20I%20us50054dc6></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>How can I use $Session to store a $dbh database handle ?</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>You cannot use $Session to store a $dbh handle.  This can 
+be awkward for those coming from the IIS/NT world, where
+you could store just about anything in $Session, but this
+boils down to a difference between threads vs. processes.
+<font face="courier new" size=3><pre>
+</pre></font>Database handles often have per process file handles open,
+which cannot be shared between requests, so though you 
+have stored the $dbh data in $Session, all the other 
+initializations are not relevant in another httpd process.
+<font face="courier new" size=3><pre>
+</pre></font>All is not lost! Apache::DBI can be used to cache 
+database connections on a per process basis, and will
+work for most cases.</font>
+	
+	<p>
+	<a name=Development></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Development</b></font>
+</font>
+	
+	<p>
+	<a name=VBScript%20or%201d28c52b></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>VBScript or JScript supported?</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Yes, but not with this Perl module.  For ASP with other scripting
+languages besides Perl, you will need to go with a commercial vendor
+in the UNIX world.  Sun has such a solution.
+Of course on Windows NT and Windows 2000, you get VBScript for free with IIS.
+<font face="courier new" size=3><pre>
+  <a href="http://www.chilisoft.com">Sun ONE Active Server Pages (formerly Sun Chili!Soft ASP)</a>
+</pre></font>
+	
+	<p>
+	<a name=How%20is%20datab66fe735a></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>How is database connectivity handled?</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Database connectivity is handled through perl&#39;s DBI &amp; DBD interfaces.
+In the UNIX world, it seems most databases have cross platform support in perl.
+You can find the book on DBI programming at <a href=http://www.oreilly.com/catalog/perldbi/>http://www.oreilly.com/catalog/perldbi/</a>
+<font face="courier new" size=3><pre>
+</pre></font>DBD::ODBC is often your ticket on Win32.  On UNIX, commercial vendors
+like OpenLink Software (<a href=http://www.openlinksw.com/>http://www.openlinksw.com/</a>) provide the nuts and 
+bolts for ODBC.
+<font face="courier new" size=3><pre>
+</pre></font>Database connections can be cached per process with Apache::DBI.</font>
+	
+	<p>
+	<a name=What%20is%20the%20ffd599fa></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>What is the best way to debug an ASP application ?</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>There are lots of perl-ish tricks to make your life developing
+and debugging an ASP application easier.  For starters,
+you will find some helpful hints by reading the 
+$Response-&gt;Debug() API extension, and the Debug
+configuration directive.</font>
+	
+	<p>
+	<a name=How%20are%20file3e89fb5c></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>How are file uploads handled?</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Please see the <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a> section.  File uploads are implemented
+through CGI.pm which is loaded at runtime only for this purpose.
+This is the only time that CGI.pm will be loaded by Apache::ASP,
+which implements all other cgi-ish functionality natively.  The
+rationale for not implementing file uploads natively is that 
+the extra 100K in memory for CGI.pm shouldn&#39;t be a big deal if you 
+are working with bulky file uploads.</font>
+	
+	<p>
+	<a name=How%20do%20I%20acc6523fd95></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>How do I access the ASP Objects in general?</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>All the ASP objects can be referenced through the main package with
+the following notation:
+<font face="courier new" size=3><pre>
+ $main::Response-&gt;Write(&quot;html output&quot;);
+</pre></font>This notation can be used from anywhere in perl, including routines
+registered with $Server-&gt;RegisterCleanup().  
+<font face="courier new" size=3><pre>
+</pre></font>You use the normal notation in your scripts, includes, and global.asa:
+<font face="courier new" size=3><pre>
+ $Response-&gt;Write(&quot;html output&quot;);
+</pre></font>
+	
+	<p>
+	<a name=Can%20I%20print%2874ba394b></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>Can I print() in ASP?</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Yes.  You can print() from anywhere in an ASP script as it aliases
+to the $Response-&gt;Write() method.  Using print() is portable with
+<a href=http://www.activestate.com/ActivePerl/><font size=-1 face=verdana><b>PerlScript</b></font></a> when using Win32::ASP in that environment.</font>
+	
+	<p>
+	<a name=Do%20I%20have%20aca178cfb4></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>Do I have access to ActiveX objects?</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Only under Win32 will developers have access to ActiveX objects through
+the perl Win32::OLE interface.  This will remain true until there
+are free COM ports to the UNIX world.  At this time, there is no ActiveX
+for the UNIX world.</font>
+	
+	<p>
+	<a name=Support%20and%20b4365dac></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Support and Production</b></font>
+</font>
+	
+	<p>
+	<a name=How%20do%20I%20get45b324ef></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>How do I get things I want done?!</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>If you find a problem with the module, or would like a feature added,
+please mail support, as listed in the <a href=support.html><font size=-1 face=verdana><b>SUPPORT</b></font></a> section, and your 
+needs will be promptly and seriously considered, then implemented.</font>
+	
+	<p>
+	<a name=What%20is%20the%20bd2800a9></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>What is the state of Apache::ASP?  Can I publish a web site on it?</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Apache::ASP has been production ready since v.02.  Work being done
+on the module is on a per need basis, with the goal being to eventually
+have the ASP API completed, with full portability to ActiveState <a href=http://www.activestate.com/ActivePerl/><font size=-1 face=verdana><b>PerlScript</b></font></a>
+and MKS PScript.  If you can suggest any changes to facilitate these
+goals, your comments are welcome.</font>
+	
+
+</font>
+</td>
+
+<td bgcolor=white valign=top>
+&nbsp;
+</td>
+
+</tr>
+<tr bgcolor=#063678>
+	<td colspan=3 align=center width=80%>
+	<font face=verdana color=white size=-1>
+	Copyright &copy; 1998-2008,
+	<a href=http://www.chamas.com><font color=white>Chamas Enterprises Inc.</font></a>
+	</font>
+	</td>
+</tr>
+</table>
+
+</td></tr>
+</table>
+</center>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::Depends: '0.402'
+  IO::All: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::Depends: '0.402'
+  IO::All: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0515, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-HDF4
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Alien::HDF4:
+    file: lib/Alien/HDF4.pm.PL
+    version: '0.03'
+requires:
+  perl: '5.010'
+resources:
+  repository: git://github.com/PDLPorters/Alien-HDF4
+version: '0.03'
+

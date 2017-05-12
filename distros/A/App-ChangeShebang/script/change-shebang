@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use utf8;
+use App::ChangeShebang;
+
+App::ChangeShebang->new->parse_options(@ARGV)->run;
+
+__END__
+
+=head1 NAME
+
+change-shebang - change shebang lines for relocatable perl
+
+=head1 SYNOPSIS
+
+    > change-shebang [OPTIONS] FILES
+
+    Options:
+    --force, -f    skip dialogs that confirm the files to be changed
+    --quiet, -q    don't output messages
+    --help, -h     show this help
+    --version, -v  show version
+
+    Type `perldoc App::ChangeShebang` for the more detailed explanation
+
+    Examples:
+    > change-shebang /path/to/bin/*
+    > change-shebang --force --quiet /path/to/bin/cpanm
+
+=head1 AUTHOR
+
+Shoichi Kaji
+
+=cut
+

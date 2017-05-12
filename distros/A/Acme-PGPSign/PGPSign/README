@@ -1,0 +1,49 @@
+Acme/PGPSign version 0.01
+=========================
+
+SYNOPSIS
+            use Acme::PGPSign (Key => 'ABDCED'); 
+        
+            print "Hello World\n";
+
+DESCRIPTION
+    The first time you run a program under "use Acme::PGPSign", the
+    module converts your program to a PGP signed code segment. The code
+    continues to work exactly as it did before, but now it looks like this:
+
+use Acme::PGPSign;
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+print "Hello World\n";
+-----BEGIN PGP SIGNATURE-----
+Version: Crypt::OpenPGP 1.03
+
+iQBGBAERAgAGBQI/HCQpAAoJEKWJ3MaRjamws9UAoKSTyel1JNOj9erCMjmMlI9s
+wc5oAJ9UuzLk2J1WBnzZR4+AwgBiIvi6xw==
+=PdE4
+-----END PGP SIGNATURE-----
+
+		 
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Crypt::OpenPGP
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Patrick Mulvany All Rights Reserved.
+This module is free software. It may be used, redistributed
+and/or modified under the terms of the Perl Artistic License
+(see http://www.perl.com/perl/misc/Artistic.html)

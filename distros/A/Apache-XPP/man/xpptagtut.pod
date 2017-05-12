@@ -1,0 +1,265 @@
+=head1 NAME
+
+xpptagtut - How to create custom tags with Apache::XPP
+
+=head1 DESCRIPTION
+
+Apache::XPP is a great tool for embedding Perl in your web pages, partly
+because it allows you to extend it's built-in tag parser with custom XPP tags
+of your own. If the built-in tags don't meet all of your needs, you can create
+new tags by subclassing Apache::XPP and Apache::XPP::PreParse.
+
+=head1 CREATING CUSTOM TAGS
+
+There are two types of tags in XPP, just as there are in HTML. In XPP, they're
+called single tags and double tags. Single tags consist of one element, and do
+not have an end tag. Double tags consist of both a starting and ending element,
+with content inbetween. Note that there is no way to create a tag with an
+"optional" ending element (like E<lt>PE<gt> in HTML).
+
+XPP tags can accept any number of C<option="value">-style options, but they
+cannot accept single word options.
+
+For this tutorial, we're going to create two custom tags, one of each type.
+The E<lt>SHIFTE<gt> tag is a single tag, it is used to shift an element off
+of an array. The E<lt>REPLACEE<gt> tag is a double tag, it displays the text
+appearing between it's starting and ending elements, replacing a given pattern
+with a specified string.
+
+We'll call our subclasses My::XPP and My::XPP::PreParse.
+
+=head2 Subclassing Apache::XPP
+
+Only one method in this class needs to be overridden, which is the one that
+XPP uses to determine what PreParse class to use. This method is called
+C<preparseclass>, and it returns the name of the PreParse class you
+are going to implement (we'll get to that).
+
+Here's the complete Apache::XPP subclass:
+
+  package My::XPP;
+
+  use strict;
+  use Apache::XPP;
+
+  use vars qw( @ISA );
+  @ISA = qw( Apache::XPP );
+
+  sub preparseclass {
+      return "My::XPP::PreParse";
+  }
+
+  1;
+
+That's it. All the functionality of this class is still handled by
+Apache::XPP, you've instructed it to use a different PreParse class.
+Of course, creating that PreParse class is a little more complicated.
+
+=head2 Subclassing Apache::XPP::PreParse
+
+Subclassing Apache::XPP::PreParse to create a custom tags involves two
+basic steps. The first thing you have to do it create a class variable
+called C<@parsers> that contains the names of all the parser methods you're
+creating to handle your custom tags. Each tag will have exactly one parser
+method associated with it. The second step is to implement those parser methods
+for your custom tags.
+
+The beginning of our Apache::XPP::PreParse subclass looks like this:
+
+  package My::XPP::PreParse;
+
+  use strict;
+  use Apache::XPP::PreParse;
+
+  use vars qw( @ISA @parsers );
+  @ISA = qw( Apache::XPP::PreParse );
+
+  @parsers = (
+      @Apache::XPP::PreParse::parsers,
+      qw( parser_xppshift parser_xppreplace )
+	);
+
+Once we get the usual formalities of package declaration and inheritance out
+of the way, we create the C<@parsers> array by filling it with the contents
+of the parent class's parsers array, then adding our own custom parsers.
+
+In this example, we've added two names to the list. These are the names of the
+custom parser methods we're going to implement. Now we need to write the code
+for these methods.
+
+=head2 Implementing a single tag parser
+
+Our single tag is called E<lt>SHIFTE<gt>, it has the following form:
+
+  <SHIFT as="$scalarname" array="@arrayname">
+
+In the above example, the first element is shifted off of C<@arrayname> and
+assigned to the lexically-scoped variable C<$scalarname>. The C<array> option
+can be omitted, in which case @_ is used.
+
+Your parser method should accept two arguments. The first is the PreParse
+object itself, the second is the text you're parsing. To implement a single
+tag parser, you need to pass this text along to an XPP::PreParse method
+called C<stag> (as in I<s>ingle I<tag>), along with some other data. Your
+parser is called as an object method, and calls to C<stag> are made on that
+object.
+
+Here's the beginning of our parser method for E<lt>SHIFTE<gt>:
+
+  sub parser_shift {
+    my $self = shift;
+    my $text = shift;
+    $self->stag( $text,
+
+Simple enough, but we need to pass some more information to C<stag>. First,
+we need to specify what text our tag starts with, including the opening angle
+bracket. This one is fairly simple:
+
+    '<SHIFT',
+
+The last argument is a single arrayref, which in turn contains at least one
+nested arrayref. Think of each nested arrayref as a sort of case statment.
+Every nested arrayref will contain 3 values, except for the last one
+(the default case), which will contain only two.
+
+For the non-default cases, the first value is the name of an option that
+must be present for that case to be used. The next value is a C<printf>-style
+format string with a number of string placeholders (C<%s>). This string should
+evaluate to valid XPP or HTML content. The last value is an arrayref that
+contains the names of the options whose values should be substituted in the
+format string.
+
+For our E<lt>SHIFTE<gt> tag, we'll use two nested arrayrefs. For the first one,
+we must pass the string C<'array'> as the first value, followed by a format
+string that contains two placeholders, followed by the options whose
+values are to be substituted:
+
+    [ 'array', '<?xpp my %s = shift(%s); ?>', [ 'as', 'array' ] ],
+
+If there was no C<array> option passed to the tag, the next line, the default
+in this case, will be processed instead. The next line doesn't include an
+option name, since it's the default behavior:
+
+    [ '<?xpp my %s = shift; ?>', [ 'as' ] ],
+
+The resulting XPP code shifts off the default array (implicitly C<@_>,
+although you could specify it explictly if you wanted) and assigns it to
+the variable named by the C<as> option.
+
+For completeness, here's the complete parser method for the E<lt>SHIFTE<gt> tag:
+
+  sub parser_shift {
+    my $self = shift;
+    my $text = shift;
+    $self->stag( $text, '<SHIFT',
+      [
+        [ 'array', '<?xpp my %s = shift(%s); ?>', [ 'as', 'array' ] ],
+        [ '<?xpp my %s = shift; ?>', [ 'as' ] ],
+      ]
+    );
+  }
+
+This method goes in your PreParse subclass, My::XPP::PreParse in this case.
+Now on to the double tag...
+
+=head2 Implementing a double tag parser
+
+Our double tag is called E<lt>REPLACEE<gt>. It has the following form:
+
+  <REPLACE pattern="not(?= happy)" string="so">
+    I am very happy!
+    I am not happy!
+    I am not sad!
+  </REPLACE>
+
+In the above example, the contents of the tag would be changed to read:
+
+    I am very happy!
+    I am so happy!
+    I am not sad!
+
+As you can probably already see, this will be implemented as a simple
+pattern match/replacement.
+
+Double tags are actually more straightforward to implement than single tags.
+Once again, your parser method will get only two parameters passed to it, the
+PreParse object and the text to be parsed:
+
+  sub parser_replace {
+    my $self = shift;
+    my $text = shift;
+
+Since this is a double tag, we'll be using the C<dtag> (as in I<d>ouble I<tag>)
+method for the actual parsing. C<dtag> accepts three arguments, the text to be
+parsed (passed along directly by your method), the name of the tag, and a
+subroutine reference to process the content between your start and end elements.
+
+First, let's create the subroutine ref:
+
+  my $subref = sub {
+      my $option = shift;
+      my $data = shift;
+      my $pattern = $option->{'pattern'};
+      my $string  = $option->{'string'};
+      $data =~ s/$pattern/$string/g;
+      return $data;
+    };
+
+Two values are passed to this subref: a hashref of the options parsed into
+key => value pairs, and the data contained between the start and end elements
+of the tag. The subref modifies this data however you like, and returns it.
+
+Next, you pass all this info to C<dtag>:
+
+  $self->dtag( $text, "REPLACE", $subref );
+
+Note that the second argument, the name of the tag, does not include a
+leading angle bracket like it does for single tags.
+
+For completeness, here's the complete parser method:
+
+  sub parser_replace {
+    my $self = shift;
+    my $text = shift;
+    my $subref = sub {
+        my $params = shift;
+        my $data = shift;
+        my $pattern = $params->{'pattern'};
+        my $string  = $params->{'string'};
+        $data =~ s/$pattern/$string/g;
+		return $data;
+      };
+    $self->dtag( $text, "REPLACE", $subref );
+  }	
+
+B<Note:> Double tags support 1 level of nesting. This shouldn't affect how you
+build your custom tags, but you should note that the inner tag will always be
+parsed first.
+
+=head1 USING YOUR CUSTOM XPP TAGS
+
+Once you've created your custom tags, how do you use them?
+
+The Apache::XPP documentation already covers the subject of configuring Apache
+to use Apache::XPP. To use your custom tag, you must replace the line in your
+conf file that sets the XPP handler:
+
+  PerlHandler Apache::XPP
+
+to this:
+
+  PerlHandler My::XPP
+
+adjusting, of course, for whatever name you gave your Apache::XPP subclass.
+Restart your httpd, and from that point on things should function as normal,
+except you'll have new custom XPP tags at your disposal!
+
+=head1 SEE ALSO
+
+L<Apache::XPP::PreParse>
+
+=head1 AUTHORS
+
+Zack Hobson E<lt>zack@cnation.comE<gt> based on an original document by
+Doug Wiemer E<lt>dougw@cnation.comE<gt>.
+

@@ -1,0 +1,43 @@
+---
+abstract: 'A pre-edit file backup program'
+author:
+  - 'Duncan Ferguson <duncan_j_ferguson@yahoo.co.uk>'
+build_requires:
+  CPAN::Meta::Spec: '2.13338'
+  English: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Which: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  Module::Build: '0.42'
+  POSIX: '0'
+  Pod::Usage: '0'
+  Test::More: '0.94'
+  Test::Trap: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-bk
+provides:
+  App::bk:
+    file: lib/App/bk.pm
+    version: '0.06'
+requires:
+  English: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Which: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  POSIX: '0'
+  Pod::Usage: '0'
+resources:
+  homepage: https://github.com/duncs/perl-app-bk
+  license: http://dev.perl.org/licenses/
+version: '0.06'

@@ -1,0 +1,155 @@
+2014-06-15  Boyd Duffee <b dot duffee at keele dot ac dot uk>
+
+	* cleaned test suite and advanced version to v1.26
+
+2013-08-06  Boyd Duffee <b dot duffee at keele dot ac dot uk>
+
+	* re-vamped the Test Suite
+		- changed all tests to use Test::More
+		- uses is_deeply() to test array values 
+		- added 00-load.t and moved the load module tests
+		- added 01-lwp.t for the User Agent specific code
+		- tests add [Test Suite hh:mm:ss] to their UserAgent strings
+		- added sleep before subsequent calls to ADS to ease burden on remote server
+		- general de-cluttering, moving print statements to diag()
+
+	* Query.pm
+		- removed explicit return undef statements for failure, as per
+			Perl Best Practices, p199
+		- agent() can now add information to the UserAgent string
+
+	* Paper.pm
+		- removed explicit return undef statements for failure, as per
+			Perl Best Practices, p199
+
+	* Updated all modules to version 1.25, just for consistancy
+		(except where it isn't)
+
+2011-07-11  Boyd Duffee <b dot duffee at isc dot keele dot ac dot uk>
+
+	* Query.pm
+		- applied same fix as #35645 to the followup queries
+		- improved error reporting on HTTP::Request to include URL 
+			and HTTP_PROXY in output
+		- changed URL to access a new class attribute, accessible via the 
+			ads_mirror class method
+
+	* added and updated tests and released as v1.21.0
+
+2010-02-10  Boyd Duffee <b dot duffee at isc dot keele dot ac dot uk>
+
+	* Fixed bugs in Query.pm: 
+		- #35645 filed at rt.cpan.org (Ampersands);
+		- last line missing from data fetch (while condition tested 
+			in wrong order)
+
+	* updated tests to reflect current ADS values and test for bug #35645
+
+2003-07-15  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * ADS.pm: Introduced a placeholder class to get round a documentation
+          bug on search.cpan.org.
+
+        * Fixed MANIFEST problems and released as v1.20.7
+                  
+2003-07-02  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Removed some tests from t/*.t since the things they were based
+          on kept changing and I had to update the module every time. The
+          test quite is now somewhat uncomplete. This is not good. 
+          
+2002-09-23  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Fixed a bug which meant that that followup
+	  queries no longer worked with the new interface.
+
+2002-09-03  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Modified query string to reflect changes in
+          the ADS interface, if you wondered where the Journal strings
+          went this should fix it. Fixed handling of 500 errors as these
+          are now returned under some circumstances by ADS when no results 
+          are found.
+          
+        * t/paper.t: Fixed tests, same problem.  
+
+2002-05-30  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * t/paper.t: Minor bugfix to test harness.
+        
+2002-01-10  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Added method to allow you to decide wether only
+          refereed, non-refereed or all bibiliographic sources are queried.
+       
+2002-01-09  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Added start & end year/month options to the
+          query module so that the time over which the query can be made
+          can be specified.
+           
+2001-12-03  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Added conditional test to see if $base_url is
+          defined before setting it in the method.
+          
+2001-11-13  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* adsquery.PL: Turn adsquery.pl into a "proper" executable
+
+2001-11-14  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Added user agent tag to module and allowed the user
+          to specify an alternative URL for the closest ADS server to them
+          
+        * Makefile.PL: Added Net::Domain to the default build requirements,
+          needed for the user agent tag  
+
+2001-11-10  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* Result/Paper/Paper.pm (summary): Deal with undefined values
+
+	* adsquery.pl: Add --bibcode
+
+	* Result/Result.pm (summary): Fix -w warning
+
+2001-11-10  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Added bibcode() method and associated 
+          $self->{OPTIONS} hash entry as requested by Tim.
+
+2001-11-07  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* Result/Result.pm (summary): Add summary and stringify
+
+	* Result/Paper/Paper.pm (summary): Add summary and stringify
+
+	* adsquery.pl: Add first stab at adsquery command line
+
+	* Result/Result.pm (papers): Add a papers method
+
+2001-11-07  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Added timeout() method
+
+2001-11-04  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Added proxy() method
+
+2001-11-02  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Pre-alpha release, not for general distribution.
+
+2001-11-02  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Now parses ADS successfully in all tested cases, can carry out
+          a limited selection of followup queries on the results.
+
+2001-10-31  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Minimum functionality implemented,  no parsing of ADS query 
+          into Results object
+
+2001-10-30  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Original version

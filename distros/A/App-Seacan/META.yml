@@ -1,0 +1,42 @@
+---
+abstract: 'A tool to prepare a self-contained app directory.'
+author:
+  - 'Kang-min Liu C<< <gugod@gugod.org> >>.'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Seacan
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Seacan:
+    file: lib/App/Seacan.pm
+    version: v0.1.0
+requires:
+  Mo: '0'
+  TOML: '0'
+resources:
+  bugtracker: https://github.com/gugod/Seacan/issues
+  homepage: https://github.com/gugod/Seacan
+  repository: git://github.com/gugod/Seacan.git
+version: 0.1.0
+x_authority: cpan:GUGOD
+x_contributors:
+  - 'nxadm <pub.claudio@gmail.com>'
+  - 'Mickey Nasriachi <mickey@cpan.org>'
+  - 'Kang-min Liu <gugod@users.noreply.github.com>'
+  - 'Kang-min Liu <gugod@gugod.org>'

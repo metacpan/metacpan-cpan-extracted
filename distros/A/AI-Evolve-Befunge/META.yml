@@ -1,0 +1,56 @@
+---
+name: AI-Evolve-Befunge
+version: 0.03
+author:
+  - 'Mark Glines <mark@glines.org>'
+abstract: practical evolution of Befunge AI programs
+license: artistic_2
+resources:
+  license: ~
+requires:
+  Algorithm::Evolutionary::Wheel: 0
+  Class::Accessor::Fast: 0
+  LWP::UserAgent: 0
+  Language::Befunge: 4.10
+  Language::Befunge::Storage::Generic::Vec::XS: 0.02
+  Language::Befunge::Vector::XS: 1.1.0
+  Parallel::Iterator: 0
+  Perl6::Export::Attrs: 0
+  Task::Weaken: 0
+  Test::Exception: 0
+  Test::MockRandom: 0
+  Test::Output: 0
+  UNIVERSAL::require: 0
+  YAML: 0
+  aliased: 0
+  perl: 5.10.0
+provides:
+  AI::Evolve::Befunge:
+    file: lib/AI/Evolve/Befunge.pm
+    version: 0.03
+  AI::Evolve::Befunge::Blueprint:
+    file: lib/AI/Evolve/Befunge/Blueprint.pm
+  AI::Evolve::Befunge::Board:
+    file: lib/AI/Evolve/Befunge/Board.pm
+  AI::Evolve::Befunge::Critter:
+    file: lib/AI/Evolve/Befunge/Critter.pm
+  AI::Evolve::Befunge::Critter::Result:
+    file: lib/AI/Evolve/Befunge/Critter/Result.pm
+  AI::Evolve::Befunge::Migrator:
+    file: lib/AI/Evolve/Befunge/Migrator.pm
+  AI::Evolve::Befunge::Physics:
+    file: lib/AI/Evolve/Befunge/Physics.pm
+  AI::Evolve::Befunge::Physics::othello:
+    file: lib/AI/Evolve/Befunge/Physics/othello.pm
+  AI::Evolve::Befunge::Physics::ttt:
+    file: lib/AI/Evolve/Befunge/Physics/ttt.pm
+  AI::Evolve::Befunge::Population:
+    file: lib/AI/Evolve/Befunge/Population.pm
+  AI::Evolve::Befunge::Util:
+    file: lib/AI/Evolve/Befunge/Util.pm
+  AI::Evolve::Befunge::Util::Config:
+    file: lib/AI/Evolve/Befunge/Util/Config.pm
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+onetwo='.{1,2}'
+re="$1"
+re="${re//[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]/.}"
+re="${re//ue/$onetwo}"
+re="${re//ae/$onetwo}"
+re="${re//oe/$onetwo}"
+re="${re//ss/$onetwo}"
+
+# have to use perl for grepping because of umlauts
+
+lynx -dump -nolist  'http://dict.leo.org/'$2$3'?lp='$2$3'&lang='$2'&searchLoc=0&cmpType=strict&sectHdr=on&spellToler=on&search='$1'&relink=on' | perl -n -e "print if /$re/i;"

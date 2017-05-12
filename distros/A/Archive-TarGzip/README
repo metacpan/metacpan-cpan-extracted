@@ -1,0 +1,672 @@
+NAME
+    Archive::TarGzip - save and restore files to and from compressed tape
+    archives (tar)
+
+SYNOPSIS
+     ######
+     # Subroutine Interface
+     #  
+     use Archive::TarGzip qw(parse_header tar untar);
+
+     $tar_file = tar(@file, \@options);
+     $tar_file = tar(@file);
+
+     $success = untar(@file);
+     $success = untar(@file, \@options);
+
+     \%tar_header = parse_header($buffer);
+
+     ######
+     # File subroutines
+     # 
+     use Archive::TarGzip;
+
+     tie *TAR_FILEHANDLE, 'Tie::Layers'
+     tie *TAR_FILEHANDLE, 'Tie::Layers', @options
+
+     $success = open(TAR_FILEHANDLE, $tar_file);
+     $success = open(TAR_FILEHANDLE, $mode, $tar_file);
+
+     $success = print TAR_FILEHANDLE $file_name; 
+     $success = print TAR_FILEHANDLE $file_name, $file_contents;
+
+     \%tar_header = <TAR_FILEHANDLE>;
+
+     $success = close(TAR_FILEHANDLE);
+
+     ######
+     # Object 
+     # 
+     tie *TAR_FILEHANDLE, 'Tie::Layers';
+     tie *TAR_FILEHANDLE, 'Tie::Layers', @options;
+
+     $tar = tied \*TAR_FILEHANDLE; 
+     $tar = new Archive::TarGzip( ); 
+     $tar = new Archive::TarGzip(@options); 
+
+     $success = $tar->OPEN( $tar_file, \@options);
+     $success = $tar->OPEN( $mode, $tar_file, \@options);
+
+     $success = $tar->PRINT($file_name);
+     $success = $tar->PRINT($file_name, $file_contents);
+
+     \%tar_header = $tar->READLINE(\@options);
+     \%tar_header = $tar->READLINE(@file, \@options);
+
+     $status = $tar->target( \$buffer, $size);
+     $success = $tar->CLOSE();
+
+DESCRIPTION
+    The "Archive::TarGzip" module provides "tar" subroutine to archive a
+    list of files in an archive file in the tar format. The archive file may
+    be optionally compressed using the gzip compression routines. The
+    "Archive::TarGzip" module also provides a "untar" subroutine that can
+    extract the files from the tar or tar/gzip archive files. The "tar" and
+    "untar" top level subroutines use methods from the "Archive::TarGzip"
+    class.
+
+    The "Archive::TarGzip" class has many similarities to the very mature
+    Archive::Tar class being at least three years older. The newer
+    "Archive::TarGzip" relied very heavy on the work of the author of the
+    Archive::Tar and in many instance the Archive::Tar is a better solution.
+
+    Altough the underlying tar file format is the same and similar code is
+    used to access the data in the underlying tar files, the interace
+    bewteen the two are completely different. The "Archive::TarGzip" is
+    built on a Tie File Handle type interface. The nthe "Archive::TarGzip"
+    provide means to access individual files within the archive file without
+    bringing the entire archive file into memory. When the gzip compression
+    option is active, the compression is performed on the fly without
+    creating an intermediate uncompressed tar file.
+
+METHODS
+  tar
+
+     $tar_file = Archive::TarGzip->tar(@file, [\%options or\@options]);
+     $tar_file = tar(@file, [\%options or\@options]); # only if imported
+
+    The tar subroutine creates a tar archive file containing the files in
+    the @file list. The name of the file is $option{tar_file}. The tar
+    subroutine will enforce that the $option{tar_file} has the .tar or
+    .tar.gz extensions (uses the $option{compress} to determine which one).
+
+    The tar subroutine will add directories to the @file list in the correct
+    order needed to create the directories so that they will be available to
+    extract the @files files from the tar archive file.
+
+    If the $option{src_dir} is present, the tar subroutine will change to
+    the $option{src_dir} before reading the @file list. The subroutine will
+    restore the original directory after processing.
+
+    If the $option{dest_dir} is present, the tar subroutine will add the
+    $option{dest_dir} to each of the files in the @file list. The
+    $options{dest_dir} name is only used for the name stored in the tar
+    archive file and not to access the files from the site storage.
+
+  untar
+
+     $success = Archive::TarGzip->untar([@file], \%options or\@options or @options);
+     $success = untar([@file], \%options or\@options or @options); # only if imported
+
+    The untar subroutine extracts directories and files from a tar archive
+    file. The untar subroutine does not assume that the directories are
+    stored in the correct order so that they will be present as needed to
+    create the files.
+
+    The name of the file is $option{tar_file}. If tar subroutine that cannot
+    find the $option{tar_file}, it will look for file with the .tar or
+    .tar.gz extension (uses the $option{compress} to determine which one).
+
+    If the $option{dest_dir} is present, the tar subroutine will change to
+    the $option{dest_dir} before extracting the files from the tar archive
+    file. The subroutine will restore the original directory after
+    processing.
+
+    If the @file list is present or the @{$option{extract_file}} list is
+    present, the untar subroutine will extract only the files in these
+    lists.
+
+    If the @{$option{exclude_file}} list is present, the untar subroutine
+    will not extract files in this list.
+
+  new
+
+     $tar = new Archive::TarGzip( );
+     $tar = new Archive::TarGzip( $filename or filehandle, [$compress]);
+
+     $tar = new Archive::TarGzip( \%options or\@options);
+
+    The new method creates a new tar object. The Archive::TarGzip::new
+    method is the only methods that hides a Archive::Tar method with the
+    same name.
+
+    The new method passes $filename and $compress inputs to the
+    Archive::Tar::new method which will read the entire tar archive file
+    into memory.
+
+    The new method with the $filename is better when using only the
+    Archive::TarGzip methods.
+
+  OPEN
+
+     $tar_handle = $tar->taropen( $tar_file, $compress, [\%options or\@options]);
+
+    The taropen method opens a $tar_file without bringing any of the files
+    into memory.
+
+    If $options{tar_flag} is '>', the taropen method creats a new $tar_file;
+    otherwise, it opens the $tar_file for reading.
+
+  PRINT
+
+     $success = $tar->taradd($file_name, $file_contents);
+
+    The taradd method appends $file_contents using the name $file_name to
+    the end of the tar archive file taropen for writing. If $file_contents
+    is undefined, the taradd method will use the contents from the file
+    $file_name.
+
+    The tarwrite method will remove the first file in the Archive::Tar
+    memory and append it to the end of the tar archive file taropen for
+    writing.
+
+    The tarwrite method uses the $option{compress} to decide whether use
+    gzip compress or normal writing of the tar archive file.
+
+  READLINE
+
+     \%tar_header = $tar->tarread(@file, [\%options or\@options]);
+     \%tar_header = $tar->tarread(\%options or\@options);
+
+    The tarread method reads the next file from the tar archive file taropen
+    for reading. The tar file header and file contents are returned in the
+    %tar_header hash along with other information needed for processing by
+    the Archive::Tar and Archive::TarGzip classes.
+
+    If the $option{header_only} exists the tarread method skips the file
+    contents and it is not return in the %tar_header.
+
+    If either the @file or the @{$option{extract_files}} list is present,
+    the tarread method will check to see if the file is in either of these
+    lists. If the file name is not in the @files list or the
+    @{$option{extract_files}} list, the tarread method will set the
+    $tar_header{skip_file} key and all other %tar_header keys are
+    indetermined.
+
+    If the @{$option{exclude_files}} list is present, the tarread method
+    will check to see if the file is in this list. If the file name is in
+    the list, the tarread method will set the $tar_header{skip_file} key and
+    all other %tar_header keys are indetermined.
+
+    If the tarread method reaches the end of the tar archive file, it will
+    set the $tar_header{end_of_tar} key and all other %tar_header keys are
+    indermeined.
+
+    The $tar_header keys are as follows:
+
+     name
+     mode
+     uid
+     gid
+     size
+     mtime
+     chksum
+     typeflag
+     linkname
+     magic
+     version
+     uname
+     gname
+     devmajor
+     devminor
+     prefix
+     error
+     end_of_tar
+     header_only
+     skip_file
+     data
+     file_position
+
+  target
+
+     $status = $tar->target( \$buffer, $size);
+
+    The target method gets bytes in 512 byte chunks from the tar archive
+    file taropen for reading. If \$buffer is undefined, the target method
+    skips over the $size bytes and any additional bytes to pad out to 512
+    byte boundaries.
+
+    The target method uses the $option{compress} to decide whether use gzip
+    uncompress or normal reading of the tar archive file.
+
+  CLOSE
+
+     $success = $tar->CLOSE( );
+
+    This closes the tar archive opened by the OPEN subroutine.
+
+  parse_header
+
+     \%tar_header = Archive::TarGzip->parse_header($buffer) ;
+     \%tar_header = parse_header($buffer);  # only if imported
+
+    The "parse_header" subroutine takes the pack 512 byte tar file header
+    and parses it into a the "Archive::Tar" header hash with a few
+    additional hash keys. This is the return for the "READLINE" subroutine.
+
+REQUIREMENTS
+    Someday
+
+DEMONSTRATION
+     #########
+     # perl TarGzip.d
+     ###
+
+    ~~~~~~ Demonstration overview ~~~~~
+
+    The results from executing the Perl Code follow on the next lines as
+    comments. For example,
+
+     2 + 2
+     # 4
+
+    ~~~~~~ The demonstration follows ~~~~~
+
+         use File::Package;
+         use File::AnySpec;
+         use File::SmartNL;
+         use File::Spec;
+         use File::Path;
+
+         my $fp = 'File::Package';
+         my $snl = 'File::SmartNL';
+         my $uut = 'Archive::TarGzip'; # Unit Under Test
+         my $loaded;
+
+     ##################
+     # Load UUT
+     # 
+
+     my $errors = $fp->load_package($uut)
+     $errors
+
+     # ''
+     #
+          my @files = qw(
+              lib/Data/Str2Num.pm
+              lib/Docs/Site_SVD/Data_Str2Num.pm
+              Makefile.PL
+              MANIFEST
+              README
+              t/Data/Str2Num.d
+              t/Data/Str2Num.pm
+              t/Data/Str2Num.t
+          );
+          my $file;
+          foreach $file (@files) {
+              $file = File::AnySpec->fspec2os( 'Unix', $file );
+          }
+          my $src_dir = File::Spec->catdir('TarGzip', 'expected');
+
+         unlink 'TarGzip.tar.gz';
+         rmtree (File::Spec->catfile('TarGzip', 'Data-Str2Num-0.02'));
+
+     ##################
+     # tar files into compressed archive
+     # 
+
+     Archive::TarGzip->tar( @files, {tar_file => 'TarGzip.tar.gz', src_dir  => $src_dir,
+                 dest_dir => 'Data-Str2Num-0.02', compress => 1} )
+
+     # 'TarGzip.tar.gz'
+     #
+
+     ##################
+     # Untar compressed archive
+     # 
+
+     Archive::TarGzip->untar( {dest_dir=>'TarGzip', tar_file=>'TarGzip.tar.gz', compress => 1, umask => 0} )
+
+     # 1
+     #
+     $snl->fin(File::Spec->catfile('TarGzip', 'Data-Str2Num-0.02', 'MANIFEST'))
+
+     # 'lib/Docs/Site_SVD/Data_Str2Num.pm
+     #MANIFEST
+     #Makefile.PL
+     #README
+     #lib/Data/Str2Num.pm
+     #t/Data/Str2Num.d
+     #t/Data/Str2Num.pm
+     #t/Data/Str2Num.t'
+     #
+     $snl->fin(File::Spec->catfile('TarGzip', 'expected', 'MANIFEST'))
+
+     # 'lib/Docs/Site_SVD/Data_Str2Num.pm
+     #MANIFEST
+     #Makefile.PL
+     #README
+     #lib/Data/Str2Num.pm
+     #t/Data/Str2Num.d
+     #t/Data/Str2Num.pm
+     #t/Data/Str2Num.t'
+     #
+
+QUALITY ASSURANCE
+    Running the test script "TarGzip.t" verifies the requirements for this
+    module. The "tmake.pl" cover script for Test::STDmaker automatically
+    generated the "TarGzip.t" test script, "TarGzip.d" demo script, and
+    "t::Archive::TarGzip" Software Test Description (STD) program module
+    POD, from the "t::Archive::TarGzip" program module contents. The
+    "tmake.pl" cover script automatically ran the "TarGzip.d" demo script
+    and inserted the results into the 'DEMONSTRATION' section above. The
+    "t::Tie::TarGzip" program module is in the distribution file
+    Archive-TarGzip-$VERSION.tar.gz. =head1 NOTES
+
+  Author
+
+    The holder of the copyright and maintainer is
+
+    < support@SoftwareDiamonds.com >
+
+  Copyright Notice
+
+    Copyrighted (c) 2002 Software Diamonds
+
+    All Rights Reserved
+
+  Binding Requirements Notice
+
+    Binding requirements are indexed with the
+
+    pharse 'shall[dd]' where dd is an unique number for each header section.
+    This conforms to standard federal government practices, 490A 3.2.3.6. In
+    accordance with the License for 'Tie::Gzip', Software Diamonds is not
+    liable for meeting any requirement, binding or otherwise.
+
+  License
+
+    Software Diamonds permits the redistribution and use in source and
+    binary forms, with or without modification, provided that the following
+    conditions are met:
+
+    1   Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+
+    2   Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    3   Commercial installation of the binary or source must visually
+        present to the installer the above copyright notice, this list of
+        conditions intact, that the original source is available at
+        http://softwarediamonds.com and provide means for the installer to
+        actively accept the list of conditions; otherwise, a license fee
+        must be paid to Softwareware Diamonds.
+
+    SOFTWARE DIAMONDS, http://www.softwarediamonds.com, PROVIDES THIS
+    SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+    NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+    FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL SOFTWARE
+    DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+    TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF NEGLIGENCE OR OTHERWISE) ARISING IN
+    ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SEE ALSO
+    Docs::Site_SVD::Archive_TarGzip
+    Test::STDmaker
+    Archive::Tar
+NAME
+    Docs::Site_SVD::Archive_TarGzip - tar and gzip or untar and gunzip with
+    a small memory footprint
+
+Title Page
+     Software Version Description
+
+     for
+
+     Docs::Site_SVD::Archive_TarGzip - tar and gzip or untar and gunzip with a small memory footprint
+
+     Revision: B
+
+     Version: 0.03
+
+     Date: 2004/05/14
+
+     Prepared for: General Public 
+
+     Prepared by:  SoftwareDiamonds.com E<lt>support@SoftwareDiamonds.comE<gt>
+
+     Copyright: copyright © 2003 Software Diamonds
+
+     Classification: NONE
+
+1.0 SCOPE
+    This paragraph identifies and provides an overview of the released
+    files.
+
+  1.1 Identification
+
+    This release, identified in 3.2, is a collection of Perl modules that
+    extend the capabilities of the Perl language.
+
+  1.2 System overview
+
+    The Archive::TarGzip module provides tar subroutine to archive a list of
+    files in an archive file in the tar format. The archve file may be
+    optionally compressed using the gzip compression routines. The
+    ARchive::TarGzip module also provides a untar subroutine that can
+    extract the files from the tar or tar/gzip archive files.
+
+    The tar and untar top level subroutines use methods from the
+    Archive::TarGzip class. The Archive::TarGzip class is dervided from its
+    parent Archive::Tar class. The new methods supplied with the
+    Archive::TarGzip derived class provide means to access individual files
+    within the archive file without bringing the entire archive file into
+    memory. When the gzip compression option is active, the compression is
+    performed on the fly without creating an intermediate uncompressed tar
+    file. The new methods provide a smaller memory footprint that enhances
+    performance for very large archive files.
+
+  1.3 Document overview.
+
+    This document releases Archive::TarGzip version 0.03 providing a
+    description of the inventory, installation instructions and other
+    information necessary to utilize and track this release.
+
+3.0 VERSION DESCRIPTION
+    All file specifications in this SVD use the Unix operating system file
+    specification.
+
+  3.1 Inventory of materials released.
+
+    This document releases the file
+
+     Archive-TarGzip-0.03.tar.gz
+
+    found at the following repository(s):
+
+      http://www.softwarediamonds/packages/
+      http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+    Restrictions regarding duplication and license provisions are as
+    follows:
+
+    Copyright.
+        copyright © 2003 Software Diamonds
+
+    Copyright holder contact.
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+    License.
+        Software Diamonds permits the redistribution and use in source and
+        binary forms, with or without modification, provided that the
+        following conditions are met:
+
+        1   Redistributions of source code, modified or unmodified must
+            retain the above copyright notice, this list of conditions and
+            the following disclaimer.
+
+        2   Redistributions in binary form must reproduce the above
+            copyright notice, this list of conditions and the following
+            disclaimer in the documentation and/or other materials provided
+            with the distribution.
+
+        3   Commercial installation of the binary or source must visually
+            present to the installer the above copyright notice, this list
+            of conditions intact, that the original source is available at
+            http://softwarediamonds.com and provide means for the installer
+            to actively accept the list of conditions; otherwise, a license
+            fee must be paid to Softwareware Diamonds.
+
+        SOFTWARE DIAMONDS, http://www.SoftwareDiamonds.com, PROVIDES THIS
+        SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+        BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+        FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+        SOFTWARE DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+        SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+        LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+        USE,DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+        ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+        NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE POSSIBILITY
+        OF SUCH DAMAGE.
+
+  3.2 Inventory of software contents
+
+    The content of the released, compressed, archieve file, consists of the
+    following files:
+
+     file                                                         version date       comment
+     ------------------------------------------------------------ ------- ---------- ------------------------
+     lib/Docs/Site_SVD/Archive_TarGzip.pm                         0.03    2004/05/14 revised 0.02
+     MANIFEST                                                     0.03    2004/05/14 generated, replaces 0.02
+     Makefile.PL                                                  0.03    2004/05/14 generated, replaces 0.02
+     README                                                       0.03    2004/05/14 generated, replaces 0.02
+     lib/Archive/TarGzip.pm                                       0.03    2004/05/14 revised 0.02
+     t/Archive/TarGzip.d                                          0.03    2004/05/14 revised 0.02
+     t/Archive/TarGzip.pm                                         0.01    2003/09/12 unchanged
+     t/Archive/TarGzip.t                                          0.03    2004/05/14 revised 0.02
+     t/Archive/File/SmartNL.pm                                    1.16    2004/05/14 new
+     t/Archive/File/Package.pm                                    1.17    2004/05/14 new
+     t/Archive/Test/Tech.pm                                       1.25    2004/05/14 new
+     t/Archive/Data/Secs2.pm                                      1.23    2004/05/14 new
+     t/Archive/Data/SecsPack.pm                                   0.08    2004/05/14 new
+     t/Archive/Data/Startup.pm                                    0.06    2004/05/14 new
+     t/Archive/TarGzip/expected/Makefile.PL                       0.01    2003/08/04 unchanged
+     t/Archive/TarGzip/expected/MANIFEST                          0.01    2003/08/04 unchanged
+     t/Archive/TarGzip/expected/README                            0.01    2003/08/04 unchanged
+     t/Archive/TarGzip/expected/lib/Data/Str2Num.pm               0.01    2003/08/04 unchanged
+     t/Archive/TarGzip/expected/lib/Docs/Site_SVD/Data_Str2Num.pm 0.01    2003/08/04 unchanged
+     t/Archive/TarGzip/expected/t/Data/Str2Num.d                  0.01    2003/08/04 unchanged
+     t/Archive/TarGzip/expected/t/Data/Str2Num.pm                 0.01    2003/08/04 unchanged
+     t/Archive/TarGzip/expected/t/Data/Str2Num.t                  0.01    2003/08/04 unchanged
+
+  3.3 Changes
+
+    Changes are as follows
+
+    Archive::TarGzip-0.01
+        Originated
+
+    Archive::TarGzip-0.02
+        Outsource the gzip compression to Tie::Gzip.
+
+        Change the mode on tar directories from 666 to 777.
+
+    Archive::TarGzip-0.03
+        The lastest build of Test::STDmaker expects the test library in the
+        same directory as the test script. Coordiated with the lastest
+        Test::STDmaker by moving the test library from tlib to t/Archive,
+        the same directory as the test script and deleting the test library
+        File::TestPath program module.
+
+  3.4 Adaptation data.
+
+    This installation requires that the installation site has the Perl
+    programming language installed. There are no other additional
+    requirements or tailoring needed of configurations files, adaptation
+    data or other software needed for this installation particular to any
+    installation site.
+
+  3.5 Related documents.
+
+    There are no related documents needed for the installation and test of
+    this release.
+
+  3.6 Installation instructions.
+
+    Instructions for installation, installation tests and installation
+    support are as follows:
+
+    Installation Instructions.
+        To installed the release file, use the CPAN module pr PPM module in
+        the Perl release or the INSTALL.PL script at the following web site:
+
+         http://packages.SoftwareDiamonds.com
+
+        Follow the instructions for the the chosen installation software.
+
+        If all else fails, the file may be manually installed. Enter one of
+        the following repositories in a web browser:
+
+          http://www.softwarediamonds/packages/
+          http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+        Right click on 'Archive-TarGzip-0.03.tar.gz' and download to a
+        temporary installation directory. Enter the following where $make is
+        'nmake' for microsoft windows; otherwise 'make'.
+
+         gunzip Archive-TarGzip-0.03.tar.gz
+         tar -xf Archive-TarGzip-0.03.tar
+         perl Makefile.PL
+         $make test
+         $make install
+
+        On Microsoft operating system, nmake, tar, and gunzip must be in the
+        exeuction path. If tar and gunzip are not install, download and
+        install unxutils from
+
+         http://packages.softwarediamonds.com
+
+    Prerequistes.
+         'Tie::Gzip' => '0.01',
+         'File::AnySpec' => '1.11',
+         'Data::Startup' => '0.02',
+         'File::Package' => '0.00',
+         'File::Where' => '0.00',
+
+    Security, privacy, or safety precautions.
+        None.
+
+    Installation Tests.
+        Most Perl installation software will run the following test
+        script(s) as part of the installation:
+
+         t/Archive/TarGzip.t
+
+    Installation support.
+        If there are installation problems or questions with the
+        installation contact
+
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+  3.7 Possible problems and known errors
+
+    There are no known open issues.
+
+4.0 NOTES
+    The following are useful acronyms:
+
+    .d  extension for a Perl demo script file
+
+    .pm extension for a Perl Library Module
+
+    .t  extension for a Perl test script file
+
+2.0 SEE ALSO
+    Docs::US_DOD::SVD

@@ -1,0 +1,277 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Getopt::Long;
+use TAP::Parser;
+
+our $VERSION = "2.00";
+$|++;
+
+#  simple_report NAME <tap.output
+
+my($verbose, $status);
+GetOptions("verbose+" => \$verbose,
+           "status"   => \$status);
+
+my $test_name = shift || "UNNAMED_TEST";
+my $parser = TAP::Parser->new( { source => \*STDIN } );
+
+my %totals  = (
+                max       => undef,
+                seen      => 0,
+
+                ok        => 0,
+                todo      => 0,
+                skip      => 0,
+                bonus     => 0,
+                unplanned => 0, 
+
+                details   => {}
+               );
+
+my $current_test_count = 0;
+my $unplanned = 0;
+my $sharp = "# ";
+my $last_item;
+
+# Read and analyze input.
+TAP_LINE:
+  while( defined(my $item = $parser->next) ) {
+
+      # If this is a "Bail out!" just quit.
+      last if $item->is_bailout;
+
+      # Comments are assumed to "belong" to the last test seen.
+      if ($item->is_comment) {
+          next TAP_LINE if $item->as_string =~ /\A# Looks like /;
+          push @{ $totals{details}->{$current_test_count}->{lines} }, $item->as_string;
+          next TAP_LINE;
+      }
+
+      # Record the predicted max test number if this is a plan line.
+      # If this is a skip_all, then quit.
+      if ($item->is_plan and not defined $totals{plan}) {
+          last TAP_LINE if $item->has_skip;
+          # First test plan seen.
+          $totals{max} = $item->tests_planned;
+          next TAP_LINE;
+      }
+
+      # Should be a test; bump the test count by 1 if so.
+      if ($item->is_test) {
+          $current_test_count++, $totals{seen}++;
+          $totals{details}->{$current_test_count}->{item} = $item;
+      }
+
+      if ($item->is_actual_ok) {
+          $totals{ok}++;
+      }
+      if ($item->has_todo) {
+          $totals{todo}++;
+          $totals{ok}++, $totals{bonus}++ if $item->todo_passed;
+      }
+      $totals{skip}++  if $item->has_skip;
+
+      if ($status and not defined $totals{max} ) {
+          $unplanned++;
+          print "$sharp.";
+          $sharp = '';
+      }
+      elsif ($status) {
+          printf STDERR "$sharp %2.1d%% complete\n", ($totals{seen}*1.0/$totals{max})*100;
+      }
+  }
+print "\n" if $unplanned;
+
+
+# Print summary
+print "$test_name: tests=$totals{seen}, ",
+                  "ok=$totals{ok}, ",
+                  "failed=@{[$totals{seen}-$totals{ok}]}, ",
+                  "skipped=$totals{skip}, ",
+                  "todo=$totals{todo}";
+print $totals{bonus} 
+        ? " ($totals{bonus} UNEXPECTEDLY SUCCEEDED)" 
+        : "";
+print $totals{unplanned}
+        ? " ($totals{unplanned} UNPLANNED)"
+        : "";
+print "\n";
+
+if ($status) {
+   print STDERR "$sharp $test_name: tests=$totals{seen}, ok=$totals{ok}, failed=@{[$totals{seen}-$totals{ok}]}, skipped=$totals{skip}, todo=$totals{todo}";
+   print STDERR $totals{bonus} ? " ($totals{bonus} UNEXPECTEDLY SUCCEEDED)" : "";
+   print STDERR $totals{unplanned} ? " ($totals{unplanned} UNPLANNED)" : "";
+   print STDERR "\n";
+   
+}
+
+# Print details if requested
+if ($verbose) {
+  for my $test_number (sort keys %{ $totals{details} }) {
+        my $item = $totals{details}->{$test_number}->{item};
+        my $lines = $totals{details}->{$test_number}->{lines};
+        (my $description = $item->description) =~ s/\A-\s+//;
+
+        if ($item->has_todo and $item->todo_passed) {
+            printf "T %d %s\n",$test_number, $description;
+            verbose_details($lines);
+        }
+        elsif (not $item->is_ok and not $item->has_todo) {
+            printf "F %d %s\n", $test_number, $description;
+            verbose_details($lines);
+        }
+    }
+}
+
+sub verbose_details {
+    my $lines = shift;
+    # Print detailed details (diags) if requested
+    if ($verbose > 1) {
+        # Super-verbose - all diags will be there, including snapshot
+        print  map {"$_\n"} @$lines;
+    }
+    else {
+        # Plain verbose - snapshots only (if any)
+        snapshot($lines);
+    }
+}
+
+sub snapshot {
+  my($lines) = shift;
+  print map { "$_\n" } grep { /^(See snapshot.*\z)/sm } @{ $lines };
+
+}
+
+__END__
+
+=head1 NAME
+
+simple_report - Ultra-compact TAP summary
+
+=head1 SYNOPSIS
+
+  # For a one-line summary:
+  % simple_scan <ss.in 2>&1 | simple_report MyLabel
+  MyLabel: tests=9, ok=8, failed=1, skipped=1, todo=2 (1 UNEXPECTEDLY SUCCEEDED)
+
+  # For the summary plus a one-line comment for failed 
+  # tests and unexpectedly-suceeding TODO tests:
+  % simple_scan <ss.in 2>&1 | simple_report -v MyLabel
+  MyLabel: tests=9, ok=8, failed=1, skipped=1, todo=2 (1 UNEXPECTEDLY SUCCEEDED)
+  F 7 Broken test
+  T 9 unexpected success
+
+  # For the summary plus one-line comment plus diagnostics:
+  % simple_scan <ss.in 2>&1 | simple_report -v -v MyLabel
+  MyLabel: tests=9, ok=8, failed=1, skipped=1, todo=2 (1 UNEXPECTEDLY SUCCEEDED)
+  F 7 Deliberately broken test (zorch) [http://zorch.mysite.com/] [/fnord/ should match]
+  #   Failed test 'Deliberately broken test (zorch) [http://zorch.mysite.com] [/fnord/ should match]'
+  #   in /home/y/lib/perl5/site_perl/5.6.1/Test/WWW/Simple.pm at line 65.
+  #          got: "<!doctype html public "-//W3C//DTD HTML 4.01//EN" "...
+  #       length: 37943
+  #     doesn't match '(?-xism:fnord)'
+  T 9 unexpected success (glonk) [http://glonk.mysite.com/] [/sproing/ should match]
+
+
+=head1 DESCRIPTION
+
+Raw TAP output is often lengthy, making it difficult to spot tests that have failed.
+C<simple_report> is a TAP filter: it reads TAP output from its standard input, and
+creates a compact report as to
+
+=over 4
+
+=item * number of tests run
+
+=item * number of tests passed
+
+=item * number of tests failed
+
+=item * number of tests skipped
+
+=item * number of TODO tests (and number unexpectedly passing, if any)
+
+=back
+
+If you want to see the test comments from the tests which failed, add C<--verbose>
+(or C<-v> for the lazy) to get a one-line printout of the failing (and 
+unexpectedly-succeeding) tests as well.
+
+If you want to see all of the diag messages as well, specify C<-v -v> (that's
+I<two> C<--verbose> options). 
+
+If you've installed C<WWW::Mechanize::Plugin::Snapshot> and snapshots were 
+taken, a one-line diag will be printed showing you where the snapshot was 
+stored.
+
+If you're running simple_report as part of a pipe from simple_scan, you may
+want to use the C<-s> option. This outputs a status message each time another
+test runs, culminating in the standard reports that simple_report outputs. 
+The status messages all begin with '# ', so they're easy to filter out of
+your final output if you only want the report output.
+
+=head1 INTERFACE
+
+See the C<DESCRIPTION> section.
+
+=head1 DIAGNOSTICS
+
+If you do not specify a test name as the first argument, C<UNNAMED_TEST>
+is assumed.
+
+Output will indicate no tests were run if the input is not valid TAP:
+
+  > perldoc simple_report | simple_report
+  UNNAMED_TEST: tests=0, ok=0, failed=0, skipped=0, todo=0
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+No config files or environment variables used.
+
+=head1 DEPENDENCIES
+
+Test::Harness, simple_scan 
+
+=head1 INCOMPATIBILITIES
+
+None known.
+
+=head1 BUGS AND LIMITATIONS
+
+None reported.
+
+=head1 AUTHOR
+
+Joe McMahon C<< <mcmahon@yahoo-inc.com> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2005, Yahoo! and Joe McMahon. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CON-
+SEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFT-
+WARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
+INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF
+THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER
+OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+

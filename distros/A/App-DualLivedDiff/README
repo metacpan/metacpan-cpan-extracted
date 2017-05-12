@@ -1,0 +1,68 @@
+NAME
+    App::DualLivedDiff - Diff between the perl core and dual-lived modules'
+    CPAN distributions
+
+SYNOPSIS
+    Example: Filter::Simple.
+
+    Given a simple YAML file .dualLivedDiffConfig in the current working
+    directory or the Filter::Simple CPAN distribution:
+
+      ---
+      exclude-regexes:
+        - ^(?:\./)?MANIFEST$
+        - ^(?:\./)?META.yml$
+      files:
+        lib/Filter/Simple.pm: lib/Filter/Simple.pm
+        Changes: lib/Filter/Simple/Changes
+      dirs-flat:
+        t/: lib/Filter/Simple/t/
+      dirs-recursive:
+        t/lib/Filter/Simple/: t/lib/Filter/Simple/
+
+    By running the following command, you can get the diff between your
+    blead perl checkout and the CPAN distribution:
+
+      dualLivedDiff --dual http://search.cpan.org/CPAN/authors/id/S/SM/SMUELLER/Filter-Simple-0.84.tar.gz --blead $HOME/perl-ssh
+
+    Or this if you have CPAN.pm configured:
+
+      dualLivedDiff --dual SMUELLER/Filter-Simple-0.84.tar.gz --blead $HOME/perl-ssh
+
+    Or this if you want to search for a given module name:
+
+      dualLivedDiff --dual Filter::Simple --blead $HOME/perl-ssh
+
+    You can use the "base-path-in-blead" option in the YAML config file to
+    set a base path within the blead-perl checkout. Example of the
+    configuration for the Attribute::Handlers dual-lived module/distribution
+    which lives entirely within ext/Attribute-Handlers:
+
+      ---
+      base-path-in-blead: ext/Attribute-Handlers
+      files:
+        Changes: Changes
+        README: README
+      dirs-recursive:
+        lib/: lib/
+        t/: t/
+        demo/: demo/
+
+    Run the "dualLivedDiff" program to get an overview of the command line
+    options.
+
+DESCRIPTION
+    Very early version of a tool to automatically generate diffs/patches
+    between CPAN distributions of dual lived Perl modules and the perl core.
+    The code isn't beautiful. It's a hack.
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8 or, at your
+    option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,321 @@
+
+=head1 NAME
+
+Async::Selector::Example::Mojo - Example of using Async::Selector for real-time Web
+
+=head1 SYNOPSIS
+
+This example shows how L<Async::Selector> can be used to build a
+so-called real-time Web application. An L<Async::Selector> object is
+attached to a piece of resource, and its events are published via both
+Comet (long-polling) and WebSocket. This example uses
+L<Mojolicious::Lite> for a Web application framework because of its
+great support for real-time Web. However you can use
+L<Async::Selector> with any framework that supports real-time transaction
+somehow.
+
+
+=head1 CODE
+
+The code is available as C<eg/mojo.pl> in the L<Async::Selector> distribution package.
+
+
+    #!/usr/bin/env perl
+    use strict;
+    use warnings;
+    use Mojolicious::Lite;
+    use Mojo::IOLoop;
+    use Async::Selector;
+    use constant {
+        UPDATE_RATE => 1,
+        RESOURCE_LENGTH => 1024,
+    };
+    
+    sub randomData {
+        return pack("C*", map { int(rand(0x7E - 0x21)) + 0x21 } 1..RESOURCE_LENGTH);
+    }
+    
+    my $selector;
+    
+    {
+        ################## Resource part: Setup resource and selector
+        $selector = Async::Selector->new();
+        my $resource = randomData;
+        my $sequence = 1;
+    
+        $selector->register(res => sub {
+            my ($given_sequence) = @_;
+            return ($sequence > $given_sequence)
+                ? {resource => $resource, sequence => $sequence} : undef;
+        });
+    
+        ## Update the resource periodically
+        Mojo::IOLoop->recurring(1/UPDATE_RATE, sub {
+            $resource = randomData;
+            $sequence++;
+            $selector->trigger('res');
+        });
+    }
+    
+    {
+        ################## HTTP part: Setup HTTP frontend
+        get '/' => sub {
+            my $self = shift;
+            $self->render('index');
+        };
+    
+        get '/comet' => sub {
+            my $self = shift;
+            my $client_sequence = $self->param('seq');
+            my $watcher = $selector->watch(res => $client_sequence, sub {
+                my ($w, %resources) = @_;
+                my ($resource, $sequence)
+                    = ($resources{res}{resource}, $resources{res}{sequence});
+                $self->render_data("$sequence $resource");
+                $w->cancel();
+            });
+            $self->on(finish => sub {
+                $watcher->cancel();
+            });
+        };
+    
+        websocket '/websocket' => sub {
+            my $self = shift;
+            Mojo::IOLoop->stream($self->tx->connection)->timeout(0);
+            my $watcher = $selector->watch(res => 0, sub {
+                my ($w, %resources) = @_;
+                my ($resource, $sequence)
+                    = ($resources{res}{resource}, $resources{res}{sequence});
+                $self->send("$sequence $resource");
+            });
+            $self->on(finish => sub {
+                $watcher->cancel();
+            });
+        };
+    
+        app->start;
+    }
+    
+    
+    __DATA__
+    @@ index.html.ep
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Async::Selector test</title>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script><!--
+    $(function() {
+        var RECONNECT_BACKOFF = 2000;
+        // Setup Comet (long-polling)
+        var my_sequence = 0;
+        var sendCometRequest = function() {
+            $.get("<%= url_for('comet') %>?seq=" + my_sequence)
+                .done(function(data) {
+                    data = data.split(" ");
+                    my_sequence = data[0];
+                    $('#comet_sequence').text(data[0]);
+                    $('#comet_resource').text(data[1]);
+                    sendCometRequest();
+                })
+                .fail(function() {
+                    setTimeout(sendCometRequest, RECONNECT_BACKOFF);
+                });
+        };
+        sendCometRequest();
+    
+        // Setup WebSocket
+        var connectWebsocket = function() {
+            var ws = new WebSocket("<%= url_for('websocket')->to_abs %>");
+            ws.onmessage = function(event) {
+                var data = event.data.split(" ");
+                $('#websocket_sequence').text(data[0]);
+                $('#websocket_resource').text(data[1]);
+            };
+            ws.onclose = function() {
+                setTimeout(connectWebsocket, RECONNECT_BACKOFF);
+            };
+        };
+        connectWebsocket();
+    });
+    //--></script>
+      </head>
+      <body>
+        <div>
+          <h1>Comet (long-polling)</h1>
+          <p>Sequence number: <span id="comet_sequence"></span></p>
+          <textarea id="comet_resource" rows="10" cols="100" readonly="true"></textarea>
+        </div>
+        <div>
+          <h1>WebSocket</h1>
+          <p>Sequence number: <span id="websocket_sequence"></span></p>
+          <textarea id="websocket_resource" rows="10" cols="100" readonly="true"></textarea>
+        </div>
+      </body>
+    </html>
+
+
+
+=head1 USAGE
+
+=over
+
+=item 1.
+
+Install L<Async::Selector> and L<Mojolicious>.
+
+=item 2.
+
+Save the code as C<mojo.pl> for example.
+
+=item 3.
+
+Run C<mojo.pl>.
+
+    $ perl mojo.pl daemon
+
+
+=item 4.
+
+Access C<http://localhost:3000/> from Web browsers.
+
+=item 5.
+
+You will see two random sequences of characters displayed in textareas,
+both of which represent the same resource.
+
+One of the two sequences is updated periodically using Comet (long-polling),
+while the other using WebSocket.
+
+=back
+
+
+=head1 DESCRIPTION
+
+The code above consists of three parts, the resource part, the HTTP
+part and the HTML/Javascript part.
+
+
+=head2 Resource Part
+
+The resource part sets up the resource (C<$resource>) and its
+L<Async::Selector> object (C<$selector>).  In this example,
+C<$resource> is a random sequence of printable characters, and its
+size is 1024 bytes.
+
+C<$resource> is associated with a sequence number (C<$sequence>).
+C<$sequence> is incremented when C<$resource> is updated.
+
+C<$resource> is then registered with C<$selector> by C<register()>
+method.  In the resource provider subroutine, C<$given_sequence> is
+given as the condition input. C<$given_sequence> represents the
+sequence number the client currently has. If C<$sequence> is greater
+than C<$given_sequence>, it means that the client needs to be updated.
+In this case the resource provider exports C<$resource> and
+C<$sequence> in a hash reference.
+
+Finally, we use L<Mojo::IOLoop> to periodically update C<$resource>.
+When C<$resource> is updated, C<trigger()> method is called on
+C<$selector> to notify the clients of the update.
+
+
+=head2 HTTP Part
+
+In the HTTP part, the events from C<$selector> are exported to Web
+browsers via Comet (long-polling) and WebSocket. You might have
+to check out L<Mojolicious::Lite> documentation if you are not
+familiar with it.
+
+First, we set up the request path for C</>, which just renders an
+HTML page.
+
+Second, we set up the request path for C</comet>, which is the request
+point for Comet (long-polling).
+
+C</comet> path accepts a query parameter C<seq>, which is supposed to
+be the sequence number the Web browser currently has.  We pass the
+content of C<seq> to C<watch()> method on C<$selector> object. That
+way, the response is deferred until the C<$sequence> on the server
+side is higher than C<$client_sequence> given by the browser.
+
+When C<$sequence> on the server side is higher than
+C<$client_sequence>, the callback function given to C<watch()> is
+called with C<$resource> and C<$sequence>. We encode these values in a
+single string separated by a space, and send it to the browser.
+
+The comet request is not persistent, i.e. a session is finished after
+the server sends a response. That is why we call C<< $w->cancel() >>
+at the end of the callback function.
+
+Finally, we set up the request path for C</websocket>, which accepts
+WebSocket connections. We use L<Mojo::IOLoop> to set the connection's
+timeout to 0 (infinite).
+
+Unlike C</comet>, we call C<watch()> method on C<$selector> with the
+condition input of 0. There are two reasons for this.
+
+One reason is that we want to send the C<$resource> as soon as the
+WebSocket connection is established, so that the C<$resource> can be
+immediately rendered in the HTML page. Because C<$sequence> is always
+greater than 0, the C<$resource> is immediately provided to the
+callback function for C<watch()> method. Thus we don't have to wait for
+the first update of the C<$resource>.
+
+The other reason is that WebSocket connections are persistent.  For
+persistent connections, we can let C<$selector> execute the callback
+function every time the C<$resource> is C<trigger()>-ed.
+
+Because WebSocket connections are persistent, we don't call C<< $w->cancel() >>
+in the callback function. That way, the selection
+remains after sending a message to the Web browser.
+
+
+
+=head2 HTML/Javascript Part
+
+HTML/Javascript part is an HTML text for Web browsers to render.
+It contains a Javascript program using jQuery (L<http://jquery.com/>).
+
+In the Javascript program, we set up Comet (long-polling) and
+WebSocket connections.
+
+In C<sendCometRequest()> function, we send an HTTP Ajax request to
+C</comet> with C<seq> query parameter being set from C<my_sequence>
+variable. C<my_sequence> variable is maintained by the Javascript
+program and it is the current sequence number of the resource.
+
+When we get a successful response for the Ajax request, we extract the
+sequence number and the resource from the response, show them in the
+HTML page, update C<my_sequence> and repeat the request recursively.
+
+Updating C<my_sequence> is very important for Comet connections. If
+you do not update it, the server thinks the client is out of date and
+needs to be updated. As a result, the server responds to every request
+immediately. This is not Comet (long-polling) but just regular
+polling. By setting C<my_sequence> appropriately, the client can get a
+response ONLY WHEN it needs to be updated. This is possible because
+L<Async::Selector> is level-triggered.
+
+C<my_sequence> is initialized to 0. Because the C<$sequence> on the
+server side is always greater than 0, the first request for C</comet>
+always gets an immediate response from the server.  That way, the
+resource is rendered immediately after the HTML page is loaded.  We do
+not have to wait for the first update of the resource.
+
+In C<connectWebSocket()> function, we initiate a WebSocket connection
+to C</websocket> request path. When we get a message via the
+WebSocket, we execute the same decode-and-show routine as in
+C<sendCometRequest()>.
+
+Unlike Comet, we do not have to maintain C<my_sequence> for the
+WebSocket connection. This is because the WebSocket connection is
+persistent.  We can get the resource when it is updated through the
+persistent connection.
+
+
+
+=head1 AUTHOR
+
+Toshio Ito, C<< <toshioito at cpan.org> >>
+
+

@@ -1,0 +1,334 @@
+=head1 NAME
+
+ASNMTAP::Time is a Perl module that provides date and time functions used by ASNMTAP and ASNMTAP-based applications and plugins.
+
+=head1 SYNOPSIS
+
+  use ASNMTAP::Time qw(:ALL);
+
+  print "Timeslot current  : ", get_timeslot (), "\n";
+  print "Timeslot time()   : ", get_timeslot ( time() ), "\n\n";
+
+  print "YYYYMMDD current  : ", get_yearMonthDay (), "\n";
+  print "YYYYMMDD time()   : ", get_yearMonthDay ( time() ), "\n";
+  
+  print "yyyymmddhhmmsswday: ", get_yyyymmddhhmmsswday (), "\n";
+
+  print "get datetimeSignal: ", get_datetimeSignal (), "\n";
+  print "get datetime      : ", get_datetime (), "\n";
+
+  print "get hour          : ", get_hour (), "\n";
+  print "get min           : ", get_min (), "\n";
+  print "get seconds       : ", get_seconds (), "\n";
+
+  print "get logfile date  : ", get_logfiledate (), "\n";
+  print "get csvfile date  : ", get_csvfiledate (), "\n";
+  print "get csvfile time  : ", get_csvfiletime (), "\n";
+
+  print "epoch 1 days ago  : ", get_epoch ('-1 days'), "\n";
+  print "week  1 week ago  : ", get_week ('-1 week'), "\n";
+  print "wday  1 days ago  : ", get_wday ('-1 days'), "\n";
+  print "day   1 days ago  : ", get_day ('-1 days'), "\n";
+  print "month 1 month ago : ", get_month ('-1 month'), "\n";
+  print "year  1 year ago  : ", get_year ('-1 year'), "\n";
+
+=head1 DESCRIPTION
+
+Provides date and time functions used by ASNMTAP and ASNMTAP-based applications and plugins.
+
+=head2 localtime() based functions
+
+=over 4
+
+=item *
+
+get_timeslot()
+
+Returns an epochtime for the current/specified localtime(), where the seconds are equal to 0.
+
+current time  : get_timeslot()
+
+specified time: get_timeslot ($time), where $time is time() compatible
+
+=item *
+
+get_yearMonthDay()
+
+Returns an formated year, month & day for the current/specified localtime().
+
+current time  : get_yearMonthDay()
+
+specified time: get_yearMonthDay ($time), where $time is time() compatible
+
+Format: 'YYYYMMDD' where
+
+  YYYY: year Number
+  MM  : month Number of months since January (1 - 12)
+  DD  : monthday Numeric day of the month (1 - 31)
+
+=item *
+
+get_yyyymmddhhmmsswday()
+
+Returns an formated date for the current localtime().
+
+Format: 'YYYY:MM:DD:hh:mm:ss:W' where
+
+  YYYY: year Number
+  MM  : month Number of months since January (1 - 12)
+  DD  : monthday Numeric day of the month (1 - 31)
+  hh  : hour since midnight (0 - 23)
+  mm  : minutes after each hour (0 - 59)
+  ss  : seconds after each minute (0 - 59)
+  W   : weekday Number of days since Sunday (0 - 6)
+
+=item *
+
+get_datetimeSignal()
+
+Returns an formated date/time for the current localtime().
+
+Format: 'YYYY/MM/DD hh:mm:ss' where
+
+  YYYY: year Number
+  MM  : month Number of months since January (1 - 12)
+  DD  : monthday Numeric day of the month (1 - 31)
+  hh  : hour since midnight (0 - 23)
+  mm  : minutes after each hour (0 - 59)
+  ss  : seconds after each minute (0 - 59)
+
+=item *
+
+get_datetime()
+
+Returns an formated date/time for the current localtime().
+
+Format: 'YYYYMMDD hhmmss' where
+
+  YYYY: year Number
+  MM  : month Number of months since January (1 - 12)
+  DD  : monthday Numeric day of the month (1 - 31)
+  hh  : hour since midnight (0 - 23)
+  mm  : minutes after each hour (0 - 59)
+  ss  : seconds after each minute (0 - 59)
+
+=item *
+
+get_logfiledate()
+
+Returns an formated logfile date for the current localtime().
+
+Format: 'YYYYMMDD' where
+
+  YYYY: year Number
+  MM  : month Number of months since January (1 - 12)
+  DD  : monthday Numeric day of the month (1 - 31)
+
+=item *
+
+get_csvfiledate()
+
+Returns an formated csv file date for the current localtime().
+
+Format: 'YYYY/MM/DD' where
+
+  YYYY: year Number
+  MM  : month Number of months since January (1 - 12)
+  DD  : monthday Numeric day of the month (1 - 31)
+
+=item *
+
+get_csvfiletime()
+
+Returns an formated csv file time for the current localtime().
+
+Format: 'hh:mm:ss' where
+
+  hh: hour Hour since midnight (0 - 23)
+  mm: min Minutes after each hour (0 - 59)
+  ss: sec Seconds after each minute (0 - 59)
+
+=item *
+
+get_epoch()
+
+Returns the epoch time described by $STRING.
+
+=item *
+
+get_week()
+
+Returns the week and year described by $STRING, where week (01-53) started on a Monday, calculated for the current localtime() or specified time() at call.
+
+=item *
+
+get_wday()
+
+Returns the day of week described by $STRING, where day of week (1-7) first day of week is Monday, calculated for the current localtime() or specified time() at call.
+
+=item *
+
+get_hour()
+
+Returns formated hour for the current localtime() or specified time() at call.
+
+Format: 'hh' where 'hh' hour since midnight (0 - 23)
+
+=item *
+
+get_min()
+
+Returns formated min for the current localtime() or specified time() at call.
+
+Format: 'mm' where 'mm' minutes after each hour (0 - 59)
+
+=item *
+
+get_seconds()
+
+Returns formated seconds for the current localtime() or specified time() at call.
+
+Format: 'ss' where 'ss' seconds after each minute (0 - 59)
+
+=item *
+
+get_day()
+
+Returns the day of month described by $STRING, where day of month (01-31), calculated for the current localtime() or specified time() at call.
+
+=item *
+
+get_month()
+
+Returns the month described by $STRING, where month (01-12), calculated for the current localtime() or specified time() at call.
+
+=item *
+
+get_year()
+
+Returns the year described by $STRING, where year (YYYY), calculated for the current localtime() or specified time() at call.
+
+=item *
+
+$STRING
+
+can be on of the following options:
+  +/- n sec
+  +/- n min
+  +/- n hour
+  +/- n day(s)
+  +/- n week(s)
+  +/- n month(s)
+  +/- n year(s)
+  now
+  today
+  tomorrow
+  yesterday
+
+=back
+
+=head1 EXPORT
+
+=head2 TAGS
+
+=over 4
+
+=item *
+
+ALL
+
+ SEC MIN HOUR DAY WEEK
+
+ get_timeslot()
+ get_yearMonthDay()
+ get_yyyymmddhhmmsswday()
+ get_datetimeSignal()
+ get_datetime()
+ get_logfiledate()
+ get_csvfiledate()
+ get_csvfiletime()
+
+ get_epoch()
+ get_week()
+ get_wday()
+ get_seconds()
+ get_min()
+ get_hour()
+ get_day()
+ get_month()
+ get_year()
+
+=item *
+
+EPOCHTIME
+
+ SEC MIN HOUR DAY WEEK
+
+=item *
+
+LOCATTIME
+
+ get_timeslot()
+ get_yearMonthDay()
+ get_yyyymmddhhmmsswday()
+ get_datetimeSignal()
+ get_datetime()
+ get_logfiledate()
+ get_csvfiledate()
+ get_csvfiletime()
+
+ get_epoch()
+ get_week()
+ get_wday()
+ get_seconds()
+ get_min()
+ get_hour()
+ get_day()
+ get_month()
+ get_year()
+
+=back
+
+=head1 AUTHOR
+
+Alex Peeters [alex.peeters@citap.be]
+
+=head1 SEE ALSO
+
+ASNMTAP::Asnmtap
+
+=head1 DEPENDENCIES
+
+ Carp
+ Date::Calc
+ Time::Local
+
+=head1 COPYRIGHT NOTICE
+
+(c) Copyright 2000-2011 by Alex Peeters [alex.peeters@citap.be],
+                        All Rights Reserved.
+
+ASNMTAP is based on 'Process System daemons v1.60.17-01', Alex Peeters [alex.peeters@citap.be]
+
+ Purpose: CronTab (CT, sysdCT),
+          Disk Filesystem monitoring (DF, sysdDF),
+          Intrusion Detection for FW-1 (ID, sysdID)
+          Process System daemons (PS, sysdPS),
+          Reachability of Remote Hosts on a network (RH, sysdRH),
+          Rotate Logfiles (system activity files) (RL),
+          Remote Socket monitoring (RS, sysdRS),
+          System Activity monitoring (SA, sysdSA).
+
+'Process System daemons' is based on 'sysdaemon 1.60' written by Trans-Euro I.T Ltd
+
+=head1 LICENSE
+
+This ASNMTAP CPAN library and Plugin templates are free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+The other parts of ASNMTAP may be used and modified free of charge by anyone so long as this copyright notice and the comments above remain intact. By using this code you agree to indemnify Alex Peeters from any liability that might arise from it's use.
+
+Selling the code for this program without prior written consent is expressly forbidden. In other words, please ask first before you try and make money off of my program.
+
+Obtain permission before redistributing this software over the Internet or in any other medium. In all cases copyright and header must remain intact.
+
+=cut

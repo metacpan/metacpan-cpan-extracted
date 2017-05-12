@@ -1,0 +1,60 @@
+# PODNAME: Alien::Build::Plugin::Extract
+# ABSTRACT: Extract Alien::Build plugins
+# VERSION
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Alien::Build::Plugin::Extract - Extract Alien::Build plugins
+
+=head1 VERSION
+
+version 0.36
+
+=head1 SYNOPSIS
+
+ use alienfile
+ plugin 'Extract' => 'tar.gz';
+
+=head1 DESCRIPTION
+
+Extract plugins extract packages that have been downloaded from the internet.
+Unless you are doing something unusual you will likely want to use the 
+L<Alien::Build::Plugin::Extract::Negotiate> plugin to select the best 
+Extract plugin available.
+
+=over 4
+
+=item L<Alien::Build::Plugin::Extract::ArchiveTar>
+
+=item L<Alien::Build::Plugin::Extract::ArchiveZip>
+
+=item L<Alien::Build::Plugin::Extract::CommandLine>
+
+=item L<Alien::Build::Plugin::Extract::Directory>
+
+=item L<Alien::Build::Plugin::Extract::Negotiate>
+
+=back
+
+=head1 SEE ALSO
+
+L<Alien::Build>, L<Alien::Build::Plugin>
+
+=head1 AUTHOR
+
+Graham Ollis <plicease@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Graham Ollis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

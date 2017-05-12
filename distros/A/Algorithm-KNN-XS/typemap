@@ -1,0 +1,105 @@
+LibANNInterface*                     O_OBJECT
+bool                                 T_BOOL
+std::string                          T_STRING
+std::vector< double >                T_DOUBLE_VECTOR
+std::vector< std::vector< double > > T_DOUBLE_VECTOR_VECTOR
+
+INPUT
+
+T_BOOL
+    $var = (bool)SvTRUE($arg)
+
+T_STRING
+    if (SvOK($arg) && !SvROK($arg)) {
+        $var = std::string(SvPV_nolen($arg));
+    } else {
+        croak(\"${Package}::$func_name() -- $var is not a string\");
+        XSRETURN_UNDEF;
+    }
+
+T_DOUBLE_VECTOR
+    if(SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV){
+        AV  *av = (AV *)SvRV($arg);
+        I32 len = av_len(av) + 1;
+        I32 dim = 0;
+
+        for (I32 i = 0; i < len; i++) {
+            ${var}.push_back(SvNV(*av_fetch(av, i, 0)));
+        }
+    } else {
+        croak(\"${Package}::$func_name() -- $var is not a array reference\");
+        XSRETURN_UNDEF;
+    }
+
+T_DOUBLE_VECTOR_VECTOR
+    if(SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV){
+        AV  *av = (AV *)SvRV($arg);
+        I32 len = av_len(av) + 1;
+        I32 dim = 0;
+
+        for (I32 i = 0; i < len; i++) {
+            AV  *av_2 = (AV *)SvRV(*av_fetch(av, i, 0));
+            I32 len_2 = av_len(av_2) + 1;
+            std::vector< double > tmp;
+
+            if (dim == 0) {
+                dim = len_2;
+            }
+            else {
+                if (dim != len_2) {
+                    croak(\"${Package}::$func_name() -- Array is malformed\");
+                    XSRETURN_UNDEF;
+                }
+            }
+
+            for (I32 j = 0; j < len_2; j++) {
+                tmp.push_back(SvNV(*av_fetch(av_2, j, 0)));
+            }
+
+            ${var}.push_back(tmp);
+        }
+    } else {
+        croak(\"${Package}::$func_name() -- $var is not a array reference\");
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+
+T_STRING
+    $arg = newSVpvn($var.c_str(), $var.length());
+
+T_DOUBLE_VECTOR
+    AV* av = newAV();
+    $arg = newRV_noinc((SV*)av);
+    av_extend(av, $var.size() - 1);
+    I32 i = 0;
+
+    std::vector<double>::iterator iter;
+
+    for(iter = $var.begin(); iter != $var.end(); iter++) {
+        av_store(av, i, newSVnv(*iter));
+        i++;
+    }
+
+T_DOUBLE_VECTOR_VECTOR
+    AV* av = newAV();
+    $arg = newRV_noinc((SV*)av);
+    av_extend(av, $var.size() - 1);
+    I32 i = 0;
+
+    std::vector< std::vector<double> >::iterator iter;
+
+    for(iter = $var.begin(); iter != $var.end(); iter++) {
+        AV* av2 = newAV();
+        av_extend(av, iter->size() - 1);
+        std::vector<double>::iterator iter2;
+        I32 j = 0;
+
+        for(iter2 = iter->begin(); iter2 != iter->end(); iter2++) {
+            av_store(av2, j, newSVnv(*iter2));
+            j++;
+        }
+
+        av_store(av, i, newRV_noinc((SV*)av2));
+        i++;
+    }

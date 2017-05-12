@@ -1,0 +1,27 @@
+Revision history for Perl extension AI::NNEasy.
+
+0.06  2005-01-16
+      - Added reinforce learning algorithm.
+      - Added check of errors bigger than 1 at learn_set().
+      - Fix some memory leak for non mortal SV*.
+
+0.05  2005-01-15
+      - Fixed default values for layers, specially the activation
+        funtion for the output layer that is better as linear.
+      - Added samples.
+      - Changed some internal values for learn_set() to learn faster.
+      - More XS support: AI::NNEasy::NN::backprop::RMSErr_c
+
+0.04  2005-01-15
+      - POD fixes.
+      - Added some XS support to learn_set() method.
+
+0.03  2005-01-14
+      - Changed requisite of Class::HPLOO to version 0.19.
+
+0.02  2005-01-14
+      - Fix make file prereq.
+
+0.01  2005-01-14 00:11:38
+      - original version;
+

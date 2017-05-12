@@ -1,0 +1,161 @@
+Revision history for App-fsql
+
+0.22    2016-03-10 (PERLANCAR)
+
+	- Replace File::Slurp::Tiny with File::Slurper (in tests).
+
+	- Replace JSON with JSON::MaybeXS.
+
+
+0.21    2015-07-27 (PERLANCAR)
+
+	- Rename FSQL_DEBUG_KEEP_TEMPDIR to DEBUG_KEEP_TEMPDIR (which is
+	  also observed by App::depak).
+
+
+0.20    2015-06-30 (PERLANCAR)
+
+	- Support -F NAME:NEWNAME to load function as a new name.
+
+
+0.19    2015-06-28 (PERLANCAR)
+
+	- Add option: --define-function (-D).
+
+
+0.18    2015-05-13 (PERLANCAR)
+
+	- Adjust with SQL::Statement::Functions::Date 0.02+.
+
+
+0.17    2015-05-10 (PERLANCAR)
+
+        - No functional changes.
+
+        - Tweak docs.
+
+
+0.16    2015-05-09 (PERLANCAR)
+
+        - Avoid error message when performing non-SELECT queries.
+
+        - [doc] Add FAQ entry, add example for INSERT/DELETE.
+
+
+0.15    2015-05-09 (PERLANCAR)
+
+	- Add option: --load-function (-F).
+
+
+0.14    2015-01-11 (PERLANCAR)
+
+	- [ux] Be less restrictive: allow arguments when -s.
+
+
+0.13    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (generate TODO.md, testing).
+
+
+0.12    2014-12-03 (PERLANCAR)
+
+	- Add short alias -s for --show-schema because it turns out to be
+	  used quite often.
+
+
+0.11    2014-07-02 (SHARYANTO)
+
+        - No functional changes.
+
+        - [Bugfix] scripts/ or bin/ files need to have something like #!perl and
+          not #!/usr/bin/env perl so it can be replaced to the path of perl when
+          installing [RT#96884]
+
+
+0.10    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.09    2014-05-05 (SHARYANTO)
+
+        - No functional changes.
+
+        - [build] Bump required version of IPC::Cmd (to first version which has
+          run_forked()).
+
+
+0.08    2014-04-29 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - For outputs 'json', 'yaml', 'perl', display naked instead of enveloped
+          result. This should make fsql more usable in general. Use
+          Data::Format::Pretty::* modules directly instead of
+          Perinci::Result::Format.
+
+        - Rename --hash to --aoh. Add --aoa for completeness.
+
+
+0.07    2014-04-29 (SHARYANTO)
+
+        - Add --add (-a) option.
+
+        - Add --hash option.
+
+        - Add some tests.
+
+
+0.06    2014-04-29 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - By default outputs array of arrays (fetchrow_arrayref) instead array
+          of hashes (fetchrow_hashref) to get consistent column ordering. Old
+          behavior is possible using the new --hash option. This only affects
+          outputs like 'json', 'yaml', 'perl', 'text'.
+
+
+0.05    2014-04-29 (SHARYANTO)
+
+        - Add -f alias for --format.
+
+        - Add output formats 'csv', 'tsv', 'ltsv' (thanks baileych for csv/tsv).
+
+        - Add input & output format 'perl'.
+
+        - Default output format is now the most used input format.
+
+
+0.04    2014-04-22 (SHARYANTO)
+
+        - Show format information in --show-schema.
+
+
+0.03    2014-04-22 (SHARYANTO)
+
+        - No functional changes.
+
+        - Fix a couple of bugs and add some missing doc.
+
+
+0.02    2014-04-17 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Add --format (previously missing).
+
+        - Add --show-schema.
+
+        [BUG FIXES]
+
+        - Fix a couple of bugs.
+
+
+0.01    2014-04-17 (SHARYANTO)
+
+        - First release.

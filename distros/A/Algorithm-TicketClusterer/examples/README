@@ -1,0 +1,41 @@
+The 'examples' directory:
+
+This directory contains the following scripts that would be
+your quickest way to become familiar with this module:
+
+1.    ticket_preprocessor_and_doc_modeler.pl
+
+2.    retrieve_similar_tickets.pl
+
+
+Run the first script to see ticket preprocessing and doc
+modeling being carried out on the (fake) tickets stored in
+the Excel file ExampleExcelFile.xls in this directory.
+
+Next, run the second script to retrieve five tickets that
+are closest to the query ticket whose integer is supplied to
+the retrieve_similar_tickets_with_vsm()> method in the
+script.
+
+If both scripts run fine, go through the statements in the
+scripts to see how you need to sequence the different
+preprocessing, doc modeling, and retrieval steps for your
+tickets.
+
+IMPORTANT1: The spreadsheet 
+
+                        ExampleExcelFile.xls 
+
+            is contrived.  Do not draw any conclusions about 
+            the retrieval precision of this module based on
+            the tickets in this file.
+
+IMPORTANT2: You need to set the parameter 
+
+                           min_idf_threshold 
+
+            with care in the retrieve_similar_tickets.pl script.
+            See the comment block in that script.  In general, its
+            value will depend on how many tickets there are in your
+            spreadsheet.
+

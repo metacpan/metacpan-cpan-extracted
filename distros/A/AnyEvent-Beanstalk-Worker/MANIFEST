@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+eg/null-add.pl
+eg/null.pl
+eg/ssh-add.pl
+eg/ssh.pl
+eg/web-add.pl
+eg/web.pl
+eg/web-state-add.pl
+eg/web-state.pl
+eg/WebWorker.pm
+lib/AnyEvent/Beanstalk/Worker.pm
+t/AnyEvent-Beanstalk-Worker.t
+t/shared.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,27 @@
+---
+name: Authen-Simple-IMAP
+version: 0.1.2
+author:
+  - 'Dylan Martin <dmartin@sccd.ctc.edu>'
+abstract: Simple IMAP and IMAPS authentication
+license: artistic
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+requires:
+  Authen::Simple: 0
+  Authen::Simple::Adapter: 0
+  Net::IMAP::Simple: 1.17
+  Test::More: 0
+  perl: 5.8.6
+  version: 0
+recommends:
+  Net::IMAP::Simple::Plus: 0
+  Net::IMAP::Simple::SSL: 0
+provides:
+  Authen::Simple::IMAP:
+    file: lib/Authen/Simple/IMAP.pm
+    version: 0.1.2
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

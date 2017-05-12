@@ -1,0 +1,21 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::VOS;
+
+my ($vos, $server);
+
+die "Usage: $0 server \n" if $#ARGV != 0;
+
+$server = shift;
+
+$vos = AFS::VOS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+my $stat = $vos->status($server);
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+if (defined $stat) { print "$stat"; }

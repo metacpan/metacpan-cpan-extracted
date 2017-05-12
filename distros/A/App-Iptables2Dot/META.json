@@ -1,0 +1,51 @@
+{
+   "abstract" : "Analyze iptables with GraphViz",
+   "author" : [
+      "Mathias Weidner <mamawe@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Iptables2Dot",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Probe::Perl" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "v5.10.1",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Iptables2Dot" : {
+         "file" : "lib/App/Iptables2Dot.pm",
+         "version" : "v0.2.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.2.4",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,12 @@
+Changes
+examples/read-data.pl
+lib/Acme/Include/Data.pm
+lib/Acme/Include/Data.pod
+lib/Acme/Include/this-is-a-data-file.txt
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/Acme-Include-Data.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

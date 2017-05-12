@@ -1,0 +1,126 @@
+#!/usr/bin/perl -w
+use strict;
+
+use Acme::AsciiArt2HtmlTable;
+
+my $ascii;
+my $html;
+
+$ascii = _readfile('../lib/Acme/AsciiArt2HtmlTable.pm');
+$html = aa2ht({"randomize-new-colors"=>1},$ascii);
+_writefile('Acme::AsciiArt2HtmlTable.html',$html);
+
+$ascii = _readfile('simple');
+$html = aa2ht({table=>{'cellpadding'=>6,'cellspacing'=>6}},$ascii);
+_writefile('simple.html',$html);
+
+$ascii = _readfile('simple');
+$html = aa2ht({table=>{'cellpadding'=>6,'cellspacing'=>6},"optimization"=>1},$ascii);
+_writefile('simple_opt.html',$html);
+
+$ascii = _readfile('camel');
+$html = aa2ht({"randomize-new-colors"=>1,table=>{cellspacing=>1,colspacing=>1},td=>{width=>"4px",height=>"8px"}},$ascii);
+_writefile('camel.html',$html);
+
+$ascii = _readfile('cog');
+$html = aa2ht({table=>{cellspacing=>1,colspacing=>1},td=>{width=>"4px",height=>"2px"},colors=>{"#"=>"ffff00","+"=>"ff0000","."=>"00ff00"}},$ascii);
+_writefile('cog.html',$html);
+
+# others
+$ascii = _readfile('rose');
+$html = aa2ht({colors=>{"#"=>"lightgreen",";"=>"red",","=>"green"}},$ascii);
+_writefile('rose.html',$html);
+
+$ascii = _readfile('smile');
+$html = aa2ht({table=>{cellspacing=>1,colspacing=>1},td=>{width=>"4px",height=>"8px"}},$ascii);
+_writefile('smile.html',$html);
+
+$ascii = _readfile('heart');
+$html = aa2ht($ascii);
+_writefile('heart.html',$html);
+
+$ascii = _readfile('josecastro');
+$html = aa2ht({td=>{width=>"2px",height=>"1px"},colors=>{"#"=>"ffff00","+"=>"ff0000","."=>"00ff00"}},$ascii);
+_writefile('josecastro.html',$html);
+
+# flags
+for my $flag (qw/portugal spain usa/) {
+  _writefile("flag_$flag.html",aa2ht(_readfile("flag_$flag")));
+  _writefile("flag_${flag}_opt.html",aa2ht({'optimization'=>1},_readfile("flag_$flag")));
+}
+
+# people
+my (%people, %people_opt, %name);
+
+for my $person (qw/acme autrijus damian larry merlyn schwern/) {
+  _writefile("$person.html",_people(_readfile("$person")));
+  $people{$person} = aa2ht({'randomize-new-colors'=>1},_readfile($person));
+  $people_opt{$person} = aa2ht({'randomize-new-colors'=>1,'optimization'=>1},_readfile($person));
+  _writefile("${person}_opt.html",_people_opt(_readfile("$person")));
+}
+
+_writefile('people.html',
+           '<table><tr>' .
+           (join "\n", map { '<td>' . $people{$_} . '</td>' } sort keys %people) .
+           '</tr><tr>' .
+           (join "\n", map { "<td><a href=\"$_.html\">$_</a></td>" } sort keys %people) .
+           '</tr></table>'
+          );
+
+_writefile('people_opt.html',
+           '<table><tr>' .
+           (join "\n", map { '<td>' . $people_opt{$_} . '</td>' } sort keys %people_opt) .
+           '</tr><tr>' .
+           (join "\n", map { "<td><a href=\"$_.html\">$_</a></td>" } sort keys %people) .
+           '</tr></table>'
+          );
+
+# subroutines
+
+sub _readfile { # reads a file
+  my $file = shift;
+  my $text;
+  open (F, $file) or die "could not open $file ($!)\n";
+  while (<F>) {
+    $text .= $_;
+  }
+  close F;
+  return $text;
+}
+
+sub _writefile { # writes a file
+  my $filename = shift;
+  my $text = shift;
+  open (F, ">$filename") or die "could not write $filename ($!)\n";
+  print F $text;
+  close F;
+}
+
+sub _people { # default configuration for big people's heads
+  return aa2ht( {'use-default-colors'   => 0,
+                'colors'               => { ' '          => 'ffffff' },
+                'randomize-new-colors' => 1,
+                'table'                =>{ 'cellspacing' => 1,
+                                           'colspacing'  => 1,
+                                         },
+                'td'                   =>{ 'width'       => '4px',
+                                           'height'      => '8px'
+                                         },
+               },
+               shift);
+}
+
+sub _people_opt { # default configuration for big people's heads, optimized
+  return aa2ht( {'use-default-colors'   => 0,
+                'colors'               => { ' '          => 'ffffff' },
+                'randomize-new-colors' => 1,
+                'optimization'         => 1,
+                'table'                =>{ 'cellspacing' => 1,
+                                           'colspacing'  => 1,
+                                         },
+                'td'                   =>{ 'width'       => '4px',
+                                           'height'      => '8px'
+                                         },
+                },
+                shift);
+}

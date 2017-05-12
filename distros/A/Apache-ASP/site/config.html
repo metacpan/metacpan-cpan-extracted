@@ -1,0 +1,2193 @@
+
+
+<html>
+<head>
+<title>Apache::ASP::Config</title>
+
+
+
+<style type="text/css">
+<!--
+      td {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      font {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      .title {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 16px}
+
+
+
+
+-->
+</style>
+
+
+</head>
+<body bgcolor=black link=#063678 alink=#ff5599 vlink=#993399
+marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
+
+
+
+
+<center>
+<table border=0 cellpadding=0 width=99% cellspacing=8>
+<tr><td align=center>
+
+<table border=0 cellpadding=3 width=100% cellspacing=0>
+<tr bgcolor=#063678>
+<td>
+	<table border=0 cellpadding=1 cellspacing=0 width=100%>
+	<tr>
+	<td><img border=0 src=asptitlelogo.gif alt="Apache::ASP" width=267 height=44 ></td>	
+	
+		<td align=right></td>
+	
+	</tr>
+	</table>
+</td>
+</tr>
+<tr>
+  <td bgcolor=#005196 align=center>
+    <b>
+    <font color=#ffffff>&lt;% Web Applications with Apache &amp; mod_perl %&gt;</font>  
+    </b>
+  </td>
+</tr>
+</table>
+
+
+<table border=0 cellpadding=10 cellspacing=0 width=100% bgcolor=#005196>
+<tr>
+<td valign=top width=120 bgcolor=#005196>
+    
+        <table cellpadding=5 cellspacing=0 border=1 bgcolor=white><tr><td>
+
+	<table border=0 cellpadding=0 cellspacing=0 width=105 bgcolor=white>
+	
+	
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="index.html" style="text-decoration:none"><font color=#063678>INTRO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="install.html" style="text-decoration:none"><font color=#063678>INSTALL</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>%</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><font color=#993399>CONFIG</font></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="syntax.html" style="text-decoration:none"><font color=#063678>SYNTAX</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="events.html" style="text-decoration:none"><font color=#063678>EVENTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="objects.html" style="text-decoration:none"><font color=#063678>OBJECTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="ssi.html" style="text-decoration:none"><font color=#063678>SSI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sessions.html" style="text-decoration:none"><font color=#063678>SESSIONS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="xml.html" style="text-decoration:none"><font color=#063678>XML/XSLT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="cgi.html" style="text-decoration:none"><font color=#063678>CGI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="perlscript.html" style="text-decoration:none"><font color=#063678>PERLSCRIPT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="style.html" style="text-decoration:none"><font color=#063678>STYLE GUIDE</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="faq.html" style="text-decoration:none"><font color=#063678>FAQ</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="tuning.html" style="text-decoration:none"><font color=#063678>TUNING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="kudos.html" style="text-decoration:none"><font color=#063678>CREDITS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="support.html" style="text-decoration:none"><font color=#063678>SUPPORT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sites.html" style="text-decoration:none"><font color=#063678>SITES USING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="testimonials.html" style="text-decoration:none"><font color=#063678>TESTIMONIALS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="resources.html" style="text-decoration:none"><font color=#063678>RESOURCES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="todo.html" style="text-decoration:none"><font color=#063678>TODO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="changes.html" style="text-decoration:none"><font color=#063678>CHANGES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="license.html" style="text-decoration:none"><font color=#063678>LICENSE</font></a></nobr></b></font></td>		
+
+		</tr>
+		<tr><td colspan=2><hr size=1></td></tr>
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="eg/index.html" style="text-decoration:none"><font color=#063678>EXAMPLES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+	</table>
+
+	</td></tr>
+	</table>
+
+		<br>
+		<center>
+		<a href=http://www.apache-asp.org/><img src="powered_by_apache_asp.jpg" width="88" height="31" alt="Powered by Apache::ASP" border="0"></a>
+		<br>
+		<a href=http://perl.apache.org><img src="powered_by_modperl.gif" width="88" height="31" alt="Powered by ModPerl and Apache" border="0"></a>
+		<br>
+		<a href=http://www.perl.com><img src="rectangle_power_perl.gif" width="88" height="31" alt="Powered by Perl" border="0"></a>
+		</center>
+
+</center>
+
+</td>
+
+
+
+<td valign=top bgcolor=white>
+<font size=+0 face=verdana,arial>
+
+<font face=verdana><font class=title size=+1 color=#555555><b>CONFIG</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>You may use a &lt;Files ...&gt; directive in your httpd.conf 
+Apache configuration file to make Apache::ASP start ticking.  Configure the
+optional settings if you want, the defaults are fine to get started.  
+The settings are documented below.  
+Make sure Global is set to where your web applications global.asa is 
+if you have one!
+<font face="courier new" size=3><pre>
+ PerlModule  Apache::ASP
+ &lt;Files ~ (\.asp)&gt;    
+   SetHandler  perl-script
+   PerlHandler Apache::ASP
+   PerlSetVar  Global .
+   PerlSetVar  StateDir /tmp/asp
+ &lt;/Files&gt;
+</pre></font>NOTE: do not use this for the examples in ./site/eg.  To get the 
+examples working, check out the Quick Start section of <a href=install.html><font size=-1 face=verdana><b>INSTALL</b></font></a>
+<font face="courier new" size=3><pre>
+</pre></font>You may use other Apache configuration tags like &lt;Directory&gt;,
+&lt;Location&gt;, and &lt;VirtualHost&gt;, to separately define ASP
+configurations, but using the &lt;Files&gt; tag is natural for
+ASP application building because it lends itself naturally
+to mixed media per directory.  For building many separate
+ASP sites, you might want to use separate .htaccess files,
+or &lt;Files&gt; tags in &lt;VirtualHost&gt; sections, the latter being
+better for performance.</font>
+
+	<hr size=1>
+	<table width=100% border=0 cellpadding=1 cellspacing=3>
+	<tr>
+	<td valign=top><font face="lucida console" size=-1>
+	
+		<tr>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#Core><font color=white>Core</font></a></b></font>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#XMLSubsMatch>XMLSubsMatch</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Global>Global</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#XMLSubsStric569463b3>XMLSubsStrict</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#GlobalPackag78b2e61e>GlobalPackage</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#XMLSubsPerlA21dba3d7>XMLSubsPerlArgs</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#UniquePackagcf82a357>UniquePackages</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#XSLT>XSLT</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#DynamicInclu7867a61a>DynamicIncludes</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#XSLTMatch>XSLTMatch</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#IncludesDir>IncludesDir</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#XSLTParser>XSLTParser</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#NoCache>NoCache</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#XSLTCache>XSLTCache</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#XSLTCacheSiz6e7d9101>XSLTCacheSize</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#State%20Managedeff2cd7><font color=white>State Management</font></a></b></font>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#NoState>NoState</a>
+			</font>
+			</td>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#Caching><font color=white>Caching</font></a></b></font>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#AllowSession471aaf40>AllowSessionState</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#CacheDB>CacheDB</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#AllowApplica55cb396b>AllowApplicationState</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#CacheDir>CacheDir</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#StateDir>StateDir</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#CacheSize>CacheSize</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#StateManager>StateManager</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#StateDB>StateDB</a>
+			</font>
+			</td>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#Miscellaneou387baf01><font color=white>Miscellaneous</font></a></b></font>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#StateCache>StateCache</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#AuthServerVaa7584921>AuthServerVariables</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#StateSeriali106736b1>StateSerializer</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#BufferingOn>BufferingOn</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#InodeNames>InodeNames</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#Sessions><font color=white>Sessions</font></a></b></font>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#RequestParam25a784ba>RequestParams</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#CookiePath>CookiePath</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#RequestBinarc4419e4b>RequestBinaryRead</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#CookieDomain>CookieDomain</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#StatINC>StatINC</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#SessionTimeo21fc354e>SessionTimeout</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#StatINCMatch>StatINCMatch</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#SecureSessio77114c01>SecureSession</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#StatScripts>StatScripts</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#ParanoidSess9085f1d5>ParanoidSession</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#SoftRedirect>SoftRedirect</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#SessionSeria0633b2a7>SessionSerialize</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Filter>Filter</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#SessionCount>SessionCount</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#CgiHeaders>CgiHeaders</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Clean>Clean</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#Cookieless%20S21cbf4f4><font color=white>Cookieless Sessions</font></a></b></font>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#CompressGzip>CompressGzip</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#SessionQuery6920bb61>SessionQueryParse</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#FormFill>FormFill</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#SessionQueryd88d64b8>SessionQueryParseMatch</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#TimeHiRes>TimeHiRes</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#SessionQuery>SessionQuery</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#SessionQuery3ae841c3>SessionQueryMatch</a>
+			</font>
+			</td>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#Mail%20Adminis1a4d2b59><font color=white>Mail Administration</font></a></b></font>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#SessionQuery85863960>SessionQueryForce</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#MailHost>MailHost</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#MailFrom>MailFrom</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#Developer%20Enc3495841><font color=white>Developer Environment</font></a></b></font>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#MailErrorsTo>MailErrorsTo</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#UseStrict>UseStrict</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#MailAlertTo>MailAlertTo</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Debug>Debug</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#MailAlertPer096b67a8>MailAlertPeriod</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#DebugBufferL32fcff6d>DebugBufferLength</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#PodComments>PodComments</a>
+			</font>
+			</td>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#File%20Uploads><font color=white>File Uploads</font></a></b></font>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#CollectionItb0343456>CollectionItem</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#FileUploadMa625d7c4d>FileUploadMax</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#FileUploadTeb83a1ea3>FileUploadTemp</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#XML%20%2F%20XSLT><font color=white>XML / XSLT</font></a></b></font>
+			</font>
+			</td>
+		<td>&nbsp;</td>					
+		</tr>
+			
+	</table>
+	<hr size=1>
+	<p>
+
+	<p>
+	<a name=Core></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Core</b></font>
+</font>
+	
+	<p>
+	<a name=Global></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>Global</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Global is the nerve center of an Apache::ASP application, in which
+the global.asa may reside defining the web application&#39;s 
+event handlers.
+<font face="courier new" size=3><pre>
+</pre></font>This directory is pushed onto @INC, so you will be able 
+to &quot;use&quot; and &quot;require&quot; files in this directory, and perl modules 
+developed for this application may be dropped into this directory, 
+for easy use.
+<font face="courier new" size=3><pre>
+</pre></font>Unless StateDir is configured, this directory must be some 
+writeable directory by the web server.  $Session and $Application 
+object state files will be stored in this directory.  If StateDir
+is configured, then ignore this paragraph, as it overrides the 
+Global directory for this purpose.
+<font face="courier new" size=3><pre>
+</pre></font>Includes, specified with &lt;!--#include file=somefile.inc--&gt; 
+or $Response-&gt;Include() syntax, may also be in this directory, 
+please see section on includes for more information.
+<font face="courier new" size=3><pre>
+  PerlSetVar Global /tmp
+</pre></font>
+	
+	<p>
+	<a name=GlobalPackag78b2e61e></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>GlobalPackage</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Perl package namespace that all scripts, includes, &amp; global.asa
+events are compiled into.  By default, GlobalPackage is some
+obscure name that is uniquely generated from the file path of 
+the Global directory, and global.asa file.  The use of explicitly
+naming the GlobalPackage is to allow scripts access to globals
+and subs defined in a perl module that is included with commands like:
+<font face="courier new" size=3><pre>
+  in perl script: use Some::Package;
+  in apache conf: PerlModule Some::Package
+
+  PerlSetVar GlobalPackage Some::Package
+</pre></font>
+	
+	<p>
+	<a name=UniquePackagcf82a357></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>UniquePackages</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0.  Set to 1 to compile each script into its own perl package,
+so that subroutines defined in one script will not collide with another.
+<font face="courier new" size=3><pre>
+</pre></font>By default, ASP scripts in a web application are compiled into the 
+*same* perl package, so these scripts, their includes, and the 
+global.asa events all share common globals &amp; subroutines defined by each other.
+The problem for some developers was that they would at times define a 
+subroutine of the same name in 2+ scripts, and one subroutine definition would
+redefine the other one because of the namespace collision.
+<font face="courier new" size=3><pre>
+  PerlSetVar UniquePackages 0
+</pre></font>
+	
+	<p>
+	<a name=DynamicInclu7867a61a></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>DynamicIncludes</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0.  <a href=ssi.html><font size=-1 face=verdana><b>SSI</b></font></a> file includes are normally inlined in the calling 
+script, and the text gets compiled with the script as a whole. 
+With this option set to TRUE, file includes are compiled as a
+separate subroutine and called when the script is run.  
+The advantage of having this turned on is that the code compiled
+from the include can be shared between scripts, which keeps the 
+script sizes smaller in memory, and keeps compile times down.
+<font face="courier new" size=3><pre>
+  PerlSetVar DynamicIncludes 0
+</pre></font>
+	
+	<p>
+	<a name=IncludesDir></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>IncludesDir</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>no defaults.  If set, this directory will also be used to look
+for includes when compiling scripts.  By default the directory 
+the script is in, and the Global directory are checked for includes.  
+<font face="courier new" size=3><pre>
+</pre></font>This extension was added so that includes could be easily shared
+between ASP applications, whereas placing includes in the Global
+directory only allows sharing between scripts in an application.
+<font face="courier new" size=3><pre>
+  PerlSetVar IncludesDir .
+</pre></font>Also, multiple includes directories may be set by creating
+a directory list separated by a semicolon &#39;;&#39; as in
+<font face="courier new" size=3><pre>
+  PerlSetVar IncludesDir ../shared;/usr/local/asp/shared
+</pre></font>Using IncludesDir in this way creates an includes search
+path that would look like ., Global, ../shared, /usr/local/asp/shared
+The current directory of the executing script is checked first
+whenever an include is specified, then the Global directory
+in which the global.asa resides, and finally the IncludesDir 
+setting.</font>
+	
+	<p>
+	<a name=NoCache></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>NoCache</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Default 0, if set to 1 will make it so that neither script nor
+include compilations are cached by the server.  Using this configuration
+will save on memory but will slow down script execution.  Please
+see the <a href=tuning.html><font size=-1 face=verdana><b>TUNING</b></font></a> section for other strategies on improving site performance.
+<font face="courier new" size=3><pre>
+  PerlSetVar NoCache 0
+</pre></font>
+	
+	<p>
+	<a name=State%20Managedeff2cd7></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>State Management</b></font>
+</font>
+	
+	<p>
+	<a name=NoState></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>NoState</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, if true, neither the $Application nor $Session objects will
+be created.  Use this for a performance increase.  Please note that 
+this setting takes precedence over the AllowSessionState and
+AllowApplicationState settings.
+<font face="courier new" size=3><pre>
+  PerlSetVar NoState 0
+</pre></font>
+	
+	<p>
+	<a name=AllowSession471aaf40></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>AllowSessionState</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Set to 0 for no session tracking, 1 by default
+If Session tracking is turned off, performance improves,
+but the $Session object is inaccessible.
+<font face="courier new" size=3><pre>
+  PerlSetVar AllowSessionState 1    
+</pre></font>Note that if you want to dissallow session creation
+for certain non web browser user agents, like search engine
+spiders, you can use an init handler like:
+<font face="courier new" size=3><pre>
+  PerlInitHandler &quot;sub { $_[0]-&gt;dir_config(&#39;AllowSessionState&#39;, 0) }&quot;
+</pre></font>
+	
+	<p>
+	<a name=AllowApplica55cb396b></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>AllowApplicationState</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Default 1.  If you want to leave $Application undefined, then set this
+to 0, for a performance increase of around 2-3%.  Allowing use of 
+$Application is less expensive than $Session, as there is more
+work for the StateManager associated with $Session garbage collection
+so this parameter should be only used for extreme tuning.
+<font face="courier new" size=3><pre>
+  PerlSetVar AllowApplicationState 1
+</pre></font>
+	
+	<p>
+	<a name=StateDir></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>StateDir</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default $Global/.state.  State files for ASP application go to 
+this directory.  Where the state files go is the most important
+determinant in what makes a unique ASP application.  Different
+configs pointing to the same StateDir are part of the same
+ASP application.
+<font face="courier new" size=3><pre>
+</pre></font>The default has not changed since implementing this config directive.
+The reason for this config option is to allow operating systems with caching
+file systems like Solaris to specify a state directory separately
+from the Global directory, which contains more permanent files.
+This way one may point StateDir to /tmp/myaspapp, and make one&#39;s ASP
+application scream with speed.
+<font face="courier new" size=3><pre>
+  PerlSetVar StateDir ./.state
+</pre></font>
+	
+	<p>
+	<a name=StateManager></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>StateManager</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 10, this number specifies the numbers of times per SessionTimeout
+that timed out sessions are garbage collected.  The bigger the number,
+the slower your system, but the more precise Session_OnEnd&#39;s will be 
+run from global.asa, which occur when a timed out session is cleaned up,
+and the better able to withstand Session guessing hacking attempts.
+The lower the number, the faster a normal system will run.  
+<font face="courier new" size=3><pre>
+</pre></font>The defaults of 20 minutes for SessionTimeout and 10 times for 
+StateManager, has dead Sessions being cleaned up every 2 minutes.
+<font face="courier new" size=3><pre>
+  PerlSetVar StateManager 10
+</pre></font>
+	
+	<p>
+	<a name=StateDB></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>StateDB</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default SDBM_File, this is the internal database used for state
+objects like $Application and $Session.  Because an SDBM_File %hash 
+has a limit on the size of a record key+value pair, usually 1024 bytes,
+you may want to use another tied database like DB_File or
+MLDBM::Sync::SDBM_File.
+<font face="courier new" size=3><pre>
+</pre></font>With lightweight $Session and $Application use, you can get 
+away with SDBM_File, but if you load it up with complex data like
+<font face="courier new" size=3><pre>  $Session{key} = { # very large complex object }
+</pre></font>you might max out the 1024 limit.
+<font face="courier new" size=3><pre>
+</pre></font>Currently StateDB can be: SDBM_File, MLDBM::Sync::SDBM_File,
+DB_File, and GDBM_File.  Please let me know if you would like to
+add any more to this list.
+<font face="courier new" size=3><pre>
+</pre></font>As of version .18, you may change this setting in a live production
+environment, and new state databases created will be of this format.
+With a prior version if you switch to a new StateDB, you would want to 
+delete the old StateDir, as there will likely be incompatibilities between
+the different database formats, including the way garbage collection
+is handled.
+<font face="courier new" size=3><pre>
+  PerlSetVar StateDB SDBM_File
+</pre></font>
+	
+	<p>
+	<a name=StateCache></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>StateCache</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Deprecated as of 2.23.  There is no equivalent config for
+the functionality this represented from that version on.
+The 2.23 release represented a significant rewrite
+of the state management, moving to MLDBM::Sync for its
+subsystem.</font>
+	
+	<p>
+	<a name=StateSeriali106736b1></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>StateSerializer</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default Data::Dumper, you may set this to Storable for 
+faster serialization and storage of data into state objects.
+This is particularly useful when storing large objects in
+$Session and $Application, as the Storable.pm module has a faster
+implementation of freezing and thawing data from and to
+perl structures.  Note that if you are storing this much
+data in your state databases, you may want to use 
+DB_File since it does not have the default 1024 byte limit 
+that SDBM_File has on key/value lengths.
+<font face="courier new" size=3><pre>
+</pre></font>This configuration setting may be changed in production
+as the state database&#39;s serializer type is stored
+in the internal state manager which will always use 
+Data::Dumper &amp; SDBM_File to store data.
+<font face="courier new" size=3><pre>
+  PerlSetVar StateSerializer Data::Dumper
+</pre></font>
+	
+	<p>
+	<a name=Sessions></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Sessions</b></font>
+</font>
+	
+	<p>
+	<a name=CookiePath></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>CookiePath</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>URL root that client responds to by sending the session cookie.
+If your asp application falls under the server url &quot;/asp&quot;, 
+then you would set this variable to /asp.  This then allows
+you to run different applications on the same server, with
+different user sessions for each application.
+<font face="courier new" size=3><pre>
+  PerlSetVar CookiePath /
+</pre></font>
+	
+	<p>
+	<a name=CookieDomain></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>CookieDomain</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Default 0, this NON-PORTABLE configuration will allow sessions to span
+multiple web sites that match the same domain root.  This is useful if
+your web sites are hosted on the same machine and can share the same
+StateDir configuration, and you want to shared the $Session data 
+across web sites.  Whatever this is set to, that will add a 
+<font face="courier new" size=3><pre>
+  ; domain=$CookieDomain
+</pre></font>part to the Set-Cookie: header set for the session-id cookie.
+<font face="courier new" size=3><pre>
+  PerlSetVar CookieDomain .your.global.domain
+</pre></font>
+	
+	<p>
+	<a name=SessionTimeo21fc354e></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>SessionTimeout</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Default 20 minutes, when a user&#39;s session has been inactive for this
+period of time, the Session_OnEnd event is run, if defined, for 
+that session, and the contents of that session are destroyed.
+<font face="courier new" size=3><pre>
+  PerlSetVar SessionTimeout 20
+</pre></font>
+	
+	<p>
+	<a name=SecureSessio77114c01></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>SecureSession</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0.  Sets the secure tag for the session cookie, so that the cookie
+will only be transmitted by the browser under https transmissions.
+<font face="courier new" size=3><pre>
+  PerlSetVar SecureSession 1
+</pre></font>
+	
+	<p>
+	<a name=ParanoidSess9085f1d5></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>ParanoidSession</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0.  When true, stores the user-agent header of the browser 
+that creates the session and validates this against the session cookie presented.
+If this check fails, the session is killed, with the rationale that 
+there is a hacking attempt underway.
+<font face="courier new" size=3><pre>
+</pre></font>This config option was implemented to be a smooth upgrade, as
+you can turn it off and on, without disrupting current sessions.  
+Sessions must be created with this turned on for the security to take effect.
+<font face="courier new" size=3><pre>
+</pre></font>This config option is to help prevent a brute force cookie search from 
+being successful. The number of possible cookies is huge, 2^128, thus making such
+a hacking attempt VERY unlikely.  However, on the off chance that such
+an attack is successful, the hacker must also present identical
+browser headers to authenticate the session, or the session will be
+destroyed.  Thus the User-Agent acts as a backup to the real session id.
+The IP address of the browser cannot be used, since because of proxies,
+IP addresses may change between requests during a session.
+<font face="courier new" size=3><pre>
+</pre></font>There are a few browsers that will not present a User-Agent header.
+These browsers are considered to be browsers of type &quot;Unknown&quot;, and 
+this method works the same way for them.
+<font face="courier new" size=3><pre>
+</pre></font>Most people agree that this level of security is unnecessary, thus
+it is titled paranoid :)
+<font face="courier new" size=3><pre>
+  PerlSetVar ParanoidSession 0
+</pre></font>
+	
+	<p>
+	<a name=SessionSeria0633b2a7></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>SessionSerialize</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, if true, locks $Session for duration of script, which
+serializes requests to the $Session object.  Only one script at
+a time may run, per user $Session, with sessions allowed.
+<font face="courier new" size=3><pre>
+</pre></font>Serialized requests to the session object is the Microsoft ASP way, 
+but is dangerous in a production environment, where there is risk
+of long-running or run-away processes.  If these things happen,
+a session may be locked for an indefinite period of time.  A user
+STOP button should safely quit the session however.
+<font face="courier new" size=3><pre>
+  PerlSetVar SessionSerialize 0
+</pre></font>
+	
+	<p>
+	<a name=SessionCount></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>SessionCount</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, if true enables the $Application-&gt;SessionCount API
+which returns how many sessions are currently active in 
+the application.  This config was created 
+because there is a performance hit associated with this
+count tracking, so it is disabled by default.
+<font face="courier new" size=3><pre>
+  PerlSetVar SessionCount 1
+</pre></font>
+	
+	<p>
+	<a name=Cookieless%20S21cbf4f4></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Cookieless Sessions</b></font>
+</font>
+	
+	<p>
+	<a name=SessionQuery6920bb61></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>SessionQueryParse</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, if true, will automatically parse the $Session
+session id into the query string of each local URL found in the 
+$Response buffer.  For this setting to work therefore, 
+buffering must be enabled.  This parsing will only occur
+when a session cookie has not been sent by a browser, so the 
+first script of a session enabled site, and scripts viewed by 
+web browsers that have cookies disabled will trigger this behavior.
+<font face="courier new" size=3><pre>
+</pre></font>Although this runtime parsing method is computationally 
+expensive, this cost should be amortized across most users
+that will not need this URL parsing.  This is a lazy programmer&#39;s
+dream.  For something more efficient, look at the SessionQuery
+setting.  For more information about this solution, please 
+read the <a href=sessions.html><font size=-1 face=verdana><b>SESSIONS</b></font></a> section.
+<font face="courier new" size=3><pre>
+  PerlSetVar SessionQueryParse 0
+</pre></font>
+	
+	<p>
+	<a name=SessionQueryd88d64b8></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>SessionQueryParseMatch</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, set to a regexp pattern that matches all URLs that you 
+want to have SessionQueryParse parse in session ids.  By default
+SessionQueryParse only modifies local URLs, but if you name
+your URLs of your site with absolute URLs like <tt>http://localhost</tt>
+then you will need to use this setting.  So to match 
+<tt>http://localhost</tt> URLs, you might set this pattern to 
+^<tt>http://localhost.</tt>  Note that by setting this config,
+you are also setting SessionQueryParse.
+<font face="courier new" size=3><pre>
+  PerlSetVar SessionQueryParseMatch ^https?://localhost
+</pre></font>
+	
+	<p>
+	<a name=SessionQuery></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>SessionQuery</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, if set, the session id will be initialized from
+the $Request-&gt;QueryString if not first found as a cookie.
+You can use this setting coupled with the 
+<font face="courier new" size=3><pre>
+  $Server-&gt;URL($url, \%params) 
+</pre></font>API extension to generate local URLs with session ids in their
+query strings, for efficient cookieless session support.
+Note that if a browser has cookies disabled, every URL
+to any page that needs access to $Session will need to
+be created by this method, unless you are using SessionQueryParse
+which will do this for you automatically.
+<font face="courier new" size=3><pre>
+  PerlSetVar SessionQuery 0
+</pre></font>
+	
+	<p>
+	<a name=SessionQuery3ae841c3></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>SessionQueryMatch</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, set to a regexp pattern that will match
+URLs for $Server-&gt;URL() to add a session id to.  SessionQuery
+normally allows $Server-&gt;URL() to add session ids just to 
+local URLs, so if you use absolute URL references like 
+<tt>http://localhost/</tt> for your web site, then just like 
+with SessionQueryParseMatch, you might set this pattern
+to ^<tt>http://localhost</tt>
+<font face="courier new" size=3><pre>
+</pre></font>If this is set, then you don&#39;t need to set SessionQuery,
+as it will be set automatically.
+<font face="courier new" size=3><pre>
+  PerlSetVar SessionQueryMatch ^<tt>http://localhost</tt>
+</pre></font>
+	
+	<p>
+	<a name=SessionQuery85863960></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>SessionQueryForce</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, set to 1 if you want to disallow the use of cookies
+for session id passing, and only allow session ids to be passed
+on the query string via SessionQuery and SessionQueryParse settings.
+<font face="courier new" size=3><pre>
+  PerlSetVar SessionQueryForce 1
+</pre></font>
+	
+	<p>
+	<a name=Developer%20Enc3495841></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Developer Environment</b></font>
+</font>
+	
+	<p>
+	<a name=UseStrict></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>UseStrict</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, if set to 1, will compile all scripts, global.asa
+and includes with &quot;use strict;&quot; inserted at the head of 
+the file, saving you from the painful process of strictifying
+code that was not strict to begin with.
+<font face="courier new" size=3><pre>
+</pre></font>Because of how essential &quot;use strict&quot; programming is in
+a <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a> environment, this default might be set to 1 
+one day, but this will be up for discussion before that
+decision is made.
+<font face="courier new" size=3><pre>
+</pre></font>Note too that errors triggered by &quot;use strict&quot; are
+now captured as part of the normal Apache::ASP error 
+handling when this configuration is set, otherwise
+&quot;use strict&quot; errors will not be handled properly, so
+using UseStrict is better than your own &quot;use strict&quot;
+statements.
+<font face="courier new" size=3><pre>
+</pre></font>PerlSetVar UseStrict 1</font>
+	
+	<p>
+	<a name=Debug></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>Debug</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>1 for server log debugging, 2 for extra client html output,
+3 for microtimes logged. Use 1 for production debugging, 
+use 2 or 3 for development.  Turn off if you are not 
+debugging.  These settings activate $Response-&gt;Debug().
+<font face="courier new" size=3><pre>
+  PerlSetVar Debug 2	
+</pre></font>If Debug 3 is set and Time::HiRes is installed, microtimes
+will show up in the log, and also calculate the time
+between one $Response-&gt;Debug() and another, so good for a
+quick benchmark when you glance at the logs.
+<font face="courier new" size=3><pre>
+  PerlSetVar Debug 3
+</pre></font>If you would like to enable system level debugging, set
+Debug to a negative value.  So for system level debugging,
+but no output to browser:
+<font face="courier new" size=3><pre>
+  PerlSetVar Debug -1
+</pre></font>
+	
+	<p>
+	<a name=DebugBufferL32fcff6d></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>DebugBufferLength</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Default 100, set this to the number of bytes of the 
+buffered output&#39;s tail you want to see when an error occurs
+and Debug 2 or MailErrorsTo is set, and when 
+BufferingOn is enabled.  
+<font face="courier new" size=3><pre>
+</pre></font>With buffering the script output will not naturally show 
+up when the script errors, as it has been buffered by the 
+$Response object.  It helps to see where in the script
+output an error halted the script, so the last bytes of 
+the buffered output are included with the rest of 
+the debugging information.  
+<font face="courier new" size=3><pre>
+</pre></font>For a demo of this functionality, try the 
+<a href=eg/syntax_error.htm>./site/eg/syntax_error.htm</a> script, and turn buffering on.</font>
+	
+	<p>
+	<a name=PodComments></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>PodComments</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 1.  With pod comments turned on, perl pod style comments
+and documentation are parsed out of scripts at compile time.
+This make for great documentation and a nice debugging tool,
+and it lets you comment out perl code and html in blocks.  
+Specifically text like this:
+<font face="courier new" size=3><pre>
+ =pod
+ text or perl code here
+ =cut 
+</pre></font>will get ripped out of the script before compiling.  The =pod and =cut 
+perl directives must be at the beginning of the line, and must
+be followed by the end of the line.
+<font face="courier new" size=3><pre>
+  PerlSetVar PodComments 1
+</pre></font>
+	
+	<p>
+	<a name=CollectionItb0343456></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>CollectionItem</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Enables <a href=http://www.activestate.com/ActivePerl/><font size=-1 face=verdana><b>PerlScript</b></font></a> syntax like:
+<font face="courier new" size=3><pre>
+  $Request-&gt;Form(&#39;var&#39;)-&gt;Item;
+  $Request-&gt;Form(&#39;var&#39;)-&gt;Item(1);
+  $Request-&gt;Form(&#39;var&#39;)-&gt;Count;
+</pre></font>Old PerlScript syntax, enabled with
+<font face="courier new" size=3><pre>
+  use Win32::OLE qw(in valof with OVERLOAD);
+</pre></font>is like native syntax
+<font face="courier new" size=3><pre>
+  $Request-&gt;Form(&#39;var&#39;);
+</pre></font>Only in Apache::ASP, can the above be written as:
+<font face="courier new" size=3><pre>
+  $Request-&gt;{Form}{var};
+</pre></font>which you would do if you _really_ needed the speed.</font>
+	
+	<p>
+	<a name=XML%20%2F%20XSLT></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>XML / XSLT</b></font>
+</font>
+	
+	<p>
+	<a name=XMLSubsMatch></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>XMLSubsMatch</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default not defined, set to some regexp pattern
+that will match all XML and HTML tags that you want
+to have perl subroutines handle.  The is Apache::ASP&#39;s
+custom tag technology, and can be used to create
+powerful extensions to your XML and HTML rendering.
+<font face="courier new" size=3><pre>
+</pre></font>Please see <a href=xml.html><font size=-1 face=verdana><b>XML/XSLT</b></font></a> section for instructions on its use.
+<font face="courier new" size=3><pre>
+  PerlSetVar XMLSubsMatch my:[\w\-]+
+</pre></font>
+	
+	<p>
+	<a name=XMLSubsStric569463b3></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>XMLSubsStrict</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, when set XMLSubs will only take arguments
+that are properly formed XML tag arguments like:
+<font face="courier new" size=3><pre>
+ &lt;my:sub arg1=&quot;value&quot; arg2=&quot;value&quot; /&gt;
+</pre></font>By default, XMLSubs accept arbitrary perl code as
+argument values:
+<font face="courier new" size=3><pre>
+ &lt;my:sub arg1=1+1 arg2=&amp;perl_sub()/&gt;
+</pre></font>which is not always wanted or expected.  Set
+XMLSubsStrict to 1 if this is the case.
+<font face="courier new" size=3><pre>
+  PerlSetVar XMLSubsStrict 1
+</pre></font>
+	
+	<p>
+	<a name=XMLSubsPerlA21dba3d7></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>XMLSubsPerlArgs</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 1, when set attribute values will be interpreted
+as raw perl code so that these all would execute as one
+would expect:
+<font face="courier new" size=3><pre>
+ &lt;my:xmlsubs arg=&#39;1&#39; arg2=&quot;2&quot; arg3=$value arg4=&quot;1 $value&quot; /&gt;
+</pre></font>With the 2.45 release, 0 may be set for this configuration
+or a more ASP style variable interpolation:
+<font face="courier new" size=3><pre>
+ &lt;my:xmlsubs arg=&#39;1&#39; arg2=&quot;2&quot; args3=&quot;&lt;%= $value %&gt;&quot; arg4=&quot;1 &lt;%= $value %&gt;&quot; /&gt;
+</pre></font>This configuration is being introduced experimentally in version 2.45,
+as it will become the eventual default in the 3.0 release.
+<font face="courier new" size=3><pre>
+  PerlSetVar XMLSubsPerlArgs Off
+</pre></font>
+	
+	<p>
+	<a name=XSLT></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>XSLT</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default not defined, if set to a file, ASP scripts will
+be regarded as XML output and transformed with the given
+XSL file with <a href=http://xmlxslt.sourceforge.net/><font size=-1 face=verdana><b>XML::XSLT</b></font></a>.  This XSL file will also be
+executed as an ASP script first, and its output will be
+the XSL data used for the transformation.  This XSL file
+will be executed as a dynamic include, so may be located
+in the current directory, Global, or IncludesDir.
+<font face="courier new" size=3><pre>
+</pre></font>Please see the <a href=xml.html><font size=-1 face=verdana><b>XML/XSLT</b></font></a> section for an explanation of its
+use.
+<font face="courier new" size=3><pre>
+  PerlSetVar XSLT template.xsl
+</pre></font>
+	
+	<p>
+	<a name=XSLTMatch></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>XSLTMatch</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default .*, if XSLT is set by default all ASP scripts 
+will be XSL transformed by the specified XSL template.
+This regexp setting will tell XSLT which file names to 
+match with doing XSL transformations, so that regular
+HTML ASP scripts and XML ASP scripts can be configured
+with the same configuration block.  Please see
+<a href=eg/.htaccess>./site/eg/.htaccess</a> for an example of its use.
+<font face="courier new" size=3><pre>
+  PerlSetVar XSLTMatch \.xml$
+</pre></font>
+	
+	<p>
+	<a name=XSLTParser></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>XSLTParser</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default <a href=http://xmlxslt.sourceforge.net/><font size=-1 face=verdana><b>XML::XSLT</b></font></a>, determines which perl module to use for 
+XSLT parsing.  This is a new config as of 2.11.
+Also supported is XML::Sablotron which does not
+handle XSLT with the exact same output, but is about
+10 times faster than XML::XSLT.  XML::LibXSLT may
+also be used as of version 2.29, and seems to be
+about twice again as fast as XML::Sablotron,
+and a very complete XSLT implementation.
+<font face="courier new" size=3><pre>
+  PerlSetVar XSLTParser XML::XSLT
+  PerlSetVar XSLTParser XML::Sablotron
+  PerlSetVar XSLTParser XML::LibXSLT
+</pre></font>
+	
+	<p>
+	<a name=XSLTCache></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>XSLTCache</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Activate XSLT file based caching through CacheDB, CacheDir,
+and CacheSize settings.  This gives cached XSLT performance
+near AxKit and greater than Cocoon.  XSLT caches transformations
+keyed uniquely by XML &amp; XSLT inputs.
+<font face="courier new" size=3><pre>
+  PerlSetVar XSLTCache 1
+</pre></font>
+	
+	<p>
+	<a name=XSLTCacheSiz6e7d9101></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>XSLTCacheSize</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>as of version 2.11, this config is no longer supported.</font>
+	
+	<p>
+	<a name=Caching></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Caching</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>The output caching layer is a file dbm based output cache that runs
+on top of the MLDBM::Sync so inherits its performance characteristics.  
+With CacheDB set to MLDBM::Sync::SDBM_File, the cache layer is 
+very fast at caching entries up to 20K in size, but for greater 
+cached items, you should set CacheDB to another dbm like DB_File 
+or GDBM_File.
+<font face="courier new" size=3><pre>
+</pre></font>In order for the cache layer
+to function properly, whether for $Response-&gt;Include() output
+caching, see <a href=objects.html><font size=-1 face=verdana><b>OBJECTS</b></font></a>, or XSLT caching, see <a href=xml.html><font size=-1 face=verdana><b>XML/XSLT</b></font></a>, then
+Apache::ASP must be loaded in the parent httpd like so:
+<font face="courier new" size=3><pre>
+  # httpd.conf
+  PerlModule Apache::ASP
+    -- or --
+  &lt;Perl&gt;
+    use Apache::ASP;
+  &lt;/Perl&gt;
+</pre></font>The cache layer automatically expires entries upon
+server restart, but for this to work, a $ServerID
+must be computed when the Apache::ASP module gets
+loaded to store in each cached item.  Without the 
+above done, each child httpd process will get its
+own $ServerID, so caching will not work at all.
+<font face="courier new" size=3><pre>
+</pre></font>This said, output caching will not work in raw <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a> mode,
+just running under <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a>.</font>
+	
+	<p>
+	<a name=CacheDB></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>CacheDB</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Like StateDB, sets dbm format for caching.  Since SDBM_File
+only support key/values pairs of around 1K max in length,
+the default for this is MLDBM::Sync::SDBM_File, which is very
+fast for &lt; 20K output sizes.  For caching larger data than 20K,
+DB_File or GDBM_File are probably better to use.
+<font face="courier new" size=3><pre>
+  PerlSetVar CacheDB MLDBM::Sync::SDBM_File
+
+</pre></font>Here are some benchmarks about the CacheDB when used 
+with caching output from $Response-&gt;Include(\%cache)
+running on a Linux 2.2.14 dual PIII-450. 
+The variables are output size being cached &amp; the CacheDB used,
+the default being MLDBM::Sync::SDBM_File. 
+<font face="courier new" size=3><pre>
+</pre></font><table class="noescape" border="0">
+<tr><th>CacheDB</th><th>Output Cached</th><th>Operation</th><th>Ops/sec</th></tr>
+<tr><td>MLDBM::Sync::SDBM_File</td>	<td>3200 bytes</td>	<td>read</td>	<td>177</td></tr>
+<tr><td>DB_File</td>			<td>3200 bytes</td>	<td>read</td>	<td>59</td></tr>
+<tr><td>MLDBM::Sync::SDBM_File</td>	<td>32000 bytes</td>	<td>read</td>	<td>42</td></tr>
+<tr><td>DB_File</td>			<td>32000 bytes</td>	<td>read</td>	<td>53</td></tr>
+<tr><td>MLDBM::Sync::SDBM_File</td>	<td>3200 bytes</td>	<td>write</td>	<td>42</td></tr>
+<tr><td>DB_File</td>			<td>3200 bytes</td>	<td>write</td>	<td>39</td></tr>
+</table>
+<font face="courier new" size=3><pre>
+</pre></font>For your own benchmarks to test the relative speeds of the
+various DBMs under MLDBM::Sync, which is used by CacheDB,
+you may run the ./bench/bench_sync.pl script from the 
+MLDBM::Sync distribution on your system.</font>
+	
+	<p>
+	<a name=CacheDir></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>CacheDir</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>By default, the cache directory is at StateDir/cache,
+but CacheDir can be used to set the StateDir value for 
+caching purposes.  One may want the CacheDir separate
+from StateDir for example StateDir might be a centrally
+network mounted file system, while CacheDir might be
+a local file cache.
+<font face="courier new" size=3><pre>
+  PerlSetVar CacheDir /tmp/asp_demo
+</pre></font>On a system like Solaris where there is a RAM disk 
+mounted on the system like /tmp, I could put the CacheDir
+there.  On a system like Linux where files are cached
+pretty well by default, this is less important.</font>
+	
+	<p>
+	<a name=CacheSize></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>CacheSize</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>By default, this is 10M of data per cache.  When any cache, 
+like the XSLTCache, reaches this limit, the cache will be purged 
+by deleting the cached dbm files entirely.  This is better for 
+long term running of dbms than deleting individual records, 
+because dbm formats will often degrade in performance with 
+lots of insert &amp; deletes.
+<font face="courier new" size=3><pre>
+</pre></font>Units of M, K, and B are supported for megabytes, kilobytes, and bytes,
+with the default unit being B, so the following configs all mean the
+same thing;
+<font face="courier new" size=3><pre>
+  PerlSetVar CacheSize 10M
+  PerlSetVar CacheSize 10240K
+  PerlSetVar CacheSize 10485760B
+  PerlSetVar CacheSize 10485760
+</pre></font>There are 2 caches currently, the XSLTCache, and the
+Response cache, the latter which is currently invoked
+for caching output from includes with special syntax.
+See $Response-&gt;Include() for more info on the Response cache.</font>
+	
+	<p>
+	<a name=Miscellaneou387baf01></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Miscellaneous</b></font>
+</font>
+	
+	<p>
+	<a name=AuthServerVaa7584921></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>AuthServerVariables</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0. If you are using basic auth and would like 
+$Request-&gt;ServerVariables set like AUTH_TYPE, AUTH_USER, 
+AUTH_NAME, REMOTE_USER, &amp; AUTH_PASSWD, then set this and
+Apache::ASP will initialize these values from Apache-&gt;*auth* 
+commands.  Use of these environment variables keeps applications
+cross platform compatible as other servers set these too
+when performing basic 401 auth.
+<font face="courier new" size=3><pre>
+  PerlSetVar AuthServerVariables 0
+</pre></font>
+	
+	<p>
+	<a name=BufferingOn></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>BufferingOn</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 1, if true, buffers output through the response object.
+$Response object will only send results to client browser if
+a $Response-&gt;Flush() is called, or if the asp script ends.  Lots of 
+output will need to be flushed incrementally.
+<font face="courier new" size=3><pre>
+</pre></font>If false, 0, the output is immediately written to the client,
+<a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a> style.  There will be a performance hit server side if output
+is flushed automatically to the client, but is probably small.
+<font face="courier new" size=3><pre>
+</pre></font>I would leave this on, since error handling is poor, if your asp 
+script errors after sending only some of the output.
+<font face="courier new" size=3><pre>
+  PerlSetVar BufferingOn 1
+</pre></font>
+	
+	<p>
+	<a name=InodeNames></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>InodeNames</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Default 0. Set to 1 to uses a stat() call on scripts and includes to
+derive subroutine namespace based on device and inode numbers. In case of 
+multiple symbolic links pointing to the same script this will result 
+in the script being compiled only once. Use only on unix flavours
+which support the stat() call that know about device and inode 
+numbers.
+<font face="courier new" size=3><pre>
+  PerlSetVar InodeNames 1
+</pre></font>
+	
+	<p>
+	<a name=RequestParam25a784ba></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>RequestParams</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Default 0, if set creates $Request-&gt;Params object with combined 
+contents of $Request-&gt;QueryString and $Request-&gt;Form.  This
+is for developer convenience simlar to <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a>.pm&#39;s param() method.
+<font face="courier new" size=3><pre>
+  PerlSetVar RequestParams 1
+</pre></font>
+	
+	<p>
+	<a name=RequestBinarc4419e4b></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>RequestBinaryRead</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Default On, if set to Off will not read POST data into $Request-&gt;Form().
+<font face="courier new" size=3><pre>
+</pre></font>One potential reason for configuring this to Off might be to initialize the Apache::ASP
+object in an Apache handler phase earlier than the normal PerlRequestHandler
+phase, so that it does not interfere with normal reading of POST data later
+in the request.
+<font face="courier new" size=3><pre>
+  PerlSetVar RequestBinaryRead On
+</pre></font>
+	
+	<p>
+	<a name=StatINC></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>StatINC</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, if true, reloads perl libraries that have changed
+on disk automatically for ASP scripts.  If false, the www server
+must be restarted for library changes to take effect.
+<font face="courier new" size=3><pre>
+</pre></font>A known bug is that any functions that are exported, e.g. confess 
+Carp qw(confess), will not be refreshed by StatINC.  To refresh
+these, you must restart the www server.  
+<font face="courier new" size=3><pre>
+</pre></font>This setting should be used in development only because it is so slow.
+For a production version of StatINC, see StatINCMatch.
+<font face="courier new" size=3><pre>
+  PerlSetVar StatINC 1
+</pre></font>
+	
+	<p>
+	<a name=StatINCMatch></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>StatINCMatch</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default undef, if defined, it will be used as a regular expression
+to reload modules that match as in StatINC.  This is useful because
+StatINC has a very high performance penalty in production, so if
+you can narrow the modules that are checked for reloading each
+script execution to a handful, you will only suffer a mild performance 
+penalty.
+<font face="courier new" size=3><pre>
+</pre></font>The StatINCMatch setting should be a regular expression like: Struct|LWP
+which would match on reloading Class/Struct.pm, and all the LWP/.*
+libraries.
+<font face="courier new" size=3><pre>
+</pre></font>If you define StatINCMatch, you do not need to define StatINC.
+<font face="courier new" size=3><pre>
+  PerlSetVar StatINCMatch .*
+</pre></font>
+	
+	<p>
+	<a name=StatScripts></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>StatScripts</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 1, if set to 0, changed scripts, global.asa, and includes
+will not be reloaded.  Coupled with Apache <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a> startup and restart
+handlers executing Apache::ASP-&gt;Loader() for your application
+this allows your application to be frozen, and only reloaded on the 
+next server restart or stop/start.
+<font face="courier new" size=3><pre>
+</pre></font>There are a few advantages for not reloading scripts and modules
+in production.  First there is a slight performance improvement
+by not having to stat() the script, its includes and the global.asa
+every request.  
+<font face="courier new" size=3><pre>
+</pre></font>From an application deployment standpoint, you
+also gain the ability to deploy your application as a 
+snapshot taken when the server starts and restarts.
+This provides you with the reassurance that during a
+production server update from development sources, you 
+do not have to worry with sources being used for the 
+wrong libraries and such, while they are all being 
+copied over.
+<font face="courier new" size=3><pre>
+</pre></font>Finally, though you really should not do this, you can
+work on a live production application, with a test server
+reloading changes, but your production server does see
+the changes until you restart or stop/start it.  This 
+saves your public from syntax errors while you are just
+doing a quick bug fix.
+<font face="courier new" size=3><pre>
+  PerlSetVar StatScripts 1
+</pre></font>
+	
+	<p>
+	<a name=SoftRedirect></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>SoftRedirect</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, if true, a $Response-&gt;Redirect() does not end the 
+script.  Normally, when a Redirect() is called, the script
+is ended automatically.  SoftRedirect 1, is a standard
+way of doing redirects, allowing for html output after the 
+redirect is specified.
+<font face="courier new" size=3><pre>
+  PerlSetVar SoftRedirect 0
+</pre></font>
+	
+	<p>
+	<a name=Filter></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>Filter</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>On/Off, default Off.  With filtering enabled, you can take advantage of 
+full server side includes (<a href=ssi.html><font size=-1 face=verdana><b>SSI</b></font></a>), implemented through Apache::SSI.  
+SSI is implemented through this mechanism by using Apache::Filter.  
+A sample configuration for full SSI with filtering is in the 
+<a href=eg/.htaccess>./site/eg/.htaccess</a> file, with a relevant example script <a href=eg/ssi_filter.ssi>./site/eg/ssi_filter.ssi</a>.
+<font face="courier new" size=3><pre>
+</pre></font>You may only use this option with modperl v1.16 or greater installed
+and PERL_STACKED_HANDLERS enabled.  Filtering may be used in 
+conjunction with other handlers that are also &quot;filter aware&quot;.
+If in doubt, try building your <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a> with 
+<font face="courier new" size=3><pre>
+  perl Makefile.PL EVERYTHING=1
+</pre></font>With filtering through Apache::SSI, you should expect near a
+a 20% performance decrease.
+<font face="courier new" size=3><pre>
+  PerlSetVar Filter Off
+</pre></font>
+	
+	<p>
+	<a name=CgiHeaders></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>CgiHeaders</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0.  When true, script output that looks like HTTP / <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a>
+headers, will be added to the HTTP headers of the request.
+So you could add:
+<font face="courier new" size=3><pre>  Set-Cookie: test=message
+
+  &lt;html&gt;...
+</pre></font>to the top of your script, and all the headers preceding a newline
+will be added as if with a call to $Response-&gt;AddHeader().  This
+functionality is here for compatibility with raw cgi scripts,
+and those used to this kind of coding.
+<font face="courier new" size=3><pre>
+</pre></font>When set to 0, CgiHeaders style headers will not be parsed from the 
+script response.
+<font face="courier new" size=3><pre>
+  PerlSetVar CgiHeaders 0
+</pre></font>
+	
+	<p>
+	<a name=Clean></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>Clean</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, may be set between 1 and 9.  This setting determine how much
+text/html output should be compressed.  A setting of 1 strips mostly
+white space saving usually 10% in output size, at a performance cost
+of less than 5%.  A setting of 9 goes much further saving anywhere
+25% to 50% typically, but with a performance hit of 50%.
+<font face="courier new" size=3><pre>
+</pre></font>This config option is implemented via HTML::Clean.  Per script
+configuration of this setting is available via the $Response-&gt;{Clean}
+property, which may also be set between 0 and 9.
+<font face="courier new" size=3><pre>
+  PerlSetVar Clean 0
+</pre></font>
+	
+	<p>
+	<a name=CompressGzip></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>CompressGzip</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, if true will gzip compress HTML output on the
+fly if Compress::Zlib is installed, and the client browser
+supports it.  Depending on the HTML being compressed, 
+the client may see a 50% to 90% reduction in HTML output.
+I have seen 40K of HTML squeezed down to just under 6K.
+This will come at a 5%-20% hit to CPU usage per request
+compressed.
+<font face="courier new" size=3><pre>
+</pre></font>Note there are some cases when a browser says it will accept
+gzip encoding, but then not render it correctly.  This
+behavior has been seen with IE5 when set to use a proxy but 
+not using a proxy, and the URL does not end with a .html or .htm.
+No work around has yet been found for this case so use at your 
+own risk.
+<font face="courier new" size=3><pre>
+  PerlSetVar CompressGzip 1
+</pre></font>
+	
+	<p>
+	<a name=FormFill></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>FormFill</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, if true will auto fill HTML forms with values
+from $Request-&gt;Form().  This functionality is provided
+by use of HTML::FillInForm.  For more information please
+see &quot;perldoc HTML::FillInForm&quot;, and the 
+example <a href=eg/formfill.asp>./site/eg/formfill.asp</a>.  
+<font face="courier new" size=3><pre>
+</pre></font>This feature can be enabled on a per form basis at runtime
+with $Response-&gt;{FormFill} = 1
+<font face="courier new" size=3><pre>
+  PerlSetVar FormFill 1
+</pre></font>
+	
+	<p>
+	<a name=TimeHiRes></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>TimeHiRes</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, if set and Time::HiRes is installed, will do 
+sub second timing of the time it takes Apache::ASP to process
+a request.  This will not include the time spent in the 
+session manager, nor modperl or Apache, and is only a 
+rough approximation at best.
+<font face="courier new" size=3><pre>
+</pre></font>If Debug is set also, you will get a comment in your
+HTML output that indicates the time it took to process
+that script.
+<font face="courier new" size=3><pre>
+</pre></font>If system debugging is set with Debug -1 or -2, you will
+also get this time in the Apache error log with the 
+other system messages.</font>
+	
+	<p>
+	<a name=Mail%20Adminis1a4d2b59></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Mail Administration</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Apache::ASP has some powerful administrative email
+extensions that let you sleep at night, knowing full well
+that if an error occurs at the web site, you will know
+about it immediately.  With these features already enabled,
+it was also easy to provide the $Server-&gt;Mail(\%mail) API 
+extension which you can read up about in the <a href=objects.html><font size=-1 face=verdana><b>OBJECTS</b></font></a> section.</font>
+	
+	<p>
+	<a name=MailHost></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>MailHost</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>The mail host is the smtp server that the below Mail* config directives
+will use when sending their emails.  By default Net::SMTP uses
+smtp mail hosts configured in Net::Config, which is set up at
+install time, but this setting can be used to override this config.
+<font face="courier new" size=3><pre>
+</pre></font>The mail hosts specified in the Net::Config file will be used as
+backup smtp servers to the MailHost specified here, should this
+primary server not be working.
+<font face="courier new" size=3><pre>
+  PerlSetVar MailHost smtp.yourdomain.com.foobar
+</pre></font>
+	
+	<p>
+	<a name=MailFrom></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>MailFrom</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Default NONE, set this to specify the default mail address placed 
+in the From: mail header for the $Server-&gt;Mail() API extension, 
+as well as MailErrorsTo and MailAlertTo.
+<font face="courier new" size=3><pre>
+  PerlSetVar MailFrom <b>&#121;&#111;&#117;&#114;&#101;&#109;&#097;&#105;&#108;&#064;&#121;&#111;&#117;&#114;&#100;&#111;&#109;&#097;&#105;&#110;&#046;&#099;&#111;&#109;&#046;&#102;&#111;&#111;&#098;&#097;&#114;</b>
+</pre></font>
+	
+	<p>
+	<a name=MailErrorsTo></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>MailErrorsTo</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>No default, if set, ASP server errors, error code 500, that result
+while compiling or running scripts under Apache::ASP will automatically
+be emailed to the email address set for this config.  This allows
+an administrator to have a rapid response to user generated server
+errors resulting from bugs in production ASP scripts.  Other errors, such 
+as 404 not found will be handled by Apache directly.
+<font face="courier new" size=3><pre>
+</pre></font>An easy way to see this config in action is to have an ASP script which calls
+a die(), which generates an internal ASP 500 server error.
+<font face="courier new" size=3><pre>
+</pre></font>The Debug config of value 2 and this setting are mutually exclusive,
+as Debug 2 is a development setting where errors are displayed in the browser,
+and MailErrorsTo is a production setting so that errors are silently logged
+and sent via email to the web admin.
+<font face="courier new" size=3><pre>
+  PerlSetVar MailErrorsTo <b>&#121;&#111;&#117;&#114;&#101;&#109;&#097;&#105;&#108;&#064;&#121;&#111;&#117;&#114;&#100;&#111;&#109;&#097;&#105;&#110;&#046;&#099;&#111;&#109;</b>
+</pre></font>
+	
+	<p>
+	<a name=MailAlertTo></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>MailAlertTo</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>The address configured will have an email sent on any ASP server error 500,
+and the message will be short enough to fit on a text based pager.  This
+config setting would be used to give an administrator a heads up that a www
+server error occurred, as opposed to MailErrorsTo would be used for debugging
+that server error.
+<font face="courier new" size=3><pre>
+</pre></font>This config does not work when Debug 2 is set, as it is a setting for
+use in production only, where Debug 2 is for development use.
+<font face="courier new" size=3><pre>
+  PerlSetVar MailAlertTo <b>&#121;&#111;&#117;&#114;&#101;&#109;&#097;&#105;&#108;&#064;&#121;&#111;&#117;&#114;&#100;&#111;&#109;&#097;&#105;&#110;&#046;&#099;&#111;&#109;</b>
+</pre></font>
+	
+	<p>
+	<a name=MailAlertPer096b67a8></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>MailAlertPeriod</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Default 20 minutes, this config specifies the time in minutes over 
+which there may be only one alert email generated by MailAlertTo.
+The purpose of MailAlertTo is to give the admin a heads up that there
+is an error at the www server.  MailErrorsTo is for to aid in speedy 
+debugging of the incident.
+<font face="courier new" size=3><pre>
+  PerlSetVar MailAlertPeriod 20
+</pre></font>
+	
+	<p>
+	<a name=File%20Uploads></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>File Uploads</b></font>
+</font>
+	
+	<p>
+	<a name=FileUploadMa625d7c4d></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>FileUploadMax</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, if set will limit file uploads to this
+size in bytes.  This is currently implemented by 
+setting $<a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a>::POST_MAX before handling the file
+upload.  Prior to this, a developer would have to
+hardcode a value for $CGI::POST_MAX to get this 
+to work.
+<font face="courier new" size=3><pre>
+  PerlSetVar 100000
+</pre></font>
+	
+	<p>
+	<a name=FileUploadTeb83a1ea3></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>FileUploadTemp</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>default 0, if set will leave a temp file on disk during the request, 
+which may be helpful for processing by other programs, but is also
+a security risk in that other users on the operating system could 
+potentially read this file while the script is running. 
+<font face="courier new" size=3><pre>
+</pre></font>The path to the temp file will be available at
+$Request-&gt;{FileUpload}{$form_field}{TempFile}.
+The regular use of file uploads remains the same
+with the &lt;$filehandle&gt; to the upload at 
+$Request-&gt;{Form}{$form_field}.  Please see the <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a> section
+for more information on file uploads, and the $Request
+section in <a href=objects.html><font size=-1 face=verdana><b>OBJECTS</b></font></a>.
+<font face="courier new" size=3><pre>
+  PerlSetVar FileUploadTemp 0
+</pre></font>
+	
+
+</font>
+</td>
+
+<td bgcolor=white valign=top>
+&nbsp;
+</td>
+
+</tr>
+<tr bgcolor=#063678>
+	<td colspan=3 align=center width=80%>
+	<font face=verdana color=white size=-1>
+	Copyright &copy; 1998-2008,
+	<a href=http://www.chamas.com><font color=white>Chamas Enterprises Inc.</font></a>
+	</font>
+	</td>
+</tr>
+</table>
+
+</td></tr>
+</table>
+</center>
+
+</body>
+</html>

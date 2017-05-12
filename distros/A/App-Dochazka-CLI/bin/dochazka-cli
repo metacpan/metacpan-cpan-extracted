@@ -1,0 +1,313 @@
+#!/usr/bin/perl
+# ************************************************************************* 
+# Copyright (c) 2014-2016, SUSE LLC
+# 
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+# 
+# 2. Redistributions in binary form must reproduce the above copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution.
+# 
+# 3. Neither the name of SUSE LLC nor the names of its contributors may be
+# used to endorse or promote products derived from this software without
+# specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+# ************************************************************************* 
+#
+# Dochazka CLI script
+#
+use 5.012;
+use strict;
+use warnings;
+
+use App::CELL qw( $CELL $log $site $meta );
+use App::Dochazka::CLI qw( $debug_mode $current_emp $current_priv $prompt_date );
+use App::Dochazka::CLI::Completion qw( dochazka_cli_completion );
+use App::Dochazka::CLI::Parser qw( process_command );
+use App::Dochazka::CLI::Util qw( authenticate_to_server init_logger init_prompt );
+use App::Dochazka::Common::Model::Employee;
+use Data::Dumper;
+use File::HomeDir;
+use Getopt::Long 2.32;
+use JSON;
+use Pod::Usage;
+use Term::ReadKey;
+use Term::ReadLine;
+use Web::MREST::CLI qw( init_cli_client );
+
+my $JSON = JSON->new->pretty;
+
+
+=head1 NAME
+
+dochazka-cli - Command-line client for Dochazka Attendance & Time Tracking System
+
+
+
+=head1 SYNOPSIS
+
+Assuming Dochazka REST server is running on port 5000:
+
+    $ dochazka-cli http://localhost:5000
+    Loading configuration files from /usr/lib/perl5/site_perl/5.20.1/auto/share/dist/App-Dochazka-CLI
+    Authenticating to server at http://localhost:5000
+    Username: 
+    Server is alive
+    Dochazka(2015-03-11) root ADMIN>
+
+This is the Dochazka command-line interface (CLI). Options:
+
+    --debug     -d      Make parser display debug messages
+    --help      -h      Get help
+    --noauth    -n      Omit authentication
+    --password  -p      Specify password
+    --sitedir   -s      Specify sitedir
+    --user      -u      Specify username
+    --version   -v      Display App::Dochazka::CLI version number
+
+For more information, see L<http://metacpan.org/pod/App::Dochazka::CLI>.
+
+
+=head1 DESCRIPTION
+
+This script is used to start the Dochazka command line interface, hereinafter
+referred to as "the CLI".
+
+CLI commands are documented in L<App::Dochazka::CLI::Guide>.
+
+=cut 
+
+local $Data::Dumper::Terse = 1;
+
+$log->init( 
+    ident => "DochazkaCLI",
+    debug_mode => 1,
+); 
+
+my $server = '';
+my $home = File::HomeDir->my_home;
+my $noauth = 0;
+my $versionparam = 0;
+
+sub get_prompt {
+    init_prompt();
+    if ( $noauth ) {
+        return "App::Dochazka::CLI> ";
+    } else {
+        return "Dochazka($prompt_date) " . $current_emp->nick . " " . uc $current_priv . "> ";
+    }
+}
+
+sub printversion {
+    print "App::Dochazka::CLI version $App::Dochazka::CLI::VERSION\n";
+    exit(0);
+}
+
+
+# -------------------------------------------------------------------------
+# main
+# -------------------------------------------------------------------------
+
+# process command-line options
+my $help = 0;
+my $user = '';
+my $password = '';
+my $sitedir;
+my $early_debug;
+GetOptions( 
+    'help|?' => \$help, 
+    'user|u=s' => \$user, 
+    'password|p=s' => \$password,
+    'sitedir|s=s' => \$sitedir,
+    'noauth|n' => \$noauth,
+    'debug|d' => \$debug_mode,
+    'early-debug|e=s' => \$early_debug,
+    'version|v' => \$versionparam,
+);
+
+pod2usage(1) if $help;
+
+print "Debug mode: parser state dumps will be generated\n" if $debug_mode;
+
+printversion() if $versionparam;
+
+# assemble array of sitedirs
+if ( $sitedir and not -d $sitedir ) {
+    die "sitedir value must be a valid directory";
+}
+my @sitedirs;
+foreach my $target ( '/etc/dochazka-cli', "$home/.dochazka-cli", $sitedir ) {
+    if ( defined( $target ) and -d $target ) {
+        push @sitedirs, $target;
+    }
+}
+
+my $interactive = -t STDIN ? 1 : 0;
+my $pipe = -p STDIN ? 1 : 0;
+
+# initialize CLI client
+my $status = init_cli_client( 
+    distro => 'App-Dochazka-CLI',
+    sitedir => [ @sitedirs ],
+    early_debug => $early_debug,
+);
+if ( $status->not_ok ) {
+    print $status->code . ' (' . $status->level . ') ' . $status->text . "\n";
+    print "Response: " . Dumper( $status->payload ) . "\n";
+    exit;
+}
+init_logger();
+init_prompt();
+
+# determine server
+if ( ! ( $server = $ARGV[0] ) ) {
+    if ( $server = $meta->MREST_CLI_URI_BASE ) {
+        print "URI base $server set from site configuration\n";
+    } else {
+        $server = 'http://localhost:5000';
+        print "URI base not set; defaulting to $server\n";
+    }
+}
+
+$meta->set( 'MREST_CLI_URI_BASE', $server );
+
+# authenticate unless --noauth given
+if ( ! $noauth ) {
+    if ( ! $user ) {
+        if ( $user = $site->DOCHAZKA_REST_LOGIN_NICK ) {
+            print "Username $user set from site configuration\n";
+            if ( $password = $site->DOCHAZKA_REST_LOGIN_PASSWORD ) {
+                print "Password set from site configuration\n";
+            }
+        } else {
+            print "Username: ";
+            chomp( $user = <STDIN> );
+        }
+    }
+    print "Authenticating to server at $server as user $user\n";
+    if ( ! $password ) {
+        ReadMode ('noecho');
+        print "Password: ";
+        chomp( $password = <STDIN> );
+        ReadMode ('restore');
+        print "\n";
+    }
+    my $status = authenticate_to_server( user => $user, password => $password );
+    if ( $status->not_ok ) {
+
+        # Handle two classic scenarios:
+        # 1. server not running
+        if ( $status->payload =~ m/Connection refused/ ) {
+            print "Server refused connection - is it running?\n";
+            exit;
+        }
+        # 2. authentication failed
+        if ( $status->text =~ m/Authentication failed/ ) {
+            print "Authentication failed.\n";
+            exit;
+        }
+        # 3. authentication failed
+        if ( $status->text =~ m/Internal auth failed/ ) {
+            print "Authentication failed.\n";
+            exit;
+        }
+
+        # some other scenario?
+        print $status->code . ' (' . $status->level . ') ' . $status->text . "\n";
+        print "Response: " . Dumper( $status->payload ) . "\n";
+        exit;
+    } else {
+        print "Server is alive\n";
+    }
+}
+
+
+# paraphrased from https://metacpan.org/source/HAYASHI/Term-ReadLine-Gnu-1.26/eg/fileman
+sub initialize_readline {
+    my $term = new Term::ReadLine 'dochazka-cli';
+    $term->Attribs->{completion_function} = \&dochazka_cli_completion;
+    return $term;
+}
+
+my $term = initialize_readline() if $interactive;
+
+my $readline = $interactive 
+    ? sub { $term->readline( get_prompt() ) } 
+    : sub {
+        my $line = <STDIN>;
+        return unless defined($line);
+        print get_prompt() . $line;
+        return $line;
+    };
+
+binmode STDOUT, ":utf8";
+
+my $cmd;
+COMMAND: while ( defined ( $cmd = $readline->() ) ) {
+
+    my $rv = process_command( $cmd );
+
+    # The return value SHOULD be a status object, but tolerate the eventuality
+    # that it might be just a plain string
+
+    if ( ref( $rv ) eq 'App::CELL::Status' ) {
+        if ( delete $rv->{'rest_test'} ) {
+            print "HTTP status: " . ( delete $rv->{'http_status'} || '<NONE>' ) . "\n";
+            print "Non-suppressed headers: " . Dumper( $rv->{'headers'} ) if $rv->{'headers'};
+            delete $rv->{'headers'};
+            my $expurgated_rv = $rv->expurgate;
+            #print Dumper( $expurgated_rv );
+            print "Response:\n" . $JSON->encode( $expurgated_rv ) . "\n";
+            next COMMAND;
+        }
+        if ( $rv->level eq 'ERR' and $rv->code eq 'DOCHAZKA_CLI_PARSE_ERROR' ) {
+            print "Command not recognized (parse error)\n";
+            next COMMAND;
+        }
+        if ( $rv->code eq 'REST_ERROR' ) {
+            print "*** REST ERROR ***\n";
+            print $rv->payload, "\n";
+            next COMMAND;
+        }
+        if ( $rv->ok ) {
+            my $pl = $rv->payload;
+            if ( defined( $pl ) and ref( $pl ) eq '' ) {
+                print "$pl\n";
+            } else {
+                if ( $rv->text ) {
+                    print $rv->text, "\n";
+                    print "Payload: " . Dumper( $pl ) . "\n" if defined $pl;
+                } else {
+                    print Dumper( $rv ), "\n";
+                }
+            }
+        } else {
+            print "*** Anomaly detected ***\n";
+            if ( my $status = $rv->{'http_status'} ) {
+                print "Status:      $status\n";
+            }
+            print "Explanation: " . $rv->text . " (" . $rv->level . ")\n";
+            print "\n";
+        }
+        last COMMAND if $rv->level eq 'OK' and $rv->code eq 'DOCHAZKA_CLI_EXIT';
+    } elsif ( ref( $rv ) eq '' ) {
+        print $rv, "\n";
+    }
+}

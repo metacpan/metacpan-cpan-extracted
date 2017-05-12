@@ -1,0 +1,23 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use warnings 'all';
+use base 'Apache2::ASP::Test::Base';
+use Data::Dumper;
+
+my $url = shift(@ARGV) or die <<"USAGE";
+  Usage:  $0 "<url>"
+USAGE
+
+my $s = __PACKAGE__->SUPER::new();
+
+my $res = $s->ua->get( $url );
+if( $res->is_success )
+{
+  print $res->as_string;
+}
+else
+{
+  warn "ERROR - Response As Follows:\n" . ("="x80) . "\n\n" . $res->as_string;
+}# end if()
+

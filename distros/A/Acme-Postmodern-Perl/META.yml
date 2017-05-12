@@ -1,0 +1,23 @@
+---
+abstract: 'Postmodern Perl solves all problems'
+author:
+  - 'Frank Wiegand <frank.wiegand@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Postmodern-Perl
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: 0
+  perl: 5.022
+version: 0.09

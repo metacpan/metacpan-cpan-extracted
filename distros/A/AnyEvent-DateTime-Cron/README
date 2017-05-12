@@ -1,0 +1,149 @@
+NAME
+    AnyEvent::DateTime::Cron - AnyEvent crontab with DateTime::Event::Cron
+
+VERSION
+    version 0.08
+
+SYNOPSIS
+        AnyEvent::DateTime::Cron->new()
+            ->add(
+                '* * * * *'   => sub { warn "Every minute"},
+                '*/2 * * * *' => sub { warn "Every second minute"},
+              )
+            ->start
+            ->recv
+
+        $cron = AnyEvent::DateTime::Cron->new();
+        $cron->debug(1)->add(
+            '* * * * *', name   => 'job_name', single => 1,  sub {'foo'},
+            ...
+        );
+
+        $cron->delete($job_id,$job_id...)
+
+        $cv = $cron->start;
+        $cv->recv;
+
+        AnyEvent::DateTime::Cron->new(time_zone => 'local');
+            ->add(
+                '* * * * *'   => sub { warn "Every minute"},
+                '*/2 * * * *' => sub { warn "Every second minute"},
+              )
+            ->start
+            ->recv
+
+DESCRIPTION
+    AnyEvent::DateTime::Cron is an AnyEvent based crontab, which supports
+    all crontab formats recognised by DateTime::Event::Cron.
+
+    It allows you to shut down a running instance gracefully, by waiting for
+    any running cron jobs to finish before exiting.
+
+METHODS
+  new()
+        $cron = AnyEvent::DateTime::Cron->new(
+            time_zone => ...
+            quartz    => 0/1
+        );
+
+    Creates a new AnyEvent::DateTime::Cron instance - takes optional
+    parameters time_zone and quartz.
+
+    time_zone can will be used to set the time_zone for any DateTime objects
+    that are used internally.
+
+    if quartz is set to a true value then this class will use switch to
+    using DateTime::Event::Cron::Quartz internally, which will allow the use
+    of seconds in the cron expression. See the DateTime::Event::Cron::Quartz
+    for details on writing a proper quartz cron expression.
+
+  add()
+        $cron->add(
+            '* * * * *',                                     sub {...},
+            '* * * * *', name   => 'job_name', single => 1,  sub {...},
+            ...
+        );
+
+    Use "add()" to add new cron jobs. It accepts a list of crontab entries,
+    optional paremeters and callbacks.
+
+    The "name" parameter is useful for debugging, otherwise the
+    auto-assigned "ID" is used instead.
+
+    The "single" parameter, if "true", will only allow a single instance of
+    a job to run at any one time.
+
+    New jobs can be added before running, or while running.
+
+    See "CALLBACKS" for more.
+
+  delete()
+        $cron->delete($job_id,$job_id,....)
+
+    Delete one or more existing jobs, before starting or while running.
+
+  start()
+        my $cv = $cron->start;
+        $cv->recv;
+
+    Schedules all jobs to start at the next scheduled time, and returns an
+    AnyEvent condvar
+    <http://metacpan.org/module/AnyEvent#CONDITION-VARIABLES>.
+
+    The cron loop can be started by calling "recv()" on the condvar.
+
+  stop()
+        $cron->stop()
+
+    Used to shutdown the cron loop gracefully. You can also shutdown the
+    cron loop by sending a "TERM" signal to the process.
+
+  jobs()
+        $job = $cron->jobs
+
+    Returns a hashref containing all the current cron jobs.
+
+  debug()
+        $cron->debug(1|0)
+
+    Turn on debugging.
+
+CALLBACKS
+    A callback is a coderef (eg an anonymous subroutine) which will be
+    called every time your job is triggered. Callbacks should use "AnyEvent"
+    themselves, so that they run asynchronously, otherwise they can block
+    the execution of the cron loop, delaying other jobs.
+
+    Two parameters are passed to your callback: the main $cv of the cron
+    loop, and the $job_description which contains various details about the
+    current job.
+
+    The $cv is the most important parameter, as it allows you to control how
+    your cron loop will shut down. If your callback doesn't use "AnyEvent"
+    and is blocking, then your callback will complete before it returns to
+    the cron loop.
+
+    However, if your callback is running asynchronously (and it really
+    should), then you can block the cron loop from responding to a "stop()"
+    request until your job has completed:
+
+        sub {
+            my $cv = shift;
+            $cv->begin;
+            do_something_asynchronous( cb => sub { $cv->end })
+        }
+
+    Callbacks are called inside an "eval" so if they throw an error, they
+    will warn, but won't cause the cron loop to exit.
+
+AUTHORS
+    *   Clinton Gormley <drtech@cpan.org>
+
+    *   Andy Gorman <agorman@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Clinton Gormley.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

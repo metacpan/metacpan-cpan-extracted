@@ -1,0 +1,131 @@
+==================================================
+Changes from 2013-10-07 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.71 at 2015-10-07 08:10:06 +0000
+-----------------------------------------
+
+  Change: 221296497b441b42259041cf5b711d9cee7c34c1
+  Author: Andrew Kirkpatrick <ubermonk@gmail.com>
+  Date : 2015-10-07 18:37:18 +0000
+
+    Update docs and bump version to 1.71 
+
+  Change: 93dc9043ab9ff3c90bff0b8aa8514a692ea4d75b
+  Author: Andrew Kirkpatrick <ubermonk@gmail.com>
+  Date : 2015-10-05 13:43:44 +0000
+
+    Bump to developer release 
+
+  Change: 6b8d2a4b3d6cc8e68729a11b9d613306d7c13e42
+  Author: Andrew Kirkpatrick <ubermonk@gmail.com>
+  Date : 2015-10-05 13:34:57 +0000
+
+    Restrict multiple whitespace tolerance
+
+    The introduction of \s+ in between all elements led to a missing
+    non-quoted element being mistaken for a gap between two elements. Now
+    \s+ is only matched in between quoted elements where it is
+    unambiguous.
+
+    Refactored tests so that lines and parsed hashes are adjacent, and
+    included tests for multiple spaces between quoted elements, and the
+    failure to parse due to a missing element.
+
+    Fixes RT#107511 
+
+-----------------------------------------
+version 1.70 at 2015-02-14 04:50:11 +0000
+-----------------------------------------
+
+  Change: c844c83d94df36a325d06cc7b82d447fdf284593
+  Author: Andrew Kirkpatrick <ubermonk@gmail.com>
+  Date : 2015-02-14 15:20:11 +0000
+
+    version bump to 1.70 
+
+  Change: 4222b76c6427c56cc1af49a6c95dfedd59576751
+  Author: Andrew Kirkpatrick <ubermonk@gmail.com>
+  Date : 2015-02-14 15:12:01 +0000
+
+    support arbitrary whitespace between elements
+
+    Previously format elements had to be separated by exactly one space
+    character. If there was a typo in the apache.conf that introduced
+    more spaces or a tab, this module couldn't parse the resulting format
+    or log file. Now the separator between log elements is matched by one
+    or more whitespace characters.
+
+    Also the return of a hashref from the parse method is now conditional
+    on a successful parse. A false value is returned if the parse fails. 
+
+  Change: 091ba4a94bbe827099b98b65202bca22d58212a1
+  Author: Andrew Kirkpatrick <ubermonk@gmail.com>
+  Date : 2015-02-14 15:06:52 +0000
+
+    add ChangelogFromGit 
+
+-----------------------------------------
+version 1.60 at 2015-02-12 14:08:11 +0000
+-----------------------------------------
+
+  Change: c335baccfcf3c0f1f1e9f2e558531e591c1f87c0
+  Author: Andrew Kirkpatrick <ubermonk@gmail.com>
+  Date : 2015-02-13 00:38:11 +0000
+
+    version bump to 1.60 
+
+  Change: b071ac622764c5f738fab2bd4ab92511876fc9aa
+  Author: Andrew Kirkpatrick <ubermonk@gmail.com>
+  Date : 2015-02-13 00:37:05 +0000
+
+    add generate_parser method returnign a closure
+
+    Also tests for this feature. 
+
+  Change: e647e9191814dd0a047b388ee04fbfe3cda1c98e
+  Author: Andrew Kirkpatrick <ubermonk@gmail.com>
+  Date : 2015-02-12 23:29:39 +0000
+
+    clarity in member names 
+
+  Change: ee438bfd2e74048dfe1092f93d10241751ad7177
+  Author: Andrew Kirkpatrick <ubermonk@gmail.com>
+  Date : 2015-02-12 18:44:58 +0000
+
+    code cleanup and die on falsey format 
+
+  Change: 9f0ad6b45731f983d173384887dc82bc21f3d1d0
+  Author: Andrew Kirkpatrick <ubermonk@gmail.com>
+  Date : 2015-02-12 18:21:44 +0000
+
+    whitespace normalisation 
+
+  Change: 020d656141dc3bff6c0449d9e9d9f5fef0e73568
+  Author: Andrew Kirkpatrick <ubermonk@gmail.com>
+  Date : 2015-02-12 18:21:21 +0000
+
+    add a .dir-locals.el 
+
+  Change: 552cf49ca8a2db0e76ab5d1fdf09de33b00f3fec
+  Author: Andrew Kirkpatrick <ubermonk@gmail.com>
+  Date : 2015-01-23 19:48:07 +0000
+
+    use GithubMeta dzil plugin 
+
+  Change: bbb9ac10d6c8ffddccbef0a060344a6c709cced7
+  Author: Andrew Kirkpatrick <ubermonk@gmail.com>
+  Date : 2013-04-03 15:34:32 +0000
+
+    ignore build artefacts 
+
+  Change: 7540210979e209a46732f45b6d28c31667e49b3c
+  Author: Andrew Kirkpatrick <ubermonk@gmail.com>
+  Date : 2013-04-03 15:29:31 +0000
+
+    dzil release config 
+
+================================================
+Plus 2 releases after 2013-10-07 00:00:00 +0000.
+================================================

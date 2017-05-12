@@ -1,0 +1,7 @@
+Revision history for Alien::Web
+
+1.1 2017-03-24
+    - Add basic unit tests (PR #1,#3 - PLICEASE)
+
+1.0 2014-12-06
+    - Initial release

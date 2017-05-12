@@ -1,0 +1,39 @@
+<link rel="stylesheet" type="text/css" media="screen" href="<tmpl_var debug_root>/debug.css">
+<script language="Javascript" type="text/javascript" src="<tmpl_var debug_root>/debug.js"></script>
+<script language="Javascript" type="text/javascript">
+var vdDebug = new voodooDebug({
+	"debug_root": "<tmpl_var debug_root>",
+	'app_id':     "<tmpl_var app_id>",
+	'session_id': "<tmpl_var session_id>",
+	'request_id': "<tmpl_var request_id>"
+});
+</script>
+
+<div class="voodooDebug" id="voodooDebug">
+	<div class="vdClosed">
+		<span class="vdClick" onClick="vdDebug.handleSection(this,'top');"><img src="<tmpl_var debug_root>/plus.png" width="9"/>Debug</span>
+		<div class="vdContent">
+			Change Request: <select id="voodooDebugSelect" onChange="vdDebug.changeRequest(this)" onFocus="vdDebug.listRequests()"></select>
+			<tmpl_if enable_profile><div class="vdClosed"><span onClick="vdDebug.handleSection(this,'profile');"      ><img src="<tmpl_var debug_root>/plus.png" width="9"/>Generation Time</span><div id="vd_profile"       class="vdContent"></div></div></tmpl_if>
+			<tmpl_if enable_anydebug>
+				<div class="vdClosed">
+					<span class="vdClick" onClick="vdDebug.handleSection(this,'debug');"><img src="<tmpl_var debug_root>/plus.png" width="9"/>Debug Trace</span>
+					<div class="vdContent">
+						<tmpl_if enable_debug>    <input type="checkbox" id="vd_switch_debug"     checked="1" onClick="vdDebug.filterDebug(this,'debug')"    />debug</tmpl_if>
+						<tmpl_if enable_info>     <input type="checkbox" id="vd_switch_info"      checked="1" onClick="vdDebug.filterDebug(this,'info')"     />info</tmpl_if>
+						<tmpl_if enable_warn>     <input type="checkbox" id="vd_switch_warn"      checked="1" onClick="vdDebug.filterDebug(this,'warn')"     />warn</tmpl_if>
+						<tmpl_if enable_error>    <input type="checkbox" id="vd_switch_error"     checked="1" onClick="vdDebug.filterDebug(this,'error')"    />error</tmpl_if>
+						<tmpl_if enable_exception><input type="checkbox" id="vd_switch_exception" checked="1" onClick="vdDebug.filterDebug(this,'exception')"/>exception</tmpl_if>
+						<tmpl_if enable_trace>    <input type="checkbox" id="vd_switch_trace"     checked="1" onClick="vdDebug.filterDebug(this,'trace')"    />trace</tmpl_if>
+						<tmpl_if enable_table>    <input type="checkbox" id="vd_switch_table"     checked="1" onClick="vdDebug.filterDebug(this,'table')"    />table</tmpl_if>
+						<div id="vd_debug"></div>
+					</div>
+				</div>
+			</tmpl_if>
+			<tmpl_if enable_return_data>  <div class="vdClosed"><span class="vdClick" onClick="vdDebug.handleSection(this,'return_data');"  ><img src="<tmpl_var debug_root>/plus.png" width="9"/>Return Data</span    ><div id="vd_return_data"   class="vdContent"></div></div></tmpl_if>
+			<tmpl_if enable_session>      <div class="vdClosed"><span class="vdClick" onClick="vdDebug.handleSection(this,'session');"      ><img src="<tmpl_var debug_root>/plus.png" width="9"/>Session Data</span   ><div id="vd_session"       class="vdContent"></div></div></tmpl_if>
+			<tmpl_if enable_template_conf><div class="vdClosed"><span class="vdClick" onClick="vdDebug.handleSection(this,'template_conf');"><img src="<tmpl_var debug_root>/plus.png" width="9"/>Config Data</span    ><div id="vd_template_conf" class="vdContent"></div></div></tmpl_if>
+			<tmpl_if enable_params>       <div class="vdClosed"><span class="vdClick" onClick="vdDebug.handleSection(this,'parameters');"   ><img src="<tmpl_var debug_root>/plus.png" width="9"/>Input Params</span   ><div id="vd_parameters"    class="vdContent"></div></div></tmpl_if>
+		</div>
+	</div>
+</div>

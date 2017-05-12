@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+lib/API/Assembla.pm
+lib/API/Assembla/Space.pm
+lib/API/Assembla/Ticket.pm
+t/release-pod-syntax.t
+t/release-synopsis.t
+t/spaces.t
+t/tickets.t

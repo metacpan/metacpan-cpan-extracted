@@ -1,0 +1,35 @@
+{
+  'quitmsg' => 'alice.',
+  'static_prefix' => '/static/',
+  'ignore' => {
+    'msg' => [],
+    'part' => [],
+    'nick' => [],
+    'join' => []
+  },
+  'highlights' => [],
+  'auth' => {},
+  'audio' => 'show',
+  'message_store' => 'Memory',
+  'image_prefix' => 'https://noembed.com/i/',
+  'order' => [],
+  'animate' => 'show',
+  'monospace_nicks' => [],
+  'address' => '127.0.0.1',
+  'avatars' => 'show',
+  'images' => 'show',
+  'alerts' => 'show',
+  'tabsets' => {},
+  'style' => 'default',
+  'timeformat' => '24',
+  'port' => 50029,
+  'first_run' => 1,
+  'servers' => {
+    'test' => {
+      'nick' => 'tester',
+      'autoconnect' => 0,
+      'port' => 6667,
+      'host' => 'not.real.server'
+    }
+  }
+}

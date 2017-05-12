@@ -1,0 +1,14 @@
+bin/matrixclient
+Build.PL
+lib/App/MatrixClient.pm
+lib/App/MatrixClient/Matrix.pm
+lib/App/MatrixClient/RoomTab.pm
+MANIFEST			This list of files
+sample-client.yaml
+t/00use.t
+t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

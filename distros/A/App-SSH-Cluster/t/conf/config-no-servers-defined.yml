@@ -1,0 +1,4 @@
+identity_file: "/home/hunter/.ssh/id_rsa"
+user: "hunter"
+
+servers:

@@ -1,0 +1,38 @@
+<section class="article-list">
+[% IF list.size %]
+<div class="list-group">
+  [% FOREACH item in list %]
+    [% SET template = item.is _ '_result.tt' %]
+    [% PROCESS $template article=item %]
+  [% END %]
+</div>
+[% ELSE %]
+<div class="alert alert-warning">
+  <h4>Write something!</h4>
+  <p>
+    No content has been written yet, which is why you are seeing this message.
+  </p>
+  <p>
+    There's a button to create new content. If you try clicking on it before you're logged in, though, it won't work.
+  </p>
+  <p>
+    So, to get started:
+  </p>
+  <ol>
+    <li>Go to the log in page using that nice button up there</li>
+    <li>
+      Your username in this demonstration app is
+      <code>admin</code>
+      and your password is
+      <code>admin</code>. Hopefully you can remember that.
+    </li>
+    <li>Create content - that's another button. Make sure you fill out all the fields.</li>
+  </ol>
+  <p>
+    <b>That's it!</b> Once you're done admiring your content, head over to the file
+  </p>
+  <pre>examples/plain-speaking/config.yml</pre>
+  <p>... to see how it's all been put together.</p>
+</div>
+[% END %]
+</section>

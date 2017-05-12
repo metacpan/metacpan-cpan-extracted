@@ -1,0 +1,8 @@
+TODO: check to see if the static config has any runAt in it.  If it does, then the runAts will run over and over again.  Fail config sanity check if they exist.
+
+TODO: consideration: should we bake in the idea of various 'instances' at this point?  Going with 'no' for now, but keep it in mind.
+
+TODO: consideration: should we bake in transforms and forwards?  Going with 'no' for now, and keep it in the Router, and see if it sucks
+
+TODO: As currently explained, we have the problem of a lot of things running at the same time when it starts if MultiModule has been down for a while.  Thought: order the run from most from most frequently recurring to least frequently recurring, and only run N any given tick.  Perhaps prefer one-time runs.
+

@@ -1,0 +1,15 @@
+MANIFEST
+README.md
+t/clear.t
+t/sticky-array.t
+t/inc.t
+t/lib/Test/Easy.pm
+README
+MANIFEST.SKIP
+lib/Array/Sticky.pm
+lib/Array/Sticky/INC.pm
+.gitconfig
+Makefile.PL
+LICENSE
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

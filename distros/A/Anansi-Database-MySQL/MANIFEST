@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Anansi-Database-MySQL.t
+lib/Anansi/Database/MySQL.pm

@@ -1,0 +1,23 @@
+Revision history for AnyEvent-Worker
+
+0.06    2011-09-23
+        #68242: offset parameter for syswrite (Thanks to Erik Rantapaa)
+
+0.05    2011-09-23
+        #64971: errors in worker are not correctly passed back to the parent (Thanks to Brian Philips)
+
+0.04    2010-03-03
+        Fix broken dependency.
+
+0.03    2010-02-27
+        Fix broken tests.
+
+0.02    2010-01-30
+        Fix licence.
+
+0.01_1  Date/time
+        Developer info
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

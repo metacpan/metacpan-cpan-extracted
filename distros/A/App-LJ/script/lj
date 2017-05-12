@@ -1,0 +1,50 @@
+#!perl
+use strict;
+use warnings;
+use App::LJ;
+App::LJ->new_with_options(@ARGV)->run;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+lj - detect json from logfile and prettify it
+
+=head1 SYNOPSIS
+
+    % echo '2015-01-31 [21:06:22] json: {"key": "value", "array": [1,2,3]}' | lj [--no-color]'
+    2015-01-31 [21:06:22] json:
+    {
+       "array": [
+          1,
+          2,
+          3
+       ],
+       "key": "value"
+    }
+
+=head1 DESCRIPTION
+
+L<lj> is command line utility for prettify the log containing JSON.
+
+=head1 INSTALLATION
+
+    % cpanm App::LJ
+
+or you can get single packed executable file.
+
+    % curl -L https://raw.githubusercontent.com/Songmu/App-LJ/master/lj > /usr/local/bin/lj; chmod +x /usr/local/bin/lj
+
+=head1 LICENSE
+
+Copyright (C) Songmu.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Songmu E<lt>y.songmu@gmail.comE<gt>
+

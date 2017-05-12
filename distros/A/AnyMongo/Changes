@@ -1,0 +1,14 @@
+Revision history for AnyMongo
+
+0.03      2010-09-09 10:19:52 Asia/Shanghai
+
+    - just release AnyEvent::MongoDB. 
+
+0.02      2010-09-08 01:10:17 Asia/Shanghai
+
+    - replica set support
+    - fix dzil configuration error.
+    - build documents minor.
+
+0.01
+    - Initialize prototype

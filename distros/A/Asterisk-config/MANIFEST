@@ -1,0 +1,21 @@
+Changes
+examples/exten.conf
+examples/new.conf
+examples/new_exten.conf
+examples/sip.conf
+examples/test1.pl
+examples/test2.pl
+examples/test3.pl
+examples/test4.pl
+examples/test5.pl
+examples/test6.pl
+lib/Asterisk/config.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/read.t
+t/array_hash.t
+t/test.conf
+META.yml                                 Module meta-data (added by MakeMaker)
+examples/Asteriskgui.pm		Example asterisk-gui DAHDI configuration generator
+examples/Asteriskgui.txt	Help text for Asteriskgui.pm

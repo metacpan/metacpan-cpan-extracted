@@ -1,0 +1,42 @@
+---
+abstract: 'Quickly and easily create secure passwords'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  List::MoreUtils: '0'
+  Module::Build: '0.28'
+  Test::Deep: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Genpass
+requires:
+  Carp: '0'
+  Config::Any: '0'
+  File::HomeDir: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  List::AllUtils: '0'
+  Math::Random::Secure: '0.06'
+  Moo: '0'
+  MooX::Types::MooseLike: '0'
+  Sub::Quote: '0'
+  namespace::clean: '0.2'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/xsawyerx/app-genpass.git
+version: '2.401'
+x_serialization_backend: 'YAML::Tiny version 1.69'

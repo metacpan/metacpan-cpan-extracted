@@ -1,0 +1,31 @@
+---
+abstract: 'Perl bindings to libarchive via XS'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0.94'
+  perl: '5.008'
+configure_requires:
+  Alien::Libarchive: '0.18'
+  ExtUtils::CChecker: '0'
+  Module::Build: '0.28'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Archive-Libarchive-XS
+requires:
+  Alien::Libarchive: '0'
+  Exporter::Tidy: '0'
+  ExtUtils::CChecker: '0'
+  Math::Int64: '0.28'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/plicease/Archive-Libarchive-XS/issues
+  homepage: http://perl.wdlabs.com/Archive-Libarchive-XS
+  repository: git://github.com/plicease/Archive-Libarchive-XS.git
+version: '0.0901'

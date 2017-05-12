@@ -1,0 +1,65 @@
+App-Smolder-Report
+
+The App::Smolder::Report distribution provides a command line tool,
+smolder_report, that allows you to submit smoke reports to a Smolder
+server.
+
+First you need to generate your smoke report. The easiest way to do it is:
+
+    prove -l -a smoke.tgz
+
+Then you need to submit your smoke.tgz report to Smolder:
+
+    smolder_report --server=hostname --project-id=1 --username=me \
+                   --password=secret smoke.tgz
+
+That's it!
+
+You can also have a .smolder.conf with all the important parameters.
+
+If you want to tweak this module, the repository is available at:
+
+    http://github.com/melo/perl-app-smolder-report
+
+Fork away!
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	sudo make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this command with the
+perldoc command.
+
+    perldoc smoke_report
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Smolder-Report
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-Smolder-Report
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-Smolder-Report
+
+    Search CPAN
+        http://search.cpan.org/dist/App-Smolder-Report
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Pedro Melo
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

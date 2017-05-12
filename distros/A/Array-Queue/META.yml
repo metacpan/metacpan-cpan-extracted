@@ -1,0 +1,24 @@
+---
+abstract: 'A simple fifo queue'
+author:
+  - 'Dan Burke <dburke@addictmud.org>'
+build_requires:
+  FindBin: '0'
+  Test::Spec: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Array-Queue
+requires:
+  Moose: '0'
+  namespace::autoclean: '0'
+resources:
+  homepage: https://github.com/dwburke/perl-Array-Queue
+  repository: https://github.com/dwburke/perl-Array-Queue.git
+version: 0.1.2

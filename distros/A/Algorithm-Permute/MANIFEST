@@ -1,0 +1,12 @@
+README
+Changes
+Makefile.PL
+MANIFEST
+Permute.pm
+Permute.xs
+test.pl
+typemap
+coollex.c
+coollex.h
+bench/benchmark.pl
+META.yml                                Module meta-data in YAML

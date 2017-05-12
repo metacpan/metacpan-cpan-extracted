@@ -1,0 +1,32 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+use App::Sys::Info;
+
+our $VERSION = '0.21';
+
+App::Sys::Info->run;
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+psysinfo - Front end to App::Sys::Info
+
+=head1 SYNOPSIS
+
+Excute from command line.
+
+=head1 DESCRIPTION
+
+Front end to C<App::Sys::Info>.
+
+=head1 SEE ALSO
+
+L<App::Sys::Info>.
+
+=cut

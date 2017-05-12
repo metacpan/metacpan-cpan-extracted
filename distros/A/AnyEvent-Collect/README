@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution AnyEvent-Collect,
+version 0.1.0:
+
+  Block till one or more events fire
+
+This software is copyright (c) 2012 by Rebecca Turner.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

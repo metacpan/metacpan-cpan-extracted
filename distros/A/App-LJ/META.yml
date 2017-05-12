@@ -1,0 +1,39 @@
+---
+abstract: 'detect json and prettify it from log'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-LJ
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::LJ:
+    file: lib/App/LJ.pm
+    version: '0.02'
+requires:
+  JSON::Color: '0'
+  JSON::XS: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Songmu/App-LJ/issues
+  homepage: https://github.com/Songmu/App-LJ
+  repository: git://github.com/Songmu/App-LJ.git
+version: '0.02'
+x_authority: cpan:SONGMU

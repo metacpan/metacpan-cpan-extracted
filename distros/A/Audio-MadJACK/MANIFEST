@@ -1,0 +1,9 @@
+Build.PL
+Makefile.PL
+Changes
+lib/Audio/MadJACK.pm
+MANIFEST
+META.yml
+README
+madjack-remote.pl
+t/00use.t

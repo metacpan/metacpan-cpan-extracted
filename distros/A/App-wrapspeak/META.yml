@@ -1,0 +1,32 @@
+---
+abstract: 'It speaks for you !'
+author:
+  - 'mucker, C<< <mukcer at gmx.com> >>'
+  - 'mucker <mukcer@gmx.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-wrapspeak
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Slurp: 0
+  IO::Select: 0
+  IPC::Open3: 0
+  Modern::Perl: 0
+  Term::TermKey: 0
+  Time::HiRes: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.1

@@ -1,0 +1,12 @@
+<xml>
+  <CONFIG>
+    <order>asc</order>
+    <tag>.</tag>
+  </CONFIG>
+  <Twitter>
+    <username>yourlogin</username>
+  </Twitter>
+  <Identica>
+    <username>yourlogin</username>
+  </Identica>
+</xml>

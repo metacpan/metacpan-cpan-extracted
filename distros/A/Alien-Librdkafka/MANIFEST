@@ -1,0 +1,9 @@
+.travis.yml
+Build.PL
+Changes
+lib/Alien/Librdkafka.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/librdkafka.t

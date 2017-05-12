@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Algorithm-MarkovChain
+version: 0.06
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: Object oriented Markov chain generator
+license: perl
+build_requires:
+  Test::More: 0
+provides:
+  Algorithm::MarkovChain:
+    file: lib/Algorithm/MarkovChain.pm
+    version: 0.06
+  Algorithm::MarkovChain::Base:
+    file: lib/Algorithm/MarkovChain/Base.pm
+generated_by: Module::Build version 0.24

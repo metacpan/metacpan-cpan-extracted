@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 4b0c3aab6c6ea272c5ebb04f249046f76e9ed74d COPYRIGHT
+SHA1 540e627824058dc4b3f75009923f7af8f8e388c8 CREDITS
+SHA1 05e971943b0cda6d1fa83077e3b9c0632a1b346a Changes
+SHA1 4f2638eeb2df3a6331b44220f355bd02f4a1fdf4 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 bb3fd1070d8713c47ecea7da540d84aabc47e653 MANIFEST
+SHA1 2d8d2a068c0e6736e60c4e14ea5848c39727e2f0 META.json
+SHA1 7aced4f1d98bd45334d564dccd9bf82fb41833bb META.yml
+SHA1 16a8ab06639ad6fee5e64aef67a08d64566d0a42 Makefile.PL
+SHA1 0153cbf8b1bd6f04c8fc3a501726c7459446f2a7 README
+SHA1 d1f3af0d2061d87b63bf5d9182363c2bc4f2cf50 bin/perl-pink-pony
+SHA1 458fcda8f7412b82bb8073dac28893a99e10a3be dist.ini
+SHA1 39dc1dd00a802b37fc3be8bf3279a462a08cdd01 doap.ttl
+SHA1 dbcaa2af43bb1a6fa4b95f800ed52511e2b0eb87 examples/greeting.gif
+SHA1 c17029a6c35e7a429464cf86e0240d1d569e53c2 examples/greeting.pl
+SHA1 99646f58996ea1d973787fdd706a1799471f755a lib/Acme/Pony/Pink.pm
+SHA1 fea312960adbccd7137e22a6f7cb86ecc52f6306 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQQ154ACgkQzr+BKGoqfTnfxwCgkNdGhw8cPuxE/Acoe6ZgSjNg
+5M0AoLUIlf//jyVKgRIieStFFZxWJEeR
+=xmcL
+-----END PGP SIGNATURE-----

@@ -1,0 +1,34 @@
+---
+version: 0.0.6
+date:    Wed Dec 24 23:50:47 PST 2014
+changes:
+- Build in .inline
+---
+version: 0.0.5
+date:    Sun Dec 21 00:46:21 EST 2014
+changes:
+- Add a MANIFEST.SKIP
+---
+version: 0.0.4
+date:    Thu Dec 18 19:19:32 PST 2014
+changes:
+- Normalize the dist to match others
+- Update pod
+- Add travis file
+- Fix Makefile.PL
+- Add MANIFEST.SKIP
+---
+version: 0.0.3
+date:    Thu Dec 18 00:11:25 PST 2014
+changes:
+- Release with Inline-Module-0.25
+---
+version: 0.0.2
+date:    Sun Dec 14 22:37:34 PST 2014
+changes:
+- Change to latest Inline::Module
+---
+version: 0.0.1
+date:    Sat Nov 22 06:48:50 UTC 2014
+changes:
+- First Release

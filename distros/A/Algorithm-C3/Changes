@@ -1,0 +1,41 @@
+Revision history for Perl extension Algorithm-C3.
+
+0.10 - 2014-08-15
+    - declare minimum version of perl as 5.6 in metadata
+
+0.09 - 2014-03-01
+    - convert to use ExtUtils::MakeMaker using distar
+    - include repo and bugtracker metadata
+
+0.08 Thu. May 28, 2009
+    - Fix a couple of doc typos.
+    - Don't create a fake Makefile.PL.
+
+0.07 Mon. May 14, 2007
+    - Some very small optimizations had been
+      gathering in the repo for a while, this
+      gets them out to CPAN.  Probably won't
+      notice much difference except in extreme
+      cases.
+
+0.06 Fri. Nov. 17, 2006
+    - Added tests from konobi
+    - Added some other new tests too
+    - Fixed infinite loop on recursive heirarchies
+
+0.05 Fri. Aug. 25, 2006
+    - Add the ability for the caller to supply a persistent
+      merge cache hashref
+
+0.04 Wed. Aug. 09, 2006
+    - Remove accidental "use Class::C3" from t/006_complex_merge.t
+      (no functional changes from 0.03)
+
+0.03 Tue. Aug. 08, 2006
+    - New test + bugfix for RT#20879
+
+0.02 Sun. Jul. 30, 2006
+    - code refactored for speed by Brandon L. Black
+
+0.01 Wed. Feb. 15, 2006
+    - initial release, code and tests taken from Class::C3

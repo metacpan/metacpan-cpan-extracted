@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+META.yml
+README
+lib/App/Pod2CpanHtml.pm
+
+bin/pod2cpanhtml
+
+t/00-load.t
+
+META.json                                Module JSON meta-data (added by MakeMaker)

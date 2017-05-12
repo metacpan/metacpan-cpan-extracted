@@ -1,0 +1,12 @@
+<div class="floatleft">
+<table>
+	<caption>Copy Permissions from Other Group</caption>
+	<tbody>
+[% FOREACH l IN list %]
+		<tr>
+			<td><a href="[% s.uof %]?group_id=[% s.in.group_id %]&copy_group_id=[% l.group_id %]">[% l.name %]</a></td>
+		</tr>
+[% END %]
+	</tbody>
+</table>
+</div>

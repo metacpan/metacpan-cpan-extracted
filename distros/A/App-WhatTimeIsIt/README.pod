@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<App::WhatTimeIsIt>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/App-WhatTimeIsIt"><img src="https://secure.travis-ci.org/bayashi/App-WhatTimeIsIt.png"/></a> <a href="https://coveralls.io/r/bayashi/App-WhatTimeIsIt"><img src="https://coveralls.io/repos/bayashi/App-WhatTimeIsIt/badge.png?branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+App::WhatTimeIsIt installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan App::WhatTimeIsIt
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+App::WhatTimeIsIt documentation is available as in POD. So you can do:
+
+    % perldoc App::WhatTimeIsIt
+
+
+=head1 REPOSITORY
+
+App::WhatTimeIsIt is hosted on github
+L<http://github.com/bayashi/App-WhatTimeIsIt>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

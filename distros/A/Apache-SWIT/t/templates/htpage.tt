@@ -1,0 +1,23 @@
+<html>
+<body>
+
+[% INCLUDE templates/more.tt %]
+
+<form action="u" method="post" enctype="multipart/form-data">
+:[% template.name %]:
+hello [% hello %]
+file: [% file %]
+upload: [% up %]
+[% hid %]
+host: [% hostport %]
+[% inhe_val%]
+<input type="submit" />
+<!-- Test.pm should handle readonly fields with no name -->
+<input type="hidden" />
+</form>
+<form name="aa" method="post">
+[% inv_up %]
+<input type="submit" />
+</form>
+</body>
+</html>

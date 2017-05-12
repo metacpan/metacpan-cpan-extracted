@@ -1,0 +1,36 @@
+Revision history for App-TimelogTxt
+
+0.22  2015-06-23
+  - Corrected bugfix to handle in task today reporting.
+0.21  2015-06-23
+  - Fixed bug where last project/task had too large a duration if it did not
+    close on the last day of the reporting period.
+0.20  2015-04-09
+  - Modify testing code to use xt-based author tests
+  - Update metadata for more repo information
+  - Add minimum perl version test
+  - Add 'curr' command to display only most recent task.
+  - Update POD for new commands and previously missing documentation.
+0.12  2013-11-22T18:15:00-0600
+  - Add a check requiring a project when specifying an event.
+0.11  2013-11-05T21:15:00-0600
+  - Fixed accidental auto-dereference noted by CPANTEST suite.
+0.10  2013-11-05T19:00:00-0600
+  - Added ability to filter reports by project name
+0.06  2013-07-26T00:10:00-0500
+  - Fixed bug where days other than today with a task still open at midnight
+    were misreported.
+  - Fixed a second bug where the day before a report begins had a task open
+    at midnight. We need to account for that in the first day of report.
+0.05  2013-07-15T09:00:00-0500
+  - Removed absolute path correction in setting .timelogrc location.
+  - Added LICENSE and repository fields to module metadata.
+0.04  2013-07-10T14:20:50-0500
+  - Many portability fixes pointed out by CPANTESTERS.
+  - Added documentation, including a manual and tutorial.
+  - Added an 'init' command to initialize the timelog system.
+  - Added consistent handling of '~' in paths.
+  - Corrected handling of time when a task crosses midnight.
+0.03  2013-06-30T14:37:20-0500
+  - Initial release.
+

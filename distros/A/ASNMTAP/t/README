@@ -1,0 +1,12 @@
+Self test suite for the ASNMTAP library
+---------------------------------------
+
+Tests are invoked by running the ./TEST script, but usually you run
+the tests with "make test" at the top libwww-perl directory.  Use -v
+option for verbose tests.  You might run an individual test like this:
+
+  ./TEST -v Asnmtap/Plugins/Nagios/check_xml.pl.t
+
+or all tests in a directory like this
+
+  ./TEST Asnmtap

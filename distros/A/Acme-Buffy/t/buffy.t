@@ -1,0 +1,2 @@
+use Acme::Buffy;
+BUffY bUFFY BUffY bUFFY buffY	BufFy BUFfY bUfFY bUFFy	BuffY BUFfy bufFy bUffy	buFfy BUffy	BUfFy bUFFy	buFfy BUffy BUFfY bUFFy	BufFy bUffY	bUFFy bUfFy buffy BUFfy	buFFY BufFy	BufFY	bUFfy BuFFY buffy	bufFy bUffY	BUfFY BUfFy	Buffy bUffY buFFy buFFY BufFY	bUFfy	bufFy BUfFY	bufFy	buff

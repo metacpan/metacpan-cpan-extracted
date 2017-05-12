@@ -1,0 +1,14 @@
+Revision history for Acme-ChuckNorris
+
+0.3 2013-09-27 18:05:12
+    - add =encoding to POD
+    - add pod tests for encoding line and VERSION
+
+0.2  2013-09-26 20:42:23
+    - rt 83327: Chuck worthy EOM-trueism
+    - fix 5.18 "allowed arg override works" test failure
+    - rt 64313 (sans 4, later)
+
+0.1  2010-11-24 23:17:28
+       Initial release.
+

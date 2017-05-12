@@ -1,0 +1,14 @@
+Revision history for App-texttable
+
+0.02    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+
+0.01    2015-12-25 (PERLANCAR)
+
+        - First early release. I hope to use Perinci::CmdLine::Inline instead of
+          ::Lite for this. Also, I hope to improve the interface and
+          convenience.

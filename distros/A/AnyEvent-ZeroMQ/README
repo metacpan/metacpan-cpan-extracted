@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution AnyEvent-ZeroMQ,
+version 0.01:
+
+  non-blocking interface to ZeroMQ sockets
+
+This software is copyright (c) 2011 by Jonathan Rockway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

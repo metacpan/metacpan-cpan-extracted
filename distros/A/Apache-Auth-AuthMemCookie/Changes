@@ -1,0 +1,12 @@
+Tue Jan 26 09:25:21 NZDT 2010
+    *  The first version
+
+Thu Jan 28 08:53:11 NZDT 2010
+    *  import packages that aren't automatically imported in earlier versions of mod_perl
+    *  kill off REMOTE_USER headers, so they can't be injected
+
+Sat Jul 19 16:55:41 NZST 2014
+    * set X-Remote-User as the default Header for REMOTE_USER
+
+Sun Jul 20 12:32:01 NZST 2014
+    * bump release number

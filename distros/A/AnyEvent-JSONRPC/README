@@ -1,0 +1,44 @@
+This is a fork of Daisuke Murase's Perl module AnyEvent::JSONRPC::Lite.
+
+CHANGES
+
+This module is updated to use Yuval Kogman's JSON::RPC::Common for handling
+the JSONRPC messages. This enables support for handling messages complying to
+all versions of the JSONRPC standard.
+
+The System Services/Service Description parts of version 1.1-wd and 1.1-alt is
+unimplemented and left to users to implement.
+
+TODO
+
+There are the following outstanding issues before a real release
+
+  - Testing of new features (support for multiple versions)
+  - Making sure that marshalling of parameters makes sense in both ends
+
+
+INSTALLATION (Not uploaded to CPAN yet)
+
+AnyEvent::JSONRPC installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan AnyEvent::JSONRPC
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+AnyEvent::JSONRPC documentation is available as in POD. So you can do:
+
+    % perldoc AnyEvent::JSONRPC
+
+to read the documentation online with your favorite pager.
+
+Peter Makholm

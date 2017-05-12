@@ -1,0 +1,78 @@
+=head1 NAME
+
+Apache::Tika - A perl interface to Apache Tika API
+
+=head1 SYNOPSIS
+
+ use Apache::Tika
+
+ my $tika = Apache::Tika->new();
+
+ # Extract metadata and text from a pdf file
+ open my $fh, '<:raw', '/local/file.pdf';
+ my $pdf = do { local $/; <$fh> };
+ close $fh;
+
+ my $meta = $tika->meta($pdf);
+ my $text = $tika->tika($pdf);
+
+ # Extract text from a website
+ my $response = LWP::UserAgent->get('http://some.web.site');
+ my $text = $tika->tika(
+  $r->decoded_content('charset' => 'none'),
+  $r->headers->header('content-type')
+ );
+
+=head1 DESCRIPTION
+
+This module provide Apache Tika api support
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item Apache::Tika->new(%options)
+
+This constructs C<Apache::Tika> object. You can specify the following options
+
+=over 4
+
+=item url
+
+Apache Tika server url (defaults to http://localhost:9998)
+
+=item ua
+
+Custom useragent
+
+=back
+
+=back
+
+=head1 METHODS
+
+The following api methods are available, to get more information about method responses visit L<http://wiki.apache.org/tika/TikaJAXRS>
+
+=over 4
+
+=item $tika->meta($bytes, $contentType)
+
+=item $tika->rmeta($bytes, $contentType)
+
+=item $tika->tika($bytes, $contentType)
+
+=item $tika->detect_stream($bytes)
+
+=item $tika->language_stream($bytes)
+
+=back
+
+The $bytes parameter is always required and must contain the data to send to the server.
+The $contentType is optional, but if know the $bytes content-type (p.e. "text/html; charset=iso-8") you can send it to improve the tika response.
+
+=head1 SEE ALSO
+
+L<Apache Tika|http://wiki.apache.org/tika/TikaJAXRS>
+
+
+=cut

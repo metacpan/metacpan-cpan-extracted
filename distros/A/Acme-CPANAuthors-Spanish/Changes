@@ -1,0 +1,24 @@
+Revision history for Acme-CPANAuthors-Spanish
+
+0.06  Feb 13, 2016
+      - Add utf8 pragma (closes: CPAN #87077)
+      - JAVIER added
+
+0.05  Oct 19, 2011
+      - AMONTERO, BRUNODIAZ, BREQUESEN, CARLOSFB, ECASTILLA, EDUSEGRE,
+        EJDRS, FMERGES, JFRAIRE, JLMARTIN, JOSERODR, JREY, MRUIZ,
+        RPORRES and XCALBET added
+
+0.04  Oct 18, 2011
+      - ALEXM added
+
+0.03  Oct 18, 2011
+      - PECO, DIEGOK and RODRIGO added
+      - GitHub link was broken
+
+0.02  Oct 18, 2011
+      - CASIANO, FXN and JMERELO added
+
+0.01  Oct 18, 2011
+      - first version released
+

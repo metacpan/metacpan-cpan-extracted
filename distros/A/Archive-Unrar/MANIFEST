@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Archive-Unrar.t
+test/mytest.pl
+test/testnopass.rar
+test/testwithpass.rar
+test/testwithpass1.rar
+test/testwithpass2.rar
+test/testwithpass3.rar
+lib/Archive/Unrar.pm
+META.yml                                 Module meta-data (added by MakeMaker)

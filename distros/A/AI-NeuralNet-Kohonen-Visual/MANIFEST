@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/AI-NeuralNet-Kohonen-Visual.t
+lib/AI/NeuralNet/Kohonen/Visual.pm
+META.yml                                 Module meta-data (added by MakeMaker)

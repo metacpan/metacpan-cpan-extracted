@@ -1,0 +1,1002 @@
+1.017   2017-02-03 (PERLANCAR)
+
+	- Typo.
+
+
+1.016   2017-02-02 (PERLANCAR)
+
+	- [dist] Update copyright year.
+
+        - Add argument: modules_or_dists.
+
+
+1.015   2017-01-19 (PERLANCAR)
+
+	- Add subcommand: dist-meta.
+
+
+1.014   2016-12-28 (PERLANCAR)
+
+	- [Bugfix] Prefer getting META from META.json over META.yml (e.g. to get
+	  x_* prereqs). A full reindex is recommended (`lcpan reset` follows by
+	  `lcpan update`).
+
+	- Add subcommand: delete-rel.
+
+
+1.013   2016-12-28 (PERLANCAR)
+
+	- [dist] Fix expressing follow-spec prereq relationship with
+	  x_spec.
+
+	- Allow phase and rel with values /^x_/.
+
+
+1.012   2016-11-01 (PERLANCAR)
+
+        - [ux] related-mods: Instead of specifying min_score, let users just
+          specify number of result they want; hide score-related fields by
+          default in result unless user specifies --with-scores.
+
+
+1.011   2016-10-14 (PERLANCAR)
+
+	- authors-by-rdep-count: fix SQL again, derp (didn't really count
+	  the number of dists).
+
+
+1.010   2016-10-14 (PERLANCAR)
+
+
+        - authors-by-rdep-count: fix SQL which caused duplicated author rows,
+          include author name in the result, only count latest distributions,
+          add options --exclude-same-author.
+
+        - [doc] Add Synopsis and Description for lcpanm.
+
+
+1.009   2016-10-09 (PERLANCAR)
+
+	- stats-last-index-time: Return CPAN mirror information (path and
+	  index name) to be more useful for CLI users.
+
+
+1.008   2016-10-08 (PERLANCAR)
+
+	- Make it work when SetEnv dzil plugin is used.
+
+
+1.007   2016-10-07 (PERLANCAR)
+
+        - [Bugfix] Trap POD parsing errors to avoid dying (thanks Norbert
+          Csongradi) [GH#1] [GH#2].
+
+
+1.006   2016-09-25 (PERLANCAR)
+
+	- Add subcommand: inject.
+
+	- [ux] No need to warn that 'perl' and 'Config' does not have dist
+	  ID.
+
+
+1.005   2016-09-06 (PERLANCAR)
+
+	- D'oh, screwed up last commit.
+
+
+1.004   2016-09-06 (PERLANCAR)
+
+	- Add to builtin skip list: Shipment-2.03.tar.gz (segfaults
+	  Compiler::Lexer 0.22).
+
+	- Add subcommands: dist-contents, mod-contents.
+
+
+1.003   2016-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add to builtin skip list: App-IndonesianBankingUtils-0.07.tar.gz
+	  (segfaults at phase 3/3).
+
+
+1.002   2016-08-11 (PERLANCAR)
+
+	- When checking if a module is core (using
+	  Module::CoreList::More->is_still_core), use version=0 instead of the
+	  currently indexed version. Using currently indexed version might
+	  result in a false negative for dual-life modules that has a newer
+	  release on CPAN. For example, as of this writing, for List::Util the
+	  currently indexed version is 1.42. If we use perl 5.22.2 as the base,
+	  it only has 1.41. Thus, is_still_core("List::Util", "1.42", 5.022002)
+	  returns false. While we generally want it to return true. So now we
+	  use is_still_core("List::Util", undef, 5.022002).
+
+	- [ux] Tweak completion: enable path-mode in --index-name.
+
+	- [ux] Tweak wording in log when skipping, show the word 'reason:'.
+
+
+1.001   2016-07-20 (PERLANCAR)
+
+	- Use more specific schemas (e.g. perl::distname, perl::modname,
+	  dirname, filename instead of just str) to get coercion rules
+	  benefits, e.g. now you can say 'lcpan dist-scripts App::MTPUtils'
+	  and it will be normalized to 'lcpan dist-scripts App-MTPUtils'.
+
+	- [Internal] Change builtin skip list from array to hash to store
+	  reason, and show the reason in the log.
+
+
+1.000   2016-06-29 (PERLANCAR)
+
+	- No functional changes.
+
+	- Bump version to 1.000 to get 3 digits of minor version number.
+
+        - Add to builtin skip list: Shipment-2.02.tar.gz (segfaults
+	  Compiler::Lexer 0.22).
+
+
+0.89    2016-06-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add to builtin skip list: Shipment-2.01.tar.gz (segfaults
+	  Compiler::Lexer 0.22).
+
+
+0.88    2016-06-21 (PERLANCAR)
+
+	- [ux] Format time for some subcommands.
+
+
+0.87    2016-05-25 (PERLANCAR)
+
+	- Try setting cache_size to 400000 (400MB), the default is 2MB.
+
+	- Update to Data::Sah 0.76+ (date/duration by default now already
+	  coerces to floats).
+
+
+0.86    2016-04-15 (PERLANCAR)
+
+	- [Bugfix] Fix misnumbering in log statement because we 'next'
+	  before incrementing counter.
+
+	- Add subcommand: src.
+
+	- doc: Also page --raw result.
+
+
+0.85    2016-03-17 (PERLANCAR)
+
+	- changes: Allow specifying script name in addition to module/dist.
+
+
+0.84    2016-03-12 (PERLANCAR)
+
+	- [Bug fixes] Some fixes for subcommand 'changes'.
+
+        - [ux] Tweak completion for module names (allow / as path separator).
+
+
+0.83    2016-03-12 (PERLANCAR)
+
+	- Add subcommand: changes.
+
+
+0.82    2016-03-10 (PERLANCAR)
+
+        - Add subcommand: mentions-for-all-mods.
+
+        - [ux] mods: Add shortcut options -x (for --query-type=exact-name), -n
+          (for --query-type=name), -N (for --namespace).
+
+        - [ux] authors, dists, rels: Also add shortcut options -x & -n.
+
+        - [ux] [completion] mods, dists, authors, rels: Do completion on query
+          when query type is exact name.
+
+        - [ux] [completion] Don't do completion when word is empty, to avoid
+          slow response.
+
+
+0.81    2016-03-02 (PERLANCAR)
+
+	- doc: Encoding fixes (use pod2man -u option).
+
+	- related-mods: Add option --skip-same-dist.
+
+	- Use Rinci 1.1.79's cmdline_src=stdin_or_args to allow subcommands
+	  like 'mods' to get arguments from stdin, e.g. 'cpan-outdated -p |
+	  lcpan mod2dist'.
+
+
+0.80    2016-02-25 (PERLANCAR)
+
+	[Enhancements]
+
+        - Add subcommands: mentions-by-mod, mentions-by-script,
+          mentions-for-mod, mentions-for-script, author-deps,
+          author-deps-by-dependent-count, deps-by-dependent-count.
+
+	- mods: Add options --include-core, --include-noncore.
+
+	- deps: Add options --module-author, --module-author-isnt,
+	  --include-noncore; various small fixes.
+
+        - [ux] Set default log level to 'info' (verbose) so 'lcpan update' by
+          default can see indexing process.
+
+	[Bug fixes]
+
+        - Fix a typo in SQL.
+
+	[Incompatible changes]
+
+        - Rename subcommand distmods -> dist-mods, distscripts ->
+	  dist-scripts.
+
+	[Others]
+
+        - deps: Assume 'perl' is a core dependency instead of non-core.
+
+
+0.79    2016-02-19 (PERLANCAR)
+
+	- Add subcommand: related-mods.
+
+	- [Optimization] mentions: No need to include both clause when
+	  type=known-module or type=unknown-module.
+
+	- mentions: Allow multiple --mentioned-{module,script,author}, add
+	  options --mentioner-{module,script}.
+
+
+0.78    2016-02-17 (PERLANCAR)
+
+        [Bug fixes]
+
+        - Fix indexing of content. Previously content mode (>777) was used to
+          skip directory, this is wrong so some (many?) content were not
+          indexed. It is now fixed and we force a reindex of
+          content/script/mention.
+
+        - dists: Forgot to update field name.
+
+        - dists: fix Rinci argument specification for 'sort'.
+
+        [Experimental]
+
+        - Indexing of subroutines. Currently basic (only subroutine name and
+          source line number are indexed). I plan to add include more
+          information e.g. type (whether subroutine is a method, static method,
+          function), argument list (either from POD or subroutine signature),
+          summary (from POD). Also planned is support for Mo/Moo/Moose/Mouse and
+          the indexing of classes/roles, attributes.
+
+          Since this is experimental, it's not enabled by default. To index
+          subroutines, you'll have to add '--no-skip-sub-indexing' option during
+          'lcpan update'.
+
+          It increases index size to ~360M on current mini CPAN.
+
+        - Bump database schema version to 10 to support subroutine indexing and
+          force reindexing of content/script/mention.
+
+        [Enhancements]
+
+        - New subcommands: sub, subs-by-count, script2author, mod2author,
+          dist2author.
+
+
+0.77    2016-02-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] mods: fix Rinci argument specification for 'sort'.
+
+
+0.76    2016-02-16 (PERLANCAR)
+
+	- [Bugfix] dists: release name was shown instead of size in
+	  rel_size result field.
+
+
+0.75    2016-02-16 (PERLANCAR)
+
+	- dists: Add options --sort, --rel-mtime-newer-than.
+
+
+0.74    2016-02-16 (PERLANCAR)
+
+        - Add subcommand: stats-last-index-time. This is a faster version of
+          'stats' for App::lcpan::Call by only returning the result that is
+          needed.
+
+        - stats: Add total_filesize.
+
+        - doc: Add option --html to open browser and show the HTML
+          documentation.
+
+
+0.73    2016-02-14 (PERLANCAR)
+
+	- doc: Search .pod using content path to be able to show POD when
+	  there is no package declaration in the .pod.
+
+
+0.72    2016-02-14 (PERLANCAR)
+
+        - [Bugfix] doc: Fix SQL error when name contains /\.(pod|pm)$/.
+
+        - mods: Add result field rel_mtime.
+
+        - rels: Add option --no-path.
+
+
+0.71    2016-02-12 (PERLANCAR)
+
+	- No functional changes.
+
+	- 2nd attempt to workaround PAUSE indexer mistakenly detects a
+	  package declaration.
+
+
+0.70    2016-02-12 (PERLANCAR)
+
+	- No functional changes.
+
+	- Workaround package declaration false positive from PAUSE indexer.
+
+
+0.69    2016-02-12 (PERLANCAR)
+
+        - Bump database schema version to v9 (add index for 'package' field in
+          'content' table).
+
+        - New subcommands: doc, script2mod, copy-script, extract-script,
+          authors-by-filesize.
+
+        - script2dist: Add option --all.
+
+        - script2rel: Accept multiple arguments.
+
+        - dists: Add options --sort, --has-multiple-rels.
+
+        - authors-by-*: Add percentage result field.
+
+        - contents: Add option --package.
+
+
+0.68    2016-02-11 (PERLANCAR)
+
+        - Skip files that cannot be extracted from pass 2 of files processing.
+
+        - Add subcommands: mods-by-mention-count, scripts-by-mention-count,
+          script2dist, script2rel.
+
+
+0.67    2016-02-11 (PERLANCAR)
+
+        - [Bugfix] Previous version was broken (a SQL error when updating
+          index).
+
+        - Bump database schema version to v8. We are now indexing more stuffs:
+          mtime/size of files, content of files (files inside release files)
+          along with their mtime/uncompressed size, scripts. We also parse PODs
+          of module/script files inside each release files, so we now record the
+          abstract of each module/script, and mentions/references of modules &
+          scripts in POD of modules/scripts. Note that size of index (index.db)
+          now increases from ~60M to ~250M.
+
+        - This version forces a full reindex.
+
+        - New subcommands: contents, scripts, mentions, authors-by-script-count,
+          authors-by-mod-mention-count, scripts-from-same-dist, distscripts,
+          author-scripts. UPDATE 2016-02-20: distscripts now renamed to
+          dist-scripts.
+
+
+0.66    2016-02-07 (PERLANCAR)
+
+        - [Bugfix] file should be indexed by (cpanid,name) not (name) because
+          PAUSE allows two authors to have the same filename.
+
+        - Bump database schema version to v7 due to the above fix.
+
+        - [Incompatible change] deps: Change default --include-core to 1.
+
+        - copy_*, extract_*: Check that release file exists.
+
+
+0.65    2016-01-23 (PERLANCAR)
+
+	- [Bugfix] deps: Dependency to unindexed modules was not shown.
+
+	- Use authors/00whois.xml (produced by e.g. OrePAN) when
+	  authors/01mailrc.txt.gz does not exist.
+
+	- [doc] Update mini CPAN current size.
+
+	- mods: Complete namespace.
+
+
+0.64    2016-01-16 (PERLANCAR)
+
+        - Adjust so we can be used like a daemon.
+
+        - [Bugfix] mod2dist: Used wrong database result field.
+
+        - [Bugfix] releases: Used wrong result field.
+
+        - [doc] Update information about mini CPAN current size.
+
+
+0.63    2016-01-06 (PERLANCAR)
+
+	- [Bugfix] Propagate error from _update_index().
+
+	- Add safety code to bail out when indexer_version is newer than
+	  current version, remove old code.
+
+
+0.62    2016-01-04 (PERLANCAR)
+
+	- mods: Allow specifying multiple namespaces.
+
+
+0.61    2015-12-31 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated PWR:DumpPerinciCmdLineScript (0.04) which
+          lets us avoid extraneous subcommands from being included in the
+          bin/lcpan's POD.
+
+
+0.60    2015-12-25 (PERLANCAR) (It's *this* Christmas!)
+
+	- Replace --exact-match with the more general --query-type to be
+	  able to search certain fields only or exact match on certain
+	  fields only.
+
+	- deps: Add option --flatten when doing recursive.
+
+	- [internal] Replace 'format_options' result metadata with the simpler
+	  'table.fields'.
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.59    2015-12-07 (PERLANCAR)
+
+        - No functional changes.
+
+        - [Build] [Bugfix] Don't include subcommand modules outside of our dist
+          when building with dzil, because we'll document and depend on
+          extraneous subcommands/modules [CT].
+
+
+0.58    2015-12-07 (PERLANCAR)
+
+	- mods-by-rdep-count: [ux] Allow lowercase names in author
+	  argument.
+
+	- [Incompatible change] Rename subcommands author{rdeps,mods,rels,dists}
+	  to author-{rdeps,mods,rels,dists} to be more consistent. It's
+	  recommended that you first uninstall the old version (e.g. using
+	  'pm-uninstall' or 'pmuninst') before installing this version, to clean
+	  up old names.
+
+
+0.57    2015-11-22 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Don't show large results in example.
+
+
+0.56    2015-11-21 (PERLANCAR)
+
+	- stats: Add num_authors_with_releases.
+
+	- [dist] Bump version of IPC::System::Options to fixed 0.22
+	  version.
+
+
+0.55    2015-10-20 (PERLANCAR)
+
+	- deps: Add --with-xs-or-pp to show dependency is XS/PP.
+
+	- Warn about modules that don't have dist ID.
+
+	- Avoid perl undef warning.
+
+
+0.54    2015-10-09 (PERLANCAR)
+
+	- Add convenience commands: copy-rel & copy-mod.
+
+
+0.53    2015-09-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Adjust to Complete::Util 0.36 (complete_file() split to
+	  Complete-File).
+
+
+0.52    2015-09-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Remove prereq: Complete because it is not directly used.
+
+
+0.51    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.50    2015-08-11 (PERLANCAR)
+
+	- No functional changes.
+
+	- Shave about 6ms of startup time (56ms -> 50ms) when doing completion,
+	  by delay-loading POSIX and avoiding experimental (+Carp) in App::lcpan
+	  as well as in Perinci::Sub::Complete and Complete::Util.
+
+
+0.49    2015-08-11 (PERLANCAR)
+
+	- No functional changes.
+
+	- Shave about 8ms of startup time (64ms -> 56ms) when doing completion,
+	  by replacing Log::Any with Log::Any::IfLOG.
+
+
+0.48    2015-08-11 (PERLANCAR)
+
+	- Save about 10ms of startup time (74ms -> 64ms) when doing completion,
+	  by replacing Module:List with PERLANCAR::Module::List.
+
+	- [Bugfix] Avoid SQL error when there are nulls in IN(...) clause.
+
+
+0.47    2015-07-27 (PERLANCAR)
+
+	- [ux] Show local/remote size which exceeds size.
+
+
+0.46    2015-07-02 (PERLANCAR)
+
+        - [ux] Add alias -l for --detail (like in ls).
+
+        - [ux] namespaces: Remove alias -l for --level, because we want -l to
+          mean --detail in all subcommands (like in ls)
+
+
+0.45    2015-07-02 (PERLANCAR)
+
+        - Add subcommand: reset.
+
+        - update: Add options --skip-index-file (-F), --force-update-index.
+
+        - Don't assume an empty indexer_version in meta table to mean reindex
+          from scratch. It might be that the current version fails/crashes in
+          the middle while indexing.
+
+
+0.44    2015-07-02 (PERLANCAR)
+
+	- [Bugfix] Fix deleting old file records (forgot to $sth->execute,
+	  forgot to delete records in file table).
+
+
+0.43    2015-07-01 (PERLANCAR)
+
+        - modst, dists, authors, rels, namespaces: Change multiple query to have
+          AND logic instead of OR, and provide --or switch.
+
+
+0.42    2015-06-28 (PERLANCAR)
+
+        - Add subcommand 'rels' as alias for 'releases' (for consistency, the
+          term 'rels' and not 'release'/'releases' is used in all other
+          subcommand names).
+
+        - mods, dists, authors, rels, namespaces: Accept multiple queries, add
+          option --exact-match. This way, you can use the subcommand to list
+          several things of certain names.
+
+        - [Bugfix] Fix namespace matching (previously --namespace Win32 would
+          also match Win32API).
+
+
+0.41    2015-06-17 (PERLANCAR)
+
+	- [Bugfix] authorrdeps: Fix completion for --user-author-{is,isnt}.
+          UPDATE: Renamed to author-rdeps in 0.58.
+
+	- [Bugfix] modules: Forgot to give default SQL order.
+
+	- Add FAQ item about seeing SQL queries.
+
+
+0.40    2015-06-16 (PERLANCAR)
+
+	- Add subcommand 'mods' as alias for 'modules' (for consistency, the
+          term 'mods' and not 'module'/'modules' is used in all other subcommand
+          names).
+
+        - mods: Add option --sort which allows sorting by name, author, as well
+          as rdeps (number of reverse dependencies). This means we can show
+          "popular" modules first.
+
+
+0.39    2015-06-13 (PERLANCAR)
+
+	- Add subcommands for convenience: extract-mod, extract-rel.
+
+
+0.38    2015-06-10 (PERLANCAR)
+
+	- [Bugfix] Update referenced function name in lcpanm.
+
+
+0.37    2015-06-09 (PERLANCAR)
+
+        - [dist] Add missing prereq to PerlIO::gzip.
+
+        - [Bugfix] Fix way to use Parse::CPAN::Meta.
+
+        - Replace YAML::XS with core module Parse::CPAN::Meta (thanks ether).
+
+
+0.36    2015-05-20 (PERLANCAR)
+
+	- [Bugfix] Search for META.json, META.yml, Build.PL, Makefile.PL at
+	  the top-level or second-level only, not anywhere.
+
+	- Switch from YAML::Syck to YAML::XS (YAML::Syck can't parse things
+	  like '--- # YAML1.0' header).
+
+
+0.35    2015-05-19 (PERLANCAR)
+
+	- dists: Add filtering options
+	  --has-{makefilepl,buildpl,metayml,metajson}.
+
+
+0.34    2015-05-15 (PERLANCAR)
+
+        - mod2dist: Accept multiple modules.
+
+        - authorrdeps: Add completion for --user-author{,--isnt}.
+
+
+0.33    2015-04-29 (PERLANCAR)
+
+        - [Bugfix] (update schema) Mixed up 'has_child' and 'num_sep' columns
+          when filling the 'namespace' table. So we need to empty and re-fill
+          the table.
+
+        - [Bugfix] update: Forgot to update 'namespace' table when adding a new
+          module.
+
+
+0.32    2015-04-29 (PERLANCAR)
+
+        - Bump database schema version to v6 (add 'namespace' table). This is
+          mostly to help speed up tab completion query when completing module
+          name.
+
+        - Add subcommand: namespaces.
+
+        - modules: Add filter option --namespace.
+
+
+0.31    2015-04-28 (PERLANCAR)
+
+	- [Bugfix] Don't update dist by name because name is not unique,
+	  update by id instead.
+
+
+0.30    2015-04-26 (PERLANCAR)
+
+        - This version will require full reindex.
+
+        - [Bugfix] When indexing, used wrong dist_id (from last_insert_id())
+          when record already exists.
+
+        - [Bugfix] deps, rdeps: Result ordering fixes.
+
+
+0.29    2015-04-24 (PERLANCAR)
+
+	- [Bugfix] Fix missing dependencies/reverse dependencies information
+          when a depended module is updated, this is because we used INSERT OR
+          REPLACE {dist,module} which changes module/dist IDs. We should've used
+          INSERT or UPDATE. From this new version on we record the module
+          version which did the reindexing. We are doing a full reindex when
+          indexer <= 0.28.
+
+
+0.28    2015-04-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- Avoid perl undef warning.
+
+
+0.27    2015-04-23 (PERLANCAR)
+
+        - rdeps: Implement recursive (-l/-R).
+
+        - deps: Ordering when in -l/-R mode.
+
+        - deps: Optimize query (avoid retrieving module ID's twice when in
+          recursive mode).
+
+        - [Bugfix] deps: Forget to clone data causing deps --phase & --level
+          defaults being reset to 'ALL'.
+
+
+0.26    2015-04-22 (PERLANCAR)
+
+	- Add phase & rel arguments to rdeps & authorrdeps.
+
+	- Add test: xt/author/sql_schema_versioned.t.
+
+
+0.25    2015-04-22 (PERLANCAR)
+
+	- [Bugfix] Fix SQL error when creating schema.
+
+
+0.24    2015-04-21 (PERLANCAR)
+
+	- deps: Accept multiple modules, speed up query.
+
+
+0.23    2015-04-16 (PERLANCAR)
+
+	- Add subcommand: dists-by-dep-count.
+
+	- Add subcommand: authors-by-rdep-count.
+
+	- Remove unnecessary (and unhelpful) package metadata in command
+	  modules, module abstract will be retrieved from handle_cmd's
+	  metadata anyway.
+
+	- mods-by-rdep-count: Add filter options --phase & --rel.
+
+
+0.22    2015-04-15 (PERLANCAR)
+
+        - rdeps: Accept multiple modules.
+
+        - New subcommand: authorrdeps. If you are a CPAN author, this subcommand
+          makes it easy to list all distributions that use one of your modules.
+          To filter only distributions created by others, just pass
+          --user-author-isnt YOURCPANID.
+
+        - New subcommand: mods-by-rdep-count.
+
+
+0.21    2015-04-15 (PERLANCAR)
+
+        - [Removed feature] Remove separate 'update-files' and 'update-index'
+          subcommands, to simplify configuration. Merge options to 'update'
+          subcommand.
+
+        - update: Add filter options --include-author, --exclude-author.
+
+
+0.20    2015-04-15 (PERLANCAR)
+
+	- Bump database schema version to v5 (add column is_latest to dist table
+          to ease queries).
+
+        - Allow --nolatest in addition to --latest.
+
+        - Add --latest filter option to 'modules' and 'mods-from-same-dist'
+          subcommands.
+
+
+0.19    2015-04-15 (PERLANCAR)
+
+	- Replace Module::CoreList->is_core with
+	  Module::CoreList::More->is_still_core.
+
+
+0.18    2015-04-15 (PERLANCAR)
+
+	- mods-from-same-dist: Accept multiple modules.
+
+
+0.17    2015-04-14 (PERLANCAR)
+
+        - Add command: mods-from-same-dist.
+
+        - stats: Add raw_mirror_mtime & raw_last_index_time to ease scripts
+          calculating freshness.
+
+
+0.16    2015-04-12 (PERLANCAR)
+
+        - [ux] Rename functions in App::lcpan to match CLI subcommand names
+          (e.g. list_local_cpan_authors -> authors) to make codebase easier to
+          use/understand.
+
+        - Various minor tweaks and fixes.
+
+
+0.15    2015-04-11 (PERLANCAR)
+
+        - Bump database schema version to v4. This update mainly adds column
+          'cpanid' to tables 'module' and 'dist' to speed up queries. This
+          version requires a full reindex.
+
+        - [Bugfix] Dependency information were sometimes lost when we update
+          mirror and old files information were removed, because we stored
+          dependency information on a per-dist basis instead of per-file.
+
+        - Enable authors-by-{mod,rel}-count because the queries are now fast.
+
+        - Add command: authors-by-dist-count.
+
+
+0.14    2015-04-07 (PERLANCAR)
+
+        - Make subcommands pluggable (App::lcpan::Cmd::*) to prepare for adding
+          more/custom subcommands by plugins.
+
+        - Add subcommands authors-by-mod-count & authors-by-rel-count, though
+          they are currently disabled by default because the queries are slow
+          (100+ secs).
+
+        - [Optimization] update: don't update index if mirrored files do not
+          change (done by checking the mtime of
+          modules/02packages.details.txt.gz).
+
+        - Add completion for --index-name.
+
+        - [dist] Rebuild with newer Pod::Weaver::Plugin::Rinci for producing
+          Configuration POD section.
+
+
+0.13    2015-02-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Forget to tag 'index_name' arg as common arg.
+
+
+0.12    2015-02-25 (PERLANCAR)
+
+	- [ux] Avoid creating index database automatically when we are just
+	  reading the index (ro mode).
+
+	- Allow customizing db filename via --index-name.
+
+
+0.11    2015-02-24 (PERLANCAR)
+
+        - To help chase bugs in updating index, now keeps old indexes (by
+          default 7, customize via --num-backups).
+
+
+0.10    2015-02-06 (PERLANCAR)
+
+	- Mark common args with 'common' tag.
+
+	- Add convenient option --all (equivalent to: --phase ALL --rel
+	  ALL).
+
+
+0.09    2015-01-20 (PERLANCAR)
+
+	- Skip erroneous version in dep information, instead of exploding.
+
+	- rdeps: Allow multiple --author & --author-isnt options.
+
+
+0.08    2015-01-14 (PERLANCAR)
+
+        - More tweaks and minor bug fixes.
+
+        - Add more examples.
+
+
+0.07    2015-01-14 (PERLANCAR)
+
+        - Various small tweaks.
+
+
+0.06    2015-01-14 (PERLANCAR)
+
+        [REMOVED FEATURES]
+
+        - Remove the feature that extracts dist metadata from Makefile.PL and
+          Build.PL because this is unsafe (we are running untrusted code). Note
+          that MetaCPAN also does not extract dist metadata from Makefile.PL and
+          Build.PL for the same reason.
+
+          Also, it has been pointed out to me that the current way is not proper
+          ("idiomatic"). The more proper way is to let perl run Makefile.PL and
+          Build.PL to generate Makefile/Build as well as MYMETA.{json,yml}. Then
+          we read MYMETA. Perhaps this feature will come back as an optional
+          plugin later, should there be any demand. BTW, Dist::Requires does
+          this kind of functionality.
+
+        - Also remove the feature that detects *.meta files, because these files
+          are not present in a mini CPAN mirror.
+
+        [ENHANCEMENTS]
+
+        - New subcommands: releases, mod2dist, mod2rel, dist2rel, distmods,
+          authormods, authordists, authorrels. UPDATE 2015-12-06: authormods now
+          renamed to author-mods, authordists -> author-dists, authorrels ->
+          author-rels. UPDATE 2016-02-20: distmods now renamed to dist-mods.
+
+        [DATABASE CHANGES]
+
+        - Bump database schema version to v3: add columns
+          has_{metayml,metajson,makefilepl,buildpl} to 'file' table. Add
+          'version_numified' to 'dist' and 'module' tables.
+
+        - Clear data for reindexing.
+
+
+0.05    2015-01-14 (PERLANCAR)
+
+        - No functional changes.
+
+        - Rebuild to update TODO.md (d'oh).
+
+
+0.04    2015-01-14 (PERLANCAR)
+
+        - Use Perinci::CmdLine::Util::Config to get lcpan configuration without
+          running the binary.
+
+        - Rebuild to update TODO.md.
+
+
+0.03    2015-01-14 (PERLANCAR)
+
+	- Bump database schema version to v2.
+
+        - The indexer now tries to extract dist metadata from Makefile.PL or
+          Build.PL in addition to from META.{json,yml}. This allows for more
+          thorough indexing of dependencies information (as well as distribution
+          name & abstract), as a lot of older releases do not include CPAN META
+          files. But this also means actually executing the Makefile.PL &
+          Build.PL scripts, which might have some side effects.
+
+        - Add script: lcpanm.
+
+        - Rename 'rev-deps' subcommand to 'rdeps'.
+
+        - rdeps: Add options --author and --author-isnt to be able to filter by
+          author. This allows you to, for example, see if a module is used by
+          other authors instead of just herself.
+
+
+0.02    2015-01-13 (PERLANCAR)
+
+	- Rename module/dist from CPAN::Local to App::lcpan (PAUSE
+	  conflict, CPAN::Local already exists on CPAN).
+
+
+0.01    2015-01-13 (PERLANCAR)
+
+        - First version.

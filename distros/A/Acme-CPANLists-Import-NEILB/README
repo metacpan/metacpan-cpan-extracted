@@ -1,0 +1,11 @@
+DESCRIPTION
+
+    This distribution contains module lists that are imported from Neil
+    Bowers' (CPANID:NEILB) module review articles located at
+    http://neilb.org/reviews/. This distribution is created to improve the
+    "mentions cloud".
+
+append:SEE ALSO
+
+    App::lcpan and lcpan, particularly the related-mods subcommand.
+

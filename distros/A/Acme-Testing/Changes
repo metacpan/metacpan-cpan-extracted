@@ -1,0 +1,8 @@
+Revision history for Acme-Testing
+
+0.002   22/Jun/2012
+        Added some excuses to so it doesn't constantly say 'Finalizing test...' every time. Hoepfully your bosses will fall for it. Good luck!
+
+0.001   Yesterday
+        First version, released on an unsuspecting world.
+

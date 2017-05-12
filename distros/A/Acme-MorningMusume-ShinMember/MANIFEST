@@ -1,0 +1,12 @@
+.cvsignore
+bin/genmusume
+Build.PL
+Changes
+lib/Acme/MorningMusume/ShinMember.pm
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

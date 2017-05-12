@@ -1,0 +1,48 @@
+#!/tools/local/perl -w
+my $N    = 256;
+my $STEP = 16;
+use strict;
+use Tk;
+use Tk::widgets qw(Photo);
+use Audio::Data;
+my $file = shift;
+open(AU,$file) || die "Cannot open $file";
+binmode(AU);
+my $au = new Audio::Data;
+$au->Load(\*AU);
+close(AU);
+my $rate = $au->rate;
+print "Rate is $rate\n";
+my $n = $au->samples;
+my $w = 0;
+my $s = new Audio::Data;
+my $max = 0;
+my $min = 1000;
+for (my $st = 0; $st < $n; $st += $STEP)
+ {
+  my $window = $au->hamming($N,$st);
+  $window->r2_fft;
+  my @amp = $window->dB(0,$N/2+1);
+  foreach my $v (@amp)
+   {
+    $max = $v if $v > $max;
+    $min = $v if $v < $min;
+   }
+  $s .= \@amp;
+  $w++;
+ }
+my $mw = MainWindow->new;
+my $img = $mw->Photo(-width => $w, -height => $N/2+1);
+for (my $x = 0; $x < $w; $x++)
+ {
+  my @amp = $s->amplitude($x*($N/2+1),$N/2+1);
+  for (my $y = 0; $y < @amp; $y++)
+   {
+    my $c = int(255*($amp[$y]-$max)/($min-$max));
+    $c = sprintf("#%02X%02X%02X",$c,$c,$c);
+    $img->put([[$c]], -to => $x, (@amp-1-$y));
+   }
+ }
+$mw->Label(-image => $img)->pack;
+MainLoop;
+

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Anansi-ComponentManager.t
+lib/Anansi/ComponentManager.pm

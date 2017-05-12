@@ -1,0 +1,26 @@
+* Create the postinst scripts so /var/arepa/gnupg-web is created on package
+  installation (see --list-keys and the contents of the default option file
+  inside it)
+* Create a default keyring with the Opera key, and make it part of the
+  distribution (use it for the initial /var/arepa/keyring/uploaders.gpg)
+* Figure out some permissions for package.db that work for both www-data and
+  arepa-master. Should package.db be created by default as an empty database?
+
+* The user, after installation, will have to "su - arepa-master" and create a
+  new GPG key for it. The secret key ID should be in the configuration
+
+* Make www-data be part of a new group, arepa. That group should be the group
+  for all the interesting directories, and those directories should have the
+  gid bit set.
+* Have to set the umask to 0002 to reprepro creates the files with the
+  appropriate permissions
+
+Pending
+-------
+
+* sometimes installation of build-essential and such fails
+* it would be nice having the canonical distribution name when generating the
+  apt sources line so it just works
+* it would be good having some tool to either generate the reprepro
+  configuration file (and builders?) or at least make sure you have everything
+  in sync.

@@ -1,0 +1,29 @@
+Asterisk-CDR version 0.01
+=========================
+
+Asterisk::CDR - Perl extension for accessing Asterisk CDRs stored in a database as objects
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::DBI::Frozen::301
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Jason Bodnar, gNumber, Inc.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

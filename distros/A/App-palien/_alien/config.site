@@ -1,0 +1,5 @@
+CC='clang'
+CFLAGS='-fno-strict-aliasing -pipe -fstack-protector-strong'
+CPPFLAGS='-fno-strict-aliasing -pipe -fstack-protector-strong'
+CXXFLAGS='-fno-strict-aliasing -pipe -fstack-protector-strong'
+LDFLAGS=' -fstack-protector-strong -L/usr/local/lib'

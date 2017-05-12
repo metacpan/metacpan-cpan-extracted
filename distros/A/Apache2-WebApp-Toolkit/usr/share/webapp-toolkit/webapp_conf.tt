@@ -1,0 +1,28 @@
+# Uncomment this for detailed errors (stack backtrace)
+#debug              = 0
+
+[project]
+title              = [% project_title   %]                      # no spaces or special characters
+author             = [% project_author  || 'Your Name Here'   %]
+email              = [% project_email   || 'alias@domain.com' %]
+version            = [% project_version || '0.01' %]
+
+[apache]
+doc_root           = [% apache_doc_root %]                      # path to project directory
+domain             = [% apache_domain   %]                      # valid domain name
+disable_uploads    = 0                                          # allow file uploads
+post_max           = 5242880                                    # post max in bytes (example 5MB)
+temp_dir           = [% apache_doc_root %]/tmp/uploads
+
+[template]
+cache_size         = 100                                        # total files to store in cache
+compile_dir        = [% apache_doc_root %]/tmp/cache/templates  # path to template cache
+include_path       = [% apache_doc_root %]/templates            # path to template directory
+stat_ttl           = 60                                         # template to HTML build time (in seconds)
+encoding           = utf8                                       # template output encoding
+
+[%- USE dir = Directory("$source/plugin/conf") -%]
+
+[%- FOREACH file = dir.files %]
+[%  PROCESS "$source/plugin/conf/$file.name" %]
+[%- END -%]

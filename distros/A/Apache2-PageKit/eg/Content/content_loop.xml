@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<content>
+  <html_title>PageKit Example: CONTENT_LOOP</html_title>
+  <news>
+    <date>January 10th, 2001</date>
+    <title>Release of PageKit 0.94</title>
+    <description>Rewrote MyPageKit, moving
+	handler into Apache2::PageKit and site specific code into
+	MyPageKit::Common.  Model now follows the hierarchy:
+	Apache2::PageKit::Model -&gt;
+	MyPageKit::Common -&gt;
+	User Defined Model Classes.
+    </description>
+  </news>
+  <news>
+    <date>January 4th, 2001</date>
+    <title>&quot;Building Web Sites with Apache2::PageKit&quot;</title>
+    <description>&lt;a href=&quot;http://take23.org/articles/2001/01/04/pagekit.xml&quot;&gt;Article&lt;/a&gt;
+		appeared in &lt;a href=&quot;http://www.take23.org/&quot;&gt;take23&lt;/a&gt;, discussing how Pagekit seperates
+		the development of your site into manageable components
+		without using embedded Perl code.</description>
+  </news>
+</content>

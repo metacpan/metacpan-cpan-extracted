@@ -1,0 +1,185 @@
+{
+   "abstract" : "Update a static website",
+   "author" : [
+      "Bernie Simon <bernie.simon@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.3",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Followme",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "GD" : "2.21",
+            "Net::FTP" : "0",
+            "Pod::Simple::XHTML" : "3.20",
+            "Text::Markdown" : "1.000031"
+         },
+         "requires" : {
+            "Test::Requires" : "0",
+            "Time::Format" : "1.04",
+            "Time::Local" : "1.18",
+            "YAML::Tiny" : "1.60",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::Followme" : {
+         "file" : "lib/App/Followme.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::BaseData" : {
+         "file" : "lib/App/Followme/BaseData.pm"
+      },
+      "App::Followme::ConfiguredObject" : {
+         "file" : "lib/App/Followme/ConfiguredObject.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::ConvertPage" : {
+         "file" : "lib/App/Followme/ConvertPage.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::CreateGallery" : {
+         "file" : "lib/App/Followme/CreateGallery.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::CreateIndex" : {
+         "file" : "lib/App/Followme/CreateIndex.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::CreateNews" : {
+         "file" : "lib/App/Followme/CreateNews.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::CreateSitemap" : {
+         "file" : "lib/App/Followme/CreateSitemap.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::DoubleDown" : {
+         "file" : "lib/App/Followme/DoubleDown.pm",
+         "version" : "1.12"
+      },
+      "App::Followme::EditSections" : {
+         "file" : "lib/App/Followme/EditSections.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::FIO" : {
+         "file" : "lib/App/Followme/FIO.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::FileData" : {
+         "file" : "lib/App/Followme/FileData.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::FolderData" : {
+         "file" : "lib/App/Followme/FolderData.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::FormatPage" : {
+         "file" : "lib/App/Followme/FormatPage.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::Initialize" : {
+         "file" : "lib/App/Followme/Initialize.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::JpegData" : {
+         "file" : "lib/App/Followme/JpegData.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::MarkdownData" : {
+         "file" : "lib/App/Followme/MarkdownData.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::Module" : {
+         "file" : "lib/App/Followme/Module.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::PodData" : {
+         "file" : "lib/App/Followme/PodData.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::Template" : {
+         "file" : "lib/App/Followme/Template.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::UploadData" : {
+         "file" : "lib/App/Followme/UploadData.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::UploadFtp" : {
+         "file" : "lib/App/Followme/UploadFtp.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::UploadLocal" : {
+         "file" : "lib/App/Followme/UploadLocal.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::UploadNone" : {
+         "file" : "lib/App/Followme/UploadNone.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::UploadSite" : {
+         "file" : "lib/App/Followme/UploadSite.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::Web" : {
+         "file" : "lib/App/Followme/Web.pm",
+         "version" : "1.92"
+      },
+      "App::Followme::WebData" : {
+         "file" : "lib/App/Followme/WebData.pm",
+         "version" : "1.92"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Jinzang/App-Followme/issues"
+      },
+      "homepage" : "https://github.com/Jinzang/App-Followme",
+      "repository" : {
+         "url" : "git://github.com/Jinzang/App-Followme.git",
+         "web" : "https://github.com/Jinzang/App-Followme"
+      }
+   },
+   "version" : "1.92"
+}

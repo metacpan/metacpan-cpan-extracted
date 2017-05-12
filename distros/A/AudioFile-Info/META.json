@@ -1,0 +1,48 @@
+{
+   "abstract" : "Perl extension to get info from audio files.",
+   "author" : [
+      "Dave Cross, E<lt>dave@mag-sol.comE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AudioFile-Info",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "YAML" : "0",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "AudioFile::Info" : {
+         "file" : "lib/AudioFile/Info.pm",
+         "version" : "v1.10.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davorg/audiofile-info.git",
+         "web" : "https://github.com/davorg/audiofile-info"
+      }
+   },
+   "version" : "v1.10.3",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

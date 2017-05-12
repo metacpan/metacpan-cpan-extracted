@@ -1,0 +1,58 @@
+#
+#
+# Copyright (C) 2006 by Richard Holden
+#
+# This library is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+#
+#
+
+PROTOTYPES: ENABLE
+
+#include "disk.h"
+
+
+perfstat_disk_total_t*
+disk_total()
+CODE:
+	 RETVAL = disk_total_impl();
+OUTPUT:
+	RETVAL
+CLEANUP:
+	safefree(RETVAL);
+
+
+int
+disk_count()
+CODE:
+	RETVAL = disk_count_impl();
+OUTPUT:
+	RETVAL
+
+my_disk_t*
+disk(desired_number = 1, name = "")
+	int desired_number;
+	char* name;
+PREINIT:
+	perfstat_id_t disk_name;
+	int update_name = 0;
+CODE:
+	if ((items == 2) && (!SvREADONLY((SV*)ST(1))))
+	{
+		 update_name = 1;
+	}
+	RETVAL = disk_impl(desired_number, name, update_name);
+	if (RETVAL == NULL)
+	{
+		 XSRETURN_UNDEF;
+	}
+	if ((items == 2) && (!SvREADONLY((SV*)ST(1))))
+	{
+		 sv_setpv((SV*)ST(1), name);
+		 SvSETMAGIC(ST(1));
+	}
+OUTPUT:
+	RETVAL
+CLEANUP:
+	safefree(RETVAL->data);
+	safefree(RETVAL);

@@ -1,0 +1,114 @@
+NAME
+    Apache::Backend::POE - Communicate with a POE server using persistent
+    connections
+
+SYNOPSIS
+     # Configuration in httpd.conf:
+
+     PerlModule Apache::Backend::POE
+
+     # use in startup.pl
+ 
+     Apache::Backend::POE->connect_on_init(
+            host => 'localhost',
+            port => 2021,
+            alias => 'poeky'
+     );
+
+     # in your mod_perl script
+
+     # use in mod_perl handler
+     my $poe = Apache::Backend::POE->connect(
+            host => 'localhost',
+            port => 2021,
+            alias => 'poeky'
+     );
+ 
+     unless (defined $poe) {
+            return SERVER_ERROR;
+     }
+
+     # use msg_send and msg_read like the example POE server
+
+DESCRIPTION
+    This module allows you to communicate with a POE server using persistent
+    connections.
+
+CONFIGURATION
+    The module should be loaded upon startup of the Apache daemon. Add the
+    following line to your httpd.conf or startup.pl:
+
+     PerlModule Apache::Backend::POE
+
+    A common usage is to load the module in a startup file via the
+    PerlRequire directive.
+
+    There are two configurations which are server-specific and which can be
+    done upon server startup:
+
+     Apache::Backend::POE->connect_on_init(host => $host, port => $port, alias => $alias);
+
+    This can be used as a simple way to have apache servers establish
+    connections on process startup. Alias defaults to 'backend'
+
+     Apache::Backend::POE->setPingTimeOut($timeout, $alias);
+
+    This configures the usage of the ping method, to validate a connection.
+    Setting the timeout to 0 will always validate the connection using the
+    ping method (default). Setting the timeout < 0 will de-activate the
+    validation of the connection object. Setting the timeout > 0 will ping
+    the connection only if the last access was more than timeout seconds
+    before. Alias defaults to 'backend'
+
+    For the menu item 'Backend POE connections' you need to call
+    Apache::Status BEFORE Apache::Backend::POE ! For an example of the
+    configuration order see startup.pl.
+
+    To enable debugging the variable $Apache::Backend::POE::DEBUG must be
+    set. This can either be done in startup.pl or in the user script.
+    Setting the variable to 1, just reports about a new connect. Setting the
+    variable to 2 enables full debug output.
+
+PREREQUISITES
+    Note that this module needs mod_perl-1.08 or higher, apache_1.3.0 or
+    higher and that mod_perl needs to be configured with the appropriate
+    call-back hooks:
+
+      PERL_CHILD_INIT=1 PERL_STACKED_HANDLERS=1. 
+
+    Also, Storable should be the same version on both the client and server.
+
+MOD_PERL 2.0
+    Apache::Backend::POE might not work under mod_perl 2.0. Please send
+    patches.
+
+SERVER
+    See the examples directory for a POE server to get you started.
+
+TODO
+    * Authentication
+    * SSL encryption
+    * Rollback support
+    * Create Backend::POE module for non mod_perl applications.
+    * Improve the documentation.
+    * Support for other serializers like YAML.
+
+BUG REPORTS
+    File bug reports at:
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Apache::Backend::POE>
+
+SEE ALSO
+    Apache, mod_perl, POE, Filter::Reference
+
+AUTHOR
+    David Davis <xantus@cpan.org>
+
+THANKS
+    Ask Bjoern Hansen, and Edmund Mergl for Apache::DBI
+
+COPYRIGHT
+    Copyright 2005 by David Davis and Teknikill Software
+
+    This libaray is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

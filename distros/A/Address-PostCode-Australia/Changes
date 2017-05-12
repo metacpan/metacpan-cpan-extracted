@@ -1,0 +1,32 @@
+Revision history for Address::PostCode::Australia
+
+0.08  Wed Mar 29 15:45:00 2017
+      - Tidied up test scripts and removed "-T" switch.
+
+0.07  Wed May 06 13:35:00 2015
+      - Upgraded to use Address::PostCode::UserAgent 0.05.
+
+0.06  Wed Mar 11 10:40:00 2015
+      - Added section SYNOPSIS to the package Address::PostCode::Australia.
+      - Updated description of the method details() in the pod document.
+      - Updated description of the methods provided by the package Address::PostCode::Australia::Place.
+
+0.05  Tue Mar 03 18:10:00 2015
+      - Upgraded to use Address::PostCode::UserAgent 0.04.
+
+0.04  Fri Jan 16 12:20:00 2015
+      - Updated Makefile.PL to generate the key 'provides' for META file correctly.
+      - Added unit test to test META files.
+      - Added LICENSE file.
+      - Removed SIGNATURE file.
+      - Updated Copyright year information.
+
+0.03  Mon Nov 17 20:08:00 2014
+      - Added missing package Address::PostCode::Australia::Params to the MANIFEST file.
+      - Updated manifest.t script to run even when the author is running the test.
+
+0.02  Sun Nov 16 01:20:28 2014
+      - Updated the copyright year details in the package Address::PostCode::Australia::Params.
+
+0.01  Sun Nov 16 01:00:01 2014
+      - First version, released.

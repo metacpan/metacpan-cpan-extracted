@@ -1,0 +1,44 @@
+---
+abstract: 'Clone module source codes with ghq'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Devel::CheckBin: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-CPANGhq
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::CPANGhq:
+    file: lib/App/CPANGhq.pm
+    version: '0.10'
+requires:
+  App::CPANRepo: '0'
+  Class::Accessor::Lite::Lazy: '0.03'
+  Getopt::Long: '0'
+  Pod::Usage: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Songmu/p5-App-CPANGhq/issues
+  homepage: https://github.com/Songmu/p5-App-CPANGhq
+  repository: git://github.com/Songmu/p5-App-CPANGhq.git
+version: '0.10'
+x_authority: cpan:SONGMU
+x_contributors:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'

@@ -1,0 +1,61 @@
+MATT DAEMON
+NAME
+    Acme::Matt::Daemon - MATT DAEMON
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+    MATT DAEMON
+
+        perl -MAcme::Matt::Daemon -e 'MATT DAEMON'
+
+DESCRIPTION
+    MATT DAEMON
+
+    <http://www.youtube.com/watch?v=ZWTzyU5MFgM>
+
+    Acme::Matt::Daemon will daemonize and output MATT DAEMON to your syslog
+    at every 15 to 60 minutes (randomly). Enjoy!
+
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-acme-matt-daemon at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Acme-Matt-Daemon>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Acme::Matt::Daemon
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-Matt-Daemon>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Acme-Matt-Daemon>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Acme-Matt-Daemon>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Acme-Matt-Daemon/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+MATT DAEMON

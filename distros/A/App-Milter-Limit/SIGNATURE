@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f8ef3dd392001fc5fe4f1cff3fc5338407e3084d Changes
+SHA1 54dda90b3b1d13d5d5ec34f1f3ec80c21b7ef4ca LICENSE
+SHA1 76a9caddb882569d3f1fe06775f2f00e9413ff2f MANIFEST
+SHA1 b255a06d31520a21962df3fdef27fb703a5cbc6d META.yml
+SHA1 3c950451f897c42bec770e581419c0ae8f254ea3 Makefile.PL
+SHA1 0c206059ed0f7ace53def7793980acb067aa3b12 Makefile.old
+SHA1 1f2af066160ee4478aef16bf1a0bf61a7cf4828e README
+SHA1 0238c57484b253a530eb18f46ad3aa7490c955a1 bin/milter-limit
+SHA1 6f7838e7c7a51724643d6d3480eae2d622d38c85 conf/milter-limit.conf
+SHA1 ddb45e13a1681c06afce9c7e46894f35d9d731a1 contrib/fedora/milter-limit.service
+SHA1 b3b2995ef10ea795d346a6c9446b15fd6331fff1 contrib/freebsd/milter-limit.sh
+SHA1 cd3476d6e1735402dd4b10f700e51dd067fc6ffc dist.ini
+SHA1 14e04bd451558b5bc9d1a214d5d130f0b5ee492d lib/App/Milter/Limit.pm
+SHA1 4c6eebe385730ce94b01f2e3e8fad1cb26b44827 lib/App/Milter/Limit/Config.pm
+SHA1 612f82bc4a403b1ecacee87d8e006cb160a25f7f lib/App/Milter/Limit/Log.pm
+SHA1 51e45eace15a32920dfaa588f53ded0c7a620cf1 lib/App/Milter/Limit/PidFile.pm
+SHA1 e804c3479857b491a4d1719ab92676b108b51ce8 lib/App/Milter/Limit/Plugin.pm
+SHA1 d2be455cbe115d6801a4b105be36a1b8dc1ae8c8 lib/App/Milter/Limit/Util.pm
+SHA1 886c83d1c6818c31244b51a323bb52db523881b5 t/compile.t
+SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
+SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
+SHA1 46a3b211d86fc7da03762365c626e33fc9d9ad44 t/signature.t
+SHA1 dc5577d84d6015589321fed7ab730d17a80d4410 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.17 (Darwin)
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAlO9aSoACgkQ+CqvSzp9LOx5cgCfVAGFrbJRGmSxDhJsmqldcXT1
+rVQAn0j98lNN4BGOZVLWatZsD9Kz7HFx
+=CseI
+-----END PGP SIGNATURE-----

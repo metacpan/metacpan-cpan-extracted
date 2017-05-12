@@ -1,0 +1,227 @@
+#!/usr/bin/env perl
+
+use 5.006002;
+
+use strict;
+use warnings;
+
+use Astro::Coord::ECI;
+use Astro::Coord::ECI::Sun;
+use Astro::Coord::ECI::Utils qw{ PI };
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+
+our $VERSION = '0.079';
+
+my %opt;
+
+GetOptions( \%opt,
+    qw{ local! reform_date|reform-date=s southern! },
+    'northern!' => sub {
+	$opt{southern} = !$_[1];
+    },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+my $year = @ARGV ? shift( @ARGV ) : ( gmtime )[5] + 1900;
+
+my $era = '';
+$year =~ s/ \s* ( ad | bce? | ce ) \z //smxi
+    and $era = uc $1;
+$year =~ m/ \A [+-]? [0-9]+ \z /smx
+    or die "Year must be numeric\n";
+$year < 1
+    and $era
+    and die "Year with era may not be negative\n";
+my $code = __PACKAGE__->can( "era_$era" )
+    or die "Invalid era '$era'\n";
+$year = $code->( $year );
+
+my $sta = Astro::Coord::ECI->new()->geodetic(
+    ( $opt{southern} ? - PI : PI ) / 4,
+    0,
+    0,
+);
+
+my $zone = $opt{local} ? 'local' : 'UTC';
+
+my $strftime = eval {
+    require DateTime::Calendar::Christian;
+    sub {
+	my ( $epoch ) = @_;
+	my @dt_arg;
+	$opt{reform_date}
+	    and push @dt_arg, reform_date => $opt{reform_date};
+	my $dt = DateTime::Calendar::Christian->from_epoch(
+	    epoch	=> $epoch,
+	    time_zone	=> $zone,
+	    @dt_arg,
+	);
+	my $calendar = $dt->is_julian() ? 'Julian' : 'Gregorian';
+	return $dt->strftime( "%{year_with_era}-%m-%d %H:%M:%S $zone $calendar" );
+    };
+} || do {
+    $opt{reform_date}
+	and die "-reform-date requires DateTime::Calendar::Christian\n";
+    require POSIX;
+    sub {
+	my ( $epoch ) = @_;
+	my @date = $opt{local} ? localtime( $epoch ) : gmtime( $epoch );
+	$date[4]++;
+	$date[5] += 1900;
+	( $date[5], my $era ) = $date[5] > 0 ?
+	    ( $date[5], 'AD' ) :
+	    ( 1 - $date[5], 'BC' );
+	return sprintf "%04d$era-%02d-%-2d %02d:%02d:%02d $zone Gregorian",
+	    reverse @date[0..5];
+    };
+};
+
+my $yr_2_epoch = eval {
+    require DateTime::Calendar::Christian;
+    sub {
+	my ( $year ) = @_;
+	return DateTime::Calendar::Christian->new(
+	    year	=> $year,
+	    month	=> 1,
+	    day		=> 1,
+	    time_zone	=> $zone,
+	)->epoch();
+    };
+} || do {
+    my $class = eval {
+	require Time::y2038;
+	'Time::y2038';
+    } || do {
+	require Time::Local;
+	'Time::Local';
+    };
+    $year < 1000
+	and die "Dates less than 1000 require DateTime::Calendar::Julian\n";
+    my $timegm = $class->can( $opt{local} ? 'timelocal' : 'timegm' );
+    sub {
+	my ( $year ) = @_;
+	return $timegm->( 0, 0, 0, 1, 0, $year );
+    };
+};
+
+my $sun = Astro::Coord::ECI::Sun->new( station => $sta )->universal(
+    $yr_2_epoch->( $year ) );
+
+foreach ( 1 .. 4 ) {
+    my ( $time, $quarter, $desc ) = $sun->next_quarter();
+    print "$desc at ", $strftime->( $time ), "\n";
+}
+
+sub era_AD {
+    my ( $year ) = @_;
+    return $year;
+}
+
+sub era_BC {
+    my ( $year ) = @_;
+    return 1 - $year;
+}
+
+BEGIN {
+    *era_ = \&era_AD;
+    *era_CE = \&era_AD;
+    *era_BCE = \&era_BC;
+}
+
+__END__
+
+=head1 TITLE
+
+solstice - Calculate equinox and solstice times for a given year.
+
+=head1 SYNOPSIS
+
+ solstice
+ solstice 2012
+ solstice 44bc
+ solstice -help
+ solstice -version
+
+=head1 OPTIONS
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -local
+
+If asserted, local times are used. Otherwise UTC is used.
+
+=head2 -northern
+
+If asserted, this option specifies that the calculation is for the
+northern hemisphere. If negated, it is for the southern hemisphere, and
+equinoxes and solstices are exchanged.
+
+The default is C<-northern> (or, equivalently, C<-nosouthern>), but it
+can be explicitly negated with C<-nonorthern> (or, equivalently,
+C<-southern>.
+
+If both C<-northern> and C<-southern> are specified, either asserted or
+negated, the rightmost specification rules.
+
+=head2 -reform-date
+
+ -reform-date uk
+
+This option specifies the date the calendar was reformed from Julian to
+Gregorian. The specification must be acceptable to
+L<DateTime::Calendar::Christian|DateTime::Calendar::Christian>, which
+must be loadable.
+
+=head2 -southern
+
+If asserted, this option specifies that the calculation is for the
+southern hemisphere. The effect is to exchange spring and fall equinoxes
+and summer and winter solstices.
+
+The default is C<-nosouthern> (or, equivalently, C<-northern>).
+
+If both C<-northern> and C<-southern> are specified, either asserted or
+negated, the rightmost specification rules.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script calculates the GMT dates and times of the equinoxes and
+solstices for a given year. The year is specified as the only argument.
+If this is omitted, you get the data for the current year.
+
+The year is specified either as a signed number (years since C<1 BC>) or
+with a trailing era (C<'AD'>, C<'BC'>, C<'BCE'>, or C<'CE'>,
+case-insensitive).
+
+If the L<DateTime::Calendar::Christian|DateTime::Calendar::Christian>
+module can be loaded, dates before October 15 1582 will be interpreted
+and displayed in the Julian calendar. Otherwise all dates are Gregorian,
+and dates less than C<1000AD> are not supported.
+
+=head1 AUTHOR
+
+Tom Wyant (wyant at cpan dot org)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016-2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

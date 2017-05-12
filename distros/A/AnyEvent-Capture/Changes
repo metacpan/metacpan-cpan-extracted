@@ -1,0 +1,9 @@
+Revision history for perl module AnyEvent::Capture
+
+0.1.1     2012-08-02
+
+- Added support for calls that return guard objects.
+
+0.1.0     2012-07-29
+
+- Initial release.

@@ -1,0 +1,113 @@
+SYNOPSIS
+
+     use App::datecalc;
+     my $calc = App::datecalc->new;
+     say $calc->eval('2014-05-13 + 2 days'); # -> 2014-05-15
+
+DESCRIPTION
+
+    This is an early release. More features and documentation will follow
+    in subsequent releases.
+
+    This module provides a date calculator, for doing date-related
+    calculations. You can write date literals in ISO 8601 format (though
+    not all format variants are supported), e.g. 2014-05-13. Date duration
+    can be specified using the natural syntax e.g. 2 days 13 hours or using
+    the ISO 8601 format e.g. P2DT13H.
+
+    Currently supported calculations:
+
+      * date literals
+
+       2014-05-19
+       now
+       today
+       tomorrow
+
+      * (NOT YET) time and date-time literals
+
+      * duration literals, either in ISO 8601 format or natural syntax
+
+       P3M2D
+       3 months 2 days
+
+      * date addition/subtraction with a duration
+
+       2014-05-19 - 2 days
+       2014-05-19 + P29W
+
+      * date subtraction with another date
+
+       2014-05-19 - 2013-12-25
+
+      * duration addition/subtraction with another duration
+
+       1 week 1 day + P10D
+
+      * duration multiplication/division with a number
+
+       P2D * 2
+       2 * P2D
+
+      * extract elements from date
+
+       year(2014-05-20)
+       quarter(today)
+       month(today)
+       day(today)
+       dow(today)
+       doy(today)
+       doq(today)
+       wom(today)
+       woy(today)
+       hour(today)
+       minute(today)
+       second(today)
+
+      * extract elements from duration
+
+       years(P22D)
+       months(P22D)
+       weeks(P22D)
+       days(P22D)       # 1, because P22D normalizes to P3W1D
+       totdays(P22D)    # 22
+       days(P1M1D)      # 1
+       totdays(P1M1D)   # 1, because months cannot be converted to days
+       hours(P22D)
+       minutes(P22D)
+       seconds(P22D)
+
+      * some simple number arithmetics
+
+       3+4.5
+       2**3 * P1D
+       abs(2-5)         # 3
+       round(1.6+3)     # 5
+
+      * (NOT YET) date comparison
+
+       today >= 2014-05-20
+
+      * (NOT YET) duration comparison
+
+       P20D < P3W
+
+METHODS
+
+ new
+
+ eval
+
+SEE ALSO
+
+    DateTime and DateTime::Format::ISO8601, the backend modules used to do
+    the actual date calculation.
+
+    Marpa::R2 is used to generate the parser.
+
+    Date::Calc another date module on CPAN. No relation except the
+    similarity of name.
+
+    http://en.wikipedia.org/wiki/ISO_8601 for more information about the
+    ISO 8601 format.
+

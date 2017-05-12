@@ -1,0 +1,37 @@
+Revision history for AnyEvent-DBI-MySQL
+
+v2.1.0  2016-11-22 19:21:45 EET
+	- Reformat doc.
+	- Fix 100% CPU usage on broken connection.
+	- Experimental support for mysql_auto_reconnect=>1.
+
+v2.0.0  2016-02-19 11:14:28 EET
+	- Switch to Dist::Milla.
+	- Use Test::Database.
+
+1.0.6   2014-12-24 11:47:39 EET
+	- Fix dependencies, closes RT #93458.
+
+1.0.5   2013-12-15 05:58:43 EET
+	- Fix tests for perl 5.16.3.
+
+1.0.4   2013-10-31 19:02:30 EET
+	- fix: don't throw on failed connect with {RaiseError=>0}
+	- fix: #88907 superfluous warning
+
+1.0.3   2013-05-20 19:22:41 EEST
+	- Improve compatibility with CPAN Testers.
+
+1.0.2	2013-04-29 07:02:06 EEST
+	- Add support for AnyEvent::CondVar as cb.
+	- minor: use $h->err instead of $h->errstr
+	- minor: don't send undef in 3rd param to cb
+
+1.0.1	2013-04-26 17:31:11 EEST
+	- fix: select*(…,{async=>0},$cb) didn't run $cb
+	- fix: async select*() didn't get correct $dbh->errstr
+	- fix: async execute() didn't return execute error
+	- Add more tests.
+
+1.0.0	2013-04-25 08:53:04 EEST
+	- Initial release.

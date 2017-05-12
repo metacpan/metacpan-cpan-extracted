@@ -1,0 +1,18 @@
+0.003   2017-01-29 (PERLANCAR)
+
+	- Add option: separator to produce aos instead of aohos.
+
+
+0.002   2016-09-26 (PERLANCAR)
+
+	- No functional changes.
+
+        - [doc] Add more example (JSON output).
+
+	- [ux] Set singular name of argument 'aoaos' as 'aos' for usage line
+	  that makes more sense.
+
+
+0.001   2016-09-26 (PERLANCAR)
+
+        - First release.

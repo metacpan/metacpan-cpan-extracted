@@ -1,0 +1,49 @@
+Revision history for Perl module scriptdist
+
+0.242 2017-04-24T05:45:35Z
+	* Fix a testing problem on Windows
+
+0.242 2017-04-24T05:44:38Z
+	* Fix a testing problem on Windows
+
+0.241 2017-03-29T05:29:44Z
+	* Fix up various distro things. I neglected a package statement.
+	Thus, this wasn't indexed. And then CPAN.pm went into a spiral
+	in  https://rt.cpan.org/Ticket/Display.html?id=120781 [D
+
+0.24 2015-08-17T22:04:15Z
+	* Move some things into a module, App::scripdist
+	* Everything is still really hacky.
+
+0.23 - 2014-01-03
+	* Get rid of MYMETA
+
+0.22 - 2013-08-17
+	* Update for Mastering Perl, 2e
+	* Use git instead of CVS
+
+0.21 - 2011-11-01
+	* Check for minimum perl version
+	* Extract prerequisites
+
+0.16 - 2008-05-27
+	* In compile.t template, use $^X, not "perl" (RT #36207)
+
+0.14 - 2004-09-02
+	* fixed a problem with the prereq.t test
+	* cleaned up the distro
+	* you don't need to upgrade if you already have this script
+
+0.13 - 2004-02-22
+	* don't look in CVS or Subversion directories for templates
+	* minor fixes to default templates, mostly quoting issues
+
+0.11 - 2004-02-07
+    * use FindBin to get script name
+    * some formatting fixes and warnings quashes
+    * most fixes thanks to Soren Andersen
+
+0.10 - 2004-01-12
+	* this is the first release, a trial version
+
+

@@ -1,0 +1,9 @@
+Revision history for Perl extension Authen::Ticket.
+
+0.02  Thu Nov 11 15:39:59 1999
+        - Changed mode of shared memory from 0644 to 0600
+        - Modified code to work with either CGI or CGI::WeT by default
+
+0.01  Wed May 26 17:22:45 1999
+	- original version; created by h2xs 1.18
+

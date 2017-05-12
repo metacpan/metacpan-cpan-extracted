@@ -1,0 +1,175 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use App::CSV;
+
+App::CSV->new_with_options->run;
+
+__END__
+=head1 NAME
+
+csv - process CSV files from the command line
+
+=head1 SYNOPSIS
+
+  # On the command line:
+
+  csv 1 2 -1 < report.csv
+
+  # Reads the first two fields, as well as the last one, from "report.csv".
+  # Data is cleaned up and emitted as CSV.
+
+  csv --fields Revenue,Q1,Q2 < report.csv   # or "-f" for short
+
+  # First line of the input (from file "report.csv") is considered as
+  # header line; the fields are emitted in the order "Revenue", "Q1",
+  # and "Q2". Data is cleaned up and emitted as CSV.
+
+  csv --input report.csv --to_tsv
+
+  # Converts the whole report to TSV (tab-separated values).
+
+=head1 DESCRIPTION
+
+CSV (comma-separated value) files are the lowest common denominator of
+structured data interchange formats. For such a humble file format, it
+is pretty difficult to get right: embedded quote marks and linebreaks,
+slipshod delimiters, and no One True Validity Test make CSV data found
+in the wild hard to parse correctly. L<Text::CSV_XS> provides flexible
+and performant access to CSV files from Perl, but is cumbersome to use
+in one-liners and the command line.
+
+B<csv> is intended to make commandline processing of CSV files as easy
+as plain text is meant to be on Unix. Internally, it holds two L<Text::CSV>
+objects (for input and for output), which have reasonable defaults but
+which you can reconfigure to suit your needs. Then you can extract just
+the fields you want, change the delimiter, clean up the data etc.
+
+In the simplest usage, B<csv> filters stdio and takes a list of integers.
+These are 1-based column numbers to select from the input CSV stream.
+Negative numbers are counted from the line end. Without any column list,
+B<csv> selects all columns (this is still useful to normalize quoting
+style etc.).
+
+=head2 Command line options
+
+The following options are passed to L<Text::CSV>. When preceded by the
+prefix "output_", the destination is affected. Otherwise these options
+affect both input and output.
+
+=over 4
+
+=item B<--quote_char>
+
+=item B<--escape_char>
+
+=item B<--sep_char>
+
+=item B<--eol>
+
+=item B<--always_quote>
+
+=item B<--binary>
+
+=item B<--keep_meta_info>
+
+=item B<--allow_loose_quotes>
+
+=item B<--allow_loose_escapes>
+
+=item B<--allow_whitespace>
+
+=item B<--verbatim>
+
+=back
+
+B<NOTE>: I<binary> is set to 1 by default in B<csv>. The other options have
+their L<Text::CSV> defaults.
+
+The following additional options are available:
+
+=over 4
+
+=item B<--input>, B<-i>
+
+=item B<--output>, B<-o>
+
+Filenames for input and output. "-" means stdio. Useful to trigger TSV mode
+(C<--from_tsv> and C<--to_tsv>).
+
+=item B<--columns>, B<-c>
+
+Column numbers may be specified using this option.
+
+=item B<--fields>, B<-f>
+
+When this option is specified, the first line of the input file is
+considered as a header line. This option takes a comma-separated list
+of column-names from the first line.
+
+For convenience, this option also accepts a comma-separated list of
+column numbers as well. Multiple --fields options are allowed, and
+both column names and numbers can be mixed together.
+
+=item B<--from_tsv>, B<--from-tsv>
+
+=item B<--to_tsv>, B<--to-tsv>
+
+Use tabs instead of commas as the delimiter. When B<csv> has the input or
+output filenames available, this is inferred when they end with C<.tsv>.
+To disable this dwimmery, you may say C<--to_tsv=0> and C<--from_tsv=0>.
+
+=back
+
+=head1 SEE ALSO
+
+L<Text::CSV>, L<Text::CSV_XS>
+
+=head1 AUTHOR
+
+Gaal Yahas C<< <gaal@forum2.org> >>
+
+=head1 THANKS
+
+nothingmuch, gphat, t0m, themoniker, Prakash Kailasa, tsibley, srezic, and
+ether.
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-app-csv at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-CSV>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+You're also invited to work on a patch. The source repo is at
+
+L<git://github.com/gaal/app-csv.git>
+
+L<http://github.com/gaal/app-csv/tree/master>
+
+=head1 COPYRIGHT (The "MIT" License)
+
+Copyright 2013 Gaal Yahas.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+=cut

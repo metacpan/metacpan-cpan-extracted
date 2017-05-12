@@ -1,0 +1,48 @@
+[COMMON]
+USER = user
+REMOTE_USER =user 
+MAX_REQ = 10
+MIN_UNQ = 2
+LOG_EXTN = log
+DEBUG_SSH  = 1
+SSH_PROTO  = '2,1'
+ID_RSA     = /home/user/.ssh/id_rsa_AA,/home/user/.ssh/id_rsa_KA,/home/user/.ssh/id_rsa_AW,/home/user/.ssh/id_rsa_KW,/home/user/.ssh/id_rsa_AD,/home/user/.ssh/id_rsa_KD
+MAIL_TO = 'user@xyz.com,user2@xyz.com'
+PAGE_TO = 8881119999@nma.vodafone.in
+FROM = user@hurray.com
+SMTP = hurray.xyz.com
+ENC_PASS_FILE = pass.txt
+DEFAULT_HOME = /home/user/perl/
+LOG_DIR = /home/user/perl//log
+RET_PERIOD = 5 
+MTCE_WINDOW  = Sun 0300-0800
+LINK = http://cpan.org
+PROCESS_TMPL = ps -eaf | grep -i %s | grep -v grep | wc -l 
+FILESYS_TMPL = cd %s
+#FILESYS_TMPL = cd %s; ls -ltr | wc -l
+
+[AA.xyz.com]
+PROCESSES = BBL:1, EPsrv:1, WEBLEPsrv:1, DMADM:1, GWADM:7, GWTDOMAIN:7, rexrqd:1, clndr_dmn:1, baticon_dmn:1, ora_pmon_8:1, tnslsnr:1, cdpmgr:1
+FILE_SYS  = /, /nfsdata/wwc_mail, /data/wwc1, /data/wwc3, /data/wwc2, /export/home,  /opt/oracle9206, /opt/cdunix, /co/pa/data, /co/pa/bin, /corpdata, /var, /var/run
+
+[KA.xyz.com]
+PROCESSES = BBL:1, EPsrv:1, WEBLEPsrv:1, DMADM:1, GWADM:6, GWTDOMAIN:6, rexrqd:1, baticon_dmn:1, ora_pmon_8:1, tnslsnr:1, cdpmgr:1
+FILE_SYS  = /, /nfsdata/wwc_mail, /data/wwc1, /data/wwc3, /data/wwc2, /export/home,  /opt/oracle9206, /opt/cdunix, /co/pa/data, /co/pa/bin, /corpdata, /var, /var/run
+
+[AW.xyz.com]
+PROCESSES = BBL:1, rexrqd:1, genesis_mond:1, dappdomain4:1, genesis_client:4, BBCom:1, inetd.conf:6
+FILE_SYS  = /, /var, /tmp, /opt, /corpdata, /export/home, /co/pa/bin, /co/pa/data, /corpdata/wwc1, /corpdata/wwc2, /corpdata/wwc3, /nfsdata, /nfsdata/wwc_mail
+
+[KW.xyz.com]
+PROCESSES = BBL:1, rexrqd:1, genesis_mond:1, dappdomain4:1, genesis_client:4, BBCom:1, inetd.conf:6
+FILE_SYS  = /, /var, /tmp, /opt, /corpdata, /export/home, /co/pa/bin, /co/pa/data, /corpdata/wwc1, /corpdata/wwc2, /corpdata/wwc3, /nfsdata, /nfsdata/wwc_mail
+
+[AD.xyz.com]
+PROCESSES = genesis_mond:1, dappdomain4ks:1, dappdomain4as:1, dwebdomain:1, startWLS:8, jdk:8, genesis_client:4
+FILE_SYS  = /, /var, /tmp, /opt, /corpdata,  /weblogic, /export/home, /co/pa/bin, /co/pa/data
+LINKS = http://xyz.com:7101/Login_Servlet/Login_Servlet,http://xyz.com:7201/Login_Servlet/Login_Servlet,http://xyz.com:7301/Login_Servlet/Login_Servlet,http://xyz.com:7401/Login_Servlet/Login_Servlet,http://xyz.com:7501/Login_Servlet/Login_Servlet,http://xyz.com:7601/Login_Servlet/Login_Servlet
+
+[KD.xyz.com]
+PROCESSES = genesis_mond:1, dappdomain4ks:1, dappdomain4as:1, dwebdomain:1, startWLS:8, jdk:8, genesis_client:4
+FILE_SYS  = /, /var, /tmp, /opt, /corpdata,  /weblogic, /export/home, /co/pa/bin, /co/pa/data
+LINKS     = http://KD.xyz.com:7101/Login_Servlet/Login_Servlet,http://KD.xyz.com:7201/Login_Servlet/Login_Servlet,http://KD.xyz.com:7301/Login_Servlet/Login_Servlet,http://KD.xyz.com:7401/Login_Servlet/Login_Servlet,http://KD.xyz.com:7501/Login_Servlet/Login_Servlet,http://KD.xyz.com:7601/Login_Servlet/Login_Servlet

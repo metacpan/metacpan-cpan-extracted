@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Acme-Oppai.t
+lib/Acme/Oppai.pm
+example/pearl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+---
+abstract: 'The FizzBuzz program can be written shortest'
+author:
+  - 'Kazuhiro Osawa <yappo {{{{}}}} shibuya {ddddoooott} pl>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-FizzBuzz
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+resources:
+  homepage: http://github.com/yappo/p5-Acme-FizzBuzz/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/yappo/p5-Acme-FizzBuzz.git
+version: 0.03

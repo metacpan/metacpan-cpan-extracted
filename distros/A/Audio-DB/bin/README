@@ -1,0 +1,9 @@
+The scripts in this directory provide some
+quick examples for using Audio::DB.
+
+You can fetch information on any script by
+
+  % perldoc <scriptname>
+
+Todd Harris
+harris@cshl.edu

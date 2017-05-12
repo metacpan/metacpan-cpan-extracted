@@ -1,0 +1,78 @@
+{
+   "abstract" : "Web interface to Map::Metro maps",
+   "author" : [
+      "Erik Carlsson <info@code301.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Map-Metro",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0",
+            "List::AllUtils" : "0",
+            "Map::Metro" : "0.2206",
+            "Mojolicious::Lite" : "5.00",
+            "MooseX::App::Command" : "0",
+            "URI::Encode" : "0",
+            "perl" : "5.016000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "App::Map::Metro" : {
+         "file" : "lib/App/Map/Metro.pm",
+         "version" : "0.0100"
+      },
+      "Map::Metro::Cmd::Mroute" : {
+         "file" : "lib/Map/Metro/Cmd/Mroute.pm",
+         "version" : "0.0100"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Csson/p5-App-Map-Metro/issues"
+      },
+      "homepage" : "https://metacpan.org/release/App-Map-Metro",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Csson/p5-App-Map-Metro.git",
+         "web" : "https://github.com/Csson/p5-App-Map-Metro"
+      }
+   },
+   "version" : "0.0100"
+}
+

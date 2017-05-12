@@ -1,0 +1,7 @@
+Revision history for Acme-ICan-tSpell
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02    23/03/2017
+        Return the original if no mistake was found.

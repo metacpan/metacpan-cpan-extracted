@@ -1,0 +1,21 @@
+Revision history for Acme-Sort-Bozo
+
+0.05 2012-11-02
+ - "Changes" is CPAN::Changes::Spec compliant.
+
+0.04 2011-08-21
+ - Added 'parent' to Makefile.PL dependencies.
+ - Reverted to old style version numbering in dependencies:
+   5.010 instead of v5.10.
+ - Fixed version number in POD.
+ - Moved remainder of tests out of TODO status.
+
+0.03 2011-08-20
+ - Added Try::Tiny dependency.
+
+0.02 2011-08-19
+ - Skipped - bring version number to coincide with sister
+   module, Acme::Sort::Bogosort.
+
+0.01 2011-08-18
+  - First version, released on an unsuspecting world.

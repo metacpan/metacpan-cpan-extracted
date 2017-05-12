@@ -1,0 +1,37 @@
+$Id: Changes 1915 2006-02-06 06:26:33Z btrott $
+
+Revision history for Authen::TypeKey
+
+0.05  2006.02.05
+    - Fixed a validation bug where verify would incorrectly return a true
+      result for an invalid signature like "foo". Thanks to Tatsuhiko
+      Miyagawa for the spot and test case.
+
+0.04  2005.05.27
+    - Use 'B*' in unpack, rather than 'B160'.
+    - Added support for supplying a hash reference to verify, in addition
+      to the query object (already supported).
+    - Test suite now uses Test::More instead of Test.
+
+0.03  2005.05.15
+    - Instead of using Crypt::DSA for signature verification, the signature
+      verification is now done inline using Math::BigInt. Math::BigInt
+      has a plugin architecture allowing multiple math libraries to be used
+      under the hood, and provides plugins for using both GMP and Pari. It
+      also has a pure-Perl implementation that will work without any
+      external math libraries. See Math::BigInt::GMP and Math::BigInt::Pari.
+    - Added ability to override the LWP::UserAgent-like object used to
+      retrieve the public key from the network. Thanks to Brad Fitzpatrick
+      for the patch.
+    - Use Class::ErrorHandler instead of replicating functionality. Thanks
+      to Tim Appnel for the patch.
+    - $tk->key_cache can now be a CODE reference, allowing a callback to
+      fetch the key from a MySQL database, session, or otherwise. Thanks to
+      Tim Appnel for the patch.
+
+0.02  2004.07.29
+    - Added support for TypeKey 1.1 protocol.
+    - Added $tk->token and $tk->version settings.
+
+0.01  2004.06.20
+    - Initial distribution.

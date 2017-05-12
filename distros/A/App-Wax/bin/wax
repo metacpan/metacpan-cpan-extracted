@@ -1,0 +1,186 @@
+#!/usr/bin/env perl
+
+use App::Wax;
+
+exit App::Wax->new->run(\@ARGV);
+
+# FIXME reconcile the need for a) GitHub doc display and b) Pod::Usage
+# discoverability by duplicating wax.pod here :-(
+
+__END__
+
+=head1 NAME
+
+wax - webify your CLI
+
+=head1 SYNOPSIS
+
+    wax [OPTIONS] program [OPTIONS] ...
+
+=head1 DESCRIPTION
+
+C<wax> is a command-line program which runs other command-line programs and converts their URL
+arguments to local file paths. By default, the files are removed after the command has exited.
+
+As well as adding transparent support for remote resources to commands that don't support them
+natively, wax can be used to:
+
+=over
+
+=item *
+
+add support for HTTPS (and any other protocols supported by L<LWP>) to programs that only support HTTP
+
+=item *
+
+add a mirroring layer to network requests (remote resources are only fetched if they've been updated)
+
+=item *
+
+add a caching layer to network requests (remote resources are only fetched once)
+
+=back
+
+=head1 OPTIONS
+
+The following C<wax> options can be supplied before the command name. Subsequent options are passed to
+the command verbatim, apart from URLs, which are converted to paths to the corresponding
+files. URL arguments can be excluded from the conversion process by supplying a separator token.
+Arguments after this are no longer processed by C<wax> and are passed through verbatim e.g.:
+
+    wax --cache --separator --no-wax cmd http://example.com/foo --no-wax --referrer http://example.com
+
+Note that the C<--cache> and C<--mirror> options are mutually exclusive i.e. only one (or neither)
+should be supplied. Supplying both will cause C<wax> to terminate with an error.
+
+=head2 -c, --cache
+
+Don't remove the downloaded file(s) after the command exits. Subsequent invocations will
+resolve the URL(s) to the cached files(s) (if still available) rather than hitting the network.
+
+If a local file no longer exists, the resource is re-downloaded.
+
+Note: by default, files are saved to the system's temp directory, which is typically cleared when
+the system restarts. To save files to another directory, use the C<-D> or C<--directory> option.
+
+=head2 -d, --dir, --directory STRING
+
+Specify the directory to download files to. Default: the system's
+L<temp directory|https://en.wikipedia.org/wiki/Temporary_folder>.
+
+If the directory doesn't exist, it is created if its parent directory exists.
+Otherwise, an error is raised.
+
+=head2 -D
+
+Download files to C<$XDG_CACHE_HOME/wax> or C<$HOME/.cache/wax> rather than the system's
+temp directory. Can be overriden by C<-d>.
+
+If the directory doesn't exist, it is created if its parent directory exists.
+Otherwise, an error is raised.
+
+=head2 -?, -h, --help
+
+Display this documentation.
+
+=head2 -m, --mirror
+
+Like the C<--cache> option, this keeps the downloaded file(s) after the command exits.
+In addition, a HEAD request is issued for each resource to see if it has been updated.
+If so, the latest version is downloaded; otherwise, the cached version is used (if still
+available).
+
+If a local file no longer exists, the resource is re-downloaded.
+
+=head2 -s, --separator STRING
+
+Set the token used to mark the end of waxable options e.g.:
+
+    wax --cache --separator :: cmd http://example.com/foo :: --referrer http://example.com
+
+Note: the separator token is removed from the list of options passed to the command.
+
+=head2 -t, --timeout INTEGER
+
+Set the timeout for network requests in seconds. Default: 60.
+
+=head2 -u, --user-agent STRING
+
+Set the user-agent string for network requests.
+
+=head2 -v, --verbose
+
+Print diagnostic information to STDERR.
+
+=head2 -V, --version
+
+Print the version of wax.
+
+=head1 EXAMPLES
+
+=head2 grep
+
+    $ wax grep -B1 demons http://www.mplayerhq.hu/DOCS/man/en/mplayer.1.txt
+
+=head2 espeak
+
+    $ alias espeak="wax espeak"
+    $ espeak -f http://www.setec.org/mel.txt
+
+=head2 nman
+
+Node.js man-page viewer
+
+    #!/bin/sh
+
+    node_version=${NODE_VERSION:-`node --version`}
+    docroot="https://cdn.rawgit.com/nodejs/node/$node_version/doc/api"
+    wax -D --cache pandoc --standalone --from markdown --to man "$docroot/$1.md" | man -l -
+
+=head1 CAVEATS
+
+As with any command-line programs that take URL parameters, care should be taken to ensure that
+special shell characters are suitably quoted. As a general rule, URLs that contain C<&>, C<~>,
+C<E<lt>>, C<E<gt>>, C<$> &c. should be quoted in shells on Unix-like systems and quoted with
+embedded escapes in Windows C<cmd>/C<command.exe>-like shells.
+
+It's worth checking that a program actually needs waxing. Many command-line programs already support
+URLs e.g:
+
+    eog http://upload.wikimedia.org/wikipedia/commons/4/4c/Eye_of_GNOME.png
+    gedit http://projects.gnome.org/gedit/
+    gimp http://upload.wikimedia.org/wikipedia/commons/6/6c/Gimpscreen.png
+    perldoc -F "http://www.pair.com/~comdog/brian's_guide.pod"
+    vim http://www.vim.org/
+
+&c.
+
+=head1 VERSION
+
+1.1.0
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<rlwrap|http://utopia.knoware.nl/~hlub/uck/rlwrap/#rlwrap>
+
+=item * L<sshfs|http://fuse.sourceforge.net/sshfs.html>
+
+=item * L<zsh completion script|https://github.com/chocolateboy/App-Wax/wiki/Zsh-completion-script>
+
+=back
+
+=head1 AUTHOR
+
+chocolateboy <chocolate@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010-2016 by chocolateboy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

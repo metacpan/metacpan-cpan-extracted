@@ -1,0 +1,7 @@
+^\.
+build\b
+blib\b
+~$
+MANFIEST.SKIP
+^#.*#$
+^MYMETA\.

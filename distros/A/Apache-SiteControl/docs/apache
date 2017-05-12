@@ -1,0 +1,44 @@
+Apache configuration variables, and their default values/meanings:
+
+AccessControllerDebug: default 0
+   - Turn on/off debugging of access controller. Set to 1 to enable.
+
+AccessControllerLocks: default /tmp
+   - The location of the lock files for the session information
+
+AccessControllerManagerFactory: default SiteControl::ManagerFactory
+   - The name of the module to use as the permission manager factory. This 
+     package includes SiteControl::ManagerFactory, which is an abstract base.
+     It must be overridden and supplied by the user.
+
+AccessControllerSessions: default /tmp
+   - The location of the session files
+
+AccessControllerUserFactory: default SiteControl::UserFactory
+   - The module that will take the user information and create some kind of
+     user object.
+
+AuthName: default "default"
+   - The auth name to use with apache for the set of auth parameters. See docs
+     for apache.
+
+RadiusAccessControllerHost: default localhost
+   - If using radius, the name of the host that is running the radius server
+
+RadiusAccessControllerSecret: default unknown
+   - If using radius, the secret key that allows communication
+
+SiteControlMethod: default SiteControl::Radius
+   - The module that is used to verify credentials. See SiteControl::Radius for
+     ideas on writing your own.
+
+UserObjectSavePassword: default 0
+   - Should the user's password be saved in the server side session file. This
+     is necessary for webapps that must log into other servers as that user
+     (i.e. imap).
+
+UserObjectPasswordCipher: default CAST5
+   - The cipher to use for encrypting the user passwords in the session files
+
+UserObjectPasswordKey:
+   - The key to use with the above cipher when encrypting passwords.

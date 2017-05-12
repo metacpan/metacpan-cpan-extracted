@@ -1,0 +1,5 @@
+Revision history for App-BCVI-AutoInstall
+
+0.1     2010-08-07
+        - first version, based on App::BCVI::InstallManager
+

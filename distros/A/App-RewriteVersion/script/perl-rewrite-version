@@ -1,0 +1,144 @@
+#!perl
+
+use strict;
+use warnings;
+use App::RewriteVersion;
+use Getopt::Long::Modern 'auto_help';
+
+our $VERSION = '0.005';
+
+GetOptions(
+	'D|dist-dir=s'       => \my $dist_dir,
+	'd|dry-run'          => \my $dry_run,
+	'f|from=s'           => \my $version_from,
+	'g|global'           => \my $global,
+	'L|follow-symlinks'  => \my $follow,
+	't|trial'            => \my $is_trial,
+	'u|allow-underscore' => \my $underscore,
+	'V|set-version=s'    => \my $set_version,
+	'v|verbose'          => \my $verbose,
+);
+
+my $subdirs = @ARGV ? [@ARGV] : undef;
+
+my $app = App::RewriteVersion->new;
+$app->allow_decimal_underscore($underscore) if defined $underscore;
+$app->dry_run($dry_run) if defined $dry_run;
+$app->follow_symlinks($follow) if defined $follow;
+$app->global($global) if defined $global;
+$app->verbose($verbose) if defined $verbose;
+
+my $new_version = $set_version // $app->current_version(dist_dir => $dist_dir, file => $version_from);
+$app->rewrite_versions($new_version, dist_dir => $dist_dir, is_trial => $is_trial, subdirs => $subdirs);
+
+=head1 NAME
+
+perl-rewrite-version - A tool to rewrite your Perl module versions
+
+=head1 SYNOPSIS
+
+ perl-rewrite-version [options] [subdir ...]
+ 
+   perl-rewrite-version --from lib/Foo/Bar.pm
+   perl-rewrite-version --trial --allow-underscore -V 3.30_3 lib script
+   perl-rewrite-version -LdvgD /opt/projects/Foo-Bar/
+   V=v1.0.0 perl-rewrite-version
+ 
+ Options:
+   -D, --dist-dir <dir>         distribution directory to operate on (default: current directory)
+   -d, --dry-run                don't actually update files (default: disabled)
+   -f, --from <file>            file to read version from
+   -g, --global                 rewrite versions globally instead of just the first per file (default: disabled)
+   -L, --follow-symlinks        follow symlinks when finding perl files to rewrite (default: disabled)
+   -t, --trial                  mark version as a trial version (default: disabled)
+   -u, --allow-underscore       allow decimal versions with underscores (default: disabled)
+   -V, --set-version <version>  set version manually instead of from file
+   -v, --verbose                print progress messages to STDOUT (default: disabled)
+
+=head1 DESCRIPTION
+
+L<perl-rewrite-version> is a command-line tool using L<App::RewriteVersion> to
+update Perl module versions in a distribution. The main module's version is
+read, and then used to update the version in all perl files in the distribution
+with a version assignment. The subdirectories (relative to the distribution
+directory) to update versions in can be specified as arguments, defaulting to
+C<lib>, C<script>, and C<bin> if no subdirectories are specified. The C<V>
+environment variable can be used to set the "current" version instead of
+retrieving it from a module, and the C<-V> option overrides the version to
+rewrite regardless of the current version.
+
+Existing version assignments and new versions must be parseable with the same
+rules as in L<Dist::Zilla::Plugin::RewriteVersion/"DESCRIPTION">, that is to
+say, they should either be a decimal number with a single decimal point, or a
+tuple version with a leading C<v> and at least 3 segments separated by decimal
+points. Version assignments should be in the form C<our $VERSION = '...';>.
+
+See the script L<perl-bump-version> for automatic incrementing of the version
+across your distribution.
+
+=head1 OPTIONS
+
+=head2 -D, --dist-dir <dir>
+
+Distribution directory to operate on, defaults to current working directory.
+
+=head2 -d, --dry-run
+
+Run as normal but don't actually update any files. Useful with C<--verbose> to
+verify expected functionality.
+
+=head2 -f, --from <file>
+
+File to read main version from. If unspecified, the main module of the
+distribution will be guessed in order to determine its version, see
+L<App::RewriteVersion/"current_version">. Ignored if the C<V> environment
+variable or the C<-V> option is set.
+
+=head2 -g, --global
+
+Update all instances of version assignment, instead of just the first
+occurrence in each file.
+
+=head2 -L, --follow-symlinks
+
+Follow directory symlinks when traversing the distribution for perl files to
+rewrite.
+
+=head2 -t, --trial
+
+Mark version assignment as a trial release.
+
+=head2 -u, --allow-underscore
+
+Allow decimal versions with underscores. See
+L<Dist::Zilla::Plugin::BumpVersionAfterRelease/"Using underscore in decimal $VERSION">
+for more information.
+
+=head2 -V, --set-version <version>
+
+Override the version to use for rewriting, ignoring any existing versions and
+the C<V> environment variable.
+
+=head2 -v, --verbose
+
+Print progress output to STDOUT.
+
+=head1 BUGS
+
+Report any issues on the public bugtracker.
+
+=head1 AUTHOR
+
+Dan Book <dbook@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by Dan Book.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=head1 SEE ALSO
+
+L<Dist::Zilla::Plugin::RewriteVersion>, L<Version::Next>

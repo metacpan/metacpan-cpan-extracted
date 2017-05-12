@@ -1,0 +1,31 @@
+---
+abstract: 'builds a series of SQLite extensions provided with the SQLite source to be compatible with DBD::SQLite'
+author:
+  - unknown
+build_requires: {}
+configure_requires:
+  Alien::Base::ModuleBuild: '0.005'
+  Archive::Zip: '0'
+  DBD::SQLite: '0'
+  Module::Build: '0.28'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-DBD-SQLite-BundledExtensions
+provides:
+  Alien::DBD::SQLite::BundledExtensions:
+    file: lib/Alien/DBD/SQLite/BundledExtensions.pm
+    version: '0.001'
+  DBD::SQLite::BundledExtensions:
+    file: lib/DBD/SQLite/BundledExtensions.pm
+requires:
+  Alien::Base: '0.005'
+  DBD::SQLite: '0'
+  File::ShareDir: '1.00'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

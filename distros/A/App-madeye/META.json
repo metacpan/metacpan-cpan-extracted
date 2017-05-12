@@ -1,0 +1,252 @@
+{
+   "abstract" : "enterprise-class monitoring solutions",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.6.7",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-madeye",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Perl::Critic" : "1.105",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Perl::Critic" : "1.02",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Cache::FileCache" : "0",
+            "Cache::Memcached::Fast" : "0",
+            "Class::Component" : "0.17",
+            "Class::Component::Plugin" : "0",
+            "DBI" : "0",
+            "DateTime" : "0",
+            "DateTime::Event::Cron" : "0",
+            "Digest::SHA1" : "0",
+            "Encode" : "0",
+            "Furl" : "0",
+            "Gearman::Client" : "0",
+            "Gearman::Util" : "0",
+            "Gearman::Worker" : "0",
+            "Getopt::Long" : "0",
+            "IO::Select" : "0",
+            "IO::Socket::INET" : "0",
+            "IO::Socket::SSL" : "0",
+            "IPC::Open3" : "0",
+            "Kwalify" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "Log::Dispatch" : "0",
+            "MIME::Lite" : "0",
+            "MogileFS::Admin" : "0",
+            "Net::DNS" : "0",
+            "Net::SMTP::TLS" : "0",
+            "Net::SNMP" : "0",
+            "Net::SSH" : "0",
+            "Net::SSL::ExpireDate" : "0",
+            "Net::XMPP" : "0",
+            "POE::Component::IKC::ClientLite" : "0",
+            "Params::Validate" : "0.91",
+            "Pod::POM" : "0",
+            "Scalar::Util" : "0",
+            "Socket" : "0",
+            "Sys::Syslog" : "0",
+            "Text::Diff" : "0",
+            "Text::Truncate" : "0",
+            "Time::HiRes" : "0",
+            "UNIVERSAL::require" : "0",
+            "XML::Stream" : "0",
+            "YAML" : "0",
+            "perl" : "5.008_001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::MadEye" : {
+         "file" : "lib/App/MadEye.pm",
+         "version" : "0.13"
+      },
+      "App::MadEye::Plugin::Agent::Base" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/Base.pm"
+      },
+      "App::MadEye::Plugin::Agent::DBI" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/DBI.pm"
+      },
+      "App::MadEye::Plugin::Agent::DJabberd" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/DJabberd.pm"
+      },
+      "App::MadEye::Plugin::Agent::DNS" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/DNS.pm"
+      },
+      "App::MadEye::Plugin::Agent::FTP" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/FTP.pm"
+      },
+      "App::MadEye::Plugin::Agent::FileSync" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/FileSync.pm"
+      },
+      "App::MadEye::Plugin::Agent::Gearmand" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/Gearmand.pm"
+      },
+      "App::MadEye::Plugin::Agent::HTTP" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/HTTP.pm"
+      },
+      "App::MadEye::Plugin::Agent::Memcached" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/Memcached.pm"
+      },
+      "App::MadEye::Plugin::Agent::Mogilefsd" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/Mogilefsd.pm"
+      },
+      "App::MadEye::Plugin::Agent::MySQLSlave" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/MySQLSlave.pm"
+      },
+      "App::MadEye::Plugin::Agent::POP3S" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/POP3S.pm"
+      },
+      "App::MadEye::Plugin::Agent::Perlbal" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/Perlbal.pm"
+      },
+      "App::MadEye::Plugin::Agent::Ping" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/Ping.pm"
+      },
+      "App::MadEye::Plugin::Agent::Process" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/Process.pm"
+      },
+      "App::MadEye::Plugin::Agent::SMTP" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/SMTP.pm"
+      },
+      "App::MadEye::Plugin::Agent::SMTPTLS" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/SMTPTLS.pm"
+      },
+      "App::MadEye::Plugin::Agent::SNMP::Disk" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/SNMP/Disk.pm"
+      },
+      "App::MadEye::Plugin::Agent::SNMP::IPAddress" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/SNMP/IPAddress.pm"
+      },
+      "App::MadEye::Plugin::Agent::SNMP::Process" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/SNMP/Process.pm"
+      },
+      "App::MadEye::Plugin::Agent::SSLExpireDate" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/SSLExpireDate.pm"
+      },
+      "App::MadEye::Plugin::Agent::Sleep" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/Sleep.pm"
+      },
+      "App::MadEye::Plugin::Agent::TheSchwartz::Error" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/TheSchwartz/Error.pm"
+      },
+      "App::MadEye::Plugin::Agent::TheSchwartz::Job" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/TheSchwartz/Job.pm"
+      },
+      "App::MadEye::Plugin::Agent::WriteDisk" : {
+         "file" : "lib/App/MadEye/Plugin/Agent/WriteDisk.pm"
+      },
+      "App::MadEye::Plugin::Base" : {
+         "file" : "lib/App/MadEye/Plugin/Base.pm"
+      },
+      "App::MadEye::Plugin::Check::Flock" : {
+         "file" : "lib/App/MadEye/Plugin/Check/Flock.pm"
+      },
+      "App::MadEye::Plugin::Check::Network" : {
+         "file" : "lib/App/MadEye/Plugin/Check/Network.pm"
+      },
+      "App::MadEye::Plugin::Check::User" : {
+         "file" : "lib/App/MadEye/Plugin/Check/User.pm"
+      },
+      "App::MadEye::Plugin::Notify::Debug" : {
+         "file" : "lib/App/MadEye/Plugin/Notify/Debug.pm"
+      },
+      "App::MadEye::Plugin::Notify::Email" : {
+         "file" : "lib/App/MadEye/Plugin/Notify/Email.pm"
+      },
+      "App::MadEye::Plugin::Notify::IKC" : {
+         "file" : "lib/App/MadEye/Plugin/Notify/IKC.pm"
+      },
+      "App::MadEye::Plugin::Notify::IMKayac" : {
+         "file" : "lib/App/MadEye/Plugin/Notify/IMKayac.pm"
+      },
+      "App::MadEye::Plugin::Notify::Ikachan" : {
+         "file" : "lib/App/MadEye/Plugin/Notify/Ikachan.pm"
+      },
+      "App::MadEye::Plugin::Notify::XMPP" : {
+         "file" : "lib/App/MadEye/Plugin/Notify/XMPP.pm"
+      },
+      "App::MadEye::Plugin::Worker::Gearman" : {
+         "file" : "lib/App/MadEye/Plugin/Worker/Gearman.pm"
+      },
+      "App::MadEye::Plugin::Worker::Simple" : {
+         "file" : "lib/App/MadEye/Plugin/Worker/Simple.pm"
+      },
+      "App::MadEye::Rule" : {
+         "file" : "lib/App/MadEye/Rule.pm"
+      },
+      "App::MadEye::Rule::DateTimeCron" : {
+         "file" : "lib/App/MadEye/Rule/DateTimeCron.pm"
+      },
+      "App::MadEye::Rule::Interval" : {
+         "file" : "lib/App/MadEye/Rule/Interval.pm"
+      },
+      "App::MadEye::Rule::Retry" : {
+         "file" : "lib/App/MadEye/Rule/Retry.pm"
+      },
+      "App::MadEye::Util" : {
+         "file" : "lib/App/MadEye/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/madeye/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/madeye",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/madeye.git",
+         "web" : "https://github.com/tokuhirom/madeye"
+      }
+   },
+   "version" : "0.13",
+   "x_contributors" : [
+      "otsune <otsune@d0d07461-0603-4401-acd4-de1884942a52>",
+      "tokuhirom <tokuhirom@d0d07461-0603-4401-acd4-de1884942a52>",
+      "walf443 <walf443@d0d07461-0603-4401-acd4-de1884942a52>",
+      "hirose31 <hirose31@d0d07461-0603-4401-acd4-de1884942a52>",
+      "Hiroyuki Akabane <vanity.fair.meta@gmail.com>",
+      "tokuhirom <tokuhirom@gmail.com>"
+   ]
+}

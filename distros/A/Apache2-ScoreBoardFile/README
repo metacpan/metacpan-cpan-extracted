@@ -1,0 +1,259 @@
+NAME
+    Apache2::ScoreBoardFile - Perl extension to the Apache HTTPD ScoreBoard
+
+SYNOPSIS
+    "httpd.conf":
+
+     LoadModule status_module "/path/to/mod_status.so"
+     ExtendedStatus On
+     ScoreBoardFile "/path/to/scoreboard.sb"
+
+    Perl level:
+
+     use Apache2::ScoreBoardFile;
+     $sb=Apache2::ScoreBoardFile->new($filename);
+     $sb=Apache2::ScoreBoardFile->new($filehandle);
+
+     $shared_mem_size=$sb->shmsize;
+     $server_limit=$sb->server_limit;
+     $thread_limit=$sb->thread_limit;
+     $type=$sb->type;
+     $generation=$sb->generation;
+     $lb_limit=$sb->lb_limit;
+     $restart_time=$sb->restart_time;
+
+     $process=$sb->process($index);
+
+     $pid=$process->pid;
+     $generation=$process->generation;
+     $quiescing=$process->quiescing;
+
+     $worker=$sb->worker($index);
+     $worker=$sb->worker($proc_index, $thread_index);
+
+     $thread_num=$worker->thread_num;
+     $pid=$worker->pid;
+     $generation=$worker->generation;
+     $status=$worker->status;
+     $access_count=$worker->access_count;
+     $bytes_served=$worker->bytes_served;
+     $my_access_count=$worker->my_access_count;
+     $my_bytes_served=$worker->my_bytes_served;
+     $conn_count=$worker->conn_count;
+     $conn_bytes=$worker->conn_bytes;
+     $start_time=$worker->start_time;
+     $stop_time=$worker->stop_time;
+     $last_used=$worker->last_used;
+     $client=$worker->client;
+     $request=$worker->request;
+     $vhost=$worker->vhost;
+     $tid=$worker->tid;
+     $utime=$worker->utime;
+     $stime=$worker->stime;
+     $cutime=$worker->cutime;
+     $cstime=$worker->cstime;
+
+     my %summary;
+     my @keys=qw/. _ S R W K L D C G I bw iw cw nr nb/;
+     @summary{@keys}=$sb->summary(@keys);
+
+INSTALLATION
+     perl Makefile.PL -apxs /path/to/apxs
+     make
+     make test
+     make install
+
+DESCRIPTION
+    "Apache2::ScoreBoardFile" provides an interface to the shared scoreboard
+    file used by Apache HTTPD.
+
+    Apache HTTPD can keep track of its activity in a memory section mapped
+    into the address space of each of its processes. Provided that shared
+    memory section is configured as a disk file this module makes it
+    read-only accessible for an unrelated process. In other words you can
+    watch what HTTPD is doing not being part of HTTPD.
+
+    There is already a module named Apache::ScoreBoard which does a very
+    similar thing as this one. Except it relies on a working HTTPD server to
+    access the scoreboard. This has the advantage that you can fetch the
+    information from a remote machine. But on the downside if the server is
+    under heavy load or not serving at all it's hard to access the
+    scoreboard.
+
+    NOTE, by the time of this writing this module is tested with the prefork
+    MPM only. Also, the test suite is expected to fail for other MPMs. That
+    does not mean that the module does not work for other MPMs. It only
+    requires some manual tests by your site. Patches are welcome.
+
+  Methods
+   $sb=Apache2::ScoreBoardFile->new($filename_or_handle);
+    the constructor. The parameter is either the name of the scoreboard file
+    or an open file handle.
+
+   $shared_mem_size=$sb->shmsize;
+    the shared memory size.
+
+   $server_limit=$sb->server_limit;
+    see "ServerLimit" in Apache HTTP Server Documentation.
+
+   $thread_limit=$sb->thread_limit;
+    see "ThreadLimit" in Apache HTTP Server Documentation.
+
+   $type=$sb->type;
+    the type of the scoreboard. See include/scoreboard.h in your apache
+    distribution. This value should contain 2 which means "SB_SHARED".
+    Please drop me a mail if it says otherwise in your installation.
+
+   $generation=$sb->generation;
+    the server generation (number of times it has been restarted by "SIGHUP"
+    or "SIGUSR1")
+
+   $lb_limit=$sb->lb_limit;
+    no clue what that means
+
+   $restart_time=$sb->restart_time;
+    server restart time in UNIX seconds (fractional number)
+
+   $process=$sb->process($index);
+    returns a parent (or process) score board entry. $index is a number
+    between 0 and "ServerLimit - 1". Returns an
+    "Apache2::ScoreBoardFile::Process" object.
+
+   $pid=$process->pid;
+    returns the process ID of the "Apache2::ScoreBoardFile::Process" object.
+
+   $generation=$process->generation;
+    returns the generation of the "Apache2::ScoreBoardFile::Process" object.
+    If this generation differs from the one reported by "$sb->generation"
+    the server is performing a restart and this process belongs to the old
+    generation.
+
+   $quiescing=$process->quiescing;
+    if true the process is going down gracefully.
+
+   $worker=$sb->worker($index);
+    returns an "Apache2::ScoreBoardFile::Worker" object by its overall
+    index.
+
+   $worker=$sb->worker($proc_index, $thread_index);
+    returns an "Apache2::ScoreBoardFile::Worker" object by its process index
+    and the thread index within the process.
+
+   $thread_num=$worker->thread_num;
+    returns the overall index of a worker
+
+   $pid=$worker->pid;
+    with prefork-MPM this field is unused. include/scoreboard.h explains:
+
+     /* With some MPMs (e.g., worker), a worker_score can represent
+      * a thread in a terminating process which is no longer
+      * represented by the corresponding process_score.  These MPMs
+      * should set pid and generation fields in the worker_score.
+      */
+
+   $generation=$worker->generation;
+    with prefork-MPM this field is unused. include/scoreboard.h explains:
+
+     /* With some MPMs (e.g., worker), a worker_score can represent
+      * a thread in a terminating process which is no longer
+      * represented by the corresponding process_score.  These MPMs
+      * should set pid and generation fields in the worker_score.
+      */
+
+   $status=$worker->status;
+    the status of a worker as one of the letters seen on the "mod_status"
+    page:
+
+     "_" Waiting for Connection
+     "S" Starting up
+     "R" Reading Request
+     "W" Sending Reply
+     "K" Keepalive (read)
+     "D" DNS Lookup
+     "C" Closing connection
+     "L" Logging
+     "G" Gracefully finishing
+     "I" Idle cleanup of worker
+     "." Open slot with no current process
+
+    A "?" is reported for an unknown status.
+
+   $access_count=$worker->access_count;
+   $bytes_served=$worker->bytes_served;
+   $my_access_count=$worker->my_access_count;
+   $my_bytes_served=$worker->my_bytes_served;
+   $conn_count=$worker->conn_count;
+   $conn_bytes=$worker->conn_bytes;
+   $start_time=$worker->start_time;
+   $stop_time=$worker->stop_time;
+   $last_used=$worker->last_used;
+   $client=$worker->client;
+   $request=$worker->request;
+   $vhost=$worker->vhost;
+   $tid=$worker->tid;
+   $utime=$worker->utime;
+   $stime=$worker->stime;
+   $cutime=$worker->cutime;
+   $cstime=$worker->cstime;
+    various other fields. Documentation patches welcome.
+
+   @summary{@keys}=$sb->summary(@keys);
+    This method iterates over all workers and collects summary activity.
+
+    The following keys are recognized:
+
+    "_" count the number of workers in "Waiting for Connection" state
+
+    "S" count the number of workers in "Starting up" state
+
+    "R" count the number of workers in "Reading Request" state
+
+    "W" count the number of workers in "Sending Reply" state
+
+    "K" count the number of workers in "Keepalive (read)" state
+
+    "D" count the number of workers in "DNS Lookup" state
+
+    "C" count the number of workers in "Closing connection" state
+
+    "L" count the number of workers in "Logging" state
+
+    "G" count the number of workers in "Gracefully finishing" state
+
+    "I" count the number of workers in "Idle cleanup of worker" state
+
+    "." count the number of open slots with no current worker
+
+    "cw"
+        the current number of active workers. For prefork-MPM this is the
+        number of apache worker processes currently running. Number of
+        workers in any state except for ".", "S" and "I".
+
+    "bw"
+        current number of busy workers. Any worker in a state except for
+        ".", "S", "I", "_" is busy.
+
+    "iw"
+        current number of idle workers ("_" state).
+
+    "nr"
+        overall number of requests served so far, sum(access_count).
+
+    "nb"
+        overall number of bytes served so far, sum(bytes_served).
+
+SEE ALSO
+    *   Apache::ScoreBoard
+
+    *   include/scoreboard.h in your apache distribution
+
+AUTHOR
+    Torsten Förtsch, <torsten.foertsch@gmx.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010 by Torsten Förtsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.12.1 or, at
+    your option, any later version of Perl 5 you may have available.
+

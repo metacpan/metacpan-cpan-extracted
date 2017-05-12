@@ -1,0 +1,13 @@
+Revision history for Acme-CPANAuthors-Danish
+
+0.03      2013-07-22 07:23:00 Europe/Copenhagen
+  * Add missing utf8 pragma, and fixed pod errors (Karen Etheridge)
+
+0.02      2011-10-21 17:36:28 Europe/Copenhagen
+  * Added LTHEGLER.
+
+0.01      2011-10-19 23:07:05 Europe/Copenhagen
+  * Added ABH, JONASBN, MADZ.
+
+0.001     2011-10-18 11:58:35 Europe/Copenhagen
+  * Initial release.

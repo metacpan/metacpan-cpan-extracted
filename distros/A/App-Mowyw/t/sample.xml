@@ -1,0 +1,14 @@
+<root>
+  <item>
+    <foo>bar1</foo>
+    <baz>quox1</baz>
+  </item>
+  <item>
+    <foo>bar2</foo>
+    <baz>quox2</baz>
+  </item>
+  <item>
+    <foo>bar3</foo>
+    <baz>quox3</baz>
+  </item>
+</root>

@@ -1,0 +1,19 @@
+Acme::Sub::Parms
+
+Provides simple function/method parameter processing handlers 
+
+To install:
+
+perl Makefile.PL
+make
+make test
+make install
+
+Alternatively, if you have Module::Build installed,
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+See 'perldoc Acme::Sub::Parms' for the documentation.

@@ -1,0 +1,107 @@
+#!/usr/local/bin/perl
+#	Title:	SpaceTrack
+#	Author:	T. R. Wyant
+#	Date:	07-Mar-2005
+#	Remarks:
+#		This Perl script is just a really simple encapsulation
+#		of the Astro::SpaceTrack shell subroutine. Note that the
+#		command line arguments are passed, so you can do things
+#		like
+#		$ perl SpaceTrack 'set username me password secret'
+#		followed by whatever commands you like at the SpaceTrack
+#		prompt.
+
+
+use strict;
+use warnings;
+
+our $VERSION = '0.098';
+
+use Astro::SpaceTrack qw{shell};
+use Getopt::Long 2.39;
+
+my %opt = (
+    filter => 0,
+);
+
+my $go = Getopt::Long::Parser->new();
+
+$go->getoptionsfromarray(
+    \@ARGV,
+    \%opt,
+    qw{ filter! }
+) or die <<'EOD';
+
+SpaceTrack - Retrieve orbital elements from the Space Track database.
+
+usage: SpaceTrack [option] [command ...]
+
+with the only legal option being
+  -filter
+    to supress all output to stdout except orbital data.
+EOD
+
+my $st = Astro::SpaceTrack->new (filter => $opt{filter});
+$st->shell (@ARGV);
+
+__END__
+
+
+=head1 NAME
+
+SpaceTrack - Perl application to fetch satellite orbit data.
+
+=head1 SYNOPSIS
+
+This application provides a command-line interface to the
+Astro::SpaceTrack module, based on the Astro::SpaceTrack::shell
+subroutine.
+
+This gives you interactive access to all Astro::SpaceTrack methods,
+plus pseudo output redirection (with tilde expansion) if you want your
+output to go to a file.
+
+Commands can be passed in on the command line. After all command-line
+commands have been processed, you get an interactive prompt unless one
+of the command-line commands was 'exit'. Beginning with 0.014, commands
+can also be piped in, or redirected in from a file.
+
+The one and only option is -filter, which sets the 'filter' attribute
+of the C<Astro::SpaceTrack> object. This prevents informational output
+(such as the banner and 'OK' messages) to STDOUT. The idea is that
+with -filter asserted, you can pipe the output to another program,
+and only have orbital elements written to the pipe.
+
+Please see L<Astro::SpaceTrack|Astro::SpaceTrack> for the details.
+
+=head1 ACKNOWLEDGMENTS
+
+The author wishes to thank Dr. T. S. Kelso of
+L<http://celestrak.com/> and the staff of L<http://www.space-track.org/>
+(whose names are unfortunately unknown to me) for their co-operation,
+assistance and encouragement in the development of the Astro::SpaceTrack
+module.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III (F<wyant at cpan dot org>).
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2006, 2010-2017 by Thomas R. Wyant, III
+(F<wyant at cpan dot org>).
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+The data obtained by this script may be subject to the Space
+Track user agreement (L<http://www.space-track.org/perl/user_agreement.pl>).
+
+=cut
+
+# ex: set textwidth=72 :

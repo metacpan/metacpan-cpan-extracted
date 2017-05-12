@@ -1,0 +1,242 @@
+$VAR1 = [
+
+          bless( {
+                   'HEIGHT' => 3,
+                   'TEXT' => '.---.
+|   |
+\'---\'',
+                   'NAME' => 'box',
+                   'WIDTH' => 5,
+		   'TEXT_ONLY' => '',
+		   'TITLE' => '',
+		   'BOX_TYPE' => 
+				[
+				[TRUE, 'top', '.', '-', '.', TRUE, ],
+				[FALSE, 'title separator', '|', '-', '|', TRUE, ],
+				[TRUE, 'body separator', '| ', '|', ' |', TRUE, ], 
+				[TRUE, 'bottom', '\'', '-', '\'', TRUE, ],
+				] ,
+		   'EDITABLE' => 1,
+		   RESIZABLE => 1,
+		   X_OFFSET => 0, Y_OFFSET => 0,
+                 }, 'App::Guiio::stripes::editable_box2' ),
+		 
+          bless( {
+                   'HEIGHT' => 1,
+                   'TEXT' => 'A',
+                   'NAME' => 'text',
+                   'WIDTH' => 1,
+		   'TEXT_ONLY' => 'A',
+		   'TITLE' => '',
+		   'BOX_TYPE' => 
+				[
+				[FALSE, 'top', '.', '-', '.', TRUE, ],
+				[FALSE, 'title separator', '.', '-', '.', TRUE, ],
+				[FALSE, 'body separator', '. ', '|', ' .', TRUE, ], 
+				[FALSE, 'bottom', '\'', '-', '\'', TRUE, ],
+				], 
+		   'EDITABLE' => 1,
+		   RESIZABLE => 1,
+		   X_OFFSET => 0, Y_OFFSET => 0,
+                 }, 'App::Guiio::stripes::editable_box2' ),
+
+bless({
+        'NAME' => 'wirl_arrow',
+	'HEIGHT' => 6,
+	'WIDTH' => 17,
+	'POINTS' => [[16,5]],
+	'SELECTED' => 0,
+	'EDITABLE' => 1,
+	'ALLOW_DIAGONAL_LINES' => 0,
+	'POINTS_OFFSETS' => [[0,0]],
+	'DIRECTION' => 'down-right' ,
+	'ARROW_TYPE' => 
+		[
+		['origin', '', '*', '', '', '', TRUE],
+		['up', '|', '|', '', '', '^', TRUE],
+		['down', '|', '|', '', '', 'v', TRUE],
+		['left', '-', '-', '', '', '<', TRUE],
+		['upleft', '|', '|', '.', '-', '<', TRUE],
+		['leftup', '-', '-', '\'', '|', '^', TRUE],
+		['downleft', '|', '|', '\'', '-', '<', TRUE],
+		['leftdown', '-', '-', '.', '|', 'v', TRUE],
+		['right', '-', '-','', '', '>', TRUE],
+		['upright', '|', '|', '.', '-', '>', TRUE],
+		['rightup', '-', '-', '\'', '|', '^', TRUE],
+		['downright', '|', '|', '\'', '-', '>', TRUE],
+		['rightdown', '-', '-', '.', '|', 'v', TRUE],
+		['45', '/', '/', '', '', '^', TRUE, ],
+		['135', '\\', '\\', '', '', 'v', TRUE, ],
+		['225', '/', '/', '', '', 'v', TRUE, ],
+		['315', '\\', '\\', '', '', '^', TRUE, ],
+		], 
+	
+	'ARROWS' => 
+		[	
+		bless(
+			{
+			'HEIGHT' => 6,
+			'STRIPES' => 
+				[
+				{'TEXT' => '|
+|
+|
+|
+|
+\'',
+				'HEIGHT' => 6,
+				'Y_OFFSET' => 0,
+				'WIDTH' => 1,
+				'X_OFFSET' => 0}
+				,
+				{
+				'TEXT' => '--------------->',
+				'HEIGHT' => 1,
+				'Y_OFFSET' => 5,
+				'WIDTH' => 16,
+				'X_OFFSET' => 1
+				}
+				],
+		
+			'WIDTH' => 17,
+			'END_X' => 16,
+			'ARROW_TYPE' =>
+				[
+				#name: $start, $body, $connection, $body_2, $end
+				
+				['origin', '', '*', '', '', '', TRUE],
+				['up', '|', '|', '', '', '^', TRUE],
+				['down', '|', '|', '', '', 'v', TRUE],
+				['left', '-', '-', '', '', '<', TRUE],
+				['upleft', '|', '|', '.', '-', '<', TRUE],
+				['leftup', '-', '-', '\'', '|', '^', TRUE],
+				['downleft', '|', '|', '\'', '-', '<', TRUE],
+				['leftdown', '-', '-', '.', '|', 'v', TRUE],
+				['right', '-', '-','', '', '>', TRUE],
+				['upright', '|', '|', '.', '-', '>', TRUE],
+				['rightup', '-', '-', '\'', '|', '^', TRUE],
+				['downright', '|', '|', '\'', '-', '>', TRUE],
+				['rightdown', '-', '-', '.', '|', 'v', TRUE],
+				['45', '/', '/', '', '', '^', TRUE, ],
+				['135', '\\', '\\', '', '', 'v', TRUE, ],
+				['225', '/', '/', '', '', 'v', TRUE, ],
+				['315', '\\', '\\', '', '', '^', TRUE, ],
+				], 
+			'END_Y' => 5,
+			'DIRECTION' => 'down-right'
+			}, 'App::Guiio::stripes::wirl_arrow' ),
+	
+		],
+	}, 'App::Guiio::stripes::section_wirl_arrow' ) ,
+		 
+          bless( {
+                   'STRIPES' => [
+                                  {
+                                    'HEIGHT' => 1,
+                                     'TEXT' => '--->',
+                                    'WIDTH' => 4,
+                                    'X_OFFSET' => 0,
+                                    'Y_OFFSET' => 0
+                                  },
+				  ],
+                   'NAME' => 'axis',
+		   'ARROW_TYPE' => 
+				[
+				['Up', '|', '|', '^', TRUE, ],
+				['45', '/', '/', '^', TRUE, ],
+				['Right', '-', '-', '>', TRUE, ],
+				['135', '\\', '\\', 'v', TRUE, ],
+				['Down', '|', '|', 'v', TRUE, ],
+				['225', '/', '/', 'v', TRUE, ],
+				['Left', '-', '-', '<', TRUE, ],
+				['315', '\\', '\\', '^', TRUE, ],
+				], 
+		   EDITABLE => 1,
+		   X_OFFSET => 0, Y_OFFSET => 0,
+		   END_X => 3, END_Y => 0,
+                 }, 'App::Guiio::stripes::editable_arrow2' ),
+		 
+          bless( {
+                   'HEIGHT' => 4,
+                   'STRIPES' => [
+				{
+				'HEIGHT' => 2,
+				'TEXT' => "______________\n\\             \\",
+				'WIDTH' => 15,
+				'X_OFFSET' => 0,
+				'Y_OFFSET' =>0,
+				},
+				{
+				'HEIGHT' => 1,
+				'TEXT' => ")             )",
+				'WIDTH' => 15,
+				'X_OFFSET' => 1,
+				'Y_OFFSET' => 2 ,
+				},
+				{
+				'HEIGHT' => 1,
+				'TEXT' => "/_____________/",
+				'WIDTH' => 15,
+				'X_OFFSET' =>0,
+				'Y_OFFSET' => 3 ,
+				}
+				],
+		  TEXT_ONLY => '',
+		  LEFT_CENTER_X => 0,
+		  RESIZE_POINT_X => 14,
+                   'NAME' => 'boxes/process',
+                   'WIDTH' => 16,
+		   EDITABLE => 1,
+		   X_OFFSET => 0, Y_OFFSET => 0,
+                 }, 'App::Guiio::stripes::process_box' ),
+		 
+		bless( {
+			  'NAME' => 'boxes/if',
+			  'HEIGHT' => 5,
+			  'WIDTH' => 16,
+			  'SELECTED' => 0,
+			  'TEXT_ONLY' => '',
+			  'TEXT' => '  .----------.
+ /            \\
+(              )
+ \\            /
+  \'----------\'
+',
+			  'EDITABLE' => 1,
+			  'RESIZABLE' => 1
+			}, 'App::Guiio::stripes::if_box' ),
+			
+          bless( {
+                   'HEIGHT' => 1,
+                   'TEXT' => '01___5____0____5____0____5____0____5____0____5____0',
+                   'NAME' => 'rulers/01_to_50_horizontal',
+                   'WIDTH' => 51,
+		   X_OFFSET => 0, Y_OFFSET => 0,
+                 }, 'App::Guiio::stripes::single_stripe' ),
+		 
+          bless( {
+                   'HEIGHT' => 1,
+                   'TEXT' => '0123456789',
+                   'NAME' => 'rulers/0_to_9_horizontal',
+                   'WIDTH' => 10,
+		   X_OFFSET => 0, Y_OFFSET => 0,
+                 }, 'App::Guiio::stripes::single_stripe' ),
+		 
+          bless( {
+                   'HEIGHT' => 10,
+                   'TEXT' => '0
+1
+2
+3
+4
+5
+6
+7
+8
+9',
+                   'NAME' => 'rulers/0_to_9_vertical',
+                   'WIDTH' => 1,
+		   X_OFFSET => 0, Y_OFFSET => 0,
+                 }, 'App::Guiio::stripes::single_stripe' ),
+		 
+		];

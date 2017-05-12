@@ -1,0 +1,33 @@
+---
+abstract: 'Command line scrobbling app'
+author:
+  - 'Adam Taylor <ajct@cpan.org>'
+build_requires:
+  English: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Scrobble
+requires:
+  Data::Dump: 0
+  File::HomeDir: 0
+  Module::PluginFinder: 0
+  Moose: 0
+  Moose::Role: 0
+  MooseX::Getopt::Dashes: 0
+  MooseX::SimpleConfig: 0
+  Net::LastFM::Submission: 0
+  WWW::BBC::TrackListings: 0
+  WWW::Mixcloud: 0
+  namespace::autoclean: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/adamtaylor/App-Scrobble.git
+version: 0.03

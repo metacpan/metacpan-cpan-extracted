@@ -1,0 +1,47 @@
+{
+   "abstract" : "A simple fifo queue",
+   "author" : [
+      "Dan Burke <dburke@addictmud.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Array-Queue",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::Spec" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/dwburke/perl-Array-Queue",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dwburke/perl-Array-Queue.git",
+         "web" : "https://github.com/dwburke/perl-Array-Queue"
+      }
+   },
+   "version" : "0.1.2"
+}
+

@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>
+      ARSperl Manual - ars_GetListEntry
+    </title>
+    <style type="text/css">
+/*<![CDATA[*/
+    body {
+    background-color: #FFFFFF;
+    }
+    p.c2 {font-style: italic}
+    dt.c1 {font-weight: bold}
+    /*]]>*/
+    </style>
+  </head>
+  <body>
+    <h2>
+      <code>ars_GetListEntry(ctrl, schema, qualifier, maxRetrieve=0, firstRetrieve=0,...)</code>
+    </h2>This function is used to retrieve the list of <code>entry_id</code>s and results list
+    strings from the specified schema. The entries are returned as an array of <i>(entry_id,
+    resultslist)</i> pairs. If you wish to retrieve all entries in the schema (upto the maximum
+    allowed by the server or specified by you as the <code>maxRetrieve</code> parameter) you should
+    load a qualifier with something like <code>(1 = 1)</code>.
+    <p>
+      See also the <a href="ars_GetListEntryWithFields.html">ars_GetListEntryWithFields</a> which
+      is similar to GetListEntry but returns selected fields as separate values and not as
+      formatted strings.
+    </p>
+    <p>
+      The "..." in the above function can be one of two things:
+    </p>
+    <ol>
+      <li>A Hash Reference that specifies what you want the query list to look like, followed by
+      (optionally) a list of field ids and sorting types to indicate how you want the query list
+      sorted.
+      </li>
+      <li>An optional list of field ids and sorting types to indicate how you want the schemas
+      default results list to be sorted. If you do not specify the fields you want to have
+      returned, the function returns the fields defined as the results list for this schema, which
+      can be changed on the server side.
+      </li>
+    </ol>
+    <p></p>
+    <p>
+      The sorting type can be 1 for ascending, or 2 for descending. Also, note that if you want to
+      retain the order of the entry ids returned, then you must assign the list to an array, and
+      not a hash.
+    </p>
+    <p>
+      Setting <code>maxRetrieve = 0</code> will return as many matches as the server will allow.
+      This is the default.
+    </p>
+    <p>
+      <code>firstRetrieve</code> specifies which entry to start with. The default (zero) is to
+      start with the first entry that matches the qualifier.
+    </p>
+    <p></p>
+    <dl>
+      <dt class="c1">
+        On success
+      </dt>
+      <dd>
+        Returns a list of <i>(entry_id, resultslist)</i> pairs.
+      </dd>
+      <dt class="c1">
+        On failure
+      </dt>
+      <dd>
+        Returns <code>undef</code>.
+      </dd>
+    </dl>
+    <h2>
+      Examples:
+    </h2>
+    <h3>
+      Simple usage:
+    </h3>
+    <pre>
+           %entries = ars_GetListEntry($c, "User", $q, 100, 0);
+           foreach $entry_id (sort keys %entries) {
+             print "EntryID: $entry_id ResultsList: $entries{$entry_id}\n";
+           }
+</pre>
+    <h3>
+      Example of how to set sorting options:
+    </h3>
+    <pre>
+           # returns entries for User schema sorted by login name
+           $all = ars_LoadQualifier($c,"User","1=1"); 
+           $login_name = ars_GetFieldByName($c,"User","Login Name");
+           @Entries = ars_GetListEntry($c, "User", $all, 0, 0, $login_name, 1);
+           
+                   for ( $i = 0; $i &lt;= $#Entries; $i +=2 ) {
+               $entry_num = $Entries[$i];
+               $resultslist_fields = $Entries[$i+1];
+                           print "$entry_num\t$resultslist_fields\n";
+           }
+ 
+</pre>
+    <h3>
+      Example of how to specify your own query list and sorting options:
+    </h3>
+    <pre>
+           %f = ars_GetFieldTable($ctrl, "User");
+           # retrieve list of matching records. query list should only
+           # contain the Login name and Full Name fields. In addition, 
+           # query list should be reverse sorted by Login name.
+           @a = ars_GetListEntry($ctrl, "User", $qual, 0, 0,
+                                # getListFields
+                                [ 
+                                  {columnWidth=&gt;5, separator=&gt;' ', fieldId=&gt;$f{'Login Name'} },
+                                  {columnWidth=&gt;5, separator=&gt;' ', fieldId=&gt;$f{'Full Name'}  } 
+                                ],
+                                # sort Order
+                                $f{'Login Name'}, 1);
+ 
+</pre>
+    <p>
+      <a href="toc.html">Back to Table of Contents</a>
+    </p>
+    <p></p>
+    <address>
+      Last changes to this page 14 Apr 2009 by michiel.beijen@gmail.com
+      <p>
+        © J.C.Murphy, J.W.Murphy 1998 arsperl@arsperl.org
+      </p>
+    </address>
+  </body>
+</html>

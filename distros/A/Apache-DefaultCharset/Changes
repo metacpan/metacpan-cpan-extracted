@@ -1,0 +1,7 @@
+Revision history for Perl extension Apache::DefaultCharset
+
+0.02  Mon Sep  2 17:30:08 JST 2002
+	* Add add_default_charset_name() into Apache package
+
+0.01  Fri May 31 04:47:01 2002
+	- original version

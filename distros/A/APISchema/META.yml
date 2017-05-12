@@ -1,0 +1,98 @@
+---
+abstract: 'Schema for API'
+author:
+  - 'hitode909 <hitode909@gmail.com>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Path::Class: '0'
+  Test::Class: '0'
+  Test::Deep: '0'
+  Test::Deep::JSON: '0'
+  Test::Fatal: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: APISchema
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  APISchema:
+    file: lib/APISchema.pm
+    version: '1.24'
+  APISchema::DSL:
+    file: lib/APISchema/DSL.pm
+  APISchema::Generator::Markdown:
+    file: lib/APISchema/Generator/Markdown.pm
+  APISchema::Generator::Markdown::ExampleFormatter:
+    file: lib/APISchema/Generator/Markdown/ExampleFormatter.pm
+  APISchema::Generator::Markdown::Formatter:
+    file: lib/APISchema/Generator/Markdown/Formatter.pm
+  APISchema::Generator::Markdown::ResourceResolver:
+    file: lib/APISchema/Generator/Markdown/ResourceResolver.pm
+  APISchema::Generator::Router::Simple:
+    file: lib/APISchema/Generator/Router/Simple.pm
+  APISchema::Resource:
+    file: lib/APISchema/Resource.pm
+  APISchema::Route:
+    file: lib/APISchema/Route.pm
+  APISchema::Schema:
+    file: lib/APISchema/Schema.pm
+  APISchema::Validator:
+    file: lib/APISchema/Validator.pm
+  APISchema::Validator::Decoder:
+    file: lib/APISchema/Validator/Decoder.pm
+  APISchema::Validator::Result:
+    file: lib/APISchema/Validator/Result.pm
+  Plack::App::APISchema::Document:
+    file: lib/Plack/App/APISchema/Document.pm
+  Plack::App::APISchema::MockServer:
+    file: lib/Plack/App/APISchema/MockServer.pm
+  Plack::Middleware::APISchema::RequestValidator:
+    file: lib/Plack/Middleware/APISchema/RequestValidator.pm
+  Plack::Middleware::APISchema::ResponseValidator:
+    file: lib/Plack/Middleware/APISchema/ResponseValidator.pm
+requires:
+  Class::Accessor::Lite: '0'
+  Class::Accessor::Lite::Lazy: '0'
+  Class::Load: '0'
+  HTML::Escape: '0'
+  HTTP::Message: '0'
+  Hash::Merge::Simple: '0'
+  JSON::Pointer: '0'
+  JSON::XS: '0'
+  List::MoreUtils: '0'
+  Path::Class: '0'
+  Plack: '0'
+  Router::Simple: '0'
+  Text::Markdown::Hoedown: '0'
+  Text::MicroTemplate: '0'
+  Text::MicroTemplate::DataSection: '0'
+  Text::MicroTemplate::Extended: '0'
+  URI::Escape: '0'
+  URL::Encode: '0'
+  Valiemon: '0.04'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/hitode909/APISchema/issues
+  homepage: https://github.com/hitode909/APISchema
+  repository: git://github.com/hitode909/APISchema.git
+version: '1.24'
+x_authority: cpan:HITODE
+x_contributors:
+  - 'Tomohiro Nishimura <tomohiro68@gmail.com>'
+  - 'aereal <aereal@aereal.org>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

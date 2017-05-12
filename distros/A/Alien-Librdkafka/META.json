@@ -1,0 +1,56 @@
+{
+   "abstract" : "build and install librdkafka",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-Librdkafka",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Socket::SSL" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0.005",
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.005",
+            "File::ShareDir" : "1.00"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Librdkafka" : {
+         "file" : "lib/Alien/Librdkafka.pm",
+         "version" : "v0.9.5"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/trinitum/perl-Alien-Librdkafka/issues"
+      },
+      "homepage" : "https://github.com/trinitum/perl-Alien-Librdkafka",
+      "repository" : {
+         "url" : "git://github.com/trinitum/perl-Alien-Librdkafka"
+      }
+   },
+   "version" : "v0.9.5",
+   "x_contributors" : [
+      "Pavel Shaydo <zwon@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

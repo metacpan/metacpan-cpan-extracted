@@ -1,0 +1,15 @@
+<div id="login_form">
+[% IF user %]
+    <i>Logged in as <b>[% link_user(user) %]</b></i>
+[% ELSE %]
+<form action="./" method="post" class="float">
+    <input type="hidden" name="mode" value="login">
+    <input type="hidden" name="from" value="[% request_uri | html %]">
+    <label for="login">login</label>
+    <input type="text" name="user" id="login" class="text" size="8"><br>
+    <label for="passwd">password</label>
+    <input type="password" name="passwd" id="passwd" size="8" class="text">
+    <input type="submit" value="login">
+</form>
+[% END %]
+</div>

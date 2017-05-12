@@ -1,0 +1,37 @@
+NAME
+
+    Alien::unibilium - Alien wrapping for unibilium
+
+DESCRIPTION
+
+    This CPAN distribution wraps the C library unibilium in a wrapper
+    suitable to drive CPAN and other Perl-related build infrastructure.
+
+    If the C library is already installed and known by pkg-config, this
+    module provides a simple access to its configuration. If not, the
+    process of installing it will install a locally-bundled copy of the
+    library into perl's arch-specific library directory.
+
+    This module bundles unibilium version v1.1.4.
+
+METHODS
+
+    This module behaves like ExtUtils::PkgConfig, responding to the same
+    methods, except that the module name is implied. Thus, the
+    configuration can be obtained by calling
+
+     $cflags = Alien::unibilium->cflags
+     $libs = Alien::unibilium->libs
+    
+     $ok = Alien::unibilium->atleast_version( $version )
+    
+     etc...
+
+SEE ALSO
+
+      * https://github.com/mauke/unibilium - mauke/unibilium on github
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,0 +1,52 @@
+{
+   "abstract" : "L<Alien> wrapping for F<unibilium>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-unibilium",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Path" : "2.07",
+            "File::Spec" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Path" : "2.07",
+            "File::Spec" : "0",
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::PkgConfig" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::unibilium" : {
+         "file" : "lib/Alien/unibilium.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,6 @@
+# d4
+# The user must have an entry in the userIdent and user table, and
+# not be in a deactivated state.
+
+AuthType auth-any
+Require identified-user

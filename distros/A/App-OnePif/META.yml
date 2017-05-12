@@ -1,0 +1,37 @@
+---
+abstract: 'Read 1Password Interchange Format exports'
+author:
+  - 'Flavio Poletti <polettix@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-OnePif
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  JSON::PP: '2.27400'
+  Mo: '0.40'
+  Path::Tiny: '0.098'
+  Term::ReadLine: '1.14'
+  YAML::Tiny: '1.69'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/polettix/App-OnePif/issues
+  homepage: https://github.com/polettix/App-OnePif
+  repository: https://github.com/polettix/App-OnePif.git
+version: '0.002'
+x_contributors:
+  - 'Flavio Poletti <flavio@polettix.it>'

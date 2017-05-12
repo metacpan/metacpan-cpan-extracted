@@ -1,0 +1,37 @@
+Revision history for Perl extension Astro::MoonPhase.
+
+0.10  Thu Jan 20 05:34:08 2000
+
+	- original version; created by h2xs 1.19
+
+
+0.11  Thu Oct 30 15:57:25 PST 2003
+
+        - bug fix. values returned from phase() were incorrect by the amount
+	  of timezone offset between localtime to gmtime.  Values were based
+	  on the use of localtime() instead of gmtime() in jtime(). jtime()
+	  is now much simplified, and jdate() has been eliminated.
+	- phasehunt() rewritten, but still returning phases from the wrong
+	  lunation, skipping the correct dates. behavior slightly changed.
+
+
+0.51  Wed Oct  6 14:15:27 PDT 2004
+
+	- bug fix. phasehunt() meanphase() and jyear() rewritten using code
+	  from moontool.c version 3.1. Thanks to John Walker and Ron Hitchens
+	  for the source code.  Thanks to Janto Trappe and Douglas Clifton for
+	  the bug reports.
+	- bug fix. daytosecs() was causing new phasehunt() error. jdaytosecs()
+	  is now much simplified, and jhms() has been eliminated.
+
+
+0.52  Thu Oct  7 08:34:06 PDT 2004
+
+	- minor change to authors section
+
+
+0.60  Wed Mar 21 10:15:45 CDT 2007
+
+	Contributions by Christopher J. Madsen:
+	- new function: phaselist
+        - real tests

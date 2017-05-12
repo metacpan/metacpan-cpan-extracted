@@ -1,0 +1,15 @@
+// Map the type of our custom classes
+%typemap{HipRecord*}{simple};
+
+// Map simple types
+%typemap{std::string}{simple};
+%typemap{int}{simple};
+%typemap{short int}{simple};
+%typemap{unsigned int}{simple};
+%typemap{double}{simple};
+%typemap{void}{simple};
+%typemap{float}{simple};
+%typemap{bool}{simple};
+%typemap{char}{simple};
+
+%typemap{const std::string&}{reference};

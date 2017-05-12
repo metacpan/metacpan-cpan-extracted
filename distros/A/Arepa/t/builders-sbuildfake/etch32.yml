@@ -1,0 +1,7 @@
+type: sbuildfake
+results_from: t/fixtures/build-results/etch32
+architecture: i386
+architecture_all: yes
+distribution: etch-opera
+distribution_aliases: [etch]
+bin_nmu_for: [unstable]

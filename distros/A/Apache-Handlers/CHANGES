@@ -1,0 +1,4 @@
+0.02
+----
+Added check for BEGIN phase during module importation
+Corrected @EXPORT_OK to refer to run_phase

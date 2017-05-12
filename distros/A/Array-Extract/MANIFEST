@@ -1,0 +1,21 @@
+inc/Module/Install.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/GithubMeta.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Array/Extract.pm
+lib/Array/Extract/Example.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+t/extract.t
+xt/001pod.t
+xt/002podcoverage.t
+xt/003perlcritic.t
+xt/anyperlperlcriticrc

@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/ex1.pl
+examples/ex2.pl
+lib/Authen/Simple/WebForm.pm
+t/00-load.t
+t/01-new.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

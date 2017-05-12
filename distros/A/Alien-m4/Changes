@@ -1,0 +1,29 @@
+Revision history for Alien-m4
+
+0.09      2017-03-04 20:25:58 -0500
+  - Migrated to alienfile + Alien::Build
+
+0.08      2017-01-18 15:40:28 -0500
+  - Added %{m4} helper
+
+0.07      2016-01-29 10:33:59 -0500
+  - Use Alien::Base::ModuleBuild as configure_requires
+    instead of Alien::Base
+
+0.06      2015-04-22 11:26:16 -0400
+  - use alien_stage_install
+
+0.05      2015-02-18 17:22:14 -0500
+  - Require Alien::Base 0.010
+
+0.04      2015-02-18 17:17:10 -0500
+  - Do not accept existing versions of m4 that AutoConf will turn its nose to
+
+0.03      2014-11-19 15:52:46 -0500
+  - fix for source code build version detection
+
+0.02      2014-11-19 14:40:09 -0500
+  - first release to CPAN
+
+0.01      2014-11-19 13:30:19 -0500
+  - initial version

@@ -1,0 +1,103 @@
+Revision history for App-CreateSelfSignedSSLCert
+
+0.13    2016-06-09 (PERLANCAR)
+
+        - No functional changes.
+
+        - [dist] Replace Log::Any::For::Builtins with IPC::System::Options.
+
+
+0.12    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+        - Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.11    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.10    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.09    2015-04-02 (PERLANCAR)
+
+	- [ux] Tweak Rinci metadata: add completion for ca (*.crt + *.pem
+	  files) & ca_key (*.key + *.pem files).
+
+
+0.08     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.07     2014-07-22 (SHARYANTO)
+
+         - No functional changes.
+
+         - Switch CLI scripts from using Perinci::CmdLine to
+           Perinci::CmdLine::Any to reduce size of dependencies.
+
+
+0.06    2014-07-02 (SHARYANTO)
+
+        - No functional changes.
+
+        - [Bugfix] scripts/ or bin/ files need to have something like #!perl and
+          not #!/usr/bin/env perl so it can be replaced to the path of perl when
+          installing [RT#96884]
+
+
+0.05    2014-06-19 (SHARYANTO)
+
+        - No functional changes.
+
+        - Revert previous decision. App dist name should still be the name of
+          the main module. When binary name is a single word (e.g. foo) then
+          module name should be App::foo and dist App-foo. When binary name is
+          multiple words (e.g. foo-bar-baz) then module name should use camel
+          case App::FooBarBaz and dist App-FooBarBaz.
+
+
+0.04    2014-06-19 (SHARYANTO)
+
+        - No functinal changes.
+
+        - Rename dist from App-CreateSelfSignedSSL to
+          App-create-self-signed-ssl-cert, to reflect the name of the binary.
+
+
+0.03    2014-05-22 (SHARYANTO)
+
+        - Add utility: create-ssl-csr.
+
+        - Add options: --csr-only.
+
+        - [Bugfix] --wildcard option didn't create CN=*.host.com.
+
+
+0.02    2014-03-26 (SHARYANTO)
+
+        - No functional changes.
+
+        - Move function from bin/ to lib/ so it's accessible outside CLI
+          context.
+
+
+0.01    2014-03-26 (SHARYANTO)
+
+        - First release.

@@ -1,0 +1,91 @@
+Algorithm::Networksort version 2.01
+===================================
+
+    "I've got to sort this out. ... There must be a list somewhere
+    of the ones these bastards were nicking, and I wish I had it.  I
+    would make it even money that the name of the murderer is on it.
+    Would you?"
+
+    "No."
+
+    "Anything to be contrary. Why not?"
+
+    "You haven't done enough sorting, Mr. Cramer."
+        The Golden Spiders, by Rex Stout (1953, ch. 13)
+
+With version 2.00, sorting networks are now much easier to use
+objects. If your code is not ready for this change, stick with
+version 1.30, which will stay present on CPAN until at least 2017.
+
+This module will create sorting networks, a sequence of comparisons
+that do not depend upon the results of prior comparisons.
+
+Since the sequences and their order never change, they can be very
+useful if deployed in hardware, or used in software with a compiler
+that can take advantage of parallelism.  However a network cannot be
+used as a generic sort like quicksort, as the arrangement of the
+comparisons is fixed according to the number of elements to be
+sorted.
+
+There are several algorithms to generate sorting networks.  This
+module has four of them:  Bose and Nelson's, Hibbard's, Batcher's
+Merge Exchange, Batcher's Bitonic, Batcher's Odd-Even Merge,
+as well as Odd-Even Transposition, Balanced, and Bubble (thanks to
+Doug Hoyte, who contributed code for the last five sorts, the last
+three of which are more for comparison and teaching purposes).
+
+It also has networks that were found to be superior in comparison
+count or parallel count ('depth') to those generated automatically
+by these algorithms (thanks to Morwenn, who contributed to this).
+
+There is a flexible formatting function that will allow you to
+print out your network in many ways (see documentation).  There
+is also a graphical output function that will return the network
+in an encapsulated postscript, SVG, or text form.
+
+
+INSTALLATION
+
+The usual way.  Unpack the archive:
+	gzip -d Algorithm-Networksort-2.01.tar.gz
+	tar xvf Algorithm-Networksort-2.01.tar
+
+Go into the resulting directory, and type:
+	perl Build.PL
+	Build
+
+Run the tests:
+	Build test
+
+Install the module:
+	Build install
+
+
+MORE ON TESTING
+
+With the addition of 'best' networks for sizes 18 and 22, the testing
+time went from 'lengthy' to 'intolerable for unsuspecting CPAN testers'.
+Consequently, the sorting tests now have an upper limit of 10 for
+normal testing. This size goes up to 17 if the environment variable
+AUTHOR_TESTING is set (and the size 12 and up 'best' networks are also
+tested).
+
+If you want to have the full testing experience, I've provided a switch
+that will automatically do all this for you. Run the tests with
+
+	Build test --Testlong
+
+and the full suite will run (and depending on your machine, you may have
+time to go out and get lunch). If you want to run only a single test file,
+then the Module-Build switch '--test_files' can select that file for you:
+
+	Build test --test_files=t/best.t --Testlong
+
+Note that the '--Testlong' switch comes last.
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 John M. Gamble. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.

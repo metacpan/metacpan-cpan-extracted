@@ -1,0 +1,23 @@
+Revision history for Algorithm::SetCovering:
+
+0.05 11/27/2003
+    (ms) Applied patch by Julien Gervais-Bird
+         <j.bird@usherbrooke.ca> fixing an endless loop in case
+         keys don't cover all the required locks. () is returned
+         in this case now as well as in the case where a solution
+         to open no locks at all is requested.
+
+0.04 11/22/2003
+    (ms) Added comment by Julien Gervais-Bird 
+         <j.bird@usherbrooke.ca> on limits of greedy algorithm
+
+0.03 06/07/2003
+    (ms) Fixed perl 5.006 dependency according to report at
+         https://rt.cpan.org/Ticket/Display.html?id=2660
+         Also added dependency on Log::Log4perl 0.27
+
+0.02 05/20/2003
+    (ms) Added Greedy Algorithm
+
+0.01 05/18/2003
+    (ms) Where it all began

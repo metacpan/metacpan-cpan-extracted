@@ -1,0 +1,43 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Name overloaded operators.
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More tests => 18;
+use_ok("Arch::Name");
+
+my $archive = 'my@arch.com--public';
+my $category = 'my-category';
+
+my $name = Arch::Name->new($archive);
+isa_ok($name, "Arch::Name",        "new with archive");
+is("$name", $archive,              "stringify");
+
+$name += $category;
+isa_ok($name, "Arch::Name",        "add category");
+is($name->level, 2,                "level");
+is($name->category, $category,     "category");
+
+$name--;
+isa_ok($name, "Arch::Name",        "remove category");
+is($name->level, 1,                "level");
+
+$name = $name + $category + "my-branch";
+isa_ok($name, "Arch::Name",        "add category and branch");
+is($name->error, undef,            "error");
+is(int($name), 3,                  "int");
+ok($name? 1: 0,                    "bool");
+
+$name += "invalid-version";
+isa_ok($name, "Arch::Name",        "add invalid version");
+isnt($name->error, undef,          "error");
+is(int($name), 3,                  "int");
+
+$name -= 3;
+isa_ok($name, "Arch::Name",        "remove 3 levels");
+is($name->level, 0,                "level");
+ok($name? 0: 1,                    "bool");

@@ -1,0 +1,30 @@
+Acme::List::CarCdr - car cdr cdaadadrdrr
+
+To install this module, use CPAN, for example:
+
+  cpan Acme::List::CarCdr
+
+For the source code, see:
+
+https://github.com/thrig/Acme-List-CarCdr
+
+This can be built and installed by running:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Run perldoc(1) on Acme::List::CarCdr for more documentation.
+
+DEPENDENCIES
+
+Moo, Perl, a suitable computer, active electrical supply, etc.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 Jeremy Mates
+
+This module is free software; you can redistribute it and/or modify it
+under the Artistic License (2.0).

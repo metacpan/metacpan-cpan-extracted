@@ -1,0 +1,32 @@
+NAME
+    AutoXS::Header - Container for the AutoXS header files
+
+SYNOPSIS
+      # potentially in your Makefile.PL
+      sub MY::post_constants {
+        # Write header as AutoXS.h in current directory
+        return <<'MAKE_FRAG';
+      linkext ::
+              $(PERL) -MAutoXS::Header -e AutoXS::Header::WriteAutoXSHeader
+      # note the tab character in the previous line!
+
+      MAKE_FRAG
+      }
+
+DESCRIPTION
+    This module is a simple container for the newest version of the AutoXS
+    header file "AutoXS.h".
+
+SEE ALSO
+    AutoXS
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008-2009 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8 or, at your
+    option, any later version of Perl 5 you may have available.
+

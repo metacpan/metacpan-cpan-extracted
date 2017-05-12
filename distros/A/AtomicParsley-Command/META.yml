@@ -1,0 +1,41 @@
+---
+abstract: 'Interface to the Atomic Parsley command'
+author:
+  - 'Andrew Jones <andrew@arjones.co.uk>'
+build_requires:
+  File::Spec: 0
+  FindBin: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::Deep: 0
+  Test::Fatal: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AtomicParsley-Command
+requires:
+  File::Copy: 0
+  File::Glob: 0
+  File::Spec: 0
+  IPC::Cmd: 0
+  Object::Tiny: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/andrewrjones/perl5-AtomicParsley-Command/issues
+  homepage: https://github.com/andrewrjones/perl5-AtomicParsley-Command
+  repository: https://github.com/andrewrjones/perl5-AtomicParsley-Command.git
+version: 1.153400
+x_contributors:
+  - 'Andrew Jones <andrew@andrew-jones.com>'
+  - 'Andrew Jones <andrewjones86@googlemail.com>'
+  - 'Jim Graham <jim@jim-graham.net>'
+  - 'WATANABE Hiroaki <hwat@mac.com>'
+  - 'andrewrjones <andrewjones86@googlemail.com>'

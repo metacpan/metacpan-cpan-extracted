@@ -1,0 +1,32 @@
+---
+abstract: 'Preprocess Pandoc before Processing Pandoc'
+author:
+  - 'DBR <dbr@cpan.org>'
+build_requires:
+  Carp: '0'
+  Scalar::Util: '0'
+  Test::More: '0.94'
+  perl: v5.14.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: v5.14.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-pandoc-preprocess
+requires:
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  perl: v5.14.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/plicease/App-pandoc-preprocess/issues
+  homepage: http://perl.wdlabs.com/App-pandoc-preprocess
+  repository: git://github.com/plicease/App-pandoc-preprocess.git
+version: v0.9.10
+x_serialization_backend: 'YAML::Tiny version 1.64'

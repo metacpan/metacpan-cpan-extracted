@@ -1,0 +1,50 @@
+{
+   "abstract" : "Transform paths in @ARGV to absolute paths",
+   "author" : [
+      "Olivier Mengu\u00c3\u00a9 <dolmen@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ARGV-Abs",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : 0,
+            "File::Spec" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/dolmen/p5-ARGV-Abs",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dolmen/p5-ARGV-Abs.git",
+         "web" : "https://github.com/dolmen/p5-ARGV-Abs"
+      }
+   },
+   "version" : "1.01"
+}
+

@@ -1,0 +1,241 @@
+#!perl -w
+# run this document through perl to check its syntax
+use Pod::Checker;
+podchecker(\*DATA);
+__END__
+
+=head1 NAME
+
+App::installguide::win32 - Installation Guide for Perl Software on Win32 System
+
+=head1 INTRODUCTION
+
+These is a general Installation Guide for installing Perl software on
+the Microsoft Windows platform.  The emphasis is on web and database applications
+in Perl.
+
+This document is motivated by helping people install the
+App-Context Framework (comprised of
+App-Context, App-Options, App-Repository, and App-Widget).
+However, most of the information here is useful regardless of what Perl modules
+you are installing.
+
+You should also read through the general Installation Guide (App::installguide) and
+understand how the software would be installed on Unix/Linux
+before consulting this specialized Win32 guide. 
+
+This guide will predominantly focus on how to get
+up and running on a plain vanilla Windows system
+for demonstration or development purposes.
+The focus here is not on optimized server installation on Windows
+servers, although the instructions may still be useful.
+
+These instructions assume that your PC is connected to the
+Internet.
+
+=head1 PERL
+
+The official Perl for the Windows platform is available from
+ActiveState.
+
+  http://www.activestate.com
+  http://www.activestate.com/Products/ActivePerl/
+
+Registration is required, but it is free of charge.
+Follow the download and installation directions and you should end
+up with perl installed in the following directories under C:\Perl.
+
+  C:\Perl            # install directory for Perl
+  C:\Perl\bin        # programs directory (home of perl.exe)
+  C:\Perl\eg         # example code
+  C:\Perl\html       # html doc for the installed perl modules
+  C:\Perl\lib        # standard perl modules
+  C:\Perl\site\lib   # extram perl modules installed at this site
+
+=head1 OTHER PERL MODULES
+
+After you install the base Perl distribution, you need to install
+a number of other Perl modules, which would normally be downloaded
+from CPAN.  Because you are installing on a Windows platform, however,
+you will use ActiveState's Perl Package Manager (PPM, included with
+ActiveState Perl).  This installs Windows binary versions of many of the
+packages which are on CPAN from ActiveState's website.
+Take a look at this web page.
+
+  http://aspn.activestate.com/ASPN/Modules
+
+NOTE: The following instructions are good for the latest version of PPM (PPM3).
+Some syntax changed since PPM2.
+
+You can go into the PPM utility to manage installed binary distributions
+and check on which "repositories" of PPM files are currently configured.
+
+  C:\> ppm
+  PPM> repository
+  PPM> quit
+  C:\>
+
+Not all of the Perl modules you may want (i.e. mod_perl) are available from
+ActiveState, so you should know about a second popular repository for PPM 
+files.  Take a look at the following web pages.
+
+  http://theoryx5.uwinnipeg.ca/ppmpackages/
+  http://theoryx5.uwinnipeg.ca/
+
+To add this repository to the list for the ppm shell utility to
+search, do the following.
+
+  C:\> ppm
+  PPM> repository add theoryx5 http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer58
+  PPM> repository add officevision http://www.officevision.com/pub/ppm/           # for App::Options, App::Build, App::Context, etc.
+  PPM> quit
+  C:\>
+
+You may also want to add the following repositories if you don't find what you want
+on those other repositories.
+
+  PPM> repository add crazyinsomniac http://crazyinsomniac.perlmonk.org/perl/ppm/ # for various hard to find modules
+  PPM> repository add bribes http://www.bribes.org/perl/ppm/                      # for various hard to find modules
+  PPM> repository add gtk2 http://gtk2-perl.sourceforge.net/win32/ppm/            # for GTK2
+  PPM> repository add log4perl http://log4perl.sourceforge.net/ppm/               # for log4perl
+  PPM> repository add openi http://openinteract.sourceforge.net/ppmpackages/      # for Template Toolkit
+
+The following commands are to install some packages which are
+useful in order to develop or run applications based on the App-Context Framework.
+
+(Sometimes a module will fail to install because more than one version of it was found.
+You may need to follow up any such "install XYZ::ABC" module with a command like "install 1"
+which selects one of the versions found. Sometimes even this will fail, saying that the
+module is already installed.  In that case, you may need to type something like
+"install 1 -force -nofollow".  Sometimes you need to "search XYZ::ABC" before you do the
+"install 1 -force -nofollow".)
+
+  C:\> ppm
+  PPM> install TimeDate                # Date::Parse and Date::Format
+  PPM> install Module::Build
+  PPM> install App::Build
+  PPM> install App::Options
+  PPM> install XML::Simple
+  PPM> install XML::XPath
+  PPM> quit
+  C:\>
+
+=cut
+
+=head1 NMAKE
+
+The PPM method for installing software is described above.  However, the method of
+installing software which is most native to Perl is through the CPAN shell.
+In order for this to work, you need a "make" tool.  Microsoft provides "nmake" for
+this purpose.
+
+I found reference to "nmake" on Microsoft's site here.
+
+  http://support.microsoft.com/default.aspx?scid=kb;en-us;132084
+
+Then I downloaded the most recent version (a self-extracting archive) here.
+
+  http://download.microsoft.com/download/vc15/patch/1.52/w95/en-us/nmake15.exe
+
+After saving it on your disk, run the program to extract three files.
+
+  README.TXT
+  NMAKE.EXE
+  NMAKE.ERR
+
+Move these files to C:\Perl\bin.  This should put them in the PATH so that
+they will be found by the CPAN shell.
+
+=head1 MYSQL
+
+Install a Windows binary distribution of MySQL.
+Use a version of MySQL which is compatible with your Apache setup.
+
+  http://dev.mysql.com/downloads/
+  http://dev.mysql.com/doc/refman/5.0/en/windows-installation.html
+
+On March 13, 2006, the latest version of MySQL is 5.0.19.
+I download and install the "Windows Essentials (x86)" binary distribution.
+
+  http://dev.mysql.com/downloads/mysql/5.0.html
+
+Based on whatever password you entered in the configuration (instead of
+"xyzabc" shown below), enter something like the following in a new file
+named "C:\windows\my.cnf".
+
+  [client]
+  host            = localhost
+  port            = 3306
+  user            = root
+  password        = xyzabc
+  [mysql]
+  database        = test
+
+Then from the Windows command shell, you can type "mysql" and get
+in to the database directly.
+
+=head1 APACHE AND MOD_PERL: METHOD 1
+
+I recommend the all-in-one Apache/mod_perl/PHP/phpMyAdmin approach.
+
+  http://www.apachefriends.org/en/xampp-windows.html
+
+I downloaded the "XAMPP for Windows 1.5.1 [basic package]" Installer
+and the "XAMPP for Windows Add-Ons : Perl 5.8.7-2.2.0-pl2" Installer.
+
+=head1 APACHE AND MOD_PERL: METHOD 2
+
+You could download a binary distribution of Apache for Windows from apache.org.
+Then install mod_perl.
+
+  http://httpd.apache.org/docs/2.2/
+  http://httpd.apache.org/docs/2.2/platform/windows.html
+
+See the following sites for mod_perl.
+
+  http://perl.apache.org/
+  http://perl.apache.org/docs/2.0/os/win32/install.html
+
+After installing Perl and Apache, you can then install mod_perl
+via the PPM utility.
+
+  C:\> ppm
+  PPM> install mod_perl
+  PPM> quit
+  C:\>
+
+The mod_perl PPM package also includes the necessary Apache DLL
+mod_perl.so; a post-installation script should be run which will offer
+to copy this file to your Apache modules directory (eg, C:\Apache\modules).
+
+Note that the mod_perl package available from this site will always use
+the latest mod_perl sources compiled against the latest official Apache
+release; depending on changes made in Apache, you may or may not be able
+to use an earlier Apache binary. However, in the Apache Win32 world it
+is particularly a good idea to use the latest version, for bug and
+security fixes.
+
+=head1 CVS - CONCURRENT VERSION SYSTEM
+
+WinCVS
+TortoiseCVS ?
+
+=head1 SVN - SUBVERSION
+
+TortoiseSVN
+
+=head1 SVN - SUBVERSION SERVER
+
+NOTE: Setting up a Subversion server is not necessary for creating the typical
+Windows development/demonstration machine.
+
+If you have any Linux systems, you probably want to run the Subversion
+server software there.  However, if you really want to set up Subversion
+as a server on a Windows machine, here are some links I found.
+
+  http://blogs.vertigosoftware.com/teamsystem/archive/2006/01/16/Setting_up_a_Subversion_Server_under_Windows.aspx
+  http://excastle.com/blog/archive/2005/05/31/1048.aspx
+  http://svn1clicksetup.tigris.org/
+
+=cut
+

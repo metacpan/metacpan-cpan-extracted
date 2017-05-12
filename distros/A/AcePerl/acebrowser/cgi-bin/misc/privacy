@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+# -*- Mode: perl -*-
+# file: privacy
+# Privacy statement
+
+use strict;
+use Ace::Browser::AceSubs;
+use CGI 2.42 qw/redirect h1 start_form end_form start_html hidden submit param referer p/;
+
+my $where_from   = param('referer') || referer();
+if (param('return') && $where_from !~ /\/privacy/ ) {
+    print redirect($where_from);
+    exit 0;
+}
+
+
+PrintTop(undef,undef,'Privacy Statement');
+print
+  p(
+      "This server logs the IP address of your browser and each database query.",
+      "This is done in order to track usage statistics",
+      "and to identify operational problems.  This information is not used",
+      "to identify individuals or organizations, and is never shared with third",
+      "parties."
+      ),
+    p(
+      "Cookies are used by the search pages in order to bookmark your search",
+      "requests.  They do not persist after you exit the browser, and are never",
+      "used for identification or tracking purposes."
+      ),
+    start_form,
+    hidden(-name=>'referer',-value=>$where_from),
+    submit(-name=>'return',-label=>'Return to Database'),
+    end_form;
+PrintBottom();

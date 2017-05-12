@@ -1,0 +1,10 @@
+#
+#  Cleanup system files.
+#
+
+
+# *.dpkg-old
+DeleteFilesMatching( Root => "/etc", Pattern => "\\.dpkg-old\$" );
+
+# *.old
+DeleteFilesMatching( Root => "/etc", Pattern => "\\.old\$"      );

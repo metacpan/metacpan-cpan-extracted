@@ -1,0 +1,8 @@
+Revision history for Perl extension Audio::FLAC::Decoder.
+
+0.3  Mon Nov 24 14:33:34 PST 2008
+	* Patch from Mark Glines to update to the latest FLAC version.
+
+0.01  Fri Jan  3 17:33:52 2003
+	- original version; created by h2xs 1.21 with options
+		-XA -n Audio::FLAC::Decoder

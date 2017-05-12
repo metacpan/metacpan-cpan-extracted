@@ -1,0 +1,74 @@
+NAME
+    AnyEvent::Monitor - Service Monitoring using AnyEvent
+
+SYNOPSIS
+      use AnyEvent::Monitor;
+
+      my $foo = AnyEvent::Monitor->new(
+          name => 'foo',
+          on_softfail => sub {
+              warn "==> service fail: $_[1]";
+          },
+          on_hardfail => sub {
+              my ($resume_check);
+              warn "==> service fail, should attempt to do something to fix it: $_[1]";
+              $resume_check->(60); # resume checking after 60 secs
+          },
+          on_resume => sub {
+              my ($prev, $outage) = @_;
+              if ($prev) {
+                  warn "service resumed from: $prev, total outage: $outage secs";
+              }
+          });
+
+      $foo->install_timers( 300 ); # delay checking for 300 secs
+
+      sub my_polling_check {
+          my ($timestamp, $status) = @_;
+          # $foo->heartbeat($timestamp, $status);
+      }
+
+      $foo->status; # expecting "normal"
+
+DESCRIPTION
+    AnyEvent::Monitor provides a simple way to do periodical checks on given
+    services, and provides callback when the service fails that you can
+    attempt to fix it programmatically.
+
+ATTRIBUTES
+    softfail_timeout
+    hardfail_timeout
+    on_softfail
+        The callback to be called after service remains failed for
+        $soft_timeout.
+
+    on_hardfail($resume)
+        The callback to be called after service remains failed for
+        $hard_timeout. You should attempt to fix the service and call
+        "$resume-"($delay)> after the attempt has been made. This will make
+        the monitoring resume after $delay seconds.
+
+    on_resume($previous_status, $outage)
+        The callback to be called after service monitoring resumes. If it
+        had failed, $previous_status and $outage seconds will be given.
+
+METHODS
+    install_timers($delay)
+        Set the next checking timer according to "soft_timeout" and
+        "hard_timeout", with additional $delay from now. You don't normally
+        need to call this method manually, unless you want to delay the
+        start of the monitoring.
+
+    heartbeat($timestamp, $status)
+        This is used to update the status of the service. only "normal" is
+        meaningful to AnyEvent::Monitor. Other values are considered as the
+        service failed.
+
+AUTHOR
+    Chia-liang Kao <clkao@clkao.org>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

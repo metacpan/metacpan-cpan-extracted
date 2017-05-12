@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+use lib 'lib';
+use Apache::SiteConfig::Deploy;
+
+name 'projectA';
+
+domain 'foo.com';
+
+domain_alias 'foo.com';
+
+source git => 'git@git.foo.com:projectA.git';
+
+# source hg  => 'http://.........';
+
+# relative web document path of repository
+webroot 'webroot/';

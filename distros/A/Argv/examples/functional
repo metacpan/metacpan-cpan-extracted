@@ -1,0 +1,11 @@
+#!perl
+
+## Demo of the functional interface
+
+use Argv qw(system qv);
+
+Argv->dbglevel(1);
+system('date');
+
+my $host = qv('hostname');
+print "host=$host";

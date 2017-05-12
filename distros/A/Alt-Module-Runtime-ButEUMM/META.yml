@@ -1,0 +1,32 @@
+---
+abstract: 'alternative distribution of Module::Runtime, using ExtUtils::MakeMaker'
+author:
+  - 'Andrew Main (Zefram) <zefram@fysh.org>'
+build_requires:
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::Simple version 0.022, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alt-Module-Runtime-ButEUMM
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+  package:
+    - Module::Runtime
+optional_features: {}
+provides:
+  Alt::Module::Runtime::ButEUMM:
+    file: lib/Alt/Module/Runtime/ButEUMM.pm
+    version: '0.001'
+requires:
+  perl: '5.006'
+version: '0.001'

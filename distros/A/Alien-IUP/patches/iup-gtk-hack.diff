@@ -1,0 +1,13 @@
+diff -r -u iup.orig/src/gtk/iupgtk_dialog.c iup/src/gtk/iupgtk_dialog.c
+--- iup.orig/src/gtk/iupgtk_dialog.c	2015-05-29 19:54:14.460664100 +0200
++++ iup/src/gtk/iupgtk_dialog.c	2015-05-30 19:41:13.206873200 +0200
+@@ -4,6 +4,9 @@
+  * See Copyright Notice in "iup.h"
+  */
+ 
++/* XXX-HACK GtkStatusIcon */
++#undef GTK_DISABLE_DEPRECATED
++ 
+ #include <gtk/gtk.h>
+ 
+ #ifdef HILDON

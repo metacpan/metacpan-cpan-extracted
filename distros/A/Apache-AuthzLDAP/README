@@ -1,0 +1,8 @@
+Apache::AuthzLDAP is designed to work with mod_perl and
+Net::LDAP. This module authorizes a user against an LDAP
+backend. It can be combined with Apache::AuthenLDAP to provide
+LDAP authentication as well.
+
+See AuthzLDAP.pm pod for detailed documentation.
+
+$Id: README,v 1.1 2000/09/26 18:51:51 cgilmore Exp $

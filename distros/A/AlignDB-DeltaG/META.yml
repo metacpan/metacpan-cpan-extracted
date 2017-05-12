@@ -1,0 +1,42 @@
+---
+abstract: 'Calculate deltaG of polymer DNA sequences'
+author:
+  - 'Qiang Wang <wang-q@outlook.com>'
+build_requires:
+  Test::More: '0.88'
+  Test::Number::Delta: '1.06'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.7, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AlignDB-DeltaG
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  AlignDB::DeltaG:
+    file: lib/AlignDB/DeltaG.pm
+    version: v1.1.0
+requires:
+  Moose: '0'
+  YAML::Syck: '1.29'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/wang-q/AlignDB-DeltaG/issues
+  homepage: https://github.com/wang-q/AlignDB-DeltaG
+  repository: git://github.com/wang-q/AlignDB-DeltaG.git
+version: 1.1.0
+x_contributors:
+  - 'wangq <wangqiang1997@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

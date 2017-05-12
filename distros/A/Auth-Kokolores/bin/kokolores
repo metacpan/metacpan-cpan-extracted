@@ -1,0 +1,187 @@
+#!/usr/bin/env perl
+#
+use strict;
+use warnings;
+
+
+# ABSTRACT: an alternative saslauthd
+# PODNAME: kokolores
+our $VERSION = '1.01'; # VERSION
+
+
+use Auth::Kokolores;
+
+Auth::Kokolores->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+kokolores - an alternative saslauthd
+
+=head1 VERSION
+
+version 1.01
+
+=head1 DESCRIPTION
+
+kokolores is an alternative saslauthd written in perl.
+
+It is based on prefork server based on Net::Server and configurable
+thru a configuration file.
+
+It features a plugin architecture and could be easily extended with custom plugins.
+
+=head1 COMMANDLINE OPTIONS
+
+Usage:
+
+  bin/kokolores [-h|--help] [-c|--config=<file>] [-f|--foreground] [-l|--loglevel=<level>]
+
+=over
+
+=item -h --help
+
+Show usage text.
+
+=item -c --config=<file>
+
+Specify an alternative configuration file path.
+
+Default: /etc/kokolores/kokolores.conf
+
+=item -f --foreground
+
+Dont fork to background. Stay in foreground.
+
+=item -l --loglevel=<level>
+
+A value from 0-4:
+
+=over
+
+=item 0 errror
+
+=item 1 warning
+
+=item 2 notice
+
+=item 3 info
+
+=item 4 debug
+
+=back
+
+=back
+
+=head1 CONFIGURATION FILE
+
+Configuration options could be given in the format:
+
+  key = "value"
+
+One per line.
+
+=head2 GLOBAL CONFIGURATION OPTIONS
+
+Global configuration options can just be listed in the global scope
+of the configuration file.
+
+=over
+
+=item log_level (default: 2)
+
+=item log_file (default: Sys::Syslog)
+
+=item syslog_ident (default: kokolores)
+
+=item syslog_facility (default: auth)
+
+=item socket_path (default: /var/run/saslauthd/mux)
+
+=item socket_mode (default: 0660)
+
+=item pid_file (default: empty)
+
+=item user (default: nobody)
+
+=item group (default: mail)
+
+=item min_servers (default: 4)
+
+=item min_spare_servers (default: 4)
+
+=item max_spare_servers (default: 12)
+
+=item max_servers (default: 25)
+
+=item max_requests (default: 1000)
+
+=item satisfy (default: all)
+
+=back
+
+All plugins are required to succeed.
+
+Change to "any" to return a successfull authentication when the first
+plugin returns success.
+
+=head2 PLUGIN CONFIGURATION
+
+Plugins can be defined with a <Plugin> section:
+
+  <Plugin plugin-name>
+    module = "ModuleName"
+    option1 = "param"
+    option2 = "param"
+    # ...
+  </Plugin>
+
+=head2 PLUGINS
+
+kokolores comes with the following plugins:
+
+=over
+
+=item SqlRetrieve
+
+Search an retrieve an user from a SQL database.
+
+All databases supported by perl-DBI should be supported.
+
+=item CheckPassword
+
+Check an password. Supports different hash methods to validate a password.
+
+=back
+
+=head2 WRITING CUSTOM PLUGINS
+
+If you know some perl it should be easy for your to write a custom plugin
+for kokolores.
+
+Plugins have to be under the kokolores plugin namespace:
+
+  Auth::Kokolores::Plugin::<name>
+
+For an example plugin read the source of:
+
+L<Auth::Kokolores::Plugin::Example>
+
+=head1 AUTHOR
+
+Markus Benning <ich@markusbenning.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Markus Benning <ich@markusbenning.de>.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+=cut

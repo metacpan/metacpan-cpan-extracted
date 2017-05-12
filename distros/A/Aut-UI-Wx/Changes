@@ -1,0 +1,5 @@
+0.02 Changed the ask_pass dialog (__Aut__Entry). to be able to display
+     the full AskPass text for RSA Encryption in Win32. (it worked already
+     with wxGTK (Linux)).
+
+0.01 Initial version

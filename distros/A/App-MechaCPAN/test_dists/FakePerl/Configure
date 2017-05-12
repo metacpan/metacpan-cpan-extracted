@@ -1,0 +1,12 @@
+#! /bin/sh
+
+cat >Makefile <<EOF
+default:
+	touch default
+install:
+	touch install
+test_harness:
+	touch test_harness
+EOF
+
+exit 0;

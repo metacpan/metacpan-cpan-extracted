@@ -1,0 +1,50 @@
+Alvis-bags version 0.2
+======================
+
+This is a module for running MPCA using text file input.
+
+Contains these scripts:
+
+	linkBags
+	linkTables
+	linkRedir
+	linkMpca
+
+INSTALLATION
+
+To install this module first install the prerequisities,
+then type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Note that the last stage of of the test assumes MPCA is installed.
+If you haven't done so, it will fail on step.   This is
+generally safe to go ahead and install even if it fails this
+last one.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ 	HTML::Entities Encode Getopt::Long 
+	Pod::Usage IO::Handle POSIX
+        URI Digest::MD5
+
+Also, the MPCA system needs to have been downloaded and installed from:
+
+        http://www.componentanalysis.org
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005-2006 by Wray Buntine
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

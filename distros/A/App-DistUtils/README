@@ -1,0 +1,17 @@
+SYNOPSIS
+
+    This distribution provides the following command-line utilities related
+    to Perl distributions:
+
+    #INSERT_EXECS_LIST
+
+    The main feature of these utilities is tab completion.
+
+FAQ
+
+    #INSERT_BLOCK: App::PMUtils faq
+
+SEE ALSO
+
+    #INSERT_BLOCK: App::PMUtils see_also
+

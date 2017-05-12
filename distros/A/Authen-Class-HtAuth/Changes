@@ -1,0 +1,13 @@
+Revision history for Authen-Class-HtAuth
+
+0.02  Mon Nov 14 10:36:14 EST 2005
+    - added ->groupcheck
+
+0.02  Thu Nov 10 07:59:11 EST 2005
+    - Removed version requirement from t/01-tests.t - doesn't work in older
+      versions of Test::More
+    - perldoc -t Authen::Class::HtAuth > README
+
+0.01  2005.11.??
+      First version, released on an unsuspecting world.
+

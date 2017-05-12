@@ -1,0 +1,203 @@
+NAME
+    Authen::Captcha - Perl extension for creating captcha's to verify the
+    human element in transactions.
+
+SYNOPSIS
+      use Authen::Captcha;
+
+      # create a new object
+      my $captcha = Authen::Captcha->new();
+
+      # set the data_folder. contains flatfile db to maintain state
+      $captcha->data_folder('/some/folder');
+
+      # set directory to hold publicly accessable images
+      $captcha->output_folder('/some/http/folder');
+
+      # Alternitively, any of the methods to set variables may also be
+      # used directly in the constructor
+
+      my $captcha = Authen::Captcha->new(
+        data_folder => '/some/folder',
+        output_folder => '/some/http/folder',
+        );
+
+      # create a captcha. Image filename is "$md5sum.png"
+      my $md5sum = $captcha->generate_code($number_of_characters);
+
+      # check for a valid submitted captcha
+      #   $code is the submitted letter combination guess from the user
+      #   $md5sum is the submitted md5sum from the user (that we gave them)
+      my $results = $captcha->check_code($code,$md5sum);
+      # $results will be one of:
+      #          1 : Passed
+      #          0 : Code not checked (file error)
+      #         -1 : Failed: code expired
+      #         -2 : Failed: invalid code (not in database)
+      #         -3 : Failed: invalid code (code does not match crypt)
+      ##############
+
+ABSTRACT
+    Authen::Captcha provides an object oriented interface to captcha file
+    creations. Captcha stands for Completely Automated Public Turning test
+    to tell Computers and Humans Apart. A Captcha is a program that can
+    generate and grade tests that:
+
+        - most humans can pass.
+        - current computer programs can't pass
+
+    The most common form is an image file containing distorted text, which
+    humans are adept at reading, and computers (generally) do a poor job.
+    This module currently implements that method. We plan to add other
+    methods, such as distorted sound files, and plain text riddles.
+
+REQUIRES
+        GD          (see http://search.cpan.org/~lds/GD-2.11/)
+        Digest::MD5 (standard perl module)
+
+    In most common situations, you'll also want to have:
+
+     A web server (untested on windows, but it should work)
+     cgi-bin or mod-perl access
+     Perl: Perl 5.00503 or later must be installed on the web server.
+     GD.pm (with PNG support)
+
+INSTALLATION
+    Download the zipped tar file from:
+
+        http://search.cpan.org/search?dist=Authen-Captcha
+
+    Unzip the module as follows or use winzip:
+
+        tar -zxvf Authen-Captcha-1.xxx.tar.gz
+
+    The module can be installed using the standard Perl procedure:
+
+        perl Makefile.PL
+        make
+        make test
+        make install    # you need to be root
+
+    Windows users without a working "make" can get nmake from:
+
+        ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
+
+METHODS
+  MAIN METHODS
+
+    "$captcha = Authen::Captcha->new();"
+        This creates a new Captcha object. Optionally, you can pass in a
+        hash with configuration information. See the method descriptions for
+        more detail on what they mean.
+
+             data_folder => '/some/folder', # required
+             output_folder => '/some/http/folder', # required
+             expire => 300, # optional. default 300
+             width =>  25, # optional. default 25
+             height => 35, # optional. default 35
+             images_folder => '/some/folder', # optional. default to lib dir
+             debug => 0, # optional. default 0
+
+    "$md5sum = $captcha->generate_code( $number_of_characters );"
+        Creates a captcha. Image filename is "$md5sum.png"
+
+        It can also be called in array context to retrieve the string of
+        characters used to generate the captcha (the string the user is
+        expected to respond with). This is useful for debugging. ex.
+
+        "($md5sum,$chars) = $captcha->generate_code( $number_of_characters
+        );"
+
+    "$results = $captcha->check_code($code,$md5sum);"
+        check for a valid submitted captcha $code is the submitted letter
+        combination guess from the user $md5sum is the submitted md5sum from
+        the user (that we gave them) $results will be one of:
+
+            1 : Passed
+            0 : Code not checked (file error)
+           -1 : Failed: code expired
+           -2 : Failed: invalid code (not in database)
+           -3 : Failed: invalid code (code does not match crypt)
+
+  ACCESSOR METHODS
+
+    "$captcha->data_folder( '/some/folder' );"
+        Required. Sets the directory to hold the flatfile database that will
+        be used to store the current non-expired valid captcha md5sum's.
+        Must be writable by the process running the script (usually the web
+        server user, which is usually either "apache" or "http"), but should
+        not be accessable to the end user.
+
+    "$captcha->output_folder( '/some/folder' );"
+        Required. Sets the directory to hold the generated Captcha image
+        files. This is usually a web accessable directory so that the user
+        can view the images in here, but it doesn't have to be web
+        accessable (you could be attaching the images to an e-mail for some
+        verification, or some other Captcha implementation). Must be
+        writable by the process running the script (usually the web server
+        user, which is usually either "apache" or "http").
+
+    "$captcha->images_folder( '/some/folder' );"
+        Optional, and may greatly affect the results... use with caution.
+        Allows you to override the default character graphic png's and
+        backgrounds with your own set of graphics. These are used in the
+        generation of the final captcha image file. The defaults are held
+        in: [lib install dir]/Authen/Captcha/images
+
+    "$captcha->expire( 300 );"
+        Optional. Sets the number of seconds this captcha will remain valid.
+        This means that the created captcha's will not remain valid forever,
+        just as long as you want them to be active. Set to an appropriate
+        value for your application. Defaults to 300.
+
+    "$captcha->width( 25 );"
+        Optional. Number of pixels high for the character graphics. Defaults
+        to 25.
+
+    "$captcha->height( 35 );"
+        Optional. Number of pixels wide for the character graphics. Defaults
+        to 35.
+
+    "$captcha->debug( [0|1|2] );"
+        Optional. Sets the debugging bit. 1 turns it on, 0 turns it off. 2
+        will print out verbose messages to STDERR.
+
+TODO
+    sound file captcha: Incorporating distorted sound file creation.
+
+SEE ALSO
+    The Captcha project: http://www.captcha.net/
+
+    The origonal perl script this came from:
+    http://www.firstproductions.com/cgi/
+
+AUTHORS
+    Seth T. Jackson, <sjackson@purifieddata.net>
+
+    Josh I. Miller, <jmiller@purifieddata.net>
+
+    First Productions, Inc. created the cgi-script distributed under the GPL
+    which was used as the basis for this module. Much work has gone into
+    making this more robust, and suitable for other applications, but much
+    of the origonal code remains.
+
+COPYRIGHT AND LICENSE
+    Copyright 2003, First Productions, Inc. (FIRSTPRODUCTIONS HUMAN TEST
+    1.0)
+
+    Copyright 2003 by Seth Jackson
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version. (see license.txt).
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+

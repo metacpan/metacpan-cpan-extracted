@@ -1,0 +1,58 @@
+{
+   "abstract" : "Simple, hierarchical user authorization for web applications, with optional support for plan-based (paid) services.",
+   "author" : [
+      "Ido Perlmuter <ido@ido50.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300031, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Abilities",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Hash::Merge" : "0",
+            "Moo::Role" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moo" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/ido50/Abilities",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ido50/Abilities.git",
+         "web" : "https://github.com/ido50/Abilities"
+      }
+   },
+   "version" : "0.5"
+}
+

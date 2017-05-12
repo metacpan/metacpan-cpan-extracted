@@ -1,0 +1,110 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+no  App::VirtPerl::Setup; # restore INC to outside the env.
+
+use File::Path 2.00 qw(make_path remove_tree);
+use Config;
+use JSON;
+
+
+my ($action, @args) = @ARGV;
+
+if (!$action) {
+    usage();
+}
+
+my $method = __PACKAGE__->can($action);
+
+if (!$method) {
+    usage();
+}
+
+$method->(@args);
+
+
+sub create {
+    my ($name) = @_;
+    
+    my $dir = "$ENV{PERL_VIRTPERL_ROOT}/$name";
+    
+    make_path("$dir/bin");
+    make_path("$dir/lib/perl5");
+    
+    print "$name env created.\n";
+}
+sub new { &create }
+
+sub list {
+    my @envs = map { s:^.*/::; $_ } grep { -d } <"$ENV{PERL_VIRTPERL_ROOT}/*">;
+    
+    my $current = $ENV{PERL_VIRTPERL_CURRENT_ENV} || '';
+    foreach my $env (@envs) {
+        if ($env eq $current) {
+            print " * $env\n";
+        }
+        else {
+            print "   $env\n";
+        }
+    }
+}
+
+sub remove {
+    my ($name) = @_;
+    my $dir = "$ENV{PERL_VIRTPERL_ROOT}/$name";
+    
+    my $current = $ENV{PERL_VIRTPERL_CURRENT_ENV} || '';
+    
+    if ($name eq $current) {
+        die "Please change to another env before removing $name\n";
+    }
+    
+    remove_tree($dir);
+    
+    print "$name removed\n"   
+}
+sub rm { &remove }
+
+
+sub mkcpanfile {
+    my $current = $ENV{PERL_VIRTPERL_CURRENT_ENV};
+    
+    if (!$current) {
+        die "An env must be in use for mkcpanfile\n";
+    }
+    
+    my $metadir = "$ENV{PERL_VIRTPERL_ROOT}/$current/lib/perl5/$Config{archname}/.meta";
+    
+    my $read_install_json = sub {
+        my $file = "$_/install.json";
+        open(my $fh, '<', $file) || die "Couldn't open $file: $!\n";
+        my $json = do {
+            local $/;
+            <$fh>
+        };
+        close($fh) || die "Couldn't close $file: $!\n";
+        return JSON::decode_json($json);
+    };
+    
+    my @dists = map { $read_install_json->() } glob("$metadir/*");
+    my %newest_version;
+    foreach my $meta (@dists) {
+        if ($newest_version{$meta->{name}}) {
+            if (version->parse($meta->{version}) > version->parse($newest_version{$meta->{name}})) {
+                $newest_version{$meta->{name}} = $meta->{version};
+            }
+        }
+        else {
+            $newest_version{$meta->{name}} = $meta->{version};
+        }
+    }
+    foreach my $name (sort keys %newest_version) {
+        print "requires '$name', '$newest_version{$name}';\n";
+    }
+}
+
+sub usage {
+    die "Usage: virtperl <create|use|remove|off|mkcpanfile>\n";
+}
+

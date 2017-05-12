@@ -1,0 +1,132 @@
+Name
+    Algorithm::Simplex - Simplex Algorithm Implementation using Tucker
+    Tableaux
+
+Synopsis
+    Given a linear program formulated as a Tucker tableau, a 2D matrix or
+    ArrayRef[ArrayRef] in Perl, seek an optimal solution.
+
+        use Algorithm::Simplex::Rational;
+        my $matrix = [
+            [ 5,  2,  30],
+            [ 3,  4,  20],
+            [10,  8,   0],
+        ];
+        my $tableau = Algorithm::Simplex::Rational->new( tableau => $matrix );
+        $tableau->solve;
+        my ($primal_solution, $dual_solution) = $tableau->current_solution;
+
+Methods
+  _build_number_of_rows
+    Set the number of rows. This number represent the number of rows of the
+    coefficient matrix. It is one less than the full tableau.
+
+  _build_number_of_columns
+    Set the number of columns given the tableau matrix. This number
+    represent the number of columns of the coefficient matrix.
+
+  _build_x_variables
+    Set x variable names for the given tableau, x1, x2 ... xn These are the
+    decision variables of the maximization problem. The maximization problem
+    is read horizontally in a Tucker tableau.
+
+  _build_y_variables
+    Set y variable names for the given tableau. These are the slack
+    variables of the maximization problem.
+
+  _build_u_variables
+    Set u variable names for the given tableau. These are the slack
+    variables of the minimization problem.
+
+  _build_v_variables
+    Set v variable names for the given tableau: v1, v2 ... vm These are the
+    decision variables for the minimization problem. The minimization
+    problem is read horizontally in a Tucker tableau.
+
+  get_bland_number_for
+    Given a column number (which represents a u variable) build the bland
+    number from the generic variable name.
+
+  determine_bland_pivot_column_number
+    Find the pivot column using Bland ordering technique to prevent cycles.
+
+  determine_bland_pivot_row_number
+    Find the pivot row using Bland ordering technique to prevent cycles.
+
+  min_index
+    Determine the index of the element with minimal value. Used when finding
+    bland pivots.
+
+  exchange_pivot_variables
+    Exchange the variables when a pivot is done. The method pivot() does the
+    algrebra while this method does the variable swapping, and thus tracking
+    of what variables take on non-zero values. This is needed to accurately
+    report an optimal solution.
+
+  get_row_and_column_numbers
+    Get the dimensions of the tableau.
+
+  determine_bland_pivot_row_and_column_numbers
+    Higher level function that uses others to return the (bland) pivot
+    point.
+
+Authors
+    Mateu X. Hunter "hunter@missoula.org"
+
+    Strong design influence by George McRae at the University of Montana.
+
+    #moose for solid assistance in the refactor: particularly _build_*
+    approach and PDL + Moose namespace management, 'inner'.
+
+Copyright
+    Copyright 2009, Mateu X. Hunter
+
+License
+    You may distribute this code under the same terms as Perl itself.
+
+Description
+    Base class for the Simplex model using Tucker tableaus.
+
+    The implementation is currently limited to phase II, i.e. one must start
+    with a feasible solution.
+
+    This class defines some of the methods concretely, and others such as:
+
+    *  pivot
+
+    *  is_optimal
+
+    *  determine_positive_ratios
+
+    *  determine_simplex_pivot_columns
+
+    are implemented in one of the three model types:
+
+    *  Float
+
+    *  Rational
+
+    *  PDL
+
+Variables
+    We have implicit variable names: x1, x2 ... , y1, y2, ... , u1, u2 ... ,
+    v1, v2 ...
+
+    Our variables are represented by:
+
+        x, y, u, and v
+
+    as found in Nering and Tuckers' book.
+
+    x and y are for the primal LP while u and v belong to the dual LP.
+
+    These variable names are set using the lazy feature of Moo.
+
+Limitations
+    The API is stabilizing, but still subject to change.
+
+    The algorithm requires that the initial tableau be a feasible solution.
+
+Development
+    http://github.com/mateu/Algorithm-Simplex
+

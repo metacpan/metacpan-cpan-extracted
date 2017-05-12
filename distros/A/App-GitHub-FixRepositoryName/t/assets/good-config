@@ -1,0 +1,13 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+	url = git://github.com/1.git
+	url = git://github.com/robertkrimen/App-GitHub-FindRepository.git
+	url = git@github.com:robertkrimen/App-GitHub-FindRepository.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master

@@ -1,0 +1,25 @@
+---
+abstract: 'The great new Acme::JMOLLY::Utils!'
+author:
+  - 'Alexander Saenko <sajenko@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4208, CPAN::Meta::Converter version 2.132830'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-JMOLLY-Utils
+provides:
+  Acme::JMOLLY::Utils:
+    file: lib/Acme/JMOLLY/Utils.pm
+    version: '0.02'
+  Tie::Cycle:
+    file: lib/Tie/Cycle.pm
+    version: '1.21'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: '0.01'

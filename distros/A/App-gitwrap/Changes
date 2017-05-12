@@ -1,0 +1,38 @@
+Revision history for App-gitwrap
+
+0.005   2016-10-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Update doc, add FAQ entry about continuing after error.
+
+
+0.004   2016-10-09 (PERLANCAR)
+
+	- [doc] Add FAQ entry about string quote/comment in configuration.
+
+
+0.003   2016-10-09 (PERLANCAR)
+
+        - Add logging (Log::Any::IfLOG).
+
+        - Allow multiple commands in before_*_cmd (by specifying it multiple
+          times in the config).
+
+        - Die in any of the command specified in before_*_cmd fails.
+
+        - [doc] Add example of when I use gitwrap: correct hooks.
+
+
+0.002   2016-06-12 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Expand the example description.
+
+	- Update doc & function name.
+
+
+0.001   2016-06-11 (PERLANCAR)
+
+        - First early release.

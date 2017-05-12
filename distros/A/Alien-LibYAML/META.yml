@@ -1,0 +1,35 @@
+---
+abstract: 'Build and install libyaml, a C-based YAML parser and emitter'
+author:
+  - 'Richard Simões <rsimoes AT cpan DOT org>'
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Alien::Build: '0.25'
+  Alien::Build::MM: '0.25'
+  ExtUtils::MakeMaker: '6.52'
+  Test2::Bundle::Extended: '0'
+  Test::Alien: '0'
+  Test::More: '0'
+  perl: '5.008001'
+configure_requires:
+  Alien::Build: '0.25'
+  Alien::Build::MM: '0.25'
+  ExtUtils::MakeMaker: '6.52'
+  perl: '5.008001'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-LibYAML
+requires:
+  Alien::Base: '0'
+  perl: '5.008001'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/rsimoes/alien-libyaml/issues
+  homepage: https://metacpan.org/release/Alien-LibYAML
+  repository: git://github.com/rsimoes/alien-libyaml.git
+version: '2.01'
+x_serialization_backend: 'YAML::Tiny version 1.70'

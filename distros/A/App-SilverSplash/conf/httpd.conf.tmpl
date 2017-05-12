@@ -1,0 +1,122 @@
+ServerRoot           [% cfg.sl_root %]
+ServerAdmin          [% cfg.sl_admin %]
+ServerSignature      Off
+ServerTokens         Prod
+PidFile              [% cfg.sl_tmp %]/sl_cp.pid
+DocumentRoot         [% cfg.sl_httpd_root %]/htdocs/sl
+TypesConfig          [% cfg.sl_root %]/conf/mime.types
+User                 [% cfg.sl_apache_user %] 
+Group                [% cfg.sl_apache_group %]
+KeepAlive            [% cfg.sl_apache_keepalive %]
+MaxKeepAliveRequests 0
+KeepAliveTimeout     300
+MinSpareServers      [% cfg.sl_apache_min_spare_servers %]
+MaxSpareServers      [% cfg.sl_apache_max_spare_servers %]
+StartServers         [% cfg.sl_apache_start_servers %]
+LogLevel             [% IF cfg.sl_debug %]debug[% ELSE %]warn[% END %]
+MaxClients           [% cfg.sl_apache_maxclients %]
+ErrorLog             [% cfg.sl_tmp %]/logs/error_log
+TransferLog          [% cfg.sl_tmp %]/logs/access_log
+MaxRequestsPerChild  [% cfg.sl_apache_max_requests_per_child %]
+LogFormat "%h %t (%{User-agent}i) %{Host}i \"%r\" %>s %b %{SL_URL}e %{SL_TIMER}e %D"
+UseCanonicalName     Off
+HostNameLookups      Off
+Timeout              300
+AllowEncodedSlashes On
+
+Listen [% cfg.sl_apache_listen %]
+Listen [% cfg.sl_wan_listen %]
+
+ServerName           [% cfg.sl_apache_servername %]
+ErrorDocument        404 "An error occurred, please email support@slwifi.com"
+ErrorDocument        500 "An error occurred, please email support@slwifi.com"
+
+LoadModule perl_module         modules/mod_perl.so
+LoadModule apreq_module        modules/mod_apreq2.so
+
+PerlPassEnv SL_ROOT
+PerlPostConfigRequire "/etc/sl/startup.pl"
+
+PerlOptions +GlobalRequest
+
+[% IF cfg.sl_debug %]
+# Apache::Reload for development.
+PerlModule           Apache2::Reload
+PerlInitHandler      Apache2::Reload
+PerlSetVar           ReloadAll Off
+PerlSetVar           ReloadModules "App::SilverSplash*"
+[% END %]
+
+PerlPassEnv          SL_DEBUG
+PerlPassEnv          SL_PROXY_DEBUG
+PerlPassEnv          SL_VERBOSE_DEBUG
+PerlPassEnv          SL_TIMING
+
+PerlPostReadRequestHandler Apache2::Connection::XForwardedFor App::SilverSplash::Apache2->iphone_check
+
+# don't uncomment this or errors ye shall have
+# PerlTransHandler           Apache2::Const::OK
+
+<Location />
+    SetHandler          modperl
+    PerlHeaderParserHandler Apache2::Const::OK
+    PerlAccessHandler       Apache2::Const::OK
+    PerlAuthenHandler       Apache2::Const::OK
+    PerlAuthzHandler        Apache2::Const::OK
+    PerlTypeHandler         Apache2::Const::OK
+    PerlFixupHandler        Apache2::Const::OK
+    PerlResponseHandler     App::SilverSplash::Apache2->handler
+</Location>
+
+<Location /free>
+    SetHandler modperl
+    PerlHeaderParserHandler Apache2::Const::OK
+    PerlAccessHandler       Apache2::Const::OK
+    PerlAuthenHandler       Apache2::Const::OK
+    PerlAuthzHandler        Apache2::Const::OK
+    PerlTypeHandler         Apache2::Const::OK
+    PerlFixupHandler        Apache2::Const::OK
+
+    PerlResponseHandler App::SilverSplash::Apache2->free
+</Location>
+
+
+<Location /ipn_validate>
+    SetHandler modperl
+    PerlHeaderParserHandler Apache2::Const::OK
+    PerlAccessHandler       Apache2::Const::OK
+    PerlAuthenHandler       Apache2::Const::OK
+    PerlAuthzHandler        Apache2::Const::OK
+    PerlTypeHandler         Apache2::Const::OK
+    PerlFixupHandler        Apache2::Const::OK
+
+    PerlResponseHandler App::SilverSplash::Apache2->ipnvalidate
+</Location>
+
+
+
+
+<Location /paid>
+    SetHandler modperl
+    PerlHeaderParserHandler Apache2::Const::OK
+    PerlAccessHandler       Apache2::Const::OK
+    PerlAuthenHandler       Apache2::Const::OK
+    PerlAuthzHandler        Apache2::Const::OK
+    PerlTypeHandler         Apache2::Const::OK
+    PerlFixupHandler        Apache2::Const::OK
+
+    PerlResponseHandler App::SilverSplash::Apache2->paid
+</Location>
+
+
+<Directory />
+    AllowOverride None
+</Directory>
+
+[% IF cfg.sl_status %]
+<Location /sl_secret_status>
+	SetHandler modperl
+    PerlHandler Apache2::Status
+    PerlSetVar StatusOptionsAll On
+</Location>
+[% END %]

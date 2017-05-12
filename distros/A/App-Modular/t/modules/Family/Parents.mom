@@ -1,0 +1,49 @@
+#!/usr/bin/perl -w
+use strict;
+
+package App::Modular::Module::Family::Parents;
+
+use App::Modular;
+our ($AUTOLOAD, @ISA);
+use base qw(App::Modular::Module);
+my $module_name = "Family::Parents";
+
+sub module_init {
+   my $type = shift;
+   my $self = $type->SUPER::module_init($type);
+
+   $self->{'mother'} = 'Eva';
+   $self->{'father'} = 'Adam';
+
+   return $self;
+};
+
+sub mother {
+   my ($self, $mother) = @_;
+
+   $self->{'mother'} = $mother if ($mother);
+
+   return $self->{'mother'};
+};
+
+
+sub AUTOLOAD {
+   my ($self, $param) = shift;
+
+   my $name = $AUTOLOAD;
+   $name =~ s/.*://;   # strip fully-qualified portion
+
+   unless ($name eq 'mother' or $name eq 'father') {
+      App::Modular::instance()->mlog (1, 
+         "which kind of person is a $name?"); 
+      return undef;
+   }
+
+   if ($param) {
+      return $self->{$name} = $param;
+   } else {
+      return $self->{$name};
+   }
+}
+
+1;

@@ -1,0 +1,1093 @@
+#! /usr/bin/perl
+# -*- mode: cperl -*-
+
+# PODNAME: bootstrap-perl
+# ABSTRACT: Bootstrap Perl inclusive CPAN from git
+
+
+$|++; # autoflush
+
+use 5.006;
+use strict;
+use warnings;
+
+use Getopt::Long ":config", "no_ignore_case", "bundling";
+use Cwd "getcwd";
+use Sys::Hostname;
+
+my $HOME                = $ENV{HOME} || '/opt';
+my $hostname            = hostname();
+
+our $build_path          = "$HOME/.bootstrapperl/bootstrap-perl-build";
+my $build_path_perl     = "$build_path/perl";
+my $logfile             = "$build_path/bootstrap-perl.log";
+my $logcommand          = "$build_path/command.log";
+my $giturl              = "git://github.com/Perl/perl5.git";
+
+my $cpucount             = `cat /proc/cpuinfo | grep bogomips | wc -l`; chomp $cpucount;
+my $threadcount          = $cpucount + 1;
+
+# getopt
+my $dry;
+my $prefix;
+my $prefixbase          = "$HOME/.bootstrapperl/$hostname";
+my $version             = "blead";
+our $VERSION;
+my $installdeps;
+my $sourcetgz           = "/var/tmp/perl.tar.gz";
+my $blead               = 0;
+my $usethreads          = 1;
+my $bit64               = 1;
+my $help                = 0;
+my $test                = 0;
+my $cpan                = 1;
+my $cleancpansources    = 0;
+my $forcecpancfg        = 1;
+my $forcebuildperl      = 0;
+my $perlformance        = 0;
+my $perlformance_local  = 0;
+my $perlformance_report = 0;
+my $jobs                = $threadcount;
+my @mirrors;
+my @modules;
+my @runscripts          = ();
+my @runargs             = ();
+my @confargs            = ();
+my @exesuffixes         = ();
+my $OLDSTDOUT;
+my $OLDSTDERR;
+my $LOGFILE;
+my $COMMAND;
+my $USER;
+
+sub caller_line {
+        my $i = 0;
+        my ($rc, $rc_prev, $func);
+        while (1) {
+                my @v = caller($i);
+                defined($v[0]) or last;
+                $rc_prev = $rc;
+                ($rc, $func) = @v[2..3];
+                $i++;
+        };
+        $func ne "(eval)"? $rc: $rc_prev;
+}
+
+sub setup_user {
+        open($USER, ">&", \*STDOUT) || die;
+}
+
+sub setup_log {
+        open($OLDSTDOUT, ">&", \*STDOUT) || die;
+        open($OLDSTDERR, ">&", \*STDERR) || die;
+        open($LOGFILE,   ">" , $logfile) || die;
+        open($COMMAND,   ">",  $logcommand) || die;
+}
+
+# Execute a command via system(). Output goes to log file.
+sub print_and_system {
+        my ($cmd) = @_;
+        my $exitcode;
+        my $line = caller_line();
+
+        my @cmd = split / +/, $cmd;
+        my $bin = $cmd[0];
+        my $is_cpan = $bin eq bin_cpan();
+
+        if (! $is_cpan) {
+                open(STDOUT, ">&", $LOGFILE) || die;
+                open(STDERR, ">&", $LOGFILE) || die;
+
+                print $COMMAND $cmd, "\n";
+                print $LOGFILE $cmd, "\n";
+                $exitcode = system ($cmd);
+
+                open(STDOUT, ">&", $OLDSTDOUT) || die;
+                open(STDERR, ">&", $OLDSTDERR) || die;
+
+                $exitcode == 0 || warn "$0($line): $cmd ($exitcode>>".($exitcode>>8).")";
+        } else {
+                cpan_command(join(" ", @cmd[1..$#cmd]));
+        }
+}
+
+# Execute a command via system(). Output goes to normal stdout/stderr.
+sub print_and_system_out {
+        my ($cmd) = @_;
+        my $line = caller_line();
+
+        print $COMMAND $cmd, "\n";
+        print $LOGFILE $cmd, "\n";
+        print $USER    $cmd, "\n";
+        system ($cmd) == 0 || warn "$0($line): $cmd ($?>>".($?>>8).")";
+}
+
+# Execute a command via qx(). Output goes to log file.
+sub print_and_qx {
+        my ($cmd) = @_;
+        my $line = caller_line();
+        my $exitcode;
+        my $out;
+
+        print $COMMAND $cmd, "\n";
+        print $LOGFILE $cmd, "\n";
+        $out = qx($cmd 2>&1);
+        $exitcode = $?;
+        print $LOGFILE $out, "\n";
+        $exitcode == 0 || warn "$0($line): $cmd ($exitcode>>".($exitcode>>8).")";
+
+        $out;
+}
+
+# Execute a command via qx(). Output goes to normal stdout/stderr.
+sub print_and_qx_chomp {
+        my $out = print_and_qx @_;
+        chomp $out;
+        $out;
+}
+
+sub _perl_base_name {
+        my ($perl_revision, $perl_version, $perl_subversion, $usethreads, $bit64, $gitdescribe, $gitchangeset, $exe_suffixes, $blead) = @_;
+        return join("-",
+                    ($blead      ? "blead" : "$perl_revision.$perl_version"),
+                    ($usethreads ? "" : "no" )."thread",
+                    ($bit64      ? "" : "no" )."64bit",
+                    @$exe_suffixes,
+                   );
+}
+
+sub _perl_exe_name {
+        my ($perl_revision, $perl_version, $perl_subversion, $usethreads, $bit64, $gitdescribe, $gitchangeset, $exe_suffixes, $blead) = @_;
+
+        return join("-",
+                    "perl",
+                    _perl_base_name(@_),
+                   );
+}
+
+sub _perl_pathprefix {
+        my ($perl_revision, $perl_version, $perl_subversion, $usethreads, $bit64, $gitdescribe, $gitchangeset, $exe_suffixes, $blead) = @_;
+
+        return join("-",
+                    $prefixbase."/perl",
+                    _perl_base_name(@_),
+                    $gitdescribe,
+                   );
+}
+
+# ========== getopt ==========
+
+my $ok = GetOptions (
+                     "prefix=s"     => \$prefix,
+                     "prefixbase=s" => \$prefixbase,
+                     "version|commit|c=s" => \$version,
+                     "installdeps=s" => \$installdeps,
+                     "sourcetgz=s"  => \$sourcetgz,
+                     "blead!"       => \$blead,
+                     "usethreads!"  => \$usethreads,
+                     "use64bit!"    => \$bit64,
+                     "help|h"       => \$help,
+                     "jobs|j=i"     => \$jobs,
+                     "test|t"       => \$test,
+                     "cpan!"        => \$cpan,
+                     "cleancpansources!" => \$cleancpansources,
+                     "forcecpancfg!" => \$forcecpancfg,
+                     "forcebuildperl!" => \$forcebuildperl,
+                     'perlformance' => \$perlformance,
+                     'perlformance-local' => \$perlformance_local,
+                     'perlformance-report' => \$perlformance_report,
+                     'dry|n'        => \$dry,
+                     'mirror|m=s@'  => \@mirrors,
+                     'module|M=s@'  => \@modules,
+                     'run|r=s@'     => \@runscripts,
+                     'runargs=s@'   => \@runargs,
+                     'confargs=s@'  => \@confargs,
+                     'exesuffixes=s@' => \@exesuffixes,
+                     'giturl|g=s'   => \$giturl,
+                    );
+
+if ($help) {
+        exec("perldoc", "bootstrap-perl") or do {
+                print $USER "\nPlease see 'perldoc bootstrap-perl' for help.\n";
+                exit 0;
+        }
+}
+
+my $DISTROPREFSREPO     = "git://github.com/renormalist/cpanpm-distroprefs.git";
+my $DISTROPREFSSRCBASE  = "$build_path";
+my $DISTROPREFSSRC1     = "$DISTROPREFSSRCBASE/cpanpm-distroprefs/cpanpm/distroprefs";
+my $DISTROPREFSSRC2     = "$DISTROPREFSSRCBASE/cpanpm-distroprefs/renormalist/distroprefs";
+my $DISTROPREFSDIR      = $prefixbase."/cpan/prefs";
+my $SOURCESDIR          = $prefixbase."/cpan/sources";
+my $CPANBUILDDIR        = $prefixbase."/cpan/build";
+
+# defaults
+my @default_runscripts = ();
+my @default_confargs   = ();
+my @default_runargs    = ();
+my @default_modules    = ();
+my @default_mirrors    = (qw( http://search.cpan.org/CPAN/ ));
+
+return if defined($::{"no_run"});
+setup_user();
+print $USER "\n";
+print $USER "============================================================\n";
+print $USER "Bootstrap Perl\n";
+print $USER "============================================================\n";
+
+# giturl "." means clone from local dir
+if ($giturl eq '.') {
+        $giturl = getcwd;
+        my $firstcommit = qx!git log --oneline 8d063cd8450e59ea1c611a2f4f5a21059a2804f1 2> /dev/null!;
+        if ($firstcommit !~ /a "replacement" for awk and sed/) {
+                print $USER "Local git repo does not look like it is Perl's.\n";
+                exit 1;
+        }
+}
+
+# version "." is replaced with current repo's HEAD
+if ($version =~ /^\./) {
+        my $rev = print_and_qx_chomp qq!git rev-parse HEAD!;
+        $version =~ s/^\./$rev/ if $rev;
+}
+
+if ($perlformance_local) {
+        $giturl             = ".";
+        @default_modules    = qw(Benchmark::Perl::Formance);
+        @default_mirrors    = qw(http://perlformance.net/PINTO/perlformance/);
+        @default_runscripts = qw(benchmark-perlformance);
+        @default_runargs    = ("--plugins=Fib,FibOO,DPath,Mem,Rx,Shootout::fasta,Shootout::binarytrees,Shootout::nbody,Shootout::spectralnorm");
+}
+if ($perlformance or $perlformance_report) {
+        @default_modules    = qw(Task::PerlFormance);
+        @default_mirrors    = qw(http://perlformance.net/PINTO/perlformance/);
+        @default_runscripts = qw(benchmark-perlformance);
+        @default_runargs    = qw(--plugins=ALL);
+}
+if ($perlformance_report) {
+        @default_runscripts = qw(tapper-testsuite-benchmark-perlformance);
+        @default_runargs    = qw(--plugins=ALL);
+        @default_runargs    = ("-Doptimize='-O2 -falign-loops=8 -falign-jumps=8 -falign-functions=64 -falign-labels=8 -mpreferred-stack-boundary=8 -minline-all-stringops'");
+}
+
+# modules/mirros/runscripts can be comma-separated
+my @MODULES     = map { chomp; $_ } map { split(qr/,/, $_) } (@modules    ? @modules    : @default_modules);
+my @CPANMIRRORS = map { chomp; $_ } map { split(qr/,/, $_) } (@mirrors    ? @mirrors    : @default_mirrors);
+my @RUNSCRIPTS  = map { chomp; $_ } map { split(qr/,/, $_) } (@runscripts ? @runscripts : @default_runscripts);
+my @RUNARGS     = map { chomp; $_ } map { split(qr/;/, $_) } (@runargs    ? @runargs    : @default_runargs);
+my @EXESUFFIXES = sort map { chomp; $_ } map { split(qr/,/, $_) } @exesuffixes;
+my $CONFARGS    = join " ", map { chomp; $_ } (@confargs ? @confargs : @default_confargs); # repeatable, but no comma-separate
+
+# ========== build dependencies ==========
+
+sub installdeps_debian
+{
+        my $APTGETOPTIONS ='-o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --yes';
+        my $APTGET        = "DEBIAN_FRONTEND=noninteractive; export DEBIAN_FRONTEND ; sudo apt-get $APTGETOPTIONS";
+        my @DEPENDECIES   = (qw(make
+                                patch
+                                makepatch
+                                curl
+                                wget
+                                rsync
+                                gcc
+                                g++
+                                git
+                                perl-modules
+                                libbz2-1.0
+                                libbz2-dev
+                                libdb-dev
+                                libsqlite3-dev
+                                linux-source
+                                libgmp3-dev
+                                libssl-dev
+                                libpcre3-dev
+                              )
+                            );
+        foreach my $dep (@DEPENDECIES) {
+                print_and_system "$APTGET install $dep\n";
+        }
+}
+
+if ($installdeps) {
+        my @SUPPORTED_DISTROS = (qw(debian));
+        if (grep { /$installdeps/ } @SUPPORTED_DISTROS) {
+                print $USER "*** Install dependencies for: $installdeps\n";
+                eval "installdeps_$installdeps()";
+        } else {
+                print $USER "Unsupported dependency installation for distro: $installdeps\n";
+                print $USER "Allowed distros: ".join(", ", @SUPPORTED_DISTROS), "\n";
+                exit 1;
+        }
+}
+
+# ========== prepare ==========
+
+system("mkdir -p $build_path") == 0 || die;
+setup_log();
+
+if (-d "$build_path_perl/.git") {
+        print_and_system "cd $build_path_perl && git config remote.origin.url $giturl";
+}
+else
+{
+        if (-e $sourcetgz) {
+                print_and_system_out "cd $build_path && tar xzf $sourcetgz";
+        } else {
+                print_and_system_out "cd $build_path && git clone $giturl perl";
+        }
+}
+
+chdir "$build_path_perl"; # important, I don't remember for what below
+print_and_system "cd $build_path_perl && rm -f $build_path_perl/.git/index.lock";
+print_and_system "cd $build_path_perl && git reset --hard";
+print_and_system "cd $build_path_perl && git clean -dxf";
+print_and_system "cd $build_path_perl && git checkout blead";
+print_and_system "cd $build_path_perl && git pull";
+print_and_system "cd $build_path_perl && git checkout $version";
+print_and_system "cd $build_path_perl && git pull";
+
+# ========= version =========
+
+my $gitdescribe;
+$gitdescribe = print_and_qx_chomp qq!cd $build_path_perl && git describe --all!;
+$gitdescribe = print_and_qx_chomp qq!cd $build_path_perl && git describe! if ($gitdescribe =~ m,/, && $gitdescribe !~ m,tags/,);
+$gitdescribe =~ s|^tags/||g;
+my $gitchangeset = print_and_qx_chomp qq!cd $build_path_perl && git rev-parse HEAD!;
+my ($perl_revision, $perl_version, $perl_subversion) = $gitdescribe =~ m/^\D*(\d+)[._](\d+)(?:[._](\d+))?.*$/g;
+$perl_version    = sprintf("%02d", $perl_version);
+$perl_subversion ||= 0;
+$VERSION = eval("v$perl_revision.$perl_version.$perl_subversion");
+
+# ========= cherry-picks  =========
+
+# cherry pick several bugfixes in 5.8/5.9 that break building
+if (v5.8.0 le $VERSION && $VERSION le v5.9.4) {
+        print $LOGFILE "*** cherry-pick building fixes for older perl versions\n";
+        # FIX: <command-line>
+        print_and_system qq!cd $build_path_perl && git cherry-pick -n cf14425e2bd169ce935f76d359f3253b51e441a0!;
+        # FIX: rebuild / gcc -g
+        print_and_system qq!cd $build_path_perl && git cherry-pick -n a3d1be69db4c082c1b9cef14f51a6e7fe4a9dac9!;
+        # FIX: makedepend.SH
+        print_and_system qq!cd $build_path_perl && git cherry-pick -n 96a8704c85b1e14bb3d63195b0b720f2fd5b8182!;
+        # FIX: create missing link (5.8.8)
+        print_and_system q'sudo ln -sf `find  /usr/src -name page.h | grep arch/x86/include/asm/page.h | tail -1` /usr/include/asm/'  if ! -e "/usr/include/asm/page.h";
+}
+
+if ($VERSION lt v5.12.4) {
+        print $LOGFILE "*** cherry-pick: fix search libs in configure\n";
+        print_and_system qq!cd $build_path_perl && git cherry-pick -n 40f026236b9959b7ad3260fedc6c66cd30bb7abc!;
+        print_and_system qq!cd $build_path_perl && git cherry-pick -n bcab1245a0693be445ce018352f6fbe4abc26e88!;
+}
+
+# ========== prepare paths ==========
+
+unless (defined $perl_revision && defined $perl_version)
+{
+        no warnings 'uninitialized';
+        print $USER "# Bummer! Unrecognized version schema ($gitdescribe).\n";
+        print $USER "# ($perl_revision, $perl_version, $perl_subversion)\n";
+        exit 1;
+}
+
+my $codespeed_executable =            _perl_exe_name  ($perl_revision, $perl_version, $perl_subversion, $usethreads, $bit64, $gitdescribe, $gitchangeset, \@EXESUFFIXES, $blead);
+my $PREFIX               = $prefix || _perl_pathprefix($perl_revision, $perl_version, $perl_subversion, $usethreads, $bit64, $gitdescribe, $gitchangeset, \@EXESUFFIXES, $blead);
+my $USETHREADS           = $usethreads ? "-Dusethreads"  : "";
+my $BIT64                = $bit64      ? "-Duse64bitall" : "";
+
+print $USER "\n";
+print $USER "============================================================\n\n";
+print $USER "  Bootstrap Perl\n";
+print $USER "  --------------\n\n";
+print $USER "  version:        $version\n\n";
+print $USER "  git-describe:   $gitdescribe\n\n";
+print $USER "  git-changeset:  $gitchangeset\n\n";
+print $USER "  codespeed name: $codespeed_executable\n\n";
+print $USER "  PREFIX:         $PREFIX\n\n";
+print $USER "  configureargs:  ".join("\n                  ", @confargs)."\n\n";
+print $USER "  CPAN mirrors:   ".join("\n                  ", @CPANMIRRORS)."\n\n";
+print $USER "  modules:        ".join("\n                  ", @MODULES)."\n\n";
+print $USER "  scripts:        ".join("\n                  ", map { $_ ." ".join(" ", @RUNARGS) } @RUNSCRIPTS)."\n\n";
+print $USER "============================================================\n\n";
+
+my @in_blead = grep { / blead$/ }
+               map  { chomp ; $_ }
+               print_and_qx qq!git branch --contains $gitchangeset!;
+if ($blead && !@in_blead) {
+        print $USER "# Bummer!\n";
+        print $USER "#   Use '--blead' only with commits in blead branch.\n";
+        exit 1;
+}
+$ENV{PERL_AUTOINSTALL} = "--defaultdeps";
+$ENV{TEST_JOBS}        = $threadcount;
+$ENV{TWMC_TEST_PORT}   = "9876";
+
+my $perl_exe = "$PREFIX/bin/perl";
+
+my $THREADS = $jobs ? "-j $jobs" : "-j $threadcount";
+my $DRY = $dry ? "-n" : "";
+
+# ========== build ==========
+
+if ($forcebuildperl or ! -x $perl_exe )
+{
+        print $USER "*** BUILD perl\n";
+
+        # ========== metainfo in Perl Config ==========
+
+        # This (mis-)uses a built-in mechanism in Configure.
+        #
+        # Ultimately we want to inject meta information so it appears
+        # later in Perl's %Config.
+        #
+        # Instead of dumping metadata directly into "config.arch" it
+        # generates script code in there that in turn appends variable
+        # assignments to "UU/config.sh" which in turn pretend to
+        # later Configure steps that there would be configuration data
+        # of an earlier session which it then merges into %Config.
+        #
+        # It should work for any ancient or future Perl 5 version.
+        # Credits to Tux for help sorting this out.
+
+        my $config_arch;
+        print $LOGFILE "*** CONFIGURE meta information for Perl's \%Config via config.arch\n";
+        open ($config_arch, ">>", "$build_path_perl/config.arch") and do {
+                print $config_arch qq!\
+cat >> UU/config.sh <<EOUUCONFIG
+: Meta information from bootstrap-perl for later Perl Config
+bootstrap_perl_perl_version='$version'
+bootstrap_perl_git_describe='$gitdescribe'
+bootstrap_perl_git_changeset='$gitchangeset'
+bootstrap_perl_symbolic_name='$codespeed_executable'
+bootstrap_perl_prefix='$PREFIX'
+bootstrap_perl_configureargs='!.join(";", @confargs)                                       .qq!'
+bootstrap_perl_cpan_mirrors='! .join(";",  @CPANMIRRORS)                                   .qq!'
+bootstrap_perl_modules='!      .join(";",  @MODULES)                                       .qq!'
+bootstrap_perl_scripts='!      .join(";", map { $_ ." ".join(" ", @RUNARGS) } @RUNSCRIPTS) .qq!'
+EOUUCONFIG
+!;
+        };
+        close $config_arch;
+
+        # ========== Configure ==========
+
+        print_and_system_out "cd $build_path_perl; sh Configure -der -Dusedevel $USETHREADS $BIT64 $CONFARGS -Dprefix=$PREFIX";
+
+        # ========== make ==========
+
+        print_and_system "cd $build_path_perl; make $THREADS";
+
+        if ($test)
+        {
+                my $api_version = print_and_qx_chomp qq!cd $build_path_perl; . ./config.sh && echo \$api_version!;
+
+                my $TEST = $api_version >= 11 ? "test_harness" : "test"; # only Perl 5.11+
+                my $TEST_JOBS = $jobs ? "TEST_JOBS=$jobs" : "TEST_JOBS=$threadcount";
+                print_and_system "cd $build_path_perl; $TEST_JOBS make $TEST";
+        }
+
+        # ========== install ==========
+
+        print_and_system "cd $build_path_perl; make $DRY install";
+} else {
+        print $USER "*** SKIP building perl - found $perl_exe\n";
+}
+
+# binaries
+my $CPAN     = print_and_qx_chomp qq!ls -drt1 $PREFIX/bin/cpan5.*.*     | tail -1!;
+my $PERL     = print_and_qx_chomp qq!ls -drt1 $PREFIX/bin/perl5.*.*     | tail -1!;
+my $PERLDOC  = print_and_qx_chomp qq!ls -drt1 $PREFIX/bin/perldoc5.*.*  | tail -1!;
+my $POD2TEXT = print_and_qx_chomp qq!ls -drt1 $PREFIX/bin/pod2text5.*.* | tail -1!;
+
+print $USER "# CPAN:     $CPAN\n";
+print $USER "# PERL:     $PERL\n";
+print $USER "# PERLDOC:  $PERLDOC\n";
+print $USER "# POD2TEXT: $POD2TEXT\n";
+
+my $bin_perl     = "$PREFIX/bin/perl";
+my $bin_cpan     = "$PREFIX/bin/cpan";
+my $bin_perldoc  = "$PREFIX/bin/perldoc";
+my $bin_pod2text = "$PREFIX/bin/pod2text";
+
+# some dists don't find the versioned developer files
+print_and_system "if [ ! -e $bin_perl     ] ; then ln -sf $PERL     $bin_perl     ; fi";
+print_and_system "if [ ! -e $bin_cpan     ] ; then ln -sf $CPAN     $bin_cpan     ; fi";
+print_and_system "if [ ! -e $bin_perldoc  ] ; then ln -sf $PERLDOC  $bin_perldoc  ; fi";
+print_and_system "if [ ! -e $bin_pod2text ] ; then ln -sf $POD2TEXT $bin_pod2text ; fi";
+
+my $bin_cpan_helper  = "$build_path/cpan_helper.pl";
+my $pipe_cpan_helper = "$build_path/cpan_helper.out";
+my $log_cpan_helper  = "$build_path/cpan_helper.log";
+my $CPAN_COMMAND;
+my $CPAN_OUTPUT;
+
+my $text_cpan_helper = <<'END_HELPER';
+        use App::Cpan;
+
+        my ($result_pipe, $logfile) = @ARGV;
+
+        open(my $LOGFILE, ">", $logfile) || die;
+        open(STDOUT, ">&", $LOGFILE) || die;
+        open(STDERR, ">&", \*STDOUT) || die;
+        print "*** HELPER_START ".localtime()."\n";
+
+        open(my $RESULT, ">", $result_pipe) || die;
+        my $ofh = select($RESULT); $| = 1; select($ofh);
+
+        my $has_cfg = 0;
+
+        while (my $cmd = <STDIN>) {
+                chomp $cmd;
+                print "*** COMMAND_START [$cmd]\n";
+
+                # pass cfg to run() only once
+                # run() uses @ARGV
+                @ARGV  = split / +/, $cmd;
+                if ($ARGV[0] eq '-j') {
+                        $has_cfg && do { @ARGV = @ARGV[2..$#ARGV] };
+                        $has_cfg = 1;
+                }
+                print "cmd now [", join(" ", @ARGV),"]\n";
+
+                my $rc = App::Cpan->run(@ARGV);
+                print "*** COMMAND_END [$rc] [$cmd]\n";
+                print $RESULT $rc, "\n";
+        }
+
+        END {
+                print "*** HELPER_END [$?] ".localtime()."\n";
+        }
+END_HELPER
+
+sub cpan_helper_setup {
+        # create helper script
+        open (my $fh_helper, ">", $bin_cpan_helper) || die;
+        print $fh_helper $text_cpan_helper || die;
+        close $fh_helper;
+
+        # create fifo, helper outputs result code to it
+        print_and_system("if [ ! -p $pipe_cpan_helper ]; then mkfifo $pipe_cpan_helper; fi");
+
+        # start helper
+        open ($CPAN_COMMAND, "|-", "$PERL $bin_cpan_helper $pipe_cpan_helper $log_cpan_helper") || die;
+        my $ofh = select $CPAN_COMMAND; $| = 1; select $ofh;
+        open ($CPAN_OUTPUT, "<", $pipe_cpan_helper) || die;
+}
+
+sub cpan_command {
+        my ($cmd) = @_;
+        $cmd =~ /\S+$/; my $mod = $&;
+        local $SIG{PIPE} = sub { die "cpan helper pipe broke" };
+        print $USER $mod, "\n";
+        print $COMMAND "cpan_command ", $cmd, "\n";
+        print $LOGFILE "cpan_command ", $cmd, "\n";
+        print $CPAN_COMMAND $cmd, "\n";
+        my $rc = <$CPAN_OUTPUT>;
+        defined $rc || die "could not get cpan helper output";
+        chomp $rc;
+        $rc == 0 || die "rc is $rc";
+}
+
+sub bin_cpan { $bin_cpan || "" }
+
+# ========== cpan ==========
+
+if ($cpan)
+{
+        print $USER "*** PREPARE cpan\n";
+
+        # distroprefs: get all from git
+        print_and_system "mkdir -p $DISTROPREFSSRCBASE";
+        print_and_system "cd $DISTROPREFSSRCBASE && git clone $DISTROPREFSREPO";
+        print_and_system "cd $DISTROPREFSSRCBASE/cpanpm-distroprefs && git pull";
+        print_and_system "cd $DISTROPREFSSRCBASE/cpanpm-distroprefs && git submodule update --init --recursive";
+        print_and_system "cd $DISTROPREFSSRCBASE/cpanpm-distroprefs && git pull";
+        # distroprefs: merge our flavour
+        print_and_system qq!mkdir -p $DISTROPREFSDIR!;
+        print_and_system qq!rsync -r $DISTROPREFSSRC1/ $DISTROPREFSDIR/!;
+        print_and_system qq!rsync -r $DISTROPREFSSRC2/ $DISTROPREFSDIR/!;
+
+        # Cleanup build dir
+        print_and_system qq!rm -fr $CPANBUILDDIR!;
+
+        # Configure CPAN initially
+        my $CFG   = print_and_qx_chomp qq!$PERLDOC -l CPAN | sed -e "s/CPAN\.pm/CPAN\\/Config.pm/"!;
+        my $MYCFG = print_and_qx_chomp qq!$PERLDOC -l CPAN | sed -e "s/CPAN\.pm/CPAN\\/MyConfig.pm/"!;
+
+        if ($forcecpancfg or ! -e $CFG) {
+                print $USER "*** CONFIGURE cpan\n";
+
+                my $CPANCFG = do { local $/; <DATA> };
+                my $MIRRORSLIST = join(" ", @CPANMIRRORS);
+                $CPANCFG =~ s/__DISTROPREFSDIR__/$DISTROPREFSDIR/g;
+                $CPANCFG =~ s/__MIRRORS__/$MIRRORSLIST/g;
+                $CPANCFG =~ s/__PREFIXBASE__/$prefixbase/g;
+
+                # the real cpan config
+                open my $CPANCFGFILE, ">", $CFG or die "Can not create $CFG";
+                print $CPANCFGFILE $CPANCFG;
+                close $CPANCFGFILE;
+
+                # empty MyConfig to suppress loading one from ~/.cpan/
+                open my $MYCPANCFGFILE, ">", $MYCFG or die "Can not create $MYCFG";
+                print $MYCPANCFGFILE "package CPAN::MyConfig;\n1;\n\n=head1 ABOUT\n\nEmpty CPAN::MyConfig to suppress loading one from C<~/.cpan/>.\n\n=cut\n\n";
+                close $MYCPANCFGFILE;
+        } else {
+                print $USER "*** SKIP configuring cpan".(-e $CFG ? " - found $CFG" : "")."\n";
+        }
+
+        # remove stale cpan lock
+        my $cpanlock = "$prefixbase/cpan/.lock";
+        if (-e $cpanlock) {
+                my ($pid, $host) = qx!cat $cpanlock!;
+                chomp $pid;
+                my $exists = kill 0, $pid;
+                if (not $exists) {
+                        print $LOGFILE "# Remove stale CPAN.pm lock.\n";
+                        print_and_system qq!rm -f $cpanlock!;
+                }
+        }
+
+        # optionally remove sources cache to avoid conflicts,
+        # like happening with hot-patched CPAN mirrors (via Pinto)
+        if ($cleancpansources) {
+                print $LOGFILE "# Remove $SOURCESDIR.\n";
+                print_and_system qq!rm -fr '$SOURCESDIR'!;
+        }
+
+        # force a CPAN.pm with all features we need, assume old-school CPAN.pm
+        print_and_system qq{if [ -L $bin_cpan -o ! -e $bin_cpan ] ; then /bin/rm $bin_cpan ; echo "force install CPAN" | $PERL -MCPAN -e shell ; fi};
+
+        # once upon a time the cpan exe missed the executable bit - set it to be sure
+        print_and_system qq!chmod +x $CPAN!;
+        print_and_system qq!chmod +x $bin_cpan!;
+
+        cpan_helper_setup();
+
+        print $USER "*** INSTALL cpan dependencies\n";
+
+        # install extended cpan toolchain; contains some "force" where we know they are really required
+        print_and_system qq{if ! $PERL -MExtUtils::Config -e1 ; then $bin_cpan -j $CFG -f -i ExtUtils::Config ; fi };
+        print_and_system qq{if ! $PERL -MYAML::XS         -e1 ; then $bin_cpan -j $CFG -f -i YAML::XS         ; fi };
+        print_and_system qq{if ! $PERL -MYAML             -e1 ; then $bin_cpan -j $CFG -f -i YAML             ; fi };
+
+        # try really hard with some modules until we find a version
+        # that fits currrent Perl
+        my %mod_dists = (
+                         "YAML" => [qw(MSTROUT/YAML-0.84.tar.gz
+                                       MSTROUT/YAML-0.83.tar.gz
+                                       MSTROUT/YAML-0.82.tar.gz
+                                       INGY/YAML-0.81.tar.gz
+                                       INGY/YAML-0.80.tar.gz
+                                       INGY/YAML-0.79.tar.gz
+                                       INGY/YAML-0.78.tar.gz
+                                       INGY/YAML-0.77.tar.gz
+                                       INGY/YAML-0.76.tar.gz)],
+                         # "Devel::Size" => [qw(NWCLARK/Devel-Size-0.78.tar.gz
+                         #                      NWCLARK/Devel-Size-0.77.tar.gz
+                         #                      NWCLARK/Devel-Size-0.76.tar.gz
+                         #                      NWCLARK/Devel-Size-0.75.tar.gz
+                         #                      BROWSERUK/Devel-Size-0.72.tar.gz
+                         #                      TELS/devel/Devel-Size-0.71.tar.gz
+                         #                      TELS/devel/Devel-Size-0.70.tar.gz)],
+                         );
+
+        foreach my $mod (keys %mod_dists) {
+                foreach my $dist (@{$mod_dists{$mod}}) {
+                        print_and_system qq{if ! $PERL -M$mod -e1 ; then $bin_cpan -j $CFG $dist ; fi };
+                }
+                print_and_system qq{if ! $PERL -M$mod -e1 ; then $bin_cpan -j $CFG -f -i $mod ; fi };
+        }
+
+        print_and_system qq{if ! $PERL -MIO::Compress::Base -e1 ; then $bin_cpan -j $CFG -f -i IO::Compress::Base ; fi };
+        if ($gitdescribe =~ /perl-5\.8\.0/) {
+                # ignore known failing tests
+                print_and_system qq!$bin_cpan -j $CFG -f -i Module::Build!;
+        }
+        if ($gitdescribe =~ /perl-5\.8\./) {
+                # test failure on some of my machines
+                print_and_system qq!$bin_cpan -j $CFG -f -i List::MoreUtils!;
+        }
+        if ($gitdescribe =~ /perl-5\.9\./) {
+                # ignore known hanging tests with utf8
+                print_and_system qq! echo "notest install Test::Simple" | $bin_cpan -j $CFG!;
+        }
+
+        # install dependencies needed for CPAN itself
+        foreach my $module (qw(version YAML::Syck IO::Tty Expect LWP Task::Bootstrap::Perl)) {
+                print $USER "$module\n";
+                print_and_system qq{if ! $PERL -M$module -e1 ; then $bin_cpan -j $CFG -f -i $module ; fi };
+        }
+        if ($perlformance || $perlformance_report) {
+                print $USER "AAAA::Mail::SpamAssassin (for Benchmark::Perl::Formance)\n";
+                print_and_system qq{if ! $PERL -MAAAA::Mail::SpamAssassin -e1 ; then $bin_cpan -j $CFG -f -i AAAA::Mail::SpamAssassin ; fi };
+        }
+
+        # install requested modules from CPAN
+        foreach my $module (@MODULES) {
+                print_and_system qq!$bin_cpan -j $CFG -i $module!;
+                if ($module =~ qr/^(Benchmark::Perl::Formance|Mail::SPF)$/) {
+                        # That's the whole deal, so we force it.
+                        print_and_system qq{if ! $PERL -M$module -e1 ; then $bin_cpan -j $CFG -f -i $module ; fi };
+                }
+        }
+} else {
+        print $USER "*** SKIP bootstrapping cpan.\n";
+} # if ($cpan)
+
+# Run scripts from inside the just installed Perl
+foreach my $runscript (@RUNSCRIPTS) {
+        print_and_system qq!$PREFIX/bin/$runscript !.join(" ", @RUNARGS);
+}
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+bootstrap-perl - Bootstrap Perl inclusive CPAN from git
+
+=head1 SYNOPSIS
+
+Install a threaded 64bit Perl using current "blead"
+from git with CPAN config into a path like
+C</$HOME/.bootstrapperl/$HOSTNAME/perl-5.15-thread-64bit-v5.15.5-258-ge7d0a3f>:
+
+  $ bootstrap-perl [ <OPTIONS> ]
+
+=head2 Specify git revisions
+
+=head3 latest "blead"
+
+  $ bootstrap-perl --version blead  # same as default
+
+=head3 tag
+
+  # note the different tag forms before and after Perl 5.10
+  $ bootstrap-perl --version perl-5.8.7
+  $ bootstrap-perl --version v5.14.1
+
+=head3 branch name
+
+  $ bootstrap-perl --version remotes/origin/smoke-me/cpan
+  $ bootstrap-perl --version remotes/origin/zefram/pad_api
+  $ bootstrap-perl --version remotes/origin/maint-5.12
+  $ bootstrap-perl --version remotes/origin/maint-5.12^
+  $ bootstrap-perl --version remotes/origin/maint-5.12~3
+
+=head3 by commit id
+
+  $ bootstrap-perl --version c14f2f9db08de3f50fe2ff7438429153d6ceb9a5
+  $ bootstrap-perl --version c14f2f9db08de3f50fe2ff7438429153d6ceb9a5^
+
+=head3 current HEAD in local git repo
+
+A leading C<.> is replaced with HEAD's commitid in current subdir; you
+can still combine that like usual git revisions:
+
+  $ bootstrap-perl --version .
+  $ bootstrap-perl --version .^
+  $ bootstrap-perl --version .~5
+
+=head2 Installation options
+
+=head3 specify giturl
+
+  $ bootstrap-perl --giturl git://github.com/mirrors/perl.git
+  $ bootstrap-perl -g git://github.com/mirrors/perl.git # same
+  $ bootstrap-perl -g .                                 # local dir
+
+The giturl is always cloned from the specified giturl to a temporary
+working directory, so your local subdir stays untouched.
+
+=head3 install directory
+
+Install into other install directory than the unified naming schema
+(see below for more on this schema):
+
+  $ bootstrap-perl --prefix <PREFIX>
+
+Use the unified naming schema but not under C</$HOME/.bootstrapperl/$HOSTNAME>:
+
+  $ bootstrap-perl --prefixbase /foo/bar
+
+=head3 install build dependencies
+
+Provide the distro for which to install known build dependencies, like
+gcc, git, make, etc.:
+
+ $ bootstrap-perl --installdeps=debian
+
+Currently there is only one: C<debian>. Simply send me a patch for
+your preferred distro, it's easy.
+
+=head3 parallel build
+
+Use this many parallel jobs to build:
+
+  $ bootstrap-perl --jobs <n>
+  $ bootstrap-perl -j <n>
+
+Default is to use core count + 1.
+
+=head3 test
+
+Run the perl test suite:
+
+  $ bootstrap-perl --test
+  $ bootstrap-perl -t
+
+Default is B<not> to run the tests.
+
+=head3 (re-)build Perl
+
+You can specify whether you want to compile perl even when an
+executable C<perl> already exists:
+
+  $ bootstrap-perl --forcebuildperl
+  $ bootstrap-perl --noforcebuildperl
+
+Default is B<off>.
+
+=head3 bootstrap CPAN
+
+You can specify whether to bootstrap a full CPAN environment with
+distroprefs and dependencies:
+
+  $ bootstrap-perl --cpan
+  $ bootstrap-perl --nocpan
+
+Default is B<on>.
+
+=head3 (re-)configure CPAN
+
+You can specify whether to (re-)write a CPAN config
+(C<CPAN/Config.pm>, C<CPAN/MyConfig.pm>) even when it already exists:
+
+  $ bootstrap-perl --forcecpancfg
+  $ bootstrap-perl --noforcecpancfg
+
+Default is B<on>.
+
+=head3 use threads
+
+Build a threaded Perl (C<-Dusethreads>):
+
+  $ bootstrap-perl --usethreads
+
+which is already the default. To build non-threaded Perl use:
+
+  $ bootstrap-perl --nousethreads
+
+=head3 use 64bit
+
+Build a 64bit enabled Perl (C<-Duse64bitall>):
+
+  $ bootstrap-perl --use64bit
+
+which is already the default. To build Perl without 64bit use:
+
+  $ bootstrap-perl --nouse64bit
+
+=head3 version numbers vs. blead
+
+By default the Perl version number is derived from git-describe and
+kept for later reference (e.g., for codespeed exe name). However, if you
+specify
+
+  $ bootstrap-perl --blead
+
+then the version used in paths or codespeed executables is using
+"blead" in order to generate a make it belong to to a common
+development line besides the yearly segmented graphs.
+
+It is only possible to use C<--blead> with development versions in
+order to create consistent results from only the blead branch.
+
+Note that C<--blead> does not set a version but only modifies the
+formats of path prefix and how the version is reported to
+Perl::Formance; it is B<not> the same as C<--version blead>.
+
+=head3 configure CPAN and modules
+
+Configure CPAN to use these mirrors:
+
+  $ bootstrap-perl --mirror file:///home/ss5/MINICPAN/
+  $ bootstrap-perl -m file:///home/ss5/MINICPAN/ -m ftp://ftp.rub.de/pub/CPAN/
+  $ bootstrap-perl -m file:///home/ss5/MINICPAN/,ftp://ftp.rub.de/pub/CPAN/
+
+(Option can be repeated and allow comma separated lists.)
+
+Install these modules from CPAN:
+
+  $ bootstrap-perl --module YAML::Syck
+  $ bootstrap-perl -M YAML::Syck -M Digest::SHA1 -M IO::Tty -M LWP
+  $ bootstrap-perl -M YAML::Syck,Digest::SHA1 -M IO::Tty,LWP
+
+(Option can be repeated and allow comma separated lists.)
+
+=head3 run scripts
+
+Run these scripts relative to built <PREFIX>/bin/:
+
+  $ bootstrap-perl --run tapper-testsuite-benchmark-perlformance
+  $ bootstrap-perl --run tapper-testsuite-benchmark-perlformance --runargs="--plugins=Fib,FibOO;-vvv"
+  $ bootstrap-perl -r tapper-testsuite-benchmark-perlformance -r primes.pl
+
+(Option C<--run> can be repeated and allows comma separated lists.)
+
+(Option C<--runargs> can be repeated and allows semicolon[sic] separated lists.)
+
+=head3 run Perl::Formance benchmarks
+
+To do everything in one go needed for running
+Benchmark::Perl::Formance do:
+
+  $ bootstrap-perl --perlformance
+
+This sets defaults equivalent to C<-M Task::PerlFormance> C<-m
+http://perlformance.net/PINTO/perlformance/> C<--run
+benchmark-perlformance> C<--runargs=--plugins=ALL>.
+
+You can override parts of that like this:
+
+  $ bootstrap-perl --perlformance --runargs="--plugins=Fib,FibOO"
+
+to specify different set ob benchmarks.
+
+To use current subdir as Perl's repo and run only
+those benchmarks with no extra dependencies
+
+  $ bootstrap-perl --perlformance-local
+  $ bootstrap-perl --perlformance-local -c .
+  $ bootstrap-perl --perlformance-local -c .^
+  $ bootstrap-perl --perlformance-local -c .~5
+
+=head2 Unified installation prefix schema
+
+It uses a unified naming schema for it's installation PREFIX:
+
+  /$HOME/.bootstrapperl/$HOSTNAME/perl-5.<VERSION>-<(no)?thread>-<(no)?64bit>-<git-describe>
+
+which leads to paths like this:
+
+  /home/ss5/.bootstrapperl/zomtec/perl-5.10-thread-64bit-v5.10.0
+  /home/ss5/.bootstrapperl/zomtec/perl-5.15-thread-64bit-v5.15.5-258-ge7d0a3f
+
+This naming schema consist of the major version, basic configuration
+and I<git-describe>.
+
+=head1 ABOUT
+
+The script B<bootstrap-perl> bootstraps Perl installations with
+complete CPAN environment, inclusive distroprefs, from git.
+
+It was originally developed to be used by
+L<Benchmark::Perl::Formance|Benchmark::Perl::Formance> and now lives
+on its own.
+
+It should work for Perl versions from 5.8.6 to blead. Occasionally it
+cherry-picks a very few patches to fix some known build issues, like
+for 5.8.x.
+
+=head1 AUTHOR
+
+Steffen Schwigon <ss5@renormalist.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Steffen Schwigon.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__DATA__
+
+# Have POD in it so perldoc -l can find its path.
+
+=head1 ABOUT
+
+B<AUTO-GENERATED> -- see L<https://metacpan.org/pod/bootstrap-perl>
+
+This is CPAN.pm's systemwide configuration file. This file provides
+defaults for users, and the values can be changed in a per-user
+configuration file. The user-config file is being looked for as
+~/.cpan/CPAN/MyConfig.pm.
+
+=cut
+
+$CPAN::Config = {
+  'applypatch' => q[/usr/bin/applypatch],
+  'auto_commit' => q[1],
+  'build_cache' => q[10],
+  'build_dir' => q[__PREFIXBASE__/cpan/build],
+  'build_dir_reuse' => q[0],
+  'build_requires_install_policy' => q[yes],
+  'bzip2' => q[/bin/bzip2],
+  'cache_metadata' => q[0],
+  'check_sigs' => q[0],
+  'colorize_debug' => q[bold cyan],
+  'colorize_output' => q[1],
+  'colorize_print' => q[bold blue],
+  'colorize_warn' => q[bold red],
+  'commandnumber_in_prompt' => q[0],
+  'connect_to_internet_ok' => q[0],
+  'cpan_home' => q[__PREFIXBASE__/cpan],
+  'dontload_hash' => {  },
+  'ftp' => q[/usr/bin/ftp],
+  'patch' => q[/usr/bin/patch],
+  'ftp_passive' => q[1],
+  'ftp_proxy' => q[],
+  'getcwd' => q[cwd],
+  'gpg' => q[/usr/bin/gpg],
+  'gzip' => q[/bin/gzip],
+  'halt_on_failure' => q[0],
+  'histfile' => q[__PREFIXBASE__/cpan/histfile],
+  'histsize' => q[100],
+  'http_proxy' => q[],
+  'inactivity_timeout' => q[0],
+  'index_expire' => q[0],
+  'inhibit_startup_message' => q[0],
+  'keep_source_where' => q[__PREFIXBASE__/cpan/sources],
+  'load_module_verbosity' => q[v],
+  'lynx' => q[],
+  'make' => q[/usr/bin/make],
+  'make_arg' => q[],
+  'make_install_arg' => q[],
+  'make_install_make_command' => q[/usr/bin/make],
+  'makepl_arg' => q[],
+  'mbuild_arg' => q[],
+  'mbuild_install_arg' => q[],
+  'mbuild_install_build_command' => q[./Build],
+  'mbuildpl_arg' => q[],
+  'ncftp' => q[],
+  'ncftpget' => q[],
+  'no_proxy' => q[],
+  'pager' => q[/usr/bin/less],
+  'perl5lib_verbosity' => q[v],
+  'prefer_installer' => q[MB],
+  'prefs_dir' => q[__DISTROPREFSDIR__],
+  'prerequisites_policy' => q[follow],
+  'scan_cache' => q[atstart],
+  'shell' => q[/bin/bash],
+  'show_unparsable_versions' => q[0],
+  'show_upload_date' => q[0],
+  'show_zero_versions' => q[0],
+  'tar' => q[/bin/tar],
+  'tar_verbosity' => q[v],
+  'term_is_latin' => q[0],
+  'term_ornaments' => q[1],
+  'test_report' => q[0],
+  'trust_test_report_history' => q[0],
+  'unzip' => q[],
+  'urllist' => [qw[__MIRRORS__]],
+  'use_sqlite' => q[0],
+  'version_timeout' => q[15],
+  'wget' => q[/usr/bin/wget],
+  'yaml_load_code' => q[0],
+  'yaml_module' => q[YAML],
+};
+1;

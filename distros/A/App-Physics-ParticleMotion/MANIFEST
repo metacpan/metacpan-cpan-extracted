@@ -1,0 +1,22 @@
+bin/tk-motion.pl
+Build.PL
+Changes
+eg/ex1.ini
+eg/ex1mini.ini
+eg/ex2.ini
+eg/ex3.ini
+eg/ex4.ini
+eg/ex5.ini
+eg/ex5f.ini
+eg/ex6.ini
+eg/ex7.ini
+eg/ex7f.ini
+lib/App/Physics/ParticleMotion.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00pod.t
+t/00podcover.t
+t/01basic.t
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+Makefile
+README.md
+cpanfile
+lib/Apache/LoadAvgLimit.pm
+lib/Apache/LoadAvgLimit/GetAvg.pm
+lib/Apache/LoadAvgLimit/GetAvg.xs
+minil.toml
+t/01_use.t
+t/02_get_avg.t.off
+META.yml
+MANIFEST

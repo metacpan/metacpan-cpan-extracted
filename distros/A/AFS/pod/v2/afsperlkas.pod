@@ -1,0 +1,347 @@
+#------------------------------------------------------------------------------
+# RCS-Id: "@(#)$RCS-Id: pod/v2/afsperlkas.pod 2e2ca60 Tue Apr 15 13:04:20 2014 +0200 Norbert E Gruener$"
+#
+# © 2001-2014 Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<AFS::KAS> - Class to communicate with the B<AFS Authentication Server>
+
+=head1 SYNOPSIS
+
+  use AFS::KAS;
+  use AFS::KTC_PRINCIPAL;
+  use AFS::KTC_TOKEN;
+  use AFS::KTC_EKEY;
+
+  my $admin = AFS::KTC_PRINCIPAL->new('admin');
+  my $key   = AFS::KTC_EKEY->ReadPassword($admin->name."'s Password:");
+  my $token = AFS::KTC_TOKEN->GetAdminToken($admin, $key, 300);
+  my $kas   = AFS::KAS->AuthServerConn($token, &AFS::KA_MAINTENANCE_SERVICE);
+
+  my $user  = AFS::KTC_PRINCIPAL->new('xyz');
+  my $ukey  = AFS::KTC_EKEY->ReadPassword($user->name."'s Password:");
+
+  my $ok = $kas->create($user->name, $user->instance, $ukey);
+
+  my $flags    = 1;        # (1 = normal, 4 = admin)
+  my $expire   = 925715000;# epoch time => 03 May 1999 07:03
+  my $maxassoc = 0;
+  my $lifetime = 48*60*60; #unit is secs; => 48 hrs
+  my $pwexpire = 10;       #number of days
+  my $pw_reuse = 2;        #pwreuse allowed: [ 2 = no ]
+  my $nfail    = 4;        #(nfail - 1) tries are allowed; => 3 tries
+  my $locktime = 3;        #unit is 8.5 min => 3 * (8.5)
+  my $spare2   = 0;
+
+  my $packed = (($pwexpire << 24)|($pw_reuse << 16)|($nfail << 8)|$locktime);
+
+  $ok = $kas->setfields($user->name, $user->instance, $flags,
+                        $expire, $lifetime, $maxassoc, $packed);
+
+  my $entry = $kas->getentry($user->name, $user->instance);
+  $packed   = $$entry{'misc_auth_bytes'};
+  $pwexpire = (($packed >> 24) & 0xff);
+  $is_lockd = (($packed >> 16) & 0xff);
+  $nfail    = (($packed >>  8) & 0xff);
+  $locktime = (($packed >>  0) & 0xff);
+  $pw_reuse = $$entry{'passwd_reuse'} - 0x12340000;
+
+  $kas->DESTROY;           # destroy server connection
+
+=head1 DESCRIPTION
+
+This class is used to communicate with the B<AFS Authentication
+Server>.  It verifies user identities and provides the facilities
+through which participants in transactions prove their identities to
+one another (mutually authenticate). It maintains the Authentication
+Database, in which it stores user passwords converted into encryption
+key form as well as the AFS server encryption key.  It has methods to
+query the information held for any given AFS user and to create,
+modify, and delete the records in the DB where the above information
+is held.
+
+Before you can access any DB record you must establish a connection to
+the Authentication Server.  This is done by the constructor methods
+I<SingleServerConn> and I<AuthServerConn> which return a KAS object.  A
+KAS object is essentially a handle to talk to an Authentication Server
+in a given cell.  Such a KAS object is required before any of the
+other KAS instance methods can be called.
+
+=head1 COMPATIBILITY
+
+B<This release does NOT support any features and interfaces
+from version 1.>
+
+=head1 METHODS
+
+=over 4
+
+=item B<CONSTRUCTOR>
+
+=item S< >
+
+=item B<$kas = AFS::KAS-E<gt>AuthServerConn(TOKEN, SERVICE [, CELL]);>
+
+Creates a new object of the class AFS::KAS and establishes connections
+to all the Authentication Servers in a given CELL (default null).  An
+AFS::KAS object is essentially a handle to talk to the Authentication
+Server.  Internally an AFS::KAS object is a pointer to a ubik_client
+structure, although this may change and the value returned should always
+be treaded as an opaque handle.  A TOKEN may or may not be needed
+depending on the SERVICE.  TOKEN must be an instance of AFS::KTC_TOKEN.
+Possible values for SERVICE are
+
+   &AFS::KA_MAINTENANCE_SERVICE
+   &AFS::KA_AUTHENTICATION_SERVICE
+   &AFS::KA_TICKET_GRANTING_SERVICE
+
+It calls the AFS system library function 'ka_AuthServerConn'.
+
+=item B<$kas = AFS::KAS-E<gt>SingleServerConn(HOST, TOKEN, SERVICE [, CELL]);>
+
+Creates a new object of the class AFS::KAS and establishes a connection
+to only one Authentication Server running on HOST in a given CELL
+(default null).  An AFS::KAS object is essentially a handle to talk to
+the Authentication Server.  Internally an AFS::KAS object is a pointer
+to a ubik_client structure, although this may change and the value
+returned should always be treaded as an opaque handle.  A TOKEN may or
+may not be needed depending on the SERVICE.  TOKEN must be an instance
+of AFS::KTC_TOKEN.  Possible values for SERVICE are
+
+   &AFS::KA_MAINTENANCE_SERVICE
+
+It calls the AFS system library function 'ka_SingleServerConn'.
+
+=item B<DESTRUCTOR>
+
+=item S< >
+
+=item B<$kas-E<gt>DESTROY;>
+
+Destroys the ubik connection to the Authentication Server and frees the
+ubik connection structure.
+
+=item B<INSTANCE METHODS>
+
+Nearly all instance methods come in two flavors. The KAM_* methods
+are essentially the same as the low-level AFS KAS APIs.  The other
+methods are simply just wrappers around the KAM_* methods.  These have
+been introduced in order to offer a more perlish interface :-)
+
+=item S< >
+
+=item B<$token = $kas-E<gt>Authenticate(UNAME, UINST, SERVICE, EKEY, STIME, ETIME [, PWEXP]);>
+
+Returns a token for the user entry UNAME.UINST for the specified
+SERVICE.  The desired ticket lifetime is specified by STIME and ETIME
+(given in 5 minute intervals). This ticket is referred to as the
+AuthTicket.  EKEY contains the encrypted user password and must be an
+instance of AFS::KTC_EKEY.  It assumes that a connection to the
+AuthServer has already been established.  Possible values for SERVICE
+are
+
+    &AFS::KA_TICKET_GRANTING_SERVICE
+    &AFS::KA_MAINTENANCE_SERVICE
+
+It calls the AFS system library function 'ka_Authenticate'
+
+=item B<$ok = $kas-E<gt>ChangePassword(UNAME, UINST, OKEY, NKEY);>
+
+Changes the password for the user entry UNAME.UINST in the
+Authentication Database to NKEY. OKEY and NKEY must be instances of
+AFS::KTC_EKEY.  OEKY is never used, so you can put in any key
+(randomkey).  It calls the AFS system library function
+'ka_ChangePassword'.
+
+=item B<$ok = $kas-E<gt>create(UNAME, UINST, NKEY);>
+
+=item B<$ok = $kas-E<gt>KAM_CreateUser(UNAME, UINST, NKEY);>
+
+Adds the user entry UNAME.UINST to the Authentication Database and sets
+its password key to NKEY.  NKEY must be an instance of AFS::KTC_EKEY.
+This call requires a connection encrypted with an AdminTicket.  It calls
+the AFS system library function 'KAM_CreateUser'.
+
+=item B<$entry = $kas-E<gt>debug;>
+
+=item B<$entry = $kas-E<gt>KAM_Debug(VERSION);>
+
+Returns information about the Authentication Database, the key cache,
+and the state of the AuthServer.  The return value is a reference to a
+hash table containing the values from the C structure C<ka_debugInfo>.
+Possible values for VERSION are
+
+   &AFS::KAMAJORVERSION
+
+It calls the AFS system library function'KAM_Debug'.
+
+=item B<$ok = $kas-E<gt>delete(UNAME, UINST);>
+
+=item B<$ok = $kas-E<gt>KAM_DeleteUser(UNAME, UINST);>
+
+Removes the user entry UNAME.UINST from the Authentication Database. It
+requires a connection encrypted with an AdminTicket.
+It calls the AFS system library function 'KAM_DeleteUser'.
+
+=item B<$entry = $kas-E<gt>getentry(UNAME, UINST);>
+
+=item B<$entry = $kas-E<gt>KAM_Getentry(UNAME, UINST);>
+
+Returns information from the Authentication Database entry for the
+user entry UNAME.UINST.  The return value is a reference to a hash
+table containing the values from the C structure C<kaentryinfo>.  The
+hash table has the following keys
+
+    change_password_time    flags                  keyCheckSum
+    key_version             max_ticket_lifetime    minor_version
+    misc_auth_bytes         modification_time      modification_user
+    user_expiration
+
+It calls the AFS system library function 'KAM_GetEntry'.
+
+=item B<($num_admins, $kasstats, $kadstats) = $kas-E<gt>getstats;>
+
+=item B<($num_admins, $kasstats, $kadstats) = $kas-E<gt>KAM_GetStats(VERSION);>
+
+Returns statistics about the AuthServer and its database. If VERSION
+does not match that used by the server, the call returns an error
+code. The return values are references to the hash tables containing
+the values from the C structures C<kasstats> and C<kadstats>.  This
+call requires a connection encrypted with an AdminTicket.  Possible
+values for VERSION are
+
+   &AFS::KAMAJORVERSION
+
+It calls the AFS system library function 'KAM_Getstats'.
+
+=item B<$token = $kas-E<gt>GetToken(SNAME, SINST, STIME, ETIME, AUTH_TOKEN [, AUTH_CELL]);>
+
+Return a token for the specified service SNAME.SINST.  The desired
+ticket lifetime is specified by STIME and ETIME (given in 5 minute
+intervals). AUTH_TOKEN must be a ticket for the ticket­granting
+service (an instance of AFS::KTC_TOKEN) in the cell AUTH_CELL (default
+null). It assumes that a connection to the AuthServer has already been
+established.  It calls the AFS system library function 'ka_GetToken'.
+
+=item B<($name, $inst) = $kas-E<gt>listentry(PREV, INDX, COUNT);>
+
+=item B<($name, $inst) = $kas-E<gt>KAM_ListEntry(PREV, INDX, COUNT);>
+
+Returns the name and instance of an entry in the database.  It provides
+a way to step through all the entries in the database. The first call
+should be made with previous index PREV set to zero. The method updates
+COUNT, which is an estimate of the number of entries remaining to be
+returned, and INDX, which should be passed in as previous index on the
+next call. A negative COUNT or a non­zero return code indicates that an
+error occurred.  A zero INDX means there were no more entries. A zero
+COUNT means the last entry has been returned. This call requires a
+connection encrypted with an AdminTicket.  It calls the AFS system
+library function 'KAM_ListEntry'.
+
+=item B<$rkey = $kas-E<gt>randomkey;>
+
+=item B<$rkey = $kas-E<gt>KAM_GetRandomKey;>
+
+Returns a random DES key (an instance of AFS::KTC_EKEY) and is preferred
+over a calling routine just inventing a key.  It calls the AFS system
+library function 'KAM_GetRandomKey'.
+
+=item B<$ok = $kas-E<gt>setpassword(UNAME, UINST, KVNO, NKEY);>
+
+=item B<$ok = $kas-E<gt>KAM_SetPassword(UNAME, UINST, KVNO, NKEY);>
+
+Sets the key NKEY and key version number KVNO of the user entry
+UNAME.UINST to the given values. NKEY must be an instance of
+AFS::KTC_EKEY.  This call requires a connection encrypted with an
+AdminTicket.  It calls the AFS system library function
+'KAM_SetPassword'.
+
+=item B<$ok = $kas-E<gt>setfields(UNAME, UINST, FLAGS, EXPIRE, LIFETIME, MAXASSOC, PACKED);>
+
+=item B<$ok = $kas-E<gt>KAM_SetFields(UNAME, UINST, FLAGS, EXPIRE, LIFETIME, MAXASSOC, PACKED);>
+
+This function alters the miscellaneous parameters associated with the
+user entry UNAME.UINST. The FLAGS argument can be set to the following values
+
+   &AFS::KAFNORMAL    regular user
+   &AFS::KAFADMIN     an administrator
+   &AFS::KAFNOTGS     not allow principal to get or use TGT
+   &AFS::KAFNOSEAL    not allow principal as server in GetTicket
+   &AFS::KAFNOCPW     not allow principal to change its own key
+   &AFS::KAFNEWASSOC  allow user to create associates
+
+EXPIRE is the epoch time after which attempts to authenticate as this user
+will fail. The LIFETIME can be set to limit the lifetime of an
+authentication ticket created for a user (unit is secs). MAXASSOC
+defaults to -1.  PACKED is an array of four bytes. It contains
+
+  PACKED[0]: password lifetime; range must be [0..254] days; 0 = infinity
+  PACKED[1]: password reuse; [1 = yes], [2 = no], [0 = not changed]
+  PACKED[2]: numb of failed logins; (fail - 1) tries are allowed; 0 = infinity
+  PACKED[3]: lock time, must be set in units of 8.5 minutes; 0 = infinity
+
+This call requires a connection encrypted with an AdminTicket.  It
+calls the AFS system library function 'KAM_SetFields'.
+
+=back
+
+=head1 CURRENT AUTHOR
+
+Norbert E. Gruener E<lt>nog@MPA-Garching.MPG.deE<gt>
+
+=head1 AUTHOR EMERITUS
+
+Roland Schemers E<lt>schemers@slapshot.stanford.eduE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (c) 2001-2010 Norbert E. Gruener <nog@MPA-Garching.MPG.de>.
+ All rights reserved.
+
+ Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University.
+ All rights reserved.
+
+Most of the explanations in this document are taken from the original
+AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ Authentication Server Interface
+ Edward R. Zayas
+ Copyright (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ Copyright (c) IBM Corporation 2000.
+ All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=over 6
+
+=item The original module is covered by the following copyright:
+
+Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation,
+advertising materials, and other materials related to such
+distribution and use acknowledge that the software was developed
+by Stanford University.  The name of the University may not be used
+to endorse or promote products derived from this software without
+specific prior written permission.
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=back
+
+=head1 DOCUMENT VERSION
+
+Revision $Rev: 980 $

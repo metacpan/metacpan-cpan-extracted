@@ -1,0 +1,6 @@
+name = "Acme-HowToMakeSushi"
+# badges = ["travis"]
+authority="cpan:ANATOFUZ"
+
+module_maker="ModuleBuildTiny"
+

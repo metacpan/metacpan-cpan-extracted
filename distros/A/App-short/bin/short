@@ -1,0 +1,558 @@
+#!perl
+
+our $DATE = '2017-01-13'; # DATE
+our $VERSION = '0.13'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $prefix = "/App/short/";
+
+Perinci::CmdLine::Any->new(
+    url => "$prefix",
+    subcommands => {
+        ls        => { url => "${prefix}list_shorts" },
+        long      => { url => "${prefix}list_longs" },
+        missing   => { url => "${prefix}list_missing" },
+        duplicate => { url => "${prefix}list_duplicates" },
+        add       => { url => "${prefix}add_short" },
+        get       => { url => "${prefix}get_short_target" },
+        rm        => { url => "${prefix}rm_short" },
+    },
+)->run;
+
+# ABSTRACT: Manage short directory symlinks
+# PODNAME: short
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+short - Manage short directory symlinks
+
+=head1 VERSION
+
+This document describes version 0.13 of short (from Perl distribution App-short), released on 2017-01-13.
+
+=head1 SYNOPSIS
+
+Assuming you put your projects/repositories under C<~/repos>, e.g.:
+
+ perl-Text-ANSITable/
+ cpan-Perinci-Sub-Exporter/
+ p5-Data-Format-Pretty/
+ p5-Data-Format-Pretty-HTML/
+ p5-Data-Format-Pretty-JSON/
+ some-other-project/
+ yet-another-project/
+
+and you want to maintain a list of short symlink names in C<~/proj>, e.g.:
+
+ ansitable -> ../repos/perl-Text-ANSITable
+ perisexp -> ../repos/cpan-Perinci-Sub-Exporter
+ dfp -> ../repos/p5-Data-Format-Pretty
+ dfph -> ../repos/p5-Data-Format-Pretty-HTML
+ dfpj -> ../repos/p5-Data-Format-Pretty-JSON
+
+First, create C<~/.config/short.conf>:
+
+ long_dir  = ~/repos
+ short_dir = ~/proj
+
+ ; only include dirs in long_dir matching these regexes
+ long_include = ["^perl-", "^p5-", "^cpan-"]
+
+Then you can:
+
+ # list all short names
+ % short ls
+ % short ls -l; # more detail
+
+ # list all long names
+ % short long
+ % short long -l
+
+ # list long names which do not have short symlinks yet
+ % short missing
+ % short missing -l
+
+ # add short name
+ % short add p5-Data-Format-Pretty-Console dfpc
+
+ # return long directory (return undef when short name is unknown)
+ % short get dfpc
+ /home/ujang/repos/p5-Data-Format-Pretty-Console
+ % cd `short get dfpc`
+
+Pro-tip: install this bash function to be able to cd quickly to a short
+directory (tab completion is also provided):
+
+ # function definition
+ cds ()
+ {
+     if [[ "$1" = "" ]]; then echo "Please specify a short name"; return; fi
+     local dir=`short get "$1"`
+     if [[ "$dir" = "" ]]; then echo "Failed"; else cd "$dir"; fi
+ }
+ 
+ # tab completion
+ _cds ()
+ {
+     local cur=${COMP_WORDS[COMP_CWORD]}
+     COMPREPLY=( `COMP_LINE="short get $cur" COMP_POINT=$[10+${#cur}] short` )
+ }
+ 
+ # activate tab completion
+ complete -F _cds cds
+
+Afterwards, you can:
+
+ % cds ans<tab>
+ % cds ansitable
+
+=head1 DESCRIPTION
+
+B<NOTE: EARLY IMPLEMENTATION, MORE SUBCOMMANDS AND OPTIONS WILL BE ADDED IN THE
+FUTURE.>
+
+Perl project directories (typically CPAN distributions, Git repositories)
+usually have rather long names, e.g.:
+
+ perl-Text-ANSITable
+ cpan-Perinci-Sub-Exporter
+ p5-Data-Format-Pretty
+ p5-Data-Format-Pretty-HTML
+ p5-Data-Format-Pretty-JSON
+
+In some places short single-word aliases are useful, e.g.:
+
+ ansitable
+ perisexp
+ dfp
+ dfph
+ dfpj
+
+Where is this useful? First, when typing or cd-ing the directory names (even
+though there is shell tab completion, we still often have to type the names):
+
+ % cd proj/dfph; # shorter than: cd repos/p5-Data-Format-Pretty-HTML
+
+Second is when referring in internal documents. Writing and reading the short
+names like C<dfpj> is much more convenient and faster (as long as they are
+already familiar) than having to explicitly write C<Data::Format::Pretty::JSON>
+every time. Especially if you, like me, have hundreds of projects and have to
+cross-reference one another when writing documentation, for example when writing
+todo lists:
+
+ * TODO dfp: Add support for more environment variables
+ * TODO perisexp: Support Sub::Exporter-style interface
+ * TODO ansitable: Optimize performance
+
+The short names are implemented as just symlinks to the real names. And this
+script is just a simple CLI tool to help you manage them. I've used symlinks
+since at least 2002-2003, and have only started writing this tool in March 2015.
+
+=head1 SUBCOMMANDS
+
+=head2 B<add>
+
+=head2 B<duplicate>
+
+=head2 B<get>
+
+=head2 B<long>
+
+=head2 B<ls>
+
+=head2 B<missing>
+
+=head2 B<rm>
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand add
+
+=over
+
+=item B<--long-dir>=I<s>*, B<-L>
+
+=item B<--long-include-json>=I<s>
+
+See C<--long-include>.
+
+=item B<--long-include>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--long>=I<s>*
+
+=item B<--short-dir>=I<s>*, B<-S>
+
+=item B<--short>=I<s>*
+
+=back
+
+=head2 Options for subcommand duplicate
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--long-dir>=I<s>*, B<-L>
+
+=item B<--long-include-json>=I<s>
+
+See C<--long-include>.
+
+=item B<--long-include>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--short-dir>=I<s>*, B<-S>
+
+=back
+
+=head2 Options for subcommand get
+
+=over
+
+=item B<--long-dir>=I<s>*, B<-L>
+
+=item B<--long-include-json>=I<s>
+
+See C<--long-include>.
+
+=item B<--long-include>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--short-dir>=I<s>*, B<-S>
+
+=item B<--short>=I<s>*
+
+=back
+
+=head2 Options for subcommand long
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--long-dir>=I<s>*, B<-L>
+
+=item B<--long-include-json>=I<s>
+
+See C<--long-include>.
+
+=item B<--long-include>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--short-dir>=I<s>*, B<-S>
+
+=back
+
+=head2 Options for subcommand ls
+
+=over
+
+=item B<--broken>
+
+=item B<--detail>, B<-l>
+
+=item B<--long-dir>=I<s>*, B<-L>
+
+=item B<--long-include-json>=I<s>
+
+See C<--long-include>.
+
+=item B<--long-include>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--query>=I<s>
+
+=item B<--short-dir>=I<s>*, B<-S>
+
+=back
+
+=head2 Options for subcommand missing
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--long-dir>=I<s>*, B<-L>
+
+=item B<--long-include-json>=I<s>
+
+See C<--long-include>.
+
+=item B<--long-include>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--short-dir>=I<s>*, B<-S>
+
+=back
+
+=head2 Options for subcommand rm
+
+=over
+
+=item B<--long-dir>=I<s>*, B<-L>
+
+=item B<--long-include-json>=I<s>
+
+See C<--long-include>.
+
+=item B<--long-include>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--short-dir>=I<s>*, B<-S>
+
+=item B<--short-json>=I<s>
+
+See C<--short>.
+
+=item B<--short>=I<s@>*
+
+Can be specified multiple times.
+
+=back
+
+=head1 COMPLETION
+
+The script comes with a companion shell completer script (L<short>)
+for this script.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C short short
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using L<shcompgen>) at installation time,
+so you can immediately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete short 'p/*/`short`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/short.conf>, F<~/short.conf>, or F</etc/short.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ format (see --format)
+ naked_res (see --naked-res)
+
+=head2 Configuration for subcommand 'add'
+
+ long (see --long)
+ long_dir (see --long-dir)
+ long_include (see --long-include)
+ short (see --short)
+ short_dir (see --short-dir)
+
+=head2 Configuration for subcommand 'duplicate'
+
+ detail (see --detail)
+ long_dir (see --long-dir)
+ long_include (see --long-include)
+ short_dir (see --short-dir)
+
+=head2 Configuration for subcommand 'get'
+
+ long_dir (see --long-dir)
+ long_include (see --long-include)
+ short (see --short)
+ short_dir (see --short-dir)
+
+=head2 Configuration for subcommand 'long'
+
+ detail (see --detail)
+ long_dir (see --long-dir)
+ long_include (see --long-include)
+ short_dir (see --short-dir)
+
+=head2 Configuration for subcommand 'ls'
+
+ broken (see --broken)
+ detail (see --detail)
+ long_dir (see --long-dir)
+ long_include (see --long-include)
+ query (see --query)
+ short_dir (see --short-dir)
+
+=head2 Configuration for subcommand 'missing'
+
+ detail (see --detail)
+ long_dir (see --long-dir)
+ long_include (see --long-include)
+ short_dir (see --short-dir)
+
+=head2 Configuration for subcommand 'rm'
+
+ long_dir (see --long-dir)
+ long_include (see --long-include)
+ short (see --short)
+ short_dir (see --short-dir)
+
+=head1 ENVIRONMENT
+
+=head2 SHORT_OPT => str
+
+Specify additional command-line options
+
+=head1 FILES
+
+~/.config/short.conf
+
+~/short.conf
+
+/etc/short.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-short>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-projdir>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-short>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

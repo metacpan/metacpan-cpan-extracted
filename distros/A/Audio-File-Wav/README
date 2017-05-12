@@ -1,0 +1,22 @@
+NAME
+    Audio::File::Wav - represents a Microsoft WAV audio file
+
+DESCRIPTION
+    An extension to Audio::File enabling support for Microsoft WAV files.
+
+    Uses Audio::Wav internally to parse necessary information from the file.
+
+SEE ALSO
+    Audio::Wav, Audio::File, Audio::File::Tag, Audio::File::AudioProperties
+
+ACKNOWLEDGEMENTS
+    Thanks to Florian Ragwitz for writing Audio::File
+
+AUTHORS
+    Nathaniel Heinrichs <nheinric@cpan.org>
+
+COPYRIGHT AND LICENSE
+     Copyright (c) 2009 Nathaniel Heinrichs.
+     This program is free software; you can redistribute it and/or
+     modify it under the same terms as Perl itself.
+

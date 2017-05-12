@@ -1,0 +1,52 @@
+Apache::AxKit::Provider::File::Formatter version 0.96
+=====================================================
+
+This is an AxKit Provider that may be used to apply any module that
+conforms with the Formatter API to a file. At the time of this
+writing, there are three modules in the Formatter:: namespace, one for
+formatting the Text::Textile syntax, one to use HTML::Tidy to clean up
+existing HTML and one to add minimal HTML markup to a preformatted
+plain text.
+
+The Formatter API is a very simple API, designed to do simple
+conversion between different syntaxes. The API Specification itself
+can be found in the Formatter distribution on CPAN and has currently
+version 0.93, but is expected to be rather stable. The author will
+make a 1.0 release of the Provider once the Formatter API hits 1.0. It
+is mostly used to make HTML from some simple text-based syntax, but it
+can be used to convert anything.
+
+This Provider will let you use any syntax that there is a Formatter
+module for with minimum effort.
+
+If you want to output HTML, and not XML for further processing, you
+may configure AxKit to use the supplied transforms/xhtml2html.xsl
+XSLT, see inline POD for an example. You may need to apply a
+stylesheet even if you just want XML too, in that case, you may find
+transforms/do-nothing.xsl handy.
+
+INSTALLATION
+
+To install this module use the CPAN or CPANPLUS tools, or type the
+following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module only depends on AxKit, but you would need to have at least
+one of the modules in the Formatter:: namespace to use this Provider
+meaningfully. See CPAN for available Formatters. 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Kjetil Kjernsmo
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

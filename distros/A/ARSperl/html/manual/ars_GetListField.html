@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>ARSperl Manual - ars_GetListField</title>
+
+
+</head>
+
+<body style="background-color: rgb(255, 255, 255);">
+
+<h2><code>ars_GetListField(control,schema,changedsince=0,fieldType)</code></h2>
+
+Fetches the Field ID's for all fields in the schema specified. <code>changedsince</code>
+is an optional unix timestamp and defaults to 0.
+<ul>
+
+The <code>fieldType</code> parameter allows you to specify
+what field type(s) to retrieve. This is a bitmask.
+  <ul>
+
+    <li>Bit 0: Retrieve data fields (AR_FIELD_TYPE_DATA).
+    </li>
+
+    <li>Bit 1: Retrieve trim fields (AR_FIELD_TYPE_TRIM).
+    </li>
+
+    <li>Bit 2: Retrieve control fields (AR_FIELD_TYPE_CONTROL).
+    </li>
+
+    <li>Bit 3: Retrieve page fields (AR_FIELD_TYPE_PAGE).
+    </li>
+
+    <li>Bit 4: Retrieve page holder fields
+(AR_FIELD_TYPE_PAGE_HOLDER).
+    </li>
+
+    <li>Bit 5: Retrieve table fields (AR_FIELD_TYPE_TABLE).
+    </li>
+
+    <li>Bit 6: Retrieve column fields (AR_FIELD_TYPE_COLUMN).
+    </li>
+
+    <!-- <li>Bit 8: Retrieve vendor type fields
+(AR_FIELD_TYPE_VENDOR).
+    </li> -->
+
+    <li>Bit 7: Retrieve attachment type fields
+(AR_FIELD_TYPE_ATTACH).
+    </li>
+
+    <li>Bit 8: Retrieve attachement pool type fields
+(AR_FIELD_TYPE_ATTACH_POOL)
+    </li>
+
+  </ul>
+
+  <br>
+
+Ergo, fieldType = 6 will return trim and control fields.
+</ul>
+
+<dl>
+
+  <dt><b>On success</b></dt>
+
+  <dd> Returns an array of field ids. </dd>
+
+  <dt><b>On failure</b></dt>
+
+  <dd> Returns <code>undef</code>. </dd>
+
+</dl>
+
+<p>Example: </p>
+
+<pre> @fields = ars_GetListField($c, "User");<br> </pre>
+
+<p>
+<a href="toc.html"><img alt="&lt;--" src="arrow.gif" align="middle"> Back to Table of Contents</a></p>
+
+<p><a href="toc.html"> </a></p>
+<p></p>
+
+<address>Last changes to this page August 23 2007 by
+michiel.beijen@mansolutions.nl<br>
+
+&copy; J.C.Murphy, J.W.Murphy 1997 arsperl@arsperl.org
+</address>
+</body>
+</html>

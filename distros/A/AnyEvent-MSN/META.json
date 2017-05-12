@@ -1,0 +1,85 @@
+{
+   "abstract" : "Simple, Less Annoying Client for Microsoft's Windows Live Messenger Network",
+   "author" : [
+      "Sanko Robinson <sanko@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120630",
+   "keywords" : [
+      "MSN",
+      "client",
+      "MSNP21",
+      "IM",
+      "instant",
+      "message",
+      "Windows",
+      "Live",
+      "Messenger",
+      "WLM"
+   ],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-MSN",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "5.31",
+            "AnyEvent::HTTP" : "2.1",
+            "Crypt::CBC" : "2.30",
+            "Crypt::DES" : "2.05",
+            "Crypt::DES_EDE3" : "0.01",
+            "Digest::HMAC" : "1.02",
+            "Digest::MD5" : "2.51",
+            "Digest::SHA" : "5.61",
+            "MIME::Base64" : "3.13",
+            "Moose" : "2.0002",
+            "Try::Tiny" : "0.09",
+            "XML::Twig" : "3.38",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "provides" : {
+      "AnyEvent::MSN" : {
+         "file" : "lib/AnyEvent/MSN.pm",
+         "version" : "0.002"
+      },
+      "AnyEvent::MSN::Protocol" : {
+         "file" : "lib/AnyEvent/MSN/Protocol.pm",
+         "version" : "0.002"
+      },
+      "AnyEvent::MSN::Types" : {
+         "file" : "lib/AnyEvent/MSN/Types.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/sanko/anyevent-msn/issues"
+      },
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "http://github.com/sanko/anyevent-msn/"
+      },
+      "x_ChangeLog" : "http://github.com/sanko/anyevent-msn/commits"
+   },
+   "version" : "0.002"
+}

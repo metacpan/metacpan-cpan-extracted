@@ -1,0 +1,10 @@
+!<arch>
+foo.txt         1384344423  1000  1000  100644  9         `
+hi there
+
+bar.txt         1384344423  1000  1000  100644  31        `
+this is the content of bar.txt
+
+baz.txt         1384344423  1000  1000  100644  11        `
+and again.
+

@@ -1,0 +1,15 @@
+Build.PL
+Makefile.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README.txt
+IE7_0_9.zip
+bin/ie7-install
+inc/MY/Build.pm
+lib/Alien/IE7.pm
+t/01-loads.t
+t/02-install.t
+t/pod.t
+t/pod-coverage.t

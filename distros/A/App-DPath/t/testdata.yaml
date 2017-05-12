@@ -1,0 +1,363 @@
+--- 
+- !!perl/hash:TAP::DOM 
+  end_time: 1236463400.25468
+  exit: 0
+  has_problems: 2
+  is_good_plan: 0
+  lines: 
+    - 
+      as_string: TAP version 13
+      has_skip: 0
+      has_todo: 0
+      is_actual_ok: 0
+      is_bailout: 0
+      is_comment: 0
+      is_plan: 0
+      is_pragma: 0
+      is_test: 0
+      is_unknown: 0
+      is_version: 1
+      is_yaml: 0
+      raw: TAP version 13
+    - 
+      as_string: 1..6
+      has_skip: 0
+      has_todo: 0
+      is_actual_ok: 0
+      is_bailout: 0
+      is_comment: 0
+      is_plan: 1
+      is_pragma: 0
+      is_test: 0
+      is_unknown: 0
+      is_version: 0
+      is_yaml: 0
+      raw: 1..6
+    - 
+      _children: 
+        - 
+          as_string: "   ---\n     - name: 'Hash one'\n       value: 1\n     - name: 'Hash two'\n       value: 2\n   ..."
+          data: 
+            - 
+              name: Hash one
+              value: 1
+            - 
+              name: Hash two
+              value: 2
+          has_skip: 0
+          has_todo: 0
+          is_actual_ok: 0
+          is_bailout: 0
+          is_comment: 0
+          is_plan: 0
+          is_pragma: 0
+          is_test: 0
+          is_unknown: 0
+          is_version: 0
+          is_yaml: 1
+          raw: "   ---\n     - name: 'Hash one'\n       value: 1\n     - name: 'Hash two'\n       value: 2\n   ..."
+      as_string: ok 1 - use Data::DPath;
+      description: "- use Data::DPath;"
+      directive: ''
+      explanation: ''
+      has_skip: 0
+      has_todo: 0
+      is_actual_ok: 0
+      is_bailout: 0
+      is_comment: 0
+      is_ok: 1
+      is_plan: 0
+      is_pragma: 0
+      is_test: 1
+      is_unknown: 0
+      is_unplanned: 0
+      is_version: 0
+      is_yaml: 0
+      number: 1
+      raw: ok 1 - use Data::DPath;
+      type: test
+    - 
+      as_string: ok 2 - KEYs + PARENT
+      description: "- KEYs + PARENT"
+      directive: ''
+      explanation: ''
+      has_skip: 0
+      has_todo: 0
+      is_actual_ok: 0
+      is_bailout: 0
+      is_comment: 0
+      is_ok: 1
+      is_plan: 0
+      is_pragma: 0
+      is_test: 1
+      is_unknown: 0
+      is_unplanned: 0
+      is_version: 0
+      is_yaml: 0
+      number: 2
+      raw: ok 2 - KEYs + PARENT
+      type: test
+    - 
+      as_string: ok 3 - quoted KEY containg slash
+      description: "- quoted KEY containg slash"
+      directive: ''
+      explanation: ''
+      has_skip: 0
+      has_todo: 0
+      is_actual_ok: 0
+      is_bailout: 0
+      is_comment: 0
+      is_ok: 1
+      is_plan: 0
+      is_pragma: 0
+      is_test: 1
+      is_unknown: 0
+      is_unplanned: 0
+      is_version: 0
+      is_yaml: 0
+      number: 3
+      raw: ok 3 - quoted KEY containg slash
+      type: test
+    - 
+      as_string: pragma +strict
+      has_skip: 0
+      has_todo: 0
+      is_actual_ok: 0
+      is_bailout: 0
+      is_comment: 0
+      is_plan: 0
+      is_pragma: 1
+      is_test: 0
+      is_unknown: 0
+      is_version: 0
+      is_yaml: 0
+      raw: pragma +strict
+    - 
+      _children: 
+        - 
+          as_string: "#   Failed (TODO) test at t/data_dpath.t line 144."
+          has_skip: 0
+          has_todo: 0
+          is_actual_ok: 0
+          is_bailout: 0
+          is_comment: 1
+          is_plan: 0
+          is_pragma: 0
+          is_test: 0
+          is_unknown: 0
+          is_version: 0
+          is_yaml: 0
+          raw: "#   Failed (TODO) test at t/data_dpath.t line 144."
+        - 
+          as_string: "#     Structures begin differing at:"
+          has_skip: 0
+          has_todo: 0
+          is_actual_ok: 0
+          is_bailout: 0
+          is_comment: 1
+          is_plan: 0
+          is_pragma: 0
+          is_test: 0
+          is_unknown: 0
+          is_version: 0
+          is_yaml: 0
+          raw: "#     Structures begin differing at:"
+        - 
+          as_string: "#          $got->[0] = Does not exist"
+          has_skip: 0
+          has_todo: 0
+          is_actual_ok: 0
+          is_bailout: 0
+          is_comment: 1
+          is_plan: 0
+          is_pragma: 0
+          is_test: 0
+          is_unknown: 0
+          is_version: 0
+          is_yaml: 0
+          raw: "#          $got->[0] = Does not exist"
+        - 
+          as_string: "#     $expected->[0] = ARRAY(0x8e4c238)"
+          has_skip: 0
+          has_todo: 0
+          is_actual_ok: 0
+          is_bailout: 0
+          is_comment: 1
+          is_plan: 0
+          is_pragma: 0
+          is_test: 0
+          is_unknown: 0
+          is_version: 0
+          is_yaml: 0
+          raw: "#     $expected->[0] = ARRAY(0x8e4c238)"
+      as_string: "not ok 4 # TODO spec only"
+      description: ''
+      directive: TODO
+      explanation: spec only
+      has_skip: 0
+      has_todo: 1
+      is_actual_ok: 0
+      is_bailout: 0
+      is_comment: 0
+      is_ok: 1
+      is_plan: 0
+      is_pragma: 0
+      is_test: 1
+      is_unknown: 0
+      is_unplanned: 0
+      is_version: 0
+      is_yaml: 0
+      number: 4
+      raw: "not ok 4 # TODO spec only"
+      type: test
+    - 
+      as_string: "ok 5 - ANYWHERE + KEY + FILTER int # TODO spec only"
+      description: "- ANYWHERE + KEY + FILTER int"
+      directive: TODO
+      explanation: spec only
+      has_skip: 0
+      has_todo: 1
+      is_actual_ok: 1
+      is_bailout: 0
+      is_comment: 0
+      is_ok: 1
+      is_plan: 0
+      is_pragma: 0
+      is_test: 1
+      is_unknown: 0
+      is_unplanned: 0
+      is_version: 0
+      is_yaml: 0
+      number: 5
+      raw: "ok 5 - ANYWHERE + KEY + FILTER int # TODO spec only"
+      type: test
+    - 
+      as_string: "ok 6 # SKIP rethink twice"
+      description: ''
+      directive: SKIP
+      explanation: rethink twice
+      has_skip: 1
+      has_todo: 0
+      is_actual_ok: 0
+      is_bailout: 0
+      is_comment: 0
+      is_ok: 1
+      is_plan: 0
+      is_pragma: 0
+      is_test: 1
+      is_unknown: 0
+      is_unplanned: 0
+      is_version: 0
+      is_yaml: 0
+      number: 6
+      raw: "ok 6 # skip rethink twice"
+      type: test
+    - 
+      _children: 
+        - 
+          as_string: "#   Failed (TODO) test at t/data_dpath.t line 356."
+          has_skip: 0
+          has_todo: 0
+          is_actual_ok: 0
+          is_bailout: 0
+          is_comment: 1
+          is_plan: 0
+          is_pragma: 0
+          is_test: 0
+          is_unknown: 0
+          is_version: 0
+          is_yaml: 0
+          raw: "#   Failed (TODO) test at t/data_dpath.t line 356."
+        - 
+          as_string: "#     Structures begin differing at:"
+          has_skip: 0
+          has_todo: 0
+          is_actual_ok: 0
+          is_bailout: 0
+          is_comment: 1
+          is_plan: 0
+          is_pragma: 0
+          is_test: 0
+          is_unknown: 0
+          is_version: 0
+          is_yaml: 0
+          raw: "#     Structures begin differing at:"
+        - 
+          as_string: "#          $got->[0] = Does not exist"
+          has_skip: 0
+          has_todo: 0
+          is_actual_ok: 0
+          is_bailout: 0
+          is_comment: 1
+          is_plan: 0
+          is_pragma: 0
+          is_test: 0
+          is_unknown: 0
+          is_version: 0
+          is_yaml: 0
+          raw: "#          $got->[0] = Does not exist"
+        - 
+          as_string: "#     $expected->[0] = 'interesting value'"
+          has_skip: 0
+          has_todo: 0
+          is_actual_ok: 0
+          is_bailout: 0
+          is_comment: 1
+          is_plan: 0
+          is_pragma: 0
+          is_test: 0
+          is_unknown: 0
+          is_version: 0
+          is_yaml: 0
+          raw: "#     $expected->[0] = 'interesting value'"
+      as_string: "not ok 7 # TODO spec only"
+      description: ''
+      directive: TODO
+      explanation: spec only
+      has_skip: 0
+      has_todo: 1
+      is_actual_ok: 0
+      is_bailout: 0
+      is_comment: 0
+      is_ok: 0
+      is_plan: 0
+      is_pragma: 0
+      is_test: 1
+      is_unknown: 0
+      is_unplanned: 1
+      is_version: 0
+      is_yaml: 0
+      number: 7
+      raw: "not ok 7 # TODO spec only"
+      type: test
+    - 
+      as_string: "ok 8 - FILTER eval regex # TODO too dirty, first cleanup _filter_eval"
+      description: "- FILTER eval regex"
+      directive: TODO
+      explanation: too dirty, first cleanup _filter_eval
+      has_skip: 0
+      has_todo: 1
+      is_actual_ok: 1
+      is_bailout: 0
+      is_comment: 0
+      is_ok: 0
+      is_plan: 0
+      is_pragma: 0
+      is_test: 1
+      is_unknown: 0
+      is_unplanned: 1
+      is_version: 0
+      is_yaml: 0
+      number: 8
+      raw: "ok 8 - FILTER eval regex # TODO too dirty, first cleanup _filter_eval"
+      type: test
+  parse_errors: 
+    - Bad plan.  You planned 6 tests but ran 8.
+  plan: 1..6
+  pragmas: 
+    - strict
+  skip_all: ~
+  start_time: 1236463400.25151
+  tests_planned: 6
+  tests_run: 8
+  version: 13

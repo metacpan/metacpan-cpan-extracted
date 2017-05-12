@@ -1,0 +1,79 @@
+Listen     0.0.0.0:@Port@
+
+ServerRoot   "@ServerRoot@"
+DocumentRoot "@DocumentRoot@"
+
+PidFile     @t_pid_file@
+ErrorLog    @t_logs@/error_log
+LogLevel    debug
+
+<IfModule mod_log_config.c>
+    TransferLog @t_logs@/access_log
+</IfModule>
+
+<IfModule mod_cgid.c>
+    ScriptSock @t_logs@/cgisock
+</IfModule>
+
+ServerAdmin @ServerAdmin@
+
+#needed for http/1.1 testing
+KeepAlive       On
+
+HostnameLookups Off
+
+<Directory />
+    Options FollowSymLinks
+</Directory>
+
+<IfModule @THREAD_MODULE@>
+    LockFile             @t_logs@/accept.lock
+    StartServers         1
+    MinSpareThreads      @MinClients@
+    MaxSpareThreads      @MinClients@
+    ThreadsPerChild      @MinClients@
+    MaxClients           @MaxClientsThreadedMPM@
+    MaxRequestsPerChild  0
+</IfModule>
+
+<IfModule perchild.c>
+    LockFile             @t_logs@/accept.lock
+    NumServers           1
+    StartThreads         @MinClients@
+    MinSpareThreads      @MinClients@
+    MaxSpareThreads      @MinClients@
+    MaxThreadsPerChild   @MaxClients@
+    MaxRequestsPerChild  0
+</IfModule>
+
+<IfModule prefork.c>
+    LockFile             @t_logs@/accept.lock
+    StartServers         @MinClients@
+    MinSpareServers      @MinClients@
+    MaxSpareServers      @MinClients@
+    MaxClients           @MaxClients@
+    MaxRequestsPerChild  0
+</IfModule>
+
+<IfDefine APACHE1>
+    LockFile             @t_logs@/accept.lock
+    StartServers         @MinClients@
+    MinSpareServers      @MinClients@
+    MaxSpareServers      @MinClients@
+    MaxClients           @MaxClients@
+    MaxRequestsPerChild  0
+</IfDefine>
+
+<IfModule mpm_winnt.c>
+    ThreadsPerChild      50
+    MaxRequestsPerChild  0
+</IfModule>
+
+<Location /server-info>
+    SetHandler server-info
+</Location>
+
+<Location /server-status>
+    SetHandler server-status
+</Location>
+

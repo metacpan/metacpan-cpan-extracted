@@ -1,0 +1,52 @@
+ALPM 3.06
+
+INTRODUCTION
+
+This is a perl XS module which provides an interface to the libalpm C library.
+libalpm is used by Archlinux (and other distributions) who use pacman as the
+package managing program.
+
+Read-only access is provided to the database. All transaction creation logic
+was removed from this module. After each major pacman upgrade, and sub-
+sequent libalpm API change, I would be forced to rewrite a majority of this
+module. After the third or fourth time I decided it was not worth the effort
+for a feature possibly no one uses in an obscure perl module no one knows
+about.
+
+If you really need transactions why not call pacman with "system" or
+backticks? In contrast, complicated queries becomes ugly and convoluted
+when calling pacman in shell scripts. With the aid of this module, queries
+should instead be possible in the quintessential ugly and succinct perl form.
+Small utility scripts, like the examples, can also be quickly drawn up. This
+is the new goal of the module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the alpm C library that is included with pacman.
+libalpm 9.0.0 included with pacman version 4.2.0 was the latest version
+used to build and test this module.
+
+DOCUMENTATION
+
+The online documentation is bundled with this module in the form of POD
+files under the lib/ directory. To read a document right now you can run
+``perldoc lib/ALPM.pod''. These also display formatted in github and are
+published on cpan.org or metacpan.org.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Justin Davis
+Copyright (C) 2015 by Andrew Gregory <apg@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

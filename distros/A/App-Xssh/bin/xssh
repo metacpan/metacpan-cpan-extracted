@@ -1,0 +1,128 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use 5.6.0;
+
+use App::Xssh;
+
+my $main = App::Xssh->new();
+if ( !$main->run() ) {
+    exit 1;
+}
+
+__END__
+
+=head1 NAME
+
+xssh - A customisable X terminal emulator
+
+=head1 SYNOPSIS
+
+	xssh HOST
+	xssh --sethostopt HOST OPTION VALUE
+	xssh --setprofileopt PROFILE OPTION VALUE
+	xssh --showconfig
+	xssh --version
+
+=head1 DESCRIPTION
+
+This program will allow you to ssh to a remote host inside a new X Terminal
+window (like XTerm).  
+
+The idea here is that each time you ssh to a particular host, a terminal
+window will be launched with a consistent customised appearance.  For
+example, you may wish to configure 'prodserver' so the terminal window
+background is a redish colour - reminding you to tread very carefully...
+
+=head1 OPTIONS
+
+=over
+
+=item B<--sethostopt> HOST OPTION VALUE
+
+Set or update a host option and save it to the config file.
+
+A host option defines an attribute that will always apply when you refer
+to that host.
+
+It is also possoble to define a regular expression for the HOST.  The
+option you define will apply to all hosts that match the regular expression.
+
+=item B<--setprofileopt> PROFILE OPTION VALUE
+
+Set or update a profile option and save it to the config file.
+
+Hosts can be defined with a profile option, in which case all options
+defined for that profile will be applied to that host.
+
+=item B<--showconfig>
+
+Display the current configuration to STDOUT.
+
+=item B<--version>
+
+Display the current version string and exit.
+
+=back
+
+=head1 EXAMPLES
+
+First, you may like to define some defualts that will apply to all the
+remote servers you might log in to.
+
+	xssh --sethostopt DEFAULT scrollback 1024
+	xssh --sethostopt DEFAULT foreground blue
+	xssh --sethostopt DEFAULT background white
+
+Then you may like to override those defaults for some specific hosts.
+
+	xssh --sethostopt favourite foreground green
+	xssh --sethostopt favourite background black
+	xssh --sethostopt favourite geometry 128x70
+
+You may then get bored with setting all options for all hosts, so you
+might want to set up some "profile" options.
+
+	xssh --setprofileopt prod foreground black
+	xssh --setprofileopt prod background IndianRed
+
+You would then define which hosts take those profile options.
+
+	xssh --sethostopt important profile prod
+
+FINALLY, you can use xssh to log in to those servers
+
+	# Log in to the server "important" - you'll get a new xterm
+	# window with a redish background, black text, 1024 lines of
+	# scrollback
+	xssh important
+	
+	# Log in to the server "unknown" - you'll get a new xterm window
+	# with a white background, blue text, 1024 lines of scrollback
+	xssh unknown
+	
+	# Log in to the server "favourite" - you'll get a new xterm
+	# window with a black background, green text, 1024 lines of
+	# scrollback, and a larger terminal
+	xssh favourite
+
+=head1 FILES
+
+=over
+
+=item F<$HOME/.xsshrc>
+
+This file contains all the configuration for xssh.  It is in
+L<Config::General> format.
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010-2013 Evan Giles <egiles@capn.org>.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+=cut

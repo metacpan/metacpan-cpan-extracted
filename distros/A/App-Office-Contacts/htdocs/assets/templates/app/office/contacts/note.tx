@@ -1,0 +1,23 @@
+<form id="<: $context :>_note_form">
+
+<table align="center">
+	<tr>
+		<td align="center"><span class="blue_centered">Notes for <: $name :></span></td>
+	</tr>
+	<tr>
+		<td><span id="<: $context :>_note_list_div"><: $note_list :></span></td>
+	</tr>
+</table>
+
+<table align="center">
+	<tr>
+		<td colspan="2"><textarea id="<: $context :>_note" cols="100" rows="2"></textarea></td>
+	</tr>
+	<tr>
+		<td align="center"><span id="add_<: $context :>_note_button">Add</span></td>
+		<td align="center"><input id="reset_<: $context :>_note_button" type="reset" value="Reset"></td>
+	</tr>
+</table>
+
+</form>
+<a name="#<: $context :>">

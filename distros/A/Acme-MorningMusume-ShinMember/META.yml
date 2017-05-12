@@ -1,0 +1,22 @@
+---
+name: Acme-MorningMusume-ShinMember
+version: 0.01
+author:
+  - 'Jonathan Rockway <jrockway@cpan.org>'
+abstract: Create random Morning Musume!
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Acme::BloodType: 0
+  Acme::MorningMusume: 0
+build_requires:
+  Test::More: 0
+provides:
+  Acme::MorningMusume::ShinMember:
+    file: lib/Acme/MorningMusume/ShinMember.pm
+    version: 0.01
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

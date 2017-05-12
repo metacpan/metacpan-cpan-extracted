@@ -1,0 +1,172 @@
+#!/usr/bin/env perl
+#
+# $Id: check_version,v 7.1 2004/01/13 19:01:44 wpm Exp $
+#
+# (c) 2003-2004 Morgan Stanley and Co.
+# See ..../src/LICENSE for terms of distribution.
+#
+# OK, this hack fixes the $VERSION in all the modules, according the
+# cwd.
+#
+# To run this, from the top level source directory,
+# ./util/check_version
+#
+
+use Getopt::Long;
+use File::Basename;
+use Cwd;
+
+GetOptions( \%args, qw( update version=s ) ) || die;
+
+%skip = map { $_ => 1 }
+  qw(
+     .options/rcsMajor
+     .msbaseline
+     .exclude
+     MANIFEST
+     Changes.html
+     README.html
+    );
+
+my $cwd = cwd;
+
+my $newversion = $args{version};
+
+if ( not $newversion ) {
+    unless ( $cwd =~ m:perl5/AFS-Command/([^/]+)/: ) {
+	die "Unable to determine MSDE version\n";
+    }
+    $newversion = $1;
+}
+
+warn "New \$VERSION is $newversion\n";
+
+warn "Searching source tree for files...\n";
+
+open(FIND,"find . -type f -print |") ||
+  die "Unable to fork find: $!\n";
+
+while ( <FIND> ) {
+    chomp;
+    s|^\./||;
+    next if $skip{$_};
+    next if /~$/;
+    next unless /(\.pm(\.in)?|\.t)$/;
+    push(@file,$_);
+}
+
+close(FIND) ||
+  die "Error running find: $!\n";
+
+foreach my $file ( sort @file ) {
+
+    open(FILE,$file) || die "Unable to open $file: $!\n";
+    my $found = 0;
+    my $old = 0;
+    while ( <FILE> ) {
+	if ( $file =~ /\.pm(\.in)?$/ ) {
+	    next unless /\$VERSION\s+=\s+\'([\d\.]+)\'/;
+	    $version = $1;
+	} else {
+	    next unless /use\s+\S+\s+([\d\.]+)/;
+	    $version = $1;
+	}
+	$found = 1;
+	$old = 1 if $version ne $newversion;
+	last;
+    }
+    close(FILE);
+
+    if ( $file =~ /\.pm(\.in)?$/ ) {
+	push(@missing,$file) unless $found;
+    }
+
+    push(@old,$file) if $old;
+
+}
+
+unless ( @missing || @old ) {
+    warn "Everythings OK.... don't panic.\n";
+    exit 0;
+}
+
+if ( @missing ) {
+    warn("The following modules have no \$VERSION:\n\t" .
+	 join("\n\t",@missing) . "\n");
+}
+
+if ( ! $args{update} && @old ) {
+    warn("The following modules or test suites have an old \$VERSION:\n\t" .
+	 join("\n\t",@old) . "\n");
+}
+
+exit 0 unless $args{update};
+
+#
+# Update the $VERSION if asked to.
+#
+foreach my $old ( @old) {
+
+    warn "Updating \$VERSION to $newversion in $old\n";
+
+    #
+    # If the file is in RCS, we have to check it out/in.
+    #
+    my $rcs = rcs($old);
+
+    if ( $rcs ) {
+	system("co -l $old > /dev/null");
+	die "Unable to co -l $old\n" if $? >> 8;
+    }
+
+    open(NEW,">$old.new") || die "Unable to write to $old.new: $!\n";
+    open(OLD,$old) || die "Unable to read $old: $!\n";
+
+    while ( <OLD> ) {
+
+	if ( $old =~ /\.pm(\.in)?$/ ) {
+	    #
+	    # Fix the module version
+	    #
+	    if ( /\$VERSION\s+=\s+\'([\d\.]+)\'/ ) {
+		print NEW "our \$VERSION = '$newversion';\n";
+	    } else {
+		print NEW;
+	    }
+	} else {
+	    #
+	    # Fix the use statements for tests
+	    #
+	    if ( /use\s+\S+\s+([\d\.]+)/ ) {
+		$oldversion = $1;
+		s/$oldversion/$newversion/;
+	    }
+	    print NEW;
+	}
+
+    }
+
+    close(OLD) || die "Unable to close $old: $!\n";
+    close(NEW) || die "Unable to close $old.new: $!\n";
+
+    rename("$old.new",$old) || die "Unable to rename $old.new to $old: $!\n";
+
+    if ( $rcs ) {
+	system("echo 'Updated \$VERSION to $newversion' | ci -u $old > /dev/null");
+	die "Unable to ci -u $old\n" if $? >> 8;
+    }
+
+}
+
+exit 0;
+
+sub rcs {
+
+    my ($file) = @_;
+
+    my $dirname = dirname($file);
+    my $basename = basename($file);
+
+    return -f "$dirname/RCS/$basename,v" ? "$dirname/RCS/$basename,v" : "";
+
+}

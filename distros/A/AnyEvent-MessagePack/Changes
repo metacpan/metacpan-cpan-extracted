@@ -1,0 +1,9 @@
+Revision history for Perl extension AnyEvent::MessagePack
+
+0.20 2016-09-07T14:28:17Z
+
+    - Fix test for newer Data::MessagePack and Data::MessagePack::Stream
+
+0.19
+
+    - Split from AnyEvent::MPRPC's distribution.

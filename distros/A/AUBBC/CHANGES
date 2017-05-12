@@ -1,0 +1,262 @@
+Improvement history for AUBBC
+
+v4.06 - 04/12/2011
+
+Fixed - The hash for tag_security() needed the images and link renamed to a tag
+name being used. Changed the image name to img and the link to url. Read
+"Tag Security Levels" for more info.
+
+Fixed - security for links was in method make_link and was causing an access issue
+if used outside of the module. Made a new method to check link access now the
+make_link method could be used outside of the module without the security access
+in it, as intended.
+
+Changed - forgot to say in version 4.05 that I changed the aubbc_error so a new line
+will be added after each inserted error.
+
+v4.05 - 04/05/2011
+
+Addition - Assign security levels for links, images, built and code tags.
+New subroutine names: security_levels, user_level, tag_security, check_access
+
+Changed - The default value for $AUBBC::BAD_MESSAGE is now 'Unathorized'
+
+v4.04 - 02/05/2011
+
+Fixed - Bug with quote tag, needed to convert all its tags.
+
+v4.03 - 02/03/2011
+
+Addition - New Object method aubbc_error . Developers can now controle if or when
+to handle errors, see the POD 'Error Message' for usage.
+
+Fixed - All built-in tags only convert balanced tags so no unbalanced HTML can
+be produced
+
+Fixed - Bug in code_highlight a highlight regex needed to be changed after
+version 4.01 to support the Parser style.
+
+Improvement - Small restructure of add_build_tag and change the 'all' setting
+of 'pattern' to allow more.
+
+v4.02 - 11/28/2010
+
+Fixed - The element ID for the code download started at 1 for every instance this
+will force the browser to take priority to load the first ID it reads. The fix
+starts the counter at 'time.$$.000' to try to produce a more unique ID for each
+instance.
+
+Fixed - under the code tag in do_ubbc line " $do_f[8] = '' if $do_f[8]; "
+should have been $do_f[9] = '' if $do_f[9];
+
+v4.01 - 11/08/2010
+
+Fixed - Bug that converts the true text typed to the HTML code name.
+All parts of the module where effected by this bug, in the code tag if the
+author ment & #59 ; it would show ; . This also caused a long standing bug with
+typing any HTML code name and saving it to a backend.
+this fix removes the HTML code name regex in do_unicode and had to add/move two
+filters in "script_escape to conver the & to an amp and ; to #59;" and
+"html_to_text to conver amp to & and #59 to ;". This fix also helped in allowing
+the regex's for highlighting subroutines to be made.
+
+Fixed - had to add a null byte marker to escape_aubbc so the code tag's
+highlighter can detect the escaped character and change it back. In do_all_ubbc
+All markers get removed before the message is returned because FireFox can see
+the null bytes as an error.
+
+Addition - Perl subroutine highlighting for the code tag highlighter. Had a
+problem making this till this version because a HTML code name can look like
+&TheName; and a Perl subroutine looked the same till ; got converted.
+
+Addition - AUBBC::make_image($align,$src,$width,$height,$alt) this is useful enough
+to mention once.
+
+v4.00 - 11/02/2010
+
+Addition - New feature to the code tags aubbc_setting code_download.
+the default setting for code_download is '^Download above code^' this message will
+be the links name. the link will open a JavaScript pop-up window and write the
+code in it to be copied or printed to a printer. A new JavaScript function was
+added to the js_print method called MyCodePrint. JavaScript makes this feature
+portable and dynamic. the link for code_download is added after the code_extra
+setting so a disclaimer can be added before the code_download link
+
+Addition - $AUBBC::MEMOIZE This setting can turn AUBBC's usage of Memoize on or off.
+Default setting 1 will check if it needs to load Memoize, if loaded then load the sub's that need the speed.
+Setting 0 will not use Memoize.
+
+Addition - AUBBC::make_link($link,$name,$javascript,$target) this is useful enough
+to mention once.
+
+Improvement - After lots of testing I have removed all /o in the regex. One main
+reason is Memoize provides enough speed.
+
+v3.13 - 09/30/2010
+
+Addition - do_ubbc New built-in tag [list][*=1]... [*]... [/list], This will
+follow XHTML or HTML Transitional element style and XHTML or HTML Strict will not
+support the elements that tag [*=1] in the [list] will produce
+(use the other enumerated List Block tags for XHTML or HTML Strict).
+
+Addition - do_ubbc New built-in tag [em]Hello[/em]
+
+Addition - New value for setting line_break 2 for old <br style. This effects script_escape.
+
+Addition - This module now uses Memoize for a massive speed improvement.
+If you thought it was fast before, I hope your sitting down when you bench this version. LOL
+
+Addition - added setting highlight_function to replace the highlighting method
+of AUBBC with a costume one.
+
+Fixed - in do_ubbc the line breaks was invalidating HTML for List Block elements
+
+Improvement - in do_all_ubbc changed defining $msg each time. there could have
+been a bug in past versions if an undefined variable was used after a defined message was
+converted. was going to allow do_all_ubbc to pass the last message but decided
+other people may see that as a bug.
+
+Improvement - in do_all_ubbc moved if $do_flag[4] for no_bypass to a better spot
+
+Improvement - in do_all_ubbc moved if for for_links to a better spot
+
+Improvement - changed tags left,right and center to only convert balanced tags
+
+v3.00 - 09/14/2010
+
+Improvement - made it balls to the wall faster.
+
+v2.21 - 09/09/2010 16:32:34
+
+Fixed -  -withoutworldwriteables, bug with making an archive on windows to PAUSE.
+
+v2.20 - 09/08/2010 19:40:55
+
+Addition - in examples folder there is a bench.pl to test the speed and support
+of all the Perl BBcode modules. BBCode::Parser Parse::BBCode HTML::BBCode HTML::BBReverse
+
+Fixed - fixed a line break and new line sandbox bug
+
+Improvement - Massive speed improvement to the hole module and no features lost.
+changed new for faster loading, the module uses vars for some variables,
+re-spaced the hole code.
+
+v2.10 - 08/31/2010 11:17:13
+
+Addition - adding type 4 to add_build_tag this will use style 3 but will work
+different then the other built functions. Type 4 will print the text defined in
+function and not point to a defined Perl subroutine.
+
+Addition - added line_break setting to have control over the script_escape and
+html_to_text methods converting html line break <br> and new line \n
+
+Addition - added fix_amp this setting finds all the & that need to covert to the amp; html code name
+so the w3c xhtml validation checks ok.
+
+Addition - added no_img this setting will allow some control for using [img] tags
+for security reasons
+
+Fixed - bug in settings_prep when a setting gets changed html_type could change
+
+Fixed - Better support for XHTML 1.0 Strict for some tags having issues in do_ubbc
+
+Fixed - in do_ubbc the [url] tag produces a bug if a link is used as a name
+the fix converts the period and/or colon of the name so its not seen as a new
+link.
+
+Improvement - in do_unicode removed then changed the two regexs to do a 3 in 1 filter.
+
+Improvement - in html_to_text added a code to fix a <br> bug if ppl use html or xhtml line break.
+
+Improvement - moved the pattern building code from do_build_tag to add_build_tag
+so it only runs one time
+
+Improvement - in add_build_tag using a hash array to store the build tag data so
+there is no need to use split in do_build_tag
+
+Improvement - in do_all_ubbc moved script_escape to a location where one call
+to the function is needed
+
+Improvement - in do_all_ubbc added check for undefined "$message" variable
+
+Improvement - in script_escape added check for undefined "$text" variable
+
+Improvement - in html_to_text added check for undefined "$html" variable
+
+Improvement - in escape_aubbc converting the brackets one time with the html
+code name so the filter will only need to run one time in do_all_ubbc. This
+also fixes one bug in escape_aubbc
+
+Removed - In script_escape removed the \cM regex, it is very rare that anyone will need
+it so it wont be missed.
+
+
+v2.0 - 10/07/2008 13:52:11
+
+Fixed single tag [name] for build tags
+
+Changed the regex in plain URL's
+
+Removed bad patter setting and now using a more standard way to detect bad image tags
+
+Fixed dynamic view in XHTML for the protect email method.
+
+Added js_print method which will print out the javascript needed for the new protect email method
+
+Added values for the code highlighter so it can support CSS classes
+
+Added highlighting of variables and changed 2 quote regex to allow multi line quotes
+
+and a few other things that make this 2.0
+
+v1.30 - 09/08/2008 14:12:10
+
+Fixed the function check in add_build_tag(), when the 1.20 changes where made this check was neglected
+
+Edited add_build_tag() Error messages, hopefully they make more sense.
+
+Now add_build_tag() name allows - and _ in it.
+
+v1.20 - 09/07/2008 09:23:09
+
+Fixed bug that bypassed utf tag converter if square bracket wasn't detected
+
+Fixed Makefile.PL
+
+v1.10 - 09/02/2008 09:49:46
+
+Added two more tags [big]..[/big] and [small]..[/small].
+
+Removed utf tag style [ux23] and [u://0931] to make more tag names available.
+
+Changed add_build_tag() to use hash variable, see "Build your own tags" for the new style.
+
+Changed the way functions should work for built tags, the custom function for built tags will receive the tag name and data of the tag. This is so one function can handle many tags.
+
+Removed other site tags and setting other_sites_pattern, an example of them are in "Build your own tags"
+
+Removed [time] tag, example in "Build your own tags".
+
+Email now allows names with & sign
+
+Now every message that is passed to do_all_ubbc() gets escaped before being returned if script_escape is Enabled.
+
+All tags in %AUBBC_TAGS will only convert if lowercase.
+
+"new" now uses the most standard referenced object method.
+
+Removed DOS_prevent() method, since the script has been tested more and was causing a timing problem.
+
+Removed [cd]#code[/cd] code tag, which had no code_class or code_extra.
+
+Commented bad_pattern check for [email] tags, this security check is not needed because the next line will take care of all email tag security.
+
+Added missing $AUBBC{image_border}, $AUBBC{html_type} and $AUBBC{image_wrap} to the none icon image.
+
+Changed names of left and right align images to [left_img]..[/img] and [right_img]..[/img], also updated examples to show tags.
+
+Added missing $AUBBC{html_type} to quote, code tags and code_highlight function.
+
+v1.0 01/20/2008 08:46:08
+
+Released.

@@ -1,0 +1,54 @@
+<!-- common menu main links -->
+
+<table width="198" border="0" cellspacing="0" cellpadding="2" bgcolor="black">
+<tr><td valign="middle" align="center">
+<table width="194" border="0" cellspacing="0" cellpadding="3">
+
+% for (@{$menuitems}) {
+%   if (defined($_->{head})) { # it's a menu heading
+        <tr><td ID="menu-head"><% $_->{head} %></td></tr>
+%   }
+%   if (defined($_->{href})) { # it's a link
+<tr><td ID="menu-item">
+    <img src="/images/bullet.gif">
+    <a href="<% $_->{href} %>"><% $_->{text} %></a>
+</td></tr>
+%   }
+% }
+
+</table>
+</td></tr>
+</table>
+
+<!-- end of common menu main links -->
+
+<%init>
+## default menu items
+unless (defined($menuitems)) {
+	$menuitems = [
+		{head => 'Single Host Demos:'},
+		{text => 'adam (Cookie::BasicAuth)', 
+			href => 'http://adam.acme.com/protected'},
+		{text => 'lysander (Cookie::LoginForm)', 
+			href => 'http://lysander.acme.com/protected'},
+		{text => 'tom (Cookie::X509)', 
+			href => 'https://tom.acme.com/protected'},
+		{text => 'john (Cookie::X509PIN)', 
+			href => 'https://john.sec.acme.com/protected'},
+		{head => 'Multi-Host Demo:'},
+		{text => 'milt (Cookie::URL)',
+			href => 'https://milt.sec.acme.com/protected'},
+		{text => 'noam (Cookie::URL)', 
+			href => 'https://noam.acme.org/protected'},
+		{text => 'stu (X509PIN)', 
+			href => 'https://stu.transacme.com/protected'},
+		{head => 'Miscellaneous:'},
+		{text => 'Get Cert', href => 'http://adam.acme.com/acme-ca.crt'},
+		{text => 'Sign Out', href => '/signout'}
+	];
+}
+</%init>
+
+<%args>
+$menuitems => undef
+</%args>

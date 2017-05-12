@@ -1,0 +1,76 @@
+{
+   "abstract" : "Key URI generator for mobile multi factor authenticator app",
+   "author" : [
+      "ritou <ritou.06@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Authen-OATH-KeyURI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : "0.34",
+            "Convert::Base32" : "0.06",
+            "Params::Validate" : "1.13",
+            "URI" : "1.64",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Authen::OATH::KeyURI" : {
+         "file" : "lib/Authen/OATH/KeyURI.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ritou/p5-authen-oath-keyuri/issues"
+      },
+      "homepage" : "https://github.com/ritou/p5-authen-oath-keyuri",
+      "repository" : {
+         "url" : "git://github.com/ritou/p5-authen-oath-keyuri.git",
+         "web" : "https://github.com/ritou/p5-authen-oath-keyuri"
+      }
+   },
+   "version" : "0.02"
+}

@@ -1,0 +1,15 @@
+0.06	Sunday 9th March, 2004
+	Fix for rt.cpan.org #6259
+	Converted to Module::Build
+
+0.03  Tue Oct 31 16:22:56 2000
+	- change in spew behavior, prevents infinite loops in the case
+	  that a chainset is self-referential
+
+0.02  Mon Oct 09 17:54:00 2000
+	- test for existence of chains in spew to prevent looping
+
+
+0.01  Sat Sep 30 23:30:25 2000
+	- original version;
+

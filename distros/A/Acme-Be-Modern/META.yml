@@ -1,0 +1,27 @@
+---
+abstract: "enables your script to \"be modern\""
+author:
+  - 'SÃ¸ren Lund <slu@cpan.org>'
+build_requires:
+  Module::Loaded: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+  Software::License: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Be-Modern
+provides:
+  Acme::Be::Modern:
+    file: lib/Acme/Be/Modern.pm
+    version: 0.03
+requires:
+  Filter::Util::Call: 0
+  Modern::Perl: 0
+resources:
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+version: 0.03

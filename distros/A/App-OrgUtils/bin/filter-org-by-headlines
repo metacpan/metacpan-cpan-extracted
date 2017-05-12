@@ -1,0 +1,346 @@
+#!perl
+
+# Note: This script is a CLI  for Riap function /App/FilterOrgByHeadlines/filter_org_by_headlines
+# and generated automatically using Perinci::CmdLine::Gen version 0.39
+
+our $DATE = '2016-12-24'; # DATE
+our $DIST = 'App-OrgUtils'; # DIST
+our $VERSION = '0.45'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => "/App/FilterOrgByHeadlines/filter_org_by_headlines",
+    program_name => "filter-org-by-headlines",
+)->run;
+
+# ABSTRACT: Filter Org by headlines
+# PODNAME: filter-org-by-headlines
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+filter-org-by-headlines - Filter Org by headlines
+
+=head1 VERSION
+
+This document describes version 0.45 of filter-org-by-headlines (from Perl distribution App-OrgUtils), released on 2016-12-24.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % filter-org-by-headlines [options] <input>
+
+=head1 DESCRIPTION
+
+This routine uses simple regex instead of Org::Parser, for faster performance.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--input>=I<s>*
+
+Value is either a string or an array of strings.
+
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--ascendant-match>=I<s>
+
+Only include headline whose ascendant matches this.
+
+Value is either a string or a regex. If string is in the form of `/.../` or
+`/.../i` it is assumed to be a regex.
+
+
+=item B<--has-tag>=I<s@>
+
+Only include headline which have all these tags.
+
+Can be specified multiple times.
+
+=item B<--has-tags-json>=I<s>
+
+Only include headline which have all these tags (JSON-encoded).
+
+See C<--has-tag>.
+
+=item B<--is-done>
+
+Only include headline which is a done todo item.
+
+=item B<--is-todo>
+
+Only include headline which is a todo item.
+
+=item B<--lacks-tag>=I<s@>
+
+Only include headline which lack all these tags.
+
+Can be specified multiple times.
+
+=item B<--lacks-tags-json>=I<s>
+
+Only include headline which lack all these tags (JSON-encoded).
+
+See C<--lacks-tag>.
+
+=item B<--level>=I<i>
+
+=item B<--match>=I<s>
+
+Only include headline which matches this.
+
+Value is either a string or a regex. If string is in the form of `/.../` or
+`/.../i` it is assumed to be a regex.
+
+
+=item B<--max-level>=I<i>
+
+=item B<--min-level>=I<i>
+
+=item B<--parent-match>=I<s>
+
+Only include headline whose parent matches this.
+
+Value is either a string or a regex. If string is in the form of `/.../` or
+`/.../i` it is assumed to be a regex.
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Result options
+
+=over
+
+=item B<--return-array>
+
+Return array of strings instead of strings.
+
+=item B<--without-content>
+
+Don't include headline content, just print the headlines.
+
+=item B<--without-preamble>
+
+Don't include text before any headline.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C filter-org-by-headlines filter-org-by-headlines
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete filter-org-by-headlines 'p/*/`filter-org-by-headlines`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/filter-org-by-headlines.conf>, F<~/filter-org-by-headlines.conf>, or F</etc/filter-org-by-headlines.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ ascendant_match (see --ascendant-match)
+ format (see --format)
+ has_tags (see --has-tag)
+ input (see --input)
+ is_done (see --is-done)
+ is_todo (see --is-todo)
+ lacks_tags (see --lacks-tag)
+ level (see --level)
+ match (see --match)
+ max_level (see --max-level)
+ min_level (see --min-level)
+ naked_res (see --naked-res)
+ parent_match (see --parent-match)
+ return_array (see --return-array)
+ with_content (see --without-content)
+ with_preamble (see --without-preamble)
+
+=head1 ENVIRONMENT
+
+=head2 FILTER_ORG_BY_HEADLINES_OPT => str
+
+Specify additional command-line options
+
+=head1 FILES
+
+~/.config/filter-org-by-headlines.conf
+
+~/filter-org-by-headlines.conf
+
+/etc/filter-org-by-headlines.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-OrgUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-App-OrgUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-OrgUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

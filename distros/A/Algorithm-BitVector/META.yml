@@ -1,0 +1,26 @@
+---
+abstract: 'A Perl module for constructing memory efficient packed representations of bit vectors from different data types, and for logical and arithmetic operations on such vectors'
+author:
+  - 'Avinash Kak (kak@purdue.edu)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-BitVector
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Fcntl: '0'
+  List::Util: '1.33'
+  Math::BigInt: '0'
+  Math::Random: '0'
+version: '1.25'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

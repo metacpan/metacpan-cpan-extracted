@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>U2F Demo</title>
+   <script src='/u2f-api.js'></script>
+</head>
+<body>
+  <p id='message'>waiting for device... </p>
+  <script>
+    var req = [% u2f.sign_request %];
+    console.log(req);
+    u2f.sign(location.origin, req.challenge, req.registeredKeys, function (r) {
+      console.log(r);
+      if (r.errorCode) {
+        document.getElementById('message').innerText += " error "+r.errorCode;
+      }
+      else {
+        document.getElementById('message').innerText += "got it!";
+        console.log(r);
+        window.location = "/finish_u2f?keyHandle="+encodeURIComponent(r.keyHandle)+"&clientData="+encodeURIComponent(r.clientData)+"&signatureData="+encodeURIComponent(r.signatureData);
+      }
+    });
+  </script>
+</body>
+</html>
+

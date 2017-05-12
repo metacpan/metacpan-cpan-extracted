@@ -1,0 +1,41 @@
+Revision history for Perl extension ArangoDB
+
+0.08    Fri Oct 26 01:50:00 2012
+        - Improve performance
+        - Change API(document,edge,get_index move to ArangoDB.pm)
+
+0.07    Mon Oct 22 03:20:00 2012
+        - Optimize JSON encoding
+
+0.06    Sun Oct 21 20:05:00 2012
+        - Change default timeout value
+
+0.05    Sat Oct 20 02:30:00 2012
+        - Add document revision check option
+        - Improved documents
+
+0.04    Thu Oct 18 02:00:00 2012
+        - Add inet_aton option
+        - Fixed deps
+
+0.03    Wed Oct 17 02:35:00 2012
+        - Switch HTTP client Furl to Furl::HTTP
+
+0.02    Tue Oct 16 21:05:00 2012
+        - Fixed document bug
+
+0.01    Tue Oct 16 02:00:00 2012
+		- Switch to Module::Build
+        - Optimized: JSON handling
+        - Changed: ArangoDB server start method
+        - Add all() method to the ArangoDB::Cursor
+
+0.01_03 Sun Oct 14 19:31:00 2012
+        - Change API(Document/Edge/Index)
+        - Improved documents
+
+0.01_02 Fri Oct 12 02:47:00 2012
+        - dev release version
+
+0.01_01 Tue Jul  3 22:33:37 2012
+        - original version

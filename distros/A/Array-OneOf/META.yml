@@ -1,0 +1,14 @@
+---
+abstract: 'Array::OneOf -- checks if an element is in an array'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: Array-OneOf
+provides:
+    Array::OneOf:
+        file: lib/Array/OneOf.pm
+        version: 1.04
+requires:
+    perl: 5.003
+version: 1.04

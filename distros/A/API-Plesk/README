@@ -1,0 +1,106 @@
+NAME
+    API::Plesk - OO interface to the Plesk XML API
+    (http://www.parallels.com/en/products/plesk/).
+
+SYNOPSIS
+        use API::Plesk;
+
+        my $api = API::Plesk->new(
+            username    => 'user', # required
+            password    => 'pass', # required
+            url         => 'https://127.0.0.1:8443/enterprise/control/agent.php', # required
+            api_version => '1.6.3.1',
+            debug       => 0,
+            timeout     => 30,
+        );
+
+        my $res = $api->customer->get();
+
+        if ($res->is_success) {
+            for ( @{$res->data} ) {
+                print "login: $_->{login}\n";
+            }
+        }
+        else {
+            print $res->error;
+        }
+
+DESCRIPTION
+    At present the module provides interaction with Plesk 10.1 (API
+    1.6.3.1). Distribution was completely rewritten and become more friendly
+    for developers. Naming of packages and methods become similar to the
+    same operators and operations of Plesk XML API.
+
+    Partially implemented:
+
+    API::Plesk::Customer
+
+    API::Plesk::Database
+
+    API::Plesk::DNS
+
+    API:Plesk::FTPUser
+
+    API:Plesk::Mail
+
+    API::Plesk::ServicePlan
+
+    API::Plesk::ServicePlanAddon
+
+    API::Plesk::Site
+
+    API::Plesk::SiteAlias
+
+    API::Plesk::SiteBuilder
+
+    API::Plesk::Webspace
+
+    API::Plesk::WebUser
+
+COMPATIBILITY WITH VERSION 1.*
+    This is develover release. Comapatibility with Plesk::API 1.* is not
+    implemented yet.
+
+METHODS
+    new(%params)
+       Create new class instance.
+
+       Required params: username password url
+
+       Additional params: api_version - default 1.6.3.1 debug - default 0
+       timeout - default 30 sec.
+
+    send($operator, $operation, $data, %params)
+       This method prepare and sends request to Plesk API.
+
+       Returns API::Plesk::Response object.
+
+       $operator - name of operator XML section of Plesk API.
+
+       $operation - mane of operation XML section of Plesk API.
+
+       $data - data hash that is converted to XML and is sended to plesk
+       server.
+
+    xml_http_req( $xml )
+       Internal method. it implements real request sending to Plesk API.
+
+       Returns array ( $response_xml, $error ).
+
+SEE ALSO
+    Plesk XML RPC API http://www.parallels.com/en/products/plesk/docs/
+
+AUTHOR
+    Odintsov Pavel <nrg[at]cpan.org>
+
+    Nikolay Shulyakovskiy <shulyakovskiy[at]rambler.ru>
+
+    Ivan Sokolov <ivsokolov[at]cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008 by Ivan Sokolov
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

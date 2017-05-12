@@ -1,0 +1,63 @@
+<%doc>
+=pod
+
+=head1 NAME
+
+edit_field_checkbox
+
+=head1 SYNOPSIS
+
+  <& edit_field_checkbox, column => $column, row => $row &>
+
+=head1 DESCRIPTION
+
+Given a column and an optional row, this component produces a checkbox
+form element for that column.  The value of this column when checked
+is 1.
+
+If a row is given, then its value will determine whether or not the
+checkbox is checked.  Otherwise the column's default value will be
+used.
+
+=head1 PARAMETERS
+
+=over 4
+
+
+=item * column (required)
+
+An C<Alzabo::Column> object.
+
+=item * row (optional)
+
+An Alzabo row object.
+
+=item * class (optional)
+
+This defaults to C<<
+$m->base_comp->attr_if_exists('checkbox_class_default') >>.
+
+=back
+
+=cut
+</%doc>
+<input type="checkbox" name="<% $col_name %>" value="1" <% $true ? 'checked="checked"' : '' %> class="<% $class %>">\
+<%args>
+$column
+$row => undef
+$class => $m->base_comp->attr_if_exists('checkbox_class_default')
+</%args>
+<%init>
+my $true;
+
+my $col_name = ref $column ? $column->name : $column;
+
+if (defined $row)
+{
+    $true = $row->select( $col_name );
+}
+else
+{
+    $true = $column->default;
+}
+</%init>

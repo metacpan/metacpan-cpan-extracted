@@ -1,0 +1,21 @@
+---
+abstract: 'The Zen of Perl'
+author:
+  - 'Miquel Ruiz <mruiz@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Test::Output: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-this
+resources:
+  bugtracker: https://github.com/miquelruiz/Acme-this/issues
+  homepage: http://metacpan.org/release/Acme-this/
+  repository: git://github.com/miquelruiz/Acme-this.git
+version: '0.02'

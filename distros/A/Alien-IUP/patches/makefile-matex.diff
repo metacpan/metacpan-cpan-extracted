@@ -1,0 +1,12 @@
+diff -ru iup iup
+--- iup.orig/Makefile	2014-11-13 19:54:23.000000000 +0100
++++ iup/Makefile	2015-02-04 17:07:38.715201000 +0100
+@@ -11,6 +11,8 @@
+ 	@$(MAKE) --no-print-directory -C ./srccd/
+ iupcontrols:
+ 	@$(MAKE) --no-print-directory -C ./srccontrols/
++iupmatrixex:
++	@$(MAKE) --no-print-directory -C ./srcmatrixex/
+ iup_plot:
+ 	@$(MAKE) --no-print-directory -C ./srcplot/
+ iup_pplot:

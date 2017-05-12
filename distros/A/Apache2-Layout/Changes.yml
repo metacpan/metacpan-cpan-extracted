@@ -1,0 +1,43 @@
+---
+global:
+  name: Apache2::Layout
+releases:
+  - author: 'Philippe M. Chiasson <gozer@ectoplasm.org>'
+    changes:
+      - Fix a bug that could cause output mangling when stacked with other filters
+    date: 2008-01-04T01:19:15Z
+    tags: []
+    version: 0.06
+  - author: 'Philippe M. Chiasson <gozer@ectoplasm.org>'
+    changes:
+      - 'Allocate new buckets from the new brigade, otherwise, things can go leaky'
+    date: 2008-01-02T23:59:48Z
+    tags: []
+    version: 0.05
+  - author: 'Philippe M. Chiasson <gozer@ectoplasm.org>'
+    changes:
+      - Removing a bucket before reading it was a bug.
+    date: 2008-01-02T23:04:47Z
+    tags: []
+    version: 0.04
+  - author: 'Philippe M. Chiasson <gozer@ectoplasm.org>'
+    changes:
+      - 'When running sub-requests, make sure to pass them throught the entire initial filter chain'
+      - Skip filtering for sub-requests
+    date: 2008-01-01T19:01:33Z
+    tags: []
+    version: 0.03
+  - author: 'Philippe M. Chiasson <gozer@ectoplasm.org>'
+    changes:
+      - Relayout directory structure
+      - Switch Changes to Module::Changes
+      - Correct a brigade memory leak
+    date: 2007-12-27T21:13:07Z
+    tags: []
+    version: 0.02
+  - author: 'Philippe M. Chiasson <gozer@ectoplasm.org>'
+    changes:
+      - Initial release
+    date: 2007-12-27T06:09:05Z
+    tags: []
+    version: 0.01

@@ -1,0 +1,123 @@
+NAME
+
+    Algorithm::SlopeOne - Slope One collaborative filtering for rated
+    resources
+
+VERSION
+
+    version 0.004
+
+SYNOPSIS
+
+        #!/usr/bin/env perl
+        use common::sense;
+        use Algorithm::SlopeOne;
+        use Data::Printer;
+    
+        my $s = Algorithm::SlopeOne->new;
+        $s->add([
+            {
+                squid       => 1.0,
+                cuttlefish  => 0.5,
+                octopus     => 0.2,
+            }, {
+                squid       => 1.0,
+                octopus     => 0.5,
+                nautilus    => 0.2,
+            }, {
+                squid       => 0.2,
+                octopus     => 1.0,
+                cuttlefish  => 0.4,
+                nautilus    => 0.4,
+            }, {
+                cuttlefish  => 0.9,
+                octopus     => 0.4,
+                nautilus    => 0.5,
+            },
+        ]);
+        p $s->predict({ squid => 0.4 });
+    
+        # Output:
+        # \ {
+        #     cuttlefish   0.25,
+        #     nautilus     0.1,
+        #     octopus      0.233333333333333
+        # }
+
+DESCRIPTION
+
+    Perl implementation of the Weighted Slope One rating-based
+    collaborative filtering scheme.
+
+ATTRIBUTES
+
+ diffs
+
+    Differential ratings matrix.
+
+ freqs
+
+    Ratings count matrix.
+
+METHODS
+
+ clear
+
+    Reset the instance.
+
+ add($userprefs)
+
+    Update matrices with user preference data, accepts a HashRef or an
+    ArrayRef of HashRefs:
+
+        $s->predict({ StarWars => 5, LOTR => 5, StarTrek => 3, Prometheus => 1 });
+        $s->predict({ StarWars => 3, StarTrek => 5, Prometheus => 4 });
+        $s->predict([
+            { IronMan => 4, Avengers => 5, XMen => 3 },
+            { XMen => 5, DarkKnight => 5, SpiderMan => 3 },
+        ]);
+
+ predict($userprefs)
+
+    Recommend new items given known item ratings.
+
+        $s->predict({ StarWars => 5, LOTR => 5, Prometheus => 1 });
+
+TODO
+
+    Implement Non-Weighted and Bi-Polar Slope One schemes.
+
+REFERENCES
+
+      * Slope One <https://en.wikipedia.org/wiki/Slope_One> - Wikipedia
+      article
+
+      * Slope One Predictors for Online Rating-Based Collaborative
+      Filtering <http://lemire.me/fr/abstracts/SDM2005.html> - original
+      paper
+
+      * Collaborative filtering made easy
+      <http://www.serpentine.com/blog/2006/12/12/collaborative-filtering-ma
+      de-easy/> - Python implementation by Bryan O'Sullivan (primary
+      reference, test code)
+
+      * github.com/ashleyw/Slope-One <https://github.com/ashleyw/Slope-One>
+      - Ruby port of the above by Ashley Williams (used to borrow test
+      code)
+
+      * Programming Collective Intelligence book
+      <http://shop.oreilly.com/product/9780596529321.do> by Toby Segaran
+
+      * Data Sets by GroupLens Research <http://www.grouplens.org/node/12>
+
+AUTHOR
+
+    Stanislaw Pusep <stas@sysd.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Stanislaw Pusep.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

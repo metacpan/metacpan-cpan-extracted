@@ -1,0 +1,49 @@
+NAME
+    AnyEvent::MSN - Exactly what you're expecting...
+
+Synopsis
+        use AnyEvent::MSN;
+        my $msn = AnyEvent::MSN->new(
+            passport => 'you@hotmail.com',
+            password => 'sekrit',
+            on_im => sub { # Simiple echo bot
+                my ($msn, $head, $body) = @_;
+                $msn->im($head->{From}, $body)
+            }
+        );
+        AnyEvent->condvar->recv;
+
+Description
+    TODO
+
+See Also
+    Net::MSN
+    MSN::PersonalMessage
+    POE::Component::Client::MSN
+    Net::Msmgr::Session
+
+Author
+    Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/
+
+    CPAN ID: SANKO
+
+License and Legal
+    Copyright (C) 2011 by Sanko Robinson <sanko@cpan.org>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of The Artistic License 2.0
+    <http://www.perlfoundation.org/artistic_license_2_0>. See the LICENSE
+    file included with this distribution or notes on the Artistic License
+    2.0 <http://www.perlfoundation.org/artistic_2_0_notes> for
+    clarification.
+
+    When separated from the distribution, all original POD documentation is
+    covered by the Creative Commons Attribution-Share Alike 3.0 License
+    <http://creativecommons.org/licenses/by-sa/3.0/us/legalcode>. See the
+    clarification of the CCA-SA3.0
+    <http://creativecommons.org/licenses/by-sa/3.0/us/>.
+
+    Some protocol descriptions taken from text Copyright 2011, Microsoft.
+
+    Neither this module nor the Author is affiliated with Microsoft.
+

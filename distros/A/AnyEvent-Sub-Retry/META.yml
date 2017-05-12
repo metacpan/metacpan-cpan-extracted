@@ -1,0 +1,42 @@
+---
+abstract: 'retry $n times in AnyEvent'
+author:
+  - 'maedama <maedama85@gmail.com>'
+build_requires:
+  Test::LeakTrace: 0.14
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.5, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-Sub-Retry
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  AnyEvent::Sub::Retry:
+    file: lib/AnyEvent/Sub/Retry.pm
+    version: 0.04
+requires:
+  AnyEvent: 7.04
+  Exporter: 5.66
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/maedama/p5-AnyEvent-Sub-Retry/issues
+  homepage: https://github.com/maedama/p5-AnyEvent-Sub-Retry
+  repository: git://github.com/maedama/p5-AnyEvent-Sub-Retry.git
+version: 0.04
+x_contributors:
+  - 'maeda-shuntaro <maeda.shuntaro@dena.jp>'

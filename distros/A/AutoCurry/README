@@ -1,0 +1,161 @@
+NAME
+    AutoCurry - automatically create currying variants of functions
+
+SYNOPSIS
+        use AutoCurry qw( foo );  # pass :all to curry all functions
+
+        sub foo { print "@_\n"; }
+        # currying variant, foo_c, is created automatically
+
+        my $hello = foo_c("Hello, ");
+        $hello->("world!");       # Hello, world!
+        $hello->("Pittsburgh!");  # Hello, Pittsburgh!
+
+DESCRIPTION
+    This module automatically creates currying variants of functions. For
+    each function "foo", a currying variant "foo_c" will be created that (1)
+    captures whatever arguments are passed to it and (2) returns a new
+    function. The new function awaits any new arguments that are passed to
+    *it*, and then calls the original "foo", giving it both the captured and
+    new arguments.
+
+    If "foo" is a function and "foo_c" is its currying variant, then the
+    following are equivalent for all argument lists @a and @b:
+
+        foo(@a, @b);
+        foo_c(@a, @b)->();
+        foo_c()->(@a, @b);
+        foo_c(@a)->(@b);
+        do { my $foo1 = foo_c(@a); $foo1->(@b) };
+
+  use AutoCurry *names*
+    You can create currying variants at "use" time by listing the functions
+    to be curried:
+
+        use AutoCurry qw( foo bar );
+
+    Or, if you want to curry everything in the current package:
+
+        use AutoCurry ':all';
+
+  curry_named_functions(*names*)
+    You can also create variants at run time:
+
+        my @created_variants =
+        AutoCurry::curry_named_functions(qw( foo bar My::Package::baz ));
+
+    The fully-qualified names of the created functions are returned:
+
+        print "@created_variants";
+        # main::foo_c main::bar_c My::Package::baz
+
+    If you are writing a module, this list of names is handy for augmenting
+    your export lists.
+
+  curry_package(*package*)
+        AutoCurry::curry_package("My::Package"); # autocurries My::Package
+        AutoCurry::curry_package();              # autocurries calling pkg
+
+    Creates currying variants for all of the subroutines within the given
+    package or, if no package is given, the current package from which
+    "curry_package" was called.
+
+    Returns a list of the functions created.
+
+  Using another suffix
+    Do not change the suffix unless you truly must.
+
+    If for some reason you cannot use the standard "_c" suffix, you can
+    override it by changing $AutoCurry::suffix *for the duration of your
+    calls to AutoCurry*. Use "do" and "local" to limit the scope of your
+    changes:
+
+        use AutoCurry;  # suffix changing is not compatible with ':all'
+
+        my @curried_fns = do {
+            local $AutoCurry::suffix = "_curry";
+            AutoCurry::curry_package();
+        };
+        # result: ( "main::foo_curry" )
+
+        sub foo { ... };
+        # foo_curry will be created by call to C<curry_package>, above
+
+MOTIVATION
+    Currying reduces the cost of reusing functions by allowing you to
+    "specialize" them by pre-binding values to a subset of their arguments.
+    Using it, you can convert any function into a family of related,
+    specialized functions.
+
+    Currying in Perl is somewhat awkward. My motivation for writing this
+    module was to minimize that awkwardness and approximate the "free"
+    currying that modern functional programming languages such as Haskell
+    offer.
+
+    As an example, let's say we have a general-purpose logging function:
+
+        sub log_to_file {
+            my ($fh, $heading, $message) = @_;
+            print $fh "$heading: $message\n";
+        }
+
+    We can use it like so:
+
+        log_to_file( *STDERR, "warning", "hull breach imminent!" );
+
+    If we are logging a bunch of warnings to STDERR, we can save some work
+    by creating a temporary, specialized version of the function that is
+    tailored for our warnings:
+
+        my $log_warning = sub {
+            log_to_file( *STDERR, "warning", @_ );
+        };
+
+        $log_warning->("cap'n, she's breakin' up!");
+
+    The "log_warning" function is easier to use, but having to create it is
+    a pain. We are effectively currying by hand. For this reason, many
+    people use a helper function to curry for them:
+
+        $log_warning = curry( \&log_to_file, *STDERR, "warning" );
+
+    An improvement, but still far from free.
+
+    This module does away with the manual labor altogether by creating
+    currying variants of your functions automatically. These variants have
+    names ending in a "_c" suffix and *automatically curry* the original
+    functions for the arguments you give them:
+
+        use AutoCurry ':all';
+        $log_warning = log_to_file_c( *STDERR, "warning" );
+
+        $log_warning->("she's gonna blow!");
+
+    The total cost of currying is reduced to appending a "_c" suffix, which
+    is probably as low as it's going to get on this side of Perl 6.
+
+A NOTE FOR MODULE AUTHORS
+    The handling of "use AutoCurry ':all'" relies upon an "INIT" block,
+    which may cause problems in environments such as mod_perl or if you are
+    creating functions dynamically. Therefore, I recommend that module
+    authors call "AutoCurry::curry_package" instead:
+
+        package My::Amazing::Thing;
+
+        use AutoCurry;   # but don't say ':all'
+
+        sub blargh { .... }
+        # more stuff here
+        # maybe generate a few functions dynamically
+
+        AutoCurry::curry_package();
+
+AUTHOR
+    Tom Moertel (tom@moertel.com)
+
+COPYRIGHT and LICENSE
+    Copyright (c) 2004-05 by Thomas G Moertel. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,59 @@
+# ----------------------------------------------------------------------------------------------------------
+# © Copyright 2003-2011 by Alex Peeters [alex.peeters@citap.be]
+# ----------------------------------------------------------------------------------------------------------
+# Asnmtap.cnf for package ASNMTAP::Asnmtap v3.002.003
+# ----------------------------------------------------------------------------------------------------------
+
+# SET ENVIRONMENT VARIABLES - - - - - - - - - - - - - - - - - - - - - - -
+#<ENV>
+#    PATH				/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin
+#    BASH_ENV
+#    ENV
+#</ENV>
+
+#<SET>
+#    PERL5LIB			/opt/asnmtap/cpan-shared/lib/perl5
+#    MANPATH			/opt/asnmtap/cpan-shared/share/man
+#    LD_LIBRARY_PATH	/opt/asnmtap/ssl/lib
+#</SET>
+
+# Common variables  - - - - - - - - - - - - - - - - - - - - - - - - - - -
+<COMMON>
+    APPLICATION     Application Monitoring
+    BUSINESS        CITAP
+    DEPARTMENT      Development
+    COPYRIGHT       2003-2011
+    SENDEMAILTO     alex.peeters@citap.be
+  # TYPEMONITORING  central                      # central or distributed
+  # RUNCMDONDEMAND  localhost                    # localhost or probe
+</COMMON>
+
+#<COMMAND>
+#    CHAT            /usr/sbin/chat
+#    DIFF            /usr/bin/diff
+#    KILLALL         /usr/bin/killall
+#    PERL            /usr/bin/perl
+#    PPPD            /usr/sbin/pppd
+#    ROUTE           /sbin/route
+#    RSYNC           /usr/bin/rsync
+#    SCP             /usr/bin/scp
+#    SSH             /usr/bin/ssh
+#</COMMAND>
+
+#<IO>
+#    CAPTUREOUTPUT	1
+#</IO>
+
+# -----------------------------------------------------------------------
+# DON'T TOUCH BELOW HERE UNLESS YOU KNOW WHAT YOU ARE DOING!
+# -----------------------------------------------------------------------
+
+#<SUBDIR>
+#    APPLICATIONS    applications
+#    PLUGINS         plugins
+#    LOG             log
+#    PID             pid
+#    RUN             run
+#</SUBDIR>
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

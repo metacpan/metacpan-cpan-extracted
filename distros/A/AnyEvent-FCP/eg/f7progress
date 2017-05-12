@@ -1,0 +1,76 @@
+#!/opt/bin/perl
+
+# displays, via curses, progress messages by downloaded file
+
+use common::sense;
+use POSIX ();
+use Curses;
+use AnyEvent;
+use AnyEvent::FCP;
+
+my $cnt = 20;
+my $log = 15;
+
+initscr;
+curs_set 0;
+
+addstr 0, 0, "waiting for progress messages...";
+refresh;
+
+my %ID;
+my $updater;
+my @log;
+
+sub updater {
+   undef $updater;
+
+   erase;
+
+   my @id = sort { $b->[1] <=> $a->[1] } values %ID;
+
+   delete $ID{(pop @id)->[0]}
+      while @id > $cnt;
+
+   my $y = 0;
+   for (@id) {
+      addstr $y++, 0, sprintf "%s %5d", $_->[2], AE::now - $_->[1];
+   }
+
+   $y++;
+
+   shift @log
+      while @log > $log;
+
+   addstr $y++, 0, $_
+      for @log;
+
+   refresh;
+}
+
+my $w = AE::timer 10, 10, \&updater;
+
+my $fcp = new AnyEvent::FCP progress => sub {
+   my ($fcp, $type, $kv, $rdata) = @_;
+
+   delete $kv->{pkt_type};
+   (my $id = delete $kv->{identifier}) =~ s/^FProxy://;
+
+   if ($type eq "simple_progress") {
+      my $progress = sprintf "%5d / %5d, %3d%%", $kv->{succeeded}, $kv->{required}, 100 * $kv->{succeeded} / $kv->{required};
+      $progress = $kv->{finalized_total} eq "true" ? " $progress " : "($progress)";
+      my $progress = sprintf "%-60.60s %s", $id, $progress;
+      $ID{$id} = [$id, AE::now, $progress];
+      
+      $updater ||= AE::idle \&updater;
+   } elsif ($type !~ /^(?:sending_to_network|persistent_get|persistent_request_modified)$/) {
+      my $line = sprintf "%s %-25.25s %-40.40s %-80.80s",
+                         (POSIX::strftime "%H:%M:%S", localtime AE::now),
+                         $type, $id, join " ", %$kv;
+      push @log, $line;
+      $updater ||= AE::idle \&updater;
+   }
+};
+
+$fcp->watch_global (1, 0);
+
+AE::cv->recv;

@@ -1,0 +1,5 @@
+* Wed Oct 30 2002 Eric Anderson <eric.anderson@cordata.net>
+- Changed the defination of the constructor to allow being called
+  as a static or virtual method.
+* Wed Oct 30 2002 Eric Anderson <eric.anderson@cordata.net>
+- Packaged Constructor module for distribution to CPAN

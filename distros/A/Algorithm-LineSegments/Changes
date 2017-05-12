@@ -1,0 +1,15 @@
+Revision history for Perl extension Algorithm::LineSegments.
+
+0.04  March 2013
+  - https://rt.cpan.org/Ticket/Display.html?id=94055 should be
+    fixed using Test::Deeply now.
+
+0.03  March 2013
+  - Floating point number serialisation apparently differs among
+    platforms, making a test fail; attempt to address that.
+
+0.02  March 2014
+  - Removed accidental debug print
+
+0.01  March 2014
+  - Initial release

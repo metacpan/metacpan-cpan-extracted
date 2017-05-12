@@ -1,0 +1,104 @@
+Revision history for Perl extension AnyEvent::Twitter::Stream
+
+0.28  2016-07-29 18:02:28 PDT
+        - Make it work on perl 5.24
+
+0.27  2014-04-18 14:08:51 JST
+        - Fixed Chunked handling for long JSON strings (dexterbt1)
+
+0.26  2013-06-10 14:52:56 PDT
+        - Fix dependencies
+
+0.25  2013-05-20 18:02:46 PDT
+        - Encode URI parameters with UTF-8 (Yapo, Songmu)
+
+0.24  2013-05-13 16:26:48 PDT
+        - Make it non-trial
+        - Convert to Milla
+
+0.23  Sat Mar  9 23:33:48 PST 2013
+        - Added on_direct_message support (semifor)
+        - Fixed compression (perigrin)
+        - Support 1.1 API and Site Streams (semifor)
+
+0.22  Tue Oct  4 23:52:17 PDT 2011
+        - Streaming is now SSL only
+
+0.21  Tue May 17 09:54:03 PDT 2011
+        - Same as 0.20_1
+
+0.20_1 Wed Apr 13 17:14:25 PDT 2011
+        - Workaround with AE::HTTP 2.0 that forces HTTP/1.1 which makes the Twitter response
+          transfered in chunked encoding (hidekiy)
+
+0.20  Fri Oct  1 01:10:51 PDT 2010
+        - UserStreams is now live. Updated the host name and protocol to use HTTPS (norm)
+
+0.19  Fri Sep 17 14:44:01 PDT 2010
+        - Fixed on_connect callback so it only gets fired in the real connection, not
+          pseudo callback for 4xx/5xx responses
+
+0.18  Fri Sep 17 14:26:06 PDT 2010
+        - Added on_connect callback
+
+0.17  Mon Sep 13 16:56:59 PDT 2010
+        - Remove artificial on_eof callback when $client gets undef (hachi, miyagawa)
+
+0.16  Fri Aug 20 16:58:14 PDT 2010
+        - Support UserStreams (franck)
+        - SSL support (franck)
+
+0.15  Wed Aug 18 00:48:16 PDT 2010
+        - Updated tests to use Twiggy rather than P::S::AE (hidekiy)
+
+0.14  Mon Aug 16 15:08:41 PDT 2010
+        - Added OAuth support (franck)
+        - Added on_delete event (franck)
+
+0.13  Thu Apr  1 14:00:35 PDT 2010
+        - Fixed an error when HTTP connection is disconnected
+          http://rt.cpan.org/Public/Bug/Display.html?id=55798
+
+0.12  Tue Mar 23 12:55:01 PDT 2010
+        - Support new 'locations' parameter for 'filter' method (requested by M. Edward (Ed) Borasky)
+        - Support multiple post parameters for 'filter'.
+          ... I thought this has been there for a while but it wasn't.
+        - Support partner-only endpoints: links and retweet        
+
+0.11  Mon Mar  1 17:12:37 PST 2010
+        - Added 'no_decode_json' option that passes the undecoded raw JSON to the callback
+
+0.10  Sat Feb  6 17:55:28 PST 2010
+        - Fixed a possible memory leak (hidekiy)
+
+0.09  Mon Dec  7 16:45:06 PST 2009
+        - Added on_keepalive and timeout options (Marc Mims)
+
+0.08  Thu Sep 17 19:27:29 JST 2009
+        - Added on_error to the handle (thanks to typester)
+
+0.07  Mon Aug 31 04:06:18 PDT 2009
+        - Fixed POD code to match with 0.05 API
+
+0.06  Thu Aug 27 10:08:07 PDT 2009
+        - filter track/follow params should be POST not GET (megamic)
+
+0.05  Wed Aug 26 16:31:52 PDT 2009
+        - Unbreak the refcount stuff introduced in 0.03
+        - BACKWARD INCOMPATIBLE: method names should now be either 'firehose', 'sample' or 'filter'
+          per Twitter API update.
+          http://groups.google.com/group/twitter-development-talk/browse_frm/thread/44bd32155dbf2c16
+
+0.04  Wed Aug 26 01:59:30 PDT 2009
+        - test_requires Test::TCP
+
+0.03  Tue Aug 25 19:08:29 PDT 2009
+        - Fixed a bug where undef $client doesn't really disconnect
+          (Thanks to Daisuke Murase)
+
+0.02  Sat Jul 18 18:20:18 PDT 2009
+        - Ignore newline when kee-alive empty line is coming when no tweets are there
+          (Thanks to Masayoshi Sekimura)
+
+0.01  Mon Jul 13 13:46:08 2009
+        - original version

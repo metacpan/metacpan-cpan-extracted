@@ -1,0 +1,31 @@
+<div class="floatleft">
+<table>
+<tr>
+	<th>First Name</th>
+	<td>[% s.html_input('first_name',s.in.first_name) %]</td>
+</tr>
+<tr>
+	<th>Last Name</th>
+	<td>[% s.html_input('last_name',s.in.last_name) %]</td>
+</tr>
+<tr>
+	<th>Company</th>
+	<td>[% s.html_input('company',s.in.company) %]</td>
+</tr>
+<tr>
+	<th>Address</th>
+	<td>
+		[% s.html_input('address',s.in.address) %]<br>
+		[% s.html_input('address2',s.in.address2) %]
+	</td>
+</tr>
+<tr>
+	<th>City</th>
+	<td>[% s.html_input('city',s.in.city) %]</td>
+</tr>
+<tr>
+	<th>Zipcode</th>
+	<td>[% s.html_input('zipcode',s.in.zipcode,9) %]</td>
+</tr>
+</table>
+</div>

@@ -1,0 +1,22 @@
+---
+name: Authen-Simple-Twitter
+version: 0.01
+author:
+  - 'Dan Moore <dan@moore.cx>'
+abstract: Simple authentication using Twitter or Identi.ca
+license: perl
+resources:
+  license: ~
+requires:
+  Authen::Simple::Adapter: 0
+  Net::Twitter: 0
+build_requires:
+  Test::More: 0
+provides:
+  Authen::Simple::Twitter:
+    file: lib/Authen/Simple/Twitter.pm
+    version: 0.01
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

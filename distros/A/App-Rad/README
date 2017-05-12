@@ -1,0 +1,43 @@
+App-Rad
+
+This is the general README file for installing the App-Rad module. 
+Please refer to the main POD for usage documentation.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::Rad
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Rad
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-Rad
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-Rad
+
+    Search CPAN
+        http://search.cpan.org/dist/App-Rad
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Breno G. de Oliveira
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

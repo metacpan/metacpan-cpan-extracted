@@ -1,0 +1,9 @@
+# $Id: MANIFEST,v 1.1 2001/01/02 23:10:47 cgilmore Exp $
+
+ChangeLog			History of this package
+INSTALL				Instructions for installing this package
+MANIFEST			This file
+Makefile.PL			Makefile generator
+ProxyRewrite.pm			The URL-rewriting proxy module
+README				Get you started with this package
+SUPPORT				Links to support for this package

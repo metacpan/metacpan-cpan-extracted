@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_compile.t
+t/01_validate.t
+lib/Acme/Web20/Validator.pm
+lib/Acme/Web20/Validator/Rule.pm
+lib/Acme/Web20/Validator/Rule/UsePrototype.pm
+lib/Acme/Web20/Validator/Rule/UseCatalyst.pm
+lib/Acme/Web20/Validator/Rule/UseRails.pm
+lib/Acme/Web20/Validator/Rule/MentionsWeb20.pm
+lib/Acme/Web20/Validator/Rule/UseLighttpd.pm
+lib/Acme/Web20/Validator/Rule/HasAnyFeeds.pm
+lib/Acme/Web20/Validator/Rule/ReferToDelicious.pm
+lib/Acme/Web20/Validator/Rule/XHtmlStrict.pm
+lib/Acme/Web20/Validator/Rule/UseCSS.pm
+lib/Acme/Web20/Validator/Rule/UseFeedBurner.pm
+lib/Acme/Web20/Validator/Rule/HasTrackbackURI.pm
+META.yml                                 Module meta-data (added by MakeMaker)

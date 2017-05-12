@@ -1,0 +1,45 @@
+Algorithm::TravelingSalesman::BitonicTour
+
+This module implements the "Bitonic Tour" solution to the Traveling Salesman
+problem.  The module was inspired by problem 15-1 of the book "Introduction to
+Algorithms", 2nd ed., T. H. Cormen, C. E. Leiserson, R.  Rivest, and C. Stein,
+MIT Press, 2001.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Algorithm::TravelingSalesman::BitonicTour
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Algorithm-TravelingSalesman-BitonicTour
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Algorithm-TravelingSalesman-BitonicTour
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Algorithm-TravelingSalesman-BitonicTour
+
+    Search CPAN
+        http://search.cpan.org/dist/Algorithm-TravelingSalesman-BitonicTour
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 John Trammell
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

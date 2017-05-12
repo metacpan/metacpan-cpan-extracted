@@ -1,0 +1,290 @@
+Revision history for Perl extension Algorithm::Networksort.
+
+2.01
+	Wed Apr 20 2016
+	- Add nwsrt_title() to the list of default exported functions
+	  in Networksort.pm for consistency with ::Best.pm and for the
+	  programs that call it.
+	- Explain this in documentation.
+	- Also for consistency, =item items are now enclosed in
+	  single quotes in both modules.
+	- Grey background in SVG at begining lightened up.
+
+2.00
+	Tue Apr 12 2016
+	- The module now returns the sorting network as an object.
+	  This is obviously a major change; please see the documentation
+	  for reassuring examples.  The OO basis is Moose, plus
+	  Moose::Exporter for a couple of convenience functions. The
+	  function-heavy Version 1.30  will remain on CPAN for at
+	  least another year in the mean time.
+	- The collection of 'best' networks has been greatly added to,
+	  thanks to the efforts of Morwenn. These networks now reside
+	  in their own child module, Algorithm::Networksort::Best.
+	  It could be argued that the module should be named
+	  Algorithm::Networksort::Optimal, but 'optimal' has seven
+	  letters and 'best' has four, so 'best' wins.
+	- Doug Hoyte provided code for an astonishing three more
+	  algorithms: odd-even merge, odd-even transposition, and balanced.
+	- The example scripts in eg/ have been updated and in some
+	  cases improved.
+	- Found untested cases (formats in particular) and added them
+	  to the tests.
+	- SVG output is massively improved. The graphing example is now
+	  HTML5 instead of XML, beginning circles now cover their line
+	  instead of vice versa, background color is now supported, and
+	  the ids of graph elements now have a random component in them
+	  so as not to confuse the parser if more than one graph is on
+	  the page (this is one that bit me).
+1.31
+	Sat Mar 22 2012
+	- Good grief, I mis-spelled nw_comparators() in the
+	  documentation.
+	- And I left out abecedarian.t in the MANIFEST.
+1.30
+	Tue Nov 20 2012
+	- Updated the references in the POD documentation.
+	- Time to upload to CPAN.
+	Mon Nov 19 2012
+	- Update the version number everywhere.
+	- Update documentation to make sure 'bitonic' is mentioned.
+	- Got svg.t to work correctly in systems that don't have
+	  Test::XML::Easy installed.
+	- Heavily update README to cover testing, and Doug Hoyte's
+	  contributions.
+	Sun Nov 18 2012
+	- Consolidated the "algorithm" test files into one file,
+	  abecedarian.t. Now that we're using $ENV{AUTHOR_TESTING},
+	  we can consolidate test files without worrying about
+	  tests timing out on CPAN testers' machines.
+	- Simplified code in the "best" test files.
+	Sat Nov 17 2012
+	- Upgrage tests to use the is() function from Test::More.
+	Fri Nov 16 2012
+	- Fixed the code in Build.PL that would set $ENV{AUTHOR_TESTING}.
+	  All tests, even the lengthy ones, are now run when using
+	     "Build test --Testlong".
+	Tue Nov 13 2012
+	- Long-running tests now check for $ENV{AUTHOR_TESTING} = 1,
+	  and skip if it doesn't.
+	Tue Nov 6 2012
+	- Worked on bitonic() code. Use existing pack/unpack code to
+	  determine power-of-two value, this replaces the
+	  greater_power_of_2_less_than() function.
+	- Made loop a little more perlish by using the '..' operator.
+	- Added 'bitonic' to the keyword list.
+	- Added a get_options parameter in Build.PL. Looking towards
+	  an option to automatically skip long-running tests in
+	  non-development situations.
+	Tue Oct 30 2012
+	- Fall-back algorithm for 'best' option is now Batcher's Merge
+	  Exchange algorithm instead of Bose-Nelson.
+	- Checks for $inputs < 2 in the algorithm functions are pointless
+	  since the calling, exported function already checks for it.
+	- "use integer" means that int($n/2) may be written more simply
+	  as $n/2.
+	Sat Oct 27 2012
+	- Added two new 'best' networks for input sizes 18 and 22,
+	  discovered by Sherenaz Waleed Al-Haj Baddar and submited
+	  by Doug Hoyte.
+	- Added the bitonic() code and test file as provided by Doug Hoyte.
+	Thu Oct 25 2012
+	- New function nw_sort_stats() to return information about
+	  sorting network exchange counts (based on Doug Hoyte's
+	  idea) and other future ideas.
+1.24
+	Sun Oct 14 2012
+	- Emergency change to svg.t -- I'm doing something wrong in
+	  the tests, so for now they are skip()ped.
+1.23
+	Thu Oct 11 2012
+	- Doug Hoyte requested the addition of the sorting network
+	  equivalent of the bubble sort, for demonstration purposes
+	  only, and sent a patch to implement it and a test file to
+	  add to the t/ directory. Free code is hard to turn down,
+	  even if it is for bubble sort.
+	Tue Oct  2 2012
+	- Added a new test, svg.t. It is modeled on pod.t, and uses
+	  Test::XML::Easy. If I had had it as part of the tests
+	  before, I wouldn't have let the badly merged code in the
+	  earlier versions get released.
+1.22
+	Sun Sep 30 2012
+	- Something odd happened to the SVG code post version 1.08,
+	  leading to unparsable output (could be the result of the
+	  hardware failure, could be merge error on my part).
+	  Took the SVG graph code from version 1.08, and re-applied
+	  the changes to the graph code between then and version 1.21.
+	  The graphs come out correctly now.
+	Fri Sep 28 2012
+	- Took horizontal and vertical coord code out of nw_eps_graph()
+	  and nw_svg_graph(), and made them into their own functions.
+	- I really had an odd style for initializing variables from @_
+	  back in 2003. Made it less odd.
+	- Small inefficiency with the column count in nw_text_graph() fixed.
+1.21
+	Sun Sep 24 2012
+	- Added color debugging code in eg/svg.pl (it lists the
+	  color settings in XML comments).
+	- Updated eg/text.pl to take command line options.
+	- Moved graph and text option handling to their own functions,
+	  graph_segment() and text_segment(), for future non-messy coding.
+	Fri Sep 22 2012
+	- Removed prototypes.
+	- Found and removed some left-over marker code in the SVG output.
+	- Moved SVG graph color code to its own function, svg_color().
+	Mon Sep 10 2012
+	- Modernized parts of the code -- $VERSION is now an 'our'
+	  variable instead of a 'use VARS' variable, for example.
+	- Added 'create_license => 1' to the Build.PL list of attributes.
+	- Added 'dynamic_config => 0' to the Build.PL list of attributes.
+	- Added LICENSE to the MANIFEST file.
+	- Yanked an "$flag_internal" variable (and its debugging code)
+	  in favor of Smart::Comments.
+	- Bumped the $VERSION value up a point.
+1.20
+	Sun May 20 2012
+	- Really bad bug introduced in version 1.08 (text graph
+	  options were checked for in the wrong hash) has been squashed.
+1.10
+	Wed Mar 28 2012
+	- Finally organized changes (I had a hardware failure), and updated
+	  the MANIFEST file to include the new JSON formatted META files.
+	  Ready for release to CPAN.
+	Tue Jan 31 2012
+	- Perl version requirement changed to 5.8.3 (from 5.6.0). Support
+	  for 5.6.0 in various perl development tools is being dropped,
+	  and 5.8.3 seems to be a safe minimum, at least for the current
+	  year. Change made in Build.PL and Networksort.pm.
+	- Changed "repository" key in Build.PL from a hash to a string,
+	  as seems to be currently required under the version of
+	  Module::Build that I'm developing with (the hash form looks
+	  to be for a later version that I cannot install yet).
+	Tue Jan 11 2011
+	- Found an error in the SYNOPSIS portion of the POD. Function
+	  nw_format() had an incorrect argument.
+	Thu Sep 23 2010
+	- Experimented by adding a 'keywords' hash to Build.PL. We'll see if I
+	  did it correctly.
+	Wed Sep 15 2010
+	- Update the references. Joe Celko's article in dbazine.com is gone
+	  (dbazine.com seems to be under new ownership), but he used the
+	  same material in the third edition of his book, so I refer to
+	  that now.  Dr. Batcher's web site at Kent State has changed slightly,
+	  making a change in the links necessary.
+1.09	Sat May 22 2010
+	- Error in POD snuck in. While I was fixing this, added some more
+	  documentation on group options.
+	- Added another choice for "grouping" in nw_comparators().
+1.08    Mon May 17 2010
+	- Added an option to nw_comparators() as a result of a communication by
+	  Daniel Stutzbach. Up until now, nw_comparators simply returned the
+	  comparator in the order that the algorithms created them. Daniel
+	  Stutzbach pointed out that these were often not in the best order and
+	  would cause a super-scalar pipeline to stall. He also pointed out that
+	  just reading the list of comparators grouped for graphing removes that
+	  problem (the function that arranges them for graphing, nw_group(), does
+	  in fact "parallelize" the comparators so that they'll look nice on the
+	  graph). So there's now an option to re-group the list. It's not the
+	  default because the default behavior has been there since the beginning
+	  of the module.
+	  See the documentation for nw_comparator() for more information.
+	- Undid use of mark attributes for SVG graphing. Too many inconsistencies
+	  between different SVG viewers for me to be sure that I'm doing the right
+	  thing.
+	- While undoing that change, simplified the code that generates the
+	  group/color attributes.  I decided that individually assigning the
+	  color attribute to each element was probably a less error-prone mechanism.
+	- Updated svg.pl and eps.pl in the eg directory to make use of the
+	  color options.
+	- Fixed the nw_group() example. It was using the default 'bosenelson'
+	  algorithm, but the output was from the 'batcher' algorithm. Oops.
+	- Added grouping.pl to the eg directory.
+	Wed Feb 10 2010
+	- Changed <svg> tag adding xmlns and viewBox attributes.
+	* Change input and comparator lines to use mark attributes instead
+	  of separate geometric circles.
+	- Added nw_algorithms() and nw_algorithm_name() functions, and documented
+	  them.
+	- Updated the SVG output example and demo program in the eg directory.
+1.07	Tue Feb 13 2007
+	- Bowed to convention and reversed the order of the Change entries.
+	- SVG-aware browsers are better at parsing, which means that my
+	  output needs to be improved.  Internet Explorer 7 and Firefox
+	  now parse without errors.  I am not certain that the namespace
+	  option works well enough.
+	- Changed the example that used the SVG output, which was based on
+	  an older version of the Adobe SVG plugin, and which is not current.
+	- In the interests of code clarity, made use of q and qq operators
+	  instead of quotes and escaped quotes.
+	- Split the test files even further.
+	- SVG colors!
+	- Embedded the [from, to] pairs in an xml comment before each svg
+	  command to draw comparators. Debugging aid.
+	- Put a group tag around the SVG commands for the input line.
+1.06	Sun Jan 16 2005
+	- Made some code changes to allow running this module under
+	  perl 5.005.
+	- Added to the SEE ALSO section a link to Joe Celko's
+	  article in dbazine.com.  Bose-Nelson in SQL!
+	- Updated the link to Ian Parberry's article.
+	Mon Mar 21 2005
+	- Removed a redundant check for an empty network in nw_format()
+	  in the default format section.
+	Tue May 23 2006
+	- Changed arrangement of files to default layout by Module::Build.
+	- Added the Meta.yml and Build.PL files.
+	- Changed test files to use Test::Simple.
+	Fri Jun 2 2006
+	- Added pod.t.
+	- Typo fix in pod (itme instead of item).  Fixed stale links.
+	- It looks like the Forbes D. Lewis article, "Sorting Networks"
+	  has vanished altogether.  Removed it from the See Also section.
+	Wed Jul 26 2006
+	- Split the batcher.t, best.t, bn.t, and hibbard.t files into
+	  two.  I'm trying to  cut down the time-to-finish length, which
+	  some test environments don't handle well ("Is this test done
+	  yet?  I'm bored.")
+	Wed Sep 13 2006
+	- Added color components, although no actual colors are set yet
+	  except for 'foreground'.
+	- Changed the text graph option names 'fromcomp' and 'tocomp'
+	  to 'compbegin' and 'compend' to make them consistant with the
+	  input line names 'inputbegin' and 'inputend'.  These names
+	  get adopted by the color option hash.
+	Fri Sep 15 2006
+	- SVG output now has colors.
+1.05   Thu Jan 22 2004
+	- Missing namespace in ending </g> tag for inputline definition.
+	- For some reason, I took the input value for hibbard() and
+	  batcher() to be the bit count, and restricted it to 32.  I
+	  claim tiredness and caffeine overload.  The restriction is
+	  removed, and you could have an input of 2**32 if you want,
+	  although you'd be waiting a long time for a result.
+	- Fixed L<> tags in the documentation.
+	- In the eg directory, renamed svg.pl to svg00.pl, and added
+	  svg01.pl for the XHTML version.
+1.04   Sun Dec 14 2003
+	- Added 'namespace' to the svg graphing options.  Added
+	  it to the svg.pl script in the eg subdirectory.
+1.03   Sat Dec 13 2003
+	- Added 'title' to the eps and svg graphing options.
+1.02  Tue Dec 9 2003
+	- Little document formating errors bother me.
+	- Another stupid error.  Function nw_text_graph(), used
+	  by nw_graph(), was printing directly, not returning a
+	  string.  It's an old function, that's how it originally
+	  was designed.
+	- Added the graphing options (hz_margin, indent, etc.)
+	  to nw_graph().
+	- Merged in the nw_group_parallel() function (moved from
+	  parallel.pl in the eg subdirectory) into nw_group(),
+	  fairly painlessly as it turned out.
+1.01  Sat Oct 25 2003
+	- Stupid error in my test scripts prevented them from
+	  reading the zero_one.pl file.  Fixed.
+1.00  Fri Oct 17 2003
+	- Released.
+0.01  Fri Jan 24 23:55:59 2003
+	- original version; created by h2xs 1.21 with options
+		-X -nAlgorithm::Networksort

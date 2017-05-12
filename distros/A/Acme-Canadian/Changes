@@ -1,0 +1,12 @@
+Revision history for Acme-Canadian
+
+0.03    2006-06-28 1343
+        got new test in to manifest
+        fixed test
+
+0.02    2006-06-28 0920
+        use Filter::Simple, added tests
+
+0.01    2006-06-28 0130
+        First version of Canadianization
+

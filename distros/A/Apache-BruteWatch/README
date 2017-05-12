@@ -1,0 +1,71 @@
+NAME
+    Apache::BruteWatch - Watch the Apache logs and notify of bruteforce
+    password attacks
+
+VERSION
+     $Revision: 1.2 $
+
+SYNOPSIS
+    Place the following in your "httpd.conf"
+
+        PerlLogHandler Apache::BruteWatch
+
+        PerlSetVar BruteDatabase     DBI:mysql:brutelog
+        PerlSetVar BruteDataUser     username
+        PerlSetVar BruteDataPassword password
+
+        PerlSetVar BruteMaxTries     10
+        PerlSetVar BruteMaxTime      30
+        PerlSetVar BruteNotify       rbowen@example.com
+        PerlSetVar BruteForgive      300
+
+DESCRIPTION
+    "mod_perl" log handler for warning you when someone is attempting a
+    brute-force password attack on your web site.
+
+Variables
+    The following variables can be set in your Apache configuration file:
+
+  BruteDatabase
+    The DBI database name, such as "DBI:mysql:brutelog"
+
+  BruteDataUser
+    The database username
+
+  BruteDataPassword
+    The database password
+
+  BruteMaxTries and BruteMaxTime
+    Allow this many failed attempts in this much time. After that,
+    notification will be sent. Time is in seconds.
+
+  BruteNotify
+    Email address to which notifications will be sent
+
+  BruteForgive
+    Failed login attempts will be cleaned up after they are this old. Units
+    are seconds.
+
+Database
+     CREATE TABLE bruteattempt (
+      ID int(11) NOT NULL auto_increment,
+      ts int(11) default NULL,
+      username varchar(255) default NULL,
+      PRIMARY KEY  (ID)
+     ) TYPE=MyISAM;
+
+     CREATE TABLE brutenotified (
+      ID int(11) NOT NULL auto_increment,
+      username varchar(255) default NULL,
+      ts int(11) default NULL,
+      PRIMARY KEY  (ID)
+     ) TYPE=MyISAM;
+
+AUTHOR
+            Rich Bowen
+            rbowen@rcbowen.com
+            http://www.cre8tivegroup.com
+ 
+DATE
+            $Date: 2003/08/04 23:31:53 $
+

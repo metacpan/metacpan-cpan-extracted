@@ -1,0 +1,31 @@
+2008-05-13  Arno Rehn  <arno@arnorehn.de>
+
+	* Merged the modular smoke branch with trunk.
+
+2004-06-27  Richard Dale  <Richard_Dale@tipitina.demon.co.uk>
+
+	* The qtruby and korundum ruby bindings are built by default
+	* Both Qt only and Qt/KDE versions of the Smoke library are built
+
+2002-11-05 Marcus Urban <murban@mylinuxisp.com>
+	* Match changes made in KDE's RGBColor class in kdec, kdejava
+	* Various changes in qtc and qtjava to match changes in Qt 3.1
+
+2002-04-12  Richard Dale <duke@tipitina.demon.co.uk>
+
+	* qtobjc is now built before kdeobjc
+
+2002-04-12  Richard Dale <duke@tipitina.demon.co.uk>
+	* added some extra Objective-C macro initialisation
+	* kdec is now built by default
+2001-11-16  Richard Dale <duke@tipitina.demon.co.uk
+	* added kalyptus - kdoc derived bindings generator for 
+          C/Objective-C/Java. Initial checkin.
+2001-11-15  Richard Dale <duke@tipitina.demon.co.uk
+	* added Qt 3 beta6/KDE 3 alpha1/GNUstep Foundation Kit 
+          Objective-C bindings
+2001-10-22  Richard Dale <duke@tipitina.demon.co.uk
+	* added Qt 3 beta6/KDE 3 alpha1 C bindings
+2000-11-06  Simon Hausmann  <simon@kde.org>
+	* added dcop c bindings
+

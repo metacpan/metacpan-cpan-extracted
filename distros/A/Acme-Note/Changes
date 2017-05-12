@@ -1,0 +1,39 @@
+Revision history for Perl extension Acme::Note.
+
+    $Id: /local/cpan/acme/Acme-Note/trunk/Changes 2450 2008-06-08T17:29:28.928652Z ferreira  $
+
+0.8  Mon Jan  4 2016
+        - no code change
+        - modernize Makefile.PL
+
+0.7  Sun Jun  8 2008, 14:19 -0300
+        - no code change
+        - more CPANTS whoreness
+        - POD has its own file now
+
+0.6  Mon Feb 11 2008, 15:33 -0200
+        - use warnings
+        - make all prereqs explicit
+        - don't hide the use of Term::ANSIColor
+        - require warnings::compat on pre-5.6 perls
+        - no real code change: idleness is an evil thing
+
+0.5  Fri Jun  1 2007, 09:07 -0300
+        - now accepts an import tag :color (or :colour) and
+          produce colored warnings (with Term::ANSIColor)
+
+0.4  Thu May 31 2007, 16:32 -0300
+        - now dist has a README (thanks to Pod::Readme)
+        - now Acme::Note uses strict
+
+0.3  Wed May 30 2007, 16:36 -0300
+        - 0.2 got tests right, but broke Makefile.PL
+        - that was out of order for too long
+
+0.2  Tue Aug 22 2006, 14:27 -0300 
+        - now I've got it right (Test::More::use_ok works and so
+          does Test::Pod::Coverage, doh)
+
+0.1  Mon Aug 21 2006, 17:34 -0300
+        - original version
+        - first (hasty) release to CPAN

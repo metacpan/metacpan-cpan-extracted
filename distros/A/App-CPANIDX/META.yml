@@ -1,0 +1,60 @@
+---
+abstract: 'Queryable web-based CPAN Index'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-CPANIDX
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  App::CPANIDX:
+    file: lib/App/CPANIDX.pm
+    version: '0.40'
+  App::CPANIDX::Queries:
+    file: lib/App/CPANIDX/Queries.pm
+    version: '0.40'
+  App::CPANIDX::Renderer:
+    file: lib/App/CPANIDX/Renderer.pm
+    version: '0.40'
+  App::CPANIDX::Tables:
+    file: lib/App/CPANIDX/Tables.pm
+    version: '0.40'
+recommends:
+  DBD::mysql: '4.013'
+requires:
+  CPAN::DistnameInfo: '0.09'
+  Config::Tiny: '2.12'
+  DBD::SQLite: '1.29'
+  DBI: '1.609'
+  Date::Parse: '2.30'
+  FCGI: '0.69'
+  File::Fetch: '0.24'
+  File::Path: '2.08'
+  File::Spec: '3.31'
+  HTML::Tiny: '1.05'
+  IO::Zlib: '1.10'
+  JSON::XS: '2.32'
+  Module::CoreList::DBSchema: '0.06'
+  Parse::CPAN::MirroredBy: '0.02'
+  URI: '1.52'
+  XML::Simple: '2.18'
+  YAML::Tiny: '1.41'
+  perl: 5.6.0
+resources:
+  homepage: https://github.com/bingos/app-cpanidx/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bingos/app-cpanidx.git
+version: '0.40'

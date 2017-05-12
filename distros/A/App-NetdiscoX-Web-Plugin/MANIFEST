@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/App/NetdiscoX/Web/Plugin/JackReport.pm
+share/views/jackreport.tt
+share/views/plugin/jackreport/jackreport.css
+share/views/plugin/jackreport/jackreport.js
+share/views/sidebar/report/jackreport.tt

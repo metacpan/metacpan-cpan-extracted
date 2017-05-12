@@ -1,0 +1,7 @@
+# this is a hack so that international "262" gets converted to "262262"
+# since 262 numbers are either 262262 or 262692...
+# same for other french overseas departments
+"262(?!262|692)"	"262262"  
+"590(?!590|690)"	"590590"
+"594(?!594|694)"	"594594"
+"596(?!596|696)"	"596596"

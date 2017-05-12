@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+bin/tategaki
+bin/tategaki_one_line
+cpanfile
+lib/Acme/Tategaki.pm
+t/00_compile.t
+t/01_tategaki.t
+t/02_tategaki_one_line.t
+META.yml
+MANIFEST

@@ -1,0 +1,121 @@
+#!/usr/bin/env perl
+# PODNAME: jt
+# ABSTRACT: JSON Transformer
+
+if (-t STDIN) {
+    require Pod::Usage;
+    Pod::Usage::pod2usage(-noperldoc => 1);
+}
+
+use App::jt;
+App::jt->new_with_options->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+jt - JSON Transformer
+
+=head1 VERSION
+
+version 0.43
+
+=head1 SYNOPSIS
+
+jt works only with data from input pipe. Here are some examples.
+For quick references on command line options, run C<jt -h>.
+For more comprehensive documentation, run C<perldoc =jt>.
+
+    # prettyfied
+    curl http://example.com/action.json | jt
+
+    # uglified
+    cat random.json | jt --ugly > random.min.json
+
+    # take only selected fields
+    cat cities.json | jt --field name,country,latlon
+
+    ## --pick, --grep, -map assumes the input is an array.
+    # randomly pick 10 hashes
+    cat cities.json | jt --pick 10
+
+    # pick 10 hashes from position 100, and uglified the output
+    cat cities.json | jt --pick 100..109 --ugly
+
+    # filtered by code
+    cat cities.json | jt --grep '$_{country} eq "us"' | jt --field name,latlon
+
+    # convert to csv. Only scalar values are chosen.
+    cat cities.json | jt --csv
+
+    # Run a piece of code on each hash
+    cat orders.json | jt --map 'say "$_{name} sub-total: " . $_{count} * $_{price}'
+
+=head1 DESCRIPTION
+
+jt assumes the input is some data serialized as JSON, and perform transformation
+based on its parameter. It can be used to deal with various RESTful web service
+api, such as ElasticSearch.
+
+=head1 OUTPUT OPTIONS
+
+The default output format is JSON. If C<--csv> is provided then simple fields
+are chosen and then converted to CSV. If C<--tsv> is provided then it becomes
+tab-separated values.
+
+=head1 SELECTING FIELDS
+
+The C<--field> option can be used to select only the wanted fields in the output.
+
+The field name notation is based on L<Hash::Flatten> or C<MongoDB>. C<"."> is used
+to delimit sub-fields within a hash, and C<":"> is used to delimit array elements.
+Here's a brief example table that maps such flatten notation with perl expression:
+
+    | flatten notation | perl expression        |
+    |                  |                        |
+    | foo.bar          | $_->{foo}{bar}         |
+    | foo:0            | $_->{foo}[0]           |
+    | foo.bar:3.baz    | $_->{foo}{bar}[3]{baz} |
+    | foo.0.bar.4      | $_->{foo}{0}{bar}{4}   |
+
+The C<--fields> option transform the input such that the output contain only
+values of those fields. It may contain multilpe values seperated by comma,
+such as:
+
+    --fields title,address,phone
+
+Each specified field name is matched to the flatten notation of full field
+names. So C<"title"> would match any C<"title"> field an any depth in the input.
+
+Then the input is an array of hash, then it applies on the hashes inside, so
+the selection can be simplified.
+
+=head1 SELECTING BY JSON PATH
+
+JSONPath is a more comprehensive way to specify the elements within a JSON structure.
+See the full description of JSONPath at L<http://goessner.net/articles/JsonPath/>
+
+To specify a JSONPath selector, use C<--json-path> option. Here are some simple
+examples:
+
+    cat store.json | jt --json-path '$..author'   # Get all book authors
+    cat store.json | jt --json-path '$..book[:2]' # The first 2 books.
+
+    # print unique authors
+    cat store.json | bin/jt --json-path '$..author' | bin/jt --silent --map 'say $_' | sort -u
+
+=head1 AUTHOR
+
+Kang-min Liu <gugod@gugod.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Kang-min Liu.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

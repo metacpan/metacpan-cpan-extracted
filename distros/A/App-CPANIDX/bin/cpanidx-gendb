@@ -1,0 +1,353 @@
+#!perl
+
+use strict;
+use warnings;
+use App::CPANIDX::Tables;
+use DBI;
+use URI;
+use Config::Tiny;
+use CPAN::DistnameInfo;
+use Date::Parse qw[str2time];
+use Parse::CPAN::MirroredBy;
+use Module::CoreList::DBSchema;
+use IO::Zlib;
+use File::Fetch;
+use File::Spec;
+use File::Path qw[mkpath];
+use File::Spec::Unix;
+use Getopt::Long;
+
+my $verbose;
+my $config = 'cpanidx.ini';
+
+my $mirror_fields = [qw(
+dst_bandwidth
+dst_contact
+dst_ftp
+dst_http
+dst_location
+dst_notes
+dst_organisation
+dst_rsync
+dst_src
+dst_timezone
+frequency
+hostname
+)];
+
+GetOptions( 'config=s', \$config, 'verbose', \$verbose );
+
+my $ini = Config::Tiny->new();
+
+my $dsn;
+my $user;
+my $pass;
+my $url;
+my $corelist;
+my $mirrorlist;
+my $cpanperms;
+my $mirror = 'ftp://ftp.funet.fi/pub/CPAN/';
+
+my $cfg = $ini->read( $config ) or warn $ini->errstr, "\n";
+
+if ( $cfg ) {
+  $dsn = $cfg->{_}->{dsn};
+  $user = $cfg->{_}->{user};
+  $pass = $cfg->{_}->{pass};
+  $url = $cfg->{_}->{url};
+  $corelist = $cfg->{_}->{skipcore};
+  $mirrorlist = $cfg->{_}->{skipmirrors};
+  $cpanperms = $cfg->{_}->{skipperms};
+  $mirror = $cfg->{_}->{mirror} || 'ftp://ftp.funet.fi/pub/CPAN/';
+}
+
+unless ( $dsn ) {
+  $dsn = 'dbi:SQLite:dbname=cpanidx.db';
+  warn "Using '$dsn'\n";
+}
+
+$|=1;
+
+my $packages_file = '02packages.details.txt.gz';
+my $mailrc_file   = '01mailrc.txt.gz';
+my $perms_file    = '06perms.txt.gz';
+my $mirrord_file  = 'MIRRORED.BY';
+
+my $idxdir = _cpanidx_dir();
+mkpath( $idxdir ) unless -d $idxdir;
+fetch_indexes($idxdir,$mirror,$mailrc_file,$packages_file,$perms_file);
+my $dbh = DBI->connect($dsn,$user,$pass);
+if ( $dsn =~ /^dbi\:SQLite/i ) {
+  $dbh->do(qq{PRAGMA synchronous = OFF}) or die $dbh->errstr;
+}
+print "Populating auths ... ";
+populate_auths($dbh,$idxdir,$mailrc_file);
+print "DONE\nPopulating dists and mods ... ";
+my $packtime = populate_dists($dbh,$idxdir,$packages_file);
+unless ( $mirrorlist ) {
+  print "DONE\nPopulating mirrors ... ";
+  populate_mirrors($dbh,$idxdir,$mirrord_file);
+}
+else {
+  print "DONE\nSkipping mirrors ... ";
+}
+unless ( $cpanperms ) {
+  print "DONE\nPopulating CPAN perms ... ";
+  populate_perms($dbh,$idxdir,$perms_file);
+}
+else {
+  print "DONE\nSkipping CPAN perms ... ";
+}
+unless ( $corelist ) {
+  print "DONE\nPopulating corelist ... ";
+  populate_corelist($dbh);
+}
+else {
+  print "DONE\nSkipping corelist ... ";
+}
+print "DONE\n";
+timestamp($dbh,$packtime);
+poll_server($url) if $url;
+exit 0;
+
+sub timestamp {
+  my $handle = shift;
+  my $packages = shift;
+  $handle->do(qq{DROP TABLE IF EXISTS timestamp}) or die $handle->errstr;
+  create_table( $handle, 'timestamp' );
+  my $sth = $handle->prepare_cached(qq{INSERT INTO timestamp values (?,?)}) or die $handle->errstr;
+  $sth->execute( time, $packages );
+  return 1;
+}
+
+sub create_table {
+  my $handle = shift;
+  my $table  = shift;
+  my $sql = App::CPANIDX::Tables->table( $table );
+  $handle->do($sql) or die $handle->errstr;
+  $handle->do('DELETE FROM ' . $table) or die $handle->errstr;
+  return 1;
+}
+
+sub populate_dists {
+  my ($handle,$dir,$pfile) = @_;
+  my $fh = IO::Zlib->new( File::Spec->catfile($dir,$pfile), "rb" ) or die "$!\n";
+  my %dists;
+  my @mods;
+
+  my $time;
+
+  while (<$fh>) {
+    chomp;
+    last if /^\s*$/;
+    my($field,$data) = split /\:\s+/;
+    $time = str2time($data) if $field eq 'Last-Updated';
+  }
+  while (<$fh>) {
+    chomp;
+    my ($module,$version,$package_path) = split ' ', $_;
+    my $d = CPAN::DistnameInfo->new( $package_path );
+    next unless $d;
+    my $metaname = $d->pathname;
+    my $extension = $d->extension;
+    next unless $extension;
+    unless ( exists $dists{$package_path} ) {
+      $dists{$package_path} = [ $d->dist, $d->cpanid, $d->pathname, $d->version ];
+    }
+    push @mods, [ $module, $d->dist, $d->version, $d->cpanid, $version ];
+  }
+
+  $handle->begin_work;
+
+  create_table( $handle, 'tmp_dists' );
+  foreach my $dist ( keys %dists ) {
+      my $sth = $handle->prepare_cached(qq{INSERT INTO tmp_dists values (?,?,?,?)}) or die $handle->errstr;
+      $sth->execute( @{ $dists{ $dist } } );
+  }
+  create_table( $handle, 'tmp_mods' );
+  foreach my $mod ( @mods ) {
+    my $sth = $handle->prepare_cached(qq{INSERT INTO tmp_mods values (?,?,?,?,?)}) or die $handle->errstr;
+    $sth->execute( @{ $mod } );
+  }
+
+  $handle->do(qq{DROP TABLE IF EXISTS dists}) or die $handle->errstr;
+  $handle->do(qq{ALTER TABLE tmp_dists RENAME TO dists}) or die $handle->errstr;
+  $handle->do(qq{DROP TABLE IF EXISTS mods}) or die $handle->errstr;
+  $handle->do(qq{ALTER TABLE tmp_mods RENAME TO mods}) or die $handle->errstr;
+
+  foreach my $table ( qw( dists mods ) ) {
+    foreach my $sql ( @{ App::CPANIDX::Tables->index( $table ) } ) {
+      $handle->do( $sql ) or die $handle->errstr;
+    }
+  }
+
+  $handle->commit;
+
+  return $time;
+}
+
+sub populate_perms {
+  my ($handle,$dir,$pfile) = @_;
+  my $fh = IO::Zlib->new( File::Spec->catfile($dir,$pfile), "rb" ) or die "$!\n";
+
+  while (<$fh>) {
+    last if /^\s*$/;
+  }
+
+  $handle->begin_work;
+
+  create_table( $handle, 'tmp_perms' );
+
+  while (<$fh>) {
+    chomp;
+    my ($mod,$id,$perm) = split /,/;
+    my $sth = $handle->prepare_cached(qq{INSERT INTO tmp_perms values (?,?,?)}) or die $handle->errstr;
+    $sth->execute( $mod, $id, $perm ) or die $handle->errstr;
+  }
+
+  $handle->do(qq{DROP TABLE IF EXISTS perms}) or die $handle->errstr;
+  $handle->do(qq{ALTER TABLE tmp_perms RENAME TO perms}) or die $handle->errstr;
+
+  foreach my $sql ( @{ App::CPANIDX::Tables->index( 'perms' ) } ) {
+    $handle->do( $sql ) or die $handle->errstr;
+  }
+
+  $handle->commit;
+
+  return 1;
+}
+
+sub populate_auths {
+  my ($handle,$dir,$mfile) = @_;
+  my $fh = IO::Zlib->new( File::Spec->catfile($dir,$mfile), "rb" ) or die "$!\n";
+  my @auths;
+  while (<$fh>) {
+    chomp;
+    my ( $alias, $pauseid, $long ) = split ' ', $_, 3;
+    $long =~ s/^"//;
+    $long =~ s/"$//;
+    my ($name, $email) = $long =~ /(.*) <(.+)>$/;
+    push @auths, [ $pauseid, $name, $email ];
+  }
+
+  $handle->begin_work;
+
+  create_table( $handle, 'tmp_auths' );
+  foreach my $auth ( @auths ) {
+    my $sth = $handle->prepare_cached(qq{INSERT INTO tmp_auths values (?,?,?)}) or die $handle->errstr;
+    $sth->execute( @{ $auth } ) or die $handle->errstr;
+  }
+
+  $handle->do(qq{DROP TABLE IF EXISTS auths}) or die $handle->errstr;
+  $handle->do(qq{ALTER TABLE tmp_auths RENAME TO auths}) or die $handle->errstr;
+
+  foreach my $sql ( @{ App::CPANIDX::Tables->index( 'auths' ) } ) {
+    $handle->do( $sql ) or die $handle->errstr;
+  }
+
+  $handle->commit;
+
+  return 1;
+}
+
+sub populate_mirrors {
+  my ($handle,$dir,$mfile) = @_;
+
+  my $pm = Parse::CPAN::MirroredBy->new();
+
+  $handle->begin_work;
+
+  create_table( $handle, 'tmp_mirrors' );
+
+  foreach my $mirror ( $pm->parse_file( File::Spec->catfile($dir,$mfile) ) ) {
+    $mirror->{$_} = '' for grep { !$mirror->{$_} } @{ $mirror_fields };
+    my $hostname = delete $mirror->{hostname};
+    my $sth = $handle->prepare_cached(qq{INSERT INTO tmp_mirrors values(?,?,?,?,?,?,?,?,?,?,?,?)})
+                or die $DBI::errstr;
+    $sth->execute( $hostname, ( map { $mirror->{$_} } sort keys %{ $mirror } ) ) or die $handle->errstr;
+  }
+
+  $handle->do(qq{DROP TABLE IF EXISTS mirrors}) or die $handle->errstr;
+  $handle->do(qq{ALTER TABLE tmp_mirrors RENAME TO mirrors}) or die $handle->errstr;
+
+  $handle->commit;
+
+  return 1;
+}
+
+sub populate_corelist {
+  my ($handle) = @_;
+
+  my $mcdbs = Module::CoreList::DBSchema->new();
+  my %tables = $mcdbs->tables();
+
+  $handle->begin_work;
+
+  create_table( $handle, 'tmp_' . $_ ) for keys %tables;
+
+  foreach my $row ( $mcdbs->data( prefix => 'tmp_' ) ) {
+    my $sql = shift @{ $row };
+    my $sth = $handle->prepare_cached($sql) or die $handle->errstr;
+    $sth->execute( @{ $row } ) or die $handle->errstr;
+  }
+
+  foreach my $table ( keys %tables ) {
+    $handle->do(qq{DROP TABLE IF EXISTS $table}) or die $handle->errstr;
+    $handle->do(qq{ALTER TABLE tmp_$table RENAME TO $table}) or die $handle->errstr;
+  }
+
+  $handle->commit;
+
+  return 1;
+}
+
+sub fetch_indexes {
+  my ($location,$mirror,$mailrc,$packages,$perms) = @_;
+
+  my $mailurl = URI->new($mirror);
+  my $packurl = URI->new($mirror);
+  my $mirrord = URI->new($mirror);
+  my $permurl = URI->new($mirror);
+
+  $mailurl->path_segments( ( grep { $_ } $mailurl->path_segments ), 'authors', $mailrc );
+  $packurl->path_segments( ( grep { $_ } $packurl->path_segments ), 'modules', $packages );
+  $permurl->path_segments( ( grep { $_ } $permurl->path_segments ), 'modules', $perms );
+  $mirrord->path_segments( ( grep { $_ } $mirrord->path_segments ), 'MIRRORED.BY' );
+
+  foreach my $file ( $mailurl, $packurl, $permurl, $mirrord ) {
+    my $url = $file->as_string;
+    print "Fetching '$url' to '$location'\n";
+    my $ff = File::Fetch->new( uri => $url );
+    print $ff->output_file, "\n";
+    my $stat = $ff->fetch( to => $location );
+    next unless $stat;
+    print "Downloaded '$url' to '$stat'\n";
+  }
+}
+
+sub poll_server {
+  my $url = shift;
+  my $uri = URI->new($url);
+  $uri->path_segments( ( grep { $_ } $uri->path_segments ), 'yaml', 'timestamp' );
+  my $string;
+  my $ff = File::Fetch->new( uri => $uri->as_string );
+  $ff->fetch( to => \$string );
+  print $string, "\n";
+}
+
+sub _cpanidx_dir {
+  return $ENV{PERL5_CPANIDX_DIR}
+     if  exists $ENV{PERL5_CPANIDX_DIR}
+     && defined $ENV{PERL5_CPANIDX_DIR};
+
+  my @os_home_envs = qw( APPDATA HOME USERPROFILE WINDIR SYS$LOGIN );
+
+  for my $env ( @os_home_envs ) {
+      next unless exists $ENV{ $env };
+      next unless defined $ENV{ $env } && length $ENV{ $env };
+      my $idx = File::Spec->catdir( $ENV{ $env }, '.cpanidx' );
+      return $idx if -d $ENV{ $env };
+  }
+
+  return cwd();
+}

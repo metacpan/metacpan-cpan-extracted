@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+bin/alig
+dist.ini
+lib/Acme/AliG.pm
+t/01-basic.t

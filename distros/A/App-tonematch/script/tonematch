@@ -1,0 +1,180 @@
+#!/usr/bin/perl
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+
+use Tk;
+use Tk::MTDial;
+use Tk::FileSelect;
+use feature qw(say);
+
+my $fh;
+
+my $started=0;
+my $tried=0;
+my ($v0, $v1, $v2, $v3)=(0,0,0,0);
+my ($gl, $gr)=(0,0);
+my $valor=440;
+my $lvalor="Frequency: 440.00 Hz";
+
+my $target=440;
+my $minvol=-40;
+
+my $mw=Tk::MainWindow->new(-title=>"Synthesizer");
+
+my $vf=$mw->Frame->pack;
+my $vl=$vf->Scale(-variable=>\$gl,
+		  -from=>$minvol,
+		  -to=>0,
+		  -label=>"Vol. ref. (db)",
+		  -orient=>"horizontal"		  
+    )->pack(-side=>'left');
+my $vr=$vf->Scale(-variable=>\$gr,
+		  -from=>$minvol,
+		  -to=>0,
+		  -label=>"Vol. try (db)",
+		  -orient=>"horizontal"		  
+    )->pack;
+my $kf=$mw->Frame->pack;
+my $k0=$kf->Frame->pack(-side=>'right');
+$k0->MTDial( -width=>100, 
+		  -height=>100,
+		  -dialsize=>49, 
+		  -dialrovariable=>\$v0,
+		  -dialcommand=>\&valor,
+    )->pack->createMTDial;
+$k0->Label(-text=>1)->pack;
+my $k1=$kf->Frame->pack(-side=>'right');
+$k1->MTDial( -width=>100, 
+		  -height=>100,
+		  -dialsize=>49, 
+		  -dialrovariable=>\$v1,
+		  -dialcommand=>\&valor,
+    )->pack->createMTDial;  
+$k1->Label(-text=>10)->pack;
+my $k2=$kf->Frame->pack(-side=>'right');
+$k2->MTDial( -width=>100, 
+		  -height=>100,
+		  -dialsize=>49, 
+		  -dialrovariable=>\$v2,
+		  -dialcommand=>\&valor,
+    )->pack->createMTDial;  
+$k2->Label(-text=>100)->pack;
+my $k3=$kf->Frame->pack(-side=>'right');
+$k3->MTDial( -width=>100, 
+		  -height=>100,
+		  -dialsize=>49, 
+		  -dialrovariable=>\$v3,
+		  -dialcommand=>\&valor,
+    )->pack->createMTDial;  
+$k3->Label(-text=>1000)->pack;
+my $label=$mw->Label(-textvariable=>\$lvalor)->pack(-side=>'top');
+my $bf=$mw->Frame->pack();
+my $test=$bf->Button(-text=>'(Re)init', 
+		     -command=>\&inicia,
+		     -width=>10
+    )->pack(-side=>'left');
+my $ref=$bf->Button(-text=>'Reference', 
+		    -command=>\&referencia,
+		    -width=>10
+    )->pack(-side=>'left');
+my $try=$bf->Button(-text=>'Current', 
+		    -command=>\&retro,
+		    -width=>10
+    )->pack(-side=>'left');
+my $shw=$bf->Button(-text=>'Peek', 
+		    -command=>\&muestra,
+		    -width=>10
+    )->pack(-side=>'left');
+
+my $obf=$mw->Frame->pack();
+my $fin=$obf->Button(-text=>'Finish', 
+		    -command=>\&fin,
+		    -width=>10
+    )->pack(-side=>'left');
+my $h=$mw->Label(
+	-text=> <<'FIN'
+Test the accuracy of your hearing.
+Press the (Re)init button to initialize a tone.
+Choose a file to save the results.
+Repeatedly, press the Reference and Current buttons while
+modifying the frequency dials until you believe both tones
+match. You might want to set the volume for each channel. If the tone
+is inaudible, you can change it by Reiniting.
+After matching a tone, Reinit and repeat the process until you get
+tired, and then Stop. 
+You may Peek (but you shouldn't) to find out how
+you are doing.  
+FIN
+    )->pack(-side=>'bottom');
+
+MainLoop;
+
+sub inicia {
+    myopen() unless $started;
+    return unless $fh;
+    $started=1;
+    graba();
+    $tried=0;
+    $gr=$gl=$minvol;
+    my ($min,$max)=(40,10000); #extreme frequencies
+    my $range=log($max/$min);
+    my $rand=rand($range);
+    $target=$min*exp($rand);
+}
+
+sub myopen {
+    $fh=undef;
+    $mw->messageBox(-message=>
+	       "Choose a file (or provide a new filename) " .
+	       "for saving the results."
+	);
+    my $f=$mw->FileSelect(-directory=>'.', -defaultextension=>'.txt');
+    my $file=$f->Show;
+    return unless $file;
+    open($fh, '>', $file) or 
+	messageBox(-type=>"error", -message=>"Couldn't open file");
+}
+
+sub referencia {
+    inicia unless $started;
+    system 
+	"play -q -n synth 1 sine $target 1 sine $valor "  .
+	" remix 1 0 gain $gl "
+}
+sub retro {
+    system 
+	"play -q -n synth 1 sine $target 1 sine $valor " . 
+	" remix 0 2 gain $gr ";
+    $tried=1 if $started;
+}
+sub muestra {
+    my $w=$mw->messageBox(
+	-message=>"Target: $target.\nCurrent: $valor. Off by: "
+	           . sprintf("%.2f semitones",semitonos($valor,$target))
+	);
+}
+
+sub valor {
+    $valor=(1000*$v3+100*$v2+10*$v1+$v0+440);
+    $lvalor=sprintf "Frequency: %.2f Hz", $valor;
+    $lvalor.=" OUT OF RANGE (0-2000)", if $valor>20000 or $valor < 0;
+    $valor=0 if $valor<0;
+    $valor=20000 if $valor > 20000;
+}
+
+sub fin {
+    graba();
+    exit(0);
+}
+
+sub semitonos {
+    my ($v1, $v2)=@_;
+    return 12*log($v1/$v2)/log(2);
+}
+
+sub graba {
+    print $fh "$target $valor " . semitonos($valor, $target) . "\n"
+	if $started and $tried;
+}

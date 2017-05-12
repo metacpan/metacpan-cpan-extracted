@@ -1,0 +1,74 @@
+AI::ExpertSystem::Simple - A class implementing an expert system
+
+This is release V1.2 of AI::ExpertSystem::Simple. The class 
+implements a simple expert system that reads its knowledge base 
+(set of IF .. THEN rules) from an XML file.
+
+Three sample knowledge bases are provided along with a command line shell
+that allows the knowledge bases to be consulted.
+
+There is a Tcl/Tk based shell in which you can run a consultation, I
+was going to write this in Perl/Tk as would seem obvious but this is
+less than simple under OSX, infact I never got it to work. However there
+was an OSX based version of Tcl/Tk and it would be easier to write the
+shell in that which is much more portable (just install ActiveTcl on 
+Windows, Aqua Tcl/Tk on OSX and use what you have on Linux - ideal).
+
+So I dont have to write to a lowest common installation of PerlTk and
+I don't have to explain in excruciating detail how to install PerlTk
+on a variety of systems that I do not have access to. Suits me.
+
+Also when I get to upgrade my Ruby version of this class it too can 
+use the same shell. Go ahead and learn Tcl and Tk - it's rather 
+usefull in it's own way.
+
+INSTALLATION
+
+ % perl Makefile.PL
+ % make
+ % make test
+ % sudo make install
+
+TEST FAILURES
+
+The tests are there to make sure that I have broken nothing when I
+fiddle with the code and will teach you very little about how to use
+the code. 
+
+To see how to use the code look at simpleshell in the bin directory
+and read the contents of the docs directory (when I have written them).
+
+I am assuming that you know what an expert system is and know why 
+you are even running this code for in the first place.
+
+TO DO
+
+* More documentation (you can never have too much)
+
+REQUIREMENTS
+
+* Developed under 5.6.1 but should work on anything 5+.
+* Written completely in Perl. XS is not required.
+* Requires XML::Twig to parse the XML
+
+AUTHOR
+
+Peter Hickman <peterhi@ntlworld.com>
+
+Copyright (c) 2003, Peter Hickman. All rights reserved.
+
+This module is free software. It may be used, redistributed and/or 
+modified under the same terms as Perl itself.
+
+CHANGES IN THIS RELEASE
+
+V1.02:
+      - The explain method now works
+
+V1.01:
+      - Implemented the reset method
+	  - Simpleshell now works with the consult the Tcl/Tk shell
+	  - Included a copy of the Tcl/Tk shell
+
+V1.00:
+      - First release to CPAN

@@ -1,0 +1,152 @@
+---
+global:
+  logger:
+    - class: Screen
+      config:
+        name: screen
+        min_level: debug
+        stderr: 1
+
+plugins:
+  - module: Check::User
+    config:
+      user: tokuhirom
+  - module: Check::Network
+    config:
+      urls:
+       - http://livedoor.com/
+       - http://google.com/
+
+  - module: Worker::Simple
+    config:
+      task_timeout: 10
+
+# - module: Worker::Gearman
+#   config:
+#     fork_num: 3
+#     task_timeout: 20
+#     child_timeout: 40
+#     gearman_servers:
+#       - 127.0.0.1
+
+# - module: Agent::HTTP
+#   config:
+#     timeout: 5
+#     target:
+#       - http://livedoor.com/
+#     user_agent: DoCoMo/1.0/P504i/c30/TB
+
+# - module: Agent::FTP
+#   config:
+#     port: 21
+#     target:
+#      - ftp.ring.gr.jp
+#      - ftp.ring.gr.jp
+#      - ring.shibaura-it.ac.jp
+#     message: FTP server raady.
+#   rule:
+#     - module: Retry
+#       config:
+#         expire_time: 30
+#         cache_root: /tmp/foo
+
+#     - module: DateTimeCron
+#       config:
+#         crontab: "* 16 * * *"
+#         type: ignore
+
+# - module: Agent::HTTP
+#   config:
+#     timeout: 6
+#     target:
+#      - http://livedoor.com/
+#      - http://ljkdlsjaflfvedoor.com/
+#     user_agent: DoCoMo/1.0/P504i/c30/TB
+
+# - module: Agent::DJabberd
+#   config:
+#     target:
+#       - 127.0.0.1
+#     admin_port: 33562
+
+# - module: Agent::SNMP::Disk
+#   config:
+#     threshold: 50
+#     community: public
+#     target:
+#       - 127.0.0.1
+
+# - module: Agent::POP3S
+#   config:
+#     target:
+#       - 127.0.0.1
+#     port: 1122252
+
+# - module: Agent::DBI
+#   config:
+#     target:
+#       - dbi:
+#     user: root
+#     password: root
+
+# - module: Agent::Gearmand
+#   config:
+#     target:
+#       - 127.0.0.1
+
+# - module: Agent::DNS
+#   config:
+#     target:
+#       - host: ldns01.data-hotel.net
+#         name: livedoor.com
+#         ip:   203.131.197.197
+#     timeout: 1
+
+# - module: Agent::Mogilefsd
+#   config:
+#     target:
+#       - 127.0.0.1:1111
+
+# - module: Agent::SMTPTLS
+#   config:
+#     timeout: 1
+#     target:
+#       - 127.0.0.1
+#       - 192.168.1.1
+
+# - module: Agent::Process
+#   config:
+#     target:
+#       - 127.0.0.1
+#     pattern: /usr/bin/gearmandaa
+
+# - module: Agent::Ping
+#   config:
+#     timeout: 6
+#     target:
+#       - 127.0.0.1
+#       - 192.168.2.3
+
+# - module: Agent::Sleep
+#   config:
+#     target:
+#       - 127.0.0.1
+#     sleep: 1000
+
+# - module: Agent::SMTP
+#   config:
+#     target:
+#       - 127.0.0.1
+#       - 192.168.2.3
+
+  - module: Notify::Debug
+  - module: Notify::Ikachan
+    config:
+      url: http://127.0.0.1:4979/
+      channel: '#deadbeef'
+
+# - module: Notify::Email
+#   config:
+#     from_addr: tokuhirom@example.com
+#     to_addr  : tokuhirom@example.com
+

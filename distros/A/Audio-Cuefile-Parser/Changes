@@ -1,0 +1,7 @@
+Revision history for Audio::Cuefile::Parser
+
+0.02    2010-04-01
+        Removed POD tests.
+
+0.01    Date/time
+        Initial release.

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MonitoringXML>
+	<Monitoring>
+		<Schema Value="1.2"/>
+		<Results>
+		    <Details Host="Host Name ..." Service="Service Name ..." Environment="LOCAL" Date="2005/11/04" Time="17:27:30" Epochtime="1131121650" Status="2" StatusMessage="StatusMessage ..." PerfData="'PerfData Label 1'=99ms;0;;; 'PerfData Label n'=99ms;0;;;"/>
+			<ErrorDetail><![CDATA[ErrorDetail .1.]]></ErrorDetail>
+			<ErrorStack><![CDATA[ErrorStack .1.]]></ErrorStack>
+            <SubResults>
+		       <SubDetails Host="Host Name ..." Service="Service Name ..." Environment="LOCAL" Date="2005/11/04" Time="17:27:30" Epochtime="1131121650" Status="2" StatusMessage="StatusMessage ..." PerfData="'PerfData Label 1'=99ms;0;;; 'PerfData Label n'=99ms;0;;;"/>
+			   <SubErrorDetail><![CDATA[ErrorDetail .1.]]></SubErrorDetail>
+			   <SubErrorStack><![CDATA[ErrorStack .1.]]></SubErrorStack>
+			</SubResults>
+            <SubResults>
+		       <SubDetails Host="Host Name ..." Service="Service Name ..." Environment="LOCAL" Date="2005/11/04" Time="17:27:30" Epochtime="1131121650" Status="2" StatusMessage="StatusMessage ..." PerfData="'PerfData Label 1'=99ms;0;;; 'PerfData Label n'=99ms;0;;;"/>
+			   <SubErrorDetail><![CDATA[ErrorDetail .1.]]></SubErrorDetail>
+			   <SubErrorStack><![CDATA[ErrorStack .1.]]></SubErrorStack>
+			</SubResults>
+  	        <Extension>
+		        <Element eName="one integer" eDescription="description a" eType="INTEGER" eValue="1" ePerfData="'PerfData Label 1'=99ms;0;;; 'PerfData Label n'=99ms;0;;;"/>
+		        <Element eName="one string" eDescription="description b" eType="STRING" eValue="string, no Format" ePerfData="'PerfData Label 1'=99ms;0;;; 'PerfData Label n'=99ms;0;;;"/>
+		        <Element eName="one string" eDescription="description c" eType="STRING" eFormat="" eValue="string, no Perfdata"/>
+		        <Element eName="one string" eDescription="description d" eType="STRING" eValue="string, no Format, no Perfdata"><![CDATA[ErrorDetail .1.]]></Element>
+	        </Extension>
+		</Results>
+		<Results>
+		    <Details Host="Host Name ..." Service="Service Name ..." Environment="LOCAL" Date="2005/11/04" Time="17:27:30" Epochtime="1131121650" Status="2" StatusMessage="StatusMessage ..." PerfData="'PerfData Label 1'=99ms;0;;; 'PerfData Label n'=99ms;0;;;"/>
+			<ErrorDetail><![CDATA[ErrorDetail .1.]]></ErrorDetail>
+			<ErrorStack><![CDATA[ErrorStack .1.]]></ErrorStack>
+            <SubResults>
+		       <SubDetails Host="Host Name ..." Service="Service Name ..." Environment="LOCAL" Date="2005/11/04" Time="17:27:30" Epochtime="1131121650" Status="2" StatusMessage="StatusMessage ..." PerfData="'PerfData Label 1'=99ms;0;;; 'PerfData Label n'=99ms;0;;;"/>
+			   <SubErrorDetail><![CDATA[ErrorDetail .1.]]></SubErrorDetail>
+			   <SubErrorStack><![CDATA[ErrorStack .1.]]></SubErrorStack>
+			</SubResults>
+            <SubResults>
+		       <SubDetails Host="Host Name ..." Service="Service Name ..." Environment="LOCAL" Date="2005/11/04" Time="17:27:30" Epochtime="1131121650" Status="2" StatusMessage="StatusMessage ..." PerfData="'PerfData Label 1'=99ms;0;;; 'PerfData Label n'=99ms;0;;;"/>
+			   <SubErrorDetail><![CDATA[ErrorDetail .1.]]></SubErrorDetail>
+			   <SubErrorStack><![CDATA[ErrorStack .1.]]></SubErrorStack>
+			</SubResults>
+  	        <Extension>
+		        <Element eName="one integer" eDescription="description a" eType="INTEGER" eValue="1" ePerfData="'PerfData Label 1'=99ms;0;;; 'PerfData Label n'=99ms;0;;;"/>
+		        <Element eName="one string" eDescription="description b" eType="STRING" eValue="string, no Format" ePerfData="'PerfData Label 1'=99ms;0;;; 'PerfData Label n'=99ms;0;;;"/>
+		        <Element eName="one string" eDescription="description c" eType="STRING" eFormat="" eValue="string, no Perfdata"/>
+		        <Element eName="one string" eDescription="description d" eType="STRING" eValue="string, no Format, no Perfdata"><![CDATA[ErrorDetail .1.]]></Element>
+	        </Extension>
+		</Results>
+	</Monitoring>
+</MonitoringXML>

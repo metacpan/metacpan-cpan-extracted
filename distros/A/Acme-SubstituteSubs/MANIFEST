@@ -1,0 +1,7 @@
+Makefile.PL
+MANIFEST
+README
+t/Acme-SubstituteSubs.t
+t/1.t
+lib/Acme/SubstituteSubs.pm
+META.yml                                 Module meta-data (added by MakeMaker)

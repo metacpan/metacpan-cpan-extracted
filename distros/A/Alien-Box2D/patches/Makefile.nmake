@@ -1,0 +1,38 @@
+OBJS       =Dynamics/Joints/b2DistanceJoint.obj Dynamics/Joints/b2FrictionJoint.obj Dynamics/Joints/b2GearJoint.obj Dynamics/Joints/b2Joint.obj Dynamics/Joints/b2LineJoint.obj Dynamics/Joints/b2MouseJoint.obj Dynamics/Joints/b2PrismaticJoint.obj Dynamics/Joints/b2PulleyJoint.obj Dynamics/Joints/b2RevoluteJoint.obj Dynamics/Joints/b2WeldJoint.obj Dynamics/Contacts/b2CircleContact.obj Dynamics/Contacts/b2Contact.obj Dynamics/Contacts/b2ContactSolver.obj Dynamics/Contacts/b2PolygonAndCircleContact.obj Dynamics/Contacts/b2PolygonContact.obj Dynamics/Contacts/b2TOISolver.obj Dynamics/b2Body.obj Dynamics/b2ContactManager.obj Dynamics/b2Fixture.obj Dynamics/b2Island.obj Dynamics/b2World.obj Dynamics/b2WorldCallbacks.obj Common/b2BlockAllocator.obj Common/b2Math.obj Common/b2Settings.obj Common/b2StackAllocator.obj Collision/Shapes/b2CircleShape.obj Collision/Shapes/b2PolygonShape.obj Collision/b2BroadPhase.obj Collision/b2CollideCircle.obj Collision/b2CollidePolygon.obj Collision/b2Collision.obj Collision/b2Distance.obj Collision/b2DynamicTree.obj Collision/b2TimeOfImpact.obj
+
+PREFIX     =./_output_
+STATIC_LIB =Box2D.lib
+
+PERL       =perl
+CP         =$(PERL) -MExtUtils::Command -e cp --
+RM_F       =$(PERL) -MExtUtils::Command -e rm_f --
+MKPATH     =$(PERL) -MExtUtils::Command -e mkpath --
+
+all: $(STATIC_LIB)
+
+clean:
+	$(RM_F) $(OBJS) $(STATIC_LIB)
+
+$(STATIC_LIB): $(OBJS)
+	lib /OUT:$@ $(OBJS)
+
+.cpp.obj:
+	cl /O2 /I.. /Fo$@ /c $<
+
+install: all
+	$(MKPATH) "$(PREFIX)/lib"
+	$(MKPATH) "$(PREFIX)/include/Box2D"
+	$(MKPATH) "$(PREFIX)/include/Box2D/Collision"
+	$(MKPATH) "$(PREFIX)/include/Box2D/Collision/Shapes"
+	$(MKPATH) "$(PREFIX)/include/Box2D/Common"
+	$(MKPATH) "$(PREFIX)/include/Box2D/Dynamics"
+	$(MKPATH) "$(PREFIX)/include/Box2D/Dynamics/Contacts"
+	$(MKPATH) "$(PREFIX)/include/Box2D/Dynamics/Joints"
+	$(CP) Box2D.h "$(PREFIX)/include/Box2D"
+	$(CP) Collision/*.h "$(PREFIX)/include/Box2D/Collision"
+	$(CP) Collision/Shapes/*.h "$(PREFIX)/include/Box2D/Collision/Shapes"
+	$(CP) Common/*.h "$(PREFIX)/include/Box2D/Common"
+	$(CP) Dynamics/*.h "$(PREFIX)/include/Box2D/Dynamics"
+	$(CP) Dynamics/Contacts/*.h "$(PREFIX)/include/Box2D/Dynamics/Contacts"
+	$(CP) Dynamics/Joints/*.h "$(PREFIX)/include/Box2D/Dynamics/Joints"
+	$(CP) $(STATIC_LIB) "$(PREFIX)/lib"

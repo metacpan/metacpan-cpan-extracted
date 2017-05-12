@@ -1,0 +1,95 @@
+#!perl
+use strict;
+use App::PAUSE::TimeMachine;
+
+App::PAUSE::TimeMachine->new->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+pausetm - Web Server and CLI script to display PAUSE 02package data in previous time
+
+=head1 SYNOPSIS
+
+  # initialize PAUSE-git repository if it's not synced yet
+  # WARNING: it will take a lot of time to do the first sync
+  > pausetm init
+
+  # pulls PAUSE-git repository
+  > paysetm sync
+
+  # use your custom PAUSE-git repository
+  > export PAUSETM_GIT_DIR=~/git/PAUSE-git
+
+  # show 02packages.details.txt in 2015/01/01
+  > pausetm cat 2015-01-01
+  File:         02packages.details.txt
+  URL:          http://www.perl.com/CPAN/modules/02packages.details.txt
+  Description:  Package names found in directory $CPAN/authors/id/
+  Columns:      package name, version, path
+  Intended-For: Automated fetch routines, namespace documentation.
+  Written-By:   PAUSE version 1.005
+  Line-Count:   151580
+  Last-Updated: Thu, 01 Jan 2015 10:41:02 GMT
+  ...
+
+  # runs httpd that works as a mirror!
+  # use this URL as: cpanm -M http://localhost:5000/<yyyy>-<mm>-<dd> module...
+  > pausetm server
+
+=head1 DESCRIPTION
+
+C<pausetm> is a frontend script to get 02packages.details.txt data
+provided by PAUSE-git repository at
+L<https://github.com/batchpause/PAUSE-git> which has a history of
+package list since March 31st, 2012.
+
+Note that this tool is just a frontend tool, and C<cpanm> can utilize
+a local C<02packages.details.txt> with its C<--mirror-index>
+option without running a web server. Read more details about it at
+L<http://weblog.bulknews.net/post/48794875384/freeze-cpan-deps-with-pause-git>
+
+=head1 COMMANDS
+
+=over 4
+
+=item sync
+
+  > pausetm sync
+
+Initializes and synchronizes PAUSE-git. It is just a wrapper for C<git
+clone> and C<git pull>. git checkout location can be configured using
+C<PAUSETM_GIT_DIR> environment variable, which is set to
+C<~/.pausetm/PAUSE-git> by default.
+
+=item cat
+
+  > pausetm cat 2014-02-01
+
+shos the content of C<02packages.details.txt> file on a given
+date. The date format accepts whatever C<git rev-list --before>
+accepts, such as C<Sep 1 2012> or C<2012-09-01>.
+
+=item server
+
+  > pausetm server
+
+Runs an httpd that serves as a CPAN mirror. To specify options such as
+listen port, see L<plackup> man page.
+
+You can access http://localhost:5000/<yyyy>-<mm>-<dd> for example, to
+make it work as a CPAN mirror in CPAN clients such as C<cpanm>.
+
+=back
+
+=head1 AUTHOR
+
+Tatsuhiko Miyagawa
+
+=head1 SEE ALSO
+
+L<App::PAUSE::TimeMachine>
+
+=cut
+

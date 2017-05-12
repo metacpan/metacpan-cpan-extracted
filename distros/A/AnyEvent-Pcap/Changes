@@ -1,0 +1,7 @@
+Revision history for Perl extension AnyEvent::Pcap
+
+0.00002  2011/10/3
+        - fix a POD's bug. 
+
+0.00001  2009/11/11 
+        - original version

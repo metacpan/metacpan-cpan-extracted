@@ -1,0 +1,6 @@
+Revision history for Perl extension Algorithm::Knap01DP.
+
+0.01  Mon May 16 18:27:54 2005
+	- original version; created by h2xs 1.23 with options
+		-XA -n Algorithm::Knap01DP
+

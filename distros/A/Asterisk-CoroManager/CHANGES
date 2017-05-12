@@ -1,0 +1,5 @@
+0.11    Small documentation fix and skips tests unless there's a
+        manager account given.  Better error-message when unable to
+        connect to server.
+
+0.10	First official release, after some weeks use in production locally.

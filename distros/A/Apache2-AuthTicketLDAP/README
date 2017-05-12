@@ -1,0 +1,44 @@
+Installation:
+perl Makefile.PL
+make
+sudo make install
+
+This version of Apache2::AuthTicketLDAP overloads several methods from
+Apache::AuthTicket, including:
+
+===============================================================================
+Plan to submit upstream
+===============================================================================
+dbi_connect()
+ a) passwordless local connections
+ b) AutoCommit via TicketDBAutoCommit option
+ c) a couple of Informix-specific options (ISOLATION and LOCK MODE)
+
+_update_ticket_timestamp()
+ a) TicketThreshold: Only update the database when a ticket timestamp is at
+ least X seconds old. Reduces database updates.
+
+===============================================================================
+Needs some work to support configuration, but could be submitted upstream
+===============================================================================
+hash_for()
+ a) Use Digest::SHA instead of MD5
+
+===============================================================================
+Will not submit upstream due to using cache
+===============================================================================
+is_hash_valid()
+ a) Use a SQL SELECT statement result cache
+
+fetch_secret()
+ a) Use a SQL SELECT statement result cache
+ b) Change DESC LIMIT 1 to SELECT FIRST 1. This is an Informix-ism.
+ c) Don't listen to SQL::Abstract's quoting of the version number, which 
+ Informix doesn't like.
+ d) FIXME: Informixisms should be ifdef'd for Driver eq Informix. Also, SELECT
+ FIRST is only supported in Informix 10+
+
+check_credentials()
+ a) Use LDAP
+ b) Use LDAP Entry cache
+

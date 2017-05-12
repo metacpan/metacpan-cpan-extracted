@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/App/Hako.pm
+lib/App/Hako/MagicNumbers.pm.PL
+minil.toml
+script/hako
+t/00_compile.t
+t/01_usage.t
+t/02_run.t
+t/03_net.t
+META.yml
+MANIFEST

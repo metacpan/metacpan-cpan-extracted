@@ -1,0 +1,18 @@
+Revision history for Perl extension App::Prove::RunScripts
+
+0.05  Thu Oct 27 23:56 2011
+    - add some documents #2
+
+0.04  Wed Oct 26 00:12 2011
+    - add t/03_run_scripts.t to check running before/after scripts #3
+
+0.03  Tue Oct 25 23:37 2011
+    - using Class::Method::Modifiers#install_modifier to set before/after scripts #1
+
+0.02  Tue Oct 25 12:37 2011
+    - change module name and script name.
+
+0.01  Tue Oct 25 01:03 2011
+	- original version; created by h2xs 1.23 with options
+		-AXc --use-new-test -n App::Prove::Around
+

@@ -1,0 +1,64 @@
+Acme::Tie::Eleet - Perl extension to 5pE4k 1Ik3 4n 3l337!
+
+
+DESCRIPTION
+
+    Have you ever wanted to speak like an eleet? Do you feel like it's too
+    difficult to do your case mixin' manually? Tired of being laugh at by
+    your mates because your quotes don't make you look like an h4x0r? Well,
+    there's a solution, and you're reading the documentation of the module
+    specially made for u, Ye4h M4n!
+
+    This module basically allows you to perform a tie on filehandles,
+    converting text written to it!
+
+    And since it's quite difficult to do urself a tie, the module will also
+    tie the 2 (no, not the letter 'S', the figure, u b4st4rd) standard file
+    descriptors perl comes with (aka, STDOUT and STDERR). A simple use of
+    the module and you're ready to go! Fe4R u5!
+
+
+INSTALLATION
+
+    To install this module type the following:
+        perl Makefile.PL
+        make
+        make test
+        make install
+        make clean
+
+    Or using Module::Build:
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+        ./Build realclean
+
+
+AUTHOR
+
+    Jerome Quelin, <jquelin@cpan.org>
+
+
+COPYRIGHT
+
+    Copyright (c) 2001-2007 Jerome Quelin, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.
+
+
+TODO
+
+    - Find more h4x0R quotes to add.
+    - Allow user to provide a dictionnary for words. Backward
+      compatibility would be ok since a ref to a hash evaluates
+      to true.
+    - Allow user to provide a hash of quotes for both add_before /
+      add_after. Backward compatibility would be ok since a ref to
+      a hash evaluates to true.
+    - Allow user to provide an array of quotes to add. Backward
+      compatibility would be ok since a ref to a hash evaluates
+      to true.
+
+

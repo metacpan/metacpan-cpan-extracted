@@ -1,0 +1,10 @@
+LICENSE
+LibNeural.pm
+LibNeural.xs
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+README
+t/00.AILibNeural.t
+t/01.AILibNeuralChild.t
+typemap

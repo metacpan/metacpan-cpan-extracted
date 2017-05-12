@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name: Apache2::WebApp::Plugin::DBI
+abstract: Database interface wrapper for MySQL, PostGre, and Oracle
+version: 0.10
+author:
+  - Marc S. Brooks <mbrooks@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  Apache::DBI: 1.07 
+  Apache2::WebApp: 0.38
+  DBI: 1.602
+  Params::Validate: 0
+  Test::More: 0
+build_requires:
+  Apache::Test: 0
+resources:
+  license: http://dev.perl.org/licenses/
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html

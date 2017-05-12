@@ -1,0 +1,82 @@
+NAME
+    zonewalk - recursive DNS zone walk
+
+SYNOPSIS
+    zonewalk [-d] [-4] [-6] [-l] [-s server] zone
+
+DESCRIPTION
+    This script walks the given zone recursively and prints all the DWIM
+    resource records.
+
+    As a convenience, if you specify an ip address as startzone the reverse
+    zone is fetched, e.g.
+
+      134.60         does the zonewalk for 60.134.in-addr.arpa
+      2001:07c0:0900 does the zonewalk for 0.0.9.0.0.c.7.0.1.0.0.2.ip6.arpa
+
+    The server option is optional. If you don't specify the server, default
+    servers are used, as defined by the resolver config file.
+
+    Keep in mind that the server must be authoritative for the zones and the
+    client must be allowed to fetch the zones from the authoritative server
+    via AXFR.
+
+OPTIONS
+    -d
+          Enable debug messages
+
+    -4
+          Print A records, no AAAA records
+
+    -6
+          Print AAAA records, no A records
+
+    -l
+          Long zone listing, print all resource records instead of DWIM
+
+    -s server
+          DNS server for zone transfers, must be authoritative or authorized
+
+ARGUMENTS
+    Define the DNS start zone.
+
+LIMITATIONS
+    If IPv6 addresses are given, abbreviated forms are not allowed, .e.g.
+
+      2001:07c0:0900     allowed
+      2001:7c0:900   not allowed
+
+AUTHOR
+    Karl Gaissmaier, "<gaissmai(at)cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-app-dns-zonewalk at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-DNS-Zonewalk>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can look for information at:
+
+    * RT: CPAN's request tracker (report bugs here)
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-DNS-Zonewalk>
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/App-DNS-Zonewalk>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/App-DNS-Zonewalk>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/App-DNS-Zonewalk/>
+
+LICENSE AND COPYRIGHT
+    Copyright 2012 Karl Gaissmaier.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

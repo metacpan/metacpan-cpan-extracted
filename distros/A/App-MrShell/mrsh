@@ -1,0 +1,314 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long; Getopt::Long::Configure("bundling"); # make switches case sensitive (and turn on bundling)
+use Pod::Usage;
+
+use App::MrShell;
+
+my @hosts;
+my $conf = "$ENV{HOME}/.mrshrc";
+my $log;
+my $shell;
+my $trunc;
+my $debug;
+my $no_esc;
+my $show_groups_and_exit;
+
+my @orig_ARGV = @ARGV;
+MAGICALLY_UNDERSTAND_HOSTGROUPS: {
+    GetOptions(
+        "groups|list|g" => \$show_groups_and_exit,
+        "version|v"     => sub { print "This is Mr. Shell version $App::MrShell::VERSION.\n\n"; pod2usage() },
+        "host|H=s@"     => \@hosts,
+        "conf|c:s"      => \$conf, # optional value
+        "noesc|N"       => \$no_esc,
+        "log|l=s"       => \$log,
+        "trunc|t"       => \$trunc, # whether to truncate the log file
+        'debug|d:i'     => \$debug,
+        "shell|s=s"     => \$shell,
+        "help|h"        => sub { pod2usage(-verbose=>1) },
+
+    ) or pod2usage(); do{ warn "ERROR: command required\n"; pod2usage()} unless @ARGV or $show_groups_and_exit;
+
+    no warnings 'uninitialized'; ## no critic: this is a stupid warning anyway
+    if( $ARGV[0] =~ m/^\@/ ) {
+        while( $ARGV[0] =~ m/^\@/) {
+            @orig_ARGV = map { $_ eq $ARGV[0] ? ('-H'=>$_) : ($_) } @orig_ARGV;
+            shift @ARGV;
+        }
+
+        @ARGV = @orig_ARGV; ## no critic: no I really really meant to change the global one, thanks
+        redo MAGICALLY_UNDERSTAND_HOSTGROUPS;
+    }
+}
+
+my $mrsh = App::MrShell->new->set_usage_error("pod2usage");
+
+   $mrsh->read_config($conf)                  if $conf;
+   show_groups_and_exit()                     if $show_groups_and_exit;
+   $mrsh->set_logfile_option($log, $trunc)    if $log;
+   $mrsh->set_shell_command_option($shell)    if $shell;
+   $mrsh->set_debug_option($debug)            if defined $debug;
+   $mrsh->set_no_command_escapes_option       if $no_esc;
+
+   $mrsh->set_hosts(@hosts)    # tell Mr. Shell where to run things
+        ->queue_command(@ARGV) # queue a command for whatever hosts are set
+        ->run_queue;           # tell POE to do what POE does
+
+sub show_groups_and_exit {
+    my %groups = $mrsh->groups;
+    my @groups = sort keys %groups;
+
+    if( my @h = grep {s/^@//} @hosts ) { ## no critic: bah
+        @groups = @h;
+    }
+
+    unless(@groups) {
+        print "(no gropus to show)\n";
+        exit 0;
+    }
+
+    my $len = length $groups[0];
+    for(@groups) { $len = length $_ if length $_ > $len }
+
+    $len ++;
+    for(@groups) {
+        printf '%-*s %s', $len, "$_:", "@{ $groups{$_} }\n";
+    }
+
+    exit 0;
+}
+
+__END__
+
+=head1 NAME
+
+mrsh - Mr. Shell runs a command on multiple hosts
+
+=head1 SYNOPSIS
+
+    mrsh [options] [--] command
+        --version -v: print the version, help, and exit
+        --help    -h: print extended help and exit
+
+        --host    -H: specify a host or group to run commands on
+        --conf    -c: specify config file location, or skip configs
+        --log     -l: specify a logfile location
+        --trunc   -t: overwrite logfile, rather than append
+        --shell   -s: change the (remote-)shell command
+        --noesc   -N: do not escape the sub commands during host-routing mode
+        --groups  -g: show groups and exit
+        --list      : (nickname for --groups)
+        --          : not strictly an option, but good to put before commands
+
+=head1 DESCRIPTION
+
+The B<-H> has some special magic concerning L</[groups]>.  If a group is
+specified before any other options or options arguments arguments (but possibly
+after other groups), it will automatically be expanded to have an imaginary
+B<-H> before it.  Example:
+
+    # list /tmp on all the hosts in @gr1
+    mrsh @gr1 -- ls -al /tmp
+
+    # list /tmp on all the hosts in @gr1 with a logfile
+    mrsh --log logfile @gr1 -- ls -al /tmp
+
+=over
+
+=item B<-->
+
+Sometimes the option processor get confused by switches and options for the
+command being sent to the remote hosts.  B<--> tells the options parser to quit
+looking.
+
+=item B<--groups> B<-g> B<--list>
+
+List the groups and their hosts and exit.  Will use groups listed in B<-H>
+switches if applicable (ignoring B<-H> arguments that are not groups).
+
+=item B<--host> B<-H>
+
+Names of hosts or L</[groups]> upon which to run commands.  Groups are prefixed
+with an C<@> character and can only be specified in the configuration file (see
+L</CONFIG FILE>).
+
+Host and group specifications that overlap are reduced to a unique set, so if
+C<@localhosts> contains C<host1> and C<@desktops> contains C<host1>, and for
+whatever reason C<-H host1> is also specified on the command line ...  C<host1>
+will only appear in the hosts list just the one time.
+
+Hostnames may be subtracted from any lists provided (via groups or B<-H>) by
+prefixing the hostname (but not group) with C<->.
+
+For instance, if C<@hosts> contains a host named C<host1>> and C<host1>> is
+unavailable, users might type something like this:
+
+    mrsh @hosts -H-host1 uptime
+
+=item B<--conf> B<-c>
+
+By default, L<mrsh> will look for C<.mrshrc> the user's home directory.  Users
+may change the location with this switch.  The switch takes an optoinal
+argument, the location.  When a location is not specified, it disables the
+loading of any config files.
+
+Caveat: careful that -c doesn't slurp up the next word on the command line.  It
+wants to eat your arguments.
+
+=item B<--log> B<-l> B<--trunc> B<-t>
+
+L<mrsh> doesn't keep any logs by default.  Users may specify a logfile location
+to start logging.  Logs will be appended (even between runs) unless the truncate
+option is specified -- in which case, the logfile will simply be overwritten
+instead.
+
+=item B<--shell> B<-s>
+
+By default, L<mrsh> uses the following command as the shell command.
+
+    ssh -o BatchMode yes -o StrictHostKeyChecking no -o ConnectTimeout 20 [%u]-l []%u %h
+
+The C<%h> will be replaced by the hostname(s) during execution
+(see L</COMMAND ESCAPES>).
+
+Almost any shell command will work, see C<t/05_touch_things.t> in the
+distribution for using perl as a "shell" to touch files.  Arguments to B<-s> are
+space delimited but understand very simple quoting:
+
+=item B<--noesc> B<-N>
+
+During host routing mode, L<mrsh> will escape spaces and backslashes in a way
+that openssh (L<http://openssh.com/>) will understand correctly.  That behavior
+can be completely disabled with this option.
+
+=back
+
+=head1 COMMAND ESCAPES
+
+These things will be replaced before forking the commands on the remote hosts.
+There aren't many of these yet, but there will likely be more in the future.
+
+=over
+
+=item B<%c>
+
+The command number.
+
+=item B<%h>
+
+The hostname.  The hostname escape supports a special host routing protocol.
+Hostnames that contain the routing character will be expanded to magically
+create sub-commands as needed to connect I<through> hosts while executing
+commands.
+
+When expanding a host route, all C<%h> will be replaced with the elements of
+the command array up to that escape, plus the hostname, for each host in the
+hosts route.
+
+This expansion also optionally (see B<-N> above) expands spaces and slashes to
+escaped values compatible with openssh (L<http://openssh.com/>).
+
+This is perhaps more clear by example.
+
+Let's say this is the command in question.
+
+    ssh -o 'BatchMode Yes' %h 'ls -ald /tmp/'
+
+And let's say our hostname is C<corky!wisp>, then the command becomes:
+
+    ssh -o 'BatchMode Yes' corky ssh -o 'Batchmode\ Yes' wisp 'ls\\ -ald\\ /tmp'
+
+=item B<%u>
+
+Replaced with the username, if applicable.  When hostname contains an C<@>
+character, for example C<jettero@corky>, the portion before the C<@> is
+considered a username.
+
+=item conditional replacement
+
+If an element in a command exists in the form C<[%u]-l>, then the argument
+C<-l> will only appear in the argument list when C<%u> has a value.  If an
+arguemnt of the form C<[]%u> (C<[%u]%u> works identically), it will only appear
+in the argument list when C<%u> has a value.
+
+The following command is expanded as follows for C<jettero@corky> and C<corky>
+respectively.
+
+    ssh [%u]-l []%u %h
+    ssh -l jettero corky # for jettero@corky
+    ssh corky            # for corky
+
+=back
+
+=head1 CONFIG FILE
+
+The config file is loaded using the L<Config::Tiny> module, which supports
+basic "standard" C<.ini> files.  L<mrsh> reads two sections for values and
+ignores all values it doesn't understand.
+
+=head2 B<[options]>
+
+=over
+
+=item B<default-hosts>
+
+When no hosts are specified for a command, L<mrsh> will seek to use these hosts
+and L</[groups]> instead.
+
+=item B<shell-command>
+
+This is the above B<-s> setting, which allows changing the shell command.
+
+=item B<no-command-escapes>
+
+This is the above B<-N> setting, which disables escaping of arguments during
+host-routing mode.
+
+=back
+
+=head2 B<[groups]>
+
+The B<[groups]> section can contain as many hostname values as ... your platform
+as memory.  Groups are expanded by pre-fixing with an C<@> character when passing
+hostnames to B<-H> or via the C<default-hosts> option above.
+
+Hosts and host routes are space separated.
+
+If a group contains references to other groups, it will automatically be
+recursively replaced.  This recursion naively assumes there are no loops, but
+automatically stops about 30 deep.  If you get unexpected results, this could
+be the problem.
+
+=head2 EXAMPLE CONFIG
+
+    [options]
+        default-hosts = @debian-desktops
+        shell-command = ssh -o 'BatchMode Yes' [%u]-l []%u %h
+
+    [groups]
+        debian-desktops = wisp corky razor
+
+=head1 AUTHOR
+
+Paul Miller C<< <jettero@cpan.org >>
+
+L<http://github.com/jettero>
+
+=head1 THANKS
+
+Dennis Boone -- L<http://github.com/drboone>
+
+=head1 COPYRIGHT
+
+Copyright 2009-2010 - Paul Miller
+
+Released as GPL, like the original Mr. Shell circa 1997.
+
+=head1 SEE ALSO
+
+ssh(1), perl(1), L<App::MrShell>, L<POE>, L<POE::Wheel::Run>
+
+=cut

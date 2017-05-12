@@ -1,0 +1,31 @@
+Acme::Octarine version 0.02
+===========================
+
+Acme::Octarine - Provides Octarine support for Acme::Colour
+There may be some unavoidable leakage of magic whenever an octarine
+Acme::Colour object is created.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Acme::Colour
+  CPANPLUS
+  PadWalker
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003,2005 Nicholas Clark
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

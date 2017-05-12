@@ -1,0 +1,238 @@
+[% center("$name $version") %]
+[% center("($synopsis)") %]
+[% center("Maintained by $maintainer") %]
+
+  [% FOREACH copr IN copyrights %]Copyright [% copr.years %]
+  [% copr.holder %].  [% END %]This software is distributed under
+  [% license.summary %].  Please see the section LICENSE below for more
+  information.
+
+BLURB
+
+[% indent(to_text(blurb), 2) %]
+
+DESCRIPTION
+
+[% indent(to_text(description), 2) %]
+
+REQUIREMENTS
+
+[% indent(to_text(requirements), 2) %]
+[% IF build.lancaster %]
+  To enable tests that don't detect functionality problems but are used to
+  sanity-check the release, set the environment variable RELEASE_TESTING
+  to a true value.  To enable tests that may be sensitive to the local
+  environment or that produce a lot of false positives without uncovering
+  many problems, set the environment variable AUTHOR_TESTING to a true
+  value.
+[% END %][% IF build.autotools %]
+
+  To bootstrap from a Git checkout, or if you change the Automake files
+  and need to regenerate Makefile.in, you will need Automake
+  [% build.automake %] or later.  For bootstrap or if you change
+  configure.ac or any of the m4 files it includes and need to regenerate
+  configure or config.h.in, you will need Autoconf [% build.autoconf %] or
+  later.[% IF build.manpages %]  Perl is also required to generate manual
+  pages from a fresh Git checkout.
+  [% END %][% IF bootstrap %][% indent(to_text(bootstrap), 2) %][% END %]
+[% END %][% IF build.type == 'Module::Build' %]
+BUILDING AND INSTALLATION
+
+  [% name %] uses Module::Build and can be installed using the same process
+  as any other Module::Build module:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+  You will have to run the last command as root unless you're installing
+  into a local Perl module tree in your home directory.
+[% ELSIF build.type == 'ExtUtils::MakeMaker' %]
+BUILDING AND INSTALLATION
+
+  [% name %] uses ExtUtils::MakeMaker and can be installed using the same
+  process as any other ExtUtils::MakeMaker module:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+  You'll probably need to do the last as root unless you're installing
+  into a local Perl module tree in your home directory.
+[% ELSIF build.type == 'Autoconf' %][% IF build.install %]
+BUILDING AND INSTALLATION
+
+  You can build and install [% name %] with the standard commands:
+
+      ./configure
+      make
+      make install
+[% ELSE %]
+BUILDING
+
+  You can build [% name %] with the standard commands:
+
+      ./configure
+      make
+[% END %]
+  If you are building from a Git clone, first run ./bootstrap in the
+  source directory to generate the build files.[% IF build.install %]
+  make install will probably have to be done as root.[% END %]  Building
+  outside of the source directory is also supported, if you wish, by
+  creating an empty directory and then running configure with the correct
+  relative path.
+[% IF build.middle %]
+[% indent(to_text(build.middle), 2) %]
+[% END %][% IF build.kerberos %]
+  Normally, configure will use krb5-config to determine the flags to use
+  to compile with your Kerberos libraries.  To specify a particular
+  krb5-config script to use, either set the PATH_KRB5_CONFIG environment
+  variable or pass it to configure like:
+
+      ./configure PATH_KRB5_CONFIG=/path/to/krb5-config
+
+  If krb5-config isn't found, configure will look for the standard
+  Kerberos libraries in locations already searched by your compiler.  If
+  the the krb5-config script first in your path is not the one
+  corresponding to the Kerberos libraries you want to use, or if your
+  Kerberos libraries and includes aren't in a location searched by default
+  by your compiler, you need to specify a different Kerberos installation
+  root via --with-krb5=PATH.  For example:
+
+      ./configure --with-krb5=/usr/pubsw
+
+  You can also individually set the paths to the include directory and the
+  library directory with --with-krb5-include and --with-krb5-lib.  You may
+  need to do this if Autoconf can't figure out whether to use lib, lib32,
+  or lib64 on your platform.
+
+  To not use krb5-config and force library probing even if there is a
+  krb5-config script on your path, set PATH_KRB5_CONFIG to a nonexistent
+  path:
+
+      ./configure PATH_KRB5_CONFIG=/nonexistent
+
+  krb5-config is not used and library probing is always done if either
+  --with-krb5-include or --with-krb5-lib are given.
+[% IF build.gssapi %]
+  GSS-API libraries are found the same way: with krb5-config by default if
+  it is found, and a --with-gssapi=PATH flag to specify the installation
+  root.  PATH_KRB5_CONFIG is similarly used to find krb5-config for the
+  GSS-API libraries, and --with-gssapi-include and --with-gssapi-lib can
+  be used to specify the exact paths, overriding any krb5-config results.
+[% END %][% END %]
+  Pass --enable-silent-rules to configure for a quieter build (similar to
+  the Linux kernel).  Use make warnings instead of make to build with full
+  GCC compiler warnings (requires a relatively current version of GCC).
+[% IF build.reduced_depends %]
+  You can pass the --enable-reduced-depends flag to configure to try to
+  minimize the shared library dependencies encoded in the binaries.  This
+  omits from the link line all the libraries included solely because other
+  libraries depend on them and instead links the programs only against
+  libraries whose APIs are called directly.  This will only work with
+  shared libraries and will only work on platforms where shared libraries
+  properly encode their own dependencies (this includes most modern
+  platforms such as all Linux).  It is intended primarily for building
+  packages for Linux distributions to avoid encoding unnecessary shared
+  library dependencies that make shared library migrations more difficult.
+  If none of the above made any sense to you, don't bother with this flag.
+[% END %][% IF build.suffix %]
+[% indent(to_text(build.suffix), 2) %]
+[% END %][% IF !readme.testing %]
+TESTING
+
+  [% name %] comes with a test suite, which you can run after building
+  with:
+
+      make check
+
+  If a test fails, you can run a single test with verbose output via:
+
+      tests/runtests -o <name-of-test>
+
+  Do this instead of running the test program directly since it will
+  ensure that necessary environment variables are set up.
+[% END %][% IF test.suffix %]
+[% indent(to_text(test.suffix), 2) %]
+[% END %][% END %]
+[% FOREACH section IN readme.sections %][% section.title FILTER upper %]
+
+[% indent(to_text(section.body), 2) %]
+
+[% END %]SUPPORT
+
+  The [% name %] web page at:
+
+      [% support.web %]
+
+  will always have the current version of this package, the current
+  documentation, and pointers to any additional resources.
+[% IF support.listname %]
+  New [% name %] releases are announced on the [% support.listname %]
+  mailing list.  To subscribe or see the list archives, go to:
+
+      [% support.listurl %]
+[% END %]
+[% IF support.cpan %]
+  For bug tracking, use the CPAN bug tracker at:
+
+      https://rt.cpan.org/Dist/Display.html?Name=[% support.cpan %]
+
+[% ELSIF support.github %]
+  For bug tracking, use the issue tracker on GitHub:
+
+      https://github.com/[% support.github %]/issues
+
+[% ELSE %]
+  I welcome bug reports and patches for this package at
+  [% support.email %].[% END %]  However, please be aware that I tend to
+  be extremely busy and work projects often take priority.  I'll save your
+  report and get to it as soon as I can, but it may take me a couple of
+  months.
+
+SOURCE REPOSITORY
+
+  [% name %] is maintained using [% vcs.type %].  You can access the
+  current source [% IF vcs.github %]on GitHub at:
+
+      https://github.com/[% vcs.github %]
+
+  or [% END %]by cloning the repository at:
+
+      [% vcs.url %]
+
+  or view the repository via the web at:
+
+      [% vcs.browse %]
+[% IF vcs.github %]
+  The eyrie.org repository is the canonical one, maintained by the author,
+  but using GitHub is probably more convenient for most purposes.  Pull
+  requests are gratefully reviewed and normally accepted.
+  [% IF support.cpan %]It's probably better to use the CPAN bug tracker
+  than GitHub issues, though, to keep all Perl module issues in the same
+  place.[% END %]
+[% ELSIF vcs.type == 'Git' %]
+  When contributing modifications, patches (possibly generated by
+  git-format-patch) are preferred to Git pull requests.
+[% END %]
+LICENSE
+
+  The [% name %] package as a whole is covered by the following copyright
+  statement and license:
+
+[% copyright(4) %]
+
+[% indent(license.full, 4) %]
+[% IF license.notices %]
+[% indent(to_text(license.notices), 4) %]
+[% END %]
+  Some files in this distribution are individually released under
+  different licenses, all of which are compatible with the above general
+  package license but which may require preservation of additional
+  notices.  All required notices, and detailed information about the
+  licensing of each file, are recorded in the LICENSE file.
+
+  For any copyright range specified by files in this package as YYYY-ZZZZ,
+  the range specifies every single year in that closed interval.

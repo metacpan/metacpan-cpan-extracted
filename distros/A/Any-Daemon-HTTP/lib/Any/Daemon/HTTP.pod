@@ -1,0 +1,458 @@
+=encoding utf8
+
+=head1 NAME
+
+Any::Daemon::HTTP - preforking Apache/Plack-like webserver
+
+=head1 INHERITANCE
+
+ Any::Daemon::HTTP
+   is a Any::Daemon
+
+=head1 SYNOPSIS
+
+  #
+  # Simpelest
+  #
+
+  use Log::Report;
+  use Any::Daemon::HTTP;
+  my $http = Any::Daemon::HTTP->new
+    ( handler   => \&handler
+    , listen    => 'server.example.com:80'
+    , %daemon_opts
+    );
+
+  sub handler($$$$$)
+  {   my ($server, $client, $request, $vhost, $dir) = @_;
+      return HTTP::Response->new(500);
+  }
+
+  #
+  # Clean style
+  #
+
+  use Log::Report;
+  use Any::Daemon::HTTP;
+  my $http = Any::Daemon::HTTP->new
+    ( listen    => 'server.example.com:80'
+    );
+
+  $http->addVirtualHost
+    ( name      => 'www.example.com'
+    , aliases   => 'example.com'
+    , documents => '/www/srv/example.com/http'
+    , handler   => \&handler
+    );
+
+  $http->run;
+
+  #
+  # Limited server
+  #
+
+  my $http = Any::Daemon::HTTP->new
+    ( listen    => 'www.example.com'
+    , documents => '/www/srv/example.com/http'
+    , handler   => \&handler
+    , %daemon_opts
+    );
+  $http->run;
+
+=head1 DESCRIPTION
+
+This module extends the basic L<Any::Daemon|Any::Daemon> with childs which handle http
+connections.  This daemon does understand virtual hosts, per directory
+configuration, access rules, uri rewrites, proxies, and other features of
+Apache and Plack.  But you can also use it for a very simple HTTP server.
+
+The HTTP/1.1 protocol implementation of HTTP::Daemon is (ab)used.
+See L</DETAILS> for a list of features and limitations.
+
+Please support my development work by submitting bug-reports, patches
+and (if available) a donation.
+
+Extends L<"DESCRIPTION" in Any::Daemon|Any::Daemon/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Any::Daemon|Any::Daemon/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Any::Daemon|Any::Daemon/"Constructors">.
+ 
+=over 4
+
+=item Any::Daemon::HTTP-E<gt>B<new>(%options)
+
+Also see the option descriptions of L<Any::Daemon::new()|Any::Daemon/"Constructors">.
+
+When C<documents> or C<handler> is passed, then a virtual host will
+be created from that.  It is nicer to create the vhost explicitly.
+If you L<run()|Any::Daemon::HTTP/"Action"> without host or documents or any vhost definition,
+then the defaults are used to create a default vhost.
+
+ -Option          --Defined in     --Default
+  documents                          undef
+  group             Any::Daemon      undef
+  handlers                           undef
+  listen                             <required>
+  on_error                           undef
+  pid_file          Any::Daemon      undef
+  proxies                            <default>
+  proxy_class                        Any::Daemon::HTTP::Proxy
+  server_id                          <program name>
+  session_class                      Any::Daemon::HTTP::Session
+  standard_headers                   [ ]
+  user              Any::Daemon      undef
+  vhost_class                        Any::Daemon::HTTP::VirtualHost
+  vhosts                             <default>
+  workdir           Any::Daemon      current working directory
+
+=over 2
+
+=item documents => DIRECTORY
+
+See L<Any::Daemon::HTTP::VirtualHost::new(documents)|Any::Daemon::HTTP::VirtualHost/"Constructors">.
+
+=item group => GID|GROUPNAME
+
+=item handlers => CODE|HASH
+
+See  L<Any::Daemon::HTTP::VirtualHost::new(handlers)|Any::Daemon::HTTP::VirtualHost/"Constructors">. You can also use
+the option name C<handler>.
+
+=item listen => SOCKET|HOSTNAME[:PORT]|IPADDR[:PORT]|ARRAY
+
+Specifies one or more SOCKETs, HOSTNAMEs, or IP-ADDResses where connections
+can come in.  Old option names C<host> and C<socket> are also still
+available.
+
+=item on_error => CODE
+
+[0.21] This handler is called when an 4xx or 5xx error response has
+been produced.  The result of this function should be the new response
+(may be the same as the incoming)
+
+=item pid_file => FILENAME
+
+=item proxies => PROXY|PACKAGE|\%options|ARRAY
+
+[0.24] For %options, see L<addProxy()|Any::Daemon::HTTP/"Host administration">.
+The %options are passed to L<addProxy()|Any::Daemon::HTTP/"Host administration">, to create a proxy
+object under fly.  You may also pass an L<Any::Daemon::HTTP::Proxy|Any::Daemon::HTTP::Proxy>
+objects or by the %options to create such objects.  An ARRAY contains a
+mixture of proxy definitions.  Same as option C<proxy>.
+
+=item proxy_class => PACKAGE
+
+[0.24] The PACKAGE must extend the default class.
+
+=item server_id => STRING
+
+=item session_class => PACKAGE
+
+[0.21] The PACKAGE must extend the default class.  The extended class may
+be used to implement loading and saving session information, or adding
+abstraction.
+
+=item standard_headers => ARRAY
+
+Pass a list of key-value pairs which will be added to each produced
+response.  They are fed into HTTP::Headers subroutine push_header.
+
+=item user => UID|USERNAME
+
+=item vhost_class => PACKAGE
+
+[0.22] The PACKAGE must extend the default class.  See the
+L<Any::Daemon::HTTP::VirtualHost/DETAILS> about creating your own virtual
+hosts.
+
+=item vhosts => VHOST|PACKAGE|\%options|ARRAY
+
+The %options are passed to L<addVirtualHost()|Any::Daemon::HTTP/"Host administration">, to create a virtual host
+object under fly.  You may also pass an initialized
+L<Any::Daemon::HTTP::VirtualHost|Any::Daemon::HTTP::VirtualHost> object, or a PACKAGE name to be used
+for the default vhost.  An ARRAY contains a mixture of vhost definitions.
+[0.24] Same as option C<vhost>.
+
+=item workdir => DIRECTORY
+
+=back
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in Any::Daemon|Any::Daemon/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<sockets>()
+
+Returns all the sockets we listen on.  This list is the result of
+L<new(listen)|Any::Daemon::HTTP/"METHODS">.
+
+=item $obj-E<gt>B<workdir>()
+
+Inherited, see L<Any::Daemon/"Accessors">
+
+=back
+
+=head2 Host administration
+
+VirtualHosts and a global proxy can be added in a any order.  They
+can also be added at run-time!
+
+When a request arrives, it contains a C<Host> header which is used to
+select the right object.  When a VirtualHost has this name or alias,
+that will be address.  Otherwise, if there are global proxy objects,
+they are tried one after the other to see whether the forwardRewrite()
+reports that it accepts the request.  If this all fails, then the request
+is redirected to the host named (or aliased) 'default'.  As last resort,
+you get an error.
+
+=over 4
+
+=item $obj-E<gt>B<addProxy>($object|\%options|%options)
+
+Add a L<Any::Daemon::HTTP::Proxy|Any::Daemon::HTTP::Proxy> object which has a C<proxy_map>,
+about how to handle requests for incoming hosts.  The proxy settings
+will be tried in order of addition, only when there are no virtual
+hosts addressed.
+
+=item $obj-E<gt>B<addVirtualHost>($vhost|\%options|%options)
+
+Adds a new virtual host to the knowledge of the daemon.  Can be used
+at run-time, until the daemon goes into 'run' mode (starts forking
+childs)  The added virtual host object is returned.
+
+The $vhost is an already prepared VirtualHost object.  With %options,
+the VirtualHost object gets created for you with those %options.
+See L<Any::Daemon::HTTP::VirtualHost::new()|Any::Daemon::HTTP::VirtualHost/"Constructors"> for %options.
+
+See the manual page for L<Any::Daemon::HTTP::VirtualHost|Any::Daemon::HTTP::VirtualHost> on how you
+can cleanly extend the class for your own purpose.
+
+example: 
+
+  # Simple version
+  $http->addVirtualHost
+    ( name      => 'images'
+    , aliases   => 'images.example.com'
+    , documents => '/home/www/images
+    );
+
+  # Own virtual host, usually in separate pm-file
+  { package My::VHost;
+    use parent 'Any::Daemon::HTTP::VirtualHost';
+    ...
+  }
+  my $vhost = My::VHost->new(...);
+  $http->addVirtualHost($vhost);
+
+  # Implicitly add virtual hosts
+  push @vhosts, $vhost;
+  my $http = Any::Daemon::HTTP->new
+    ( ...
+    , vhosts    => \@vhosts
+    );
+
+=item $obj-E<gt>B<findProxy>($session, $request, $host)
+
+[0.24] Find the first proxy which is mapping the URI of the $request.  Returns a
+pair, containing the proxy and the location where it points to.
+
+Usually, in a proxy, the request needs to be in absolute form in the
+request header.  However, we can be more 
+
+=item $obj-E<gt>B<proxies>()
+
+[0.24] Returns a list with all added proxy objects.
+
+=item $obj-E<gt>B<removeVirtualHost>($vhost|$name|$alias)
+
+Remove all name and alias registrations for the indicated virtual host.
+Silently ignores non-existing vhosts.  The removed virtual host object
+is returned.
+
+=item $obj-E<gt>B<virtualHost>($name)
+
+Find the virtual host with the $name or alias.  Returns the
+L<Any::Daemon::HTTP::VirtualHost|Any::Daemon::HTTP::VirtualHost> or C<undef>.
+
+=back
+
+=head2 Action
+
+Extends L<"Action" in Any::Daemon|Any::Daemon/"Action">.
+ 
+=over 4
+
+=item $obj-E<gt>B<run>(%options)
+
+When there is no vhost yet, one will be created.  When only one vhost
+is active, you may pass C<handle_request> (see the vhost docs).
+
+ -Option            --Defined in     --Default
+  background          Any::Daemon      <true>
+  child_died          Any::Daemon      spawn new childs
+  child_task          Any::Daemon      <accept http connections>
+  kill_childs         Any::Daemon      send sigterm
+  linger                               undef
+  max_childs          Any::Daemon      10
+  max_conn_per_child                   10_000
+  max_req_per_child                    100_000
+  max_req_per_conn                     100
+  max_time_per_conn                    120
+  new_connection                       <undef>
+  reconfigure         Any::Daemon      ignore
+  req_time_bonus                       5
+
+=over 2
+
+=item background => BOOLEAN
+
+=item child_died => CODE
+
+=item child_task => CODE
+
+=item kill_childs => CODE
+
+=item linger => SECONDS
+
+When defined, it sets the maximim time a client may stay connected
+to collect the data after the connection is closed by the server.
+When zero, the last response may get lost, because the connection gets
+reset immediately.  Without linger, browsers may block the server
+resource for a long time.  So, a linger of a few seconds (when you only
+have small files) will help protecting your server.
+
+This setting determines the minimum time for a save server reboot.  When
+the daemon is stopped, the client may still keeps its socket.  The restart
+of the server may fail with "socket already in use".
+
+=item max_childs => INTEGER
+
+=item max_conn_per_child => INTEGER
+
+[0.24] Average maximum number of connections which are handled
+per process, before it commits suicide to cleanup garbaged memory.
+The parent will start a new process.
+
+This value gets a random value in 10% range added to subtracted to avoid
+that all childs reset at the same time.  So, for the default value, 9_000
+upto 11_000 connections will be served before a reset.
+
+=item max_req_per_child => INTEGER
+
+[0.24] maximum number of HTTP requests accepted by all connections for
+one process.
+
+=item max_req_per_conn => INTEGER
+
+[0.24] maximum number of HTTP requests handled in one connection.
+
+=item max_time_per_conn => SECONDS
+
+Maximum time a connection will stay alive.  When the time expires, the
+process will forcefully killed.  For each request, C<req_time_bonus>
+seconds are added.  This may be a bit short when your files are large.
+
+=item new_connection => CODE
+
+The CODE is called on each new connection made.  It gets as parameters
+the server (this object) and the connection (an
+L<Any::Daemon::HTTP::Session|Any::Daemon::HTTP::Session> extension)
+
+=item reconfigure => CODE
+
+=item req_time_bonus => SECONDS
+
+=back
+
+=back
+
+=head1 DETAILS
+
+=head2 Server supported features
+
+Many often used features are supported
+
+=over 4
+
+=item * HTTP/1.1 protocol
+
+Supported by via the HTTP::Daemon connection implementation, which
+is gracefully hijacked.  Messages are HTTP::Request and HTTP::Response
+objects, borrowed from LWP.
+
+=item * virtual hosts
+
+Multiple "hosts" listening on the same port, abstracted in
+L<Any::Daemon::HTTP::VirtualHost|Any::Daemon::HTTP::VirtualHost> objects.  The vhosts have a
+name and may have a number of aliases.
+
+=item * directories per VirtualHost 
+
+One or more "directory" configurations may be added, which may be
+nested.  They are represened by a L<Any::Daemon::HTTP::Directory|Any::Daemon::HTTP::Directory> objects.
+Each "directory" maps a "path" in the request to a directory on disk.  
+
+=item * allow/deny per Directory
+
+Supports CIDR and hostname based access restrictions.
+
+=item * directory lists per Directory
+
+When permitted and no C<index.html> file is found, a listing is generated.
+
+=item * user directories per VirtualHost 
+
+One directory object can be a L<Any::Daemon::HTTP::UserDirs|Any::Daemon::HTTP::UserDirs>, managing
+user directories (request paths which start with C</~$username>)
+
+=item * proxies
+
+=item * static content caching
+
+Reduce retransmitting files, supporting C<ETag> and C<Last-Modified>.
+
+=item * rewrite rules per VirtualHost
+
+Translate incoming request paths into new paths in the same vhost.
+
+=item * redirection rules per VirtualHost
+
+Translate incoming request paths into browser redirects.
+
+=item * dynamic content handlers per VirtualHost
+
+When there is no matching file, a handler will be called to produce the
+required information.  The default handler will produce 404 errors.
+
+=item * dynamic content caching
+
+Reduce transmitting dynamic content using C<ETag> and C<MD5>'s
+
+=back
+
+=head2 Server limitations
+
+Ehhh...
+
+=head1 SEE ALSO
+
+This module is part of Any-Daemon-HTTP distribution version 0.26,
+built on September 19, 2016. Website: F<http://perl.overmeer.net/any-daemon/>
+
+=head1 LICENSE
+
+Copyrights 2013-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

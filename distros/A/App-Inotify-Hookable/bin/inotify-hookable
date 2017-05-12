@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+package main;
+BEGIN {
+  $main::AUTHORITY = 'cpan:AVAR';
+}
+{
+  $main::VERSION = '0.09';
+}
+use strict;
+use warnings;
+use App::Inotify::Hookable;
+
+App::Inotify::Hookable->new_with_options->run;
+
+=head1 NAME
+
+inotify-hookable - See L<App::Inotify::Hookable> for documentation
+
+=cut

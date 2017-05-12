@@ -1,0 +1,10 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use App::cpanmigrate;
+
+my @args = @ARGV;
+App::cpanmigrate->new(@args)->run;
+
+__END__
+

@@ -1,0 +1,78 @@
+{
+   "abstract" : "command line json tools",
+   "author" : [
+      "Eric Johnson <eric.git@iijo.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-JSON-Tools",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "0",
+            "JSON::MaybeXS" : "0",
+            "JSON::Path" : "0",
+            "JSON::Pointer" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::JSON::Tools" : {
+         "file" : "lib/App/JSON/Tools.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kablamo/App-JSON-Tools/issues"
+      },
+      "homepage" : "https://github.com/kablamo/App-JSON-Tools",
+      "repository" : {
+         "url" : "git://github.com/kablamo/App-JSON-Tools.git",
+         "web" : "https://github.com/kablamo/App-JSON-Tools"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:KABLAMO",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

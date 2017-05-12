@@ -1,0 +1,20 @@
+1.000     2017-04-26 22:10:40 EDT
+  - Use MetaCPAN::Client to query via the new MetaCPAN API v1
+  - Added mcpan parameter to find_all_dependents for specifying a
+    MetaCPAN::Client object to use
+
+0.005     2016-03-14 14:44:47 EDT
+  - Use Getopt::Long::Modern
+  - Updates to test suite for automated testing
+
+0.004     2015-08-28 19:21:55 EDT
+  - Change installer to Module::Build::Tiny
+
+0.003     2015-05-26 12:08:20 EDT
+  - use Test::RequiresInternet to check for network connectivity
+
+0.002     2015-05-18 11:22:33 EDT
+  - Set required versions for some prereqs
+
+0.001     2015-05-18 00:21:49 EDT
+  - First release

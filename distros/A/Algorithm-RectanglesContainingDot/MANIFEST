@@ -1,0 +1,9 @@
+benchmark/ben1.pl
+Changes
+lib/Algorithm/RectanglesContainingDot.pm
+Makefile.PL
+MANIFEST
+README
+t/Algorithm-RectanglesContainingDot.t
+t/pods.t
+META.yml                                 Module meta-data (added by MakeMaker)

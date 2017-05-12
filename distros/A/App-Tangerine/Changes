@@ -1,0 +1,43 @@
+0.22 2015-06-23
+
+- Revert the previous change.  We don't want to list
+  pragmas at the end.  Inline:: grouping needs to be handled
+  differently, preferrably in Tangerine itself.
+
+0.21 2015-06-23
+
+- Don't convert module and file names to lowercase before sorting
+  them.  There's no reason for it and it messes Inline::* groups.
+
+0.20 2015-05-15
+
+- Added [GithubMeta] to dist.ini, so the repo will be listed in the
+  dist metadata, and also [MetaJSON], so the release will include a
+  META.json file.
+
+0.19 2015-05-04
+
+ - Yet another improvement/bugfix for the archive diff feature
+
+0.18 2015-04-30
+
+ - Fix a regression introduced in the previous release
+
+0.17 2015-04-30
+
+ - Make sure we chdir into a directory even if there isn't one in the
+   tarball, thanks to Paul Howarth
+
+0.16 2015-04-27
+
+ - Fix a sorting bug
+
+0.15 2015-04-24
+
+ - Split from Tangerine
+ - Complete rewrite for readability and possible future hacking
+ - Clean and fast!
+ - The output is slightly different now
+ - Added support for parallel processing via MCE, see the -j option
+ - Added support for diffs (dirs and tarballs), see the -d option
+ - Added proper documentation

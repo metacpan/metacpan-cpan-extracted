@@ -1,0 +1,9 @@
+##-*- Mode: Change-Log; coding: utf-8; -*-
+##
+## Change log for perl distribution Alien::Gfsm
+
+v0.002 Wed, 02 Mar 2016 15:29:59 +0100 moocow
+	+ specify Alien::Base::ModuleBuild in configure_requires, fixes RT bug #112610
+
+v0.001 Mon, 22 Feb 2016 10:56:08 +0100 moocow
+	+ initial version

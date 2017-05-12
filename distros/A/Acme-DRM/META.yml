@@ -1,0 +1,17 @@
+---
+name: Acme-DRM
+version: 0.03
+author:
+  - 'Brett T. Warden, C<< <bwarden-cpan@wgz.org> >>'
+abstract: 'Library providing cryptographic capabilities especially suited for Digital Rights Management. Protects against Pirates.  May increase global warming. Note: Not guaranteed to protect against Pirates or increase global warming.'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+provides:
+  Acme::DRM:
+    file: lib/Acme/DRM.pm
+    version: 0.03
+generated_by: Module::Build version 0.28
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               AnyEvent-Serialize
+version:            0.05
+abstract:           async serialize/deserialize function
+author:
+    - Dmitry E. Oboukhov <unera@debian.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    AnyEvent:             0
+    AnyEvent::AggressiveIdle:  0.01
+    Data::StreamDeserializer:  0.04
+    Data::StreamSerializer:  0.05
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

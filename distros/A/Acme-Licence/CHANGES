@@ -1,0 +1,5 @@
+1.1	2001-04-11	Sub-second periods now work.  Introduced
+			dependency on Timer::HiRes
+1.1.1	2001-05-21	Removed test for sub-second periods - too sensitive
+			to system load so test returned false negative too
+			often.  It does work though :-)

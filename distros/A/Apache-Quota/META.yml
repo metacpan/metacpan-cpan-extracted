@@ -1,0 +1,24 @@
+---
+name: Apache-Quota
+version: 0.04
+author:
+  - 'Dave Rolsky <autarch@urth.org>'
+abstract: Flexible transfer limiting/throttling under mod_perl
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+recommends:
+  BerkeleyDB: 0
+  DB_File::Lock: 0
+provides:
+  Apache::Quota:
+    file: lib/Apache/Quota.pm
+    version: 0.04
+  Apache::Quota::BerkeleyDB:
+    file: lib/Apache/Quota/BerkeleyDB.pm
+  Apache::Quota::DB_File::Lock:
+    file: lib/Apache/Quota/DB_File/Lock.pm
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

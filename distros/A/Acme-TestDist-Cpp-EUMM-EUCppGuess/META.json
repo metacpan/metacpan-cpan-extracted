@@ -1,0 +1,62 @@
+{
+   "abstract" : "Example C++ distribution with MakeMaker and CppGuess to test the tool chain",
+   "author" : [
+      "Helmut Wollmersdorfer <helmut.wollmersdorfer@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-TestDist-Cpp-EUMM-EUCppGuess",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CppGuess" : "0.11",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CppGuess" : "0.11",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {},
+         "requires" : {
+            "perl" : "5.006"
+         },
+         "suggests" : {}
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wollmers/Acme-TestDist-Cpp-EUMM-EUCppGuess/issues"
+      },
+      "homepage" : "https://github.com/wollmers/Acme-TestDist-Cpp-EUMM-EUCppGuess",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wollmers/Acme-TestDist-Cpp-EUMM-EUCppGuess.git",
+         "web" : "https://github.com/wollmers/Acme-TestDist-Cpp-EUMM-EUCppGuess"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

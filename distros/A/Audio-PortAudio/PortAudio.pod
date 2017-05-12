@@ -1,0 +1,307 @@
+=head1 NAME
+
+Audio::PortAudio - portable audio I/O
+
+=head1 SYNOPSIS
+
+   my $api = Audio::PortAudio::default_host_api();
+   my $device = $api->default_input_device;
+   
+   my $stream = $device->open_read_stream( {
+	channel_count => 2,
+        sample_format => 'float32'
+     },
+     $sample_rate,
+     $frames_per_buffer, 
+     $stream_flags
+   );
+ 
+   my $buffer = "";
+   while (1) {
+     $stream->read($buffer,$number_of_frames);
+     my @samples = unpack("f".($number_of_frames * $num_channels));
+   }
+
+=head1 DESCRIPTION
+
+Audio::PortAudio is an object oriented interface to the PortAudio library ( http://www.portaudio.com/ ). It provides flexible multi-channel audio input & output on a variety of different platforms.
+
+PortAudio is B<not> a music playing / mixing library. PortAudio provides B<direct access>
+to the audio inputs and outputs using raw sample data at a fixed sample rate.
+
+The PortAudio library is available for many platforms including 
+Windows, Macintosh (8,9,X), Unix / Linux (OSS, ALSA & JACK), SGI, and BeOS. Recent linux distributions should
+have it as a package, otherwise get it at http://www.portaudio.com/
+
+
+=head1 PROGRAMMING INTERFACE
+
+PortAudio IO is implemented using Audio::PortAudio::Stream objects. To create a stream you need to select a host API
+and a device first.
+
+=head1 Audio::PortAudio
+
+=head2 host_apis
+
+ my @apis = Audio::PortAudio::host_apis();
+ 
+Returns a list of all available host APIs.
+
+=head2 default_host_api
+
+ my $api = Audio::PortAudio::default_host_api();
+
+Get the default host API.
+
+=head2 version
+
+ my $version_number = Audio::PortAudio::version();
+
+The version number of the portaudio library.
+
+=head2 version_text
+
+ my $version = Audio::PortAudio::version_text();
+
+Human readable version information from the portaudio library.
+
+=head2 error_text
+
+ my $text = Audio::PortAudio::error_text($error_num);
+
+Translate an error number into a human readable error text.
+
+=head2 is_format_supported
+
+ my $error = is_format_supported($input_parameters,$output_parameters,$sample_rate);
+
+$error is B<not> 0 if the specified format isn't available. You can use error_text()
+to translate the $error.
+
+=head2 open_read_stream
+
+ my $stream = Audio::PortAudio::open_read_stream(
+	$stream_parameters,
+	$sample_rate,
+	$frames_per_buffer,
+	$stream_flags
+ );
+
+Open a stream for reading only.
+
+=head2 open_write_stream
+
+ my $stream = Audio::PortAudio::open_write_stream(
+	$stream_parameters,
+	$sample_rate,
+	$frames_per_buffer,
+	$stream_flags
+ );
+
+Open a stream for writing only.
+
+=head2 open_stream / open_rw_stream
+
+ my $stream = Audio::PortAudio::open_rw_stream(
+	$input_stream_parameters,
+	$output_stream_parameters,
+	$sample_rate,
+	$frames_per_buffer,
+	$stream_flags
+ );
+
+Open a stream for reading and writing.
+
+=head2 stream parameters
+
+Stream parameters as specified for the open_*stream calls are hash refs with
+the following keys:
+
+=head3 device
+
+The Audio::PortAudio::Device to use.
+
+=head3 channel_count
+
+The number of channels to use
+
+=head3 sample_format
+
+One of 'float32', 'int16', 'int32', 'int24', 'int8', 'uint8'.
+
+Default is 'float32'.
+
+=head3 latency
+
+Suggest latency in seconds (floating point).
+
+=head2 stream flags
+
+Stream flags is an integer containing a binary or of zero or more of the
+following constants in Audio::PortAudio::Stream:
+
+=head3 CLIP_OFF
+
+No clipping
+
+=head3 DITHER_OFF
+
+No dithering
+
+=head3 NEVER_DROP_INPUT
+
+This is probably not a valid option for blocking IO.
+
+=head1 Audio::PortAudio::HostAPI
+
+=head2 name
+
+ my $name = $api->name;
+
+Human readable name for this API (OSS, ALSA ...)
+
+=head2 devices
+
+ my @devices = $api->devices;
+
+Returns all available C<Audio::PortAudio::Device>s for this host API.
+
+=head2 default_input_device
+
+ my $device = $api->default_input_device;
+
+Get the default device for this API.
+
+=head2 default_output_device
+
+ my $device = $api->default_output_device;
+
+Get the default device for this API.
+
+=head1 Audio::PortAudio::Device
+
+=head2 name
+
+ my $name = $device->name;
+
+Returns the human readable name of this device.
+
+=head2 host_api
+
+ my $api =  $device->host_api;
+
+The API that provides this device.
+
+=head2 max_input_channels
+
+ my $max = $device->max_input_channels;
+
+Maximum number of input channels available for this device. Channels are always
+monophonic, so there should be two channels for each stereo input.
+
+=head2 max_output_channels
+
+ my $max = $device->max_output_channels;
+
+Maximum number of output channels available for this device.
+
+=head2 default_low_input_latency, default_high_input_latency, default_low_output_latency, default_high_output_latency
+
+ my $latency = $device->default_low_input_latency;
+ # etc.
+
+Default latencies for this device in seconds (floating point).
+
+=head2 open_read_stream, open_write_stream, open_stream, open_rw_stream
+
+ my $stream = $device->open_read_stream( 
+	$stream_parameters, 
+	$sample_rate, 
+	$frames_per_buffer, 
+	$stream_flags
+ );
+
+ my $stream = $device->open_rw_stream( 
+	$input_stream_parameters, 
+	$output_stream_parameters, 
+	$sample_rate, 
+	$frames_per_buffer, 
+	$stream_flags
+ );
+
+
+Like their counterparts in Audio::PortAudio, only default to the $device.
+
+=head1 Audio::PortAudio::Stream
+
+Currently blocking IO only.
+
+=head2 read
+
+ my $buffer = "";
+ $stream->read($buffer,$frames);
+
+Fill buffer with $frames * channels samples. Samples are interleaved and
+packed in the format as specified during open_stream.
+
+=head2 write
+
+ $stream->write($buffer);
+
+Write $buffer to $stream. Samples should be in the format specified during
+open_stream.
+
+=head2 close
+
+ $stream->close;
+
+Flush buffers (if writing) and close stream. Called automatically on destruction
+of $stream.
+
+=head2 read_available;
+
+ my $frames = $stream->read_available;
+
+Number of frames that can be read before read() will block.
+
+=head2 write_available;
+
+ my $frames = $stream->write_available;
+
+Number of frames that can be written before write() will block.
+
+=head1 CHANGES
+
+ 0.03 - distribution/building improvements only:
+	now uses pkg-config (if available) to detect portaudio version
+        and LIBS flags
+	moved vumeter example to eg directory
+	removed Makefile from distribution
+
+ 0.02 - fixed makefile; no longer reports dependency on Audio::SndFile
+	fixed embarrassing typo in the name of this document :-)
+      - fixed some conversion problems with multiple channels
+
+ 0.01 - initial release
+
+=head1 COPYRIGHT AND LICENSE
+
+ Audio::PortAudio perl modules for portable audio I/O
+ Copyright (C) 2007  Joost Diepenmaat.
+ 
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+ See the COPYING file for more information.
+

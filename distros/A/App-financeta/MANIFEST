@@ -1,0 +1,20 @@
+bin/financeta
+Build.PL
+Changes
+lib/App/financeta.pm
+lib/App/financeta/editor.pm
+lib/App/financeta/gui.pm
+lib/App/financeta/gui.pod
+lib/App/financeta/indicators.pm
+lib/App/financeta/language.pm
+lib/App/financeta/mo.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+share/changelogger.sh
+share/icon.gif
+share/sm_perl_id_bk_wt.gif
+t/00_use.t
+t/01_lang.t

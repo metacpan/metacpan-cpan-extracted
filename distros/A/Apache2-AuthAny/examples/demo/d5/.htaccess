@@ -1,0 +1,8 @@
+# d5
+# Only the user "aatest1|basic" is allowed. Note that the
+# user, "aatest1|basic" does not have an entry in the userIdent
+# table. If it had, the user name seen in the PerlAuthzHandler
+# would be the "username" column in the user table.
+
+AuthType auth-any
+Require user aatest1|basic

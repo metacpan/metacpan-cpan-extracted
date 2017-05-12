@@ -1,0 +1,12 @@
+Revision history for Apache-TrapSubRequest
+
+0.03    2005-06-08
+        woops, "documentation" fix.
+
+0.02    2005-06-08
+        updated for mod_perl 2 >= rc5. removed dumb dependency on 
+        nonexistent ap_save_brigade. made a test that works. i rule.
+
+0.01    2005-02-11
+        First version, released on an unsuspecting world.
+

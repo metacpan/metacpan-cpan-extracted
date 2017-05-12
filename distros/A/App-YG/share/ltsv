@@ -1,0 +1,3 @@
+time:08/Feb/2013:12:00:00 +0900	host:192.168.0.1	req:GET / HTTP/1.1	status:200
+time:08/Feb/2013:12:00:01 +0900	host:192.168.0.2	req:GET /update HTTP/1.1	status:200
+time:08/Feb/2013:12:00:02 +0900	host:192.168.0.3	req:GET /select HTTP/1.1	status:200

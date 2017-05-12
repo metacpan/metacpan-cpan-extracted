@@ -1,0 +1,10 @@
+Revision history for Perl module App::Nopaste::Service::dpaste
+
+0.03 2014-05-24
+  - fix syntax mappings
+
+0.02 2013-08-07
+  - rename Dpaste -> dpaste throughout the dist
+
+0.01 2013-03-15
+  - original version

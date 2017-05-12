@@ -1,0 +1,119 @@
+README FILE FOR PERL MODULE -- AnyData
+
+WHY USE IT?
+
+The AnyData modules provide simple and uniform access to data from
+many sources -- perl arrays, local files, remote files retrievable via
+http or ftp -- and in many formats including flat files (CSV, Fixed
+Length, Tab Delimited, etc), standard format files (Web Logs,
+Passwd files, etc.),  structured files (XML, HTML Tables) and binary 
+files with parseable headers (mp3s, jpgs, pngs, etc).  
+
+There are two separate modules, each providing a different interface:
+AnyData.pm provides a simple tied hash interface and DBD::AnyData
+provides a DBI/SQL interface.  You can use either or both depending on
+your needs.
+
+Here are a few examples of the tied hash interface:
+
+  # FIND A USER'S HOME DIRECTORY IN A PASSWD FILE
+  #
+  my $users = adTie( 'Passwd', '/etc/passwd' );
+  print $users->{jdoe}->{homedir};
+
+  # DELETE A PLAYER FROM A PIPE DELIMITED GAMES DATABASE
+  #
+  my $players = adTie( 'Pipe', 'games.db', 'u' );
+  delete $players->{jdoe};
+
+  # RECURSIVELY LIST THE ARTISTS FOR ALL REGGAE MP3s
+  # IN A SPECIFIED DIRECTORY TREE
+  #
+  my $music = adTie( 'Mp3', ['c:/My Music/'] );
+  while ( my $song = each %$music ) {
+      print $song->{artist},"\n" if $song->{genre} eq 'Reggae';
+  }
+
+  # RETRIEVE A CSV FILE FROM AN FTP SERVER
+  # AND PRINT IT TO THE SCREEN AS AN HTML TABLE
+  #
+  # print adConvert( 'CSV', 'ftp://foo.edu/pub/bar.csv', 'HTMLtable' );
+
+  # COUNT THE NUMBER OF HITS FOR A SPECIFIED PAGE IN A WEB LOG
+  #
+  my $hits = adTie( 'Weblog', 'access.log');
+  print adCount( $hits , request => 'mypage.html' );
+
+  # CREATE A CGI POP-UP MENU FROM A LISTING
+  # OF THE VALUES OF A TABLE COLUMN
+  #
+  my $game = adTie( 'Pipe','games.db' );
+  my @players  = adColumn( $game, 'player' );
+  print CGI::popup_menu( 'players', \@players );
+
+  # SELECT OR MODIFY MULTIPLE ROWS BASED ON COMPLEX CRITERIA
+  # (this deletes all North American males over age 30)
+  #
+  my $data = adTie( 'Tab', 'mydb.tab');
+  delete $data->{{ country => qr/us|mx|ca/,
+                   gender  => 'eq m',
+                   age     => '> 30',
+                }};
+
+WHAT ELSE DO I NEED?
+
+     * Perl
+
+     * Additional modules are required for some advanced features,
+       see 'perldoc AnyData'.
+
+HOW DO I INSTALL IT?
+
+     1.  Install Perl if not already installed
+
+     2.  Unpack the compressed files.
+         (AnyData-version.tar.gz or AnyData-version.zip)
+
+     3a. If you are not familiar with the standard Perl
+         makefile method, you can simply copy the files
+  
+     3b. If you are familiar with the standard Perl make 
+         installation, just do as always (perl Makefile.PL; 
+         make; make test; make install) this should also 
+         work with dmake or nmake. 
+
+HOW DO I USE IT?
+
+     First you might like to try this simple script which 
+     creates a database and inserts the string "hello new world"
+     into a record  and then retrieves the record and prints it:
+
+     #!perl -w
+     use strict;
+     use AnyData;
+     my $table = adTie ('CSV','test.db','o',{cols=>'id,phrase'});
+     $table->{1} = {phrase=>'hello new world'};
+     print $table->{1}->{phrase}.
+
+WHERE CAN I GET MORE INFO?
+
+     After installing the module, type "perldoc AnyData" at 
+     the command prompt, or just read the documentation at 
+     the bottom of the AnyData.pm file.
+
+WHO DUNNIT?
+
+  Jeff Zucker <jeff@vpservices.com>
+
+  Feel free to email me comments and suggestions, but please
+  post questions requiring a response to the comp.lang.perl.modules
+  newsgroup.
+
+READ MORE AND GRAB THE MODULE AT
+
+   http://www.vpservices.com/jeff/programs/AnyData/
+
+Enjoy!
+
+
+

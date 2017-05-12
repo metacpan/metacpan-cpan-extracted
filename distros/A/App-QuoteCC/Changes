@@ -1,0 +1,70 @@
+Revision history for App::QuoteCC
+
+0.10 2010-10-12 21:19:15
+
+    - Don't FAIL due to test count error on systems without lua
+    
+      The skip count was always off on systems without lua. We said we
+      skipped 6 tests, but it was 3 where the URL wasn't =~ /failo/.
+    
+      It's easier to just skip the entire test suite on those systems, so
+      move the prereq for lua before the plan.
+    
+      Also don't run each of those tests 10 times. There's no need.
+
+0.09 2010-09-23 08:54:47
+
+    - Use the not-so-well-known dong string delimiting syntax in the
+      Perl emitter.
+
+0.08 2010-09-22 13:46:28
+
+    - Replace horridly complex Lua string escaping with something that
+      just uses Lua's multiline string
+      syntax. http://www.wellho.net/resources/ex.php4?item=u104/mlx
+
+    - Don't mark any strings coming into the program as UTF-8. Just
+      apply binmode() to the filehandles. Garbage in/garbage out.
+
+    - Test UTF-8 output of C programs, and test Lua if we have it
+
+0.07 2010-09-21 19:07:44
+
+    - FIX UTF-8 output & tests.
+
+    - Add App::QuoteCC::Input::Text for line-delimited text input.
+
+0.06 2010-09-21 17:14:08
+
+    - Stop using perl5i to avoid perl5i issue #99
+      (http://github.com/schwern/perl5i/issues#issue/99)
+
+      Maybe I'll give perl5i another shot once it's more stable. But
+      for now I don't feel like chasing its bugs.
+
+0.05 2010-06-23 13:49:48
+
+    - Cleanup the tempdir() after we're done with it.
+
+    - Be more pedantic about checking for curl/gcc due to cpantesters failures
+
+0.04 2010-05-31 09:32:23
+
+    - Add support for Lua output. The Lua output requires the Lua
+      POSIX library.
+
+0.03 2010-05-21 14:27:39
+
+    - Typo: ::Perl not ::C in App::QuoteCC::Output::Perl
+
+    - Hack to make UTF-8 input work. Use Encode to mark strings as
+      UTF-8 (why weren't they marked before?!), and use open, not
+      File::Slurp to spit out files.
+
+0.02 2010-05-19 13:44:22
+
+    - Lots of changes, more docs, bugfixes, Perl backend and more
+
+0.01 2010-05-17 23:32:52
+
+    - Initial buggy version

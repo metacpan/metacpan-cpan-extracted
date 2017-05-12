@@ -1,0 +1,9 @@
+Build.PL
+cgi-bin/foo/foo.cgi
+cgi-bin/foo/foo.conf
+htdocs/.htaccess
+htdocs/index.html
+htdocs/robots.txt
+lib/MyFoo.pm
+lib/MyPod.pm
+MANIFEST			This list of files

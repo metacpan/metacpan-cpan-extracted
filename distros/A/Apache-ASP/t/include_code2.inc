@@ -1,0 +1,2 @@
+# one line
+$t->ok();

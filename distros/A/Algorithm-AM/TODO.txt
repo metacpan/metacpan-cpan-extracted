@@ -1,0 +1,107 @@
+Algorithm::AM
+
+Generalize to using any number of lattices
+    Next: generalize lattice intersection to any number
+
+Make some big int handling functions to reduce complexity
+
+save active_feats instead of remaking it in AM.pm if exclude_nulls is not set
+
+Check/document how one must be careful about changing data sets after they have already been included in a result or somewhere else.
+
+Several setters in Result should be private: score, high_score, etc.
+
+Bug reports: OverridePkgVersion doesn't work with numerical versions, RequireArgUnpacking doesn't work with hash assignment.
+
+Initialize size in XS to reduce pack logic in Perl code
+
+What are the /* CHANGED */ comments in AM.xs?
+
+Explain linear/quadratic in algorithm.pod
+
+Rename result->result when you can think of something better.
+
+Add method to remove Item from a DataSet.
+
+Note that datacap won't take effect until next round of data adding
+
+Increase reference count on data_classes array (search 'save_this' in AM)
+
+Make a standalone app for classifying projects
+
+Excluded data isn't quite reported properly if the test item is given, more than once.
+
+As far as flexibility goes, a good goal is to make the system bootstrappable, meaning that in end_hook the user can add the classified test item to the training data.
+	- Pretty sure this is done. Make a demo before crossing it off.
+
+Change XS to use RV field for bigint data so that we can keep the exact array representation, the string, and the inexact NV. Then we could pass the data back from Perl to XS again for more calculation if needed.
+
+Could AM_BIG_INT carry, etc. be allowed to use 32-bits on some architectures?
+
+Anytime: What are the itemcontextchain and itemcontextchainhead variables?
+
+Someday: should be able to ignore any variables
+
+Add tests for logging
+
+Perhaps make a DataSet iterator that would work even when new items were added. That could be used to allow the user to add items during any hook and have them be used immediately.
+
+Add tests for everything in Result that isn't tested yet.
+
+Try to move more of the AM guts stuff back into AM.pm or into Project.pm, or into a new Guts.pm. Right now quite a bit of it is in Result, which seems sub-par.
+
+Add timing accessors to Result.
+Do better time handling in Result; something that will allow checking how long classification took would be nice.
+
+Add other bigint helper methods into BigInt and test them, as well.
+
+Instead of passing around the "activeVars" variable and skipping nulls if needed, it might make more sense to create an array containing all of the active indices, i.e. [0,1,2,4,6,7] if 3 and 5 are null and exclude nulls is on. This would make it easier to simplify things via `map` or whatever.
+
+do something better than just calling rand() for the probability/skip function.
+
+Move the XS code to a different package so all of those variables can be stored in something private: pointers, itemcontextchainhead, etc. The work done on gangs could also be put into this package, since it requires special knowledge of the underlying structure. Maybe the Guts package?
+
+change active_features to be accepted at classification time
+
+properly destroy project or AM object on error so that illegal state is not possible even if someone catches an error and tries to continue.
+
+## Other TODOs:
+
+-Figure out good project organization to allow dual builders (MB and EUMM)
+-Create an AM old stuff branch
+-Think about possibilities of other types of lattices (non-boolean)
+
+## Documentation TODOs:
+- Add pictures!
+- Provide a glossary of terms including usage from ML and AM literature.
+	- specifier/comment (set to data unless otherwise specified)
+	- outcome/prediction/oracle/label
+	- data/exemplar/train/item. Note that "train" is a misnomer but is normal practice.
+	- test, labeled test item, given
+	- classify
+	- grandtotal/total_pointers/total_score
+	- datacap
+- Where the documentation says to see 'the red book' or 'the green book' for details, remove the reference and put the details in the text!
+- Change the POD to use Pod::Weaver properly (=method, etc.).
+
+
+##Parallel Algorithm thoughts
+pseudocode for a distributed lattice
+
+decide which features go in each lattice;
+fill individual lattices without throwing any out because of heterogeneity
+(list of supracontexts) lattice = lattices[0]
+for 1..$#$lattices - 1
+combine(lattice, lattices[$_])
+combine_final(lattice, lattices[$#lattices])
+
+list<Supracontext> combine(lat1, lat2){
+    list<Supra> output;
+    for (Supra s1 : lat1) {
+        for (Supra s2 : lat2) {
+        Item[] data = intersection(s1.data, s2.data);
+        if(data)
+            output.add(new Supra(data));
+        }
+    }
+}

@@ -1,0 +1,4 @@
+# name, singular. See View::Base.build_select().
+currencies, currency
+donation_motives, donation_motive
+donation_projects, donation_project

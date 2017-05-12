@@ -1,0 +1,11 @@
+Build.PL
+Makefile.PL
+Changes
+lib/Array/Compare.pm
+MANIFEST
+META.yml
+README
+t/pod.t
+t/test.t
+t/pod_coverage.t
+META.json

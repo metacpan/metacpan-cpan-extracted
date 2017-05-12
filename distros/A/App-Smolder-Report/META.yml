@@ -1,0 +1,29 @@
+---
+abstract: 'Report test runs to a smoke server'
+author:
+  - 'Pedro Melo, C<< <melo at cpan.org> >>'
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Smolder-Report
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp::Clan: 0
+  Cwd: 0
+  File::Temp: 0
+  Getopt::Long: 0
+  LWP::UserAgent: 0
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::More: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/melo/perl-app-smolder-report
+version: 0.03

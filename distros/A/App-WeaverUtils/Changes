@@ -1,0 +1,36 @@
+Revision history for App-WeaverUtils
+
+0.05    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+
+0.04    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.03    2015-03-21 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Documentation] Mention list of utilities in main module, add FAQ
+	  & more complete See Also.
+
+
+0.02    2014-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- Extract completion routine to separate dist Complete-Pod-Weaver.
+
+
+0.01    2014-12-14 (PERLANCAR)
+
+        - First release.

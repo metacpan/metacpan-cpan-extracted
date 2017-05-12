@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Changes methods.
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More tests => 12;
+BEGIN { use_ok("Arch::Changes", ":type"); }
+
+my $changes = Arch::Changes->new;
+
+$changes->add(ADD,         1, "dir1");
+$changes->add(RENAME,      0, "oldfile", "newfile");
+$changes->add(MODIFY,      0, "modfile");
+$changes->add(META_MODIFY, 0, "modfile");
+$changes->add(META_MODIFY, 1, "metadir");
+$changes->add(DELETE,      0, "delfile");
+
+is($changes->count, 6, "good count");
+
+my $ch = $changes->get(1);
+
+ok(defined $ch, "change no. 1 defined");
+
+is($ch->{type}, RENAME, "is rename");
+is($ch->{is_dir}, 0, "is file");
+is($ch->{arguments}->[0], "oldfile", "correct old name");
+is($ch->{arguments}->[1], "newfile", "correct new name");
+
+is_deeply($changes->is_changed('from', "dir1", 1),
+	{ ADD, 1 }, "is_changed(dir1)");
+is_deeply($changes->is_changed(0, "oldfile"),
+	{ RENAME, "newfile" }, "is_changed(oldfile)");
+is_deeply($changes->is_changed(1, "newfile"),
+	{ RENAME, "oldfile" }, "is_changed(newfile)");
+is_deeply($changes->is_changed('to', "modfile"),
+	{ MODIFY, 1, META_MODIFY, 1 }, "is_changed(modfile)");
+
+my $listing = q{A/ dir1
+=> oldfile	newfile
+M  modfile
+-- modfile
+-/ metadir
+D  delfile
+};
+
+is($changes->get_listing, $listing, "get_listing");

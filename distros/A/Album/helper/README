@@ -1,0 +1,13 @@
+This directory contains some helper programs.
+
+Makefile        A generic Makefile to maintain albums.
+
+mpegstill.c	A fast tool to extract a still image from an MPEG movie.
+		Requires libmpeg2, http://libmpeg2.sourceforge.net
+
+shellrun.exe	MS Windows autostart helper program. Put this program,
+autorun.inf	and autorun.inf, both in the root of the CD-ROM.
+		Inserting the CD-ROM in a Windows system will then
+		automatically open index.html in a browser.
+
+shellrun.c	Source for shellrun.c. No secrets.

@@ -1,0 +1,90 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - OO Layer Overview</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<CENTER>
+<H1>ARSperl Programmer's Manual - OO Layer Overview</H1>
+</CENTER>
+
+<H2> Objective </H2>
+
+Since there are several (at least 3) separate OO layers out there, some of
+      which work on top of ARSperl and some of which don't, I decided to
+      implement a layer ontop of ARSperl so that you get all of the
+      features of ARSperl as well as an OO layer for a subset of those
+      features.
+
+<H2> Features </H2>
+
+The following features are available as part of the OO layer.
+
+<DL>
+<DT> <B> Exception Handlers </B> <DD>
+
+        The OO layer abstracts exception handling away a bit (optionally,
+	ofcourse). By default, the layer installs three handlers that are
+	called if an FATAL, ERROR, or WARNING return code is returned by
+	the ARS C API. At first, these handlers map to the Perl "die" and
+	"warn" functions. You can, however, disable or over-ride this
+	feature and install your own handlers. <P>
+
+	Have a look at the <A href="connection.html#new">Connection Object's   
+        constructor method</A>. <P>
+
+        Also examine the <code>t/entry.t</code> script available in the
+        source distribution for an example of how to use this. <P>
+
+        Basically, what this means is you don't have to test the
+        return code of each call you make. If a call encounters a problem
+	while doing it's job, it'll call an exception handler to handle
+	the problem.<P>
+
+<DT> <B> Wide Variety of API Calls </B> <DD>
+
+	Since the OO layer is written ontop of ARSperl itself, you can "mix 
+	and match" the two within scripts. This allows you access to all of 
+	the API calls you've come to use while allowing you to utilize some 
+	OOP practices where available. You don't need to login twice, the
+	OO layer and the class functional layer can share a single control
+	record. <P>
+
+<DT> <B> Automatic Type Conversion </B> <DD>
+
+        The OO layer converts enumeration values on the fly for you. This
+	is done on 
+	<a href="connection.html#create">creates</a>,
+	<a href="connection.html#set">sets</A> and
+	<a href="connection.html#get">gets</a>. You no longer have to lookup
+	with enumeration values yourself. <P>
+
+<DT> <B> Named Parameters </B> <DD>
+
+	All of the OO layer's methods accept named parameters so you don't
+	have to remember what the correct parameter order is. You can
+	optionally leave out the named parameter portion (if you like) but
+	then you'll need to be sure you get the order right (just like in
+	the "classic", i.e. ars_*, function calls).<P> 
+        Also noteworthy is that the named parameters are case-insensitive.<P>
+
+<DT> <B> Parameter Checking </B> <DD>
+
+	Finally, if you utilize Named Parameters, then the methods will
+	check to make sure you specified the minimum number of parameters
+	and will put up a usage message if you have not.<P>
+
+<DT> <B> Stack Trace </B> <DD>
+
+	Last, but not least, the OO layer uses the Carp module to give you
+	a meaningful backtrace in the event of an error. Unlike the classic 
+	function call interface, and error might occur and one of several
+	points, the traceback functionality of Carp makes it more obvious
+	where the error is occurring in your code.<P>
+
+</DL>
+
+<HR>
+<A HREF="../toc.html">Back to Table of Contents</A>
+Last updated 12 Mar 1999 by jcmurphy@buffalo.edu.
+</BODY>
+</HTML>

@@ -1,0 +1,36 @@
+Revision history for Perl module App::padconsole
+
+0.10 2016-11-22
+    - Use Etherpad instead of Etherpad::API (which is deprecated)
+    - Add html method
+    - Fix "Wide character" issue
+
+0.09 2015-03-09
+    - Requests at least Etherpad::API 1.2.10.3 (older versions are buggy)
+
+0.08 2013-11-05
+    - Add pad creation by calling "create <pad>"
+
+0.07 2013-10-26
+    - Fixed #5: Make history persistent
+    - bug fixes
+    - better Perl inside (use of perlcritic)
+
+0.06 2013-10-26
+    - Fixed #3: open pad or instance home page in browser from padconsole
+
+0.05 2013-10-25
+    - Changed NAME to App::padconsole, so distname becomes App-console,
+      which is the convention.
+    - Tweaked formatting of this file to conform to CPAN::Changes::Spec
+
+0.04 2013-10-25
+
+0.03 2013-10-21
+    - Add App::padconsole module to be indexed in CPAN
+
+0.02 2013-10-21
+
+0.01 2013-10-20
+    - First import, working
+

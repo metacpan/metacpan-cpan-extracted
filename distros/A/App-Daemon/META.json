@@ -1,0 +1,53 @@
+{
+   "abstract" : "Start an Application as a Daemon",
+   "author" : [
+      "Mike Schilli <m@perlmeister.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Daemon",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Pid" : "0",
+            "File::Temp" : "0",
+            "Getopt::Std" : "0",
+            "Log::Log4perl" : "1.0",
+            "Pod::Usage" : "0",
+            "Sysadm::Install" : "0.37",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/mschilli/app-daemon"
+      }
+   },
+   "version" : "0.22"
+}

@@ -1,0 +1,306 @@
+0.80    Wed Jan 18 23:14:32 GMT 2017
+* Change Linux unzip heuristic to match FreeBSD's [rt#119905]
+
+0.78    Wed Jul 27 20:40:15 2016
+* CVE-2016-1238: avoid loading optional modules from default .
+* Add additional heuristics for unzip on FreeBSD
+
+0.76    Sat Jul  4 18:44:42 2015
+* Resolve RT#105425, putting refs in $/ has been
+  fatal since v5.20.0
+
+0.74    Thu Nov 20 10:03:50 2014
+* NetBSD's tar does not like some archives
+  on CPAN, prefer gtar if it is available.
+
+0.72    Sun Jan 26 16:21:07 2014
+
+* On FreeBSD favour info-unzip if it is found
+* Treat DragonflyBSD as a FreeBSD
+
+0.68    Fri Feb 15 22:57:09 2013
+
+* Solaris' tar doesn't like some archives on
+  CPAN, prefer gtar if it is available
+
+0.66    Sat Feb  9 18:21:52 2013
+
+* Treat midnightbsd the same as freebsd for
+  the purposes of finding Info-ZIP unzip
+
+Chnages for 0.64    Sat Jan 26 21:07:03 2013
+
+* Add deprecation usage to warn if the
+  module is loaded from corelib.
+  Archive::Extract is leaving core with
+  v5.20.0, but will remain available from
+  CPAN.
+
+0.62    Wed Jan  9 21:38:10 2013
+
+* OpenBSD's tar does not like some archives
+  on CPAN, prefer gtar if it is available.
+* Correctly detect lack of /bin/tar (Smylers)
+
+0.60    Mon Feb 20 22:28:10 2012
+
+* Work around an edge-case on Linux with
+  Busybox's unzip
+
+0.58    Sat Oct 22 20:25:00 2011
+
+* Apply patch from Craig A. Berry [rt#71846]
+  make _untar_bin use Unix-syntax archive names
+  on VMS
+
+0.56    Tue Aug 23 15:55:52 2011
+
+* Amend the MSWin32 fixes for 'unzip' to
+  work with Cygwin-based tools too.
+
+0.54    Mon Aug 22 11:52:18 2011
+
+* Resolve issues on MSWin32 when 'unzip' is
+  found in PATH
+
+0.52    Thu Apr 28 20:56:27 2011
+
+* Only use unzip from /usr/local/bin when on
+  FreeBSD which will be the Info-ZIP version
+
+0.50    Tue Apr 12 19:17:23 2011
+
+* Resolve RT #56208 reported by Apocalypse
+
+0.48    Fri Jan  7 20:45:37 2011
+
+* upstream blead patches from Peter Acklam
+
+0.46    Tue Oct 26 23:45:52 2010
+
+* Correct speeling errors in docs, spotted by 
+  Avar
+* Only use unzip from /usr/pkg/bin when on 
+  NetBSD which will be the Info-ZIP version
+
+0.44    Wed Sep 29 15:51:26 2010
+
+* Apply a patch from brian d foy that adds a
+  debug() method for $DEBUG output.
+
+0.42    Mon Jun 28 19:35:17 2010
+
+* Apply a patch from Robin Barker RT #56927 
+  "Unnecessary chdir/INC manipulation in test"
+
+0.40    Fri May 14 13:31:32 2010
+
+* Add support for TZ files, Paul Marquess provided
+  the patches in RT #57387
+* modified the lzma logic to favour IO::Uncompress::Unlzma
+  Paul Marquess via RT #57387
+
+0.38    Wed Jan  6 23:48:52 2010
+
+* Apply a patch from Michael G Schwern RT #53246
+  extract() is vulnerable to print globals.
+
+0.36    Tue Nov 24 10:27:16 2009
+
+* Explicitly use Cwd's chdir
+
+0.34    Sat Jun 27 14:23:54 2009
+
+* Attempt to address #46948: unable to install install on win32.
+  Binaries on Win32 are notoriously unreliable and Strawberry perl
+  ships with all the needed perl modules, so skip failed binary
+  tests on Win32.
+* Address #47053: Use Archive::Tar iter to keep from read the 
+  tar into memory. Thanks to Robert Krimen and Doug Wilson for 
+  their patches.
+
+0.32    Fri Jun 12 13:23:11 2009
+
+* Some tars have extra newlines in their '-x' output, 
+  so grep for 'length' when parsing the file list, or 
+  errors like this one can crop up:
+    http://www.nntp.perl.org/group/perl.cpan.testers/2009/03/msg3476639.html 
+* Add docs that A::E is not always thread safe. See RT #45671
+
+0.31_03 Wed Mar 11 12:38:43 2009
+
+* Newer versions of 'tar' (1.21 and up) now print record size
+  to STDERR as well if v OR t is given (used to be both). This 
+  is a 'feature' according to the changelog, so we must now only
+  inspect STDOUT, otherwise, failures like these occur:
+  nntp.perl.org/group/perl.cpan.testers/2009/02/msg3230366.html
+  Thanks to tcallawa from RedHat for tracking this down.
+
+0.31_02 Tue Mar  3 17:01:26 2009
+
+* Address: #43278: Explicitly tell Archive::Zip where to put the files
+  In certain edge cases, archive::zip would extract to dirname($0) instead
+  of cwd(); Now we tell Archive::Zip explicitly where to extract to. 
+
+0.31_01 Fri Feb  6 15:39:13 2009
+
+* Address #40138; .tar files on Win32 would not extract properly with
+  gnu tar (default on cygwin) under Cmd.exe/Native Win32 system calls.
+  Gnu tar interprets file names with a : in them, like C:\tmp\foo.tar
+  as a remote path, and attempts to execute rsh instead.
+  Archive::Extract now checks for gnu tar on Win32 and adds the 
+  '--force-local' flag to disable this behaviour.
+* Improved diagnostics from the test suite
+* Enabled debugging in the test suite for development releases.
+
+0.30    Tue Dec 16 17:32:13 2008
+
+* This is a test suite fix; users of 0.28 need not upgrade.
+* Archive::Extract would not reliably skip binary extraction
+  tests when no binaries were found in $PATH, which causes
+  test suite failures.
+
+0.28    Fri Oct 10 15:22:51 2008
+
+* Address: #39554: Must set $Archive::Tar::CHOWN, not
+  $Archive::Tar::Constant::CHOWN to control the chown()
+  functionality when using Archive::Tar.
+* Various test suite improvements to test warnings 
+  and errors emitted by Archive::Extract.
+
+0.27_02 Wed Sep 24 17:37:52 2008
+
+* Test & build improvements: users of 0.27_01 need 
+  not upgrade.
+* Test suite would die if no files were reported 
+  to be extracted, because Test::More::is() would
+  choke on a negative array index on an empty array
+  ref.
+* Up dependency of IPC::Cmd to 0.41_05 to handle 
+  pipes and whitespace better on shell out commands.  
+
+0.27_01 Mon Sep 22 14:20:20 2008
+
+* Address: #32751: incorrect error message
+  Multiple error messages are now joined and will only be 
+  reset upon next ->extract()
+* Test suite improvement to split binary from pure perl 
+  solutions to test implementations without fallback.
+
+0.26    Sun Jan 27 16:31:20 2008
+
+* Address #32370: Archive::Extract will hang if stdin 
+  is a pipe. /bin/bunzip2 tried to read STDIN when printing
+  out it's '--version'. 
+* Address rt #32336 by a.r.ferreira@gmail.com to add .lzma 
+  support to archive::extract 
+* Older versions of bunzip2 insist on a .bz2 suffix to extract 
+  things. Guard against this, adapt the test suite and mention 
+  it in the caveats. 
+
+0.24    Thu Sep 20 15:05:55 2007
+
+* Older versions of /bin/bunzip2 only support archives
+  with a .bz2 suffix. Attempt to detect this with a new
+  method ->have_old_bunzip2, and skip tests accordingly.
+  Also document this in the CAVEATS section of the docs.
+* Apply core change 31904: Clean up test files left 
+  behind (on Win32, at least).
+
+0.23_01 Sun Sep  9 12:39:08 2007
+
+* Address Update ticket #27991 (Archive::Extract and 
+  very large tar.gz files). Add a CAVEATS entry explianing 
+  how to deal with large files & memory consumption 
+* VMS shell out & test fixes by John Malmberg
+
+0.22    Tue May 29 21:18:46 2007
+
+* Manifest didn't include one of the source files
+  for tests. If you have 0.20 installed there is no
+  need to upgrade. This is just a test suite fix.
+  
+0.20    Mon May 28 12:06:33 2007
+
+* Address #27195: Implement support for .Z files.
+* Small POD fixes
+* Disable some test diagnostics under perl core tests
+
+0.18    Wed Apr 11 21:20:53 2007
+
+* Starting 5.9.5, this module installs itself in
+  the core-perl dir, rather than site-perl, as it's
+  now part of core.
+* Reverse '$PREFER_BIN' conditional for tar/tar.gz
+  files. The current logic was actually exactly the
+  wrong way around.
+* Small regex change to tar/tar.gz detection.  
+
+0.16    Fri Jan 26 11:07:24 2007
+
+* address #24578: Wrong check for `type' argument
+* add new method ->types that returns a list of
+  all supported archive types
+* promote 0.15_03 to stable  
+
+0.15_03 Thu Jan  4 14:46:58 2007
+
+* address #23999: Attempt to generate Makefile.PL 
+  gone awry where paths starting with a '.' 
+  are sometimes reported to be extracted in '.' 
+  as well rather than their actual extraction dir.
+
+0.15_02 Sun Nov 26 18:06:02 2006
+
+* fix testing logic error, that assumed extracted 
+  files were always logged when we did not prefer 
+  binaries to extract with. However, that does not 
+  mean the perl module is available, so we might 
+  not have buffers after all.
+* make sure we dont have test count mismatches 
+  between buffers/non-buffers
+
+0.15_01 Fri Nov 24 15:07:44 2006
+
+* Apply patch from Paul Marquess to add pure
+  perl support for bzip2 encoded files. This 
+  support requires you to have the module
+  IO::Uncompress::Bunzip2 installed.
+* Error storage is now per object like it should
+  be rather than class wide.
+* Update tests to not skip unnecessarily  
+* Up required version of IPC::Cmd to 0.36 for 
+  5.6.x compatibility
+* Improve diagnostics in the test suite when
+  run verbosely
+  
+0.14    Fri Oct 20 14:37:36 2006
+
+* Tweak tests to play nicer on win32
+* Up required version of IPC::Cmd
+
+0.12    Sun Aug 13 14:55:54 2006
+
+* Add diagnostics during the test suite informing
+  the user that File::Spec warnings may be 
+  generated by Archive::Zip (see rt #19713).
+  These are safe to ignore.
+
+0.11_02 Thu Aug  3 14:18:16 2006
+
+* attempt to address #19815: make test fail under Cygwin
+  again. Unzip giving trouble this time. Adding -o 
+  option to force overwriting of old files
+* address #20829: test failure on Win32: no bunzip2?
+  bunzip2 detection wasn't working properly in the
+  test suite so tests weren't skipped on missing
+  bunzip2
+
+0.11_01 Wed Aug  2 13:04:37 2006
+
+* attempt to address #19815: make test fail under Cygwin
+  by adding more sanity checks about buffers 
+
+0.11    Wed Aug  2 11:15:48 2006
+
+* add tentative bzip2 support

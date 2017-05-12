@@ -1,0 +1,92 @@
+#!/usr/bin/env perl -w
+
+use strict;
+
+# This script is run Test::Harness on the tests found under the 't' directory.
+
+# First we check if we already are within the 't' directory
+unless ( -d 'Asnmtap' ) {
+  # try to move into test directory
+  chdir 't' or die "Can't chdir: $!";
+
+  # fix all relative library locations
+  foreach (@INC) {
+    $_ = "../$_" unless m,^([a-z]:)?[/\\],i;
+  }
+}
+
+# Pick up the library files from the ../blib directory
+unshift(@INC, "../blib/lib", "../blib/arch");
+
+use Test::Harness;
+$Test::Harness::verbose = shift if defined $ARGV[0] and $ARGV[0] =~ /^\d+$/ || $ARGV[0] eq "-v";
+
+my @tests;
+
+if (@ARGV) {
+  for (@ARGV) {
+    if (-d $_) {
+      push (@tests, <$_/*.t>);
+    } else {
+      $_ .= ".t" unless /\.t$/;
+      push (@tests, $_);
+    }
+  }
+} else {
+  @tests = (<Time.t>, <Asnmtap.t>);
+
+  if ( -f 'APPLICATIONS_ENABLED' ) {
+    push ( @tests, (<Asnmtap/Applications.t>, <Asnmtap/Applications/Collector.t>, <Asnmtap/Applications/Display.t>) );
+    push ( @tests, (<Asnmtap/Applications/CGI.t>) )       if ( -f 'APPLICATIONS_CGI_ENABLED' );
+  }
+
+  if ( -f 'PLUGINS_ENABLED' ) {
+    push ( @tests, <Asnmtap/Plugins.t> );
+    push ( @tests, <Asnmtap/Plugins/IO.t> )               if ( -f 'PLUGINS_IO_ENABLED' );
+    push ( @tests, <Asnmtap/Plugins/Mail.t> )             if ( -f 'PLUGINS_MAIL_ENABLED' );
+    push ( @tests, <Asnmtap/Plugins/Modem.t> )            if ( -f 'PLUGINS_MODEM_ENABLED' );
+    push ( @tests, <Asnmtap/Plugins/Nagios.t> )           if ( -f 'PLUGINS_NAGIOS_ENABLED' );
+    push ( @tests, <Asnmtap/Plugins/SOAP.t> )             if ( -f 'PLUGINS_SOAP_ENABLED' );
+    push ( @tests, <Asnmtap/Plugins/WebTransact.t> )      if ( -f 'PLUGINS_WEBTRANSACT_ENABLED' );
+    push ( @tests, <Asnmtap/Plugins/XML.t> )              if ( -f 'PLUGINS_XML_ENABLED' );
+
+    if ( -f 'PLUGINS_NPTEST_ENABLED' ) {
+      push ( @tests, (<Templates/Plugins/check_dummy.t>, <Templates/Plugins/check_template.t>) );
+    # push ( @tests, (<Templates/Plugins/check_dummy.t>, <Templates/Plugins/check_template.t>, <Templates/Plugins/check_MySQL-database-replication.t>) );
+
+      push ( @tests, <Templates/Plugins/IO/*.t> )         if ( -f 'PLUGINS_IO_ENABLED' );
+ 
+      if ( -f 'PLUGINS_MAIL_ENABLED' ) {
+        push ( @tests, (<Templates/Plugins/Mail/check_template-mail.t>, <Templates/Plugins/Mail/check_template-mail-without-fingerprint.t>) );
+
+        if ( -f 'PLUGINS_XML_ENABLED' ) {
+          push ( @tests, (<Templates/Plugins/Mail/check_template-mail-fingerprint-xml.t>, <Templates/Plugins/Mail/check_template-mail-xml.t>, <Templates/Plugins/Mail/check_template-mail-xml-fingerprint-xml.t>, <Templates/Plugins/Mail/check_template-mail-xml-fingerprint-xml-monitoring.t>, <Templates/Plugins/Mail/check_template-mail-xml-fingerprint-xml-monitoring-1.1.t>) );
+        }
+      }
+
+      push ( @tests, <Templates/Plugins/Modem/*.t> )      if ( -f 'PLUGINS_MODEM_ENABLED' );
+
+      if ( -f 'PLUGINS_NAGIOS_ENABLED' ) {
+        push ( @tests, (<Templates/Plugins/Nagios/check_template-nagios.t>, <Templates/Plugins/Nagios/check_template-ftp.t>, <Templates/Plugins/Nagios/check_template-ldap.t>) );
+
+        if ( -f 'PLUGINS_XML_ENABLED' ) {
+          push ( @tests, (<Templates/Plugins/Nagios/check_xml.t>, <Templates/Plugins/Nagios/check_xml-monitoring.t>) );
+        }
+      }
+
+      push ( @tests, <Templates/Plugins/SOAP/*.t> )       if ( -f 'PLUGINS_SOAP_ENABLED' );
+
+      if ( -f 'PLUGINS_WEBTRANSACT_ENABLED' ) {
+        push ( @tests, (<Templates/Plugins/WebTransact/check_template-WebTransact.t>, <Templates/Plugins/WebTransact/check_template-WebTransact-Perfdata.t>, <Templates/Plugins/WebTransact/check_template-WebTransact-with-client-authorization.t>, <Templates/Plugins/WebTransact/check_template-WebTransact-with-client-certificate.t>) );
+
+        if ( -f 'PLUGINS_XML_ENABLED' ) {
+          push ( @tests, (<Templates/Plugins/WebTransact/check_template-WebTransact-XML.t>, <Templates/Plugins/WebTransact/check_template-WebTransact-XML-Cactus-parser.t>, <Templates/Plugins/WebTransact/check_template-WebTransact-XML-Monitoring.t>, <Templates/Plugins/WebTransact/check_template-WebTransact-XML-Monitoring-1.1.t>, <Templates/Plugins/WebTransact/check_template-WebTransact-XML-Monitoring-1.2.t>) );
+        }
+      }
+
+      push ( @tests, <Templates/Plugins/XML/*.t> )        if ( -f 'PLUGINS_XML_ENABLED' );
+    }
+  }
+}
+
+runtests @tests;

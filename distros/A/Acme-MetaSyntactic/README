@@ -1,0 +1,66 @@
+
+Acme::MetaSyntactic - Themed metasyntactic variables
+
+DESCRIPTION
+
+When writing code examples, it's always easy at the beginning:
+
+    my $foo = "bar";
+    $foo .= "baz";   # barbaz
+
+But one gets quickly stuck with the same old boring examples. Does it
+have to be this way? I say "No".
+
+Here is Acme::MetaSyntactic, designed to fulfill your metasyntactic
+needs. No more will you scratch your head in search of a good variable
+name!
+
+UPDATES
+
+From January 2005 to November 2006, I have published a CPAN distribution
+a week, including new themes for Acme::MetaSyntactic (almost) every week.
+
+With the version 1.000 of Acme::MetaSyntactic (published on May 7, 2012),
+I have split the core modules (the ones that provide the list behaviour)
+from the actual themes, making the distribution containing the very
+stable Acme::MetaSyntactic modules driving its behaviour a lot thinner.
+
+If you think a important list is missing from the module, you should
+be able to make a distribution for it yourself. To ensure correctness,
+include the following test script in your t/ directory:
+
+    use Test::MetaSyntactic;
+    all_themes_ok();
+
+If you think something's missing from a list distributed with
+Acme-MetaSyntatic-Themes, please send me a patch against that
+distribution.
+
+INSTALL
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+Alternatively, to install with ExtUtils::MakeMaker, you can use the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUCCESS STORIES
+
+See the documentation for meta(1).
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2017 Philippe 'BooK' Bruhat
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

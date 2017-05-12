@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+Snark.pm
+t/01_test.t
+t/02_test_pod.t
+t/03_test_pod_coverage.t
+examples/example.pl
+README
+META.yml                                 Module meta-data (added by MakeMaker)

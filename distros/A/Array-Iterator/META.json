@@ -1,0 +1,48 @@
+{
+   "abstract" : "A simple class for iterating over Perl arrays",
+   "author" : [
+      "Steven Haryanto <stevenharyanto@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Array-Iterator",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Rinci" : "0.01"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88",
+            "blib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/Array-Iterator/",
+      "repository" : {
+         "url" : "http://github.com/sharyanto/perl-Array-Iterator"
+      }
+   },
+   "version" : "0.11"
+}
+

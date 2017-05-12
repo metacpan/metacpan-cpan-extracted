@@ -1,0 +1,59 @@
+---
+abstract: "It's new $module"
+author:
+  - 'This library is free software; you can redistribute it and/or modify'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-PriPara
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::PriPara:
+    file: lib/Acme/PriPara.pm
+    version: '0.02'
+  Acme::PriPara::MainMembers:
+    file: lib/Acme/PriPara/MainMembers.pm
+  Acme::PriPara::MainMembers::DorothyWest:
+    file: lib/Acme/PriPara/MainMembers/DorothyWest.pm
+  Acme::PriPara::MainMembers::HojoSophy:
+    file: lib/Acme/PriPara/MainMembers/HojoSophy.pm
+  Acme::PriPara::MainMembers::ManakaLaara:
+    file: lib/Acme/PriPara/MainMembers/ManakaLaara.pm
+  Acme::PriPara::MainMembers::MinamiMirei:
+    file: lib/Acme/PriPara/MainMembers/MinamiMirei.pm
+  Acme::PriPara::MainMembers::ReonaWest:
+    file: lib/Acme/PriPara/MainMembers/ReonaWest.pm
+  Acme::PriPara::MainMembers::TodoSion:
+    file: lib/Acme/PriPara/MainMembers/TodoSion.pm
+requires:
+  Data::Section::Simple: '0'
+  Mouse: '0'
+  Readonly: '0'
+  YAML::Tiny: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/htk291/p5-Acme-PriPara/issues
+  homepage: https://github.com/htk291/p5-Acme-PriPara
+  repository: git://github.com/htk291/p5-Acme-PriPara.git
+version: '0.02'
+x_contributors:
+  - 'htk291 <htk0129@gmail.com>'
+  - 'OGATA Tetsuji <tetsuji.ogata@gmail.com>'
+  - 'SUZUKI Masashi <m15.suzuki.masashi@gmail.com>'
+  - 'H.Takahashi <htk291@gmail.com>'

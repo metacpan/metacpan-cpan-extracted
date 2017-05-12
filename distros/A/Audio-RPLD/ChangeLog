@@ -1,0 +1,32 @@
+v. 0.1beta5 (0.006) - Mon Sep 17 2012 22:56 CEST
+	* Added support for the SERVERINFO command.
+	* Handle EOF from server in a nicer way (Closes: #315)
+	* Added support for the SEARCHPLE command.
+
+v. 0.1beta4 (0.005) - Tue Aug 21 2012 21:44 CEST
+	* Updated POD (Closes: RT#77183)
+	* Added support for new commands (Closes: #238)
+	* Corrected error in cmd_data() resulting in dummy playlist entrys displayed.
+
+v. 0.1beta3 (0.004) - Sun May 13 2012 16:52 CEST
+	* Added support for new commands:
+	  SETQUEUE, ADDQUEUE, DELQUEUE, ADDHISTORY, DELHISTORY, SHOWIDENTIFIER
+	  (See: #222)
+	* Updated protocol support to match new protocol (Closes: #222)
+
+v. 0.1beta2 (0.003) - Wed Feb 02 2011 18:17 CET
+	* Fixed typos
+	* Added support for envvar $RPLD_SERVER.
+	* Added info on new EIs (num:, likeness:, random: and randomlike:)
+	* Added support for likeness.
+	* Added support for SETPARENTLIST.
+	* Added support for already connected sockets.
+
+v. 0.1beta1 (0.002) - thu Sep 30 2010 20:56 CEST
+	* fixed small bug in PLE parser
+	* Added support to connect to default server
+
+v. 0.1beta0 (0.001) - Sat Sep 18 2010 21:14 CEST
+	* Project forked from Romie project.
+	* Wrote POD
+	* Added Makefile.PL

@@ -1,0 +1,23 @@
+<form name="import_vcards_form" id="import_vcards_form" action="" method="post" enctype="multipart/form-data" onSubmit="return import_vcards()">
+<table align="center">
+<tr>
+<td>Broadcast</td><td><tmpl_var name=broadcasts></td>
+</tr>
+<tr>
+<td>Communicate</td><td><tmpl_var name=communication_types></td>
+</tr>
+<tr>
+<td>Role</td><td><tmpl_var name=roles></td>
+</tr>
+<tr>
+<td>File name</td><td><input type="file" name="vfile_name" id="vfile_name" size="60" /></td>
+</tr>
+<tr>
+<td align="center" colspan="2"><input type="submit" name="submit_upload" value="Upload vFile" /></td>
+</tr>
+</table>
+<input type="hidden" name="sid" id="sid" value="<tmpl_var name=sid>" />
+</form>
+<table align="center">
+<tr><td><div id="import_vcards_result"></div></td></tr>
+</table>

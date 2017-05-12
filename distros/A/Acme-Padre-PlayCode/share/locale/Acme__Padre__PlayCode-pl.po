@@ -1,0 +1,36 @@
+#
+# Cezary Morga <cm@therek.net>, 2009.
+msgid ""
+msgstr ""
+"Project-Id-Version: padre-plugin-acmeplaycode\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-11 19:53+0300\n"
+"PO-Revision-Date: 2009-05-13 20:36+0200\n"
+"Last-Translator: Cezary Morga <cm@therek.net>\n"
+"Language-Team: Polish <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 0.3\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: lib/Padre/Plugin/AcmePlayCode.pm:19
+msgid "Averything"
+msgstr "Averything"
+
+#: lib/Padre/Plugin/AcmePlayCode.pm:20
+msgid "DoubleToSingle"
+msgstr "DoubleToSingle"
+
+#: lib/Padre/Plugin/AcmePlayCode.pm:21
+msgid "ExchangeCondition"
+msgstr "ExchangeCondition"
+
+#: lib/Padre/Plugin/AcmePlayCode.pm:22
+msgid "NumberPlus"
+msgstr "NumberPlus"
+
+#: lib/Padre/Plugin/AcmePlayCode.pm:23
+msgid "PrintComma"
+msgstr "PrintComma"
+

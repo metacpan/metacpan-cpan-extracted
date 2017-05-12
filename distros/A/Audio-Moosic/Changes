@@ -1,0 +1,38 @@
+Revision history for Perl extension Audio::Moosic.
+
+0.10  Fri Jan 18 13:50:16 2008
+        - Minor update. No functional changes.
+
+0.09  Mon Mar 21 20:45:33 2005
+        - Makefile.PL: Added RPC::XML to PREREQ_PM.
+
+0.08  Wed Dez 15 15:10:03 2004
+        - Documentation fix.
+        - Fixed fatal bugs in move() and move_list().
+        - Removed 'use 5.008004;' from Makefile.PL.
+
+0.07  Tue Sep 14 21:23:08 2004
+        - Added can_play().
+
+0.06  Mon Sep 13 12:48:22 2004
+        - Fixed bug with set_loop_mode().
+        - Added play().
+
+0.05  Fri Aug 20 12:41:03 2004
+        - Don't croak anymore if the connect failed. Simply set $@ and return an
+          undefined value.
+
+0.04  Thu Aug 19 13:26:12 2004
+        - Added swap method introduced by moosic 1.5.1 (api version 1.8).
+
+0.03  Thu Jul 15 09:35:34 2004
+        - LWP::Protocol::http::SocketUnix is the new name included in the module
+          list.
+
+0.02  Thu Jul 15 04:18:20 2004
+        - LWP::Protocol::http::UNIX is now known as LWP::Protocol::http::UnixSocket
+
+0.01  Sun Jun  6 19:21:53 2004
+        - original version; created by h2xs 1.23 with options
+                -AXO -n Audio::Moosic
+

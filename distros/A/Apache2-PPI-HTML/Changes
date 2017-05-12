@@ -1,0 +1,7 @@
+Revision history for Perl extension Apache2-PPI-HTML
+
+0.02 Sun 24 Aug 2008
+	- Updating to Module::Install 0.77
+
+0.01 Sun 10 Jul 2005
+	- Throwing up a quick initial version

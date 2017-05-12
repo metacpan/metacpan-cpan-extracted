@@ -1,0 +1,35 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+lib/Archive/Har.pm
+lib/Archive/Har/Creator.pm
+lib/Archive/Har/Page.pm
+lib/Archive/Har/Browser.pm
+lib/Archive/Har/Page/PageTimings.pm
+lib/Archive/Har/Entry.pm
+lib/Archive/Har/Entry/Request.pm
+lib/Archive/Har/Entry/Header.pm
+lib/Archive/Har/Entry/Cookie.pm
+lib/Archive/Har/Entry/Response.pm
+lib/Archive/Har/Entry/Request/QueryString.pm
+lib/Archive/Har/Entry/Request/PostData.pm
+lib/Archive/Har/Entry/Request/PostData/Params.pm
+lib/Archive/Har/Entry/Response/Content.pm
+lib/Archive/Har/Entry/Cache.pm
+lib/Archive/Har/Entry/Cache/Request.pm
+lib/Archive/Har/Entry/Timings.pm
+t/00-load.t
+t/pingdom.t
+t/chrome.t
+t/firebug_get.t
+t/firebug_post.t
+t/firebug_cookies_n_cache.t
+t/httpwatch_cookies_n_cache.t
+t/ie_network_inspector.t
+t/mandatory_optional.t
+t/manifest.t
+t/pod.t
+t/fiddler2.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

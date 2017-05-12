@@ -1,0 +1,65 @@
+---
+abstract: 'Classes and app to compute satellite visibility'
+author:
+  - 'Tom Wyant (wyant at cpan dot org)'
+build_requires:
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4222, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Astro-satpass
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Astro::Coord::ECI:
+    file: lib/Astro/Coord/ECI.pm
+    version: '0.079'
+  Astro::Coord::ECI::Mixin:
+    file: lib/Astro/Coord/ECI/Mixin.pm
+    version: '0.079'
+  Astro::Coord::ECI::Moon:
+    file: lib/Astro/Coord/ECI/Moon.pm
+    version: '0.079'
+  Astro::Coord::ECI::Star:
+    file: lib/Astro/Coord/ECI/Star.pm
+    version: '0.079'
+  Astro::Coord::ECI::Sun:
+    file: lib/Astro/Coord/ECI/Sun.pm
+    version: '0.079'
+  Astro::Coord::ECI::TLE:
+    file: lib/Astro/Coord/ECI/TLE.pm
+    version: '0.079'
+  Astro::Coord::ECI::TLE::Iridium:
+    file: lib/Astro/Coord/ECI/TLE/Iridium.pm
+    version: '0.079'
+  Astro::Coord::ECI::TLE::Set:
+    file: lib/Astro/Coord/ECI/TLE/Set.pm
+    version: '0.079'
+  Astro::Coord::ECI::Utils:
+    file: lib/Astro/Coord/ECI/Utils.pm
+    version: '0.079'
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Exporter: '5.64'
+  IO::File: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  base: '0'
+  constant: '0'
+  perl: '5.006002'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trwyant/perl-Astro-Coord-ECI.git
+version: '0.079'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

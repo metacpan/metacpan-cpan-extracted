@@ -1,0 +1,5 @@
+PerlLoadModule Apache2::FixupLastModified
+#PerlDebugLogDomain +subreq +invoc
+PerlDebugLogDomain *
+PerlDebugLogLevel 9
+PerlFixupHandler Apache2::FixupLastModified

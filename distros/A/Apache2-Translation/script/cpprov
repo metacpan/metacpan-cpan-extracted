@@ -1,0 +1,62 @@
+#!perl
+
+use strict;
+use Getopt::Long;
+
+my (@from, @to, $clear, $notes);
+
+sub config {
+  my $help;
+  Getopt::Long::Configure(qw/no_ignore_case/);
+  $clear=1;
+  $notes=1;
+  GetOptions('from=s{,}'=>\@from,
+	     'to=s{,}'=>\@to,
+	     'clear!'=>\$clear,
+	     'notes!'=>\$notes,
+	     'h'=>\$help) && !$help or do {
+	       warn <<"USAGE";
+cpprov -h | [-noclear] [-nonotes] -f[rom] FROM... -t[o] TO...
+ copies one Apache2::Translation provider into another
+
+ FROM, TO specify the source and destination provider.
+          Both expect an arbitrary number of string parameters. The first
+          string defines the provider type, e.g. File for
+          Apache2::Translation::File. All other strings are parameters
+          for the provider constructor.
+
+ Example:
+   cpprov -f File NotesDir notes ConfigFile trans \
+          -t MMapDB FileName trans.mmdb -noclear
+
+ -noclear do not clear the destination provider before appending the content
+          of the source.
+ -nonotes do not copy any notes
+ -h       print this help
+USAGE
+	       exit 1;
+	     };
+}
+
+config;
+
+my ($from, $to)=map {
+  my @param=@$_;
+  my $type=shift @param;
+  if( eval "require Apache2::Translation::$type" ) {
+    $type="Apache2::Translation::$type";
+    warn "Using $type (@param)\n";
+  } else {
+    eval "require $type" and warn "Using $type (@param)\n";
+  }
+  $type->new(@param) or die "$type->new(@param) ==> undef\n";
+} \@from, \@to;
+
+$from->start;
+$to->start;
+$to->begin;
+$to->clear if $clear;
+$to->append($from, drop_notes=>!$notes);
+$to->commit;
+$to->stop;
+$from->stop;

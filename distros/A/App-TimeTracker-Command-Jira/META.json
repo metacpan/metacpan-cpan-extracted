@@ -1,0 +1,76 @@
+{
+   "abstract" : "App::TimeTracker Jira plugin",
+   "author" : [
+      "Michael Kröll <pepl@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-TimeTracker-Command-Jira",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::TimeTracker::Utils" : "0",
+            "Data::Dumper" : "0",
+            "JIRA::REST" : "0",
+            "JSON::XS" : "0",
+            "Moose::Role" : "0",
+            "Path::Class" : "0",
+            "Try::Tiny" : "0",
+            "Unicode::Normalize" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Test::More" : "0.94",
+            "lib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::TimeTracker::Command::Jira" : {
+         "file" : "lib/App/TimeTracker/Command/Jira.pm",
+         "version" : "0.5"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pepl/app-timetracker-command-jira/issues"
+      },
+      "homepage" : "https://github.com/pepl/App-TimeTracker-Jira",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pepl/App-TimeTracker-Jira.git",
+         "web" : "https://github.com/pepl/App-TimeTracker-Jira"
+      }
+   },
+   "version" : "0.5"
+}
+

@@ -1,0 +1,4 @@
+Revision history for Algorithm-Nhash
+
+0.002     2011-05-13 18:36:03 Europe/London
+        updated distribution to use Dist::Zilla

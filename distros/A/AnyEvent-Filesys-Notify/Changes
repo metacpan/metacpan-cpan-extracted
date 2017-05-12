@@ -1,0 +1,164 @@
+Changes for AnyEvent::Filesys::Notify
+
+1.21 - Thu Jun 23 15:13:59 EDT 2016
+    Updates KQueue to remove file handles from watch list for deleted paths
+    - Addresses issue with leaking file handles. Thanks to dave@jetcafe.org.
+      (RT#115562).
+    - Upgrade is recommended if you use the KQueue backend.
+
+1.20 - Fri Jun 17 13:59:05 EDT 2016
+    Runs bug test against KQueue if possible; improves comments
+    - Ensures files are added to watch before calling in callback (RT#115380)
+      Files that were modified in the callback were sometimes not added to the
+      watch list first (specifically in KQueue and Inotify2). This patch
+      ensures that files/directories are added to the watch before the callback
+      is called. Thanks to Dave Hayes <dave@jetcafe.org> for the bug report.
+    - If you modified _process_events (a private method) this could break your
+      code.
+    - Upgrade is recommended if you use the KQueue or Inotify2 backends.
+
+1.19 - Tue May 26 15:20:03 EDT 2015
+    - Converts utility functions to methods to support subclassing (RT#104714).
+      The use of local functions (rather than methods) makes subclassing
+      more difficult. This change converts all utility functions in Notify.pm
+      to methods. Thanks to Dave Hayes for submitting RT#104714.
+    - Any users attempting to subclass should consider upgrading.
+
+1.18 - Wed May 20 20:27:58 EDT 2015
+    - Adds version to some files which were missing it
+    - No change in functionality. No need to upgrade.
+
+1.17 - Wed May 20 08:07:04 EDT 2015
+    - Switches from namespace::sweep to namespace::autoclean (RT#104554).
+      autoclean no longer depends on Class::MOP (a heavy prereq).
+      Thanks to Karen Etheridge (ether++) for report.
+    - No change in functionality. No need to upgrade.
+
+1.16 - Fri Feb 27 13:38:46 EST 2015
+    - Rewrites the test functions to accommodate optional events
+      Parsing events from Inotify2 (instead of re-scanning) results in
+      extraneous modifications in some situations. Tests shouldn't fail if
+      these optional events are triggered.
+
+1.15 - Fri Aug 15 20:14:38 EDT 2014
+    - Adds minimum version of perl to the prereqs
+
+1.12 - Sun Dec 22 14:04:39 EST 2013
+    - Uses KQueue on any BSD RT#91556
+
+1.11 - Wed Dec 11 08:59:54 EST 2013
+    - Uses IO::KQueue on all freebsd-like systems (ie, gnufreebsd).
+    - Fixes minor POD linking problem.
+
+1.10 - Tue Dec 10 11:42:06 EST 2013
+    - If the parse_events flag is set, use events from Inotify2 instead of
+      rescanning all files (RT#82847).  Thanks to Carsten Wolff
+      <carsten@wolffcarsten.de> for the patch.
+    - Generates 'created' events for files in a new subdirs when parsing events.
+      This ensures that we don't miss any.
+    - Refactors the test routines to improve reliability and increase code
+      reuse.
+
+0.24 - Fri Oct  4 11:44:42 EDT 2013
+    - Makes an official release of after converting to Moo. CPANTesters didn't
+      seem to have any issues with the conversion. Hopefully this change will
+      be seemless for users.
+
+0.23_10 - Mon Sep 30 20:06:50 EDT 2013
+    EXPERIMENTAL DEVELOPERS RELEASE
+
+    - Attempts to convert from Moose to Moo for our OO infrastructure. We
+      don't need much of Moose's power, so let's take advantage of Moo's speed.
+    - Adds version requirements to the prereqs. Earlier version of some of
+      the prereq seemed to produce an unstable result. Current versions seem
+      fine.
+    - Fixes Changes file to adhere to CPAN::Changes spec
+    - Replaces namespace::autoclean with namespace::sweep as
+      namespace::autoclean relies on Class::MOP
+
+0.22 - Tue Mar  5 14:15:44 EST 2013
+    - This is an important release for KQueue users. Prior versions had several
+      bugs in the KQueue backend. As a result, KQueue was effectively polling
+      the filesystem with no delay. KQueue has a serious limitation which makes
+      it impractical for monitoring medium to large sets of files (namely, you
+      need an open filehandle for each directory AND file that you are
+      monitoring). The use of the KQueue backend is discouraged.
+
+    - Fixes KQueue backend bug which causes CPU usage to peg at 100%
+      (thank to gdxhsw++ for the bug report and patch)
+    - Updates the documentation and issue warnings for KQueue filehandles
+    - Fixes errors in documentation
+    - Adds namespace::autoclean to the Event object
+
+0.21 - Mon Feb  4 15:52:47 EST 2013
+    - Converts from File::Find::Rule to Path::Interator::Rule
+      - Should speed things up marginally.
+      - Adds benchmark and profiling tools
+    - Marks tests as TODO if we are on gnufreebsd or gnukfreebsd
+      - Based on diag output, tests appear to work, but we get failures from
+        cpantesters. I don't have access to this platform to investigate
+        further.
+
+0.19 - Mon Jan 14 20:30:38 EST 2013
+    - Fixes KQueue bugs.  This works on a Mac, hoping it will work on FreeBSD.
+
+0.18 - Thu Jan 10 10:39:22 EST 2013
+    - Fixes non-mac bug where 'plan' is called twice.
+      Thanks to syohex for the patch.
+
+0.17 - Wed Jan  9 19:53:53 EST 2013
+    - Renames backend roles to reflect the implementation rather than the O/S
+      (Inotify2, FSEvents and KQueue)
+    - Adds the 'backend' argument to the constructor allow the user to force
+      a particular backend
+    - Guides the user to avoid no_external in the docs
+
+0.15 - Wed Dec  5 12:01:07 EST 2012
+    - Skips attribute modification tests on Win32.
+
+0.14 - Tue Nov 27 08:58:47 EST 2012
+    - Adds missing prereq for FreeBSD
+    - Checks of Kqueue from TODO list
+
+0.12 - Wed Nov 21 08:22:55 EST 2012
+    - Fixes missing file in MANIFEST and bumps versions
+
+0.11 - Tue Nov 20 11:27:16 EST 2012
+    - Adds kqueue support and test on FreeBSD. Thanks to Gasol Wu
+      <gasol.wu@gmail.com> who provided the well done patch.
+
+0.10 - Tue Nov 20 10:57:28 EST 2012
+    - Move author/release tests to xt/
+    - Skip the symlink tests on Win32
+
+0.09 - Mon Oct 22 11:06:48 EDT 2012
+    - Skips attribute modification tests on MS Win platforms
+    - Updates README with current year in copyright
+
+0.08 - Tue Oct 16 12:08:22 EDT 2012
+    - Adds support for changes in a file or directory's attributes. Thanks to
+      Florian Koch for the bug report (RT#80156) and patch.
+
+0.07 - Sun Jul 22 09:34:00 EDT 2012
+    - Fixes missing events for file moves on Linux (RT#78482)
+      - Adds the IN_MOVE flag to Linux::Inotify2 watcher
+      - Adds a timeout to the test scripts
+
+0.06 - Wed Dec 14 17:24:52 EST 2011
+    - Implemented a fix for RT#72849 (excessive warnings if there are broken
+      symlinks on ext4)
+
+0.05 - Mon Feb  8 18:47:45 2010
+    - Fixed bug in AFN::Event, where is_dir was incorrectly typed.
+
+0.04 - Fri Jan 29 16:13:39 2010
+    - Updated documentation to reflect ability to watch multiple
+      directories.
+    - Other minor cleanup.
+
+0.03 - Fri Dec 11 08:55:30 2009
+    - Added namespace::autoclean and switched to apply_all_roles. This gives us
+      true per-instance application of backends (Inotify/FSEvents/Fallback).
+
+0.02 - Thu Dec 10 11:53:37 2009
+    - Initial release on CPAN

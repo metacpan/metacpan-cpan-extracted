@@ -1,0 +1,652 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use warnings 'all';
+use Cwd 'cwd';
+use DBI;
+
+
+my $args = { };
+
+$args->{domain}           = prompt("What is the web application domain?", "www.example.com");
+$args->{application_name} = prompt("Application name?", "MyApp");
+
+$args->{mail_errors_to}   = prompt("Email errors to?", 'you@domain.com');
+$args->{mail_errors_from} = prompt("Email errors from?", 'root@localhost.com');
+$args->{smtp_server}      = prompt("SMTP Server?", 'localhost');
+
+$args->{session_dsn}            = prompt("Session DSN?", "DBI:mysql:dbname:localhost");
+$args->{session_user}           = prompt("Session db username?");
+$args->{session_pass}           = prompt("Session db password?");
+$args->{session_cookie_domain}  = prompt("Session cookie domain?", $args->{domain});
+$args->{session_timeout}        = prompt("Session timeout? (in minutes)", 30);
+$args->{session_cookie_name}    = prompt("Session cookie name?", 'session-id');
+
+$args->{app_dsn}  = prompt("Application DSN?", $args->{session_dsn});
+$args->{app_user} = prompt("Application db username?", $args->{session_user});
+$args->{app_pass} = prompt("Application db password?", $args->{session_pass});
+
+$args->{main_dsn}   = prompt("Main DSN?", $args->{session_dsn});
+$args->{main_user}  = prompt("Main db username?", $args->{session_user});
+$args->{main_pass}  = prompt("Main db password?", $args->{session_pass});
+
+
+warn "="x79, "\n";
+warn "Creating database tables...\n";
+eval {
+  my $dbh = DBI->connect( $args->{session_dsn}, $args->{session_user}, $args->{session_pass} );
+  $dbh->do(q~
+  DROP TABLE IF EXISTS asp_sessions
+  ~);
+  $dbh->do(q~
+  CREATE TABLE `asp_sessions` (
+    `session_id`   char(32) NOT NULL,
+    `session_data` blob,
+    `created_on`   datetime default NULL,
+    `modified_on`  datetime default NULL,
+    PRIMARY KEY  (`session_id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+  ~);
+  $dbh->disconnect();
+  1;
+} or die $@;
+eval {
+  my $dbh = DBI->connect( $args->{app_dsn}, $args->{app_user}, $args->{app_pass} );
+  $dbh->do(q~
+  DROP TABLE IF EXISTS asp_applications
+  ~);
+  $dbh->do(q~
+  CREATE TABLE `asp_applications` (
+    `application_id`   varchar(100) NOT NULL,
+    `application_data` blob,
+    PRIMARY KEY  (`application_id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+  ~);
+  $dbh->disconnect();
+  1;
+} or die $@;
+
+
+warn "="x79, "\n";
+warn "Creating directory structure...\n";
+
+mkdir($args->{domain}) or die "Cannot mkdir('$args->{domain}'): $!";
+foreach my $dir (qw( lib etc conf htdocs handlers PAGE_CACHE MEDIA ))
+{
+  mkdir("$args->{domain}/$dir") or die "Cannot mkdir('$args->{domain}'): $!";
+}# end foreach()
+
+open my $ofh, '>', "$args->{domain}/conf/apache2-asp-config.xml";
+print $ofh <<"CONFIG_XML";
+<?xml version="1.0" ?>
+<configuration>
+
+  <system>
+    <post_processors>
+<!--
+      <class>My::PostProcessor</class>
+      <class>My::PostProcessor2</class>
+-->
+    </post_processors>
+    <libs>
+      <lib>\@ServerRoot\@/lib</lib>
+    </libs>
+    <load_modules>
+      <module>DBI</module>
+    </load_modules>
+    <env_vars>
+      <var>
+        <name>environment-var1</name>
+        <value>value-1</value>
+      </var>
+      <var>
+        <name>environment-var2</name>
+        <value>value-2</value>
+      </var>
+    </env_vars>
+    <settings>
+      <setting>
+        <name>mysetting</name>
+        <value>some-value</value>
+      </setting>
+      <setting>
+        <name>anothersetting</name>
+        <value>anothervalue</value>
+      </setting>
+    </settings>
+  </system>
+  
+  <errors>
+    <error_handler>Apache2::ASP::ErrorHandler</error_handler>
+    <mail_errors_to>@{[ $args->{mail_errors_to} ]}</mail_errors_to>
+    <mail_errors_from>@{[ $args->{mail_errors_from} ]}</mail_errors_from>
+    <smtp_server>@{[ $args->{smtp_server} ]}</smtp_server>
+  </errors>
+
+  <web>
+    <application_name>@{[ $args->{application_name} ]}</application_name>
+    <application_root>\@ServerRoot\@</application_root>
+    <handler_root>\@ServerRoot\@/handlers</handler_root>
+    <media_manager_upload_root>\@ServerRoot\@/MEDIA</media_manager_upload_root>
+    <www_root>\@ServerRoot\@/htdocs</www_root>
+    <page_cache_root>\@ServerRoot\@/PAGE_CACHE</page_cache_root>
+    <request_filters>
+<!--
+      <filter>
+        <uri_match>/.*</uri_match>
+        <class>My::MemberFilter</class>
+      </filter>
+      <filter>
+        <uri_equals>/index.asp</uri_equals>
+        <class>My::MemberFilter2</class>
+      </filter>
+-->
+    </request_filters>
+  </web>
+
+  <data_connections>
+    <session>
+      <manager>Apache2::ASP::SessionStateManager::MySQL</manager>
+      <cookie_domain>@{[ $args->{session_cookie_domain} ]}</cookie_domain>
+      <cookie_name>@{[ $args->{session_cookie_name} ]}</cookie_name>
+      <dsn>@{[ $args->{session_dsn} ]}</dsn>
+      <username>@{[ $args->{session_user} ]}</username>
+      <password>@{[ $args->{session_pass} ]}</password>
+      <session_timeout>@{[ $args->{session_timeout} ]}</session_timeout>
+    </session>
+    <application>
+      <manager>Apache2::ASP::ApplicationStateManager::MySQL</manager>
+      <dsn>@{[ $args->{app_dsn} ]}</dsn>
+      <username>@{[ $args->{app_user} ]}</username>
+      <password>@{[ $args->{app_pass} ]}</password>
+    </application>
+    <main>
+      <dsn>@{[ $args->{main_dsn} ]}</dsn>
+      <username>@{[ $args->{main_user} ]}</username>
+      <password>@{[ $args->{main_pass} ]}</password>
+    </main>
+  </data_connections>
+
+</configuration>
+CONFIG_XML
+close($ofh);
+
+
+open my $conf_ofh, '>', "$args->{domain}/conf/httpd.conf";
+print $conf_ofh <<"CONF";
+
+
+# Load up some important modules:
+PerlModule DBI
+PerlModule Apache2::ASP::ModPerl
+
+# Admin website:
+<VirtualHost *:80>
+
+  ServerName    @{[ $args->{domain} ]}
+  DocumentRoot  @{[ cwd() . '/' . $args->{domain} . '/htdocs' ]}
+  
+  # Set the directory index:
+  DirectoryIndex index.asp
+  
+  # All *.asp files are handled by Apache2::ASP::ModPerl
+  <Files ~ (\.asp\$)>
+    SetHandler  perl-script
+    PerlResponseHandler Apache2::ASP::ModPerl
+  </Files>
+  
+  # !IMPORTANT! Prevent anyone from viewing your GlobalASA.pm
+  <Files ~ (\.pm\$)>
+    Order allow,deny
+    Deny from all
+  </Files>
+  
+  # All requests to /handlers/* will be handled by their respective handler:
+  <Location /handlers>
+    SetHandler  perl-script
+    PerlResponseHandler Apache2::ASP::ModPerl
+  </Location>
+  
+</VirtualHost>
+
+CONF
+close($conf_ofh);
+
+open my $asa_ofh, '>', "$args->{domain}/htdocs/GlobalASA.pm";
+print $asa_ofh <<"ASA";
+
+package @{[ $args->{application_name} ]}::GlobalASA;
+
+use strict;
+use warnings 'all';
+use base 'Apache2::ASP::GlobalASA';
+use vars __PACKAGE__->VARS;
+
+# sub Server_OnStart;
+# sub Application_OnStart;
+# sub Session_OnStart;
+# sub Script_OnStart;
+# sub Script_OnEnd;
+
+1;# return true:
+
+ASA
+close($asa_ofh);
+
+warn "\nSetup is almost complete.
+Make sure to add the following lines to your main httpd.conf:
+
+  # Unless you've already done this:
+  NameVirtualHost *:80
+  
+  # And this (unless you already have):
+  AddModule perl_module modules/mod_perl.so
+  
+  # And *Don't* forget about this line:
+  Include @{[ cwd() ]}/@{[ $args->{domain} ]}/conf/httpd.conf
+";
+
+open my $asp_ofh, '>', "$args->{domain}/htdocs/index.asp";
+print $asp_ofh <<'ASP';
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Apache2::ASP Test Page</title>
+</head>
+<body>
+<h1>Congratulations</h1>
+<p>You have successfully installed Apache2::ASP.</p>
+<p>
+  Visit your <a href="/examples/contact.asp">example contact form</a> to see 
+  several concepts in action.
+</p>
+</body>
+</html>
+ASP
+close($asp_ofh);
+
+open my $props_ofh, '>', "$args->{domain}/etc/properties.yaml";
+print $props_ofh <<"YAML";
+---
+contact_form:
+  first_name:
+    is_missing: Required
+  last_name:
+    is_missing: Required
+  email:
+    is_missing: Required
+    is_invalid: Invalid
+  message:
+    is_missing: Required
+
+YAML
+close($props_ofh);
+
+open my $data_ofh, '>', "$args->{domain}/etc/test_fixtures.yaml";
+print $data_ofh <<"YAML";
+---
+  contact_form:
+    first_name: John
+    last_name:  Doe
+    email:      john.doe\@test.com
+    message:    This is a test message...just a test.
+
+YAML
+close($data_ofh);
+
+mkdir "$args->{domain}/htdocs/examples" or die "CANNOT MKDIR examples: $!";
+open my $contact_asp, '>', "$args->{domain}/htdocs/examples/contact.asp";
+print $contact_asp <<"ASP";
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<%
+  # Make a "sticky form":
+  if( my \$args = \$Session->{__lastArgs} )
+  {
+    \$Form->{\$_} = \$args->{\$_} foreach keys(\%\$args);
+  }# end if()
+  my \$errors = \$Session->{validation_errors} || { };
+  my \$err = sub {
+    my \$name = shift;
+    return unless \$errors->{\$name};
+%><span class="field_error"><%= \$Server->HTMLEncode( \$errors->{\$name} ) %></span><%
+  };
+%>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Apache2::ASP Example Contact Form</title>
+  <style type="text/css">
+  .field_error {
+    color: #FF0000;
+    font-weight: bold;
+  }
+  
+  .label {
+    display: block;
+    float: left;
+    width: 150px;
+    text-align: right;
+    padding-right: 5px;
+    margin-right: 5px;
+    position: relative;
+    top: 2px;
+  }
+  
+  .required {
+    border-right: solid 6px #FF0000;
+  }
+  
+  .optional {
+    border-right: solid 6px transparent;
+  }
+  </style>
+</head>
+<body>
+<form method="post" action="/handlers/examples.contact">
+
+<div>
+  <span class="label required">First Name:</span>
+  <input type="text" name="first_name" value="<%= \$Server->HTMLEncode( \$Form->{first_name} ) %>" />
+  <% \$err->('first_name'); %>
+</div>
+
+<div>
+  <span class="label required">Last Name:</span>
+  <input type="text" name="last_name" value="<%= \$Server->HTMLEncode( \$Form->{last_name} ) %>" />
+  <% \$err->('last_name'); %>
+</div>
+
+<div>
+  <span class="label required">Email Address:</span>
+  <input type="text" name="email_address" value="<%= \$Server->HTMLEncode( \$Form->{email_address} ) %>" />
+  <% \$err->('email_address'); %>
+</div>
+
+<div>
+  <span class="label required">Your Message:</span>
+  <textarea rows="6" cols="40" name="message"><%= \$Server->HTMLEncode( \$Form->{message} ) %></textarea>
+  <% \$err->('email_address'); %>
+</div>
+
+<div>
+  <span class="label optional">&nbsp;</span>
+  <input type="submit" value="Submit Form" />
+</div>
+
+</form>
+</body>
+</html>
+<%
+  map { delete( \$Session->{\$_} ) } qw/
+    validation_errors
+    __lastArgs
+    msg
+  /;
+%>
+ASP
+close($contact_asp);
+
+mkdir( "$args->{domain}/handlers/examples" );
+open my $handler_ofh, '>', "$args->{domain}/handlers/examples/contact.pm";
+print $handler_ofh <<'HANDLER';
+
+package examples::contact;
+
+use strict;
+use warnings 'all';
+use base 'Apache2::ASP::FormHandler';
+use vars __PACKAGE__->VARS;
+use Data::Properties::YAML;
+
+
+#==============================================================================
+sub run
+{
+  my ($s, $context) = @_;
+  
+  if( my $errors = $s->validate( $context ) )
+  {
+    $Session->{__lastArgs} = $Form;
+    $Session->{validation_errors} = $errors;
+    return $Response->Redirect( $ENV{HTTP_REFERER} );
+  }# end if()
+  
+  # Uncomment to actually email someone:
+  if( 0 )
+  {
+    $Server->Mail(
+      From        => 'root@localhost',
+      'reply-to'  => $Form->{email},
+      To          => 'you@yours.com',
+      Subject     => "$ENV{HTTP_HOST} Contact Form Results",
+      Message     => <<"EMAIL",
+Dear admin,
+
+$Form->{first_name} $Form->{last_name} <$Form->{email}> has sent you the 
+following message:
+
+$Form->{message}
+
+EMAIL
+    );
+  }# end if()
+  
+  $Response->Write("Thanks for contacting us.<br/>If this were a real form, you would have been redirected someplace.");
+}# end run()
+
+
+#==============================================================================
+sub validate
+{
+  my ($s, $context) = @_;
+  
+  # Remove leading/trailing whitespace:
+  map {
+    $Form->{$_} =~ s/^\s+//;
+    $Form->{$_} =~ s/\s+$//;
+  } keys(%$Form);
+  
+  no warnings 'uninitialized';
+  
+  # We pull our warnings from a YAML properties file so they can be changed easily:
+  my $props = Data::Properties::YAML->new(
+    properties_file => $Config->web->application_root . '/etc/properties.yaml',
+  )->contact_form;
+  
+  my $errors = { };
+  
+  # Validate first_name:
+  unless( length($Form->{first_name}) )
+  {
+    $errors->{first_name} = $props->first_name->is_missing;
+  }# end unless()
+  
+  # Validate last_name:
+  unless( length($Form->{last_name}) )
+  {
+    $errors->{last_name} = $props->last_name->is_missing;
+  }# end unless()
+  
+  # Validate email:
+  if( length($Form->{email}) )
+  {
+    # Just a simple regex - knock yourself out if you want:
+    unless( $Form->{email} =~ m/^.*?@.*?\..+$/ )
+    {
+      $errors->{email} = $props->email->is_invalid;
+    }# end unless()
+  }
+  else
+  {
+    $errors->{email} = $props->email->is_missing;
+  }# end if()
+  
+  # Validate message:
+  unless( length($Form->{message}) )
+  {
+    $errors->{message} = $props->message->is_missing;
+  }# end unless()
+  
+  return keys(%$errors) ? $errors : undef;
+}# end validate()
+
+1;# return true:
+
+HANDLER
+close($handler_ofh);
+
+mkdir "$args->{domain}/t";
+open my $t_ofh, '>', "$args->{domain}/t/01.01-contact_form.t";
+print $t_ofh <<'TEST';
+#!/usr/bin/perl -w
+
+use strict;
+use warnings 'all';
+use Test::More 'no_plan';
+use base 'Apache2::ASP::Test::Base';
+use HTML::Form;
+use Data::Properties::YAML;
+
+ok( my $s = __PACKAGE__->SUPER::new() );
+
+# Get our contact_form testing data:
+my %data = $s->data->contact_form->as_hash;
+my $props = Data::Properties::YAML->new(
+  properties_file => $s->ua->context->config->web->application_root . '/etc/properties.yaml',
+)->contact_form;
+
+# Will it load?:
+{
+  my $res = $s->ua->get("/examples/contact.asp");
+  is( $res->is_success => 1, "/examples/contact.asp loads");
+}
+
+### Validation Testing:
+
+# first_name:
+{
+  local $data{first_name} = '';
+  my $res = $s->ua->post("/handlers/examples.contact", [
+    %data
+  ]);
+  
+  # Redirected?:
+  is( $res->header('location') => '/examples/contact.asp' );
+  
+  # Correct validation message?:
+  is(
+    $s->ua->context->session->{validation_errors}->{first_name} => $props->first_name->is_missing
+  );
+}
+
+# last_name:
+{
+  local $data{last_name} = '';
+  my $res = $s->ua->post("/handlers/examples.contact", [
+    %data,
+  ]);
+  
+  # Redirected?:
+  is( $res->header('location') => '/handlers/examples.contact' );
+  
+  # Correct validation message?:
+  is(
+    $s->ua->context->session->{validation_errors}->{last_name} => $props->last_name->is_missing
+  );
+}
+
+# email - missing:
+{
+  local $data{email} = '';
+  my $res = $s->ua->post("/handlers/examples.contact", [
+    %data,
+  ]);
+  
+  # Redirected?:
+  is( $res->header('location') => '/handlers/examples.contact' );
+  
+  # Correct validation message?:
+  is(
+    $s->ua->context->session->{validation_errors}->{email} => $props->email->is_missing
+  );
+}
+
+# email - invalid:
+{
+  local $data{email} = 'invalid-email';
+  my $res = $s->ua->post("/handlers/examples.contact", [
+    %data,
+  ]);
+  
+  # Redirected?:
+  is( $res->header('location') => '/handlers/examples.contact' );
+  
+  # Correct validation message?:
+  is(
+    $s->ua->context->session->{validation_errors}->{email} => $props->email->is_invalid
+  );
+}
+
+# message:
+{
+  local $data{message} = '';
+  my $res = $s->ua->post("/handlers/examples.contact", [
+    %data,
+  ]);
+  
+  # Redirected?:
+  is( $res->header('location') => '/handlers/examples.contact' );
+  
+  # Correct validation message?:
+  is(
+    $s->ua->context->session->{validation_errors}->{message} => $props->message->is_missing
+  );
+}
+
+# And make sure everything works when we submit the form nicely:
+{
+  $s->ua->get("/examples/contact.asp");
+  my $res = $s->ua->post("/handlers/examples.contact", [
+    %data,
+  ]);
+  
+  # No error messages:
+  is(
+    $s->ua->context->session->{validation_errors} => undef
+  );
+}
+
+
+TEST
+close($t_ofh);
+
+#==============================================================================
+sub prompt
+{
+  my ($q, $default) = @_;
+  
+  local $| = 1;
+  my $answer;
+  
+  if( defined($default) )
+  {
+    print "\n$q: [$default] ";
+  }
+  else
+  {
+    print "\n$q: ";
+  }# end if()
+  chomp($answer = <STDIN>);
+
+  return $default if defined($default) && ! length($answer);
+  
+  until( length($answer) )
+  {
+    print "$q: ";
+    chomp($answer = <STDIN>);
+  }# end until()
+  
+  return $answer;
+}# end prompt()
+

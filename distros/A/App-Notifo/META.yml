@@ -1,0 +1,21 @@
+---
+abstract: 'command-line tool to send a notification to notifo.com'
+author:
+  - 'Pedro Melo <melo@simplicidade.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.101670'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Notifo
+requires:
+  Getopt::Long: 0
+  Pod::Usage: 0
+  WebService::Notifo: 0
+resources:
+  repository: http://github.com/melo/app-notifo.git
+version: 0.001

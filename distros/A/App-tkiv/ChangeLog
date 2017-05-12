@@ -1,0 +1,187 @@
+0.130 - 02 Jan 2016, H.Merijn Brand
+    * Add a third line to in-image exif info showing device/camera
+    * Add CONTRIBUTING.md
+    * Use File::Temp for temporary files (esp. for Windows users)
+    * It's 2016
+
+0.129 - 11 Feb 2015, H.Merijn Brand
+    * Remove defined-or test from Makefile.PL
+    * Remove perl recommendation from META as it breaks cpan clients
+    * Move repo to github
+
+0.128 - 02 Jan 2015, H.Merijn Brand
+    * Require Image::ExifInfo (was optional) and META info for rest
+
+0.127 - 01 Jan 2015, H.Merijn Brand
+    * Update copyright to 2014
+    * Open images under eval to skip invalid files
+    * Update copyright to 2015
+
+0.126 - 12 May 2013, H.Merijn Brand
+    * Update copyright to 2013
+    * Declare UTF-8 in documentation
+    * Support buttons <5> and <6> for horizontal scrolling
+
+0.125 - 11 Jan 2012, H.Merijn Brand
+    * Update copyright to 2012
+
+0.124 - 07 Sep 2011, H.Merijn Brand
+    * NAME / DISTNAME in Makefile.PL
+
+0.123 - 07 Sep 2011, H.Merijn Brand
+    * Safeguard on failing exiftran
+    * More cross-checks for META data
+    * Follow original path when targets are sym-linked instead of realpath
+    * Don't expand thumbs when resizing main window
+    * Make firstprev work
+    * Introduce dirTreeStartPos
+
+0.122 - 11 Aug 2010, H.Merijn Brand
+    * Allow iv.rc as well
+    * Introduce keys_firstprev
+    * Spell checking
+
+0.121 - 03 Jun 2010, H.Merijn Brand
+    * Introduce keys_focusthumbs
+    * Introduce titleIndex
+    * Update examples/.ivrc
+
+0.120 - 12 Apr 2010, H.Merijn Brand
+    * Introduce keys_full_toggle
+    * Introduce lastFirstNext option
+    * Hugely speed up user experience on firstNext and lastFirstNext
+    * Dropped YAML spec to 1.0
+    * Moved pod to App::tkiv
+
+0.116 - 15 Dec 2009, H.Merijn Brand
+    * Updated META.yml to meet most recent specs (optional_features = map)
+
+0.115 - 15 Dec 2009, H.Merijn Brand
+    * Correct name in META.yml
+
+0.114 - 31 Oct 2009, H.Merijn Brand
+    * META.yml declaration fix
+
+0.113 - 31 Oct 2009, H.Merijn Brand
+    * Correct wrong eval { use ... }} checking of optional modules
+    * system call now takes list to prevent quote detection
+    * Delayed destroy of previous pic display to ease transitions (thanks JV)
+    * Introduce ScrollSpeed option
+    * Introduce ThumbRefresh option
+    * Use both possible methods to detect screen-size and use largest values
+    * Introduce -1 command line option
+    * Update and expand documentation
+    * Introduce keys_quit_all
+    * Add missing start with last pic key binding
+    * Introduce keys_firstnext
+    * Introduce titledirs
+    * Bad images are now skipped instead of causing a die
+
+0.112 - 11 Aug 2009, H.Merijn Brand
+    * Make X11::Protocol optional, and use $mw->screenwidth
+
+0.111 - 07 Aug 2009, H.Merijn Brand
+    * Canvas has native restrictive scroll (Wheel, Alt-Wheel and Control-Wheel),
+      no more Scrolled subwidget (still need working key-bindings)
+
+0.110 - 28 Jul 2009, H.Merijn Brand
+    * Add showexifinfo
+
+0.103 - 19 Jul 2009, H.Merijn Brand
+    * Make slidecover work (a bit)
+
+0.102 - 05 Jul 2009, H.Merijn Brand
+    * removed unused slideshowloop attrib
+
+0.101 - 27 Apr 2009, H.Merijn Brand
+    * selectionFont & selectionColor attributes
+    * better deal with maxx (Xinerama dual screens)
+
+0.100 - 05 Mar 2009, H.Merijn Brand
+    * Cropping/selection (switch from Label to Canvas to display full images)
+    * Data::Peek instead of Data::Dumper
+
+
+0.051 - 30 Jan 2009, H.Merijn Brand
+    * Die if PhotoXY fails
+
+0.050 - 09 Jul 2008, H.Merijn Brand
+    * Switch font syntax
+
+0.049 - 08 Jul 2008, H.Merijn Brand
+    * Exif Info window now expands (top level pack i.o. grid)
+
+0.048 - 25 Nov 2007, H.Merijn Brand
+    * Added NEF (a TIFF variant)
+
+0.047 - 05 Nov 2007, H.Merijn Brand
+    * Small changes in preparation of App::tkiv (defined-or)
+
+0.046 - 29 Oct 2007, H.Merijn Brand
+    * Added Tk::TIFF which works fine with 804.027_501
+
+0.045 - 05 Oct 2007, H.Merijn Brand
+    * ...
+
+0.044 - 25 Sep 2007, H.Merijn Brand
+    * Upgrade window titles to UTF-8
+    * Some perlcritic cleanups (perlcritic also evolves)
+
+0.043 - 17 Sep 2007, H.Merijn Brand
+    * Reset update status if folder deleted
+    * Remember the refreshed folder in refreshing
+
+0.042 - 10 Sep 2007, H.Merijn Brand
+    * Prevent update while update
+
+0.041 - 09 Sep 2007, H.Merijn Brand
+    * Some perl::critic cleanups
+
+0.040 - 03 Sep 2007, H.Merijn Brand
+    * Cleaned up slideshow somewhat. added -s
+
+0.039 - 30 Aug 2007, H.Merijn Brand
+    * Added random sorting for images
+
+0.038 - 18 Aug 2007, H.Merijn Brand
+    * Reverse is alias for descending for ThumbSortOrder
+
+0.037 - 26 Jun 2007, H.Merijn Brand
+    * Support for Image::Size; better parsing for identify
+
+0.036 - 22 Jun 2007, H.Merijn Brand
+    * Added key bindings to set image position
+
+0.035 - 11 Feb 2007, H.Merijn Brand
+    * Added fit-to-height (h), fit-to-width (b) and orig-size (o)
+    * Added changelog, delete folder if empty, fix key-F
+
+0.034 - 02 Jan 2007, H.Merijn Brand
+    * Rotation saves Orientation *and* Rotation
+
+0.033 - 16 Feb 2006, H.Merijn Brand
+    * Skip un-identify-able pics, up- and down keys in treeview
+
+0.032 - 06 Feb 2006, H.Merijn Brand
+    * Show legal values for alt options in usage
+
+0.031 - 10 Dec 2005, H.Merijn Brand
+    * show options, default-keys, more TODO, $opt_v, Image::Info,
+      background/backdrop, slide-show options, first stab at
+      animated pics, key F stores fullscreen on current dir,
+
+0.025 - 15 Aug 2005, H.Merijn Brand
+    * option slidefull & imagefull, Image::ExifTool, take space
+      for toolbar and window decoration into account with size
+      calculations, better resize and rotate, show_exif, better
+      image list, use Image::Info if available, otherwise use
+      identify, rotated thumbnails, reset some vars for slide
+      show, pass name of first pic on command line
+
+0.021 - 08 Dec 2004, H.Merijn Brand
+    * Added usage (), command line options (for now only -f),
+      useful locations for .ivrc, $ENV{IVRC}, rotate right now
+      rotates right instead of left, 
+
+0.020 - 28 Nov 2004, H.Merijn Brand
+    * From backpan :)

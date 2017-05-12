@@ -1,0 +1,43 @@
+Revision history for App::Gre.
+
+0.12  Tue Oct 25 12:34:53 CDT 2016
+0.11
+    - Regular file recursion. nothing fancy. and do not read symlinks
+      unless given on the command line.
+
+0.10  Mon Sep  7 13:08:08 CDT 2015
+    - Make sure sort order of readdir doesn't affect the test
+
+0.09  Thu Aug 27 16:06:50 CDT 2015
+    - Repackage with new MakeMaker version
+
+0.08  Wed Aug 26 11:27:12 CDT 2015
+    - Specified min perl version 5.6.0 in metadata and code
+    - Added github repo to the dist metadata and doc
+    - Specified license type of 'perl' in dist metadata
+    - Put all dependencies in PREREQ_PM and TEST_REQUIRES if supported
+    - Removed App-Gre-0.04.tar.gz from MANIFEST
+    - Fixed pod warnings - needed to use escapes for < and >
+    (Thanks to Neil Bowers <neil@bowers.com> for these)
+
+0.07  Wed Aug 26 11:25:56 CDT 2015
+    - Add links to docs
+
+0.06  Tue Aug 25 11:27:41 CDT 2015
+    - Fix POD error
+
+0.05  Tue Aug 25 11:15:55 CDT 2015
+    - passthru option sets style 3
+    - More tests
+
+0.04  Mon Aug 24 17:55:05 CDT 2015
+    - Messing with ExtUtils::MakeMaker options.
+    - More tests
+
+0.03
+0.02
+    - I forget
+
+0.01  Fri Aug 14 15:39:25 2015
+    - gre, a grep clone.
+

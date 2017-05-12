@@ -1,0 +1,88 @@
+Revision history for Perl extension Apache::ClickPath
+1.901 Tue Apr  8 14:29:44 CEST 2008
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- Crypt::CBC interface has changed
+	- some minor changes to the build process
+
+1.9   Sun Oct 30 20:15:24 CET 2005
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- using Apache2::URL::parse_uri instead of $r->uri
+	  to set the uri after cutting the session off
+
+1.8   Sun Jul 17 13:52:56 CEST 2005
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- ClickPathSecret, ClickPathSecretIV  directives
+	- better testing
+
+1.7   Sun Jun 12 18:34:39 CEST 2005
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- Bugfix: when a CGI script was sending a Location or Refresh header
+	  with a session included the session prefix was sent twice. Now only
+	  our session prefix is sent.
+
+1.6   Fri Jun 10 20:45:20 CEST 2005
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- "local store" notion
+
+1.5   Tue May 31 21:21:13 CEST 2005
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- Apache2::ClickPath::Store and Apache2::ClickPath::StoreClient
+	  added
+	- ClickPathMachineTable directive added
+	- 2 new environment variables: ClickPathMachineName and
+	  ClickPathMachineStore
+
+1.4   Sat Apr 23 21:19:56 CEST 2005
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- now I have finally sorted out the SSI problems. No other
+	  module is required anymore.
+
+1.3   Wed Apr 20 10:56:25 CEST 2005
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- Adaption to mod_perl-RC5
+	- Renaming from Apache::ClickPath to Apache2::ClickPath
+	- SPEC file added
+
+1.2a  Mon Apr  4 10:30:07 CEST 2005
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- Bugfix: check for $r->main and $r->prev not only for $r->prev
+
+1.2   Fri Apr  1 22:08:54 CEST 2005
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- Bugfix: <meta HTTP-EQUIV=REFRESH> without quotes surrounding
+	  "REFRESH" did not work
+	- Apache::ClickPath::_parse and Apache::ClickPath::Decode added
+	- decode_session.pl added
+
+1.1d  Tue Mar 29 22:33:46 CEST 2005
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- Bugfix: the combination of internal redirect and expired sessions
+	  did not work well.
+
+1.1c  Thu Jan 27 21:45:44 CET 2005
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- Bugfix: now anchor links <a href="#top"> also work
+
+1.1b  Thu Jan 27 14:16:36 CET 2005
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- Bugfix: mailto:, javascript: links are not considered to be
+	  relative links anymore
+
+1.1a  Thu Jan 13 17:08:19 CET 2005
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- Bugfix: the handler crashed without a <ClickPathUAExceptions>
+	  section
+
+1.1   Tue Jan 11 14:50:20 CET 2005
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- <area> (image maps) support
+	- <frame> und <iframe> support
+	- ClickPathMachine directive
+	- ClickPathUAExceptions directive
+	- ClickPathFriendlySessions directive
+	- ClickPathUAExceptionsFile directive
+	- ClickPathFriendlySessionsFile directive
+
+1.0   Mon Dec 13 10:22:15 CET 2004
+	* Torsten Foertsch <torsten.foertsch@gmx.net>
+	- original version

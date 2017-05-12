@@ -1,0 +1,126 @@
+=head1 NAME
+
+ALPM::Conf - pacman.conf config file parser and ALPM loader
+
+=head1 SYNOPSIS
+
+	use ALPM::Conf;	
+	my $conf = ALPM::Conf->new('/etc/pacman.conf');
+	my $alpm = $conf->parse;
+	
+	# Try again with custom fields:
+	my $value;
+	my %fields = ('CustomField' => sub { $value = shift });
+	$conf->custom_fields(%fields);
+	$alpm = $conf->parse();
+	print "$value\n";
+
+	# When imported with an argument, a conf file is loaded and
+	# an alpm instance (named $alpm) is imported into the caller's
+	# namespace.
+	use ALPM::Conf '/etc/pacman.conf';
+	print $alpm->get_arch, "\n";
+
+	# This is handy for the command line or shell scripts.
+	% perl -MALPM::Conf=/etc/pacman.conf -e '
+	for $p ($alpm->localdb->pkgs){
+		print $p->name, " ", $p->version, "\n";
+	}
+	'
+
+=head1 DESCRIPTION
+
+This class is used to parse the pacman.conf files which are used by ArchLinux's
+pacman for config files.  The configuration fields are used to set ALPM options.
+A new I<ALPM> object instance is created with corresponding options set.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+	$OBJ = ALPM::Conf->new($CONF_PATH);
+
+=over 4
+
+=item C<$CONF_PATH>
+
+The path to the configuration file that should be parsed.
+
+=item C<$OBJ>
+
+A new I<ALPM::Conf> object.
+
+=back
+
+=head1 METHODS
+
+=head2 parse
+
+	$ALPM_OBJ = $OBJ->parse()
+
+Parses the configuration file that is located at the path provided by the
+constructor argument. Options and servers are applied to a newly
+created ALPM object.
+
+=over 4
+
+=item C<$ALPM_OBJ>
+
+A new instance of an L<ALPM> object.
+
+=back
+
+=head2 custom_fields
+
+	undef = $OBJ->custom_fields(%CFIELDS);
+
+=over 4
+
+=item C<%CFIELDS>
+
+A hash that describes custom fields and the actions that should
+be performed when a matching field is scanned. The keys of the hash
+are the field names (case sensitive) and the values are code references.
+When a field is scanned the code reference is called with the entire line
+of the field's value as the only argument.
+
+=back
+
+=head1 IMPORT MAGIC
+
+When an import argument is given then special magic is performed. The
+argument should be the path to a pacman configuration file to load. This
+.conf file is parsed by a newly created I<ALPM::Conf> instance. The result
+of the parsing is stored in the importing package's namespace under the
+name of the C<$alpm> scalar. See the synopsis for an example. If you are
+not familiar, you can give import arguments the following ways:
+
+	# Using use:
+	use ALPM::Conf '/etc/pacman.conf';
+	
+	# Require is more transparent:
+	require ALPM::Conf;
+	ALPM::Conf->import('/etc/pacman.conf');
+	
+	# On the command-line (see perlrun(1) manpage):
+	perl -MALPM::Conf=/etc/pacman.conf -e '...'
+
+=head1 SEE ALSO
+
+L<ALPM>
+
+=head1 AUTHOR
+
+Justin Davis, C<< <juster at cpan dot org> >>
+
+Andrew Gregory <apg@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Justin Davis
+
+Copyright (C) 2015 by Andrew Gregory <apg@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

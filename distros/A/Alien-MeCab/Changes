@@ -1,0 +1,22 @@
+Changes
+=======
+
+0.97005 18 Apr 2008
+  - Add dependency to Alien::Iconv if we could not detect libiconv and
+    the user chose to do so
+
+0.97004 12 Apr 2008
+  - Ask for prefix and charset to use at configure time.
+
+0.97003 06 Apr 2008
+  - Use LIBS instead of libpath as suggested by srezic
+
+0.97002 05 Apr 2008
+  - Respect CCFLAGS and LDFLAGS. refs #34700
+  - Only detect libiconv on non-Windows platforms
+
+0.97001 05 Apr 2008
+  - Detect libiconv as well.
+
+0.97000 04 Apr 2008
+  - Initial release for mecab 0.97

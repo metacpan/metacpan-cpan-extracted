@@ -1,0 +1,262 @@
+{
+   "abstract" : "split an array into sub-arrays",
+   "author" : [
+      "Christian Walde <mithaldu@yahoo.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Array-Split",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : 0,
+            "POSIX" : 0,
+            "Sub::Exporter::Simple" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0,
+            "Test::Most" : 0,
+            "Test::Simple" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/wchristian/Array-Split.git",
+         "web" : "http://github.com/wchristian/Array-Split"
+      }
+   },
+   "version" : "1.103261",
+   "x_Dist_Zilla" : {
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::AutoVersion",
+            "name" : "AutoVersion",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "PkgVersion",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "GatherDir",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "ExecDir",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "PruneCruft",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "ManifestSkip",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "AutoPrereqs",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "MetaYAML",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "License",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "Readme",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "name" : "PodWeaver",
+            "version" : "3.101641"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "ExtraTests",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
+            "name" : "PodCoverageTests",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "PodSyntaxTests",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::KwaliteeTests",
+            "name" : "KwaliteeTests",
+            "version" : "1.101420"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CompileTests",
+            "name" : "CompileTests",
+            "version" : "1.103030"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PerlTidy",
+            "name" : "PerlTidy",
+            "version" : "0.09"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "MetaConfig",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "MetaJSON",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckChangeLog",
+            "name" : "CheckChangeLog",
+            "version" : "0.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "NextRelease",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "name" : "MakeMaker",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "Manifest",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "TestRelease",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "ConfirmRelease",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "UploadToCPAN",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "name" : "Git::Check",
+            "version" : "1.102810"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "name" : "Git::Commit",
+            "version" : "1.102810"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "name" : "Git::Tag",
+            "version" : "1.102810"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "name" : "Git::Push",
+            "version" : "1.102810"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::CommitBuild",
+            "name" : "Git::CommitBuild",
+            "version" : "1.102810"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
+            "name" : "MetaNoIndex",
+            "version" : "1.101550"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "TestRequires",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "MetaResources",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "4.102342"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "4.102342"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "4.102342"
+      }
+   }
+}
+

@@ -1,0 +1,92 @@
+---
+apppec:
+  version: '0.001'
+class: API::CLI
+name: digitaloceancl
+openapi:
+  basePath: /v2
+  host: api.digitalocean.com
+  info:
+    description: Unofficial DigitalOcean API specification
+    title: DigitalOcean API
+    version: 3
+  paths:
+    /account:
+      get:
+        description: Account information
+        parameters: []
+    /droplets:
+      get:
+        description: List all droplets
+    /droplets/:id:
+      get:
+        description: Retrieve a droplet by id
+        parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+    /droplets/:id/actions:
+      post:
+        description: Trigger droplet action
+        parameters:
+        - description: action type
+          in: body
+          name: type
+          required: true
+          type:
+            enum:
+            - rename
+        - description: new droplet name
+          in: body
+          name: name
+          required: true
+          type: string
+  schemes:
+  - https
+  swagger: 2.0
+options:
+- name: data-file
+  summary: File with data for POST/PUT/PATCH/DELETE requests
+  type: file
+- aliases:
+  - d
+  name: debug
+  summary: debug
+  type: flag
+- aliases:
+  - v
+  name: verbose
+  summary: verbose
+  type: flag
+subcommands:
+  GET:
+    op: apicall
+    subcommands:
+      /account:
+        options: []
+        parameters: []
+        summary: Account information
+      /droplets:
+        options: []
+        parameters: []
+        summary: List all droplets
+      /droplets/:id:
+        options: []
+        parameters:
+        - name: id
+          required: 1
+          summary: ~
+          type: integer
+        summary: Retrieve a droplet by id
+    summary: GET call
+  POST:
+    op: apicall
+    subcommands:
+      /droplets/:id/actions:
+        options: []
+        parameters: []
+        summary: Trigger droplet action
+    summary: POST call
+summary: Unofficial DigitalOcean API specification
+title: DigitalOcean API

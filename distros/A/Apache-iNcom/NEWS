@@ -1,0 +1,29 @@
+Apache::iNcom NEWS -- History of User-Visible Changes.  
+
+Changes in Apache::iNcom 0.08 Mar 30 2000
+
+- New configuration directive : INCOM_SESSION_SERIALIZE_ACCESS
+
+    If you set this directive to 1, only one request by session will 
+    be processed simultaneously. This is necessary if you are using
+    frames and your database doesn't support full serializable
+    transaction isolation level, so that one request overwrites changes
+    made in the other request. 
+
+    You will need to add a field locked_by of type INT to your 
+    sessions table.
+
+
+- Periodic garbage collection of of expired sessions.
+
+- New input filters : 
+
+	integer, pos_integer, neg_integer, 
+	decimal, pos_decimal, neg_decimal,
+	phone, dollars, quotemeta, uc, lc, ucfirst,
+	sql_wildcard.
+
+- Bug fixes :
+
+    - Important bug fixes in the processing of input filters.
+

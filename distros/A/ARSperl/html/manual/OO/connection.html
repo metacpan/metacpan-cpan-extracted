@@ -1,0 +1,111 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - OO Layer Overview</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<CENTER>
+<H1>ARSperl Programmer's Manual - OO Layer Connection Object</H1>
+</CENTER>
+
+<H2> Methods </H2>
+
+<DL>
+<DT><A NAME="new"><B>constructor</B></A> <DD>
+
+<PRE>
+  $c = new ARS(-server   =&gt; scalar, 
+               -username =&gt; scalar,
+	       -password =&gt; scalar,
+	       -catch    =&gt; hash reference,
+               -ctrl     =&gt; control record reference,
+               -debug    =&gt; true or false) 
+</PRE>
+
+<DT><A NAME="DESTROY"><B>destructor</B></A><DD>
+
+        If the constructor called ars_Login() itself, then the destructor
+	will call ars_Logoff(). If, however, you are "sharing" a control
+	structer and called ars_Login() yourself (and then passed the
+	control structer into the ARS constructor via the
+	<code>-ctrl</code> parameter) then the destructor will not call
+	ars_Logoff(). Since you called ars_Login(), the OO layer assumes
+	that you will call ars_Logoff() at the appropriate time. <P>
+
+<DT><A NAME="ctrl"><B>ctrl()</B></A><DD>
+
+	This method returns the control structure. This allows you to call
+	API functions that are not available in the OO layer. For example,
+
+<PRE>
+   $c = new ARS(-server =&gt; ...);
+   ars_Import($c->ctrl(), ...);
+</PRE>
+
+    By using this, you still have the full power of ARSperl available
+    to you, even when using the OO layer to develop new scripts. <P>
+
+<DT><A NAME="print"><B>print()</B></A><DD>
+
+<PRE>
+   $c->print();
+</PRE>
+
+	This method prints out the connection object in a readable format.
+	<P>
+
+<DT><A NAME="availableSchemas"><B>availableSchemas()</B></A><DD>
+
+<PRE>
+   @s = $c->availableSchemas(-changedsince =&gt; scalar timestamp,
+                             -schematype   =&gt; scalar,
+                             -name         =&gt; scalar string);
+</PRE>
+
+    This method returns a list of available schemas that the 
+    current user connection has access to. It is more or less the same as
+    the ars_GetListSchema() call. <P>
+      
+      The <code>schematype</code> parameter is one of:
+
+<table border="1">
+<tr><td>Value</td><td>Meaning</td></tr>
+<tr><td>ARS::AR_LIST_SCHEMA_ALL</td><td>get list of all schemas</td></tr>
+<tr><td>ARS::AR_LIST_SCHEMA_REGULAR</td><td> get list of all regular
+	schemas</td></tr>
+<tr><td>ARS::AR_LIST_SCHEMA_JOIN         </td><td>  get list of all join schemas </td></tr>
+<tr><td>ARS::AR_LIST_SCHEMA_VIEW          </td><td> get list of all view schemas </td></tr>
+<tr><td>ARS::AR_LIST_SCHEMA_UPLINK      </td><td>   get list of all schemas
+      depending </td></tr>
+<tr><td>ARS::AR_LIST_SCHEMA_DOWNLINK   </td><td>    get list of all schemas the
+      given </td></tr>A
+<tr><td>ARS::AR_LIST_SCHEMA_DIALOG      </td><td>   get list of all dialog schemas</td></tr>
+<tr><td>ARS::AR_LIST_SCHEMA_ALL_WITH_DATA </td><td> get list of all schemas
+	    with data</td></tr>
+</table>
+
+	In addition, you may optionally OR (logical OR) the value
+	<code>ARS::AR_HIDDEN_INCREMENT</code> with the above to include
+	hidden schemas in the final list of available schemas.
+
+<DT><A NAME="openForm"><B>openForm()</B></A><DD>
+
+<PRE>
+  $f = $c->openForm(-form =&gt; scalar string,
+                    -vui  =&gt; scalar string);
+</PRE>
+
+	This call opens up a new form and caches some information for you
+	to improve performance. The <code>vui</code> parameter currently
+	does nothing, but it will eventually alter the field labels that
+	you can pass into form->get() form->set(), etc. The form parameter
+	is the name of the form you wish to open (e.g. "User"). Upon
+	successful completetion this call returns a new ARS::form object.
+
+</DL>
+
+<HR>
+<A HREF="../toc.html">Back to Table of Contents</A>
+Last updated 12 Mar 1999 by jcmurphy@buffalo.edu.
+</BODY>
+</HTML>
+

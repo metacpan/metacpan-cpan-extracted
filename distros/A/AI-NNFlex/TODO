@@ -1,0 +1,12 @@
+Put in some more error checking, particularly trying to create connections
+between layers/nodes that don't exist.
+
+Write a simple net simulator with syntax loosely based on xerion. At
+present this lot is API driven, it should be straightforward to write
+a basic simulator that calls the API in the backend.
+
+read & write methods for both networks and datasets modelled on snns format (for use with frontend script). data should be snns format, network definition file will probably have to differ
+
+Implement an error method in addition to dbug, and clean up the dbug & error calls
+
+

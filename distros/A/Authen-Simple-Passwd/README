@@ -1,0 +1,74 @@
+NAME
+    Authen::Simple::Passwd - Simple Passwd authentication
+
+SYNOPSIS
+        use Authen::Simple::Passwd;
+    
+        my $passwd = Authen::Simple::Passwd->new( 
+            path => '/etc/passwd'
+        );
+    
+        if ( $passwd->authenticate( $username, $password ) ) {
+            # successfull authentication
+        }
+    
+        # or as a mod_perl Authen handler
+    
+        PerlModule Authen::Simple::Apache
+        PerlModule Authen::Simple::Passwd
+
+        PerlSetVar AuthenSimplePasswd_path "/etc/passwd"
+
+        <Location /protected>
+          PerlAuthenHandler Authen::Simple::Passwd
+          AuthType          Basic
+          AuthName          "Protected Area"
+          Require           valid-user
+        </Location>    
+
+DESCRIPTION
+    Authenticate against a passwd file.
+
+METHODS
+    * new
+        This method takes a hash of parameters. The following options are
+        valid:
+
+        * path  Path to passwd file to authenticate against. Any standard
+                passwd file that has records seperated with newline and
+                fields seperated by ":" is supported. First field is
+                expected to be username and second field, plain or encrypted
+                password. Required.
+
+                    path => '/etc/passwd'
+                    path => '/var/www/.htpasswd'
+    
+        * flock A boolean to enable or disable the usage of "flock()".
+                Defaults to "d_flock" in Config.
+
+                    flock => 0
+
+        * log   Any object that supports "debug", "info", "error" and
+                "warn".
+
+                    log => Log::Log4perl->get_logger('Authen::Simple::Passwd')
+
+    * authenticate( $username, $password )
+        Returns true on success and false on failure. Authentication
+        attempts with a username that begins with a hyphen "-" will always
+        return false.
+
+SEE ALSO
+    Authen::Simple.
+
+    Authen::Simple::Password.
+
+    passwd(5).
+
+AUTHOR
+    Christian Hansen "ch@ngmedia.com"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

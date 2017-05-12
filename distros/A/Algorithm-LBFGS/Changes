@@ -1,0 +1,50 @@
+Revision history for Perl extension Algorithm::LBFGS.
+
+0.16  Sat Feb 16 12:43:00 2008
+	- Tiny fix on the test
+
+0.15  Fri Feb 15 22:09:00 2008
+	- Fixed a bug in the 'verbose' progress callback
+	- Add some macros for debugging and timing in Algorithm-LBFGS.xs
+	- Replace Test::Differences with is_deeply in Test::More
+
+0.14  Tue Feb 12 16:31:00 2008
+	- Move 'dSP' to the start of each block containing it, making it
+	  compatible with non-C99 compilers, much thanks to Taro Nishino
+	  again
+	- Include Algorithm::Diff for testing
+
+0.13  Sun Feb 10 20:47:00 2008
+	- Fixed a fatal bug that may cause serious memory leak
+	- Rewrote the tests by Test::Number::Delta and Test::Differences
+
+0.12  Thu Jan 31 18:29:00 2008
+	- Compatibility with some non-C99 compilers
+		- Much thanks to Taro Nishino, now the module can be built
+		  by some of the non-C99 compilers, e.g., Microsoft C/C++ 
+		  Compiler.
+	- Small refactoring on the test suite 
+
+0.11  Web Jan 24 16:52:00 2008
+	- Some small fixes
+		- converted the line breaks in the C source files to Unix 
+		  style. The former DOS style line breaks make the module
+		  failed to be compiled on some platforms
+		- rewrote Makefile.PL by Module::Install
+		- reorganized the structure of the documentation
+		- add a license file
+
+0.10  Wed Jan 23 20:28:00 2008
+	- A totally refactoring
+		- uses liblbfgs instead of the f2c version of lbfgs.f
+		- removed the dependency of libf2c
+		- broke the former API
+		- Object oriented and thread safe
+
+0.02  Fri Jan 11 14:22:00 2008
+	- corrected some documentation typos
+
+0.01  Tue Jan  8 15:31:18 2008
+	- original version; created by h2xs 1.23 with options
+		-An Algorithm::LBFGS
+

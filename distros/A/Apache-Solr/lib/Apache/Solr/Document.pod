@@ -1,0 +1,167 @@
+=encoding utf8
+
+=head1 NAME
+
+Apache::Solr::Document - Apache Solr (Lucene) Document container
+
+=head1 SYNOPSIS
+
+  # create and upload a new document
+  my $doc = Apache::Solr::Document->new(...);
+  $doc->addField(id => 'tic');
+  $doc->addFields( {name => 'tac', foot => 'toe'}, boost => 2);
+
+  $solr->addDocument($doc, commit => 1, overwrite => 1)
+
+  # take results
+  my $results = $solr->select
+    ( q  => 'text:gold'             # search text-fields for 'gold'
+    , hl => { field => 'content' }  # highlight 'gold' in content'
+    );
+
+  my $doc = $results->selected(3);  # fourth answer
+  print $doc->rank;                 # 3
+
+  print $doc->uniqueId;             # usually the 'id' field
+
+  @names = $doc->fieldNames;
+  print $doc->field('subject')->{content};
+  print $doc->content('subject');   # same
+  print $doc->_subject;             # same, via autoload (mind the '_'!)
+
+  my $hl  = $results->highlighted($doc);  # another ::Doc object
+  print $hl->_content;              # highlighted field named 'content'
+
+=head1 DESCRIPTION
+
+This object wraps-up an document: a set of fields.  Either, this
+is a document which has to be added to the Solr database using
+L<Apache::Solr::addDocument()|Apache::Solr/"Updates">, or the subset of a document as returned
+by L<Apache::Solr::select()|Apache::Solr/"Search">.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Apache::Solr::Document-E<gt>B<fromResult>(HASH, $rank)
+
+Create a document object from data received as result of a select
+search.
+
+=item Apache::Solr::Document-E<gt>B<new>(%options)
+
+ -Option--Default
+  boost   1.0
+  fields  {}
+
+=over 2
+
+=item boost => FLOAT
+
+Boost the preference for hits in this document.
+
+=item fields => HASH|ARRAY
+
+Passed to L<addFields()|Apache::Solr::Document/"Accessors">.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<addField>($name, $content, %options)
+
+$content can be specified as SCALAR (reference) for performance. In
+that case, a reference to the original will be kept.  When C<undef>,
+the field gets ignored.
+
+ -Option--Default
+  boost   1.0
+  update  undef
+
+=over 2
+
+=item boost => FLOAT
+
+=item update => 'add'|'set'|'inc'|...
+
+[1.02, Solr 4.0]  See 'Atomic Updates' in
+F<https://cwiki.apache.org/confluence/display/solr/Updating+Parts+of+Documents>
+
+=back
+
+=item $obj-E<gt>B<addFields>(HASH|ARRAY, %options)
+
+The HASH or ARRAY containing NAME/CONTENT pairs.
+The %options are passed L<addField()|Apache::Solr::Document/"Accessors"> as %options.
+
+=item $obj-E<gt>B<boost>( [$fieldname, [$boost]] )
+
+Boost value for all fields in the document.
+
+[0.93] When a FIELD NAME is given, the boost specific for that field is
+returned (not looking at the document's boost value)  This can also be
+used to set the $boost value for the field.
+
+=item $obj-E<gt>B<content>($name)
+
+Returns the content of the first field with $name.
+
+=item $obj-E<gt>B<field>($name)
+
+Returns the first field with $name (or undef).  This is a HASH, containing
+C<name>, C<content> and sometimes a C<boost> key.
+
+If you need the content (that's the usually the case), you can also
+(probably more readible) use the (autoloaded) method NAMEd after the
+field with a leading '_'.
+
+example: 
+
+   $doc->field('subject')->{content};
+   $doc->content('subject');
+   $doc->_subject;
+
+=item $obj-E<gt>B<fieldNames>()
+
+All used unique names.
+
+=item $obj-E<gt>B<fields>( [$name] )
+
+Returns a list of HASHs, each containing at least a C<name> and a
+C<content>.  Each HASH will also contain a C<boost> value.  When a $name
+is provided, only those fields are returned.
+
+=item $obj-E<gt>B<rank>()
+
+Only defined when the document contains results of a search: the ranking.
+A value of '0' means "best".
+
+=item $obj-E<gt>B<uniqueId>()
+
+Returns the value of the unique key associated with the document C<id>.  Only
+the server knowns which field is the unique one.  If it differs from the
+usual C<id>, you have to set it via global value C<$Apache::Solr::uniqueKey>
+
+=back
+
+=head2 Helpers
+
+=head1 SEE ALSO
+
+This module is part of Apache-Solr distribution version 1.04,
+built on May 23, 2016. Website: F<http://perl.overmeer.net>
+
+=head1 LICENSE
+
+Copyrights 2012-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

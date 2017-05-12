@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Gtk2 -init;
+use Glib qw(TRUE FALSE);
+use Arch::Run;
+
+# use "/usr/share/doc/*" on slow disks
+my @dirs = @ARGV ? @ARGV : glob('/usr/share/*');
+
+my $window = Gtk2::Window->new;
+my $scroll = Gtk2::ScrolledWindow->new;
+my $text = Gtk2::TextView->new;
+my $pbar = Gtk2::ProgressBar->new;
+my $vbox = Gtk2::VBox->new;
+$vbox->pack_start($scroll, TRUE, TRUE, 0);
+$vbox->pack_start($pbar, FALSE, FALSE, 0);
+$scroll->add($text);
+$window->add($vbox);
+
+$window->signal_connect(destroy => sub { Gtk2->main_quit });
+$window->set_default_size(300, 400); $window->show_all;
+
+sub append_text {
+	my $str = shift;
+	$text->get_buffer->insert($text->get_buffer->get_end_iter, $str);
+}
+
+my $keep = 1;
+Glib::Timeout->add(50, sub { $pbar->pulse; Arch::Run::poll(0); $keep });
+
+Arch::Run::run_async(
+	command => [ 'du', '-hs', @dirs ],
+	mode    => Arch::Run::LINES,
+	datacb  => sub { append_text($_[0]); },
+	exitcb  => sub { $keep = 0 },
+);
+
+Gtk2->main;

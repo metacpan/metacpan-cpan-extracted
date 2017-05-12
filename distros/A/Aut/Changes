@@ -1,0 +1,32 @@
+0.11 Initializing the encryption system will call ask_pass twice.
+     Because it needs to have a password that is completely correct.
+
+0.10 ask_pass will always return 'undef' now if the given password
+     is the empty string "".
+
+0.09 Encryption through tickets using a different scheme.
+     Instead of beginning all encryptions with the string 'crypted',
+     it starts with a random sequence of 6 bytes, which is repeated.
+     The decryption algorithm checks if the first and the second
+     6 bytes are the same.
+
+0.08 Documentation change; Minor bug with decrypting rsa private solved.
+     Delete all variables in the bag if account is deleted.
+
+0.07 Added BAG functionality to the Aut Framework. Through 
+     Aut, configuration items can be set for a ticket.
+
+0.06 Fixed a flaw in the ticket_all_admin_get() routine.
+     This routine must check the validity of the given
+     password for the RSA Private key, otherwise the underlying
+     routine will give an error message for each account in the
+     database.
+
+0.05 The first meaningfull functional Aut Framework.
+
+0.02 Small bugfix.
+
+0.01  Wed Mar 24 21:19:13 2004
+	- original version; created by h2xs 1.22 with options
+		-X auth -b 5.6.0
+

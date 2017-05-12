@@ -1,0 +1,50 @@
+NAME
+    Acme::Padre::PlayCode - Acme::PlayCode Plugin for Padre
+
+SYNOPSIS
+            $>padre
+            Plugins -> Acme::PlayCode -> *
+
+DESCRIPTION
+    This is a simple plugin to run Acme::PlayCode on your source code.
+    If there is any selection, just run with the text you selected.
+    If not, run with the whole text from selected document.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Acme::Padre::PlayCode
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-Padre-PlayCode
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Acme-Padre-PlayCode
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Acme-Padre-PlayCode
+
+    Search CPAN
+        http://search.cpan.org/dist/Acme-Padre-PlayCode/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Fayland Lam
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

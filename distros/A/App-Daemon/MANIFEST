@@ -1,0 +1,18 @@
+.licensizer.yml
+adm/release
+Changes
+Daemon.pm
+eg/test-daemon
+eg/test-detach
+eg/test-fork-daemon
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/001Basic.t
+t/002Params.t
+t/003CmdLine.t
+t/004Pidfile.t
+t/005Detach.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

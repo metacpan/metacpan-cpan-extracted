@@ -1,0 +1,30 @@
+Revision history for AnyEvent-FCP
+
+TODO: docs, examples, more requests
+TODO: rethink API
+
+0.5  Sun Jun 12 03:48:14 CEST 2016
+        - more documentation, more error hooks.
+        - bugfixes.
+
+0.4  Thu Dec  3 20:07:34 CET 2015
+	- semantic redesign, better request/response handling.
+	- implement test_dda request, with lots of heuristics.
+	- increase default timeout to two hours.
+        - MAJOR parsing performance improvements (can now parse FCP at
+          ~8.5MB/s  instead of ~1.6MB/s on my box).
+        - internal cleanup.
+
+0.3  Sat Jun  5 16:49:03 CEST 2010
+	- add a small example in the manpage and a bigger one in eg/.
+	- implement/support a progress callback for unsolicited
+          messages.
+
+0.21 Tue Dec  1 14:49:30 CET 2009
+	- added missing dependency on common::sense.
+
+0.2  Tue Jul 28 04:19:59 CEST 2009
+	- first release, brittle, undocumented, incomplete.
+
+0.1  Thu May  1 17:23:16 CEST 2008
+	- original version, adapted from Net::FCP.

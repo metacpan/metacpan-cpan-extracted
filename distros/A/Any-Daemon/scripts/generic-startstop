@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -e
+
+DAEMON=#### ABSOLUTE LOCATION OF DAEMON CODE
+
+PNAME=${PIDFILE##*/}
+PIDFILE="/var/run/${PNAME}.pid"
+
+case "$1" in
+
+start)
+    $DAEMON -v --pid-file=$PIDFILE
+    sleep 1
+    echo "Process: $(cat $PIDFILE)"
+    ;;
+
+stop)
+    if [ -f $PIDFILE ]
+    then PID=$(cat $PIDFILE)
+         [ -n "$PID" ] && kill -TERM $PID || :
+         rm -f $PIDFILE
+    fi
+    ;;
+
+restart)
+    $0 stop
+    sleep 3
+    $0 start
+    ;;
+
+*)  echo "Usage: $0 start|stop|restart" >&2
+    exit 1
+    ;;
+
+esac
+exit 0

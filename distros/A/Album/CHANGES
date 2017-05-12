@@ -1,0 +1,72 @@
+Version 1.06,
+
+* Hide in-line uuencoded material from prying eyes of stupid POD
+  converters.
+
+Version 1.05,
+
+* Several file naming fixes for Windows. Thanks to Slaven Rezic and
+  Aldo Calpini for being guinea pigs.
+
+* Do not copy movies unless they require rotation. Link them if
+  possible.
+
+* Album should now be fully functional on Windows platforms.
+
+Version 1.04, Fri Oct 20 16:48:60 CET 2006
+
+* Install Album and, more important, Album::Tutorial.
+
+* Allow file names with spaces and other uglyness.
+
+* Allow avi and mov file extensions for movies.
+
+* Allow non-DCF filenames in the import area.
+
+Version 1.03,Thu Sep 21 15:46:00 CET 2006
+
+* Keyboard navigation for web pages.
+
+  Space	    -> next
+  Backspace -> previous
+  Enter	    -> detail
+  d	    -> index page (dir)
+  u	    -> up
+  j	    -> journal
+
+* Formats for the HTML pages can be external.
+
+  Files in directory 'formats' will be used if they exists, and
+  created if option --extformats is used.
+  Files: index.fmt image.fmt large.fmt medium.fmt journal.fmt.
+
+* All formats get hbuttons and vbuttons.
+
+* !depth N, to use icons, css and formats from another, N higher directory.
+
+* !medium N, use -1 to reset medium format.
+
+* If journaling, the right top text of the image pages shows the
+  journal text when hovered.
+
+* Bug fixes
+
+  - Correctly write info entries when journaling.
+
+  - Sometimes mplayer doesn't produce a still.
+
+  - Silence many warnings and info from mplayer.
+
+  - Output HTML entities for non-ascii characters. Use Latin-9 instead
+    of Latin-1.
+
+Version 1.02, Unreleased
+
+Version 1.01, Sun Nov 21 11:29:10 CET 2004
+
+ * Album now uses style sheets (CSS) for most formatting, making
+   it easy to customize the appearance of the pages.
+
+Version 1.00, Sun Oct  3 16:40:34 CET 2004
+
+ * First official release after a long period of beta tests.

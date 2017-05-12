@@ -1,0 +1,43 @@
+---
+abstract: 'CPANfile to OPML converter'
+author:
+  - 'This library is free software; you can redistribute it and/or modify'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-CPANfile2OPML
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::CPANfile2OPML:
+    file: lib/App/CPANfile2OPML.pm
+    version: '0.01'
+requires:
+  File::Path::Expand: '0'
+  Module::CPANfile: '0'
+  Path::Class: '0'
+  XML::Simple: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/hitode909/App-CPANfile2OPML/issues
+  homepage: https://github.com/hitode909/App-CPANfile2OPML
+  repository: git://github.com/hitode909/App-CPANfile2OPML.git
+version: '0.01'
+x_authority: cpan:HITODE
+x_contributors:
+  - 'hitode909 <hitode909@gmail.com>'

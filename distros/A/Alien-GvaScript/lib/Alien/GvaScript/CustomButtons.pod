@@ -1,0 +1,385 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+Alien::GvaScript::CustomButtons - Manage buttons creation, styling and keyboard navigation
+
+=head1 DESCRIPTION
+
+Composed of three subclasses that take care of rendering and
+displaying application buttons.
+
+=over
+
+=item B<GvaScript.CustomButtons.Button>
+
+=item B<GvaScript.CustomButtons.ButtonNavigation>
+
+=item B<GvaScript.CustomButtons.ActionsBar>
+
+=back
+
+
+Displayed buttons will support hovering effects through custom css classnames
+and keyboard navigation using RIGHT and LEFT arrows.
+
+Buttons in their different states (idle, focus and hover) are easily
+styled using css classes.
+
+=head1 GvaScript.CustomButtons.Button 
+
+For rendering a Single Button
+
+=head2 Usage
+
+=head3 Javascript
+
+  var container = $('my_button_will_display_here');
+  var button_properties = {
+    id        : 'btn_'+(new Date()).getTime(),
+    callback  : Prototype.emptyFunction, // btnClickHandler
+    condition : true,                    // boolean indicating whether to render button
+    width     : 'auto',                  // string value including unit. ex: '100px', '5em' .. 
+    type      : 'button',                // button|reset|submit
+    style     : {borderWidth: '2px'}     // hash of inline style elemets to be set on the button container
+    label     : 'GVA_SCRIPT_BUTTON'      // button label
+  }
+  
+  // create a new button and display in container
+  var mybutton = new GvaScript.CustomButtons.Buttons(container, button_properties);
+
+
+=head3 HTML
+
+The button will be rendered and resulting HTML will be placed in th designated container.
+
+  <div id="my_button_will_display_here" style="border-width: 2px;">
+    <span class="gva-btn-container">
+      <span class="left"/>
+      <span class="center">
+          <button type="button" class="btn" style="width: auto;" id="btn_1227001526005">
+              GVA_SCRIPT_BUTTON
+          </button>
+      </span>
+      <span class="right"/>
+    </span>
+  </div>
+
+
+=head2 Methods
+
+=head3 new
+
+  var mybutton = new GvaScript.CustomButtons.Buttons(container, properties);
+
+The C<properties> hash describes the button behavior and display, with 
+the following entries :
+
+=over
+
+=item id I<(string)>
+
+unique identifier of the button - will be set to the <button> element.
+
+optional - system will provide one if none provided.
+
+=item tabindex I<(numeric)>
+
+numeric value of the tabindex to set on the generated button element.
+
+optional - button will not have tabindex attribute if none provided.
+
+=item callback I<(function)>
+
+onclick handler of the <button> element - will execute in the B<button context>.
+
+optional - defaulted to empty function.
+
+=item condition I<(boolean|function)>
+
+boolean value B<or> a function that returns a boolean value indicating whether to render and display the button or not.
+Note that if condition is false, the button will B<not> be a part of the DOM.
+
+optional - defaulted to true.
+
+=item width I<(string)>
+
+string value to set on the style.width of the <button> element.
+string value B<must> include the unit or else will be ignored.
+
+optional - defaulted to 'auto'.
+
+=item type I<(string)>
+
+the I<type> attribute of the <button> element. could be one of the following:
+
+=over
+
+=item button
+
+generic  behavior of the button.
+
+=item submit
+
+submits containing <form> when clicked.
+
+=item reset
+
+resets containing <form> when clicked.
+
+=back
+
+optional - default to 'button'
+
+=item style I<(hash)>
+
+hash containing style elements to be set to the inline style attribute of the button container element.
+
+optional - defaulted to {}.
+
+=item label I<(string)>
+
+label of the button.
+
+optional - defaulted to 'GVA_SCRIPT_BUTTON'.
+
+=back
+
+
+=head3 destroy
+
+  mybutton.destroy()
+
+This method removes the click handler attached to the button.
+Call this method when the button is removed
+from the DOM.
+
+
+
+
+=head1 GvaScript.CustomButtons.ButtonNavigation
+
+For adding support of keyboard navigation over a list of buttons.
+Mostly used internally with GvaScript.CustomButtons.ActionsBar class.
+
+The class searches for <button> or <input type="button|submit|reset"> elements that has a predefined classname 
+and that are contained in a provided container.
+
+I<This class is used implicitly by the ActionsBar class>.
+
+=head2 Usage
+
+=head3 Javascript
+
+  // container of the buttons we are looking for
+  var container  = $('my_buttons_are_contained_here');
+  
+  // classname of the buttons we are looking for
+  var className  = 'gva-btn-container';
+  
+  // initialize ButtonNavigation to activate keyboard map
+  var mybuttonnavigator = new GvaScript.CustomButtons.ButtonNavigation(container, {
+    selectFirstBtn  : true, 
+    className       : className,
+    preventListBlur : false,
+    flashClassName  : 'flash', 
+    flashDuration   : 100
+  });
+
+=head3 HTML
+
+I<class does not produce any HTML>
+
+
+=head2 Methods
+
+=head3 new
+
+The C<properties> hash has the following entries : 
+
+=over
+
+=item selectFirstBtn I<(boolean)>
+
+boolean indicating whether to give focus to the first button in the found list.
+
+optional - defaulted to true
+
+=item className I<(string)>
+
+classname to match with button elements that are a part of navigation
+
+optional - defaulted to 'BN_button'
+
+=item preventListBlur I<(boolean)>
+
+boolean indicating whether a user can use the TAB and S_TAB keys to prevent 
+navigation outside the button list.
+
+optional - defaulted to false
+
+=item flashClassName I<(string)>
+
+classname to give to the button when in flashing mode
+
+optional - defaulted to 'flash'
+
+=item flashDuration I<(numeric)>
+
+value in millis indicating how long to keep the flashClassName set on the button
+
+optional - defaulted to 100
+
+=back
+
+
+=head3 destroy
+
+  mybuttonnavigator.destroy()
+
+This method removes the different handlers attached on the buttons container.
+Call this method when the buttons container is removed
+from the DOM.
+
+
+
+=head1 GvaScript.CustomButtons.ActionsBar 
+
+For rendering a list of Buttons and adding support of keyboard navigation
+
+=head2 Usage
+
+=head3 Javascript
+
+  var container = $('my_buttons_bar_will_display_here');
+  var actionsbar_properties = {
+    actions     : [],    // array of button_properties
+    selectfirst : false  // focus on first button
+  }
+  
+  // create a new buttons list and display next to each other in container
+  var myactionsbar = new GvaScript.CustomButtons.ActionsBar(container, actionsbar_properties);
+
+
+=head3 HTML
+
+The list of buttons will be rendered one by one and the resulting HTML will be 
+appended sequentially into the designated container.
+
+  <div id="my_buttons_bar_will_display_here" class="gva-actionsbar">
+    <span id="btn_1236083609358" class="gva-btn-container">
+      <span class="left"/>
+      <span class="center">
+        <button class="btn" style="width: auto;" type="button">Modifier</button>
+      </span>
+      <span class="right"/>
+    </span>
+    <span id="btn_1236083609358" class="gva-btn-container">
+      <span class="left"/>
+      <span class="center">
+        <button class="btn" style="width: auto;" type="button">Modifier</button>
+      </span>
+      <span class="right"/>
+    </span>
+  </div>
+
+
+
+=head2 Methodes
+
+
+=head3 new  
+
+The C<properties> hash has the following entries :
+
+=over
+
+=item actions I<array>
+
+list of button_properties describing a Button.
+
+required.
+
+=item selectfirst I<boolean>
+
+boolean indicating whether to give focus to the first button in the list when the actionsbar finished rendering.
+
+optional - defaulted to false.
+
+=back
+
+
+ActionsBar implicitly initializes ButtonNavigation object with following properties
+
+  new GvaScript.CustomButtons.ButtonNavigation(this.container, {
+    selectFirstBtn : this.options.selectfirst, 
+    className      : 'gva-btn-container'
+  });
+
+
+
+
+=head3 destroy
+
+  myactionsbar.destory();
+
+This method removes the different handlers attached on the 
+buttons and their container.
+Call this method when the buttons container is removed
+from the DOM.
+
+
+=head1 CSS
+
+Example CSS stylesheet for styling buttons.
+
+By default, css classnames are prefixed by 'gva'.
+
+This can be overloaded by a global js variable: CSS_PREFIX
+if declared before the inclusion of this Library
+
+Notice the B<btn-focus>, B<btn-hover> and B<flash> classnames that are used to style
+the buttons in their different states.
+
+    /* IE fix: to the ridiculously wide buttons in IE */
+    .gva-btn-container .btn {width:1pt;overflow:visible;}
+    /* END: IE specific */
+    
+    .gva-actionsbar {background-color:#E8E8E8;border:1px solid #8c8c8c;border-width:1px 0px;height:25px;padding:4px 0 1px;}
+    .gva-btn-container {display:inline;}
+    .gva-btn-container .btn {margin:0 3px;font-size:12px;cursor:pointer;}
+    .gva-btn-container .btn {
+        font-family:verdana,geneva,lucida,'lucida grande',arial,helvetica,sans-serif;
+        background:none;
+        border:none;
+        cursor:pointer;
+        padding:1px 2px;
+        color:#000;
+        background-color:transparent !important;
+    }
+    .gva-btn-container .btn {float:left;}
+    .gva-btn-container.btn-focus .btn {color:#aa0000;}
+    .gva-btn-container span {display:block;float:left;height:21px;}
+    .gva-btn-container span.left {background:transparent url(btn_sprite.gif) no-repeat scroll 0 0;padding:0 1px 0 2px;margin-left:4px;}
+    .gva-btn-container span.center {background:transparent url(btn_sprite.gif) repeat-x scroll 0 -42px;padding:0 2px}
+    .gva-btn-container span.right {background:transparent url(btn_sprite.gif) no-repeat scroll 0 -21px;padding:0 1px 0 2px;}
+    .gva-btn-container.btn-hover span.left {background-position:0 -63px;}
+    .gva-btn-container.btn-hover span.center {background-position:0 -105px;}
+    .gva-btn-container.btn-hover span.right {background-position:0 -84px;}
+    .gva-btn-container.btn-focus span.left {background-position:0 -63px;}
+    .gva-btn-container.btn-focus span.center {background-position:0 -126px;}
+    .gva-btn-container.btn-focus span.right {background-position:0 -84px;}
+    .gva-btn-container.flash .btn {color:red !important}
+
+
+
+=head1 DEPENDENCIES
+
+This class depends on other GvaScript classes:
+
+=over
+
+=item GvaScript.KeyMap
+
+=back
+

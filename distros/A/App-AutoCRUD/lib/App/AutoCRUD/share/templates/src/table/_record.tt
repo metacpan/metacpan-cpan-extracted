@@ -1,0 +1,35 @@
+[% FOREACH group IN data.colgroups;
+     seen_col = 0;
+     node_status = group.node or "open";
+     FOREACH col IN group.columns;
+       colname = col.COLUMN_NAME;
+       val = row.$colname;
+       IF val.length; 
+         IF !seen_col; %]
+          <div class="TN_node[% " TN_closed" IF node_status == "closed" %]">
+            <span class="TN_label groupname">[% group.name %]</span>
+            <div class="TN_content">
+[%         seen_col = 1;
+         END; # IF !seen_col; %]
+              <div class="TN_leaf">
+                <span class="TN_label colname
+                             [%~ ' pk' IF col.is_pk %]">[% colname %] :</span>
+                <span class="after_label">
+                  <span class="val">[% val | html | replace('\n', '<br>') %]</span>
+                  [% FOREACH path IN col.paths;
+                     loop.first ? "&rArr;" : ", "; %]
+                     <a href="[% dsbase %]table/[% path.to_table | utf8_url %]/list?[% path.foreign_key | utf8_url %]='[% val | utf8_url %]'">
+                       [%~ path.name ~%]
+                     </a>
+                  [% END; # FOREACH path IN col.paths %]
+                </span>
+              </div>
+[%     END; # IF val.length;
+     END; # FOREACH col IN group.columns
+     IF seen_col; %]
+            </div>
+          </div>
+[%     
+     END; # IF seen_col;
+   END; # FOREACH group IN data.colgroups %]
+

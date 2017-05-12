@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+README.chngpwd
+SimplePam.pm
+test.pl
+bin/auth_user.pl
+bin/change_password.pl
+bin/chngpwd

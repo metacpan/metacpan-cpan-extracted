@@ -1,0 +1,52 @@
+{
+   "abstract" : "an aheui interpreter",
+   "author" : [
+      "Rakjin Hwang, C<< <rakjin@cpan.org> >>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Aheui",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Term::Encoding" : "0",
+            "Term::ReadKey" : "0",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Aheui" : {
+         "file" : "lib/Acme/Aheui.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/rakjin/aheui-perl.git"
+      }
+   },
+   "version" : "0.05"
+}

@@ -1,0 +1,314 @@
+ Copyright (c) 1998,1999 Kenneth Albanowski. All rights reserved.
+ Copyright (c) 2000 Ilya Zakharevich. All rights reserved.
+ Copyright (c) 2007 Bob Free. All rights reserved.
+ Copyright (c) 2009-2013 Chris Marshall. All rights reserved.
+ Copyright (c) 2015 Bob Free. All rights reserved.
+ Copyright (c) 2016 Chris Marshall. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself. 
+
+
+Perl OpenGL: a.k.a. POGL
+
+As of OpenGL-0.57 POGL now requires FreeGLUT (GLUT on Mac OS X)
+for full functionality:
+
+  http://freeglut.sourceforge.net/
+
+This was due to licensing constraints and lack of window close events
+in GLUT.  Efforts are being made to support the original GLUT with
+reduced functionality and limited to the common subset of operations.
+
+
+NOTE: FreeGLUT distributions on Linux are deployed as libglut.so files,
+making it difficult to detect whether GLUT or FreeGLUT is installed.
+As such, FreeGLUT is assumed.  See INSTALL for options to override
+this default.
+
+
+NOTE: POGL automatically installs a binary FreeGLUT library on 32bit
+      win32 perl platforms.
+
+
+POGL provides access to most of the OpenGL 1.0, 1.1, and 1.2 APIs, and
+many OpenGL Extensions, such as Framebuffer Objects (FBOs) and Vertex
+Array Objects (VBOs).
+
+Some amount of GLU is supported, and GLUT is completely supported up
+to API version 3, with some support for 4.0 and FreeGlut 2.4.0.  A small
+portion of GLX and X11 may still be supported, but this is deprecated
+in favor of FreeGLUT and will be removed in the future.  If you use
+this functionality, please let us know.
+
+
+Compatibility notes with OpenGL 0.4:
+
+    The OpenGL 0.4 library, written by Stan Melax, contains more
+    support for some SGI specific functions then 0.5, so you may
+    wish to stay with 0.4 on an SGI system. For other machines,
+    0.5 should greatly improve compatibility (compiling where 0.4
+    wouldn't have).
+    
+    Code-level compatibility with OpenGL 0.4 is available if you
+    refer to OpenGL simply via 'use OpenGL;'. If you request specific
+    packages (such as 'use OpenGL qw(glfunctions glconstants
+    glutfunctions);'), you'll get 0.5 specific support.  For more
+    information, please read the OpenGL manual, available in OpenGL.pod.
+    
+    Portions of this module that directly derive from Stan's code
+    are marked with "Melax" comments, and his copyright is described
+    in the COPYRIGHT file.
+
+As this library is a simple binding between Perl and any library
+that complies with the OpenGL API, this module should interoperate
+seamlessly with any other modules that make use of OpenGL directly
+or (through another library) indirectly.
+
+For build instructions, please see the INSTALL file.
+
+For a brief description of what functions are supported, please read
+"SUPPORTS", and better yet read the two sample files, test.pl and
+isosurf.pl.
+
+Thanks for help developing this module goes to Stan Melax, Cass Everitt,
+Alligator Descarte, and probably others that I've forgotten.
+
+Happy Hacking,
+Kenneth Albanowski <kjahds@kjahds.com>
+
+As of April 13, 2007, Bob Free has assumed primary ownership of
+this module.
+
+As of July 03, 2011, Chris Marshall started the Perl OpenGL Project
+at http://sourceforge.net/projects/pogl/ .  All development and
+module support going forward has moved there.
+
+Chris Marshall is the current maintainer of this module.
+
+
+
+DISTRIBUTIONS:
+
+CPAN: http://search.cpan.org/~chm/	# for latest CPAN version
+
+GIT: git clone git://pogl.git.sourceforge.net/gitroot/pogl/pogl
+
+PPM for 32-bit perl 5.8 +: http://www.sisyphusion.tk/ppm/OpenGL.ppd
+
+PPM for 64-bit perl 5.10+: http://www.sisyphusion.tk/ppm/OpenGL.ppd
+
+
+
+Changes:
+
+0.58+:  Chris Marshall <devel DOT chm DOT 01 at gmail DOT com>
+        See GIT_CHANGES file in CPAN releases or use git log --stat on
+        a git repository
+
+0.57:	Bob "grafman" Free <grafman@graphcomp.com>
+	Updated test.pl to fix fullscreen handling
+	Fixed OpenGL.pod to reflect correct module name
+	Added FBO constants to param enums in gl_util.c
+	Implemented GL_ARB_point_parameters
+	Implemented GL_ARB_multisample
+	Implemented GL_ARB_color_buffer_float
+	Added OGA calc and affine functions
+	Added glpHasGPGPU
+	Added an ATI workaround for GL_ARB_shading_language_100 dependencies
+	Added VBO and FBO caching in OGAs - gl_util.h
+	Fixed gluProject and gluUnProject - was converting matrices to ints
+	Added glutSpecialUpFunc and glutWindowStatusFunc
+	Added dist option to Makefile.PL to support binary distributions
+	Switched from GLUT to FreeGLUT
+	Added FreeGLUT folder for Win32 DLLs
+	Implemented glutSetOption
+	Implemented glutGameModeString
+	Implemented glutEnterGameMode
+	Implemented glutLeaveGameMode
+	Implemented glutGameModeGet
+	Added glpFullScreen and glpRestoreScreen
+	Updated test.pl to support Game Mode
+	Implemented glutCloseFunc
+	Implemented glutLeaveMainLoop
+	Major refactoring of Makefile.PL
+	Renamed WGL interface option to W32API
+	Added help message to Makefile.PL
+	Added verbose option to Makefile.PL
+	Added documentation comments to OpenGL.xs
+	Added glpHasGLUT
+	Updated test.pl to run texhack if no GLUT
+	Added a countdown timer to examples/texhack
+	Fixed GL_X_BYTES in assign
+	Fixed vertex.glsl to work on newer nvidia cards
+	Implemented glutIgnoreKeyRepeat
+	Implemented glutSetKeyRepeat
+	Implemented glutForceJoystickFunc
+	Added FreeGLUT support for cygwin builds
+	Fixed builds for Apple's recent Mac OS changes
+	Added README for building on Mac OS
+
+	Chris Marshall
+	Added support for building POGL within cygwin
+	Added Config.pm support
+
+	Sisyphus
+	Added partial support for MinGW/dmake - not yet fully functional
+	Added "clean" target to Makefile.PL
+
+	Alex Dodge
+	Added glutKeyboardUpFunc
+
+0.56:	Bob "grafman" Free <grafman@graphcomp.com>
+	Added $BUILD_VERSION
+	Updated OpenGL::Array->new
+	Added OpenGL::Array->length
+	Added OpenGL::Array->bind
+	Added OpenGL::Array->bound
+	Added OpenGL::Array->new_scalar
+	Added OpenGL::Array->new_pointer
+	Added OpenGL::Array->update_pointer
+	Updated OpenGL::Array->retrieve
+	Updated OpenGL::Array->retrieve_data
+	Added glVertexPointer_s
+	Added glNormalPointer_s
+	Added glColorPointer_s
+	Added glIndexPointer_s
+	Added glTexCoordPointer_s
+	Added glEdgeFlagPointer_s
+	Added glVertexPointerEXT_s
+	Added glNormalPointerEXT_s
+	Added glColorPointerEXT_s
+	Added glIndexPointerEXT_s
+	Added glTexCoordPointerEXT_s
+	Added glEdgeFlagPointerEXT_s
+	Added gluBuild1DMipmaps_c
+	Added gluBuild2DMipmaps_c
+	Added OpenGL::Image support to test.pl
+	Updated typemap to add GLcharARB and GLhandleARB
+	Implemented GL_EXT_texture_cube_map
+	Implemented GL_ARB_shader_objects
+	Implemented GL_ARB_fragment_shader
+	Implemented GL_ARB_vertex_shader
+	Implemented GL_ARB_shading_language_100
+	Implemented GL_EXT_Cg_shader
+	Updated test.pl to use OpenGL::Image and OpenGL::Shader
+
+	Geoffrey Broadwell
+	Fixed a bug in gl_pixelbuffer_size
+
+0.55:	Bob "grafman" Free <grafman@graphcomp.com>
+	Added OpenGL::Array->new_list
+	Added OpenGL::Array->elements
+	Added macro abstraction for wgl extensions
+	Implemented GL_ARB_depth_texture
+	Implemented GL_ARB_draw_buffers
+	Implemented GL_ARB_fragment_program
+	Implemented GL_ARB_fragment_program_shadow
+	Implemented GL_ARB_half_float_pixel
+	Implemented GL_ARB_multitexture
+	Implemented GL_ARB_pixel_buffer_object
+	Implemented GL_ARB_point_sprite
+	Implemented GL_ARB_shadow
+	Implemented GL_ARB_texture_border_clamp
+	Implemented GL_ARB_texture_cube_map
+	Implemented GL_ARB_texture_env_add
+	Implemented GL_ARB_texture_float
+	Implemented GL_ARB_texture_mirrored_repeat
+	Implemented GL_ARB_texture_non_power_of_two
+	Implemented GL_ARB_texture_rectangle
+	Implemented GL_ARB_vertex_buffer_object
+	Implemented GL_ARB_vertex_program
+	Implemented GL_ATI_texture_float
+	Implemented GL_ATI_texture_mirror_once
+	Implemented GL_EXT_bgra
+	Implemented GL_EXT_copy_texture
+	Implemented GL_EXT_framebuffer_object
+	Implemented GL_EXT_packed_pixels
+	Implemented GL_EXT_pixel_buffer_object
+	Implemented GL_EXT_rescale_normal
+	Implemented GL_EXT_separate_specular_color
+	Implemented GL_EXT_shadow_funcs
+	Implemented GL_EXT_stencil_wrap
+	Implemented GL_EXT_subtexture
+	Implemented GL_EXT_textureD3
+	Implemented GL_EXT_texture_env_dot3
+	Implemented GL_EXT_texture_filter_anisotropic
+	Implemented GL_EXT_texture_lod_bias
+	implemented GL_EXT_texture_mirror_clamp
+	implemented GL_EXT_vertex_array
+	Implemented GL_HP_occlusion_test
+	Implemented GL_IBM_rasterpos_clip
+	Implemented GL_NV_blend_square
+	Implemented GL_NV_copy_depth_to_color
+	Implemented GL_NV_depth_clamp
+	Implemented GL_NV_fog_distance
+	Implemented GL_NV_fragment_program2
+	Implemented GL_NV_fragment_program_option
+	Implemented GL_NV_light_max_exponent
+	Implemented GL_NV_packed_depth_stencil
+	Implemented GL_NV_texgen_reflection
+	Implemented GL_NV_texture_expand_normal
+	Implemented GL_NV_texture_rectangle
+	Implemented GL_NV_vertex_program2_option
+	Implemented GL_NV_vertex_program3
+	Implemented GL_S3_s3tc
+	Implemented GL_SGIS_generate_mipmap
+	Implemented GL_SGIS_texture_lod
+	Implemented GL_SGIX_depth_texture
+	Implemented GL_SGIX_shadow
+	Implemented GL_SUN_slice_accum
+	Added glDrawRangeElements_p
+	Added glColorPointer_p
+	Added glEdgeFlagPointer_p
+	Added glIndexPointer_p
+	Added glNormalPointer_p
+	Added glTexCoordPointer_p
+	Added glVertexPointer_p
+	Added 'include' folder for updated GL header files
+	Added 'utils' folder for header processing scripts
+	Added glversion utility to enhance Makefile.PL
+	Fixed compiler warnings in gl_util.c and OpenGL.xs
+	Fixed glPolygonOffsetEXT bias mapping
+	Fixed glDrawRangeElements_s code
+	Fixed glGetPointerv_c params pointer
+	Moved obsolete/deprecated extensions
+	Added $glext_implemented hashref of implemented GL extensions
+	Added glpCheckExtension
+	Updated test.pl
+
+	Ilya Zakharevich
+	Updated support for SunRay
+
+	Sherm Pendley
+	Added MacOSX support
+
+	Daiki Nomura
+	Helped add FreeBSD support
+
+0.54:	Martien Verbruggen fixed another Mesa limitation.
+	#ifdef out unglob'ing: symbol not found on Solaris...
+
+0.53:	Correct vertex_array detection in isosample.pl.
+	Add more vertex_array constants (and move the definition earlier).
+	Exchange (default) arguments for glp*: move display after window
+	  (should not break old stuff, since there was/is no way to query
+	   the display and window).
+	New function $d = glpDisplay() (croaks on failure).
+	Make glpOpenWindow() return the window handle.
+	New functions with signatures
+ void glpMoveResizeWindow(int x, int y, unsigned int width, unsigned int height, Window w, Display* display);
+ void glpMoveWindow(int x, int y, Window w, Display* display);
+ void glpResizeWindow(unsigned int width, unsigned int height, Window w, Display* display);
+	  (w and display are optional).
+
+0.52:	More of the portability, bug fixes, and examples.
+	New option -steal for glpOpenWindow() to allow drawing into an
+	  existing window (no "Visual" syncronization yet).
+	GL_EXT_vertex_array done on the level of cpp.
+
+0.51:	Portability enhancement (X and OS/2 PM), bug fixes, examples enhanced.
+	_have_glp() should be used instead of _have_glx to test for
+	  presence of glp* functions.
+	Remap OpenGL 1.1 functions into GL_EXT_vertex_array interface
+	if needed.
+

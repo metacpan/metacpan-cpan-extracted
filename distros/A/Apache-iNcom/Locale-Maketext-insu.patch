@@ -1,0 +1,236 @@
+--- Locale-Maketext-0.17/lib/Locale/Maketext.pm.insu	Tue Mar 16 00:11:07 1999
++++ Locale-Maketext-0.17/lib/Locale/Maketext.pm	Wed Feb 23 11:54:44 2000
+@@ -84,7 +84,7 @@
+ 
+ sub sprintf {
+   my($handle, $format, @params) = @_;
+-  return sprintf($format, @params);
++  return CORE::sprintf($format, @params);
+ }
+ 
+ =item the method $LH->quant
+@@ -136,13 +136,41 @@
+ 
+ sub numf {
+   my($handle, $num) = @_[0,1];
+-  $num = sprintf("%g", $num);
++  $num = CORE::sprintf("%g", $num);
+   $num =~ tr<.,><,.> if $handle->{'numf_comma'} || 0;
+   return $num;
+ }
+ 
+ #--------------------------------------------------------------------------
+ 
++=item the method $LH->currency(AMOUNT,CURRENCY)
++
++This returns AMOUNT formatted appropriately for the conventions of
++$LH's language.  The default behaviour for this is to group the
++thousands together separated by $LH->{thousand_sep}, to round
++the amount to two decimals and to put the currency symbol in front.
++Default symbol is $LD->{currency} or $.
++
++=cut
++
++sub currency {
++  my($hdl, $amount,$curr) = @_;
++
++  $curr  ||= $hdl->{currency} || '$';
++  my $sep  = $hdl->{thousand_sep} || ",";
++  my $dot  = $hdl->{numf_comma} ? "," : ".";
++
++  # Kludge
++  my ($int,$cents) = split /[.,]/, CORE::sprintf "%.2f", $amount;
++  for ( my $i =  length($int) - 3 ; $i > 0; $i -= 3 ) {
++      substr( $int, $i, 1) = $sep . substr $int, $i, 1;
++  }
++
++  return "$curr$int$dot$cents";
++}
++
++#--------------------------------------------------------------------------
++
+ =item the method CLASS->new
+ 
+ This is used by CLASS->get_handle to actually perform the
+@@ -209,7 +237,7 @@
+     if(ref($handle) && defined($handle->{'fail'})
+        && length($handle->{'fail'})) {
+       my $fail = $handle->{'fail'};
+-      print "WARNING0: maketext fails looking for <$phrase>\n" if $Debug;
++      print STDERR "WARNING0: maketext fails looking for <$phrase>\n" if $Debug;
+       if(ref($fail) eq 'CODE') { # it's a sub reference
+ 	$value = &{$fail}($handle, $phrase, @params);
+         # if it ever returns, it should return a good value
+@@ -218,7 +246,7 @@
+         # if it ever returns, it should return a good value
+       }
+     } else {
+-      print "WARNING1: maketext fails looking for <$phrase>\n" if $Debug;
++      print STDERR "WARNING1: maketext fails looking for <$phrase>\n" if $Debug;
+     }
+     return $value;
+   }
+@@ -259,15 +287,16 @@
+       @languages = &I18N::LangTags::extract_language_tags($in);
+     } else { # Not running as a CGI: try to puzzle out from the environment
+       if(length($ENV{'LANG'})) {
+-	@languages = split /,:/, $ENV{'LANG'};
+-         # LANG can be one lg as far as I know, but what the hey.
+-	print "Noting ENV languages ", join(',', @languages),"\n" if $Debug;
++	@languages = split /,:/, $ENV{LANGUAGE} || $ENV{LANG};
++	# LANGUAGE is a GNU extension which specifies the preferred language
++	# as a path.
++	print STDERR "Noting ENV languages ", join(',', @languages),"\n" if $Debug;
+       }
+     }
+   }
+ 
+   #------------------------------------------------------------------------
+-  print "Lgs1: ", map("<$_>", @languages), "\n" if $Debug > 0;
++  print STDERR "Lgs1: ", map("<$_>", @languages), "\n" if $Debug > 0;
+ 
+   if($USING_LANGUAGE_TAGS) {
+     @languages = map &I18N::LangTags::locale2language_tag($_), @languages;
+@@ -289,7 +318,7 @@
+ 	$it;
+       } @languages;
+   }
+-  print "Lgs2: ", map("<$_>", @languages), "\n" if $Debug > 0;
++  print STDERR "Lgs2: ", map("<$_>", @languages), "\n" if $Debug > 0;
+ 
+   push @languages, $base_class->fallback_languages;
+    # You are free to override fallback_languages to return empty-list
+@@ -385,21 +414,21 @@
+    unless defined $key;
+ 
+   my @lex_refs = $handle->lex_refs;
+-  print " Lex refs for $class : ", map("<$_>", @lex_refs), "\n" if $Debug;
++  print STDERR " Lex refs for $class : ", map("<$_>", @lex_refs), "\n" if $Debug;
+   foreach my $h_r (@lex_refs) {
+-    print "* Looking up \"$key\" in $h_r\n" if $Debug;
++    print STDERR "* Looking up \"$key\" in $h_r\n" if $Debug;
+     if(exists $h_r->{$key}) {
+-      print "  Found \"$key\" in $h_r\n" if $Debug;
++      print STDERR "  Found \"$key\" in $h_r\n" if $Debug;
+       return $h_r->{$key} if ref $h_r->{$key};
+       return( $h_r->{$key} = $handle->compile($h_r->{$key}) );
+     } elsif(exists($h_r->{'_AUTO'}) && $h_r->{'_AUTO'}) { # it's an auto lex
+-      print "  Automaking \"$key\" into $h_r\n" if $Debug;
++      print STDERR "  Automaking \"$key\" into $h_r\n" if $Debug;
+       return( $h_r->{$key} = $handle->compile($key) );
+     }
+-    print "  Not found in $h_r, nor automakable\n" if $Debug > 1;
++    print STDERR "  Not found in $h_r, nor automakable\n" if $Debug > 1;
+     # else keep looking
+   }
+-  print "! Lookup of \"$key\" in/under $class fails.\n" if $Debug;
++  print STDERR "! Lookup of \"$key\" in/under $class fails.\n" if $Debug;
+   return undef;  # Fallthru
+ }
+ 
+@@ -423,7 +452,7 @@
+ 
+   # Cobbles together a sub that's a closure around @bits and maybe @methods
+ 
+-  print "About to compile $text\n" if $Debug;
++  print STDERR "About to compile $text\n" if $Debug;
+ 
+   return sub { $text } unless $text =~ /\[/;
+    # if there's no brackety things to compile, just be a closure
+@@ -435,9 +464,9 @@
+   my @pre_out = ("sub {\n use strict;\n my \$handle = \$_[0];\n");
+   if($Debug > 1) {
+     push @pre_out,
+-     "  print \"\\\@_: \", join(',', \@_), \"\\n\";\n",
+-     "  print \"\\\@methods: \", join(',', \@methods), \"\\n\";\n",
+-     "  print \"\\\@bits: \", join(',', \@bits), \"\\n\";\n",
++     "  print STDERR \"\\\@_: \", join(',', \@_), \"\\n\";\n",
++     "  print STDERR \"\\\@methods: \", join(',', \@methods), \"\\n\";\n",
++     "  print STDERR \"\\\@bits: \", join(',', \@bits), \"\\n\";\n",
+     ;
+   }
+   my @out = (" return join '',\n");
+@@ -451,7 +480,7 @@
+     if($bits[$i] =~ /^\[([^\]]*)\]$/s) { # It's brackety.
+       next unless length $1;
+       my @p = split(',', $1, -1);
+-       # print " <$bits[$i]> => ", map("<$_>", @p), "\n" if $Debug > 1;
++       # print STDERR " <$bits[$i]> => ", map("<$_>", @p), "\n" if $Debug > 1;
+ 
+       next unless @p; # sanity
+       $bits[$i] = \@p;
+@@ -460,7 +489,7 @@
+       # Iterate over the remaining bits of this brackety thing
+       my(@p_calls) = ();
+       for(my $p_i = 0; $p_i < @p; $p_i++) {
+-        # print "  looky #", $p_i, ":", $p[$p_i], "\n" if $Debug > 1;
++        # print STDERR "  looky #", $p_i, ":", $p[$p_i], "\n" if $Debug > 1;
+         if($p[$p_i] =~ /^\s*_(\d+)\s*$/s) {  # It's like _2 for $_[2]
+ 	  push @p_calls, "\$_[", (0 + $1), "], ";
+         } else { # it's a literal
+@@ -482,10 +511,10 @@
+   push @out, "  '', # no content!?\n" unless $real_bits_done; # sanity
+   push @out, "}\n";
+ 
+-  print "Code to eval:\n", @pre_out, @out if $Debug > 1;
++  print STDERR "Code to eval:\n", @pre_out, @out if $Debug > 1;
+   my $sub = eval(join('', @pre_out, @out));
+   croak "Shocking! Error $@ in compilation of $text !?!?\n" if $@;
+-  print "Compiled OK\n" if $Debug;
++  print STDERR "Compiled OK\n" if $Debug;
+   return $sub;
+ }
+ 
+@@ -504,16 +533,19 @@
+     # weird case: we never use'd it, but there it is!
+   }
+ 
+-  print " About to use $module ...\n" if $Debug;
+-  {
+-    local $SIG{'__DIE__'} = undef;
++  print STDERR " About to use $module ...\n" if $Debug;
++#  {
++# The following makes HTML::Embperl die.
++#    local $SIG{'__DIE__'} = undef;
++# We don't need it anyhow
++
+     eval "use $module";
+-  }
++#  }
+   if($@) {
+-    print "Error using $module \: $@\n" if $Debug > 1;
++    print STDERR "Error using $module \: $@\n" if $Debug > 1;
+     return($tried{$module} = 0);
+   } else {
+-    print " OK, $module is used\n" if $Debug;
++    print STDERR " OK, $module is used\n" if $Debug;
+     return($tried{$module} = 1);
+   }
+ }
+@@ -538,7 +570,7 @@
+ sub lex_refs { # report the lexicon references for this handle's class
+   no strict;
+   my $class = ref($_[0]) || $_[0];
+-  print "Lex refs lookup on $class\n" if $Debug > 1;
++  print STDERR "Lex refs lookup on $class\n" if $Debug > 1;
+   return @{$isa_scan{$class}} if exists $isa_scan{$class};  # memoization!
+ 
+   my @lex_refs = ();
+@@ -547,7 +579,7 @@
+   if(defined %{$class . "::Lexicon"}) {
+     my $ref = \%{$class . "::Lexicon"};
+     push @lex_refs, $ref;
+-    print "%" . $class . "::Lexicon contains ",
++    print STDERR "%" . $class . "::Lexicon contains ",
+          scalar(keys %$ref), " entries\n" if $Debug;
+   }
+ 
+@@ -556,7 +588,7 @@
+ 
+   # Implements depth(height?)-first recursive searching of superclasses
+   foreach my $superclass (@{$class . "::ISA"}) {
+-    print " Super-class search into $superclass\n" if $Debug;
++    print STDERR " Super-class search into $superclass\n" if $Debug;
+     next if $seen_r->{$superclass}++;
+     push @lex_refs, &lex_refs($superclass, $seen_r);  # call myself
+   }

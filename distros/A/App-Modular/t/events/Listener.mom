@@ -1,0 +1,54 @@
+#!/usr/bin/perl -w
+#----------------------------------------------------------------------------
+#   App::Modular::Module::Listener - perl program modularization framewok
+#                                   event handler test listener
+#
+#   Copyright (c) 2003-2004 Baltasar Cevc
+#
+#   This code is released under the L<perlartistic> Perl Artistic
+#   License, which can should be accessible via the C<perldoc
+#   perlartistic> command and the file COPYING provided with this
+#
+#   DISCLAIMER: THIS SOFTWARE AND DOCUMENTATION IS PROVIDED "AS IS," AND
+#   COPYRIGHT HOLDERS MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+#   IMPLIED, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY
+#   OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE
+#   OR DOCUMENTATION WILL NOT INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS,
+#   TRADEMARKS OR OTHER RIGHTS.
+#   IF YOU USE THIS SOFTWARE, YOU DO SO AT YOUR OWN RISK.
+#
+#   See this internet site for more details: http://technik.juz-kirchheim.de/
+#
+#   Creation:       30.07.04    bc
+#   Last Update:    01.08.04    bc
+#   Version:         0. 1. 1  
+# ----------------------------------------------------------------------------
+use strict;
+
+package App::Modular::Module::Listener;
+
+use base qw(App::Modular::Module);
+
+sub start_listen {
+   my ($self) = @_;
+
+   $self->modularizer()->module('Events')->register($self, 'newinput');
+};
+
+sub event_handler {
+   my ($self, $event, @arguments) = @_;
+
+   if ($event ne 'newinput') {
+      $self->modularizer->mlog(10, "no handler for event '$event'");
+   } else {
+      $self->{'gotinput'}++;
+   }
+};
+
+sub gotinput {
+  my ($self) = @_;
+
+  return $self->{'gotinput'};
+}
+
+1;

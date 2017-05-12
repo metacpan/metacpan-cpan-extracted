@@ -1,0 +1,35 @@
+---
+abstract: 'Web server and CLI to display PAUSE package list in previous time'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-PAUSE-TimeMachine
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  File::pushd: '0'
+  IO::Compress::Gzip: '0'
+  IPC::Run: '0'
+  Plack: '1.0'
+  Pod::Usage: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/miyagawa/App-PAUSE-TimeMachine/issues
+  homepage: https://github.com/miyagawa/App-PAUSE-TimeMachine
+  repository: https://github.com/miyagawa/App-PAUSE-TimeMachine.git
+version: '0.05'

@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 149bcf756bf630d5020fea4e45fc72fd58d865f3 Changes
+SHA1 7723a717e5d5b325e5435fd706668cc096fb959c LICENSE
+SHA1 68a715e43ae99cc88253b4fe5334788d05b03c9b MANIFEST
+SHA1 638e511fcc6968fbf8c6ce48cd54db5e06c57fc5 MANIFEST.SKIP
+SHA1 d0bd33a6774635c468729c63f406e780f4c8d25b META.yml
+SHA1 81e5d114ad5d8ffc0dac0e70aa05675315aaf0cd Makefile.PL
+SHA1 0f8939d79505ac256542824b3a5aacd70adc440b README
+SHA1 744efcc6201896ffdd1d9b2c73dd9dd09abb8d2a dist.ini
+SHA1 4e3dfee54d405ab714f2380e2bd90870619b96a8 lib/Apache/Singleton.pm
+SHA1 d2efec79c29136fb041e2c22cbcccfe9e2bcac09 lib/Apache/Singleton/Process.pm
+SHA1 f0decdb4e752b22f59e7e0b9f09e163af35fb07d lib/Apache/Singleton/Request.pm
+SHA1 ae6746c529ae00390016998223e17e046c0bf402 t/TEST.PL
+SHA1 6a442ecd0fe896777fc6a9c15bcc77f58c6af0a6 t/apache/singleton/process/printer_instance.t
+SHA1 0125edfa8087ea24461c5a398ab50713b57969d0 t/apache/singleton/request/printer_instance.t
+SHA1 3c1df8a086f535819467ab89b944e13a7ac60d4b t/compile.t
+SHA1 2b1a6e84dbd7d106ae16f2ce86b03464ca2f2caa t/conf/extra.conf.in
+SHA1 cdbf5ce2a047f203dffd6b7476d5ae079fbf439d t/lib/Printer/Device/PerProcess.pm
+SHA1 eda1c07023b8de065df9315ae0473fc5c7e188bc t/lib/Printer/Device/PerRequest.pm
+SHA1 c1b5f84ff25a702d204912a659dcd03828827481 t/lib/Printer/PerProcess.pm
+SHA1 a498a952edc27a7be0ab8299b8bc77b7ca3b0538 t/lib/Printer/PerRequest.pm
+SHA1 be744f1752e7bbb5bf38e7e899acdbc943df736c t/mock/Apache.pm
+SHA1 17f648a7902e56e902a5753e255cdeaa8877d3b8 t/mock/Apache2/RequestUtil.pm
+SHA1 3182eeaa36b1c11ddd2ca3d57ae11780ad2d0a8b t/mock/Mock/Apache.pm
+SHA1 c8a0ecbfe110fb1c6ce6ecd2aa96a210476b473d t/mock/mod_perl.pm
+SHA1 dd998242b6632ee0ba45fb85fa8ebdb3539cecf6 t/mock/mod_perl2.pm
+SHA1 6906be1fbc63eec20c4385beddef2af2533d5106 t/multiclass.t
+SHA1 0379a5b667e982d96348c7a2d2ba8f8474a268b7 t/new_instance.t
+SHA1 2217c3ebca493dddf5e60d2f75884718ef689467 t/process.t
+SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
+SHA1 24dadebd6a0799135df8885524b3fd9a0a20e148 t/request.t
+SHA1 030a93c377abdbf9645e7c5d4b6af950d0a1b26f t/request_mp2.t
+SHA1 7275132dcaf45ecfa79e8c4f04614bf56848a83f t/response/TestApache/Singleton/Process/printer_instance.pm
+SHA1 f64ff004c0a77e6e4f144496bdb10da9668efd77 t/response/TestApache/Singleton/Request/printer_instance.pm
+SHA1 15978707f609815b9d1234c883157a7872c046f0 t/response/TestApache/Singleton/request.pm
+SHA1 46a3b211d86fc7da03762365c626e33fc9d9ad44 t/signature.t
+SHA1 734b6548a02d5c2a810c0f89aae0bdef7fca8339 t/singleton.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.17 (Darwin)
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAlRc2bsACgkQ+CqvSzp9LOyvWwCdHQy90F2kw5UvGMexrZVnzx+p
+R+0AoJDjAlIRFrnMRZQOObZbhnHRRzP8
+=XOQa
+-----END PGP SIGNATURE-----

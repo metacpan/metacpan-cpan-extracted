@@ -1,0 +1,66 @@
+Apache/Precompress version 0.01
+===============================
+
+This module lets you send pre-compressed files as though they were
+not. For those clients that do not support compressed content, the
+file is de-compressed on the fly.
+
+This module overcomes the overhead of having to compress data on the
+fly by keeping the data compressed on disk at all times. The driving
+force behind this approach was that I couldn't afford to upgrade my
+ISP account to have more disk space. The effective savings on bandwidth
+are also quite handy.
+
+This module handles SSI very well. If you just want compressed templates
+then you won't need Apache::Filter or Apache::SSI. However, if you want
+compressed templates or pages (or both!) then, provided they are installed,
+simply follow the example configuration above. Do note, however, that
+the savings in bandwidth will be lost as this will be sent uncompressed
+down the pipe. This is a todo but will probably involve Apache::Compress
+(or something).
+
+Otherwise you will have a normal page with garbled content intermingled 
+within it.
+
+More information is available in the POD.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Compress::Zlib
+	Apache::Log
+	Apache::Constants
+	Mod Perl and Apache
+
+Additionally, the test suite requires:
+
+	Test::MockObject
+	File::Temp
+	File::Spec
+	Cwd
+	
+To fake the incoming request and ensure the content
+is sent properly.
+	
+COPYRIGHT AND LICENCE
+
+Simon Proctor, www.simonproctor.com
+
+Based on the work of Apache::Compress
+
+Copyright (C) 2003 Simon Proctor.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+

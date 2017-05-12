@@ -1,0 +1,222 @@
+=encoding utf8
+
+=head1 NAME
+
+Any::Daemon::HTTP::Directory - describe a server directory 
+
+=head1 INHERITANCE
+
+ Any::Daemon::HTTP::Directory
+   is a Any::Daemon::HTTP::Source
+
+ Any::Daemon::HTTP::Directory is extended by
+   Any::Daemon::HTTP::UserDirs
+
+=head1 SYNOPSIS
+
+ # implicit creation of ::Directory object
+ my $vh = Any::Daemon::HTTP::VirtualHost
+   ->new(directories => {path => '/', location => ...})
+
+ my $vh = Any::Daemon::HTTP::VirtualHost
+   ->new(directories => [ \%dir1, \%dir2, $dir_obj ])
+
+ # explicit use
+ my $root = Any::Daemon::HTTP::Directory
+   ->new(path => '/', location => '...');
+ my $vh = Any::Daemon::HTTP::VirtualHost
+   ->new(directories => $root);
+
+=head1 DESCRIPTION
+
+Each L<Any::Daemon::HTTP::VirtualHost|Any::Daemon::HTTP::VirtualHost> will define where the files
+are located.  Parts of the URI path can map on different (virtual)
+directories, with different access rights.
+
+Extends L<"DESCRIPTION" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"Constructors">.
+ 
+=over 4
+
+=item Any::Daemon::HTTP::Directory-E<gt>B<new>(%options|\%options)
+
+ -Option        --Defined in               --Default
+  allow           Any::Daemon::HTTP::Source  <undef>
+  charset                                    utf-8
+  deny            Any::Daemon::HTTP::Source  <undef>
+  directory_list                             <false>
+  index_file                                 ['index.html', 'index.htm']
+  location                                   <required>
+  name            Any::Daemon::HTTP::Source  path
+  path            Any::Daemon::HTTP::Source  '/'
+
+=over 2
+
+=item allow => CIDR|HOSTNAME|DOMAIN|CODE|ARRAY
+
+=item charset => STRING
+
+The character-set which is used all text-files on the system, used in
+response headers of text-files.
+
+=item deny => CIDR|HOSTNAME|DOMAIN|CODE|ARRAY
+
+=item directory_list => BOOLEAN
+
+Enables the display of a directory, when it does not contain one of the
+C<index_file> prepared defaults.
+
+=item index_file => STRING|ARRAY
+
+When a directory is addressed, it is scanned whether one of these files
+exist.  If so, the content will be shown.
+
+=item location => DIRECTORY|CODE
+
+The DIRECTORY to be prefixed before the path of the URI, or a CODE
+reference which will rewrite the path (passed as only parameter) into the
+absolute file or directory name.
+
+=item name => STRING
+
+=item path => PATH
+
+=back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<charset>()
+
+=item $obj-E<gt>B<location>()
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<Any::Daemon::HTTP::Source/"Attributes">
+
+=item $obj-E<gt>B<path>()
+
+Inherited, see L<Any::Daemon::HTTP::Source/"Attributes">
+
+=back
+
+=head2 Permissions
+
+Extends L<"Permissions" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"Permissions">.
+ 
+=over 4
+
+=item $obj-E<gt>B<allow>($session, $request, $uri)
+
+Inherited, see L<Any::Daemon::HTTP::Source/"Permissions">
+
+=item $obj-E<gt>B<collect>($vhost, $session, $request, $uri)
+
+Inherited, see L<Any::Daemon::HTTP::Source/"Permissions">
+
+=back
+
+=head2 Actions
+
+Extends L<"Actions" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"Actions">.
+ 
+=over 4
+
+=item $obj-E<gt>B<filename>($path)
+
+Convert a URI $path into a directory path.  Return C<undef> if not possible.
+
+=item $obj-E<gt>B<list>($directory, %options)
+
+Returns a HASH with information about the $directory content.  This may
+be passed into some template or the default template.  See L</Return of
+directoryList> about the returned output.
+
+ -Option       --Default
+  filter         <undef>
+  hide_symlinks  <false>
+  names          <skip hidden files>
+
+=over 2
+
+=item filter => CODE
+
+For each of the selected names (see  C<names> option) the lstat() is
+called.  That data is expanded into a HASH, but not all additional
+fields are yet filled-in (only the ones which come for free).
+
+=item hide_symlinks => BOOLEAN
+
+=item names => CODE|Regexp
+
+Reduce the returned list.  The CODE reference is called with the found
+filename, and should return true when the name is acceptable.  The
+default regexp (on UNIX) is C<< qr/^[^.]/ >>
+
+=back
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"DETAILS">.
+ 
+=head2 Resource restrictions
+
+Extends L<"Resource restrictions" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"Resource restrictions">.
+ 
+=head2 Return of list()
+
+The L<list()|Any::Daemon::HTTP::Directory/"Actions"> method returns a HASH of HASHes, where the
+primary keys are the directory entries, each refering to a HASH
+with details.  It is designed to ease the connection to template
+systems.
+
+The details contain the C<lstat> information plus some additional
+helpers.  The lstat call provides the fields C<dev>, C<ino>, C<mode>,
+C<nlink>, C<uid>, C<gid>, C<rdev>, C<size>,  C<atime>, C<mtime>,
+C<ctime>, C<blksize>, C<blocks> -as far as supported by your OS.
+The entry's C<name> and C<path> are added.
+
+The C<kind> field contains the string C<DIRECTORY>, C<FILE>, C<SYMLINK>,
+or C<OTHER>.  Besides, you get either an C<is_directory>, C<is_file>,
+C<is_symlink>, or C<is_other> field set to true.  Equivalent are:
+
+   if($entry->{kind} eq 'DIRECTORY')
+   if($entry->{is_directory})
+
+It depends on the kind of entry which of the following fields are added
+additionally.  Symlinks will get C<symlink_dest>, C<symlink_dest_exists>.
+Files hace the C<size_nice>, which is the size in pleasant humanly readable
+format.
+
+Files and directories have the C<mtime_nice> (in localtime).  The C<user> and
+C<group> which are textual representations of the numeric uid and gid are
+added.  The C<flags> represents the UNIX standard permission-bit display,
+as produced by the "ls -l" command.
+
+=head1 SEE ALSO
+
+This module is part of Any-Daemon-HTTP distribution version 0.26,
+built on September 19, 2016. Website: F<http://perl.overmeer.net/any-daemon/>
+
+=head1 LICENSE
+
+Copyrights 2013-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

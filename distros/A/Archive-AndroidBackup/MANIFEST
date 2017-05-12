@@ -1,0 +1,10 @@
+bin/abk
+lib/Archive/AndroidBackup.pm
+lib/Archive/AndroidBackup/TarIndex.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/version.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

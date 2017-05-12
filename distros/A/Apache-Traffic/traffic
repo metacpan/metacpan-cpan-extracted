@@ -1,0 +1,149 @@
+#!/usr/bin/perl
+
+use constant ONEDAY => 60 * 60 * 24;
+
+use vars qw( %OPT %UNITS %LUNITS );
+use Apache::Traffic qw( fetch remove error );
+use Time::Local;
+use Date::Parse;
+use Getopt::Long;
+
+%UNITS  = ( B => 1, K => 1024, M => 1048576, G => 1073741824 );
+%LUNITS = ( B => 'Bytes', K => 'Kilobytes', M => 'Megabytes', G => 'Gigabytes');
+
+sub numerically    { $a <=> $b }
+sub alphabetically { $a cmp $b }
+
+sub usage {
+  print <<EOF;
+Usage: traffic [options] [username] 
+
+  See the Apache::Traffic POD for details.
+EOF
+  exit;
+}
+
+sub parse_date {
+  my $date = shift;
+
+  $date = ($date ? str2time($date) : time);
+  $date = timelocal(0, 0, 0, (localtime($date))[3..5]); # START OF DAY
+  $date; 
+}
+
+sub compute_range {
+  my($start, $end, $days) = @_;
+
+  $start = parse_date($start);
+  $end   = parse_date($end);
+  $end   = $start + ($days * ONEDAY) if ($days);  
+  ($start, $end) = ($end, $start) if ($end < $start);
+  ($start, $end);
+}
+
+sub datestr {
+  my $time = shift;
+  my($day, $month, $year);
+
+  ($day, $month, $year) = (gmtime($time))[3..5];
+  $month = substr("JanFebMarAprMayJunJulAugSepOctNovDec", $month*3, 3);
+  $year += 1900;
+  return sprintf("%02d-%s-%04d", $day, $month, $year);
+}
+
+sub header {
+  my($start, $end, $message) = @_;
+  my($days);
+
+  $days = ($end - $start + ONEDAY) / ONEDAY;
+  print "APACHE::TRAFFIC $message\n";
+  print datestr($start), " thru ", datestr($end);
+  print " ($days day", ($days > 1 ? 's' : ''), ")\n\n";
+}
+
+sub summary {
+  my($start, $end, $wantuid, $all, $unit, @uids) = @_;
+  my($hashref, $days, $date, %totals, $sortfunc);
+
+  $hashref = fetch($start, $end, $wantuid, $all, @uids)
+    or die Apache::Traffic::error;
+  $sortfunc = ($wantuid ? 'numerically' : 'alphabetically');
+  header($start, $end, "SUMMARY");
+  printf("User %25s         Total Hits\n", "Total $LUNITS{$unit}");
+  print "=================================================\n";
+  foreach $date (keys %$hashref) {
+    foreach $user (keys %{ $$hashref{$date} }) {
+      ($bytes, $hits) =
+        ($$hashref{$date}{$user}{bytes}, $$hashref{$date}{$user}{hits});
+      $totals{$user}{bytes} += $bytes;
+      $totals{$user}{hits}  += $hits;
+    }
+  }
+  foreach $user (sort $sortfunc keys %totals) {
+    ($bytes, $hits) = ($totals{$user}{bytes}, $totals{$user}{hits});
+    $bytes = $bytes / $UNITS{ $unit };
+    if ($unit eq 'B') {
+      printf("%-12s %17d %18d\n", $user, $bytes, $hits);
+    } else {
+      printf("%-12s %17.2f %18d\n", $user, $bytes, $hits);
+    }
+  }
+  1;
+}
+
+sub report {
+  my($start, $end, $wantuid, $all, $unit, $reverse, @uids) = @_;
+  my($hashref, $date, $datestr, $user, $bytes, $hits, $sortfunc);
+
+  $reverse = 'reverse' if ($reverse);
+  $hashref = fetch($start, $end, $wantuid, $all, @uids)
+    or die Apache::Traffic::error;
+  $sortfunc = ($wantuid ? 'numerically' : 'alphabetically');
+  header($start, $end, "DAILY REPORT");
+  printf("Date        User %20s        Hits\n", $LUNITS{$unit});
+  print "=================================================\n";
+  foreach $date (eval "$reverse sort numerically keys \%\$hashref") {
+    $datestr = datestr($date);
+    foreach $user (sort $sortfunc keys %{ $$hashref{$date} }) {
+      ($bytes, $hits) = 
+        ($$hashref{$date}{$user}{bytes}, $$hashref{$date}{$user}{hits});
+      $bytes = $bytes / $UNITS{ $unit };
+      if ($unit eq 'B') {
+        printf("%s %-12s %12d %11d\n", $datestr, $user, $bytes, $hits);
+      } else {
+        printf("%s %-12s %12.2f %11d\n", $datestr, $user, $bytes, $hits);
+      }
+    } 
+  }
+  1;
+}
+
+GetOptions(\%OPT, 'user:s@', 'start:s', 'end:s', 'days:i', 'unit:s', 
+           'remove', 'n', 'usage', 'summary', 'reverse', 'all');
+usage if ($OPT{'usage'});
+$OPT{unit} = uc substr($OPT{unit}, 0, 1) || 'B';
+$OPT{unit} = 'B' unless ($UNITS{ $OPT{unit} });
+push(@{ $OPT{user} }, @ARGV);
+push(@{ $OPT{user} }, $>) unless (@{ $OPT{user} });
+($OPT{start}, $OPT{end}) = compute_range($OPT{start}, $OPT{end}, $OPT{days});
+
+if ($OPT{'remove'}) {
+  unless ($> == 0) {
+    print "Permission denied.\n";
+    exit;
+  } 
+  unless ($OPT{f}) {
+    print "Are you sure you want to remove all records between\n";
+    print datestr($OPT{start}), " and ", datestr($OPT{end}), " [N]?";
+    chomp(my $response = <STDIN>);
+    unless ($response =~ /y/i) { exit; }
+  }
+  remove($OPT{start}, $OPT{end})
+    or die Apache::Traffic::error;
+} elsif ($OPT{'summary'}) {
+  summary($OPT{start}, $OPT{end}, $OPT{n}, $OPT{all}, $OPT{unit}, 
+          @{ $OPT{user} }); 
+} else {
+  report($OPT{start}, $OPT{end}, $OPT{n}, $OPT{all}, $OPT{unit}, $OPT{reverse},
+         @{ $OPT{user} });
+}

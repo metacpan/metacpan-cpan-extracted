@@ -1,0 +1,14 @@
+SYNOPSIS
+
+    Use the provided riap script.
+
+DESCRIPTION
+
+    This is the backend/implementation of the riap script.
+
+SEE ALSO
+
+    Perinci::Access
+
+    peri-access
+

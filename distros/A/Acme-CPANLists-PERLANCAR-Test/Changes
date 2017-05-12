@@ -1,0 +1,24 @@
+Revision history for Acme-CPANLists-PERLANCAR-Test
+
+0.04    2016-11-17 (PERLANCAR)
+
+	- Rename dist from Acme-CPANLists-Test to Acme-CPANLists-PERLANCAR-Test.
+
+        - Add some more test lists.
+
+
+0.03    2015-10-23 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Update prereq version to Acme::CPANLists 0.9.1 -> 0.90.1.
+
+
+0.02    2015-10-23 (PERLANCAR)
+
+        - Add some properties, adjust to Acme::CPANLists specification v0.9.0.
+
+
+0.01    2015-10-22 (PERLANCAR)
+
+        - First release.

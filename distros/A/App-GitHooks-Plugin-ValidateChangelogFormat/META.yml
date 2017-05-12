@@ -1,0 +1,38 @@
+---
+abstract: 'Validate the format of changelog files.'
+author:
+  - 'Guillaume Aubert <aubertg@cpan.org>'
+build_requires:
+  App::GitHooks::Test: '0'
+  Capture::Tiny: '0'
+  Test::Exception: '0'
+  Test::FailWarnings: '0'
+  Test::More: '0'
+  Test::Requires::Git: '1.005'
+  Test::Type: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-GitHooks-Plugin-ValidateChangelogFormat
+provides:
+  App::GitHooks::Plugin::ValidateChangelogFormat:
+    file: lib/App/GitHooks/Plugin/ValidateChangelogFormat.pm
+    version: v1.1.0
+requires:
+  App::GitHooks::Constants: '0'
+  App::GitHooks::Plugin: '0'
+  CPAN::Changes: '0'
+  Try::Tiny: '0'
+  perl: '5.01'
+  version: '0'
+resources:
+  bugtracker: https://github.com/guillaumeaubert/App-GitHooks-Plugin-ValidateChangelogFormat/issues
+  homepage: https://metacpan.org/release/App-GitHooks-Plugin-ValidateChangelogFormat
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/guillaumeaubert/App-GitHooks-Plugin-ValidateChangelogFormat
+version: v1.1.0

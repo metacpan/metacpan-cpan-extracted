@@ -1,0 +1,28 @@
+---
+abstract: 'level-triggered resource observer like select(2)'
+author:
+  - 'Toshio Ito <toshioito@cpan.org>'
+build_requires:
+  FindBin: 0
+  List::Util: 0
+  Test::Exception: 0
+  Test::Memory::Cycle: 0
+  Test::More: 0
+  Test::Warn: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Async-Selector
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Scalar::Util: 0
+version: 1.03

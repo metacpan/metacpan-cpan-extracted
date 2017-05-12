@@ -1,0 +1,85 @@
+
+=pod
+
+=head1 NAME
+
+Subclassing - A guide to subclassing Apache2::Mogile::Dispatch
+
+=head1 DESCRIPTION
+
+On its own Apache2::Mogile::Dispatch won't do what you want it to. The best
+way to take full advantage of its features is to subclass it to suite your
+needs.
+
+=head1 WHAT TO SUBCLASS?
+
+=head2 mogile_key
+
+This function returns the key used to query in mogile. In most cases it is the
+request uri but for large sites or sites that span multiple hosts there is a
+chance you may have conflicting urls.
+
+=head2 get_direction
+
+This function returns the host_config (also known as the request config) that
+is used to determine if a give uri (request) is to be handled through mogile
+or not.
+
+=head2 get_config
+
+This function returns a hash ref that configures the module. See the docs on
+module configuration.
+
+=head2 reproxy_request
+
+This function is used to determine if a mogile handled request is filtered
+through mod_include. See the example module SSI.pm for more information.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+  perldoc Apache2::Mogile::Dispatch
+
+You can also look for information at:
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Apache2-Mogile-Dispatch>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Apache2-Mogile-Dispatch>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Apache2-Mogile-Dispatch>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Apache2-Mogile-Dispatch>
+
+=item * The socklabs-cpan project page
+
+The project page: 
+L<http://dev.socklabs.com/projects/cpan/>
+
+The SVN repository:
+L<http://dev.socklabs.com/svn/cpan/Apache2-Mogile-Dispatch/trunk/>
+
+=item * MogileFS project page on Danga Interactive
+
+L<http://www.danga.com/mogilefs/>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Nick Gerakines, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

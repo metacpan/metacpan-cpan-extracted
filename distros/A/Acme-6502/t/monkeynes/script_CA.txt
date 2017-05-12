@@ -1,0 +1,44 @@
+clear
+power on
+regs
+
+op a2 55
+
+# IX should now be set to 55
+test ix = 55
+
+op ca
+
+# IX should now be set to 54
+test ix = 54
+
+# Wrap and negative case --------------
+power on
+
+op a2 00
+
+# IX should now be set to 00
+test ix = 0
+
+op ca
+
+# Should be: IX=FF, S=1
+test ix = ff
+test s = 1
+
+# Zero case ----------------------------
+power on
+
+op a2 01
+
+# Should be: IX=01, Z=0
+test ix = 1
+test z = 0
+
+op ca
+
+# Should be: IX=00, Z=1
+test ix = 0
+test z = 1
+
+save verify_CA.txt

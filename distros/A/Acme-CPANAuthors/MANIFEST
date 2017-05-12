@@ -1,0 +1,33 @@
+Changes
+cpanfile
+lib/Acme/CPANAuthors.pm
+lib/Acme/CPANAuthors/Factory.pm
+lib/Acme/CPANAuthors/Register.pm
+lib/Acme/CPANAuthors/Utils.pm
+lib/Acme/CPANAuthors/Utils/Authors.pm
+lib/Acme/CPANAuthors/Utils/CPANIndex.pm
+lib/Acme/CPANAuthors/Utils/Kwalitee.pm
+lib/Acme/CPANAuthors/Utils/Packages.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/01_basic.t
+t/02_standalone.t
+t/03_extra.t
+t/04_lookfor.t
+t/05_kwalitee.t
+t/06_parse_mailrc.t
+t/07_parse_packages.t
+t/08_inline_package.t
+t/09_factory.t
+t/99_pod.t
+t/99_podcoverage.t
+t/data/authors/01mailrc.txt
+t/data/authors/01mailrc.txt.gz
+t/data/modules/02packages.details.txt
+t/data/modules/02packages.details.txt.gz
+t/lib/Acme/CPANAuthors/Test.pm
+t/lib/Acme/CPANAuthors/TestExtra.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

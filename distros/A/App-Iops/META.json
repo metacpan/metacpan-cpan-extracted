@@ -1,0 +1,38 @@
+{
+   "abstract" : "Show process I/O operations",
+   "author" : [
+      "Josh Jore <jjore@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Iops",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-App-Iops@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Iops"
+      },
+      "homepage" : "http://search.cpan.org/dist/App-Iops",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jbenjore/App-Iops.git",
+         "web" : "http://github.com/jbenjore/App-Iops"
+      }
+   },
+   "version" : "0.006"
+}
+

@@ -1,0 +1,81 @@
+#gateBody 
+{
+  width:760px;
+  background-color:#FCFCFC;
+  font-family:Verdana,Arial,Helvetica,sans-serif;
+  margin: 5px 10px;
+  padding:0;
+  font-size: 13px;
+}
+
+#gateBody p
+{
+  font-size: 0.8em;
+  color: #888888;
+  font-weight: normal;
+  line-height: 1.2;
+}
+
+#gateBody .gate-message
+{
+  background: yellow; width: 850px; border: 2px solid; padding: 10px; margin-bottom: 10px
+}
+
+#gateBody h1
+{ 
+  font-size:40px;
+  margin:0 0 0.4em;
+}
+
+#gateBody h2
+{ 
+  color:#555555;
+  margin:0 0 0.4em;
+  font-size: 1.2em;
+}
+
+.gate-providers
+{
+  width: 700px;
+  height: 200px;
+  border: 2px solid;
+  background: #EEEECC;
+}
+
+.gate-provider
+{
+  margin: 5px 3px;
+  float: left;
+}
+
+.gate-provider button
+{ 
+  background: #FFFFFF;
+  cursor: pointer;
+  margin-right: 15px; /* IE only */
+  height: 45px;
+  width: 150px;
+
+   border-top : 1px solid #000000;
+   border-left : 1px solid #000000;
+   border-bottom : 3px solid gray;
+   border-right : 3px solid gray;
+}
+
+.gate-provider button:hover
+{ 
+
+   border-top : 3px solid gray;
+   border-left : 3px solid gray;
+   border-bottom : 1px solid #000000;
+   border-right : 1px solid #000000;
+}
+
+.gate-provider img
+{
+  vertical-align: middle;
+  padding-right: 10px;
+  border: 0 none;
+  width: 120px;
+}
+

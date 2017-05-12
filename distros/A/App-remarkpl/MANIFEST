@@ -1,0 +1,17 @@
+.ship.conf
+Changes
+cpanfile
+lib/App/remarkpl.pm
+lib/App/remarkpl/public/basic.css
+lib/App/remarkpl/public/custom.js
+lib/App/remarkpl/public/example.jpg
+lib/App/remarkpl/public/fonts.css
+lib/App/remarkpl/public/remark.min.js
+Makefile.PL
+MANIFEST			This list of files
+README
+script/remarkpl
+t/00-basic.t
+t/remarkpl.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,6 @@
+name = "App-WithSound"
+authority="cpan:MOZNION"
+module_maker="ModuleBuildTiny"
+
+[FileGatherer]
+include_dotfiles = false

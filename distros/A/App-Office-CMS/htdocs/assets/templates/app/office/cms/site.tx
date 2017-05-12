@@ -1,0 +1,60 @@
+<h3 align="center"><: $ucfirst_context :> Site and Design</h3>
+<form name="<: $context :>_site_form" id="<: $context :>_site_form" action="" method="post" onSubmit="return <: $context :>_site_onsubmit()">
+<table align="center">
+<tr>
+<td align="center" colspan="5"><div id="<: $context :>_site_message_div"></div></td>
+</tr>
+<tr>
+<td>Site name:</td>
+<td align="left" colspan="4"><input type="text" name="name" id="name" size="50" maxlength="255" value="<: $name :>" class="required" title="Site name is required" /></td>
+</tr>
+<tr>
+<td>Design name:</td>
+<td align="left" colspan="4"><input type="text" name="design_name" id="design_name" size="50" maxlength="255" value="<: $design_name :>" class="required" title="Design name is required" /></td>
+</tr>
+<!--
+<tr>
+<td>Menu orientation:</td>
+<td align="left" colspan="4"><: $menu_orientation :></td>
+</tr>
+<tr>
+<td>Output operating system:</td>
+<td align="left" colspan="4"><: $os_type :></td>
+</tr>
+-->
+<tr>
+<td>Output directory:</td>
+<td align="left" colspan="4"><input type="text" name="output_directory" id="output_directory" size="50" maxlength="255" value="<: $output_directory :>" class="required" title="Output directory is required" /></td>
+</tr>
+<tr>
+<td>Output document root:</td>
+<td align="left" colspan="4"><input type="text" name="output_doc_root" id="output_doc_root" size="50" maxlength="255" value="<: $output_doc_root :>" class="required" title="Output document root is required" /></td>
+</tr>
+<tr>
+: if $context == "new" {
+<td></td><td></td><td></td>
+: }
+: else {
+<td><input type="submit" name="submit_delete_design" id="submit_delete_design" value="Delete design" onClick="document.<: $context :>_site_form.action.value=1" /></td>
+<td><input type="submit" name="submit_delete_site" id="submit_delete_site" value="Delete site" onClick="document.<: $context :>_site_form.action.value=2" /></td>
+<td><input type="submit" name="submit_edit_page" id="submit_edit_page" value="Edit pages" onClick="document.<: $context :>_site_form.action.value=3" /></td>
+: }
+<td><input type="reset" value="Reset" /></td>
+<td><input type="submit" name="submit_<: $context :>_site" id="submit_<: $context :>_site" value="<: $submit_text :>" onClick="document.<: $context :>_site_form.action.value=4" /></td>
+</tr>
+: if $context != "new" {
+<tr><td colspan="5"><hr /></td></tr>
+<tr>
+<td>New name:</td>
+<td colspan="4"><input type="text" name="new_name" id="new_name" size="50" maxlength="255" value="" /></td>
+</tr>
+<tr>
+<td></td>
+<td colspan="2"><input type="submit" name="submit_duplicate_design" id="submit_duplicate_design" value="Duplicate design" onClick="document.<: $context :>_site_form.action.value=5" /></td>
+<td colspan="2"><input type="submit" name="submit_duplicate_site" id="submit_duplicate_site" value="Duplicate site" onClick="document.<: $context :>_site_form.action.value=6" /></td>
+</tr>
+: }
+</table>
+<input type="hidden" name="action" id="action" value="0" />
+<input type="hidden" name="sid" id="sid" value="<: $sid :>" />
+</form>

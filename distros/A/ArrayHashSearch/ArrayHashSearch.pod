@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>ArrayHashSearch - Search utility for arrays and hashes in Perl.</title>
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#features">Features</a></li>
+	<ul>
+
+		<li><a href="#array_contain">array_contain</a></li>
+		<li><a href="#array_deeply_contain">array_deeply_contain</a></li>
+		<li><a href="#hash_contain">hash_contain</a></li>
+		<li><a href="#hash_deeply_contain">hash_deeply_contain</a></li>
+		<li><a href="#deeply_contain">deeply_contain</a></li>
+	</ul>
+
+	<li><a href="#synopsis">Synopsis</a></li>
+	<li><a href="#description">Description</a></li>
+	<li><a href="#bugs_and_caveats">Bugs and Caveats</a></li>
+	<li><a href="#author">Author</a></li>
+	<li><a href="#copyright">Copyright</a></li>
+	<li><a href="#history">History</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>ArrayHashSearch - Search utility for arrays and hashes in Perl.</p>
+<p>
+</p>
+<hr />
+<h1><a name="features">Features</a></h1>
+<p>
+</p>
+<h2><a name="array_contain">array_contain</a></h2>
+<pre>
+  this routine searches the given array for the given scalar value and stops at the first value match found
+  parameters: &lt;array reference&gt; &lt;scalar&gt;
+  returns 1 if an element with the given scalar value was found else 0</pre>
+<p>
+</p>
+<h2><a name="array_deeply_contain">array_deeply_contain</a></h2>
+<pre>
+  this routine searches the given array and any hierarchy of referenced arrays for the given scalar value and stops at the first value match found
+  parameters: &lt;array reference&gt; &lt;scalar&gt;
+  returns 1 if an element with the given scalar value was found else 0</pre>
+<p>
+</p>
+<h2><a name="hash_contain">hash_contain</a></h2>
+<pre>
+  this routine searches the given hash for the given scalar value and stops at the first value match found
+  parameters: &lt;hash reference&gt; &lt;scalar&gt;
+  returns 1 if an element with the given scalar value was found else 0</pre>
+<p>
+</p>
+<h2><a name="hash_deeply_contain">hash_deeply_contain</a></h2>
+<pre>
+  this routine searches the given hash and any hierarchy of referenced hashes for the given scalar value and stops at the first value match found
+  parameters: &lt;hash reference&gt; &lt;scalar&gt;
+  returns 1 if an element with the given scalar value was found else 0</pre>
+<p>
+</p>
+<h2><a name="deeply_contain">deeply_contain</a></h2>
+<pre>
+  this routine searches the given hash/array and any hierarchy of referenced hashes/arrays for the given scalar value and stops at the first value match found
+  this routine should be used for mixed data structures of arrays and hashes.
+  parameters: &lt;reference to an array or a hash&gt; &lt;scalar&gt;
+  returns 1 if an element with the given scalar value was found else 0</pre>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">Synopsis</a></h1>
+<pre>
+  <span class="keyword">use</span> <span class="variable">ArrayHashSearch</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$dummyarrayref</span> <span class="operator">=</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span><span class="number">3</span><span class="operator">,</span><span class="number">7</span><span class="operator">,</span><span class="number">11</span><span class="operator">,</span><span class="number">13</span><span class="operator">,</span><span class="number">17</span><span class="operator">,</span><span class="number">19</span><span class="operator">,</span><span class="number">23</span><span class="operator">]</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$dummyarrayref2</span> <span class="operator">=</span> <span class="operator">[</span><span class="string">'a'</span><span class="operator">,</span><span class="string">'c'</span><span class="operator">,</span><span class="string">'z'</span><span class="operator">,</span><span class="variable">$dummyarrayref</span><span class="operator">]</span><span class="operator">;</span>
+    
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">array_contain</span><span class="operator">(</span><span class="variable">$dummyarrayref</span><span class="operator">,</span><span class="number">7</span><span class="operator">))</span>
+  <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="string">"Value 7 exists in the array!"</span><span class="operator">;</span>
+  <span class="operator">}</span>  
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">array_deeply_contain</span><span class="operator">(</span><span class="variable">$dummyarrayref2</span><span class="operator">,</span><span class="number">7</span><span class="operator">))</span>
+  <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="string">"Value 7 exists in the array!"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  
+  <span class="variable">A</span> <span class="variable">more</span> <span class="variable">complex</span> <span class="variable">example</span><span class="operator">:</span>  
+  
+  <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">ArrayHashSearch</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$dummyarray1</span> <span class="operator">=</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span><span class="number">2</span><span class="operator">,</span><span class="number">3</span><span class="operator">]</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$dummyarray2</span> <span class="operator">=</span> <span class="operator">[</span><span class="number">4</span><span class="operator">,</span><span class="number">5</span><span class="operator">,</span><span class="variable">$dummyarray1</span><span class="operator">]</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$dummyarray3</span> <span class="operator">=</span> <span class="operator">[</span><span class="number">7</span><span class="operator">,</span><span class="variable">$dummyarray2</span><span class="operator">,</span><span class="number">9</span><span class="operator">]</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$dummyhash1</span> <span class="operator">=</span> <span class="operator">{</span><span class="number">1</span><span class="operator">=&gt;</span><span class="string">'a'</span><span class="operator">,</span><span class="number">2</span><span class="operator">=&gt;</span><span class="string">'b'</span><span class="operator">,</span><span class="number">3</span><span class="operator">=&gt;</span><span class="string">'c'</span><span class="operator">}</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$dummyhash2</span> <span class="operator">=</span> <span class="operator">{</span><span class="number">1</span><span class="operator">=&gt;</span><span class="variable">$dummyhash1</span><span class="operator">,</span><span class="number">2</span><span class="operator">=&gt;</span><span class="string">'d'</span><span class="operator">,</span><span class="number">3</span><span class="operator">=&gt;</span><span class="string">'e'</span><span class="operator">}</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$dummyhash3</span> <span class="operator">=</span> <span class="operator">{</span><span class="number">1</span><span class="operator">=&gt;</span><span class="string">'f'</span><span class="operator">,</span><span class="number">2</span><span class="operator">=&gt;</span><span class="string">'g'</span><span class="operator">,</span><span class="number">3</span><span class="operator">=&gt;</span><span class="variable">$dummyhash2</span><span class="operator">}</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$dummystructure1</span> <span class="operator">=</span> <span class="operator">[</span><span class="number">1</span><span class="operator">=&gt;</span><span class="variable">$dummyhash3</span><span class="operator">,</span><span class="number">2</span><span class="operator">=&gt;</span><span class="variable">$dummyarray3</span><span class="operator">,</span><span class="number">3</span><span class="operator">=&gt;</span><span class="number">10</span><span class="operator">]</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$dummystructure2</span> <span class="operator">=</span> <span class="operator">{</span><span class="number">1</span><span class="operator">=&gt;</span><span class="string">'h'</span><span class="operator">,</span><span class="number">2</span><span class="operator">=&gt;</span><span class="variable">$dummystructure1</span><span class="operator">,</span><span class="number">3</span><span class="operator">=&gt;</span><span class="string">'i'</span><span class="operator">}</span><span class="operator">;</span>
+  
+  <span class="keyword">print</span> <span class="string">"ARRAY BINGO!\n"</span> <span class="keyword">if</span> <span class="variable">array_deeply_contain</span><span class="operator">(</span><span class="variable">$dummyarray3</span><span class="operator">,</span><span class="number">5</span><span class="operator">);</span>
+  <span class="keyword">print</span> <span class="string">"HASH BINGO!\n"</span> <span class="keyword">if</span> <span class="variable">hash_deeply_contain</span><span class="operator">(</span><span class="variable">$dummyhash3</span><span class="operator">,</span><span class="string">'a'</span><span class="operator">);</span>
+  <span class="keyword">print</span> <span class="string">"ARRAY/HASH BINGO!\n"</span> <span class="keyword">if</span> <span class="variable">deeply_contain</span><span class="operator">(</span><span class="variable">$dummystructure1</span><span class="operator">,</span><span class="number">5</span><span class="operator">);</span>
+  <span class="keyword">print</span> <span class="string">"HASH/ARRAY BINGO!\n"</span> <span class="keyword">if</span> <span class="variable">deeply_contain</span><span class="operator">(</span><span class="variable">$dummystructure2</span><span class="operator">,</span><span class="string">'a'</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">Description</a></h1>
+<pre>
+  This module provides routines to search content of n-dimensional arrays and/or hashes for given values.
+  These routines are useful for people who often test existence of specific values in complex data structures returned by other routines.
+  Since there are currently no such built-in functions to search arrays/hashes, one can save time by using this module.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="bugs_and_caveats">Bugs and Caveats</a></h1>
+<pre>
+  There no known bugs at this time, but this doesn't mean there are aren't any. Use it at your own risk.
+  Note that there may be other bugs or limitations that the author is not aware of.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="author">Author</a></h1>
+<pre>
+  Serge Tsafak &lt;tsafserge2001@yahoo.fr&gt;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">Copyright</a></h1>
+<pre>
+  This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="history">History</a></h1>
+<pre>
+ <span class="variable">Version</span> <span class="number">0</span><span class="operator">.</span><span class="number">0</span><span class="operator">.</span><span class="number">4</span><span class="operator">:</span> <span class="variable">first</span> <span class="variable">release</span><span class="operator">;</span> <span class="variable">December</span> <span class="number">2007</span>
+</pre>
+
+</body>
+
+</html>

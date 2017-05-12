@@ -1,0 +1,4 @@
+# This file contains a list of actions, and required attributes
+send-mail=account,ip,group,dow,time
+rwi_login=account,ip,auth_method,dow,time
+create_user=account,ip

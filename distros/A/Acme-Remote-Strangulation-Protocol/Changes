@@ -1,0 +1,12 @@
+Revision history for Perl extension Acme::Remote::Strangulation::Protocol.
+
+0.01  Fri May 14 10:23:38 2004
+	- original version; created by h2xs 1.20 with options
+		-AXn Acme::Remote::Strangulation::Protocol
+
+0.03  Fri Dec  9 08:06:20 2005
+      - Added 2 module dependencies (Test::Harness, Test::Pod)
+      - Added a test for Pod
+      - Added a META.yml file
+
+

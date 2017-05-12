@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Any-Template
+version:      1.015
+version_from: lib/Any/Template.pm
+installdirs:  site
+requires:
+    File::Spec:                    0
+    Log::Trace:                    0
+    Test::Assertions:              0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

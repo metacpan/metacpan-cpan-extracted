@@ -1,0 +1,1544 @@
+#!/usr/bin/perl
+use utf8;
+
+# vim: ts=4:sw=4:et:ai:sts=4
+#
+# KGB - an IRC bot helping collaboration
+# Copyright © 2008 Martín Ferrari
+# Copyright © 2008,2009,2010,2011,2012,2013 Damyan Ivanov
+# Copyright © 2010 gregor herrmann
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 51
+# Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+=head1 NAME
+
+kgb-bot - an IRC bot helping collaborative work
+
+=head1 SYNOPSIS
+
+kgb-bot [--config I<file>] [--foreground] [--simulate I<file>]
+
+=head1 OPTIONS
+
+=over 4
+
+=item --config I<file>
+
+Specify configuration file to load. Default is F</etc/kgb-bot/kgb.conf>.
+
+=item --config-dir I<directory>
+
+Specify directory with configuration files to load. All files like F<*.conf>
+are loaded, in alphabetical order. Default is F</etc/kgb-bot/kgb.conf.d>.
+
+=item --foreground
+
+Do not detach from console, print log messages to STDERR and do not become a
+daemon, useful for debugging.
+
+=item --simulate I<file>
+
+Do not connect to IRC. Instead, output each notification line to the given
+I<file>, like:
+
+    #chan repo user branch revision module changed-paths
+    #chan repo commit message line 1
+    #chan repo commit message line 2
+
+There are no colour codes in the output, unless B<--simulate-color> is also
+given.
+
+=item --simulate-color
+
+Include color codes in the file used by B<--simulate>.
+
+=item --debug
+
+Log additional debugging information
+
+=back
+
+=cut
+
+package KGB;
+
+use strict;
+use warnings;
+use utf8;
+use open ':encoding(utf8)';
+use App::KGB::Painter;
+use Time::Piece qw(localtime);
+
+our $VERSION = '1.33';
+
+use Cwd;
+
+our $config;
+our ( $config_file, $config_dir, $foreground, $debug );
+our %const = (
+    SOAPsvc => "SOAPServer",
+    BAsvc   => "BotAddressed",
+    Connsvc => "Connecter",
+    NSsvc   => "NickServID",
+    NRsvc   => "NickReclaim",
+    AJsvc   => "AutoJoin",
+);
+our %supported_protos = (
+    "0" => 1,
+    "1" => 1,
+    "2" => 1,
+    "3" => 1,
+);
+our $progname;
+our $restart      = 0;
+our $shuttingdown = 0;
+our $painter;
+
+sub save_progname () {
+    $progname = Cwd::realpath($0);
+}
+
+sub polygen_available () {
+    unless ( eval { require IPC::Run } ) {
+        KGB->debug("error loading IPC::Run\n");
+        KGB->debug($@);
+        return undef;
+    }
+
+    unless ( eval { require File::Which } ) {
+        KGB->debug("error loading File::Which\n");
+        KGB->debug($@);
+        return undef;
+    }
+
+    my $oldpath = $ENV{PATH};
+    $ENV{PATH}='/usr/bin/:/usr/games';
+    my $polygen;
+    unless ( $polygen = File::Which::which('polygen') ) {
+        KGB->debug("missing polygen binary\n");
+    }
+    $ENV{PATH} = $oldpath;
+
+    return $polygen;
+}
+
+sub merge_conf_hash($$);
+
+sub merge_conf_hash($$) {
+    my ( $dst, $src ) = @_;
+
+    while ( my ($k, $v) = each %$src ) {
+        if ( ref($v) ) {
+            if ( exists $dst->{$k} ) {
+                die
+                    "Error merging key '$k': source is a reference, but destination is scalar\n"
+                    unless ref( $dst->{$k} );
+                ref( $dst->{$k} ) eq ref($v)
+                    or die
+                    "Error merging key '$k': reference type mismatch\n";
+                if ( ref($v) eq 'ARRAY' ) {
+                    push @{ $dst->{$k} }, @$v;
+                }
+                elsif ( ref($v) eq 'HASH' ) {
+                    merge_conf_hash( $dst->{$k}, $v );
+                }
+                else {
+                    die "Error merging key '$k': unknown reference type\n";
+                }
+            }
+            else {
+                $dst->{$k} = $v;
+            }
+        }
+        else {
+            die
+                "Error merging key '$k': source is scalar, but destination is not\n"
+                if exists $dst->{$k} and ref( $dst->{$k} );
+            $dst->{$k} = $v;
+        }
+    }
+}
+
+sub parse_conf_file($;$);
+sub parse_conf_file($;$) {
+    my $src = shift;
+    my $met = shift // {};
+
+    return {} if $met->{$src}++;
+
+    my $conf = {};
+    KGB->debug("Loading '$src.");
+    if ( -d $src ) {
+        -r _ or die "'$src' is not readable\n";
+        -x _ or die "'$src' is not usable (missing execute permission)\n";
+        for ( sort <$src/*.conf> ) {
+            my $c = parse_conf_file($_);
+
+            eval { merge_conf_hash( $conf, $c ); 1 } or die "Error loading $_: $@";
+        }
+    }
+    elsif ( -e $src ) {
+        die "$src is world-readable\n" if ( stat($src) )[2] & 04;
+
+        $conf = YAML::LoadFile($src)
+            or die "Error loading config from $src\n";
+    }
+    else {
+        die "'$src' does not exist\n";
+    }
+
+    if ( exists $conf->{include} ) {
+        my $inc = $conf->{include};
+        my @inc;
+
+        if (ref($inc)) {
+            die "'include' should be scalar or list\n"
+                unless ref($inc) eq 'ARRAY';
+
+            push @inc, @$inc;
+        }
+        else {
+            push @inc, $inc;
+        }
+
+        for my $f ( @inc ) {
+            my $c = parse_conf_file( $f, $met );
+            eval { merge_conf_hash( $conf, $c ); 1 } or die "Error loading $f: $@";
+        }
+    }
+
+    return $conf;
+}
+
+sub read_conf ($) {
+    my $file = shift;
+
+    my $conf = {};
+    $conf = parse_conf_file($file) if -e $file;
+
+    die "Invalid or missing config key: soap"
+        unless ( ref $conf->{soap}
+        and ref $conf->{soap} eq "HASH" );
+    die "Invalid or missing config key: repositories"
+        unless ( ref $conf->{repositories}
+        and ref $conf->{repositories} eq "HASH" );
+    die "Invalid or missing config key: networks"
+        unless ( ref $conf->{networks}
+        and ref $conf->{networks} eq "HASH" );
+    die "Invalid or missing config key: channels"
+        unless ( ref $conf->{channels}
+        and ref $conf->{channels} eq "ARRAY" );
+
+    $conf->{soap}{service_name} ||= "KGB";
+    $conf->{soap}{server_port}  ||= 5391;
+    $conf->{soap}{server_addr}  ||= "127.0.0.1";
+
+    if ( my $queue_limit = ( $conf->{queue_limit} //= 150 ) ) {
+        $queue_limit =~ /^\d{1,10}$/
+            or die
+            "Invalid value for config key 'queue_limit' ($queue_limit)";
+    }
+
+    $conf->{min_protocol_ver} = 1
+        unless ( defined $conf->{min_protocol_ver} );
+    $conf->{smart_answers} ||= ["My master told me to not respond."];
+
+    $conf->{admins} //= [];
+    ref( $conf->{admins} ) and ref( $conf->{admins} ) eq 'ARRAY'
+        or die "Invalid config key: 'admins'. Must be an array";
+
+    unless ( $KGB::supported_protos{ $conf->{min_protocol_ver} } ) {
+        die("Unrecognised min_protocol_ver (",
+            $conf->{min_protocol_ver},
+            "). I only know about protocols ",
+            join( ", ", keys %KGB::supported_protos ),
+            ".\n"
+        );
+    }
+    foreach ( keys %{ $conf->{networks} } ) {
+        $conf->{networks}{$_}{nick}     ||= "KGB";
+        $conf->{networks}{$_}{ircname}  ||= "KGB bot";
+        $conf->{networks}{$_}{username} ||= "kgb";
+        $conf->{networks}{$_}{port}     ||= 6667;
+        die "Missing server name in network $_\n"
+            unless $conf->{networks}{$_}{server};
+    }
+
+    $conf->{broadcast_channels} = [];
+
+    $_->{channels} //= [] for values %{ $conf->{repositories} };
+
+    foreach ( @{ $conf->{channels} } ) {
+        $_->{repositories} //= [];
+        die "Missing channel name at channel\n" unless ( $_->{name} );
+        die "Invalid network at channel " . $_->{name} . "\n"
+            unless ( $_->{network} and $conf->{networks}{ $_->{network} } );
+        push @{ $conf->{networks}{ $_->{network} }{channels} }, $_->{name};
+        die "Invalid repos key at channel " . $_->{name} . "\n"
+            unless $_->{broadcast}
+            or ( ref $_->{repos} and ref $_->{repos} eq "ARRAY" );
+        if ( $_->{broadcast} ) {
+            push @{ $conf->{broadcast_channels} }, $_->{name};
+            KGB->out("Repository list ignored for broadcast channel $_->{name}\n")
+                if @{ $_->{repositories} };
+        }
+        else {
+            KGB->out("Channel " . $_->{name} . " doesn't listen on any repository\n")
+                unless @{ $_->{repos} };
+            foreach my $repo ( @{ $_->{repos} } ) {
+                die "Invalid repository $repo at channel " . $_->{name} . "\n"
+                    unless ( $conf->{repositories}{$repo} );
+                push @{ $conf->{repositories}{$repo}{channels} }, $_->{name};
+            }
+        }
+    }
+    my %chanidx
+        = map ( { $conf->{channels}[$_]{name} => $conf->{channels}[$_] }
+        0 .. $#{ $conf->{channels} } );
+    $conf->{chanidx} = \%chanidx;
+
+    $conf->{colors}             ||= {};
+    $conf->{colors}{revision}   //= '';
+    $conf->{colors}{path}       //= 'teal';
+    $conf->{colors}{author}     //= 'green';
+    $conf->{colors}{branch}     //= 'brown';
+    $conf->{colors}{module}     //= 'purple';
+    $conf->{colors}{web}        //= 'silver';
+    $conf->{colors}{separator}  //= '';
+
+    $conf->{colors}{addition}     //= 'green';
+    $conf->{colors}{modification} //= 'teal';
+    $conf->{colors}{deletion}     //= 'bold red';
+    $conf->{colors}{replacement}  //= 'brown';
+
+    $conf->{colors}{prop_change} //= 'underline';
+
+    $KGB::debug = $conf->{debug} if exists $conf->{debug};
+    $conf->{pid_dir}
+        = Cwd::realpath( $conf->{pid_dir} // '/var/run/kgb-bot' );
+
+    KGB->debug( JSON::XS::encode_json($conf) );
+    return $conf;
+}
+
+sub load_conf($) {
+    my $file = shift;
+    my $conf = read_conf($file);
+
+    # Save globals
+    $config_file = Cwd::realpath($file);
+    $config      = $conf;
+    return $conf;
+}
+
+sub reload_conf() {
+    my $new_conf = eval { KGB::read_conf($config_file) };
+    if ($@) {
+        KGB->out("Error in configuration file: $@");
+        return -1;
+    }
+    if (   $new_conf->{soap}{service_name} ne $config->{soap}{service_name}
+        or $new_conf->{soap}{server_port} ne $config->{soap}{server_port}
+        or $new_conf->{soap}{server_addr} ne $config->{soap}{server_addr} )
+    {
+        KGB->out("Cannot reload configuration file, restarting\n");
+        return -2;    # need restart
+    }
+
+    $painter = App::KGB::Painter->new( { styles => $new_conf->{colors} } );
+
+    KGB->out("Configuration file reloaded\n");
+    $config = $new_conf;
+    return 0;
+}
+
+sub out {
+    shift;
+    print $KGB::out localtime->strftime('%Y.%m.%d %H:%M:%S').': ', @_, ( $_[-1] =~ /\n$/s ) ? () : "\n";
+}
+
+sub debug {
+    return unless $KGB::debug;
+
+    shift->out( @_ );
+}
+
+sub open_log {
+    if ( my $f = $KGB::config->{log_file} ) {
+        open( STDOUT, ">>", $f )
+            or die "Error opening log $f: $!\n";
+        open( STDERR, ">>", $f )
+            or die "Error opening log $f: $!\n";
+    }
+    else {
+        open( STDOUT, ">", "/dev/null" )
+            or die "Error closing stdout: $!\n";
+        open( STDERR, ">", "/dev/null" )
+            or die "Error closing stderr: $!\n";
+    }
+}
+
+sub remove_pid() {
+    unlink File::Spec->catfile( $KGB::config->{pid_dir}, 'kgb-bot.pid' );
+}
+
+package KGB::POE;
+
+use strict;
+use warnings;
+
+use POE;
+
+sub _start {
+    my $kernel  = $_[KERNEL];
+    my $session = $_[SESSION];
+    my $heap    = $_[HEAP];
+
+    $kernel->sig( INT  => 'sighandler' );
+    $kernel->sig( TERM => 'sighandler' );
+    $kernel->sig( QUIT => 'restarthandler' );
+    $kernel->sig( HUP  => 'reloadhandler' );
+
+    $kernel->alias_set( $KGB::config->{soap}{service_name} );
+    $kernel->post(
+        SOAPServer => 'ADDMETHOD',
+        $KGB::config->{soap}{service_name}, 'commit',
+        $KGB::config->{soap}{service_name}, 'commit',
+    );
+    $kernel->yield("_irc_reconnect") unless $KGB::simulate;
+
+    KGB->out(
+        "Listening on http://", $KGB::config->{soap}{server_addr},
+        ":",                    $KGB::config->{soap}{server_port},
+        "?session=",            $KGB::config->{soap}{service_name},
+        "\n"
+    );
+    undef;
+}
+
+sub _stop {
+    my $kernel  = $_[KERNEL];
+    my $session = $_[SESSION]->ID();
+    KGB->out("_stop \@session $session\n");
+    $kernel->post(
+        SOAPServer => 'DELSERVICE',
+        $KGB::config->{soap}{service_name}
+    );
+}
+
+sub sighandler {
+    my ( $kernel, $sig ) = ( $_[KERNEL], $_[ARG0] );
+    if ($KGB::shuttingdown) {
+        die "Dying forcefully...\n";
+    }
+    KGB->out("Deadly signal $sig received, exiting...\n");
+    $kernel->sig_handled();
+    $kernel->signal(
+        $kernel => 'POCOIRC_SHUTDOWN',
+        "KGB going to drink vodka"
+    );
+    $kernel->post( SOAPServer => 'STOPLISTEN' );
+    %{ $_[HEAP] } = ();
+    $KGB::shuttingdown = 1;
+    undef;
+}
+
+sub restarthandler {
+    my ( $kernel, $sig ) = ( $_[KERNEL], $_[ARG0] );
+    if ($KGB::shuttingdown) {
+        die "Dying forcefully...\n";
+    }
+    KGB->out("Signal $sig received, restarting...\n");
+    $kernel->sig_handled();
+    $KGB::restart      = 1;
+    $KGB::shuttingdown = 1;
+    $kernel->signal( $kernel => 'POCOIRC_SHUTDOWN', "KGB restartink" );
+    $kernel->post( SOAPServer => 'STOPLISTEN' );
+    %{ $_[HEAP] } = ();
+    undef;
+}
+
+sub reloadhandler {
+    my ( $kernel, $sig ) = ( $_[KERNEL], $_[ARG0] );
+    KGB->out("Signal $sig received, reloading...\n");
+    $kernel->sig_handled();
+    my $ret = KGB::reload_conf();
+    if ( $ret == -1 ) {    # error in config file
+        return undef;
+    }
+    elsif ( $ret == -2 ) {    # needs reload
+        KGB->out("Forcing restart\n");
+        $KGB::restart      = 1;
+        $KGB::shuttingdown = 1;
+        $kernel->signal( $kernel => 'POCOIRC_SHUTDOWN', "KGB restartink" );
+        $kernel->post( SOAPServer => 'STOPLISTEN' );
+        %{ $_[HEAP] } = ();
+        return undef;
+    }
+
+    # reopen log file
+    # we catch any exceptions, because we don't want reloading to be able
+    # to kill the server
+    unless ($KGB::foreground) {
+        KGB->out("Error re-openning logs: $@\n")
+            unless eval { KGB::open_log(); 1 };
+    }
+
+    # Reload successful
+    $kernel->yield("_irc_reconnect");
+    undef;
+}
+
+package KGB::SOAP;
+
+use strict;
+use warnings;
+
+use POE;
+use List::Util qw(max);
+use Digest::SHA qw(sha1_hex);
+use File::Basename;
+use App::KGB::Change;
+use Error ':try';
+
+sub colorize {
+    my( $category, $text ) = @_;
+
+    return $text if $KGB::simulate and not $KGB::simulate_color;
+
+    return $KGB::painter->colorize( $category => $text );
+}
+
+sub colorize_change {
+    my $c = shift;
+
+    return $KGB::painter->colorize_change($c);
+}
+
+sub do_commit_msg {
+    my ($kernel, $repo_id, $data) = @_;
+
+    my $rev_prefix = $data->{rev_prefix} // '';
+    my $commit_id = $data->{commit_id};
+    my $changes = $data->{changes};
+    my @log = split( /\n+/, $data->{commit_log} );
+    my $author = $data->{author} // '';
+    my $branch = $data->{branch} // '';
+    my $module = $data->{module} // '';
+
+    local $KGB::config->{colors} = {}
+        if exists $data->{extra}
+        and exists $data->{extra}{use_color}
+        and not $data->{extra}{use_color};
+
+    my $repo = $KGB::config->{repositories}{$repo_id};
+
+    my @channels = @{ $repo->{channels} };
+    push @channels, @{ $KGB::config->{broadcast_channels} }
+        unless $repo->{private};
+
+    throw Error::Simple("Repository $repo_id has no associated channels.\n")
+        unless (@channels);
+
+    my $path_string;
+    my %dirs;
+    my $changed_files   = scalar(@$changes);
+    my $MAGIC_MAX_FILES = 4;
+
+    $_ = App::KGB::Change->new($_)
+        for grep { defined($_) and $_ ne '' } @$changes;  # convert to objects
+
+    my $common_dir = App::KGB::Change->detect_common_dir($changes) // '';
+
+    my @info;
+
+    push @info, colorize( author => $author ) if $author ne '';
+    push @info, colorize( branch => $branch ) if $branch ne '';
+    push @info, "$rev_prefix" . colorize( revision => $commit_id )
+        if defined $commit_id;
+    push @info, colorize( module => $module ) if $module ne '';
+    push @info, colorize( path => "$common_dir/" ) if $common_dir ne '';
+
+    if ( $changed_files > $MAGIC_MAX_FILES ) {
+        my %dirs;
+        for my $c (@$changes) {
+            my $dir = dirname( $c->path );
+            $dirs{$dir}++;
+        }
+
+        my $dirs = scalar( keys %dirs );
+
+        my $path_string = join( ' ',
+            ( $dirs > 1 )
+            ? sprintf( "(%d files in %d dirs)", $changed_files, $dirs )
+            : sprintf( "(%d files)",            $changed_files ) );
+
+        push @info, colorize( path => $path_string );
+    }
+    else {
+        push @info, join( ' ', map { colorize_change($_) } @$changes )
+            if @$changes;
+    }
+
+    my @string = join( ' ', @info );
+
+    my $web_string
+        = defined( $data->{extra}{web_link} )
+        ? colorize( web => $data->{extra}{web_link} )
+        : undef;
+
+    my $use_notices = $data->{extra}{use_irc_notices};
+
+    # one-line notifications result in:
+    #  user branch commit module changes log link
+    # multi-line notifications look like:
+    #  user branch commit module changes link
+    #  log line 1
+    #  log line 2 ...
+    if ( 1 == @log and length($log[0]) <= 80 ) {
+        $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $log[0];
+    }
+    else {
+        push @string, @log;
+    }
+
+    $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
+        if defined($web_string);
+
+    my @tmp;
+    # Standard says 512 (minus \r\n), anyway that's further trimmed when
+    # resending to clients because of prefix.
+    # Let's trim on 400, to be safe
+    my $MAGIC_MAX_LINE
+        = ( 400 - length("PRIVMSG ") - max( map( length, @channels ) ) );
+
+    while ( $_ = shift @string ) {
+        if ( length($_) > $MAGIC_MAX_LINE ) {
+            push @tmp, substr( $_, 0, $MAGIC_MAX_LINE );
+            unshift @string,
+                colorize( repository => $repo_id )
+                . substr( $_, $MAGIC_MAX_LINE );
+        }
+        else {
+            push @tmp, $_;
+        }
+    }
+    @string = @tmp;
+
+    foreach my $chan ( @channels ) {
+        if ($KGB::simulate) {
+            my $fh = IO::File->new(">> $KGB::simulate")
+                or die "Error opening $KGB::simulate for writing: $!\n";
+            $fh->autoflush(1);
+            $fh->binmode(':utf8');
+            for (@string) {
+                $fh->print("$chan $_\n");
+            }
+            $fh->close;
+        }
+        else {
+            $kernel->yield(
+                irc_notify => $chan => \@string,
+                $use_notices ? 'notice' : 'privmsg'
+            );
+        }
+    }
+}
+
+sub do_commit_v0 {
+    my ( $kernel, $repo_id, $passwd, $rev, $paths, $log, $author )
+        = @_;
+
+    throw Error::Simple("Unknown repository '$repo_id'\n")
+        unless $KGB::config->{repositories}{$repo_id};
+
+    throw Error::Simple("Invalid password for repository $repo_id\n")
+        if $KGB::config->{repositories}{$repo_id}{password}
+        and $KGB::config->{repositories}{$repo_id}{password} ne $passwd;
+
+    do_commit_msg(
+        $kernel,
+        $repo_id,
+        {   rev_prefix => 'r',
+            commit_id  => $rev,
+            changes    => $paths,
+            commit_log => $log,
+            author     => $author
+        }
+    );
+}
+
+sub do_commit_v1 {
+    my ($kernel, $repo_id, $checksum, $rev,
+        $paths,  $log,      $author,  $branch,   $module
+    ) = @_;
+
+    # v1 is the same as v2, but has no rev_prefix parameter
+    return do_commit_v2(
+        $kernel, $repo_id, $checksum, 'r', $rev,
+        $paths,  $log,      $author,  $branch,   $module
+    );
+}
+
+sub do_commit_v2 {
+    my ($kernel,     $repo_id, $checksum,
+        $rev_prefix, $rev,      $paths,   $log,
+        $author,     $branch,   $module,
+    ) = @_;
+
+    throw Error::Simple("Repository $repo_id is unknown\n")
+        unless $KGB::config->{repositories}{$repo_id};
+
+    # Protocol v2 always uses UTF-8
+    utf8::decode($_)
+        for ( $repo_id, $rev, @$paths, $log, $author, $branch, $module );
+    my $message = join( "",
+        $repo_id,
+        $rev // (),
+        @$paths,
+        $log,
+        ( defined($author) ? $author : () ),
+        ( defined($branch) ? $branch : () ),
+        ( defined($module) ? $module : () ),
+        $KGB::config->{repositories}{$repo_id}{password} );
+    utf8::encode($message);    # Convert to byte-sequence
+
+    throw Error::Simple("Authentication failed for repository $repo_id\n")
+        if $KGB::config->{repositories}{$repo_id}{password}
+        and sha1_hex($message) ne $checksum;
+
+    do_commit_msg(
+        $kernel,
+        $repo_id,
+        {   rev_prefix => $rev_prefix,
+            commit_id  => $rev,
+            changes    => $paths,
+            commit_log => $log,
+            author     => $author,
+            branch     => $branch,
+            module     => $module
+        }
+    );
+}
+
+sub do_commit_v3 {
+    my ( $kernel, $repo_id, $serialized, $checksum ) = @_;
+
+    throw Error::Simple("Repository $repo_id is unknown\n")
+        unless exists $KGB::config->{repositories}{$repo_id};
+
+    my $pwd = $KGB::config->{repositories}{$repo_id}{password};
+    throw Error::Simple("Authentication failed for repository $repo_id\n")
+        if not defined($pwd)
+        or sha1_hex( $repo_id, $serialized, $pwd ) ne $checksum;
+
+    my $data;
+    my $ok = eval { $data = Storable::thaw($serialized); 1 };
+
+    throw Error::Simple("Invalid serialized data\n")
+        unless $ok;
+
+    do_commit_msg( $kernel, $repo_id, $data );
+}
+
+sub commit {
+    my $kernel   = $_[KERNEL];
+    my $response = $_[ARG0];
+    my $params   = $response->soapbody();
+
+    my $result;
+    try {
+        $result = do_commit( $kernel, $params );
+
+        $response->content("OK");
+        $kernel->post( SOAPServer => 'DONE', $response );
+    }
+    catch Error::Simple with {
+        my $E = shift;
+        KGB->out("$E");
+        $kernel->post(
+            SOAPServer => 'FAULT',
+            $response, 'Client.Arguments',
+            "$E",
+        );
+    }
+    otherwise {
+        my $E = shift;
+        KGB->out("commit crashed: $E");
+        $kernel->post(
+            SOAPServer => 'FAULT',
+            $response, 'Server.Code',
+            'Internal Server Error'
+        );
+    };
+}
+
+sub do_commit {
+    my ( $kernel, $params ) = @_;
+
+    KGB->out( "commit: " . YAML::Dump($params) ) if $KGB::debug;
+
+    throw Error::Simple("commit(params ...)\n")
+        unless ref $params
+        and ref $params eq "HASH"
+        and $params->{Array}
+        and ref $params->{Array}
+        and ref $params->{Array} eq "ARRAY";
+
+    my $proto_ver;
+    if ( @{ $params->{Array} } == 6 ) {
+        $proto_ver = 0;
+    }
+    else {
+        $proto_ver = shift @{ $params->{Array} };
+    }
+
+    throw Error::Simple(
+        sprintf(
+            "Protocol version %s not welcomed\n", $proto_ver // '<undef>'
+        )
+        )
+        unless defined($proto_ver)
+        and $KGB::supported_protos{$proto_ver}
+        and $proto_ver >= $KGB::config->{min_protocol_ver};
+
+    throw Error::Simple("Rate limit enforced\n")
+        if $KGB::config->{queue_limit}
+        and $KGB::IRC::irc_object
+        and $KGB::config->{queue_limit} < $KGB::IRC::irc_object->send_queue;
+
+    if ( $proto_ver == 0 ) {
+        return do_commit_v0( $kernel, @{ $params->{Array} } );
+    }
+    if ( $proto_ver == 1 ) {
+        return do_commit_v1( $kernel, @{ $params->{Array} } );
+    }
+    if ( $proto_ver == 2 ) {
+        return do_commit_v2( $kernel, @{ $params->{Array} } );
+    }
+    if ( $proto_ver == 3 ) {
+        return do_commit_v3( $kernel, @{ $params->{Array} } );
+    }
+    throw Error::Simple("Invalid protocol version ($proto_ver)\n");
+}
+
+package KGB::IRC;
+
+use strict;
+use warnings;
+
+use Digest::MD5 qw(md5_hex);
+use POE;
+use POE::Component::IRC::Common qw( parse_user matches_mask );
+use Schedule::RateLimiter;
+
+our %current = ();
+our $irc_object;
+our $autoresponse_limitter
+    = Schedule::RateLimiter->new( iterations => 5, seconds => 30,
+    block => 0 );
+
+# Handles the connection, disconnection and real-time configuration changes WRT
+# IRC servers and channels
+sub _irc_reconnect {
+    my ( $kernel, $session ) = @_[ KERNEL, SESSION ];
+    my ( @to_start, @to_stop, @to_restart );
+
+    foreach my $net ( keys %current ) {
+        next unless ( defined( $current{$net} ) );
+        my ( $new, $old )
+            = ( $KGB::config->{networks}{$net}, $current{$net} );
+        if ( !$new ) {
+            push @to_stop, $net;
+        }
+        elsif ($new->{nick} ne $old->{nick}
+            or $new->{ircname}  ne $old->{ircname}
+            or $new->{username} ne $old->{username}
+            or ( $new->{password} || "" ) ne ( $old->{password} || "" )
+            or ( $new->{nickserv_password} || "" ) ne
+            ( $old->{nickserv_password} || "" )
+            or $new->{server} ne $old->{server}
+            or $new->{port}   ne $old->{port} )
+        {
+            push @to_restart, $net;
+        }
+        else {
+            my ( %newchan, %oldchan, %allchan );
+            %newchan = map( { $_ => 1 } @{ $new->{channels} } );
+            %oldchan = map( { $_ => 1 } @{ $old->{channels} } );
+            %allchan = ( %newchan, %oldchan );
+            foreach my $chan ( keys %allchan ) {
+                if ( $newchan{$chan} and !$oldchan{$chan} ) {
+                    KGB->out("Joining $chan...\n");
+                    $kernel->post( "irc_$net" => join => $chan );
+                }
+                elsif ( !$newchan{$chan} and $oldchan{$chan} ) {
+                    KGB->out("Parting $chan...\n");
+                    $kernel->post( "irc_$net" => part => $chan );
+                }
+            }
+            $current{$net} = $new;
+        }
+    }
+    foreach ( keys %{ $KGB::config->{networks} } ) {
+        if ( !$current{$_} ) {
+            push @to_start, $_;
+        }
+    }
+    foreach my $net (@to_start) {
+        my $opts = $KGB::config->{networks}{$net};
+        $current{$net} = $opts;
+
+        my $irc = POE::Component::IRC::State->spawn( Alias => "irc_$net" );
+
+        # No need to register, as it's done automatically now. If you register
+        # twice, POE never exits
+    }
+    foreach ( @to_stop, @to_restart ) {
+        KGB->out("Disconnecting from $_\n");
+        $kernel->post( "irc_$_" => "shutdown" );
+        delete $current{$_};
+    }
+    if (@to_restart) {
+        $kernel->delay( "_irc_reconnect", 3 );
+    }
+}
+
+sub irc_registered {
+    my ( $kernel, $heap, $sender ) = @_[ KERNEL, HEAP, SENDER ];
+    $irc_object = $_[ARG0];
+
+    my $alias = $irc_object->session_alias();
+    $alias =~ s/^irc_//;
+    my $opts = $KGB::config->{networks}{$alias};
+
+    $irc_object->plugin_add( $KGB::const{AJsvc},
+        POE::Component::IRC::Plugin::AutoJoin->new(
+            Channels => $opts->{channels},
+        )
+    ) if ( $opts->{channels} );
+
+    $irc_object->plugin_add( $KGB::const{NSsvc},
+        POE::Component::IRC::Plugin::NickServID->new(
+            Password => $opts->{nickserv_password},
+        )
+    ) if ( $opts->{nickserv_password} );
+
+    $irc_object->plugin_add( $KGB::const{NRsvc},
+        POE::Component::IRC::Plugin::NickReclaim->new() );
+
+    $irc_object->plugin_add( $KGB::const{Connsvc},
+        POE::Component::IRC::Plugin::Connector->new() );
+
+    $irc_object->plugin_add( $KGB::const{BAsvc},
+        POE::Component::IRC::Plugin::BotAddressed->new() );
+
+    $irc_object->plugin_add(
+        'CTCP' => POE::Component::IRC::Plugin::CTCP->new(
+            version    => "KGB v$KGB::VERSION",
+            userinfo   => "KGB v$KGB::VERSION",
+            clientinfo => "VERSION USERINFO CLIENTINFO SOURCE",
+            source     => "http://alioth.debian.org/projects/kgb",
+        )
+    );
+
+    $kernel->post(
+        $sender => connect => {
+            Server   => $opts->{server},
+            Port     => $opts->{port},
+            Nick     => $opts->{nick},
+            Ircname  => $opts->{ircname},
+            Username => $opts->{username},
+            Password => $opts->{password},
+            Flood    => $opts->{flood},
+        }
+    );
+    undef;
+}
+
+sub _default {
+    return 0 unless $KGB::debug;
+    my ( $event, $args ) = @_[ ARG0 .. $#_ ];
+    my $out = "$event ";
+    foreach (@$args) {
+        if ( ref($_) eq 'ARRAY' ) {
+            $out .= "[" . join( ", ", @$_ ) . "] ";
+        }
+        elsif ( ref($_) eq 'HASH' ) {
+            $out .= "{" . join( ", ", %$_ ) . "} ";
+        }
+        elsif ( defined $_ ) {
+            $out .= "'$_' ";
+        }
+        else {
+            $out .= "undef ";
+        }
+    }
+    KGB->debug("$out\n");
+    return 0;
+}
+
+sub irc_public {
+    my ( $kernel, $heap, $who, $where, $what )
+        = @_[ KERNEL, HEAP, ARG0, ARG1, ARG2 ];
+    my $nick = parse_user($who);
+    my $chan = $where->[0];
+
+    $kernel->yield( irc_new_hash => $chan => $what );
+
+    KGB->debug( $chan . ':<' . $nick . '> ' . $what . "\n" );
+    undef;
+}
+
+sub get_net {
+    my $obj = shift;
+
+    ( my $net = $obj->get_heap()->session_alias() ) =~ s/^irc_//;
+
+    return $net;
+}
+
+sub irc_001 {
+    my ( $kernel, $sender ) = @_[ KERNEL, SENDER ];
+    my $net = get_net($sender);
+    my $channels = $KGB::config->{networks}{$net}{channels};
+
+    # Get the component's object at any time by accessing the heap of
+    # the SENDER
+    KGB->out( "Connected to $net (", $sender->get_heap->server_name(), ")\n" );
+    KGB->out( "Joining @$channels...\n" ) if ($channels);
+    undef;
+}
+
+sub get_polygen_joke {
+    my ( $out, $err );
+
+    my $polygen = KGB::polygen_available();
+    return undef unless $polygen;
+
+    my $grammar = 'manager';
+    my @polygen
+        = ( $polygen, "/usr/share/polygen/eng/$grammar.grm" );
+
+    my $result = eval { IPC::Run::run( \@polygen, \undef, \$out, \$err ) };
+    if ($@) {
+        KGB->debug( "Error while running " . join( ' ', @polygen ) . ": $@" );
+        return undef;
+    }
+    elsif ($result) {
+        return $out;
+    }
+    else {
+        KGB->debug( "Error while running " . join( ' ', @polygen ) . ": $err" );
+        return undef;
+    }
+}
+
+sub get_smart_answer {
+    my $chan = shift;
+
+    # Channel config
+    if ( $KGB::config->{chanidx}{$chan}{smart_answers_polygen} ) {
+        my $polygen_joke = get_polygen_joke;
+
+        return $polygen_joke if $polygen_joke;
+    }
+
+    my $smart_answers
+        = $chan ? $KGB::config->{chanidx}{$chan}{smart_answers} : undef;
+    return $smart_answers->[ ( int( rand( scalar(@$smart_answers) ) ) ) ]
+        if $smart_answers;
+
+    # Global config
+    if ( $KGB::config->{smart_answers_polygen} ) {
+        my $polygen_joke = get_polygen_joke;
+
+        return $polygen_joke if $polygen_joke;
+    }
+
+    $smart_answers = $KGB::config->{smart_answers};
+    return $smart_answers->[ ( int( rand( scalar(@$smart_answers) ) ) ) ]
+        if $smart_answers;
+
+    return undef;
+}
+
+sub got_a_message {
+    my ( $kernel, $sender, $who, $where, $what ) = @_;
+    my $chan = $where ? $where->[0] : undef;    # could be a private message
+    my $net = get_net($sender);
+
+    return undef if $who =~ /\.bot\./;  # try to ignore bots
+
+    unless ( $autoresponse_limitter->event() ) {
+        KGB->out("Auto response rate-limit reached.\n");
+        return undef;
+    }
+
+    if ( $what =~ /^\!([a-z]+)$/ ) {
+        $kernel->yield( irc_command => $1 => $who => $chan => $net );
+    }
+    else {
+        my $msg = get_smart_answer($chan);
+        return undef unless ($msg);
+        my $nick = parse_user($who);
+        reply( $kernel, $net, $chan, $nick, $msg );
+    }
+}
+
+sub irc_bot_addressed {
+    my ( $kernel, $sender, $who, $where, $what )
+        = @_[ KERNEL, SENDER, ARG0, ARG1, ARG2 ];
+
+    got_a_message( $kernel, $sender, $who, $where, $what );
+}
+
+sub irc_msg {
+    my ( $kernel, $sender, $who, $what ) = @_[ KERNEL, SENDER, ARG0, ARG2 ];
+
+    got_a_message( $kernel, $sender, $who, undef, $what );
+}
+
+sub irc_new_hash {
+    my ( $kernel, $heap, $chan, $str ) = @_[ KERNEL, HEAP, ARG0, ARG1 ];
+
+    my $hash = md5_hex( $chan, substr( $str, 0, 100 ) );
+
+    my $seen_idx  = $heap->{seen_idx}  ||= {};
+    my $seen_list = $heap->{seen_list} ||= [];
+    my $idx = exists $seen_idx->{$hash} ? $seen_idx->{$hash} : undef;
+
+    # if found, move to the top of the list
+    if ( defined($idx) ) {
+        my $hash = splice( @$seen_list, $idx, 1 );
+        $seen_idx->{ $seen_list->[$_] }++ for 0 .. ( $idx - 1 );
+        unshift @$seen_list, $hash;
+        $seen_idx->{$hash} = 0;
+
+        return undef;
+    }
+
+    # only keep last 100 hashes
+    if ( scalar( @{ $heap->{seen_list} } ) == 100 ) {
+        delete $seen_idx->{ pop @$seen_list };
+    }
+
+    push @$seen_list, $hash;
+    $seen_idx->{$hash} = $#$seen_list;
+}
+
+sub irc_notify {
+    my ( $kernel, $heap, $chan, $str, $method )
+        = @_[ KERNEL, HEAP, ARG0, ARG1, ARG2 ];
+
+    $method ||= 'privmsg';
+
+    # put some hidden character to avoid addressing anyone
+    my $safety = $KGB::painter->color_codes->{normal};
+    $_ = "$safety$_" for @$str;
+
+    my $part = substr( $str->[0], 0, 100 );
+    utf8::encode($part);
+    my $hash = md5_hex( $chan, $part );
+
+    if ( exists $heap->{seen_idx}{$hash} ) {
+        KGB->debug("'$part' seen recently\n");
+
+        return undef;
+    }
+
+    my $alias = "irc_" . $KGB::config->{chanidx}{$chan}{network};
+    $kernel->post( $alias => $method => $chan => $_ ) foreach (@$str);
+    if ( $KGB::debug ) {
+        KGB->out("$alias/$chan > $_\n") foreach (@$str);
+    }
+}
+
+sub reply {
+    my ( $kernel, $net, $chan, $nick, $msg ) = @_;
+    # put some hidden character to avoid addressing anyone
+    my $safety = $KGB::painter->color_codes->{normal};
+    return $chan
+        ? $kernel->post( "irc_$net" => privmsg => $chan => "$safety$nick: $msg" )
+        : $kernel->post( "irc_$net" => privmsg => $nick => "$safety$msg" );
+}
+
+sub irc_command {
+    my ( $kernel, $heap, $command, $who, $chan, $net )
+        = @_[ KERNEL, HEAP, ARG0 .. ARG3 ];
+
+    my $nick = parse_user($who);
+
+    return reply( $kernel, $net, $chan, $nick, "You are not my master" )
+        unless grep { matches_mask( $_, $who ) } @{ $KGB::config->{admins} };
+
+    if ( $command eq 'version' ) {
+        return reply( $kernel, $net, $chan, $nick,
+                  "Tried /CTCP "
+                . $KGB::config->{networks}{$net}{nick}
+                . " VERSION?" );
+    }
+    else {
+        return reply( $kernel, $net, $chan, $nick,
+            "command '$command' is not known to me" );
+    }
+}
+
+package KGB::JSON;
+
+use JSON::XS;
+use POE;
+use Digest::SHA qw(sha1_hex);
+
+sub json_error {
+    my ( $json, $resp, $error ) = @_;
+    KGB->out($error);
+    $resp->code(200);
+    $resp->message('OK');
+    $resp->content(
+        encode_json(
+            { id => $json->{id} // 0, error => $error, result => undef }
+        )
+    );
+}
+
+sub http_error {
+    my ( $resp, $error, $code ) = @_;
+    KGB->out($error);
+    $resp->code($code // 400);
+    $resp->message($error);
+    $resp->content('');
+}
+
+sub json_request {
+    my ( $req, $resp, $path ) = @_[ ARG0, ARG1, ARG2 ];
+
+    my ($repo_id, $auth);
+    unless (defined( $repo_id = $req->header('X-KGB-Project') )
+        and defined( $auth = $req->header('X-KGB-Auth') ) )
+    {
+        http_error( $resp,
+            'Invalid or missing X-KGB-Project or X-KGB-Auth headers' );
+        $_[KERNEL]->post( $_[SENDER], DONE => $resp );
+        return;
+    }
+
+    unless ( exists $KGB::config->{repositories}{$repo_id} ) {
+        http_error( $resp, "Unknown project ($repo_id)" );
+        $_[KERNEL]->post( $_[SENDER], DONE => $resp );
+        return;
+    }
+    my $check = sha1_hex( $KGB::config->{repositories}{$repo_id}{password},
+        $repo_id, $req->content );
+
+    unless ( $check eq $auth ) {
+        http_error( $resp, "[$repo_id] Authentication failed", 401 );
+        $_[KERNEL]->post( $_[SENDER], DONE => $resp );
+        return;
+    }
+
+    my $json;
+    my $ok = eval { $json = decode_json( $req->content ); 1; };
+
+    unless ($ok) {
+        http_error( $resp, "[$repo_id] Error decoding JSON request" );
+        $_[KERNEL]->post( $_[SENDER], DONE => $resp );
+        return;
+    }
+
+    unless (exists $json->{method}
+        and defined $json->{method}
+        and not ref( $json->{method} )
+        and length $json->{method} )
+    {
+        json_error( $json, $resp, "[$repo_id] Request has no valid \"method\" member" );
+        $_[KERNEL]->post( $_[SENDER], DONE => $resp );
+        return;
+    }
+    unless (exists $json->{params}
+        and defined $json->{params}
+        and ref( $json->{params} )
+        and ref( $json->{params} ) eq 'ARRAY'
+        and length $json->{params} )
+    {
+        json_error( $json, $resp, "[$repo_id] Request has no valid \"params\" member" );
+        $_[KERNEL]->post( $_[SENDER], DONE => $resp );
+        return;
+    }
+    unless (exists $json->{id}
+        and defined $json->{id}
+        and not ref( $json->{id} )
+        and length $json->{id} )
+    {
+        json_error( $json, $resp, "[$repo_id] Request has no valid \"id\" member" );
+        $_[KERNEL]->post( $_[SENDER], DONE => $resp );
+        return;
+    }
+
+    my $json_result;
+    $ok = eval {
+        $json_result = encode_json(
+            {   id     => $json->{id} // 0,
+                result => __PACKAGE__->handle_json_request( $_[KERNEL], $repo_id, $json ),
+                error  => undef
+            }
+        );
+        1;
+    };
+
+    unless ($ok) {
+        KGB->out($@);
+        json_error( $json, $resp, "[$repo_id] Internal server error" );
+        $_[KERNEL]->post( $_[SENDER], DONE => $resp );
+        return;
+    }
+
+    $resp->code(200);
+    $resp->message('OK');
+    $resp->content($json_result);
+    $_[KERNEL]->post( $_[SENDER], DONE => $resp );
+    return;
+}
+
+sub handle_json_request {
+    my ( $self, $kernel, $repo_id, $req ) = @_;
+
+    my $meth = "do_json_$req->{method}";
+
+    die "Unknown method '$req->{method}'" unless $self->can($meth);
+
+    return $self->$meth( $kernel, $repo_id, @{ $req->{params} } );
+}
+
+sub do_json_commit_v4 {
+    my ( $self, $kernel, $repo_id, $data ) = @_;
+
+    KGB::SOAP::do_commit_msg( $kernel, $repo_id, $data );
+}
+
+sub do_json_relay_message {
+    my ( $self, $kernel, $repo_id, $message, $opts ) = @_;
+
+    $opts ||= {};
+
+    defined $repo_id or die "Missing repo_id argument\n";
+    exists $KGB::config->{repositories}{$repo_id} or die "Invalid repository '$repo_id'\n";
+    my $repo = $KGB::config->{repositories}{$repo_id};
+    my @channels = @{ $repo->{channels} };
+    push @channels, @{ $KGB::config->{broadcast_channels} }
+            unless $repo->{private};
+
+    die("Repository $repo_id has no associated channels.\n") unless @channels;
+
+    my @messages;
+
+    defined($message) or die "No message parameter";
+    if (ref($message) ) {
+        ref($message) eq 'ARRAY'
+            or die "Unsupported ref ("
+            . ref($message)
+            . ") for the message parameter";
+
+        for (@$message) {
+            defined($_) and not ref($_) or die "Invalid message";
+            length($_) or die "Empty message";
+        }
+
+        KGB->debug(
+            sprintf( "Received a batch of %d messages\n", scalar(@$message) )
+        );
+        @messages = @$message;
+    }
+    else {
+        length($message) or die "Empty message";
+
+        push @messages, $message;
+    }
+
+    die "Too much messages (rate limit overflow)"
+        if $KGB::config->{queue_limit}
+        and $KGB::IRC::irc_object
+        and $KGB::config->{queue_limit}
+        < ( $KGB::IRC::irc_object->send_queue + scalar(@messages) );
+
+    foreach my $msg (@messages) {
+        foreach my $chan ( @channels ) {
+            for my $line ( split( /\n/, $msg ) ) {
+                if ($KGB::simulate) {
+                    my $fh = IO::File->new(">> $KGB::simulate")
+                        or die "Error opening $KGB::simulate for writing: $!\n";
+                    $fh->autoflush(1);
+                    $fh->binmode(':utf8');
+                    $fh->print("$chan $line\n");
+                    $fh->close;
+                }
+                else {
+                    $kernel->yield(
+                        irc_notify => $chan => [$line],
+                        $opts->{use_irc_notices} ? 'notice' : 'privmsg'
+                    );
+                }
+            }
+        }
+    }
+
+    return 'OK';
+}
+
+package main;
+
+use strict;
+use warnings;
+
+use POE;
+use POE::Component::Server::SOAP;
+use POE::Component::IRC::State;
+use POE::Component::IRC::Plugin::AutoJoin;
+use POE::Component::IRC::Plugin::BotAddressed;
+use POE::Component::IRC::Plugin::Connector;
+use POE::Component::IRC::Plugin::NickReclaim;
+use POE::Component::IRC::Plugin::NickServID;
+use POE::Component::IRC::Plugin::CTCP;
+use Getopt::Long;
+use YAML ();
+use Proc::PID::File;
+
+KGB::save_progname();
+$KGB::out = \*STDERR;
+binmode( $KGB::out, ':utf8' );
+
+my $conf_file  = '/etc/kgb-bot/kgb.conf';
+my $conf_dir   = '/etc/kgb-bot/kgb.conf.d';
+$KGB::foreground = 0;
+$KGB::simulate = 0;
+$KGB::simulate_color = 0;
+$KGB::debug = 0;
+
+Getopt::Long::Configure("bundling");
+GetOptions(
+    'c|config=s'   => \$conf_file,
+    'cd|config-dir=s' => \$conf_dir,
+    'f|foreground' => \$KGB::foreground,
+    'simulate=s'    => \$KGB::simulate,
+    'simulate-color!' => \$KGB::simulate_color,
+    'debug!'        => \$KGB::debug,
+) or die 'Invalid parameters';
+
+@ARGV and die "No command line arguments supported\n";
+
+KGB::load_conf($conf_file);
+
+use Cwd;
+$KGB::simulate = Cwd::realpath($KGB::simulate) if $KGB::simulate;
+
+$KGB::painter
+    = App::KGB::Painter->new( { styles => $KGB::config->{colors} } );
+
+unless ($KGB::foreground) {
+    pipe IN, OUT or die "pipe: $!\n";
+    my $pid = fork();
+    die "Can't fork: $!" unless ( defined $pid );
+    if ($pid) {
+        close OUT;
+        my $r = join( "", <IN> );
+        close IN or die $!;
+        if ( $r =~ /^OK$/ ) {
+            exit 0;
+        }
+        else {
+            die $r;
+        }
+    }
+    else {
+        $poe_kernel->has_forked;
+    }
+    close IN;
+    eval {
+        die "Already running\n"
+            if (
+            Proc::PID::File->running(
+                verify => 1,
+                dir    => $KGB::config->{pid_dir},
+            )
+            );
+        POSIX::setsid() or die "setsid: $!\n";
+        umask(0022);
+        chdir("/") or die "chdir: $!\n";
+
+        open( STDIN, "<", "/dev/null" ) or die "Error closing stdin: $!\n";
+
+        KGB::open_log();
+    };
+    if ($@) {
+        print OUT $@;
+        exit 1;
+    }
+    else {
+        print OUT "OK\n";
+        close OUT;
+    }
+}
+
+# only after possible forking
+eval " END { KGB::remove_pid() }";
+
+POE::Component::Server::SOAP->new(
+    ALIAS   => $KGB::const{SOAPsvc},
+    ADDRESS => $KGB::config->{soap}{server_addr},
+    PORT    => $KGB::config->{soap}{server_port},
+    # override PoCo::SOAP HANDLERS to plug json-rpc
+    SIMPLEHTTP => {
+                'HANDLERS'      =>      [
+                        {
+                                'DIR'           =>      '^/json-rpc',
+                                'SESSION'       =>      $KGB::config->{soap}{service_name},
+                                'EVENT'         =>      'json_request',
+                        },
+                        {
+                                'DIR'           =>      '.*',
+                                'SESSION'       =>      'SOAPServer',
+                                'EVENT'         =>      'Got_Request',
+                        },
+                ],
+    },
+);
+
+POE::Session->create(
+    package_states => [
+        "KGB::POE" => [
+            qw(_start _stop sighandler restarthandler
+                reloadhandler)
+        ],
+        "KGB::IRC" => [
+            qw(_irc_reconnect irc_registered irc_001
+                irc_public irc_bot_addressed irc_new_hash irc_notify _default
+                irc_command irc_msg),
+        ],
+        "KGB::SOAP" => [qw(commit)],
+        'KGB::JSON' => [qw(json_request)],
+    ],
+
+    #    options => {trace => 1, debug => 1}
+);
+
+$poe_kernel->run;
+if ($KGB::restart) {
+    exec( $KGB::progname, '--foreground',
+        '--config'     => $KGB::config_file,
+        $KGB::debug ? '--debug' : (),
+    ) or die "couldn't re-exec: $!\ņ";
+}
+
+exit 0;

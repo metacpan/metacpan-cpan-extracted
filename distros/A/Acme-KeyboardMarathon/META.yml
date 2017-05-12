@@ -1,0 +1,26 @@
+---
+abstract: 'How far have your fingers ran?'
+author:
+  - 'Phil Pollard <bennie@cpan.org>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-KeyboardMarathon
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+provides:
+  Acme::KeyboardMarathon:
+    file: lib/Acme/KeyboardMarathon.pm
+    version: '1.25'
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Acme-KeyboardMarathon
+  repository: git://github.com/bennie/perl-Acme-KeyboardMarathon.git
+version: '1.25'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

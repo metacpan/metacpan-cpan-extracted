@@ -1,0 +1,7 @@
+1.161190  2016-04-27 18:34:51-07:00 America/Los_Angeles
+    * Big bug fix in basic behaviour
+    * Handle zombies
+    * Remove some stray unconditional logging
+
+1.161170  2016-04-26 16:06:34-07:00 America/Los_Angeles
+    * Initial release

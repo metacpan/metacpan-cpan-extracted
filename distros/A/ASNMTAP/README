@@ -1,0 +1,408 @@
+# -----------------------------------------------------------------------
+# © Copyright 2003-2011 by Alex Peeters [alex.peeters@citap.be]
+# -----------------------------------------------------------------------
+
+# General - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Author       : Alex Peeters [alex.peeters@citap.be]
+Latest update: dd month 2011
+Version      : 3.002.003
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+TODO:                          - TODO ALL   -  Log::Dispatch, Log::Dispatch::FileRotate depend on Date::Manip depend on perl 5.10
+                               -               , 'Log::Dispatch' => '2.26'
+                               -               , 'Log::Dispatch::FileRotate' => '1.19'
+                               -               , 'Log::Log4perl::Layout::XMLLayout' => 'x.x'
+
+Version 3.002.003, 2011/xx/yy, by Alex Peeters
+                               ASNMTAP
+                               - Nagios.pm
+                                 BUGFIX: convert_from_KB_to_metric for GB
+                                 BUGFIX: DESTROY created new reference to dead object 'ASNMTAP::Asnmtap::Plugins::Nagios' during global destruction.
+                               - WebTransact.pm
+                                 UPDATE: added Content_Type: 'multipart/form-data' for qs-fixed
+                               - change code to use 'perfdata'
+                               - UPDATE: asnmtap-3.002.003_mysql-v5.0.x-trigger-events.sql
+                               - UPDATE: asnmtap-3.002.003_mysql-v5.0.x-trigger-eventsUpdate.sql
+                               - runCmdOnDemand.pl & WebTransact.pm
+                                 - replace <BODY onload="..."> with <BODY>
+                               - SOAP.pm
+                                 NEW: encodingStyle
+																 NEW: error 'Missing SOAP Envelope or Body'
+                                 UPDATE soapaction
+                               - create_ASNMTAP_weblogic_configuration_for_SNMP.pl
+                                 UPDATE: added status to e-mail subject
+                               - NEW: supportRequest template (applications/custom/supportRequest.pm-orig) integrated into comments.pl
+                               - NEW: integration for SDE (applications/custom/sde-supportRequest.pm-orig) into comments.pl
+                               - NEW: check_xml-monitoring-1.2.pl
+                               - UPDATE: coments.pl with integration for applications/custom/supportRequest.pm
+                               ASNMTAP::Asnmtap::Applications
+                               - Applications.cnf
+                                 <COMMON>
+                                 ...
+                                 #  <PERFPARSE>
+                                 #    ...
+                                 #    VERSION         20                     # '19' or '20'
+                                 #    CONFIG          perfparse20.cfg        # 'perfparse.cfg' or 'perfparse20.cfg'
+                                 #  </PERFPARSE>
+                                 </COMMON>
+
+# INSTALLATION  - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+OR
+
+When you need a proxyserver, and your CPAN and/or CPANPLUS isn't confugured
+to use one, then you must set: 
+- CPAN    : HTTP_PROXY and/or FTP_PROXY
+- CPANPLUS: http_proxy and/or ftp_proxy
+
+  CPAN
+    export HTTP_PROXY="http://host:port"
+    export FTP_PROXY="http://host:port"
+
+    perl -MCPAN -e shell
+      cpan shell -- CPAN exploration and modules installation (v1.xxx)
+      ...
+
+      cpan> reload index
+
+  CPANPLUS
+    export http_proxy="http://host:port"
+    export ftp_proxy="http://host:port"
+
+    perl -MCPANPLUS -e shell
+      CPANPLUS::Shell::Default -- CPAN exploration and module installation (v0.xxx)
+      ...
+
+      CPAN Terminal> x --update_source
+
+  perl -MCPAN -e 'install ASNMTAP::Asnmtap'
+
+
+# BINARIES  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Cygwin:
+
+  General:
+  - Devel, expat v1.95.8
+
+  Needed for Win32::API used by ASNMTAP::Asnmtap::Plugins::Modem
+  - Libs, w32api v 3.6-1
+
+  Needed for XML::LibXML used by ASNMTAP::Asnmtap::Plugins::XML
+  - Libs, libxml2 v 2.6.22
+  - Devel, libxml2 v 2.6.22
+
+
+Linux:
+
+  General:
+  - yum install expat
+  - yum install expat-devel
+
+  Needed for XML::LibXML used by ASNMTAP::Asnmtap::Plugins::XML
+  - yum install lib2xml
+  - yum install lib2xml-devel
+
+
+Solaris:
+
+  General:
+  - wget ftp://sunfreeware.com/pub/freeware/sparc/9/expat-1.95.5-sol9-sparc-local.gz
+  - gzip -d expat-1.95.5-sol9-sparc-local.gz
+  - pkgadd -d expat-1.95.5-sol9-sparc-local
+  or
+  - wget ftp://sunfreeware.com/pub/freeware/sparc/10/expat-1.95.5-sol10-sparc-local.gz
+  - gzip -d expat-1.95.5-sol10-sparc-local.gz
+  - pkgadd -d expat-1.95.5-sol10-sparc-local
+
+  Needed for XML::LibXML used by ASNMTAP::Asnmtap::Plugins::XML
+  - wget ftp://sunfreeware.com/pub/freeware/sparc/9/libxml2-2.6.16-sol9-sparc-local.gz
+  - gzip -d libxml2-2.6.16-sol9-sparc-local.gz
+  - pkgadd -d libxml2-2.6.16-sol9-sparc-local
+  or
+  - wget ftp://sunfreeware.com/pub/freeware/sparc/10/libxml2-2.6.16-sol10-sparc-local.gz
+  - gzip -d libxml2-2.6.16-sol10-sparc-local.gz
+  - pkgadd -d libxml2-2.6.16-sol10-sparc-local
+
+
+# DEPENDENCIES  - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+This module requires these other modules and libraries:
+
+Base package ASNMTAP::Asnmtap
+- Config::General:               2.33
+- Config::General::Interpolated: 2.06
+- Data::Dumper:                  2.12
+- Dumpvalue:                     1.11
+- Getopt::Long:                  2.36
+- IO::CaptureOutput:             1.03
+- Test::Simple:                  0.65
+- Time::Local:                   1.17
+
+ASNMTAP::Time
+- Date::Calc:                    5.4
+- Time::Local:                   1.17
+
+ASNMTAP::Asnmtap::Applications
+- ASNMTAP::Time:
+- ASNMTAP::Asnmtap:
+- Carp:
+- Config::General:               2.33
+- Config::General::Interpolated: 2.06
+- Getopt::Long:                  2.36
+- HTML::Entities:                1.29
+- Mail::Sendmail:                0.79
+- Time::Local:                   1.17
+
+ASNMTAP::Asnmtap::Applications::CGI
+- ASNMTAP::Time:
+- ASNMTAP::Asnmtap::Applications:
+- Carp:
+- CGI::Session:                  4.20
+- Date::Calc:                    5.4
+- NetAddr::IP:                   4.007
+- Proc::ProcessTable:            0.39
+- Time::Local:                   1.17
+
+ASNMTAP::Asnmtap::Applications::Collector
+- ASNMTAP::Asnmtap::Applications:
+- Carp:
+- Time::Local:                   1.17
+
+ASNMTAP::Asnmtap::Applications::Display
+- ASNMTAP::Asnmtap::Applications:
+- Carp:
+- Time::Local:
+ 
+ASNMTAP::Asnmtap::Plugins
+- ASNMTAP::Asnmtap:
+- Time::HiRes:                   1.9704
+
+ASNMTAP::Asnmtap::Plugins::IO
+- ASNMTAP::Asnmtap::Plugins:
+- IO:                            1.20
+
+ASNMTAP::Asnmtap::Plugins::Nagios
+- ASNMTAP::Asnmtap::Plugins:
+- Time::Local:                   1.17
+
+  check_template-ldap.pl
+  - Net::LDAP:
+
+    Dependencies Net::LDAP:
+    - Convert::ASN1   - required
+    - URI::ldap       - optional, needed for URL parsing
+    - Digest::MD5     - optional, needed for SASL CRAM-MD5 auth
+    - Net::SSLeay     - optional, needed for IO::Socket::SSL
+                        needed OpenSSL-0.9.7b or newer...
+    - IO::Socket::SSL - optional, needed for Net::LDAPS
+    - XML::Parser     - optional, needed for Net::LDAP::DSML
+
+ASNMTAP::Asnmtap::Plugins::Mail
+- Date::Calc:                    5.4
+- Email::Simple:                 1.996
+- Mail::POP3Client               2.17
+- Mail::Sendmail:                0.79
+- MIME::Base64:                  3.01
+- MIME::Parser                   5.419
+- Net::IMAP::Simple:             1.16
+- Net::POP3:                     2.28
+- Time::Local:                   1.17
+
+ASNMTAP::Asnmtap::Plugins::Modem
+- ASNMTAP::Asnmtap::Plugins:
+
+ASNMTAP::Asnmtap::Plugins::SOAP
+- ASNMTAP::Asnmtap::Plugins:
+- SOAP::Lite:
+
+  Dependencies SOAP::Lite:
+  - libwww-perl:
+  - MIME::Base64:
+  - URI:
+  - WSRF::Lite:
+  - XML::Parser:
+
+  Dependencies WSRF::Lite:
+  - DateTime:
+  - DateTime::Format::Epoch:
+  - DateTime::Format::W3CDTF:
+  - Digest::SHA1:
+  - Crypt::OpenSSL::RSA:
+  - Crypt::OpenSSL::X509:
+  - HTTP::Daemon::SSL:
+  - MIME::Base64:
+  - Sys::Hostname::Long:
+  - XML::CanonicalizeXML:
+  - XML::DOM:
+
+  Following modules will be loaded on demand only, and are considered optional:
+  - Crypt::SSLeay     HTTPS/SSL support
+  - Apache            mod_perl server implementation (included with mod_perl)
+  - Net::POP3         POP3 server implementation
+  - MIME::Lite        SMTP client implementation
+  - IO::File          FTP client and IO server
+  - Net::FTP          FTP client
+  - MQSeries          MQSeries transport
+  - Net::Jabber       Jabber transport
+  - FCGI              FastCGI server implementation
+  - IO::Socket::SSL   SSL support for TCP transport
+  - MIME::Tools       MIME attachment support
+  - DIME::Tools       DIME attachment support
+  - Compress::Zlib    HTTP compression support
+
+ASNMTAP::Asnmtap::Plugins::WebTransact
+- ASNMTAP::Asnmtap::Plugins:
+- Bundle::LWP:                   1.11
+- CGI:                           3.28
+- Compress::Zlib:                2.004
+- Digest::MD5:                   2.33
+- Crypt::SSLeay:                 0.56
+- MIME::Base64:                  3.01
+- Net::FTP:                      2.58
+- URI:                           1.35
+
+ASNMTAP::Asnmtap::Plugins::XML
+- ASNMTAP::Asnmtap::Plugins:
+- XML::Parser:                   2.34
+- XML::LibXML:                   1.63
+- XML::Simple:                   2.14
+
+ASNMTAP::Asnmtap::Plugins::NPTest
+- Cwd:                           3.25
+- Data::Dumper:                  2.12
+- File::Basename:                2.73
+
+
+HOWTO:
+
+1) How can i unbless a data structure:
+
+use Data::Structure::Util qw(unbless);
+unbless($WSListResults);
+
+Dependencies Data::Structure::Util
+- Clone
+- File::Find::Rule
+- Test::Builder::Tester
+- Test::Pod
+
+
+# COPYRIGHT AND LICENCE - - - - - - - - - - - - - - - - - - - - - - - - -
+
+COPYRIGHT
+© Copyright 2000-2007 by Alex Peeters [alex.peeters@citap.be]
+
+Version 3.000.004, 2006/02/12, ASNMTAP CPAN module ASNMTAP::Asnmtap::Plugins::Mail and  ASNMTAP::Asnmtap::Plugins::Modem
+
+Version 3.000.003, 2006/02/03, ASNMTAP CPAN module
+
+Version 3.000.002, 2006/01/08, ASNMTAP Package Object Oriented Perl
+
+Version 3.000.001, 2006/01/01, ASNMTAP Package
+
+'ASNMTAP' is based on 'Process System daemons v1.60.17-01' written by Alex Peeters [alex.peeters@citap.be]
+'collector.pl' is based on 'Process System daemons v1.60.17-01' written by Alex Peeters [alex.peeters@citap.be]
+
+Purpose: CronTab (CT, sysdCT),
+         Disk Filesystem monitoring (DF, sysdDF),
+         Intrusion Detection for FW-1 (ID, sysdID)
+         Process System daemons (PS, sysdPS),
+         Reachability of Remote Hosts on a network (RH, sysdRH),
+         Rotate Logfiles (system activity files) (RL),
+         Remote Socket monitoring (RS, sysdRS),
+         System Activity monitoring (SA, sysdSA).
+
+         sysdCT : (1.60.1.13) <minute (0-59)> <hour (0-23)> <day of the month (1-31)> <month of the year (1-12)> <day of the week (0-6 with 0=Sunday)> DF|ID|PS|RH|RL|RS|SA
+
+         sysdDF : (1.60.1.2)  filesystem:percent:[optional stop action]:[optional start action]:support team email
+
+         sysdID : (1.60.1.14) ... preparations ...
+
+         sysdPS : (1.60.1.1)  process:comment:[optional stop action]:[optional start action]:support team email
+
+         sysdRH : (1.60.1.9)  hostname:ip-adres:gateway:[protocol]:[timeout]:[bytes]:[optional stop action]:[optional start action]:support team email
+                                                       icmp|tcp|udp   >= 0   <= 1024
+         sysdRS : (1.60.1.15) protocol:ip-adres:port:service:[request]:[timeout]:[status]:[optional stop action]:[optional start action]:support team email
+                               tcp|udp                                    >= 0
+         sysdSA : (1.60.1.11) process:activity:comment:priority:facility:logfile:[optional stop action]:[optional start action]:support team email
+
+         2002/03/02 - 2003/03/01, from v1.60.16.x until v1.60.17-01
+
+         2002/01/03 - 2002/02/26, from v1.60.14.x until v1.60.15.x
+
+         2001/12/26 - 2002/01/02, from v1.60.13.x until v1.60.14.x
+
+         2000/10/19 - 2001/12/24, from v1.60.1.x until v1.60.13.x
+
+'Process System daemons' is based on 'sysdaemon 1.60' written by Trans-Euro I.T Ltd
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+COPYRIGHT
+© Copyright 2003-2011 by Alex Peeters [alex.peeters@citap.be]
+
+ASNMTAP::Asnmtap::Plugins::WebTransact is based on 'Nagios::WebTransact', v0.14.1, Stanley.Hopcroft@IPAustralia.Gov.AU
+
+Version 3.000.004, 2006/02/12, ASNMTAP CPAN module ASNMTAP::Asnmtap::Plugins::Mail and  ASNMTAP::Asnmtap::Plugins::Modem
+
+Version 3.000.003, 2006/02/03, ASNMTAP CPAN module
+
+Version 3.000.001 - 3.000.002, 2006/01/01 - 2006/01/08, ASNMTAP Package Object Oriented Perl
+
+v0.15.1 - v0.15.19, 2004/02/05 - 2005/12/11
+
+v0.14.1a - v0.14.2, 2004/01/01 - 2004/02/02
+
+
+COPYRIGHT NOTICE
+© Copyright 2003 Stanley.Hopcroft@IPAustralia.Gov.AU
+
+'Nagios::WebTransact', v0.14.1, Stanley.Hopcroft@IPAustralia.Gov.AU
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+COPYRIGHT
+© Copyright 2000-2007 by Alex Peeters [alex.peeters@citap.be]
+
+'archive.pl'                              is based on 'Secure System Backup tool v1.3.2-03' written by Alex Peeters [alex.peeters@citap.be]
+'rsync-mirror-distributed-<hostname>.sh'  is based on 'Secure System Backup tool v1.3.2-03' written by Alex Peeters [alex.peeters@citap.be]
+'rsync-mirror-failover-<hostname>.sh'     is based on 'Secure System Backup tool v1.3.2-03' written by Alex Peeters [alex.peeters@citap.be]
+'rsync-wrapper-distributed-<hostname>.sh' is based on 'Secure System Backup tool v1.3.2-03' written by Alex Peeters [alex.peeters@citap.be]
+'rsync-wrapper-failover-<hostname>.sh'    is based on 'Secure System Backup tool v1.3.2-03' written by Alex Peeters [alex.peeters@citap.be]
+'sshWrapperASNMTAP.pl'                    is based on 'Secure System Backup tool v1.3.2-03' written by Alex Peeters [alex.peeters@citap.be]
+
+2000/12/09 - 2002/01/28, v1.3.2-01 - v1.3.2-03
+
+2000/11/07 - 2000/12/02, v1.3.1-01 - v1.3.1-05
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+LICENCE
+
+This ASNMTAP CPAN library and Plugin templates are free software; you can 
+redistribute it and/or modify it under the same terms as Perl itself.
+
+The other parts of ASNMTAP may be used and modified free of charge by anyone
+so long as this copyright notice and the comments above remain intact. By 
+using this code you agree to indemnify Alex Peeters from any liability that 
+might arise from it's use.
+
+Selling the code for this program without prior written consent is expressly 
+forbidden. In other words, please ask first before you try and make money off 
+of my program.
+
+Obtain permission before redistributing this software over the Internet or
+in any other medium. In all cases copyright and header must remain intact.
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+

@@ -1,0 +1,43 @@
+Revision history for Apache::PrettyText.
+
+1.08 2004-02-19
+
+	- Removed dependency on Apache::Constants altogether.
+
+1.07 2002-07-31
+
+	- Changed Makefile.PL's PREREQ_PM => {'Apache::Constants' => 0} to
+      PREREQ_PM => {'Apache::Constants' => '0'} in hopes of fixing a
+      testers.cpan.org complaint.
+
+1.06 2002-05-07
+
+	- Fixed build shortcoming.
+
+1.05 Tue Apr 30 2002 
+	
+	- Cleaned up the build and docs.  Created a project home page.
+
+1.04 Thu May 31 2001 
+
+	- Added better <title> extraction.
+
+	- Added hook to allow code in httpd.conf to modify text before it
+	  goes out.
+
+1.03 Fri Aug 14
+
+	- Added quoting of <, > and &.
+
+1.02 Fri Aug 14 
+
+	- Added README in prep for upload to CPAN.
+
+1.01 Tue Aug  4 
+
+	- Added some fixes suggested by Doug M.
+
+1.0  Tue Aug  4 17:21:48 1998
+
+	- original version; created by h2xs 1.18
+

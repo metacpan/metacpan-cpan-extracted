@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+INSTALL
+LICENSE
+t/TEST.PL
+t/00signature.t
+t/01load.t
+t/conf/extra.conf.in
+lib/Apache/UploadMeter.pm
+lib/Apache/UploadMeter/Resources/XML.pm
+lib/Apache/UploadMeter/Resources/CSS.pm
+lib/Apache/UploadMeter/Resources/HTML.pm
+lib/Apache/UploadMeter/Resources/JavaScript.pm
+javascript.pod
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

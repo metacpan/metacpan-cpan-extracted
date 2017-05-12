@@ -1,0 +1,18 @@
+<backup>
+<email>
+	<recipient>admin</recipient>
+</email>
+<plan name="one">
+	<default>
+		<maxFiles>3</maxFiles>
+		<frequency>1m</frequency>
+		<targetDir><![CDATA[/backup]]></targetDir>
+	</default>
+	<task name="test">
+		<prefix>tst</prefix>
+		<sourceDir><![CDATA[TestData/source]]></sourceDir>
+		<targetDir><![CDATA[TestData/target]]></targetDir>
+		<frequency>0d</frequency>	
+	</task>	
+</plan>
+</backup>

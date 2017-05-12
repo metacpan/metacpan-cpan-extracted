@@ -1,0 +1,130 @@
+#!/usr/bin/perl -w
+# $Id: smtpchecker 8 2014-09-19 13:51:01Z abalama $
+use strict;
+
+=head1 NAME
+
+ftpchecker - App::MonM checker SMTP
+
+=head1 VERSION
+
+Version 1.01
+
+=head1 SYNOPSIS
+
+    smtpchecker [-d] [-P PORTNUMBER] [-t SECS] HOST
+
+    Type smtpchecker -h or smtpchecker -? for more information
+
+=head1 DESCRIPTION
+
+Testing SMTP connection
+
+=head1 DEPENDENCES
+
+L<Net::SMTP>
+
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is distributed under the GNU GPL v3.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+See C<LICENSE> file
+
+=cut
+
+use Net::SMTP;
+use Try::Tiny;
+use Getopt::Long;
+use Pod::Usage;
+
+use constant {
+        TIMEOUT     => 5,
+        PORT        => 25,
+    };
+
+use vars qw/$VERSION/;
+$VERSION = '1.01';
+
+$SIG{INT} = sub { die "ABORTED\n"; };
+
+$| = 1;  # autoflush
+
+BEGIN {
+    sub say { return unless -t; print STDOUT @_ ? @_ : '',"\n" }
+    sub err { print STDERR @_ ? @_ : '',"\n" }
+    sub tms { sprintf "[%s GMT]", scalar(gmtime(time())) }
+    sub exception { say "FAILED"; err tms, " ", @_ }
+}
+
+Getopt::Long::Configure("bundling");
+my %OPT;
+GetOptions(\%OPT,
+    "help|usage|h",
+    "longhelp|man|m|?",
+    "timeout|time|t=i", # Timeout
+    "port|P=i",         # Port
+    "debug|d",          # Debug mode: 0/1
+) || pod2usage(-exitval => 1, -verbose => 0);
+pod2usage(-exitval => 0, -verbose => 1) if $OPT{help};
+pod2usage(-exitval => 0, -verbose => 2) if $OPT{longhelp};
+
+my @args = @ARGV ? @ARGV : (); # Arguments
+my $host    = shift(@args) || 'localhost';
+my $to      = $OPT{timeout} || TIMEOUT;
+my $port    = $OPT{port} || PORT;
+my $debug   = $OPT{debug} || 0;
+
+my $err = '';
+
+say "App::MonM smtpchecker/$VERSION";
+say;
+START: say "START ", tms;
+try {
+    my $smtp = Net::SMTP->new(
+        Host    => $host, 
+        Timeout => $to,
+        Port    => $port,
+        Debug   => $debug ? 1 : 0,
+    );
+    if ($smtp) {
+        my $domainresult = $smtp->domain() || ''; # warn $smtp->message();
+        $smtp->quit;
+        $err = "SMTP domain not defined (host \"$host\", port: \"$port\")" unless $domainresult;
+    } else {
+        $err = "Host \"$host\" not reachable on port \"$port\"";
+    }
+}
+catch {
+    $err = $_;
+};
+FINISH: say "FINISH ", tms;
+say;
+
+if ($err) { 
+    exception($err);
+    print STDOUT "FAILED" unless -t;
+} else { 
+    say "OK";
+    print STDOUT "OK" unless -t;
+}
+
+exit 0;
+__END__

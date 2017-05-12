@@ -1,0 +1,36 @@
+NAME
+    App::FQStat - Interactive console front-end for Sun's grid engine
+
+SYNOPSIS
+      Just run fqstat.pl
+
+DESCRIPTION
+    "App::FQStat" is the internal module that runs the "fqstat.pl" tool.
+    "fqstat" is an interactive, console based front-end for Sun's Grid
+    Engine (<http://gridengine.sunsource.net/>).
+
+    This has grown out of an in-house tool I wrote just for convenience, but
+    I believe it may be useful to others who loathe the ugly and slow Java
+    GUI "qmon" that comes with the grid engine software and who find the
+    huge list of jobs coming out of "qstat" to be painful.
+
+    Usage of the tool is quite simple. Run it, it'll show all current jobs
+    on the cluster. Hit "h" to get online-help or F10 to enter the menu.
+
+    "fqstat" was tested against a couple of versions of the grid engine
+    software starting somewhere around 6.0. If you find an incompatibility,
+    please let me know.
+
+SEE ALSO
+    <http://gridengine.sunsource.net/>
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007-2009 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.1 or, at
+    your option, any later version of Perl 5 you may have available.
+

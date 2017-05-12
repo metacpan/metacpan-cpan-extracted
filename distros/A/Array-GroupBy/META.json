@@ -1,0 +1,45 @@
+{
+   "abstract" : "Group equal elements of an ordered array, or list.",
+   "author" : [
+      "Sam Brain <samb@stanford.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Array-GroupBy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.25",
+            "List::Util" : "1.23",
+            "Params::Validate" : "1",
+            "Test::More" : 0,
+            "version" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Array::GroupBy" : {
+         "file" : "lib/Array/GroupBy.pm",
+         "version" : "v0.0.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.4"
+}

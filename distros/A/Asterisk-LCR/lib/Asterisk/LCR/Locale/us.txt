@@ -1,0 +1,10 @@
+# local prefix	<tab>	global number replacement
+"011"	""
+"1"	"1"
+
+# this is a hack so that international "262" gets converted to "262262"
+# since 262 numbers are either 262262 or 262692...
+"011262(?!262|692)"	"262262"  
+"011590(?!590|690)"	"590590"
+"011594(?!594|694)"	"594594"
+"011596(?!596|696)"	"596596"

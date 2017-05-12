@@ -1,0 +1,38 @@
+Apache/Session/Lazy version 0.05
+================================
+
+This is Apache::Session::Lazy.
+It is an extension of Apache::Session.
+
+Apache::Session is a persistence framework which is particularly useful
+for tracking session data between httpd requests.  Apache::Session is
+designed to work with Apache and mod_perl, but it should work under
+CGI and other web servers, and it also works outside of a web server
+altogether.
+
+Apache::Session::Lazy extends Apache::Session by opening Sessions only after they are either
+modified or examined (first read or write access to the tied hash.)  It should provide
+transparent access to the session hash at all times.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries in order to be useful:
+
+  Apache::Session
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Gyan Kapur
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

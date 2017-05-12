@@ -1,0 +1,95 @@
+$Id: README,v 1.4 2003/06/16 02:12:38 ian Exp $
+
+NAME
+    Acme::Holy - Test whether references are blessed.
+
+SYNOPSIS
+      use Acme::Holy;
+
+      my $ref = ... some reference ...
+      my $obj = bless $ref , 'Some::Class';
+  
+      print holy( $obj );                           # prints 'Some::Class'
+      print ( holy [] ? 'object' : 'not object' );  # prints 'not object'
+
+INSTALLATION
+
+    To install this module type the following:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    Acme::Holy uses XS to access the internals of Perl for it's magic, and
+    therefore must be compiled to be installed. Also, for testing,
+    Acme::Holy relies on Test::More and Test::Exception.
+
+DESCRIPTION
+    Acme::Holy provides a single routine, holy(), which returns the name of
+    the package an object has been "bless"ed into, or "undef", if its first
+    argument is not a blessed reference.
+
+    Isn't this what "ref()" does already? Yes, and no. If given a blessed
+    reference, "ref()" will return the name of the package the reference has
+    been blessed into. However, if "ref()" is passed an unblessed reference,
+    then it will return the type of reference (e.g. "SCALAR", "HASH",
+    "CODEREF", etc). This means that a call to "ref()" by itself cannot
+    determine if a given reference is an object. holy() differs from "ref()"
+    by returning "undef" if its first argument is not a blessed reference
+    (even if it is a reference).
+
+    Can't we use "UNIVERSAL::isa()"? Yes, and no. If you already have an
+    object, then "isa()" will let you know if it inherits from a given
+    class. But what do we do if we know nothing of the inheritance tree of
+    the object's class? Also, if we don't have an object, just a normal
+    reference, then attempting to call "isa()" through it will result in a
+    run-time error.
+
+    holy() is a quick, single test to determine if a given scalar represents
+    an object (i.e. a blessed reference).
+
+  EXPORT
+    By default, Acme::Holy exports the method holy() into the current
+    namespace. Aliases for holy() (see below) may be imported upon request.
+
+  Methods
+    holy *scalar*
+        holy() accepts a single scalar as its argument, and, if that scalar
+        is a blessed reference, returns the name of the package the
+        reference has been blessed into. Otherwise, holy() returns "undef".
+
+  Method Aliases
+    To reflect that there are many terms for referring to something that is
+    blessed, Acme::Holy offers a list of aliases for holy() that may be
+    imported upon request:
+
+      use Acme::Holy qw( blessed );
+
+    The following aliases are supported:
+
+    * blessed()
+    * consecrated()
+    * divine()
+    * hallowed()
+    * sacred()
+    * sacrosanct()
+
+ACKNOWLEDGEMENTS
+	The idea for this module came from a conversation I had with David
+	Cantrell <david@cantrell.org.uk>. However, the lack of RTFM is a
+	clear failing on my part. It was obviously a good idea, otherwise
+	someone wouldn't have already written it.
+
+SEE ALSO
+    bless, perlboot, perltoot, perltooc, perlbot, perlobj.
+
+AUTHOR
+    Ian Brayshaw, <ian@onemore.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2003 by Ian Brayshaw
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

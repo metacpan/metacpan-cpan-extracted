@@ -1,0 +1,27 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use Time::localtime;
+use AFS::KTC_TOKEN;
+use AFS::KTC_PRINCIPAL;
+
+print "\nTokens held by the Cache Manager:\n\n";
+my $index = 0;
+while (my $service = AFS::KTC_PRINCIPAL->ListTokens($index)) {
+    if(my ($token, my $client) = AFS::KTC_TOKEN->GetToken($service)) {
+        my $user = $client->name;
+        $user .= "." . $client->instance if ($client->instance);
+        if ($user eq '' || $user =~ /Unix UID/) { printf("Tokens"); }
+        elsif ($user =~ /AFS ID/) { printf("User's (%s) tokens",$user); }
+        print " for ", $service->principal," ";
+        if ($token->endTime <= time) { print "[>> Expired <<]\n"; }
+        else {
+            chomp(my $expire = substr(ctime($token->endTime),4,13));
+            print "[Expires $expire]\n";
+        }
+    }
+}
+print"   --End of list--\n";

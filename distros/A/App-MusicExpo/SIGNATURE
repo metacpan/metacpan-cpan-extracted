@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 57268a1e06c0b7e6be719f6199ff185fa5a3a464 Changes
+SHA1 f230aef04fc46dc7b063f90ab0e5844547d309e4 MANIFEST
+SHA1 8081525905b41160dad5b6ce41654272ad509d1e META.json
+SHA1 3115d1644f09547ed62ebb4738204777fbf19bd0 META.yml
+SHA1 1f12984c142f61d381bbc58f8eb92283e8b46d93 Makefile.PL
+SHA1 cc3e00b17e079d183efc5a1f466a1c4612c55bb4 README
+SHA1 4c9a07c85f911b2633682c4f2f2571bb6763e770 empty.flac
+SHA1 366cb7e1da64b59769c6ff8067f7de5c29ae4567 empty.ogg
+SHA1 6270b4dc8e3b193ead8685c90b82d33ebf594832 empty2.opus
+SHA1 5bb97acab901ba09a62e00ac23eedff120db4f45 empty3.mp3
+SHA1 7580f6643e8bf6f63c17c4af948792e70fe5757b empty4.aac
+SHA1 b9cfb5181cbce51e3470eab205288c156c8bf4c5 lib/App/MusicExpo.pm
+SHA1 b9f4dbddea7149e53d3bf73c18ddb73a527fa1f8 musicexpo
+SHA1 120273da5aa14fde7d985e52f58fe1e72ea11c8a musicexpo.css
+SHA1 6b4b485bceb33a33c4b3e2ac21d31294244ca67f player.js
+SHA1 90b84214d41f831ead9eb01dd41d7b2c1b425972 t/App-MusicExpo.t
+SHA1 c612e51d99fc7945058853cbafc340a2788340f6 t/musicexpo-cache.t
+SHA1 5ef5d5c16dcc72509dee5fb7cdd254f7e7559e6c t/musicexpo.t
+SHA1 fa4cca04d35b71b2c9a4d04e5977efb3868f88aa t/perlcritic.t
+SHA1 e4e0fd9a5add27aea8ea4b88c780bba779e973f6 t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+
+iQItBAEBCgAXBQJYE95XEBxtYXJpdXNAaWV2YWwucm8ACgkQygQ1vl7Bs2JQYg/+
+Ip9RFPOJPk0sIOdDOSFKUtslcJaIKrsunXMejIa9T7nn/DAE2HVrvY3jXodO8ie6
+MwW9wu6t4Fh4D+vcYCc5efTt8YXQk+qLifkrBhAsW9/2eNwoVf3mOKyba8v0Di9V
+qKSaS7UwfRZiLgw/Yp1WI+NSiCWyCQWtUk3zjZAt1mPaqrJmuBAJrfvp9JQgGkag
+PAlzq8F4eAoY2TIHKKGNUD6f71WP6VYw50lDk25n8z5/qz+E9xx5/XXbfyPxPu0x
+uZq4DPqzXkDLDF+XOYKxHnulURkzp4PURdXP9auxZZisgkDYME0fTE8x4QpBGmO7
+kDibkIQEU0N20AGfx3DdZiC21xHDS8y9HTajRHhDbUBetpJ1ZqNCkZiQ2rOVgkzB
+uqat/nVlhcVieu9Uv5L0g+aKOpAozSkq1+z5KrfroVolPClJCAdGicqksTxnINBK
+5rl08ct80BiuPGNVFcDTQWqvPv9vOvQLMfrw9WPm30ksCQScaiAMWF8InOuL1YjD
+lsw6w2PTsULInpaWGDWEfPXzrJApRwnS+USzEbC+nueDsylN0m01jvotXa/FtWC+
+y2Mme/a2w/ru0KLlZoxqywaokme+EQDdZ54CROYkO05YN4DQjStv+RIFDh0mCiBM
+LI1zKXUmEEtlZlvFzZVr1rMPOAtgZ5d3guQ8FJrp+Ss=
+=cEBJ
+-----END PGP SIGNATURE-----

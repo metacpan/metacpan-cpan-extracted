@@ -1,0 +1,7 @@
+Changes
+CPAN/MakeMaker.pm
+lib/Acme/Test/Weather.pm
+Makefile.PL
+MANIFEST
+t/use.t
+

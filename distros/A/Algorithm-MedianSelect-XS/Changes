@@ -1,0 +1,75 @@
+Revision history for Perl extension Algorithm::MedianSelect::XS.
+
+0.21 Sun Jun 22 14:45:50 CEST 2008
+
+ - Fixed installation for Module::Build users.
+
+ - Reformatted the source code layout of XS.xs.
+
+0.20 Sun Jan  6 17:34:09 CET 2008
+
+ - Renamed basic test-file to median.t.
+
+ - Removed occurence of 'my' within the synopsis part of the
+   documentation.
+
+ - Updated ppport.h.
+
+0.19 Sun Jan  6 14:07:48 CET 2008
+
+ - Added basic test-file which tests the functionality of median().
+
+ - Beautified code layout within XS.xs.
+
+ - Check for odd count of elements within the list supplied to median(),
+   which excludes a list consisting of a single element.
+
+ - Updated documentation.
+
+0.18 Mon Jan 29 08:18:19 CET 2007
+
+ - Fixed warning which was output when no algorithm argument
+   was supplied.
+
+0.17 Sun Jan 28 22:52:36 CET 2007
+
+ - Extended median() that it will accept a reference to
+   a list; but, pass by reference is only marginally (10%) faster.
+
+ - Made the quicksort algorithm default and bubblesort optional.
+   Tremendous improvement in computation time originated thereof.
+
+ - Rewrote the Perl interface to median(); options to median()
+   may be passed via an anonymous hash reference.
+
+0.16 Mon Apr 17 16:46:48 CEST 2006
+
+ - Removed superfluous @ISA in XS.pm.
+
+0.15 Mon Apr 17 16:37:52 CEST 2006
+
+ - Changed Build.PL argument create_makefile_pl from 'passtrough'
+   to 'traditional' for the sake of compatibility.
+
+ - Removed the dependency upon DynaLoader since XSLoader
+   suffices (listed as dependency).
+
+0.13 Sun Nov 13 13:14:49 CET 2005
+
+ - DynaLoader's bootstrap() is honored on older perls.
+
+0.12 Sun Oct 30 20:18:12 CET 2005
+
+ - Converted Algorithm::MedianSelect entirely over to XS.
+
+0.08 2005/02/15
+
+ - Added missing export section in documentation.
+
+0.07 2004/02/29
+
+ - median() takes an array instead of an arrayref.
+
+0.01 2004/01/22
+
+ - Initial version.

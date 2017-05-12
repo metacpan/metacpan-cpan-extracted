@@ -1,0 +1,47 @@
+.clearfix {zoom: 1;} 
+.clearfix:after {content:".";display:block;height:0;clear:both;visibility:hidden;}
+
+.message {float:right;padding:4px;}
+.message-info {background-color: #EFFFF1;border:1px solid green;}
+.message-error {background-color: pink;border: 1px solid red;}
+
+span.counter {
+  float: left;
+  background-color: #ddd;
+  border-right: 1px dashed #aaa;
+  color: #aaa;
+  height: 100%;
+  margin-right: 5px;
+  padding: 0 2px;
+  font-weight: bold;
+}
+form {width:800px;border:1px solid #aaa;padding:4px;margin:0 auto;background-color:#f5f5f5;}
+form.form-edited {border-color:green;}
+form.form-error {border-color:red;}
+div.header, div.authors {
+  float:left; width:50%;
+}
+
+label {
+  display: block;
+  padding: 2px;
+  color: #aaa;
+  font-weight: bold;
+}
+input, textarea {
+  border: 1px solid #ddd;
+  padding: 2px;
+}
+textarea {
+  width: 350px;
+  height: 50px;
+  overflow: auto;
+}
+
+div.header {}
+div.author {height:170px;background-color:#eee;margin:2px 0;}
+
+.hover {border-color: #a0a;}
+.focus {background-color: cornsilk;}
+.validation-failed {background-color:pink;border-color:red;}
+.validation-advice {display:inline; font: italic 8pt 'courier new';color: red;margin-left:3px;}

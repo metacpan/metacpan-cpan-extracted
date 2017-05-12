@@ -1,0 +1,45 @@
+######################################################################
+## File: $Id: README 6706 2006-07-25 02:14:50Z spadkins $
+######################################################################
+
+WHAT IS THIS?
+
+This is the App-Widget-ChartDirector distribution.
+It implements the Graph Widget abstraction from the App-Widget/App-Context
+frameworks on top of the ChartDirector graphing library.
+
+Thus, it is a widget for displaying line graphs, bar charts, pie charts,
+meters/gauges, and more.
+
+The underlying ChartDirector module is not free software. 
+However, it has a very liberal try-before-you-buy policy,
+starting with free, anonymous downloading.
+The unlicensed version simply puts a small "Unregistered" message at
+the bottom of every graph.  This is quite workable for prototyping and
+development.  When you are ready to buy, the price is quite reasonable.
+
+As of 25-Oct-2005 when I checked the prices for Linux licenses were
+
+   * USD 99 each (for 1 - 4 server licenses)
+   * USD 79 each (for 5 - 19 server licenses)
+   * USD 59 each (for >= 20 server licenses)
+
+The web site for ChartDirector is at
+
+   http://www.advsofteng.com/index.html      # Product/company home page
+   http://www.advsofteng.com/cdperl.html     # Perl library page
+   http://www.advsofteng.com/download.html   # Download page
+   http://www.advsofteng.com/gallery.html    # Chart gallery
+
+HOW DO I INSTALL IT?
+
+Install ChartDirector for Perl first.
+
+Then install this distribution.  cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

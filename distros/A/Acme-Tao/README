@@ -1,0 +1,80 @@
+NAME
+    Acme::Tao - strongly suggests proper respect for the Tao
+
+SYNOPSIS
+     use Acme::Tao;
+
+    or
+
+     use Acme::Tao qw(something_that_must_not_be_constant);
+
+DESCRIPTION
+    Everyone knows that the Tao is not constant. But some people just might
+    not get it. To make sure no one tries to use constant Tao in a program
+    with your module, put a "use Acme::Tao" at the top of your code. If Tao
+    has been made constant by time your module is used, Acme::Tao may die
+    with a nice message. Note that the package in which Tao is constant is
+    irrelavent.
+
+    On a walk between shrines in Nikko, Japan, I had an epiphany: if the Tao
+    is not constant, than neither should Acme::Tao be constant.
+
+     The Tao doesn't take sides;
+     it gives birth to both wins and losses.
+
+    Acme::Tao doesn't take sides either, at least not consistently. It will
+    sometimes die and sometimes not (50% chance of it doing so), in
+    accordance with its understanding of the nature of the Tao.
+
+    As Lao-tzu teaches, "The name that can be named is not the constant
+    name," and Acme::Tao can *also* be used to check for any other symbols
+    you might not want to have as constants. When used in this fashion, it
+    will always try to work.
+
+    For example:
+
+     use Acme::Tao qw(foo);
+
+    This will die if "foo" is defined as a constant in the current package.
+
+     use Acme::Tao qw(::foo);
+
+    This will die if "foo" is defined as a constant in the "main::" package.
+    This is the same as "main::foo".
+
+    If Acme::Tao is checking for particular symbols, it will not check for a
+    constant Tao.
+
+MESSAGES
+    The messages are stored in @__PACKAGE__::messages. Feel free to add to
+    them. You can even subclass Acme::Tao:
+
+     package My::Tao;
+
+     use Acme::Tao ();
+     use vars(@messages @ISA);
+
+     @ISA = qw(Acme::Tao);
+
+     @messages = ( ... );
+
+     1;
+     __END__
+
+    The messages will come from the appropriate package and are not
+    cumulative.
+
+AUTHOR
+    James G. Smith, <jsmith@cpan.org>
+
+    I owe Kip Hampton a big thank you for mentioning the idea in passing and
+    assisting with parts of the documentation.
+
+    The messages are lifted from the "fortune" data files.
+
+COPYRIGHT
+    Copyright (C) 2002, 2004 James G. Smith.
+
+    This module is free software. It may be used, redistributed, and/or
+    modified under the same terms as Perl.
+

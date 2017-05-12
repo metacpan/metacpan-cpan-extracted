@@ -1,0 +1,7 @@
+- example programs
+- further refine level2 checks, esp. princ/policy names
+- add write() methods so we can change data and write out a new dump file
+- V2 dump format
+- should print methods return printable data instead of printing data directly?
+- more tests for boundary cases and error conditions
+- add build_contents, parse_e_data, build_e_data methods

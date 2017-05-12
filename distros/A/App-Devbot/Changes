@@ -1,0 +1,22 @@
+Release history for Perl extension App::Devbot.
+
+0.001004 2014-06-30T20:17+03:00
+ - Untaint --server and --port (RT #96836) - Thanks Philipp Gortan!
+ - Recommend POE::Component::SSLify
+
+0.001003 2014-03-17T01:55+02:00
+ - Update Changes to CPAN::Changes::Spec format
+ - Use a git repository
+ - Add SIGN => 1, MIN_PERL_VERSION, resources, dynamic_config => 0 to Makefile.PL
+ - Add an 'use strict;' (to keep Kwalitee happy) and a $VERSION
+
+0.001002 2013-06-15
+ - Fix typo: Compnent instead of Component
+
+0.001001 2013-06-15
+ - Log quits and nicks
+ - Add tests for quits and nicks
+ - Clean up tests
+
+0.001 2013-06-13
+ - Initial release

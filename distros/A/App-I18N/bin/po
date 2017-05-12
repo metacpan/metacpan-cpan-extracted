@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib 'lib';
+use App::I18N;
+use App::I18N::Command;
+use App::I18N::Command::Help;
+use App::I18N::Command::Parse;
+use App::I18N::Command::Lang;
+use App::I18N::Command::Update;
+
+my $cmd = shift @ARGV;
+my @args = @ARGV;
+
+$cmd ? App::I18N::Command->invoke( $cmd , @args )
+     : App::I18N::Command->invoke('help');

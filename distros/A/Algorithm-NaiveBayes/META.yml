@@ -1,0 +1,27 @@
+---
+name: Algorithm-NaiveBayes
+version: 0.04
+author:
+  - 'Ken Williams, ken@mathforum.org'
+abstract: Bayesian prediction of categories
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  List::Util: 0
+provides:
+  Algorithm::NaiveBayes:
+    file: lib/Algorithm/NaiveBayes.pm
+    version: 0.04
+  Algorithm::NaiveBayes::Model::Discrete:
+    file: lib/Algorithm/NaiveBayes/Model/Discrete.pm
+  Algorithm::NaiveBayes::Model::Frequency:
+    file: lib/Algorithm/NaiveBayes/Model/Frequency.pm
+  Algorithm::NaiveBayes::Model::Gaussian:
+    file: lib/Algorithm/NaiveBayes/Model/Gaussian.pm
+  Algorithm::NaiveBayes::Util:
+    file: lib/Algorithm/NaiveBayes/Util.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

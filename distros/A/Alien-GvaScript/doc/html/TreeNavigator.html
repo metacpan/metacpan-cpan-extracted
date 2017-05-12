@@ -1,0 +1,935 @@
+<html>
+<head>
+  <script src="../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <link href="GvaScript_doc.css" rel="stylesheet" type="text/css">
+  <script>
+    document.observe('dom:loaded', function() { new GvaScript.TreeNavigator('TN_tree'); });
+    function jumpto_href(event) {
+      var label = event.controller.label(event.target);
+      if (label && label.tagName == "A") {
+        label.focus();
+        return Event.stopNone;
+      }
+    }
+  </script>
+</head>
+<body>
+<div id='TN_tree'>
+  <div class="TN_node">
+   <h1 class="TN_label">Alien::GvaScript::TreeNavigator</h1>
+   <div class="TN_content">
+     <p><em>Navigation in a tree structure
+</em></p>
+     <div class="TN_node"  onPing="jumpto_href">
+       <h3 class="TN_label">Table of contents</h3>
+       <div class="TN_content">
+         <div class="TN_leaf">
+  <a class="TN_label" href="#NAME">NAME</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#SYNOPSIS">SYNOPSIS</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#DESCRIPTION">DESCRIPTION</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Tree_structure">Tree structure</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#HTML_tree_declaration">HTML tree declaration</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#Icons_customization">Icons customization</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#Usage_navigation">Usage : navigation</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Mouse_events">Mouse events</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#Keyboard_events">Keyboard events</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#Programming_interface">Programming interface</a>
+  <div class="TN_content"><div class="TN_node">
+  <a class="TN_label" href="#Methods">Methods</a>
+  <div class="TN_content"><div class="TN_node">
+  <a class="TN_label" href="#new_GvaScript_TreeNavigator">new GvaScript.TreeNavigator</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#tabIndex">tabIndex</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#treeTabIndex">treeTabIndex</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#flashDuration">flashDuration</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#flashColor">flashColor</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#selectOnButtonClick">selectOnButtonClick</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#noPingOnFirstClick">noPingOnFirstClick</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#selectFirstNode">selectFirstNode</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#createButtons">createButtons</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#scrollingContainer">scrollingContainer</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#autoScrollPercentage">autoScrollPercentage</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#keymap">keymap</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#classes">classes</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#destroy">destroy</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#Node_manipulation">Node manipulation</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#Walking_the_tree">Walking the tree</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#Event_handling">Event handling</a>
+  <div class="TN_content"><div class="TN_node">
+  <a class="TN_label" href="#Event_list">Event list</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Select_Deselect"><code>Select</code> / <code>Deselect</code></a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#Open_Close"><code>Open</code> / <code>Close</code></a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#BeforeLoadContent_AfterLoadContent"><code>BeforeLoadContent</code> / <code>AfterLoadContent</code></a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#inspect"><code>inspect</code></a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#Event_structure_passed_to_handlers">Event structure passed to handlers</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#Registering_event_handlers">Registering event handlers</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#additional_attributes_on_node_elements">additional attributes on node elements</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#additional_attributes_on_the_tree_element">additional attributes on the tree element</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#additional_properties_on_the_tree_navigator_object">additional properties on the tree navigator object</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#Dynamic_tree_expansion">Dynamic tree expansion</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+
+       </div>
+     </div>
+     <hr/>
+   </div>
+  </div>
+  <div class="TN_node" id="NAME">
+    <h2 class="TN_label">NAME</h2>
+    <div class="TN_content">
+      <p>Alien::GvaScript::TreeNavigator - Navigation in a tree structure</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="SYNOPSIS">
+    <h2 class="TN_label">SYNOPSIS</h2>
+    <div class="TN_content">
+      <pre>  &lt;head&gt;
+    &lt;script src="prototype.js"&gt;&lt;/script&gt;
+    &lt;script src="Keymap.js"&gt;&lt;/script&gt;
+    &lt;script src="Navigator.js"&gt;&lt;/script&gt;
+    &lt;link href="Navigator.css" rel="stylesheet" type="text/css"&gt;
+  &lt;/head&gt;
+  
+  &lt;body onload="new GvaScript.TreeNavigator('TN_tree')"&gt;
+    &lt;div id="TN_tree"&gt;
+      &lt;div class="TN_node"&gt;
+        &lt;span class="TN_label"&gt;Label 1&lt;/span&gt;
+        &lt;div class="TN_content"&gt;
+          &lt;div class="TN_node"&gt;
+            &lt;span class="TN_label"&gt;Label 1.1&lt;/span&gt;
+            &lt;div class="TN_content"&gt;
+            ...Content of node 1.1
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class="TN_leaf"&gt;
+            &lt;span class="TN_label"&gt;Label 1.2 for leaf&lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;                  
+    &lt;/div&gt;
+  &lt;/body&gt;</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="DESCRIPTION">
+    <h2 class="TN_label">DESCRIPTION</h2>
+    <div class="TN_content">
+      <p>Handles navigation in a data tree. The tree
+description is usual HTML, with some special classes to
+identify nodes.  Nodes can be browsed, closed or
+opened. All operations take place directly within the
+tree, not in a separate panel.</p>
+  <div class="TN_node" id="Tree_structure">
+    <h3 class="TN_label">Tree structure</h3>
+    <div class="TN_content">
+      <p>A tree is a collection of <i>nodes</i>. Each node must have a <i>label</i>
+element and can have a <i>content</i> element. A node may be either
+<i>open</i> (its content is visible) or <i>closed</i> (its content is
+invisible). The label of the node is always visible, if the node
+itself is visible. Some nodes can be declared as <i>leaves</i> : in that
+case they have no content and have no open/close operations.</p>
+<p>The content of a node may include other nodes, so a whole subtree may
+become invisible if the parent node is closed.  Opening or closing
+nodes may be controlled by the mouse, by the keyboard, or through the
+programming interface.</p>
+<p>A node's content may also by dynamic, by
+specifying <code>TN:contentURL</code> with the URL as value:</p>
+<pre>  &lt;div class="TN_node TN_closed" TN:contentURL="/my/url.html"&gt;
+    &lt;div class="TN_label"&gt;Label for dynamic node&lt;/div&gt;
+  &lt;/div&gt;</pre>
+
+<p>If the user opens that node, the content of the URL will by
+dynamically fetched and inserted into the tree.  The content then
+stays there, but can be forcibly reloaded by hitting the 
+<code>Ctrl-R</code> key.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="HTML_tree_declaration">
+    <h3 class="TN_label">HTML tree declaration</h3>
+    <div class="TN_content">
+      <p>The tree can be any HTML block element. It should contain one or
+several block elements declared with class <code>TN_node</code> or class
+<code>TN_leaf</code> -- usually these are DIV elements. Other HTML elements
+may be freely interspersed with nodes, although this usually does not
+make much sense for navigability.</p>
+<p>Every node must in turn contain an inline element
+declared with class <code>TN_label</code> -- usually this is
+a SPAN element. If the node is not a leaf, it may
+then contain a block element declared
+with class <code>TN_content</code> -- usually this is
+another DIV element. Both the label and the content
+should be direct children of the node element.</p>
+<p>At initialisation time, a new SPAN element is
+automatically inserted before each label, in order to
+add the +/- navigation buttons.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Icons_customization">
+    <h3 class="TN_label">Icons customization</h3>
+    <div class="TN_content">
+      <p>By default, the navigation buttons inserted on the
+left of labels are small icons representing +/- signs.
+To show other icons, change the CSS rules about the 
+<code>TN_button</code> class:</p>
+<pre>  .TN_button { 
+  background-image: url(myIconForOpenNodes.gif);   
+  }
+  .TN_closed .TN_button { 
+  background-image: url(myIconForClosedNodes.gif); 
+  }</pre>
+
+<p>In addition, if you want another icon for illustrating
+the node's content (like for example an open or closed
+folder), you can proceed as follows:</p>
+<ul>
+<li>
+<p>add an empty <code>span</code> element within the
+labels that should have the icon</p>
+<pre>  &lt;span class="TN_label"&gt;&lt;span class="specialNode"&gt;&lt;/span&gt;some label&lt;/span&gt;</pre>
+
+</li>
+<li>
+<p>define CSS background images for selectors
+<code>.specialNode</code> and  <code>.TN_closed .specialNode</code>,
+as in the example above</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Usage_navigation">
+    <h2 class="TN_label">Usage : navigation</h2>
+    <div class="TN_content">
+      <p>Navigation in the tree is either with the mouse or with
+the keyboard. At any point in time, at most one node is
+<i>selected</i> : this is the one that receives keyboard
+events. Hence if the tree has no
+selected node, no keyboard events are interpreted.</p>
+  <div class="TN_node" id="Mouse_events">
+    <h3 class="TN_label">Mouse events</h3>
+    <div class="TN_content">
+      <p>Mousing over a node label adds the class
+<code>TN_mouse</code> to that node; the default style for
+that class is just to underline the label.</p>
+<p>Clicking on a node label selects that node and
+fires the <code>Ping</code> event.
+Clicking on the square +/- icon on the left of the
+label toggles the open/closed status of the node.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Keyboard_events">
+    <h3 class="TN_label">Keyboard events</h3>
+    <div class="TN_content">
+      <ul>
+<li><a name="item__code_keypad____code_"></a><b><code>keypad +</code></b>
+<p>open the node</p>
+</li>
+<li><a name="item__code_keypad____code_"></a><b><code>keypad -</code></b>
+<p>close the node</p>
+</li>
+<li><a name="item__code_keypad____code_"></a><b><code>keypad *</code></b>
+<p>open the node and all its subnodes</p>
+</li>
+<li><a name="item__code_keypad____code_"></a><b><code>keypad /</code></b>
+<p>close the node and all its subnodes</p>
+</li>
+<li><a name="item__code_Ctrl_keypad____code_"></a><b><code>Ctrl-keypad *</code></b>
+<p>activate "show all" mode (the content of closed nodes is nevertheless
+visible, which may be useful for printing)</p>
+</li>
+<li><a name="item__code_Ctrl_keypad____code_"></a><b><code>Ctrl-keypad /</code></b>
+<p>deactivate the "show all" mode</p>
+</li>
+<li><a name="item__code_TAB__code_"></a><b><code>TAB</code></b>
+<p>if closed, open the node; if already opened, pass focus to the next
+item (maybe the next node, or another tabindex-enabled HTML element,
+such as a form control).</p>
+</li>
+<li><a name="item__code_ARROW_UP__code_"></a><b><code>ARROW_UP</code></b>
+<p>move to previous displayed node</p>
+</li>
+<li><a name="item__code_ARROW_DOWN__code_"></a><b><code>ARROW_DOWN</code></b>
+<p>move to next displayed node</p>
+</li>
+<li><a name="item__code_ARROW_LEFT__code_"></a><b><code>ARROW_LEFT</code></b>
+<p>if open, close the node; if already closed, move to parent node</p>
+</li>
+<li><a name="item__code_ARROW_RIGHT__code_"></a><b><code>ARROW_RIGHT</code></b>
+<p>if closed, open the node; if already open, move to next subnode</p>
+</li>
+<li><a name="item__code_HOME__code_"></a><b><code>HOME</code></b>
+<p>select the first node of the tree</p>
+</li>
+<li><a name="item__code_END__code_"></a><b><code>END</code></b>
+<p>select the last visible subnode of the tree</p>
+</li>
+<li><a name="item__code_Ctrl_PAGE_UP__code_"></a><b><code>Ctrl-PAGE_UP</code></b>
+<p>select the enclosing node (useful if not positioned on a node, but
+within a long node content)</p>
+</li>
+<li><a name="item__code_Ctrl_PAGE_DOWN__code_"></a><b><code>Ctrl-PAGE_DOWN</code></b>
+<p>select the displayed node after 
+the current enclosing node (useful if not positioned on a node, but
+within a long node content)</p>
+</li>
+<li><a name="item__code_Ctrl_R__code_"></a><b><code>Ctrl-R</code></b>
+<p>refresh the node's content (if that node has an URL for dynamic
+content).</p>
+</li>
+<li><a name="item__code_RETURN__code_"></a><b><code>RETURN</code></b>
+<p>fire the <code>Ping</code> event</p>
+</li>
+<li><a name="item__code_Ctrl_1__code____code_Ctrl_9__code_"></a><b><code>Ctrl-1</code>..<code>Ctrl-9</code></b>
+<p>close all nodes at level of the specified digit, and open all nodes
+above</p>
+</li>
+<li><a name="item__code_char_s___code_"></a><b><code>char(s)</code></b>
+<p>Tree navigator supports the 'Find As You Type' feature that allows
+quick node navigation when you type a series of characters.
+This feature is enabled by default whenever any node is active.
+The series of characters are cleared after an 800ms timeout of no character input.
+After that, a new search will be effective.</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Programming_interface">
+    <h2 class="TN_label">Programming interface</h2>
+    <div class="TN_content">
+        <div class="TN_node" id="Methods">
+    <h3 class="TN_label">Methods</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="new_GvaScript_TreeNavigator">
+    <h4 class="TN_label">new GvaScript.TreeNavigator</h4>
+    <div class="TN_content">
+      <pre>  var treeNavigator = new GvaScript.TreeNavigator(
+        elem, 
+        {opt1:"val1", opt2:"val2", ...}
+  );</pre>
+
+<p>Creates the object that controls
+navigation in the tree. Arguments are</p>
+<ul>
+<li><a name="item__code_elem__code_"></a><b><code>elem</code></b>
+<p>the HTML element containing the
+tree, or the id of that element.</p>
+</li>
+<li><a name="item__code_options__code_"></a><b><code>options</code></b>
+<p>an optional inline object
+specifying options.</p>
+</li>
+</ul>
+<p>The tree navigation object is returned, which may be
+useful if you later want to act on the tree
+programmatically (opening or closing nodes).</p>
+<p>Unless otherwise specified, the method adds a tab
+index to each label (so that the user can jump to the
+next label through the <code>TAB</code> key).
+The method also registers <code>onfocus</code>,
+<code>onblur</code>, <code>onmouseover</code>, <code>onmouseout</code>
+and <code>onclick</code> handlers for label elements.
+Finally, as already mentioned, a new SPAN element is
+automatically inserted before each label.</p>
+<p>Available options are:</p>
+  <div class="TN_node" id="tabIndex">
+    <h5 class="TN_label">tabIndex</h5>
+    <div class="TN_content">
+      <p>Which tabIndex will be assigned to node labels. If
+labels should not participate in tabbing, specify a value of -1
+(this is the default).</p>
+<p>Setting <code>tabIndex &gt;= 0</code> is especially useful for structuring
+forms in treeNavigator sections : then 
+the user will be able to smoothly tab from section headers
+(i.e. treeNavigator labels) to form fields within these sections.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="treeTabIndex">
+    <h5 class="TN_label">treeTabIndex</h5>
+    <div class="TN_content">
+      <p>Which tabIndex will be assigned to the tree element
+(if not already specified in markup).
+The default is 0; specifying a higher value
+would give a higher priority to the tree
+navigator within the tabbing order.</p>
+<p>Setting <code>tabIndex</code> to a negative value means
+that the tree navigator receives no focus.
+In that case, the keymap created for
+capturing keyboard events will be  bound globally
+to the <code>document</code> element (and therefore might
+interact in unpredictable ways with other elements
+capturing keys; so this is not a recommended setting).</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="flashDuration">
+    <h5 class="TN_label">flashDuration</h5>
+    <div class="TN_content">
+      <p>Duration (in milliseconds) of "flashing", i.e. visual feedback when a
+key is pressed in a wrong context, like for example trying to open a
+node which is already open; default is 200 ms.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="flashColor">
+    <h5 class="TN_label">flashColor</h5>
+    <div class="TN_content">
+      <p>Color for "flashing", expressed as standard CSS color; default is red.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="selectOnButtonClick">
+    <h5 class="TN_label">selectOnButtonClick</h5>
+    <div class="TN_content">
+      <p>If true, clicking on a "+/-" button next to a label will not only open
+or close the node, but will also select that node; default is true.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="noPingOnFirstClick">
+    <h5 class="TN_label">noPingOnFirstClick</h5>
+    <div class="TN_content">
+      <p>If true, clicking on an unselected node will just select that node,
+without firing the <code>Ping</code> event. Since the node will then be selected,
+a second clic (or a double-clic) will fire the event.</p>
+<p>This option is <code>false</code> by default.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="selectFirstNode">
+    <h5 class="TN_label">selectFirstNode</h5>
+    <div class="TN_content">
+      <p>If true (the default), the first node is selected and gets focus
+just after constructing the tree navigator.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="createButtons">
+    <h5 class="TN_label">createButtons</h5>
+    <div class="TN_content">
+      <p>If true, creates the "+/-" buttons next to labels; default is true.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="scrollingContainer">
+    <h5 class="TN_label">scrollingContainer</h5>
+    <div class="TN_content">
+      <p>The id of the container where the tree overflows.
+Default to <code>tree.ownerDocument.documentElement</code>.</p>
+<p>This is used for keyboard tree navigation autoscrolling.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="autoScrollPercentage">
+    <h5 class="TN_label">autoScrollPercentage</h5>
+    <div class="TN_content">
+      <p>Makes sure that the selected node is visible in the central area of 
+its offset parent; if not, the parent is scrolled.
+The percentage is the ratio between the parent height and the 
+margin at which scrolling must occur (default is 20%);</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="keymap">
+    <h5 class="TN_label">keymap</h5>
+    <div class="TN_content">
+      <p>A keymap object (see <code>Keymap.js</code>). If that option is given, keyboard
+handlers are pushed into that keymap; otherwise a new keymap is
+created.</p>
+<p>If you supply your own keymap, make
+sure that:</p>
+<ul>
+<li>
+<p>the keymap is attached to an element that properly receives keyboard
+events. The document element does, but the tree DIV element does not,
+unless it contains items with activated focus (with <code>tabIndex</code>
+defined and positive).</p>
+</li>
+<li>
+<p>the keymap is created with options <code>preventDefault:false</code> and
+<code>stopPropagation:false</code> (because when the tree has no selected node,
+the tree navigation handlers do not consume events and try to
+propagate them further).</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="classes">
+    <h5 class="TN_label">classes</h5>
+    <div class="TN_content">
+      <p>Class names for various parts of the tree structure.
+This should be an inline object, with keys corresponding 
+to the names below, and with values specified either as 
+a single class name or as an array of class names.</p>
+<ul>
+<li><a name="item_node"></a><b>node</b>
+<p>Class(es) for node elements (default is <code>TN_node</code>). 
+A node should contain a label element and a 
+content element, and should have style
+<code>display:block</code>.</p>
+</li>
+<li><a name="item_leaf"></a><b>leaf</b>
+<p>Class(es) for leaf elements (default is <code>TN_leaf</code>). 
+A leaf should contain just a label element.</p>
+</li>
+<li><a name="item_label"></a><b>label</b>
+<p>Class(es) for label elements (default is <code>TN_label</code>). 
+A label should have style <code>display:inline</code>.</p>
+</li>
+<li><a name="item_content"></a><b>content</b>
+<p>Class(es) for content elements (default is <code>TN_content</code>).</p>
+</li>
+<li><a name="item_closed"></a><b>closed</b>
+<p>Class(es) for marking closed nodes (default is <code>TN_closed</code>).</p>
+</li>
+<li><a name="item_selected"></a><b>selected</b>
+<p>Class(es) for marking the selected node (default is <code>TN_selected</code>).</p>
+</li>
+<li><a name="item_mouse"></a><b>mouse</b>
+<p>Class(es) added when the mouse hovers over a node
+(default is <code>TN_mouse</code>).</p>
+</li>
+<li><a name="item_button"></a><b>button</b>
+<p>Class(es) for buttons added automatically by the tree navigator
+(default is <code>TN_button</code>).</p>
+</li>
+<li><a name="item_showall"></a><b>showall</b>
+<p>Class(es) for the special mode in which closed nodes are nevertheless
+displayed
+(default is <code>TN_showall</code>).</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="destroy">
+    <h4 class="TN_label">destroy</h4>
+    <div class="TN_content">
+      <pre>  mytreenavigator.destroy();</pre>
+
+<p>This method will remove all handlers assigned to tree navigator.
+Call this method when the tree navigator element is removed from the DOM.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Node_manipulation">
+    <h4 class="TN_label">Node manipulation</h4>
+    <div class="TN_content">
+      <p>All methods below take a node element as
+argument, i.e. are called according to pattern:</p>
+<pre>  treeNavigator.method(node);</pre>
+
+<ul>
+<li><a name="item__code_open_node___code_"></a><b><code>open(node)</code></b>
+<p>opens the node</p>
+</li>
+<li><a name="item__code_close_node___code_"></a><b><code>close(node)</code></b>
+<p>closes the node</p>
+</li>
+<li><a name="item__code_openAtLevel_elem__level___code_"></a><b><code>openAtLevel(elem, level)</code></b>
+<p>walks down the tree and opens all subnodes of <code>elem</code> until level
+<code>level</code>; closes nodes underneath</p>
+</li>
+<li><a name="item__code_openEnclosingNodes_elem___code_"></a><b><code>openEnclosingNodes(elem)</code></b>
+<p>walks up the DOM, starting at <code>elem</code> (which might by any element on
+the page), and opens all nodes found on the way</p>
+</li>
+<li><a name="item__code_select_node__prevent_autoscroll___code_"></a><b><code>select(node, prevent_autoscroll)</code></b>
+<p>If there was a selected node, unselect it; then select the argument
+node. The argument can be <code>null</code>, in which case the tree no longer
+has any selected node.</p>
+<p>The second argument <code>prevent_autoscroll</code> is optional; if true,
+no autoscroll will be performed.</p>
+</li>
+<li><a name="item__code_scrollTo_node___code_"></a><b><code>scrollTo(node)</code></b>
+<p>Positions the node in the middle of the screen</p>
+</li>
+<li><a name="item__code_flash_node__duration__color___code_"></a><b><code>flash(node, duration, color)</code></b>
+<p>Changes the background color of <i>node</i> to <i>color</i> for <i>duration</i>
+milliseconds.  Duration and color are optional and default to 200 ms
+and 'red' (unless otherwise specified in the options to the
+<code>treeNavigator</code> constructor).</p>
+</li>
+<li><a name="item__code_isClosed_node___code_"></a><b><code>isClosed(node)</code></b>
+<p>Returns true if the node is closed</p>
+</li>
+<li><a name="item__code_isVisible_node___code_"></a><b><code>isVisible(node)</code></b>
+<p>Returns true if the node is visible
+(i.e. does not have <code>display:none</code>).</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Walking_the_tree">
+    <h4 class="TN_label">Walking the tree</h4>
+    <div class="TN_content">
+      <ul>
+<li><a name="item__code_nextSibling_node___code_"></a><b><code>nextSibling(node)</code></b>
+<p>Returns the next sibling tree node (i.e. next HTML sibling element
+having class <code>TN_node</code>; this is <i>not</i> equivalent to
+<code>node.nextSibling</code>).</p>
+</li>
+<li><a name="item__code_previousSibling_node___code_"></a><b><code>previousSibling(node)</code></b>
+<p>Returns the previous sibling tree node.</p>
+</li>
+<li><a name="item__code_parentNode_node___code_"></a><b><code>parentNode(node)</code></b>
+<p>Returns the parent tree node.</p>
+</li>
+<li><a name="item__code_firstSubNode_node___code_"></a><b><code>firstSubNode(node)</code></b>
+<p>Returns the first subnode within that node's content. If no argument
+is given, returns the first node of the tree.</p>
+</li>
+<li><a name="item__code_lastSubNode_node___code_"></a><b><code>lastSubNode(node)</code></b>
+<p>Returns the last subnode within that node's content.  If no argument
+is given, returns the last node of the tree.</p>
+</li>
+<li><a name="item__code_lastVisibleSubNode_node___code_"></a><b><code>lastVisibleSubNode(node)</code></b>
+<p>Returns the last visible subnode (recursively) of the argument
+node. If no argument is given, returns the last visible subnode of the
+tree.</p>
+</li>
+<li><a name="item__code_label_node___code_"></a><b><code>label(node)</code></b>
+<p>Returns the label of that node, i.e. the first HTML child element
+having class <code>TN_label</code>.</p>
+</li>
+<li><a name="item__code_content_node___code_"></a><b><code>content(node)</code></b>
+<p>Returns the content of that node, i.e. the last HTML child element
+having class <code>TN_content</code>.</p>
+</li>
+<li><a name="item__code_nextDisplayedNode_node___code_"></a><b><code>nextDisplayedNode(node)</code></b>
+<p>Returns the next tree node in page display order (i.e. next visible
+node down the page).</p>
+</li>
+<li><a name="item__code_previousDisplayedNode_node___code_"></a><b><code>previousDisplayedNode(node)</code></b>
+<p>Returns the previous tree node in page display order (i.e. previous
+visible node up the page).</p>
+</li>
+<li><a name="item__code_enclosingNode_elem___code_"></a><b><code>enclosingNode(elem)</code></b>
+<p>Returns the first tree node that contains the given element
+(which might be for example a form input).</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Event_handling">
+    <h3 class="TN_label">Event handling</h3>
+    <div class="TN_content">
+      <p>Manipulations to the tree generate <i>events</i>
+for which clients can register some <i>handlers</i>,
+exactly like ordinary HTML events.</p>
+  <div class="TN_node" id="Event_list">
+    <h4 class="TN_label">Event list</h4>
+    <div class="TN_content">
+        <div class="TN_node" id="Select_Deselect">
+    <h5 class="TN_label"><code>Select</code> / <code>Deselect</code></h5>
+    <div class="TN_content">
+      <p>triggered when a node is marked / unmarked as the
+currently selected node. Both events are not
+triggered immediately, but only after 
+<code>selectDelay</code> milliseconds have elapsed :
+this is an optimization to avoid too many calls
+while the user is navigating quickly through the
+nodes; in other words, intermediate nodes
+crossed while navigating the tree will not
+receive any trigger.</p>
+<p>If label selection is associated with 
+focus (i.e. if <code>tabIndex</code> was not set
+to -1), then selection/deselection events
+are also triggered when the user switches
+to another desktop window.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Open_Close">
+    <h5 class="TN_label"><code>Open</code> / <code>Close</code></h5>
+    <div class="TN_content">
+      <p>triggered when a node is opened or
+closed</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="BeforeLoadContent_AfterLoadContent">
+    <h5 class="TN_label"><code>BeforeLoadContent</code> / <code>AfterLoadContent</code></h5>
+    <div class="TN_content">
+      <p>triggered before/after a node's content
+is loaded from an URL (throug opening the node,
+or hitting the <code>Ctrl-R</code> key) -- see
+the section below about dynamic tree
+updates).</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="inspect">
+    <h5 class="TN_label"><code>inspect</code></h5>
+    <div class="TN_content">
+      <p>triggered when a user calls the
+<i>inspector</i> for a node (either by
+hitting the RETURN key or by
+double-clicking the node's label)</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Event_structure_passed_to_handlers">
+    <h4 class="TN_label">Event structure passed to handlers</h4>
+    <div class="TN_content">
+      <p>Handlers can access an <code>event</code> structure,
+similar to what is passed to ordinary HTML events;
+the entries are:</p>
+<ul>
+<li><a name="item__code_type__code_"></a><b><code>type</code></b>
+<p>the name of the triggered event
+(i.e. <code>Select</code>, <code>Deselect</code>, <code>Open</code>, etc.)</p>
+</li>
+<li><a name="item__code_target__code_"></a><b><code>target</code></b>
+<p>the node element on which the event was
+triggered</p>
+</li>
+<li><a name="item__code_srcElement__code_"></a><b><code>srcElement</code></b>
+<p>synonym for <code>target</code></p>
+</li>
+<li><a name="item__code_treeNavigator__code_"></a><b><code>treeNavigator</code></b>
+<p>the tree navigator object controlling the
+target node</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Registering_event_handlers">
+    <h4 class="TN_label">Registering event handlers</h4>
+    <div class="TN_content">
+      <p>Event handlers can be registered in several ways:</p>
+  <div class="TN_node" id="additional_attributes_on_node_elements">
+    <h5 class="TN_label">additional attributes on node elements</h5>
+    <div class="TN_content">
+      <pre>  &lt;div class="TN_node" TN:onOpen="handleOpen(this, treeNavigator)"&gt;</pre>
+
+<p>The additional attribute is the event name,
+prefixed by the constant <code>TN:on</code>; so in
+the example above, a hander is registered for
+event <code>Open</code>.</p>
+<p>The string containing handler code is
+evaluated in a context where some special
+variables are predefined:</p>
+<ul>
+<li><a name="item__code_targetNode__code_"></a><b><code>targetNode</code></b>
+<p>the node element</p>
+</li>
+<li><a name="item__code_this__code_"></a><b><code>this</code></b>
+<p>the node element (synonym for <code>targetNode</code>)</p>
+</li>
+<li><a name="item__code_treeNavigator__code_"></a><b><code>treeNavigator</code></b>
+<p>the tree navigator object</p>
+</li>
+<li><a name="item__code_event__code_"></a><b><code>event</code></b>
+<p>an event structure as described above</p>
+</li>
+</ul>
+<p>If the string just contains the name of a
+handler function (i.e. without the
+parentheses), then that function will be
+called with a single argument, namely the
+event structure described above. Therefore</p>
+<pre>  &lt;div class="TN_node" TN:onOpen="handleOpen"&gt;</pre>
+
+<p>is equivalent to</p>
+<pre>  &lt;div class="TN_node" TN:onOpen="handleOpen(event)"&gt;</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="additional_attributes_on_the_tree_element">
+    <h5 class="TN_label">additional attributes on the tree element</h5>
+    <div class="TN_content">
+      <pre>  &lt;div id="theTree" TN:onOpen="handleOpen(targetNode, this)"&gt;</pre>
+
+<p>Handlers can be registered on the tree element, 
+exactly like for node elements. The only
+difference is that <code>this</code> is then bound to
+the tree element instead of the target node.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="additional_properties_on_the_tree_navigator_object">
+    <h5 class="TN_label">additional properties on the tree navigator object</h5>
+    <div class="TN_content">
+      <pre>  var treeNavigator = new Tree.Navigator('myTree', {onOpen: myOpenHandler});
+  treeNavigator.onClose = function(event){doSomethingWith(event.target)};</pre>
+
+<p>Handlers can be inserted as properties on the
+tree navigator object, either through options to
+the constructor, or later on through ordinary
+property assignments. These properties start
+with the constant <code>on</code> followed by the
+event name, but without the <code>TN:</code> prefix.
+Handlers are called with a single argument, 
+namely the event structure described above.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Dynamic_tree_expansion">
+    <h3 class="TN_label">Dynamic tree expansion</h3>
+    <div class="TN_content">
+      <pre>  treeNavigator.initSubTree(subtree);</pre>
+
+<p>Whenever a subtree was added programmatically into the
+tree, this method should be called in order to install the
+navigation buttons, mouse event handlers and tabbing
+behaviour. The <code>initSubTree</code> method expects to find
+at least one <code>TN_label</code> element within the
+subtree.</p>
+<p>This method is called automatically when a subtree
+is dynamically fetched through the 
+<code>TN:contentURL</code> property.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+
+print "My bin is $Bin\n";
+
+$| = 1;
+
+my @vars = ( "", qw(carp always never) );
+
+#run_cmd();
+
+for my $var (@vars) {
+    run_cmd($var);
+}
+
+sub run_cmd {
+    my($flavor) = @_ ? @_ : undef;
+
+    my $cmd = "$^X -I lib $Bin/test-assert";
+    $cmd =~ s/^/ASSERT_CONDITIONAL=$flavor / if defined $flavor;
+    print "\nRUNNING: $cmd\n";
+    my $rc = system $cmd;
+
+    my($exit, $signo, $core) = ($rc >> 8, $rc & 127, $rc & 128);
+    $core = " (core dumped)" if $core;
+    my $status = '';
+
+    if ($signo) {
+        $status = "Signal $signo";
+        $status .= " $core" if $core;
+    } else {
+        $status = "Exit $exit";
+    }
+
+    print "$status\n";
+
+}

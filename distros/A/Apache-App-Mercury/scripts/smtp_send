@@ -1,0 +1,71 @@
+#!/usr/bin/perl -T -w
+
+require 5.004;
+use strict;
+use File::Basename;
+
+# --------------------- USER CUSTOMIZABLE VARIABLES ------------------------
+
+my $DEBUG = 0;
+my $CROND = 0;
+my $sleep_interval = 600;  # in seconds (600 == 10 min)
+my $pid_dir = "/var/run";
+my $logfile = "/var/log/smtp_send_log";
+
+# --------------------- END USER CUSTOMIZABLE VARIABLES --------------------
+
+use Apache::App::Mercury;
+use Apache::App::Mercury::SMTP_Message;
+
+# log pid to $pid_dir
+my $pid_file = basename($0).".pid";
+$pid_file =~ m/^(.*)$/;  # untaint
+open(PIDF, ">$pid_dir/$1");
+print PIDF $$."\n";
+close PIDF;
+
+my $date;
+while (1) {
+    open(LOG, ">>$logfile");
+    $date = localtime;
+    &send_new_messages();
+    close LOG;
+    if ($CROND) { last; } # only run once if we're running under cron
+    else { sleep $sleep_interval; } # sleep for specified interval
+}
+
+sub send_new_messages {
+    my $messaging = Apache::App::Mercury->new;
+    $messaging->initialize({ r => bless({}, "Apache") });
+
+    # retrieve all new messages (ones that haven't been checked by this script)
+    my $msglist = $messaging->get_messages(undef, undef, undef, 'unsent');
+    my @msgs = sort {$a->{'id'} <=> $b->{'id'}} values %$msglist;
+    print LOG "[$date] found ".($#msgs+1)." unsent messages in database\n" if $DEBUG;
+
+    my $cnt = 0;
+    my (@senders, @recips, @addrs);
+    foreach my $msg (@msgs) {
+	my $smtp_msg = Apache::App::Mercury::SMTP_Message->new($msg);
+	print LOG "[$date] got SMTP_Message object for msg id '".$smtp_msg->{'id'}."'\n" if $DEBUG > 1;
+	my $num_sent = $smtp_msg->send_by_e_mail;
+	if ($num_sent) {
+	    $cnt += $num_sent;
+	    push(@senders, $smtp_msg->{'sender'});
+	    push(@recips, $smtp_msg->{'recipient'});
+	    push(@addrs, $smtp_msg->{'address'});
+	}
+    }
+    print LOG "[$date] sent $cnt message(s) by SMTP".
+      ($cnt ? ": ".join(', ', map {
+	  $senders[$_]." -> ".$recips[$_]." <".$addrs[$_].">"
+      } 0..$#addrs) : "")."\n";
+}
+
+
+package Apache;
+sub warn       { print LOG $_[1] . "\n"; }
+sub log_error  { print LOG $_[1] . "\n"; }
+
+
+1;

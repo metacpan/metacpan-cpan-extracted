@@ -1,0 +1,28 @@
+---
+abstract: 'Watch files for changes and re-run prove'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-prowess
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  App::Prove: '3.35'
+  Filesys::Notify::Simple: '0.12'
+resources:
+  bugtracker: https://github.com/jhthorsen/app-prowess/issues
+  homepage: https://github.com/jhthorsen/app-prowess
+  repository: https://github.com/jhthorsen/app-prowess.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

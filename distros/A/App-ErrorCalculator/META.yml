@@ -1,0 +1,30 @@
+---
+name: App-ErrorCalculator
+version: 1.02
+author:
+  - 'Steffen Mueller <modules at steffen-mueller dot net>'
+abstract: Calculations with Gaussian Error Propagation
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Gtk2: 0
+  Gtk2::Ex::Dialogs: 0
+  Math::Symbolic: 0.163
+  Math::SymbolicX::Error: 0
+  Math::SymbolicX::NoSimplification: 0
+  Number::WithError: 0.03
+  Spreadsheet::Read: 0
+build_requires:
+  Test::More: 0
+recommends:
+  Test::Pod: 1.0
+  Test::Pod::Coverage: 1.0
+provides:
+  App::ErrorCalculator:
+    file: lib/App/ErrorCalculator.pm
+    version: 1.02
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

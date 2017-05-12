@@ -1,0 +1,1 @@
+[% item i1 i1{{b}} %][% item i2 i2{{b}} %][% item i3 {{[%item i3i1 i3i1{{b}}%]}}%]

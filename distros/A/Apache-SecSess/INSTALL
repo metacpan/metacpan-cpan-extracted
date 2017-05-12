@@ -1,0 +1,117 @@
+
+	Apache::SecSess Installation
+
+NOTE: This is beta software.  Some "install" targets in makefiles 
+will blow away things you might not expect like httpd.conf.  It is best to 
+install this into a virgin Apache installation.
+	Also, only the core module is properly handled by top-level Makefile(.PL)
+targets.  The demo pieces currently require extra attention to individual 
+Makefiles as described below.
+
+
+1. Install Apache::SecSess module
+
+Here, you should be able to rely on standard Perl.
+
+	perl Makefile.PL
+	make
+	make install
+
+
+2. Setup SSL certificates used in demo
+
+Attend to definition APACHE in utils/Makefile.
+
+
+3. make install_demo (at top level)
+
+This will populate the DB, install demo htdocs, and make certificates.
+
+Note: you will need (Apache::) Mason for the demo, but not for the
+core Apache::SecSess module.  Therefore perl Makefile.PL will not
+warn you if you don't have Mason.
+
+
+4. Set up database used in demo.  Currently only postgres is supported.
+You must create a database user and database in the standard way for 
+postgres:
+
+	/bin/su -
+	/bin/su - postgres
+	createuser user
+	exit
+	/bin/su - user
+	createdb dbname
+
+Attend to makefile definitions in "db/Makefile"; DBNAME=dbname and 
+DBUSER=user as above.  AS THAT USER,
+
+	cd db; make init
+
+THEN AS ROOT,
+
+	cd db; cp dbilogin.txt /usr/local/apache/conf/private
+
+NOTE: This path is hard-coded in startup.pl, so if you change it, you must
+change it consistently everywhere.
+
+
+5. Set up IP Aliasing.
+
+The demo shows the transfer of credentials between different hosts.  You
+don't actually need separate physical hosts, if your machine supports IP 
+aliasing.
+
+On Linux, if you have an old kernel (<2.4?) read the HOWTO on IP Aliasing.  
+Otherwise (new linux kernels), ip aliasing is automatic.  Here is the 
+relevant fragment from my /etc/hosts:
+
+	## prototype web devel virtual hosts (some Libertarians)
+	192.168.1.11	adam.acme.com adam smith
+	192.168.1.12	lysander.acme.com lysander spooner
+	192.168.1.13	tom.acme.com tom thomas paine
+	192.168.1.14	john.sec.acme.com john locke
+	192.168.1.15	milt.sec.acme.com milton friedman
+	192.168.1.16	noam.acme.org noam chomsky
+	192.168.1.17	stu.transacme.com jstuart mill
+
+and here is a typical /etc/sysconfig/network-scripts/ifcfg-eth0:?
+
+	DEVICE=eth0:1
+	BOOTPROTO=static
+	IPADDR=192.168.1.11
+	NETMASK=255.255.255.0
+	NETWORK=192.168.1.0
+	BROADCAST=192.168.1.255
+	ONBOOT=yes
+
+
+6. Start Apache and import certs
+
+In utils, you will find X.509 client certificate bob.p12. Import it into
+your browser according to its instructions (Netscape: Security =>
+Certificates:Yours => Import a Certificate ...).  You will need the
+PKCS#12 passowrd.
+
+	bob's PKCS12 Password: certb@by
+
+Connect to adam.acme.com, and import the Signing certificate from menu
+bar.
+
+
+7. Try the demos.
+
+All relevant user login info is:
+
+	user: bob
+	password: sekret
+	pin code: 0918
+
+As you go from top to bottom in the menu, there are increasing
+authentication requirements, and increasingly strong credentials are
+issued.  When you get to milt.sec.acme.com, watch carefully, as you will 
+be redirected to stu.transacme.com for login.  And, when stu issues
+URL credentials you will be transparently redirected across domains to get
+cookies for milt.sec.acme.com and noam.acme.org, before being redirected
+back to the original milt request.  Then you may hop to noam and stu 
+without further interruption.

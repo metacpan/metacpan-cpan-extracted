@@ -1,0 +1,3 @@
+charcoal-rot , normal gt-norm whole-field lt-80 abnorm absent dna dna absent absent absent abnorm yes absent tan absent absent absent black present norm dna absent norm absent norm , test_item
+purple-seed-stain , normal gt-norm upper-areas 80-89 abnorm no-yellow-halos w-s-marg lt-1/8 absent absent absent norm no absent tan absent absent absent none absent diseased colored absent norm absent norm , num_501
+purple-seed-stain , normal lt-norm whole-field lt-80 abnorm no-yellow-halos w-s-marg lt-1/8 absent absent absent abnorm yes absent tan absent absent absent none absent diseased colored absent norm absent norm , num_502

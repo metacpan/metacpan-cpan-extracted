@@ -1,0 +1,76 @@
+<package>
+  <Parameter name="local_address" aliases="ip" help="local ip address" manual="" type="Param" />
+  <Parameter name="auth" aliases="" help="auth level within control" manual="" type="Param" />
+  <Parameter name="user" aliases="" help="control user" manual="" type="Param" />
+<Command name="show" call_style="state" command="pre-loaded" handler="show" help="show Control variables" topic="admin" usage="Control show local_address">
+  <contexts Control="show" ></contexts>
+  <parameters user="1" local_address="1" auth="1"></parameters></Command>
+<Command name="root" call_style="state" command="pre-loaded" handler="exit" help="exit to root context, use '/command' for a one time switch" manual="root, or '/' for the Unix geeks, will change the context back to root. See 'manual context' for more information on context. Unless otherwise noted, changing to root context does not normally clear out any default settings that were established in that context. 
+
+One can preceed a command directly with a '/' such as '/exit' to force the root context. Sometimes a context may independently process everything said within the context and, if misbehaving, doesn't provide a way to leave the context. Using '/exit' or '/help' should always work. The example package Eliza is known to have trouble saying Goodbye and exiting properly." topic="general" usage="root or /   ">
+  <contexts>
+    <UNIVERSAL>/</UNIVERSAL>
+    <UNIVERSAL>root</UNIVERSAL>
+  </contexts>
+</Command>
+<Command name="manual" call_style="state" command="pre-loaded" handler="manual" help="Display detailed help about a command" manual="The manual command provides detailed information about running a command and the parameters the command accepts. Manual is currently broken in that it only operates within the existing context and cannot be called with a full context." topic="general" usage="manual [ command ]">
+  <contexts>
+    <UNIVERSAL>manual</UNIVERSAL>
+    <UNIVERSAL>man</UNIVERSAL>
+  </contexts>
+</Command>
+<Command name="ip" call_style="state" command="pre-loaded" handler="net" help="Returns the local ip address" topic="net" usage="ip">
+  <contexts ROOT="ip" />
+</Command>
+<Command name="status" call_style="state" command="pre-loaded" handler="general" help="Display general TCLI control status" topic="general" usage="status or /status">
+  <contexts UNIVERSAL="status" />
+</Command>
+<Command name="exit" call_style="state" command="pre-loaded" handler="exit" help="exit the current context, returning to previous context" manual="exit, or '..' for the Unix geeks, will change the context back one level. See 'manual context' for more information on context. Unless otherwise noted, leaving a context does not normally clear out any default settings that were established in that context. 
+
+" topic="general" usage="exit or /exit">
+  <contexts>
+    <UNIVERSAL>exit</UNIVERSAL>
+    <UNIVERSAL>..</UNIVERSAL>
+  </contexts>
+</Command>
+<Command name="debug_request" call_style="state" command="pre-loaded" handler="general" help="show what the request object contains" topic="admin" usage="debug_request &lt;some other args&gt;">
+  <contexts UNIVERSAL="debug_request" />
+</Command>
+<Command name="Hi" call_style="state" command="pre-loaded" handler="general" help="Greetings" topic="general" usage="Hi/Hello">
+  <contexts>
+    <ROOT>Hi</ROOT>
+    <ROOT>hi</ROOT>
+    <ROOT>Hello</ROOT>
+    <ROOT>hello</ROOT>
+  </contexts>
+</Command>
+<Command name="Verbose" call_style="state" command="pre-loaded" handler="general" help="changes the verbosity of output to logs" topic="admin" usage="Verbose">
+  <contexts UNIVERSAL="Verbose" />
+</Command>
+<Command name="Control" call_style="state" command="pre-loaded" handler="establish_context" help="show or set Control variables" topic="admin" usage="Control show local_address">
+  <contexts ROOT="Control" />
+</Command>
+<Command name="context" call_style="state" command="pre-loaded" handler="general" help="displays the current context" manual="Context can be somewhat difficult to understand when one thinks of normal command line interfaces that often retain context differently. Context is a way of nesting commands, much like a file directory, to make it easier to navigate. There are a few commands, such as 'help' or 'exit' that are global, but most commands are available only within specific contexts. Well written packages will collect groups of similar commands within a context. For instance, if one had package of attack commands, one wouldCan't encode a value of type: CODE at TCLI.Command.pl line 208
+ put them all in an 'attack' context. Instead of typing 'attack one target=example.com', one could type 'attack' to change to the attack context then type 'one target=example.com' followed by 'two target=example.com' etc. 
+
+Furthermore, a well written package will support the setting of default parameters for use within a context. One can then say: 
+ 	attack 
+	set target=example.com 
+	one 
+	two 
+	...
+
+The full command 'attack one target=example.com' must always be supported, but using context makes it easier to do repetitive tasks manually as well as allow one to navigate through a command syntax that one's forgotten the details of without too much trouble. 
+
+Context has a sense of depth, as in how many commands one has in front of whatever one is currently typing. An alias to the context command is 'pwd' which stands for Present Working Depth. Though it may make the Unix geeks happy, they should remember that this is not a file directory structure that one is navigating within." topic="general" usage="context or /context">
+  <contexts>
+    <UNIVERSAL>context</UNIVERSAL>
+    <UNIVERSAL>pwd</UNIVERSAL>
+  </contexts>
+</Command>
+<Command name="help" call_style="state" command="pre-loaded" handler="help" help="Display help about available commands" manual="The help command provides summary information about running a command and the parameters the command accepts. Help with no arguments will list the currently available commands. Help is currently broken in that it only operates within the existing context and cannot be called with a full context." topic="general" usage="help [ command ] or /help">
+  <contexts UNIVERSAL="help" />
+</Command>
+<Command name="dumpcmd" call_style="state" command="pre-loaded" handler="dumpcmd" help="Dump the registered command hash information" topic="admin" usage="dumpcmd &lt;cmd&gt;">
+  <contexts UNIVERSAL="dumpcmd" />
+</Command></package>

@@ -1,0 +1,225 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+Alien::GvaScript::Paginator - API for data pagination
+
+=head1 SYNOPSIS
+
+  var url = '/app/my/paginated/data';
+  var mypaginator = new GvaScript.Paginator(url, {
+    list_container  : 'list_result_container', 
+    links_container : 'pagination_links_container'
+
+    onSuccess   : onSuccessHandler,
+    parameters  : {param1: 'val1', param2: 'val2'},
+    step        : 20
+  }
+
+
+=head1 DESCRIPTION
+
+Paginated data is a set of data that can be divided into differnent pages. 
+It is best described as a list of items that overflow one page and best presented in several pages.
+The Paginator Object is used in this case to manage retrieval (through AJAX Requests) and handling (through an onSuccess handler).
+It also will take care of creating the navigation links (first, prev, next, last) and rendering them into provided container.
+Navigation links are used for an on demand I<page flipping>.
+
+Data will be requested using an HTTP call to a provided URL.
+Data Index and Size are decided using C<INDEX> and C<STEP> parameters respectively. 
+It is up to you to make use of these parameters to decide on the items to display.
+
+=head2 Pagination Parameters
+
+The Paginator Object will manage the 2 request parameters
+
+=over 2
+
+=item C<INDEX> start index of items to retrieve
+
+=item C<STEP>  number if items to include per page
+
+These two parameters would help you in deciding which part of the dataset to return.
+
+=back
+
+=head2 Navigation Links
+
+Navigation links are the icons used to navigate through pages (page flipping). Along with icons, a 
+text with start-to-end index of displayed records / number of total records is displayed.
+
+=head3 HTML
+
+  <div class="gva-paginatorbar">
+    <div title="Dernière page" class="last"/>
+    <div title="Page suivante" class="forward"/>
+    <div class="text">1 à 11 de 115</div>
+    <div title="Page précédente" class="back inactive"/>
+    <div title="Première page" class="first inactive"/>
+  </div>
+
+Note that the icons are aware if they should be active/inactive. An 'inactive' css classname would be set to differentiate.
+
+=head3 CSS
+
+Easy customization of icons
+
+By default, css classnames are prefixed by 'gva'.
+
+This can be overloaded by a global js variable: CSS_PREFIX
+if declared before the inclusion of this Library
+
+  .gva-paginatorbar {float:right;width:250px;}
+  .gva-paginatorbar div {width:16px;height:16px;cursor:pointer;float:right;}
+  .gva-paginatorbar div.first {background:url(page-first.gif) no-repeat top center;}
+  .gva-paginatorbar div.last {background:url(page-last.gif) no-repeat top center;}
+  .gva-paginatorbar div.back {background:url(page-prev.gif) no-repeat top center;}
+  .gva-paginatorbar div.forward {background:url(page-next.gif) no-repeat top center;}
+  .gva-paginatorbar div.inactive {cursor:default;opacity:0.25;filter:alpha(opacity=25);}
+  .gva-paginatorbar div.text {text-align:center;width:140px;color:#4b34c5;font-size:10pt;}
+  
+  /* classname given to the list container while data is waiting to be loaded */
+  .gva-loading {
+    background:url(ajax_loading.gif) no-repeat center center;
+    position:absolute;
+    width:30px;height:30px;
+    top:50%;left:50%;
+  }
+
+
+=head1 Programming Interface
+
+=head2 Methods
+
+=head3 new GvaScript.Paginator 
+
+  var paginator = new GvaScript.Paginator(
+        url, 
+        {opt1:"val1", opt2:"val2", ...}
+  );
+
+Creates the object that controls pages navigation. Arguments are 
+
+=over 12
+
+=item C<url>
+
+URL used to retrieve pages content using HTTP request. 
+
+=item C<options>
+
+=back
+
+Options used to define and customize the Paginator object.
+
+The Paginator object is returned as it might be useful for a programatic navigation of pages.
+
+Available options are:
+
+=over 12 
+
+=item links_container I<(String|HTMLElement)>
+
+Element or an id of an HTML Element to render the navigation links into.
+
+required.
+
+=item list_container I<(String|HTMLElement)>
+
+Element of an id of an HTML Element that is used to render the result of the pagination.
+A 'gva-loading' classname is set to this container in the duration of page request.  Also ajax timeout and error messages
+will be displayed in this container.
+
+required.
+
+=item step I<(numeric)>
+
+Number of items to display per page.  
+This number would be the value of C<STEP> (HTTP Request Parameter) that is transferred with pagination calls.
+
+optional - defaulted to 20
+
+=item method I<(String)>
+
+String indicating the HTTP method to use in the AJAX request for retrieving paginated data.
+
+optional - defaulted to 'post'
+
+=item parameters I<(String|Hash)>
+
+String in the syntax of key1=val1&key2=val2, or hash {key1: 'val1', key2: 'val2'} of key/value pairs of parameters to be 
+sent with the HTTP request 
+
+optional - defaulted to {}
+
+=item onSuccess I<(function)>
+
+Function handler of the onSuccess of the AJAX HTTP request to retrieve paginated data.
+
+optional - defaulted to Prototype.emptyFunction
+
+=item lazy I<(boolean)>
+
+Boolean indicating whether to load first page with the initialization of the Paginator Object.
+C<true> implies lazy loading of the first page - will wait for an explicit call to C<loadContent> method.
+
+optional - defaulted to false
+
+=item timeoutAjax I<(Numeric)> 
+
+Number of seconds to wait before aborting the Ajax HTTP Request.  Upon abort, an error message will display in the C<list_container>.
+
+optional - defaulted to 15
+
+=item errorMsg I<(String)>
+
+Error message to display on timeoutAjax.
+
+optional - defaulted to "Problème de connexion. Réessayer et si le problème persiste, contacter un administrateur."
+
+=back
+
+
+=head3 Flipping the Pages
+
+=over 12
+
+=item hasNext()
+
+Returns boolean indicating whether the paginator has more data to display.
+
+=item hasPrevious()
+
+Returns boolean indicating whether the paginator has previous data to display.
+
+=item getFirstPage()
+
+Returns boolean if successful.
+
+=item getPrevPage()
+
+Returns boolean if successful.
+
+=item getNextPage()
+
+Returns boolean if successful.
+
+=item getLastPage()
+
+Returns boolean if successful
+
+=item loadContent()
+
+Core method that initializes the AJAX HTTP Request to retrieve data and calls the onSuccess handler
+to dipplay the result.
+
+=back
+
+
+=head3 destroy
+
+  mypaginator.destroy();
+
+This method will remove all handlers assigned to pagination buttons.
+Call this method when the paginator element is removed from the DOM.
+

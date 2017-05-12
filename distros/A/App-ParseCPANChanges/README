@@ -1,0 +1,18 @@
+DESCRIPTION
+
+    This distribution provides a simple command-line wrapper for
+    CPAN::Changes. See parse-cpan-changes for more details.
+
+SEE ALSO
+
+    CPAN::Changes
+
+    CPAN::Changes::Spec
+
+    An alternative way to manage your Changes using INI master format:
+    Module::Metadata::Changes.
+
+    Dist::Zilla plugin to check your Changes before build:
+    Dist::Zilla::Plugin::CheckChangesHasContent,
+    Dist::Zilla::Plugin::CheckChangeLog.
+

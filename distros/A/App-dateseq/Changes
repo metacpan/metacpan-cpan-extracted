@@ -1,0 +1,50 @@
+Revision history for App-dateseq
+
+0.07    2016-09-28 (PERLANCAR)
+
+        - Update to Data::Sah 0.76+ (add x.perl.coerce_to) since Data::Sah now
+          by default converts to Unix epoch.
+
+        - [ux] Add x.perl.coerce_rules for convenience, to be able to use
+          e.g. 'today' or 'in 3 days' for date.
+
+
+0.06    2015-09-26 (PERLANCAR)
+
+	- [ux] Switch default format from '%Y-%m-%d' to '%Y-%m-%dT%H:%M:%S'
+	  if there is hour/minute/second mentioned.
+
+
+0.05    2015-09-25 (PERLANCAR)
+
+        - No functional changes.
+
+        - Rebuild with fixed Perinci::Sub::To::POD which skips showing non-Perl
+          examples in function documentation.
+
+
+0.04    2015-09-25 (PERLANCAR)
+
+	- Adjust to Perinci::Sub::CoerceArgs 0.10+ (change coercion hint
+	  attribute).
+
+
+0.03    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.02    2015-05-13 (PERLANCAR)
+
+        - No functional changes.
+
+        - POD tweaks.
+
+
+0.01    2015-05-13 (PERLANCAR)
+
+        - First release.

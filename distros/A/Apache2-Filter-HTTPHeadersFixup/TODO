@@ -1,0 +1,5 @@
+
+- add a separate handler for non-KeepAlive server configs which don't
+  need all the extra checks overhead
+
+- rewrite handle_input to not use a helper bb

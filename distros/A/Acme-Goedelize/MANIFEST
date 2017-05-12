@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Acme-Goedelize.t
+lib/Acme/Goedelize.pm
+META.yml                                 Module meta-data (added by MakeMaker)

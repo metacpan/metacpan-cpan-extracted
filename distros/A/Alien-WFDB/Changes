@@ -1,0 +1,22 @@
+0.004 2016-04-17 13:14:00-0500
+  - Added a minimum version version for Alien::Base `configure_requires`.
+    Thanks to Graham Ollis (PLICEASE++)!
+
+v0.003 2015-01-24 15:19:22-0600
+  - add Inline 'with' support
+
+v0.002 2015-01-24 14:43:51-0600
+  - add ExtUtils::Depends support
+
+v0.001_02 2014-04-15 19:25:13-0500
+  - no functional change
+  - build fixes (for changes introduced in wfdb-10.5.23)
+
+v0.001_01 2013-12-29 01:11:30-0600
+  - no functional change
+  - fix of Alien pattern
+
+v0.001 2013-10-28 00:57:05-0500
+  - initial package
+  - using Alien::Base to download latest WFDB package from
+    <http://physionet.org/physiotools/archives/>

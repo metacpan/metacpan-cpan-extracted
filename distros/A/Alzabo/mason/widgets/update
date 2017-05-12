@@ -1,0 +1,57 @@
+<%doc>
+=pod
+
+=head1 NAME
+
+update
+
+=head1 SYNOPSIS
+
+  <& update, table => $table, %ARGS &>
+
+=head1 DESCRIPTION
+
+A simple widget to perform an update based on the values of %ARGS.
+
+=head1 PARAMETERS
+
+=over 4
+
+=item * table
+
+An <Alzabo::Table> object which contains the row to be updated
+
+=back
+
+The rest of the arguments should simply be the C<%ARGS> hash as passed
+to the calling component.  This component will extract the relevant
+column values from that hash.
+
+=head1 RETURNS
+
+The row just updated is returned from this component.
+
+=cut
+</%doc>
+<%args>
+$table
+</%args>
+<%init>
+my %data;
+my %pk;
+foreach my $c ( $table->primary_key )
+{
+    $pk{ $c->name } = $ARGS{ $c->name };
+}
+
+foreach my $c ( $table->columns )
+{
+    $data{ $c->name } = $ARGS{ $c->name }
+	if exists $ARGS{ $c->name };
+}
+
+my $row = $table->row_by_primary_key( pk => \%pk );
+$row->update(%data);
+
+return $row;
+</%init>

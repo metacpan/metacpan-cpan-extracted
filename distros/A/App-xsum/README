@@ -1,0 +1,9 @@
+SYNOPSIS
+
+    See xsum.
+
+append:SEE ALSO
+
+    Backend module: File::Digest, which in turn uses Digest::CRC,
+    Digest::MD5, and Digest::SHA.
+

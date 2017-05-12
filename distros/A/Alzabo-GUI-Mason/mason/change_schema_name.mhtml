@@ -1,0 +1,32 @@
+<%args>
+$schema
+$name
+</%args>
+
+<%init>
+my ($s);
+eval
+{
+    $s = Alzabo::Create::Schema->load_from_file( name => $schema );
+
+    $s->set_name($name);
+    $s->save_to_file;
+};
+
+my $e = $@;
+
+$m->comp( 'handle_rules_exception', e => $e, comp => 'view_schema', %ARGS );
+
+$m->comp( 'exception', $e ) if $e;
+
+$m->redirect( uri( path => 'view_schema' . Alzabo::GUI::Mason::Config::mason_extension(),
+                   query => { schema => $s->name,
+                            },
+                 ),
+            );
+
+</%init>
+
+<%flags>
+inherit => 'syshandler'
+</%flags>

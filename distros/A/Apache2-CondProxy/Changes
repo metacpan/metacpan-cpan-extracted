@@ -1,0 +1,20 @@
+Revision history for Apache2-CondProxy
+
+0.17    Fri Oct  2 20:25:48 PDT 2015
+        Added RemoteFirst directive which does what it says on the tin
+
+0.14    Thu Jan  2 23:03:14 PST 2014
+        Added proxy-nocanon magic to stop proxy URIs being messed with
+
+0.13    Thu Jan  2 21:57:04 PST 2014
+        Added URI scheme matching, Location header rewriting
+
+0.12    Thu Jan  2 19:29:31 PST 2014
+        Fixed misbehaving subrequest input filter
+
+0.11    Thu Jan  2 15:13:33 PST 2014
+        Fixed aberrant MANIFEST, moved Apache::Test to configure_requires
+
+0.01    Fri Aug 24 23:03:10 PDT 2012
+        Initial prototype, packaged for CPAN
+

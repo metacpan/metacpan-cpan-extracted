@@ -1,0 +1,17 @@
+Makefile
+\.old$
+Vec\.bs
+Vec\.c
+Vec\.o
+testme\.perl
+\.svn\b
+\bblib\b
+\bpm_to_blib\b
+README\.rpod
+~$
+\.tar\.gz$
+\.vec$
+^MYMETA\.
+^reversion\.sh$
+^svntag\.sh$
+

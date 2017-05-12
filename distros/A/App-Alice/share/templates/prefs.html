@@ -1,0 +1,56 @@
+? my $app = shift;
+
+<div id="prefs" class="config">
+  <form id="config_data" onsubmit="return Alice.prefs.submit(this)">
+    <div class="field" style="width:150px">
+      <input type="checkbox"<? if ($app->config->images eq "show") { ?> checked<? } ?> name="images" id="images" />
+      <label>Inline images?</label>
+    </div>
+
+    <div class="field clear" style="width:150px">
+      <input type="checkbox"<? if ($app->config->avatars eq "show") { ?> checked="checked"<? } ?> name="avatars" id="avatars" />
+      <label>Show avatars?</label>
+    </div>
+
+    <div class="field clear" style="width:150px">
+      <input type="checkbox"<? if ($app->config->alerts eq "show") { ?> checked="checked"<? } ?> name="alerts" id="alerts" />
+      <label>Enable alerts?</label>
+      <a style="font-size:10px" href="javascript:void(0)" onclick="window.webkitNotifications.requestPermission()">Grant permission</a>
+    </div>
+
+    <div class="field clear" style="width: 150px">
+      <label for="style">Style <span style="font-size:0.8em">(refresh required)</span></label>
+      <select name="style" id="style">
+        <option value="default"<? if ($app->config->style eq "default") {?> selected<? } ?>>Default</option>
+        <option value="dark"<? if ($app->config->style eq "dark") {?> selected<? } ?>>Dark</option>
+      </select>
+    </div>
+
+    <div class="field clear" style="width: 150px">
+      <label for="timeformat">Time Format</label>
+      <select name="timeformat" id="timeformat">
+        <option value="12"<? if ($app->config->timeformat eq "12") {?> selected<? } ?>>12 Hour</option>
+        <option value="24"<? if ($app->config->timeformat eq "24") {?> selected<? } ?>>24 Hour</option>
+      </select>
+    </div>
+
+    <div class="field clear" style="width:150px">
+      <label>Highlights</label>
+      <select name="highlights" multiple="multiple" id="highlights">
+        <? for my $highlight (@{$app->config->highlights}) { ?>
+        <option value="<?= $highlight ?>"><?= $highlight ?></option>
+        <? } ?>
+      </select>
+      <div class="controls">
+        <a href="#" onclick="return Alice.prefs.addHighlight()">Add</a>
+        <a href="#" onclick="return Alice.prefs.removeHighlights()">Remove</a>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button type="submit">Save</button>
+      <button onclick="Alice.prefs.remove(); return false;">Cancel</button>
+    </div>
+
+  </form>
+</div>

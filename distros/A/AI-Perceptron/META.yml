@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: AI-Perceptron
+version: 1.0
+license: perl
+distribution_type: module
+requires:
+  accessors: 0.01
+recommends: {}
+build_requires:
+  Module::Build: 0.20
+  Test::More: 0.01
+conflicts: {}
+provides:
+  AI::Perceptron:
+    file: lib/AI/Perceptron.pm
+    version: 1.0
+generated_by: Module::Build version 0.20_02

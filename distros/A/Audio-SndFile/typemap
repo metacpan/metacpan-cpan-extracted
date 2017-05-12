@@ -1,0 +1,57 @@
+TYPEMAP
+
+#
+# T_PTROBJ_SPECIAL translates _ to ::
+#
+
+# note: Audio_SndFile and SNDFILE* both map to Audio::SndFile perl objects
+# Audio_SndFile contains a SNDFILE*
+
+Audio_SndFile      T_PTROBJ_SPECIAL
+Audio_SndFile_Info T_PTROBJ_SPECIAL
+sf_count_t         T_U_LONG 
+SNDFILE*           SNDFILEP
+
+#
+# T_PTROBJ_SPECIAL_RO is like T_PTROBJ_SPECIAL, but has no OUTPUT map
+#
+# these are used for creating objects that are derived from a base
+# but who's package names are unknown at compile time (they are
+# composed from the plugins loaded at runtime)
+#
+
+
+INPUT
+T_PTROBJ_SPECIAL
+    if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")) {
+	IV tmp = SvIV((SV*)SvRV($arg));
+        $var = ($type) tmp;
+    }
+    else
+	croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")
+
+T_PTROBJ_SPECIAL_RO
+    if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")) {
+	IV tmp = SvIV((SV*)SvRV($arg));
+        $var = ($type) tmp;
+    }
+    else
+	croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")
+
+SNDFILEP
+    if (sv_derived_from($arg, \"Audio::SndFile\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = ((Audio_SndFile) tmp)->sndfile;
+    }
+    else {
+        croak(\"$var is not an of type Audio::SndFile\");
+    }
+
+
+OUTPUT
+T_PTROBJ_SPECIAL
+    sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\",
+    (void*)$var);
+
+
+

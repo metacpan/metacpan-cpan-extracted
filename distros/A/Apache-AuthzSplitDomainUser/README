@@ -1,0 +1,88 @@
+NAME
+
+Apache::AuthzSplitDomainUser - mod_perl module for checking the htgroup file while
+		       allowing you to split the DOMAIN\user, as sent forward by some winboxes
+
+
+SYNOPSIS
+
+    <Directory /foo/bar>
+    # Optional Variables
+    PerlSetVar groupFile /path/to/htgroups
+    # Set the format of the username to check against
+    # defaults to username
+    PerlSetVar authzUsername username or domain\username
+
+    PerlAuthzHandler Apache::AuthzSplitDomainUser
+
+    # Standard require stuff, only user and 
+    # valid-user work currently
+    require valid-user
+
+    # Optional, reqires that you have Apache::Htgroup
+    # require group groupname
+    </Directory>
+
+    These directives can be used in a .htaccess file as well.
+
+    If you wish to use your own PerlAuthzHandler then the require 
+    directive should follow whatever handler you use.
+
+DESCRIPTION
+
+This module was written so that we could high-jack the Authz phase from Apache and 
+modify values that are passed to the Authz Handler with perl.  The initial concept
+was to deal with a problem that we are seeing from winXP boxes that are sending 
+forward DOMAIN\username to Apache.  These obviously fail when checked against an
+authentication, or authorization, scheme where the syntax is simply username. 
+
+PerlSetVar groupFile
+
+Set this to the path of the htgroup file you wish this module
+to check in.  It allows you to specify your users in groups
+found on the web server, as opposed to groups within Active 
+Directory, etc. 
+
+PerlSetVar authzUsername
+
+Set this to "username" or "domain\username" depending on your preference.
+(This simply formats the input username to allowing checking the username 
+as "domain\username" or "username".)  For example:
+
+# speeves is a DOMAIN user of DOMAIN
+domain\username =>  DOMAIN\speeves 
+
+# speeves is a DOMAIN user of DOMAIN,
+# but the server administrator wants to
+# check this user against groups in the 
+# htgroup file as: 
+
+# groupname: speeves userA userB
+
+username => speeves
+
+If you allow users to use B<Domain\Username> and restrict access
+using the C<require user username> or C<require group groupname> make
+sure to set the username with the domain included. The authorization 
+phase will be looking for C<Domain\Username> string.
+
+Example: require user mydomain\ramirezc
+
+Note
+
+This was shamelessly stolen from the authz method in Apache::AuthenSmb...
+  
+If you are using this module please let me know, I'm curious how many
+people there are that need this type of functionality.
+
+AUTHOR
+
+Shannon Eric Peevey <speeves@unt.edu>
+
+COPYRIGHT
+
+Copyright (c) 2004 Shannon Eric Peevey.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

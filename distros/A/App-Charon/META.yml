@@ -1,0 +1,38 @@
+---
+abstract: 'See charon'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  Test::More: '1'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Charon
+requires:
+  App::Genpass: '0'
+  Getopt::Long::Descriptive: '0'
+  HTML::Zoom: '0'
+  IO::All: '0'
+  IO::Async: '0'
+  IO::Socket::IP: '0'
+  JSONY: '0'
+  Module::Runtime: '0'
+  Moo: '2'
+  Net::Async::HTTP::Server::PSGI: '0'
+  Plack::App::Directory: '0'
+  Plack::App::File: '0'
+  Time::Duration::Parse: '0'
+  Try::Tiny: '0'
+  Web::Simple: '0'
+  namespace::clean: '0'
+  perl: '5.01'
+resources:
+  bugtracker: https://github.com/frioux/App-Charon/issues
+  homepage: https://github.com/frioux/App-Charon
+  repository: https://github.com/frioux/App-Charon.git
+version: '0.001003'

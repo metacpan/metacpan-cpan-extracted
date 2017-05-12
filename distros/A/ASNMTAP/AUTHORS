@@ -1,0 +1,82 @@
+# -----------------------------------------------------------------------
+# © Copyright 2003-2011 by Alex Peeters [alex.peeters@citap.be]
+# -----------------------------------------------------------------------
+
+# General - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Author       : Alex Peeters [alex.peeters@citap.be]
+Latest update: dd month 2011
+Version      : 3.002.003
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# AUTHORS FILE  - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+If you have contributed to ASNMTAP, you deserve to be on this list. 
+Contact us (see: AUTHORS) and we'll add you. 
+
+
+# PROJECT MANAGERS  - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Alex Peeters [alex.peeters@citap.be]
+
+
+# DEVELOPERS  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Yves Van den Hove <yvdhove@users.sourceforge.net>
+  * NEW perfparse_crontab_failed.sh
+  * NEW perfparse_debug.sh
+  * GrinderCaptureConverter.pl
+
+
+# BUGS REPORTED - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Yves Van den Hove <yvdhove@users.sourceforge.net>
+  * 1863109 createCommentsAndEventsArchiveTables at the end of the year (FIX)
+  * 1827421 reports.pl - reportTitle (FIX)
+  * 1822759 A first time config generate/install doesn't say what actions need to be done on a server (FIX)
+
+
+# FEATURE REQUEST - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Yves Van den Hove <yvdhove@users.sourceforge.net>
+  * 1727568 Bij wisselen omgeving op dezelfde pagina blijven.
+  * 1725445 Groeperen Mails
+  * 1768193 PDF issues with Adobe Acrobat 8
+  * 1768190 Please filter out the passwords from the HTML dump files for J2EE based Applications
+  * 1724056 Timeout for Webtransact
+  * 1706596 Collapse error summary
+
+
+Tom De Clercq <tomsworld@users.sourceforge.net> 
+  * 1507255 Detailed Statistics and Report Generation - output
+
+
+# CONTRIBUTORS  - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Yves Van den Hove <yvdhove@users.sourceforge.net>
+  * htmlToPdf.pl
+    FIX for 1768193 PDF issues with Adobe Acrobat 8
+  * detailedStatisticsReportGenerationAndCompareResponsetimeTrends.pl
+    FIX Use of uninitialized value in concatenation (.) or string at line 333
+ 
+
+# TESTERS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Testers wanted
+
+
+# DOC WRITERS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Doc writers wanted
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,0 +1,9 @@
+# $Id: MANIFEST,v 1.2 2000/09/26 20:13:09 cgilmore Exp $
+
+ChangeLog			History of this package
+INSTALL				Instructions for installing this package
+MANIFEST			This file
+Makefile.PL			Makefile generator
+AuthzCache.pm			The authorization cache module
+README				Get you started with this package
+SUPPORT				Links to support for this package

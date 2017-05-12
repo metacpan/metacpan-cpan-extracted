@@ -1,0 +1,54 @@
+---
+abstract: 'Module to try to perform an action, with various ways of retrying and sleeping between retries.'
+author:
+  - "Damien \"dams\" Krotkine"
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Action-Retry
+provides:
+  Action::Retry:
+    file: lib/Action/Retry.pm
+    version: 0.24
+  Action::Retry::Strategy:
+    file: lib/Action/Retry/Strategy.pm
+    version: 0.24
+  Action::Retry::Strategy::Constant:
+    file: lib/Action/Retry/Strategy/Constant.pm
+    version: 0.24
+  Action::Retry::Strategy::Fibonacci:
+    file: lib/Action/Retry/Strategy/Fibonacci.pm
+    version: 0.24
+  Action::Retry::Strategy::HelperRole::RetriesLimit:
+    file: lib/Action/Retry/Strategy/HelperRole/RetriesLimit.pm
+    version: 0.24
+  Action::Retry::Strategy::HelperRole::SleepCapping:
+    file: lib/Action/Retry/Strategy/HelperRole/SleepCapping.pm
+    version: 0.24
+  Action::Retry::Strategy::HelperRole::SleepTimeout:
+    file: lib/Action/Retry/Strategy/HelperRole/SleepTimeout.pm
+    version: 0.24
+  Action::Retry::Strategy::Linear:
+    file: lib/Action/Retry/Strategy/Linear.pm
+    version: 0.24
+requires:
+  Math::Fibonacci: 0
+  Module::Runtime: 0
+  Moo: 0
+  Scalar::Util: 0
+  Time::HiRes: 0
+resources:
+  repository: git://github.com/dams/Action-Retry.git
+version: 0.24

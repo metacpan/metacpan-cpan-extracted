@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# earase all IPC shmid of current user (or user specified in argument)
+# DISCLAMER don't use this on a production machine ! this script don't care
+# about applications that own segments.
+
+user=$1
+[ -z "$user" ] && user=$LOGNAME
+
+if [ "`uname`" = "Linux" ]; then
+    ipcs -m | awk "/^0x/ && /$user/ {print \$2}" | while read id; do
+        ipcrm shm $id
+    done &&
+    ipcs -s | awk "/^0x/ && /$user/ {print \$2}" | while read id; do
+        ipcrm sem $id
+    done
+else
+    ipcs | awk "/^s/ && /$user/ {print \$2}" | while read id; do
+        ipcrm -s $id
+    done && 
+    ipcs | awk "/^m/ && /$user/ {print \$2}" | while read id; do
+        ipcrm -m $id
+    done
+fi

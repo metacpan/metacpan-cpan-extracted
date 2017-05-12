@@ -1,0 +1,9 @@
+appname: "AtomBus"
+charset: "UTF-8"
+
+atombus:
+    page_size: 100
+    db:
+        dsn: "dbi:Pg:dbname=atombus"
+        user: "joe"
+        pass: "momma"

@@ -1,0 +1,26 @@
+[% META title = "COMMENT" %]
+You can add html tag such as &lt;br&gt;, &lt;p&gt;&lt;/p&gt;, &lt;b&gt;&lt;/b&gt; to format your comment.
+[% FormBuilder.render %]
+<!--
+<form method="post" action="[% Catalyst.uri_for('/comment/add_do') %]" name="add_comment">
+<table cellpadding="2" cellspacing="2">
+<tbody>
+<tr>
+<td style="vertical-align: top;"><b>Comment</b> :<br> 
+You can add html tag such as &lt;br&gt;, &lt;p&gt;&lt;/p&gt;, &lt;b&gt;&lt;/b&gt; to format your comment.
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top;"><textarea cols="60" rows="10"
+name="text_comment" value="">[% comment %]</textarea><br>
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top;">
+<button name="btn"
+value="preview">Preview</button><button name="btn" value="submit">Submit</button><br>
+</td>
+</tr>
+</tbody>
+</table>
+-->

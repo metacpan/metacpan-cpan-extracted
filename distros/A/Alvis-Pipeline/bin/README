@@ -1,0 +1,51 @@
+$Id: README,v 1.2 2005/09/30 16:19:37 mike Exp $
+
+This directory contains three simple programs that exercise the
+Alvis::Pipeline module:
+
+* alvis-pipeline-put.pl -- generates a sequence of XML documents and
+	pushes them down a pipe at random intervals.
+* alvis-pipeline-filter.pl -- reads documents from an input pipe, and
+	writes that straight back down an output pipe.
+* alvis-pipeline-get.pl -- reads documents from an input pipe and
+	prints them.
+
+These can be be plumbed together to make an elementary pipeline
+(though not a very exciting one as the generated documents are small
+and dull, and the filter in the middle of the pipeline doesn't do
+anything to them.)  Try this:
+
+In window 1:
+	alvis-pipeline-get.pl <readport> <spooldir>
+	e.g. alvis-pipeline-get.pl 20004 /tmp/spool1
+
+In window 2:
+	alvis-pipeline-filter.pl <readport> <spooldir> <writehost> <writeport>
+	e.g. alvis-pipeline-filter.pl 12344 /tmp/spool2 localhost 20004
+
+In window 3:
+	alvis-pipeline-put.pl <writehost> <writeport>
+	e.g. alvis-pipeline-put.pl localhost 12344
+
+In these invocations, the command-line arguments represent Internet
+port numbers, hostnames and spool directories.
+
+Each program that acts as a reader (i.e. "get" and "filter") must
+specify the port to listen on and the spool directory in which to
+accumulate acquired files that have not yet been requested.  No two
+pipeline components on the same machine may use the same spool
+directory, or chaos will ensue.  (### A later release might enforce
+this restriction using locks.)  In this example, the consumer keeps
+its temporary files in /tmp/spool1 and the filter in /tmp/spool2.  You
+may use any other directories you wish, so long as they are different
+from each other, and each is empty or non-existent at startup time.
+
+Each program that acts as a writer (i.e. "filter" and "put") must
+specify what host and port to write documents to.  In this example,
+all three program run on the same machine, so both writers specify
+localhost.
+
+The reading port of "get" must match the writing port of "filter" (in
+the example, 20004), and its reading port of "filter" must match the
+writing port of "put" (in the example, 12344).
+

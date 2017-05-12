@@ -1,0 +1,92 @@
+{
+   "abstract" : "About \"SPEED\" is Japanese female vocal/dance group",
+   "author" : [
+      "@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.5",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Speed",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "DateTime" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Speed" : {
+         "file" : "lib/Acme/Speed.pm",
+         "version" : "0.01"
+      },
+      "Acme::Speed::Member::ArakakiHitoe" : {
+         "file" : "lib/Acme/Speed/Member/ArakakiHitoe.pm"
+      },
+      "Acme::Speed::Member::Base" : {
+         "file" : "lib/Acme/Speed/Member/Base.pm"
+      },
+      "Acme::Speed::Member::ImaiEriko" : {
+         "file" : "lib/Acme/Speed/Member/ImaiEriko.pm"
+      },
+      "Acme::Speed::Member::ShimabukuroHiroko" : {
+         "file" : "lib/Acme/Speed/Member/ShimabukuroHiroko.pm"
+      },
+      "Acme::Speed::Member::UeharaTakako" : {
+         "file" : "lib/Acme/Speed/Member/UeharaTakako.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kitak/p5-Acme-Speed/issues"
+      },
+      "homepage" : "https://github.com/kitak/p5-Acme-Speed",
+      "repository" : {
+         "url" : "https://github.com/kitak/p5-Acme-Speed.git",
+         "web" : "https://github.com/kitak/p5-Acme-Speed"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Keisuke KITA <kei.kita2501@gmail.com>"
+   ]
+}

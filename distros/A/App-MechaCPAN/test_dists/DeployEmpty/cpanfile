@@ -1,0 +1,3 @@
+requires 'perl', '5.012000';
+
+on 'configure' => sub { requires 'Test::More' };

@@ -1,0 +1,9 @@
+$Id: Changes,v 1.4 2006/01/02 10:04:06 c10232 Exp $ -*-text-*-
+Revision history for Perl extension Apache::AxKit::Plugin::QueryStringCacheRegexp.
+
+0.03 - initial release
+
+0.04 - handle multiple-valued CGI-Parameters (as pointed out by Ken Neighbors)
+     - use 'our', Perl >= 5.6.0 required.
+     - cleanup Makefile.PL
+     - added pod.t

@@ -1,0 +1,22 @@
+Revision history for Perl extension Anansi::ObjectManager.
+
+0.01  Sat Apr  6 17:57:11 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Anansi::ObjectManager
+0.02  Wed Apr 10 11:05:23 2013
+	- deprecated perl issues fixed.
+0.03  Wed Apr 10 12:08:09 2013
+	- munged email address.
+0.04  Sun May  5 11:30:23 2013
+	- modified POD.
+0.05  Sun May  5 14:06:56 2013
+	- basic POD example corrections.
+0.06  Sun May  5 14:15:04 2013
+	- package version number correction.
+0.07  Mon May 20 11:05:29 2013
+	- modified the POD to reflect more concise examples and include method parameter.
+0.08  Mon Jun 03 13:10:45 2013
+	- modified "identification" subroutine to accommodate internal ordinal numbers.
+	- fixed "user" subroutine to return an array instead of a list.
+	- fixed "uses" subroutine to return an array instead of a list.
+	- modified the POD.

@@ -1,0 +1,8 @@
+# iptables
+*/12 * * * * /usr/local/bin/perl /usr/local/bin/sl_cp_bouncer
+
+# apache
+* * * * * /usr/local/bin/perl /usr/local/bin/sl_httpd_watch
+
+# perlbal
+* * * * * /usr/local/bin/perl /usr/local/bin/sl_perlbal_watch

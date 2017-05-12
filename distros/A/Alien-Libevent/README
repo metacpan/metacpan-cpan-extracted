@@ -1,0 +1,26 @@
+NAME
+    Alien::Libevent - Wrapper for installing libevent v1.4.13
+
+DESCRIPTION
+    Alien::Libevent is a wrapper to install libevent library. Modules that
+    depend on libevent can depend on Alien::Libevent and use the CPAN shell
+    to install it for you.
+
+    Win32 is currently not supported, please help supporting it if you're
+    interested.
+
+AUTHOR
+    Johannes Plunien <plu@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2009 by Johannes Plunien
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    * Alien
+
+REPOSITORY
+    <http://github.com/plu/alien-libevent/>
+

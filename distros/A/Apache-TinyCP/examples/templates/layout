@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>mysite.com :: [% title %]</title>
+    <link rel="shortcut icon" href="/images/favicon.png" type="image/png"/>
+    <link rel="stylesheet" href="/css.css" title="Simple" />
+  </head>
+  <body>
+    <div id="content">
+
+      <div id="banner">
+        <h1>mysite.com</h1>
+      </div>
+
+      <div id="menu">
+        <ul>
+          <li class="first"><a href="/HomePage">HomePage</a></li>
+          <li><a href="/gallery">Gallery</a></li>
+          <li><a href="/downloads/">Downloads</a></li>
+          <li><a href="/ContactMe">Contact</a></li>
+        </ul>
+      </div>
+
+      <div id="header">
+        <h2>[% title %]</h2>
+      </div>
+
+      <div id="body">
+        <hr/>
+          [% content %]
+        <hr/>
+      </div>
+
+      <div id="footer">
+        Unless otherwise explicity noted, all content on this website is
+        copyright (c) Me.
+      </div>
+
+    </div>
+
+  </body>
+</html>

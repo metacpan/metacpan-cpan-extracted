@@ -1,0 +1,80 @@
+filename(./reverse)
+formtitle(Read Everything Backwards)
+proc(reverseFunction)
+desc(reverseDesc)
+quit(exitFunction)
+
+##
+
+=head1 NAME
+
+reverse - an application built using Navegante
+
+=head1 SYNOPSIS
+
+Build the application:
+
+  $ navegante examples/reverse
+
+Use the newly created file I<reverse> as a CGI.
+
+=head1 DESCRIPTION
+
+This application behaves as a CGI and it reverses the content being
+browsed. The specific DSL section is:
+
+  cginame(./reverse)
+  formtitle(Read Everything Backwards)
+  proc(reverseFunction)
+  desc(reverseDesc)
+  quit(exitFunction)
+
+=head1 FUNCTIONS
+
+=head2 C<exitFunction>
+
+The function that is called when the user follows the link to
+leave the application. This is defined in the DSL by the 
+C<quit> statement.
+
+=cut
+
+sub exitFunction {
+    return "i got out!";
+}
+
+=head2 C<reverseDesc>
+
+This function is prints the description of the create application. This
+is defined in the DSL by the C<desc> statement.
+
+=cut
+
+sub reverseDesc {
+    return "This makes every content reverse.";
+}
+
+=head2 C<reverseFunction>
+
+This is the function used to actually process the conten. This
+is defined in the DSL by the C<proc> statement.
+
+XXX - _loadit
+
+=cut
+
+sub reverseFunction {
+    my $item = shift;
+    reverse($item); 
+}
+
+=head1 AUTHOR
+
+Nuno Carvalho, smash@cpan.org
+
+=head1 SEE ALSO
+
+TODO
+
+=cut
+

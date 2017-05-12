@@ -1,0 +1,167 @@
+
+                                 Identification:
+DHSVER  = 'UKDHS 2001 Apr 3 '  / Data handling version
+TELESCOP= 'UKIRT   '           / Telescope name
+INSTRUME= 'Michelle'           / Instrument name
+OBSERVER= 'nobody  '           / Observers names
+OBSREF  = '00      '           / PATT (or equivalent) reference
+PROJECT = 'U/04A/46'           / Time-allocation code
+MSBID   = '25c225f3170e06695847113f1c478b28' / Id min.-schedulable block
+USERID  = 'nobody  '           / ORAC Userid
+
+                                 eStar headers:
+RMTAGENT= 'none    '           / Name of remote agent
+AGENTID = 'none    '           / Unique identifier for remote agent
+
+OBJECT  = 'BS3262  '           / Object name from telescope
+
+                                 Data Reduction:
+RECIPE  = 'STANDARD_STAR'      / Data reduction recipe to be used
+OBSNUM  =                   21 / Observation number
+GRPNUM  =                    7 / The number of the group applied to all
+GRPMEM  =                    T / Is the observation a group member?
+STANDARD=                    T / Whether observation is a standard
+NOFFSETS=                    0 / Number of offset positions
+OBSTYPE = 'OBJECT  '           / Type (BIAS|DARK|ARC|FLAT|OBJECT|SKY)
+
+                                 Astrometric and time information:
+UTDATE  = '20040426'           / UT date in yyyymmdd format
+DATE-OBS= '2004-04-26T07:37:52Z' / Date and time (UTC) of start of observation
+DATE-END= '2004-04-26T07:38:37Z' / Date and time (UTC) of end   of observation
+EQUINOX =             2000.000 / [yr] Equinox of object position
+CTYPE1  = 'Detector Columns'   / Label for axis 1
+CRPIX1  =                1.000 / Pixel of reference point axis 1
+CRVAL1  =               0.1067 / Co-ordinate value of axis 1
+CDELT1  =               0.2134 / Co-ordinate increment along axis 1
+CUNIT1  = 'arcsec  '           / Units for axis 1
+CTYPE2  = 'Detector Rows'      / Label for axis 2
+CRPIX2  =                1.000 / Pixel of reference point axis 2
+CRVAL2  =               0.1067 / Co-ordinate value of axis 1
+CDELT2  =               0.2134 / Co-ordinate increment along axis 2
+CUNIT2  = 'arcsec  '           / Units for axis 2
+CROTA2  =                -90.0 / [deg] Angle DEC axis wrt axis 2 ccw
+RABASE  =            8.3344597 / [h] RA of base position
+DECBASE =           27.2174833 / [deg] Declination of base position
+TRAOFF  =                0.000 / [arcsec] Telescope offset in RA
+TDECOFF =                0.000 / [arcsec] Telescope offset in Dec
+AMSTART =                1.411 / Airmass at start of observation
+AMEND   =                1.415 / Airmass at end of observation
+
+                                 Instrument aperture:
+APER_X  =                7.188 / [arcsec] Aperture X axis coordinate
+APER_Y  =               -8.282 / [arcsec] Aperture Y axis coordinate
+
+PIXELSIZ=               0.2134 / [arcsec] Pixel size
+
+                                 Instrument configuration:
+OBSTIME = '17.1500445528'      / [s] Duration of observation
+EXP_TIME=             2.750000 / [s] Exposure time for each coadd
+NEXP    =                    3 / Number of exposures in integration
+NREADS  =                   56 / Number of reads per exposure
+DET_MODE= 'NDCHOP  '           / Observing mode
+GAIN    =                180.0 / [electrons/ADU] Gain
+SPD_GAIN= 'Normal'             / Readout speed
+READINT =             0.050000 / [s] Interval between reads
+DET_NRST=                    1 / Number of detector resets before first
+exposure
+DET_RSTD=             0.010000 / [s] Time twixt final reset & first read
+CHPDWELL=             2.858341 / [s] Chop dwell
+CHPDELAY=             0.015000 / [s] Chop delay
+CHOPBEAM= 'B       '           / Chopping beam name (A|B|MIDDLE)
+DCOLUMNS=                  320 / [pixel] Number of detector columns
+DROWS   =                  240 / [pixel] Number of detector rows
+RDOUT_X1=                    1 / Start column of array readout
+RDOUT_X2=                  320 / End   column of array readout
+RDOUT_Y1=                    1 / Start row    of array readout
+RDOUT_Y2=                  240 / End   row    of array readout
+
+INSTMODE= 'spectroscopy'       / Camera mode (imaging|spectroscopy)
+GRATNAME= 'MedN2   '           / Grating name
+GRATPOS =               8.6477 / [um] Grating wavelength
+GRATDISP=             0.001562 / [um/pixel] Grating dispersion
+GRATORD =                    1 / Grating order
+GRATANG =               9.3575 / Grating Angle
+SLITNAME= '2_pixels'           / Slit name
+SLITANG =               5.7494 / [deg] Slit angle
+FILTER  = 'I88B10  '           / Combined filter name
+FILTER1 = 'F88B10  '           / Filter A name
+FILTER2 = 'F14SA   '           / Filter B name
+FOCNAME = 'MedN2   '           / Focus named position
+FOC_MM  =               3.5000 / [mm] Focus position
+IRDEG   =              -5.7520 / [deg] Image rotator angle
+GFLEXCOR= 'on      '           / Whether grating flexure correction enabled
+CALSELN = 'clear   '           / Calibration selection
+WPLANGLE=               0.0000 / [deg] Waveplate angle
+SAMPLING= '1x2     '           / Oversampling type used
+DETINCR =                1.000 / [pixel] Increment between scan positions
+DETNINCR=                    2 / Number of scan positions in scan
+POLARISE=                    F / Whether or not using polariser
+CHPANGLE=                0.000 / [deg] Position angle of the chop
+CHPTHROW=               10.360 / [arcsec] Throw of the chop wrt middle position
+CHOPFREQ=             0.174927 / [Hz] Chop frequency
+NULL_CYC=                    0 / Cycles prior to data taking
+NULL_EXP=                    0 / Exposures prior to data taking
+NULL_NDR=                    1 / ND reads prior to data taking
+WAVEFORM= 'mch_ndr_sw'         / Waveform set name
+
+                                 Environment:
+AIRTEMP =               -0.264 / [degC] Air temperature
+BARPRESS=              611.845 / Ambient pressure
+DEWPOINT=               -8.626 / [degC] Dewpoint
+DOMETEMP=                0.240 / [degC] Dome temperature
+HUMIDITY=               53.413 / Relative Humidity
+MIRR_NE =                1.409 / [degC] Mirror temperature NE
+MIRR_NW =                1.734 / [degC] Mirror temperature NW
+MIRR_SE =                2.061 / [degC] Mirror temperature SE
+MIRR_SW =                1.229 / [degC] Mirror temperature SW
+MIRRBTNW=                5.645 / [degC] Mirror bottom temp. SW
+MIRRTPNW=                4.346 / [degC] Mirror top temp. SW
+SECONDAR=                0.656 / [degC] Temperature of secondary
+TOPAIRNW=                1.136 / [degC] Top air NW
+TRUSSENE=                2.354 / [degC] Truss leg ENE
+TRUSSWSW=                0.556 / [degC] Truss leg WSW
+WIND_DIR=              285.490 / [deg] Wind direction, azimuth
+WIND_SPD=               38.189 / [km/s] Wind speed
+CSOTAU  =                0.124 / Tau at 225 GHz from CSO
+TAUDATE = '2004-04-26T07:35'   / Time and date of Tau reading
+
+                                 Engineering:
+CNFINDEX=             11843869 / Configuration index
+ARRAYTMP=                10.07 / [K] Array temperature
+ARRYTMP2=                 5.73 / [K] Array temperature ch.2
+LN2TEMP =                80.60 / [K] Temperature of LN2 can
+CCC1_TMP=                56.80 / [K] CCC 1st stage temp.
+GRS_TEMP=                80.60 / [K] Grad. rad. shield temp.
+CCC2_TMP=                16.80 / [K] CCC 2nd stage temp.
+FRS_TEMP=                78.60 / [K] Front rad. shield temp.
+GRTDRTMP=                20.80 / [K] Grating drum temperature
+SRM_TEMP=                22.00 / [K] SRM temperature
+IMSTPTMP=                22.70 / [K] Imiger stop temperature
+JT1_TEMP=                59.20 / [K] JT 1st stage temperature
+JT2_TEMP=                15.70 / [K] JT 2nd stage temperature
+JT4KTEMP=                 4.60 / [K] JT 4K stage temperature
+FILT_TMP=                71.90 / [K] Filter motor temperature
+VRSTUC  =               -2.000 / [V] Bias voltage: vrstuc
+VCASUC  =               -3.500 / [V] Bias voltage: vcasuc
+VNEG    =               -7.000 / [V] Bias voltage: vneg
+VDETGRD =               -5.100 / [V] Bias voltage: vdetgrd
+VGG1    =                0.000 / [V] Bias voltage: vgg1
+VGG4    =               -1.500 / [V] Bias voltage: vgg4
+VDETGRV =               -6.800 / [V] Bias voltage: vdetgrv
+VGG2    =               -1.800 / [V] Bias voltage: vgg2
+VGG3    =               -1.650 / [V] Bias voltage: vgg3
+IMUX    =               -1.600 / [V] Bias voltage: imux
+VSHPCHG =               -3.000 / [V] Bias voltage: vshpchg
+VSH     =               -5.000 / [V] Bias voltage: vsh
+VSSD    =               -5.000 / [V] Bias voltage: vssd
+VSS     =               -5.000 / [V] Bias voltage: vss
+VPW     =               -5.200 / [V] Bias voltage: vpw
+VCLOUT  =               -4.300 / [V] Bias voltage: vclout
+VCLCOL  =               -3.000 / [V] Bias voltage: vclcol
+VCAP    =               -5.000 / [V] Bias voltage: vcap
+VOFFSET =               -2.700 / [V] Bias voltage: voffset
+VGATELO =               -6.000 / [V] Clock voltage: vgatelow
+VGATEHI =                0.000 / [V] Clock voltage: vgatehigh
+
+                                 Subheader:
+DINDEX  =                    1 / Ceci n'est pas un comment

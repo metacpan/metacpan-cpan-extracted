@@ -1,0 +1,35 @@
+/*
+    Black & white color scheme for XHMTL ChangeLog rendition
+    $Id: black-white.css 2 2009-01-07 11:54:42Z rjray $
+ */
+
+body {
+  color:      black;
+  background: white;
+}
+
+hr {
+  color:      black;
+  background: black;
+}
+
+div.changelog-release-div:hover {
+  background: #f0f0f0;
+}
+
+.changelog-toc-link {
+  color:      #a0a0a0;
+}
+
+.changelog-toc-link:hover {
+  color:      black;
+  background: #d0d0d0;
+}
+
+.changelog-html-a:hover {
+  background: #d0d0d0;
+}
+
+.changelog-release-file-action {
+  color:      #a0a0a0;
+}

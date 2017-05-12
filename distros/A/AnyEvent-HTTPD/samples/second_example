@@ -1,0 +1,31 @@
+#!/opt/perl/bin/perl
+use common::sense;
+use AnyEvent;
+use AnyEvent::HTTPD;
+
+my $cvar = AnyEvent->condvar;
+
+my $httpd = AnyEvent::HTTPD->new (port => 19090);
+
+$httpd->reg_cb (
+   '' => sub {
+      my ($httpd, $req) = @_;
+
+      $req->respond ({ content => [ 'text/html',
+         "<html><body><h1>Testing return types...</h1>"
+         . "<img src=\"/image/bshttp.png\" />"
+         . "</body></html>"
+      ]});
+   },
+   '/image/bshttp.png' => sub {
+      $_[0]->stop_request;
+
+      open IMG, 'bshttp.png'
+         or do { $_[1]->respond (
+                    [404, 'not found', { 'Content-Type' => 'text/plain' }, 'Fail!']);
+                    return };
+      $_[1]->respond ({ content => [ 'image/png', do { local $/; <IMG> } ] });
+   },
+);
+
+$cvar->wait;

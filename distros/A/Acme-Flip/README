@@ -1,0 +1,25 @@
+NAME
+    Acme::Flip - Replace alphanumeric characters in text with ones that look
+    flipped
+
+SYNOPSIS
+        use Acme::Flip;
+        binmode STDOUT, ':encoding(utf8)';
+        print Acme::Flip::flip ('Hello world');
+
+DESCRIPTION
+    Replace alphanumeric characters in text with ones that look flipped.
+
+BUGS
+    Not all capitalizations, characters and numbers have adequate "flipped"
+    representation
+
+AUTHOR
+    Lubomir Rintel "<lkundrak@v3.sk>"
+
+COPYRIGHT
+    Copyright 2009 Lubomir Rintel, All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

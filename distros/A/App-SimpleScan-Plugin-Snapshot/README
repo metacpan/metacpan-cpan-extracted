@@ -1,0 +1,33 @@
+App-SimpleScan-Plugin-Snapshot version 0.02
+
+Provides a snapshot feature for simple_scan.
+
+Snapshots are HTML framesets containing readable
+debugging information from the WWW::Mechanize object:
+ - the request
+ - the response
+ - the cookie jar
+ - the actual page content
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+App::SimpleScan, WWW::Mechanize::Pluggable, WWW::Mechanize::Plugin::Snapshot.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Joe McMahon and Yahoo!
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

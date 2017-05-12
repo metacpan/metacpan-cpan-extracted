@@ -1,0 +1,8 @@
+
+cerebro:~/src/App-Manager# clr;rm -rf /var/spool/appman/test;make&&perl -Mblib appman install test -vvv -C ~/cvs/gnome/gimp/libgimp make install
+make && perl -Mblib appman info test
+
+- better shared library creation(!)
+- MAX_PATH
+
+

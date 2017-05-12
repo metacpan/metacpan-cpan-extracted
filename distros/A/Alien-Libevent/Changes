@@ -1,0 +1,17 @@
+Revision history for Alien-Libevent
+
+0.01004  Tue Jan 05 2010
+         - Fix broken behaviour when answering
+           'really install?' with 'no' # BinGOs++
+
+0.01003  Sat Jan 01 2010
+         - Removed Devel::CheckLib based test
+
+0.01002  Sat Jan 01 2010
+         - Added test using Devel::CheckLib
+
+0.01001  Wed Dec 30 2009
+         - Fix Changes
+
+0.01000  Wed Dec 30 2009
+         - Initial release.

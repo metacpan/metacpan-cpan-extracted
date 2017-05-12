@@ -1,0 +1,76 @@
+{
+   "abstract" : "interactive sieve shell",
+   "author" : [
+      "Mario Domgoergen <dom@math.uni-bonn.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Siesh",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::String" : 0,
+            "Test::More" : 0,
+            "Test::Output" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Authen::SASL" : 0
+         },
+         "requires" : {
+            "Config::Find" : 0,
+            "Config::Tiny" : 0,
+            "File::Temp" : 0,
+            "Getopt::Long" : 0,
+            "IO::File" : 0,
+            "IO::Handle" : 0,
+            "IO::Interactive" : 0,
+            "IO::Prompt" : 0,
+            "IO::Socket::SSL" : 0,
+            "IPC::System::Simple" : 0,
+            "Net::ManageSieve" : "0.08",
+            "Pod::Usage" : 0,
+            "Term::ShellUI" : 0,
+            "autodie" : 0,
+            "parent" : 0
+         }
+      }
+   },
+   "provides" : {
+      "App::Siesh" : {
+         "file" : "lib/App/Siesh.pm",
+         "version" : "0.21"
+      },
+      "App::Siesh::Batch" : {
+         "file" : "lib/App/Siesh/Batch.pm",
+         "version" : 0
+      },
+      "Net::ManageSieve::Siesh" : {
+         "file" : "lib/Net/ManageSieve/Siesh.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/mdom/app-siesh"
+      }
+   },
+   "version" : "0.21"
+}

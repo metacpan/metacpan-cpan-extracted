@@ -1,0 +1,36 @@
+0.11    2014-09-12
+        Add is_tablet to BrowserDetect response
+
+0.10    2012-11-14
+        Errors in the plugins no longer cause App::Cerberus to die.
+        Minor typos in the the BrowserDetect plugin fixed
+        Thanks to @gittex for both patches
+
+0.09    2012-09-27
+        Include the request_count per $limit in the Throttle info
+
+0.08    2012-08-06
+        Renamed Changes.txt to Changes
+
+0.07    2012-07-28
+        Moved App::Cerberus::Client into its own distro
+
+0.06    2012-07-24
+        Add App::Cerberus::Client
+
+0.05    2012-07-24
+        Added note about Geo::IP failing tests and why
+
+0.04    2012-07-24
+        Only open the GeoIP database after forking, otherwise some lookups fail
+        under load
+
+0.03    2012-07-24
+        Removed some debugging
+
+0.02    2012-07-24
+        Corrected the install docs for GeoIP plugin
+        cerberus.pl wasn't being installed
+
+0.01    2012-07-23
+        First release

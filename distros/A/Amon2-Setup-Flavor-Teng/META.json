@@ -1,0 +1,78 @@
+{
+   "abstract" : "Teng flavor for Amon2",
+   "author" : [
+      "Kazuhiro Shibuya"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.0.53",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amon2-Setup-Flavor-Teng",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Wordlist::hanekomu" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Amon2" : "3.53",
+            "Amon2::Plugin::DBI" : "0.08",
+            "DBD::SQLite" : "1.37",
+            "Teng" : "0.15",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Amon2::Setup::Flavor::Teng" : {
+         "file" : "lib/Amon2/Setup/Flavor/Teng.pm",
+         "version" : "0.05"
+      },
+      "Amon2::Setup::Flavor::TengWithoutLoader" : {
+         "file" : "lib/Amon2/Setup/Flavor/TengWithoutLoader.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ka2u/Amon2-Setup-Flavor-Teng/issues"
+      },
+      "homepage" : "https://github.com/ka2u/Amon2-Setup-Flavor-Teng",
+      "repository" : {
+         "url" : "https://github.com/ka2u/Amon2-Setup-Flavor-Teng.git",
+         "web" : "https://github.com/ka2u/Amon2-Setup-Flavor-Teng"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>",
+      "memememomo <memememomo@gmail.com>",
+      "Hiroaki Yoshida <yoshidaster@gmail.com>",
+      "Kazuhiro Shibuya <stevenlabs@gmail.com>"
+   ]
+}

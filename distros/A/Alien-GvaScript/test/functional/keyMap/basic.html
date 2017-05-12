@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <link href="../../test.css" rel="stylesheet" type="text/css">
+  <link href="../../images/GvaScript.css" rel="stylesheet" type="text/css">
+  <script src="../../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+
+  <style type="text/css">
+    #current_cell {background-color: blue; color: yellow;}
+    tt {font-size:1.2em;background-color:#eee;}
+    table {border-width: 2px;}
+    td {width: 20px; text-align: center;}
+    td.rborder {border-right: 2px solid black;}
+    tr.bborder td {border-bottom: 2px solid black;}
+  </style>
+
+<script>
+
+function Red(event) {
+  $('current_cell').style.backgroundColor="red";
+  Event.stop(event);
+}
+
+function Up() {
+  var cell = $('current_cell');
+  var colIndex = cell.cellIndex;
+  var row = cell.parentNode;
+  if (row.rowIndex > 0) {
+    cell.id = null;
+    row.parentNode.rows[row.rowIndex - 1].cells[colIndex].id = "current_cell";
+  }
+}
+
+function Down() {
+  var cell = $('current_cell');
+  var colIndex = cell.cellIndex;
+  var row = cell.parentNode;
+  if (row.rowIndex + 1 < row.parentNode.rows.length) {
+    cell.id = null;
+    row.parentNode.rows[row.rowIndex + 1].cells[colIndex].id = "current_cell";
+  }
+}
+
+function Left() {
+  var cell = $('current_cell');
+  if (cell.cellIndex > 0) {
+    cell.id = null;
+    cell.parentNode.cells[cell.cellIndex - 1].id = "current_cell";
+  }
+}
+
+function Right() {
+  var cell = $('current_cell');
+  if (cell.cellIndex + 1 < cell.parentNode.cells.length) {
+    cell.id = null;
+    cell.parentNode.cells[cell.cellIndex + 1].id = "current_cell";
+  }
+}
+
+function fill_cell_from_key(event) {
+  $('current_cell').innerHTML = event.keyName; 
+  Event.stop(event);
+}
+
+
+function say(msg) {
+  return function() {alert(msg)};
+}
+
+
+var keymap;
+document.observe('dom:loaded', function() {
+  var C_X_map = {A: say('A'),
+                 B: say('B'),
+                 R: GvaScript.KeyMap.Prefix({K: say('Ctrl-X R K'),
+                                          O: say('Ctrl-X R O')})};
+
+  var rules   = {UP:     Up, 
+                 DOWN:   Down, 
+                 LEFT:   Left, 
+                 RIGHT:  Right, 
+                 RETURN: Red,
+                 27:     say('no escape from here'),
+
+                 C_X: GvaScript.KeyMap.Prefix(C_X_map),
+
+                 REGEX: [ ["",   /[0-9]/,             fill_cell_from_key],
+                          ["C_", /^[aeiou]$/i,        fill_cell_from_key],
+                          [null, "RETURN|TAB|ESCAPE", add_msg           ] ]};
+
+  keymap = new GvaScript.KeyMap(rules);
+
+  keymap.observe("keydown", 'table');
+
+  $('table').focus();
+});
+
+
+function push_grab_all() {
+  keymap.rules.push(GvaScript.KeyMap.MapAllKeys(add_msg));
+}
+
+function push_ignore_all() {
+  keymap.rules.push(GvaScript.KeyMap.MapAllKeys(function () {}));
+}
+
+function push_navigate_divs() {
+  var cur_div = 3;
+
+  var tmp_rules = {
+    UP : function () {
+      if (cur_div > 1) {
+        document.getElementById("d" + cur_div).style.background = "";
+        cur_div -= 1;
+        document.getElementById("d" + cur_div).style.background = "yellow";
+      }
+    },
+    DOWN : function () {
+      if (cur_div < 4) {
+        document.getElementById("d" + cur_div).style.background = "";
+        cur_div += 1;
+        document.getElementById("d" + cur_div).style.background = "yellow";
+      }
+    },
+    REGEX: [[null, '.*', function () {}]]
+  }
+
+  keymap.rules.push(tmp_rules);
+}
+
+function log_rules() {
+  $A(keymap.rules).each(function(r, i) {
+    r = $H(r);
+    var msg = i + ': ';
+    r.keys().each(function(k) {
+      msg += ('<br/>\t<strong>'+k+ ':</strong> '+r.get(k)+'<br />');
+    });
+    log(msg);
+  });
+}
+
+function log(msg) {
+  $('logs').innerHTML += "<div class='msg'> >> "+msg+" </div>" ;
+  $('logs').scrollTop  = 99999; 
+}
+function pop() {
+  keymap.rules.pop();
+}
+function add_msg(event) {
+  var msg = event.keyModifiers + event.keyName + " / " +  event.keyCode;
+  log(msg);
+}
+</script>
+</head>
+
+<body>
+
+[<a href="#" onclick="log_rules()">KeyMap Rules</a>]
+[<a href="#" onclick="$('logs').update()">Clear</a>]
+
+<div id="logs"></div>
+
+<h1>Keymap Example</h1>
+
+<div id="d1">Use arrow keys to move the cursor in cells.</div>
+<div id="d2">Press RETURN to color a cell.</div>
+<div id="d3">Type digits or Ctrl-vowels to insert content in cells.</div>
+<div id="d4">Try combinations <tt>Ctrl-X A</tt>, <tt>Ctrl-X B</tt>, 
+     <tt>Ctrl-X R K</tt>, <tt>Ctrl-X R O</tt>.</div>
+
+<br/>
+
+<table id="table" border="1" tabindex="0">
+<tr>
+<td>&nbsp;</td><td>1</td><td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+<td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td><td>4</td><td class="rborder">2</td><td>&nbsp;</td><td>&nbsp;</td>
+<td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+</tr>
+
+<tr class="bborder">
+<td>8</td><td>7</td><td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+<td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td><td>&nbsp;</td><td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+<td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td><td>&nbsp;</td><td class="rborder">&nbsp;</td><td>&nbsp;</td>
+<td id="current_cell">&nbsp;</td>
+<td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+</tr>
+
+<tr class="bborder">
+<td>&nbsp;</td><td>&nbsp;</td><td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+<td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td><td>&nbsp;</td><td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+<td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td><td>&nbsp;</td><td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+<td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td><td>&nbsp;</td><td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+<td class="rborder">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+</tr>
+
+</table>
+
+<br/>
+<em>Use buttons below to push new rules or pop to 
+previous rules.</em>
+<br/><br/>
+
+<button onclick=push_grab_all()>Grab all</button>
+<button onclick=push_ignore_all()>Ignore all</button>
+<button onclick=push_navigate_divs()>Navigate divs</button>
+<button onclick=pop()>Pop</button>
+
+</body>
+</html>

@@ -1,0 +1,111 @@
+Revision history for App-CPAN2Pkg
+
+3.004     2014-06-12 14:04:24+02:00 Europe/Paris
+ - urls shouldn't have newlines (gh#4)
+
+3.003     2014-04-04 14:34:35+02:00 Europe/Paris
+ - fix Moose enum warning
+ - make it work with dzil v5
+ - add env var CPAN2PKG_NO_CPANP_X to skip "cpanp x"
+
+3.002     2012-10-29 13:47:56 Europe/Paris
+ - mageia: allow only 2 urpm instances at the same time to prevent fork pikes
+
+3.001     2012-10-09 13:51:44 Europe/Paris
+ - tk ui: allow user to mark a module as available
+ - tk ui: prevent empty module creation
+ - tk ui: "clean all" button now below the hlist
+
+3.000     2012-10-09 11:08:45 Europe/Paris
+ - moving to dzpba-jquelin 3.x
+ - mageia: waiting only 1 minute for index (bs now pauses by itself)
+ - mageia: prevent warning when bs ate the submission
+ - prereqs: prevent Module::AutoInstall to kick in
+ - text ui: clearer internal cpan2pkg information
+
+**
+
+2.122690  2012-09-25 15:51:35 Europe/Paris
+ - new text interface available
+
+2.122620  2012-09-18 13:44:38 Europe/Paris
+ - using official (yet hidden) mageia bs api instead of parsing html
+
+2.120460  2012-02-15 09:39:46 Europe/Paris
+ - fix pod name of bin/cpan2pkg
+
+2.120370  2012-02-06 09:53:42 Europe/Paris
+ - reflect new page layout of pkgsubmit.mageia.org
+
+2.111781  2011-06-27 17:28:44 Europe/Paris
+ - adding missing prereq POE::Loop::Tk, not autodetected
+
+2.111780  2011-06-27 14:40:26 Europe/Paris
+ - using dist::zilla for release: versioning is 2.YYDDDN (YY=year,
+   DDD=day of year, N=increment in case of multiple releases per day)
+ - using a tk gui instead of a curses one
+ - mageia platform fully supported
+ - platform mandriva no more supported (can be adapted quite easily)
+
+**
+
+1.1.0 Sat Jun  6 20:27:53 CEST 2009
+ - using cpan2dist --ban instead of --ignore, which somehow seems to have changed
+ - adding resources to meta.yml
+
+1.0.0 Sun May 17 12:14:19 CEST 2009
+ - updating prereqs + moving on when module installed from upstream
+ - splitted module in poe session + worker
+ - moved info from app:cpan2pkg to module attributes
+ - don't submit on upstream build-system if missing prereqs on it
+ - cpan2pkg documentation written
+
+**
+
+0.5.0 Tue Feb 17 19:33:15 CET 2009
+ - importing package upstream
+ - submitting package upstream
+ - waiting for user confirmation when package is available on upstream
+   build system.
+
+0.4.1 Sun Feb 15 19:07:12 CET 2009
+ - storing when a module is complete
+ - build module when all prereqs has been built & installed
+ - better prereqs extraction
+ - local part of cpan2pkg is complete
+
+0.4.0 Fri Feb  6 18:13:23 CET 2009
+ - building package for module
+ - installing freshly build package
+
+0.3.1 Fri Feb  6 16:32:38 CET 2009
+ - moving appli forward when no more missing prereqs
+ - listing missing prereqs in ui
+ - sorting list of modules
+
+0.3.0 Sat Jan 31 14:48:59 CET 2009
+ - spawning prereqs
+
+0.2.2 Sat Jan 31 12:32:05 CET 2009
+ - installing module from upstream dist
+ - module status in listbox
+
+0.2.1 Fri Jan 30 18:56:23 CET 2009
+ - checking if module is installed locally
+ - better output for prereqs
+
+0.2.0 Fri Jan 30 15:36:47 CET 2009
+ - checking if module is available upstream
+
+0.1.0 Fri Jan 23 18:13:27 CET 2009
+ - finding module prereqs
+ - revamped gui, getting rid of notebook
+
+0.0.2 Wed Jan 21 16:43:28 CET 2009
+ - fix to support latest curses::ui::poe version
+ - starting logic to package modules supplied on command-line
+ - first curses interface update
+
+0.0.1 Tue Jan 20 14:19:19 CET 2009
+ - original version
+

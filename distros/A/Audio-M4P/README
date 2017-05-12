@@ -1,0 +1,41 @@
+NAME
+
+Audio::M4P -- M4P / MP4 / m4a Quicktime audio and video tools, including DRMS removal tools
+
+DESCRIPTION
+    
+Slice, dice, deconstruct, markup, and decrypt MP4 / M4P / M4V / M4A (Apple Quicktime) audio and video
+
+SYNOPSIS
+
+
+use Audio::M4P::QuickTime;
+
+my $mp4file = "file.m4p";
+my $qt = new Audio::M4P::QuickTime(file => $mp4file);
+my $tags = $qt->GetMetaInfo;
+print "Artist is $tags->{ARTIST}\n" if $tags->{ARTIST};
+
+my ($track, $count) = $qt->tracks;
+my $new_track_number = 3;
+my $total_tracks_on_CD = 17;
+$qt->tracks($new_track_number, $total_tracks_on_CD);
+
+use Audio::M4P::Decrypt;
+
+my $mp4file = 'myfile';
+my $outfile = 'mydecodedfile';
+my $decrypt = new Audio::M4P::Decrypt;
+$decrypt->DecryptFile($mp4file, $outfile);
+
+
+
+To install the module...
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

@@ -1,0 +1,127 @@
+=encoding utf8
+
+=head1 NAME
+
+Ado::Manual::Installation - Various ways to install and deploy Ado
+
+=head1 DESCRIPTION
+
+We strongly recommend using Ado with L<your own
+Perl|https://metacpan.org/pod/distribution/App-perlbrew/bin/perlbrew> (not the
+system-wide)! This will give you freedom to install modules from CPAN etc.
+
+Get a precompiled Perl distro like "Citrus Perl"
+(L<http://www.citrusperl.com/download.html>) or "ActivePerl Community Edition"
+(L<http://www.activestate.com/activeperl/downloads>) for your OS,  or build your
+own using L<App::perlbrew>.
+
+Ado can be downloaded from L<CPAN|http://search.cpan.org/dist/Ado/> and
+installed manually or installed into any folder of your choice. By default it
+goes into the C<siteprefix> folder of the perl distribution used for
+installation.
+
+
+=head1 INSTALLATION METHODS
+
+When installing Ado in its own folder, you may want to add the
+C</path/to/ado/bin> to your C<$PATH> environment variable.
+
+=head2 MANUAL
+
+To install manually Ado after downloading, run the following commands:
+
+  tar -zxf Ado-X.XX.tar.gz
+  cd Ado-X.XX/
+  perl Build.PL --install_base $HOME/opt/ado
+  #or if you want it in your Perl file tree
+  perl Build.PL
+  ./Build installdeps
+  ./Build
+  ./Build test
+  ./Build install
+
+=head2 CPAN
+
+  cpanm -n -l Ado
+  --> Working on Ado
+  Fetching http://www.cpan.org/authors/id/B/BE/BEROV/Ado-0.87.tar.gz ... OK
+  Configuring Ado-0.87 ... OK
+  Building Ado-0.87 ... OK
+  Successfully installed Ado-0.87 (upgraded from 0.86)
+  1 distribution installed
+
+  #or
+
+  cpan Ado
+  Running install for module 'Ado'
+  Running make for B/BE/BEROV/Ado-0.85.tar.gz
+  ...
+  ...
+    BEROV/Ado-0.85.tar.gz
+  ./Build install install  -- OK
+
+=head2 PERLBREW
+
+Installing Ado under your own perlbrew environment
+
+  perlbrew init
+  perlbrew install -n perl-5.18.1 --as ado -j 3
+  perlbrew switch ado
+  perlbrew install-cpanm
+  cpanm Ado
+
+=head2 Carton
+
+Installing Ado using Carton
+
+  echo 'requires "Ado";' > cpanfile
+  carton install
+  carton exec local/bin/ado daemon
+
+=head2 local::lib
+
+Be warned that L<local::lib>, installed on some shared hosting providers'
+machines, sets the environment variables  C<$PERL5LIB, $PERL_LOCAL_LIB_ROOT,
+$PERL_MB_OPT, $PERL_MM_OPT>. If you are aware and expect Ado to be installed in
+C<$PERL_LOCAL_LIB_ROOT> (usually C<~/perl5>) then fine. If you are using your
+own Perl and not the provided on the machine, you have to reset those variables
+while installing Ado. Otherwise you may be unpleasantly surprised. For
+ActivePerl it may be best to install Ado dependencies using L<PPM>.  Ado is
+available as L<PPM> package too.
+
+  export PERL_MB_OPT='--install_base /home/you/example.com'
+  #your own perl is already in $PATH and dependencies are installed
+  perl Build.PL
+  ./Build install
+
+=head2 DUMMY
+
+May be you want to just unwrap and run it...
+
+  mkdir ~/ado && cd ~/ado && wget https://github.com/kberov/Ado/archive/v0.87.zip
+  unzip v0.87.zip
+  Ado-0.87/bin/ado daemon
+  #Server available at http://127.0.0.1:3000
+
+=head2 SUMMARY
+
+Ado can be installed and deployed in many different ways. At the end it is
+simply a Perl module which happen to be a Mojolicious application. For
+inspiration, please read  L<Mojolicious::Guides::Cookbook/DEPLOYMENT> and maybe
+try L<Ado::Command::generate::apache2htaccess>. Now you can follow the
+instructions, found on the home-page
+L<http://127.0.0.1:3000|http://127.0.0.1:3000>. But to grow with Ado, you should
+install and create some plugins. See L<Ado::Manual::Plugins>.
+
+=head1 SEE ALSO
+
+L<Ado::Manual>, L<Ado>, L<Mojolicious::Guides>,
+L<Module::Build::Cookbook/prefix_vs_install_base>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2013-2015 Красимир Беров (Krasimir Berov).
+
+This program is free software, you can redistribute it and/or
+modify it under the terms of the
+GNU Lesser General Public License v3 (LGPL-3.0).

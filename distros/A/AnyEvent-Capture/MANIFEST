@@ -1,0 +1,13 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+SIGNATURE
+lib/AnyEvent/Capture.pm
+t/basic.t
+t/release-no-tabs.t
+t/release-portability.t
+t/release-synopsis.t

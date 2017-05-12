@@ -1,0 +1,20 @@
+#!perl
+
+use Argv;
+
+# A demonstration of how to use option sets in a wrapper program.
+# Instantiate an object using current @ARGV and parse its potential
+# flags into 3 different sets, of which we'll use one for 'who'
+# and another for 'uname'.
+
+@ARGV = qw(Who -a -y foo -r);		# hack up an @ARGV
+my $who = Argv->new(@ARGV);		# instantiate
+$who->dbglevel(1);			# set verbosity
+$who->optset(qw(UNAME FOO WHO));	# define 3 option sets
+$who->parseUNAME(qw(a m n p));		# parse these to set UNAME
+$who->parseFOO(qw(y=s z));		# parse -y and -z to FOO
+$who->parseWHO('r');			# for the 'who' cmd
+warn "got -y flag in option set FOO\n" if $who->flagFOO('y');
+print Argv->new('uname', $who->optsUNAME)->qx;
+$who->prog(lc $who->prog);		# force $0 to lower case
+$who->exec(qw(WHO));			# exec the who cmd

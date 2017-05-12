@@ -1,0 +1,40 @@
+---
+abstract: 'Command line tool around Report::Controller'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+build_requires:
+  App::Cmd::Tester: 0.300
+  DBD::Sys: 0.102
+  File::ConfigDir: 0.003
+  File::Path: 0
+  File::Slurp: 0
+  JSON::Any: 0
+  Template: 2.00
+  Template::Plugin::DBI: 2.65
+  Test::More: 0.90
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Report-Generator
+provides:
+  App::Report::Generator:
+    file: lib/App/Report/Generator.pm
+    version: 0.002
+  App::Report::Generator::Command::GenReport:
+    file: lib/App/Report/Generator/Command/GenReport.pm
+    version: 0.002
+requires:
+  App::Cmd: 0.300
+  Carp: 0
+  Config::Any: 0
+  File::Basename: 0
+  File::ConfigDir: 0.001
+  File::Find::Rule: 0.30
+  Report::Generator: 0.002
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.002

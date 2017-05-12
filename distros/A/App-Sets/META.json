@@ -1,0 +1,64 @@
+{
+   "abstract" : "set operations in Perl",
+   "author" : [
+      "Flavio Poletti <polettix@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Sets",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Log4perl::Tiny" : "1.002_003",
+            "perl" : "5.010_000"
+         }
+      }
+   },
+   "provides" : {
+      "App::Sets" : {
+         "file" : "lib/App/Sets.pm",
+         "version" : "0.976"
+      },
+      "App::Sets::Iterator" : {
+         "file" : "lib/App/Sets/Iterator.pm",
+         "version" : "0.976"
+      },
+      "App::Sets::Operations" : {
+         "file" : "lib/App/Sets/Operations.pm",
+         "version" : "0.976"
+      },
+      "App::Sets::Parser" : {
+         "file" : "lib/App/Sets/Parser.pm",
+         "version" : "0.976"
+      },
+      "App::Sets::Sort" : {
+         "file" : "lib/App/Sets/Sort.pm",
+         "version" : "0.976"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/polettix/App-sets/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/polettix/App-sets.git",
+         "web" : "https://github.com/polettix/App-sets"
+      }
+   },
+   "version" : "0.976"
+}
+

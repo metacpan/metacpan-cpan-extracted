@@ -1,0 +1,55 @@
+{
+   "abstract" : "Discover or download and install pkgconf + libpkgconf",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-pkgconf",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "JSON::PP" : "2.27400"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "JSON::PP" : "2.27400"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.102",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2" : "1.302073",
+            "Test2::Suite" : "0.000065",
+            "Test::Alien" : "0.08"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "x_IRC" : "irc://irc.perl.org/#native",
+      "x_MailingList" : "https://groups.google.com/forum/#!forum/perl5-alien"
+   },
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.27400_01"
+}

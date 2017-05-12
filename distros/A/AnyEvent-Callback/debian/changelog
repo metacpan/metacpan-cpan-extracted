@@ -1,0 +1,23 @@
+libanyevent-callback-perl (0.05-1) unstable; urgency=low
+
+  * Cleans perldoc.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 21 Jun 2012 16:17:48 +0400
+
+libanyevent-callback-perl (0.04-1) unstable; urgency=low
+
+  * New upstream version: add CBS function.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 18 Jun 2012 23:39:03 +0400
+
+libanyevent-callback-perl (0.03-1) unstable; urgency=low
+
+  * typo in perldoc
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 03 Jun 2012 00:56:12 +0400
+
+libanyevent-callback-perl (0.02-1) unstable; urgency=low
+
+  * Debian first commit, closes: #675697.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sat, 02 Jun 2012 22:05:53 +0400

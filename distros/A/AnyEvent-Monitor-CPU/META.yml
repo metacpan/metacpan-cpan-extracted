@@ -1,0 +1,20 @@
+---
+abstract: 'monitors your process CPU usage, with high/low watermark triggers'
+author:
+  - 'Pedro Melo'
+generated_by: 'Dist::Zilla version 1.092830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-Monitor-CPU
+requires:
+  AnyEvent: 5.201
+  Proc::CPUUsage: 0
+  Test::Exception: 0
+  Test::More: 0.92
+  common::sense: 0
+  parent: 0
+resources:
+  repository: http://github.com/melo/proc-metrics/
+version: 0.3

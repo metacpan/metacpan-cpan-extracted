@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/AI-Calibrate-1.t
+t/AI-Calibrate-pathologies.t
+t/AI-Calibrate-NB.t
+t/AI-Calibrate-KL.t
+lib/AI/Calibrate.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

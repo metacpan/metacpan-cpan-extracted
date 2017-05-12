@@ -1,0 +1,7 @@
+Revision history for Authen-OATH-OCRA
+
+1.00    March 11 2012
+        First version.
+
+1.01    March 12 2012
+        Added missing Build required module, correct errors in documentation.

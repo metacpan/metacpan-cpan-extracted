@@ -1,0 +1,29 @@
+NAME
+    App::SilverSplash - A network captive portal for Linux platforms.
+
+ABSTRACT
+    See http://groups.google.com/group/silversplash for information. This
+    module is currently beta status and being polished.
+
+DESCRIPTION
+    Silver Splash is a captive portal for Linux platforms.
+
+    Setup is still rough - see the Google Group for discussion of setup.
+
+    But there are a few notes being added here.
+
+    You will need to add the apache user to /etc/sudoers and give it
+    permission to run iptables. Here's the entry I'm using:
+
+     apache  ALL=NOPASSWD:/sbin/iptables
+
+    Adding apache to iptables worked quite well, however I also had to
+    comment out # Defaults requiretty
+
+COPYRIGHT AND LICENSE
+    Copyright 2010 Silver Lining Networks. All rights reserved.
+
+    This program is licensed under the Apache 2.0 software license.
+
+    A copy of this license is included in the module distribution.
+

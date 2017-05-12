@@ -1,0 +1,53 @@
+#!/usr/bin/env perl
+# PODNAME: Jup
+# ABSTRACT: jup, (docker/vagrant)-like deployments with Juju.
+
+
+use App::Jup;
+App::Jup->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Jup - jup, (docker/vagrant)-like deployments with Juju.
+
+=head1 SYNOPSIS
+
+A Jupfile in your projects directory
+
+    set 'name'       => 'super app';
+    set 'maintainer' => 'Adam Stokes <adamjs@cpan.org>';
+    set 'workdir'    => cwd;
+    set 'destdir'    => '/srv/app';
+    
+    link {
+        mysql => {'max-connections' => 5},
+        nginx => {'app_path'        => get 'destdir'}
+    };
+
+Next run B<jup>
+
+    $ jup it
+
+=head1 DESCRIPTION
+
+Single deployment application file. This allows you to create a Jupfile and
+perform staged deployments of your application.
+
+Jup works with Juju and LXD as its provider type.
+
+=head1 AUTHOR
+
+Adam Stokes <adamjs@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Adam Stokes.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

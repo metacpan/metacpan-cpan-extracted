@@ -1,0 +1,15 @@
+2000-04-28  Jochen Wiedmann  <joe@ispsoft.de> (0.1003)
+
+	* Added a workaround for a netscape bug related to escaping blanks.
+	  Eric Garland <egarland@mediaone.net>
+
+1999-04-23  Jochen Wiedmann  <joe@ispsoft.de> (0.1002)
+
+	* lib/Apache/Roaming.pm (GET): The Last-Modified header is
+	  now set. This requires compiling mod_perl with PERL_FILE_API=1.
+
+1999-02-12  Jochen Wiedmann  <joe@ispsoft.de> (0.1001)
+
+	* Roaming.pm (handler): Added use of uri_escape.
+	* Added some words on the browser configuration to the docs.
+	* Test suite should now work with dynamic modules.

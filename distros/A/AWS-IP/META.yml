@@ -1,0 +1,32 @@
+---
+abstract: 'Get and search AWS IP ranges in a caching, auto-refreshing way'
+author:
+  - 'David Farrell <dnmfarrell@cpan.org>'
+build_requires:
+  File::Slurp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AWS-IP
+requires:
+  Cache::File: '0'
+  Carp: '0'
+  File::Temp: '0'
+  HTTP::Tiny: '0'
+  IO::Socket::SSL: '1.56'
+  JSON::XS: '0'
+  Net::CIDR::Set: '0'
+  Net::SSLeay: '1.49'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/dnmfarrell/AWS-IP
+  repository: https://github.com/dnmfarrell/AWS-IP.git
+version: '0.03'

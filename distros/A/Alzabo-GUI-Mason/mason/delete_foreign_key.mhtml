@@ -1,0 +1,40 @@
+<%args>
+$schema
+$table_from
+$table_to
+$column_from
+$fk_id
+</%args>
+
+<%init>
+my ($s, $t);
+eval
+{
+    $s = Alzabo::Create::Schema->load_from_file( name => $schema );
+
+    $t = $s->table($table_from);
+    foreach my $fk ( $t->foreign_keys( table => $s->table($table_to),
+				       column => $t->column($column_from) ) )
+    {
+	$t->delete_foreign_key($fk) if  $fk->id eq $fk_id;
+    }
+
+    $s->save_to_file;
+};
+
+my $e = $@;
+
+$m->comp( 'exception', $e ) if $e;
+
+$m->redirect( uri( path => 'view_table_other' . Alzabo::GUI::Mason::Config::mason_extension(),
+                   query => { schema => $s->name,
+                              table  => $t->name,
+                            },
+                 ),
+            );
+
+</%init>
+
+<%flags>
+inherit => 'syshandler'
+</%flags>

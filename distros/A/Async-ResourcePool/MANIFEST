@@ -1,0 +1,8 @@
+Build.PL
+lib/Async/ResourcePool.pm
+MANIFEST			This list of files
+t/bugs.t
+t/core.t
+t/features.t
+META.yml
+META.json

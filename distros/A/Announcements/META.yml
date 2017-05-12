@@ -1,0 +1,27 @@
+---
+abstract: 'communicate across the object network'
+author:
+  - 'Shawn M Moore, C<sartak@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Announcements
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+resources:
+  homepage: http://github.com/sartak/Announcements/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/sartak/Announcements.git
+version: 0.01

@@ -1,0 +1,33 @@
+// Copyright (c) 2009 AdCopy
+// Author: Jeff Weisberg
+// Created: 2009-Apr-01 10:41 (EDT)
+// Function: 
+//
+// $Id$
+
+message ACPYentaMapDatum {
+        required string         map             = 1;
+        required string         key             = 2;
+        optional int64          version         = 3;
+        optional bytes          value           = 4;
+        optional bytes          meta            = 5;
+        optional bytes          file            = 6;
+        optional int64          shard           = 7;
+};
+
+message ACPYentaGetSet {
+        repeated ACPYentaMapDatum data          = 1;
+};
+
+message ACPYentaDistRequest {
+        required int32          hop             = 1;
+        required int64          expire          = 2;
+        required string         sender          = 3;
+        required ACPYentaMapDatum datum         = 4;
+};
+
+message ACPYentaDistReply {
+	required int32		status_code	= 1;
+	required string		status_message	= 2;
+        required bool           haveit          = 3;
+};

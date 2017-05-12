@@ -1,0 +1,37 @@
+Algorithm::Voting
+
+This module contains pure-Perl implementations of various voting algorithms.
+Care has been taken to thoroughly document and test these implementations.
+Nonetheless, this code is for educational and entertainment purposes only.  Use
+at your own risk.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Algorithm::Voting
+
+This project, including source control, knowledge base, and bug tracking is
+hosted on the Google Code website:
+
+    http://code.google.com/p/algorithm-voting/
+
+Please check there first for issues, updates, et cetera.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 johntrammell@gmail.com
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

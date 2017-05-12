@@ -1,0 +1,6 @@
+Revision history for Perl extension Attribute::Final.
+
+0.01  Wed Jan 28 12:07:48 2004
+	- original version; created by h2xs 1.21 with options
+		-AX -n Attribute::Final
+

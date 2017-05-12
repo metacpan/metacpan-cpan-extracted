@@ -1,0 +1,42 @@
+Apache/FilteringProxy version 0.1
+=================================
+
+The Apache::FilteringProxy module provides a rewriting proxy for HTTP servers.
+This module was originally created to allow remote access of resources that are
+restricted to using IP-based authentication.
+
+INSTALLATION
+
+    To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+    This module requires these other modules and libraries:
+
+    LWP::UserAgent
+    XML::EasyOBJ
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2000-2002 - David Castro <dcastro@apu.edu>
+	Azusa Pacific University
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the Free
+    Software Foundation; either version 2 of the License, or (at your option)
+    any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+    more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc., 
+	59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+

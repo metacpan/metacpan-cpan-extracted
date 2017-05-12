@@ -1,0 +1,21 @@
+Revision history for Perl extension Algorithm::ConstructDFA::XS.
+
+0.23  March 2013
+  - Fixed a stack management bug thanks to bulk88 on irc.perl.org.
+    See https://github.com/Perl-XS/notes/issues/7 for details.
+
+0.17  March 2013
+  - Fixes for `edges_from` support
+
+0.15  March 2013
+  - Initial support for `edges_from` parameter to accomodate
+    input with labeled edges instead of labeled vertices
+
+0.13  February 2014
+  - Fixed bugs in handling of multiple start states
+
+0.09  February 2014
+  - added many_start option (documented in the Pure Perl version)
+
+0.03  February 2014
+	- Initial release

@@ -1,0 +1,20 @@
+diff --git a/src/getargs.c b/src/getargs.c
+index 1fd9cfa..27c2662 100644
+--- a/src/getargs.c
++++ b/src/getargs.c
+@@ -363,6 +363,7 @@ FEATURE is a list of comma separated words that can include:\n\
+       /* Don't output this redundant message for English locales.
+          Note we still output for 'C' so that it gets included in the
+          man page.  */
++#ifndef _WIN32
+       const char *lc_messages = setlocale (LC_MESSAGES, NULL);
+       if (lc_messages && !STREQ (lc_messages, "en_"))
+         /* TRANSLATORS: Replace LANG_CODE in this URL with your language
+@@ -372,6 +373,7 @@ FEATURE is a list of comma separated words that can include:\n\
+            email address.  */
+         fputs (_("Report translation bugs to "
+                  "<http://translationproject.org/team/>.\n"), stdout);
++#endif
+       fputs (_("For complete documentation, run: info bison.\n"), stdout);
+     }
+ 

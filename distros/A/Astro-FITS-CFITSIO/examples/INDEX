@@ -1,0 +1,5 @@
+image_read.pl        - read m51.fits, display image
+image_read_pdl.pl    - same as above, but reads data into PDL object
+bintable_read.pl     - reads binary table data into PDL, makes hist and plots
+check_status.pl      - check_status() subroutine
+match_datatype.pl    - match_datatype() subroutine

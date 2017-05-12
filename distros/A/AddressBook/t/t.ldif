@@ -1,0 +1,14 @@
+dn: cn=user one,o=test
+cn: user one
+mail: user1@one.mail.com
+objectclass: abookPerson
+
+dn: cn=user two,o=test
+cn: user two
+mail: user2@two.mail.com
+objectclass: abookPerson
+
+dn: cn=user three,o=test
+cn: user three
+mail: user3@three.mail.com
+objectclass: abookPerson

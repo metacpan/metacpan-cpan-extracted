@@ -1,0 +1,157 @@
+mamgal - a program for creating static image galleries
+Copyright 2007-2010 Marcin Owsiany <marcin@owsiany.pl>
+
+Features:
+=========
+
+MaMGal was inspired by imageindex(1) and as such aims for a similar featureset
+but higher efficiency as well as better code architecture and test coverage.
+
+*   Index and slide views, simple layouts.
+
+*   Image captions extracted from comments embedded in images themselves. This
+    way your photo descriptions will never get lost.
+
+*   Static HTML output, no need for PHP or other server-side execution support.
+
+*   Designed with efficiency in mind - only reads and processes the files which
+    were modified since the last run.
+
+*   Image creation time extracted from EXIF metadata.
+
+--------------------------------------------------------------------------------
+
+Dependencies:
+=============
+
+MaMGal needs a backend image information library. It works with either
+Image::ExifTool or Image::Info. However Image::ExifTool is recommended, and
+Image::Info is only supported on a "best-effort" basis. (In fact its own
+documentation states that Image::ExifTool is a more featureful and less buggy
+library.)
+
+Other dependencies are documented in Makefile.PL
+
+mplayer is useful, but not strictly necessary for galleries which contain films.
+
+Installation:
+=============
+
+Please follow instructions in perlmodinstall. Afterwards, if your language is
+listed in LINGUAS in po/Makefile you may want to run the following command to
+install translation catalogs:
+
+  make -C po install
+
+Release notes:
+==============
+
+1.4: Fixed unit tests tests under Perl 5.10
+
+ - Exporter had been used incorrectly in App::MaMGal::TestHelper
+
+1.3: Improved performance:
+
+ - creates just one stylesheet file, in the root directory, and deletes legacy
+   stylesheet files in other directories.
+   NOTE: This will cause the first run to be somewhat longer, as all HTML files
+   need to be regenerated to point to the single stylesheet file.
+
+ - does not regenerate the montage file if it is fresh (i.e. more recent than
+   the directory timestamp and timestamps of its interesting elements)
+
+ - does not regenerate the index file if it is fresh (i.e. more recent than the
+   directory timestamp and timestamps of all its elements)
+
+1.2: First public release, using the App::MaMGal namespace
+
+--------------------------------------------------------------------------------
+
+License
+=======
+
+License for the files not specified individually below:
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+    
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+--------------------------------------------------------------------------------
+
+As a special exception, any files produced by running the program (i.e. the
+produced gallery) are instead covered by the following license, even when they
+are being made by copying parts of the program itself:
+
+    Redistribution and use in any form, with or without modification, are
+    permitted in any medium. They are offered as-are, without warranty of any
+    kind.
+
+--------------------------------------------------------------------------------
+
+The directory icon file (dir.png) is Copyright by Susan Kare
+It was taken from a file called
+icon-themes/Sandy/72x72/filesystems/gnome-fs-directory-accept.png in the
+gnome-themes package.
+
+The lib/App/MaMGal/DirIcon.pm file contains an uuencoded version of that file, as
+well as code Copyright 2007 Marcin Owsiany.
+
+The license for dir.png and lib/App/MaMGal/DirIcon.pm is:
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+--------------------------------------------------------------------------------
+
+The video icon file (video.png) is Copyright 2006 by Lapo Calamandrei <calamandrei@gmail.com>
+It was created by conversion from a file called
+calable/mimetypes/video-x-generic.svg in the gnome-icon-theme package.
+
+The lib/App/MaMGal/VideoIcon.pm file contains an uuencoded version of that file, as
+well as code Copyright 2009 Marcin Owsiany.
+
+The license for video.png and lib/App/MaMGal/VideoIcon.pm is:
+
+   This package is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 dated June, 1991.
+
+   This package is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this package; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301,
+   USA.
+
+--------------------------------------------------------------------------------
+
+Some commands useful to the maintainer:
+=======================================
+
+diff -u <(find * -type f|LANG=C sort) <(LANG=C sort MANIFEST )
+git grep -h '^use' lib t mamgal testlib |awk '$2 == "base" {print $3}; $2 != "base" {print $2}'|sed "s/'//g;s/;//"|sort -u|grep -v ^App::MaMGal|egrep '^[A-Z]'
+

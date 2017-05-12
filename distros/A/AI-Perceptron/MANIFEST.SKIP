@@ -1,0 +1,8 @@
+^_build
+^Build$
+^blib
+~$
+\.bak$
+CVS
+^\.DS_Store$
+^AI-Perceptron.+\.tar\.gz$

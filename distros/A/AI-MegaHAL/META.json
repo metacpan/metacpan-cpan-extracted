@@ -1,0 +1,48 @@
+{
+   "abstract" : "Perl interface to the MegaHAL natural language conversation simulator.",
+   "author" : [
+      "Alexandr Ciornii <alexchorny@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AI-MegaHAL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/chorny/AI-MegaHAL"
+      },
+      "x_Keywords" : [
+         "megahal",
+         "chat"
+      ]
+   },
+   "version" : "0.08"
+}

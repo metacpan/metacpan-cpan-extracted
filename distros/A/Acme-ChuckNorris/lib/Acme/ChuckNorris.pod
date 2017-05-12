@@ -1,0 +1,244 @@
+=encoding utf8
+
+=head1 NAME
+
+Acme::ChuckNorris - Perl prefers to code in Chuck Norris
+
+=head1 VERSION
+
+This document describes Acme::ChuckNorris version 0.3
+
+=head1 SYNOPSIS
+
+    use Acme::ChuckNorris;
+
+=head1 DESCRIPTION
+
+This module is intended to be a place to store all things combining Chuck Norris and Perl.
+
+Current "things" are detailed in the next section. If you have any ideas let me know and you'll get Chuck Norris cred.
+
+=head1 INTERFACE 
+
+All functions are exported unless you call it in non-import() context (i.e. require Acme::ChuckNorris; or use Acme::ChuckNorris ();).
+
+=head2 round_house_kick_to_the_perl()
+
+Turns your code into executable Chuck Norris perl.
+
+   my $chuck_norris_shaped_code = round_house_kick_to_the_perl(\q{print "Goodbye\n";die "You are now dead.\n";}); 
+   my $chuck_norris_shaped_code = round_house_kick_to_the_perl("/usr/bin/chuck_norris.pl");
+
+Takes a scalar ref, file, of file handle that contains perl code.
+
+Additional arguments could be any Acme::EyeDrops::sightly() option except SourceString, SourceFile, SourceHandle, or Shape (if you pass those they are ignored and you might get kicked in the face).
+
+These Acme::EyeDrops::sightly() options are set by default and can be overridden:
+
+  'Gap'            => 1,
+  'InformHandler'  => sub { },
+  'TrailingSpaces' => 1,
+  'Regex'  => 1,
+  'Binary' => 0,
+  'TrapEvalDie' => 1,
+  'TrapWarn'    => 1,
+
+requires L<Acme::EyeDrops>
+
+=head2 round_house_kick_to_the_text()
+
+Turns your text into executable Chuck Norris perl code that prints the original text.
+
+   my $chuck_norris_shaped_code = round_house_kick_to_the_text(\'Just Another Perl Hacker'); 
+   my $chuck_norris_shaped_code = round_house_kick_to_the_text(\'Chuck Norris can literally hack code with a machete');
+
+Takes a scalar ref, file, of file handle that contains text.
+
+Additional arguments could be any Acme::EyeDrops::sightly() option except SourceString, SourceFile, SourceHandle, Shape, Print, Regex, or Binary (if you pass those they are ignored and you might get kicked in the face).
+
+These Acme::EyeDrops::sightly() options are set by default and can be overridden:
+
+  'Gap'            => 1,
+  'InformHandler'  => sub { },
+  'TrailingSpaces' => 1,
+
+requires L<Acme::EyeDrops>
+
+=head1 JAPH - Chuck Norris Style!
+
+    #!/usr/bin/perl -w
+
+    use strict;
+
+
+                                                                      ''=~('('.'?'.'{'                                                              
+                                                                    .('['^'+').('['^')').(                                                          
+                                                            '`'|')').('`'|'.').('['^'/').'"'                                                        
+                                                        .('`'^'*').('['^'.').('['^'(').('['^  ((                                                    
+                                                      '/'))).('{'^'[').('`'^'!').('`'|'.').(('`')|                                                  
+                                                    '/').('['^'/').('`'|'(').('`'|'%').(('[')^  ((                                                  
+                                                  ')'))).('{'^'[').('{'^'+').('`'|'%').('['^(')')).(                                                
+                                                  '`'|',').('{'^'[').('`'^'(').('`'|'!').('`'|'#').(                                                
+                                                '`'|'+').('`'|'%').('['^')').('!'^'+').'"'.'}'.')');$:                                              
+                                                ='.'^'~';$~='@'|'(';$^=')'^'[';$/='`'|'.';$,='('^"\}";                                              
+                                                $\='`'|'!';$:=')'^'}';$~='*'|'`';$^='+'^'_';$/='&'|'@'                                              
+                                                ;$,='['&'~';$\=','^'|';$:='.'^'~';$~='@'|'(';$^=')'^'[';                                            
+                                                $/='`'|'.';$,='('^'}';$\='`'|'!';$:=')'^'}';$~='*'|"\`";                                            
+                                                $^='+'^'_';$/='&'|'@';$,='['&'~';$\=','^'|';$:='.'^"\~";                                            
+                                              $~='@'|'(';$^=')'^'[';$/='`'|'.'  ;$,='('^'}';$\='`'|'!';$:=                                          
+                                                ')'^'}';$~='*'|'`';$^='+'^            '_';$/='&'|('@');$,=                                          
+                                                '['&'~';$\=','^'|';$:=  ((            '.'))^'~';$~='@'|'('                                          
+                                                ;$^=')'^'[';$/='`'|'.'                  ;$,='('^'}';$\="\`"|                                        
+                                                '!';$:=')'^'}';$~='*'|                  '`';$^='+'^('_');$/=                                        
+                                                '&'|"\@";$,=                              '['&'~';$\=','^'|'                                        
+                                                  ;$:='.'^"\~";$~=                        '@'|'(';$^=')'^'['                                        
+                                                  ;$/=('`')|                              '.';$,='('^'}';$\=                                        
+                                                    '`'|"\!";$:=  ')'^'}';$~='*'            |'`';$^=  ('+')^                                        
+            '_';                                    $/='&'|"\@";  $,='['&'~';$\=              ','^'|';$:='.'                                        
+            ^"\~";                                  $~='@'|"\(";    $^=')'^"\[";          ($/)        ='`'                                          
+              |"\.";                                $,='('^"\}";    ($\)                  ='`'      |"\!";                                          
+              $:=')'                                ^'}';$~='*'|                          '`';      $^='+'                                          
+                ^"\_";                              ($/)    ='&'                          |'@'    ;($,)=                                            
+                '['&'~';                            ($\)    =','                          ^'|'    ;($:)=                                            
+                  '.'^'~';$~                          =(    ((                          '@')))  |"\(";                                              
+                  $^=')'^"\[";                        $/  ='`'          |+                '.';  $,='('                                              
+                    ^('}');$\=                        '`'|'!';        $:                  =(                                                        
+                  ')')^('}');$~=    '*'|'`';            $^='+'  ^"\_";                $/='&'      |+                                                
+                    '@';$,='['&'~';$\=      ((          ','))^'|';$:                ='.'^'~'      ;$~=                                              
+                      ('@')|  ((      '(')  );          $^=')'^'[';$/='`'|'.';$,  ='('^"\}";        ($\)                                            
+                      ='`'|'!';$:=        ')'^'}';$~='*'|'`';$^='+'^'_';$/='&'|'@';$,=('[')&      '~';$\                                            
+                      =','^('|');$:=    '.'^'~';$~='@'|'(';$^=')'^'[';    $/='`'|('.');$,=        '('^'}';                                          
+                      $\='`'|'!';$:=    ')'^'}';$~='*'|'`';$^=('+')^        '_';$/="\&"|        '@';$,='['                                          
+                      &'~';$\=','^'|';    $:='.'^'~';$~='@'|'(';$^=')'^'[';$/='`'|'.';$,        ='('^"\}";                                          
+                        $\='`'|('!');$:=    ')'^'}';$~='*'|'`';$^='+'^'_';$/='&'|'@';$,=      '['&'~';$\=','                                        
+                        ^'|';$:='.'^'~';    $~='@'|'(';$^=')'^'[';$/='`'|'.';$,='('^'}';    $\='`'|'!';$:=')'^                                      
+                          '}';$~="\*"|  '`';$^  ='+'^'_';$/='&'|'@';$,='['&'~';$\=(',')^  '|';$:='.'^'~';$~=('@')|                                  
+                          '(';$^=')'^('[');$/=  '`'|'.';$,='('^'}';$\='`'|'!';$:=')'^'}';$~='*'|'`';$^='+'^('_');$/=                                
+                            '&'|'@';$,='['&'~'  ;$\=','^'|';$:='.'^'~';$~='@'|'(';$^=')'^'[';$/='`'|'.';$,='('^'}';$\=                              
+                            '`'|'!';$:=')'^"\}";  $~='*'|'`';$^='+'^'_';$/='&'|'@';$,='['&'~';$\=','^'|';$:='.'^'~';$~='@'                          
+                              |'(';$^=(')')^  ((      '['));$/='`'|'.';$,='('^'}';$\='`'|'!';$:=')'^'}';$~='*'|'`';$^=('+')^                        
+                              '_';$/='&'|('@');$,=    '['&'~';$\=','^'|';$:='.'^'~';$~='@'|'(';$^=')'^'[';$/='`'|'.';$,='('^                        
+                              '}';$\='`'|"\!";  $:      =')'^'}';$~='*'|'`';$^='+'^'_';$/='&'|'@';$,='['&'~';$\=','^'|';$:='.'                      
+                              ^'~';$~='@'|'(';$^  =(      ')')^'[';$/='`'|'.';$,='('^'}';$\='`'|'!';$:=')'^'}';$~='*'|"\`";$^=                      
+                            '+'^'_';$/='&'|'@';$,='['&    '~';$\=','^'|';$:='.'^'~';$~='@'|'(';$^=')'^'[';$/='`'|'.';$,='('^'}';                    
+                            $\='`'|'!';$:=')'^'}';  $~      ='*'|'`';$^='+'^'_';$/='&'|'@';$,='['&'~';$\=','^'|';$:='.'^'~';$~="\@"|                
+                            '(';$^=')'^'[';$/=    ((  ((      '`'))))|'.';$,='('^'}';$\='`'|'!';$:=')'^'}';$~='*'|'`';$^='+'^'_';$/=                
+                            '&'|'@';$,='['&'~'  ;(  ($\))=    ','^'|';$:='.'^'~';$~='@'|'(';$^=')'^'[';$/='`'|'.';$,='('^'}';$\=('`')|              
+                            '!';$:=')'^'}';$~='*'|"\`";$^=      '+'^'_';$/='&'|'@';$,='['&'~';$\=','^'|';$:='.'^'~';$~='@'|'(';$^=(')')^            
+                            '[';$/='`'|'.';$,=('(')^  ((  ((    '}'))));$\='`'|'!';$:=')'^'}';$~='*'|'`';$^='+'^'_';$/='&'|'@';$,=('[')&            
+                          '~';$\=','^'|';$:='.'^'~';$~    ="\@"|  '(';$^=')'^'[';$/='`'|'.';$,='('^'}';$\='`'|'!';$:=')'^'}';$~='*'|'`';$^          
+                        ='+'^'_';$/='&'|'@';$,  ="\["&  '~';$\=','  ^'|';$:='.'^'~';$~='@'|'(';$^=')'^'[';$/='`'|"\.";          $,='('^'}'          
+      ;(                $\)='`'|'!';$:="\)"^      '}';$~  ='*'|'`';$^='+'^'_';$/='&'|'@';$,='['&'~';$\=','^('|');$:=              '.'^'~';          
+    $~='@'            |'(';$^=')'^'[';$/='`'      |'.';$,='('^'}';$\  ='`'|'!';$:=')'^'}';$~='*'|'`';$^='+'^'_';                    $/='&'          
+    |+    ((          '@'));$,='['&('~');$\=        ','^'|';$:='.'^'~'  ;$~='@'|'(';$^=')'^'[';$/='`'|"\.";$,=                      ('(')^          
+    ((    ((        '}'))));$\="\`"|  "\!";$:=    ')'^'}';$~='*'|"\`";  $^='+'^'_';$/='&'|'@';$,='['&'~';$\=                        (',')^          
+      ((  ((      '|'))));$:='.'^"\~";    ($~)    =(  '@')|('(');$^=      ')'^'[';$/='`'|'.';$,='('^'}';$\                          ="\`"|          
+      ((  '!')    );$:=')'^"\}";  $~='*'            |+  '`';$^      =(      '+')^'_';$/='&'|'@';$,="\["&                              '~';          
+      $\      =','^'|';$:='.'^'~';$~='@'            |'(';$^=  ((  ((  ((    ')'))))))^'[';$/='`'|"\.";                                ($,)          
+      =(      '(')^'}';$\=  '`'|"\!";$:=              ((  (')')))^    '}';    $~='*'|'`';$^='+'^'_';                                  $/            
+      ='&'|'@'        ;$,=  '['&'~';  $\                =','^'|'        ;(    $:)='.'^'~';$~='@'|'('                                ;$^=            
+      ')'^                  "\[";$/=                    '`'|'.';$,    =(  ((  '(')))^'}';$\='`'|'!';                                ($:)            
+      =')'      ^'}'      ;$~=('*')|                    '`';$^='+'^'_';$/='&'|'@';$,='['&'~';$\=','^                                ((              
+    '|'));    ($:)        ='.'^'~'                      ;$~='@'|'(';$^  =(  ((  ')')))    ^('[');$/=                                ((              
+    '`'))|'.';$,            ="\("^                      '}';$\='`'|"\!";  $:=')'^"\}";      $~='*'                                  |+              
+    '`';$^='+'              ^"\_";                      $/='&'|'@';$,='['&'~';$\            =','                                    ^+              
+    '|';$:='.'              ^'~';$~=                    '@'|'(';$^=')'^'['  ;(          $/  )=((                                  ((                
+    '`'))))|'.';$,          ='('^'}'                    ;$\='`'|'!';$:="\)"^                ((                                    ((                
+    "\}"))));$~=      '*'|  '`';$^='+'                  ^'_';$/='&'|'@';$,                ='['                                    &+                
+    '~';$\="\,"^      ((    "\|"));$:=                    '.'^'~';$~='@'|'('            ;($^)=                                    ((                
+    ')'))^'[';$/    ='`'    |+    '.';$,                    ='('^"\}";                                                            $\                
+      ='`'|'!';$:=')'^                '}';                                                                                      $~                  
+        ='*'|('`');$^=    ((            '+')                                                                                    )^                  
+                    '_';#;
+
+=head1 DIAGNOSTICS
+
+Throws no warnings or errors of its own. But Chuck Norris can throw you wherever he likes.
+
+use Acme::ChuckNorris does not die w/ “Can't locate Acme/ChuckNorris.pm in @INC …” it formats your hard drive
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+Chuck Norris requires no configuration files or environment variables (or food or love).
+
+=head1 DEPENDENCIES
+
+Chuck Norris depends on nothing. 
+
+That said, individual functions might require() something. If so it will be documented w/ the function and in the Build.PL and Makefile.PL
+
+=head1 INCOMPATIBILITIES
+
+Chuck Norris is compatible with anything he chooses. The only driver he ever uses is a pile driver.
+
+=head1 BUGS AND LIMITATIONS
+
+Chuck Norris has no limitations.
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-acme-chucknorris@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+=head1 TODO 
+
+Random Chuck Norris Joke function
+
+Chuck Norris exception handler with only the ability to throw() (as-in "off a building")
+
+=head2 SUBMIT YOUR IDEAS
+
+There is a lot of potential for this module and ideas are welcome. 
+
+I initially thought to fiddle with kill() and die() for grins but, for now at least, the inner Chuck says no.
+
+=head1 THANKS
+
+To Chuck Norris for being so awesome
+
+My pals Woody and Parker for their Chuck-spiration
+
+L<Acme::EyeDrops> for being so slick
+
+=head1 SEE ALSO
+
+For the crypto fans: L<WWW::SchneierFacts>
+
+=head1 AUTHOR
+
+This module wrote itself, just ask Daniel Muey  C<< <http://drmuey.com/cpan_contact.pl> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2010, Daniel Muey C<< <http://drmuey.com/cpan_contact.pl> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+IF YOU ARE KILLED BY CHUCK NORRIS FOR USING THIS MODULE IT IS YOUR OWN 
+FAULT - YOU'VE BEEN WARNED.

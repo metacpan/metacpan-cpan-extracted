@@ -1,0 +1,285 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use lib qw(./lib);
+
+# Don't buffer standard output.  Buffered stdout would be faster, but
+# it tends to have synchronization issues with unbuffered stderr.
+use IO::Handle;
+STDOUT->autoflush(1);
+
+use Getopt::Long;
+
+my $replayer_class = "git";
+my (
+	$authors_file, $replay_base, $dump_file_name, $copy_depot_path,
+	$include_regexp, $analysis_db_name,
+);
+my $verbose = 0;
+my $help = 0;
+my $agree = 0;
+
+my $getopt_okay = GetOptions(
+	'analysis=s',   \$analysis_db_name,
+	'authors=s',    \$authors_file,
+	'copies=s',     \$copy_depot_path,
+	'dump=s',       \$dump_file_name,
+	'experimental', \$agree,
+	'help',         \$help,
+	'include=s',    \$include_regexp,
+	'into=s',       \$replay_base,
+	'replayer=s',   \$replayer_class,
+	'verbose',      \$verbose,
+);
+
+if ($help or !$getopt_okay) {
+	die(
+		"$0 usage:\n",
+		"  --replayer=CLASS     how to replay the svn dump file\n",
+		"                          ('git' or 'filesystem' so far)\n",
+		"  --authors=FILENAME   location of git-svn authors file\n",
+		"                          (optional; only for git)\n",
+		"  --dump=FILENAME      location of svn dump file to replay. - for STDIN\n",
+		"  --into=PATH          path where the svn dump will be replayed\n",
+		"                          (must not exist)\n",
+		"  --copies=PATH        directory where svn copy files are stored\n",
+		"                          (must not exist)\n",
+		"  --verbose            explain what's happening in great detail\n",
+		"  --help               you're soaking in it.\n",
+		"  --experimental       enable experimental features at one's own risk\n",
+		"  --include=REGEXP     limit replay to paths matching REGEXP\n",
+		"  --analysis=FILENAME  path to snanalyze sqlite3 database\n",
+	);
+}
+
+unless (
+	defined($replayer_class) and ($replayer_class =~ /(:?git|filesystem)/i)
+) {
+	die "$0: --replayer=git or --replayer=filesystem required\n";
+}
+
+unless ($agree) {
+	die(
+		"$0:\n",
+		"  This is alpha-quality experimental code.\n",
+		"  Use the --experimental flag to run it at your own risk.\n",
+	);
+}
+
+unless (defined $replay_base and length $replay_base) {
+	die "$0: --into=PATH required\n";
+}
+
+if (-e $replay_base) {
+	die "$0: --into path ($replay_base) must not exist\n";
+}
+
+my $lc_replay = lc($replay_base);
+mkdir $lc_replay or die(
+	"$0: cannot create temporary directory at $replay_base: $!\n"
+);
+my $uc_exists = -e uc($replay_base);
+rmdir $lc_replay;
+if ($uc_exists) {
+	die(
+		"$0: case sensitive filesystem required for --into path ($replay_base)\n"
+	);
+}
+
+if (defined $authors_file) {
+	unless (-e $authors_file) {
+		die "$0: --authors path ($authors_file) must exist if used\n";
+	}
+	unless (-f $authors_file) {
+		die "$0: --authors path ($authors_file) must be a file\n";
+	}
+}
+
+if (defined $analysis_db_name) {
+	unless (-e $analysis_db_name) {
+		die "$0: --analysis path ($analysis_db_name) must exist if used\n";
+	}
+	unless (-f $analysis_db_name) {
+		die "$0: --analysis path ($analysis_db_name) must be a file\n";
+	}
+}
+
+unless (defined $dump_file_name and length $dump_file_name) {
+	die "$0: --dump=FILENAME required\n";
+}
+
+if ($dump_file_name ne '-') {
+	unless (-e $dump_file_name) {
+		die "$0: --dump path ($dump_file_name) doesn't exist\n";
+	}
+	unless (-f $dump_file_name) {
+		die "$0: --dump path ($dump_file_name) must be a file\n";
+	}
+}
+
+$copy_depot_path = "$replay_base.copies" unless (
+	defined $copy_depot_path and length $copy_depot_path
+);
+
+if (-e $copy_depot_path) {
+	die "$0: --copies path ($copy_depot_path) must not exist\n";
+}
+
+# Convert the replayer class into a Perl class, and load it.
+$replayer_class = "SVN::Dump::Replayer::" .  ucfirst(lc($replayer_class));
+eval "require $replayer_class";
+die if $@;
+$replayer_class->import();
+
+# Begin replaying.
+
+# TODO - Coerce withiin SVN::Dump::Walker.
+$include_regexp = qr/$include_regexp/ if defined $include_regexp;
+
+my $replayer = $replayer_class->new(
+	svn_dump_filename => $dump_file_name,
+	replay_base       => $replay_base,
+	copy_source_depot => $copy_depot_path,
+	authors_file      => $authors_file,
+	verbose           => $verbose,
+	include_regexp    => $include_regexp,
+	db_file_name      => $analysis_db_name,
+);
+
+$replayer->walk();
+exit;
+
+__END__
+
+=head1 NAME
+
+snerp - Export a Subversion repository to some other format
+
+=head1 SYNOPSIS
+
+	snerp \
+		--replayer      git                     \
+		--dump          ./project.svndump       \
+		--analysis      ./project-index.sqlite3 \
+		--into          ./project-git-dir       \
+		--authors       ./authors.txt           \
+		--copies        ./project-copies-dir    \
+		--experimental
+
+=head1 DESCRIPTION
+
+snerp walks through a Subversion dump, replaying each revision into
+some other system.
+
+For example, the "filesystem" replayer will track the state of the
+files in the repository after each revisions.  The filesystem copy of
+the repository should be essentially identical to a clean checkout,
+with some insignificant differences.
+
+The "git" replayer will replay each reivision into a new Git
+repository.  The resulting Git repository should be essentially
+identical to the source Subversion repository, with some insignificant
+differences.
+
+The snerp tool works on files produced by other Snerp Vortex tools.
+See L</USAGE> for details.
+
+=head1 USAGE
+
+=head2 --analysis DB_FILENAME
+
+The location of the SQLite database corresponding to the Subversion
+dump being replayed.  Snerp Vortex uses the database to recognize tags
+and branches in the source Subversion repository.  Required.
+
+=head2 --authors AUTHORS_FILENAME
+
+The location of an authors.txt file used to map Subversion authors to
+authors in the target version control system.  Modeled after git-svn's
+authors.txt file.  Optional but recommended for Git.
+
+See "git --help svn" for the file's format and purpose.
+
+See L<snauthors> for a tool to find all your Subversion authors.
+
+=head2 --copies TEMPORARY_COPIES_DIRECTORY
+
+A temporary directory where copied files are kept until needed.  Not
+all replayers can support copies that come from earlier revisions, so
+snerp caches the source files in the TEMPORARY_COPIES_DIRECTORY until
+it's time to actually copy them.
+
+This directory may become quite large, espeically in large projects
+that branch a lot.
+
+=head2 --dump SVN_DUMP_FILENAME
+
+The location of the Subversion dump to replay.  Required since nothing
+can be done without one.
+
+=head2 --experimental
+
+By using the --experimental flag, you acknowlede that Snerp Vortex is
+experimental software that you wish to use at your own risk.  Very
+much required.
+
+The snerp tool does potentially harmful things like deleting entire
+directories.  We hope it's safe, but the things Snerp Vortex does
+makes it a good candidate for abuse.  If it accidentally wipes out
+your machine, please file an actionable bug.  You are otherwise on
+your own.
+
+=head2 --include REGEXP
+
+A regular expression to limit the directories included in the replayed
+repository.  Experimental, and be aware that the option can break copy
+operations that cross the border between included and excluded
+directories.  It's probably better to convert the entire repository,
+then clean up the structure in the new VCS.  Optional and discouraged.
+
+=head2 --into NEW_BASE_DIRECTORY
+
+The base directory into which the new repository will be replayed.
+Required.
+
+=head2 --replayer REPLAYER_CLASS
+
+The type of repository to create.  By default only "filesystem" and
+"git" are allowed, but we hope people write plugins for their favorite
+version control systems.  Required.
+
+=head2 --verbose
+
+Enable more debugging output than your screen has room for.  Traces
+every move snerp makes.  Every step it takes.
+
+=head1 TODO
+
+Remove temporary copy sources from the --copies directory when they're
+not longer needed.
+
+=head1 SEE ALSO
+
+L<App::SnerpVortex> - Main documentation for Snerp Vortex.
+
+L<SVN::Dump> - Subversion dumps are parsed by SVN::Dump.
+
+snanalyze - Analyze a Subversion dump, and produce an index database
+for other tools to process.
+
+snassign-auto - Automatically assign tags and branches to a snanalyze
+index.
+
+snassign-gui - Graphical snanalyze index browser.  Future plans will
+allow users to assign branches and tags by hand.  Requires Gtk.
+
+snauthors - Extract a basic authors.txt file from a Subversion dump.
+
+=head1 AUTHORS AND LICENSE
+
+Snerp Vortex is Copyright 2010 by Rocco Caputo and contributors.
+
+It is released under the same terms as Perl itself.
+
+=cut

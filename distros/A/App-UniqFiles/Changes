@@ -1,0 +1,75 @@
+Revision history for App-UniqFiles
+
+0.11    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.10    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.09    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.08     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.07     2014-07-22 (SHARYANTO)
+
+         - No functional changes.
+
+         - Switch CLI scripts from using Perinci::CmdLine to
+           Perinci::CmdLine::Any to reduce size of dependencies.
+
+
+0.06    2014-05-16 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.05    2012-03-02 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace Sub::Spec with Rinci/Perinci.
+
+
+0.04    2011-07-28 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Add option: check_content.
+
+
+0.03    2011-07-28 (SHARYANTO)
+
+        - Fix behaviour to match `uniq` command: by default, duplicate files are
+          returned but only one for each content.
+
+
+0.02    2011-07-28 (SHARYANTO)
+
+        - Minor bug fixes; use logging in script.
+
+
+0.01    2011-07-28 (SHARYANTO)
+
+        - First release.

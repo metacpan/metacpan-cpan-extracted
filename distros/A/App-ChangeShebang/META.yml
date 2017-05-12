@@ -1,0 +1,37 @@
+---
+abstract: 'change shebang lines for relocatable perl'
+author:
+  - 'Shoichi Kaji <skaji@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-ChangeShebang
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::ChangeShebang:
+    file: lib/App/ChangeShebang.pm
+    version: '0.06'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/shoichikaji/change-shebang/issues
+  homepage: https://github.com/shoichikaji/change-shebang
+  repository: git://github.com/shoichikaji/change-shebang.git
+version: '0.06'
+x_authority: cpan:SKAJI

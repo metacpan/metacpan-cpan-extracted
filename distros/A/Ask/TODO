@@ -1,0 +1,13 @@
+Detection Improvements
+======================
+Ask::Wx, Ask::Tk, Ask::Gtk2 should not assume they are usable because they could load. They should e.g. detect if an X server is running.
+
+New Backends
+============
+Ask::Win32 - a native Win32 thing. Perhaps write a zenity-like command-line tool and wrap that?
+Ask::Prima - pointed out by Joel Berger; dependency-light X11-based GUI toolkit
+
+Backend Improvements
+====================
+Ask::STDIO - better file selection method
+Ask::Wx - support multi file selection

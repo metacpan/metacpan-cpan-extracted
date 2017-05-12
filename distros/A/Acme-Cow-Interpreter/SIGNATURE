@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0ff06447407d28a5e40fea9b59a6e6c4d08c67ef Changes
+SHA1 f1892383560003c47da5b7d0376f11a3a88b1133 MANIFEST
+SHA1 1daedeabd7a37135d4cbd9008abfe872a8c30556 META.yml
+SHA1 6caa67fe02ba8a14e5204715bb5650c85eb6a624 Makefile.PL
+SHA1 8a8338c7db778e346176c4395b94b0c94c2b04b7 README
+SHA1 e3c0aa060408050a842b6b17dcb810b2456b62f5 bin/cow.c
+SHA1 77a4cb87710b273e2a80cbe4f833100015438dbf bin/cow.pl
+SHA1 93c4f8f3a257f4bccda991ce787f237e0e1f1418 bin/cowtidy.pl
+SHA1 6b98f2ca15e7f881eb410e96b2ae3ba1da478d17 bin/text2cow.pl
+SHA1 7365e808b87ca5c295ba6a32f82c84fa3cf45f2f examples/fibonacci.cow
+SHA1 b109aedb6debe6d0df7eb8c27fa19f67f1f51207 examples/hello.cow
+SHA1 95abbd43fdcd5da1296953f9ab8111a429d9b292 lib/Acme/Cow/Interpreter.pm
+SHA1 7b1f10c2507015bfe040823addf12704f8a91fff t/00-signature.t
+SHA1 e9f8566c98647a7f965e4163e34be0e95a466bd0 t/01-load.t
+SHA1 eb02f3b4962fdac122ec4d8292d8613de87e1923 t/02-pod.t
+SHA1 7468083fbdea2dcdd2e8b661371b34d0e3da21b2 t/03-pod-coverage.t
+SHA1 1147731837c848a7bfa7a962d52b919fbc9f33a7 t/10-methods.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (Cygwin)
+
+iEYEARECAAYFAkv9EbsACgkQVQvyyU1bchqKsACgscNY/S367sMAwanGhyRS/jtR
+HCUAoJb7vL/L6jgHVN5t1GmEQ0N3i/8V
+=dkll
+-----END PGP SIGNATURE-----

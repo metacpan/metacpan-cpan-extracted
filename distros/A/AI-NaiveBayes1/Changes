@@ -1,0 +1,85 @@
+Revision history for Perl extension AI::NaiveBayes1.
+
+0.01  Fri May  9 14:48:53 ADT 2003
+	- original version;
+
+0.02  Fri May  9 15:53:53 ADT 2003
+	- bug fix
+
+0.03  Wed Sep  3 08:25:43 ADT 2003
+	- bug fix
+	- import and export to/from string and file (using YAML)
+
+1.0   Thu Sep  4 08:01:19 ADT 2003
+        - bug fix in testing (attributes and labels are sorted now in
+  	  print_model)
+
+1.1   Tue Apr 20 08:07:33 ADT 2004
+	- added several more test
+        - implemented optional Gaussian distribution for numerical
+	  attributes
+
+1.2   Mon Mar 14 08:03:16 AST 2005
+	- addition to documentation
+	- fixing a minor bug and a warning
+
+1.3   Fri Dec  7 07:26:47 AST 2007
+	- added reading from a table format (add_table)
+	- fixed some warnings reported during testing
+	- added option "with counts" to print_model
+	- added smoothing option for attributes
+
+1.4   Fri Dec 14 11:42:16 AST 2007
+	- added test skipping if YAML module is not available
+	- removing deprecated "our" reserved word
+
+1.5   Wed Jan 30 08:06:22 AST 2008
+	- fixed testing problems due to differences in the lowest
+	  significant digit on different platforms
+
+1.6   Wed Aug 19 09:09:57 ADT 2009
+        - improved an error message
+	- fixed some testing problems due to whitespace
+	- small improvement in generating documentation
+
+1.7   Thu Aug 20 14:20:15 ADT 2009
+	- improvements in documentation
+	- added method add_csv_file
+	- added method drop_attributes
+	- removed real_attr and added attribute_type field
+
+1.8   Fri Aug 21 06:36:34 ADT 2009
+	- fixed a pod documentation error
+
+1.9   Tue Aug 31 09:27:51 ADT 2010
+	- fixed testing problems due to differences in precision in
+	  t/2.t
+
+1.10  Tue Feb 22 09:31:12 AST 2011
+	- fixed testing problems due to differences in precision
+	- fixed podchecker warning (some space)
+	- better test error reporting in 2.t
+	- added t/pod.t, thanks to Michael Stevens
+
+2.000  Tue Feb 22 09:58:04 AST 2011
+	- fixing lexical sorting of version numbers
+
+2.001  Mon Feb 28 11:18:22 AST 2011
+	- fixed some testing problems due to differences in precision
+
+2.002  Wed Mar  2 06:29:06 AST 2011
+	- fixed some testing problems due to differences in precision
+
+2.003  Fri Mar  4 06:43:31 AST 2011
+	- fixed more testing problems due to differences in precision
+
+2.004  Sat Mar  5 12:39:35 AST 2011
+	- added missing files to MANIFES (t/7-3.out and t/7-5.out)
+
+2.005  Tue Mar  8 06:35:43 AST 2011
+	- reduced precision in comparison to avoid testing problems on
+	different platforms (from 14 to 12 digits after decimal point)
+
+2.006  Tue Mar 15 06:17:04 ADT 2011
+	- reduced precision in \d{4}.\d+ to \d{4}.\d{10} avoid testing
+	problems on different platforms

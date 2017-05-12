@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         App-SimpleScan-Plugin-Retry
+version:      1.02
+version_from: lib/App/SimpleScan/Plugin/Retry.pm
+installdirs:  site
+requires:
+    App::SimpleScan:               1
+    Scalar::Util:                  0
+    Test::More:                    0
+    WWW::Mechanize::Plugin::Retry: 0.02
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

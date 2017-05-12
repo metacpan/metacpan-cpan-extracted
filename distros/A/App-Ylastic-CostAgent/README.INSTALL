@@ -1,0 +1,64 @@
+INSTALLATION INSTRUCTIONS
+
+Note: the 'ylastic-costagent' program must be installed from CPAN.  
+
+The app-ylastic-costagent git repository is not designed for direct
+installation.  It contains an incomplete version of ylastic-costagent that is
+compiled and released using the awesome Dist::Zilla tool (http://dzil.org).
+
+(Think about it like this: dzil 'compiles' the repository into a tarball
+for release to CPAN.  If you are an end-user, you want the code from CPAN,
+not the repo.)
+
+STEP 1 - Install App::Ylastic::CostAgent from CPAN
+
+Install App::Ylastic::CostAgent using your regular CPAN client or distribution
+package manager (if available). You may need the OpenSSL development libraries
+installed if you don't already have SSL working.
+
+If you aren't sure how to configure a CPAN client, see this excellent post on
+using CPAN as a non-root user: http://goo.gl/j27IB 
+
+For example, assuming Ubuntu Linux and a bash shell:
+
+  $ sudo apt-get install libssl-dev
+  $ curl -L http://cpanmin.us | perl - -l ~/perl5 App::cpanminus local::lib
+  $ eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`
+  $ echo 'eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`' >> ~/.bashrc
+  $ cpanm App::Ylastic::CostAgent
+
+STEP 2 - Write a configuration file
+
+The ylastic-costagent program requires a configuration file that specifies your
+Ylastic and AWS account data. The file is 'INI' format. Here is a template:
+
+   ylastic_id = 1234567890abdcef1234567890abcdef12345678
+ 
+   [1234-5689-0123]
+   user = foo@example.com
+   pass = trustno1
+ 
+   [4321-9865-3210]
+   user = foo@example.com
+   pass = trustno1
+
+Each Amazon account should be listed as a separate section with the account ID
+number in brackets. (You may omit dashes if you wish.)
+
+STEP 3 - Schedule ylastic-costagent as a cron job
+
+The ylastic-costagent program should be run regularly to keep your usage data
+current on Ylastic. Here is an example cron job entry that updates usage data
+every 12 hours:
+
+   0 */12 * * * /path/to/ylastic-costagent -s user /path/to/config.ini
+
+The -s user option will log to the user facility of syslogd.
+
+If you use a local perl library, be sure to add an appropriate PERL5LIB to your
+crontab file, e.g.:
+
+   PERL5LIB=$HOME/perl5/lib/perl5/i686-linux:$HOME/perl5/lib/perl5
+
+Look at the PERL5LIB set by local::lib for the right paths to use.
+

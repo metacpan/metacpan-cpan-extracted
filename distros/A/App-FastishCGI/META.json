@@ -1,0 +1,68 @@
+{
+   "abstract" : "provide CGI support to webservers which don't have it",
+   "author" : [
+      "Ioan Rogers <ioan.rogers@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-FastishCGI",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : 0,
+            "AnyEvent::FCGI" : 0,
+            "AnyEvent::Handle" : 0,
+            "Carp" : 0,
+            "Data::Dumper" : 0,
+            "File::Basename" : 0,
+            "Getopt::Long" : 0,
+            "IO::Handle" : 0,
+            "IPC::Open3" : 0,
+            "Pod::Usage" : 0,
+            "Sys::Syslog" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "CGI" : 0,
+            "Chart::Lines" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0,
+            "YAML::Any" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ioanrogers/App-FastishCGI/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ioanrogers/App-FastishCGI.git",
+         "web" : "https://github.com/ioanrogers/App-FastishCGI"
+      }
+   },
+   "version" : "0.002"
+}
+

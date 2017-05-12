@@ -1,0 +1,39 @@
+NAME
+    App::Prove::Plugin::Idempotent - a prove plugin to keep output TAP
+    reusable
+
+SYNOPSIS
+     prove -P Idempotent t/foo.t
+
+DESCRIPTION
+    This plugin tries to keep the verbose output of `prove' to be the same
+    TAP as it consumed. In particular, the final `ok' line that is normally
+    added is left out. Therefore you can reuse the output TAP stream and
+    feed it again into a TAP parser.
+
+    See the email thread
+
+      http://www.mail-archive.com/perl-qa@perl.org/msg11830.html 
+
+    for discussion.
+
+AUTHOR
+    Steffen Schwigon, `<ss5 at renormalist.net>'
+
+ACKNOWLEDGEMENTS
+    The prove plugin code is shamelessly stolen from Steve Purkis'
+    App::Prove::Plugin::HTML.
+
+SEE ALSO
+    prove, App::Prove
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 Steffen Schwigon.
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of either: the GNU General Public
+    License as published by the Free Software Foundation; or the
+    Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

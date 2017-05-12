@@ -1,0 +1,7 @@
+MANIFEST
+Bibcode.pm
+README
+Makefile.PL
+t/parse.t
+verifybib
+META.yml

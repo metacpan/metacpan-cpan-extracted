@@ -1,0 +1,148 @@
+=head1 NAME
+
+Apache2::Translation::DB - A provider for Apache2::Translation
+
+=head1 SYNOPSIS
+
+  <TranslationProvider DB>
+      Database  dbi:mysql:dbname:host
+      User      username
+      Password  password
+      Singleton 1
+      Table     tablename
+      Key       keycolumn
+      Uri       uricolumn
+      Block     blockcolumn
+      Order     ordercolumn
+      Action    actioncolumn
+      Cachetbl  cachetablename
+      Cachecol  cachecolumn
+      Cachesize 1000
+  </TranslationProvider>
+
+  or
+
+  $provider=Apache2::Translation::DB->new(Database=>..., ...);
+
+  $provider->start;
+  $provider->stop;
+
+=head1 DESCRIPTION
+
+The C<DB> provider implements the C<Apache2::Translation> provider interface
+as documented in L<Apache2::Translation::_base>. It provides for all optional
+functions. No additional functions are supported.
+
+=head2 B<Parameters>
+
+=over 2
+
+=item B<database DSN>
+
+a string describing a L<DBI> database
+
+=item B<user NAME>
+
+=item B<password PW>
+
+the user and password to use
+
+=item B<table NAME>
+
+names the translation table.
+
+=item B<key NAME>
+
+=item B<uri NAME>
+
+=item B<block NAME>
+
+=item B<order NAME>
+
+=item B<action NAME>
+
+=item B<id NAME>
+
+=item B<notes NAME>
+
+name the columns of the translation table to use. The C<id> and C<notes>
+columns are necessary only in combination with the admin interface.
+The C<id> column if specified must have a default value on C<INSERT>
+generating unique keys, something like C<autoincrement> in MySQL or
+C<nextval('sequence')> in PostgreSQL.
+
+=item B<cachetbl NAME>
+
+=item B<cachecol NAME>
+
+name the cache table and its column
+
+=item B<cachesize NUMBER|infinite>
+
+sets the maximum number of cached block lists, default is 1000.
+
+If set to C<infinite> the cache has no limits.
+
+A L<Tie::Cache::LRU> cache is used.
+
+C<Apache2::Translation::DB> caches database entries as lists of blocks.
+Each list of blocks consumes one cache entry.
+
+For each request first the following lookup is done:
+
+ SELECT MAX($cachecol) FROM $cachetbl
+
+The resulting value is then compared with the previous read value. If it
+has changed, it means the cache is invalid. If not, the cache is valid
+and if all information is found in the cache, no further database lookups
+are needed.
+
+=item B<singleton BOOLEAN>
+
+Normally, C<Apache2::Translation> tries to connect to the database at
+server startup. Then it inspects the database handle to see if
+C<Apache::DBI> or C<Apache::DBI::Cache> are loaded. If so, it will
+connect and disconnect for each translation phase / request, thus,
+put back the connection to the connection pool.
+
+If neither of them is loaded the DB connection is used as a singleton.
+It is connected once at server startup and then held open (and reconnected
+if dropped by the database server).
+
+With the optional C<singleton> parameter you can decide to use a
+singleton connection even if a connection pool is in effect. If no
+connection pool is loaded, then of course setting C<singleton> to false
+has no effect.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Apache2::Translation>
+
+=item L<Apache2::Translation::BDB>
+
+=item L<Apache2::Translation::File>
+
+=item L<Apache2::Translation::_base>
+
+=back
+
+=head1 AUTHOR
+
+Torsten Foertsch, E<lt>torsten.foertsch@gmx.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2008 by Torsten Foertsch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+# Local Variables:
+# mode: perl
+# End:

@@ -1,0 +1,36 @@
+<table align="center">
+<tr><td><div id="<tmpl_var name=context>_donations_result"><tmpl_var name=result></div></td></tr>
+</table>
+<form name="<tmpl_var name=context>_update_donations_form" id="<tmpl_var name=context>_update_donations_form" action="" method="post" onSubmit="return <tmpl_var name=context>_update_donations_onsubmit()">
+<table align="center">
+<tr><td>Amount</td><td><input type="text" name="amount_input" id="amount_input" size="10" /></td><td><tmpl_var name=currencies></td></tr>
+<tr><td>Motive</td><td><tmpl_var name=donation_motives></td><td><input type="text" name="motive_text" id="motive_text" size="40" /></td></tr>
+<tr><td>Project</td><td><tmpl_var name=donation_projects></td><td><input type="text" name="project_text" id="project_text" size="40" /></td></tr>
+<tr>
+<td align="center"><input type="button" id="close_donations_form" name="close_donations_form" onClick="tab_set.removeTab(<tmpl_var name=context>_donations_tab); <tmpl_var name=context>_donations_tab=null; tab_set.set('activeTab', search_tab)" value="Close tab"/></td>
+<td align="center"><input type="reset" name="reset" value="Reset" /></td>
+<td align="center"><input type="submit" name="submit_donations_add" id="submit_donations_add" value="Save" onClick="document.<tmpl_var name=context>_update_donations_form.action.value=1" /></td>
+</tr>
+</table>
+<input type="hidden" name="action" id="action" value="0" />
+<input type="hidden" name="target_id" id="target_id" value="<tmpl_var name=target_id>" />
+<input type="hidden" name="sid" id="sid" value="<tmpl_var name=sid>" />
+</form>
+<tmpl_if name=donations_loop>
+<form name="<tmpl_var name=context>_update_donations_list_form" id="<tmpl_var name=context>_update_donations_list_form" action="" method="post" onSubmit="return <tmpl_var name=context>_update_donations_list_onsubmit()">
+<table align="center">
+<tr><td colspan="2"><hr /></td></tr>
+<tr><td>Total donations:</td><td align="right"><tmpl_var name=total> <tmpl_var name=currency_code></td></tr>
+<tmpl_loop name=donations_loop>
+<tr><td align="center" colspan="2"><tmpl_var name=timestamp></td><input type="checkbox" name="donations_id_<tmpl_var name=donations_id>" id="donations_id_<tmpl_var name=donations_id>" value="<tmpl_var name=donations_id>" /></td></tr>
+<tr><td>Amount</td><td align="right"><tmpl_var name=amount_input> <tmpl_var name=currency_code></td></tr>
+<tr><td>Motive</td><td align="right"><tmpl_if name=motive_text><span class="donations_text"><tmpl_var name=motive_text></span><tmpl_else></tmpl_if></td></tr>
+<tr><td>Project</td><td align="right"><tmpl_if name=project_text><span class="donations_text"><tmpl_var name=project_text></span><tmpl_else></tmpl_if></td></tr>
+</tmpl_loop>
+<tr>
+<td align="center" colspan="3"><input type="submit" name="submit_donations_delete" id="submit_donations_delete" value="Delete donation(s)" onClick="document.<tmpl_var name=context>_update_donations_list_form.action.value=2" /></td>
+</tr>
+</table>
+<input type="hidden" name="action" id="action" value="0" />
+</form
+</tmpl_if>

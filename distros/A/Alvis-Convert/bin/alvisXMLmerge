@@ -1,0 +1,363 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Encode;
+use File::Copy;
+use File::Path;
+
+use encoding 'utf8';
+use open ':utf8';
+use Time::HiRes qw(gettimeofday tv_interval);
+
+use Alvis::Utils qw(absolutize_path open_file get_files);
+
+####################### global vars
+my $VERBOSE = 1;
+my $DEBUG   = 0;
+
+################################################################################
+# main sub
+
+# TODO: optimize reqexp
+# TODO: performance
+my ($orig_dir, $extra_dir, $out_dir, $config_file, $bzip2, $extra_file) =
+  read_params();
+my %config = read_config($config_file);
+my %extra_all = read_extra_file($extra_file, keys %config)
+  if (defined($extra_file));
+
+for my $file (get_files($orig_dir)) {
+	merge_file($file);
+}
+
+################################################################################
+sub read_params
+{
+    my ($orig_dir, $extra_dir, $out_dir, $config_file, $bzip2, $extra_file);
+    GetOptions(
+        '<>' => sub {$orig_dir = shift},
+        'man'       => sub {pod2usage(-exitstatus => 0, -verbose => 2)},
+        'e|extra=s' => \$extra_dir,
+        'extra-file=s' => \$extra_file,
+        'o|out=s'      => \$out_dir,
+        'c|conf=s'     => \$config_file,
+        'z|bzip2'      => \$bzip2,
+        'h|help'       => sub {pod2usage(1)}
+    );
+    pod2usage(-message => "ERROR: input dir is not specified")
+      if (!defined($orig_dir));
+    pod2usage(-message => "ERROR: extra dir or file is not specified")
+      if (!defined($extra_dir) and !defined($extra_file));
+    pod2usage(-message => "ERROR: $extra_file is not a file")
+      if (defined($extra_file) and !(-f $extra_file));
+    pod2usage(-message => "ERROR: output dir is not specified")
+      if (!defined($out_dir));
+    pod2usage(-message => "ERROR: cofiguration file is not specified")
+      if (!defined($config_file));
+
+    $orig_dir = absolutize_path($orig_dir);
+    pod2usage(-message => "ERROR: input dir does not exist")
+      if (!defined($orig_dir));
+    if (defined($extra_dir)) {
+        $extra_dir = absolutize_path($extra_dir);
+        pod2usage(-message => "ERROR: extra dir does not exist")
+          if (!defined($extra_dir));
+    } elsif (defined($extra_file)) {
+        $extra_file = absolutize_path($extra_file);
+        pod2usage(-message => "ERROR: extra file does not exist")
+          if (!defined($extra_file));
+    } else {
+        pod2usage(
+            -message => "ERROR: extra file or extra dir must be specified");
+    }
+
+    $out_dir = absolutize_path($out_dir);
+    pod2usage(-message => "ERROR: out dir does not exist")
+      if (!defined($out_dir));
+
+    $config_file = absolutize_path($config_file);
+    pod2usage(-message => "ERROR: cofig file does not exist")
+      if (!defined($config_file));
+
+    return ($orig_dir, $extra_dir, $out_dir, $config_file, $bzip2, $extra_file);
+}
+
+################################################################################
+sub merge_file
+{
+    my $orig_filename = shift;
+    my ($extra_filename, $out_filename) = mk_paths($orig_filename);
+
+    if ($VERBOSE) {
+        print "\n";
+        print "input file: $orig_filename\n";
+    }
+
+    my $is_merged = 0;
+
+    if (defined($extra_file)) {
+        print "extra file: $extra_file\n";
+        merge($orig_filename, $out_filename, \%extra_all);
+        compress($out_filename)
+          if ($bzip2 || $orig_filename =~ /\.bz2$/);
+        $is_merged = 1;
+    } else {
+        my @extra_filenames = guess_filename($extra_filename);
+        for my $extra_filename (@extra_filenames) {
+            if (-e $extra_filename) {
+                print "extra file: $extra_filename\n" if ($VERBOSE);
+                my %extra = read_extra_file($extra_filename, keys %config);
+
+                my $start_time = [gettimeofday] if ($DEBUG);
+                merge($orig_filename, $out_filename, \%extra);
+                print "merge time: ", tv_interval($start_time, [gettimeofday]),
+                  "\n"
+                  if ($DEBUG);
+
+                compress($out_filename)
+                  if ($bzip2 || $orig_filename =~ /\.bz2$/);
+                $is_merged = 1;
+                last;
+            }
+        }
+    }
+    unless ($is_merged) {
+        print "Extra file not found. Output file will be a copy of input.\n"
+          if ($VERBOSE);
+        copy($orig_filename, $out_filename);
+        if ($bzip2) {
+            print "Compressing output file ...\n" if ($VERBOSE);
+            compress($out_filename);
+        }
+
+        #print "Output file: $out_filename\n" if ($VERBOSE);
+    }
+}
+
+################################################################################
+sub merge
+{
+    my ($orig_filename, $out_filename, $extra) = @_;
+    my @nodes = keys %config;
+    my $IN    = Alvis::Utils::open_file("$orig_filename");
+
+    #$out_filename =~ s/\.bz2$// if ($orig_filename =~ /\.bz2$/);
+    open(OUT, ">$out_filename")
+      or die "Cannot open file for write '$out_filename': $!";
+
+    my ($id, $skip) = ();
+    my %printed = ();
+    my $n       = 0;
+    while (defined(my $str = <$IN>)) {
+
+        if (!defined($skip) && defined($id) && defined($extra->{$id})) {
+            $skip = 1;
+        }
+
+        # trim
+        my $oring_str = $str;
+        $str =~ s/^\s+//;
+        $str =~ s/\s+$//;
+
+        if (defined($skip)) {
+            for my $node (@nodes) {
+                if (!defined($printed{$node})
+                    && defined($extra->{$id}{$node}))
+                {
+
+                   #if ($str =~ /^\s*<\/$node>/) { # node already defined in xml
+                    if ($str eq "<\/$node>") {
+                        my $x = $extra->{$id}{$node};
+                        $x =~ s/\n*<$node>\n*//s;
+                        $x =~ s/\n*<\/$node>\n*//s;
+                        print OUT $x;
+                        $printed{$node} = 1;
+                    }
+
+                    #elsif ($str =~ /^\s*$config{$node}/) {
+                    elsif ($str eq $config{$node}) {
+                        print OUT $extra->{$id}{$node};
+                        $printed{$node} = 1;
+                    }
+                }
+            }
+        }
+
+        print OUT $oring_str;
+
+        #if ($str =~ /^\s*<documentRecord id="(.+)">/) {
+        if ($str =~ /^<documentRecord id="([^"]+)"/) {
+            $id = $1;
+            undef $skip;
+            %printed = ();
+            print "$n records merged\n" if ($VERBOSE && (++$n % 100 == 0));
+        }
+    }
+
+    close OUT;
+    close $IN;
+}
+
+################################################################################
+# TODO: move this to Alvis::Utils
+sub mk_paths
+{
+    my $orig_filename  = shift;
+    my $uorig_filename = $orig_filename;
+    $uorig_filename =~ s/\.bz2$//;
+    $uorig_filename =~ s/\.gz$//;
+    my $extra_filename = $uorig_filename;
+    my $out_filename   = $uorig_filename;
+
+    my $orig_dir_p  = escape($orig_dir);
+    my $out_dir_p   = escape($out_dir);
+    my $extra_dir_p = escape($extra_dir) unless (defined($extra_file));
+    $out_filename   =~ s/$orig_dir_p/$out_dir_p/;
+    $extra_filename =~ s/$orig_dir_p/$extra_dir_p/
+      unless (defined($extra_file));
+
+    $out_filename =~ /(.+)\/(.+?)$/;
+    my $out_dir = $1;
+    mkpath($out_dir) unless (-e $out_dir);
+
+    return ($extra_filename, $out_filename);
+}
+
+# TODO: move this to Alvis::Utils
+sub escape
+{
+    my $val = shift;
+    $val =~ s/(['|"\+?*])/\\$1/g;
+    return $val;
+}
+
+################################################################################
+sub read_extra_file
+{
+    my $filename = shift;
+    my @nodes    = @_;
+    my %extra    = ();
+
+    my $IN = Alvis::Utils::open_file("$filename");
+    my ($id, $tag, $xml) = ();
+    while (defined(my $str = <$IN>)) {
+        $id = $1 if ($str =~ /^\s*<documentRecord id="([^"]+)"/);
+
+        unless (defined $tag) {
+            for my $node (@nodes) {
+                $tag = $node
+                  if ($str =~ /.*<$node>.*/);    # TODO: optimize reqexp
+            }
+        }
+
+        if (defined $tag) {
+            $xml .= $str;
+            if ($str =~ /.*<\/$tag>.*/) {        # TODO: optimize reqexp
+                $extra{$id}{$tag} = $xml;
+                undef $xml;
+                undef $tag;
+            }
+        }
+    }
+    close $IN;
+
+    return %extra;
+}
+
+################################################################################
+sub read_config
+{
+    my %config      = ();
+    my $config_file = shift;
+    open(FP, $config_file) or die $!;
+
+    while (defined(my $str = <FP>)) {
+        $str =~ /(\S+?)\s+"\^(.+)"/;
+        $config{$1} = $2;
+    }
+    close FP;
+
+    return %config;
+}
+
+################################################################################
+sub compress
+{
+    my $file = shift;
+    unless ($file =~ /\.bz2$/) {
+        `bzip2 $file`;
+    }
+}
+
+################################################################################
+sub guess_filename
+{
+    my %guessed  = ();
+    my $filename = shift;
+    $guessed{$filename} = 1;
+    $guessed{$1}        = 1 if ($filename =~ /(.+)\.bz2$/);
+    $guessed{$1}        = 1 if ($filename =~ /(.+)\.gz$/);
+    $guessed{$1}        = 1 if ($filename =~ /(.+)\.zip$/);
+
+    if ($filename =~ /(.+)\.xml$/) {
+        $guessed{$filename . '.bz2'} = 1;
+        $guessed{$filename . '.gz'}  = 1;
+        $guessed{$filename . '.zip'} = 1;
+    }
+
+    return keys %guessed;
+}
+
+__END__
+
+=head1 NAME
+    
+    alvisXMLmerge.pl - script to merge ALVIS XML files from input directory 
+with ALVIS XML nodes in extra directory or file
+
+=head1 SYNOPSIS
+    
+    alvisXMLmerge [-z] [-e extra_dir] [--extra-file extra_file] -o out_dir -c config_file input_dir
+    
+  Options:
+
+    input_dir           top directory with original ALVIS XML files
+    -z, --bzip2         bzip2 compress all output files
+                        not set by default.
+    -e, --extra         directory of extra files with ALVIS XML nodes
+    --extra-file        path to file with all extra ALVIS XML nodes.
+                        Use --extra-file instead of --extra parameter 
+                        if you have all extra ALVIS XML nodes in one file.
+    -o, --out           directory to output merged files
+    -c, --conf          config file
+    -h, --help          display help message and exit.
+        --man           print man page and exit.
+
+=head1 DESCRIPTION
+
+=head1 AUTHOR
+
+Poroshin Vladimir
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 Poroshin Vladimir
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+=cut

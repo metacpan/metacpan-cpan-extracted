@@ -1,0 +1,24 @@
+Revision history for App-GitHooks-Plugin-RequireCommitMessage
+
+v1.2.0  2017-03-19
+        - Switched to Test::Requires::Git instead of the now obsolete
+          Test::Git::has_git(). Thank you, Philippe Bruhat!
+        - Relicensed under Perl 5 terms.
+
+v1.1.0  2015-03-29
+        - Synchronized with App-GitHooks' changes to fix the detection of the
+          commit message without the possibly auto-generated ticket ID part
+          (GH-2).
+
+v1.0.3  2014-06-08
+        - Noted git version in tests to help troubleshooting.
+        - Required git v1.7.4.1.
+
+v1.0.2  2014-06-03
+        - Synced manifest.
+
+v1.0.1  2014-06-02
+        - Make test independent of the system's language (GH-1).
+
+v1.0.0  2014-05-31
+        - Public release.

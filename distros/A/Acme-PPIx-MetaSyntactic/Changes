@@ -1,0 +1,19 @@
+Acme-PPIx-MetaSyntactic
+=======================
+
+Created:      2013-05-15
+Home page:    <https://metacpan.org/release/Acme-PPIx-MetaSyntactic>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Acme-PPIx-MetaSyntactic>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.002	2013-05-16
+
+ [ Packaging ]
+ - Add missing dependency on Acme::MetaSyntactic::haddock.
+
+0.001	2013-05-15	Initial release

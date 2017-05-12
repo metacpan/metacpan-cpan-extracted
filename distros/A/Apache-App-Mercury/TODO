@@ -1,0 +1,26 @@
+* rewrite:
+  - mod_perl handler connections
+  - get database schema working, figure out user prefs
+  - user settings maintenance page!!
+* documentation:
+  - per-class, method-by-method detailed pods
+  - FAQ / HOWTO: eg. walkthrough for private-labelling, customization, etc
+  - class hierarchy diagrams; is-a, has-a relationships between objects
+  - special methods AUX_HEADERS and USER_INFO_HREF in Display class
+* live, working demo
+  - use basic HTTP authentication with AuthDBFile, and include code
+    in distribution
+  - make an easier install process: working application out-of-the-box
+* site-specific display class
+  - support for CSS
+* regression test suite
+* POE-based SMTP sender
+* extensions:
+  - SOAP listener and sender to connect to and send/receive messages with
+    other Mercury hosts, securely if using SSL
+  - inbound MIME messages
+  - Jabber IM connectivity
+  - PGP, GPG support
+  - encrypted messages in backing store
+  - POP3, IMAP connectivity
+  - mbox, Maildir, MH support: use Mail::Box

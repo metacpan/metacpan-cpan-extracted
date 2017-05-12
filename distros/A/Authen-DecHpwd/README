@@ -1,0 +1,50 @@
+NAME
+
+Authen::DecHpwd - DEC VMS password hashing
+
+DESCRIPTION
+
+This module implements the SYS$HASH_PASSWORD password hashing function
+from VMS (also known as LGI$HPWD), and some associated VMS username and
+password handling functions.
+
+The password hashing function is implemented in XS, with a hideously
+slow pure Perl backup version for systems that can't handle XS.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+The original C implementation of LGI$HPWD was written by Shawn Clifford.
+The code has since been developed by Davide Casale, Mario Ambrogetti,
+Terence Lee, Jean-loup Gailly, Solar Designer, and Andrew Main (Zefram).
+
+Mike McCauley <mikem@open.com.au> created the first version of
+"Authen::DecHpwd", establishing the Perl interface.  This was based on
+Shawn Clifford's code without the later developments.
+
+Andrew Main (Zefram) <zefram@fysh.org> created a new "Authen::DecHpwd"
+based on the more developed C code presently used, and added ancillary
+functions.
+
+COPYRIGHT
+
+Copyright (C) 2002 Jean-loup Gailly <http://gailly.net>
+
+Based in part on code from John the Ripper, Copyright (C) 1996-2002
+Solar Designer
+
+Copyright (C) 2006, 2007, 2009, 2010, 2011
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.

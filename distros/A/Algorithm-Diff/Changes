@@ -1,0 +1,56 @@
+Revision history for Perl module Algorithm::Diff.
+
+1.19_03 2014-11-25
+- Fix documentation typos (RT 84981)
+  contributed by dsteinbrunner
+- add -w and -i switches to diffnew.pl (RT 69945)
+  contributed by Brian.Eschner
+- Remove Algorithm::DiffOld from the index
+  The module is still distributed with Algorithm::Diff, but is not indexed on
+  CPAN because this is an ***UNAUTHORIZED*** release of Algorithm::DiffOld.
+
+1.19_02 2006-07-31
+- Fix typo in @EXPORT_OK (s/LCDidx/LCSidx/) (RT 8576)
+- Use 'printf' in example code, not 'sprintf' nor 'sprint' (RT 16067)
+- DiffOld wasn't passing extra arguments to compare routine (RT 20650)
+
+1.19 2004-09-22
+- Added OO interface.
+- Based on Ned's v1.18 (unreleased)
+
+1.13 Sun Mar 24 16:05:32 PST 2002
+- sdiff and traverse_balanced added by Mike Schilli <m@perlmeister.com>.
+
+1.11 Thu Jul 12 12:52:18 PDT 2001
+- Added A_FINISHED and B_FINISHED per docs
+- Called user callback function from keygen properly
+
+1.10 July 7 2000
+- Uploaded to CPAN
+- More optimizations
+- Added Algorithm::DiffOld
+
+1.08
+- Fixed bug with binary search that was making diff output too big
+
+1.06 Wed Jun 14 14:15:31 PDT 2000
+- First CPAN version by NEDKONZ
+- Added MJD's list info to README
+
+1.05 Sun Jun 11 15:17:05 PDT 2000
+- Changed version label string.
+- Put MJD's PPT diff version into this distribution as diffnew.pl
+
+1.04 Added documentation.
+
+1.03 Working version
+
+1.01 First version by Ned Konz.
+- Total re-write to cure problems with memory usage and speed.
+  Now takes only a few seconds and less than three megabytes
+  to compare two 4000-line files.
+
+- Changed optional callback function reference from being equality
+  function to being key (hash) generation function.
+
+0.59 Last version maintained by Mark-Jason Dominus

@@ -1,0 +1,15 @@
+YAML:1.0
+Imagefile: "00032009.jpg"
+Contourscount: 8
+Contours:
+   -
+      Name: FO
+      Count: 41
+      Closed: 0
+      Points:
+         -
+            x: 682.5947265625000000
+            y: 743.1998901367187500
+         -
+            x: 685.9638061523437500
+            y: 771.3800659179687500

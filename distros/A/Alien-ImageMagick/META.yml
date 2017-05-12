@@ -1,0 +1,29 @@
+---
+abstract: 'cpanm compatible Image::Magick packaging.'
+author:
+  - 'Jerome Eteve <jerome.eteve@gmail.com>'
+build_requires:
+  Alien::Base: '0.009'
+  Test::More: '1.001014'
+configure_requires:
+  Alien::Base::ModuleBuild: '0.009'
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-ImageMagick
+provides:
+  Alien::ImageMagick:
+    file: lib/Alien/ImageMagick.pm
+    version: '0.07'
+requires:
+  Alien::Base: '0.009'
+  File::ShareDir: '1.00'
+  perl: '5.006'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/plicease/Alien-ImageMagick
+version: '0.07'

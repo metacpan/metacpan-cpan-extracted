@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: Apache2::WebApp::Plugin::Filters
+abstract: Common methods for filtering HTTP request parameters.
+version: 0.09
+author:
+  - Marc S. Brooks <mbrooks@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  Apache2::WebApp: 0.38
+  HTML::StripScripts::Parser: 1.02
+  Params::Validate: 0
+build_requires:
+  Apache::Test: 0
+resources:
+  license: http://dev.perl.org/licenses/
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html

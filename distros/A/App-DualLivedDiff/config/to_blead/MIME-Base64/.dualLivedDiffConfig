@@ -1,0 +1,6 @@
+---
+dirs-recursive:
+  .: ext/MIME-Base64
+exclude-regexes:
+  - '^(?:\.?/)?META.yml$'
+  - '^(?:\.?/)?MANIFEST$'

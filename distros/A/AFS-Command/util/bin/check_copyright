@@ -1,0 +1,153 @@
+#!/ms/dist/perl5/bin/perl
+#
+# $Id: check_copyright,v 7.1 2004/01/13 19:01:52 wpm Exp $
+#
+# (c) 2003-2004 Morgan Stanley and Co.
+# See ..../src/LICENSE for terms of distribution.
+#
+# This hack is just to sanity check that my copyright is found
+# everywhere....
+#
+# To run this, from the top level source directory,
+# ./util/check_copyright
+#
+
+use Getopt::Long;
+use File::Basename;
+
+GetOptions( \%args, qw( update ) ) || die;
+
+%skip = map { $_ => 1 }
+qw(
+   .options/rcsMajor
+   .msbaseline
+   .exclude
+   MANIFEST
+   Changes.html
+   README.html
+   ToDo.html
+  );
+
+warn "Searching source tree for files...\n";
+
+open(FIND,"find . -type f -print |") ||
+  die "Unable to fork find: $!\n";
+
+while ( <FIND> ) {
+    chomp;
+    s|^\./||;
+    next if $skip{$_};
+    next if /~$/;
+    push(@file,$_);
+}
+
+close(FIND) ||
+  die "Error running find: $!\n";
+
+$thisyear = (localtime())[5] + 1900;
+
+foreach my $file ( sort @file ) {
+
+    open(FILE,$file) || die "Unable to open $file: $!\n";
+    my $found = 0;
+    my $old = 0;
+    while ( <FILE> ) {
+	#
+	# OK, if I wasn't so damn lazy, I'd parse the COPYRIGHT file,
+	# but I'm lazy...
+	#
+	next unless /\(c\) ([\d\-\s,]+) Morgan Stanley and Co\./;
+	$found = 1;
+	my $year = $1;
+	$old = 1 if $year !~ /\b$thisyear$/;
+	last;
+    }
+    close(FILE);
+
+    push(@missing,$file) unless $found;
+    push(@old,$file) if $old;
+
+}
+
+unless ( @missing || @old ) {
+    warn "Everythings OK.... don't panic.\n";
+    exit 0;
+}
+
+if ( @missing ) {
+    warn("The following files have no copyright notice:\n\t" .
+	 join("\n\t",@missing) . "\n");
+}
+
+if ( ! $args{update} && @old ) {
+    warn("The following files have an old copyright notice:\n\t" .
+	 join("\n\t",@old) . "\n");
+}
+
+exit 0 unless $args{update};
+
+$errors = 0;
+
+#
+# Update the copyrights (add the year 2000) if asked to.
+#
+foreach my $old ( @old) {
+
+    warn "Updating copyright notice in $old\n";
+
+    #
+    # If the file is in RCS, we have to check it out/in.
+    #
+    my $rcs = rcs($old);
+
+    if ( $rcs ) {
+	system("co -l $old > /dev/null");
+	if ( $? >> 8 ) {
+	    warn "Unable to co -l $old\n";
+	    $errors++;
+	    next;
+	}
+    }
+
+    #
+    # Hey, I *know* its a hack to call perl from inside perl, but
+    # this is a hack...
+    #
+    # Hmm.  This doesn't work.  Must be a quoting issue.  I dunno...
+    # system("perl -i -pe 's/(\(c\) 1999)/\1, 2000/g;' $old");
+    # die "Unable to update copyright years in $old\n" if $? >> 8;
+    #
+
+    open(NEW,">$old.new") || die "Unable to write to $old.new: $!\n";
+    open(OLD,$old) || die "Unable to read $old: $!\n";
+
+    while ( <OLD> ) {
+	s/(\(c\)) (\d{4}).* (Morgan Stanley and Co\.)/\1 \2-$thisyear \3/;
+	#s/(\(c\) 1999)/\1, 2000/g;
+	print NEW;
+    }
+
+    close(OLD) || die "Unable to close $old: $!\n";
+    close(NEW) || die "Unable to close $old.new: $!\n";
+
+    rename("$old.new",$old) || die "Unable to rename $old.new to $old: $!\n";
+
+    if ( $rcs ) {
+	system("echo 'Updated copyright year' | ci -u $old > /dev/null");
+	die "Unable to ci -u $old\n" if $? >> 8;
+    }
+
+}
+
+exit $errors ? 1 : 0;
+
+sub rcs {
+
+    my ($file) = @_;
+
+    my $dirname = dirname($file);
+    my $basename = basename($file);
+
+    return -f "$dirname/RCS/$basename,v" ? "$dirname/RCS/$basename,v" : "";
+
+}

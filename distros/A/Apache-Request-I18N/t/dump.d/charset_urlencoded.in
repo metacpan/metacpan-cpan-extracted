@@ -1,0 +1,5 @@
+# application/x-www-form-urlencoded charset override
+POST /latin1?string=Cha%2bAO4-ne&Cha%2bAO4-ne=string HTTP/1.0
+Content-Type: application/x-www-form-urlencoded; charset=utf-7
+
+long_string=Longue+cha%2bAO4-ne&Longue+cha%2bAO4-ne=long_string

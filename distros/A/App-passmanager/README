@@ -1,0 +1,88 @@
+NAME
+    passmanager - Command-Line Shared Password Store
+
+VERSION
+    version 1.113580
+
+SYNOPSIS
+     $ passmanager --help
+     Available commands:
+ 
+       commands: list the application's commands
+           help: display a command's help screen
+ 
+           init: initialize git repository and passphrase files
+        newuser: provision a new user, or reset a user passphrase
+           open: browse and edit the password repository
+
+DESCRIPTION
+    This program manages one or more password stores which can be securely
+    shared and edited amongst a team. Each team member maintains their own
+    passphrase to access a password store.
+
+    Individual user passphrases can be changed and new users added. The
+    password store is a simple XML format which can easily be read by humans
+    or the XML::Simple Perl module, and is maintained in a Git repository.
+
+USAGE
+    The program "passmanager" takes three commands as shown in "SYNOPSIS",
+    above. These allow you to initialise a new password store, access the
+    store, and add a new user to an existing store.
+
+    There can be multiple password stores (a default name is provided, or
+    overridden on the command line), and they are stored in a Git repository
+    (obviously, as binary files due to the encryption).
+
+    Use the "--help" flag to see what options are available. In general you
+    can set the location of the Git repository, the name of the password
+    store, and your own username. Each of these has sane defaults shown in
+    the help text.
+
+PASSWORD HIERARCHY
+    A three tier system is provided to help organise passwords. The names of
+    the tiers have no special meaning - you can group passwords however you
+    wish. The first two tiers, called Categories and Services, are simply
+    containers. The third tier, Entries, holds multiple password details.
+
+    *   Category
+
+    *   Service
+
+    *   Entry
+
+    Categories and Services have only a title. The password Entry itself has
+    a tile, username, password, and comment field. In each case the title is
+    required, and for entries, either of the username or password is
+    required.
+
+INITIAL SET-UP
+     $ passmanager init
+
+    Call the initialisation command as shown, and you will be prompted for
+    your own passphrase (twice) and the master passphrase for the store
+    (also twice). Then the Git repository will be initialised and you are
+    shown the password management interface.
+
+    Subsequently, run the application with the "open" command and you will
+    be prompted for your own passphrase:
+
+     $ passmanager open
+
+    Use the "--help" flag to see what options are available. In general you
+    can set the location of the Git repository, the name of the password
+    store, and your own username. Each of these has sane defaults shown in
+    the help text.
+
+THANKS
+    My thanks to Guy Edwards who collaborated on the original version of
+    this application.
+
+AUTHOR
+    Oliver Gorwits <oliver@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Oliver Gorwits.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

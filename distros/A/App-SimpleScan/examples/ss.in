@@ -1,0 +1,4 @@
+http://perl.org/ 	/python/ 	N No python on perl.org
+http://python.org/ 	/perl/  	N No perl on python.org
+http://python.org/ 	/python/ 	Y Python on python.org
+http://perl.org/ 	/perl/ 		Y Perl on perl.org

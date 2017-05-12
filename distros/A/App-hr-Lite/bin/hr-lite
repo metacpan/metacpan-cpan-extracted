@@ -1,0 +1,254 @@
+#!perl
+
+# Note: This script is a CLI interface to Riap function /App/hr/hr_app
+# and generated automatically using App::GenPericmdScript version 0.12
+
+our $DATE = '2015-07-12'; # DATE
+our $DIST = 'App-hr-Lite'; # DIST
+our $VERSION = '0.01'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Lite;
+
+$ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
+
+Perinci::CmdLine::Lite->new(
+    url => "/App/hr/hr_app",
+    skip_format => 1,
+)->run;
+
+# ABSTRACT: Print horizontal bar on the terminal
+# PODNAME: hr-lite
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+hr-lite - Print horizontal bar on the terminal
+
+=head1 VERSION
+
+This document describes version 0.01 of hr-lite (from Perl distribution App-hr-Lite), released on 2015-07-12.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % hr-lite [options] [pattern]
+
+=head1 DESCRIPTION
+
+C<hr> can be useful as a marker/separator, especially if you use other commands
+that might produce a lot of output, and you need to scroll back lots of pages to
+see previous output. Example:
+
+ % hr; command-that-produces-lots-of-output
+ ============================================================================
+ Command output
+ ...
+ ...
+ ...
+ 
+ % hr -r; some-command; hr -r; another-command
+
+Usage:
+
+ % hr
+ ============================================================================
+ 
+ % hr -c red  ;# will output the same bar, but in red
+ 
+ % hr --random-color  ;# will output the same bar, but in random color
+ 
+ % hr x----
+ x----x----x----x----x----x----x----x----x----x----x----x----x----x----x----x
+ 
+ % hr -- -x-  ;# specify a pattern that starts with a dash
+ % hr -p -x-  ;# ditto
+ 
+ % hr --random-pattern
+ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+ 
+ % hr --random-pattern
+ *---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---
+ 
+ % hr -r  ;# shortcut for --random-pattern --random-color
+ 
+ % hr --help
+
+If you use Perl, you can also use the C<hr> function in C<App::hr> module.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--color>=I<s>, B<-c>
+
+Specify a color (see Term::ANSIColor).
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--pattern>=I<s>, B<-p>
+
+Specify a pattern.
+
+=item B<--random-color>
+
+=item B<--random-pattern>
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=item B<-r>
+
+Alias for --random-pattern --random-color.
+
+See C<--random-pattern>.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C hr-lite hr-lite
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete hr-lite 'p/*/`hr-lite`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 ENVIRONMENT
+
+=over
+
+=item * HR_LITE_OPT
+
+Specify additional command-line options
+
+=back
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at C<~/.config/hr-lite.conf>, C<~/hr-lite.conf> or C</etc/hr-lite.conf> (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features. 
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+List of available configuration parameters:
+
+ color (see --color)
+ pattern (see --pattern)
+ random_color (see --random-color)
+ random_pattern (see --random-pattern)
+
+=head1 FILES
+
+~/.config/hr-lite.conf
+
+~/hr-lite.conf
+
+/etc/hr-lite.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-hr-Lite>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-hr-Lite>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-hr-Lite>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

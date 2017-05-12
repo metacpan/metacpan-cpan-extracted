@@ -1,0 +1,57 @@
+2002-01-16	Christian Gilmore <cag@us.ibm.com>
+	o  Corrected bug with relative redirects. Bug reported by Shail.
+	o  Made release 0.17.
+
+2002-01-15	Christian Gilmore <cag@us.ibm.com>
+	o  Corrected bug with ports in embedded URIs that match ProxyTo
+	   variable. Bug reported by Rob Wybrow.
+	o  Added feature of translating response header Client-Peer.
+	   Requested by Shail.
+	o  Corrected bug with case sensitivity of host names. Bug
+	   reported by Dirk van der Zee.
+	o  Made release 0.16.
+		
+2001-09-27	Christian Gilmore <cag@us.ibm.com>
+
+	o  Corrected bug with treatment of spaces. Bug first reported by
+	   Chad Kitching.
+	o  Made release 0.15.
+	
+2001-03-20	Christian Gilmore <cgilmore@tivoli.com>
+
+	o  Corrected bug preparing redirect responses. Bug reported by
+	   Vsevolod Ilyushchenko.
+	o  Parser now handles tags with single quotes. Bug reported by
+	   Andrew Carlson.
+	o  Made release 0.14.
+	
+2001-03-02	Christian Gilmore <cgilmore@tivoli.com>
+
+	o  Corrected bug handling tags with whitespace around
+	   edges of quotes.
+	o  Made release 0.13.
+	
+2001-03-02	Christian Gilmore <cgilmore@tivoli.com>
+
+	o  Corrected mishandling of URL-shrinking in rewrite_url.
+	o  Ensured that parsing loop closes in the case of final
+	   missing end tag.
+	o  Now unescape headers for proxy request. Bug reported and
+	   patched by Eric Kolve.
+	o  Removed use of deprecated header_in and header_out in favor
+	   of current headers_in and headers_out.
+	o  Set-Cookie path is now rewritten. Feature requested by Eric
+ 	   Kolve.
+	o  Made release 0.12.
+
+2001-01-14	Christian Gilmore <cgilmore@tivoli.com>
+
+	o  Added 'base' as an element of the LINK_ELEMENT hash. Bug
+	   reported by Eric Kolve.
+	o  Made release 0.11.
+	
+2001-01-02	Christian Gilmore <cgilmore@tivoli.com>
+
+	o  Made first public release 0.10.
+
+$Id: ChangeLog,v 1.10 2002/01/16 15:49:42 cgilmore Exp $

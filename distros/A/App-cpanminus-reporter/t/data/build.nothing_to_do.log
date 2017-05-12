@@ -1,0 +1,8 @@
+cpanm (App::cpanminus) 1.7001 on perl 5.019009 built for darwin-2level
+Work directory is /Users/garu/.cpanm/work/1395021324.11085
+You have make /usr/bin/make
+You have LWP 6.05
+You have /usr/bin/tar: bsdtar 2.8.3 - libarchive 2.8.3
+You have /usr/bin/unzip
+Searching Data::Printer on cpanmetadb ...
+Data::Printer is up to date. (0.35)

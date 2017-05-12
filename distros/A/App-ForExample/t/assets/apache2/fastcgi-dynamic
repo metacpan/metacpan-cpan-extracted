@@ -1,0 +1,22 @@
+# vim: set filetype=apache
+<VirtualHost *:80>
+
+    ServerName eg.localhost
+    ServerAlias www.eg.localhost
+
+    CustomLog "|/usr/bin/cronolog /home/rob/develop/App-ForExample/Eg/log/apache2-eg.localhost-%Y-%m.access.log -S /home/rob/develop/App-ForExample/Eg/log/apache2-eg.localhost.access.log" combined
+    ErrorLog "|/usr/bin/cronolog /home/rob/develop/App-ForExample/Eg/log/apache2-eg.localhost-%Y-%m.error.log -S /home/rob/develop/App-ForExample/Eg/log/apache2-eg.localhost.error.log"
+
+    # TODO Need trailing slash?
+    Alias / /home/rob/develop/App-ForExample/Eg/script/eg_fastcgi.pl/
+
+
+    <Directory "/home/rob/develop/App-ForExample/Eg/script">
+       Options +ExecCGI
+    </Directory>
+
+    <Files "eg_fastcgi.pl">
+       SetHandler fastcgi-script
+    </Files>
+
+</VirtualHost>

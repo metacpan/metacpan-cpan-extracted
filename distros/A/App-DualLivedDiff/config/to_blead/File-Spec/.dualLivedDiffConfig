@@ -1,0 +1,17 @@
+---
+files:
+  lib/File/Spec.pm: lib/File/Spec.pm
+  Cwd.pm: lib/Cwd.pm
+  Cwd.xs: ext/Cwd/Cwd.xs
+  Changes: ext/Cwd/Changes
+  t/cwd.t: ext/Cwd/t/cwd.t
+  t/taint.t: ext/Cwd/t/taint.t
+  t/win32.t: ext/Cwd/t/win32.t
+  t/crossplatform.t: lib/File/Spec/t/crossplatform.t
+  t/Functions.t: lib/File/Spec/t/Functions.t
+  t/rel2abs2rel.t: lib/File/Spec/t/rel2abs2rel.t
+  t/Spec.t: lib/File/Spec/t/Spec.t
+  t/tmpdir.t: lib/File/Spec/t/tmpdir.t
+dirs-recursive:
+  lib/File/Spec/: lib/File/Spec/
+

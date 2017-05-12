@@ -1,0 +1,10 @@
+Revision history for App-PayPalUtils
+
+0.002   2016-12-30 (PERLANCAR)
+
+        - Add utility: parse-paypal-txfinder-report.
+
+
+0.001   2016-08-07 (PERLANCAR)
+
+        - First release.

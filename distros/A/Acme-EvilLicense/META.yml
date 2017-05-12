@@ -1,0 +1,23 @@
+---
+abstract: 'The great new Acme::EvilLicense!'
+author:
+  - 'Evil Hacker <blackhole@krot.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-EvilLicense
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

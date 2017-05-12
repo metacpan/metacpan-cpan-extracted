@@ -1,0 +1,43 @@
+Revision history for Perl extension App-sync_cpantesters
+
+1.111470  2011-05-27 22:35:40 Europe/Vienna
+    - separated command-line processing into bin/sync_cpantesters
+    - the module has been turned into a class; the former options are now
+      accessors
+    - added a trigger 'dist.filter', per Class::Trigger
+
+1.110730  2011-03-14 10:49:24 Europe/Vienna
+    - get rid of "Wide character in print at ..." (thanks trapd00r)
+
+1.100830  2010-03-24 22:52:50 Europe/Vienna
+    - added --ignore option to filter out reports for unwanted distributions
+
+1.100710  2010-03-12 14:17:51 Europe/Vienna
+    - adapted scraper (etc.) to new HTML contents
+    - converted the distribution to Dist::Zilla-style
+    - moved the code to App::perlzonji; bin/sync_cpantesters is just a thin
+      wrapper
+    - documented the subroutines
+
+0.05 Sat Jul 18 20:07:13 CEST 2009 (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+     - Changed scraper to match new HTML layout
+
+0.04  Thu, 29 May 2008 12:00:00 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.04
+     - now uses LWP::UserAgent::ProgressBar
+     - .shipit: fixed svk.tagpattern
+
+0.03  Sat, 24 Nov 2007 16:39:38 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.03
+     - fixed bug in how directories are deleted - before, the whole base dir
+       was deleted
+
+0.02  Sat, 24 Nov 2007 15:09:29 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.02
+     - forgot to enable the code that does the deletions at the end
+
+0.01  Fri, 23 Nov 2007 14:01:21 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

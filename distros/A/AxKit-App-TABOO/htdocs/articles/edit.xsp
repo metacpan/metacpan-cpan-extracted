@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="NULL" type="application/x-xsp"?>
+<?xml-stylesheet href="/transforms/articles/insert-values-edit.xsl" type="text/xsl"?>
+<?xml-stylesheet href="/transforms/articles/xhtml/submit.xsl" type="text/xsl"?>
+<xsp:page
+  xmlns:xsp="http://www.apache.org/1999/XSP/Core"  
+  xmlns:art="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Article" 
+  xmlns:ct="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Control"
+  xmlns:cust="http://www.kjetil.kjernsmo.net/software/TABOO/NS/CustomGrammar"
+  xmlns:user="http://www.kjetil.kjernsmo.net/software/TABOO/NS/User"
+  xmlns:cat="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Category"
+  xmlns:lang="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Language"
+  xmlns:i18n="http://www.kjetil.kjernsmo.net/software/TABOO/NS/I18N"
+  xmlns:val="http://www.kjetil.kjernsmo.net/software/TABOO/NS/FormValues"
+  xmlns:session="http://www.axkit.org/2002/XSP/BasicSession"
+  xmlns:param="http://www.axkit.org/2002/XSP/QueryParam">
+  <html>
+    <body><h1>The article was stored</h1></body>
+  </html>
+</xsp:page>

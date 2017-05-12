@@ -1,0 +1,12 @@
+BASSXS.xs
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+typemap
+t/Audio-BASSXS.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Audio/BASSXS.pm
+META.yml                                Module meta-data (added by MakeMaker)

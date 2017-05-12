@@ -1,0 +1,14 @@
+---
+pod_spelling_system:
+  stopwords:
+    - hostname
+    - hostnames
+    - TCP
+    - IP
+    - bindport
+    - req
+    - PlugAuth
+
+pod_coverage:
+  private:
+    - AnyEvent::Finger.*#new

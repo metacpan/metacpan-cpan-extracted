@@ -1,0 +1,186 @@
+Revision history for GnuPG
+
+1.001 2014-12-10
+ - improve test
+ - satisfy perlcritic
+ - more documentation
+ - add method for getting gpg version
+ - abort when ttl exceeded
+ - increase ttl to 10min
+ - tidy up code
+
+1.000 2014-12-06
+ - merge ChangeLog with NEWS to Changes
+ - tidy up code (Perl::Tidy)
+ - remove spec file
+
+ [API CHANGES]
+
+ [BUG FIXES]
+
+ [DOCUMENTATION]
+
+ [ENHANCEMENTS]
+
+0.190 2014-12-03
+ - change version format
+
+0.19 2012-04-15
+ - POD typo fix. (patch by Salvatore Bonaccorso) [RT72600]
+ - Don't use deprecated shared memory mode (patch by Adam Benjamin)
+ - Log format. (pointed out by Adam Benjamin)
+ - command output parsing for newer gnupg (patch by Adam Benjamin)
+
+0.18 2011-11-21
+ - encrypt() now accept many recipients. [RT71127]
+ - new() doesn't die if 'homedir' isn't writeable. 
+ - [RT568] (bug reported by Mark Stosberg)
+
+0.17 2010-05-25 Mark Frost
+ - Applied a patch written by Niko Tyni to fix a hanging issue discovered
+   by Salvatore Bonaccorso in chroot environments.
+
+0.16 2010-04-19 Mark Frost
+ - Fixed a hanging issue that came up under certain scenarios. 
+
+0.15 2010-04-19 Mark Frost
+ - Added some quotes whose absence was causing one of the original tests to
+   fail. 
+
+0.14 2010-04-16 Mark Frost
+ - Fixed an endless read-wait scenario introduced in 0.13
+
+0.13 2010-04-16 Mark Frost
+ - Catching up some outstanding changes I left out in releases 11 and 12
+
+0.12 2010-02-03 Mark Frost
+ - This release is merely some documentation fixes
+
+0.11 2010-01-27 Mark Frost
+ - Module can now run in Apache environment.
+ - Fix: Allows undef passphrases (for keys without them)
+ - The module should now properly handle the situation where a key is setup
+   with a blank passphrase, as long as passphrase => undef is provided (or
+   left out)
+ - Fixed an issue where STDIN and STDOUT cannot be overridden in an Apache
+   environment. 
+
+0.10 2009-05-07 Robbie Bow
+ - Changes in 0.09_0{1-3} being released in to the wild proper.
+ - Includes fixes that should resolve these RT tickets: * 6563 * 6562 *
+   4957 * 1364 (which are all variations on the same two themes)
+
+0.09_03 2009-05-07 Robbie Bow
+ - Dev release - Fix import_key to expect correct response; fix encrypt to
+   expect correct response (both running against gnupg 1.4.6); use
+   Test::More for tests
+
+0.09_02 2009-05-06 Robbie Bow
+ - Dev release - update $VERSION in GnuPG.pm to see cpantesters reports
+
+0.09_01 2009-05-06 Robbie Bow
+ - Dev release that cargo cults the numerous fixes Debian maintainers have
+   added since the last release. See debian/chnagelog for more details
+
+0.08 2001-05-21 Francis J. Lacoste  <francis.lacoste@Contre.COM>
+ - Fix POSIX::_SC_OPEN_MAX problem under use strict.
+ - Updated for gnupg 1.0.5
+ - Tie implementation doesn't add an extra fork. Only one fork for the gpg
+   process is done.
+ - Added ClearSign and Sign tie interface.
+ - GnuPG.pm (sign): Check for invalid passphrase. (Thanks to Park Hays for
+   reporting this).
+ - GnuPG/Tie/Sign.pm (run_gnupg): Updates for new tie implementation.
+ - GnuPG/Tie/Encrypt.pm (run_gnupg): Updates for new tie implementation.
+ - GnuPG/Tie/Decrypt.pm (run_gnupg,postread_hook,postwrite_hook): Updates
+   for new tie implementation. (signature) Returns the signature info of
+   the decryption.
+ - GnuPG/Tie/ClearSign.pm (run_gnupg): Updates for new tie implementation.
+ - GnuPG/Tie.pm: Removed fork. Tie interface doesn't use another process
+   anymore.
+ - test.pl: Made tests to run and tracing controllable via environment
+   variables.
+ - GnuPG.pm (send_passphrase): Added check for USERID_HINT from gnupg 1.0.5
+   (run_gnupg): Close all file descriptors except stdin, stdout, stderr and
+   status fd. (decrypt,decrypt_postread,decrypt_postwrite): Factored
+   decrypt process for tie interface. (VERSION): Updated version number to
+   0.08
+ - GnuPG/Tie/Sign.pm: New Sign tie mode.
+ - GnuPG/Tie/ClearSign.pm: New ClearSign tie mode.
+ - GnuPG/Tie.pm (POD): Fix untie example in documentation.
+
+0.07 2000-08-15 Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+ - Output to a file handle reference was broken.
+ - Tag: GNUPG_0_07
+ - GnuPG.spec: Updated for version 0.07.
+ - NEWS: Updated for version 0.07.
+ - README: Updated for version 0.07.
+ - GnuPG.pm (VERSION): Updated version number to 0.07. (run_gnupg): Close
+   the fh ref not its file descriptor.
+ - test.pl: Added tests for encryption and decryption to a file reference /
+   pipe.
+
+0.06 2000-08-07 Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+ - Local-user wasn't working. Thanks to Chris Andrews for reporting and
+   fixing this.
+ - Compatible with gpg 1.02.
+ - Ignore warning about RSA or IDEA algorithms.
+ - Tag: GNUPG_0_06
+ - GnuPG.spec: Updated spec file to use new macros.
+ - GnuPG.pm (encrypt): Local user option wasn't working. (Thanks to Chris
+   Andrews for the fix) (sign): Local user option wasn't working.
+   (version):  Version number is now 0.06
+
+0.05 2000-06-21 Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+ - Support for paragraph mode in tied interface. 
+ - Removed file descriptor leaks.
+ - Made CPR interface more robust.
+ - Tag: GNUPG_0_05
+ - GnuPG/Tie.pm (TIEHANDLE): Removed file descriptor leaks. (READLINE)
+   Handle array context properly. (getlines) Support paragraph mode.
+   (CLOSE) Return true when process completes successfully.
+ - test.pl: Added test for GnuPG::Tie paragraph mode.
+ - GnuPG.pm: (version) Updated to version 0.05 (run_gnupg) Removed file
+   descriptor leaks. Use CORE::die in case of errors. (read_from_status)
+   Make sure that we are using newlin as INPUT_RECORD_SEPARATOR.
+
+0.04 1999-12-06 Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+ - Small bugfixes related to running under mod_perl.
+ - Tag: GNUPG_0_04
+ - NEWS: Added a news file.
+ - GnuPG/Tie.pm(new): Make sure that pipes aren't closed after an exec and
+   that they are unbuffered. Also use CORE::Exit(0) instead of exit(0) so
+   that the things works under mod_perl. (version): Upgraded to version
+   0.04.
+ - GnuPG.pm (new): Specifying gnupg_path wasn't working properly. When gpg
+   isn't found in PATH print the content of PATH in the error message.
+   (run_gnupg): /dev/null wasn't open for writing. Use CORE::exit(1) so
+   that the function still works under mod_perl.
+
+0.03 1999-11-30 Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+ - New tied file handle interface for encryption and decryption. 
+ - Small bugfixes.
+ - GnuPG.pm (pod): Inserted a line before a =over line. Added reference to
+   documentation on tied file handle operations. (send_cpr): Removed
+   undefined warning when expecting an optional command and receiving an
+   EOF. (run_gnupg): Check for valid file descriptor when using file handle
+   reference in input and output redirection. (version): Updated to version
+   0.03
+ - test.pl:		  Added tests for tied file handle operations.
+   Changed output format of tests.
+ - GnuPG/Tie/Decrypt.pm: Added encryption on a tied filehandle.
+ - GnuPG/Tie/Encrypt.pm: Added decryption on a tied filehandle.
+ - GnuPG/Tie.pm:       Added abstract implementation for tied filehandle
+   operations on GnuPG.
+
+0.02 1999-09-08 Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+ - TAG: GNUPG_0_02
+ - GnuPG.pm: Removed colons from tag names.
+ - GnuPG.pm(run_gnupg): Handled input and output from file handle
+   correctly.
+ - GnuPG.pm(abort_gnupg): Aborting now correctly throws the error message.
+ - gpgmailtunl: Added as sample program.
+
+0.01 1999-09-05 Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+ - GnuPG.pm: Release 0.01.
+

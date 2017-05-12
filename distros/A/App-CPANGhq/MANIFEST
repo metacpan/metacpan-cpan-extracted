@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/App/CPANGhq.pm
+minil.toml
+script/cpan-ghq
+t/00_compile.t
+t/data/02packages.details.txt
+t/data/meta/Parse-Crontab-0.04/MYMETA.json
+t/data/meta/Riji-v0.0.11/MYMETA.json
+t/data/meta/Riji-v0.0.9/MYMETA.json
+META.yml
+MANIFEST

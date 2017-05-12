@@ -1,0 +1,10 @@
+Revision history for Perl extension Algorithm::TrunkClassifier.
+
+v1.0.1 Mars 2013
+	- fixed inspect command output
+	- cleaned up code in feature selection library
+	- added Windows installation instructions to README
+	- added Pubmed link in documentation
+
+v1.0.0 November 2012
+	- release version distribution of the module was built

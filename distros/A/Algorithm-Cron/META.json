@@ -1,0 +1,43 @@
+{
+   "abstract" : "abstract implementation of the F<cron(8)> scheduling",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Algorithm-Cron",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Time::timegm" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Algorithm::Cron" : {
+         "file" : "lib/Algorithm/Cron.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.10"
+}

@@ -1,0 +1,50 @@
+{
+   "abstract" : "WUPHF, a blast messaging system",
+   "author" : [
+      "Hunter McMillen <mcmillhj@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-WUPHF",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/mcmillhj/App-WUPHF/issues"
+      },
+      "homepage" : "https://metacpan.org/release/App-WUPHF",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mcmillhj/App-WUPHF.git",
+         "web" : "http://github.com/mcmillhj/App-WUPHF"
+      }
+   },
+   "version" : "0.001"
+}
+

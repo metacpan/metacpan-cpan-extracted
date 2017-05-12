@@ -1,0 +1,77 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 5c5b3bade5920a991aafae6075f841642892324a Build.PL
+SHA1 cc97e889a41642cf85ee5f78e5ab4f1f81af9c00 COPYING
+SHA1 f94f7512cafa7868832fdd6b5d26139d97619a69 Changelog
+SHA1 c7fc8aa7555c3f5b17351a03e8238f259b60b998 MANIFEST
+SHA1 ce5c2a2dca8ee1d6aceea4d2b0c39bb13cb94dbe META.json
+SHA1 c9c78c98a1d94c97e29129f5a5d9b5a638c25b1b META.yml
+SHA1 ef8574973c4dd97826880decdd0d17c319a28628 README
+SHA1 5c2dfcb10ce8fbef487b4507b08859f562ff1b29 bin/icli
+SHA1 fd12cd309642488339e33308e219f8e2debd0e3a lib/App/Icli.pm
+SHA1 56b27bef3a56deec5a01187b76559dd60622ab1d t/00-compile.t
+SHA1 5eddc9f3988a343de160418be7e5d25eb1f6790f t/10-pod-coverage.t
+SHA1 2b12761d52b23a982edb48c01729a16102702751 t/50-icli.at
+SHA1 6b4ef812e8e972d59f69db19244c37554120e2a9 t/in/objects.cache
+SHA1 5ffcc65b00cc8a05d753a95cf6ed98657c994a9b t/in/status.dat
+SHA1 ff9d311ad4972ca8f45479c9649f5065dc13329d t/in/status.dat.weird.1
+SHA1 cf58eec680ee3d08e1d922c736ce45eb43eb0de4 t/in/status.dat.weird.2
+SHA1 77bcfcc33e145815e5fe5087ff33c2d467251b3f t/out/filter_.A.o
+SHA1 77bcfcc33e145815e5fe5087ff33c2d467251b3f t/out/filter_.o
+SHA1 61244076565851295bbe24cbb9060bcce39bc957 t/out/filter_.o.A.D
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/out/filter_A
+SHA1 356048bd5883c959e2efcf08931896059a077086 t/out/filter_D
+SHA1 77bcfcc33e145815e5fe5087ff33c2d467251b3f t/out/filter_S
+SHA1 05e19241e3c6337fdfe09a95dd8a571d893503d4 t/out/filter_c
+SHA1 37917f82f487a2b90c111aa9abd78de5cbc41ce3 t/out/filter_u
+SHA1 61244076565851295bbe24cbb9060bcce39bc957 t/out/filter_w
+SHA1 7d0b8d54d5754fe98d8b9410c9ca79bed77bf2a5 t/out/h_filter_.o
+SHA1 7d0b8d54d5754fe98d8b9410c9ca79bed77bf2a5 t/out/h_filter_S
+SHA1 4bf23e27681c50bcf2879eb8bbc03fd3e1fdf989 t/out/h_filter_S.x.A
+SHA1 4bf23e27681c50bcf2879eb8bbc03fd3e1fdf989 t/out/h_filter_d
+SHA1 44868da750529bd35477b3bb58e7da96b28dbeec t/out/h_filter_x
+SHA1 5b916c58e7c6b564784026d5cc65887a56fbb4bb t/out/host_steel_steel
+SHA1 7d0b8d54d5754fe98d8b9410c9ca79bed77bf2a5 t/out/hosts_group_local
+SHA1 eb3b280f9975defdd142212608028501b307d6ce t/out/hosts_group_reduce
+SHA1 7d0b8d54d5754fe98d8b9410c9ca79bed77bf2a5 t/out/hosts_short
+SHA1 6ab503be4eb4f220c34ca7b2e3655fbeab384469 t/out/list_hosts
+SHA1 912625806fd54a14a2f6e1a584369544b0a72ef3 t/out/list_hosts_nc
+SHA1 d7faaa5da24ea846943c7da3fb6c014132f7907a t/out/list_hosts_v
+SHA1 cfa2d3843fc9f53844a61b500dcbee306fabca0c t/out/list_services
+SHA1 75b99d2c780be2acd31b0816865ebea76d287236 t/out/list_services_nc
+SHA1 57ba93e59a67418e694d1965ea4cbe7d96a60900 t/out/list_services_single
+SHA1 8cbafe57ac1cc49203827359e521d76e8c29234f t/out/list_services_v
+SHA1 356048bd5883c959e2efcf08931896059a077086 t/out/services_group_local
+SHA1 77bcfcc33e145815e5fe5087ff33c2d467251b3f t/out/services_short
+SHA1 cfa2d3843fc9f53844a61b500dcbee306fabca0c t/out/standard
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJTm1oZAAoJEBANW/tRZuAFjNgQAJqYJGnLsZMizvayRVuHBk/v
+gQxLZGkaO/Shu+SZePJQp+tNpN5Fb1xvgxcdH85xoHLbeF6/d5BBqGY23MXNZWTC
+RrTVVSvjeGfPJWhIHdxsc2XCqlgWMroULYgptjntAGoXkIqvdH8Esjk3SMb1El2Z
+h6XNxHUE5XTwD6rAvpgNyePTLHtUQTyflV96Zmo+pbJ4NwSHuzR0vwW27cyUDwrX
+zM4FIrdfObTtqCpwCiAissEwq/Uoj02LNXzPML/gvhcQjeby2z0H/FgOnOe4bvu7
+C9IUUBBYiplrkV81khcAFnAe0Q18z62hobixJxulwNAiG9LNKWpWeOFe+I06VCS6
+OuaJHMzh2jjiT7SrgZBLSRaT8dfr4m96pCHyF/UyeXn6cMHGugwkxofHzrMQ82xP
+R3O3//4WXt+mD2YCoVauzFZCxw6QrloguSevDu+OOfiZTjDVX7SqQ5BiHx0z/DVN
+Bs0EMZakYYEZ/fg+Io/RbIEl0GpmgbM7B6o/dr1xXW4rfcabQHKiLj7WUWHfmrUI
+5+pbr0dMdxagOVwTk7vf/Ri+c3/8+W5olFNaznwzB5Jvcd8ijYMuNL7htVJVTLVI
+2LmFi6lSTrFOR5lBAXqFID0VbQGknBYZUcjHQezKEPYwhgwADbdnHVcXLB6MH1eV
+zunkMUvyNB+ER/9mBEWH
+=St5F
+-----END PGP SIGNATURE-----

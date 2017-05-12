@@ -1,0 +1,110 @@
+==============================================================================
+                      Release of version 0.91 of Acme::Smirch
+==============================================================================
+
+NAME
+    Acme::Smirch - For *really* dirty programs
+
+SYNOPSIS
+            use Smirch;
+
+            Smirch::smear("tooClean.pl");
+
+DESCRIPTION
+    If you have not yet seen the most clever Acme::Bleach.pm by Damian
+    Conway, go see that now. The only trouble with showing off Bleach to
+    your friends is that it requires Bleach to be installed on their
+    machines. So here is Smirch, that does the converse of Bleach - rewrites
+    your program using only non alphanumeric characters BUT it does not
+    depend on any external module! That's right - complete perl without
+    numbers or letters.
+
+    After you have Smirched a program, the program continues to work as
+    before except now it is absolutely unreadable as the module removes all
+    *sightly* characters from your source file.
+
+    The Smirched program has to sit in a file of its own - you cannot run a
+    smirched program by piping it to perl.
+
+    You can now reform your source to look like this:
+
+                                              $==$'; 
+                                             $;||$.| $|;$_
+                 ='*$ (                  ^@(%_+&~~;# ~~/.~~
+             ;_);;.);;#)               ;~~~~;_,.~~,.* +,./|~
+        ~;_);@-,  .;.); ~             ~,./@@-__);@-);~~,.*+,.
+      /|);;;~~@-~~~~;;(),.           ;.,./@,./@,.;_~~@-););,.
+      ;_);~~,./@,.;;;./@,./        |~~~~;#-(@-__@-__&$#%^';$__
+       ='`'&'&';$___="````"  |"$[`$["|'`%",';$~=("$___$__-$[``$__"|
+                  "$___"|       ("$___$__-$[.%")).("'`"|"'$["|"'#").
+            '/.*?&([^&]*)&.*/$'.++$=.("/``"|"/$[`"|"/#'").(";`/[\\`\\`$__]//`;"
+            |";$[/[\\$[\\`$__]//`;"|";#/[\\\$\\.$__]//'").'@:=("@-","/.",
+           "~~",";#",";;",";.",",.",");","()","*+","__","-(","/@",".%","/|",
+            ";_");@:{@:}=$%..$#:;'.('`'|"$["|'#')."/(..)(..)/".("```"|"``$["|
+            '#("').'(($:{$'.$=.'}<<'.(++$=+$=).')|($:{$'.$=.'}))/'.("```;"|
+            "``$[;"|"%'#;").("````'$__"|"%$[``"|"%&!,").${$[};`$~$__>&$=`;$_=
+           '*$(^@(%_+&@-__~~;#~~@-;.;;,.(),./.,./|,.-();;#~~@-);;;,.;_~~@-,./.,
+            ./@,./@~~@-);;;,.(),.;.~~@-,.,.,.;_,./@,.-();;#~~@-,.;_,./|~~@-,.
+              ,.);););@-@-__~~;#~~@-,.,.,.;_);~~~~@-);;;,.(),.*+);;# ~~@-,
+               ./|,.*+,.,.);;;);*+~~@-,.*+,.;;,.;.,./.~~@-,.,.,.;_)   ;~~~
+                 ~@-,.;;,.;.,./@,./.);*+,.;.,.;;@-__~~;#~~@-,.;;,.*   +);;
+                   #);@-,./@,./.);*+~~@-~~.%~~.%~~@-;;__,. /.);;#@-   __@-
+                     __   ~~;;);/@;#.%;#/.;#-(@-__~~;;;.;_ ;#.%~~~~  ;;()
+                          ,.;.,./@,.  /@,.;_~~@- ););,.;_   );~~,./  @,.
+                          ;;;./@,./|  ~~~~;#-(@- __,.,.,.    ;_);~~~ ~@
+                           -~~());;   #);@-,./@,  .*+);;;     ~~@-~~
+                           );~~);~~  *+~~@-);-(   ~~@-@-_      _~~@-
+                           ~~@-);;   #,./@,.;.,    .;.);@      -~~@-;
+                           #/.;#-(   ~~@-@-__      ~~@-~~       @-);@
+                           -);~~,    .*+,./       |);;;~        ~@-~~
+                            ;;;.;     _~~@-@     -__);.         %;#-(
+                            @-__@      -__~~;#  ~~@-;;          ;#,.
+                            ;_,..         %);@-,./@,            .*+,
+                            ..%,           .;.,./|)             ;;;)
+                            ;;#~            ~@-,.*+,.           ,.~~
+                           @-);            *+,.;_);;.~         ~););
+                          ~~,.;         .~~@-);~~,.;.,         ./.,.;
+                          ;,.*+        ,./|,.);  ~~@-         );;;,.(
+                        ),.*+);                              ;#~~/|@-
+                      __~~;#~~                                $';$;;
+
+    Valid and devious perl.
+
+INSTALLATION
+
+    It's all pure Perl, so just put the .pm file in its appropriate
+    local Perl subdirectory.
+
+TODO
+    Smirch currently spits out perl in one line - it would be nice to have
+    it reform the code automatically into pretty pictures like the above
+    camel.
+
+BUGS
+    Yes.
+
+    Smirch does not work with windows (yet?). Also, smirched programs are a
+    little flakey and sadness happens when used with Bleach or anything too
+    strenuous. Use is unadvisable for anything important.
+
+AUTHOR
+    Jasvir Nagra
+
+COPYRIGHT
+       Copyright (c) 2001, Jasvir Nagra. All Rights Reserved.
+     This module is free software. It may be used, redistributed
+    and/or modified under the terms of the Perl Artistic License
+         (see http://www.perl.com/perl/misc/Artistic.html)
+
+==============================================================================
+
+AVAILABILITY
+
+Smirch has been uploaded to the CPAN
+and is also available from:
+
+	http://www.cs.auckland.ac.nz/~jas/CPAN/Acme-Smirch.tar.gz
+
+==============================================================================
+
+

@@ -1,0 +1,337 @@
+NAME
+
+    App::Multigit - Run commands on a bunch of git repositories without
+    having to deal with git subrepositories.
+
+PACKAGE VARS
+
+ %BEHAVIOUR
+
+    This holds configuration set by options passed to the mg script itself.
+
+    Observe that mg [options] command [command-options] will pass options
+    to mg, and command-options to mg-command. It is those options that will
+    affect %BEHAVIOUR.
+
+    Scripts may also therefore change %BEHAVIOUR themselves, but it is
+    probably badly behaved to do so.
+
+  report_on_no_output
+
+    Defaults to true; this should be used by scripts to determine whether
+    to bother mentioning repositories that gave no output at all for the
+    given task. If you use App::Multigit::Repo::report, this will be
+    honoured by default.
+
+    Controlled by the MG_REPORT_ON_NO_OUTPUT environment variable.
+
+  ignore_stdout
+
+  ignore_stderr
+
+    These default to false, and will black-hole these streams wherever we
+    have control to do so.
+
+    Controlled by the MG_IGNORE_{STDOUT,STDERR} environment variables.
+
+  concurrent_processes
+
+    Number of processes to run in parallel. Defaults to 20.
+
+    Controlled by the MG_CONCURRENT_PROCESSES environment variable.
+
+  skip_readonly
+
+    Do nothing to repositories that have readonly = 1 set in .mgconfig.
+
+    Controlled by the MG_SKIP_READONLY environment variable.
+
+ @SELECTED_REPOS
+
+    If this is not empty, it should contain paths to repositories. Relative
+    paths will be determined relative to <mg_root|/mg_root>.
+
+    Instead of using the .mgconfig, the directories in here will be used as
+    the list of repositories on which to work.
+
+    Each repository's origin remote will be interrogated. If this exists in
+    the .mgconfig then it will be used as normal; otherwise, it will be
+    treated as though it had the default configuration.
+
+FUNCTIONS
+
+    These are not currently exported.
+
+ mgconfig
+
+    Returns .mgconfig. This is a stub to be later configurable, but also to
+    stop me typoing it all the time.
+
+ mg_parent
+
+    Tries to find the closest directory with an mgconfig in it. Dies if
+    there is no mgconfig here. Optionally accepts the directory to start
+    with.
+
+ all_repositories
+
+    Returns a hashref of all repositories under mg_parent.
+
+    The keys are the repository directories relative to mg_parent, and the
+    values are the hashrefs from the config, if any.
+
+ selected_repositories
+
+    This returns the repository configuration as determined by
+    <@SELECTED_REPOS|/@SELECTED_REPOS>. Directories that exist in the main
+    config (all_repositories) will have their configuration honoured, but
+    unknown directories will have default configuration.
+
+ each($command[, $ia_config])
+
+    For each configured repository, $command will be run. Each command is
+    run in a separate process which chdirs into the repository first.
+    Optionally, the $ia_config hashref may be provided; this will be passed
+    to "run" in App::Multigit::Repo.
+
+    It returns a convergent App::Multigit::Future that represents all
+    tasks. When this Future completes, all tasks are complete.
+
+   Subref form
+
+    The most useful form is the subref form. The subref must return a
+    Future; when this Future completes, that repository's operations are
+    done.
+
+    The convergent Future ($future below) completes when all component
+    Futures (the return value of then, below) have completed. Thus the
+    script blocks at the $future->get until all repositories have reported
+    completion.
+
+        use curry;
+        my $future = App::Multigit::each(sub {
+            my $repo = shift;
+            $repo
+                ->run(\&do_a_thing)
+                ->then($repo->curry::run(\&do_another_thing))
+            ;
+        });
+    
+        my @results = $future->get;
+
+    See examples/mg-branch for a simple implementation of this.
+
+    The Future can complete with whatever you like, but be aware that run
+    returns a hash-shaped list; see the docs for run. This means it is
+    often useful for the very last thing in your subref to be a
+    transformation - something that extracts data from the %data hash and
+    turns it into a usefully-shaped list.
+
+    The example examples/mg-closes does this, whereas examples/mg-branch
+    uses report.
+
+    report in App::Multigit::Repo implements a sensible
+    directory-plus-output transformation for common usage.
+
+        use curry;
+        my $future = App::Multigit::each(sub {
+            my $repo = shift;
+            $repo
+                ->run(\&do_a_thing)
+                ->then($repo->curry::run(\&do_another_thing))
+                ->then($repo->curry::report)
+            ;
+        });
+
+    The subref given to run is passed the %data hash from the previous
+    command. %data is pre-prepared with blank values, so you don't have to
+    check for definedness to avoid warnings, keeping your subrefs nice and
+    clean.
+
+        sub do_a_thing {
+            my ($repo_obj, %data) = @_;
+            ...
+        }
+
+    Thus you can chain them in any order.
+
+        use curry;
+        my $future = App::Multigit::each(sub {
+            my $repo = shift;
+            $repo
+                ->run(\&do_another_thing)
+                ->then($repo->curry::run(\&do_a_thing))
+                ->then($repo->curry::report)
+            ;
+        });
+
+    Observe also that the interface to run allows for the arrayref form as
+    well:
+
+        use curry;
+        my $future = App::Multigit::each(sub {
+            my $repo = shift;
+            $repo
+                ->run([qw/git checkout master/])
+                ->then($repo->curry::run(\&do_another_thing))
+            ;
+        });
+
+    A command may fail. In this case, the Future will fail, and if not
+    handled, the script will die - which is the default behaviour of
+    Future. You can use else to catch this and continue.
+
+        use curry;
+        my $future = App::Multigit::each(sub {
+            my $repo = shift;
+            $repo
+                ->run([qw{git rebase origin/master}])
+                ->else([qw{git rebase --abort])
+                ->then($repo->curry::report)
+            ;
+        });
+
+    The failure is thrown in a manner that conforms to the expected Future
+    fail interface, i.e. there is an error message and an error code in
+    there. Following these is the %data hash that is consistent to all
+    invocations of run. That means that when you do else, you should be
+    aware that there will be two extra parameters at the start of the
+    argument list.
+
+        use curry;
+        my $future = App::Multigit::each(sub {
+            my $repo = shift;
+            $repo
+                ->run([qw{git rebase origin/master}])
+                ->else(sub {
+                    my ($message, $error, %data) = @_;
+                    ...
+                })
+                ->then($repo->curry::report)
+            ;
+        });
+
+    In the case that you don't care whether the command succeeds or fails,
+    you can use finally to catch the failure and pretend it wasn't actually
+    a failure.
+
+        use curry;
+        my $future = App::Multigit::each(sub {
+            my $repo = shift;
+            $repo
+                ->run([qw{git rebase origin/master}])
+                ->finally($repo->curry::report)
+            ;
+        });
+
+    Despite the name, finally does not have to be the final thing. Think
+    "finally" as in "try/catch/finally". In the following code, finally
+    simply returns the %data hash, because finally transforms a failure
+    into a success and discards the error information.
+
+        use curry;
+        my $future = App::Multigit::each(sub {
+            my $repo = shift;
+            $repo
+                ->run([qw{git rebase origin/master}])
+                ->finally(sub { @_ })
+                ->then(\&carry_on_camping)
+                ->then($repo->curry::report)
+            ;
+        });
+
+   Arrayref form
+
+    In the arrayref form, the $command is passed directly to run in
+    App::Multigit::Repo. The Futures returned thus are collated and the
+    list of return values is thus collated.
+
+    Because run completes a Future with a hash-shaped list, the convergent
+    Future that each returns will be a useless list of all flattened
+    hashes. For this reason it is not actually very much use to do this -
+    but it is not completely useless, because all hashes are the same size:
+
+        my $future = App::Multigit::each([qw/git reset --hard HEAD/]);
+        my @result = $future->get;
+    
+        my $natatime = List::MoreUtils::natatime(10, @result);
+    
+        while (my %data = $natatime->()) {
+            say $data{stdout};
+        }
+
+    However, the %data hashes do not contain repository information; just
+    the output. It is expected that if repository information is required,
+    the closure form is used.
+
+ mg_each
+
+    This is the exported name of each
+
+        use App::Multigit qw/mg_each/;
+
+ mkconfig($workdir)
+
+    Scans $workdir for git directories and registers each in .mgconfig. If
+    the config file already exists it will be appended to; existing config
+    will be preserved where possible.
+
+ write_config
+
+    Write a .mgconfig configuration file.
+
+ clean_config
+
+    Checks the .mgconfig for directories that don't exist and removes the
+    associated repo section.
+
+ base_branch
+
+    Returns the branch that the base repository is on -the repository that
+    contains the .mgconfig or equivalent.
+
+    The purpose of this is to switch the entire project onto a feature
+    branch; scripts can use this as the cue to work against a branch other
+    than master.
+
+    This will die if the base repository is not on a branch, because if
+    you've asked for it, giving you a default will more likely be a
+    hindrance than a help.
+
+ set_base_branch($branch)
+
+    Checks out the provided branch name on the parent repository. Beware of
+    using a branch name that already exists, because this will switch to
+    that branch if it does.
+
+AUTHOR
+
+    Alastair McGowan-Douglas, <altreus at perl.org>
+
+ACKNOWLEDGEMENTS
+
+    This module could have been a lot simpler but I wanted it to be a foray
+    into the world of Futures. Shout outs go to those cats in
+    irc.freenode.net#perl who basically architectured this for me.
+
+    tm604 (TEAM) - for actually understanding Future architecture, and not
+    being mad at me.
+
+    LeoNerd (PEVANS) - also for not being irritated by my inane questions
+    about IO::Async and Future.
+
+BUGS
+
+    Please report bugs on the github repository
+    https://github.com/Altreus/App-Multigit.
+
+LICENSE
+
+    Copyright 2015 Alastair McGowan-Douglas.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a
+    copy of the full license at:
+
+    http://www.perlfoundation.org/artistic_license_2_0
+

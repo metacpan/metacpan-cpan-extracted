@@ -1,0 +1,94 @@
+# Check for memory leaks in all test files, in both scan and seek modes
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use Test::More;
+use File::Next;
+use Audio::Scan;
+eval "use Proc::ProcessTable";
+
+plan skip_all => 'Proc::ProcessTable required for this test' if $@;
+
+plan tests => 464;
+
+$ENV{AUDIO_SCAN_NO_ARTWORK} = 1;
+
+my $custom_dir = shift;
+
+our $t = Proc::ProcessTable->new( cache_ttys => 1 );
+our ( $initial, $final ) = ( 0, 0 );
+
+my $files = File::Next::files(
+    { file_filter => sub { Audio::Scan->is_supported($_) } },
+    $custom_dir || $FindBin::Bin,
+);
+
+while ( defined ( my $file = $files->() ) ) {
+    print "# $file\n";
+    
+    # Test scan leak
+    {
+        for ( 1 .. 3 ) {
+            my $s = Audio::Scan->scan($file);
+        }
+        $initial = size_of();
+        for ( 1 .. 2000 ) {
+            my $s = Audio::Scan->scan($file);
+        }
+        $final = size_of();
+        is( $final - $initial, 0, "$file scan not leaking" );
+    }
+    
+    # Test artwork mode leak
+    {
+        local $ENV{AUDIO_SCAN_NO_ARTWORK} = 0;
+        
+        for ( 1 .. 3 ) {
+            my $s = Audio::Scan->scan($file);
+        }
+        $initial = size_of();
+        for ( 1 .. 2000 ) {
+            my $s = Audio::Scan->scan($file);
+        }
+        $final = size_of();
+        is( $final - $initial, 0, "$file artwork mode scan not leaking" );
+    }        
+    
+    # Test seek leak
+    {
+        if ( $file =~ /\.m4a$/ ) {
+            for ( 1 .. 3 ) {
+                Audio::Scan->find_frame_return_info( $file, 10 );
+            }
+            $initial = size_of();
+            for ( 1 .. 2000 ) {
+                Audio::Scan->find_frame_return_info( $file, 10 );
+            }
+            $final = size_of();
+            is( $final - $initial, 0, "$file seek not leaking" );
+        }
+        else {
+            for ( 1 .. 3 ) {
+                Audio::Scan->find_frame( $file, 10 );
+            }
+            $initial = size_of();
+            for ( 1 .. 2000 ) {
+                Audio::Scan->find_frame( $file, 10 );
+            }
+            $final = size_of();
+            is( $final - $initial, 0, "$file seek not leaking" );
+        }
+    }
+}
+
+sub size_of {
+    foreach my $p ( @{ $t->table } ) {
+        if ( $p->pid == $$ ) {
+            return $p->rss;
+        }
+    }
+    
+    die "PID not found?";
+}

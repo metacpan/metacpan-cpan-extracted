@@ -1,0 +1,27 @@
+---
+abstract: 'SmokeBox helper module to determine perl version'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-SmokeBox-PerlVersion
+requires:
+  IPC::Cmd: 0
+  POE: 1.293
+  POE::Wheel::Run: 0
+  perl: 5.006002
+resources:
+  homepage: https://github.com/bingos/app-smokebox-perlversion
+  repository: https://github.com/bingos/app-smokebox-perlversion.git
+version: 0.16

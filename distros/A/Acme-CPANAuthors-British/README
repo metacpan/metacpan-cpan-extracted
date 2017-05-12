@@ -1,0 +1,64 @@
+NAME
+
+    Acme::CPANAuthors::British - We are British CPAN authors
+
+DESCRIPTION
+
+    This class provides a hash of British CPAN authors' PAUSE ID and name to
+    the Acme::CPANAuthors module. As an added bonus this distribution also
+    includes a list of British Companies too!
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+    After installing, you can find documentation for this module with the
+    perldoc command.
+
+        perldoc Acme::CPANAuthors::British
+
+    You can also look for information at:
+
+        Search CPAN
+            http://search.cpan.org/dist/Acme-CPANAuthors-British
+
+	MetaCPAN
+	    https://metacpan.org/module/Acme::CPANAuthors::British
+
+        AnnoCPAN, Annotated CPAN documentation
+            http://annocpan.org/dist/Acme-CPANAuthors-British
+
+        CPAN Ratings
+            http://cpanratings.perl.org/d/Acme-CPANAuthors-British
+
+    Bugs, patches and feature requests can be reported at:
+
+        RT, CPAN's request tracker
+            http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-CPANAuthors-British
+
+	GitHub
+	    http://github.com/barbie/acme-cpanauthors-british
+
+
+    There are no known bugs at the time of this release. However, if you spot a
+    bug or are experiencing difficulties that are not explained within the POD
+    documentation, please send an email to barbie@cpan.org or submit a bug to 
+    the RT queue. However, it would help greatly if you are able to pinpoint 
+    problems or even supply a patch. 
+
+    Fixes are dependent upon their severity and my availability. Should a fix 
+    not be forthcoming, please feel free to (politely) remind me.
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2009-2015 Barbie for Miss Barbell Productions.
+
+    This distribution is free software; you can redistribute it and/or
+    modify it under the Artistic License v2.

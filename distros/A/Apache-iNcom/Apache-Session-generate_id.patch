@@ -1,0 +1,11 @@
+--- Apache-Session-1.03/Session.pm.gen_id	Sun Sep 12 00:33:48 1999
++++ Apache-Session-1.03/Session.pm	Mon Sep 27 10:12:51 1999
+@@ -371,7 +371,7 @@
+     }
+     else {
+         $self->{status} |= NEW;
+-        $self->{data}->{_session_id} = generate_id();
++        $self->{data}->{_session_id} = $self->generate_id();
+         $self->save;
+     }
+     

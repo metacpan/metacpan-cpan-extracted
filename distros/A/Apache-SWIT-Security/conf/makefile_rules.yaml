@@ -1,0 +1,47 @@
+- targets: [ pure_all ]
+  dependencies: 
+    - t/conf/httpd.conf
+    - blib/conf/httpd.conf
+    - blib/conf/seal.key
+    - blib/lib/T/Apache/SWIT/Security/Role/Container.pm
+    - blib/lib/T/Apache/SWIT/Security/Role/Manager.pm
+    - blib/lib/Apache/SWIT/Security/InstallationContent.pm
+    - t/conf/schema.sql
+  actions:
+    - $(NOECHO) $(NOOP)
+- actions:
+    - rm -f t/conf/schema.sql
+  dependencies: []
+  targets:
+    - realclean
+- targets: [ t/conf/httpd.conf ]
+  dependencies: 
+    - t/conf/extra.conf.in
+  actions:
+    - PERL_DL_NONLAZY=1 $(FULLPERLRUN) t/apache_test_run.pl -config
+- actions:
+    - ./scripts/swit_app.pl dump_db
+  dependencies:
+    - lib/Apache/SWIT/Security/DB/Schema.pm
+  targets:
+    - t/conf/schema.sql
+- targets: [ blib/conf/seal.key ]
+  dependencies:
+    - conf/seal.key
+  actions:
+    - cp conf/seal.key blib/conf/seal.key
+- targets:
+    - blib/conf/httpd.conf
+    - blib/conf/do_swit_startups.pl
+    - blib/lib/T/Apache/SWIT/Security/Role/Container.pm
+    - blib/lib/T/Apache/SWIT/Security/Role/Manager.pm
+  dependencies:
+    - conf/swit.yaml
+    - conf/httpd.conf.in
+    - lib/Apache/SWIT/Security/Maker.pm
+  actions:
+    - ./scripts/swit_app.pl regenerate_httpd_conf
+- targets: [ 'blib/lib/Apache/SWIT/Security/InstallationContent.pm' ]
+  dependencies: [ conf/swit.yaml, '%IC_TEST_FILES%' ]
+  actions:
+    - ./scripts/swit_app.pl installation_content

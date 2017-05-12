@@ -1,0 +1,38 @@
+$Id: README,v 1.8 2005/10/21 18:07:33 reggers Exp $
+
+This module, Apache2::AuthenMSAD, is an Apache2/mod_perl2 authentication
+handler to authenticate users using a Microsoft Active Directory
+server. Authentication is an LDAP bind to the user's UserPrincipal name --
+"$user\@$domain" (that's the "Kerberos" name, you can do the same bind to
+"$domain\\$user")
+
+To build and install it, please run
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+To read more about this module try
+
+    pod2text AuthenMSAD.pm
+
+It should be clear that this requires Apache v2.X with mod_perl2. Also
+require correspondinunderlying perl packages including Apache2 and Net2::LDAP
+
+This package is Copyright (C) 2005 by Yvan Rodrigues (Graphics Services/UW),
+Reg Quinton (Information Systems and Technology/UW) and Franz Skale (of
+www.cubit.at). It may be copied, used and redistributed under the same terms
+as perl itself. We are found as
+
+Yvan Rodrigues <yrodrigu@admmail.uwaterloo.ca>
+Reg Quinton <reggers@ist.uwaterloo.ca>
+Franz Skale <franz.skale@cubit.at>
+
+This package is *derived* from Apache::AuthenMSAD which is Copyright (C) 2004
+by Yvan Rodrigues, and Reg Quinton (both) University of Waterloo with similar
+copyright.
+
+-- Reg Quinton <reggers@ist.uwaterloo.ca>
+                                     "Stay calm, be brave, wait for the signs."
+							Dead Dog Cafe/CBC Radio

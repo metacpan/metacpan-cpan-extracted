@@ -1,0 +1,608 @@
+=head1 Name
+
+sqitch-config - Get and set local, user, or system Sqitch options
+
+=head1 Synopsis
+
+  sqitch config [<file-option>] [type] name [value [value_regex]]
+  sqitch config [<file-option>] [type] --add name value
+  sqitch config [<file-option>] [type] --replace-all name value [value_regex]
+  sqitch config [<file-option>] [type] --get name [value_regex]
+  sqitch config [<file-option>] [type] --get-all name [value_regex]
+  sqitch config [<file-option>] [type] --get-regexp name_regex [value_regex]
+  sqitch config [<file-option>] --unset name [value_regex]
+  sqitch config [<file-option>] --unset-all name [value_regex]
+  sqitch config [<file-option>] --rename-section old_name new_name
+  sqitch config [<file-option>] --remove-section name
+  sqitch config [<file-option>] -l | --list
+  sqitch config [<file-option>] -e | --edit
+
+=head1 Description
+
+You can query/set/replace/unset Sqitch options with this command. The name is
+actually the section and the key separated by a dot, and the value will be
+escaped.
+
+Multiple lines can be added to an option by using the C<--add> option. If you
+want to update or unset an option which can occur on multiple lines, a Perl
+regular expression C<value_regex> needs to be given. Only the existing values
+that match the regex will be updated or unset. If you want to handle lines
+that do not match the regex, just prepend a single C<!> (exclamation point) in
+front (see L<Examples>).
+
+The C<type> specifier can be C<--int>, C<--num>, or C<--bool>, to ensure that
+the variable(s) are of the given type and convert the value to the canonical
+form (simple integer for C<--int>, decimal number for C<--num>, a "true" or
+"false" string for C<--bool>) If no type specifier is passed, no checks or
+transformations are performed on the value.
+
+The C<file-option> can be one of C<--local>, C<--user>, C<--system>, or
+C<--file>, which specify where the values will be read from or written to. The
+default is to assume the local config file in the current project directory,
+for editing, and the all files merged for fetching (see L</Files>).
+
+=begin comment
+
+XXX Need to implmenent these.
+
+This command will fail (with exit code ret) if:
+
+=over
+
+=item 1.
+
+The config file is invalid (ret=3)
+
+=item 2.
+
+Cannot write to the config file (ret=4)
+
+=item 3.
+
+No section or name was provided (ret=2)
+
+=item 4.
+
+The section or key is invalid (ret=1)
+
+=item 5.
+
+You try to unset an option which does not exist (ret=5)
+
+=item 6.
+
+You try to unset/set an option for which multiple lines match (ret=5)
+
+=item 7.
+
+You try to use an invalid regexp (ret=6)
+
+=item 8.
+
+You use C<--user> option without C<$HOME> being properly set (ret=128)
+
+=back
+
+=end comment
+
+On success, the command returns the exit code 0.
+
+=head1 Options
+
+=over
+
+=item C<--replace-all>
+
+The default behavior is to replace at most one line. This replaces all lines
+matching the key (and optionally the C<value_regex>).
+
+=item C<--add>
+
+Adds a new line to the option without altering any existing values. This is
+the same as providing C<^$> as the value_regex in C<--replace-all>.
+
+=item C<--get>
+
+Get the value for a given key (optionally filtered by a regex matching the
+value). Returns error code 1 if the key was not found and error code 2 if
+multiple values were found.
+
+=item C<--get-all>
+
+Like C<--get>, but does not fail if the number of values for the key is not
+exactly one.
+
+=item C<--get-regexp>
+
+Like C<--get-all>, but interprets the name as a regular expression and writes
+out the key names and value.
+
+=item C<--local>
+
+For writing options: write to the local F<./sqitch.conf> file. This is
+the default if no file option is specified.
+
+For reading options: read only from the local F<./sqitch.conf> file rather
+than from all available files.
+
+See also L</Files>.
+
+=item C<--user>
+
+For writing options: write to the user F<~/.sqitch/sqitch.conf> file rather
+than the repository F<./sqitch.conf>.
+
+For reading options: read only from the user F<~/.sqitch/sqitch.conf> file
+rather than from all available files.
+
+See also L</Files>.
+
+=item C<--global>
+
+An alias for C<--user> for the benefit of the muscle memory of Git users.
+
+=item C<--system>
+
+For writing options: write to system-wide F<$(prefix)/etc/sqitch/sqitch.conf>
+file rather than the repository F<./sqitch.conf>.
+
+For reading options: read only from system-wide
+F<$(prefix)/etc/sqitch/sqitch.conf> file rather than from all available files.
+
+Call C<sqitch --etc-path> to find out exactly where the system configuration
+file lives (e.g., C<$(sqitch --etc-path)/sqitch.conf>).
+
+See also L</Files>.
+
+=item C<-f config-file, --file config-file>
+
+Use the given config file instead of the one specified by C<$SQITCH_CONFIG>.
+
+=item C<--remove-section>
+
+Remove the given section from the configuration file.
+
+=item C<--rename-section>
+
+Rename the given section to a new name.
+
+=item C<--unset>
+
+Remove the line matching the key from config file.
+
+=item C<--unset-all>
+
+Remove all lines matching the key from config file.
+
+=item C<-l, --list>
+
+List all variables set in config file.
+
+=item C<--bool>
+
+C<sqitch config> will ensure that the output is "true" or "false".
+
+=item C<--int>
+
+C<sqitch config> will ensure that the output is a simple integer.
+
+=item C<--num>
+
+C<sqitch config> will ensure that the output is a simple decimal number.
+
+=item C<--bool-or-int>
+
+C<sqitch config> will ensure that the output matches the format of either
+C<--bool> or C<--int>, as described above.
+
+=item C<-e, --edit>
+
+Opens an editor to modify the specified config file; either C<--local>,
+C<--user>, C<--system>, or C<--file>. If none of those options is specified,
+the local file will be opened.
+
+=back
+
+=head1 Files
+
+If not set explicitly with C<--file>, there are three files in which
+C<sqitch config> will search for configuration options:
+
+=over
+
+=item F<./sqitch.conf>
+
+Local, project-specific configuration file.
+
+=item F<~/.sqitch/sqitch.conf>
+
+User-specific configuration file.
+
+=item F<$(prefix)/etc/sqitch/sqitch.conf>
+
+System-wide configuration file.
+
+=back
+
+=head1 Environment
+
+=over
+
+=item C<SQITCH_CONFIG>
+
+Take the local configuration from the given file instead of F<./sqitch.conf>.
+
+=item C<SQITCH_USER_CONFIG>
+
+Take the user configuration from the given file instead of
+F<~/.sqitch/sqitch.conf>.
+
+=item C<SQITCH_SYSTEM_CONFIG>
+
+Take the system configuration from the given file instead of
+F<$($etc_prefix)/sqitch.conf>.
+
+=back
+
+=head1 Examples
+
+Given a F<./sqitch.conf> like this:
+
+  #
+  # This is the config file, and
+  # a '#' or ';' character indicates
+  # a comment
+  #
+
+  ; core variables
+  [core]
+          ; Use PostgreSQL
+          engine    = pg
+
+  ; Bundle command settings.
+  [bundle]
+          from      = gamma
+          tags_only = false
+          dest_dir  = _build/sql
+
+  ; Revert command settings
+  [core "revert"]
+          set        = foo=bar
+          set        = baz=yo
+
+You can set the C<tags_only> setting to true with
+
+  % sqitch config bundle.tags_only true
+
+The hypothetical C<set> key in the C<core.revert> section might need to set C<foo>
+to "hi" instead of "bar". Here's how to make that change:
+
+  % sqitch config core.revert.set foo=bar foo=hi
+
+To delete the entry for C<bundle.from>, do
+
+  % sqitch config --unset bundle.from
+
+If you want to delete an entry for a multivalue setting (like C<core.revert.set>),
+provide a regex matching the value of exactly one line.
+
+To query the value for a given key, do:
+
+  % sqitch config --get core.engine
+
+Or:
+
+  % sqitch config core.engine
+
+Or, to query a multivalue setting for only those values that match C</ba/>:
+
+  % sqitch config --get core.revert.set ba
+
+If you want to know all the values for a multivalue setting, do:
+
+  % sqitch config --get-all core.revert.set
+
+If you like to live dangerously, you can replace all C<core.revert.set> with a
+new one with
+
+  % sqitch config --replace-all core.revert.set bring=funk
+
+However, if you only want to replace the line without C<baz>, do something
+like this:
+
+  % sqitch config core.revert.set = '!baz'
+
+To match only values with an exclamation mark, you have to escape them:
+
+  % sqitch config section.key value '[!]'
+
+To add a new setting without altering any of the existing ones, use:
+
+  % sqitch config core.revert.set widget=fred
+
+=head1 Configuration File
+
+The sqitch configuration file contains a number of variables that affect the
+sqitch command's behavior. The F<./sqitch.conf> file local to each project is
+used to store the configuration for that project, and
+F<$HOME/.sqitch/sqitch.conf> is used to store a per-user configuration as
+fallback values for the F<./sqitch.conf> file. The file
+F<$($etc_prefix)/sqitch.conf> can be used to store a system-wide default
+configuration.
+
+The variables are divided into sections, wherein the fully qualified variable
+name of the variable itself is the last dot-separated segment and the section
+name is everything before the last dot. The variable names are
+case-insensitive, allow only alphanumeric characters and -, and must start
+with an alphabetic character. Some variables may appear multiple times.
+
+=head2 Syntax
+
+The syntax is fairly flexible and permissive; white space is mostly ignored.
+The C<#> and C<;> characters begin comments to the end of line, blank lines
+are ignored.
+
+The file consists of sections and variables. A section begins with the name of
+the section in square brackets and continues until the next section begins.
+Section names are not case sensitive. Only alphanumeric characters, C<-> and
+C<.> are allowed in section names. Each variable must belong to some section,
+which means that there must be a section header before the first setting of a
+variable.
+
+Sections can be further divided into subsections. To begin a subsection put
+its name in double quotes, separated by space from the section name, in the
+section header, like in the example below:
+
+     [section "subsection"]
+
+Subsection names are case sensitive and can contain any characters except
+newline (double quote and backslash have to be escaped as C<\"> and C<\\>,
+respectively). Section headers cannot span multiple lines. Variables may
+belong directly to a section or to a given subsection. You can have
+C<[section]> if you have C<[section "subsection"]>, but you don't need to.
+
+All the other lines (and the remainder of the line after the section header)
+are recognized as setting variables, in the form C<name = value>. If there is
+no equal sign on the line, the entire line is taken as name and the variable
+is recognized as boolean C<true>. The variable names are case-insensitive,
+allow only alphanumeric characters and C<->, and must start with an alphabetic
+character. There can be more than one value for a given variable; we say then
+that the variable is multivalued.
+
+Leading and trailing whitespace in a variable value is discarded. Internal
+whitespace within a variable value is retained verbatim.
+
+The values following the equals sign in variable assignments are either
+strings, integers, numbers, or booleans. Boolean values may be given as
+yes/no, 1/0, true/false or on/off. Case is not significant in boolean values,
+when converting value to the canonical form using the C<--bool> type
+specifier; C<sqitch config> will ensure that the output is "true" or "false".
+
+String values may be entirely or partially enclosed in double quotes. You need
+to enclose variable values in double quotes if you want to preserve leading or
+trailing whitespace, or if the variable value contains comment characters
+(i.e. it contains C<#> or C<;>). Double quote and backslash characters in
+variable values must be escaped: use C<\"> for C<"> and C<\\> for C<\>.
+
+The following escape sequences (beside C<\"> and C<\\>) are recognized: C<\n>
+for newline character (NL), C<\t> for horizontal tabulation (HT, TAB) and
+C<\b> for backspace (BS). No other character escape sequence or octal
+character sequence is valid.
+
+Variable values ending in a C<\> are continued on the next line in the
+customary UNIX fashion.
+
+Some variables may require a special value format.
+
+=head2 Example
+
+  # Core variables
+  [core]
+      engine    = pg
+      top_dir   = migrations
+      extension = ddl
+
+  [engine "pg"]
+      registry  = widgetopolis
+
+  [revert]
+      to        = gamma
+
+  [bundle]
+      from      = gamma
+      tags_only = yes
+      dest_dir  = _build/sql
+
+=head2 Variables
+
+Note that this list is not comprehensive and not necessarily complete. For
+command-specific variables, you will find a more detailed description in the
+appropriate manual page.
+
+=over
+
+=item C<core.plan_file>
+
+The plan file to use. Defaults to F<$top_dir/sqitch.plan>.
+
+=item C<core.engine>
+
+The database engine to use. Supported engines include:
+
+=over
+
+=item * C<pg> - L<PostgreSQL|http://postgresql.org/> and L<Postgres-XC|http://sourceforge.net/>
+
+=item * C<sqlite> - L<SQLite|http://sqlite.org/>
+
+=item * C<oracle> - L<Oracle|http://www.oracle.com/us/products/database/>
+
+=item * C<mysql> - L<MySQL|http://dev.mysql.com/> and L<MariaDB|https://mariadb.com/>
+
+=item * C<firebird> - L<Firebird|http://www.firebirdsql.org/>
+
+=item * C<vertica> - L<Vertica|https://my.vertica.com/>
+
+=back
+
+=item C<core.top_dir>
+
+Path to directory containing deploy, revert, and verify SQL scripts. It
+should contain subdirectories named C<deploy>, C<revert>, and (optionally)
+C<verify>. These may be overridden by C<deploy_dir>, C<revert_dir>, and
+C<verify_dir>. Defaults to C<.>.
+
+=item C<core.deploy_dir>
+
+Path to a directory containing SQL deployment scripts. Overrides the value
+implied by C<core.top_dir>.
+
+=item C<core.revert_dir>
+
+Path to a directory containing SQL reversion scripts. Overrides the value
+implied by C<core.top_dir>.
+
+=item C<core.verify_dir>
+
+Path to a directory containing SQL verify scripts. Overrides the value implied
+by C<core.top_dir>.
+
+=item C<core.extension>
+
+The file name extension on deploy, revert, and verify SQL scripts. Defaults to
+C<sql>.
+
+=item C<core.verbosity>
+
+An integer determining how verbose Sqitch should be. Defaults to 1. Set to 0
+to silence status messages and to 2 or three to increase verbosity. Error
+message output will not be affected by this property.
+
+=back
+
+=head3 C<user>
+
+Configuration properties that identify the user.
+
+=over
+
+=item C<user.name>
+
+Your full name, to be recorded in changes and tags added to the plan,
+and to commits to the database.
+
+=item C<user.email>
+
+Your email address, to be recorded in changes and tags added to the plan, and
+to commits to the database.
+
+=back
+
+=head3 C<engine.$engine>
+
+Each supported engine offers a set of configuration variables, falling under
+the key C<engine.$engine> where C<$engine> may be any value accepted for
+C<core.engine>.
+
+=over
+
+=item C<engine.$engine.target>
+
+A database target, either the name of target managed by the
+L<C<target>|sqitch-target> command, or a database connection URI. If it's a
+target name, then the associated C<uri>, C<registry>, and C<client> values
+will override any values specified for the values below. Targets are the
+preferred way to configure engines on a per-database basis, and the one
+specified here should be considered the default.
+
+=item C<engine.$engine.uri>
+
+A database connection URI.
+
+=item C<engine.$engine.registry>
+
+The name of the Sqitch registry schema or database. Sqitch will store its own
+data in this schema.
+
+=item C<engine.$engine.client>
+
+Path to the engine command-line client. Defaults to the first instance found
+in the path.
+
+=back
+
+Notes on engine-specific configuration:
+
+=over
+
+=item C<engine.pg.registry>
+
+For the PostgreSQL engine, the C<registry> value identifies the schema for
+Sqitch to use for its own data. No other data should be stored there. Defaults
+to C<sqitch>.
+
+=item C<engine.sqlite.registry>
+
+For the SQLite engine, if the C<registry> value looks like an absolute path,
+then it will be the database file. Otherwise, it will be in the same directory
+as the database specified by the C<uri>. Defaults to C<sqitch>.
+
+=item C<engine.mysql.registry>
+
+For the MySQL engine, the C<registry> value identifies the database for Sqitch
+to use for its own data. If you need to manage multiple databases on a single
+server, and don't want them all to share the same registry, change this
+property to a value specific for your database. Defaults to C<sqitch>.
+
+=item C<engine.oracle.registry>
+
+For Oracle, C<registry> value identifies the schema for Sqitch to use for its
+own data. No other data should be stored there. Uses the current schema by
+default (usually the same name as the connection user).
+
+=item C<engine.firebird.registry>
+
+For the Firebird engine, if the C<registry> value looks like an absolute path,
+then it will be the database file. Otherwise, it will be in the same directory
+as the database specified by the C<uri>. Defaults to C<sqitch.$extension>,
+where C<$extension> is the same as that in the C<uri>, if any.
+
+=item C<engine.vertica.registry>
+
+For the Vertica engine, the C<registry> value identifies the schema for Sqitch
+to use for its own data. No other data should be stored there. Defaults to
+C<sqitch>.
+
+=back
+
+=head3 C<core.vcs>
+
+Configuration properties for the version control system. Currently, only Git
+is supported.
+
+=over
+
+=item C<core.vcs.client>
+
+Path to the C<VCS> command-line client. Defaults to the first instance of
+F<git> found in the path.
+
+=back
+
+=head3 C<user>
+
+=over
+
+=item C<user.email>
+
+Your email address to be recorded in any newly planned changes.
+
+=item C<user.name>
+
+Your full name to be recorded in any newly planned changes.
+
+=back
+
+=head1 Sqitch
+
+Part of the L<sqitch> suite.

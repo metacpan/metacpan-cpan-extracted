@@ -1,0 +1,59 @@
+<script>
+function check (str,value) {
+	var r = new RegExp(str);
+	var f = document.form;
+	for (var i = 0; i < f.elements.length; i++) {
+		if (f.elements[i].type == 'checkbox' && r.test(f.elements[i].id) ) {
+			f.elements[i].checked=value;
+		}
+	}
+}
+</script>
+<form METHOD="POST" action="[% s.uof %]" name="form">
+[% s.html_hidden('f','save') %]
+[% s.html_hidden('group_id',s.in.group_id) %]
+<div class="floatleft">
+[% s.html_submit('Save') %]
+<table>
+	<caption>Group Permissions</caption>
+	<thead>
+		<tr>
+			<th class='shead' colspan="2">
+			<a href="#" onClick="javascript: check('p',true); return false;" class="action">Check All</a>
+			<a href="#" onClick="javascript: check('p',false); return false;" class="action">UnCheck All</a>
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+[% lastcat %]
+[% lastobject %]
+[% FOREACH l IN list %]
+	[% IF lastcat != l.object_cat %]
+		[% lastcat = l.object_cat %]
+		<tr>
+			<th colspan="2">[% l.object_cat %]</th>
+		</tr>
+	[% END %]
+	[% IF lastobject != l.object_name %]
+		[% lastobject = l.object_name %]
+		<tr>
+			<th>&nbsp;&nbsp;</th>
+			<th><a href="[% s.ubase %]/[% l.code %]/permission">[% l.object_name %]</a></th>
+		</tr>
+		<tr>
+			<th class='shead'>&nbsp;&nbsp;</th>
+			<th class='shead'>
+			<a href="#" onClick="javascript: check('p[% l.code %]:',true); return false;" class="action">Check</a>
+			<a href="#" onClick="javascript: check('p[% l.code %]:',false); return false;" class="action">UnCheck</a>
+			</th>
+		</tr>
+	[% END %]
+		<tr>
+			<td>&nbsp;&nbsp;</td>
+			<td>[% s.html_checkbox("a:${l.action_id}",l.action_id,l.checked,l.action_name,"p${l.code}:a:${l.action_id}") %] ([% l.action_id %])</td>
+		</tr>
+[% END %]
+</table>
+[% s.html_submit('Save') %]
+</div>
+</form>

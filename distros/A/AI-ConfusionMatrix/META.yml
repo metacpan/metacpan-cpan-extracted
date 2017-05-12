@@ -1,0 +1,31 @@
+---
+abstract: 'Make a confusion matrix'
+author:
+  - 'Vincent Lequertier <sky@riseup.net>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AI-ConfusionMatrix
+provides:
+  AI::ConfusionMatrix:
+    file: lib/AI/ConfusionMatrix.pm
+    version: '0.006'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Tie::File: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?AI-ConfusionMatrix
+  repository: git://github.com/SkySymbol/perl-ai-confusionmatrix.git
+version: '0.006'
+x_serialization_backend: 'YAML::Tiny version 1.69'

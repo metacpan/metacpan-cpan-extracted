@@ -1,0 +1,19 @@
+# $Id: /local/CPAN/AxKit-XSP-Minisession/t/conf/extra.conf.in 1418 2005-03-05T18:07:22.924154Z claco  $
+PerlSetVar MinisessionDir @documentroot@/session
+PerlSetVar MinisessionLockDir @documentroot@/sessionlock
+
+<IfModule mod_perl.c>
+	<IfDefine AXKIT>
+		PerlModule		AxKit
+		AxNoCache		On
+		AxLogDeclines	On
+		AxDebugLevel	10
+		AxStackTrace	On
+		AxAddProcessor	application/x-xsp .
+		AxAddXSPTaglib	AxKit::XSP::Minisession
+
+		<Files *.xsp>
+			SetHandler	AxKit
+		</Files>
+	</IfDefine>
+</IfModule>

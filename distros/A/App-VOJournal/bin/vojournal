@@ -1,0 +1,4 @@
+#!/usr/bin/perl
+
+use App::VOJournal;
+App::VOJournal->run;

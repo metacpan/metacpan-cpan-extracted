@@ -1,0 +1,33 @@
+---
+abstract: 'Backup and restore your Minecraft. Install mods.'
+author:
+  - 'Brad Haywood <brad@perlpowered.com>'
+  - 'Brad Haywood <brad@perlpowered.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: artistic2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-minecraft
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Archive::Zip: 1.30
+  Cwd: 0
+  File::Copy::Recursive: 0.38
+  File::Path: 0
+  perl: 5.01
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-minecraft
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: 0.001

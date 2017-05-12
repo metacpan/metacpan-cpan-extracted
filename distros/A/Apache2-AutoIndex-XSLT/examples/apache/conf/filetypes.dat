@@ -1,0 +1,3042 @@
+Extension:      .323
+  Type:         h323file
+  MimeType:     text/h323
+  DisplayName:  H.323 Internet Telephony
+  IconDesc:     "C:\Program Files\NetMeeting\conf.exe",1
+
+Extension:      .3g2
+  Type:         QuickTime.3g2
+  MimeType:     video/3gpp2
+  DisplayName:  3GPP2 Movie Importer
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-163
+
+Extension:      .3gp
+  Type:         QuickTime.3gp
+  MimeType:     video/3gpp
+  DisplayName:  3GPP Movie Importer
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-162
+
+Extension:      .3gp2
+  Type:         QuickTime.3gp2
+  MimeType:     video/3gpp2
+  DisplayName:  3GPP2 Movie Importer
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-163
+
+Extension:      .3gpp
+  Type:         QuickTime.3gpp
+  MimeType:     video/3gpp
+  DisplayName:  3GPP Movie Importer
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-162
+
+Extension:      .aac
+  Type:         QuickTime.aac
+  MimeType:     audio/aac
+  DisplayName:  
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-130
+
+Extension:      .aca
+  Type:         Agent.Character.2
+  MimeType:     
+  DisplayName:  Microsoft Agent Character File (HTTP format)
+  IconDesc:     C:\WINDOWS\msagent\agentdpv.dll,-201
+
+Extension:      .acf
+  Type:         Agent.Character.2
+  MimeType:     
+  DisplayName:  Microsoft Agent Character File (HTTP format)
+  IconDesc:     C:\WINDOWS\msagent\agentdpv.dll,-201
+
+Extension:      .acg
+  Type:         Agent.Preview.2
+  MimeType:     
+  DisplayName:  Microsoft Agent Preview File
+  IconDesc:     C:\WINDOWS\msagent\agentdp2.dll,-201
+
+Extension:      .acl
+  Type:         ACLFile
+  MimeType:     
+  DisplayName:  AutoCorrect List File
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .acs
+  Type:         Agent.Character2.2
+  MimeType:     
+  DisplayName:  Microsoft Agent Character File
+  IconDesc:     C:\WINDOWS\msagent\agentdp2.dll,-201
+
+Extension:      .acw
+  Type:         acwfile
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\WINDOWS\system32\accwiz.exe,0
+
+Extension:      .ade
+  Type:         Access.ADEFile.11
+  MimeType:     application/msaccess
+  DisplayName:  Microsoft Office Access Project Extension
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,52
+
+Extension:      .adn
+  Type:         Access.BlankProjectTemplate.11
+  MimeType:     
+  DisplayName:  Microsoft Office Access Blank Project Template
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,53
+
+Extension:      .adp
+  Type:         Access.Project.11
+  MimeType:     application/msaccess
+  DisplayName:  Microsoft Office Access Project
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,53
+
+Extension:      .adts
+  Type:         QuickTime.adts
+  MimeType:     audio/aac
+  DisplayName:  
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-130
+
+Extension:      .aif
+  Type:         QuickTime.aif
+  MimeType:     audio/aiff
+  DisplayName:  AIFF Audio
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-131
+
+Extension:      .aifc
+  Type:         QuickTime.aifc
+  MimeType:     audio/aiff
+  DisplayName:  AIFF Audio
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-131
+
+Extension:      .aiff
+  Type:         QuickTime.aiff
+  MimeType:     audio/aiff
+  DisplayName:  AIFF Audio
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-131
+
+Extension:      .amc
+  Type:         QuickTime.amc
+  MimeType:     application/x-mpeg
+  DisplayName:  AMC Movie Importer
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-164
+
+Extension:      .ani
+  Type:         anifile
+  MimeType:     
+  DisplayName:  Animated Cursor
+  IconDesc:     %1
+
+Extension:      .aom
+  Type:         AOM
+  MimeType:     application/aom
+  DisplayName:  Adobe Download Manager file
+  IconDesc:     "C:\Program Files\Common Files\Adobe\ESD\AdobeDownloadManager.exe",0
+
+Extension:      .api
+  Type:         AcroExch.Plugin
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\App\Acrobat\Reader\AcroRd32.dll,-6
+
+Extension:      .asa
+  Type:         asafile
+  MimeType:     
+  DisplayName:  
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,0
+
+Extension:      .asax
+  Type:         VisualStudio.asax.7.1
+  MimeType:     
+  DisplayName:  
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,1
+
+Extension:      .ascx
+  Type:         VisualStudio.ascx.7.1
+  MimeType:     
+  DisplayName:  ASP.NET Custom Control
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,2
+
+Extension:      .asf
+  Type:         ASFFile
+  MimeType:     video/x-ms-asf
+  DisplayName:  Windows Media Audio/Video file
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .asm
+  Type:         VisualStudio.asm.7.1
+  MimeType:     text/plain
+  DisplayName:  Assembler Source
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-2
+
+Extension:      .asmx
+  Type:         VisualStudio.asmx.7.1
+  MimeType:     
+  DisplayName:  
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,3
+
+Extension:      .asp
+  Type:         aspfile
+  MimeType:     
+  DisplayName:  Active Server Page
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,4
+
+Extension:      .aspx
+  Type:         VisualStudio.aspx.7.1
+  MimeType:     
+  DisplayName:  ASP.NET Server Page
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,5
+
+Extension:      .asx
+  Type:         ASXFile
+  MimeType:     video/x-ms-asf
+  DisplayName:  Windows Media Audio/Video playlist
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .au
+  Type:         AUFile
+  MimeType:     audio/basic
+  DisplayName:  AU Format Sound
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .avi
+  Type:         avifile
+  MimeType:     video/avi
+  DisplayName:  Video Clip
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .aw
+  Type:         AWFile
+  MimeType:     
+  DisplayName:  Answer Wizard File
+  IconDesc:     C:\WINDOWS\Installer\\{90510409-6000-11D3-8CFE-0150048383C9}\misc.exe,6
+
+Extension:      .bat
+  Type:         batfile
+  MimeType:     
+  DisplayName:  MS-DOS Batch File
+  IconDesc:     C:\WINDOWS\System32\shell32.dll,-153
+
+Extension:      .bfc
+  Type:         Briefcase
+  MimeType:     
+  DisplayName:  Briefcase
+  IconDesc:     C:\WINDOWS\system32\syncui.dll,0
+
+Extension:      .bkf
+  Type:         msbackupfile
+  MimeType:     
+  DisplayName:  Microsoft Backup File
+  IconDesc:     C:\WINDOWS\system32\ntbackup.exe,10
+
+Extension:      .bmp
+  Type:         OISbmpfile
+  MimeType:     image/bmp
+  DisplayName:  Bitmap Image
+  IconDesc:     "C:\App\Office\OFFICE11\ois.exe",3
+
+Extension:      .bsc
+  Type:         VisualStudio.bsc.7.1
+  MimeType:     
+  DisplayName:  Source Browser Database
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-7
+
+Extension:      .c
+  Type:         VisualStudio.c.7.1
+  MimeType:     text/plain
+  DisplayName:  C Source
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-4
+
+Extension:      .cab
+  Type:         CLSID\{0CD7A5C0-9F37-11CE-AE65-08002B2E1262}
+  MimeType:     
+  DisplayName:  Cabinet File
+  IconDesc:     cabview.dll,0
+
+Extension:      .caf
+  Type:         QuickTime.caf
+  MimeType:     audio/x-caf
+  DisplayName:  CAF audio file
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-130
+
+Extension:      .cat
+  Type:         CATFile
+  MimeType:     application/vnd.ms-pki.seccat
+  DisplayName:  Security Catalog
+  IconDesc:     C:\WINDOWS\System32\cryptui.dll,-3418
+
+Extension:      .cbo
+  Type:         MITrain.Document
+  MimeType:     application/sha
+  DisplayName:  Microsoft Interactive Training Bookmark
+  IconDesc:     C:\WINDOWS\Help\SBSI\Training\ORUN32.EXE,0
+
+Extension:      .cc
+  Type:         VisualStudio.cpp.7.1
+  MimeType:     text/plain
+  DisplayName:  C++ Source
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-3
+
+Extension:      .cda
+  Type:         CDAFile
+  MimeType:     
+  DisplayName:  CD Audio Track
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .cdda
+  Type:         QuickTime.cdda
+  MimeType:     audio/aiff
+  DisplayName:  AIFF Audio
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-130
+
+Extension:      .cdf
+  Type:         ChannelFile
+  MimeType:     application/x-cdf
+  DisplayName:  Channel File
+  IconDesc:     %1
+
+Extension:      .CDR
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .cdx
+  Type:         aspfile
+  MimeType:     
+  DisplayName:  Active Server Page
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,4
+
+Extension:      .cer
+  Type:         CERFile
+  MimeType:     application/x-x509-ca-cert
+  DisplayName:  Security Certificate
+  IconDesc:     C:\WINDOWS\System32\cryptui.dll,-3410
+
+Extension:      .cfg
+  Type:         CFGFile
+  MimeType:     
+  DisplayName:  Microsoft Office Outlook Configuration File
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .cfy
+  Type:         Pure.Coverage.Data
+  MimeType:     
+  DisplayName:  PureCoverage Data
+  IconDesc:     C:\App\Rational\PURIFY~1\COVERA~2.EXE,0
+
+Extension:      .cgm
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .chm
+  Type:         chm.file
+  MimeType:     
+  DisplayName:  Compiled HTML Help file
+  IconDesc:     C:\WINDOWS\hh.exe,0
+
+Extension:      .clp
+  Type:         clpfile
+  MimeType:     
+  DisplayName:  Clipboard Clip
+  IconDesc:     C:\WINDOWS\system32\clipbrd.exe,1
+
+Extension:      .cmd
+  Type:         cmdfile
+  MimeType:     
+  DisplayName:  Windows NT Command Script
+  IconDesc:     C:\WINDOWS\System32\shell32.dll,-153
+
+Extension:      .CMX
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .cnf
+  Type:         ConferenceLink
+  MimeType:     
+  DisplayName:  SpeedDial
+  IconDesc:     msconf.dll,-103
+
+Extension:      .cod
+  Type:         VisualStudio.cod.7.1
+  MimeType:     text/plain
+  DisplayName:  C/C++ Code Listing
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-8
+
+Extension:      .col
+  Type:         COLFile
+  MimeType:     
+  DisplayName:  HTML Help File
+  IconDesc:     misc.exe,6
+
+Extension:      .com
+  Type:         comfile
+  MimeType:     
+  DisplayName:  MS-DOS Application
+  IconDesc:     C:\WINDOWS\System32\shell32.dll,2
+
+Extension:      .config
+  Type:         VisualStudio.config.7.1
+  MimeType:     
+  DisplayName:  Web Configuration File
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,6
+
+Extension:      .cpp
+  Type:         VisualStudio.cpp.7.1
+  MimeType:     text/plain
+  DisplayName:  C++ Source
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-3
+
+Extension:      .crl
+  Type:         CRLFile
+  MimeType:     application/pkix-crl
+  DisplayName:  Certificate Revocation List
+  IconDesc:     C:\WINDOWS\System32\cryptui.dll,-3417
+
+Extension:      .crt
+  Type:         CERFile
+  MimeType:     application/x-x509-ca-cert
+  DisplayName:  Security Certificate
+  IconDesc:     C:\WINDOWS\System32\cryptui.dll,-3410
+
+Extension:      .cs
+  Type:         VisualStudio.csfile.7.1
+  MimeType:     text/plain
+  DisplayName:  C# Source file
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\csproj.dll,1
+
+Extension:      .csdproj
+  Type:         VisualStudio.csdprojfile.7.1
+  MimeType:     
+  DisplayName:  C# Device Project file
+  IconDesc:     c:\App\MSDev\VC#\VCPackages\esproj.dll,0
+
+Extension:      .csproj
+  Type:         VisualStudio.csprojfile.7.1
+  MimeType:     
+  DisplayName:  C# Project file
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\csproj.dll,0
+
+Extension:      .css
+  Type:         CSSfile
+  MimeType:     text/css
+  DisplayName:  Cascading Style Sheet Document
+  IconDesc:     C:\WINDOWS\system32\shell32.dll,-151
+
+Extension:      .csv
+  Type:         Excel.CSV
+  MimeType:     application/vnd.ms-excel
+  DisplayName:  Microsoft Office Excel Comma Separated Values File
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\xlicons.exe,9
+
+Extension:      .CTT
+  Type:         MessengerContactList
+  MimeType:     
+  DisplayName:  Messenger Contact List
+  IconDesc:     C:\Program Files\Messenger\msmsgs.exe,-1
+
+Extension:      .cur
+  Type:         curfile
+  MimeType:     
+  DisplayName:  Cursor
+  IconDesc:     %1
+
+Extension:      .CUT
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .cxx
+  Type:         VisualStudio.cpp.7.1
+  MimeType:     text/plain
+  DisplayName:  C++ Source
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-3
+
+Extension:      .db
+  Type:         dbfile
+  MimeType:     
+  DisplayName:  Data Base File
+  IconDesc:     shell32.dll,-154
+
+Extension:      .dbp
+  Type:         VisualStudio.DatabaseProject.7.1
+  MimeType:     
+  DisplayName:  Visual Studio .NET Database Project
+  IconDesc:     c:\App\MSDev\Common7\Tools\VDT\vdt70p.dll,-1058
+
+Extension:      .dbs
+  Type:         dbsfile.7.1
+  MimeType:     text/plain
+  DisplayName:  SQL Database Script file
+  IconDesc:     c:\App\MSDev\Common7\Tools\VDT\vdt70p.dll,-1054
+
+Extension:      .dcs
+  Type:         dcsfile
+  MimeType:     
+  DisplayName:  Database Content Source
+  IconDesc:     C:\Program Files\Common Files\Microsoft Shared\Web Folders\pkmres.dll,11
+
+Extension:      .def
+  Type:         VisualStudio.def.7.1
+  MimeType:     text/plain
+  DisplayName:  Export Definition File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-8
+
+Extension:      .der
+  Type:         CERFile
+  MimeType:     application/x-x509-ca-cert
+  DisplayName:  Security Certificate
+  IconDesc:     C:\WINDOWS\System32\cryptui.dll,-3410
+
+Extension:      .DeskLink
+  Type:         CLSID\{9E56BE61-C50F-11CF-9A2C-00A0C90A90CE}
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\WINDOWS\explorer.exe,-103
+
+Extension:      .det
+  Type:         DETFile
+  MimeType:     
+  DisplayName:  Office Data File
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .dib
+  Type:         OISbmpfile
+  MimeType:     image/bmp
+  DisplayName:  Bitmap Image
+  IconDesc:     "C:\App\Office\OFFICE11\ois.exe",3
+
+Extension:      .dic
+  Type:         txtfile
+  MimeType:     
+  DisplayName:  Text Document
+  IconDesc:     C:\WINDOWS\system32\shell32.dll,-152
+
+Extension:      .dif
+  Type:         QuickTime.dif
+  MimeType:     video/x-dv
+  DisplayName:  DV
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-134
+
+Extension:      .disco
+  Type:         VisualStudio.disco.7.1
+  MimeType:     
+  DisplayName:  Dynamic Discovery Document
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,12
+
+Extension:      .dll
+  Type:         dllfile
+  MimeType:     application/x-msdownload
+  DisplayName:  Application Extension
+  IconDesc:     C:\WINDOWS\System32\shell32.dll,-154
+
+Extension:      .dmp
+  Type:         VisualStudio.dmp.7.1
+  MimeType:     
+  DisplayName:  Crash Dump File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-13
+
+Extension:      .doc
+  Type:         Word.Document.8
+  MimeType:     application/msword
+  DisplayName:  Microsoft Word Document
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\wordicon.exe,1
+
+Extension:      .dochtml
+  Type:         wordhtmlfile
+  MimeType:     
+  DisplayName:  Microsoft Word HTML Document
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\wordicon.exe,11
+
+Extension:      .docmhtml
+  Type:         wordmhtmlfile
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\App\Office\OFFICE11\WINWORD.EXE,-16
+
+Extension:      .docxml
+  Type:         wordxmlfile
+  MimeType:     
+  DisplayName:  Microsoft Word XML Document
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\wordicon.exe,12
+
+Extension:      .dot
+  Type:         Word.Template.8
+  MimeType:     application/msword
+  DisplayName:  Microsoft Word Template
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\wordicon.exe,2
+
+Extension:      .dothtml
+  Type:         wordhtmltemplate
+  MimeType:     
+  DisplayName:  Microsoft Word HTML Template
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\wordicon.exe,9
+
+Extension:      .dqy
+  Type:         dqyfile
+  MimeType:     
+  DisplayName:  Microsoft Office Excel ODBC Query files
+  IconDesc:     C:\App\Office\OFFICE11\EXCEL.EXE,-271
+
+Extension:      .DRW
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .dsn
+  Type:         MSDASQL
+  MimeType:     
+  DisplayName:  Microsoft OLE DB Provider for ODBC Drivers
+  IconDesc:     C:\Program Files\Common Files\System\Ole DB\msdasql.dll,0
+
+Extension:      .dsp
+  Type:         VisualStudio.dsp.7.1
+  MimeType:     text/plain
+  DisplayName:  VC++ 6 Project
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-1
+
+Extension:      .dsw
+  Type:         VisualStudio.dsw.7.1
+  MimeType:     text/plain
+  DisplayName:  VC++ 6 Workspace
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-9
+
+Extension:      .dtq
+  Type:         dtqfile.7.1
+  MimeType:     
+  DisplayName:  SQL Query file
+  IconDesc:     c:\App\MSDev\Common7\Tools\VDT\vdt70p.dll,-1057
+
+Extension:      .dun
+  Type:         dunfile
+  MimeType:     
+  DisplayName:  Dialup Networking File
+  IconDesc:     C:\WINDOWS\system32\netshell.dll,1
+
+Extension:      .dv
+  Type:         QuickTime.dv
+  MimeType:     video/x-dv
+  DisplayName:  DV
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-134
+
+Extension:      .dvr-ms
+  Type:         WMP.DVR-MSFile
+  MimeType:     
+  DisplayName:  Microsoft Recorded TV Show
+  IconDesc:     C:\Program Files\Windows Media Player\wmplayer.exe,-120
+
+Extension:      .DXF
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .ecs
+  Type:         ecsfile
+  MimeType:     
+  DisplayName:  Exchange Server Content Source
+  IconDesc:     C:\Program Files\Common Files\Microsoft Shared\Web Folders\pkmres.dll,10
+
+Extension:      .elm
+  Type:         ELMFile
+  MimeType:     
+  DisplayName:  Microsoft Office Themes File
+  IconDesc:     C:\WINDOWS\Installer\\{90510409-6000-11D3-8CFE-0150048383C9}\misc.exe,6
+
+Extension:      .emf
+  Type:         emffile
+  MimeType:     
+  DisplayName:  
+  IconDesc:     shimgvw.dll,2
+
+Extension:      .eml
+  Type:         Microsoft Internet Mail Message
+  MimeType:     message/rfc822
+  DisplayName:  Internet E-Mail Message
+  IconDesc:     C:\Program Files\Outlook Express\msimn.exe,-4
+
+Extension:      .epf
+  Type:         EPFFile
+  MimeType:     
+  DisplayName:  Exchange Certificate File
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .exc
+  Type:         txtfile
+  MimeType:     
+  DisplayName:  Text Document
+  IconDesc:     C:\WINDOWS\system32\shell32.dll,-152
+
+Extension:      .exe
+  Type:         exefile
+  MimeType:     application/x-msdownload
+  DisplayName:  Application
+  IconDesc:     %1
+
+Extension:      .exp
+  Type:         VisualStudio.exp.7.1
+  MimeType:     
+  DisplayName:  Exports Library File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-14
+
+Extension:      .ext
+  Type:         extfile.7.1
+  MimeType:     text/plain
+  DisplayName:  SQL Extended Properties Script file
+  IconDesc:     c:\App\MSDev\Common7\Tools\VDT\vdt70p.dll,-1054
+
+Extension:      .fad
+  Type:         FADFile
+  MimeType:     
+  DisplayName:  Office Data File
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .fcs
+  Type:         fcsfile
+  MimeType:     
+  DisplayName:  File Share Content Source
+  IconDesc:     C:\Program Files\Common Files\Microsoft Shared\Web Folders\pkmres.dll,12
+
+Extension:      .fdf
+  Type:         AcroExch.FDFDoc
+  MimeType:     application/vnd.fdf
+  DisplayName:  Adobe Acrobat Forms Document
+  IconDesc:     C:\WINDOWS\Installer\{AC76BA86-7AD7-1033-7B44-A70000000000}\FDFFile.ico,0
+
+Extension:      .fdlang
+  Type:         FeedDemon.Lang
+  MimeType:     
+  DisplayName:  FeedDemon Language Resource
+  IconDesc:     "c:\App\FeedDemon\FeedDemon.exe", 0
+
+Extension:      .fdm
+  Type:         FDMFile
+  MimeType:     
+  DisplayName:  Microsoft Office Outlook Form Definition
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .fdsrch
+  Type:         FeedDemon.Search
+  MimeType:     
+  DisplayName:  FeedDemon Search Data
+  IconDesc:     "c:\App\FeedDemon\FeedDemon.exe", 0
+
+Extension:      .fdxsl
+  Type:         FeedDemon.Style
+  MimeType:     
+  DisplayName:  FeedDemon Newspaper Style
+  IconDesc:     "c:\App\FeedDemon\FeedDemon.exe", 0
+
+Extension:      .ffa
+  Type:         FFAFile
+  MimeType:     
+  DisplayName:  Find Fast Index
+  IconDesc:     C:\WINDOWS\Installer\\{90510409-6000-11D3-8CFE-0150048383C9}\misc.exe,6
+
+Extension:      .ffl
+  Type:         FFLFile
+  MimeType:     
+  DisplayName:  Find Fast Index
+  IconDesc:     C:\WINDOWS\Installer\\{90510409-6000-11D3-8CFE-0150048383C9}\misc.exe,6
+
+Extension:      .fft
+  Type:         FFTFile
+  MimeType:     
+  DisplayName:  Find Fast Index
+  IconDesc:     C:\WINDOWS\Installer\\{90510409-6000-11D3-8CFE-0150048383C9}\misc.exe,6
+
+Extension:      .ffx
+  Type:         FFXFile
+  MimeType:     
+  DisplayName:  Find Fast Index
+  IconDesc:     C:\WINDOWS\Installer\\{90510409-6000-11D3-8CFE-0150048383C9}\misc.exe,6
+
+Extension:      .fky
+  Type:         fkyfile.7.1
+  MimeType:     text/plain
+  DisplayName:  SQL Foreign Constraint Script file
+  IconDesc:     c:\App\MSDev\Common7\Tools\VDT\vdt70p.dll,-1054
+
+Extension:      .fnd
+  Type:         fndfile
+  MimeType:     
+  DisplayName:  Saved Search
+  IconDesc:     C:\WINDOWS\System32\shell32.dll,-134
+
+Extension:      .fon
+  Type:         fonfile
+  MimeType:     
+  DisplayName:  Font file
+  IconDesc:     C:\WINDOWS\System32\shell32.dll,-155
+
+Extension:      .fsqueue
+  Type:         FeedStation.Queue
+  MimeType:     
+  DisplayName:  FeedStation Download Queue
+  IconDesc:     "C:\App\FeedDemon\FeedStation.exe", 0
+
+Extension:      .GEM
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .gif
+  Type:         OISgiffile
+  MimeType:     image/gif
+  DisplayName:  GIF Image
+  IconDesc:     "C:\App\Office\OFFICE11\ois.exe",2
+
+Extension:      .gsm
+  Type:         QuickTime.gsm
+  MimeType:     audio/x-gsm
+  DisplayName:  GSM Audio
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-130
+
+Extension:      .h
+  Type:         VisualStudio.h.7.1
+  MimeType:     text/plain
+  DisplayName:  C/C++ Header
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-5
+
+Extension:      .HGL
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .hlp
+  Type:         hlpfile
+  MimeType:     
+  DisplayName:  Help File
+  IconDesc:     C:\WINDOWS\System32\shell32.dll,23
+
+Extension:      .hol
+  Type:         holfile
+  MimeType:     
+  DisplayName:  Microsoft Office Outlook Holidays
+  IconDesc:     C:\App\Office\OFFICE11\1033\OUTLLIBR.DLL,2
+
+Extension:      .hpp
+  Type:         VisualStudio.h.7.1
+  MimeType:     text/plain
+  DisplayName:  C/C++ Header
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-5
+
+Extension:      .ht
+  Type:         htfile
+  MimeType:     
+  DisplayName:  HyperTerminal File
+  IconDesc:     %1
+
+Extension:      .hta
+  Type:         htafile
+  MimeType:     application/hta
+  DisplayName:  HTML Application
+  IconDesc:     C:\WINDOWS\system32\mshta.exe,1
+
+Extension:      .htc
+  Type:         htcfile
+  MimeType:     text/x-component
+  DisplayName:  HTML Component
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,0
+
+Extension:      .htm
+  Type:         FirefoxHTML
+  MimeType:     text/html
+  DisplayName:  
+  IconDesc:     "%1"
+
+Extension:      .html
+  Type:         FirefoxHTML
+  MimeType:     text/html
+  DisplayName:  
+  IconDesc:     "%1"
+
+Extension:      .htt
+  Type:         HTTfile
+  MimeType:     text/webviewhtml
+  DisplayName:  HyperText Template
+  IconDesc:     C:\WINDOWS\system32\SHELL32.dll,-178
+
+Extension:      .hwl
+  Type:         HttpWatchStudio.Document
+  MimeType:     
+  DisplayName:  HttpWatch Log File
+  IconDesc:     c:\App\HTTPWA~1\HTTPWA~1.EXE,1
+
+Extension:      .HxA
+  Type:         hxafile
+  MimeType:     
+  DisplayName:  Microsoft Help Attribute Definition File
+  IconDesc:     c:\Program Files\Common Files\Microsoft Shared\Help\hxds.dll,-206
+
+Extension:      .HxC
+  Type:         hxcfile
+  MimeType:     
+  DisplayName:  Microsoft Help Collection Definition File
+  IconDesc:     c:\Program Files\Common Files\Microsoft Shared\Help\hxds.dll,-207
+
+Extension:      .HxE
+  Type:         hxefile
+  MimeType:     
+  DisplayName:  Microsoft Help Samples Definition File
+  IconDesc:     c:\Program Files\Common Files\Microsoft Shared\Help\hxds.dll,-208
+
+Extension:      .HxF
+  Type:         hxffile
+  MimeType:     
+  DisplayName:  Microsoft Help Include File
+  IconDesc:     c:\Program Files\Common Files\Microsoft Shared\Help\hxds.dll,-219
+
+Extension:      .HxI
+  Type:         hxifile
+  MimeType:     
+  DisplayName:  Microsoft Help Compiled Index
+  IconDesc:     c:\Program Files\Common Files\Microsoft Shared\Help\hxds.dll,-215
+
+Extension:      .HxK
+  Type:         hxkfile
+  MimeType:     
+  DisplayName:  Microsoft Help Index File
+  IconDesc:     c:\Program Files\Common Files\Microsoft Shared\Help\hxds.dll,-209
+
+Extension:      .HxQ
+  Type:         hxqfile
+  MimeType:     
+  DisplayName:  Microsoft Help Merged Query Index
+  IconDesc:     c:\Program Files\Common Files\Microsoft Shared\Help\hxds.dll,-216
+
+Extension:      .HxR
+  Type:         hxrfile
+  MimeType:     
+  DisplayName:  Microsoft Help Merged Attribute Index
+  IconDesc:     c:\Program Files\Common Files\Microsoft Shared\Help\hxds.dll,-218
+
+Extension:      .HxS
+  Type:         hxsfile
+  MimeType:     
+  DisplayName:  Compiled Microsoft Help file
+  IconDesc:     c:\Program Files\Common Files\Microsoft Shared\Help\hxds.dll,-210
+
+Extension:      .HxT
+  Type:         hxtfile
+  MimeType:     
+  DisplayName:  Microsoft Help Table of Contents File
+  IconDesc:     c:\Program Files\Common Files\Microsoft Shared\Help\hxds.dll,-211
+
+Extension:      .HxV
+  Type:         hxvfile
+  MimeType:     
+  DisplayName:  Microsoft Help Virtual Topic Definition File
+  IconDesc:     c:\Program Files\Common Files\Microsoft Shared\Help\hxds.dll,-212
+
+Extension:      .hxx
+  Type:         VisualStudio.h.7.1
+  MimeType:     text/plain
+  DisplayName:  C/C++ Header
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-5
+
+Extension:      .i
+  Type:         VisualStudio.i.7.1
+  MimeType:     text/plain
+  DisplayName:  Preprocessed C/C++ Source
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-8
+
+Extension:      .icc
+  Type:         icmfile
+  MimeType:     
+  DisplayName:  ICC Profile
+  IconDesc:     C:\WINDOWS\System32\icmui.dll,0
+
+Extension:      .icm
+  Type:         icmfile
+  MimeType:     
+  DisplayName:  ICC Profile
+  IconDesc:     C:\WINDOWS\System32\icmui.dll,0
+
+Extension:      .ico
+  Type:         icofile
+  MimeType:     image/x-icon
+  DisplayName:  Icon
+  IconDesc:     %1
+
+Extension:      .ics
+  Type:         icsfile
+  MimeType:     text/calendar
+  DisplayName:  iCalendar File
+  IconDesc:     C:\App\Office\OFFICE11\1033\OUTLLIBR.DLL,0
+
+Extension:      .idb
+  Type:         VisualStudio.idb.7.1
+  MimeType:     
+  DisplayName:  VC++ Minimal Rebuild Dependency File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-15
+
+Extension:      .idl
+  Type:         VisualStudio.idl.7.1
+  MimeType:     text/plain
+  DisplayName:  Interface Definition Language File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-8
+
+Extension:      .IFF
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .iii
+  Type:         iiifile
+  MimeType:     application/x-iphone
+  DisplayName:  Intel IPhone Compatible
+  IconDesc:     "C:\Program Files\NetMeeting\conf.exe",1
+
+Extension:      .ilk
+  Type:         VisualStudio.ilk.7.1
+  MimeType:     
+  DisplayName:  Incremental Linker File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-17
+
+Extension:      .IMG
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .inc
+  Type:         VisualStudio.inc.7.1
+  MimeType:     text/plain
+  DisplayName:  Include File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-8
+
+Extension:      .inf
+  Type:         inffile
+  MimeType:     
+  DisplayName:  Setup Information
+  IconDesc:     C:\WINDOWS\System32\shell32.dll,-151
+
+Extension:      .infopathxml
+  Type:         InfoPath.Document.1
+  MimeType:     application/ms-infopath.xml
+  DisplayName:  Microsoft Office InfoPath 1.0 XML Document
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\inficon.exe,1
+
+Extension:      .ini
+  Type:         inifile
+  MimeType:     
+  DisplayName:  Configuration Settings
+  IconDesc:     C:\WINDOWS\System32\shell32.dll,-151
+
+Extension:      .inl
+  Type:         VisualStudio.inl.7.1
+  MimeType:     text/plain
+  DisplayName:  C/C++ Inline File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-8
+
+Extension:      .ins
+  Type:         x-internet-signup
+  MimeType:     application/x-internet-signup
+  DisplayName:  Internet Communication Settings
+  IconDesc:     C:\Program Files\Internet Explorer\Connection Wizard\ICWCONN1.EXE,0
+
+Extension:      .ipr
+  Type:         IntelliJIdeaProjectFile
+  MimeType:     
+  DisplayName:  IntelliJ IDEA Project File
+  IconDesc:     c:\App\IDEA\bin\idea.ico
+
+Extension:      .iqy
+  Type:         iqyfile
+  MimeType:     text/x-ms-iqy
+  DisplayName:  Microsoft Office Excel Web Query File
+  IconDesc:     C:\App\Office\OFFICE11\EXCEL.EXE,-270
+
+Extension:      .isp
+  Type:         x-internet-signup
+  MimeType:     application/x-internet-signup
+  DisplayName:  Internet Communication Settings
+  IconDesc:     C:\Program Files\Internet Explorer\Connection Wizard\ICWCONN1.EXE,0
+
+Extension:      .its
+  Type:         ITS File
+  MimeType:     
+  DisplayName:  Internet Document Set
+  IconDesc:     C:\WINDOWS\system32\itss.dll,0
+
+Extension:      .itss
+  Type:         MS-ITSS File
+  MimeType:     
+  DisplayName:  Microsoft Infotech Storage System File
+  IconDesc:     C:\Program Files\Common Files\Microsoft Shared\Information Retrieval\msitss.dll, 0
+
+Extension:      .ivf
+  Type:         IVFfile
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\WINDOWS\system32\ivfsrc.ax,0
+
+Extension:      .java
+  Type:         JCreator.java
+  MimeType:     
+  DisplayName:  Java Source File
+  IconDesc:     C:\App\JCreator\JCreator.exe,2
+
+Extension:      .jbf
+  Type:         PSP.BrowserFile
+  MimeType:     
+  DisplayName:  PSP Browser File
+  IconDesc:     C:\App\PSP\Psp.exe,2
+
+Extension:      .jcp
+  Type:         JCreator.jcp
+  MimeType:     
+  DisplayName:  JCreator Project File
+  IconDesc:     C:\App\JCreator\JCreator.exe,7
+
+Extension:      .jcw
+  Type:         JCreator.jcw
+  MimeType:     
+  DisplayName:  JCreator Workspace File
+  IconDesc:     C:\App\JCreator\JCreator.exe,7
+
+Extension:      .jfif
+  Type:         OISjpegfile
+  MimeType:     image/jpeg
+  DisplayName:  JPEG Image
+  IconDesc:     "C:\App\Office\OFFICE11\ois.exe",1
+
+Extension:      .JIF
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .jpe
+  Type:         OISjpegfile
+  MimeType:     image/jpeg
+  DisplayName:  JPEG Image
+  IconDesc:     "C:\App\Office\OFFICE11\ois.exe",1
+
+Extension:      .jpeg
+  Type:         OISjpegfile
+  MimeType:     image/jpeg
+  DisplayName:  JPEG Image
+  IconDesc:     "C:\App\Office\OFFICE11\ois.exe",1
+
+Extension:      .jpg
+  Type:         OISjpegfile
+  MimeType:     image/jpeg
+  DisplayName:  JPEG Image
+  IconDesc:     "C:\App\Office\OFFICE11\ois.exe",1
+
+Extension:      .js
+  Type:         JSFile
+  MimeType:     
+  DisplayName:  JScript Script File
+  IconDesc:     C:\WINDOWS\System32\WScript.exe,3
+
+Extension:      .JSE
+  Type:         JSEFile
+  MimeType:     
+  DisplayName:  JScript Encoded Script File
+  IconDesc:     C:\WINDOWS\System32\WScript.exe,3
+
+Extension:      .jsp
+  Type:         JCreator.jsp
+  MimeType:     
+  DisplayName:  JSP Source File
+  IconDesc:     C:\App\JCreator\JCreator.exe,13
+
+Extension:      .kci
+  Type:         kcifile.7.1
+  MimeType:     text/plain
+  DisplayName:  SQL Key Contraint and Index Script file
+  IconDesc:     c:\App\MSDev\Common7\Tools\VDT\vdt70p.dll,-1054
+
+Extension:      .key
+  Type:         regfile
+  MimeType:     
+  DisplayName:  Registration Entries
+  IconDesc:     C:\WINDOWS\regedit.exe,1
+
+Extension:      .kml
+  Type:         Google Earth.kmlfile
+  MimeType:     application/vnd.google-earth.kml+xml
+  DisplayName:  Google Earth KML
+  IconDesc:     c:\App\GoogleEarth\kml_file.ico
+
+Extension:      .kmz
+  Type:         Google Earth.kmzfile
+  MimeType:     application/vnd.google-earth.kmz
+  DisplayName:  Google Earth KMZ
+  IconDesc:     c:\App\GoogleEarth\kmz_file.ico
+
+Extension:      .kpf
+  Type:         Komodo.Project
+  MimeType:     
+  DisplayName:  Komodo Project File
+  IconDesc:     C:\App\Komodo\lib\mozilla\komodo.exe,1
+
+Extension:      .LBM
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .ldb
+  Type:         Access.LockFile.11
+  MimeType:     
+  DisplayName:  Microsoft Office Access Record-Locking Information
+  IconDesc:     C:\App\Office\OFFICE11\MSACCESS.EXE,42
+
+Extension:      .lex
+  Type:         LEXFile
+  MimeType:     
+  DisplayName:  Dictionary File
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .lgn
+  Type:         lgnfile.7.1
+  MimeType:     text/plain
+  DisplayName:  SQL Login Script file
+  IconDesc:     c:\App\MSDev\Common7\Tools\VDT\vdt70p.dll,-1054
+
+Extension:      .lib
+  Type:         VisualStudio.inl.7.1
+  MimeType:     
+  DisplayName:  C/C++ Inline File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-8
+
+Extension:      .lic
+  Type:         VisualStudio.lic.7.1
+  MimeType:     
+  DisplayName:  License
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-8
+
+Extension:      .loc
+  Type:         locfile
+  MimeType:     
+  DisplayName:  Connection Wizard location profile database
+  IconDesc:     C:\PROGRA~1\ThinkPad\CONNEC~1\QCWizard.exe,-100
+
+Extension:      .log
+  Type:         log_auto_file
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\App\JCreator\JCreator.exe,3
+
+Extension:      .lst
+  Type:         VisualStudio.lst.7.1
+  MimeType:     text/plain
+  DisplayName:  MASM Listing
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-8
+
+Extension:      .lua
+  Type:         lua_auto_file
+  MimeType:     
+  DisplayName:  
+  IconDesc:     shell32.dll,69
+
+Extension:      .lwv
+  Type:         LWVFile
+  MimeType:     
+  DisplayName:  Microsoft Linguistically Enhanced Sound File
+  IconDesc:     C:\WINDOWS\msagent\mslwvtts.dll,-133
+
+Extension:      .m1v
+  Type:         mpegfile
+  MimeType:     video/mpeg
+  DisplayName:  Movie Clip
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .m3u
+  Type:         m3ufile
+  MimeType:     audio/x-mpegurl
+  DisplayName:  M3U file
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .mac
+  Type:         QuickTime.mac
+  MimeType:     image/x-macpaint
+  DisplayName:  MacPaint Image
+  IconDesc:     C:\App\QuickTime\PictureViewer.exe,-134
+
+Extension:      .mad
+  Type:         Access.Shortcut.Module.1
+  MimeType:     
+  DisplayName:  Microsoft Office Access Module Shortcut
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,10
+
+Extension:      .maf
+  Type:         Access.Shortcut.Form.1
+  MimeType:     
+  DisplayName:  Microsoft Office Access Form Shortcut
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,7
+
+Extension:      .mag
+  Type:         Access.Shortcut.Diagram.1
+  MimeType:     
+  DisplayName:  Microsoft Office Access Diagram Shortcut
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,50
+
+Extension:      .mak
+  Type:         VisualStudio.mak.7.1
+  MimeType:     text/plain
+  DisplayName:  Makefile
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-10
+
+Extension:      .mam
+  Type:         Access.Shortcut.Macro.1
+  MimeType:     
+  DisplayName:  Microsoft Office Access Macro Shortcut
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,9
+
+Extension:      .map
+  Type:         VisualStudio.map.7.1
+  MimeType:     text/plain
+  DisplayName:  Linker Address Map
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-8
+
+Extension:      .MAPIMail
+  Type:         CLSID\{9E56BE60-C50F-11CF-9A2C-00A0C90A90CE}
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\WINDOWS\system32\sendmail.dll,-2001
+
+Extension:      .maq
+  Type:         Access.Shortcut.Query.1
+  MimeType:     
+  DisplayName:  Microsoft Office Access Query Shortcut
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,6
+
+Extension:      .mar
+  Type:         Access.Shortcut.Report.1
+  MimeType:     
+  DisplayName:  Microsoft Office Access Report Shortcut
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,8
+
+Extension:      .mas
+  Type:         Access.Shortcut.StoredProcedure.1
+  MimeType:     
+  DisplayName:  Microsoft Office Access Stored Procedure Shortcut
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,51
+
+Extension:      .mat
+  Type:         Access.Shortcut.Table.1
+  MimeType:     
+  DisplayName:  Microsoft Office Access Table Shortcut
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,5
+
+Extension:      .mau
+  Type:         Access.Shortcut.Function.1
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\App\Office\OFFICE11\MSACCESS.EXE,-321
+
+Extension:      .mav
+  Type:         Access.Shortcut.View.1
+  MimeType:     
+  DisplayName:  Microsoft Office Access View Shortcut
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,6
+
+Extension:      .maw
+  Type:         Access.Shortcut.DataAccessPage.1
+  MimeType:     
+  DisplayName:  Microsoft Office Access Data Access Page Shortcut
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,49
+
+Extension:      .mda
+  Type:         Access.Extension.11
+  MimeType:     application/msaccess
+  DisplayName:  Microsoft Office Access Add-in
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,40
+
+Extension:      .mdb
+  Type:         Access.Application.11
+  MimeType:     application/msaccess
+  DisplayName:  Microsoft Office Access Application
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,1
+
+Extension:      .mdbhtml
+  Type:         accesshtmlfile
+  MimeType:     
+  DisplayName:  Microsoft Office Access HTML Document
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,58
+
+Extension:      .mde
+  Type:         Access.MDEFile.11
+  MimeType:     application/msaccess
+  DisplayName:  Microsoft Office Access MDE Database
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,44
+
+Extension:      .mdi
+  Type:         MSPaper.Document
+  MimeType:     image/vnd.ms-modi
+  DisplayName:  Microsoft Office Document Imaging File
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\mspicons.exe,3
+
+Extension:      .mdmp
+  Type:         VisualStudio.dmp.7.1
+  MimeType:     
+  DisplayName:  Crash Dump File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-13
+
+Extension:      .mdn
+  Type:         Access.BlankDatabaseTemplate.11
+  MimeType:     
+  DisplayName:  Microsoft Office Access Blank Database Template
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,2
+
+Extension:      .mdp
+  Type:         VisualStudio.mdp.7.1
+  MimeType:     
+  DisplayName:  VC++ 5 Workspace
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-9
+
+Extension:      .mdt
+  Type:         Access.WizardDataFile.11
+  MimeType:     
+  DisplayName:  Microsoft Office Access Add-in Data
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,41
+
+Extension:      .mdw
+  Type:         Access.Workgroup.11
+  MimeType:     
+  DisplayName:  Microsoft Office Access Workgroup Information
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,43
+
+Extension:      .mdz
+  Type:         Access.DatabaseWizardTemplate.11
+  MimeType:     
+  DisplayName:  Microsoft Office Access Database Wizard Template
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,3
+
+Extension:      .mfp
+  Type:         MacromediaFlashPaper.MacromediaFlashPaper
+  MimeType:     application/x-shockwave-flash
+  DisplayName:  Macromedia Flash Paper
+  IconDesc:     C:\Program Files\Internet Explorer\iexplore.exe,1
+
+Extension:      .mgc
+  Type:         MediaCatalogMGC
+  MimeType:     
+  DisplayName:  Media Catalog File
+  IconDesc:     C:\App\Office\OFFICE11\MSTORE.EXE,0
+
+Extension:      .mht
+  Type:         mhtmlfile
+  MimeType:     message/rfc822
+  DisplayName:  MHTML Document
+  IconDesc:     "%1"
+
+Extension:      .mhtml
+  Type:         mhtmlfile
+  MimeType:     message/rfc822
+  DisplayName:  MHTML Document
+  IconDesc:     "%1"
+
+Extension:      .mid
+  Type:         midfile
+  MimeType:     audio/mid
+  DisplayName:  MIDI Sequence
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .midi
+  Type:         midfile
+  MimeType:     audio/mid
+  DisplayName:  MIDI Sequence
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .mk
+  Type:         VisualStudio.mak.7.1
+  MimeType:     text/plain
+  DisplayName:  Makefile
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-10
+
+Extension:      .mml
+  Type:         MediaCatalogMML
+  MimeType:     
+  DisplayName:  Media Catalog File
+  IconDesc:     C:\App\Office\OFFICE11\MSTORE.EXE,0
+
+Extension:      .mmm
+  Type:         MPlayer
+  MimeType:     
+  DisplayName:  Media Clip
+  IconDesc:     mplay32.exe,1
+
+Extension:      .mmw
+  Type:         MediaCatalogMMW
+  MimeType:     
+  DisplayName:  Media Catalog File
+  IconDesc:     C:\App\Office\OFFICE11\MSTORE.EXE,0
+
+Extension:      .mov
+  Type:         QuickTime.mov
+  MimeType:     video/quicktime
+  DisplayName:  QuickTime Movie
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-137
+
+Extension:      .mp2
+  Type:         mpegfile
+  MimeType:     video/mpeg
+  DisplayName:  Movie Clip
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .mp2v
+  Type:         mpegfile
+  MimeType:     video/mpeg
+  DisplayName:  Movie Clip
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .mp3
+  Type:         mp3file
+  MimeType:     audio/mpeg
+  DisplayName:  MP3 Format Sound
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .mp4
+  Type:         QuickTime.mp4
+  MimeType:     video/mp4
+  DisplayName:  MPEG-4 Movie
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-143
+
+Extension:      .mpa
+  Type:         mpegfile
+  MimeType:     video/mpeg
+  DisplayName:  Movie Clip
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .mpe
+  Type:         mpegfile
+  MimeType:     video/mpeg
+  DisplayName:  Movie Clip
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .mpeg
+  Type:         mpegfile
+  MimeType:     video/mpeg
+  DisplayName:  Movie Clip
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .mpf
+  Type:         MediaPackageFile
+  MimeType:     application/vnd.ms-mediapackage
+  DisplayName:  Clip Organizer Media Package File
+  IconDesc:     C:\WINDOWS\Installer\{90510409-6000-11D3-8CFE-0150048383C9}\cagicon.exe,0
+
+Extension:      .mpg
+  Type:         mpegfile
+  MimeType:     video/mpeg
+  DisplayName:  Movie Clip
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .mpv2
+  Type:         mpegfile
+  MimeType:     video/mpeg
+  DisplayName:  Movie Clip
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .mqv
+  Type:         QuickTime.mqv
+  MimeType:     video/quicktime
+  DisplayName:  QuickTime Movie
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-130
+
+Extension:      .msc
+  Type:         MSCFile
+  MimeType:     
+  DisplayName:  Microsoft Common Console Document
+  IconDesc:     %1
+
+Extension:      .msg
+  Type:         msgfile
+  MimeType:     
+  DisplayName:  Outlook Item
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\outicon.exe,0
+
+Extension:      .msi
+  Type:         Msi.Package
+  MimeType:     
+  DisplayName:  Windows Installer Package
+  IconDesc:     C:\WINDOWS\system32\msiexec.exe,0
+
+Extension:      .msp
+  Type:         Msi.Patch
+  MimeType:     
+  DisplayName:  Windows Installer Patch
+  IconDesc:     C:\WINDOWS\system32\msiexec.exe,0
+
+Extension:      .MsRcIncident
+  Type:         MsRcIncident
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\WINDOWS\PCHealth\HelpCtr\Binaries\HelpCtr.exe
+
+Extension:      .msstyles
+  Type:         msstylesfile
+  MimeType:     
+  DisplayName:  Windows Visual Style File
+  IconDesc:     C:\WINDOWS\system32\themeui.dll,-701
+
+Extension:      .MSWMM
+  Type:         Windows.Movie.Maker
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\Program Files\Movie Maker\wmm2res.dll,27
+
+Extension:      .mydocs
+  Type:         CLSID\{ECF03A32-103D-11d2-854D-006008059367}
+  MimeType:     
+  DisplayName:  MyDocs Drop Target
+  IconDesc:     C:\WINDOWS\system32\mydocs.dll
+
+Extension:      .ncb
+  Type:         VisualStudio.ncb.7.1
+  MimeType:     
+  DisplayName:  Visual C++ IntelliSense Database
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-18
+
+Extension:      .ncs
+  Type:         ncsfile
+  MimeType:     
+  DisplayName:  Lotus Notes Content Source
+  IconDesc:     C:\Program Files\Common Files\Microsoft Shared\Web Folders\pkmres.dll,14
+
+Extension:      .nfo
+  Type:         MSInfo.Document
+  MimeType:     
+  DisplayName:  MSInfo File
+  IconDesc:     C:\Program Files\Common Files\Microsoft Shared\MSInfo\MSInfo32.exe,0
+
+Extension:      .nick
+  Type:         NICKFile
+  MimeType:     
+  DisplayName:  Office Data File
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .nk2
+  Type:         NICKFile
+  MimeType:     
+  DisplayName:  Office Data File
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .NMW
+  Type:         T126_Whiteboard
+  MimeType:     application/nmwb
+  DisplayName:  Microsoft Netmeeting T126 Compatible Whiteboard Document
+  IconDesc:     "C:\Program Files\NetMeeting\nmwb.dll",-1
+
+Extension:      .nws
+  Type:         Microsoft Internet News Message
+  MimeType:     message/rfc822
+  DisplayName:  Internet News Message
+  IconDesc:     C:\Program Files\Outlook Express\msimn.exe,-5
+
+Extension:      .obd
+  Type:         Office.Binder.9
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\unbndico.exe,1
+
+Extension:      .obj
+  Type:         VisualStudio.obj.7.1
+  MimeType:     
+  DisplayName:  Object File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-19
+
+Extension:      .obt
+  Type:         Office.Binder.Template.9
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\unbndico.exe,2
+
+Extension:      .obz
+  Type:         Office.Binder.Wizard.9
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\unbndico.exe,3
+
+Extension:      .odc
+  Type:         odcfile
+  MimeType:     text/x-ms-odc
+  DisplayName:  Microsoft Office Data Connection
+  IconDesc:     "%1"
+
+Extension:      .odccubefile
+  Type:         odccubefile
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSO.DLL,22
+
+Extension:      .odcdatabasefile
+  Type:         odcdatabasefile
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSO.DLL,23
+
+Extension:      .odcnewfile
+  Type:         odcnewfile
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSO.DLL,24
+
+Extension:      .odctablefile
+  Type:         odctablefile
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSO.DLL,21
+
+Extension:      .odh
+  Type:         VisualStudio.idl.7.1
+  MimeType:     text/plain
+  DisplayName:  Interface Definition Language File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-8
+
+Extension:      .odl
+  Type:         VisualStudio.idl.7.1
+  MimeType:     text/plain
+  DisplayName:  Interface Definition Language File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-8
+
+Extension:      .oft
+  Type:         Outlook.Template
+  MimeType:     
+  DisplayName:  Outlook Item Template
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\outicon.exe,0
+
+Extension:      .opc
+  Type:         OPCFile
+  MimeType:     
+  DisplayName:  Microsoft Clean-up Wizard File
+  IconDesc:     C:\WINDOWS\Installer\\{90510409-6000-11D3-8CFE-0150048383C9}\misc.exe,6
+
+Extension:      .opml
+  Type:         OPML
+  MimeType:     text/x-opml
+  DisplayName:  Radio UserLand OPML Document
+  IconDesc:     C:\App\OPMLEditor\opml.exe,-15
+
+Extension:      .oqy
+  Type:         oqyfile
+  MimeType:     
+  DisplayName:  Microsoft Office Excel OLAP Query File
+  IconDesc:     C:\App\Office\OFFICE11\EXCEL.EXE,-275
+
+Extension:      .oss
+  Type:         ossfile
+  MimeType:     
+  DisplayName:  Office Search
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\misc.exe,7
+
+Extension:      .ost
+  Type:         OSTFile
+  MimeType:     
+  DisplayName:  Office Data File
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .otf
+  Type:         otffile
+  MimeType:     
+  DisplayName:  OpenType Font file
+  IconDesc:     %1
+
+Extension:      .otm
+  Type:         OTMFile
+  MimeType:     
+  DisplayName:  Outlook VBA Project File
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .p12
+  Type:         PFXFile
+  MimeType:     application/x-pkcs12
+  DisplayName:  Personal Information Exchange
+  IconDesc:     C:\WINDOWS\System32\cryptui.dll,-3425
+
+Extension:      .p7b
+  Type:         SPCFile
+  MimeType:     application/x-pkcs7-certificates
+  DisplayName:  PKCS #7 Certificates
+  IconDesc:     C:\WINDOWS\System32\cryptui.dll,-3410
+
+Extension:      .p7c
+  Type:         certificate_wab_auto_file
+  MimeType:     application/pkcs7-mime
+  DisplayName:  Digital ID File
+  IconDesc:     C:\Program Files\Outlook Express\wab.exe,1
+
+Extension:      .p7r
+  Type:         SPCFile
+  MimeType:     application/x-pkcs7-certreqresp
+  DisplayName:  PKCS #7 Certificates
+  IconDesc:     C:\WINDOWS\System32\cryptui.dll,-3410
+
+Extension:      .pab
+  Type:         PABFile
+  MimeType:     
+  DisplayName:  Office Data File
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .pal
+  Type:         palfile
+  MimeType:     
+  DisplayName:  Palette File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\resedit.dll,-27009
+
+Extension:      .pbk
+  Type:         pbkfile
+  MimeType:     
+  DisplayName:  Dial-Up Phonebook
+  IconDesc:     C:\WINDOWS\system32\netshell.dll,2
+
+Extension:      .PBM
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .PCD
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .pch
+  Type:         VisualStudio.pch.7.1
+  MimeType:     
+  DisplayName:  Precompiled Header File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-20
+
+Extension:      .pct
+  Type:         QuickTime.pct
+  MimeType:     image/pict
+  DisplayName:  PICT Image
+  IconDesc:     C:\App\QuickTime\PictureViewer.exe,-136
+
+Extension:      .PCX
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .pcy
+  Type:         PurifyError+Coverage.Data
+  MimeType:     
+  DisplayName:  Purify+Coverage Data
+  IconDesc:     C:\App\Rational\PURIFY~1\purifyw.exe,0
+
+Extension:      .pdb
+  Type:         VisualStudio.pdb.7.1
+  MimeType:     
+  DisplayName:  Program Debug Database
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-21
+
+Extension:      .pdx
+  Type:         PDXFileType
+  MimeType:     application/vnd.adobe.pdx
+  DisplayName:  Acrobat Catalog Index
+  IconDesc:     C:\WINDOWS\Installer\{AC76BA86-7AD7-1033-7B44-A70000000000}\PDXFile.ico,0
+
+Extension:      .pfm
+  Type:         pfmfile
+  MimeType:     
+  DisplayName:  Type 1 Font file
+  IconDesc:     C:\WINDOWS\system32\shell32.dll,-157
+
+Extension:      .pfx
+  Type:         PFXFile
+  MimeType:     application/x-pkcs12
+  DisplayName:  Personal Information Exchange
+  IconDesc:     C:\WINDOWS\System32\cryptui.dll,-3425
+
+Extension:      .pfy
+  Type:         Purify.Data
+  MimeType:     
+  DisplayName:  Purify Data
+  IconDesc:     C:\App\Rational\PURIFY~1\purifyw.exe,0
+
+Extension:      .PGM
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .pic
+  Type:         QuickTime.pic
+  MimeType:     image/pict
+  DisplayName:  PICT Image
+  IconDesc:     C:\App\QuickTime\PictureViewer.exe,-136
+
+Extension:      .pict
+  Type:         QuickTime.pict
+  MimeType:     image/pict
+  DisplayName:  PICT Image
+  IconDesc:     C:\App\QuickTime\PictureViewer.exe,-136
+
+Extension:      .pip
+  Type:         PIPFile
+  MimeType:     
+  DisplayName:  Microsoft Office Settings File
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .ple
+  Type:         MsgPlus.Encrypted
+  MimeType:     
+  DisplayName:  Encrypted Log File
+  IconDesc:     c:\App\MsgPlus3\Resources\MsgPlusRes.dll,-2781
+
+Extension:      .plist
+  Type:         QuickTimePreferences
+  MimeType:     
+  DisplayName:  QuickTime Preferences
+  IconDesc:     C:\App\QuickTime\QTSystem\QuickTime.qts,-102
+
+Extension:      .plp
+  Type:         MsgPlus.SoundPack
+  MimeType:     
+  DisplayName:  Messenger Plus! Sound Pack
+  IconDesc:     c:\App\MsgPlus3\Resources\MsgPlusRes.dll,-8127
+
+Extension:      .pmy
+  Type:         MemoryProfiling.Data
+  MimeType:     
+  DisplayName:  Memory Profiling Data
+  IconDesc:     C:\App\Rational\PURIFY~1\purifyw.exe,0
+
+Extension:      .pnf
+  Type:         pnffile
+  MimeType:     
+  DisplayName:  Precompiled Setup Information
+  IconDesc:     C:\WINDOWS\system32\shell32.dll,-154
+
+Extension:      .png
+  Type:         OISpngfile
+  MimeType:     image/png
+  DisplayName:  PNG Image
+  IconDesc:     "C:\App\Office\OFFICE11\ois.exe",4
+
+Extension:      .pnt
+  Type:         QuickTime.pnt
+  MimeType:     image/x-macpaint
+  DisplayName:  MacPaint Image
+  IconDesc:     C:\App\QuickTime\PictureViewer.exe,-130
+
+Extension:      .pntg
+  Type:         QuickTime.pntg
+  MimeType:     image/x-macpaint
+  DisplayName:  MacPaint Image
+  IconDesc:     C:\App\QuickTime\PictureViewer.exe,-134
+
+Extension:      .pot
+  Type:         PowerPoint.Template.8
+  MimeType:     application/vnd.ms-powerpoint
+  DisplayName:  Microsoft PowerPoint Template
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\pptico.exe,2
+
+Extension:      .pothtml
+  Type:         powerpointhtmltemplate
+  MimeType:     
+  DisplayName:  Microsoft PowerPoint HTML Template
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\pptico.exe,7
+
+Extension:      .ppa
+  Type:         PowerPoint.Addin.8
+  MimeType:     application/vnd.ms-powerpoint
+  DisplayName:  Microsoft PowerPoint Addin
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\pptico.exe,5
+
+Extension:      .PPM
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .pps
+  Type:         PowerPoint.SlideShow.8
+  MimeType:     application/vnd.ms-powerpoint
+  DisplayName:  Microsoft PowerPoint Slide Show
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\pptico.exe,4
+
+Extension:      .ppt
+  Type:         PowerPoint.Show.8
+  MimeType:     application/vnd.ms-powerpoint
+  DisplayName:  Microsoft PowerPoint Presentation
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\pptico.exe,1
+
+Extension:      .ppthtml
+  Type:         powerpointhtmlfile
+  MimeType:     
+  DisplayName:  Microsoft PowerPoint HTML Document
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\pptico.exe,9
+
+Extension:      .pptmhtml
+  Type:         powerpointmhtmlfile
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\App\Office\OFFICE11\POWERPNT.EXE,-1308
+
+Extension:      .prc
+  Type:         prcfile.7.1
+  MimeType:     text/plain
+  DisplayName:  SQL Stored Procedure Script file
+  IconDesc:     c:\App\MSDev\Common7\Tools\VDT\vdt70p.dll,-1054
+
+Extension:      .prf
+  Type:         prffile
+  MimeType:     application/pics-rules
+  DisplayName:  Microsoft Office Outlook Profile Settings
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\misc.exe,6
+
+Extension:      .psd
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .pst
+  Type:         PSTFile
+  MimeType:     
+  DisplayName:  Office Data File
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .pub
+  Type:         Publisher.Document.11
+  MimeType:     application/vnd.ms-publisher
+  DisplayName:  Microsoft Office Publisher Document
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\pubs.exe,1
+
+Extension:      .pubhtml
+  Type:         publisherhtmlfile
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\App\Office\OFFICE11\MSPUB.EXE,-348
+
+Extension:      .pubmhtml
+  Type:         publishermhtmlfile
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\App\Office\OFFICE11\MSPUB.EXE,-347
+
+Extension:      .pwz
+  Type:         PowerPoint.Wizard.8
+  MimeType:     application/vnd.ms-powerpoint
+  DisplayName:  Microsoft PowerPoint Wizard
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\pptico.exe,3
+
+Extension:      .qds
+  Type:         SavedDsQuery
+  MimeType:     
+  DisplayName:  Directory Query
+  IconDesc:     C:\WINDOWS\system32\dsquery.dll,0
+
+Extension:      .qfy
+  Type:         Quantify.Data
+  MimeType:     
+  DisplayName:  Quantify Data
+  IconDesc:     C:\App\Rational\PURIFY~1\QUANTI~2.EXE,0
+
+Extension:      .qht
+  Type:         QuickTime.qht
+  MimeType:     text/x-html-insertion
+  DisplayName:  
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-130
+
+Extension:      .qhtm
+  Type:         QuickTime.qhtm
+  MimeType:     text/x-html-insertion
+  DisplayName:  
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-130
+
+Extension:      .qpa
+  Type:         QuickTimePlayerAddition
+  MimeType:     
+  DisplayName:  QuickTime Player Addition
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-140
+
+Extension:      .qt
+  Type:         QuickTime.qt
+  MimeType:     video/quicktime
+  DisplayName:  QuickTime Movie
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-137
+
+Extension:      .qti
+  Type:         QuickTime.qti
+  MimeType:     image/x-quicktime
+  DisplayName:  QuickTime Image
+  IconDesc:     C:\App\QuickTime\PictureViewer.exe,-138
+
+Extension:      .qtif
+  Type:         QuickTime.qtif
+  MimeType:     image/x-quicktime
+  DisplayName:  QuickTime Image
+  IconDesc:     C:\App\QuickTime\PictureViewer.exe,-138
+
+Extension:      .qtl
+  Type:         QuickTime.qtl
+  MimeType:     application/x-quicktimeplayer
+  DisplayName:  QuickTime Movie
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-137
+
+Extension:      .qtp
+  Type:         QuickTimePreferences
+  MimeType:     
+  DisplayName:  QuickTime Preferences
+  IconDesc:     C:\App\QuickTime\QTSystem\QuickTime.qts,-102
+
+Extension:      .qtr
+  Type:         QuickTimeResources
+  MimeType:     
+  DisplayName:  QuickTime Resources
+  IconDesc:     C:\App\QuickTime\QTSystem\QuickTime.qts,-105
+
+Extension:      .qts
+  Type:         QuickTimeSystem
+  MimeType:     
+  DisplayName:  QuickTime
+  IconDesc:     C:\App\QuickTime\QTSystem\QuickTime.qts,-100
+
+Extension:      .qtx
+  Type:         QuickTimeExtension
+  MimeType:     
+  DisplayName:  QuickTime Extension
+  IconDesc:     C:\App\QuickTime\QTSystem\QuickTime.qts,-101
+
+Extension:      .qup
+  Type:         QuickTime.qup
+  MimeType:     application/x-quicktimeupdater
+  DisplayName:  QuickTime Update Package
+  IconDesc:     
+
+Extension:      .RAS
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .rat
+  Type:         ratfile
+  MimeType:     application/rat-file
+  DisplayName:  Rating System File
+  IconDesc:     msrating.dll,8
+
+Extension:      .RAW
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .rb
+  Type:         rbFile
+  MimeType:     
+  DisplayName:  Ruby Program
+  IconDesc:     c:\App\Ruby\lib\ruby.ico,0
+
+Extension:      .rbw
+  Type:         rbwFile
+  MimeType:     
+  DisplayName:  Ruby Program (no window)
+  IconDesc:     c:\App\Ruby\lib\rubyw.ico,0
+
+Extension:      .rc
+  Type:         VisualStudio.rc.7.1
+  MimeType:     text/plain
+  DisplayName:  Resource Script
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\resedit.dll,-27000
+
+Extension:      .rc2
+  Type:         VisualStudio.rc.7.1
+  MimeType:     text/plain
+  DisplayName:  Resource Script
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\resedit.dll,-27000
+
+Extension:      .rct
+  Type:         VisualStudio.rct.7.1
+  MimeType:     text/plain
+  DisplayName:  Resource Compiler Template
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\resedit.dll,-27001
+
+Extension:      .RDP
+  Type:         RDP.File
+  MimeType:     
+  DisplayName:  Remote Desktop Connection
+  IconDesc:     C:\WINDOWS\system32\mstsc.exe
+
+Extension:      .reg
+  Type:         regfile
+  MimeType:     
+  DisplayName:  Registration Entries
+  IconDesc:     C:\WINDOWS\regedit.exe,1
+
+Extension:      .res
+  Type:         VisualStudio.res.7.1
+  MimeType:     
+  DisplayName:  Compiled Resource Script
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\resedit.dll,-27002
+
+Extension:      .rgs
+  Type:         VisualStudio.rgs.7.1
+  MimeType:     text/plain
+  DisplayName:  Registration Script
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-11
+
+Extension:      .rle
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .rmf
+  Type:         AcroExch.RMFFile
+  MimeType:     application/vnd.adobe.rmf
+  DisplayName:  Rights Management File
+  IconDesc:     C:\WINDOWS\Installer\{AC76BA86-7AD7-1033-7B44-A70000000000}\RMFFile.ico,0
+
+Extension:      .rmi
+  Type:         midfile
+  MimeType:     audio/mid
+  DisplayName:  MIDI Sequence
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .rnk
+  Type:         rnkfile
+  MimeType:     
+  DisplayName:  Dial-Up Shortcut
+  IconDesc:     C:\WINDOWS\system32\netshell.dll,1
+
+Extension:      .rpd
+  Type:         RocketPost.Document
+  MimeType:     
+  DisplayName:  RocketPost.Document
+  IconDesc:     C:\App\ROCKET~1\ROCKET~1.EXE,1
+
+Extension:      .rqy
+  Type:         rqyfile
+  MimeType:     text/x-ms-rqy
+  DisplayName:  Microsoft Office Excel OLE DB Query files
+  IconDesc:     C:\App\Office\OFFICE11\EXCEL.EXE,-271
+
+Extension:      .rtf
+  Type:         Word.RTF.8
+  MimeType:     application/msword
+  DisplayName:  Rich Text Format
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\wordicon.exe,1
+
+Extension:      .rul
+  Type:         rulfile.7.1
+  MimeType:     text/plain
+  DisplayName:  SQL Rule Script file
+  IconDesc:     c:\App\MSDev\Common7\Tools\VDT\vdt70p.dll,-1054
+
+Extension:      .rwz
+  Type:         RWZFile
+  MimeType:     
+  DisplayName:  Office Data File
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .s
+  Type:         VisualStudio.asm.7.1
+  MimeType:     text/plain
+  DisplayName:  Assembler Source
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-2
+
+Extension:      .sbr
+  Type:         VisualStudio.sbr.7.1
+  MimeType:     
+  DisplayName:  Source Browser Intermediate File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-22
+
+Extension:      .scp
+  Type:         txtfile
+  MimeType:     
+  DisplayName:  Text Document
+  IconDesc:     C:\WINDOWS\system32\shell32.dll,-152
+
+Extension:      .sct
+  Type:         scriptletfile
+  MimeType:     text/scriptlet
+  DisplayName:  Windows Script Component
+  IconDesc:     C:\WINDOWS\system32\scrobj.dll,0
+
+Extension:      .sd2
+  Type:         QuickTime.sd2
+  MimeType:     audio/x-sd2
+  DisplayName:  Sound Designer 2
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-138
+
+Extension:      .sdb
+  Type:         appfixfile
+  MimeType:     
+  DisplayName:  Appfix Package
+  IconDesc:     C:\WINDOWS\System32\shell32.dll,-154
+
+Extension:      .sdl
+  Type:         VisualStudio.sdl.7.1
+  MimeType:     
+  DisplayName:  Web Service Description Language
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,7
+
+Extension:      .sdp
+  Type:         QuickTime.sdp
+  MimeType:     application/sdp
+  DisplayName:  Session Description Protocol
+  IconDesc:     C:\App\QuickTime\QuickTimePlayer.exe,-130
+
+Extension:      .secstore
+  Type:         AcroExch.SecStore
+  MimeType:     
+  DisplayName:  Adobe Acrobat Secstore file
+  IconDesc:     C:\App\Acrobat\Reader\AcroRd32.dll,-12
+
+Extension:      .shb
+  Type:         DocShortcut
+  MimeType:     
+  DisplayName:  Shortcut into a document
+  IconDesc:     C:\WINDOWS\System32\shscrap.dll,-100
+
+Extension:      .shs
+  Type:         ShellScrap
+  MimeType:     
+  DisplayName:  Scrap object
+  IconDesc:     C:\WINDOWS\system32\shscrap.dll,-100
+
+Extension:      .shtml
+  Type:         FirefoxHTML
+  MimeType:     
+  DisplayName:  
+  IconDesc:     "%1"
+
+Extension:      .skype
+  Type:         Skype.Content
+  MimeType:     
+  DisplayName:  Skype files
+  IconDesc:     C:\App\Skype\Skype.exe,0
+
+Extension:      .slj
+  Type:         Semagic.Document
+  MimeType:     
+  DisplayName:  Semagic saved entry
+  IconDesc:     C:\App\SeMagic\LiveJournalU.exe,1
+
+Extension:      .slk
+  Type:         Excel.SLK
+  MimeType:     application/vnd.ms-excel
+  DisplayName:  Microsoft Office Excel SLK Data Import Format
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\xlicons.exe,10
+
+Extension:      .sln
+  Type:         VisualStudio.Solution.7.1
+  MimeType:     application/octet-stream
+  DisplayName:  Microsoft Visual Studio Solution Object
+  IconDesc:     c:\App\MSDev\Common7\IDE\devenv.exe,-6826
+
+Extension:      .snd
+  Type:         AUFile
+  MimeType:     audio/basic
+  DisplayName:  AU Format Sound
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .snp
+  Type:         SnapshotFile
+  MimeType:     application/msaccess
+  DisplayName:  Snapshot File
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\misc.exe,11
+
+Extension:      .spc
+  Type:         SPCFile
+  MimeType:     application/x-pkcs7-certificates
+  DisplayName:  PKCS #7 Certificates
+  IconDesc:     C:\WINDOWS\System32\cryptui.dll,-3410
+
+Extension:      .srf
+  Type:         VisualStudio.srf.7.1
+  MimeType:     text/plain
+  DisplayName:  Server Response File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-12
+
+Extension:      .std
+  Type:         DanElwellSpeedTest
+  MimeType:     
+  DisplayName:  Broadband Speed Test Results Report
+  IconDesc:     c:\App\SpeedTest\icos.icl,0
+
+Extension:      .stf
+  Type:         STFFile
+  MimeType:     
+  DisplayName:  Microsoft Setup File
+  IconDesc:     C:\WINDOWS\Installer\\{90510409-6000-11D3-8CFE-0150048383C9}\misc.exe,6
+
+Extension:      .stl
+  Type:         STLFile
+  MimeType:     application/vnd.ms-pki.stl
+  DisplayName:  Certificate Trust List
+  IconDesc:     C:\WINDOWS\System32\cryptui.dll,-3413
+
+Extension:      .stm
+  Type:         stmlfile
+  MimeType:     
+  DisplayName:  STML Document
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,0
+
+Extension:      .stml
+  Type:         stmlfile
+  MimeType:     
+  DisplayName:  STML Document
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,0
+
+Extension:      .suo
+  Type:         VisualStudio.SolutionUserOptions.7.1
+  MimeType:     
+  DisplayName:  Visual Studio Solution User Options
+  IconDesc:     c:\App\MSDev\Common7\IDE\devenv.exe,-1202
+
+Extension:      .tab
+  Type:         tabfile.7.1
+  MimeType:     text/plain
+  DisplayName:  SQL Table Script file
+  IconDesc:     c:\App\MSDev\Common7\Tools\VDT\vdt70p.dll,-1054
+
+Extension:      .tcs
+  Type:         tcsfile
+  MimeType:     
+  DisplayName:  Tahoe Server Content Source
+  IconDesc:     C:\Program Files\Common Files\Microsoft Shared\Web Folders\pkmres.dll,13
+
+Extension:      .TGA
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .theme
+  Type:         themefile
+  MimeType:     
+  DisplayName:  Windows Theme File
+  IconDesc:     C:\WINDOWS\system32\themeui.dll,-701
+
+Extension:      .tif
+  Type:         MSPaper.Document
+  MimeType:     image/tiff
+  DisplayName:  Microsoft Office Document Imaging File
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\mspicons.exe,3
+
+Extension:      .tiff
+  Type:         MSPaper.Document
+  MimeType:     image/tiff
+  DisplayName:  Microsoft Office Document Imaging File
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\mspicons.exe,3
+
+Extension:      .tlh
+  Type:         VisualStudio.tlh.7.1
+  MimeType:     text/plain
+  DisplayName:  Typelib Generated C/C++ Header File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-5
+
+Extension:      .tli
+  Type:         VisualStudio.tli.7.1
+  MimeType:     text/plain
+  DisplayName:  Typelib Generated C/C++ Inline File
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-8
+
+Extension:      .trg
+  Type:         trgfile.7.1
+  MimeType:     text/plain
+  DisplayName:  SQL Trigger Script file
+  IconDesc:     c:\App\MSDev\Common7\Tools\VDT\vdt70p.dll,-1054
+
+Extension:      .ttc
+  Type:         ttcfile
+  MimeType:     
+  DisplayName:  TrueType Collection Font file
+  IconDesc:     %1
+
+Extension:      .ttf
+  Type:         ttffile
+  MimeType:     
+  DisplayName:  TrueType Font file
+  IconDesc:     %1
+
+Extension:      .tws
+  Type:         TextPad.tws
+  MimeType:     
+  DisplayName:  TextPad Workspace
+  IconDesc:     C:\App\Textpad\TextPad.exe,-2000
+
+Extension:      .txt
+  Type:         txtfile
+  MimeType:     text/plain
+  DisplayName:  Text Document
+  IconDesc:     C:\WINDOWS\system32\shell32.dll,-152
+
+Extension:      .udf
+  Type:         udffile.7.1
+  MimeType:     text/plain
+  DisplayName:  SQL User Defined Function Script file
+  IconDesc:     c:\App\MSDev\Common7\Tools\VDT\vdt70p.dll,-1054
+
+Extension:      .UDL
+  Type:         MSDASC
+  MimeType:     
+  DisplayName:  Microsoft Data Link
+  IconDesc:     C:\Program Files\Common Files\System\Ole DB\oledb32.dll,0
+
+Extension:      .udt
+  Type:         udtfile.7.1
+  MimeType:     text/plain
+  DisplayName:  SQL User Defined Type Script file
+  IconDesc:     c:\App\MSDev\Common7\Tools\VDT\vdt70p.dll,-1054
+
+Extension:      .ui
+  Type:         Komodo.UI
+  MimeType:     
+  DisplayName:  Komodo GUI Builder User Interface file
+  IconDesc:     C:\App\Komodo\lib\mozilla\komodo.exe,2
+
+Extension:      .uls
+  Type:         ulsfile
+  MimeType:     text/iuls
+  DisplayName:  Internet Location Service
+  IconDesc:     "C:\Program Files\NetMeeting\conf.exe",1
+
+Extension:      .url
+  Type:         InternetShortcut
+  MimeType:     
+  DisplayName:  Internet Shortcut
+  IconDesc:     C:\WINDOWS\system32\url.dll,0
+
+Extension:      .user
+  Type:         Microsoft.userfile.7.1
+  MimeType:     text/plain
+  DisplayName:  Visual Studio Project User Options
+  IconDesc:     c:\App\MSDev\Common7\Packages\dirprj.dll,4
+
+Extension:      .usr
+  Type:         usrfile.7.1
+  MimeType:     text/plain
+  DisplayName:  SQL User Script file
+  IconDesc:     c:\App\MSDev\Common7\Tools\VDT\vdt70p.dll,-1054
+
+Extension:      .uxdc
+  Type:         UXDCFILE
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSO.DLL,-560
+
+Extension:      .vb
+  Type:         Microsoft.vb.7.1
+  MimeType:     text/plain
+  DisplayName:  Visual Basic Source
+  IconDesc:     c:\App\MSDev\Vb7\Bin\msvbprj.dll,1
+
+Extension:      .vbdproj
+  Type:         Microsoft.vbdproj.7.1
+  MimeType:     
+  DisplayName:  Visual Basic .NET Device Project
+  IconDesc:     c:\App\MSDev\Vb7\Bin\msevbprj.dll,0
+
+Extension:      .VBE
+  Type:         VBEFile
+  MimeType:     
+  DisplayName:  VBScript Encoded Script File
+  IconDesc:     C:\WINDOWS\System32\WScript.exe,2
+
+Extension:      .vbproj
+  Type:         Microsoft.vbproj.7.1
+  MimeType:     
+  DisplayName:  Visual Basic .NET Project
+  IconDesc:     c:\App\MSDev\Vb7\Bin\msvbprj.dll,0
+
+Extension:      .vbs
+  Type:         VBSFile
+  MimeType:     
+  DisplayName:  VBScript Script File
+  IconDesc:     C:\WINDOWS\System32\WScript.exe,2
+
+Extension:      .vcf
+  Type:         vcffile
+  MimeType:     text/x-vcard
+  DisplayName:  vCard File
+  IconDesc:     C:\App\Office\OFFICE11\1033\OUTLLIBR.DLL,1
+
+Extension:      .vcproj
+  Type:         VisualStudio.vcproj.7.1
+  MimeType:     text/plain
+  DisplayName:  VC++ Project
+  IconDesc:     c:\App\MSDev\Vc7\vcpackages\VCProject.dll,-1
+
+Extension:      .vcs
+  Type:         vcsfile
+  MimeType:     
+  DisplayName:  vCalendar File
+  IconDesc:     C:\App\Office\OFFICE11\1033\OUTLLIBR.DLL,0
+
+Extension:      .vdp
+  Type:         vdprojfile
+  MimeType:     
+  DisplayName:  Visual Studio Deployment Project
+  IconDesc:     c:\App\MSDev\Common7\Tools\Deployment\Vspkgs\dpprj.dll,-208
+
+Extension:      .vdproj
+  Type:         vdprojfile
+  MimeType:     
+  DisplayName:  Visual Studio Deployment Project
+  IconDesc:     c:\App\MSDev\Common7\Tools\Deployment\Vspkgs\dpprj.dll,-208
+
+Extension:      .vdx
+  Type:         Visio.Drawing.11
+  MimeType:     application/vnd.visio
+  DisplayName:  Microsoft Visio Drawing
+  IconDesc:     C:\WINDOWS\Installer\{90510409-6000-11D3-8CFE-0150048383C9}\visicon.exe,1
+
+Extension:      .viw
+  Type:         viwfile.7.1
+  MimeType:     text/plain
+  DisplayName:  SQL View Script file
+  IconDesc:     c:\App\MSDev\Common7\Tools\VDT\vdt70p.dll,-1054
+
+Extension:      .vlc
+  Type:         VLC.vlc
+  MimeType:     
+  DisplayName:  VLC media file
+  IconDesc:     "c:\App\VLCPlayer\vlc.exe",0
+
+Extension:      .vob
+  Type:         VLC.vob
+  MimeType:     
+  DisplayName:  VLC media file
+  IconDesc:     "c:\App\VLCPlayer\vlc.exe",0
+
+Extension:      .vsd
+  Type:         Visio.Drawing.11
+  MimeType:     application/vnd.visio
+  DisplayName:  Microsoft Visio Drawing
+  IconDesc:     C:\WINDOWS\Installer\{90510409-6000-11D3-8CFE-0150048383C9}\visicon.exe,1
+
+Extension:      .vsl
+  Type:         Visio.AddOn.11
+  MimeType:     application/vnd.visio
+  DisplayName:  
+  IconDesc:     C:\App\Office\Visio11\VISIO.EXE,-28
+
+Extension:      .vsmacros
+  Type:         VisualStudio.MacroProject.Binary
+  MimeType:     
+  DisplayName:  Visual Studio Macro Project (Binary)
+  IconDesc:     c:\App\MSDev\Common7\IDE\vsmacros.dll,4
+
+Extension:      .vsmproj
+  Type:         VisualStudio.MacroProject.Text
+  MimeType:     
+  DisplayName:  Visual Studio Macro Project (Text)
+  IconDesc:     c:\App\MSDev\Common7\IDE\vsmacros.dll,3
+
+Extension:      .vspscc
+  Type:         VisualStudio.vspscc.7.1
+  MimeType:     text/plain
+  DisplayName:  Visual Studio Source Control Project Metadata File
+  IconDesc:     c:\App\MSDev\Common7\IDE\VS SCC\vsscc.dll,8
+
+Extension:      .vss
+  Type:         Visio.Stencil.11
+  MimeType:     application/vnd.visio
+  DisplayName:  Microsoft Visio Stencil
+  IconDesc:     C:\WINDOWS\Installer\{90510409-6000-11D3-8CFE-0150048383C9}\visicon.exe,2
+
+Extension:      .vsscc
+  Type:         VisualStudio.vsscc.7.1
+  MimeType:     text/plain
+  DisplayName:  Visual Studio Source Control Solution Root Metadata File
+  IconDesc:     c:\App\MSDev\Common7\IDE\VS SCC\vsscc.dll,8
+
+Extension:      .vssscc
+  Type:         VisualStudio.vssscc.7.1
+  MimeType:     text/plain
+  DisplayName:  Visual Studio Source Control Solution Metadata File
+  IconDesc:     c:\App\MSDev\Common7\IDE\VS SCC\vsscc.dll,8
+
+Extension:      .vst
+  Type:         Visio.Template.11
+  MimeType:     application/vnd.visio
+  DisplayName:  Microsoft Visio Template
+  IconDesc:     C:\WINDOWS\Installer\{90510409-6000-11D3-8CFE-0150048383C9}\visicon.exe,3
+
+Extension:      .vsu
+  Type:         Visio.CustomUI.11
+  MimeType:     application/vnd.visio
+  DisplayName:  
+  IconDesc:     C:\App\Office\Visio11\VISIO.EXE,-30
+
+Extension:      .vsw
+  Type:         Visio.Workspace.11
+  MimeType:     application/vnd.visio
+  DisplayName:  Microsoft Visio Workspace
+  IconDesc:     C:\WINDOWS\Installer\{90510409-6000-11D3-8CFE-0150048383C9}\visicon.exe,4
+
+Extension:      .vsx
+  Type:         Visio.Stencil.11
+  MimeType:     application/vnd.visio
+  DisplayName:  Microsoft Visio Stencil
+  IconDesc:     C:\WINDOWS\Installer\{90510409-6000-11D3-8CFE-0150048383C9}\visicon.exe,2
+
+Extension:      .vtx
+  Type:         Visio.Template.11
+  MimeType:     application/vnd.visio
+  DisplayName:  Microsoft Visio Template
+  IconDesc:     C:\WINDOWS\Installer\{90510409-6000-11D3-8CFE-0150048383C9}\visicon.exe,3
+
+Extension:      .wab
+  Type:         wab_auto_file
+  MimeType:     
+  DisplayName:  Address Book File
+  IconDesc:     C:\Program Files\Outlook Express\wab.exe,0
+
+Extension:      .wav
+  Type:         soundrec
+  MimeType:     audio/wav
+  DisplayName:  Wave Sound
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .wax
+  Type:         WAXFile
+  MimeType:     audio/x-ms-wax
+  DisplayName:  Windows Media Audio shortcut
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .wbk
+  Type:         Word.Backup.8
+  MimeType:     application/msword
+  DisplayName:  Microsoft Word Backup Document
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\wordicon.exe,4
+
+Extension:      .wcs
+  Type:         wcsfile
+  MimeType:     
+  DisplayName:  Web Site Content Source
+  IconDesc:     C:\Program Files\Common Files\Microsoft Shared\Web Folders\pkmres.dll,9
+
+Extension:      .webpnp
+  Type:         webpnpFile
+  MimeType:     
+  DisplayName:  Webpnp
+  IconDesc:     C:\WINDOWS\system32\oleprn.dll,-200
+
+Extension:      .WHT
+  Type:         Whiteboard
+  MimeType:     
+  DisplayName:  Microsoft NetMeeting Old Whiteboard Document
+  IconDesc:     "C:\Program Files\NetMeeting\nmoldwb.dll",-1
+
+Extension:      .wiz
+  Type:         Word.Wizard.8
+  MimeType:     application/msword
+  DisplayName:  Microsoft Word Wizard
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\wordicon.exe,3
+
+Extension:      .wizhtml
+  Type:         accessthmltemplate
+  MimeType:     
+  DisplayName:  Microsoft Office Access HTML Template
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\accicons.exe,59
+
+Extension:      .wm
+  Type:         ASFFile
+  MimeType:     video/x-ms-wm
+  DisplayName:  Windows Media Audio/Video file
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .wma
+  Type:         WMAFile
+  MimeType:     audio/x-ms-wma
+  DisplayName:  Windows Media Audio file
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .wmd
+  Type:         WMDFile
+  MimeType:     application/x-ms-wmd
+  DisplayName:  Windows Media Player Download Package
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .wmdb
+  Type:         WMP.WMDBFile
+  MimeType:     
+  DisplayName:  Windows Media Library
+  IconDesc:     C:\Program Files\Windows Media Player\wmplayer.exe,-120
+
+Extension:      .wmf
+  Type:         wmffile
+  MimeType:     
+  DisplayName:  
+  IconDesc:     shimgvw.dll,2
+
+Extension:      .wms
+  Type:         WMSFile
+  MimeType:     
+  DisplayName:  Windows Media Player Skin File
+  IconDesc:     C:\WINDOWS\system32\wmploc.dll,-617
+
+Extension:      .wmv
+  Type:         WMVFile
+  MimeType:     video/x-ms-wmv
+  DisplayName:  Windows Media Audio/Video file
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .wmx
+  Type:         ASXFile
+  MimeType:     video/x-ms-wmx
+  DisplayName:  Windows Media Audio/Video playlist
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .wmz
+  Type:         WMZFile
+  MimeType:     application/x-ms-wmz
+  DisplayName:  Windows Media Player Skin Package
+  IconDesc:     C:\WINDOWS\system32\wmploc.dll,-617
+
+Extension:      .wpg
+  Type:         PSP.Image
+  MimeType:     
+  DisplayName:  Paint Shop Pro Image
+  IconDesc:     C:\App\PSP\Psp.exe,1
+
+Extension:      .wpl
+  Type:         WPLFile
+  MimeType:     application/vnd.ms-wpl
+  DisplayName:  Windows Media playlist
+  IconDesc:     C:\WINDOWS\system32\wmploc.dll,-616
+
+Extension:      .wri
+  Type:         wrifile
+  MimeType:     
+  DisplayName:  Write Document
+  IconDesc:     "C:\Program Files\Windows NT\Accessories\WORDPAD.EXE",2
+
+Extension:      .wsc
+  Type:         scriptletfile
+  MimeType:     text/scriptlet
+  DisplayName:  Windows Script Component
+  IconDesc:     C:\WINDOWS\system32\scrobj.dll,0
+
+Extension:      .wsdl
+  Type:         VisualStudio.wsdl.7.1
+  MimeType:     
+  DisplayName:  Web Service Description Language
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,13
+
+Extension:      .WSF
+  Type:         WSFFile
+  MimeType:     
+  DisplayName:  Windows Script File
+  IconDesc:     C:\WINDOWS\System32\WScript.exe,2
+
+Extension:      .WSH
+  Type:         WSHFile
+  MimeType:     
+  DisplayName:  Windows Script Host Settings File
+  IconDesc:     C:\WINDOWS\System32\WScript.exe,1
+
+Extension:      .wtx
+  Type:         txtfile
+  MimeType:     
+  DisplayName:  Text Document
+  IconDesc:     C:\WINDOWS\system32\shell32.dll,-152
+
+Extension:      .wvx
+  Type:         WVXFile
+  MimeType:     video/x-ms-wvx
+  DisplayName:  Windows Media Audio/Video playlist
+  IconDesc:     C:\PROGRA~1\WINDOW~2\wmplayer.exe,-120
+
+Extension:      .xdp
+  Type:         AcroExch.XDPDoc
+  MimeType:     application/vnd.adobe.xdp+xml
+  DisplayName:  Adobe Acrobat XML Data Package File
+  IconDesc:     C:\WINDOWS\Installer\{AC76BA86-7AD7-1033-7B44-A70000000000}\XDPFile.ico,0
+
+Extension:      .xevgenxml
+  Type:         XEV.GenericApp
+  MimeType:     
+  DisplayName:  
+  IconDesc:     shell32.dll,72
+
+Extension:      .xfdf
+  Type:         AcroExch.XFDFDoc
+  MimeType:     application/vnd.adobe.xfdf
+  DisplayName:  Adobe Acrobat Forms Document
+  IconDesc:     C:\WINDOWS\Installer\{AC76BA86-7AD7-1033-7B44-A70000000000}\FDFFile.ico,0
+
+Extension:      .xht
+  Type:         FirefoxHTML
+  MimeType:     
+  DisplayName:  
+  IconDesc:     "%1"
+
+Extension:      .xhtml
+  Type:         FirefoxHTML
+  MimeType:     
+  DisplayName:  
+  IconDesc:     "%1"
+
+Extension:      .xla
+  Type:         Excel.Addin
+  MimeType:     application/vnd.ms-excel
+  DisplayName:  Microsoft Office Excel Add-In
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\xlicons.exe,6
+
+Extension:      .xlb
+  Type:         Excel.Sheet.8
+  MimeType:     application/vnd.ms-excel
+  DisplayName:  Microsoft Excel Worksheet
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\xlicons.exe,1
+
+Extension:      .xlc
+  Type:         Excel.Chart.8
+  MimeType:     application/vnd.ms-excel
+  DisplayName:  Microsoft Excel Chart
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\xlicons.exe,3
+
+Extension:      .xld
+  Type:         Excel.Dialog
+  MimeType:     application/vnd.ms-excel
+  DisplayName:  Microsoft Excel 5.0 DialogSheet
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\xlicons.exe,12
+
+Extension:      .xlk
+  Type:         Excel.Backup
+  MimeType:     application/vnd.ms-excel
+  DisplayName:  Microsoft Office Excel Backup File
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\xlicons.exe,5
+
+Extension:      .xll
+  Type:         Excel.XLL
+  MimeType:     application/vnd.ms-excel
+  DisplayName:  Microsoft Office Excel XLL Add-In
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\xlicons.exe,8
+
+Extension:      .xlm
+  Type:         Excel.Macrosheet
+  MimeType:     application/vnd.ms-excel
+  DisplayName:  Microsoft Excel 4.0 Macro
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\xlicons.exe,2
+
+Extension:      .xls
+  Type:         Excel.Sheet.8
+  MimeType:     application/vnd.ms-excel
+  DisplayName:  Microsoft Excel Worksheet
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\xlicons.exe,1
+
+Extension:      .xlshtml
+  Type:         Excelhtmlfile
+  MimeType:     
+  DisplayName:  Microsoft Office Excel HTML Document
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\xlicons.exe,26
+
+Extension:      .xlsmhtml
+  Type:         excelmhtmlfile
+  MimeType:     
+  DisplayName:  
+  IconDesc:     C:\App\Office\OFFICE11\EXCEL.EXE,-277
+
+Extension:      .xlt
+  Type:         Excel.Template
+  MimeType:     application/vnd.ms-excel
+  DisplayName:  Microsoft Office Excel Template
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\xlicons.exe,4
+
+Extension:      .xlthtml
+  Type:         Excelhtmltemplate
+  MimeType:     
+  DisplayName:  Microsoft Office Excel HTML Template
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\xlicons.exe,14
+
+Extension:      .xlv
+  Type:         Excel.VBAModule
+  MimeType:     application/vnd.ms-excel
+  DisplayName:  Microsoft Office Excel VBA Module
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\xlicons.exe,11
+
+Extension:      .xlw
+  Type:         Excel.Workspace
+  MimeType:     application/vnd.ms-excel
+  DisplayName:  Microsoft Office Excel Workspace
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\xlicons.exe,7
+
+Extension:      .xlxml
+  Type:         Excelxmlss
+  MimeType:     
+  DisplayName:  Microsoft Office Excel XML Worksheet
+  IconDesc:     C:\App\Office\OFFICE11\EXCEL.EXE,-282
+
+Extension:      .xml
+  Type:         VisualStudio.xml.7.1
+  MimeType:     text/xml
+  DisplayName:  XML Document
+  IconDesc:     "%1"
+
+Extension:      .xnk
+  Type:         xnkfile
+  MimeType:     
+  DisplayName:  Exchange Shortcut
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\outicon.exe,22
+
+Extension:      .xsd
+  Type:         xsdfile
+  MimeType:     
+  DisplayName:  XML Schema file
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,8
+
+Extension:      .xsf
+  Type:         InfoPath.SolutionManifest.1
+  MimeType:     
+  DisplayName:  Microsoft Office InfoPath Form Definition File
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\inficon.exe,2
+
+Extension:      .xsl
+  Type:         xslfile
+  MimeType:     text/xml
+  DisplayName:  XSL Stylesheet
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,10
+
+Extension:      .xslt
+  Type:         xsltfile
+  MimeType:     
+  DisplayName:  XML Transformation
+  IconDesc:     c:\App\MSDev\Common7\Packages\htmed.dll,10
+
+Extension:      .xsn
+  Type:         InfoPath.Solution.1
+  MimeType:     
+  DisplayName:  Microsoft Office InfoPath Form Template
+  IconDesc:     C:\WINDOWS\Installer\{90110409-6000-11D3-8CFE-0150048383C9}\inficon.exe,2
+
+Extension:      .xst
+  Type:         PSTFile
+  MimeType:     
+  DisplayName:  Office Data File
+  IconDesc:     C:\PROGRA~1\COMMON~1\MICROS~1\OFFICE11\MSOICONS.EXE,6
+
+Extension:      .zap
+  Type:         zapfile
+  MimeType:     
+  DisplayName:  Software Installation Settings
+  IconDesc:     C:\WINDOWS\system32\appmgr.dll,-218
+
+Extension:      .ZFSendToTarget
+  Type:         CLSID\{888DCA60-FC0A-11CF-8F0F-00C04FD7D062}
+  MimeType:     
+  DisplayName:  Compressed (zipped) Folder SendTo Target
+  IconDesc:     C:\WINDOWS\system32\zipfldr.dll
+
+Extension:      .zip
+  Type:         CompressedFolder
+  MimeType:     application/x-zip-compressed
+  DisplayName:  Compressed (zipped) Folder
+  IconDesc:     C:\WINDOWS\system32\zipfldr.dll
+
+Extension:      .ZPL
+  Type:         ZPZPLFile
+  MimeType:     
+  DisplayName:  Zoom Player PlayList
+  IconDesc:     C:\App\ZPlayer\zplayer.exe
+

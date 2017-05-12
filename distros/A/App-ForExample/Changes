@@ -1,0 +1,25 @@
+TODO:
+    - Add --backup (or --no-backup) option
+    - Change --package option to --class
+
+0.024 Monday June 08 11:06:08 PDT 2009:
+    - Added --class as an alias to --package
+    - Added "Apache2 and FastCGI on Ubuntu" tutorial
+
+0.023 Monday June 08 10:21:26 PDT 2009:
+    - Have minimum Moose version of 0.76 (thanks KAARE)
+
+0.022 Friday 2009-05-05:
+    - Fixed some errors in SYNOPSIS
+
+0.021 Friday June 05 09:16:57 PDT 2009:
+    - Tweaked documentation
+    - Changed how --output worked when writing to disk
+
+0.020 Thursday June 04 18:46:28 PDT 2009:
+    - Replaced --no-bundle, etc. with --bare and added --output
+    - Documented --fastcgi options
+    - Testing for -h/help
+
+0.010 Wednesday June 03 17:39:34 PDT 2009: 
+    - Initial release

@@ -1,0 +1,91 @@
+NAME
+    App::screenorama - Application output to websocket stream
+
+VERSION
+    0.06
+
+DESCRIPTION
+    This program allow you to pipe STDOUT and STDERR from a program over a
+    websocket.
+
+  Protocol
+    The data transmitted over the websocket connection is JSON in each
+    frame:
+
+    *   Startup
+
+          {"program":$str,"program_args":...}
+
+        Same as "program" and "program_args".
+
+    *   Output
+
+          {"output":$str}
+
+        Comes after each time the program emit data. NOTE: There's no
+        guaranty that it will be emitted on newline.
+
+    *   Exit
+
+          {"exit_value":$int,"signal":$int}
+
+        The exit value of the application. The websocket will be closed
+        after you see this.
+
+    *   Error
+
+          {"error":$str}
+
+        If something goes wrong with the application or other operating
+        system errors.
+
+SYNOPSIS
+  Server
+      # let others connect to the running program
+      $ screenorama daemon --listen http://*:5000 -- 'while sleep 1; do echo "hey!"; done'
+
+      # pipe the output on incoming request
+      $ screenorama daemon -- ls -l
+
+      # Set parameters from config file
+      $ MOJO_CONFIG=/path/to/config.pl screenorama daemon
+
+    Supported config/environment variables:
+
+    *   conduit
+
+        See Mojo::IOLoop::ReadWriteFork.
+
+        Default value: "pty".
+
+        Environment variable: "SCREENORAMA_CONDUIT".
+
+    *   program
+
+        The application to run.
+
+    *   program_args
+
+        The arguments given to "program".
+
+    *   single
+
+        Set this to true if the server should just run one application,
+        shared between every connection. The default is false, meaning a new
+        instance of "program" will be started on each request.
+
+        Environment variable: "SCREENORAMA_SINGLE".
+
+    *   stdin
+
+        Set this to true if the "program" should accept commands from STDIN.
+
+        Environment variable: "SCREENORAMA_STDIN".
+
+  Client
+    Connect a browser to <http://localhost:5000> or <ws://localhost:5000> to
+    see the output.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+

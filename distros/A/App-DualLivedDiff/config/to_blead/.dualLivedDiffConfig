@@ -1,0 +1,10 @@
+---
+base-path-in-blead: ext/Attribute-Handlers
+files:
+  Changes: Changes
+  README: README
+dirs-recursive:
+  lib/: lib/
+  t/: t/
+  demo/: demo/
+

@@ -1,0 +1,6 @@
+name = "Amon2-Plugin-Web-Maintenance"
+# badges = ["travis"]
+authority="cpan:ZONCOEN"
+
+module_maker="ModuleBuildTiny"
+

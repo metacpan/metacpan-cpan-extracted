@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.78.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 8624bcdae55baeef00cd11d5dfcfa60f68710a02 COPYING
+SHA1 c1478b5fd4dbbd44d296c8a2e468d7642e1e77ca Changes
+SHA1 422c805cc1c5c6d1b58948684a45bd9ac93bc2e4 MANIFEST
+SHA1 240bd5a317fec9eb7be6f70997bc30cbd6c03a4f META.json
+SHA1 b8b15a3deed0e1659b49f1b4a8513a7b68cea2ab META.yml
+SHA1 1708a5a37a9d90061d0a8b51606c4153d2623ba4 Makefile.PL
+SHA1 b24b4fe8d6ded06456b1f06d2d76d13255491608 README
+SHA1 e8289ec78799d2daed70ed2aaf6b6de4327df0cd lib/App/RemoteGnokii.pm
+SHA1 0e92e4864d75253eedf6de50f63c300106db3d2e rg-action
+SHA1 caa14160fe589043e2c4de606d19c7d7071c7319 rg-psgi
+SHA1 02b9c2746a92ad9eba064295df5436126d39249b rg-smsd
+SHA1 755a9e5a02ef56cd5877366dd51f2face31839fc t/App-RemoteGnokii.t
+SHA1 914879db4b2be180214243cad14f938828b2a98e t/perlcritic.t
+SHA1 19d48dc9cb1480e88ed2f0e34f6a97fea61f2bfc t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJVV5RJAAoJEMoENb5ewbNiKkoQAKTg6Qf60KARuAPqgjOdTUls
+GbVHSLYtKEtxswZAo8ERg/bAVk5lO7s3qfpC6mOJYH3jdLCK58Dh3qTQAk/IoA5g
++a/Ym3my2QzZp8Bm6L7Qtbuuafiorp/uqt/kzCkyedWxA39qO5Yu5qj51X/XU1kR
+cWpVwVpVb55c0Te1ByKzotgyI0/aV6oRTlhR0fMWc+mPVyVqHvqm964uRyv6x7Iy
+PlE1SIX9GX2JcTdgGV9/OhzIsrZ0w/lUGeJOyY8aDzBz/GJpZveogUrptXQ6g/gx
+b0hgdn2hCbKu7SJ8OANwgzdfEP4tNgdNmZa2SAVABBhlCtV/VxycDxWASRfRfS1E
+gWAVnaDKTNkE/tNPjKCJjIn4T/G01KJckULmjM8vA2jhBaWnSmWpXtrlc4VzsIXc
+dKOQhEQhjhm8Flfh8inom/ae/nGewQhDmK4TqDZOpFh8KzmTTcClAJ+JiHzdOrNa
+N8VSClg7FVwU6BWx5N3EW3W6zNZKb/1tnEnSNAvy2tLiMEf0Be3hYxUNa4rGf4Vy
+WssrsSz3v9uDURz97ww5f+RMWeJYehC5wpH89p5QjuRynYF9EWYX78v5LC5IYbxj
+9xppdN/1wnn2ZqaWNS26eGiI+CSHldT2HUpaPq/tEu7HMkKos8ZUIMfRYUGGVAyF
+nazo05ziLX31BOq0C/bG
+=sxZJ
+-----END PGP SIGNATURE-----

@@ -1,0 +1,136 @@
+#!perl
+
+=head1 NAME
+
+verifybib - Verify an astronomical bibcode
+
+=head1 SYNOPSIS
+
+  verifybib 1995MNRAS.276.1024J
+
+  cat bibcodes.dat | verifybib
+
+=head1 DESCRIPTION
+
+This program can be used to verify a standardized astronomical
+bibcode. Output is a summary of the valid bibcode.
+
+If only one bibcode is supplied, exit status is bad if
+the bibcode is not valid.
+
+=head1 OPTIONS
+
+The following options are supported:
+
+=over 4
+
+=item B<-version>
+
+Report the version number.
+
+=item B<-help>
+
+A help message.
+
+=item B<-man>
+
+This manual page.
+
+=back
+
+
+=cut
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Astro::Bibcode;
+
+# Options
+my ($help, $man, $version);
+my $status = GetOptions("help" => \$help,
+                        "man" => \$man,
+                        "version" => \$version,
+                       );
+
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+if ($version) {
+  my $id = '$Id: verifybib,v 0.1 2004/08/18 03:29:50 timj Exp $ ';
+  print "verifybib - Verify an astronomical bibcode\n";
+  print " CVS revision: $id\n";
+  exit;
+}
+
+
+my @bibcodes;
+if (@ARGV) {
+  @bibcodes = @ARGV;
+} else {
+  @bibcodes = map {chomp; $_ } <>;
+}
+
+die "No bibcodes found on command line or on STDIN\n"
+  unless @bibcodes;
+
+my $bib = new Astro::Bibcode;
+for my $bcode (@bibcodes) {
+  my $verified = $bib->bibcode( $bcode );
+  if ($verified) {
+    print $bib->summary;
+  } else {
+    print "Bibcode '$bcode' is invalid\n";
+    exit(1) if @bibcodes == 1;
+  }
+  print "\n";
+}
+
+
+=head1 NOTES
+
+The official ADS bibcode verifier can be found at:
+
+ http://adsabs.harvard.edu/verify.html
+
+=head1 REFERENCES
+
+Details on the bibcode standard can be obtained from
+
+ http://cdsweb.u-strasbg.fr/simbad/refcode.html
+
+A complete description of the reference coding has been published as a
+chapter of the book "Information & On-Line Data in Astronomy", 1995,
+D. Egret and M. A. Albrecht (Eds), Kluwer Acad. Publ.
+
+ADS seems to use non-standard bibcodes for meetings and conferences:
+
+  http://adsabs.harvard.edu/abs_doc/conferences.html
+
+=head1 AUTHOR
+
+Tim Jenness E<lt>tjenness@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004 Tim Jenness and the Particle Physics and
+Astronomy Research Council.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+=head1 SEE ALSO
+
+L<Astro::Bibcode>, L<Astro::ADS>
+
+=cut

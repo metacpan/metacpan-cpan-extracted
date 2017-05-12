@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: /local/CPAN/AxKit-XSP-Currency/t/htdocs/axkit/out/format_options.xsp.out 1434 2005-03-05T01:08:13.559154Z claco  $ -->
+<body>
+	<price>10.50 US Dollar</price>
+</body>

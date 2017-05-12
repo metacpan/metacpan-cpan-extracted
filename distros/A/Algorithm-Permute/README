@@ -1,0 +1,13 @@
+    Algorithm::Permute - Handy and fast permutation with object oriented
+    interface
+
+As of version 0.11, a different implementation of the same permutation
+generator algorithm can be chosen at compile time. This one uses linked list
+instead of array, and hopefully a little bit faster. 
+
+To enable this, run Makefile.PL with a custom DEFINE argument:
+perl Makefile.PL DEFINE="-DPERL_EXT -DUSE_LINKEDLIST"
+
+This option only affects the iterative style (OO) interface. The callback 
+interface remains unaffected.
+

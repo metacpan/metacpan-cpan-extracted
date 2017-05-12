@@ -1,0 +1,39 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::BOS;
+
+my ($server, $cellname, $instance, $bos, $ok);
+my ($nargs, $wait, @instance);
+
+die "Usage: $0 server instances [wait [cell]]\n" if $#ARGV < 1;
+
+$nargs    = $#ARGV;
+$server   = shift;
+$instance = shift if $nargs > 0;
+$wait     = shift if $nargs > 1;
+$cellname = shift if $nargs > 2;
+
+#warn ">$server< >$instance< >$wait< >$cellname< \n";
+
+if ($instance eq '') { undef $instance; }
+if (defined $instance and $instance =~ / /) { @instance = split / /, $instance; }
+
+if ($cellname) { $bos = AFS::BOS->new($server, 0, 0, $cellname); }
+else           { $bos = AFS::BOS->new($server); }
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+if    (@instance and defined $wait) { $ok = $bos->shutdown(\@instance, $wait); }
+elsif (@instance)                   { $ok = $bos->shutdown(\@instance); }
+elsif ($instance and defined $wait) { $ok = $bos->shutdown($instance, $wait); }
+elsif ($instance)                   { $ok = $bos->shutdown($instance); }
+elsif (defined $wait)               { $ok = $bos->shutdown($wait); }
+else                                { $ok = $bos->shutdown(); }
+print "Error Code: $AFS::CODE\n" if ($AFS::CODE);
+
+print "OK = $ok \n";
+
+$bos->DESTROY;

@@ -1,0 +1,75 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: App-perlrdf
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/App-perlrdf
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ lib/App/perlrdf/Command.pm
+ lib/App/perlrdf/Command/About.pm
+ lib/App/perlrdf/Command/Aliases.pm
+ lib/App/perlrdf/Command/Canonicalize.pm
+ lib/App/perlrdf/Command/Commands.pm
+ lib/App/perlrdf/Command/FileSpec.pm
+ lib/App/perlrdf/Command/Isomorphic.pm
+ lib/App/perlrdf/Command/MakeStore.pm
+ lib/App/perlrdf/Command/Prefix.pm
+ lib/App/perlrdf/Command/StoreDescribe.pm
+ lib/App/perlrdf/Command/StoreDump.pm
+ lib/App/perlrdf/Command/StoreLoad.pm
+ lib/App/perlrdf/Command/StoreTruncate.pm
+ lib/App/perlrdf/Command/Translate.pm
+ lib/App/perlrdf/Command/Validate.pm
+ lib/App/perlrdf/DummyModel.pm
+ lib/App/perlrdf/FileSpec.pm
+ lib/App/perlrdf/FileSpec/InputFile.pm
+ lib/App/perlrdf/FileSpec/InputRDF.pm
+ lib/App/perlrdf/FileSpec/OutputFile.pm
+ lib/App/perlrdf/FileSpec/OutputRDF.pm
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+ TODO
+Copyright: Unknown
+License: Unknown
+
+Files: bin/perlrdf
+ t/01basic.t
+ t/02translate.t
+Copyright: Copyright 2012 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: README
+ lib/App/perlrdf.pm
+Copyright: This software is copyright (c) 2012-2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use File::Spec;
+use App::Monport;
+use Getopt::Long;
+use Pod::Usage;
+
+# Command line options
+GetOptions(
+    "h|?|help"  => \( my $help ),
+    "v|verbose" => \( my $verbose ),
+) or pod2usage(1);
+
+# Help
+pod2usage( -exitval => 0, -verbose => 2, -noperldoc => 1 ) if $help;
+
+my $conf_file = File::Spec->catfile( $ENV{HOME}, '.monport.yml' );
+my @hosts = @ARGV;
+
+if (@hosts) {
+    create_config(
+        {
+            verbose   => $verbose,
+            conf_file => $conf_file,
+            hosts     => [@hosts],
+        }
+    );
+} else {
+    compare_config(
+        {
+            verbose   => $verbose,
+            conf_file => $conf_file
+        }
+    );
+}
+
+__END__
+
+=head1 NAME
+
+monport - keep an eye on network ports
+
+=head1 SYNOPSIS
+
+monport [options] [hosts]
+
+  options:
+    -h, -?, --help  brief help message
+    -v, --verbose   print what you are doing
+
+=head1 DESCRIPTION
+
+Compare the open ports against an expected state defined in a configuration
+file. To create the configuration file (F<$HOME/.monport.yml>) run:
+
+    $ monport host1 host2
+
+To check the state of the ports:
+
+    $ monport
+
+=cut

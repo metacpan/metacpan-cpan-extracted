@@ -1,0 +1,33 @@
+This is the README file for Archive::Rar, the Perl module for creation
+and manipulation of rar files.
+
+* Installation
+
+Archive::Rar uses the standard perl module install process
+
+perl Makefile.PL
+make
+make test (optional but recommended)
+make install
+
+This module uses no C-coded parts in itself, but it uses
+the rar command available under Windsows (WinRar) and Linux.
+Archive::Rar don't work without that.
+
+* important changes for version 0.072.
+
+Fixes a problem with systems that don't like open files being deleted.
+It also has an explicit copyright notice so folks like Debian can
+redistribute it in peace, and an new custodial maintainer due to
+Calle's suffering Carpal Tunnel Syndrome.
+
+Get better soon, Calle!
+
+* important changes for version 1.9
+
+This is the first public version
+
+If you use this module at all, please mail
+<jmbperl@hotmail.com> and tell me what
+you think of it.
+

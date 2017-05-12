@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentCollection xmlns="http://alvis.info/enriched/" version="1.1">
+<documentRecord xmlns="http://alvis.info/enriched/" id="EE84646F3CDF765B8EE759DC235DF475">
+  <acquisition>
+      <acquisitionData>
+        <modifiedDate>2007-12-13 22:03:06</modifiedDate>
+        <urls>
+          <url>file://Fichiers-Test/NLPPlatform.html</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>
+          <list>
+            <item>NAME</item> 
+            <item>SYNOPSIS</item> 
+            <item>DESCRIPTION</item> 
+            <item>Linguistic annotation: requirements</item> 
+            <item>METHODS</item> 
+            <item>compute_dependencies()</item> 
+            <item>starttimer()</item> 
+            <item>endtimer()</item> 
+            <item>linguistic_annotation()</item> 
+            <item>standalone()</item> 
+            <item>standalone_main()</item> 
+            <item>client_main()</item> 
+            <item>load_config()</item> 
+            <item>client()</item> 
+            <item>sigint_handler()</item> 
+            <item>server()</item> 
+            <item>disp_log()</item> 
+            <item>split_to_docRecs()</item> 
+            <item>sub_dir_from_id()</item> 
+            <item>record_id()</item> 
+            <item>delete_id()</item> 
+            <item>init_server()</item> 
+            <item>token_id_is_in_list_refid_token()</item> 
+            <item>token_id_follows_list_refid_token()</item> 
+            <item>token_id_just_before_last_of_list_refid_token()</item> 
+            <item>unparseable_id()</item></list> PLATFORM CONFIGURATION DEFAULT INTEGRATED/WRAPPED NLP TOOLS 
+          <list>
+            <item>Named Entity Tagger</item> 
+            <item>Word and sentence segmenter</item> 
+            <item>Part-of-Speech Tagger</item> 
+            <item>Term Tagger</item> 
+            <item>Part-of-Speech specialized for Biological texts</item> 
+            <item>Parser</item> 
+            <item>Parser specialized for biological texts</item></list> TUNING THE NLP PLATFORM PROTOCOL SEE ALSO AUTHORS LICENSE  
+          <section title="NAME">
+            <section>NAME</section> 
+            <section>Alvis::NLPPlatform - Perl extension for linguistically annotating XML documents in Alvis</section></section>
+          <section title="SYNOPSIS">
+            <section>SYNOPSIS</section> 
+            <list>
+              <item>Standalone mode: use Alvis::NLPPlatform; Alvis::NLPPlatform::standalone_main(\%config, $doc_xml, \*STDOUT);</item> 
+              <item>Distributed mode: # Server process use Alvis::NLPPlatform; Alvis::NLPPlatform::server($rcfile); # Client process use Alvis::NLPPlatform; Alvis::NLPPlatform::client($rcfile);</item></list></section>
+          <section title="DESCRIPTION">
+            <section>DESCRIPTION</section> 
+            <section>This module is the main part of the Alvis NLP platform. It provides overall methods for the linguistic annotation of web documents. Linguistic annotations depend on the configuration variables and dependencies between linguistic steps.</section> 
+            <section>Input documents are assumed to be in the ALVIS XML format ( standalone_main ) or to be loaded in a hashtable ( client_main ). The annotated document is recorded in the given descriptor ( standalone_main ) or returned as a hashtable ( client_main ).</section> 
+            <section>The ALVIS format is described here:</section> 
+            <section><ulink url="http://www.alvis.info/alvis/Architecture_2fFormats?action=show&amp;redirect=architecture%2Fformats#documents">http://www.alvis.info/alvis/Architecture_2fFormats?action=show&amp;redirect=architecture%2Fformats#documents</ulink></section> 
+            <section>The DTD and XSD are provied in etc/alvis-nlpplatform.</section></section>
+          <section title="Linguistic annotation: requirements">
+            <section>Linguistic annotation: requirements</section> 
+            <list>
+              <item>Tokenization: this step has no dependency. It is required for any following annotation level.</item> 
+              <item>Named Entity Tagging: this step requires tokenization.</item> 
+              <item>Word segmentation: this step requires tokenization. The Named Entity Tagging step is recommended to improve the segmentation.</item> 
+              <item>Sentence segmentation: this step requires tokenization. The Named Entity Tagging step is recommended to improve the segmentation.</item> 
+              <item>Part-Of-Speech Tagging: this step requires tokenization, and word and sentence segmentation.</item> 
+              <item>Lemmatization: this step requires tokenization, word and sentence segmentation, and Part-of-Speech tagging.</item> 
+              <item>Term Tagging: this step requires tokenization, word and sentence segmentation, and Part-of-Speech tagging. Lemmatization is recommended to improve the term recognition.</item> 
+              <item>Parsing: this step requires tokenization, word and sentence segmentation. Term tagging is recommended to improve the parsing of noun phrases.</item> 
+              <item>Semantic feature tagging: To be determined</item> 
+              <item>Semantic relation tagging: To be determined</item> 
+              <item>Anaphora resolution: To be determined</item></list></section>
+          <section title="METHODS">
+            <section>METHODS</section>  
+            <section title="compute_dependencies()">
+              <section>compute_dependencies()</section> compute_dependencies($hashtable_config); 
+              <section>This method processes the configuration variables defining the linguistic annotation steps. $hash_config is the reference to the hashtable containing the variables defined in the configuration file. The dependencies of the linguistic annotations are then coded. For instance, asking for POS annotation will imply tokenization, word and sentence segmentations.</section></section>
+            <section title="starttimer()">
+              <section>starttimer()</section> starttimer() 
+              <section>This method records the current date and time. It is used to compute the time of a processing step.</section></section>
+            <section title="endtimer()">
+              <section>endtimer()</section> endtimer(); 
+              <section>This method ends the timer and returns the time of a processing step, according to the time recorded by starttimer() .</section></section>
+            <section title="linguistic_annotation()">
+              <section>linguistic_annotation()</section> linguistic_annotation($h_config,$doc_hash); 
+              <section>This methods carries out the lingsuitic annotation according to the list of required annotations. Required annotations are defined by the configuration variables ( $hash_config is the reference to the hashtable containing the variables defined in the configuration file).</section> 
+              <section>The document to annotate is passed as a hash table ( $doc_hash ). The method adds annotation to this hash table.</section></section>
+            <section title="standalone()">
+              <section>standalone()</section> standalone($config, $HOSTNAME, $doc); 
+              <section>This method is used to annotate a document in the standalone mode of the platform. The document $doc is given in the ALVIS XML format.</section> 
+              <section>The reference to the hashtable $config contains the configuration variables. The variable $HOSTNAME is the host name.</section> 
+              <section>The method returns the annotation document.</section></section>
+            <section title="standalone_main()">
+              <section>standalone_main()</section> standalone_main($hash_config, $doc_xml, \*STDOUT); 
+              <section>This method is used to annotate a document in the standalone mode of the platform. The document ( %doc_xml ) is given in the ALVIS XML format.</section> 
+              <section>The document is loaded into memory and then annotated according to the steps defined in the configuration variables ( $hash_config is the reference to the hashtable containing the variables defined in the configuration file). The annotated document is printed to the file defined by the descriptor given as parameter (in the given example, the standard output). $printCollectionHeaderFooter indicates if the documentCollection header and footer have to be printed.</section> 
+              <section>The function returns the time of the XML rendering.</section></section>
+            <section title="client_main()">
+              <section>client_main()</section> client_main($doc_hash, $r_config); 
+              <section>This method is used to annotate a document in the distributed mode of the NLP platform. The document given in the ALVIS XML format is already is loaded into memory ( $doc_hash ).</section> 
+              <section>The document is annotated according to the steps defined in the configuration variables. The annotated document is returned to the calling method.</section></section>
+            <section title="load_config()">
+              <section>load_config()</section> load_config($rcfile); 
+              <section>The method loads the configuration of the NLP Platform by reading the configuration file given in argument.</section></section>
+            <section title="client()">
+              <section>client()</section> client($rcfile) 
+              <section>This is the main method for the client process. $rcfile is the file name containing the configuration.</section></section>
+            <section title="sigint_handler()">
+              <section>sigint_handler()</section> sigint_handler($signal); 
+              <section>This method is used to catch the INT signal and send a ABORTING message to the server.</section></section>
+            <section title="server()">
+              <section>server()</section> server($rcfile) 
+              <section>This is the main method for the server process. $rcfile is the file name containing the configuration.</section></section>
+            <section title="disp_log()">
+              <section>disp_log()</section> disp_log($hostname,$message); 
+              <section>This method prints the message ( $message ) on the standard error output, in a formatted way:</section> 
+              <section>date: (client=hostname) message</section></section>
+            <section title="split_to_docRecs()">
+              <section>split_to_docRecs()</section> split_to_docRecs($xml_docs); 
+              <section>This method splits a list of documents into a table and return it. Each element of the table is a two element table containing the document id and the document.</section></section>
+            <section title="sub_dir_from_id()">
+              <section>sub_dir_from_id()</section> sub_dir_from_id($doc_id) 
+              <section>Ths method returns the subdirectory where annotated document will stored. It computes the subdirectory from the two first characters of the document id ( $doc_id ).</section></section>
+            <section title="record_id()">
+              <section>record_id()</section> record_id($doc_id, $r_config); 
+              <section>This method records in the file $ALVISTMP/.proc_id , the id of the document that has been sent to the client.</section></section>
+            <section title="delete_id()">
+              <section>delete_id()</section> delete_id($doc_id,$r_config); 
+              <section>This method delete the id of the document that has been sent to the client, from the file $ALVISTMP/.proc_id .</section></section>
+            <section title="init_server()">
+              <section>init_server()</section> init_server($r_config); 
+              <section>This method initializes the server. It reads the document id from the file $ALVISTMP/.proc_id and loads the corresponding documents i.e. documents which have been annotated but not recorded due to a server crash.</section></section>
+            <section title="token_id_is_in_list_refid_token()">
+              <section>token_id_is_in_list_refid_token()</section> token_id_is_in_list_refid_token($list_refid_token, $token_to_search); 
+              <section>The method returns 1 if the token $token_to_search is in the list $list_refid_token , 0 else.</section></section>
+            <section title="token_id_follows_list_refid_token()">
+              <section>token_id_follows_list_refid_token()</section> token_id_follows_list_refid_token($list_refid_token, $token_to_search); 
+              <section>The method returns 1 if the token $token_to_search is the foollwing of the last token of the list $list_refid_token , 0 else.</section></section>
+            <section title="token_id_just_before_last_of_list_refid_token()">
+              <section>token_id_just_before_last_of_list_refid_token()</section> token_id_just_before_last_of_list_refid_token($list_refid_token, $token_to_search); 
+              <section>The method returns 1 if the token $token_to_search is just before the first token of the list $list_refid_token , 0 else.</section></section>
+            <section title="unparseable_id()">
+              <section>unparseable_id()</section> unparseable_id($id) 
+              <section>The method checks if the id have been parsed or not. If not, it prints a warning.</section></section></section>
+          <section title="PLATFORM CONFIGURATION">
+            <section>PLATFORM CONFIGURATION</section> 
+            <section>The configuration file of the NLP Platform is composed of global variables and divided into several sections:</section>  
+            <section>Global variables. 
+              <section>The two mandatory variables are ALVISTMP and PRESERVEWHITESPACE (in the XML_INPUT section).</section>  
+              <section>
+                <section>ALVISTMP : it defines the temporary directory used during the annotation process. The files are recorded in (XML files and input/output of the NLP tools) during the annotation step. It must be writable to the user the process is running as.</section></section> 
+              <section>
+                <section>DEBUG : this variable indicates if the NLP platform is run in a debug mode or not. The value are 1 (debug mode) or 0 (no debug mode). Default value is 0. The main consequence of the debug mode is to keep the temporary file.</section></section> 
+              <section>Additional variables and environement variables can be used if they are interpolated in the configuration file. For instance, in the default configuration file, we add</section>  
+              <section>
+                <section>PLATFORM_ROOT : directory where are installed NLP tools and resources.</section></section> 
+              <section>
+                <section>NLP_tools_root : root directory where are installed the NLP tools</section></section> 
+              <section>
+                <section>AWK : path for awk</section></section> 
+              <section>
+                <section>SEMTAG_EN_DIR : directory where is installed the semantic tagger</section></section> 
+              <section>
+                <section>ONTOLOGY : path for the ontology for the semanticTypeTagger (trish2 format -- see documentation of the semanticTypeTagger)</section></section> 
+              <section>
+                <section>CANONICAL_DICT : path for the dictionary with the canonical form of the semantic units (trish2 format -- see documentation of the semanticTypeTagger)</section></section> 
+              <section>
+                <section>PARENT_DICT :: path for the dictionary with the parent nodes of the semantic units (trish2 format -- see documentation of the semanticTypeTagger)</section></section></section> 
+            <section>Section alvis_connection  
+              <section>
+                <section>HARVESTER_PORT : the port of the harverster/crawler ( combine ) that the platform will read from to get the documents to annotate.</section></section> 
+              <section>
+                <section>NEXTSTEP : indicates if there is a next step in the pipeline (for instance, the indexer IdZebra). The value is 0 or 1 .</section></section> 
+              <section>
+                <section>NEXTSTEP_HOST : the host name of the component that the platform will send the annotated document to.</section></section> 
+              <section>
+                <section>NEXTSTEP_PORT : the port of the component that the platform will send the annotated document to.</section></section> 
+              <section>
+                <section>SPOOLDIR : the directory where the documents coming from the harvester are stored.</section> 
+                <section>It must be writable to the user the process is running as.</section></section> 
+              <section>
+                <section>OUTDIR : the directory where are stored the annotated documents if SAVE_IN_OUTDIR (in Section NLP_misc ) is set.</section> 
+                <section>It must be writable to the user the process is running as.</section></section></section> 
+            <section>Section NLP_connection  
+              <section>
+                <section>SERVER : The host name where the NLP server is running, for the connections with the NLP clients.</section></section> 
+              <section>
+                <section>PORT : The listening port of the NLP server, for the connections with the NLP clients.</section></section> 
+              <section>
+                <section>RETRY_CONNECTION : The number of times that the clients attempts to connect to the server.</section></section></section> 
+            <section>XML_INPUT  
+              <section>
+                <section>PRESERVEWHITESPACE is a boolean indicating if the linguistic annotation will be done by preserving white space or not, i.e. XML blank nodes and white space at the beginning and the end of any line, but also indentation of the text in the canonicalDocument</section> 
+                <section>Default value is 0 or false (blank nodes and indentation characters are removed).</section></section> 
+              <section>
+                <section>LINGUISTIC_ANNOTATION_LOADING : The linguistic annotations already existing in the input documents are loaded or not. Default value is c60162 or true (linguistic annotations are loaded).</section></section></section> 
+            <section>
+              <section>XML_OUTPUT (Not available yet)</section>   
+              <section>
+                <section>FORM</section></section>  
+              <section>
+                <section>ID</section></section></section> 
+            <section>Section linguistic_annotation 
+              <section>the section defines the NLP steps that will be used for annotating documents. The values are 0 or 1 .</section>  
+              <section>
+                <section>ENABLE_TOKEN : toggles the tokenization step.</section></section> 
+              <section>
+                <section>ENABLE_NER : toggles the named entity recognition step.</section></section> 
+              <section>
+                <section>ENABLE_WORD : toogles the word segmentation step.</section></section> 
+              <section>
+                <section>ENABLE_SENTENCE : toogles the sentence segmentation step.</section></section> 
+              <section>
+                <section>ENABLE_POS : toogles the Part-of-Speech tagging step.</section></section> 
+              <section>
+                <section>ENABLE_LEMMA : toogles the lemmatization step.</section></section> 
+              <section>
+                <section>ENABLE_TERM_TAG : toogles the term tagging step.</section></section> 
+              <section>
+                <section>ENABLE_SYNTAX : toogles the parsing step.</section></section></section> 
+            <section>Section NLP_misc 
+              <section>the section defines miscellenous variables for NLP annotation steps.</section>  
+              <section>
+                <section>NLP_resources : the root directory where NLP resources can be found.</section></section> 
+              <section>
+                <section>SAVE_IN_OUTDIR : enable or not to save the annotated documents in the outdir directory.</section></section> 
+              <section>
+                <section>TERM_LIST_EN : the path of the term list for English.</section></section> 
+              <section>
+                <section>TERM_LIST_FR : the path of the term list for French.</section></section></section> 
+            <section>Section NLP_tools 
+              <section>This section defines the command line for the NLP tools integrated in the platform.</section> 
+              <section>Additional variables and environment variables can be used for interpolation.</section>  
+              <section>
+                <section>NETAG_EN : command line for the Named Entity Recognizer for English.</section></section> 
+              <section>
+                <section>NETAG_FR : command line for the Named Entity Recognizer for French.</section></section> 
+              <section>
+                <section>WORDSEG_EN : command line for the word segmentizer for English.</section></section> 
+              <section>
+                <section>WORDSEG_FR : command line for the word segmentizer for French.</section></section> 
+              <section>
+                <section>POSTAG_EN : command line for the Part-of-Speech tagger for English.</section></section> 
+              <section>
+                <section>POSTAG_FR : command line for the Part-of-Speech tagger for French.</section></section> 
+              <section>
+                <section>SYNTACTIC_ANALYSIS_EN : command line for the parser for English.</section></section> 
+              <section>
+                <section>SYNTACTIC_ANALYSIS_FR : command line for the parser for French.</section></section> 
+              <section>
+                <section>TERM_TAG_EN : command line for the term tagger for English.</section></section> 
+              <section>
+                <section>TERM_TAG_FR : command line for the term tagger for French.</section></section> 
+              <section>
+                <section>SEMTAG_EN : command line for the semantic tagger for English.</section></section> 
+              <section>
+                <section>SEMTAG_FR : command line for the semantic tagger for French.</section></section></section> 
+            <section>Section CONVERTERS 
+              <section>This section defines the converters for th MIME types and additional information (see following subsections).</section> 
+              <section>Each line of this section indicates the command line for the corresping MIME types.</section>  
+              <section>Section STYLESHEET 
+                <section>This section defines the command lines (the program and the stylesheet) to apply according to the namespace. Each line defines a variable (the name is the namespace), the value is the command line.</section> 
+                <section>A default cammand line is defined by the variable default .</section>  
+                <section>
+                  <section>default</section> 
+                  <section>This variable defines the default cammand line, i.e. for unknown name space.</section></section></section> 
+              <section>
+                <section>SupplMagicFile</section> 
+                <section>This variable indicates the file defining the additional MIME types.</section></section> 
+              <section>
+                <section>StoreInputFiles</section> 
+                <section>This internal variable indicates if the converted input file are stored in a directory.</section></section></section></section>
+          <section title="DEFAULT INTEGRATED/WRAPPED NLP TOOLS">
+            <section>DEFAULT INTEGRATED/WRAPPED NLP TOOLS</section> 
+            <section>Several NLP tools have been integrated in wrappers. In this section, we summarize how to download and install the NLP tools used by default in the Alvis::NLPPlatform::NLPWrappers.pm module. We also give additional information about the tools.</section>  
+            <section title="Named Entity Tagger">
+              <section>Named Entity Tagger</section> 
+              <section>We integrated TagEn as the default named entity tagger.</section>  
+              <section>Form: 
+                <section>sources, binaries and Perl scripts</section></section> 
+              <section>Obtain: 
+                <section><ulink url="http://www-lipn.univ-paris13.fr/~hamon/ALVIS/Tools/TagEN.tar.gz">http://www-lipn.univ-paris13.fr/~hamon/ALVIS/Tools/TagEN.tar.gz</ulink></section></section> 
+              <section>Install: untar TagEN.tar.gz in a directory go to src directory run compile script</section> 
+              <section>Licence: 
+                <section>GPL</section></section> 
+              <section>Version number required: 
+                <section>any</section></section> 
+              <section>Additional information: 
+                <section>This named entity tagger can be run according to various mode. A mode is defined by Unitex (http://www-igm.univ-mlv.fr/~unitex/) graphs. The tagger can be used for English and French texts.</section></section></section>
+            <section title="Word and sentence segmenter">
+              <section>Word and sentence segmenter</section> 
+              <section>The Word and sentence segmenter we use by default is a awk script sent by Gregory Grefenstette on the Corpora mailing list. We modified it to segmentize French texts.</section> 
+              <list>
+                <item>Form: AWK script</item> 
+                <item>Obtain: <ulink url="http://www-lipn.univ-paris13.fr/~hamon/ALVIS/Tools/WordSeg.tar.gz">http://www-lipn.univ-paris13.fr/~hamon/ALVIS/Tools/WordSeg.tar.gz</ulink></item> 
+                <item>Install: untar WordSeg.tar.gz in a directory</item> 
+                <item>Licence: GPL</item> 
+                <item>Version number required: any (modifications for French by Paris 13)</item></list></section>
+            <section title="Part-of-Speech Tagger">
+              <section>Part-of-Speech Tagger</section> 
+              <section>The default wrapper call the TreeTagger. This tool is a Part-of-Speech tagger and lemmatizer.</section>  
+              <section>Form: binary+resources</section> 
+              <section>Obtain: links and instructions at <ulink url="http://www.ims.uni-stuttgart.de/projekte/corplex/TreeTagger/DecisionTreeTagger.html">http://www.ims.uni-stuttgart.de/projekte/corplex/TreeTagger/DecisionTreeTagger.html</ulink></section> 
+              <section>Install: Information are given on the web site. To summarize, you need to:  
+                <section>
+                  <section>make a directory named, for instance, TreeTagger</section></section> 
+                <section>
+                  <section>Download archives in tools/TreeTagger</section></section> 
+                <section>
+                  <section>go in the directory tools/TreeTagger</section></section> 
+                <section>
+                  <section>Run install-tagger.sh</section></section></section> 
+              <section>Licence: free for research only</section> 
+              <section>Version number required: (by date) 62= 09.04.1996</section></section>
+            <section title="Term Tagger">
+              <section>Term Tagger</section> 
+              <section>We have integrated a tool developed specifically for the Alvis project.It is required while installing the platform.</section> 
+              <list>
+                <item>Form: Perl module</item> 
+                <item>Obtain: On CPAN, <ulink url="http://search.cpan.org/~thhamon/Alvis-TermTagger-0.3/">http://search.cpan.org/~thhamon/Alvis-TermTagger-0.3/</ulink></item> 
+                <item>Install: perl Makefile.PL make make install</item> 
+                <item>Licence: GPL</item> 
+                <item>Version number required: any</item></list></section>
+            <section title="Part-of-Speech specialized for Biological texts">
+              <section>Part-of-Speech specialized for Biological texts</section> 
+              <section>GeniaTagger (POS and lemma tagger):</section> 
+              <list>
+                <item>Form: source+resources</item> 
+                <item>Obtain: links and instructions at <ulink url="http://www-tsujii.is.s.u-tokyo.ac.jp/~genia/postagger/geniatagger-2.0.1.tar.gz">http://www-tsujii.is.s.u-tokyo.ac.jp/~genia/postagger/geniatagger-2.0.1.tar.gz</ulink></item> 
+                <item>Install: untar geniatagger-2.0.1.tar.gz in a directory cd tools/geniatagger-2.0.1 Run make</item> 
+                <item>Licence: free for research only (and Wordnet licence for the dictionary)</item> 
+                <item>Version number required: 2.0.1</item></list></section>
+            <section title="Parser">
+              <section>Parser</section> 
+              <section>Link Grammar Parser:</section> 
+              <list>
+                <item>Form: sources + resources</item> 
+                <item>Obtain: <ulink url="http://www.link.cs.cmu.edu/link/ftp-site/link-grammar/link-4.1b/unix/link-4.1b.tar.gz">http://www.link.cs.cmu.edu/link/ftp-site/link-grammar/link-4.1b/unix/link-4.1b.tar.gz</ulink></item> 
+                <item>Install: untar link-4.1b.tar.gz See the Makefile for configuration run make Apply the additional patch for the Link Grammar parser (lib/Alvis/NLPPlatform/patches). cd link-4.1b patch -p0 60 lib/Alvis/NLPPlatform/patches/link-4.1b-WithWhiteSpace.diff Similar patch exists for the version 4.1a of the Link Grammar parser</item> 
+                <item>Licence: Compatible with GPL</item> 
+                <item>Version number required: 4.1a or 4.1b</item></list></section>
+            <section title="Parser specialized for biological texts">
+              <section>Parser specialized for biological texts</section> 
+              <section>BioLG:</section>  
+              <section>Form: sources + resources</section> 
+              <section>Obtain: <ulink url="http://www.it.utu.fi/biolg/">http://www.it.utu.fi/biolg/</ulink></section> 
+              <section>Install:  untar See the Makefile for configuration run make</section> 
+              <section>Licence: Compatible with GPL</section> 
+              <section>Version number required: 1.1.11</section> 
+              <section>additional programs</section> 
+              <section># =head2 Semantic Tagger</section> 
+              <section># SemanticTypeTagger:</section> 
+              <section># =over</section> 
+              <section># =item * Form:</section> 
+              <section># sources + resources</section> 
+              <section># =item * Obtain:</section> 
+              <section># =item * Install:</section> 
+              <section># (see the README in the archive)</section> # untar # run make check 
+              <section># rn make</section> 
+              <section># =item * Licence:</section> 
+              <section># Compatible with GPL</section> 
+              <section># =item * Version number required:</section> 
+              <section># 0.4</section> 
+              <section># =back</section></section></section>
+          <section title="TUNING THE NLP PLATFORM">
+            <section>TUNING THE NLP PLATFORM</section> 
+            <section>The main characteristic of the NLP platform is its tunability according to the domain (language specificity of the documents to be annotated) and the user requirements. The tuning can be done at two levels:</section>  
+            <section>either resources adapted or describing more precisely the domain can be exploited. 
+              <section>In that respect, tuning concerns the integration of these resources in the NLP tools used in the plaform. The command line in the configuration file can be modified.</section> 
+              <section>Example of resource switching can be found at the named entity recognition step. The default Named Entity tagger can use either bio-medical resources, or more general, according to the value of the parameter -t .</section></section> 
+            <section>
+              <section>either other NLP tools can be integrated in the NLP platform.</section> 
+              <section>In that case, new wrappers should be written. To make easier, the integration of a new NLP tools, we used the polymorphism to override default wrappers. NLP platform package is defined as a three level hierarchy. The top is the Alvis::NLPPlatform package. The Alvis::NLPPlatform::NLPWrappers package is the deeper. We define the package Alvis::NLPPlatform::UserNLPWrappers as between the both. In that respect, integrating a new NLP tool, and then writing a new wrapper requires to modify methods in the Alvis::NLPPlatform::UserNLPWrappers , and calling or not the default methods.</section> 
+              <section>NB: If the package Alvis::NLPPlatform::UserNLPWrappers is not writable to the user, the tuning can be done by copying the Alvis::NLPPlatform::UserNLPWrappers in a local directory, and by adding this local directory to the PERL5LIB variable (before the path of Alvis::NLPPlatform ).</section> 
+              <section>NB: A template for the package Alvis::NLPPlatform::UserNLPWrappers can be found in Alvis::NLPPlatform::UserNLPWrappers-template .</section> 
+              <section>Example of such tuning can be fouond at the parsing level. We integrate a parser designed for biological documents in Alvis::NLPPlatform::UserNLPWrappers .</section></section></section>
+          <section title="PROTOCOL">
+            <section>PROTOCOL</section> 
+            <list>
+              <item>Requesting a document:</item> 
+              <item>from the client, to the server :</item> 
+              <item>REQUEST</item></list> from the server, to the client : 
+            <list>
+              <item>SENDING id ( id is the document id)</item> 
+              <item>SIZE size ( size is the document size)</item> 
+              <item>document ( document is the XML document)</item> 
+              <item>60 DONE 62</item></list> from the client, to the server : 
+            <list>
+              <item>ACK</item></list> Returning a document: 
+            <list>
+              <item>from the client, to the server :</item> 
+              <item>GIVEBACK</item> 
+              <item>id ( id is the document id)</item> 
+              <item>document ( document is the annotated document)</item> 
+              <item>60 DONE 62</item></list> from the server, to the client : 
+            <list>
+              <item>ACK</item></list> Aborting the annotation process: 
+            <list>
+              <item>from the client, to the server :</item></list>  
+            <section>ABORTING</section> 
+            <section>id ( id is the document id)</section> Exiting: 
+            <section>the server understands the following messages QUIT , LOGOUT and EXIT . However, this is not been implemented in the client yet.</section></section>
+          <section title="SEE ALSO">
+            <section>SEE ALSO</section> 
+            <section>Alvis web site: <ulink url="http://www.alvis.info">http://www.alvis.info</ulink></section> 
+            <section>Description of the input/output format: <ulink url="http://www.alvis.info/alvis/Architecture_2fFormats?action=show&amp;redirect=architecture%2Fformats#documents">http://www.alvis.info/alvis/Architecture_2fFormats?action=show&amp;redirect=architecture%2Fformats#documents</ulink></section></section>
+          <section title="AUTHORS">
+            <section>AUTHORS</section> 
+            <section>Thierry Hamon 60 <ulink url="mailto:thierry.hamon@lipn.univ-paris13.fr">thierry.hamon@lipn.univ-paris13.fr</ulink>62 and Julien Deriviere 60 <ulink url="mailto:julien.deriviere@lipn.univ-paris13.fr">julien.deriviere@lipn.univ-paris13.fr</ulink>62</section></section>
+          <section title="LICENSE">
+            <section>LICENSE</section> 
+            <section>Copyright (C) 2005 by Thierry Hamon and Julien Deriviere</section> 
+            <section>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.8.6 or, at your option, any later version of Perl 5 you may have available.</section></section></section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">title</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>http://www.link.cs.cmu.edu/link/ftp-site/link-grammar/link-4.1b/unix/link-4.1b.tar.gz</anchorText>
+            <location>http://www.link.cs.cmu.edu/link/ftp-site/link-grammar/link-4.1b/unix/link-4.1b.tar.gz</location>
+          </link>
+          <link type="a">
+            <anchorText>http://www-tsujii.is.s.u-tokyo.ac.jp/~genia/postagger/geniatagger-2.0.1.tar.gz</anchorText>
+            <location>http://www-tsujii.is.s.u-tokyo.ac.jp/~genia/postagger/geniatagger-2.0.1.tar.gz</location>
+          </link>
+          <link type="a">
+            <anchorText>http://www.alvis.info</anchorText>
+            <location>http://www.alvis.info</location>
+          </link>
+          <link type="a">
+            <anchorText>http://www.it.utu.fi/biolg/</anchorText>
+            <location>http://www.it.utu.fi/biolg/</location>
+          </link>
+          <link type="a">
+            <anchorText>thierry.hamon@lipn.univ-paris13.fr</anchorText>
+            <location>mailto:thierry.hamon@lipn.univ-paris13.fr</location>
+          </link>
+          <link type="a">
+            <anchorText>http://www.alvis.info/alvis/Architecture_2fFormats?action=show&amp;amp;redirect=architecture%2Fformats#documents</anchorText>
+            <location>http://www.alvis.info/alvis/Architecture_2fFormats?action=show&amp;amp;redirect=architecture%2Fformats#documents</location>
+          </link>
+          <link type="a">
+            <anchorText>http://www.ims.uni-stuttgart.de/projekte/corplex/TreeTagger/DecisionTreeTagger.html</anchorText>
+            <location>http://www.ims.uni-stuttgart.de/projekte/corplex/TreeTagger/DecisionTreeTagger.html</location>
+          </link>
+          <link type="a">
+            <anchorText>http://www-lipn.univ-paris13.fr/~hamon/ALVIS/Tools/TagEN.tar.gz</anchorText>
+            <location>http://www-lipn.univ-paris13.fr/~hamon/ALVIS/Tools/TagEN.tar.gz</location>
+          </link>
+          <link type="a">
+            <anchorText>http://search.cpan.org/~thhamon/Alvis-TermTagger-0.3/</anchorText>
+            <location>http://search.cpan.org/~thhamon/Alvis-TermTagger-0.3/</location>
+          </link>
+          <link type="a">
+            <anchorText>julien.deriviere@lipn.univ-paris13.fr</anchorText>
+            <location>mailto:julien.deriviere@lipn.univ-paris13.fr</location>
+          </link>
+          <link type="a">
+            <anchorText>http://www-lipn.univ-paris13.fr/~hamon/ALVIS/Tools/WordSeg.tar.gz</anchorText>
+            <location>http://www-lipn.univ-paris13.fr/~hamon/ALVIS/Tools/WordSeg.tar.gz</location>
+          </link>
+        </outlinks>
+      </links>
+    		<analysis>
+			<property name="language">en</property>
+		</analysis>
+  </acquisition>
+</documentRecord>
+</documentCollection>

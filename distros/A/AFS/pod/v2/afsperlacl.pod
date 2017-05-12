@@ -1,0 +1,258 @@
+#------------------------------------------------------------------------------
+# RCS-Id: "@(#)$RCS-Id: pod/v2/afsperlacl.pod 2e2ca60 Tue Apr 15 13:04:20 2014 +0200 Norbert E Gruener$"
+#
+# © 2001-2014 Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<AFS::ACL> - Class to handle the B<AFS Access Control Lists>
+
+=head1 SYNOPSIS
+
+  use AFS::ACL;
+
+  my $acl = AFS::ACL->new({'foobar' => 'none'}, {'anyuser' => 'write'});
+  $acl->set('rjs' => 'write');
+  $acl->nset('opusl' => 'write');
+  $acl->remove('rjsnfs' => 'write');
+  $acl->clear;
+
+  foreach my $user ($acl->get_users) {
+      print " $user ", $acl->get_rights($user), "\n";
+  }
+
+  foreach my $user ($acl->nget_users) {
+      print " $user ", $acl->nget_rights($user), "\n";
+  }
+
+  my $ok = $acl->apply('/afs/mpa/home/guest');
+
+  my $copy   = $acl->copy;
+  my $rights = AFS::ACL->crights('read');
+
+  my $new_acl = AFS::ACL->retrieve('/afs/mpa/home/nog');
+  $ok = $new_acl->modifyacl('/afs/mpa/home/guest');
+
+=head1 DESCRIPTION
+
+This class provides methods to handle the B<AFS Access Control Lists>
+(ACL).  It is used to create, modify, delete, and reset ACL instances.
+It has methods to retrieve and to set the ACL list for directories and
+its files.
+
+These methods have the optional argument FOLLOW.  FOLLOW determines
+which file should be used should PATH be a symbolic link.  If FOLLOW be
+set to 1, then the symbolic link is followed to its target.  If FOLLOW
+is set to 0, then the method applies to the symbolic link itself.  If
+not specified FOLLOW defaults to 1.
+
+=head1 COMPATIBILITY
+
+B<This release does NOT support any features and interfaces
+from version 1.>
+
+=head1 METHODS
+
+=over 4
+
+=item B<CONSTRUCTOR>
+
+=item S< >
+
+=item B<$acl = AFS::ACL-E<gt>new([\%POS [, \%NEG]]);>
+
+Creates a new object of the class AFS::ACL.  The constructor takes two
+optional arguments.  C<%POS> and C<%NEG> are lists of positive and
+negative ACL entries given in the form of user-rights pairs, just like a
+hash table.
+
+=item B<COPY CONSTRUCTOR>
+
+=item S< >
+
+=item B<$new_acl = $acl-E<gt>copy;>
+
+Returns a copy of an existing ACL object.
+
+=item B<CLASS METHODS>
+
+=item S< >
+
+=item B<$acl = AFS::ACL-E<gt>retrieve(PATH [, FOLLOW]);>
+
+Retrieves the ACL list for the given PATH and stores it in the object $acl.
+
+=item B<$ok = AFS::ACL-E<gt>copyacl(FROMDIR, TODIR [, FOLLOW]);>
+
+Copies the ACL list from a source directory FROMDIR to the specified destination
+directory TODIR. The source directory''s ACL is unchanged.
+
+=item B<$ok = AFS::ACL-E<gt>cleanacl(PATH [, FOLLOW]);>
+
+Removes from the ACL list of the specified PATH any entry that
+refers to a user or group that no longer has a Protection Database entry.
+
+=item B<$crights = AFS::ACL-E<gt>crights(RIGHTS);>
+
+Canonicalizes the RIGHTS string. Duplicate rights will be removed. It recognizes
+the following special strings:
+  read  => rl
+  write => rlidwk
+  all   => rlidwka
+  mail  => lik
+
+=item B<$flags = AFS::ACL-E<gt>ascii2rights(RIGHTS);>
+
+Converts RIGHTS as expressed in a character string to its internal value
+(an integer with the appropriate bits set).  Returns -1 if RIGHTS are
+not valid (rlidwka, read, write, all, none) or returns the internal
+value (int32 with bits set).
+
+=item B<$rights = AFS::ACL-E<gt>rights2ascii(FLAGS);>
+
+Converts the internal value FLAGS to its corresponding character string.
+
+=item B<ATTRIBUTES ACCESS>
+
+=item S< >
+
+=item B<$rights = $acl-E<gt>get_rights(USER);>
+
+=item B<$nrights = $acl-E<gt>nget_rights(USER);>
+
+Returns the access rights for the given USER in the positive(-E<gt>get_rights) or
+negative(-E<gt>nget_rights) ACL list.
+
+=item B<$acl-E<gt>set(USER, RIGHTS);>
+
+=item B<$acl-E<gt>nset(USER, RIGHTS);>
+
+Adds the given USER and its access RIGHTS to the positive(-E<gt>set) or
+negative(-E<gt>nset) ACL list.
+
+=item B<$acl-E<gt>remove(USER);>
+
+=item B<$acl-E<gt>nremove(USER);>
+
+Removes the given USER and its access rights from the positive(-E<gt>remove) or
+negative(-E<gt>nremove) ACL list.
+
+=item B<$acl-E<gt>empty;>
+
+Removes all users and their access rights from the positive and negative ACL list.
+
+=item B<$acl-E<gt>clear;>
+
+=item B<$acl-E<gt>nclear;>
+
+Removes all users and their access rights from the positive(-E<gt>clear) or
+negative(-E<gt>nclear) ACL list.
+
+=item B<@users = $acl-E<gt>get_users;>
+
+=item B<@nusers = $acl-E<gt>nget_users;>
+
+Returns users from the positive(-E<gt>get_users) or negative(-E<gt>nget_users)
+ACL list.
+
+=item B<$pos = $acl-E<gt>length;>
+
+=item B<$npos = $acl-E<gt>nlength;>
+
+Returns the number of users in the positive(-E<gt>length)
+or negative(-E<gt>nlength) ACL list.
+
+=item B<$acl-E<gt>exists(USER);>
+
+=item B<$acl-E<gt>nexists(USER);>
+
+Returns 1 if the given USER exists in the positive(-E<gt>exists)
+or negative(-E<gt>nexists) ACL list.
+
+=item B<$acl-E<gt>is_clean>
+
+Returns 1 if the ACL list is clean, or 0 when the ACL list needs
+cleaning.  An ACL list needs cleaning if it contains entries
+referencing nonexistant PTS entries, which are represented by a
+numeric ID in the ACL instead of a name.
+
+=item B<INSTANCE METHODS>
+
+=item S< >
+
+=item B<$acl-E<gt>add(NEWACL);>
+
+Adds all entries of the ACL list NEWACL to the ACL list $acl.
+
+=item B<$ok = $acl-E<gt>apply(PATH [, FOLLOW]);>
+
+Sets the ACL list for the given PATH. This call replaces the existing ACL
+list with the new ACL list $acl.
+
+=item B<$ok = $acl-E<gt>modifyacl(PATH, [, FOLLOW]);>
+
+Sets the ACL to the union of the given $acl list and the current ACL
+of the PATH.  An access right of I<none> or an empty string will cause
+an entry to be removed from the ACL.
+
+=back
+
+=head1 CURRENT AUTHOR
+
+Norbert E. Gruener E<lt>nog@MPA-Garching.MPG.deE<gt>
+
+=head1 AUTHOR EMERITUS
+
+Roland Schemers E<lt>schemers@slapshot.stanford.eduE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (c) 2001-2011 Norbert E. Gruener <nog@MPA-Garching.MPG.de>.
+ All rights reserved.
+
+ Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University.
+ All rights reserved.
+
+Most of the explanations in this document are taken from the original
+AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ File Server/Cache Manager Interface
+ Edward R. Zayas
+ Copyright (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ Copyright (c) IBM Corporation 2000.
+ All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=over 6
+
+=item The original module is covered by the following copyright:
+
+Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation,
+advertising materials, and other materials related to such
+distribution and use acknowledge that the software was developed
+by Stanford University.  The name of the University may not be used
+to endorse or promote products derived from this software without
+specific prior written permission.
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=back
+
+=head1 DOCUMENT VERSION
+
+Revision $Rev: 1056 $

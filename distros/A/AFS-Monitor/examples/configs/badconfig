@@ -1,0 +1,33 @@
+#
+# Copyright © 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+#                  Elizabeth Cassell <e_a_c@mailsnare.net>
+#
+# $Revision: 1.2 $ $Date: 2004/08/05 20:52:03 $ $Author: alfw $
+#
+
+# global show statments
+show cm PerfStats_section
+#show cm Auth_Stats_group
+show cm fs_sc_numTtlRecords
+show fs VnodeCache_group
+
+#global thresholds
+thresh fs FetchData_sqr 2000
+thresh fs vcache_L_Allocs 20 ThreshHandlerScript
+thresh cm fs_sc_maxDowntimesInARecord 100
+
+#individual connections
+
+cm afs01
+
+fs sysdev11
+show fs FetchData_sqr
+thresh fs vcache_L_Entries 198 S 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3
+
+cm afs03
+
+fs afs02
+show cm fs_sc_maxDowntimesInARecord
+
+cm afs04
+thresh cm fs_sc_numTtlRecords 00000000000

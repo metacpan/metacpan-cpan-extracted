@@ -1,0 +1,41 @@
+Revision history for Perl extension Attribute::Default.
+
+1.35 2013-08-24
+ - Reformatted Changes file
+ - Fixed my email address
+
+1.34 2013-08-21
+ - Added an example package
+ - Added pod and pod coverage tests
+ - Added license
+ - (Yes, this is all for CPANTS)
+ - Updated dist.ini to provide a META.json file and provide a link to the
+   git repository
+
+1.33 2013-06-21
+ - Upgraded for versions of perl after 5.10
+ - Moved to dzil
+ - Deprecated
+
+1.14 2002-05-13
+ - Added check for ':method' to Defaults().
+
+1.13 2002-05-13
+ - Removed DefaultMethod, added check for ':method'.
+
+1.12 2002-05-10
+ - Added "Sub::NamedParams" to manpage.
+
+1.11 2002-05-09
+ - Added DefaultSub attribute. Refactored main code. Added minimal
+   documentation for DefaultMethod.
+
+1.10 2002-05-06
+ - Added DefaultMethod attribute.
+
+1.09 2002-04-29
+ - Initial public release
+
+0.01 2002-04-23
+ - original version; created by h2xs 1.21 with options -AX -n
+   Attribute::Default

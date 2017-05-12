@@ -1,0 +1,31 @@
+NAME
+    Acme::Alt::Dep::Test - Test Depping on an Alted Module
+
+SYNOPSIS
+        cpanm Alt::Acme::Math::XS::EUMM
+        cpanm Acme::Alt::Dep::Test
+        perl -MAcme::Math::XS\ 9
+
+DESCRIPTION
+    Alt::Acme::Math::XS::EUMM ships a version of Acme::Math::XS with:
+
+        our $VERSION = -1;
+
+    Acme::Alt::Dep::Test deps on:
+
+        Acme::Math::XS: 0
+
+    Install Acme::Alt::Dep::Test after Alt::Acme::Math::XS::EUMM should
+    install the real Acme::Math::XS (v0.0.15 or higher).
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright 2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

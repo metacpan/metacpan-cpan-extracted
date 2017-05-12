@@ -1,0 +1,162 @@
+=head1 NAME
+
+Authen::PAM::FAQ - Frequently-Asked Questions about Authen::PAM.
+
+=head1 SYNOPSIS
+
+perldoc Authen::PAM::FAQ
+
+=head1 VERSION
+
+This document is currently at version I<0.05>, as of I<May 4, 2005>
+
+=head1 DESCRIPTION
+
+=head2 1. Can I authenticate a user non interactively?
+
+Yes, you can although not in a very clean way. The PAM library
+has a mechanism, in a form of a conversation function, to send and
+receive text data from the user. For details of the format of the
+conversation function consult the Authen::PAM manual.  This function
+receives a list of code/string pairs. There are two codes
+(PAM_TEXT_INFO and PAM_ERROR_MSG) for displaying the associated string
+to the user and two codes (PAM_ECHO_ON and PAM_ECHO_OFF) for getting
+input from the user. As you can see the codes are rather general and
+you can not be completely sure when you are asked for a user name and
+when for a password. However, the common practice is that PAM_ECHO_ON
+is used for a user name and PAM_ECHO_OFF is used for a password. So,
+what you can do is to write your own conversation function which
+ignores the PAM_TEXT_INFO and PAM_ERROR_MSG codes and returns the
+user name for the code PAM_ECHO_ON and the password for the code
+PAM_ECHO_OFF. If you pass the user name in the initialization function
+then usually you will not be asked for it. Here is a simple example
+how to do this:
+
+  use Authen::PAM;
+  use POSIX qw(ttyname);
+
+  $service = "login";
+  $username = "foo";
+  $password = "bar";
+  $tty_name = ttyname(fileno(STDIN));
+
+  sub my_conv_func {
+    my @res;
+    while ( @_ ) {
+        my $code = shift;
+        my $msg = shift;
+        my $ans = "";
+
+	$ans = $username if ($code == PAM_PROMPT_ECHO_ON() );
+	$ans = $password if ($code == PAM_PROMPT_ECHO_OFF() );
+
+        push @res, (PAM_SUCCESS(),$ans);
+    }
+    push @res, PAM_SUCCESS();
+    return @res;
+  }
+
+  ref($pamh = new Authen::PAM($service, $username, \&my_conv_func)) ||
+	 die "Error code $pamh during PAM init!";
+
+  $res = $pamh->pam_set_item(PAM_TTY(), $tty_name);
+  $res = $pamh->pam_authenticate;
+  print $pamh->pam_strerror($res),"\n" unless $res == PAM_SUCCESS();
+
+
+The Authen::PAM module comes with a default conversation function
+which you can find in the file F<PAM.pm>.
+
+=head2 2. Can I change a password non interactively?
+
+All the discussion of the previous question also applies here.  There
+is however one serious complication. When changing a password it is
+quite possible that the PAM library will send you at lest two
+PAM_ECHO_OFF prompts - one for the old password and one or two for the
+new one. Therefore, the first thing you should do is to see what
+sequence of prompts is produced by your service. Then the conversation
+function should include some state variable to distinguish the
+different prompts. Here is an example:
+
+
+  use Authen::PAM;
+
+  $service = "passwd";
+  $username = "foo";
+  $oldpassword = "old_pass";
+  $newpassword = "new_pass";
+
+  sub my_conv_func {
+    my @res;
+    while ( @_ ) {
+        my $code = shift;
+        my $msg = shift;
+        my $ans = "";
+
+	$ans = $username if ($code == PAM_PROMPT_ECHO_ON() );
+	if ($code == PAM_PROMPT_ECHO_OFF() ) {
+	  $ans = $oldpassword if ($state == 0);
+	  $ans = $newpassword if ($state == 1);
+	  $ans = $newpassword if ($state == 2);
+
+	  $state++;
+        }
+
+        push @res, (PAM_SUCCESS(),$ans);
+    }
+    push @res, PAM_SUCCESS();
+    return @res;
+  }
+
+  ref($pamh = new Authen::PAM($service, $username, \&my_conv_func)) ||
+	 die "Error code $pamh during PAM init!";
+
+  $state = 0;
+  $res = $pamh->pam_chauthtok;
+  print $pamh->pam_strerror($res),"\n" unless $res == PAM_SUCCESS();
+
+If you are running the script as root then most likely you will not be
+prompted for an old password. In this case you can simply return the
+new password at the ECHO_OFF prompt. 
+
+The $msg variable contains the text of the input prompt which you can
+use for additional test or for debugging purposes, e.g.
+
+  if ($code == PAM_PROMPT_ECHO_OFF() ) {
+    if ($state>=1 || $msg=~/new/i) { # are we asked for a new password
+       $ans = $newpassword;
+    } else {
+       $ans = $oldpassword;
+    }
+    $state++;
+  }
+
+
+=head2 3. Why are the constants PAM_AUTHTOK and PAM_OLDAUTHTOK not avaliable?
+
+The PAM_AUTHTOK and PAM_OLDAUTHTOK items can be used to pass
+authentication tokens (passwords) from one module to another. However,
+they are avaliable only to PAM modules and not to PAM applicatinos. If
+you have a special setup in which you really need to preset the
+password from the application (e.g. using a radius server) then you
+can use the pam_set_authtok module avaliable from
+L<http://www.uni-hohenheim.de/~schaefer/linux/pam/pam_set_authtok.html>.
+
+
+=head1 SEE ALSO
+
+L<Authen::PAM>
+
+=head1 AUTHOR
+
+Nikolay Pelov <NIKIP at cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1998-2005 Nikolay Pelov. All rights reserved. This file
+is part of the Authen::PAM library. This library is free software; you
+can redistribute it and/or modify it under the same terms as Perl
+itself.
+
+=cut
+

@@ -1,0 +1,15 @@
+Slice.pm
+Slice.xs
+Changes
+MANIFEST
+Makefile.PL
+README
+t/01_load.t
+t/02_explicit.t
+t/03_implicit.t
+t/04_reset.t
+t/05_leak.t
+t/06_tied.t
+t/98_pod.t
+t/99_pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

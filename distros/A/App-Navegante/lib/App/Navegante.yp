@@ -1,0 +1,106 @@
+%%
+f       : actions fop {+{ action=>$_[1], %{$_[2]}}} ;
+
+fop     : FIM {+{perl => $_[1]}} | {+{}} ;
+
+actions : actions  'save' actarg         {+{ %{$_[1]}, save => $_[3]}}
+        | actions  'mail' actarg         {+{ %{$_[1]}, mail => $_[3]}}
+        | actions  'init' STRING         {+{ %{$_[1]}, init => $_[3]}}
+        | actions  'desc' STRING         {+{ %{$_[1]}, desc => $_[3]}}
+        | actions  'proc' STRING         {+{ %{$_[1]}, proc => $_[3]}}
+        | actions  'proctags' STRING         {+{ %{$_[1]}, proctags => $_[3]}}
+        | actions  'livefeedback' STRING   {+{ %{$_[1]}, livefeedback => $_[3]}}
+        | actions  'feedback' STRING     {+{ %{$_[1]}, feedback => $_[3]}}
+        | actions  'annotate' STRING     {+{ %{$_[1]}, annotate => $_[3]}}
+        | actions  'iform' STRING     {+{ %{$_[1]}, iform => $_[3]}}
+        | actions  'iframe' STRING     {+{ %{$_[1]}, iframe => $_[3]}}
+        | actions  'quit' STRING     {+{ %{$_[1]}, quit => $_[3]}}
+        | actions  'formtitle' STRING    {+{ %{$_[1]}, formtitle => $_[3]}}
+        | actions  'filename' STRING      {+{ %{$_[1]}, filename => $_[3]}}
+        | actions  'protect' STRING      {+{ %{$_[1]}, protect => $_[3]}}
+        |                                {+{}}
+        ;
+
+actarg  : STRING            { +{arg=>$_[1]}}
+        | STRING ':' ID     { +{arg=>$_[1], feedback => $_[3] }}
+        ;
+
+%%
+
+package App::Navegante;
+use lib './lib/';
+use CGI qw( :all :nodebug);
+use Data::Dumper;
+use App::Navegante::CGI;
+
+my $File;
+my $t = parseFile();
+
+preparafiles($t->{action}) if $t->{action};
+geraCgi($t);
+
+sub preparafiles{
+  my $a= shift;
+  if($a->{save} && !-e $a->{save}{arg}){
+      open(F,">$a->{save}{arg}") or die ("cant create $a->{save}{arg}\n");
+      print F "##Created by FormLang\n";
+      close F;
+      chmod (0666,$a->{save}{arg})
+  }
+}
+
+sub geraCgi{
+    my %args = (%{$_[0]{action}}, PERL=>$_[0]{perl});
+    my $t = App::Navegante::CGI->new(%args);
+
+    if( defined $_[0]{action}{filename}) {
+        open(F,">$_[0]{action}{filename}") or die ("cant create $_[0]{action}{filename}");
+        print F $t->createCGI();
+        close(F);
+        chmod(0755,$_[0]{action}{filename});
+    }
+    else {
+        print $t->createCGI();
+    }
+}
+
+sub yyerror {
+  if ($_[0]->YYCurtok) {
+      printf STDERR ('Error: a "%s" (%s) was fond where %s was expected'."\n",
+         $_[0]->YYCurtok, $_[0]->YYCurval, $_[0]->YYExpect)
+  }
+  else { print  STDERR "Expecting one of ",join(", ",$_[0]->YYExpect),"\n";
+  }
+}
+
+sub parseFile {
+  my $p = new Navegante();
+  init_lex();
+  $p->YYParse(
+      yylex   => \&lex,
+      yyerror => \&yyerror
+  );
+}
+
+sub init_lex{
+ local $/;
+ undef $/;
+ $File = <>
+}
+
+
+sub lex{
+ for($File){
+   s!^\s+!!;
+   if($_ eq "")             {    return ("","") }
+   s!^\(([^)]+)\)!!          and return("STRING",$1);
+   s!^([\{\}\[\];+*/,:])!!   and return($1,$1);
+   s!^\((.*?)\)!!            and return("ARG",$1);
+   s!^##(.*)$!!s             and return("FIM",$1);
+   s!^(init|desc|formtitle|save|mail|filename|feedback|proc|proctags|livefeedback|annotate|iform|iframe|quit|protect)\b!!
+                             and return($1,$1);
+   s!^(\w+)!!                and return("ID",$1);
+
+   print STDERR "Simbolos desconhecidos '$File'\n" ;
+ }
+}

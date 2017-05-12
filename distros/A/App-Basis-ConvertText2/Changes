@@ -1,0 +1,13 @@
+0.4 2014-5-14
+    * fix testing where pandoc is not available
+0.3 2014-5-13
+    * yamlasjson now adds extra blank lines
+    * handle fenced code-blocks that do not need a handler
+    * relative images handled
+    * new plugins & tests for gle and gnuplot
+    * documentation updated
+    * now can use wkhtmltopdf to generate PDF output
+0.2 2014-5-12
+    * major refactor from my previous code (not released)
+    * Now has plugins
+    * Some documentation needs completing

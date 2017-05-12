@@ -1,0 +1,22 @@
+This Perl module is a simple and convenient interface to the ANSI terminal
+escape sequences for color (from ECMA-48, also included in ISO 6429).  The
+color sequences are provided in two forms, either as constants for each
+color or via a function that takes the names of colors and returns the
+appropriate escape codes or wraps them around the provided text.  The
+non-color text style codes from ANSI X3.64 (bold, dark, underline, and
+reverse, for example), which were also included in ECMA-48 and ISO 6429,
+are also supported.  Also supported are the extended colors used for
+sixteen-color and 256-color emulators.
+
+This module is very stable, and I've used it in a wide variety of
+applications.  It has been included in the core Perl distribution starting
+with version 5.6.0, so you don't need to download and install it yourself
+unless you have an old version of Perl or need a newer version of the
+module than comes with your version of Perl.  I continue to maintain it as
+a separate module, and the version included in Perl is resynced with mine
+before each release.
+
+The original module came out of a discussion in comp.lang.perl.misc and is
+a combination of two approaches, one with constants by Zenin and one with
+functions that I wrote.  I offered to maintain a combined module that
+included both approaches.

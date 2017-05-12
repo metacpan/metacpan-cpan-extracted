@@ -1,0 +1,48 @@
+2010-07-12 16:53 -0400  djerius  <djerius@cfa.harvard.edu>  (6d2d93586cbb [tip])
+
+	* .hgignore: new file.
+	* .hgignore:
+	make mercurial ignore the dist directory and tarball
+
+2010-07-12 16:48 -0400  djerius  <djerius@cfa.harvard.edu>  (ffae437bd6b4)
+
+	* dist.ini:
+	add mercurial support
+
+2010-07-12 16:48 -0400  djerius  <djerius@cfa.harvard.edu>  (c374bdf5679c)
+
+	* lib/Astro/XSPEC/Model/Parse.pm:
+	add license to head of code
+
+2010-07-12 16:40 -0400  djerius  <djerius@cfa.harvard.edu>  (32f7bec3eda0)
+
+	* dist.ini:
+	add more tests; automatically generate ChangeLog
+
+2010-07-12 16:39 -0400  djerius  <djerius@cfa.harvard.edu>  (bbbbc32acc1a)
+
+	* lib/Astro/XSPEC/Model/Parse.pm:
+	ignore undefined variables in synopsis code so it will pass test
+
+2010-07-12 16:38 -0400  djerius  <djerius@cfa.harvard.edu>  (29202813ef0c)
+
+	* Changes: new file.
+	* Changes:
+	added official Changes file
+
+2010-07-12 16:38 -0400  djerius  <djerius@cfa.harvard.edu>  (9c960a09d9a8)
+
+	* lib/Astro/XSPEC/Model/Parse.pm, t/parse.t:
+	untabify, remove trailing whitespace
+
+2010-07-12 14:56 -0400  djerius  <djerius@cfa.harvard.edu>  (aa07ca401baf)
+
+	* MANIFEST.SKIP, data/jmkmod.dat, data/model.dat, data/stanza.dat,
+	data/sum1346_ssd5.xcm, dist.ini, lib/Astro/XSPEC/Model/Parse.pm,
+	t/parse.t: new file.
+	* MANIFEST.SKIP, data/jmkmod.dat, data/model.dat, data/stanza.dat,
+	data/sum1346_ssd5.xcm, dist.ini, lib/Astro/XSPEC/Model/Parse.pm,
+	t/parse.t:
+	initial import
+
+

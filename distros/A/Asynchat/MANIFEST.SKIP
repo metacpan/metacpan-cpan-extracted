@@ -1,0 +1,4 @@
+^MYMETA.yml$
+MYREADME
+.DS_Store
+script/test.pl

@@ -1,0 +1,17 @@
+[% META title = 'SSL Certificate Generation' -%]
+    
+    <form method="post" action="/ca/template/ssl/certify/bundle.pem">
+    <table>
+      <tr><td>Type :</td>
+      <td>
+      	<select name="template">
+      		<option value="SSLServer">SSLServer</option>
+	      	<option value="SSLClient">SSLCLient</option>
+    	</select>
+      </td></tr>
+      <tr><td>DNS (needed for servers):</td><td><input type="text" name="dns"></td></tr>
+      <tr><td>role (needed for clients):</td><td><input type="text" name="role"></td></tr>
+	  <tr><td colspan=2><input type="submit" name="Submit" value="Issue"></td></tr>
+    </table>
+
+    </form>

@@ -1,0 +1,11 @@
+
+2011-05-09      v0.003
+  - content-length is no longer set.  It was causing problems when combined with mod_gzip.
+
+2010-06-03      v0.002
+  - "Scaling" the captcha larger/smaller works better now, so you're not stuck
+    with the default width and height.
+
+2010-03-23      v0.001
+  - Initial release.
+

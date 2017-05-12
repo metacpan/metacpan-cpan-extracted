@@ -1,0 +1,5 @@
+TYPEMAP
+
+Archive::Tar::Builder	T_PTROBJ
+const char *	T_PV
+PerlIO *    T_INOUT

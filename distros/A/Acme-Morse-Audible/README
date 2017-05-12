@@ -1,0 +1,74 @@
+Acme::Morse::Audible version 1.10
+=================================
+NAME
+    Acme::Morse::Audible - Audio(Morse) Programming with Perl
+
+SYNOPSIS
+            use Acme::Morse::Audible;
+            print <<Message;
+            "For there is no enchantment against Jacob, no divination against Israel; now it shall be said of Jacob and Israel, `What has God wrought!'"
+        
+                    --Bible, Numbers 23:23
+                
+            (The first telegraphic message. Dispatched by Samuel F. B. Morse on May 24, 1844 from Washington D.C. to Baltimore.)
+            Message
+
+DESCRIPTION
+    The first time a program is run under "use Acme::Morse::Audible;", it
+    will become a playable MIDI file with the Morse encoding of the code.
+    (Dots and dashes encoding, actually. Morse Code contains only alphabet.)
+    The program will continue to run as it did before, but will now also be
+    audible. (Some players might not play it unless you rename it to .mid.)
+
+  STATUS QUO ANTE BELLUM
+
+            no Acme::Morse::Audible;
+
+    Running the audible program with "no Acme::Morse::Audible;" instead of
+    "use Acme::Morse::Audible;" will make it readable back again (and no
+    longer audible). The "no Acme::Morse::Audible;" has no affect on a
+    readable program.
+
+  DIAGNOSTICS
+
+    "Cannot record '%s'."
+        Acme::Morse::Audible could not access the source file to modify it
+        (substitute readability with audibility or vice versa).
+
+    "Cannot hear '%s'."
+        Acme::Morse::Audible could not access the source file to read it.
+
+SEE ALSO
+    the Acme::Morse manpage, the Acme::Bleach manpage.
+
+AUTHOR
+    Ido Trivizki, <trivizki@bigfoot.com>.
+
+    Based on Acme::Morse by Damian Conway.
+
+INSTALLATION
+
+	To install this module type the following:
+
+	   perl Makefile.PL
+	   make
+	   make test
+	   make install
+
+HISTORY
+	Revision history for Perl extension Acme::Morse::Audible.
+
+	1.10  Sun Aug 25 01:45:00 2002
+		- Some bug fixes.
+		- New 'no Acme::Morse::Audible;' feature.
+		- New test cases.
+
+	1.00  Thu Aug 22 15:30:00 2002
+		- original version.
+
+COPYRIGHT AND LICENCE
+
+	Copyright (C) 2002 Ido Trivizki
+
+	This library is free software; you can redistribute it and/or modify
+	it under the same terms as Perl itself.

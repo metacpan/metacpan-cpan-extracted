@@ -1,0 +1,106 @@
+Apache::MP3::Skin version 0.9x BETA
+
+
+NOTE: This is a BETA RELEASE and has been tested on a limited
+number of hardware and software configuration.  The author
+know of no reason why it shouldn't work everywhere, but is also
+certain that it won't.  You should not use this module in a production
+environment.  Use at your own risk, and look for updates
+at http://www.apachemp3.com
+
+
+
+This module subclasses Apache::MP3::Playlist and through the magic
+of HTML::Template allows Apache::MP3 to be "skinned".
+
+DEMOS and sample SKINS can be found at http://www.apachemp3.com
+
+
+INSTALLATION
+
+1. Prequisites
+
+This module requires Apache::MP3 2.12 or greater.  Before you begin
+installing this module, install and verify that Apache::MP3 works.
+This module also requires HTML::Template 2.00 or greater.  Both Apache::MP3
+and HTML::Template are available on CPAN.
+
+2. Download and Install Apache::MP3::Skin
+
+The latest version can be found http://www.apachemp3.com. 
+
+Unzip and untar it, then the following commands:
+
+   perl Makefile.PL
+   make
+   make install
+
+
+3. Copy the default Skin Files
+
+Copy the contents of the apache_mp3 included with this distribution
+into the apache_mp3 directory which came with Apache::MP3 and should
+now be located in your web tree.  
+
+4. Set Apache::MP3::Skin to be the handler for the MP3 directory
+
+If you are already running Apache::MP3, and you should be, then inside
+your httpd.conf or access.conf file,  change the handler for your songs
+directory from Apache::MP3 (or Apache::MP3::Playlist or something
+similar) to Apache::MP3::Skin.  At this point, without going any further
+in the installation process, Apache::MP3::Skin will act just as
+Apache::MP3::Playlist. If you want you can restart Apache and verify
+that that's true.
+
+
+You should have something like this in httpd.conf or access.conf
+
+  <Location /Songs>
+    SetHandler perl-script
+    PerlHandler Apache::MP3::Skin
+  </Location>
+
+5. Set the default skin
+
+Add two lines to your httpd.conf or access.conf:
+
+PerlSetVar DefaultSkin	default.tmpl #required
+PerlSerVar HomePath /Songs           #optional
+
+The result should be something like:
+
+
+ <Location /songs>
+   SetHandler perl-script
+   PerlHandler Apache::MP3::Skin
+   PerlSetVar HomePath  /songs   # optional
+   PerlSetVar DefaultSkin  default.tmpl   # required  
+ </Location>
+
+You may have other configuration variables set depending on how
+you have Apache::MP3 configured.  Leave them as they also work with
+this module.
+
+DefaultSkin is the filename of the skin to be used if no skin is explicity
+requested in the url a browser requests.  Set this to default.tmpl to start.
+default.tmpl comes with Apache::MP3::Skin and should have been one of the files
+copied in step 3.  Apache::MP3::Skin first looks for this file in the directory
+that the browser is viewing, and if it doesn't find it there looks in BaseDir 
+which is defaulted to be /apache_mp3.
+
+HomePath should be set to the logical root of your songs directory 
+structure, if you don't want that to be your document root.  HomePath
+is most commonly used when building breadcrumb trails, and in most cases
+will be the the same path as in your Location or Directory tag.
+
+
+
+6. Restart Apache
+
+Don't forget to restart Apache so that the new configuration is read.
+
+
+AUTHOR
+
+Robert Graff, <rgraff@apachemp3.com>
+

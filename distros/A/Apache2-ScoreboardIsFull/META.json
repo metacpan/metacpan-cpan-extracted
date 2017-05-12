@@ -1,0 +1,42 @@
+{
+   "abstract" : "set $r->pnotes('scoreboard_is_full' => 1) if no servers left",
+   "author" : [
+      "Fred Moyer <fredmoyer@redhotpenguin.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Apache2-ScoreboardIsFull",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache::Scoreboard" : "0",
+            "mod_perl2" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01"
+}

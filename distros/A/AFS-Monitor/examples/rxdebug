@@ -1,0 +1,600 @@
+#!/usr/bin/perl -w
+#
+# Copyright © 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+#                  Elizabeth Cassell <e_a_c@mailsnare.net>
+#
+# $Revision: 1.9 $ $Date: 2004/10/22 15:04:40 $ $Author: alfw $
+#
+
+use blib;
+use strict;
+use AFS::Monitor qw(rxdebug constant);
+use Data::Dumper;
+
+my $servers  = 'virtue.openafs.org'; # machine to run this on
+my $port     = 7001;      # port to run this on
+my $onlyhost = 'andrew.e.kth.se';  # some of the tests will show only connections from this host
+my $onlyport = 7000;      # some of the tests will show only connections on this port
+my $onlyauth = 'auth';    # some of the tests will show only connections with this auth level
+
+my @tests;      # choose which tests to run
+$tests[1] = 1;  # prints version
+$tests[2] = 0;  # prints all peers and all non-dallying connections.
+                # (can be long)
+$tests[3] = 0;  # nonexistant host
+$tests[4] = 0;  # nonexistant port
+$tests[5] = 0;  # bad port; getstats fails. (can be slow)
+$tests[6] = 0;  # prints long version of all peers. (can be long)
+$tests[7] = 0;  # server $servers port $port. prints default info.
+$tests[8] = 0;  # prints rxstats, no connections.
+$tests[9] = 0;  # prints only auth $onlyauth
+$tests[10] = 0; # shows all connections. (can be long)
+$tests[11] = 0; # shows all server connections. (can be long)
+$tests[12] = 0; # shows all client connections on port $port from host $onlyhost
+$tests[13] = 0; # doesn't give port, tries default (7000).
+$tests[14] = 0; # no arguments, runs on current machine with default port.
+$tests[15] = 0; # port $port, runs on current machine.
+$tests[16] = 0; # prints rxstats, all connections, long version of all peers.
+                # (can be very long)
+
+my $all = 1;    # show all tests
+
+my $showdump = 0; # dump contents of hash to the screen for each test instead of printing rxdebug formatted output
+
+# all available options:
+# rxdebug(nodally        => 1,
+#         allconnections => 1,
+#         rxstats        => 1,
+#         onlyserver     => 1,
+#         onlyclient     => 1,
+#         onlyport       => $onlyport,
+#         version        => 1,
+#         noconns        => 1,
+#         peers          => 1,
+#         long           => 1,
+#         servers        => $servers, # required
+#         port           => $port,
+#         onlyhost       => $onlyhost,
+#         onlyauth       => $onlyauth,
+#        );
+
+print "***** Starting now... *****\n";
+my $rxdeb;
+
+if ($all || $tests[1]) {
+  print "\n******** TEST 1: ********\n";
+
+  print "\nrxdebug -version -servers $servers -port $port\n\n";
+
+  $rxdeb = rxdebug(version => 1,
+                   servers => $servers, # required
+                   port    => $port
+                  );
+  parse_results($rxdeb);
+}
+
+if ($all || $tests[2]) {
+  print "\n******** TEST 2: ********\n";
+
+  print "\nrxdebug -nodally -allconnections -peers -servers $servers -port $port\n\n";
+
+  $rxdeb = rxdebug(nodally        => 1,
+                   allconnections => 1,
+                   peers          => 1,
+                   servers        => $servers,
+                   port           => $port
+                  );
+  parse_results($rxdeb);
+}
+
+if ($all || $tests[3]) {
+  print "\n******** TEST 3: ********\n";
+
+  print "\nrxdebug -servers speedy1 -port $port\n\n";
+
+  $rxdeb = rxdebug(servers => 'speedy1',
+                   port    => $port
+                  );
+  parse_results($rxdeb);
+}
+
+if ($all || $tests[4]) {
+  print "\n******** TEST 4 ********\n";
+
+  print "\nrxdebug -servers $servers -port no\n\n";
+
+  $rxdeb = rxdebug(servers => $servers,
+                   port    => 'no'
+                  );
+  parse_results($rxdeb);
+}
+
+if ($all || $tests[5]) {
+  print "\n******** TEST 5 ********\n";
+
+  print "\nrxdebug -servers $servers -port 643543\n(may take a while..)\n\n";
+
+  $rxdeb = rxdebug(servers => $servers,
+                   port    => 643543
+                  );
+  parse_results($rxdeb);
+}
+
+if ($all || $tests[6]) {
+  print "\n******** TEST 6 ********\n";
+
+  print "\nrxdebug -servers $servers -port $port -noconns -peers -long\n\n";
+
+  $rxdeb = rxdebug(servers => $servers,
+                   port    => $port,
+                   noconns => 1,
+                   peers   => 1,
+                   long    => 1
+                  );
+  parse_results($rxdeb);
+}
+
+if ($all || $tests[7]) {
+  print "\n******** TEST 7 ********\n";
+
+  print "\nrxdebug -servers $servers -port $port\n\n";
+
+  $rxdeb = rxdebug(servers => $servers,
+                   port    => $port
+                  );
+  parse_results($rxdeb);
+}
+
+if ($all || $tests[8]) {
+  print "\n******** TEST 8 ********\n";
+
+  print "\nrxdebug -noconns -servers $servers -port $port -rxstats\n\n";
+
+  $rxdeb = rxdebug(noconns => 1,
+                   servers => $servers,
+                   port    => $port,
+                   rxstats => 1
+                  );
+  parse_results($rxdeb);
+}
+
+if ($all || $tests[9]) {
+  print "\n******** TEST 9 ********\n";
+
+  print "\nrxdebug -servers $servers -port $port -onlyauth $onlyauth\n\n";
+
+  $rxdeb = rxdebug(servers  => $servers,
+                   port     => $port,
+                   onlyauth => $onlyauth
+                  );
+  parse_results($rxdeb);
+}
+
+if ($all || $tests[10]) {
+  print "\n******** TEST 10 ********\n";
+
+  print "\nrxdebug -servers $servers -port $port -allconnections\n\n";
+
+  $rxdeb = rxdebug(servers        => $servers,
+                   port           => $port,
+                   allconnections => 1
+                  );
+  parse_results($rxdeb);
+}
+
+if ($all || $tests[11]) {
+  print "\n******** TEST 11 ********\n";
+
+  print "\nrxdebug -servers $servers -port $port -allconnections -onlyserver\n\n";
+
+  $rxdeb = rxdebug(allconnections => 1,
+                   onlyserver     => 1,
+                   servers        => $servers,
+                   port           => $port
+                  );
+  parse_results($rxdeb);
+}
+
+if ($all || $tests[12]) {
+  print "\n******** TEST 12 ********\n";
+
+  print "\nrxdebug -servers $servers -port $port -allconnections -onlyclient -onlyport $onlyport -onlyhost $onlyhost\n\n";
+
+  $rxdeb = rxdebug(allconnections => 1,
+                   onlyclient     => 1,
+                   onlyport       => $onlyport,
+                   servers        => $servers,
+                   port           => $port,
+                   onlyhost       => $onlyhost
+                  );
+  parse_results ($rxdeb);
+}
+
+if ($all || $tests[13]) {
+  print "\n******** TEST 13 ********\n";
+
+  print "\nrxdebug -servers $servers\n\n";
+
+  $rxdeb = rxdebug(servers => $servers);
+  parse_results ($rxdeb);
+}
+
+if ($all || $tests[14]) {
+  print "\n******** TEST 14 ********\n";
+
+  print "\nrxdebug 0\n\n";
+
+  $rxdeb = rxdebug();
+  parse_results ($rxdeb);
+}
+
+if ($all || $tests[15]) {
+  print "\n******** TEST 15 ********\n";
+
+  print "\nrxdebug 0 -port $port\n\n";
+
+  $rxdeb = rxdebug(port => $port);
+  parse_results ($rxdeb);
+}
+
+if ($all || $tests[16]) {
+  print "\n******** TEST 16 ********\n";
+
+  print "\nrxdebug -servers $servers -port $port -allconnections -peers -long -rxstats\n\n";
+
+  $rxdeb = rxdebug(allconnections => 1,
+                   rxstats        => 1,
+                   peers          => 1,
+                   long           => 1,
+                   servers        => $servers,
+                   port           => $port
+                  );
+  parse_results($rxdeb);
+}
+
+
+sub parse_results {
+  my $val = shift;
+
+  # if there was an error, print it and then return.
+  if ($AFS::CODE) {
+    print "Error case: ", ref($val), "\n" if (defined($val));
+    # die("Error: AFS::CODE = $AFS::CODE (", ($AFS::CODE+0), ")\n");
+    print "Error: AFS::CODE = $AFS::CODE (", ($AFS::CODE+0), ")\n";
+    return;
+  }
+
+  # print entire hash to screen
+  if ($showdump) {
+    print Dumper($val);
+    return;
+  }
+
+  # print ip address and port
+  print "For ", $val->{address}, " (port ", $val->{port}, ") ...\n";
+
+  # prints everything as the rxdebug function would
+
+  # print version if it was returned
+  if (exists $val->{version}) {
+    print "AFS version: ", $val->{version}, "\n";
+  }
+
+  # print tstats if they were returned
+  if (exists $val->{tstats}) {
+    print "Free packets: $val->{tstats}->{nFreePackets}, ";
+    print "packet reclaims: $val->{tstats}->{packetReclaims}, ";
+    print "calls: $val->{tstats}->{callsExecuted}, ";
+    print "used FDs: $val->{tstats}->{usedFDs}\n";
+    if (!$val->{tstats}->{waitingForPackets}) {
+      print "not ";
+    }
+    print "waiting for packets.\n";
+    if (exists $val->{tstats}->{nWaiting}) {
+      print "$val->{tstats}->{nWaiting} calls waiting for a thread\n";
+    }
+    if (exists $val->{tstats}->{idleThreads}) {
+      print "$val->{tstats}->{idleThreads} threads are idle\n";
+    }
+  }
+
+  # print rxstats if they were returned
+  if (exists $val->{rxstats}) {
+
+    print "rx stats: free packets ", $val->{tstats}->{nFreePackets},
+          ", allocs ", $val->{rxstats}->{packetRequests}, ", ";
+
+    if ($val->{tstats}->{version} >=
+               constant("RX_DEBUGI_VERSION_W_NEWPACKETTYPES")) {
+
+      print "alloc-failures(rcv ", $val->{rxstats}->{receivePktAllocFailures},
+        "/", $val->{rxstats}->{receiveCbufPktAllocFailures},
+        ",send ", $val->{rxstats}->{sendPktAllocFailures},
+        "/", $val->{rxstats}->{sendCbufPktAllocFailures},
+        ",ack ", $val->{rxstats}->{specialPktAllocFailures}, ")\n";
+    } else {
+      print "alloc-failures(rcv ", $val->{rxstats}->{receivePktAllocFailures},
+            ",send ", $val->{rxstats}->{sendPktAllocFailures},
+            ",ack ", $val->{rxstats}->{specialPktAllocFailures}, ")\n";
+    }
+
+    print "   greedy ", $val->{rxstats}->{socketGreedy},
+          ", bogusReads ", $val->{rxstats}->{bogusPacketOnRead},
+          " (last from host ", $val->{rxstats}->{bogusHost},
+          "), noPackets ", $val->{rxstats}->{noPacketOnRead},
+          ", noBuffers ", $val->{rxstats}->{noPacketBuffersOnRead},
+          ", selects ", $val->{rxstats}->{selects},
+          ", sendSelects ", $val->{rxstats}->{sendSelects}, "\n";
+
+    print "   packets read: ";
+    foreach my $key (sort keys %{$val->{rxstats}->{packets}}) {
+      print $key, " ", $val->{rxstats}->{packets}->{$key}->{packetsRead}, " ";
+    }
+    print "\n";
+
+    print "   other read counters: data ", $val->{rxstats}->{dataPacketsRead},
+          ", ack ", $val->{rxstats}->{ackPacketsRead},
+          ", dup ", $val->{rxstats}->{dupPacketsRead},
+          " spurious ", $val->{rxstats}->{spuriousPacketsRead},
+          " dally ", $val->{rxstats}->{ignorePacketDally}, "\n";
+
+    print "   packets sent: ";
+    foreach my $key (sort keys %{$val->{rxstats}->{packets}}) {
+      print $key, " ", $val->{rxstats}->{packets}->{$key}->{packetsSent}, " ";
+    }
+    print "\n";
+
+    print "   other send counters: ack ", $val->{rxstats}->{ackPacketsSent},
+          ", data ", $val->{rxstats}->{dataPacketsSent},
+          " (not resends), resends ", $val->{rxstats}->{dataPacketsReSent},
+          ", pushed ", $val->{rxstats}->{dataPacketsPushed},
+          ", acked&ignored ", $val->{rxstats}->{ignoreAckedPacket}, "\n";
+    print "   \t(these should be small) ",
+          "sendFailed ", $val->{rxstats}->{netSendFailures},
+          ", fatalErrors ", $val->{rxstats}->{fatalErrors}, "\n";
+
+    if ($val->{rxstats}->{nRttSamples}) {
+      my $avrtt = $val->{rxstats}->{totalRtt}->{usec} / 1000000.00;
+         $avrtt = $avrtt + $val->{rxstats}->{totalRtt}->{sec};
+         $avrtt = $avrtt / $val->{rxstats}->{nRttSamples};
+
+      printf("   Average rtt is %0.3f, with %d samples\n",
+                 $avrtt,
+                 $val->{rxstats}->{nRttSamples});
+
+      my $minrtt = $val->{rxstats}->{minRtt}->{usec} / 1000000.00;
+         $minrtt = $minrtt + $val->{rxstats}->{minRtt}->{sec};
+      my $maxrtt = $val->{rxstats}->{maxRtt}->{usec} / 1000000.00;
+         $maxrtt = $maxrtt + $val->{rxstats}->{maxRtt}->{sec};
+      printf("   Minimum rtt is %0.3f, maximum is %0.3f\n",
+            $minrtt,
+            $maxrtt);
+    }
+
+    print "   ", $val->{rxstats}->{nServerConns}, " server connections, ",
+           $val->{rxstats}->{nClientConns}, " client connections, ",
+           $val->{rxstats}->{nPeerStructs}, " peer structs, ",
+           $val->{rxstats}->{nCallStructs}, " call structs, ",
+           $val->{rxstats}->{nFreeCallStructs}, " free call structs\n";
+    if (exists $val->{rxstats}->{clock_nUpdates}) {
+      print "   ", $val->{rxstats}->{clock_nUpdates}, " clock updates\n";
+    }
+  }
+
+  # print connections if they were returned
+  if (exists $val->{connections}) {
+    for (my $i = 0; $i <= $#{$val->{connections}}; $i++) { # print each connection
+      print "Connection from host ", $val->{connections}->[$i]->{host},
+            ", port ", $val->{connections}->[$i]->{port},", ";
+
+      if ($val->{connections}->[$i]->{epoch}) {
+        printf "Cuid %x/%x", $val->{connections}->[$i]->{epoch}, $val->{connections}->[$i]->{cid};
+      } else {
+        printf "cid %x", $val->{connections}->[$i]->{cid};
+      }
+      if ($val->{connections}->[$i]->{error}) {
+        print ", error ", $val->{connections}->[$i]->{error};
+      }
+      print "\n  serial $val->{connections}->[$i]->{serial}, ";
+      print " natMTU $val->{connections}->[$i]->{natMTU}, ";
+
+      if ($val->{connections}->[$i]->{flags}) {
+        print "flags";
+        if ($val->{connections}->[$i]->{flags} & constant("RX_CONN_MAKECALL_WAITING")) {
+          print " MAKECALL_WAITING";
+        }
+        if ($val->{connections}->[$i]->{flags} & constant("RX_CONN_DESTROY_ME")) {
+          print " DESTROYED";
+        }
+        if ($val->{connections}->[$i]->{flags} & constant("RX_CONN_USING_PACKET_CKSUM")) {
+          print " pktCksum";
+        }
+        print ", ";
+      }
+
+      print "security index $val->{connections}->[$i]->{securityIndex}, ";
+      if ($val->{connections}->[$i]->{type} == constant("RX_CLIENT_CONNECTION")) {
+        print "client conn\n";
+      } else {
+        print "server conn\n";
+      }
+
+      # print secStats if this connection has them
+      if (exists $val->{connections}->[$i]->{secStats}) {
+        my $secStatsType = $val->{connections}->[$i]->{secStats}->{type};
+        if ($secStatsType == 0) {
+          if ($val->{connections}->[$i]->{securityIndex} == 2) {
+            print "  no GetStats procedure for security object\n";
+          }
+        } elsif ($secStatsType == 1) {
+          print "  rxnull level=", $val->{connections}->[$i]->{secStats}->{level};
+          print ", flags=", $val->{connections}->[$i]->{secStats}->{flags},"\n";
+        } elsif ($secStatsType == 2) {
+          print "  rxvab level=", $val->{connections}->[$i]->{secStats}->{level};
+          print ", flags=", $val->{connections}->[$i]->{secStats}->{flags},"\n";
+        } elsif ($secStatsType == 3) {
+          my $secStatsLevel;
+          my $secStatsFlags = $val->{connections}->[$i]->{secStats}->{flags};
+          if ($val->{connections}->[$i]->{secStats}->{level} == 0) {
+            $secStatsLevel = "clear";
+          } elsif ($val->{connections}->[$i]->{secStats}->{level} == 1) {
+            $secStatsLevel = "auth";
+          } elsif ($val->{connections}->[$i]->{secStats}->{level} == 2) {
+            $secStatsLevel = "crypt";
+          } else {
+            $secStatsLevel = "unknown";
+          }
+          print "  rxkad: level ", $secStatsLevel;
+          if ($secStatsFlags) {
+            print ", flags";
+          }
+          if ($secStatsFlags & 1) {
+            print " unalloc";
+          }
+          if ($secStatsFlags & 2) {
+            print " authenticated";
+          }
+          if ($secStatsFlags & 4) {
+            print " expired";
+          }
+          if ($secStatsFlags & 8) {
+            print " pktCksum";
+          }
+          if ($val->{connections}->[$i]->{secStats}->{expires}) {
+            my $secStatsExpires = $val->{connections}->[$i]->{secStats}->{expires} - time();
+            $secStatsExpires = $secStatsExpires / 3600.0;
+            printf(", expires in %.1f hours", $secStatsExpires);
+          }
+          if (!($secStatsFlags & 1)) {
+            print "\n  Received ", $val->{connections}->[$i]->{secStats}->{bytesReceived},
+                  " bytes in ", $val->{connections}->[$i]->{secStats}->{packetsReceived}," packets\n";
+            print "  Sent ", $val->{connections}->[$i]->{secStats}->{bytesSent},
+                  " bytes in ", $val->{connections}->[$i]->{secStats}->{packetsSent}, " packets\n";
+          } else {
+            print "\n";
+          }
+        } else {
+          print "  unknown\n";
+        }
+      } # done printing secStats
+
+      # print calls for this connection
+      for (my $j = 0; $j < constant("RX_MAXCALLS"); $j++) {
+        print "    call ", $j, ": # ", $val->{connections}->[$i]->{callNumber}->[$j], ", state ";
+
+        # print call state
+        if ($val->{connections}->[$i]->{callState}->[$j] == constant("RX_STATE_NOTINIT")) {
+          print "not initialized\n";
+          next;
+        } elsif ($val->{connections}->[$i]->{callState}->[$j] == constant("RX_STATE_PRECALL")) {
+          print "precall, ";
+        } elsif ($val->{connections}->[$i]->{callState}->[$j] == constant("RX_STATE_ACTIVE")) {
+          print "active, ";
+        } elsif ($val->{connections}->[$i]->{callState}->[$j] == constant("RX_STATE_DALLY")) {
+          print "dally, ";
+        } elsif ($val->{connections}->[$i]->{callState}->[$j] == constant("RX_STATE_HOLD")) {
+          print "hold, ";
+        }
+
+        # print call mode
+        print "mode: ";
+        if ($val->{connections}->[$i]->{callMode}->[$j] == constant("RX_MODE_SENDING")) {
+          print "sending";
+        } elsif ($val->{connections}->[$i]->{callMode}->[$j] == constant("RX_MODE_RECEIVING")) {
+          print "receiving";
+        } elsif ($val->{connections}->[$i]->{callMode}->[$j] == constant("RX_MODE_ERROR")) {
+          print "error";
+        } elsif ($val->{connections}->[$i]->{callMode}->[$j] == constant("RX_MODE_EOF")) {
+          print "eof";
+        } else {
+          print "unknown";
+        }
+
+        # print flags for this call
+        if ($val->{connections}->[$i]->{callFlags}->[$j]) {
+          printf(", flags:");
+          if ($val->{connections}->[$i]->{callFlags}->[$j] & constant("RX_CALL_READER_WAIT")) {
+            print " reader_wait";
+          }
+          if ($val->{connections}->[$i]->{callFlags}->[$j] & constant("RX_CALL_WAIT_WINDOW_ALLOC")) {
+            print " window_alloc";
+          }
+          if ($val->{connections}->[$i]->{callFlags}->[$j] & constant("RX_CALL_WAIT_WINDOW_SEND")) {
+            print " window_send";
+          }
+          if ($val->{connections}->[$i]->{callFlags}->[$j] & constant("RX_CALL_WAIT_PACKETS")) {
+            print " wait_packets";
+          }
+          if ($val->{connections}->[$i]->{callFlags}->[$j] & constant("RX_CALL_WAIT_PROC")) {
+            print " waiting_for_process";
+          }
+          if ($val->{connections}->[$i]->{callFlags}->[$j] & constant("RX_CALL_RECEIVE_DONE")) {
+            print " receive_done";
+          }
+          if ($val->{connections}->[$i]->{callFlags}->[$j] & constant("RX_CALL_CLEARED")) {
+            print " call_cleared";
+          }
+        }
+        if ($val->{connections}->[$i]->{callOther}->[$j] & constant("RX_OTHER_IN")) {
+          print ", has_input_packets";
+        }
+        if ($val->{connections}->[$i]->{callOther}->[$j] & constant("RX_OTHER_OUT")) {
+          print ", has_output_packets";
+        }
+        print "\n";
+      }
+    }
+    # if -nodally flag was set, print number of dallying connections skipped
+    if (exists $val->{dallyCounter}) {
+      print "Skipped ", $val->{dallyCounter}, " dallying connections.\n";
+    }
+  } # done printing connections
+
+  # print peers if they were returned
+  if (exists $val->{peers}) {
+    for (my $i = 0; $i <= $#{$val->{peers}}; $i++) {
+      print "Peer at host ", $val->{peers}->[$i]->{host},
+            ", port ", $val->{peers}->[$i]->{port}, "\n";
+
+      printf("\tifMTU %hu\tnatMTU %hu\tmaxMTU %hu\n",
+              $val->{peers}->[$i]->{ifMTU},
+              $val->{peers}->[$i]->{natMTU},
+              $val->{peers}->[$i]->{maxMTU});
+      printf("\tpackets sent %d\tpacket resends %d\n",
+              $val->{peers}->[$i]->{nSent},
+              $val->{peers}->[$i]->{reSends});
+      printf("\tbytes sent high %d low %d\n",
+              $val->{peers}->[$i]->{bytesSent}->{high},
+              $val->{peers}->[$i]->{bytesSent}->{low});
+      printf("\tbytes received high %d low %d\n",
+              $val->{peers}->[$i]->{bytesReceived}->{high},
+              $val->{peers}->[$i]->{bytesReceived}->{low});
+
+      my $tpeer_rtt = $val->{peers}->[$i]->{rtt} >> 3;
+      my $tpeer_rtt_dev = $val->{peers}->[$i]->{rtt_dev} >> 2;
+      printf("\trtt %d msec, rtt_dev %d msec\n",
+             $tpeer_rtt, $tpeer_rtt_dev);
+
+      my $timeoutusec = $val->{peers}->[$i]->{timeout}->{usec};
+      $timeoutusec = $timeoutusec / 1000;
+      printf("\ttimeout %d.%03d sec\n",
+              $val->{peers}->[$i]->{timeout}->{sec}, $timeoutusec);
+
+      # prints extra information if -long flag was set
+      if (exists $val->{peers}->[$i]->{inPacketSkew}) {
+        printf("\tin/out packet skew: %d/%d\n",
+                $val->{peers}->[$i]->{inPacketSkew},
+                $val->{peers}->[$i]->{outPacketSkew});
+        printf("\tcongestion window %d, MTU %d\n",
+                $val->{peers}->[$i]->{cwind},
+                $val->{peers}->[$i]->{MTU});
+        printf("\tcurrent/if/max jumbogram size: %d/%d/%d\n",
+                $val->{peers}->[$i]->{nDgramPackets},
+                $val->{peers}->[$i]->{ifDgramPackets},
+                $val->{peers}->[$i]->{maxDgramPackets});
+      }
+    }
+  }
+}
+
+print "...Done\n";

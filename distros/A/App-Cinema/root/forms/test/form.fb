@@ -1,0 +1,13 @@
+name: test
+method: POST
+fields:
+	fname:
+		label: First Name
+		size: 30
+	lname:
+		label: Last Name
+		size: 30
+	role:
+        label:   Role
+        type: checkbox
+        options: 1=user, 2=vipuser, 3=admin, 4=sysadmin

@@ -1,0 +1,79 @@
+Apache::Backhand - write mod_backhand functions in Perl
+
+Copyright
+=========
+
+Copyright (c) 2000 David Lowe.  All rights reserved.  This program is free
+software; you can redistribute it and/or modify it under the same terms as
+Perl itself. 
+
+
+Description
+===========
+
+Apache::Backhand ties mod_perl together with mod_backhand, in two major ways.
+First, the Apache::Backhand module itself provides access to the global and
+shared state information provided by mod_backhand (most notably serverstats).
+Second, the byPerl C function (which is not part of the Apache::Backhand
+module, but is distributed together with it) allows you to write candidacy
+functions in Perl.
+
+In case this is all new to you, here are three links for background
+information:
+
+The Backhand Project                - http://www.backhand.org/
+The Apache/Perl Integration Project - http://perl.apache.org/
+The Apache Foundation               - http://www.apache.org/
+
+
+Prerequisites
+=============
+
+You'll need a C compiler, a recent version of Perl, and the Apache and
+mod_backhand source just to build the module.
+
+To actually do something interesting with it, you'll need Apache with
+both mod_perl and mod_backhand.
+
+I've only tested with FreeBSD 3.0, gcc version 2.7.2.1, perl 5.005_03,
+Apache 1.3.12, mod_perl 1.21, mod_backhand 1.0.8.  Clearly there are
+tons of other permutations out there, so I'd love to hear if it works
+(or doesn't) for you with a different setup.
+
+
+Building
+========
+
+  # perl Makefile.PL BACKHAND_SRCDIR=/path/to/backhand/source \
+                     APACHE_SRCDIR=/path/to/apache/source
+  # make
+
+Note that byPerl.c is *not* compiled by default.  Please read README.byPerl
+for details.
+
+
+Installing
+==========
+
+  # make test
+  # make install
+
+Note that byPerl.so is *not* installed by default.  Please read README.byPerl
+for details.
+
+
+Additional Information
+======================
+
+If you're using this module, let me know!  It's always fascinating to hear
+what uses people have found for it.
+
+There is a web page for Apache::Backhand at
+http://pootpoot.com/~dlowe/Apache-Backhand/
+The latest version can always be found there.
+
+You can contact me directly at dlowe@pootpoot.com.  I'm happy to answer any
+questions you might have.
+
+I also skim the mod_backhand mailing lists for relevant questions, so you can
+ask there.

@@ -1,0 +1,15 @@
+Empty subclass
+Check that uploads are subclassed too
+
+Create with %args vs. SetVar
+Calling instance twice
+Calling instance after A::R
+Calling param w/ and w/o encode_parms, w/ and w/o param, in list or scalar
+Calling parms, checking table
+Calling parms twice returns same table
+Calling upload(), upload(UPLOAD) scalar/list
+Calling Upload->next
+Check decode_parms / encode_parms
+
+Check handler
+

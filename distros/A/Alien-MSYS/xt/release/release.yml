@@ -1,0 +1,13 @@
+---
+pod_spelling_system:
+  # list of words that are spelled correctly
+  # (regardless of what spell check thinks)
+  stopwords:
+    - automake
+    - msys
+    - autoconf
+
+pod_coverage:
+  # format is "Class#method" or "Class", regex allowed
+  # for either Class or method.
+  private: []

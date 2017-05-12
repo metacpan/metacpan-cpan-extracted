@@ -1,0 +1,13 @@
+This sample database was copied from the Sakila project
+(https://code.google.com/p/sakila-sample-database-ports/)
+
+Sakila example database was originally developed by Mike Hillyer of the MySQL AB documentation team. 
+
+This project is designed to help database administrators to decide which database to use for development of new products The user can run the same SQL against different kind of databases and compare the performance 
+
+License: http://opensource.org/licenses/BSD-3-Clause
+
+The sakila.sqlite file is not included in the App::AutoCRUD distribution
+because it is too big; but it can be downloaded from
+"http://sakila-sample-database-ports.googlecode.com/svn/trunk/ sakila-sample-database-ports/sqlite-sakila-db/sqlite-sakila.sq"
+

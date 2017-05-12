@@ -1,0 +1,21 @@
+---
+abstract: 'Test ActionScript (.as) with prove, Adobe Air, and tap4air'
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-prove4air
+requires:
+  File::Copy: 0
+  Getopt::Long: 0
+  IPC::System::Simple: 0
+  Path::Class: 0
+version: 0.0013

@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Acme/Speed.pm
+lib/Acme/Speed/Member/ArakakiHitoe.pm
+lib/Acme/Speed/Member/Base.pm
+lib/Acme/Speed/Member/ImaiEriko.pm
+lib/Acme/Speed/Member/ShimabukuroHiroko.pm
+lib/Acme/Speed/Member/UeharaTakako.pm
+minil.toml
+t/00_compile.t
+t/01_members.t
+META.yml
+MANIFEST

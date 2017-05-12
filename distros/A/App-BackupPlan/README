@@ -1,0 +1,55 @@
+App::BackupPlan version 0.0.1
+=======================
+
+App::BackupPlan - Perl extension for automated, regular backups
+
+App::BackupPlan is a simple module to perform regular, selective and automated 
+backups of your system. It requires an xml file with the
+specification of your backup plan, logically divided into independent tasks.
+The constructor also takes a log4perl configuration file, to customise the logging produced.
+This can be omitted if the default logging behaviour is desired.
+By setting up a regular back-up task using cron or similar, and by configuring a backup plan with different
+tasks, backup frequencies and max number of files retained, it is possible to achieve a regular
+and incremental backup of different part of your system, without too much trouble. 
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+USAGE
+
+This perl module was written with an automated backup functionality in mind. So, even if it can
+be run manually and on demand, it is best suited to be integrated in a regular batch (overnight maybe)
+or even better as a cron task. To facilitate this task there is a script client in the bin
+directory of this distribution, backup.pl, which can be easily scheduled as cron task. 
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+XML::DOM for parsing the configuration file,
+
+Log::Log4perl for logging,
+
+File::Find to collect the entire content of a directory substructure when using Archive::Tar
+
+Archive::Tar to perform perl based tar, instead of using system tar
+
+tar executable used in Linux environment for storage and compression
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Gualtiero Chiaia
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

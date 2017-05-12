@@ -1,0 +1,41 @@
+NAME
+    Acme::Innuendo - polite access to Perls private parts
+
+SYNOPSIS
+      use Acme::Innuendo;
+
+      # Create an alias
+
+      nudge_nudge( special_place(), "alias_sub",
+        wink_wink( special_place(), "some_sub" )
+      );
+
+      # Walk the symbol table
+
+      walk_the_dog( special_place(), sub {
+        my ($namespace, $symbol, $ref) = @_;
+        print $namespace, $symbol, "\n";
+      } );
+
+DESCRIPTION
+    This module provides an alternative method of addressing the symbol
+    table for those who condider it akin to "touching Perl's genitals."
+
+    See the module documentation for more naughty details.
+
+AUTHOR
+    Robert Rothenberg <rrwo at cpan.org>
+
+    current Maintainer: Rene Schickbauer <rene.schickbauer at gmail.com>
+
+REPORTING BUGS
+    We don't know of any bugs, but that doesn't mean there aren't any.
+    Please the CPAN bugtracker or mail Rene Schickbauer directly.
+
+LICENSE
+    Copyright (c) 2004 Robert Rothenberg. All rights reserved. This program
+    is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+
+    Now maintained by Rene Schickbauer, so i guess everything after version 0.02
+    is (C) 2010 Rene Schickbauer

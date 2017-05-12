@@ -1,0 +1,53 @@
+#!/usr/bin/env perl
+
+#  PODNAME: wylie-transliterate
+# ABSTRACT: Executable to `wylie-transliterate`
+
+use v5.14;
+use strict;
+use warnings;
+use utf8::all;
+use FindBin;
+
+use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/./lib";
+
+use App::Lingua::BO::Wylie::Transliteration;
+
+my $app = App::Lingua::BO::Wylie::Transliteration->new;
+
+while (<>) {
+  say $app->transliterate($_) for split
+}
+
+=pod
+
+=head1 NAME
+
+wylie-transliterate - Executable to `wylie-transliterate`
+
+=head1 VERSION
+
+version 0.1.0
+
+=head1 AUTHOR
+
+DBR <dbr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by DBR.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__END__
+# my @test = qw[bsgrubs];
+# KA    KHA   GA    GHA   NGA   CA    CHA   JA    NYA   TTA   TTHA  DDA   DDHA
+# NNA   TA    THA   DA    DHA   NA    PA    PHA   BA    BHA   MA    TSA   TSHA
+# DZA   DZHA  WA    ZHA   ZA    YA    RA    LA    SHA   SSA   SA    HA    A KSSA
+# kugs bsgrubs kyo dbu deg deb dom nang das bkads bskads bskeds bskengs brkengs skengs grungs de bde bdegs bdengs bskyads bskyeds bsklings kyugs kyo ko k khwo
+# kog kogs kags klugs sklugs dbu can de kyo bde
+

@@ -1,0 +1,24 @@
+clear
+power on
+regs
+
+op a2 55
+
+# IX should now show $55
+test ix = 55
+
+op a2 00
+
+# IX should be 0 and Z should be 1
+test ix = 0
+test z = 1
+
+op a2 f2
+
+# IX should be f2 and S should be 1
+test ix = f2
+test s = 1
+
+regs
+
+save verify_A2.txt

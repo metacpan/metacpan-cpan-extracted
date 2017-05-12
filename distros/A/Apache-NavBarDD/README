@@ -1,0 +1,45 @@
+Apache/NavBarDD version 0.75
+============================
+
+vBarDD package provides a dynamic navigation bar along the lines
+of the NavBar module described in Lincoln Stein's and Doug MacEachern's
+"Writing Apache Modules with Perl and C". It goes one step further in
+allowing double-decker (two-level) navigation bars, where the selection
+in the first level (the *master* bar) determines the contents of the 
+second level (the *vassal* bar).
+
+The module provides an object oriented API to allow for easy
+customisation. The navigation bar is an object that must be created
+prior to use, for example in a server start-up file, according to the
+contents of a special configuration file.
+
+The main features of the module are:
+
+* Allows both single and two level navigation bars.
+* It can be used to endow existing HTML pages with a navigation bar, or
+  it can be called from mod_perl modules.
+* Provides a full object oriented interface. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+Then read the modules pod to see how to configure it.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Apache::Constants
+   Apache::File
+   Apache::URI
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002-2003 Panagiotis Louridas <louridas@acm.org>. 
+All rights reserved. This program is free software; you can redistribute it 
+and/or modify it under the same terms as Perl itself.

@@ -1,0 +1,221 @@
+NAME
+    AxKit::XSP::Currency - Currency formatting and conversion taglib
+
+SYNOPSIS
+    Add this taglib to AxKit in your http.conf or .htaccess:
+
+        AxAddXSPTaglib AxKit::XSP::Currency
+
+    Add the namespace to your XSP file and use the tags:
+
+        <xsp:page
+             language="Perl"
+             xmlns:xsp="http://apache.org/xsp/core/v1"
+             xmlns:currency="http://today.icantfocus.com/CPAN/AxKit/XSP/Currency"
+        >
+
+        <currency:format code="USD" options="FMT_STANDARD">19.5</currency:format>
+
+        <currency:format>
+            <currency:code>USD</currency:code>
+            <currency:options>FMT_HTML</currency:options>
+            <currency:price>10.95</currenct:price>
+        </currency:format>
+
+        <price><currency:symbol/>10.92</price>
+
+DESCRIPTION
+    This tag library provides an interface to format and convert currency
+    values within XSP pages.
+
+CHANGES
+    As of version 0.10, the defaults have changed. If no "options" are
+    specified for "symbol", the default is now "SYM_UTF" instead of
+    "SYM_HTML". If no "options" are specified for "format", "FMT_SYMBOL" is
+    used instead of "FMT_HTML".
+
+TAG HIERARCHY
+        <currency:format code="USD|CAD|..." options="FMT_STANDARD|FMT_COMMON|..." price="10.95">
+            <currency:code></currency:code>
+            <currency:options></currency:options>
+            <currency:price>10.95</currency:price>
+            <convert:price>
+                <currency:convert from="USD|CAD|JPY|..." price="10.95" to="CAD|JPY|...">
+                    <currency:from></currency:from>
+                    <currency:price</currency:price>
+                    <currency:to></currency:to>
+                </currency:convert>
+            </convert:price>
+        </currency:format>
+        <currency:symbol code="USD|CAD|..." options="SYM_HTML|SYM_UTF">
+            <currency:code></currency:code>
+            <currency:options></currency:options>
+        </currency:symbol>
+        <currency:convert from="USD|CAD|JPY|..." price="10.95" to="CAD|JPY|...">
+            <currency:from></currency:from>
+            <currency:price</currency:price>
+            <currency:to></currency:to>
+        </currency:convert>
+
+TAG REFERENCE
+  <currency:format>
+    Given a price, usually in decimal form, format returns a formatted price
+    using the various options in "Locale::Currency::Format".
+
+        <currency:format>
+            <currency:price>10.9</currency:price>
+        </currency:format>  # prints &amp;#x0024;10.50
+
+    The "format" tag has three available attributes to control the output:
+
+    code
+        This is the 3 letter currency code used to specify the currency in
+        use. The "code" attribute can also be specified using a child tag
+        instead:
+
+            <currency:format>
+                <currency:code>USD</currency:code>
+            </currency:format>
+
+        "USD" is used as the default if no currency code is specified. See
+        "Locale::Currency::Format" and "Locale::Currencty" for all of the
+        available currency codes.
+
+        If "Locale::Currency" is installed, it will verify the 3 letter code
+        is actually a valid currency code and die if it is not, otherwise it
+        simply checks that the code conforms to:
+
+            /^[A-Z]{3}$/
+
+    options
+        This is a string containing the formatting options to be used to
+        specify the desired output format. The "options" attribute can also
+        be specified using a child tag instead:
+
+            <currency:format>
+                <currency:options>FMT_STANDARD | FMT_NOZEROS</currency:options>
+            </currency:format>
+
+        "FMT_SYMBOL" is used as the default if no options are specified. See
+        "Locale::Currency::Format" for all of the available format options.
+
+    price
+        This is the price to be formatted. While it can be passed as an
+        attribute, the more common usage will be as a child tag:
+
+            <currency:format>
+                <currency:price>19.95</currency:price>
+            </currency:format>
+
+        You can also next a "convert" tag inside of "price" to format the
+        results of a currency conversion:
+
+            <convert:price>
+                <currency:convert from="USD|CAD|JPY|..." price="10.95" to="CAD|JPY|...">
+                    <currency:from></currency:from>
+                    <currency:price</currency:price>
+                    <currency:to></currency:to>
+                </currency:convert>
+            </convert:price>
+
+  <currency:symbol>
+    Returns the monetary symbol for the specified currency code.
+
+        <currency:symbol code="USD"/>   # prints $
+
+    The "symbol" tag has two available attributes to control the output:
+
+    code
+        This is the 3 letter currency code used to specify the currency in
+        use. The "code" attribute can also be specified using a child tag
+        instead:
+
+            <currency:symbol>
+                <currency:code>USD</currency:code>
+            </currency:symbol>
+
+        "USD" is used as the default if no currency code is specified. See
+        "Locale::Currency::Format" for all of the available currency codes.
+
+        If "Locale::Currency" is installed, it will verify the 3 letter code
+        is actually a valid currency code and die if it is not, otherwise it
+        simply checks that the code conforms to:
+
+            /^[A-Z]{3}$/
+
+    options
+        This is a string containing the formatting options to be used to
+        specify the desired output format. The "options" attribute can also
+        be specified using a child tag instead:
+
+            <currency:symbol code="USD">
+                <currency:options>SYM_HTML|SYM_UTF</currency:options>
+            </currency:symbol>
+
+        "SYM_UTF" is used as the default if no options are specified. See
+        "Locale::Currency::Format" for all of the available format options.
+
+  <currency:convert>
+    Converts a price from one currency to another using
+    "Finance::Currency::Convert::WebserviceX".
+
+        <currency:convert from="USD|CAD|JPY|..." price="10.95" to="CAD|JPY|...">
+            <currency:from></currency:from>
+            <currency:price</currency:price>
+            <currency:to></currency:to>
+        </currency:convert>
+
+    The "convert" tag has three available attributes to control the output:
+
+    from
+        This is the 3 letter currency code used to specify the currency in
+        use. The "from" attribute can also be specified using a child tag
+        instead:
+
+            <currency:convert>
+                <currency:from>USD</currency:from>
+            </currency:convert>
+
+        "USD" is used as the default if no currency code is specified.
+
+        If "Locale::Currency" is installed, it will verify the 3 letter code
+        is actually a valid currency code and die if it is not, otherwise it
+        simply checks that the code conforms to:
+
+            /^[A-Z]{3}$/
+
+        See "Locale::Currency" for all of the available currency codes.
+
+    price
+        This is the price to be formatted. While it can be passed as an
+        attribute, the more common usage will be as a child tag:
+
+            <currency:convert>
+                <currency:price>19.95</currency:price>
+            </currency:convert>
+
+    to  This is the 3 letter currency code used to specify the currency in
+        use. The "to" attribute can also be specified using a child tag
+        instead:
+
+            <currency:convert>
+                <currency:to>USD</currency:to>
+            </currency:convert>
+
+        If "Locale::Currency" is installed, it will verify the 3 letter code
+        is actually a valid currency code and die if it is not, otherwise it
+        simply checks that the code conforms to:
+
+            /^[A-Z]{3}$/
+
+        See "Locale::Currency" for all of the available currency codes.
+
+SEE ALSO
+    Locale::Currency::Format, Locale::Currency
+
+AUTHOR
+        Christopher H. Laco
+        CPAN ID: CLACO
+        claco@chrislaco.com
+        http://today.icantfocus.com/blog/
+

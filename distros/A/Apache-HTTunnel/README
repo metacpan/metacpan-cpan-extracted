@@ -1,0 +1,72 @@
+Apache-HTTunnel
+===============
+
+Apache::HTTunnel is a universal HTTP tunnel that allows the transport
+of any TCP or UDP protocol over HTTP. It is designed to allow people
+behind firewalls/proxies to access non-HTTP services.
+
+It is loaded into the Apache web server using mod_perl. The client
+module (HTTunnel::Client) or script (/usr/bin/httunnel) can then be
+used to setup the actual tunnel(s). See Client/README for more information
+on using the client components.
+
+Note: Apache::HTTunnel works only on UNIX-type platforms, more specifically
+those that support the sendmsg(2)/recvmsg(2) API.
+
+
+
+INSTALLATION
+
+- To install this module type the following:
+
+    % perl Makefile.PL
+    % make
+    % make test
+    % make install
+
+    Note 1: Apache::Test is used in the test suite. If the test suite cannot 
+            find your Apache web server, you may want to try one of the 
+            following (see the Apache::TestMM documentation for more details):
+
+               % perl Makefile.PL -apxs /path/to/apxs
+               % perl Makefile.PL -httpd /path/to/httpd
+
+- A sample configuration file should have been created for you during the 
+  installation and placed in /etc/httpd/conf/perl_httunnel.conf. If this is
+  not satisfactory, you can move/copy it or generate a new one like this:
+
+    % perl -MApache::HTTunnel=sample_config > /etc/httpd/conf/perl_httunnel.conf
+
+  See the Apache::HTTunnel documentation for more information on the available
+  configuration file options. 
+
+  Note: Some of the settings in the sample configuration file may be more 
+  permisive than you would like. MAKE SURE YOU REVIEW THE SAMPLE CONFIGURATION 
+  FILE BEFORE PROCEEDING!
+
+- Restart Apache (see the HTTunnel::Client documentation for more information
+  on using the client components to setup a tunnel):
+
+     % service httpd restart
+
+- To install only the client portion, see Client/README.
+
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+- mod_perl 1.999021
+- File::FDkeeper (which in turn will require File::FDpasser)
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Patrick LeBoutillier <patl@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

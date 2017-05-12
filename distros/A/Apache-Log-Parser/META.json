@@ -1,0 +1,77 @@
+{
+   "abstract" : "Parser for Apache Log (common, combined, and any other custom styles by LogFormat).",
+   "author" : [
+      "TAGOMORI Satoshi <tagomoris at gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.6.6",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Apache-Log-Parser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Apache::Log::Parser" : {
+         "file" : "lib/Apache/Log/Parser.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tagomoris/Apache-Log-Parser/issues"
+      },
+      "homepage" : "https://github.com/tagomoris/Apache-Log-Parser",
+      "repository" : {
+         "url" : "git://github.com/tagomoris/Apache-Log-Parser.git",
+         "web" : "https://github.com/tagomoris/Apache-Log-Parser"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "TAGOMORI Satoshi <tagomoris@livedoor.jp>",
+      "magnolia <magnolia.k@me.com>",
+      "TAGOMORI Satoshi <tagomoris@gmail.com>"
+   ]
+}

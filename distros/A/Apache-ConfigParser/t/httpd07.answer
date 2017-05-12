@@ -1,0 +1,705 @@
+reference 0 EmptySubclass=HASH with 6 keys
+reference 0 EmptySubclass=HASH key 'current_node'
+  reference 1-0 Apache::ConfigParser::Directive=HASH with 10 keys
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'attributes'
+    reference 1-1-0 HASH with 0 keys
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'daughters'
+    reference 1-1-1 ARRAY with 25 elements
+    reference 1-1-1 ARRAY index 0
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-1-0 HASH with 0 keys
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-1-1 ARRAY with 0 elements
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '4'
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'name'
+         'serverroot'
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '/home/server/root'
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-1-2 ARRAY with 1 elements
+        reference 1-1-2-1-2 ARRAY index 0
+           '/home/server/root'
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'value'
+         '/home/server/root'
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-1-3 ARRAY with 1 elements
+        reference 1-1-2-1-3 ARRAY index 0
+           '/home/server/root'
+    reference 1-1-1 ARRAY index 1
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-2-0 HASH with 0 keys
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-2-1 ARRAY with 0 elements
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '6'
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'name'
+         'accessconfig'
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-2-2 ARRAY with 1 elements
+        reference 1-1-2-2-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-2-3 ARRAY with 1 elements
+        reference 1-1-2-2-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 2
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-3-0 HASH with 0 keys
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-3-1 ARRAY with 0 elements
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '8'
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'name'
+         'authgroupfile'
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-3-2 ARRAY with 1 elements
+        reference 1-1-2-3-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-3-3 ARRAY with 1 elements
+        reference 1-1-2-3-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 3
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-4-0 HASH with 0 keys
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-4-1 ARRAY with 0 elements
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '10'
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'name'
+         'authuserfile'
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-4-2 ARRAY with 1 elements
+        reference 1-1-2-4-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-4-3 ARRAY with 1 elements
+        reference 1-1-2-4-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 4
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-5-0 HASH with 0 keys
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-5-1 ARRAY with 0 elements
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '12'
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'name'
+         'cookielog'
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-5-2 ARRAY with 1 elements
+        reference 1-1-2-5-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-5-3 ARRAY with 1 elements
+        reference 1-1-2-5-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 5
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-6-0 HASH with 0 keys
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-6-1 ARRAY with 0 elements
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '14'
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'name'
+         'customlog'
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-6-2 ARRAY with 1 elements
+        reference 1-1-2-6-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-6-3 ARRAY with 1 elements
+        reference 1-1-2-6-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 6
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-7-0 HASH with 0 keys
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-7-1 ARRAY with 0 elements
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '15'
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'name'
+         'customlog'
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"| some-pipe-program \"arg number 1\""'
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-7-2 ARRAY with 1 elements
+        reference 1-1-2-7-2 ARRAY index 0
+           '| some-pipe-program "arg number 1"'
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'value'
+         '"| some-pipe-program \"arg number 1\""'
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-7-3 ARRAY with 1 elements
+        reference 1-1-2-7-3 ARRAY index 0
+           '| some-pipe-program "arg number 1"'
+    reference 1-1-1 ARRAY index 7
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-8-0 HASH with 0 keys
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-8-1 ARRAY with 0 elements
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '17'
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'name'
+         'errorlog'
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-8-2 ARRAY with 1 elements
+        reference 1-1-2-8-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-8-3 ARRAY with 1 elements
+        reference 1-1-2-8-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 8
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-9-0 HASH with 0 keys
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-9-1 ARRAY with 0 elements
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '18'
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'name'
+         'errorlog'
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"| some-pipe-program \"arg number 1\""'
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-9-2 ARRAY with 1 elements
+        reference 1-1-2-9-2 ARRAY index 0
+           '| some-pipe-program "arg number 1"'
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'value'
+         '"| some-pipe-program \"arg number 1\""'
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-9-3 ARRAY with 1 elements
+        reference 1-1-2-9-3 ARRAY index 0
+           '| some-pipe-program "arg number 1"'
+    reference 1-1-1 ARRAY index 9
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-10-0 HASH with 0 keys
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-10-1 ARRAY with 0 elements
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '19'
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'name'
+         'errorlog'
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'syslog:notice'
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-10-2 ARRAY with 1 elements
+        reference 1-1-2-10-2 ARRAY index 0
+           'syslog:notice'
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'value'
+         'syslog:notice'
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-10-3 ARRAY with 1 elements
+        reference 1-1-2-10-3 ARRAY index 0
+           'syslog:notice'
+    reference 1-1-1 ARRAY index 10
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-11-0 HASH with 0 keys
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-11-1 ARRAY with 0 elements
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '21'
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'name'
+         'include'
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-11-2 ARRAY with 1 elements
+        reference 1-1-2-11-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-11-3 ARRAY with 1 elements
+        reference 1-1-2-11-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 11
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-12-0 HASH with 0 keys
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-12-1 ARRAY with 0 elements
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '23'
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadfile'
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file" "some-other-existent-file" "one-more"'
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-12-2 ARRAY with 3 elements
+        reference 1-1-2-12-2 ARRAY index 0
+           'some-non-existent-file'
+        reference 1-1-2-12-2 ARRAY index 1
+           'some-other-existent-file'
+        reference 1-1-2-12-2 ARRAY index 2
+           'one-more'
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file" "MUNGE /home/server/root/some-other-existent-file" "MUNGE /home/server/root/one-more"'
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-12-3 ARRAY with 3 elements
+        reference 1-1-2-12-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+        reference 1-1-2-12-3 ARRAY index 1
+           'MUNGE /home/server/root/some-other-existent-file'
+        reference 1-1-2-12-3 ARRAY index 2
+           'MUNGE /home/server/root/one-more'
+    reference 1-1-1 ARRAY index 12
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-13-0 HASH with 0 keys
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-13-1 ARRAY with 0 elements
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '25'
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file" "some-other-existent-file" "one-more"'
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-13-2 ARRAY with 3 elements
+        reference 1-1-2-13-2 ARRAY index 0
+           'some-non-existent-file'
+        reference 1-1-2-13-2 ARRAY index 1
+           'some-other-existent-file'
+        reference 1-1-2-13-2 ARRAY index 2
+           'one-more'
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'value'
+         'some-non-existent-file "MUNGE /home/server/root/some-other-existent-file" one-more'
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-13-3 ARRAY with 3 elements
+        reference 1-1-2-13-3 ARRAY index 0
+           'some-non-existent-file'
+        reference 1-1-2-13-3 ARRAY index 1
+           'MUNGE /home/server/root/some-other-existent-file'
+        reference 1-1-2-13-3 ARRAY index 2
+           'one-more'
+    reference 1-1-1 ARRAY index 13
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-14-0 HASH with 0 keys
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-14-1 ARRAY with 0 elements
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '27'
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'name'
+         'lockfile'
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-14-2 ARRAY with 1 elements
+        reference 1-1-2-14-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-14-3 ARRAY with 1 elements
+        reference 1-1-2-14-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 14
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-15-0 HASH with 0 keys
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-15-1 ARRAY with 0 elements
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '29'
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'name'
+         'mimemagicfile'
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-15-2 ARRAY with 1 elements
+        reference 1-1-2-15-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-15-3 ARRAY with 1 elements
+        reference 1-1-2-15-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 15
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-16-0 HASH with 0 keys
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-16-1 ARRAY with 0 elements
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '31'
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'name'
+         'pidfile'
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-16-2 ARRAY with 1 elements
+        reference 1-1-2-16-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-16-3 ARRAY with 1 elements
+        reference 1-1-2-16-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 16
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-17-0 HASH with 0 keys
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-17-1 ARRAY with 0 elements
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '33'
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'name'
+         'refererlog'
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-17-2 ARRAY with 1 elements
+        reference 1-1-2-17-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-17-3 ARRAY with 1 elements
+        reference 1-1-2-17-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 17
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-18-0 HASH with 0 keys
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-18-1 ARRAY with 0 elements
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '34'
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'name'
+         'refererlog'
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"| some-pipe-program \"arg number 1\""'
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-18-2 ARRAY with 1 elements
+        reference 1-1-2-18-2 ARRAY index 0
+           '| some-pipe-program "arg number 1"'
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'value'
+         '"| some-pipe-program \"arg number 1\""'
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-18-3 ARRAY with 1 elements
+        reference 1-1-2-18-3 ARRAY index 0
+           '| some-pipe-program "arg number 1"'
+    reference 1-1-1 ARRAY index 18
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-19-0 HASH with 0 keys
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-19-1 ARRAY with 0 elements
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '36'
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'name'
+         'resourceconfig'
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-19-2 ARRAY with 1 elements
+        reference 1-1-2-19-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-19-3 ARRAY with 1 elements
+        reference 1-1-2-19-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 19
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-20-0 HASH with 0 keys
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-20-1 ARRAY with 0 elements
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '38'
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'name'
+         'scoreboardfile'
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-20-2 ARRAY with 1 elements
+        reference 1-1-2-20-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-20-3 ARRAY with 1 elements
+        reference 1-1-2-20-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 20
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-21-0 HASH with 0 keys
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-21-1 ARRAY with 0 elements
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '40'
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'name'
+         'scriptlog'
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-21-2 ARRAY with 1 elements
+        reference 1-1-2-21-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-21-3 ARRAY with 1 elements
+        reference 1-1-2-21-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 21
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-22-0 HASH with 0 keys
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-22-1 ARRAY with 0 elements
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '42'
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'name'
+         'transferlog'
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-22-2 ARRAY with 1 elements
+        reference 1-1-2-22-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-22-3 ARRAY with 1 elements
+        reference 1-1-2-22-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 22
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-23-0 HASH with 0 keys
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-23-1 ARRAY with 0 elements
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '43'
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'name'
+         'transferlog'
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"| some-pipe-program \"arg number 1\""'
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-23-2 ARRAY with 1 elements
+        reference 1-1-2-23-2 ARRAY index 0
+           '| some-pipe-program "arg number 1"'
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'value'
+         '"| some-pipe-program \"arg number 1\""'
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-23-3 ARRAY with 1 elements
+        reference 1-1-2-23-3 ARRAY index 0
+           '| some-pipe-program "arg number 1"'
+    reference 1-1-1 ARRAY index 23
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-24-0 HASH with 0 keys
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-24-1 ARRAY with 0 elements
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '45'
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'name'
+         'typesconfig'
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-24-2 ARRAY with 1 elements
+        reference 1-1-2-24-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-24-3 ARRAY with 1 elements
+        reference 1-1-2-24-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+    reference 1-1-1 ARRAY index 24
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-25-0 HASH with 0 keys
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-25-1 ARRAY with 0 elements
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd07.conf'
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '47'
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'name'
+         'includeoptional'
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"some-non-existent-file"'
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-25-2 ARRAY with 1 elements
+        reference 1-1-2-25-2 ARRAY index 0
+           'some-non-existent-file'
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'value'
+         '"MUNGE /home/server/root/some-non-existent-file"'
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-25-3 ARRAY with 1 elements
+        reference 1-1-2-25-3 ARRAY index 0
+           'MUNGE /home/server/root/some-non-existent-file'
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'filename'
+     ''
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'line_number'
+     '-1'
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'mother'
+     UNDEFINED
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'name'
+     'root'
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'orig_value'
+     ''
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+    reference 1-1-2 ARRAY with 0 elements
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'value'
+     ''
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'value_array'
+    reference 1-1-3 ARRAY with 0 elements
+reference 0 EmptySubclass=HASH key 'errstr'
+   ''httpd07.conf' line 47 'includeoptional MUNGE /home/server/root/some-non-existent-file': stat of 'MUNGE /home/server/root/some-non-existent-file' failed: operating system specific error message'
+reference 0 EmptySubclass=HASH key 'post_transform_path_sub'
+  reference 1-1 ARRAY with 3 elements
+  reference 1-1 ARRAY index 0
+    reference 1-2-0 CODE
+  reference 1-1 ARRAY index 1
+     '1'
+  reference 1-1 ARRAY index 2
+     '2'
+reference 0 EmptySubclass=HASH key 'pre_transform_path_sub'
+   ''
+reference 0 EmptySubclass=HASH key 'root'
+   SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+reference 0 EmptySubclass=HASH key 'server_root'
+   '/home/server/root'

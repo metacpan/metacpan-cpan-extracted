@@ -1,0 +1,39 @@
+#!perl
+
+use ExtUtils::testlib;
+
+#e.g. ravemp_upload /usr/local/mp3/to_upload/*.mp3
+
+use strict;
+
+use Audio::RaveMP ();
+use File::Basename qw(basename);
+
+my $rmp = Audio::RaveMP->new;
+
+unless ($rmp->permitted) {
+    print "$!\n";
+    exit 1;
+}
+
+unless ($rmp->is_ready) {
+    print "device not ready\n";
+    exit 2;
+}
+
+$| = 1;
+for (@ARGV) {
+    print "uploading $_...";
+    unless ($rmp->upload($_, basename $_)) {
+	print "not ";
+    }
+    print "ok\n";
+}
+
+#my $contents = $rmp->contents(1);
+my $contents = $rmp->contents;
+
+for my $slot (@$contents) {
+    printf "%d: %s (%s)\n", $slot->number, $slot->filename || '-',
+    $slot->file_description;
+}

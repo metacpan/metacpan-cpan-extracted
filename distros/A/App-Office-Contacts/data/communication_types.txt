@@ -1,0 +1,7 @@
+name
+Any
+Email only
+Phone only
+SMS only
+Snail mail only
+Never

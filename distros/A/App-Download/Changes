@@ -1,0 +1,9 @@
+Revision history for App::Download
+
+1.0.0   2015-09-12
+        * First public release
+
+1.0.1   2015-09-18
+        [Patch]
+        * Added info that `git` is needed for the script
+        * Fixing misspells

@@ -1,0 +1,433 @@
+NAME
+    Apache2::PodBrowser - show your POD in a browser
+
+INSTALLATION
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DESCRIPTION
+    Yet another mod_perl2 handler to view POD in a HTML browser. See
+    "HISTORY" for more information.
+
+  Direct Mode
+    "Apache2::PodBrowser" can run in *direct* and *perldoc* modes. In direct
+    mode apache takes care of the URI to filename translation. So,
+    "$r->filename" points to a regular file when the request hits
+    "Apache2::PodBrowser"'s handler. Use this mode if your POD files are
+    installed in one directory tree which is accessible through the WEB
+    server. You'll perhaps need an additional directory index handler.
+
+  Perldoc Mode
+    In *perldoc* mode you specify a "Location" where the handler resides. If
+    you append a module name to the location URL as in
+
+      http://localhost/location/Apache2::PodBrowser
+
+    you'll get its documentation.
+
+    Further, in perldoc mode you can ask for documentation for a given perl
+    function similar to "perldoc -f open" at the command line. Simply call
+    the location and give the wanted function as CGI keyword:
+
+      http://localhost/location/?open
+
+    The same works also for special variables. Try
+
+      http://localhost/location/?$_
+
+    and you'll see the documentation for $_.
+
+    Usually you want to use perldoc mode. It allows you to access PODs at
+    their natural locations. On the downside, it is of course a bit slower.
+
+  Indexes
+    Also in perldoc mode, there are 2 indexes available, one of all
+    installed modules and scripts that come with POD and one of built-in
+    functions and variables.
+
+    The the handler location itself shows the module index:
+
+      http://localhost/location/
+
+    If a single question mark "?" is given as CGI keyword the function and
+    variable index is shown:
+
+      http://localhost/location/??
+
+    Don't worry you don't have to remember all these URLs. The pages are
+    properly linked together.
+
+CONFIGURATION
+  Direct Mode
+    Direct mode's basic configuration look like this:
+
+      <Directory /...>
+          Options +Indexes
+          <Files ~ "\.p(od|m|l)">
+              SetHandler modperl
+              PerlResponseHandler Apache2::PodBrowser
+              PerlSetVar  STYLESHEET /path/to/style.css
+              PerlSetVar  PARSER Apache2::PodBrowser::DirectMode
+          </Files>
+      </Directory>
+
+    All *.pod, *.pm and *.pl files will magically be converted to HTML.
+
+  Perldoc Mode
+    For perldoc mode add the following lines to your httpd.conf:
+
+      <Location /perldoc>
+          SetHandler  modperl
+          PerlHandler Apache2::PodBrowser
+          PerlFixupHandler Apache2::PodBrowser::Fixup
+          PerlSetVar  STYLESHEET fancy
+      </Location>
+
+    You can then get documentation for module "Apache2::PodBrowser" at
+    <http://localhost/perldoc/Apache2::PodBrowser>.
+
+    Finally, a particular Perl built-in function's or variable's
+    documentation is at
+    <http://localhost/perldoc/?function_or_variable_name>. For example
+    <http://localhost/perldoc/?open> or <http://localhost/perldoc/?$_>.
+
+    At <http://localhost/perldoc/> you'll see a module index and at
+    <http://localhost/perldoc/??> an index over all built-in functions and
+    variables.
+
+  Configuration Variables
+    The following variables affect the work of "Apache2::PodBrowser". They
+    are all set by "PerlSetVar" or "PerlAddVar". See t/conf/extra.conf.in
+    for example configurations.
+
+   STYLESHEET
+    Specifies the stylesheet to use with the output HTML file.
+
+      PerlSetVar  STYLESHEET /path/to/style.css
+
+    There are 2 stylesheets *auto* and *fancy* that come with this module.
+    They are installed alongside in @INC. To use them either teach your
+    Apache to look for them or use the provided fixup handler:
+
+      PerlFixupHandler Apache2::PodBrowser::Fixup
+      PerlSetVar STYLESHEET fancy    # or auto
+
+    If you want to use your own stylesheet simply specify its URL.
+
+    To use one of the built in styles in direct mode you have to teach
+    apache where it is located. One way is to use an "Alias" and make the
+    file accessible. Another is to use the provided fixup handler. For
+    example
+
+      <Directory /some/directory>
+          Options +Indexes
+          <Files ~ "\.p(od|m)">
+              SetHandler modperl
+              PerlResponseHandler Apache2::PodBrowser
+              PerlSetVar STYLESHEET /auto.css
+              PerlSetVar PARSER Apache2::PodBrowser::DirectMode
+          </Files>
+          <Files *.css>
+              PerlFixupHandler Apache2::PodBrowser::Fixup
+          </Files>
+      </Directory>
+
+    In direct mode the stylesheet must be given as a complete URL not just
+    "auto" or "fancy".
+
+   INDEX
+    When INDEX is true, a table of contents is added at the top of the HTML
+    document.
+
+      PerlSetVar INDEX 1
+
+    By default, this is off.
+
+    The "fancy" stylesheet places the index into a sort of drop-down menu
+    that is placed fixed at the right top corner of the page. So, it is
+    always at hand if you want to jump to another part of the document. This
+    works in most browsers with the necessary CSS support. Notably, the
+    Internet Explorer is not among them.
+
+   GZIP
+    When GZIP is true, the whole HTTP body is compressed. The browser must
+    accept gzip, and Compress::Zlib must be available. Otherwise, GZIP is
+    ignored.
+
+    An appropriate "Vary" header is issued to make proxy servers happy.
+
+    Also the environment variables "no-gzip" and "gzip-only-text/html" that
+    can be set for example by the "BrowserMatch" directive are regarded. See
+    the mod_deflate documentation
+    <http://httpd.apache.org/docs/2.2/mod/mod_deflate.html#recommended> for
+    more information
+
+      PerlSetVar GZIP 1
+
+    By default, this is off.
+
+   PODDIR
+    This variable is useful only in perldoc mode.
+
+    It declares additional directories to look for PODs. This can be given
+    multiple times. Directories given this way are searched before @INC.
+
+      PerlAddVar PODDIR /path/to/project1
+      PerlAddVar PODDIR /path/to/project2
+
+   NOINC
+    In perldoc mode POD files are normally looked up in @INC plus in the
+    directories given by "PODDIR". If "NOINC" is set then the @INC search is
+    skipped. That means only the directories specifed in httpd.conf are
+    scanned:
+
+      PerlAddVar NOINC 1
+
+    For documentation requests for perl functions via
+    <http://localhost/perldoc/?functionname> @INC is used nevertheless to
+    locate "perlfunc.pod" if it is not found in one of the given
+    directories.
+
+    In direct mode this variable is ignored.
+
+   CACHE
+    When in perldoc mode "Apache2::PodBrowser" uses Pod::Find::pod_find to
+    generate a list of available POD files. This may take quite a while
+    depending upon the number of directories and files to scan for POD.
+
+    To avoid to repeat this for each POD index request one can set up a
+    cache.
+
+      PerlSetVar CACHE /path/to/cache.mmdb
+
+    The cache file itself is created on the first access to the index. The
+    POD index page then contains a link to update the cache. So, if a POD
+    file is added or removed from the system this link is to be clicked to
+    keep the POD index page up to date.
+
+    The cache file itself is a MMapDB object. If this module is not
+    available you'll probably get a "404 - NOT FOUND" response the next time
+    the POD index page is requested if "CACHE" is set.
+
+    The directory containing the cache file must be writable by the "httpd".
+
+   CONTENTTYPE
+    You'll probably need that only for plain text output with the
+    Pod::Simple::Text parser. Here one can set the content type of the
+    output.
+
+      PerlSetVar CONTENTTYPE "text/plain; charset=UTF-8"
+
+   PARSER and LINKBASE
+    "PARSER" sets the POD-to-HTML converter class that is used. It should
+    support at least the interface that Pod::Simple::Text provides.
+
+    The Pod::Simple::Text parser gives you plain text.
+
+    If Pod::Simple::HTML is used as parser one gets almost usable output
+    except for the missing "DOCTYPE" HTML header and the broken linkage to
+    other modules.
+
+    The default "PARSER" is "Apache2::PodBrowser::Formatter" and is suitable
+    for perldoc mode. It derives from Pod::Simple::HTML but overrides the
+    constructor "new" to provide a "DOCTYPE" and "resolve_pod_page_link" to
+    fix the linkage.
+
+    If "LINKBASE" is not set or empty "resolve_pod_page_link" creates
+    relative links to other modules of the type:
+
+      ./Other::Module
+
+    If "LINKBASE" is set it is prepended before "Other::Module" instead of
+    "./". For example you could set
+
+      PerlSetVar LINKBASE http://search.cpan.org/perldoc?
+
+    to generate links to CPAN.
+
+    For perldoc mode an empty "LINKBASE" is best choice.
+
+    In direct mode an other parser "Apache2::PodBrowser::DirectMode" should
+    be used. It derives from "Apache2::PodBrowser::Formatter" but overrides
+    "resolve_pod_page_link".
+
+    This time the link generator searches for the link destination POD by
+    the module name with one of the following extensions appended: ".pod",
+    ".pm" and ".pl". If none is found it resorts to its base class. And now
+    "LINKBASE" makes sense.
+
+    If you know of a "Apache2::PodBrowser" running in perldoc mode you can
+    point "LINKBASE" to that address. This way modules that does not exist
+    in the local tree would be looked up there or on CPAN if "LINKBASE"
+    points there.
+
+    If all that is unsuitable for you you can implement your own "PARSER"
+    class. Have a look at the source code of this module. It is quite
+    straight forward regarding the 2 parser classes.
+
+  The Fixup Handler
+    If you use your own stylesheet or teach apache to find one of the
+    provided styles in the file system you don't need the fixup handler.
+
+    It simply does the file lookup for you.
+
+    If you don't like it just find the style sheet in your file system:
+
+      find $(perl -e 'print "@INC"') -type f -name fancy.css
+
+    copy it into your "DocumentRoot" and set "STYLESHEET" to find it.
+
+WHISHLIST
+    *   speed up POD index generation
+
+HISTORY
+    As you may know there is already Apache2::Pod::HTML. This module has
+    borrowed some ideas from it but is implemented anew. In fact, I had
+    started by editing Apache2::Pod::HTML 0.27 but at a certain moment I had
+    patched it into something that only vaguely remembered the original
+    code. When the HTML functionality was ready I discovered that
+    Apache2::Pod::Text had also to be taken care of. That was too much to
+    bear.
+
+  Differences from Apache2::Pod::HTML as of version 0.01
+    *   POD index
+
+        an index of all PODs found in the given scan directories is returned
+        if the handler is called in "perldoc" mode without a module
+        argument.
+
+    *   NOINC variable
+
+    *   PODDIR variable
+
+    *   PARSER variable
+
+    *   CONTENTTYPE variable
+
+        new configuration variables
+
+    *   proper HTTP protocol handling
+
+        Apache2::Pod::HTML does not issue a "Vary" HTTP header in GZIP mode.
+        It does not support turning off GZIP for certain browsers by
+        "BrowserMatch". And it does not sent "Content-Length",
+        "Last-Modified" or "ETag" headers.
+
+        "Apache2::PodBrowser" issues correct headers when GZIP is on. It
+        also sends "ETag", "Last-Modified" and "Content-Length" headers. And
+        it checks if a conditional GET request meets its conditions and
+        answers with HTTP code 304 (NOT MODIFIED) if so.
+
+    *   using CGI keywords instead of "PATH_INFO"
+
+        how to pass function names to the handler in "perldoc -f" mode
+
+    *   proper HTTP error codes
+
+        Apache2::Pod::HTML returns HTTP code 200 even if there is no POD
+        found by a given name
+
+    *   CSS: fancy stylesheet
+
+        "Apache2::PodBrowser" comes with 2 stylesheets, see above
+
+    *   CSS: sent by default handler
+
+        "Apache2::PodBrowser" uses a fixup handler to reconfigure apache to
+        ship included stylesheets by it's default response handler.
+
+    *   much better test suite
+
+        "Apache2::PodBrowser" uses the Apache::Test framework to test its
+        work. Apache2::Pod::HTML tests almost only the presence of POD.
+
+Embedding HTML in POD
+    POD provides the
+
+     =begin html
+     ...
+     =end html
+
+    or
+
+     =for html ...
+
+    syntax. This module supports it. If you look at this document via this
+    module you'll probably see a picture of me on the right side.
+
+    Example:
+
+     =begin html
+
+     <img align="right"
+          alt="Picture of ..."
+          src="http://host.name/image.jpg"
+          border="0">
+
+     =end html
+
+    You might notice that the image URL is absolute. Wouldn't it be good to
+    bundle the images with the module, install them somewhere beside it in
+    @INC and reference them relatively?
+
+    It is possible to do that in perldoc mode. Just strip off the ".pm" or
+    ".pod" suffix from the installed perl module file name and make a
+    directory with that name. For example assuming that this module is
+    installed as:
+
+     /perl/lib/Apache2/PodBrowser.pm
+
+    create the directory
+
+     /perl/lib/Apache2/PodBrowser
+
+    and place the images there.
+
+    To include them in POD write:
+
+     =begin html
+
+     <img align="right"
+          alt="Picture of ..."
+          src="./Apache2::PodBrowser/torsten-foertsch.jpg"
+          border="0">
+
+     =end html
+
+    If the POD file name doesn't contain a dot (".") the last path component
+    is stripped off to get the directory name.
+
+    Note that you need to write the package name again. You also need to
+    either escape the semicolons as in
+    "src="Apache2%3A%3APodBrowser/torsten-foertsch.jpg"" or put a "./" in
+    front of the link.
+
+    A note about the content type of linked documents. "Apache::PodBrowser"
+    does not enter a new request cycle to ship these documents. So, the
+    normal Apache Content-Type guessing does not take place.
+    "Apache::PodBrowser" knows a few file name extensions ("png", "jpg",
+    "jpeg", "gif", "js", "pdf" and "html"). For those it sends the correct
+    Content-Type headers. All other documents are shipped as
+    "application/octet-stream".
+
+    If a document needs a different Content-Type header it can be passed as
+    CGI parameter:
+
+     src="Apache2%3A%3APodBrowser/torsten-foertsch.jpg?ct=text/plain"
+
+    The link above will ship the image as "text/plain".
+
+SEE ALSO
+    Apache2::Pod::HTML
+    Pod::Simple
+    Pod::Simple::HTML
+    Pod::Simple::Text
+
+AUTHOR
+    Torsten Förtsch "<torsten.foertsch@gmx.net>"
+
+LICENSE
+    This package is licensed under the same terms as Perl itself.
+

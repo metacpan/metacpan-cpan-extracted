@@ -1,0 +1,97 @@
+NAME
+    App::EvalServer - Evaluate arbitrary code in a safe environment
+
+SYNOPSIS
+     use App::EvalServer;
+
+     my $server = App::EvalServer->new(
+         port    => 1234,
+         timeout => 30,
+     );
+
+     $server->run();
+ 
+     # ...
+ 
+     $server->shutdown();
+
+DESCRIPTION
+    This application evaluates arbitrary source code in a safe enviroment.
+    It listens on a TCP port and accepts JSON data desribing a language and
+    some code to evaluate. The result of the evaluation and some
+    accompanying information is then returned as back as JSON data. See
+    "INPUT" and "OUTPUT" for details.
+
+METHODS
+  "new"
+    Constructs a new "App::EvalServer" object. Takes the following optional
+    argunments:
+
+    'host', the host to listen on (default: 'localhost')
+
+    'port', the port to listen on (default: 14400)
+
+    'user', evaluate code as this user (default: 'nobody')
+
+    'timeout', kill the evaluating process after this many seconds (default:
+    10)
+
+    'limit', resource limit in megabytes (default: 50)
+
+    'daemonize', daemonize the process
+
+    'unsafe', don't chroot or set resource limits (no root needed). Default
+    is false.
+
+  "run"
+    Runs the server. Takes no arguments.
+
+  "shutdown"
+    Shuts down the server. Takes no arguments.
+
+INPUT
+    To request an evaluation, you need to send a JSON hash containing the
+    following keys:
+
+    'lang', a string containing the language module suffix, e.g. 'Perl' for
+    App::EvalServer::Language::Perl.
+
+    'code', a string containing the code you want evaluated.
+
+OUTPUT
+    When your request has been processed, you will receive a JSON hash back.
+    If no errors occurred before the code was evaluated, the hash will
+    contain the following keys:
+
+    *   'result', containing the result of the evaluation.
+
+    *   'stdout', a string containing everything that was printed to the
+        evaluating process' stdout handle.
+
+    *   'stderr', a string containing everything that was printed to the
+        evaluating process' stderr handle.
+
+    *   'output' a string containing the merged output (stdout & stderr)
+        from the evaluating process.
+
+    *   'memory', the memory use of the evaluating process (as reported by
+        "(getrusage())[2]").
+
+    *   'real_time', the real time taken by the evaluating process.
+
+    *   'user_time', the user time taken by the evaluating process.
+
+    *   'sys_time', the sys time taken by the evaluating process.
+
+    If an error occurred before the code could be evaluated, the only key
+    you will get is 'error', which tells you what went wrong.
+
+AUTHOR
+    Hinrik Örn Sigurðsson (hinrik.sig@gmail.com), "buu", and probably others
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Hinrik Örn Sigurðsson
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

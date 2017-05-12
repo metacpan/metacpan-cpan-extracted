@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::GitHooks;
+
+
+=head1 NAME
+
+prepare-commit-msg - Call App::GitHooks for the prepare-commit-msg hook.
+
+=cut
+
+App::GitHooks->run(
+    name      => $0,
+    arguments => \@ARGV,
+);

@@ -1,0 +1,11 @@
+# this file contains testing parameters for Apache::Session::Memcached
+# Note: params have to be all on one line
+
+# Session ID generation scheme
+Generate = MD5
+
+# Serialization scheme
+Serialize = Storable
+
+# memcached servers. It must be on the form: IP:port IP:port ...
+Servers = 127.0.0.1:20000 

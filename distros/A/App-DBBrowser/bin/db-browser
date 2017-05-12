@@ -1,0 +1,606 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use 5.008003;
+no warnings 'utf8';
+
+our $VERSION = '1.053';
+
+use Encode::Locale qw();
+
+use App::DBBrowser;
+
+use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
+print "\e(U" if $^O eq 'MSWin32';
+
+binmode STDIN,  ':encoding(console_in)';
+binmode STDOUT, ':encoding(console_out)';
+binmode STDERR, ':encoding(console_out)';
+
+
+my $db_browser = App::DBBrowser->new();
+$db_browser->run();
+
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+C<db-browser> - Browse SQLite/MySQL/PostgreSQL databases and their tables interactively.
+
+=head1 VERSION
+
+Version 1.053
+
+=cut
+
+=head1 SYNOPSIS
+
+=head2 SQLite/MySQL/PostgreSQL
+
+    db-browser -h|--help
+
+    db-browser
+
+    db-browser [database-name, ...]
+
+When the C<db-browser> is called with the argument C<-h|--help>, it shows a menu. The menu entry I<HELP> shows this
+documentation - see L</OPTIONS>.
+
+If C<db-browser> called without arguments, the user can choose from the databases offered by the database plugin. The
+database is chosen automatically if it is available only one database. With the C<SQLite> driver is in use, the option
+I<Search directories> tells the database plugin where to search for C<SQLite> databases (defaults to the home directory).
+
+If C<db-browser> is called with arguments, the arguments are used as the available databases.
+
+=head2 SQLite
+
+    db-browser [-s|--search]
+
+C<db-browser> called with C<-s|--search> causes a new search of SQLite databases instead of using the cached data.
+
+=head1 DESCRIPTION
+
+Search and read in SQL databases. With the C<db-browser> one can browse databases and their tables interactively.
+
+The database plugins bundled with C<App::DBBrowser> provide support for the DBI drivers C<DBD::SQLite>, C<DBD::mysql>
+and C<DBD::Pg>. See L<App::DBBrowser::DB> how to write a database plugin.
+
+To be able to browse the database-, schema- and table-lists and the content of tables the user must have the database
+privileges required for fetching the requested data.
+
+The C<db-browser> expects an existing home directory with read and write permissions for the user of the C<db-browser>.
+
+Before the output leading and trailing spaces are removed from the elements and spaces are squashed to a single
+white-space.
+
+The elements in a column are right-justified if one or more elements of that column do not look like a number, else they
+are left-justified.
+
+See L<Term::TablePrint|Term::TablePrint/DESCRIPTION> for more details.
+
+=head3 Legacy encodings
+
+Non mappable characters will break the output.
+
+=head1 USAGE
+
+The best way to find out how C<db-browser> works is calling C<db-browser>.
+
+To be able to use all the features of the C<db-browser> some basic SQL knowledge is required.
+
+=head3 Keys to move around
+
+=over
+
+=item *
+
+the C<Arrow> keys (or C<h,j,k,l>) to move up and down and to move to the right and to the left.
+
+=item *
+
+the C<PageUp> key (or C<Ctrl-B>) to go back one page, the C<PageDown> key (or C<Ctrl-F>) to go forward one page.
+
+=item *
+
+the C<Home> key (or C<Ctrl-A>) to jump to the beginning of the menu, the C<End> key (or C<Ctrl-E>) to jump to the end
+of the menu.
+
+=back
+
+With the option I<mouse> enabled it can be used the mouse with the left mouse key to navigate through the menus.
+
+To confirm a chosen menu item use the C<Return> key.
+
+In some sub-menus it is possible to select more then one item before C<Return> is pressed; in such sub-menus the list of
+items marked with the C<SpaceBar> key including the highlighted item are added to the chosen items when C<Return>
+is pressed. If a mouse mode is enabled, it can be used the right mouse key instead of the C<SpaceBar>. C<Ctrl-SpaceBar>
+(or C<Ctrl-@>) inverts the made choices - marked items are unmarked and unmarked items are marked.
+
+To move backwards in the menu hierarchy one can press the C<q> key. When prompted for a string, try C<Ctrl-D> instead
+of C<q>.
+
+=head3 SQL menu
+
+The SQL menu is the menu which opens after a table was selected.
+
+If C<AGGREGATE> or C<GROUP BY> is set, the C<SELECT> statement is automatically formed; a previous user defined
+C<SELECT> statement is reset. A user defined C<SELECT> resets a previous set C<AGGREGATE> or C<GROUP BY> statement.
+
+To reset a SQL "sub-statement" (e.g C<WHERE>) re-enter into the respective menu entry and choose C<'- OK -'>.
+
+Changing the I<lock> mode (C<Lk0>,C<Lk1>) resets the entire SQL.
+
+=head3 Delete, Update and Insert
+
+To get to the I<Delete>/I<Update>/I<Insert> menu, navigate to the SQL menu and then select two times the prompt.
+
+C<DELETE>, C<UPDATE> or C<INSERT INTO> are not available with C<JOIN> and C<UNION> statements (except C<INSERT> with
+C<mysql> and C<JOIN>).
+
+=head3 Create table, Drop table
+
+To reach the I<Create table>/I<Drop table> menu, select the prompt in the menu where the tables are selected.
+
+To create a table without inserting anything, enter as the first and only row the column names and then choose "Use the
+first row as column names".
+
+=head3 Scalar functions
+
+The scalar functions can be reached in the main SQL menu and also in the C<DELETE> and C<UPDATE> SQL sub-menus by
+selecting the prompt.
+
+The available functions are:
+
+=head4 Epoch_to_DateTime
+
+=head4 Epoch_to_Date
+
+=head4 Truncate
+
+With SQLite the function C<TRUNCATE> is a user-defined function which returns stringified values.
+
+    return sprintf "%.*f", $places, int( $number * 10 ** $places ) / 10 ** $places;
+
+When comparing in C<WHERE> or C<HAVING TO> clauses with numbers, take the non-truncated (original) value for the
+comparison if C<sqlite_see_if_its_a_number> is enabled (default).
+
+Also to get a numeric comparison in an C<ORDER BY> clause use the non-truncated (original) values for the ordering.
+
+=head4 Bit_Length
+
+With SQLite the function C<Bit_Length> is a user-defined function which uses the Perl builtin C<length>. To make
+C<length> return the number of bytes the C<bytes> pragma is C<use>d.
+
+=head4 Char_Length
+
+With SQLite the function C<Char_Length> is a user-defined function which uses the Perl builtin C<length> to get the
+number of characters.
+
+To remove a chosen scalar function from a column select the column with the function a second time.
+
+=head2 OPTIONS
+
+=head3 HELP
+
+Show this Info.
+
+=head3 Path
+
+Shows the version and the path of the running C<db-browser> and the path of the application directory.
+
+=head3 Database
+
+=head4 DB Plugins
+
+Choose the required database plugins.
+
+=head4 DB Settings
+
+I<DB Settings> are used as default database settings.
+
+There is also in each database sub-menu the menu entry "Database settings". If these database specific parameter are not
+set, the global (to the database plugin) I<DB Settings> are use instead.
+
+It depends on the database plugin which items are offered to set in each option and whether the selections made by the
+user a considered.
+
+=over
+
+=item Fields
+
+Set which fields are required to connect to a database.
+
+=item ENV Variables
+
+Which environment variables should be used.
+
+=item Login Data
+
+The entered data for a field is saved with the field in a configuration file. If the configuration file contains a field
+with a defined value, the value is used for that field to connect instead to ask the user for the value.
+
+=item DB Options
+
+For the meaning of the different attributes (apart I<binary_filter>) see the documentation of the DBI database driver.
+
+The last entry of this sub-menu is I<binary_filter>. Setting it to C<1> means: print "BNRY" instead of arbitrary binary
+data. If data matches the repexp C</[\x00-\x08\x0B-\x0C\x0E-\x1F]/>, it is considered arbitrary binary data. Printing
+arbitrary binary data could break the output.
+
+=item SQLite directories
+
+This is a SQLite-only option.
+
+Sets the directories where C<db-browser> searches for SQLite databases. Defaults to the home directory.
+
+To move around in the directory tree select a directory and press C<Return> to enter in the selected directory or choose
+"C< .. >" to move upwards. To add the current working-directory to the list of chosen directories use the "C< . >" menu
+entry. To confirm the made choices select "C< = >". The ( "C< < >" ) menu entry resets the list of chosen directories if
+any. If the list of chosen directories is empty, "C< < >" goes back without changing anything.
+
+This setting can not be overwritten in a single database.
+
+=item Reset DB
+
+Reset database specific parameter to the global I<DB Settings>.
+
+=back
+
+=head3 Menu
+
+=head4 Menu Memory
+
+Set the behavior of the interactive menus:
+
+- setting I<Config Menus> to "Memory" means: save the selected configuration menu position while entering in a config
+sub menu.
+
+- setting I<SQL Menu> to "Memory" means: save the selected SQL menu position while entering in a SQL sub menu.
+
+- setting I<DB Menus> to "Memory" means: save the selected menu position in the database/schema/table menus while
+entering in a sub menu.
+
+=head4 Table
+
+Expand Rows:
+
+- "YES": if C<Return> is pressed, the selected table row is printed with each column in its own line.
+
+- "NO": don't expand table rows.
+
+- "YES - fast back": do not expand the first row if the cursor auto-jumped to the first row.
+
+=head4 Mouse Mode
+
+Set the I<Mouse Mode> (see L<Term::Choose/mouse>).
+
+=head3 SQL
+
+=head4 Metadata
+
+If I<Metadata> is enabled, system tables/schemas/databases are appended to the respective list.
+
+=head4 Operators
+
+Choose the required operators.
+
+There are two REGEXP entries: "REGEXP" matches case sensitive while "REGEXP_i" matches case insensitive.
+
+With MySQL the sensitive match is achieved by enabling the C<BINARY> operator.
+
+=head4 Lock
+
+Set the default I<lock> value:
+
+- Lk0: Reset the SQL-statement after each "PrintTable".
+
+- Lk1: Reset the SQL-statement only when a table is selected.
+
+=head4 Parentheses
+
+Enable parentheses in C<WHERE> and/or C<HAVING TO> clauses.
+
+=head3 Output
+
+=head4 Max Rows
+
+Set the maximum number of fetched table rows. This can be overwritten by setting a SQL C<LIMIT> statement.
+
+The fetched table rows are kept in memory.
+
+To disable the automatic limit set I<Max Rows> to C<0>.
+
+=head4 Colwidth
+
+Columns with a width below or equal I<Colwidth> are only trimmed if it is still required to lower the row width despite
+all columns wider than I<Colwidth> have been trimmed to I<Colwidth>.
+
+=head4 ProgressBar
+
+Set the progress bar threshold. If the number of fields (rows x columns) is higher than the threshold, a progress bar is
+shown while preparing the data for the output.
+
+=head4 Tabwidth
+
+Set the number of spaces between columns.
+
+=head4 Grid
+
+Separate the columns from each other and the header from the body with lines.
+
+=head4 Keep Header
+
+Show the table header on top of each page.
+
+=head4 Undef
+
+Set the string that will be shown on the screen instead of an undefined field.
+
+On MSWin32 only single-byte character sets are supported when setting I<Undef>, I<user>, I<host> or I<port> with the
+C<db-browser>. Edit the configuration files directly if multi-byte encoded characters are required for these settings on
+a machine with 'MSWin32' OS.
+
+=head3 Insert
+
+These I<Insert> settings can also be set in the C<INSERT INTO> sub-menu by selecting the prompt.
+
+=head4 Input Modes
+
+For C<INSERT>ing data into a table - choose the available input modes:
+
+=over
+
+=item
+
+Cols
+
+It is prompted for each column.
+
+=item
+
+Rows
+
+Enter a row at a time.
+
+To parse the rows it is used C<Text::CSV>.
+
+=item
+
+Multi row
+
+Enter many rows. Reads until the end of input. It is OS-depend how to indicate the end of input.
+
+=item
+
+File
+
+Read the input from am file.
+
+Supported file formats: csv-files and the spreadsheet formats supported by L<Spreadsheet::Read>.
+
+=back
+
+=head4 Default file directory
+
+Searching for input files: set the default directory.
+
+=head4 File History
+
+Set how many input file names should be saved. A value of C<0> disables the file history.
+
+=head4 File encoding
+
+How to decode csv files.
+
+=head4 Parse mode
+
+Set how to parse text files or the "multi row" input. Files where C<-T $filename> returns true are considered text
+files. If a file is not a text file, then it is always used C<Spreadsheet::Read> to parse the file regardless of this
+setting.
+
+=over
+
+=item
+
+Text::CSV
+
+Use L<Text::CSV> to parse text files and the "multi row" input. To decode the files it is used the I<File encoding>.
+
+Advantages:
+
+=over
+
+=item
+
+Maybe the fastest with the smallest memory footprint.
+
+=item
+
+Allows to set different csv-related options.
+
+=back
+
+=back
+
+=over
+
+=item
+
+split
+
+Reads to whole input at once and splits the input with the input record separator (IRS) to get the records (rows). Then
+it splits the records with the input field separator (IFS) to get the fields (columns) of each record.
+
+To decode the files it is used the I<File encoding>.
+
+Advantages:
+
+=over
+
+=item
+
+The values assigned to the IRS and the IFS are treated as regexps.
+
+=back
+
+=back
+
+=over
+
+=item
+
+Spreadsheet::Read
+
+If L<Spreadsheet::Read> is chosen, the default settings from C<Spreadsheet::Read> are used.
+
+C<Spreadsheet::Read> will use the first line of the file to auto-detect the separation character if the file is a
+csv-file.
+
+Advantages:
+
+=over
+
+=item
+
+Auto-detects the separation character for csv-files
+
+=back
+
+=back
+
+=over
+
+=back
+
+=head4 Conf T::CSV
+
+Set different L<Text::CSV> options.
+
+=head4 Conf 'split'
+
+=over
+
+=item
+
+IRS
+
+Set the input record separator (regexp).
+
+=item
+
+IFS
+
+Set the input field separator (regexp).
+
+=back
+
+=head4 Create table
+
+=over
+
+=item
+
+Default ID col name
+
+If "Add auto increment primary key" is used, this sets the default name of the added column.
+
+=item
+
+Default data type
+
+The default data type of the columns.
+
+=back
+
+=head2 CONFIGURATION FILES
+
+The syntax of the configuration file names is C<"conf_${db_plugin_name}.json">. To find out the location of the
+configuration files call C<db-browser -h> and choose I<Path>.
+
+The data is saved in JSON format.
+
+The global database settings are placed in the member called C<"*$db_plugin">. Database specific settings have its own
+member named like the database itself.
+With the C<SQLite> driver "database name" means the absolute path to the database file.
+
+Sub-members (keys):
+
+    SQLite:                                    mysql:                             Pg:
+        sqlite_unicode              (0,1)           user                              user
+        sqlite_see_if_its_a_number  (0,1)           host                              host
+        binary_filter               (0,1)           port                              port
+        directories_sqlite¹                         mysql_enable_utf8  (0,1)          pg_enable_utf8  (0,1,-1)
+                                                    binary_filter      (0,1)          binary_filter   (0,1)
+
+¹ only with the C<SQLite> driver: expects an array-reference as its value. C<db-browser> searches for SQLite databases in the
+directories passed with this array-reference.
+
+Examples
+
+    conf_SQLite.json:                                           conf_mysql.json:
+
+    {                                                           {
+        "*SQLite" : {                                               "*mysql" : {
+            "binary_filter" : 0,                                        "binary_filter" : 0,
+            "directories_sqlite" : [                                    "host" : "localhost",
+                "/home/my/Documents",                                   "mysql_enable_utf8" : 1,
+                "/home/my/databases"                                    "port" : null,
+            ],                                                          "user" : "name"
+            "sqlite_see_if_its_a_number" : 1,                       },
+            "sqlite_unicode" : 1                                    "database1" : {
+        },                                                              "mysql_enable_utf8" : 0,
+        "/home/my/databases/db1.sqlite" : {                             "host" : "my_host",
+            "binary_filter" : 1,                                        "user" : "user_5"
+            "sqlite_unicode" : 0                                    },
+        }                                                           "database2" : {
+    }                                                                   "binary_filter" : 1
+                                                                    }
+                                                                }
+
+=head1 REQUIREMENTS
+
+See L<Term::TablePrint/REQUIREMENTS>.
+
+=head2 Perl version
+
+Requires Perl version 5.8.3 or greater.
+
+=head2 Decoded strings
+
+C<db-browser> expects decoded strings.
+
+=head2 Terminal
+
+It is required a terminal that uses a monospaced font which supports the printed characters.
+
+Also the terminal has to understand ANSI escape sequences. If the OS is MSWin32 C<App::DBBrowser> uses
+L<Win32::Console::ANSI> which emulates an ANSI console for the C<db-browser>.
+
+The terminal should have a width of at least 40 print columns.
+
+=head1 SEE ALSO
+
+L<DBI>, L<DBD::SQLite>, L<DBD::mysql>, L<DBD::Pg>.
+
+=head1 CREDITS
+
+Thanks to the L<Perl-Community.de|http://www.perl-community.de> and the people form
+L<stackoverflow|http://stackoverflow.com> for the help.
+
+=head1 AUTHOR
+
+Matthäus Kiem <cuer2s@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012-2017 Matthäus Kiem.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
+details, see the full text of the licenses in the file LICENSE.
+
+=cut

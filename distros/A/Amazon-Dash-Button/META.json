@@ -1,0 +1,58 @@
+{
+   "abstract" : "a very simple perl interface to play & interact with an Amazon Dash Button.",
+   "author" : [
+      "Nicolas R. <atoomic@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Amazon-Dash-Button",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::Pcap::Easy" : "0",
+            "Simple::Accessor" : "1.11",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Scalar::Util" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0.94",
+            "blib" : "1.01",
+            "lib" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://metacpan.org/dist/Amazon-Dash-Button",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/atoomic/Amazon-Dash-Button.git",
+         "web" : "https://github.com/atoomic/Amazon-Dash-Button"
+      }
+   },
+   "version" : "0.11",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0211"
+}
+

@@ -1,0 +1,24 @@
+Ananke::Template version 1.4
+============================
+
+Based in Template ToolKit
+This documentation describes the Template module which is the direct
+Perl interface into the Ananke::Template.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+	( echo 'TL: Your name <your@email.com> '; echo `/bin/uname -a` ) \
+	| mail nattis@anankeit.com.br
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2002 Udlei Nattis <nattis@anankeit.com.br>
+

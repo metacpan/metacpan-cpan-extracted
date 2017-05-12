@@ -1,0 +1,16 @@
+Build.PL
+Changes
+conf/acme-syspath.cfg
+lib/Acme/SysPath.pm
+lib/Acme/SysPath/SPc.pm
+MANIFEST			This list of files
+README
+share/acme-syspath/images/smile.ascii
+share/acme-syspath/tt/index.tt2
+t/01_Acme-SysPath.t
+t/distribution.t
+t/fixme.t
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+META.yml

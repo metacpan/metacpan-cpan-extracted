@@ -1,0 +1,6 @@
+Revision history for Perl extension Algorithm::BreakOverlappingRectangles.
+
+0.01  Wed Feb 13 10:08:05 2008
+	- original version; created by h2xs 1.23 with options
+		-AXn Algorithm::BreakOverlappingRectangles
+

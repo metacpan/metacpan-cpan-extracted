@@ -1,0 +1,260 @@
+Revision history for App-shcompgen
+
+0.30    2016-12-03 (PERLANCAR)
+
+	- Detect Getopt::Long::More-based scripts.
+
+
+0.29    2016-11-03 (PERLANCAR)
+
+	- Support Getopt::Std-based scripts.
+
+	- [Bugfix] Don't write to bash-completion's dir, use our own dir
+
+	  In our loader (_shcompgen_loader shell function installed as complete
+	  -D) we detect whether bash-completion system is active, and if so then
+	  we also search for completion scripts in bash-completion dirs
+	  (/etc/bash_completion.d, /usr/share/bash-completion/completions) in
+	  addition to our dir because there is only one default loader and we
+	  want to support bash-completion.
+
+	  But we also put our completion scripts into bash-completion dir by
+	  default. This means, when bash-completion is not active, we don't load
+	  our own generated completion scripts.
+
+	  So now, the default for global dir for bash is /etc/bash/completions
+	  instead of /etc/bash_completion.d/
+
+	  Note that this is not an issue in zsh or fish because they have their
+	  fpath mechanism so we don't need to create our own default loader.
+
+
+0.28    2016-10-28 (PERLANCAR)
+
+        - Add shortcut options --zsh, --fish, --tcsh.
+
+        - Support Getopt::Long::Descriptive-based scripts.
+
+        - Add option --per-option to enable generating prettier completion
+          scripts when possible.
+
+        - Some bug fixes.
+
+
+0.27    2016-10-26 (PERLANCAR)
+
+	- fish: Use general form ('complete -c CMD -a (...)') instead of
+	  defining per-option completion, so now all detectable scripts
+	  work in fish, albeit without highlighted/description of each
+	  option names.
+
+
+0.26    2016-10-26 (PERLANCAR)
+
+        - Re-upload.
+
+
+0.25    2016-10-26 (PERLANCAR)
+
+        - [Enhancement] Support completion for Getopt::Long scripts for all
+          shells (previously only for fish).
+
+        - [Bugfix] list: was empty when shell is not bash
+
+        - A couple of other tweaks and fixes.
+
+
+0.24    2016-10-25 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Document known issues (zsh, fish, tcsh).
+
+
+0.23    2016-10-25 (PERLANCAR)
+
+	- [Enhancement] Add tcsh support.
+
+
+0.22    2016-10-25 (PERLANCAR)
+
+        - [Enhancement] [Experimental] Add support for zsh.
+
+        - [doc] Restore note about 'init' and 'generate' being run during
+          distribution installation, because shell detection has been modified
+          (bash is forced).
+
+
+0.21    2016-10-25 (PERLANCAR)
+
+        - Use shell=bash when running under make (detected as bourne).
+
+        - [Bugfix] init: didn't create completion scripts dir on fish.
+
+
+0.20    2016-10-21 (PERLANCAR)
+
+        - [Enhancement] Add support for fish shell.
+
+        - [Enhancement] Add subcommands (for utility/testing): guess-shell,
+          detect-prog.
+
+        - [doc] Remove note about 'init' and 'generate' being run the first time
+          it's installed because it doesn't work usually because we detect shell
+          as 'bourne' under make and bail.
+
+        - generate: Add option --stdout.
+
+
+0.19    2016-07-12 (PERLANCAR)
+
+	- [Bugfix] Don't remove completion script we created in the same
+	  run (this fixes e.g. 'shcompgen _hr hr' when hr changes from
+	  Perinci::CmdLine::Lite to Perinci::CmdLine::Inline where
+	  previously the completion script created by processing _hr would
+	  be immediately deleted when hr results in negative).
+
+
+0.18    2016-07-12 (PERLANCAR)
+
+	- [Bugfix] Perinci::CmdLine::Inline-based scripts currently cannot
+	  self-complete.
+
+
+0.17    2016-04-30 (PERLANCAR)
+
+	- Avoid perl undef warning.
+
+
+0.16    2016-04-30 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Update documentation: remove EARLY RELEASE label, document
+	  about detecting Getopt::Long::Subcommand-based scripts, update
+	  dzil plugin name in mention.
+
+
+0.15    2016-02-29 (PERLANCAR)
+
+	- generate: Add option --remove.
+
+	- Use Perinci::CmdLine::Util's detect_perinci_cmdline_script to be
+	  able to handle # NO_PERINCI_CMDLINE_SCRIPT etc.
+
+
+0.14    2016-01-29 (PERLANCAR)
+
+	- Use command_args=... attribute in shcompgen-hint text fragment.
+
+
+0.13    2015-09-17 (PERLANCAR)
+
+	- Adjust to Complete::Util 0.36 (complete_file() &
+	  complete_program() split to Complete-File & Complete-Program).
+
+
+0.12    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.11    2015-08-17 (PERLANCAR)
+
+	- Make sure we add result for all programs being processed, so we
+	  get the appropriate final status code (e.g. 207 partial success).
+
+
+0.10    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.09    2015-02-11 (PERLANCAR)
+
+	- Support Perinci::CmdLine::Classic and Getopt::Long::Subcommand.
+
+
+0.08    2014-12-20 (PERLANCAR)
+
+	- Simplify completion routine for remove(), adjust to periscomp
+	  0.68+.
+
+
+0.07    2014-12-17 (PERLANCAR)
+
+	- Tweak/fix init script for bash: forgot to return 124 when
+	  completion script exists (so user still needed extra tab), don't
+	  use bash-completion scripts when bash-completion is not active.
+
+
+0.06    2014-12-14 (PERLANCAR)
+
+        - No functional changes.
+
+        - Rebuild with new version of DZP::shcompgen::InitOnInstall (show output
+          of init, though most users won't see this because they will install
+          using 'cpanm' without the -v option).
+
+
+0.05    2014-12-14 (PERLANCAR)
+
+        - Support multiple global/per-user dirs (e.g. bash has global completion
+          scripts dir in /usr/share/bash-completion/completions as well as
+          /etc/bash_completion.d).
+
+        - [ux] Run 'shcompgen init' and 'shcompgen generate --replace' during
+          install, for user's convenience.
+
+        - [Bugfix] Regression: File::Which *was* needed, but removed.
+
+        - [Bugfix] in shcompgen.bashrc: Return 124 instead of 0, otherwise we'll
+          need an extra Tab when completing a new command which is annoying
+          (UPDATE: but extra Tab is still needed?)
+
+        - Tweak completion routines.
+
+
+0.04    2014-12-13 (PERLANCAR)
+
+	- [Bugfix] Use the correct completee.
+
+	- Add completion for 'generate'.
+
+	- Add completion for 'remove'.
+
+
+0.03    2014-12-13 (PERLANCAR)
+
+        - [Bugfix] Fix typo that caused per-user completion directory not
+          created during init (despite the success message).
+
+        - Minor tweaks.
+
+
+0.02    2014-12-13 (PERLANCAR)
+
+        - Rename module/dist from App-ShellCompletionInstaller to App-shcompgen.
+
+        - [ux] Change interface to use subcommands.
+
+        - [Bugfix] Fix loader function for bash: forgot to pass argument to
+          _completion_loader.
+
+        - [ux] Add subcommand: 'init', to help ease initialization.
+
+
+0.01    2014-12-12 (PERLANCAR)
+
+        - First release, an evolution from App-BashCompletionProg and
+          App-BashCompletionF; this one supports multiple shells and works with
+          shells' standard completion scripts layout. Another advantage is the
+          completion scripts can be activated on the current shell (instead of
+          waiting to start a new shell) because we use on-demand loading (e.g.
+          'complete -D' on bash). Early release though, only supports bash.

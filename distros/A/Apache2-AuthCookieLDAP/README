@@ -1,0 +1,8 @@
+Apache2::AuthCookieLDAP is a module that subclasses Apache2::AuthCookie
+and acts as an authentication backend to check a user credentials against an
+LDAP server. In case of successfull authentication an encrypted session key is
+stored as a browser authentication cookie on the client's side.
+
+Latest distribution at: http://search.cpan.org/dist/Apache2-AuthCookieLDAP
+ 
+Maintainer: ksolomko@cpan.org

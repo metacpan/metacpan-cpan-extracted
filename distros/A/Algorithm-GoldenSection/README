@@ -1,0 +1,43 @@
+Algorithm-GoldenSection version 0.0.2
+
+This module is an implementation of the Golden Section Search Algorithm for finding minima of a unimodal function. 
+In order to isolate a minimum of a univariate functions the minimum must first be isolated. 
+Consequently the program first bounds a minimum - i.e. the program initially creates a triplet of points: 
+x_low < x_int < x_high, such that f(x_int) is lower than both f(x_low) and f(x_high). Thus we ensure that there 
+is a local minimum within the interval: x_low-x_high. The program then uses the Golde Section Search algorithm 
+to successively narrow down on the bounded region to find the minimum. 
+See http://en.wikipedia.org/wiki/Golden_section_search and
+http://www.gnu.org/software/gsl/manual/html_node/One-dimensional-Minimization.html.
+
+The module provides a Perl5OO interface. Simply construct a Algorithm::GoldenSection object with appropriate parameters
+- see L</SYNOPSIS>. Then call the minimise C<method>. This returns a LIST of the value of x at the minimum, the value of
+f(x) at the minimum and the number of iterations used to isolate the minimum.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+Carp                => "1.08",
+Readonly            => "1.03",
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, Daniel S. T. Hughes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

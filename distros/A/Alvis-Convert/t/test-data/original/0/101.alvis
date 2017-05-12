@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentCollection>
+  <documentRecord id="0717FBB236A4A067DC9BE4FA48801BE3">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1141065614536</modifiedDate>
+        <httpServer>Apache/1.3.34 (Unix) DAV/1.0.3 mod_auth_passthrough/1.8 mod_log_bytes/1.2 mod_bwlimited/1.4 PHP/4.4.1 FrontPage/5.0.2.2635 mod_ssl/2.8.25 OpenSSL/0.9.7a</httpServer>
+        <urls>
+          <url>http://battellemedia.com/archives/2004_08.php</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>I'm slow to report the news here (the embargo lifted last night at 9 pm) but today Yahoo launched its local search product. I was on an informal "advisory board" for this product, but I have to admit that my focus on the book did not allow me to be very engaged. However I did get to play with it early, and found it pretty damn good. Chris Sherman of SEW agrees, his write up is here. He notes the major features, the clean interface, and the elegant "refine" features that let you zero in on lists of search results. He quotes Jeff Weiner on the goal: "Our mission is to understand intention of user, to help them complete tasks as quickly as possible," said Jeff Weiner, senior vice president, search and marketplace, sharply contrasting Yahoo's approach with Google's mission "to make the world's information universally accessible and useful." You know what a sucker I am for intent-based media. Net net: I like Yahoo Local, and plan to use it, at least for now. Udpate: I should have pointed out that Ask has a new local search product as well, clearly timed to Yahoo's news as it's a partnership with Citysearch, which Yahoo used to use...CNET coverage... (full release for Yahoo Local in "continue reading" link...) FOR IMMEDIATE RELEASE YAHOO! LAUNCHES LOCAL SEARCH BETA: AN INNOVATIVE WAY FOR PEOPLE TO SEARCH FOR LOCAL INFORMATION ONLINE New Product Leverages Yahoo! Search Technology and Comprehensive Local Content for a Precise and Useful Local Search Experience Sunnyvale, CA -- August 3, 2004 -- Yahoo! Inc., a leading global Internet company, today released a beta of Yahoo!� Local, available at http://local.yahoo.com. Building on Yahoo!'s position as the most popular local destination on the Internet, Yahoo! Local integrates proprietary Yahoo! Search Technology, leading Yellow Pages and maps offerings, and unique third party and user-generated content, to create an improved local search experience for consumers - all in one place. "A great search experience is about more than just offering users relevant and comprehensive Web search results. It's also about creating an experience where we can quickly and easily provide users the answers they are seeking, whether it's the best Italian restaurant in their neighborhood or the nearest museums while traveling," said Jeff Weiner, senior vice president of Yahoo! Search and Marketplace. "This beta launch marks just the beginning of what we are capable of achieving with local and will continue to leverage our world-class search technology and content to provide the most valuable category-specific search solutions for our users." "As part of Yahoo!'s commitment to providing the best search experience on the Web, consumers now have a more powerful way to find local information," said Paul Levine, general manager, Yahoo! Local. "Building on the debut of our innovative SmartViewTM maps feature earlier this year, the beta release of Yahoo! Local reinforces our commitment to improving the way people find local content online." New Benefits of Yahoo! Local Available today, the Yahoo! Local beta provides users with improved: * Precision: When looking for local information, consumers have indicated that precision is paramount. Yahoo! is the first to develop a local service from the ground up with precision in mind. Users can now pinpoint businesses and services around an address or zip code - letting the user define their exact location. Yahoo! Local also features unique narrowing tools that allow users to quickly refine local searches - by distance, rating, category, and more. * Comprehensiveness and Freshness: Yahoo! Local starts with more than 14 million businesses found in Yahoo! Yellow Pages - from dry cleaners and dentists to florists and fine dining - and integrates valuable information like store hours, accepted payment methods and products offered. Yahoo! Local also includes professional restaurant reviews, photos, and menus, as well as content from other areas of Yahoo! (like information about movies, tickets and hotels), to offer a more engaging and comprehensive product. Additionally, the product leverages Yahoo! Search Technology to identify official Web sites for local businesses and crawls those sites for content to create a richer, more relevant search experience. * Usefulness: With SmartView, a new visual search tool, consumers can use a dynamic map to see where businesses or points of interest are located in relation to each other. For example, one can find a day spa to visit, and plot nearby ATM machines and restaurants on the same map. For some categories such as hotels and restaurants, consumers can even take the next step by making reservations directly through Yahoo! Local. * Community Voice: Users can now rate and review almost every business in the country - from dry cleaners and dentists to florists and fine dining establishments. Consumers can also use the "email a friend" feature to share their favorite businesses or services with others who are in - or are planning to visit - their neighborhood. * Personalization: Yahoo! Local provides users the opportunity to save their most frequently used locations or view most recently used locations and quickly and easily access that information each time they do a new search. High Consumer Demand and Expectation The Kelsey Group estimates that as many as 20 to 25 percent of all Internet searches have a local intent. "Consumers are increasingly looking for local information online, but the local search experience has generally failed to deliver against user expectations," said Greg Sterling, analyst and program director, The Kelsey Group. "Yahoo! is bringing together its formidable strengths in search and local content in an easy-to-use and tightly integrated format that ultimately delivers a much better local experience for consumers." About Yahoo! Yahoo! Inc. is a leading provider of comprehensive online products and services to consumers and businesses worldwide. Yahoo! is the No. 1 Internet brand globally and the most trafficked Internet destination worldwide. Headquartered in Sunnyvale, Calif., Yahoo!'s global network includes 25 world properties and is available in 13 languages. # # # Yahoo!, the Yahoo! logo and SmartView are trademarks and/or registered trademarks of Yahoo! Inc. All other names are trademarks and/or registered trademarks of their respective owners. Contact: Yahoo! Inc. Terra Carmichael, terra@yahoo-inc.com or Fleishman Hillard for Yahoo! Inc. Tara Kirchner, 415-318-4121 kirchnet@fleishman.com</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">John Battelle's Searchblog: August 2004 Archives</meta>
+        <meta name="dc.date">2004-08-03</meta>
+        <meta name="dc.type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>CNET coverage...</anchorText>
+            <location>http://news.com.com/Yahoo%2C+Ask+Jeeves+out+to+lure+locals/2100-1024_3-5294125.html</location>
+          </link>
+          <link type="a">
+            <anchorText>Ask has a new local search product</anchorText>
+            <location>http://news.com.com/Yahoo%2C+Ask+Jeeves+out+to+lure+locals/2100-1024_3-5294125.html</location>
+          </link>
+          <link type="a">
+            <location>http://battellemedia.com/images/ylslogobeta_3.gif</location>
+          </link>
+          <link type="a">
+            <anchorText>Yahoo launched</anchorText>
+            <location>http://local.yahoo.com/welcome?csz=</location>
+          </link>
+          <link type="a">
+            <anchorText>intent-based</anchorText>
+            <location>http://battellemedia.com/archives/000141.php</location>
+          </link>
+          <link type="a">
+            <anchorText>local search product</anchorText>
+            <location>http://local.yahoo.com/</location>
+          </link>
+          <link type="a">
+            <anchorText>here</anchorText>
+            <location>http://searchenginewatch.com/sereport/article.php/3389591</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  </documentRecord>
+</documentCollection>
+

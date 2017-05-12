@@ -1,0 +1,28 @@
+Format: 1.8
+Date: Tue, 16 Mar 2010 15:44:34 +0100
+Source: experimental-package
+Binary: experimental-package
+Architecture: source i386
+Version: 1.0
+Distribution: experimental
+Urgency: low
+Maintainer: Esteban Manchado Velázquez <estebanm@estebanm-desktop>
+Changed-By: Esteban Manchado Velázquez <estebanm@estebanm-desktop>
+Description: 
+ experimental-package - <short description; defaults to some wise words>
+Changes: 
+ experimental-package (1.0) experimental; urgency=low
+ .
+   * New upstream release
+Checksums-Sha1: 
+ a068b6fc18a2f775af9dca730354b2bf8ddb68f4 523 experimental-package_1.0.dsc
+ 6bb42f4ff4fd9cd23e0821a4e34a789f1bc9317b 1785 experimental-package_1.0.tar.gz
+ 20cc7780c92f2c456a75d44f67c21d3f77d1eb02 2104 experimental-package_1.0_i386.deb
+Checksums-Sha256: 
+ 40ea2191bda6e7be4af701df0fe16b70efd805a02cc2cebc59a6b86ef6d00167 523 experimental-package_1.0.dsc
+ 441de50f86c4fcc64756fbed880731d44e32d1df5e2f4dad4d154155cfdcf06d 1785 experimental-package_1.0.tar.gz
+ c2645eb3e67916b3d34ff74ed58549f725c3c6506a0e157adb523c8d25c244ad 2104 experimental-package_1.0_i386.deb
+Files: 
+ 717cd15c9a1a6d13e45cabc85e93e3ba 523 misc optional experimental-package_1.0.dsc
+ ba40893e68979a858d83ca2eed1d9a3e 1785 misc optional experimental-package_1.0.tar.gz
+ fa03d613149a50dd9367b2b68b80118c 2104 misc optional experimental-package_1.0_i386.deb

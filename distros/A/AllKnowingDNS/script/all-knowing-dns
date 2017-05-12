@@ -1,0 +1,73 @@
+#!/usr/bin/env perl
+# vim:ts=4:sw=4:expandtab
+
+use strict;
+use warnings;
+# These modules are in core:
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Getopt::Long;
+use Sys::Syslog;
+# All these modules are not in core:
+use App::AllKnowingDNS::Util;
+use App::AllKnowingDNS::Handler;
+use Net::DNS::Nameserver;
+use Privileges::Drop;
+use v5.10;
+
+my $configfile = '/etc/all-knowing-dns.conf';
+my $querylog = 0;
+
+GetOptions(
+    'configfile=s' => \$configfile,
+    'querylog!' => \$querylog,
+    'version' => sub {
+        say "AllKnowingDNS v$App::AllKnowingDNS::Handler::VERSION " .
+            "© 2012 Michael Stapelberg and contributors";
+        exit 0;
+    },
+    'help' => sub {
+        say "all-knowing-dns [--configfile <path>] [--querylog]";
+        say "";
+        say "\t--configfile <path>\tSpecifies an alternate configfile location.";
+        say "\t\t\t\tThe default is /etc/all-knowing-dns.conf";
+        say "\t--querylog\t\tLogs every query to stdout (for debugging).";
+        say "";
+        exit 0;
+    },
+);
+
+openlog('all-knowing-dns', 'pid', 'daemon');
+syslog('info', "AllKnowingDNS v$App::AllKnowingDNS::Handler::VERSION starting");
+
+my $input;
+my $fh;
+if (!open($fh, '<', $configfile)) {
+    my $errormsg = qq|Could not load configfile ("$configfile"): $!|;
+    syslog('err', $errormsg);
+    die $errormsg;
+}
+{
+    local $/;
+    $input = <$fh>;
+}
+close($fh);
+
+my $config = App::AllKnowingDNS::Util::parse_config($input);
+# TODO: sanity check config
+
+# XXX: port configurable? better error message when running without privileges
+my $ns = Net::DNS::Nameserver->new(
+    LocalPort => 53,
+    LocalAddr => [ $config->all_listen_addresses ],
+    ReplyHandler => sub {
+        App::AllKnowingDNS::Handler::reply_handler($config, $querylog, @_)
+    },
+    # For Net::DNS < 0.67 we need this handler, otherwise it exits on notify.
+    NotifyHandler => sub { ('SERVFAIL', undef, undef, undef) },
+    Verbose => 0);
+
+# Now that we are listening, drop privileges.
+drop_privileges('nobody');
+
+$ns->main_loop;

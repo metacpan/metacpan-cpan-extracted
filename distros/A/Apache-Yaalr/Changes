@@ -1,0 +1,9 @@
+Version: 0.03.2
+
+	Improved and somewhat more thourough testing.
+	Preparing to add new functionality and to create more modules
+
+
+Version: 0.02.9
+
+	Removed guess() in favor of os()

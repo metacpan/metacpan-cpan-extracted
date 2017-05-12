@@ -1,0 +1,32 @@
+Array/Stream/Transactional version 1.00
+=======================================
+
+DESCRIPTION
+
+Array::Stream::Transactional is a Perl extension for wrapping an array and 
+having it pose as a stream. The streams current position can be 
+commited and rollbacked at any time.
+
+INSTALLATION
+
+To install this module, type the following using Module::Build:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+or using ExtUtils::MakeMaker:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Claes Jacobsson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

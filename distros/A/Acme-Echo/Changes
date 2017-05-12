@@ -1,0 +1,8 @@
+Revision history for Acme-Echo
+
+0.02    2006-11-10
+	Added IO::Scalar as a dep (tests rely on it)
+
+0.01    2006-08-26
+	Initial release
+

@@ -1,0 +1,43 @@
+#!/usr/bin/env perl 
+use warnings;
+use strict;
+
+BEGIN { $ENV{'CLASS_MOP_NO_XS'} = 1 if ($^V == 5.0010); }
+
+use App::SD::CLI;
+
+$ENV{'PROPHET_REPO'} ||= $ENV{'SD_REPO'} if $ENV{'SD_REPO'};
+
+# Moose likes generating very noisy backtraces. Most users don't need to see
+# anything more than the root cause of the failure. Developers and the curious
+# can set environment variable SD_VERBOSE_ERROR to retain the backtraces.
+# When Moose's error throwing is more malleable we should switch to using that.
+unless ($ENV{SD_VERBOSE_ERROR} || $ENV{'TEST_VERBOSE'}) {
+    $SIG{__DIE__} = sub {
+        my $line = shift;
+        $line =~ s/\n.*//s if ($line =~ /at .* line \d+.$/s);
+        $line .= "\n";
+        $line =~ s/\n+$/\n/gs;
+        die $line;
+    };
+}
+
+my $cli = App::SD::CLI->new;
+$cli->run_one_command(@ARGV);
+
+__END__
+
+=head1 NAME
+
+sd - a distributed ticket tracking system
+
+=head1 DESCRIPTION
+
+SD is a peer to peer ticket tracking system built on the Prophet
+distributed database. SD is designed to make it easy to work with tickets
+and to share ticket databases with your collaborators.
+
+Please run C<sd help> for documentation and C<sd help intro> for an
+introduction to SD.
+
+=cut

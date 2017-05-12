@@ -1,0 +1,757 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+Alien::GvaScript::TreeNavigator - Navigation in a tree structure
+
+=head1 SYNOPSIS
+
+  <head>
+    <script src="prototype.js"></script>
+    <script src="Keymap.js"></script>
+    <script src="Navigator.js"></script>
+    <link href="Navigator.css" rel="stylesheet" type="text/css">
+  </head>
+  
+  <body onload="new GvaScript.TreeNavigator('TN_tree')">
+    <div id="TN_tree">
+      <div class="TN_node">
+        <span class="TN_label">Label 1</span>
+        <div class="TN_content">
+          <div class="TN_node">
+            <span class="TN_label">Label 1.1</span>
+            <div class="TN_content">
+            ...Content of node 1.1
+            </div>
+          </div>
+          <div class="TN_leaf">
+            <span class="TN_label">Label 1.2 for leaf</span>
+          </div>
+        </div>
+      </div>                  
+    </div>
+  </body>
+
+
+=head1 DESCRIPTION
+
+Handles navigation in a data tree. The tree
+description is usual HTML, with some special classes to
+identify nodes.  Nodes can be browsed, closed or
+opened. All operations take place directly within the
+tree, not in a separate panel. 
+
+
+=head2 Tree structure
+
+
+A tree is a collection of I<nodes>. Each node must have a I<label>
+element and can have a I<content> element. A node may be either
+I<open> (its content is visible) or I<closed> (its content is
+invisible). The label of the node is always visible, if the node
+itself is visible. Some nodes can be declared as I<leaves> : in that
+case they have no content and have no open/close operations.
+
+The content of a node may include other nodes, so a whole subtree may
+become invisible if the parent node is closed.  Opening or closing
+nodes may be controlled by the mouse, by the keyboard, or through the
+programming interface.
+
+A node's content may also by dynamic, by
+specifying C<TN:contentURL> with the URL as value:
+
+  <div class="TN_node TN_closed" TN:contentURL="/my/url.html">
+    <div class="TN_label">Label for dynamic node</div>
+  </div>
+
+If the user opens that node, the content of the URL will by
+dynamically fetched and inserted into the tree.  The content then
+stays there, but can be forcibly reloaded by hitting the 
+C<Ctrl-R> key.
+
+=head2 HTML tree declaration
+
+The tree can be any HTML block element. It should contain one or
+several block elements declared with class C<TN_node> or class
+C<TN_leaf> -- usually these are DIV elements. Other HTML elements
+may be freely interspersed with nodes, although this usually does not
+make much sense for navigability.
+
+
+Every node must in turn contain an inline element
+declared with class C<TN_label> -- usually this is
+a SPAN element. If the node is not a leaf, it may
+then contain a block element declared
+with class C<TN_content> -- usually this is
+another DIV element. Both the label and the content
+should be direct children of the node element.
+
+At initialisation time, a new SPAN element is
+automatically inserted before each label, in order to
+add the +/- navigation buttons.
+
+
+=head2 Icons customization
+
+By default, the navigation buttons inserted on the
+left of labels are small icons representing +/- signs.
+To show other icons, change the CSS rules about the 
+C<TN_button> class: 
+
+  .TN_button { 
+  background-image: url(myIconForOpenNodes.gif);   
+  }
+  .TN_closed .TN_button { 
+  background-image: url(myIconForClosedNodes.gif); 
+  } 
+
+
+In addition, if you want another icon for illustrating
+the node's content (like for example an open or closed
+folder), you can proceed as follows:
+
+=over
+
+=item * 
+
+add an empty C<span> element within the
+labels that should have the icon
+
+  <span class="TN_label"><span class="specialNode"></span>some label</span>
+
+=item *
+
+define CSS background images for selectors
+C<.specialNode> and  C<.TN_closed .specialNode>,
+as in the example above
+
+=back
+
+=head1 Usage : navigation
+
+Navigation in the tree is either with the mouse or with
+the keyboard. At any point in time, at most one node is
+I<selected> : this is the one that receives keyboard
+events. Hence if the tree has no
+selected node, no keyboard events are interpreted.
+
+=head2 Mouse events
+
+Mousing over a node label adds the class
+C<TN_mouse> to that node; the default style for
+that class is just to underline the label.
+
+Clicking on a node label selects that node and
+fires the C<Ping> event.
+Clicking on the square +/- icon on the left of the
+label toggles the open/closed status of the node.
+
+=head2 Keyboard events
+
+
+=over
+
+=item C<keypad +>
+
+open the node
+
+=item C<keypad ->
+
+close the node
+
+=item C<keypad *>
+
+open the node and all its subnodes 
+
+=item C<keypad />
+
+close the node and all its subnodes
+
+=item C<Ctrl-keypad *>
+
+activate "show all" mode (the content of closed nodes is nevertheless
+visible, which may be useful for printing)
+
+
+=item C<Ctrl-keypad />
+
+deactivate the "show all" mode
+
+
+=item C<TAB>
+
+if closed, open the node; if already opened, pass focus to the next
+item (maybe the next node, or another tabindex-enabled HTML element,
+such as a form control).
+
+=item C<ARROW_UP>
+
+move to previous displayed node
+
+=item C<ARROW_DOWN>
+
+move to next displayed node
+
+=item C<ARROW_LEFT>
+
+if open, close the node; if already closed, move to parent node
+
+=item C<ARROW_RIGHT>
+
+if closed, open the node; if already open, move to next subnode
+
+=item C<HOME>
+
+select the first node of the tree
+
+=item C<END>
+
+select the last visible subnode of the tree
+
+=item C<Ctrl-PAGE_UP>
+
+select the enclosing node (useful if not positioned on a node, but
+within a long node content)
+
+=item C<Ctrl-PAGE_DOWN>
+
+select the displayed node after 
+the current enclosing node (useful if not positioned on a node, but
+within a long node content)
+
+=item C<Ctrl-R>
+
+refresh the node's content (if that node has an URL for dynamic
+content).
+
+=item C<RETURN>
+
+fire the C<Ping> event
+
+=item C<Ctrl-1>..C<Ctrl-9>
+
+close all nodes at level of the specified digit, and open all nodes
+above
+
+=item C<char(s)>
+
+Tree navigator supports the 'Find As You Type' feature that allows
+quick node navigation when you type a series of characters.
+This feature is enabled by default whenever any node is active.
+The series of characters are cleared after an 800ms timeout of no character input.
+After that, a new search will be effective.
+
+=back
+
+
+=head1 Programming interface
+
+=head2 Methods
+
+=head3 new GvaScript.TreeNavigator
+
+  var treeNavigator = new GvaScript.TreeNavigator(
+        elem, 
+        {opt1:"val1", opt2:"val2", ...}
+  );
+
+Creates the object that controls
+navigation in the tree. Arguments are
+
+=over
+
+=item C<elem> 
+
+the HTML element containing the
+tree, or the id of that element.
+
+=item C<options>
+
+an optional inline object
+specifying options. 
+
+=back
+
+The tree navigation object is returned, which may be
+useful if you later want to act on the tree
+programmatically (opening or closing nodes).
+
+Unless otherwise specified, the method adds a tab
+index to each label (so that the user can jump to the
+next label through the C<TAB> key).
+The method also registers C<onfocus>,
+C<onblur>, C<onmouseover>, C<onmouseout>
+and C<onclick> handlers for label elements.
+Finally, as already mentioned, a new SPAN element is
+automatically inserted before each label.
+
+Available options are:
+
+=head4 tabIndex
+
+Which tabIndex will be assigned to node labels. If
+labels should not participate in tabbing, specify a value of -1
+(this is the default).
+
+Setting C<< tabIndex >= 0 >> is especially useful for structuring
+forms in treeNavigator sections : then 
+the user will be able to smoothly tab from section headers
+(i.e. treeNavigator labels) to form fields within these sections.
+
+=head4 treeTabIndex
+
+Which tabIndex will be assigned to the tree element
+(if not already specified in markup).
+The default is 0; specifying a higher value
+would give a higher priority to the tree
+navigator within the tabbing order.
+
+Setting C<tabIndex> to a negative value means
+that the tree navigator receives no focus.
+In that case, the keymap created for
+capturing keyboard events will be  bound globally
+to the C<document> element (and therefore might
+interact in unpredictable ways with other elements
+capturing keys; so this is not a recommended setting). 
+
+
+
+=head4 flashDuration
+
+Duration (in milliseconds) of "flashing", i.e. visual feedback when a
+key is pressed in a wrong context, like for example trying to open a
+node which is already open; default is 200 ms.
+
+=head4 flashColor
+
+Color for "flashing", expressed as standard CSS color; default is red.
+
+=head4 selectOnButtonClick
+
+If true, clicking on a "+/-" button next to a label will not only open
+or close the node, but will also select that node; default is true.
+
+=head4 noPingOnFirstClick
+
+If true, clicking on an unselected node will just select that node,
+without firing the C<Ping> event. Since the node will then be selected,
+a second clic (or a double-clic) will fire the event.
+
+This option is C<false> by default.
+
+=head4 selectFirstNode
+
+If true (the default), the first node is selected and gets focus
+just after constructing the tree navigator. 
+
+=head4 createButtons
+
+If true, creates the "+/-" buttons next to labels; default is true.
+
+=head4 scrollingContainer
+
+The id of the container where the tree overflows.
+Default to C<tree.ownerDocument.documentElement>.
+
+This is used for keyboard tree navigation autoscrolling.
+
+
+=head4 autoScrollPercentage
+
+Makes sure that the selected node is visible in the central area of 
+its offset parent; if not, the parent is scrolled.
+The percentage is the ratio between the parent height and the 
+margin at which scrolling must occur (default is 20%);
+
+
+
+=head4 keymap
+
+A keymap object (see C<Keymap.js>). If that option is given, keyboard
+handlers are pushed into that keymap; otherwise a new keymap is
+created.
+
+If you supply your own keymap, make
+sure that:
+
+=over
+
+=item *
+
+the keymap is attached to an element that properly receives keyboard
+events. The document element does, but the tree DIV element does not,
+unless it contains items with activated focus (with C<tabIndex>
+defined and positive).
+
+
+=item *
+
+the keymap is created with options C<preventDefault:false> and
+C<stopPropagation:false> (because when the tree has no selected node,
+the tree navigation handlers do not consume events and try to
+propagate them further).
+
+=back
+
+
+=head4 classes
+
+Class names for various parts of the tree structure.
+This should be an inline object, with keys corresponding 
+to the names below, and with values specified either as 
+a single class name or as an array of class names.
+
+=over
+
+=item node
+
+Class(es) for node elements (default is C<TN_node>). 
+A node should contain a label element and a 
+content element, and should have style
+C<display:block>.
+
+=item leaf
+
+Class(es) for leaf elements (default is C<TN_leaf>). 
+A leaf should contain just a label element.
+
+=item label
+
+Class(es) for label elements (default is C<TN_label>). 
+A label should have style C<display:inline>.
+
+
+=item content
+
+Class(es) for content elements (default is C<TN_content>). 
+
+=item closed
+
+Class(es) for marking closed nodes (default is C<TN_closed>). 
+
+=item selected
+
+Class(es) for marking the selected node (default is C<TN_selected>). 
+
+=item mouse
+
+Class(es) added when the mouse hovers over a node
+(default is C<TN_mouse>). 
+
+=item button
+
+Class(es) for buttons added automatically by the tree navigator
+(default is C<TN_button>). 
+
+=item showall
+
+Class(es) for the special mode in which closed nodes are nevertheless
+displayed
+(default is C<TN_showall>). 
+
+=back
+
+
+=head3 destroy
+
+  mytreenavigator.destroy();
+
+This method will remove all handlers assigned to tree navigator.
+Call this method when the tree navigator element is removed from the DOM.
+
+
+=head3 Node manipulation
+
+All methods below take a node element as
+argument, i.e. are called according to pattern:
+
+  treeNavigator.method(node);
+
+=over
+
+=item C<open(node)>
+
+
+opens the node
+
+=item C<close(node)>
+
+
+closes the node
+
+=item C<openAtLevel(elem, level)>
+
+walks down the tree and opens all subnodes of C<elem> until level
+C<level>; closes nodes underneath
+
+=item C<openEnclosingNodes(elem)>
+
+walks up the DOM, starting at C<elem> (which might by any element on
+the page), and opens all nodes found on the way
+
+=item C<select(node, prevent_autoscroll)>
+
+If there was a selected node, unselect it; then select the argument
+node. The argument can be C<null>, in which case the tree no longer
+has any selected node. 
+
+The second argument C<prevent_autoscroll> is optional; if true,
+no autoscroll will be performed.
+
+
+=item C<scrollTo(node)>
+
+Positions the node in the middle of the screen
+
+=item C<flash(node, duration, color)>
+
+
+Changes the background color of I<node> to I<color> for I<duration>
+milliseconds.  Duration and color are optional and default to 200 ms
+and 'red' (unless otherwise specified in the options to the
+C<treeNavigator> constructor).
+
+=item C<isClosed(node)>
+
+Returns true if the node is closed
+
+=item C<isVisible(node)>
+
+Returns true if the node is visible
+(i.e. does not have C<display:none>).
+
+=back
+
+=head3 Walking the tree
+
+=over
+
+=item C<nextSibling(node)>
+
+Returns the next sibling tree node (i.e. next HTML sibling element
+having class C<TN_node>; this is I<not> equivalent to
+C<node.nextSibling>).
+
+
+=item C<previousSibling(node)>
+
+Returns the previous sibling tree node.
+
+=item C<parentNode(node)>
+
+Returns the parent tree node.
+
+=item C<firstSubNode(node)>
+
+Returns the first subnode within that node's content. If no argument
+is given, returns the first node of the tree.
+
+=item C<lastSubNode(node)>
+
+Returns the last subnode within that node's content.  If no argument
+is given, returns the last node of the tree.
+
+=item C<lastVisibleSubNode(node)>
+
+Returns the last visible subnode (recursively) of the argument
+node. If no argument is given, returns the last visible subnode of the
+tree.
+
+=item C<label(node)>
+
+Returns the label of that node, i.e. the first HTML child element
+having class C<TN_label>.
+
+=item C<content(node)>
+
+Returns the content of that node, i.e. the last HTML child element
+having class C<TN_content>.
+
+=item C<nextDisplayedNode(node)>
+
+Returns the next tree node in page display order (i.e. next visible
+node down the page).
+
+=item C<previousDisplayedNode(node)>
+
+Returns the previous tree node in page display order (i.e. previous
+visible node up the page).
+
+=item C<enclosingNode(elem)>
+
+Returns the first tree node that contains the given element
+(which might be for example a form input).
+
+=back
+
+=head2 Event handling
+
+Manipulations to the tree generate I<events>
+for which clients can register some I<handlers>,
+exactly like ordinary HTML events.
+
+
+=head3 Event list
+
+=head4 C<Select> / C<Deselect>
+
+triggered when a node is marked / unmarked as the
+currently selected node. Both events are not
+triggered immediately, but only after 
+C<selectDelay> milliseconds have elapsed :
+this is an optimization to avoid too many calls
+while the user is navigating quickly through the
+nodes; in other words, intermediate nodes
+crossed while navigating the tree will not
+receive any trigger.
+
+If label selection is associated with 
+focus (i.e. if C<tabIndex> was not set
+to -1), then selection/deselection events
+are also triggered when the user switches
+to another desktop window.
+
+
+=head4 C<Open> / C<Close>
+
+triggered when a node is opened or
+closed
+
+
+=head4 C<BeforeLoadContent> / C<AfterLoadContent>
+
+triggered before/after a node's content
+is loaded from an URL (throug opening the node,
+or hitting the C<Ctrl-R> key) -- see
+the section below about dynamic tree
+updates).
+
+=head4 C<inspect>
+
+
+triggered when a user calls the
+I<inspector> for a node (either by
+hitting the RETURN key or by
+double-clicking the node's label)
+
+=head3 Event structure passed to handlers
+
+Handlers can access an C<event> structure,
+similar to what is passed to ordinary HTML events;
+the entries are:
+
+=over 
+
+=item C<type>
+
+the name of the triggered event
+(i.e. C<Select>, C<Deselect>, C<Open>, etc.)
+
+=item C<target>
+
+the node element on which the event was
+triggered
+
+=item C<srcElement>
+
+synonym for C<target>
+
+=item C<treeNavigator>
+
+the tree navigator object controlling the
+target node
+
+=back
+
+
+=head3 Registering event handlers
+
+Event handlers can be registered in several ways:
+
+=head4 additional attributes on node elements
+
+
+  <div class="TN_node" TN:onOpen="handleOpen(this, treeNavigator)">
+
+
+The additional attribute is the event name,
+prefixed by the constant C<TN:on>; so in
+the example above, a hander is registered for
+event C<Open>.
+
+The string containing handler code is
+evaluated in a context where some special
+variables are predefined: 
+
+
+=over 
+
+=item C<targetNode>
+
+the node element
+
+=item C<this>
+
+the node element (synonym for C<targetNode>)
+
+=item C<treeNavigator>
+
+the tree navigator object
+
+=item C<event>
+
+an event structure as described above
+
+=back
+
+If the string just contains the name of a
+handler function (i.e. without the
+parentheses), then that function will be
+called with a single argument, namely the
+event structure described above. Therefore
+
+  <div class="TN_node" TN:onOpen="handleOpen">
+
+is equivalent to
+
+  <div class="TN_node" TN:onOpen="handleOpen(event)">
+
+
+=head4 additional attributes on the tree element
+
+  <div id="theTree" TN:onOpen="handleOpen(targetNode, this)">
+
+Handlers can be registered on the tree element, 
+exactly like for node elements. The only
+difference is that C<this> is then bound to
+the tree element instead of the target node.
+
+=head4 additional properties on the tree navigator object
+
+  var treeNavigator = new Tree.Navigator('myTree', {onOpen: myOpenHandler});
+  treeNavigator.onClose = function(event){doSomethingWith(event.target)};
+
+Handlers can be inserted as properties on the
+tree navigator object, either through options to
+the constructor, or later on through ordinary
+property assignments. These properties start
+with the constant C<on> followed by the
+event name, but without the C<TN:> prefix.
+Handlers are called with a single argument, 
+namely the event structure described above.
+
+=head2 Dynamic tree expansion
+
+  treeNavigator.initSubTree(subtree);
+
+Whenever a subtree was added programmatically into the
+tree, this method should be called in order to install the
+navigation buttons, mouse event handlers and tabbing
+behaviour. The C<initSubTree> method expects to find
+at least one C<TN_label> element within the
+subtree.
+
+This method is called automatically when a subtree
+is dynamically fetched through the 
+C<TN:contentURL> property.
+

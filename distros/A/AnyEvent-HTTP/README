@@ -1,0 +1,639 @@
+NAME
+    AnyEvent::HTTP - simple but non-blocking HTTP/HTTPS client
+
+SYNOPSIS
+       use AnyEvent::HTTP;
+
+       http_get "http://www.nethype.de/", sub { print $_[1] };
+
+       # ... do something else here
+
+DESCRIPTION
+    This module is an AnyEvent user, you need to make sure that you use and
+    run a supported event loop.
+
+    This module implements a simple, stateless and non-blocking HTTP client.
+    It supports GET, POST and other request methods, cookies and more, all
+    on a very low level. It can follow redirects, supports proxies, and
+    automatically limits the number of connections to the values specified
+    in the RFC.
+
+    It should generally be a "good client" that is enough for most HTTP
+    tasks. Simple tasks should be simple, but complex tasks should still be
+    possible as the user retains control over request and response headers.
+
+    The caller is responsible for authentication management, cookies (if the
+    simplistic implementation in this module doesn't suffice), referer and
+    other high-level protocol details for which this module offers only
+    limited support.
+
+  METHODS
+    http_get $url, key => value..., $cb->($data, $headers)
+        Executes an HTTP-GET request. See the http_request function for
+        details on additional parameters and the return value.
+
+    http_head $url, key => value..., $cb->($data, $headers)
+        Executes an HTTP-HEAD request. See the http_request function for
+        details on additional parameters and the return value.
+
+    http_post $url, $body, key => value..., $cb->($data, $headers)
+        Executes an HTTP-POST request with a request body of $body. See the
+        http_request function for details on additional parameters and the
+        return value.
+
+    http_request $method => $url, key => value..., $cb->($data, $headers)
+        Executes a HTTP request of type $method (e.g. "GET", "POST"). The
+        URL must be an absolute http or https URL.
+
+        When called in void context, nothing is returned. In other contexts,
+        "http_request" returns a "cancellation guard" - you have to keep the
+        object at least alive until the callback get called. If the object
+        gets destroyed before the callback is called, the request will be
+        cancelled.
+
+        The callback will be called with the response body data as first
+        argument (or "undef" if an error occurred), and a hash-ref with
+        response headers (and trailers) as second argument.
+
+        All the headers in that hash are lowercased. In addition to the
+        response headers, the "pseudo-headers" (uppercase to avoid clashing
+        with possible response headers) "HTTPVersion", "Status" and "Reason"
+        contain the three parts of the HTTP Status-Line of the same name. If
+        an error occurs during the body phase of a request, then the
+        original "Status" and "Reason" values from the header are available
+        as "OrigStatus" and "OrigReason".
+
+        The pseudo-header "URL" contains the actual URL (which can differ
+        from the requested URL when following redirects - for example, you
+        might get an error that your URL scheme is not supported even though
+        your URL is a valid http URL because it redirected to an ftp URL, in
+        which case you can look at the URL pseudo header).
+
+        The pseudo-header "Redirect" only exists when the request was a
+        result of an internal redirect. In that case it is an array
+        reference with the "($data, $headers)" from the redirect response.
+        Note that this response could in turn be the result of a redirect
+        itself, and "$headers->{Redirect}[1]{Redirect}" will then contain
+        the original response, and so on.
+
+        If the server sends a header multiple times, then their contents
+        will be joined together with a comma (","), as per the HTTP spec.
+
+        If an internal error occurs, such as not being able to resolve a
+        hostname, then $data will be "undef", "$headers->{Status}" will be
+        590-599 and the "Reason" pseudo-header will contain an error
+        message. Currently the following status codes are used:
+
+        595 - errors during connection establishment, proxy handshake.
+        596 - errors during TLS negotiation, request sending and header
+        processing.
+        597 - errors during body receiving or processing.
+        598 - user aborted request via "on_header" or "on_body".
+        599 - other, usually nonretryable, errors (garbled URL etc.).
+
+        A typical callback might look like this:
+
+           sub {
+              my ($body, $hdr) = @_;
+
+              if ($hdr->{Status} =~ /^2/) {
+                 ... everything should be ok
+              } else {
+                 print "error, $hdr->{Status} $hdr->{Reason}\n";
+              }
+           }
+
+        Additional parameters are key-value pairs, and are fully optional.
+        They include:
+
+        recurse => $count (default: $MAX_RECURSE)
+            Whether to recurse requests or not, e.g. on redirects,
+            authentication and other retries and so on, and how often to do
+            so.
+
+            Only redirects to http and https URLs are supported. While most
+            common redirection forms are handled entirely within this
+            module, some require the use of the optional URI module. If it
+            is required but missing, then the request will fail with an
+            error.
+
+        headers => hashref
+            The request headers to use. Currently, "http_request" may
+            provide its own "Host:", "Content-Length:", "Connection:" and
+            "Cookie:" headers and will provide defaults at least for "TE:",
+            "Referer:" and "User-Agent:" (this can be suppressed by using
+            "undef" for these headers in which case they won't be sent at
+            all).
+
+            You really should provide your own "User-Agent:" header value
+            that is appropriate for your program - I wouldn't be surprised
+            if the default AnyEvent string gets blocked by webservers sooner
+            or later.
+
+            Also, make sure that your headers names and values do not
+            contain any embedded newlines.
+
+        timeout => $seconds
+            The time-out to use for various stages - each connect attempt
+            will reset the timeout, as will read or write activity, i.e.
+            this is not an overall timeout.
+
+            Default timeout is 5 minutes.
+
+        proxy => [$host, $port[, $scheme]] or undef
+            Use the given http proxy for all requests, or no proxy if
+            "undef" is used.
+
+            $scheme must be either missing or must be "http" for HTTP.
+
+            If not specified, then the default proxy is used (see
+            "AnyEvent::HTTP::set_proxy").
+
+            Currently, if your proxy requires authorization, you have to
+            specify an appropriate "Proxy-Authorization" header in every
+            request.
+
+        body => $string
+            The request body, usually empty. Will be sent as-is (future
+            versions of this module might offer more options).
+
+        cookie_jar => $hash_ref
+            Passing this parameter enables (simplified) cookie-processing,
+            loosely based on the original netscape specification.
+
+            The $hash_ref must be an (initially empty) hash reference which
+            will get updated automatically. It is possible to save the
+            cookie jar to persistent storage with something like JSON or
+            Storable - see the "AnyEvent::HTTP::cookie_jar_expire" function
+            if you wish to remove expired or session-only cookies, and also
+            for documentation on the format of the cookie jar.
+
+            Note that this cookie implementation is not meant to be
+            complete. If you want complete cookie management you have to do
+            that on your own. "cookie_jar" is meant as a quick fix to get
+            most cookie-using sites working. Cookies are a privacy disaster,
+            do not use them unless required to.
+
+            When cookie processing is enabled, the "Cookie:" and
+            "Set-Cookie:" headers will be set and handled by this module,
+            otherwise they will be left untouched.
+
+        tls_ctx => $scheme | $tls_ctx
+            Specifies the AnyEvent::TLS context to be used for https
+            connections. This parameter follows the same rules as the
+            "tls_ctx" parameter to AnyEvent::Handle, but additionally, the
+            two strings "low" or "high" can be specified, which give you a
+            predefined low-security (no verification, highest compatibility)
+            and high-security (CA and common-name verification) TLS context.
+
+            The default for this option is "low", which could be interpreted
+            as "give me the page, no matter what".
+
+            See also the "sessionid" parameter.
+
+        session => $string
+            The module might reuse connections to the same host internally.
+            Sometimes (e.g. when using TLS), you do not want to reuse
+            connections from other sessions. This can be achieved by setting
+            this parameter to some unique ID (such as the address of an
+            object storing your state data, or the TLS context) - only
+            connections using the same unique ID will be reused.
+
+        on_prepare => $callback->($fh)
+            In rare cases you need to "tune" the socket before it is used to
+            connect (for example, to bind it on a given IP address). This
+            parameter overrides the prepare callback passed to
+            "AnyEvent::Socket::tcp_connect" and behaves exactly the same way
+            (e.g. it has to provide a timeout). See the description for the
+            $prepare_cb argument of "AnyEvent::Socket::tcp_connect" for
+            details.
+
+        tcp_connect => $callback->($host, $service, $connect_cb,
+        $prepare_cb)
+            In even rarer cases you want total control over how
+            AnyEvent::HTTP establishes connections. Normally it uses
+            AnyEvent::Socket::tcp_connect to do this, but you can provide
+            your own "tcp_connect" function - obviously, it has to follow
+            the same calling conventions, except that it may always return a
+            connection guard object.
+
+            There are probably lots of weird uses for this function,
+            starting from tracing the hosts "http_request" actually tries to
+            connect, to (inexact but fast) host => IP address caching or
+            even socks protocol support.
+
+        on_header => $callback->($headers)
+            When specified, this callback will be called with the header
+            hash as soon as headers have been successfully received from the
+            remote server (not on locally-generated errors).
+
+            It has to return either true (in which case AnyEvent::HTTP will
+            continue), or false, in which case AnyEvent::HTTP will cancel
+            the download (and call the finish callback with an error code of
+            598).
+
+            This callback is useful, among other things, to quickly reject
+            unwanted content, which, if it is supposed to be rare, can be
+            faster than first doing a "HEAD" request.
+
+            The downside is that cancelling the request makes it impossible
+            to re-use the connection. Also, the "on_header" callback will
+            not receive any trailer (headers sent after the response body).
+
+            Example: cancel the request unless the content-type is
+            "text/html".
+
+               on_header => sub {
+                  $_[0]{"content-type"} =~ /^text\/html\s*(?:;|$)/
+               },
+
+        on_body => $callback->($partial_body, $headers)
+            When specified, all body data will be passed to this callback
+            instead of to the completion callback. The completion callback
+            will get the empty string instead of the body data.
+
+            It has to return either true (in which case AnyEvent::HTTP will
+            continue), or false, in which case AnyEvent::HTTP will cancel
+            the download (and call the completion callback with an error
+            code of 598).
+
+            The downside to cancelling the request is that it makes it
+            impossible to re-use the connection.
+
+            This callback is useful when the data is too large to be held in
+            memory (so the callback writes it to a file) or when only some
+            information should be extracted, or when the body should be
+            processed incrementally.
+
+            It is usually preferred over doing your own body handling via
+            "want_body_handle", but in case of streaming APIs, where HTTP is
+            only used to create a connection, "want_body_handle" is the
+            better alternative, as it allows you to install your own event
+            handler, reducing resource usage.
+
+        want_body_handle => $enable
+            When enabled (default is disabled), the behaviour of
+            AnyEvent::HTTP changes considerably: after parsing the headers,
+            and instead of downloading the body (if any), the completion
+            callback will be called. Instead of the $body argument
+            containing the body data, the callback will receive the
+            AnyEvent::Handle object associated with the connection. In error
+            cases, "undef" will be passed. When there is no body (e.g.
+            status 304), the empty string will be passed.
+
+            The handle object might or might not be in TLS mode, might be
+            connected to a proxy, be a persistent connection, use chunked
+            transfer encoding etc., and configured in unspecified ways. The
+            user is responsible for this handle (it will not be used by this
+            module anymore).
+
+            This is useful with some push-type services, where, after the
+            initial headers, an interactive protocol is used (typical
+            example would be the push-style twitter API which starts a
+            JSON/XML stream).
+
+            If you think you need this, first have a look at "on_body", to
+            see if that doesn't solve your problem in a better way.
+
+        persistent => $boolean
+            Try to create/reuse a persistent connection. When this flag is
+            set (default: true for idempotent requests, false for all
+            others), then "http_request" tries to re-use an existing
+            (previously-created) persistent connection to the host and,
+            failing that, tries to create a new one.
+
+            Requests failing in certain ways will be automatically retried
+            once, which is dangerous for non-idempotent requests, which is
+            why it defaults to off for them. The reason for this is because
+            the bozos who designed HTTP/1.1 made it impossible to
+            distinguish between a fatal error and a normal connection
+            timeout, so you never know whether there was a problem with your
+            request or not.
+
+            When reusing an existent connection, many parameters (such as
+            TLS context) will be ignored. See the "session" parameter for a
+            workaround.
+
+        keepalive => $boolean
+            Only used when "persistent" is also true. This parameter decides
+            whether "http_request" tries to handshake a HTTP/1.0-style
+            keep-alive connection (as opposed to only a HTTP/1.1 persistent
+            connection).
+
+            The default is true, except when using a proxy, in which case it
+            defaults to false, as HTTP/1.0 proxies cannot support this in a
+            meaningful way.
+
+        handle_params => { key => value ... }
+            The key-value pairs in this hash will be passed to any
+            AnyEvent::Handle constructor that is called - not all requests
+            will create a handle, and sometimes more than one is created, so
+            this parameter is only good for setting hints.
+
+            Example: set the maximum read size to 4096, to potentially
+            conserve memory at the cost of speed.
+
+               handle_params => {
+                  max_read_size => 4096,
+               },
+
+        Example: do a simple HTTP GET request for http://www.nethype.de/ and
+        print the response body.
+
+           http_request GET => "http://www.nethype.de/", sub {
+              my ($body, $hdr) = @_;
+              print "$body\n";
+           };
+
+        Example: do a HTTP HEAD request on https://www.google.com/, use a
+        timeout of 30 seconds.
+
+           http_request
+              HEAD    => "https://www.google.com",
+              headers => { "user-agent" => "MySearchClient 1.0" },
+              timeout => 30,
+              sub {
+                 my ($body, $hdr) = @_;
+                 use Data::Dumper;
+                 print Dumper $hdr;
+              }
+           ;
+
+        Example: do another simple HTTP GET request, but immediately try to
+        cancel it.
+
+           my $request = http_request GET => "http://www.nethype.de/", sub {
+              my ($body, $hdr) = @_;
+              print "$body\n";
+           };
+
+           undef $request;
+
+  DNS CACHING
+    AnyEvent::HTTP uses the AnyEvent::Socket::tcp_connect function for the
+    actual connection, which in turn uses AnyEvent::DNS to resolve
+    hostnames. The latter is a simple stub resolver and does no caching on
+    its own. If you want DNS caching, you currently have to provide your own
+    default resolver (by storing a suitable resolver object in
+    $AnyEvent::DNS::RESOLVER) or your own "tcp_connect" callback.
+
+  GLOBAL FUNCTIONS AND VARIABLES
+    AnyEvent::HTTP::set_proxy "proxy-url"
+        Sets the default proxy server to use. The proxy-url must begin with
+        a string of the form "http://host:port", croaks otherwise.
+
+        To clear an already-set proxy, use "undef".
+
+        When AnyEvent::HTTP is loaded for the first time it will query the
+        default proxy from the operating system, currently by looking at
+        "$ENV{http_proxy"}.
+
+    AnyEvent::HTTP::cookie_jar_expire $jar[, $session_end]
+        Remove all cookies from the cookie jar that have been expired. If
+        $session_end is given and true, then additionally remove all session
+        cookies.
+
+        You should call this function (with a true $session_end) before you
+        save cookies to disk, and you should call this function after
+        loading them again. If you have a long-running program you can
+        additionally call this function from time to time.
+
+        A cookie jar is initially an empty hash-reference that is managed by
+        this module. Its format is subject to change, but currently it is as
+        follows:
+
+        The key "version" has to contain 1, otherwise the hash gets emptied.
+        All other keys are hostnames or IP addresses pointing to
+        hash-references. The key for these inner hash references is the
+        server path for which this cookie is meant, and the values are again
+        hash-references. Each key of those hash-references is a cookie name,
+        and the value, you guessed it, is another hash-reference, this time
+        with the key-value pairs from the cookie, except for "expires" and
+        "max-age", which have been replaced by a "_expires" key that
+        contains the cookie expiry timestamp. Session cookies are indicated
+        by not having an "_expires" key.
+
+        Here is an example of a cookie jar with a single cookie, so you have
+        a chance of understanding the above paragraph:
+
+           {
+              version    => 1,
+              "10.0.0.1" => {
+                 "/" => {
+                    "mythweb_id" => {
+                      _expires => 1293917923,
+                      value    => "ooRung9dThee3ooyXooM1Ohm",
+                    },
+                 },
+              },
+           }
+
+    $date = AnyEvent::HTTP::format_date $timestamp
+        Takes a POSIX timestamp (seconds since the epoch) and formats it as
+        a HTTP Date (RFC 2616).
+
+    $timestamp = AnyEvent::HTTP::parse_date $date
+        Takes a HTTP Date (RFC 2616) or a Cookie date (netscape cookie spec)
+        or a bunch of minor variations of those, and returns the
+        corresponding POSIX timestamp, or "undef" if the date cannot be
+        parsed.
+
+    $AnyEvent::HTTP::MAX_RECURSE
+        The default value for the "recurse" request parameter (default: 10).
+
+    $AnyEvent::HTTP::TIMEOUT
+        The default timeout for connection operations (default: 300).
+
+    $AnyEvent::HTTP::USERAGENT
+        The default value for the "User-Agent" header (the default is
+        "Mozilla/5.0 (compatible; U; AnyEvent-HTTP/$VERSION;
+        +http://software.schmorp.de/pkg/AnyEvent)").
+
+    $AnyEvent::HTTP::MAX_PER_HOST
+        The maximum number of concurrent connections to the same host
+        (identified by the hostname). If the limit is exceeded, then
+        additional requests are queued until previous connections are
+        closed. Both persistent and non-persistent connections are counted
+        in this limit.
+
+        The default value for this is 4, and it is highly advisable to not
+        increase it much.
+
+        For comparison: the RFC's recommend 4 non-persistent or 2 persistent
+        connections, older browsers used 2, newer ones (such as firefox 3)
+        typically use 6, and Opera uses 8 because like, they have the
+        fastest browser and give a shit for everybody else on the planet.
+
+    $AnyEvent::HTTP::PERSISTENT_TIMEOUT
+        The time after which idle persistent connections get closed by
+        AnyEvent::HTTP (default: 3).
+
+    $AnyEvent::HTTP::ACTIVE
+        The number of active connections. This is not the number of
+        currently running requests, but the number of currently open and
+        non-idle TCP connections. This number can be useful for
+        load-leveling.
+
+  SHOWCASE
+    This section contains some more elaborate "real-world" examples or code
+    snippets.
+
+  HTTP/1.1 FILE DOWNLOAD
+    Downloading files with HTTP can be quite tricky, especially when
+    something goes wrong and you want to resume.
+
+    Here is a function that initiates and resumes a download. It uses the
+    last modified time to check for file content changes, and works with
+    many HTTP/1.0 servers as well, and usually falls back to a complete
+    re-download on older servers.
+
+    It calls the completion callback with either "undef", which means a
+    nonretryable error occurred, 0 when the download was partial and should
+    be retried, and 1 if it was successful.
+
+       use AnyEvent::HTTP;
+
+       sub download($$$) {
+          my ($url, $file, $cb) = @_;
+
+          open my $fh, "+<", $file
+             or die "$file: $!";
+
+          my %hdr;
+          my $ofs = 0;
+
+          if (stat $fh and -s _) {
+             $ofs = -s _;
+             warn "-s is ", $ofs;
+             $hdr{"if-unmodified-since"} = AnyEvent::HTTP::format_date +(stat _)[9];
+             $hdr{"range"} = "bytes=$ofs-";
+          }
+
+          http_get $url,
+             headers   => \%hdr,
+             on_header => sub {
+                my ($hdr) = @_;
+
+                if ($hdr->{Status} == 200 && $ofs) {
+                   # resume failed
+                   truncate $fh, $ofs = 0;
+                }
+
+                sysseek $fh, $ofs, 0;
+
+                1
+             },
+             on_body   => sub {
+                my ($data, $hdr) = @_;
+
+                if ($hdr->{Status} =~ /^2/) {
+                   length $data == syswrite $fh, $data
+                      or return; # abort on write errors
+                }
+
+                1
+             },
+             sub {
+                my (undef, $hdr) = @_;
+
+                my $status = $hdr->{Status};
+
+                if (my $time = AnyEvent::HTTP::parse_date $hdr->{"last-modified"}) {
+                   utime $time, $time, $fh;
+                }
+
+                if ($status == 200 || $status == 206 || $status == 416) {
+                   # download ok || resume ok || file already fully downloaded
+                   $cb->(1, $hdr);
+
+                } elsif ($status == 412) {
+                   # file has changed while resuming, delete and retry
+                   unlink $file;
+                   $cb->(0, $hdr);
+
+                } elsif ($status == 500 or $status == 503 or $status =~ /^59/) {
+                   # retry later
+                   $cb->(0, $hdr);
+
+                } else {
+                   $cb->(undef, $hdr);
+                }
+             }
+          ;
+       }
+
+       download "http://server/somelargefile", "/tmp/somelargefile", sub {
+          if ($_[0]) {
+             print "OK!\n";
+          } elsif (defined $_[0]) {
+             print "please retry later\n";
+          } else {
+             print "ERROR\n";
+          }
+       };
+
+   SOCKS PROXIES
+    Socks proxies are not directly supported by AnyEvent::HTTP. You can
+    compile your perl to support socks, or use an external program such as
+    socksify (dante) or tsocks to make your program use a socks proxy
+    transparently.
+
+    Alternatively, for AnyEvent::HTTP only, you can use your own
+    "tcp_connect" function that does the proxy handshake - here is an
+    example that works with socks4a proxies:
+
+       use Errno;
+       use AnyEvent::Util;
+       use AnyEvent::Socket;
+       use AnyEvent::Handle;
+
+       # host, port and username of/for your socks4a proxy
+       my $socks_host = "10.0.0.23";
+       my $socks_port = 9050;
+       my $socks_user = "";
+
+       sub socks4a_connect {
+          my ($host, $port, $connect_cb, $prepare_cb) = @_;
+
+          my $hdl = new AnyEvent::Handle
+             connect    => [$socks_host, $socks_port],
+             on_prepare => sub { $prepare_cb->($_[0]{fh}) },
+             on_error   => sub { $connect_cb->() },
+          ;
+
+          $hdl->push_write (pack "CCnNZ*Z*", 4, 1, $port, 1, $socks_user, $host);
+
+          $hdl->push_read (chunk => 8, sub {
+             my ($hdl, $chunk) = @_;
+             my ($status, $port, $ipn) = unpack "xCna4", $chunk;
+
+             if ($status == 0x5a) {
+                $connect_cb->($hdl->{fh}, (format_address $ipn) . ":$port");
+             } else {
+                $! = Errno::ENXIO; $connect_cb->();
+             }
+          });
+
+          $hdl
+       }
+
+    Use "socks4a_connect" instead of "tcp_connect" when doing
+    "http_request"s, possibly after switching off other proxy types:
+
+       AnyEvent::HTTP::set_proxy undef; # usually you do not want other proxies
+
+       http_get 'http://www.google.com', tcp_connect => \&socks4a_connect, sub {
+          my ($data, $headers) = @_;
+          ...
+       };
+
+SEE ALSO
+    AnyEvent.
+
+AUTHOR
+       Marc Lehmann <schmorp@schmorp.de>
+       http://home.schmorp.de/
+
+    With many thanks to Дмитрий Шалашов, who provided countless testcases
+    and bugreports.
+

@@ -1,0 +1,48 @@
+Revision history for App-Iptables2Dot
+
+v0.2.4 Wed Apr 26 07:55:29 CEST 2017
+	- fixed GitHub issue #1
+	- added regression test
+	- changed option 'icmp-type=i' to 'icmp-type=s' in
+	  @App::Iptables2Dot::optdefs
+
+v0.2.3 2017-03-15
+	- fixed bug #120616
+	- added regression test
+	- added some more options to @App::Iptables2Dot::optdefs:
+	  comment=s, ctstate=s, gid-owner=s, notrack
+	- t/script-iptables2dot.t: Skip if missing Probe::Perl
+
+0.2.2 Fr 30. Jan 20:27:22 CET 2015
+	- added some more options to @App::Iptables2Dot::optdefs
+	- changed POD of bin/iptables2dot to (hopefully) make clearer
+	  that the program is best suited to get an overview over a set
+	  of iptables rules and only sometimes can be used directly for
+	  a detailed analysis
+
+0.2.1 Mi 28. Nov 21:39:19 CET 2012
+	- sort internal nodes to get predictable test results
+
+0.2.0 Wed Sep 19 21:13:45 CEST 2012
+	- added function App::Iptables2Dot::add_optdefs() to add options
+	  on the fly
+	- added command line option --add-optdef to iptables2dot to add
+	  options on the fly
+
+0.1.1 Tue Sep 18 00:11:40 CEST 2012
+	- added options provided by Michael Cottencin to
+	  @App::Iptables2Dot::optdefs
+
+0.1.0 Sat Jun 30 20:18:40 CEST 2012
+	- Use module App::Iptables2Dot to do the work (now better
+	  testable).
+	- Method read_iptables_file() handles file opening and closing.
+	- Don't show multiple jumps to a target with option
+	  C<showrules => 0,>. Instead show jump count as label.
+	- Ignore jump targets with option C<omittargets => 1,> suppresses
+	  output of given targets as nodes in the dot graph.
+	- Omit unused chains per default (can be show with option
+	  C<showunusednodes => 1,>
+
+0.0.1 Do 14. Jun 11:42:39 CEST 2012
+	- Initial release

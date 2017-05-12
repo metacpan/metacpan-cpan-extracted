@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/Acme/Teddy.pm
+MANIFEST
+README
+t/00.load.t
+t/teddytest-oo.t
+t/teddytest.t
+META.yml

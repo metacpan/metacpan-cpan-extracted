@@ -1,0 +1,81 @@
+TYPEMAP
+WCS *          T_PTROBJ_WCS
+StarCat  *     T_PTROBJ_StarCat
+Star  *        T_PTROBJ
+Tokens  *      T_PTROBJ
+TabTable  *    T_PTROBJ_TabTable
+Range  *       T_PTROBJ_Range
+Keyword *      T_PTROBJ
+byte *         T_BYTEP
+int *          T_INTP
+double *       T_DOUBLEP
+double **      T_DOUBLEPP
+char  *        T_STRING
+char  **       T_STRINGP
+float          T_FLOAT
+
+INPUT
+T_STRINGP
+	$var = ($type)packND($arg,TSTRING)
+T_BYTEP
+	$var = ($type)packND($arg,TBYTE)
+T_INTP
+	$var = ($type)packND($arg,TINT)
+T_DOUBLEP
+	$var = ($type)packND($arg,TDOUBLE)
+T_DOUBLEPP
+	croak(\"typemap file problem: T_DOUBLEPP without NO_INIT is unsupported\");
+T_STRING
+	{
+		if ( ! SvOK($arg) )
+			$var = ($type)NULL;
+		else
+			$var = ($type)SvPV($arg,PL_na);
+	}
+
+T_PTROBJ_WCS
+	if (sv_derived_from($arg, \"WCSPtr\"))
+	   $var = (WCS*)SvIV((SV*)SvRV($arg));
+        else
+            croak(\"$var is not of type WCSPtr\");
+
+T_PTROBJ_StarCat
+	if (sv_derived_from($arg, \"StarCatPtr\"))
+	   $var = (StarCat*)SvIV((SV*)SvRV($arg));
+        else
+            croak(\"$var is not of type StarCatPtr\");
+
+T_PTROBJ_TabTable
+	if (sv_derived_from($arg, \"TabTablePtr\"))
+	   $var = (TabTable*)SvIV((SV*)SvRV($arg));
+        else
+            croak(\"$var is not of type TabTablePtr\");
+
+T_PTROBJ_Range
+	if (sv_derived_from($arg, \"RangePtr\"))
+	   $var = (Range*)SvIV((SV*)SvRV($arg));
+        else
+            croak(\"$var is not of type RangePtr\");
+
+
+OUTPUT
+T_STRING
+	if ($var != NULL)
+		sv_setpv((SV *)$arg, $var);
+
+T_PTROBJ_WCS
+	if ($var != NULL)
+	        sv_setref_pv($arg, \"WCSPtr\", (void*)$var);
+
+T_PTROBJ_StarCat
+	if ($var != NULL)
+	        sv_setref_pv($arg, \"StarCatPtr\", (void*)$var);
+
+T_PTROBJ_TabTable
+	if ($var != NULL)
+	        sv_setref_pv($arg, \"TabTablePtr\", (void*)$var);
+
+T_PTROBJ_Range
+	if ($var != NULL)
+	        sv_setref_pv($arg, \"RangePtr\", (void*)$var);
+

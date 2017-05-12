@@ -1,0 +1,41 @@
+---
+abstract: 'Simple FIFO Callback Dispatch'
+author:
+  - 'Daisuke Maki.'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.0.53, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-FIFO
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  AnyEvent::FIFO:
+    file: lib/AnyEvent/FIFO.pm
+    version: 0.00003
+requires:
+  AnyEvent: 0
+resources:
+  bugtracker: https://github.com/lestrrat/AnyEvent-FIFO/issues
+  homepage: https://github.com/lestrrat/AnyEvent-FIFO
+  repository: git://github.com/lestrrat/AnyEvent-FIFO.git
+version: 0.00003
+x_contributors:
+  - 'kolya <mar.kolya@gmail.com>'
+  - 'Daisuke Maki <lestrrat+github@gmail.com>'

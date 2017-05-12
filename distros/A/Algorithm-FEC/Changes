@@ -1,0 +1,30 @@
+Revision history for Perl extension Algorithm::FEC
+
+1.1   Thu Nov 22 02:41:04 CET 2012
+	- apply fix for newer perl versions and additional testing patch by
+          Father Chrysostomos.
+
+1.0   Sun Dec 23 16:43:02 CET 2007
+	- more small doc fixes.
+        - fix a crash occuring while generating an error message.
+
+0.5   Mon Jun 21 15:06:15 CEST 2004
+	- check filesize and croak if mmap extends. also laid
+          the foundation for auto-extending short segments.
+        - small doc corrections by Jochen Stenzel.
+
+0.4   Sat Sep 13 23:59:10 CEST 2003
+	- INCOMPATIBLE CHANGE: added shuffle, changed;
+          semantics of shuffled indices. (yes, I am trying
+          to get this right :)
+
+0.03  Sat Sep 13 16:18:57 CEST 2003
+	- fix index ordering that decode returns.
+
+0.02  Wed Sep 10 01:11:03 CEST 2003
+	- removed funny "magic" that uses undefined u_long,
+          spotted by Autrijus Tang.
+
+0.01  Mon Sep  8 22:11:12 CEST 2003
+	- original version; cloned from Digest::Hashcash
+

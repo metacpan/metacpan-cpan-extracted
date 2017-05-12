@@ -1,0 +1,50 @@
+
+This is the Perl distribution App-FileTools-BulkRename.
+
+Installing App-FileTools-BulkRename is straightforward.
+
+## Installation with cpanm
+
+If you have cpanm, you only need one line:
+
+    % cpanm App::FileTools::BulkRename
+
+If you are installing into a system-wide directory, you may need to pass the
+"-S" flag to cpanm, which uses sudo to install the module:
+
+    % cpanm -S App::FileTools::BulkRename
+
+## Installing with the CPAN shell
+
+Alternatively, if your CPAN shell is set up, you should just be able to do:
+
+    % cpan App::FileTools::BulkRename
+
+## Manual installation
+
+As a last resort, you can manually install it. Download the tarball,
+untar it, then build and install it. 
+
+If you are installing into a system-wide directory, then:
+
+    % perl Makefile.PL
+    % make && make test
+    % sudo make install
+
+That last command may just be 'make install' depending on your privileges.
+
+If you are installing into a local directory, then
+
+    % perl Makefile.PL INSTALL_BASE=~
+    % make && make test
+    % make install
+
+This will install the executable into ~/bin, the man pages into ~/man
+and the needed library files into directories below ~/lib
+
+## Documentation
+
+App-FileTools-BulkRename documentation is available as POD.
+You can run perldoc from a shell to read the documentation:
+
+    % perldoc App::FileTools::BulkRename

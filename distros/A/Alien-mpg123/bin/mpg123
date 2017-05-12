@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+# PODNAME: mpg123
+# ABSTRACT: Command mpg123 of Alien-mpg123
+
+$|=1;
+
+use strict;
+use warnings;
+use File::ShareDir ':ALL';
+use Path::Class;
+
+my $abs = file(dist_dir('Alien-mpg123'),'bin','mpg123')->cleanup->absolute;
+
+exec($abs, @ARGV) or print STDERR "couldn't exec mpg123: $!";
+
+
+__END__
+=pod
+
+=head1 NAME
+
+mpg123 - Command mpg123 of Alien-mpg123
+
+=head1 VERSION
+
+version 0.002
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudss.us>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

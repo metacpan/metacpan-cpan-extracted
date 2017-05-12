@@ -1,0 +1,9 @@
+# perl_critic setup file
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME | SYNOPSIS | DESCRIPTION | DOCUMENTATION | SUBROUTINES/METHODS | BUGS AND LIMITATIONS | LICENSE AND COPYRIGHT | SUPPORT | AUTHOR  | SEE ALSO 
+script_sections = NAME | USAGE | OPTIONS | EXIT STATUS | AUTHOR
+
+[Documentation::PodSpelling]
+stop_words = AnnoCPAN CPAN CPAN's screenshots  eg vnc evilvte IRC textcast screencast textcasts telnetcast aewan vte perldoc
+

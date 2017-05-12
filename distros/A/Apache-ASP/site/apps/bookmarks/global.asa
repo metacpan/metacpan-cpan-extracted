@@ -1,0 +1,65 @@
+use File::Basename;
+use DBI;
+use DBD::CSV;
+
+use vars qw( $DarkColor $Name %Titles $FontBase $Db $Title $Basename $Form $Query );
+
+$DarkColor = '#0000aa';
+$Name = "MyBookmarks";
+%Titles = (
+	   'index.asp' => 'Introduction',
+	   'bookmarks.asp' => 'Viewer'
+	  );
+$FontBase = 'face=verdana,arial';
+
+$Db = DBI->connect("DBI:CSV:f_dir=".Apache->dir_config('StateDir'), '', '', 
+		   { RaiseError => 1 })
+  or die "Cannot connect: " . $DBI::errstr;
+
+# setup bookmark database if first time
+unless(eval { $Db->do("select bookmark_id,username,title,url from bookmarks") }) {
+    eval { $Db->do("drop table bookmarks"); };
+    $Db->do(<<CREATE) || die("can't create table $DBI::errstr");
+    create table bookmarks (
+			    bookmark_id varchar(15),
+			    username varchar(30),
+			    title varchar(60),
+			    url varchar(120)
+			   )
+CREATE
+  ;
+}
+
+$Db->do("select * from bookmarks")
+  || die("can't do select against bookmarks: $DBI::errstr");
+
+sub Script_OnStart {
+    $Basename = basename($0);
+    $Title = $Name.' / '.$Titles{$Basename};
+    $Response->Include('header.inc');
+    $Form = $Request->Form();
+    $Query = $Request->QueryString();
+    $Response->Expires(0);
+
+    # a user may logout from any script, destroy session, and go
+    # to login / intro page
+    if($Form->{logout}) {
+	$Session->Abandon();
+	$Response->Redirect("index.asp?abandon=".
+			    ++$Application->{abandon});
+    }
+}
+
+sub Script_OnEnd {
+    $Response->Include('footer.inc');
+}
+
+sub Application_OnStart {
+    # use max_bookmark_id as a pseudo sequence
+    $Application->Lock();
+    my $sth = $Db->prepare_cached
+      ("select bookmark_id from bookmarks order by bookmark_id desc");
+    $sth->execute();
+    $Application->{max_bookmark_id} = $sth->fetchrow_array();
+    $Application->UnLock();
+}

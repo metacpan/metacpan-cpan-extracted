@@ -1,0 +1,28 @@
+---
+abstract: 'parse an XSPEC model.dat file'
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  Data::Dumper: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Test::Exception: 0
+  Test::More: 0.94
+  perl: 5.004
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Astro-XSPEC-Model-Parse
+requires:
+  Carp: 0
+  IO::File: 0
+  Params::Validate: 0
+  Text::ParseWords: 0
+version: 0.01

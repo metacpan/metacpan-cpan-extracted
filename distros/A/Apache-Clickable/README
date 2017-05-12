@@ -1,0 +1,74 @@
+NAME
+    Apache::Clickable - Make URLs and Emails in HTML clickable
+
+SYNOPSIS
+      # in httpd.conf
+      <Location /clickable>
+      SetHandler perl-script
+      PerlHandler Apache::Clickable
+      </Location>
+
+      # filter aware
+      PerlModule Apache::Clickable
+      SetHandler perl-script
+      PerlSetVar Filter On
+      PerlHandler Apache::Clickable Apache::AntiSpam Apache::Compress
+
+DESCRIPTION
+    Apache::Clickable is a filter to make URLs in HTML clickable. With
+    URI::Find and Email::Find, this module finds URL and Email in HTML
+    document, and automatically constructs hyperlinks for them.
+
+    For example,
+
+      <body>
+      Documentation is available at http://www.foobar.com/ freely.<P>
+      someone@foobar.com  
+      </body>
+
+    This HTML would be filtered to:
+
+      <body>
+      Documentation is available at <a href="http://www.foobar.com/">http://www.foobar.com</a> freely.<P>
+      <a href="mailto:someone@foobar.com">someone@foobar.com</a>
+      </body>
+
+    This module is Filter aware, meaning that it can work within
+    Apache::Filter framework without modification.
+
+CONFIGURATION
+      PerlSetVar ClickableTarget _blank
+      PerlSetVar ClickableEmail Off
+
+    ClickableTarget
+          PerlSetVar ClickableTarget _blank
+
+        specifies target window name of hyperlinks. If set "_blank" for
+        example, it filters to:
+
+          <a href="http://www.foobar.com/" target="_blank">http://www.foobar.com/</a>
+
+        None by default.
+
+    ClickableEmail
+          PerlSetVar ClickableEmail Off
+
+        specifies whether it makes email clickable. On by default. See the
+        Apache::AntiSpam manpage for more.
+
+TODO
+    *   Configurable hyperlink construction using subclass.
+
+    *   Currently, this module requires HTML::Parser, not to make duplicate
+        hyperlinks. Maybe this can be done without HTML::Parser.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Apache::Filter manpage, the Apache::AntiSpam manpage, the URI::Find
+    manpage, the Email::Find manpage, the HTML::Parser manpage
+

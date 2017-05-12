@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache::WebDAV.
+
+0.01  Fri May  5 10:28:39 2006
+	- original version; created by h2xs 1.22 with options
+		-X -n Apache::WebDAV
+

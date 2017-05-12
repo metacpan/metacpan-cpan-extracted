@@ -1,0 +1,40 @@
+---
+abstract: 'for enabling it to treat simply'
+author:
+  - 'meru_akimbo <merukatoruayu0@gmail.com>'
+build_requires:
+  Amon2: '0'
+  Test::More: '0.98'
+  Test::RedisServer: '0'
+  parent: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amon2-Plugin-Redis
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Amon2::Plugin::Redis:
+    file: lib/Amon2/Plugin/Redis.pm
+    version: '0.04'
+requires:
+  Redis: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/meru-akimbo/Amon2-Plugin-Redis/issues
+  homepage: https://github.com/meru-akimbo/Amon2-Plugin-Redis
+  repository: git://github.com/meru-akimbo/Amon2-Plugin-Redis.git
+version: '0.04'

@@ -1,0 +1,130 @@
+Revision history for App-cpanminus-reporter
+
+0.17 2016-04-24
+    BUG FIXES:
+        - fixed support for extended paths on Windows
+          (thanks Mithaldu and Sinan Unur)
+
+0.16 2016-04-24
+    NEW FEATURES:
+        - exposes extra environment variables
+    OTHER:
+        - bumping up CTCC dependency
+        - minor refactoring
+
+0.15 2016-04-24
+    BUG FIXES:
+        - updated dependencies
+
+0.14 2016-04-23
+    NEW FEATURES:
+        - support for cpanm --installdeps .
+        - local installations are just skipped now, instead of aborting the
+          entire thing.
+    BUG FIXES:
+        - improving the parser so it handles UNKNOWN/NA outputs properly
+          (distributions with no tests, etc).
+        - support for explicit NOTESTS results.
+        - reports are skipped when current/tested
+          perl versions mismatch (Michael LaGrasta)
+        - added minimal perl version (Michael LaGrasta)
+    OTHER:
+        - improved some error messages with likely diagnostics.
+        - significantly increased test coverage.
+
+0.13  2015-04-19
+    NEW FEATURES:
+      - now cpanm-reporter understands the history file from other
+        CPAN Testers' clients! It should work seamlessly, and you
+        can disable it by passing the '--skip-history' (GARU)
+
+0.12  2015-01-05
+    NEW FEATURES:
+      - new "--dry-run" option (PLICEASE)
+
+    BUG FIXES:
+      - supporting HTTPS (PLICEASE)
+
+0.11  2014-06-24
+    BUG FIXES:
+      - Github #11 - Proper handling of vstrings on parser log (KENTNL)
+      - Ignoring modules from the LOCAL user (PLICEASE)
+      - Ignoring modules from the 'Local::' namespace (ETHER)
+      - Avoid 'deep recursion' warning
+
+    OTHER:
+      - several more tests written.
+      - documenting PERL_MM_USE_DEFAULT behaviour on prompts.
+
+0.10  2013-07-16
+    NEW FEATURES:
+      - new command line option, 'only' to enable just one
+        dist, or a group of comma-separated dists, for reporting (BBUSS)
+      - new command line option, 'exclude' to disable a dist, or
+        a group of comma-separated dists, for reporting (BBUSS)
+
+    BUG FIXES:
+      - works even on systems that don't support symlinks.
+
+    OTHER:
+      - catch errors happening when trying to send the report, showing
+        a nice error message instead of a confusing trace (BBUSS)
+
+0.09  2013-05-18
+    BUG FIXES:
+      - prevents prompt from being affected by PERL_MM_USE_DEFAULT
+        (thanks Marcel "hanekomu" Grünauer for reporting!)
+
+    OTHER:
+      - Metabase transport now marked as a dependency (previously it was
+        only a recommendation). Some clients do not trust recommendations
+        and the vast majority of cpanm-reporter users are probably
+        sending stuff via Metabase anyway, so I rather "punish" the
+        minority with an extra dependency than the majority with a runtime
+        error :)
+      - improved docs
+
+0.08  2013-05-09
+    BUG FIXES:
+      - forced CTCC 0.06 to avoid Metabase id_file issues
+
+0.07  2013-05-08
+    NEW FEATURES:
+      - new '--setup' option that configures and updates your CPAN Testers
+        data for you, just like CPAN::Reporter does for 'cpan'!
+        (this fixes RT#84799 and Github#2, thanks Maurice Mengel and Boris
+         Däppen for reporting!)
+
+    BUG FIXES:
+      - fixed RT#84979 where cpanm-reporter crashed when the build.log file
+        could not be found (thanks Nathan Glenn for reporting!)
+      - recommends installing Test::Reporter::Transport::Metabase as well,
+        since almost all testers want to report directly to the CPAN Testers
+        servers. Fixes RT#84794 (thanks Mark Lawrence for reporting!)
+      - forces dependency on version 0.05 of CPAN::Testers::Common::Client,
+        which fixes RT#85112 (thanks Lars for reporting!)
+
+    OTHER:
+      - updated docs :)
+
+0.06  2013-04-18
+      - fixed issue where cpanm-reporter sometimes failed to
+        find the user's metabase_id.json file (thanks aero
+        and wizonesolutions for reporting)
+
+0.05  2013-04-17
+      - Added missing deps
+
+0.04  2013-04-17
+      - version requirement for CPAN::Testers::Common::Client
+
+0.03  2013-04-16
+      - App is now a bit more verbose, but has a --quiet option
+      - Added missing dep (File::stat)
+
+0.02  2013-04-15
+      - Better placement of TOCTOU caveat warning
+
+0.01  2013-04-15
+      - Initial release.
+

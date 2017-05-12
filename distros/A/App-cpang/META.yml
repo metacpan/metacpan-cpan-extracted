@@ -1,0 +1,24 @@
+---
+abstract: 'CPAN GUI in Gtk2'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102340, CPAN::Meta::Converter version 2.101610'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-cpang
+requires:
+  Glib: 0
+  Gnome2::Vte: 0
+  Gtk2: 0
+version: 0.03

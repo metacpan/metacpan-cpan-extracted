@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution AnyEvent-Digest,
+version v0.0.5:
+
+  A tiny AnyEvent wrapper for Digest::*
+
+This software is copyright (c) 2013 by Yasutaka ATARASHI.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

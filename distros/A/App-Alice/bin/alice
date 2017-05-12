@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use FindBin;
+
+BEGIN {
+  # running from source dir
+  if (-e "$FindBin::Bin/../lib/App/Alice") {
+    require lib;
+    lib->import("$FindBin::Bin/../lib");
+    # extlib present
+    if (-e "$FindBin::Bin/../extlib") {
+      lib->import("$FindBin::Bin/../extlib/lib/perl5");
+      require local::lib;
+      local::lib->import("$FindBin::Bin/../extlib");
+    }
+  }
+  require App::Alice;
+}
+
+$0 = "aliced\0";
+binmode(STDERR, ":utf8");
+binmode(STDOUT, ":utf8");
+  
+App::Alice->new->run;

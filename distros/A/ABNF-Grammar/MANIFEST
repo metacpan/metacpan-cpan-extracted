@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/ABNF-Grammar.t
+t/ABNF-Validator.t
+t/ABNF-Generator-Liar.t
+t/ABNF-Generator-Honest.t
+t/data/test.abnf
+lib/ABNF/Grammar.pm
+lib/ABNF/Validator.pm
+lib/ABNF/Generator.pm
+lib/ABNF/Generator/Liar.pm
+lib/ABNF/Generator/Honest.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,8 @@
+- improve OOP interfase
+- Add tests for the solutions and new functionalities
+- solutions: give the option to choose just one solution or all
+- get and set accessors using AUTOLOAD
+- WriteKnap
+- scripts
+- document
+- Makefile.PL

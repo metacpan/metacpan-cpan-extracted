@@ -1,0 +1,307 @@
+2013-06-11  rocky <rocky@cpan.org>
+
+	* ChangeLog, GNUmakefile, lib/Array/Columnize.pm,
+	lib/Array/Columnize/columnize.pm: Podify columnize.pm. Work around a
+	rlib limitation. Get ready for release 1.03
+
+2013-06-10  rocky <rocky@cpan.org>
+
+	* Changes, lib/Array/Columnize/columnize.pm: Ooops- spurious extra
+	"usr rlib"
+
+2013-06-10  rocky <rocky@cpan.org>
+
+	* Changes, lib/Array/Columnize.pm,
+	lib/Array/Columnize/columnize.pm, lib/Array/Columnize/options.pm: 
+	Work around a rlib limitation
+
+2013-03-02  rocky <rocky@cpan.org>
+
+	* Build.PL, META.yml, lib/Array/Columnize.pm: rlib is only needed in
+	testing
+
+2012-08-19  rocky <rocky@cpan.org>
+
+	* ChangeLog: What's up.
+
+2012-08-19  rocky <rocky@cpan.org>
+
+	* Build.PL, Changes, lib/Array/Columnize.pm: Get ready for 1.02
+	release
+
+2012-08-16  rocky <rocky@cpan.org>
+
+	* lib/Array/Columnize.pm: puts -> print. This is not Ruby.
+
+2012-08-16  rocky <rocky@cpan.org>
+
+	* lib/Array/Columnize.pm: Remove extra \n's in perlpod. We don't
+	need them any more.
+
+2012-08-14  rocky <rocky@cpan.org>
+
+	* lib/Array/Columnize.pm: Update bug tracker location
+
+2012-08-14  rocky <rocky@cpan.org>
+
+	* Build.PL, ChangeLog, README.md, lib/Array/Columnize.pm: Doc
+	formatting on last example. Bump version number and updated
+	ChangeLog.
+
+2012-08-13  rocky <rocky@cpan.org>
+
+	* META.yml: Add version of perl and bump version.
+
+2012-08-13  rocky <rocky@cpan.org>
+
+	* Build.PL, Changes, README.md, eg/example.pl,
+	lib/Array/Columnize.pm, lib/Array/Columnize/columnize.pm,
+	lib/Array/Columnize/options.pm, t/02.options.t, t/04.columnize.t,
+	t/05.longcol.t, t/Makefile: Add option arrange_array to format data
+	as an array. Use rlib more pervasively; is a package require ot now
+	silence smoker failures. Add t/Makefile for my convenience.
+
+2012-08-13  rocky <rocky@cpan.org>
+
+	* .gitignore, Build.PL, ChangeLog, Changes, MANIFEST,
+	MANIFEST.SKIP, META.yml, eg/example.pl, lib/Array/Columnize.pm,
+	t/00.test-pod.t: Various changes for kwality - not to be confused
+	with real quality.
+
+2012-08-11  rocky <rocky@cpan.org>
+
+	* .gitignore, Build.PL: rlib is only needed in testing.
+
+2012-08-11  rocky <rocky@cpan.org>
+
+	* Changes, lib/Array/Columnize.pm: Columnize.pm: Correct examples in
+	pod. I said, use github's issue tracker. Changes: what's up.
+
+2012-08-11  rocky <rocky@cpan.org>
+
+	* Build.PL, lib/Array/Columnize.pm: Change version according to
+	http://perldoc.perl.org/perlmodstyle.html#Version-numbering. Add
+	github for repository and issue tracker.
+
+2012-01-05  rocky <rocky@cpan.org>
+
+	* Build.PL, Changes, META.yml: Add min version on Test::More
+
+2011-12-25  rocky <rocky@cpan.org>
+
+	* Build.PL, lib/Array/Columnize.pm: Don't use ExtUtils::PkgConfig.
+	Go for minimum Module::Build.
+
+2011-12-03  rocky <rocky@cpan.org>
+
+	* Changes, META.yml, lib/Array/Columnize.pm: Get ready for release
+	4.1
+
+2011-11-29  rocky <rocky@cpan.org>
+
+	* MANIFEST, META.yml, lib/Array/Columnize.pm, t/04.columnize.t: Try
+	to make CPANTS from bitching.
+
+2011-11-24  rocky <rocky@cpan.org>
+
+	* ChangeLog, Changes, lib/Array/Columnize.pm: Get ready for 0.4.0
+	release
+
+2011-11-24  rocky <rocky@cpan.org>
+
+	* lib/Array/Columnize/columnize.pm, t/05.longcol.t: More
+	exceeded-line testing.
+
+2011-11-24  rocky <rocky@cpan.org>
+
+	* lib/Array/Columnize/columnize.pm, t/05.longcol.t: One more
+	situation where we have a long column.
+
+2011-11-20  rocky <rocky@cpan.org>
+
+	* : commit 6fb32d8567a0da6729d63eacf0669e4aacb9c7aa Author: rocky
+	<rocky@cpan.org> Date:   Sun Nov 20 22:12:33 2011 -0500
+
+2011-11-20  rocky <rocky@cpan.org>
+
+	* : commit f7687c20a230e60931a76a542665ac29fcce2843 Author: rocky
+	<rocky@cpan.org> Date:   Sun Nov 20 22:08:00 2011 -0500
+
+2011-11-13  rocky <rocky@cpan.org>
+
+	* GNUmakefile: Add installdeps target
+
+2011-11-12  rocky <rocky@cpan.org>
+
+	* META.yml: Meta changed
+
+2011-11-12  rocky <rocky@cpan.org>
+
+	* Build.PL, ChangeLog, Changes, GNUmakefile, MANIFEST,
+	lib/Array/Columnize.pm: Get ready for 0.3.9 release
+
+2011-11-06  rocky <rocky@cpan.org>
+
+	* Build.PL, GNUmakefile, MANIFEST, Makefile.devel: Makefile.devel ->
+	GNUmakefile is more user-friendly. Document MANFIEST files. Put back
+	shbang in Build.PL.
+
+2011-10-29  rocky <rocky@cpan.org>
+
+	* Makefile.devel: Clean up after patch files.
+
+2011-10-29  rocky <rocky@cpan.org>
+
+	* Changes, META.yml, README.md, lib/Array/Columnize.pm: 
+	Columnize.pm: fill in POD from README.md README.md: correct a couple
+	of typos Changes: Did I catch everything Shlomi?
+
+2011-10-29  R. Bernstein <rocky.bernstein@gmail.com>
+
+	* : Merge pull request #1 from shlomif/master Some fixes for the module's outstanding issues
+
+2011-10-29  Shlomi Fish <shlomif@iglu.org.il>
+
+	* lib/Array/Columnize.pm: Add some rudimentary POD.  To lib/Array/Columnize.pm.
+
+2011-10-29  Shlomi Fish <shlomif@iglu.org.il>
+
+	* Changes, README.md: Fix typos in the README.
+
+2011-10-29  Shlomi Fish <shlomif@iglu.org.il>
+
+	* lib/Array/Columnize.pm: Removed a sha-bang from a .pm file.  It's not needed there, and editors should recognise .pm files as
+	Perl 5 code if configured correctly.
+
+2011-10-29  Shlomi Fish <shlomif@iglu.org.il>
+
+	* Changes, MANIFEST, MANIFEST.SKIP, Makefile, Makefile.devel: 
+	Makefile -> Makefile.devel and MANIFEST.SKIP.
+
+2011-10-29  Shlomi Fish <shlomif@iglu.org.il>
+
+	* Build.PL, Changes: Add the PERL_MB_NOSIGN env var.  This is to disable signing a package.
+
+2011-10-29  Shlomi Fish <shlomif@iglu.org.il>
+
+	* Build.PL, META.yml: Made Build.PL non-executable.  See: http://cpants.perl.org/kwalitee.html#buildtool_not_executable for why.
+
+2011-10-28  rocky <rocky@cpan.org>
+
+	* Build.PL, lib/Array/Columnize.pm: build_requires =>
+	configure_requires
+
+2011-10-28  rocky <rocky@cpan.org>
+
+	* Build.PL, Changes, META.yml, lib/Array/Columnize.pm,
+	lib/Array/Columnize/columnize.pm: Get ready for 0.37
+
+2011-10-27  rocky <rocky@cpan.org>
+
+	* MANIFEST, META.yml: I said release v.0.3.6 please!
+
+2011-10-27  rocky <rocky@cpan.org>
+
+	* Build.PL, Changes, META.yml, lib/Array/Columnize/columnize.pm: Get
+	ready for release v0.3.6. This time, for sure!
+
+2011-10-27  rocky <rocky@cpan.org>
+
+	* .gitignore, Build.PL, MANIFEST, MANIFEST.SKIP, META.yml: Get ready
+	for v0.3.6
+
+2011-10-22  rocky <rocky@cpan.org>
+
+	* lib/Array/Columnize.pm, lib/Array/Columnize/columnize.pm: Remove
+	use of "say" so we can use Perl before version 5.10.
+
+2011-09-10  rocky <rocky@cpan.org>
+
+	* MANIFEST: Remove Makefile.PL; we provide our own compatibility
+	Makefile.
+
+2011-09-10  rocky <rocky@cpan.org>
+
+	* MANIFEST, META.yml, Makefile, lib/Array/Columnize.pm: I said no
+	"\n at end of returned string.
+
+2011-09-10  rocky <rocky@cpan.org>
+
+	* : I hate conflicted merges
+
+2011-09-10  rocky <rocky@cpan.org>
+
+	* : commit a4610f53ac49aa3e5c718c6f49c9d3d1fd627992 Author: rocky
+	<rocky@cpan.org> Date:   Sat Sep 10 07:42:52 2011 -0400
+
+2011-09-05  rocky <rocky@cpan.org>
+
+	* lib/Array/Columnize/columnize.pm, t/04.columnize.t: Remove
+	trailing newlines in returned string. Folks can add that if they
+	want.
+
+2011-08-24  rocky <rocky@cpan.org>
+
+	* : commit c944e21329b71f23874143749bf8553847388694 Author: rocky
+	<rocky@cpan.org> Date:   Sun Aug 21 19:10:54 2011 -0400
+
+2011-08-21  rocky <rocky@cpan.org>
+
+	* lib/Array/Columnize/columnize.pm, t/04.columnize.t: Get some of
+	the vertical tests working
+
+2011-08-14  rocky <rocky@cpan.org>
+
+	* Build.PL: Remove spurious "Device" in module name
+
+2011-08-08  rocky <rocky@cpan.org>
+
+	* .gitignore, MANIFEST, MANIFEST.SKIP, Makefile, README.md,
+	lib/Array/Columnize/Makefile, lib/Array/Columnize/columnize.pm: 
+	Correct README.md. Add Makefiles for compatibility.
+
+2011-08-07  rocky <rocky@cpan.org>
+
+	* lib/Array/Columnize/options.pm: Don't use "use" for demo code as
+	it takes effect at compile time. E.g.  don't necessarily want to
+	pull in Data::Dumper if we don't have to.  (However in the
+	full-blown debugger it will probably be there.)
+
+2011-08-07  rocky <rocky@cpan.org>
+
+	* lib/Array/Columnize/options.pm: Simplify
+
+2011-08-07  rocky <rocky@cpan.org>
+
+	* lib/Array/Columnize/options.pm: Add DEFAULT_OPTS has to make a
+	little more like Ruby with its Hash#merge method.
+
+2011-08-07  rocky <rocky@cpan.org>
+
+	* Build.PL: Don't need a compiler for this package
+
+2011-08-07  rocky <rocky@cpan.org>
+
+	* README.md: Tidy README
+
+2011-08-07  rocky <rocky@cpan.org>
+
+	* MANIFEST, README, README.md: Convert README to markdown.
+
+2011-08-07  rocky <rocky@cpan.org>
+
+	* .gitignore, Build.PL, MANIFEST, META.yml, README,
+	lib/Array/Columnize.pm, lib/Array/Columnize/version.pm,
+	t/01.version.t: Package Administrivia.
+
+2011-08-07  rocky <rocky@cpan.org>
+
+	* lib/Array/Columnize/columnize.pm, t/.gitignore, t/04.columnize.t: 
+	Towards getting tests to work. Some progress made in formatting
+	horizontally.
+
+2011-08-07  rocky <rocky@cpan.org>
+
+	* Initial commit of port of Ruby Columnize.  Have a bug in listing
+	horizontally. Need to port test and package this.
+

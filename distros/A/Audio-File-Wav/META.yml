@@ -1,0 +1,21 @@
+---
+abstract: 'represents a Microsoft WAV audio file'
+author:
+  - 'Nathaniel Heinrichs <nheinric@cpan.org>'
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Audio-File-Wav
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Audio::File: 0
+  Audio::Wav: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01a

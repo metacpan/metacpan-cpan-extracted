@@ -1,0 +1,9 @@
+
+Add configuration options like in mod_extract_forwarded
+ - block spec for accept/remove hosts
+ - cache headers per mod_extract_forwarded
+
+Possibly use configuration directives.
+Runtime setting of trace
+
+

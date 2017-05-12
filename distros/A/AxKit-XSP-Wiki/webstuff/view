@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<xspwiki xmlns:wiki="http://axkit.org/NS/xsp/wiki/1"
+      xmlns:xsp="http://apache.org/xsp/core/v1"
+      xmlns:comment="http://axkit.org/NS/xsp/comments/1"
+      xmlns:cookie="http://axkit.org/NS/xsp/cookie/v1"
+>
+    <xsp:logic>
+      my $path_info = $r->path_info;
+      
+      my $dbroot = $r->dir_config('WikiDBRoot') || die "No DB root specified!";
+      my $default_db = $r->dir_config( 'WikiDB' ) || 'AxKit';
+      my $default_page = $r->dir_config( 'DefaultPage' ) || 'DefaultPage';
+      $AxKit::XSP::Wiki::EmailAlerts = $r->dir_config('WikiEmailTo');
+      my $uri = $r->uri;
+      
+      my ($db, $page) = AxKit::XSP::Wiki::extract_page_info($path_info);
+
+      if (!$db) {
+        $r->header_out(Location => "$uri/$default_db/$default_page");
+	return 302;
+      }
+      if (!$page) {
+        $r->header_out(Location => "$uri/$db/$default_page");
+	return 302;
+      }
+      
+      my $action = $cgi->param('action') || 'view';
+      $action = 'preview' if $cgi->param('preview');
+      my $id = $cgi->param('id');
+      if ($id !~ /^\d*$/) {
+        die "Invalid id format";
+      }
+      
+      if ($action eq 'search') {
+       <xsp:content>
+        <page><xsp:expr>$page</xsp:expr></page>
+        <db><xsp:expr>$db</xsp:expr></db>
+        <main-content>
+        <wiki:search>
+          <wiki:dbpath><xsp:expr>$dbroot</xsp:expr></wiki:dbpath>
+          <wiki:db><xsp:expr>$db</xsp:expr></wiki:db>
+          <wiki:query><xsp:expr>$cgi->param('q')</xsp:expr></wiki:query>
+        </wiki:search>
+        </main-content>
+       </xsp:content>
+      }
+      else {
+      <xsp:content>
+	<page><xsp:expr>$page</xsp:expr></page>
+        <db><xsp:expr>$db</xsp:expr></db>
+        <main-content>
+        <wiki:display-page>
+          <wiki:dbpath><xsp:expr>$dbroot</xsp:expr></wiki:dbpath>
+          <wiki:db><xsp:expr>$db</xsp:expr></wiki:db>
+	  <wiki:page><xsp:expr>$page</xsp:expr></wiki:page>
+          <wiki:action><xsp:expr>$action</xsp:expr></wiki:action>
+          <wiki:id><xsp:expr>$id</xsp:expr></wiki:id>
+        </wiki:display-page>
+        </main-content>
+      </xsp:content>
+      }
+      
+    </xsp:logic>
+
+</xspwiki>

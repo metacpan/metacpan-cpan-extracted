@@ -1,0 +1,54 @@
+{
+   "abstract" : "Perl extension to get info from MP4 files.",
+   "author" : [
+      "Simon Wistow, E<lt>simon@thegestalt.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AudioFile-Info-MP4-Info",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "YAML" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "YAML" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AudioFile::Info" : 0,
+            "MP4::Info" : 0,
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "AudioFile::Info::Build" : {
+         "file" : "lib/AudioFile/Info/Build.pm",
+         "version" : 0
+      },
+      "AudioFile::Info::MP4::Info" : {
+         "file" : "lib/AudioFile/Info/MP4/Info.pm",
+         "version" : "0.6"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.6"
+}

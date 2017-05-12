@@ -1,0 +1,12 @@
+0.004     2017-02-20 14:15:44 EST
+  - Skip autoloading DESTROY method, instead of installing one
+
+0.003     2017-02-20 13:47:55 EST
+  - Only invoke a code dereference overload once if returned by AUTOCAN
+
+0.002     2017-02-20 01:50:33 EST
+  - Handle cases where AUTOCAN may return blessed objects with underlying
+    coderefs or code dereference overloads
+
+0.001     2017-02-19 20:49:18 EST
+  - First release

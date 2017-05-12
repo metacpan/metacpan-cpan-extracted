@@ -1,0 +1,134 @@
+Changes log for App-Maisha
+==========================
+
+0.21    2014-09-09
+        - added mock skips for plugin tests.
+        - added configuration skips if config loaders not installed.
+
+0.20    2014-09-01
+        - fixed license fields in META.json to be lists.
+        - fixed distribution name in Makefile.PL.
+        - extended test suite.
+        - clean up method returns.
+        - added current year to copyright notice for 'about' command.
+        - Test::Effects and Devel::Cover don't work together, so moving new
+          run_methods test script to /xt/ directory, and reverting original
+          script back to eval tests.
+        - added config tests and data.
+
+0.19    2014-05-16
+        - added LICENSE file.
+        - fixed distribution name in META.
+        - META resources update.
+
+0.18    2012-10-14
+        - set permissions on secret files (thanks to Colin Newell).
+        - added Search API.
+        - fixed timeline/list pagination and limits.
+        - added reauthorize functionality to allow for the higher permissions
+          Maisha needs to access direct messages.
+
+0.17    2012-10-14
+        - POD updates ... never liked how POD forces double newlines for
+          bullet-point lists. (thanks to Mario Domgoergen).
+
+0.16    2012-10-14
+        - spelling fix. (thanks to Florian Schlichting & Gregor Herrmann).
+        - added =encoding to POD.
+        - reworked Makefile.PL for clarity.
+        - License updated to Artistic License v2.0.
+        - added minimum perl version (5.006).
+        - META tests no longer require specific versions.
+        - change file dates changed to meet W3CDTF standards.
+        - implemented Perl::Critic suggestions.
+        - added login and connection protection.
+        - added debug feature for more verbose error messages.
+        - added command history storage functionality.
+        - fixed repeated network lines with help command.
+        - added initial lines to help messages.
+        - always use internal pager (RT#61433).
+        - extend time/date formats.
+        - added regular command protection.
+        - updated Net::Twitter API commands.
+        - Now requires Net-Twitter-3.18003.
+        - updated tests.
+
+0.15    2010-09-26
+        - added OAuth support to Identica access.
+        - added better protection for failing commands.
+        - removed password from example settings.
+        - updated tests.
+        - Now requires Net-Twitter-3.13009.
+
+0.14    2010-09-11
+        - documentation fix for INI format example (thanks to Alan Haggai Alavi).
+        - rewrite to Twitter.pm to use OAuth mechanism for logging in.
+        - interface to plugins changed, now passes a config hash.
+        - config hash now saves the home directory.
+        - added META.json file and associated test.
+
+0.13    2009-08-20
+        - fixed requests with limits larger than 20.
+        - suppressing 'command ok' messages.
+        - refactored common code in to new functions
+        - added user completion functionality.
+
+0.12    2009-02-27
+        - various documentation updates.
+        - timelines are filtered through a pager (RR)
+        - added completion for use command (RR)
+        - fixed bug with configured message limits.
+        - added user defined message formatting
+        - added user defined terminal character width
+
+        RR = Robert Rothenberg. Many thanks for the patches and ideas Rob.
+
+0.11    2009-02-18
+        - improved META.yml testing in 94metatest.t.
+        - added plugin check for 'use' command.
+        - fixed send_message and update so that single quotes are accepted, as
+          Term::Shell was stripping them out :(
+        - added 92disttest.t and 95changedate.t tests to the suite.
+        - added Text::Wrap at Rob Rothenberg's suggestion to more neatly wrap
+          the messages and replies listings.
+
+0.10    2009-02-17
+        - somethimes I'm just too eager. META.yml now updated too!
+
+0.09    2009-02-17
+        - added README to MANIFEST.
+        - document changes.
+
+0.08    2009-02-17
+        - added about and version methods to the shell.
+        - removed follow/unfollow from Identica plugin, as they are not
+          supported.
+        - more tests.
+
+0.07    2009-02-17
+        - various documentation updates.
+        - more tests
+        - provided more example configuration files.
+
+0.06    2009-02-16
+        - default configuration file name and location changed. Thanks to Rob
+          Rothenberg for the suggestion.
+        - added dependencies used by maisha script.
+
+0.05    2009-02-16
+        - fixed Test::CPAN::Meta dependency, as spotted by Dave Cross.
+
+0.04    2009-02-15
+        - added missing README.
+
+0.03    2009-02-14
+        - bugfix: missing prerequisite :(
+
+0.02    2009-02-14
+        - bugfix: a follower/friend may not have sent a status update.
+        - minor UI improvement for command ok messages.
+        - added commands 'user' and 'user_timeline'
+        - added commands 'follow' and 'unfollow'
+
+0.01    2009-02-13
+        - Initial release.

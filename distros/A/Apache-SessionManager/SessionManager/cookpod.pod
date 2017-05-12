@@ -1,0 +1,1420 @@
+=pod
+
+=head1 NAME
+
+Apache::SessionManager::cookpod - Session management Cookpod with
+Apache::SessionManager
+
+=head1 INTRODUCTION
+
+This HOWTO describes use of L<Apache::SessionManager|Apache::SessionManager>
+with several application servers  and toolkits available designed to run (also)
+under mod_perl. There are many ways to do it; this document will not describe
+all possible configurations.
+
+=head1 WHAT DOES Apache::SessionManager DO
+
+L<Apache::SessionManager|Apache::SessionManager> is a HTTP session manager
+wrapper around L<Apache::Session|Apache::Session>
+(L<Apache::Session|Apache::Session> provides a persistence mechanism for data
+associated with a session  between a client and the server).
+
+L<Apache::SessionManager|Apache::SessionManager> allows you to integrate a
+transparent session management into your web application (it handles for you
+the cookie/URI session tracking management).
+
+A session is a set of interactions (HTTP transactions).  For example, a visitor
+may add items to be purchased to a shopping cart and the  contents of the cart
+may be made visible by several different pages the visitor views  during the
+purchase process.
+
+=head1 Apache::SessionManager WITH CGI::Application
+
+=head2 INTRODUCTION
+
+This section describes how to use
+L<Apache::SessionManager|Apache::SessionManager> within
+L<CGI::Application|CGI::Application>. The idea is to use sublass
+L<CGI::Application|CGI::Application> by adding session support and to use 
+CGI::Application::SessionManager as base class for your applications.
+
+L<CGI::Application|CGI::Application> is intended to make it easier to create
+sophisticated,  reusable web-based applications.  
+
+L<CGI::Application|CGI::Application> is an Object-Oriented Perl module which
+implements an Abstract Class. It is not intended that this package be
+instantiated directly. Instead, it is intended that your Application Module
+will be  implemented as a Sub-Class of L<CGI::Application|CGI::Application>.
+
+=head2 CONFIGURATION
+
+This section illustrates how to use configure
+L<Apache::SessionManager|Apache::SessionManager> for use within
+L<CGI::Application|CGI::Application> Perl extension.
+
+=head3 CONFIGURATION VIA F<httpd.conf>
+
+In F<httpd.conf> (or any files included by the C<Include> directive):
+
+   <IfModule mod_perl.c>
+
+      PerlModule Apache::SessionManager
+      PerlTransHandler Apache::SessionManager
+
+      Alias /cgi-application "/usr/local/apache/cgi-application"
+      <Location /cgi-application>
+         SetHandler perl-script
+         PerlHandler Apache::Registry
+         PerlSendHeader On
+         PerlSetupEnv   On
+         Options ExecCGI
+
+         PerlSetVar SessionManagerTracking On
+         PerlSetVar SessionManagerExpire 90
+         PerlSetVar SessionManagerInactivity 900
+         PerlSetVar SessionManagerName CGIAPPSESSIONID
+         PerlSetVar SessionManagerStore File
+         PerlSetVar SessionManagerStoreArgs "Directory => /tmp/apache_session_data/cgiapp"
+         PerlSetVar SessionManagerDebug 5
+      </Location>   
+
+   </IfModule>   
+
+=head3 CONFIGURATION VIA F<.htaccess>
+
+In the case you don't have access to F<httpd.conf>, you can put similar
+directives  directly into an F<.htaccess> file:
+
+   <IfModule mod_perl.c>
+      <FilesMatch "\.cgi$">
+         SetHandler perl-script
+         PerlHandler Apache::Registry
+         PerlSendHeader On
+         PerlSetupEnv   On
+         Options ExecCGI
+
+         PerlHeaderParserHandler Apache::SessionManager
+
+         PerlSetVar SessionManagerTracking On
+         PerlSetVar SessionManagerExpire 90
+         PerlSetVar SessionManagerInactivity 900
+         PerlSetVar SessionManagerName CGIAPPSESSIONID
+         PerlSetVar SessionManagerStore File
+         PerlSetVar SessionManagerStoreArgs "Directory => /tmp/apache_session_data/cgiapp"
+         PerlSetVar SessionManagerDebug 5
+      </FilesMatch>
+   </IfModule>   
+
+The only difference is that you cannot use C<Location> directive (I used
+C<FilesMatch>) and you must install
+L<Apache::SessionManager|Apache::SessionManager> in C<Header parsing> phase of
+Apache request instead of C<URI translation> phase.
+
+=head3 NOTES ON USING F<.htaccess> INSTEAD OF F<httpd.conf>
+
+=over 4
+
+=item *
+
+In this cases it is necessary to install
+L<Apache::SessionManager|Apache::SessionManager> in C<Header parsing> phase and
+not into C<URI translation> phase (in this phase, F<.htaccess> hasn't yet  been
+processed).
+
+=item *
+
+Using F<.htaccess>, it is possible to use only cookies for the session
+tracking.
+
+=back
+
+=head2 SUBCLASSING CGI::Application
+
+We subclass L<CGI::Application|CGI::Application> in order to supply the
+C<cgiapp_init> method where we restore the session object from datastore and
+put it into class property:
+
+   package CGI::Application::SessionManager;
+   use Apache::SessionManager;
+   use base 'CGI::Application';
+   sub cgiapp_init {
+      my $self = shift;
+      # if mod_perl
+      $self->{'session'} = Apache::SessionManager::get_session(Apache->request) if $ENV{MOD_PERL};
+   }
+
+Save it under the directory
+F</usr/local/apache/cgi-application/CGI/Application/SessionManager.pm>.
+
+The reason to for subclassing this is the benefits is creating a custom
+"application super-class"  from which which all your CGI applications would
+inherit, instead of L<CGI::Application|CGI::Application>.
+
+Then we write F<WebApp.pm> Application Module that inherit from our
+super-class  CGI::Application::SessionManager:
+
+   package WebApp;
+   use Data::Dumper;
+   use base 'CGI::Application::SessionManager';
+
+   sub setup {
+      my $self = shift;
+      $self->start_mode('mode1');
+      $self->mode_param('rm');
+      $self->run_modes(
+         'mode1' => 'do_session'
+         'mode2' => 'do_stuff',
+         'mode3' => 'do_more_stuff',
+         'mode4' => 'do_something_else',
+      );
+   }
+
+   sub do_session {
+        $self = shift;
+        $self->{'session'}->{rand()} = rand;
+        my $out = '<PRE>' . Dumper($self->{'session'}) . '<PRE>';
+        return $out;
+   }
+   sub do_stuff { return $_[0]->get_current_runmode() }
+   sub do_more_stuff { return $_[0]->get_current_runmode() }
+   sub do_something_else { print $_[0]->get_current_runmode() }
+   1; 
+
+Save it as F</usr/local/apache/cgi-application/WebApp.pm>.
+
+=head2 TESTING Apache::SessionManager
+
+To test our application we must implement the Instance Script that is what is
+actually  called by your web server.
+
+It is a very small, simple file which simply creates an instance of your
+application and calls an inherited method, B<run()>. Following is the entirety
+of F</usr/local/apache/cgi-application/webapp.cgi>:
+
+   #!/usr/local/bin/perl
+   use WebApp;
+
+   my $webapp = WebApp->new();
+   $webapp->run();  
+
+Restart the httpd server and launch http://localhost/cgi-application/webapp.cgi
+
+=head2 SEE ALSO
+
+L<Apache::SessionManager|Apache::SessionManager>,
+L<CGI::Application|CGI::Application>, L<Apache|Apache>, perl
+
+=head1 Apache::SessionManager WITH CGI::Builder
+
+=head2 INTRODUCTION
+
+This section describes how to use
+L<Apache::SessionManager|Apache::SessionManager> with
+L<CGI::Builder|CGI::Builder> toolkit.
+
+L<CGI::Builder|CGI::Builder> is a set of Perl modules which collectively implement a
+template processing system. In this context, a template is a text document
+containing special markup tags.
+
+The idea is to use the
+L<CGI::Builder::SessionManager|CGI::Builder::SessionManager> extension
+(available on CPAN), that is the L<CGI::Builder|CGI::Builder> wrapper around
+L<Apache::SessionManager|Apache::SessionManager>.
+
+For installation and use of this extension, please see
+L<CGI::Builder::SessionManager|CGI::Builder::SessionManager> documentation.
+
+=head2 SEE ALSO
+
+L<Apache::SessionManager|Apache::SessionManager>,
+L<CGI::Builder::SessionManager|CGI::Builder::SessionManager>,
+L<CGI::Builder|CGI::Builder>, L<Apache|Apache>, perl
+
+=head1 Apache::SessionManager WITH HTML::Mason
+
+=head2 INTRODUCTION
+
+This section describes use of L<Apache::SessionManager|Apache::SessionManager>
+with L<HTML::Mason|HTML::Mason> (L<http://www.masonhq.com>).  There are many
+ways to do it; this document will not describe all possible configurations.
+It's meant to be a quick C<get on your feet> HOWTO and also to answer some
+common questions that appear on the mailing list.
+
+Yes. I know, there's
+L<MasonX::Request::WithApacheSession|MasonX::Request::WithApacheSession>. But I
+wrote and released L<Apache::SessionManager|Apache::SessionManager> some time
+before L<MasonX::Request::WithApacheSession|MasonX::Request::WithApacheSession>
+has been released. And since I need session object also outside Response
+phase (like Authentication and/or Authorization phases) I still use
+L<Apache::SessionManager|Apache::SessionManager> with Mason.
+
+=head2 CONFIGURATION
+
+The idea is to use a global variable C<$session> in order to store session
+object, and to initialize it into autohandler special component instead of call
+a separate  component in each Mason page.
+
+L<HTML::Mason|HTML::Mason> can be configured under mod_perl in two different
+ways: 
+
+=head3 CONFIGURATION VIA CUSTOM CODE
+
+This method is preferred because gives you complete control over how
+L<HTML::Mason|HTML::Mason> handles requests  at the cost of a bit of extra code
+to maintain.
+
+In F<httpd.conf>:
+
+   PerlModule Apache::SessionManager
+   PerlTransHandler Apache::SessionManager
+   PerlRequire /usr/local/apache/conf/masonhandler.pl
+
+   Alias /mason "/usr/local/apache/htdocs/mason"
+   <Location /mason>
+      SetHandler perl-script
+      PerlHandler HTML::Mason
+
+      # Apache::SessionManager configuration (see 'perldoc Apache::SessionManager')
+      PerlSetVar SessionManagerTracking On
+      PerlSetVar SessionManagerExpire 3600
+      PerlSetVar SessionManagerInactivity 900
+      PerlSetVar SessionManagerName MASONSESSIONID
+      PerlSetVar SessionManagerStore File
+      PerlSetVar SessionManagerStoreArgs "Directory => /tmp/session_data/mason"
+   </Location> 
+
+F</usr/local/apache/conf/masonhandler.pl>:
+
+   #
+   # masonhandler.pl: HTML::Mason startup configuration Perl script
+   # By Enrico Sorcinelli <enrico@sorcinelli.it>
+   package HTML::Mason;
+   use HTML::Mason;
+   use HTML::Mason::ApacheHandler (args_method=>'mod_perl');
+   use strict;
+   # List of all modules that will be used
+   {
+       package HTML::Mason::Commands;
+       use DBI;
+       use LWP;
+       use Apache::SessionManager;
+       ...
+   }
+
+   # Create Mason object
+   my $ah = new HTML::Mason::ApacheHandler (
+           comp_root => '/usr/local/apache/htdocs/mason',
+           data_dir  => '/usr/local/apache/htdocs/mason/data',
+           allow_globals => [ '$session' ]
+                                           );
+   sub handler {
+       my ($r) = @_;
+       return $ah->handle_request($r);
+   }
+
+   1;  
+
+In the case you don't have access to F<httpd.conf>, you can put similar
+directive directly into an F<.htaccess> file:
+
+   PerlRequire /usr/local/apache/conf/masonhandler.pl
+   <FilesMatch "\.html$">
+      SetHandler perl-script
+      PerlHandler HTML::Mason
+
+      PerlHeaderParserHandler Apache::SessionManager
+      PerlSetVar SessionManagerTracking On
+      PerlSetVar SessionManagerExpire 3600
+      PerlSetVar SessionManagerInactivity 900
+      PerlSetVar SessionManagerName MASONSESSIONID
+      PerlSetVar SessionManagerStore File
+      PerlSetVar SessionManagerStoreArgs "Directory => /tmp/session_data/mason"
+      PerlSetVar SessionManagerDebug 5
+   </FilesMatch>
+
+The only difference is that you cannot use C<Location> directive (I used
+C<FilesMatch>) and you must install
+L<Apache::SessionManager|Apache::SessionManager> in C<Header parsing> phase of
+Apache request instead of C<URI translation> phase.
+
+Moreover, using F<.htaccess> is less flexible and efficient because
+C<PerlRequire> starts F<masonhandler.pl> at run-time on each request.
+
+=head3 CONFIGURATION VIA F<httpd.conf>
+
+This is the easiest of the previous configuration. You must add a few
+C<PerlSetVar Mason*> directives into Apache's configuration files. 
+
+This method is very easy to use and is appropriate for most uses of
+L<HTML::Mason|HTML::Mason> . 
+
+   PerlModule Apache::SessionManager
+   PerlTransHandler Apache::SessionManager
+
+   Alias /mason "/usr/local/apache/htdocs/mason"
+   <Location /mason>
+      SetHandler perl-script
+      PerlHandler HTML::Mason::ApacheHandler
+      PerlSetVar MasonCompRoot /usr/local/apache/htdocs/mason
+      PerlSetVar MasonDataDir /usr/local/apache/htdocs/mason/data
+      PerlSetVar MasonAllowGlobals $session
+
+      PerlHeaderParserHandler Apache::SessionManager
+      PerlSetVar SessionManagerTracking On
+      PerlSetVar SessionManagerExpire 3600
+      PerlSetVar SessionManagerInactivity 900
+      PerlSetVar SessionManagerName MASONSESSIONID
+      PerlSetVar SessionManagerStore File
+      PerlSetVar SessionManagerStoreArgs "Directory => /tmp/session_data/mason"
+      PerlSetVar SessionManagerDebug 5
+   </Location> 
+
+In the case you don't have access to F<httpd.conf>, you can put similar
+directive directly into an F<.htaccess> file:
+
+   <FilesMatch "\.html$">
+      SetHandler perl-script
+      PerlHandler HTML::Mason::ApacheHandler
+      PerlSetVar MasonCompRoot /usr/local/apache/htdocs/mason
+      PerlSetVar MasonDataDir /usr/local/apache/htdocs/mason/data
+      PerlSetVar MasonAllowGlobals $session
+
+      PerlHeaderParserHandler Apache::SessionManager
+      PerlSetVar SessionManagerTracking On
+      PerlSetVar SessionManagerExpire 3600
+      PerlSetVar SessionManagerInactivity 900
+      PerlSetVar SessionManagerName MASONSESSIONID
+      PerlSetVar SessionManagerStore File
+      PerlSetVar SessionManagerStoreArgs "Directory => /tmp/session_data/mason"
+      PerlSetVar SessionManagerDebug 5
+   </FilesMatch> 
+
+
+=head3 NOTES ON USING F<.htaccess> INSTEAD OF F<httpd.conf>
+
+=over 4
+
+=item *
+
+In both cases it is necessary to install
+L<Apache::SessionManager|Apache::SessionManager> in C<Header parsing> phase and
+not into C<URI translation> phase (in this phase, F<.htaccess> hasn't yet  been
+processed).
+
+=item *
+
+Using F<.htaccess>, it is possible to use only cookies for the session
+tracking.
+
+=back
+
+=head2 THE AUTOHANDLER
+
+This is the autohandler F</usr/local/apache/htdocs/mason/autohandler>:
+
+   <%init>
+   local $session = Apache::SessionManager::get_session($r);
+   </%init>
+   <% $m->call_next %>
+
+=head2 TESTING Apache::SessionManager
+
+Now, you you can use C<$session> (hash reference) in all pages managed by 
+L<HTML::Mason|HTML::Mason>. For example this is
+F</usr/local/apache/htdocs/mason/session.html>: 
+
+   <%perl>
+      my $foo = 'bla bla';
+
+      $$session{'foo'} = $foo;
+      # same as 
+      $session->{'foo'} = $foo;
+
+      print $$session{'bar'};
+   </%perl>
+
+=head2 SEE ALSO
+
+L<HTML::Mason|HTML::Mason>, L<Apache::Session|Apache::Session>,
+L<Apache::Session::Flex|Apache::Session::Flex>,
+L<Apache::SessionManager|Apache::SessionManager>,
+L<Apache::Request|Apache::Request>, L<Apache::Cookie|Apache::Cookie>,
+L<Apache|Apache>, perl(1)
+
+=head1 Apache::SessionManager WITH PLP
+
+=head2 INTRODUCTION
+
+This section describes use of L<Apache::SessionManager|Apache::SessionManager>
+with L<PLP|PLP>. L<PLP|PLP> (L<http://plp.juerd.nl/>) is yet another Perl
+embedder, primarily for HTML documents. 
+
+Unlike with other Perl embedders, there is no need to learn a meta-syntax or
+object model: one can just use the normal Perl constructs. PLP runs under
+mod_perl for speeds comparable to those of PHP, but can also be run as a CGI
+script. Note that the session management it is possible only under mod_perl
+environment.
+
+=head2 CONFIGURATION
+
+The idea is to use a global variable C<$session> in order to store session
+object, and to initialize it into C<start> sub of PLP processor.
+
+To do it, you must patch I<PLP.pm> with following lines (you can find the patch
+also in I<patches/PLP-3.18.patch> shipped with
+L<Apache::SessionManager|Apache::SessionManager> distribution):
+
+   --- PLP.pm	Fri Oct 18 21:47:07 2002
+   +++ PLP.pm-patched	Fri May 30 11:38:37 2003
+   @@ -317,6 +317,13 @@
+        {
+    	package PLP::Script;
+    	use vars qw(%headers %header %cookies %cookie %get %post %fields);
+   +
+   +	use vars qw($session);
+   +	eval { require Apache::SessionManager };
+   +	unless ( $@ ) {
+   +		$session = Apache::SessionManager::get_session(Apache->request);
+   +	}
+   +
+    	*headers = \%header;
+    	*cookies = \%cookie;
+    	PLP::Functions->import();
+
+To apply the patch do (before installing PLP):
+
+   #> cd /path/to/src/PLP-3.18
+   #> patch -p0 < /path/to/PLP-3.18.patch
+
+then you can continue installing PLP normally.
+
+However you could use session management even without patching I<PLP.pm> at
+the cost of a bit of extra code in your CGI scripts (see C<Testing
+Apache::SessionManager> section).
+
+=head3 CONFIGURATION VIA F<httpd.conf>
+
+In F<httpd.conf> (or any files included by the C<Include> directive):
+
+   PerlModule Apache::SessionManager
+   PerlTransHandler Apache::SessionManager
+
+   Alias /plp "/usr/local/apache/htdocs/plp"
+   <Location /plp>
+      SetHandler perl-script
+      PerlHandler PLP
+      PerlSendHeader On
+      PerlSetVar PLPcache On
+
+      PerlSetVar SessionManagerTracking On
+      PerlSetVar SessionManagerExpire 90
+      PerlSetVar SessionManagerInactivity 900
+      PerlSetVar SessionManagerName PLPSESSIONID
+      PerlSetVar SessionManagerStore File
+      PerlSetVar SessionManagerStoreArgs "Directory => /tmp/apache_session_data/plp"
+      PerlSetVar SessionManagerDebug 5
+   </Location> 
+
+=head3 CONFIGURATION VIA F<.htaccess>
+
+In the case you don't have access to F<httpd.conf>, you can put similar
+directive directly into an F<.htaccess> file:
+
+   <FilesMatch "\.plp$">
+      SetHandler perl-script
+      PerlHandler PLP
+      PerlSendHeader On
+      PerlSetVar PLPcache On
+
+      PerlHeaderParserHandler Apache::SessionManager
+      PerlSetVar SessionManagerTracking On
+      PerlSetVar SessionManagerExpire 3600
+      PerlSetVar SessionManagerInactivity 900
+      PerlSetVar SessionManagerName PLPSESSIONID
+      PerlSetVar SessionManagerStore File
+      PerlSetVar SessionManagerStoreArgs "Directory => /tmp/apache_session_data/plp"
+      PerlSetVar SessionManagerDebug 5
+   </FilesMatch>
+
+The only difference is that you cannot use C<Location> directive (I used
+C<FilesMatch>) and you must install
+L<Apache::SessionManager|Apache::SessionManager> in C<Header parsing> phase of
+Apache request instead of C<URI translation> phase.
+
+=head3 NOTES ON USING F<.htaccess> INSTEAD OF F<httpd.conf>
+
+=over 4
+
+=item *
+
+In this cases it is necessary to install
+L<Apache::SessionManager|Apache::SessionManager> in C<Header parsing> phase and
+not into C<URI translation> phase (in this phase, F<.htaccess> hasn't yet  been
+processed).
+
+=item *
+
+Using F<.htaccess>, it is possible to use only cookies for the session
+tracking.
+
+=back
+
+=head2 TESTING Apache::SessionManager
+
+Now you you can use C<$session> (hash reference) in all pages managed by PLP.
+For example this is F</usr/local/apache/htdocs/plp/session.plp>:
+
+   <: 
+      my $title = 'Session management with PLP'; 
+   :>
+   <HTML>
+   <HEAD>
+   <TITLE><: print $title :></TITLE>
+   <BODY>
+   <:
+      use Data::Dumper;
+      print "<H1>$title</H1>";
+   :>
+   <B>Session dump</B><PRE>
+   <:
+      print Dumper($session);
+      $session->{$$ . '-' . rand()} = rand;
+   :>
+   </PRE>
+   </BODY>
+   </HTML> 
+
+The previous example assumes that you've patched F<PLP.pm>. Without the patch
+you must add the following line before using C<$session> hash reference:
+
+   <:
+      my $session = Apache::SessionManager::get_session(Apache->request);
+   :>
+
+=head2 SEE ALSO
+
+L<PLP|PLP>, L<Apache::Session|Apache::Session>,
+L<Apache::Session::Flex|Apache::Session::Flex>,
+L<Apache::SessionManager|Apache::SessionManager>,
+L<Apache::Request|Apache::Request>, L<Apache::Cookie|Apache::Cookie>,
+L<Apache|Apache>, perl(1)
+
+=head1 Apache::SessionManager WITH THE TEMPLATE TOOLKIT
+
+=head2 INTRODUCTION
+
+This section describes how to use
+L<Apache::SessionManager|Apache::SessionManager> with Template Toolkit
+(L<http://www.tt2.org>). The idea is to use the
+L<Template::Plugin::Apache::SessionManager|Template::Plugin::Apache::SessionManager>
+plugin (available on CPAN), the TT2 wrapper around
+L<Apache::SessionManager|Apache::SessionManager>.
+
+The Template Toolkit is a set of Perl modules which collectively implement a
+template processing system. In this context, a template is a text document
+containing special markup tags called 'directives'.
+
+TT2 runs under mod_perl for speeds, but can also be run as a CGI script. Note
+that this session management is possible only under mod_perl environment.
+
+=head2 USING Apache::Template
+
+This section illustrates how to use session manager TT2 plugin for use within
+L<Apache::Template|Apache::Template> mod_perl extension.
+
+The L<Apache::Template|Apache::Template> module provides a simple interface to
+the Template Toolkit allowing Apache to serve directly TT2 files.
+
+=head3 CONFIGURATION VIA F<httpd.conf>
+
+In F<httpd.conf> (or any files included by the C<Include> directive):
+
+   <IfModule mod_perl.c>
+      PerlModule Apache::Template
+
+      TT2Trim             On
+      TT2PostChomp        On
+      TT2EvalPerl         On
+      TT2Params           uri env params
+      TT2IncludePath      /usr/local/apache/htdocs/tt2/includes
+      TT2PreProcess       config header
+      TT2PostProcess      footer
+
+      PerlModule Apache::SessionManager
+      PerlTransHandler Apache::SessionManager
+
+      <LocationMatch "\.tt2$">
+
+         SetHandler perl-script
+         PerlHandler Apache::Template
+
+         PerlSetVar SessionManagerTracking On
+         PerlSetVar SessionManagerExpire 600
+         PerlSetVar SessionManagerInactivity 60
+         PerlSetVar SessionManagerName TT2SESSIONID
+         PerlSetVar SessionManagerDebug 5
+         PerlSetVar SessionManagerStore File
+         PerlSetVar SessionManagerStoreArgs "Directory => /tmp/apache_session_data"
+
+      </LocationMatch>
+   </IfModule>   
+
+=head3 CONFIGURATION VIA F<.htaccess>
+
+In the case you don't have access to F<httpd.conf>, you can put similar
+directives  directly into an F<.htaccess> file:
+
+   <IfModule mod_perl.c>
+      PerlModule Apache::Template
+      <FilesMatch "\.tt2$">
+
+         SetHandler perl-script
+         PerlHandler Apache::Template
+
+         PerlHeaderParserHandler Apache::SessionManager
+         PerlSetVar SessionManagerTracking On
+         PerlSetVar SessionManagerExpire 600
+         PerlSetVar SessionManagerInactivity 60
+         PerlSetVar SessionManagerName TT2SESSIONID
+         PerlSetVar SessionManagerDebug 5
+         PerlSetVar SessionManagerStore File
+         PerlSetVar SessionManagerStoreArgs "Directory => /tmp/apache_session_data"
+
+      </FilesMatch>
+   </IfModule>   
+
+The only difference is that you cannot use C<Location> directive (I used
+C<FilesMatch>) and you must install
+L<Apache::SessionManager|Apache::SessionManager> in C<Header parsing> phase of
+Apache request instead of C<URI translation> phase.
+
+Now you can use C<Template:Plugin::Apache::SessionManager> plugin by 'USE' it
+in tt2 template file. This is a F<session.tt2> TT2 template: 
+
+   [% USE my_sess = Apache.SessionManager %]
+   <HTML>
+   <HEAD>
+   <TITLE>Session management with Apache::Template</TITLE>
+   <BODY>
+
+   The Session Dump
+   [% USE dumper %]
+   <PRE>
+   [% dumper.dump(my_sess.session) %]
+   </PRE>
+
+   <H3>Getting session values</H3>
+   Sigle session value<BR>
+   ID is [% my_sess.get('_session_id') %]<P>
+
+   Multiple session values<BR>
+   [% FOREACH s = my_sess.get('_session_id','_session_timestamp') %]
+   * [% s %]<BR>
+   [% END %]<P>
+
+   Multiple values by array ref<BR>
+   [% keys = [ '_session_id', '_session_start' ];
+      FOREACH s = my_sess.get(keys) %]
+   * [% s %]<BR>
+   [% END %]
+
+   All session values<BR>
+   [% FOREACH s = my_sess.get %]
+   * [% s %]<BR>
+   [% END %]
+
+   <H3>Setting session values:</H3>
+   ID: [% my_sess.set('foo' => 10, 'bar' => 20, '_session_test' => 'test') %]<BR>
+
+   </BODY>
+   </HTML>   
+
+Save it under the root web directory and launch it with
+http://localhost/session.tt2
+
+This is an example of deleting session keys and destroying session itself:
+
+   [% USE my_sess = Apache.SessionManager %]
+   <HTML>
+   <HEAD>
+   <TITLE>Session management with Apache::Template</TITLE>
+   <BODY>
+   <PRE>
+   [% USE dumper %]
+   [% dumper.dump(my_sess.session) %]
+   </PRE>
+
+   <H3>Delete session values:</H3>
+   [% my_sess.delete('foo','bar','_session_id') %]<BR>
+
+   Delete session values by array ref:
+   [% keys = ['foo','bar','_session_id'];
+      my_sess.delete(keys) %]<BR>
+
+   <H3>Destroy session</H3>
+   [% my_sess.destroy %]<BR>
+
+   </BODY>
+   </HTML>   
+
+=head3 NOTES ON USING F<.htaccess> INSTEAD OF F<httpd.conf>
+
+=over 4
+
+=item *
+
+In this cases it is necessary to install
+L<Apache::SessionManager|Apache::SessionManager> in C<Header parsing>  phase
+and not into C<URI translation> phase (in this phase, F<.htaccess> hasn't yet 
+been processed).
+
+=item *
+
+Using F<.htaccess>, it is possible to use only cookies for the session
+tracking.
+
+=back
+
+=head2 USING CGI scripts 
+
+This section illustrates how to use session manager TT2 plugin for use in CGI
+scripts under L<Apache::Registry|Apache::Registry> or
+L<Apache::PerlRun|Apache::PerlRun> environment. 
+
+=head3 CONFIGURATION VIA F<httpd.conf>
+
+This example assumes that you can access to F<httpd.conf>. If not, you must see
+the C<Notes on using .htaccess instead of httpd.conf> on previous section about
+configuring it via F<.htaccess>.
+
+   <IfModule mod_perl.c>
+      Alias /perl/ /usr/local/apache/perl-scripts/ 
+      PerlModule Apache::SessionManager
+      PerlTransHandler Apache::SessionManager
+      <Location /perl> 
+         SetHandler perl-script
+         PerlHandler Apache::Registry
+         PerlSendHeader On
+         PerlSetupEnv   On
+         Options ExecCGI 
+
+         PerlSetVar SessionManagerTracking On
+         PerlSetVar SessionManagerExpire 600
+         PerlSetVar SessionManagerInactivity 60
+         PerlSetVar SessionManagerName TT2SESSIONID
+         PerlSetVar SessionManagerDebug 5
+         PerlSetVar SessionManagerStore File
+         PerlSetVar SessionManagerStoreArgs "Directory => /tmp/apache_session_data"
+      </Location>
+   </IfModule>   
+
+This is the simple CGI script I<session.cgi>:
+
+   #!/usr/bin/perl
+
+   use strict;
+   use Template;
+
+   my $file = 'session.tt2';
+   my $vars = {
+      title  => "Session management in a CGI Apache::Registry environment\n"
+   };
+
+   my $template = Template->new();
+   $template->process($file, $vars)
+      || die "Template process failed: ", $template->error(), "\n";
+
+and this is a F<session.tt2> TT2 template (it's the same than the
+L<Apache::Template|Apache::Template> version!)
+
+   [% USE my_sess = Apache.SessionManager %]
+   <HTML>
+   <HEAD>
+   <TITLE>[% title %]</TITLE>
+   <BODY>
+
+   The session dump
+   [% USE dumper %]
+   <PRE>
+   [% dumper.dump(my_sess.session) %]
+   </PRE>
+
+   <H3>Getting session values</H3>
+   Sigle session value<BR>
+   ID is [% my_sess.get('_session_id') %]<P>
+
+   Multiple session values<BR>
+   [% FOREACH s = my_sess.get('_session_id','_session_timestamp') %]
+   * [% s %]<BR>
+   [% END %]<P>
+
+   Multiple values by array ref<BR>
+   [% keys = [ '_session_id', '_session_start' ];
+      FOREACH s = my_sess.get(keys) %]
+   * [% s %]<BR>
+   [% END %]
+
+   All session values<BR>
+   [% FOREACH s = my_sess.get %]
+   * [% s %]<BR>
+   [% END %]
+
+   <H3>Setting session values:</H3>
+   ID: [% my_sess.set('foo' => 10, 'bar' => 20, '_session_test' => 'test') %]<BR>
+
+   </BODY>
+   </HTML>  
+
+Save both into the F</usr/local/apache/perl-scripts> directory and launch
+http://localhost/perl/session.cgi
+
+=head2 SEE ALSO
+
+L<Apache::SessionManager|Apache::SessionManager>, L<Template Toolkit|Template>,
+L<Apache|Apache>, perl(1)
+
+=head1 Apache::SessionManager WITH AUTHENTICATION MECHANISM
+
+=head2 INTRODUCTION
+
+This section describes using L<Apache::SessionManager|Apache::SessionManager>
+with simple authentication mechanism.  There are many ways to do it; this
+document will not describe all possible configurations. 
+
+=head2 CONFIGURATION
+
+The idea is to write a custom authentication handler in order to verify each
+request  that session is valid (the user has been already authenticaded).
+
+=head3 CONFIGURATION VIA F<httpd.conf>
+
+In F<httpd.conf> (or any files included by the C<Include> directive):
+
+   PerlModule Apache::SessionManager
+   PerlTransHandler Apache::SessionManager
+   <Location /protected>
+
+      PerlSetVar SessionManagerTracking On
+      PerlSetVar SessionManagerExpire 3600
+      PerlSetVar SessionManagerInactivity 1800
+      PerlSetVar SessionManagerName SESSIONID
+      PerlSetVar SessionManagerStore File
+      PerlSetVar SessionManagerStoreArgs "Directory => /tmp/apache_session_data/"
+
+      <Perl>
+         use lib '/usr/local/apache/perl/';
+      </Perl>
+      PerlAuthenHandler Apache::MyAuth
+      AuthName "Reserved Club"
+      AuthType Basic
+      require valid-user
+      PerlSetVar MyAuthLogin /protected/login.html
+   </Location>
+
+We have added a C<PerlSetvar> directive in order to set C<MyAuthLogin> variable
+with login form URI.
+
+=head3 CONFIGURATION VIA F<.htaccess>
+
+In the case you don't have access to F<httpd.conf>, you can put similar
+directive  directly into an F<.htaccess> file:
+
+   PerlModule Apache::SessionManager
+   <FilesMatch "\.foo$">
+
+      PerlHeaderParserHandler Apache::SessionManager
+      PerlSetVar SessionManagerTracking On
+      PerlSetVar SessionManagerExpire 3600
+      PerlSetVar SessionManagerInactivity 1800
+      PerlSetVar SessionManagerName SESSIONID
+      PerlSetVar SessionManagerStore File
+      PerlSetVar SessionManagerStoreArgs "Directory => /tmp/apache_session_data/"
+
+      <Perl>
+         use lib '/usr/local/apache/perl/';
+      </Perl>
+      PerlAuthenHandler Apache::MyAuth
+      AuthName "Reserved Club"
+      AuthType Basic
+      require valid-user
+      PerlSetVar MyAuthLogin /protected/login.html
+   </FilesMatch>
+
+The only difference is that you cannot use C<Location> directive (I used
+C<FilesMatch>) and you must install
+L<Apache::SessionManager|Apache::SessionManager> in C<Header parsing> phase of
+Apache request instead of C<URI translation> phase.
+
+=head3 NOTES ON USING F<.htaccess> INSTEAD OF F<httpd.conf>
+
+=over 4
+
+=item *
+
+In both cases it is necessary to install
+L<Apache::SessionManager|Apache::SessionManager> in C<Header parsing>  phase
+and not into C<URI translation> phase (in this phase, F<.htaccess> hasn't yet 
+been processed).
+
+=item *
+
+Using F<.htaccess>, it is possible to use only cookies for the session
+tracking.
+
+=back
+
+=head2 THE AUTHENTICATION HANDLER
+
+This simple code is the authentication handler
+F</usr/local/apache/perl/Apache/MyAyth.pm>:
+
+   package Apache::MyAuth;
+   use Apache::Constants qw(:common REDIRECT);
+   use Apache::SessionManager;
+   use strict;
+
+   sub handler {
+      my $r = shift;
+      my $session = Apache::SessionManager::get_session($r);
+
+      # Login ok: user is already logged or login form is requested
+      if ( $session->{'logged'} == 1 || $r->uri eq $r->dir_config('MyAuthLogin') ) { 
+         return OK;
+      }
+
+      # user not logged in or session expired
+
+      # store in session the destination url if not set
+      $session->{'redirect'} ||= $r->uri . ( ( $r->args ) ? ('?' . $r->args) : '' );
+
+      # verify credenitals
+      unless ( verifiy_cred( ($r->args) ) ) {
+
+         # Log error
+         $r->log_error('MyAuth: access to ' . $r->uri . ' failed for ' . $r->get_remote_host);
+
+         # Redirect to login page
+         $r->custom_response(FORBIDDEN, $r->dir_config('MyAuthLogin'));
+         return FORBIDDEN;
+      }
+      $session->{'logged'} = 1;
+
+      # Redirect to original protected resource
+      $r->content_type('text/html'); 
+      $r->header_out( Location => $session->{'redirect'} );
+      return REDIRECT;     
+   }
+
+   # Check correct username and password with your own policies
+   sub verifiy_cred {
+      my %cred = @_;
+      return 1 if ( $cred{'username'} eq 'foo' && $cred{'password'} eq 'baz' );
+      return 0;
+   }
+
+   1;
+
+Now we write an essential login form code
+F</usr/local/apache/htdocs/protected/login.html> (save it according to
+C<PerlSetVar MyAuthLogin> setting):
+
+   <HTML>
+   <BODY>
+   <FORM METHOD="GET">
+      <INPUT TYPE="test" NAME="username" SIZE="10">
+      <INPUT TYPE="password" NAME="password" SIZE="10">
+      <INPUT TYPE="submit" VALUE="Login">
+   </FORM>
+   </BODY>
+   </HTML> 
+
+=head3 NOTE ON CUSTOM ERROR MESSAGE WITH MSIE
+
+The recently released version of Microsoft's Internet Explorer (from 5.x) has
+some new "features" (?) which may affect sites.
+
+The first new "feature" is that MSIE 5 may replace a site's own error messages
+with its in-built error pages. This occurs if the error page from the site is
+less than a particular size.
+
+For most errors, this is 512 bytes. If the error page from the site is more
+than 512 bytes, MSIE 5 will display the site's error message, otherwise it will
+not display it.
+
+For a few statuses (403, 405 and 410), the cut-off size is 256. The solution to
+this problem is to ensure that all error pages are greater than 512 bytes.
+
+However note that most of Apache's built in error messages will be less than
+512 bytes, so the only way to ensure that viewers see the site's real error 
+pages is to use the ErrorDocument directive in Apache.
+
+So, because we redefine C<FORBIDDEN> response (status 403) with the HTML form,
+in order to work with MSIE, we must ensure to put more than 512 bytes into 
+I<login.html> file! 
+
+=head2 TESTING Apache::SessionManager
+
+Now, you you can test authentication mechanism by accessing some resources
+under protected area.
+In our case launch: http://localhost/protected/foo.html.
+
+Note that the authorization can be applied also on dinamic contents (for
+example mod_perl handlers, CGI, etc) simply by setting right content handler
+in protected C<Location>s.
+
+=head1 USING Apache::SessionManager WITHOUT SYSTEM ADMINISTRATOR ACCOUNT
+
+=head2 INTRODUCTION
+
+This section illustrates how to use module without any system administrator
+account (usually C<root>) in a machine.
+
+Generally, this means that you cannot:
+
+=over 4
+
+=item * 
+
+install modules in standard directories
+
+=item * 
+
+configure F<httpd.conf> Apache
+
+=back
+
+There are several situations like this: 
+
+=over 4
+
+=item *
+
+students on a departmental Web server at a university
+
+=item *
+
+individual customers of an ISP
+
+=item *
+
+clients of a Web-hosting company. 
+
+=back
+
+This chapter will helps you to use
+L<Apache::SessionManager|Apache::SessionManager> in one of this situation.
+
+=head2 REQUIREMENTS
+
+There are some prerequisites in order to install and use
+L<Apache::SessionManager|Apache::SessionManager> without C<root> privileges:
+
+=over 4
+
+=item * a shell
+
+Obvious
+
+=item * gcc
+
+C<gcc> is necessary in order to compile some required module like
+L<Storable|Storable> or L<Digest::MD5|Digest::MD5> that have several XS code
+
+=item * make
+
+Again, obvious
+
+=item * mod_perl with hook C<PERL_HEADER_PARSER=1>
+
+You can use this simple script (supplied in 'Practical mod_perl' book) to see
+enabled hooks:
+
+   use mod_perl_hooks;
+
+   for my $hook(mod_perl::hooks()) {
+      if (mod_perl::hooks($hook)) {
+         print "$hook is enabled\n";
+      }
+      else {
+         print "$hook is not enabled\n";
+      }
+   }  
+
+=item * a configurable F<.htaccess> file
+
+I know, you could install and run another C<httpd> instance on a port greather
+than 1024 and configure directly your F<httpd.conf>. Then you could ask to your
+Webmaster in order to proxy your Apache from main web server (at port 80), if
+you dont want export to the world a web site in a port different than 80.
+
+So, working with F<.htaccess> files is the only possibilty to enable and
+configure session manager transparently (both for web users and  your
+sysadmin).
+
+Depending on wich Apache directives you would override, first you must check
+the status of C<AllowOverride> directive for your directories.
+
+If none of C<AllowOverride> directive appears in main F<httpd.conf> then you
+can use all allowed directives in F<.htaccess> file (by default 
+C<AllowOverride> is set to C<All>, that means that any directive which has the
+F<.htaccess> C<Context> is allowed in F<.htaccess> files).
+
+Otherwise, be sure that at least the directive like:
+
+   AllowOverride FileInfo
+
+is present in order to use C<SetHandler> in F<.htaccess> file.
+
+You can found more info about allowed directives at
+http://httpd.apache.org/docs/mod/core.html#allowoverride
+
+For example, if you want to run CGI scripts also outside F<cgi-bin> script
+directory, then a directive like:
+
+   AllowOverride FileInfo Options
+
+should be appear in order to override directory behaviour by adding a:
+
+   Options +ExecCGI
+
+in your F<.htaccess> file.
+
+=item * lwp || ftp || ...
+
+A way to transfer the perl packages in the system :-)
+
+=back
+
+=head2 CREATING YOU PRIVATE PERL LIBRARY DIRECTORY
+
+First of all, you must choose and create the directory that will contain the
+private installation copy of Perl modules. It should be readable by web server.
+
+   %> mkdir /path/to/your/perl-lib
+
+=head2 INSTALLING Storable
+
+As L<Apache::Session|Apache::Session> documentation says, "no particular 
+modules are required, but most of L<Apache::Session's|Apache::Session>
+functions require L<Digest::MD5|Digest::MD5> and L<Storable|Storable>". 
+
+Here, we explain how to install L<Storable|Storable> if it isn't already
+present in the machine. Note that starting from Perl 5.8.0,
+L<Storable|Storable> is a core module.
+
+   %> lwp-download http://search.cpan.org/CPAN/authors/id/A/AM/AMS/Storable-2.07.tar.gz 
+   %> tar -xzvf Storable-2.07.tar.gz  
+   %> cd Storable-2.07   
+   %> perl Makefile.PL PREFIX=/path/to/your/perl-lib
+   %> make
+   %> make test
+   %> make install
+
+The installation procedure for L<Digest::MD5|Digest::MD5> or
+L<Apache::Cookie|Apache::Cookie> (libapreq) is almost the same.
+
+=head2 INSTALLING Apache::Session
+
+   %> lwp-download http://search.cpan.org/CPAN/authors/id/J/JB/JBAKER/Apache-Session-1.54.tar.gz 
+   %> tar -xzvf Apache-Session-1.54.tar.gz
+   %> cd Apache-Session-1.54
+   %> perl Makefile.PL PREFIX=/path/to/your/perl-lib
+   %> PERL5LIB=/path/to/your/perl-lib/lib make test
+   %> make install
+
+Plese note that the environment variable C<PERL5LIB> setting is necessary
+before  run tests in order to append F</path/to/your/perl-lib/lib> to C<@INC>.
+
+=head2 INSTALLING Apache::SessionManager
+
+   %> lwp-download http://search.cpan.org/CPAN/authors/id/E/EN/ENRYS/Apache-SessionManager-0.06.tar.gz
+   %> tar -xzvf Apache-SessionManager-0.06.tar.gz
+   %> cd Apache-SessionManager-0.06
+   %> PERL5LIB=/path/to/your/perl-lib/lib/site_perl:/path/to/your/perl-lib/lib \
+      perl Makefile.PL PREFIX=/path/to/your/perl-lib
+   %> make
+   %> PERL5LIB=/path/to/your/perl-lib/lib/site_perl:/path/to/your/perl-lib/lib \
+      make test
+   %> make install
+
+To test the installation:
+
+   %> PERL5LIB=/path/to/your/perl-lib/lib/site_perl perldoc Apache::SessionManager 
+
+=head2 TESTING Apache::SessionManager
+
+Tipically, without system administration account you cannot manage Apache
+F<httpd.conf>.
+
+Also if you cannot install (or run) another C<httpd> instance even at high
+ports (for example > 1024) the only possibilty to use session manager is to
+configure F<.htaccess> file appropriately.
+
+Using F<.htaccess>, you must install
+L<Apache::SessionManager|Apache::SessionManager> in C<Header parsing> phase of
+Apache request instead of C<URI translation> phase. Moreover, it is possible to
+use only cookies for the session tracking.
+
+This is an example of how configure F<.htaccess> file for use session (using
+file system as backend datastore) with CGI scripts under 
+L<Apache::Registry|Apache::Registry>:
+
+   <IfModule mod_perl.c>
+      <Perl>
+         use lib '/path/to/your/perl-lib/lib/site_perl',
+                 '/path/to/your/perl-lib/lib/';           # for Storable.pm
+      </Perl>
+      PerlModule Apache::SessionManager
+      <FilesMatch "\.cgi$">
+         SetHandler perl-script
+         PerlHandler Apache::Registry
+         PerlSendHeader On
+         PerlSetupEnv On
+         Options ExecCGI
+         PerlHeaderParserHandler Apache::SessionManager
+
+         PerlSetVar SessionManagerTracking On
+         PerlSetVar SessionManagerExpire 300
+         PerlSetVar SessionManagerInactivity 1800
+         PerlSetVar SessionManagerName SESSIONID
+         PerlSetVar SessionManagerStore File
+         PerlSetVar SessionManagerStoreArgs "Directory => /path/to/session/data"
+         PerlSetVar SessionManagerDebug 5
+      </FilesMatch>
+   </IfModule>   
+
+To test session you can use this simple CGI script:
+
+   #!/usr/bin/perl
+
+   use Data::Dumper ();
+
+   my $session = Apache::SessionManager::get_session(Apache->request);
+   $session->{$$ . '-' . rand()} = rand; 
+
+   print "Content-type: text/html\n\n";
+   print '<PRE>' . Data::Dumper::Dumper($session) . '</PRE>'; 
+
+Save it with a F<.cgi> extension (like F<session.cgi>) in the same directory
+where you have F<.htaccess> and make it executable by web server.
+
+=head1 USING Apache::SessionManager AND Apache::DBI 
+
+=head2 INTRODUCTION
+
+This section describes how to use
+L<Apache::SessionManager|Apache::SessionManager> with
+L<Apache::DBI|Apache::DBI> when using a RDBMS for sessions back-end datastore.
+
+L<Apache::DBI|Apache::DBI> is a useful mod_perl module that caches database
+connections according to args (like DBD driver, user, password) and attributes.
+So, if your application uses a different user and/or attributes to connect to a
+(different) database, every connection will be cached. Also, every child could
+have these cached DB's handles. L<Apache::DBI|Apache::DBI> works very well for
+web applications that uses same DB user.
+
+=head2 CONFIGURATION
+
+There is no need of extra configuration steps to use advantage of persistent DB
+connections offered by L<Apache::DBI|Apache::DBI> when using
+L<Apache::SessionManager|Apache::SessionManager> with a RDBMS as session
+datastore.
+
+L<Apache::DBI|Apache::DBI> overrides DBI C<connect> and C<disconnect>  methods
+and it intercepts, transparently, all related calls (including
+L<Apache::SessionManager|Apache::SessionManager> DBI calls) by returning cached
+connections, if any. 
+
+Simply add a line like:
+
+   PerlModule Apache::DBI
+
+in your F<httpd.conf>, or:
+
+   use Apache::DBI;
+
+in a F<startup.pl> file where you can also setup your initial persistent
+connection.
+
+However, remember that you must load L<Apache::DBI|Apache::DBI> module before
+L<DBI|DBI> or any module that uses it! 
+
+=head2 TESTING
+
+Restart the server and... test your application :-)
+
+Additionally, you can enable perl-status console by putting, before loading
+L<Apache::DBI|Apache::DBI>, lines like:
+
+   <Location /perl-status>
+      SetHandler perl-script
+      PerlHandler Apache::Status
+      # or PerlResponseHandler Apache::Status in mod_perl 2
+   </Location>   
+
+You will see in the 'DBI connections' page, the cached datasource (in current
+child) used by Apache::Session::* plugin datastore you've chosen.  Also yo can
+start C<httpd> in single mode with C<-X> option to work with a single child.
+
+=head2 SEE ALSO
+
+L<Apache::DBI|Apache::DBI>
+
+=head1 MOVING SESSION EXPIRATION POLICIES TO THE CLIENT SIDE
+
+=head2 INTRODUCTION
+
+This section describes how to move expiration policies on the client side by
+setting expiration cookie properties appropriately.
+
+=head2 CONFIGURATION
+
+Practically, you must only add C<Expires> cookie attribute in
+C<SessionManagerCookieArgs> module directive:
+
+   <Location /sessions>
+      SetHandler perl-script
+      PerlHandler Apache::MyModule
+
+      PerlSetVar SessionManagerExpire none
+      PerlSetVar SessionManagerStore File
+      PerlSetVar SessionManagerCookieArgs "Path => /sessions, Expires => +2d"
+      PerlSetVar SessionManagerStoreArgs "Directory => /tmp"
+   </Location>
+
+Optionally, you can set C<SessionManagerExpire> with value C<none>(or C<no> or
+C<disable>) in order to disable expiration session control at server side.
+
+However, it is not completely safe to left session expiration policies only on
+the client side. A C<SessionManagerExpire> value should be always defined.
+
+=head1 SEE ALSO
+
+L<Apache::SessionManager|Apache::SessionManager>,L<Apache::Request|Apache::Request>,
+L<Apache::Cookie|Apache::Cookie>, L<Apache|Apache>, perl(1)
+
+=head1 AUTHORS
+
+Enrico Sorcinelli <enrico@sorcinelli.it>
+
+=head1 VERSION
+
+0.06
+
+=head1 BUGS 
+
+Send bug reports and comments to: enrico@sorcinelli.it In each report please
+include the module version, the Perl version, the Apache, the mod_perl version
+and your OS. If the problem is  browser dependent please include also browser
+name and version.
+
+Patches are welcome and I'll update the document if any problems or errors
+will be found.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2001-2003 Enrico Sorcinelli. All rights reserved.
+This program is free software; you can redistribute it 
+and/or modify it under the same terms as Perl itself. 
+
+=cut

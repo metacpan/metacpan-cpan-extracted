@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/ExamplePackage.pm
+lib/Attribute/Default.pm
+t/basic.t
+t/exsub.t
+t/exsub_defaults.t
+xt/pod.t
+xt/pod_coverage.t

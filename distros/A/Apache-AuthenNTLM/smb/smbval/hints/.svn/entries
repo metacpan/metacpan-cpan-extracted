@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="9"
+   name=""
+   committed-date="2004-09-21T10:22:21.291102Z"
+   url="file:///home/speeves/svn/modperl/authenntlm/trunk/smb/smbval/hints"
+   last-author="root"
+   kind="dir"
+   uuid="55723fa2-1fe4-0310-95fb-f6aa04edc561"
+   revision="15"/>
+<entry
+   committed-rev="9"
+   name="solaris_2.pl"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="3a28e111fb2e257e718d4fdf8e739c2e"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+</wc-entries>

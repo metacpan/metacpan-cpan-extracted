@@ -1,0 +1,95 @@
+NAME
+    Authen::Perl::NTLM - Perl extension for NTLM related computations
+
+SYNOPSIS
+    use Authen::Perl::NTLM qw(nt_hash lm_hash);
+
+        $my_pass = "mypassword";
+        $client = new_client Authen::Perl::NTLM(lm_hash($my_pass), nt_hash($my_pass));
+
+    # To compose a NTLM Negotiate Packet $flags =
+    Authen::Perl::NTLM::NTLMSSP_NEGOTIATE_80000000 |
+    Authen::Perl::NTLM::NTLMSSP_NEGOTIATE_128 |
+    Authen::Perl::NTLM::NTLMSSP_NEGOTIATE_ALWAYS_SIGN |
+    Authen::Perl::NTLM::NTLMSSP_NEGOTIATE_OEM_DOMAIN_SUPPLIED |
+    Authen::Perl::NTLM::NTLMSSP_NEGOTIATE_OEM_WORKSTATION_SUPPLIED |
+    Authen::Perl::NTLM::NTLMSSP_NEGOTIATE_NTLM |
+    Authen::Perl::NTLM::NTLMSSP_NEGOTIATE_UNICODE |
+    Authen::Perl::NTLM::NTLMSSP_NEGOTIATE_OEM |
+    Authen::Perl::NTLM::NTLMSSP_REQUEST_TARGET; $negotiate_msg =
+    $client->negotiate_msg($flags);
+
+    # To instantiate a server to compose a NTLM challenge $server =
+    new_server Authen::Perl::NTLM; $flags =
+    Authen::Perl::NTLM::NTLMSSP_NEGOTIATE_ALWAYS_SIGN |
+    Authen::Perl::NTLM::NTLMSSP_NEGOTIATE_NTLM |
+    Authen::Perl::NTLM::NTLMSSP_REQUEST_INIT_RESPONSE |
+    Authen::Perl::NTLM::NTLMSSP_NEGOTIATE_UNICODE |
+    Authen::Perl::NTLM::NTLMSSP_REQUEST_TARGET; $challenge_msg =
+    $server->challenge_msg($flags);
+
+    # client parse NTLM challenge ($domain, $flags, $nonce, $ctx_upper,
+    $ctx_lower) = $client->parse_challenge($challenge_msg);
+
+    # To compose a NTLM Response Packet $flags =
+    Authen::Perl::NTLM::NTLMSSP_NEGOTIATE_ALWAYS_SIGN |
+    Authen::Perl::NTLM::NTLMSSP_NEGOTIATE_NTLM |
+    Authen::Perl::NTLM::NTLMSSP_NEGOTIATE_UNICODE |
+    Authen::Perl::NTLM::NTLMSSP_REQUEST_TARGET; $auth_msg =
+    $client->auth_msg($nonec, $flags);
+
+DESCRIPTION
+    The NTLM (Windows NT LAN Manager) authentication scheme is the
+    authentication algorithm used by Microsoft.
+
+    NTLM authentication scheme is used in DCOM and HTTP environment. It is
+    used to authenticate DCE RPC packets in DCOM. It is also used to
+    authenticate HTTP packets to MS Web Proxy or MS Web Server.
+
+    Currently, it is the authentication scheme Internet Explorer chooses to
+    authenticate itself to proxies/web servers that supports NTLM.
+
+    As of this version, NTLM module only provides the client side functions
+    to calculate NT response and LM response. The next revision will provide
+    the server side functions that computes the nonce and verify the NTLM
+    responses.
+
+    This module was written without the knowledge of Mark Bush's (MARKBUSH)
+    NTLM implementation. It was used by Yee Man Chan to implement a Perl
+    DCOM client.
+
+DEPENDENCIES
+    To use this module, please install the one of the following two sets of
+    DES and MD4 modules:
+
+    1) Crypt::DES module by Dave Paris (DPARIS) and Digest::MD4 module by
+    Mike McCauley (MIKEM) first. These two modules are implemented in C.
+
+    2) Crypt::DES_PP module by Guido Flohr (GUIDO) and Digest::Perl::MD4
+    module by Ted Anderson (OTAKA). These two modules are implemented in
+    Perl.
+
+    The first set of modules will be preferred by NTLM because they are
+    supposedly faster.
+
+TO-DO
+    1) A function to parse NTLM negotiation packet for DCE RPC.
+
+    2) A function to parse NTLM response packet for DCE RPC.
+
+    3) A function to compute session key for DCE RPC.
+
+    4) Implement the module in C.
+
+BUGS
+    Nothing known.
+
+AUTHOR
+    This implementation was written by Yee Man Chan (ymc@yahoo.com).
+    Copyright (c) 2002 Yee Man Chan. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+SEE ALSO
+    Digest::MD4(3), Crypt::DES(3), perl(1), m4(1).
+

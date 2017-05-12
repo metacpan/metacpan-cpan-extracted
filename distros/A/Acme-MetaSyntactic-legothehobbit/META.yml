@@ -1,0 +1,26 @@
+---
+abstract: 'LEGO The Hobbit game theme'
+author:
+  - 'Chris Williams'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::MetaSyntactic: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-MetaSyntactic-legothehobbit
+requires:
+  Acme::MetaSyntactic::List: '1.001'
+  perl: v5.6.0
+resources:
+  homepage: https://github.com/bingos/acme-metasyntactic-legothehobbit
+  repository: https://github.com/bingos/acme-metasyntactic-legothehobbit.git
+version: '0.02'

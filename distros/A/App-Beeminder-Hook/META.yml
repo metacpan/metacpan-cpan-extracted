@@ -1,0 +1,28 @@
+---
+abstract: 'Integrate Github and Beeminder'
+author:
+  - "Jonathan \"Duke\" Leto <jonathan@leto.net>"
+build_requires:
+  Dancer::Test: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Beeminder-Hook
+requires:
+  Dancer: 0
+  Data::Dumper: 0
+  JSON::Any: 0
+  YAML: 0
+  autodie: 0
+resources:
+  homepage: http://github.com/letolabs/App-Beeminder-Hook
+  repository: http://github.com/letolabs/App-Beeminder-Hook.git
+version: 0.003

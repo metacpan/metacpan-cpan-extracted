@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+AI/Gene/Sequence.pm
+AI/Gene/Simple.pm
+demo/Regexgene.pm
+demo/Musicgene.pm
+demo/spamscan.pl
+demo/music.pl
+t/tgene.t
+t/tsimp.t
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

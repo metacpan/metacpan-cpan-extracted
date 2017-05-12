@@ -1,0 +1,12 @@
+Key
+ . = still to do
+ - = discarded
+ * = completed
+
+* move executable over from TPath::Forester::File
+
+Attic
+-----
+
+Completed TODO items kept around as curios.
+

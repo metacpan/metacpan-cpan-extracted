@@ -1,0 +1,54 @@
+---
+abstract: 'Client for txtwt, the minimalist microblogging service for hackers'
+author:
+  - 'Mario Domgoergen C<< <mario@domgoergen.com> >>'
+build_requires:
+  FindBin: '0'
+  Mojo::UserAgent::Server: '0'
+  Mojolicious::Lite: '0'
+  Test::More: '0'
+  Test::Output: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-txtnix
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  Carp: '0'
+  Config::Tiny: '0'
+  IO::Interactive: '0'
+  IO::Pager: '0'
+  Mojo::Base: '0'
+  Mojo::ByteStream: '0'
+  Mojo::Date: '0'
+  Mojo::JSON: '0'
+  Mojo::Loader: '0'
+  Mojo::Template: '0'
+  Mojo::URL: '0'
+  Mojo::UserAgent: '0'
+  Mojolicious: '6.54'
+  OptArgs: '0'
+  POSIX: '0'
+  Path::Tiny: '0'
+  String::ShellQuote: '0'
+  Term::ANSIColor: '1.04'
+  Text::Wrap: '0'
+  Time::Local: '1.2100'
+  perl: v5.14.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/mdom/txtnix/issues
+  homepage: https://github.com/mdom/txtnix
+  repository: https://github.com/mdom/txtnix.git
+version: '0.07'
+x_contributors:
+  - 'Mario Domgoergen <mdom@taz.de>'

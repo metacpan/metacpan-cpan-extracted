@@ -1,0 +1,67 @@
+domain "PageKit.mo"
+
+#
+# Apache2::PageKit
+#
+
+msgid "You have successfully logged in."
+msgstr ""
+
+msgid "You have successfully logged out."
+msgstr ""
+
+msgid "Cookies must be enabled in your browser."
+msgstr ""
+
+msgid "This page requires a login."
+msgstr ""
+
+msgid "Please try again."
+msgstr ""
+
+msgid "You did not fill out all the required fields. Please fill the <font color=\"<PKIT_ERRORSTR>\">red</font> fields."
+msgstr ""
+
+#
+# MyPageKit::Common
+#
+
+msgid "Your login/password is invalid. Please try again."
+msgstr ""
+
+msgid "You did not fill all of the fields.  Please try again."
+msgstr ""
+
+#
+# MyPageKit::MyModel
+#
+
+msgid "Your changes have been made."
+msgstr ""
+
+msgid "The E-mail address, <b>%%VALUE%%</b>, is invalid."
+msgstr ""
+
+msgid "The phone number, <b>%%VALUE%%</b>, is invalid."
+msgstr ""
+
+msgid "[Session not set]"
+msgstr ""
+
+msgid "The login, <b>%%VALUE%%</b>, has already been used."
+msgstr ""
+
+msgid "The phone number you entered is invalid."
+msgstr ""
+
+msgid "The passwords you entered do not match."
+msgstr ""
+
+msgid "This message was passed throught pkit_redirect"
+msgstr ""
+
+msgid "Another message passed throught pkit_redirect"
+msgstr ""
+
+msgid "This ERROR message was passed throught pkit_redirect"
+msgstr ""

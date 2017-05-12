@@ -1,0 +1,162 @@
+#!/usr/bin/env perl
+# PODNAME: appbasis - simple script to create a boilerplate app
+# ABSTRACT: Create a boilerplate app for App::Basis
+
+
+use strict;
+use warnings;
+use App::Basis ;
+use Path::Tiny;
+
+# -----------------------------------------------------------------------------
+# main
+
+my %opt = init_app(
+    help_text    => "Create a new App::Basis app",
+    help_cmdline => "filepath_of_file_to_create",
+    options      => {
+        'overwrite|o' => 'allow overwrite of existing file',
+    } 
+);
+
+my $appname = $ARGV[0];
+
+show_usage( "You need to provide the filepath") if ( !$appname ) ;
+show_usage( "$appname already exists, not overwriting") if ( -f $appname && !$opt{ overwrite} ) ;
+
+my $path = path($appname)->dirname;
+path($path)->mkpath if ($path);
+
+# read the data section after __END__
+my $boilerplate = join( "", <DATA> );
+my $shortname = path( $appname)->basename ;
+$boilerplate =~ s/%%APPNAME%%/$shortname/gsm;
+# remove the leading '|' that is used to keep the boilerplate doc header away 
+# from the pod for this app
+$boilerplate =~ s/^\|//gsm ;
+
+path($appname)->spew($boilerplate);
+if ( -f $appname ) {
+
+    # being lazy, not reading in the current value and updating and writing back
+    system("chmod a+x '$appname'");
+    print "app $appname created.\n";
+}
+else {
+    print "failed to create $appname\n";
+    exit 1;
+}
+
+exit 0;
+
+# this is the boilerplate
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+appbasis - simple script to create a boilerplate app - Create a boilerplate app for App::Basis
+
+=head1 VERSION
+
+version 1.2
+
+=head1 SYNOPSIS
+
+    > appbasis file/to/create
+
+=head1 DESCRIPTION
+
+Create the boilerplate for an L<App::Basis> application.
+
+This simple script creates all you need to get started, adds command line 
+handling and config file
+
+=head1 AUTHOR
+
+Kevin Mulholland <moodfarm@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kevin Mulholland.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__END__
+|#!/usr/bin/env perl
+|# PODNAME: %%APPNAME%% - simple script to ...
+|# ABSTRACT: Create a boilerplate app for App::Basis
+|
+|=head1 NAME
+|
+|%%APPNAME%%
+|
+|=head1 SYNOPSIS
+|
+|    > %%APPNAME%% ..options..
+|
+|    to get full help use
+|    > %%APPNAME%% --help   
+|
+|=head1 DESCRIPTION
+|
+|Description of what your application does
+|
+|=cut
+
+#
+# (c) yourname, your@email.address.com
+# this code is released under the Perl Artistic License
+
+use 5.10.0 ;
+use strict;
+use warnings;
+use App::Basis;
+use App::Basis::Config ;
+
+# -----------------------------------------------------------------------------
+# main
+
+my $program = get_program();
+
+my %opt = init_app(
+    help_text    => "Boiler plate code for an App::Basis app",
+    help_cmdline => "extra commandline args",
+    options      => {
+        'verbose|v' => 'Dump extra useful information',
+        'test=s'    => {
+            desc => 'test item',
+
+            # depends => 'item',
+            default => 'testing 123',
+
+            # required => 1,
+        },
+        'item=s' => {
+
+            # required  => 1,
+            default => '123',
+            desc    => 'another item',
+
+            # validate => sub { my $val = shift ; return $val eq 'item'}
+        }    
+    },
+    #log_file => "your-logfile",
+);
+
+# debug will go into "~/$program.log" by default
+
+# lets have the config named after this program
+my $cfg = App::Basis::Config->new( filename => "~/.$program" ) ;
+# example of using an app specifc config
+my $user = $cfg->get('/appbasis/name') ;
+my $pass = $cfg->get('/appbasis/password') ;
+
+if ( $opt{verbose} ) {
+    debug( "INFO", "Started");
+}

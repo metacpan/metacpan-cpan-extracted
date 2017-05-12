@@ -1,0 +1,39 @@
+---
+abstract: 'application class for syntax highlighting Perl source code'
+author:
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0
+  Test::Output: 0
+  open: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-perlhl
+no_index:
+  directory:
+    - corpus
+    - inc
+    - examples
+requires:
+  Getopt::Long: 0
+  Pod::Usage: 0
+  Syntax::Highlight::Perl::Improved: 1.01
+  Term::ANSIColor: 3.00
+  if: 0
+  perl: v5.10.1
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/doherty/App-perlhl/issues
+  homepage: http://metacpan.org/release/App-perlhl/
+  repository: git://github.com/doherty/App-perlhl.git
+version: 0.007

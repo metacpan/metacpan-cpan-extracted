@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.pod
+bin/git-gerrit
+dist.ini
+etc/bash_completion.d/git-gerrit
+lib/App/GitGerrit.pm
+t/00-load.t
+t/author-critic.t
+t/release-pod-syntax.t
+tidyall.ini

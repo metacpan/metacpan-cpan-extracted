@@ -1,0 +1,31 @@
+---
+abstract: 'Use the power of Net::Amazon::EC2 to power Cluster SSH (or CsshX)'
+author:
+  - 'Jerome Eteve <jerome.eteve@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-EC2Cssh
+requires:
+  AnyEvent: '0'
+  Cwd: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  IO::Pipe: '0'
+  IO::Socket::SSL: '2.012'
+  IPC::System::Simple: '0'
+  Log::Any: '1.032'
+  Net::Amazon::EC2: '0.30'
+  Pod::Usage: '0'
+  Safe: '0'
+  Text::Template: '1.46'
+resources:
+  homepage: https://github.com/jeteve/ec2-cssh
+  repository: https://github.com/jeteve/ec2-cssh.git
+version: '0.007'

@@ -1,0 +1,37 @@
+				TO DO
+
+We should handle PUT and OPTIONS requests.  We should handle Expect
+headers and 100 (Continue) responses.
+
+We should handle TRACE requests and the Max-Forwards field.  However,
+TRACE requests never even make it to the handler.
+
+We should use the proposed DRP and WEBDAV mechanisms to get
+information about mirrors, rather than having to input all this
+information manually.
+
+Via field uses a pseudonym (apache) to suppress the hostname for
+security but exposes the server version in a comment.  Should allow
+customization or at least suppression of the comment.  Should allow
+choice of whether or not to suppress the hostname.  Should use same
+or similar directive name as the Apache Proxy module, whenever it
+gets around to implementing this requirement.
+
+The UserAgent and cached configuration information are created and
+stored per-process.  Would it be better to have just one copy for all
+processes?  In particular, the index of the next site for round-robin
+multiplexing is stored with the configuration information and would be
+better as a global.
+
+Try using Apache::URI instead of URI::URL.
+
+Consider allowing passing of requests to Apache's proxy mechanism.
+Automatic failover in this case would be quite difficult and is
+probably not worthwhile.  However, many people would like a faster
+more lightweight method for distributing requests amongst their own
+servers which, presumably, never fail. :-)
+
+Remember which servers have errored.  Move these servers to the end of
+the priority queue until after some user specified timeout.  This will
+allow known bad servers to be tried only after any other servers have
+been tried.

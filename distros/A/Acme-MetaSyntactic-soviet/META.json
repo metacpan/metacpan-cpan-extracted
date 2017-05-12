@@ -1,0 +1,67 @@
+{
+   "abstract" : "Metasyntactic theme with NATO codenames for Soviet-designed equipment",
+   "author" : [
+      "Jean Forget <JFORGET@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-MetaSyntactic-soviet",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::MetaSyntactic::MultiList" : "1",
+            "Test::More" : "0",
+            "perl" : "v5.6.2",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::MetaSyntactic::soviet" : {
+         "file" : "lib/Acme/MetaSyntactic/soviet.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jforget/Acme-MetaSyntactic-soviet.git",
+         "web" : "https://github.com/jforget/Acme-MetaSyntactic-soviet"
+      }
+   },
+   "version" : "0.05"
+}

@@ -1,0 +1,39 @@
+---
+abstract: 'Creates .info file for use with Impressive and LaTeX Beamer'
+author:
+  - 'Joel A. Berger <joel.a.berger@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-makebeamerinfo
+no_index:
+  file:
+    - README.pod
+provides:
+  App::makebeamerinfo:
+    file: lib/App/makebeamerinfo.pm
+    version: 2.002
+  App::makebeamerinfo::CLI:
+    file: lib/App/makebeamerinfo/CLI.pm
+    version: 0
+  App::makebeamerinfo::GUI:
+    file: lib/App/makebeamerinfo/GUI.pm
+    version: 0
+  App::makebeamerinfo::Transitions:
+    file: lib/App/makebeamerinfo/Transitions.pm
+    version: 0
+recommends:
+  Tk: 0
+requires:
+  perl: v5.8.1
+resources:
+  bugtracker: http://github.com/jberger/MakeBeamerInfo/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/MakeBeamerInfo
+version: 2.002

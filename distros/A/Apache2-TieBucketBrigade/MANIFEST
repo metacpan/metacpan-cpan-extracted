@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Apache2/TieBucketBrigade.pm
+t/TEST.PL
+t/conf/extra.conf.in
+t/response/Apache/TestTieBucketBrigade.pm
+META.yml                                 Module meta-data (added by MakeMaker)

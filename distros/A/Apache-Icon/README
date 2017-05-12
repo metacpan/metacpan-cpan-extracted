@@ -1,0 +1,69 @@
+NAME
+    Apache::Icon - Lookup icon images
+
+SYNOPSIS
+        use Apache::Icon ();
+        my $icon = Apache::Icon->new($subr);
+        my $img = $icon->find || $icon->default;
+        my $alt = $icon->alt;
+
+DESCRIPTION
+    This module rips out the icon guts of mod_autoindex and provides
+    a Perl interface for looking up icon images. The motivation is
+    to piggy-back the existing *AddIcon* and related directives for
+    mapping file extensions and names to icons, while keeping things
+    as small and fast as mod_autoindex does.
+
+METHODS
+    new Create a new *Apache::Icon* object with the given
+        *Apache::SubRequest* object. Example:
+
+            for my $entry (sort $dh->read) {
+                next if $entry eq '.';
+                my $subr = $r->lookup_file($entry);
+                my $icon = Apache::Icon->new($subr);
+                ...
+
+    find
+        Lookup icon image associated with the subrequest.
+
+            my $img = $icon->find;
+
+    default
+        Lookup the default icon images.
+
+            my $img = $icon->default; #DefaultIcon (unknown.gif)
+            my $img = $icon->default("^^DIRECTORY^^"); #folder.gif
+            my $img = $icon->default("^^BLANKICON^^"); #blank.gif
+
+    alt Lookup the text alternative specified by the AddAlt directive.
+
+            my $alt = $icon->alt || $img;
+
+DIRECTIVES
+    Refer to the *mod_autoindex* documentation for directives listed
+    here with no description.
+
+    IconDouble
+        This directive can be set to *On* or *Off*. The default is
+        *On* if *mod_autoindex* is configured with the server, *Off*
+        otherwise. When the directive is *On*, *mod_icon* directive
+        handlers will return DECLINE_CMD after processing which
+        allows *mod_autoindex* to also handle the various *Icon* and
+        *Alt* directives.
+
+    AddIcon
+    AddIconByType
+    AddIconByEncoding
+    AddAlt
+    AddAltByType
+    AddAltByEncoding
+    DefaultIcon
+SEE ALSO
+    Apache::AutoIndex(3)
+
+AUTHOR
+    Doug MacEachern
+
+    C code based on mod_autoindex by the Apache Group
+

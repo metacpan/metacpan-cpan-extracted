@@ -1,0 +1,117 @@
+0.20  Wed 30 Nov 2011
+        - Lazy loading of channel content
+          (infinite scrolling)
+        - Ignore part/join
+        - UI additions (join button, etc)
+        - Use Fliggy and websocket-js for Firefox
+        - Use noembed.com for embedded content
+          (tweets, video, etc.)
+
+0.19  Tue 31 Aug 2010
+        - Added a dark theme
+        - Made preferences and connections windows
+          into popup divs instead of real windows
+        - Redis message store improvements
+        - Improved debug output
+        - Workarounds for weird android browser
+          quirks
+        - Much better mobile style
+        - Improved reconnect behavior
+        - Nick tab completion in private messages
+        - Use browser's timezone for timestamps
+        - Faster page loads
+
+0.18  Tue 10 Aug 2010
+        - Shortcuts work on Linux and Windows
+        - Alt-[0-9] shortcuts added to jump to tab
+        - javascript bug fixes
+        - Added link to grant Chrome permission
+          for notifications
+        - Fixed tab order saving
+
+0.17  Fri 30 Jul 2010
+        - Improved URL regex (thanks gruber)
+        - Added color chooser to wysiwyg
+        - Smooth out wysiwyg interface
+        - Bump IRC::Formatting::HTML requirement
+          for improved invert/italic support
+        - Better iPad display
+        - Some changes to improve memory usage
+          by a small amount 
+        - URL hash tags for each tab include network
+          and tab name, instead of md5 of them
+
+0.16  Fri 18 Jun 2010
+        - Added basic wysiwyg input field
+        - Reload commands without restarting
+        - Added /names -avatars to view a grid of
+          nicks and avatars in the channel
+        - Added support for REALNAME command
+          (only works on hector irc server)
+
+0.15  Thu 03 Jun 2010
+        - Added a help dialog
+        - Added a preferences window that allows:
+          - disabling inline images
+          - disabling avatars
+          - disabling alerts
+          - custom highlight list
+        - Put current tab in the URL hash
+          - refocuses current tab on reload
+        - Style highlighted lines w/ a red stripe
+        - Various CSS and JS fixes
+        - Use random port in tests
+        - Added /window command
+        - Better iPad/iPod display
+
+0.14  Sun 18 Apr 2010
+        - Fixed broken tests
+
+0.13  Sat 10 Apr 2010
+        - Use cookie based auth
+        - Don't break on perl 5.8
+        - Added Redis message store
+        - Moved most display logic to CSS
+
+0.12  Thu 25 Mar 2010
+        - Switched to Twiggy from AE:HTTPD
+        - Many HTML/CSS tweaks
+        - Sends buffered messages with initial page
+          load (loads much faster)
+        - Improved iPhone stylesheet
+
+0.11  Sat 13 Mar 2010
+        - Improved unicode support
+        - Faster shutdown process
+        - Make / an alias for /view
+        - Show context for log search result on click
+
+0.10  Mon 22 Feb 2010
+        - Added NullLogger to fix test failures
+
+0.09  Sun 21 Feb 2010
+        - Added back log.db template file
+
+0.06  Tue 06 Dec 2009
+        - Fixed bug with initial tab focus
+
+0.05  Tue 06 Dec 2009
+        - Removed Digest::CRC dependency
+        - Added /ignore /unignore and /ignores
+        - UI additions
+        - Switched to Any::Moose
+
+0.04  Tue 24 Nov 2009
+        - Removed MooseX::ClassAttribute dependency
+        - Added reconnect retry counter
+
+0.03  Sat 21 Nov 2009
+        - Fixed a number of issues with reconnecting
+        - Fixed issue adding new server from config window
+
+0.02  Fri 20 Nov 2009
+         - Switched to AnyEvent and Text::MicroTemplate
+         - Removed other dependencies
+
+0.01  Wed 19 Aug 2009
+         - Initial release

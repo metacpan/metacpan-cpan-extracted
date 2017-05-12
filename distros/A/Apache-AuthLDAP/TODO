@@ -1,0 +1,2 @@
+- Convert over to using PerLDAP
+- Add better fault handling routines

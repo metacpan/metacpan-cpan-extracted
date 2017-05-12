@@ -1,0 +1,10 @@
+Revision history for Acme-LAUTER-DEUTSCHER
+
+1.02    Tue Nov 15 07:56:01 EST 2005
+        * Fixed plan error in POD coverage test
+
+1.01    Sun Nov 13 21:01:44 EST 2005
+        * Module is now PGP signed
+
+1.00    Sun Nov 13 15:20:35 EST 2005
+        * Intial release

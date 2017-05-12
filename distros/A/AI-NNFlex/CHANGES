@@ -1,0 +1,281 @@
+0.24
+20050620
+
+Fixed a bug in the implementation of bias weights. Implemented
+the addition example.
+
+##########################################################
+
+0.23
+20050424
+
+changed sigmoid to sigmoid2 in mathlib - this is a sigmoid
+function generally used in BPTT, which isn't yet implemented.
+
+Replaced with a more standard 1/1+exp(1)**-x function.
+
+Implemented Hopfield module.
+
+###########################################################
+0.22
+XXXXXXXXX
+
+implemented node & layer connect methods, to allow recurrent
+connections.
+
+put sigmoid_slope function in mathlib, courtesy of frodo72
+@ perlmonks
+
+Implemented functions to save & load snns .pat files in Dataset
+
+Altered Dataset constructor to allow an empty param set - you
+can now construct a null Dataset & add items to it using the
+$dataset->add([[0,1],[1]) method (also implemented in this 
+version.
+
+Altered feedforward run method to return output pattern - more
+intuitive that way.
+
+Implemented a Hopfield module. This is very much the first cut
+at this, since I've never really used hopfield nets before, and
+haven't put any debug in etc, until I've rethought the whole
+approach to debug in this set of code.
+
+Implemented dataset->delete method.
+
+Put the pod documentation back in Dataset.pm :-)
+
+
+###############################################################
+0.21
+20050313
+
+Rewrote all the pod. Its probably a bit sparse now, but its 
+much more accurate.
+
+Removed the eval calls from feedforward, backprop & momentum
+for speed.
+
+Implemented fahlman constant. This eliminates the 'flat spot'
+problem, and gets the network to converge more reliably. XOR
+seems to never get stuck with this set to 0.1. as a bonus, its 
+also about 50% faster (do you sense a theme developing here?)
+
+Removed momentum module (well, removed backprop module and 
+renamed momentum module in fact). There were few code differences
+and its easier to maintain this way. Default option is vanilla
+backprop, momentum & fahlman adjustments are only implemented if
+specified in the network config.
+
+Bundled all the maths functions into AI::NNFlex::Mathlib
+
+Implemented calls to error transformation function, as per
+Fahlman. Testing, it doesn't seem to make much difference, but
+at least now the facility is there.
+
+#############################################################
+
+0.20
+20050308
+
+v0.17 was never released, as I rejigged the whole lot for
+object inheritance before I got around to uploading it to CPAN.
+Why? I hear you ask, when it worked OK already.
+1) its faster, a lot faster.
+2) feedforward isn't the only kind of network, and I wanted to
+be free to overload some of the methods (especially init) to
+simplify writing a Hopfield module (in progress)
+3) its more theoretically correct
+
+So now, AI::NNFlex is the base class for the other types of 
+networks, and you should never need to call AI::NNFlex class
+directly - you should call the constructor of the subclass, such
+as:
+my $network = AI::NNFlex::momentum->new(params);
+
+The upshot of that is that the network type and learning algorithm
+parameters are now obsolete.
+
+###
+
+Removed draw.pm from the distribution - it really wasn't very useful
+and hadn't been kept up to date with newer revisions of the code. It
+will be put back later (perhaps) or incorporated into a separate GUI
+frontend.
+
+Removed feedforward_pdl.pm from the distribution - it shouldn't have
+been there in the first place!
+
+Fixed the lesion subs so they expect parameter=>value pairs instead
+of an anonymous hash (left over from when I didn't know you could do
+that).
+
+Fixed an error - random weights was bounded by 1, not the parameter
+'randomweights'. Its now positive only. Some benchmarking needed as
+it appears that positive random starting weights rather than a mix
+of positive and negative make the network quicker to converge, at
+least with momentum.
+
+weights now defaults to rand(1) instead of 0 - at least for backprop
+type nets, a default 0 weight will never work. For other types of nets
+the random weights can be overridden with the 'fixedweights' parameter.
+
+Fixed load_state to correctly read weights from the bias node
+
+
+
+
+
+
+#############################################################
+0.17
+2005030x
+
+Implemented a rounding network property in output
+
+Fixed a bug that allowed activation to flow through a node 
+even if it was inactive
+
+Altered the syntax for output to be param=>value instead of
+an anonymous hash
+
+As per Scott Fahlmans comments about neural net benchmarking,
+(Fahlman S.E., (1988) 'An empirical study of learning speed in back-propagation networks'. Tech. Rep. CMU-CS-88-162, Carnegie Mellon University, Pittsburgh, PA.) , I've started using a more realistic benchmark than xor.
+The 'cars' subfolder in examples contains the learning code
+for this, drawn from
+ ftp://ftp.ics.uci.edu/pub/machine-learning-databases/car/
+
+
+
+
+
+#############################################################
+
+0.16
+20050218
+
+Changed the way weights are identified from a hash (keyed on
+stringified node object ref) to an array. Cleaner that way,
+and makes it easier to turn the weights into a matrix for
+compatibility with the upcoming PDL based modules.
+
+Altered the syntax for calls to load_state and dump_state,
+to get rid of the nasty hashref thing.
+
+Cleaned up a bit of debugging in ::init
+
+
+###############################################################
+0.15
+20050206
+
+I've rushed another release out because I found a big fat bug
+in feedforward. Instead of applying the transfer function to
+the summed node inputs, it was applying it to each input in
+turn, then again to the sum. Wups! The network is now more
+stable and a lot faster.
+
+I also altered the debug calls, so in normal use without debug
+the overhead is a lot smaller.
+
+This version, particular in use with momentum, is a LOT faster.
+
+###############################################################
+
+0.14
+20050201
+
+The backprop calculation was nailed to 1-y*y, which is the
+derivative of tanh, so only tanh hidden layers would work.
+Thats now been removed, and a function in linear & tanh called
+<activation function>_slope implemented, which returns the
+slope. I haven't implemented a slope function in sigmoid, for
+the simple reason that I need to learn how to integrate the
+function to find out what the slope is! 
+
+This version introduces a new, friendlier constructor. Instead
+of the pair of anonymous hashes previously required, the 
+constructor now takes fairly normal looking parameters. Layers
+are added to a network using the add_layer method. This combines
+a more intuitive approach with more flexibility.
+The original constructor is not deprecated. Parameter names with
+spaces in on the other hand ('activation function') are. They
+should be replaced by the same parameter name without any spaces.
+The new constructor will convert old format parameter names, but
+its at the users risk.
+See xor.pl or the perldoc & readme for examples.
+
+Cleaned up the perldoc some more. Commented out all the method
+perldocs, so there is just the single block defining the 
+distributions documentation, as advocated by perlmonks. Method
+perldocs in importable modules have not been commented out.
+
+Removed the weight bounding in backprop & momentum. If the network
+is going into an unstable state the weight bounding won't help,
+and it causes errors under perl -w.
+
+Implemented tests (apologies to the CPAN testers for not having
+done so before!).
+
+
+#################################################################
+
+0.13
+20050121
+
+New plugin training algorithm - momentum.pm
+Improvement in speed using momentum on xor as follows (epochs)
+mom 0.6
+334
+288
+124
+502
+7433
+avg=1736.2
+
+no mom
+641
+718
+20596
+19964
+660
+avg=8515.8
+
+Significant, I think you'll agree!
+
+Fixed a bug that allowed training to proceed even if the activation
+function (s) can't be loaded.
+
+################################################################
+
+0.12
+20050116
+
+Fixed a bug in reinforce.pm reported by G M Passos
+Inserted a catch in feedforward->run to call datasets if the syntax
+
+$network->run($dataset) is called.
+
+Strictly speaking this doesn't fit with the design, but its likely to
+be used quite a bit so its worth catching
+
+
+###############################################################
+
+0.11
+20050115
+Added PNG support to AI::NNFlex::draw
+
+Added AI::NNFlex::Dataset
+This creates a dataset object that can be run against a
+network
+
+Added AI::NNFlex::lesion
+Damages a network with a probability of losing a node
+or a connection. See the perldoc
+
+Cleaned up the POD docs a bit, although theres a lot still
+to do.
+
+################################################################
+

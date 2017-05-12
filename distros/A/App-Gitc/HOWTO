@@ -1,0 +1,97 @@
+This is a howto document to show you the process of setting up GITC from the
+beginning with RT.  You can alter it for your relevant ticketing system.
+
+This document assumes that you already have a working ticketing system, a
+working install of GIT, and have git pull-ed or downloaded and expanded an
+archive of gitc in the 'gitc' directory.
+
+Begin by editing gitc.config.  In this file, you will specify the various
+statuses tickets will be put in by gitc, as well as the user lookup method.
+
+The default rt_statuses for github is probably fine if that's what you're
+using, but we're using RT for this example, so copy/edit
+examples/rt-gitc.config.
+
+For RT, my default workflow is:
+
+Set( %Lifecycles, default => {
+    initial     => [qw( new )],
+    active      => [qw( in_progress merged failed in_test in_stage in_production pending_review )],
+    inactive    => [qw( worksforme closed rejected )],
+
+    transitions => {
+        q{}            => [qw(new)],
+        new            => [qw(worksforme in_progress closed rejected )],
+        worksforme     => [qw(closed new)],
+        in_progress    => [qw(new pending_review)],
+        closed         => [qw(new)],
+        rejected       => [qw(new closed)],
+        pending_review => [qw(in_progress new failed merged)],
+        failed         => [qw(in_progress pending_review closed)],
+        merged         => [qw(in_test in_progress failed)],
+        in_test        => [qw(failed in_progress in_stage)],
+        in_stage       => [qw(failed in_progress in_production)],
+        in_production  => [qw(failed in_progress closed)],
+    },
+} );
+
+In short, an example status:
+
+open:
+  from: '.*'
+  to: 'in_progress'
+  block: ['closed', 'in_production']
+
+This means the 'open' command will put a ticket in the 'in_progress' status,
+and it will let it go from any status, except closed or in production.  The
+from is a regex.
+
+user_lookup_method specifies which module in lib/App/Gitc/UserLookup will be
+used to get a list of users for submitting changesets to.
+
+user_lookup_group is a specific config value used by LocalGroup.
+
+The defaults are gitc tags, as well as users in a unix group.  You can
+implement your own class here if you need to.  The module is expected to have a
+'user_list' method.  The method will receive a copy of the gitc config, and is
+expected to return a list of usernames.
+
+Once your configuration file is ready to go, copy it to either
+/etc/gitc/gitc.config, or $HOME/.gitc/gitc.config or gitc.config in your
+project root directory.
+
+Next, create a '.gitc' file inside of the root of your git project.  In that
+file, enter:
+
+name: This is the name of my project.
+
+You can imagine what you should put there.
+
+Add and commit this file.
+
+Next, you'll need to make sure that the requisite branches are available on the
+remote server.  Create a test, stage, and prod branch to coincide with the
+config file.
+
+After that, you're done.
+
+Some common gitc commands:
+
+    open <ticket #> - Opens a new changeset in a new branch -- this gives you a
+    clean checkout of the code to start hacking on.  If you have an ITS (Issue
+    Tracking System) set up, it will update its status and put a note on it
+    saying you've done this.
+
+    edit <ticket #> - This lets you edit a previously existing ticket.  Usually
+    to fix a failure from a code review.
+
+    submit <reviewer> - This submits the current changeset's changes to a reviewer.
+
+    fail - This is if you're the reviewer of an application and have decided
+    something in the code/changeset makes it unpassable.
+
+    pass - Merges the code to your master branch, and marks it ready for promotion.
+
+    promote <target> - Used to promote code into <target> branch.  It will
+    merge it, and then give you a chance to go play with it and make sure it
+    works out OK.

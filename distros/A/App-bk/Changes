@@ -1,0 +1,24 @@
+Revision history for App-bk
+
+0.06    19th August 2013
+        Add in '-d' option to show file differences between current 
+            and previous version
+        Amend module prereq's
+
+0.05    11th July 2011
+        Fixes to tests for cpantesters.org
+
+0.04    7th July 2011
+        Change tests to ensure backed up file is writable before amending
+
+0.03    28th June 2011
+        Correct use of BAIL_OUT in tests
+
+0.02    24th June 2011
+        Allow tests to be run as root user
+        Improve documentation
+        Disallow building on Windows servers
+
+0.01    23rd May 2011
+        First version, released on an unsuspecting world.
+

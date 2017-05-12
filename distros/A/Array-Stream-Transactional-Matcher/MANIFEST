@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+Build.PL
+META.yml
+MANIFEST
+README
+t/01_value.t
+t/02_logical.t
+t/03_sequence.t
+t/04_multiple.t
+t/05_custom.t
+lib/Array/Stream/Transactional/Matcher.pm
+lib/Array/Stream/Transactional/Matcher/Rule.pm
+lib/Array/Stream/Transactional/Matcher/Logical.pm
+lib/Array/Stream/Transactional/Matcher/Value.pm
+lib/Array/Stream/Transactional/Matcher/Flow.pm

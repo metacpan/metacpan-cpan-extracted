@@ -1,0 +1,36 @@
+CHROOTDIR=/srv/chroot/lenny
+CHROOTNAME=lenny
+MIRRORURL=http://ftp.uk.debian.org/debian/
+
+# When installing the 'arepa' package:
+# * Create a user arepa-master
+# * Make that user part of the group 'sbuild'
+# * Make sure the directories /var/arepa/logs and /var/arepa/stats exist and
+#   are writable by arepa-master (/var/arepa is the home directory for
+#   arepa-master)
+# * /etc/apache2/sites-available/arepa-internal-repository will be part of the
+#   package. There has to be a notice somewhere that it has to be activated, or
+#   a similar configuration has to be converted to a different webserver
+# Alias /arepa-repository /var/arepa/repository
+# <Location /arepa-repository>
+#     Options +Indexes
+# </Location>
+# <Location /arepa-repository/conf>
+#     Order Deny,Allow
+#     Deny From All
+# </Location>
+# <Location /arepa-repository/db>
+#     Order Deny,Allow
+#     Deny From All
+# </Location>
+# # Maybe add something about only accessing from the same host? At least,
+# # commented out
+# * Create the reprepro configuration file
+# /var/arepa/repository/conf/distributions?
+
+
+# Steps to create a new builder:
+# * Have to give some option for the type of builder (schroot or other)
+# * Have to give some option for the "personality", at least for schroot
+# The sources.list might need some tweaking afterwards (distribution name or
+# URL for the local repo)

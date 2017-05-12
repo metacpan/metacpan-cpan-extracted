@@ -1,0 +1,52 @@
+Changelog for App-FastishCGI
+
+0.002 2012-01-12T18:54:09
+ [Ioan Rogers <ioan.rogers@gmail.com>]
+ - Not-so-auto readme
+
+ - Fixed #! for systemd, run service as non-priveleged user
+
+ - Improvements to docs and more useful logging+errors
+
+ - More fixed shebang path
+
+ - Fixed shebang path
+
+ - Use a different changelog generator
+
+ - * updated and fixed debian packaging
+   * added test cgi scripts (no auto tests yet!)
+   * improvements to dzil and podweaver
+   * doc tweaks
+
+ - * Using Pod::Weaver
+   * Tweaks for dist.ini
+   * Initial debian packaging
+
+
+v0.001 2011-10-06T22:26:11
+ [Ioan Rogers <ioan.rogers@gmail.com>]
+ - Release dzil.ini
+
+ - Debian packaging
+
+ - dzil tweaks
+
+ - Added systemd unit file
+
+ - Renamed file
+
+ - Switched to AnyEvent and made most things asynchronous
+
+ - Fixed readme
+
+ - * Improvements to dzil.ini
+   * Removed daemonising code as not needed on a systemd-based system
+   * Switched to Net::Async::FastCGI api
+
+ - * daemonising works
+   * install docs
+   * mod/app split
+   * standard boilerplate author tests
+
+

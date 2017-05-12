@@ -1,0 +1,23 @@
+######################################################################
+## File: $Id: TODO,v 1.9 2005/01/30 23:04:59 spadkins Exp $
+######################################################################
+
+These items next (high priority)
+
+These items are what will be required to go to version 1.0.
+
+ o Read appropriate vars from app.conf
+ o Auto-detect CGIDIR and HTMLDIR
+ o Install documentation ("html" directory) to $prefix/htdocs/docs
+ o Fix: ## Running 'make install UNINST=1' will unlink this file for you.
+   (actually, this is a Module::Build bug because it uses ExtUtils::Install)
+ o Write to perllocal.pod (as well as .packlist) (Module::Build bug)
+
+ o Ensure Win32 compatibility
+ o Fix App::Options so it runs on Win32
+ o Fix tests so that all paths use File::Spec
+
+These are other interesting things which I might do
+
+ o Write more tests
+

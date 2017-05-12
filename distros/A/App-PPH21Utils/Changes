@@ -1,0 +1,12 @@
+Revision history for App-PPH21Utils
+
+0.02    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+
+0.01    2015-12-22 (PERLANCAR)
+
+        - First release.

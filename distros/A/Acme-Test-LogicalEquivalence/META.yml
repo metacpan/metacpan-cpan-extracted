@@ -1,0 +1,45 @@
+---
+abstract: 'Test if expressions are logically equivalent'
+author:
+  - 'Charles McGarvey <chazmcgarvey@brokenzipper.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - test
+  - logic
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Test-LogicalEquivalence
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Acme::Test::LogicalEquivalence:
+    file: lib/Acme/Test/LogicalEquivalence.pm
+    version: '0.001'
+requires:
+  Exporter: '0'
+  Test::More: '0'
+  namespace::clean: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources: {}
+version: '0.001'
+x_authority: cpan:CCM
+x_serialization_backend: 'YAML::Tiny version 1.69'

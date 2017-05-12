@@ -1,0 +1,24 @@
+Except for *mirror* all definitions are taken directly from the
+HTTP 1.1 and HTTP Duplicate Suppression Internet-Drafts.
+
+gateway
+    A server which acts as an intermediary for some other server.
+    Unlike a proxy, a gateway receives requests as if it were the
+    origin server for the requested resource; the requesting client
+    may not be aware that it is communicating with a gateway.
+
+origin server
+    The server on which a given resource resides or is to be created.
+
+resource
+    A network data object or service that can be identified by a URI.
+
+instance
+    The entity that would be returned in a status-200 response to a
+    GET request, at the current time, for the selected variant of the
+    specified resource, but without the application of any
+    content-coding or transfer-coding.
+
+mirror
+    Informally, one of multiple origin servers or URIs providing the
+    same instance body.

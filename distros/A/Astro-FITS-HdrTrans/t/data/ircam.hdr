@@ -1,0 +1,117 @@
+                                  Identification:
+TELESCOP= 'UKIRT,Mauna_Kea,HI' / Telescope name
+INSTRUME= 'IRCAM3  '           / Instrument
+OBSERVER= 'opk     '           / Observers present
+OBSREF  = 'PATT17  '           / PATT or other reference
+PROJECT = 'none'               / Time-allocation code
+MSBID   = 'made-up-for-compliance' / Id min.-schedulable block
+RUN     =                  104 / Number of run
+OBJECT  = 'HS0741+4741'        / Object name from telescope
+OBJCLASS=                    0 / Class of observed object
+ORIGIN  = 'JAC, Hilo, Hawaii'  / Organisation creating the FITS file
+UTDATE  = 'Saturday, 05-Jan-2002' / Weekday and date
+IDATE   =             20020105 / Date as integer
+
+                                  Data Reduction:
+OBSNUM  =                  104 / Observation number
+GRPNUM  =                   51 / Number of observation group
+GRPMEM  =                    T / Whether or not frame is part of the group
+OBSTYPE = 'OBJECT  '           / Type of observation
+NOFFSETS=                    9 / Number of offset positions in a pattern
+STANDARD=                    F / Is the target a standard-star observation?
+DRRECIPE= 'NOD_SELF_FLAT_NO_MASK_APHOT' / Data-reduction recipe to be used
+
+                                  Astrometric and time information:
+EQUINOX =             2000.000 / Equinox of object position FK5 [years]
+PIXELSIZ=                0.081 / Pixel size [arcsec]
+CROTA2  =               -88.84 / Angle DEC axis wrt axis 2 ccw [deg]
+
+MEANRA  =            7.7558222 / Object RA at equinox [h]
+MEANDEC =           47.5743059 / Object Dec at equinox [deg]
+RABASE  =            7.7560280 / Offset zero-point RA at equinox [h]
+DECBASE =           47.5763892 / Offset zero-point Dec at equinox [deg]
+RAOFF   =               -7.498 / Offset RA at equinox [arcsec]
+DECOFF  =               -7.500 / Offset Dec at equinox [arcsec]
+AMSTART =                1.142 / Airmass at start of the observation
+AMEND   =                1.142 / Airmass at end of theobservation
+RUTSTART=               11.788 / Start UTC of observation (DR efficiency) [h]
+RUTEND  =               11.794 / End UTC of observation (DR efficiency) [h]
+
+                                  Instrument configuration:
+EXPOSED =                9.000 / Total integration time (sum of co-adds) [s]
+DEXPTIME=                0.120 / Exposure time for each co-add [s]
+NINT    =                    1 / Number of integrations in observation
+NEXP    =                   75 / Number of exposures in the integration
+NEXP_PH =                    0 / Number of exposures in each chop phase
+INTTYPE = 'STARE   '           / Type of integration
+MODE    = 'STARE   '           / Observing mode
+SPD_GAIN= 'Deepwell'           / Type of readout (Standard|Fast|Deepwell)
+DEPERDN =                6.000 / Electrons per data number
+
+FILTER  = 'Mp98    '           / Combined filter name
+FILTER1 = 'open    '           / Filter in wheel 1
+FILTER2 = 'Mp98    '           / Filter in wheel 2
+FILTERS = 'Mp98    '           / Combined filter name
+CHOPDIFF=                    T / Main-offset beam value stored
+IF_SHARP=                    F / Whether or not shift and add enabled
+LINEAR  =                    F / Whether or not linearisation enabled
+WPLANGLE=                0.000 / IRPOL waveplate angle [deg]
+
+DETECTOR= 'fpa046  '           / Detector array used
+DROWS   =                  256 / Number of detectors in a readout row
+DCOLUMNS=                  256 / Number of detectors in a readout column
+RDOUT_X1=                    1 / Start column of array readout
+RDOUT_X2=                  256 / End   column of array readout
+RDOUT_Y1=                    1 / Start row    of array readout
+RDOUT_Y2=                  256 / End   row    of array readout
+
+                                  Engineering:
+DFOCUS  =                4.560 / Focus position
+RESET_DL=                0.200 / NDR reset delay [s]
+CHOP_DEL=                0.000 / Chop delay [s]
+READ_INT=               60.000 / NDR read interval [s]
+
+CLOCK0  =               -6.200 / ALICE CLOCK0 voltage [V]
+CLOCK1  =               -3.000 / ALICE CLOCK1 voltage [V]
+CLOCK2  =               -7.300 / ALICE CLOCK2 voltage [V]
+CLOCK3  =               -2.700 / ALICE CLOCK3 voltage [V]
+CLOCK4  =               -6.000 / ALICE CLOCK4 voltage [V]
+CLOCK5  =               -2.000 / ALICE CLOCK5 voltage [V]
+CLOCK6  =               -7.500 / ALICE CLOCK6 voltage [V]
+VSLEW   =                4.000 / ALICE VSLEW voltage [V]
+VDET    =               -2.900 / ALICE VDET voltage [V]
+DET_BIAS=                0.800 / ALICE DET_BIAS voltage [V]
+VDDUC   =               -3.700 / ALICE VDDUC voltage [V]
+VDETGATE=               -4.500 / ALICE VDETGATE voltage [V]
+VGG_A   =               -1.700 / ALICE VGG_ACTIVE voltage [V]
+VGG_INA =               -1.000 / ALICE VGG_INACTIVE voltage [V]
+VDDOUT  =               -1.000 / ALICE VDDOUT voltage [V]
+V3      =               -2.700 / ALICE V3 voltage [V]
+VLCLR   =               -3.000 / ALICE VLCLR voltage [V]
+VLD_A   =                4.000 / ALICE VLOAD_ACTIVE voltage [V]
+VLD_INA =                4.000 / ALICE VLOAD_INACTIVE voltage [V]
+WFREQ   =                1.000 / ALICE waveform state freq. [MHz]
+
+                                  Environment:
+AIRTEMP =                6.380 / Air temperature [C]
+BARPRESS=              615.507 / Ambient pressure
+DEWPOINT=              -16.109 / Dewpoint [C]
+DOMETEMP=                6.112 / Dome temperature [C]
+HUMIDITY=               18.132 / Relative Humidity [%]
+MIRR_NE =                4.580 / Mirror temperature NE [C]
+MIRR_NW =                5.465 / Mirror temperature NW [C]
+MIRR_SE =                4.673 / Mirror temperature SE [C]
+MIRR_SW =                4.959 / Mirror temperature SW [C]
+MIRRBTNW=                4.619 / Mirror bottom temp. SW [C]
+MIRRTPNW=                4.253 / Mirror top temp. SW [C]
+SECONDAR=                4.573 / Temperature of secondary [C]
+TOPAIRNW=                7.664 / Top air NW [C]
+TRUSSENE=                5.898 / Truss leg ENE [C]
+TRUSSWSW=                4.380 / Truss leg WSW [C]
+WIND_DIR=              299.189 / Wind direction, azimuth[deg]
+WIND_SPD=               31.353 / Wind speed [km/h]
+CSOTAU  =                0.082 / Tau at 225 GHz from CSO
+TAUDATE = '2002-01-05T11:41'   / Time and date of Tau reading
+
+                                 Subheader:
+DINDEX  =                    1

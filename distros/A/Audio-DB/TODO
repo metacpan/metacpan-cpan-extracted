@@ -1,0 +1,22 @@
+clean up so that
+
+1) data access methods are in one location if possible
+ or are in specific packages if they collide
+
+2) none of the main modules should either
+   1.  need to be passed the adaptor
+   2.  need to be an @ISA of mp3::db::web
+
+(should stash the adaptor in each object???)
+
+3)  remove duplicated queries in the dbi::mysql
+
+4)  rewrite reports to match the new strcuture (ie using returned objects instead of just lists...)
+
+
+
+
+DB.pm is the sole new constructor factory for all objects
+
+
+5) URL formation should be passed the object instead of having the object method passed to it.

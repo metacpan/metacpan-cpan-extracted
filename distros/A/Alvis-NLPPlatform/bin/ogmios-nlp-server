@@ -1,0 +1,137 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+# use Alvis::Pipeline;
+# use XML::LibXML;
+# use IO::Socket;
+# use IO::File;
+# use IO::Socket::INET;
+# use Fcntl qw(:flock);
+
+use Alvis::Convert;
+
+use Alvis::NLPPlatform;
+use Alvis::NLPPlatform::Convert;
+
+use Getopt::Long;
+use Pod::Usage;
+use Config::General;
+use Data::Dumper;
+
+# Process Option
+
+my $man = 0;
+my $help = 0;
+my $rcfile = "";
+
+my $current_dir;
+my $dirfile;
+my $file;
+
+
+GetOptions('help|?' => \$help, man => \$man, "rcfile=s" => \$rcfile) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+if (($rcfile eq "") || (!(-f $rcfile))) {
+    pod2usage(1);
+    warn "No such config file or config file is not set\n";
+} 
+
+
+my %config = &Alvis::NLPPlatform::load_config($rcfile);
+
+my $mm = Alvis::NLPPlatform::Convert::load_MagicNumber(\%config);
+
+my $AlvisConverter = Alvis::NLPPlatform::Convert::html2alvis_init(\%config);
+
+foreach $file (@ARGV) {
+    if (-f $file) {
+	print STDERR "Converting the file $file ... ";
+	# Insure that Input files will be stored
+	$config{"CONVERTERS"}->{"StoreInputFiles"} = 1;
+	Alvis::NLPPlatform::Convert::conversion_file_to_alvis_xml($file, $AlvisConverter, \%config, $mm);
+	print STDERR "done\n";
+    } else { 
+	if (-d $file) {
+	    $current_dir = $file;
+	    opendir DIR, $file;
+	    while ($dirfile = readdir DIR) {
+		if (($dirfile ne ".") && ($dirfile ne "..")) {
+		    push @ARGV, "$current_dir/$dirfile";
+		}
+	    }
+	    closedir DIR;
+	}
+    }
+}
+
+
+
+Alvis::NLPPlatform::Convert::making_spool(\%config, $AlvisConverter->{"outputRootDir"});
+
+Alvis::NLPPlatform::server($rcfile);
+
+
+__END__
+
+=head1 NAME
+
+ogmios-nlp-server - Perl script for the server of the Ogmios NLP Platform. 
+
+=head1 SYNOPSIS
+
+ogmios-nlp-server [options]
+
+=head1 OPTIONS
+
+=over 4
+
+=item    B<--help>            brief help message
+
+=item    B<--man>             full documentation
+
+=item    B<--rcfile=file>     read the given configuration file
+
+=back
+
+=head1 DESCRIPTION
+
+
+This script is the server part of the OGMIOS NLP Platform in 
+distributed mode. The document is sent to the requesting client and
+then back to the server after the annotation process. One document is processed at
+a time. According the configuration, document can be stored in a local
+directory or sent to the next step of the Alvis pipeline.
+
+During the annotation, the documents are saved in the ALVISTMP
+directory, and their id in ALVISTMP/.proc_id file.
+
+=head1 METHODS
+
+
+=cut 
+
+=head1 PROTOCOL
+
+See the documentation associated to the script server.pl
+
+=head1 SEE ALSO
+
+
+Alvis web site: http://www.alvis.info
+
+=head1 AUTHORS
+
+Thierry Hamon <thierry.hamon@lipn.univ-paris13.fr> and Julien Deriviere <julien.deriviere@lipn.univ-paris13.fr>
+
+=head1 LICENSE
+
+Copyright (C) 2005 by Thierry Hamon and Julien Deriviere
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

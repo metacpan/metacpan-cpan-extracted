@@ -1,0 +1,58 @@
+{
+   "abstract" : "A collection of extra Group::Git commands",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Git-Workflow-Extra",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Git::Workflow" : "0.8",
+            "App::Git::Workflow::Command::BranchConflicts" : "0",
+            "App::Git::Workflow::Command::Cat" : "0",
+            "App::Git::Workflow::Command::SinceRelease" : "0",
+            "App::Git::Workflow::Command::Take" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "App::Git::Workflow::Extra" : {
+         "file" : "lib/App/Git/Workflow/Extra.pm",
+         "version" : "0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Git-Workflow-Extra"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/ivanwills/App-Git-Workflow-Extra.git"
+      }
+   },
+   "version" : "0.3"
+}

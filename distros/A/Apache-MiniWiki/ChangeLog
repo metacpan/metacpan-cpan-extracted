@@ -1,0 +1,27 @@
+Version 0.92, November 8 2003, Wim Kerkhoff <kerw@cpan.org>
+ - fixes to be XHTML compliant
+ - fixes to run better under PerlTaintCheck and PerlWarn
+ - fixed caching code to be aware of maxchanges and maxpages
+ - added Preview function by popular demand
+
+Version 0.91, October 11 2003, Wim Kerkhoff <kerw@cpan.org>
+ - Added list changes functionality
+ - Added some support for caching of list pages that take a long time to
+   generate
+ - Updated binary formats
+ - Better support for CSS
+ - Do not convert email links into mail to tags
+ - Hide all dot files
+ - Prompt user before reverting a page, as protection against spiders
+ - No HTML in the lastmod template variable
+ - Handle RCS files that can't be read better
+ - Add feature, using HTML::LinkExtor, Javascript, and CSS to show relations
+   between all links in a MiniWiki site
+ - Handle thumbnailed pictures better
+ - Moved more code into seperate subroutines
+ - Updated perldoc and README files
+ - Updated example pages
+
+Prior versions:
+ - See CVS for full diffs and log comments:
+   http://savannah.nongnu.org/cgi-bin/viewcvs/miniwiki/miniwiki/

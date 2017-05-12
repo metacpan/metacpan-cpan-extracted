@@ -1,0 +1,5 @@
+GHash.pm
+GHash.xs
+MANIFEST
+Makefile.PL
+t/Algorithm-MarkovChain-GHash.t

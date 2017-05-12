@@ -1,0 +1,25 @@
+.travis.yml
+bin/derived
+Build.PL
+Changes
+lib/App/derived.pm
+lib/App/derived/Plugin.pm
+lib/App/derived/Plugin/Dumper.pm
+lib/App/derived/Plugin/GrowthForecast.pm
+lib/App/derived/Plugin/Memcached.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00_compile.t
+t/01_derived.t
+t/30_plugin/01_growthforecast.t
+t/30_plugin/02_dumper.t
+t/CmdsFile
+xt/01_podspell.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/04_minimum_version.t
+xt/05_cpan_meta.t
+xt/06_meta_author.t

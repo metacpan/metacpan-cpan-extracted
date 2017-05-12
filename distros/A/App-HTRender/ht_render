@@ -1,0 +1,239 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use Getopt::Long;
+use File::Basename ();
+use Data::Dumper;
+
+use HTML::Template;
+use JSON::Tiny qw(decode_json);
+$JSON::Tiny::TRUE  = 1;
+$JSON::Tiny::FALSE = 0;
+
+use App::HTRender;
+
+our $VERSION = '1.00';
+
+our $Template_File = '';
+our $Values_File   = '';
+our $Output_File   = '';
+our $Config_File   = '';
+our $OPT_VERSION   = 0;
+our $OPT_DEBUG     = 0;
+our $OPT_QUIET     = 0;
+our $OPT_HELP      = 0;
+
+GetOptions(
+	"template=s" => \$Template_File,
+	"conf=s"     => \$Config_File,
+	"V|values=s" => \$Values_File,
+	"output=s"   => \$Output_File,
+	"version"    => \$OPT_VERSION,
+	"debug"      => \$OPT_DEBUG,
+	"quiet"      => \$OPT_QUIET,
+	"help"       => \$OPT_HELP,
+);
+
+if ($OPT_HELP) {
+	require Pod::Usage;
+	Pod::Usage::pod2usage(-verbose => 2, -exitstatus => 0);
+}
+
+if ($OPT_VERSION) {
+	print "App::HTRender version ",App::HTRender->VERSION,"\n";
+	exit(0);
+}
+
+
+# config
+my $config;
+my $config_json;
+if ($Config_File) {
+	eval {
+		local $/;		
+		open(my $cf, '<', $Config_File) or die($!);
+		$config_json = <$cf>;
+		close $cf;
+		$config = decode_json($config_json);
+		1;
+	} or do {
+		my $E = $@;
+		print STDERR "ERROR loading config file: $E";
+		exit(1);
+	};
+	print "Config file ", File::Basename::basename($Config_File)," loaded.\n" unless $OPT_QUIET;
+	print "Config options:\n", Dumper($config),"\n" if $OPT_DEBUG;
+}
+
+# template
+my $t;
+eval {
+	if ($Config_File) {
+		# create template file with config from config file
+		$t = HTML::Template->new(
+			filename => $Template_File,
+			(%$config),
+		);
+	} else {
+		# create template object with defaults
+		$t = HTML::Template->new(
+			filename          => $Template_File,
+			die_on_bad_params => 0,
+			loop_context_vars => 1,
+		);
+	}
+	1;
+} or do {
+	my $E = $@;
+	print STDERR "ERROR loading template: $E";
+	exit(1);
+};
+print "Template ",File::Basename::basename($Template_File)," loaded.\n" unless $OPT_QUIET;
+
+
+# values
+my $json;
+eval {
+	local $/;		
+	open(my $jf, '<', $Values_File) or die($!);
+	$json = <$jf>;
+	close $jf;
+	1;
+} or do {
+	my $E = $@;
+	print STDERR "ERROR loading values file: $E";
+	exit(1);
+};
+print "Values file ",File::Basename::basename($Values_File)," loaded.\n" unless $OPT_QUIET;
+
+my $v;
+eval {
+	$v = decode_json($json);
+	1; 
+} or do {
+	my $E = $@;
+	print STDERR "ERROR parsing values: $E";
+	exit(1);
+}; 
+print "Values parsed.\n" unless $OPT_QUIET;
+print "Values parsed:\n", Dumper($v),"\n" if $OPT_DEBUG;
+
+# fill values into template
+foreach (keys %$v) {
+	print "Filling in template parameter:  $_\n" if $OPT_DEBUG;
+	$t->param($_ => $v->{$_});
+}
+
+
+# dump result into output
+eval {
+	open(my $out, '>', $Output_File) or die($!);
+	print $out $t->output();
+	close $out;
+	1;
+} or do {
+	my $E = $@;
+	print STDERR "ERROR rendering output: $E";
+	exit(1);	
+};
+print "Output file ",File::Basename::basename($Output_File)," rendered.\n" unless $OPT_QUIET;
+
+# done!
+exit(0);
+
+=head1 NAME
+
+ht_render - tool to work with HTML::Template templates from the command line
+
+=head1 SYNOPSIS
+
+ ht_render --template=template.html --values=values.json --output=output.html [--config=config.json] 
+ 
+ # Render template tmpl.html with values from values.json into webpage.html
+ # You can use single-letter shortcuts as well as the full option names
+ ht_render -t tmpl.html -V values.json -o webpage.html
+ 
+ # Same as above, but configure the template object using values from 
+ # the config.json file
+ ht_render -t tmpl.html -V values.json -o webpage.html --config=config.json
+  
+=head1 DESCRIPTION
+
+App::HTRender is a tool for working with HTML::Template templates from the 
+command line.  It is designed to be useful during the development process to 
+design templates and model the data to drive them, as well as a diagnostic tool
+to help troubleshoot problems with templates and/or the data used with them.
+
+=head1 OPTIONS
+
+=head2 --template
+
+The path the template file.  The template file is a normal HTML::Template file.
+
+=head2 --values
+
+The path to the values file.  The values file should describe a JSON object, 
+which will be parsed into a Perl hash.  The keys of the hash should correspond 
+to variables in the template file.
+
+The single letter shortcut for --values is -V to distinguish it from --version.
+
+=head2 --output
+
+The path to the output file.  The values will be substituted into the template 
+and the resulting HTML will be written to this file.
+
+=head2 --config
+
+An optional config file.  Normally the HTML::Template object is created with 
+a couple of options already set by default:
+
+ die_on_bad_params => 0
+ loop_context_vars => 1
+
+These defaults may not match the application's needs, however, so you can 
+specify a config file to override these HTML::Template config options or 
+set your own.  Like the values file, the config file should define a JSON 
+object, which will be parsed into a Perl hash and passed to the HTML::Template 
+object at creation time.
+
+For example, if your template requires all of its values to use the HTML 
+escaping scheme, and you wish to disable including other template files, you 
+can specify a JSON object with requisite HTML::Template options:
+
+ {
+ 	"default_escape" : "html",
+ 	"no_includes": 1
+ } 
+ 
+=head2 --version
+
+Displays the application version.
+
+=head2 --help
+
+Displays this help page.
+
+=head1 SEE ALSO
+
+L<HTML::Template>, L<JSON::Tiny>
+
+=head1 AUTHOR
+
+Andrew Johnson, E<lt>lajandy at cpan dot orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Andrew Johnson.
+
+This library is free software; you can redistribute it and/or modify it under 
+the terms of the Artistic License 2.0.  See the included LICENSE file for 
+details.
+
+=head1 WARRANTY
+
+This software comes with no warranty of any kind.
+
+=cut

@@ -1,0 +1,13 @@
+DESCRIPTION
+
+    This distribution provides the following command-line utilities related
+    to App::FatPacker:
+
+    #INSERT_EXECS_LIST
+
+SEE ALSO
+
+    App::FatPacker, Module::FatPack
+
+    App::depak
+

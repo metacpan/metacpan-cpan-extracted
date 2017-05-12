@@ -1,0 +1,39 @@
+				 FAQs
+
+What is the difference between a gateway and a reverse proxy?
+
+    HTTP gateways and their requirements are defined the HTTP
+    specification.  Reverse proxy is a looser term without, as far as
+    I know, no standardized definition.  The terms are similar.
+
+How does C<Apache::Gateway> differ from B<apache-rproxy>?
+
+    Apache::Gateway is a big memory-hogging mod_perl module with
+    lots of random features that I find useful.  apache-rproxy was,
+    I believe, a stripped down special purpose server which first
+    implemented the ProxyPassReverse and rnd map features (both now
+    officially part of Apache since 1.3b6).  Additional features
+    Apache::Gateway provides include automatic failover, gatewaying
+    of LWP protocols, and mirror timestamp correction.
+
+How does Apache::Gateway differ from Apache::SiteSwitch?
+
+    I do not know much about Apache::SiteSwitch, but it sounds very
+    interesting.  Apache::SiteSwitch is supposed to allow server
+    balancing based upon bandwidth.  Perhaps Apache::Gateway could
+    call Apache::SiteSwitch when choosing servers instead of the
+    current round-robin technique.
+
+LWP often sets file types incorrectly.  What can I do?
+
+    For example, LWP will assume that a .../README file downloaded via
+    FTP has type application/octet-stream.  One way to override the
+    type is with an Apache ForceType directive as follows:
+    
+      <LocationMatch "^/gateRoot/.*README">
+      SetHandler perl-script
+      PerlHandler Apache::Gateway
+      PerlSetVar GatewayConfig /etc/apache/gateway/thisGate
+      PerlSetupEnv Off
+      ForceType text/plain
+      </LocationMatch>

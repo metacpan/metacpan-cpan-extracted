@@ -1,0 +1,241 @@
+#!/usr/bin/env perl
+## Copyright © 2011 by Daniel Friesel <derf@finalrewind.org>
+## License: WTFPL:
+##   0. You just DO WHAT THE FUCK YOU WANT TO.
+use strict;
+use warnings;
+use 5.010;
+
+use App::Slackeria::Config;
+use App::Slackeria::PluginLoader;
+use App::Slackeria::Output;
+
+use Getopt::Long qw(:config no_ignore_case);
+
+my $conf = App::Slackeria::Config->new();
+my $project;
+my $plugin = App::Slackeria::PluginLoader->new();
+my $template;
+my $verbose = 0;
+my ( @plugins, @projects );
+
+our $VERSION = '0.12';
+
+GetOptions(
+	'h|help'        => sub { show_help(0) },
+	'P|projects=s@' => sub { push( @projects, split( qr{,}, $_[1] ) ) },
+	'p|plugins=s@'  => sub { push( @plugins, split( qr{,}, $_[1] ) ) },
+	't|template=s' => \$template,
+	'v|verbose'    => \$verbose,
+	'V|version'    => sub { say "slackeria version ${VERSION}"; exit 0 },
+
+) or show_help(1);
+
+my $filename = shift or show_help(1);
+
+sub show_help {
+	my ($exit_status) = @_;
+
+	say 'Usage: slackeria [-v] [-P projects] [-p plugins] [-t template] '
+	  . '<outfile>';
+
+	exit $exit_status;
+}
+
+if ( @projects == 0 ) {
+	@projects = $conf->projects();
+}
+if ( @plugins == 0 ) {
+	@plugins = $conf->plugins();
+}
+
+for my $p (@projects) {
+	$project->{$p} = {};
+}
+
+for my $name (@plugins) {
+	$plugin->load( $name, %{ $conf->get( 'config', $name ) } );
+}
+
+for my $p ( keys %{$project} ) {
+
+	for my $name ( $plugin->list() ) {
+
+		if ($verbose) {
+			say "Running ${p}/${name}";
+		}
+
+		$project->{$p}->{$name}
+		  = $plugin->run( $name, $conf->get( $p, $name ) );
+	}
+}
+
+App::Slackeria::Output->write_out(
+	data     => $project,
+	filename => $filename,
+	template => $template,
+);
+
+__END__
+
+=head1 NAME
+
+slackeria - Project status overview
+
+=head1 SYNOPSIS
+
+B<slackeria> [B<-v>|B<--verbose>] I<outfile>
+
+=head1 VERSION
+
+version 0.12
+
+=head1 DESCRIPTION
+
+B<slackeria> outputs a nice (XHTML) overview of all your projects and their
+status in various distributions, on websites, et cetera.  So far it checks two
+things: First, if the project exists on a given site, and second what version
+it has there.  This output is then put into a table so you can quickly see
+what's missing  or not up-to-date.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-t>, B<--template> I<file>
+
+Read output template from I<file>. See App::Slackeria::Out::XHTML(3pm).
+
+=item B<-v>, B<--verbose>
+
+Show the names of projects/plugins as they are run.
+
+=item B<-V>, B<--version>
+
+Print program version
+
+=back
+
+=head1 EXIT STATUS
+
+Zero unless something went completely wrong.  The exist status does not
+indicate the status of projects or plugins.
+
+=head1 CONFIGURATION
+
+The configuration is stored in F<~/.config/slackeria/> (or whatever prefix your
+B<XDG_CONFIG_HOME> is set to), it is in Config::Tiny(3pm) INI-style format.  The
+list of projects, plugins and their default configuration are read from
+F<~/.config/slackeria/config>, for each project F<~/.config/slackeria/projectname>
+(if it exists) is also read.  Use it to override global plugin options.
+
+B<slackeria> reads its projects from the whitespace-separated value of the
+"projects" key in the "slackeria" section.  Plugins need to be explicitly
+enabled by creating a section with their name.  In this section, you can
+configure the plugin (see the plugin documentation).
+
+Two options are supported by all plugins:
+
+=over
+
+=item enable
+
+Set it to 0 to disable the plugin by default.  You can set it back to 1 in a
+project-specific config file
+
+=item name
+
+Override project name (like App-Slackeria for cpan, but slackeria for freshmeat)
+
+
+=back
+
+=head2 EXAMPLE
+
+    # slackeria/config
+
+    [slackeria]
+    projects = dtach irssi perl zsh
+
+    [Debian]
+
+    [FreeBSD]
+
+    [Freshmeat]
+    token = secretsecret
+
+    [OpenPorts]
+
+    [OpenSUSE]
+
+    [Pkgsrc]
+
+    # slackeria/perl
+
+    [OpenPorts]
+    enable = 0
+
+    [Pkgsrc]
+    enable = 0
+
+=head1 PLUGINS
+
+This version of slackeria ships the following plugins:
+
+=over
+
+=item * App::Slackeria::Plugin::CPAN(3pm)
+
+=item * App::Slackeria::Plugin::Debian(3pm)
+
+=item * App::Slackeria::Plugin::FreeBSD(3pm)
+
+=item * App::Slackeria::Plugin::Freshmeat(3pm)
+
+=item * App::Slackeria::Plugin::Gentoo(3pm)
+
+=item * App::Slackeria::Plugin::GitHub(3pm)
+
+=item * App::Slackeria::Plugin::Git(3pm)
+
+=item * App::Slackeria::Plugin::Ikiwiki(3pm)
+
+=item * App::Slackeria::Plugin::OpenPorts(3pm)
+
+=item * App::Slackeria::Plugin::OpenSUSE(3pm)
+
+=item * App::Slackeria::Plugin::Pkgsrc(3pm)
+
+=item * App::Slackeria::Plugin::Ubuntu(3pm)
+
+=back
+
+For plugin options and dependencies, see their documentation.
+
+=head1 DEPENDENCIES
+
+B<slackeria> itself only depends on Config::Tiny, File::BaseDir and
+HTML::Template.
+
+=head1 BUGS AND LIMITATIONS
+
+Some plugins are based on B<whohas>, which breaks easily.
+
+This is alpha software.  The Plugin API and Config format can be considered
+stable, but other things may still change.
+
+=head1 SEE ALSO
+
+Config::Tiny(3pm), App::Slackeria::PluginLoader(3pm).
+
+=head1 CREDITS
+
+The name "slackeria" is courtesy of Maximilian GaE<szlig>.
+
+=head1 AUTHOR
+
+Copyright (C) 2011 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+  0. You just DO WHAT THE FUCK YOU WANT TO.

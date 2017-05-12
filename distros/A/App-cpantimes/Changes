@@ -1,0 +1,30 @@
+See https://bitbucket.org/tobyink/p5-app-cpantimes for the latest development.
+
+1.501800	2012-12-16
+	- initial version, based on cpanminus 1.5018
+
+1.501801	2012-12-16
+	- fix MANIFEST
+
+1.501802	2012-12-16
+	- general cleanups
+
+1.501803	2012-12-17
+	- don't even attempt to send reports for local tarballs
+
+1.501804	2012-12-17
+	- more cross-platform technique to locate metabase_id.json
+
+1.501900	2012-01-02
+	- based on cpanminus 1.5019
+
+1.501901	2012-01-07
+	- check availability of LWP::Protocol::https (RT#82505)
+
+1.502100	2012-01-31
+	- based on cpanminus 1.5021
+
+1.502101	2012-01-31
+	- mention cpanm's new "--verify" option in help output
+	- fix fatpacking
+

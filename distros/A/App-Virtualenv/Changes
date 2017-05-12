@@ -1,0 +1,108 @@
+2.06	2017-03-16
+		- Accepting more than one packages when listing packages
+
+2.05	2017-03-08
+		- CPAN min required version setted 2.00
+		- Improved creating virtual environment
+
+2.04	2017-03-08
+		- Script files bug fix for #! /usr/bin/perl
+		- POD changes
+
+2.03	2017-03-06
+		- Perl v5.10.1 compatibility
+
+2.02	2017-03-05
+		- Fix for Experimental keys on scalar is now forbidden, Perl >= 5.24
+
+2.01	2017-03-04
+		- POD changes
+
+2.00	2017-03-03
+		- Removed Perl in Virtual environment (PiV)
+		- App::Virtualenv::Piv is deprecated now
+		- App::Virtualenv::Module is deprecated now
+		- Bug fixed for finding best matching virtual environment
+		- App::Virtualenv just use CPAN now
+		- Added new features to virtualenv.pl
+		- Improved documentation
+
+1.13	2017-01-17
+		- Added AUTOMATED_TESTING in Piv for noninteractive testing
+		- Used PERL5LIB in Virtualenv::activate
+
+1.12	2017-01-07
+		- App::Virtualenv::Utils is deprecated
+		- Noninteractive piv create/install/remove
+		- Added piv -h
+		- Documentation is improved
+
+1.11	2016-12-15
+		- App::Virtualenv::Module::inPerLib() fix
+		- App::Virtualenv::activate2() added
+		- Perl v5.14 for all modules
+
+1.10	2016-12-10
+		- Version, POD and README fixes for v1.09
+		- Improved local library and Perl library module checks
+		- Added piv install -v
+		- Added piv remove -v
+		- Added summary for piv install
+		- Added summary for piv remove
+		- Documentation is improved
+
+1.09	2016-12-10
+		- Improved local library and Perl library module checks
+		- Added piv install -v
+		- Added piv remove -v
+		- Added summary for piv install
+		- Added summary for piv remove
+		- Documentation is improved
+
+1.08	2016-12-04
+		- Hotfix for versioning
+
+1.07	2016-12-04
+		- Minimum Perl version setted v5.14
+		- Added piv install -t
+		- Added piv install -s
+		- Module.pm checking installed module is fixed
+		- Module.pm $Config{sitearch} fix
+
+1.06	2016-12-04
+		- Added piv remove -f
+		- Added piv virtualenv -e
+		- Added archlib check for Perl library
+		- Added archlib for installed
+
+1.05	2016-12-03
+		- Perl::Shell removed from project
+		- Removed wrapper functions from App::Virtualenv
+		- App::Virtualenv::Utils module added
+		- App::Virtualenv::Module module ok with CPANPLUS
+		- App::Virtualenv::Piv added
+
+1.04	2016-11-29
+		- Kwalitee Issue - has_abstract_in_pod fix
+		- Added Change log
+		- Improved modules
+		- Improved Perl POD sections
+		- Little bug fixes
+
+1.03	2016-11-28
+		- Module name changed to App::Virtualenv from App::virtualenv
+		- Added Perl PODs
+		- Added META_MERGE to Makefile.PL
+		- Changed README.md
+		- Initialized App::Virtualenv::Module but not implemented yet
+
+1.02	2016-11-27
+		- Added Perl::Shell in shell.pl
+		- Bug fixes
+
+1.01	2016-11-25
+		- Version fixes
+		- README & COPYRIGHT improvements
+
+1.00	2016-11-23
+		- First release

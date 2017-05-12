@@ -1,0 +1,71 @@
+==================================================
+Changes from 2012-05-21 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.013 at 2013-05-21 01:57:18 +0000
+------------------------------------------
+
+  Change: 438f3b10bbba0efadbae8c691deddae7c57e1715
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-05-20 18:57:13 +0000
+
+    Bump version 
+
+  Change: a0415025832495a2d9435529f1354a9f67835c95
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-05-20 18:40:43 +0000
+
+    Add GPG tips to PRO TIPS docs 
+
+------------------------------------------
+version 0.012 at 2012-08-15 19:05:05 +0000
+------------------------------------------
+
+  Change: 0066b6404245b10ff4405193bc01fd2b3485a01b
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-08-15 12:05:05 +0000
+
+    v0.012 
+
+  Change: 74f5898da747cfbf5407783e9a518090b3bb71a0
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-08-15 12:04:24 +0000
+
+    Merge pull request #10 from throughnothing/rename-fix
+
+    Fix issue with rename not comitting. 
+
+  Change: d665edbb1633a21184f91137f3623d4d946296c7
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-08-15 12:03:25 +0000
+
+    Fix issue with rename not comitting. 
+
+------------------------------------------
+version 0.011 at 2012-06-05 22:05:44 +0000
+------------------------------------------
+
+  Change: 16b52f379d83e3c384c65bdd7453274ccee7bedb
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-06-05 18:05:44 +0000
+
+    v0.011 
+
+  Change: 5fc72d7856588b3391a6b2423dcc979d2cd8e413
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-06-05 15:01:50 +0000
+
+    Merge pull request #9 from ironcamel/pod-typo
+
+    Fixing a type in the pod 
+
+  Change: 45b7a38bc493c1c19d826e523f737e70f9f03d48
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-05 17:57:05 +0000
+
+    Fixing a type in the pod 
+
+=================================================
+Plus 11 releases after 2012-05-21 00:00:00 +0000.
+=================================================

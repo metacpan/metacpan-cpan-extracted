@@ -1,0 +1,674 @@
+Mon Sep 8 13:44:18 2014 -0400
+18dbf677fe4d178be293a3c532d3955b1fbf17e8
+getting ready for release 0.10
+
+Mon Sep 8 10:34:27 2014 -0400
+70f8a260f7949c99765342e081fd96d8b137bc46
+switching Talib to TA as per kmx's module renaming
+
+Fri Sep 5 17:28:23 2014 -0400
+31c8d371badc77ab20e7032c82b46973772b6e73
+bugfix
+
+Fri Sep 5 16:43:20 2014 -0400
+b8f86a452290540abb64b210690037b9fe47feda
+ok the candlesticks are also done pretty easily
+
+Fri Sep 5 16:40:19 2014 -0400
+339f6cc557c461a49586b9387802248e96d3b7f4
+adding variables for all other indicators except candlesticks
+
+Fri Sep 5 16:32:44 2014 -0400
+d548ed821473e556ee02edfa7fdb390a93662e5f
+momemtum indicator variables written now
+
+Fri Sep 5 16:05:28 2014 -0400
+d904a946b2c2ff6f6381886bc2575260c0ae9da8
+adding variable names for volatility indicators
+
+Fri Sep 5 15:52:56 2014 -0400
+3a4e80274fb4280a3eb0b8ff6714bbffa605def5
+adding variable names to the output arrays for use by the rules editor
+
+Thu Sep 4 16:58:19 2014 -0400
+0667c2fe038ec4becae95db9d3dc743ae3fbfe20
+Making keywords case insensitive but variables are case-sensitive
+
+Thu Sep 4 16:00:05 2014 -0400
+289bf16ce40b1bb920a45e245bbcbb18cec823d5
+saving the file in the .financeta directory by default to avoid polluting random directories. Also tracking if the old-filename saved was different from the new
+
+Wed Sep 3 18:08:38 2014 -0400
+1947196f7af6d24c44080669c7b023240af75e01
+Banging out a basic grammar schema for the language
+
+Wed Sep 3 16:13:42 2014 -0400
+64b8294fb556cfbadb14c5e2b6704103dc6f4a74
+sample language class updated. handles comments correctly
+
+Wed Sep 3 12:44:45 2014 -0400
+173e3baff84bd24c0d854471a44dc52b85a31e42
+Adding a framework package module to kickstart the language parsing
+
+Tue Sep 2 12:30:41 2014 -0400
+6825355b8a3a75610d4f81fafcdf4bc063ccc075
+binary mode for plots now adjusted based on Gnuplot version
+
+Tue Sep 2 11:32:13 2014 -0400
+2bdc083c76605d32ec3396107580989d75c84307
+updating the binary thing to only be on windows as Linux gnuplot 4.4 doesn't support it but gnuplot 4.6 does
+
+Tue Sep 2 10:55:58 2014 -0400
+6a6ea0416ab01ca5e97124d8b7f5f0fbf03f6c89
+Windows needs binary => 1 flag set to allow plotting BAD values. Linux works with or without it.
+
+Sun Aug 31 22:51:43 2014 -0400
+b6cfea70172de5783ddd107e258e4e4bad822fc7
+Allow loading of stock data from user's own CSV file in Date-OHLC-Volume format
+
+Sun Aug 31 12:42:56 2014 -0400
+b1ac1d28f890ea1e21f14c7552fcd00d84904a19
+some auto-rule saving if the rules have never been saved
+
+Sun Aug 31 10:17:10 2014 -0400
+465f76772d20ac31bba46043a13c0add1f39c85f
+Unique editor per tab is now being opened. If editor is already open it is brought to the front.
+
+Sat Aug 30 23:26:53 2014 -0400
+95a2988204ec27a4418cd139c58981f558da7a2d
+Adding an editor for rules to the gui.
+
+Thu Aug 28 16:24:06 2014 -0400
+057d5a8c578c664c026af351a35838f708a914aa
+Refactoring of code to allow saving and loading of model files
+
+Thu Aug 28 16:00:29 2014 -0400
+2210cb65feadfcb58ca55492bfc8053046c9d74e
+Save, save-as and load of models is now working except for loading indicators
+
+Thu Aug 28 15:14:03 2014 -0400
+8f0b7772509dbc55de328b7bf47f347b8a74c1c7
+Saving the model is now done
+
+Thu Aug 28 13:32:47 2014 -0400
+0f1022f53ee5e1a01633a0be7528c2d0c333ed3d
+if the tab closes, update the plot despite the index number being same
+
+Thu Aug 28 13:23:43 2014 -0400
+783c395bb4d5365b8014a85373c5eb9fd52946ed
+Updating the MAVP with some elegant cyclic pdl work
+
+Thu Aug 28 13:02:16 2014 -0400
+8f8c08f48bab979b2782845a49cfdb3d15fcb981
+Updating the build.pl to use the correct version
+
+Thu Aug 28 12:39:17 2014 -0400
+5f375c4e16564c3d7902f30986f56c8acc95ab75
+updating changes
+Mon Sep 8 10:34:27 2014 -0400
+70f8a260f7949c99765342e081fd96d8b137bc46
+switching Talib to TA as per kmx's module renaming
+
+Fri Sep 5 17:28:23 2014 -0400
+31c8d371badc77ab20e7032c82b46973772b6e73
+bugfix
+
+Fri Sep 5 16:43:20 2014 -0400
+b8f86a452290540abb64b210690037b9fe47feda
+ok the candlesticks are also done pretty easily
+
+Fri Sep 5 16:40:19 2014 -0400
+339f6cc557c461a49586b9387802248e96d3b7f4
+adding variables for all other indicators except candlesticks
+
+Fri Sep 5 16:32:44 2014 -0400
+d548ed821473e556ee02edfa7fdb390a93662e5f
+momemtum indicator variables written now
+
+Fri Sep 5 16:05:28 2014 -0400
+d904a946b2c2ff6f6381886bc2575260c0ae9da8
+adding variable names for volatility indicators
+
+Fri Sep 5 15:52:56 2014 -0400
+3a4e80274fb4280a3eb0b8ff6714bbffa605def5
+adding variable names to the output arrays for use by the rules editor
+
+Thu Sep 4 16:58:19 2014 -0400
+0667c2fe038ec4becae95db9d3dc743ae3fbfe20
+Making keywords case insensitive but variables are case-sensitive
+
+Thu Sep 4 16:00:05 2014 -0400
+289bf16ce40b1bb920a45e245bbcbb18cec823d5
+saving the file in the .financeta directory by default to avoid polluting random directories. Also tracking if the old-filename saved was different from the new
+
+Wed Sep 3 18:08:38 2014 -0400
+1947196f7af6d24c44080669c7b023240af75e01
+Banging out a basic grammar schema for the language
+
+Wed Sep 3 16:13:42 2014 -0400
+64b8294fb556cfbadb14c5e2b6704103dc6f4a74
+sample language class updated. handles comments correctly
+
+Wed Sep 3 12:44:45 2014 -0400
+173e3baff84bd24c0d854471a44dc52b85a31e42
+Adding a framework package module to kickstart the language parsing
+
+Tue Sep 2 12:30:41 2014 -0400
+6825355b8a3a75610d4f81fafcdf4bc063ccc075
+binary mode for plots now adjusted based on Gnuplot version
+
+Tue Sep 2 11:32:13 2014 -0400
+2bdc083c76605d32ec3396107580989d75c84307
+updating the binary thing to only be on windows as Linux gnuplot 4.4 doesn't support it but gnuplot 4.6 does
+
+Tue Sep 2 10:55:58 2014 -0400
+6a6ea0416ab01ca5e97124d8b7f5f0fbf03f6c89
+Windows needs binary => 1 flag set to allow plotting BAD values. Linux works with or without it.
+
+Sun Aug 31 22:51:43 2014 -0400
+b6cfea70172de5783ddd107e258e4e4bad822fc7
+Allow loading of stock data from user's own CSV file in Date-OHLC-Volume format
+
+Sun Aug 31 12:42:56 2014 -0400
+b1ac1d28f890ea1e21f14c7552fcd00d84904a19
+some auto-rule saving if the rules have never been saved
+
+Sun Aug 31 10:17:10 2014 -0400
+465f76772d20ac31bba46043a13c0add1f39c85f
+Unique editor per tab is now being opened. If editor is already open it is brought to the front.
+
+Sat Aug 30 23:26:53 2014 -0400
+95a2988204ec27a4418cd139c58981f558da7a2d
+Adding an editor for rules to the gui.
+
+Thu Aug 28 16:24:06 2014 -0400
+057d5a8c578c664c026af351a35838f708a914aa
+Refactoring of code to allow saving and loading of model files
+
+Thu Aug 28 16:00:29 2014 -0400
+2210cb65feadfcb58ca55492bfc8053046c9d74e
+Save, save-as and load of models is now working except for loading indicators
+
+Thu Aug 28 15:14:03 2014 -0400
+8f0b7772509dbc55de328b7bf47f347b8a74c1c7
+Saving the model is now done
+
+Thu Aug 28 13:32:47 2014 -0400
+0f1022f53ee5e1a01633a0be7528c2d0c333ed3d
+if the tab closes, update the plot despite the index number being same
+
+Thu Aug 28 13:23:43 2014 -0400
+783c395bb4d5365b8014a85373c5eb9fd52946ed
+Updating the MAVP with some elegant cyclic pdl work
+
+Thu Aug 28 13:02:16 2014 -0400
+8f8c08f48bab979b2782845a49cfdb3d15fcb981
+Updating the build.pl to use the correct version
+
+Thu Aug 28 12:39:17 2014 -0400
+5f375c4e16564c3d7902f30986f56c8acc95ab75
+updating changes
+Thu Aug 28 12:39:03 2014 -0400
+e66b720909f38fab34ee635e34df0e81cea1bf54
+Releasing 0.09
+
+Thu Aug 28 12:34:32 2014 -0400
+37535066b8b079fa94cb3d4cc02d66d6319a4a68
+fixing the close tab bug for now.
+
+Thu Aug 28 12:19:16 2014 -0400
+cd1dd414df4a6c816da377012b31e436f825fbac
+Beta and correlation indicators finally complete. All ta-lib indicators supported now
+
+Thu Aug 28 11:15:53 2014 -0400
+93b288be91f54420c6b90072727429edb7ba4895
+MAVP work complete now
+
+Wed Aug 27 23:40:04 2014 -0400
+1dd202ac6c341366fb8737c6d7a73c020a988eb1
+Candlestick plots are now done as well
+
+Wed Aug 27 22:23:56 2014 -0400
+7de2039a015abc069de4d244df0db4ec0a75ec2c
+all momentum stuff has to be in an additional plot
+
+Wed Aug 27 22:12:32 2014 -0400
+d03751d5e9d723d3ab870a9d443a1ab464e0f607
+updating some of the momentum indicators to plot nice
+
+Wed Aug 27 21:25:41 2014 -0400
+52fb7c30bdcf3e54ebcf7c472d1f1ebdae3a57c9
+Statistical plots and cycle plots can be on x1y2 axes or in an additional plot or both.
+
+Wed Aug 27 18:52:28 2014 -0400
+0c2fb64c68bd7d0131ffa13a32fe4c36b689077a
+MACD plotting complete. renaming the volatility plotting to additional since it is more general
+
+Wed Aug 27 18:48:44 2014 -0400
+b5fa25228548ac52fe0585866e36f178709b640e
+- cycle plotting done somewhat. - allow detailedlist to scroll horizontally
+
+Wed Aug 27 18:27:47 2014 -0400
+bff8feeb19410cfbf80ac735bfeffa1b439c95d4
+bugfix to avoid crash when form selection is incomplete
+
+Wed Aug 27 18:09:43 2014 -0400
+2165daba92dca0bf8d85f54c3b0af2bf73257497
+enable menu only if the downloaded data succeeds
+
+Wed Aug 27 17:36:29 2014 -0400
+3d44c8dc1da612f813a861c6866763f59f12c23d
+removing unnecessary modules from requirements since they're not needed for distribution
+
+Wed Aug 27 17:35:24 2014 -0400
+911f48d0504df9adbab6e429b91d05d4c57a5717
+Removing the Pod viewer since there is no pod documentation for the UI anymore except for the dummy stuff for CPAN. using browser::open instead
+
+Wed Aug 27 17:14:38 2014 -0400
+a24426847192bccfaa45a75d205da8fbf2dab7ce
+Adding an add-on sub-plot for volatility indicators to work
+
+Wed Aug 27 16:46:46 2014 -0400
+29ca3f0960e54d99a98be7bcbaddb998209b1793
+Volume indicators are now handled correctly
+
+Wed Aug 27 16:21:36 2014 -0400
+a45295fd1d19d5227d5d7cd9788b727133dbfc9c
+multiplot and reset are common now and moved outside the if-elsif-else block
+
+Wed Aug 27 16:18:21 2014 -0400
+4afc972b0e7256949a0e77a56d510ff4193ec044
+given-when gives experimental warnings so removing it
+
+Wed Aug 27 15:48:20 2014 -0400
+bcc8bcd78a411c517e043e554ffc7f760168bca0
+Making OK the default button despite being disabled. Also moving the help button before the OK button since it is more likely to be clicked instead of OK
+
+Wed Aug 27 15:46:34 2014 -0400
+c499ec2389e664f70e48d1580ef18b17bcc970c6
+Menu option cosmetics for disabling and enabling the appropriate options as the user uses the GUI
+
+Wed Aug 27 15:20:41 2014 -0400
+f366bbec71b332c94037be88373c3189b585196a
+Adding a testcase to debug the tab closing in Prima. removing it from distribution though.
+
+Wed Aug 27 14:07:10 2014 -0400
+cb8f18449bb19d6ea8463fc1115e9b94a386818b
+minor correction to logging statement
+
+Wed Aug 27 10:46:21 2014 -0400
+8c5beb7c50ef7cc99a705ab392b2fd6977656b1d
+renaming the symbol help to symbol search
+
+Wed Aug 27 10:43:48 2014 -0400
+1494ace97debc5ca0293d574faaf209abd887e83
+Adding help buttons for symbol search and indicator help
+
+Wed Aug 27 10:19:03 2014 -0400
+1adf311ed0486d1149fb75362d0af053613b5841
+trying the tab closing as per Dmitry but still not working.
+
+Tue Aug 26 17:49:04 2014 -0400
+91c2ca0339eca3ed5b98bf1f691c53664b21c30f
+Adding close tab function as expected to be coded per docs. But it is buggy unless we only have 1 tab open.
+
+Tue Aug 26 17:16:21 2014 -0400
+74df58122529f2c642943ea0de0b173bafc09133
+Adding remove indicator wizard and related options to remove an added indicator from the plot
+
+Tue Aug 26 13:40:19 2014 -0400
+6dcfba944a491288c82449ffa3d9bd2a7605ebba
+Handling SAR-ext correctly now
+
+Tue Aug 26 12:12:12 2014 -0400
+5c8a32928b078d83c491ea3d08d15702fdc51766
+no image file type needed anymore
+
+Tue Aug 26 11:35:39 2014 -0400
+d267f9397fc2eac5ec1229ebd3dbc471e53c7460
+updating changes
+Thu Aug 28 12:34:32 2014 -0400
+37535066b8b079fa94cb3d4cc02d66d6319a4a68
+fixing the close tab bug for now.
+
+Thu Aug 28 12:19:16 2014 -0400
+cd1dd414df4a6c816da377012b31e436f825fbac
+Beta and correlation indicators finally complete. All ta-lib indicators supported now
+
+Thu Aug 28 11:15:53 2014 -0400
+93b288be91f54420c6b90072727429edb7ba4895
+MAVP work complete now
+
+Wed Aug 27 23:40:04 2014 -0400
+1dd202ac6c341366fb8737c6d7a73c020a988eb1
+Candlestick plots are now done as well
+
+Wed Aug 27 22:23:56 2014 -0400
+7de2039a015abc069de4d244df0db4ec0a75ec2c
+all momentum stuff has to be in an additional plot
+
+Wed Aug 27 22:12:32 2014 -0400
+d03751d5e9d723d3ab870a9d443a1ab464e0f607
+updating some of the momentum indicators to plot nice
+
+Wed Aug 27 21:25:41 2014 -0400
+52fb7c30bdcf3e54ebcf7c472d1f1ebdae3a57c9
+Statistical plots and cycle plots can be on x1y2 axes or in an additional plot or both.
+
+Wed Aug 27 18:52:28 2014 -0400
+0c2fb64c68bd7d0131ffa13a32fe4c36b689077a
+MACD plotting complete. renaming the volatility plotting to additional since it is more general
+
+Wed Aug 27 18:48:44 2014 -0400
+b5fa25228548ac52fe0585866e36f178709b640e
+- cycle plotting done somewhat. - allow detailedlist to scroll horizontally
+
+Wed Aug 27 18:27:47 2014 -0400
+bff8feeb19410cfbf80ac735bfeffa1b439c95d4
+bugfix to avoid crash when form selection is incomplete
+
+Wed Aug 27 18:09:43 2014 -0400
+2165daba92dca0bf8d85f54c3b0af2bf73257497
+enable menu only if the downloaded data succeeds
+
+Wed Aug 27 17:36:29 2014 -0400
+3d44c8dc1da612f813a861c6866763f59f12c23d
+removing unnecessary modules from requirements since they're not needed for distribution
+
+Wed Aug 27 17:35:24 2014 -0400
+911f48d0504df9adbab6e429b91d05d4c57a5717
+Removing the Pod viewer since there is no pod documentation for the UI anymore except for the dummy stuff for CPAN. using browser::open instead
+
+Wed Aug 27 17:14:38 2014 -0400
+a24426847192bccfaa45a75d205da8fbf2dab7ce
+Adding an add-on sub-plot for volatility indicators to work
+
+Wed Aug 27 16:46:46 2014 -0400
+29ca3f0960e54d99a98be7bcbaddb998209b1793
+Volume indicators are now handled correctly
+
+Wed Aug 27 16:21:36 2014 -0400
+a45295fd1d19d5227d5d7cd9788b727133dbfc9c
+multiplot and reset are common now and moved outside the if-elsif-else block
+
+Wed Aug 27 16:18:21 2014 -0400
+4afc972b0e7256949a0e77a56d510ff4193ec044
+given-when gives experimental warnings so removing it
+
+Wed Aug 27 15:48:20 2014 -0400
+bcc8bcd78a411c517e043e554ffc7f760168bca0
+Making OK the default button despite being disabled. Also moving the help button before the OK button since it is more likely to be clicked instead of OK
+
+Wed Aug 27 15:46:34 2014 -0400
+c499ec2389e664f70e48d1580ef18b17bcc970c6
+Menu option cosmetics for disabling and enabling the appropriate options as the user uses the GUI
+
+Wed Aug 27 15:20:41 2014 -0400
+f366bbec71b332c94037be88373c3189b585196a
+Adding a testcase to debug the tab closing in Prima. removing it from distribution though.
+
+Wed Aug 27 14:07:10 2014 -0400
+cb8f18449bb19d6ea8463fc1115e9b94a386818b
+minor correction to logging statement
+
+Wed Aug 27 10:46:21 2014 -0400
+8c5beb7c50ef7cc99a705ab392b2fd6977656b1d
+renaming the symbol help to symbol search
+
+Wed Aug 27 10:43:48 2014 -0400
+1494ace97debc5ca0293d574faaf209abd887e83
+Adding help buttons for symbol search and indicator help
+
+Wed Aug 27 10:19:03 2014 -0400
+1adf311ed0486d1149fb75362d0af053613b5841
+trying the tab closing as per Dmitry but still not working.
+
+Tue Aug 26 17:49:04 2014 -0400
+91c2ca0339eca3ed5b98bf1f691c53664b21c30f
+Adding close tab function as expected to be coded per docs. But it is buggy unless we only have 1 tab open.
+
+Tue Aug 26 17:16:21 2014 -0400
+74df58122529f2c642943ea0de0b173bafc09133
+Adding remove indicator wizard and related options to remove an added indicator from the plot
+
+Tue Aug 26 13:40:19 2014 -0400
+6dcfba944a491288c82449ffa3d9bd2a7605ebba
+Handling SAR-ext correctly now
+
+Tue Aug 26 12:12:12 2014 -0400
+5c8a32928b078d83c491ea3d08d15702fdc51766
+no image file type needed anymore
+
+Tue Aug 26 11:35:39 2014 -0400
+d267f9397fc2eac5ec1229ebd3dbc471e53c7460
+updating changes
+Tue Aug 26 11:35:16 2014 -0400
+3765cc26bf5aed7d45a92689a343cc19c1c75bbf
+Releasing v0.08
+
+Tue Aug 26 11:30:28 2014 -0400
+2120fdf31b91534e9a31e201f94f42904e24b529
+updating manifest
+
+Tue Aug 26 11:29:05 2014 -0400
+7bddf9167d8ff5b869f30bb255fd0ade7600276f
+Merge pull request #2 from kmx/master
+some ideas by kmx
+Tue Aug 26 14:48:28 2014 +0200
+72eee7a0d18dba022ddc7122ed761c9e0276e7dd
+some ideas by kmx
+
+Mon Aug 25 19:10:55 2014 -0400
+3b50ea37f7b3d312c1d9ddac4f8375ed317edd86
+adjusting to handle bugs in P:G:G
+
+Mon Aug 25 18:45:50 2014 -0400
+ba30d20a1605a2133a40613792c3f8f930319578
+PSAR-extended also uses dots.
+
+Mon Aug 25 18:24:36 2014 -0400
+7973be6d780b77d3ffee042929a16d2383965c44
+SAR indicator's plotting updated to use different options in the same graph
+
+Mon Aug 25 17:55:16 2014 -0400
+7e94cb5d0cc5adb5987f87c0ef6f3ab13023c169
+rearranging some default colors
+
+Mon Aug 25 17:51:53 2014 -0400
+fb03a37a226b9ab91ef2f8af1eaa0860163761d7
+Color change and setting the default plot to OHLC
+
+Sun Aug 24 09:39:18 2014 -0400
+f5f8629141ec213891fa435c86a9484e0d41ed17
+updating changes
+Tue Aug 26 11:30:28 2014 -0400
+2120fdf31b91534e9a31e201f94f42904e24b529
+updating manifest
+
+Tue Aug 26 11:29:05 2014 -0400
+7bddf9167d8ff5b869f30bb255fd0ade7600276f
+Merge pull request #2 from kmx/master
+some ideas by kmx
+Tue Aug 26 14:48:28 2014 +0200
+72eee7a0d18dba022ddc7122ed761c9e0276e7dd
+some ideas by kmx
+
+Mon Aug 25 19:10:55 2014 -0400
+3b50ea37f7b3d312c1d9ddac4f8375ed317edd86
+adjusting to handle bugs in P:G:G
+
+Mon Aug 25 18:45:50 2014 -0400
+ba30d20a1605a2133a40613792c3f8f930319578
+PSAR-extended also uses dots.
+
+Mon Aug 25 18:24:36 2014 -0400
+7973be6d780b77d3ffee042929a16d2383965c44
+SAR indicator's plotting updated to use different options in the same graph
+
+Mon Aug 25 17:55:16 2014 -0400
+7e94cb5d0cc5adb5987f87c0ef6f3ab13023c169
+rearranging some default colors
+
+Mon Aug 25 17:51:53 2014 -0400
+fb03a37a226b9ab91ef2f8af1eaa0860163761d7
+Color change and setting the default plot to OHLC
+
+Sun Aug 24 09:39:18 2014 -0400
+f5f8629141ec213891fa435c86a9484e0d41ed17
+updating changes
+Sun Aug 24 09:38:50 2014 -0400
+7c9ba25efdc942fc73789cb096bb5c50194c9fa5
+Releasing 0.07
+
+Sat Aug 23 14:30:13 2014 -0400
+4f857070a745a54165585dda312466b531c59e91
+if one tab is using a different plot and a new tab is opened, it should open using the same plot_type as the other tabs
+
+Fri Aug 22 16:04:31 2014 -0400
+1f53aa0d6ad665177f85651543672bd3a249f6d7
+Changes update
+Sat Aug 23 14:30:13 2014 -0400
+4f857070a745a54165585dda312466b531c59e91
+if one tab is using a different plot and a new tab is opened, it should open using the same plot_type as the other tabs
+
+Fri Aug 22 16:04:31 2014 -0400
+1f53aa0d6ad665177f85651543672bd3a249f6d7
+Changes update
+Fri Aug 22 16:04:28 2014 -0400
+61980cb25962ded745684d76172508478a24af56
+Releasing 0.06 with Windows support
+
+Fri Aug 22 14:57:03 2014 -0400
+d140d2debeeccd94cd8caa021577639078b3a904
+adding win32 related gnuplot adjustment
+
+Fri Aug 22 12:55:30 2014 -0400
+c8dea466abd55688c246ea03c6e44873927608ec
+update changes file
+Fri Aug 22 12:55:17 2014 -0400
+4d6a5efa3234ac5e984937be46c8835cde52e535
+Release 0.05
+
+Fri Aug 22 10:52:47 2014 -0400
+22dfcfffdc36440ced9c87ac3a2dc208f9c421d1
+gh-pages is a dir
+
+Thu Aug 21 17:52:33 2014 -0400
+0c715f3014aa69be5dd8808811a08c2836ad6984
+updating manifest/.gitignore
+
+Thu Aug 21 12:02:47 2014 -0400
+13d82b182f924e1a84e75c51948de542ca3f6d76
+Hint example added for possible future use.
+
+Thu Aug 21 11:51:08 2014 -0400
+a164d4d3e4de783ee2956a8e5dfe8870c233ebfe
+adding dummy input pdl to avoid MAVP indicator crash
+
+Thu Aug 21 11:16:25 2014 -0400
+85889b5b01075a7782eca3111dd7114e8c7d6190
+updating changes file
+
+Thu Aug 21 11:13:35 2014 -0400
+35d2ad0099fcf68c34f21499aff0f0be5c2c054f
+Renaming variable for clarity and better search across the code
+
+Wed Aug 20 16:43:12 2014 -0400
+62022902912714b431340cb06127bfba3311a04d
+minor bug in key name
+
+Wed Aug 20 16:39:24 2014 -0400
+0fa689579688378d0acb5e7c2094add96ee63108
+Making the plots look nicer
+
+Wed Aug 20 15:38:18 2014 -0400
+01fc0ea5ca1d41442a8a68264a33c7b47c9c4a0f
+minor error check
+
+Wed Aug 20 14:09:15 2014 -0400
+601af6ac80b3978f8a081e09754b3ab1e43c5fdb
+Managing colors automatically in the gnuplot window when multiple indicators are added.
+
+Wed Aug 20 13:32:19 2014 -0400
+8a03cfa05efa3f02b00fcc9362ba723b3508c8fb
+Managing multiple indicators for single security in one display table correctly
+
+Wed Aug 20 11:59:28 2014 -0400
+0aa520138882c9581b34efdc28cefeba2a878a9f
+Adding basic candlestick plotting to the list of default plots
+
+Wed Aug 20 11:37:46 2014 -0400
+b07609193cc1056fe2a7e8aedac4c21e8696b9d7
+Updating branding of the plots
+
+Wed Aug 20 10:41:02 2014 -0400
+6fc97857086826f77102892145c0cfbf44d47a5d
+awesomeness of vim pattern matching applied to pass the function name as string for debug messages
+
+Tue Aug 19 22:25:13 2014 -0400
+b543f429064307b32eaefa9c07cc1b902d13a93a
+method invocation interferes with PDL::NiceSlice. So using old school way
+
+Tue Aug 19 22:21:35 2014 -0400
+4c79493011cbef082a789a16a8482a8be8c1a552
+adding all the candlestick indicator information except plotting info
+
+Tue Aug 19 21:08:00 2014 -0400
+ca9ba93c6653d81f0d97fbca34351e41a6f12387
+Adding the hash keys for all the candlesticks.. there are way too many
+
+Tue Aug 19 17:33:18 2014 -0400
+d7d0da97358bea727503adcc3e93f53eb1e00a87
+bugfix with ta_macdfix and cosmetic name change for all the candlestick patterns
+
+Tue Aug 19 17:28:17 2014 -0400
+c20d949c7e818b7db18f700f4972fe94abccbe92
+Adding all the remaining Momentum Indicators
+
+Tue Aug 19 16:58:05 2014 -0400
+ff00b764f7965d4fd8f84c00db7a1c64b5a5fa21
+Half of Momentum indicators added
+
+Tue Aug 19 16:13:37 2014 -0400
+e58e96b6fc7afe147e5cc11cb53fe3f4c8f1f532
+Adding statistic indicators
+
+Tue Aug 19 15:53:31 2014 -0400
+bc7cd31054c49e97d307f7a23969c3eb779170fb
+Cycle indicators added
+
+Tue Aug 19 15:46:50 2014 -0400
+4f2b98064473a78b1329c266c6571510ce4c9ff1
+Volume indicators added
+
+Tue Aug 19 15:32:23 2014 -0400
+296450cfe7ab79e30024df217e669f3687166ae6
+Adding price transform indicators
+
+Tue Aug 19 15:07:49 2014 -0400
+b07f7f972464215db7f7ed911748b969897cbe7f
+Volatility indicator done but plotting left to be desired
+
+Tue Aug 19 14:52:42 2014 -0400
+5a0659e42868108f52649877bf3855edde27e22b
+group names are now pretty printed in the indicator wizard as well
+
+Tue Aug 19 14:18:50 2014 -0400
+826a1c7cd068affc78f031fdeb022d40a7b609ee
+Adding all the overlay indicators to the list of indicators for analysis.
+
+Tue Aug 19 12:52:15 2014 -0400
+99897694de189d954e9dc61e581a00ea6f4a873e
+Changing the abbreviations to full names for user benefit
+
+Tue Aug 19 12:12:44 2014 -0400
+83329b95e31d4ca1e37fa9610c7d9c52d426525d
+adding a sample skeleton for creating more indicators
+
+Tue Aug 19 10:47:55 2014 -0400
+0a9cc0763b22cfe0a33ab5bd568de5983eb31b4b
+Adding version numbering to the inlined Mo class for PAUSE
+
+Tue Aug 19 10:39:58 2014 -0400
+02a86d89f894497f9a13274af64077c6580a8724
+Releasing 0.04

@@ -1,0 +1,9 @@
+Revision history for Perl extension Algorithm::Verhoeff.
+
+0.1  Mon Sep 27 21:01:12 2004
+	- original version
+0.2  Sun Oct 3 23:31:00 2004
+	- documentation fixes
+0.3  Wed Dec 29 17:00:00 2004
+	- Fixed perl version requirements to only require version 5.0 or better
+

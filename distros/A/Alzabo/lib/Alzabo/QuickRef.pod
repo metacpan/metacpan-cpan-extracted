@@ -1,0 +1,364 @@
+=head1 NAME
+
+Alzabo::QuickRef - A quick reference to methods in the Alzabo classes
+
+=head1 GENERAL
+
+This reference is intended to provide a quick reference to I<some> of
+the more commonly used methods that Alzabo provides.  In addition,
+this reference can give you an idea of what classes contain certain
+I<types> of methods, so you have an idea of where to look in order to
+figure out how to achieve a certain task.
+
+=head2 Alzabo, Alzabo::Create, and Alzabo::Runtime
+
+These modules are mostly used just to load other modules.  The
+C<Alzabo::Runtime> module can be used to preload schemas at compile
+time by doing:
+
+  use Alzabo::Runtime qw( schema1 schema2 schema3 );
+
+=head2 Alzabo::MethodMaker
+
+This module can be used to generate many useful convenience methods.
+This is done by auto-generating methods in new packages and
+re-blessing some of the schema objects into these packages.  To have
+it generate all the possible methods for a schema you would do:
+
+  use Alzabo::MethodMaker ( schema => 'some_schema',
+                            # Root for new packages
+                            class_root => 'My::Data',
+                            # Make all possible methods
+                            all => 1 );
+
+This will make convenience methods for such things as getting table
+and column objects, following various types of foreign keys, and
+getting data from row objects.
+
+=head1 METHODS
+
+=head2 Retrieving data
+
+=head3 Alzabo::Runtime::Schema
+
+This object allows you to connect to the database.  It contains
+several data retrieval methods including
+L<C<join>|Alzabo::QuickRef/join>.
+
+=over 4
+
+=item * load_from_file
+
+=for html_docs type=class
+
+Load an existing schema object from disk.  Returns a new schema
+object.
+
+=for html_docs link=L<More|Alzabo::Create::Schema/load_from_file($name)>
+
+=item * set_user ($user)
+
+=for html_docs type=object
+
+Set the username to be used when connecting to the database.
+
+=for html_docs link=L<More|Alzabo::Runtime::Schema/set_user ($user)>
+
+=item * set_password ($password)
+
+=for html_docs type=object
+
+Set the password to be used when connecting to the database.
+
+=for html_docs link=L<More|Alzabo::Runtime::Schema/set_password ($password)>
+
+=item * set_host ($host)
+
+=for html_docs type=object
+
+Set the host to be used when connecting to the database.
+
+=for html_docs link=L<More|Alzabo::Runtime::Schema/set_host ($host)>
+
+=item * connect (%params)
+
+=for html_docs type=object
+
+Connect to the RDBMS.  This will use the previously set
+username/password/host, though these can be overridden by the
+C<%params> given to the call.
+
+B<Important>: This method must be called before any data retrieval is
+attempted.
+
+=for html_docs link=L<More|Alzabo::Runtime::Schema/connect (%params)>
+
+=item * join
+
+=for html_docs type=object
+
+Fetch rows from one or more tables based on a table join.  Returns
+either a L<C<Alzabo::Runtime::RowCursor>|Alzabo::Runtime::RowCursor>
+or L<C<Alzabo::Runtime::JoinCursor>|Alzabo::Runtime::JoinCursor>
+object.
+
+=for html_docs link=L<More|Alzabo::Runtime::Schema/join>
+
+=item * function/select
+
+=for html_docs type=object
+
+Allows you to execute arbitrary column aggregate SQL functions such as
+C<AVG> or C<MAX> with a multi-table join.
+
+=for html_docs link=L<More|Alzabo::Runtime::Schema/function and select>
+
+=item * table ($name)
+
+=for html_docs type=object
+
+Returns an L<C<Alzabo::Runtime::Table>|Alzabo::Runtime::Table> object.
+This is important because most of the row fetching operations are
+table object methods.
+
+=for html_docs link=L<More|Alzabo::Runtime::Schema/table ($name)>
+
+=back
+
+=head3 Alzabo::Runtime::Table
+
+Objects in this class have methods allowing you to insert new rows as
+well as retrieving exist data in the form of
+L<C<Alzabo::Runtime::Row>|Alzabo::Runtime::Row> or
+L<C<Alzabo::Runtime::RowCursor>|Alzabo::Runtime::RowCursor> objects.
+
+All methods that return a single row return an
+L<C<Alzabo::Runtime::Row>|Alzabo::Runtime::Row> object.
+
+All methods that return multiple rows return an
+L<C<Alzabo::Runtime::RowCursor>|Alzabo::Runtime::RowCursor> object.
+
+All methods that return rows can be given the C<no_cache> parameter,
+which ensures that the row(s) returned will not be cached.  Rows
+obtained in this manner should not be updated or deleted, as this will
+play havoc with the caching system.  See the
+L<C<Alzabo::Runtime::Row>|Alzabo::Runtime::Row> documentation for more
+details.
+
+All methods that return multiple rows in the form of a cursor object
+can take an C<order_by> parameter.  See the
+L<C<Alzabo::Runtime::Table>|Alzabo::Runtime::Table> documentation for
+more details.
+
+=over 4
+
+=item * insert
+
+=for html_docs type=object
+
+Insert a new row and return it.
+
+=for html_docs link=L<More|Alzabo::Runtime::Table/insert>
+
+=item * row_by_pk
+
+=for html_docs type=object
+
+Returns the row identified by the primary key give.
+
+=for html_docs link=L<More|Alzabo::Runtime::Table/row_by_pk>
+
+=item * rows_where
+
+=for html_docs type=object
+
+Retrieves a set of rows based on a where clause.  Please see the
+method documentation for details on how where clauses are constructed.
+
+=for html_docs link=L<More|Alzabo::Runtime::Table/rows_where>
+
+=item * all_rows
+
+=for html_docs type=object
+
+Retrieves all the rows in the table.
+
+=for html_docs link=L<More|Alzabo::Runtime::Table/all_rows>
+
+=item * function/select
+
+=for html_docs type=object
+
+Allows you to execute arbitrary column aggregate SQL functions such as
+C<AVG> or C<MAX>.
+
+=for html_docs link=L<More|Alzabo::Runtime::Table/function and select>
+
+=item * potential_row
+
+=for html_docs type=object
+
+Make a new L<C<Alzabo::Runtime::Row>|Alzabo::Runtime::Row> in the
+"potential" state.
+
+=for html_docs link=L<More|Alzabo::Runtime::Table/potential_row>
+
+=back
+
+=head3 Alzabo::Runtime::Row
+
+Objects in this class represent a single row of data.  You can
+retrieve the actual column values from it, update it, or delete it.
+
+=over 4
+
+=item * select (@list_of_column_names)
+
+=for html_docs type=object
+
+Given a list of column names, this method returns the values for those
+columns.
+
+=for html_docs link=L<More|Alzabo::Runtime::Row/select (@list_of_column_names)>
+
+=item * update (%hash_of_columns_and_values)
+
+=for html_docs type=object
+
+Given a hash of columns and values, this method will update the
+database and the object to match those values.
+
+=for html_docs link=L<More|Alzabo::Runtime::Row/update (%hash_of_columns_and_values)>
+
+=item * delete
+
+=for html_docs type=object
+
+Deletes the row from the database.  Further attempts to retrieve data
+from this row will throw an exception.
+
+=for html_docs link=L<More|Alzabo::Runtime::Row/delete>
+
+=item * rows_by_foreign_key
+
+=for html_docs type=object
+
+Given a foreign key object from the row's table to another table,
+returns either an L<C<Alzabo::Runtime::Row>|Alzabo::Runtime::Row>
+object or an
+L<C<Alzabo::Runtime::RowCursor>|Alzabo::Runtime::RowCursor> object for
+the row(s) in the table to which the relationship exists, based on the
+value of the relevant column(s) in the current row.
+
+This method can also take a C<no_cache> and/or C<order_by> parameter.
+
+=for html_docs link=L<More|Alzabo::Runtime::Row/rows_by_foreign_key>
+
+=back
+
+=head3 Alzabo::Runtime::RowCursor
+
+Objects in this class are used to return multiple rows as a cursor,
+rather than as a list.  This is much more efficient, at the expense of
+a few extra lines in your code.
+
+=over 4
+
+=item * next
+
+=for html_docs type=object
+
+Returns the next L<C<Alzabo::Runtime::Row>|Alzabo::Runtime::Row>
+object, or undef if there are no more.
+
+=for html_docs link=L<More|Alzabo::Runtime::RowCursor/next>
+
+=item * all_rows
+
+=for html_docs type=object
+
+Returns a list of all the remaining
+L<C<Alzabo::Runtime::Row>|Alzabo::Runtime::Row> objects, or an empty
+list if there are no more.
+
+=for html_docs link=L<More|Alzabo::Runtime::RowCursor/all_rows>
+
+=back
+
+=head2 Creating/removing a schema
+
+=head3 Alzabo::Create::Schema
+
+This object represents a schema, and contains one or more table
+objects.  It is only used when creating or altering a schema, as
+opposed to when fetching data.  Data manipulation is done via the
+C<Alzabo::Runtime::*> classes.
+
+=over 4
+
+=item * reverse_engineer
+
+=for html_docs type=class
+
+Connect to a database and reverse engineer a schema.  Returns a new
+schema object.
+
+=for html_docs link=L<More|Alzabo::Create::Schema/reverse_engineer>
+
+=item * load_from_file
+
+=for html_docs type=class
+
+Load an existing schema object from disk.  Returns a new schema
+object.
+
+=for html_docs link=L<More|Alzabo::Create::Schema/load_from_file($name)>
+
+=item * create
+
+=for html_docs type=object
+
+If the schema has not yet been instantiated in an RDBMS, this method
+will instantiate the schema.  If it has been previously instantiated,
+it will bring the schema in the RDBMS into sync with its object
+representation (altering tables/columns, etc.)  Where possible, exist
+data will be preserved.
+
+=for html_docs link=L<More|Alzabo::Create::Schema/create>
+
+=item * make_sql
+
+=for html_docs type=object
+
+Returns an array, each element of which is a SQL statement.  The SQL
+is either the SQL to create the schema from scratch or the SQL needed
+to update the RDBMS to match the current object.  See the
+L<C<create>|Alzabo::QuickRef/create> method for more details.
+
+=for html_docs link=L<More|Alzabo::Create::Schema/make_sql>
+
+=item * drop
+
+=for html_docs type=object
+
+Drop the database from the RDBMS where it was created.  Does not
+remove the schema object itself from disk.
+
+=for html_docs link=L<More|Alzabo::Create::Schema/drop>
+
+=item * delete
+
+=for html_docs type=object
+
+Delete the schema object files from disk.  Does not drop the database
+from the RDBMS.
+
+=for html_docs link=L<More|Alzabo::Create::Schema/delete>
+
+=back
+
+=head1 AUTHOR
+
+Dave Rolsky, E<lt>autarch@urth.orgE<gt>
+
+=cut

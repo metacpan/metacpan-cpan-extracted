@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/Apache/JavaScript/DocumentWrite.pm
+t/00_compile.t
+t/01_js.t
+t/TEST.PL
+t/conf/extra.conf.in
+t/htdocs/test.html
+META.yml                                 Module meta-data (added by MakeMaker)

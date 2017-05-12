@@ -1,0 +1,27 @@
+This is Perl module App::CLI::Plugin::Log::Dispatch::Configurator::YAML.
+
+INSTALLATION
+
+App::CLI::Plugin::Log::Dispatch::Configurator::YAML installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan App::CLI::Plugin::Log::Dispatch::Configurator::YAML
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+App::CLI::Plugin::Log::Dispatch::Configurator::YAML documentation is available as in POD. So you can do:
+
+    % perldoc App::CLI::Plugin::Log::Dispatch::Configurator::YAML
+
+to read the documentation online with your favorite pager.
+
+Akira Horimoto

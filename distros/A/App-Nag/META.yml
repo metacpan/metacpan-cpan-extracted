@@ -1,0 +1,26 @@
+---
+abstract: 'send yourself a reminder'
+author:
+  - 'David F. Houghton <dfhoughton@gmail.com>'
+build_requires:
+  Test::Fatal: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110420'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Nag
+requires:
+  DateTime: 0
+  DateTime::TimeZone: 0
+  File::Temp: 0
+  Getopt::Long::Descriptive: 0
+  Gtk2: 0
+  Gtk2::Notify: 0
+  Modern::Perl: 0
+  constant: 0
+version: 0.002

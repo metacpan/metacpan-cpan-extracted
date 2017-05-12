@@ -1,0 +1,15 @@
+Revision history for Perl extension Apache::Session::CacheAny.
+
+0.03  Wed May 11 10:52:03 JST 2005
+	- Added options translation for Cache::FileCache to
+	  Apache::Session::Store::CacheAny
+	  (Thanks to Vitaly Tomilin)
+
+0.02  Tue Sep 18 04:13:25 JST 2001
+	- Lock scheme changed to Null
+	  Thanks to Perrin Harkins <perrin@elem.com>
+	- Added no implementation fail test
+
+0.01  Mon Sep 10 00:55:26 2001
+	- original version; created by h2xs 1.19
+

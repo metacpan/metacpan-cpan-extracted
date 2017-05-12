@@ -1,0 +1,10 @@
+sub Session_OnStart {
+    $Response->Debug("Session_OnStart ".$Session->SessionID);
+    $Application->{$Session->SessionID}++;
+}
+
+sub Session_OnEnd {
+    $Response->Debug("Session_OnEnd ".$Session->SessionID);
+    delete $Application->{$Session->SessionID};
+}
+

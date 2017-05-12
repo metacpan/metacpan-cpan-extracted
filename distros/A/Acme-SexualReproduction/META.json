@@ -1,0 +1,47 @@
+{
+   "abstract" : "beacuse fork() is for unicellular ones.",
+   "author" : [
+      "Ivan Krylov <krylov.r00t@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4004, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-SexualReproduction",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IPC::Shareable" : 0,
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::SexualReproduction" : {
+         "file" : "lib/Acme/SexualReproduction.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

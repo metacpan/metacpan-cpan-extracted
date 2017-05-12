@@ -1,0 +1,15 @@
+Build.PL
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+bin/tracker_gtk_trayicon.pl
+dist.ini
+lib/App/TimeTracker/Gtk2TrayIcon.pm
+share/busy.png
+share/lazy.png
+t/00-load.t
+t/it_lives.t

@@ -1,0 +1,61 @@
+App-Navegante
+
+App::Navegante is a framework to build intrusive high order proxies. Please
+see the App::Navegante documentation for the complete set of instructions
+on using this framework. For example:
+
+  $ perldoc App::Navegante
+
+You can also read examples/README for a list of examples distributed in
+this module.
+
+PREREQUISTES
+
+You need the following modules installed in your system:
+
+  Test::More
+  LWP::UserAgent
+  HTTP::Request
+  URI::URL
+  CGI
+  XML::DT
+  Parser::Yapp
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::Navegante
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Navegante
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-Navegante
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-Navegante
+
+    Search CPAN
+        http://search.cpan.org/dist/App-Navegante
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Nuno Carvalho
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

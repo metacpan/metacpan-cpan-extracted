@@ -1,0 +1,74 @@
+mamgal - a program for creating static image galleries
+Copyright 2007, 2008 Marcin Owsiany <marcin@owsiany.pl>
+See the README file for license information
+
+Some information about tests
+============================
+
+Quick HOWTO
+-----------
+  
+  Simply run the following in the top source directory:
+  
+    perl Makefile.PL
+    make test
+
+Dependencies
+------------
+
+  Apart from the test modules (Test::More, Test::Exception and so on), the
+  Image::ExifTool library is required. Even though the program itself supports
+  running with either Image::ExifTool as well as Image::Info, it would be to
+  complex to support both backend libraties for unit tests. Therefore the
+  latter library is only supported on a "best-effort" basis.
+
+Purpose
+-------
+
+  The tests have a dual purpose. I use them as part of test-driven development,
+  so they basically define the code architecture. They also serve as a
+  regression test suite.
+
+Kinds of tests
+--------------
+
+  We have:
+
+   - unit tests: testing classes individually, in separation from each other.
+     Any necessary instances of other classes should be mocked.
+
+   - integration tests: testing larger test cases involving interactions of
+     objects of different classes
+
+Organization
+------------
+
+  Although test ordering itself should not matter, it does make sense to run
+  the unit tests before integration tests. The reason is that if some change
+  breaks both kinds of tests, seeing the unit tests failure at the beginning
+  will make it easier to find the cause (integration tests are usually more
+  complicated).
+
+  Additionally, having the biggest integration test execute as last, makes it
+  easy to visually inspect the program behaviour in a relatively interesting
+  use case.
+
+  Therefore we have a naming convention which makes the unit tests run before
+  all other tests. Also, integration tests which use less classes should be put
+  before those which use more classes, if possible.
+
+  Ordering is possible because the perl testing framework runs them in filename
+  alphabetical order.
+
+Notes
+-----
+
+Things to keep in mind when changing/adding tests:
+ - they should succeed in any timezone and any locale: you can check that by
+   running for example:
+
+   LANG=C TZ=GMT make test
+   LANG=pl_PL.UTF-8 TZ=America/Los_Angeles make test
+
+   before that make sure your system supports the locale you are testing with (try "LANG=pl_PL.UTF-8 locale")
+

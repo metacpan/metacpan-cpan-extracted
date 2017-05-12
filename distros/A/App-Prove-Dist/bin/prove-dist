@@ -1,0 +1,4 @@
+#!/usr/bin/perl
+
+use App::Prove::Dist;
+App::Prove::Dist->run;

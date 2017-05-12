@@ -1,0 +1,39 @@
+Revision history for Perl extension Algorithm::SISort.
+
+0.14  Sat Mar 02 19:00 GMT 2003
+        - Added information on how to install the package to the 
+          README file.
+        - Added a reference to rt.cpan.org to the documentation
+	- Made Makefile.PL fallback to ExtUtils::MakeMaker if
+          Inline::MakeMaker is not available. Hopefully allowing
+          for seamless installation or upgrade of Inline when installing
+          through the CPAN shell.
+
+0.13  Sat Mar 01 02:00 GMT 2003
+        - Moved SISort.pm into the root of the package to
+          work around a bug where Inline::MakeMaker does not specify
+          the path up to the .pm file to process in the Makefile.
+        - Updated my email address in the documentation
+
+0.12  Jun 01 2001
+	- ran the documentation files through a spell checker
+	- updated package to use Inline 0.40's Inline::MakeMaker
+	  The package now requires Inline v 0.40 to install
+
+0.11  Mon Feb 19 12:58 GMT 2001
+	- added time zones to the Changelog
+	- changed Sort() to only copy the input array once.
+	- some minimal error checking added on the parameters to
+	  _sort().
+	- removed the need for a sentinel at the front of the
+	  array.
+	- corrected some spelling errors in the documentation
+
+0.10  Sun Feb 18 23:31 GMT 2001
+	- renamed to Algorithm::SISort
+	- initial packaging and release
+
+0.01  Sun Feb 18 13:28 GMT 2001
+	- original version; created by h2xs 1.20 with options
+		-AXn Sort::SiSort
+

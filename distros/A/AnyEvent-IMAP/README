@@ -1,0 +1,87 @@
+NAME
+    AnyEvent::IMAP - IMAP client library for AnyEvent
+
+SYNOPSIS
+        use AnyEvent::IMAP;
+
+        my $imap = AnyEvent::IMAP->new(
+            host   => 'server',
+            user   => "USERID",
+            pass   => 'password',
+            port   => 993,
+            ssl    => 1,
+        );
+        $imap->reg_cb(
+            connect => sub {
+                $imap->login()->cb(sub {
+                    my ($ok, $line) = shift->recv;
+                    ...
+                }
+            }
+        );
+        $imap->connect();
+
+DESCRIPTION
+    AnyEvent::IMAP is IMAP client library for AnyEvent/Perl.
+
+METHODS
+    And some methods are usable by Object::Event.
+
+    my $imap = AnyEvent::IMAP->new(%args);
+        Create a new instance with following attributes.
+
+        host
+        user
+        pass
+        port
+        ssl
+
+    my ($tag, $cv) = $imap->send_cmd($command[, $filter : CodeRef])
+        Send a $command to the server. You can filter the response by
+        optional $filter.
+
+        $tag is a IMAP command tag.
+
+        $cv is a instance of AnyEvent::CondVar. You can process the server
+        response by following format.
+
+            my ($tag, $cv) = $imap->send_cmd('LOGIN');
+            $cv->cb(sub {
+                my ($ok, $res) = shift->recv;
+                ...
+            });
+
+        First response value is $ok. It presents server status is OK or not
+        in boolean value. $res is a response value. You can filter it by
+        $filter in argument.
+
+EVENTS
+    connect
+    connect_error
+    disconnect
+    buffer_empty
+    send
+    recv
+
+AND Example code
+    is available in example/demo.pl
+
+FAQ
+    How can I decode UTF-7 folder names?
+        use Encode::IMAPUTF7.
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
+
+THANKS TO
+    Some of the code taken from Net::IMAP::Client.
+
+SEE ALSO
+    Net::IMAP::Client, RFC 3501, AnyEvent
+
+LICENSE
+    Copyright (C) Tokuhiro Matsuno
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Acme-Spork.t
+lib/Acme/Spork.pm
+META.yml                                 Module meta-data (added by MakeMaker)

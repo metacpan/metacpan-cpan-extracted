@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/test.t
+t/perlcriticrc
+t/perlcritic.t
+lib/App/XMMS2/Notifier.pm
+xmms2-notifier
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

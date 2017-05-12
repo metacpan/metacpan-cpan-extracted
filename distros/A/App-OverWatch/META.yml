@@ -1,0 +1,35 @@
+---
+abstract: 'Watch over your infrastructure'
+author:
+  - 'Chris Hughes <chrisjh@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::Exception: 0
+  Test::More: 0
+  lib: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-OverWatch
+requires:
+  Config::Tiny: 0
+  DBIx::Connector: 0
+  Getopt::Long: 0
+  Module::Load: 0
+  Moo: 0
+  Pod::Usage: 0
+  Try::Tiny: 0
+  base: 0
+  namespace::clean: 0
+  strict: 0
+  utf8: 0
+  warnings: 0
+version: 0.1

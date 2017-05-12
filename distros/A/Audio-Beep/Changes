@@ -1,0 +1,78 @@
+Revision history for Perl extension Audio::Beep.
+
+0.11 Wed Apr 14 09:46:13 CEST 2004
+    - (maybe) added support for BSD, thanks to Andrew Stevenson's "beep"
+    - added Japanese documentation (thanks to perldoc.jp and Kato Atsushi)
+    - extracted English documentation from Beep.pm into Beep.pod
+    - lots of (dirty) hacking into Makefile.PL
+    - added beep_player.pl in the music directory to help playing samples
+    - extracted some samples from the docs and put them in music dir
+    - added META.yml
+    - fixed some documentation
+
+0.10 Sun Apr 06 21:57:12 2003
+    - there was no need for 'no strict "refs"' 
+        in _best_player() and _player_from_string()
+    - added name to tests
+    - added Test::More in dependecies
+    - exported function beep() now uses a cached $player
+    - added single quotes around EOFs in Music Examples in doc
+    - love will tear us apart
+    - we skip 0.09: we don't like it.
+
+0.08 Wed Feb 26 10:23:41 2003
+    - In _best_player() we were "trying to club someone to dead 
+        with a loaded uzi": now we use bullets (thanks to perlport)
+    - Audio::Beep::Win32::API now use native Win32::Sleep
+        (more a proof of concept than something useful)
+    - in Audio::Beep::Linux::PP, $console reduced its scope to the play method 
+        (thanks to a closure)
+    - now we warn if it's going to install on a non-compatible Windows
+
+0.07 Tue Feb 25 00:34:19 2003
+    - Now we install no submodules on not supported OSs
+    - lazier way to set the player object and more POD on the subject
+    - some more carping and croaking
+    - new one-liner examples in POD
+
+0.06 Fri Feb 21 10:35:11 2003
+    - local $SIG{INT} in Audio::Beep::Linux::PP
+    - fixed serious bug in Makefile.PL
+
+0.05 Tue Feb 19 00:20:57 2003
+    - Added Audio::Beep::Win32::API player module
+        (now we work on NT, 2000 and XP)
+    - Updated Makefile.PL to install just required modules depending on OS
+    - Updated POD to account for Windows support
+    - Added scales sample in music/ directory
+    - Rewrote _best_player()
+    - Updated tests
+
+0.04 Sun Feb 16 19:48:32 2003
+    - Added a $beeper->rest($milliseconds) method
+    - Rewrote parsing
+    - Added \ in front of all methods 
+        (breaking compatibility with previous versions)
+    - Added \rel, \norel e \transpose
+    - Implemented relative noting the right way 
+        (again breaking compatibility)
+    - Added comments with #
+    - More POD
+    - Updated the samples in the POD
+    - Added a sample in music/ directory
+    - Probably other stuff
+
+0.03  Fri Feb 14 14:25:54 2003
+    - Fixed a missing bless in Audio::Beep::Linux::PP
+    - Fixed POD
+
+0.02  Thu Feb 13 18:40:05 2003
+    - Changed namespace to Audio::Beep
+    - Moved Beep::beep module to Audio::Beep::Linux::beep
+    - New module Audio::Beep::Linux::PP
+    - A ton of other stuff
+
+0.01  Tue Feb 11 18:20:12 2003
+	- original version; created by h2xs 1.22 with options
+		-XA -n Beep
+

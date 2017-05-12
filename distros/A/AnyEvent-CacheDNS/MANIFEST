@@ -1,0 +1,9 @@
+Build.PL
+lib/AnyEvent/CacheDNS.pm
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+t/dns.t
+README
+META.json

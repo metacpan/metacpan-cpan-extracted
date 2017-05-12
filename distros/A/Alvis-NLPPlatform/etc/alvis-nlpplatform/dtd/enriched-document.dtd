@@ -1,0 +1,100 @@
+<!-- $Id: enriched-document.dtd,v 1.1 2007/03/19 09:46:48 ht Exp $ -->
+
+<!-- This DTD prescribes the format of Alvis enriched document records -->
+
+
+<!ELEMENT documentCollection (documentRecord*)>
+
+
+<!ELEMENT documentRecord (acquisition, linguisticAnalysis?, relevance?)>
+<!ATTLIST documentRecord id CDATA #REQUIRED>
+
+
+<!ELEMENT acquisition (acquisitionData, originalDocument?, canonicalDocument,
+		       metaData?, links?, analysis?)>
+
+<!ELEMENT acquisitionData (modifiedDate, expiryDate?, checkedDate?,
+			   httpServer?, urls)>
+<!ELEMENT modifiedDate (#PCDATA)>
+<!ELEMENT expiryDate (#PCDATA)>
+<!ELEMENT checkedDate (#PCDATA)>
+<!ELEMENT httpServer (#PCDATA)>
+<!ELEMENT urls (url*)>
+<!ELEMENT url (#PCDATA)>
+
+<!ELEMENT originalDocument (#PCDATA)>
+<!-- The "encoding" attribute may be "base64" or "quoted-printable" -->
+<!ATTLIST originalDocument mimeType CDATA #REQUIRED
+                           charSet CDATA #REQUIRED
+                           compression CDATA #IMPLIED
+                           encoding CDATA #IMPLIED>
+<!-- originalDocument.mimeType chosen from IANA's list -->
+<!-- originalDocument.charSet chosen from IANA's list -->
+<!-- originalDocument.compression may take the following values:
+	"deflate", "gzip" -->
+<!-- originalDocument.encoding may take the following values:
+	"quoted-printable", "base64", "xml" -->
+
+<!ELEMENT canonicalDocument (section*)>
+<!ELEMENT section (#PCDATA|list|ulink|section)*>
+<!ATTLIST section title CDATA #IMPLIED>
+<!ELEMENT list (item*)>
+<!ELEMENT item (#PCDATA|list|ulink)*>
+<!ELEMENT ulink (#PCDATA)>
+<!ATTLIST ulink url CDATA #IMPLIED>
+
+<!ELEMENT metaData (meta*)>
+<!ELEMENT meta (#PCDATA)>
+<!ATTLIST meta name CDATA #REQUIRED>
+<!-- meta.name may take values chosen from the Dublin Core element set -->
+
+<!ELEMENT links (outlinks?, inlinks?, inlinkHosts?)>
+<!ELEMENT outlinks (link*)>
+<!ELEMENT inlinks (link*)>
+<!ELEMENT inlinkHosts (#PCDATA)>
+<!ELEMENT link (anchorText?, location)>
+<!ATTLIST link type CDATA #REQUIRED>
+<!-- link.type may take the following values: "a", "img", "frame" -->
+<!ELEMENT anchorText (#PCDATA)>
+<!ELEMENT location (#PCDATA)>
+<!ATTLIST location documentId CDATA #IMPLIED>
+
+<!ELEMENT analysis (domain?, property*, ranking*, topic*)>
+<!ELEMENT domain (#PCDATA)>
+<!ELEMENT property (#PCDATA)>
+<!ATTLIST property name CDATA #REQUIRED>
+<!ELEMENT ranking (#PCDATA)>
+<!ATTLIST ranking scheme CDATA #REQUIRED>
+<!ELEMENT topic (class, terms?)>
+<!ATTLIST topic absoluteScore CDATA #REQUIRED
+		relativeScore CDATA #REQUIRED>
+<!ELEMENT class (#PCDATA)>
+<!ELEMENT terms (#PCDATA)>
+
+
+<!ELEMENT linguisticAnalysis (token?, word?, sentence?, tagging?,
+			      phrase?, sectioning?)>
+
+<!-- This will be structured in the final version of the format -->
+<!ELEMENT token (#PCDATA)>
+
+<!-- This will be structured in the final version of the format -->
+<!ELEMENT word (#PCDATA)>
+
+<!-- This will be structured in the final version of the format -->
+<!ELEMENT sentence (#PCDATA)>
+
+<!-- This will be structured in the final version of the format -->
+<!ELEMENT tagging (#PCDATA)>
+
+<!-- This will be structured in the final version of the format -->
+<!ELEMENT phrase (#PCDATA)>
+
+<!-- This will be structured in the final version of the format -->
+<!ELEMENT sectioning (#PCDATA)>
+
+
+<!-- This will be structured in the final version of the format -->
+<!ELEMENT relevance (#PCDATA)>
+
+

@@ -1,0 +1,62 @@
+#!/usr/bin/env perl
+
+#  PODNAME: mio
+# ABSTRACT: Executable for App::mio
+
+use strict;
+use warnings;
+
+use FindBin;
+
+use lib "$FindBin::Bin/../lib";
+
+use App::mio;
+
+while (<>) {
+    $_ = App::mio->commify($_);
+} continue {
+    print
+}
+
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+mio - Executable for App::mio
+
+=head1 VERSION
+
+version 0.1.0
+
+=head1 SYNOPSIS
+
+Just a simple executable to commify your numbers.
+
+=head1 USAGE
+
+Simply pipe your input in:
+
+     wc -l *.txt | mio
+
+=head1 WARNING
+
+No special care is taken for non-integers.
+
+=head1 AUTHOR
+
+DBR <dbr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by DBR.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
+=cut
+

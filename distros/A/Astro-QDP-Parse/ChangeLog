@@ -1,0 +1,193 @@
+2008-05-06 15:04 -0400  djerius  <djerius@cfa.harvard.edu>  (2f1822e5da7e [tip])
+
+	* lib/Astro/QDP/Parse.pm, t/parse_qdpfile.t:
+	assymmetric errors are now ehi & elo as the names emin & emax may be
+	confused with bounds rather than errors
+
+2008-05-06 13:57 -0400  djerius  <djerius@cfa.harvard.edu>  (a32d2df34cea)
+
+	* .hgtags:
+	Added tag 0.12 for changeset 23d3159b86cb
+
+2008-05-06 13:56 -0400  djerius  <djerius@cfa.harvard.edu>  (9d2ae89f0629)
+
+	* lib/Astro/QDP/Parse.pm:
+	CPAN RT address in docs used the old module name
+
+2008-05-06 08:09 -0400  djerius  <djerius@cfa.harvard.edu>  (23d3159b86cb [0.12])
+
+	* ChangeLog, Changes, lib/Astro/QDP/Parse.pm:
+	updated version and logs for release
+
+2008-05-06 08:06 -0400  djerius  <djerius@cfa.harvard.edu>  (67cb88c074ae)
+
+	* MANIFEST.SKIP:
+	MANIFEST.SKIP excluded Module::Install directories, causing a broken
+	distribution file
+
+2008-05-05 16:32 -0400  djerius  <djerius@cfa.harvard.edu>  (9dbe55299656)
+
+	* lib/Astro/QDP/Parse.pm:
+	typo caused runtime as_pdl consistency check to fail
+
+2008-05-05 16:19 -0400  djerius  <djerius@cfa.harvard.edu>  (655c92641b0e)
+
+	* .hgtags:
+	Added tag 0.11 for changeset 9d68b348f91f
+
+2008-05-05 16:19 -0400  djerius  <djerius@cfa.harvard.edu>  (9d68b348f91f [0.11])
+
+	* ChangeLog, Changes, lib/Astro/QDP/Parse.pm:
+	update for release
+
+2008-05-05 16:18 -0400  djerius  <djerius@cfa.harvard.edu>  (7d63ab32d792)
+
+	* t/parse_qdpfile.t:
+	ensure that test works if PDL is not available
+
+2008-05-05 16:10 -0400  djerius  <djerius@cfa.harvard.edu>  (3c1de9e291c0)
+
+	* .hgtags:
+	Added tag 0.1 for changeset dea7297dc3aa
+
+2008-05-05 16:10 -0400  djerius  <djerius@cfa.harvard.edu>  (dea7297dc3aa [0.1])
+
+	* ChangeLog: new file.
+	* ChangeLog, Changes, lib/Astro/QDP/Parse.pm:
+	update for release
+
+2008-05-05 16:08 -0400  djerius  <djerius@cfa.harvard.edu>  (a7c80e98184b)
+
+	* lib/Astro/QDP/Parse.pm: new file.
+	* lib/Astro/HEADAS/QDP/Parse.pm: deleted file.
+	* Makefile.PL, README, lib/Astro/HEADAS/QDP/Parse.pm,
+	lib/Astro/QDP/Parse.pm, t/00-load.t, t/parse_qdpfile.t,
+	t/read_qdpfile.t:
+	rename to Astro::QDP::Parse
+
+2008-05-05 15:57 -0400  djerius  <djerius@cfa.harvard.edu>  (48d1dc908fb3)
+
+	* lib/Astro/HEADAS/QDP/Parse.pm:
+	specify minimum Perl version
+
+2008-05-05 15:56 -0400  djerius  <djerius@cfa.harvard.edu>  (00a8c03492c7)
+
+	* Makefile.PL:
+	specify license
+
+2008-05-05 15:51 -0400  djerius  <djerius@cfa.harvard.edu>  (2f6f0cd45257)
+
+	* data/nopu1.pco, data/phvavn1.pco: new file.
+	* .cvsignore, MANIFEST, META.yml, t/parse_qdpfile_1.t,
+	t/parse_qdpfile_2.t, t/parse_qdpfile_as_pdls.t: deleted file.
+	* .cvsignore, MANIFEST, META.yml, Makefile.PL, README,
+	data/goobish.qdp, data/nopu1.pco, data/phvavn1.pco,
+	lib/Astro/HEADAS/QDP/Parse.pm, t/parse_qdpfile.t,
+	t/parse_qdpfile_1.t, t/parse_qdpfile_2.t, t/parse_qdpfile_as_pdls.t,
+	t/read_qdpfile.t:
+	major rewrite of code + tests. API change
+
+2008-05-03 07:52 -0400  djerius  <djerius@cfa.harvard.edu>  (78154ce6892c)
+
+	* lib/Astro/HEADAS/QDP/Parse.pm:
+	more pod-coverage cleanups
+
+2008-05-03 07:49 -0400  djerius  <djerius@cfa.harvard.edu>  (e0f3f904d36f)
+
+	* lib/Astro/HEADAS/QDP/Parse.pm:
+	use Regexp::Common for the regexp to match floats.
+
+	For some reason switch to Regexp::Common made Perl notice that the
+	module didn't return a true value on parsing. Weird.
+
+2008-05-03 07:42 -0400  djerius  <djerius@cfa.harvard.edu>  (0a4abdbee265)
+
+	* lib/Astro/HEADAS/QDP/Parse.pm:
+	cleanup documentation structure - no need to fool pod-coverage
+
+2008-05-03 07:40 -0400  djerius  <djerius@cfa.harvard.edu>  (26a12b56fa4b)
+
+	* lib/Astro/HEADAS/QDP/Parse.pm:
+	white space cleanup
+
+2008-05-02 16:52 -0400  tgaetz  <tgaetz@cfa.harvard.edu>  (6f7b2dc63bd5)
+
+	* data/nopu1.qdp, t/parse_qdpfile_2.t: new file.
+	* data/nopu1.qdp, lib/Astro/HEADAS/QDP/Parse.pm, t/parse_qdpfile_2.t:
+	Name changed; move to /proj/axaf/simul/src/hg
+
+2008-05-02 16:51 -0400  tgaetz  <tgaetz@cfa.harvard.edu>  (0b79a44c3b90)
+
+	* .hgtags:
+	name change & revisions
+
+2008-01-22 19:27 -0500  tgaetz  <tgaetz@cfa.harvard.edu>  (a26bc9f83c84 [0.05])
+
+	* Changes, MANIFEST, lib/Astro/HEADAS/QDP/Parse.pm,
+	t/parse_qdpfile_1.t:
+	various bugfixes
+
+2008-01-22 19:27 -0500  tgaetz  <tgaetz@cfa.harvard.edu>  (49caf79b34b5)
+
+	* .hgtags:
+	various bugfixes
+
+2008-01-22 11:23 -0500  tgaetz  <tgaetz@cfa.harvard.edu>  (865ecc29a054 [0.04])
+
+	* MANIFEST, MANIFEST.SKIP:
+	fixed docs and manifest
+
+2008-01-22 11:22 -0500  tgaetz  <tgaetz@cfa.harvard.edu>  (7bce96665a8d)
+
+	* .hgtags:
+	fixed docs & manifest
+
+2008-01-22 11:22 -0500  tgaetz  <tgaetz@cfa.harvard.edu>  (404022fa976d [0.03])
+
+	* .hgtags:
+	fixed manifest
+
+2008-01-22 11:18 -0500  tgaetz  <tgaetz@cfa.harvard.edu>  (f08de890626a)
+
+	* data/goobish.qdp, t/parse_qdpfile_1.t: new file.
+	* MANIFEST, data/goobish.qdp, lib/Astro/HEADAS/QDP/Parse.pm,
+	t/parse_qdpfile.t, t/parse_qdpfile_1.t, t/parse_qdpfile_as_pdls.t,
+	t/read_qdpfile.t:
+	fixed docs
+
+2008-01-22 11:18 -0500  tgaetz  <tgaetz@cfa.harvard.edu>  (3f6a9dd2579e)
+
+	* .hgtags:
+	fixed docs
+
+2008-01-17 17:13 -0500  tgaetz  <tgaetz@cfa.harvard.edu>  (181a078eb33a)
+
+	* Changes, lib/Astro/HEADAS/QDP/Parse.pm, t/parse_qdpfile.t,
+	t/parse_qdpfile_as_pdls.t, t/read_qdpfile.t:
+	added tests for TERR
+
+2008-01-17 17:13 -0500  tgaetz  <tgaetz@cfa.harvard.edu>  (f1078df31d2a)
+
+	* .hgtags:
+	added tests for TERR
+
+2008-01-17 16:27 -0500  tgaetz  <tgaetz@cfa.harvard.edu>  (241f83426b54 [0.02])
+
+	* .cvsignore, Changes, MANIFEST, MANIFEST.SKIP, META.yml, Makefile.PL,
+	README, data/foobish.pco, data/foobish.qdp, data/phvavn1.qdp,
+	lib/Astro/HEADAS/QDP/Parse.pm, t/00-load.t, t/parse_qdpfile.t,
+	t/parse_qdpfile_as_pdls.t, t/perlcritic.t, t/pod-coverage.t,
+	t/pod.t, t/read_qdpfile.t: new file.
+	* .cvsignore, Changes, MANIFEST, MANIFEST.SKIP, META.yml, Makefile.PL,
+	README, data/foobish.pco, data/foobish.qdp, data/phvavn1.qdp,
+	lib/Astro/HEADAS/QDP/Parse.pm, t/00-load.t, t/parse_qdpfile.t,
+	t/parse_qdpfile_as_pdls.t, t/perlcritic.t, t/pod-coverage.t,
+	t/pod.t, t/read_qdpfile.t:
+	initial version
+
+2008-01-17 16:27 -0500  tgaetz  <tgaetz@cfa.harvard.edu>  (d5fad25f0d21)
+
+	* .hgtags: new file.
+	* .hgtags:
+	initial version
+

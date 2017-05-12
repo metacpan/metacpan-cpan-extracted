@@ -1,0 +1,34 @@
+Any::Template v1.015
+
+(c) BBC 2004. This program is free software; you can redistribute it and/or modify it under the GNU GPL.
+
+See the file COPYING in this distribution, or http://www.gnu.org/licenses/gpl.txt 
+
+QUICK START:
+
+Install Any::Template by unpacking the tarball and running the following
+commands in the source directory:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    Then delete the source directory tree since it's no longer needed.
+
+    run 'perldoc Any::Template' to read the full documentation.
+
+BACKENDS INCLUDED WITH THIS DISTRIBUTION:
+
+    TemplateToolkit
+    HTML::Template
+    Text::Template
+    Text::MicroMason
+
+the Template languages currently supported are:
+
+    Template (Template Toolkit)
+    HTML::Template (directly and also the emulation via Text::MicroMason)
+    Text::Template (directly and also the emulation via Text::MicroMason)
+    HTML::Mason (emulated via Text::MicroMason)
+    Embperl (emulated via Text::MicroMason)
+    Apache::ASP (emulated via Text::MicroMason)

@@ -1,0 +1,34 @@
+First of all, thanks for taking the time to try and make this project 
+better!  Secondly this is an optional document, if you have a small fix, 
+just submit as a pull request in GitHub, or send me a patch against the 
+latest released version on the GitHub issue tracker here:
+
+ https://github.com/plicease/Archive-Libarchive-FFI/issues?state=open
+
+I will most likely be able to shoehorn it into the idiosyncrasies of 
+this project.
+
+That being said, if you want to save me time, and speed the process, 
+please do use dzil to help create and test your patch.
+
+ - I use Dist::Zilla, so you will have to install it plus the plugins 
+   that I am using, which may take a while if you aren't already using 
+   it.
+ 
+ - It isn't a pure-perl distribution, so you really do need dzil to 
+   build and test (you can't just prove -l to run the tests).
+   
+ - Most of the tests and some code are pulled in from the 
+   Archive::Libarchive::XS distribution, as part of the build/release 
+   project, I've disabled the pull if your username isn't ollisg (my 
+   uesr id).  Just keep in mind that part of the code base is shared.
+ 
+ - If you are really interested, you can checkout 
+   Archive::Libarchive::XS in a sybling directory and set your USER 
+   environment variable to ollisg and run inc/run/before_build.pl
+ 
+ - Some generated content is intended to be checked back into the
+   repository, which is probably a confusing and bad thing long term.
+
+I hope to refactor some of this in the future so that it is easier for 
+contributors.

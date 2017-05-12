@@ -1,0 +1,41 @@
+0.976     2016-04-08 23:57:23+02:00 Europe/Rome
+   - again Win32 issues, next time I'll just drop support on this
+     impossible platform
+
+0.974     2016-04-06 22:11:35+02:00 Europe/Rome
+   - a couple Windows Win32 seem to be happy with the tests now
+   - release
+
+0.973_07  2016-04-05 19:36:48+02:00 Europe/Rome (TRIAL RELEASE)
+   - made test about presence of 'sort' more strict
+
+0.973_06  2016-04-03 00:58:07+02:00 Europe/Rome (TRIAL RELEASE)
+   - added option for binmode
+   - setting :raw:encoding(UTF-8) as default binmode for STDOUT
+
+0.973_05  2015-05-15 18:45:54 Europe/Rome
+   - hopefully fixed issue with pipe open on Windows
+
+0.973_04  2015-05-10 18:34:31 Europe/Rome
+   - performance enhancement upon sorting
+   - added command-line options for sort selection
+   - added documentation
+
+0.973_03  2015-05-10 13:37:24 Europe/Rome
+   - added internal sorting capability
+
+0.973_02  2015-04-27 08:56:46 Europe/Rome
+   - added meta information about the GitHub repository
+   - added generation of META.json
+   - patched test to work on Windows
+
+0.973_01  2015-04-26 02:00:16 Europe/Rome
+   - raised minimum perl version to 5.10
+   - fixed https://rt.cpan.org/Public/Bug/Display.html?id=103970
+     "System perl used in tests" (thanks SREZIC for pointing out)
+
+0.973     2013-08-04 08:21:51 Europe/Rome
+   - added (and fixed) dependency on Log::Log4perl::Tiny
+
+0.972     2013-08-03 16:17:07 Europe/Rome
+   - Initial release

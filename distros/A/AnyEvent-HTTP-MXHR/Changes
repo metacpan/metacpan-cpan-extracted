@@ -1,0 +1,29 @@
+Changes
+=======
+
+0.00007 - 28 Mar 2012
+    * Fix a problem where the handle goes away on newer versions of
+      AnyEvent. (rt #76115, Alex Vandiver)
+    * Make sure that we have AE 6.01 for the above fix.
+
+0.00006 - 24 Feb 2010
+    * Be a bit more careful when we fire on_error
+    * Don't run callback when we have been freed already
+
+0.00005 - 24 Feb 2010
+    * Fix resetting on_error handlers being ignored.
+    * Now on_error/on_eof does not free the current client.
+      You need to explicitly free it yourself
+
+0.00004 - 23 Feb 2010
+    * Add handle as the third parameter, but don't use it unless you're
+      wacky like me.
+
+0.00003 - 05 Feb 2010
+    * Properly split on :\s* when splitting headers (Reported by miyagawa)
+
+0.00002 - 05 Feb 2010
+    * Work with boundaries being sent before the data
+
+0.00001 - 05 Feb 2010
+    * Initial release

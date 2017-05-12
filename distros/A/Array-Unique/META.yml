@@ -1,0 +1,21 @@
+---
+name: Array-Unique
+version: 0.08
+author:
+  - 'Gabor Szabo <gabor@pti.co.il>'
+abstract: Tie-able array that allows only unique values
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: 5.006
+build_requires:
+  Test::More: 0.47
+provides:
+  Array::Unique:
+    file: lib/Array/Unique.pm
+    version: 0.08
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

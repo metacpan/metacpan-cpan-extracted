@@ -1,0 +1,7 @@
+terminal urxvtc
+browser chromium
+screenshot scrot
+lock xscreensaver-command -lock
+sleep nightnight
+file_manager urxvtc -e ranger 
+editor urxvtc -e vim

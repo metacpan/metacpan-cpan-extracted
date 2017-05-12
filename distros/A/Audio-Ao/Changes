@@ -1,0 +1,6 @@
+Revision history for Perl extension Audio::Ao.
+
+0.01  Sat Jan  4 01:19:51 2003
+	- original version; created by h2xs 1.21 with options
+		-XA -n Audio::Ao
+

@@ -1,0 +1,47 @@
+{
+   "abstract" : "Find installed LibVLC",
+   "author" : [
+      "Alexey Sokolov <alexey@alexeysokolov.co.cc>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-VideoLAN-LibVLC",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.20",
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.20"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::PkgConfig" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Alien::VideoLAN::LibVLC" : {
+         "file" : "lib/Alien/VideoLAN/LibVLC.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.04"
+}

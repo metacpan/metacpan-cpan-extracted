@@ -1,0 +1,17 @@
+clear
+power on
+regs
+
+# create an overflow
+memset 1000 40
+op 2c 0010
+
+# V flag should now be 1
+test v = 1
+
+op b8
+
+# V flag should now be 0 again
+test v = 0
+
+save verify_B8.txt

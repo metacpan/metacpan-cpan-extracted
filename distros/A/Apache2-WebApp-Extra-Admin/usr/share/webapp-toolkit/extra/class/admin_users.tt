@@ -1,0 +1,241 @@
+package [% project_title %]::Admin::Users;
+
+use strict;
+use warnings;
+use base '[% project_title %]::Admin';
+use [% project_title %]::Admin::Users::Error qw( ERROR_ACCESS_DENIED );
+use Apache::Htpasswd;
+
+our $VERSION = 0.19;
+
+#----------------------------------------------------------------------------+
+# _default(\%controller)
+#
+# Dispatch the action.
+
+sub _default {
+    my ($self, $c) = @_;
+
+    $self->SUPER::_error($c, 'Error', ERROR_ACCESS_DENIED)
+      unless ($c->request->user eq 'admin');
+
+    $self->_list_users($c);
+}
+
+#----------------------------------------------------------------------------+
+# _list_users(\%controller)
+#
+# List the htpasswd users.
+
+sub _list_users {
+    my ($self, $c) = @_;
+
+    my $start = $c->request->param('start') || '0';
+    my $sc    = $c->request->param('sc')    || 'username';
+    my $so    = $c->request->param('so')    || 'asc';
+
+    # check the user input
+    my $error;
+    $error = 1 if ($start !~ /^[\d]{1,6}$/);
+    $error = 1 if ($sc    !~ /^[\w]{1,55}$/); 
+    $error = 1 if ($so    !~ /^[\w]{1,4}$/);
+
+    $self->SUPER::_error($c, 'Error', 'Bad Request') if $error;
+
+    my $results = $self->SUPER::_sort_data($sc, $so, $self->_get_htpasswd_data($c) );
+    my $total   = @$results;
+    my $limit   = $c->config->{custom_items_per_page} || '25';
+
+    $c->request->content_type('text/html');
+
+    $c->template->process(
+        'extras/admin/users.tt',
+        {
+            %{ $c->config },
+            sc   => $sc,
+            so   => $so,
+            data => $self->SUPER::_gen_results($total, $start, $limit, \@$results),
+        }
+      )
+      or $self->SUPER::_error($c, 'Template process failed', $c->template->error() );
+
+    exit;
+}
+
+#----------------------------------------------------------------------------+
+# delete(\%controller)
+#
+# Delete the user from the htpasswd file.
+
+sub delete {
+    my ($self, $c) = @_;
+
+    my $username = $c->request->param('username');
+
+    $self->SUPER::_error($c, 'Error', ERROR_ACCESS_DENIED)
+      if ($username eq 'admin');
+
+    my $htpasswd = $c->config->{apache_doc_root} . '/conf/htpasswd';
+    my $pwd      = new Apache::Htpasswd($htpasswd);
+    my @users    = $pwd->fetchUsers();
+
+    foreach (@users) {
+        next if ($username eq 'admin');     # always exclude
+
+        $pwd->htDelete($_) if (/^(?:|\#)$username/i);
+    }
+
+    $self->SUPER::_log_action($c, "Deleted User ($username)");
+
+    # list the users
+    $self->_list_users($c);
+}
+
+#----------------------------------------------------------------------------+
+# status(\%controller)
+#
+# Change the user status.
+
+sub status {
+    my ($self, $c) = @_;
+
+    my $username = $c->request->param('username');
+    my $value    = $c->request->param('value');
+
+    $self->SUPER::_error($c, 'Error', ERROR_ACCESS_DENIED)
+      if ($username eq 'admin');
+
+    my $htpasswd = $c->config->{apache_doc_root} . '/conf/htpasswd';
+
+    open (INFILE, $htpasswd) or die $self->SUPER::_error($c, "Cannot open $htpasswd: $!");
+    my @lines = <INFILE>;
+    close(INFILE);
+
+    open (OUTFILE, ">$htpasswd") or die $self->SUPER::_error($c, "Cannot open $htpasswd: $!");
+    foreach (@lines) {
+        chomp;
+        next if ($username eq 'admin');
+
+        if (/^(?:|\#)$username/i) {
+            if (/^#/) {
+                s/^#(\w+)/$1/gi;
+            }
+            else {
+                s/^(\w+)/\#$1/gi;
+            }
+        }
+
+        print OUTFILE "$_\n";
+    }
+    close(OUTFILE);
+
+    $self->SUPER::_log_action($c, "Changed Status to '$value' ($username)");
+
+    # list the users
+    $self->_list_users($c);
+}
+
+#----------------------------------------------------------------------------+
+# _get_htpasswd_data(\%controller)
+#
+# Return the htpasswd user list as a reference to an array.
+
+sub _get_htpasswd_data {
+    my ($self, $c) = @_;
+
+    my $htpasswd = $c->config->{apache_doc_root} . '/conf/htpasswd';
+
+    open (FILE, $htpasswd) or die $self->ERROR::_error($c, "Cannot open $htpasswd: $!");
+    my @lines = <FILE>;
+    close(FILE);
+
+    my @results;
+
+    foreach (@lines) {
+        chomp;
+        my ($user, $pass, $epoch) = split(/\:/);
+
+        my $status;
+
+        if ($user =~ /^#/) {
+            $status = 'Disabled';
+
+            $user =~ s/^#//;
+        }
+        else {
+            $status = 'Active';
+        }
+
+        $epoch ||= 110790000;    # default
+
+        push( @results, {
+            username => $user,
+            status   => $status,
+            created  => $c->plugin('DateTime')->format_time($epoch, '%m-%d-%Y / %R %p'),
+          });
+    }
+
+    return \@results;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+[% project_title %]::Admin::Users - Web based admin control panel module
+
+=head1 SYNOPSIS
+
+  use [% project_title %]::Admin::Users;
+
+=head1 DESCRIPTION
+
+Base class module that is used to manage admin control panel users.
+
+=head1 OBJECT METHODS
+
+=head2 _list_users
+
+List the htpasswd users.
+
+  $self->_list_users(\%controller);
+
+=head2 _get_htpasswd_data
+
+Return the htpasswd user list as a reference to an array.
+
+  $self->_get_htpasswd_data(\%controller);
+
+=head2 URI DISPATCHABLE
+
+=head2 delete
+
+Delete the user from the htpasswd file.
+
+  http://domain.com/app/admin/users/delete
+
+=head2 status
+
+Change the user status.
+
+  http://domain.com/app/admin/users/status
+
+=head1 SEE ALSO
+
+L<Apache2::WebApp>, L<Apache2::WebApp::Admin>, L<Apache2::WebApp::Plugin::DBI>, 
+L<Apache::Htpasswd>
+
+=head1 AUTHOR
+
+Marc S. Brooks, E<lt>mbrooks@cpan.orgE<gt> L<http://mbrooks.info>
+
+=head1 COPYRIGHT
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

@@ -1,0 +1,30 @@
+hashl - Create database with partial file hashes, check if other files are in it
+--------------------------------------------------------------------------------
+
+* <https://finalrewind.org/projects/hashl/>
+
+Dependencies
+------------
+
+ * perl version 5.10 or newer
+ * DateTime
+ * Digest::SHA
+ * List::MoreUtils
+ * Time::Progress
+
+Installation
+------------
+
+$ perl Build.PL
+$ perl Build
+$ sudo perl Build install
+
+You can then run 'man hashl' for more information.
+
+Testing
+-------
+
+$ perl Build test
+
+Note that this will require the Test::More, Test::Compile and Test::Pod
+modules.

@@ -1,0 +1,25 @@
+---
+abstract: 'WUPHF, a blast messaging system'
+author:
+  - 'Hunter McMillen <mcmillhj@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-WUPHF
+requires:
+  Moo: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/mcmillhj/App-WUPHF/issues
+  homepage: https://metacpan.org/release/App-WUPHF
+  repository: git://github.com/mcmillhj/App-WUPHF.git
+version: '0.001'

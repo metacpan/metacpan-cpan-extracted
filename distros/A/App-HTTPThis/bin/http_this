@@ -1,0 +1,111 @@
+#!/usr/bin/env perl
+
+## Make dist-zilla happy
+package
+  http_this;
+
+use strict;
+use warnings;
+use App::HTTPThis;
+
+# ABSTRACT: export the current directory over HTTP
+
+App::HTTPThis->new->run;
+
+
+
+
+=pod
+
+=head1 NAME
+
+http_this - export the current directory over HTTP
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+    ## Export the current directory with HTTP
+    $ http_this
+
+    ## Export the dir_name directory with HTTP
+    $ http_this dir_name
+
+    ## Start the server on a specific port
+    $ http_this --port 9001
+
+    ## Announces the HTTP server via Bonjour with the specified name
+    $ http_this --name "My cool webserver"
+
+    ## Show documentation about our options
+    $ http_this --help
+
+    ## Show the entire man page
+    $ http_this --man
+
+=head1 DESCRIPTION
+
+The C<http_this> command exports the current directory via HTTP. You can
+also export any directory by providing the path as a parameter.
+
+A simple web server is started and is kept running until you kill it
+with C<Ctrl-C>.
+
+All the files and directories will be availble to a browser under the
+URL the script outputs.
+
+=encoding utf8
+
+=head1 ARGUMENTS
+
+The script accepts a single optional argument: the path of the directory
+to export.
+
+=head1 OPTIONS
+
+The following options are available:
+
+=over 4
+
+=item --port PORT
+
+Start the HTTP server on a specific C<PORT>.
+
+=item --name NAME
+
+Announces the server over Bonjour.
+
+This feature requires the L<Net::Rendezvous::Publish> module and the
+appropriate backend for your operating system, both available from
+L<CPAN|http://search.cpan.org/>. If one of them cannot be found, a
+warning message will be displayed.
+
+=item --help
+
+Print information about the script usage and its options.
+
+=item --man
+
+Print the entire man page for the command.
+
+=back
+
+=head1 AUTHOR
+
+Pedro Melo <melo@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2010 by Pedro Melo.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0
+
+=cut
+
+
+__END__
+

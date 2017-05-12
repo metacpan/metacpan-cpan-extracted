@@ -1,0 +1,56 @@
+{
+   "abstract" : "Test Module for Depping on Alted Modules",
+   "author" : [
+      "Ingy döt Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Alt-Dep-Test",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt",
+         "example"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::Math::XS" : "0",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ingydotnet/acme-alt-dep-test-pm/issues"
+      },
+      "homepage" : "https://github.com/ingydotnet/acme-alt-dep-test-pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ingydotnet/acme-alt-dep-test-pm.git",
+         "web" : "https://github.com/ingydotnet/acme-alt-dep-test-pm"
+      }
+   },
+   "version" : "0.0.1"
+}
+

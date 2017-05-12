@@ -1,0 +1,49 @@
+#------------------#
+# This is Todo.txt #
+#------------------#
+
+
+Plog entries should be generated as individual html and the plog blog should refer to them
+	=> older entries can still be available to linking pages even if the blog only 
+	contains the N latest entries
+
+#Add configuration template
+Add version information to blog and blog configuration 
+how do we handle blog entries that are removed?
+
+#Add help
+new handlers
+	txt2html
+	multimarkdown
+
+check rss feed with plogger team
+	#fixed => could it be the timestamp format?
+
+
+explain little help script
+Add installation documentation
+#generation should also install the extra elements in the temporary directory
+for 'generate' command, show an example of a generation in temporary directory and explain that it is usefull for local test before update on web site
+	perl': ./Build ; perl -Mblib scripts/plog --configuration_path t/dot_plog/ --temporary_directory ./tmp --blog_id perl update
+
+tests:
+
+	#generate the git repository on the fly 
+
+	generation with and without rss
+	only commited versions are generated
+	warning when tmp directory is not empty
+	all elements in sub directories are copied
+	order of presentation
+	commands accepted
+	commands do as expected
+	verify git is installed
+	verify feed works with ironman feed generator
+
+
+install:
+	#install .plog
+	#do not override previous .plog
+	fail if git is not installed?
+	warn about asciidoc if not installed?
+

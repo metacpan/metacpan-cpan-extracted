@@ -1,0 +1,72 @@
+{
+   "abstract" : "import Python-style constructor functions",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.015, CPAN::Meta::Converter version 2.120921",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Constructor-Pythonic",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Tiny" : "0",
+            "Module::Runtime" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Moose" : "2.0600",
+            "Sub::Identify" : "0"
+         },
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Constructor::Pythonic" : {
+         "file" : "lib/Acme/Constructor/Pythonic.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Acme-Constructor-Pythonic/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Acme-Constructor-Pythonic"
+      },
+      "homepage" : "https://metacpan.org/release/Acme-Constructor-Pythonic",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-acme-constructor-pythonic.git",
+         "web" : "https://github.com/tobyink/p5-acme-constructor-pythonic"
+      }
+   },
+   "version" : "0.002"
+}

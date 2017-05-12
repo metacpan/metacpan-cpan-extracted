@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Acme::Archive::Mbox;
+use File::Find;
+use File::Spec;
+
+print "$0 archive.mbox dir/\n" and exit unless @ARGV >= 2;
+my $archivename = shift @ARGV;
+my @dirs = @ARGV;
+my @files;
+my $wanted = sub { push @files, $File::Find::name if -f; };
+
+find($wanted, @dirs);
+
+my $archive = Acme::Archive::Mbox->new();
+for my $file (@files) {
+    my $name = File::Spec->canonpath($file);
+    if (File::Spec->file_name_is_absolute($name)) {
+        my $root = File::Spec->rootdir();
+        warn "Stripping leading $root";
+        $name =~ s/^$root//;
+    }
+
+    die "BUG: $name is still absolute somehow" if File::Spec->file_name_is_absolute($name);
+
+    print $name."\n";
+    $archive->add_file($file, $name);
+}
+
+$archive->write($archivename);
+
+
+=head1 NAME
+
+mboxify - create an mbox archive
+
+=head1 USAGE
+
+mboxify archive.mbox [list_of_files_and_directories]
+
+Pass one or more files or directories to be added to the created
+archive.  Directories will be searched recursively.
+
+=head1 VERSION
+
+Version 0.01
+
+=cut

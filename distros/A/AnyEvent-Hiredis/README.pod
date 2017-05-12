@@ -1,0 +1,85 @@
+=pod
+
+=head1 NAME
+
+AnyEvent::Hiredis - AnyEvent hiredis API
+
+=head1 SYNOPSIS
+
+  use AnyEvent::Hiredis;
+
+  my $redis = AnyEvent::Hiredis->new(
+      host => '127.0.0.1',
+      port => 6379,
+  );
+
+  $redis->command( [qw/SET foo bar/], sub { warn "SET!" } );
+  $redis->command( [qw/GET foo/], sub { my $value = shift } );
+
+  $redis->command( [qw/LPUSH listkey value/] );
+  $redis->command( [qw/LPOP listkey/], sub { my $value = shift } );
+
+  # errors
+  $redis->command( [qw/SOMETHING WRONG/, sub { my $error = $_[1] } );
+
+=head1 DESCRIPTION
+
+C<AnyEvent::Hiredis> is an AnyEvent Redis API that uses the hiredis C client
+library (L<https://github.com/antirez/hiredis>).
+
+=head1 PERFORMANCE
+
+One reason to consider C<AnyEvent::Hiredis> over its pure Perl counterpart
+C<AnyEvent::Redis> is performance.  Here's a head to head comparison of the two
+modules running on general purpose hardware:
+
+                       Rate     ae_redis  ae_hiredis
+    AnyEvent::Redis    7590/s   --        -89%
+    AnyEvent::Hiredis 69400/s   814%      --
+
+Rate here is the number of set operations per second achieved by each module.
+See C<bin/compare.pl> for details.
+
+=head1 METHODS
+
+=head2 new
+
+  my $redis = AnyEvent::Hiredis->new; # 127.0.0.1:6379
+
+  my $redis = AnyEvent::Hiredis->new(server => '192.168.0.1', port => '6379');
+
+=head2 command
+
+C<command> takes an array ref representing a Redis command and a callback.
+When the command has completed the callback is executed and passed the result
+or error.
+
+  $redis->command( ['SET', $key, 'foo'], sub {
+      my ($result, $error) = @_;
+
+      $result; # 'OK'
+  });
+
+  $redis->command( ['GET', $key], sub {
+      my ($result, $error) = @_;
+
+      $result; # 'foo'
+  });
+
+If the Redis server replies with an error then C<$result> will be C<undef> and
+C<$error> will contain the Redis error string.  Otherwise C<$error> will be
+C<undef>.
+
+=head1 REPOSITORY
+
+L<http://github.com/wjackson/anyevent-hiredis>
+
+=head1 AUTHORS
+
+Whitney Jackson
+
+Jonathan Rockway
+
+=head1 SEE ALSO
+
+L<Redis>, L<Hiredis::Async>, L<AnyEvent::Redis>

@@ -1,0 +1,19 @@
+Revision history for Perl module Array::Transpose
+
+0.06 2013-12-29
+  - Fixed empty array case RT 89202 - edavis at cpan.org
+
+0.05 2010-11-04
+  - Documentation
+
+0.04 2009-11-27
+  - Documentation
+
+0.03 2009-10-10
+  - Removed Pod Converage Tests from distribution
+
+0.02 2009-02-12
+  - Updated package for Kwalitee tests
+
+0.01 2008-07-12
+  - original version; created by ExtUtils::ModuleMaker 0.51

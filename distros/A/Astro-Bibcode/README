@@ -1,0 +1,60 @@
+Astro::Bibcode
+==============
+
+This module provides the ability to parse standard astronomical
+bibliography codes as used by CDS, NED and ADS. Using this module
+information such as the year of publication, the journal name,
+volume number and page number can be obtained.
+
+This module is useful when combined with the Astro::ADS module,
+also on CPAN, which returns bibcodes.
+
+The bibcode specification can be obtained from
+
+ http://cdsweb.u-strasbg.fr/simbad/refcode.html
+
+Currently this module is at v0.01 although it should handle 
+most bibcode types.
+
+Note that the module itself is quite large due to the inclusion
+of the journal and conference proceedings lookup tables required to
+convert a journal code to its full length.
+
+A simple bibcode verification utility is provided (verifybib).
+
+Installation
+------------
+
+Installs in the normal manner. No external modules are required.
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+History
+-------
+
+  v0.03  First public release (Aug 2004)
+
+Author
+------
+
+Tim Jenness (tjenness@cpan.org)
+
+Copyright (C) 2004 Tim Jenness and the Particle Physics and
+Astronomy Research Council.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+

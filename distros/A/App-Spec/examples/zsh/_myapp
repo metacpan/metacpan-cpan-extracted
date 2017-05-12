@@ -1,0 +1,624 @@
+#compdef myapp
+
+_myapp() {
+    local program=myapp
+    typeset -A opt_args
+    local curcontext="$curcontext" state line context
+
+
+        # ---- Command: 
+        _arguments -s  \
+            '1: :->cmd1' \
+            '*: :->args' \
+            && ret=0
+
+
+        case $state in
+        cmd1)
+            _alternative 'args:cmd2:((config\:"configuration" convert\:"Various unit conversions" cook\:"Cook something" help\:"Show command help" palindrome\:"Check if a string is a palindrome" weather\:"Weather"))'
+        ;;
+
+        args)
+            case $line[1] in
+            _meta)
+
+                # ---- Command: _meta
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->cmd2' \
+                    '*: :->args' \
+                    && ret=0
+
+
+                case $state in
+                cmd2)
+                    _alternative 'args:cmd3:((completion\:"Shell completion functions" pod\:"Pod documentation"))'
+                ;;
+
+                args)
+                    case $line[2] in
+                    completion)
+
+                        # ---- Command: _meta completion
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '3: :->cmd3' \
+                            '*: :->args' \
+                            && ret=0
+
+
+                        case $state in
+                        cmd3)
+                            _alternative 'args:cmd4:((generate\:"Generate self completion"))'
+                        ;;
+
+                        args)
+                            case $line[3] in
+                            generate)
+
+                                # ---- Command: _meta completion generate
+                                _arguments -s -C \
+                                    '1: :->cmd1' \
+                                    '2: :->cmd2' \
+                                    '3: :->cmd3' \
+                                    '*--verbose[be verbose]' \
+                                    '*-v[be verbose]' \
+                                    '--help[Show command help]' \
+                                    '-h[Show command help]' \
+                                    '--name[name of the program (optional, override name in spec)]:name' \
+                                    '--zsh[for zsh]' \
+                                    '--bash[for bash]' \
+                                    && ret=0
+
+
+                            ;;
+                            esac
+
+                        ;;
+
+                        esac
+                    ;;
+                    pod)
+
+                        # ---- Command: _meta pod
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '3: :->cmd3' \
+                            '*: :->args' \
+                            && ret=0
+
+
+                        case $state in
+                        cmd3)
+                            _alternative 'args:cmd4:((generate\:"Generate self pod"))'
+                        ;;
+
+                        args)
+                            case $line[3] in
+                            generate)
+
+                                # ---- Command: _meta pod generate
+                                _arguments -s -C \
+                                    '1: :->cmd1' \
+                                    '2: :->cmd2' \
+                                    '3: :->cmd3' \
+                                    '*--verbose[be verbose]' \
+                                    '*-v[be verbose]' \
+                                    '--help[Show command help]' \
+                                    '-h[Show command help]' \
+                                    && ret=0
+
+
+                            ;;
+                            esac
+
+                        ;;
+
+                        esac
+                    ;;
+                    esac
+
+                ;;
+
+                esac
+            ;;
+            config)
+
+                # ---- Command: config
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '*--verbose[be verbose]' \
+                    '*-v[be verbose]' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
+                    '*--set[key=value pair(s)]:set' \
+                    && ret=0
+
+
+            ;;
+            convert)
+
+                # ---- Command: convert
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->type' \
+                    '3: :->source' \
+                    '4: :->value' \
+                    '*: :->target' \
+                    '*--verbose[be verbose]' \
+                    '*-v[be verbose]' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
+                    && ret=0
+
+                case $state in
+                type)
+_myapp_convert_param_type_completion
+                ;;
+                source)
+_myapp_convert_param_source_completion
+                ;;
+                value)
+
+                ;;
+                target)
+_myapp_convert_param_target_completion
+                ;;
+                esac
+
+            ;;
+            cook)
+
+                # ---- Command: cook
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->drink' \
+                    '*--verbose[be verbose]' \
+                    '*-v[be verbose]' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
+                    '--with[Drink with ...]:with:("almond milk" "soy milk" "oat milk" "spelt milk" "cow milk")' \
+                    '--sugar[add sugar]' \
+                    '-s[add sugar]' \
+                    && ret=0
+
+                case $state in
+                drink)
+                        compadd -X 'drink:' 'tea' 'coffee'
+                ;;
+                esac
+
+            ;;
+            help)
+
+                # ---- Command: help
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->cmd2' \
+                    '*: :->args' \
+                    && ret=0
+
+
+                case $state in
+                cmd2)
+                    _alternative 'args:cmd3:((config convert cook palindrome weather))'
+                ;;
+
+                args)
+                    case $line[2] in
+                    _meta)
+
+                        # ---- Command: help _meta
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '3: :->cmd3' \
+                            '*: :->args' \
+                            && ret=0
+
+
+                        case $state in
+                        cmd3)
+                            _alternative 'args:cmd4:((completion pod))'
+                        ;;
+
+                        args)
+                            case $line[3] in
+                            completion)
+
+                                # ---- Command: help _meta completion
+                                _arguments -s -C \
+                                    '1: :->cmd1' \
+                                    '2: :->cmd2' \
+                                    '3: :->cmd3' \
+                                    '4: :->cmd4' \
+                                    '*: :->args' \
+                                    && ret=0
+
+
+                                case $state in
+                                cmd4)
+                                    _alternative 'args:cmd5:((generate))'
+                                ;;
+
+                                args)
+                                    case $line[4] in
+                                    generate)
+
+                                        # ---- Command: help _meta completion generate
+                                        _arguments -s -C \
+                                            '1: :->cmd1' \
+                                            '2: :->cmd2' \
+                                            '3: :->cmd3' \
+                                            '4: :->cmd4' \
+                                            '*--verbose[be verbose]' \
+                                            '*-v[be verbose]' \
+                                            '--help[Show command help]' \
+                                            '-h[Show command help]' \
+                                            '--all[]' \
+                                            && ret=0
+
+
+                                    ;;
+                                    esac
+
+                                ;;
+
+                                esac
+                            ;;
+                            pod)
+
+                                # ---- Command: help _meta pod
+                                _arguments -s -C \
+                                    '1: :->cmd1' \
+                                    '2: :->cmd2' \
+                                    '3: :->cmd3' \
+                                    '4: :->cmd4' \
+                                    '*: :->args' \
+                                    && ret=0
+
+
+                                case $state in
+                                cmd4)
+                                    _alternative 'args:cmd5:((generate))'
+                                ;;
+
+                                args)
+                                    case $line[4] in
+                                    generate)
+
+                                        # ---- Command: help _meta pod generate
+                                        _arguments -s -C \
+                                            '1: :->cmd1' \
+                                            '2: :->cmd2' \
+                                            '3: :->cmd3' \
+                                            '4: :->cmd4' \
+                                            '*--verbose[be verbose]' \
+                                            '*-v[be verbose]' \
+                                            '--help[Show command help]' \
+                                            '-h[Show command help]' \
+                                            '--all[]' \
+                                            && ret=0
+
+
+                                    ;;
+                                    esac
+
+                                ;;
+
+                                esac
+                            ;;
+                            esac
+
+                        ;;
+
+                        esac
+                    ;;
+                    config)
+
+                        # ---- Command: help config
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '*--verbose[be verbose]' \
+                            '*-v[be verbose]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
+                            && ret=0
+
+
+                    ;;
+                    convert)
+
+                        # ---- Command: help convert
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '*--verbose[be verbose]' \
+                            '*-v[be verbose]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
+                            && ret=0
+
+
+                    ;;
+                    cook)
+
+                        # ---- Command: help cook
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '*--verbose[be verbose]' \
+                            '*-v[be verbose]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
+                            && ret=0
+
+
+                    ;;
+                    palindrome)
+
+                        # ---- Command: help palindrome
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '*--verbose[be verbose]' \
+                            '*-v[be verbose]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
+                            && ret=0
+
+
+                    ;;
+                    weather)
+
+                        # ---- Command: help weather
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '3: :->cmd3' \
+                            '*: :->args' \
+                            && ret=0
+
+
+                        case $state in
+                        cmd3)
+                            _alternative 'args:cmd4:((cities countries show))'
+                        ;;
+
+                        args)
+                            case $line[3] in
+                            cities)
+
+                                # ---- Command: help weather cities
+                                _arguments -s -C \
+                                    '1: :->cmd1' \
+                                    '2: :->cmd2' \
+                                    '3: :->cmd3' \
+                                    '*--verbose[be verbose]' \
+                                    '*-v[be verbose]' \
+                                    '--help[Show command help]' \
+                                    '-h[Show command help]' \
+                                    '--all[]' \
+                                    && ret=0
+
+
+                            ;;
+                            countries)
+
+                                # ---- Command: help weather countries
+                                _arguments -s -C \
+                                    '1: :->cmd1' \
+                                    '2: :->cmd2' \
+                                    '3: :->cmd3' \
+                                    '*--verbose[be verbose]' \
+                                    '*-v[be verbose]' \
+                                    '--help[Show command help]' \
+                                    '-h[Show command help]' \
+                                    '--all[]' \
+                                    && ret=0
+
+
+                            ;;
+                            show)
+
+                                # ---- Command: help weather show
+                                _arguments -s -C \
+                                    '1: :->cmd1' \
+                                    '2: :->cmd2' \
+                                    '3: :->cmd3' \
+                                    '*--verbose[be verbose]' \
+                                    '*-v[be verbose]' \
+                                    '--help[Show command help]' \
+                                    '-h[Show command help]' \
+                                    '--all[]' \
+                                    && ret=0
+
+
+                            ;;
+                            esac
+
+                        ;;
+
+                        esac
+                    ;;
+                    esac
+
+                ;;
+
+                esac
+            ;;
+            palindrome)
+
+                # ---- Command: palindrome
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->string' \
+                    '*--verbose[be verbose]' \
+                    '*-v[be verbose]' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
+                    && ret=0
+
+                case $state in
+                string)
+_myapp_palindrome_param_string_completion
+                ;;
+                esac
+
+            ;;
+            weather)
+
+                # ---- Command: weather
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->cmd2' \
+                    '*: :->args' \
+                    && ret=0
+
+
+                case $state in
+                cmd2)
+                    _alternative 'args:cmd3:((cities\:"show list of cities" countries\:"show list of countries" show\:"Show Weather forecast"))'
+                ;;
+
+                args)
+                    case $line[2] in
+                    cities)
+
+                        # ---- Command: weather cities
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '*--verbose[be verbose]' \
+                            '*-v[be verbose]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '*--country[country name(s)]:country:_myapp_weather_cities_option_country_completion' \
+                            '*-c[country name(s)]:country:_myapp_weather_cities_option_country_completion' \
+                            && ret=0
+
+
+                    ;;
+                    countries)
+
+                        # ---- Command: weather countries
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '*--verbose[be verbose]' \
+                            '*-v[be verbose]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            && ret=0
+
+
+                    ;;
+                    show)
+
+                        # ---- Command: weather show
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '3: :->country' \
+                            '*: :->city' \
+                            '*--verbose[be verbose]' \
+                            '*-v[be verbose]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--temperature[show temperature]' \
+                            '-T[show temperature]' \
+                            '--celsius[show temperature in celsius]' \
+                            '-C[show temperature in celsius]' \
+                            '--fahrenheit[show temperature in fahrenheit]' \
+                            '-F[show temperature in fahrenheit]' \
+                            && ret=0
+
+                        case $state in
+                        country)
+_myapp_weather_show_param_country_completion
+                        ;;
+                        city)
+_myapp_weather_show_param_city_completion
+                        ;;
+                        esac
+
+                    ;;
+                    esac
+
+                ;;
+
+                esac
+            ;;
+            esac
+
+        ;;
+
+        esac
+
+}
+
+_myapp_convert_param_type_completion() {
+    local __dynamic_completion
+    __dynamic_completion=`PERL5_APPSPECRUN_SHELL=zsh PERL5_APPSPECRUN_COMPLETION_PARAMETER='type' $words`
+    __myapp_dynamic_comp 'type' "$__dynamic_completion"
+}
+_myapp_convert_param_source_completion() {
+    local __dynamic_completion
+    __dynamic_completion=`PERL5_APPSPECRUN_SHELL=zsh PERL5_APPSPECRUN_COMPLETION_PARAMETER='source' $words`
+    __myapp_dynamic_comp 'source' "$__dynamic_completion"
+}
+_myapp_convert_param_target_completion() {
+    local __dynamic_completion
+    __dynamic_completion=`PERL5_APPSPECRUN_SHELL=zsh PERL5_APPSPECRUN_COMPLETION_PARAMETER='target' $words`
+    __myapp_dynamic_comp 'target' "$__dynamic_completion"
+}
+_myapp_palindrome_param_string_completion() {
+    local __dynamic_completion
+    IFS=$'\n' set -A __dynamic_completion `cat /usr/share/dict/words | perl -nle'print if $_ eq reverse $_'
+`
+    compadd -X "string:" $__dynamic_completion
+}
+_myapp_weather_cities_option_country_completion() {
+    local __dynamic_completion
+    IFS=$'\n' set -A __dynamic_completion `$program 'weather' 'countries'`
+    compadd -X "country:" $__dynamic_completion
+}
+_myapp_weather_show_param_country_completion() {
+    local __dynamic_completion
+    __dynamic_completion=`PERL5_APPSPECRUN_SHELL=zsh PERL5_APPSPECRUN_COMPLETION_PARAMETER='country' $words`
+    __myapp_dynamic_comp 'country' "$__dynamic_completion"
+}
+_myapp_weather_show_param_city_completion() {
+    local __dynamic_completion
+    __dynamic_completion=`PERL5_APPSPECRUN_SHELL=zsh PERL5_APPSPECRUN_COMPLETION_PARAMETER='city' $words`
+    __myapp_dynamic_comp 'city' "$__dynamic_completion"
+}
+
+__myapp_dynamic_comp() {
+    local argname="$1"
+    local arg="$2"
+    local comp="arg:$argname:(("
+    local line
+    while read -r line; do
+        local name="$line"
+        local desc="$line"
+        name="${name%$'\t'*}"
+        desc="${desc/*$'\t'}"
+        comp="$comp$name"
+        if [[ -n "$desc" && "$name" != "$desc" ]]; then
+            comp="$comp\\:"'"'"$desc"'"'
+        fi
+        comp="$comp "
+    done <<< "$arg"
+
+    comp="$comp))"
+    _alternative "$comp"
+}
+

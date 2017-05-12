@@ -1,0 +1,26 @@
+Revision history for Amazon-S3-FastUploader
+
+0.01    2012-09-23
+        First version is released !
+
+0.02    2012-09-25
+        Changed API
+
+0.03    2012-09-26
+        bugfix
+
+0.04    2012-09-30
+        improve error handling
+
+0.05    empyt update (just test)
+
+
+0.06	2012-10-21
+        can set acl_short
+        set mime types automatically
+
+0.07    2012-12-01
+        can use ssl option for the cmd tool
+
+0.08    2012-12-01
+        refer Github Repository

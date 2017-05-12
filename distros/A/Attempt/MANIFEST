@@ -1,0 +1,22 @@
+Build.PL
+CHANGES
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+TODO
+lib/Attempt.pm
+lib/Attribute/Attempts.pm
+lib/Sub/Attempts.pm
+t/01basic.t
+t/02withparm.t
+t/03dies.t
+t/04select.t
+t/05return.t
+t/06basic.t
+t/07param.t
+t/08sleep.t
+t/09method.t
+t/10handlers.t
+t/mylib/My/Package.pm
+t/mylib/My/Subclass.pm

@@ -1,0 +1,58 @@
+{
+   "abstract" : "The Chrome Logger Plugin for Amon2",
+   "author" : [
+      "Dai Okabayashi <bayashi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amon2-Plugin-Web-ChromeLogger",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "JSON" : "0",
+            "JSON::XS" : "0",
+            "MIME::Base64" : "0",
+            "Test::More" : "0.88",
+            "Test::WWW::Mechanize::PSGI" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Amon2" : "0",
+            "Web::ChromeLogger" : "0.04",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Amon2::Plugin::Web::ChromeLogger" : {
+         "file" : "lib/Amon2/Plugin/Web/ChromeLogger.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/bayashi/Amon2-Plugin-Web-ChromeLogger/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/bayashi/Amon2-Plugin-Web-ChromeLogger"
+      }
+   },
+   "version" : "0.03"
+}

@@ -1,0 +1,920 @@
+#!perl -w
+
+package ManCen;
+use strict;
+use warnings;
+use Prima;
+use Prima::Application name => "ManCen";
+use App::PLab::ImageApp;
+use App::PLab::Calibrations;
+
+$::application-> icon( App::PLab::ImageAppGlyphs::icon( bga::cells));
+
+package CenWindow;
+use vars qw(@ISA);
+@ISA = qw(App::PLab::Calibrations);
+
+# WIN
+
+sub win_inidefaults
+{
+   my $w = $_[0];
+   return (
+      $w-> SUPER::win_inidefaults,
+      forwardLookup   => 0,
+      lookupEnabled   => 0,
+      StdPointerShape => 0,
+   );
+}
+
+
+sub win_newframe
+{
+   my $w = $_[0];
+   $w-> SUPER::win_newframe;
+   return unless defined $w-> {file};
+
+   $w-> win_extwarn if defined $w-> {ini}-> {path} &&
+      defined $w-> {oldPath} && $w-> {oldPath} ne $w-> {ini}-> {path};
+   $w-> {oldPath} = $w-> {ini}-> {path};
+
+   my $cenname = $w-> win_extname( $w-> {file});
+   if ( open F, "< $cenname") {
+      $w-> {points} = $w-> rpt_read( *F);
+      close F;
+   }
+}
+
+# finds connections between points in @$exp and @$pts.
+# the arrays are being sorted.
+
+sub valid_comm_series
+{
+   my ( $self, $exp, $pts) = @_;
+   my $i;
+   my ( $mx, $my) = ( $self->{ini}->{XCalibration}, $self->{ini}->{YCalibration});
+
+   my $n = @$pts / 2;
+   my $k;
+   die "Internal error: |$pts|$exp|@$pts|@$exp" if $n != @$exp / 2;
+   
+   # for each cell in previous frame
+   for ( $i = 0; $i < $n; $i++) {
+      my $minD2 = 1.0E20;
+      my $minK = $n;
+      my ( $xp, $yp) = ( $exp->[ $i * 2] * $mx, $exp-> [ $i * 2 + 1] * $my);
+
+      # XXX print "i=$i, xp=$xp, yp=$yp\n";
+      # for each cell in current frame
+      for ( $k = 0; $k < $n; $k++) {
+         my ( $x, $y) = ( $pts->[ $k * 2] * $mx, $pts-> [ $k * 2 + 1] * $my);
+         my $d2 = ( $x - $xp) * ( $x - $xp) + ( $y - $yp) * ( $y - $yp);
+         $minD2 = $d2, $minK = $k if $d2 < $minD2;
+         # XXX print "k=$k, x=$x, y=$y, d2=$d2, minD2=$minD2, minK=$minK\n";
+      }
+
+      return $minK,$i if $minK < $i;
+
+      if ( $minK != $i) {
+         # swap objects
+         @$pts[ $i*2, $i*2+1, $minK*2, $minK*2+1] =
+            @$pts[ $minK*2, $minK*2+1, $i*2, $i*2+1];
+      }
+   }
+
+   # second pass
+   # for each cell in a current frame
+   for ( $k = 0; $k < $n; $k++) {
+      my $minD2 = 1.0E20;
+      my $minI = $n;
+      my ( $x, $y) = ( $pts->[ $k * 2] * $mx, $pts-> [ $k * 2 + 1] * $my);
+
+      # for each cell in a previous frame
+      for ( $i = 0; $i < $n; $i++) {
+         my ( $xp, $yp) = ( $exp->[ $i * 2] * $mx, $exp-> [ $i * 2 + 1] * $my);
+         my $d2 = ( $x - $xp) * ( $x - $xp) + ( $y - $yp) * ( $y - $yp);
+         $minD2 = $d2, $minI = $i if $d2 < $minD2;
+      }
+      return $k,$minI if $minI != $k;
+   }
+   return;
+}
+
+sub win_untemp
+{
+   my ( $w, $urgent) = @_;
+   return unless $w-> {ambiguity};
+   $w-> {ambiguity} = undef;
+   return unless defined $urgent;
+   $w-> IV-> repaint;
+   $w-> IV-> update_view if $urgent;
+}
+
+sub win_saveframe
+{
+   my $w = $_[0];
+   my $cenname = $w-> win_extname( $w-> {file});
+   my $p = $w-> {points};
+   my $e = $w-> {extraPoints};
+
+   my ( $scp, $sce) = ( defined $p ? scalar @$p : 0, defined $e ? scalar @$e : 0);
+   my $next = $w->{$w->{ini}->{forwardLookup} ? 'nextFile' : 'prevFile'};
+   my $prl  = $w->{preloadfile};
+   $w-> {ambiguity} = undef;
+
+   if (defined $next && ( !defined $prl || $prl ne $next)) {
+       my $xt = $w->{ini}->{forwardLookup} ? 'next' : 'previous';
+       if ( $scp != $sce) {
+          return 0 if Prima::MsgBox::message_box( $::application-> name,
+            "Inconsistent number of points (comparing with those on the $xt frame).Proceed anyway?\n",
+            mb::YesNo|mb::Warning, {defButton => mb::No}) == mb::No;
+       } elsif ( $w->{extraPoints}) {
+          my @res = $w-> valid_comm_series( $w-> {extraPoints}, $w->{points});
+          if ( @res) {
+             $w-> {ambiguity} = [ 
+                 $w-> {extraPoints}-> [$res[1] * 2],
+                 $w-> {extraPoints}-> [$res[1] * 2 + 1],
+                 $w-> {points}-> [$res[0] * 2],
+                 $w-> {points}-> [$res[0] * 2 + 1],
+                 $w-> {points}-> [$res[1] * 2],
+                 $w-> {points}-> [$res[1] * 2 + 1],
+             ];
+             $w-> IV-> repaint;
+             $w-> IV-> update_view;
+             if ( Prima::MsgBox::message_box( $::application-> name,
+                "Distance ambiguity detected ( comparing with those on the $xt frame).Proceed anyway?\n",
+                mb::YesNo|mb::Warning, {defButton => mb::No}) == mb::No) {
+                return 0;
+             }   
+          }   
+       }
+   }
+   
+   unless (defined($p) && @$p) {
+      unlink $cenname;
+      return 1;
+   }
+
+   if ( open F, "> $cenname") {
+      $w-> rpt_write( *F, $p);
+      close F;
+      $w-> modified( 0);
+   } else {
+      return 0 if Prima::MsgBox::message_box( $::application-> name,
+         "Error saving file $cenname. Ignore changes?", mb::YesNo|mb::Warning) == mb::No;
+   }
+   return 1;
+}
+
+sub win_ptremove
+{
+   my $w = $_[0];
+   my @pt = @{$w-> {lastPopupPoint}};
+   my ( $min, $max) = $w-> win_getseriesrange;
+   my $from = $w-> {fileNum};
+   my $to   = $w->{ini}->{forwardLookup} ? $max : $min;
+   my $n = @{$w->{points}};
+   
+   my $ptIdx = $w-> rpt_is( @pt);
+   die "Internal error $ptIdx $n | @pt" if !defined $ptIdx || $ptIdx >= $n;
+   if ( $to == $from) {
+      # single frame case
+      $w-> rpt_toggle( @pt);
+      $w-> IV-> repaint;
+      $w-> sb_text("Deleted point referred only to the current file");
+      return;
+   }   
+   # multiple frame case
+   return unless $w-> win_saveframe;
+   $ptIdx = $w-> rpt_is( @pt); # points might be rearranged
+   
+   return if Prima::MsgBox::message( "This will delete point [$pt[0], $pt[1]] from the current file up to and including ".
+       $w-> win_formfilename( $to) . ", heading " . 
+        ( $w->{ini}->{forwardLookup} ? "forwards" : "backwards") .
+       ". Proceed?", mb::OkCancel) != mb::OK;
+   my $curr = $w-> {fileNum};
+   my %cendata = ( $curr => [@{$w->{points}}]);
+#   print "init cendata: $curr to @{$cendata{$curr}}\n"; 
+
+   my $userAborted = 0;
+   my $ok = 1;
+   my $statwin = $w-> insert( Dialog =>
+      centered    => 1,
+      text        => 'Processing...',
+      size        => [ 300, 60],
+      onKeyDown   => sub {
+         my ( $self, $code, $key, $mod) = @_;
+         if ( $key == kb::Esc &&
+            ( Prima::MsgBox::message("Abort process?", mb::OKCancel|mb::Warning) == mb::OK)) {
+            $userAborted = 1;
+            $_[0]-> text('Cancelling');
+         }
+      },
+      onClose     => sub {
+         $_[0]-> clear_event;
+         return if Prima::MsgBox::message("Abort process?", mb::OKCancel|mb::Warning) != mb::OK;
+         $userAborted = 1;
+         $_[0]-> text('Cancelling');
+      },
+   );
+
+   my $g = $statwin-> insert( Gauge =>
+      origin => [ 5, 5],
+      size   => [ $statwin-> width - 10, $statwin-> height - 10],
+      min    => 0,
+      max    => ( abs( $to - $curr) - 1) * 2,
+      value  => 0,
+      font   => {height => $statwin-> height - 16},
+   );
+
+   my $jump;
+   my @ambiguity;
+   $statwin-> execute_shared;
+   my $incr = $w-> {ini}->{forwardLookup} ? 1 : -1;
+      
+   while ( $curr != $to + $incr) {
+      # loading cen file
+      my $cenname = $w-> win_extname( $w-> win_formfilename( $curr));
+      if ( $curr != $w->{fileNum}) { # avoid re-reading current .cen
+         if ( open F, "< $cenname") {
+            $cendata{$curr} = $w-> rpt_read( *F);
+            close F;
+ #          print "added cendata: $curr to @{$cendata{$curr}}\n"; 
+         } else {
+            Prima::MsgBox::message("Cannot open $cenname. Aborting process");
+            $ok = 0;
+            last;
+         }   
+      
+         # checking 
+         if ( @{$cendata{$curr}} != $n) {
+            my $x = @{$cendata{$curr}};
+            my $fj = $w-> win_formfilename( $curr);
+            $jump = $fj if Prima::MsgBox::message(<<EOF, mb::YesNoCancel|mb::Error);
+$cenname has inconsistent number of points ($x vs $n).
+Process aborted, no files were changed. Jump to $fj?
+EOF
+            $ok = 0;
+            last;
+         }   
+         
+         my @res = $w-> valid_comm_series( $cendata{$curr}, $cendata{$curr - $incr});
+         if ( @res) {
+            my $fj = $w-> win_formfilename( $curr - $incr);
+            $jump = $fj if Prima::MsgBox::message("Distance ambiguity detected between $cenname and " .
+               $w-> win_extname( $w-> win_formfilename( $curr - $incr)) . 
+               ". Process aborted, no files were changed. Jump to $fj?",
+               mb::YesNoCancel|mb::Error) == mb::Yes;
+            @ambiguity = (
+               $cendata{$curr}-> [$res[1] * 2],
+               $cendata{$curr}-> [$res[1] * 2 + 1],
+               $cendata{$curr - $incr}-> [$res[0] * 2],
+               $cendata{$curr - $incr}-> [$res[0] * 2 + 1],
+               $cendata{$curr - $incr}-> [$res[1] * 2],
+               $cendata{$curr - $incr}-> [$res[1] * 2 + 1],
+            );
+            $ok = 0;
+            last;
+         } 
+      }
+      # deleting the point
+      my @rxdata = @{$cendata{$curr}};
+      splice( @rxdata, $ptIdx, 2);
+      
+      # saving backing data
+      if ( @rxdata) {
+         if ( open F, "> $cenname.bak") {
+            $w-> rpt_write( *F, \@rxdata);
+            close F;         
+         } else {
+            Prima::MsgBox::message("Error saving $cenname.bak. Aborting");
+            $ok = 0;
+            last;
+         }   
+      } elsif ( -f "$cenname.bak") {
+	 # null files to be deleted
+    	 unless ( unlink "$cenname.bak") {
+            Prima::MsgBox::message("Error accessing $cenname.bak. Aborting");
+            $ok = 0;
+            last;
+	     }
+      }
+   
+      $curr += $incr;
+      $g-> value( $g-> value + 1);
+      # status dialog tribute
+      $::application-> yield;
+      $ok = 0, last if $userAborted;
+   }   
+
+   $curr = $w-> {fileNum};
+   if ( $ok) {
+      # big rename from .bak to .cen
+      $statwin-> text("Restoring .cen files...");
+      while ( $curr != $to + $incr) {
+         my $cenname = $w-> win_extname( $w-> win_formfilename( $curr));
+         if ( -f "$cenname.bak") {
+              Prima::MsgBox::message("Cannot rename backup file. Please note that it $cenname.bak file contains actual information.")
+                 if !unlink($cenname) || !rename( "$cenname.bak", $cenname);
+         } else {
+            Prima::MsgBox::message("Cannot delete $cenname. Note that it contains non actual information.")
+               if !unlink($cenname);
+    	 }
+         $curr += $incr;
+         $g-> value( $g-> value + 1);
+         $g-> update_view;
+      }   
+   } else {
+      # removing .baks
+      while ( $curr != $to + $incr) {
+         my $cenname = $w-> win_extname( $w-> win_formfilename( $curr));
+         unlink "$cenname.bak";
+         $curr += $incr;
+      }   
+   }   
+
+   $statwin-> destroy;
+   
+   if ( $ok) {
+      # points might be rearranged again
+      $w->{points} = $cendata{$w->{fileNum}};
+      splice( @{$w-> {points}}, $ptIdx, 2);
+      if (defined $w->{extraPoints}) {
+         $w->{extraPoints} = $cendata{$w->{fileNum} + $incr};
+         splice( @{$w-> {extraPoints}}, $ptIdx, 2);
+      }   
+      $w-> IV-> repaint;
+      Prima::MsgBox::message("Queue processed", mb::OK|mb::Information);
+   } elsif ( defined $jump) {
+      $w-> {ambiguity} = \@ambiguity if $w-> win_loadfile( $jump) && scalar(@ambiguity);
+   }   
+}   
+
+sub win_closeframe
+{
+   my $w = $_[0];
+   $w-> SUPER::win_closeframe;
+   $w-> rpt_clear();
+}
+
+sub win_framechanged
+{
+   my $w = $_[0];
+   $w-> SUPER::win_framechanged;
+   $w-> sb_points();
+   $w-> win_untemp(0);
+}
+
+sub win_newextras
+{
+   my $w = $_[0];
+   $w-> SUPER::win_newextras;
+
+   my $cenname = $w->{ini}-> {forwardLookup} ? $w-> {nextFile} : $w-> {prevFile};
+   if ( defined $cenname) {
+      $cenname = $w-> win_extname( $cenname);
+      if ( open F, "< $cenname") {
+         $w-> {extraPoints} = $w-> rpt_read( *F);
+         close F;
+      }
+   }
+}
+
+sub win_closeextras
+{
+   my $w = $_[0];
+   $w-> SUPER::win_closeextras;
+   $w-> rptex_clear();
+}
+
+sub win_extraschanged
+{
+   my $w = $_[0];
+   $w-> win_untemp;
+   $w-> SUPER::win_extraschanged;
+   $w-> sb_points();
+}
+
+
+sub win_extpathchanged
+{
+   my $w = $_[0];
+   if ( defined $w-> {file}) {
+      my $i;
+      my @pt = defined $w-> {points} ? @{$w->{points}} : ();
+      $w-> win_closeextras;
+      $w-> win_closeframe;
+      $w-> win_newframe;
+      for ( $i = 0; $i < scalar @pt; $i += 2) {
+         $w-> rpt_add( $pt[$i], $pt[ $i+1]);
+      }
+      $w-> win_newextras;
+      $w-> win_extraschanged;
+      $w-> IV-> repaint;
+   }
+}
+
+sub on_create
+{
+   my $self = $_[0];
+   my $w    = $_[0];
+   $self-> SUPER::on_create;
+   $self-> {dataExt} = 'cen';
+
+   $self-> win_pointerchanged();
+
+   my $tb  = $self-> ToolBar;
+   my $cck = $tb-> insert( Label =>
+      origin      => [ 120, 1],
+      size        => [ $tb-> width - 138, 36],
+      name        => 'PointRef',
+      text        => '0:0',
+      growMode    => gm::Client,
+      transparent => 1,
+      color       => $self-> {ini}-> {Color_Label},
+      alignment   => ta::Right,
+      valignment  => ta::Center,
+      font        => { style => fs::Bold },
+   );
+   $tb-> insert( Widget =>
+      origin      => [ $tb-> width - 18, 1],
+      size        => [ 16, 36],
+      transparent => 1,
+      growMode    => gm::Right,
+      name        => 'Lookup',
+      onPaint     => sub {
+         my ( $self, $canvas) = @_;
+         my ( $x, $y) = $canvas-> size;
+         $canvas-> color( $w-> {ini}-> {Color_Label});
+         my @pt = $w-> {ini}-> {forwardLookup} ? (
+            0, 0.6, 0.5, 0.6, 0.5, 0.75, 0.9, 0.5, 0.5, 0.25, 0.5, 0.4, 0, 0.4
+         ) : (
+            0.9, 0.6, 0.9, 0.4, 0.5, 0.4, 0.5, 0.25, 0, 0.5, 0.5, 0.75, 0.5, 0.6
+         );
+         my $i;
+         for ( $i = 0; $i < scalar @pt; $i+=2) {
+            $pt[$i]   *= $x;
+            $pt[$i+1] *= $y;
+         }
+         $canvas-> fillpoly( \@pt );
+      },
+   );
+}
+
+sub win_pointerchanged
+{
+   my  $w = $_[0];
+
+   if ( $w-> {ini}-> {StdPointerShape}) {
+      $w-> IV-> pointer( cr::Arrow);
+      return;
+   }
+
+   my $color = $w-> {ini}-> {Color_Pointer};
+   my ( $cx, $cy) = ( $::application-> get_system_value( sv::XPointer), $::application-> get_system_value( sv::YPointer));
+   my $ic = Prima::Image-> create(
+      width  => $cx,
+      height => $cy,
+      type   => im::Mono,
+      palette => [0,0,0, $color & 0xFF, ( $color >> 8) & 0xFF, ( $color >> 16) & 0xFF],
+   );
+   $ic-> begin_paint;
+   $ic-> color( cl::Black);
+   $ic-> bar( 0, 0, $cx, $cx);
+   $ic-> color( $color ? $color : cl::White);
+   my ( $c2x, $c2y) = ( int($cx/2), int($cy/2));
+   $ic-> line( 0, $c2y, $c2x - 2, $c2y);
+   $ic-> line( $c2x + 2, $c2y, $cx - 1, $c2y);
+   $ic-> line( $c2x, 0, $c2x, $c2y - 2);
+   $ic-> line( $c2x, $c2y + 2, $c2x, $cy - 1);
+   $ic-> end_paint;
+   my $mc = Prima::Image-> create(
+      width  => $cx,
+      height => $cy,
+      type   => im::BW,
+      preserveType  => 1,
+   );
+   $mc-> begin_paint;
+   $mc-> color( cl::White);
+   $mc-> bar( 0, 0, $cx, $cx);
+   if ( $color) {
+      $mc-> color( cl::Black);
+      $mc-> line( 0, $c2y, $c2x - 2, $c2y);
+      $mc-> line( $c2x + 2, $c2y, $cx - 1, $c2y);
+      $mc-> line( $c2x, 0, $c2x, $c2y - 2);
+      $mc-> line( $c2x, $c2y + 2, $c2x, $cy - 1);
+   }
+   $mc-> end_paint;
+   my $icx = Prima::Icon-> create;
+   $icx-> combine( $ic, $mc);
+   $w-> IV-> set(
+      pointerIcon    => $icx,
+      pointerHotSpot => [$c2x, $c2y],
+      pointerType    => cr::User,
+   );
+}
+
+# WIN_END
+# OPT
+
+sub opt_colormount
+{
+   my $w = $_[0];
+   $w-> win_pointerchanged;
+   $w-> ToolBar-> PointRef-> color( $w-> {ini}-> {Color_Label});
+   $w-> ToolBar-> Lookup-> color( $w-> {ini}-> {Color_Label});
+}
+
+sub opt_colors
+{
+    return {
+       'Points'      => [ cl::LightGreen, 'Points'],
+       'ExtraPoints' => [ cl::LightRed,   'Crosses'],
+       'Pointer'     => [ cl::Black,      'Cursor and selection'],
+       'Label'       => [ cl::Black,      'Label'],
+    }
+}
+
+sub opt_keys
+{
+   return {
+      %{$_[0]-> SUPER::opt_keys()},
+      EditClearPoints  => [ kb::NoKey,      'Remove all points'],
+      EditToggleLookup => [ kb::Space,      'Turn on or off neighbour points lookup'],
+      HelpAbout        => [ kb::NoKey,      'Standard about box'],
+      HelpPlabApps     => [ kb::NoKey,      'Online PlabApps overview'],
+      HelpContents     => [ kb::NoKey,      'Online ManCen overview'],
+   }   
+}
+
+sub opt_propcreate
+{
+   my ( $w, $dlg, $nb, $nbpages) = @_;
+   $w-> SUPER::opt_propcreate( $dlg, $nb, $nbpages);
+   my $mh = 0;
+   for ( $nbpages-> widgets_from_page(1)) {
+      my $y = $_-> top;
+      $mh = $y if $mh < $y;
+   }
+   $nb-> insert_to_page( 1, CheckBox =>
+       origin => [ 10,  $mh + 10],
+       size   => [ 300, 36],
+       text   => 'Default ~cursor shape',
+       name   => 'CursorShape',
+       hint   => 'Uses system default cursor instead of crosshair',
+   );
+   $nb-> insert_to_page( 0, [ CheckBox =>
+       origin => [ 10, 170],
+       size   => [ 300, 36],
+       text   => 'Look .cen ~forward',
+       name   => 'ForwardLookup',
+       hint   => "Looks one step back or forward.\n See also at the arrow indicator into right upper corner",
+   ] , [ CheckBox =>
+       origin => [ 10, 130],
+       size   => [ 300, 36],
+       text   => '~Display neighbour .cen',
+       name   => 'LookupEnabled',
+       hint   => 'Draws next or previous data points with crosses',
+   ]);
+}
+
+sub opt_proppush
+{
+   my ( $w, $dlg, $nb, $nbpages) = @_;
+   $w-> SUPER::opt_proppush( $dlg, $nb, $nbpages);
+   $nbpages-> CursorShape-> checked( $w->{ini}->{StdPointerShape});
+   $nbpages-> ForwardLookup-> checked( $w->{ini}->{forwardLookup});
+   $nbpages-> LookupEnabled-> checked( $w->{ini}->{lookupEnabled});
+}
+
+sub opt_proppop
+{
+   my ( $w, $dlg, $nb, $nbpages, $mr) = @_;
+   $w-> SUPER::opt_proppop( $dlg, $nb, $nbpages, $mr);
+   if ( $mr) {
+      $w->{ini}->{StdPointerShape} = $nbpages-> CursorShape-> checked;
+      $w-> win_pointerchanged;
+      my $newlookup = $nbpages-> ForwardLookup-> checked;
+      if ( $newlookup != $w->{ini}->{forwardLookup}) {
+         $w->{ini}->{forwardLookup} = $newlookup;
+         $w-> ToolBar-> Lookup-> repaint;
+         if ( $w->{file}) {
+            $w-> win_closeextras;
+            $w-> win_newextras;
+            $w-> win_extraschanged;
+         }
+      }
+      $w->{ini}->{lookupEnabled} = $nbpages-> LookupEnabled-> checked;
+      $w-> IV-> repaint;
+   }
+}
+
+# OPT_END
+# RPT
+
+sub rpt_read
+{
+   my ( $w, $fh) = @_;
+   my @pts = ();
+   while ( <$fh>) {
+      chomp;
+      next if /^\s*\#/;
+      next if /^\s*$/;
+      my @p = split( ' ', $_);
+      next if @p < 4 || $p[0] !~ /^\d+$/ || $p[1] !~ /^\d+$/;
+      next if $p[0] < 0 || $p[0] >= $w-> {IVx};
+      next if $p[1] < 0 || $p[1] >= $w-> {IVy};
+      push ( @pts, @p[0,1]);
+   }
+   return \@pts;
+}
+
+sub rpt_write
+{
+   my ( $w, $fh, $p) = @_;
+   print $fh "# Number of points: ", scalar @$p / 2, "\n";
+   my ( $mx, $my) = ( $w->{ini}->{XCalibration}, $w->{ini}->{YCalibration});
+   my $i;
+   for ( $i = 0; $i < scalar @$p; $i += 2) {
+      my @j = ( int($$p[ $i]), int($$p[ $i + 1]), $$p[ $i] * $mx, $$p[ $i + 1] * $my);
+      print F "@j\n";
+   }
+}
+
+sub rpt_toggle
+{
+   my ( $w, $x, $y) = @_;
+   return if $x < 0 || $y < 0 || $x >= $w-> {IVx} || $y >= $w-> {IVy};
+   my $i = $w-> rpt_is( $x, $y);
+   $w = $w->{points};
+   defined $i ? splice( @$w, $i, 2) : push( @$w, $x, $y);
+   return ! defined $i;
+}
+
+sub rpt_add
+{
+   my ( $w, $x, $y) = @_;
+   return if $x < 0 || $y < 0 || $x >= $w-> {IVx} || $y >= $w-> {IVy};
+   my $i = $w-> rpt_is( $x, $y);
+   $w = $w->{points};
+   push( @$w, $x, $y) unless defined $i;
+}
+
+sub rpt_exclude
+{
+    my ( $w, $l, $b, $r, $t) = @_;
+    return unless defined $w-> {points};
+    my $p = $w->{points};
+    my $i;
+    my @newPoints = ();
+    for ( $i = 0; $i < scalar @$p; $i += 2) {
+       my ( $x, $y) = ( $$p[$i], $$p[$i + 1]);
+       next if $x >= $l && $x <= $r && $y >= $b && $y <= $t;
+       push( @newPoints, $x, $y);
+    }
+    $w->{points} = \@newPoints;
+}
+
+sub rpt_is
+{
+   my ( $w, $x, $y) = @_;
+   $w-> {points} = [] unless defined $w-> {points};
+   $w = $w->{points};
+   my $i = 0;
+   my $found = undef;
+   for ( $i = 0; $i < scalar @$w; $i+=2) {
+      my ( $ax, $ay) = @$w[$i,$i+1];
+      $found = $i, last if ( abs( $ax - $x) < $App::PLab::ImageAppWindow::pointClickTolerance) &&
+         ( abs( $ay - $y) < $App::PLab::ImageAppWindow::pointClickTolerance);
+   }
+   return $found;
+}
+
+sub rpt_clear
+{
+   $_[0]-> {points} = undef;
+}
+
+sub rptex_clear
+{
+   $_[0]-> {extraPoints} = undef;
+}
+
+
+# RPT_END
+# SB
+
+sub sb_points
+{
+   my $w = $_[0];
+   my $r = $w-> ToolBar-> PointRef;
+   $r-> text( sprintf("%d:%d",
+      defined $w->{points} ? ( scalar @{$w->{points}} / 2) : 0,
+      defined $w->{extraPoints} ? ( scalar @{$w->{extraPoints}} / 2) : 0
+   ));
+}
+
+# SB_END
+# IV
+
+sub IV_xorrect
+{
+   my ( $w, $self) = @_;
+   my @r = @{$self->{xorData}};
+   my $pc = $w->{ini}->{Color_Pointer};
+   $pc = (( $pc >> 16) & 0xFF) | ( $pc & 0xFF00) | (( $pc & 0xFF) << 16); # RGB => BGR
+   $self-> begin_paint;
+   $self-> set(
+      fillPattern => fp::CloseDot,
+      color       => cl::White,
+      backColor   => $pc,
+      rop         => rop::XorPut,
+   );
+   $self-> bar( @r);
+   $self-> end_paint;
+}
+
+sub IV_MouseDown
+{
+   my ( $w, $self, $btn, $mod, $x, $y) = @_;
+
+   $w-> win_untemp(1);
+
+   if ( $btn == mb::Right && $mod & km::Shift && !$self->{transaction} && $w->{file}) {
+      $w-> iv_entermode( $self, 4);
+      $self-> {xorData} = [ $x, $y, $x, $y];
+      $w-> IV_xorrect( $self);
+      $self-> clear_event;
+      $w-> sb_text( "Select points to remove");
+      return;
+   }
+
+   if ( $btn == mb::Right && !$self->{transaction} && defined $w-> rpt_is( $self-> screen2point( $x, $y))) {
+      $w-> {lastPopupPoint} = [$self-> screen2point( $x, $y)];
+      $w-> iv_cancelmode( $self);
+      $self-> PointPopup-> popup( $self-> pointerPos);
+      $self-> clear_event;
+      return;
+   }   
+               
+
+   $w-> SUPER::IV_MouseDown( $self, $btn, $mod, $x, $y);
+   return unless $self-> eventFlag;
+
+
+   if ( $btn == mb::Left && !$self->{transaction}) {
+      my ( $ax, $ay) = $self-> screen2point( $x, $y);
+      if ( $ax >= 0 && $ay >= 0 && $ax < $w->{IVx} && $ay < $w->{IVy}) {
+         if ( $w-> rpt_toggle( $ax, $ay)) {
+            $self-> begin_paint;
+            $self-> color( $w->{ini}->{Color_Points});
+            my $p = ( 6 * $self-> zoom < 1) ? 1 : ( 6 * $self-> zoom);
+            $self-> ellipse( $x, $y, $p, $p);
+            $self-> end_paint;
+            $w-> sb_text( "New reference point: $ax $ay");
+         } else {
+            my $p = ( 32 * $self-> zoom < 1) ? 1 : ( 32 * $self-> zoom);
+            $self-> invalidate_rect( $x - $p, $y - $p, $x + $p, $y + $p);
+            $w-> sb_text( "Reference point deleted: $ax $ay");
+         }
+         $w-> sb_points();
+      }
+   }
+
+   $self-> clear_event;
+}
+
+sub IV_MouseUp
+{
+   my ( $w, $self, $btn, $mod, $x, $y) = @_;
+
+   if ( $self->{transaction} && $self->{transaction} == 4 && $btn == mb::Right) {
+      $self-> {transaction} = undef;
+      $self-> capture( 0);
+      $w-> IV_xorrect( $self);
+      my @r = @{$self-> {xorData}};
+      $self-> {xorData} = [(-1)x4];
+      $self-> clear_event;
+      $r[2] = $x;
+      $r[3] = $y;
+      @r[0,2] = @r[2,0] if $r[0] > $r[2];
+      @r[1,3] = @r[3,1] if $r[1] > $r[3];
+      @r = $self-> screen2point( @r);
+      $w-> rpt_exclude( @r);
+      $self-> repaint;
+      return;
+   }
+
+   $w-> SUPER::IV_MouseUp( $self, $btn, $mod, $x, $y);
+}
+
+sub IV_MouseMove
+{
+   my ( $w, $self, $mod, $x, $y) = @_;
+
+   if ( $self->{transaction} && $self->{transaction} == 4) {
+      $w-> IV_xorrect( $self);
+      $self-> {xorData}-> [2] = $x;
+      $self-> {xorData}-> [3] = $y;
+      $w-> IV_xorrect( $self);
+      $self-> clear_event;
+   }
+
+   $w-> SUPER::IV_MouseMove( $self, $mod, $x, $y);
+}
+
+sub IV_Paint
+{
+   my ( $w, $self, $canvas) = @_;
+   $self-> on_paint( $canvas);
+   my $wl = $w-> {points};
+   my $z = $self-> zoom;
+   my $p = ( 6 * $z < 1) ? 1 : ( 6 * $z);
+   $canvas-> translate( $self-> point2screen( 0, 0));
+   if ( defined $wl) {
+      my $i;
+      $canvas-> color( $w-> {ini}->{Color_Points});
+      for ( $i = 0; $i < scalar @$wl; $i+=2) {
+         my ( $x, $y) = @$wl[ $i, $i+1];
+         $canvas-> ellipse( $x * $z, $y * $z, $p, $p);
+      }
+   }
+   $wl = $w-> {extraPoints};
+   if ( $w->{ini}->{lookupEnabled} && defined $wl) {
+      my $i;
+      $canvas-> color( $w-> {ini}->{Color_ExtraPoints});
+      for ( $i = 0; $i < scalar @$wl; $i+=2) {
+         my ( $x, $y) = @$wl[ $i, $i+1];
+         $canvas-> line( $x * $z - $p, $y * $z - $p, $x * $z + $p, $y * $z + $p);
+         $canvas-> line( $x * $z + $p, $y * $z - $p, $x * $z - $p, $y * $z + $p);
+      }
+   }
+   if ( $w->{ambiguity}) {
+      my @a = @{$w->{ambiguity}};
+      $_ *= $z for @a;
+      $canvas-> linePattern( lp::Dash);
+      $canvas-> lineWidth( $z) if $z > 1;
+      $canvas-> color( $w-> {ini}->{Color_Points});
+      $canvas-> line( @a[0..3]);
+      $canvas-> line( @a[0,1,4,5]);
+   }   
+}
+
+# IV_END
+
+package Run;
+
+my $wedt = App::PLab::ImageAppWindow::winmenu_edit();
+splice( @{$$wedt[2]}, 0, 0,
+   [ EditClearPoints => "Clear all ~points"    => sub { 
+      $_[0]-> rpt_clear; 
+      $_[0]-> sb_points(); 
+      $_[0]-> win_untemp;
+      $_[0]-> IV-> repaint; 
+   }, ],
+   [],
+   [ EditToggleLookup => "Toggle look~up" => sub{
+       my $w = $_[0];
+       $w-> {ini}-> {lookupEnabled} = $w-> {ini}-> {lookupEnabled} ? 0 : 1;
+       $w-> win_untemp;
+       $w-> IV-> repaint if $w-> {file};
+   }],
+   [],
+);
+
+my $w = CenWindow-> create(
+   menuItems => [
+      App::PLab::ImageAppWindow::winmenu_file(),
+      $wedt,
+      App::PLab::ImageAppWindow::winmenu_view(),
+      [],[ "~Help" => [
+         [ HelpAbout    => "~About" => sub {Prima::MsgBox::message("PLab application series, ManCen, version 1.00", mb::OK|mb::Information)}],
+         [ HelpPlabApps => "~PLab Apps" => sub { $_[0]-> open_help(); }],
+         [ HelpContents => "~Contents" => sub { $_[0]-> open_help("ManCen"); }],
+      ]],
+   ],
+);
+
+$w-> IV-> insert( Popup =>
+   autoPopup  => 0,
+   name  => 'PointPopup',
+   items => [
+      [ "~Delete point to the series end" => sub {
+         $w-> win_ptremove;
+      }],
+   ],
+);
+$w-> IV-> delegations(['Paint']);
+$w-> sb_points();
+$w-> sb_text("Started OK");
+$w-> visible(1);
+$w-> select;
+
+$w-> win_extwarn;
+
+
+package main;
+
+
+run Prima;
+

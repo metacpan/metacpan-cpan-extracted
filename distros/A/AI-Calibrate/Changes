@@ -1,0 +1,32 @@
+Revision history for Perl extension AI::Calibrate.
+
+1.5   Fri Aug 3 2012
+      - Changes to ./t/AI-Calibrate-1.t to let it pass with almost-equal
+        numbers.
+
+1.4   Thu Aug 2 2012
+      - Revised calibration algorithm based on bug
+      - Updated tests in ./t
+      - Added ./t/AI-Calibrate-KL.t using Kun Liu's dataset.
+      - Added ./t/AI-Calibrate-pathologies.t to test for pathological cases.
+
+1.3   Fri Nov 4
+      - Removed dependency on Test::Deep, added explicit declaration of
+        dependency on Test::More to Makefile.PL
+
+1.2   Thu Nov 3
+      - Fixed test ./t/AI-Calibrate-NB.t so that test wouldn't fail.  Used to
+        call is_deeply, which was failing on slight differences between
+        floating point numbers.  Now compares with a small tolerance.
+
+1.1   Thu Feb 28 19:00:06 2008
+      - Added new function print_mapping
+      - Added new test file AI-Calibrate-NB.t which, if AI::NaiveBayes1 is
+        present, trains a classifier and calibrates it.
+
+1.0   Thu Feb 05 11:37:31 2008
+      - First public release to CPAN.
+
+0.01  Thu Jan 24 11:37:31 2008
+	- original version; created by h2xs 1.23 with options
+		-XA -n AI::Calibrate

@@ -1,0 +1,23 @@
+---
+abstract: 'a module that shows that Perl can do all the Ruby things ;-)'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-DarmstadtPM-TieHash
+requires:
+  Test::CheckManifest: 1.26
+  Tie::ListKeyedHash: 1.02
+  perl: 5.006001
+resources:
+  bugtracker: http://github.com/reneeb/Acme-DarmstadtPM-TieHash/issues
+  homepage: http://github.com/reneeb/Acme-DarmstadtPM-TieHash
+  repository: http://github.com/reneeb/Acme-DarmstadtPM-TieHash.git
+version: 0.4

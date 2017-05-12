@@ -1,0 +1,25 @@
+Revision history for App-podispell
+
+0.001004 - 2016-10-18
+  - fixed repository link in metadata
+
+0.001003 - 2016-10-18
+  - don't spell check verbatim sections or C<> or X<> format codes
+  - fix handling of =begin and =for sections
+  - code simplifications and refactoring
+  - fix handling of 0 in format codes
+  - allow format codes to cross line boundaries
+  - strip HTML codes from begin/for html blocks
+  - display errors from hunspell
+  - allow multiple dictionaries to be specified
+  - allow language selection in pod with '=for language' section
+  - don't spell check stray symbols
+  - fix accept, add, and add lowercase commands
+  - allow corrections past 9 to be used
+  - some minor speed improvements in hunspell interaction
+
+0.001002 - 2015-08-06
+  - actually include podispell script in release (GH#1)
+
+0.001001 - 2015-07-03
+  - initial release

@@ -1,0 +1,14 @@
+Revision history for Perl extension App::Edge
+
+0.03    Sat Jun 28 17:46:10 JST 2014
+        - new feature: '--total-count' option
+        - enhanced POD
+        - few refactors
+
+0.02    Wed Jun 25 22:21:30 JST 2014
+        - added POD: EXAMPLES
+        - fixed -h
+        - fixed Build.PL
+
+0.01    Wed Jun 25 09:35:09 JST 2014
+        - original version

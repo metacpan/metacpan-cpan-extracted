@@ -1,0 +1,88 @@
+Revision history for Perl extension Apache2::AuthCookieDBI.
+
+2.17
+     - Added support for Digest::SHA::sha256/384/512_hex digests for passwords.
+       This is a response to https://rt.cpan.org/Ticket/Display.html?id=79333
+       which requested sha256_base64 but because base64 digests are not properly
+       padded I chose to go with sha256/384/512_hex instead.
+
+     - Quote all database column and field names in SQL queries.
+       https://rt.cpan.org/Ticket/Display.html?id=79341
+       Table column names may confict with sql key words
+
+2.16 - Sun May 27 00:23:41 PDT 2012
+     - Fix 'wrong method names in calls to apache request logging' for https://rt.cpan.org/Ticket/Display.html?id=77464
+
+2.15 - Sat May 26 08:32:23 PDT 2012
+     - Implemented a logger() method that uses Apache::Log (inspired by https://rt.cpan.org/Ticket/Display.html?id=75675)
+     - Address 'Error Message Inconsistency' https://rt.cpan.org/Ticket/Display.html?id=75725
+     - Address ' If user is not active, it produces 2 errors'  https://rt.cpan.org/Ticket/Display.html?id=75724
+     - Added small amount of test coverage for authen_cred()
+
+2.14 - Sat Mar 26 09:41:01 PDT 2011
+     - Changed documentation about WhateverDBI_SecretKey to
+       address https://rt.cpan.org/Ticket/Display.html?id=62488
+     - Fixes for https://rt.cpan.org/Public/Bug/Display.html?id=66336
+       (_dbi_connect should be called as a class method.)
+
+2.13 - Sat Dec 18 10:33:19 PST 2010
+     - Build system uses Module::Build (generates a Makefile.PL for compatability.)
+     - Distro version now matches module version (2.13)
+     - Fixed statement handle still active <https://rt.cpan.org/Public/Bug/Display.html?id=57906>
+       Also added support for WhatEverDBI_UserActiveField
+       Thanks to Chad Columbus
+     - Fixed $HEX_STRING_REGEX definition is wrong <https://rt.cpan.org/Public/Bug/Display.html?id=46117>
+       Thanks to Joe Ingersoll
+     - Fixed User authenticated if not in MySQL database <https://rt.cpan.org/Ticket/Display.html?id=62470>
+       Thanks to Keith Lawson
+     - Fixed Login.pl example - syntax error <https://rt.cpan.org/Public/Bug/Display.html?id=62487>
+       (also moved from eg/public-pl/login.pl to eg/bin/login.pl)
+       Thanks to William McKee http://search.cpan.org/~wmckee/
+     - Updated documentation to cover protecting the DocumentRoot <https://rt.cpan.org/Ticket/Display.html?id=51593>
+     - Now depends on DBI 1.40 instead of Apache::DBI - <https://rt.cpan.org/Ticket/Display.html?id=43083>
+
+2.05 - Thu May 14 18:37:07 PDT 2009
+       - Fixed bug in _get_cipher_type() where it was not memoizing the
+         Crypt::CBC objects.
+       - Fixed https://rt.cpan.org/Ticket/Display.html?id=45207
+         Hash keys for configuration values were wrong in several places.
+       - Improved test coverage a little.
+       
+2.04 - Fri Nov 28 15:41:33 PST 2008
+       Incorporated bug fix for authen_ses_key() provided by
+       Carl Gustafsson. authen_ses_key() was not properly handling
+       any extra_session_info - the fix is to get $hashed_string with
+          my $hashed_string = pop @rest;
+
+       Also releasing the work done between April 26, 2005 and February 4, 2007,
+       plus bug fix for authen_ses_key
+       - Added basic framework for unit tests.
+       - Factored out some of the DBI code into new methods:
+         - _dbi_connect()
+         - _get_crypted_password()
+
+       - Changes to satisfy Perl::Critic, e.g.
+         - Removed function prototypes (they are ignored for methods.)
+         - Cleaned up regular expressions: use /x, etc.
+
+2.03 - Mon Apr 25 10:01:04 PDT 2005
+       Incorporated Lance P Cleveland's changes porting module to mod_perl 1.999_22
+       (That is, Version 2.0.0-RC5 - April 14, 2005)
+       Mainly involves changing almost all references to Apache:: to Apache2::
+       
+       Also some minor documentation changes.
+
+
+2.02 - Tue Apr 12 17:58:40 PDT 2005
+       Minor documentation fix. Noted that SecretKeyFile has been
+       replaced by SecretKey.
+       
+
+2.0.1 - Fixed bug in  group()
+  It was expecting the list of groups to be already split up.
+
+2.0 - mod_perl 2 version
+
+0.01  Mon Apr  3 10:50:32 2000
+	- original version; created by h2xs 1.19
+

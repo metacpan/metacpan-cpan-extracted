@@ -1,0 +1,12 @@
+SYNOPSIS
+
+    See the included script acme-cpanauthors.
+
+ENVIRONMENT
+
+ DEBUG => bool
+
+SEE ALSO
+
+    Acme::CPANAuthors and Acme::CPANAuthors::* modules.
+

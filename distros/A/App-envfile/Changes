@@ -1,0 +1,23 @@
+Revision history for Perl extension App::envfile
+
+0.07 2013-05-10T11:51:16Z
+    - Fixed extension regexp (shyouhei++)
+
+0.06  Mon Oct 22 01:22:09 2012
+    - repacking (suggested by miyagawa++)
+
+0.05  Wed Jan 11 19:21:58 2012
+    - support .pl .js .yml config file (suggested by nekokak++)
+
+0.04  Thu Aug 25 01:07:53 2011
+    - workaround for Test::Builder2
+    - fix: confusing error messages
+
+0.03  Thu Jul 14 00:23:51 2011
+    - suppress warnings on envfile
+
+0.02  Tue Jul 12 00:57:36 2011
+    - refactor (advised by tokuhirom++)
+
+0.01  Mon Jul 11 00:19:37 2011
+    - original version

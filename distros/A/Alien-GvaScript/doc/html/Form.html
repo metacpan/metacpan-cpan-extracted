@@ -1,0 +1,661 @@
+<html>
+<head>
+  <script src="../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <link href="GvaScript_doc.css" rel="stylesheet" type="text/css">
+  <script>
+    document.observe('dom:loaded', function() { new GvaScript.TreeNavigator('TN_tree'); });
+    function jumpto_href(event) {
+      var label = event.controller.label(event.target);
+      if (label && label.tagName == "A") {
+        label.focus();
+        return Event.stopNone;
+      }
+    }
+  </script>
+</head>
+<body>
+<div id='TN_tree'>
+  <div class="TN_node">
+   <h1 class="TN_label">Alien::GvaScript::Form</h1>
+   <div class="TN_content">
+     <p><em>Wrapper around HTML Forms
+</em></p>
+     <div class="TN_node"  onPing="jumpto_href">
+       <h3 class="TN_label">Table of contents</h3>
+       <div class="TN_content">
+         <div class="TN_leaf">
+  <a class="TN_label" href="#NAME">NAME</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#SYNOPSIS">SYNOPSIS</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#DESCRIPTION">DESCRIPTION</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#Constructor">Constructor</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#HTML">HTML</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Markup_of_repeat_elements">Markup of repeat elements</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#Autofocus">Autofocus</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#METHODS">METHODS</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#destroy">destroy</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#getId">getId</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#fire">fire</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#register">register</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#unregister">unregister</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#init">init</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#to_hash">to_hash</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#to_tree">to_tree</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#fill_from_tree">fill_from_tree</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#add">add</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#remove">remove</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#autofocus">autofocus</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#GvaScript_Forms">GvaScript.Forms</a>
+  <div class="TN_content"><div class="TN_node">
+  <a class="TN_label" href="#METHODS">METHODS</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#get">get</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#GvaScript_Form_Responders">GvaScript.Form.Responders</a>
+  <div class="TN_content"><div class="TN_node">
+  <a class="TN_label" href="#METHODS">METHODS</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#register">register</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#unregister">unregister</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#GvaScript_Form_EarlyResponders">GvaScript.Form.EarlyResponders</a>
+  <div class="TN_content"></div>
+</div>
+
+       </div>
+     </div>
+     <hr/>
+   </div>
+  </div>
+  <div class="TN_node" id="NAME">
+    <h2 class="TN_label">NAME</h2>
+    <div class="TN_content">
+      <p>Alien::GvaScript::Form - Wrapper around HTML Forms</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="SYNOPSIS">
+    <h2 class="TN_label">SYNOPSIS</h2>
+    <div class="TN_content">
+      <pre>  &lt;form id="my_form" onsubmit="return false;"&gt;
+    &lt;div repeat="foo"&gt;
+      &lt;h2&gt;Foo #{foo.count}&lt;/h2&gt;
+      &lt;input type="text" name="person.name"/&gt;
+      &lt;input type="text" name="person.bdate"/&gt;
+      This is the repeated foo section
+      &lt;table&gt;
+        &lt;tr repeat="bar"&gt;
+          &lt;td&gt;Item #{bar.count}&lt;/td&gt;
+          &lt;td&gt;&lt;input name="#{bar.path}.buz"&gt;&lt;/td&gt;
+          &lt;td&gt;&lt;button onclick="GvaScript.Form.remove('#{bar.path}')"&gt;
+                Remove this row
+              &lt;/button&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/table&gt;
+       &lt;button onclick="GvaScript.Form.add('#{foo.path}.bar')"&gt;
+          Add a bar
+       &lt;/button&gt;
+    &lt;/div&gt;  
+    &lt;button onclick="GvaScript.Form.add('foo')"&gt;Add a foo&lt;/button&gt;
+  &lt;/form&gt;
+
+  &lt;script&gt;
+    var gvascript_form = new GvaScript.Form('my_form', {
+      datatree: {name:'kitty', bdate:'01.01.1990'},
+      dataprefix: 'person',
+      // 'active' form elements 
+      registry: [
+        ['input', 'mouseover', function(event) {}],
+        ['input', 'mouseout',  function(event) {}],
+        ['input', 'change',    function(event, newv ,oldv) {}],
+        ['input', 'init',      function(event, newv) {}]
+      ],
+      // handlers to form's custom events
+      onInit: function(gva_form) {},
+      onRepeatBlockRemove: function(gva_form, arg) {
+        arg[0] // removed repeat name
+        arg[1] // removed repeat path
+      },
+      onRepeatBlockAdd: function(gva_form, arg) {
+        arg[0] // added repeat name
+        arg[1] // added repeat path
+      },
+      onChange: function(gva_form, event) {
+        // event.target -&gt; element changed
+        // event.memo.oldvalue -&gt; changed element's old value
+        // event.memo.newvalue -&gt; changed element's new value
+      },
+      onSubmit: function(gva_form) {
+        // ....
+        // do form submission
+        // ....
+        if(success)               {gva_form.fire('AfterSubmit', arg)}
+        else 
+        if(data_validation_error) {gva_form.fire('DataValidationError', arg)}
+        else                      {gva_form.fire('SubmitFailure', arg)} 
+      },
+      onAfterSubmit: function(gva_form, arg) {},
+      onDataValidationError: function(gva_form, arg) {},
+      onSubmitFailure: function(gva_form, arg) {},
+      onBeforeDestroy: function(gva_form, arg) {}
+    }
+  &lt;/script&gt;</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="DESCRIPTION">
+    <h2 class="TN_label">DESCRIPTION</h2>
+    <div class="TN_content">
+      <p>This module of <i>Alien::GvaScript</i> manages forms with
+hierarchical fields and dynamically repeated sections.
+It works in close collaboration with  <i>Alien::GvaScript::Repeat</i>.</p>
+<p>The design is partially inspired by the <code>Web Forms 2.0</code> proposal
+(<a href="http://www.whatwg.org/specs/web-forms/current-work/">http://www.whatwg.org/specs/web-forms/current-work/</a>), but is 
+not an attempt to implement the proposed specification: there are
+some differences both in syntax and in semantics.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Constructor">
+    <h2 class="TN_label">Constructor</h2>
+    <div class="TN_content">
+      <pre>  new GvaScript.Form(form_id[, options])</pre>
+
+<ul>
+<li><a name="item_form_id"></a><b>form_id</b>
+<p>id of the HTML form to extend</p>
+</li>
+<li><a name="item_options"></a><b>options</b>
+<p>hash of optional properties that would define the behavior of the form</p>
+<ul>
+<li><a name="item_datatree"></a><b>datatree</b>
+<p>tree represention of the initial form data.</p>
+<p>Ex:</p>
+<pre>  { 
+    name: 'barbie', 
+    age: '49', 
+    friends: [
+      { name: 'ken', age: '35' }, 
+      { name: 'jen', age: '55' }
+    ] 
+  }</pre>
+
+</li>
+<li><a name="item_dataprefix"></a><b>dataprefix</b>
+<p>sometimes it's helpful to prefix the html input names to give them 'context'.</p>
+<p>Ex: <code>doll.name</code> <code>doll.friends.0.name</code>.</p>
+<p>in this example, the dataprefix should be set to 'doll'</p>
+</li>
+<li><a name="item_registry"></a><b>registry</b>
+<p>a list of arrays <code>[expression, eventName, handler]</code>.</p>
+<p>each item in the array would be passed over to the <a href="#notify">/notify</a> method.</p>
+</li>
+<li><a name="item_onInit"></a><b>onInit</b>
+<p>function to be called after the successful initialization of the GvaScript.Form instance.</p>
+</li>
+<li><a name="item_onRepeatBlockRemove"></a><b>onRepeatBlockRemove</b>
+<p>function to be called after a block in a repeated section is removed</p>
+<p>Signature</p>
+<pre>  function onRepeatBlockRemove(gva_form, arg) {
+    // gva_form : GvaScript.Form instance
+    // arg: array containing repeat name as first element and repeat path as second
+  }</pre>
+
+</li>
+<li><a name="item_onRepeatBlockAdd"></a><b>onRepeatBlockAdd</b>
+<p>function to be called after a block in a repeated section is added</p>
+<p>Signature</p>
+<pre>  function onRepeatBlockAdd(gva_form, arg) {
+    // gva_form : GvaScript.Form instance
+    // arg: array containing repeat name as first element and repeat path as second
+  }</pre>
+
+</li>
+<li><a name="item_onChange"></a><b>onChange</b>
+<p>function to be called when any of the form's elements has changed or onAdd/onRemove of a repeatable section.</p>
+<p>Signature</p>
+<pre>  function onChange(gva_form, event) {
+    // gva_form : GvaScript.Form instance
+    // event: Event object fired by the change on the form element
+    //        Has a memo object that has olvalue and newvalue set unless 
+    //        called from the Repeat module
+  }</pre>
+
+</li>
+<li><a name="item_onBeforeSubmit"></a><b>onBeforeSubmit</b>
+<p>function to be called directly before the form submits.</p>
+<p>Signature</p>
+<pre>  function onBeforeSubmit(gva_form) {
+    // gva_form : GvaScript.Form instance
+    // return false if you want to stop the form from submitting
+  }</pre>
+
+</li>
+<li><a name="item_onSubmit"></a><b>onSubmit</b>
+<p>function to be called when the form is submit.</p>
+<p>Signature</p>
+<pre>  function onSubmit(gva_form) {
+    // gva_form : GvaScript.Form instance
+    // use to fire 'onAfterSubmit', 'onSubmitFailure' or 'onDataValidationError'
+  }</pre>
+
+</li>
+<li><a name="item_onBeforeDestroy"></a><b>onBeforeDestroy</b>
+<p>function to be called right before the form instance calls the destroy method.</p>
+<p>Callback useful for doing some inhouse cleaning before the form gets removed from the DOM.</p>
+</li>
+<li><a name="item_on_XYZ_"></a><b>on[XYZ]</b>
+<p>Event handlers for custom form events. The form instance should fire these events so as corresponding handler can be fired.</p>
+</li>
+<li><a name="item_actionsbar"></a><b>actionsbar</b>
+<p>initializes and instance of <i>Alien::GvaScript::ActionsBar</i>.</p>
+<p>Signature</p>
+<pre>      actionsbar : {
+          container :  'container_id',
+          actions   : [
+              {
+                  label : 'Submit Form',
+                  type  : 'submit'
+              },
+              {
+                  label : 'Init Form',
+                  type  : 'button',
+                  callback : function() {
+                    // 'this' correspond to the button 
+                    GvaScript.Form.init('form', datatree);
+                  }
+              }
+          ]
+      }</pre>
+
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="HTML">
+    <h2 class="TN_label">HTML</h2>
+    <div class="TN_content">
+        <div class="TN_node" id="Markup_of_repeat_elements">
+    <h3 class="TN_label">Markup of repeat elements</h3>
+    <div class="TN_content">
+      <p>Repeat elements may occur outside of forms and therefore 
+are described in a separate document; 
+see <i>Alien::GvaScript::Repeat</i>.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Autofocus">
+    <h3 class="TN_label">Autofocus</h3>
+    <div class="TN_content">
+      <p>The <a href="#init">/init</a> method inspects all form elements for an
+<code>autofocus</code> attribute; the first element that possesses
+this attribute automatically receives focus.</p>
+<p>Similarly, when a repetition block is added into 
+the form through the <a href="#add">/add</a> method, the first
+element within that repetition block that possesses
+an <code>autofocus</code> attribute automatically receives focus.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="METHODS">
+    <h2 class="TN_label">METHODS</h2>
+    <div class="TN_content">
+        <div class="TN_node" id="destroy">
+    <h3 class="TN_label">destroy</h3>
+    <div class="TN_content">
+      <pre>  gvascript_form.destroy()</pre>
+
+<p>instance destructor -  will unregister the GvaScript.Form instance from the GvaScript.Forms namespace and will remove all of its observers.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="getId">
+    <h3 class="TN_label">getId</h3>
+    <div class="TN_content">
+      <pre>  gvascript_form.getId()</pre>
+
+<p>returns the id of the form element that the gvascript_form instance is wrapped around.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="fire">
+    <h3 class="TN_label">fire</h3>
+    <div class="TN_content">
+      <pre>  gvascript_form.fire(eventName[, arg])</pre>
+
+<p>used to fire event on the for instance and thus called corresponding responders and instance callback.</p>
+<p><code>eventName</code>: eventName to fire without the 'on' prefix.</p>
+<p><code>arg</code> argument to send over to the corresponding responder(s) and callback.</p>
+<p>this method will</p>
+<ol>
+<li>
+<p>execute the early responders set the on[eventName]</p>
+</li>
+<li>
+<p>execute instance on[eventName] callback</p>
+</li>
+<li>
+<p>execute the responders set the on[eventName]</p>
+</li>
+</ol>
+<p>execution sequence will stop whenever one of the responders or callback returns <code>false</code></p>
+<p>NOTE that the <b>onBeforeSubmit, onSubmit</b> events cannot be notified programatically. 
+You actually need to call form.submit() for these events to be fired.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="register">
+    <h3 class="TN_label">register</h3>
+    <div class="TN_content">
+      <pre>   gvascript_form.register(expression, eventName, handler)
+   GvaScript.Form.register(form, expression, eventName, handler)</pre>
+
+<p>tells the form to watch the <i>eventName</i> on elements that match the <i>expression</i> and to fire the corresponding <i>handler</i>.</p>
+<p><code>expression</code> (String) - A css selector</p>
+<p><code>eventName</code> (String) - The name of the event, in all lower case, without the "on" prefix &#x97; e.g., "click" (not "onclick").</p>
+<p>A custom <b>"init"</b> event is also supported which is fired on an input that gets its value initialized with the initialization of the form.</p>
+<p><code>handler</code> (Function) - handler to fire.</p>
+<p>Signature</p>
+<pre>  function handler(event[, newValue[, oldValue]]) {
+    event.target // element being observed
+  }</pre>
+
+<p><code>newValue</code> is set for the <code>change</code> and the <code>init</code> events.</p>
+<p><code>oldValue</code> is set for the <code>change</code>.</p>
+<p><b>NOTE:</b> Form.Element.setValue method is wrapped in GvaScript.ProtoExtensions module to programatically fire the blur event after setting the value on the input, and hence firing the change handler if any.</p>
+<p>[<i>This method can be called either as an instance method or as a generic method. If calling as a generic, pass the form HTMLElement/id in as the first argument.</i>]</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="unregister">
+    <h3 class="TN_label">unregister</h3>
+    <div class="TN_content">
+      <pre>   gvascript_form.unregister(expression[, eventName[, handler]])
+   GvaScript.Form.unregister(form, expression[, eventName[, handler]])</pre>
+
+<p>removes observers set on given <code>expression</code>.  if <code>eventName</code> is provided, will only stop observing that eventName.
+if <code>handler</code> is also provided, will just stop calling this handler.</p>
+<p>NOTE that the same handler signature should be used in the register method for it to work in the unregister method.</p>
+<p>[<i>This method can be called either as an instance method or as a generic method. If calling as a generic, pass the form HTMLElement/id in as the first argument.</i>]</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="init">
+    <h3 class="TN_label">init</h3>
+    <div class="TN_content">
+      <pre>   gvascript_form.init(initial_tree, prefix)
+   GvaScript.Form.init(form, initial_tree, prefix)</pre>
+
+<p><code>form</code> is the id of a form (or directly the DOM element).  Optional
+<code>initial_tree</code> is a javascript nested datastructure containing
+initial values for fields, that will be passed to the 
+<a href="#fill_from_tree">/fill_from_tree</a> method.</p>
+<p>[<i>This method can be called either as an instance method or as a generic method. If calling as a generic, pass the form HTMLElement/id in as the first argument.</i>]</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="to_hash">
+    <h3 class="TN_label">to_hash</h3>
+    <div class="TN_content">
+      <pre>  var flat_hash = GvaScript.Form.to_hash(form);</pre>
+
+<p>Inspects the contents of all fields in <code>form</code> and 
+returns a flat hash of pairs (key-value).</p>
+<p>[<i>This method can be called either as an instance method or as a generic method. If calling as a generic, pass the form HTMLElement/id in as the first argument.</i>]</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="to_tree">
+    <h3 class="TN_label">to_tree</h3>
+    <div class="TN_content">
+      <pre>  var tree = GvaScript.Form.to_tree(form);</pre>
+
+<p>Inspects the contents of all fields in <code>form</code> and 
+returns a data tree, were dotted names in form names
+are expanded into sub-arrays or sub-hashes. So for example 
+if the form looks like</p>
+<pre>  &lt;input name="father.firstname"&gt; &lt;input name="father.lastname"&gt;&lt;br&gt;
+  &lt;input name="mother.firstname"&gt; &lt;input name="mother.lastname"&gt;&lt;br&gt;
+  &lt;div repeat="child" repeat-start="1"&gt;
+    &lt;input name="#{child.path}.firstname"&gt;&lt;br&gt;
+  &lt;/div&gt;</pre>
+
+<p>and if that form has been expanded with 3 repetition blocks
+for children, the resulting tree would be</p>
+<pre>  { "father" : {"firstname" : ..., "lastname": ...},
+    "mother" : {"firstname" : ..., "lastname": ...},
+    "child"  : [ {"firstname": ...},
+                 {"firstname": ...},
+                 {"firstname": ...} ] }</pre>
+
+<p>[<i>This method can be called either as an instance method or as a generic method. If calling as a generic, pass the form HTMLElement/id in as the first argument.</i>]</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="fill_from_tree">
+    <h3 class="TN_label">fill_from_tree</h3>
+    <div class="TN_content">
+      <pre>  GvaScript.Form.fill_from_tree(form, field_prefix, tree);</pre>
+
+<p>Fills the form from values found in <code>tree</code> (this is the 
+reverse of the <a href="#to_tree">/to_tree</a> operation).
+Optional <code>field_prefix</code> is prepended to key names in <code>tree</code> for
+finding the corresponding form fields.</p>
+<p>The method walks through nested subtrees in <code>tree</code>: the sequence
+of keys leading to a leaf is concatenated into a flat string, with dot 
+separators, and if the form has a corresponding input element,
+the value of that element is set to the value of the leaf.
+Furthermore, if the initial tree contains repeated data sets
+(array subtrees), and if the form contains repeat elements
+with the same path, then new repetition blocks are 
+dynamically created to match the number of items in the array:
+so if the form above is filled with the following tree</p>
+<pre>  { "child"  : [ {"firstname": "Abel"},
+                 {"firstname": "Bob"},
+                 {"firstname": "Cod"},
+                 {"firstname": "Dave"}, ] }</pre>
+
+<p>then four repetition blocks will automatically created in the form.</p>
+<p>[<i>This method can be called either as an instance method or as a generic method. If calling as a generic, pass the form HTMLElement/id in as the first argument.</i>]</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="add">
+    <h3 class="TN_label">add</h3>
+    <div class="TN_content">
+      <pre>  GvaScript.Form.add(repeat_name, count);</pre>
+
+<p>Creates one or several new repetition blocks.  The parameter <code>count</code>
+is optional and defaults to 1.  Focus is automatically given to the
+first input element in the last repetition block that has an
+<code>autofocus</code> attribute (if any).</p>
+<p>See <i>Alien::GvaScript::Repeat/add</i> for more explanations on
+the <code>add</code> operation.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="remove">
+    <h3 class="TN_label">remove</h3>
+    <div class="TN_content">
+      <pre>  GvaScript.Form.remove(repeat_block[, live_update]);</pre>
+
+<p>Removes a repetition block from the DOM. The argument is either
+a DOM element or a string containing the element id.</p>
+<p>param <code>Boolean</code> live_update: flag to indicate whether the 'remaining'
+repeatable sections are to be also removed from DOM, recreated by re-merging
+the data with repeat template, then finally re-appended to the DOM.
+Default true.</p>
+<p>All repetition blocks above the removed block are renumbered,
+leaving no hole in the index sequence. To do so, these
+blocks are also removed from the DOM, and then added
+again through the <a href="#add">/add</a> method. This operation is implemented
+by <i>Alien::GvaScript::Repeat/remove</i>.</p>
+<p>The recreated blocks are then re-populated with their
+previous input values.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="autofocus">
+    <h3 class="TN_label">autofocus</h3>
+    <div class="TN_content">
+      <pre>  GvaScript.Form.autofocus(element);</pre>
+
+<p>Inspects DOM children of  <code>element</code>, and gives focus to the 
+first child that has an <code>autofocus</code> attribute.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="GvaScript_Forms">
+    <h2 class="TN_label">GvaScript.Forms</h2>
+    <div class="TN_content">
+      <p>namespace that holds all active instances of GvaScript.Form</p>
+<p>instances are unique per form id</p>
+  <div class="TN_node" id="METHODS">
+    <h3 class="TN_label">METHODS</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="get">
+    <h4 class="TN_label">get</h4>
+    <div class="TN_content">
+      <pre>  GvaScript.Forms.get(id)</pre>
+
+<p>finds and returns the GvaScript.Form instance where id is the unique id of the form HTMLElement.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="GvaScript_Form_Responders">
+    <h2 class="TN_label">GvaScript.Form.Responders</h2>
+    <div class="TN_content">
+      <p>A repository of global listeners notified about every step of the GvaSript.Form lifecycle.</p>
+<p>Sometimes, you need to provide generic behaviors over all GvaScript.Form(s) in a single application.</p>
+<p>To achieve this, GvaScript.Form provides global Responders that will be executed for every GvaScript.Form instance.</p>
+<p>Responders by default are executed <b>after</b> the instance specific event callback.</p>
+  <div class="TN_node" id="METHODS">
+    <h3 class="TN_label">METHODS</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="register">
+    <h4 class="TN_label">register</h4>
+    <div class="TN_content">
+      <pre>  GvaScript.Form.Responders.register({eventName: handler}[, {eventName: handler}[, ...]]})</pre>
+
+<p>adding one or more global form events responders.</p>
+<p>Supported <b>eventNames</b>: <code>onInit, onChange, onBeforeSubmit, onSubmit, on[XXX]</code> where <code>on[XXX]</code> is a custom event name.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="unregister">
+    <h4 class="TN_label">unregister</h4>
+    <div class="TN_content">
+      <pre>  GvaScript.Form.Responders.unregister({eventName: handler}[, {eventName: handler}[, ...]]})</pre>
+
+<p>unregistering one or more global form events responders.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="GvaScript_Form_EarlyResponders">
+    <h2 class="TN_label">GvaScript.Form.EarlyResponders</h2>
+    <div class="TN_content">
+      <p>Identical to GvaScript.Form.Responders except that these responders would be executed <b>before</b> the instance specific callback.</p>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

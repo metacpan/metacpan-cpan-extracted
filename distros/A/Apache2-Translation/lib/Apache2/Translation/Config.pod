@@ -1,0 +1,49 @@
+=head1 NAME
+
+Apache2::Translation::Config - export our provider parameters to the WEB
+
+=head1 SYNOPSIS
+
+  PerlModule Apache2::Translation::Config
+  <Location /-/config>
+    SetHandler modperl
+    PerlResponseHandler Apache2::Translation::Config
+  </Location>
+
+=head1 DESCRIPTION
+
+This module implements a simple C<modperl> handler that exports our
+provider parameters in JSON or YAML to the WEB, e.g.:
+
+  $ curl http://localhost/-/config?yaml
+  ---
+  TranslationEvalCache: 1000
+  TranslationKey: default
+  TranslationProvider:
+    - File
+    - configfile
+    - /path/to/config
+
+Since C<Apache2::Translation> version 0.31 JSON is default.
+C<Apache2::Translation::Admin> can decode both formats provided the
+L<YAML> and L<JSON::XS> modules are installed.
+
+This format can be used by the WEB interface L<Apache2::Translation::Admin>
+to connect to the provider.
+
+=head1 AUTHOR
+
+Torsten Foertsch, E<lt>torsten.foertsch@gmx.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2009 by Torsten Foertsch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+# Local Variables:
+# mode: perl
+# End:

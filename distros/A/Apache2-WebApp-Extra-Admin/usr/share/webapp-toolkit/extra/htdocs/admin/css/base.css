@@ -1,0 +1,190 @@
+/*
+ *  Apache2::WebApp::Toolkit - Admin Control Panel (base.css)
+ *  Copyright (C) 2010 Marc S. Brooks <mbrooks@cpan.org>
+ *
+ *  Licensed under the terms of the BSD License
+ *  http://www.opensource.org/licenses/bsd-license.php
+ */
+
+/*--------------------------------------------------------------------------*/
+/* defaults                                                                 */
+
+* {
+	margin: 0px;
+	padding: 0px;
+}
+
+html {
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+html, body {
+	min-width: 800px;
+}
+
+body {
+	font-family: Arial, Helvetica, Sans-Serif;
+	font-size: 13px;
+	margin: 20px 20px 20px 25px;
+}
+
+a, a:visited {
+	color: #0000FF;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+a:hover {
+	background-color: #EEEEEE;
+	color: #787878;
+	text-decoration: underline;
+}
+
+img {
+	border: 1px solid #000000;
+}
+
+hr {
+	display: none;
+}
+
+textarea {
+	overflow-x: hidden;
+}
+
+
+/*--------------------------------------------------------------------------*/
+/* other                                                                    */
+
+/* form alerts */
+
+#alert {
+	background-color: #FFFFFF;
+	border: 1px solid #EEEEEE;
+	border-left: none;
+	border-right: none;
+	clear: both;
+	color: #FF0000;
+	display: block;
+	font-weight: bold;
+	padding: 6px;
+	position: relative;
+	text-align: center;
+	width: 460px;
+}
+
+
+/* messages */
+
+#message {
+	background-color: #F7F7F7;
+	border: 1px solid #000000;
+	color: #AAAAAA;
+	display: block;
+	height: 100px;
+	margin: 10px 0px 10px 0px;
+	padding: 6px;
+	position: relative;
+	width: 460px;
+}
+
+#message span.title {
+	color: #000000;
+	display: block;
+	padding-bottom: 10px;
+}
+
+
+/* horizontal bar */
+
+#split {
+	border-bottom: 1px solid #EEEEEE;
+	height: 1px;
+	left: -4px;
+	margin: 10px 0px 10px 0px;
+	position: relative;
+	width: 100%;
+}
+
+
+/* highlight */
+
+.highlight {
+	background-color: #FFFF00;
+	color: #000000;
+}
+
+
+/* internal system errors */
+
+#error {
+	background-color: #FF0000;
+	border: 1px solid #CCCCCC;
+	color: #FFFFFF;
+	font-weight: bold;
+	padding: 10px;
+	margin-bottom: 10px;
+	margin-top: 25px;
+}
+
+#error ul {
+	font-size: 13px;
+	list-style: square;
+	margin-left: 20px;
+	padding: 2px;
+}
+
+#error li {
+	margin-top: 10px;
+}
+
+
+/* saved message */
+
+#saved {
+	background-color: #FFFFFF;
+	color: #00FF00;
+	display: block;
+	font-weight: bold;
+	margin: 10px;
+	padding: 6px;
+	position: relative;
+	text-align: center;
+	width: 430px;
+}
+
+
+/* copyright notice */
+
+#copy {
+	bottom: 0px;
+	color: #000000;
+	font-size: 12px;
+	padding: 10px;
+	position: absolute;
+	text-align: center;
+	width: 110px;
+}
+
+#copy span {
+	color: #787878;
+}
+
+
+/* version */
+
+#version {
+	border-left: 1px solid #BBBBBB;
+	color: #787878;
+	font-size: 14px;
+	font-weight: normal;
+	left: 10px;
+	padding-left: 10px;
+	position: absolute;
+	top: 9px;
+}
+
+#version small {
+	font-size: 11px;
+}

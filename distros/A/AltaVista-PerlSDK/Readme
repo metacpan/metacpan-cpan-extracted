@@ -1,0 +1,209 @@
+AltaVista Search SDK support package
+Copyright (c)2000 AltaVista Company
+All Rights Reserved.
+
+This software is furnished under a license and may be used and copied
+only  in  accordance  with  the  terms  of such  license and with the
+inclusion of the above copyright notice. This software or  any  other
+copies thereof may not be provided or otherwise made available to any
+other person. No title to and ownership of  the  software  is  hereby
+transferred.
+
+The information in this software is subject to change without  notice
+and  should  not be  construed as a commitment  by AltaVista Company.
+
+Readme for PerlSDK
+
+NAME
+    AltaVista::PerlSDK - Perl extension for AltaVista Search 
+    Software Development Kit
+
+SYNOPSIS
+    use AltaVista::PerlSDK;
+
+    avs_adddate(idx, yr, mo, da, startloc)
+
+    avs_addfield(idx, pFname, startloc, endloc)	
+
+    avs_addliteral(idx, pWord, loc)
+
+    avs_addvalue(idx, valtype, value, loc)
+
+    avs_addword(idx, pWords, loc, pNumWords)
+
+    avs_buildmode(idx)
+
+    avs_buildmode_ex(idx, ntiers)
+
+    avs_close(idx)
+
+    avs_compact(idx, bMore_p)
+
+    avs_compactionneeded(idx)
+
+    avs_compact_minor(idx, bMore_p)
+
+    avs_count(idx, pWordPrefix, pCountsHdl)
+
+    avs_count_close(CountsHdl)
+
+    avs_count_getcount(CountsHdl)
+
+    avs_count_getword(CountsHdl)
+
+    avs_countnext(CountsHdl)
+
+    avs_default_options(pOptions)
+
+    avs_define_valtype(name, minval, maxval, valtype_p)
+
+    avs_define_valtype_multiple(name, minval, maxval, numvalues, valtype_p)
+
+    avs_deletedocid(idx, pDocId, pCount)
+
+    avs_enddoc(idx)
+
+    avs_errmsg(code)
+
+    avs_getindexmode(idx)
+
+    avs_getindexversion(idx)
+
+    avs_getindexversion_counts_v(countsHdl)
+
+    avs_getindexversion_search_v(searchHdl)
+
+    avs_getmaxloc(idx, pMaxloc)
+
+    avs_getsearchresults(searchHdl, resultNum)
+
+    avs_getsearchterms(psearchHdl, termNum, term, count)
+
+    avs_licenseinfo(key, expDate, docLimit)
+
+    avs_lookup_valtype(name)
+
+    avs_makestable(idx)
+
+    avs_open(parameters, path, mode, pIdx)
+
+    avs_querymode(idx)
+
+    avs_release_valtypes()
+
+    avs_search(idx, pQuery, pBoolQuery, pOptions, pDocsFound, pDocsReturned, pTermCount, pSearchHdl)
+
+    avs_search_close(pSearchHdl)
+
+    avs_search_ex(idx, pQuery, pBoolQuery, pOptions, searchsince, pDocsFound, pDocsReturned, pTermCount, pSearchHdl)
+
+    avs_search_genrank(idx, pBoolQuery, pRankTerms, pRankSetup, pOptions, searchsince, pDocsFound, pDocsReturned, pSearchHdl)
+
+    avs_search_getdata(searchHdl)
+
+    avs_search_getdatalen(searchHdl)
+
+    avs_search_getdate(psearchHdl, year, month, day)
+
+    avs_search_getdocid(searchHdl)
+
+    avs_search_getdocidlen(searchHdl)
+
+    avs_search_getrelevance(psearchHdl)
+
+    avs_setdocdata(idx, pDocData, len)
+
+    avs_setdocdate(idx, year, month, day)
+
+    avs_setdocdatetime(idx, year, month, day, hour, minute, second)
+
+    avs_setparseflags(idx, parseflags)
+
+    avs_setrankval(idx, valtype, value)
+
+    avs_startdoc(idx, pDocId, flags, pStartLoc)
+
+    avs_timer(current)
+
+    avs_total_docs(idx, pDoccount)
+
+    avs_version(license_key)
+
+    avs_create_options(limit, timeout, flags)
+
+    avs_create_parameters(_interface_version, license, ignored_thresh, chars_before_wildcard, unlimited_wild_words, indexformat, cache_threshold, options, charset, ntiers, nbuckets)
+
+DESCRIPTION
+    This set of extensions provides wrappers for most of the C functionalities in
+    the AltaVista Search software development kit (SDK) except for a few functions 
+    that did not make sense to export to perl.
+
+    Two additional functions are used to ease the process of creating options and parameters: 
+        avs_create_options
+        avs_create_parameters
+
+    The following functions are not implemented due to its complexity or they are
+    unnecessary.
+
+    <avs_add_ms_callback> UNIMPLEMENTED
+
+    <avs_addrankterms> UNIMPLEMENTED
+
+    <avs_count_docs> UNIMPLEMENTED
+
+    <avs_count_docs_freelist> UNIMPLEMENTED
+
+    <avs_errmsg_copy> UNIMPLEMENTED
+
+    <avs_newdoc> UNIMPLEMENTED
+
+    <avs_search_getdata_copy> UNIMPLEMENTED
+
+    <avs_search_getdocid_copy> UNIMPLEMENTED
+
+    <avs_search_getrelevance> RETURN ARGUMENT
+
+PREREQUISITES
+    Perl 5.004, AltaVista SearchSDK Library 
+
+INSTALLATION - Windows System
+    To install this module, copy avs.h and avs30.lib from your 
+    AltaVista SearchSDK source hierarchy into this directory. Then 
+    type the following commands:
+    
+        perl Makefile.PL
+        nmake
+        nmake test
+        nmake install
+
+    This will install the module into the Perl library directory.
+
+INSTALLATION - UNIX/Linux/Solaris System
+
+    To install this module, copy avs.h and libavs30.a from your 
+    AltaVista SearchSDK source hierarchy into this directory.  Then 
+    type the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+AUTHOR
+	AltaVista Search <avse-support@av.com>
+
+    Copyright (c)2000 AltaVista Company
+    All Rights Reserved.
+
+    This software is furnished under a license and may be used and copied
+    only  in  accordance  with  the  terms  of such  license and with the
+    inclusion of the above copyright notice. This software or  any  other
+    copies thereof may not be provided or otherwise made available to any
+    other person. No title to and ownership of  the  software  is  hereby
+    transferred.
+
+    The information in this software is subject to change without  notice
+    and  should  not be  construed as a commitment  by AltaVista Company.
+
+SEE ALSO
+    perl, AltaVista Search SDK documentation.

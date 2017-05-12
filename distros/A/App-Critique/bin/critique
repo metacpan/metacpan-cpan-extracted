@@ -1,0 +1,46 @@
+#!perl -w
+
+# PODNAME: bin/critique
+# ABSTRACT: An incremental refactoring tool for Perl powered by Perl::Critic
+
+use strict;
+use warnings;
+use FindBin;
+
+use lib "$FindBin::Bin/../lib";
+
+use App::Critique;
+
+App::Critique->new({ show_version_cmd => 1 })->run;
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+bin/critique - An incremental refactoring tool for Perl powered by Perl::Critic
+
+=head1 VERSION
+
+version 0.04
+
+=head1 DESCRIPTION
+
+The script entry point for the L<App::Critique> application, see the individual
+L<App::Critique::Command> classes for more information.
+
+=head1 AUTHOR
+
+Stevan Little <stevan@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Stevan Little.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

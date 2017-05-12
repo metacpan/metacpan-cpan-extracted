@@ -1,0 +1,64 @@
+0.97 2009-5-31
+	- Fix handling of hash/array values in _do_append().
+	- Fix truncation of data on _parse() on some cases.
+	- Documentation fixes.
+0.96 2008-4-29
+	- error name _format_convert in _do_append
+	- add return when not commit list on save_file
+0.95 2008-3-19
+	- add variable $object->{parsed_section_chunk}
+0.94 2008-3-11
+	- enable reload_when_save function
+0.93 2008-2-1
+	- add value_regexp to assign_delkey
+0.92 2008-1-28
+	- add make test
+0.91 2008-1-25
+	- fix some warnnings syntax.
+
+0.9 2008-1-23
+	- changed object syntax.
+	- add function get_objvar
+	- add function fetch_sections_list
+	- add function fetch_sections_hashref
+	- add function fetch_keys_list
+	- add function fetch_keys_hashref
+	- add function fetch_values_arrayref
+	- add function reload
+	- add function set_objvar
+	- add object variable file
+	- add object variable keep_resource_array
+	- add object variable reload_when_save
+	- add object variable clean_when_reload
+	- add object variable commit_list
+	- add object variable parsed_conf
+	- changed readme
+
+0.8 2006-6-2
+	- new parameter point=>'foot' in assign_append().
+	- fix dejected \n in do_append() and/or do_delsection().
+
+0.7 2006-4-18
+	- add addsection.
+	- fix regexp in sub clean_string.
+	- fixed the bug of @commit_list dirty-write resulted by more than one instance of Asterisk::config
+
+0.6 2006-2-19
+	- change load_config parameters to hash struct.
+	- fix split (.+) to (.*) in sub clean_keyvalue.
+	- fix split (.+) to (.*) in sub load_config.
+	- add use Fcntl ':flock' for disable flock warnings.
+	- more POD docs.
+	- fix VERSION variable.
+	- fix $stream_data warnings in load_config using strict.
+	- fix # warnings in load_config using strict.
+0.5 2006-1-6
+	- support stream in load_config.
+	- my $VERSION
+
+0.4 2005-12-23
+	- add assign_matchreplace.
+
+0.1 2005-11-29
+        - start....
+

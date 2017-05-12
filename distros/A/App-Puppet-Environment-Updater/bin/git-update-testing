@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+
+package
+	git_update_testing;
+
+# ABSTRACT: Update testing Puppet environment from development branch
+
+use strict;
+use warnings;
+
+use App::Puppet::Environment::Updater;
+
+App::Puppet::Environment::Updater->new_with_options({
+	environment => 'testing',
+	from        => 'development'
+})->run();
+
+
+__END__
+=pod
+
+=head1 NAME
+
+git_update_testing - Update testing Puppet environment from development branch
+
+=head1 VERSION
+
+version 0.001001
+
+=head1 SYNOPSIS
+
+	$ git update-testing
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<App::Puppet::Environment::Updater|App::Puppet::Environment::Updater>
+
+=back
+
+=head1 AUTHOR
+
+Manfred Stock <mstock@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Manfred Stock.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

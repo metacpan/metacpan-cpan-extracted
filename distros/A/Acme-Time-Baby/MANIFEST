@@ -1,0 +1,24 @@
+lib/Acme/Time/Baby.pm
+Makefile.PL
+MANIFEST
+Changes
+README
+t/00_en.t
+t/01_du.t
+t/02_custom.t
+t/03_noimport.t
+t/04_chef.t
+t/05_warez.t
+t/06_de.t
+t/07_fr.t
+t/08_no.t
+t/09_it.t
+t/10_se.t
+t/11_br.t
+t/12_es.t
+t/13_ceb.t
+t/14_de_ch.t
+t/15_hr.t
+t/90_pod.t
+t/96_pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

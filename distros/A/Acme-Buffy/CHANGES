@@ -1,0 +1,32 @@
+Revision history for Perl extension Buffy
+
+1.6 Tue Jul 19 10:56:52 BST 2011
+    - remove pod, perlcritic tests
+
+1.5 Sat Apr 28 15:56:29 CEST 2007
+    - perltidy
+    - move examples to examples directory
+    - code cleanups
+    - add META.yml and LICENSE
+    - perlcritic test
+
+1.4 Fri Sep  8 17:22:08 BST 2006
+    - fixed broken POD
+    - added POD test and POD coverage test
+    - updated MANIFEST to include META.yml
+    - made Makefile.PL unexecutable
+    - perltidy
+    - added 'use strict'. oh the irony
+
+1.3 Wed Mar 27 13:44:23 GMT 2002
+    - added extra newline 'cos CPAN wasn't finding the version
+
+1.2 Sun Aug 12 12:52:17 BST 2001
+    - merged in patch by Brian Ingerson which moved code
+      to an import subroutine
+
+1.1 Wed May 23 16:46:45 BST 2001
+    - Changed name to Acme::Buffy
+
+1.00 Sun Apr  1 13:20:37 BST 2001
+	- original version

@@ -1,0 +1,10 @@
+Revision history for Perl extension Acme::LifeUniverseEverything.
+
+0.02	Mon Jul 21 2003
+	- Revised tests with Test::More, added more tests
+	- Fixed problem with (and pod relating to) const 0 not
+	  being overloaded.
+	- Revised a few overloaded operators to return objects
+
+0.01	Mon Jul 21 2003
+	- Initial release

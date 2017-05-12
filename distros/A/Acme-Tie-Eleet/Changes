@@ -1,0 +1,104 @@
+Revision history for Acme::Tie::Eleet
+
+High-level changelog
+====================
+
+1.0.x   kwalitee release
+0.3x    TIESCALAR
+0.1x    cleaning, bugfixes, documentation
+0.0x    initial work:
+
+
+Low-level changelog
+===================
+
+1.0.2 Mon Nov 26 13:48:05 CET 2007
+ - kwalitee/cpants release
+
+1.0.1 Fri May 25 10:47:34 CEST 2007
+ - change license back to perl
+
+1.0.0 Thu May 24 17:21:23 CEST 2007
+ - change license to gpl
+ - module officially registered in pause
+ - change versioning to x.y.z
+ - move to a lib/ scheme
+ - meta.yml file provided
+ - provided build.pl as alternative to makefile.pl
+
+**
+
+0.33  Sun Oct 12 15:43:05 CEST 2003
+ - typo in %words
+
+0.32  Thu Jun 12 19:24:15 CEST 2003
+ - TIEHANDLE seems to be broken on Perl >= 5.8.0, so...
+ - STDOUT and STDERR no longer tied by default
+ - test suited does not test TIEHANDLE
+ - minor change in documentation
+
+0.31  Sat Feb  9 11:38:17 CET 2002
+ - minor change in documentation
+
+0.30  Sat Feb  9 09:43:34 CET 2002
+ - now able to perform a TIESCALAR (idea from Juerd  <juerd@juerd.nl>)
+ - test suite updated
+ - documentation updated
+
+**
+
+0.20  Fri Feb  8 12:18:02 CET 2002
+ - minor change in documentation
+
+0.19  Fri Feb  8 12:10:04 CET 2002
+ - minor change in documentation
+
+0.18  Thu Feb  7 20:20:05 CET 2002
+ - minor change in documentation
+
+0.17  Fri Feb  1 17:37:48 CET 2002
+ - new translitterations thanks to Moun's and
+   http://www.google.com/intl/xx-hacker/
+
+0.16  Fri Feb  1 16:57:23 CET 2002
+ - new transliterations thanks to Moun's
+ - spacer on by default
+
+0.15  Wed Jan 30 17:16:10 CET 2002
+ - some code cleaning
+
+0.14  Wed Jan 30 17:07:52 CET 2002
+ - bug fix in print
+
+0.13  Wed Jan 30 16:50:40 CET 2002
+ - some code cleaning
+
+0.12  Wed Jan 30 16:37:56 CET 2002
+ - README file written
+
+0.11  Wed Jan 30 16:05:22 CET 2002
+ - a few bug fixes (warnings only)
+
+0.10  Wed Jan 30 15:32:51 CET 2002
+ - first complete release
+
+**
+
+0.04  Wed Jan 30 13:57:25 CET 2002
+ - add_before fully implemented
+ - add_after fully implemented
+ - test suite modified to take it into account
+
+0.03  Wed Jan 30 13:20:04 CET 2002
+ - letters translitteration fully functionnal
+ - word replacement fully implemented
+ - test suite modified to take it into account
+ - test suite cleaned
+
+0.02  Tue Jan 29 17:46:42 CET 2002
+ - test suite splitten into multiple files
+ - spacer, case-mixer fully implemented
+
+0.01  Tue Jan 29 14:31:04 CET 2002
+ - initial version, with basic letters translitteration, spacer
+   and case-mixer

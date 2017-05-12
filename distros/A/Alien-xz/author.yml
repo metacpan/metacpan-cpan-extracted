@@ -1,0 +1,18 @@
+---
+pod_spelling_system:
+  skip: 0
+  # list of words that are spelled correctly
+  # (regardless of what spell check thinks)
+  stopwords:
+    - xz
+
+pod_coverage:
+  skip: 0
+  # format is "Class#method" or "Class", regex allowed
+  # for either Class or method.
+  private:
+    - Alien::xz::Install::Files#Inline
+    - Alien::xz#alien_helper
+
+version:
+  dir: lib

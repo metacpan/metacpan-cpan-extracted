@@ -1,0 +1,88 @@
+<html>
+<head>
+  <title>Aw::Admin::Client</title>
+</head>
+<body bgcolor="#f0f0f0" link="#cc0000" vlink="brown">
+
+<h1><u>Aw::Admin::Client</u></h1>
+
+<table width="90%" border=1 bgcolor="#cccc99">
+<tr bgcolor="#bfbfbf"><th>Method</th><th>Arguments</th><th>Return</th><th>Throws<br>Exception</th></tr>
+<tr align="center"><th align="left"><a name="acquireChangeLock"></a>acquireChangeLock</th><td>( )</td><td>% of {acquired, client_id, session_id, lock_time}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="clearClientQueueById"></a>clearClientQueueById</th><td>( client_id )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="createClient"></a>createClient</th><td>( client_id, client_group, app_name, user_name, authenticator_name [, Aw::ConnectionDescriptor] )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="createClientGroup"></a>createClientGroup</th><td>( client_group_name, life_cycle, storage_type )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="createSubscriptionById"></a>createSubscriptionById</th><td>( client_id, [ sub | \@subs ] )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="createTerritory"></a>createTerritory</th><td>( territory_name )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="createTerritoryGateway"></a>createTerritoryGateway</th><td>( territory_name, broker_host, broker_name )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="destroyBroker"></a>destroyBroker</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="destroyClientById"></a>destroyClientById</th><td>( [ client_id | \@client_ids ] )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="destroyClientGroup"></a>destroyClientGroup</th><td>( [ client_group_name | \@client_group_name ], force_destroy )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="destroyEventTypeInfoset"></a>destroyEventTypeInfoset</th><td>( event_type_name, [ infoset_name | \@infoset_names ] )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="destroyEventType"></a>destroyEventType</th><td>( [ event_type_name | \@event_type_names ], force_destroy )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="destroySubscriptionById"></a>destroySubscriptionById</th><td>( client_id, [ sub | \@subs ] )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="destroyTerritoryGateway"></a>destroyTerritoryGateway</th><td>( territory_name )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="disconnectClientById"></a>disconnectClientById</th><td>( [ client_id | \@client_ids ] )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="disconnectClientSessionById"></a>disconnectClientSessionById</th><td>( client_id, session_id )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="doesSubscriptionExistById"></a>doesSubscriptionExistById</th><td>( client_id, event_type_name, filter )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getActivityTraces"></a>getActivityTraces</th><td>( seqn, msecs )</td><td>% of {seqn,<br>key,<br>tag,<br>ip_address,<br>session_id,<br>session_count,<br>encrypt_level,<br>has_tag,<br>is_authenticated,<br>event_id,<br>dest_client_id,<br>broker_name,<br>broker_host,<br>app_name,<br>client_group,<br>event_type_name}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getAllTerritoryGateways"></a>getAllTerritoryGateways</th><td>( )</td><td>@ of % of {gateway_host_name,<br>gateway_broker_name,<br>remote_territory_name,<br>remote_host_name,<br>remote_broker_name,<br>remote_broker_description,<br>auth_type,<br>encrypt_level,<br>is_local,<br>is_complete,<br>num_accessible_territories,<br>accessible_territories}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getBrokerDescription"></a>getBrokerDescription</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getBrokersInTerritory"></a>getBrokersInTerritory</th><td>( )</td><td>@ of %  of {<br>territory_name,<br>broker_host,<br>broker_name,<br>description}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getBrokerStats"></a>getBrokerStats</th><td>( )</td><td>Aw::Event</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClientGroupACL"></a>getClientGroupACL</th><td>( )</td><td>Aw::Admin::AccessControlList</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClientGroupCanPublishList"></a>getClientGroupCanPublishList</th><td>( client_group_name )</td><td>@ of Strings</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClientGroupCanSubscribeList"></a>getClientGroupCanSubscribeList</th><td>( event_type_name )</td><td>@ of Strings</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClientGroupInfo"></a>getClientGroupInfo</th><td>( [ client_group_name | \@client_group_names ] )</td><td>% (or @ of %) of {name,<br>description,<br>life_cycle,<br>storage_type,<br>required_encryption,<br>access_label_required,<br>is_system_defined}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClientGroupNames"></a>getClientGroupNames</th><td>( )</td><td>@ of Strings</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClientGroupStats"></a>getClientGroupStats</th><td>( client_group_name )</td><td>Aw::Event</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClientGroupsWhichCanPublish"></a>getClientGroupsWhichCanPublish</th><td>( event_type_name )</td><td>@ of Strings</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClientGroupsWhichCanSubscribe"></a>getClientGroupsWhichCanSubscribe</th><td>( event_type_name )</td><td>@ of Strings</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClientIds"></a>getClientIds</th><td>( )</td><td>@ of Strings</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClientIdsByClientGroup"></a>getClientIdsByClientGroup</th><td>( client_group_name )</td><td>@ of Strings</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClientIdsWhichAreSubscribed"></a>getClientIdsWhichAreSubscribed</th><td>( event_type_name )</td><td>@ of Strings</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClientInfoById"></a>getClientInfoById</th><td>( [ client_id | \@client_ids [, n] ] )</td><td>% (or @ of %) of {client_id,<br>client_group,<br>app_name,<br>shared_event_ordering,<br>[user_name],<br>[authenticator_name],<br>can_share_state,<br>state_share_limit,<br>access_label,<br>num_sessions,<br>num_access_labels,<br>high_pub_seqn,<br>[sessions]}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClientInfosetById"></a>getClientInfosetById</th><td>( client_id )</td><td>Aw::Event</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClientStatsById"></a>getClientStatsById</th><td>( client_id )</td><td>Aw::Event</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClientSubscriptionsById"></a>getClientSubscriptionsById</th><td>( client_id )</td><td>@ of Aw::Subscription</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getEventAdminTypeDef"></a>getEventAdminTypeDef</th><td>( event_type_name )</td><td>Aw::Admin::TypeDef</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getEventAdminTypeDefs"></a>getEventAdminTypeDefs</th><td>( \@event_type_names )</td><td>@ of Aw::Admin::TypeDef</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getEventAdminTypeDefsByScope"></a>getEventAdminTypeDefsByScope</th><td>( scope_name )</td><td>@ of Aw::Admin::TypeDef</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getEventTypeStats"></a>getEventTypeStats</th><td>( event_type_name )</td><td>Aw::Event</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getLocalTerritoryGateways"></a>getLocalTerritoryGateways</th><td>( )</td><td>@ of % of {gateway_host_name,<br>gateway_broker_name,<br>remote_territory_name,<br>remote_host_name,<br>remote_broker_name,<br>remote_broker_description,<br>auth_type,<br>encrypt_level,<br>is_local,<br>is_complete,<br>num_accessible_territories,<br>accessible_territories}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getTerritoryACL"></a>getTerritoryACL</th><td>( )</td><td>Aw::Admin::AccessControlList</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getTerritoryGatewayACL"></a>getTerritoryGatewayACL</th><td>( )</td><td>Aw::Admin::AccessControlList</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getTerritoryGatewaySharedEventTypes"></a>getTerritoryGatewaySharedEventTypes</th><td>( territory_name )</td><td>@ of % {event_type_name,<br>accept_publish,<br>accept_subscribe,<br>is_synchronized,<br>subscribe_filter}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getTerritoryGatewayStats"></a>getTerritoryGatewayStats</th><td>( territory_name )</td><td>Aw::Event</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getTerritoryInfo"></a>getTerritoryInfo</th><td>( )</td><td>% of {territory_name,<br>auth_type,<br>encrypt_level}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getTerritoryStats"></a>getTerritoryStats</th><td>( )</td><td>Aw::Event</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="joinTerritory"></a>joinTerritory</th><td>( broker_host, broker_name )</td><td>% of {client_group_names,<br>num_client_group_names,<br>num_efent_type_names}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="leaveTerritory"></a>leaveTerritory</th><td>( msecs, forced )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="releaseChangeLock"></a>releaseChangeLock</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="removeBrokerFromTerritory"></a>removeBrokerFromTerritory</th><td>( broker_host, broker_name )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setBrokerDescription"></a>setBrokerDescription</th><td>( description )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setClientGroupAccessLabelRequired"></a>setClientGroupAccessLabelRequired</th><td>( client_grou_name, required )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setClientGroupRequiredEncryption"></a>setClientGroupRequiredEncryption</th><td>( client_group_name, level )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setClientGroupACL"></a>setClientGroupACL</th><td>( client_group_name, Aw::Admin::AccessControlList )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setClientGroupDescription"></a>setClientGroupDescription</th><td>( client_group_name, description )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setClientGroupCanPublishList"></a>setClientGroupCanPublishList</th><td>( client_group_name, \@event_type_names )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setClientGroupCanSubscribeList"></a>setClientGroupCanSubscribeList</th><td>( client_group_name, \@event_type_names )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setClientLastPublishSequenceNumberById"></a>setClientLastPublishSequenceNumberById</th><td>( client_id, seqn )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setClientStatsById"></a>setClientStatsById</th><td>( client_id, infoset )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setClientStateShareLimitById"></a>setClientStateShareLimitById</th><td>( client_id, limit )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setEventAdminTypeDef"></a>setEventAdminTypeDef</th><td>( [ type_def | \@type_defs ] )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setEventTypeInfoset"></a>setEventTypeInfoset</th><td>( event_type_name, [infoset_name], [infoset|\@infosets] )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setTerritoryACL"></a>setTerritoryACL</th><td>( Aw::Admin::AccessControlList )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setTerritoryGatewayACL"></a>setTerritoryGatewayACL</th><td>( territory_name, Aw::Admin::AccessControlList )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setTerritoryGatewaySecurity"></a>setTerritoryGatewaySecurity</th><td>( territory_name, auth_type, encrypt_level )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setTerritoryGatewaySharedEventTypes"></a>setTerritoryGatewaySharedEventTypes</th><td>( territory_name, av )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setTerritorySecurity"></a>setTerritorySecurity</th><td>( auth_type, encrypt_level )</td><td>Boolean</td><td>YES</td></tr>
+
+<tr bgcolor="#bfbfbf" align="left"><th colspan=4>Inherited Methods</th></tr>
+<tr><th align="left"><a href="../Aw_Client.html">Aw::Client</a></th><td colspan="3">Aw::Admin::Client is derived from <a href="../Aw_Client.html">Aw::Client.</a></td></tr>
+</table>
+
+<p><hr size=3 noshade>
+
+</body>
+</html>

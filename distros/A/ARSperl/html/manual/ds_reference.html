@@ -1,0 +1,41 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - Reference Structure</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H2>References Structure</H2>
+
+
+<PRE>
+{
+ "label"            =&gt; value of Label, if applicable (string),
+ "description"      =&gt; description of reference, if applicable (string),
+ "type"             =&gt; type of reference (integer)
+ "dataType"         =&gt; either 0 (AR System reference) or 1 (external refrence)
+}
+</PRE>
+<P>If <EM>dataType</EM> is 0 then hash will also contain:</P>
+<PRE>
+{
+ "name"             =&gt; name of this reference (string)
+}
+</PRE>
+<P>If <EM>dataType</EM> is 1 then hash will also contain:</P>
+<PRE>
+{
+ "permittedGroups"  =&gt; <EM>list</EM> of groups (ids) who can access this item
+ "value"            =&gt; value of this reference (string)
+}
+</PRE>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+&#169; Ian Trimnell 2005 i.d.trimnell@open.ac.uk
+</address>
+</BODY>
+</HTML>

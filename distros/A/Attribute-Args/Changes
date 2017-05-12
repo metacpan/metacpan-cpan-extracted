@@ -1,0 +1,19 @@
+Revision history for Attribute-Args
+
+0.06	08 Mar 2017
+	Do not run coverage test unless $ENV{TEST_AUTHOR} is set
+
+0.05	31 Jan 2011
+	Fixed tests
+
+0.04	13 Jan 2011
+	Fixed tests	
+
+0.03	21 Jan 2011
+	Fixed tests
+
+0.02	10 Sep 2009
+	Fixed attribute import. Fixed dependecies. Added tests.
+
+0.01	01 Sep 2009 
+	First version, released on an unsuspecting world.

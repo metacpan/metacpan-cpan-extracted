@@ -1,0 +1,30 @@
+name: apicli
+appspec: { version: '0.001' }
+class: API::CLI::Cmd
+title: 'API::CLI utils'
+description: |
+  apicli lets you create an appspec file from an OpenAPI file.
+options:
+subcommands:
+    appspec:
+      summary: "Generate App::Spec file"
+      op: "appspec_openapi"
+      description: "This will generate an App::Spec file from an OpenAPI file"
+      options:
+      - name: from
+        summary: Currently only 'openapi' is supported
+        default: 'openapi'
+      - name: out
+        summary: Output file (default stdout)
+      - name: name
+        summary: appname
+        required: true
+      - name: class
+        summary: Class name (default API::CLI)
+      parameters:
+      - name: "file"
+        summary: "openapi file"
+        required: true
+        type: file
+
+# vim:et:sts=2:sws=2:sw=2:foldmethod=indent

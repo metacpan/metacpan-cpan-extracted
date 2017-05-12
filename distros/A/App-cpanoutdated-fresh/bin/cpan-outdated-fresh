@@ -1,0 +1,163 @@
+#!/usr/bin/env perl
+
+use 5.006;
+use strict;
+use warnings;
+
+package    # hide
+  App::cpanoutdated::fresh::script;
+
+# ABSTRACT: Indicate out-of-date modules by walking the metacpan releases backwards
+
+# PODNAME: cpan-outdated-fresh
+
+our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
+
+our $VERSION = '0.001006';
+
+use App::cpanoutdated::fresh;
+
+exit App::cpanoutdated::fresh->run_command;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpan-outdated-fresh - Indicate out-of-date modules by walking the metacpan releases backwards
+
+=head1 VERSION
+
+version 0.001006
+
+=head1 SYNOPSIS
+
+  cpan-outdated-fresh [--args]
+
+    --age  TIMESPEC  The maximum age for a release (default: 7d)
+     -a    TIMESPEC
+
+    --develop        Include development releases in output
+    --devel
+    --dev
+
+    --no-develop     Exclude development releases from output (default)
+    --no-devel
+    --no-dev
+
+    --authorized     Show only authorized releases in output (default)
+    --authed
+
+    --no-authorized  Show even unauthorized releases in output
+    --no-authed
+
+=head2 TIMESPEC
+
+  <int seconds>
+  <int><multiplier>
+
+=head3 multipliers
+
+  s = second
+  m = minute
+  h = hour
+  d = day
+  w = 7 days
+  M = 31 days
+  Y = 365 days
+
+=head1 DESCRIPTION
+
+This application bears much resemblance to L<< cpan-outdated|App::cpanoutdated >>, but with a few important differences.
+
+=over 4
+
+=item * MetaCPAN Driven
+
+=item * C<--dev> supported
+
+=item * Temporal difference comparison.
+
+=back
+
+=head2 Temporal difference comparison
+
+One of the big features of using the C<MetaCPAN> API, is the ability to filter results into a time bracket.
+
+As such, this application can tell you only about updates that happened to things you have installed C<IF> they've been
+recently updated.
+
+For instance, one problem I kept facing was this:
+
+  $ cpan-outdated
+  # Broken::Package
+  $ cpanm Broken::Package
+  # Broken::Package is broken!
+  ... wait a few days
+  $ cpan-outdated
+  # Broken::Package
+  $ cpanm Broken::Package
+  # Broken::Package is broken!
+  ... doh
+  ... repeat.
+
+With this app, as soon as C<Broken::Package> falls outside the C<age> window, you stop getting told about it.
+
+B<DU;DC> - Didn't Update, Don't Care.
+
+This also has a benefit that if you run it very frequently, you can get a speed boost by narrowing the update window.
+
+  $ time
+  # 12:00
+  $ cpan-outdated
+  # install ALL the things
+  ... wait a while
+  $ time
+  #  1:00
+  $ cpan-outdated-fresh -a 1h
+  # One update
+
+Essentially rewarding you for frequent use by being fast for frequent use.
+
+=head3 Downside
+
+Unfortunately, this optimization has a trade-off, namely, it scales very poorly vs time, due to exponential growth.
+
+C<cpan-outdated> uses C<02packages>, which has its limits, and its inefficiencies, but the inefficiencies are effectively
+constant due to old packages getting pruned from C<02packages> as newer versions replace them.
+
+So:
+
+  cpan-outdated-fresh -a 30d
+
+Will take substantially more time to execute than
+
+  cpan-outdated
+
+We've tried to combat this by trimming some cycles, but they may still prove over-zealous.
+
+However, this approach is still going to give you C<--dev> results that C<cpan-outdated> can't deliver.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<< C<App::cpanoutdated::fresh>|App::cpanoutdated::fresh >>
+
+=back
+
+=head1 AUTHOR
+
+Kent Fredric <kentnl@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric <kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

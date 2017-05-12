@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+bin/pocoirc
+dist.ini
+example/config.json
+example/config.yml
+lib/App/Pocoirc.pm
+lib/App/Pocoirc/ReadLine.pm
+lib/App/Pocoirc/Status.pm
+t/01_compile.t

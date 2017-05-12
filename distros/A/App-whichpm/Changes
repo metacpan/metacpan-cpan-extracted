@@ -1,0 +1,23 @@
+Revision history for App-whichpm
+
+0.05    29 May 2015
+    * whichpm does exit(1) when .pm not found (thanks Skye Shaw)
+
+0.04    19 Jun 2010
+    * added "SEE ALSO" Pod section (thanks to Jerrad Pierce for suggesting)
+    * -q (--quiet) to disable version display (thanks to Jerrad Pierce for suggesting)
+    * -v (--verbose) to force version display (thanks to Jerrad Pierce for suggesting)
+    * -V (--version) to show version of App::whichpm
+
+0.03    19 Jun 2010
+    * MSWin32 \/ mess tidy-up (as %INC has always UNIX / slashes)
+
+0.02    10 Mar 2010
+    * windows '\' friendly find()
+    * also show modules that fail to load or doesn't include package inside
+    * pleasing old Exporter module version with "use base" instead of requesting
+      exporting of 'import' method
+
+0.01     5 Mar 2010
+    * First version, released on an unsuspecting world.
+

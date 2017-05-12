@@ -1,0 +1,169 @@
+==================================================
+Changes from 2015-11-09 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.006 at 2016-11-08 12:59:01 +0000
+------------------------------------------
+
+  Change: 2c0eee06e08f6224c876bf7ea9d016b2410a9186
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-10-03 07:36:23 +0000
+
+    Use a temporary file for the test 
+
+  Change: 57e93ccc1ec21c2d089f2582f1038d0336ea5133
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-10-03 07:36:12 +0000
+
+    Can't use Tie::File with write-only handles 
+
+  Change: 75e4c45ba6f292a7d99cd1fbea9aa35806e52d76
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-10-02 21:42:05 +0000
+
+    Untie the array 
+
+  Change: 4ea38eceb618d8a1b81df227cf88ba4ebe0d3558
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-10-02 15:10:32 +0000
+
+    Document using makeConfusionMatrix with a file handle 
+
+  Change: 6268561fdc7ffab94a01e28b62bb4b29b5786d40
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-09-19 09:47:52 +0000
+
+    Support perl < 5.10 
+
+------------------------------------------
+version 0.005 at 2016-09-17 16:07:35 +0000
+------------------------------------------
+
+  Change: cf7e6ed4249ce4f1f2cbe71b96d4a92c649227c2
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-09-17 18:07:35 +0000
+
+    Release 0.005 
+
+  Change: b710b6fddc4321cad871a5ac2be0db8c3801116e
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-09-13 21:32:15 +0000
+
+    Fix CPAN tests 
+
+------------------------------------------
+version 0.004 at 2016-09-09 08:29:28 +0000
+------------------------------------------
+
+  Change: 4f973918215997e55df4a8ecada82d17dfacae5f
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-09-09 10:29:28 +0000
+
+    Release 0.004 
+
+  Change: b94468d257f869bb3b7c0feecdab11f8adfbd73c
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-09-04 23:25:39 +0000
+
+    Incorrect initialization of the False Positive Counter 
+
+  Change: c125ed7e0748c2430495037282be462d364807ab
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-09-04 10:35:42 +0000
+
+    Let's add tests 
+
+  Change: 2a8465b04170cd30ac944c44f6fd93401ac0bd25
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-08-29 21:41:34 +0000
+
+    Incorrect Total accuracy calculation 
+
+------------------------------------------
+version 0.003 at 2016-08-27 11:00:46 +0000
+------------------------------------------
+
+  Change: a206546a26f22950a6e825a3b1ac4ffa3d9499e4
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-08-27 13:00:46 +0000
+
+    Release 0.003 
+
+  Change: 6f2dbb30b9612e39fa5c69023dcf531b3d5bedcc
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-08-27 12:56:21 +0000
+
+    Add strict & warnings to the requirements list 
+
+  Change: e2bcba127270e2970a59f8e94a7501b686649cb2
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-08-27 12:52:48 +0000
+
+    Prettify the table generated 
+
+  Change: 9cd6d207911575705bbe9d2db0722e4877f779c9
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-08-27 12:42:18 +0000
+
+    Add some comments to improve the readability 
+
+  Change: 2356b83544f97e7ff1d537de17ebe66a32009269
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-08-23 22:20:31 +0000
+
+    At this state, the False Positive counter can't be undefined 
+
+  Change: d2a71bea5dd5a702ccdd1d67cb8e4c8a5e9100af
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-08-22 23:39:17 +0000
+
+    use strict & warnings 
+
+  Change: 93705b06aae588718bf9d729aaaf40b48d5c74d9
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-08-22 23:15:58 +0000
+
+    Add the 'provides' field to the METAs files 
+
+------------------------------------------
+version 0.002 at 2016-08-22 19:33:33 +0000
+------------------------------------------
+
+  Change: 0eff1a511fe9ff7b77920238c76a7deff8fbbafe
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-08-22 21:33:33 +0000
+
+    Release 0.002 
+
+  Change: 290bc71709666672d860630ff089ebec65850a0e
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-08-22 21:30:49 +0000
+
+    Documentation 
+
+  Change: d60e8ff6f6cb1ee7f12c0439ac9622f4bfbb00eb
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-08-22 21:06:02 +0000
+
+    Formatting 
+
+  Change: fac74ae0ce7bc58a4fd6fc9fc35c655268e03a4f
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-08-22 21:00:34 +0000
+
+    Add the totals per column 
+
+------------------------------------------
+version 0.001 at 2016-08-21 17:30:39 +0000
+------------------------------------------
+
+  Change: e02b467e6a641cba9f3facefcef43733edb744ef
+  Author: Vincent Lequertier <sky@riseup.net>
+  Date : 2016-08-21 19:30:39 +0000
+
+    Initial release 
+
+================
+End of releases.
+================

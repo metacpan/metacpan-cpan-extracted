@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Acme/AwesomeQuotes.pm
+t/01-prerequisites.t
+t/author-critic.t
+t/getawesome.t
+t/release-distmeta.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

@@ -1,0 +1,217 @@
+==================================================
+Changes from 2011-04-30 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.005 at 2012-04-29 22:06:28 +0000
+------------------------------------------
+
+  Change: 31cb38417cd994ea62ab188827ce78bea2039ca3
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-04-29 18:06:21 +0000
+
+    Standardize my distribution workflow. 
+
+  Change: 0a3df819d0f29418b3f8d834cc3004d27fa16e98
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-04-29 14:21:20 +0000
+
+    Merge pull request #2 from kimmel/master
+
+    Add package App::PipeFilter so CPAN can find it by its distribution
+    name. 
+
+  Change: a5038ba147d7f9a2663e342ea7e0654d296b890c
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-04-29 17:12:51 +0000
+
+    [rt.cpan.org 76837] Un-hardcode sort(1) and cut(1) paths for jsort.
+
+    Peter P. Hallam pointed out that my hardcoded /usr/bin/sort and
+    /usr/bin/cut weren't universal. I added a little path search with
+    fallbacks to /usr/bin/env {sort,cut}. It's still not non-UNIX safe,
+    of course, but I'm hoping I'll get patches for other systems. 
+
+  Change: bf4730bbb518c0a5e4b5586a28aa729e25316b74
+  Author: Kirk Kimmel <kimmel.k.programmer@gmail.com>
+  Date : 2012-04-28 01:29:09 +0000
+
+    App::PipeFilter should now work correctly with the cpan client and
+    metacpan.org indexing. 
+
+  Change: 3065ebb3b2e97598646d54a55780d1074602289b
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-04-27 14:08:15 +0000
+
+    Document where to read about JSONPath. 
+
+  Change: 2b51acc36f1abbe5670605952fddc8cfde6450dd
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-06-13 16:30:18 +0000
+
+    Add json2pcap to write pcap files from JSON input.
+
+    Required the ability to open output files and write to them in
+    different ways. For example, using Net::Pcap's functions for those
+    purposes. 
+
+  Change: 4ebaf976c9b6a318b65cec473e41dcd77f015c17
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-06-09 16:39:47 +0000
+
+    Add tools to read pcap and convert network layers to JSON. 
+
+  Change: 4e2502c7fba5448e9305ff64ce43ea23bd1b07a2
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-06-06 19:09:36 +0000
+
+    Add support for tab-separated output.
+
+    Implement a TSV output role. Implement a JsonToTsv subclass of
+    App::PipeFilter::Generic. Implement json2tsv, which is like jcut but
+    outputs TSV. 
+
+------------------------------------------
+version 0_004 at 2011-06-06 14:29:55 +0000
+------------------------------------------
+
+  Change: ddfebb5d53d8f49819fb79a8d75d975e262b8d07
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-06-06 10:29:55 +0000
+
+    Switch to YAML::Any for output. 
+
+  Change: 274d9e3372ca55a2f83f9f7c703eee6db99c8eb6
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-06-06 10:25:36 +0000
+
+    Merge branch 'master' of github.com:rcaputo/app-pipefilter 
+
+  Change: 6fe98ba5c1bd7aba1275beda8823328346dcbae2
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-06-06 07:23:22 +0000
+
+    Merge pull request #1 from ingydotnet/master
+
+    Allow the default YAML::Syck to be overridden by an environment
+    variable. 
+
+  Change: 768becd9c324729aa9d1e7440b0d4b758e62d6a5
+  Author: Ingy dot Net <ingy@ingy.net>
+  Date : 2011-06-07 00:09:05 +0000
+
+    Allow YAML implementation to be configurable. 
+
+  Change: 2b959fee86c6e99d7b109d769c382b774ce56592
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-06-05 04:02:36 +0000
+
+    Use PPI to detect "use", "extends", and "with" statements. 
+
+------------------------------------------
+version 0_003 at 2011-05-28 20:01:20 +0000
+------------------------------------------
+
+  Change: b0da50e0ff26c036ce8d80ebb31d75b59744e380
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-05-28 16:01:20 +0000
+
+    Depend upon JSON::Path and YAML::Syck. 
+
+------------------------------------------
+version 0_002 at 2011-05-25 02:55:39 +0000
+------------------------------------------
+
+  Change: 087d339ad69dee42541b90f701b1082a543ce347
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-05-24 22:55:39 +0000
+
+    POD fixes. 
+
+------------------------------------------
+version 0_001 at 2011-05-24 04:16:48 +0000
+------------------------------------------
+
+  Change: c3c9eb92db45c8e5ba490ace96f18931fae2bec3
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-05-24 00:16:48 +0000
+
+    Continue documenting. Remove --input and --output.
+
+    Removed the --input and --output flags. Input files are named plainly
+    on the command line, like the rest of the UNIX tool chain. Output
+    goes to standard output, and pipeline redirection can send it
+    elsewhere.
+
+    Also, it appears the documentation will continue until morale
+    improves. 
+
+  Change: 27fe0ec4f5ded6cc96dd97325dc408161a29626f
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-05-23 01:45:20 +0000
+
+    Huge documentation commit and refactored the generic filter.
+
+    Documentation is several times the size of the actual code.
+
+    Refactored App::PipeFilter::Generic to open input and output files
+    via methods.
+
+    Refactored App::PipeFilter::Generic to process each input file in a
+    filter_file() method. App::PipeFilter::MysqlToJson uses a before()
+    wrapper to extract the tab-separated column header so it can name
+    output fields.
+
+    Added roles to read input in chunks or line-by-line. mysql2json works
+    better as a line-by-line filter, while all the JSON input filters
+    perform better reading in large chunks.
+
+    Added jcat and App::PipeFilter::JsonCat to flatten multiline JSON
+    objects into one line each.
+
+    Did I mention the copious documentation? Ogods, so much
+    documentation, and I'm not done yet. 
+
+  Change: d3e1ad55afc73b137d4336dc2299a0cc2ebd35b8
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-05-21 13:58:52 +0000
+
+    Rename jpath to jsonpath because jpath is something different.
+    Document some additional post-1.000 features. 
+
+  Change: 3c84b441cfb99971bafb7dd71ef16b99a27c7e74
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-05-21 01:44:36 +0000
+
+    Add jpath, a cut(1) that uses JSONPath to describe fields to output. 
+
+  Change: b0065f1e5e1c7496e8cd0d3fb84b951437a4933d
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-05-21 00:44:04 +0000
+
+    Add some sample JSON files for testing. I hope to have JSON::Path
+    working in some form soon, if I can figure out how the resulting data
+    stream ought to look. 
+
+  Change: 6352a40f9a2d1523a94178f9581464b9886cb2be
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-05-20 23:26:33 +0000
+
+    Support multiline input and reading input in chunks (64KB for now).
+    Should be a bit faster. 
+
+  Change: 20b88b66e5a14f6791acfab1fd713c9413b66104
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-05-20 00:17:33 +0000
+
+    Add a README for github, and fix the Copyright date. 
+
+  Change: 70306672654e2a0e5db689c4cc6ad1d85d276eb9
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-05-20 00:10:56 +0000
+
+    Initial commit of work in progress. 
+
+================
+End of releases.
+================

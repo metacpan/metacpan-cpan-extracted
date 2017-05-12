@@ -1,0 +1,227 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use App::spaceless;
+
+# PODNAME: spaceless
+# ABSTRACT: Remove spaces and other hazards from your PATH 
+our $VERSION = '0.07'; # VERSION
+
+
+exit App::spaceless->main(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+spaceless - Remove spaces and other hazards from your PATH 
+
+=head1 VERSION
+
+version 0.07
+
+=head1 SYNOPSIS
+
+Convert PATH (by default):
+
+ cygwin% spaceless
+ PATH=/usr/bin:/cygdrive/c/PROGRA~2/NVIDIA~1/PhysX/Common:...
+ export PATH
+
+Convert another PATH style environment variable
+
+ cygwin% spaceless PERL5LIB
+ PERL5LIB=/PERL~1/lib:/PERL~2/lib
+ export PERL5LIB
+
+Update the PATH in the current shell (works with both sh and csh):
+
+ cygwin% eval `spaceless PATH`
+
+Same thing from C<cmd.exe> or C<command.com> prompt:
+
+ C:\> spaceless PATH -f path.bat
+ C:\> path.bat
+
+=head1 DESCRIPTION
+
+Although legal in most modern operating system directory names, spaces are only
+frequently encountered in Windows.  This can be troublesome for some tools that
+do not take such antics into account.  Fortunately, Windows provides alternate 
+file and directory names for any name that is not compatible with MS DOS.  Since
+spaces were never supported by MS DOS we can use these alternate names for tools
+that don't take spaces into account.
+
+L<spaceless> converts PATH style environment variables on windows into equivalents
+that do not have spaces.  By default it uses L<Shell::Guess> to make a reasonable
+guess as to the shell you are currently using (not your login shell).  You may
+alternately specify a specific shell type using one of the options below.
+
+L<spaceless> will not convert long directory (non 8.3 format) names that do not
+have spaces, as these are usually handled gracefully by scripts that are space
+challenged.
+
+=head1 OPTIONS
+
+=head2 --cmd
+
+Generate cmd.exe configuration
+
+=head2 --command
+
+Generate command.com configuration
+
+=head2 --csh
+
+Generate c shell configuration
+
+=head2 -f I<filename>
+
+Write configuration to I<filename> instead of standard output
+
+=head2 --expand | -x
+
+Expand short paths to long paths (adding any spaces that may be back in)
+
+=head2 --fish
+
+Generate fish shell configuration
+
+=head2 --help
+
+Print help message and exit
+
+=head2 --korn
+
+Generate korn shell configuration
+
+=head2 --list | -l
+
+Instead of generating a shell configuration, list the directories
+in the given path style variable
+
+=head2 --login
+
+Use the your default login shell (as determined by L<Shell::Guess>)
+On Unix style systems this consults the C<GECOS> field in the
+C</etc/passwd> file or uses NIS.  On other platforms it may use
+another means to determine your login shell, or simply make an
+informed guess based on the platform.
+
+=head2 --no-cygwin
+
+Remove any cygwin paths.  Has no affect on non cygwin platforms.
+
+=head2 --power
+
+Generate Power shell configuration
+
+=head2 --sh
+
+Generate bourne shell configuration
+
+=head2 --sep I<char> | --sep-in I<char> | --sep-out I<char>
+
+You can use these options to change the path separator character.
+Normally you do not need to set this.  the Platform default is used for
+input (C<:> for Unix and cygwin, and C<;> for Windows) and the shell
+default is used for output (C<:> for sh and csh, and C<;> for C<command.com>
+and C<cmd.exe>).  But in some situation you might want a UNIX style path
+in a C<cmd.exe> script.  Any character may be specified, but keep in mind
+that not all characters are supported by L<Shell::Config::Generate>.
+
+=head2 --squash | -s
+
+Remove duplicate paths from the given path style variable.
+
+=head2 --trim | -t
+
+Trim non-existing directories.  This is a good idea since such directories can 
+sometimes cause L<spaceless> to die.
+
+=head2 --version | v
+
+Print version number and exit
+
+=head1 EXAMPLES
+
+=head2 Removing spaces from the PATH on Cygwin
+
+My motivation for writing this script was trying to get L<perlbrew> to work on Cygwin.
+Since Windows frequently includes spaces in its C<%PATH%> environment variable, and
+cygwin inherits them.
+
+ xian-x86_64% source ~/perl5/perlbrew/etc/cshrc
+ setenv: Too many arguments.
+ xian-x86_64% eval `spaceless PATH`
+ xian-x86_64% source ~/perl5/perlbrew/etc/cshrc
+ xian-x86_64%
+
+I could have manually updated my C<%PATH%> to not include spaces, or better yet submitted
+a patch to L<perlbrew> to fix its spacing problem.  This probably won't be the last script
+that I will have the spaces in the C<%PATH%> problem with.
+
+=head2 Visualizing the PATH
+
+Reading the C<%PATH%> variable can be difficult, especially if you have already
+removed the spaces and are using the short version.
+
+ C:\> echo %PATH%
+ N:\lang\perl\strawberry\x86\5.18.2\c\bin;N:\lang\perl\strawberry
+ \x86\5.18.2\perl\site\bin;N:\lang\perl\strawberry\x86\5.18.2\per
+ l\bin;n:\program32\GnuWin32\bin;C:\PROGRA~2\NVIDIA~1\PhysX\Commo
+ n;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Win
+ dows\System32\WindowsPowerShell\v1.0\;C:\PROGRA~1\MICROS~3\110\T
+ ools\Binn\;C:\PROGRA~2\Git\cmd;N:\lang\tcl\x86\8.6.1.0\bin;C:\PR
+ OGRA~2\NVIDIA~1\PhysX\Common;C:\PROGRA~2\Intel\ICLSCL~1\;C:\PROG
+ RA~1\Intel\ICLSCL~1\;C:\Windows\system32;C:\Windows;C:\Windows\S
+ ystem32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;
+
+You can use the C<-l> (short for C<--list>) and C<-x> (short for C<--expand>) options to
+make it a little more readable
+
+ C:\> spaceless -l -x
+ N:\lang\perl\strawberry\x86\5.18.2\c\bin
+ N:\lang\perl\strawberry\x86\5.18.2\perl\site\bin
+ N:\lang\perl\strawberry\x86\5.18.2\perl\bin
+ N:\program32\GnuWin32\bin
+ C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common
+ ...
+
+=head2 Remove duplicate directories in the path
+
+You can use the C<-s> (short for C<--squeeze>) option to squeeze out duplicate paths.
+It keeps the first instance of a directory in a path style variable, which is usually
+what you want.
+
+ % spaceless -l
+ /usr/local/bin
+ /usr/bin
+ /bin
+ /usr/local/bin
+ % spaceless -s -l
+ /usr/local/bin
+ /usr/bin
+ /bin
+
+You can then update the C<PATH> with the eval trick:
+
+ % eval `spaceless -s`
+
+=head1 AUTHOR
+
+Graham Ollis <plicease@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Graham Ollis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

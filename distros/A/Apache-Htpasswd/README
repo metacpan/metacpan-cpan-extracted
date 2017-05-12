@@ -1,0 +1,174 @@
+NAME
+    Apache::Htpasswd - Manage Unix crypt-style password file.
+
+SYNOPSIS
+        use Apache::Htpasswd;
+
+        $foo = new Apache::Htpasswd("path-to-file");
+
+        # Add an entry    
+        $foo->htpasswd("zog", "password");
+
+        # Change a password    
+        $foo->htpasswd("zog", "new-password", "old-password");
+    
+        # Change a password without checking against old password
+        # The 1 signals that the change is being forced.
+    
+        $foo->htpasswd("zog", "new-password", 1);
+        
+        # Check that a password is correct
+        $pwdFile->htCheckPassword("zog", "password");
+
+        # Fetch an encrypted password 
+        $foo->fetchPass("foo");
+    
+        # Delete entry
+        $foo->htDelete("foo");
+
+        # If something fails, check error
+        $foo->error;
+
+        # Write in the extra info field
+        $foo->writeInfo("login", "info");
+
+        # Get extra info field for a user
+        $foo->fetchInfo("login");
+
+DESCRIPTION
+    This module comes with a set of methods to use with htaccess password
+    files. These files (and htaccess) are used to do Basic Authentication on
+    a web server.
+
+    The passwords file is a flat-file with login name and their associated
+    crypted password. You can use this for non-Apache files if you wish, but
+    it was written specifically for .htaccess style files.
+
+  FUNCTIONS
+
+    htaccess->new("path-to-file");
+        "path-to-file" should be the path and name of the file containing
+        the login/password information.
+
+    error;
+        If a method returns an error, or a method fails, the error can be
+        retrived by calling error()
+
+    htCheckPassword("login", "password");
+        Finds if the password is valid for the given login.
+
+        Returns 1 if passes. Returns 0 if fails.
+
+    htpasswd("login", "password");
+        This will add a new user to the password file. Returns 1 if
+        succeeds. Returns undef on failure.
+
+    htDelete("login")
+        Delete users entry in password file.
+
+        Returns 1 on success Returns undef on failure.
+
+    htpasswd("login", "new-password", "old-password");
+        If the *old-password* matches the *login's* password, then it will
+        replace it with *new-password*. If the *old-password* is not
+        correct, will return 0.
+
+    htpasswd("login", "new-password", 1);
+        Will replace the password for the login. This will force the
+        password to be changed. It does no verification of old-passwords.
+
+        Returns 1 if succeeds Returns undef if fails
+
+    fetchPass("login");
+        Returns *encrypted* password if succeeds. Returns 0 if login is
+        invalid. Returns undef otherwise.
+
+    fetchInfo("login");
+        Returns additional information if succeeds. Returns 0 if login is
+        invalid. Returns undef otherwise.
+
+    writeInfo("login", "info");
+        Will replace the additional information for the login. Returns 0 if
+        login is invalid. Returns undef otherwise.
+
+    CryptPasswd("password", "salt");
+        Will return an encrypted password using 'crypt'. If *salt* is
+        ommitted, a salt will be generated. 
+
+INSTALLATION
+    You install Apache::Htpasswd, as you would install any perl module
+    library, by running these commands:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+       make clean
+
+DOCUMENTATION
+    POD style documentation is included in the module. These are normally
+    converted to manual pages and installed as part of the "make install"
+    process. You should also be able to use the 'perldoc' utility to extract
+    and read documentation from the module files directly.
+
+AVAILABILITY
+    The latest version of Apache::Htpasswd should always be available from:
+
+        $CPAN/modules/by-authors/id/K/KM/KMELTZ/
+
+    Visit <URL:http://www.perl.com/CPAN/> to find a CPAN site near you.
+
+CHANGES
+
+    Revision 1.5.7  2004/08/23 09:05:12 Made generated salt more
+		random. Tidied up the code a bit. Also added use of Crypt::PasswdMD5
+		for Apache on MSWin for use of (modified) MD5 passwords on that
+		platform.
+	
+    Revision 1.5.5  2002/08/14 11:27:05 Newline issue fixed for certain conditions.
+
+    Revision 1.5.4  2002/07/26 12:17:43 kevin doc fixes, new fetchUsers method,
+    new ReadOnly option, named params for new(), various others
+
+    Revision 1.5.3  2001/05/02 08:21:18 kevin Minor bugfix
+
+    Revision 1.5.2  2001/04/03 09:14:57 kevin Really fixed newline problem :)
+
+    Revision 1.5.1 2001/03/26 08:25:38 kevin Fixed newline problem
+
+    Revision 1.5 2001/03/15 01:50:12 kevin Fixed small bug for newlines
+
+    Revision 1.4 2001/02/23 08:23:46 kevin Added support for extra info
+    fields
+
+    Revision 1.3 2000/04/04 15:00:15 meltzek Made file locking safer to
+    avoid race conditions. Fixed typo in docs.
+
+    Revision 1.2 1999/01/28 22:43:45 meltzek Added slightly more verbose
+    error croaks. Made sure error from htCheckPassword is only called when
+    called directly, and not by $self.
+
+    Revision 1.1 1998/10/22 03:12:08 meltzek Slightly changed how files
+    lock. Made more use out of carp and croak. Made sure there were no ^M's
+    as per Randal Schwartz's request.
+
+BUGS
+    None knows at time of writting.
+
+AUTHOR INFORMATION
+    Copyright 1998..2004, Kevin Meltzer. All rights reserved. It may be used
+    and modified freely, but I do request that this copyright notice remain
+    attached to the file. You may modify this module as you wish, but if you
+    redistribute a modified version, please attach a note listing the
+    modifications you have made.
+
+    This is released under the same terms as Perl itself.
+
+    Address bug reports and comments to: perlguy@perlguy.com
+
+    The author makes no warranties, promises, or gaurentees of this
+    software. As with all software, use at your own risk.
+
+SEE ALSO
+    the Apache::Htgroup manpage
+

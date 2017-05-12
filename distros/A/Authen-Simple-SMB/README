@@ -1,0 +1,71 @@
+NAME
+    Authen::Simple::SMB - Simple SMB authentication
+
+SYNOPSIS
+        use Authen::Simple::SMB;
+    
+        my $smb = Authen::Simple::SMB->new( 
+            domain => 'DOMAIN', 
+            pdc    => 'PDC'
+        );
+    
+        if ( $smb->authenticate( $username, $password ) ) {
+            # successfull authentication
+        }
+    
+        # or as a mod_perl Authen handler
+    
+        PerlModule Authen::Simple::Apache
+        PerlModule Authen::Simple::SMB
+
+        PerlSetVar AuthenSimpleSMB_domain "DOMAIN"
+        PerlSetVar AuthenSimpleSMB_pdc    "PDC"
+
+        <Location /protected>
+          PerlAuthenHandler Authen::Simple::SMB
+          AuthType          Basic
+          AuthName          "Protected Area"
+          Require           valid-user
+        </Location>
+
+DESCRIPTION
+    Authenticate against an SMB server.
+
+METHODS
+    * new
+        This method takes a hash of parameters. The following options are
+        valid:
+
+        * domain
+                Domain to authenticate against. Required.
+
+                    domain => 'NTDOMAIN'
+
+        * pdc   Primary Domain Controller. Required.
+
+                    pdc => 'PDC'
+
+        * bdc   Backup Domain Controller.
+
+                    bdc => 'BDC'
+
+        * log   Any object that supports "debug", "info", "error" and
+                "warn".
+
+                    log => Log::Log4perl->get_logger('Authen::Simple::SMB')
+
+    * authenticate( $username, $password )
+        Returns true on success and false on failure.
+
+SEE ALSO
+    Authen::Simple.
+
+    Authen::Smb.
+
+AUTHOR
+    Christian Hansen "ch@ngmedia.com"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

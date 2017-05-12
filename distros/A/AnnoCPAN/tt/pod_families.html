@@ -1,0 +1,21 @@
+[% PROCESS header.html title='Pod Families' %]
+[% PROCESS login_form.html %]
+[% PROCESS form.html %]
+
+<h2>Pod Families</h2>
+
+<table>
+<tr><th>POD</th><th>Distributions</th></tr>
+[% FOR pod = pods %]
+    <tr>
+    <td>[% link_perldoc(pod) %]</td>
+    <td>
+    [% FOR dist = pod.dists %]
+        [% link_dist_latest(dist); ', ' UNLESS loop.last  %]
+    [% END %]
+    </td>
+    </tr>
+[% END %]
+</table>
+
+[% PROCESS footer.html %]

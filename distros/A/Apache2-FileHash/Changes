@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache2::FileHash.
+
+0.01  Sun Jan  1 17:27:09 2012
+	- original version; created by h2xs 1.23 with options
+		-X -n Apache2::FileHash
+

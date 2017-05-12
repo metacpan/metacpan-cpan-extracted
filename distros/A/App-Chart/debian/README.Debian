@@ -1,0 +1,58 @@
+Copyright 2005, 2006, 2007, 2008, 2009, 2014, 2016 Kevin Ryde
+
+This file is part of Chart.
+
+Chart is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3, or (at your option) any later
+version.
+
+Chart is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with Chart.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+The package "Recommends" are as follows,
+
+* libcrypt-ssleay-perl - for data sources using "https:" secure-HTTP,
+  as described in the manual.
+
+* libdevel-stacktrace-perl or libdevel-backtrace-perl - for more info
+  in the error dialog (good for bug reporting, pretty obscure unless
+  you want to do some programming otherwise)
+
+* libintl-xs-perl - faster gettext message translations, though the
+  plain perl libintl-perl is also fine generally
+
+* libset-intspan-fast-xs-perl - faster IntSpan bits, may help series
+  read/write/redisplay
+
+The package "Suggests" are as follows,
+
+* libbsd-resource-perl, libdevel-arena-perl,
+  libdevel-findblessedrefs-perl, libdevel-mallinfo-perl - further
+  technical info in the Help/Diagnostics dialog, but otherwise not
+  needed
+
+* libfinance-quote-perl - prices from Finance::Quote, and needed for
+  the .TSP data source
+
+* libfinance-ta-perl, geniustrader - more indicators and averages.  As
+  of June 2009 neither are in the Debian archive.
+
+Other bits,
+
+* chart.bash described under "Invocation" in the manual is installed
+  as /etc/bash_completion.d/chart so it's loaded automatically by
+  bash_completion, if you use that.
+
+  /usr/share/perl5/App/Chart/chart.bash is a symlink to
+  /etc/bash_completion.d/chart so the file can also be found in the
+  usual place described in the manual.
+
+ -- Kevin Ryde <user42_kevin@yahoo.com.au>, Fri, 29 Jan 2016 19:41:16 +1100

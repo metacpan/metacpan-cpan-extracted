@@ -1,0 +1,31 @@
+[% PROCESS header.html title="Create new user" %]
+
+<h2>Create account</h2>
+
+<form method="post" action="./">
+<input type="hidden" name="mode" value="create_user">
+<table>
+<tr>
+    <td>login</td>
+    <td><input type="text" name="login" value="[% login | html %]"></td>
+</tr>
+<tr>
+    <td>email (optional)</td>
+    <td><input type="text" name="email" value="[% email | html %]"></td>
+</tr>
+<tr>
+    <td>password</td>
+    <td><input type="password" name="passwd"></td>
+</tr>
+<tr>
+    <td>verify password</td>
+    <td><input type="password" name="passwd2"></td>
+</tr>
+<tr>
+    <td></td>
+    <td><input type="submit" value="create account"></td>
+</tr>
+</table>
+</form>
+
+[% PROCESS footer.html %]

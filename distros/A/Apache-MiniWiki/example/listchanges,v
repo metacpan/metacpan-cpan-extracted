@@ -1,0 +1,55 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2003.10.11.19.11.02;	author anonymous;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2002.05.24.03.56.32;	author wim;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@update links and note
+@
+text
+@How have things changed recently?
+
+You can limit the number of results on this page, by adding creating links like this. 'maxpages' is the maximum number of page changes to show, 'maxdays' is over how many days.
+
+* last 10 changes: http://servername/wiki/listchanges?maxpages=10
+* last 30 changes: http://servername/wiki/listchanges?maxpages=30
+* last 3 days: http://servername/wiki/listchanges?maxdays=10
+* last 4 days, or 40 changes: http://servername/wiki/listchanges?maxpages=40&maxdays=10
+
+Replace servername with the host/domain name for your system.
+
+---
+
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 6
+a10 4
+* last 10 changes: http://nyetwork.org/wiki/listchanges?maxpages=10
+* last 30 changes: http://nyetwork.org/wiki/listchanges?maxpages=30
+* last 3 days: http://nyetwork.org/wiki/listchanges?maxdays=10
+* last 4 days, or 40 changes: http://nyetwork.org/wiki/listchanges?maxpages=40&maxdays=10
+@

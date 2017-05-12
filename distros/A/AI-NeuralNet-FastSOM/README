@@ -1,0 +1,37 @@
+NAME
+    AI::NeuralNet::FastSOM - Perl extension for fast Kohonen Maps
+
+SYNOPSIS
+      use AI::NeuralNet::FastSOM::Rect;
+
+    instead of
+
+      use AI::NeuralNet::SOM;
+
+DESCRIPTION
+    A drop-in replacement for Robert Barta's AI::NeuralNet::SOM. See those
+    docs for details.
+
+SUPPORT
+    Bugs should always be submitted via the CPAN bug tracker
+
+SEE ALSO
+    Explanation of the algorithm:
+
+    <http://www.ai-junkie.com/ann/som/som1.html>
+
+    Subclasses:
+
+    AI::NeuralNet::FastSOM::Hexa AI::NeuralNet::FastSOM::Rect
+    AI::NeuralNet::FastSOM::Torus
+
+AUTHOR
+    Rick Myers, <jrm@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009-2016 by Rick Myers
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,20 @@
+array_run_t *					T_PV588force
+array_stats_t *					T_PV588force
+double *					T_PV588force
+int *						T_PV588force
+void_char *					T_PTR_my
+
+#############################################################################
+INPUT
+
+# T_PV Taken from 5.8.8, with force added, and (void*) to quiet warning about change of alignment
+T_PV588force
+	$var = ($type)(void*)SvPV_force_nolen($arg)
+
+# T_PV Taken from 5.8.8
+T_PV588
+	$var = ($type)SvPV_nolen($arg)
+
+# Taken from 5.22.2
+T_PTR_my
+	$var = INT2PTR($type,SvIV($arg))

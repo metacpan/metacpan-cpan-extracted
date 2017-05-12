@@ -1,0 +1,23 @@
+Installation instructions for App::Siesh
+
+To install this module, just do:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install  (this step may need to be done as the superuser)
+
+Testing App::Siesh
+
+To run the test suite, please create a config file named t/siesh.conf. See
+the pod of bin/siesh for possible values.
+
+	host = imap
+	user = dom
+	password = xxx
+
+If this file does not exist, we just skip all tests that need a network
+connection. We also won't delete any files during testing on your
+account. But as we need to test some destructive cases, we can't test
+with a non empty account. So please delete all your scripts before you
+run any author tests, otherwise we just bail out.

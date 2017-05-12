@@ -1,0 +1,109 @@
+			   Apache::Gateway
+
+The Apache::Gateway module implements a gateway using LWP
+(libwww-perl) with assorted optional features.  From the HTTP 1.1
+draft, a gateway is
+
+    [a] server which acts as an intermediary for some other
+    server.  Unlike a proxy, a gateway receives requests as if
+    it were the origin server for the requested resource; the
+    requesting client may not be aware that it is communicating
+    with a gateway.
+
+FEATURES
+
+  * Standard Gateway Features implemented using LWP
+  * Automatic Failover with Mirrored Instances
+  * Multiplexing
+  * Pattern-dependent Gatewaying
+  * FTP Directory Gatewaying
+  * Timestamp Correction
+
+REQUIREMENTS
+
+In order to install and use this package you will need Perl
+version 5.004 or better, an Apache server with modperl, and the
+appropriate administrative privileges to run Apache/Perl modules.
+
+Apache::Gateway uses many other modules.
+  * Apache::Constants
+  * HTTP::Date
+  * HTTP::Request
+  * HTTP::Status
+  * IO::File
+  * LWP::UserAgent
+  * Regexp
+  * Time::Zone
+  * URI::URL
+
+These packages should be available on CPAN.
+
+INSTALLATION
+
+You install Apache::Gateway as you would install any perl module
+library.  Use the CPAN module or run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORTED PLATFORMS
+
+I have built and tested Apache::Gateway under Linux.
+
+AVAILABILITY
+
+The latest public version of this package is available for download
+from the Comprehensive Perl Archive Network (CPAN)
+<URL:http://www.cpan.org/>.
+
+DOCUMENTATION
+
+See ChangeLog for a list of recent changes.  POD style documentation
+is included in Gateway.pm.  This is normally converted to a manual
+page and installed as part of the "make install" process.  You should
+also be able to use the 'perldoc' utility to extract and read
+documentation from the module file directly.
+
+Definitions.txt defines some HTTP terms used in the documentation.
+
+NOTES
+
+Apache::Gateway is now quite dated.  Sites needing to implement
+gateways using Apache might now wish to consider a combination of
+mod_proxy (to which I've also contributed), mod_rewrite, and, if
+necessary, connection input/output filters.
+
+Failover remains a distinguishing key feature of Apache::Gateway.  If
+you want to automatically failover to other servers when one is down,
+Apache::Gateway is the only commonly available solution.
+
+Rotating or otherwise multiplexing requests to servers in a server
+farm or set of mirrors is possible with mod_rewrite, although it's
+easier with Apache::Gateway.  Fixing up timestamps for misconfigured
+gatewayed mirrors is possible with connection input/output filters but
+is much easier with Apache::Gateway.  However, the performance penalty
+of Apache::Gateway is enough that, even with its greater ease of use,
+I would recommend using mod_rewrite and/or connection filters for busy
+sites that don't need the failover feature.
+
+SUPPORT
+
+For comments, questions, bug-reports, announcements, etc., send mail
+to <modperl@apache.org>.  To subscribe to this list (which you must do
+to send mail to the list), send a mail message to
+<majordomo@apache.org> with the body:
+
+    subscribe modperl
+
+See the modperl documentation for a list of modperl list archives.
+
+Comments can also be sent to the author at <perl@web-i18n.net>.
+
+COPYRIGHT
+
+Copyright (c) 1998,2004 Charles C. Fu.  All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

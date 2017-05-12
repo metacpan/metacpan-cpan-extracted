@@ -1,0 +1,179 @@
+#statusliste .statustable {
+    float: left;
+    margin: 20px;
+}
+.hide {
+    display: none;
+}
+#statusliste .statustable table tbody tr td {
+    height: 30px;
+}
+#statusliste .statustable table.headertable thead th {
+    border-radius: 0 0 0 0;
+}
+.highlightVerspaetung {
+    color: Red;
+}
+ /*
+.table th.title {
+    background-color: #EF7C00;
+    color: #FFFFFF;
+    text-align: center;
+}
+*/
+input.RED {
+    background-color: Red;
+    color: #000000;
+    width: 25px;
+}
+table.RED th.title {
+    background-color: Red;
+    color: #000000;
+    text-align: center;
+}
+input.BLACK {
+    background-color: Black;
+    color: #FFFFFF;
+    width: 25px;
+}
+table.BLACK th.title {
+    background-color: Black;
+    color: #FFFFFF;
+    text-align: center;
+}
+input.ORANGE {
+    background-color: Orange;
+    color: #000000;
+    width: 25px;
+}
+table.ORANGE th.title {
+    background-color: Orange;
+    color: #000000;
+    text-align: center;
+}
+input.BROWN {
+    background-color: #A68740;
+    color: #FFFFFF;
+    width: 25px;
+}
+table.BROWN th.title {
+    background-color: #A68740;
+    color: #FFFFFF;
+    text-align: center;
+}
+input.YELLOW {
+    background-color: Yellow;
+    color: #000000;
+    width: 25px;
+}
+table.YELLOW th.title {
+    background-color: Yellow;
+    color: #000000;
+    text-align: center;
+}
+input.GRAY {
+    background-color: #CCCCCC;
+    color: #000000;
+    width: 25px;
+}
+table.GRAY th.title {
+    background-color: #CCCCCC;
+    color: #000000;
+    text-align: center;
+}
+input.GREEN {
+    background-color: Green;
+    color: #FFFFFF;
+    width: 25px;
+}
+table.GREEN th.title {
+    background-color: Green;
+    color: #FFFFFF;
+    text-align: center;
+}
+input.GREEN_LIGHT {
+    background-color: #00CC00;
+    color: #000000;
+    width: 25px;
+}
+table.GREEN_LIGHT th.title {
+    background-color: #00CC00;
+    color: #000000;
+    text-align: center;
+}
+input.WHITE {
+    background-color: White;
+    color: #000000;
+    width: 25px;
+}
+table.WHITE th.title {
+    background-color: White;
+    color: #000000;
+    text-align: center;
+}
+input.ROSA {
+    background-color: #FF99FF;
+    color: #000000;
+    width: 25px;
+}
+table.ROSA th.title {
+    background-color: #FF99FF;
+    color: #000000;
+    text-align: center;
+}
+input.BLUE {
+    background-color: Blue;
+    color: #FFFFFF;
+    width: 25px;
+}
+table.BLUE th.title {
+    background-color: BLUE;
+    color: #FFFFFF;
+    text-align: center;
+}
+input.BLUE_LIGHT {
+    background-color: #78AFF5;
+    color: #000000;
+    width: 25px;
+}
+table.BLUE_LIGHT th.title {
+    background-color: #78AFF5;
+    color: #000000;
+    text-align: center;
+}
+input.PURPLE {
+    background-color: Purple;
+    color: #FFFFFF;
+    width: 25px;
+}
+table.PURPLE th.title {
+    background-color: Purple;
+    color: #FFFFFF;
+    text-align: center;
+}
+
+/* TABLEAU */
+/*
+.Bookable {
+    background-color: #2EF12E !important;
+    cursor: pointer;
+}
+.NotBookable {
+    background-color: #E3362C !important;
+    cursor: not-allowed;
+}
+.SlotsLocked {
+    background-color: yellow;
+}
+*/
+td.YELLOW {
+    background-color: yellow !important;
+}
+
+td.WHITE {
+    background-color: white !important;
+}
+
+span.GREEN_LIGHT {
+    color: #00CC00;
+}

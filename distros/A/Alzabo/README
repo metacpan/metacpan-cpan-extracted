@@ -1,0 +1,129 @@
+ABOUT
+
+Alzabo is a two-fold program. Its first function is as a data
+modelling tool. Through either a schema creation interface or a custom
+perl program, you can create a set of schema, table, column,
+etc. objects that represent your data model. Alzabo is also capable of
+reverse engineering an existing data model.
+
+Its second function is as a RDBMS to object mapping system. Once you
+have created a schema, you can use the Alzabo::Runtime::Table and
+Alzabo::Runtime::Row classes to access its data. These classes offer a
+high level interface to common operations such as SQL SELECT, INSERT,
+DELETE, and UPDATE commands.
+
+To take it a step further, you could then aggregate a set of rows from
+different tables into a larger container object which could understand
+the logical relationship between these tables.  The
+Alzabo::MethodMaker module can be very helpful in this regard.
+
+For more information please see the Alzabo docs (start with perldoc
+Alzabo) or the Alzabo homepage at http://www.alzabo.org/.  The full
+documentation in HTML form is available at
+http://www.alzabo.org/docs/.
+
+Install information is in the INSTALL file.
+
+REQUIREMENTS
+
+Alzabo passes all its test with Perl 5.6.1+.  5.6.0 is known to be
+buggy and not recommended.
+
+Alzabo currently supports MySQL (3.23.x or 4.0.x release is
+recommended) and Postgres (7.2.x or newer is recommended).
+
+Alzabo also requires a number of modules, and will prompt you to
+install them if necessary.  Of course, if you install Alzabo via the
+CPAN or CPANPLUS shells this will be handled for you.
+
+SUPPORT
+
+The Alzabo docs are conveniently located online at
+http://www.alzabo.org/docs/.
+
+There is also a mailing list.  You can sign up at
+http://lists.sourceforge.net/lists/listinfo/alzabo-general.
+
+Please don't email me directly.  Use the list instead so others can
+see your questions.
+
+REPORTING BUGS
+
+If you are getting some sort of error message, please set the
+environment variable ALZABO_DEBUG to TRACE and then send the now very
+verbose error message to the mailing list.
+
+If you are experiencing test failures, please run the tests like this:
+
+        ./Build test verbose=1
+
+and send the output along with the bug report.  Otherwise I'll just
+ask you to do this before I can do anything.
+
+UPGRADING
+
+As of version 0.65, Alzabo automatically upgrades older schemas as it
+loads them.  This works for schemas made by versions going back to
+version 0.55.
+
+BUGS
+
+- Forking apps and Postgres
+
+In testing, I found that there were some problems using Postgres in a
+situation where you start the app, connect to the database, get some
+data, fork, reconnect, and and then get more data.  I suspect that
+this has more to do with the DBD::Pg driver and/or Postgres itself
+than Alzabo.  I don't believe this would be a problem with an app
+which forks before ever connecting to the database (such as mod_perl).
+I have structured the test suite to avoid this problem in testing but
+forewarned is forearmed (or something like that).
+
+- make_html_docs.pl and Pod::Html
+
+There are links in some of the POD that Pod::Html fails to resolve.
+This causes warnings when running make_html_docs.pl.  However, the
+generated HTML files are processed to correct these problems so you
+can just ignore them.
+
+CREDITS
+
+Ilya Martynov deserves special thanks for providing a _lot_ of patches
+as well as many useful suggestions on new features, bug fixing, etc.
+
+Ken Williams contributed a number of patches, many of which focused on
+improving Postgres support.
+
+Bob Gustafson has provided extensive assistance in testing and
+debugging.
+
+Thanks very much to Randal Schwartz for spending time with me on IRC
+helping me find problems with the install process way back in the
+early releases.
+
+Some features in Alzabo have been borrowed or influenced by Class:DBI
+(Michael Schwern and Tony Bowden) and Tangram (Jean-Louis Leroy).
+
+Various bug reports and assistance from:
+
+Alexei Barantsev
+Robin Berjon
+Brad Bowman
+Terrence Brannon
+Remi Cohen-Scali
+Martin Ertl
+Daniel Gaspani
+Robert Goff
+Raul Nohea Goodness
+Michael Graham
+Eric Hillman
+Barry Hoggard
+Sam Horrocks
+Aaron Johnson
+Josh Jore
+Dan Martinez
+William McKee
+Dana Powers
+Jared Rhine
+Ron Savage
+Jeremy R. Semeiks

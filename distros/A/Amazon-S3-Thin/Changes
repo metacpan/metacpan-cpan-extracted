@@ -1,0 +1,56 @@
+Revision history for Perl extension Amazon-S3-Thin
+
+0.16 2015-05-08T04:51:36Z
+   - get_object() takes optinal headers
+
+0.15 2015-04-26T06:44:48Z
+   - add garu to contributors
+
+0.14 2015-04-25T19:36:32Z
+
+   - add delete_multiple_objects()
+
+0.13 2015-04-25T11:12:57Z
+
+   - documented on list_objects()
+
+0.11 2015-04-24T13:17:21Z
+   - refine document
+
+0.10 2015-04-24T13:04:42Z
+
+   - add head_object method
+   - refine document
+
+0.09 2015-03-02T13:11:39Z
+
+   - rename Signer.pm -> SignerV2.pm
+
+0.07 2015-03-01T15:49:47Z
+
+   - separate Signer class
+
+0.06 2015-03-01T08:37:56Z
+
+    - elminate Class::Accessor::Fast
+
+0.05 2015-02-28T16:53:23Z
+
+    - move developer test into xt dir to pass travis-ci
+
+0.04 2015-02-28T12:43:30Z
+
+    - refine document
+
+0.03 2015-02-28T10:44:08Z
+
+    - refine document
+
+0.02 2015-02-28T10:36:45Z
+
+    - refine document
+
+0.01 2015-02-28T08:47:14Z
+
+    - original version
+

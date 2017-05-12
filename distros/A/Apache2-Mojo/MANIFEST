@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Apache2/Mojo.pm
+t/00.load.t
+t/01.usage.t
+t/mojo.conf

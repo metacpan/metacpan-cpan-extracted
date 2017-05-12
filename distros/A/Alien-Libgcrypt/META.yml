@@ -1,0 +1,28 @@
+---
+abstract: 'Download, configure, build and install libgcrypt.'
+author:
+  - 'Salvador FandiÃ±o <sfandino@yahoo.com>'
+build_requires: {}
+configure_requires:
+  Alien::Base: '0.024'
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Libgcrypt
+provides:
+  Alien::Libgcrypt:
+    file: lib/Alien/Libgcrypt.pm
+    version: '0.02'
+requires:
+  File::ShareDir: '1.00'
+resources:
+  bugtracker: https://github.com/salva/p5-Alien-Libgcrypt/issues
+  homepage: https://github.com/salva/p5-Alien-Libgcrypt
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/salva/p5-Alien-Libgcrypt.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

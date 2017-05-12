@@ -1,0 +1,18 @@
+[% PROCESS header.html title="Recent notes for Pause ID " _ author rss='author' %]
+[% PROCESS login_form.html %]
+[% PROCESS form.html %]
+
+<h2>Recent notes for PAUSE ID [% link_author(author) %]
+<a href="[% root_uri_rel %]/~[% author %]/recent.rss"><img src="[% img_root %]/rss1.gif" alt="RSS 1.0" title="AnnoCPAN Notes for [% author %] (RSS feed) width="80" height="15""></a></h2>
+
+<p class="sisters">
+[ 
+[% link_author_search_cpan_org(author) %]
+| [% link_author_kobes(author) %]
+]
+</p>
+
+
+[% PROCESS note_table.html notes=notes %]
+
+[% PROCESS footer.html %]

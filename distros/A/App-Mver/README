@@ -1,0 +1,28 @@
+NAME
+    App::Mver - just print modules' $VERSION (and some other stuff)
+
+DESCRIPTION
+    For those, who are sick of
+
+        perl -MLong::Module::Name -le'print Long::Module::Name->VERSION'
+
+    The main purpose of this simple stupid tool is to save you some typing.
+
+    It will report you the following things (some of them require command
+    line arguments):
+
+    your installed version of the given module(s)
+    whether or not your current version is the last one available on CPAN
+    whether or not the module is included in Perl distribution
+    changes between installed and latest version
+
+SEE ALSO
+    mver
+
+AUTHOR
+    Alexey Surikov <ksuri@cpan.org>
+
+LICENSE
+    This program is free software, you can redistribute it under the same
+    terms as Perl itself.
+

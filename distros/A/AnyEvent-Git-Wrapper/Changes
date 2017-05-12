@@ -1,0 +1,32 @@
+Revision history for AnyEvent-Git-Wrapper
+
+0.10      2017-03-23 06:27:22 -0400
+  - more resiliant in the face of white space
+
+0.09      2015-08-31 21:58:24 -0400
+  - bump minimum required Git::Wrapper to 0.045
+
+0.08      2015-08-31 09:26:44 -0400
+  - fix for Git::Wrapper 0.045 (changes to tests only)
+
+0.07      2014-10-08 11:25:36 -0400
+  - fix for Strawberry Perl 5.20
+
+0.06      2014-05-15 08:40:54 -0400
+  - MSWin32 compat (prereq Git::Wrapper still unreliable with MSWin32)
+  - fix deprecation wanrning with AnyEvent::Open3::Simple
+
+0.05      2013-10-13 05:48:15 -0400
+  - fix tests to properly skip when git is old
+
+0.04      2013-09-27 09:32:04 -0400
+  - first CPAN release
+
+0.03      2013-09-17 12:49:09 -0400
+  - fix Git::Wrapper prereq
+
+0.02      2013-09-17 12:46:57 -0400
+  - support for MSWin32
+
+0.01      2013-09-09 13:04:44 -0400
+  - initial version

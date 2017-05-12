@@ -1,0 +1,75 @@
+NAME
+    perldolicious - Mojolicious::Lite webapp that lets you search (with
+    regexp) and display CPAN modules documentation
+
+VERSION
+    Version 0.011.
+
+SYNOPSIS
+      perldolicious daemon
+      # now point your web browser to the address http://localhost:3000/
+
+      # or use a different port
+      perldolicious daemon -l http://localhost:8000
+
+      # or use the Mojolicious' builtin webserver morbo (assuming
+      # perldolicious is installed in /usr/local/bin)
+      morbo /usr/local/bin/perldolicious
+
+DESCRIPTION
+  FEATURES
+    *   Search CPAN modules with regular expressions.
+
+    *   Modules that you wish to see its documentation don't have to be
+        installed on your system. Since perldolicious uses Pod::Cpandoc
+        under the hood.
+
+    *   Pretty fast, since it stores the modules list cache in Storable
+        format.
+
+    *   Gradient-free, no-nonsense webpage. Although it'll cheerfully blink
+        when necessary (it's all about priorities).
+
+CONFIGURATIONS
+    You can configure the behavior of perldolicious by writing configuration
+    file, stored at ~/.perldolicious/config.json (written in JSON format).
+    Here are the recognized options:
+
+    *   modules_cache_file. Specify different location to store the modules
+        list cache file. Defaults to ~/.perldolicious/modules.storable.
+
+    *   auto_download. Delete "modules_cache_file" and generate a new one by
+        downloading the cpan package file 02packages.details.txt.gz if it's
+        older than the specified number (in days). Default is set to 14 (two
+        weeks).
+
+    *   quiet. Send the server log to the file ~/.perldolicious/server.log
+        instead of to "STDERR". Default: false.
+
+    Example:
+
+      $ cat ~/.perldolicious/config.json
+      {
+          "quiet": 1,
+          "auto_download": 5,
+          "modules_cache_file": "/Users/Syaltut/.modules"
+      }
+
+LIMITATIONS
+    *   No pagination - which means you shouldn't use patterns like ".*" if
+        you don't want your browser to eat up all of your computer's memory.
+
+SEE ALSO
+    *   Mojolicious
+
+    *   Pod::Cpandoc
+
+AUTHOR
+    Ahmad Syaltut <syaltut@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Ahmad Syaltut.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

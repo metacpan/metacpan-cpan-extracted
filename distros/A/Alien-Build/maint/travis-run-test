@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+./maint/travis-dzil clean
+./maint/travis-dzil build
+rm -f *.tar.gz
+
+cd Alien-Build-*
+
+./maint/travis-daemon
+
+perl Makefile.PL
+make
+make test TEST_VERBOSE=1

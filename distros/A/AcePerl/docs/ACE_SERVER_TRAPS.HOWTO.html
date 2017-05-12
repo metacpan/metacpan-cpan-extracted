@@ -1,0 +1,105 @@
+<html>
+<head>
+<title>Troubleshooting a new ACE Database</title>
+</head>
+<body>
+
+<i>NOTE: These notes were put together by Sarah Yurman, a programmer
+at Spatial Focus, while setting up her first ACEDB server.  She has
+contributed these notes in the hope that they will help other
+programmers to avoid the traps that she stumbled into.  Another
+important document to consult is <a
+href="SERVER_INSTALLATION.HOWTO">wrpc/SERVER.INSTALLATION</a>, part of
+the ACeDB source distribution.</i>
+
+<p><h1>Troubleshooting a new ACE Database</h1></title>
+<hr>
+<p><h2>Introduction<br>May 25, 1999</h2>
+This is a list of things great and small that we have discovered while implementing a new ACE database at <a href="http://www.spatialfocus.com/"><strong>Spatial Focus</strong></a>.  We are working with ACE in Linux, at the time of this writing we are using Redhat 5.2.</p>
+<p><h2>Caveat Emptor</h2>
+This document is a work in progress.  It is being written <strong>while</strong> we are solving problems.  Its primary purpose is to maintain a record for internal use at Spatial Focus.  Although we don't deliberately make mistakes, anything in this document could be wrong.  Mistakes will be corrected as they are found.  We are not responsible for any harm resulting from information we record here.</p>
+<p><h2>Merci!</h2>
+Many thanks to <a href="http://stein.cshl.org/"><strong>Lincoln Stein</strong></a> and all the folks at the Human Genome Project.</p>
+<p><h3>Contents</h3></p>
+<p><h4>Environment Description</h4></p>
+<p><h4>Installation</h4></p>
+<p><h5>ACEDB</h5>
+<ul>
+<li><h5>ACEDB and environment variables</h5></li>
+<li><h5>Permissions</h5></li>
+</ul></p>
+<p><h5>Gifaceserver</h5>
+<ul>
+<li><h5>inetd.conf</h5></li>
+<li><h5>server.log</h5></li>
+</ul></p>
+<p><h4>Models</h4></p>
+<p><h5>Editors</h5></p>
+<p><h5>White Space</h5></p>
+<p><h4>To Do</h4></p>
+<hr>
+<p><h3>Environment Description</h3></p>
+<p>These notes refer to the following environment:</p>
+<ul>
+<li>ACEDB: 4.7g, loaded from the Linux binary (bin.linux_libc6.4_7g.tar.Z)</li>
+<li>Perl 5.005_03</li>
+<li>CGI.pm 2.51</li>
+<li>AcePerl 1.54</li>
+<li>Gifaceserver loaded from gifaceserver.LINUX</li>
+<li>Apache 1.3<br>(This is just for local use, so upgrading hasn't been a priority)</li>
+<li>Netscape 4.51</li>
+<li>Linux (Redhat 5.2)</li>
+<li>bash shell</li>
+</ul>
+<p><h3>Installation:<br>ACEDB</h3></p>
+<p><h4>ACEDB and environment variables</h4></p>
+<p><h5>Problem</h5></p>
+<p>If nothing works, chances are the environment variables haven't been set.  The <em>acedb</em> and <em>textdb</em> scripts built by INSTALL wouldn't work due to the differences in shells. <em>acedb</em> sets environment variables called $ACEDB and $DBDIR, and appends your path, then starts the <em>xace</em> graphical interface to ACEDB.  <em>textdb</em> sets the environment variables and starts the <em>tace</em> text interface.</p> 
+<p><h5>Solution</h5></p>
+<p>I altered my .bash_profile with the following lines:</p>
+
+<p>ACEDB=[pathname to database]<br>
+DBDIR=[pathname to database]/database/<br>
+PATH=$PATH:[pathname to ace software directory]/bin<br>
+export ACEDB<br>
+export DBDIR<br>
+(PATH was already exported)</p>
+
+<p><h5>Testing the Solution</h5></p>
+<p>Use the <em>echo</em> command to make sure the environment variables are in place.  We put our "contacts" database  under /home/httpd because that directory is accessible to the web server.  This is a requirement of AceBrowser, which we want to use as the primary interface.</p>
+<p>A test of the $ACEDB environment variable looks like this:<br>
+<em>echo $ACEDB (return)</em></p>
+<p>It returns this:<br>
+<em>/home/httpd/database/contacts/</em></p>
+
+<p><h5>Consequences of the Solution</h5></p>
+<p>The <strong>NOTES</strong> file distributed with this version of ACEDB advises you to move the <em>acedb</em> and <em>textace</em> scripts to /usr/local/bin, and using them to start the program.  With your environment variables in place, you can simply use <em>xace</em> or <em>tace</em> instead.</p>
+
+<p><h4>Permissions</h4></p>
+<p>Take your permissions seriously.  Richard Durbin's Installation Guide is out of date, but gives good advice in this department.</p>
+
+<p><h3>Gifaceserver<br>Warning: this isn't yet working completely</h3></p>
+<p><h4>Problem</h4></p>
+<p>Most documentation dealing with this software simply tells you to get it going.  The software comes with no documentation whatsoever.  No README at all.  There is a manual that comes in /acedocs called aceserver.html.  Its installation instructions don't work on version 4.7g.</p>  
+<p><h4>Solution</h4></p>
+<p>The best installation information is in the <strong>README</strong> file for <em>AcePerl-1.54</em>.  A few more hints are listed here.</p>
+<p>The <em>AcePerl</em> <strong>README</strong> file implies creating a user called <em>acedb</em>.  This creates permissions problems that we haven't solved yet.  We are using individual user names instead.</p>
+<p>One thing that <strong>no</strong> documentation mentions is that we had to move <em>gifaceserver.LINUX</em> to <em>/usr/local/bin/gifaceserver</em>.  Obvious, but still makes you wonder while you do it.</p>
+<p><h4>Inetd.conf</h4></p>
+<p>Our individual <em>inetd.conf</em> files were completely commented out, and the daemon stopped because of our dispersed locations.  Append the required line to the file, and enter:</p>
+<p><em>Killall -HUP inetd</em></p>
+<p><h4>server.log</h4></p>
+<p>The server really wants a <em>server.log</em> file, writable by the user to whom the <em>gifaceserver</em> is assigned in the <em>inetd.conf</em> file.  We created one by opening the <em>gifaceserver</em> on a fake port number (12345):</p>
+<p><em> /usr/local/bin/gifaceserver /home/httpd/database/contacts 12345 1200:1200:10</em></p> 
+<p><h2>Models</h2></p>
+<p><h3>Documentation</h3></p>
+The <strong>best</strong> documentation for models is in <em>/acedocs/exploring/*.</em>  The table of contents is in <em>/acedocs/exploring/toc_models.html</em>.  Unfortunately, like all the ACEDB documentation, it uses absolute pathnames.  We have converted these pathnames to relative ones, and will make the document available for download on the Spatial Focus private web page.  Although the document is marked "draft" and dated 1994, it is thorough and simple.  Doesn't appear to be significantly out of date.</p>
+<p>The moviedb database is the best simple example of a database.</p>
+<p><h3>Editors</h3></p>
+<p>ACEDB is picky about its ascii.  <em>vi</em> works great.  Can't vouch for <em>emacs</em> ;-).  <strong>Don't</strong> use anything nasty like a word processor.</p>
+<p><h3>White Space</h3></p>
+<p>It really likes alignment, and it likes tabs.  Combining tabs and spaces kills otherwise perfectly good models every five seconds.</p>
+<p><h4>To Do</h4></p>
+Solve the mysteries of the failure of AceBrowser.  Every other means of access works now.</p>
+</body>
+</html>

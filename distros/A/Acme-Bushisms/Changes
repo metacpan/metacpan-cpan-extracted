@@ -1,0 +1,10 @@
+Revision history for Perl extension Acme::Bushisms.
+
+0.02  Sun Jul 20 
+	-Added default quote if slate is unreachable.
+	-Now using 'make dist', as per suggestions.
+
+0.01  Sun Jul 13 21:35:13 2003
+	- original version
+		
+

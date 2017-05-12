@@ -1,0 +1,37 @@
+---
+abstract: 'Query and install CPAN modules realtime from the fresh mirror'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-CPAN-Fresh
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  App::Cmd: '0.30'
+  CPAN::Inject: '0'
+  Filter::Util::Call: '0'
+  JSON: '2.0'
+  LWP: '0'
+  Time::Piece: '0'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/miyagawa/cpanf/issues
+  homepage: https://github.com/miyagawa/cpanf
+  repository: https://github.com/miyagawa/cpanf.git
+version: '0.12'

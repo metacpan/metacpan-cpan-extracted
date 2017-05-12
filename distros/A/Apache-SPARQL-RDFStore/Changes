@@ -1,0 +1,14 @@
+0.3	Wed Aug 17 19:46:04 CEST 2005 (Oslo, Norway)
+
+	- added 'application/sparql-results+xml' content-type for DAWG-XML
+	  results as latest spec v1.66 says http://www.w3.org/2001/sw/DataAccess/rf1/
+
+0.2	Wed Apr 13 17:50:24 CEST 2005 (Monte San Savino, Tuscany)
+
+	- first query() method implementation using RDFStore SPARQL
+	- support for smart RDF/S lightweight inferencing
+	- support for sparqlet_* CGI place-holders to queries
+
+0.1	Tue Mar  1 13:14:25 CET 2005 (Lunde, Norway)	
+
+	- initial release

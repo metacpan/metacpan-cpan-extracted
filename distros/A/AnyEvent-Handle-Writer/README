@@ -1,0 +1,111 @@
+NAME
+    AnyEvent::Handle::Writer - Extended version of AnyEvent::Handle with
+    additional write options
+
+SYNOPSIS
+       use AnyEvent;
+       use AnyEvent::Handle::Writer;
+
+       my $hdl; $hdl = AnyEvent::Handle::Writer->new(
+          fh => $fh,
+          on_error => sub {
+             my ($hdl, $fatal, $msg) = @_;
+             warn "got error $msg\n";
+             $hdl->destroy;
+          }
+       );
+
+       # Custom writer
+       $hdl->push_write(sub {
+          my $h = shift;
+          if ($have_data) {
+             $h->unshift_write($data);
+             return 1; # Work done
+          } else {
+             return 0; # Work not done, call me again
+          }
+       });
+
+       # sendfile
+       $hdl->push_sendfile('/path/to/file', 1024);
+
+RATIONALE
+    We have great l<AnyEvent::Handle>. But it have only raw write queue.
+    This module extends it with callbacks in write queue and adds a
+    "push_sendfile()" call, which would be processed at correct time
+
+METHODS
+  push_write($data)
+    "WRITE_QUEUE" in AnyEvent::Handle
+
+  push_write(type => @args)
+    "WRITE_QUEUE" in AnyEvent::Handle
+
+  push_write($cb->($handle))
+    This version of call allow to push a callback, which will be invoked
+    when the write queue before it became empty.
+
+       Callback should return:
+          true  - when there is no work to be done with this callback.
+                  it will be removed from queue and continue
+          false - when it want to be called again (i.e. not all work was done)
+                  it will be kept in queue and called on next drain
+
+    This call allow us to implement such a thing:
+
+       $handle->push_write("HTTP/1.1 200 OK\012\015\012\015");
+       $handle->push_write(sub {
+          # Manual work on handle
+          my $h = shift;
+          my $len = syswrite($h->{fh}, $data); # Here may be also sendfile work
+          if (defined $len) {
+             diag "written $len";
+             substr $data, 0, $len, "";
+             if (length $data) {
+                return 0; # want be called again
+             } else {
+                return 1; # all done
+             }
+          } elsif (!$!{EAGAIN} and !$!{EINTR} and !$!{WSAEWOULDBLOCK}) {
+             $h->_error ($!, 1);
+             return 1; # No more requests to me, got an error
+          }
+          else { return 0; }
+       });
+       $handle->push_write("HTTP/1.1 200 OK\012\015\012\015");
+       $handle->push_write("Common response");
+
+  unshift_write($data)
+=head2 unshift_write(type => @args)
+=head2 unshift_write($cb->($handle))
+    Analogically to "unshift_read", it unshift write data at the beginngin
+    of queue. The only recommended usage is from write callback
+
+       $handle->push_write("1")
+       $handle->push_write(sub {
+          my $h = shift;
+          $h->unshift_write("2");
+          return 1;
+       });
+       $handle->push_write("3");
+       
+   # The output will be "123"
+
+  push_sendfile($filename, [$size, [$offset]]);
+    Push sendfile operation into write queue. If sendfile cannot be found
+    (Sys::Sendfile) or if it fails with one of ENOSYS, ENOTSUP, EOPNOTSUPP,
+    EAFNOSUPPORT, EPROTOTYPE or ENOTSOCK, it will be emulated with chunked
+    read/write
+
+       $handle->push_write("HTTP/1.0 200 OK\nContent-length: $size\n...\n\n");
+       $handle->push_sendfile($file, $size, $offset);
+
+ACKNOWLEDGEMENTS
+AUTHOR
+    Mons Anderson, "<mons at cpan.org>"
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+

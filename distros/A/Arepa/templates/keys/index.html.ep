@@ -1,0 +1,16 @@
+<pre>
+<%= $output %>
+</pre>
+
+<h1>Import new uploader GPG keys</h1>
+<% if ($is_user_admin) { %>
+<form method="post" action="<%= url_for('generic', controller => 'keys', action => 'import') %>">
+  <textarea name="gpgkeys" cols="80" rows="20"></textarea>
+  <br/>
+  <input type="submit" value="Import" />
+</form>
+<% }
+   else { %>
+You don't have permissions to import keys yourself. Talk to an administrator
+to get you key imported.
+<% } %>

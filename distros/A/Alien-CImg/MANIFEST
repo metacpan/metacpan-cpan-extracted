@@ -1,0 +1,5 @@
+Build.PL
+lib/Alien/CImg.pm
+MANIFEST			This list of files
+META.json
+META.yml

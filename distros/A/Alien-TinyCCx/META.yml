@@ -1,0 +1,33 @@
+---
+abstract: 'Ensure the Tiny C Compiler with extended symbol table management is installed on your system'
+author:
+  - 'David Mertens <dcmertens.perl@gmail.com>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  File::ShareDir: '0'
+  Module::Build: '0'
+configure_requires:
+  File::ShareDir: '0'
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-TinyCCx
+no_index:
+  file:
+    - README.pod
+provides:
+  Alien::TinyCCx:
+    file: lib/Alien/TinyCCx.pm
+    version: '0.12'
+requires:
+  File::ShareDir: '0'
+resources:
+  bugtracker: http://github.com/run4flat/Alien-TinyCCx/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/run4flat/Alien-TinyCCx
+version: '0.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

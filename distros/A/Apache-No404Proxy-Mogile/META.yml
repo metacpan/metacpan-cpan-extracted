@@ -1,0 +1,18 @@
+---
+name: Apache-No404Proxy-Mogile
+version: 0.1
+author:
+  - 'Nick Gerakines <nick@gerakines.net>'
+abstract: Implementation of Apache::No404Proxy
+license: perl
+requires:
+  Apache::No404Proxy: 0
+  LWP::UserAgent: 0
+  MogileFS: 0
+build_requires:
+  Test::More: 0
+provides:
+  Apache::No404Proxy::Mogile:
+    file: lib/Apache/No404Proxy/Mogile.pm
+    version: 0.1
+generated_by: Module::Build version 0.2612

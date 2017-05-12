@@ -1,0 +1,11 @@
+CHANGES
+lib/App/Widget/JSApp.pm
+lib/App/Widget/JSApp/Date.pm
+lib/App/Widget/JSApp/DualSelectWidget.pm
+lib/App/Widget/JSApp/TabbedAppFrame.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/main.t
+TODO

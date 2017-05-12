@@ -1,0 +1,33 @@
+---
+abstract: 'show the Perl metrics'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Capture::Tiny: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-plmetrics
+provides:
+  App::plmetrics:
+    file: lib/App/plmetrics.pm
+    version: 0.06
+requires:
+  Docopt: 0
+  Module::Path: 0
+  Perl::Metrics::Lite: 0
+  Statistics::Swoop: 0
+  Text::ASCIITable: 0
+  perl: 5.008001
+  strict: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/App-plmetrics
+version: 0.06

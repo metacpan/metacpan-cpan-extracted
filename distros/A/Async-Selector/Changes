@@ -1,0 +1,55 @@
+Revision history for Async-Selector
+
+1.03    2013/02/21
+        Now watchers are free of cyclic refs even if they are included in
+        their watcher callback closures. This is because watcher callbacks
+        are now kept in Selector object along with the watchers.
+
+        Now that a watcher does not have the callback, call() method
+        is removed from Watcher. call() is public but undocumented, so
+        users should not be using it.
+
+        Change some private method names from camelCase to snake_case.
+        Documented methods are not changed.
+
+
+1.02    2013/02/11
+        Add Async::Selector::Aggregator module.
+        This module aggregates multiple watchers and treats them
+        as a single watcher. The aggregator can cancel all its watchers
+        at once.
+
+        Add Test::Memory::Cycle to build-requires. Cyclic references
+        are tested with it.
+
+        Async::Selector::Watcher now undefs its callback when cancel()ed.
+        This greatly reduces the risk of cyclic references and memory leak.
+        
+
+1.011   2012/12/24
+        Minor fixes in POD.
+
+
+1.01    2012/12/24
+        select(), select_lt(), select_et(), selections(), cancel() methods
+        are now deprecated (but can be used to maintain compatibility).
+        They are replaced by watch API now. See "COMPATIBILITY" for details.
+
+        Bug fix: a selection callback did not fire when triggered if its
+        condition input was undef. 
+
+
+0.02    2012/07/29
+        Modify the behavior of select() method with no resource selection.
+        Before: It accepts the (no) selection without warning.
+        After : It ignores (rejects) the selection without warning.
+
+        Because a selection without selected resource will never be
+        removed except that the user explicitly cancel() it, it easily
+        causes memory leak. To avoid this danger, selection with no resource
+        is explicitly rejected. In this case, select() returns undef.
+        
+
+0.01    2012/07/17
+        First version.
+

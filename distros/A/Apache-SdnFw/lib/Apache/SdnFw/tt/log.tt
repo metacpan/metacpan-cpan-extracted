@@ -1,0 +1,21 @@
+<div class="floatleft">
+<table>
+	<caption>[% s.object %]&nbsp;[% s.in.${s.o.id} %]&nbsp;log</caption>
+	<thead>
+	<tr>
+		<th>When</th>
+		<th>What</th>
+		<th>Who</th>
+	</tr>
+	</thead>
+	<tbody>
+[% FOREACH l IN list -%]
+	<tr>
+		<td>[% l.created_ts %]</td>
+		<td>[% l.log_msg %]</td>
+		<td>[% l.employee_name %]</td>
+	</tr>
+[% END -%]
+	</tbody>
+</table>
+</div>

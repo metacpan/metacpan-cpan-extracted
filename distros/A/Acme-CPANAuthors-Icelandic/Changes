@@ -1,0 +1,13 @@
+0.04  Thu Nov 11 20:09:34 GMT 2010
+    - Added cpan:BALDUR (Baldur Kristinsson)
+    - Moved author tests to xt/
+
+0.03  Tue Aug 17 22:30:24 GMT 2010
+    - Use Dist::Zilla
+    - Make all warnings fatal
+
+0.02 Sat Jul 11 23:51:38 EDT 2009
+    - Fix some Pod links
+
+0.01  Tue Feb 10 18:12:43 GMT 2009
+    - First CPAN release, listing 4 authors

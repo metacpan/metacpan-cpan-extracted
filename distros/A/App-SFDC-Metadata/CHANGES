@@ -1,0 +1,151 @@
+==================================================
+Changes from 2014-09-25 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.21 at 2015-09-25 10:21:05 +0000
+-----------------------------------------
+
+  Change: 04158ad57da24151ca98e09506dba3d6e3b9e3a6
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-09-15 16:50:58 +0000
+
+    SCAFCI-492 Improved xml format in test failure 
+
+  Change: 9f9eaf38347ff72129e635a284c3cd46e444f901
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-09-15 15:03:12 +0000
+
+    SCAFCI-492 Fix bug caused by $$_{message} being null, the xml format
+    is broken 
+
+  Change: 2907fc6e4b152de0f0d67ba50115ff1ad3c40ec7
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-09-11 14:01:37 +0000
+
+    Fix syntax errors so stackTrace is outputted in the test results. 
+
+  Change: 4b700b0df6feaa7e86b1babf7be023acb06d3ad3
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-09-11 10:56:02 +0000
+
+    Added stacktrace to testoutput in the case of a failure 
+
+  Change: fff90940ad3fb9cec5984e76d0520070e9d5e007
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-09-10 09:27:20 +0000
+
+    Merge branch 'master' of https://github.com/sophos/App-SFDC-Metadata
+    into UnitTestResults 
+
+  Change: b8a8cc92a867376c652bf915756948549c08aa56
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-09-09 11:02:44 +0000
+
+    Make testoutput xml file JUnit readable 
+
+  Change: 20bdf6cbb60c9b5ff3df96d5be998ee083349084
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-09-08 13:59:11 +0000
+
+    Improved XML readability 
+
+  Change: aa83086648f2fe00215ba779e11b9cd9790b6714
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-09-08 13:46:51 +0000
+
+    Corrected xml output code 
+
+  Change: c933bac4d878362783160f681d024a73221a2661
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-09-08 10:00:53 +0000
+
+    Fix JUnitOutput so correct and more readable xml is outputted 
+
+-----------------------------------------
+version 0.20 at 2015-09-09 15:39:43 +0000
+-----------------------------------------
+
+  Change: aa98f72292b6f2b6a821bafe575ce90e6d39383b
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-09-09 16:39:43 +0000
+
+    Changed variable scope so folder list was being passed through 
+
+  Change: 9eb5106117f2145080e63f52daa98d349a663173
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-09-04 15:32:57 +0000
+
+    Removed Test::Perl::Critic from dist.ini 
+
+  Change: 47e12003c313cac6523adda6fdc48d562a4bafa9
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-09-04 15:26:15 +0000
+
+    Fix runtests restriction and bug with outputting test results 
+
+  Change: 240b032ba0993c3215ca77d4672b24c8c9c54bb1
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-09-03 11:31:20 +0000
+
+    Added some documentation for sfdc deploy --help 
+
+  Change: 830f75e697490f57bdc2393ff990cf0275f47df5
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-09-02 16:25:05 +0000
+
+    Lowered restriction on writing tests to JUnitOutput 
+
+-----------------------------------------
+version 0.19 at 2015-07-30 14:30:27 +0000
+-----------------------------------------
+
+  Change: daa4b191501001447244269726f0ee9f3a3a819e
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-30 15:30:27 +0000
+
+    Tests shouldn't get written unless the _result_ says runTestsEnabled 
+
+-----------------------------------------
+version 0.18 at 2015-07-30 13:13:00 +0000
+-----------------------------------------
+
+  Change: c039d9c4c4cd588378f7c13edb8f0c0b9fc3dcac
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-30 14:13:00 +0000
+
+    Shouldn't clobber existing test results when we're not running tests 
+
+-----------------------------------------
+version 0.17 at 2015-07-22 14:44:11 +0000
+-----------------------------------------
+
+  Change: 476a9046520f8c33a99e88096f772b4e48302e2d
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-22 15:44:11 +0000
+
+    make Metadata an actual module 
+
+-----------------------------------------
+version 0.16 at 2015-07-22 10:58:15 +0000
+-----------------------------------------
+
+  Change: 5ed717eef2b983c5ee3549389fa67669ee2e8fc2
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-22 11:58:15 +0000
+
+    correct the namespace in the retrieve plugins 
+
+-----------------------------------------
+version 0.15 at 2015-07-22 10:22:32 +0000
+-----------------------------------------
+
+  Change: 94ae3b1a10a38cc0504ac5986af69c1650a3dfec
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-22 11:22:32 +0000
+
+    Initial commit - code moved from App::SFDC 
+
+================
+End of releases.
+================

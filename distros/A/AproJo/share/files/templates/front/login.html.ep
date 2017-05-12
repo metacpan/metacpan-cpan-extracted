@@ -1,0 +1,73 @@
+% layout 'default';
+% title 'AproJo - Accounts, Projects and Jobs';
+			
+<!-- MAIN -->											
+
+<div class="container">
+    <div class="lead">
+        <%= l 'The universal Time Tracking Tool by Fixpunkt' %>
+    </div>
+
+
+<!-- MIDDLE -->
+<div class="container">
+
+<!-- MENUE -->
+<div class="container">                                 
+    <div class="row">
+        <div class="span12 menu3">
+            <ul>
+                <li><a href="">Test</a>
+                </li>  
+            </ul>
+        </div>
+    </div>
+</div><!-- END MENUE -->
+
+<div class="login-group">
+    <div class="hero-image">
+        
+    </div>
+    <div class="container">                                 
+        <div class="row">
+            <div class="span12 hero-shadow">     
+            </div>
+        </div>
+    </div>
+	<div class="login-widget">			
+		<!-- VALIDATION GROUP -->		
+		<div>      
+	       <form id="login" class="form-horizontal login-box" action="/login" method="post">
+            <fieldset>
+            	<legend><%= l 'Login' %></legend>
+            	<div class="control-group">
+                    <label class="control-label-left"><%= l 'username' %></label>
+                    <div class="controls">
+                        <input name="username" maxlength="30" size="30" id="username" class="required" type="text">
+            	       </div>
+            	</div>
+            	<div class="control-group">
+                    <label class="control-label-left"><%= l 'password' %></label>
+                    <div class="controls">
+                		<input name="password" maxlength="30" size="30" id="password" class="required" type="password">
+                	</div>
+            	</div>  	
+            	<div class="control-group">
+            	    <div class="controls">
+                    	<div class="type-check">
+                    		<label class="checkbox"><input type="checkbox"> <%= l 'keep logged in' %></label>
+                    	</div>
+                    	<div class="float_right">
+                            <button type="submit" class="btn btn-primary"><%= l 'login' %> ▶</button>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+                     
+			</form>
+		</div><!-- END VALIDATION GROUP -->
+    </div><!-- END LOGIN WIDGET -->
+    </div><!-- END LOGIN GROUP -->
+</div><!-- END MIDDLE -->
+</div><!-- END MAIN -->
+

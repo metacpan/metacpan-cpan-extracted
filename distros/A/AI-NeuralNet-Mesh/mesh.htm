@@ -1,0 +1,1080 @@
+<HTML>
+<HEAD>
+<TITLE>AI::NeuralNet::Mesh - An optimized, accurate neural network Mesh.</TITLE>
+<LINK REV="made" HREF="mailto:">
+<STYLE>
+	BODY { font-family:Verdana; font-size:11; color:black; }
+	CODE { background: rgb(200,200,200); }
+	PRE	 { background:rgb(220,220,220); padding: 5; border:1px black solid; }
+	A:link    {font-family:Verdana, Arial, Helvetica, Helv; font-size:10px; text-decoration:underline; font-weight:normal; color:rgb(58,73,114);}
+	A:visited {font-family:Verdana, Arial, Helvetica, Helv; font-size:10px; text-decoration:normal; font-weight:normal; color:rgb(58,73,114);}
+	A:hover   {font-family:Verdana, Arial, Helvetica, Helv; font-size:10px; text-decoration:underline; font-weight:normal; color:rgb(200,50,0);}
+</STYLE>
+</HEAD>
+
+<BODY>
+
+<PRE>
+<B>AI::NeuralNet::Mesh</B> - An optimized, accurate neural network Mesh.
+</PRE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#version & updates">VERSION &amp; UPDATES</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#exports">EXPORTS</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#custom activation functions">CUSTOM ACTIVATION FUNCTIONS</A></LI>
+	<LI><A HREF="#variables">VARIABLES</A></LI>
+	<LI><A HREF="#custom network connectors">CUSTOM NETWORK CONNECTORS</A></LI>
+	<LI><A HREF="#what can it do">WHAT CAN IT DO?</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#other included packages">OTHER INCLUDED PACKAGES</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#thanks">THANKS</A></LI>
+	<LI><A HREF="#download">DOWNLOAD</A></LI>
+	<LI><A HREF="#mailing list">MAILING LIST</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>AI::NeuralNet::Mesh - An optimized, accurate neural network Mesh.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+
+        use AI::NeuralNet::Mesh;
+
+        # Create a mesh with 2 layers, 2 nodes/layer, and one output node.
+        my $net = new AI::NeuralNet::Mesh(2,2,1);
+
+        # Teach the network the AND function
+        $net-&gt;learn([0,0],[0]);
+        $net-&gt;learn([0,1],[0]);
+        $net-&gt;learn([1,0],[0]);
+        $net-&gt;learn([1,1],[1]);
+
+        # Present it with two test cases
+        my $result_bit_1 = $net-&gt;run([0,1])-&gt;[0];
+        my $result_bit_2 = $net-&gt;run([1,1])-&gt;[0];
+
+        # Display the results
+        print &quot;AND test with inputs (0,1): $result_bit_1\n&quot;;
+        print &quot;AND test with inputs (1,1): $result_bit_2\n&quot;;
+
+</PRE>
+<P>
+<HR>
+<H1><A NAME="version & updates">VERSION &amp; UPDATES</A></H1>
+<P>This is version <STRONG>0.43</STRONG>, the second release of this module.</P>
+<P>With this version I have gone through and tuned up many area
+of this module, including the descent algorithim in learn(),
+as well as four custom activation functions, and several export 
+tag sets. With this release, I have also included a few
+new and more practical example scripts. (See ex_wine.pl) This release 
+also includes a simple example of an ALN (Adaptive Logic Network) made
+with this module. See ex_aln.pl. Also in this release is support for 
+loading data sets from simple CSV-like files. See the <A HREF="#item_load_set"><CODE>load_set()</CODE></A> method 
+for details. This version also fixes a big bug that I never knew about 
+until writing some demos for this version - that is, when trying to use 
+more than one output node, the mesh would freeze in learning. But, that 
+is fixed now, and you can have as many outputs as you want (how does 3 
+inputs and 50 outputs sound? :-)</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>AI::NeuralNet::Mesh is an optimized, accurate neural network Mesh.
+It was designed with accruacy and speed in mind.</P>
+<P>This network model is very flexable. It will allow for clasic binary
+operation or any range of integer or floating-point inputs you care
+to provide. With this you can change activation types on a per node or
+per layer basis (you can even include your own anonymous subs as 
+activation types). You can add sigmoid transfer functions and control
+the threshold. You can learn data sets in batch, and load CSV data
+set files. You can do almost anything you need to with this module.
+This code is deigned to be flexable. Any new ideas for this module?
+See AUTHOR, below, for contact info.</P>
+<P>This module is designed to also be a customizable, extensable 
+neural network simulation toolkit. Through a combination of setting
+the $Connection variable and using custom activation functions, as
+well as basic package inheritance, you can simulate many different
+types of neural network structures with very little new code written
+by you.</P>
+<P>In this module I have included a more accurate form of ``learning'' for the
+mesh. This form preforms descent toward a local error minimum (0) on a 
+directional delta, rather than the desired value for that node. This allows
+for better, and more accurate results with larger datasets. This module also
+uses a simpler recursion technique which, suprisingly, is more accurate than
+the original technique that I've used in other ANNs.</P>
+<P>
+<HR>
+<H1><A NAME="exports">EXPORTS</A></H1>
+<P>This module exports three functions by default:</P>
+<PRE>
+        range
+        intr
+        pdiff
+</PRE>
+<P>See range() intr() and pdiff() for description of their respective functions.</P>
+<P>Also provided are several export tag sets for usage in the form of:</P>
+<PRE>
+        use AI::NeuralNet::Mesh ':tag';
+</PRE>
+<P>Tag sets are:</P>
+<PRE>
+        :default 
+            - These functions are always exported.
+                - Exports:
+                range()
+                intr()
+                pdiff()
+
+        :all
+                - Exports:
+                p()
+                high()
+                low()
+                range()
+                ramp()
+                and_gate()
+                or_gate()
+
+        :p
+                - Exports:
+                p()
+                high()
+                low()
+
+        :acts
+                - Exports:
+                ramp()
+                and_gate()
+                or_gate()
+</PRE>
+<P>See the respective methods/functions for information about
+each method/functions usage.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">AI::NeuralNet::Mesh-&gt;new();</A></STRONG><BR>
+<DD>
+There are four ways to construct a new network with new(). Each is detailed below.
+<P>P.S. Don't worry, the old <A HREF="#item_new"><CODE>new($layers, $nodes [, $outputs])</CODE></A> still works like always!</P>
+<P></P>
+<DT><STRONG>AI::NeuralNet::Mesh-&gt;new($layers, $nodes [, $outputs]);</STRONG><BR>
+<DD>
+Returns a newly created neural network from an <CODE>AI::NeuralNet::Mesh</CODE>
+object. The network will have <CODE>$layers</CODE> number of layers in it
+and it will have <CODE>$nodes</CODE> number of nodes per layer.
+<P>There is an optional parameter of $outputs, which specifies the number
+of output neurons to provide. If $outputs is not specified, $outputs
+defaults to equal $size.</P>
+<P></P>
+<DT><STRONG>AI::NeuralNet::Mesh-&gt;new($file);</STRONG><BR>
+<DD>
+This will automatically create a new network from the file <CODE>$file</CODE>. It will
+return undef if the file was of an incorrect format or non-existant. Otherwise,
+it will return a blessed refrence to a network completly restored from <CODE>$file</CODE>.
+<P></P>
+<DT><STRONG>AI::NeuralNet::Mesh-&gt;new(\@layer_sizes);</STRONG><BR>
+<DD>
+This constructor will make a network with the number of layers corresponding to the length
+in elements of the array ref passed. Each element in the array ref passed is expected
+to contain an integer specifying the number of nodes (neurons) in that layer. The first
+layer ($layer_sizes[0]) is to be the input layer, and the last layer in @layer_sizes is to be
+the output layer.
+<P>Example:</P>
+<PRE>
+        my $net = AI::NeuralNet::Mesh-&gt;new([2,3,1]);</PRE>
+<P>Creates a network with 2 input nodes, 3 hidden nodes, and 1 output node.</P>
+<P></P>
+<DT><STRONG>AI::NeuralNet::Mesh-&gt;new(\@array_of_hashes);</STRONG><BR>
+<DD>
+Another dandy constructor...this is my favorite. It allows you to tailor the number of layers,
+the size of the layers, the activation type (you can even add anonymous inline subs with this one),
+and even the threshold, all with one array ref-ed constructor.
+<P>Example:</P>
+<PRE>
+        my $net = AI::NeuralNet::Mesh-&gt;new([
+            {
+                    nodes        =&gt; 2,
+                    activation   =&gt; linear
+                },
+                {
+                    nodes        =&gt; 3,
+                    activation   =&gt; sub {
+                        my $sum  =  shift;
+                        return $sum + rand()*1;
+                    }
+                },
+                {
+                    nodes        =&gt; 1,
+                    activation   =&gt; sigmoid,
+                    threshold    =&gt; 0.75
+                }
+        ]);
+</PRE>
+<P>Interesting, eh? What you are basically passing is this:</P>
+<PRE>
+        my @info = ( 
+                { },
+                { },
+                { },
+                ...
+        );</PRE>
+<P>You are passing an array ref who's each element is a hash refrence. Each
+hash refrence, or more precisely, each element in the array refrence you are passing
+to the constructor, represents a layer in the network. Like the constructor above,
+the first element is the input layer, and the last is the output layer. The rest are
+hidden layers.</P>
+<P>Each hash refrence is expected to have AT LEAST the ``nodes'' key set to the number
+of nodes (neurons) in that layer. The other two keys are optional. If ``activation'' is left
+out, it defaults to ``linear''. If ``threshold'' is left out, it defaults to 0.50.</P>
+<P>The ``activation'' key can be one of four values:</P>
+<PRE>
+        linear                    ( simply use sum of inputs as output )
+        sigmoid    [ sigmoid_1 ]  ( only positive sigmoid )
+        sigmoid_2                 ( positive / 0 /negative sigmoid )
+        \&amp;code_ref;</PRE>
+<P>``sigmoid_1'' is an alias for ``sigmoid''.</P>
+<P>The code ref option allows you to have a custom activation function for that layer.
+The code ref is called with this syntax:</P>
+<PRE>
+        $output = &amp;$code_ref($sum_of_inputs, $self);
+</PRE>
+<P>The code ref is expected to return a value to be used as the output of the node.
+The code ref also has access to all the data of that node through the second argument,
+a blessed hash refrence to that node.</P>
+<P>See CUSTOM ACTIVATION FUNCTIONS for information on several included activation functions
+other than the ones listed above.</P>
+<P>Three of the activation syntaxes are shown in the first constructor above, the ``linear'',
+``sigmoid'' and code ref types.</P>
+<P>You can also set the activation and threshold values after network creation with the
+<A HREF="#item_activation"><CODE>activation()</CODE></A> and <A HREF="#item_threshold"><CODE>threshold()</CODE></A> methods.</P>
+<P></P>
+<P></P>
+<DT><STRONG><A NAME="item_learn">$net-&gt;learn($input_map_ref, $desired_result_ref [, options ]);</A></STRONG><BR>
+<DD>
+NOTE: <A HREF="#item_learn_set"><CODE>learn_set()</CODE></A> now has increment-degrading turned OFF by default. See note
+on the degrade flag, below.
+<P>This will 'teach' a network to associate an new input map with a desired 
+result. It will return a string containg benchmarking information.</P>
+<P>You can also specify strings as inputs and ouputs to learn, and they will be 
+crunched automatically. Example:</P>
+<PRE>
+        $net-&gt;learn('corn', 'cob');
+</PRE>
+<P>Note, the old method of calling crunch on the values still works just as well.</P>
+<P>The first two arguments may be array refs (or now, strings), and they may be 
+of different lengths.</P>
+<P>Options should be written on hash form. There are three options:
+</P>
+<PRE>
+         inc      =&gt;    $learning_gradient
+         max      =&gt;    $maximum_iterations
+         error    =&gt;    $maximum_allowable_percentage_of_error
+         degrade  =&gt;    $degrade_increment_flag</PRE>
+<P>$learning_gradient is an optional value used to adjust the weights of the internal
+connections. If $learning_gradient is ommitted, it defaults to 0.002.
+</P>
+<P>$maximum_iterations is the maximum numbers of iteration the loop should do.
+It defaults to 1024.  Set it to 0 if you never want the loop to quit before
+the pattern is perfectly learned.</P>
+<P>$maximum_allowable_percentage_of_error is the maximum allowable error to have. If 
+this is set, then <A HREF="#item_learn"><CODE>learn()</CODE></A> will return when the perecentage difference between the
+actual results and desired results falls below $maximum_allowable_percentage_of_error.
+If you do not include 'error', or $maximum_allowable_percentage_of_error is set to -1,
+then <A HREF="#item_learn"><CODE>learn()</CODE></A> will not return until it gets an exact match for the desired result OR it
+reaches $maximum_iterations.</P>
+<P>$degrade_increment_flag is a simple flag used to allow/dissalow increment degrading
+during learning based on a product of the error difference with several other factors.
+$degrade_increment_flag is off by default. Setting $degrade_increment_flag to a true
+value turns increment degrading on.</P>
+<P>In previous module releases $degrade_increment_flag was not used, as increment degrading
+was always on. In this release I have looked at several other network types as well
+as several texts and decided that it would be better to not use increment degrading. The
+option is still there for those that feel the inclination to use it. I have found some areas
+that do need the degrade flag to work at a faster speed. See test.pl for an example. If
+the degrade flag wasn't in test.pl, it would take a very long time to learn.</P>
+<P></P>
+<DT><STRONG><A NAME="item_learn_set">$net-&gt;learn_set(\@set, [ options ]);</A></STRONG><BR>
+<DD>
+This takes the same options as <A HREF="#item_learn"><CODE>learn()</CODE></A> (learn_set() uses <A HREF="#item_learn"><CODE>learn()</CODE></A> internally) 
+and allows you to specify a set to learn, rather than individual patterns. 
+A dataset is an array refrence with at least two elements in the array, 
+each element being another array refrence (or now, a scalar string). For 
+each pattern to learn, you must specify an input array ref, and an ouput 
+array ref as the next element. Example:
+
+<PRE>
+
+        my @set = (
+                # inputs        outputs
+                [ 1,2,3,4 ],  [ 1,3,5,6 ],
+                [ 0,2,5,6 ],  [ 0,2,1,2 ]
+        );</PRE>
+<P>Inputs and outputs in the dataset can also be strings.</P>
+<P>See the paragraph on measuring forgetfulness, below. There are 
+two learn_set()-specific option tags available:</P>
+<PRE>
+        flag     =&gt;  $flag
+        pattern  =&gt;  $row</PRE>
+<P>If ``flag'' is set to some TRUE value, as in ``flag =&gt; 1'' in the hash of options, or if the option ``flag''
+is not set, then it will return a percentage represting the amount of forgetfullness. Otherwise,
+<A HREF="#item_learn_set"><CODE>learn_set()</CODE></A> will return an integer specifying the amount of forgetfulness when all the patterns 
+are learned.</P>
+<P>If ``pattern'' is set, then <A HREF="#item_learn_set"><CODE>learn_set()</CODE></A> will use that pattern in the data set to measure forgetfulness by.
+If ``pattern'' is omitted, it defaults to the first pattern in the set. Example:</P>
+<PRE>
+        my @set = (
+                [ 0,1,0,1 ],  [ 0 ],
+                [ 0,0,1,0 ],  [ 1 ],
+                [ 1,1,0,1 ],  [ 2 ],  #  &lt;---
+                [ 0,1,1,0 ],  [ 3 ]
+        );
+</PRE>
+<P>If you wish to measure forgetfulness as indicated by the line with the arrow, then you would
+pass 2 as the &quot;pattern&quot; option, as in &quot;pattern =&gt; 2&quot;.</P>
+<P>Now why the heck would anyone want to measure forgetfulness, you ask? Maybe you wonder how I 
+even measure that. Well, it is not a vital value that you have to know. I just put in a 
+``forgetfulness measure'' one day because I thought it would be neat to know.</P>
+<P>How the module measures forgetfulness is this: First, it learns all the patterns 
+in the set provided, then it will run the very first pattern (or whatever pattern
+is specified by the ``row'' option) in the set after it has finished learning. It 
+will compare the <A HREF="#item_run"><CODE>run()</CODE></A> output with the desired output as specified in the dataset. 
+In a perfect world, the two should match exactly. What we measure is how much that 
+they don't match, thus the amount of forgetfulness the network has.</P>
+<P>Example (from examples/ex_dow.pl):</P>
+<PRE>
+        # Data from 1989 (as far as I know..this is taken from example data on BrainMaker)
+        my @data = ( 
+                #       Mo  CPI  CPI-1 CPI-3    Oil  Oil-1 Oil-3    Dow   Dow-1 Dow-3   Dow Ave (output)
+                [       1,      229, 220,  146,         20.0, 21.9, 19.5,       2645, 2652, 2597],      [       2647  ],
+                [       2,      235, 226,  155,         19.8, 20.0, 18.3,       2633, 2645, 2585],      [       2637  ],
+                [       3,      244, 235,  164,         19.6, 19.8, 18.1,       2627, 2633, 2579],      [       2630  ],
+                [       4,      261, 244,  181,         19.6, 19.6, 18.1,       2611, 2627, 2563],      [       2620  ],
+                [       5,      276, 261,  196,         19.5, 19.6, 18.0,       2630, 2611, 2582],      [       2638  ],
+                [       6,      287, 276,  207,         19.5, 19.5, 18.0,       2637, 2630, 2589],      [       2635  ],
+                [       7,      296, 287,  212,         19.3, 19.5, 17.8,       2640, 2637, 2592],      [       2641  ]                 
+        );
+
+        # Learn the set
+        my $f = $net-&gt;learn_set(\@data, 
+                                          inc   =&gt;      0.1,    
+                                          max   =&gt;      500,
+                                         );
+
+        # Print it 
+        print &quot;Forgetfullness: $f%&quot;;</PRE>
+<P></P>
+<P>This is a snippet from the example script examples/finance.pl, which demonstrates DOW average
+prediction for the next month. A more simple set defenition would be as such:</P>
+<PRE>
+        my @data = (
+                [ 0,1 ], [ 1 ],
+                [ 1,0 ], [ 0 ]
+        );
+
+        $net-&gt;learn_set(\@data);</PRE>
+<P>Same effect as above, but not the same data (obviously).</P>
+<P></P>
+<DT><STRONG><A NAME="item_run">$net-&gt;run($input_map_ref);</A></STRONG><BR>
+<DD>
+This method will apply the given array ref at the input layer of the neural network, and
+it will return an array ref to the output of the network. <A HREF="#item_run"><CODE>run()</CODE></A> will now automatically <A HREF="#item_crunch"><CODE>crunch()</CODE></A> 
+a string given as an input (See the <A HREF="#item_crunch"><CODE>crunch()</CODE></A> method for info on crunching).
+<P>Example Usage:
+</P>
+<PRE>
+        my $inputs  = [ 1,1,0,1 ];
+        my $outputs = $net-&gt;run($inputs);</PRE>
+<P>You can also do this with a string:
+</P>
+<PRE>
+        my $outputs = $net-&gt;run('cloudy - wind is 5 MPH NW');</PRE>
+<P>See also <A HREF="#item_run_uc"><CODE>run_uc()</CODE></A> and <A HREF="#item_run_set"><CODE>run_set()</CODE></A> below.</P>
+<P></P>
+<DT><STRONG><A NAME="item_run_uc">$net-&gt;run_uc($input_map_ref);</A></STRONG><BR>
+<DD>
+This method does the same thing as this code:
+
+<PRE>
+        $net-&gt;uncrunch($net-&gt;run($input_map_ref));</PRE>
+<P>All that <A HREF="#item_run_uc"><CODE>run_uc()</CODE></A> does is that it automatically calls <A HREF="#item_uncrunch"><CODE>uncrunch()</CODE></A> on the output, regardless
+of whether the input was <A HREF="#item_crunch"><CODE>crunch()</CODE></A> -ed or not.</P>
+<P></P>
+<DT><STRONG><A NAME="item_run_set">$net-&gt;run_set($set);</A></STRONG><BR>
+<DD>
+<P>This takes an array ref of the same structure as the learn_set() method, above. It returns
+an array ref. Each element in the returned array ref represents the output for the corresponding
+element in the dataset passed. Uses run() internally.</P>
+<DT><STRONG><A NAME="item_get_outs">$net-&gt;get_outs($set);</A></STRONG><BR>
+<DD>
+Simple utility function which takes an array ref of the same structure as the <A HREF="#item_learn_set"><CODE>learn_set()</CODE></A> method,
+above. It returns an array ref of the same type as <A HREF="#item_run_set"><CODE>run_set()</CODE></A> wherein each element contains an
+output value. The output values are the target values specified in the $set passed. Each element
+in the returned array ref represents the output value for the corrseponding row in the dataset
+passed. (A row is two elements of the dataset together, see <A HREF="#item_learn_set"><CODE>learn_set()</CODE></A> for dataset structure.)
+<P></P>
+<DT><STRONG><A NAME="item_load_set">$net-&gt;load_set($file,$column,$seperator);</A></STRONG><BR>
+<DD>
+Loads a CSV-like dataset from disk
+<P>Returns a data set of the same structure as required by the
+<A HREF="#item_learn_set"><CODE>learn_set()</CODE></A> method. $file is the disk file to load set from.
+$column an optional variable specifying the column in the 
+data set to use as the class attribute. $class defaults to 0.
+$seperator is an optional variable specifying the seperator
+character between values. $seperator defaults to ',' (a single comma). 
+NOTE: This does not handle quoted fields, or any other record
+seperator other than ``\n''.</P>
+<P>The returned array ref is suitable for passing directly to
+<A HREF="#item_learn_set"><CODE>learn_set()</CODE></A> or get_outs().</P>
+<P></P>
+<DT><STRONG><A NAME="item_range">$net-&gt;range();</A></STRONG><BR>
+<DD>
+See CUSTOM ACTIVATION FUNCTIONS for information on several included activation functions.
+<P></P>
+<DT><STRONG><A NAME="item_benchmark">$net-&gt;benchmark();</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_benchmarked">$net-&gt;benchmarked();</A></STRONG><BR>
+<DD>
+This returns a benchmark info string for the last <A HREF="#item_learn"><CODE>learn()</CODE></A> call.
+It is easily printed as a string, as following:
+<PRE>
+        print &quot;Last learn() took &quot;,$net-&gt;benchmark(),&quot;\n&quot;;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_verbose">$net-&gt;verbose($level);</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_verbosity">$net-&gt;verbosity($level);</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_v">$net-&gt;v($level);</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_debug">$net-&gt;debug($level)</A></STRONG><BR>
+<DD>
+Note: verbose(), verbosity(), and <A HREF="#item_v"><CODE>v()</CODE></A> are all functional aliases for debug().
+<P>Toggles debugging off if called with $level = 0 or no arguments. There are several levels
+of debugging.</P>
+<P>NOTE: Debugging verbosity has been toned down somewhat from AI::NeuralNet::BackProp,
+but level 4 still prints the same amount of information as you were used to. The other
+levels, however, are mostly for  advanced use. Not much explanation in the other
+levels, but they are included for those of you that feel daring (or just plain bored.)</P>
+<P>Level 0 ($level = 0) : Default, no debugging information printed. All printing is 
+left to calling script.</P>
+<P>Level 1 ($level = 1) : Displays the activity between nodes, prints what values were
+received and what they were weighted to.</P>
+<P>Level 2 ($level = 2) : Just prints info from the <A HREF="#item_learn"><CODE>learn()</CODE></A> loop, in the form of ``got: X, wanted Y''
+type of information. This is about the third most useful debugging level, after level 12 and
+level 4.</P>
+<P>Level 3 ($level = 3) : I don't think I included any level 3 debugs in this version.</P>
+<P>Level 4 ($level = 4) : This level is the one I use most. It is only used during learning. It
+displays the current error (difference between actual outputs and the target outputs you
+asked for), as well as the current loop number and the benchmark time for the last learn cycle.
+Also printed are the actual outputs and the target outputs below the benchmark times.</P>
+<P>Level 12 ($level = 12) : Level 12 prints a dot (period) [.] after each learning loop is
+complete. This is useful for letting the user know that stuff is happening, but without
+having to display any of the internal variables. I use this in the ex_aln.pl demo,
+as well as the ex_agents.pl demo.</P>
+<P>Toggles debuging off when called with no arguments.</P>
+<P></P>
+<DT><STRONG><A NAME="item_save">$net-&gt;save($filename);</A></STRONG><BR>
+<DD>
+This will save the complete state of the network to disk, including all weights and any
+words crunched with <A HREF="#item_crunch"><CODE>crunch()</CODE></A> . Also saves the layer size and activations of the network.
+<P>NOTE: The only activation type NOT saved is the CODE ref type, which must be set again
+after loading.</P>
+<P>This uses a simple flat-file text storage format, and therefore the network files should
+be fairly portable.</P>
+<P>This method will return undef if there was a problem with writing the file. If there is an
+error, it will set the internal error message, which you can retrive with the <A HREF="#item_error"><CODE>error()</CODE></A> method,
+below.</P>
+<P>If there were no errors, it will return a refrence to $net.</P>
+<P></P>
+<DT><STRONG><A NAME="item_load">$net-&gt;load($filename);</A></STRONG><BR>
+<DD>
+This will load from disk any network saved by <A HREF="#item_save"><CODE>save()</CODE></A> and completly restore the internal
+state at the point it was <A HREF="#item_save"><CODE>save()</CODE></A> was called at.
+<P>If the file is of an invalid file type, then <A HREF="#item_load"><CODE>load()</CODE></A> will
+return undef. Use the <A HREF="#item_error"><CODE>error()</CODE></A> method, below, to print the error message.</P>
+<P>If there were no errors, it will return a refrence to $net.</P>
+<P>UPDATE: $filename can now be a newline-seperated set of mesh data. This enables you
+to do $net-&gt;load(join(``\n'',&lt;DATA&gt;)) and other fun things. I added this mainly
+for a demo I'm writing but not qutie done with yet. So, Cheers!</P>
+<P></P>
+<DT><STRONG><A NAME="item_activation">$net-&gt;activation($layer,$type);</A></STRONG><BR>
+<DD>
+This sets the activation type for layer <CODE>$layer</CODE>.
+<P><CODE>$type</CODE> can be one of four values:</P>
+<PRE>
+        linear                    ( simply use sum of inputs as output )
+        sigmoid    [ sigmoid_1 ]  ( only positive sigmoid )
+        sigmoid_2                 ( positive / 0 /negative sigmoid )
+        \&amp;code_ref;</PRE>
+<P>``sigmoid_1'' is an alias for ``sigmoid''.</P>
+<P>The code ref option allows you to have a custom activation function for that layer.
+The code ref is called with this syntax:</P>
+<PRE>
+        $output = &amp;$code_ref($sum_of_inputs, $self);
+</PRE>
+<P>The code ref is expected to return a value to be used as the output of the node.
+The code ref also has access to all the data of that node through the second argument,
+a blessed hash refrence to that node.</P>
+<P>See CUSTOM ACTIVATION FUNCTIONS for information on several included activation functions
+other than the ones listed above.</P>
+<P>The activation type for each layer is preserved across load/save calls.</P>
+<P>EXCEPTION: Due to the constraints of Perl, I cannot load/save the actual subs that the code
+ref option points to. Therefore, you must re-apply any code ref activation types after a 
+<A HREF="#item_load"><CODE>load()</CODE></A> call.</P>
+<P></P>
+<DT><STRONG><A NAME="item_node_activation">$net-&gt;node_activation($layer,$node,$type);</A></STRONG><BR>
+<DD>
+This sets the activation function for a specific node in a layer. The same notes apply
+here as to the <A HREF="#item_activation"><CODE>activation()</CODE></A> method above.
+<P></P>
+<DT><STRONG><A NAME="item_threshold">$net-&gt;threshold($layer,$value);</A></STRONG><BR>
+<DD>
+This sets the activation threshold for a specific layer. The threshold only is used
+when activation is set to ``sigmoid'', ``sigmoid_1'', or ``sigmoid_2''.
+<P></P>
+<DT><STRONG><A NAME="item_node_threshold">$net-&gt;node_threshold($layer,$node,$value);</A></STRONG><BR>
+<DD>
+This sets the activation threshold for a specific node in a layer. The threshold only is used
+when activation is set to ``sigmoid'', ``sigmoid_1'', or ``sigmoid_2''.
+<P></P>
+<DT><STRONG><A NAME="item_join_cols">$net-&gt;join_cols($array_ref,$row_length_in_elements,$high_state_character,$low_state_character);</A></STRONG><BR>
+<DD>
+This is more of a utility function than any real necessary function of the package.
+Instead of joining all the elements of the array together in one long string, like <CODE>join()</CODE> ,
+it prints the elements of $array_ref to STDIO, adding a newline (\n) after every $row_length_in_elements
+number of elements has passed. Additionally, if you include a $high_state_character and a $low_state_character,
+it will print the $high_state_character (can be more than one character) for every element that
+has a true value, and the $low_state_character for every element that has a false value. 
+If you do not supply a $high_state_character, or the $high_state_character is a null or empty or 
+undefined string, it <A HREF="#item_join_cols"><CODE>join_cols()</CODE></A> will just print the numerical value of each element seperated
+by a null character (\0). <A HREF="#item_join_cols"><CODE>join_cols()</CODE></A> defaults to the latter behaviour.
+<P></P>
+<DT><STRONG><A NAME="item_extend">$net-&gt;extend(\@array_of_hashes);</A></STRONG><BR>
+<DD>
+This allows you to re-apply any activations and thresholds with the same array ref which
+you created a network with. This is useful for re-applying code ref activations after a <A HREF="#item_load"><CODE>load()</CODE></A>
+call without having to type the code ref twice.
+<P>You can also specify the extension in a simple array ref like this:</P>
+<PRE>
+        $net-&gt;extend([2,3,1]);
+</PRE>
+<P>Which will simply add more nodes if needed to set the number of nodes in each layer to their 
+respective elements. This works just like the respective new() constructor, above.</P>
+<P>NOTE: Your net will probably require re-training after adding nodes.</P>
+<P></P>
+<DT><STRONG><A NAME="item_extend_layer">$net-&gt;extend_layer($layer,\%hash);</A></STRONG><BR>
+<DD>
+With this you can modify only one layer with its specifications in a hash refrence. This hash
+refrence uses the same keys as for the last <A HREF="#item_new"><CODE>new()</CODE></A> constructor form, above.
+<P>You can also specify just the number of nodes for the layer in this form:</P>
+<PRE>
+        $net-&gt;extend_layer(0,5);</PRE>
+<P>Which will set the number of nodes in layer 0 to 5 nodes. This is the same as calling:
+</P>
+<PRE>
+        $net-&gt;add_nodes(0,5);</PRE>
+<P>Which does the exact same thing. See <A HREF="#item_add_nodes"><CODE>add_nodes()</CODE></A> below.</P>
+<P>NOTE: Your net will probably require re-training after adding nodes.</P>
+<P></P>
+<DT><STRONG><A NAME="item_add_nodes">$net-&gt;add_nodes($layer,$total_nodes);</A></STRONG><BR>
+<DD>
+This method was created mainly to service the extend*() group of functions, but it 
+can also be called independently. This will add nodes as needed to layer <CODE>$layer</CODE> to 
+make the nodes in layer equal to $total_nodes.
+<P>NOTE: Your net will probably require re-training after adding nodes.</P>
+<P></P>
+<DT><STRONG><A NAME="item_p">$net-&gt;p($a,$b);</A></STRONG><BR>
+<DD>
+Returns a floating point number which represents $a as a percentage of $b.
+<P></P>
+<DT><STRONG><A NAME="item_intr">$net-&gt;intr($float);</A></STRONG><BR>
+<DD>
+Rounds a floating-point number rounded to an integer using <CODE>sprintf()</CODE> and <CODE>int()</CODE> , Provides
+better rounding than just calling <CODE>int()</CODE> on the float. Also used very heavily internally.
+<P></P>
+<DT><STRONG><A NAME="item_high">$net-&gt;high($array_ref);</A></STRONG><BR>
+<DD>
+Returns the index of the element in array REF passed with the highest comparative value.
+<P></P>
+<DT><STRONG><A NAME="item_low">$net-&gt;low($array_ref);</A></STRONG><BR>
+<DD>
+Returns the index of the element in array REF passed with the lowest comparative value.
+<P></P>
+<DT><STRONG><A NAME="item_pdiff">$net-&gt;pdiff($array_ref_A, $array_ref_B);</A></STRONG><BR>
+<DD>
+This function is used VERY heavily internally to calculate the difference in percent
+between elements of the two array refs passed. It returns a %.20f (sprintf-format) 
+percent sting.
+<P></P>
+<DT><STRONG><A NAME="item_show">$net-&gt;show();</A></STRONG><BR>
+<DD>
+This will dump a simple listing of all the weights of all the connections of every neuron
+in the network to STDIO.
+<P></P>
+<DT><STRONG><A NAME="item_crunch">$net-&gt;crunch($string);</A></STRONG><BR>
+<DD>
+This splits a string passed with /[\s\t]/ into an array ref containing unique indexes
+to the words. The words are stored in an intenal array and preserved across <A HREF="#item_load"><CODE>load()</CODE></A> and <A HREF="#item_save"><CODE>save()</CODE></A>
+calls. This is designed to be used to generate unique maps sutible for passing to <A HREF="#item_learn"><CODE>learn()</CODE></A> and 
+<A HREF="#item_run"><CODE>run()</CODE></A> directly. It returns an array ref.
+<P>The words are not duplicated internally. For example:</P>
+<PRE>
+        $net-&gt;crunch(&quot;How are you?&quot;);</PRE>
+<P>Will probably return an array ref containing 1,2,3. A subsequent call of:</P>
+<PRE>
+    $net-&gt;crunch(&quot;How is Jane?&quot;);</PRE>
+<P>Will probably return an array ref containing 1,4,5. Notice, the first element stayed
+the same. That is because it already stored the word ``How''. So, each word is stored
+only once internally and the returned array ref reflects that.</P>
+<P></P>
+<DT><STRONG><A NAME="item_uncrunch">$net-&gt;uncrunch($array_ref);</A></STRONG><BR>
+<DD>
+Uncrunches a map (array ref) into an scalar string of words seperated by ' ' and returns the 
+string. This is ment to be used as a counterpart to the <A HREF="#item_crunch"><CODE>crunch()</CODE></A> method, above, possibly to 
+<A HREF="#item_uncrunch"><CODE>uncrunch()</CODE></A> the output of a <A HREF="#item_run"><CODE>run()</CODE></A> call. Consider the below code (also in ./examples/ex1.pl):
+
+<PRE>
+        use AI::NeuralNet::Mesh;
+        my $net = AI::NeuralNet::Mesh-&gt;new(2,3);
+
+        for (0..3) {
+                $net-&gt;learn_set([
+                        $net-&gt;crunch(&quot;I love chips.&quot;),  $net-&gt;crunch(&quot;That's Junk Food!&quot;)),
+                        $net-&gt;crunch(&quot;I love apples.&quot;), $net-&gt;crunch(&quot;Good, Healthy Food.&quot;)),
+                        $net-&gt;crunch(&quot;I love pop.&quot;),    $net-&gt;crunch(&quot;That's Junk Food!&quot;)),
+                        $net-&gt;crunch(&quot;I love oranges.&quot;),$net-&gt;crunch(&quot;Good, Healthy Food.&quot;))
+                ]);
+        }
+
+        print $net-&gt;run_uc(&quot;I love corn.&quot;)),&quot;\n&quot;;</PRE>
+<P>On my system, this responds with, ``Good, Healthy Food.'' If you try to run <A HREF="#item_crunch"><CODE>crunch()</CODE></A> with
+``I love pop.'', though, you will probably get ``Food! apples. apples.'' (At least it returns
+that on my system.) As you can see, the associations are not yet perfect, but it can make
+for some interesting demos!</P>
+<P></P>
+<DT><STRONG><A NAME="item_crunched">$net-&gt;crunched($word);</A></STRONG><BR>
+<DD>
+This will return undef if the word is not in the internal crunch list, or it will return the
+index of the word if it exists in the crunch list.
+<P>If the word is not in the list, it will set the internal error value with a text message
+that you can retrive with the <A HREF="#item_error"><CODE>error()</CODE></A> method, below.</P>
+<P></P>
+<DT><STRONG><A NAME="item_word">$net-&gt;word($word);</A></STRONG><BR>
+<DD>
+A function alias for crunched().
+<P></P>
+<DT><STRONG><A NAME="item_col_width">$net-&gt;col_width($width);</A></STRONG><BR>
+<DD>
+This is useful for formating the debugging output of Level 4 if you are learning simple 
+bitmaps. This will set the debugger to automatically insert a line break after that many
+elements in the map output when dumping the currently run map during a learn loop.
+<P>It will return the current width when called with a 0 or undef value.</P>
+<P>The column width is preserved across <A HREF="#item_load"><CODE>load()</CODE></A> and <A HREF="#item_save"><CODE>save()</CODE></A> calls.</P>
+<P></P>
+<DT><STRONG><A NAME="item_random">$net-&gt;random($rand);</A></STRONG><BR>
+<DD>
+This will set the randomness factor from the network. Default is 0. When called 
+with no arguments, or an undef value, it will return current randomness value. When
+called with a 0 value, it will disable randomness in the network. The randomness factor
+is preserved across <A HREF="#item_load"><CODE>load()</CODE></A> and <A HREF="#item_save"><CODE>save()</CODE></A> calls.
+<P></P>
+<DT><STRONG><A NAME="item_const">$net-&gt;const($const);</A></STRONG><BR>
+<DD>
+This sets the run const. for the network. The run const. is a value that is added
+to every input line when a set of inputs are <A HREF="#item_run"><CODE>run()</CODE></A> or <A HREF="#item_learn"><CODE>learn()</CODE></A> -ed, to prevent the
+network from hanging on a 0 value. When called with no arguments, it returns the current
+const. value. It defaults to 0.0001 on a newly-created network. The run const. value
+is preserved across <A HREF="#item_load"><CODE>load()</CODE></A> and <A HREF="#item_save"><CODE>save()</CODE></A> calls.
+<P></P>
+<DT><STRONG><A NAME="item_error">$net-&gt;error();</A></STRONG><BR>
+<DD>
+Returns the last error message which occured in the mesh, or undef if no errors have
+occured.
+<P></P>
+<DT><STRONG><A NAME="item_load_pcx">$net-&gt;load_pcx($filename);</A></STRONG><BR>
+<DD>
+NOTE: To use this function, you must have PCX::Loader installed. If you do not have
+PCX::Loader installed, it will return undef and store an error for you to retrive with 
+the <A HREF="#item_error"><CODE>error()</CODE></A> method, below.
+<P>This is a treat... this routine will load a PCX-format file (yah, I know ... ancient 
+format ... but it is the only one I could find specs for to write it in Perl. If 
+anyone can get specs for any other formats, or could write a loader for them, I 
+would be very grateful!) Anyways, a PCX-format file that is exactly 320x200 with 8 bits 
+per pixel, with pure Perl. It returns a blessed refrence to a PCX::Loader object, which 
+supports the following routinges/members. See example files ex_pcx.pl and ex_pcxl.pl in 
+the ./examples/ directory.</P>
+<P>See <CODE>perldoc PCX::Loader</CODE> for information on the methods of the object returned.</P>
+<P>You can download PCX::Loader from <A HREF="http://www.josiah.countystart.com/modules/get.pl?pcx-loader:mpod">http://www.josiah.countystart.com/modules/get.pl?pcx-loader:mpod</A></P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="custom activation functions">CUSTOM ACTIVATION FUNCTIONS</A></H1>
+<P>Included in this package are four custom activation functions meant to be used
+as a guide to create your own, as well as to be useful to you in normal use of the
+module. There is only one function exported by default into your namespace, which
+is the <A HREF="#item_range"><CODE>range()</CODE></A> functions. These are not meant to be used as methods, but as functions.
+These functions return code refs to a Perl closure which does the actual work when
+the time comes.</P>
+<DL>
+<DT><STRONG>range(0..X);</STRONG><BR>
+<DD>
+<DT><STRONG>range(@range);</STRONG><BR>
+<DD>
+<DT><STRONG>range(A,B,C);</STRONG><BR>
+<DD>
+<A HREF="#item_range"><CODE>range()</CODE></A> returns a closure limiting the output 
+of that node to a specified set of values.
+Good for use in output layers.
+<P>Usage example:
+	$net-&gt;activation(4,range(0..5));
+or (in the <A HREF="#item_new"><CODE>new()</CODE></A> hash constructor form):
+	..
+	{ 
+		nodes		=&gt;	1,
+		activation	=&gt;	range 5..2
+	}
+	..
+You can also pass an array containing the range
+values (not array ref), or you can pass a comma-
+seperated list of values as parameters:</P>
+<PRE>
+        $net-&gt;activation(4,range(@numbers));
+        $net-&gt;activation(4,range(6,15,26,106,28,3));</PRE>
+<P>Note: when using a <A HREF="#item_range"><CODE>range()</CODE></A> activatior, train the
+net TWICE on the data set, because the first time
+the <A HREF="#item_range"><CODE>range()</CODE></A> function searches for the top value in
+the inputs, and therefore, results could flucuate.
+The second learning cycle guarantees more accuracy.</P>
+<P>The actual code that implements the range closure is
+a bit convulted, so I will expand on it here as a simple
+tutorial for custom activation functions.</P>
+<PRE>
+        = line 1 =      sub {
+        = line 2 =              my @values = ( 6..10 );
+        = line 3 =              my $sum   = shift;
+        = line 4 =              my $self  = shift;
+        = line 5 =              $self-&gt;{top_value}=$sum if($sum&gt;$self-&gt;{top_value});
+        = line 6 =              my $index = intr($sum/$self-&gt;{top_value}*$#values);
+        = line 7 =              return $values[$index];
+        = line 8 =      }</PRE>
+<P>Now, the actual function fits in one line of code, but I expanded it a bit
+here. Line 1 creates our array of allowed output values. Lines two and
+three grab our parameters off the stack which allow us access to the
+internals of this node. Line 5 checks to see if the sum output of this
+node is higher than any previously encountered, and, if so, it sets
+the marker higher. This also shows that you can use the $self refrence
+to maintain information across activations. This technique is also used
+in the <A HREF="#item_ramp"><CODE>ramp()</CODE></A> activator. Line 6 computes the index into the allowed
+values array by first scaling the $sum to be between 0 and 1 and then
+expanding it to fit smoothly inside the number of elements in the array. Then
+we simply round to an integer and pluck that index from the array and
+use it as the output value for that node.</P>
+<P>See? It's not that hard! Using custom activation functions, you could do
+just about anything with the node that you want to, since you have
+access to the node just as if you were a blessed member of that node's object.</P>
+<P></P>
+<DT><STRONG><A NAME="item_ramp">ramp($r);</A></STRONG><BR>
+<DD>
+<A HREF="#item_ramp"><CODE>ramp()</CODE></A> preforms smooth ramp activation between 0 and 1 if $r is 1, 
+or between -1 and 1 if $r is 2. $r defaults to 1.
+<P>You can get this into your namespace with the ':acts' export 
+tag as so:
+</P>
+<PRE>
+        use AI::NeuralNet::Mesh ':acts';</PRE>
+<P>Note: when using a <A HREF="#item_ramp"><CODE>ramp()</CODE></A> activatior, train the
+net at least TWICE on the data set, because the first 
+time the <A HREF="#item_ramp"><CODE>ramp()</CODE></A> function searches for the top value in
+the inputs, and therefore, results could flucuate.
+The second learning cycle guarantees more accuracy.</P>
+<P>No code to show here, as it is almost exactly the same as range().</P>
+<P></P>
+<DT><STRONG><A NAME="item_and_gate">and_gate($threshold);</A></STRONG><BR>
+<DD>
+Self explanitory, pretty much. This turns the node into a basic AND gate.
+$threshold is used to decide if an input is true or false (1 or 0). If 
+an input is below $threshold, it is false. $threshold defaults to 0.5.
+<P>You can get this into your namespace with the ':acts' export 
+tag as so:
+</P>
+<PRE>
+        use AI::NeuralNet::Mesh ':acts';</PRE>
+<P>Let's look at the code real quick, as it shows how to get at the indivudal
+input connections:</P>
+<PRE>
+        = line 1 =      sub {
+        = line 2 =              my $sum  = shift;
+        = line 3 =              my $self = shift;
+        = line 4 =              my $threshold = 0.50;
+        = line 5 =              for my $x (0..$self-&gt;{_inputs_size}-1) { 
+        = line 6 =                      return 0.000001 if(!$self-&gt;{_inputs}-&gt;[$x]-&gt;{value}&lt;$threshold)
+        = line 7 =              }
+        = line 8 =              return $sum/$self-&gt;{_inputs_size};
+        = line 9 =      }</PRE>
+<P>Line 2 and 3 pulls in our sum and self refrence. Line 5 opens a loop to go over
+all the input lines into this node. Line 6 looks at each input line's value 
+and comparse it to the threshold. If the value of that line is below threshold, then
+we return 0.000001 to signify a 0 value. (We don't return a 0 value so that the network
+doen't get hung trying to multiply a 0 by a huge weight during training [it just will
+keep getting a 0 as the product, and it will never learn]). Line 8 returns the mean 
+value of all the inputs if all inputs were above threshold.</P>
+<P>Very simple, eh? :)
+</P>
+<P></P>
+<DT><STRONG><A NAME="item_or_gate">or_gate($threshold);</A></STRONG><BR>
+<DD>
+<P>Self explanitory. Turns the node into a basic OR gate, $threshold is used same as above.</P>
+<P>You can get this into your namespace with the ':acts' export 
+tag as so:
+</P>
+<PRE>
+        use AI::NeuralNet::Mesh ':acts';</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="variables">VARIABLES</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_%24AI%3A%3ANeuralNet%3A%3AMesh%3A%3AConnector">$AI::NeuralNet::Mesh::Connector</A></STRONG><BR>
+<DD>
+This is an option is step up from average use of this module. This variable 
+should hold the fully qualified name of the function used to make the actual connections
+between the nodes in the network. This contains '_c' by default, but if you use
+this variable, be sure to add the fully qualified name of the method. For example,
+in the ALN example, I use a connector in the main package called <CODE>tree()</CODE> instead of
+the default connector. Before I call the <A HREF="#item_new"><CODE>new()</CODE></A> constructor, I use this line of code:
+<PRE>
+        $AI::NeuralNet::Mesh::Connector = 'main::tree'
+</PRE>
+<P>The tree() function is called as a blessed method when it is used internally, providing
+access to the bless refrence in the first argument. See notes on CUSTOM NETWORK CONNECTORS,
+below, for more information on creating your own custom connector.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24AI%3A%3ANeuralNet%3A%3AMesh%3A%3ADEBUG">$AI::NeuralNet::Mesh::DEBUG</A></STRONG><BR>
+<DD>
+This variable controls the verbosity level. It will not hurt anything to set this 
+directly, yet most people find it easier to set it using the <A HREF="#item_debug"><CODE>debug()</CODE></A> method, or 
+any of its aliases.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="custom network connectors">CUSTOM NETWORK CONNECTORS</A></H1>
+<P>Creating custom network connectors is step up from average use of this module. 
+However, it can be very useful in creating other styles of neural networks, other
+than the default fully-connected feed-foward network.</P>
+<P>You create a custom connector by setting the variable $AI::NeuralNet::Mesh::Connector
+to the fully qualified name of the function used to make the actual connections
+between the nodes in the network. This variable contains '_c' by default, but if you use
+this variable, be sure to add the fully qualified name of the method. For example,
+in the ALN example, I use a connector in the main package called <CODE>tree()</CODE> instead of
+the default connector. Before I call the <A HREF="#item_new"><CODE>new()</CODE></A> constructor, I use this line of code:</P>
+<PRE>
+        $AI::NeuralNet::Mesh::Connector = 'main::tree'
+</PRE>
+<P>The tree() function is called as a blessed method when it is used internally, providing
+access to the bless refrence in the first argument.</P>
+<P>Example connector:</P>
+<PRE>
+        sub connect_three {
+        my $self        =       shift;
+        my $r1a         =       shift;
+        my $r1b         =       shift;
+        my $r2a         =       shift;
+        my $r2b         =       shift;
+        my $mesh        =       $self-&gt;{mesh};
+
+            for my $y (0..($r1b-$r1a)-1) {
+                        $mesh-&gt;[$y+$r1a]-&gt;add_output_node($mesh-&gt;[$y+$r2a-1]) if($y&gt;0);
+                        $mesh-&gt;[$y+$r1a]-&gt;add_output_node($mesh-&gt;[$y+$r2a]) if($y&lt;($r2b-$r2a));
+                        $mesh-&gt;[$y+$r1a]-&gt;add_output_node($mesh-&gt;[$y+$r2a+1]) if($y&lt;($r2b-$r2a));
+                }
+        }</PRE>
+<P>This is a very simple example. It feeds the outputs     of every node in the first layer
+to the node directly above it, as well as the nodes on either side of the node directly
+above it, checking for range sides, of course.</P>
+<P>The network is stored internally as one long array of node objects. The goal here
+is to connect one range of nodes in that array to another range of nodes. The calling
+function has already calculated the indices into the array, and it passed it to you
+as the four arguments after the $self refrence. The first two arguments we will call
+$r1a and $r1b. These define the start and end indices of the first range, or ``layer.'' Likewise,
+the next two arguemnts, $r2a and $r2b, define the start and end indices of the second
+layer. We also grab a refrence to the mesh array so we dont have to type the $self
+refrence over and over.</P>
+<P>The loop that folows the arguments in the above example is very simple. It opens
+a <CODE>for()</CODE> loop over the range of numbers, calculating the size instead of just going
+$r1a..$r1b because we use the loop index with the next layer up as well.</P>
+<P>$y + $r1a give the index into the mesh array of the current node to connect the output FROM.
+We need to connect this nodes output lines to the next layers input nodes. We do this
+with a simple method of the outputing node (the node at $y+$r1a), called add_output_node().</P>
+<P><CODE>add_output_node()</CODE> takes one simple arguemnt: A blessed refrence to a node that it is supposed
+to output its final value TO. We get this blessed refrence with more simple addition.</P>
+<P>$y + $r2a gives us the node directly above the first node (supposedly...I'll get to the ``supposedly''
+part in a minute.) By adding or subtracting from this number we get the neighbor nodes.
+In the above example you can see we check the $y index to see that we havn't come close to
+any of the edges of the range.</P>
+<P>Using $y+$r2a we get the index of the node to pass to <CODE>add_output_node()</CODE> on the first node at
+$y+<STRONG>$r1a</STRONG>.</P>
+<P>And that's all there is to it!</P>
+<P>For the fun of it, we'll take a quick look at the default connector.
+Below is the actual default connector code, albeit a bit cleaned up, as well as
+line numbers added.</P>
+<PRE>
+        = line 1  =     sub _c {
+        = line 2  =     my $self        =       shift;
+        = line 3  =     my $r1a         =       shift;
+        = line 4  =     my $r1b         =       shift;
+        = line 5  =     my $r2a         =       shift;
+        = line 6  =     my $r2b         =       shift;
+        = line 7  =     my $mesh        =       $self-&gt;{mesh};
+        = line 8  =             for my $y ($r1a..$r1b-1) {
+        = line 9  =                     for my $z ($r2a..$r2b-1) {
+        = line 10 =                             $mesh-&gt;[$y]-&gt;add_output_node($mesh-&gt;[$z]);
+        = line 11 =                     }
+        = line 12 =             }
+        = line 12 =     }
+</PRE>
+<P>Its that easy! The simplest connector (well almost anyways). It just connects each
+node in the first layer defined by ($r1a..$r1b) to every node in the second layer as
+defined by ($r2a..$r2b).</P>
+<P>Those of you that are still reading, if you do come up with any new connection functions,
+PLEASE SEND THEM TO ME. I would love to see what others are doing, as well as get new
+network ideas. I will probably include any connectors you send over in future releases (with
+propoer credit and permission, of course).</P>
+<P>Anyways, happy coding!</P>
+<P>
+<HR>
+<H1><A NAME="what can it do">WHAT CAN IT DO?</A></H1>
+<P>Rodin Porrata asked on the ai-neuralnet-backprop malining list,
+``What can they [Neural Networks] do?''. In regards to that questioin,
+consider the following:</P>
+<P>Neural Nets are formed by simulated neurons connected together much the same
+way the brain's neurons are, neural networks are able to associate and
+generalize without rules.  They have solved problems in pattern recognition,
+robotics, speech processing, financial predicting and signal processing, to
+name a few.</P>
+<P>One of the first impressive neural networks was NetTalk, which read in ASCII
+text and correctly pronounced the words (producing phonemes which drove a
+speech chip), even those it had never seen before.  Designed by John Hopkins
+biophysicist Terry Sejnowski and Charles Rosenberg of Princeton in 1986,
+this application made the Backprogagation training algorithm famous.  Using
+the same paradigm, a neural network has been trained to classify sonar
+returns from an undersea mine and rock.  This classifier, designed by
+Sejnowski and R.  Paul Gorman, performed better than a nearest-neighbor
+classifier.</P>
+<P>The kinds of problems best solved by neural networks are those that people
+are good at such as association, evaluation and pattern recognition.
+Problems that are difficult to compute and do not require perfect answers,
+just very good answers, are also best done with neural networks.  A quick,
+very good response is often more desirable than a more accurate answer which
+takes longer to compute.  This is especially true in robotics or industrial
+controller applications.  Predictions of behavior and general analysis of
+data are also affairs for neural networks.  In the financial arena, consumer
+loan analysis and financial forecasting make good applications.  New network
+designers are working on weather forecasts by neural networks (Myself
+included).  Currently, doctors are developing medical neural networks as an
+aid in diagnosis.  Attorneys and insurance companies are also working on
+neural networks to help estimate the value of claims.</P>
+<P>Neural networks are poor at precise calculations and serial processing. They
+are also unable to predict or recognize anything that does not inherently
+contain some sort of pattern.  For example, they cannot predict the lottery,
+since this is a random process.  It is unlikely that a neural network could
+be built which has the capacity to think as well as a person does for two
+reasons.  Neural networks are terrible at deduction, or logical thinking and
+the human brain is just too complex to completely simulate.  Also, some
+problems are too difficult for present technology.  Real vision, for
+example, is a long way off.</P>
+<P>In short, Neural Networks are poor at precise calculations, but good at
+association, evaluation, and pattern recognition.</P>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>Included are several example files in the ``examples'' directory from the
+distribution ZIP file. Each of the examples includes a short explanation 
+at the top of the file. Each of these are ment to demonstrate simple, yet 
+practical (for the most part :-) uses of this module.</P>
+<P>
+<HR>
+<H1><A NAME="other included packages">OTHER INCLUDED PACKAGES</A></H1>
+<P>These packages are not designed to be called directly, they are for internal use. They are
+listed here simply for your refrence.</P>
+<DL>
+<DT><STRONG><A NAME="item_AI%3A%3ANeuralNet%3A%3AMesh%3A%3Anode">AI::NeuralNet::Mesh::node</A></STRONG><BR>
+<DD>
+This is the worker package of the mesh. It implements all the individual nodes of the mesh.
+It might be good to look at the source for this package (in the Mesh.pm file) if you
+plan to do a lot of or extensive custom node activation types.
+<P></P>
+<DT><STRONG><A NAME="item_AI%3A%3ANeuralNet%3A%3AMesh%3A%3Acap">AI::NeuralNet::Mesh::cap</A></STRONG><BR>
+<DD>
+This is applied to the input layer of the mesh to prevent the mesh from trying to recursivly
+adjust weights out throug the inputs.
+<P></P>
+<DT><STRONG><A NAME="item_AI%3A%3ANeuralNet%3A%3AMesh%3A%3Aoutput">AI::NeuralNet::Mesh::output</A></STRONG><BR>
+<DD>
+This is simply a data collector package clamped onto the output layer to record the data 
+as it comes out of the mesh.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>This is a beta release of <CODE>AI::NeuralNet::Mesh</CODE>, and that holding true, I am sure 
+there are probably bugs in here which I just have not found yet. If you find bugs in this module, I would 
+appreciate it greatly if you could report them to me at <EM>&lt;<A HREF="mailto:jdb@wcoil.com">jdb@wcoil.com</A>&gt;</EM>,
+or, even better, try to patch them yourself and figure out why the bug is being buggy, and
+send me the patched code, again at <EM>&lt;<A HREF="mailto:jdb@wcoil.com">jdb@wcoil.com</A>&gt;</EM>.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Josiah Bryan <EM>&lt;<A HREF="mailto:jdb@wcoil.com">jdb@wcoil.com</A>&gt;</EM></P>
+<P>Copyright (c) 2000 Josiah Bryan. All rights reserved. This program is free software; 
+you can redistribute it and/or modify it under the same terms as Perl itself.</P>
+<P>The <CODE>AI::NeuralNet::Mesh</CODE> and related modules are free software. THEY COME WITHOUT WARRANTY OF ANY KIND.</P>
+<P>$Id: AI::NeuralNet::Mesh.pm, v0.43 2000/15/09 03:29:08 josiah Exp $</P>
+<P>
+<HR>
+<H1><A NAME="thanks">THANKS</A></H1>
+<P>Below are a list of the people that have contributed in some way to this module (no particular order):</P>
+<PRE>
+        Rodin Porrata, rodin@ursa.llnl.gov
+        Randal L. Schwartz, merlyn@stonehedge.com
+        Michiel de Roo, michiel@geo.uu.nl
+</PRE>
+<PRE>
+
+Thanks to Randal and Michiel for spoting some documentation and makefile bugs in the last release.
+Thanks to Rodin for continual suggetions and questions about the module and more.</PRE>
+<P>
+<HR>
+<H1><A NAME="download">DOWNLOAD</A></H1>
+<P>You can always download the latest copy of AI::NeuralNet::Mesh
+from <A HREF="http://www.josiah.countystart.com/modules/get.pl?mesh:pod">http://www.josiah.countystart.com/modules/get.pl?mesh:pod</A></P>
+<P>
+<HR>
+<H1><A NAME="mailing list">MAILING LIST</A></H1>
+<P>A mailing list has been setup for AI::NeuralNet::Mesh and AI::NeuralNet::BackProp. 
+The list is for discussion of AI and neural net related topics as they pertain to 
+AI::NeuralNet::BackProp and AI::NeuralNet::mesh. I will also announce in the group
+each time a new release of AI::NeuralNet::Mesh is available.</P>
+The list address is: <A HREF="mailto:ai-neuralnet-backprop@egroups.com">ai-neuralnet-backprop@egroups.com</A> <BR>
+To subscribe, send a blank email to: <A HREF="mailto:ai-neuralnet-backprop-subscribe@egroups.com">ai-neuralnet-backprop-subscribe@egroups.com</A> 
+
+<BR><BR><BR>
+<HR>
+<A HREF="http://www.josiah.countystart.com/modules/get.pl?mesh:(c)"><B>AI::NeuralNet::Mesh</B></A> - An optimized, accurate neural network Mesh. By <A HREF="mailto:jdb@wcoil.com"><B>Josiah Bryan</B></A>.
+
+
+</BODY>
+
+</HTML>

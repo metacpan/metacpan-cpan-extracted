@@ -1,0 +1,113 @@
+Revision history for App-ShellCompleter-cpanm
+
+0.17    2016-10-21 (PERLANCAR)
+
+	- Allow script to be dumped by Getopt::Long::Dump.
+
+
+0.16    2016-02-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Specify an optional prereq to App::lcpan.
+
+
+0.15    2016-01-14 (PERLANCAR)
+
+	- Fix/tweak: local files should be consulted first because it's the
+	  cheapest, then CPAN module names.
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.14    2015-09-18 (PERLANCAR)
+
+	- Adjust to Complete::Util 0.36 (complete_file() split to
+	  Complete-File).
+
+
+0.13    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.12    2015-05-13 (PERLANCAR)
+
+	- Don't use '/' as module namespace separator because cpanm doesn't
+	  recognize it.
+
+
+0.11    2015-04-30 (PERLANCAR)
+
+	- Fixes/tweaks (update for lcpan 0.16+, use new 'namespace' table
+	  in lcpan 0.32+ for speedier query).
+
+	- Don't specify ci explicitly (Complete 0.06+).
+
+
+0.10    2015-02-15 (PERLANCAR)
+
+	- Support tcsh.
+
+
+0.09    2015-01-14 (PERLANCAR)
+
+	- Complete from App::lcpan if it's installed (I'm still not happy
+	  with the response time though, there's still a noticeable delay).
+
+
+0.08    2015-01-08 (PERLANCAR)
+
+        - Disable the use of XPAN::Query (completing available CPAN modules) for
+          now due to slow initial response time.
+
+        - [Bugfix][minor] Move log messages inside conditionals.
+
+
+0.07    2015-01-07 (PERLANCAR)
+
+	- [opt] Don't bother to complete module names if word doesn't look
+	  like module name.
+
+
+0.06    2014-12-31 (PERLANCAR)
+
+	- Tweak logging, fix completion of CPAN modules.
+
+
+0.05    2014-12-31 (PERLANCAR)
+
+	- Fix/update code (use combine_answers).
+
+
+0.04    2014-12-29 (PERLANCAR)
+
+        - No functional changes.
+
+        - Remove FAQ item because we now have a workaround in Complete::Bash.
+
+
+0.03    2014-12-14 (PERLANCAR)
+
+        - Rename module/dist from App-BashCompleter-cpanm to
+          App-ShellCompleter-cpanm.
+
+        - Mention shcompgen instead of the obsolete bash-completion-prog.
+
+        - Complete module names on CPAN using XPAN::Query.
+
+        - Add some logging for debugging.
+
+
+0.02    2014-11-10 (PERLANCAR)
+
+        - No functional changes.
+
+        - Mention Bash::Completion::Plugins::cpanm.
+
+
+0.01    2014-11-10 (PERLANCAR)
+
+        - First release.

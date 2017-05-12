@@ -1,0 +1,60 @@
+<div class="floatleft">
+<table>
+	<caption>[% s.object %]</caption>
+	<tbody>
+	<tr>
+		<th>ID</th>
+		<td>[% hash.${s.o.id} %]</td>
+	</tr>
+[% FOREACH f IN s.o.fields -%]
+	<tr>
+		<th>[% f.t %]</th>
+		<td>[% IF f.r && f.i %]
+<a href="[% s.ubase %]/[% f.r %]/display?[% f.i %]=[% hash.${f.i} %]">[% hash.${f.k} %]</a>
+		[% ELSIF f.textarea %]
+		<pre>[% hash.${f.k} %]</pre>
+		[% ELSE %]
+[% IF f.verify == 'phone' %][% s.format_phone(hash.${f.k}) %]
+[% ELSIF f.boolean %]
+[% s.format_boolean(hash.${f.k}) %]
+[% ELSIF f.textarea %]
+[% s.format_text(hash.${f.k}) %]
+[% ELSIF f.format == 'percent' %]
+[% s.format_percent(hash.${f.k}) %]
+[% ELSE %][% hash.${f.k} %][% END %]
+		[% END %]</td>
+	</tr>
+[% END -%]
+	</tbody>
+</table>
+</div>
+[% FOREACH r IN s.o.relations %]
+<div class="floatleft">
+<table>
+	<caption>[% r.title || r.t %]</caption>
+	<thead><tr><th>[% r.n %]</th></tr></thead>
+	<tbody>
+	[% FOREACH d IN hash.relation.${r.t} -%]
+		<tr>
+			<td>[% IF r.o %]<a href="[% s.ubase %]/[% r.o %]/display?[% r.k %]=[% d.${r.k} %]">[% END %][% d.${r.n} %][% IF r.o %]</a>[% END %]</td>
+		</tr>
+	[% END -%]
+	</tbody>
+</table>
+</div>
+[% END -%]
+[% FOREACH su IN s.o.subs %]
+<div class="floatleft">
+<table>
+	<caption>[% su.t %]</caption>
+	<thead><tr><th>[% su.o %]</th></tr></thead>
+	<tbody>
+	[% FOREACH d IN hash.sub.${su.t} -%]
+		<tr>
+			<td>[% IF su.o %]<a href="[% s.ubase %]/[% su.o %]/display?[% su.k %]=[% d.${su.k} %]">[% END %][% d.${su.n} %][% IF su.o %]</a>[% END %]</td>
+		</tr>
+	[% END -%]
+	</tbody>
+</table>
+</div>
+[% END -%]

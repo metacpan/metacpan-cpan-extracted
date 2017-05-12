@@ -1,0 +1,45 @@
+---
+abstract: 'MessagePack stream serializer/deserializer for AnyEvent'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-MessagePack
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  AnyEvent::MessagePack:
+    file: lib/AnyEvent/MessagePack.pm
+    version: '0.20'
+requires:
+  AnyEvent: '7.02'
+  Data::MessagePack: '0.46'
+  Data::MessagePack::Stream: '0.07'
+  parent: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/tokuhirom/AnyEvent-MessagePack/issues
+  homepage: https://github.com/tokuhirom/AnyEvent-MessagePack
+  repository: git://github.com/tokuhirom/AnyEvent-MessagePack.git
+version: '0.20'
+x_contributors:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

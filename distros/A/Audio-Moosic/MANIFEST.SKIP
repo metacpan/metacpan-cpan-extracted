@@ -1,0 +1,5 @@
+blib\b
+^Makefile(?!\.PL)
+\.bak$
+^\.
+^Audio-Moosic-

@@ -1,0 +1,1 @@
+%vars = ( 'Frédéric'	=> [ 'Brière' ] );

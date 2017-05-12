@@ -1,0 +1,5 @@
+- adding a stopword list to better retrict the list of terms
+  potentialy appearing in the corpus
+
+- rewrite the module to handle objects and with option in the associated scripts
+

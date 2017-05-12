@@ -1,0 +1,11 @@
+Revision history for Acme-Rautavistic-Sort
+
+0.03      2015-10-05
+  - migrate dist to Dist::Zilla - no functional changes
+
+0.02      2008-11-19
+  - "dropsortx" allows comparator sub, eg. for numerical comparisons
+
+0.01      2008-04-24
+  - Initial version
+  - Supports "dropsort"

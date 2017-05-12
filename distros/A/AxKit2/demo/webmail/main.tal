@@ -1,0 +1,92 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal">
+<head>
+    <title>AxMail for <span tal:replace="/webmail/user">the_user</span></title>
+    <base href="http://server/mail" tal:attributes="href /webmail/base-uri"/>
+    <link rel="stylesheet" href="css/webmail.css"/>
+    <script src="js/prototype.js" type="text/javascript"/>
+</head>
+<body onload="init_imap()">
+<script>
+<!--
+function init_imap() {
+    var foldersAjax = new Ajax.Request(
+        'folders',
+        { method: 'get', onComplete: folders_response }
+    );
+    var folderAjax = new Ajax.Request(
+        'folder/INBOX',
+        { method: 'get', onComplete: contents_response }
+    );
+}
+
+function load_folder_page(folder, page) {
+    $('folderlist').innerHTML = '<img src="img/bigrotation2.gif"/> Loading Folder Contents...';
+
+    var folderAjax = new Ajax.Request(
+        'folder/' + folder + '?page=' + page,
+        { method: 'get', onComplete: contents_response }
+    );
+}
+
+function load_folder(folder) {
+    $('folderlist').innerHTML = '<img src="img/bigrotation2.gif"/> Loading Folder Contents...';
+
+    var folderAjax = new Ajax.Request(
+        'folder/' + folder,
+        { method: 'get', onComplete: contents_response }
+    );
+}
+
+function load_message(folder, message) {
+    $('message').innerHTML = '<img src="img/bigrotation2.gif"/> Loading Message...';
+    
+    var messageAjax = new Ajax.Request(
+        'folder/' + folder + '/' + message,
+        { method: 'get', onComplete: message_response }
+    );
+}
+
+function folders_response (theRequest) {
+    $('folders').innerHTML = theRequest.responseText;
+}
+
+function contents_response (theRequest) {
+    $('folderlist').innerHTML = theRequest.responseText;
+}
+
+function message_response (theRequest) {
+    $('message').innerHTML = theRequest.responseText;
+}
+-->
+</script>
+<table width="100%" border="1">
+    <tr>
+        <td class="folders" id="folders" width="25%" valign="top">
+            <img src="img/bigrotation2.gif"/>
+            Loading Folders...
+        </td>
+        <td class="pane" width="75%" valign="top">
+            <table width="100%" border="1">
+                <tr>
+                    <td class="buttons">Buttons go here</td>
+                    <td class="search">Search goes here</td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="folderlist" id="folderlist">
+                        <div style="height: 100px; background: #faa">
+                            <img src="img/bigrotation2.gif"/>
+                            Loading Folder Contents...
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="message" id="message">
+                        No message selected.
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

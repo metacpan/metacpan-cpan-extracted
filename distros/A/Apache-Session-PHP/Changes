@@ -1,0 +1,19 @@
+Revision history for Perl extension Apache::Session::PHP
+
+0.05  Tue Feb  3 03:00:13 JST 2004
+	* Now it works under tainting mode
+	  Thanks to Ed Summers
+
+0.04  Sat Aug 24 05:02:37 JST 2002
+	- Added test for 0.04 fix
+
+0.03  Sat Aug 24 04:34:44 JST 2002
+	* Fixed bug that previous session is not correctly cleared
+	  Thanks to: Andy Lester <andy@petdance.com>
+                     Ed Summers <esummers@cpan.org>
+
+0.02  Wed Mar 27 03:16:44 JST 2002
+	- CPAN upload problem
+
+0.01  Wed Mar 27 02:00:47 2002
+	- original version

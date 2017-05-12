@@ -1,0 +1,68 @@
+PerlModule Apache2::PodBrowser
+
+<IfModule setenvif_module>
+    BrowserMatch MSIE no-gzip
+    BrowserMatch HUHU gzip-only-text/html
+</IfModule>
+
+<Directory @DocumentRoot@>
+    Options +Indexes
+    <Files ~ "\.p(od|m)">
+        SetHandler modperl
+        PerlResponseHandler Apache2::PodBrowser
+        PerlSetVar STYLESHEET /fancy.css
+        PerlSetVar LINKBASE /perldoc/
+        PerlSetVar PARSER Apache2::PodBrowser::DirectMode
+	PerlSetVar INDEX 1
+    </Files>
+    <Files *.css>
+        PerlFixupHandler Apache2::PodBrowser::Fixup
+    </Files>
+</Directory>
+
+<Location /perldoc>
+    SetHandler modperl
+    PerlResponseHandler Apache2::PodBrowser
+    PerlFixupHandler Apache2::PodBrowser::Fixup
+    PerlSetVar STYLESHEET fancy
+    PerlSetVar GZIP 1
+    PerlAddVar PODDIR @DocumentRoot@
+</Location>
+
+<Location /cached>
+    SetHandler modperl
+    PerlResponseHandler Apache2::PodBrowser
+    PerlFixupHandler Apache2::PodBrowser::Fixup
+    PerlSetVar STYLESHEET fancy
+    PerlSetVar GZIP 1
+    PerlAddVar PODDIR @DocumentRoot@
+    PerlAddVar CACHE @t_dir@/cache.mmdb
+</Location>
+
+<Location /NOINC>
+    SetHandler modperl
+    PerlResponseHandler Apache2::PodBrowser
+    PerlFixupHandler Apache2::PodBrowser::Fixup
+    PerlSetVar STYLESHEET fancy
+    PerlSetVar NOINC 1
+    PerlAddVar PODDIR @DocumentRoot@
+    PerlAddVar PODDIR @top_dir@/blib/lib
+</Location>
+
+<Location /simpletext>
+    SetHandler modperl
+    PerlResponseHandler Apache2::PodBrowser
+    PerlSetVar PARSER Pod::Simple::Text
+    PerlAddVar PODDIR @DocumentRoot@
+    PerlSetVar INDEX 1
+    PerlSetVar CONTENTTYPE "text/plain; charset=UTF-8"
+</Location>
+
+<Location /simplehtml>
+    SetHandler modperl
+    PerlResponseHandler Apache2::PodBrowser
+    PerlSetVar PARSER Pod::Simple::HTML
+    PerlAddVar PODDIR @DocumentRoot@
+    PerlSetVar INDEX 1
+    PerlSetVar CONTENTTYPE "text/html; charset=UTF-8"
+</Location>

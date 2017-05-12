@@ -1,0 +1,557 @@
+#!/usr/bin/perl -w
+
+use Digest::SHA1 qw(sha1_hex);
+use AxKit2::Utils qw(xml_escape);
+use Net::IMAP::Simple::NB;
+use Matts::Message::Parser;
+use Scalar::Util qw(weaken isweak);
+use Data::Pageset;
+use Time::Piece qw(gmtime);
+use Text::Wrap qw(wrap);
+use File::Temp qw(tempfile);
+
+my %imap_cache;
+my %password_cache;
+
+sub conf_IMAP_Server;
+sub conf_IMAP_Port;
+
+sub register {
+    my $self = shift;
+    $self->register_hook('xmlresponse' => 'main_response');
+    $self->register_hook('xmlresponse' => 'main_response_cont');
+    $self->register_hook('xmlresponse' => 'auth_response');
+    $self->register_hook('xmlresponse' => 'auth_response_cont');
+}
+
+sub main_response {
+    my ($self, $input) = @_;
+    
+    my $client  = $self->client;
+    my $headers = $client->headers_in;
+    
+    $client->notes('mail_response', DECLINED);
+    
+    my $cookie  = $headers->cookie('mail_session');
+    
+    # No cookie, skip to auth
+    return DECLINED unless $cookie;
+    
+    # Cookie invalid/expired, skip to auth
+    my $login = eval { decookie($cookie) };
+    if ($@) {
+        $self->log(LOGINFO, $@);
+        $client->notes('cookie_failure', $@);
+        return DECLINED;
+    }
+    
+    my $server = shift @{ $imap_cache{$login} || [] };
+    if ($server) {
+        my $bref = $server->read(1);
+        if (!defined $bref) {
+            # connection went away, login again
+            return $self->imap_login($input, $client, $headers, $login, $password_cache{$login}) if $password_cache{$login};
+            return DECLINED; # if password isn't currently stored for some reason
+        }
+    }
+    else {
+        return $self->imap_login($input, $client, $headers, $login, $password_cache{$login}) if $password_cache{$login};
+        return DECLINED; # if password isn't currently stored for some reason
+    }
+    
+    push @{ $imap_cache{$login} }, $server;
+    
+    $self->display_page($input, $client, $headers, $login);
+    
+    # Everything IMAP happens as a continuation
+    return CONTINUATION;
+}
+
+sub main_response_cont {
+    my ($self, $input) = @_;
+    
+    if ($self->client->notes('mail_response') == OK) {
+        return OK, $input;
+    }
+    return $self->client->notes('mail_response');
+}
+
+*auth_response_cont = \&main_response_cont;
+
+sub auth_response {
+    my ($self, $input, $headers) = @_;
+    
+    $self->log(LOGDEBUG, "Sending login page");
+    
+    my $client = $self->client;
+    $client->notes('mail_response', DECLINED);
+    
+    # display login page
+    if ($client->headers_in->request_method eq 'GET') {
+        return $self->display_login($input, $client, $headers);
+    }
+    else {
+        my $login    = $client->param('login');
+        my $password = $client->param('password');
+        
+        return $self->imap_login($input, $client, $headers, $login, $password);
+    }
+}
+
+sub imap_login {
+    my ($self, $input, $client, $headers, $login, $password) = @_;
+    
+    delete $imap_cache{$login};
+    
+    my $server   = $self->config('IMAP_Server') || die "No IMAP_Server configured";
+    my $port     = $self->config('IMAP_Port') || 143;
+    
+    # connecting to the server is actually blocking, so we make it timeout
+    # in just 3 seconds. You don't want to use this on an IMAP server over
+    # the internet anyway - use it on localhost or a LAN only.
+    my $imap = Net::IMAP::Simple::NB->new("$server:$port", timeout => 3);
+    if (!$imap) {
+        $self->log(LOGERROR, "IMAP Connect to $server:$port failed: $!");
+        return SERVICE_UNAVAILABLE;
+    }
+    
+    $imap->login($login, $password, sub {
+        my $login_ok = shift;
+        
+        if ($login_ok) {
+            push @{$imap_cache{$login}}, $imap;
+            $password_cache{$login} = $password;
+            $client->headers_out->cookie('mail_session', encookie($login), path => $client->config->path);
+            $self->display_page($input, $client, $headers, $login);
+        }
+        else {
+            $client->notes('cookie_failure', "Invalid userid or password");
+            $self->display_login($input, $client, $headers);
+            return $client->finish_continuation;
+        }
+    });
+    
+    return CONTINUATION;
+}
+
+sub display_login {
+    my ($self, $input, $client, $headers) = @_;
+    my $failnotes = $client->notes('cookie_failure') || '';
+    
+    print "Login failed: $failnotes\n";
+    
+    $input->dom('<login>' . 
+        (
+            $failnotes ? "<error>" . xml_escape($failnotes) . "</error>"
+                       : ""
+        ) . '</login>');
+    $input->transform(TAL('demo/webmail/login.tal', 'request.uri' => $headers->request_uri));
+    $client->notes('auth_response', OK);
+    return OK, $input;
+}
+
+sub display_page {
+    my ($self, $input, $client, $headers, $login) = @_;
+    
+    my $full_uri = $headers->request_uri . $headers->path_info;
+    my $rootpath = $client->config->path;
+    $full_uri =~ s/^\Q$rootpath// if $rootpath ne '/';
+    $full_uri =~ s/\?.*$//;
+    my $relative = $full_uri;
+    $relative =~ s/^\///;
+    
+    my $output = '<webmail><uri>' . xml_escape($relative) . '</uri>' .
+                 '<base-uri>http://' . xml_escape($headers->header('Host') . $client->config->path) . '/</base-uri>' .
+                 '<user>'. xml_escape($login) . '</user>';
+    
+    print "Full URI: $full_uri\n";
+    if ($full_uri =~ /\/folder\/([^\/]+)(\/([^\/]*))?/) {
+        my $folder = $1;
+        my $msg = $3;
+        print "URI parsed to: $folder, $msg\n";
+        if ($msg) {
+            return $self->display_email($input, $client, $headers, $login, $output, $folder, $msg);
+        }
+        else {
+            return $self->display_folder_list($input, $client, $headers, $login, $output, $folder);
+        }
+    }
+    elsif ($full_uri =~ /\/folders$/) {
+        return $self->display_all_folders($input, $client, $headers, $login, $output);
+    }
+    else {
+        return $self->display_main_page($input, $client, $headers, $login, \$output);
+    }
+}
+
+sub display_main_page {
+    my ($self, $input, $client, $headers, $login, $output) = @_;
+    
+    $$output .= '</webmail>';
+    print "Output: $$output\n";
+    
+    $input->dom($$output);
+    
+    my $out = $input->transform(TAL($client->config->docroot . '/main.tal'));
+    $out->output();
+    $client->notes('mail_response', DONE);
+    return $client->finish_continuation;
+}
+
+sub display_all_folders {
+    my ($self, $input, $client, $headers, $login, $output) = @_;
+    
+    # get imap connection and delete it from the valid pool.
+    my $imap = shift @{ $imap_cache{$login} || [] }
+        || die "Should never get here without a valid IMAP connection";
+    
+    print "All Folders Using IMAP Server: $imap\n";
+    
+    # Get folders
+    $imap->mailboxes(sub {
+        my @boxes = @_;
+        
+        $output .= '<mailboxes>';
+        
+        my $start = "INBOX";
+        
+        my $sub;
+        $sub = sub {
+            weaken($sub) unless isweak($sub);
+            
+            my $num_msgs = shift;
+            
+            print "Got $start ($num_msgs)\n";
+            
+            $output .= '<mailbox><name>' . xml_escape($start) . '</name>' .
+                                '<count>' . xml_escape($num_msgs) . '</count>' .
+                       '</mailbox>';
+            
+            if (@boxes) {
+                $start = shift @boxes;
+                $imap->select($start, $sub);
+            }
+            else {
+                $output .= '</mailboxes>';
+                return $self->finish_output(\$output, $input, $client, 'folders.xsl');
+            }
+        };
+        
+        $imap->select($start, $sub);
+    });
+    
+    return CONTINUATION;
+}
+
+sub display_folder_list {
+    my ($self, $input, $client, $headers, $login, $output, $folder) = @_;
+    
+    # get imap connection and delete it from the valid pool.
+    my $imap = shift @{ $imap_cache{$login} || [] }
+        || die "Should never get here without a valid IMAP connection";
+    
+    print "Folder $folder list Using IMAP Server: $imap\n";
+    
+    $imap->select($folder, sub {
+        my $num_in_selected = shift;
+        
+        if (!$num_in_selected) {
+            # folder didn't exist probably
+            $output .= '<error>' . xml_escape($Net::IMAP::Simple::errstr) . '</error>';
+            return $self->finish_output(\$output, $input, $client);
+        }
+        
+        my $pageset = Data::Pageset->new({
+            total_entries => $num_in_selected,
+            entries_per_page => 50,
+            mode => 'slide',
+            pages_per_set => 10,
+        });
+        
+        $output .= pageset_xml($pageset, $headers);
+        
+        my $current = $pageset->first;
+        my $last    = $pageset->last;
+        
+        $output .= '<contents folder="' . xml_escape($folder) . '">';
+        
+        my $sub;
+        $sub = sub {
+            weaken($sub) unless isweak($sub);
+            my $headers = shift;
+            
+            if ($headers) {
+                my ($from)  = grep {/^From:/i} @$headers;
+                my ($subj)  = grep {/^Subject:/i} @$headers;
+                my ($recvd) = grep {/^Received:/i} @$headers;
+                my ($date)  = grep {/^Date:/i} @$headers;
+                s/^.*?:\s*// for ($from, $subj, $recvd, $date);
+                local $/="\r\n";
+                chomp($from, $subj);
+                
+                my $parsed_recvd_time;
+                my $time;
+                if ($recvd =~ /(\d{1,2} [a-z]{3} \d{4} \d\d:\d\d:\d\d)/i) {
+                    #print "parsing recieved header date: $1\n";
+                    $time = Time::Piece->strptime($1, '%d %b %Y %H:%M:%S');
+                }
+                elsif ($date =~ /(\d{1,2} [a-z]{3} \d{4} \d\d:\d\d:\d\d)/i) {
+                    #print "parsing Date header date: $1\n";
+                    $time = Time::Piece->strptime($1, '%d %b %Y %H:%M:%S');
+                }
+                else {
+                    $time = gmtime;
+                }
+                my $today = gmtime;
+                my $today_midnight = $today - ($today->hour * 60 * 60 + $today->min * 60 + $today->sec);
+                my $yesterday = $today_midnight - (60 * 60 * 24);
+                my $output_date;
+                if ($time >= $today_midnight) {
+                    $output_date = "Today";
+                }
+                elsif ($time >= $yesterday) {
+                    $output_date = "Yesterday";
+                }
+                else {
+                    $output_date = join(' ', $time->day_of_month, $time->fullmonth, $time->year);
+                }
+                print "got mail: $subj ($output_date)\n";
+                $output .= "<mail id='$current'>" . 
+                             '<from>'    . xml_escape($from) . '</from>' .
+                             '<subject>' . xml_escape($subj) . '</subject>' .
+                             '<received_at><date>' . xml_escape($output_date) . '</date>' .
+                                          '<time>' . xml_escape($time->hms) . '</time>' .
+                             '</received_at>' .
+                           '</mail>';
+            }
+            else {
+                $self->log(LOGDEBUG, "Unable to get headers for $login/$folder::$current");
+            }
+            if ($current >= $last) {
+                $output .= '</contents>';
+                return $self->finish_output(\$output, $input, $client, 'contents.xsl');
+            }
+            else {
+                $current++;
+                $imap->top($current, $sub);
+            }
+        };
+        $imap->top($current, $sub);
+    });
+    
+    return CONTINUATION;
+}
+
+sub display_email {
+    my ($self, $input, $client, $headers, $login, $output, $folder, $msg) = @_;
+    
+    # get imap connection and delete it from the valid pool.
+    my $imap = shift @{ $imap_cache{$login} || [] }
+        || die "Should never get here without a valid IMAP connection";
+    
+    $imap->select($folder, sub {
+        my $num_msgs = shift;
+        
+        if (!$num_msgs) {
+            $output .= '<error>No messages in this folder</error>';
+        }
+        
+        $imap->getfh( $msg, sub {
+            my $fh = shift;
+            if (!$fh) {
+                die "Unable to retrieve message: $msg from folder $folder";
+            }
+            
+            $output .= $self->get_email_as_xml($client, $fh);
+            
+            return $self->finish_output(\$output, $input, $client, 'xmlmail-display.xsl');
+        });
+    });
+    
+    return CONTINUATION;
+}
+
+sub finish_output {
+    my ($self, $output, $input, $client, $stylesheet) = @_;
+    
+    $$output .= '</webmail>';
+    print "Output: $$output\n";
+    
+    $input->dom($$output);
+    
+    my $out = $input->transform(XSLT($client->config->docroot . '/' . $stylesheet));
+    $out->output();
+    $client->notes('mail_response', DONE);
+    return $client->finish_continuation;
+}
+
+sub pageset_xml {
+    my ($pageset, $headers) = @_;
+    
+    my $current_page = $headers->param('page') || $pageset->last_page;
+    $pageset->current_page($current_page);
+    
+    my $output = '<pageset>';
+    if ($pageset->previous_page) {
+        $output .= '<previous>' . $pageset->previous_page . '</previous>';
+    }
+    if ($pageset->next_page) {
+        $output .= '<next>' . $pageset->next_page . '</next>';
+    }
+    
+    for my $page_num (@{$pageset->pages_in_set()}) {
+        $output .= '<page' . ($page_num == $current_page ? ' current="1"' : '') . ">$page_num</page>";
+    }
+    
+    $output .= '</pageset>';
+    return $output;
+}
+
+sub get_email_as_xml {
+    my ($self, $client, $fh) = @_;
+    
+    my $x_headers = $client->param('show-x-headers');
+    
+    my $mail = Matts::Message::Parser->parse($fh);
+    
+    # single items...
+    my $from = $mail->header('From') || '';
+    $from = "<from>" . xml_escape($from) . "</from>" if $from;
+    my $date = $mail->header('Date') || '';
+    $date = "<date>" . xml_escape($date) . "</date>" if $date;
+    my $subject = $mail->header('Subject') || '';
+    $subject = "<subject>" . xml_escape($subject) . "</subject>" if $subject;
+    
+    # multiple items
+    my @to = map { "<to>" . xml_escape($_) . "</to>" } $mail->header('To');
+    my @cc = map { "<to>" . xml_escape($_) . "</to>" } $mail->header('Cc');
+    my @x_headers;
+    if ($x_headers) {
+        foreach my $header (grep { /^X-/i } $mail->headers) {
+            push @x_headers, map { "<x-header><name>" . xml_escape($header) . "</name><value>" . xml_escape($_) . "</value></x-header>" }
+                         $mail->header($header);
+        }
+    }
+    
+    my $output = "<xmlmail>\n" .
+                "<header>\n" .
+                $from . $date . $subject . "@to" . "@cc" . "@x_headers" .
+                "</header>\n" .
+                "<body>";
+    
+    # Do all the body parts
+    my @bodies = $mail->bodies;
+    while (@bodies) {
+        my ($type, $fh) = splice(@bodies, 0, 2);
+        if ($type =~ /html/i) {
+            # warn("Found a html body part\n");
+            my $in = do { local $/; <$fh> };
+
+            my $string = '';
+
+            my ($lfh, $file) = tempfile(DIR => "/tmp");
+            binmode($lfh, ":utf8") if $] > 5.007;
+            print $lfh $in;
+            close($lfh);
+            
+            warn("Tidying: $file\n");
+            open(TIDY, "tidy --hide-comments true --force-output true --show-warnings false --word-2000 true -upper -numeric -quiet -asxml -utf8 $file |") || die $!;
+            binmode(TIDY, ":utf8") if $] > 5.007;
+            my $tidied = '';
+            while (<TIDY>) {
+                $tidied .= $_;
+            }
+            close(TIDY);
+            unlink($file);
+            
+            if ($tidied) {
+                # warn("Using XML::LibXSLT\n");
+                eval {
+                my $xslfile = $client->config->docroot . "/htmlstrip.xsl";
+                # warn("($xslfile) : $@");
+                my $p = XML::LibXML->new;
+                local $XML::LibXML::match_cb;
+                #local $XML::LibXML::read_cb;
+                #local $XML::LibXML::close_cb;
+                #local $XML::LibXML::open_cb;
+                $p->recover(1);
+                my $xsld = $p->parse_file($xslfile);
+                my $xslt = XML::LibXSLT->new->parse_stylesheet($xsld);
+                my $dom = $p->parse_string($tidied);
+                my $res = $xslt->transform($dom);
+                $string = $xslt->output_string($res);
+                $string =~ s/<\?xml[^>]*\?>//; # strip xml decl
+                $string =~ s/\A.*<htmlpart>/<htmlpart>/s;
+                };
+           }
+           
+           if (!$string) {
+                $string = '';
+                warn("Lynxing file\n");
+                my ($lfh, $file) = tempfile(DIR => "/tmp");
+                binmode($lfh, ":utf8") if $] > 5.007;
+                print $lfh $in;
+                close($lfh);
+                $ENV{LYNX_TEMP_SPACE} = "/tmp";
+                open(LYNX, "lynx -dump -raw -nolist -display_charset=utf-8 -width=72 -force_html $file 2>&1 |") || die $!;
+                while (<LYNX>) {
+                    $string .= $_;
+                }
+                close(LYNX);
+                unlink($file);
+                $string =~ s/\n{2,}/\n\n/g;
+                $string = "<htmlpart pre='1'>" . 
+                          xml_escape(wrap("","",$string)) . 
+                          "</htmlpart>";
+            }
+            
+            if (!$string) {
+                # XML::LibXML failed, as did lynx, so just display the raw HTML
+                $string = "<htmlpart pre='1'>" . xml_escape(wrap("","",$in)) . "</htmlpart>";
+            }
+            
+            $output .= $string;
+        }
+        else {
+            # assume plain text
+            $output .= "<textpart>";
+            while (my $line = <$fh>) {
+                $output .= ($line =~ /^\s*$/ ? "\n" : xml_escape(wrap("","",$line)));
+            }
+            $output .= "</textpart>";
+        }
+    }
+    
+    $output .= "</body>\n" .
+                "</xmlmail>\n";
+    
+    # ensure this is parsable before returning
+    my $p = XML::LibXML->new;
+    $p->recover(1);
+    my $dom = eval { $p->parse_string($output) };
+    if ($@) {
+        warn($@);
+        return "<xmlmail><body>Unable to parse this email</body></xmlmail>";
+    }
+    $dom->setEncoding('UTF-8');
+    return $dom->documentElement->toString;
+}
+
+# secret changes on each restart, but that's fine as the user will have to
+# login again anyway
+our $SECRET = join('', map {chr} map {40 + rand(85)} (0..10));
+
+sub encookie {
+    my ($login) = @_;
+    my $date = time;
+    return "$login:$date:" . sha1_hex("$login:$date:$SECRET");
+}
+
+sub decookie {
+    my ($cookie) = @_;
+    my ($login, $date, $sha1) = split(':', $cookie, 3);
+    no warnings 'uninitialized';
+    die "cookie '$cookie' does not match this login" unless $sha1 eq sha1_hex("$login:$date:$SECRET");
+    die "cookie timed out" unless (time - $date) < 3600; # 1 hour timeout
+    return $login;
+}

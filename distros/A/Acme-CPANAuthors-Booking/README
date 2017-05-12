@@ -1,0 +1,50 @@
+NAME
+
+   Acme::CPANAuthors::Booking - Booking.com CPAN authors
+
+DESCRIPTION
+
+   This class provides a hash of Booking.com CPAN authors' PAUSE ID and
+   name to the Acme::CPANAuthors module.
+
+BUGS
+
+   As soon as Booking.com hires a new CPAN author, this module is out of
+   date.
+
+COMMERCIAL BREAK
+
+   Booking.com is hiring. Send your resume to work@booking.com if you are
+   interested. See also http://www.booking.com/jobs/
+
+DEVELOPMENT
+   The current sources of this module are found on github:
+   http://github.com/book/Acme-CPANAuthors-Booking/
+
+AUTHOR
+   Originally written by Abigail, cpan@abigail.be.  Now maintained by
+   Philippe Bruhat (BooK), book@cpan.org.
+
+COPYRIGHT
+   Copyright (C) 2010, 2011, 2012 by Abigail.  Copyright (C) 2012 by
+   Philippe Bruhat (BooK).  Copyright (C) 2010-2014 by Dennis Kaarsemaker.
+
+LICENSE
+   Permission is hereby granted, free of charge, to any person obtaining a
+   copy of this software and associated documentation files (the
+   "Software"), to deal in the Software without restriction, including
+   without limitation the rights to use, copy, modify, merge, publish,
+   distribute, sublicense, and/or sell copies of the Software, and to
+   permit persons to whom the Software is furnished to do so, subject to
+   the following conditions:
+
+   The above copyright notice and this permission notice shall be included
+   in all copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+   IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+   DEALINGS IN THE SOFTWARE.

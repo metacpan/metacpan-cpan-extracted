@@ -1,0 +1,46 @@
+#!/bin/bash
+
+rm -rf res; mkdir res
+
+tst() {
+   res=$((res + 1))
+   echo
+   echo res/$res
+   PERL_ANYEVENT_MODEL=$1 perl $4 bench2 $2 $3 | tee res/$res
+}
+
+export PERL_ANYEVENT_VERBOSE=1
+
+a=8
+b=3
+
+tst EV $a $b
+tst Perl $a $b
+tst Event $a $b
+tst Glib $a $b
+tst POE $a $b "-MEvent -MPOE=Loop::Event"
+
+echo
+echo
+echo
+echo
+
+for ((i=2;i<=res;++i)); do
+   join res/1 res/$i >res/x && mv res/x res/1
+done
+
+{
+   <res/1 perl -e '
+      print "<table>";
+      push @a, [split /\s+/] while <>;
+      for my $x (0 .. $#{$a[0]}) {
+         print "<tr>";
+         for my $y (0 .. $#a) {
+            print "<td align=\"right\">", $a[$y][$x], "</td>";
+         }
+         print "</tr>";
+      }
+      print "</table>";
+   '
+} >res/1.html
+links -dump res/1.html

@@ -1,0 +1,59 @@
+{
+   "abstract" : "A tmux session loading tool",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Devmode2",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Term::Title" : "0"
+         },
+         "requires" : {
+            "Path::Tiny" : "0",
+            "YAML" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "App::Devmode2" : {
+         "file" : "lib/App/Devmode2.pm",
+         "version" : "0.8"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::Devmode2"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/ivanwills/App-Devmode2.git"
+      }
+   },
+   "version" : "0.8",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

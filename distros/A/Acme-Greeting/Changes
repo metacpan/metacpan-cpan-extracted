@@ -1,0 +1,12 @@
+Revision history for Acme-Greeting
+
+0.0.3
+- fix inf loop when "language" option is invalid
+- requires the correct version of perl.
+
+0.0.2
+- Remove UNIVERSAL::require from Greeting.pm
+
+0.0.1  Sun Feb 10 06:15:24 2008
+       Initial release.
+

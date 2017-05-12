@@ -1,0 +1,35 @@
+---
+abstract: 'IRC bot which helps development'
+author:
+  - 'Marius Gavrilescu <marius@ieval.ro>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Devbot
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  POE::Component::SSLify: '0'
+requires:
+  File::Slurp: '0'
+  Getopt::Long: '0'
+  IRC::Utils: '0'
+  POE: '0'
+  POE::Component::IRC::Plugin::AutoJoin: '0'
+  POE::Component::IRC::Plugin::NickServID: '0'
+  POE::Component::IRC::State: '0'
+  POSIX: '0'
+  Regexp::Common: '0'
+  perl: '5.014000'
+resources:
+  repository: https://git.ieval.ro/?p=app-devbot.git
+version: '0.001004'

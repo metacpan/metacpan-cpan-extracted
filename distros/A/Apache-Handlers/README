@@ -1,0 +1,230 @@
+NAME
+    Apache::Handlers
+
+SYNOPSIS
+    In code:
+
+      use Apache::Handlers qw(CLEANUP);
+
+      our $global;
+      my $session : PerlCleanupHandler;
+
+      CLEANUP {
+        our $global = undef;
+      };
+
+    In httpd.conf:
+
+      PerlModule Apache::Handlers
+      PerlChildInitHandler Apache::Handlers
+      PerlPostReadRequestHandler Apache::Handlers
+      <Perl>
+        Apache::Handlers -> reset;
+      </Perl>
+
+DESCRIPTION
+    "Apache::Handlers" provides two different methods of declaring when code
+    snippets should be run during the Apache request phase.
+
+    The code defined with the constructs provided by this module do not
+    directly affect the success or failure of the request. Thus, this module
+    does not provide a replacement for content, access, or other handlers.
+
+    The code is executed in the order it is encountered except for
+    "CHILDEXIT", "CLEANUP", "PerlChildExitHandler", and "PerlCleanupHandler"
+    code. These are executed in the reverse order, similar to the pairing of
+    "BEGIN" and "END" blocks.
+
+    The block construct or attribute must be run before the phase it refers
+    to. Otherwise, it won't be run in that phase. The phases are run in the
+    following order:
+
+    CHILDINIT TRANS HEADERPARSER ACCESS AUTHEN AUTHZ TYPE FIXUP CONTENT LOG
+    CLEANUP CHILDEXIT
+
+    The RESTART phase is not an actual Apache request phase and has no
+    effect after the server has started. It is used to define code that
+    should run during the server startup phase when Apache reads the server
+    configuration the second time or is gracefully (or not so gracefully)
+    restarted. It should be used to clean up so the second configuration
+    process won't duplicate information or cause errors.
+
+    If this module is called during the ChildInit phase, then it will only
+    call that code associated with CHILDINIT blocks. Otherwise, the
+    CHILDINIT code will be run at the first opportunity (basically, the
+    first request made of the child process). Thus the two Perl*Handler
+    configuration directives in the Synopsis.
+
+  Running without mod_perl
+
+    When developing outside mod_perl, all code associated with CHILDINIT,
+    TRANS, HEADERPARSER, ACCESS, AUTHEN, AUTHZ, TYPE, FIXUP, and CONTENT is
+    run in an "INIT" block. All code associated with LOG, CLEANUP, and
+    CHILDEXIT is run in an "END" block.
+
+  Block Constructs
+
+    The following allow for blocks of code to be run at the specified phase.
+    Note that these are subroutines taking a single code reference argument
+    and thus require a terminating semi-colon (;). They are named to be like
+    the BEGIN, END, etc., constructs in Perl, though they are not quite at
+    the same level in the language.
+
+    If the code is seen and handled before Apache has handled a request, it
+    will be run for each request. Otherwise, it is pushed on the handler
+    stack, run, and then removed at the end of the request.
+
+    These are named the same as the Apache/mod_perl configuration directives
+    except the "Perl" and "Handler" strings have been removed and the
+    remainder has been capitalized.
+
+    ACCESS
+    AUTHEN
+    AUTHZ
+    CHILDEXIT
+    CHILDINIT
+    CLEANUP
+    CONTENT
+    FIXUP
+    HEADERPARSER
+    LOG
+    POSTREADREQUEST
+    RESTART
+    TRANS
+    TYPE
+  Attributes
+
+    If Attribute::Handlers is available, then the following attributes are
+    available (N.B.: Attribute::Handlers requires Perl 5.6.0). These are
+    named the same as the Apache/mod_perl configuration directives.
+
+    If the attribute argument is a constant value (non-CODE reference), then
+    the variable is assigned that value. Otherwise, it is assigned the value
+    that the CODE reference returns.
+
+    If the attribute is being applied to a subroutine, then that subroutine
+    is called during that phase. For example, the following two snippets
+    result in the same code being run at the same time.
+
+     my $something  = sub : PerlChildExitHandler {
+       print "We did it!\n";
+     };
+
+     sub something : PerlChildExitHandler {
+       print "We did it!\n";
+     };
+
+    When an attribute is applied to a subroutine, the argument is ignored.
+
+    When the attribute argument is itself a CODE reference, the referent
+    (the variable the attribute applies to) is passed as a reference:
+
+     my $global : PerlChildInitHandler(sub { print "global: $$_[0]\n" });
+
+    This will print the value of $global and set it equal to 1 (or the value
+    of the print statement).
+
+    PerlAccessHandler
+    PerlAuthenHandler
+    PerlAuthzHandler
+    PerlChildInitHandler
+    PerlChildExitHandler
+    PerlCleanupHandler
+    PerlFixupHandler
+    PerlHandler
+    PerlHeaderParserHandler
+    PerlLogHandler
+    PerlPostReadRequestHandler
+    PerlRestartHandler
+    PerlTransHandler
+    PerlTypeHandler
+  Other Methods
+
+    dump
+        This will dump the current set of code references and return the
+        string. This uses Data::Dumper.
+
+    reset
+        This will clear out all previously set code. This should only be
+        used in the "startup.pl" or equivalent so that code doesn't get run
+        twice during a request (when it should only be run once). This will
+        also run any RESET blocks that have been defined.
+
+    run_phase
+        Given a list of phases (using the names for the block constructs
+        above), this will run through the code for that phase, "die"ing
+        (outside mod_perl) or logging (if in mod_perl) if there is an error.
+        For example,
+
+          run_phase( qw: CONTENT LOG CLEANUP : );
+
+        will run any code associated with the CONTENT, LOG, and CLEANUP
+        phases.
+
+CAVEATS
+    Caveats are things that at first glance might be bugs, but end up
+    potentially useful. So I am going to make this section into a kind of
+    cookbook for non-obvious uses for these potential bugs.
+
+  Authentication and Authorization
+
+    Be aware that these two phases only run if Apache has reason to believe
+    they are needed. This can be a bit handy since the following snippet
+    should tell you if the authentication phase was run. Of course, if an
+    authentication handler runs before this and returns OK, then this may
+    not run.
+
+      my $authentication_ran : PerlTransHandler(0) PerlAuthenHandler(1);
+
+      LOG {
+        if($authentication_ran) {
+          # log something special
+        }
+      };
+
+  Errors
+
+    If code causes an error (such that an eval would set $@), then the
+    request will throw a SERVER_ERROR and write $@ to either STDERR (if not
+    in mod_perl and there is no "die" handler, such as the Error module) or
+    to the Apache error log with a log level of debug.
+
+  "Use"ing modules
+
+    Any of the block constructs or attributes provided by this module that
+    are used in the body of a module that is brought in via the "use"
+    keyword will be considered to take place before the child is spawned.
+    This means that any code designated to run during a particular phase
+    will be run at the appropriate time as if the module had been loaded
+    during the server startup.
+
+    Modules can now rest assured that using a CLEANUP block in their file
+    will mean that code is run at the end of every request, even if the
+    module was loaded in the child process and not during server startup.
+
+    This is done by looking for code run during the BEGIN phase.
+
+BUGS
+    Unlike caveats, bugs are features that are undesirable and/or get in the
+    way of doing something useful. I'm sure there are some. Please let me
+    know when you find them.
+
+  Security
+
+    There is no way (currently) to limit registration of code for later
+    processing during a particular phase. Ideas are welcome for how this
+    should be designed.
+
+SEE ALSO
+    the Apache manpage, the Attribute::Handlers manpage, the Data::Dumper
+    manpage.
+
+AUTHOR
+    James G. Smith <jsmith@cpan.org>
+
+COPYRIGHT
+    Copyright (C) 2002 Texas A&M University. All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+CURDIR=`dirname "$0"`
+cd "$CURDIR"
+VERSION="2.7"
+SOURCE_PACKAGE="libuninum-$VERSION"".tar.gz"
+TARGET_DIR="../inc/" # relative to $CURDIR
+mkdir "$TARGET_DIR"
+wget -P "$TARGET_DIR" -c http://billposer.org/Software/Downloads/"$SOURCE_PACKAGE"

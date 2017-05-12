@@ -1,0 +1,69 @@
+#!/usr/bin/perl
+
+require 5;
+BEGIN { $^W = 1 if $ENV{'PERLDOCDEBUG'} }
+use AnnoCPAN::Perldoc;
+exit( AnnoCPAN::Perldoc->run() );
+
+__END__
+
+=head1 NAME
+
+annopod - a perldoc with annotations
+
+=head1 SYNOPSYS
+
+B<annopod> [B<-h>] [B<-v>] [B<-t>] [B<-u>] [B<-m>] [B<-l>] [B<-F>]
+[B<-i>] [B<-V>] [B<-T>] [B<-r>]
+[B<-dI<destination_file>>]
+[B<-oI<formatname>>]
+[B<-MI<FormatterClassName>>]
+[B<-wI<formatteroption:value>>]
+[B<-n>I<nroff-replacement>]
+[B<-X>]
+PageName|ModuleName|ProgramName
+
+B<annopod> B<-f> BuiltinFunction
+
+B<annopod> B<-q> FAQ Keyword
+
+=head1 DESCRIPTION
+
+The C<annopod> program works exactly the same as L<perldoc>, except that it
+looks for a local annotation database and inserts the annotations just before
+rendering the POD.
+
+It works by using a local note database that can be downloaded from
+
+    http://annocpan.org/annopod.db
+
+This is an SQLite3 database; the file should be saved in one of these
+locations:
+
+$HOME
+$USERPROFILE
+$ALLUSERSPROFILE
+/var/annocpan
+
+It can also be called .annopod.db, to hide it in Unix-like systems. It is your
+resposibility to keep this file as up-to-date as you want. Future versions may
+include an automatic update feature (which will require network connectivity).
+
+=head1 SEE ALSO
+
+L<AnnoCPAN>,
+L<AnnoCPAN::Perldoc>,
+L<Pod::Perldoc>
+
+=head1 AUTHOR
+
+Ivan Tubert-Brohman E<lt>itub@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005 Ivan Tubert-Brohman. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same terms as
+Perl itself.
+
+=cut
+

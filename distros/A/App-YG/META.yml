@@ -1,0 +1,45 @@
+---
+abstract: 'log line filter, like \G of MySQL'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Exporter: 0
+  Test::More: 0.88
+  Test::Warn: 0
+  parent: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-YG
+provides:
+  App::YG:
+    file: lib/App/YG.pm
+    version: 0.063
+  App::YG::Apache::Combined:
+    file: lib/App/YG/Apache/Combined.pm
+  App::YG::Apache::Common:
+    file: lib/App/YG/Apache/Common.pm
+  App::YG::Apache::Error:
+    file: lib/App/YG/Apache/Error.pm
+  App::YG::Nginx::Main:
+    file: lib/App/YG/Nginx/Main.pm
+  App::YG::Vmstat:
+    file: lib/App/YG/Vmstat.pm
+recommends:
+  Digest::SHA1: 0
+requires:
+  Carp: 0
+  Class::Accessor::Lite: 0
+  Getopt::Long: 2.38
+  IO::Interactive: 0
+  Pod::Usage: 0
+  Term::ANSIColor: 0
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.063

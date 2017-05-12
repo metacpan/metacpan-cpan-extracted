@@ -1,0 +1,14 @@
+Revision history for Perl extension App-Kritika
+
+0.03 2017-03-21T23:06:21Z
+
+    - more portable path handling
+
+0.02 2017-03-20T18:32:41Z
+
+    - fix dependencies
+
+0.01 2017-03-20T18:25:52Z
+
+    - original version
+

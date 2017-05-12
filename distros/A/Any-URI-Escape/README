@@ -1,0 +1,32 @@
+NAME
+    Any::URI::Escape - Load URI::Escape::XS preferentially over URI::Escape
+
+SYNOPSIS
+      use Any::URI::Escape;
+      $escaped_url = uri_escape($url);
+
+      # URI::Escape::XS will be used instead of URI::Escape if it is installed.
+
+DESCRIPTION
+    URI::Escape is great, but URI::Escape::XS is faster. This module loads
+    URI::Escape::XS and imports the two most common methods if XS is
+    installed.
+
+    The insides of this module aren't completely shaken out yet, so patches
+    welcome.
+
+SEE ALSO
+    URI::Escape
+
+    URI::Escape::XS
+
+AUTHOR
+    Fred Moyer, <fred@redhotpenguin.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010 by Fred Moyer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.12.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

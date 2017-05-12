@@ -1,0 +1,8 @@
+Revision history for Perl extension Apache::ShowStatus.
+
+0.02  Mon May 16 17:00:00 2005
+	- ported to Apache2 namespace (mod_perl2 RC5++)
+
+0.01  Wed Dec 29 13:05:58 2004
+	- original version
+

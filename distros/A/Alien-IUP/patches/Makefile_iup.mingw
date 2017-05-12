@@ -1,0 +1,728 @@
+#PLEASE NOTE: this Makefile was designed to be compatible with GNU make and dmake
+
+CC       = gcc
+AR       = ar
+ARFLAGS  = csr
+PERL     = perl
+
+CP     = $(PERL) -MExtUtils::Command -e cp --
+RM_F   = $(PERL) -MExtUtils::Command -e rm_f --
+MKPATH = $(PERL) -MExtUtils::Command -e mkpath --
+
+### GLOBAL PART ###
+
+BUILDBITS= 32
+BUILDNICK= mingw
+
+PREFIX   = ../_output_
+INCDIR   = $(PREFIX)/include
+LIBDIR   = $(PREFIX)/lib
+
+CF_ALL   = -DTEC_UNAME=gcc4 -DTEC_SYSNAME=Win$(BUILDBITS) -DTEC_LITTLEENDIAN -DTEC_$(BUILDBITS) -DWIN32 -DNDEBUG -I"$(INCDIR)"
+LF_ALL   = -L./lib/$(BUILDNICK) -L"$(LIBDIR)"
+
+VER_OBJ      = version.o
+VER_RC       = version.rc
+
+BUILD_DIRS   = ./obj/$(BUILDNICK)/iup ./obj/$(BUILDNICK)/iupcd ./obj/$(BUILDNICK)/iupcontrols ./obj/$(BUILDNICK)/iupgl ./obj/$(BUILDNICK)/iupglcontrols ./obj/$(BUILDNICK)/iupim ./obj/$(BUILDNICK)/iupimglib ./obj/$(BUILDNICK)/iupmatrixex ./obj/$(BUILDNICK)/iupole ./obj/$(BUILDNICK)/iup_mglplot ./obj/$(BUILDNICK)/iup_plot ./obj/$(BUILDNICK)/iup_scintilla ./obj/$(BUILDNICK)/iuptuio ./lib/$(BUILDNICK)
+
+ALL_OBJS     = $(OBJS_iup) $(OBJS_iupcd) $(OBJS_iupcontrols) $(OBJS_iupgl) $(OBJS_iupglcontrols) $(OBJS_iupim) $(OBJS_iupimglib) $(OBJS_iupmatrixex) $(OBJS_iupole) $(OBJS_iup_mglplot) $(OBJS_iup_plot) $(OBJS_iup_scintilla) $(OBJS_iuptuio)
+
+STATIC_LIBS  = $(SLIB_iup) $(SLIB_iupcd) $(SLIB_iupcontrols) $(SLIB_iupgl) $(SLIB_iupglcontrols) $(SLIB_iupim) $(SLIB_iupimglib) $(SLIB_iupmatrixex) $(SLIB_iupole) $(SLIB_iup_mglplot) $(SLIB_iup_plot) $(SLIB_iup_scintilla) $(SLIB_iuptuio)
+
+DYNAMIC_LIBS = $(DLIB_iup) $(ILIB_iup) $(DLIB_iupcd) $(ILIB_iupcd) $(DLIB_iupcontrols) $(ILIB_iupcontrols) $(DLIB_iupgl) $(ILIB_iupgl) $(DLIB_iupglcontrols) $(ILIB_iupglcontrols) $(DLIB_iupim) $(ILIB_iupim) $(DLIB_iupimglib) $(ILIB_iupimglib) $(DLIB_iupmatrixex) $(ILIB_iupmatrixex) $(DLIB_iupole) $(ILIB_iupole) $(DLIB_iup_mglplot) $(ILIB_iup_mglplot) $(DLIB_iup_plot) $(ILIB_iup_plot) $(DLIB_iup_scintilla) $(ILIB_iup_scintilla) $(DLIB_iuptuio) $(ILIB_iuptuio)
+
+ALL_LIBS     = $(STATIC_LIBS) $(DYNAMIC_LIBS)
+
+.PHONY: install-all install-static install-dynamic all all-static all-dynamic clean build-dirs
+
+all: all-static all-dynamic
+
+
+### START OF iup ###
+CF_iup   = -c  -Wall -O2 -Iinclude -Isrc -Isrc/win -Ietc   -D_WIN32_WINNT=0x0501 -D_WIN32_IE=0x600 -DWINVER=0x0501 -DNOTREEVIEW -DUNICODE -DIUP_DLL $(CF_iup_EXTRA)
+LF_iup   = -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_iup_EXTRA)
+SLIB_iup = ./lib/$(BUILDNICK)/libiup.a
+DLIB_iup = ./lib/$(BUILDNICK)/libiup.dll.a
+ILIB_iup = ./lib/$(BUILDNICK)/iup_alien_.dll
+OBJS_iup = ./obj/$(BUILDNICK)/iup/iup_array.o ./obj/$(BUILDNICK)/iup/iup_callback.o ./obj/$(BUILDNICK)/iup/iup_dlglist.o ./obj/$(BUILDNICK)/iup/iup_attrib.o ./obj/$(BUILDNICK)/iup/iup_focus.o ./obj/$(BUILDNICK)/iup/iup_font.o ./obj/$(BUILDNICK)/iup/iup_globalattrib.o ./obj/$(BUILDNICK)/iup/iup_object.o ./obj/$(BUILDNICK)/iup/iup_key.o ./obj/$(BUILDNICK)/iup/iup_layout.o ./obj/$(BUILDNICK)/iup/iup_ledlex.o ./obj/$(BUILDNICK)/iup/iup_names.o ./obj/$(BUILDNICK)/iup/iup_ledparse.o ./obj/$(BUILDNICK)/iup/iup_predialogs.o ./obj/$(BUILDNICK)/iup/iup_register.o ./obj/$(BUILDNICK)/iup/iup_scanf.o ./obj/$(BUILDNICK)/iup/iup_show.o ./obj/$(BUILDNICK)/iup/iup_str.o ./obj/$(BUILDNICK)/iup/iup_func.o ./obj/$(BUILDNICK)/iup/iup_childtree.o ./obj/$(BUILDNICK)/iup/iup.o ./obj/$(BUILDNICK)/iup/iup_classattrib.o ./obj/$(BUILDNICK)/iup/iup_dialog.o ./obj/$(BUILDNICK)/iup/iup_assert.o ./obj/$(BUILDNICK)/iup/iup_messagedlg.o ./obj/$(BUILDNICK)/iup/iup_timer.o ./obj/$(BUILDNICK)/iup/iup_image.o ./obj/$(BUILDNICK)/iup/iup_label.o ./obj/$(BUILDNICK)/iup/iup_fill.o ./obj/$(BUILDNICK)/iup/iup_zbox.o ./obj/$(BUILDNICK)/iup/iup_colordlg.o ./obj/$(BUILDNICK)/iup/iup_fontdlg.o ./obj/$(BUILDNICK)/iup/iup_filedlg.o ./obj/$(BUILDNICK)/iup/iup_strmessage.o ./obj/$(BUILDNICK)/iup/iup_menu.o ./obj/$(BUILDNICK)/iup/iup_frame.o ./obj/$(BUILDNICK)/iup/iup_user.o ./obj/$(BUILDNICK)/iup/iup_button.o ./obj/$(BUILDNICK)/iup/iup_radio.o ./obj/$(BUILDNICK)/iup/iup_toggle.o ./obj/$(BUILDNICK)/iup/iup_progressbar.o ./obj/$(BUILDNICK)/iup/iup_text.o ./obj/$(BUILDNICK)/iup/iup_val.o ./obj/$(BUILDNICK)/iup/iup_box.o ./obj/$(BUILDNICK)/iup/iup_hbox.o ./obj/$(BUILDNICK)/iup/iup_vbox.o ./obj/$(BUILDNICK)/iup/iup_cbox.o ./obj/$(BUILDNICK)/iup/iup_class.o ./obj/$(BUILDNICK)/iup/iup_classbase.o ./obj/$(BUILDNICK)/iup/iup_maskmatch.o ./obj/$(BUILDNICK)/iup/iup_mask.o ./obj/$(BUILDNICK)/iup/iup_maskparse.o ./obj/$(BUILDNICK)/iup/iup_tabs.o ./obj/$(BUILDNICK)/iup/iup_spin.o ./obj/$(BUILDNICK)/iup/iup_list.o ./obj/$(BUILDNICK)/iup/iup_getparam.o ./obj/$(BUILDNICK)/iup/iup_link.o ./obj/$(BUILDNICK)/iup/iup_sbox.o ./obj/$(BUILDNICK)/iup/iup_scrollbox.o ./obj/$(BUILDNICK)/iup/iup_normalizer.o ./obj/$(BUILDNICK)/iup/iup_tree.o ./obj/$(BUILDNICK)/iup/iup_split.o ./obj/$(BUILDNICK)/iup/iup_layoutdlg.o ./obj/$(BUILDNICK)/iup/iup_recplay.o ./obj/$(BUILDNICK)/iup/iup_progressdlg.o ./obj/$(BUILDNICK)/iup/iup_expander.o ./obj/$(BUILDNICK)/iup/iup_open.o ./obj/$(BUILDNICK)/iup/iup_table.o ./obj/$(BUILDNICK)/iup/iup_canvas.o ./obj/$(BUILDNICK)/iup/iup_gridbox.o ./obj/$(BUILDNICK)/iup/iup_detachbox.o ./obj/$(BUILDNICK)/iup/iup_backgroundbox.o ./obj/$(BUILDNICK)/iup/iup_linefile.o ./obj/$(BUILDNICK)/iup/iup_config.o ./obj/$(BUILDNICK)/iup/iup_flatbutton.o ./obj/$(BUILDNICK)/iup/iup_animatedlabel.o ./obj/$(BUILDNICK)/iup/iup_draw.o ./obj/$(BUILDNICK)/iup/iupwin_common.o ./obj/$(BUILDNICK)/iup/iupwin_brush.o ./obj/$(BUILDNICK)/iup/iupwin_focus.o ./obj/$(BUILDNICK)/iup/iupwin_font.o ./obj/$(BUILDNICK)/iup/iupwin_globalattrib.o ./obj/$(BUILDNICK)/iup/iupwin_handle.o ./obj/$(BUILDNICK)/iup/iupwin_key.o ./obj/$(BUILDNICK)/iup/iupwin_str.o ./obj/$(BUILDNICK)/iup/iupwin_loop.o ./obj/$(BUILDNICK)/iup/iupwin_open.o ./obj/$(BUILDNICK)/iup/iupwin_tips.o ./obj/$(BUILDNICK)/iup/iupwin_info.o ./obj/$(BUILDNICK)/iup/iupwin_dialog.o ./obj/$(BUILDNICK)/iup/iupwin_messagedlg.o ./obj/$(BUILDNICK)/iup/iupwin_timer.o ./obj/$(BUILDNICK)/iup/iupwin_image.o ./obj/$(BUILDNICK)/iup/iupwin_label.o ./obj/$(BUILDNICK)/iup/iupwin_canvas.o ./obj/$(BUILDNICK)/iup/iupwin_frame.o ./obj/$(BUILDNICK)/iup/iupwin_colordlg.o ./obj/$(BUILDNICK)/iup/iupwin_fontdlg.o ./obj/$(BUILDNICK)/iup/iupwin_filedlg.o ./obj/$(BUILDNICK)/iup/iupwin_dragdrop.o ./obj/$(BUILDNICK)/iup/iupwin_button.o ./obj/$(BUILDNICK)/iup/iupwin_draw.o ./obj/$(BUILDNICK)/iup/iupwin_toggle.o ./obj/$(BUILDNICK)/iup/iupwin_clipboard.o ./obj/$(BUILDNICK)/iup/iupwin_progressbar.o ./obj/$(BUILDNICK)/iup/iupwin_text.o ./obj/$(BUILDNICK)/iup/iupwin_val.o ./obj/$(BUILDNICK)/iup/iupwin_touch.o ./obj/$(BUILDNICK)/iup/iupwin_tabs.o ./obj/$(BUILDNICK)/iup/iupwin_menu.o ./obj/$(BUILDNICK)/iup/iupwin_list.o ./obj/$(BUILDNICK)/iup/iupwin_tree.o ./obj/$(BUILDNICK)/iup/iupwin_calendar.o ./obj/$(BUILDNICK)/iup/iupwin_datepick.o ./obj/$(BUILDNICK)/iup/iupwindows_main.o ./obj/$(BUILDNICK)/iup/iupwindows_help.o ./obj/$(BUILDNICK)/iup/iupwindows_info.o
+
+./obj/$(BUILDNICK)/iup/iup_array.o : src/iup_array.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_callback.o : src/iup_callback.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_dlglist.o : src/iup_dlglist.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_attrib.o : src/iup_attrib.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_focus.o : src/iup_focus.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_font.o : src/iup_font.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_globalattrib.o : src/iup_globalattrib.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_object.o : src/iup_object.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_key.o : src/iup_key.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_layout.o : src/iup_layout.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_ledlex.o : src/iup_ledlex.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_names.o : src/iup_names.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_ledparse.o : src/iup_ledparse.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_predialogs.o : src/iup_predialogs.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_register.o : src/iup_register.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_scanf.o : src/iup_scanf.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_show.o : src/iup_show.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_str.o : src/iup_str.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_func.o : src/iup_func.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_childtree.o : src/iup_childtree.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup.o : src/iup.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_classattrib.o : src/iup_classattrib.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_dialog.o : src/iup_dialog.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_assert.o : src/iup_assert.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_messagedlg.o : src/iup_messagedlg.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_timer.o : src/iup_timer.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_image.o : src/iup_image.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_label.o : src/iup_label.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_fill.o : src/iup_fill.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_zbox.o : src/iup_zbox.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_colordlg.o : src/iup_colordlg.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_fontdlg.o : src/iup_fontdlg.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_filedlg.o : src/iup_filedlg.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_strmessage.o : src/iup_strmessage.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_menu.o : src/iup_menu.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_frame.o : src/iup_frame.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_user.o : src/iup_user.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_button.o : src/iup_button.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_radio.o : src/iup_radio.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_toggle.o : src/iup_toggle.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_progressbar.o : src/iup_progressbar.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_text.o : src/iup_text.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_val.o : src/iup_val.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_box.o : src/iup_box.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_hbox.o : src/iup_hbox.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_vbox.o : src/iup_vbox.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_cbox.o : src/iup_cbox.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_class.o : src/iup_class.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_classbase.o : src/iup_classbase.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_maskmatch.o : src/iup_maskmatch.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_mask.o : src/iup_mask.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_maskparse.o : src/iup_maskparse.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_tabs.o : src/iup_tabs.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_spin.o : src/iup_spin.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_list.o : src/iup_list.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_getparam.o : src/iup_getparam.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_link.o : src/iup_link.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_sbox.o : src/iup_sbox.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_scrollbox.o : src/iup_scrollbox.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_normalizer.o : src/iup_normalizer.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_tree.o : src/iup_tree.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_split.o : src/iup_split.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_layoutdlg.o : src/iup_layoutdlg.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_recplay.o : src/iup_recplay.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_progressdlg.o : src/iup_progressdlg.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_expander.o : src/iup_expander.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_open.o : src/iup_open.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_table.o : src/iup_table.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_canvas.o : src/iup_canvas.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_gridbox.o : src/iup_gridbox.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_detachbox.o : src/iup_detachbox.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_backgroundbox.o : src/iup_backgroundbox.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_linefile.o : src/iup_linefile.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_config.o : src/iup_config.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_flatbutton.o : src/iup_flatbutton.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_animatedlabel.o : src/iup_animatedlabel.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iup_draw.o : src/iup_draw.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_common.o : src/win/iupwin_common.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_brush.o : src/win/iupwin_brush.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_focus.o : src/win/iupwin_focus.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_font.o : src/win/iupwin_font.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_globalattrib.o : src/win/iupwin_globalattrib.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_handle.o : src/win/iupwin_handle.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_key.o : src/win/iupwin_key.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_str.o : src/win/iupwin_str.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_loop.o : src/win/iupwin_loop.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_open.o : src/win/iupwin_open.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_tips.o : src/win/iupwin_tips.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_info.o : src/win/iupwin_info.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_dialog.o : src/win/iupwin_dialog.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_messagedlg.o : src/win/iupwin_messagedlg.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_timer.o : src/win/iupwin_timer.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_image.o : src/win/iupwin_image.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_label.o : src/win/iupwin_label.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_canvas.o : src/win/iupwin_canvas.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_frame.o : src/win/iupwin_frame.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_colordlg.o : src/win/iupwin_colordlg.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_fontdlg.o : src/win/iupwin_fontdlg.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_filedlg.o : src/win/iupwin_filedlg.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_dragdrop.o : src/win/iupwin_dragdrop.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_button.o : src/win/iupwin_button.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_draw.o : src/win/iupwin_draw.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_toggle.o : src/win/iupwin_toggle.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_clipboard.o : src/win/iupwin_clipboard.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_progressbar.o : src/win/iupwin_progressbar.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_text.o : src/win/iupwin_text.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_val.o : src/win/iupwin_val.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_touch.o : src/win/iupwin_touch.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_tabs.o : src/win/iupwin_tabs.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_menu.o : src/win/iupwin_menu.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_list.o : src/win/iupwin_list.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_tree.o : src/win/iupwin_tree.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_calendar.o : src/win/iupwin_calendar.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwin_datepick.o : src/win/iupwin_datepick.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwindows_main.o : src/win/iupwindows_main.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwindows_help.o : src/win/iupwindows_help.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+./obj/$(BUILDNICK)/iup/iupwindows_info.o : src/win/iupwindows_info.c ; gcc $(CF_ALL) $(CF_iup) $^ -o $@
+
+$(SLIB_iup): $(OBJS_iup)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_iup) $(DLIB_iup) : $(OBJS_iup)
+	g++ -s -shared -o $(ILIB_iup) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_iup) $(LF_iup) $(LF_ALL)
+	-strip $(ILIB_iup)
+
+iup-static: build-dirs $(SLIB_iup)
+iup-dynamic: build-dirs $(ILIB_iup) $(DLIB_iup)
+
+### START OF iupcd ###
+CF_iupcd   = -c  -Wall -O2 -Iinclude -Isrc -I../cd/include   -DCD_NO_OLD_INTERFACE $(CF_iupcd_EXTRA)
+LF_iupcd   = -L../cd/lib/$(BUILDNICK) -liup -lcd -lfreetype6 -lzlib1 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_iupcd_EXTRA)
+SLIB_iupcd = ./lib/$(BUILDNICK)/libiupcd.a
+DLIB_iupcd = ./lib/$(BUILDNICK)/libiupcd.dll.a
+ILIB_iupcd = ./lib/$(BUILDNICK)/iupcd_alien_.dll
+OBJS_iupcd = ./obj/$(BUILDNICK)/iupcd/iup_cd.o ./obj/$(BUILDNICK)/iupcd/iup_cdutil.o
+
+./obj/$(BUILDNICK)/iupcd/iup_cd.o : srccd/iup_cd.c ; gcc $(CF_ALL) $(CF_iupcd) $^ -o $@
+./obj/$(BUILDNICK)/iupcd/iup_cdutil.o : srccd/iup_cdutil.c ; gcc $(CF_ALL) $(CF_iupcd) $^ -o $@
+
+$(SLIB_iupcd): $(OBJS_iupcd)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_iupcd) $(DLIB_iupcd) : $(OBJS_iupcd)
+	g++ -s -shared -o $(ILIB_iupcd) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_iupcd) $(LF_iupcd) $(LF_ALL)
+	-strip $(ILIB_iupcd)
+
+iupcd-static: build-dirs $(SLIB_iupcd)
+iupcd-dynamic: build-dirs $(ILIB_iupcd) $(DLIB_iupcd)
+
+### START OF iupcontrols ###
+CF_iupcontrols   = -c  -Wall -O2 -Iinclude -Isrc -Isrccontrols -Isrccd -I../cd/include    $(CF_iupcontrols_EXTRA)
+LF_iupcontrols   = -L../cd/lib/$(BUILDNICK) -liup -liupcd -lcd -lfreetype6 -lzlib1 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_iupcontrols_EXTRA)
+SLIB_iupcontrols = ./lib/$(BUILDNICK)/libiupcontrols.a
+DLIB_iupcontrols = ./lib/$(BUILDNICK)/libiupcontrols.dll.a
+ILIB_iupcontrols = ./lib/$(BUILDNICK)/iupcontrols_alien_.dll
+OBJS_iupcontrols = ./obj/$(BUILDNICK)/iupcontrols/iup_gauge.o ./obj/$(BUILDNICK)/iupcontrols/iup_cells.o ./obj/$(BUILDNICK)/iupcontrols/iup_colorbar.o ./obj/$(BUILDNICK)/iupcontrols/iup_controls.o ./obj/$(BUILDNICK)/iupcontrols/iup_dial.o ./obj/$(BUILDNICK)/iupcontrols/iup_matrixlist.o ./obj/$(BUILDNICK)/iupcontrols/iup_colorbrowser.o ./obj/$(BUILDNICK)/iupcontrols/iup_colorhsi.o ./obj/$(BUILDNICK)/iupcontrols/iup_colorbrowserdlg.o ./obj/$(BUILDNICK)/iupcontrols/iupmat_key.o ./obj/$(BUILDNICK)/iupcontrols/iupmat_mark.o ./obj/$(BUILDNICK)/iupcontrols/iupmat_aux.o ./obj/$(BUILDNICK)/iupcontrols/iupmat_mem.o ./obj/$(BUILDNICK)/iupcontrols/iupmat_mouse.o ./obj/$(BUILDNICK)/iupcontrols/iupmat_numlc.o ./obj/$(BUILDNICK)/iupcontrols/iupmat_colres.o ./obj/$(BUILDNICK)/iupcontrols/iupmat_draw.o ./obj/$(BUILDNICK)/iupcontrols/iupmat_getset.o ./obj/$(BUILDNICK)/iupcontrols/iupmatrix.o ./obj/$(BUILDNICK)/iupcontrols/iupmat_scroll.o ./obj/$(BUILDNICK)/iupcontrols/iupmat_edit.o ./obj/$(BUILDNICK)/iupcontrols/iupmat_ex.o
+
+./obj/$(BUILDNICK)/iupcontrols/iup_gauge.o : srccontrols/iup_gauge.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iup_cells.o : srccontrols/iup_cells.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iup_colorbar.o : srccontrols/iup_colorbar.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iup_controls.o : srccontrols/iup_controls.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iup_dial.o : srccontrols/iup_dial.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iup_matrixlist.o : srccontrols/iup_matrixlist.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iup_colorbrowser.o : srccontrols/color/iup_colorbrowser.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iup_colorhsi.o : srccontrols/color/iup_colorhsi.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iup_colorbrowserdlg.o : srccontrols/color/iup_colorbrowserdlg.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iupmat_key.o : srccontrols/matrix/iupmat_key.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iupmat_mark.o : srccontrols/matrix/iupmat_mark.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iupmat_aux.o : srccontrols/matrix/iupmat_aux.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iupmat_mem.o : srccontrols/matrix/iupmat_mem.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iupmat_mouse.o : srccontrols/matrix/iupmat_mouse.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iupmat_numlc.o : srccontrols/matrix/iupmat_numlc.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iupmat_colres.o : srccontrols/matrix/iupmat_colres.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iupmat_draw.o : srccontrols/matrix/iupmat_draw.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iupmat_getset.o : srccontrols/matrix/iupmat_getset.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iupmatrix.o : srccontrols/matrix/iupmatrix.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iupmat_scroll.o : srccontrols/matrix/iupmat_scroll.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iupmat_edit.o : srccontrols/matrix/iupmat_edit.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupcontrols/iupmat_ex.o : srccontrols/matrix/iupmat_ex.c ; gcc $(CF_ALL) $(CF_iupcontrols) $^ -o $@
+
+$(SLIB_iupcontrols): $(OBJS_iupcontrols)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_iupcontrols) $(DLIB_iupcontrols) : $(OBJS_iupcontrols)
+	g++ -s -shared -o $(ILIB_iupcontrols) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_iupcontrols) $(LF_iupcontrols) $(LF_ALL)
+	-strip $(ILIB_iupcontrols)
+
+iupcontrols-static: build-dirs $(SLIB_iupcontrols)
+iupcontrols-dynamic: build-dirs $(ILIB_iupcontrols) $(DLIB_iupcontrols)
+
+### START OF iupgl ###
+CF_iupgl   = -c  -Wall -O2 -Iinclude -Isrc    $(CF_iupgl_EXTRA)
+LF_iupgl   = -liup -lglaux -lglu32 -lopengl32 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_iupgl_EXTRA)
+SLIB_iupgl = ./lib/$(BUILDNICK)/libiupgl.a
+DLIB_iupgl = ./lib/$(BUILDNICK)/libiupgl.dll.a
+ILIB_iupgl = ./lib/$(BUILDNICK)/iupgl_alien_.dll
+OBJS_iupgl = ./obj/$(BUILDNICK)/iupgl/iup_glcanvas.o ./obj/$(BUILDNICK)/iupgl/iup_glcanvas_win.o
+
+./obj/$(BUILDNICK)/iupgl/iup_glcanvas.o : srcgl/iup_glcanvas.c ; gcc $(CF_ALL) $(CF_iupgl) $^ -o $@
+./obj/$(BUILDNICK)/iupgl/iup_glcanvas_win.o : srcgl/iup_glcanvas_win.c ; gcc $(CF_ALL) $(CF_iupgl) $^ -o $@
+
+$(SLIB_iupgl): $(OBJS_iupgl)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_iupgl) $(DLIB_iupgl) : $(OBJS_iupgl)
+	g++ -s -shared -o $(ILIB_iupgl) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_iupgl) $(LF_iupgl) $(LF_ALL)
+	-strip $(ILIB_iupgl)
+
+iupgl-static: build-dirs $(SLIB_iupgl)
+iupgl-dynamic: build-dirs $(ILIB_iupgl) $(DLIB_iupgl)
+
+### START OF iupglcontrols ###
+CF_iupglcontrols   = -c  -Wall -O2 -Iinclude -Isrc -Isrcglcontrols -I../ftgl/include -I../freetype/include   -DFTGL_LIBRARY $(CF_iupglcontrols_EXTRA)
+LF_iupglcontrols   = -liupgl -liup -lftgl -lfreetype6 -lzlib1 -lglaux -lglu32 -lopengl32 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_iupglcontrols_EXTRA)
+SLIB_iupglcontrols = ./lib/$(BUILDNICK)/libiupglcontrols.a
+DLIB_iupglcontrols = ./lib/$(BUILDNICK)/libiupglcontrols.dll.a
+ILIB_iupglcontrols = ./lib/$(BUILDNICK)/iupglcontrols_alien_.dll
+OBJS_iupglcontrols = ./obj/$(BUILDNICK)/iupglcontrols/iup_glcontrols.o ./obj/$(BUILDNICK)/iupglcontrols/iup_glcanvasbox.o ./obj/$(BUILDNICK)/iupglcontrols/iup_glsubcanvas.o ./obj/$(BUILDNICK)/iupglcontrols/iup_gllabel.o ./obj/$(BUILDNICK)/iupglcontrols/iup_glimage.o ./obj/$(BUILDNICK)/iupglcontrols/iup_glfont.o ./obj/$(BUILDNICK)/iupglcontrols/iup_gldraw.o ./obj/$(BUILDNICK)/iupglcontrols/iup_glicon.o ./obj/$(BUILDNICK)/iupglcontrols/iup_glseparator.o ./obj/$(BUILDNICK)/iupglcontrols/iup_glbutton.o ./obj/$(BUILDNICK)/iupglcontrols/iup_gltoggle.o ./obj/$(BUILDNICK)/iupglcontrols/iup_gllink.o ./obj/$(BUILDNICK)/iupglcontrols/iup_glprogressbar.o ./obj/$(BUILDNICK)/iupglcontrols/iup_glval.o ./obj/$(BUILDNICK)/iupglcontrols/iup_glframe.o ./obj/$(BUILDNICK)/iupglcontrols/iup_glexpander.o ./obj/$(BUILDNICK)/iupglcontrols/iup_glscrollbars.o ./obj/$(BUILDNICK)/iupglcontrols/iup_glscrollbox.o ./obj/$(BUILDNICK)/iupglcontrols/iup_glsizebox.o ./obj/$(BUILDNICK)/iupglcontrols/iup_gltext.o
+
+./obj/$(BUILDNICK)/iupglcontrols/iup_glcontrols.o : srcglcontrols/iup_glcontrols.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_glcanvasbox.o : srcglcontrols/iup_glcanvasbox.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_glsubcanvas.o : srcglcontrols/iup_glsubcanvas.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_gllabel.o : srcglcontrols/iup_gllabel.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_glimage.o : srcglcontrols/iup_glimage.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_glfont.o : srcglcontrols/iup_glfont.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_gldraw.o : srcglcontrols/iup_gldraw.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_glicon.o : srcglcontrols/iup_glicon.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_glseparator.o : srcglcontrols/iup_glseparator.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_glbutton.o : srcglcontrols/iup_glbutton.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_gltoggle.o : srcglcontrols/iup_gltoggle.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_gllink.o : srcglcontrols/iup_gllink.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_glprogressbar.o : srcglcontrols/iup_glprogressbar.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_glval.o : srcglcontrols/iup_glval.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_glframe.o : srcglcontrols/iup_glframe.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_glexpander.o : srcglcontrols/iup_glexpander.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_glscrollbars.o : srcglcontrols/iup_glscrollbars.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_glscrollbox.o : srcglcontrols/iup_glscrollbox.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_glsizebox.o : srcglcontrols/iup_glsizebox.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+./obj/$(BUILDNICK)/iupglcontrols/iup_gltext.o : srcglcontrols/iup_gltext.c ; gcc $(CF_ALL) $(CF_iupglcontrols) $^ -o $@
+
+$(SLIB_iupglcontrols): $(OBJS_iupglcontrols)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_iupglcontrols) $(DLIB_iupglcontrols) : $(OBJS_iupglcontrols)
+	g++ -s -shared -o $(ILIB_iupglcontrols) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_iupglcontrols) $(LF_iupglcontrols) $(LF_ALL)
+	-strip $(ILIB_iupglcontrols)
+
+iupglcontrols-static: build-dirs $(SLIB_iupglcontrols)
+iupglcontrols-dynamic: build-dirs $(ILIB_iupglcontrols) $(DLIB_iupglcontrols)
+
+### START OF iupim ###
+CF_iupim   = -c  -Wall -O2 -Iinclude -Isrc -I../im/include    $(CF_iupim_EXTRA)
+LF_iupim   = -L../im/lib/$(BUILDNICK) -liup -lim -lzlib1 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_iupim_EXTRA)
+SLIB_iupim = ./lib/$(BUILDNICK)/libiupim.a
+DLIB_iupim = ./lib/$(BUILDNICK)/libiupim.dll.a
+ILIB_iupim = ./lib/$(BUILDNICK)/iupim_alien_.dll
+OBJS_iupim = ./obj/$(BUILDNICK)/iupim/iup_im.o
+
+./obj/$(BUILDNICK)/iupim/iup_im.o : srcim/iup_im.c ; gcc $(CF_ALL) $(CF_iupim) $^ -o $@
+
+$(SLIB_iupim): $(OBJS_iupim)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_iupim) $(DLIB_iupim) : $(OBJS_iupim)
+	g++ -s -shared -o $(ILIB_iupim) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_iupim) $(LF_iupim) $(LF_ALL)
+	-strip $(ILIB_iupim)
+
+iupim-static: build-dirs $(SLIB_iupim)
+iupim-dynamic: build-dirs $(ILIB_iupim) $(DLIB_iupim)
+
+### START OF iupimglib ###
+CF_iupimglib   = -c  -Wall -Iinclude -Isrc    $(CF_iupimglib_EXTRA)
+LF_iupimglib   = -liup -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_iupimglib_EXTRA)
+SLIB_iupimglib = ./lib/$(BUILDNICK)/libiupimglib.a
+DLIB_iupimglib = ./lib/$(BUILDNICK)/libiupimglib.dll.a
+ILIB_iupimglib = ./lib/$(BUILDNICK)/iupimglib_alien_.dll
+OBJS_iupimglib = ./obj/$(BUILDNICK)/iupimglib/iup_image_library.o ./obj/$(BUILDNICK)/iupimglib/iup_imglib_circleprogress.o ./obj/$(BUILDNICK)/iupimglib/iup_imglib_basewin32x32.o ./obj/$(BUILDNICK)/iupimglib/iup_imglib_logos48x48.o ./obj/$(BUILDNICK)/iupimglib/iup_imglib_logos32x32.o ./obj/$(BUILDNICK)/iupimglib/iup_imglib_iconswin48x48.o
+
+./obj/$(BUILDNICK)/iupimglib/iup_image_library.o : srcimglib/iup_image_library.c ; gcc $(CF_ALL) $(CF_iupimglib) $^ -o $@
+./obj/$(BUILDNICK)/iupimglib/iup_imglib_circleprogress.o : srcimglib/iup_imglib_circleprogress.c ; gcc $(CF_ALL) $(CF_iupimglib) $^ -o $@
+./obj/$(BUILDNICK)/iupimglib/iup_imglib_basewin32x32.o : srcimglib/iup_imglib_basewin32x32.c ; gcc $(CF_ALL) $(CF_iupimglib) $^ -o $@
+./obj/$(BUILDNICK)/iupimglib/iup_imglib_logos48x48.o : srcimglib/iup_imglib_logos48x48.c ; gcc $(CF_ALL) $(CF_iupimglib) $^ -o $@
+./obj/$(BUILDNICK)/iupimglib/iup_imglib_logos32x32.o : srcimglib/iup_imglib_logos32x32.c ; gcc $(CF_ALL) $(CF_iupimglib) $^ -o $@
+./obj/$(BUILDNICK)/iupimglib/iup_imglib_iconswin48x48.o : srcimglib/iup_imglib_iconswin48x48.c ; gcc $(CF_ALL) $(CF_iupimglib) $^ -o $@
+
+$(SLIB_iupimglib): $(OBJS_iupimglib)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_iupimglib) $(DLIB_iupimglib) : $(OBJS_iupimglib)
+	g++ -s -shared -o $(ILIB_iupimglib) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_iupimglib) $(LF_iupimglib) $(LF_ALL)
+	-strip $(ILIB_iupimglib)
+
+iupimglib-static: build-dirs $(SLIB_iupimglib)
+iupimglib-dynamic: build-dirs $(ILIB_iupimglib) $(DLIB_iupimglib)
+
+### START OF iupmatrixex ###
+CF_iupmatrixex   = -c  -Wall -O2 -Iinclude -Isrc -Isrcmatrixex -I../cd/include    $(CF_iupmatrixex_EXTRA)
+LF_iupmatrixex   = -liup -liupcontrols -lcd -lfreetype6 -lzlib1 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_iupmatrixex_EXTRA)
+SLIB_iupmatrixex = ./lib/$(BUILDNICK)/libiupmatrixex.a
+DLIB_iupmatrixex = ./lib/$(BUILDNICK)/libiupmatrixex.dll.a
+ILIB_iupmatrixex = ./lib/$(BUILDNICK)/iupmatrixex_alien_.dll
+OBJS_iupmatrixex = ./obj/$(BUILDNICK)/iupmatrixex/iup_matrixex.o ./obj/$(BUILDNICK)/iupmatrixex/iupmatex_clipboard.o ./obj/$(BUILDNICK)/iupmatrixex/iupmatex_busy.o ./obj/$(BUILDNICK)/iupmatrixex/iupmatex_export.o ./obj/$(BUILDNICK)/iupmatrixex/iupmatex_visible.o ./obj/$(BUILDNICK)/iupmatrixex/iupmatex_copy.o ./obj/$(BUILDNICK)/iupmatrixex/iupmatex_units.o ./obj/$(BUILDNICK)/iupmatrixex/iupmatex_find.o ./obj/$(BUILDNICK)/iupmatrixex/iupmatex_undo.o ./obj/$(BUILDNICK)/iupmatrixex/iupmatex_sort.o
+
+./obj/$(BUILDNICK)/iupmatrixex/iup_matrixex.o : srcmatrixex/iup_matrixex.c ; gcc $(CF_ALL) $(CF_iupmatrixex) $^ -o $@
+./obj/$(BUILDNICK)/iupmatrixex/iupmatex_clipboard.o : srcmatrixex/iupmatex_clipboard.c ; gcc $(CF_ALL) $(CF_iupmatrixex) $^ -o $@
+./obj/$(BUILDNICK)/iupmatrixex/iupmatex_busy.o : srcmatrixex/iupmatex_busy.c ; gcc $(CF_ALL) $(CF_iupmatrixex) $^ -o $@
+./obj/$(BUILDNICK)/iupmatrixex/iupmatex_export.o : srcmatrixex/iupmatex_export.c ; gcc $(CF_ALL) $(CF_iupmatrixex) $^ -o $@
+./obj/$(BUILDNICK)/iupmatrixex/iupmatex_visible.o : srcmatrixex/iupmatex_visible.c ; gcc $(CF_ALL) $(CF_iupmatrixex) $^ -o $@
+./obj/$(BUILDNICK)/iupmatrixex/iupmatex_copy.o : srcmatrixex/iupmatex_copy.c ; gcc $(CF_ALL) $(CF_iupmatrixex) $^ -o $@
+./obj/$(BUILDNICK)/iupmatrixex/iupmatex_units.o : srcmatrixex/iupmatex_units.c ; gcc $(CF_ALL) $(CF_iupmatrixex) $^ -o $@
+./obj/$(BUILDNICK)/iupmatrixex/iupmatex_find.o : srcmatrixex/iupmatex_find.c ; gcc $(CF_ALL) $(CF_iupmatrixex) $^ -o $@
+./obj/$(BUILDNICK)/iupmatrixex/iupmatex_undo.o : srcmatrixex/iupmatex_undo.c ; gcc $(CF_ALL) $(CF_iupmatrixex) $^ -o $@
+./obj/$(BUILDNICK)/iupmatrixex/iupmatex_sort.o : srcmatrixex/iupmatex_sort.c ; gcc $(CF_ALL) $(CF_iupmatrixex) $^ -o $@
+
+$(SLIB_iupmatrixex): $(OBJS_iupmatrixex)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_iupmatrixex) $(DLIB_iupmatrixex) : $(OBJS_iupmatrixex)
+	g++ -s -shared -o $(ILIB_iupmatrixex) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_iupmatrixex) $(LF_iupmatrixex) $(LF_ALL)
+	-strip $(ILIB_iupmatrixex)
+
+iupmatrixex-static: build-dirs $(SLIB_iupmatrixex)
+iupmatrixex-dynamic: build-dirs $(ILIB_iupmatrixex) $(DLIB_iupmatrixex)
+
+### START OF iupole ###
+CF_iupole   = -c  -Wall -O2 -Iinclude -Isrc    $(CF_iupole_EXTRA)
+LF_iupole   = -liup -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_iupole_EXTRA)
+SLIB_iupole = ./lib/$(BUILDNICK)/libiupole.a
+DLIB_iupole = ./lib/$(BUILDNICK)/libiupole.dll.a
+ILIB_iupole = ./lib/$(BUILDNICK)/iupole_alien_.dll
+OBJS_iupole = ./obj/$(BUILDNICK)/iupole/iup_olecontrol.o ./obj/$(BUILDNICK)/iupole/tLegacy.o ./obj/$(BUILDNICK)/iupole/tAmbientProperties.o ./obj/$(BUILDNICK)/iupole/tDispatch.o ./obj/$(BUILDNICK)/iupole/tOleClientSite.o ./obj/$(BUILDNICK)/iupole/tOleControlSite.o ./obj/$(BUILDNICK)/iupole/tOleHandler.o ./obj/$(BUILDNICK)/iupole/tOleInPlaceFrame.o ./obj/$(BUILDNICK)/iupole/tOleInPlaceSite.o
+
+./obj/$(BUILDNICK)/iupole/iup_olecontrol.o : srcole/iup_olecontrol.cpp ; g++ $(CF_ALL) $(CF_iupole) $^ -o $@
+./obj/$(BUILDNICK)/iupole/tLegacy.o : srcole/tLegacy.cpp ; g++ $(CF_ALL) $(CF_iupole) $^ -o $@
+./obj/$(BUILDNICK)/iupole/tAmbientProperties.o : srcole/tAmbientProperties.cpp ; g++ $(CF_ALL) $(CF_iupole) $^ -o $@
+./obj/$(BUILDNICK)/iupole/tDispatch.o : srcole/tDispatch.cpp ; g++ $(CF_ALL) $(CF_iupole) $^ -o $@
+./obj/$(BUILDNICK)/iupole/tOleClientSite.o : srcole/tOleClientSite.cpp ; g++ $(CF_ALL) $(CF_iupole) $^ -o $@
+./obj/$(BUILDNICK)/iupole/tOleControlSite.o : srcole/tOleControlSite.cpp ; g++ $(CF_ALL) $(CF_iupole) $^ -o $@
+./obj/$(BUILDNICK)/iupole/tOleHandler.o : srcole/tOleHandler.cpp ; g++ $(CF_ALL) $(CF_iupole) $^ -o $@
+./obj/$(BUILDNICK)/iupole/tOleInPlaceFrame.o : srcole/tOleInPlaceFrame.cpp ; g++ $(CF_ALL) $(CF_iupole) $^ -o $@
+./obj/$(BUILDNICK)/iupole/tOleInPlaceSite.o : srcole/tOleInPlaceSite.cpp ; g++ $(CF_ALL) $(CF_iupole) $^ -o $@
+
+$(SLIB_iupole): $(OBJS_iupole)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_iupole) $(DLIB_iupole) : $(OBJS_iupole)
+	g++ -s -shared -o $(ILIB_iupole) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_iupole) $(LF_iupole) $(LF_ALL)
+	-strip $(ILIB_iupole)
+
+iupole-static: build-dirs $(SLIB_iupole)
+iupole-dynamic: build-dirs $(ILIB_iupole) $(DLIB_iupole)
+
+### START OF iup_mglplot ###
+CF_iup_mglplot   = -c  -Wall -O2 -Iinclude -Isrc -Isrcmglplot   -DMGL_STATIC_DEFINE -DMGL_SRC $(CF_iup_mglplot_EXTRA)
+LF_iup_mglplot   = -liup -liupgl -lglaux -lglu32 -lopengl32 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_iup_mglplot_EXTRA)
+SLIB_iup_mglplot = ./lib/$(BUILDNICK)/libiup_mglplot.a
+DLIB_iup_mglplot = ./lib/$(BUILDNICK)/libiup_mglplot.dll.a
+ILIB_iup_mglplot = ./lib/$(BUILDNICK)/iup_mglplot_alien_.dll
+OBJS_iup_mglplot = ./obj/$(BUILDNICK)/iup_mglplot/iup_mglplot.o ./obj/$(BUILDNICK)/iup_mglplot/addon.o ./obj/$(BUILDNICK)/iup_mglplot/complex.o ./obj/$(BUILDNICK)/iup_mglplot/data_gr.o ./obj/$(BUILDNICK)/iup_mglplot/evalp.o ./obj/$(BUILDNICK)/iup_mglplot/fit.o ./obj/$(BUILDNICK)/iup_mglplot/pde.o ./obj/$(BUILDNICK)/iup_mglplot/vect.o ./obj/$(BUILDNICK)/iup_mglplot/axis.o ./obj/$(BUILDNICK)/iup_mglplot/complex_io.o ./obj/$(BUILDNICK)/iup_mglplot/data_io.o ./obj/$(BUILDNICK)/iup_mglplot/exec.o ./obj/$(BUILDNICK)/iup_mglplot/font.o ./obj/$(BUILDNICK)/iup_mglplot/pixel.o ./obj/$(BUILDNICK)/iup_mglplot/volume.o ./obj/$(BUILDNICK)/iup_mglplot/base.o ./obj/$(BUILDNICK)/iup_mglplot/cont.o ./obj/$(BUILDNICK)/iup_mglplot/data_png.o ./obj/$(BUILDNICK)/iup_mglplot/export.o ./obj/$(BUILDNICK)/iup_mglplot/obj.o ./obj/$(BUILDNICK)/iup_mglplot/plot.o ./obj/$(BUILDNICK)/iup_mglplot/window.o ./obj/$(BUILDNICK)/iup_mglplot/base_cf.o ./obj/$(BUILDNICK)/iup_mglplot/crust.o ./obj/$(BUILDNICK)/iup_mglplot/export_2d.o ./obj/$(BUILDNICK)/iup_mglplot/opengl.o ./obj/$(BUILDNICK)/iup_mglplot/prim.o ./obj/$(BUILDNICK)/iup_mglplot/canvas.o ./obj/$(BUILDNICK)/iup_mglplot/data.o ./obj/$(BUILDNICK)/iup_mglplot/eval.o ./obj/$(BUILDNICK)/iup_mglplot/export_3d.o ./obj/$(BUILDNICK)/iup_mglplot/other.o ./obj/$(BUILDNICK)/iup_mglplot/surf.o ./obj/$(BUILDNICK)/iup_mglplot/canvas_cf.o ./obj/$(BUILDNICK)/iup_mglplot/data_ex.o ./obj/$(BUILDNICK)/iup_mglplot/evalc.o ./obj/$(BUILDNICK)/iup_mglplot/fft.o ./obj/$(BUILDNICK)/iup_mglplot/parser.o ./obj/$(BUILDNICK)/iup_mglplot/complex_ex.o ./obj/$(BUILDNICK)/iup_mglplot/fractal.o ./obj/$(BUILDNICK)/iup_mglplot/s_hull_pro.o
+
+./obj/$(BUILDNICK)/iup_mglplot/iup_mglplot.o : srcmglplot/iup_mglplot.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/addon.o : srcmglplot/src/addon.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/complex.o : srcmglplot/src/complex.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/data_gr.o : srcmglplot/src/data_gr.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/evalp.o : srcmglplot/src/evalp.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/fit.o : srcmglplot/src/fit.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/pde.o : srcmglplot/src/pde.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/vect.o : srcmglplot/src/vect.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/axis.o : srcmglplot/src/axis.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/complex_io.o : srcmglplot/src/complex_io.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/data_io.o : srcmglplot/src/data_io.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/exec.o : srcmglplot/src/exec.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/font.o : srcmglplot/src/font.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/pixel.o : srcmglplot/src/pixel.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/volume.o : srcmglplot/src/volume.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/base.o : srcmglplot/src/base.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/cont.o : srcmglplot/src/cont.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/data_png.o : srcmglplot/src/data_png.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/export.o : srcmglplot/src/export.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/obj.o : srcmglplot/src/obj.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/plot.o : srcmglplot/src/plot.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/window.o : srcmglplot/src/window.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/base_cf.o : srcmglplot/src/base_cf.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/crust.o : srcmglplot/src/crust.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/export_2d.o : srcmglplot/src/export_2d.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/opengl.o : srcmglplot/src/opengl.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/prim.o : srcmglplot/src/prim.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/canvas.o : srcmglplot/src/canvas.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/data.o : srcmglplot/src/data.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/eval.o : srcmglplot/src/eval.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/export_3d.o : srcmglplot/src/export_3d.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/other.o : srcmglplot/src/other.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/surf.o : srcmglplot/src/surf.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/canvas_cf.o : srcmglplot/src/canvas_cf.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/data_ex.o : srcmglplot/src/data_ex.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/evalc.o : srcmglplot/src/evalc.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/fft.o : srcmglplot/src/fft.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/parser.o : srcmglplot/src/parser.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/complex_ex.o : srcmglplot/src/complex_ex.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/fractal.o : srcmglplot/src/fractal.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+./obj/$(BUILDNICK)/iup_mglplot/s_hull_pro.o : srcmglplot/src/s_hull/s_hull_pro.cpp ; g++ $(CF_ALL) $(CF_iup_mglplot) $^ -o $@
+
+$(SLIB_iup_mglplot): $(OBJS_iup_mglplot)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_iup_mglplot) $(DLIB_iup_mglplot) : $(OBJS_iup_mglplot)
+	g++ -s -shared -o $(ILIB_iup_mglplot) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_iup_mglplot) $(LF_iup_mglplot) $(LF_ALL)
+	-strip $(ILIB_iup_mglplot)
+
+iup_mglplot-static: build-dirs $(SLIB_iup_mglplot)
+iup_mglplot-dynamic: build-dirs $(ILIB_iup_mglplot) $(DLIB_iup_mglplot)
+
+### START OF iup_plot ###
+CF_iup_plot   = -c  -Wall -O2 -Iinclude -Isrc -Isrccd -I../cd/include   -DCD_NO_OLD_INTERFACE $(CF_iup_plot_EXTRA)
+LF_iup_plot   = -liup -liupgl -liupcd -lcdgl -lcdcontextplus -lcd -lfreetype6 -lzlib1 -lglaux -lglu32 -lopengl32 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_iup_plot_EXTRA)
+SLIB_iup_plot = ./lib/$(BUILDNICK)/libiup_plot.a
+DLIB_iup_plot = ./lib/$(BUILDNICK)/libiup_plot.dll.a
+ILIB_iup_plot = ./lib/$(BUILDNICK)/iup_plot_alien_.dll
+OBJS_iup_plot = ./obj/$(BUILDNICK)/iup_plot/iup_plot.o ./obj/$(BUILDNICK)/iup_plot/iupPlotCalc.o ./obj/$(BUILDNICK)/iup_plot/iupPlot.o ./obj/$(BUILDNICK)/iup_plot/iupPlotDraw.o ./obj/$(BUILDNICK)/iup_plot/iupPlotTick.o ./obj/$(BUILDNICK)/iup_plot/iup_plot_attrib.o
+
+./obj/$(BUILDNICK)/iup_plot/iup_plot.o : srcplot/iup_plot.cpp ; g++ $(CF_ALL) $(CF_iup_plot) $^ -o $@
+./obj/$(BUILDNICK)/iup_plot/iupPlotCalc.o : srcplot/iupPlotCalc.cpp ; g++ $(CF_ALL) $(CF_iup_plot) $^ -o $@
+./obj/$(BUILDNICK)/iup_plot/iupPlot.o : srcplot/iupPlot.cpp ; g++ $(CF_ALL) $(CF_iup_plot) $^ -o $@
+./obj/$(BUILDNICK)/iup_plot/iupPlotDraw.o : srcplot/iupPlotDraw.cpp ; g++ $(CF_ALL) $(CF_iup_plot) $^ -o $@
+./obj/$(BUILDNICK)/iup_plot/iupPlotTick.o : srcplot/iupPlotTick.cpp ; g++ $(CF_ALL) $(CF_iup_plot) $^ -o $@
+./obj/$(BUILDNICK)/iup_plot/iup_plot_attrib.o : srcplot/iup_plot_attrib.cpp ; g++ $(CF_ALL) $(CF_iup_plot) $^ -o $@
+
+$(SLIB_iup_plot): $(OBJS_iup_plot)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_iup_plot) $(DLIB_iup_plot) : $(OBJS_iup_plot)
+	g++ -s -shared -o $(ILIB_iup_plot) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_iup_plot) $(LF_iup_plot) $(LF_ALL)
+	-strip $(ILIB_iup_plot)
+
+iup_plot-static: build-dirs $(SLIB_iup_plot)
+iup_plot-dynamic: build-dirs $(ILIB_iup_plot) $(DLIB_iup_plot)
+
+### START OF iup_scintilla ###
+CF_iup_scintilla   = -c -std=gnu++11 -Wall -O2 -Iinclude -Isrc -Isrcscintilla -Isrc/win -Isrcscintilla/lexlib -Isrcscintilla/src -Isrcscintilla/include -Isrcscintilla/win32 -Isrcscintilla/win   -DSTATIC_BUILD -DSCI_LEXER -DUNICODE -D_WIN32 -DDISABLE_D2D $(CF_iup_scintilla_EXTRA)
+LF_iup_scintilla   = -liup -limm32 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_iup_scintilla_EXTRA)
+SLIB_iup_scintilla = ./lib/$(BUILDNICK)/libiup_scintilla.a
+DLIB_iup_scintilla = ./lib/$(BUILDNICK)/libiup_scintilla.dll.a
+ILIB_iup_scintilla = ./lib/$(BUILDNICK)/iup_scintilla_alien_.dll
+OBJS_iup_scintilla = ./obj/$(BUILDNICK)/iup_scintilla/AutoComplete.o ./obj/$(BUILDNICK)/iup_scintilla/CallTip.o ./obj/$(BUILDNICK)/iup_scintilla/Catalogue.o ./obj/$(BUILDNICK)/iup_scintilla/CellBuffer.o ./obj/$(BUILDNICK)/iup_scintilla/CharClassify.o ./obj/$(BUILDNICK)/iup_scintilla/ContractionState.o ./obj/$(BUILDNICK)/iup_scintilla/Decoration.o ./obj/$(BUILDNICK)/iup_scintilla/Document.o ./obj/$(BUILDNICK)/iup_scintilla/Editor.o ./obj/$(BUILDNICK)/iup_scintilla/ExternalLexer.o ./obj/$(BUILDNICK)/iup_scintilla/Indicator.o ./obj/$(BUILDNICK)/iup_scintilla/KeyMap.o ./obj/$(BUILDNICK)/iup_scintilla/LineMarker.o ./obj/$(BUILDNICK)/iup_scintilla/PerLine.o ./obj/$(BUILDNICK)/iup_scintilla/PositionCache.o ./obj/$(BUILDNICK)/iup_scintilla/RESearch.o ./obj/$(BUILDNICK)/iup_scintilla/RunStyles.o ./obj/$(BUILDNICK)/iup_scintilla/ScintillaBase.o ./obj/$(BUILDNICK)/iup_scintilla/Selection.o ./obj/$(BUILDNICK)/iup_scintilla/Style.o ./obj/$(BUILDNICK)/iup_scintilla/UniConversion.o ./obj/$(BUILDNICK)/iup_scintilla/ViewStyle.o ./obj/$(BUILDNICK)/iup_scintilla/XPM.o ./obj/$(BUILDNICK)/iup_scintilla/CaseConvert.o ./obj/$(BUILDNICK)/iup_scintilla/CaseFolder.o ./obj/$(BUILDNICK)/iup_scintilla/EditModel.o ./obj/$(BUILDNICK)/iup_scintilla/EditView.o ./obj/$(BUILDNICK)/iup_scintilla/MarginView.o ./obj/$(BUILDNICK)/iup_scintilla/LexA68k.o ./obj/$(BUILDNICK)/iup_scintilla/LexAbaqus.o ./obj/$(BUILDNICK)/iup_scintilla/LexAda.o ./obj/$(BUILDNICK)/iup_scintilla/LexAPDL.o ./obj/$(BUILDNICK)/iup_scintilla/LexAsn1.o ./obj/$(BUILDNICK)/iup_scintilla/LexASY.o ./obj/$(BUILDNICK)/iup_scintilla/LexAU3.o ./obj/$(BUILDNICK)/iup_scintilla/LexAVE.o ./obj/$(BUILDNICK)/iup_scintilla/LexAVS.o ./obj/$(BUILDNICK)/iup_scintilla/LexBaan.o ./obj/$(BUILDNICK)/iup_scintilla/LexBash.o ./obj/$(BUILDNICK)/iup_scintilla/LexBasic.o ./obj/$(BUILDNICK)/iup_scintilla/LexBullant.o ./obj/$(BUILDNICK)/iup_scintilla/LexCaml.o ./obj/$(BUILDNICK)/iup_scintilla/LexCLW.o ./obj/$(BUILDNICK)/iup_scintilla/LexCmake.o ./obj/$(BUILDNICK)/iup_scintilla/LexCOBOL.o ./obj/$(BUILDNICK)/iup_scintilla/LexCoffeeScript.o ./obj/$(BUILDNICK)/iup_scintilla/LexConf.o ./obj/$(BUILDNICK)/iup_scintilla/LexCPP.o ./obj/$(BUILDNICK)/iup_scintilla/LexCrontab.o ./obj/$(BUILDNICK)/iup_scintilla/LexCsound.o ./obj/$(BUILDNICK)/iup_scintilla/LexCSS.o ./obj/$(BUILDNICK)/iup_scintilla/LexD.o ./obj/$(BUILDNICK)/iup_scintilla/LexECL.o ./obj/$(BUILDNICK)/iup_scintilla/LexEiffel.o ./obj/$(BUILDNICK)/iup_scintilla/LexErlang.o ./obj/$(BUILDNICK)/iup_scintilla/LexEScript.o ./obj/$(BUILDNICK)/iup_scintilla/LexFlagship.o ./obj/$(BUILDNICK)/iup_scintilla/LexForth.o ./obj/$(BUILDNICK)/iup_scintilla/LexFortran.o ./obj/$(BUILDNICK)/iup_scintilla/LexGAP.o ./obj/$(BUILDNICK)/iup_scintilla/LexGui4Cli.o ./obj/$(BUILDNICK)/iup_scintilla/LexHaskell.o ./obj/$(BUILDNICK)/iup_scintilla/LexHTML.o ./obj/$(BUILDNICK)/iup_scintilla/LexInno.o ./obj/$(BUILDNICK)/iup_scintilla/LexKix.o ./obj/$(BUILDNICK)/iup_scintilla/LexLisp.o ./obj/$(BUILDNICK)/iup_scintilla/LexLout.o ./obj/$(BUILDNICK)/iup_scintilla/LexLua.o ./obj/$(BUILDNICK)/iup_scintilla/LexMagik.o ./obj/$(BUILDNICK)/iup_scintilla/LexMarkdown.o ./obj/$(BUILDNICK)/iup_scintilla/LexMatlab.o ./obj/$(BUILDNICK)/iup_scintilla/LexMetapost.o ./obj/$(BUILDNICK)/iup_scintilla/LexMMIXAL.o ./obj/$(BUILDNICK)/iup_scintilla/LexModula.o ./obj/$(BUILDNICK)/iup_scintilla/LexMPT.o ./obj/$(BUILDNICK)/iup_scintilla/LexMSSQL.o ./obj/$(BUILDNICK)/iup_scintilla/LexMySQL.o ./obj/$(BUILDNICK)/iup_scintilla/LexNimrod.o ./obj/$(BUILDNICK)/iup_scintilla/LexNsis.o ./obj/$(BUILDNICK)/iup_scintilla/LexOpal.o ./obj/$(BUILDNICK)/iup_scintilla/LexOScript.o ./obj/$(BUILDNICK)/iup_scintilla/LexPascal.o ./obj/$(BUILDNICK)/iup_scintilla/LexPB.o ./obj/$(BUILDNICK)/iup_scintilla/LexPerl.o ./obj/$(BUILDNICK)/iup_scintilla/LexPLM.o ./obj/$(BUILDNICK)/iup_scintilla/LexPO.o ./obj/$(BUILDNICK)/iup_scintilla/LexPOV.o ./obj/$(BUILDNICK)/iup_scintilla/LexPowerPro.o ./obj/$(BUILDNICK)/iup_scintilla/LexPowerShell.o ./obj/$(BUILDNICK)/iup_scintilla/LexProgress.o ./obj/$(BUILDNICK)/iup_scintilla/LexPS.o ./obj/$(BUILDNICK)/iup_scintilla/LexPython.o ./obj/$(BUILDNICK)/iup_scintilla/LexR.o ./obj/$(BUILDNICK)/iup_scintilla/LexRebol.o ./obj/$(BUILDNICK)/iup_scintilla/LexRuby.o ./obj/$(BUILDNICK)/iup_scintilla/LexScriptol.o ./obj/$(BUILDNICK)/iup_scintilla/LexSmalltalk.o ./obj/$(BUILDNICK)/iup_scintilla/LexSML.o ./obj/$(BUILDNICK)/iup_scintilla/LexSorcus.o ./obj/$(BUILDNICK)/iup_scintilla/LexSpecman.o ./obj/$(BUILDNICK)/iup_scintilla/LexSpice.o ./obj/$(BUILDNICK)/iup_scintilla/LexSQL.o ./obj/$(BUILDNICK)/iup_scintilla/LexTACL.o ./obj/$(BUILDNICK)/iup_scintilla/LexTADS3.o ./obj/$(BUILDNICK)/iup_scintilla/LexTAL.o ./obj/$(BUILDNICK)/iup_scintilla/LexTCL.o ./obj/$(BUILDNICK)/iup_scintilla/LexTCMD.o ./obj/$(BUILDNICK)/iup_scintilla/LexTeX.o ./obj/$(BUILDNICK)/iup_scintilla/LexTxt2tags.o ./obj/$(BUILDNICK)/iup_scintilla/LexVB.o ./obj/$(BUILDNICK)/iup_scintilla/LexVerilog.o ./obj/$(BUILDNICK)/iup_scintilla/LexVHDL.o ./obj/$(BUILDNICK)/iup_scintilla/LexVisualProlog.o ./obj/$(BUILDNICK)/iup_scintilla/LexYAML.o ./obj/$(BUILDNICK)/iup_scintilla/LexKVIrc.o ./obj/$(BUILDNICK)/iup_scintilla/LexLaTeX.o ./obj/$(BUILDNICK)/iup_scintilla/LexSTTXT.o ./obj/$(BUILDNICK)/iup_scintilla/LexRust.o ./obj/$(BUILDNICK)/iup_scintilla/LexDMAP.o ./obj/$(BUILDNICK)/iup_scintilla/LexDMIS.o ./obj/$(BUILDNICK)/iup_scintilla/LexBibTeX.o ./obj/$(BUILDNICK)/iup_scintilla/LexHex.o ./obj/$(BUILDNICK)/iup_scintilla/LexAsm.o ./obj/$(BUILDNICK)/iup_scintilla/LexRegistry.o ./obj/$(BUILDNICK)/iup_scintilla/LexBatch.o ./obj/$(BUILDNICK)/iup_scintilla/LexDiff.o ./obj/$(BUILDNICK)/iup_scintilla/LexErrorList.o ./obj/$(BUILDNICK)/iup_scintilla/LexMake.o ./obj/$(BUILDNICK)/iup_scintilla/LexNull.o ./obj/$(BUILDNICK)/iup_scintilla/LexProps.o ./obj/$(BUILDNICK)/iup_scintilla/LexJSON.o ./obj/$(BUILDNICK)/iup_scintilla/Accessor.o ./obj/$(BUILDNICK)/iup_scintilla/CharacterSet.o ./obj/$(BUILDNICK)/iup_scintilla/LexerBase.o ./obj/$(BUILDNICK)/iup_scintilla/LexerModule.o ./obj/$(BUILDNICK)/iup_scintilla/LexerNoExceptions.o ./obj/$(BUILDNICK)/iup_scintilla/LexerSimple.o ./obj/$(BUILDNICK)/iup_scintilla/PropSetSimple.o ./obj/$(BUILDNICK)/iup_scintilla/StyleContext.o ./obj/$(BUILDNICK)/iup_scintilla/WordList.o ./obj/$(BUILDNICK)/iup_scintilla/CharacterCategory.o ./obj/$(BUILDNICK)/iup_scintilla/PlatWin.o ./obj/$(BUILDNICK)/iup_scintilla/ScintillaWin.o ./obj/$(BUILDNICK)/iup_scintilla/HanjaDic.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_clipboard.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_folding.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_lexer.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_margin.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_overtype.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_scrolling.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_selection.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_style.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_tab.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_text.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_wordwrap.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_markers.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_bracelight.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_cursor.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_whitespace.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_annotation.o ./obj/$(BUILDNICK)/iup_scintilla/iup_scintilla.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_autocompletion.o ./obj/$(BUILDNICK)/iup_scintilla/iupsci_searching.o
+
+./obj/$(BUILDNICK)/iup_scintilla/AutoComplete.o : srcscintilla/src/AutoComplete.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/CallTip.o : srcscintilla/src/CallTip.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/Catalogue.o : srcscintilla/src/Catalogue.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/CellBuffer.o : srcscintilla/src/CellBuffer.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/CharClassify.o : srcscintilla/src/CharClassify.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/ContractionState.o : srcscintilla/src/ContractionState.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/Decoration.o : srcscintilla/src/Decoration.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/Document.o : srcscintilla/src/Document.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/Editor.o : srcscintilla/src/Editor.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/ExternalLexer.o : srcscintilla/src/ExternalLexer.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/Indicator.o : srcscintilla/src/Indicator.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/KeyMap.o : srcscintilla/src/KeyMap.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LineMarker.o : srcscintilla/src/LineMarker.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/PerLine.o : srcscintilla/src/PerLine.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/PositionCache.o : srcscintilla/src/PositionCache.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/RESearch.o : srcscintilla/src/RESearch.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/RunStyles.o : srcscintilla/src/RunStyles.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/ScintillaBase.o : srcscintilla/src/ScintillaBase.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/Selection.o : srcscintilla/src/Selection.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/Style.o : srcscintilla/src/Style.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/UniConversion.o : srcscintilla/src/UniConversion.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/ViewStyle.o : srcscintilla/src/ViewStyle.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/XPM.o : srcscintilla/src/XPM.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/CaseConvert.o : srcscintilla/src/CaseConvert.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/CaseFolder.o : srcscintilla/src/CaseFolder.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/EditModel.o : srcscintilla/src/EditModel.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/EditView.o : srcscintilla/src/EditView.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/MarginView.o : srcscintilla/src/MarginView.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexA68k.o : srcscintilla/lexers/LexA68k.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexAbaqus.o : srcscintilla/lexers/LexAbaqus.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexAda.o : srcscintilla/lexers/LexAda.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexAPDL.o : srcscintilla/lexers/LexAPDL.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexAsn1.o : srcscintilla/lexers/LexAsn1.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexASY.o : srcscintilla/lexers/LexASY.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexAU3.o : srcscintilla/lexers/LexAU3.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexAVE.o : srcscintilla/lexers/LexAVE.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexAVS.o : srcscintilla/lexers/LexAVS.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexBaan.o : srcscintilla/lexers/LexBaan.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexBash.o : srcscintilla/lexers/LexBash.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexBasic.o : srcscintilla/lexers/LexBasic.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexBullant.o : srcscintilla/lexers/LexBullant.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexCaml.o : srcscintilla/lexers/LexCaml.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexCLW.o : srcscintilla/lexers/LexCLW.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexCmake.o : srcscintilla/lexers/LexCmake.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexCOBOL.o : srcscintilla/lexers/LexCOBOL.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexCoffeeScript.o : srcscintilla/lexers/LexCoffeeScript.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexConf.o : srcscintilla/lexers/LexConf.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexCPP.o : srcscintilla/lexers/LexCPP.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexCrontab.o : srcscintilla/lexers/LexCrontab.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexCsound.o : srcscintilla/lexers/LexCsound.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexCSS.o : srcscintilla/lexers/LexCSS.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexD.o : srcscintilla/lexers/LexD.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexECL.o : srcscintilla/lexers/LexECL.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexEiffel.o : srcscintilla/lexers/LexEiffel.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexErlang.o : srcscintilla/lexers/LexErlang.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexEScript.o : srcscintilla/lexers/LexEScript.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexFlagship.o : srcscintilla/lexers/LexFlagship.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexForth.o : srcscintilla/lexers/LexForth.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexFortran.o : srcscintilla/lexers/LexFortran.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexGAP.o : srcscintilla/lexers/LexGAP.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexGui4Cli.o : srcscintilla/lexers/LexGui4Cli.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexHaskell.o : srcscintilla/lexers/LexHaskell.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexHTML.o : srcscintilla/lexers/LexHTML.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexInno.o : srcscintilla/lexers/LexInno.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexKix.o : srcscintilla/lexers/LexKix.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexLisp.o : srcscintilla/lexers/LexLisp.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexLout.o : srcscintilla/lexers/LexLout.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexLua.o : srcscintilla/lexers/LexLua.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexMagik.o : srcscintilla/lexers/LexMagik.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexMarkdown.o : srcscintilla/lexers/LexMarkdown.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexMatlab.o : srcscintilla/lexers/LexMatlab.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexMetapost.o : srcscintilla/lexers/LexMetapost.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexMMIXAL.o : srcscintilla/lexers/LexMMIXAL.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexModula.o : srcscintilla/lexers/LexModula.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexMPT.o : srcscintilla/lexers/LexMPT.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexMSSQL.o : srcscintilla/lexers/LexMSSQL.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexMySQL.o : srcscintilla/lexers/LexMySQL.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexNimrod.o : srcscintilla/lexers/LexNimrod.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexNsis.o : srcscintilla/lexers/LexNsis.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexOpal.o : srcscintilla/lexers/LexOpal.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexOScript.o : srcscintilla/lexers/LexOScript.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexPascal.o : srcscintilla/lexers/LexPascal.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexPB.o : srcscintilla/lexers/LexPB.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexPerl.o : srcscintilla/lexers/LexPerl.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexPLM.o : srcscintilla/lexers/LexPLM.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexPO.o : srcscintilla/lexers/LexPO.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexPOV.o : srcscintilla/lexers/LexPOV.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexPowerPro.o : srcscintilla/lexers/LexPowerPro.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexPowerShell.o : srcscintilla/lexers/LexPowerShell.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexProgress.o : srcscintilla/lexers/LexProgress.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexPS.o : srcscintilla/lexers/LexPS.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexPython.o : srcscintilla/lexers/LexPython.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexR.o : srcscintilla/lexers/LexR.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexRebol.o : srcscintilla/lexers/LexRebol.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexRuby.o : srcscintilla/lexers/LexRuby.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexScriptol.o : srcscintilla/lexers/LexScriptol.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexSmalltalk.o : srcscintilla/lexers/LexSmalltalk.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexSML.o : srcscintilla/lexers/LexSML.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexSorcus.o : srcscintilla/lexers/LexSorcus.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexSpecman.o : srcscintilla/lexers/LexSpecman.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexSpice.o : srcscintilla/lexers/LexSpice.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexSQL.o : srcscintilla/lexers/LexSQL.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexTACL.o : srcscintilla/lexers/LexTACL.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexTADS3.o : srcscintilla/lexers/LexTADS3.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexTAL.o : srcscintilla/lexers/LexTAL.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexTCL.o : srcscintilla/lexers/LexTCL.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexTCMD.o : srcscintilla/lexers/LexTCMD.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexTeX.o : srcscintilla/lexers/LexTeX.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexTxt2tags.o : srcscintilla/lexers/LexTxt2tags.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexVB.o : srcscintilla/lexers/LexVB.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexVerilog.o : srcscintilla/lexers/LexVerilog.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexVHDL.o : srcscintilla/lexers/LexVHDL.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexVisualProlog.o : srcscintilla/lexers/LexVisualProlog.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexYAML.o : srcscintilla/lexers/LexYAML.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexKVIrc.o : srcscintilla/lexers/LexKVIrc.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexLaTeX.o : srcscintilla/lexers/LexLaTeX.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexSTTXT.o : srcscintilla/lexers/LexSTTXT.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexRust.o : srcscintilla/lexers/LexRust.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexDMAP.o : srcscintilla/lexers/LexDMAP.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexDMIS.o : srcscintilla/lexers/LexDMIS.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexBibTeX.o : srcscintilla/lexers/LexBibTeX.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexHex.o : srcscintilla/lexers/LexHex.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexAsm.o : srcscintilla/lexers/LexAsm.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexRegistry.o : srcscintilla/lexers/LexRegistry.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexBatch.o : srcscintilla/lexers/LexBatch.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexDiff.o : srcscintilla/lexers/LexDiff.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexErrorList.o : srcscintilla/lexers/LexErrorList.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexMake.o : srcscintilla/lexers/LexMake.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexNull.o : srcscintilla/lexers/LexNull.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexProps.o : srcscintilla/lexers/LexProps.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexJSON.o : srcscintilla/lexers/LexJSON.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/Accessor.o : srcscintilla/lexlib/Accessor.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/CharacterSet.o : srcscintilla/lexlib/CharacterSet.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexerBase.o : srcscintilla/lexlib/LexerBase.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexerModule.o : srcscintilla/lexlib/LexerModule.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexerNoExceptions.o : srcscintilla/lexlib/LexerNoExceptions.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/LexerSimple.o : srcscintilla/lexlib/LexerSimple.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/PropSetSimple.o : srcscintilla/lexlib/PropSetSimple.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/StyleContext.o : srcscintilla/lexlib/StyleContext.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/WordList.o : srcscintilla/lexlib/WordList.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/CharacterCategory.o : srcscintilla/lexlib/CharacterCategory.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/PlatWin.o : srcscintilla/win32/PlatWin.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/ScintillaWin.o : srcscintilla/win32/ScintillaWin.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/HanjaDic.o : srcscintilla/win32/HanjaDic.cxx ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_clipboard.o : srcscintilla/iupsci_clipboard.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_folding.o : srcscintilla/iupsci_folding.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_lexer.o : srcscintilla/iupsci_lexer.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_margin.o : srcscintilla/iupsci_margin.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_overtype.o : srcscintilla/iupsci_overtype.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_scrolling.o : srcscintilla/iupsci_scrolling.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_selection.o : srcscintilla/iupsci_selection.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_style.o : srcscintilla/iupsci_style.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_tab.o : srcscintilla/iupsci_tab.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_text.o : srcscintilla/iupsci_text.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_wordwrap.o : srcscintilla/iupsci_wordwrap.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_markers.o : srcscintilla/iupsci_markers.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_bracelight.o : srcscintilla/iupsci_bracelight.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_cursor.o : srcscintilla/iupsci_cursor.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_whitespace.o : srcscintilla/iupsci_whitespace.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_annotation.o : srcscintilla/iupsci_annotation.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iup_scintilla.o : srcscintilla/iup_scintilla.cpp ; g++ $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_autocompletion.o : srcscintilla/iupsci_autocompletion.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+./obj/$(BUILDNICK)/iup_scintilla/iupsci_searching.o : srcscintilla/iupsci_searching.c ; gcc $(CF_ALL) $(CF_iup_scintilla) $^ -o $@
+
+$(SLIB_iup_scintilla): $(OBJS_iup_scintilla)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_iup_scintilla) $(DLIB_iup_scintilla) : $(OBJS_iup_scintilla)
+	g++ -s -shared -o $(ILIB_iup_scintilla) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_iup_scintilla) $(LF_iup_scintilla) $(LF_ALL)
+	-strip $(ILIB_iup_scintilla)
+
+iup_scintilla-static: build-dirs $(SLIB_iup_scintilla)
+iup_scintilla-dynamic: build-dirs $(ILIB_iup_scintilla) $(DLIB_iup_scintilla)
+
+### START OF iuptuio ###
+CF_iuptuio   = -c  -Wall -O2 -Iinclude -Isrc -Isrctuio/tuio -Isrctuio/oscpack   -DOSC_HOST_LITTLE_ENDIAN $(CF_iuptuio_EXTRA)
+LF_iuptuio   = -liup -lws2_32 -lwinmm -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_iuptuio_EXTRA)
+SLIB_iuptuio = ./lib/$(BUILDNICK)/libiuptuio.a
+DLIB_iuptuio = ./lib/$(BUILDNICK)/libiuptuio.dll.a
+ILIB_iuptuio = ./lib/$(BUILDNICK)/iuptuio_alien_.dll
+OBJS_iuptuio = ./obj/$(BUILDNICK)/iuptuio/TuioClient.o ./obj/$(BUILDNICK)/iuptuio/TuioServer.o ./obj/$(BUILDNICK)/iuptuio/TuioTime.o ./obj/$(BUILDNICK)/iuptuio/OscTypes.o ./obj/$(BUILDNICK)/iuptuio/OscOutboundPacketStream.o ./obj/$(BUILDNICK)/iuptuio/OscReceivedElements.o ./obj/$(BUILDNICK)/iuptuio/OscPrintReceivedElements.o ./obj/$(BUILDNICK)/iuptuio/iup_tuio.o ./obj/$(BUILDNICK)/iuptuio/NetworkingUtils.o ./obj/$(BUILDNICK)/iuptuio/UdpSocket.o
+
+./obj/$(BUILDNICK)/iuptuio/TuioClient.o : srctuio/tuio/TuioClient.cpp ; g++ $(CF_ALL) $(CF_iuptuio) $^ -o $@
+./obj/$(BUILDNICK)/iuptuio/TuioServer.o : srctuio/tuio/TuioServer.cpp ; g++ $(CF_ALL) $(CF_iuptuio) $^ -o $@
+./obj/$(BUILDNICK)/iuptuio/TuioTime.o : srctuio/tuio/TuioTime.cpp ; g++ $(CF_ALL) $(CF_iuptuio) $^ -o $@
+./obj/$(BUILDNICK)/iuptuio/OscTypes.o : srctuio/oscpack/osc/OscTypes.cpp ; g++ $(CF_ALL) $(CF_iuptuio) $^ -o $@
+./obj/$(BUILDNICK)/iuptuio/OscOutboundPacketStream.o : srctuio/oscpack/osc/OscOutboundPacketStream.cpp ; g++ $(CF_ALL) $(CF_iuptuio) $^ -o $@
+./obj/$(BUILDNICK)/iuptuio/OscReceivedElements.o : srctuio/oscpack/osc/OscReceivedElements.cpp ; g++ $(CF_ALL) $(CF_iuptuio) $^ -o $@
+./obj/$(BUILDNICK)/iuptuio/OscPrintReceivedElements.o : srctuio/oscpack/osc/OscPrintReceivedElements.cpp ; g++ $(CF_ALL) $(CF_iuptuio) $^ -o $@
+./obj/$(BUILDNICK)/iuptuio/iup_tuio.o : srctuio/iup_tuio.cpp ; g++ $(CF_ALL) $(CF_iuptuio) $^ -o $@
+./obj/$(BUILDNICK)/iuptuio/NetworkingUtils.o : srctuio/oscpack/ip/win32/NetworkingUtils.cpp ; g++ $(CF_ALL) $(CF_iuptuio) $^ -o $@
+./obj/$(BUILDNICK)/iuptuio/UdpSocket.o : srctuio/oscpack/ip/win32/UdpSocket.cpp ; g++ $(CF_ALL) $(CF_iuptuio) $^ -o $@
+
+$(SLIB_iuptuio): $(OBJS_iuptuio)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_iuptuio) $(DLIB_iuptuio) : $(OBJS_iuptuio)
+	g++ -s -shared -o $(ILIB_iuptuio) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_iuptuio) $(LF_iuptuio) $(LF_ALL)
+	-strip $(ILIB_iuptuio)
+
+iuptuio-static: build-dirs $(SLIB_iuptuio)
+iuptuio-dynamic: build-dirs $(ILIB_iuptuio) $(DLIB_iuptuio)
+
+### compile RC
+
+$(VER_OBJ) : $(VER_RC) ; windres --define GCC_WINDRES $^ -o $@
+
+all: build-dirs $(STATIC_LIBS) $(DYNAMIC_LIBS)
+all-static: build-dirs $(STATIC_LIBS)
+all-dynamic: build-dirs $(DYNAMIC_LIBS)
+
+install-all:
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) ./lib/$(BUILDNICK)/* "$(LIBDIR)"
+	$(CP) ./include/*.h "$(INCDIR)"
+
+install-static: all-static
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) $(STATIC_LIBS) "$(LIBDIR)"
+	$(CP) ./include/*.h "$(INCDIR)"
+
+install-dynamic: all-dynamic
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) $(DYNAMIC_LIBS) "$(LIBDIR)"
+	$(CP) ./include/*.h "$(INCDIR)"
+
+build-dirs:
+	$(MKPATH) $(BUILD_DIRS)
+
+clean:
+	$(RM_F) $(ALL_OBJS) $(ALL_LIBS) $(VER_OBJ)

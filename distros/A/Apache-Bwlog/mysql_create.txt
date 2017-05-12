@@ -1,0 +1,12 @@
+The following SQL can be used to create your table for bandwidth logging.
+
+	CREATE TABLE `bw_log` (
+	  `bw_id` bigint(20) NOT NULL auto_increment,
+	  `vhost` varchar(100) NOT NULL default '',
+	  `bytes_sent` bigint(20) NOT NULL default '0',
+	  `time_stamp` timestamp(14) NOT NULL,
+	  PRIMARY KEY (`bw_id`)
+	) 
+
+If using an existing table simply create the "vhost" and "bytes_sent" columns.  A timestamp isn't required 
+but is highly recommended.

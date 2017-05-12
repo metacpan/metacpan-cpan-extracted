@@ -1,0 +1,53 @@
+Amazon::SQS::ProducerConsumer
+
+This module makes it easy to use Amazon's Simple Queue Service to coordinate
+worker processes using a producer/consumer pattern in which each process
+loops while reading messages from a queues, processes them, and publishes new
+messages in other queues to drive the workflow along to other workers.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+
+To pass all tests, you will have to create an SQS queue called TestQueue
+and put your AWS_PUBLIC_KEY and AWS_SECRET_KEY in environment variables.
+
+  make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Amazon::SQS::ProducerConsumer
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Amazon-SQS-ProducerConsumer
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Amazon-SQS-ProducerConsumer
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Amazon-SQS-ProducerConsumer
+
+    Search CPAN
+        http://search.cpan.org/dist/Amazon-SQS-ProducerConsumer/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Nic Wolff
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

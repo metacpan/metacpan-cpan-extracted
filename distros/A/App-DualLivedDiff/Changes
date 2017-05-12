@@ -1,0 +1,36 @@
+Revision history for Perl extension App::DualLivedDiff
+
+1.07  Wed Mar 25 14:10 2009
+  - Option to ignore whitespace.
+
+1.06  Mon Mar 16 13:12 2009
+  - Explicitly mapped files trump the exclusion regexps.
+  - config subdirectory ships with many file mappings
+    between blead and CPAN
+  - config subdirectory also contains tools to run in
+    batch mode and generate HTML reports
+
+1.05  Wed Mar 11 18:15 2009
+  - '--paths=blead' / '--paths=dual' option to manually set the
+    paths shown in the diff.
+  - "exclude-regexes" option in the YAML config file
+    (an array of regexes matched against source files)
+
+1.04  Tue Mar 10 10:20 2009
+  - Fix path correction brain fart.
+
+1.03  Sun Mar  8 13:08 2009
+  - Fix the path munging of the diffs.
+  - Work around what seems to be a slight bug in CPAN.pm's
+    expand("Distribution, ...) to make expansion of dev
+    releases on CPAN work.
+
+1.02  Sat Mar  7 19:32 2009
+  - Default to using the current directory as distribution directory.
+
+1.01  Sat Mar  7 18:34 2009
+  - Support for base-paths in bleadperl
+
+1.00  Fri Mar  6 19:45 2009
+  - Initial baby steps.
+

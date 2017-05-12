@@ -1,0 +1,11 @@
+--- SDL_gfx-2.0.20/configure	2009-09-25 02:49:14.000000000 +0200
++++ SDL_gfx-2.0.20/configure	2011-07-20 15:44:24.249792800 +0200
+@@ -21630,7 +21630,7 @@
+ 
+ 
+ case "$target" in
+-    *-*-cygwin* | *-*-mingw32*)
++    *-*-mingw32*)
+ 	CFLAGS="$CFLAGS -DWIN32"
+         if test "$build" != "$target"; then # cross-compiling
+             ac_default_prefix=/usr/local/cross-tools/i386-mingw32msvc

@@ -1,0 +1,27 @@
+Revision history for App-ZofCMS
+
+1.001007 2017-01-04
+    - Update for 5.26 '{' in regex stuff
+
+1.001006 2015-03-21
+    - Fixed FileUpload plugin not erroring out correctly for
+        too-large uploads (Fixes #7)
+    - Fixed FileUpload plugin not taking scalar ref as `name` value
+        as advertized (Fixes #6)
+
+1.001005 2015-03-10
+    - Fixes #4: zofcms_helper must respect zcms_template_extension
+
+1.001004 2014-02-14
+    - Added missing zofcms_helper that got left out during
+     conversion to dzil
+    - Added a big warning in the docs, discouraging people use this framework
+
+1.001003 2014-01-31
+    - Fixed a stupid auto-replacement error of "ment" -> "meant"
+     (read your "documeantation"!)
+    - Removed unpacked file icons for the FileTypeIcon plugin;
+      there's already a tar with them inside.
+
+1.001002 2014-01-31
+    - First version that bundles up all the "nice" plugins inside the dist

@@ -1,0 +1,8 @@
+[
+  {
+    "name":   "foo.route",
+    "path":   "/foo/foo",
+    "target": "/foo/foo.asp",
+    "method": "GET"
+  }
+]

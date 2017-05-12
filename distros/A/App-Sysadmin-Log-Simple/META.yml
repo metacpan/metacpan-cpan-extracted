@@ -1,0 +1,53 @@
+---
+abstract: 'application class for managing a simple sysadmin log'
+author:
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IO::Scalar: 0
+  IPC::Open3: 0
+  Module::Build: 0.3601
+  Path::Tiny: 0.015
+  Test::More: 0.96
+  Test::Output: 0
+  Test::Requires: 0
+  Test::Script: 1.05
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Sysadmin-Log-Simple
+no_index:
+  directory:
+    - inc
+requires:
+  Carp: 0
+  Config::General: 0
+  DateTime: 0
+  DateTime::TimeZone: 0
+  File::Find::Rule: 0
+  File::HomeDir: 0
+  Getopt::Long: 0
+  HTTP::Tiny: 0
+  IO::Pager: 0
+  IO::Socket::INET: 0
+  Module::Pluggable: 0
+  Net::Twitter::Lite::WithAPIv1_1: 0
+  Path::Tiny: 0
+  Pod::Usage: 0
+  Try::Tiny: 0
+  URI::Escape: 0
+  autodie: 0
+  perl: v5.10.1
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/doherty/App-Sysadmin-Log-Simple/issues
+  homepage: http://p3rl.org/App::Sysadmin::Log::Simple
+  repository: git://github.com/doherty/App-Sysadmin-Log-Simple.git
+version: 0.009

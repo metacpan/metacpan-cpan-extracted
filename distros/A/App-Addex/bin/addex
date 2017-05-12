@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+package App::Addex::addex;
+# PODNAME:  addex
+# ABSTRACT: create mail helper files for address book entries
+$App::Addex::addex::VERSION = '0.026';
+#pod =head1 DESCRIPTION
+#pod
+#pod The F<addex> command produces configuration for various email tools based on
+#pod your address book.  For more information, consult L<App::Addex>.
+#pod
+#pod =cut
+
+use App::Addex;
+use Config::MVP::Assembler;
+use Config::MVP::Reader::INI;
+use File::HomeDir;
+use File::Spec;
+use Getopt::Long::Descriptive;
+
+my ($opt, $usage) = describe_options(
+  '%c %o',
+  [ 'config|c=s',     'config file name',
+    { default => File::Spec->catfile(File::HomeDir->my_home, '.addex') }   ],
+);
+
+my $assembler = Config::MVP::Assembler->new;
+$assembler->change_section('App::Addex', 'classes');
+
+my $seq = Config::MVP::Reader::INI->read_config(
+  $opt->{config},
+  { assembler => $assembler }
+);
+
+my $addex = App::Addex->from_sequence($seq);
+
+$addex->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+addex - create mail helper files for address book entries
+
+=head1 VERSION
+
+version 0.026
+
+=head1 DESCRIPTION
+
+The F<addex> command produces configuration for various email tools based on
+your address book.  For more information, consult L<App::Addex>.
+
+=head1 AUTHOR
+
+Ricardo SIGNES <rjbs@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2006 by Ricardo SIGNES.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

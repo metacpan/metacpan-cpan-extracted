@@ -1,0 +1,7 @@
+Revision history for App-Ttyrec
+
+0.02  2014-02-25
+      - stop using #!/usr/bin/env in installed scripts
+
+0.01  2012-03-07
+      - Initial release

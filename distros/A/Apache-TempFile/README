@@ -1,0 +1,20 @@
+This is an beta release of the Apache::TempFile module package for 
+Apache with mod_perl and perl5.
+
+This module generates names for temporary file names which are
+automatically removed when the current request has been completed.
+
+After unpacking the distribution, to install this module type
+
+        perl Makefile.PL
+        make
+        make install
+
+Please report any bugs/suggestions to <tom@compton.nu>.
+
+Copyright (c) Tom Hughes <tom@compton.nu>.
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+$Id: README,v 1.3 2002/08/17 22:33:39 tom Exp $

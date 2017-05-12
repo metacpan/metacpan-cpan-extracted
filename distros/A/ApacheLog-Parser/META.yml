@@ -1,0 +1,43 @@
+---
+name: ApacheLog-Parser
+version: v0.0.1
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: parse apache 'combined' log format
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=ApacheLog-Parser
+  homepage: http://scratchcomputing.com/
+  license: http://dev.perl.org/licenses/
+  repository: http://scratchcomputing.com/svn/ApacheLog-Parser/trunk
+requires:
+  Class::Accessor::Classy: v0.9.0
+  Date::Piece: v0.0.1
+  Digest::MD5: 0
+  File::Fu: v0.0.1
+  Getopt::Helpful: 0.04
+  IPC::Run: 0
+  YAML: 0
+build_requires:
+  Module::Build: 0.26
+  Test::More: 0
+provides:
+  ApacheLog::Parser:
+    file: lib/ApacheLog/Parser.pm
+    version: v0.0.1
+  ApacheLog::Parser::Report:
+    file: lib/ApacheLog/Parser/Report.pm
+    version: v0.0.1
+  ApacheLog::Parser::SkipList:
+    file: lib/ApacheLog/Parser/SkipList.pm
+    version: v0.0.1
+  ApacheLog::Parser::SkipList::Base:
+    file: lib/ApacheLog/Parser/SkipList.pm
+  ApacheLog::Parser::SkipList::Reader:
+    file: lib/ApacheLog/Parser/SkipList.pm
+  ApacheLog::Parser::SkipList::Writer:
+    file: lib/ApacheLog/Parser/SkipList.pm
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

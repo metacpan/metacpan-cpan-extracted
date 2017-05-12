@@ -1,0 +1,26 @@
+Revision history for Alien-ImageMagick
+
+0.07    2016-03-02
+        Make sure that Alien::Base::ModuleBuild is correctly specified as a configure_requires. Thanks @plicease
+        PR #2
+
+0.05    2015-02-08
+        No requirement for shared lib perl. See RT#95322
+        Bumped up Alien::Base dependency.
+
+0.04    2015-01-29
+        Moved pod tests to xt. see RT#101448
+
+0.03    2014-09-20
+        Fixed dynamic linking to build-dir libraries. see RT#98979
+
+        Completed history. see RT#98978
+
+0.02    2014-08-30
+        Install ImageMagick binary utilities in an accessible place
+        for perlbrew. see RT#96475
+
+0.01    2014-05-03
+
+        First version, released on an unsuspecting world.
+

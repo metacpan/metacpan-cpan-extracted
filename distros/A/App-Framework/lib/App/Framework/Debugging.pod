@@ -1,0 +1,71 @@
+=head1 NAME
+
+App::Framework::Debugging - Debugging tools/methods
+
+=head1 DESCRIPTION
+
+There are some mechanisms built into the application framework that provide methods of getting extra script debugging information. I have also
+described below some of the external tools I've found useful when debugging my scripts.
+
+=head2 Printing
+
+The application framework object (referred to as B<$app> here) has a B<prt_data> method that provides a hierarchical printout of HASHes, ARRAYs,
+and scalars. This method always outputs. 
+
+An alternative is to use the B<debug_prt> method. This prints out information, but only if the debug command line option has been set. You may also
+specify the debug level above which the debug option has to be set before any output appears. Some examples are:
+
+    sub app
+    {
+        my ($app, $opts_href, $args_href) = @_ ;
+        
+        my %a_hash ;
+        
+        # always print out a string followed by the options HASH
+        $app->prt_data("Options=", $opts_href) ;
+    
+        # always print out a string followed by the local HASH
+        $app->prt_data("Options=", \%a_hash) ;
+    
+    
+        ## do the same but only when the script is called with '-debug 1'
+        $app->debug_prt( ["Options=", $opts_href] ) ;
+        
+        ## this only shows when the script is called with '-debug 2' or above
+        $app->debug_prt( ["Options=", $opts_href], 2 ) ;
+    
+    }    
+    
+
+=head2 Debugger
+
+In certain circumstances, I've had to resort to a GUI debugger. The one I use is Devel::ptkdb at L<http://search.cpan.org/~aepage/Devel-ptkdb/> 
+and you run your script as:
+
+    perl -d:ptkdb your_script.pl
+
+
+Note that on startup you won't see the various B<Feature> modules loaded up in the 'open file' menu. This is because the framework dynamically loads them.
+If you set a breakpoint in your B<app()> subroutine, then they are all loaded by then.
+
+=head2 Profiler
+
+I have also found it useful to profile scripts to find whatever is slowing the script down. I've found that the default Perl profiler (Devel::prof)
+doesn't like my framework! The alternative I use is Devel::FastProf at L<http://search.cpan.org/~salva/Devel-FastProf/> which produces
+counts per module line. You gather the data as:
+
+    perl -d:FastProf your_script.pl
+
+to produce a binary file B<fastprof.out> which you convert into text using B<fprofpp>:
+
+    fprofpp > your_script.txt
+
+As I also prefer to see which function the line number is refering to, I use my script (using the App::Framework Filter extension!) to post-process
+the data. My script is available from L<ftp://www.cpan.org/authors/id/S/SD/SDPRICE/Examples/App-Framework/Filter/> and is run as:
+
+    fprofpp-filter your_script.txt
+
+
+=cut
+
+

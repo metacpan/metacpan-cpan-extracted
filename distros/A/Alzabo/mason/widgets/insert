@@ -1,0 +1,48 @@
+<%doc>
+=pod
+
+=head1 NAME
+
+insert
+
+=head1 SYNOPSIS
+
+  <& insert, table => $table, %ARGS &>
+
+=head1 DESCRIPTION
+
+A simple component to perform an insert based on the values of %ARGS.
+
+=head1 PARAMETERS
+
+=over 4
+
+=item * table
+
+An <Alzabo::Table> object into which a new row will be inserted.
+
+=back
+
+The rest of the arguments should simply be the C<%ARGS> hash as passed
+to the calling component.  This component will extract the relevant
+column values from that hash.
+
+=head1 RETURNS
+
+The new row that was inserted is returned.
+
+=cut
+</%doc>
+<%args>
+$table
+</%args>
+<%init>
+my %data;
+foreach my $c ( $table->columns )
+{
+    $data{ $c->name } = $ARGS{ $c->name }
+	if exists $ARGS{ $c->name };
+}
+
+return $table->insert( values => \%data );
+</%init>

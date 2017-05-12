@@ -1,0 +1,134 @@
+
+!IF "$(CFG)" == "Win64"
+BUILDBITS= 64
+!ELSE
+BUILDBITS= 32
+!ENDIF
+
+PERL   = perl 
+CP     = $(PERL) -MExtUtils::Command -e cp --
+RM_F   = $(PERL) -MExtUtils::Command -e rm_f --
+MKPATH = $(PERL) -MExtUtils::Command -e mkpath --
+
+### GLOBAL PART ###
+
+BUILDNICK= msvc
+
+PREFIX   = ../../_output_
+INCDIR   = $(PREFIX)/include
+LIBDIR   = $(PREFIX)/lib
+
+CF_ALL   = -DTEC_UNAME=vc9 -DTEC_SYSNAME=Win32 -DTEC_LITTLEENDIAN -DTEC_32 -DWIN32 -DNDEBUG -I"$(INCDIR)"
+LF_ALL   = -L../lib/$(BUILDNICK) -L"$(LIBDIR)"
+
+VER_OBJ      = version.o
+VER_RC       = version.rc
+
+BUILD_DIRS   = ../obj/$(BUILDNICK)/cd_freetype ../lib/$(BUILDNICK)
+
+ALL_OBJS     = $(OBJS_cd_freetype)
+
+STATIC_LIBS  = $(SLIB_cd_freetype)
+
+DYNAMIC_LIBS = $(DLIB_cd_freetype) $(ILIB_cd_freetype)
+
+ALL_LIBS     = $(STATIC_LIBS) $(DYNAMIC_LIBS)
+
+all: all-static all-dynamic
+
+
+### START OF cd_freetype ###
+CF_cd_freetype   = -c   -O2 -I../include -I../../zlib/include   -DFT2_BUILD_LIBRARY -DFT_CONFIG_OPTION_SYSTEM_ZLIB -DWIN32 $(CF_cd_freetype_EXTRA)
+LF_cd_freetype   = -lzlib1 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_cd_freetype_EXTRA)
+SLIB_cd_freetype = ../lib/$(BUILDNICK)/freetype6.lib
+DLIB_cd_freetype = ../lib/$(BUILDNICK)/libfreetype6.dll.a
+ILIB_cd_freetype = ../lib/$(BUILDNICK)/freetype6_alien_.dll
+OBJS_cd_freetype = ../obj/$(BUILDNICK)/cd_freetype/autofit.obj ../obj/$(BUILDNICK)/cd_freetype/bdf.obj ../obj/$(BUILDNICK)/cd_freetype/cff.obj ../obj/$(BUILDNICK)/cd_freetype/ftcache.obj ../obj/$(BUILDNICK)/cd_freetype/ftgzip.obj ../obj/$(BUILDNICK)/cd_freetype/ftlzw.obj ../obj/$(BUILDNICK)/cd_freetype/gxvalid.obj ../obj/$(BUILDNICK)/cd_freetype/otvalid.obj ../obj/$(BUILDNICK)/cd_freetype/pcf.obj ../obj/$(BUILDNICK)/cd_freetype/pfr.obj ../obj/$(BUILDNICK)/cd_freetype/psaux.obj ../obj/$(BUILDNICK)/cd_freetype/pshinter.obj ../obj/$(BUILDNICK)/cd_freetype/psnames.obj ../obj/$(BUILDNICK)/cd_freetype/raster.obj ../obj/$(BUILDNICK)/cd_freetype/sfnt.obj ../obj/$(BUILDNICK)/cd_freetype/smooth.obj ../obj/$(BUILDNICK)/cd_freetype/truetype.obj ../obj/$(BUILDNICK)/cd_freetype/type1.obj ../obj/$(BUILDNICK)/cd_freetype/type1cid.obj ../obj/$(BUILDNICK)/cd_freetype/type42.obj ../obj/$(BUILDNICK)/cd_freetype/winfnt.obj ../obj/$(BUILDNICK)/cd_freetype/ftbzip2.obj ../obj/$(BUILDNICK)/cd_freetype/ftapi.obj ../obj/$(BUILDNICK)/cd_freetype/ftbbox.obj ../obj/$(BUILDNICK)/cd_freetype/ftbdf.obj ../obj/$(BUILDNICK)/cd_freetype/ftbitmap.obj ../obj/$(BUILDNICK)/cd_freetype/ftdebug.obj ../obj/$(BUILDNICK)/cd_freetype/ftgasp.obj ../obj/$(BUILDNICK)/cd_freetype/ftglyph.obj ../obj/$(BUILDNICK)/cd_freetype/ftgxval.obj ../obj/$(BUILDNICK)/cd_freetype/ftinit.obj ../obj/$(BUILDNICK)/cd_freetype/ftlcdfil.obj ../obj/$(BUILDNICK)/cd_freetype/ftmm.obj ../obj/$(BUILDNICK)/cd_freetype/ftotval.obj ../obj/$(BUILDNICK)/cd_freetype/ftpatent.obj ../obj/$(BUILDNICK)/cd_freetype/ftpfr.obj ../obj/$(BUILDNICK)/cd_freetype/ftstroke.obj ../obj/$(BUILDNICK)/cd_freetype/ftsynth.obj ../obj/$(BUILDNICK)/cd_freetype/ftsystem.obj ../obj/$(BUILDNICK)/cd_freetype/fttype1.obj ../obj/$(BUILDNICK)/cd_freetype/ftwinfnt.obj ../obj/$(BUILDNICK)/cd_freetype/ftbase.obj ../obj/$(BUILDNICK)/cd_freetype/ftcid.obj ../obj/$(BUILDNICK)/cd_freetype/ftfstype.obj ../obj/$(BUILDNICK)/cd_freetype/md5.obj ../obj/$(BUILDNICK)/cd_freetype/ftfntfmt.obj
+
+../obj/$(BUILDNICK)/cd_freetype/autofit.obj : ./autofit/autofit.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/bdf.obj : ./bdf/bdf.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/cff.obj : ./cff/cff.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftcache.obj : ./cache/ftcache.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftgzip.obj : ./gzip/ftgzip.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftlzw.obj : ./lzw/ftlzw.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/gxvalid.obj : ./gxvalid/gxvalid.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/otvalid.obj : ./otvalid/otvalid.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/pcf.obj : ./pcf/pcf.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/pfr.obj : ./pfr/pfr.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/psaux.obj : ./psaux/psaux.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/pshinter.obj : ./pshinter/pshinter.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/psnames.obj : ./psnames/psnames.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/raster.obj : ./raster/raster.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/sfnt.obj : ./sfnt/sfnt.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/smooth.obj : ./smooth/smooth.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/truetype.obj : ./truetype/truetype.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/type1.obj : ./type1/type1.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/type1cid.obj : ./cid/type1cid.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/type42.obj : ./type42/type42.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/winfnt.obj : ./winfonts/winfnt.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftbzip2.obj : ./bzip2/ftbzip2.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftapi.obj : ./base/ftapi.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftbbox.obj : ./base/ftbbox.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftbdf.obj : ./base/ftbdf.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftbitmap.obj : ./base/ftbitmap.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftdebug.obj : ./base/ftdebug.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftgasp.obj : ./base/ftgasp.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftglyph.obj : ./base/ftglyph.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftgxval.obj : ./base/ftgxval.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftinit.obj : ./base/ftinit.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftlcdfil.obj : ./base/ftlcdfil.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftmm.obj : ./base/ftmm.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftotval.obj : ./base/ftotval.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftpatent.obj : ./base/ftpatent.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftpfr.obj : ./base/ftpfr.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftstroke.obj : ./base/ftstroke.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftsynth.obj : ./base/ftsynth.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftsystem.obj : ./base/ftsystem.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/fttype1.obj : ./base/fttype1.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftwinfnt.obj : ./base/ftwinfnt.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftbase.obj : ./base/ftbase.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftcid.obj : ./base/ftcid.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftfstype.obj : ./base/ftfstype.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/md5.obj : ./base/md5.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_freetype/ftfntfmt.obj : ./base/ftfntfmt.c ; cl $(CF_ALL) $(CF_cd_freetype) /Fo$@ $**
+
+$(SLIB_cd_freetype): $(OBJS_cd_freetype)
+	lib /OUT:$@ $**
+
+$(ILIB_cd_freetype) $(DLIB_cd_freetype) : $(OBJS_cd_freetype)
+	xxxg++ -s -shared -o $(ILIB_cd_freetype) $** -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_cd_freetype) $(LF_cd_freetype) $(LF_ALL)
+
+cd_freetype-static: build-dirs $(SLIB_cd_freetype)
+cd_freetype-dynamic: build-dirs $(ILIB_cd_freetype) $(DLIB_cd_freetype) 
+
+### compile RC
+
+$(VER_OBJ) : $(VER_RC) ; windres --define GCC_WINDRES $** -o $@
+
+all-static: build-dirs $(STATIC_LIBS)
+
+all-dynamic: build-dirs $(DYNAMIC_LIBS)
+
+install-all:
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) ../lib/$(BUILDNICK)/*.lib "$(LIBDIR)"
+	$(CP) ../include/*.h "$(INCDIR)"
+
+install-static: all-static
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) $(STATIC_LIBS) "$(LIBDIR)"
+	$(CP) ../include/*.h "$(INCDIR)"
+
+install-dynamic: all-dynamic
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) $(DYNAMIC_LIBS) "$(LIBDIR)"
+	$(CP) ../include/*.h "$(INCDIR)"
+
+build-dirs:
+	$(MKPATH) $(BUILD_DIRS)
+
+clean:
+	$(RM_F) $(ALL_OBJS) $(ALL_LIBS) $(VER_OBJ)

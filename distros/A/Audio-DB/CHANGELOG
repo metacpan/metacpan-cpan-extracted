@@ -1,0 +1,7 @@
+Revision history for Perl extension Audio::DB
+
+0.01  Sun Feb 27 2005
+        - first release to CPAN in new namespace as Audio::DB
+
+0.01  Wed Feb 16 10:14:04 2005
+	- first release to CPAN as Music::DB

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Resize.xs
+t/Apache-Imager-Resize.t
+lib/Apache/Imager/Resize.pm
+META.yml                                 Module meta-data (added by MakeMaker)

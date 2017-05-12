@@ -1,0 +1,81 @@
+NAME
+    Aspect::Library::Profiler - reusable method call profiling aspect
+
+SYNOPSIS
+      # profile all subs on SlowObject
+      aspect Profiler => call qr/^SlowObject::/;
+
+      # will be profiled
+      SlowObject->foo;
+
+      # will not
+      FastObject->bar;
+
+SUPER
+    Aspect::Modular
+
+DESCRIPTION
+    This class implements a reusable aspect that profiles subroutine calls.
+    It uses "Benchmark::Timer" to profile elapsed times for your calls to
+    the affected methods. The profiling report will be printed to "STDERR"
+    at the end of program execution.
+
+    The design comes from "Attribute::Profiled" by Tatsuhiko Miyagawa.
+
+WHY
+      +-------------+
+      |      A      |
+      +-------------+
+      | X -> Y <- Z |
+      +-^-----------+
+
+    Suppose you want to profile some code, call it "X", part of a larger
+    program, called "A". So you run your program under a profiler, and
+    notice most of the time is spent not in "X", but in "Y". "X" uses "Y",
+    but so does "Z". You only want to profile how "X" uses "Y", not how "Z"
+    uses "Y". This is where this aspect can help- you can install a
+    profiling aspect with a "cflow()" pointcut, to profile only usage of "Y"
+    by code in the call flow of "X".
+
+SEE ALSO
+    See the Aspect pods for a guide to the Aspect module.
+
+    You can find an example of using this aspect in the "examples/"
+    directory of the distribution.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org>.
+
+SUPPORT
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Aspect-Library-Profile
+    r>.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you. Or see
+    <http://www.perl.com/CPAN/authors/id/M/MA/MARCEL/>.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+    Marcel Grünauer <marcel@cpan.org>
+
+    Ran Eilam <eilara@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2001 by Marcel Grünauer.
+
+    Some parts copyright 2009 - 2011 Adam Kennedy.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

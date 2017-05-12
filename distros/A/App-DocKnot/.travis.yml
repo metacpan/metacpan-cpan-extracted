@@ -1,0 +1,24 @@
+language: perl
+perl:
+  - "5.22"
+  - "5.20"
+  - "5.18"
+
+env: AUTHOR_TESTING=1
+before_install:
+  - cpanm Devel::Cover
+  - cpanm File::BaseDir
+  - cpanm File::ShareDir
+  - cpanm JSON
+  - cpanm Perl6::Slurp
+  - cpanm Template
+  - cpanm Test::MinimumVersion
+  - cpanm Test::Perl::Critic
+  - cpanm Test::Pod
+  - cpanm Test::Pod::Coverage
+  - cpanm Test::Strict
+  - cpanm Test::Synopsis
+
+branches:
+  only:
+    - master

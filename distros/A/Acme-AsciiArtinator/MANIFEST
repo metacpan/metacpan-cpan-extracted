@@ -1,0 +1,14 @@
+.cvsignore
+ascii-art.pl
+Changes
+lib/Acme/AsciiArtinator.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-artinate.t
+t/02-test_input.t
+t/10-tokenize.t
+t/19-tokenize-regex.t
+t/pod-coverage.tt
+META.yml                                 Module meta-data (added by MakeMaker)

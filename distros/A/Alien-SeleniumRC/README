@@ -1,0 +1,70 @@
+Alien-SeleniumRC is a package containing the Java based Selenium Server
+for use in Selenium Remote Control.
+
+From the Selenium RC website: http://openqa.org/selenium-rc
+
+  Selenium Remote Control a test tool that allows you to write automated
+  web application UI tests in any programming language against any HTTP
+  website using any mainstream JavaScript-enabled browser.
+
+  Selenium Remote Control provides a Selenium Server, which can
+  automatically start/stop/control any supported browser. It works by
+  using Selenium Core, a pure-HTML+JS library that performs automated
+  tasks in JavaScript.
+
+  The Selenium Server communicates directly with the browser using AJAX
+  (XmlHttpRequest). You can send commands directly to the Server using
+  simple HTTP GET/POST requests; that means that you can use any
+  programming language that can make HTTP requests to automate Selenium
+  tests on the browser. To further ease this process, we provide wrapper
+  objects for a number of mainstream programming languages (Perl, Java,
+  .NET, Python, and Ruby).
+
+  Finally, the Selenium Server acts as a client-configured HTTP proxy, to
+  stand in between the browser and your website. This allows a
+  Selenium-enabled browser to run JavaScript on arbitrary websites.
+
+  The Selenium Server is great for testing complex AJAX-based web user
+  interfaces under a Continuous Integration system. It is also an ideal
+  solution for users of Selenium Core or Selenium IDE who want write tests
+  in a more expressive programming language than the Selenese HTML table
+  format customarily used with Selenium Core.
+
+Selenium-RC is released under the Apache 2.0 license:
+http://www.apache.org/licenses/LICENSE-2.0
+
+This package assumes that Java is installed on the system and that
+'java' is available on the command line.
+
+The server will attempt to launch browsers, so make sure they're there.
+
+To install:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Using the Selenium Server
+
+Alien::SeleniumRC bundles a script called selenium-rc which will launch
+the bundled selenium-server.jar server.  Any arguments given to
+selenium-rc will be passed through to java.
+
+Start the server:
+
+  selenium-rc
+
+See options:
+
+  selenium-rc -help
+
+Run server on alternate port:
+
+  selenium-rc -port 1234
+
+
+Copyright (c) 2006 Luke Closs <lukec@cpan.org>.
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

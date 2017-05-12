@@ -1,0 +1,68 @@
+NAME
+    pod-example - Script to print or run of example from documentation.
+
+SYNOPSIS
+     pod-example [-d flag] [-e] [-h] [-n number] [-p] [-r] [-s section] [--version] pod_file_or_module [argument ..]
+
+ARGUMENTS
+    *       "-d flag"
+
+             Turn debug (0/1).
+             Default value is 1.
+
+    *       "-e"
+
+             Enumerate lines. Only for print mode.
+
+    *       "-h"
+
+             Print help.
+
+    *       "-n number"
+
+             Number of example.
+             Default value is nothing.
+
+    *       "-p"
+
+             Print example.
+
+    *       "-r"
+
+             Run example.
+
+    *       "-s section"
+
+             Use section.
+             Default value is EXAMPLE.
+
+    *       "--version"
+
+             Print version of script.
+
+    *       "pod_file_or_module"
+
+             Perl POD file or module.
+
+    *       "argument .."
+
+             Example arguments.
+
+EXAMPLE
+     pod-example -p -r Class::Utils
+
+REPOSITORY
+    <https://github.com/tupinek/App-Pod-Example>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2011-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.16
+

@@ -1,0 +1,59 @@
+[% WRAPPER head %]
+<style>
+  .groupname { font-weight: bold; color: navy; font-size: 120% }
+  .remarques { font-size: 90%; text-decoration: italic }
+  .readonly  { background-color: lightgrey }
+  .where     { width: 4em; text-align: right;  }
+</style>
+<script>
+  function setup() {  
+    new GvaScript.TreeNavigator(
+       'TN_tree', 
+       {selectFirstNode: false, tabIndex: -1}
+    );
+    new GvaScript.Form('insert_form', {
+      datatree: [% data.init_form %]
+     });
+  }
+  window.onload = setup;
+</script>
+
+[% END; # WRAPPER head %]
+
+[%# ---------- start body ---------- %]
+
+
+<div class="actions">
+  <a href="descr">describe</a> | 
+  <a href="search">search</a> this table
+</div>
+
+
+<h1>Insert into [% data.table %]</h1>
+
+<form action="[% dsbase _ 'table/' _ data.table _ '/insert' %]"
+      method="POST" id='insert_form' accept-charset='utf-8'>
+
+  <div id="TN_tree">
+    [% USE group_iter = iterator(data.colgroups) %]
+    [% FOREACH group IN group_iter %]
+    <div class="TN_node">
+      <span class="TN_label groupname">[% group.name %]</span>
+      <div class="TN_content">
+        [% FOREACH col IN group.columns;
+           SET col_name = col.COLUMN_NAME %]
+        <div class="TN_leaf">
+          <span class="TN_label colname" title="[% col.descr %]">[% col_name %]</span>
+          <span class="after_label">
+            <input name="[% col_name %]" size=40>
+          </span>
+        </div>
+        [% END; # FOREACH col IN group.columns %]
+      </div>
+    </div>
+    [% END; # FOREACH group IN group_iter %]
+  </div>
+
+  <input type="submit">
+  <input type="reset">
+</form>

@@ -1,0 +1,40 @@
+---
+abstract: 'Convert texts like which a cat is talking in Japanese'
+author:
+  - 'azumakuniyuki <perl.org [at] azumakuniyuki.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.3, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Nyaa
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Acme::Nyaa:
+    file: lib/Acme/Nyaa.pm
+    version: v0.0.10
+  Acme::Nyaa::Ja:
+    file: lib/Acme/Nyaa/Ja.pm
+requires:
+  Encode: 2.42
+  Module::Load: 0.18
+  perl: 5.010001
+version: 0.0.10
+x_contributors:
+  - 'azumakuniyuki <azumakuniyuki@gmail.com>'

@@ -1,0 +1,10 @@
+README
+lib/Apache2/AuthCAS.pm
+lib/Apache2/AuthCAS/Configuration.pm
+Makefile.PL
+MANIFEST
+LICENSE
+Changes
+t/00basic.t
+schemaPg.sql
+schemaOracle.sql

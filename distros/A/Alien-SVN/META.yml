@@ -1,0 +1,49 @@
+---
+abstract: 'A wrapper for installing the SVN Perl bindings'
+author:
+  - 'Michael G Schwern <schwern@pobox.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.31'
+  Module::Build: '0.28'
+  Test::More: '0.40'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.142060'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-SVN
+no_index:
+  directory:
+    - inc
+    - src
+provides:
+  Alien::SVN:
+    file: lib/Alien/SVN.pm
+    version: v1.8.11.0
+  SVN::Base:
+    file: src/subversion/subversion/bindings/swig/perl/native/Base.pm
+  SVN::Client:
+    file: src/subversion/subversion/bindings/swig/perl/native/Client.pm
+  SVN::Core:
+    file: src/subversion/subversion/bindings/swig/perl/native/Core.pm
+    version: v1.8.11
+  SVN::Delta:
+    file: src/subversion/subversion/bindings/swig/perl/native/Delta.pm
+  SVN::Fs:
+    file: src/subversion/subversion/bindings/swig/perl/native/Fs.pm
+  SVN::Ra:
+    file: src/subversion/subversion/bindings/swig/perl/native/Ra.pm
+  SVN::Repos:
+    file: src/subversion/subversion/bindings/swig/perl/native/Repos.pm
+  SVN::Wc:
+    file: src/subversion/subversion/bindings/swig/perl/native/Wc.pm
+requires:
+  perl: v5.8.0
+  version: '0.70'
+resources:
+  bugtracker: https://github.com/evalEmpire/Alien-SVN/issues
+  repository: https://github.com/evalEmpire/Alien-SVN/
+version: v1.8.11.0

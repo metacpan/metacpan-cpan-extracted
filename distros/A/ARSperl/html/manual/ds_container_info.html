@@ -1,0 +1,61 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - Container Information</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H2>Container Info Structure</H2>
+
+A list of these HASH structures is returned by function 
+<A href="ars_GetListContainer.html">ars_GetListContainer</a>.
+
+<PRE>
+{
+ ......
+ "adminList"            =&gt; <i>list</i> of group ids,
+ "changeDiary"          =&gt; <i>list</i> of references to <a href="ds_diaryentry_hash.html">Diary Entry Structures</a>,
+ "getListFields"        =&gt; <i>list</i> of references to <A href="ds_elfs.html">Entry List Field Structure</a>,
+ "groupList"            =&gt; <B>see below</B>
+ "helpText"             =&gt; string,
+ "indexList"            =&gt; <i>list</i> of references to <A href="ds_is.html">Index Structure</a>
+ "lastChanged"          =&gt; string,
+ "owner"                =&gt; string,
+ "schema"               =&gt; reference to <a href="ds_schematype.html">schemaType</a> hash, (<B>3.x and above</B>)
+ "sortList"             =&gt; <i>list</i>,
+ "timestamp"            =&gt; integer,
+ "defaultVui"		=&gt; string (5.x only)
+}
+ </PRE>
+
+<DL>
+<DT><B>groupList</B><DD>
+   When compiled against <B>3.x</B>, this will be a hash reference containing
+   the groupId as the key to the hash and one of: <P> 
+   <blockquote>
+   <CODE>none</CODE>, <CODE>hidden</CODE>, or <CODE>visible</CODE>
+   </blockquote>
+   as the value of the hash. <P>
+
+   When compiled under <B>2.x</B> this will be an array reference. The
+   array will contain a list of groupId's that can access this schema.
+</DL>
+
+
+<P>
+
+Example:
+
+<PRE>
+@filterGuides = ars_GetListContainer( $ctrl, 0, 124, 4 );
+print $s-&gt;{"containerName"};
+</PRE>
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 23rd November 2005 by tstapff@users.sourceforge.net
+</address>
+</BODY>
+</HTML>

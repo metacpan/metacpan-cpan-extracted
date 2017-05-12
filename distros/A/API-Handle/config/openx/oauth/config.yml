@@ -1,0 +1,5 @@
+---
+api_host: http://blahblah.openxenterprise.com
+api_url: http://blahblah.openxenterprise.com/ox/3.0
+sso_url: https://sso.openx.com
+realm: blahblah_ad_server

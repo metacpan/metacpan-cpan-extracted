@@ -1,0 +1,135 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-sync
+# ABSTRACT: Sync up all local branches with the remote
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    git
+    confirm current_branch
+    guarantee_a_clean_working_directory
+);
+
+my $stash = guarantee_a_clean_working_directory();
+git "remote update -p origin";
+
+warn "Updating local branches...\n";
+my @needs_rebase = update_local_branches();
+
+warn "Packing tags...\n";
+git "pack-refs";
+my $git_dir = git "rev-parse --git-dir";
+if ( -d "$git_dir/refs/tags" ) {
+    system "find $git_dir/refs/tags -depth -type d -empty -exec rmdir {} \\;";
+}
+
+if ( @needs_rebase > 1 ) {
+    my $branches = join ' and ', @needs_rebase;
+    warn  "\n"
+        . "$branches have local changes which aren't in the\n"
+        . "central repository.  To bring them up to date, you need to\n"
+        . "rebase each one with something like this:\n"
+        . "\n"
+        . " git checkout master\n"
+        . " git rebase origin/master\n"
+        . "\n"
+        . "Because you've committed directly to multiple branches, gitc\n"
+        . "can't start the rebase for you automatically\n"
+        ;
+}
+elsif( @needs_rebase ) {
+    my $branch = $needs_rebase[0];
+    warn "\n$branch had local changes and may be outdated\n";
+    if($stash) {
+        warn "Since you stashed changes, you'll have to rebase manually\n";
+    }
+    elsif ( confirm('Shall I start a rebase for you?') ) {
+        git "checkout $branch";
+        exec "git rebase origin/$branch";
+    }
+}
+
+# reinstate any changes present when we started
+git "stash apply $stash" if $stash;
+
+exit;
+
+sub branch_exists {
+    my ($branch) = @_;
+    our $branches;
+    if ( not $branches ) {
+        my %all = map { substr( $_, 2 ) => 1 } git "branch";
+        $branches = \%all;
+    }
+
+    return $branches->{$branch};
+}
+
+# make sure that local branches match upstream branches.
+# returns a list of local branches with local changes
+sub update_local_branches {
+    my $current_branch = current_branch;
+    for my $branch (qw( master test stage prod )) {
+        my $branch_exists = branch_exists($branch);
+        my $has_local_commits
+            = $branch_exists ? git "rev-list -n 1 $branch ^origin/$branch" : '';
+        if($has_local_commits) {
+            warn "You've committed directly to $branch. I'll leave it alone.\n";
+            push @needs_rebase, $branch;
+        }
+        elsif ( $branch eq $current_branch ) {
+            git "reset --hard origin/$branch";
+        }
+        elsif ($branch_exists) {
+            git "update-ref -m 'gitc sync' refs/heads/$branch origin/$branch";
+        }
+        else {
+            git "branch $branch origin/$branch";
+        }
+    }
+    return @needs_rebase;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-sync - Sync up all local branches with the remote
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

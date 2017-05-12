@@ -1,0 +1,15 @@
+# $Id: MANIFEST,v 1.3 2007/12/08 03:32:14 atobey Exp $
+
+AuthenSecurID.pm
+Auth/Auth.pm
+Changes
+MANIFEST
+Makefile.PL
+README
+test.pl
+ace_initd
+redhat/sysconfig/ace_initd
+redhat/httpd/conf.d/authensecurid.conf
+redhat/init.d/ace_initd
+Auth/Makefile.PL
+Auth/test.pl

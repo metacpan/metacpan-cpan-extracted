@@ -1,0 +1,24 @@
+0.10  Sat Nov 15 18:30:00 2008
+        - add dependency on Gtk2
+
+0.09  Sun Feb 10 21:03:00 2008
+        - corrected version numbers
+
+0.08  Sat Jan 05 22:44:00 2008
+        - updated gramofile homepage to http://www.opensourcepartners.nl/~costar/gramofile/
+
+0.07  Mon Oct 31 17:56:00 2005
+        - added support for begin end times and framesize
+
+0.06  Mon Jul 5  23:42:00 2004
+        - added a scrolled window for smaller screens
+
+0.05  Sat Jul 3  22:07:00 2004
+        - corrected dependency versions
+
+0.04  Sat Jul 3  21:15:00 2004
+        - implemented progress bars
+
+0.01  Fri May 28 22:07:29 2004
+	- original version; created by h2xs 1.23 with options
+		--compat-version=5.6.0 -AfXn Audio::GtkGramofile

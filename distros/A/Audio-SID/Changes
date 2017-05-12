@@ -1,0 +1,77 @@
+Revision history:
+
+3.11 - Sun Aug 14 2005
+        - The textual fields of "title", "author" and "released" were
+          handled as Unicode. They were supposed to be ISO 8859-1 ASCII
+          single-byte chars in SID files. This is now enforced when doing
+          a set(), write() or validate().
+        - getC64BASIC() returned undef for RSIDs, which was incorrect.
+
+3.10 - Sun Jul 17 2005
+        - Fixed MD5 calculation for RSIDs.
+        - The 'name' field is now called 'title' for consistency with
+          HVSC and other SID-related programs. 'name' is still accepted
+          for backwards compatibility.
+        - New method isRSID() that returns 'true' if the file is a RealSID,
+          'false' otherwise.
+
+3.03 - Tue Jan 31 2004
+        - Added check in validate() to make sure the initAddress is within
+          the load range for PSIDs.
+        - Added complete support for the 'C64 BASIC' RSID flag: added the new
+          getC64BASIC(), isC64BASIC(), setC64BASIC() methods, changed the
+          PlaySID flag related methods. See documentation for details.
+
+3.02 - Fri Nov 22 2002
+        - The load range wasn't calculated correctly when checking for the
+          relocation range. Fixed it.
+        - Changed the "copyright" field name to "released", but "copyright"
+          remains an accepted alias for "released".
+
+3.01 - Sat Nov 03 2002
+        - There was a bug in the relocation page checking code. Fixed it.
+
+3.00 - Tue Oct 29 2002
+        Major changes:
+        - First of all, the module name was changed from Audio::PSID to
+          Audio::SID.
+        - The module now also handles RSID (Real SID) files, which are
+          basically PSID v2NG files with 'RSID' as their magic ID (instead
+          of 'PSID'). These files strictly require a C64 environment in SID
+          emulators to run properly, appropriate PSID v2NG restrictions are
+          enforced for it.
+        - 'magicID' is a new field that can also be changed: it can be set
+          either to 'PSID' or 'RSID'.
+        - new(), read() and write() can also take named parameters (see POD
+          for details).
+        - The validate() method was updated so it produces a valid PSID v2NG
+          or RSID file.
+        - The included PSID_v2NG.txt file containing the file specification
+          was extended to include RSID and renamed to SID_file_format.txt.
+
+        Bugfixes:
+        - The read() method didn't take a filehandle correctly. (Thanks to
+          Niklas Bichinger for reporting it!)
+        - The last byte of a file wasn't read if the C64 data was exactly
+          64 kB large (#$%@ boundary conditions!).
+        - set() didn't always set the fields properly if a hash containing
+          more than one field-value pair was passed to it.
+
+2.02 - Tue Sep 5 2002
+        There was a bug in the new MD5 calculation when PSID version was 1.
+        Fixed it.
+
+2.01 - Tue Sep 3 2002
+        Changed the MD5 calculation to include the CLOCK field if it's
+        set to NTSC. The old MD5 fingerprints can still be asked - see
+        POD for details.
+
+2.00 - Wed Apr 3 2002
+        Added PSID v2NG support.
+        Major interface changes - see POD for details.
+
+1.60 - Sun Jan 6 2002
+        First version released to CPAN.
+
+1.00 - Fri Jun 11 1999
+        First publicly released version.

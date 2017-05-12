@@ -1,0 +1,32 @@
+---
+abstract: 'AnyEvent ProtocolBuffers Riak Client'
+author:
+  - 'Damien Krotkine <dams@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  Module::Build::Tiny: 0.039
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-Riak
+requires:
+  AnyEvent: 0
+  AnyEvent::Handle: 0
+  Carp: 0
+  Google::ProtocolBuffers: 0
+  Moo: 0
+  Types::Standard: 0
+  perl: 5.010
+resources:
+  bugtracker: https://github.com/dams/p5-anyevent-riak/issues
+  homepage: https://github.com/dams/p5-anyevent-riak
+  repository: git://github.com/dams/p5-anyevent-riak.git
+version: 0.93

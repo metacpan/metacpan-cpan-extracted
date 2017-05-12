@@ -1,0 +1,119 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Pod::Usage;
+use Getopt::Long;
+use JSON::PP qw(decode_json);
+use App::cloudconvert;
+
+## Parse options
+my %opt;
+GetOptions(\%opt, 
+    "help|?", "man", "config=s", "dry",
+    "wait=i", "agent=s",
+    "apikey=s", "from=s", "to=s",
+) || pod2usage(-verbose => 0);
+pod2usage(-verbose => 1)  if ($opt{help});
+pod2usage(-verbose => 2)  if ($opt{man});
+
+## Read configuration
+my $configfile = $opt{config} || 'cloudconvert.json';
+if (-e $configfile) {
+    my $config = decode_json(do {local (@ARGV, $/) = $configfile; <>});
+    foreach (keys %$config) {
+        $opt{$_} = $config->{$_} unless exists $opt{$_}
+    }
+}
+
+## Set default values
+$opt{url} ||=  'https://api.cloudconvert.org/convert';
+$opt{wait} ||= 300;
+ 
+## check usage
+pod2usage("missing apikey") unless $opt{apikey};
+pod2usage("missing input file") unless @ARGV;
+
+## guess missing options
+my ($input, $output) = @ARGV;
+if ($input =~ /(.+)\.([a-z0-9]+)$/) {
+    $opt{from} ||= $2;    
+    if (!defined $output and $opt{to}) {
+        $output = "$1.".$opt{to};
+    } elsif (defined $output and $output =~ /\.([a-z0-9]+)$/) {
+        $opt{to} ||= $1;
+    }
+}
+
+pod2usage("missing input format") unless $opt{from};
+pod2usage("missing output format") unless $opt{to};
+pod2usage("missing output file") unless defined $output;
+
+my $app = App::cloudconvert->new(%opt);
+exit $app->convert( $input, $output );
+
+
+__END__
+
+=head1 NAME
+
+cloudconvert - convert files via cloudconvert.org
+
+=head1 SYNOPSIS
+ 
+cloudconvert [options] inputfile [outputfile]
+ 
+ Options:
+   -apikey key    api key (required)
+   -from format   input format
+   -to format     output format
+   -dry           don't convert, just show
+   -url URL       base URL
+   -wait seconds  timeout (300 by default)
+   -config file   read configuration from JSON file
+   -help          brief help message
+   -man           full documentation
+
+=head1 OPTIONS
+ 
+Options can be set by config file (C<cloudconvert.json> by default) or as
+command line options.
+
+=over 8
+
+=item apikey
+
+required API key
+
+=item url
+
+custom base url (instead of C<https://api.cloudconvert.org/convert>), for
+instance a L<http://requestb.in/> URL for testing
+
+=item from
+
+Input format (input file extension by default)
+
+=item to
+
+Output format (output file extension by default)
+
+=item wait
+
+Timeout in seconds (300 by default)
+
+=item agent
+
+User agent to identify with
+
+=back
+
+=head1 DESCRIPTION
+
+See L<https://cloudconvert.org/>
+
+=head1 SEE ALSO
+
+See L<App::cloudconvert> for internals
+
+=cut

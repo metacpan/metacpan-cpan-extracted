@@ -1,0 +1,131 @@
+#!/usr/bin/env perl
+
+# Pragmas.
+use strict;
+use warnings;
+
+# Modules.
+use App::Translit::String;
+
+# Version.
+our $VERSION = 0.04;
+
+# Run.
+App::Translit::String->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+translit-string - Script to transliterate string.
+
+=head1 SYNOPSIS
+
+ translit-string [-h] [-r] [-t table] [--version] string
+
+=head1 DESCRIPTION
+
+ translit-string script uses Lingua::Translit class to transliterate strings.
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+ Print help.
+
+=item * C<-r>
+
+ Reverse transliteration.
+
+=item * C<-t table>
+
+ Transliteration table.
+ For list of transliteration tables see L<Lingua::Translit>.
+
+=item * C<--version>
+
+ Print version of script.
+
+=item * C<string>
+
+ String to transliterate.
+
+=back
+
+=head1 EXAMPLE1
+
+ translit-string
+
+ # Output:
+ # Usage: translit-string [-h] [-r] [-t table] [--version]
+ #         string
+ # 
+ #         -h              Print help.
+ #         -r              Reverse transliteration.
+ #         -t table        Transliteration table (default value is 'ISO/R 9').
+ #         --version       Print version.
+
+=head1 EXAMPLE2
+
+ translit-string 'Российская Федерация'
+
+ # Output:
+ # Rossijskaja Federacija
+
+=head1 EXAMPLE3
+
+ translit-string -r 'Rossijskaja Federacija'
+
+ # Output:
+ # Российскайа Федерацийа
+
+=head1 DEPENDENCIES
+
+L<App::Translit::String>.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<translit>
+
+transliterate text between various writing systems
+
+=item L<Lingua::Translit>
+
+transliterates text between writing systems
+
+=back
+
+=head1 REPOSITORY
+
+L<https://github.com/tupinek/App-Translit-String>
+
+=head1 AUTHOR
+
+Michal Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+ © 2015-2016 Michal Špaček
+ BSD 2-Clause License
+
+=head1 VERSION
+
+0.04
+
+=cut

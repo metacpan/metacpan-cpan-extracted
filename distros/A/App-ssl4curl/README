@@ -1,0 +1,43 @@
+NAME
+    App::ssl4curl - Install and setup Mozilla certificates for curl SSL/TLS
+    from ~/.bashrc
+
+SYNOPSIS
+    Install Mozilla::CA module and setup certificates for curl SSL/TLS from
+    ~/.bashrc
+
+GIF
+                https://github.com/z448/ssl4curl
+
+USAGE
+                - Initialize from command line as root or use sudo. Use
+                normal user if you have local::lib set up. This will install
+                Mozilla::CA module.
+
+                `udo ssl4curl -i'
+
+                - Add to ~/.bashrc to check/download and setup certificates
+                on start of every session
+
+                `export `ssl4curl -p`'
+
+                - Execute on command line to check/download certificates and
+                list export string. You can add output string into your
+                ~/.bashrc in which case certificate setup will be skiped on
+                start of session.
+
+                `ssl4curl'
+
+                - Print this documentation
+
+                `ssl4curl -h'
+
+AUTHOR
+    Zdenek Bohunek , `<zdenek@cpan.org>'
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Zdenek Bohunek, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

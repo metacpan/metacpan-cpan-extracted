@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Archive/SimpleExtractor.pm
+lib/Archive/SimpleExtractor/Rar.pm
+lib/Archive/SimpleExtractor/Tar.pm
+lib/Archive/SimpleExtractor/Zip.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

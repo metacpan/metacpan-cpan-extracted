@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         App-REPL
+version:      0.012
+version_from: lib/App/REPL.pm
+installdirs:  site
+requires:
+    PadWalker:                     1.5
+    PPI:                           1.118
+    Term::ANSIColor:               0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

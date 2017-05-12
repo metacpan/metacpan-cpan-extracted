@@ -1,0 +1,34 @@
+# This file acts as the project's changelog.
+
+`Acme-Perl-Consensual 0.000_01 cpan:TOBYINK`
+	issued  2012-07-05;
+	label   "Preview release";
+	.
+
+`Acme-Perl-Consensual 0.000_02 cpan:TOBYINK`
+	issued  2012-07-26;
+	changeset [
+		item "Bundle perlhist info in __DATA__."^^Change;
+	];
+	.
+
+`Acme-Perl-Consensual 0.001 cpan:TOBYINK`
+	issued  2012-07-30;
+	label   "first public release"@en;
+	changeset [
+		item "perlhist data includes some 5.17.x release dates."^^Update;
+	];
+	.
+
+`Acme-Perl-Consensual 0.002 cpan:TOBYINK`
+	issued  2013-05-18;
+	changeset [
+		item "perlhist data includes up to 5.18.0."^^Update;
+		item [
+			a dcs:Bugfix;
+			label "LC_ALL is supposed to override all other LC_* variables.";
+			dcs:fixes RT#81252;
+			dcs:thanks cpan:MAUKE;
+		];
+	];
+	.

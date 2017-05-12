@@ -1,0 +1,46 @@
+{
+   "abstract" : "find Google ProtoBuf library",
+   "author" : [
+      "Mattia Barbon <mattia@barbon.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-ProtoBuf",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0.023",
+            "ExtUtils::CppGuess" : "0.11",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/mbarbon/alien-protobuf",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mbarbon/alien-protobuf.git",
+         "web" : "https://github.com/mbarbon/alien-protobuf"
+      }
+   },
+   "version" : "0.05"
+}
+

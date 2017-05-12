@@ -1,0 +1,7 @@
+
+12 Nov 2006  0.10 Bugfixes contributed by Richard Clamp
+                  - passing float values to line caused it not to terminate
+                  - correction to precedence in circle algorithm
+                  Basic test for circle added
+
+23 Sep 2004  0.10 Initial release

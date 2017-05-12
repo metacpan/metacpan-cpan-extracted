@@ -1,0 +1,44 @@
+{
+   "abstract" : "A non-blocking API to Amazon's SQS",
+   "author" : [
+      "Jeffrey Ryan Thalhammer <jeff@thaljef.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amazon-SQS-Simple-AnyEvent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Amazon::SQS::Simple" : "2.04",
+            "AnyEvent::HTTP" : "0",
+            "Test::More" : "0",
+            "XML::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}

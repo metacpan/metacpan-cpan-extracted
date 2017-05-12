@@ -1,0 +1,164 @@
+[% WRAPPER head %]
+<style>
+  .param_group       { font-weight: bold; color: firebrick; font-size: 120%; }
+  .groupname         { font-weight: bold; color: navy; font-size: 110%; }
+  .check_column      { float: right; }
+  .check_col_group   { margin-right: 1.5em } 
+  .check_all_groups  { margin-right: 3em } 
+  .clear_float       { display:block;height:0;margin:0;
+                       clear:both;visibility:hidden;}
+  #TN_tree           { clear: right }
+  #criteria .TN_node { border-top: 1px dashed gray }
+  .TN_button         { background-position-y: top; }
+  .focused_label     { border-bottom: 1px dashed blue }
+  .pk                { text-decoration: underline }
+</style>
+
+<script>
+  var tn_tree;
+  function setup() {  
+    tn_tree = new GvaScript.TreeNavigator(
+       'TN_tree', 
+       {selectFirstNode: false, tabIndex: -1}
+    );
+    var form = new GvaScript.Form('search_form', {
+      datatree: [% data.init_form %]
+     });
+    form.register('textarea, input', 'focus', on_focus_input);
+    form.register('textarea, input', 'blur',  on_blur_input);
+  }
+  window.onload = setup;
+  function propagate_checkbox(main_box, id) {
+    var boxes = $$("#" + id + " input[type=checkbox]");
+    boxes.each(function(box) {
+       box.checked = main_box.checked;
+      });
+  }
+
+  function on_focus_input(event) {
+    var label = get_label(event);
+    if (label)
+      label.addClassName('focused_label');
+
+    // deselect treeNavigator
+    tn_tree.select(undefined);
+  }
+    
+  function on_blur_input(event) {
+    var label = get_label(event);
+    if (label)
+      label.removeClassName('focused_label');
+  }
+
+  function get_label(event) {
+    var node = tn_tree.enclosingNode(event.element());
+    return node ? tn_tree.label(node) : undefined;
+  }
+
+</script>
+
+[% END; # WRAPPER head %]
+
+[%# ---------- start body ---------- %]
+
+
+
+<div class="actions">
+  <a href="descr">describe</a> this table
+</div>
+
+
+<h1>Search [% data.table %]</h1>
+
+
+<div class="check_column groupname">Displayed columns</div>
+
+<form action="search" method="POST" id='search_form'>
+
+  <div id="TN_tree">
+
+    <div class="check_column">
+      check/uncheck all <input type=checkbox class="check_all_groups"
+                               onclick="propagate_checkbox(this, 'TN_tree')"> 
+    </div>
+    <div class="TN_node" id="criteria">
+      <span class="TN_label param_group">Criteria</span>
+      <span class="clear_float"></span>
+      <div class="TN_content">
+        [% FOREACH group IN data.colgroups;
+             node_status = group.node or "open"; %]
+        <input type="checkbox" class="check_column check_col_group"
+               tabindex="100"  title="check/uncheck columns in this group"
+               onclick="propagate_checkbox(this, 'group_[% group.name %]')">
+        <div class="TN_node[% " TN_closed" IF node_status == "closed" %]"
+             id="group_[% group.name %]">
+          <span class="TN_label groupname">[% group.name %]</span>
+          <span class="clear_float"></span>
+          <div class="TN_content">
+            [% FOREACH col IN group.columns %]
+            <input name="col.[% col.COLUMN_NAME %]" value="1"
+                   title="display this column"
+                   type="checkbox" class="check_column" tabindex="100" />
+            <div class="TN_leaf">
+              <span class="TN_label colname[% ' pk' IF col.is_pk %]">[% col.COLUMN_NAME %]</span>
+              <span class="after_label">
+                <input name="[% col.COLUMN_NAME %]" size=60 tabindex="1"
+                   [%~ IF !seen_autofocus; 
+                         " autofocus"; 
+                         seen_autofocus = 1; 
+                       END %]>
+                [%# TODO : autocompleter on col.path (if any) %]
+              </span>
+            </div>
+            [% END; # FOREACH col IN group.columns %]
+          </div>
+        </div>
+        [% END; # FOREACH group IN data.colgroups %]
+      </div>
+    </div>
+
+    <div class="TN_node">
+      <span class="TN_label param_group">Parameters</span>
+      <div class="TN_content">
+        <div class="TN_leaf">
+          <span class="TN_label colname">Page index</span>
+            <input name="-page_index" size=8 tabindex="1">
+        </div>
+        <div class="TN_leaf">
+          <span class="TN_label colname">Page size</span>
+            <input name="-page_size" size=8 tabindex="1">
+        </div>
+        <div class="TN_leaf">
+          <span class="TN_label colname">Output as</span>
+            <input type="radio" id="o.html" name="-output" value="" checked
+                   tabindex="1">
+            <label for="o.html">html</label>
+            <input type="radio" id="o.xlsx" name="-output" value=".xlsx"
+                   tabindex="1">
+            <label for="o.xlsx">xlsx</label>
+            <input type="radio" id="o.tsv" name="-output" value=".tsv"
+                   tabindex="1">
+            <label for="o.tsv">tsv</label>
+            <input type="radio" id="o.yaml" name="-output" value=".yaml"
+                   tabindex="1">
+            <label for="o.yaml">yaml</label>
+            <input type="radio" id="o.json" name="-output" value=".json"
+                   tabindex="1">
+            <label for="o.json">json</label>
+            <input type="radio" id="o.xml" name="-output" value=".xml"
+                   tabindex="1">
+            <label for="o.xml">xml</label>
+        </div>
+        <div class="TN_leaf">
+          <span class="TN_label colname">With count</span>
+            <input name="-with_count" type="checkbox" value="1" checked
+                   tabindex="1">
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <input type="submit" tabindex="1">
+  <input type="reset"  tabindex="1">
+</form>

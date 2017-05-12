@@ -1,0 +1,86 @@
+Revision history for Perl extension Apache::LogFormat::Compiler
+
+0.35 2017-03-08T04:10:07Z
+
+   - fixed test. load module from relative path.
+
+0.34 2017-03-07T03:18:42Z
+
+   - re package with Minilla v3
+
+0.33 2016-01-28T12:19:05Z
+
+   - bugfix: Make `%T` to formatted in seconds (Thank you astj)
+
+0.32 2014-06-09T02:00:15Z
+
+   - change perl version requirements to 5.8.1
+
+0.30 2014-01-28T07:59:07Z
+
+   - add docs abount POSIX::strftime::Compiler
+   - non trial release
+
+0.24 2014-01-27T03:12:16Z
+
+   - [TRIAL] switch to using POSIX::strftime::Compiler
+
+0.23 2014-01-16T15:53:09Z
+
+   - fixed POSIX::setlocale fails on system without locales (Android) #6 (Thank you dex4er)
+
+0.22 2014-01-08T00:25:14Z
+
+   - skip tz test on Windows.
+
+0.21 2014-01-07T13:43:29Z
+
+   - requires perl v5.8.4 (Thank you dex4er)
+   - skip tz test on Cygwin.
+
+0.20 2014-01-07T00:38:29Z
+
+   - Fixed test. Cygwin does not die tzset. But timezone does not been changed
+
+0.15 2014-01-06T13:47:11Z
+
+   - Fixed test. POSIX::tzset not implemented on Windows (Thank you dex4er)
+
+0.14 2014-01-06T05:41:14Z
+
+   - Check tzoffset for every line. It's need for daylight saving time.
+   - Use POSIX::strftime::GNU if available (Thank you dex4er)
+
+0.13 2013-05-24T00:19:31Z
+
+   - fixed pod issue (Thank you fschlich)
+
+0.12 2013-04-03T16:14:28Z
+
+   - fixed tzoffset calculation.
+     https://github.com/plack/Plack/pull/344
+
+0.11 2013-04-03T06:51:48Z
+
+    - re-packaging with Minilla
+
+0.10    Mon Mar 25 17:34:14 2013
+    - updated docs
+
+0.05    Fri Mar 22 16:18:21 2013
+    - compatibility with Plack::Middleware::AccessLog
+      if reqtime is undefined, use "-" instead of "0" for %D and %T. 
+
+0.04    Fri Mar 22 14:03:54 2013
+    - custom format string support
+    - remove Plack dependency
+    - [bug fix] Special-case Content-Length and Content-Type for %{}i. They are reseverd in PSGI
+
+0.03    Mon Mar 11 11:28:35 2013
+    - Added custom log formats for %m, %U, %q and %H
+
+0.02    Fri Mar  1 23:32:11 2013
+    - added $time option to log_line. the request was recieved 
+
+0.01    Fri Mar  1 15:00:11 2013
+    - original version

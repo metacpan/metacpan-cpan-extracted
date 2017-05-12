@@ -1,0 +1,10 @@
+function HEAD() { adenosine HEAD "$@" }
+function OPTIONS() { adenosine OPTIONS "$@" }
+function GET() { adenosine GET "$@" }
+function POST() { adenosine POST "$@" }
+function PUT() { adenosine PUT "$@" }
+function DELETE() { adenosine DELETE "$@" }
+function TRACE() { adenosine TRACE "$@" }
+function PATCH() { adenosine PATCH "$@" }
+
+export PATH="$PATH:$(cd $(dirname $0) && pwd)/bin"

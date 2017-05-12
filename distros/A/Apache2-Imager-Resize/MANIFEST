@@ -1,0 +1,11 @@
+Build
+Build.PL
+Changes
+lib/Apache2/Imager/Resize.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/basic.t
+t/conf/extra.conf.in
+t/TEST.PL

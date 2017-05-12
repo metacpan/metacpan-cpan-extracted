@@ -1,0 +1,52 @@
+Algorithm::RandomPointGenerator generates a set of random points in a 2D plane
+according to a user-specified probability distribution that is supplied as a 2D
+histogram.
+
+The quickest way to use the module is through the script genRand2D that you'll
+find in the examples subdirectory.  You can move this script to any convenient
+location in your directory structure.  Call this script as a command-line
+utility in the following manner:
+
+  genRand2D  --histfile  your_histogram_file.csv  --bbfile  your_bounding_box_file.csv
+
+where the '--histfile' option supplies the name of the file that contains a 2D
+histogram and the option '--bbfile' the name of the file that defines a bounding
+box in the XY-plane to which the histogram applies. The module uses the
+Metropolis-Hastings algorithm to draw random points from a probability density
+function that is approximated by the 2D histogram you supply through the
+'--histfile' option. You can also run the command
+                                                                                                         genRand2D  --help  
+
+for further information regarding these two command-line options.
+
+This module requires the following three modules:
+
+   List::Util
+   Graphics::GnuplotIF
+   Math::Big
+   Math::Random
+   File::Basename
+
+For installation, do the usual
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+if you have root access.  If not, 
+
+    perl Makefile.PL prefix=/some/other/directory/
+    make
+    make test
+    make install
+
+Contact:
+
+Avinash Kak  
+
+email: kak@purdue.edu
+
+Please place the string "RandomPointGenerator" in the subject line
+if you wish to write to the author.  Any feedback regarding
+this module would be highly appreciated.

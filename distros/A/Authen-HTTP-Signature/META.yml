@@ -1,0 +1,29 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Authen-HTTP-Signature
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::OpenSSL::RSA: '0.28'
+  Digest::SHA: '5.70'
+  HTTP::Date: '6.00'
+  HTTP::Message: '6.02'
+  MIME::Base64: '3.13'
+  Moo: '0.009013'
+  Test::Fatal: '0'
+  Test::More: '0'
+version: '0.03'

@@ -1,0 +1,58 @@
+Revision history for Perl extension App::LDAP
+
+0.1.2   Wed Oct  2 15:13:46 CST 2013
+        - correct behavior of Command::Help
+
+0.1.1   Fri Jan 11 15:03:39 CST 2013
+        - use Namespace::Dispatch 0.05
+
+0.1.0   Fri Sep 21 18:00:48 2012
+        - App::LDAP::Role as the base of Roles
+        - refactor functions every commands used into App::LDAP::Role::Command
+        - separate App::LDAP::Utils into different Roles
+        - Role::Bindable for the command need to bind itself
+        - Role::Stem for the command has subcommands
+        - Role::FromEntry to make LDIF::* can new from a Net::LDAP::Entry
+        - tranlate schemas into ObjectClass::*
+        - reform LDIF::* via extending them from ObjectClass::*
+        - make sure LDIF::* satisfy the schema in tests
+        - change constructors of LDIF::* not to transform args in BUILDARG() except dn
+        - fix shadowLastChange to get correct day
+        - App::LDAP::Secret to load the secret file automatically
+        - LDIF#search for LDIF::*
+        - Command::Del::* use LDIF#search
+
+0.07    Sat Jul 14 18:32:12 2012
+        - reorganize tests suit
+        - reimplement existed command modules 
+        - implement command modules Add::Host, Del::Host, Export, 
+          Passwd, Add::Ou, Del::Ou
+        - App::LDAP and App::LDAP::Config use MooseX::Singleton
+        - add App::LDAP::Connection as a Singleton of Net::LDAP
+        - App::LDAP::LDIF as a role like ORMs for App::LDAP::LDIF::*
+        - uniform APIs of LDIFs to use 'base' rather than 'ou'
+        - add many shortcuts in App::LDAP::Utils such as find_user(), 
+          current_user(), config() and ldap()
+
+0.06    Sun Apr 08 00:58:20 2012
+        - replace App::CLI with Namespace::Dispatch
+        - drop Rubyish::Attribute. adopt Moose
+        - all new LDIF::* with Moose
+        - use MooseX::Getopt
+        - new implementation in Add::User
+
+0.05    Fri Dec 03 14:11:24 2010
+        - use Crypt::Password to crypt password
+
+0.04    Fri Dec 03 13:25:12 2010
+        - be able to $ ldap add user <username>
+
+0.03    Thu Dec 02 11:56:34 2010
+        - be able to $ ldap del user <username>
+
+0.02    Thu Dec 02 01:34:20 2010
+        - verify user via UID
+        - be able to $ ldap import ldif_files
+
+0.01    Wed Nov 24 15:11:39 2010
+        - original version

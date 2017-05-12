@@ -1,0 +1,36 @@
+NAME
+    Acme::String::Trim - Acme::String::Trim - Module to experiment with
+    'dist-zilla', github and cpan
+
+VERSION
+    version 0.003
+
+DESCRIPTION
+    A sample module to experiment with 'dist-zilla', github and cpan
+
+METHODS
+  new
+    traditional constructor
+
+  string
+    getter/setter for class attribute
+
+  trim
+    trim the string
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/abhishekisnot/Acme-String-Trim/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Abhishek Shende <abhishekisnot@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Abhishek Shende.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

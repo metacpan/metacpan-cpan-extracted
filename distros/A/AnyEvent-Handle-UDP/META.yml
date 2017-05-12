@@ -1,0 +1,45 @@
+---
+abstract: 'client/server UDP handles for AnyEvent'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  IO::Socket::INET: '0'
+  Test::Fatal: '0'
+  Test::More: '0.89'
+  perl: '5.006'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Handle-UDP
+provides:
+  AnyEvent::Handle::UDP:
+    file: lib/AnyEvent/Handle/UDP.pm
+    version: '0.048'
+recommends:
+  Sub::Name: '0'
+requires:
+  AnyEvent: '0'
+  AnyEvent::Socket: '0'
+  AnyEvent::Util: '0'
+  Carp: '0'
+  Scalar::Util: '0'
+  Socket: '0'
+  Symbol: '0'
+  namespace::clean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=AnyEvent-Handle-UDP
+  repository: git://github.com/Leont/anyevent-handle-udp.git
+version: '0.048'
+x_contributors:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+  - 'Sergey Leschenko <sergle.ua@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

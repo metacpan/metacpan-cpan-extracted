@@ -1,0 +1,89 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Test::Tree methods.
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More;
+use Arch::Util qw(is_tla_functional);
+
+plan skip_all => "No functional arch backend" unless is_tla_functional;
+plan tests => 14;
+
+use_ok("Arch::Test::Framework");
+use_ok("Arch::Backend", "is_baz", "arch_backend_version");
+
+my $fw = Arch::Test::Framework->new;
+isa_ok($fw, 'Arch::Test::Framework', 'environment');
+my $ar = $fw->make_archive;
+isa_ok($ar, 'Arch::Test::Archive',   'archive');
+
+my $version = $ar->make_version();
+my $tree = $fw->make_tree($version);
+isa_ok($tree, 'Arch::Test::Tree', 'tree');
+
+my $dir1 = $tree->add_dir();
+my $dir2 = $tree->add_dir($dir1, 'mydir');
+my $file1 = $tree->add_file();
+my $file2 = $tree->add_file($dir1, 'myfile', 'howdiw ho');
+
+my @inv = map { './' . $_ }
+	$tree->run_tla('inventory', '-Bs');
+
+ok(
+	eq_set(
+		[@inv],
+		[$dir1, $dir2, $file1, $file2]
+ 	),
+	"inventory is correct"
+);
+
+SKIP: {
+skip("buggy baz-1.2", 8) if is_baz() && arch_backend_version() =~ /^1\.2\b/;
+
+$tree->import('initial import');
+
+my @lines = $fw->run_tla('revisions', '-s', $version);
+is(scalar @lines, 2,                'single revision');
+is($lines[0], 'base-0',             'base-0 import');
+is($lines[1], '    initial import', 'import summary');
+
+my $file3 = $tree->add_file($dir2, undef, 'stuff');
+my @inv2 = map { './' . $_ }
+	$tree->run_tla('inventory', '-Bs');
+
+ok(
+	eq_set(
+		[@inv2],
+		[$dir1, $dir2, $file1, $file2, $file3]
+ 	),
+	"inventory is correct"
+);
+
+$tree->commit('commit');
+
+@lines = $fw->run_tla('revisions', '-s', $version);
+is(scalar @lines, 4,        'two revisions');
+is($lines[2], 'patch-1',    'patch-1 commit');
+is($lines[3], '    commit', 'patch summary');
+
+$tree->remove_file($file3);
+$tree->remove_dir($dir2);
+$tree->remove_file($file2);
+
+$dir1 = $tree->rename_dir($dir1, 'test-dir');
+$file1 = $tree->rename_file($file1, $dir1);
+
+my @inv3 = map { './' . $_ }
+	$tree->run_tla('inventory', '-Bs');
+
+ok(
+	eq_set(
+		[@inv3],
+		[$dir1, $file1]
+ 	),
+	"inventory is correct after remove/rename"
+);
+
+}

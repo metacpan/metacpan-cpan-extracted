@@ -1,0 +1,12 @@
+ * 1.29 - canonical multicolumn read on stdin, Test::Cmd test rewrite, etc.
+ * 1.28 - atonal-util notes2time --fraction=..., basic shows common
+   names for certain pitch sets, fix a dep.
+ * 1.27 - atonal-util adjacent_interval_content + --sd improvements.
+ * 1.25 - atonal-util time2notes so can reverse the notes2time ms.
+ * 1.24 - mandate POD tests, in contrary motion to the fad of skimping on such.
+ * 1.22 - support different languages with ly-fu mostly so can use with
+   Music::PitchNum::German output. Also, ensure script headers reference the
+   module that installs them.
+ * 1.19 - reworked ly-fu: add --show-code option, better output, etc.
+
+Otherwise, see the git repository.

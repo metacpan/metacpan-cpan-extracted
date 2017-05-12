@@ -1,0 +1,70 @@
+2.026	Apr 26 2017
+
+	Fix testing problem with parallel testing.
+
+2.026	Apr 07 2017
+
+	Fix testing problem with perl 5.26.
+
+2.025	Mar 26 2014
+
+	Add --syntax and --lilypond options.
+	Add help for syntax and lilypond syntax.
+	Allow numeric (bpm) argument for !ly directive.
+	Add example song, free of copyrights.
+	Be liberate with 'chord' names.
+	Finetuning of new musical symbols.
+	Rename songs to use .ptb file extension instead of .dat.
+
+2.024	Dec 07 2012
+
+	Add a different musical symbols font to prevent PDF conversion
+	problems.
+	Remove some obsolete code.
+
+2.023	Jan 16 2012
+
+	Add (experimental) support for high notes.
+	Fix problem with transposing bass/high notes.
+	Fix LilyPond comments (single % is sufficient).
+
+2.021	Apr 19 2011
+
+	Add minor7 chords.
+	Migrate CVS to git.
+
+2.020	May 21 2010
+2.019	May 21 2010
+
+	Add posttext.
+
+	Better test testing for Windows.
+
+	Recognize LilyPond power chords.
+
+2.018	Jan 17 2008
+0.06
+
+	Add '!n <n>' for bar numbering. N > 0 enables, n = 0 disables,
+	n < 0 skips bars before starting to number. Default is no
+	numbering, '!n' is equivalent to '!n 1'.
+
+	Add '!lilypond <n>' to interpret chords in LilyPond format.
+	With <n> = 0, uses the traditional format.
+
+	Rewrote the parsers into modules.
+	Rewrote the main into a module as well.
+
+0.05	Apr 16 2007
+
+	Use sharps when transposing up, flats when transposing down.
+
+	Better layout for power chords.
+
+0.04	Feb 20 2007
+
+	Add --transpose (global) option.
+
+	Merge all examples into a single zzexamples directory.
+
+	Fix some typo's.

@@ -1,0 +1,58 @@
+<global>
+    nick robobot
+</global>
+
+<logging>
+    log4j.rootLogger                INFO, stdout
+    log4j.appender.stdout           org.apache.log4j.ConsoleAppender
+    log4j.appender.stdout.layout    org.apache.log4j.PatternLayout
+    log4j.appender.stdout.layout.ConversionPattern      %d %5p [%c] %m%n
+</logging>
+
+<database>
+    <primary>
+        driver   Pg
+        database robobot
+        host     localhost
+        port     5432
+        user     robobot
+        schemas  robobot
+        schemas  public
+    </primary>
+</database>
+
+<network example-irc>
+    type     irc
+    enabled  0
+
+    host irc.mydomain.tld
+    port 6689
+    ssl  1
+
+    channel  chitchat
+    channel  robobot
+</network>
+
+<network example-mattermost>
+    type    mattermost
+    enabled 0
+
+    server   https://mattermost.mydomain.tld/
+    team     myteam
+    email    robobot@mydomain.tld
+    password botuserpassword
+</network>
+
+<network example-slack>
+    type     slack
+    enabled  0
+
+    nick      RoboBot
+    username  robobot
+    token     xxxx-0123456789-aaaa1234bbbb5678cccc0987
+
+    <disabled_plugins>
+        net::urls        true
+    </disabled_plugins>
+</network>
+

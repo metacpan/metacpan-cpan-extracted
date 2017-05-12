@@ -1,0 +1,6 @@
+/img/:
+  - 1
+/search/:
+  - 2
+other:
+  - 3 

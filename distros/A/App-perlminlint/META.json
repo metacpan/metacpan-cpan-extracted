@@ -1,0 +1,81 @@
+{
+   "abstract" : "minimalistic lint for perl",
+   "author" : [
+      "KOBAYASHI, Hiroaki <hkoba@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-perlminlint",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Module::CPANfile" : "0",
+            "YAML::Tiny" : "0"
+         },
+         "requires" : {
+            "Module::Pluggable" : "0",
+            "autodie" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Differences" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::perlminlint" : {
+         "file" : "lib/App/perlminlint.pm",
+         "version" : "0.23"
+      },
+      "App::perlminlint::Object" : {
+         "file" : "lib/App/perlminlint/Object.pm"
+      },
+      "App::perlminlint::Plugin" : {
+         "file" : "lib/App/perlminlint/Plugin.pm"
+      },
+      "App::perlminlint::Plugin::LintCPANfile" : {
+         "file" : "lib/App/perlminlint/Plugin/LintCPANfile.pm"
+      },
+      "App::perlminlint::Plugin::LintPL" : {
+         "file" : "lib/App/perlminlint/Plugin/LintPL.pm"
+      },
+      "App::perlminlint::Plugin::LintPM" : {
+         "file" : "lib/App/perlminlint/Plugin/LintPM.pm"
+      },
+      "App::perlminlint::Plugin::LintT" : {
+         "file" : "lib/App/perlminlint/Plugin/LintT.pm"
+      },
+      "App::perlminlint::Plugin::LintYATTRC" : {
+         "file" : "lib/App/perlminlint/Plugin/LintYATTRC.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/hkoba/app-perlminlint"
+      }
+   },
+   "version" : "0.23"
+}

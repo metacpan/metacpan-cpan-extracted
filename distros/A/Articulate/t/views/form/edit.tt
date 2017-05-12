@@ -1,0 +1,25 @@
+[% USE JSON %]
+
+<form method="post">
+
+  <div>
+    <label>Article ID</label>
+    <pre>[%- raw.location -%]</pre>
+  </div>
+  <div>
+    <label for="meta">Meta</label>
+    <textarea name="meta">
+      [%- raw.meta.json -%]
+    </textarea>
+  </div>
+  <div>
+    <label for="content">Content</label>
+    <textarea name="content">
+      [%- raw.content -%]
+    </textarea>
+  </div>
+  <div>
+    <input type="submit" value="submit"></input>
+  </div>
+
+</form>

@@ -1,0 +1,9 @@
+CHANGES
+MANIFEST
+README
+TODO
+Makefile.PL
+t/Acme-Curses-Marquee-Extensions.t
+lib/Acme/Curses/Marquee/Extensions.pm
+lib/Acme/Curses/Marquee/EVIL.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+#------------------#
+# This is Todo.txt #
+#------------------#
+
+handle cursor hidding
+
+restore start state, eg white screens remain dark
+
+handle all the options passed as arguments
+
+option to display
+	percentage played
+	time and time left
+
+show terminal bottom if possible
+
+pause/play/jump/back/forward
+
+play within a window
+
+index format
+    image
+    overlay
+    speex/mp3
+    interaction 
+	choice

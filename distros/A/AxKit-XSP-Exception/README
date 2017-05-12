@@ -1,0 +1,4 @@
+AxKit Exceptions taglib
+
+Allows you to catch exceptions thrown by your own code, or
+by other taglibs.

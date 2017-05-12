@@ -1,0 +1,16 @@
+bin/sqs-toolkit
+Changes
+lib/Amazon/SQS/Simple.pm
+lib/Amazon/SQS/Simple/Base.pm
+lib/Amazon/SQS/Simple/Message.pm
+lib/Amazon/SQS/Simple/Queue.pm
+lib/Amazon/SQS/Simple/SendResponse.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/01-construct.t
+META.json                                Module JSON meta-data (added by MakeMaker)

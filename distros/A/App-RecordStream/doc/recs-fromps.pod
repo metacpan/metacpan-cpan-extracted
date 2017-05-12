@@ -1,0 +1,51 @@
+=head1 NAME
+
+recs-fromps
+
+=head1 recs-fromps --help-all
+
+ Usage: recs-fromps <args>
+    Prints out JSON records converted from the process table.
+ 
+    --keys <fields>              Fields to output. May be specified multiple
+                                 times, may be comma separated. Default to all
+                                 fields These are Proc::ProcessTable keys, and
+                                 thus may not be keyspecs or groups
+    --filename-key|fk <keyspec>  Add a key with the source filename (if no
+                                 filename is applicable will put NONE)
+ 
+   Help Options:
+       --help  This help screen
+ 
+ Default fields for Linux:
+    uid, gid, pid, fname, ppid, pgrp, sess, ttynum, flags, minflt, cminflt,
+    majflt, cmajflt, utime, stime, cutime, cstime, priority, start, size, rss,
+    wchan, time, ctime, state, euid, suid, fuid, egid, sgid, fgid, pctcpu,
+    pctmem, cmndline, exec, cwd
+ 
+ Default fields for OS X:
+    pid, ppid, pgrp, uid, gid, euid, egid, suid, sgid, priority, size, rss,
+    flags, nice, sess, time, stime, utime, start, wchan, ttydev, ttynum, pctcpu,
+    pctmem, state, cmndline, fname
+ 
+ Examples:
+    Get records for the process table
+       recs-fromps
+    Only get uid and pid
+       recs-fromps --keys uid,pid
+
+=head1 SEE ALSO
+
+=over
+
+=item * See L<App::RecordStream> for an overview of the scripts and the system
+
+=item * Run C<recs examples> or see L<App::RecordStream::Manual::Examples> for a set of simple recs examples
+
+=item * Run C<recs story> or see L<App::RecordStream::Manual::Story> for a humorous introduction to RecordStream
+
+=item * Every command has a C<--help> mode available to print out usage and
+examples for the particular command, just like the output above.
+
+=back
+

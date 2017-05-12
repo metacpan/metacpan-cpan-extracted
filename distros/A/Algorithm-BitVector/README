@@ -1,0 +1,30 @@
+                     README
+
+Algorithm::BitVector is a Perl5 module for creating a memory
+efficient representation of arbitrary-sized bit vectors, and
+for logical and arithmetic operations on such vectors.
+
+
+For installation, do the usual
+
+    perl Makefile.PL
+    make
+    make test
+    sudo make install
+
+if you have root access.  If not, 
+
+    perl Makefile.PL prefix=/some/other/directory/
+    make
+    make test
+    make install
+
+Contact:
+
+Avinash Kak  
+
+email: kak@purdue.edu
+
+Please place the string "BitVector" in the subject line if
+you wish to write to the author.  Any feedback regarding
+this module would be highly appreciated.

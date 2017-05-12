@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/Alister/Base/Sums.pm
+lib/Alister/Base/Sums.pod
+t/00_basic_compile.t
+t/01_validate_args.t
+t/02_sum_add.t
+t/03_sum_get.t
+t/04_sum_delete.t
+t/05_sum_update.t
+t/06_sum_register_bechmark_test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,34 @@
+[%#
+   Apache2::WebApp::Toolkit - Admin Control Panel (frame_top.tt)
+   Copyright (C) 2010 Marc S. Brooks <mbrooks@cpan.org>
+
+   Licensed under the terms of the BSD License
+   http://www.opensource.org/licenses/bsd-license.php
+-%]
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Top</title>
+
+	<meta http-equiv="pragma" content="no-cache" />
+
+	<script type="text/javascript" src="/extras/admin/js/disable.js"></script>
+
+	<style type="text/css">
+		@import url( /extras/admin/css/base.css );
+		@import url( /extras/admin/css/top.css );
+	</style>
+</head>
+<body>
+
+[% IF username %]
+<div id="logged">
+	Logged in as <strong>[% username %]</strong> from <strong>[% ip_address %]</strong>
+</div>
+[% END %]
+
+</body>
+</html>

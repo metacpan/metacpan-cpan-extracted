@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lang>
+   <header>
+      <infoBox>
+         <currentTrapLog>Aktueller Trap Log</currentTrapLog>
+         <lastUpdate>Letztes Update</lastUpdate>
+         <loggedInAs>Eingeloggt als</loggedInAs>
+      </infoBox>
+      <filter>
+         <displayFilters>Filtereinstellungen</displayFilters>
+         <host>Host</host>
+         <trapOID>TrapOID</trapOID>
+         <severityLevel>Gewichtung</severityLevel>
+         <category>Kategorie</category>
+         <reset>Filter zur_u_cksetzen</reset>
+      </filter>
+      <navBox>
+         <logFileNav>
+	        <line1>Log File</line1>
+		    <line2>_U_bersicht</line2>
+	     </logFileNav>
+         <to>bis</to>
+      </navBox>
+      <dbInfo>
+         <database>Datenbank</database>
+         <table>Tabelle</table>
+      </dbInfo>
+      <optBox>
+         <severityDetail>Gewichtung der aktuellen Eintr_a_ge</severityDetail>
+         <category>Kategorieauswahl</category>
+         <option>
+	        <valueAll>Alle Eintr_a_ge</valueAll>
+	     </option>
+	     <olderEntriesFirst>_A_ltere Eintr_a_ge zuerst</olderEntriesFirst>
+	     <updateButton>Aktualisieren</updateButton>
+      </optBox>
+   </header>
+   <main>
+      <trapTableHeader>
+         <option></option>
+         <traptime>Trapzeit</traptime>
+         <trapoid>TrapOID</trapoid>
+         <host>Host</host>
+         <category>Kategorie</category>
+         <severity>Gewichtung</severity>
+         <message>Inhalt</message>
+      </trapTableHeader>
+      <trapTableEntry>
+         <optionRead>Als gelesen makieren</optionRead>
+         <optionDelete>L_o_schen</optionDelete>
+      </trapTableEntry>
+   </main>
+</lang>

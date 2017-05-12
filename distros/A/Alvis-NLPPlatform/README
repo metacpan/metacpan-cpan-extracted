@@ -1,0 +1,85 @@
+Alvis-NLPPlatform version 0.6
+================================
+
+This is a module to annotate Web document in the ALVIS pipeline.
+
+Contains this :
+
+    alvis-nlp-standalone (for a standalone annotation process, out of the ALVIS pipeline)
+    alvis-nlp-server (Server for a client/server process in the ALVIS pipeline)
+    alvis-nlp-client (Client for a client/server process in the ALVIS pipeline)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or if you don't have the "make" program:
+
+   perl Build.PL
+   Build
+   Build test
+   Build install
+
+ It requires Mdoule::Build version 0.28 (at least) and File::chmod
+
+DEPENDENCIES
+
+This module requires the other modules and libraries:
+
+  Time::HiRes
+  IO
+  XML::Parser::PerlSAX
+  Data::Dumper
+  Alvis::TermTagger
+  Alvis::Pipeline
+  Alvis::Convert
+  XML::LibXML
+  IO::File
+  IO::Socket::INET
+  Getopt::Long
+  Pod::Usage
+  Config::General
+  Sys::Hostname
+  Fcntl
+  utf8
+  File::Touch
+  File::Basename
+  Encode
+  Fcntl
+  File::Path
+  File::MMagic
+  File::Basename
+  Lingua::Identify
+  XML::Parser
+  Parse::Yapp
+
+Corresponding Debian packages are : 
+
+  libconfig-general-perl and libxml-perl
+
+  (apt-get install libconfig-general-perl libxml-perl)
+
+In case of use of Link Grammar parser for syntactic parsing, an 
+additional patch for the Link Grammar parser is required
+(lib/Alvis/NLPPlatform/patches).
+
+
+CONFIGURATION AND NLP TOOLS INSTALLATION
+
+See man Alvis::NLPPlatform.3pm (or documentation in the module
+Alvis::NLPPlatform.pm).
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Thierry Hamon and Julien Deriviere
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

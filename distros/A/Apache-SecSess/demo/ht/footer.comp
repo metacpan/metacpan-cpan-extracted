@@ -1,0 +1,16 @@
+
+%# <hr>
+<tr><td ID="hrule"><img src="/images/hrule0.gif"></td></tr>
+
+<tr><td><center>&copy; 2002 <% $sitename %></center></td></tr>
+
+</table>
+
+</td></tr></table>
+
+</body>
+</html>
+
+<%args>
+$sitename => ''
+</%args>

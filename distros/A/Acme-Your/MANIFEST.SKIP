@@ -1,0 +1,11 @@
+~$
+blib/
+\.tar\.gz$
+\bCVS\b
+Makefile
+Makefile\.old
+\.cvsignore
+MANIFEST.SKIP
+cover_db/
+pm_to_blib
+\.cvp$

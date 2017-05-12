@@ -1,0 +1,79 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Acme-Constructor-Pythonic/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Tiny"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [ doap-deps:on "Moose 2.0600"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Identify"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Acme-Constructor-Pythonic>;
+	doap:created         "2012-10-21"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Acme-Constructor-Pythonic>;
+	doap:homepage        <https://metacpan.org/release/Acme-Constructor-Pythonic>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Acme-Constructor-Pythonic";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Acme-Constructor-Pythonic/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Acme-Constructor-Pythonic/v_0-002>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-acme-constructor-pythonic>;
+	];
+	doap:shortdesc       "import Python-style constructor functions".
+
+<http://purl.org/NET/cpan-uri/dist/Acme-Constructor-Pythonic/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Acme-Constructor-Pythonic-0.001"^^xsd:string;
+	dc:issued            "2012-10-22"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Constructor-Pythonic-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-Constructor-Pythonic/v_0-002>
+	a                    doap:Version;
+	rdfs:label           "Almost total rewrite";
+	dc:identifier        "Acme-Constructor-Pythonic-0.002"^^xsd:string;
+	dc:issued            "2014-04-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Use Exporter::Tiny instead of Sub::Install+Data::OptList.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Exported subs should run slightly faster as they are compiled from strings rather than being closures.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Exported subs will have a more consistent refaddr.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Exceptions thrown in the wrapped constructor will report slightly more useful line numbers and so on in their stack traces.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Test exported subs using Sub::Identify if it's available.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Constructor-Pythonic-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

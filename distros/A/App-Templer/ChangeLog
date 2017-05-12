@@ -1,0 +1,127 @@
+templer (1.2-1) stable; urgency=low
+
+  * Only invoke plugin methods that exist.
+  * Added Templer::Plugin::SiteMap
+     * This generates /sitemap.xml file, if configured to do so.
+
+ -- Steve Kemp <steve@steve.org.uk>  Sun, 10 Jul 2016 12:44:21 +0000
+
+templer (1.1-1) stable; urgency=low
+
+  * Added `init` method to our plugin interface.
+
+ -- Steve Kemp <steve@steve.org.uk>  Sun, 10 Jul 2016 10:33:01 +0000
+
+templer (1.0-1) stable; urgency=low
+
+  * Avoid running tests if Redis isn't available/running.
+
+ -- Steve Kemp <steve@steve.org.uk>  Sun, 20 Sep 2015 18:00:00 +0000
+
+templer (0.9-9-1) stable; urgency=low
+
+  * Bumped version to 0.9.9.1
+  * Updated copyright year to 2015.
+  * Moved version from Templer::VERSION to App::Templer::VERSION.
+
+ -- Steve Kemp <steve@steve.org.uk>  Sat, 18 Apr 2015 16:55:60 +0000
+
+templer (0.9-9) stable; urgency=low
+
+  * Updated POD files to fix a minor error.
+  * Bumped copyright years to 2014.
+  * Updated Makefile.PL to declare test-dependencies correctly.
+
+ -- Steve Kemp <steve@steve.org.uk>  Sat, 25 Oct 2014 08:18:28 +0000
+
+templer (0.9-8) stable; urgency=low
+
+  * This release fixes a bug where L<Image::Size> wouldn't be invoked
+    correctly by the file_glob() plugin - because it would use the
+    wrong file location.
+  * Previous release changelogs aren't available, but since 0.9.2 the
+    only changes applied related to the CPAN Makefile.PL and MANIFEST
+    files.
+
+ -- Steve Kemp <steve@steve.org.uk>  Thu, 11 Sep 2014 07:44:07 +0000
+
+templer (0.9-2) stable; urgency=low
+
+  * Added a the missing dependency Test::Exception to allow the test suite
+    to pass.
+
+ -- Steve Kemp <steve@steve.org.uk>  Sun, 15 Jun 2014 07:08:09 +0000
+
+templer (0.9-1) stable; urgency=low
+
+  * Install in a CPAN-like manner, rather than our older system.
+
+ -- Steve Kemp <steve@steve.org.uk>  Sun, 8 Jun 2014 08:44:00 +0000
+
+templer (0.8-1) stable; urgency=low
+
+  * When the dependencies aren't available for the various formatting
+    plugins let the user know.
+
+ -- Steve Kemp <steve@steve.org.uk>  Sat, 1 Feb 2014 10:00:01 +0000
+
+templer (0.7-1) stable; urgency=low
+
+  * Updated the file-glob plugin to allow the content of files to be
+    available - for non-images.
+
+ -- Steve Kemp <steve@steve.org.uk>  Fri, 27 Dec 2013 10:00:01 +0000
+
+templer (0.6.5-1) stable; urgency=low
+
+  * New plugins:
+    - RootPath
+    - TimeStamp
+  * Cleaned up and simplified coding.
+  * Additional test-cases.
+  * Rebuild pages when referenced include-files change.
+
+ -- Steve Kemp <steve@steve.org.uk>  Mon, 1 Apr 2013 11:20:02 +0000
+
+templer (0.6-1) stable; urgency=low
+
+  * Updated to keep track of dependencies for input-pages.
+    This means if a page includes a file and the include file changes
+    then the output page will be rebuilt.
+
+ -- Steve Kemp <steve@steve.org.uk>  Sun, 10 Mar 2013 14:15:16 +0000
+
+templer (0.5-1) stable; urgency=low
+
+  * Simplified the command-line handling, by moving all options to
+    the configuration file.
+  * Work in sub-directories, not just the top-level directory.
+  * Reorganized code to be more logical.
+  * Pages may setup their own output filename.
+
+ -- Steve Kemp <steve@steve.org.uk>  Sat, 09 Mar 2013 15:16:17 +0000
+
+templer (0.4-1) stable; urgency=low
+
+  * Added release target to the makefile.
+  * Bundle up changes.
+
+ -- Steve Kemp <steve@steve.org.uk>  Thu, 28 Feb 2013 22:33:44 +0000
+
+templer (0.3-1) stable; urgency=low
+
+  * Updated to build with our modular code-base.
+
+ -- Steve Kemp <steve@steve.org.uk>  Fri, 4 Jan 2012 08:33:08 +0000
+
+templer (0.2-1) stable; urgency=low
+
+  * Added the new script "templer-generate"
+
+ -- Steve Kemp <steve@steve.org.uk>  Sun, 30 Dec 2012 08:33:08 +0000
+
+templer (0.1-1) stable; urgency=low
+
+  * Initial release
+
+ -- Steve Kemp <steve@steve.org.uk>  Mon, 03 Dec 2012 08:44:08 +0000

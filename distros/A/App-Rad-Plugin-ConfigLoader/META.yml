@@ -1,0 +1,21 @@
+---
+name: App-Rad-Plugin-ConfigLoader
+version: 0.01
+author:
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+abstract: Load config files of various types
+license: perl
+resources:
+  license: ~
+build_requires:
+  App::Rad: 1
+  Config::Any: 0
+  Test::More: 0
+provides:
+  App::Rad::Plugin::ConfigLoader:
+    file: lib/App/Rad/Plugin/ConfigLoader.pm
+    version: 0.01
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

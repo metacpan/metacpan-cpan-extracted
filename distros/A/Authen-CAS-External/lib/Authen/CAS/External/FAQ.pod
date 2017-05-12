@@ -1,0 +1,47 @@
+=head1 NAME
+
+Authen::CAS::External::FAQ - Frequently asked questions relating to the
+Authen-CAS-External distribution
+
+=head1 HOW TO
+
+=head2 How do I authenticate with only a ticket granting cookie?
+
+  use Authen::CAS::External 0.02
+
+  # Create a basic CAS object
+  my $cas_service = Authen::CAS::External->new(
+    cas_url  => 'http://cas.example.net/',
+    password => 'does_not_matter',
+    username => 'also_does_not_matter',
+  );
+
+  # Set the ticket granting cookie from some place
+  $cas_service->ticket_granting_cookie($cookie);
+
+  # Now authenticate using the CAS gateway option
+  my $response = $cas_service->authenticate(
+    gateway => 1,
+    service => 'http://service.example.net/',
+  );
+
+=head1 AUTHOR
+
+Douglas Christopher Wilson, C<< <doug at somethingdoug.com> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2009 Douglas Christopher Wilson.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of either:
+
+=over 4
+
+=item * the GNU General Public License as published by the Free
+Software Foundation; either version 1, or (at your option) any
+later version, or
+
+=item * the Artistic License version 2.0.
+
+=back

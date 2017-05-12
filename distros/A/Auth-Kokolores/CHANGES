@@ -1,0 +1,89 @@
+==================================================
+Changes from 2015-05-30 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.01 at 2016-05-29 16:01:34 +0000
+-----------------------------------------
+
+  Change: 1b0e7ce5da24bcfe58c90f5a1552dfb2ef14321e
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-05-29 18:00:35 +0000
+
+    Multiprotocol support, Caching, Connection Pools 
+
+  Change: b8cbb99f2e47ca867e527ffba08c02d8a6fd5ca3
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-04-12 21:21:11 +0000
+
+    Multiprotocol support, Connection Pooling, small fixes
+
+    This adds the following features to kokolores:
+
+    * added pre and post request call for plugins
+
+    * added support for plugins to register connection handles
+
+    * seperate sql connection code from SqlRetrieve to SqlConnection
+
+    * seperated protocol code from request/response objects
+
+    * added support for dovecot auth protocol
+
+    * FailDelay plugin 
+
+  Change: 708ee0a6c86fb9304de4201077cf1c9ae483ea61
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-03-30 15:35:06 +0000
+
+    add support for pid_file 
+
+-----------------------------------------
+version 1.00 at 2016-03-30 11:55:52 +0000
+-----------------------------------------
+
+  Change: ce8faf1df8c043cd40f3c3e3f6f093aedff96288
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-03-30 13:55:52 +0000
+
+    update test requires 
+
+  Change: 86e7369788c2609ca21b26120e8458391dfb86cf
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-03-30 13:53:21 +0000
+
+    Add unit tests 
+
+  Change: 55475ce162f2338ae0d15d02899f74fa8b7c6f28
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-03-27 11:41:15 +0000
+
+    Add docs to Request and SqlRetrieve 
+
+  Change: d767244005add772d7ed14891ef78d90f69fc26e
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-03-27 11:25:23 +0000
+
+    fix pod syntax 
+
+  Change: 8c38568c772e9e4570e82711336f7851e96b61f5
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-03-27 11:24:26 +0000
+
+    More documentation on plugins 
+
+  Change: 05192136fcbf415054795e75bca038f4f5823e00
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-03-27 11:04:53 +0000
+
+    Add basic documentation for configuration options 
+
+  Change: b8d9f2be966de7618d11a5efbccc893254cf47fa
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-03-27 10:44:56 +0000
+
+    initial checkin 
+
+================
+End of releases.
+================

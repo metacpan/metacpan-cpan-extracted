@@ -1,0 +1,30 @@
+0.18 Sat Aug 16 10:05:31 PDT 2014
+ - Meta 0.0.2
+
+0.17 Fri Aug 15 17:35:48 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.16 Wed Jul 30 15:20:40 PDT 2014
+ - Switch IRC to '#pkg'
+
+0.15 Wed Jul 30 15:17:31 PDT 2014
+ - Switch IRC to '#ingy'
+
+0.14 Sat Jul 26 00:05:12 PDT 2014
+ - Add badges to doc
+
+0.13 Fri Jul 25 22:20:46 PDT 2014
+ - Zilla-Dist YourBrainForOnceDude!
+
+0.12 Wed Sep  1 07:10:35 PDT 2010
+ - Keep up to date with Acme::Buffy. Some changes from 2007 broke
+   YourBrainForOnceDude. You should wear a helmet.
+
+0.11 Tue Aug 21 00:09:01 PDT 2001
+ - Added more bRAiN's
+ - Old MacDonald had a farm
+
+0.10 Sat Aug 11 14:17:56 2001
+ - First version to CPAN
+

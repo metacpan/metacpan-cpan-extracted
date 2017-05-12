@@ -1,0 +1,18 @@
+---
+name: Algorithm-SixDegrees
+version: 0.03
+author:
+  - Pete Krawczyk, C<< <petek@cpan.org> >>
+abstract: Find a path through linked elements in a set
+license: perl
+requires:
+  Test::More: 0
+  perl: 5.6
+recommends:
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+provides:
+  Algorithm::SixDegrees:
+    file: lib/Algorithm/SixDegrees.pm
+    version: 0.03
+generated_by: Module::Build version 0.2608

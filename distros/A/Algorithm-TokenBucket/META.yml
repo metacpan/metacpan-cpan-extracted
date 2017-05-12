@@ -1,0 +1,47 @@
+---
+abstract: 'Token bucket rate limiting algorithm'
+author:
+  - 'Alex Kapranoff.'
+build_requires:
+  Test::More: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  Module::Build: '0'
+  Module::Build::Tiny: '0.035'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-TokenBucket
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Algorithm::TokenBucket:
+    file: lib/Algorithm/TokenBucket.pm
+    version: '0.38'
+requires:
+  Time::HiRes: '0'
+  perl: 5.008_001
+resources:
+  bugtracker: https://github.com/kappa/Algorithm-TokenBucket/issues
+  homepage: https://github.com/kappa/Algorithm-TokenBucket
+  repository: git://github.com/kappa/Algorithm-TokenBucket.git
+version: '0.38'
+x_contributors:
+  - 'kappa@aukland <kappa@aukland>'
+  - 'Alex Kapranoff <kappa@rambler-co.ru>'
+  - 'Paul Cochrane <paul@liekut.de>'
+  - 'Alex Kapranoff <kappa@yandex.ru>'
+  - 'Alex Kapranoff <alex@kapranoff.ru>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

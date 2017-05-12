@@ -1,0 +1,21 @@
+---
+abstract: 'resynchronise diverged control flow'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::Fatal: 0
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Async-MergePoint
+provides:
+  Async::MergePoint:
+    file: lib/Async/MergePoint.pm
+    version: 0.04
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

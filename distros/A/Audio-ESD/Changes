@@ -1,0 +1,7 @@
+Revision history for Perl extension Audio::ESD.
+
+0.02  Wed Oct  2 09:57:11 EDT 2002
+	- include typemap in MANIFEST so people can actually compile it
+0.01  Fri Jan 18 12:49:35 2002
+	- original version; created by h2xs 1.19
+

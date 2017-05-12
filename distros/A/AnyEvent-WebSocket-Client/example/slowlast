@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+$|=1;
+my @lines = `last -30`;
+print($_) && sleep 2 for @lines;
+

@@ -1,0 +1,13 @@
+Revision history for Perl extension Acme::TestDist::Cpp::EUMM::EUCppGuess.
+
+0.03  Fri Jan  1 14:10:00 2016
+    - improved doc
+    - improved Makefile.PL
+    - improved tests
+
+0.02  Fri Jan  1 01:33:00 2016
+    - add MANIFEST
+
+0.01  Fri Jan  1 00:40:00 2016
+	- original version
+

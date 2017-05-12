@@ -1,0 +1,106 @@
+#! /usr/bin/env perl
+# ABSTRACT: Automatically fetch and build the most recent git.
+# PODNAME: gitgitr
+
+use strict;
+use warnings;
+
+use App::GitGitr;
+App::GitGitr->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+gitgitr - Automatically fetch and build the most recent git.
+
+=head1 VERSION
+
+version 0.906
+
+=head1 SYNOPSIS
+
+    gitgitr
+      -- fetches and builds the most recent version of git
+
+    gitgitr -t
+      -- fetches and builds the most recent version of git, and runs the
+         test suite prior to installation
+
+    gitgitr -v 1.8.0
+      -- fetches and builds version 1.8.0 of git
+
+=head1 DESCRIPTION
+
+C<gitgitr> is a tiny utility to simplify building the most recent (or,
+really, any arbitrary) version of C<git>. This is something you
+probably only really need if you're obsessive about running the most
+recent version of C<git>, or if you maintain something like
+L<Git::Wrapper>, where the ability to quickly install a particular
+C<git> version comes up way more often than you would like.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --help / -h
+
+Displays basically the same information you're currently soaking in.
+
+=item --no_symlink / -N
+
+Don't symlink C</opt/git> to the new build directory
+
+=item --prefix / -p
+
+Installation prefix for the current build. Defaults to
+C</opt/git-$GIT_VERSION_NUMBER>
+
+=item --reinstall / -r
+
+By default, C<gitgitr> will not build a version that's already
+installed. This flag will force it to build a version even if it is
+already preset.
+
+=item --run_tests / -t
+
+Makes C<gitgitr> run the C<git> test suite after building and before
+installing. If the test suite fails, the build will not be
+installed. Disabled by default because the test suite takes a really
+long time to run.
+
+=item --verbose / -V
+
+Makes C<gitgitr> be a lot more chatty about what it's doing
+
+=item --version / -v
+
+Specifies what version of C<git> to build. Defaults to the most recent
+version as found on the front page of L<http://git-scm.com>
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<http://git-scm.com>
+
+=back
+
+=head1 AUTHOR
+
+John SJ Anderson <genehack@genehack.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by John SJ Anderson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

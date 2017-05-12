@@ -1,0 +1,19 @@
+---
+abstract: 'Easily find out package details from the command line.'
+author:
+  - 'Glenn Fowler <cebjyre@cpan.org>'
+build_requires:
+  App::Cmd::Tester: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Whatsit
+requires:
+  App::Cmd::Simple: 0
+version: 0.0.1

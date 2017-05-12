@@ -1,0 +1,82 @@
+#!/usr/bin/env perl
+    
+use strict; 
+use warnings;
+    
+use Getopt::Long::Descriptive;
+use IO::Prompter;
+    
+our $VERSION = '0.003'; # VERSION
+# PODNAME: git-ribbon
+
+my ($option, $usage) = describe_options(
+    'usage: git ribbon %o',
+    ['save|s'       => 'Save your place at origin/branch'],
+    ['help|h'       => 'Show this message'],
+);  
+    
+die($usage) if $option->help;
+
+$option->save 
+    ? save($usage) 
+    : ribbon($usage);
+
+
+
+sub save { print `git tag --force _ribbon origin/master` }
+
+sub ribbon {
+    my $option = shift;
+
+    my @logs = `git log --pretty=format:'git difftool -r %p -r %h --no-prompt %n%C(bold white)%an %cr %h%n%s%Creset' --stat --no-merges --reverse --topo-order _ribbon..origin/master`;
+
+    my $i = 0;
+    while ($i < $#logs) {
+        my $cmd = $logs[$i];
+        $i++;
+
+        while ($logs[$i] !~ /^git difftool -r /) {
+            print $logs[$i];
+            $i++;
+            last if $i >= $#logs;
+        }
+
+        my $answer = prompt "press 's' to skip", -echo => "", -single;
+
+        unless ($answer eq 's') {
+            my $pid = fork();
+            if (!$pid) { # child
+                exec($cmd);
+            }
+            waitpid $pid, 0;
+        }
+        
+        print "\n";
+    }
+}
+
+END { print "\n" unless $option->save }
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+git-ribbon
+
+=head1 AUTHOR
+
+Eric Johnson <cpan at iijo dot nospamthanks dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Eric Johnson.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

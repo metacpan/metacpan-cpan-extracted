@@ -1,0 +1,64 @@
+{
+   "abstract" : "Create tickets in OTRS via the Command Line Interface.",
+   "author" : [
+      "Michiel Beijen <michiel.beijen@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "agpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-OTRS-CreateTicket",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Encode::Locale" : "0",
+            "File::Basename" : "0",
+            "File::MimeInfo" : "0",
+            "Getopt::Long" : "0",
+            "MIME::Base64" : "0",
+            "Pod::Usage" : "0",
+            "SOAP::Lite" : "0",
+            "Time::Piece" : "0",
+            "perl" : "5.008007"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mbeijen/App-OTRS-CreateTicket/issues"
+      },
+      "homepage" : "https://github.com/mbeijen/App-OTRS-CreateTicket",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mbeijen/App-OTRS-CreateTicket.git",
+         "web" : "https://github.com/mbeijen/App-OTRS-CreateTicket"
+      }
+   },
+   "version" : "1.16"
+}
+

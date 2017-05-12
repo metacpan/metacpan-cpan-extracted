@@ -1,0 +1,8 @@
+to do list for Perl module Acme::Yoda
+
+- contraction handling
+- better verb list
+- move to better subject and verb detection possibly Lingua::LinkParser
+ 
+
+

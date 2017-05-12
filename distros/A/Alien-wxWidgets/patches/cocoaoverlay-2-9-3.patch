@@ -1,0 +1,312 @@
+--- Makefile.in	2011-12-14 18:42:11.000000000 +0000
++++ Makefile.in	2012-03-20 02:49:02.000000000 +0000
+@@ -3316,6 +3316,7 @@
+ 	wx/osx/cocoa/chkconf.h \
+ 	wx/osx/cocoa/evtloop.h \
+ 	wx/osx/cocoa/private.h \
++	wx/osx/cocoa/private/overlay.h \
+ 	wx/osx/core/colour.h \
+ 	wx/osx/carbon/chkconf.h \
+ 	wx/osx/carbon/evtloop.h \
+@@ -5619,6 +5620,7 @@
+ 	monodll_carbon_msgdlg.o \
+ 	monodll_carbon_nonownedwnd.o \
+ 	monodll_notebmac.o \
++	monodll_carbon_overlay.o \
+ 	monodll_carbon_printdlg.o \
+ 	monodll_carbon_radiobut.o \
+ 	monodll_carbon_scrolbar.o \
+@@ -5655,6 +5657,7 @@
+ 	monodll_osx_cocoa_msgdlg.o \
+ 	monodll_cocoa_nonownedwnd.o \
+ 	monodll_osx_cocoa_notebook.o \
++	monodll_cocoa_overlay.o \
+ 	monodll_osx_cocoa_radiobut.o \
+ 	monodll_cocoa_printdlg.o \
+ 	monodll_osx_cocoa_scrolbar.o \
+@@ -7577,6 +7580,7 @@
+ 	monolib_carbon_msgdlg.o \
+ 	monolib_carbon_nonownedwnd.o \
+ 	monolib_notebmac.o \
++	monolib_carbon_overlay.o \
+ 	monolib_carbon_printdlg.o \
+ 	monolib_carbon_radiobut.o \
+ 	monolib_carbon_scrolbar.o \
+@@ -7613,6 +7617,7 @@
+ 	monolib_osx_cocoa_msgdlg.o \
+ 	monolib_cocoa_nonownedwnd.o \
+ 	monolib_osx_cocoa_notebook.o \
++	monolib_cocoa_overlay.o \
+ 	monolib_osx_cocoa_radiobut.o \
+ 	monolib_cocoa_printdlg.o \
+ 	monolib_osx_cocoa_scrolbar.o \
+@@ -9714,6 +9719,7 @@
+ 	coredll_carbon_msgdlg.o \
+ 	coredll_carbon_nonownedwnd.o \
+ 	coredll_notebmac.o \
++	coredll_carbon_overlay.o \
+ 	coredll_carbon_printdlg.o \
+ 	coredll_carbon_radiobut.o \
+ 	coredll_carbon_scrolbar.o \
+@@ -9750,6 +9756,7 @@
+ 	coredll_osx_cocoa_msgdlg.o \
+ 	coredll_cocoa_nonownedwnd.o \
+ 	coredll_osx_cocoa_notebook.o \
++	coredll_cocoa_overlay.o \
+ 	coredll_osx_cocoa_radiobut.o \
+ 	coredll_cocoa_printdlg.o \
+ 	coredll_osx_cocoa_scrolbar.o \
+@@ -11308,6 +11315,7 @@
+ 	corelib_carbon_msgdlg.o \
+ 	corelib_carbon_nonownedwnd.o \
+ 	corelib_notebmac.o \
++	corelib_carbon_overlay.o \
+ 	corelib_carbon_printdlg.o \
+ 	corelib_carbon_radiobut.o \
+ 	corelib_carbon_scrolbar.o \
+@@ -11344,6 +11352,7 @@
+ 	corelib_osx_cocoa_msgdlg.o \
+ 	corelib_cocoa_nonownedwnd.o \
+ 	corelib_osx_cocoa_notebook.o \
++	corelib_cocoa_overlay.o \
+ 	corelib_osx_cocoa_radiobut.o \
+ 	corelib_cocoa_printdlg.o \
+ 	corelib_osx_cocoa_scrolbar.o \
+@@ -13301,7 +13310,6 @@
+ 	monodll_carbon_frame.o \
+ 	monodll_carbon_mdi.o \
+ 	monodll_carbon_metafile.o \
+-	monodll_carbon_overlay.o \
+ 	monodll_carbon_popupwin.o \
+ 	monodll_carbon_renderer.o \
+ 	monodll_carbon_settings.o \
+@@ -13489,7 +13497,6 @@
+ 	monolib_carbon_frame.o \
+ 	monolib_carbon_mdi.o \
+ 	monolib_carbon_metafile.o \
+-	monolib_carbon_overlay.o \
+ 	monolib_carbon_popupwin.o \
+ 	monolib_carbon_renderer.o \
+ 	monolib_carbon_settings.o \
+@@ -13677,7 +13684,6 @@
+ 	coredll_carbon_frame.o \
+ 	coredll_carbon_mdi.o \
+ 	coredll_carbon_metafile.o \
+-	coredll_carbon_overlay.o \
+ 	coredll_carbon_popupwin.o \
+ 	coredll_carbon_renderer.o \
+ 	coredll_carbon_settings.o \
+@@ -13775,7 +13781,6 @@
+ 	corelib_carbon_frame.o \
+ 	corelib_carbon_mdi.o \
+ 	corelib_carbon_metafile.o \
+-	corelib_carbon_overlay.o \
+ 	corelib_carbon_popupwin.o \
+ 	corelib_carbon_renderer.o \
+ 	corelib_carbon_settings.o \
+@@ -16622,6 +16627,9 @@
+ monodll_notebmac.o: $(srcdir)/src/osx/carbon/notebmac.cpp $(MONODLL_ODEP)
+ 	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/osx/carbon/notebmac.cpp
+ 
++monodll_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(MONODLL_ODEP)
++	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
++
+ monodll_carbon_printdlg.o: $(srcdir)/src/osx/carbon/printdlg.cpp $(MONODLL_ODEP)
+ 	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/osx/carbon/printdlg.cpp
+ 
+@@ -16721,6 +16729,9 @@
+ monodll_osx_cocoa_notebook.o: $(srcdir)/src/osx/cocoa/notebook.mm $(MONODLL_ODEP)
+ 	$(CXXC) -c -o $@ $(MONODLL_OBJCXXFLAGS) $(srcdir)/src/osx/cocoa/notebook.mm
+ 
++monodll_cocoa_overlay.o: $(srcdir)/src/osx/cocoa/overlay.mm $(MONODLL_ODEP)
++	$(CXXC) -c -o $@ $(MONODLL_OBJCXXFLAGS) $(srcdir)/src/osx/cocoa/overlay.mm
++
+ monodll_osx_cocoa_radiobut.o: $(srcdir)/src/osx/cocoa/radiobut.mm $(MONODLL_ODEP)
+ 	$(CXXC) -c -o $@ $(MONODLL_OBJCXXFLAGS) $(srcdir)/src/osx/cocoa/radiobut.mm
+ 
+@@ -20126,15 +20137,6 @@
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@monodll_carbon_metafile.o: $(srcdir)/src/osx/carbon/metafile.cpp $(MONODLL_ODEP)
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/osx/carbon/metafile.cpp
+ 
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@monodll_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(MONODLL_ODEP)
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
+-
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_COCOA_USE_GUI_1_WXUNIV_0@monodll_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(MONODLL_ODEP)
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_COCOA_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
+-
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@monodll_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(MONODLL_ODEP)
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
+-
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@monodll_carbon_popupwin.o: $(srcdir)/src/osx/carbon/popupwin.cpp $(MONODLL_ODEP)
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/osx/carbon/popupwin.cpp
+ 
+@@ -22010,6 +22012,9 @@
+ monolib_notebmac.o: $(srcdir)/src/osx/carbon/notebmac.cpp $(MONOLIB_ODEP)
+ 	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/osx/carbon/notebmac.cpp
+ 
++monolib_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(MONOLIB_ODEP)
++	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
++
+ monolib_carbon_printdlg.o: $(srcdir)/src/osx/carbon/printdlg.cpp $(MONOLIB_ODEP)
+ 	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/osx/carbon/printdlg.cpp
+ 
+@@ -22109,6 +22114,9 @@
+ monolib_osx_cocoa_notebook.o: $(srcdir)/src/osx/cocoa/notebook.mm $(MONOLIB_ODEP)
+ 	$(CXXC) -c -o $@ $(MONOLIB_OBJCXXFLAGS) $(srcdir)/src/osx/cocoa/notebook.mm
+ 
++monolib_cocoa_overlay.o: $(srcdir)/src/osx/cocoa/overlay.mm $(MONOLIB_ODEP)
++	$(CXXC) -c -o $@ $(MONOLIB_OBJCXXFLAGS) $(srcdir)/src/osx/cocoa/overlay.mm
++
+ monolib_osx_cocoa_radiobut.o: $(srcdir)/src/osx/cocoa/radiobut.mm $(MONOLIB_ODEP)
+ 	$(CXXC) -c -o $@ $(MONOLIB_OBJCXXFLAGS) $(srcdir)/src/osx/cocoa/radiobut.mm
+ 
+@@ -25514,15 +25522,6 @@
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@monolib_carbon_metafile.o: $(srcdir)/src/osx/carbon/metafile.cpp $(MONOLIB_ODEP)
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/osx/carbon/metafile.cpp
+ 
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@monolib_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(MONOLIB_ODEP)
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
+-
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_COCOA_USE_GUI_1_WXUNIV_0@monolib_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(MONOLIB_ODEP)
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_COCOA_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
+-
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@monolib_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(MONOLIB_ODEP)
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
+-
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@monolib_carbon_popupwin.o: $(srcdir)/src/osx/carbon/popupwin.cpp $(MONOLIB_ODEP)
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/osx/carbon/popupwin.cpp
+ 
+@@ -28121,6 +28120,9 @@
+ coredll_notebmac.o: $(srcdir)/src/osx/carbon/notebmac.cpp $(COREDLL_ODEP)
+ 	$(CXXC) -c -o $@ $(COREDLL_CXXFLAGS) $(srcdir)/src/osx/carbon/notebmac.cpp
+ 
++coredll_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(COREDLL_ODEP)
++	$(CXXC) -c -o $@ $(COREDLL_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
++
+ coredll_carbon_printdlg.o: $(srcdir)/src/osx/carbon/printdlg.cpp $(COREDLL_ODEP)
+ 	$(CXXC) -c -o $@ $(COREDLL_CXXFLAGS) $(srcdir)/src/osx/carbon/printdlg.cpp
+ 
+@@ -28220,6 +28222,9 @@
+ coredll_osx_cocoa_notebook.o: $(srcdir)/src/osx/cocoa/notebook.mm $(COREDLL_ODEP)
+ 	$(CXXC) -c -o $@ $(COREDLL_OBJCXXFLAGS) $(srcdir)/src/osx/cocoa/notebook.mm
+ 
++coredll_cocoa_overlay.o: $(srcdir)/src/osx/cocoa/overlay.mm $(COREDLL_ODEP)
++	$(CXXC) -c -o $@ $(COREDLL_OBJCXXFLAGS) $(srcdir)/src/osx/cocoa/overlay.mm
++
+ coredll_osx_cocoa_radiobut.o: $(srcdir)/src/osx/cocoa/radiobut.mm $(COREDLL_ODEP)
+ 	$(CXXC) -c -o $@ $(COREDLL_OBJCXXFLAGS) $(srcdir)/src/osx/cocoa/radiobut.mm
+ 
+@@ -31064,15 +31069,6 @@
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@coredll_carbon_metafile.o: $(srcdir)/src/osx/carbon/metafile.cpp $(COREDLL_ODEP)
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(COREDLL_CXXFLAGS) $(srcdir)/src/osx/carbon/metafile.cpp
+ 
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@coredll_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(COREDLL_ODEP)
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(COREDLL_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
+-
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_COCOA_USE_GUI_1_WXUNIV_0@coredll_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(COREDLL_ODEP)
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_COCOA_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(COREDLL_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
+-
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@coredll_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(COREDLL_ODEP)
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(COREDLL_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
+-
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@coredll_carbon_popupwin.o: $(srcdir)/src/osx/carbon/popupwin.cpp $(COREDLL_ODEP)
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(COREDLL_CXXFLAGS) $(srcdir)/src/osx/carbon/popupwin.cpp
+ 
+@@ -32135,6 +32131,9 @@
+ corelib_notebmac.o: $(srcdir)/src/osx/carbon/notebmac.cpp $(CORELIB_ODEP)
+ 	$(CXXC) -c -o $@ $(CORELIB_CXXFLAGS) $(srcdir)/src/osx/carbon/notebmac.cpp
+ 
++corelib_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(CORELIB_ODEP)
++	$(CXXC) -c -o $@ $(CORELIB_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
++
+ corelib_carbon_printdlg.o: $(srcdir)/src/osx/carbon/printdlg.cpp $(CORELIB_ODEP)
+ 	$(CXXC) -c -o $@ $(CORELIB_CXXFLAGS) $(srcdir)/src/osx/carbon/printdlg.cpp
+ 
+@@ -32234,6 +32233,9 @@
+ corelib_osx_cocoa_notebook.o: $(srcdir)/src/osx/cocoa/notebook.mm $(CORELIB_ODEP)
+ 	$(CXXC) -c -o $@ $(CORELIB_OBJCXXFLAGS) $(srcdir)/src/osx/cocoa/notebook.mm
+ 
++corelib_cocoa_overlay.o: $(srcdir)/src/osx/cocoa/overlay.mm $(CORELIB_ODEP)
++	$(CXXC) -c -o $@ $(CORELIB_OBJCXXFLAGS) $(srcdir)/src/osx/cocoa/overlay.mm
++
+ corelib_osx_cocoa_radiobut.o: $(srcdir)/src/osx/cocoa/radiobut.mm $(CORELIB_ODEP)
+ 	$(CXXC) -c -o $@ $(CORELIB_OBJCXXFLAGS) $(srcdir)/src/osx/cocoa/radiobut.mm
+ 
+@@ -35078,15 +35080,6 @@
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@corelib_carbon_metafile.o: $(srcdir)/src/osx/carbon/metafile.cpp $(CORELIB_ODEP)
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(CORELIB_CXXFLAGS) $(srcdir)/src/osx/carbon/metafile.cpp
+ 
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@corelib_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(CORELIB_ODEP)
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(CORELIB_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
+-
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_COCOA_USE_GUI_1_WXUNIV_0@corelib_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(CORELIB_ODEP)
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_COCOA_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(CORELIB_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
+-
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@corelib_carbon_overlay.o: $(srcdir)/src/osx/carbon/overlay.cpp $(CORELIB_ODEP)
+-@COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_IPHONE_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(CORELIB_CXXFLAGS) $(srcdir)/src/osx/carbon/overlay.cpp
+-
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@corelib_carbon_popupwin.o: $(srcdir)/src/osx/carbon/popupwin.cpp $(CORELIB_ODEP)
+ @COND_PLATFORM_MACOSX_1_TOOLKIT_OSX_CARBON_USE_GUI_1_WXUNIV_0@	$(CXXC) -c -o $@ $(CORELIB_CXXFLAGS) $(srcdir)/src/osx/carbon/popupwin.cpp
+ 
+
+--- build/bakefiles/files.bkl	2011-12-14 18:42:11.000000000 +0000
++++ build/bakefiles/files.bkl	2012-03-20 02:33:43.000000000 +0000
+@@ -2369,7 +2369,6 @@
+     src/osx/carbon/frame.cpp
+     src/osx/carbon/mdi.cpp
+     src/osx/carbon/metafile.cpp
+-    src/osx/carbon/overlay.cpp
+     src/osx/carbon/popupwin.cpp
+     src/osx/carbon/renderer.cpp
+     src/osx/carbon/settings.cpp
+@@ -2521,6 +2520,7 @@
+     src/osx/carbon/msgdlg.cpp
+     src/osx/carbon/nonownedwnd.cpp
+     src/osx/carbon/notebmac.cpp
++    src/osx/carbon/overlay.cpp
+     src/osx/carbon/printdlg.cpp
+     src/osx/carbon/radiobut.cpp
+     src/osx/carbon/scrolbar.cpp
+@@ -2578,6 +2578,7 @@
+     src/osx/cocoa/msgdlg.mm
+     src/osx/cocoa/nonownedwnd.mm
+     src/osx/cocoa/notebook.mm
++    src/osx/cocoa/overlay.mm
+     src/osx/cocoa/radiobut.mm
+     src/osx/cocoa/printdlg.mm
+     src/osx/cocoa/scrolbar.mm
+@@ -2597,6 +2598,7 @@
+     wx/osx/cocoa/chkconf.h
+     wx/osx/cocoa/evtloop.h
+     wx/osx/cocoa/private.h
++    wx/osx/cocoa/private/overlay.h
+     $(OSX_CARBON_HDR) <!-- FIXME: these headers need moved somewhere shared... -->
+     wx/generic/region.h
+ </set>
+
+--- include/wx/overlay.h	2011-12-14 18:42:11.000000000 +0000
++++ include/wx/overlay.h	2012-03-20 02:42:58.000000000 +0000
+@@ -14,7 +14,8 @@
+ 
+ #include "wx/defs.h"
+ 
+-#if defined(__WXMAC__) && wxOSX_USE_CARBON
++
++#if defined(__WXMAC__) && wxOSX_USE_COCOA_OR_CARBON
+     #define wxHAS_NATIVE_OVERLAY 1
+ #elif defined(__WXDFB__)
+     #define wxHAS_NATIVE_OVERLAY 1
+--- include/wx/private/overlay.h	2011-12-14 18:42:11.000000000 +0000
++++ include/wx/private/overlay.h	2012-03-20 02:42:58.000000000 +0000
+@@ -17,7 +17,11 @@
+ #ifdef wxHAS_NATIVE_OVERLAY
+ 
+ #if defined(__WXMAC__)
++#if wxOSX_USE_CARBON
+     #include "wx/osx/carbon/private/overlay.h"
++#else
++    #include "wx/osx/cocoa/private/overlay.h"
++#endif
+ #elif defined(__WXDFB__)
+     #include "wx/dfb/private/overlay.h"
+ #else

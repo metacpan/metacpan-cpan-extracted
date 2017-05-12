@@ -1,0 +1,75 @@
+Revision History for ANN
+
+0.008     2011-06-13 06:52:38 UTC
+          Add support for an Inline::C version of AI::ANN::Neuron::Execute.
+          This is the default.
+
+          Fix a few extra errors because of uninitialized values being sent to
+          the C code. If you're using the inline::c stuff, be careful that 
+          you don't skip any necessary inputs.
+
+0.007     2011-06-12 04:44:46 UTC
+          Add backprop, not tested.
+
+          Evolver now allows you to pass a coderef for mutation_amount. It 
+          will be evaluated with no arguments. If you pass a number instead, 
+          it will be coerced into a uniform random value up to +/- your value.
+
+          Change a few things from hashrefs to arrayrefs internally. Fully 
+          back-compatibile, but I hope this will speed up a few things.
+
+          Fix dependencies.
+
+0.006     2011-06-01 16:08:04 UTC
+          Remove dependency on perl 5.14, because apparently no one has that 
+          installed yet. Get with the times, people! (Debian is still on 5.10)
+
+          Add mutate_gaussian to the methods available in the evolver, and 
+          allow the population of the eta_ values in AI::ANN. 
+
+          Add a sternly worded comment to the evolver warning against the use 
+          of crossover.
+
+0.005     2011-05-31 20:18:02 UTC
+          Convert to use Moose. I'm told that this is better. There are a few 
+          neat things (not having to write accessors, and apparently 
+          inheritance just works, I'll find out about that soon enough...) 
+          but overall I really don't see the point. Default values, type 
+          constraints, I had all that anyway. Meh.
+
+          Add some words about what the point of this module is.
+
+0.004     2011-05-31 02:35:26 UTC
+          Minor calling changes that I need to commit so I can test them with 
+          another module.
+
+0.003     2011-05-31 01:09:32 UTC
+          Minor. Correct the perl version requirement.
+
+0.002     2011-05-31 01:04:53 UTC
+          Make many obvious (to a computer, I hope) references to the fact 
+          that this requires perl 5.14, to prevent the bloody annoying 
+          CPAN Testers emails. Note that I chose to do this rather than 
+          make the module compatible with earlier versions.
+
+          Add two parameters for min and max neuron output values, default to 
+          0 and 1. Conveniently, forget to actually implement that. 
+
+          Less conveniently, remember to implement the above.
+          
+          While implementing the above, also implement an activation function 
+          in the form of a coderef passed to the AI::ANN constructor.
+          
+          Add the Evolver module, and tests for it. Ensure that the AI::ANN
+          objects that Evolver returns have the same parameters as did the 
+          original.
+
+          Chase down a few bugs caused by a combination of evil references
+          and me changing the structure of my objects halfway through coding.
+          
+          Yell at myself a little bit for taunting the ghost of the (not yet 
+          dead) Larry Wall, by claiming that I was 'halfway through coding'.
+
+0.001     2011-05-27 03:04:06 UTC
+          Initial release. ANN and ANN::Neuron working, basic test suite and
+          documentation.

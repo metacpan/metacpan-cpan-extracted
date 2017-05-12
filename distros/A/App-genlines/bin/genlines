@@ -1,0 +1,273 @@
+#!perl
+
+our $DATE = '2016-10-01'; # DATE
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long::Complete;
+use Time::HiRes qw(time sleep);
+
+my %Opts = (
+    speed => 10,
+    min_speed => undef,
+    max_speed => undef,
+    change_speed_every => 5,
+    max_change_speed_every => undef,
+    min_change_speed_every => undef,
+);
+
+sub _calc_delay_and_batch_size {
+    my $speed0  = $Opts{speed};
+    my $min     = $Opts{min_speed};
+    my $max     = $Opts{max_speed};
+    $min //= $max; $max //= $min;
+
+    my $speed = defined($min) ? rand($max-$min)+$min : $speed0;
+
+    die "Cannot set speed to 0\n" if $speed == 0;
+
+    # we limit delay to >= 0.02s. high number of sleeping with very small delay
+    # will become inaccurate due to process slicing.
+    my $batch_size;
+    if ($speed > 50) {
+        $batch_size = int($speed/50);
+        $speed /= $batch_size;
+    } else {
+        $batch_size = 1;
+    }
+
+    $| = $speed > 1e4 ? 0:1;
+
+    (1/$speed, $batch_size);
+}
+
+sub _calc_change_speed_every {
+    my $e0  = $Opts{change_speed_every};
+    my $min = $Opts{min_change_speed_every};
+    my $max = $Opts{max_change_speed_every};
+    $min //= $max; $max //= $min;
+
+    defined($min) ? rand($max-$min)+$min : $e0;
+}
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'speed=f'                  => \$Opts{speed},
+        'min-speed=f'              => \$Opts{min_speed},
+        'max-speed=f'              => \$Opts{max_speed},
+        'change-speed-every=f'     => \$Opts{change_speed_every},
+        'min-change-speed-every=f' => \$Opts{min_change_speed_every},
+        'max-change-speed-every=f' => \$Opts{max_change_speed_every},
+        'version|v'     => sub {
+            no warnings;
+            print "genlines version $main::VERSION ($main::DATE)\n";
+            exit 0;
+        },
+        'help|h'        => sub {
+            print <<USAGE;
+Usage:
+  genlines [OPTIONS]...
+  genlines --version, -v
+  genlines --help, -h
+Options:
+  --min-speed=f
+  --max-speed=f
+  --change-speed-every=f
+  --min-change-speed-every=f
+  --max-change-speed-every=f
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+}
+
+sub run {
+    my ($delay, $batch_size) = _calc_delay_and_batch_size();
+    my $last_time = time();
+    my $last_speed_change_time = $last_time;
+    my $change_speed_every = _calc_change_speed_every();
+
+    my $i = 1;
+    my @batch;
+    my $num_batches = 0;
+    while (1) {
+
+        @batch = ();
+        for (1..$batch_size) { push @batch, $i++ }
+        print join("\n", @batch), "\n";
+        $num_batches++;
+
+        my $time = time();
+
+        # time to slow down?
+        #say "time=<$time>, last_time=<$last_time>, time-last_time=<", ($time-$last_time), ", num_batches=<$num_batches>, delay=<$delay>";
+        if ($time - $last_time < $num_batches*$delay) {
+            sleep $delay;
+            if ($num_batches > 10000) {
+                $num_batches = 0;
+                $last_time = $time;
+            }
+        }
+
+        # time to change speed?
+        if ($time - $last_speed_change_time > $change_speed_every) {
+            ($delay, $batch_size) = _calc_delay_and_batch_size();
+            $last_speed_change_time = $time;
+            $change_speed_every = _calc_change_speed_every();
+        }
+    }
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Produce lines with a specified speed range
+# PODNAME: genlines
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+genlines - Produce lines with a specified speed range
+
+=head1 VERSION
+
+This document describes version 0.003 of genlines (from Perl distribution App-genlines), released on 2016-10-01.
+
+=head1 SYNOPSIS
+
+Generate 10 lines per second (default):
+
+ % genlines
+
+Generate 100 lines per second:
+
+ % genlines --speed 100
+
+Generate between 20 to 30 lines per second. Speed will change (but still be in
+the 20-30 lines/sec range) every 5 seconds (default):
+
+ % genlines --min-speed 20 --max-speed 30
+
+Generate between 0.1 to 10 lines per second. Change speed after between 3 to 10
+seconds.
+
+ % genlines --min-speed 0.1 --max-speed 10 \
+     --min-change-speed-every 3 --max-change-speed-every 10
+
+=head1 DESCRIPTION
+
+=head1 TODO
+
+Option to take lines from input or customize lines.
+
+=head1 OPTIONS
+
+=head2 --speed (num, default: 10)
+
+=head2 --min-speed (num)
+
+If this is specified instead of C<--speed>, will set speed to a random number
+between C<--min-speed> and C<--max-speed>.
+
+=head2 --max-speed (num)
+
+If this is specified instead of C<--speed>, will set speed to a random number
+between C<--min-speed> and C<--max-speed>.
+
+=head2 --change-speed-every (num, default: 5)
+
+=head2 --min-change-speed-every (num)
+
+If this is specified instead of C<--change-speed-every>, will change speed after
+a random number of seconds between C<--min-change-speed-every> and
+C<--max-change-speed-every>.
+
+=head2 --max-change-speed-every (num)
+
+If this is specified instead of C<--change-speed-every>, will change speed after
+a random number of seconds between C<--min-change-speed-every> and
+C<--max-change-speed-every>.
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C genlines genlines
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete genlines 'p/*/`genlines`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-genlines>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-genlines>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-genlines>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<linespeed>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

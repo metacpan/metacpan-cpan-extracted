@@ -1,0 +1,14 @@
+Revision history for Perl extension AnyEvent::Fork::Remote
+
+TODO: AE::log
+
+1.0   Sat May 21 09:36:20 CEST 2016
+	- new_from_fh didn't work, and now does.
+        - put pid first in process name.
+
+0.2   Sun Apr 28 16:30:15 CEST 2013
+	- initial release.
+
+0.00  Sat Apr 27 01:33:09 CEST 2013
+	- post planning, pre writing.
+

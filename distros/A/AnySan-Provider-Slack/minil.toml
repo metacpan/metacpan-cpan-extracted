@@ -1,0 +1,6 @@
+name = "AnySan-Provider-Slack"
+# badges = ["travis"]
+authority="cpan:SHOGO"
+
+module_maker="ModuleBuildTiny"
+

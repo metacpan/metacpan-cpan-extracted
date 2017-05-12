@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+readme
+test.pl
+lib/ARSObject.pod
+lib/ARSObject.pm
+META.yml                                 Module meta-data (added by MakeMaker)

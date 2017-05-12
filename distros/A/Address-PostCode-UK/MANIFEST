@@ -1,0 +1,23 @@
+Changes
+lib/Address/PostCode/UK.pm
+lib/Address/PostCode/UK/Location.pm
+lib/Address/PostCode/UK/Place.pm
+lib/Address/PostCode/UK/Place/Constituency.pm
+lib/Address/PostCode/UK/Place/Council.pm
+lib/Address/PostCode/UK/Place/Geo.pm
+lib/Address/PostCode/UK/Place/Ward.pm
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-address-postcode-uk.t
+t/02-address-postcode-uk-place.t
+t/manifest.t
+t/pod.t
+t/changes.t
+t/meta-json.t
+t/meta-yml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

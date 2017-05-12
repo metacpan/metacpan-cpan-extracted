@@ -1,0 +1,35 @@
+---
+abstract: 'because Modern::Perl is too old'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.015, CPAN::Meta::Converter version 2.120921'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Futuristic-Perl
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Acme::Futuristic::Perl:
+    file: lib/Acme/Futuristic/Perl.pm
+    version: 0.001
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Acme-Futuristic-Perl/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Acme-Futuristic-Perl
+  homepage: https://metacpan.org/release/Acme-Futuristic-Perl
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-acme-futuristic-perl.git
+version: 0.001

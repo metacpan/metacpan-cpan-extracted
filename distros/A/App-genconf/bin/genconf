@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+
+#PODNAME: genconf
+
+use strict;
+use warnings;
+use App::genconf;
+
+App::genconf->new->run(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+genconf
+
+=head1 VERSION
+
+version 0.006
+
+=head1 SYNOPSIS
+
+  genconf [options] template|dir ...
+
+  options:
+  -v,--verbose                  Turns on chatty output
+  -V,--version                  Print version
+  --config-dir                  Specify config output dir
+
+=head1 NAME
+
+genconf - Generate config files from templates
+
+=head1 AUTHOR
+
+Matt Finkel <fffinkel@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Matt Finkel.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - ars_GetContainer</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H2><CODE>ars_GetContainer(ctrl,name)</CODE></H2>
+
+<P>This function fetches information regarding a specified container
+(Active Link Guide, Application, Packing List or Filter Guide).</P>
+
+<DL>
+<DT><B>On success</B></DT>
+<DD>A scalar pointer to the 
+<A HREF="ds_container.html">container attributes</a>.</DD>
+<DT><B>On failure</B></DT>
+<DD><CODE>undef</CODE>.</DD>
+</DL>
+
+<P>Example:</P>
+
+      <PRE>
+      $alink = ars_GetContainer($c, "ARReport-BuildFieldList");
+      </PRE>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+&#169; Ian Trimnell 2005 i.d.trimnell@open.ac.uk
+</address>
+</BODY>
+</HTML>

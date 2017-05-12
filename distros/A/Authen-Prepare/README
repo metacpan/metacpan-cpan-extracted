@@ -1,0 +1,89 @@
+Authen-Prepare version 0.05
+
+DESCRIPTION
+
+    Authen::Prepare sets up authentication credentials for a specific
+    hostname, username, and password using a combination of stored
+    information and user prompts. These credentials can be used in other
+    scripts or modules that require authentication information. Using this
+    module allows these other scripts to be flexible in their usage of
+    authentication information without recoding user prompts or storing
+    passwords in the code.
+
+    The simplest use of this module is to create the initial object it with
+    no arguments; the credentials will be built from a set of user prompts.
+
+    A more full-featured use of this module is to specify all authentication
+    information ahead of time using a password file and command-line
+    arguments or environment variables. The initial object can then be
+    created with three named arguments (hostname, username, and passfile)
+    and the credentials for the specified hostname and username will be
+    extracted from the password file. This allows the calling script to be
+    used in an automated environment.
+
+    Any combination of the named arguments can be provided; the user will be
+    prompted for any missing information.
+
+  Password File
+    The password file must not have any group or world permissions in order
+    to be usable by this module. Each line of the password file should
+    contain the hostname, username, and password separated by a colon.
+
+    Wildcards are supported in the hostname field only. This allows a
+    default host to be specified.
+
+    Comments may be added by prefixing a line with the '#' character.
+    (Inline comments are not supported at this time.)
+
+    NOTE: The password file is read from top to bottom so only the first
+    match will be returned.
+
+      Example:
+
+      # this is a comment
+      hostname1:username1:password1
+      hostname2:username2:password2
+      host*:username:password
+      # default hostname
+      *:username:password
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following
+commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+    IO::Prompt
+    Readonly
+    Text::Glob
+
+
+PROJECT HOME PAGE
+
+http://authen-prepare.googlecode.com
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, David Narayan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+$Id$

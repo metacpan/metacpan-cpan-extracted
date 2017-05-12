@@ -1,0 +1,54 @@
+#!/usr/bin/perl -w
+use strict;
+use Acme::Mahjong::Rule::CC qw(:all);
+use Storable;
+
+my %scores;
+eval{%scores=%{retrieve 'mj_scores.dat'}};
+print "No file for old data, making new mj_scores.dat...\n" if $@;
+print "Enter names of players: \n";
+chomp(my @players=<STDIN>);
+
+my @subs = (\&dealer, \&nondealer, \&draw);
+my %points;
+print "Enter the Scores: \n";
+foreach my $player (@players) {
+   $scores{$player}= [ ] unless (defined $scores{$player});
+   print "$player: ";
+   chomp(my $score = <STDIN>);
+   $points{$player}= $score;
+}
+my ($dealer,$winner) = ('!@$#$#%$#^','!@$#$#%$#^');
+until(grep{$_ eq $dealer} @players){
+   print "Enter dealer's name: ";
+   chomp($dealer= <STDIN>);
+}
+until((grep{$_ eq $winner} @players) || (!$winner)){
+   print "Enter winner's name: (press enter if draw) ";
+   chomp($winner= <STDIN>);
+}
+my $type;
+if ($winner eq $dealer){
+   @players = sort {$b eq $winner}  @players;
+   $type = 0;
+} elsif ($winner ne ""){
+   @players = sort {$b eq $dealer} @players;
+   @players = sort {$b eq $winner} @players;
+   $type = 1;
+} else {
+   @players = sort {$b eq $dealer} @players;
+   $type = 2;
+}
+my @scores = &{$subs[$type]}(map $points{$_}, @players);
+print map "$players[$_]: $scores[$_]\n", (0..3);
+push @{$scores{$players[$_]}}, $scores[$_] for (0..3);
+
+foreach my $name (@players) {
+   print "$name:\n";
+   print "############\n";
+   my $total;
+   print map {$total+=$_; if ($_>0){"  $_\n"}else{ " $_\n";}}  @{$scores{$name}};
+   print "--------------\n";
+   print "Total: $total\n\n";
+}
+store \%scores, 'mj_scores.dat';

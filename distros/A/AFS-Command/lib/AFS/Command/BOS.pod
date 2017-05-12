@@ -1,0 +1,1162 @@
+#
+# $Id: BOS.pod,v 7.1 2004/01/13 19:01:12 wpm Exp $
+#
+# (c) 2003-2004 Morgan Stanley and Co.
+# See ..../src/LICENSE for terms of distribution.
+#
+
+=head1 NAME
+
+AFS::Command::BOS - OO API to the AFS bos command
+
+=head1 SYNOPSIS
+
+    use AFS::Command::BOS;
+
+    my $bos = AFS::Command::BOS->new();
+
+    my $bos = AFS::Command::BOS->new
+      (
+       command			=> $path_to_your_bos_binary,
+      );
+
+    my $bos = AFS::Command::BOS->new
+      (
+       localauth		=> 1,
+      );
+
+=head1 DESCRIPTION
+
+This module implements an OO API wrapper around the AFS 'bos' command.
+The supported methods depend on the version of the bos binary used,
+and are determined automagically.
+
+=head1 METHODS -- Inherited
+
+All of the following methods are inherited from the AFS::Command::Base
+class.  See that documentation for details.
+
+=over
+
+=item new
+
+=item errors
+
+=item supportsOperation
+
+=item supportsArgument
+
+=back
+
+=head1 METHODS (with complex return values)
+
+=head2 getdate
+
+=over
+
+=item Arguments
+
+The bos help string is:
+
+    bos getdate: get dates for programs
+    Usage: bos getdate -server <machine name> -file <files to check>+ [-dir <destination dir>]
+		       [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->getdate
+      (
+       # Required arguments
+       server			=> $server,
+       file			=> $file, # OR [ $file1, $file2, ... ]
+       # Optional arguments
+       dir			=> $dir,
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=item Return Values
+
+This method returns an AFS::Object::BosServer object, which
+contains one or more generic AFS::Object, one for each file
+specified in the arguments.
+
+    my $result = $bos->getdate
+      (
+       file				=> [ 'bosserver', 'vlserver', 'ptserver' ],
+       cell				=> $cell,
+      ) || die $bos->errors();
+
+    foreach my $fileobj ( $result->getFiles() ) {
+	my ($file,$date) = ($fileobj->file(),$fileobj->date());
+	print "File $file has date $date\n";
+    }
+
+Each of these objects has the following attributes and methods:
+
+B<AFS::Object::BosServer>
+
+This object is nothing more than a container for the generic objects
+for each file.  It has several methods for extracting the file objects:
+
+    Methods			Returns
+    -------			-------
+    getFileNames()		a list of filenames
+    getFiles()			a list of AFS::Object objects
+    getFile($filename)		the AFS::Object object for $filename
+
+B<AFS::Object>
+
+The following attributes should always be present:
+
+    Attributes			Values
+    ----------			------
+    file			fully qualified pathname to the file
+    date			last modified timestamp on the file
+
+The following attributes may be present, if there are .BAK or .OLD
+versions of the file.
+
+    Attributes			Values
+    ----------			------
+    bak				last modified timestamp on the .BAK file
+    old				last modified timestamp on the .OLD file
+
+=back
+
+=head2 getlog
+
+=over
+
+=item Arguments
+
+The bos help string is:
+
+    bos getlog: examine log file
+    Usage: bos getlog -server <machine name> -file <log file to examine>
+		      [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->getlog
+      (
+       # Required arguments
+       server			=> $server,
+       file			=> $file,
+       # Optional arguments
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+       # Enhanced arguments
+       redirect			=> $redirect,
+      );
+
+The 'redirect' argument is the name of a file to "redirect" the log
+file to.  By default, 'bos getlog' dumps the contents of the requested
+file to stdout, which is not what you normally want in an application.
+The value of this argument is passed directly to IO::File->open().
+
+If this argument is not specified, then the contents of the logfile
+are stashed in an attribute of the returned object.
+
+=item Return Values
+
+This method returns an AFS::Object::BosServer object, which
+contains one attribute.
+
+    my $result = $bos->getlog
+      (
+       server			=> $server,
+       file			=> "/usr/afs/logs/VolserLog",
+       redirect			=> "/var/tmp/VolserLog.$$",
+      ) || die $bos->errors();
+
+    my $logfile = IO::File->new("</var/tmp/VolserLog.$$") ||
+      die "Unable to open logfile: $ERRNO\n";
+
+    while ( defined($_ = $logfile->getline()) ) {
+	....
+    }
+
+    # Alternately, the memory pig way:
+
+    my $result = $bos->getlog
+      (
+       server			=> $server,
+       file			=> "/usr/afs/logs/VolserLog",
+      );
+
+    foreach ( split(/\n+/,$result->log()) ) {
+	....
+    }
+
+The object has the following attribute:
+
+B<AFS::Object::BosServer>
+
+    Attributes			Values
+    ----------			------
+    log				Contents of the logfile, or the redirect pathname
+
+If redirect was given, then this attribute is simply same pathname.
+If redirect was not given, then the value of this attribute is the
+contents of the requested logfile, as a single (potentially huge)
+string.
+
+NOTE: Since this method is usually invoked to retrieve one of the AFS
+logfiles, which can be enormous on heavily loaded servers that have
+not been restarted in a while, use of the redirect option is strongly
+encouraged.  If not used, the memory allocated to store the logfile
+may be prohibitively large.  Developer beware.
+
+=back
+
+=head2 getrestart
+
+=over
+
+=item Arguments
+
+The bos help string is:
+
+    bos getrestart: get restart times
+    Usage: bos getrestart -server <machine name> [-cell <cell name>]
+			  [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->getrestart
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=item Return Values
+
+This method returns an AFS::Object::BosServer object, which
+contains two attributes.
+
+    my $result = $bos->getrestart
+      (
+       server			=> $server,
+       cell			=> $cell,
+      ) || die $bos->errors();
+    print "Binary restart time is " . $result->binaries() . "\n";
+    print "Server restart time is " . $result->restart() . "\n";
+
+The object has the following attributes:
+
+B<AFS::Object::BosServer>
+
+    Attributes			Values
+    ----------			------
+    restart			The server restart time
+    binaries			The restart time when there are new, updated binaries
+
+=back
+
+=head2 listhosts
+
+=over
+
+=item Arguments
+
+The bos help string is:
+
+    bos listhosts: get cell host list
+    Usage: bos listhosts -server <machine name> [-cell <cell name>]
+			 [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->listhosts
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=item Return Values
+
+This method returns an AFS::Object::BosServer object, which
+contains one attribute.
+
+    my $result = $bos->listhosts
+      (
+       server			=> $server,
+       cell			=> $cell,
+      ) || die $bos->errors();
+    my $hosts = $result->hosts();
+    print "Server $server in cell $cell has hosts:\n"
+    foreach my $host ( @$hosts ) {
+        print "\t$host\n";
+    }
+
+The object has the following attributes:
+
+B<AFS::Object::BosServer>
+
+    Attributes			Values
+    ----------			------
+    hosts			ARRAY reference of hostnames
+    cell			Cell name
+
+=back
+
+=head2 listkeys
+
+=over
+
+=item Arguments
+
+The bos help string is:
+
+    bos listkeys: list keys
+    Usage: bos listkeys -server <machine name> [-showkey]
+			[-cell <cell name>] [-noauth] [-localauth]
+    Where: -showkey    show the actual key rather than the checksum
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->listkeys
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       showkey			=> 1,
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=item Return Values
+
+This method returns an AFS::Object::BosServer object, which
+contains one or more AFS::Object objects, each of which
+represents a single authentication key on the server.
+
+    my $result = $bos->listkeys
+      (
+       server			=> $server,
+       cell			=> $cell,
+      ) || die $bos->errors();
+    print "Server $server in cell $cell has the following keys:\n";
+    foreach my $key ( $result->getKeys() ) {
+	my ($index,$cksum) = ($key->index(),$key->cksum());
+	print "\t$index => $cksum\n";
+    }
+
+    my $result = $bos->listkeys
+      (
+       server			=> $server,
+       cell			=> $cell,
+       showkey			=> 1,
+      ) || die $bos->errors();
+    print "Server $server in cell $cell has the following keys:\n";
+    foreach my $key ( $result->getKeys() ) {
+	my ($index,$value) = ($key->index(),$key->value());
+	print "\t$index => $cksum\n";
+    }
+
+The objects have the following attributes and methods:
+
+B<AFS::Object::BosServer>
+
+    Attributes			Values
+    ----------			------
+    keychanged			Date the keys were last changed
+
+    Methods			Returns
+    -------			-------
+    getKeyIndexes()		list of numeric key indexes
+    getKeys()			list of AFS::Object objects
+    getKey($index)		the AFS::Object object for the key with index $index
+
+B<AFS::Object>
+
+The following attribute is always present:
+
+    Attributes			Values
+    ----------			------
+    index			Numeric index of the key
+
+The following attribute is present when the 'showkey' argument is given:
+
+    Attributes			Values
+    ----------			------
+    value			Value of the key, in octal, as a string
+
+The following attribute is present when the 'showkey' argument is B<NOT> given:
+
+    Attributes			Values
+    ----------			------
+    cksum			Numeric check sum of the key
+
+=back
+
+=head2 listusers
+
+=over
+
+=item Arguments
+
+The bos help string is:
+
+    bos listusers: list super-users
+    Usage: bos listusers -server <machine name> [-cell <cell name>]
+			 [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->listusers
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=item Return Values
+
+This method returns an AFS::Object::BosServer object, which
+contains one attribute.
+
+    my $result = $bos->listusers
+      (
+       server			=> $server,
+       cell			=> $cell,
+      ) || die $bos->errors();
+    my $users = $result->susers();
+    print "Server $server in cell $cell has users:\n"
+    foreach my $user ( @$users ) {
+        print "\t$user\n";
+    }
+
+The object has the following attribute:
+
+B<AFS::Object::BosServer>
+
+    Attributes			Values
+    ----------			------
+    susers			ARRAY reference of super user names
+
+=back
+
+=head2 status
+
+=over
+
+=item Arguments
+
+The bos help string is:
+
+    bos status: show server instance status
+    Usage: bos status -server <machine name> [-instance <server process name>+]
+		      [-long] [-cell <cell name>] [-noauth] [-localauth]
+    Where: -long       long status
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->status
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       instance			=> $instance, # OR [ $inst1, $inst2, ... ],
+       cell			=> $cell,
+       long			=> 1,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=item Return Values
+
+This method returns an AFS::Object::BosServer object, which
+contains one optional attribute, and one or more
+AFS::Object::Instance objects, each of which represents a
+single instance of a bosserver managed process on the server.
+
+    my $result = $bos->status
+      (
+       server			=> $server,
+       long				=> 1,
+      ) || die $bos->errors();
+    foreach my $instanceobj ( $result->getInstances() ) {
+	my $instance		= $instanceobj->instance();
+	my $status			= $instanceobj->status();
+	print "Instance $instance has status $status\n";
+	foreach my $commandobj ( $instance->getCommands() ) {
+	    my $index		= $commandobj->index();
+	    my $command		= $commandobj->command();
+	    print "\tCmd $index is '$command'\n";
+	}
+    }
+
+The objects have the following attributes and methods:
+
+B<AFS::Object::BosServer>
+
+The following attribute is only present when "bos status" reports
+inappropriate access on directories:
+
+    Attributes			Values
+    ----------			------
+    access			Boolean, true indicating a potential security problem
+
+The following methods can be used to extract the instance objects:
+
+    Methods			Returns
+    -------			-------
+    getInstanceNames()		list of instance names
+    getInstances()		list of AFS::Object::Instance objects
+    getInstance($name)		one AFS::Object::Instance object for the instance $name
+
+B<AFS::Object::Instance>
+
+The following attributes are always present:
+
+    Attributes			Values
+    ----------			------
+    instance			Name of the instance
+    status			Status string (running normally, shutdown, etc.)
+
+The following attribute is always present is the instance is of type
+'cron':
+
+    Attributes			Values
+    ----------			------
+    auxiliary			Auxiliary status (date the next execution)
+
+The following attributes are always available when the 'long' argument
+is specified:
+
+    Attributes			Values
+    ----------			------
+    type			"cron", "simple", or "fs"
+    startdate			Date when the process was last started
+    startcount			Number of times the process has started,
+				since the bosserver was started
+    exitdate			Date when the process last exited
+
+The following attributes are optionally available, depending on the
+state of the instance, when the 'long' argument is specified:
+
+    Attributes			Values
+    ----------			------
+    notifier			Path to the notifier application for this instance
+    state			"temporarily disabled", or "disabled", or "temporarily enabled"
+    errorstop			Boolean, indicating the process was
+				"stopped for too many errors"
+    core			Boolean, indicating the instance has a core file
+    errorexitdate		Date when the process last exited with an error
+    errorexitdue		"shutdown", or "signal", or "code" (present only when
+				"errorexitdate" attribute is present)
+    errorexitsignal		Signal that cause the error exit (present only when
+				"errorexitdue" eq "signal")
+    errorexitcode		Exit code from last error exit (present only when
+				"errorexitdue" eq "code")
+
+The following methods can be used to extract the command objects,
+which are also only present when the 'long' argument is specified.
+
+    Methods			Returns
+    -------			-------
+    getCommandIndexes()		list of numeric indexes for the commands
+    getCommands()		list of AFS::Object objects for all commands
+    getCommand($index)		the AFS::Object object for the command with index $index
+
+B<AFS::Object> (Commands)
+
+The following pair of attributes are always present:
+
+    Attributes			Values
+    ----------			------
+    index			Numerical index of the command
+    command			Command string
+
+=back
+
+=head1 METHODS (with simple return values)
+
+All of the following commands return a simple Boolean (true/false)
+value, if they succeed or fail.
+
+=head2 addhost
+
+The bos help string is:
+
+    bos addhost: add host to cell dbase
+    Usage: bos addhost -server <machine name> -host <host name>+
+		       [-clone] [-cell <cell name>] [-noauth] [-localauth]
+    Where: -clone      vote doesn't count
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->addhost
+      (
+       # Required arguments
+       server			=> $server,
+       host			=> $host, # OR [ $host1, $host2, ... ]
+       # Optional arguments
+       clone			=> 1,
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 addkey
+
+The bos help string is:
+
+    bos addkey: add keys to key dbase (kvno 999 is bcrypt)
+    Usage: bos addkey -server <machine name> [-key <key>] -kvno <key version number>
+		      [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->addkey
+      (
+       # Required arguments
+       server			=> $server,
+       kvno			=> $kvno,
+       # Optional arguments
+       key			=> $key,
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 adduser
+
+The bos help string is:
+
+    bos adduser: add users to super-user list
+    Usage: bos adduser -server <machine name> -user <user names>+
+		       [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->adduser
+      (
+       # Required arguments
+       server			=> $server,
+       user			=> $user, # OR [ $user1, $user2, ... ]
+       # Optional arguments
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 blockscanner
+
+The bos help string is:
+
+    bos blockscanner: block scanner daemon from making migration requests
+    Usage: bos blockscanner -server <machine name> [-cell <cell name>]
+			    [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->blockscanner
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 create
+
+The bos help string is:
+
+    bos create: create a new server instance
+    Usage: bos create -server <machine name> -instance <server process name>
+		      -type <server type> -cmd <command lines>+ [-notifier <Notifier program>]
+		      [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->create
+      (
+       # Required arguments
+       server			=> $server,
+       instance			=> $instance,
+       type			=> $type,
+       cmd			=> $cmd, # OR [ $cmd1, $cmd2, ... ]
+       # Optional arguments
+       notifier			=> $notifier,
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 delete
+
+The bos help string is:
+
+    bos delete: delete a server instance
+    Usage: bos delete -server <machine name> -instance <server process name>+
+		      [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->delete
+      (
+       # Required arguments
+       server			=> $server,
+       instance			=> $instance, # OR [ $inst1, $inst2, ... ]
+       # Optional arguments
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 exec
+
+The bos help string is:
+
+    bos exec: execute shell command on server
+    Usage: bos exec -server <machine name> -cmd <command to execute>
+		    [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->exec
+      (
+       # Required arguments
+       server			=> $server,
+       cmd			=> $cmd,
+       # Optional arguments
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 install
+
+The bos help string is:
+
+    bos install: install program
+    Usage: bos install -server <machine name> -file <files to install>+
+		       [-dir <destination dir>] [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->install
+      (
+       # Required arguments
+       server			=> $server,
+       file			=> $file, # OR [ $file1, $file2, ... ]
+       # Optional arguments
+       dir			=> $dir,
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 prune
+
+The bos help string is:
+
+    bos prune: prune server files
+    Usage: bos prune -server <machine name> [-bak] [-old] [-core] [-all]
+		     [-cell <cell name>] [-noauth] [-localauth]
+    Where: -bak        delete .BAK files
+	   -old        delete .OLD files
+	   -core       delete core files
+	   -all        delete all junk files
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->prune
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       bak			=> 1,
+       old			=> 1,
+       core			=> 1,
+       all			=> 1,
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 removehost
+
+The bos help string is:
+
+    bos removehost: remove host from cell dbase
+    Usage: bos removehost -server <machine name> -host <host name>+
+			  [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->removehost
+      (
+       # Required arguments
+       server			=> $server,
+       host			=> $host, # OR [ $host1, $host2, ... ]
+       # Optional arguments
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 removekey
+
+The bos help string is:
+
+    bos removekey: remove keys from key dbase
+    Usage: bos removekey -server <machine name> -kvno <key version number>+
+			 [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->removekey
+      (
+       # Required arguments
+       server			=> $server,
+       kvno			=> $kvno, # OR [ $kvno1, $kvno2, ... ]
+       # Optional arguments
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 removeuser
+
+The bos help string is:
+
+    bos removeuser: remove users from super-user list
+    Usage: bos removeuser -server <machine name> -user <user names>+
+			  [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->removeuser
+      (
+       # Required arguments
+       server			=> $server,
+       user			=> $user, # OR [ $user1, $user2, ... ]
+       # Optional arguments
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 restart
+
+The bos help string is:
+
+    bos restart: restart processes
+    Usage: bos restart -server <machine name> [-instance <instances>+] [-bosserver]
+		       [-all] [-cell <cell name>] [-noauth] [-localauth]
+    Where: -bosserver  restart bosserver
+	   -all        restart all processes
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->restart
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       instance			=> $instance, # OR [ $inst1, $inst2, ... ]
+       bosserver		=> 1,
+       all			=> 1,
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 salvage
+
+The bos help string is:
+
+    bos salvage: salvage partition or volumes
+    Usage: bos salvage -server <machine name> [-partition <salvage partition>]
+		       [-volume <salvage volume number or volume name>]
+		       [-file <salvage log output file>] [-all] [-showlog]
+		       [-parallel <# of max parallel partition salvaging>]
+		       [-tmpdir <directory to place tmp files>]
+		       [-orphans <ignore | remove | attach>] [-debug] [-nowrite]
+		       [-force] [-oktozap] [-rootfiles] [-salvagedirs] [-blockreads]
+		       [-ListResidencies] [-SalvageRemote] [-SalvageArchival]
+		       [-IgnoreCheck] [-ForceOnLine] [-UseRootDirACL]
+		       [-TraceBadLinkCounts] [-DontAskFS] [-LogLevel <(MR-AFS) log level>]
+		       [-rxdebug] [-cell <cell name>] [-noauth] [-localauth]
+    Where: -all                 salvage whole server
+	   -showlog             display salvage log
+	   -debug               (MR-AFS) Run in Debugging mode
+	   -nowrite             (MR-AFS) Run readonly/test mode
+	   -force               (MR-AFS) Force full salvaging
+	   -oktozap             (MR-AFS) Give permission to destroy bogus file residencies/volumes - debugging flag
+	   -rootfiles           (MR-AFS) Show files owned by root - debugging flag
+	   -salvagedirs         (MR-AFS) Force rebuild/salvage of all directories
+	   -blockreads          (MR-AFS) Read smaller blocks to handle IO/bad blocks
+	   -ListResidencies     (MR-AFS) Just list affected file residencies - debugging flag
+	   -SalvageRemote       (MR-AFS) Salvage storage systems that are not directly attached
+	   -SalvageArchival     (MR-AFS) Salvage HSM storage systems
+	   -IgnoreCheck         (MR-AFS) Don't perform VLDB safety check when deleting unreferenced files.
+					 Only a good idea in single server cell.
+	   -ForceOnLine         (MR-AFS) Force the volume to come online, even if it hasn't salvaged cleanly.
+	   -UseRootDirACL       (MR-AFS) Use the root directory ACL for lost+found directory if it is created.
+	   -TraceBadLinkCounts  (MR-AFS) Print out lines about volume reference count changes.
+	   -DontAskFS           (MR-AFS) Don't ask fileserver to take volume offline.  THIS IS VERY DANGEROUS.
+	   -rxdebug             (MR-AFS) Write out rx debug information.
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->salvage
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       partition		=> $partition,
+       volume			=> $volume,
+       file			=> $file,
+       all			=> 1,
+       showlog			=> 1,
+       parallel			=> $parallel,
+       tmpdir			=> $tmpdir,
+       orphans			=> $orphans,
+       debug			=> 1,
+       nowrite			=> 1,
+       force			=> 1,
+       oktozap			=> 1,
+       rootfiles		=> 1,
+       salvagedirs		=> 1,
+       blockreads		=> 1,
+       ListResidencies		=> 1,
+       SalvageRemote		=> 1,
+       SalvageArchival		=> 1,
+       IgnoreCheck		=> 1,
+       ForceOnLine		=> 1,
+       UseRootDirACL		=> 1,
+       TraceBadLinkCounts	=> 1,
+       DontAskFS		=> 1,
+       LogLevel			=> $loglevel,
+       rxdebug			=> 1,
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 setauth
+
+The bos help string is:
+
+    bos setauth: set authentication required flag
+    Usage: bos setauth -server <machine name>
+		       -authrequired <on or off: authentication required for admin requests>
+		       [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->setauth
+      (
+       # Required arguments
+       server			=> $server,
+       authrequired		=> $authrequired,
+       # Optional arguments
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 setcellname
+
+The bos help string is:
+
+    bos setcellname: set cell name
+    Usage: bos setcellname -server <machine name> -name <cell name>
+			   [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->setcellname
+      (
+       # Required arguments
+       server			=> $server,
+       name			=> $name,
+       # Optional arguments
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 setrestart
+
+The bos help string is:
+
+    bos setrestart: set restart times
+    Usage: bos setrestart -server <machine name> -time <time to restart server>
+			  [-general] [-newbinary] [-cell <cell name>]
+			  [-noauth] [-localauth]
+    Where: -general    set general restart time
+	   -newbinary  set new binary restart time
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->setrestart
+      (
+       # Required arguments
+       server			=> $server,
+       time			=> $time,
+       # Optional arguments
+       general			=> 1,
+       newbinary		=> 1,
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 shutdown
+
+The bos help string is:
+
+    bos shutdown: shutdown all processes
+    Usage: bos shutdown -server <machine name> [-instance <instances>+]
+			[-wait] [-cell <cell name>] [-noauth] [-localauth]
+    Where: -wait       wait for process to stop
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->shutdown
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       instance			=> $instance, # OR [ $inst1, $inst2, ... ]
+       wait			=> 1,
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 start
+
+The bos help string is:
+
+    bos start: start running a server
+    Usage: bos start -server <machine name> -instance <server process name>+
+		     [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->start
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       instance			=> $instance, # OR [ $inst1, $inst2, ... ]
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 startup
+
+The bos help string is:
+
+    bos startup: start all processes
+    Usage: bos startup -server <machine name> [-instance <instances>+]
+		       [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->startup
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       instance			=> $instance, # OR [ $inst1, $inst2, ... ]
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 stop
+
+The bos help string is:
+
+    bos stop: halt a server instance
+    Usage: bos stop -server <machine name> -instance <server process name>+
+		    [-wait] [-cell <cell name>] [-noauth] [-localauth]
+    Where: -wait       wait for process to stop
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->stop
+      (
+       # Required arguments
+       server			=> $server,
+       instance			=> $instance, # OR [ $inst1, $inst2, ... ]
+       # Optional arguments
+       wait			=> 1,
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 unblockscanner
+
+The bos help string is:
+
+    bos unblockscanner: allow scanner daemon to make migration requests again
+    Usage: bos unblockscanner -server <machine name>
+			      [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->unblockscanner
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head2 uninstall
+
+The bos help string is:
+
+bos uninstall: uninstall program
+Usage: bos uninstall -server <machine name> -file <files to uninstall>+
+                     [-dir <destination dir>] [-cell <cell name>] [-noauth] [-localauth]
+
+The corresponding method invocation looks like:
+
+    my $result = $bos->uninstall
+      (
+       # Required arguments
+       server			=> $server,
+       file			=> $file, # OR [ $file1, $file2, ... ]
+       # Optional arguments
+       dir			=> $dir,
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+      );
+
+=head1 SEE ALSO
+
+AFS::Command(1), AFS::Object(1)
+
+=cut
+

@@ -1,0 +1,25 @@
+# (This needs a lot of cleaning up)
+#
+# This file, site_const.dat, is where you add your site specific constants.
+# A short name (first field) identical to an existing entry in the factory
+# defaults will override the previous entry (because that's what you want
+# it to do) and generate a warning during the installation (in case you
+# didn't know that's what you're doing)
+#
+# Format is tab separated fields (whatever we settle on)
+#
+# Field 1 [short name for variable]	    same
+# Field 2 [long name for variable]	    same
+# Field 3 [description]	   		    same
+# Field 4 [CGS value]			or [dimensionless value]
+# Field 5 [MKS value]			   [precision]
+# Field 6 [precision]			    no field
+# 
+# variable short name|long name|description|CGS value|MKS value|precision
+#   or:
+# variable short name|long name|description|dimensionless value|precision
+# 
+# for example
+A_inch	INCH	some outdated unit of distance	2.54	0.0254	3e-3
+A_gogl	GOOGOL	a very, very large number	1e100	0
+

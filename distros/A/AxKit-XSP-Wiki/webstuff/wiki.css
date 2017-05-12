@@ -1,0 +1,133 @@
+body {
+    background-color: #fff;
+    color:		 #000;
+    margin:		 0px;
+    font-family: sans-serif;
+}
+
+DIV.topbanner {
+  background: none #fc9;
+  border: none;
+  font-size: 20pt;
+}
+
+DIV.searchbanner {
+  position: absolute;
+  top: 0%;
+  right: 5;
+}
+
+DIV.topbanner img {
+  vertical-align: middle;
+}
+
+DIV.base {
+  background: none #fff;
+  border: solid #333333 1px;
+  color: #000000;
+  margin: 0.5em 12px 0.5em 12px;
+  padding: 5px;
+  text-align: left; width: auto;
+}
+
+DIV.sidemenu {
+  border: solid #963 1px;
+  background: none #fc9;
+  padding: 3px; width: 160px;
+}
+
+DIV.maincontent { margin: 5px; }
+
+DIV.breadcrumbs {
+  background: none;
+  text-align: left; width: auto; 
+  margin-left: 5px;
+}
+
+DIV.content {
+}
+
+DIV.line {
+  display: block; width: auto; height: 1px; background: #963;
+}
+
+DIV.sidemenumenu {
+  background: none #fff;
+  border: solid 1px #963;
+  padding-bottom: 3px;
+}
+
+DIV.sidemenutitle {
+  background: none #fc9;
+  border-bottom: solid 1px #963;
+  font-weight: bold;
+  padding: 3px;
+}
+
+DIV.sidemenuitem {
+  padding-left: 3px;
+  padding-right: 3px;
+  font-size: 12pt;
+}
+
+:link {
+    color: #9966cc;
+}
+
+:visited {
+    color: #330066;
+}
+
+:active {
+    color: #eeddff;
+}
+
+.by {
+ font-family: Verdana, sans-serif; 
+ font-size: 10pt;
+ color: black;
+}
+
+@media screen {
+
+    A.plain:hover {
+        color:      transparent;
+        background: transparent;
+    }
+    
+    a:hover {
+        color:              #fc6;
+        text-decoration:    none;
+    }
+}
+
+.toplevel {
+	color:		 #306;
+	font-size:	 11pt;
+	font-weight: bold;
+}
+
+.sublevel {
+	font-size:	 10pt;
+	font-weight: bold;
+}
+
+.toponomic {
+	font-size:	 10pt;
+	font-weight: bold;
+}
+
+.copyright {
+	font-size:	 8pt;
+	font-style:  italic;
+}
+
+pre.verbatim {
+	background: #DDD;
+	width: 90%;
+	margin: 0.5em -4px 0.5em;
+	padding: 0.5em 1em 0.25em;
+	border: 1px solid gray;
+	white-space: pre;
+	font: monospace;
+}

@@ -1,0 +1,31 @@
+---
+abstract: 'Perl Authentication and Authorization via cookies'
+author:
+  - 'Michael Schout <mschout@cpan.org>'
+build_requires:
+  URI::Escape: '1.31'
+configure_requires:
+  Apache::Test: '1.39'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache-AuthCookie
+recommends:
+  WWW::Form::UrlEncoded::XS: '0'
+requires:
+  Carp: '0'
+  Class::Load: '0.03'
+  Encode: '0'
+  HTTP::Body: '0'
+  Hash::MultiValue: '0'
+  Test::More: '0.94'
+  WWW::Form::UrlEncoded: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Apache-AuthCookie
+  homepage: http://search.cpan.org/dist/Apache-AuthCookie/
+  repository: git://github.com/mschout/apache-authcookie.git
+version: '3.26'

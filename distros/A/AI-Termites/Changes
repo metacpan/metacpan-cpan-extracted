@@ -1,0 +1,9 @@
+Revision history for Perl extension AI::Termites.
+
+0.02  Jun 30, 2011
+        - add missing dependencies
+
+0.01  Thu Jun  9 17:52:37 2011
+	- original version; created by h2xs 1.23 with options
+		-AXn AI::Termites
+

@@ -1,0 +1,50 @@
+#-*-perl-*-
+#
+# $Id: parse_config,v 7.1 2004/01/13 19:01:45 wpm Exp $
+#
+# (c) 2003-2004 Morgan Stanley and Co.
+# See ..../src/LICENSE for terms of distribution.
+#
+# Parse our config file to get the parameters we need for the tests
+#
+
+# NOTE: this is used ONLY for the installation procedures, and not in
+# the production code itself.
+
+package AFS::Command::Tests;
+
+use vars qw(%Config);
+
+my $config = "/no/such/path";
+
+foreach my $relpath ( qw( . .. ../.. ../../.. ) ) {
+    next unless -f "$relpath/CONFIG";
+    $config = "$relpath/CONFIG";
+    last;
+}
+
+die "Unable to locate CONFIG file\n" unless -f $config;
+
+open(CONFIG,"$config") or
+  die "Unable to open CONFIG file: $ERRNO\n";
+
+while ( <CONFIG> ) {
+    next if /^\#/;
+    next unless ($key,$value) = /^(\w+)\s*=\s*(.*)\s*$/;
+    if ( $ENV{$key} ) {
+	#print "Environment variable '$key' overrides CONFIG definition\n";
+	$Config{$key} = $ENV{$key};
+    } else {
+	$Config{$key} = $value;
+    }
+}
+
+close(CONFIG) or
+  die "Unable to close CONFIG file: $ERRNO\n";
+
+foreach my $key ( keys %ENV ) {
+    next unless $key =~ /^AFS_COMMAND/;
+    $Config{$key} = $ENV{$key};
+}
+
+1;

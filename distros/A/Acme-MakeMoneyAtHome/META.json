@@ -1,0 +1,44 @@
+{
+   "abstract" : "I made 17047 dollars just posting Acme dists to CPAN",
+   "author" : [
+      "Jon Portnoy <avenj@cobaltirc.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-MakeMoneyAtHome",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/avenj/acme-makemoneyathome.git",
+         "web" : "http://github.com/avenj/acme-makemoneyathome"
+      }
+   },
+   "version" : "1.004001"
+}
+

@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/bulkmail
+lib/App/Bulkmail.pm
+examples/recipients.csv
+examples/recipients.json
+examples/recipients.yaml
+examples/mail.tt
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

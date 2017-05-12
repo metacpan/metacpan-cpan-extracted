@@ -1,0 +1,34 @@
+---
+abstract: 'A basic queuing system'
+author:
+  - 'Kevin Mulholland <moodfarm@cpan.org>'
+build_requires:
+  DBI: 0
+  Data::Printer: 0
+  Test::More: 0
+  perl: v5.18.2
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Basis-Queue
+requires:
+  Data::UUID: 0
+  JSON: 0
+  Moo: 0
+  MooX::Types::MooseLike::Base: 0
+  POSIX: 0
+  Time::HiRes: 0
+  Try::Tiny: 0
+  constant: 0
+  feature: 0
+  perl: v5.18.2
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/27escape/App-Basis-Queue.git
+version: 000.400.000

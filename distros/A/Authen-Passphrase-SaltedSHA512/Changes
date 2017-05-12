@@ -1,0 +1,36 @@
+Revision history for Perl module Authen::Passphrase::SaltedSHA512
+
+0.07 2013-03-05
+  - Update PDO to reflect shift from Math::Random::Secure to
+    Bytes::Random::Secure.
+  - Optimized away two minor conditional branches (which improved
+    test coverage).
+
+0.06 2012-11-02
+  - "Changes" is now CPAN::Changes::Spec compliant.
+  - Added t/09-changes.t to verify compliance with the spec.
+
+0.05 2012-09-15
+  - Switched random number back-end to Bytes::Random::Secure (which
+    essentially uses the same dependencies anyway, but abstracts away the
+    details, and could switch easily to another generator in the future).
+  - Explanation in the POD as to why dependencies are heavy.
+
+0.04 2012-09-06
+  - Added Statistics::Test::RandomWalk to BUILD_REQUIRES
+    because Math::Random::Secure fails to list it as a 
+    dependency for its test suite.  If that bug gets fixed,
+    we can remove it from our Makefile.PL.
+    See Math::Random::Secure RT#74541.
+
+0.03 2012-05-31
+  - Improved instantiation of SUPER-class.
+
+0.02 2012-05-28
+  - Many POD fixes, improvements.
+  - POD Acknowledements section added.
+  - Additional metadata added to Makefile.PL.
+  - ./examples directory added with several example scripts.
+
+0.01 2012-05-26
+  - Initial version.  Subclasses Authen::Passphrase::SaltedDigest.

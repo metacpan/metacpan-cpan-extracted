@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE wml PUBLIC
+    "-//WAPFORUM//DTD WML 1.1//EN"
+    "http://www.wapforum.org/DTD/wml_1.1.xml">
+
+<wml>
+    <card title="Login">
+        <!-- Reset fields when entered backwards. -->
+        <onevent type="onenterbackward">
+            <refresh>
+                <setvar name="username" value=""/>
+                <setvar name="password" value=""/>
+            </refresh>
+        </onevent>
+
+        <!-- Read login and password from user. -->
+        <p>Username: <input name="username"/></p>
+        <p>Password: <input type="password" name="password"/></p>
+
+        <!-- Submit button sends data to server. -->
+        <do type="accept" label="Submit">
+            <go href="/wmlmail/" method="post">
+                <postfield name="username" value="$(username)"/>
+                <postfield name="password" value="$(password)"/>
+            </go>
+        </do>
+    </card>
+</wml>
+

@@ -1,0 +1,52 @@
+{
+   "abstract" : "Perl-only `which`",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Per Einar Ellefsen <pereinar@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-pwhich",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Which" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "Test::Script" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/App-pwhich/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/App-pwhich",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/App-pwhich.git",
+         "web" : "https://github.com/plicease/App-pwhich"
+      }
+   },
+   "version" : "1.14"
+}
+

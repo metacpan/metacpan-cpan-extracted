@@ -1,0 +1,54 @@
+{
+   "abstract" : "Module that provides simple named locks",
+   "author" : [
+      "Hunter McMillen <mcmillhj@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Highlander",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "English" : "0",
+            "Fcntl" : "0",
+            "File::Temp" : "0",
+            "Path::Tiny" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::SharedFork" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/mcmillhj/App-Highlander/issues"
+      },
+      "homepage" : "https://metacpan.org/release/App-Highlander",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mcmillhj/App-Highlander.git",
+         "web" : "http://github.com/mcmillhj/App-Highlander"
+      }
+   },
+   "version" : "0.003"
+}
+

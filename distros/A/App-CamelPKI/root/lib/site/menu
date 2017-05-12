@@ -1,0 +1,21 @@
+   		<dt onclick="javascript:montre();">
+   			<a href="/" title="Home Page">Home</a>
+   		</dt>	
+   		
+   		<dt onclick="javascript:montre('smenu1');">CRL</dt>
+			<dd id="smenu1">
+				<ul>
+					<li><a href="/ca/examine_crl" title="Show the CRL(DER Format)">Show me it</a></li>
+					<li><a href="/ca/download_crl/crl.der" title="Download the CRL(DER Format)">Download it</a></li>
+				</ul>
+			</dd>
+		
+		<dt onclick="javascript:montre('smenu2');" title="Operations with Certificates (Issue, revocation, ..)">Certificates</dt>
+			<dd id="smenu2">
+				<ul>
+					<li><a href="/ca/template/ssl/view_operations" title="SSL Certificates">SSL</a></li>
+					<li><a href="/ca/template/vpn/view_operations" title="VPN Certificates">VPN</a></li>
+					<li><a href="/ca/list_issued_certificates" title="Certificates currently valids">Valids</a></li>
+					<li><a href="/ca/list_revoked_certificates" title="Certificates currently revoked">Revoked</a></li>				</ul>
+			</dd>
+		

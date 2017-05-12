@@ -1,0 +1,74 @@
+Revision history for App-gist
+
+0.16      2014-06-24 15:11:33+02:00 Europe/Rome
+
+ - Add --name option
+ - Abort if no options are supplied and STDIN is a TTY (GH#3)
+   (thanks, @sestaton)
+
+0.15      2013-03-26 17:10:16 Europe/Rome
+
+ - Switch to Pithub
+
+0.14      2013-03-25 00:42:20 Europe/Rome
+
+ - Add a proper Changes file
+ - Improve documentation (no functional changes)
+
+0.13      2012-09-13 22:38:57 Europe/Rome
+
+ - Documentation fixes (no functional changes)
+ - Switch to WWW::GitHub::Gist
+
+0.12      2012-09-10 19:39:58 Europe/Rome
+
+ - Keep the old description on update
+
+0.11      2012-08-20 13:15:54 Europe/Rome
+
+ - Documentation fixes (no functional changes)
+
+0.10      2012-07-20 23:47:10 Europe/Rome
+
+ - Add --web option
+
+0.09      2012-07-19 11:44:30 Europe/Rome
+
+ - Rebuild to update META.* repository links (no functional changes)
+
+0.08      2012-07-07 14:07:13 Europe/Rome
+
+ - Rebuild to update META.* repository links (no functional changes)
+
+0.07      2012-06-08 12:32:28 Europe/Rome
+
+ - Switch to App::Cmd::Simple
+ - Optional support for Config::Identity
+ - Documentation fixes (no functional changes)
+
+0.06      2012-04-13 10:48:52 Europe/Rome
+
+ - Print html_url after creation (GH#1) (thanks, @alexrj)
+
+0.05      2012-02-05 16:16:24 Europe/Rome
+
+ - Switch to GitHub API v3
+
+0.04      2011-04-25 18:47:40 Europe/Rome
+
+ - Documentation fixes (no functional changes)
+ - Add --extension option
+ - Support input from STDIN
+
+0.03      2011-03-27 15:25:12 Europe/Rome
+
+ - Add --private and --description option
+ - Fix bug in command-line ardgument parsing
+
+0.02      2011-03-26 19:48:38 Europe/Rome
+
+ - Add --update option
+
+0.01      2011-03-21 22:19:42 Europe/Rome
+
+ - Initial version

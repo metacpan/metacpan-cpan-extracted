@@ -1,0 +1,51 @@
+{
+   "abstract" : "Compute distance matrix for any distance metric",
+   "author" : [
+      "Chad A. Davis <chad.a.davis@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Algorithm-DistanceMatrix",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : 0,
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Algorithm::Cluster" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/chadadavis/Algorithm-DistanceMatrix/issues"
+      },
+      "homepage" : "http://github.com/chadadavis/Algorithm-DistanceMatrix",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/chadadavis/Algorithm-DistanceMatrix.git",
+         "web" : "https://github.com/chadadavis/Algorithm-DistanceMatrix"
+      }
+   },
+   "version" : "0.04"
+}
+

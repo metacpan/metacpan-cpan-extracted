@@ -1,0 +1,11 @@
+abstract: Perl with lambdas!
+author: Nelson Elhage, C<< <nelhage at mit.edu> >>
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: Perl
+name: Acme-Lambda
+no_index: 
+  directory: 
+    - inc
+    - t
+version: 0.01

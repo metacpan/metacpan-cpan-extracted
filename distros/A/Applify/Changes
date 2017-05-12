@@ -1,0 +1,51 @@
+Revision history for perl distribution Applify
+
+0.12 2015-07-18T08:55:27+0200
+ - t/extends.t does not work on Perl 5.10.1
+
+0.11 2015-07-12T11:32:22+0200
+ - Bump minimum required Perl version to 5.10.1
+ - t/autoload.t does not work on Perl 5.10.1
+
+0.10 2015-04-23T10:22:16+0200
+ - Add support for option(..., alias => [...])
+
+0.09 2014-09-28T22:03:06Z
+ - Fix failig test in blead perl 5.21.4 #1
+
+0.08 2014-09-05T16:55:03Z
+ - Will not call meta() unless the class extends Moose::Object
+
+0.07 2014-09-05T14:36:58Z
+ - Fix --args to Moose's new()
+
+0.06 2014-04-23T14:25:16Z
+ - Fix "use constant FOO => 123;"
+
+0.0501 2012-09-06T15:53:07Z
+ - Fix major bug: Should be caller(0) and not caller(1) in import(). This
+   made the perl debugger complain: syntax error at my-script.pl line 28,
+   near "documentation __FILE__" Contributor: Ole Bjørn Hessen
+
+0.05 2012-07-20T12:13:24Z
+ - Applify works with Moo
+
+0.04 2012-05-06T11:36:19Z
+ - Fix app, option(), ... should not be defined to the appliction
+   namespace.
+
+0.03 2012-05-06T11:13:08Z
+ - Methods do not need to be defined in the app:: namespace.
+
+0.02 2012-02-19T18:33:15Z
+ - Options can be set in application
+ - Options can take (n_of => '...')
+ - --help will include SYNOPSIS
+
+0.01 2012-02-17T21:54:24Z
+ - Add option keyword
+ - Add documentation keyword
+ - Add version keyword
+ - Add extends keyword
+ - Add app keyword
+

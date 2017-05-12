@@ -1,0 +1,73 @@
+---
+name: Alvis-NLPPlatform
+version: 0.6
+author:
+  - 'Thierry Hamon <thierry.hamon@lipn.univ-paris13.fr> and Julien Deriviere <julien.deriviere@lipn.univ-paris13.fr>'
+abstract: Perl extension for linguistically annotating XML documents in Alvis
+license: gpl
+resources:
+  license: http://www.opensource.org/licenses/gpl-license.php
+requires:
+  Alvis::Convert: 0
+  Alvis::Pipeline: 0
+  Alvis::TermTagger: 0.3
+  Config::General: 2.3
+  Data::Dumper: 0
+  Encode: 0
+  Fcntl: 0
+  File::Basename: 0
+  File::MMagic: 0
+  File::Path: 0
+  File::Touch: 0
+  Getopt::Long: 0
+  IO: 0
+  IO::File: 0
+  IO::Socket::INET: 0
+  Lingua::Identify: 0
+  Parse::Yapp: 0
+  Pod::Usage: 0
+  Sys::Hostname: 0
+  Test::More: 0
+  Time::HiRes: 0
+  XML::LibXML: 0
+  XML::Parser: 0
+  XML::Parser::PerlSAX: 0
+  perl: 5.005
+  utf8: 0
+build_requires:
+  Module::Build: 0.28
+provides:
+  Alvis::NLPPlatform:
+    file: lib/Alvis/NLPPlatform.pm
+    version: 0.6
+  Alvis::NLPPlatform::Annotation:
+    file: lib/Alvis/NLPPlatform/Annotation.pm
+    version: 0
+  Alvis::NLPPlatform::Canonical:
+    file: lib/Alvis/NLPPlatform/Canonical.pm
+    version: 0
+  Alvis::NLPPlatform::Convert:
+    file: lib/Alvis/NLPPlatform/Convert.pm
+    version: 0
+  Alvis::NLPPlatform::Document:
+    file: lib/Alvis/NLPPlatform/Document.pm
+    version: 0
+  Alvis::NLPPlatform::MyReceiver:
+    file: lib/Alvis/NLPPlatform/MyReceiver.pm
+    version: 0
+  Alvis::NLPPlatform::NLPWrappers:
+    file: lib/Alvis/NLPPlatform/NLPWrappers.pm
+    version: 0
+  Alvis::NLPPlatform::ParseConstituents:
+    file: lib/Alvis/NLPPlatform/ParseConstituents.pm
+    version: 0
+  Alvis::NLPPlatform::UserNLPWrappers:
+    file: lib/Alvis/NLPPlatform/UserNLPWrappers.pm
+    version: 0
+  Alvis::NLPPlatform::XMLEntities:
+    file: lib/Alvis/NLPPlatform/XMLEntities.pm
+    version: 0
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

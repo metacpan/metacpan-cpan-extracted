@@ -1,0 +1,6 @@
+Read the documentation:
+
+    $ perldoc Alien::CodePress
+
+This module is used for installing an external library. There is no need for
+examples.

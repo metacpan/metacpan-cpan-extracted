@@ -1,0 +1,32 @@
+---
+abstract: 'turn one big decision into many small decisions'
+author:
+  - 'John Trammell <johntrammell@gmail.com>'
+build_requires:
+  Module::Build::Compat: 0
+  Test::More: 0
+  Test::Script: 1.06
+  Test::Warn: 0.11
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-War
+provides:
+  App::War:
+    file: lib/App/War.pm
+    version: 0.05
+requires:
+  Getopt::Long: 0
+  Graph: 0.84
+  List::Util: 0
+  Pod::Usage: 0
+  perl: 0
+  strict: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

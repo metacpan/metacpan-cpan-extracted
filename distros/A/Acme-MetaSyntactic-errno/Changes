@@ -1,0 +1,18 @@
+Revision history for Acme-MetaSyntactic-errno
+
+1.003 Mon May 13 2013
+        [GAMIFICATION]
+        - fix the version numbers in the Changes file,
+          to reach 100% on http://changes.cpanhq.org/
+
+1.002 Mon Jul 23 2012
+        [DOCUMENTATION]
+        - Typo fix in the CHANGES section
+
+1.001 Fri Jul 13 2012
+        [DOCUMENTATION]
+        - add a LICENSE section
+
+1.000 Thu Jun 21 2012
+        - First release
+

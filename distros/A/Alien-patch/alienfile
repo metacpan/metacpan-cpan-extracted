@@ -1,0 +1,61 @@
+use alienfile;
+use File::chdir;
+use File::Spec;
+
+requires 'File::chdir';
+
+plugin 'Probe::CommandLine' => (
+  command => 'patch',
+  # TODO: some versions of patch may not accept --version
+  args    => ['--version'],
+);
+
+share {
+  plugin 'Download' => (
+    url     => 'http://ftp.gnu.org/gnu/patch',
+    version => qr/^patch-([0-9\.]+)\.tar\.gz$/,
+  );
+  plugin 'Extract' => 'tar.gz';  
+  plugin 'Build::Autoconf' => ();
+
+  requires 'File::Basename';
+
+  meta->before_hook(
+    build => sub {
+      my($build) = @_;
+      my $basename = File::Basename::basename($CWD);
+      my($version) = $basename =~ /([0-9\.]+)$/;
+      $build->runtime_prop->{my_vendor} = 'gnu';
+      $build->runtime_prop->{version}   = $version;
+    }
+  );
+};
+
+sys {
+  requires 'Capture::Tiny';
+
+  gather sub {
+    my($build) = @_;
+    
+    my($out, $err) = Capture::Tiny::capture(sub { system 'patch', '--version' });
+    
+    if($out =~ /GNU patch ([0-9\.]+)/)
+    {
+      $build->runtime_prop->{version}   = $1;
+      $build->runtime_prop->{my_vendor} = 'gnu';
+    }
+    elsif($out =~ /patch ([0-9\.]+).*((?:Free|Open|Net)BSD)/)
+    {
+      $build->runtime_prop->{version}   = $1;
+      $build->runtime_prop->{my_vendor} = lc $2;
+    }
+    else
+    {
+      # detection logic for additional vendors
+      # welcome.
+      $build->runtime_prop->{version}   = 'unknown';
+      $build->runtime_prop->{my_vendor} = 'unknown';      
+    }
+  };
+};
+

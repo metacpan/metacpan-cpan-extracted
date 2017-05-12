@@ -1,0 +1,36 @@
+Revision history for Perl extension Algorithm::SpatialIndex
+
+0.06   Wed Jun  1 00:33:00 CEST 2011
+  - Extended the API for buckets.
+  - Made bucket implementation pluggable for optional, more efficient
+    implementations.
+  - Delegate filtering for rectangles to the bucket implementation
+    if possible.
+
+0.05   Sat Feb 26 14:15:00 CEST 2011
+  - Introduced a default maximum depth of the trees of 20 levels.
+    This takes precedence over limited bucket size and thus fixes
+    an issue with too many items being very close to one another
+    continuously overflowing buckets. [Marten Cieluch]
+
+0.04   Sun Jan 23 14:00:00 CEST 2011
+  - Refactoring of the Strategy interface and public interface to
+    allow for 3D indexes.
+  - Introduction of the Algorithm::SpatialIndex::Strategy::2D
+    and Algorithm::SpatialIndex::Strategy::3D base classes for
+    2D/3D indexes.
+  - Introduction of the first implementation of an oct tree
+    as Algorithm::SpatialIndex::Strategy::OctTree.
+
+0.03   Sat Jan 22 20:00:00 CEST 2011
+  - Quad tree with six coordinates instead of four.
+  - Updated example benchmark.
+  - Fix for the storage and strategy plugin detection.
+  - Refactoring for Algorithm::SpatialIndex::Strategy::MedianQuadTree
+    compatibility.
+
+0.02   Wed Jan 10 20:00:00 CEST 2011
+  - First release with experimental DBI backend.
+
+0.01   Sat Jan  8 20:00:00 CEST 2011
+  - First release.

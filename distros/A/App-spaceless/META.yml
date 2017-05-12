@@ -1,0 +1,29 @@
+---
+abstract: 'Convert PATH type environment variables to spaceless versions'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Module::Build: '0.28'
+  Path::Class: '0.26'
+  Test::More: '0.94'
+  perl: '5.010001'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.010001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-spaceless
+requires:
+  Shell::Config::Generate: '0.17'
+  Shell::Guess: '0.04'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/plicease/App-spaceless/issues
+  homepage: http://perl.wdlabs.com/App-spaceless
+  repository: git://github.com/plicease/App-spaceless.git
+version: '0.07'

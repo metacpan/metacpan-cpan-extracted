@@ -1,0 +1,15 @@
+Changes
+Config/MainConfig.yaml
+Config/PluginConfig/DistByCookie.yaml
+Config/PluginConfig/DistByTime.yaml
+Config/PluginConfig/DistByURL.yaml
+lib/Apache2/BalanceLogic.pm
+lib/Apache2/BalanceLogic/Plugin.pm
+lib/Apache2/BalanceLogic/Plugin/DistByCookie.pm
+lib/Apache2/BalanceLogic/Plugin/DistByTime.pm
+lib/Apache2/BalanceLogic/Plugin/DistByURL.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/Apache2-BalanceLogic.t
+META.yml                                 Module meta-data (added by MakeMaker)

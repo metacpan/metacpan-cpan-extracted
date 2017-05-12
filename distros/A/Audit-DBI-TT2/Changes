@@ -1,0 +1,44 @@
+Revision history for Audit-DBI-TT2
+
+v2.3.0  2017-03-20
+        - Relicensed under Perl 5 terms.
+        - Cleaned up dependencies.
+
+v2.2.5  2014-04-20
+        - Fixed "package version matches dist version" for CPANTS.
+        - Fixed license declared in meta files.
+        - General cleanup.
+
+v2.2.4  2013-06-15
+        - Fixed test conditional.
+
+v2.2.3  2013-06-14
+        - Fall back to a simpler test on some architectures with a non-working
+          tzset().
+        - Added Coveralls.io support and badge.
+
+v2.2.2  2013-06-02
+        - Fixed conditional.
+
+v2.2.1  2013-06-01
+        - Improved test to detect if tzset() is available.
+
+v2.2.0  2013-05-28
+        - Replaced Data::Dumper with Data::Dump.
+        - Skipped time formatting test for platforms without POSIX::tzset().
+
+v2.1.1  2013-05-21
+        - Use fixed indentation in tests, to be able to compare the output.
+
+v2.1.0  2013-05-17
+        - Removed Class::Date dependency, replaced by POSIX functions.
+
+v2.0.0  2013-05-14
+        - Split Audit::DBI::TT2 off the Audit-DBI distribution, as it adds
+          several large dependencies but it is not necessary for the use of
+          the audit system itself.
+        - Added tests for all the subroutines.
+
+Important: this distribution was previously bundled as part of Audit::DBI, and
+was split in v1.8.0. To prevent issues with reindexing in CPAN, Audit::DBI::TT2
+starts at v2.0.0.

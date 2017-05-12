@@ -1,0 +1,599 @@
+<chapter><?dbhtml filename="features.html"?>
+<chapterinfo>
+<releaseinfo role="meta">
+$Id: features.xml,v 1.21 2003/11/25 10:20:24 borisz Exp $
+</releaseinfo>
+</chapterinfo>
+<title>Overview of Features</title>
+ <sect1><?dbhtml filename="mvcc.html"?>
+  <title>Model/View/Content/Controller approach to design</title>
+  <para>
+   PageKit follows a Model/View/Content/Controller design pattern, which
+   is an adaption of the Model/View/Controller pattern used in many other
+   web frameworks, including Java's Webmacro and Struts.
+  </para>
+  <itemizedlist>
+   <listitem>
+    <para>
+     The Model is the user provided classes, which encapsulate the
+     business logic behind the web site
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     View is set of PageKit Templates, or XSLT files that generate
+     PageKit Templates
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Content is set of XML Files
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Controller is PageKit
+    </para>
+   </listitem>
+  </itemizedlist>
+  <para>
+This approach parallels the division of the job responsibilities of a large web development team.
+The programmers can focus on the Model, the designers on the View, and the content
+administrators on the (you guessed it!) Content. PageKit provides the Controller which glues
+everything together. 
+  </para>
+  <para>
+This way everybody can focus on what they do best, whether it is programming, design, or
+content. Since the interfaces are simple and well-defined they can easily work together without
+interfering with each other. 
+  </para>
+  <sect2>
+   <title>Model</title>
+   <para>
+    The Model is provided by Perl classes which implement the business logic that is custom to the
+    site.  These class files should be located in the <filename>Model/</filename> directory.  Each URL is translated into a class and method automatically. 
+   </para>
+   <para>
+It includes support for <ulink url="http://search.cpan.org/doc/MARKSTOS/Data-FormValidator-1.6/lib/Data/FormValidator.pm">Data::FormValidator</ulink>, making the tedious task of input validation easier.
+To validate a form, you simply specify required fields and constraints. If there is an error, you
+can return to the input form, and the invalid fields automatically get highlighted in red.
+   </para>
+  </sect2>
+  <sect2>
+   <title>View</title>
+   <para>
+    The View is defined by a set of PageKit Templates making up pages and their
+    components located in the <filename>View/</filename> directory. These
+    templates can be in HTML, WML, XML, or any text based format.
+   </para>
+   <para>
+    Alternatively, you can provide a set of XSLT files that will generate PageKit Templates.
+   </para>
+   <para>
+    PageKit Template is based on <ulink url="http://kobesearch.cpan.org/search?dist=HTML-Template">HTML::Template</ulink>.
+There are different sets of tags, depending on
+where the data is being pulled from.
+   </para>
+   <para>
+The <link linkend="model.tags">Model Tags</link>,
+&lt;MODEL_VAR&gt;, &lt;MODEL_LOOP&gt;, and &lt;MODEL_IF&gt;,
+are filled with data by the Model.
+   </para>
+   <para>
+The <link linkend="content.tags">Content Tags</link>,
+&lt;CONTENT_VAR&gt; and &lt;CONTENT_LOOP&gt;, contain
+XPath queries to the Content XML data.
+   </para>
+   <para>
+The <link linkend="pagekit.tags">PageKit Tags</link> are set internally by the Controller.
+   </para>
+   <para>
+It is easy to implement <link linkend="features.multiple.views">multiple views</link>, such as a printable version of a web page or a
+co-branded site. To create a new view, simply create a directory containing template files for
+the view. You only have to create templates for pages and components that you wish to
+override. That is all views inherit from the default set of templates.
+   </para>
+  </sect2>
+  <sect2>
+   <title>Content</title>
+   <para>
+Content is stored in an XML files.  It is accessed either through XPath queries from
+PageKit Template using <ulink url="http://kobesearch.cpan.org/search?dist=HTML-Template-XPath">HTML::Template::XPath</ulink> or by applying XSLT stylesheets to transform the XML into a
+PageKit Template.
+   </para>
+   <para>
+     Language localization couldn't be easier. Simply use the
+     <literal>xml:lang</literal> attribute in the tags you wish
+     to localize. For example, to have a title available in both English and Spanish use:
+   </para>
+   <informalexample>
+    <programlisting><![CDATA[
+  <title xml:lang="en">Title in English</title>
+  <title xml:lang="es">Titulo en Español</title>]]>
+    </programlisting>
+   </informalexample>
+  </sect2>
+  <sect2>
+   <title>Controller</title>
+   <para>
+     The Controller is the glue that holds everything together. To deliver a page it calls the
+     appropriate code in the Model, generates the PageKit Template from the Content if
+     necessary, then fills in the tags in the PageKit Template.
+   </para>
+   <para>
+It makes the tedious task of authentication/authorization easy, with support for cookie based
+logins and session inactivity timeouts. After a login or registration, the user is redirected to the
+protected page they originally requested, if applicable.
+   </para>
+  </sect2>
+ </sect1>
+ <sect1><?dbhtml filename="model.html"?>
+ <title>Model of OO Perl Classes</title>
+  <para>
+   Model is simply a set of OO Perl Classes whose methods get
+   exposed to the client through URIs.
+  </para>
+   <sect2 id="model.base">
+    <title>Base Model Class</title>
+    <para>
+You should implement one base Model class which derives from
+<literal>Apache::PageKit::Model</literal>.  You must specify the
+class in the <link linkend="config.global.model_base_class">model_base_class</link> option.
+    </para>
+    <para>
+     In this class, you should implement the <link linkend="model.api.extensions">PageKit Extensions</link>, and any methods that are common
+across your Derived Model Classes.
+    </para>
+   </sect2>
+   <sect2 id="model.dispatch">
+    <title>Derived Model Class</title>
+    <para>
+     The Derived Model Classes derive from your Base Model Class, and
+     should contain methods for the dynamic pages on your site.
+     You must specify the prefix of these classes in the <link linkend="config.global.model_dispatch_prefix">model_dispatch_prefix</link> option of <filename>Config/Config.xml</filename>.
+    </para>
+   </sect2>
+   <sect2>
+    <title>Inheritance Hierarchy</title>
+    <para>This figure illustrations how model classes derive from each other
+     and the level of specialization of each class.</para>
+    <informalexample>
+     <programlisting>
+              +---------------------------------------+
+              |         Apache::PageKit::Model        |                Common
+              | Model code that provides an interface |       &lt;------- across
+              | to PageKit and is common to all sites |                all sites
+              +---------------------------------------+
+                                   |
+              +---------------------------------------+
+              |           MyPageKit::Common           |                Specialized
+              | Model code that is particular to the  |       &lt;------- For Site, common
+              | site, but common across all pages     |                across site
+              +---------------------------------------+
+                      /           |           \
+  +----------------------------+     +----------------------------+
+  | MyPageKit::YourClass1      |     | MyPageKit::YourClassN      |    Specialized
+  | Model code that is for a   | ... | Model code that is for a   | &lt;- for set of
+  | group of pages on the site |     | group of pages on the site |    Pages on site
+  +----------------------------+     +----------------------------+
+     </programlisting>
+    </informalexample>
+   </sect2>
+ </sect1>
+ <sect1><?dbhtml filename="xslt_xpathtemplate.html"?>
+  <title>XSLT and HTML::Template::XPath</title>
+  <para>
+   PageKit Templates use HTML::Template::XPath to include Content from the XML
+   files.  In addition,
+   PageKit Templates themselves can be generated from the XML using XSLT
+   stylesheets.  Currently the only supported XSLT processer is
+   <ulink url="http://kobesearch.cpan.org/search?dist=XML-LibXSLT">XML::LibXSLT</ulink> which uses Gnome libxslt library.
+  </para>
+  <para>
+   You should use HTML::Template::XPath when you would like to separate
+   some Content from the View, but do not want to go the full route
+   of using XSLT.
+  </para>
+  <para>
+   On the other hand, if you are starting from scratch, have existing XML
+   and XSLT files, or have complicated transformation needs, then XSLT
+   is probably the way to go.
+  </para>
+  <sect2>
+   <title>XSLT</title>
+   <para>
+    To use XSLT, you must place the Content XML files in the <filename>Content/</filename> directory,
+    and the View XSLT files in the <filename>View/</filename> directory.
+    You must specify the XSLT template that you would like to use using the
+    <literal>xml-stylesheet</literal> processing instruction by placing
+    the following on the top of your XML file:
+   </para>
+   <informalexample>
+    <programlisting><![CDATA[
+     <?xml-stylesheet type="text/xsl" href="my_xslt_file.xsl"?>]]>
+    </programlisting>
+   </informalexample>
+   <para>
+    Note that the XSLT file specified in the href attribute is relative to
+    the <filename>View/<replaceable>pkit_view</replaceable>/</filename> or the <filename>View/Default/</filename> directory.
+   </para>
+   <para>
+    All of the input request parameters are available to the XSLT file by
+    using the <literal>xsl:param</literal> tag in the top level of the file.
+   </para>
+   <para>
+    The output of XSL Transformation should be a PageKit Template or a
+    HTML/XML/WML file (which is a special case of a PageKit Template file, namely one without any PageKit tags).  Note that the Data from the Model gets
+    filled in after the XSL transformation.  This is done for performance
+    reasons - the XSL tranformation can be cached, even if the data from
+    the model is updated.
+   </para>
+  </sect2>
+  <sect2>
+   <title>HTML::Template::XPath</title>
+   <para>
+    Using HTML::Template::XPath is easy with PageKit, it is build into the
+    PageKit Template by using
+    &lt;CONTENT_VAR&gt; and &lt;CONTENT_LOOP&gt; tags, which contain
+    XPath queries to the Content XML data.
+   </para>
+   <para>
+    The Content XML file defaults to <filename>Content/<replaceable>page_id</replaceable>.xml</filename> or can be specified using XPath's <emphasis role="bold">document()</emphasis> function.
+   </para>
+  </sect2>
+ </sect1>
+ <sect1>
+  <title>Language Localization</title>
+   <para>
+   One of the main advantages of separating out the Content
+   from the View is that it
+   is easy to implement multiple languages while sharing the same
+   look-and-feel.  You may use the <literal>xml:lang</literal>
+   to label which languages tags are in.
+   </para>
+   <para>
+   The preferred language of the user is determined as follows.
+   </para>
+  <itemizedlist>
+   <listitem>
+    <para>
+     The default language preference is set to the
+     <literal>Accept-Language</literal> incoming HTTP header.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     This default value can be overridden by setting the
+     <literal><link linkend="request.pkit_lang">pkit_lang</link></literal>
+     request parameter.
+    </para>
+   </listitem>
+  </itemizedlist>
+  <sect2>
+   <title>Applying to Content: HTML::Template::XPath</title>
+   <para>
+    HTML::Template::XPath supports language localization through the use of the
+    <literal>xml:lang</literal> attribute.  In PageKit 1.01 and above, the
+    algorithm for
+    selecting the node(s) for the selected languages is as follows:
+   </para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      First it attempts to use the XPath function <literal>lang</literal>
+      to return the node or the set of nodes whose <literal>xml:lang</literal>
+      attribute(s) are the same as the preferred language.  If the node
+      has no <literal>xml:lang</literal>, then the value of the
+      <literal>xml:lang</literal> attribute on the nearest ancestor is used.
+      If the node and the its ancestors have no <literal>xml:lang</literal>
+      attribute, then the <literal><link linkend="config.global.default_lang">default_lang</link></literal>
+      language is used.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      If no nodes are found in the preferred language, then
+      it returns the node(s) which are in the
+      <literal><link linkend="config.global.default_lang">default_lang</link></literal>
+      language.
+     </para>
+    </listitem>
+   </itemizedlist>
+  <para>
+   The algorithm in PageKit 1.00 is slightly different from the above,
+   but follows the same basic idea.
+  </para>
+  </sect2>
+  <sect2>
+   <title>Applying to Content: XSLT</title>
+   <para>
+    As of release 1.00 there is no support for Language Localization using
+    XSLT.  However I plan to offer support in one of the two following ways:
+   </para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      Different source XML files, <filename>foo.en</filename>,
+      <filename>foo.de</filename>, <filename>foo.es</filename>, and so on.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      PageKit will set the <literal>&lt;xsl:param name="pkit_lang"&gt;</literal>
+      tag in the XSLT stylesheet.
+     </para>
+    </listitem>
+   </itemizedlist>
+   <para>
+    Comments, suggestions, and patches welcome!
+   </para>
+  </sect2>
+  <sect2>
+   <title>Applying to Model</title>
+   <para>
+    To use the language settings from the Model, simply use the
+    <literal><link linkend="model.api.pkit_lang">pkit_lang</link></literal> method.
+   </para>
+   <para>
+    This can be useful for selecting content from the database based on language.
+   </para>
+  </sect2>
+  <sect2>
+  <title>Character set translation</title>
+   <para>
+    By default, PageKit attempts to output using <link linkend="config.global.default_output_charset">default_output_charset</link>.
+    PageKit will attempt to translate the PageKit Templates and output passed
+    to <link linkend="model.api.output_convert">output_convert</link> from
+    <link linkend="config.global.default_input_charset">default_input_charset</link> to
+    <link linkend="config.global.default_output_charset">default_output_charset</link>.
+   </para>
+   <para>
+    Note: This also applies also to the message catalog if any. So write your message catalog files in
+    <link linkend="config.global.default_input_charset">default_input_charset</link>.
+   </para>
+   <para>
+    PageKit attempts to translate the output to a character set that is specified in the <literal>Accept-Charset</literal> header. If this is not possible,
+    PageKit delivers the page in the <link linkend="config.global.default_output_charset">default_output_charset</link>.
+   </para>
+  </sect2>
+ </sect1>
+ <sect1>
+  <title>Caching</title>
+  <para>
+   Currently PageKit supports on-disk caching of compiled PageKit Templates.
+   Future versions should also include in-memory caching and caching
+   of Model output.
+  </para>
+  <para>
+   XSL transformations are also cached, taking into account any input
+   request parameters that are used in <literal>xsl:param</literal> tags
+   contained in the top-level the XSLT file.
+  </para>
+ </sect1>
+ <sect1><?dbhtml filename="component.html"?>
+  <title>Component based architecture</title>
+  <para>
+   Components are similar to Server Side Includes (SSIs), in that the
+   include PageKit Templates inside other PageKit Templates.  However, the
+   can also have code associated with them that fills in the 
+   <link linkend="model.tags">Model Tags</link>, including
+   &lt;MODEL_VAR&gt;, &lt;MODEL_LOOP&gt;, and &lt;MODEL_IF&gt;.
+  </para>
+  <para>
+   The <link linkend="pkit.component">PKIT_COMPONENT</link> tag specifies
+   where the component should be included.  The Component can either
+   be a PageKit Template file, or a PageKit Template generated from the
+   <filename>Content/<replaceable>component_id</replaceable>.xml</filename>
+   XML file.
+  </para>
+  <para>
+   The following example illustration how absolute and relative paths
+   work:
+  </para>
+  <informalexample>
+   <programlisting>
+    # absolute path - includes View/<replaceable>pkit_view</replaceable>/foo/bar.tmpl
+    # or output generated from Content/foo/bar.xml
+    &lt;PKIT_COMPONENT NAME="/foo/bar"&gt;
+    # relative path, includes the bar.tmpl or bar.xml in the directory
+    # of the enclosing PageKit Template/XML File.
+    &lt;PKIT_COMPONENT NAME="bar"&gt;
+   </programlisting>
+  </informalexample>
+ </sect1>
+ <sect1><?dbhtml filename="session.html"?>
+  <title>Sessions</title>
+  <para>
+   PageKit uses a subclass of <ulink url="http://kobesearch.cpan.org/search?dist=Apache-SessionX">Apache::SessionX</ulink> to provide sessions.
+   It sets a cookie named <literal>pkit_session_id</literal> with an
+   expiration of <literal><link linkend="config.global.session_expires">session_expires</link></literal>, if applicable.
+  </para>
+  <para>
+   To access the session, use
+  <informalexample>
+   <programlisting>
+    # gets hash tied to Session
+    my $session = $model->session;
+    # gets session value
+    my $count = $session->{'count'};
+    $count++;
+    # sets session value
+    $session->{'count'} = $count;
+   </programlisting>
+  </informalexample>
+   PageKit takes care of opening and closing sessions.  Note that sessions
+   are only created when something is written to session hash.
+  </para>
+  <warning>
+   <title>Warning!</title>
+   <para>Because of the way Apache::SessionX works, the session only gets saved
+    if top level element in the tied hash gets changed.
+   </para>
+   <informalexample>
+    <programlisting>
+    # session will not be saved, if 'foo' was already in $session.
+    my $session = $model->session;
+    $session->{'foo'}->{'bar'} = 1;
+
+    # session will be saved
+    my $session = $model->session;
+    $session->{'foo'}->{'bar'} = 1;
+    # since 'baz' is top level element and is assigned, session will be saved
+    $session->{'baz'} = 1;
+    </programlisting>
+   </informalexample>
+  </warning>
+  <para>
+   To store information during a request, use the
+   <literal><link linkend="model.api.pnotes">pnotes</link></literal> method.
+  </para>
+  <para>
+   As of PageKit 1.05, there is support for associating sessions with
+   authentication.  The associated session ID may be specified by the second
+   argument returned my <link linkend="model.api.pkit_auth_session_key">pkit_auth_session_key</link>.  When a user logs in, their current session may be merged with the session
+   stored with their user ID.  To override the default behavior, use the
+    <link linkend="model.api.pkit_merge_sessions">pkit_merge_sessions</link> hook.
+  </para>
+  <para>
+   As of PageKit 1.08, there is support for page based sessions.
+  </para>
+ </sect1>
+ <sect1><?dbhtml filename="authentication.html"?>
+  <title>Authentication</title>
+  <para>
+   When a user logins in, the <literal><link linkend="request.pkit_login">pkit_login</link></literal> request parameter must be set to a true value.  In addition, if you want
+the user to be redirected to another page, set the <literal><link linkend="request.pkit_done">pkit_done</link></literal> parameter.  To do this, place
+the following hidden fields in your login form page:
+  <informalexample>
+   <programlisting>
+    &lt;!-- Login Page --&gt;
+    #  will get set by pagekit to the page the user is requesting
+    &lt;input type="hidden" name="pkit_done"&gt;
+    &lt;input type="hidden" name="pkit_login" value="1"&gt;
+   </programlisting>
+  </informalexample>
+  </para>
+  <para>
+   If <literal><link linkend="request.pkit_login">pkit_login</link></literal> is set to a true value, then PageKit calls <literal><link linkend="model.api.pkit_auth_credential">pkit_auth_credential</link></literal> method.  If this method returns a session key, then PageKit redirects to the page specified
+by <literal><link linkend="request.pkit_done">pkit_done</link></literal>,
+setting the cookie <literal>pkit_id</literal> to the session_key.
+  </para>
+  <para>
+   While the user is logged in, PageKit checks the session_key by using
+   the <literal><link linkend="model.api.pkit_auth_session_key">pkit_auth_session_key</link></literal> method.  If the <literal><link linkend="request.pkit_logout">pkit_logout</link></literal> request parameter is set, then the user is
+logged out.
+  </para>
+  <para>
+PageKit access to pages based on the <literal><link linkend="config.page.require_login">require_login</link></literal> attribute.
+If <literal><link linkend="config.page.require_login">require_login</link></literal>
+is set to <emphasis>recent</emphasis>, then PageKit requires that session is currently active in the last
+<literal><link linkend="config.global.recent_login_timeout">recent_login_timeout</link></literal>
+seconds.
+  </para>
+  <para>
+  Note, that the pages <literal><link linkend="config.global.default_page">default_page</link></literal>,
+  <literal><link linkend="config.global.verify_page">verify_page</link></literal> and
+  <literal><link linkend="config.global.login_page">login_page</link></literal> can not be protected in any way.
+  </para>
+ </sect1>
+ <sect1><?dbhtml filename="validation.html"?>
+  <title>Form Validation</title>
+   <para>
+  PageKit uses <ulink url="http://search.cpan.org/doc/MARKSTOS/Data-FormValidator-1.5/lib/Data/FormValidator.pm">Data::FormValidator</ulink> to provide easy form validation.  Highlights
+fields in red that user filled incorrectly by using the
+<link linkend="pkit.errorfont">PKIT_ERRORFONT</link> tag.  In addition,
+error message(s) are displayed using the <link linkend="pkit.messages">PKIT_MESSAGES</link> tag.
+To use, pass an input profile to the
+<literal><link linkend="model.api.pkit_validate_input">pkit_validate_input</link></literal> method.
+  </para>
+  <para>
+   In addition, you may implement your own custom error handling by using <literal><link linkend="model.api.pkit_set_errorfont">pkit_set_errorfont</link></literal> to set the <link linkend="pkit.errorfont">PKIT_ERRORFONT</link> tags.
+  </para>
+ </sect1>
+ <sect1><?dbhtml filename="fillinform.html"?>
+  <title>Sticky HTML Forms</title>
+  <para>
+   PageKit uses <ulink url="http://kobesearch.cpan.org/search?dist=HTML-FillInForm">HTML::FillInForm</ulink> to fill in HTML Forms with the request parameters.  You
+   can turn this feature off by setting <literal><link linkend="config.page.fill_in_form">fill_in_form</link></literal> to <emphasis>no</emphasis>.
+  </para>
+  <para>
+   One useful application is if you have set up error handling and if an user
+   submits an HTML form without filling out
+   a required field, PageKit will re-display the HTML form with all the form 
+   elements containing the submitted info.
+  </para>
+  <para>
+   In additon to filling in request parameters, you may fill in the HTML
+   fields from the model by using the <literal><link linkend="model.api.fillinform">fillinform</link></literal> method.
+  </para>
+ </sect1>
+ <sect1 id="features.multiple.views"><?dbhtml filename="multipleview.html"?>
+  <title>Multiple Views</title>
+  <para>
+   Any page can have multiple views, by using the <literal><link linkend="request.pkit_view">pkit_view</link></literal> request parameter.
+One example is Printable pages.  Another
+is having the same web site branded differently for different companies.
+Another is having different Media outputs such as HTML, XML and WML, by
+using the <link linked="config.global.content_type">content_type</link>
+configuration options.
+  </para>
+  <para>
+   To create a new view, create a <filename>View/<replaceable>pkit_view</replaceable></filename> directory and place the PageKit Templates and XSLT files for
+the pages and components that you wish to apply the view to.  Note that if
+PageKit doesn't find a template or XSLT file in the <filename>View/<replaceable>pkit_view</replaceable></filename> directory it looks in the
+<filename>View/Default</filename> directory.  That is, the files <filename>View/<replaceable>pkit_view</replaceable></filename> "override" the files
+in <filename>View/Default</filename> directory.
+  </para>
+  <para>
+   To association a media output such as XML, WML, or PDF with a view, use
+   the View <link linkend="config.view.content_type">content_type</link> attribute.
+   Note that in order for PDF output to work, you must install the Apache XML
+   FOP processor, available from
+   <ulink url="http://xml.apache.org/fop/">http://xml.apache.org/fop/</ulink>, and
+   configure <link linkend="config.global.fop_command">fop_command</link> to point
+   to the FOP processor.
+  </para>
+  <para>
+   You may set the <literal><link linkend="request.pkit_view">pkit_view</link></literal> request parameter in the request URI or by using
+   <literal>$model->input(pkit_view => <replaceable>pkit_view</replaceable>);</literal> in your model code.
+  </para>
+ </sect1>
+ <sect1 id="features.editing"><?dbhtml filename="editing.html"?>
+  <title>On-line Editing tools</title>
+  <para>
+   PageKit supports a set of simple on-line editing tools.  To enable,
+   set <literal><link linkend="config.server.can_edit">can_edit</link></literal> in your
+   server config.  You will also need to call in your Model code:
+  </para>
+      <informalexample>
+       <programlisting>
+  $model->output(pkit_admin => 1);
+       </programlisting>
+      </informalexample>
+ </sect1>
+ <sect1><?dbhtml filename="errorreport.html"?>
+  <title>Error Reporting</title>
+  <para>
+   PageKit uses Apache::ErrorReport to report errors.
+   It reports warnings and fatal errors to screen or e-mail. Includes detailed information including error message, call
+stack, uri, host, remote host, remote user, referrer, and Apache handler.
+  </para>
+  <para>
+   To use, place the following in the your <filename>httpd.conf</filename> file:
+  <informalexample>
+   <programlisting>
+  PerlModule Apache::ErrorReport
+  PerlSetVar ErrorReportHandler display
+   </programlisting>
+  </informalexample>
+  </para>
+  <para>
+If <literal>ErrorReportHandler</literal> is set to <emphasis role="bold">display</emphasis>, errors will be displayed on the screen for easy debugging. This should be
+used in a development environment only.
+  </para>
+  <para>
+If <literal>ErrorReportHandler</literal> is set to <emphasis role="bold">email</emphasis>, errors will be e-mailed to the site adminstrator as specified in the Apache
+<literal>ServerAdmin</literal> configuration directive. This should be used on a production site.
+  </para>
+ </sect1>
+</chapter>

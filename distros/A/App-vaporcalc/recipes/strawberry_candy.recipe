@@ -1,0 +1,23 @@
+{
+   "recipe" : {
+      "target_vg" : 60,
+      "base_nic_per_ml" : 100,
+      "target_pg" : 40,
+      "base_nic_type" : "PG",
+      "target_quantity" : 120,
+      "notes" : [],
+      "flavor_array" : [
+         {
+            "tag" : "INW Strawberry",
+            "percentage" : "1",
+            "type" : "PG"
+         },
+         {
+            "tag" : "TFA Strawberry Ripe",
+            "type" : "PG",
+            "percentage" : "5"
+         }
+      ],
+      "target_nic_per_ml" : 3
+   }
+}

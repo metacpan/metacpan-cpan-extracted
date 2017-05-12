@@ -1,0 +1,61 @@
+#!/home/ivan/bin/perl
+
+use strict;
+use warnings;
+require 5.008;
+
+use AnnoCPAN::Config 'config.pl';
+use AnnoCPAN::DBI;
+use Getopt::Long;
+use LWP::Simple qw(get);
+
+my $help;
+my $verbose;
+
+my $ret = GetOptions (
+    help        => \$help,
+    verbose     => \$verbose,
+);
+
+my $file = shift;
+usage() if $help or !$ret or !$file;
+    
+my $data;
+my $fh;
+if ($file =~ m|://|) {
+    $data = get($file) or die "couldn't get $file\n";
+    open $fh, "<", \$data or die "couldn't open data\n"; 
+} else {
+    open $fh, "<", $file or die "couldn't open $file: $!\n";
+}
+
+<$fh>; # skip header line
+my ($good, $bad);
+while (<$fh>) {
+    s/"//g;
+    my ($dist_name, $rating, $count) = split /,/;
+    my ($dist) = AnnoCPAN::DBI::Dist->retrieve(name => $dist_name);
+    unless ($dist) { 
+        warn "Couldn't retrieve dist '$dist_name'\n" if $verbose;
+        $bad++;
+        next;
+    }
+    $dist->rating($rating * 20);
+    $dist->review_count($count);
+    $dist->update;
+    $good++;
+}
+
+print "Rated $good distributions; $bad not found\n";
+
+
+sub usage {
+    print <<END;
+ac_cpanratings [options] <ratings_file>
+Options:
+    --help      -h
+    --verbose   -v
+<ratings_file> may be a local file or a URL.
+END
+    exit;
+}

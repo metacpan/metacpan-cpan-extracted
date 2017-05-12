@@ -1,0 +1,35 @@
+Alvis-Tana version 0.1
+=======================
+
+This is a module containing interfaces to the Tana protocol.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	IO::Socket
+	Data::Dumper (only if you uncomment debugging)
+	Sys::Hostname
+	IO::Select
+        Fcntl
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 by Antti Tuominen, Kimmo Valtonen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

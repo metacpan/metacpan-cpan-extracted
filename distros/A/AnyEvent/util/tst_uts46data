@@ -1,0 +1,52 @@
+#!/opt/bin/perl
+
+# tests installed AnyEvent against IdnaTest.pl
+
+use common::sense;
+use utf8;
+no warnings 'utf8';
+
+use Encode;
+use AnyEvent::Util;
+
+open my $fh, "GET http://www.unicode.org/Public/idna/9.0.0/IdnaTest.txt |"
+   or die;
+
+while (<$fh>) {
+   next unless /^[NB]/; # no "T", we implement non-transitional only
+
+   chomp;
+
+   utf8::decode $_
+      or die "utf8 decode error: $_\n";
+
+   s/\s*#.*//;
+
+   s/\\u(d[8-b][0-9a-f]{2})\\u(d[c-f][0-9a-f]{2})/Encode::decode "utf-16be", pack "nn", hex $1, hex $2/ige;
+   s/\\u([0-9a-fA-F]{4})/chr hex $1/ge;
+
+   my ($type, $source, $tou, $toa, $nv8) = split /[ \t]*;[ \t]*/;
+
+   $toa = lc $toa;
+
+   $tou = $source unless length $tou;
+   $toa = $tou    unless length $toa;
+
+   my $xtou =    AnyEvent::Util::idn_to_unicode $source;
+   my $xtoa = lc AnyEvent::Util::idn_to_ascii   $source;
+
+   $xtoa = "[error]" unless defined $xtoa;
+   $xtou = "[error]" unless defined $xtou;
+
+   if ($tou ne $xtou) {
+      warn "$. TOU ERROR $type ($source expect $tou got $xtou) ($@)\n"
+         unless $tou =~ /^\[/;
+   }
+
+   if ($toa ne $xtoa) {
+#      use Data::Dump; ddx [$source, $toa, $xtoa] unless $toa =~ /^\[/;
+      warn "$. TOA ERROR $type ($source expect <$toa|$tou> got $xtoa) ($@)\n"
+         unless $toa =~ /^\[/;
+   }
+}
+

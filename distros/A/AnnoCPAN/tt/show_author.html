@@ -1,0 +1,33 @@
+[% PROCESS header.html title=author rss='author' %]
+
+[% PROCESS login_form.html %]
+[% PROCESS form.html %]
+
+<h2>Distributions by [% author %]
+<a href="[% root_uri_rel %]/~[% author %]/recent.rss"><img src="[% img_root %]/rss1.gif" alt="RSS 1.0" title="AnnoCPAN Notes for [% author %] (RSS feed)" width="80" height="15"></a></h2>
+
+<p class="sisters">
+[ 
+[% link_author_search_cpan_org(author) %]
+| [% link_author_kobes(author) %]
+| [% link_author_cpantesters(author) %]
+]
+</p>
+
+
+
+<p><a href="[% root_uri_rel %]/~[% author %]/recent.html">[% NO('note', note_count) %] for [% author %]</a> </p>
+
+<table>
+[% FOR dist = dists.sort('name') %]
+    <tr class="[% loop.count % 2 ? 'even' : 'odd' %]">
+        <td>[% link_dist(dist) %]</td>
+        <td>[% SET count = dist.count_notes; IF count > 0 %]
+            (<em>[% NO('note', count) %]; 
+            latest [% YMD.format(dist.latest_note_date) %]</em>)
+        [% END %]</td>
+    </tr>
+[% END %]
+</table>
+
+[% PROCESS footer.html %]

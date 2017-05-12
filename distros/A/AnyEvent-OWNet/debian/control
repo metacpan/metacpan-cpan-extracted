@@ -1,0 +1,17 @@
+Source: libanyevent-ownet-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5), libanyevent-mocktcpserver-perl
+Build-Depends-Indep: perl (>= 5.6.10-12)
+Maintainer: Mark Hindess <soft-debian@temporalanomaly.com>
+Standards-Version: 3.9.1.0
+Homepage: http://search.cpan.org/dist/AnyEvent-OWNet/
+
+Package: libanyevent-ownet-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, libanyevent-perl (>= 5.271-1),
+  libtry-tiny-perl, libsub-name-perl
+Description: AnyEvent::OWNet Perl Module
+ This module provides an AnyEvent API for communicating with a 1-wire file
+ system server - owserver from http://www.owfs.org/ - using the OWNet
+ protocol.

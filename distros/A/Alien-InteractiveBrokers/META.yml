@@ -1,0 +1,25 @@
+---
+abstract: 'Provides installation and config information for the InteractiveBrokers API'
+author:
+  - 'Jason McManus <infidel AT cpan.org>'
+build_requires:
+  Archive::Extract: 0
+  HTTP::Tiny: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-InteractiveBrokers
+provides:
+  Alien::InteractiveBrokers:
+    file: lib/Alien/InteractiveBrokers.pm
+    version: 9.6602
+requires:
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 9.6602

@@ -1,0 +1,30 @@
+Archive::SelfExtract version 1.1
+================================
+
+Archive::SelfExtract allows you create Perl programs out of compressed
+zip archives.  Given a piece of code and an archive, it creates a
+single file which, when run, unpacks the archive and then runs the
+code.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+  Compress::Zlib
+  Archive::Zip
+  IO::Stringy
+
+COPYRIGHT AND LICENCE
+
+Copyright 2004 Greg Fast (gdf@speakeasy.net)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

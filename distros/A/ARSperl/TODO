@@ -1,0 +1,82 @@
+Container Calls
+-----------------------------------------------
+  o active link decoding
+	decode DDE
+-----------------------------------------------
+  o implement remaining functions:
+
+ars_GetListContainer
+
+ARCreateCharMenu
+ARCreateEscalation
+ARCreateField
+ARCreateFilter
+ARCreateSchema
+ARCreateVUI
+ARGetEntryStatistics
+ARSetActiveLink
+ARSetAdminExtension
+ARSetCharMenu
+ARSetEscalation
+ARSetField
+ARSetFilter
+ARSetFullTextInfo
+ARSetSchema
+ARSetServerInfo
+ARSetVUI
+-----------------------------------------------
+
+   o clean up verbose warning output (mostly 
+     unused variables due to the 2.x/3.0 intermixed
+     code)
+-----------------------------------------------
+   o join schema entry-id handling needs a thorough
+     going-over. specifically, BUGS/00001 needs to be
+     worked in (partial fix) and outter join handling
+     needs to be fixed up. 
+-----------------------------------------------
+   o clean up documentation (replace numbers with symbolic
+     constants).
+-----------------------------------------------
+   o add additional OO support.
+
+   o add sort order option to OO
+   o obey vui name
+   o pad out entry id where applicable.
+   o allow for field id's to be specified if user chooses.
+   o status history conversion?
+   o allow for either/or enumer text or enum value in set/create
+   o if unknown param, error
+-----------------------------------------------
+
+
+
+Howdy everyone:
+  Please forgive me if this question is a bit naive, I'm still new to the
+universe of Remedy and such ... 
+
+I'm looking for a perl library which could take standard ARS/Remedy style
+query and return the query in Sybase Transact SQL format. Something like
+this:
+     @SYBASE_SQL = get_SybaseSQL($ARS_QUERY);
+where:
+   $ARS_QUERY = "'Field' = \"$value\" ...etc"
+and:
+   @SYBASE_QUERY would be something like this:
+   select Ticket_No from Schema_Name
+   WHERE Field = '$value'
+
+-----------------------------------------------
+
+allow substitution of current transaction values
+in qual and recompilation of qual. this facilitates
+the retrieval of dynamic query menu items
+
+
+
+-------------
+
+createactivelink not working with SQL assignements
+
+
+

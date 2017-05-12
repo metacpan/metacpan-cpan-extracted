@@ -1,0 +1,31 @@
+Revision history for ACL::Lite
+
+0.0004 Sat Dec 14 10:49:04 2013 CET
+
+    [BUG FIXES]
+
+    * Prevent Perl warning on undefined permissions parameter.
+
+0.0003 Wed Dec  4 13:13:00 2013 CET
+
+    [API CHANGES]
+
+    * Add default permissions ("authenticated" or "anonymous") depending
+      whether you pass uid or not.
+
+0.0002 Wed May 22 15:57:12 2013 CEST
+
+    [BUG FIXES]
+
+    * Execute POD tests only during release testing.
+
+    [ENHANCEMENTS]
+
+    * Add permissions method to retrieve list or hash reference of
+      permissions.
+
+0.0001 Thu Sep 15 22:29:36 2011 CEST
+       
+    * Initial release.
+
+

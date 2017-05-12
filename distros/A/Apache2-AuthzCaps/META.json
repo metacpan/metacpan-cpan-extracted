@@ -1,0 +1,51 @@
+{
+   "abstract" : "mod_perl2 capability authorization",
+   "author" : [
+      "Marius Gavrilescu <marius@ieval.ro>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Apache2-AuthzCaps",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Apache2::RequestRec" : "0"
+         },
+         "requires" : {
+            "YAML::Any" : "0",
+            "perl" : "5.014000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://git.ieval.ro/?p=apache2-authzcaps.git"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

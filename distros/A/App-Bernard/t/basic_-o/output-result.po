@@ -1,0 +1,28 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Demo of a .po file\n"
+"PO-Revision-Date: 2010-05-21 05:04 -0400\n"
+"Last-Translator: Thomas Thurman <marnanel@cpan.org>\n"
+"Language-Team: Shavian <ubuntu-l10n-en-shaw@launchpad.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n!=1;\n"
+
+msgid "This will not be affected"
+msgstr "because it has a translation"
+
+#, fuzzy
+msgid "This will be affected, because it's empty"
+msgstr "𐑞𐑦𐑕 𐑢𐑦𐑤 𐑚𐑰 𐑩𐑓𐑧𐑒𐑑𐑩𐑛, 𐑚𐑦𐑒𐑪𐑟 𐑦𐑑'𐑕 𐑧𐑥𐑐𐑑𐑦"
+
+#, fuzzy
+msgid "This will be affected"
+msgstr "𐑞𐑦𐑕 𐑢𐑦𐑤 𐑚𐑰 𐑩𐑓𐑧𐑒𐑑𐑩𐑛"
+
+#, fuzzy
+#: src/test.c:177
+msgid ""
+"This will be affected both because it's fuzzy, and also because it's empty"
+msgstr "𐑞𐑦𐑕 𐑢𐑦𐑤 𐑚𐑰 𐑩𐑓𐑧𐑒𐑑𐑩𐑛 𐑚𐑴𐑔 𐑚𐑦𐑒𐑪𐑟 𐑦𐑑'𐑕 𐑓𐑳𐑟𐑦, 𐑯 𐑷𐑤𐑕𐑴 𐑚𐑦𐑒𐑪𐑟 𐑦𐑑'𐑕 𐑧𐑥𐑐𐑑𐑦"
+

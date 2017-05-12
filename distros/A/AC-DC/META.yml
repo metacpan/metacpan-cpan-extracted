@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               AC-DC
+version:            1.1
+abstract:           Asynchronous IO Framework. plus.
+author:
+    - AdCopy <http://www.adcopy.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Digest::SHA1:        0
+    MIME::Base64:        0
+    POSIX:               0
+    Sys::Hostname:       0
+    Sys::Syslog:         0
+    Time::HiRes:         0
+    Time::Local:         0
+    Unicode::Normalize:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

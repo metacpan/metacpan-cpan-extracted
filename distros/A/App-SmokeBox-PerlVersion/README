@@ -1,0 +1,83 @@
+NAME
+    App::SmokeBox::PerlVersion - SmokeBox helper module to determine perl
+    version
+
+VERSION
+    version 0.16
+
+SYNOPSIS
+      use strict;
+      use warnings;
+      use POE;
+      use App::SmokeBox::PerlVersion;
+
+      my $perl = shift || $^X;
+
+      POE::Session->create(
+        package_states => [
+          main => [qw(_start _result)],
+        ],
+      );
+
+      $poe_kernel->run();
+      exit 0;
+
+      sub _start {
+        App::SmokeBox::PerlVersion->version(
+          perl => $perl,
+          event => '_result',
+        );
+        return;
+      }
+
+      sub _result {
+        my $href = $_[ARG0];
+        print "Perl version: ", $href->{version}, "\n";
+        print "Built for:    ", $href->{archname}, "\n";
+        print "OS Version:   ", $href->{osvers}, "\n";
+        return;
+      }
+
+DESCRIPTION
+    App::SmokeBox::PerlVersion is a simple helper module for
+    App::SmokeBox::Mini and minismokebox that determines version,
+    architecture and OS version of a given "perl" executable.
+
+CONSTRUCTOR
+    "version"
+        Takes a number of arguments:
+
+          'perl', the perl executable to query, defaults to $^X;
+          'event', the event to trigger in the calling session on finish;
+          'session', a POE Session, ID, alias or postback to send results to;
+          'context', optional context data you want to provide;
+
+        "event" is a mandatory argument unless "session" is provided and is
+        a POE postback/callback.
+
+RESPONSE
+    An "event" or "postback" will be sent when the module has finished with
+    a hashref of data.
+
+    For "event" the hashref will be in "ARG0".
+
+    For "postback" the hashref will be the first item in the arrayref of
+    "ARG1" in the "postback".
+
+    The hashref will contain the following keys:
+
+      'exitcode', the exit code of the perl executable that was run;
+      'version', the perl version string;
+      'archname', the perl archname string;
+      'osvers', the OS version string;
+      'context', whatever was passed to version();
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

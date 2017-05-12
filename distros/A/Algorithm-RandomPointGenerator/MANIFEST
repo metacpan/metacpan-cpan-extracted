@@ -1,0 +1,16 @@
+examples/bb1.csv
+examples/bb2.csv
+examples/hist1.csv
+examples/hist2.csv
+examples/genRand2D
+examples/generate_random_points.pl
+examples/output_histogram_for_hist1.png
+examples/output_histogram_for_hist2.png
+examples/README
+lib/Algorithm/RandomPointGenerator.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/test.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

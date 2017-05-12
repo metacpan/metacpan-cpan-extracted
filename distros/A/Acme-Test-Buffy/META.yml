@@ -1,0 +1,11 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Acme-Test-Buffy
+version:      0.02
+version_from: lib/Acme/Test/Buffy.pm
+installdirs:  site
+requires:
+    Test::Builder::Tester:         0.09
+    Test::Builder:                 0.12
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

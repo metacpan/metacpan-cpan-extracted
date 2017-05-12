@@ -1,0 +1,21 @@
+Build.PL
+Changes
+eg/login.pl
+inc/ExtUtils/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Build.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Apache/AuthTypeKey.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-compile.t

@@ -1,0 +1,24 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+example/15.pl
+example/distance_with_dfs.pl
+example/distance_with_rdfs.pl
+example/mdcost.pl
+t/Algorithm-Search.t
+t/tr.t
+t/ts.t
+t/15.t
+t/p54.t
+t/ts2.t
+t/p78.t
+t/ws.t
+t/min.t
+t/wsdict
+t/n15.t
+t/tr2.t
+t/p28.t
+lib/Algorithm/Search.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

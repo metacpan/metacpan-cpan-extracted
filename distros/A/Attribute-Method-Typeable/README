@@ -1,0 +1,13 @@
+README file
+
+do:
+perldoc lib/Attribute/Method/Typeable
+
+or install the module and do:
+man Attribute::Method::Typeable
+
+to read the real documentation.
+
+INSTALL has notes for beginners on the installation of this module.
+
+--JJ

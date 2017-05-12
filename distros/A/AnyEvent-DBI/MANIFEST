@@ -1,0 +1,13 @@
+README
+MANIFEST
+COPYING
+Changes
+Makefile.PL
+DBI.pm
+t/00_load.t
+t/01_fake_mysql.t
+t/02_sql_lite.t
+t/fake-mysql
+t/myserver.conf
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

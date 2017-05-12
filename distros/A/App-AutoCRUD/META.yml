@@ -1,0 +1,67 @@
+---
+abstract: 'A Plack application for browsing and editing databases'
+author:
+  - "Laurent Dami, C<< <dami at cpan.org> >>\r"
+  - 'Laurent Dami <dami@cpan.org>'
+build_requires:
+  DBD::SQLite: 1.39
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: artistic2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-AutoCRUD
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Alien::GvaScript: 1.43
+  Archive::Zip: 0
+  CGI::Expand: 0
+  Carp: 0
+  Clone: 0
+  Cwd: 0
+  DBI: 0
+  DBIx::DataModel: 2.42
+  Data::Domain: 0
+  Data::Dumper: 0
+  Data::Reach: 1
+  Encode: 0
+  Excel::Writer::XLSX: 0
+  HTTP::Date: 0
+  JSON::MaybeXS: 0
+  List::MoreUtils: 0
+  Moose: 0
+  MooseX::NonMoose: 0.26
+  MooseX::SemiAffordanceAccessor: 0
+  Path::Tiny: 0
+  Plack: 0
+  SQL::Abstract::FromQuery: 0.1
+  SQL::Abstract::More: 1.27
+  Scalar::Does: 0
+  Scalar::Util: 0
+  Template: 0
+  Time::HiRes: 0
+  Try::Tiny: 0
+  URI: 0
+  URI::Escape: 0
+  XML::Simple: 0
+  YAML::Any: 0
+  namespace::clean: 0
+  parent: 0
+  perl: '5.01'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-AutoCRUD
+  homepage: https://metacpan.org/author/DAMI
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: git://github.com/damil/App-AutoCRUD.git
+version: '0.13'

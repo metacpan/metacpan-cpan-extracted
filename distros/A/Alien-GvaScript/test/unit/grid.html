@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <meta http-equiv="Content-Type" content='text/html; charset=iso-8859-1' />
+    <link rel="stylesheet" href="../test.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="../images/GvaScript.css" type="text/css" media="screen" charset="utf-8" />
+
+    <script src="../../lib/Alien/GvaScript/lib/prototype.js" type="text/javascript"></script>
+    <script src="../unittest.js" type="text/javascript"></script>
+    <script src="../../lib/Alien/GvaScript/lib/GvaScript.js" type="text/javascript"></script>
+    <title>GvaScript Unit Tests</title>
+  </head>
+  <body>
+    <h1>Unit Tests :: GvaScript/grid.js </h1>
+    <p>Tests for methods included in Grid</p>
+    <!-- Test Log output -->
+    <div id="testlog">...</div>
+
+    <div class="wrapper" style="height:220px;">
+        <div id="grid" tabindex="0"></div>
+        <div id="grid_toolbar" style="height:28px"></div>
+    </div>
+
+    <textarea id="gridlog"></textarea>
+    <script type="text/javascript" language="javascript" charset="iso-8859-1">
+    // <![CDATA[
+    new Test.Unit.Runner({
+        // test initialization of Grid component
+        testInit: function() { with(this) {
+            var url = "resources/_grid_result.json";
+            var gc = new GvaScript.Grid("my_grid", url, {
+                grid_container: 'grid',
+                toolbar_container: 'grid_toolbar',
+                columns: [
+                    {label: 'CODE',      value: 'CLE_LANGUE'},
+                    {label: 'LABEL',     value: function(e) {return e.LIB_LANGUE.first()}},
+                    {label: 'SYNONYMES', value: function(e) {return e.LIB_LANGUE.reject(function(e, i) {return i==0}).join(', ')}, default_value: 'n/a', width: 300},
+                    {label: 'TARIF',     value: function(e) {return e.MNT_HEURE_LANGUE + ' CHF'}, css: 'red'}
+                ],
+                actions: [
+                    {
+                        label: 'grid action',
+                        condition: true,
+                        callback: function() {GvaScript.Grids.get('my_grid').clear('bye bye');}
+                    }
+                ],
+                grabfocus: true,
+                onEmpty: function() {
+                    $('grid').update("<h3 style='color: #183E6C'>Aucune mot ne correspond aux critères ci-dessus.</h3>");
+                },        
+                onPing: function(target) {
+                    $('gridlog').update(target.CLE_LANGUE);
+                }, 
+                onCancel: function() {$('gridlog').update('ESCAPE')}
+            });      
+            assertInstanceOf(GvaScript.Grid, gc, 'Grid Component has not been properly initialized');
+            assertEqual(8, gc.limit, 'Failed to dynamically set the Grid limit based on available space.');
+        }},
+
+        // test rendering of the grid and its columns
+        testCols: function() { with(this) {
+            wait(1000, function() { with(this) {
+                var tbl = $$('.gva-grid')[0];
+                assert(tbl, 'Failed to render Grid into HTML table.');
+
+                // test nb of rows/cols
+                assertEqual(9, tbl.rows.length, 'Failed to render 9 rows of the table');
+                assertEqual(5, tbl.rows[0].cells.length, 'Failed to render 5 columns of the table');
+                
+                // test values of cols
+                assertEqual('PUS',    tbl.rows[1].cells[1].innerHTML, 'Failed to set column value based on column key');
+                assertEqual('afghan', tbl.rows[1].cells[2].innerHTML, 'Failed to set column value based on column function');
+                assertEqual('n/a',    tbl.rows[3].cells[3].innerHTML, 'Failed to set column value based on column default value');
+                
+                // test custom column width
+                assertEqual('300px', tbl.rows[0].cells[3].getStyle('width'), 'Failed to set custom column width.');
+
+                // test custom column classname
+                assertEqual(8, $$('td.red').length, 'Failed to set custom column classname.');
+
+            }});
+            /* 
+            assertInstanceOf();
+            assert(); 
+            assertEqual();
+            assertVisible();
+            assertNotVisible();
+            Event.simulateMouse();
+            Event.simulateKey();
+            */
+        }},
+
+        // test toolbar 
+        testToolbar: function() {
+           this.assert($('grid_toolbar').hasClassName('gva-grid-toolbar'), 'Failed to initialize grid toolbar');
+           this.assert($('my_grid_btn_0'), 'Failed to initialize grid action bar');
+           this.assert($('grid_toolbar').down('.gva-paginatorbar'), 'Failed to initialize grid pagination bar');
+        
+           this.assertEqual('1 à 8 de 14', $('grid_toolbar').down('.gva-paginatorbar .text').innerHTML);
+        },
+        
+        // test choiceList navigation
+        testNavigation: function () { with(this) {
+            assertEqual($$('.gva-grid tbody tr').length, $$('.CL_choiceItem').length, 'ChoiceList is not properly initialized.');
+            assertEqual($$('.gva-grid tbody tr')[0], $$('.hilite')[0], 'First row is not selected by default!.');
+            Event.simulateKey('grid', 'keydown', {keyCode:Event.KEY_DOWN});
+            assertEqual($$('.gva-grid tbody tr')[1], $$('.hilite')[0], 'Failed to navigate to second row using KEY_DOWN');
+            Event.simulateKey('grid', 'keydown', {keyCode:Event.KEY_DOWN});
+            Event.simulateKey('grid', 'keydown', {keyCode:Event.KEY_PAGEUP});
+            assertEqual($$('.gva-grid tbody tr')[0], $$('.hilite')[0], 'Failed to navigate to first row using KEY_PAGEUP');
+
+            Event.simulateKey('grid', 'keydown', {keyCode:Event.KEY_PAGEDOWN});
+            wait(500, function() { with(this) {
+                assertEqual('9 à 14 de 14', $('grid_toolbar').down('.gva-paginatorbar .text').innerHTML,  'Failed to navigate using KEY_PAGEDOWN');
+
+                Event.simulateKey('grid', 'keydown', {keyCode:Event.KEY_LEFT});
+                wait(500, function() { with(this) {
+                    assertEqual('1 à 8 de 14', $('grid_toolbar').down('.gva-paginatorbar .text').innerHTML, 'Failed to navigate using KEY_LEFT');
+                }});
+            }});
+        }},
+        
+        testPaginator: function () { with(this) {
+            var paginator = $('grid_toolbar').down('.gva-paginatorbar'); 
+            assert(!paginator.down('.last').hasClassName('inactive'));
+            assert(!paginator.down('.forward').hasClassName('inactive'));
+            assert(paginator.down('.back').hasClassName('inactive'));
+            assert(paginator.down('.first').hasClassName('inactive'));
+            Event.simulateMouse(paginator.down('.forward'), 'click');
+            wait(500, function() { with(this) {
+                assertEqual('9 à 14 de 14', paginator.down('.text').innerHTML,  'Failed to navigate FORWARD icon');
+                assert(paginator.down('.last').hasClassName('inactive'));
+                assert(paginator.down('.forward').hasClassName('inactive'));
+                assert(!paginator.down('.back').hasClassName('inactive'));
+                assert(!paginator.down('.first').hasClassName('inactive')); 
+
+                Event.simulateMouse(paginator.down('.first'), 'click');
+                wait(500, function() { with(this) {
+                    assertEqual('1 à 8 de 14', paginator.down('.text').innerHTML,  'Failed to navigate FIRST icon');
+                    assert(!paginator.down('.last').hasClassName('inactive'));
+                    assert(!paginator.down('.forward').hasClassName('inactive'));
+                    assert(paginator.down('.back').hasClassName('inactive'));
+                    assert(paginator.down('.first').hasClassName('inactive')); 
+                }});
+            }});
+        }},
+
+        testActions: function() { with(this) {
+            // RETURN to Ping
+            Event.simulateKey('grid', 'keydown', {keyCode: Event.KEY_RETURN});
+            assertEqual('PUS', $F('gridlog'), 'Failed to fire Ping on KEY_RETURN');
+            $('gridlog').update();
+            
+            // CLICK to select
+            Event.simulateMouse($$('.gva-grid tbody tr')[3], 'click');
+            assert($$('.gva-grid tbody tr')[3].hasClassName('hilite'));
+            
+            // CLICK to Ping
+            Event.simulateMouse($$('.gva-grid tbody tr')[3], 'click');
+            assertEqual('GER', $F('gridlog'), 'Failed to fire Ping on click');
+
+            // ESC to Cancel
+            Event.simulateKey('grid', 'keydown', {keyCode: Event.KEY_ESC});
+            assertEqual('ESCAPE', $F('gridlog'), 'Failed to fire Cancel on KEY_ESC');
+
+            // grid custom Action
+            Event.simulateMouse($('my_grid_btn_0').down('.btn'), 'click');
+            wait(500, function() { with(this) {
+                assertEqual('bye bye', $('grid').innerHTML, 'Failed to fire action callback');
+            }});
+        }}
+    });
+
+    // ]]>
+    </script>
+    </body>
+</html>

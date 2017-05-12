@@ -1,0 +1,25 @@
+Revision history for Acme-BooK-Is-My-Bitch
+
+0.05 Sun Mar 29 2015
+    - new quote about BooK's favourite colour
+    - new quote about BooK naming meeting rooms
+    - added the list of contributors to the META file
+
+0.04 Fri Nov 15 2013
+    - new quote from an old August 2007 patch BooK found on his disk
+
+0.03 Mon Aug 26 2013
+    - new maintainer: Philippe Bruhat (BooK)
+    - fixed RT #21297 (BOOK)
+    - fixed RT #21298 (BOOK)
+    - fixed RT #60761 (DOLMEN)
+    - added the feature requested in RT #21307 (BOOK)
+    - incidentally also fixed RT #60762 (DOLMEN)
+    - incidentally also fixed RT #82535 (DOLMEN)
+    - added a historical note about the phrase "is my bitch"
+
+0.02  Sun Sep  3 11:40:07 2006
+    - Improved documentation.
+
+0.01  Sat Sep  2 19:07:07 2006
+    - First version, released on an unsuspecting world.

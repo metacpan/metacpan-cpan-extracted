@@ -1,0 +1,86 @@
+NAME
+    Aspect::Library::TestClass - give Test::Class test methods an IUT
+    (implementation under test)
+
+SYNOPSIS
+      # append IUT to params of all test methods in matching packages
+      # place this in your test script
+      aspect TestClass => call qr/::tests::/;
+
+SUPER
+    Aspect::Modular
+
+DESCRIPTION
+    Frequently my "Test::Class" test methods look like this:
+
+      sub some_test: Test {
+         my $self = shift;
+         my $subject = IUT->new;
+         # send $subject messages and verify expected results
+         ...
+      }
+
+    After installing this aspect, they look like this:
+
+      sub some_test: Test {
+         my ($self, $subject) = @_;
+         # send $subject messages and verify expected results
+         ...
+      }
+
+    In the test class you must add one *template method* to provide the
+    class of the IUT:
+
+      sub subject_class { 'MyApp::Person' }
+
+REQUIRES
+    Only works with "Test::Class" above version "0.06_05".
+
+SEE ALSO
+    See the Aspect pods for a guide to the Aspect module.
+
+    "XUL-Node" tests use this aspect extensively.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org>.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Aspect-Library-TestClass
+    >
+
+    For other issues, contact the author.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you. Or see
+    <http://www.perl.com/CPAN/authors/id/M/MA/MARCEL/>.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+    Marcel Grünauer <marcel@cpan.org>
+
+    Ran Eilam <eilara@cpan.org>
+
+SEE ALSO
+    You can find AOP examples in the "examples/" directory of the
+    distribution.
+
+COPYRIGHT AND LICENSE
+    Copyright 2001 by Marcel Grünauer
+
+    Some parts copyright 2009 - 2011 Adam Kennedy.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

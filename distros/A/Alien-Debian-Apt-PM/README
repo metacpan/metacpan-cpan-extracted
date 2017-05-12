@@ -1,0 +1,85 @@
+NAME
+    Alien::Debian::Apt::PM - install bundled apt-pm apt-cpan apt-pm-web
+    dh-make-pm cpan-patches dpkg-scanpmpackages
+
+SYNOPSIS
+            apt-pm update
+            apt-pm find Moose::Meta::Method
+            apt-cpan install Pod::POM::Web
+
+    See:
+
+    apt-cpan
+        http://search.cpan.org/perldoc?apt-cpan
+
+    apt-pm
+        http://search.cpan.org/perldoc?apt-pm
+
+    apt-pm-web
+        http://search.cpan.org/perldoc?apt-pm-web
+
+    dh-make-pm
+        http://search.cpan.org/perldoc?dh-make-pm
+
+    cpan-patches
+        http://search.cpan.org/perldoc?cpan-patches
+
+    dpkg-scanpmpackages
+        http://search.cpan.org/perldoc?dpkg-scanpmpackages
+
+DESCRIPTION
+    This alien was made to install PAR::Packer created versions of scripts
+    provided or needed by Debian::Apt::PM.
+
+    Alien::Debian::Apt::PM has no dependencies besides Module::Build, will
+    install one binary `alien-debian-apt-pm' and create symlinks to it.
+
+    The result is having full functional and system Perl independent
+    `apt-pm', `apt-cpan', `apt-pm-web', `dh-make-pm', `cpan-patches',
+    `dpkg-scanpmpackages' scripts.
+
+INSTALL
+  get alien-debian-apt-pm
+    form CPAN
+            cpan Alien::Debian::Apt::PM
+
+    manual set-up
+            cd /usr/local/bin/
+            wget https://github.com/jozef/Alien-Debian-Apt-PM/raw/master/script/alien-debian-apt-pm
+            ln -s alien-debian-apt-pm apt-cpan
+            ln -s alien-debian-apt-pm apt-pm
+            ln -s alien-debian-apt-pm apt-pm-web
+            ln -s alien-debian-apt-pm dh-make-pm
+            ln -s alien-debian-apt-pm cpan-patches
+            ln -s alien-debian-apt-pm dpkg-scanpmpackages
+
+  add pmindex repository
+            echo "deb     http://alioth.debian.org/~jozef-guest/pmindex/     squeeze main contrib non-free" >> /etc/apt/sources.list
+
+  create apt-pm folders
+            mkdir -p /var/cache/apt/apt-pm/deb
+            mkdir -p /var/cache/apt/apt-pm/deb-src
+
+USAGE
+            apt-pm update
+            apt-pm find Moose::Meta::Method
+            apt-cpan -n install Pod::POM::Web
+
+pp used
+            pp      -M Moose::Meta::Object::Trait -M Package::Stash::XS -M MetaCPAN::API \
+                    -M MetaCPAN::API::Author -M MetaCPAN::API::Module -M MetaCPAN::API::POD \
+                    -M MetaCPAN::API::Release -M Class::Load::PP -M CPAN::PackageDetails::Entries \
+                    -M CPAN::PackageDetails::Header -M CPAN::PackageDetails::Entry
+                    -o alien-debian-apt-pm \
+                    apt-pm apt-cpan apt-pm-web dh-make-pm cpan-patches dpkg-scanpmpackages
+
+AUTHOR
+    Jozef Kutej
+
+COPYRIGHT AND LICENSE
+    Copyright 2011 by Jozef Kutej
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6 or, at your
+    option, any later version of Perl 5 you may have available.
+

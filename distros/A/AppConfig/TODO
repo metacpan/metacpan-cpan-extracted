@@ -1,0 +1,56 @@
+#============================================================================
+#
+# TODO
+#
+# List of outstandings bugs, features and ideas for AppConfig::* modules.
+# Please note that the thoughts expressed here do not necessarily imply
+# any guaranteed future functionality of AppConfig.  Please contact the 
+# author if you wish to help implement anything here.  All help is welcome,
+# but do check first to make sure someone isn't already tackling the item 
+# in question.  Any other suggestions, ideas, patches gratefully received.
+#
+# Written by Andy Wardley <abw@cre.canon.co.uk>
+#
+# Copyright (C) 1997,1998 Canon Research Centre Europe Ltd.
+# All Rights Reserved.
+#
+#----------------------------------------------------------------------------
+#
+# $Id: TODO,v 1.1.1.1 1999/09/14 16:39:44 abw Exp $
+#
+#============================================================================
+
+*** IMPORTANT ***
+
+* change varlist() to varhash()
+
+
+AppConfig::State
+
+* Perhaps allow a callback to be installed which is called *instead* of
+  the get() and set() methods (or rather, is called by them).
+
+* CASE sensitivity may be required on a per-operation basis.  E.g. CASE
+  sensitive for AppConfig::Args but CASE insensitive for AppConfig::File.
+
+* AppConfig::State may need to have CMDARG re-introduced.  When using
+  blocks, it will be considerably more convenient to say '-v' rather
+  than -block_verbose.  The global CMDARG could be a template of the
+  form '%c', to indicate the first character, for example.
+
+#------------------------------------------------------------------------
+
+General
+
+* Change _pedantic() and _debug() calls in AppConfig::* constructors
+  to direct $state->{ XXX } lookups.  We are friends, after all and
+  the current approach is likely to be rather inefficient.
+
+#------------------------------------------------------------------------
+
+Test Suite
+
+* Modify file expansion tests to determine if getpwnam() etc are working
+  or not.
+
+#------------------------------------------------------------------------

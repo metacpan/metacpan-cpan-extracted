@@ -1,0 +1,53 @@
+{
+   "abstract" : "control iTunes from mod_perl",
+   "author" : [
+      "brian d foy <bdfoy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Apache-iTunes",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache::Constants" : "0",
+            "Apache::FakeRequest" : "0",
+            "Apache::Util" : "0",
+            "Mac::iTunes" : "0",
+            "Test::More" : "0",
+            "Text::Template" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/CPAN-Adopt-Me/Apache-iTunes",
+         "web" : "https://github.com/CPAN-Adopt-Me/Apache-iTunes"
+      }
+   },
+   "version" : 0.12
+}

@@ -1,0 +1,32 @@
+---
+abstract: 'Install and make available lzma.exe'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Remove: 1.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Alien::Win32::LZMA
+name: Alien-Win32-LZMA
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  File::ShareDir: 1.00
+  IPC::Run3: 0.042
+  perl: 5.8.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Alien-Win32-LZMA
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Alien-Win32-LZMA
+version: 4.66

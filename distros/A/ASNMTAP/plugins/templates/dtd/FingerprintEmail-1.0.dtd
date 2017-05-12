@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ENTITY AUTHOR  "Alex Peeters">
+<!ENTITY EMAIL   "Alex.Peeters@citap.com">
+<!ENTITY PURPOSE "2005/11/15, dtd schema v1.0 for Fingerprint Email by XML">
+
+<!ELEMENT FingerprintEmail (Schema, Fingerprint)>
+<!ELEMENT Schema (#PCDATA)>
+<!ATTLIST Schema Value CDATA #FIXED "1.0">
+<!ELEMENT Fingerprint (#PCDATA)>
+<!ATTLIST Fingerprint
+  From CDATA #REQUIRED
+  To CDATA #REQUIRED
+  Destination CDATA #REQUIRED
+  Plugin CDATA #REQUIRED
+  Description CDATA #REQUIRED
+  Environment (PROD|TEST|ACC|DEV|SIM|LOCAL) #REQUIRED
+  Date CDATA #REQUIRED
+  Time CDATA #REQUIRED
+  Epochtime CDATA #REQUIRED
+  Status CDATA #REQUIRED
+>
+

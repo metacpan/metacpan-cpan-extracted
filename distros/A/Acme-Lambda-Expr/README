@@ -1,0 +1,36 @@
+NAME
+
+	Acme::Lambda::Expr - Lambda expressions
+
+SYNOPSIS
+
+	use Lambda::Expr;
+
+	my $f = $x + $y;
+	print $f->(2, 3); # => 5
+
+DESCRIPTION
+
+	Acme::Lambda::Expr provides lambda expressions.
+
+	See "perldoc Acme::Lambda::Expr" for the rest of the document.
+
+DEPENDENCIES
+
+	perl 5.8.1 or later.
+
+INSTALLATION
+
+	To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+COPYRIGHT AND LICENCE
+
+	Copyright (c) 2008 Goro Fuji, Some rights reserved.
+
+	This program is free software; you can redistribute it and/or
+	modify it under the same terms as Perl itself.

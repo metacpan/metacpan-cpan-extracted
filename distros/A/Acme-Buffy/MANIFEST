@@ -1,0 +1,11 @@
+buffy
+CHANGES
+examples/demo_buffy.pl
+examples/demo_simple.pl
+lib/Acme/Buffy.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/buffy.t
+META.yml                                 Module meta-data (added by MakeMaker)

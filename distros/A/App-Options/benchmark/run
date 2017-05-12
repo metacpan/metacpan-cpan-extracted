@@ -1,0 +1,43 @@
+#!/usr/local/bin/perl
+
+use lib "../lib";
+use App::Options qw(:none);
+use Benchmark qw(:all) ;
+chdir("../t");
+
+#######################################################################
+# The purpose of this benchmark file is to understand how long it
+# takes to parse a "typical" set of options.
+# I used the option file represented by the main regression test
+# suite in the "t" directory.
+#   Result: 196 parses/second, or ~ .005 seconds
+# This seems an acceptable overhead ;-) for the flexibility that
+# this module provides.
+#######################################################################
+
+sub baseline {
+    my (%values);
+    App::Options->init(values => \%values);
+}
+
+sub baseline2 {
+    my (%values);
+    App::Options->init(values => \%values);
+    App::Options->init(values => \%values);
+}
+
+sub baseline3 {
+    my (%values);
+    App::Options->init(values => \%values);
+    %values = ();
+    App::Options->init(values => \%values);
+}
+
+$count = 400;
+
+cmpthese($count, {
+    'baseline' => \&baseline,
+    'baseline2' => \&baseline2,
+    'baseline3' => \&baseline3,
+});
+

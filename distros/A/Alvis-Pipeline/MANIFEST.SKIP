@@ -1,0 +1,7 @@
+.cvsignore
+CVS
+lib/Alvis/CVS
+lib/CVS
+private
+releases
+t/CVS

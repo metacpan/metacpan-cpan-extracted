@@ -1,0 +1,72 @@
+NAME
+    Acme::rafl::Everywhere - rafl is so everywhere, he has his own Acme
+    module!
+
+VERSION
+    version 0.011
+
+SYNOPSIS
+        use Acme::rafl::Everywhere;
+
+        my $rafl = Acme::rafl::Everywhere->new;
+        print $rafl->fact;
+
+    Or set your own facts
+
+        my $rafl = Acme::rafl::Everywhere->new(
+            facts => [@new_facts],
+        );
+
+DESCRIPTION
+    If you haven't already seen "rafl" somewhere, you probably haven't been
+    alive for too long, because he really is everywhere.
+
+    Moose, MooseX::Declare, Catalyst, Dist::Zilla, signatures, KiokuDB,
+    Gtk2, Perl core, MetaCPAN and GSoC are just *some* of the projects he's
+    involved in.
+
+    There is proof for at least one fact noted by this distribution, taken
+    at YAPC::EU 2012.
+
+CONTRIBUTERS
+    We would like to thank the following people (in alphabetical order) for
+    their help in collecting these completely real facts about "rafl". This
+    list would not exist without the help of these tireless hard-working
+    lead investigators:
+
+    *   Breno (garu) G. de Oliveira
+
+    *   Damien Krotkine
+
+    *   Toby Inkster
+
+    *   Torsten (Getty) Raudssus
+
+    *   Viacheslav (vti) Tykhanovskyi
+
+HELP ADD MORE FACTS
+    Please add more facts! We accept pull requests, patches, emails, IRC
+    messages, fortune cookie notes, sky writings, scribbled messages on
+    public bathroom stalls, inappropriate mid-meeting whispers, and more.
+
+BUGS
+    This module cannot contain all the information about "rafl", but you're
+    more than welcome to add any new info.
+
+THANKS
+    To "rafl" for being everywhere. :)
+
+SEE ALSO
+    http://piuparts.debian.org/squeeze/maintainer/r/rafl@debian.org.html
+
+    https://metacpan.org/author/FLORA
+
+AUTHOR
+    Sawyer X <xsawyerx@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Sawyer X.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

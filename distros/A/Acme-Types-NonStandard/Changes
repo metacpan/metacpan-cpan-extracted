@@ -1,0 +1,14 @@
+Revision history for Perl module Acme-Types-NonStandard
+
+0.002002 2014-03-14
+
+  - Fix broken t/, which was likely holding up thousands of production
+    deployments.
+
+0.002001 2015-03-13
+
+  - Add type ProbableMemoryLeak
+
+0.001001 2015-03-13
+
+  - Initial release

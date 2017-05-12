@@ -1,0 +1,486 @@
+nrun
+====
+
+nrun will run a single command or script on a multiple of target servers
+synchronously.  ncopy will copy a file or directory to multiple target servers.
+
+the underlying remote access mechanism is exchangeable. as of now, ssh, nsh, rsh
+and local execution modes are implemented.
+
+the return code and all command output will be logged.
+
+Copyright 2013 Timo Benk <benk@b1-systems.de>
+
+nrun is free software: you can redistribute it and/or modify it under the terms
+of the GNU General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+
+nrun is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the GNU General Public License for more details.
+
+installation
+============
+
+installation is straight forward:
+
+# perl Makefile.PL
+# make install
+
+if desired it is possible to change the installation prefix using the
+parameter DESTDIR:
+
+# perl Makefile.PL DESTDIR=~/applications
+
+usage
+=====
+
+usage: nrun -t HOST1[,HOST2,...] -- COMMAND
+--copy                      copy command to target host before execution.
+--log-directory DIR         base directory for the log files.
+--parallel,-p MAX           number of parallel connections (defaults to 5).
+--reverse,-r                reverse copy the source file from all target hosts.
+--target,-t HOST1,HOST2     comma separated list of target hosts.
+--timeout SEC               timeout for each command execution (defaults to 60).
+--version,-v                print the version string and exit.
+--mode,-m MODE              remote execution mode:
+                            generic - generic mode
+                            local - execute the script locally, set TARGET_HOST on each execution
+                            nsh - nsh based remote execution
+                            rsh - rsh based remote execution
+                          * ssh - ssh based remote execution
+--filter,-f FILTER          output filter to be applied:
+                            async - dump the command output asynchroniously
+                            null - do nothing
+                            raw - dump the raw data received from the worker module
+                            result - dump only the exit code
+                          * sync - dump the command output synchroniously
+--logger,-l LOGGER1,LOGGER2 logger to be used:
+                            null - do nothing
+                          * output - log the command output
+                          * raw - log the raw data received from the worker module
+                          * result - log only the exit code
+--check,-c CHECK1,CHECK2    checks to be applied to each host:
+                          * ns - check if hostname is resolvable
+                            null - do nothing
+                          * ping - check if host answers to ping
+                            rscd - check if rscd agent answers
+
+usage: ncopy -t HOST1[,HOST2,...] -- SOURCE TARGET
+--log-directory DIR         base directory for the log files.
+--parallel,-p MAX           number of parallel connections (defaults to 5).
+--target,-t HOST1,HOST2     comma separated list of target hosts.
+--timeout SEC               timeout for each command execution (defaults to 60).
+--version,-v                print the version string and exit.
+--mode,-m MODE              remote execution mode:
+                            generic - generic mode
+                            local - execute the script locally, set TARGET_HOST on each execution
+                            nsh - nsh based remote execution
+                            rsh - rsh based remote execution
+                          * ssh - ssh based remote execution
+--filter,-f FILTER          output filter to be applied:
+                            async - dump the command output asynchroniously
+                            null - do nothing
+                            raw - dump the raw data received from the worker module
+                          * result - dump only the exit code
+                            sync - dump the command output synchroniously
+--logger,-l LOGGER1,LOGGER2 logger to be used:
+                            null - do nothing
+                          * output - log the command output
+                          * raw - log the raw data received from the worker module
+                          * result - log only the exit code
+--check,-c CHECK1,CHECK2    checks to be applied to each host:
+                          * ns - check if hostname is resolvable
+                            null - do nothing
+                          * ping - check if host answers to ping
+                            rscd - check if rscd agent answers
+
+examples
+========
+
+1. run the command "ls" on host1 and host2.
+
+$ nrun --target host1,host2 -- ls
+
+2. run the command "ls -al" on host1, host2 and all hosts in the file HOSTS.LST.
+
+$ nrun --target HOSTS.LST,host1,host2 -- ls -al
+
+3. run the command "ls" on all hosts in the file HOSTS.LST - mode "ssh".
+
+$ nrun --target HOSTS.LST --mode ssh -- ls 
+
+4. copy the script bin/script.sh to each target hosts and execute it.
+
+$ nrun --target HOSTS.LST --copy -- bin/script.sh
+
+5. execute the local script test.sh for each target host
+
+$ nrun --target HOSTS.LST --mode local -- ./test.sh
+
+6. copy file test.tar to all hosts in the file HOSTS.LST
+
+$ ncopy --target HOSTS.LST -- test.tar /tmp 
+
+7. reverse copy file /etc/passwd from all hosts in the file HOSTS.LST
+
+$ ncopy --target HOSTS.LST --reverse -- /etc/passwd /tmp 
+
+configuration
+=============
+
+special configuration options for the different modes and additional all
+commandline options can be given in a configuration file. the following three
+places will be searched for configuration files (values in the last
+configuration file will overwrite values in the first configuration file).
+indentation does matter (YAML syntax).
+
+- $FindBin::Bin/../etc/nrunrc
+- /etc/nrunrc
+- $HOME/.nrunrc
+
+--<snip>--
+---
+# mode ssh options
+ssh_copy: >
+    /usr/bin/scp
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL
+    SOURCE HOSTNAME:TARGET
+
+ssh_rcopy: >
+    /usr/bin/scp
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL
+    HOSTNAME:SOURCE TARGET
+
+ssh_exec: >
+    /usr/bin/ssh
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL
+    HOSTNAME COMMAND ARGUMENTS
+
+ssh_delete: >
+    /usr/bin/ssh
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL
+    HOSTNAME rm -f "FILE"
+
+# additional commandline options
+nrun:
+    arg_mode: ssh
+    arg_check: ping,ns
+    arg_filter: sync
+    arg_logger: result,output,raw
+    arg_parallel: 5
+    arg_timeout: 60
+
+ncopy:
+    arg_mode: ssh
+    arg_check: ping,ns
+    arg_filter: result
+    arg_logger: result,output,raw
+    arg_parallel: 5
+    arg_timeout: 60
+
+# alias definitions
+alias:
+    production:
+        - host1
+        - host2
+    development:
+        - host3
+        - host4
+    all:
+        - production
+        - development
+--<snap>--
+
+logging
+=======
+
+on each execution run, the command output and exit code will be saved inside the
+logging directory. the default logging directory is $HOME/.nrun. Logging is realized by
+so called filters (see FILTERS).
+
+- $LOGDIR/result.log - will contain the exit codes
+- $LOGDIR/output.log - will contain the complete command output for all hosts
+- $LOGDIR/raw.log - will contain the raw worker output for all hosts
+
+mode ssh
+========
+
+use ssh as the underlying remote access mechanism.
+
+the following configuration options must be set in the configuration file:
+
+'ssh_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+'ssh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'ssh_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'ssh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
+
+for passwordless login ssh-agent can be used:
+
+# ssh-keygen
+# scp .ssh/id_rsa.pub $USER@$HOST:.ssh/authorized_keys
+
+# eval `ssh-agent` 
+# ssh-add
+
+to prevent any ssh interaction the following ssh command paramters are
+suggested:
+
+-o User=root
+-o PreferredAuthentications=hostbased,publickey
+-o StrictHostKeyChecking=no
+-o UserKnownHostsFile=/dev/null
+-o LogLevel=FATAL
+
+mode rsh
+========
+
+use rsh as the underlying remote access mechanism.
+
+the following configuration options must be set in the configuration file:
+
+'rsh_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+'rsh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'rsh_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'rsh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
+
+mode local
+==========
+
+execute the script locally for each host and set the environment variable
+TARGET_HOST on each execution.
+
+'local_exec' - commandline for local execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+
+mode nsh
+========
+
+use nsh as the underlying remote access mechanism.
+
+the following configuration options must be set in the configuration file:
+
+'nsh_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+'nsh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'nsh_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'nsh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
+'nsh_check'  - commandline for the agentinfo check command (HOSTNAME will be replaced)
+
+mode generic
+============
+
+this is a special generic mode the can be used for arbitrary remote execution
+mechanism. it takes only two configuration options, one to specify a command
+for remote exection and one to specify a command for remote copying.
+
+'generic_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+'generic_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'generic_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+'generic_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
+
+an example that resembles the mode ssh would look the following way:
+
+--<snip>--
+generic_copy: >
+    /usr/bin/scp
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey 
+    -o StrictHostKeyChecking=no 
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL 
+    SOURCE HOSTNAME:TARGET 
+
+generic_rcopy: >
+    /usr/bin/scp
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey 
+    -o StrictHostKeyChecking=no 
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL 
+    HOSTNAME:SOURCE TARGET 
+
+generic_exec: >
+    /usr/bin/ssh
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL
+    HOSTNAME COMMAND ARGUMENTS
+
+generic_delete: >
+    /usr/bin/ssh
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL
+    HOSTNAME rm -f "FILE"
+
+--<snap>--
+
+filters
+=======
+
+a filter reads the raw output generated by the worker processes and prints this
+output in a specific format.
+
+filter raw
+==========
+
+this filter will just dump the output as it is provided by the worker process. no
+formatting will be done.
+
+format:
+
+        HOSTNAME;[stdout|stderr];TSTAMP;PID;PID(CHILD);[debug|error|exit|output|end];"OUTPUT"
+
+filter async
+============
+
+this filter dumps the worker process output unsynchronized in the following format. unsynchronised
+means, that output lines from the different worker processes are printed at the same time they are
+generated.
+
+format:
+
+        HOSTNAME: OUTPUT
+
+filter sync
+============
+
+this filter dumps the worker process output synchronised in the following format. synchronized
+means, that the complete output for a single hosts will be dumped at once when the worker proces
+has finished execution.
+
+format:
+
+        HOSTNAME: OUTPUT
+
+filter result
+=============
+
+this filter will only print the exit codes for the worker processes.
+
+format:
+
+        HOSTNAME: exit code CODE
+
+
+LOGGERS
+=======
+
+a logger reads the raw output generated by the worker processes and logs this
+output in a specific format.
+
+logger output
+=============
+
+this logger creates a logfile in the logging directory called output.log which
+contains the same data that the filter sync produces.
+
+logger result
+=============
+
+this logger creates a logfile in the logging directory called result.log which
+contains the same data that the filter result produces.
+
+logger raw
+==========
+
+this logger creates a logfile in the logging directory called raw.log which contains the same
+data that the filter raw produces.
+
+checks
+======
+
+a check does a specific check for each hostname. if the check fails, the hostname
+that failed will be removed from the target list and an error message will be
+printed. multiple checks may be given at the command line.
+
+check ping
+==========
+
+checks that the host is pingable.
+
+check ns
+========
+
+checks that the hostname is resolvable to an ip address.
+
+check rscd
+==========
+
+checks that the rscd agent is alive.
+
+targets
+=======
+
+a target name may be either a filename containing the target hosts, one per line,
+an alias definition in the configuration file or simply a hostname.
+
+if there is a conflict, for example an alias named identically as an existing
+file, the alias will always overrule the filename and the filename will always
+overrule the hostname.
+
+an alias can be defined in the configuration file the following way. an alias
+definition may contain additional alias names, filenames or simply hostnames.
+indentation does matter.
+
+    # alias definitions
+    alias:
+        production:
+            - host1
+            - host2
+        development:
+            - host3
+            - host4
+        all:
+            - production
+            - development
+
+transferring the public key
+===========================
+
+the helper script misc/put_pubkey can be used to transfer the ssh public key
+to the target hosts without supplying a password for each login. it is meant
+to be executed by the nrun script in mode local.
+
+$ nrun -t HOSTS.LST --mode local --timeout 120 -- ./put_pubkey KEY USER PWD
+
+a note on the git repository
+============================
+
+$ git clone https://github.com/tbenk/nrun
+$ ln -s ../../.git_hooks/commit-msg .git/hooks
+
+to enable keyword substitution:
+$ git config --local filter.keywords.clean ".git_filters/keywords -m clean -f %f"
+$ git config --local filter.keywords.smudge ".git_filters/keywords -m smudge -f %f"
+
+to disable keyword substitution:
+$ git config --local filter.keywords.smudge "cat"
+
+after git keyword substitution is enabled, the following command will replace
+all keywords in the source files:
+
+$ git checkout HEAD .
+
+for keyword substitution to work at least git version v1.7.3.4-599-ga2b665d is
+necessary.
+

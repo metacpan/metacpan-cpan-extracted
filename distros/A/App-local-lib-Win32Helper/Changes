@@ -1,0 +1,12 @@
+Revision history for App-local-lib-Win32
+
+0.992   2016-04-25
+        missing: EXE_FILES => [ 'script/llw32helper.pl' ]
+
+0.991   2016-04-25
+        switch to ExtUtils::MakeMaker
+        fix: 'IO::Interactive' => 0.000005 (changed to '0.0.5')
+        fix: rt#64465 MODULEBUILDRC is deprecated in favor of PERL_MB_OPT
+
+0.990   2010-04-09
+        First version, released on an unsuspecting world.

@@ -1,0 +1,248 @@
+NAME
+    App::opan - A CPAN overlay for darkpan and pinning purposes
+
+SYNOPSIS
+    Set up an opan (creates a directory tree in "pans/"):
+
+      $ opan init
+      $ opan pin MSTROUT/M-1.tar.gz
+      $ opan add ./My-Dist-1.23.tar.gz
+
+    Now, you can start the server:
+
+      $ opan daemon -l http://localhost:8030/
+      Server available at http://localhost:8030/
+
+    Then in another terminal, run one of:
+
+      $ cpanm --mirror http://localhost:8030/combined/ --mirror-only --installdeps .
+      $ PERL_CARTON_MIRROR=http://localhost:8030/combined/ carton install
+
+    Or, to let opan do that part for you, skip starting the server and run
+    one of:
+
+      $ opan cpanm --installdeps .
+      $ opan carton install
+
+NOTA BENE
+    This is systems software, in its relatively early days. It may contain
+    horrible bugs. It may turn out to need redesigning in not entirely
+    compatible ways. I hope neither, but I can't guarantee that yet.
+
+DESCRIPTION
+    Two basic approaches to using this thing. First, if you're using carton,
+    you can probably completely ignore the pinning system, so just do:
+
+      $ opan init
+      $ opan add ./My-DarkPan-Dist-1.23.tar.gz
+      $ git add pans/; git commit -m 'fresh opan'
+      $ opan carton install
+
+    You can reproduce this install with simply:
+
+      $ opan carton install --deployment
+
+    When you want to update to a new version of the cpan index (assuming you
+    already have an additional requirement that's too old in your current
+    snapshot):
+
+      $ opan pull
+      $ git add pans/; git commit -m 'update pans'
+      $ opan carton install
+
+    Second, if you're not using carton, but you want reproducible installs,
+    you can still mostly ignore the pinning system by doing:
+
+      $ opan init
+      $ opan add ./My-DarkPan-Dist-1.23.tar.gz
+      $ opan cpanm --autopin --installdeps .
+      $ git add pans/; git commit -m 'opan with current version pinning'
+
+    Your reproducible install is now:
+
+      $ opan cpanm --installdeps .
+
+    When you want to update to a new version of the cpan index (assuming you
+    already have an additional requirement that's too old in your current
+    snapshot):
+
+      $ opan pull
+      $ opan cpanm --autopin --installdeps .
+      $ git add pans/; git commit -m 'update pans'
+
+    To update a single dist in this system, the easy route is:
+
+      $ opan unpin Thingy-1.23.tar.gz
+      $ opan cpanm Thingy
+      Fetching http://www.cpan.org/authors/id/S/SO/SOMEONE/Thingy-1.25.tar.gz
+      ...
+      $ opan pin SOMEONE/Thing-1.25.tar.gz
+
+    This will probably make more sense if you read the "Commands" and "PANs"
+    documentation following before trying to set things up.
+
+  Commands
+   init
+      opan init
+
+    Creates a "pans/" directory with empty indexes for "custom" and "pinset"
+    and a fresh index for "upstream" (i.e. runs "fetch" for you at the end
+    of initialisation).
+
+   fetch
+      opan fetch
+
+    Fetches 02packages from www.cpan.org into the "upstream" PAN.
+
+   add
+      opan add Dist-Name-1.23.tar.gz
+
+    Imports a distribution file into the "custom" PAN under author "MY". Any
+    path parts provided before the filename will be stripped.
+
+    Support for other authors is pending somebody explaining why that would
+    have a point. See "pin" for the command you probably wanted instead.
+
+   unadd
+      opan unadd Dist-Name-1.23.tar.gz
+
+    Looks for a "Dist-Name-1.23.tar.gz" path in the "custom" PAN index and
+    removes the entries.
+
+    Does not remove the dist file, see "purge".
+
+   pin
+      opan pin AUTHOR/Dist-Name-1.23.tar.gz
+
+    Fetches the file from the "upstream" PAN and adds it to "pinset".
+
+   unpin
+      opan unpin Dist-Name-1.23.tar.gz
+
+    Looks for a "Dist-Name-1.23.tar.gz" path in the "pinset" PAN index and
+    removes the entries.
+
+    Does not remove the dist file, see "purge".
+
+   merge
+      opan merge
+
+    Rebuilds the "combined" and "nopin" PANs' index files.
+
+   pull
+      opan pull
+
+    Does an "fetch" then an "merge". There's no equivalent for others, on
+    the assumption what you'll do is roughly "pin", "add", "unpin", "unadd",
+    ... repeat ..., "pull".
+
+   purgelist
+      opan purgelist
+
+    Outputs a list of all non-indexed dists in "pinset" and "custom".
+
+   purge
+      opan purge
+
+    Deletes all files that would have been listed by "purgelist".
+
+   daemon
+      opan daemon
+
+    Starts a single process server using Mojolicious::Command::daemon.
+
+   prefork
+      opan prefork
+
+    Starts a multi-process preforking server using
+    Mojolicious::Command::prefork.
+
+   get
+      opan get /upstream/modules/02packages.details.txt.gz
+
+    Runs a request against the opan URL space using
+    Mojolicious::Command::get.
+
+   cpanm
+      opan cpanm --installdeps .
+
+    Starts a temporary server process and runs
+
+      cpanm --mirror http://localhost:<port>/combined/ --mirror-only <your args here>
+
+    Can also be run with one of:
+
+      opan cpanm --nopin <your args here>
+      opan cpanm --autopin <your args here>
+      opan cpanm --combined <your args here>
+
+    to request a specific PAN.
+
+   carton
+      opan carton install
+
+    Starts a temporary server process and runs
+
+      PERL_CARTON_MIRROR=http://localhost:<port>/combined/ carton <your args here>
+
+    Can also be run with one of:
+
+      opan carton --nopin <your args here>
+      opan carton --autopin <your args here>
+      opan carton --combined <your args here>
+
+    to request a specific PAN.
+
+  PANs
+   upstream
+    02packages: Fetched from www.cpan.org by the "fetch" command.
+
+    Dist files: Fetched from www.cpan.org on-demand.
+
+   pinset
+    02packages: Managed by "pin" and "unpin" commands.
+
+    Dist files: Fetched from www.cpan.org by "pin" command.
+
+   custom
+    02packages: Managed by "add" and "unadd" commands.
+
+    Dist files: Imported from local disk by "add" command.
+
+   combined
+    02packages: Merged from upstream, pinset and custom PANs by "merge"
+    command.
+
+    Dist files: Fetched from custom, pinset and upstream in that order.
+
+   nopin
+    02packages: Merged from upstream and custom PANs by "merge" command.
+
+    Dist files: Fetched from custom, pinset and upstream in that order.
+
+   autopin
+    Virtual PAN with no presence on disk.
+
+    Identical to nopin, but fetching a dist from upstream does an implict
+    "pin".
+
+    Since this can modify your opan config, it's only enabled if the
+    environment variable "OPAN_AUTOPIN" is set to a true value (calling the
+    "cpanm" or "carton" commands with "--autopin" sets this for you, because
+    you already specified you wanted that).
+
+AUTHOR
+    Matt S. Trout (mst) <mst@shadowcat.co.uk>
+
+CONTRIBUTORS
+    None yet, but I'm sure there'll be enough bugs for that to change
+    shortly.
+
+COPYRIGHT
+    Copyright (c) 2016 the App::opan "AUTHOR" and "CONTRIBUTORS" as listed
+    above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

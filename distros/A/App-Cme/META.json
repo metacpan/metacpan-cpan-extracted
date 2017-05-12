@@ -1,0 +1,79 @@
+{
+   "abstract" : "Check or edit configuration data with Config::Model",
+   "author" : [
+      "Dominique Dumont"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Cme",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.34"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.34"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Config::Model::CursesUI" : "0",
+            "Tk" : "0"
+         },
+         "requires" : {
+            "App::Cmd::Setup" : "0",
+            "Config::Model" : "2.101",
+            "Config::Model::FuseUI" : "0",
+            "Config::Model::Lister" : "0",
+            "Config::Model::ObjTreeScanner" : "0",
+            "Config::Model::SimpleUI" : "0",
+            "Config::Model::TermUI" : "0",
+            "Config::Model::Utils::GenClassPod" : "0",
+            "Data::Dumper" : "0",
+            "Encode" : "0",
+            "File::HomeDir" : "0",
+            "JSON" : "0",
+            "Path::Tiny" : "0",
+            "Pod::POM" : "0",
+            "Pod::POM::View::Text" : "0",
+            "Scalar::Util" : "0",
+            "Tie::Hash" : "0",
+            "YAML" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Probe::Perl" : "0",
+            "Test::Command" : "0.08",
+            "Test::File::Contents" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "ddumont at cpan.org",
+         "web" : "https://github.com/dod38fr/cme-perl/issues"
+      },
+      "homepage" : "https://github.com/dod38fr/config-model/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dod38fr/cme-perl.git",
+         "web" : "http://github.com/dod38fr/cme-perl"
+      }
+   },
+   "version" : "1.019",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

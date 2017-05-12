@@ -1,0 +1,13 @@
+Revision history for App-cpanchanges
+
+20140125.0  2014-01-25 00:15:12 PST
+        - Fix copy and paste error referring to cpangrep.  Thanks Olaf!
+        - Switch to ExtUtils::MakeMaker instead of Module::Build::Tiny
+
+20130523.0  2013-05-23 10:31:56 PDT
+        - Display POD change logs using perldoc or CPANCHANGES_PERLDOC
+        - Use one-arg system() so $PAGER has the full power of shell
+        - Fixes typos
+
+20130522.0  2013-05-22 23:56:55 PDT
+        - Initial release

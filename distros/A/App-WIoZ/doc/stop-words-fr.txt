@@ -1,0 +1,44 @@
+# Some Stopwords for french Language
+# -- for swish-e (V2.0 or higher)
+# -- Rainer.Scherg (Rainer.Scherg@t-online.de)
+
+au as ai ait aux aussi ainsi autre autres avec aucun
+
+bien
+
+ce ca ci cas ça ces cette chaque car cela celle comment
+
+de du des dans donc doit doivent
+
+en et est etc elle elles être été ete entre étant
+
+fait
+
+il ils
+
+je
+
+jusqu
+
+le la les
+
+me mes mais met mieux
+
+ne non nos nous notre
+
+ou où ont
+
+pas par pour plus peu peux peut puis pro
+
+qu qui que quelque quelques
+
+sa se si ses sur sans soit sont sous sera seront
+
+tu tout tous toute toute tres trés très tel telle tels telles
+
+un une
+
+deux trois quatre cinq six
+
+vos vous votre vends vers
+

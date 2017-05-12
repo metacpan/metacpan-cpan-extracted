@@ -1,0 +1,25 @@
+TODO:
+  - implement tests for the new CWB::CQP interface, using the included VSS corpus
+
+Version 3.0
+-----------
+
+This is the first official release of the redesigned CWB/Perl interface.
+It is compatible with version 3.0 of the IMS Open Corpus Workbench.
+
+New features:
+
+  - complete reorganisation of CWB/Perl modules into packages CWB (utility functions,
+    corpus encoding, CQP interface) and CWB-CL (API for low-level corpus access);
+    WebCqp functionality and demo Web interface will be released as a separate package
+    at a later time (with improved and extended implementation)
+
+  - all modules are in the CWB namespace now (e.g. CWB::CQP instead of CQP)
+
+  - new implementation of standard simple query language CEQL for Web interfaces,
+    providing a common core syntax that can easily be adapted and extended
+
+  - CQP interface has been re-implemented with better consistency and ease of use,
+    faster performance, and non-blocking operation
+
+  - improved auto-configuration, using information from the "cwb-config" utility

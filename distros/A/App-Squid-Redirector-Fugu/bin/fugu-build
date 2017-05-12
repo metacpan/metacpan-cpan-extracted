@@ -1,0 +1,111 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Carp qw/ croak /;
+use Config::Any;
+use DBI;
+use Getopt::Long;
+use Log::Handler;
+
+use App::Squid::Redirector::Fugu::BDB;
+
+
+# global vars
+my $config_file;
+my $config;
+
+# Get options - param values
+GetOptions('config=s' => \$config_file);
+
+# Parse config file
+if($config_file) { 
+    my $cfg = Config::Any->load_files({ files => [$config_file], force_plugins => ['Config::Any::JSON'] });
+    (undef, $config) = %{ $$cfg[0] };
+} else { croak('You should inform a config file: fugu-build --config /path/to/fugu.conf'); }
+
+# Logger
+$config->{logger} = Log::Handler->new();
+$config->{logger}->add( 
+	file => { 
+	    filename => $config->{'logdir'}.'/fugu.log', 
+	    die_on_errors => 1,
+	    message_layout => "[%L] - %T - %m",
+	    maxlevel => 7,
+	    minlevel => 0
+    }
+);
+
+# dbh
+if($config->{dbdsn}) {
+	$config->{dbh} = DBI->connect($config->{dbdsn}, $config->{dbuser}, $config->{dbpassword}, { AutoCommit => 0 }) or $config->{logger}->die("Can't connect to database: $DBI::errstr");
+}
+
+
+print "Building BDBs\n";
+$config->{logger}->log('Building BDBs');
+
+print 'Directory: '.$config->{bdbdir}."\n";
+$config->{logger}->log('Directory: '.$config->{bdbdir});
+
+# iterate over destinations
+foreach my $item (keys $config->{dst}) {
+
+    my $dst = $config->{dst}->{$item};
+
+    print "Destination: $item\n";
+    $config->{logger}->log("Destination: $item");
+    
+    my $bdb = App::Squid::Redirector::Fugu::BDB->new();
+    $bdb->set_logger($config->{logger});
+    $bdb->set_dir($config->{bdbdir});
+    $bdb->set_dbh($config->{dbh});
+    
+	# DOMAINS
+	# text file
+	if($dst->{domain_file}) {
+		# compile domain file		
+		print 'Processing: '.$dst->{domain_file}."\n";
+		$config->{logger}->log('Processing: '.$dst->{domain_file});
+		
+		$bdb->compile_domain_file($item, $dst->{domain_file});
+	}
+	# sql query
+	elsif($dst->{domain_sql}) {
+	    # compile domain sql
+		print 'Processing: '.$dst->{domain_sql}."\n";
+		$config->{logger}->log('Processing: '.$dst->{domain_sql});
+		
+		$bdb->compile_domain_sql($item, $dst->{domain_sql});
+	}
+
+
+	# URL
+	# text file
+	if($dst->{url_file}) {
+		# compile domain file
+		print 'Processing: '.$dst->{url_file}."\n";
+		$config->{logger}->log('Processing: '.$dst->{url_file});
+		
+		$bdb->compile_url_file($item, $dst->{url_file});
+	}
+	# sql query
+	elsif($dst->{url_sql}) {
+	    # compile url sql
+		print 'Processing: '.$dst->{url_sql}."\n";
+		$config->{logger}->log('Processing: '.$dst->{url_sql});
+		
+		$bdb->compile_url_sql($item, $dst->{url_sql});
+	}    
+    
+}
+
+# disconnect dbh, all data already loaded
+$config->{dbh}->disconnect() if($config->{dbh});
+	
+print "Done\n";
+$config->{logger}->log('Done');
+
+
+__END__

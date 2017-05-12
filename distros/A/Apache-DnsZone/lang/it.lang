@@ -1,0 +1,89 @@
+#!/usr/bin/perl -w 
+
+# created by thomas@stderr.net (2001/03/23) 
+# $Id: it.lang,v 1.5 2001/04/25 12:20:23 thomas Exp $ 
+
+use strict; 
+
+sub lang () { 
+    my %text = ( 
+		'SUBMIT'            => 'Invia', 
+		'CANCEL'            => 'Annulla', 
+		'HELP'              => 'Aiuto', 
+		'EDIT'              => 'Modifica', 
+		'ADD'               => 'Aggiungi', 
+		'REMOVE'            => 'Elimina', 
+		'LOCKED'            => 'Bloccato', 
+		'SETTINGS'          => 'Preferenze', 
+		'LIST_DOMAIN'       => 'Lista dei domini',
+		'LOGOUT'            => 'Logout',
+		'LANGUAGE'          => 'Lingua', 
+		'EMAIL'             => 'E-mail',
+		'NEW_PASSWORD'      => 'Nuova password', 
+		'CONFIRM_PASSWORD'  => 'Conferma password', 
+		'AUTH_NS'           => 'Nameserver Autoritativo', 
+		'SERIAL'            => 'Numero Seriale', 
+		'ADMIN_EMAIL'       => 'E-mail Amministrativa', 
+		'REFRESH'           => 'Refresh', 
+		'RETRY'             => 'Retry', 
+		'EXPIRE'            => 'Expire', 
+		'TTL'               => 'TTL', 
+		'HOST'              => 'Host',
+		'IP_ADDRESS'        => 'Indirizzo IP', 
+		'CNAME'             => 'Nome Canonico (CNAME)', 
+		'MX'                => 'Gestore Mail (MX)',
+		'PREFERENCE'        => 'Priorit&agrave; MX', 
+		'ZONE'              => 'Zona', 
+		'NS'                => 'Nameserver (NS)',
+		'TXT'               => 'Testo (TXT)', 
+		'DNS'               => 'DNS (Sistema Nomi di Dominio)',
+		'SOA'               => 'SOA (Inizio dell\'autorit&agrave;)',
+		'PAGE_LIST_DOMAIN'  => 'Domini gestiti con DnsZone', 
+		'PAGE_VIEW_DOMAIN'  => 'Visualizzazione dominio $domain', 
+		'PAGE_HELP'         => 'Aiuto', 
+		'PAGE_SETTINGS'     => 'Cambia Preferenze Personali', 
+		'PAGE_EDIT'         => 'Modifica del dato $record in $domain', 
+		'PAGE_ADD'          => 'Aggiunta del dato $record a $domain', 
+		'PAGE_DEL'          => 'Eliminazione del dato $record da $domain', 
+		'ERROR_CORRECT'     => 'Per favore correggi il/i seguente/i errore/i:',
+		'ERROR_DUPLICATE'   => 'Record duplicato',
+		'ERROR_IP'          => 'Valore non corretto per l\'indirizzo IP',
+		'ERROR_HOST'        => 'Valore non corretto per l\'Host',
+		'ERROR_TTL'         => 'Valore non corretto per il campo TTL',
+		'ERROR_CNAME'       => 'Valore non corretto per il campo CNAME',
+		'ERROR_MX'          => 'Valore non corretto per il campo MX',
+		'ERROR_PREFERENCE'  => 'Valore non corretto per la priotit&agrave; MX',
+		'ERROR_ZONE'        => 'Valore non corretto per la zona',
+		'ERROR_NS'          => 'Valore non corretto per il nameserver',
+		'ERROR_TXT'         => 'Valore non corretto per il campo TXT',
+		'ERROR_EMAIL'       => 'Valore non corretto per l\'E-mail',
+		'ERROR_PASSWORD'    => 'Le password non sono uguali',
+		'ERROR_ADMIN_EMAIL' => 'Valore non corretto per l\'E-mail Amministrativa',
+		'ERROR_REFRESH'     => 'Valore non corretto per il Refresh time',
+		'ERROR_RETRY'       => 'Valore non corretto per il Retry time',
+		'ERROR_EXPIRE'      => 'Valore non corretto per l\'Expire time',
+		'FILLOUT_FIELDS'    => 'Per favore riempire i seguenti campi:',
+		'EDIT_FIELDS'       => 'Per favore modificare i campi:',
+		'DELETE_RECORD'     => 'Il seguente record sta per essere cancellato:',
+		'USERNAME'          => 'Nome Utente',
+		'PASSWORD'          => 'Password',
+		'LOGIN_BUTTON'      => 'Login',
+		'PAGE_LOGIN'        => 'Pagina di Login',
+		'LOGIN_NOTE'        => 'Nota: Per poter effettuare il login occorre impostare il browser per accettare i cookie. Dopo un certo periodo di tempo ti verr&agrave; richiesto di rieseguire il login.',
+		'IDLE_TIMEOUT'      => 'Motivo del Logout: Timeout della connessione',
+		'MALFORMED_TICKET'  => 'Motivo del Logout: Sessione errata',
+		'INVALID_HASH'      => 'Motivo del Logout: Sessione sconosciuta',
+		'EXPIRED_TICKET'    => 'Motivo del Logout: Sessione scaduta',
+		'MISSING_SECRET'    => 'Motivo del Logout: Errore del server',
+		'TAMPERED_HASH'     => 'Motivo del Logout: Sessione modificata illecitamente',
+		'PASSWORD_CHANGE'   => 'La password verr&agrave; cambiata solo se verr&agrave; scritto qualcosa nel campo sottostante.'
+		); 
+
+    return %text; 
+} 
+
+1; 
+
+
+
+

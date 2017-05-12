@@ -1,0 +1,19 @@
+---
+abstract: 'Simple authentication to Atheme IRC services'
+author:
+  - 'Alexandria Marie Wolcott <alyx@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Authen-Simple-Atheme
+requires:
+  Atheme: 0
+  Authen::Simple::Adapter: 0
+  Params::Validate: 0
+version: 0.003

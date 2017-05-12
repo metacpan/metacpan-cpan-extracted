@@ -1,0 +1,35 @@
+---
+name: Acme-MetaSyntactic-vim
+version: 1.000001
+author:
+  - 'Elliot Shank <perl@galumph.com>'
+abstract: The Vim theme
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Acme::MetaSyntactic: 0.99
+  version: 0
+build_requires:
+  File::Find::Rule: 0
+  Test::More: 0
+  version: 0
+recommends:
+  File::Slurp: 0
+  Perl::Critic: 0
+  Pod::Coverage::CountParents: 0
+  Test::Differences: 0
+  Test::Distribution: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  Test::Spelling: 0
+dynamic_config: 1
+provides:
+  Acme::MetaSyntactic::vim:
+    file: lib/Acme/MetaSyntactic/vim.pm
+    version: 1.000001
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3

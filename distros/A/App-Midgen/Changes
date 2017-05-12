@@ -1,0 +1,248 @@
+Revision history for App-Midgen
+
+0.34 2014-05-25
+ - Bump to 0.34 and out to CPAN
+
+0.33_05 2014-05-18
+ - ignore dirs - bug found by farabi, azawawi++
+ - Info: now only if verbose >= 1
+
+0.33_03 2014-05-03
+ - conversion to using MetaCPAN::Client -> issue #7
+
+0.33_01 2014-04-27
+ - tweak regexs to allow lower case modules
+
+0.32 2014-04-08
+ - Bump to 0.32 and out to CPAN
+ - update tests
+
+0.31_07 2014-04-06
+ - fix issue with 2nd part of mro catch to only recast for meta1
+ - re-write parts of Eval
+ - various tweaks to tidy up the display of found data via verbose
+
+0.31_05 2014-03-22
+ - add MRO::Compat meta-1.x recast
+ - tweak logic to ignore mro - MRO::Compact regardless
+ - add skip to ignore unknown modules in t/
+
+0.31_03 2014-03-22
+ - add heuristics catach for runtimerecommends -> runtimerequires
+ - add heuristics catach for testsuggests -> testrequires
+ - do phase_relationship ajustment before calling output formats
+
+0.31_01 2014-03-17
+ - Add phase-requirments to infiles data store
+ - Add pmv mro catch
+ - Add catch for MRO::Compat tidy up
+ - Retain the search phase-relationship for some more huristics
+
+0.30 2014-03-12
+ - bump to 0.30 and out
+
+0.29_13 2014-03-11
+ - switch to getcwd
+ - switch to $] from $PERL_VERSION for perl 5.8 support
+ - update licence year
+ - add if can_xs to mi and midsl
+
+0.29_11 2014-03-01
+ - refactor internals to use meta2 phase-requirements naming internally
+ - rewite to support perl 5.8.1
+ - move use constant before Moo
+ - rewrite with out smartmatch
+ - ignore sub blocks - false positive in Eval
+
+0.29_09 2014-03-23
+ - hack the version check from Module::Version
+ - simplify the installed version check
+ - use version::is_lax as and where
+ - re-write to only use p-mv
+ - check all perl files in found (lib/ script/ share/ bin t/)
+ - check for min-ver in above also if exists
+ - remove v5.10 where it is not needed and add eval VERSION
+ - move composed methods in to a role - InDistribution
+
+0.29_07 2014-02-15
+ - switch to Module::Vesrion over ExtUtils::Installed->version
+
+0.29_05 2014-02-15
+ - Fix test for is_core in infiles
+
+0.29_03 2014-02-15
+ - Add Installed attribute to infile
+ - Switch to File::Slurp::Tiny nudge from ETHER++
+
+0.29_01 2014-02-09
+ - Fix typos in EUMM NEILB++
+
+0.28 2014-02-08
+ - Tweak Eval to catch postif cruff
+
+0.27_13 2014-02-05
+ - re-enable xtest for t and xt
+
+0.27_11 2014-02-04
+ - update licence year uft8 -> UTF-8 in pod
+ - tidy and a skip for infile - so that we don't bother with metacpan-api
+ - rewrite scanner Eval more accurate less code
+ - add optional prefix [Module::Runtime::]* to regex
+ - use the new scanners Eval & UseModule show output in infile
+ - update cpanfile & metajson outputs to display runtime_recommends
+
+0.27_09 2014-02-02
+ - fix failing test
+
+0.27_07 2014-02-02
+ - fix find-min-version I did knot know it was f***** Ouch :)
+ - Add output Format EUMM -> ExtUtils::MakeMaker
+ - remove the dzil format option
+
+0.27_05 2014-01-26
+ - Update additional scanners to extract version strings where possible if
+   present, used by infile format
+ - Add UseModule scanner for Module::Runtime Includes
+ - Eval.pm hack for finding try blocks as well
+ - Fix bug found by oliver++ where we were not checking module names first
+   char was upper
+ - add a valid licence to all files
+ - regex tweak for perl script to support #!perl
+
+0.26 2013-07-28
+ - Add EXE_FILES to dzil output format
+ - use rwp as and where to increase readability
+ - Add require Class::XSAccessor if can_cc for Moo
+ - Fix min-version status, opps it was back to front
+ - Add output format METAjson
+ - Add output format infile
+ - Update Eval scanner to take four
+ - Update Test-Requires scanner to take two
+ - use can_xs instead of can_cc ribasushi++
+ - start of experimental only displaying a module once 
+
+0.24 2013-06-03
+ - fix duplicate package name issue
+ - refactor the output format into composed roles
+
+0.23 2013-06-03
+ - refactor to use Perl::MinimumVersion::Fast for speed and coverage
+ - turn of anit-noise for PPI::XS if present
+ - switch Roles to use Type::Tiny
+
+0.22 2013-05-08
+ - Rename output format option from build to mb, azawawi++
+ - switch --verbose option over to support -v and -vv
+ - re-write using test-requires, we also find includes as well
+ - Turn off experimental warnings if > v17.5.10 rjbs++
+ - Add trait to find Test-requires
+ - Add trait to find use_ok
+
+0.21 2013-04-04
+ - Rename output format option from cfile to cpanfile miyagawa++
+
+0.20 2013-04-03
+ - re-write noisy children
+ - add cfile output format option for cpanfile prereqs
+ - refactor my roles, comment out cruff
+ - some eol and pod tweaks
+ - Add first attamp at finding dzill plugins
+ - Add dzill children to experimental option
+
+0.18 2013-03-24
+ - spelling mauke++
+ - refactor option names, inspired by mauke++
+ - changed default output, no extra processing, only distribution version
+   for modules without a version number mst++
+ - Add cmd option to show dual-line module versions
+ - All extra passing is now done in via experimental option
+ - Add ability to read options from ~/.midgenrc and write as well.
+ - Add color to experimental output only via Term-ANSIColor
+
+0.16 2013-03-17
+ - Fix bug in code - Use of implicit split to @_ is deprecated, moved into
+   composed method degree_separation and refactor
+
+0.15 2013-03-17
+ - Silly mistake, fix version number, removed trayling zeros
+
+0.14 2013-03-17
+ - Now using Perl-PrereqScanner to do most of the grunt work as pointed out
+   by Mithaldu++ daxim++ thanks guys.
+ - Switch to using MetaCPAN-API due to a write issue with CPAN, neilb++
+ - As a side affect of MetaCPAN-API we no longer have an 'undef' version
+   type, we also run noisy children against test requires
+ - All version numbers are now numified
+ - Added a time stamp, as we lost the free one from CPAN 
+
+0.12 2013-03-07
+ - Rewrite of all POD
+ - Add perl-minversion test
+ - Add method _is_perl to better test for vaild perl files
+ - A major refactoring to speed up operation
+ - base/parent know handles parent -norequire
+ - Do a version check for mojo catch
+ - Add no_index to Output
+ - More info output as food for thought
+
+0.10 2013-02-22
+ - be tougher on edge cases checking in tests for lines begin with use
+ - stop looking when we have found a couple of files for a package name
+ - add a timer to add with perception
+ - tidy some reg-ex up, some pbp to boot
+ - adding twins checking
+ - lets do some composition composed methods
+ - handle a test output without a package name azawawi++ [0583fda]
+ - adjust test so that we don't duplicate recommends
+ - Output format various changes
+ - Update Changes and tidy
+
+0.08 2013-02-13
+ - tweak the wiki page [582b3a1]
+ - tweak the POD for clarity [2b73d2f]
+ - remove autodie as WE are not doing any thing directly [d56e610]
+ - add test for use in an eval in testing [163576a]
+ - add test for use in an eval in testing add a second test for double to
+   complement single quote [4933099]
+ - add filters for the extra testing of t/ files to remove unwanted text
+   2nd go, still more to do [bed7915]
+ - pod pod pod, it's almost fun [5505f08]
+ - at last the test is 'not defined' as undef is ignored  [73baf27]
+ - Update Changes [82b1ba4]
+ - Add some running comments [a895b67]
+ - Add a catch block  [0f6f731]
+ - add dzil to roles [eff562f]
+ - Add an Output.pm and move all output formats to it start of [7f85598]
+ - that's the ruff copy of main body output in [8deb173]
+ - that's double quoted the dzil module names done [588addc]
+ - spellcheck [dd315f7]
+ - Update Changes [16d9516]
+
+0.07 2013-02-10
+ - Update Changes [d62fc0b]
+ - remove strictures [dd86b71]
+ - remove an unwanted dependency [5eaca1d]
+ - put a copy of pod in readme.md [4100b1a]
+ - bump to version 0.07 [1b1bcc4]
+
+0.06 2013-02-10
+ - first pass of midgen against it's self,  [6a37b2e]
+ - first attempt at a Role with the GetOpps Long cmd variables [61c8e11]
+ - Add noise control for PPI::XS test, we can't use it			   
+      as it has deprecated calls [8f6d32e]
+ - encapsulated attributes [5efce18]
+ - cooking on gas, as it was, so we are working [722185f]
+ - add some encapsulated attributes to store our module and version info in
+ - run against self - update with minilist contents [3b18315]
+ - use block form -> map [feef369]
+ - add some error checking to out attributes [35180ab]
+ - add defaults to attributes [909ee9e]
+ - the out come of re-reading PPI pod, a tweak here and there [2331f55]
+ - Hack for use_ok in test files, Ouch! but working [57a93e9]
+ - opps duplicates. yuck, ok now [5c0d4df]
+ - the joy of re-factoring, fixing things that used to work :) [50e9caa]
+
+0.05 2013-02-04
+ - Initial release. (BOWTIE)
+ - which is midgen.pl ver 0.05
+

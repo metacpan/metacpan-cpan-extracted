@@ -1,0 +1,513 @@
+Revision history for Perl extension EyeDrops
+
+0.01	Sun Sep 23 11:35:12 2001
+
+	- original version
+
+0.02	Tue Sep 25 18:05:02 2001
+
+	- updated version number :-)
+	- improved documentation
+	- new functions: get_builtin_shapes, get_eye_shapes
+	- extra tests added
+
+0.03	Sun Sep 30 14:07:03 2001
+
+	- fixed die within eval with new TrapEvalDie attribute
+	- new test t/nasty.t added to test TrapEvalDie
+	- fixed SIG warnings with new TrapWarn attribute
+	- improved filler: added $_ to $:
+	- changed encoding from octal (%o) to hex (%x)
+	  for chars in range 128..255; this reduces binary
+	  encoding size
+	- minor performance improvements
+	- minor shape improvements
+
+0.04	Sun Oct 7 11:31:42 2001
+
+	- minor improvements to documentation
+	- new tests t/recur.t and t/limit.t
+	- crude test for END block added
+
+0.05	Sun Oct 14 17:19:42 2001
+
+	- minor fixes to demo/sightly.pl
+	- new shape: spoon
+	- minor improvements to documentation
+
+1.00	Sat Nov 10 15:12:11 2001
+
+	- new shapes: larry, damian, cricket, mongers
+	- new functions: border_shape, invert_shape, rotate_shape
+	- new attributes: Rotate, Invert, BorderGap, BorderWidth
+	- documentation improvements
+
+1.01	Sun Nov 11 11:10:09 2001
+
+	- new shape from Ryan King: larry2
+	- minor improvements to documentation
+
+1.02	Sun Dec 9 17:11:42 2001
+
+	- minor improvements to documentation
+	- minor enhancements to demo/sightly.pl
+	- left-justified spoon.eye
+	- changed parameters to border_shape function
+	- new attributes: BorderGapLeft, BorderGapRight etc.
+	-                 BorderWidthLeft, BorderWidthRight etc.
+	- new attribute: Indent
+	- new attribute: Reflect
+	- new attribute: FillerVar
+	- new shape: merlyn
+	- fixed module bug raised by Mark Puttnam
+	- added new test program module.t to test Mark's bug
+
+1.03	Sat Dec 15 18:42:09 2001
+
+	- minor improvements to documentation
+	- new shapes: golfer, santa and buffy2
+
+1.04	Sat Jan 5 14:15:15 2002
+
+	- minor improvements to documentation
+	- minor fixes to shape: buffy2
+	- new shape: camel2 (use.perl.org camel)
+	- new shape: camel3 (London.pm bactrian camel at London zoo)
+	- new shape: dipsy (London.pm infobot is called dipsy)
+	- new shape: buffy3 (buffy riding a pony)
+
+1.05	Sun Jan 6 17:09:35 2002
+
+	- minor improvements to documentation
+	- minor fixes to shape: buffy3
+	- new shape: buffy4 (horizontal banner of "Buffy")
+	- new shape: riding (banner of "riding")
+	- new shape: a (banner of "a")
+	- new shape: pony (banner of "Pony")
+
+1.06	Sun Feb 24 23:09:35 2002
+
+	- minor improvements to documentation
+	- minor code improvements
+	- minor fixes to shape: pony, buffy2
+	- new shape: london
+	- new shape: pony2
+	- new shape: eugene
+	- new shape: tpr
+
+1.07	Sun Mar 31 15:12:17 2002
+
+	- improved documentation, added Buffy looking in the mirror
+	- fixed EyeDrops.pm to work with Perl 5.7.3
+	  only needed to change:
+	   $src =~ tr#\\[]{}<>^_|~'`#/()()()H-!T""#;
+	  to:
+	   $src =~ tr#_\\[]{}<>^|~'`#-/()()()H!T""#;
+	  due to 'invalid range' H-! error
+	- minor change to shapes: damian, camel
+	- new shape: kermit (thanks Jason)
+	- new shape: pgolf (thanks `/anick)
+	- fixed bug where EyeDrops sometimes generated an
+	  invalid program or more shapes than it needed to
+	- new test: limit2.t to verify above bug fixed
+	- new test: sightly2.t
+	- made sure test programs clean up all .tmp files
+	- added -Mstrict to all test programs to ensure
+	  they work with -w and 'use strict' too
+	- localised file globals appropriately in all test programs
+	- tested under Win98 and adjusted nasty.t accordingly
+
+1.08	Sun Apr 21 16:13:18 2002
+
+	- documentation: added sub-sections to Examples section
+	- documentation: added 'Dueling Dingos' sub-section
+	- minor change to shape: pgolf
+	- new shape: eye
+	- new shape: mosquito
+	- new shape: coffee
+	- new shape: yanick
+	- new shape: yanick2
+	- new shape: yanick3
+
+1.09	Sun May 19 17:09:12 2002
+
+	- new attributes: Reduce and Expand
+	- new attributes: RotateType and RotateFlip
+	- new functions: reduce_shape and expand_shape
+	- new rtype/flip parameters added to rotate_shape function
+	- rotate 90 and 270 now work, no longer squashed
+	- added support for new attributes to demo/sightly.pl
+	- new test: reshape.t (tests Reduce, Expand, Rotate)
+	- new test: camel.t
+	- documentation: added 'Thirty Two Camels' sub-section
+	- minor change to shape yanick (identical dimensions to camel now)
+
+1.10	Wed May 29 19:08:11 2002
+
+	- new attribute: Compact
+	- function pour_sightly: added new compact parameter
+	- added support for Compact attribute to demo/sightly.pl
+	- test camel.t: enhanced with Compact tests
+	- documentation: increased from 'Thirty Two Camels'
+	  to 'Twelve Thousand and Thirty Two Camels'
+	- documentation: improved 'Buffy Looking in the Mirror'
+
+1.11	Sun Jun 30 11:02:09 2002
+
+	- new shape: alien
+	- documentation: minor improvements
+	- documentation: added 'Somersaulting Camels' section
+
+1.12	Sun Aug 4 14:17:01 2002
+
+	- new shape: llama
+	- new shape: parrot
+	- new shape: simon
+	- new shape: jon
+	- new shape: yanick4
+	- new shape: tonick
+	- documentation: minor changes
+	- documentation: added 'Abbreviated History of Perl 6' section
+
+1.13	Sun Sep 15 17:05:09 2002
+
+	- new shape: siertri
+	- new shape: undies
+	- minor change to shape: simon
+	- documentation: minor changes
+	- documentation: added 'Sierpinski Triangles' section
+
+1.14	Sun Sep 22 18:42:14 2002
+
+	- converted siertri shape to a built-in (removed siertri.eye)
+	- documentation: retracted claim that Mtv's Sierpinski program
+	  is the shortest (thankyou Adam and Eugene)
+	- documentation: minor changes
+
+1.15	Sun Oct 6 19:31:14 2002
+
+	- new shape: acme
+	- code: minor changes
+	- documentation: minor changes
+
+1.16	Sun Nov 3 19:31:14 2002
+
+	- new shape: schwern
+	- new shape: naw
+	- new shape: gelly
+	- minor change to shape: acme
+	- documentation: minor changes
+	- documentation: added 'Naked Arm Wrestling' section
+
+1.17	Sun Dec 8 12:21:04 2002
+
+	- new shape from cam.pm: snow
+	- new program to generate table: demo/gentable.pl
+	- fixed bug where EyeDrops sometimes generated an
+	  invalid program
+	- extended limit2.t (test 9) to verify above bug fixed
+	- minor code improvements
+
+1.18	Sun Dec 22 13:25:12 2002
+
+	- new shape from Takanori KAWAI: kansai_pm
+	- new shape from Takanori KAWAI: writing_perl
+	- new shape derived from Yanni's Ascii Art collection: candle
+	- new shape derived from Yanni's Ascii Art collection: china1
+	- new shape derived from Yanni's Ascii Art collection: panda
+	- new shape derived from Yanni's Ascii Art collection: santa2
+	- minor code improvements
+
+1.19	Sun Jan 5 15:09:04 2003
+
+	- new shape from cam.pm: beer
+	- new shape: campm
+	- minor change to shape: candle
+	- minor change to shape: china1
+	- documentation: minor changes
+	- minor code improvements
+
+1.20	Sun Jan 12 12:21:55 2003
+
+	- documentation: added 'EyeDropping EyeDrops.pm' section
+	- minor code improvements
+
+1.21	Sun Jan 19 14:01:12 2003
+
+	- documentation: minor changes
+	- minor code improvements
+
+1.30	Sun Feb 23 17:19:04 2003
+
+	- new function: pour_text
+	- new attributes: Text, TextFiller
+	- added support for new attributes to demo/sightly.pl
+	- new test: text.t
+	- documentation: added 'Snowflakes' section
+	- minor code improvements
+
+1.31	Sun Mar 30 18:16:14 2003
+
+	- FillerVar attribute: allow a simple string as an
+	  alternative to a reference to filler variables
+	- limit.t, sightly.t: new test cases added
+	- added file: demo/hellotest.pl
+	- minor code improvements
+
+1.32	Sun Apr 13 15:09:17 2003
+
+	- added Build.PL and adjusted Makefile.PL (thanks Ken)
+	- added META.yml
+	- new function: get_eye_string
+	- documentation: make_triangle, make_siertri, make_banner
+	- convert.t, sightly.t: new test cases added
+
+1.33	Sat May 3 11:19:27 2003
+
+	- new shape: baghdad
+	- documentation: added 'Baghdad Bob' section
+
+1.34	Sun June 8 23:42:05 2003
+
+	- documentation: added '99 Bottles of Beer' section
+	- new shapes: bottle, bottle2
+	- new function: hjoin_shapes
+	- new attributes: TrailingSpaces, RemoveNewlines
+	- added support for new attributes to demo/sightly.pl
+	- function make_banner: strip leading spaces if any
+	- new test: vshape.t
+	- reshape.t, sightly2.t: new test cases added
+
+1.35	Sun June 15 09:09:59 2003
+
+	- new shape: heart (thanks `/anick)
+	- new shape: rose
+	- test vshape.t: fixed Linux-only banner test
+	- Build.PL: fixed for Module::Build v0.19
+
+1.40	Sun June 29 11:19:33 2003
+
+	- There were getting to be too many .eye files cluttering the
+	  vitally important Acme root directory, so I moved them from
+	  Acme directory to Acme/EyeDrops directory (if you have installed
+	  a previous version of Acme::EyeDrops, suggest you delete old
+	  .eye files in the Acme root directory)
+	- new shape: flag_canada (to mark Canada day, thanks `/anick)
+	- new shape: map_australia
+	- new shape: hipowls
+	- new built-in shape: all
+	- minor change to shape: rose
+	- removed demo/helloworld.pl from distribution
+	- removed demo/hellotest.pl from distribution
+	- removed demo/examples.pl from distribution
+	- updated test programs to not rely on demo directory
+
+1.41	Sun July 27 18:22:04 2003
+
+	- new shapes: smiley, smiley2, smiley3
+	- built-in shape 'all': now supports Width parameter
+	- documentation: shortened some examples
+	- new functions: get_eye_dir, set_eye_dir
+	- new functions: add_builtin_shape, del_builtin_shape
+	- new attribute: InformHandler
+	- function pour_sightly: added new inform_handler parameter
+	- new tests: border.t, gen.t, yharn.t, zgen.t (generated)
+	-            sightly2.t removed (put into sightly.t)
+	- test vshape.t: added tests for new functions
+	- tests: now skipped correctly
+	- tests: text.t now run in taint mode (-Tw)
+	- Fixed some minor border-related bugs exposed by border.t
+	- added camel shape to Makefile.PL/Build.PL
+	- Support PERL_SMOKE environment variable for long-running tests
+	  (see http://archive.develooper.com/perl-qa@perl.org/msg01927.html,
+	  thanks merlyn)
+
+1.42	Sun Aug 3 12:02:08 2003
+
+	- Bug fix release for Perl 5.8.1 (see Perl bug #23143).
+	- For the first time, the EyeDrops test suite uncovered a Perl bug
+	  (dance a little jig): recur.t, test 4 failed on Perl 5.8.1-RC2
+	  with the error: panic: pad_free curpad. Thanks merlyn for reporting.
+	  Since this bug won't be fixed for 5.8.1, we workaround
+	  it by never using $_ as a filler variable
+	- sightly.t: run generated test programs in taint mode
+	- tests: renamed to more appropriate names
+	- tests: new long running test 13_to.t
+	- documentation: added "Getting Started" section
+	- documentation: fixed program in "Naked Arm Wrestling" section
+	- documentation: updated 'Abbreviated History of Perl 6' section
+
+1.43	Sun Aug 31 17:12:55 2003
+
+	- new shapes: alpaca, bighorn, map_italy
+	- removed functions set_eye_dir, add_builtin_shape, del_builtin_shape
+	  which were mistakenly added to version 1.41 (these are not really
+	  necessary and change module state, which is a Bad Thing)
+	- documentation: added 'twang bra-strap' to acme shape description
+	- tests: merged old 13_to.t, old 12_Beer.t to new 19_surrounds.t
+	         new Test::Pod test, 18_sky.t
+	         11_bold.t now tested in taint mode (no banner test)
+	         12_Beer.t now banner test only (not taint safe)
+
+1.44	Sun Apr 25 19:07:41 2004
+
+	- Bug fix release for Perl 5.8.4: some of the tests broke because
+	  they were naughtily exploiting a Perl bug re use strict inside
+	  (?{...}) constructions in regexps (see 01_mug.t/05_Parrot.t)
+	- new shapes: map_world1, map_world2, map_world3, map_japan, map_uk
+	- new shapes: music, dan, bottle3
+	- Build.PL: fixed for Module::Build v0.24 (_find_file_by_type changed)
+	- new attribute: SourceHandle
+	- new test: 14_gulp.t tests SourceHandle (and other invalid attributes)
+	- minor code improvements (removed $this_dir, check for invalid
+	  attrs in sightly(), allow SourceFile/SourceString of '0')
+	- documentation: updated stale URL links
+
+1.45	Mon Dec 27 17:15:04 2004
+
+	- new shape: halloween (thanks TheEnigma)
+	- new shape: koaladile (thanks Schwern)
+	- new shape: saturn
+	- renamed function slurp_tfile() to _slurp_tfile()
+	- regenerated zgen.t (gen.t changed due to slurp_tfile() change)
+	     (regenerated it with: perl -w -I lib t/gen.t generate)
+	- pod coverage: documented slurp_yerself()
+	- tests: improved the ugly test suite a little
+	     new test: 16_astride.t simple threads test
+	     new test: 17_Orange.t tests pod coverage
+	     split 00_Coffee.t into two (last bit is now 15_Buffy.t)
+	     added slurp_yerself() tests to 13_to.t
+	     added Regex => 0 tests to 05_Parrot.t
+	     exercise regex_binmode_print_sightly() in 05_Parrot.t
+	     new tests added to 05_Parrot.t/06_not.t/10_Ponie.t et al
+	     in response to gaping holes detected by Devel::Cover
+	     removed exit 0 from end of tests
+	- documentation: added new Error Handling section
+	- Devel::Cover results: stmt   branch cond  sub    pod   total
+	                        95.2   91.3   90.8  100.0  100.0  93.5
+
+1.46	Sat May 14 23:21:04 2005
+
+	- new shape: pugs
+	- new shape: pugs2
+	- minor code improvements (limited scope of %builtin_shapes)
+	- tests: fixed Test::More dependency in 17_Orange.t
+	     simplified 18_sky.t (Test::Pod)
+	     added invalid shape test to 14_gulp.t
+
+1.47	Sat May 21 19:15:33 2005
+
+	- new shape: autrijus
+	- documentation: updated 'Abbreviated History of Perl 6' section
+	- tests: added new test to 05_Parrot.t
+	- Build.PL: simplified for Module::Build 0.26 and above
+	- Temporarily renamed Build.PL to xBuild.PL to stop CPAN tester
+	  robots from using Build.PL (got a lot of unexplained failures
+	  with v1.46, yet they worked fine when installed manually)
+
+1.50	Sat August 6 23:08:42 2005
+
+	- First attempt at "shape properties" -- note that these
+	  are experimental and subject to change in future releases
+	- Added new .eyp (properties) files for all .eye shapes
+	- new functions: get_eye_properties
+	                 find_eye_shapes
+	                 get_eye_keywords
+	- new internal functions: _get_properties
+	                          _get_eye_shapes
+	                          _get_eye_string
+	                          _get_eye_properties
+	                          _find_eye_shapes
+	                          _get_eye_keywords
+	- new attribute: EyeDir
+	- documentation: added 'Shape Properties' section
+	- new program: demo/findshapes.pl
+	- tests: added property tests to 13_to.t
+	- tests: adjusted 19_surrounds.t for .eyp files
+	- new shape: schwern2 (shape schwern without the banner)
+
+1.51	Sun September 11 23:17:33 2005
+
+	- new shape: adrianh
+	- minor enhancements to demo/findshapes.pl
+	- tests: improved property tests in 13_to.t
+	- tests: added InformHandler throw test to 07_a.t
+	- minor code improvements
+
+1.52	Sun February 3 20:12:42 2008
+
+	- Bug fix release for Perl 5.10.0
+	- Yay, the EyeDrops test suite uncovers another perl bug. :-)
+	  02_shatters.t (tests 2-4) and 09_Gallop.t (tests 3-6)
+	  both failed on Perl 5.10.0 with "Out of memory!".
+	  Workaround for now by commenting out these tests.
+	  Need to investigate further and perlbug to P5P.
+	- new shape: jon_oxer (thanks pjf)
+	- fixed META.yml to comply with its latest spec (1.3) at
+	  http://module-build.sourceforge.net/META-spec-current.html
+
+1.53	Wed July 16 18:17:16 2008
+
+	- new shape: debian (thanks Richard Hartmann)
+	- new shape property keyword: debian
+	- CPAN testers report occasional failures in test 01_mug
+	  on Perl 5.10.0 with "Out of memory!". Don't know why.
+	  Requires further investigation. Meanwhile, I'll try commenting
+	  out parts of this test and see if the failures disappear.
+
+1.54	Sun August 31 21:19:04 2008
+
+	- new shape: opera (thanks Cosimo)
+	- new shape: kangaroo
+	- new shape: moose
+	- new shape: moosecamel (modelled after http://irclog.perlgeek.de)
+	- new shape property keywords: logo, opera
+	- logo keyword shapes are: debian, opera, pgolf, mongers
+
+1.55	Mon December 1 21:42:07 2008
+
+	- fixed rt #39035 "The Acme-EyeDrops Archive Contains World-Writable files"
+	- documentation: updated "99 Bottles of Beer" section with one stroke golf
+	  improvement to mtve/thospel original shortest solution
+
+1.60	Sat May 12 23:59:42 2012
+
+	- Bug fix release for upcoming Perl 5.16.0
+	- Dropped support for Perl 5.005; A::E now requires Perl 5.6 or higher
+	- Clarified Acme::EyeDrops license (thanks Jotam Jr. Trejo)
+	    LICENSE and README were inconsistent with META.yml
+	    all should be consistent now
+	- minor code improvements for perl 5.6+ requirement:
+	    added "use warnings" to EyeDrops.pm
+	    use lexical file handles now
+	    can use readline() function now
+	- documentation: removed "A Slow Day" section
+	- documentation: added new "Victoria Bra, Secret Tango" section
+	- new shape: bra
+	- new shape: spider
+	- 01_mug.t: fixed rt #72163: perl -Mstrict -e 'open$['
+	  'Can't use string ("0") as a symbol ref while "strict refs" in use'
+	  This seems to be a long-standing perl bug fixed in 5.16
+	  Fixed test simply by removing -Mstrict in 01_mug.t
+	- 16_astride.t: threads test, adjusted to avoid annoying
+	  "Tests out of sequence" failure reports from CPAN testers
+
+1.61	Mon May 20 21:59:42 2013
+
+	- Bug fix release for Perl 5.18.0
+	- Tragically, perl 5.18 requires a leading "use re 'eval'"
+	  if you embed the program in a regex. To appease this change
+	  in behavior, the Regex attribute now supports three different
+	  "true" values:
+	   1: add a leading "use re 'eval';" for Perl 5.18+ only
+	   2: do not add a leading "use re 'eval';"
+	   3: add a leading "use re 'eval';"
+	- Updated test suite to work with new Regex attribute
+	- Updated sightly.pl to work with new Regex attribute
+
+1.62	Sun Apr 12 17:12:42 2015
+
+	- new shape: thumbsup
+	- new shape: heart2
+	- new shape: smiley4
+	- documentation: added new "Love Birds" section

@@ -1,0 +1,5 @@
+AxKit ESQL Taglib
+
+This taglib offers quite extensive SQL support via DBI.
+
+See perldoc AxKit::XSP::ESQL for details

@@ -1,0 +1,34 @@
+.gitignore
+.travis.yml
+benchmark/compare.pl
+benchmark/internal.pl
+benchmark/r1.yml
+benchmark/r2.yml
+benchmark/test_ai.pl
+benchmark/test_c.c
+Changes
+CMakeLists.txt
+intspan.c
+intspan.h
+lib/AlignDB/IntSpanXS.pm
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+README.md
+t/00.load.t
+t/01.basic.t
+t/02.misc.t
+t/03.index.t
+t/04.grep_map.t
+t/05.runlist.t
+t/06.relation.t
+t/07.binary.t
+t/08.spans.t
+t/09.spans_op.t
+t/10.inter_set_op.t
+t/11.islands.t
+t/12.overload.t
+typemap
+xs.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

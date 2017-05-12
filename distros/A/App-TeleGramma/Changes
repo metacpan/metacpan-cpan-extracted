@@ -1,0 +1,63 @@
+0.13      2017-05-02 20:58:33+09:30 Australia/Adelaide
+
+Reduce frequency of YearProgress check, and capture failures to send messages.
+
+0.12      2017-04-28 23:51:09+09:30 Australia/Adelaide
+
+New plugin App::TeleGramma::Plugin::Core::YearProgress, keep abreast of the
+terrifyingly fast progress of the year.
+
+0.11      2017-04-27 22:38:32+09:30 Australia/Adelaide
+
+Clean up command line options, add --help and --version.
+
+0.10      2017-04-27 20:36:19+09:30 Australia/Adelaide
+
+Fix bug where the /timer plugin would always respond with help.
+
+When timer expires, include the @username of the requester.
+
+0.09      2017-04-27 15:35:34+09:30 Australia/Adelaide
+
+New plugin App::TeleGramma::Plugin::Core::Timer to allow users to set timers.
+
+0.08      2017-04-26 16:46:46+09:30 Australia/Adelaide
+
+Use newest Mojolicious and change from deprecated/removed functions.
+
+0.07      2017-03-16 20:15:29+10:30 Australia/Adelaide
+
+Support for commands to be bare regexes.
+
+Add App::TeleGramma::Plugin::Core::Thants plugin to give thanks, the
+"Look Around You" way.
+
+Pass the 'body' of a command to App::TeleGramma::BotAction::Listen users.
+
+0.06      2017-02-03 14:45:52+10:30 Australia/Adelaide
+
+Require Module::Pluggable v5.2 to ensure we have search_dirs.
+
+0.05      2017-02-02 14:34:53+10:30 Australia/Adelaide
+
+Fix Stenographer plugin when logging entries for users with no username.
+
+Improve documentation.
+
+Add more diagnostics to tests to try to work out why occasional cpantesters tests fail.
+
+0.04      2017-01-31 10:22:19+10:30 Australia/Adelaide
+
+Harden Stenographer plugin against more types of chat messages.
+
+0.03      2017-01-30 23:38:11+10:30 Australia/Adelaide
+
+Update metadata to point to github.
+
+0.02      2017-01-30 23:25:13+10:30 Australia/Adelaide
+
+Fix problem test which referred to a missing plugin.
+
+0.01      2017-01-30 23:13:01+10:30 Australia/Adelaide
+
+Initial release.

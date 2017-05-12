@@ -1,0 +1,62 @@
+{
+   "abstract" : "Run a command when watched files change",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-watchdo",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "7.0",
+            "AnyEvent::Filesys::Notify" : "1.21",
+            "AnyEvent::Loop" : "0",
+            "List::MoreUtils" : "0.4",
+            "Moo" : "2.000002",
+            "Path::Tiny" : "0.068",
+            "VCS::Which" : "v0.6.1",
+            "perl" : "5.006",
+            "version" : "0.9912"
+         }
+      }
+   },
+   "provides" : {
+      "App::watchdo" : {
+         "file" : "lib/App/watchdo.pm",
+         "version" : "v0.0.6"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::watchdo"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/ivanwills/App-watch-do.git"
+      }
+   },
+   "version" : "v0.0.6",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

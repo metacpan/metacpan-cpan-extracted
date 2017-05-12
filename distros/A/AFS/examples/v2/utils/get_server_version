@@ -1,0 +1,18 @@
+#!/usr/local/bin/perl
+
+use v5.10.0;
+use blib;
+use strict;
+use warnings;
+
+use AFS::Utils qw (get_server_version);
+
+die "Usage: $0 service host [verbose]\n" if ($#ARGV < 1);
+
+my $service = shift;
+my $host    = shift;
+my $verbose = shift // 0;
+
+my $version = get_server_version($service, $host, $verbose);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "Host $host AFS Service $service: Version = $version\n"; }

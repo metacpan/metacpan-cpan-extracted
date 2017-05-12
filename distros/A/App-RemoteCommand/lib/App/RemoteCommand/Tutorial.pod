@@ -1,0 +1,153 @@
+=encoding utf-8
+
+=for stopwords misc
+
+=head1 NAME
+
+App::RemoteCommand::Tutorial - tutorial!
+
+=head1 TUTORIAL
+
+App::RemoteCommand or its frontend C<< rcommand >>
+is a simple remote command launcher via ssh.
+You can use it like C< ssh > command.
+
+Let's say you have 6 hosts:
+
+    www001.example.com, www002.example.com, www003.examle.com,
+    www001.example.jp,  www002.example.jp,  www003.examle.jp
+
+and you can ssh these hosts without password or passphrase.
+If your ssh private key needs a passphrase, please setup C<ssh-agent> first.
+
+=over 4
+
+=item 1. simple
+
+The usual form is (much like C<ssh> command):
+
+    > rcommand HOSTS COMMANDS
+
+For example, to execute C<uname> command in C<www001.example.com>:
+
+    > rcommand www001.example.com uname
+    [www001.example.com] Linux
+    SUCCESS www001.example.com
+
+Add C<www002.example.com> too:
+
+    > rcommand 'www001.example.com,www002.example.com' uname
+    [www001.example.com] Linux
+    [www002.example.com] Linux
+    SUCCESS www001.example.com
+    SUCCESS www002.example.com
+
+Oh, you can use range notation C<< [*-*] >> instead of using just separator C<< , >>:
+
+    > rcommand 'www[001-003].example.com' uname
+    [www001.example.com] Linux
+    [www002.example.com] Linux
+    [www003.example.com] Linux
+    SUCCESS www001.example.com
+    SUCCESS www002.example.com
+    SUCCESS www003.example.com
+
+and choice notation C<< {*,*} >>:
+
+    > rcommand 'www001.example.{com,jp}' uname
+    [www001.example.com] Linux
+    [www001.example.jp] Linux
+    SUCCESS www001.example.com
+    SUCCESS www001.example.jp
+
+of course both at the same time:
+
+    > rcommand 'www00[1-2].example.{com,jp}' uname
+    [www001.example.com] Linux
+    [www002.example.com] Linux
+    [www001.example.jp] Linux
+    [www002.example.jp] Linux
+    SUCCESS www001.example.com
+    SUCCESS www002.example.com
+    SUCCESS www001.example.jp
+    SUCCESS www002.example.jp
+
+=item 2. execute local script
+
+Sometimes it is hard to write command in one liner.
+Why don't you write a script in local and execute it with C< rcommand >:
+
+    > cat local-script.sh
+    #!/bin/bash
+    percent=`df -h | grep /dev/sda1 | perl -anle '$F[-2] =~ s/%//; print $F[-2]'`
+    if [ $percent -lt 80 ]; then
+      echo "OK $percent%"
+    else
+      echo "NG $percent%"; exit 1
+    fi
+
+    > rcommand --script local-script.sh 'www00[1-2].example.jp'
+    [www002.example.jp] OK 65%
+    [www001.example.jp] NG 85%
+    FAIL www001.example.jp
+    SUCCESS www002.example.jp
+
+Note that the SUCCESS/FAIL summary is displayed in the end.
+
+=item 3. sudo password
+
+If you want to run command which includes C<< sudo >> command,
+please execute C<< rcommand >> with C<< --ask-sudo-password  >> option:
+
+    > rcommand --ask-sudo-password 'www00[1-2].example.jp' sudo service cron restart
+    sudo password (asking with rcommand):
+    [www002.example.jp] sudo password (asking with rcommand):
+    [www002.example.jp]
+    [www001.example.jp] sudo password (asking with rcommand):
+    [www001.example.jp]
+    [www002.example.jp] cron stop/waiting
+    [www002.example.jp] cron start/running, process 7416
+    ...
+
+=item 4. misc
+
+You can specify target hosts by host file with C<< --host-file >> option:
+
+    > cat host.txt
+    # comment
+    www001.example.jp
+    www002.example.com
+
+    > rcommand --host-file host.txt 'w | head -n1'
+    [www002.example.com]  15:35:11 up  2:00,  1 user,  load average: 0.00, 0.01, 0.05
+    [www001.example.jp]  15:35:12 up  2:00,  2 users,  load average: 0.03, 0.03, 0.05
+    ...
+
+You can append current time to each output line with C<< --append-time >> option:
+
+    > rcommand --append-time www001.example.jp 'echo 1; sleep 1; echo 2'
+    [2015-01-05 00:36:58][www001.example.jp] 1
+    [2015-01-05 00:36:59][www001.example.jp] 2
+    ...
+
+You can remove hostname in each output line with C<< --no-append-hostname >> option:
+
+    > rcommand --no-append-hostname www001.example.jp 'uname -a'
+    Linux vagrant-ubuntu-trusty-64 3.13.0-30-generic #55-Ubuntu SMP Fri Jul 4 21:40:53 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux
+    SUCCESS www001.example.jp
+
+By default, C<< rcommand >> execute command in 5 parallel.
+You can change it with C<< --concurrency >> option:
+
+    > rcommand --concurrency 1 -a 'www00[1-3].example.{jp,com}' sudo service httpd stop
+    ...
+
+=item 5. help
+
+Please type:
+
+    > rcommand --help
+
+=back
+
+=cut

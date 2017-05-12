@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+#
+# example04 - example of hamming code to data converter.
+#
+# USAGE: ./example04 infile outfile
+#
+# 18-Oct-2003	Brendan Gregg	Created this.
+
+use Algorithm::Hamming::Perl  qw(hamming unhamming unhamming_err);
+
+### Check args
+if (@ARGV < 2) {
+	die "USAGE: ./example04 infile outfile\n";
+}
+
+$infile = $ARGV[0];
+$outfile = $ARGV[1];
+
+### Open filehandles
+open(IN,"$infile") || die "ERROR: Can't open $infile: $!\n";
+open(OUT,">$outfile") || die "ERROR: Can't open $outfile: $!\n";
+binmode(IN);
+binmode(OUT);
+
+### Use optional faster (but bigger) cache - adds several seconds to startup!
+Algorithm::Hamming::Perl::hamming_faster();
+
+
+### Process data
+while (read(IN,$buffer,3072)) {
+	$data = unhamming($buffer);
+	print OUT $data;
+}
+
+close IN;
+close OUT;

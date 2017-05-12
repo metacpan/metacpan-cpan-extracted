@@ -1,0 +1,47 @@
+examples/canned_example1.pl
+examples/canned_example2.pl
+examples/canned_example3.pl
+examples/canned_example4.pl
+examples/canned_example5.pl
+examples/canned_example6.pl
+examples/cleanup_directory.pl
+examples/cluster_plot.png
+examples/data_generator.pl
+examples/data_scatter_plot.png
+examples/datafile_1d.txt
+examples/mydatafile1.dat
+examples/mydatafile2.dat
+examples/mydatafile3.dat
+examples/mydatafile4.dat
+examples/mydatafile5.dat
+examples/mydatafile6.dat
+examples/mydatafile7.dat
+examples/sphericaldata.csv
+examples/param1.txt
+examples/param2.txt
+examples/param3.txt
+examples/param4.txt
+examples/param5.txt
+examples/param6.txt
+examples/param7.txt
+examples/posterior_prob_plot.png
+examples/README
+examples/save_example_1_cluster_plot.png
+examples/save_example_1_posterior_prob_plot.png
+examples/save_example_2_cluster_plot.png
+examples/save_example_2_posterior_prob_plot.png
+examples/save_example_3_cluster_plot.png
+examples/save_example_3_posterior_prob_plot.png
+examples/save_example_4_cluster_plot.png
+examples/save_example_4_posterior_prob_plot.png
+examples/save_example_5_cluster_plot.png
+examples/save_example_5_posterior_prob_plot.png
+examples/save_example_6_cluster_plot.png
+examples/save_example_6_posterior_prob_plot.png
+lib/Algorithm/ExpectationMaximization.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/test.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

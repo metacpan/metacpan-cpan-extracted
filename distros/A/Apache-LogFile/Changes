@@ -1,0 +1,13 @@
+=item 0.12 - November 16, 1998
+
+added directive handler interface
+ 
+=item 0.11 - February 20, 1998
+
+added typemap to MANIFEST so the darn thing will build,
+thanks to Randal Schwartz for the report
+
+=item 0.10 - February 12, 1998
+
+First release
+

@@ -1,0 +1,7 @@
+Revision history for ARS-Simple
+
+0.01    2013-12-04
+        First version. A set of utility methods to make using ARSPerl simpler.
+        Kudos to Joel Murphy et al for developing and maintaining ARSPerl over
+        the years.  Thanks also to Remedy Corporation for making the API C available
+

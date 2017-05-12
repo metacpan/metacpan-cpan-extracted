@@ -1,0 +1,41 @@
+---
+abstract: 'Resolve repository of CPAN Module'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-CPANRepo
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::CPANRepo:
+    file: lib/App/CPANRepo.pm
+    version: '0.01'
+requires:
+  Class::Accessor::Lite::Lazy: '0'
+  Getopt::Long: '0'
+  MetaCPAN::Client: '1.005000'
+  Pod::Usage: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Songmu/p5-App-CPANRepo/issues
+  homepage: https://github.com/Songmu/p5-App-CPANRepo
+  repository: git://github.com/Songmu/p5-App-CPANRepo.git
+version: '0.01'
+x_authority: cpan:SONGMU

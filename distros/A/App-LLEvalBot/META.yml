@@ -1,0 +1,47 @@
+---
+abstract: 'IRC bot for LLEval'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  Test::Exit: '0'
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-LLEvalBot
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::LLEvalBot:
+    file: lib/App/LLEvalBot.pm
+    version: '0.01'
+  App::LLEvalBot::CLI:
+    file: lib/App/LLEvalBot/CLI.pm
+requires:
+  Getopt::Long: '2.39'
+  LLEval: '0'
+  Mouse: '0'
+  Pod::Usage: '0'
+  UnazuSan: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Songmu/p5-App-LLEvalBot/issues
+  homepage: https://github.com/Songmu/p5-App-LLEvalBot
+  repository: git://github.com/Songmu/p5-App-LLEvalBot.git
+version: '0.01'
+x_authority: cpan:SONGMU

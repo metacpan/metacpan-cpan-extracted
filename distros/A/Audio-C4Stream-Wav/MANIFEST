@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Audio-C4Stream-Wav.t
+lib/Audio/C4Stream/Wav.pm

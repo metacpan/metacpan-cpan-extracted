@@ -1,0 +1,79 @@
+{
+   "abstract" : "青空文庫の工作員のための文字チェッカー（作：結城浩）をライブラリ化したもの",
+   "author" : [
+      "pawa <pawa@pawafuru.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AozoraBunko-Checkerkun",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "File::ShareDir" : "0",
+            "Lingua::JA::Halfwidth::Katakana" : "0",
+            "YAML::Tiny" : "1.69",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "AozoraBunko::Checkerkun" : {
+         "file" : "lib/AozoraBunko/Checkerkun.pm",
+         "version" : "0.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pawa-/AozoraBunko-Checkerkun/issues"
+      },
+      "homepage" : "https://github.com/pawa-/AozoraBunko-Checkerkun",
+      "repository" : {
+         "url" : "git://github.com/pawa-/AozoraBunko-Checkerkun.git",
+         "web" : "https://github.com/pawa-/AozoraBunko-Checkerkun"
+      }
+   },
+   "version" : "0.12",
+   "x_authority" : "cpan:PAWAPAWA"
+}

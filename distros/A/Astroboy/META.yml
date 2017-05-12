@@ -1,0 +1,23 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Astroboy
+version:      1.06
+version_from: lib/Astroboy.pm
+installdirs:  site
+requires:
+    Carp:                          1
+    Cwd:                           3
+    Exporter:                      5
+    File::Path:                    1.08
+    File::PathInfo:                1.25
+    File::Which:                   0.05
+    Getopt::Std::Strict:           1.01
+    LEOCHARRE::Class2:             1.13
+    LEOCHARRE::DEBUG:              1.11
+    LEOCHARRE::Dir:                1.06
+    MP3::Tag:                      0.9713
+    Smart::Comments:               1
+    Test::Simple:                  0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

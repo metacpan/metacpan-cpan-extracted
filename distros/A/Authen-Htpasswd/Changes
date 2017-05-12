@@ -1,0 +1,39 @@
+0.171  Tue Aug 09 13:09:00 BST 2011
+    - re-disting because I failed to notice MYMETA.* in the dist
+
+0.170  Tue Aug 09 12:17:00 BST 2011
+    - fix user inflation code to handle arbitrary usernames
+
+0.161   Sun Oct 12 12:13:27 PDT 2008
+    - fix stupid bug when trying to add a user that already exists (RT #37785)
+    - fix \Q in regular expressions for newer versions of perl (RT #27012)
+
+0.16    Sun Jul 15 15:20:28 PDT 2007
+    - Disable write locking on Win32.
+      (On Win32 you cannot delete a file with an open filehandle)
+    - use File::Spec in tests to avoid build failure on Windows
+    - add Digest::SHA1 and Crypt::PasswdMD5 as dependencies rather than recommends
+      (still works without them if you don't need SHA or MD5 support)
+
+0.15    Sun Dec 31 02:51:35 EST 2006
+    - prevent User::password() from clobbering the password if none is passed
+    - document Util::supported_hashes()
+
+0.14    Fri Mar 03 08:01:32 CET 2006
+    - add all_users method
+
+0.13    Sat Nov 26 04:18:19 CET 2005
+    - works if you don't have Crypt::PasswdMD5 or Digest::SHA1
+    - auto-detects available modules for default check_hashes
+    - added Yuval Kogman as author, also added license to POD
+
+0.12    November 10 2005
+    - extra_info is now an array, as suggested by Uwe Voelker
+    - changing the username will now delete the old username and add the new one
+
+0.11    November 09 2005
+    - implement locking with IO::LockedFile
+    - minor code and pod cleanups
+
+0.10    November 09 2005
+    - initial release

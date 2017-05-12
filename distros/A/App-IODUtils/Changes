@@ -1,0 +1,95 @@
+Revision history for App-IODUtils
+
+0.14    2016-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Fix expressing follow-spec prereq relationship with
+	  x_spec.
+
+
+0.13    2016-12-27 (PERLANCAR)
+
+        - delete-iod-section: Add --section-pattern option.
+
+
+0.12    2016-03-01 (PERLANCAR)
+
+        - Add all the other parser options (previously only
+          --ignore-unknown-encoding and --enable-expr were available).
+
+
+0.11    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+
+0.10    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.09    2015-07-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update Rinci metadata (args_groups -> args_rels).
+
+
+0.08    2015-03-21 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Documentation] Mention list of utilities in main module, add See
+	  Also.
+
+
+0.07    2015-03-19 (PERLANCAR)
+
+        - No functional changes.
+
+        - [dist] Update prereqs to versions of Config::IOD & Config::IOD::Reader
+          which support ignore_unknown_directive.
+
+
+0.06    2015-03-19 (PERLANCAR)
+
+	- Add common option to scripts: --ignore-unknown-directive.
+
+	- More proper setting of naked_res for dump-iod & parse-iod.
+
+
+0.05    2015-03-18 (PERLANCAR)
+
+        - Add script: parse-iod.
+
+
+0.04    2015-03-18 (PERLANCAR)
+
+        - [ux] For convenience, dump-iod now returns naked result by default (to
+          return enveloped result, use --no-naked-res).
+
+        - Add scripts: delete-iod-key, delete-iod-section, insert-iod-key,
+          insert-iod-section.
+
+
+0.03    2014-08-30 (PERLANCAR)
+
+        - Add option: --enable-expr (-e).
+
+
+0.02    2014-08-27 (PERLANCAR)
+
+        - Switch to Perinci::CmdLine::Lite because it now can handle
+          cmdline_src.
+
+
+0.01    2014-08-27 (PERLANCAR)
+
+        - First release.

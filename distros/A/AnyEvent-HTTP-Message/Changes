@@ -1,0 +1,32 @@
+Revision history for AnyEvent-HTTP-Message
+
+0.302     2013-06-13T03:05:24Z
+
+  - Don't pass Content-Length header to AnyEvent::HTTP to avoid persisting
+    the header incorrectly.  Closes rt-85665.
+
+0.301     2012-05-27T05:49:46Z
+
+  - Throw error if arguments are passed to $req->cb() to avoid confusion.
+  - Define $req->respond_with(@res) to pass a response to the cb.
+
+0.300     2012-04-22T22:32:36Z
+
+  [Backwards Incompatible Changes]
+  - For consistency/clarity/simplicity $request->params
+    no longer includes 'body' and 'headers'.  Use the accessor methods.
+    'params' is now only used for the extra AnyEvent::HTTP (user-agent) params.
+  - $request->body will default to an empty string if not defined.
+
+  [Enhancements]
+  - Enable conversion from/to HTTP::Message objects
+
+  [Fixes]
+  - Fix error messages when parse_args gets the wrong number of arguments.
+
+  [Documentation]
+  - Reorganize documentation for clarity/simplicity (hopefully).
+
+0.100     2012-04-19T01:28:25Z
+
+  - Initial release

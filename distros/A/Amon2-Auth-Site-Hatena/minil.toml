@@ -1,0 +1,6 @@
+name = "Amon2-Auth-Site-Hatena"
+# badges = ["travis"]
+authority="cpan:SONGMU"
+
+module_maker="ModuleBuildTiny"
+

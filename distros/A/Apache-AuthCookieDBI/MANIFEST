@@ -1,0 +1,16 @@
+AuthCookieDBI.pm
+Changes
+MANIFEST
+MANIFEST.SKIP
+README
+LICENSE
+Makefile.PL
+test.pl
+generic_reg_auth_scheme.txt
+techspec.txt
+schema.sql
+eg/html/login.html
+eg/html/login-failed.html
+eg/public-pl/login.pl
+MockKeyFile
+META.yml                                 Module meta-data (added by MakeMaker)

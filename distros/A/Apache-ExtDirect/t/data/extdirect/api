@@ -1,0 +1,37 @@
+[
+    { name => 'API 1', cgi_url => 'http://localhost/cgi-bin/api1.cgi',
+      plack_url => '/api', method => 'GET', input_content => undef,
+      plack_input => [ api_path => '/api', debug => 1, no_polling => 0,
+                       router_path => '/extdirectrouter', ],
+      http_status => 200, content_type => qr|^application/javascript\b|,
+      expected_content => q~
+        Ext.app.REMOTING_API = {
+        "actions":{
+        "Bar": [
+                    { "len":5, "name":"bar_bar" },
+                    { "formHandler":true, "len":0, "name":"bar_baz" },
+                    { "len":4, "name":"bar_foo" }
+               ],
+"Env":[{"len":1,"name":"cookie_get"},{"len":0,"name":"cookie_list"},{"len":1,"name":"http_header"},{"len":0,"name":"http_list"},{"len":1,"name":"param_get"},{"len":0,"name":"param_list"}],
+        "Foo": [
+                    { "len":2, "name":"foo_bar" },
+                    { "name":"foo_baz", "params":["foo","bar","baz"] },
+                    { "len":1, "name":"foo_foo" }
+               ],
+        "JuiceBar":[{"len":5,"name":"bar_bar"},{"formHandler":true,"len":0,"name":"bar_baz"},{"len":4,"name":"bar_foo"}],
+        "Qux": [
+                    { "len":5, "name":"bar_bar" },
+                    { "formHandler":true, "len":0, "name":"bar_baz" },
+                    { "len":4, "name":"bar_foo" },
+                    { "len":2, "name":"foo_bar" },
+                    { "name":"foo_baz", "params":["foo","bar","baz"] },
+                    { "len":1, "name":"foo_foo" }
+               ]
+        },
+        "type":"remoting",
+        "url":"/router"
+        };
+        Ext.app.POLLING_API={"type":"polling","url":"/events"};
+      ~,
+    },
+]

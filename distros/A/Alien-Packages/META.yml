@@ -1,0 +1,57 @@
+---
+abstract: 'Find information of installed packages'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+build_requires:
+  Test::More: 0.90
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-Packages
+provides:
+  Alien::Packages:
+    file: lib/Alien/Packages.pm
+    version: 0.003
+  Alien::Packages::Base:
+    file: lib/Alien/Packages/Base.pm
+    version: 0.003
+  Alien::Packages::Dpkg:
+    file: lib/Alien/Packages/Dpkg.pm
+    version: 0.003
+  Alien::Packages::LsLpp:
+    file: lib/Alien/Packages/LsLpp.pm
+    version: 0.003
+  Alien::Packages::Msi:
+    file: lib/Alien/Packages/Msi.pm
+    version: 0.003
+  Alien::Packages::PkgInfo:
+    file: lib/Alien/Packages/PkgInfo.pm
+    version: 0.003
+  Alien::Packages::Pkg_Info::pkgsrc:
+    file: lib/Alien/Packages/Pkg_Info/pkgsrc.pm
+    version: 0.003
+  Alien::Packages::Pkg_Info::ports:
+    file: lib/Alien/Packages/Pkg_Info/ports.pm
+    version: 0.003
+  Alien::Packages::Rpm:
+    file: lib/Alien/Packages/Rpm.pm
+    version: 0.003
+  Alien::Packages::RpmDB:
+    file: lib/Alien/Packages/RpmDB.pm
+    version: 0.003
+recommends:
+  IPC::Run: 0
+  Module::Pluggable: 4.8
+requires:
+  IPC::Cmd: 0
+  IPC::Open3: 0
+  Module::Pluggable: 4.5
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/rehsack/Alien-Packages
+version: 0.003

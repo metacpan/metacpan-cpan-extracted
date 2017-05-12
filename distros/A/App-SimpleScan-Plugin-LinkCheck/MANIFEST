@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/App/SimpleScan/Plugin/LinkCheck.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00.load.t
+t/01can.t
+t/02extract.t
+t/03has_link.t
+t/04no_link.t
+t/05loop.t
+t/06forget.t
+t/07forget_all.t
+t/08snapshot.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,153 @@
+#! /usr/bin/env perl
+# PODNAME: mise
+# ABSTRACT: manage directory and symlink creation, globally and per-project
+
+
+use strict;
+use warnings;
+use 5.010;
+
+use App::MiseEnPlace;
+
+App::MiseEnPlace->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mise - manage directory and symlink creation, globally and per-project
+
+=head1 VERSION
+
+version 0.160
+
+=head1 SYNOPSIS
+
+    # in ~/.mise:
+    ---
+    manage:
+      - proj/*
+      - etc
+    create:
+      directories:
+        - bin
+        - doc
+        - etc
+        - lib
+        - proj
+        - src
+        - var/tmp
+      links:
+        - var/tmp: tmp
+
+
+    # in ~/proj/my-project/.mise
+    ---
+    create:
+      links:
+        bin/script: BIN
+        DIR: ~/my-project
+
+    # then run
+    mise -v
+
+    # output
+    '/home/user/bin' exists
+    '/home/user/doc' exists
+    '/home/user/etc' exists
+    '/home/user/lib' exists
+    '/home/user/proj' exists
+    Created '/home/user/src'
+    '/home/user/var/tmp' exists
+    Link from '/home/user/var/tmp' to '/home/user/tmp' exists
+    Created link from /home/user/proj/my-project/bin/script to /home/user/bin/script
+    Created link from /home/user/proj/my-project to /home/user/my-project
+
+=head1 DESCRIPTION
+
+C<mise> is a simple script that allows you to manage directory and symlink
+creation based on a global config as well as per-project configs.
+
+=head1 OPTIONS
+
+The config file in the SYNOPSIS illustrates most of the available options.
+
+=over 4
+
+=item bindir
+
+The directory to be used for the expansion of the keyword 'BIN' when creating
+symlinks. (See below.) Defaults to C<$ENV{HOME}/bin>
+
+=item manage
+
+This is a list of directories in which to search for per-project config
+files. Directories that don't start with a '/' are assumed to be relative to
+$ENV{HOME} (i.e., 'foo' will be expanded to "$ENV{HOME}/foo"). Each line will
+be globbed, so standard shell wildcards can be used.
+
+This option is only valid in the "top-level" C<~/.mise> config file; it will
+have to effect if placed in a per-project config.
+
+=item create/directories
+
+This is a list of directories to create. Directories that don't start with a
+'/' are assumed to be relative to the directory containing the .mise
+file. (I.e., C<foo> in a C<.mise> file located in C<$ENV{HOME}/my/proj/> will
+be expanded to C<$ENV{HOME}/my/proj/foo>)
+
+=item create/links
+
+This is a list of symlinks to create, expressed as a series of source =>
+target pairs. Both the source and target will be expanded relative to the
+directory containing the C<.mise> file, as explained above for
+create/directories. Additionally, if the target ends in a '/', the basename of
+the source value will be appended (in much the same way the C<ln -s> works.)
+
+Finally, there are a few keywords that can be used when creating links. If the
+target consists solely of the keyword 'BIN', the link will be created in the
+directory in the 'bindir' configuration variable, again using the basename of
+the source. If the source consists solely of the keyword 'DIR', the link
+source will be the directory containing the .mise file in question.
+
+=back
+
+=head1 FLAGS
+
+=over 4
+
+=item C<--config/-C FILE>
+
+Use a different config file
+
+=item C<--remove-bin-links/-R>
+
+Makes C<mise> remove any sylinks from the C<bindir> after doing directory
+creation and before doing symlink creation.
+
+=item C<--verbose/-v>
+
+Makes C<mise> be very noisy about exactly what is going on.
+
+=item C<--version/-V>
+
+Displays the version number and exits
+
+=back
+
+=head1 AUTHOR
+
+John SJ Anderson <genehack@genehack.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by John SJ Anderson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

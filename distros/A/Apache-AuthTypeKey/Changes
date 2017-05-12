@@ -1,0 +1,12 @@
+# $Id: Changes 1887 2005-11-10 20:37:21Z btrott $
+
+Revision history for Apache::AuthTypeKey
+
+0.03  2005.11.10
+    - Now works with a current version of mod_perl 2!
+
+0.02  2005.11.10
+    - Now works with mod_perl 2!
+
+0.01  2004.08.22
+    - Initial distribution.

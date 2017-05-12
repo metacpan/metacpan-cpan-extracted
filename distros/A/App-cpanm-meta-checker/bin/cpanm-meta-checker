@@ -1,0 +1,46 @@
+#!perl
+use 5.006;    # our
+use strict;
+use warnings;
+
+package App::cpan::meta::checker::_main;
+
+our $VERSION = '0.001002';
+
+# PODNAME: cpan-meta-checker
+
+# ABSTRACT: command line tool for checking installed distribution integrity
+
+our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
+
+use App::cpanm::meta::checker;
+my $app = App::cpanm::meta::checker->new_from_command;
+$app->run_command();
+exit 0;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpan-meta-checker - command line tool for checking installed distribution integrity
+
+=head1 VERSION
+
+version 0.001002
+
+=head1 AUTHOR
+
+Kent Fredric <kentnl@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric <kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

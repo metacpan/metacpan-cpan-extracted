@@ -1,0 +1,47 @@
+Revision history for Acme-CPANAuthors-French
+
+0.09    2010.11.09  (SAPER)
+        [AUTHORS] Added BCO, HOBBESTIG.
+
+0.08    2009.06.29  (SAPER)
+        [BUGFIX] CPAN-RT #45077: Specify utf8 encoding in the module and add
+        a test (t/80-cpan-rt-45077.t) to check this (Olivier Mengue).
+        [AUTHORS] Added ALAMAZ, BOUBAKER, CASTOR, CFILIPPE, CGUINE, CMAUSSAN, CYK,
+        CYPLP, DAUNAY, DDUMONT, DOUMBZH, DRAUONER, EGERMAN, ELLIPSE, FBRIERE,
+        FIGANIM, FMC, FPORCHER, FRACOLO, FRANCKC, FRETT, GUIMARD, GUYDX,
+        JACQUELIN, JBNIVOIT, JETEVE, JGL, JHIVER, JMFAYARD, JMPENNEL,
+        JMVILOMET, JPDURRIOS, JPVIDAL, JUCROUZET, KAFKA, KERMAGO, KORSANI,
+        KRISSG, LEUCOS, LSIM, LWA, MHALLGREN, MOUNS, NMONNET, NTHIERY, OARCHER,
+        OLIBOU, ORTALO, OSALAUN, PVERD, RAF, RAFAEL, RCHIBOIS, RECKON,
+        RENNERT, ROSSI, ROUGE, SCOLINET, SEBDIAZ, SMAXIME, SNCK, STHEBERT,
+        STOUGARD, TCHINCHOW, TDRUGEON, YANN, YVESAGO, ZERODEUX.
+
+0.07    2008.11.02  (SAPER)
+        [TESTS] Modified t/10-synopsis.t so it skip the tests which may
+        fail if the CPAN configuration is not available.
+
+0.06    2008.10.29  (SAPER)
+        [AUTHORS] Added BRIAC, ECOCODE, GROMMIER, PIXEL, SDP, YBLUSSEAU.
+
+0.05    2008.09.22  (SAPER)
+        [AUTHORS] Removed INGRIF.
+
+0.04    2008.09.21  (SAPER)
+        [AUTHORS] Added MJONDET.
+        [EG] Added two examples scripts.
+
+0.03    2008.09.18  (SAPER)
+        [AUTHORS] Added CBOUVI, GERBERRI.
+        [TESTS] Fixed t/10-synopsis.t
+
+0.02    2008.09.14  (SAPER)
+        [AUTHORS] Added CHOLET, CMERTZ, DBARTH, DOMQ, FDESAR, MAT, 
+        NCHUCHE, PDENIS, PERRAD, PLEGALL, PMEVZEK, POLGAB, SNIPER, 
+        SUKRIA, THHAMON, XAV
+        [DOC] Fixed some links.
+        [TESTS] Modified t/10-synopsis.t to avoid some erroneous
+        testing reports from some smoke boxes.
+
+0.01    2008.09.13  (SAPER)
+        First version, released on an unsuspecting world.
+

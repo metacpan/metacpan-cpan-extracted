@@ -1,0 +1,11 @@
+name    = Acme-Floral
+author  = Josh Jore <jjore@cpan.org>
+license = Perl_5
+copyright_holder = Josh Jore
+copyright_year   = 2011
+
+version = 1.04
+
+[@Basic]
+[Prereqs]
+B::Deobfuscate = 0.10

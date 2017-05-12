@@ -1,0 +1,79 @@
+{
+   "abstract" : "Calculate deltaG of polymer DNA sequences",
+   "author" : [
+      "Qiang Wang <wang-q@outlook.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.7",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AlignDB-DeltaG",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "YAML::Syck" : "1.29",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Number::Delta" : "1.06"
+         }
+      }
+   },
+   "provides" : {
+      "AlignDB::DeltaG" : {
+         "file" : "lib/AlignDB/DeltaG.pm",
+         "version" : "v1.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wang-q/AlignDB-DeltaG/issues"
+      },
+      "homepage" : "https://github.com/wang-q/AlignDB-DeltaG",
+      "repository" : {
+         "url" : "git://github.com/wang-q/AlignDB-DeltaG.git",
+         "web" : "https://github.com/wang-q/AlignDB-DeltaG"
+      }
+   },
+   "version" : "1.1.0",
+   "x_contributors" : [
+      "wangq <wangqiang1997@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

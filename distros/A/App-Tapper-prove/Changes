@@ -1,0 +1,7 @@
+Revision history for App-Tapper-prove
+
+0.002     2013-07-04
+        - [FIX] print STDERR syntax
+
+0.001     2013-04-24
+        - a drop-in replacement for 'prove' with Tapper support

@@ -1,0 +1,24 @@
+Changes
+lib/App/SimpleScan/Plugin/Snapshot.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00.load.t
+t/01to.t
+t/02snap.t
+t/03cmdline.t
+t/04snaprun.t
+t/05cmdrun.t
+t/06leader.t
+t/07multi.t
+t/neither.in
+t/pod-coverage.t
+t/pod.t
+t/snaperror.in
+t/snaperrorrun.in
+t/snaperrorrun_leader.in
+t/snapon.in
+t/snaponrun.in
+t/snaponrun_leader.in
+t/testsnap.in

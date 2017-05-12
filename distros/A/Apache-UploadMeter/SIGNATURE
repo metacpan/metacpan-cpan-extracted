@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 dbdccd61398228ae8ff40199fa001dcfcaba380f Changes
+SHA1 b6a320f6920394cba74f0534cdb9473078c78d6e INSTALL
+SHA1 6cced9626de3277468aedd6ab4deb6f785f46715 LICENSE
+SHA1 66429e868109672b85e4b3f185f0abda3fbcec9f MANIFEST
+SHA1 0d6d7a6756cc2739467bd09ec75b4c1253043f39 MANIFEST.SKIP
+SHA1 21dc7b287c6f6124a88d9f04d1824bd4c704d3e2 META.yml
+SHA1 7d312aa89b5ecd868d3678dae4d6f95638190bb8 Makefile.PL
+SHA1 bf0c8eda2dbcd7d54ae6c37cdb384e5d784d79e7 README
+SHA1 a0ab9ed0402b33835326e1cb32260b8a6759243c javascript.pod
+SHA1 5a5f0fcea173dfbd953152affbb65bc33b794bff lib/Apache/UploadMeter.pm
+SHA1 4ce998862404f3c53c3d02acdec2f7dd990f74d2 lib/Apache/UploadMeter/Resources/CSS.pm
+SHA1 597823907feaeccba2af150bb0cf9cd6a9cfcc59 lib/Apache/UploadMeter/Resources/HTML.pm
+SHA1 ad2a0dc4fa609398582f4df00189499cd6726a50 lib/Apache/UploadMeter/Resources/JavaScript.pm
+SHA1 d09abeef575ff4ff7506cf024fe8741e2722997e lib/Apache/UploadMeter/Resources/XML.pm
+SHA1 6547aed3abf75c22bfef0f8572b2844932a42c50 t/00signature.t
+SHA1 10e50c793f911995efd1c2bace37a84adfbdce84 t/01load.t
+SHA1 67569a4df94e231750ea1133414a4ce99d6332ef t/TEST.PL
+SHA1 8a1fb57384680e7ae58760a64641fd943c30d295 t/conf/extra.conf.in
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+
+iD8DBQFF3Dzj7bEFiW+VItgRAjKIAJ9N1ECSGBmTvSbFRcoEVDl4It1Y+ACgolGR
+Tuasbj1yfAFNitDo4S0tHtk=
+=0023
+-----END PGP SIGNATURE-----

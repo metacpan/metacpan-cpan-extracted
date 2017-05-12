@@ -1,0 +1,113 @@
+NAME
+    Acme::Time::Baby - Tell time little children can understand
+
+SYNOPSIS
+        use Acme::Time::Baby;
+        print babytime;           #  Prints current time.
+
+        use Acme::Time::Baby language => 'du';
+        print babytime "10:15";   #  Prints a quarter past ten in a way
+                                  #  little Dutch children can understand.
+
+DESCRIPTION
+    Using this module gives you the function "babytime", which will return
+    the time in the form The big hand is on the ten and the little hand is
+    on the three. If no argument to "babytime" is given, the current time is
+    used, otherwise a time of the form *hh:mm* can be passed. Both 12 and 24
+    hour clocks are supported.
+
+    When using the module, various options can be given. The following
+    options can be passed:
+
+    language LANG
+        The language the time should be told in. The following languages are
+        currently supported:
+
+          en             English (this is the default)
+          br             Brazilian Portuguese.
+          ceb            Cebuano (Filipine dialect)
+          de             German.
+          de_ch          Swiss German.
+          du             Dutch.
+          es             Spanish.
+          fr             French.
+          it             Italian.
+          no             Norwegian.
+          se             Swedish.
+          swedish chef   Swedish Chef (from the Muppets).
+          warez          l44+.
+
+        If no language argument is given, English is used.
+
+        Note that some languages use accented letters. The returned
+        sentences are correct for an ISO 8859-1 platform.
+
+    format STRING
+        This is the format used to represent the time. It will be passed to
+        "sprintf", and it should have two %s formatting codes. The other two
+        arguments to "sprintf" are the position of the minute hand (the big
+        hand) and the hour hand (the little hand). If you have perl 5.8 or
+        above, you could use "%2$s" and "%1$s" to reverse the order.
+
+    number ARRAYREF
+        An array with the names of the numbers one to twelve, to be used in
+        the formatted time.
+
+    noimport EXPR
+        By default, the sub "babytime" will be exported to the calling
+        package. If for some reason the calling package does not want to
+        import the sub, there are two ways to prevent this. Either use "use
+        Acme::Time::Baby ()", which will prevent "Acme::Time::Baby::import"
+        to be called, or pass "noimport" followed by a true value as
+        arguments to the "use" statement.
+
+PACKAGE NAME
+    It has been said this package should be named 'Acme::Time::Toddler',
+    because it's the language toddlers speak, and not babies.
+
+    However, the idea of this package is based on an X application the
+    author saw more than 10 years before this package was written. It would
+    display a clock, telling the current time, in a myriad of languages. One
+    of the languages was *babytalk*, and used a language very similar to the
+    one in this package. Hence the name of this package.
+
+TODO
+    Support for more languages.
+
+SEE ALSO
+    The current sources of this module are found on github,
+    <git://github.com/Abigail/acme--time--baby.git>.
+
+AUTHOR
+    Abigail, <mailto:acme-time-baby@abigail.be>.
+
+LICENSE
+    Copyright (C) 2002 - 2004, 2009 by Abigail.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+
+INSTALLATION
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+

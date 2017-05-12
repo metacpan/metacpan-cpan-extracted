@@ -1,0 +1,17 @@
+=head1 NAME
+
+Changes - Apache::App::Mercury change logfile
+
+=head1 CHANGES
+
+all changes without author attribution are by Adi Fairbank
+
+=over 3
+
+=item 0.80 - Jul 20, 2003
+
+initial public release
+
+=back
+
+=cut

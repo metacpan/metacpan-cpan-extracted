@@ -1,0 +1,9 @@
+
+Add support for individual webalizer.conf file for each domain
+  (this is unlikely to happen until someone submits a diff)
+
+Delete log files older than X days/month - super low priority, it's
+  easy and low maintenance to manually delete a few months logs.
+
+Do something with error logs (other than just compress)
+

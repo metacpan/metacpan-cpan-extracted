@@ -1,0 +1,50 @@
+{
+   "abstract" : "XS bindings to bundled Consistent Hash library",
+   "author" : [
+      "Eric Herman <eric@freesa.org>",
+      "Sawyer X <xsawyerx@cpan.org>",
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Algorithm-ConsistentHash-CHash",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::ParseXS" : "3",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/tsee/p5-Algorithm-ConsistentHash-CHash"
+      }
+   },
+   "version" : "0.04"
+}

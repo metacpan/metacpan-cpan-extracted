@@ -1,0 +1,43 @@
+Revision history for Perl extension Algorithm::Huffman.
+
+0.09  Fri Sep 06
+        - implemented encode and decode method
+
+0.08  Wed Sep 04
+        - improved documentation (runnable synopsis)
+        - refactoring of the current code
+
+0.07  Tue Sep 02
+        - fixed bug in test script,
+          (called lives_ok with 3 arguments instead of two :-( )
+
+0.06  Tue Sep 02
+        - improved handling when called with wrong parameters
+        
+        Thanks a lot to Pierre Leopold who reported me a bug that could happen 
+        following to the missing parameter validation.
+
+0.05  Thu Aug 29
+        - improved decode_bitstring method
+          * exceptions are raised instead of an endless loop
+            if an unknown character sequence is found
+
+0.04  Wed Aug 28
+        - implemented decode_bitstring($bitstring) method
+        - fixed bug: The returned encode_bitstring had 
+          only the length of the $orig_string,
+          and not longer
+
+0.03  Mon Aug 26
+        - implemented encode_bitstring($orig_string) method
+
+0.02  Tue Aug 20
+        - implemented $huff->decode_hash method
+
+0.01  Tue Aug 13
+        - implemented new and encode_hash method
+          * my $huff = new ({$str1 => $count1, $str2 => $count2, $str3 => $count3, ...})
+          * my $encode_hash = $huff->encode_hash
+	- original version; created by h2xs 1.22 with options
+		-XA -b 5.6.0 Algorithm::Huffman
+

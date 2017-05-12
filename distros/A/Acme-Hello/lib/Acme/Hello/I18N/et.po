@@ -1,0 +1,21 @@
+# Estonian translations for GNU hello.
+# Copyright (C) 2001 Free Software Foundation, Inc.
+# Toomas Soome <tsoome@ut.ee>, 2001.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: hello 2.0.50\n"
+"POT-Creation-Date: 2002-05-22 19:23+0200\n"
+"PO-Revision-Date: 2002-02-02 20:01+0200\n"
+"Last-Translator: Toomas Soome <tsoome@ut.ee>\n"
+"Language-Team: Estonian <et@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-15\n"
+"Content-Transfer-Encoding: 8-bit\n"
+
+msgid "hello, world\n"
+msgstr "tere kõik\n"
+
+msgid "Hello, world!"
+msgstr "Tere kõik!"
+

@@ -1,0 +1,6 @@
+0.002 2016-04-17 13:09:07-0500
+  - Added a minimum version version for Alien::Base `configure_requires`.
+    Thanks to Graham Ollis (PLICEASE++)!
+
+0.001 2015-01-24 15:25:24-0600
+  - first version

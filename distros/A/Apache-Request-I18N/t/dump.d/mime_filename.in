@@ -1,0 +1,10 @@
+# MIME-decoding on filenames
+POST /latin1 HTTP/1.0
+Content-Type: multipart/form-data; boundary="FOO FOO"
+
+--FOO FOO
+Content-Disposition: form-data; name="foo"; filename="=?UTF-8?B?44OV?=.txt"
+
+bar
+--FOO FOO--
+

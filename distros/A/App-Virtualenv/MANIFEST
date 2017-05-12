@@ -1,0 +1,19 @@
+Changes
+COPYRIGHT
+lib/App/Virtualenv.pm
+lib/App/Virtualenv/activate
+lib/App/Virtualenv/Module.pm
+lib/App/Virtualenv/perl.pl
+lib/App/Virtualenv/Piv.pm
+lib/App/Virtualenv/sh.pl
+lib/App/Virtualenv/Utils.pm
+lib/App/Virtualenv/virtualenv.pl
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+t/App-Virtualenv.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

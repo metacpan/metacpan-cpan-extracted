@@ -1,0 +1,11 @@
+--- 
+abstract: mod_perl2 handler for Mojo
+author: 
+  - Uwe Voelker <uwe.voelker@gmx.de>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.003
+license: perl
+name: Apache2-Mojo
+requires: 
+  Mojo: 0.9
+  mod_perl2: 2.0
+version: 0.004

@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST
+META.yml
+README
+Changes
+lib/Acme/Incorporated.pm
+t/base.t
+t/pod.t
+t/pod-coverage.t
+t/lib/BreakMe.pm
+Build.PL
+Makefile.PL
+SIGNATURE    Added here by Module::Build

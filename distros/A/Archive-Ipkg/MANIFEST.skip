@@ -1,0 +1,6 @@
+~$
+\.svn
+\.DS_Store
+\.bak
+dist
+\.tar.gz$

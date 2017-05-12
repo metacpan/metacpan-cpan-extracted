@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/mwhere
+dist.ini
+lib/App/moduleswhere.pm
+t/release-pod-syntax.t

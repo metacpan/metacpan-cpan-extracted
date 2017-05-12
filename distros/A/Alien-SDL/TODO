@@ -1,0 +1,6 @@
+TODO list for Perl module Alien::SDL
+
+- move prebuilt binaries to http://sdl.perl.org/
+- give app to update and manage source code see below
+- use a json file which we can update off site (not hard coded) to link to new SHA sum and packs
+- when checking for prereq. libs, use pkg-config if available

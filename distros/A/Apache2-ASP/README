@@ -1,0 +1,82 @@
+NAME
+    Apache2::ASP - ASP for Perl, reloaded.
+
+SYNOPSIS
+  Hello World
+      <html>
+      <body><%= "Hello, World!" %></body>
+      </html>
+
+  Favorite Color
+      <html>
+      <body>
+      <%
+        if( $Form->{favorite_color} )
+        {
+      %>
+        Your favorite color is <%= $Server->HTMLEncode( $Form->{favorite_color} ) %>.
+      <%
+        }
+        else
+        {
+      %>
+        What is your favorite color?
+        <form>
+          <input type="text" name="favorite_color">
+          <input type="submit" value="Submit">
+        </form>
+      <%
+        }# end if()
+      %>
+      </body>
+      </html>
+
+DESCRIPTION
+    Apache2::ASP scales out well and has brought the ASP programming model
+    to Perl in a new way.
+
+    This rewrite had a few major goals:
+
+    * Master Pages
+        Like ASP.Net has, including nested Master Pages.
+
+    * Partial-page caching
+        Like ASP.Net has.
+
+    * Better configuration
+        The original config format was unsatisfactory.
+
+    * Handle multiple VirtualHosts better.
+        Configuration was the root of this problem.
+
+        NOTE: If you use an ORM, make sure your ORM doesn't have any
+        "global" configuration object in memory, unless it is schema-aware.
+        DBIx::Class is good and Class::DBI::Lite also works well with
+        Apache2::ASP. Do not use Class::DBI with Apache2::ASP because of
+        configuration overlap problems which arise when you have 2 tables
+        with the same name in 2 different databases.
+
+    * Better performance
+        Server resources were being wasted on unnecessary activities like
+        storing session state even when it had not changed, etc.
+
+BUGS
+    It's possible that some bugs have found their way into this release.
+
+    Use RT <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Apache2-ASP> to submit
+    bug reports.
+
+HOMEPAGE
+    Please visit the Apache2::ASP homepage at <http://www.devstack.com/> to
+    see examples of Apache2::ASP in action.
+
+AUTHOR
+    John Drago <jdrago_999@yahoo.com>
+
+COPYRIGHT
+    Copyright 2008 John Drago. All rights reserved.
+
+LICENSE
+    This software is Free software and is licensed under the same terms as
+    perl itself.
+

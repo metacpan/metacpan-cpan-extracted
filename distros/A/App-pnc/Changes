@@ -1,0 +1,9 @@
+Revision history for Perl extension App::pnc.
+
+0.02  Apr 26, 2013
+        - release to CPAN
+
+0.01  Wed Nov 16 17:29:08 2011
+	- original version; created by h2xs 1.23 with options
+		-AXn App::pnc
+

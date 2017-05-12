@@ -1,0 +1,9 @@
+Revision history for Perl extension App::Physics::ParticleMotion.
+
+1.01  Sun Dec 11 19:53:13 2005
+	- Corrected ugly syntax error (which yielded valid Perl, no less!).
+	  This prevented some of the examples from running at all!
+
+1.00  Sat Dec 10 18:29:31 2005
+	- original version as uploaded to CPAN
+

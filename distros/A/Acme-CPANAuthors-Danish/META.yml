@@ -1,0 +1,39 @@
+---
+abstract: 'We are Danish CPAN authors'
+author:
+  - 'Kaare Rasmussen <kaare@cpan.org>'
+build_requires:
+  Acme::CPANAuthors: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-CPANAuthors-Danish
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+provides:
+  Acme::CPANAuthors::Danish:
+    file: lib/Acme/CPANAuthors/Danish.pm
+    version: 0.03
+requires:
+  Acme::CPANAuthors::Register: 0
+  perl: 5.008
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/kaare/acme-cpanauthors-danish
+  repository: https://github.com/kaare/acme-cpanauthors-danish.git
+version: 0.03

@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+use lib qw (. .. ./lib);
+use Config::Mini;
+use warnings;
+use strict;
+
+use Asterisk::LCR::Importer;
+use Asterisk::LCR::Route;
+
+@ARGV || die "Usage: $0 <config_file>";
+Config::Mini::parse_file (@ARGV);
+$| = 1;
+
+
+our $STORE = Config::Mini::instantiate ("storage")  || die "no storage configured";
+
+
+print STDERR "Parsing all_rates.csv\n";
+open FP, "<all_rates.csv" or die "Cannot read-open all_rates.csv\n";
+my $header = <FP>;
+
+
+my %Providers = ();
+while (<FP>)
+{
+    chomp;
+    my ($pfx,$lab,$prov,$cur,$price,$conn,$finc,$ninc) = split /,/;
+    $Providers{$prov} ||= bless { rates => {} }, "Asterisk::LCR::Importer";
+    $Providers{$prov}->{rates}->{$pfx} = Asterisk::LCR::Route->new (
+        prefix          => $pfx,
+        provider        => $prov,
+        connection_fee  => $conn,
+        first_increment => $finc,
+        increment       => $ninc,
+        rate            => $price,
+        currency        => $cur,
+        label           => $lab,
+        _is_normal      => 1,
+    );
+}
+close FP;
+
+
+print "Constructing prefix list\n";
+my %prefixes = ();
+foreach my $prov ( values %Providers )
+{
+    foreach my $prfx ( $prov->prefixes() )
+    {
+        $prefixes{$prfx} = 1;
+    }
+}
+
+
+print "Building LCR object tree\n";
+my $count = 0;
+foreach my $prfx ( keys %prefixes )
+{
+    my @rates = ();
+    
+    foreach my $prov ( values %Providers )
+    {
+        my $rate = $prov->search_rate ($prfx) || next;
+        push @rates, $rate;
+    }
+                     
+    $STORE->register ($prfx, @rates);
+    $count++;
+    print "." unless ($count % 100);
+}
+$STORE->save();
+print "\n\ndone.\n";
+
+
+1;
+
+
+__END__

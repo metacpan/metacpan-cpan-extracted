@@ -1,0 +1,149 @@
+--- !!perl/hash:AI::NaiveBayes1
+attribute_type:
+  html: nominal
+  morning: nominal
+  size: real
+attributes:
+  - morning
+  - html
+  - size
+attvals:
+  html:
+    - N
+    - Y
+  morning:
+    - Y
+    - N
+  size:
+    - 408
+    - 3353
+    - 4995
+    - 1853
+    - 732
+    - 4017
+    - 3190
+    - 2345
+    - 3569
+    - 559
+    - 1732
+    - 2042
+    - 3893
+    - 3601
+    - 2176
+    - 877
+    - 272
+    - 2740
+    - 514
+    - 1321
+labels:
+  - spam=N
+  - spam=Y
+model:
+  condprob:
+    html:
+      N:
+        spam=N: 0.666666666666667
+        spam=Y: 0.0588235294117647
+      Y:
+        spam=N: 0.333333333333333
+        spam=Y: 0.941176470588235
+    morning:
+      N:
+        spam=N: 0.333333333333333
+        spam=Y: 0.647058823529412
+      Y:
+        spam=N: 0.666666666666667
+        spam=Y: 0.352941176470588
+    size: {}
+  condprobe:
+    html:
+      N:
+        spam=N: (= 2 / 3)
+        spam=Y: (= 1 / 17)
+      Y:
+        spam=N: (= 1 / 3)
+        spam=Y: (= 16 / 17)
+    morning:
+      N:
+        spam=N: (= 1 / 3)
+        spam=Y: (= 11 / 17)
+      Y:
+        spam=N: (= 2 / 3)
+        spam=Y: (= 6 / 17)
+  labelprob:
+    spam=N: 0.15
+    spam=Y: 0.85
+  real_stat:
+    size:
+      spam=N:
+        count: 3
+        mean: 1443.33333333333
+        stddev: 1521.30777074638
+        sum: 4330
+      spam=Y:
+        count: 17
+        mean: 2344.64705882353
+        stddev: 1397.40106721265
+        sum: 39859
+numof_instances: 20
+real_stat: {}
+smoothing: {}
+stat_attributes:
+  html:
+    N:
+      spam=N: 2
+      spam=Y: 1
+    Y:
+      spam=N: 1
+      spam=Y: 16
+  morning:
+    N:
+      spam=N: 1
+      spam=Y: 11
+    Y:
+      spam=N: 2
+      spam=Y: 6
+  size:
+    1321:
+      spam=Y: 1
+    1732:
+      spam=Y: 1
+    1853:
+      spam=Y: 1
+    2042:
+      spam=Y: 1
+    2176:
+      spam=Y: 1
+    2345:
+      spam=Y: 1
+    272:
+      spam=Y: 1
+    2740:
+      spam=Y: 1
+    3190:
+      spam=N: 1
+    3353:
+      spam=Y: 1
+    3569:
+      spam=Y: 1
+    3601:
+      spam=Y: 1
+    3893:
+      spam=Y: 1
+    4017:
+      spam=Y: 1
+    408:
+      spam=N: 1
+    4995:
+      spam=Y: 1
+    514:
+      spam=Y: 1
+    559:
+      spam=Y: 1
+    732:
+      spam=N: 1
+    877:
+      spam=Y: 1
+stat_labels:
+  spam=N: 3
+  spam=Y: 17

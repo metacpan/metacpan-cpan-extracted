@@ -1,0 +1,14 @@
+# A simple script to mount a remote server over sshfs
+# Modkey-a sshfs host.domain; then use ~/net/host
+host="$1"
+dir=~/net/"${host/.*}"
+remotedir="$2"
+
+mkdir -p "$dir"
+
+o="$((
+  set -e
+  mount "$dir" 2>&1 | grep -q already && fusermount -u "$dir"
+  sshfs "$host:$remotedir" "$dir"
+) 2>&1)"
+[[ $o ]] && xmessage -default okay "$o"

@@ -1,0 +1,38 @@
+1.2 2017-01-19
+  * saymd taken from echomd https://raw.githubusercontent.com/WebReflection/echomd/master/perl/echomd
+  * command line arg flags cannot be re-used in definition
+  * run_cmd and execute_cmd are run through utf8::encode
+  * run_cmd can take an optional timeout as a second argument
+  * new functions verbose, verbose_data and set_verbose
+1.0 2014-08-16
+  * fix debug spacing after date
+  * milestone release, no changes, just version number
+0.9 2014-05-19
+  * remove App::Basis from App::Basis::Config, use warn
+  * add logging to a file as default, rather than to STDERR
+  * new log_file option for init_app
+0.8 2014-05-14
+  * fix ~ replacement with home, esp for windows
+0.7 2014-05-02
+  * Fix tests for windows
+0.6 2014-05-01
+  * App::Basis::Config changes
+    * change to use Path::Tiny to load/store config
+    * add die_on_error to new
+    * cleanly handle missing path items when using get
+0.5 2014-04-25
+  * adding extra documentation
+0.4 2014-04-23
+  * clean filename in fix_filename
+  * remove some comments
+  * local PATH for run_cmd
+  * renaming tests
+0.3 2014-04-22
+  * appbasis script using correct library now.
+0.2 2014-04-22
+  * fixing minor pod issues
+  * config now uses App::Basis::PROGRAM as default config filename
+  * appbasis script nicely handles a missing parameter
+  * help now shows short options too (thanks to Arturo Escaip)
+0.1 2014-03-20
+  * initial CPAN release

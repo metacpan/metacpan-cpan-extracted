@@ -1,0 +1,10 @@
+Revision history for App-Git-Workflow-Command-Cat
+
+0.2   2015-08-12
+        Updating for release of version 0.2
+        Removed creation of makefile (Ivan Wills)
+        Added coveralls config (Ivan Wills)
+
+0.1     2015-06-17
+        First version, released on an unsuspecting world.
+

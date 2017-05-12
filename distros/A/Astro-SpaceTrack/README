@@ -1,0 +1,84 @@
+Astro-SpaceTrack is Copyright (C) 2005-2017 by Thomas R. Wyant, III
+
+DESCRIPTION
+
+This library logs in to the Space Track web site and downloads orbital
+elements. It is also capable of accessing other sources of satellite
+orbital elements. It does nothing that you can't do with a web browser,
+but it does give you a way to automate things.
+
+Note that you are required to register for a username and password before
+making use of the Space Track web site.
+
+FEDERAL LAW FORBIDS THE REDISTRIBUTION OF DOWNLOADED ORBITAL ELEMENTS
+TO THIRD PARTIES WITHOUT PRIOR PERMISSION.
+
+At some point along its career, this module has been seen to work under
+the following operating systems (or, more correctly, values of $^O):
+cygwin, darwin, MacOS, MSWin32, and VMS. CPAN Testers
+(http://testers.cpan.org/) adds Linux and Freebsd to the list.
+
+INSTALLATION
+
+This module is installable by the usual incantation:
+
+    gunzip Astro-SpaceTrack-9.999.tar.gz
+    tar -xf Astro-SpaceTrack-9.999.tar
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+You should substitute the appropriate program name for 'make', eg nmake
+(typically) under MSWin32, or mms or mmk under VMS. See
+ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe for a copy of
+nmake for MSWin32 if you need it.
+
+If your tar supports it, you can use the -z qualifier (i.e. 'tar -xzf')
+and skip the 'gunzip' step. You can also skip 'make' if you do 'make
+test', since 'make test' implies 'make'.
+
+The 'make test' step of the installation will ask you for your Space
+Track username and password. This prompt can be supressed in a number
+of ways:
+ * Set environment variable AUTOMATED_TESTING to a true value. This
+   will cause all tests that access the Space Track web site to be
+   skipped.
+ * Set environment variable SPACETRACK_USER to your username, a slash,
+   and your password. If you do this incorrectly, the tests that access
+   the Space Track website will fail.
+
+If you do not have a Space Track account, a return when prompted for
+your username will also cause the tests that access the Space Track
+database to be skipped.
+
+Note that once you have done the "make" step you can play with either of
+the two specimen applications provided (SpaceTrack for a command-line
+version, or SpaceTrackTk for the Perl/Tk windowed version). If you want
+to do this before installing, you need to invoke them as (e.g.)
+    $ perl -Mblib script/SpaceTrack
+Under VMS, you'll need to quote the -M thus:
+    $ perl "-Mblib" script/SpaceTrack
+
+By default, Makefile.PL will ask you whether you want the SpaceTrack
+and/or SpaceTrackTk applications installed. It supports two
+command-line qualifiers:
+ -n to answer all questions "no", and
+ -y to answer all questions "yes".
+You must not specify both of these, because if you do it will confuse
+the bejeebers out of Makefile.PL, and it will die horribly.
+
+Of course, since it's pure Perl, you can just expand the kit and drop
+SpaceTrack.pm and the SpaceTrack folder into the Astro directory
+(creating it if necessary) in the appropriate place in your @INC
+directories. Read Makefile.PL for how to generate the applications.
+
+LICENSING INFORMATION
+
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

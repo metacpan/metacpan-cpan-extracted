@@ -1,0 +1,16 @@
+0.05 Thu Aug 28 11:35:49 PDT 2014
+ - Don't index IO::All* modules
+
+0.04 Tue Aug 26 22:33:12 PDT 2014
+ - Add lib 'inc' for TestML tests
+
+0.03 Tue Aug 26 14:23:04 PDT 2014
+ - Switch to Zilla-Dist
+ - Move IO::All::OO to IO::All::Base
+
+0.02 Wed Jul 25 17:43:09 PDT 2012
+ - Don't index IO::All modules!
+
+0.01 Wed Jul 25 14:42:53 PDT 2012
+ - Initial release.
+

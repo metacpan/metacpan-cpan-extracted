@@ -1,0 +1,10 @@
+Revision history for Perl extension Apache-MagicPOST.
+
+1.0  Mon Dec 29 17:50:19 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n Apache-MagicPOST
+
+1.1  Mon Dec 29 21:35:00 2003
+	- it was stupid to use the redirect mechanism, so I removed
+	  it and now simply alter the request.
+

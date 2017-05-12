@@ -1,0 +1,21 @@
+Revision history for Perl extension Algorithm::Evolve.
+
+0.03	
+	- Update selection/replacement dispatch method to play well with DProf,
+	  may change back someday..
+	- Speedup of A::E::Util::str_agreement at the price of utf8
+	- Other misc speedups
+	- Change StringEvolver to use blessed hash, for better reuse prospects
+	- Added ArrayEvolver, mimicking StringEvolver for array genes
+	- Added "Breeding Perls" example
+
+0.02	Mon May 19 2003
+	- Added gladitorial selection/replacement
+	- Added co-evolving rock-paper-scissors example
+	- Lots of POD updates, added POD to StringEvolver.pm
+	- Added array utils to Algorithm::Evolve::Util
+	- Some switches can be changed dynamically (selection, replacement,
+	  parents & children per generation)
+
+0.01	Sun Feb 23 2003
+	- Initial release

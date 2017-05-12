@@ -1,0 +1,12 @@
+0.002     2015-01-15 15:28:29+01:00 Europe/Stockholm
+  - Add documentation in the form of
+    * --help and --version options
+    * README.md
+    * POD
+  - Rename serve_dir.pl to serve_dir
+  - Change dependency to Mojolicious::Plugin::Directory::Stylish
+  - Let Mojolicious have a secret so it doesn't worry about it
+  - Prevent Mojolicious from getting excited about @ARGV
+
+0.001
+  - Initial release

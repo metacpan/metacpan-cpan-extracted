@@ -1,0 +1,46 @@
+Apache::AppCluster is a lightweight mod_perl RPC mechanism that allows you to
+use your mod_perl web servers as distributed application servers that serve
+multiple concurrent RPC requests to remote clients across a network. The client
+component has the ability to fire off multiple simultaneous requests to 
+multiple remote application servers and collect the responses simultaneously. 
+
+This is similar to SOAP::Lite in that it is a web based RPC mechanism, but 
+it has the advantage of being able to send/receive multiple concurrent requests 
+to the same or different remote application servers and the methods/functions 
+called on the remote servers may receive and return Perl data structures of 
+arbritary complexity - entire objects can be flung back and forth with ease. 
+
+Please see Apache::AppCluster::Client and Apache::AppCluster::Server 
+documentation for full details on server configuration (very easy) and Client 
+usage (OO interface).
+
+INSTALLATION:
+
+Untar the distribution into a directory that will be readable by the user 
+nobody. (i.e. dont use /root for installation). The test suite runs a 
+web server on port 8228 and this runs as user nobody.
+
+As per usual do the following:
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+If you run into problems during the 'make test' stage, please email me the 
+error log which is at: Server/t/error_log. Also include the last few 
+lines of 'make test' output. 
+
+APACHE CONFIG:
+
+The documentation for Apache::AppCluster::Server contains everything you'll
+need to set up the server component. The only thing to keep in mind is that 
+if you are going to be sending multiple concurrent requests from the client
+to an apache server, make sure the server is set up to handle the load. 
+Do this by setting MaxClients, StartServers, MinSpareServers and MaxSpareServers.
+If you're going to be hitting it with 20 concurrent requests, make sure there
+are 20 child servers standing by to handle your requests.
+
+Author: Mark Maunder <mark@swiftcamel.com>
+

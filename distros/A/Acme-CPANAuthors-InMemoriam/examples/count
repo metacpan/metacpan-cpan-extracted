@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+use strict;
+use Acme::CPANAuthors;
+
+my $authors  = Acme::CPANAuthors->new("InMemoriam");
+my $number   = $authors->count;
+
+print "$number CPAN authors are known to have left us\n";

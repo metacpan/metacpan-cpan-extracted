@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f611edbb32d8af3d400f3cf3d89cd052e220affe Changes
+SHA1 118121e197d10e867dcaa5d10e4cfe89cec69912 LICENSE
+SHA1 7920e166dc4ce13aa84165f53ccc6829e0dba29f MANIFEST
+SHA1 ab560e33a2c26fe0f8dcda7e9fd89acec8a0438f MANIFEST.SKIP
+SHA1 414bbbd0f8761cc46515fd44660c4505200a5367 META.yml
+SHA1 a742a2e3a2adc9937d21c0051577fedf16fb8290 Makefile.PL
+SHA1 9d23f7efe7217d113889cdb3dc84b9d473069e1f README
+SHA1 2ba7c70bf5de1d9faa51f6c9377af729f4dcb3ce TODO
+SHA1 dfd8ad0a149af7fb2443043534c7abf800cb2d5f lib/Apache/AuthTicket.pm
+SHA1 0519451704dfd7b614edbf2079ea7be8e874c6bd lib/Apache/AuthTicket/Base.pm
+SHA1 ebcb2c868938a883b36442052c6ccd79f5b11004 lib/Apache2/AuthTicket.pm
+SHA1 5c582e555b7a769a5426c9594986503204db047c sample/apache.conf
+SHA1 43aa0abcaeb4b81a674bf4fe1e86283f11a1fa2b sample/apache2.conf
+SHA1 bfed0aca630ec73296e56764a3f8f0e95976e2a4 sample/mysql.sql
+SHA1 9b9c1209bcb8dab96718617324684794cc000e2a sample/pgsql.sql
+SHA1 a0fa4c757db0157b9b19260dd492b329444b35aa t/01-sqlite.t
+SHA1 adcfc1165110741fad1398210055ba6692debfba t/TEST.PL
+SHA1 3facbcb313bdca60feb6b5edf06bc059b82ae8b7 t/auth.t
+SHA1 65d04bd627b5270ba1709e733b86747d59c59ab2 t/compile.t
+SHA1 d2a13c2cce7bf1bf29bec26bed0b836139eb6aed t/conf/extra.conf.in
+SHA1 e16df4b6fc7e10c12a255ede916772030d4a3059 t/conf/mp1-startup.pl
+SHA1 9a4bd966b763f5f332fb867028b559359f7b6bb0 t/htdocs/protected/index.html
+SHA1 9a4bd966b763f5f332fb867028b559359f7b6bb0 t/htdocs/secure/protected/index.html
+SHA1 5aeb51048d562cf81ac4150e256865a49a41f982 t/lib/My/Util.pm
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+SHA1 61cea839dd94aaaeb301ccac9b83cde4c5c91b42 t/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk3s+/kACgkQ+CqvSzp9LOyMzQCgtwxxJ1mTr3j97HEUyWfL5CuJ
+TloAn3AsIqo26DaT5UQntIhdn7cmeeBZ
+=cXol
+-----END PGP SIGNATURE-----

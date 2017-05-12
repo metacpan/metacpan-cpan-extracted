@@ -1,0 +1,86 @@
+=head1 NAME
+
+xppcache - How to make your own XPP Store and Expiry modules
+
+=head1 XPP Caching
+
+XPP makes use of a flexible caching system.  Caching is split between two jobs:
+storing, and expiring.  Likewise, content can be cached using any combination of
+Store and Expiry modules.  Each cached entity is indexed by a B<name> and
+B<group>.  This document will cover what you need to know to add your own Store
+and Expiry modules to XPP.
+
+=head1 Store Modules
+
+Store modules provide XPP with a way to store cache data.  The way in which this
+data is stored is up to the module, and is fairly transparent to the XPP code
+wishing to cache the data.  Here are the methods that need to be in every Store
+module for things to work:
+
+=head2 REQUIRED METHODS
+
+=over 4
+
+=item C<new> ( $name, $group, \%instance_data, \$content, @args )
+
+Returns an object that may be used to retrieve the content.  C<$name> and
+C<$group> must be stored in the object as they represent a distinct cache
+entity.  C<%instance_data> is data that the caller requests the object
+store as instance data (and provide accessors to retrieve again).  Common
+use of C<%instance_data> might include the Apache request object.  C<$content>
+is is passed by reference and is the content to be stored.
+
+If further arguments are required to implement a specific Store, they should
+be documented as required arguments following the content (in C<@args>).  For
+example, a File based store might provide the ability to choose the directory
+in which the content is stored - the directory name would be the singular
+argument in C<@args>.
+
+=item C<content> (  )
+
+Returns the C<$content> passed to C<new> (the content, not the reference).
+
+=item C<is_expired> (  )
+
+Is called when the cache has expired, and should be cleaned up.  For example,
+a File based store would remove the associated file by calling C<unlink>.
+
+=back
+
+=head1 Expiry Modules
+
+=head2 REQUIRED METHODS
+
+=over 4
+
+=item C<new> ( $name, $group, \%instance_data, @args )
+
+Returns an object that may be used to retrieve expiry information.  C<$name> and
+C<$group> must be stored in the object as they represent a distinct cache
+entity.  C<%instance_data> is data that the caller requests the object
+store as instance data (and provide accessors to retrieve again).  Common
+use of C<%instance_data> might include the Apache request object.
+
+Any arguments following C<%instance_data> are Expiry specific, and should
+provide any information necessary to create a valid expiry.  For example,
+the Duration expiry which expires a cache after a specific amount of time,
+expects a string representing the time interval (such as '15m' or '2d').
+
+=item C<is_expired> (  )
+
+This method should return TRUE if the cache has expired at the current point in
+time, and FALSE if the cache is still valid.
+
+=back
+
+=head1 SEE ALSO
+
+L<Apache::XPP::Cache>,
+L<Apache::XPP::Cache::Store>,
+L<Apache::XPP::Cache::Expiry> 
+
+=head1 AUTHORS
+
+Greg Williams E<lt>greg@cnation.comE<gt>
+
+=cut

@@ -1,0 +1,39 @@
+<[% s.object %]>
+	<[% s.o.id %]>[% hash.${s.o.id} %]</[% s.o.id %]>
+[% FOREACH f IN s.o.fields -%]
+	<[% f.k %]>[% IF f.r && f.i %]
+<[% f.i %]>[% hash.${f.i} %]</[% f.i %]>
+<name>[% s.escape(hash.${f.k}) %]</name>[% ELSE %]
+[% IF f.verify == 'phone' %][% s.format_phone(hash.${f.k}) %]
+[% ELSIF f.boolean %]
+[% s.format_boolean(hash.${f.k}) %]
+[% ELSIF f.format == 'percent' %]
+[% s.format_percent(hash.${f.k}) %]
+[% ELSE %][% s.escape(hash.${f.k}) %][% END %]
+[% END %]</[% f.k %]>
+[% END %]
+<relations>
+[% FOREACH r IN s.o.relations %]
+	<[% r.t %]>
+	[% FOREACH d IN hash.relation.${r.t} -%]
+		<[% r.o %]>
+			<object>[% r.o %]</object>
+			<[% r.k %]>[% d.${r.k} %]</[% r.k %]>
+			<[% r.n %]>[% d.${r.n} %]</[% r.n %]>
+		</[% r.o %]>
+	[% END -%]
+	</[% r.t %]>
+[% END -%]
+</relations>
+<subs>
+[% FOREACH su IN s.o.subs %]
+	[% FOREACH d IN hash.sub.${su.t} -%]
+	<[% su.o %]>
+		<object>[% su.o %]</object>
+		<[% su.k %]>[% d.${su.k} %]</[% su.k %]>
+		<[% su.n %]>[% d.${su.n} %]</[% su.n %]>
+	</[% su.o %]>
+	[% END %]
+[% END %]
+</subs>
+</[% s.object %]>

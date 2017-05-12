@@ -1,0 +1,251 @@
+#!/usr/bin/env perl
+
+use common::sense;
+use warnings FATAL => q(all);
+use autodie;
+use open IN => q(:locale), OUT => q(:locale);
+use Getopt::Long qw(:config no_ignore_case auto_version);
+use Pod::Find qw(pod_where);
+use Pod::Usage;
+use App::BoolFindGrep::CLI;
+
+our $VERSION = '0.06'; # VERSION
+
+my %opt;
+#<<<
+my $result = GetOptions(
+    q(--files-from|T=s)       => sub { $opt{ $_[0] } = $_[1] },
+    q(--files-delim|d=s)      => sub { $opt{ $_[0] } = $_[1] },
+    q(--file-expr|f=s{1,})    => sub { push @{ $opt{ $_[0] } }, $_[1] },
+    q(--find-type|t=s)        => sub { $opt{ $_[0] } = $_[1] },
+    q(--find-ignore-case|I)   => sub { $opt{ $_[0] } = $_[1] },
+    q(--directory|D=s{1,})    => sub { push @{ $opt{ $_[0] } }, $_[1] },
+    q(--fixed-strings|F)      => sub { $opt{ $_[0] } = $_[1] },
+    q(--match-expr|m=s{1,})   => sub { push @{ $opt{ $_[0] } }, $_[1] },
+    q(--ignore-case|i)        => sub { $opt{ $_[0] } = $_[1] },
+    q(--line-regexp|x)        => sub { $opt{ $_[0] } = $_[1] },
+    q(--word-regexp|w)        => sub { $opt{ $_[0] } = $_[1] },
+    q(--glob-regexp|g)        => sub { $opt{ $_[0] } = $_[1] },
+    q(--files-with-matches|l) => sub { $opt{ $_[0] } = $_[1] },
+    q(--slash-as-delim|s)     => sub { $opt{ $_[0] } = $_[1] },
+    q(usage|help|h)           => sub { pod2usage( q(-verbose) => 1 ) },
+    q(man)                    => sub { pod2usage( q(-verbose) => 2 ) },
+);
+#>>>
+
+if (@ARGV) {
+    say qq(Unparsed options: '@ARGV');
+    pod2usage( -verbose => 1 );
+}
+
+pod2usage( -verbose => 1 ) if !($result) || !(%opt);
+
+my $obj   = App::BoolFindGrep::CLI->new();
+my $check = $obj->args_checker(%opt);
+
+exit 1 unless $check;
+exit 1 unless $obj->process();
+
+my @result = @{ $obj->result() };
+
+say for @result;
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+bfg - find and grep files using boolean expressions.
+
+=head1 VERSION
+
+version 0.06
+
+=head1 DESCRIPTION
+
+This program combines the power of three Unix tools (in their GNU versions): bool, find and grep to provide a way to search by filenames and/or by file contents using boolean expressions. Internaly, all boolean expressions with regexps/strings are translated into mathematical expressions and the B<Perl>'s interpreter itself is used to validade and evaluate these expressions.
+
+Complex searches using B<grep> are very painful and B<bool> have lots of limitations and complex escape rules. B<bfg> simplify these searches by using more clear syntax and better performance in some cases.
+
+For example, to search
+
+    first AND second AND third AND fourth AND NOT fifth
+
+in filenames, and the same expression in file contents using B<find> and B<grep>, you need do:
+
+    find . \
+	-type f \
+	-name '*first*' -a \
+	-name '*second*' -a \
+	-name '*third*' -a \
+	-name '*fourth*' -a \
+	-not -name '*fifth*' \
+	-print0 |
+    xargs grep -F -l 'first' |
+    tr '\n' |
+    xargs grep -F -l 'second' |
+    tr '\n' |
+    xargs grep -F -l 'third' |
+    tr '\n' |
+    xargs grep -F -l 'fourth' |
+    tr '\n' |
+    xargs grep -F -l -v 'fifth'
+
+Using B<bfg> you can sumarize this to:
+
+    bfg -t literal -f \
+    first AND second AND third AND fourth AND NOT fifth \
+    -F -m \
+    first AND second AND third AND fourth AND NOT fifth
+
+=head2 About Boolean Expressions
+
+In the context of this program, a B<Boolean Expression> is a composite of I<OPERANDS>, I<OPERATORS> and I<GROUPS>.
+
+An I<OPERAND> is a string representing a literal text or a regular expression. It can be delimited by slashes like B<ed>, B<sed> or B<vim>.
+
+An I<OPERATOR> can be B<AND>, B<OR> or B<NOT>, delimited by white spaces. The following composition of operators are valid too: B<AND NOT>, B<OR NOT>, B<NOT NOT NOT> ...  Operators are case insensitive.
+
+A I<GROUP> is a sub expression delimite by parentheses used to define a set of sub conditions to match.
+
+Any expression valid in program languages are valid here.
+
+=head1 USAGE
+
+    bfg [ -m <EXPR>]
+    bfg [-F|-i|[-w|-x]] [-m <EXPR>]
+    bfg [-D <DIR1 [DIR2 [DIR3]]>] [-t <literal|glob|regexp>] [-I <0|1>] -f <EXPR>
+    bfg [-t <literal|glob|regexp>] [-I <0|1>] -f <EXPR> -m <EXPR>
+    bfg [-T <filename|-|STDIN> [-d <char>]] [-F|-i|[-w|-x]] -m <EXPR>
+
+    OPTIONS:
+    [ --files-from         | -T ]    file name, "-" or stdin.
+    [ --files-delim        | -d ]    file names' character separator.
+    [ --file-expr          | -f ]    boolean expr to file names.
+    [ --find-type          | -t ]    regexp (default), literal or glob.
+    [ --find-ignore-case   | -I ]    ignore find operands' case.
+    [ --directory          | -D ]    where to search for files.
+    [ --match-expr         | -m ]    boolean expr to file contents.
+    [ --fixed-strings      | -F ]    operands as literal strings.
+    [ --ignore-case        | -i ]    ignore case of operands.
+    [ --line-regexp        | -x ]    interpret operands as whole lines.
+    [ --word-regexp        | -w ]    interpret operands as whole words.
+    [ --glob-regexp        | -g ]    operands as shell patterns.
+    [ --files-with-matches | -l ]    show only filenames.
+    [ --slash-as-delim     | -s ]    slashes delimit operands.
+
+=head1 OPTIONS
+
+=head2 "find" options
+
+=over
+
+=item * --files-from, -T
+
+Get file names from a file or from Standard Input. Valid forms to express STDIN are hyphen ou word "stdin" (the case is ignored). This option works like C<-T> from B<gnu tar>.
+
+=item * --files-delim, -d
+
+Specify string separator of file names when C<--files-from, -T> is given. This option can receive a NULL character if written as C<\0> (like C<-0> option from B<gnu xargs>.
+
+=item * --file-expr, -f
+
+Specify the boolean expression to search in file names. Any boolean expression is valid.
+
+=item * --find-type, -t
+
+Determines if operands of C<--file-expr, -f> are interpreted as literal strings, glob patterns or regular expressions. The default is regular expressions.
+
+=item * --find-ignore-case, -I
+
+Determines if case of operand of C<--file-expr, -f> are relevant or no. Default is yes (0). More or less like C<-iregex> and C<-iname> options from B<gnu find>.
+
+=item * --directory, -D
+
+A white space list of directories to search for files. This switch can be declared one time for each directory.
+
+=back
+
+=head2 "grep" options
+
+=over
+
+=item * --match-expr, -m
+
+Specify the boolean expression to search in file contents. Any boolean expression is valid.
+
+=item * --fixed-strings, -F
+
+Interprets the operands of C<--match-expr> as literal strings. Like C<-F> option from B<gnu grep>.
+
+=item * --ignore-case, -i
+
+Ignore or no the case operands' case letters of C<--match-expr> option.
+
+=item * --line-regexp, -x
+
+Interprets each operand of C<--match-expr> as a whole line. Like C<-x> option from B<gnu grep>.
+
+=item * --word-regexp, -w
+
+Interprets each operand of C<--match-expr> as a whole word*. Like C<-w> option from B<gnu grep>.
+
+*word here is regexp's context.
+
+=item * --glob-regexp, -g
+
+Interprets each operand of C<--match-expr> as I<S<shell patterns>>.
+
+=item * --files-with-matches, -l
+
+Show only filenames.
+
+=item * --slash-as-delim, -s
+
+Inhibt operators and parentheses interpretation insid slashes. To use literal slashes, escape them with a backslash.
+
+=back
+
+=head1 EXAMPLES
+
+=head2 "Finding" Perl files
+
+All these options are equivalents:
+
+    $ bfg -I -f '\.pl$ OR \.pm$ OR \.t$ OR \.pod$'
+    $ bfg -I -f '/\.(?:p[lm]|t|pod)$/'
+    $ bfg -I -f '/\.(?:[Pp][LlMm]|Tt|[Pp][Oo][Dd])$/'
+    $ bfg -I -f '\.pl$|\.pm$|\.t$|\.pod$'
+
+=head2 "Greping"
+
+=head3 AND operator
+
+ foo AND bar
+
+    $ bfg -m foo AND bar
+    $ bfg -m '/(?:foo|bar)/'
+    $ bfg -m 'foo|bar'
+
+=head2 Operands composed by operators or parentheses
+
+If you want search strings with any operator or parentheses, you need delimiter your pattern with slashes (and set option C<--op-delimiters>). Like in:
+
+    /foo OR bar/
+
+This example matches whole string C<foo or bar> but not matches strings C<foo> or C<bar> separately.
+
+=head1 AUTHOR
+
+Ronaldo Ferreira de Lima aka jimmy <jimmy at gmail>.
+
+=head1 SEE ALSO
+
+=over
+
+=item * B<App::BoolFindGrep>.
+
+=back
+
+=cut

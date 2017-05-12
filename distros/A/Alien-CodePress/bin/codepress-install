@@ -1,0 +1,104 @@
+#!/usr/bin/perl
+# $Id$
+# $Source$
+# $Author$
+# $HeadURL$
+# $Revision$
+# $Date$
+use strict;
+use warnings;
+
+use Alien::CodePress;
+use Getopt::Long;
+use Pod::Usage;
+
+sub SAY;
+
+my $quiet;
+my $help;
+my $ret = GetOptions(
+    'quiet|q'   => \$quiet,
+    'help|h'    => \&help,
+);
+
+if (!$ret || $help) {
+    pod2usage(1);
+}
+
+
+my $dir = shift @ARGV;
+
+SAY 'Installing CodePress to ' . ($dir ? '['.$dir.']' : 'current directory') . '...';
+Alien::CodePress->new->install($dir);
+SAY "... all done!";
+
+
+sub SAY {
+    return if $quiet;
+    print @_, "\n";
+}
+
+
+__END__
+
+=head1 NAME
+
+codepress-install   - CodePress installation.
+
+=head1 SYNOPSIS
+
+    codepress-install [-q|-h|-m] [destination-dir]
+
+    Options:
+        --quiet | -h    Install quietly (only report errors).
+        --help  | -h    This help screen.
+    
+    destination-dir     Directory to install into. (default current-directory). 
+
+
+=head1 DESCRIPTION
+
+Installs CodePress using Alien::CodePress.
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--quiet>
+
+Install quietly (only report errors).
+
+=item C<--help>
+
+Show this help screen.
+
+=item C<destination-dir>
+
+Directory to install CodePress into. Default is the current directory.
+
+=back
+
+=head1 AUTHOR 
+Ask Solem C<< <ask@0x61736b.net> >>
+
+=head1 LICENSE                                                                    
+                                                                                  
+Copyright (C) 2007, Ask Solem.  All rights reserved.                  
+                                                                                  
+This is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+=head1 SEE ALSO                                                                   
+                                                                                  
+L<Alien::CodePress>.                                                          
+                                                                                  
+=cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+# End:
+# vim: expandtab tabstop=4 shiftwidth=4 shiftround
+
+

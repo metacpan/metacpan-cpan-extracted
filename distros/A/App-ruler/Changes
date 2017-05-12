@@ -1,0 +1,43 @@
+Revision history for App-ruler
+
+0.05    2016-03-11 (PERLANCAR)
+
+	- Adjust to Text::ANSI::Util 0.22 (::NonWideUtil removed).
+
+
+0.04    2015-08-13 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add examples.
+
+
+0.03    2015-08-12 (PERLANCAR)
+
+	- Add color support (--background-color, --major-tick-color,
+	  --minor-tick-color, --number-color).
+
+	- Add tips.
+
+	- Disable warning when number format does not contain %d.
+
+
+0.02    2015-08-09 (PERLANCAR)
+
+        - Replace option --background-character with --background-pattern (--bg)
+          to make it possible to have a ruler like '123456789|123456789|...'.
+
+        - Add option: --number-format (-f).
+
+        - [ux] Make it possible in CLI to unset --{major,minor}-tick-character.
+
+        - [ux] Add some short option aliases: -m, -M, -n, -N.
+
+        - [Bugfix] Add newline if ruler is not full-terminal-width wide.
+
+        - [Bugfix] Fix a typo (triggered when using --length (-l)).
+
+
+0.01    2015-08-09 (PERLANCAR)
+
+        - First release.

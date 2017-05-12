@@ -1,0 +1,121 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Std;
+use Pod::Usage;
+use Log::Log4perl qw(:easy);
+use Algorithm::Bucketizer;
+use Sysadm::Install qw(mv mkd);
+Log::Log4perl->easy_init($DEBUG);
+
+getopts("hvs:", \my %opts);
+pod2usage() if $opts{h};
+
+my $max_size = 100*1024*1024;
+
+if($opts{s}) {
+    my($num, $mag) = ($opts{s} =~ /([\d.]+)([mgk])/);
+    $max_size = $num;
+    $max_size *= 1024 if $mag =~ /k/i;
+    $max_size *= 1024*1024 if $mag =~ /m/i;
+    $max_size *= 1024*1024*1024 if $mag =~ /g/i;
+}
+
+#Sysadm::Install::dry_run(1);
+
+my $b = Algorithm::Bucketizer->new(
+    bucketsize => $max_size,
+    algorithm => 'retry',
+);
+
+for my $file (@ARGV) {
+    my $size = -s $file;
+    LOGDIE "$file: $!" if ! defined $size;
+    $b->add_item($file, $size);
+}
+
+my $count = 1;
+
+for my $bucket ($b->buckets()) {
+    my $dir = sprintf "%03d", $count;
+    mkd $dir;
+    for my $item ($bucket->items()) {
+        mv $item, $dir;
+    }
+    $count++;
+}
+
+__END__
+
+=head1 NAME
+
+    bucketize - Move files into buckets
+
+=head1 SYNOPSIS
+
+    bucketize files ...
+
+      # Make buckets 100MB in size
+    bucketize -s 100m *.jpg
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-s>
+
+Set the bucket size
+
+=back
+
+=head1 DESCRIPTION
+
+C<bucketize> takes a number of files and moves them into subdirectories
+with limited size.
+
+These subdirectories (buckets) are created on-the-fly, and named
+001, 002, and so forth.
+
+So, if you have 8 video files like
+
+   10570148 wienerschnitzel 02.avi
+   46988832 wienerschnitzel 03.avi
+    3609584 wienerschnitzel 04.avi
+   76198332 wienerschnitzel 05.avi
+   53203604 wienerschnitzel 06.avi
+  481153928 wienerschnitzel 07.avi
+  442000760 wienerschnitzel 08.avi
+  292597256 wienerschnitzel 09.avi
+
+you can ask C<bucketize> to put them in buckets not exceeding 1GB
+each:
+
+    $ bucketize -s 1g *.avi
+
+In this case, C<bucketize> will create the following directory structure:
+
+  ./001:
+  wienerschnitzel 02.avi  wienerschnitzel 04.avi  wienerschnitzel 06.avi
+  wienerschnitzel 03.avi  wienerschnitzel 05.avi  wienerschnitzel 07.avi
+  
+  ./002:
+  wienerschnitzel 08.avi  wienerschnitzel 09.avi
+
+It is an error if a numbered directory already exists, make sure you
+start with a clean slate.
+
+=head1 EXAMPLES
+
+  $ bucketize *.jpg
+
+  $ bucketize -s 2g *.jpg
+
+=head1 LEGALESE
+
+Copyright 2007 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2007, Mike Schilli <cpan@perlmeister.com>

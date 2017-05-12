@@ -1,0 +1,22 @@
+Revision history for Alien-GMP
+
+v0.0.6    2012-04-06 04:25:16 America/Chicago
+	- Bumped Perl version requirement to v5.10.1.
+
+v0.0.5    2012-04-05 14:24:01 America/Chicago
+	- Change procedure to find header file and shared object by using
+	  qw(cc -print-search-dirs).
+
+v0.0.4    2012-04-04 01:07:37 America/Chicago
+	- Added Alien::Autotools configure dependency.
+
+v0.0.3    2012-04-02 05:08:39 America/Chicago
+	- Changed tests to check for directory existence in build directory, not
+	  eventual install directory.
+	- Changed source archive download location from gmplib.org to gnu.org.
+
+v0.0.2    2012-03-25 14:27:41 America/Chicago
+	- Removed unused configure and runtime dependencies.
+
+v0.0.1    2012-03-24 16:15:20 America/Chicago
+	- Initial trial release.

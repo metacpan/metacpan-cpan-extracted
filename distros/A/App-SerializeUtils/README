@@ -1,0 +1,25 @@
+SYNOPSIS
+
+     $ script-that-produces-json | json2yaml
+
+DESCRIPTION
+
+    This distributions provides the following command-line utilities
+    related to serialization:
+
+    # INSERT_EXECS_LIST
+
+SEE ALSO
+
+    Data::Dump
+
+    JSON
+
+    PHP::Serialization
+
+    Sereal
+
+    Storable
+
+    YAML
+

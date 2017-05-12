@@ -1,0 +1,220 @@
+=head1 NAME
+
+APR::Emulate::PSGI - Class that Emulates the mod_perl2 APR Object (Apache2::RequestRec, et al)
+
+=head1 SYNOPSIS
+
+  use APR::Emulate::PSGI;
+  my $r = APR::Emulate::PSGI->new($psgi_env);
+
+  # Or in a CGI environment:
+  my $r = APR::Emulate::PSGI->new();
+
+=head1 DESCRIPTION
+
+This class emulates the mod_perl2 APR object.  It expects either a
+PSGI environment hashref to be passed in, or to read HTTP environment
+information from the global %ENV.
+
+Currently this module is little more than a proof of concept.  There
+are rough edges.
+
+Use at your own discretion.  Contributions welcome.
+
+
+=cut
+
+=head1 METHODS
+
+=over 4
+
+=item new
+
+Creates an object that emulates the mod_perl2 APR object.
+
+    my $r = APR::Emulate::PSGI->new($psgi_env);
+
+HTTP environment information is read from the PSGI environment that is
+passed in as a parameter.  If no PSGI environment is supplied,
+environment information is read from the global %ENV.
+
+
+=cut
+
+=item psgi_status
+
+Returns the numeric HTTP response that should be used when building
+a PSGI response.
+
+    my $status = $r->psgi_status();
+
+The value is determined by looking at the current value of L</status_line>,
+or if that is not set, the current value of L</status>, or if that is not
+set, defaults to 200.
+
+
+=cut
+
+=item psgi_headers
+
+Returns an arrayref of headers which can be used when building a PSGI
+response.
+
+A Content-Length header is not included, and must be added in accordance
+with the L<PSGI> specification, while building the PSGI response.
+
+    my $headers_arrayref = $r->psgi_headers();
+
+
+=cut
+
+=back
+
+=head2 Request Methods
+
+=over 4
+
+=item headers_in
+
+Emulates L<Apache2::RequestRec/headers_in>.
+
+
+=cut
+
+=item method
+
+Emulates L<Apache2::RequestRec/method>.
+
+
+=cut
+
+=item uri
+
+Emulates L<Apache2::RequestRec/uri>.
+
+
+=cut
+
+=item parsed_uri
+
+Emulates L<Apache2::URI/parsed_uri>.
+
+
+=cut
+
+=item args
+
+Emulates L<Apache2::RequestRec/args>.
+
+
+=cut
+
+=item read
+
+Emulates L<Apache2::RequestIO/read>.
+
+
+=cut
+
+=item pool
+
+Emulates L<Apache2::RequestRec/pool>.
+
+
+=cut
+
+=back
+
+=head2 Response Methods
+
+=over 4
+
+=item headers_out
+
+Emulates L<Apache2::RequestRec/headers_out>.
+
+
+=cut
+
+=item err_headers_out
+
+Emulates L<Apache2::RequestRec/err_headers_out>.
+
+
+=cut
+
+=item no_cache
+
+Emulates L<Apache2::RequestUtil/no_cache>.
+
+
+=cut
+
+=item status
+
+Emulates L<Apache2::RequestRec/status>.
+
+
+=cut
+
+=item status_line
+
+Emulates L<Apache2::RequestRec/status_line>.
+
+
+=cut
+
+=item content_type
+
+Emulates L<Apache2::RequestRec/content_type>.
+
+If no PSGI enviroment is provided to L</new>, calling this
+method with a parameter will cause HTTP headers to be sent.
+
+
+=cut
+
+=item print
+
+Emulates L<Apache2::RequestIO/print>.
+
+
+=cut
+
+=item rflush
+
+Emulates L<Apache2::RequestIO/rflush>.
+
+
+=cut
+
+=back
+
+
+=cut
+
+=head1 SEE ALSO
+
+=over 4
+
+=item Plack
+
+=item CGI::Emulate::PSGI
+
+=back
+
+=head1 AUTHOR
+
+Nathan Gray, E<lt>kolibrie@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013, 2014 by Nathan Gray
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut
+

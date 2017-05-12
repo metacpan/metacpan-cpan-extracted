@@ -1,0 +1,5 @@
+BEGIN;
+
+ALTER TABLE node DROP CONSTRAINT node_pkey;
+
+COMMIT;

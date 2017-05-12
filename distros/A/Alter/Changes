@@ -1,0 +1,25 @@
+Revision history for Perl extension Alter.
+
+0.01  Fri May 25 05:47:40 2007
+	- original version; created by h2xs 1.23 with options
+		-A -n Alter
+
+0.02  Sat Jul  7 21:17:28 CEST 2007
+        - Released on CPAN
+
+0.03 Tue Jul 10 21:14:00 CEST 2007
+        - Bad test report (bleadperl under linux)
+          Dodged by re-writing is_xs() in Perl
+          (The trivial is_xs() is strangely hard to make portable)
+          Minor pod fixes
+
+0.04 Sun Jul 15 12:02:42 CEST 2007
+        - better check for Storable's attach-awareness
+
+0.05 Mon Jul 16 21:01:53 CEST 2007
+        - Another tester-FAIL with Storable's attach (grr)
+          Version number corrected, diag added in fail case
+
+0.07 Di Okt  9 23:29:14 CEST 2007
+        - changed ego() to accept (but ignore) more arguments than one
+          when prototype is overridden.

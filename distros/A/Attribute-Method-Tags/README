@@ -1,0 +1,68 @@
+NAME
+    Attribute::Method::Tags - Attribute interface for adding tags to
+    methods.
+
+SYNOPSIS
+     package Bleh;
+
+     # using Attribute::Method::Tags will add to callers ISA
+     use Attribute::Method::Tags;
+
+     sub foo : Tags( quick fast loose ) {
+         ...
+     }
+
+     sub bar : Tags( quick ) {
+         ...
+     }
+
+     # can use Attribute::Method::Tags::Registry to query tags on all classes.
+
+DESCRIPTION
+    This class permits adding arbitrary tags to methods, via an attribute
+    interface. The tags can later be queried via the
+    Attribute::Method::Tags::Registry class.
+
+    Note that since attributes only work via inheritance, 'use'ing this
+    class will add it to the @ISA of the composing class.
+
+ATTRIBUTES
+    The only usage of this class is through the 'Tags' attribute against
+    subs. A list of arbitrary alphanumeric tags can be given as parameters,
+    seperated by whitespace. Each of the tags will be added to the registry
+    contained in Attribute::Method::Tags::Registry, and can be queried via
+    that class.
+
+CAVEATS
+    As attributes are handled at compilation time, actions such as requiring
+    classes or eval'ing code during runtime won't play well when used with
+    attributes. This can be gotten around by doing such actions with a BEGIN
+    block. If this isn't possible, a workaround is to define your dynamic
+    methods without any attributes, the use
+    Attribute::Method::Tags::Registry 'add' method to explicitly tag the
+    method.
+
+SEE ALSO
+    Attributes::Method::Tags::Registry
+        Registry class, that permits querying of all tags across all
+        packages/methods.
+
+    Test::Class::Filter::Tags
+        The original impetus for this module. Permits specifying tags on
+        test methods, and then running only a subset of tests, matching a
+        given tag list.
+
+AUTHOR
+    Mark Morgan <makk384@gmail.com>
+
+BUGS
+    Please send bugs or feature requests through to
+    bugs-Attribute-Method-Tags@rt.rt.cpan.org or through web interface
+    <http://rt.cpan.org> .
+
+COPYRIGHT AND LICENSE
+    Copyright 2010 Mark Morgan, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

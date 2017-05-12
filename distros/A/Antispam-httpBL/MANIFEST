@@ -1,0 +1,17 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+SIGNATURE
+dist.ini
+lib/Antispam/httpBL.pm
+t/httpBL.t
+t/release-eol.t
+t/release-kwalitee.t
+t/release-no-tabs.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

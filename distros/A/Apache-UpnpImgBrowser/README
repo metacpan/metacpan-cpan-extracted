@@ -1,0 +1,66 @@
+Copyright (C) 1999-2007 James Pavlick  All Rights Reserved
+
+   You may distribute under the terms of either the GNU General Public
+   License or the Artistic License, as specified in the Perl README file.
+
+
+NAME
+
+  Apache::UpnpImgBrowser
+
+DESCRIPTION
+
+Apache::UpnpImgBrowser is a simple mod_perl application for displaying photos. 
+hosted on a UPNP DLNA compliant Media Server.  
+
+
+REQUIREMENTS
+
+  Image::Magick
+  Net::UPnP
+  SOAP::Lite 
+  XML::Simple
+  Data::Dumper
+  Cache::FileCache
+  URI::Escape
+  LWP::Simple
+
+
+INSTALLATION
+
+  perl Makefile.PL
+  make
+  make install
+
+
+USAGE
+
+Add the following to your httpd.conf and restart. Then point your browser to
+http://yoursite.com/photos
+
+
+  <Location /photos>
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+
+    SetHandler perl-script
+    PerlHandler Apache::UpnpImgBrowser
+    PerlSetVar Rows 10
+    PerlSetVar Cols 5
+    PerlSetVar Thumb-size 50x20
+    PerlSetVar Show-names 1
+    PerlSetVar Hide-dirs 1
+  </Location>
+
+CAVEATS
+
+Only tested with Twonky Media Server (http://www.twonkyvision.de/)
+
+
+AUTHOR
+
+  Original author: James Pavlick <jpavlick@mymule.com>
+
+  Copyright (C) 2000-2007 James Pavlick
+

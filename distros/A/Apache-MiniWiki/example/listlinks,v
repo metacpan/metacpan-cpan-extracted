@@ -1,0 +1,27 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2003.10.11.19.28.13;	author anonymous;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@adding listlinks page
+@
+text
+@List all links
+
+Here's every link in this Wiki, grouped by page. External links will take you directly to that external site. Links to other pages will scroll you up or down on this page. Click *View* behind the page title to open that page, click *Links* to view the list of links. On a browser that supports style sheets, this should expand into a bullet list.
+
+---@

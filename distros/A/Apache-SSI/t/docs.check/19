@@ -1,0 +1,8 @@
+
+foo = bar
+QUERY_STRING = query
+
+set_var2.ssi
+
+foo = bar
+QUERY_STRING = query

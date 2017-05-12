@@ -1,0 +1,410 @@
+#!perl
+use strict;
+use warnings;
+use utf8;
+use 5.008001;
+use App::Tacochan;
+use Amon2::Lite;
+use Skype::Any;
+use URI;
+use Getopt::Long ();
+use Pod::Usage;
+
+use Plack::Builder;
+use Plack::Builder::Conditionals -prefix => 'c';
+use Twiggy::Server;
+
+my $skype = Skype::Any->new(name => 'tacochan');
+
+sub render_text {
+    my ($self, $code, $message) = @_;
+
+    $message = $self->encoding->encode($message);
+
+    return $self->create_response(
+        $code,
+        [
+            'Content-Type'   => 'text/plain; charset=utf-8',
+            'Content-Length' => length $message,
+        ],
+        [$message]
+    );
+}
+
+sub res_404 { $_[0]->render_text(404, 'Not Found') }
+
+sub guess_chat {
+    my ($self, $stuff) = @_;
+    if ($stuff =~ /^#/) {
+        # from chatname
+        return $skype->chat($stuff);
+    } elsif ($stuff =~ /^skype:/) {
+        # from "/get uri"
+        my %query = URI->new($stuff)->query_form();
+        my $command = $skype->api->send_command("CHAT FINDUSINGBLOB $query{blob}");
+        my @reply = $command->split_reply();
+        return $skype->chat($reply[1]);
+    } else {
+        # from username
+        return $skype->user($stuff)->chat();
+    }
+}
+
+get '/' => sub {
+    my ($c) = @_;
+    return $c->render('index.tt' => {
+        ok => scalar $skype->api->is_running,
+    });
+};
+
+get '/chat_list' => sub {
+    my ($c) = @_;
+    unless ($skype->api->is_running) {
+        return $c->render_text(500, 'Skype is not running');
+    }
+
+    my $command = $skype->api->send_command('SEARCH RECENTCHATS');
+    my ($obj, $chats) = $command->split_reply(2);
+    my @recentchats;
+    for my $chatname (split /,\s+/, $chats) {
+        my $chat = $skype->chat($chatname);
+        my $topic = $chat->topic;
+        push @recentchats, {
+            chatname => $chatname,
+            status   => $chat->status,
+            members  => [split /\s+/, $chat->members],
+            $topic ? (topic => $topic) : (),
+        };
+    }
+    return $c->render_json(\@recentchats);
+};
+
+post qr!^/(?:leave|part)$! => sub {
+    my ($c) = @_;
+    unless ($skype->api->is_running) {
+        return $c->render_text(500, 'Skype is not running')
+    }
+
+    my $chat = $c->req->param('chat');
+
+    my $chat_obj = $c->guess_chat($chat);
+    eval {
+        $chat_obj->alter('leave');
+    };
+    if ($@) {
+        return $c->render_text(403, "leave failure chat: $chat");
+    }
+    return $c->render_text(200, "leave success chat: $chat");
+};
+
+post qr!^/(?:send|notice|privmsg)$! => sub {
+    my ($c) = @_;
+    unless ($skype->api->is_running) {
+        return $c->render_text(500, 'Skype is not running')
+    }
+
+    my $chat = $c->req->param('chat');
+    my $message = $c->req->param('message');
+
+    my $chat_obj = $c->guess_chat($chat);
+    eval {
+        $chat_obj->send_message($message);
+    };
+    if ($@) {
+        return $c->render_text(403, "message sent failure chat: $chat $message");
+    }
+    return $c->render_text(200, "message sent chat: $chat_obj->{id} $message");
+};
+
+get '/chat_id' => sub {
+    my ($c) = @_;
+    unless ($skype->api->is_running) {
+        return $c->render_text(500, 'Skype is not running');
+    }
+
+    my $chat = $c->req->param('chat');
+
+    my $chat_obj = $c->guess_chat($chat);
+    return $c->render_text(200, "$chat_obj->{id}");
+};
+
+__PACKAGE__->load_plugin('Web::JSON');
+
+my $parser = Getopt::Long::Parser->new(
+    config => ['no_ignore_case', 'pass_through'],
+);
+
+my %options;
+my ($http_host, $http_port) = ('127.0.0.1', 4969);
+my @reverse_proxy;
+$parser->getoptions(
+    'o|host=s'  => \$http_host,
+    'p|port=i'  => \$http_port,
+    'r|reverse-proxy=s' => \@reverse_proxy,
+    'h|help'    => \$options{help},
+    'v|version' => \$options{version},
+);
+pod2usage(1) if $options{help};
+if ($options{version}) {
+    die "tacochan $App::Tacochan::VERSION\n";
+}
+
+my $app = builder {
+    if (@reverse_proxy) {
+        enable c_match_if c_addr(\@reverse_proxy), 'Plack::Middleware::ReverseProxy';
+    }
+    enable 'Plack::Middleware::AccessLog', format => 'combined';
+    __PACKAGE__->to_app(
+        handle_static             => 1,
+        no_x_content_type_options => 1,
+        no_x_frame_options        => 1,
+    );
+};
+
+$skype->attach;
+
+warn "starting httpd: http://$http_host:$http_port/\n";
+my $twiggy = Twiggy::Server->new(
+    host => $http_host,
+    port => $http_port,
+);
+$twiggy->register_service($app);
+
+$skype->run;
+
+__DATA__
+
+@@ index.tt
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>tacochan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/bootswatch/2.3.0/united/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-responsive.min.css" />
+    <link rel="stylesheet" href="[% uri_for('/static/css/main.css') %]" />
+</head>
+<body class="tacochan">
+    <article class="container">
+        <header class="header[% IF !ok %] error[% END %]">
+            <div class="container">
+                <h1>tacochan[% IF !ok %]...[% END %]</h1>
+                <p class="lead">Skype message delivery by HTTP</p>
+            </div>
+        </header>
+        <div class="container">
+            [% IF !ok %]
+            <div class="alert alert-error">
+                <strong>Oops!</strong> tacochan doesn't work because Skype is not running. You need to manually start Skype and allow 'tacochan' to use Skype. After that restart tacochan.
+            </div>
+            [% END %]
+            <h3>Send a message to chat</h3>
+            <form class="form-inline" action="[% uri_for('/send') %]" method="post">
+                <fieldset>
+                    <input type="text" name="chat" placeholder="#chat|skype:|user[, user, ...]" />
+                    <input type="text" class="input input-xxlarge" name="message" placeholder="message" />
+                    <input type="submit" value="Send" class="btn" />
+                </fieldset>
+            </form>
+            <p>See <a href="#docsSendMessage">documentation</a> on how to use it.</p>
+        </div>
+        <div class="docs">
+            <div class="container">
+                <h2>API documentations</h2>
+                <h3><a id="docsRecentChats">Recent chats</a></h3>
+                <table class="table table-bordered">
+                    <tr>
+                        <td class="name">method</td>
+                        <td><code>GET</code></td>
+                    </tr>
+                    <tr>
+                        <td class="name">url</td>
+                        <td><code>[% c().req.base %]chat_list</code></td>
+                    </tr>
+                    <tr>
+                        <td class="name">Content-Type</td>
+                        <td><code>application/json; charset=utf-8</code></td>
+                    </tr>
+                </table>
+                <p>Responds a list of recent chats as JSON (see below).</p>
+                <table class="table table-bordered">
+                    <tr><td class="name">chatname : string</td><td colspan="2">chatname</td></tr>
+                    <tr><td class="name" rowspan="4">status : string</td><td>"LEGACY_DIALOG"</td><td>old style IM</td></tr>
+                    <tr><td>"DIALOG"</td><td>1:1 chat</td></tr>
+                    <tr><td>"MULTI_SUBSCRIBED"</td><td>participant in chat</td></tr>
+                    <tr><td>"UNSUBSCRIBED"</td><td>left chat</td></tr>
+                    <tr><td class="name">members : [string, ...]</td><td colspan="2">all users who have been there</td></tr>
+                    <tr><td class="name">topic : string</td><td colspan="2">chat topic</td></tr>
+                </table>
+                <h3><a id="docsLeaveChat">Leave the chat</a></h3>
+                <table class="table table-bordered">
+                    <tr>
+                        <td class="name">method</td>
+                        <td><code>POST</code></td>
+                    </tr>
+                    <tr>
+                        <td class="name">url</td>
+                        <td><code>[% c().req.base %]leave</code></td>
+                    </tr>
+                    <tr>
+                        <td class="name">form params</td>
+                        <td>
+                            <code>chat=#chat|skype:|user[, user, ...]</code><br />
+                        </td>
+                    </tr>
+                </table>
+                <p>Please be careful that <code>/leave</code> can only leave the chat. You can NOT re-join the chat yourself if you left already.</p>
+                <p>aliases: <code>/part</code> (for ikachan compatibility)</p>
+                <h3><a id="docsSendMessage">Send a message to chat</a></h3>
+                <table class="table table-bordered">
+                    <tr>
+                        <td class="name">method</td>
+                        <td><code>POST</code></td>
+                    </tr>
+                    <tr>
+                        <td class="name">url</td>
+                        <td><code>[% c().req.base %]send</code></td>
+                    </tr>
+                    <tr>
+                        <td class="name">form params</td>
+                        <td>
+                            <code>chat=#chat|skype:|user[, user, ...]&amp;message=your_message</code>
+                        </td>
+                    </tr>
+                </table>
+                <p>aliases: <code>/notice</code>, <code>/privmsg</code> (for ikachan compatibility)</p>
+                <h4>Examples</h4>
+                <section class="example">
+                    <h5>#1 Send a message to 1:1 chat</h5>
+                    <pre>echo123</pre>
+                    <p>Passes username to <code>chat</code> parameter. In this case, send a message to 'echo123'.</p>
+                </section>
+                <section class="example">
+                    <h5>#2 Create a new group chat and send a message</h5>
+                    <pre>echo123,anappo5</pre>
+                    <p>Passes usernames separated by ',' to <code>chat</code> parameter. In this case, create <em>a new group chat</em> to add 'echo123', 'anappo5'. If you don't want to create a new group chat, see #3 or #4.</p>
+                </section>
+                <section class="example">
+                    <h5>#3 Send a message to an existing group chat (with chatname)</h5>
+                    <pre>#anappo2/$d936403094338dbb</pre>
+                    <p>Passes chatname to <code>chat</code> parameter. Note that chatname is internal chat identifier. In tacochan, you can only get it from <a href="#docsRecentChats">Recent chats</a>.</p>
+                </section>
+                <section class="example">
+                    <h5>#4 Send a message to an existing group chat (with Skype URI)</h5>
+                    <pre>skype:?chat&amp;lob=LsgqqqCTpxWYjt9PL1hSvGDOiPhqUuQAHxI7w7Qu7gJ3VZv_q_99ZJO4lF9Dfaw</pre>
+                    <p>Passes Skype URI to <code>chat</code> parameter. Note that if you want to get Skype URI (skype:), you need to send this message to the chat: <code>/get uri</code></p>
+                </section>
+                <h3><a id="docsChatID">Chat ID</a></h3>
+                <table class="table table-bordered">
+                    <tr>
+                        <td class="name">method</td>
+                        <td><code>GET</code></td>
+                    </tr>
+                    <tr>
+                        <td class="name">url</td>
+                        <td><code>[% c().req.base %]chat_id</code></td>
+                    </tr>
+                    <tr>
+                        <td class="name">form params</td>
+                        <td>
+                            <code>chat=skype:|user[, user, ...]</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="name">Content-Type</td>
+                        <td><code>text/plain; charset=utf-8</code></td>
+                    </tr>
+                </table>
+                <p>Responds chat_id from Skype URI or username (chat_id is like this: <code>#anappo2/$d936403094338dbb</code>)</p>
+            </div>
+        </div>
+    </article>
+</body>
+</html>
+
+@@ /static/css/main.css
+.tacochan {
+    padding: 0;
+}
+.tacochan article.container {
+    width: auto;
+}
+
+header.header {
+    margin: 0 auto 2% auto;
+    padding-top: 5%;
+    background: #d44413;
+    color: #fff;
+}
+.error {
+    background: #3b4653 !important;
+}
+
+table td.name {
+    width: 150px;
+    font-weight: bold;
+}
+
+div.docs {
+    margin: 2% auto 0 auto;
+    padding: 20px 0 5%;
+    background: #eee;
+    color: #000;
+}
+div.docs h3 a {
+    color: #000;
+}
+div.docs table {
+    background: #fff;
+}
+div.docs section.example {
+    margin-bottom: 5px;
+    padding: 10px;
+    background: #fff;
+}
+
+__END__
+
+=head1 NAME
+
+tacochan - Skype message delivery by HTTP
+
+=head1 SYNOPSIS
+
+  % tacochan
+
+=head1 OPTIONS
+
+=over 4
+
+=item -o, --host
+
+The interface a TCP based server daemon binds to. Defaults to undef,
+which lets most server backends bind the any (*) interface. This
+option doesn't mean anything if the server does not support TCP
+socket.
+
+=item -p, --port (default: 4969)
+
+The port number a TCP based server daemon listens on. Defaults to
+4969. This option doesn't mean anything if the server does not support
+TCP socket.
+
+=item -r, --reverse-proxy
+
+Treat X-Forwarded-For as REMOTE_ADDR if REMOTE_ADDR match this argument.
+
+See L<Plack::Middleware::ReverseProxy>.
+
+=item -h, --help
+
+Show help for this command.
+
+=item -v, --version
+
+Show version.
+
+=back
+
+=cut

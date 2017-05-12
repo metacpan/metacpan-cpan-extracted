@@ -1,0 +1,19 @@
+Revision history for App-TableDataUtils
+
+0.03    2015-09-13 (PERLANCAR)
+
+        - [Incompatible change] Rename script: gen-table-data to gen-rand-table.
+
+        - [ux] Set positional arguments for convenience.
+
+
+0.02    2015-09-12 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dzil] Fix plugin ordering.
+
+
+0.01    2015-09-12 (PERLANCAR)
+
+        - First release.

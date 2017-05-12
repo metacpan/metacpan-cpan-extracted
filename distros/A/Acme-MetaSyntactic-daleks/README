@@ -1,0 +1,61 @@
+NAME
+
+    Acme::MetaSyntactic::daleks - EXTERMINATE! EXTERMINATE! EXTERMINATE!
+
+
+DESCRIPTION
+
+    A list of movies for the Daleks. A collective work of "#perl". See
+    <http://use.perl.org/~statico/journal/21689>
+
+    I've tried to remove all the duplicates and comments I could find, but
+    there are probably still a few left. Don't hesitate to send patch to
+    remove wrong entries or to propose new entries.
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Alternatively, to install with Module::Build, you can use
+    the following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+    After installing, you can find documentation for this module with the
+    perldoc command.
+
+        perldoc Acme::MetaSyntactic::daleks
+
+    You can also look for information at:
+
+        RT, CPAN's request tracker
+            http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-MetaSyntactic-daleks
+
+        AnnoCPAN, Annotated CPAN documentation
+            http://annocpan.org/dist/Acme-MetaSyntactic-daleks
+
+        CPAN Ratings
+            http://cpanratings.perl.org/d/Acme-MetaSyntactic-daleks
+
+        Search CPAN
+            http://search.cpan.org/dist/Acme-MetaSyntactic-daleks
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2007 Sebastien Aperghis-Tramoni
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

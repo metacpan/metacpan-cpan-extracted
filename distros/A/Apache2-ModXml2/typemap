@@ -1,0 +1,15 @@
+TYPEMAP
+APR::Bucket T_PTROBJ 
+APR::Brigade T_PTROBJ 
+APR::BucketAlloc T_PTROBJ
+Apache2::RequestRec T_APACHEOBJ
+Apache2::Filter T_PTROBJ
+
+OUTPUT
+T_APACHEOBJ
+        sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+
+INPUT
+T_APACHEOBJ
+        $var = modperl_xs_sv2request_rec(aTHX_ $arg, \"$ntype\", cv)
+

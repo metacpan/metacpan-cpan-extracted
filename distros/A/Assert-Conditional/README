@@ -1,0 +1,54 @@
+Assert-Conditional
+
+This alpha release introduces conditional asssertions that can get
+compile-time removed so they don't take up any run time in production but
+are active during testing.
+
+Currently 5.12 is required due to issues with Attribute::Handlers,
+but this module is intended to work with 5.10.
+
+The POSIX-related assertions that rely on functions like WIFEXITED
+won't work on non-POSIX systems.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Assert::Conditional
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Assert-Conditional
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Assert-Conditional
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Assert-Conditional
+
+    Search CPAN
+        http://search.cpan.org/dist/Assert-Conditional/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2015 Tom Christiansen
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+

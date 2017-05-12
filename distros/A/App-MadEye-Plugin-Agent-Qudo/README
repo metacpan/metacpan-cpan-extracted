@@ -1,0 +1,27 @@
+This is Perl module App::MadEye::Plugin::Agent::Qudo.
+
+INSTALLATION
+
+App::MadEye::Plugin::Agent::Qudo installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan App::MadEye::Plugin::Agent::Qudo
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+App::MadEye::Plugin::Agent::Qudo documentation is available as in POD. So you can do:
+
+    % perldoc App::MadEye::Plugin::Agent::Qudo
+
+to read the documentation online with your favorite pager.
+
+Atsushi Kobayashi

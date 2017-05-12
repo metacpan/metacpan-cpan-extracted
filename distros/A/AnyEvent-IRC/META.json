@@ -1,0 +1,46 @@
+{
+   "abstract" : "An event based IRC protocol client API",
+   "author" : [
+      "Robin Redeker <elmex@ta-sa.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-IRC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "5.111",
+            "Encode" : 0,
+            "Object::Event" : "0.6",
+            "Scalar::Util" : 0,
+            "Test::More" : 0,
+            "common::sense" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.97"
+}

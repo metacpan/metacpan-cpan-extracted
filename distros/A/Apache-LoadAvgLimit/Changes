@@ -1,0 +1,26 @@
+Revision history for Perl extension Apache::LoadAvgLimit.
+
+note: the module will never be updated for new feature.
+
+0.04    Tue Jun 25 14:20:07 UTC 2013
+
+    * marked as deprecated.
+    * switched to Minilla.
+    * removed useless extra files.
+
+0.03    Sat Sep  6 01:46:14 JST 2003
+
+    * add GetAvg.pm.uptime for example.
+    * a minor fix.
+
+0.02    Tue Mar 25 12:27:45 JST 2003
+
+    * add LoadAvgRetryAfter directive.
+
+0.01    Sun Jan  5 13:16:58 JST 2003
+
+    * first release.
+
+0.001    Thu Dec 19 02:34:45 JST 2002
+
+    * first alpha release.

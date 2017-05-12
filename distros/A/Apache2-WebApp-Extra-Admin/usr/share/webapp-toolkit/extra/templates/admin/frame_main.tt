@@ -1,0 +1,38 @@
+[%#
+   Apache2::WebApp::Toolkit - Admin Control Panel (frame_main.tt)
+   Copyright (C) 2010 Marc S. Brooks <mbrooks@cpan.org>
+
+   Licensed under the terms of the BSD License
+   http://www.opensource.org/licenses/bsd-license.php
+-%]
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN"
+	"http://www.w3.org/TR/html4/frameset.dtd">
+
+<html>
+<head>
+	<title>[% project_title %] v[% project_version %] - Control Panel</title>
+
+	<script type="text/javascript" src="/extras/admin/js/disable.js"></script>
+</head>
+
+<frameset cols="133, *" border="0" noresize>
+	<frame src="/app/admin/?load=side" name="side" scrolling="no" />
+
+	<frameset rows="50, *" border="0" noresize>
+		<frame src="/app/admin/?load=top" scrolling="no" />
+
+		<frame src="/app/admin/?load=default" name="main" scrolling="auto" />
+	</frameset>
+</frameset>
+
+<body>
+
+<noframes>
+	<h2>
+		To use this admin you must have a browser that supports frames
+	</h2>
+</noframes>
+
+</body>
+</html>

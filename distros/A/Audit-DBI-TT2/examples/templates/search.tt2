@@ -1,0 +1,125 @@
+[% WRAPPER wrapper.tt2 page_title='Search' %]
+
+	<style type="text/css">
+		@import "css/search.css";
+	</style>
+
+	<script type="text/javascript" src="js/search.js"></script>
+
+	<h1>
+		Audit :: Search
+	</h1>
+
+	<p style="font-size: 14px; font-weight: bold; color: red;">
+		IMPORTANT: searching audit logs takes a lot of resources and may bring a server down if used with broad criteria.<br/>
+		Please narrow your search criteria as much as possible, and always use a date range.
+	</p>
+
+	<div class="box">
+		<div id="headers">
+			<h3>Criteria</h3>
+			<h3>Values</h3>
+		</div>
+		<div id="criteria">
+		</div>
+		<div id="buttons">
+			<input type="button" value="Add criteria" onClick="Javascript:add_new_criteria();">
+			<input type="button" value="Submit" onClick="Javascript:submit_search();" style="float: right;">
+		</div>
+	</div>
+
+	<div id="model_row">
+		<div class="row">
+			<div class="remove">
+				<input type="button" value="X">
+			</div>
+			<div class="invert">
+				<select>
+					<option value="1">has</option>
+					<option value="0">has not</option>
+				</select>
+			</div>
+			<div class="criteria">
+				<select>
+					<option value="">- Select Criteria -</option>
+					<option value="ip_address">IP Address</option>
+					<option value="event">Event</option>
+					<option value="date_range">Date Range</option>
+					<option value="subject_type">Subject Type</option>
+					<option value="account_logged_in">Account Logged-in</option>
+					<option value="account_affected">Account Affected</option>
+					<option value="indexed_data">Search Indexed Data</option>
+				</select>
+			</div>
+
+			<!-- Search by IP range -->
+			<div class="values values_ip_address">
+				<div class="label">values:</div>
+				<div class="data">
+					<input type="text" name="ip_addresses">
+				</div>
+			</div>
+
+			<!-- Search by date range -->
+			<div class="values values_date_range">
+				<div class="label">from:</div>
+				<div class="data">
+					<input type="text" name="date_range_from" class="datepicker">
+				</div>
+				<div class="label" style="clear: left;">to:</div>
+				<div class="data">
+					<input type="text" name="date_range_to" class="datepicker">
+				</div>
+			</div>
+
+			<!-- Search by subject type -->
+			<div class="values values_subject_type">
+				<div class="label">type:</div>
+				<div class="data">
+					<input type="text" name="subject_type">
+				</div>
+				<div class="label" style="clear: left;">IDs:</div>
+				<div class="data">
+					<input type="text" name="subject_ids">
+				</div>
+			</div>
+
+			<!-- Search by event -->
+			<div class="values values_event">
+				<div class="label" style="clear: left;">Value:</div>
+				<div class="data">
+					<input type="text" name="event">
+				</div>
+			</div>
+
+			<!-- Search by account logged in -->
+			<div class="values values_account_logged_in">
+				<div class="label" style="clear: left;">IDs:</div>
+				<div class="data">
+					<input type="text" name="account_logged_in">
+				</div>
+			</div>
+
+			<!-- Search by account affected -->
+			<div class="values values_account_affected">
+				<div class="label" style="clear: left;">IDs:</div>
+				<div class="data">
+					<input type="text" name="account_affected">
+				</div>
+			</div>
+
+			<!-- Search by indexed values -->
+			<div class="values values_indexed_data">
+				<div class="label">key:</div>
+				<div class="data">
+					<input type="text" name="indexed_data_key">
+				</div>
+				<div class="label" style="clear: left;">values:</div>
+				<div class="data">
+					<input type="text" name="indexed_data_values">
+				</div>
+			</div>
+		</div>
+	</div>
+
+[% END %]

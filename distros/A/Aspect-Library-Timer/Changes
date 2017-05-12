@@ -1,0 +1,41 @@
+Changes for Perl extension Aspect-Library-Timer
+
+1.10 Tue 30 Oct 2012
+	- Updating Module::Install to 1.06
+
+1.09 Fri 3 Feb 2012
+	- Added recursion protection to Aspect::Library::Timer
+	- Bug fix in recursion protection across all modules
+	- We now attribute time correctly when zones contain code that
+	  throws an exception.
+
+1.08 Wed 1 Feb 2012
+	- Updating to Module::Install 1.04
+	- Fixing a big stupid bug in the totalling math that was generating
+	  a ton of warnings and then calculating exclusive time wrong.
+
+1.07 Thu 26 May 2011
+	- Updating Aspect dependency to 1.00
+
+1.06 Tue 24 May 2011
+	- Updated to Module::Install::DSL 1.01
+	- Updated to match syntax changes in Aspect 0.98
+
+1.05 Thu 22 Jul 2010
+	- Everything looks good, switching to a production version.
+	- All totals are now calculated and reported in integer
+	  microseconds to prevent floating point corruption.
+
+0.04 Thu 22 Jul 2010
+	- Downgrading to Module::Install 1.00 to get a working abstract
+
+0.03 Wed 21 Jul 2010
+	- Upgrading to Module::Install::DSL 1.00
+	- Adding a new timer aspect Aspect::Library::ZoneTimer
+	- Updated advice code slightly to the newer Aspect 0.90 API
+
+0.02 Tue 19 Jan 2010
+	- Fixing some typos
+
+0.01 Tue 19 Jan 2010
+	- Creating initial release

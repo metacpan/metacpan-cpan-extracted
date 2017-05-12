@@ -1,0 +1,59 @@
+Acme-TextLayout
+
+Lay out patterns in Text, and provide facilities for mapping this to a
+real-world coordinate space, and figuring out the relationship between
+text blocks.
+
+For example:
+
+  AAAABBBBBBBBBBBCCC
+  AAAABBBBBBBBBBBCCC
+  DDDDDDDDDDDDDDDCCC
+  EEEEEEEEEEEEEEECCC
+  FFFFFFFGGGGGGGGHHH
+
+After instantiation, this pattern is known for all the spatial relationships
+of all of the characters, and how big the contiguous blocks of like
+characters are, etc. See perdoc for more info and methods.
+
+Note that this module required Perl6::Attributes, but that is NOT
+Perl6. It just pulls some Perl6 niceness into Perl5.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Acme::TextLayout
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-TextLayout
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Acme-TextLayout
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Acme-TextLayout
+
+    Search CPAN
+        http://search.cpan.org/dist/Acme-TextLayout/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 X Cramps
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

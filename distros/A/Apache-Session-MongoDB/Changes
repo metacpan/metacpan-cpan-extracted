@@ -1,0 +1,27 @@
+Revision history for Perl extension Apache::Session::MongoDB.
+
+0.1  Fri Mar 20 08:40:32 2015
+	- original version; created by h2xs 1.23 with options
+	-AXn Apache::Session::MongoDB
+
+0.11  Wed Mar 25 21:15:12 2015
+	- missing files in manifest
+
+0.12  Thu Mar 26 18:29:43 2015
+	- missing dependency (Apache::Session)
+
+0.13  Sat Dec 19 09:58:45 2015
+	- update MongoDB::Client args
+
+0.14  Wed Feb 10 12:44:26 2016
+	- module wasn't usable by Lemonldap::NG
+	- change parameters
+
+0.15  Wed Feb 10 15:41:34 2016
+	- class methods to browse sessions
+
+0.16  Fri Apr 1 12:50:23 2016
+	- Add more MongoDB parameters
+
+0.17  Wed May 18 22:01:50 2016
+	- Return undef if no session found

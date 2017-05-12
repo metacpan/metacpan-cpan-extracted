@@ -1,0 +1,58 @@
+<%args>
+    $admin            => 0
+</%args>
+<%once>
+    use Config::JFDI;
+    my $c = Config::JFDI->new( name => 'app_mimosa', path => '.');
+    my $conf = $c->get;
+</%once>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Mimosa : Genomic Sequence Alignment</title>
+  <link rel="stylesheet" href="/css/style.css" />
+<!-- ** CSS ** -->
+<!-- base library -->
+<link rel="stylesheet" type="text/css" href="/js/ext-3.3.1/resources/css/ext-all.css" />
+
+<!-- overrides to base library -->
+
+<link rel="stylesheet" type="text/css" href="/css/tabs.css" />
+
+<!-- ** Javascript ** -->
+<!-- ExtJS library: base/adapter -->
+<script type="text/javascript" src="/js/ext-3.3.1/adapter/ext/ext-base.js"></script>
+<!-- ExtJS library: all widgets -->
+<script type="text/javascript" src="/js/ext-3.3.1/ext-all.js"></script>
+
+<!-- Bundled copy of Jquery -->
+<script src="/js/jquery.js" type="text/javascript"></script>
+
+<!-- Bundled copy of Jquery backstretch plugin -->
+<script type="text/javascript" src="/js/jquery.backstretch.min.js"></script>
+
+<!-- overrides to library -->
+
+<!-- extensions -->
+
+<!-- page specific -->
+
+% if ($admin) {
+<script type="text/javascript" src="/js/tabs-admin.js"></script>
+% } else {
+<script type="text/javascript" src="/js/tabs.js"></script>
+% }
+
+<script type="text/javascript">
+// Path to the blank image should point to a valid location on your server
+Ext.BLANK_IMAGE_URL = '/js/ext-3.3.1/resources/images/default/s.gif';
+
+Ext.onReady(function(){
+    jQuery("#default_id").val( <% $conf->{default_mimosa_sequence_set_id} %> );
+    jQuery.backstretch("/images/mimosa_pudica.jpg", {speed: 150});
+
+});
+</script>
+</head>
+<body>
+    <div id="default_id">
+    </div>

@@ -1,0 +1,29 @@
+NAME
+
+App::olson - query the Olson timezone database
+
+DESCRIPTION
+
+This program provides facilities for extracting information from the Olson
+timezone database.  It can be used to assist selection of a timezone,
+and for other purposes.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2012 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

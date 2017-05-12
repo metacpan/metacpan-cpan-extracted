@@ -1,0 +1,21 @@
+Changes
+=======
+
+0.00004 - 14 Mar 2008
+  * Add OO interface
+  * Use File::ShareDir to manage custom words. Now you can simply modify
+    that file.
+  * New basic tests (otsune)
+  * Bunch of new words (bayashi)
+  * Add unit tests: t/02_shisu.t, t/03_waiha.t, t/04_kuribitsu.t
+
+0.00003 - 13 Mar 2008
+  * Use Test::Base (typester)
+  * Created "kuribitsu rule"
+  * Check for word type before converting
+
+0.00002 - 13 Mar 2008
+  * Created "waiha rule" and "shisu rule"
+
+0.00001 - 12 Mar 2008
+  * Initial release

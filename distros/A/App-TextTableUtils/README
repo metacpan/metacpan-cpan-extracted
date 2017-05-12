@@ -1,0 +1,13 @@
+DESCRIPTION
+
+    This distributions provides the following command-line utilities
+    related to text tables:
+
+    # INSERT_EXECS_LIST
+
+SEE ALSO
+
+    App::texttable
+
+    App::TableDataUtils
+

@@ -1,0 +1,38 @@
+NAME
+    App::mymeta_requires - Extract module requirements from MYMETA files
+
+VERSION
+    version 0.006
+
+SYNOPSIS
+       use App::mymeta_requires;
+       exit App::mymeta_requires->run;
+
+DESCRIPTION
+    This module contains the guts of the L<mymeta_requires> program. See
+    that program for command line usage information.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/app-mymeta_requires/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/app-mymeta_requires>
+
+      git clone https://github.com/dagolden/app-mymeta_requires.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

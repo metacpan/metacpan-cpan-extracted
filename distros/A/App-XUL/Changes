@@ -1,0 +1,6 @@
+Revision history for Perl extension App::XUL.
+
+0.01  Tue Jan 18 21:23:04 2011
+	- original version; created by h2xs 1.23 with options
+		-A -X -n App::XUL
+

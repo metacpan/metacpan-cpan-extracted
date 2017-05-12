@@ -1,0 +1,64 @@
+App-ProcTrends-Cron
+
+App::ProcTrends is a set of libraries to track cpu / memory usage per process.
+We have plenty of software out there that measures system-level cpu / memory
+usage.  However we lack metrics at process level granularity.
+
+This application comprises of 3 components:
+1. cron script that essentially runs ps every minute
+2. command-line script that generates text-based data in tables, as well as
+graphs from RRD files
+3. RESTful webservice that can list individual and aggregated graphs
+
+PREREQUISITES
+
+The following modules are required by App::ProcTrends:
+	CGI
+	Mojolicious::Lite
+	RRDs
+	File::Slurp
+	RRDTool::OO
+	RRD::Simple
+	Log::Log4perl
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::ProcTrends::Cron
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-ProcTrends-Cron
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-ProcTrends-Cron
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-ProcTrends-Cron
+
+    Search CPAN
+        http://search.cpan.org/dist/App-ProcTrends-Cron/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Satoshi Yagi
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

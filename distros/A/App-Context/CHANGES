@@ -1,0 +1,76 @@
+#########################################
+# CHANGE LOG
+#########################################
+
+VERSION 0.968
+ x Did initial work to make App::Context::ModPerl work (full tested version should come soon)
+ x introduced deprecated flag for services in the service() method
+ x keep the app.Request.keep_url_params on the form tag url
+
+VERSION 0.967
+ x App::Request::CGI     - added the url() method to support putting the URL into the form tag in App::Widget
+ x App::Service          - added get_sym_label() method for various uses in turning a symbol into a label
+ x App::Exceptions       - removed call to do_trace on Exception::Class::Base (the method has been removed)
+ x App::Context          - Fixed bug with a defined variable
+ x App::Context          - add authentication_class option from app.conf
+ x App::Context::POE::Server - added a storable option (poe_storable) to allow for communicating more than just a string value back and forth between parent and child processes
+ x App::ValueDomain      - Added sub get_label and _load_label to allow for loading of entries in a ValueDomain one at a time
+ x App::Storable         - protect against varying versions of Storable which may cause deserialization exceptions
+ x App::Serializer::Json - read and write JSON
+ x App::Serializer::Html - serialize output as HTML for debugging/viewing
+ x App::Context::HTTP    - add support for RPC and REST (in addition to web app support)
+ x App::Context::service_exists() - detect if a service exists in the config/session (generalizes session_object_exists())
+
+VERSION 0.9661
+ x updated the dependencies so that the CPAN tests don't fail
+
+VERSION 0.966
+ x add SharedDatastore as a useful service (with a Repository-based implementation)
+ x improved support for "temporary" services (named "temporary" or with the {temporary} arg)
+   (a "temporary service" is akin to a stateless session bean in Java)
+ x add support for including/overlaying additional config files based on values present in
+   the %$options hash or when a particular named service is instantiated
+ x App::Context::POE::Server
+ x App::Context::POE::ClusterController, App::Context::POE::ClusterNode
+
+VERSION 0.965
+ x add UI timing log, activated by "app.Context.timer" option
+
+VERSION 0.964
+ x mostly documentation updates
+ x moved Apache::Framework::App to Apache::App
+ x trying to improve Makefile.PL to install things in the right place (app in cgi-bin)
+
+VERSION 0.963
+ x App->use() now detects entries in the symbol table to inhibit an attempt to load the module
+ x enhance App::Service::substitute() to understand default syntax (i.e. {username:NULL})
+
+VERSION 0.962
+   I don't remember what 0.962 was all about (minor)
+
+VERSION 0.961
+ x add per-module (subversion) $VERSION numbers
+
+VERSION 0.96
+ x added &App::in_debug_scope and &App::debug_indent()
+ x context->widget() now defaults to class App::Widget rather than class App::SessionObject
+ x trace enhancements
+   * print 'undef' instead of '' for undefined values in traces
+   * made trace behave better with newlines. added trace_justify.
+   * fixed a trace leak (return without sub_exit())
+   * trace and debug scopes can now be exclusive (i.e. --trace=!App::Context,App::Context::Cmd)
+ x log enhancements
+   * added log levels (and optional args to log())
+ x {temporary} widgets
+ x add permissions to widget display from URL and method calls, also {open_widget_urls} option
+ x add App::Service::substitute()
+ x default dates can be {today}+6
+
+VERSION 0.95
+ x Widget containership is defined in the widget name by dashes ("-") instead of dots (".") (better for CSS)
+ x Removed dependency on App::Repository in t/ServiceRemote.t
+
+VERSION 0.93
+ x Initial release (first one I started keeping this change log, anyway)
+ x Implemented App::Reference->overlay() more completely
+

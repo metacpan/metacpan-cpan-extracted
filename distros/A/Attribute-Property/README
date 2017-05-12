@@ -1,0 +1,144 @@
+Attribute::Property
+$Id: README,v 1.6 2003/04/21 16:05:50 juerd Exp $
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or use CPANPLUS to automate the process.
+
+Module documentation:
+
+NAME
+    Attribute::Property - Easy lvalue accessors with validation. ($foo->bar
+    = 42)
+
+SYNOPSIS
+  CLASS
+        use Attribute::Property;
+        use Carp;
+
+        package SomeClass;
+
+        sub new : New { further initialization here ... }
+    
+        sub nondigits : Property { /^\D+\z/ }
+        sub digits    : Property { /^\d+\z/ or croak "custom error message" }
+        sub anyvalue  : Property;
+        sub another   : Property;
+
+        sub value     : Property {
+            my $self = shift;  # Object is accessible as $_[0]
+            s/^\s+//;          # New value can be altered through $_ or $_[1]
+
+            $_ <= $self->maximum or croak "Value exceeds maximum";
+        }
+
+        package Person;
+
+        sub new  : New;
+        sub name : Property;
+        sub age  : Property { /^\d+\z/ and $_ > 0 }
+
+  USAGE
+        my $object = SomeClass->new(digits => '123');
+
+        $object->nondigits = "abc";
+        $object->digits    = "123";
+        $object->anyvalue  = "abc123\n";
+
+        $object->anyvalue('archaic style still works');
+
+        my $john = Person->new(name => 'John Doe', age => 19);
+    
+        $john->age++;
+        printf "%s is now %d years old", $john->name, $john->age;
+
+        # These would croak
+        $object->nondigits = "987";
+        $object->digits    = "xyz";
+
+DESCRIPTION
+    This module introduces two attributes that make object oriented
+    programming much easier. You can just define a constructor and some
+    properties without having to write accessors.
+
+    "Property"
+            sub color : Property;
+            sub color : Property { /^#[0-9A-F]{6}$/ }
+
+        The "Property" attribute turns a method into an object property. The
+        original code block is used only to validate new values, the module
+        croaks if it returns false. The method returns an *lvalue*, meaning
+        that you can create a reference to it, assign to it and apply a
+        regex to it.
+
+        Undefined subs (subs that have been declared but do not have a code
+        block) with the "Property" attribute will be properties without any
+        value validation.
+
+        In the validation code block, the object is in $_[0] and the value
+        to be validated is aliased as $_[1] and for regexing convenience as
+        $_.
+
+        Feel free to croak explicitly if you don't want the default error
+        message.
+
+    "New"
+            sub new : New;
+            sub new : New { my $self = shift; ...; return $self; }
+
+        The "New" attribute turns a method into an object constructor. The
+        original code block can be used for further initialization, but it
+        is completely optional.
+
+        The constructor takes named arguments in "property => value" pairs
+        and populates the hash with the given pairs. After validating them,
+        of course.
+
+        The new object is passed to the initialization code block as $_[0].
+        Be sure to return the object if you use any initialization block. If
+        there is no initialization code block, Attribute::Property takes
+        care of returning the new object.
+
+PREREQUISITES
+    Your object must be a blessed hash reference. The property names will be
+    used for the hash keys.
+
+    For class properties of "Some::Module", the hash %Some::Module is used.
+    For class properties of packages without "::", the behaviour is
+    undefined.
+
+    In short: "$foo->bar = 14" and "$foo->bar(14)" assign 14 to
+    "$foo->{bar}" after positive validation. The same thing happens with "my
+    $foo = Class->new(bar => 14);" given that "Class::new" uses the "New"
+    property.
+
+    If you have the Want module installed, Attribute::Property will use it
+    to make rvalue method calls more efficient.
+
+COMPATIBILITY
+    Old fashioned "$object->property(VALUE)" is still available.
+
+    This module requires a modern Perl (5.6.0+), fossils like Perl 5.00x
+    don't support our chicanery.
+
+BUGS
+    * The "New" attribute should really be called "Constructor", but that
+      would conflict with the existing Attribute::Constructor module.
+
+LICENSE
+    There is no license. This software was released into the public domain.
+    Do with it what you want, but on your own risk. Both authors disclaim
+    any responsibility.
+
+AUTHORS
+    Juerd Waalboer <juerd@cpan.org> <http://juerd.nl/>
+
+    Matthijs van Duin <xmath@cpan.org>
+

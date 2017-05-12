@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 ff4840b05f488485d2b529436905e849e7bac5a3 Build.PL
+SHA1 d4c3d739e88b6b0e36f7a69615a689b045b6fad3 Changes
+SHA1 9744cedce099f727b327cd9913a1fdc58a7f5599 LICENSE
+SHA1 d20cf83d4e07ab935bb78574175cb5a8f044f66b MANIFEST
+SHA1 eda0f5c5620905131e0718a91379d9599e262d6e MANIFEST.SKIP
+SHA1 d22eb55a83deb7459ac021b899516551f92800c1 META.json
+SHA1 fd284779dcbb85d867de4e1cfc6c524f5548bac6 META.yml
+SHA1 664d0507125a508842f8d32325d22058a386fa1f README
+SHA1 771189b7f76189ead1fe51e0147f43513e74fc24 inc/Alien/NSS/ModuleBuild.pm
+SHA1 f0977d1646050377eb718fbd2b758da9eae18436 lib/Alien/NSS.pm
+SHA1 c9cf3798f1dce06445a0a3881c283aeb7dc125d8 patch/nss.patch
+SHA1 c98ab92aba6d026264a79dd483971d98b723a9d2 t/01-config.t
+SHA1 4c2cb9bab0a045a7e1303f7c492d512a4b37ed4b t/02-use.t
+SHA1 3ec6171779122b0bdc69937c283be11b2a15dd89 t/03-signature.t
+SHA1 626d6905aa570c960f0c4ba734089d4f29ae65d7 t/04-build.t
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - https://gpgtools.org
+
+iQIcBAEBCgAGBQJV8fOSAAoJECOZ8Wl8E8ZdUd0P/RuY4RIboGVl/tsP+IPY6SAT
+f6hdAThTFDFYBRoYG8wIvhL/eM6mQcKv61lzAVYpmVoryLTp5bdPOXe+H1/jTRU3
+xwiCYLetKA3i6EflCF3bP7JxVwHMJUyZIwBAYryG5DEuIFfM1m+jrdFJjBwGBQ0i
+9vUnmP2VoRWXZNpdj9VEUEnAKdgZX9HGPR+C7nkkbuo92961MaWm03qNW0PkLqkB
+XgWptev5Ys9IY3gcUlo3OonRhMxRCWkgGlCMXuX3yog6KbtNJn8Ogj81R1SHAefx
+gw0GhOxgjV6VuwbCR800WJDFNb80zI6HDhJJxal8jiS1bQtlTIgiLWiWtbTUOljq
+vh6mAGxwI5GEheElHKHALs0eh5SeWoTTjB+sbsTd3H8YSQoW3xrMqwTvtvb5/awZ
+PBWVsDW+pZVDfG/wt9rzY++F+iVnVXy+pjF+NgrszZymbHJPeKjOcoyJxFMVNFPG
+oP0TRl+KEJrCb83rssf+OIErqRyBm+YcK1mmPw3vr4dIkSVUfIHU3iNkkKYuMdOZ
+saNI8BabBslgkI6GbSUabBke0Wcs2v0RYZjKp/RFToOVTgjOyYCdqt0pv/QMRuyT
+Bg3Y46advDJw/umuE7A+JNsBpWmWKcptYMgNIxLkQZGVPLUarQBZhPoAYj/kb9w0
+eWsMF88EemJLN34ayeLZ
+=Zz+D
+-----END PGP SIGNATURE-----

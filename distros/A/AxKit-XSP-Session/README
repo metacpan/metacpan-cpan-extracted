@@ -1,0 +1,17 @@
+AxKit Session taglib, based on the Cocoon2 Session taglib specification:
+    http://xml.apache.org/cocoon2/userdocs/xsp/session.html
+
+Install:
+    perl Makefile.PL && make && make test && make install
+    add:
+        AxAddXSPTaglib AxKit::XSP::Session
+    to your httpd.conf.
+
+    (Optional)
+    add:
+        PerlSetVar UseSessionAccessTimestamp On
+    to your httpd.conf if you wish to enable the get-last-accessed-time tag.
+
+    add:
+        xmlns:session="http://www.apache.org/1999/XSP/Session"
+    to your xsp:page element.

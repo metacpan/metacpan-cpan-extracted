@@ -1,0 +1,7 @@
+ChangeLog
+Todo
+MANIFEST
+Makefile.PL
+README
+lib/Apache/Session/Counted.pm
+t/loadme.t

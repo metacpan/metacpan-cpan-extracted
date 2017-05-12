@@ -1,0 +1,83 @@
+#!perl
+
+our $DATE = '2017-01-13'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+# NO_PERINCI_CMDLINE_SCRIPT
+# FRAGMENT id=shcompgen-hint completer=1 for=pause
+
+use App::pause;
+use Perinci::CmdLine::Lite;
+
+die "This script is for shell completion only\n"
+    unless $ENV{GETOPT_LONG_DUMP} || $ENV{COMP_LINE} || $ENV{COMMAND_LINE};
+
+Perinci::CmdLine::Lite->new(
+    %App::pause::cli_attrs,
+)->run;
+
+# ABSTRACT: Improved shell completer for pause
+# PODNAME: _pause
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+_pause - Improved shell completer for pause
+
+=head1 VERSION
+
+This document describes version 0.001 of _pause (from Perl distribution App-ShellCompleter-pause), released on 2017-01-13.
+
+=head1 SYNOPSIS
+
+To install, install this module and then in your bash (and/or bash startup
+file):
+
+ complete -C _pause pause
+
+or, you can use L<shcompgen> to do that for you automatically.
+
+Now L<pause> has improved bash completion:
+
+ % pause <tab>  ;# complete subcommand and options
+ % pause upload Some-Release-0.01.tar.gz --retries <tab> ;# complete argument value
+
+=head1 DESCRIPTION
+
+The L<pause> script from L<App::pause> already comes with basic completion: it
+can complete subcommand names and options. This completer can also complete
+argument values.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ShellCompleter-pause>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ShellCompleter-pause>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ShellCompleter-pause>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

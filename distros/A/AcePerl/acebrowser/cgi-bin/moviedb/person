@@ -1,0 +1,78 @@
+#!/usr/local/bin/perl
+# -*- Mode: perl -*-
+# file: person
+# Moviedb "person" display
+
+use strict;
+use lib '..';
+use vars '$DB';
+use Ace 1.51;
+use Ace::Browser::AceSubs;
+
+use CGI 2.42 qw/:standard :html3 escape/;
+
+my $person = GetAceObject();
+PrintTop($person,'Person');
+print_prompt();
+AceNotFound() unless $person;
+print_report($person);
+PrintBottom();
+
+
+sub print_prompt {
+    print
+	start_form({-name=>'form1',-action=>Url(url(-relative=>1))}),
+	p("Database ID",
+	  hidden(class=>'Person'),
+	  textfield(-name=>'name')
+	  ),
+	      end_form;
+}
+
+sub print_report {
+    my $person = shift;
+
+    print h2($person->Full_name);
+
+    if (my @address = $person->Address(2)) {
+      print h3('Contact Information'),blockquote(address(join(br,@address)));
+      print a({-href=>'mailto:' . $person->Email(1)},"Send e-mail to this person")
+	if $person->Email;
+    } else {
+      print p(font({-color=>'red'},'No contact information in database'));
+    }
+
+    if ($person->Born || $person->Height) {
+      print h3('Fun Facts'),
+            table({-border=>undef},
+		  TR({-align=>'LEFT'}, th('Height'),   td($person->Height(1) || '?')),
+		  TR({-align=>'LEFT'}, th('Birthdate'),td($person->Born(1)|| '?'))
+	      ),
+    }
+
+    if (my @directed = $person->Directed) {
+	print h3('Movies Directed');
+	my @full_names = map { ObjectLink($_,$_->Title) } @directed; 
+	print ol(li \@full_names);
+    }
+
+    if (my @scripted = $person->Scripted) {
+	print h3('Movies Scripted');
+	my @full_names = map { ObjectLink($_,$_->Title) } @scripted;
+	print ol(li \@full_names);
+    }
+
+    if (my @stars_in = $person->Stars_in) {
+	print h3('Starring Roles In');
+	my @full_names = map { ObjectLink($_,$_->Title) } @stars_in;
+	print ol(li \@full_names);
+    }
+
+    if (my @books = $person->Wrote) {
+	print h3('Wrote');
+	my @full_names = map { ObjectLink($_,$_->Title) } @books;
+	print ol(li \@full_names);
+    }
+
+}
+

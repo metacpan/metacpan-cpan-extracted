@@ -1,0 +1,134 @@
+=head1 OVERVIEW
+
+Alien::Gnuplot is intended for distribution via CPAN.  This repository
+stores the history for the Alien::Gnuplot module on CPAN. Install the
+module via CPAN.
+
+=cut
+=head1 NAME
+
+Alien::Gnuplot - Find and verify functionality of the gnuplot executable.
+
+=head1 SYNOPSIS
+
+ package MyGnuplotter;
+
+ use strict;
+
+ use Alien::Gnuplot;
+
+ $gnuplot = $Alien::Gnuplot::executable;
+
+ `$gnuplot < /tmp/plotfile`;
+
+ 1;
+
+=head1 DESCRIPTION
+
+Alien::Gnuplot verifies existence and sanity of the gnuplot external
+application.  It only declares one access method,
+C<Alien::Gnuplot::load_gnuplot>, which does the actual work and is
+called automatically at load time.  Alien::Gnuplot doesn't have any
+actual plotting methods - making use of gnuplot, once it is found and
+verified, is up to you or your client module.
+
+Using Alien::Gnuplot checks for existence of the executable, verifies
+that it runs properly, and sets several global variables to describe
+the properties of the gnuplot it found:
+
+=over 3
+
+=item * C<$Alien::Gnuplot::executable> 
+
+gets the path to the gnuplot executable.
+
+=item * C<$Alien::Gnuplot::version> 
+
+gets the self-reported version number of the executable.
+
+=item * C<$Alien::Gnuplot::pl> 
+
+gets the self-reported patch level.
+
+=item * C<@Alien::Gnuplot::terms> 
+
+gets a list of the names of all supported terminal devices.
+
+=item * C<%Alien::Gnuplot::terms> 
+
+gets a key for each supported terminal device; values are the 1-line
+description from gnuplot.  This is useful for testing whether a
+particular terminal is supported.
+
+=item * C<@Alien::Gnuplot::colors> 
+
+gets a list of the names of all named colors recognized by this gnuplot.
+
+=item * C<%Alien::Gnuplot::colors> 
+
+gets a key for each named color; values are the C<#RRGGBB> form of the color.
+This is useful for decoding colors, or for checking whether a particular color
+name is recognized.  All the color names are lowercase alphanumeric.
+
+=back
+
+You can point Alien::Gnuplot to a particular path for gnuplot, by
+setting the environment variable GNUPLOT_BINARY to the path.  Otherwise
+your path will be searched (using File::Spec) for the executable file.
+
+If there is no executable application in your path or in the location
+pointed to by GNUPLOT_BINARY, then the module throws an exception.
+You can also verify that it has not completed successfully, by
+examining $Alien::Gnuplot::version, which is undefined in case of
+failure and contains the gnuplot version string on success.
+
+If you think the global state of the gnuplot executable may have
+changed, you can either reload the module or explicitly call
+C<Alien::Gnuplot::load_gnuplot()> to force a fresh inspection of
+the executable.
+
+=head1 INSTALLATION STRATEGY
+
+When you install Alien::Gnuplot, it checks that gnuplot itself is
+installed as well.  If it is not, then Alien::Gnuplot attempts to 
+use one of several common package managers to install gnuplot for you.
+If it can't find one of those, if dies (and refuses to install), printing
+a friendly message about how to get gnuplot before throwing an error.
+
+In principle, gnuplot could be automagically downloaded and built, 
+but it is distributed via Sourceforge -- which obfuscates interior
+links, making such tools surprisingly difficult to write.
+
+=head1 CROSS-PLATFORM BEHAVIOR
+
+On POSIX systems, including Linux and MacOS, Alien::Gnuplot uses
+fork/exec to invoke the gnuplot executable and asynchronously monitor
+it for hangs.  Microsoft Windows process control is more difficult, so
+if $^O contains "MSWin32", a simpler system call is used, that is
+riskier -- it involves waiting for the unknown executable to complete.
+
+=head1 REPOSITORIES
+
+Gnuplot's main home page is at L<http://www.gnuplot.info>.
+
+Alien::Gnuplot development is at L<http://github.com/drzowie/Alien-Gnuplot>.
+
+A major client module for Alien::Gnuplot is PDL::Graphics::Gnuplot, which
+can be found at L<http://github.com/drzowie/PDL-Graphics-Gnuplot>.
+PDL is at L<http://pdl.perl.org>.
+
+=head1 AUTHOR
+
+Craig DeForest <craig@deforest.org>
+
+(with special thanks to Chris Marshall, Juergen Mueck, and
+Sisyphus for testing and debugging on the Microsoft platform)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 Craig DeForest
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

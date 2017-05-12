@@ -1,0 +1,48 @@
+Revision history for App-GitHubPullRequest
+
+0.4.0     2016-09-16 00:48:38+02:00 Europe/Oslo
+    - Added two-factor login support
+    - Now follow redirects, solving several issues
+    - Now skips invalid git remotes
+
+0.3.1     2013-03-15 16:10:15 Europe/Oslo
+    - Changed debug environment variable from PRQ_DEBUG to GIT_PR_DEBUG
+    - Documentation cleanup
+
+0.3.0     2013-03-12 08:47:15 Europe/Oslo
+    - Renamed prq to git-pr for git integration (PR#5)
+    - Fixed some encoding bugs on output
+
+0.2.0     2013-03-09 11:37:12 Europe/Oslo
+    - Added checkout command (PR#4)
+    - Fixed a bug where github URLs without .git extension
+      weren't recognized (PR#3)
+    - Made error checking when running external programs more robust
+
+0.1.0     2013-03-08 15:30:53 Europe/Oslo
+    - Added login command
+    - Added comment editing with $EDITOR
+    - Removed some excessive API calls => faster execution
+    - Running external programs is now more robust
+    - Added API debugging option
+    - Improved documentation
+
+0.0.6     2013-03-06 19:28:09 Europe/Oslo
+    - Fixed broken changelog
+
+0.0.5     2013-03-06 19:24:29 Europe/Oslo
+    - Added commands for opening and closing pull requests
+    - Added command for adding comment to pull requests
+
+0.0.4     2013-03-06 16:07:07 Europe/Oslo
+    - Renamed command-line tool from 'pr' to 'prq' because it was
+      conflicting with 'pr' from coreutils.
+
+0.0.3     2013-03-06 15:15:06 Europe/Oslo
+    - Only worked on SSH github URLs. Now works on both SSH and git:// URLs.
+
+0.0.2     2013-03-06 14:14:05 Europe/Oslo
+    - Initial documentation
+
+0.0.1     2013-03-06
+    - Initial version

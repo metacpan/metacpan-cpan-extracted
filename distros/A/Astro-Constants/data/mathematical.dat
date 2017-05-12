@@ -1,0 +1,9 @@
+# astroconst.dat
+#   v2.3, 3 June 2002
+#   Jeremy Bailin (jbailin@as.arizona.edu)
+#
+# Format: variable<tab>description<tab>CGS value<tab>MKS value
+#    or   variable<tab>description<tab>value
+#
+A_pi	PI	trig constant pi	3.14159265358979324	0.00000000000000001
+A_exp	EXP	base of natural logarithm	2.71828182846	0.00000000001

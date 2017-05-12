@@ -1,0 +1,94 @@
+<%args>
+$schema
+$neato => 0
+</%args>
+<%once>
+use Alzabo::Create;
+eval 'use GraphViz'; # optional feature
+</%once>
+<%init>
+my $s = Alzabo::Create::Schema->load_from_file( name => $schema );
+
+my $layout = $neato ? 'neato' : 'dot';
+my $g = GraphViz->new( node => { shape => 'box' },
+                       layout => $layout,
+                       directed => 1,
+                       no_overlap => 1,
+                     );
+
+foreach my $t ($s->tables)
+{
+    $g->add_node( $t->name );
+}
+
+my %fk;
+foreach my $t ($s->tables)
+{
+    foreach my $fk ($t->all_foreign_keys)
+    {
+	my @from_id = qw( columns_from columns_to );
+	    my $id1 = join "\0", map { $_->name } map { $fk->$_() } @from_id, qw( table_from table_to );
+	$id1 .= "\0";
+	$id1 .= join "\0", $fk->cardinality;
+
+	my @to_id = qw( columns_to columns_from );
+	my $id2 = join "\0", map { $_->name } map { $fk->$_() } @to_id, qw( table_to table_from );
+	$id2 .= "\0";
+	$id2 .= join "\0", reverse $fk->cardinality;
+
+	next if $fk{$id1} || $fk{$id2};
+
+	my $taillabel = join '..', $fk->cardinality;
+	$taillabel .= ' (dependent on ' . $fk->table_to->name . ')' if $fk->from_is_dependent;
+
+	my $headlabel = join '..', reverse $fk->cardinality;
+	$headlabel .= ' (dependent on ' . $fk->table_from->name . ')' if $fk->to_is_dependent;
+
+	my %p;
+	if ($fk->is_one_to_one)
+	{
+	    $p{dir} = 'none';
+	    $p{arrowhead} = $fk->from_is_dependent ? 'dot' : 'odot';
+	    $p{arrowtail} = $fk->to_is_dependent ? 'dot' : 'odot';
+	}
+	elsif ($fk->is_many_to_one)
+	{
+	    $p{dir} = 'forward';
+	    $p{arrowhead} = $fk->from_is_dependent ? 'dot' : 'odot';
+	    $p{arrowtail} = $fk->to_is_dependent ? 'invdot' : 'invodot';
+	}
+	else
+	{
+	    $p{dir} = 'back';
+	    $p{arrowhead} = $fk->from_is_dependent ? 'invdot' : 'invodot';
+	    $p{arrowtail} = $fk->to_is_dependent ? 'dot' : 'odot';
+	}
+
+	$g->add_edge( $fk->table_from->name, $fk->table_to->name,
+		      %p,
+		    );
+
+	$fk{$id1} = $fk{$id2} = 1;
+    }
+}
+
+if ( my $r = $m->apache_req )
+{
+    $r->content_type('image/png');
+}
+else
+{
+    my $cat = eval "$c";
+    die $@ if $@;
+
+    $cat->response()->content_type('image/png');
+}
+
+$m->clear_buffer; # no extra whitespace or anything
+$m->flush_buffer;
+$g->as_png( sub { $m->out(@_); $m->flush_buffer; } );
+$m->abort(200); # make sure nothing extra sneaks out
+</%init>
+<%flags>
+inherit => undef
+</%flags>

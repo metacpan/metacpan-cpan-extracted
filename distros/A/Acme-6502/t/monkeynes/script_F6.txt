@@ -1,0 +1,37 @@
+clear
+power on
+regs
+
+memset 00c9 55
+op a2 0b
+op f6 be
+
+# Should be: mem[$00C9]=56, IX=0B
+test m:00c9 = 56
+test ix = 0b
+
+# Wrap and Zero case -------------
+power on
+
+memset 00c9 ff
+op a2 0b
+op f6 be
+
+# Should be: memory[$00C9]=0, IX=0B, Z=1
+test m:00c9 = 0
+test ix = 0b
+test z = 1
+
+# Negative case -------------------
+power on
+
+memset 00c9 7f
+op a2 0b
+op f6 be
+
+# Should be: memory[$00C9]=80, IX=0B, S=1
+test m:00c9 = 80
+test ix = 0b
+test s = 1
+
+save verify_F6.txt

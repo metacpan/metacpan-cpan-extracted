@@ -1,0 +1,24 @@
+Revision history for Perl extension Algorithm::PageRank.
+
+0.01  Mon Jun  9 17:27:50 2003
+	- original version; created by h2xs 1.21 with options
+		-A Algorithm::PageRank
+
+0.03  Sun, 22 Aug 2004 14:43:27 +0800
+	- rewrite using PDL
+
+0.04  Sun, 22 Aug 2004 17:12:10 +0800
+	- update in test file
+
+0.05
+	- bug fix in PageRank.pm and in test
+
+0.06  Sun, 22 Aug 2004 17:34:49 +0800
+	- remove some stupid reshaping code.
+
+0.07  Mon, 23 Aug 2004 04:00:19 +0800
+	- added checking if out degree is zero
+	- added test for weakly connected graph
+
+0.08  Mon, 23 Aug 2004 14:03:55 +0800
+	- bug fix in Pagerank.pm for forgetting to add dampening effect. XD

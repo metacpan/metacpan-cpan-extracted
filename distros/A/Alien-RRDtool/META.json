@@ -1,0 +1,57 @@
+{
+   "abstract" : "Installation of Perl bindings to RRDtool",
+   "author" : [
+      "Fuji, Goro (gfx) <gfuji(at)cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-RRDtool",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "File::ShareDir" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::Which" : "0",
+            "File::chdir" : "0",
+            "LWP::Simple" : "0",
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.00",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Requires" : "0.06"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.06"
+}

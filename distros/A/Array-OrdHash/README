@@ -1,0 +1,31 @@
+Array-OrdHash
+==========================
+
+Array::OrdHash behaves as a hash reference and an array reference simultaneously, just like MS Collection object or PHP Array.
+It is ordered, in other words, it preserves the order in which its elements were added. 
+You are not to call `tie` function, you simple call the `Array::OrdHash->new()` constructor and then you can manipulate with the variable of this class just like with a Perl hash reference or with an Perl array reference - as it is more suitable for you. You can also perform all built-in Perl array and hash functions on a variable of this class.
+
+It is especially useful for database data fetching and further manipulating. Some additional methods supply some additional services.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module does not require other modules and/or libraries.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2011 Vladimir Surin. All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

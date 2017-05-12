@@ -1,0 +1,189 @@
+<html>
+<head>
+  <script src="../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <link href="GvaScript_doc.css" rel="stylesheet" type="text/css">
+  <script>
+    document.observe('dom:loaded', function() { new GvaScript.TreeNavigator('TN_tree'); });
+    function jumpto_href(event) {
+      var label = event.controller.label(event.target);
+      if (label && label.tagName == "A") {
+        label.focus();
+        return Event.stopNone;
+      }
+    }
+  </script>
+</head>
+<body>
+<div id='TN_tree'>
+  <div class="TN_node">
+   <h1 class="TN_label">Alien::GvaScript::Intro</h1>
+   <div class="TN_content">
+     <p><em>A javascript framework born in Geneva.
+</em></p>
+     <div class="TN_node"  onPing="jumpto_href">
+       <h3 class="TN_label">Table of contents</h3>
+       <div class="TN_content">
+         <div class="TN_leaf">
+  <a class="TN_label" href="#NAME">NAME</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#SYNOPSIS">SYNOPSIS</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#DESCRIPTION">DESCRIPTION</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#TARGETED_PLATFORMS">TARGETED PLATFORMS</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#DEPENDENCIES">DEPENDENCIES</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#AUTHORS">AUTHORS</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#LICENSE">LICENSE</a>
+  <div class="TN_content"></div>
+</div>
+
+       </div>
+     </div>
+     <hr/>
+   </div>
+  </div>
+  <div class="TN_node" id="NAME">
+    <h2 class="TN_label">NAME</h2>
+    <div class="TN_content">
+      <p>Alien::GvaScript::Intro - A javascript framework born in Geneva.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="SYNOPSIS">
+    <h2 class="TN_label">SYNOPSIS</h2>
+    <div class="TN_content">
+      <pre>  &lt;head&gt;
+    &lt;script src="path/to/prototype.js"&gt;&lt;/script&gt;
+    &lt;script src="path/to/GvaScript.js"&gt;&lt;/script&gt;
+    &lt;link href="path/to/GvaScript.css" rel="stylesheet" type="text/css"&gt;
+  
+    var cl = GvaScript.ChoiceList(choices, options);
+    var ac = GvaScript.AutoCompleter(datasource, options);
+    var tn = GvaScript.TreeNavigator(element, options);
+  &lt;/head&gt;</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="DESCRIPTION">
+    <h2 class="TN_label">DESCRIPTION</h2>
+    <div class="TN_content">
+      <p>GvaScript (pronounce "gee-vascript") is a javascript framework 
+born in Geneva, Switzerland (<code>GVA</code> is the IATA code for 
+Geneva Cointrin International Airport). 
+It is built on top of the <b>prototype</b>
+object-oriented javascript framework (<a href="http://prototype.conio.net">http://prototype.conio.net</a>).</p>
+<p>It contains four core components :</p>
+<ul>
+<li>
+<p><i>Alien::GvaScript::ProtoExtensions</i> : 
+some extensions to the prototype javascript framework
+(mainly walking the DOM searching for collections of classnames).</p>
+</li>
+<li>
+<p><i>Alien::GvaScript::Event</i> : 
+registering and firing application-specific events (in addition
+to the standard W3C event model)</p>
+</li>
+<li>
+<p><i>Alien::GvaScript::KeyMap</i> : 
+managing maps of handlers for key events (similar
+in spirit to Emacs keymaps)</p>
+</li>
+<li>
+<p><i>Alien::GvaScript::Repeat</i> : 
+managing repeated sections</p>
+</li>
+</ul>
+<p>and four widgets:</p>
+<ul>
+<li>
+<p><i>Alien::GvaScript::ChoiceList</i> : 
+dropdown list of choices with navigation</p>
+</li>
+<li>
+<p><i>Alien::GvaScript::AutoCompleter</i> : 
+autocompletion on form input fields</p>
+</li>
+<li>
+<p><i>Alien::GvaScript::TreeNavigator</i> : 
+navigation in a tree structure, opening and closing nodes</p>
+</li>
+<li>
+<p><i>Alien::GvaScript::Form</i> : 
+various extensions to HTML forms (working with data trees
+and repeated sections, automatic focus, etc.)</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="TARGETED_PLATFORMS">
+    <h2 class="TN_label">TARGETED PLATFORMS</h2>
+    <div class="TN_content">
+      <ul>
+<li>
+<p>Microsoft Internet Explorer for Windows, version 6.0 and higher</p>
+</li>
+<li>
+<p>Mozilla Firefox 2.0 and higher</p>
+</li>
+<li>
+<p>may work on other platforms supported by prototype.js, but was 
+not tested</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="DEPENDENCIES">
+    <h2 class="TN_label">DEPENDENCIES</h2>
+    <div class="TN_content">
+      <ul>
+<li>
+<p>the <a href="http://prototype.conio.net">http://prototype.conio.net</a> javascript framework,
+version 1.5.0 or higher</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="AUTHORS">
+    <h2 class="TN_label">AUTHORS</h2>
+    <div class="TN_content">
+      <p>Laurent Dami,  <code>&lt;laurent.d...@etat.ge.ch&gt;</code></p>
+<p>Mona Remlawi,  <code>&lt;mona.r...@etat.ge.ch&gt;</code></p>
+<p>Jean-Christophe Durand</p>
+<p>S&#xe9;bastien Cuendet</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="LICENSE">
+    <h2 class="TN_label">LICENSE</h2>
+    <div class="TN_content">
+      <p>This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl's artistic license
+(see <a href="http://perldoc.perl.org/perlartistic.html">http://perldoc.perl.org/perlartistic.html</a>).</p>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

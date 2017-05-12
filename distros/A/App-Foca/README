@@ -1,0 +1,161 @@
+NAME
+    App::Foca::Server - Foca server
+
+DESCRIPTION
+    Foca is an application (a HTTP server using HTTP::Daemon) that allows
+    the execution of pre-defined commands via, obviously, HTTP.
+
+    Well, lets suppose you have a log parser on all your servers and you are
+    in need to parse all of them, the common way would be to ssh to each
+    host (can be as simple as ssh'ing to each host or using a multiplex
+    tool) and execute your parser, but what if your SSH keys or the keys of
+    a user are not there? It will be a heck of pain to enter your password
+    hundred of times or lets imagine you want to parse your logs via some
+    automation (like doing it from an IRC bot or tied to your monitoring
+    solution).. then the problem comes more complex with SSH and private
+    keys. With Foca you don't need to worry about those things, the command
+    will get executed and the output will be returned as a HTTP response.
+
+    All commands that Foca knows about it are listed in a YAML file. Foca
+    uses a default timeout value for all commands but with this YAML file
+    you can give a specific timeout to a specific command. All commands are
+    executed with IPC (open3).
+
+    Now the question is.. is Foca secure? Well it depends on you. Depends if
+    you run it as non-root user and the commands you define. Foca will try
+    to do things to protect, for example it will reject all requests that
+    have pipes (|), I/O redirection (>, <, <<, >>), additionally the HTTP
+    request will be validated before it gets executed via the call of
+    "validate_request()" (App::Foca returns true all the time so if you want
+    to add extra functionality please create a subclass and re-define the
+    method).
+
+EXAMPLE
+        my $server = App::Foca::Server->new(
+                port                => $port,
+                commands_file       => $commands,
+                commands_timeout    => $timeout,
+                debug               => $debug);
+
+        $server->run_server();
+
+EXAMPLE COMMANDS FILE
+        commands_dirs:
+            - /some/path/over/there/bin
+
+        commands:
+            df_path:
+            cmd: '/bin/df {%foca_args%} | tail -n1'
+        uptime:
+            cmd: '/usr/bin/uptime'
+        'true':
+            cmd: '/bin/true'
+
+    The way the example commands file work is: First it will look if there
+    is a *commands_dir* key, this key should have a list of directories
+    (that means it should be an array reference), Foca will look for all
+    executables inside the given directories and add them into memory.
+    Second, it will look for the *commands* key, this one should be a hash
+    where each key is the name of the command and it should have at least a
+    *cmd* key which value should be the *real* command to execute.
+
+    Please note that when you use the *commands_dir*, Foca will use the
+    basename of each executable as the name of the command so if you have
+    /usr/local/foo, the foca command will be *foo* while the command it will
+    execute will be */usr/local/foo*.
+
+    Also, you can override commands found in *commands_dir* via *commands*,
+    so going back to our /usr/local/foo example, you can have this
+    executable in your /usr/local directory but also have a *foo* command
+    defined in *commands*, the one that is defined in *commands* will be the
+    one that will be used by Foca.
+
+    There are two ways to update the list of commands once the server
+    started: One is by obviously restarting it and the other one is via
+    localhost send a HTTP request to localhost:yourport/reload.
+
+Attributes
+    commands_file
+        YAML file with the supported commands.
+
+    commands
+        Hash reference with a list of supported commands. Basically the
+        content of "commands_file".
+
+    port
+        Where to listen for requests?
+
+    commands_timeout
+        Global timeout for all commands. Default to 1min (60 seconds).
+
+    tmp_dir
+        Temporary directory, for cache.
+
+    debug
+        Debug/verbose mode, turned off by default.
+
+    server
+        App::Foca::Server::HTTP object.
+
+    cache
+        For mmap cache (so we can share cache across processes).
+
+Methods
+  run_server()
+    Runs the HTTP::Daemon server. it forks on each request.
+
+  prepare_status_response()
+    Prepares a response (HTTP::Response) for the /status request. /status
+    requests returns some stats about Foca server, such as: number of active
+    connections, number of closed/zombie connections (user connected and
+    left the connection open with a process that is no longer needed).
+
+  prepare_foca_response($connection, $request)
+    Prepares a response (HTTP::Response) for a given foca request
+    (HTTP::Request).
+
+  build_response($code, $body)
+    Builds a HTTP response ("HTTP::Response") based on the given HTTP status
+    code and optionally adds a body.
+
+    Returns a "HTTP::Response" so it can be send via the opened connection.
+
+  validate_request($command, $request)
+    re-define this method if you want to add some extra security. By default
+    all requests are valid at this point.
+
+  run_cmd($connection, $name, $cmd, $params)
+    Runs whatever the command is and sets a timeout to it. If it takes too
+    long then it will try to kill the process.
+
+    Depending on the settings given to the command it will return the STDOUT
+    or STDERR or even both. The rules are:
+
+    1. On success it will look for STDOUT, if nothing is there then it looks
+    in STDERR. If nothing is foudn in STDERR and STDOUT then an empty string
+    is returned.
+    2. On error it will look for STDERR first, if nothing is there then it
+    looks in STDOUT. If nothing is there then it returns an empty string.
+
+    Both STDOUT and STDERR can be returned if the command is defined as
+    follows:
+
+        server_uptime:
+            cmd: '/usr/bin/uptime'
+            capture_all: 'y'
+
+  load_commands()
+    Load the commands YAML file and stores it in memory with Cache::FastMnap
+
+COPYRIGHT
+    Copyright (c) 2010-2012 Yahoo! Inc. All rights reserved.
+
+LICENSE
+    This program is free software. You may copy or redistribute it under the
+    same terms as Perl itself. Please see the LICENSE file included with
+    this project for the terms of the Artistic License under which this
+    project is licensed.
+
+AUTHORS
+    Pablo Fischer (pablo@pablo.com.mx)
+

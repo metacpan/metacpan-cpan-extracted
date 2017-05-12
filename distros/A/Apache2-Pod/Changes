@@ -1,0 +1,82 @@
+Revision history for Apache2::Pod
+
+0.27    Tue Mar 17 11:11:11 PST 2009
+        [Non-Maintainer Upload]
+        * CPAN:MARKLE
+
+        [FIXES]
+        * My::Pod::Simple::HTML was already indexed by PETDANCE
+          which is why the tests were failing.  Does anyone know
+          why this is needed?
+
+0.26    Tue Mar 17 11:11:11 PST 2009
+        [Non-Maintainer Upload]
+        * CPAN:MARKLE
+
+        [FIXES]
+        * requires URI::Escape; omits require of non-existent module 
+          in tests.
+
+0.25    Thu Jan 30 12:52:00 PST 2009
+        [Non-Maintainer Upload] 
+        * CPAN:MARKLE is (temporarily? permanently?)
+          granted co-maintainer status by PAUSE admin
+          brian d foy.
+
+        [FIXES]
+        * removed calls to send_http_headers which require
+          use of Apache2::compat, which is undocumented.
+          Fixes RT 31102, 39419.  Thanks Phillip Cole.
+
+
+0.24    Thu Jan  4 14:22:09 PST 2007
+		[FEATURES]
+		* added /f/keyword feature so functions can be looked up.
+
+		[FIXES]
+		* built Apache2::Pod package from Apache::Pod package. Thanks Andy
+		Lester for the help.  I will be taking over the Apache2 release of
+		this module from Andy Lester per his suggestion.
+
+0.22    Fri Sep 16 22:46:06 CDT 2005
+        [FEATURES]
+        * Added LINKBASE configuration variable to define base of the
+          URLs created by L<> links.  Thanks Pete Krawczyk.
+
+        [FIXES]
+        * URI-encodes the links in Apache::Pod::HTML.  Thanks to Chris
+          Eade.
+
+0.20    Sat Sep 10 13:57:11 CDT 2005
+        [FEATURES]
+        * Added INDEX and GZIP options.  Thanks to Kjetil Skotheim.
+
+        [FIXES]
+        * Uses C<< $r->print >> instead of bare C<print> to generate
+          output.  This is more portable.  Thanks to Kate Yoak.
+        * Added a dependency on Apache::Constants.
+
+0.10    May 10, 2004
+        [FEATURES]
+        * Pod links link to the filename.  Thereform, L<foo.pod> links
+        to foo.pod, instead of "TODO".  This is only until Sean does
+        his magic in Pod::Simple::HTML so this fudgery isn't needed.
+
+        [FIXES]
+        * Handlers now properly return OK.
+
+        [INTERNALS]
+        * Now overriding Pod::Simple::HTML.
+        * Added pod.t and pod-coverage.t
+        * Changed the handling of the CSS as a __DATA__ section.
+
+0.03    September 9, 2003
+        * Added stylesheet handling, including replicating the
+          search.cpan.org stylesheet as a default.  Thanks very much to
+          Grant McLean for the patch.
+
+0.02    September 29, 2002
+        * Seems to find modules correctly, a la perldoc.
+
+0.01    September 26, 2002
+        * First version

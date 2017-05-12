@@ -1,0 +1,36 @@
+Alien::SwaggerUI
+
+This module contains Swagger UI <http://swagger.io/swagger-ui/>. This
+pure-JavaScript application renders beautiful documentation for your
+application's OpenAPI specification <https://www.openapis.org>.
+
+The application is contained in a "share/" directory. You can get the
+path to this directory with the "root_dir" method.
+
+To render your specific API documentation, pass it in with the
+"?url=/path/to/spec" query parameter.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Doug Bell.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004

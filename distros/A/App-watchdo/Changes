@@ -1,0 +1,47 @@
+Revision history for App-watchdo
+
+0.0.6   2016-08-07
+        Updating for release of version 0.0.6
+        Added missing documentation (Ivan Wills)
+        Added skipping more files (Ivan Wills)
+        Added missing dependencies (Ivan Wills)
+        Switched to using new lib (Ivan Wills)
+        Made wait time configurable (Ivan Wills)
+        Refactored out changed file action (Ivan Wills)
+        Using inputs correctly (Ivan Wills)
+        Implemented watching (Ivan Wills)
+        Starting to implement event driven watch (Ivan Wills)
+        Added vtide config (Ivan Wills)
+        Adding missing argument documentation (Ivan Wills)
+        Updated license date (Ivan Wills)
+        Cleaned up indentation (Ivan Wills)
+
+0.0.5   2015-12-12
+        Updating for release of version 0.0.5
+        Added dependency to requires (Ivan Wills)
+        Added missing Path::Tiny (Ivan Wills)
+        Added recursing directories (Ivan Wills)
+        Fixed checking for git changes (Ivan Wills)
+        Made sleep time configurable (Ivan Wills)
+
+0.0.4   2015-09-10
+        Updating for release of version 0.0.4
+        Fixed git watching (Ivan Wills)
+
+0.0.3   2015-08-19
+        Updating for release of version 0.0.3
+        Removed creation of makefile (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.0.2   2015-06-23
+        Updating for release of version 0.0.2
+        Removed unneeded tag (Ivan Wills)
+
+0.0.1   2015-03-29
+        Updated dependencies (Ivan Wills)
+        Fixed up tests (Ivan Wills)
+        Fixed git repo location (Ivan Wills)
+        Fixed tests (Ivan Wills)
+        Moved file from App-Useful (Ivan Wills)
+        Fixed manifest (Ivan Wills)
+        Initial commit (Ivan Wills)

@@ -1,0 +1,14 @@
+Revision history for Perl extension App::cpanmigrate
+
+
+0.04    Tue Jun 28 23:18:32 2011
+        - add scripts for zsh and csh (toritori0318)
+
+0.03    Sat Jun 25 20:55:49 2011
+        - fix a bug
+
+0.02    Sat Jun 25 20:39:11 2011
+        - first implementation with bash support
+
+0.01    Sat Jun 25 14:36:09 2011
+        - original version

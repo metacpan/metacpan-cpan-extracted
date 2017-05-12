@@ -1,0 +1,113 @@
+#!perl
+use 5.010;
+use strict;
+use warnings;
+package mymeta_requires;
+
+our $VERSION = '0.006';
+
+use strict;
+use warnings;
+use App::mymeta_requires;
+exit App::mymeta_requires->run;
+
+# PODNAME: mymeta-requires
+# ABSTRACT: Extract module requirements from MYMETA files
+
+
+# vim: ts=2 sts=2 sw=2 et:
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mymeta-requires - Extract module requirements from MYMETA files
+
+=head1 VERSION
+
+version 0.006
+
+=head1 SYNOPSIS
+
+  Usage: mymeta-requires [OPTIONS...]
+
+  PHASE OPTIONS:
+  --runtime     (default: on)
+  --build       (default: on)
+  --test        (default: on)
+  --configure   (default: on)
+  --develop     (default: off)
+
+  TYPE OPTIONS
+  --recommends  (default: on)
+  --suggests    (default: on)
+
+  OTHER OPTIONS:
+  --file,     -f  Specify alternate MYMETA file
+  --verbose,  -v  Slightly more verbose logging
+  --report        Report on all prereqs, missing or not
+  --help,     -h  Usage help
+
+  All long-style options may be negated, e.g. "--no-test"
+
+=head1 DESCRIPTION
+
+This program extracts CPAN module requirements as recorded in a F<MYMETA.json>
+or F<MYMETA.yml> file in the current directory and prints them one-per-line to
+C<STDOUT>.  It is intended to help install prerequisites manually using a CPAN
+client.  For example, with L<ExtUtils::MakeMaker> 6.58 (which writes F<MYMETA>
+files) and L<App::cpanminus>:
+
+  $ perl Makefile.PL
+  $ mymeta-requires | cpanm
+
+Or with the traditional F<cpan> client:
+
+  $ perl Makefile.PL
+  $ cpan $(mymeta-requires)
+
+The various configuration options allow customizing which prerequisite
+prerequisite phases and types are extracted.  (See L<CPAN::Meta/"PREREQUITIES">
+for an explanation of phases and types.)
+
+By default all phases except C<develop> are included and types C<requires>,
+C<recommends> and C<suggests>.  Any phase or type may be negated by prefixing
+C<no-> to the option. E.g.
+
+  $ mymeta-requires --no-suggests
+
+If no F<MYMETA.json> or F<MYMETA.yml> file is found, this will fall back
+to using a F<META.json> or F<META.yml>  This is not guaranteed to have
+all dependencies, but may be useful for bootstrapping configuration
+requirements.  E.g.
+
+  # get any configuration requirements
+  $ mymeta-requires | cpanm
+
+  # run configuration
+  $ perl Makefile.PL
+
+  # repeat to get any dynamic dependencies
+  $ mymeta-requires | cpanm
+
+With C<--report>, instead of just listing missing prereqs, all the
+specified prereqs (or default ones) will be listed with their installed
+version (or listed as missing) along with the prerequisites required.
+
+=head1 AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by David Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

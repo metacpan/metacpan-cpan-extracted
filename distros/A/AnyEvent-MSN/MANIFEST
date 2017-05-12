@@ -1,0 +1,13 @@
+Build.PL
+Changes
+examples/client.pl
+lib/AnyEvent/MSN.pm
+lib/AnyEvent/MSN/Protocol.pm
+lib/AnyEvent/MSN/Types.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/000_basic/001_use_ok.t
+t/100_active/101_session.t

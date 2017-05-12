@@ -1,0 +1,14 @@
+clear
+power on
+regs
+
+op a9 55
+op a0 0B
+op 99 efbe
+
+# Should be: ACC=55, IY=0B, mem[$BEFA]=55 
+test acc = 55
+test iy = 0b
+test m:befa = 55
+
+save verify_99.txt

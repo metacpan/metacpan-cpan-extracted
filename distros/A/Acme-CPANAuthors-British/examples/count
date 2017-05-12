@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+use strict;
+use Acme::CPANAuthors;
+
+my $authors  = Acme::CPANAuthors->new("British");
+my $number   = $authors->count;
+
+print "$number declared British CPAN authors\n";

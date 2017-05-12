@@ -1,0 +1,143 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+=head1 NAME
+
+cachecache - a plugin that provides a cache API using the Cache::Cache module
+
+=head1 SYNOPSIS
+
+in axkit.conf:
+
+  Plugin cachecache
+  # mandatory:
+  CacheModule File
+  # optional:
+  CacheSize   10000
+  CacheNamespace wibble
+  CacheExpiresIn 300
+
+in your plugin:
+
+  my $cache = $self->cache();
+
+=head1 DESCRIPTION
+
+This module provides every plugin with a C<< $self->cache() >> method to access
+a cache. This could be used for storing database output, LDAP results, Session
+data, or just about any scalar.
+
+=head1 USAGE
+
+Please see L<Cache::Cache> for the API of the C<$cache> object returned. The
+construction of the cache object is done for you using the parameters specified
+in the config file.
+
+=head1 CONFIG
+
+=head2 CacheModule ( File | Memory | SharedMemory )
+
+Configures which cache module to use. The SharedMemory module doesn't make much
+sense since AxKit2 is a single process, so just use C<File> or C<Memory>.
+
+=head2 CacheSize NNN
+
+If specified, will try to use the "SizeAware" versions of the cache modules and
+specify the cache size as given (in bytes, according to the Cache::Cache docs).
+
+=head2 CacheNamespace STRING
+
+Will use a cache under the given namespace. This provides a way to separate your
+caches on a per-application basis.
+
+=head2 CacheExpiresIn NNN
+
+Number of seconds before objects in the cache expire.
+
+=cut
+
+sub init {
+    my $self = shift;
+    
+    $self->register_config('CacheModule', sub { $self->cachemodule(@_) });
+    $self->register_config('CacheSize', sub { $self->cachesize(@_) });
+    $self->register_config('CacheNamespace', sub { $self->cachens(@_) });
+    $self->register_config('CacheExpiresIn', sub { $self->cacheexpiry(@_) });
+}
+
+# Note: unlike other plugins, these don't use plugin_name::<key>
+# because multiple different plugins can call these methods
+# so plugin_name changes.
+sub cachemodule {
+    my ($self, $conf) = (shift, shift);
+    
+    my $key = 'cachemodule';
+    @_ and $conf->notes($key, shift);
+    $conf->notes($key);
+}
+
+sub cachesize {
+    my ($self, $conf) = (shift, shift);
+    
+    my $key = 'cachesize';
+    @_ and $conf->notes($key, shift);
+    $conf->notes($key);
+}
+
+sub cachens {
+    my ($self, $conf) = (shift, shift);
+    
+    my $key = 'cachens';
+    @_ and $conf->notes($key, shift);
+    $conf->notes($key);
+}
+
+sub cacheexpiry {
+    my ($self, $conf) = (shift, shift);
+    
+    my $key = 'cacheexpiry';
+    @_ and $conf->notes($key, shift);
+    $conf->notes($key);
+}
+
+sub AxKit2::Plugin::cache {
+    my $self = shift;
+    my $conf = $self->config || die "cache() method: no config available";
+    
+    # Horrid - this plugin isn't subclassable because of the __PACKAGE__ here
+    # but that's what I get for injecting methods into the base class
+    my $cachemodule = __PACKAGE__->cachemodule($conf);
+    my $cachesize   = __PACKAGE__->cachesize($conf);
+    my $cachens     = __PACKAGE__->cachens($conf);
+    my $cacheexpire = __PACKAGE__->cacheexpiry($conf);
+    
+    if ($cachesize) {
+        $cachemodule = "SizeAware$cachemodule";
+    }
+    
+    my $cachepm = "Cache/${cachemodule}Cache.pm";
+    $cachemodule = "Cache::${cachemodule}Cache";
+    require $cachepm;
+    
+    my @args = ( $cachens     ? ('namespace' => $cachens) : (),
+                 $cachesize   ? ('max_size'  => $cachesize) : (),
+                 $cacheexpire ? ('default_expires_in' => $cacheexpire) : (),
+               );
+    $self->log(LOGDEBUG, "Get cache $cachemodule with args: ", join(', ', @args));
+
+    return $cachemodule->new({@args});
+}

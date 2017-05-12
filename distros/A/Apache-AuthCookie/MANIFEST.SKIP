@@ -1,0 +1,27 @@
+^blib/
+^Makefile$
+^Makefile\.old$
+^pm_to_blib$
+^\.git/
+^\.gitignore$
+^t/TEST$
+^t/db/
+~$
+error_log
+^dist\.ini
+^weaver\.ini
+^t/httpd.loc
+^MYMETA
+
+# Apache::Test generated files
+^t/conf/extra.conf$
+^t/conf/httpd.conf$
+^t/conf/mime.types$
+^t/conf/modperl_inc.pl$
+^t/conf/modperl_startup.pl$
+^t/conf/apache_test_config.pm$
+^t/htdocs/index.html$
+^t/logs/
+^t/TEST$
+^t/SMOKE$
+

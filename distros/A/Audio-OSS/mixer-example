@@ -1,0 +1,39 @@
+#!/usr/bin/perl -w
+
+# mixer-example: read all mixers on the system, if possible
+
+# Copyright (c) 2001 Cepstral LLC
+# Written by David Huggins-Daines <dhd@cepstral.com>
+
+# This program is free software: you may copy and modify it under the
+# same terms as Perl itself.
+
+use Audio::OSS qw(:funcs @DevNames);
+use strict;
+
+for my $i (0..7) {
+    # Feh
+    if ($i == 0 and ! -f "/dev/mixer0") {
+	$i = "";
+    }
+    last unless open MIXER, "</dev/mixer$i";
+
+    print "/dev/mixer$i:\n";
+    # Some folks (FreeBSD) don't have this
+    if (defined &get_mixer_info) {
+	my ($id, $name) = get_mixer_info(\*MIXER);
+	print "id=$id name=$name\n";
+    }
+    my $mixdevs = mixer_read_devmask(\*MIXER);
+    my $stereo = mixer_read_stereodevs(\*MIXER);
+    for my $chan (0..31) {
+	next unless $mixdevs & (1<<$chan);
+	my $cname = $DevNames[$chan];
+	my $l = mixer_read(\*MIXER, $chan);
+	if ($stereo & (1<<$chan)) {
+	    print "\t$cname: left: ", ($l & 0xff), " right: ", ($l >> 8), "\n";
+	} else {
+	    print "\t$cname: ", ($l & 0xff), "\n";
+	}
+    }
+}

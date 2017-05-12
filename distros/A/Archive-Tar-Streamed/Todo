@@ -1,0 +1,5 @@
+TODO list for Perl module Archive::Tar::Streamed
+
+- Work with compression: IO::Zlib or Compress::Zlib
+
+

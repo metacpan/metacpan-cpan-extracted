@@ -1,0 +1,377 @@
+NAME
+    Algorithm::LBFGS - Perl extension for L-BFGS
+
+SYNOPSIS
+      use Algorithm::LBFGS;
+
+      # create an L-BFGS optimizer
+      my $o = Algorithm::LBFGS->new;
+
+      # f(x) = (x1 - 1)^2 + (x2 + 2)^2
+      # grad f(x) = (2 * (x1 - 1), 2 * (x2 + 2));
+      my $eval_cb = sub {
+          my $x = shift;
+          my $f = ($x->[0] - 1) * ($x->[0] - 1) + ($x->[1] + 2) * ($x->[1] + 2);
+          my $g = [ 2 * ($x->[0] - 1), 2 * ($x->[1] + 2) ];
+          return ($f, $g);
+      };
+
+      my $x0 = [0.0, 0.0]; # initial point
+      my $x = $o->fmin($eval_cb, $x0); # $x is supposed to be [ 1, -2 ];
+
+DESCRIPTION
+    L-BFGS (Limited-memory Broyden-Fletcher-Goldfarb-Shanno) is a
+    quasi-Newton method for unconstrained optimization. This method is
+    especially efficient on problems involving a large number of variables.
+
+    Generally, it solves a problem described as following:
+
+      min f(x), x = (x1, x2, ..., xn)
+
+    Jorge Nocedal wrote a Fortran 77 version of this algorithm.
+
+    <http://www.ece.northwestern.edu/~nocedal/lbfgs.html>
+
+    And, Naoaki Okazaki rewrote it in pure C (liblbfgs).
+
+    <http://www.chokkan.org/software/liblbfgs/index.html>
+
+    This module is a Perl port of Naoaki Okazaki's C version.
+
+  new
+    "new" creates a L-BFGS optimizer with given parameters.
+
+      my $o1 = new Algorithm::LBFGS(m => 5);
+      my $o2 = new Algorithm::LBFGS(m => 3, eps => 1e-6);
+      my $o3 = new Algorithm::LBFGS;
+
+    If no parameter is specified explicitly, their default values are used.
+
+    The parameter can be changed after the creation of the optimizer by
+    "set_param". Also, they can be queryed by "get_param".
+
+    Please refer to the "List of Parameters" for details about parameters.
+
+  get_param
+    Query the value of a parameter.
+
+       my $o = Algorithm::LBFGS->new;
+       print $o->get_param('epsilon'); # 1e-5
+
+  set_param
+    Change the values of one or several parameters.
+
+       my $o = Algorithm::LBFGS->new;
+       $o->set_param(epsilon => 1e-6, m => 7);
+
+  fmin
+    The prototype of "fmin" is like
+
+      x = fmin(evaluation_cb, x0, progress_cb, user_data)
+  
+    As the name says, it finds a vector x which minimize the function f(x).
+
+    "evaluation_cb" is a ref to the evaluation callback subroutine, "x0" is
+    the initial point of the optimization algorithm, "progress_cb"
+    (optional) is a ref to the progress callback subroutine, and "user_data"
+    (optional) is a piece of extra data that client program want to pass to
+    both "evaluation_cb" and "progress_cb".
+
+    Client program can use "get_status" to find if any problem occured
+    during the optimization after their calling "fmin". When the status is
+    "LBFGS_OK", the returning value "x" (array ref) contains the optimized
+    variables, otherwise, there may be some problems occured and the value
+    in the returning "x" is undefined.
+
+   evaluation_cb
+    The ref to the evaluation callback subroutine.
+
+    The evaluation callback subroutine is supposed to calculate the function
+    value and gradient vector at a specified point "x". It is called
+    automatically by "fmin" when an evaluation is needed.
+
+    The client program need to make sure their evaluation callback
+    subroutine has a prototype like
+
+      (f, g) = evaluation_cb(x, step, user_data)
+
+    "x" (array ref) is the current values of variables, "step" is the
+    current step of the line search routine, "user_data" is the extra user
+    data specified when calling "fmin".
+
+    The evaluation callback subroutine is supposed to return both the
+    function value "f" and the gradient vector "g" (array ref) at current
+    "x".
+
+   x0
+    The initial point of the optimization algorithm. The final result may
+    depend on your choice of "x0".
+
+    NOTE: The content of "x0" will be modified after calling "fmin". When
+    the algorithm terminates successfully, the content of "x0" will be
+    replaced by the optimized variables, otherwise, the content of "x0" is
+    undefined.
+
+   progress_cb
+    The ref to the progress callback subroutine.
+
+    The progress callback subroutine is called by "fmin" at the end of each
+    iteration, with information of current iteration. It is very useful for
+    a client program to monitor the optimization progress.
+
+    The client program need to make sure their progress callback subroutine
+    has a prototype like
+
+      s = progress_cb(x, g, fx, xnorm, gnorm, step, k, ls, user_data)
+
+    "x" (array ref) is the current values of variables. "g" (array ref) is
+    the current gradient vector. "fx" is the current function value. "xnorm"
+    and "gnorm" is the L2 norm of "x" and "g". "step" is the line-search
+    step used for this iteration. "k" is the iteration count. "ls" is the
+    number of evaluations in this iteration. "user_data" is the extra user
+    data specified when calling "fmin".
+
+    The progress callback subroutine is supposed to return an indicating
+    value "s" for "fmin" to decide whether the optimization should continue
+    or stop. "fmin" continues to the next iteration when "s=0", otherwise,
+    it terminates with status code "LBFGSERR_CANCELED".
+
+    The client program can also pass string values to "progress_cb", which
+    means it want to use a predefined progress callback subroutine. There
+    are two predefined progress callback subroutines, 'verbose' and
+    'logging'. 'verbose' just prints out all information of each iteration,
+    while 'logging' logs the same information in an array ref provided by
+    "user_data".
+
+      ...
+
+      # print out the iterations
+      fmin($eval_cb, $x0, 'verbose'); 
+
+      # log iterations information in the array ref $log
+      my $log = [];
+
+      fmin($eval_cb, $x0, 'logging', $log);
+  
+      use Data::Dumper;
+      print Dumper $log;
+
+   user_data
+    The extra user data. It will be sent to both "evaluation_cb" and
+    "progress_cb".
+
+  get_status
+    Get the status of previous call of "fmin".
+
+      ...
+      $o->fmin(...);
+
+      # check the status
+      if ($o->get_status eq 'LBFGS_OK') {
+         ...
+      }
+
+      # print the status out
+      print $o->get_status;
+
+    The status code is a string, which could be one of those in the "List of
+    Status Codes".
+
+  status_ok
+    This is a shortcut of saying "get_status" eq "LBFGS_OK".
+
+      ...
+
+      if ($o->fmin(...), $o->status_ok) {
+          ...
+      }
+
+  List of Parameters
+   m
+    The number of corrections to approximate the inverse hessian matrix.
+
+    The L-BFGS algorithm stores the computation results of previous "m"
+    iterations to approximate the inverse hessian matrix of the current
+    iteration. This parameter controls the size of the limited memories
+    (corrections). The default value is 6. Values less than 3 are not
+    recommended. Large values will result in excessive computing time.
+
+   epsilon
+    Epsilon for convergence test.
+
+    This parameter determines the accuracy with which the solution is to be
+    found. A minimization terminates when
+
+      ||grad f(x)|| < epsilon * max(1, ||x||)
+
+    where ||.|| denotes the Euclidean (L2) norm. The default value is 1e-5.
+
+   max_iterations
+    The maximum number of iterations.
+
+    The L-BFGS algorithm terminates an optimization process with
+    "LBFGSERR_MAXIMUMITERATION" status code when the iteration count
+    exceedes this parameter. Setting this parameter to zero continues an
+    optimization process until a convergence or error. The default value is
+    0.
+
+   max_linesearch
+    The maximum number of trials for the line search.
+
+    This parameter controls the number of function and gradients evaluations
+    per iteration for the line search routine. The default value is 20.
+
+   min_step
+    The minimum step of the line search routine.
+
+    The default value is 1e-20. This value need not be modified unless the
+    exponents are too large for the machine being used, or unless the
+    problem is extremely badly scaled (in which case the exponents should be
+    increased).
+
+   max_step
+    The maximum step of the line search.
+
+    The default value is 1e+20. This value need not be modified unless the
+    exponents are too large for the machine being used, or unless the
+    problem is extremely badly scaled (in which case the exponents should be
+    increased).
+
+   ftol
+    A parameter to control the accuracy of the line search routine.
+
+    The default value is 1e-4. This parameter should be greater than zero
+    and smaller than 0.5.
+
+   gtol
+    A parameter to control the accuracy of the line search routine.
+
+    The default value is 0.9. If the function and gradient evaluations are
+    inexpensive with respect to the cost of the iteration (which is
+    sometimes the case when solving very large problems) it may be
+    advantageous to set this parameter to a small value. A typical small
+    value is 0.1. This parameter shuold be greater than the ftol parameter
+    (1e-4) and smaller than 1.0.
+
+   xtol
+    The machine precision for floating-point values.
+
+    This parameter must be a positive value set by a client program to
+    estimate the machine precision. The line search routine will terminate
+    with the status code ("LBFGSERR_ROUNDING_ERROR") if the relative width
+    of the interval of uncertainty is less than this parameter.
+
+   orthantwise_c
+    Coeefficient for the L1 norm of variables.
+
+    This parameter should be set to zero for standard minimization problems.
+    Setting this parameter to a positive value minimizes the objective
+    function f(x) combined with the L1 norm |x| of the variables, f(x) +
+    c|x|. This parameter is the coeefficient for the |x|, i.e., c. As the L1
+    norm |x| is not differentiable at zero, the module modify function and
+    gradient evaluations from a client program suitably; a client program
+    thus have only to return the function value f(x) and gradients grad f(x)
+    as usual. The default value is zero.
+
+  List of Status Codes
+   LBFGS_OK
+    No error occured.
+
+   LBFGSERR_UNKNOWNERROR
+    Unknown error.
+
+   LBFGSERR_LOGICERROR
+    Logic error.
+
+   LBFGSERR_OUTOFMEMORY
+    Insufficient memory.
+
+   LBFGSERR_CANCELED
+    The minimization process has been canceled.
+
+   LBFGSERR_INVALID_N
+    Invalid number of variables specified.
+
+   LBFGSERR_INVALID_N_SSE
+    Invalid number of variables (for SSE) specified.
+
+   LBFGSERR_INVALID_MINSTEP
+    Invalid parameter "max_step" specified.
+
+   LBFGSERR_INVALID_MAXSTEP
+    Invalid parameter "max_step" specified.
+
+   LBFGSERR_INVALID_FTOL
+    Invalid parameter "ftol" specified.
+
+   LBFGSERR_INVALID_GTOL
+    Invalid parameter "gtol" specified.
+
+   LBFGSERR_INVALID_XTOL
+    Invalid parameter "xtol" specified.
+
+   LBFGSERR_INVALID_MAXLINESEARCH
+    Invalid parameter "max_linesearch" specified.
+
+   LBFGSERR_INVALID_ORTHANTWISE
+    Invalid parameter "orthantwise_c" specified.
+
+   LBFGSERR_OUTOFINTERVAL
+    The line-search step went out of the interval of uncertainty.
+
+   LBFGSERR_INCORRECT_TMINMAX
+    A logic error occurred; alternatively, the interval of uncertainty
+    became too small.
+
+   LBFGSERR_ROUNDING_ERROR
+    A rounding error occurred; alternatively, no line-search step satisfies
+    the sufficient decrease and curvature conditions.
+
+   LBFGSERR_MINIMUMSTEP
+    The line-search step became smaller than "min_step".
+
+   LBFGSERR_MAXIMUMSTEP
+    The line-search step became larger than "max_step".
+
+   LBFGSERR_MAXIMUMLINESEARCH
+    The line-search routine reaches the maximum number of evaluations.
+
+   LBFGSERR_MAXIMUMITERATION
+    The algorithm routine reaches the maximum number of iterations.
+
+   LBFGSERR_WIDTHTOOSMALL
+    Relative width of the interval of uncertainty is at most "xtol".
+
+   LBFGSERR_INVALIDPARAMETERS
+    A logic error (negative line-search step) occurred.
+
+   LBFGSERR_INCREASEGRADIENT
+    The current search direction increases the objective function value.
+
+SEE ALSO
+    PDL, PDL::Opt::NonLinear
+
+AUTHOR
+    Laye Suen, <laye@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 1990, Jorge Nocedal
+
+    Copyright (C) 2007, Naoaki Okazaki
+
+    Copyright (C) 2008, Laye Suen
+
+    This library is distributed under the term of the MIT license.
+
+    <http://opensource.org/licenses/mit-license.php>
+
+REFERENCE
+    J. Nocedal. Updating Quasi-Newton Matrices with Limited Storage (1980) ,
+    Mathematics of Computation 35, pp. 773-782.
+    D.C. Liu and J. Nocedal. On the Limited Memory Method for Large Scale
+    Optimization (1989), Mathematical Programming B, 45, 3, pp. 503-528.
+    Jorge Nocedal's Fortran 77 implementation,
+    <http://www.ece.northwestern.edu/~nocedal/lbfgs.html>
+    Naoaki Okazaki's C implementation (liblbfgs),
+    <http://www.chokkan.org/software/liblbfgs/index.html>
+

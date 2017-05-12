@@ -1,0 +1,4 @@
+1.21     2015-07-18
+
+- This distro was split out of Params::Validate. I do not use this module, nor
+  do I recommend that anyone else use it. It is available for adoption.

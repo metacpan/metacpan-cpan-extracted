@@ -1,0 +1,24 @@
+Revision history for Perl extension Array::Each::Override
+
+0.05  Fri Jun  3 07:41:18 2016
+	- Fix test suite bug exposed by Test2
+	- Use XSLoader instead of DynaLoader
+	- Publish on Github, and announce that in the dist metadata
+	- Announce licensing information in the dist metadata
+	- No functional changes
+
+0.04  Wed Jul  2 09:30:11 2008
+	- Support older C compilers
+	- No other changes
+
+0.03  Mon Jun 30 11:42:01 2008
+	- Make test suite work on Perls with peculiar stdio; see
+	  C<"-T" and "-B" not implemented on filehandles> in perldiag
+	- No other changes
+
+0.02  Sun Feb 24 15:06:19 2008
+	- Makefile.PL now explicitly requires Perl 5.8, to prevent
+	  CPAN testers from generating uninteresting failures
+
+0.01  Sat Feb 17 12:36:18 2007
+	- original version

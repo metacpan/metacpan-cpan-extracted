@@ -1,0 +1,10 @@
+--- 
+abstract: build empty, dependency-only distributions
+author: 
+  - Hans Dieter Pearcey <hdp@cpan.org>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.003
+license: perl
+name: App-TaskBuilder
+requires: {}
+
+version: 1.000

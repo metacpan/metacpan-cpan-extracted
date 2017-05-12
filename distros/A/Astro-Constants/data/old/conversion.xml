@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Collection>
+    <title>Astro::Constants</title>
+    <description>Physical constants for astronomy for use in Astro::Constants v0.10</description>
+    <timestamp>Wed Feb 10 11:59:13 2016</timestamp>
+    <version>v0.10</version>
+    <source>2014 CODATA</source>
+    <link href="http://metacpan.org/pod/Astro::Constants" />
+    <items>
+        <PhysicalConstant>
+            <name type="long">ATOMIC_MASS_UNIT</name>
+            <name type="short">A_amu</name>
+            <alternateName />
+            <description>atomic mass unit</description>
+            <value system="MKS">1.660539040e-27</value>
+            <value system="CGS">1.660539040e-24</value>
+            <uncertainty type="relative">1.2e-8</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?amu" />
+            <categoryList>
+                <category>conversion</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">ELECTRON_VOLT</name>
+            <name type="short">A_eV</name>
+            <alternateName />
+            <description>electron volt</description>
+            <value system="MKS">1.6021766208e-19</value>
+            <value system="CGS">1.6021766208e-12</value>
+            <uncertainty type="relative">6.1e-9</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?eV" />
+            <categoryList>
+                <category>conversion</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">PARSEC</name>
+            <name type="short">A_pc</name>
+            <alternateName />
+            <description>parsec</description>
+            <value system="MKS">3.08567758149e16</value>
+            <value system="CGS">3.08567758149e18</value>
+            <uncertainty type="relative">1e-11</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?pc" />
+            <categoryList>
+                <category>conversion</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">ASTRONOMICAL_UNIT</name>
+            <name type="short">A_AU</name>
+            <alternateName />
+            <description>astronomical unit</description>
+            <value system="MKS">149_597_870_700</value>
+            <value system="CGS">1.496e13</value>
+            <uncertainty type="relative">0</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?AU" />
+            <categoryList>
+                <category>conversion</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">LIGHT_YEAR</name>
+            <name type="short">A_ly</name>
+            <alternateName />
+            <description>light year</description>
+            <value system="MKS">9_460_730_472_580_800</value>
+            <value system="CGS">9.4607304725808e17</value>
+            <uncertainty type="relative">0</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?ly" />
+            <categoryList>
+                <category>conversion</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">ANGSTROM</name>
+            <name type="short">A_AA</name>
+            <alternateName />
+            <description>Angstrom</description>
+            <value system="MKS">1e-10</value>
+            <value system="CGS">1e-8</value>
+            <uncertainty type="relative">0</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?AA" />
+            <categoryList>
+                <category>conversion</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">JANSKY</name>
+            <name type="short">A_Jy</name>
+            <alternateName />
+            <description>Jansky</description>
+            <value system="MKS">1e-26</value>
+            <value system="CGS">1e-23</value>
+            <uncertainty type="relative">0</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?Jy" />
+            <categoryList>
+                <category>conversion</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">AVOGADRO</name>
+            <name type="short">A_NA</name>
+            <alternateName />
+            <description>Avogadro's number</description>
+            <value>6.022140857e23</value>
+            <uncertainty type="relative">1.2e-8</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?NA" />
+            <categoryList>
+                <category>conversion</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">YEAR</name>
+            <name type="short">A_yr</name>
+            <alternateName />
+            <description>year</description>
+            <value>31_557_600</value>
+            <uncertainty type="relative">0</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?yr" />
+            <categoryList>
+                <category>conversion</category>
+            </categoryList>
+        </PhysicalConstant>
+    </items>
+</Collection>

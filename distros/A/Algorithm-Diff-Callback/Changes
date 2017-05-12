@@ -1,0 +1,23 @@
+Revision history for Algorithm-Diff-Callback
+
+0.111   14.10.16
+        * Provide a META.json file.
+
+0.110   18.08.16
+        * Switch to List::Util from List::MoreUtils.
+
+0.100   28.12.12
+        * Rewrite to use keys instead of positional parameters.
+        * Much cleanup.
+        * Dzilify.
+
+0.03    03.07.10
+        * You can now remit a subroutine reference if you don't want.
+
+0.02    08.05.10
+        * Forgot the most important dependency.
+
+0.01    05.05.10
+        (5 + 5 = 10)
+        * First version, done at 1AM.
+

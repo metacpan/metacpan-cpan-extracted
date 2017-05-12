@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+lib/Acme/Magpie.pm
+lib/Acme/Magpie/l33t.pm
+t/Acme-Magpie.t
+META.yml                                 Module meta-data (added by MakeMaker)

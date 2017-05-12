@@ -1,0 +1,48 @@
+{
+   "abstract" : "L<Alien> wrapping for F<libtermkey>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-libtermkey",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Path" : "2.07",
+            "File::Spec" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CChecker" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "2.07",
+            "File::Spec" : "0",
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::libtermkey" : {
+         "file" : "lib/Alien/libtermkey.pm",
+         "version" : "0.17"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

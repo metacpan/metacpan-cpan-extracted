@@ -1,0 +1,95 @@
+=head1 NAME
+
+App::TimelogTxt::Format - Description of the timelog.txt file format.
+
+=head1 VERSION
+
+This document describes version 1 of the timelog.txt file format.
+
+=head1 HISTORY
+
+The format of this file was strongly influenced by the design of the C<todo.txt>
+system created by Gina Trapani. The major idea was to have a format that could
+be easily read and modified by a human with a text editor. This format should
+be a simple as possible, and require no proprietary technology to read or write.
+
+Some of the data stored in the file and the reporting of the data was influenced
+by years of use of the TEAK tool on the Palm. I wrote this tool to replace TEAK
+once it was obvious that the Palm was no more.
+
+=head1 DESCRIPTION
+
+Each time entry resides on a line by itself. Each line is made up of two parts:
+a time/date stamp and an event. There should be no leading or trailing white
+space on the lines.
+
+=head2 Time/Date Stamp
+
+The time/date stamp is the first thing on each line and is set in the local
+timezone. Except where we cross from Daylight Saving Time to Standard Time or
+vice versa this should cause no problems.
+
+The format of this part of the line is 'YYYY-MM-DD HH:MM:SS '. This format is
+relatively easy for a person to read, is easily and unambiuously parsed, and
+sorts nicely.
+
+=head2 Event
+
+The event is just text that describes the task or event we are now beginning.
+To enhance reporting, there are two forms of metadata. The first string
+starting with a C<+> is treated as a project. All events with the same project
+are reported together. The first string starting with C<@> is treated as a
+task. Any remaining text is treated as further detail on the task.
+
+If no task is specified, all of the event string except the project is treated
+as the task. The task is optional because not everyone will find it useful to
+define consistent tasks for reporting.
+
+There is one special case. An event of C<stop> stops timing the current event
+without starting a new event.
+
+=head2 Examples
+
+The following examples should make the format clear.
+
+=head3 Full Featured Event Line
+
+A full event using all of the features would look line this:
+
+  2013-07-01 10:01:23 +Timelog @Document File Format
+
+The project in this case is C<Timelog>, which specifies that I am working on
+this module. The task is C<Docment>, which means I am documenting something on
+the project. The string 'File Format' specifies more detail on what I am
+documenting.
+
+This event began around 10:01 on July 1st.
+
+=head3 Event With No Detail
+
+This following event contains both a project and a task, but with no extra
+detail.
+
+  2013-07-01 08:05:14 +Misc @Email
+
+In this case, I'm just checking my email for the morning. There is really no
+need for any more detail than that.
+
+=head3 Event with No Explicit Task
+
+  2013-07-01 13:05:45 +Timelog Submit to CPAN
+
+In this case, the task would be 'Submit to CPAN' because I haven't separated
+the task from the details.
+
+=head1 AUTHOR
+
+G. Wade Johnson C<< <gwadej@cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2013, G. Wade Johnson "<gwadej@cpan.org>". All rights
+reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See perlartistic.

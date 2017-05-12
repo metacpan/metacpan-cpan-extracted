@@ -1,0 +1,7 @@
+<IfDefine APACHE1>
+  PerlInitHandler Apache::Profiler
+</IfDefine>
+
+<IfDefine APACHE2>
+  PerlInitHandler Apache2::Profiler
+</IfDefine>

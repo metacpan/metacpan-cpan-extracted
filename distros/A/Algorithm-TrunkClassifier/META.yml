@@ -1,0 +1,38 @@
+---
+name: Algorithm-TrunkClassifier
+version: v1.0.1
+author:
+abstract: Implementation of the Decision Trunk Classifier algorithm
+license: unrestricted
+build_requires:
+  Exporter: 0
+  ExtUtils::CBuilder: 0.21
+  Module::Build: 0.19
+  POSIX: 0
+  XSLoader: 0
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Algorithm::TrunkClassifier:
+    file: lib/Algorithm/TrunkClassifier.pm
+    version: v1.0.1
+  Algorithm::TrunkClassifier::Classification:
+    file: lib/Algorithm/TrunkClassifier/Classification.pm
+    version: v1.0.1
+  Algorithm::TrunkClassifier::CommandProcessor:
+    file: lib/Algorithm/TrunkClassifier/CommandProcessor.pm
+    version: v1.0.1
+  Algorithm::TrunkClassifier::DataWrapper:
+    file: lib/Algorithm/TrunkClassifier/DataWrapper.pm
+    version: v1.0.1
+  Algorithm::TrunkClassifier::DecisionTrunk:
+    file: lib/Algorithm/TrunkClassifier/DecisionTrunk.pm
+    version: v1.0.1
+  Algorithm::TrunkClassifier::FeatureSelection:
+    file: lib/Algorithm/TrunkClassifier/FeatureSelection.pm
+    version: v1.0.1
+  Algorithm::TrunkClassifier::Util:
+    file: lib/Algorithm/TrunkClassifier/Util.pm
+    version: v1.0.1

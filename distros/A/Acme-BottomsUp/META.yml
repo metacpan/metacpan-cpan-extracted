@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Acme-BottomsUp
+version:             0.02
+abstract:            Write individual statements backwards
+license:             unknown
+generated_by:        ExtUtils::MakeMaker version 6.30_01
+author:              David Westbrook <dwestbrook@gmail.com>
+distribution_type:   module
+requires:     
+    Filter::Simple:                0.82
+    PPI:                           1.11
+    Test::More:                    0
+meta-spec:
+    url: <http://module-build.sourceforge.net/META-spec-new.html>;
+    version: 1.1

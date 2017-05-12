@@ -1,0 +1,34 @@
+---
+abstract: 'Find or build m4'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Alien::Build: '0.19'
+  Alien::Build::MM: '0.19'
+  ExtUtils::MakeMaker: '6.52'
+  Test2::Suite: '0.000060'
+  Test::Alien: '0'
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  Alien::Build: '0.19'
+  Alien::Build::MM: '0.19'
+  ExtUtils::MakeMaker: '6.52'
+  perl: '5.006'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-m4
+requires:
+  Alien::Base: '0.036'
+  perl: '5.006'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/Perl5-Alien/Alien-m4/issues
+  homepage: https://metacpan.org/pod/Alien::m4
+  repository: git://github.com/Perl5-Alien/Alien-m4.git
+version: '0.09'
+x_serialization_backend: 'YAML::Tiny version 1.70'

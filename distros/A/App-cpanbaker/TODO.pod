@@ -1,0 +1,20 @@
+=pod
+
+Refactor:
+
+    my $result = CPANBaker->tar(
+        filelist => [ ... ],
+    # ------- optional
+        compress => 'gzip' , 'bzip2',
+        filename => ... ,
+        sudo => 1,
+        verbose => 1,2,3
+        exclude => [ qw[  ] ],
+        exclude_listfile => ...,
+
+        tarbin => ... ,
+        taropts => ... ,
+        preserve_permission => 0,
+    );
+
+=cut

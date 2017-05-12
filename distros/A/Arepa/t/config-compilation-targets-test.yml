@@ -1,0 +1,16 @@
+---
+# Where the repo is
+repository:
+  path: t/repo-test
+# Where the upload queue is (some anonymous FTP upload directory, or
+# SSH-accesible queue or whatever)
+upload_queue:
+  path: /home/zoso/src/apt-web/incoming
+# SQLite package database with states ('pending', 'compiling', 'compiled',
+# 'compilationfailed'), architecture ('source', 'all', 'amd64', etc.),
+# timestamps, etc.
+package_db: t/compilation-targets-package.db
+web_ui:
+  template_dir: /home/zoso/src/apt-web/repo-tools-web/templates/
+dir:
+  build_logs: t/tmp

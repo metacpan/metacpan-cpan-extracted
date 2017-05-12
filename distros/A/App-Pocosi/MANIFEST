@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+bin/pocosi
+dist.ini
+example/config.json
+example/config.yml
+lib/App/Pocosi.pm
+lib/App/Pocosi/ReadLine.pm
+lib/App/Pocosi/Status.pm
+t/01_compile.t

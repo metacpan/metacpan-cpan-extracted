@@ -1,0 +1,76 @@
+--- include/wx/msw/setup.h  2012-07-08 11:28:28.000000000 +0100
++++ include/wx/msw/setup.h  2012-07-13 04:03:31.764058400 +0100
+@@ -277,7 +277,7 @@
+ // this to 0.
+ //
+ // Default is 1, but set to 0 if the scenario above is applicable.
+-#define wxUSE_COMPILER_TLS 1
++#define wxUSE_COMPILER_TLS 1
+ 
+ // ----------------------------------------------------------------------------
+ // Interoperability with the standard library.
+@@ -429,7 +429,7 @@
+ // Default is 1
+ //
+ // Recommended setting: 1 (but may be safely disabled if you don't use it)
+-#define wxUSE_FSVOLUME      1
++#define wxUSE_FSVOLUME      0
+ 
+ // Use wxStandardPaths class which allows to retrieve some standard locations
+ // in the file system
+@@ -571,7 +571,7 @@
+ #define wxUSE_FS_ARCHIVE    1
+ 
+ // Set to 1 to enable virtual Internet filesystem (requires wxUSE_FILESYSTEM)
+-#define wxUSE_FS_INET       1
++#define wxUSE_FS_INET       0
+ 
+ // wxArchive classes for accessing archives such as zip and tar
+ #define wxUSE_ARCHIVE_STREAMS     1
+@@ -617,8 +617,8 @@
+ 
+ // The settings for the individual URL schemes
+ #define wxUSE_PROTOCOL_FILE 1
+-#define wxUSE_PROTOCOL_FTP 1
+-#define wxUSE_PROTOCOL_HTTP 1
++#define wxUSE_PROTOCOL_FTP 0
++#define wxUSE_PROTOCOL_HTTP 0
+ 
+ // Define this to use wxURL class.
+ #define wxUSE_URL 1
+@@ -771,7 +771,7 @@
+ #   else
+         // MSVC 6 didn't include GDI+ headers so disable by default, enable it
+         // here if you use MSVC 6 with a newer SDK
+-#       define wxUSE_GRAPHICS_CONTEXT 0
++#       define wxUSE_GRAPHICS_CONTEXT 1
+ #   endif
+ #else
+     // Disable support for other Windows compilers, enable it if your compiler
+@@ -779,7 +779,7 @@
+     //
+     // Notice that this will be set by configure under non-Windows platforms
+     // anyhow so the value there is not important.
+-#   define wxUSE_GRAPHICS_CONTEXT 0
++#   define wxUSE_GRAPHICS_CONTEXT 1
+ #endif
+ 
+ // Enable wxGraphicsContext implementation using Cairo library.
+@@ -1367,7 +1367,7 @@
+ 
+ #define wxUSE_DRAGIMAGE 1
+ 
+-#define wxUSE_IPC         1
++#define wxUSE_IPC         1
+                                 // 0 for no interprocess comms
+ #define wxUSE_HELP        1
+                                 // 0 for no help facility
+@@ -1458,7 +1458,7 @@
+ #define wxUSE_PCX           1
+ 
+ // Set to 1 for IFF format support (Amiga format)
+-#define wxUSE_IFF           0
++#define wxUSE_IFF           1
+ 
+ // Set to 1 for XPM format support
+ #define wxUSE_XPM           1

@@ -1,0 +1,19 @@
+Revision history for App-DisplayResolutionUtils
+
+0.003   2016-10-12 (PERLANCAR)
+
+	- list-display-resolution-names(): Allow filtering by query
+	  argument.
+
+
+0.002   2016-10-09 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with fixed DZP:Rinci::AddPrereqs plugin to add missing
+          dependencies to Sah-schema-related dependencies.
+
+
+0.001   2016-10-07 (PERLANCAR)
+
+        - First release.

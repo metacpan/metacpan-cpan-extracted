@@ -1,0 +1,215 @@
+use lib qw(../../eg);
+
+use File::stat;
+use File::Basename;
+use MLDBM::Sync;
+use File::Find qw(find);
+use DemoASP;
+use Fcntl qw(O_RDWR O_CREAT);
+use Cwd qw(cwd);
+
+use vars qw(%CONF %SDB $title %TEMP_SDB);
+
+sub Script_OnStart {
+    %TEMP_SDB = ();
+    for('DB', 'FileRoot', 'SiteRoot', 'RefreshPeriod', 'FileMatch') {
+	$CONF{$_} = Apache->dir_config('Search'.$_) || die("no config for $_");
+    }
+    $CONF{FileRoot} =~ /\W/ or 
+      die("The FileRoot config must have a non word character in it ".
+	  "that matches \W, like '/', so a local dir may be specified ".
+	  "with ./");
+    if($CONF{FileRoot} !~ m,^(/|[a-z]:[\\/])$,) {
+	$CONF{FileRoot} = cwd().'/'.$CONF{FileRoot};
+    }
+    $Response->Debug('Search %CONF', \%CONF);
+
+    # only one person allowed to search at a time, this is
+    # in case we ever have to update a stale database
+    {
+	local $MLDBM::UseDB = 'MLDBM::Sync::SDBM_File';
+	my $sdb_object = tie(%SDB, 'MLDBM::Sync', $CONF{DB}, O_RDWR | O_CREAT, 0640)
+	  || die("can't tie to $CONF{DB}: $!");
+	$sdb_object->Lock;
+	$Server->RegisterCleanup(sub { 
+				     if(%TEMP_SDB) {
+					 $Response->Debug("start saving TEMP_SDB to SDB");
+					 %SDB = %TEMP_SDB;
+					 $Response->Debug("done saving TEMP_SDB to SDB");
+				     }
+				     untie %SDB;
+				     $sdb_object->UnLock;
+				 });
+    }
+    &refresh_db(\%CONF);
+}
+
+sub search_words {
+    my $input = shift;
+
+    $input =~ s/(\,\s|[\s\{\}\(\)%:;=\$\"\'\/\#]+)/ /sg;
+    my @words = split(/\s+/, $input);
+    my @dropped;
+    my @final;
+    my %final;
+    for(@words) {
+	if(length($_) < 3) {
+	    push(@dropped, $_);
+	} else {
+	    $_ = lc $_;
+	    push(@final, $_);	
+	    $final{$_}++;
+	}
+    }
+
+    %final;
+}
+
+
+sub refresh_db {
+    my($CONF) = @_;
+    $SIG{__DIE__} = \&Carp::confess;
+
+    if(($SDB{LastRefresh} + $CONF->{RefreshPeriod}) < time
+       or
+       ($SDB{LastRefresh} < stat($0)->mtime)
+      ) {
+	%SDB = ();
+	$SDB{LastRefresh} = time();
+
+	my %files;
+	find( { wanted => 
+		sub {
+		    if(! /$CONF->{FileMatch}/) {
+			$Response->Debug("$_ does not match $CONF->{FileMatch}");
+		    } elsif(-d $_) {
+			$Response->Debug("$_ is a directory");
+		    } elsif(-e $_) {
+			$Response->Debug("indexing $_");
+			my $words = &index_page($_);
+			$files{$_} = $words;
+		    } else {
+			$Response->Debug("no file for $_");
+		    }
+		},
+		no_chdir => 1
+		}
+		 , $CONF->{FileRoot}
+	       );
+
+	$Response->Debug("indexing words for ".scalar(keys %files)." files");
+	my %words;
+	for my $file ( keys %files ) {
+	    my $file_dict = $files{$file};
+	    for my $word ( keys %$file_dict ) {
+		my $count = $file_dict->{$word};
+		$words{"W:$word"}{$file} = $count;
+	    }
+	}
+	$Response->Debug("reading search database");
+	my %temp_sdb = %SDB;
+	$Response->Debug("building search database", scalar(keys %words));
+	%TEMP_SDB = ( %words, %temp_sdb );
+	$Response->Debug("done search database");
+    }
+}
+
+sub index_page {
+    my($file) = @_;
+    return unless -e $file;
+    $Response->Debug("indexing $file");
+
+    my $mtime_key = "MTIME:$file";
+    my $file_key  = "FILE:$file";
+
+    my $file_data = $SDB{$file} || '';
+    my($mtime) = split(/\:\:/, $file_data, 2);
+    $mtime ||= 0;
+    if($mtime >= stat($file)->mtime) {
+	$Response->Debug("file $file has not been modified recently, last update $mtime");
+	return;
+    }
+    
+    if($mtime) {
+	for (keys %SDB) {
+	    if(/\:$file/) {
+		#$Response->Debug("deleting old key $_");
+		delete $SDB{$_};
+	    }
+	}
+    }
+    
+    open(FILE, $file) || die("can't read $file: $!");
+    my $data = join('', <FILE>);
+    close(FILE);
+
+    $data =~ s/\<\%.*?\%\>//sg; # strip ASP code
+    $data =~ s/^\#\!.*?\n//s;
+    $data =~ s/\<head\>.*?\<title\>\s*(.*?)\s*\</\</is;    
+    my $title = $1 || '';
+    $title = substr($title, 0, 80);
+    $data =~ s/\<\!\-\-.*?\-\-\>//isg;
+
+    $data =~ s/\<[^\>]+\>/ /sg;
+    $data =~ s/\&\w+\;//sg;
+    $data =~ s/(\,\s|[\s\{\}\(\)%:;=\$\"\'\/\#]+)/ /sg;
+    while($data =~ s/\s+([A-Z]+)\s+([A-Z]+)\b/ $2 /s) {};
+    my $summary = substr($data, 0, 20000);
+
+#    $Response->Debug("just parsed $data");
+    $data = ' '.$data;
+
+    my @words = split(/\s+/, $title.$data);
+    my %words;
+    for(@words) {
+	next if length($_) < 3;
+	next if length($_) > 20;
+	$_ =~ s/\W+$//;
+	$_ = lc $_;
+	$words{$_}++;
+    }
+
+#    for my $word ( keys %words ) {
+#	my $count = $words{$word};
+#	my $word_key = "WORD:$word";
+#	my $word_dict = $SDB{$word_key} || {};
+#	$word_dict->{$file} = $count;
+#	$SDB{$word_key} = $word_dict;
+#    }
+
+    $Response->Debug("fetched words for $file"); # : ".join(", ", sort keys %words));
+
+    $SDB{$mtime_key} = stat($file)->mtime;
+    $SDB{$file_key} = {
+			 title => $title,
+			 summary => $summary,
+			};
+    my $weight = 1 / length(scalar(keys %words));
+    $SDB{"WEIGHT:$file"} = $weight;
+
+#    $Response->Debug($SDB{$file_key});
+
+    \%words;
+}
+
+sub search_files {
+    my(@words) = @_;
+    my %files;
+    my %matches;
+    
+    my $DB = %TEMP_SDB ? \%TEMP_SDB : \%SDB;
+    for my $word (@words) {
+	my $word_dict = $DB->{"W:$word"};
+	if($word_dict) {
+	    for my $file ( keys %$word_dict ) {
+		$matches{$word}++;
+		$files{$file} ||= 1;
+		$files{$file} *= int(( $word_dict->{$file} + 2) * $SDB{"WEIGHT:$file"}) + 1;
+	    }
+	}
+    }
+
+    (\%files, \%matches);
+}
+
+

@@ -1,0 +1,11 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+
+
+#printf "*** %s\n", $0;
+
+use Applications::FileQuickFind -run;
+
+1;
+__END__

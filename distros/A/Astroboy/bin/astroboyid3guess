@@ -1,0 +1,92 @@
+#!/usr/bin/perl
+use strict;
+use lib './lib';
+use vars qw($VERSION);
+use Getopt::Std::Strict 'dhvsb';
+use Cwd;
+use Astroboy;
+use Carp;
+
+$VERSION = sprintf "%d.%02d", q$Revision: 1.1 $ =~ /(\d+)/g;
+
+Init();
+
+
+
+
+my $astro = Astroboy->new;
+
+my @mp3s = _argvfiles('mp3') or die("no files chosen");
+
+for my $abs (@mp3s){
+   print $abs;
+   my $guess = $astro->artist_guess($abs);
+
+   $guess ||= '[no guess]';
+
+   print " $guess\n";
+}
+
+
+
+
+
+
+
+sub debug { print STDERR "$0, @_\n" if $opt_d; 1 }
+
+
+
+
+
+
+
+
+
+
+sub Init {
+   $opt_h and print usage() and exit;
+   $opt_v and print $VERSION and exit;
+}
+
+sub usage {
+   qq{$0 - find mp3 files missing artist and or album id3 tag
+
+OPTIONS
+
+   -d          debug on
+   -h          help
+   -v          version and exit
+   -s          also show which are missing song id3 tag
+   -b          verbose, show what is missing
+
+AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+SEE ALSO
+
+Astroboy - parent package
+
+}}
+
+sub _argvfiles {
+   my($ext)= shift;
+
+   my @got;
+
+   require Cwd;
+   for (@ARGV){
+      my $abs = Cwd::abs_path($_) or next;
+      -f $abs or warn("not on disk $abs");
+      if ($ext){
+         $abs=~/\Q$ext\E$/ or warn("not '$ext', $abs") and next;
+      }
+      push @got, $abs;
+   }
+   @got or return;
+   my $c = scalar @got;
+   debug("Got @got");
+   return @got;
+
+}

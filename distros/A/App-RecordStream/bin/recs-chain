@@ -1,0 +1,6 @@
+#!perl
+
+use strict;
+use warnings;
+
+use App::RecordStream::Operation; App::RecordStream::Operation::main();

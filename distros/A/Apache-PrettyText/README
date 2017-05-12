@@ -1,0 +1,102 @@
+NAME
+    Apache::PrettyText - Simple mod_perl PerlHandler for text files
+
+SYNOPSIS
+            ## In httpd.conf:
+            <Perl>
+            use Apache::PrettyText;
+            </ Perl> ## <-- Omit the space if you copy this example.
+
+            <Files ~ "\.txt$">
+            SetHandler perl-script
+            PerlHandler Apache::PrettyText
+            </Files>
+
+    To modify your Apache server to dynamically format .txt files so they
+    look nicer in the client's browser, put the following directives into
+    httpd.conf, or in any VirtualHost section and restart the server.
+
+    Optional: Insert a <Perl> section that changes
+    $Apache::PrettyText::TabWidth to your site's standard or set to 0 to
+    disable detabbing. If you don't set it, the default is 4.
+
+            ## In httpd.conf:
+            <Perl>
+            $Apache::PrettyText::TabWidth = 4;  
+            </ Perl> ## <-- Omit the space if you copy this example.
+
+    You must be using mod_perl. See http://perl.apache.org for details.
+
+DESCRIPTION
+    This is a simple Apache handler written in Perl that converts text files
+    on the fly into a basic HTML format:
+
+    *   surrounded by <PRE> tags
+
+    *   tabs converted to spaces (optional)
+
+    *   white background
+
+    *   hilited URLs
+
+    *   first line of text file = <TITLE>
+
+    Also serves as a good template to help you write your own simple
+
+    handler. I wrote this as an exercise because I found no good examples.
+
+INSTALLATION
+    Using CPAN module:
+
+            perl -MCPAN -e 'install Apache::PrettyText'
+
+    Or manually:
+
+            tar xzvf Apache-PrettyText*gz
+            cd Apache-PrettyText-1.??
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+    If you're reading this in pod or man, it's already installed. If you're
+    reading the source code in PrettyText.pm, you can copy this file under
+    the name "PrettyText.pm" into this location:
+
+            /usr/lib/perl5/site_perl/Apache/
+
+    ... or its equivalent on your computer.
+
+    A helpful tip: you can include the entire contents of the PrettyText.pm
+    file or of your own version of it into a <Perl> section within
+    httpd.conf. This can be very helpful if you'd like to use this module as
+    a template for your own.
+
+    To syntax-check your code under those circumstances, use:
+
+            perl -cx httpd.conf
+
+    ... which will read just the perl code between #!...perl and __END__ in
+    the httpd.conf file.
+
+AUTHOR
+    Chris Thorman <chthorman@cpan.org>
+
+    Copyright (c) 1995-2002 Chris Thorman. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Apache(3), mod_perl, http://perl.apache.org/src/contrib
+
+    The Apache::PrettyText home page:
+
+            http://christhorman.com/projects/perl/Apache-PrettyText/
+
+    The implementation in PrettyText.pm.
+
+THANKS
+    Thanks to Vivek Khera, Doug MacEachern, Jeffrey William Baker for
+    suggestions and corrections.
+

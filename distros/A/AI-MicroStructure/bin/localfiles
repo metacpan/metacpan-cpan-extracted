@@ -1,0 +1,88 @@
+#!/usr/bin/env perl
+use File::Find::Rule;
+use strict;
+use warnings;
+use JSON;
+use Cache::Memcached::Fast; 
+use AI::MicroStructure;
+use Data::Dumper;
+
+my $data={};
+
+
+our $memd = new Cache::Memcached::Fast({
+ servers => [ { address => 'localhost:11211', weight => 2.5 }],
+ namespace => 'my:',
+ connect_timeout => 0.2,
+ io_timeout => 0.1,
+ close_on_error => 1,
+ compress_threshold => 100_000,
+ compress_ratio => 0.9,
+ max_failures => 1,
+ max_size => 512 * 1024,
+});
+
+ my @result = ();
+my $rule;
+
+
+
+
+foreach(@ARGV){
+  
+    $rule = File::Find::Rule->file->name("*$_*.*")->start("/home/santex/data-hub/stock/" ,"/home/santex/Pictures/1");
+            while ( defined ( my $image = $rule->match ) ) {
+                 push @result,$image;
+          }
+print join("\n", @result);
+}
+
+
+
+
+
+
+__DATA__
+my $micro = AI::MicroStructure->new("any");
+my $path  = $micro->{state}->{cwd};
+my $picdir = sprintf("%s/%s",$ENV{"HOME"},"Pictures/1");
+my $pubdir = sprintf("%s/%s",$ENV{"HOME"},"public_html");
+push @INC ,-d $path  ? $path : $ENV{"HOME"};
+push @INC ,-d  $picdir ? $picdir :"";
+push @INC ,-d  $pubdir ? $picdir :"";
+
+my $xx=$memd->get("localfile_".$match);
+if(!$xx){
+my @images = File::Find::Rule->file()
+->name('*'.lc($match).'*\.(png|jpg|gif|svg)')
+->in(@INC);
+#my $dat = {};
+#foreach(@images){
+  
+  #my @d = split("/",$_);
+  
+ # $dat->{shift @d} = $_;
+#}
+#@images = values $dat;#@images[0..500] unless $#images<500;
+#$data->{images}=[@images];
+
+#my $cmd = sprintf( "montage '%s' /home/santex/Pictures/montage/".$match."-all.jpg",join("' '",@{$data->{images}}));
+#`$cmd`;
+ 
+ 
+ my @files = File::Find::Rule->file()
+->name('*'.ucfirst($match).'*\.(pdf|json|txt|xml)')
+->in(@INC);
+ # print  join "\n",sort{$a cmp $b}@files;
+$data->{files}=[@files];
+
+my $j = encode_json($data);
+$memd->set("localfiles_".$match,$j);
+print $j;
+}else{
+$data = decode_json( $xx);
+print $xx;
+
+
+}
+

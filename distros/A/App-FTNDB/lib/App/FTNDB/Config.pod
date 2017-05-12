@@ -1,0 +1,134 @@
+=head1 NAME
+
+App::FTNDB::Config - Fidonet/FTN SQL Database application configuration.
+
+
+=head1 DESCRIPTION
+
+This is in regard to configuration of the application for the administration
+of databases for Fidonet/FTN related processing. The SQL database engine is one for which a
+DBD module exists, defaulting to SQLite.
+
+
+=head1 CONFIGURATION
+
+Configuration information that is not provided by the command line options is
+obtained from a configuration file.  That can be defined by setting the
+"-c" option, which is the path and file name of the configuration file
+to be used. If that is not defined, it looks for a file named ftndb.cfg
+in the current directory. The file contains configuration items listed
+outside of a named section as well as those listed within a named section,
+and blank lines and lines starting with a "#" are ignored.
+
+The first items in the file are those outside of a named section:
+
+=over 4
+
+=item LogFile
+
+This is the rquired filename and path of a log file.
+
+=back
+
+The B<Database> section in the configuration file has the following
+keywords:
+
+=over 4
+
+=item Type
+
+Database type.
+This needs to be a database type for which a DBD module exists, the type
+being the name as used in the DBD module.  The default type is SQLite.
+
+=item Name
+
+Database name.
+For an SQLite database; this needs to be at least the filename and can
+also include a path.
+
+=item User
+
+Database user.
+For an SQLite database, this defaults to an empty string as it is not
+needed for that type of a database.
+
+=item Password
+
+Database password.
+For an SQLite database, this defaults to an empty string as it is not
+needed for that type of a database.
+
+=back
+
+=head1 EXAMPLES
+
+This is an example of the contents of an ftndb.cfg configuration file:
+
+    # ftndb.cfg
+    LogFile=/opt/ftndb/ftndb.log
+
+    [Database]
+    Type=mysql
+    Name=ftndbtst
+    User=sysop
+    Password=ftndbtst
+
+
+=head1 AUTHOR
+
+Robert James Clay, C<< <jame at rocasa.us> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests via the web interface at
+L<https://sourceforge.net/p/ftnpl/ftndb/tickets/>. I will be notified,
+and then you'll automatically be notified of progress on your bug
+as I make changes.
+
+Note that you can also report any bugs or feature requests to
+C<bug-ftndb at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ftndb>;
+however, the ftndb Issue tracker is preferred.
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc App::FTNDB::Config
+
+
+You can also look for information at:
+
+=over 4
+
+=item * FTN Database application issue tracker
+
+L<https://sourceforge.net/p/ftnpl/ftndb/tickets/>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-FTNDB>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/App-FTNDB>
+
+=back
+
+=head1 SEE ALSO
+
+ L<ftndbadm>, L<ftndb-admim>, L<ftndb-nodelist>, L<App::FTNDB>, L<App::FTNDB::Command::create>,
+  L<App::FTNDB::Command::drop>, L<FTN::Database>, L<FTN::Database::Nodelist>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2012-2013 Robert James Clay, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+1;

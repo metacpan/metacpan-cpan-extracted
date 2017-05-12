@@ -1,0 +1,14 @@
+<!ELEMENT voodoo ((sourcesql|sql|shell|mkdir|mkfile|install)*)>
+
+<!ELEMENT sourcesql (#PCDATA)>
+<!ELEMENT sql       (#PCDATA)>
+<!ELEMENT shell     (#PCDATA)>
+<!ELEMENT mkdir     (#PCDATA)>
+<!ELEMENT mkfile    (#PCDATA)>
+<!ELEMENT install   (#PCDATA)>
+
+<!ATTLIST sourcesql onhosts CDATA 'all'>
+<!ATTLIST sql       onhosts CDATA 'all'>
+<!ATTLIST shell     onhosts CDATA 'all'>
+<!ATTLIST mkdir     onhosts CDATA 'all'>
+<!ATTLIST mkfile    onhosts CDATA 'all'>

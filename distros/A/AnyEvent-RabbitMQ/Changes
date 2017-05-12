@@ -1,0 +1,138 @@
+Revision history for Perl extension AnyEvent::RabbitMQ
+
+1.19  Sat Mar 21 16:49:24 GMT 2015
+        - Add 'no_ack' as an optional argument to the ->consume method
+          (Dave Mueller).
+        - Fill in some missing documentation (Moritz Lenz).
+1.18  Mon Sep 29 19:36:00 PDT 2014
+        - Added the bind_exchange and unbind_exchange methods
+          for exchange-exchange bindings.
+
+1.17  Fri Jul 25 14:02:00 PDT 2014
+        - Add support for chunking large bodies into multiple AMQP frames,
+          allowing the sending of large messages.
+
+1.16  Sat Apr 12 14:42:00 BST 2014
+        - Doc fixes (Mark Ellis)
+        - Fix leak when calling ->close + tests (Peter Haworth)
+
+1.15  Mon Jul 1 12:35:00 BST 2013
+        - Fix paper-bag bug in connection close - calling nonexistent method.
+
+1.14  Fri Jun  7 08:54:00 BST 2013
+        - Fix paper-bag bug in heartbeat - always lost heartbeat even on
+          active connections
+        - on channel close, automatically call on_return callbacks for any
+          publishes that are waiting
+        - maintain more state around opening and closing to avoid hang/race
+          when server sends Close after client does (this is possible!)
+        - cope with AMQP quirk that in confirm mode, returned messages are
+	  *also* acked/nacked
+        - document $channel->publish
+
+1.13  Thu May  2 16:48:58 PDT 2013
+        - Require Net::AMQP 0.06 to:
+           + Get consume cancel notifications (e.g. queue deletion)
+           + Properly encode user-provided header strings that look like numbers
+        - Fix race between server-sent and client-sent cancellation.
+
+        - Expect server to send heartbeats as promised.  If it doesn't, go President
+            Madagasgar on its ass and SHUT DOWN EVERYTHING.
+
+        - Rearrange many things and weaken many references to eliminate bad circular
+            references.  Some circular refs are actually good, though; leave those.
+
+        - Allow customized client_properties on connection.
+
+        - Make test output clearer.
+
+1.12  Thu Apr 11 20:45:00 2013
+        - Allow AMQP client to adjust tuning, e.g. heartbeat
+          (Chip Salzenberg)
+
+        - Fix RT#84222, continue reading AMQP packets after a heartbeat.
+
+        - Spontaneously emit hearts as per amqp 0.9.1 spec.
+
+          The AMQP spec says, "The client should start sending heartbeats after
+          receiving a Connection.Tune method, and start monitoring heartbeats after
+          receiving Connection.Open."  There is no mention of merely responding to
+          heartbeat packets emitted by the server. (Dave Lambley)
+
+1.11  Tue Mar  5 22:22:00 2013
+        - Fix on_success callback for the Channel->close method (davel).
+
+1.10  Mon Feb 25 13:48:00 2013
+        - Clarify relationship to Net::RabbitFoot. RT#71099
+
+        - Add TLS connection support. RT#81729
+
+1.09   Mon Feb 25 12:03:00 2013
+        - Support AMQP heartbeat.
+
+        - Support AMQP 0.9 standard. (Chip Salzenberg)
+
+        - Stop defining a _return_cb value when not using the mandatory
+          or immediate flags when publishing a message. This means that
+          if you're not using these flags, but are using an infinite set
+          of routing keys, then you won't leak infinite RAM.
+          Currently if you do use these flags and infinitely variable
+          routing keys, we still have a problem as we leak callbacks.
+          RT#79511
+
+1.08    Mon Aug 27 08:43:00 2012
+        - Improve Data::Dumper options for protocol dumps (Chip Salzenberg)
+        - More thoroughly eliminate memory leaks on incoming messages
+          (Chip Salzenberg)
+        - Properly handle channel close: Ensure pending requests fail
+          immediately (Chip Salzenberg)
+
+1.07    Tue Aug 21 15:47:00 2012
+        - Fix dist by putting missing version numbers back into
+          all the modules.
+
+1.06    Tue Aug 21 15:10:00 2012
+        - Fix a race condition stopping connections from closing properly.
+          If you ask to open a channel, and then immediately try to close
+          the connection then the not yet open channel would never remove
+          itself from the associated connection, resulting in the connection
+          never being terminated (as there were still channels associated
+          with it).
+
+        - Stop leaking all RabbitMQ messages recieved back inside
+          a closure.
+
+        - Allow multiple clients to have independent connections
+          to RabbitMQ, as long as they all use the same spec file.
+
+1.05    Tue Jul 22 16:55:55 2011
+        - Fixed a compiling error.
+
+1.04    Tue Jul 19 17:04:24 2011
+        - Bug fix for consuming large messages.
+
+1.03    Thu Apr  7 02:55:12 2011
+        - Separate AnyEvent::RabbitMQ from Net::RabbitFoot.
+        - Avoid (additional) issues when in global destruction.
+        - Do not set reply_to to an empty string in the header frame.
+        - Implement basic.reject (requires RabbitMQ >= 2.0.0).
+        - Store server properties in the object for easy server product
+          and sever version access.
+        - Shutdown the AnyEvent handle using push_shutdown.
+        - Be more careful in DESTROY blocks.
+
+1.02    Wed Jun 30 11:35:32 2010
+        - Fix errors in global destruction due to destruction order being
+          random.
+        - Fix bug if you call ->close on a Net::RabbitFoot instance which
+          is not already connected. Previously this would never return.
+
+1.01    Sun Mar 18 07:21:58 2010
+        - fix bugs.
+        - support channel.flow.
+
+1.00    Fri Mar  5 11:30:00 2010
+        - fix module name.
+
+0.01    Sun Dec  6 20:54:03 2009
+        - original version

@@ -1,0 +1,40 @@
+Revision History for App-FileTools-BulkRename
+=============================================
+
+v0.07 2012-07-17
+----------------
+
+* Date: 2012-07-17 23:52:05 -0400
+  Commit: Stirling Westrup <swestrup@gmail.com>
+  Hash: 84a298675fa0d876530481b1be25cd1362acac21
+
+    Maybe fixed the error issued when using config files
+
+* Date: 2011-09-04 18:05:18 -0400
+  Commit: Stirling Westrup <swestrup@gmail.com>
+  Hash: c5fe8a767f037e679f800ee5596d618e8b802715
+
+    Made BulkRename.pm have a version
+
+* Date: 2011-09-04 16:20:54 -0400
+  Commit: Stirling Westrup <swestrup@gmail.com>
+  Hash: bda7c1c2c3ba35572dc4987ce3b9e0a2972ce3fe
+
+    Better support for Unicode in rd(),slurp() and clip() user functions
+
+* Date: 2011-01-25 10:22:56 -0500
+  Commit: Stirling Westrup <swestrup@gmail.com>
+  Hash: 0368066e1c8a6bbc86c297c530539ac0f6118a98
+
+    Updated INSTALL to mention local installation
+
+* Date: 2011-01-25 10:15:45 -0500
+  Commit: Stirling Westrup <swestrup@gmail.com>
+  Hash: 278779fa7d4cef69f6bcac8a5a7e4539b56dee39
+
+    Hardcoded the INSTALL file, so I can customize it.
+
+
+===================================
+End of changes in the last 365 days
+===================================

@@ -1,0 +1,98 @@
+NAME
+
+    AlignDB::Stopwatch - Record running time and print standard messages
+
+SYNOPSIS
+
+        use AlignDB::Stopwatch;
+    
+        # record command line
+        my $stopwatch = AlignDB::Stopwatch->new->record;
+    
+        # record config
+        $stopwatch->record_conf($opt);
+    
+        $stopwatch->start_message("Doing really bad things...");
+    
+        $stopwatch->end_message;
+
+ATTRIBUTES
+
+ program_name
+
+    program name
+
+ program_argv
+
+    program command line options
+
+ program_conf
+
+    program configurations
+
+ start_time
+
+    start time
+
+ div_char
+
+    Divider char used in output messages, default is [=]
+
+ div_length
+
+    Length of divider char, default is [30]
+
+ min_div_length
+
+    minimal single-side divider length, default is [5]
+
+ uuid
+
+    Use Data::UUID to generate a UUID that prevent inserting meta info more
+    than one time on multithreads mode
+
+METHODS
+
+ record
+
+    Record $main::0 to program_name and [@main::ARGV] to program_argv.
+
+    Getopt::Long would manipulate @ARGV.
+
+        my $stopwatch = AlignDB::Stopwatch->new->record;
+
+ record_conf
+
+    Record a hashref or object to program_conf.
+
+        $stopwatch->record_conf( $opt );
+
+ block_message
+
+    Print a blocked message
+
+        $stopwatch->block_message( $message, $with_duration );
+
+ start_message
+
+    Print a starting message
+
+        $stopwatch->start_message( $message, $embed_in_divider );
+
+ end_message
+
+    Print a ending message
+
+        $stopwatch->end_message( $message );
+
+AUTHOR
+
+    Qiang Wang <wang-q@outlook.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2008- by Qiang Wang.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

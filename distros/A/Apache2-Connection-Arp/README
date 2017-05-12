@@ -1,0 +1,47 @@
+=head1 NAME
+
+Apache2::Connection::Arp - use arp to get the mac address of remote clients
+
+=head1 SYNOPSIS
+
+In your httpd.conf
+
+  PerlLoadModule Apache2::Connection::Arp
+  PerlSetVar arp_binary '/usr/sbin/arp'
+
+  <Location /lan>
+      PerlPostReadRequestHandler Apache2::Connection::Arp
+  </Location>
+
+Meanwhile in a nearby mod_perl handler...
+
+  $remote_mac = $r->connection->pnotes('remote_mac');
+
+
+=cut
+
+=head1 DESCRIPTION
+
+This module grabs the mac address of the remote client and stashes it in the
+connection pnotes for later retrieval.
+
+=head1 SEE ALSO
+
+L<Apache2::ConnectionUtil>
+
+=head1 AUTHOR
+
+Fred Moyer, E<lt>fred@redhotpenguin.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Fred Moyer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+
+=cut
+

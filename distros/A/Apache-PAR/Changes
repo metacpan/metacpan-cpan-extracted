@@ -1,0 +1,77 @@
+Revision history for Perl extension Apache::PAR.
+0.30  Thu Aug 25 23:30:00 2003
+	- Added support for reloading modules from within PAR files
+	  Thanks to Raymond Field for the report
+	- Added support for unpacking content of PAR files
+	  Thanks to Maurice Aubrey for the implementation!
+	  Use PerlSetVar PARTempDir to specify (defaults to platform temp dir)
+	  and ##UNPACKDIR## within web.conf to enable/use
+	- New tests and documentation to reflect these changes.
+	- Note: Apache::PAR now requires PAR .74 due to required changes for
+	  reload functionality
+0.21  Sat Jun 07 22:00:00 2003
+	- Changed required version of Apache::Test to 1.01 - 1.03 was not
+	  on CPAN
+0.20  Sun Jun 03 ??:??:?? 2003
+	- Changed to use Apache::Test for tests - testing should now work
+	  on Win32 and mod_perl 2.x
+	  ** Note: Apache::Test is now a required module for Apache::PAR **
+	- tutorial.pod moved under PAR (shouldn't go in main Apache dir)
+	- Change for consistancy with PAR.pm to default PerlRun and Registry
+	  scripts to use the /script directory instead of /scripts.
+	  ** All modules must be updated with this change **
+	  Modules can be updated by either changing the directory name
+	  inside the PAR archive, or by setting PARRegistyPath or 
+	  PARPerlRunPath to scripts/ within a web.conf
+	  Thanks to Autrijus Tang <autrijus@autrijus.org> for this fix.
+0.14  Sun Apr 30 13:00:00 2003
+	- Added ability to do caching to the Apache::PAR::Static module
+	  (see documentation in that module for details.)  To use caching
+	  the Cache::Cache module is required 
+	- Some general code cleanup performed
+	- Switched to Eclipse IDE for editing / CVS management of project
+	- Removed use warnings to work with old versions of Perl
+	- Removed exporter tags from PAR.pm since we weren't using
+	  them anyway.
+	- Removed Win32 "fix" that wasn't necessary
+
+0.12  Thu Mar 27 22:00:00 2003
+	- Some testing performed on Win32 platforms Win 98 and Win 2k 
+	  (thanks to Raymond Field.  Documentation changed to reflect 
+	  necessary changes to get Apache::PAR up and running on Win32.
+	- Better mod_perl 2.x detection.  No longer requires 
+	  Apache::ServerUtil
+	- Support for Apache::Static pulling from root directory of 
+	  PAR file
+	- New configuration mechanism, through PARInclude directive and
+	  use/include lines in startup.pl or PERL sections
+0.11  Mon Mar 10 21:51:00 2003
+	- Changes to stay compatible with latest mod_perl CVS.  This
+	  change is not backwards compatible, however.  For mod_perl 2.x
+	  the CVS version is currently required
+	- Some code cleanup
+	- Added more tests (not yet complete)
+	- Made errors from Archive::Zip silent (less noise to logs)
+	- Added additional tests
+	- Apache::PAR::Registry was using PARPerlRunPath instead of 
+	  PARRegistryPath, identified by Raymond Field
+	- PARPerlRunPath and PARRegistryPath failed to find contents 
+	  if set to "/", identified by Raymond Field
+	- WIN32 fix (untested) for setting ##PARFILE## to reasonable value 
+	  on that platform for Apache, identified by Raymond Field
+0.10  Sat Feb 01 21:20:00 2003
+	- Added initial support for mod_perl 2!
+	- See TODO for more information
+0.02  Fri Dec 06 21:36:00 2002
+	- Added base module ScriptBase.pm for PerlRun.pm and Registry.pm
+	(code cleanup)
+	- Changed required Perl version to 5.005
+	- Fixed test code to allow skipping of tests
+	- Additional code cleanup
+	- Removed unused test file
+	- Added TODO items
+
+0.01  Tue Nov 26 21:04:37 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -b 5.6.0 -n Apache::PAR
+

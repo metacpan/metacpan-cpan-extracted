@@ -1,0 +1,10 @@
+#!/bin/sh
+
+cat << 'EOF' > test.conf
+{   Example1 => { outstr => 'howdy' },
+    Router => {
+    }
+}
+EOF
+
+bin/MultiModule -p MultiModuleTest:: -c test.conf

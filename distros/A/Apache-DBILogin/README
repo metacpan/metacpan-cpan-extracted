@@ -1,0 +1,21 @@
+The perl module Apache::DBILogin uses Apache mod_perl and the
+DBI/DBD modules to integrate database authentication with Apache.
+
+perldoc ./DBILogin.pm
+
+To build and install it, please run
+
+    perl Makefile.PL
+    make
+    make install
+
+To cache logins, the module requires Apache::DBI.
+
+This package is Copyright (C) 1997 by John Groenveld. It may be
+copied, used and redistributed under the same terms as perl itself.
+
+This module was formerly known as AuthenDBIConnect...quite a mouthfull.
+
+Happy Perl'ng,
+John
+groenveld@acm.org

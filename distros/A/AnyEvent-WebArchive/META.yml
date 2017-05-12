@@ -1,0 +1,27 @@
+---
+abstract: 'simple non-blocking WebArchive client'
+author:
+  - 'Dmitry Konstantinov <konstantinov.dmitry@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+keywords:
+  - anyevent
+  - webarchive
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-WebArchive
+provides:
+  AnyEvent::WebArchive:
+    file: lib/AnyEvent/WebArchive.pm
+    version: 0.02
+requires:
+  AnyEvent::HTTP: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/konstantinov/AnyEvent-WebArchive.git
+version: 0.02

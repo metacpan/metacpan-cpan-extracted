@@ -1,0 +1,21 @@
+Revision history for Bundle-Advent
+
+0.05	2011-02-21
+	* Added Bundle::Advent::Year2010
+	* Populated Bundle::Advent::Year2010
+
+0.04	2009-11-11
+	* fixed pod typo
+	* Added Bundle::Advent::Year2009 placeholder
+
+0.03    2008-12-12
+	* Added Bundle::Advent::Year2008
+
+0.02    2008-12-12
+        * mass-fixed the backwords L<> usage for the 'pod' links.
+        * tweaked the 2003 Regex::Common line item.
+        * removed the 2007 Perl5.10 line item.
+
+0.01    2008-12-11
+        * Iniitial release.  Includes years 2000-2007.
+

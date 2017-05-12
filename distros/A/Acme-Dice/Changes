@@ -1,0 +1,14 @@
+Revision history for Perl module Acme::Dice
+
+Date:   Fri Oct 18 20:12:26 2013 -0600
+
+    Final tweaks to POD and perltidy pass
+    Added tests for non-integer param values
+    Various tweaks to POD. Added check for integer values for params.
+    Perltidy pass
+    Removed creation boilerplate
+
+0.01 Sun Oct 13 12:45:05 2013
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

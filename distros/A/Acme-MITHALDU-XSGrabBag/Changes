@@ -1,0 +1,30 @@
+Revision history for Acme-MITHALDU-XSGrabBag
+
+1.161310  2016-05-10 04:34:38+02:00 Europe/Berlin
+    - depend on a known stable version of Inline::C
+
+1.161290  2016-05-08 17:51:14+02:00 Europe/Berlin
+    - add implicit deps so i can see their versions in test fails
+
+1.161260  2016-05-05 14:00:18+02:00 Europe/Berlin
+    - reverting back to normal
+
+1.161150  2016-04-24 14:37:54+02:00 Europe/Berlin
+    - making a test fail to check cpantesters
+
+1.151340  2015-05-14 23:14:27+02:00 Europe/Berlin
+    - do tests within a tolerance instead of using equality comparison
+      (thanks to DAXIM)
+
+1.150720  2015-03-13 18:32:15+01:00 Europe/Berlin
+    - add dot2_product
+    - add rad2deg
+
+1.150590  2015-02-28 13:28:31+01:00 Europe/Berlin
+    - rerelease with updated plugin bundle
+
+1.150511  2015-02-20 14:22:25+01:00 Europe/Berlin
+    - correct the module used in the test
+
+1.150510  2015-02-20 13:54:32+01:00 Europe/Berlin
+    - implement mix and deg2rad

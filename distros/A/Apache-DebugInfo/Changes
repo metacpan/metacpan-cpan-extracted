@@ -1,0 +1,50 @@
+Revision history for Perl extension Apache::DebugInfo.
+
+0.01  4.3.2000
+  - original version
+  - many kudos and gratitude to those who offered their
+    suggestions and improvements prior to the first release:
+      Ask Bjoern Hansen
+      Graham Barr
+      René Seindal
+        
+0.02  4.4.2000
+  - fixed bug in ip match that required an ip address to check
+    against
+  - added Data::Dumper support for dumping pnotes - not as
+    pretty as the stuff before, but it now supports complex
+    data structures and is less bulky  
+    Suggested by René Seindal
+  - minor pod and documentation changes
+
+0.03  4.6.2000
+  - reworked internal functions - should look a bit better now
+  - added DebugTypeList and supporting documentation
+  - added object oriented control of items corresponding to
+    DebugFile, DebugIPList, and DebugTypeList
+  - changed hook retrieval to $r->current_callback instead of
+    getting it from notes
+  - reverted exclusion of PERL_CUR_HOOK when printing notes
+    just to be completely true
+  - implemented various suggestions and fixes from René Seindal
+      o fixed initialization of self in new method
+      o changed pnote output format as per suggestion
+      o fixed some unititialized variable warnings 
+      o added suggested timestamp() and supporting documentation
+
+0.04  4.19.2000
+  - fixed bug in constructor that didn't set the output file 
+    to match DebugFile variable
+  - minor documentation and pod changes and additions
+
+0.05  10.19.2000
+  - added get_handlers() method and associated documentation
+  - added dir_config() method and associated documentation
+  - added mark_phases() method, associated internal functions,
+    and documentation
+  - made ip() and type() methods return 'ALL' if not set
+  - changed names of internal methods to start with _
+  - modified internal methods
+  - updated pod
+  - minor code change thanks to Damian Conway
+ 

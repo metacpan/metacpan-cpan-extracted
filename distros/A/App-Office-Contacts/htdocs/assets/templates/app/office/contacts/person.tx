@@ -1,0 +1,53 @@
+<form id="<: $context :>_person_form">
+
+<table align="center">
+	<tr>
+		<td align="center" colspan="6"><span class="blue_centered"><: $ucfirst_context :> Person</span></td>
+	</tr>
+	<tr>
+		<td>Given names</td><td><input type="text" id="<: $context :>_person_given_names" size="40" value="<: $given_names :>"></td>
+		<td>Preferred name</td><td colspan="3"><input type="text" id="<: $context :>_person_preferred_name" size="40" value="<: $preferred_name :>"></td>
+	</tr>
+	<tr>
+		<td>Surname</td><td><input type="text" id="<: $context :>_person_surname" size="40" value="<: $surname :>"></td>
+		<td>Title</td><td><: $title_id :></td><td>Gender</td><td><: $gender_id :></td>
+	</tr>
+</table>
+
+<br>
+<: $phone_field :>
+<br>
+<: $email_field :>
+<br>
+
+<table align="center">
+	<tr>
+		<td>Homepage</td><td><input type="text" id="<: $context :>_person_homepage" size="40" value="<: $homepage :>"></td>
+		<td>Role</td><td><: $role_id :></td>
+	</tr>
+	<tr>
+		<td>Facebook tag</td><td><input type="text" id="<: $context :>_person_facebook_tag" size="40" value="<: $facebook_tag :>"></td>
+		<td>Twitter tag</td><td><input type="text" id="<: $context :>_person_twitter_tag" size="40" value="<: $twitter_tag :>"></td>
+	</tr>
+	<tr>
+		<td>Visibility</td><td><: $visibility_id :></td>
+		<td>Contact via</td><td><: $communication_type_id :></td>
+	</tr>
+</table>
+
+<hr>
+
+<table align="center" width="100%">
+	<tr>
+		<td align="center"><span id="<: $context :>_person_button"><: $ucfirst_context :></span></td>
+		: if $context == "update" {
+		<td align="center"><span id="delete_person_button">Delete</span></td>
+		: }
+		<td align="center"><input id="reset_<: $context :>_person_button" type="reset" value="Reset"></td>
+	</tr>
+</table>
+
+<input type="hidden" id="<: $context :>_person_id" value="<: $person_id :>">
+<input type="hidden" id="<: $context :>_person_sid" value="<: $sid :>">
+<input type="hidden" id="<: $context :>_person_name" value="<: $person_name :>">
+</form>

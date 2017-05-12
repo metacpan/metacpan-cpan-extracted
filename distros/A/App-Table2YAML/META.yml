@@ -1,0 +1,45 @@
+---
+abstract: 'Convert the semantic of visual tables into YAML.'
+author:
+  - 'Ronaldo Ferreira de Lima aka jimmy <jimmy.tty@gmail.com>'
+build_requires:
+  File::Basename: '0'
+  File::Find: '0'
+  File::ShareDir::ProjectDistDir: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.012'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Table2YAML
+requires:
+  Carp: '0'
+  English: '0'
+  Getopt::Long: '0'
+  IO::File: '0'
+  List::Util: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Pod::Find: '0'
+  Pod::Usage: '0'
+  Text::CSV_XS: '0'
+  Unicode::CaseFold: '0'
+  autodie: '0'
+  charnames: '0'
+  common::sense: '0'
+  perl: '5.012'
+  warnings: '0'
+resources:
+  repository: https://github.com/jimmytty/App-Table2YAML.git
+version: '0.003'

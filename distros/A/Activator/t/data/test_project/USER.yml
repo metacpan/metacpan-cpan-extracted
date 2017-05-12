@@ -1,0 +1,11 @@
+default:
+  name: set by $USER.yml->default
+realm1:
+  name: set by $USER.yml->realm1
+  foo:  set by $USER.yml->realm1
+realm2:
+  name: set by $USER.yml->realm2
+overrides:
+  realm1:
+    deep:
+      deep2: override by $USER.yml

@@ -1,0 +1,9 @@
+# $Id: MANIFEST.SKIP 17 2009-01-24 10:38:38Z rjray $
+^Makefile$
+^blib/
+^pm_to_blib
+^blibdirs
+SIGNATURE
+_build
+Build
+\.svn

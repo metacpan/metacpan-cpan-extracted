@@ -1,0 +1,46 @@
+---
+abstract: 'Low level client for the Activiti Rest API'
+author:
+  - 'Nicolas Franck C<< <nicolas.franck at ugent.be> >>'
+build_requires:
+  Module::Build: '0.28'
+  Software::License: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.030, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Activiti-Rest-Client
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Carp: '0'
+  Data::Util: '0'
+  Encode: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Throwable::Error: '0'
+  URI::Escape: '0'
+  perl: v5.10.0
+  strict: '0'
+resources:
+  bugtracker: https://github.com/Universiteitsbibliotheek/Activiti-Rest-Client/issues
+  homepage: https://github.com/Universiteitsbibliotheek/Activiti-Rest-Client
+  repository: https://github.com/Universiteitsbibliotheek/Activiti-Rest-Client.git
+version: '0.1253'
+x_contributors:
+  - 'Nicolas Franck <nicolas.franck@ugent.be>'
+  - 'njfranck <njfranck@ca20c521.ugent.be>'

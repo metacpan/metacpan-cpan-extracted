@@ -1,0 +1,285 @@
+*** STDOUT ***
+
+Default arguments.
+
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+exit   get    help   list   put    quit   server set    use    
+
+Using 2 columns.
+
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+exit   quit   
+get    server 
+help   set    
+list   use    
+put    
+
+Using column width of 15.
+
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+exit           help           put            server         use            
+get            list           quit           set            
+
+Using total width of 40.
+
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+exit   help   put    server use    
+get    list   quit   set    
+
+Using 2 columns in a total width of 40.
+
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+exit   quit   
+get    server 
+help   set    
+list   use    
+put    
+
+Using 3 columns in a total width of 40.
+
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+exit   list   server 
+get    put    set    
+help   quit   use    
+
+Using column width of 15 in a total width of 45.
+
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+exit           list           server         
+get            put            set            
+help           quit           use            
+
+Using defaults with an indent of 1.
+
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+ exit   get    help   list   put    quit   server set    use    
+
+Using 2 columns with an indent of 2.
+
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+  exit   quit   
+  get    server 
+  help   set    
+  list   use    
+  put    
+
+Printing first 200 words from the dictionary using defaults.
+
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+ 0                WITH             explicit         prevent          
+ 02139            WITHOUT          expressly        price            
+ 1                WRITING          extend           print            
+ 10               We               fee              problems         
+ 11               When             file             program          
+ 12               Whether          files            program's        
+ 1989             YOU              follow           programmer       
+ 1991             You              following        programs         
+ 19yy             Your             for              prohibited       
+ 2                Yoyodyne         forbid           prominent        
+ 3                a                form             promoting        
+ 4                above            forming          property         
+ 5                absence          found            proprietary      
+ 6                accept           free             protect          
+ 675              acceptance       freedom          protecting       
+ 69               access           from             protection       
+ 7                accompanies      full             provide          
+ 8                accord           further          provided         
+ 9                achieve          generally        public           
+ A                act              generous         publish          
+ ABOVE            actions          geographical     published        
+ ABSOLUTELY       add              get              purpose          
+ ADVISED          addition         give             range            
+ AGREED           address          given            rather           
+ ALL              addressed        gives            reads            
+ AND              aggregation      goals            reason           
+ AND/OR           agreement        granted          reasonably       
+ ANY              all              grants           receive          
+ APPLICABLE       allegation       gratis           received         
+ ARISING          allowed          greatest         receives         
+ AS               along            guarantee        recipient        
+ ASSUME           also             guided           recipients       
+ Accompany        alter            has              redistribute     
+ Activities       alternative      have             redistribution   
+ Also             among            having           redistributors   
+ And              an               he               refer            
+ Any              and              held             referring        
+ Apply            and/or           hereby           refers           
+ April            announcement     herein           reflect          
+ Ave              another          holder           refrain          
+ BE               any              hope             regardless       
+ BECAUSE          anyone           how              reliance         
+ BEEN             anything         hypothetical     remain           
+ BEING            application      idea             reputations      
+ BUT              applications     identifiable     required         
+ BY               applies          if               requirements     
+ But              apply            implemented      responsibilities 
+ By               appropriate      implied          responsible      
+ C                appropriately    impose           rest             
+ CHARGE           are              imposed          restricted       
+ CONDITIONS       as               in               restrictions     
+ CONSEQUENTIAL    ask              include          reuse            
+ COPYING          associated       included         revised          
+ COPYRIGHT        at               including        right            
+ CORRECTION       attach           incorporate      rights           
+ COST             attempt          incorporates     royalty-free     
+ Cambridge        author           incorporating    run              
+ Coon             author's         independent      running          
+ Copyright        author/donor     indicate         runs             
+ DAMAGES          authors          indirectly       safest           
+ DATA             automatically    individually     same             
+ DEFECTIVE        avoid            induce           sample           
+ DISTRIBUTION     away             information      satisfy          
+ EITHER           b                infringe         say              
+ END              balance          infringement     saying           
+ ENTIRE           based            installation     school           
+ EVEN             be               instead          scope            
+ EVENT            been             intact           scripts          
+ EXCEPT           believed         integrity        section          
+ EXPRESSED        below            intended         sections         
+ EXTENT           best             intent           separate         
+ Each             binary           interactive      service          
+ Everyone         body             interactively    share            
+ Exception        both             interchange      sharing          
+ FAILURE          brief            interest         she              
+ FITNESS          bring            interface        short            
+ FOR              but              interfaces       should           
+ FREE             by               into             show             
+ Finally          c                introduced       sign             
+ For              called           invalid          signature        
+ Foundation       can              is               signed           
+ Foundation's     cannot           issues           similar          
+ Free             carry            it               simultaneously   
+ GENERAL          case             items--whatever  since            
+ GNU              cause            its              so               
+ General          certain          itself           software         
+ Gnomovision      change           judgment         software--to     
+ HAS              changed          keep             sole             
+ HOLDER           changing         kernel           someone          
+ HOLDERS          charge           know             something        
+ Hacker           choice           language         sometimes        
+ Here             choose           later            source           
+ Hereinafter      circumstance     law              speak            
+ How              circumstances    least            special          
+ However          claim            legal            specifies        
+ IF               claims           library          specify          
+ IMPLIED          clear            license          spirit           
+ IN               code             licensed         start            
+ INABILITY        collective       licensee         started          
+ INACCURATE       comes            licensees        starts           
+ INCIDENTAL       commands         licenses         stating          
+ INCLUDING        commit           licensor         status           
+ IS               compelled        like             steps            
+ If               compilation      limitation       storage          
+ In               compiler         limited          subject          
+ Inc              compilers        line             sublicense       
+ It               complete         linking          subroutine       
+ James            compliance       long             such             
+ June             component        machine-readable suits            
+ KIND             components       made             sure             
+ LAW              concerns         mail             surrender        
+ LIABLE           conditions       major            system           
+ LICENSE          consequence      make             take             
+ LICENSED         consider         makes            telling          
+ LIMITED          considered       making           term             
+ LOSS             consistent       may              terminate        
+ LOSSES           conspicuously    means            terminated       
+ Library          constantly       medium           terms            
+ License          constitute       meet             than             
+ Licenses         contact          menu             that             
+ MA               containing       mere             the              
+ MAY              contains         mode             their            
+ MERCHANTABILITY  contents         modification     them             
+ MODIFICATION     contest          modifications    themselves       
+ MODIFY           contradict       modified         then             
+ Many             contrast         modify           there            
+ Mass             contributions    modifying        thereof          
+ NECESSARY        control          modules          these            
+ NO               convey           more             they             
+ NOT              copies           most             things           
+ New              copy             mouse-clicks     third            
+ OF               copying          must             this             
+ OPERATE          copyright        name             thoroughly       
+ OR               copyrighted      names            those            
+ OTHER            corresponding    necessary        though           
+ OTHERWISE        cost             need             threatened       
+ OUT              could            new              three            
+ Of               countries        no               through          
+ Our              counts           noncommercial    thus             
+ PARTICULAR       course           normally         time             
+ PARTIES          court            not              to               
+ PARTY            covered          nothing          too              
+ PERFORMANCE      customarily      notice           transferring     
+ PERMITTED        danger           notices          translate        
+ POSSIBILITY      date             number           translated       
+ PROGRAM          decide           object           translation      
+ PROGRAMS         decision         obligations      true             
+ PROVE            definition       obtain           two              
+ PROVIDE          deny             of               type             
+ PUBLIC           depends          offer            under            
+ PURPOSE          derivative       offering         understands      
+ Preamble         derivatives      on               unenforceable    
+ President        derived          one              unless           
+ Program          designated       only             up               
+ Program's        designed         operating        use              
+ Programs         detail           option           used             
+ Public           details          or               useful           
+ QUALITY          develop          order            user             
+ REDISTRIBUTE     differ           ordinary         users            
+ RENDERED         different        original         using            
+ REPAIR           directly         other            valid            
+ REQUIRED         disclaimer       others           validity         
+ RISK             disclaims        otherwise        verbatim         
+ SERVICING        display          our              version          
+ SHOULD           distinguishing   ours             versions         
+ SPECIAL          distribute       output           view             
+ STATED           distributed      outside          void             
+ SUCH             distributing     paper            volume           
+ SUSTAINED        distribution     part             w                
+ Section          do               particular       want             
+ Sections         document         parties          warranty         
+ See              does             parts            way              
+ Software         each             party            we               
+ Some             effect           passed           welcome          
+ Subsection       effectively      passes           what             
+ Such             either           patent           when             
+ TERMS            electronic       patents          where            
+ THE              else             people           whether          
+ THERE            employer         performing       which            
+ THIRD            enforcing        permission       who              
+ TO               entire           permissions      whole            
+ Terms            entirely         permit           whose            
+ The              equivalent       permitted        wide             
+ Therefore        even             pertinent        will             
+ These            ever             physical         willing          
+ This             every            physically       wish             
+ Thus             everyone         pieces           with             
+ To               everyone's       place            without          
+ Ty               example          placed           work             
+ UNLESS           except           places           works            
+ USA              exception        plus             would            
+ USE              exceptions       pointer          write            
+ Version          exchange         portion          written          
+ Vice             excluded         possible         wrote            
+ WARRANTIES       excluding        practices        years            
+ WARRANTY         exclusion        precise          you              
+ WHEN             excuse           preferred        your             
+ WHO              executable       present          
+ WILL             exercise         preserving       
+
+Printing a list of words which failed at version 1.3
+
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+     3D                    NTDesktop_long        memory                
+     FSPEC_complete        NTDesktop_short       photoshop             
+     FSPEC_long            NT_other_complete     sys32_win95_complete  
+     FSPEC_short           NT_other_long         sys32_win95_long      
+     ISPEC_complete        NT_other_short        sys32_win95_short     
+     ISPEC_long            SysNT_complete        ubench                
+     ISPEC_short           SysNT_long            vox                   
+     LargeApps             SysNT_short           wmt_ubench            
+     MMx_complete          Win95Desktop_complete xmark96_complete      
+     MMx_long              Win95Desktop_long     xmark96_long          
+     MMx_short             Win95Desktop_short    xmark96_short         
+     Multimedia_complete   front_end             
+     NTDesktop_complete    games                 
+*** STDERR ***

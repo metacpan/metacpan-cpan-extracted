@@ -1,0 +1,46 @@
+title 'Status';
+description 'Return various HTTP status';
+
+resource none => {
+    type => 'object',
+    description => 'Empty object',
+    properties => {},
+};
+
+resource ok => {
+    type => 'string',
+    description => 'Success',
+    example => 'Succeeded!',
+};
+
+resource error => {
+    type => 'object',
+    description => 'Failure',
+    properties => {
+        status => {
+            type => 'number',
+            example => 400,
+        },
+        message => {
+            type => 'string',
+            example => 'Bad Request',
+        },
+    },
+};
+
+GET '/get' => {
+    title => 'Get API',
+    description => 'Get something',
+    destination => {},
+    request => 'none',
+    response => {
+        200 => {
+            body => 'ok',
+            encoding => 'perl',
+        },
+        400 => {
+            body => 'error',
+            encoding => 'json',
+        },
+    },
+};

@@ -1,0 +1,50 @@
+{
+   "abstract" : "We are Taiwanese CPAN Authors!",
+   "author" : [
+      "Kang-min Liu <gugod@gugod.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-CPANAuthors-Taiwanese",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::CPANAuthors::Register" : 0,
+            "perl" : "5.008",
+            "strict" : 0,
+            "utf8" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/acme-cpanauthors-taiwanese/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gugod/acme-cpanauthors-taiwanese.git",
+         "web" : "https://github.com/gugod/acme-cpanauthors-taiwanese"
+      }
+   },
+   "version" : "0.08"
+}
+

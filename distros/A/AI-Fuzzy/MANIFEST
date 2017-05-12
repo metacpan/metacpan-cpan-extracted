@@ -1,0 +1,7 @@
+Changes
+Fuzzy.pm
+MANIFEST
+Makefile.PL
+test.pl
+lib/AI/Fuzzy/Set.pm
+lib/AI/Fuzzy/Label.pm

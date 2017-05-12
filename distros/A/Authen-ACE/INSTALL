@@ -1,0 +1,43 @@
+First, edit Makefile.PL to change the LIBS and INC fields, which
+specify the location of the ACE API librarie and include files. In the
+verions of ACE that I got, the ACE client library is named
+sdiclient.a; you should create a symlink to this file named
+libsdiclient.a so that you can use the -lsdiclient syntax in the
+Makefile.
+
+You should be able to install by running these commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Before you can test this package, you will need to have a working ACE
+server, and a SecurID card assigned to your username. 
+
+Some of the tests require you to clear the PIN of a card and re-enter
+it, so you'll also need administrative access to the ACE server while
+you are running the tests. You may find it useful to have a second
+card belonging to a test user for these tests, rather than clearing
+the PIN of your own card. The PIN tests are optional if you don't want
+to run them.
+
+The machine that you run the tests on must be a valid ACE client, and
+the your username (and the optional username) should be activated on
+that machine. The system you are going to be testing from must already
+have the /var/ace/sdconf.rec file installed. It would be nice if the
+/var/ace/securid key file was already installed, but it will be
+installed automatically during the tests as long as the username you
+run the tests with has privilege to write to the /var/ace directory.
+
+Because the interactive nature of SecurID requires you to enter a
+time-sensitive token from a card, you cannot automate the test suite.
+An ACE server will never accept the same token twice, so during the
+testing, you will often be prompted to wait for the token on the card
+to change before continuing with the test.
+
+Finally, if you don't have the Term::ReadKey module installed, the PIN
+changing test will display a new PIN in plain text on the screen. You
+should use appropriate caution when doing this, and may want to change
+the PIN or disable the token afterwards. Better yet, get and install
+Term::ReadKey.

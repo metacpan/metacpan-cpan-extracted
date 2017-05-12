@@ -1,0 +1,22 @@
+# Korean messages for GNU hello.
+# Copyright (C) 1996-1997, 1999, 2001, 2002 Free Software Foundation, Inc.
+# Bang Jun-Young <bangjy@geocities.com>, 1996-1997
+# Changwoo Ryu <cwryu@debian.org> 1999-2002
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: GNU hello 1.3.37\n"
+"POT-Creation-Date: 2002-05-22 19:23+0200\n"
+"PO-Revision-Date: 2002-02-01 20:42+0900\n"
+"Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
+"Language-Team: Korean <ko@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=EUC-KR\n"
+"Content-Transfer-Encoding: 8-bit\n"
+
+msgid "hello, world\n"
+msgstr "안녕, 여러분\n"
+
+msgid "Hello, world!"
+msgstr "안녕하세요, 여러분!"
+

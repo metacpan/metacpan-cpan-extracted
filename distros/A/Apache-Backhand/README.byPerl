@@ -1,0 +1,19 @@
+README.byPerl
+
+One of Apache::Backhand's most interesting features is that it allows you
+to write candidacy functions in Perl.  However, in order to do so, you'll need
+to install the byPerl function where mod_backhand will find it.  This is
+not something I have figured out how to automate, so what follows is a set
+of (somewhat vague) instructions.  I'm assuming that you've already got
+mod_backhand built and working with Apache - if that's not the case, you
+should go do that first, then come back to this document.
+
+1. Build byPerl.so from byPerl.c
+
+For most platforms, 'make byPerl' should do this correctly.  If you encounter
+problems with this approach, please let me know and I'll help you out.
+
+2. Copy byPerl.so into your libexec (or equivalent) directory
+
+Wherever you put mod_backhand.so is usually a good place for byPerl.so as
+well.

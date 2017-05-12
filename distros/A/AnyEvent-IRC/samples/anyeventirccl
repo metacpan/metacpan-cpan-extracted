@@ -1,0 +1,64 @@
+#!/usr/bin/env perl
+use common::sense;
+use AnyEvent::IRC::Client;
+
+my $c = AnyEvent->condvar;
+
+my $pc = AnyEvent::IRC::Client->new;
+
+$pc->reg_cb (
+   irc_privmsg => sub {
+      my ($self, $msg) = @_;
+
+      if ($msg->{params}->[-1] =~ m/net_irc3:\s*(.*)/) {
+         $pc->send_chan ("#test", "PRIVMSG", "#test", "yes?");
+      }
+   }
+);
+
+$pc->reg_cb (
+   channel_add => sub {
+      my ($self, $msg, $chan, @nicks) = @_;
+      my $nick = join ",", @nicks;
+
+      print "$chan += $nick\n";
+      print "chans: " . (join ";", keys %{$self->channel_list}) ."\n";
+      print "nicks: " . (join ";", keys %{$self->channel_list ()->{$chan}}) ."\n";
+   },
+   channel_remove => sub {
+      my ($self, $msg, $chan, @nicks) = @_;
+      my $nick = join ",", @nicks;
+
+      print "$chan -= $nick\n";
+      print "chans: " . (join ";", keys %{$self->channel_list}) ."\n";
+      print "nicks: " . (join ";", keys %{$self->channel_list ()->{$chan}}) ."\n";
+   }
+);
+
+$pc->reg_cb (
+   connect => sub {
+      my ($pc, $err) = @_;
+      if (defined $err) {
+         print "Couldn't connect to server: $err\n";
+      }
+   },
+   registered => sub {
+      my ($self) = @_;
+      print "registered!\n";
+      $pc->enable_ping (60);
+   },
+   disconnect => sub {
+      print "disconnected: $_[1]!\n";
+   }
+);
+
+# these commands will queue until the connection
+# is completly registered and has a valid nick etc.
+$pc->send_srv ("JOIN", "#test");
+$pc->send_chan ("#test", "PRIVMSG", "#test", "hi, i'm a bot!");
+
+$pc->connect (
+   "irc.freenode.net", 6667, { nick => 'net_irc3', user => 'net_irc3', real => 'test bot' }
+);
+
+$c->wait;

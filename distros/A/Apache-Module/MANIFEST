@@ -1,0 +1,9 @@
+README
+Changes
+MANIFEST
+Makefile.PL
+Module.pm
+Module.xs
+typemap
+lib/Apache/ModuleDoc.pm
+lib/Apache/ShowRequest.pm

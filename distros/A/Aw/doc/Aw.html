@@ -1,0 +1,35 @@
+<html>
+<head>
+  <title>Aw::</title>
+</head>
+<body bgcolor="#f0f0f0" link="#cc0000" vlink="brown">
+
+<h1><u>Aw::</u></h1>
+
+<table width="90%" border=1 bgcolor="#cccc99">
+<tr bgcolor="#bfbfbf"><th>Method</th><th>Arguments</th><th>Return</th><th>Throws<br>Exception</th></tr>
+
+<tr align="center"><th align="left"><a name="Aw"></a>Aw</th><td align="left">( $broker, $host )<br>( '$broker@$host' )<br>
+When importing the Aw module the default broker and host may be set for the Aw::Client module. The broker and host may
+be reset at any time with the "setDefaultBroker" method.
+</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="err"></a>err</th><td align="left">( )<br>Returns <b>global</b> err code.</td><td>Boolean</td><td>YES</td></tr>
+		<tr align="center"><th align="left"><a name="errmsg"></a>errmsg</th><td align="left">( )<br>Returns <b>global</b> err message.</td><td>String</td><td>YES</td></tr>
+				<tr align="center"><th align="left"><a name="error"></a>error</th><td align="left">( )<br>Returns <b>global</b> err object.</td><td>Aw::Error</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getWarn"></a>getWarn</th><td align="left">( )<br>Returns current <b>global</b> warn <b><code>level</code></b>.</th><td>Number</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setDefaultBroker"></a>setDefaultBroker</th><td align="left">( $broker, $host )<br>( '$broker@$host' )<br>
+Sets the default broker and host may be set for the Aw::Client module.</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setWarn"></a>setWarn</th><td align="left">( level )<br>Sets new <b>global</b> warn <b><code>level</code></b>.<dir>0 : No warnings (quiet mode)<br>1 : Terse (uses awErrorToString)<br>2 : Verbose (uses awErrorToCompleteString)</dir>The Aw extensions must be compiled with AWXS_WARNS defined.</th><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setWarnAll"></a>setWarnAll</th><td align="left">( boolean )<br>Turn On/Off automatic warning when errors are encountered (printed to stderr).</th><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="warn"></a>warn</th><td align="left">( [string] )<br>Warn message is <b><code>string</code></b> if passed, otherwise current <b>global</b> err is converted to string.</th><td>void</td><td>YES</td></tr>
+<tr bgcolor="#bfbfbf" align="left"><th colspan=4>Debugging Methods</th></tr>
+<tr align="center"><th align="left"><a name="free"></a>free</th><td align="left">( ref )<br>Decrements passed sv's reference count to 1.</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="hello"></a>hello</th><td align="left">( )<br>Returns the string "hello".  Useful for debugging.</td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="refcnt"></a>refcnt</th><td align="left">( ref )<br>Returns the perl reference count of the passed sv.</td><td>Number</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="showHash"></a>showHash</th><td align="left">( \%hash )<br>Recursses down a hash and prints elemetns.</td><td>void</td><td>NO</td></tr>
+
+<tr><td colspan="4">Within the XS layer global variables are used to set a default "warning" level (which can be reset on a per-object bases) and point to the <i>last</i> BrokerError encountered.  These global variables are accessible thru the Aw:: module functions.</td></tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+Revision history for Perl extension Apache::AuthenCache.
+
+0.05  Thu Aug 16 17:00:00 2001
+	- Patch from Christian Gilmore fixing bug caused by 
+	  missing 'use Apache::Log' and removing check for mod_perl 1.26
+	- Added per-realm caching back in as implemented in 0.03 and 
+	  missed in the 0.04 rewrite 
+	  A different cache is created for each realm (AuthName) so 
+	  users allowed access to one realm do not get access to other realms.
+
+0.04  Thu Feb 01 15:00:00 2001
+	- Partial rewrite by Christian Gilmore to use IPC::Cache
+	- Christian also removed any logging of passwords (originally spotted by John Groenveld)
+
+0.03  Mon Aug 17 17:05:14 1998
+	- Added hook for Apache::Status (thanks to John Groenveld)
+
+0.02  Fri Aug 14 15:35:22 1998
+	- Added %Cache_hash for perl-realm caching (thanks to John Groenveld)
+	- Fixed typo in documentation (thanks to John Groenveld)
+
+0.01  Wed Jun 10 15:05:18 1998
+	- original version; created by h2xs 1.18
+

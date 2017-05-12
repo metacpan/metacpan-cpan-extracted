@@ -1,0 +1,252 @@
+=head1 NAME
+
+App::Pods2Site::Args
+
+Commandline options and arguments understood for Pods2Site processing
+
+=head1 SYNOPSIS
+
+ pods2site
+    [
+        --usage | -?
+            |
+        --help
+            |
+        --manual
+            |
+        --version
+    ]
+    [ -v | --verbose [ -v ... ] | --quiet]
+    [ --workdirectory <path> ]
+    [ --bindirectory <location> [ --bindirectory ... ] ]
+    [ --libdirectory <location> [ --libdirectory ... ] ]
+    [ --core-include <query> ]
+    [ --script-include <query> ]
+    [ --pragma-include <query> ]
+    [ --module-include <query> ]
+    [ --css <file> ]
+    [ --title <title> ]
+    [ --style <name> ]
+    <sitedirectory>
+
+=head1 OPTIONS AND ARGUMENTS
+
+All options can be abbreviated, as long as they are unambiguous. Option matching is case
+sensitive. Forcibly end option parsing using '--'.
+
+=head3 EXPANDING FILES IN ARGUMENT LIST
+
+The command line may at any place contain arguments of the form F<@filename>, and which means that the F<filename>
+will be read for arguments to insert in place. This will help if the command line is very long or is just nicely
+persisted for reuse.
+
+Further, this will work recursively, i.e. a any resulting argument of the same form, will be read. If the filename
+is relative, it's assumed relative to the directory the previous file was in.
+
+The example command line C<pods2site --verbose @myargs> will be expanded by reading the F<myargs> file (in the current
+directory, obviously). The F<myargs> file may contain a line of C<@/some/path/to/globalargs>, and assuming that file in
+turn contains C<@extraargs>, that file is expected to exist as F</some/path/to/extraargs>.
+
+Each line in such a file will become a single argument using the following rules:
+
+=over
+
+=item * Line continuation
+
+To avoid physical lines in the file to be extremely long, it can be continued on the next
+physical (to any length) by ending the line with a backslash (\).
+
+  Example:
+    fee \
+    fie \
+    foo
+
+Will become the argument 'fee fie foo'.
+
+=item * Comments
+
+Any line (after completed line continuation and not counting inital whitespace) having
+a '#' as the first character, will be ignored as being a comment.
+
+=item * Trimming
+
+Any beginning and ending whitespace will be trimmed away.
+
+=item * Empty lines
+
+Any empty line will be ignored.
+ 
+=back
+
+=over
+
+=item B<INFORMATION OPTIONS>
+
+If any of these options are given, the rest of the command line is ignored.
+
+If multiple of these options are given only one will be acted on, in the order
+I<--manual>, I<--help>, I<--usage> and I<--version>.
+
+=over
+
+=item B<--usage> | B<-?>
+
+Displays basic usage information.
+
+=item B<--help>
+
+Displays usage and help with options/arguments.
+
+=item B<--manual>
+
+Displays the full manual page.
+
+=item B<--version>
+
+Displays the script name and version information.
+
+=back
+
+=item B<-v>, B<--verbose>, B<--quiet>
+
+By default, a small amount of feedback will be given, including some simple 'spinners' to indicate progress.
+
+To up verbosity, add one or more verbose flags (bundling for singlecharacter options is on, so '-vvv' is the same as
+'-v -v -v'). Currently, up to verbosity level 5 is used.
+
+To completely turn off all feedback, use '--quiet'.
+
+=item B<--workdirectory E<lt>pathE<gt>>
+
+By default, a temporary directory is created to hold intermediate data. This is automatically
+removed when the run is complete.
+
+If you need to look at this data, e.g. for debugging reasons, use '--workdirectory' to appoint
+a location. The path must not exist beforehand and will not be cleaned up after completion.
+
+=item B<Sticky options>
+
+The options below are considered 'sticky options' as they are only allowed when a new site is B<created>.
+After the site has been created, the options are saved in the site and reused when an update is made.
+
+Note that this also means that they can't be used when updating a site.
+
+=over
+
+=item B<--title E<lt>titleE<gt>>
+
+The title to use for the (index) page. Defaults to 'Pods2Site'.
+
+=item B<--style E<lt>nameE<gt>>
+
+Apart from the pod2html mechanism which is not controlled by this app, a couple of things will be generated
+in order to make the pod docs navigatable. At minimum an F<index.html> is generated, but typically also
+at least a TOC and possibly other pages. As this can be done in different fashions, this option allows
+you to select some different styles of viewing the pod docs.
+
+It uses 'style' names to select different internal implementations. The following is currently available:
+ 
+=over
+
+=item * :std
+
+This special name will use the currently defined default style. At present this is 'basicframes-simple-toc'.
+
+=item * basicframes-simple-toc
+
+This style uses a simple frames layout. The left-hand TOC is implemented as a static indented tree list.
+
+=item * basicframes-tree-toc
+
+This style is very similar to the above, but the TOC is rendered with the HTML5 'details' element
+in order to create a simple open/close tree control. May need a newer browser to display correctly.
+
+=back
+
+=item B<--css E<lt>fileE<gt>>
+
+If you want to provide your own CSS file, use '--css'. The file given will be copied to the site
+and used as an import in the CSS generated by the system and thus may override anything defined in that.
+
+It will be included as a stylesheet in the generated file, and also by passing the '--css' option to the pod2html command.
+
+Note that different 'styles' may generate different things possible to tweak.  
+
+=item B<--bindirectory E<lt>locationE<gt>>
+
+By default, the code will automatically try to ascertain where the running Perl distro places executable scripts, e.g.
+generally in the vendor, site and core 'bin' locations in the tree (ascertained from L<Config> values).
+
+In case you manually want to add to, or manipulate the order of, the locations, you may provide one or more '--bindirectory'
+options and they will be searched in the given order. Any locations not existing are silently skipped. 
+
+The 'location' is generally a normal path, but some special values have special meaning:
+
+=over
+
+=item * :none
+
+Since the default locations are automatically searched if no '--bindirectory' option is given, this code is provided to
+completely turn off searching any locations for scripts - just give a single invocation of '--bindirectory :none'. 
+
+=item * :std
+
+This will insert the default locations. Useful if you want insert one or more custom paths first, and then add 'all the 
+default places'.
+
+=back
+
+=item B<--libdirectory E<lt>locationE<gt>>
+
+This is exactly like '--bindirectory', except for lib locations (e.g. where to find core pods, pragmas and ordinary modules).
+
+Aside from taking regular paths, this also handles some special values:
+
+=over
+
+=item * :none
+
+Since the default locations are automatically searched if no '--libdirectory' option is given, this code is provided to
+completely turn off searching any locations for core/pragma/module pods - just give a single invocation of '--libdirectory :none'. 
+
+=item * :std
+
+This will insert the default locations. Useful if you want insert one or more custom paths first, and then add 'all the 
+default places'.
+
+=item * :inc
+
+This will insert the default locations, like :std, but will use the @INC list, which means it will also pick up locations
+like paths listed in PERL5LIB etc.
+
+=back
+
+=item B<--xxx-include E<lt>queryE<gt>>
+
+By default, all pods found will be converted to HTML. 
+
+By providing a I<query> (see L<Grep::Query> for details on queries), a subset of pods can be selected.
+
+Note that there are separate queries for the for categories of core pods, scripts, pragmas and other modules. 
+
+=back
+
+=item B<sitedirectory>
+
+This is where the site should be created or updated.
+
+If the path doesn't exist, the full site will be created.
+
+If the path exists, it must contain a site created by this tool, and will then be updated efficiently
+(e.g. only new/updated pods will be written, as necessary).
+In this case however, the listed L<"Sticky options"> above are not allowed on the command line.
+Instead they will be read from the site and reused as they were when the site was created.
+ 
+=back
+
+=head1 MORE HELP
+
+For full information on Pods2Site, see the L<manual|App::Pods2Site>, or use I<--manual>
+or run I<perldoc App::Pods2Site> to see the manual page.
+
+=cut

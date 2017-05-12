@@ -1,0 +1,19 @@
+Changes
+lib/AnyEvent/UserAgent.pm
+Makefile.PL
+MANIFEST
+README
+t/00-use.t
+t/01-headers.t
+t/02-options-1.t
+t/03-options-2.t
+t/04-url.t
+t/05-timeout.t
+t/06-cookies.t
+t/07-warning.t
+t/90-pod.t
+t/91-pod-coverage.t
+t/92-manifest.t
+t/93-changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+---
+name: Apache-Image
+version: v0.0.4
+author:
+  - 'Scott Penrose <scottp@dd.com.au>'
+abstract: 'Generate a new image size, e.g. Thumbnail on the fly of any image, even dynamically generated (EXPERIMENTAL RELEASE)'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Apache2::TrapSubRequest: 0
+  Image::Magick: 0
+  Test::More: 0
+provides:
+  Apache::Image:
+    file: lib/Apache/Image.pm
+    version: !perl/version
+      qv: 1
+      version:
+        - 0
+        - 0
+        - 4
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

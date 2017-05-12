@@ -1,0 +1,36 @@
+Revision history for App-af
+
+0.09      2017-03-23 12:34:15 -0400
+  - Update for more recent Alien::Base / Alien::Build
+
+0.08      2017-02-22 07:26:49 +1100
+  - Removed unintended download.pm
+
+0.07      2017-02-21 18:14:17 +1100
+  - Add :repl psudo-command for --before and --after options on af install
+  - Add -I option to af install
+  - Add --blib option to af install
+
+0.06      2017-02-15 20:08:49 +1100
+  - Add wildcards % or * for --before and --after options on af install
+    subcommand
+
+0.05      2017-02-09 18:12:17 -0500
+  - Fixed bug in af missing command
+
+0.04      2017-02-09 12:51:16 -0500
+  - Added --root option or af install
+  - Added --before and --after options for af install (gh#1 plicease)
+  - af missing is a little more useful.  Prints out either share OR
+    system depending on which type is detected if phase is not specified 
+    rather than both.
+
+0.03      2017-02-08 15:19:49 -0500
+  - af install command prints runtime properties after finish
+  - Tests now pass if ALIEN_INSTALL_TYPE is set
+
+0.02      2017-02-08 12:32:11 -0500
+  - Add --dry-run option to the install subcommand
+
+0.01      2017-02-08 12:13:23 -0500
+  - initial version

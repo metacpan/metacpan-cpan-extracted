@@ -1,0 +1,38 @@
+**** NOTICE: Version 3.07 is incompatible with previous releases. ***
+
+As of release 3.07, you must be running mod_perl 2.0.0 RC5 or later.  Please
+note that in mod_perl 2.0.0 RC5 many packages were reneamed.  See the mod_perl
+documentation for updating your code for 2.0.0 RC5.
+
+*****
+
+Notes for migrating from mod_perl version 1.x to mod_perl version 2:
+
+API changes:
+
+In order to avoid requiring the GlobalRequest option under mod_perl 2, the
+interface to several of the public AuthCookie methods needed to change.  Every
+method that called Apache->request internally, now expects $r to be passed in
+as the first argument.  The affected methods are:
+
+   modperl 1.x API           modperl 2.x API
+   --------------            ----------------
+   handle_cache()            handle_cache($r)
+   remove_cookie()           remove_cookie($r)
+   login_form()              login_form($r)
+   send_cookie($ses_key)     send_cookie($r, $ses_key)
+   key()                     key($r)
+
+So, for example, instead of $auth_type->login_form(), you now need to call
+$auth_type->login_form($r).
+
+Also Note that the Apache interface for retrieving the auth type and username
+has changed in mod_perl 2, so you will need to update these calls in your
+AuthCookie subclass as well:
+
+   modperl 1.x                modperl 2.x
+   --------------------       ----------------
+   $r->auth_type              $r->ap_auth_type
+   $r->connection->user       $r->user
+
+$Id$

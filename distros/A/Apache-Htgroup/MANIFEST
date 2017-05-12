@@ -1,0 +1,13 @@
+MANIFEST
+README
+lib/Apache/Htgroup.pm
+Makefile.PL
+LICENSE
+
+t/00load.t
+t/01basic.t
+t/02scratch.t
+t/03add.t
+t/test.acl
+
+META.yml                                 Module meta-data (added by MakeMaker)

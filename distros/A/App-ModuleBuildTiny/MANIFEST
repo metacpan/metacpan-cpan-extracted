@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README
+cpanfile
+lib/App/ModuleBuildTiny.pm
+script/mbtiny
+t/00-compile.t
+t/release-kwalitee.t
+t/release-pod-syntax.t

@@ -1,0 +1,7 @@
+go to https://github.com/aanoaa/AnyEvent-MyPeopleBot-Client/issues for the roadmap and known issues.
+
+v0.0.2    Tue Jun  4 19:26:34 2013 KST
+    - rename AnyEvent::Mypeople::Client to AnyEvent::MyPeopleBot::Client
+
+v0.0.1    Mon Jun  3 18:03:27 2013 KST
+    - first release

@@ -1,0 +1,298 @@
+#!/usr/bin/perl
+#
+#   Alien::InteractiveBrokers - Command-line config-listing script
+#
+#   Copyright (c) 2010-2012 Jason McManus
+#
+#   Full POD documentation after __END__
+#
+
+use Getopt::Long;
+use strict;
+use warnings;
+
+# Ours.
+use Alien::InteractiveBrokers;
+
+###
+### Variables
+###
+
+use vars qw( $VERSION $TRUE $FALSE $PROGNAME $PROGDESC );
+BEGIN {
+	$VERSION = '9.6602';
+}
+
+*TRUE      = \1;
+*FALSE     = \0;
+$PROGNAME  = 'ibapi-config';
+$PROGDESC  = 'Dump configuration information about the IB API install';
+
+$|=1;
+
+# Argument tree
+my @args = qw( path includes classpath version help );
+my %args = (
+    help    =>
+    {
+        optspec     => 'help|?',
+        desc        => 'Display this help message',
+        required    => $FALSE,
+    },
+    path =>
+    {
+        optspec     => 'path',
+        desc        => 'Print the base path of the IBJts directory',
+        required    => $FALSE,
+    },
+    includes =>
+    {
+        optspec     => 'includes',
+        desc        => 'Print a list of -I include directives',
+        required    => $FALSE,
+    },
+    classpath =>
+    {
+        optspec     => 'classpath|cp',
+        desc        => 'Print the path of the jtsclient.jar file',
+        required    => $FALSE,
+    },
+    version =>
+    {
+        optspec     => 'version',
+        desc        => 'Print the version of the IB API (not this program)',
+        required    => $FALSE,
+    },
+);
+
+###
+### Main body
+###
+
+my $opts = get_opts();
+
+my $ibapi = Alien::InteractiveBrokers->new();
+if( $opts->{path} )
+{
+    print $ibapi->path();
+}
+elsif( $opts->{includes} )
+{
+    print ' ' . $ibapi->includes() . ' ';
+}
+elsif( $opts->{classpath} )
+{
+    print $ibapi->classpath();
+}
+elsif( $opts->{version} )
+{
+    print $ibapi->version();
+}
+else
+{
+    usage( 2 );
+}
+
+print "\n" if( -t STDIN );
+
+exit( 0 );
+
+###
+### Subs
+###
+
+sub prog_header
+{
+    return $PROGNAME . ' v' . $VERSION . ' - ' . $PROGDESC . "\n";
+}
+
+# Parse and process command-line arguments
+sub get_opts
+{
+    my( %opt_results, %opt_retval );
+
+    # get the parsed options from Getopt::Long
+    GetOptions( \%opt_results, map { $args{$_}->{optspec} } keys( %args ) )
+        or usage( 3 );
+
+    # Asked for help?
+    usage( 0 ) if( $opt_results{help} );
+
+    # Start with defaults
+    for( keys %args )
+    {
+        $opt_retval{$_} = $args{$_}->{default}
+            if( exists( $args{$_}->{default} ) );
+    }
+
+    # Set actual values
+    $opt_retval{$_} = $opt_results{$_}
+        for( keys( %opt_results ) );
+
+    return( \%opt_retval );
+}
+
+# Get rid of Pod::Usage::pod2usage formatting dependency
+sub usage
+{
+    my $exitval = defined( $_[0] ) ? $_[0] : 42;
+
+    print prog_header(), "\n";
+    print "Usage:\n\t\$ $PROGNAME OPTION\n\n";
+    print "Options:\n";
+
+    for( @args )
+    {
+        my @opts = split( /\|/, $args{$_}->{optspec} );
+        $opts[0] =~ s/[\=\:].*//;
+        my( $single ) = grep { length( $_ ) <= 2 } @opts;
+        $single = substr( $opts[0], 0, 1 )
+            unless( $single );
+        printf( "  --%s | -%s:\n    %s\n\n",
+                $opts[0], $single, $args{$_}->{desc} );
+    }
+
+    exit( $exitval );
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ibapi-config - Command-line InteractiveBrokers API configuration info utility
+
+=head1 USAGE
+
+    $ ibapi-config OPTION
+
+=head1 DESCRIPTION
+
+This tool, as part of the L<Alien::InteractiveBrokers> distribution, is
+for convenient printing of the installed IB API locations, for use in
+Makefiles, shell scripts, etc.
+
+It prints several useful options, and is used extensively during the
+build process of L<Finance::InteractiveBrokers::SWIG>.
+
+=head1 OPTIONS
+
+=head2 --path
+
+Print the base path of the IBJts directory.
+
+=head2 --includes
+
+Print a list of -I include directives.
+
+=head2 --classpath
+
+Print the path of the jtsclient.jar file, for the Java CLASSPATH var.
+
+=head2 --version
+
+Print the version of the installed IB API (not this program).
+
+=head2 --help | --?
+
+Show a brief help message.
+
+=head1 SEE ALSO
+
+L<Alien::InteractiveBrokers>
+
+L<POE::Component::Client::InteractiveBrokers>
+
+L<Finance::InteractiveBrokers::API>
+
+L<Finance::InteractiveBrokers::SWIG>
+
+L<Finance::InteractiveBrokers::Java>
+
+The L<POE> documentation, L<POE::Kernel>, L<POE::Session>
+
+L<http://poe.perl.org/> - All about the Perl Object Environment (POE)
+
+L<http://www.interactivebrokers.com/> - The InteractiveBrokers website
+
+L<http://www.interactivebrokers.com/php/apiUsersGuide/apiguide.htm> - The IB API documentation
+
+The examples/ directory of this module's distribution
+
+=head1 AUTHORS
+
+Jason McManus, C<< <infidel at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-alien-interactivebrokers at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Alien-InteractiveBrokers>.  The authors will be notified, and then you'll
+automatically be notified of progress on your bug as changes are made.
+
+If you are sending a bug report, please include:
+
+=over 4
+
+=item * Your OS type, version, Perl version, and other similar information.
+
+=item * The version of Alien::InteractiveBrokers you are using.
+
+=item * The version of the InteractiveBrokers API you are using.
+
+=item * If possible, a minimal test script which demonstrates your problem.
+
+=back
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Alien::InteractiveBrokers
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-InteractiveBrokers>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Alien-InteractiveBrokers>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Alien-InteractiveBrokers>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Alien-InteractiveBrokers/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2010-2012 Jason McManus
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+The authors are not associated with InteractiveBrokers, and as such, take
+no responsibility or provide no warranty for your use of this module or the
+InteractiveBrokers service.  You do so at your own responsibility.  No
+warranty for any purpose is either expressed or implied by your use of this
+module suite.
+
+The data from InteractiveBrokers are under an entirely separate license that
+varies according to exchange rules, etc.  It is your responsibility to
+follow the InteractiveBrokers and exchange license agreements with the data.
+
+=cut
+
+# END

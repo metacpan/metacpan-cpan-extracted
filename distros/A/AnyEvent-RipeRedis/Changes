@@ -1,0 +1,84 @@
+Revision history for AnyEvent::RipeRedis.
+
+0.42 Sat Apr 1 15:49:15 MSK 2017
+  - README.pod replaced by README.md.
+
+0.40 Sat Feb 25 16:54:34 MSK 2017
+  - Fix in Changes file.
+
+0.38 Sat Feb 25 16:38:55 MSK 2017
+  - Added error code E_NOT_BUSY.
+  - Minor fixes.
+
+0.36 Tue Feb 21 14:55:42 MSK 2017
+  - Added parsing of reply for "CLUSTER INFO" command.
+  - Added README.pod file instead of README file.
+
+0.34 Sat Jan 28 18:59:15 MSK 2017
+  - Light refactoring.
+
+0.32 Thu Dec 29 15:16:05 MSK 2016
+  - Weakened one more circular reference.
+  - Fixed typo in POD.
+
+0.30 Sun Nov 20 19:40:55 MSK 2016
+  - Fixes in POD.
+  - Fixes in tests.
+  - Cosmetic changes in code.
+
+0.28 Fri Sep 23 12:10:33 MSK 2016
+  - Bugfix. If the client object was destroyed prematurely, in some cases
+    "_process_reply" method have been called on undefined value.
+
+0.26 Fri Sep 2 18:17:17 MSK 2016
+  - "min_reconnect_interval" renamed to "reconnect_interval"
+
+0.24 Fri Sep 2 08:20:05 MSK 2016
+  - Error "not allowed after "multi"" now raise exception.
+  - Unit tests improved.
+
+0.22 Tue Aug 30 19:51:25 MSK 2016
+  - Unit tests improved.
+
+0.20 Tue Aug 30 19:20:30 MSK 2016
+  - Minor changes in POD.
+  - Cosmetic changes in tests.
+
+0.18 Tue Aug 30 11:03:25 MSK 2016
+  - Added link to AnyEvent::RipeRedis::Cluster in POD.
+
+0.16 Tue Aug 30 11:00:00 MSK 2016
+  - %ERROR_CODES moved to AnyEvent::RipeRedis::Error.
+  - Minor changes in unit tests.
+  - Changes in POD.
+
+0.14 Mon Aug 29 17:01:40 MSK 2016
+  - Removed unnecessary string in unit test.
+
+0.12 Mon Aug 29 16:48:05 MSK 2016
+  - Refactoring of unit test.
+
+0.10 Wed Aug 26 11:44:35 MSK 2016
+  - Removed "on_connect_error" callback.
+  - POD Improved.
+  - Unit tests improved.
+
+0.08 Wed Aug 25 11:18:30 MSK 2016
+  - Added method "execute()".
+  - Getter "selected_database()" renamed to "database()".
+  - Bugfix. "DISCARD" command do not turned off transaction mode.
+  - Refactoring.
+  - POD Improved.
+
+0.06 Fri Jul 29 10:51:10 MSK 2016
+  - Improved POD.
+  - Light refactoring.
+
+0.04 Mon Jul 27 11:41:15 MSK 2016
+  - Refactoring of eval_cached() method.
+  - POD improved.
+  - Bugfix in unit tests.
+  - Removed unused code. Cosmetic.
+
+0.02 Mon Jul 25 15:37:30 MSK 2016
+  - First release of new incarnation of AnyEvent::Redis::RipeRedis.

@@ -1,0 +1,196 @@
+    <HTML> 
+	<HEAD> 
+	    <TITLE>distro/README</TITLE> 
+	</HEAD>
+
+	<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#INTRODUCTION">INTRODUCTION</A>
+	<LI><A HREF="#SUMMARY">SUMMARY</A>
+	<LI><A HREF="#PREREQUISITES">PREREQUISITES</A>
+	<LI><A HREF="#INSTALLATION">INSTALLATION</A>
+	<LI><A HREF="#RELEASE_NOTES">RELEASE NOTES</A>
+	<LI><A HREF="#DOCUMENTATION">DOCUMENTATION</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="INTRODUCTION">INTRODUCTION
+
+</A></H1>
+AFS::Command -- An OO wrapper API for the AFS command line utilities (vos,
+bos, pts, fs)
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="SUMMARY">SUMMARY
+
+</A></H1>
+This suite of perl modules implements an API for the command line utilities
+for managing and using the AFS distributed file system. AFS is available as
+both an Open Source product (http://www.openafs.org), as well as a
+commercial version from IBM (http://www.ibm.com/software/stormgmt/afs/).
+
+
+<P>
+
+For example, AFS volumes are managed using the command line utility 'vos',
+for which there is currently no programmatic API, in any language. This API
+is a pure perl wrapper around the command line utility, that implements an
+OO API that allows for the easy development of systems management
+applications for AFS.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="PREREQUISITES">PREREQUISITES
+
+</A></H1>
+This module requires perl5.6 or later, as well as an installed AFS
+infrastructure to work with. The code is pure perl, with no compiled
+components, do it should work on any variant of UNIX (sorry, but this code
+makes aggressive use of <CODE>pipe()</CODE> and <CODE>fork(),</CODE> so
+porting it to Windows is gonna be painful... but then, why anyone would
+want to manage their AFS infrastructure from Windows escapes me).
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="INSTALLATION">INSTALLATION
+
+</A></H1>
+This module builds like almost everything else on CPAN:
+
+
+<P>
+
+<PRE>  perl Makefile.PL
+  make
+  make test
+  make install
+</PRE>
+
+<P>
+
+Before running 'make test', edit the CONFIG file and follow the
+instructions in the comments. Minimally, you have to specify a couple of
+AFS file servers and one AFS database server against which to run the
+tests, as well as a pathname in AFS where we can create mount points.
+
+
+<P>
+
+The test suite will require AFS super-user privileges, so you must either
+be a member of the system:administrators protection group, or a member of
+the super users list on the servers. If you don't know what that means, you
+shouldn't be testing this module, so consult your AFS administrators.
+
+
+<P>
+
+See the CONFIG file for more details. Its pretty verbosely documented.
+
+
+<P>
+
+Any failure in the test suite is a cause for concern. For more verbose
+output, run:
+
+
+<P>
+
+<PRE>  make test TEST_VERBOSE=1
+</PRE>
+
+<P>
+
+If you can't determine the source of the <CODE>problem(s),</CODE> send the
+verbose test output, along with the output from ``perl -V'', as well as the
+versions of AFS in use at your site, to the author, and I'll do my best to
+figure out why things are breaking, and if you're lucky, actually fix it.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="RELEASE_NOTES">RELEASE NOTES
+
+</A></H1>
+In addition to the README file (which in case you hadn't noticed, you're
+reading right now), the history of changes is maintained in Changes.html.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="DOCUMENTATION">DOCUMENTATION
+
+</A></H1>
+Docs for these modules are split across several files, and will be
+installed as man pages.
+
+
+<P>
+
+<PRE>  man AFS::Command
+</PRE>
+
+<P>
+
+will provide the general overview of the API, its basic design. The details
+of the API calls, their arguments, and return values, are found in the
+following documents:
+
+
+<P>
+
+<PRE>  man AFS::Command::Base
+  man AFS::Command::VOS
+  man AFS::Command::BOS
+  man AFS::Command::PTS
+  man AFS::Command::FS
+  man AFS::Object
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR
+
+</A></H1>
+This code is a product of the demented mind of:
+
+
+<P>
+
+<PRE>    W. Phillip Moore &lt;Phil.Moore@MorganStanley.com&gt;
+</PRE>
+
+<P>
+
+Feedback, patches, recommendations, adulations, and even flames are all
+welcome. Feed my ego (or try to shoot it down :-), please...
+
+
+<P>
+
+</DL>
+    </BODY>
+
+    </HTML>

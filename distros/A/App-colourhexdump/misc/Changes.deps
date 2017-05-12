@@ -1,0 +1,81 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.000003
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+1.000002 2015-08-18T05:37:10Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Removed / runtime requires]
+ - List::MoreUtils
+
+1.000001 2014-10-19T20:42:11Z
+
+1.000000 2014-10-13T23:42:53Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker
+
+ [Added / runtime requires]
+ - Module::Runtime
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec
+
+ [Changed / test requires]
+ - Test::More 0.98 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4005
+
+ [Removed / configure requires]
+ - Module::Build 0.4005
+
+ [Removed / runtime requires]
+ - Class::Load 0.06
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.01011318 2013-05-21T16:46:25Z
+ [Changed / build requires]
+ - Module::Build 0.4004 → 0.4005
+
+ [Changed / configure requires]
+ - Module::Build 0.4004 → 0.4005
+
+0.01011317 2013-04-09T21:37:30Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / test requires]
+ - Test::More 0.88 → 0.98
+
+0.01011316 2012-03-12T11:37:10Z
+ [Added / runtime requires]
+ - perl 5.006
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+0.01011315 2011-04-09T07:44:09Z
+ [Changed / runtime requires]
+ - MooseX::Getopt::Dashes 0 → 0.37
+
+ [Removed / runtime requires]
+ - MooseX::Getopt::GLD
+
+0.01000103 2010-12-20T19:02:48Z
+ [Changed / runtime requires]
+ - Term::ANSIColor 0 → 3.00

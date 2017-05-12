@@ -1,0 +1,15 @@
+Revision history for App-Install
+
+0.03    2007-07-19
+        * renamed examples/MyInstall.pm to MyAppInstall.pm because of
+          CPAN permission problems
+
+0.02    2007-07-19
+        * Name change to App::Install (from App::Bootstrap)
+        * API change: keys/values inverted in args to files()
+        * Added permissions()
+        * Doc updates
+
+0.01    2007-07-17
+        * First version, may not even work.
+

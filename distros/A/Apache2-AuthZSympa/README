@@ -1,0 +1,49 @@
+Apache-AuthSympa
+
+FILES
+
+Module files are in the following directory : lib/Apache
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Up to date documentation available running the following commands:
+
+man Apache2::AuthNSympa
+man Apache2::AuthZSympa
+
+(or perldoc).
+
+SAMPLE CONFIGURATION
+
+To use AuthNSympa and AuthZSympa with your apache server, here is a sample configuration file:
+
+<Directory "/var/www/somwehere">
+    AuthName SympaAuth
+    AuthType Basic
+    # URL of the sympa soap server which provides the lists 	
+    PerlSetVar SympaSoapServer http://mysympa.server/soap 
+    # list used for authorization
+    require SympaLists mylist 
+    # authentication module
+    PerlAuthenHandler Apache2::AuthNSympa
+    #authorization module 
+    PerlAuthzHandler Apache2::AuthZSympa 
+    require valid-user
+
+</Directory>
+
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2005 Dominique Launay
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

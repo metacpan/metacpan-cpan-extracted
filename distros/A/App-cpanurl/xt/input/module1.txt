@@ -1,0 +1,2 @@
+Mojolicious 3.82
+DBIx::Custom 0.23

@@ -1,0 +1,99 @@
+Revision history for App-FatPacker
+
+0.010007 - 2017-01-22
+  - don't fail packlist finding if one module fails to load
+  - don't fail tracing w/undef INC values due to failed optional module load
+
+0.010_006 - 2017-01-20
+  - detect and handle packing from within inc dirs w/version part
+  - fix tests to no longer rely on . being in @INC
+
+0.010005 - 2015-12-14
+  - fix fatpacked code to work properly on perl 5.6 in all cases
+  - removed x_static_install metadata (RT#110299)
+
+0.010004 - 2015-06-28
+  - fix tests to work reliably on win32
+
+0.010003 - 2015-04-17
+  - exclude virtual %INC entries from trace output
+
+0.010002 - 2014-08-16
+  - correctly specify perl prerequisite of 5.8 in meta files
+
+0.010001 - 2014-03-18
+  - include 'lib' in @INC for packlists_containing's require() calls
+
+0.010000 - 2013-11-27
+  - use object for @INC hook instead of subref, including a 'files' method to
+    return a list of files provided
+  - generate #line relative to the whole fatpacked script so die() reports and
+    caller() now point directly to the right line in the script
+    (RT#87118, DOLMEN)
+
+0.009018 - 2013-07-26
+  - deal with relative paths better by changing options passed to File::Find
+    (RT#84414, miyagawa)
+
+0.009017 - 2013-05-29
+  - fix fatal "List form of piped open not implemented" on MSWin32 (RT#85712,
+    ether)
+
+0.009016 - 2013-04-07
+  - 'file' command now takes care of keeping its original shebang line when given
+    the original file as its argument. The 'pack' command makes use of that too.
+    (Robin Smidsrod, miyagawa)
+
+0.009015 - 2013-04-07
+  - new 'pack' command, to do everything in one command (thanks, miyagawa!)
+    (RT#84415)
+
+0.009014 - 2013-04-03
+  - avoid fatal error when lib/ doesn't exist (now it is simply skipped)
+    (RT#84413, miyagawa)
+
+0.009013 - 2013-01-22
+  - fix to support for < 5.8 perls (haarg)
+
+0.009012 - 2013-01-18
+  - support for < 5.8 perls (RT#57811, haarg)
+
+0.009011 - 2012-09-24
+  - RT #79835: install bin/fatpack (lost in 0.009009 in the
+    Module::Install -> Distar conversion)
+
+0.009010 - 2012-09-19
+  - enable temp file deletion in pack.t on Win32
+  - RT #79489: %fatpacked keys need to be unix paths
+
+0.009009 - 2012-08-03
+  - RT #78724: fix trace --to-stderr (ether)
+
+0.009008 - 2012-07-16
+  - RT #78391: Avoid using $_ when requiring modules
+
+0.009007 - 2012-07-12
+  - Allow capturing of trace information into return value
+  - Add repsoitory metadata to META.YML
+
+0.009006 - 2011-01-18
+  - Use File::Path's "legacy" mkpath and rmtree functions. No longer needs
+    File::Path >= 2.07.
+
+0.009005 - 2011-01-12
+  - Avoid using done_testing so this works on older systems
+
+0.009004 - 2011-01-12
+  - Die if open fails in @INC handler, reduces confusing errors (DGL)
+  - RT #63466: Add ending newline if input lacks one (GUGOD)
+  - RT #60622: Fix conditional loading, only fatpack loaded modules (DGL)
+
+0.009003 - 2010-07-22
+  - fixed dependency for File::Path(remove_tree/make_path was first appeared at 2.07)
+
+0.009002 - 2010-07-07
+  - fixed typo and doc bug on command usage.(miyagawa)
+  - added `help' command for slightly better user experience(miyagawa)
+
+0.009001 - 2010-03-25
+  - Initial release

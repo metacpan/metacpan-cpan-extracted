@@ -1,0 +1,8 @@
+Revision history for Perl extension Acme::Stegano.
+0.02  Sat Jul  5 15:56:13 2003
+        - Fixed some pod change and a minor change to code
+
+0.01  Sat Jul  5 12:17:36 2003
+	- original version; created by h2xs 1.22 with options
+		-A -X -n Acme::Stegano
+

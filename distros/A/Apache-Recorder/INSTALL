@@ -1,0 +1,65 @@
+Installation Summary:
+
+1. make the package.
+2. Make the appropriate changes in your mod_perl-enabled Apache httpd.conf file.  Restart Apache, if necessary.
+3. Install Apache/Recorder/recorder.pl in your cgi-bin.
+4. Record a session.
+5. Write a script to execute HTTP::RecordedSession and HTTP::Monkeywrench with your stored session.
+
+Installation Details:
+
+1. make the package
+Un(tar & gzip) the package Apache-Recorder-version.tar.gz into your sources directory (such as /usr/local/src).  Then:
+
+perl Makefile.PL
+make
+make test
+make install
+
+2. Make the appropriate changes in your mod_perl-enabled Apache httpd.conf file
+
+To activate the Apache::Recorder handler in webroot (where webroot is /home/httpd/htdocs/) add the following lines to your httpd.conf:
+
+    <Directory /home/httpd/htdocs>
+	SetHandler perl-script
+	PerlHandler Apache:Recorder:
+    </Directory>
+
+You can also chain handlers in the PerlHandler directive, like so:
+
+PerlHandler Apache::Recorder My::Handler
+
+3. Install Apache/Recorder/recorder.pl in your cgi-bin
+
+copy Apache/Recorder/recorder.pl to your cgi-bin, and make sure that it has executable rights:
+
+cp recorder.pl /home/httpd/cgi-bin/
+chmod +x /home/httpd/cgi-bin/recorder.pl
+
+4. Record a session
+
+Point your browser to http://www.your-domain.com/cgi-bin/recorder.pl.
+
+recorder.pl includes detailed directions.  Essentially, Apache::Recorder will be looking for a cookie -- recorder.pl lets you set this cookie, and returns the cookie id.  Jot down the cookie id so that you can use it in Step 5.
+
+Notes:
+1. If you forget to write down the cookie id, take a look at the recorder_conf_$cookie_id files in /usr/tmp and choose the correct one based on the timestamp.
+2. recorder.pl sets a session cookie which will expire at the end of your current session.  Therefore, if you close down all instances of your browser after setting the cookie, you will have erased the cookie.  That's useful when you want to end the session, but not so useful if your are just about to begin it....
+
+5. Write a script to execute HTTP::RecordedSession and HTTP::Monkeywrench with your stored session
+
+Now that you have recorded a session, you need to pass the session to HTTP::Monkeywrench, and print the output.  Type perldoc HTTP::RecordedSession to view a sample script.
+
+Type 'perldoc Apache::Recorder' and 'HTTP::RecordedSession' for the documentation
+
+Requirements:
+    Apache
+    mod_perl
+    Apache::Log
+    Storable.pm
+    HTTP::Monkeywrench.pm
+
+
+Copyright (c) 2001, 2002 Chris Brooks. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

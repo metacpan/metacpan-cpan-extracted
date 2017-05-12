@@ -1,0 +1,43 @@
+Audio-AMaMP version 0.01
+========================
+
+This module provides a Perl language binding for the AMaMP core. AMaMP
+is a cross-platform audio engine, and more details can be found at
+http://amamp.sourceforge.net/. This module provides an OO interface
+that enables you to start the core and exchange messages with it.
+
+This is a Perl XS module in part, and is known to compile on Win32 as
+well as a range of POSIX-compliant platforms.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you get compile errors on Win32, it is most likely that the WIN32
+conditional compilement variable is not being set. You may need to
+modify the generated makefile to install it; please notify the the
+AMaMP project and send details of your compiler if this is the case.
+These reports can be sent to the AMaMP Development mailing list at
+amamp-development@lists.sourceforge.net. Reports of all other
+problems are also welcome and encouraged, particularly if you send
+a patch. ;-)
+
+DEPENDENCIES
+
+This module requires a C compiler to install. To make use of it, you
+will need to have installed the AMaMP Core, however the core itself
+is not required to install the module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Jonathan Worthington
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+

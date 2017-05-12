@@ -1,0 +1,23 @@
+Revision history for Perl extension Apache::AutoIndex.
+
+0.08 Tue Jun 29 13:53:24 1999
+ 	- Added complete prototyping information into Makefile.PL since auto-parsing
+	  for configuration directives doesn't seem to work on all platforms.
+	- Thumbnail support now fully debugged (I think)
+
+0.05 Fri Jan 29 04:00:23 1999
+	Destroyed version 0.04! forgot one friggin debug variable set :<
+
+0.04 Fri Jan 29 01:19:23 1999
+	- Maintenance version
+        - Added support for all mod_autoindex.c directives (+/- included)
+	- At this point it should work with anything mod_autoindex.c could handle
+	  maybe ignoring some directives, but it should produce an index anyway.
+
+0.03  Fri Jan 22 17:02:34 1999 
+	- Uploaded to CPAN!
+        - Waiting for bug reports
+
+0.01  Wed Jan 18 14:03:17 1999
+	- it's alive!
+	 

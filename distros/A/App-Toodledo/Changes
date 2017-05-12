@@ -1,0 +1,85 @@
+Revision history for App-Toodledo
+
+0.01    March 10, 2009
+        First version, released on an unsuspecting world.
+
+0.02	March 12, 2009
+	Switch from checking boolean to defined for some API calls.
+	Didn't realize Readonly wasn't in core.
+
+0.03    March 22, 2009
+	More meaningful error message if can't contact Toodledo.
+	(Was the parser saying no '<' found.)
+
+0.04	March 24, 2009
+	Require appropriate versions of Moose and MooseX::Method.
+
+0.05	May 2, 2009
+	Added App::Toodledo::Folder class and get_folders method.
+
+0.06	Jan 8, 2010
+	Fix for get_attribute_map being deprecated in Class::MOP::Class.
+
+0.07	Feb 11, 2010
+	Check for excessive token requests.
+
+2.00    Oct 30, 2011
+        Complete rewrite for API V2.
+
+2.01    Oct 31, 2011
+        Revisions to pass smoke tests.
+
+2.02    Nov 1, 2011
+        Added enumerated types for status, priority.
+
+2.03    Nov 1, 2011
+ 	Revised enumerated types method names to give
+ 	access to native integer types back.
+
+2.04    Nov 1, 2011
+	Fixed problem with Variable names cannot contain ::.
+
+2.05	Nov 2, 2011
+	Removed spurious use of MooseX::Method from FolderInternal.
+	Added disclaimer.
+
+2.06    Nov 4, 2011
+	Added App::Toodledo::Task::remove_tag method.  Documented
+	editing multiple tasks.
+
+2.07    Nov 28, 2011
+	Fixed t/03-token.t for path separator on DOS.
+
+2.08	Nov 30, 2011
+	Fixed braindead typo in Task.pm
+
+2.09	Dec 4, 2011
+	Fix another test failure 03-token.t.
+
+2.10	Dec 29, 2011
+	'star' and 'startdate' both matched 'startdate' in select()
+	until \b anchors added.
+
+2.11	Feb 7, 2011
+	Integrated Log4Perl changes from Eddie Ash.
+
+2.12    Feb 8, 2011
+	Require latest version of YAML, which Ingy has fixed the Mo::xxx
+	warnings in now.
+
+2.13	Feb 20, 2012
+	Quieted benign Log4Perl messages in test 04.
+
+2.14	Apr 15, 2012
+	Require a version of Log::Log4perl that doesn't have problem
+	with new defined(@array) deprecation.
+
+2.15	Nov 22, 2012
+	Fix logging bug in InfoCache found by Kurt Starsinic that prevented
+	login_from_rc working.
+
+2.16	Disable PPI::XS.  It throws warnings on deprecated(@array) on newer
+	perls and the PPI::XS bug report has been open for months.
+
+2.17	Require matching versions of latest Moose and MooseX::ClassAttribute
+	to avoid breakage of Moosex::ClassAttribute with latest Moose.

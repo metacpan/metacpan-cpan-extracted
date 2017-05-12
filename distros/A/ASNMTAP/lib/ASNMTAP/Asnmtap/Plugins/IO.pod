@@ -1,0 +1,281 @@
+=head1 NAME
+
+ASNMTAP::Asnmtap::Plugins::IO is a Perl module that provides IO functions used by ASNMTAP-based plugins.
+
+=head1 DESCRIPTION
+
+ use ASNMTAP::Asnmtap::Plugins v3.002.003;
+ use ASNMTAP::Asnmtap::Plugins qw(:PLUGINS);
+
+ my $objectPlugins = ASNMTAP::Asnmtap::Plugins->new (
+   _programName        => 'check_template-IO.pl',
+   _programDescription => "IO plugin template for the '$APPLICATION'",
+   _programVersion     => '3.002.003',
+   _programUsagePrefix => '--service <service> --protocol <protocol> --request <request>',
+   _programHelpPrefix  => '--service=<service>
+ --protocol=<protocol>
+ --request=<request>',
+   _programGetOptions  => ['host|H=s', 'port|P=i', 'service:s', 'protocol:s', 'request:s', 'username|u|loginname:s', 'password|p|passwd:s', 'timeout|t:i', 'trendline|T:i'],
+   _timeout            => 30,
+   _debug              => 0);
+
+ my $host     = $objectPlugins->getOptionsArgv ('host');
+ my $port     = $objectPlugins->getOptionsArgv ('port');
+ my $service  = $objectPlugins->getOptionsArgv ('service');
+ my $protocol = $objectPlugins->getOptionsArgv ('protocol');
+ my $request  = $objectPlugins->getOptionsArgv ('request');
+ my $username = $objectPlugins->getOptionsArgv ('username');
+ my $password = $objectPlugins->getOptionsArgv ('password');
+
+ use ASNMTAP::Asnmtap::Plugins::IO v3.002.003;
+ use ASNMTAP::Asnmtap::Plugins::IO qw(:SOCKET);
+
+ my $returnCode = scan_socket_info (
+   asnmtapInherited => \$objectPlugins,
+   protocol         => $protocol,
+   host             => $host,
+   port             => $port,
+   service          => $service,
+   request          => $request,
+   socketTimeout    => 5,
+   POP3             => {
+     username          => $username, 
+     password          => $password, 
+     serviceReady      =>  "[XMail [0-9.]+ POP3 Server] service ready",
+     passwordRequired  => 'Password required for',
+     mailMessages      => "Maildrop has [0-9.]+ messages",
+     closingSession    =>  "[XMail [0-9.]+ POP3 Server] closing session"
+                       }
+ );
+
+=head1 FUNCTIONS
+
+=head2 Socket based functions
+
+=over 4
+
+=item *
+
+scan_socket_info()
+
+=over 4
+
+=item asnmtapInherited
+
+A required reference to an ASNMTAP::Asnmtap::Plugins or ASNMTAP::Asnmtap::Plugins::Nagios subclass
+
+Through this way of working we inherited the command line option I<--debug>.
+
+=item custom
+
+optional, is an reference to your own custom defined function
+
+=over 4
+
+=item $asnmtapInherited
+
+A required reference to an ASNMTAP::Asnmtap::Plugins or ASNMTAP::Asnmtap::Plugins::Nagios subclass
+
+Through this way of working we inherited the command line option I<--debug>.
+
+=item $parms
+
+a reference to the scan_socket_info () parameters
+
+=item $INET
+
+$INET provides an object interface to using sockets in the AF_INET domain. It is built upon the IO::Socket interface and inherits all the methods defined by IO::Socket.
+
+=item $action
+
+a reference to the action
+
+=back
+
+ sub actionOnSocketResponse {
+   my ($asnmtapInherited, $parms, $INET, $action) = @_;
+
+   while ( <$$INET> ) {
+     chomp;
+
+     if ( $exit ) { $$action = "<TIMEOUT>"; last; }
+
+     SWITCH: {
+       if ( $_ =~ /^220 / ) { print $$INET "HELP\n"; }
+       if ( $_ =~ /^211 / ) { print $$INET "QUIT\n"; $$action = 'OK (211)'; }
+       if ( $_ =~ /^214 / ) { print $$INET "QUIT\n"; $$action = 'OK (214)'; }
+       if ( $_ =~ /^250 / ) { print $$INET "QUIT\n"; $$action = 'OK (250)'; }
+       if ( $_ =~ /^421 / ) { print $$INET "QUIT\n"; $$action = 'OK (421)'; }
+       if ( $_ =~ /^500 / ) { print $$INET "QUIT\n"; $$action = 'OK (500)'; }
+       if ( $_ =~ /^501 / ) { print $$INET "QUIT\n"; $$action = 'OK (501)'; }
+       if ( $_ =~ /^502 / ) { print $$INET "QUIT\n"; $$action = 'OK (502)'; }
+       if ( $_ =~ /^504 / ) { print $$INET "QUIT\n"; $$action = 'OK (504)'; }
+       if ( $_ =~ /^221 / ) { $$action = 'OK (221)'; last; }
+     }
+   }
+ }
+
+and now with customArguments:
+
+ sub actionOnSocketResponse {
+   my ($asnmtapInherited, $parms, $INET, $action, $arguments) = @_;
+
+   while ( <$$INET> ) {
+     chomp;
+
+     if ( $exit ) { $$action = "<TIMEOUT>"; last; }
+
+     SWITCH: {
+       if ( $_ =~ /^220 / ) { print $$INET "HELP\n"; }
+       if ( $_ =~ /^211 / ) { print $$INET "QUIT\n"; $$action = 'OK (211)'; }
+       if ( $_ =~ /^214 / ) { print $$INET "QUIT\n"; $$action = 'OK (214)'; }
+       if ( $_ =~ /^250 / ) { print $$INET "QUIT\n"; $$action = 'OK (250)'; }
+       if ( $_ =~ /^421 / ) { print $$INET "QUIT\n"; $$action = 'OK (421)'; }
+       if ( $_ =~ /^500 / ) { print $$INET "QUIT\n"; $$action = 'OK (500)'; }
+       if ( $_ =~ /^501 / ) { print $$INET "QUIT\n"; $$action = 'OK (501)'; }
+       if ( $_ =~ /^502 / ) { print $$INET "QUIT\n"; $$action = 'OK (502)'; }
+       if ( $_ =~ /^504 / ) { print $$INET "QUIT\n"; $$action = 'OK (504)'; }
+       if ( $_ =~ /^221 / ) { $$action = 'OK (221)'; last; }
+     }
+   }
+ }
+
+=item customArguments
+
+optional, when you need to pass parameters to your own custom defined function, this can be done with customArguments.
+
+ customArguments: SCALAR, ARRAY, HASH,
+                  REF SCALAR, REF ARRAY, REF HASH
+
+=item protocol
+
+required, can be 'udp' of 'tcp'
+
+=item host
+
+required, scalar, remote host address <hostname>[:<port>]
+
+=item port
+
+required, scalar, remote port
+
+=item service
+
+required, scalar, remote service
+
+=item request
+
+optional, scalar, default 
+
+=item socketTimeout
+
+timeout	value for various operations
+
+optional, scalar
+
+=item timeout
+
+timeout	value for all operations to die
+
+optional, scalar, default 10
+
+=item POP3
+
+=over 4
+
+=item username
+
+required, scalar
+
+=item password
+
+required, scalar
+
+=item serviceReady
+
+ "[XMail [0-9.]+ POP3 Server] service ready"
+
+required, scalar
+
+=item passwordRequired
+
+ 'Password required for'
+
+required, scalar
+
+=item mailMessages
+
+ "Maildrop has [0-9.]+ messages"
+
+required, scalar
+
+=item closingSession
+
+ "[XMail [0-9.]+ POP3 Server] closing session"
+
+required, scalar
+
+=back
+
+=back
+
+=back
+
+=head2 TAGS
+
+=over 4
+
+=item ALL
+
+ &scan_socket_info
+
+=item SOCKET
+
+ &scan_socket_info
+
+=back
+
+=head1 AUTHOR
+
+Alex Peeters [alex.peeters@citap.be]
+
+=head1 SEE ALSO
+
+ASNMTAP::Asnmtap, ASNMTAP::Asnmtap::Plugins, ASNMTAP::Asnmtap::Plugins::Nagios
+
+  check_template-IO.pl
+
+=head1 DEPENDENCIES
+
+  ASNMTAP::Asnmtap::Plugins
+  IO::Socket
+
+=head1 COPYRIGHT NOTICE
+
+(c) Copyright 2000-2011 by Alex Peeters [alex.peeters@citap.be],
+                        All Rights Reserved.
+
+ASNMTAP is based on 'Process System daemons v1.60.17-01', Alex Peeters [alex.peeters@citap.be]
+
+ Purpose: CronTab (CT, sysdCT),
+          Disk Filesystem monitoring (DF, sysdDF),
+          Intrusion Detection for FW-1 (ID, sysdID)
+          Process System daemons (PS, sysdPS),
+          Reachability of Remote Hosts on a network (RH, sysdRH),
+          Rotate Logfiles (system activity files) (RL),
+          Remote Socket monitoring (RS, sysdRS),
+          System Activity monitoring (SA, sysdSA).
+
+'Process System daemons' is based on 'sysdaemon 1.60' written by Trans-Euro I.T Ltd
+
+=head1 LICENSE
+
+This ASNMTAP CPAN library and Plugin templates are free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+The other parts of ASNMTAP may be used and modified free of charge by anyone so long as this copyright notice and the comments above remain intact. By using this code you agree to indemnify Alex Peeters from any liability that might arise from it's use.
+
+Selling the code for this program without prior written consent is expressly forbidden. In other words, please ask first before you try and make money off of my program.
+
+Obtain permission before redistributing this software over the Internet or in any other medium. In all cases copyright and header must remain intact.
+
+=cut

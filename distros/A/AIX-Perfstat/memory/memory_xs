@@ -1,0 +1,32 @@
+#
+#
+# Copyright (C) 2006 by Richard Holden
+#
+# This library is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+#
+#
+
+PROTOTYPES: ENABLE
+
+#include "memory.h"
+
+
+perfstat_memory_total_t*
+memory_total()
+CODE:
+	RETVAL = (perfstat_memory_total_t*)safemalloc(sizeof(perfstat_memory_total_t));
+	if (RETVAL == NULL)
+	{
+		warn("getmemory_total: unable to malloc");
+		XSRETURN_UNDEF;
+	}
+	if (perfstat_memory_total(NULL, RETVAL, sizeof(perfstat_memory_total_t), 1) == -1)
+	{
+		warn("getmemory_total: failed");
+		XSRETURN_UNDEF;
+	}
+OUTPUT:
+	RETVAL
+CLEANUP:
+	safefree(RETVAL);

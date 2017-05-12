@@ -1,0 +1,43 @@
+---
+abstract: 'Generate strings like title of Evangelion'
+author:
+  - ') <yuki.tannai@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.3, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-EvaTitlenize
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Acme::EvaTitlenize:
+    file: lib/Acme/EvaTitlenize.pm
+    version: 0.01
+requires:
+  Encode: 2.39
+  Text::VisualWidth: 0.02
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/saisa6153/Acme-EvaTitlenize/issues
+  homepage: https://github.com/saisa6153/Acme-EvaTitlenize
+  repository: git://github.com/saisa6153/Acme-EvaTitlenize.git
+version: 0.01
+x_contributors:
+  - 'Yuuki Tan-nai <yuuki.tannai@gaiax.com>'
+  - 'papix <mail@papix.net>'
+  - 'saisa6153 <yuuki@tan-nai.com>'

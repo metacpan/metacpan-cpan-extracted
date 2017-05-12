@@ -1,0 +1,42 @@
+Acme-Raise_my_kwalitee version 0.01
+===================================
+
+This module is intended to aid in raising my Kwalitee in the
+CPANTS project.
+
+One of the metrics is that another distribution requires
+your module, and this module is for just that.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   DBD::Ingres
+
+You can have your own module added here by just dropping me a
+line at htoug@cpan.org
+
+APOLOGIES
+
+To domm for mucking up his nice CPANTS project.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 by Henrik Tougaard
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

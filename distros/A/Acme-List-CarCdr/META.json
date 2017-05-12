@@ -1,0 +1,57 @@
+{
+   "abstract" : "car cdr cdaadadrdrr",
+   "author" : [
+      "Jeremy Mates <jmates@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-List-CarCdr",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48",
+            "strict" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Moo" : "0",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moo" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/thrig/Acme-List-CarCdr.git",
+         "web" : "https://github.com/thrig/Acme-List-CarCdr"
+      }
+   },
+   "version" : "0.01"
+}

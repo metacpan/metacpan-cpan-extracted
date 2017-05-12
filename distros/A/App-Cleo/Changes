@@ -1,0 +1,19 @@
+0.004 2014-03-23 09:15:48 America/Los_Angeles
+
+    - Fixed off-by-one error
+
+0.003 2014-03-10 01:57:48 America/Los_Angeles
+
+    - Just minor POD edits and refactoring.
+
+0.002 2014-03-09 14:55:03 America/Los_Angeles
+
+    - The "?" and "!" playback controls have been removed,
+    since they didn't work as advertised anyway.
+
+    - Added "r" and "p" playback controls to redo the
+    current or previous commands.
+
+0.001 2014-03-09 12:04:46 America/Los_Angeles
+
+    - Initial release.

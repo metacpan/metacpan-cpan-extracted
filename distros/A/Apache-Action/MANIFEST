@@ -1,0 +1,11 @@
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+README
+eg/Feedback.pm
+eg/State.pm
+lib/Apache/Action.pm
+lib/Apache/Action/State.pm
+t/01_use.t
+t/02_state.t
+t/03_action.t

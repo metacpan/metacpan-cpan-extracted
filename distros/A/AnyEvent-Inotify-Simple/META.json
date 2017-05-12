@@ -1,0 +1,55 @@
+{
+   "abstract" : "monitor a directory tree in a non-blocking way",
+   "author" : [
+      "Jonathan Rockway <jrockway@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-Inotify-Simple",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "File::Next" : "0",
+            "Linux::Inotify2" : "0",
+            "Moose" : "0",
+            "MooseX::FileAttribute" : "0",
+            "MooseX::Types::Path::Class" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Directory::Scratch" : "0",
+            "EV" : "0",
+            "MooseX::Declare" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jrockway/anyevent-inotify-simple/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jrockway/anyevent-inotify-simple.git",
+         "web" : "http://github.com/jrockway/anyevent-inotify-simple"
+      }
+   },
+   "version" : "0.03"
+}
+

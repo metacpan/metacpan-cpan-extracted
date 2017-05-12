@@ -1,0 +1,31 @@
+Apache::AxKit::Provider::DOM
+
+   A Base Class For Parsed-XML Providers
+
+Apache::AxKit::Provider::DOM allows to pass a parsed XML document
+directly to AxKit. It can be used as a base class for application
+providers, that create XML documents in memory. So
+Apache::AxKit::Provider::DOM provides an easy way to write
+application providers for AxKit 1.6.
+
+Installation
+============
+
+Apache::AxKit::Provider::DOM was implemented for AxKit 1.6. it may
+works with older versions of AxKit but I havn't tested it on any other
+than 1.6
+
+If you have AxKit 1.6 installed you just run:
+
+ $ perl Makefile.PL
+ $ make test
+ # as superuser
+ $ make install
+
+IMPORTANT NOTE:
+
+This is free software, you may use it and distribute it under the same
+terms as Perl itself.
+
+Copyright 2002 Christian Glahn and Innsbruck University (Austria), 
+All rights reserved.

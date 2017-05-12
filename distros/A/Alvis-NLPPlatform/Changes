@@ -1,0 +1,130 @@
+Revision history for Perl extension Alvis::NLPPlatform.
+
+0.6    - Word semgentation : Non break chracter (\xA0) was missing 
+       - Bug fix in the wrapper of Yatea, while producing
+         the input of Yatea
+       - Bug fix in the reader on Alvis document
+         (Alvis::NLPPlatform::Document::get_langage)
+       - Workaround for a missing feature in Module::Info : if no
+         prefix is set while running "perl Build.PL", additionnal
+         directories 'etc' and 'conf' are not installed (or well installed)
+       - The location of the rc file (yatea.rc) is automatically set,
+         while the configuration (in Build.PL)
+       - in standalone mode, annotated documents are printed just
+         after processing (and not more keep in memory)
+       - change in the default term tagger wrapper to take into
+         account carriage return in the sentence (in case of dirty
+         text)
+       - Corrections in the LICENSE file
+       - Semantic tags provided by the default term tagger are
+         integrated at the semantic features level
+       - bug fixed in the argument management of the script
+         ogmios-nlp-standalone
+       - for some OS, Config::General returns while setting variables
+         as yatea.rc is on read-inly mode
+
+
+0.5    - Addition of missing packages in the installation file
+         (Build.PL) 
+       - Switching the Makefile.PL on Build.PL
+       - Correction in the Yatea wrapper in the handling of the output file.
+
+0.4    - Correction in the function sigint handler : nlp_host and
+         nlp_port are now declared as global.
+       - Correction in the TermTagging : language switch was well
+         taken into account
+       - Correction in the management of the ".proc_id" file
+       - correction in the computing of the xml rendering time
+         (the variable is set to zero ;-)
+       - stderr when NLP tools are called, is redirected in a log file
+       - addition of a variable DEBUG defining a debug mode (temporary
+         files are not removed)
+       - alvis-nlp-standalone can read a file given in argument or on
+         the STDIN stream
+       - Documentation of the modules and scripts are gathered at the
+         end of each file
+       - Addition of DTD and XSD files in the documentation (etc
+         directory)
+       - Additional functionality: Loading files in various formats
+         (PDF, LaTeX, Word, etc.) before carrying out linguistic
+         annotations.
+       - Addition of the modules Alvis::NLPPlatform::Convert and
+         Alvis::NLPPlatform::Document for converting files in various
+         formats in ALVIS XML.
+       - Definition of the ogmios-standalone, ogmios-nlp-server,
+         ogmios-nlp-client: annotation scripts from various formats
+       - Improvement in the sentence segmentation: taking into account
+         sectioning (!)
+       - Addition of a Build.PL file        
+       - Enable to load empty markups
+       - best management of UTF8 (use of  Encode module)
+       - various fixes and optimization
+
+       - Yatea wrapper: new variable to get an yatea XML output or not
+       - Yatea warpper: addition of the output of yatea in the XML
+         output for the platform.
+       - bug fixes
+       - Rewrite of the TreeTagger wraper always by using
+         hash_words_punct but less complexe
+
+       - Modification in the Wrapper of bioLG : options are set in the
+         XML form
+       - integration of the cleanning of the output of bioLg in the code.
+       - Corrections in the LGbio wrapper
+       - Output Data can be stored in a descriptor or a scalar.
+       - Addition of the constituents in the BioLG wrapper (UserNLPWrapper.pm)
+       - Addition of examples
+       - Best management of the options (if they are not set)
+
+#       - Bad hack for the quick integration of the semantic tagging
+#         (tool SemanticTypeTagger) ** COMMENTED CODE **
+
+
+
+
+0.3    - additional options for the link parser wrapper, to write link
+         parser postscritp output (PARSING_IN_P0STSCRIPT)
+         and/or link parser graphics output (PARSING_GRAPHICS) in file 
+       - bug fix in the default term wrapper (a term embedded in a
+         named entity was not detected)
+       - bug fix in the default syntactic parser. Take into account
+         empty sentence parsing.
+       - Modification of the TermTagger : term list is loaded once.
+       - Display of the processing time for each step
+       - fix a bug in the XML loader of semantic unit/named-entity
+       - Definition of a section to manage XML input : the option
+         PRESERVEWHITESPACE is set in; addition of the option
+         LINGUISTIC_ANNOTATION_LOADING
+       - Definition of a section to manage XML output
+       - Render time is saved in the xml file (Client/server and
+         stantalone mode)
+
+0.2
+       -  rename client.pl, server.pl, go.pl, as alvis-nlp-client, alvis-nlp-server, alvis-nlp-standalone
+       -  set the default parsing wrapper (forgot in the version 0.1)
+       -  configuration files have been moved in the alvis-nlpplatform
+       -  writing functions printing header and footer of the
+          documentCollection
+       -  managing annoation of several document in the standalone
+          mode
+       - correction in the term wrapper, in the generation of the
+         semantic units
+       - correction in the default syntactic wrapper, in the
+         generationo of the head and modifier element. Corrections
+         also reported in the syntactic wrapper in the UserNLPWrapper
+         module
+       - default term tagger wrapper takes into account given
+         canonical form of terms if the term tagger returns it.
+       - modified dependencies for syntactic parsing (now needs PoS tagging)
+       - control characters are not visibles 
+       - addition of an option for preserving or not the white
+         spaces (XML blank nodes, but also beginning and end of the
+         line spaces). Default behaviour is removing the white spaces.
+       - addition of a patch for Link Gramar Parser 4.1a and
+         4.1b. This patch adds a option (!whitespaces) to avoid LG
+         tokenization.
+
+
+0.1  
+       -  version with CPAN configuration
+

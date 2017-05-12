@@ -1,0 +1,8 @@
+name      = "App-Memcached-Tool"
+badges    = ["travis"]
+authority = "cpan:KEYAMB"
+
+module_maker = "ModuleBuildTiny"
+
+readme_from    = "script/memcached-tool"
+markdown_maker = "Pod::Markdown::Github"

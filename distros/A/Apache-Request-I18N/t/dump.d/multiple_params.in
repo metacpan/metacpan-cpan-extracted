@@ -1,0 +1,22 @@
+# Multi-valued parameters
+POST /utf7 HTTP/1.0
+Content-Type: multipart/form-data; boundary="FOO FOO"
+
+--FOO FOO
+Content-Disposition: form-data; name="spicy"
+
+épicé
+--FOO FOO
+Content-Disposition: form-data; name="spicy"
+
++j5swRA-
+--FOO FOO
+Content-Disposition: form-data; name="épicé"
+
+spicy
+--FOO FOO
+Content-Disposition: form-data; name="=?ISO-8859-1?Q?=E9pic=E9?="
+
++j5swRA-
+--FOO FOO--
+

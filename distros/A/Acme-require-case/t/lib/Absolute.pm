@@ -1,0 +1,3 @@
+package Absolute;
+
+1;

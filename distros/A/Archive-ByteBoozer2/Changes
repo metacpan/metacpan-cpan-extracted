@@ -1,0 +1,15 @@
+Revision history for Perl extension Archive::ByteBoozer2.
+
+0.03  2016-03-31
+    - rebuilt a distribution package to include missing files "META.yml" and
+      "META.json"
+
+0.02  2016-03-24
+    - fixed compilation error for installations non-compliant with C99 modes
+      ("for" loop initial declarations are only allowed in C99 mode) when no
+      option like "-std=c99" or "-std=gnu99" is used to compile code
+
+0.01  2016-03-23
+    - initial version (provides Perl interface to David Malmborg's ByteBoozer
+      2.0, supports crunching Commodore data files using the compression
+      algorithm implemented via ByteBoozer 2.0)

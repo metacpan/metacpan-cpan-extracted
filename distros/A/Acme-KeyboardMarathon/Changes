@@ -1,0 +1,73 @@
+Revision history for Perl extension ACME::KeyboardMarathon.
+
+1.25  2016/08/23
+
+	Using GNU TAR now. The previous release had PAX headers in the tar file.
+	Build scripts now automatically configure minium perl version.
+
+1.23  2014/04/14
+
+	Added "source-tree-marathon.pl"
+	Work from James Raspass <jraspass@gmail.com> that vastly improves speed
+	Corrected minor scoping error in "fox" test
+
+1.22  2014/03/24
+
+	Corrected error where 'i' or 'I' was assigned the wrong value
+	Cleaned the new() method for clarity of distance calculation
+
+1.21  2014/03/21
+
+	Avoiding copying values from @_ on distance
+	Corrected a MANIFEST error
+	Added a longer test using "Call of the Wild" by Jack London
+
+1.20  2014/03/21
+
+	Added \r with a score of 0. Since in unix return is \n and in 
+          windows it is \n and \r combined, the \n score is sufficent.
+	Moved to interger only math to improve speed
+	Added a full charset test
+
+1.19  2014/03/19
+
+	Converted to Math::BigInt for cross-system compatibility
+	Only returning the integer CM distance
+	Using a 2.5-cm distance on unknown letters
+	marathon.pl now trying to ignore binary files
+	Updated to Test::Simple for tests
+
+1.18  2014/03/11
+
+	Added a POD test
+	Automatically building meta data
+
+1.17  2014/02/25
+
+	Correcting "ACME" to "Acme"
+
+1.16  2014/02/25
+
+	Updated meta information
+	Added LICENSE file to distribution
+
+1.14  2014/02/19
+
+	POD corrections from Mark A. Smith. (jprogrammer082@gmail.com)
+
+1.13  2012/04/11
+
+	Initial module creation.
+
+1.07  2012/04/09
+
+	Corrected a quoting mistake.
+	Corrected values on tests due to quoting mistake.
+	Now warning, instead of exiting on bad chars.
+	Using Carp.
+	Removed an unused var.
+	Corrected spelling and format mistakes in the POD.
+	Added info on marathon.pl to the POD.
+	Added RCS data.
+	Added warnings.
+	And several other cleanups from Perl::Critic

@@ -1,0 +1,96 @@
+{
+    "name": "rra-c-util",
+    "version": "6.1",
+    "synopsis": "Russ Allbery's utility libraries for C",
+    "maintainer": "Russ Allbery <eagle@eyrie.org>",
+    "copyrights": [
+        {
+            "holder": "Russ Allbery <eagle@eyrie.org>",
+            "years": "2000, 2009-2010, 2013-2016",
+        },
+        {
+            "holder": "The Board of Trustees of the Leland Stanford Junior University",
+            "years": "2009-2014",
+        },
+    ],
+    "license": "Expat",
+    "build": {
+        "lancaster": true,
+        "autotools": true,
+        "automake": "1.11",
+        "autoconf": "2.64",
+        "manpages": true,
+    },
+    "support": {
+        "email": "eagle@eyrie.org",
+        "github": "rra/rra-c-util",
+        "web": "https://www.eyrie.org/~eagle/software/rra-c-util/",
+    },
+    "vcs": {
+        "type": "Git",
+        "url": "https://git.eyrie.org/git/devel/rra-c-util.git",
+        "browse": "https://git.eyrie.org/?p=devel/rra-c-util.git",
+        "github": "rra/rra-c-util",
+        "openhub": "https://www.openhub.net/p/rra-c-util",
+    },
+    "readme": {
+        "sections": [
+            { "title": "Building" },
+            { "title": "Testing" },
+            { "title": "Using This Code" },
+        ],
+    },
+    "quote": {
+        "author": "Phil Greenspun",
+    },
+    "distribution": {
+        "section": "devel",
+        "tarname": "rra-c-util",
+        "version": "rra-c-util",
+    },
+    "docs": {
+        "user": [
+            {
+                "name": "fakepam",
+                "title": "PAM testing",
+            },
+            {
+                "name": "test-rra",
+                "title": "Test::RRA",
+            },
+            {
+                "name": "test-rra-automake",
+                "title": "Test::RRA::Automake",
+            },
+            {
+                "name": "test-rra-config",
+                "title": "Test::RRA::Config",
+            },
+            {
+                "name": "test-rra-moduleversion",
+                "title": "Test::RRA::ModuleVersion",
+            },
+        ],
+        "api": [
+            {
+                "name": "xmalloc",
+                "title": "xmalloc, xcalloc, and xrealloc",
+            },
+        ],
+        "extra": [
+            {
+                "title": "Test scripts",
+                "links": [
+                    {
+                        "name": "module-version",
+                        "title": "tests/perl/module-version-t",
+                    },
+                    {
+                        "name": "module-version-perl",
+                        "title": "t/style/module-version.t",
+                    },
+                ],
+            },
+        ],
+    },
+}

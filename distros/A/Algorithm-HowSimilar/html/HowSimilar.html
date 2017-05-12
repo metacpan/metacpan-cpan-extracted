@@ -1,0 +1,118 @@
+<HTML>
+<HEAD>
+<TITLE>HowSimilar.pm</TITLE>
+<LINK REL="stylesheet" HREF="../html/docs.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HowSimilar.pm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+    <LI><A HREF="#name">NAME</A></LI>
+    <LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+    <LI><A HREF="#description">DESCRIPTION</A></LI>
+    <LI><A HREF="#methods">METHODS</A></LI>
+    <UL>
+
+        <LI><A HREF="#compare( arg1, arg2, optional_callback )">compare( ARG1, ARG2, OPTIONAL_CALLBACK )</A></LI>
+        <LI><A HREF="#export">EXPORT</A></LI>
+    </UL>
+
+    <LI><A HREF="#author">AUTHOR</A></LI>
+    <LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Algorithm::HowSimilar - Perl extension for quantifying similarites between things</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Algorithm::HowSimilar qw(compare);
+  @res = compare( $str1, $str2, sub { s/\s+//g; [split //] } );
+  @res = compare( \@ary1, \@ary2 );</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module leverages Algorithm::Diff to let you compare the degree of sameness
+of array or strings. It returns a result set that defines exactly how similar
+these things are.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>
+<H2><A NAME="compare( arg1, arg2, optional_callback )">compare( ARG1, ARG2, OPTIONAL_CALLBACK )</A></H2>
+<P>You can call compare with either two strings compare( $str1, $str2 ):</P>
+<PRE>
+    my ( $av_similarity,
+         $sim_str1_to_str2,
+         $sim_str2_to_str1,
+         $matches,
+         $in_str1_but_not_str2,
+         $in_str2_but_not_str1
+       ) = compare( 'this is a string-a', 'this is a string bbb' );</PRE>
+<P>Note that the mathematical similarities of one string to another will be
+different unless the strings have the same length. The first result returned
+is the average similarity. Totally dissimilar strings will return 0. Identical
+strings will return 1. The degree of similarity therefore ranges from 0-1 and
+is reported as the biggest float your OS/Perl can manage.</P>
+<P>You can also compare two array refs compare( \@ary1, \@ary2 ):</P>
+<PRE>
+    my ( $av_similarity,
+         $sim_ary1_to_ary2,
+         $sim_ary2_to_ary1,
+         $ref_ary_matches,
+         $ref_ary_in_ary1_but_not_ary2,
+         $ref_ary_in_ary2_but_not_ary1
+       ) = compare( [ 1,2,3,4 ], [ 3,4,5,6,7 ] );</PRE>
+<P>When called with two string you can specify an optional callback that changes
+the default tokenization of strings (a simple split on null) to whatever you
+need. The strings are passed to you callback in $_ and the sub is expected to
+return an array ref. So for example to ignore all
+whitespace you could:</P>
+<PRE>
+    @res = compare( 'this is a string',
+                    'this is a string ',
+                    sub { s/\s+//g; [split //] }
+                  );</PRE>
+<P>You already get the intersection of the strings or arrays. You can get the
+union like this:</P>
+<PRE>
+    @res = compare( $str1, $str2 );
+    $intersection = $res[3];
+    $union = $res[3].$res[4].$res[5];
+    @res = compare( \@ary1, \@ary2 );
+    @intersection = @{$res[3]};
+    @union = ( @{$res[3]}, @{$res[4]}, @{$res[5]} );</PRE>
+<P>
+<H2><A NAME="export">EXPORT</A></H2>
+<P>None by default.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Dr James Freeman &lt;<A HREF="mailto:james.freeman@id3.org.uk">james.freeman@id3.org.uk</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><EM>perl</EM>.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;HowSimilar.pm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

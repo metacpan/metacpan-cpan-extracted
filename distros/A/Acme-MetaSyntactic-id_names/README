@@ -1,0 +1,29 @@
+SYNOPSIS
+
+     % perl -MAcme::MetaSyntactic=id_names -le 'print metaname'
+     ratna
+    
+     % meta id_names 2
+     dyah
+     widya
+
+DESCRIPTION
+
+    The list of most common Indonesian first names is taken from
+    https://namafb.com/2010/08/12/top-1000-nama-populer-indonesia/. From
+    the article:
+
+    "Dalam hal ini, sampel 56.719 nama diambil dari data Pelamar Lulus
+    Seleksi Administrasi CPNS KEMENKEU tahun anggaran 2010. Para Pelamar
+    berumur antara 20 s/d 30 tahun."
+
+    Some editing has been done:
+
+      * "M." removed from the list
+
+      This is obviously an abbreviation (usually for Muhammad)
+
+SEE ALSO
+
+    Acme::MetaSyntactic
+

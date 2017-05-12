@@ -1,0 +1,50 @@
+Smbxfer version 0.01
+
+Smbxfer is a module/script hybrid in the spirit of Brian D Foy's "modulino"
+concept.  Smbxfer is a command-line tool to transfer data between the local
+filesystem and a Samba share.  It supports basic file copying, recursive
+directory copying, and simple path mirroring in a manner similar to rsync.
+
+Though the 'smbclient' tool can do most of these things, it appears to be
+bound by a timeout limit that, in practice, seemed to limit my transfers to a
+bit over a gigabyte.  Smbxfer has no such limitation.  This was the main
+motivation behind its development.
+
+As a module, it provides a few useful functions for file transfers to/from
+SMB servers.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+DEPENDENCIES
+
+Exporter
+Getopt::Long
+IO::Prompt
+Filesys::SmbClient
+Test::More
+Test::Differences
+File::Find
+File::Temp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Karl Erisman
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

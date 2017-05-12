@@ -1,0 +1,24 @@
+---
+abstract: 'Print a greeting message'
+author: []
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3616'
+license: CC0
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Hello
+provides:
+  Acme::Hello:
+    file: lib/Acme/Hello.pm
+    version: 0.05
+  Acme::Hello::I18N:
+    file: lib/Acme/Hello/I18N.pm
+    version: 0.05
+recommends:
+  Locale::Maketext: 0.20
+  Locale::Maketext::Lexicon: 0.15
+requires:
+  perl: 5.005
+version: 0.05

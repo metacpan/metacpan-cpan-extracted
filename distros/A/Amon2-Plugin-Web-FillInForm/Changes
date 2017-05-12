@@ -1,0 +1,9 @@
+Revision history for Perl extension Amon2::Plugin::Web::FillInForm
+
+0.02 2015-06-09T00:06:14Z
+
+    - fixed test case
+    - minilized
+
+0.01    Fri Mar  4 10:14:48 2011
+        - original version

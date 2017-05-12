@@ -1,0 +1,56 @@
+=head1 NAME
+
+Alien::Packages::Roadmap - high level to do list and targetted goals
+
+=head1 SYNOPSIS
+
+This page provides a high level overview about the future extensions of
+the Alien::Packages module and the improvements of the module itself.
+
+=head1 EXTENSIONS
+
+=head2 More Targets
+
+Alien::Packages needs support for a wider range of platforms and packages,
+this covers Gentoo Linux or HP-UX as well as identifying installed Perl5
+modules using L<CPAN> or L<CPANPLUS>.
+
+=head2 More Information
+
+Where feasible, additional information like installed patches (e.g. AIX),
+package vulnerabilities (pkgsrc), installation dates, package origin etc.,
+can and should be provided.
+
+=head2 Speed Improvement
+
+When querying packages of several files, for each file the query is
+separately executed. That means, invoking the package tool for querying
+each file, because most query tools exit with an error code when at
+least one queried file isn't managed by this package management. Speeding
+up querying multiple files needs a way to "ignore" safe errors.
+
+=head1 RESOURCES AND CONTRIBUTIONS
+
+There're several ways how you can help to support future development: You can
+hire the author to implement the features you require at most (this also
+defines priorities), you can negotiate a support and maintenance contract
+with the company of the author and you can provide tests and patches. Further,
+you can submit documentation and links to resources to improve or add
+packaging systems or grant remote access to machines with insufficient
+supported packaging tools.
+
+=head1 AUTHOR
+
+Jens Rehsack, C<< <rehsack at cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 Jens Rehsack.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

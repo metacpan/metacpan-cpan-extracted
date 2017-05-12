@@ -1,0 +1,90 @@
+#############################################################################
+# CHANGE LOG
+#############################################################################
+
+Version 0.74
+ x More test fixes.
+
+Version 0.73
+ x Some test fixes.
+
+Version 0.72
+ x Try to avoid test failures when there is no support for manpages.
+
+Version 0.71
+ x Fix tests to work under Windows and various Unix configurations.
+
+Version 0.70
+ x Undo @ARGV stripping done by App::Options without relying on App::Options
+   internals.
+
+Version 0.69
+ x Fix the handling of standard build types (for example libdoc) by fixing
+   install_base return value when used as an accessor.
+ x Undo the @ARGV stripping done by App::Options to allow Module::Build
+   option processing to work as expected.
+ x Allow overriding paths specified by extra_dirs->dest_dir using
+   the standard --install_path option.
+ x Make the paths specified by install_path relative to install prefix
+   when they are relative (Module::Build behaviour is to make them
+   relative to current directory). 
+
+Version 0.68
+ x Some test fixes for Perl 5.6.2 and when Archive::Extract/File::Fetch
+   are not present.
+
+Version 0.67
+ x Rewritten mirror() to use File::Fetch.
+ x Rewritten unpack() to use Archive::Extract.
+ x Changed mirror() and unpack() into instance methods and use log_info()
+   instead of print inside them.
+
+Version 0.66
+ x More comprehensive tests, remove unused code and some
+   warnings.
+
+Version 0.65
+ x Fix some warnings when install_base is not specified.
+ x Allow calling install_base after the App::Build object
+   has been constructed.
+ x Fix handling of the default 'dest_dir' attribute when
+   'extra_dirs' is specified as an hash.
+ x Fix compatibility with Module::Build 0.28 and require it.
+
+Version 0.64
+ x Do not use App::Build in App::Build's Build.PL because it breaks
+   site/vendor selection operated (for example) by Gentoo g-cpan.
+
+Version 0.63
+ x Re-release changing the maintainer.
+
+Version 0.62
+ x Ensure that SVN files (files in */.svn) are not copied/installed
+
+Version 0.61
+ x Fixed some test cases that were erroring out
+
+Version 0.60
+ x Remove "Build" from @ARGV to get around weirdness with CPAN shell
+ x PREFIX is a synonym for install_base
+ x install scripts into $PREFIX/bin, not $PREFIX/scripts.
+ x override has_config_data() to always return false to overcome weirdness
+ x added regression tests (t/main.t)
+ x add the "execute" attribute on "extra_dirs"
+ x adds execute permission only to #! files in dirs that contain executables
+
+Version 0.50
+ x Cause "bin" directories (i.e. cgi-bin) to have perl interpreter substitution
+ x Ensure execute permission set on "bin" directories
+ x Properly write the .packlist (right location, right contents, right format)
+ x Ensure that packlist is written when no "module_name" exists
+ x Ensure that CVS and RCS files are not copied/installed
+
+Version 0.10
+ x Initial release
+ x Cause extra_dirs to be installed
+ x Add configure() hook
+ x Ensure that "lib" is always at the head of @INC
+ x Works with install_base or not
+ x unset $ENV{PREFIX} so that Module::Build doesn't complain
+

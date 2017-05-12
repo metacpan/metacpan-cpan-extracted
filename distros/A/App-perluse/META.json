@@ -1,0 +1,42 @@
+{
+   "abstract" : "Use the specified perl in shell command",
+   "author" : [
+      "Piotr Roszatycki <dexter@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4204",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-perluse",
+   "prereqs" : {
+      "runtime" : {
+         "recommends" : {
+            "App::perlbrew" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::perluse" : {
+         "file" : "lib/App/perluse.pm",
+         "version" : "0.0102"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/dex4er/perluse/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/dex4er/perluse"
+      }
+   },
+   "version" : "0.0102"
+}

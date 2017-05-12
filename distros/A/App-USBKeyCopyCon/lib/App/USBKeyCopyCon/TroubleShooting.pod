@@ -1,0 +1,86 @@
+=head1 NAME
+
+App::USBKeyCopyCon::Troubleshooting - Hints for making usb-key-copy-con work on your system
+
+=head1 HINTS
+
+This package relies on some fairly low-level system services.  It was developed
+on an Ubuntu 9.04 ('Jaunty') system running the GNOME desktop.  If you're
+running a different OS or indeed the same OS with different preference settings
+then your mileage may vary.
+
+=head2 Desktop Media Automount
+
+The default behaviour of GNOME/Nautlus is to automatically mount any USB
+storage device when it is plugged in and then pop up a file browser window.
+This behaviour conflicts with C<usb-key-copy-con> because it causes the scripted
+formatting and mounting operations to fail with 'Device Busy' errors.
+
+The application is meant to disable media-automount on start-up and to restore
+it on exit.  If you get file browser windows popping up while key copying is
+running then C<usb-key-copy-con> failed to disable the function.  You will
+either need to manually disable media-automount or patch the code to use
+comands that work for turning this function on and off on your system.
+
+This command turns it off on the developer's system:
+
+  gconftool-2 --type bool --set \
+      /apps/nautilus/preferences/media_automount false
+
+and this command turns it back on:
+
+  gconftool-2 --type bool --set \
+      /apps/nautilus/preferences/media_automount true
+
+Different versions of GNOME may use different configuration keys.  Other
+desktop environments (e.g.: KDE) will use different config mechanisms
+altogether.  Feedback on how to manage this better is welcome.
+
+=head2 Multiple User Logins
+
+It is safest to run C<usb-key-copy-con> when only one user is logged on to your
+workstation.  If you log in one user and then 'switch users' to log in a second
+user, the desktop of the first user may continue to respond to USB device
+add/remove events and cause conflicts with the copying process.
+
+=head2 Root Privileges / Sudo
+
+The C<usb-key-copy-con> program needs root privileges to format and
+mount/unmount devices.  If the program is run by a non-root user then it will
+use either gksudo or sudo to run the sub-commands that need privilege.  If
+gksudo is installed then password prompts should appear in a graphical window,
+if not, they may appear in the console window where the command was originally
+run.  You may wish to configure sudo so that no password prompt is needed.
+
+You can run the whole C<usb-key-copy-con> program as root:
+
+  sudo usb-key-copy-con
+
+However in this mode it will not be able to access the original user's GConf
+settings to disable media-automount so you will need to do that manually.
+
+=head2 Environment Variables
+
+The C<usb-key-copy-con> program passes the USB device parameters to the copying
+script via environment variables.  Unfortunately sudo can strip out variables
+passed to child processes.  Also the mechanism for passing environment
+variables through sudo vs gksudo is different.
+
+If you see a message like this:
+
+  USB_BLOCK_DEVICE not set
+
+Then your system is not passing environment variables through sudo to the child
+process.  You may need to either change your sudo configuration or run the
+whole program as root (see above) with the caveat that you will need to
+manually disable media-automount first.
+
+=head1 COPYRIGHT
+
+Copyright 2009 Grant McLean E<lt>grantm@cpan.orgE<gt>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

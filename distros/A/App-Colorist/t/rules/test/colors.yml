@@ -1,0 +1,91 @@
+---
+# Since not everyone likes the same colors. The keys here depend on the ruleset
+# (named in the arrays following each regex). The values define the color to
+# use for that rule keyword as follows:
+#
+#  * no color: To make no special color for that title use ~ (undef)
+#  * foreground color: To set only the foreground color, provide the name,
+#    index, or array look up described below for colors to define them.
+#  * foreground & background color: You need to provide a hash with two keys:
+#    "fg" and "bg". Each of these keys is set to the color name, index, or
+#    array lookup.
+#
+# For example:
+#
+#     DEFAULT: ~
+#     name: ~
+#     url: white
+#     title: { fg: ~, bg: purple }
+#     spam: [ 14 ]
+#     calamity: { fg: [ 1, 1, 3 ], bg [ 0, 0, 1 ] }
+#
+# Here "name" is given no extra color, "url" will have white text in the
+# foreground, "title" is printed on a purple background, "spam" will be a shade
+# of gray tending toward white on a 256 color screen, and "calamity" will be a
+# shade of blue gray in the foreground on a background of dark green on a 256
+# color screen.
+# 
+# There is also one special key, "DEFAULT", which can be given a foreground and
+# or background color to give everything unmatched a color of your choice.
+#
+# Colors are named like this:
+#
+# For standard ANSI colors:
+#  * black  (0)     * gray    (8)
+#  * maroon (1)     * red     (9)
+#  * green  (2)     * lime    (10)
+#  * olive  (3)     * yellow  (11)
+#  * navy   (4)     * blue    (12)
+#  * purple (5)     * fuschia (13)
+#  * teal   (6)     * aqua    (14)
+#  * silver (7)     * white   (15)
+#
+# If you use a 256 color terminal additional colors are available as follows.
+# Shades of gray are available by putting a single value inside an array like
+# this, where 0 is black and 23 is white (and all values in between are a shade
+# of gray).
+#
+#  * [ 0 ]
+#  * ...
+#  * [ 11 ]
+#  * ...
+#  * [ 23 ]
+#
+# For RGB colors, you can use the following:
+#
+#  * [ r, g, b ]
+#
+# A three-element array is interpreted as an RGB lookup. The number of colors
+# is limited to 216, so the range of r, g, and b must be 0 .. 5. 
+#
+# The final alternative is to use the color index directly. Manually
+# calculating the index for 256 colors works as follows:
+#
+# gray(i)      = 232 + i
+# rgb(r, g, b) = 16 + 36*r + 6*g + b
+#
+
+DEFAULT: yellow
+
+appname: white
+startup: gray
+url: teal
+ip: green
+port: fuschia
+
+message: silver
+group: gray
+timestamp: silver
+hostname: teal
+username: blue
+time: lime
+status: lime
+
+code: purple
+error: yellow
+file: aqua
+evalnumber: teal
+filehandle: teal
+line: red
+
+refresh: gray

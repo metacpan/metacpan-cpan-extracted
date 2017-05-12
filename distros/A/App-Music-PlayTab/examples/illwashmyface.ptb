@@ -1,0 +1,87 @@
+# Example playtab document.
+#
+# This is a fake song. Any resemblance to an existing song is pure
+# coincidental. But likely:
+# http://www.nature.com/srep/2012/120726/srep00521/full/srep00521.html
+
+# !t sets the title of the document
+!t I'll wash my face
+
+# !s is for subtitles, general remarks, and so on.
+!s tempo = 160 bpm
+
+# Enable bar numbering, starting at 1.
+!n 1
+
+# Use a smaller width for the columns.
+!w -6
+
+# Set a bigger margin so the margin texts will fit.
+!m +35
+
+# We're going to use lilypond syntax, assuming 4 bpm (beats per measure).
+!ly 4
+
+% We can use Lilypond comments from here, but still use # comments.
+
+% This puts the text "Intro" into the left margin.
+% "!> x 2" puts the text "x 2" at the right side.
+=Intro
+!> x 2
+% Some chords. The duration (d1 = d chord, whole note) is repeated for
+% the other chords.
+  | d1 | g | g | g |
+
+% Since we indicated that the first 4 chords must be played twice,
+% we need to adjust the bar number.
+!n 9
+
+% Another left margin text, preceeded by some vertical space.
+% By citing the first few words of a verse, it is easier to
+% synchronize with other (singing) musicians.
+-So you
+  | d1 | g | g | f |
+  | d1 | g | g | b:m |
+  | c1 | a:m | g | g |
+  | c1 | c | g | d:7 |    % 24
+
+% Left margin text, without vertical space.
++I'll wash my
+  | d1 | c | d | d |
+  | d1 | c | d | d |
+% Some 4-beat and 2-beat chords.
+  | d1 | c | d2 c:m7 | bes a:m |
+% use r or s (rest) for NC (no chord)
+  | c1 | r |  
+
+% textual remarks. You may need to play a bit with the + - = prefixes
+% to get the spacing as desired.
+
++You're still ... (m. 39-54, like m. 9-24)
+=
++I'll wash my ... (m. 55-68, like m. 25-38)
+
+% Adjust bar number.
+!n 69
+=
+  | d2. f4 | g4 d2. |  % 70
+
+% New verse.
+-You like
+  | c1 | c | g | g |  % 74
+  | e1:m | e1:m | e1:m | e1:m |  % 78
+  | a1:m | a:m | a:m/g | a:m/g |  % 82
+  | c1 | f/e | d | d |  % 86
+  | e1:m | c | d | d:maj7 |  % 90
+
+-It's like
+!n 91
+  | c1 | a:m | g | g |
+  | c1 | c | g | d:7 |  % 98
++I'll wash my
+!> x 6
+  | d1 | c | d | d |
+
+-Coda
+!n 123
+  | c1 | f | g |  % 125

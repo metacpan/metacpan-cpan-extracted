@@ -1,0 +1,72 @@
+<%args>
+$schema
+$table_from
+$table_to
+@columns_from
+@columns_to
+$cardinality_from
+$cardinality_to
+$from_is_dependent => 0
+$to_is_dependent => 0
+$comment => ''
+</%args>
+
+<%init>
+if ($ARGS{more})
+{
+    delete $ARGS{more};
+    $m->redirect( uri( path => 'add_relationship' . Alzabo::GUI::Mason::Config::mason_extension(),
+                       query => \%ARGS,
+                     ),
+                );
+}
+
+my $s;
+eval
+{
+    $s = Alzabo::Create::Schema->load_from_file( name => $schema );
+
+    my $t_from = $s->table($table_from);
+    my $t_to = $s->table($table_to);
+    my @c_from;
+    @c_from = $t_from->columns(@columns_from) unless grep { ! length } @columns_from;
+
+    my @c_to;
+    @c_to   = $t_to->columns(@columns_to) unless grep { ! length } @columns_to;
+
+    my %p = ( table_from => $t_from,
+	      table_to   => $t_to,
+	      cardinality  => [ $cardinality_from, $cardinality_to ],
+	      from_is_dependent => $from_is_dependent,
+	      to_is_dependent => $to_is_dependent,
+	      comment => $comment,
+	    );
+
+    if ( @c_to && @c_from )
+    {
+	@p{'columns_from', 'columns_to'} = ( \@c_from, \@c_to );
+    }
+
+    $s->add_relationship(%p);
+
+    $s->save_to_file;
+};
+
+my $e = $@;
+
+$m->comp( 'handle_rules_exception', e => $e, comp => 'add_relationship', %ARGS );
+
+$m->comp( 'exception', $e ) if $e;
+
+$m->redirect( uri( path => 'view_table' . Alzabo::GUI::Mason::Config::mason_extension(),
+                   query => { schema => $s->name,
+                              table  => $table_from,
+                            },
+                 ),
+            );
+
+</%init>
+
+<%flags>
+inherit => 'syshandler'
+</%flags>

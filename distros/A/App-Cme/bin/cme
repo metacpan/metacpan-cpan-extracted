@@ -1,0 +1,436 @@
+#!/usr/bin/env perl
+#
+# This file is part of App-Cme
+#
+# This software is Copyright (c) 2017 by Dominique Dumont.
+#
+# This is free software, licensed under:
+#
+#   The GNU Lesser General Public License, Version 2.1, February 1999
+#
+# PODNAME: cme
+# ABSTRACT: Check or edit configuration data with Config::Model
+
+# see perlunicook
+use utf8;      # so literals and identifiers can be in UTF-8
+use v5.12;     # or later to get "unicode_strings" feature
+use strict;    # quote strings, declare variables
+use warnings;  # on by default
+use warnings  qw(FATAL utf8);    # fatalize encoding glitches
+use open      qw(:std :utf8);    # undeclared streams in UTF-8
+use charnames qw(:full :short);  # unneeded in v5.16
+
+use App::Cme;
+App::Cme->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cme - Check or edit configuration data with Config::Model
+
+=head1 VERSION
+
+version 1.019
+
+=head1 SYNOPSIS
+
+  # general synopsis
+  cme [ global_options ] command application [ options ] [ file ] [ modification_instructions ]
+
+  # edit dpkg config with GUI (and Config::Model::Dpkg)
+  cme edit dpkg
+
+  # read data from arbitrary file (for model read from alternate file)
+  cme check dpkg-copyright -file path/to/file
+
+  # edit /etc/sshd_config (with Config::Model::OpenSsh)
+  sudo cme edit sshd
+
+  # edit ~/.ssh/config (with Config::Model::OpenSsh)
+  cme edit ssh
+
+  # just check the validity of a file. Both commands are equivalent
+  cme check multistrap file.conf
+  cme check multistrap -file file.conf
+
+  # check dpkg files, update deprecated parameters and save
+  cme migrate dpkg
+
+  # like migrate, but also apply all suggested fixes
+  cme fix dpkg
+
+  # modify configuration with command line
+  cme modify dpkg source 'format="(3.0) quilt"'
+
+  # likewise with an application that accepts file override
+  cme modify dpkg-copyright 'Comment="Modified with cme"'
+
+  # edit a file (file name specification is mandatory here)
+  cme edit multistrap my.conf
+
+  # map conf data to a fuse file system
+  cme fusefs multistrap my.conf -d fuse_dir
+
+  # likewise for dpkg data
+  cme fusefs dpkg -d fuse_dir
+
+  # list all available applications (depends on your installation)
+  cme list
+
+=head1 DESCRIPTION
+
+Depending on the command described below, C<cme> program will use
+Config::Model configuration descriptions to check or modify or fix
+configuration files.
+
+The 3rd parameter specify the application you want to work on. Most of
+the time, the relevant configuration file(s) will be found by cme. This
+is the most simple case. For instance:
+
+  sudo cme check popcon
+
+Some application like C<multistrap> have no constraint on the
+configuration file name and will require you to specify your
+configuration file name:
+
+  cme check multistrap raspbian.conf
+
+or
+
+  cme check multistrap -file raspbian.conf
+
+=head1 Configuration file specification
+
+The configuration of an application can take different forms. Either
+several files (like debian packages), a single file with a predefined
+file (popcon), or a single file with an arbitrary file name
+(multistrap).
+
+When needed the configuration file name is specified as the 3rd command
+argument, i.e. C<cme command application file_name>. This applies if the
+application requires a configuration file name (like multistrap), or if
+the application allows configuration file override.
+
+When the overridden file is C<-> (a single dash), the configuration is
+read from STDIN. The resulting file may be written on STDOUT. I.e.
+
+  cat debian/confrol | cme migrate dpkg-control -save -file -
+
+will output a fixed control file on STDOUT.
+
+=head1 Main commands
+
+This section describes the main commands shipped with cme. Other
+Config::Model extensions can bring more command. Run C<cme help> to
+get the list of available commands on your system.
+
+=head2 list
+
+Show a list all applications where a model is available. This list depends on
+installed Config::Model modules.
+
+=head2 edit
+
+Edit a configuration. By default, a Tk GUI will be opened If L<Config::Model::TkUI> is
+installed. See L<App::Cme::Command::edit>.
+
+=head2 shell
+
+Edit the configuration with a shell like interface. See L<App::Cme::Command::shell>.
+
+=head2 check
+
+Checks the content of the configuration file of an application. See L<App::Cme::Command::check>.
+
+=head2 migrate
+
+Update deprecated parameters (old value are saved to new parameters)
+and save the new configuration. See L<App::Cme::Command::migrate>.
+
+=head2 fix
+
+Migrate data and fix warnings.  See L<App::Cme::Command::fix>.
+
+=head2 modify
+
+Modify a configuration file with the values passed on the command
+line.  See L<App::Cme::Command::modify>.
+
+=head2 update
+
+Update the content of the configuration file from external data.
+Currently, only dpkg-copyright model support update sub command.
+See L<App::Cme::Command::update>.
+
+=head2 search
+
+Search configuration data for a specific string. See L<App::Cme::Command::search>.
+
+=head2 fusefs
+
+Map the configuration file content to a FUSE virtual file system on a
+directory specified with option C<-fuse-dir>. Modifications done in
+the fuse file system are saved to the configuration file when the
+C<fusermount -u> is run.
+
+=head1 Global options
+
+The following options are available for all commands:
+
+=over
+
+=item -create
+
+Perform the operation even if the configuration file is missing. This
+may be used to create a minimal configuration file. This option is
+disabled by default as a missing configuration file often indicates an
+error during the installation of the application.
+
+=item -file
+
+For model that support it, specify an alternate file to read and write the
+configuration. Use "C<->" to read from STDIN.
+
+You can use this option for model that require the target file to be
+specified (e.g. multitrap model), but file can in this case be also
+specified with the 4th command argument. E.g. these 2 commands habe
+the same effect:
+
+  cme check multistrap foo.conf
+  cme check multistrap -file foo.conf
+
+=item -force-load
+
+Load file even if error are found in data. Bad data are discarded
+
+=item -backup
+
+Create a backup of configuration files before saving. By default, C<old> will
+be appended to the backup file. I.e. C<foo.conf> will be backed up as C<foo.conf.old>.
+You can specify an alternate suffix. For instance C<-backup dpkg-old>.
+
+=item -save
+
+Force a save even if no change was done. Useful to reformat the configuration file.
+
+=item -strict
+
+When set, cme will exit 1 if warnings are found during check (of left after fix)
+
+=item -verbose
+
+Set to C<1>, C<2>, C<3> or C<info>, C<debug>, C<trace> to get more
+verbose output. These valiues can be abbreviated.
+
+Example:
+
+ cme check ssh -v 1
+ cme check ssh -v i
+ cme check ssh -v info
+
+=back
+
+=head1 Advanced options
+
+=over
+
+=item -dev
+
+Use this option if you want to test a model under development. This
+option will add C<lib> in C<@INC> and use C<lib/Config/Model/models>
+as model directory. This option is ignored when run as root.
+
+=item -model-dir
+
+Specify an alternate directory to find model files. Mostly useful for
+tests.
+
+=item -root-dir
+
+Specify a pseudo root directory to read and write the configuration
+files. (Actual default directory and file names depends on the model
+(See C<-model> option). For instance, if you specify C<~/mytest>, the
+C</etc/ssh/sshd_config> files will be written in C<~/mytest/etc/ssh/>
+directory.
+
+=item -stack-trace
+
+Provides a full stack trace when exiting on error.
+
+=item -backend
+
+Specify a read/write backend. The actual backend name depends on the model
+passed to C<-model> option. See L<Config::Model::BackendMgr> for details.
+
+=item -try-app-as-model
+
+When set, try to load a model using directly the application name specified as 3rd parameter
+on the command line. Experimental.
+
+=back
+
+=head1 Embedding cme
+
+You can use cme from another program by using C<-ui simple>
+option. This way you will be able to send command on the standard input
+of C<cme> and get the results from the standard output.
+
+=head1 Logging
+
+All Config::Model logging is now based on L<Log::Log4perl>.
+Logging can be configured in the following files:
+
+=over
+
+=item *
+
+ ~/.log4config-model
+
+=item *
+
+ /etc/log4config-model.conf
+
+=back
+
+A sample of a C<.log4config-model> is provided in contrib directory in C<Config::Model>
+distribution of on L<github|https://github.com/dod38fr/config-model/blob/master/contrib/log4config-model>
+
+Without these files, the following Log4perl config is used:
+
+ log4perl.logger=WARN, Screen
+ log4perl.appender.Screen        = Log::Log4perl::Appender::Screen
+ log4perl.appender.Screen.stderr = 0
+ log4perl.appender.Screen.layout = Log::Log4perl::Layout::PatternLayout
+ log4perl.appender.Screen.layout.ConversionPattern = %d %m %n
+
+Log4perl uses the following categories:
+
+=over
+
+=item Anything
+
+=item Anything::Change
+
+Trace change notification through configuration tree and instance.
+
+=item Backend
+
+=item Backend::Debian::Dpkg
+
+=item Backend::Debian::Dpkg::Control
+
+=item Backend::Debian::Dpkg::Copyright
+
+=item Backend::Fstab
+
+=item Backend::IniFile
+
+=item Backend::PlainFile
+
+=item Backend::ShellVar
+
+=item Backend::Yaml
+
+=item FuseUI
+
+=item Instance
+
+=item Loader
+
+=item Model::Searcher
+
+=item Tree::Element::CheckList
+
+=item Tree::Element::Id
+
+=item Tree::Element::Id::Hash
+
+=item Tree::Element::Id::List
+
+=item Tree::Element::Value
+
+=item Tree::Element::Value::Dependency
+
+=item Tree::Node
+
+=item Tree::Node::Warped
+
+=item ValueComputer
+
+=item Warper
+
+=item Iterator
+
+=item Model
+
+=back
+
+More categories will come.
+
+=head1 EXIT CODE
+
+cme exits 0 when no errors are found. Exit 1 otherwise.
+
+=head1 BUGS
+
+=head2 Configuration models can lag behind the target application
+
+If a configuration model is not up-to-date, you will get errors complaining about
+unknown parameters. In such a case, please file a bug on
+L<request tracked|http://rt.cpan.org/> or fix the model and send a pull request.
+You can see this
+L<example from OpenSsh|https://github.com/dod38fr/config-model/wiki/New-parameter-for-openssh-example>
+to learn how to fix a model.
+
+=head1 SUPPORT
+
+For support, please check the following resources:
+
+=over
+
+=item *
+
+The config-model users mailing list:
+
+ config-model-users at lists.sourceforge.net
+
+=item *
+
+The config-model wiki: L<http://github.com/dod38fr/config-model/wiki>
+
+=back
+
+=head1 FEEDBACKS
+
+Feedback from users are highly desired. If you find this module useful, please
+share your use cases, success stories with the author or with the config-model-
+users mailing list.
+
+=head1 SEE ALSO
+
+L<Config::Model::Model>,
+L<Config::Model::Instance>,
+L<Config::Model::Node>,
+L<Config::Model::HashId>,
+L<Config::Model::ListId>,
+L<Config::Model::WarpedNode>,
+L<Config::Model::Value>
+
+=head1 AUTHOR
+
+Dominique Dumont
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Dominique Dumont.
+
+This is free software, licensed under:
+
+  The GNU Lesser General Public License, Version 2.1, February 1999
+
+=cut

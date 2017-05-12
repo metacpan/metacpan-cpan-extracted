@@ -1,0 +1,19 @@
+List of known bugs
+==================
+
+1. Broken links to deleted image slide.
+
+   Description: When you delete an image, and re-run mamgal, it will delete the
+   image and all its associated files (slide, miniatures, etc), as well as
+   update the index, but will not fix the links to that image from previous and
+   following images. 
+
+   Workaround: just "touch(1)" the previous and following image, and re-run mamgal.
+
+   Fix: in order not to force re-writing all slides at all times, will probably
+   need to store some metadata about what images were present during last run.
+
+2. No i18n for error messages.
+
+   Fix: mark messages for xgettext and call gettext in Logger.
+

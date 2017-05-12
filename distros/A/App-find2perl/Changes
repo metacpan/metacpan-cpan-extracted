@@ -1,0 +1,19 @@
+Revision history for App-find2perl
+
+1.003     2014-01-30 01:35:16CET+0100 Europe/Amsterdam
+          Avoid using a less sane find(1)
+
+1.002     2014-01-06 15:47:32 Europe/Amsterdam
+          Match -links checks against find(1) not expect
+
+1.001     2013-12-05 12:07:17 Europe/Amsterdam
+          Don't try to delete nonexistent files
+          Run on all unixy systems
+          Add compilation tests
+
+1.000     2013-12-04 00:33:56 Europe/Amsterdam
+          Fixup provides field
+          Fixup copyright
+
+0.001     2013-12-03 17:08:43 Europe/Amsterdam
+          Released find2perl as in blead circa 5.19.6

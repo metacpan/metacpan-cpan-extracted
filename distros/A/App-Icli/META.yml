@@ -1,0 +1,34 @@
+---
+abstract: 'Icinga Command Line Interface'
+author:
+  - 'Copyright (C) 2014 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>'
+build_requires:
+  Test::Command: 0
+  Test::Compile: 0
+  Test::More: 0
+  Test::Pod: 0
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Icli
+provides:
+  App::Icli:
+    file: lib/App/Icli.pm
+    version: 0.48
+requires:
+  Carp: 0
+  DateTime: 0
+  DateTime::Format::Strptime: 0
+  DateTime::TimeZone: 0
+  Getopt::Long: 0
+  List::MoreUtils: 0
+  POSIX: 0
+  Term::ANSIColor: 0
+  Term::Size: 0
+  perl: v5.10.0
+version: 0.48

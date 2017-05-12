@@ -1,0 +1,73 @@
+{
+   "abstract" : "A more knowledgeable perldoc",
+   "author" : [
+      "The following persons are the authors of all the files provided in"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-perlfind",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Trigger" : "0",
+            "Module::Pluggable" : "0",
+            "Pod::Cpandoc" : "0",
+            "Pod::Functions" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Compile" : "0",
+            "Test::Differences" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/marcelgruenauer/App-perlfind/issues"
+      },
+      "homepage" : "https://github.com/marcelgruenauer/App-perlfind",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/marcelgruenauer/App-perlfind.git",
+         "web" : "https://github.com/marcelgruenauer/App-perlfind"
+      }
+   },
+   "version" : "2.07",
+   "x_contributors" : [
+      "Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯 <daxim@cpan.org>",
+      "Leo Lapworth <leo@cuckoo.org>",
+      "Marcel Gruenauer <hanekomu@gmail.com>"
+   ]
+}
+

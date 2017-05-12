@@ -1,0 +1,29 @@
+# NAME
+
+App::Chorus - Markdown-based slidedeck server app
+
+# VERSION
+
+version 1.1.0
+
+[Dancer](https://metacpan.org/pod/Dancer) application module for `chorus`. See `chorus`'s manpage for
+details on how to use it.
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 13:
+
+    Unknown directive: =HEAD1

@@ -1,0 +1,61 @@
+=encoding utf8
+
+=head1 NAME
+
+Any::Daemon::HTTP::Session - represents a client connection
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+The connection relates to one client.  Each time, some browser connects
+to the socket, a new ::Session object will be created.  It can be used
+to cache information as well.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Any::Daemon::HTTP::Session-E<gt>B<new>(%options)
+
+ -Option--Default
+  client  <required>
+  store   {}
+
+=over 2
+
+=item client => IO::Socket-client
+
+=item store => HASH
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<client>()
+
+=item $obj-E<gt>B<get>($names)
+
+=item $obj-E<gt>B<set>($name, $value)
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Any-Daemon-HTTP distribution version 0.26,
+built on September 19, 2016. Website: F<http://perl.overmeer.net/any-daemon/>
+
+=head1 LICENSE
+
+Copyrights 2013-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

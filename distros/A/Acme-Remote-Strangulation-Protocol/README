@@ -1,0 +1,35 @@
+NAME
+
+Acme::Remote::Strangulation::Protocol - The wisdom of Larry Wall
+
+SYNOPSIS
+
+  use Acme::Remote::Strangulation::Protocol;
+
+DESCRIPTION
+
+"The social dynamics of the net are a direct consequence of the fact that
+ nobody has yet developed a Remote Strangulation Protocol."
+
+EXPORT
+
+None by default.
+
+ACKNOWLEDGEMENTS
+
+My thanks goes out to the following individuals:
+
+        chromatic - For giving me the idea to do this
+        crazyinsomniac - I lifted most of the code from his Acme::MJD module
+        Larry Wall - For a great programming language and the quote that
+                     started it all.
+
+AUTHOR
+
+Thomas Stanley  < Thomas_J_Stanley@msn.com >
+
+SEE ALSO
+
+perl(1).
+
+

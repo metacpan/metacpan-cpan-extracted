@@ -1,0 +1,19 @@
+
+
+Jump
+====
+
+'utility to navigate the filesystem with heuristic'
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

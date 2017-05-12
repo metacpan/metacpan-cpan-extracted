@@ -1,0 +1,17 @@
+<!-- BEGIN site/header -->
+
+<table width="100%" cellpadding="0" cellspacing="0">
+	<tr><td>
+			<h1 class="title">[% template.title or site.title %]</h1>
+		</td>
+		<td align="right">
+			[% IF !Catalyst.user_exists %]
+			<a href="[% Catalyst.uri_for('/user/captcha') %]">Log In</a>
+			[% ELSE %]
+			<font color="white">Welcome, [% Catalyst.user.obj.username %]</font> | 
+			<A href="[% Catalyst.uri_for('/user/logout') %]">Log out</a>
+			[% END %]			
+		</td>
+	</tr>
+</table>
+<!-- END site/header -->

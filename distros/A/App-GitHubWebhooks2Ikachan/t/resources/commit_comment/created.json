@@ -1,0 +1,33 @@
+{
+  "comment": {
+    "body": "Hello!",
+    "commit_id": "adfb4f5fa983e4fc5d5559d6b653284ca03f296d",
+    "created_at": "2014-04-06T13:06:59Z",
+    "html_url": "https://github.com/moznion/sandbox/commit/adfb4f5fa983e4fc5d5559d6b653284ca03f296d#commitcomment-5920929",
+    "id": 5920929,
+    "line": null,
+    "path": null,
+    "position": null,
+    "updated_at": "2014-04-06T13:06:59Z",
+    "url": "https://api.github.com/repos/moznion/sandbox/comments/5920929",
+    "user": {
+      "avatar_url": "https://avatars.githubusercontent.com/u/1422834?",
+      "events_url": "https://api.github.com/users/moznion/events{/privacy}",
+      "followers_url": "https://api.github.com/users/moznion/followers",
+      "following_url": "https://api.github.com/users/moznion/following{/other_user}",
+      "gists_url": "https://api.github.com/users/moznion/gists{/gist_id}",
+      "gravatar_id": "e49bd291a978ddf757ba694170b356f6",
+      "html_url": "https://github.com/moznion",
+      "id": 1422834,
+      "login": "moznion",
+      "organizations_url": "https://api.github.com/users/moznion/orgs",
+      "received_events_url": "https://api.github.com/users/moznion/received_events",
+      "repos_url": "https://api.github.com/users/moznion/repos",
+      "site_admin": true,
+      "starred_url": "https://api.github.com/users/moznion/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/moznion/subscriptions",
+      "type": "User",
+      "url": "https://api.github.com/users/moznion"
+    }
+  }
+}

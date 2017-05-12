@@ -1,0 +1,229 @@
+<HTML>
+<HEAD>
+<TITLE>Apache::Wombat::Connector - Apache/mod_perl connector</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#lifecycle methods">LIFECYCLE METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Apache::Wombat::Connector - Apache/mod_perl connector</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  # My/Handler.pm</PRE>
+<PRE>
+  my $connector = Apache::Wombat::Connector-&gt;new();
+  $connector-&gt;setName('Apache connector');
+  $connector-&gt;setScheme('http');
+  $connector-&gt;setSecure(undef)</PRE>
+<PRE>
+  # ... create a Service as $service
+  # calls $connector-&gt;setContainer() internally
+  $service-&gt;addConnector($connector);</PRE>
+<PRE>
+  sub child_init_handler {
+      my $r = shift;
+      $connector-&gt;start();
+      return Apache::Constants::OK;
+  }</PRE>
+<PRE>
+  sub handler {
+      my $r = shift;
+      $connector-&gt;process($r);
+      return $r-&gt;status();
+  }</PRE>
+<PRE>
+  sub child_exit_handler {
+      my $r = shift;
+      $connector-&gt;stop();
+      return Apache::Constants::OK;
+  }</PRE>
+<PRE>
+  # httpd.conf:
+  &lt;Location /&gt;
+    SetHandler perl-script
+    PerlChildInitHandler My::Handler::child_init_handler
+    PerlHandler          My::Handler::handler
+    PerlChildExitHandler My::Handler::child_exit_handler
+  &lt;/Location&gt;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This Connector receives requests from and returns responses to an
+Apache web server within which Wombat is embedded. It does not listen
+on a socket but rather provides a <A HREF="#item_process"><CODE>process()</CODE></A> entry point with which
+it receives and returns an <STRONG>Apache</STRONG> instance. It provides HttpRequest
+and HttpResponse implementations that delegate many fields and methods
+to an underlying <STRONG>Apache::Request</STRONG> instance.</P>
+<P>ApacheConnector assumes an Apache 1 &amp; mod_perl 1 single-threaded
+multi-process environment. It's unknown whether it will work in any
+other environment.</P>
+<P>Requires mod_perl to be compiled with at least one of the following
+options:</P>
+<PRE>
+  DYNAMIC=1
+  PERL_TABLE_API=1
+  EVERYTHING=1</PRE>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Create and return an instance, initializing fields to default values.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getContainer"><CODE>getContainer()</CODE></A></STRONG><BR>
+<DD>
+Return the Container used for processing Requests received by this
+Connector.
+<P></P>
+<DT><STRONG><A NAME="item_setContainer"><CODE>setContainer($container)</CODE></A></STRONG><BR>
+<DD>
+Set the Container used for processing Requests received by this
+Connector.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24container">$container</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Container</STRONG> used for processing Requests
+<P></P></DL>
+<DT><STRONG><A NAME="item_getName"><CODE>getName()</CODE></A></STRONG><BR>
+<DD>
+Return the display name of this Connector.
+<P></P>
+<DT><STRONG><A NAME="item_getScheme"><CODE>getScheme()</CODE></A></STRONG><BR>
+<DD>
+Return the scheme that will be assigned to Requests recieved through
+this Connector. Default value is <EM>http</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_setScheme"><CODE>setScheme($scheme)</CODE></A></STRONG><BR>
+<DD>
+Set the scheme that will be assigned to Requests received through this
+Connector.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24scheme">$scheme</A></STRONG><BR>
+<DD>
+the scheme
+<P></P></DL>
+<DT><STRONG><A NAME="item_getSecure"><CODE>getSecure()</CODE></A></STRONG><BR>
+<DD>
+Return the secure connection flag that will be assigned to Requests
+received through this Connector. Default value is false.
+<P></P>
+<DT><STRONG><A NAME="item_setSecure"><CODE>setSecure($secure)</CODE></A></STRONG><BR>
+<DD>
+Set the secure connection flag that will be assigned to Requests
+received through this Connector.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24secure">$secure</A></STRONG><BR>
+<DD>
+the boolean secure connection flag
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_await"><CODE>await()</CODE></A></STRONG><BR>
+<DD>
+Begin listening for requests. Returns immediately since Apache itself
+listens for requests.
+<P></P>
+<DT><STRONG><A NAME="item_createRequest"><CODE>createRequest()</CODE></A></STRONG><BR>
+<DD>
+Create and return a <STRONG>Apache::Wombat::Request</STRONG>
+instance.
+<P></P>
+<DT><STRONG><A NAME="item_createResponse"><CODE>createResponse()</CODE></A></STRONG><BR>
+<DD>
+Create and return a <STRONG>Apache::Wombat::Response</STRONG>
+instance.
+<P></P>
+<DT><STRONG><A NAME="item_process"><CODE>process($r)</CODE></A></STRONG><BR>
+<DD>
+Process the given Apache request record (converting it to an instance
+of <STRONG>Apache::Request</STRONG> in the process), generating and sending a
+response. This method is meant to be called during the content
+handling phase by a PerlHandler subroutine; after calling this method,
+the handler should examine the Apache request's status code and return
+an appropriate value.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24r">$r</A></STRONG><BR>
+<DD>
+the <STRONG>Apache</STRONG> instance
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="lifecycle methods">LIFECYCLE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_start"><CODE>start()</CODE></A></STRONG><BR>
+<DD>
+Prepare for active use of this component. This method should be called
+before any of the public methods of the component are utilized.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Wombat%3A%3ALifecycleException"><STRONG>Wombat::LifecycleException</STRONG></A></STRONG><BR>
+<DD>
+if the component has already been started
+<P></P></DL>
+<DT><STRONG><A NAME="item_stop"><CODE>stop()</CODE></A></STRONG><BR>
+<DD>
+Gracefully terminate active use of this component. Once this method
+has been called, no public methods of the component should be
+utilized.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Wombat::LifecycleException</STRONG></STRONG><BR>
+<DD>
+if the component is not started
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><EM>mod_perl</EM>,
+<EM>Apache</EM>,
+<A HREF="../../../api/Apache/Request.html">the Apache::Request manpage</A>,
+<A HREF="../../../api/Wombat/Container.html">the Wombat::Container manpage</A>,
+<A HREF="../../../api/Apache/Wombat/Request.html">the Apache::Wombat::Request manpage</A>,
+<A HREF="../../../api/Apache/Wombat/Response.html">the Apache::Wombat::Response manpage</A>,
+<A HREF="../../../api/Wombat/Exception.html">the Wombat::Exception manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

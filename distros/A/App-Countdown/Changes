@@ -1,0 +1,49 @@
+Revision history for App-Countdown
+
+0.4.3   2014-01-17
+        - Hopefully fix the link to the repository resource at bitbucket.
+            - It is in all lower-case.
+
+0.4.2   2014-01-17
+        - Fix a typo in the NAME and made it all on one line:
+            - https://rt.cpan.org/Public/Bug/Display.html?id=92213
+            - Thanks to Neil_Bowers
+        - Made the minimum version of perl 5.10 in the Build.PL too.
+
+0.4.1   2014-01-16
+        - Add t/cpan-changes.t and adapted Changes to the CPAN::Changes
+        convention.
+
+0.4.0   2014-01-16
+        - Implement the new syntax of "1m30s" or "1h30m50s" for delays.
+        - Add examples to the bin/countdown man-page POD.
+        - Add t/style-trailing-space.t .
+
+0.3.1   2013-09-03
+        - Add a minimal dependency on Getopt::Long 2.36 for
+        GetOptionsFromArray().
+
+0.3.0   2013-08-31
+        - Implement support for the "s" delay.
+            - it kept tripping me up, so I added it.
+
+0.2.0   2012-11-15
+        - Add --version, --help, and --man flags.
+            - Thanks to Steven Haryanto from
+            http://blogs.perl.org/users/shlomi_fish/2012/11/three-command-line-utilities.html#comments
+        - Add t/unit-calc-delay.t
+        - Implement support for m and h delays (plus fractional numbers).
+            - Also thanks to Steven.
+
+0.0.4   2012-11-13
+        - URL to the repo changed to fix a typo. Updated Build.PL.
+
+0.0.3   2012-11-13
+        - Correct the phrasing in the POD of bin/countdown.
+            - Thanks to Omer Zak for pointing it out.
+
+0.0.2   2012-11-13
+        - Fix a bug to accept single digit numbers for delays.
+
+0.0.1   2012-11-13
+        - First version, released on an unsuspecting world.

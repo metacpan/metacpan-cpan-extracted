@@ -1,0 +1,9 @@
+Revision history for App-whatthecommit
+
+0.02  2014-07-03 11:35:05 CEST
+
+        - cpanfile fixes
+        - updated POD
+
+0.01  2014-06-17 15:29:49 CEST
+        - Initial release

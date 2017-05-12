@@ -1,0 +1,34 @@
+#
+# = Class: [% name %]::service
+#
+# Class to setup the [% name %] service.
+#
+# == Parameters
+# <tt>ensure</tt>:: Ensure that the service is either <code>present</code> or
+#                   <code>absent</code>. If <code>present</code>, the service
+#                   will be started if not running and enabled on boot, if
+#                   <code>absent</code>, it will be stopped and disabled at boot.
+# <tt>service</tt>:: Name of the service.
+#
+class [% name %]::service (
+    $ensure  = hiera('[% name %]::service::ensure', 'present'),
+    $service = hiera('[% name %]::service::service', $[% name %]::params::service),
+) {
+    $service_ensure = $ensure ? {
+        'present' => 'running',
+        'absent'  => 'stopped',
+    }
+    $service_enable = $ensure ? {
+        'present' => true,
+        'absent'  => false,
+    }
+    if $service {
+        service {
+            $service:
+                ensure     => $service_ensure,
+                enable     => $service_enable,
+                hasrestart => true,
+            ;
+        }
+    }
+}

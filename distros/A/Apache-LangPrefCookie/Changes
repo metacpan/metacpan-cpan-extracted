@@ -1,0 +1,42 @@
+-*-text-*-
+
+Revision history for Perl extension Apache::LangPrefCookie.
+
+0.01  Wed Dec 14 12:52:34 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n Apache::LangPrefCookie
+
+0.02 - LangPrefCookieName directive to alter the default cookie-name
+     - comments
+     - write debug-message into error log 
+
+0.03 - use "our" to declare $VERSION
+     - avoid parsing an empty Accept-Language Header
+     - made debug-message clearer
+     - fixed language-code regexp
+     - better variablenames
+     - more comments
+     - POD updates 
+
+0.04 - "real" documentation
+     - fixed Makefile.PL's PREREQ_PM
+     - add pod.t
+
+0.05 - documentation fixes
+     - correctly handle '*'
+     - strip trailing ', ' from the list of language-ranges
+     - better debug message
+
+1.00 - fix typo in regexp
+     - cleanup Makefile.PL, Perl >= 5.6.0 required.
+     - Fix README, docs clarifications
+     - more tests
+
+1.01 - set Vary header if needed
+     - updated references to Apache2 in the pod
+
+1.02 - set Vary header whenever handler is run
+
+1.03 - avoid $`
+     - avoid warnings about uninitialised strings
+     - fix PREREQ_PM

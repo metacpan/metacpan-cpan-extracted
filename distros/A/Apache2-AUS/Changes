@@ -1,0 +1,11 @@
+Revision history for Perl extension Apache2::AUS.
+
+0.02  Wed Mar 15 15:55:55 2006
+        - Depend on Schema::RDBMS::AUS version 0.03 so we're assured of
+          using a YAML serializer by default.
+        - Refactor unit tests to install/remove the schema when the
+          apache server starts/stops, instead of within each unit test.
+
+0.01  Wed Jan 18 19:53:25 2006
+	- original version; created by h2xs 1.23 with options
+		-AXP -b 5.6.0 Apache2::AUS

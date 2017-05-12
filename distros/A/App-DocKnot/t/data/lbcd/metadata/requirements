@@ -1,0 +1,9 @@
+lbcd is written in C, so you'll need a C compiler.  It also uses kernel
+calls to obtain load and uptime information, and at present has only been
+ported to Linux, Solaris, AIX, various BSD systems, Mac OS X, HP-UX, IRIX,
+and Tru64.  It is currently primarily tested on Linux.  Platforms not
+listed may require some porting effort, as may old or unusual platforms
+that aren't regularly tested.
+
+The lbcdclient program requires Perl 5.6 or later and requires the
+IO::Socket::INET6 module for IPv6 support.

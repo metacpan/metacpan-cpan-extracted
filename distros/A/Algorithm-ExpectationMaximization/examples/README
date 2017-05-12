@@ -1,0 +1,110 @@
+
+                     The "examples" directory
+                     ========================
+
+
+This directory contains the following five canned scripts to help you
+become familiar with this module.  You are urged to execute the scripts as
+they are --- without modifying anything in the directory --- in order to
+get the results that are shown in the PNG image files.  Here we go:
+
+
+1)  canned_example1.pl           
+
+          This example illustrates 2D clustering of co-located but
+          overloapping clusters with different covariances.
+
+          Unless your run gets trapped in a local maximum, your results
+          should look like those shown in the following image files:
+
+             save_example_1_cluster_plot.png          (for hard clustering)
+
+             save_example_1_posterior_prob_plot.png   (for soft clustering)
+
+          If you are using a Linux machine, you can display these image
+          files with the 'display' utility.
+
+
+
+2)  canned_example2.pl           
+
+          This example illustrates 2D clustering involving non-overlapping
+          clusters.
+
+          Unless your run gets trapped in a local maximum, your results
+          should look like those shown in the following image files:
+
+             save_example_2_cluster_plot.png          (for hard clustering)
+
+             save_example_2_posterior_prob_plot.png   (for soft clustering)
+
+
+
+3)  canned_example3.pl           
+
+          This example illustrates 2D clustering involving overlapping
+          clusters whose means are at different locations.
+
+          Unless your run gets trapped in a local maximum, your results
+          should look like those shown in the following image files:
+
+             save_example_3_cluster_plot.png          (for hard clustering)
+
+             save_example_3_posterior_prob_plot.png   (for soft clustering)
+
+
+
+4)  canned_example4.pl           
+
+          This example illustrates 3D clustering involving non-overlapping
+          clusters.
+
+          Unless your run gets trapped in a local maximum, your results
+          should look like those shown in the following image files:
+
+             save_example_4_cluster_plot.png          (for hard clustering)
+
+             save_example_4_posterior_prob_plot.png   (for soft clustering)
+
+
+
+5)  canned_example5.pl           
+
+          This example illustrates 3D clustering involving overlapping
+          clusters.
+
+          Unless your run gets trapped in a local maximum, your results
+          should look like those shown in the following image files:
+
+             save_example_5_cluster_plot.png          (for hard clustering)
+
+             save_example_5_posterior_prob_plot.png   (for soft clustering)
+
+
+6)  canned_example6.pl
+
+          This example was added in Version 1.2 to illustrate clustering
+          of 1-D data.
+
+          Unless your run gets trapped in a local maximum, your results
+          should look like those shown in the following image files:
+
+             save_example_6_cluster_plot.png          (for hard clustering)
+
+             save_example_6_posterior_prob_plot.png   (for soft clustering)
+
+
+
+========================================================================
+
+Support scripts in the `examples' directory:
+
+
+1)  For generating the data for experiments with clustering
+
+       data_generator.pl
+
+
+2)  For cleaning up the `examples' directory
+
+       cleanup_directory.pl

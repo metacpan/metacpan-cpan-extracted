@@ -1,0 +1,2 @@
+Currently, the test suite only checks the portability and utility
+libraries, not the functionality of lbcd or lbcdclient.

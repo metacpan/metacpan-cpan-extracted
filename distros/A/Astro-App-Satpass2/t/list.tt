@@ -1,0 +1,4 @@
+[%- title.name( align_left = 0 ) %] [% title.oid %]
+[% FOR item IN data %]
+    [%- item.name( align_left = 0 ) %] [% item.oid %]
+[% END -%]

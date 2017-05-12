@@ -1,0 +1,29 @@
+---
+config:
+  certificate: cacert.pem
+  machine: groups.pm.org
+  url: https://groups.pm.org/groups/GROUPNAME/
+  username: USERNAME
+location:
+  default:
+    address:
+    name:
+    url:
+presenter:
+  default:
+    cpan: cpan username
+    description:
+    github: github username
+    name:
+    url:
+meetings:
+  - event_date: 2012/06/14
+    location: default
+    open_call: 1
+    presentations:
+      - abstract: 'our first talk will be about #winning'
+        presenter: default
+        title: first
+      - abstract: our first talk will be about App::PM::Website
+        presenter: default
+        title: second talk

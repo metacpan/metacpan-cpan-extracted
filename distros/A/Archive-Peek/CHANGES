@@ -1,0 +1,14 @@
+Revision history for Perl module Archive::Peek:
+
+0.35 Mon Sep 26 20:21:30 BST 2011
+     - add support for .tar.bz2 (as suggested by Fabrizio Regalli)
+
+0.34 10 Sep 2008 17:38:14 GMT
+     - put human-readable license in the documentation
+     - add an abstract to the Makefile.PL
+
+0.33 Thu Aug 28 15:30:42 BST 2008
+     - remove MooseX::LogDispatch, it was causing problems
+
+0.32 Thu Aug 28 09:01:31 BST 2008
+     - initial release

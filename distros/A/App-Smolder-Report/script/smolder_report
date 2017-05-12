@@ -1,0 +1,110 @@
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+use strict;
+use App::Smolder::Report;
+
+my $app = App::Smolder::Report->new;
+$app->process_args();
+exit( $app->run(@ARGV) ? 0 : 1 );
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+smolder_report - Report test runs to a Smolder server
+
+=head1 VERSION
+
+Version 0.04
+
+=cut
+
+=head1 SYNOPSIS
+
+    # Run your tests and generate a report
+    $ prove -l -a smoke.tgz
+    
+    # Submit report to smoke server
+    $ smolder_report --server=smolder.example.com --project-id=1 \
+                   --username=minime --password=secret smoke.tgz
+    
+    # Lazy people like me use config files
+    # My defaults at $HOME
+    $ cat ~/.smolder.conf
+    server = "smolder.simplicidade.org"
+    username = "melo"
+    password = "secret"
+    delete = 1
+    
+    # Per project .smolder.conf
+    $ cat .smolder.conf
+    project_id = 29
+    
+    # This setup allows me to:
+    $ probe -l -a smoke.tgz
+    $ smolder_report smoke.tgz
+    
+
+=head1 DESCRIPTION
+
+TBD
+
+=head1 AUTHOR
+
+Pedro Melo, C<< <melo at cpan.org> >>
+
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-app-smolder-report at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Smolder-Report>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc App::Smolder::Report
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Smolder-Report>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/App-Smolder-Report>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/App-Smolder-Report>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/App-Smolder-Report>
+
+=back
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2008 Pedro Melo.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+=cut
+
+1; # End of App::Smolder::Report
+

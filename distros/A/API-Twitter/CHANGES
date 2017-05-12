@@ -1,0 +1,25 @@
+Changelog for API-Twitter
+
+0.05 2015-10-11T08:09:46
+ - Updated build.
+ - Modified the implementation style and dependencies.
+
+0.04 2015-09-28T13:18:04
+ - v0.04
+ - Updated build.
+ - Updated inconsistency in documentation.
+ - Updated dist.ini to generate META files.
+
+0.03 2015-09-28T04:06:26
+ - v0.03
+ - Updated build.
+ - Refactored to derive from API::Client.
+
+0.02 2015-07-13T16:54:40
+ - v0.02
+ - Allow access to unprotected oauth resources.
+ - Fixed typos.
+
+0.01 2015-07-12T05:02:04
+ - v0.01
+ - Initial commit.

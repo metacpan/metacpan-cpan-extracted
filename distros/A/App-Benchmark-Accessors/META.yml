@@ -1,0 +1,53 @@
+---
+abstract: 'Benchmark accessor generators'
+author:
+  - 'The following person is the author of all the files provided in'
+build_requires:
+  App::Benchmark: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Benchmark-Accessors
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Class::Accessor: '0'
+  Class::Accessor::Classy: '0'
+  Class::Accessor::Complex: '0'
+  Class::Accessor::Constructor: '0'
+  Class::Accessor::Fast: '0'
+  Class::Accessor::Fast::XS: '0'
+  Class::Accessor::Lite: '0'
+  Class::MethodMaker: '0'
+  Class::Spiffy: '0'
+  Class::XSAccessor: '0'
+  Class::XSAccessor::Array: '0'
+  Class::XSAccessor::Compat: '0'
+  Mojo::Base: '0'
+  Moose: '0'
+  Mouse: '0'
+  Object::Tiny: '0'
+  Rose::Object: '0'
+  Rose::Object::MakeMethods::Generic: '0'
+  Rubyish::Attribute: '0'
+  Spiffy: '0'
+  accessors: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/marcelgruenauer/App-Benchmark-Accessors/issues
+  homepage: https://github.com/marcelgruenauer/App-Benchmark-Accessors
+  repository: https://github.com/marcelgruenauer/App-Benchmark-Accessors.git
+version: '2.00'
+x_contributors:
+  - 'Marcel Gruenauer <hanekomu@gmail.com>'

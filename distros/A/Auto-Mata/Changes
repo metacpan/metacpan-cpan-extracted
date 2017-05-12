@@ -1,0 +1,35 @@
+0.08 2017-03-20
+- Fixed bug in placement of =back in POD for Auto::Mata
+- Clearer error messages on invalid transitions
+- Specified min version of Type::Tiny (latest)
+
+0.07 2017-03-08
+- API change: instance builder now accepts an input to specify whether to
+  return an interactive method (non-interactive by default)
+- Duplicate transitions with different matching constraints are now permitted
+- New alias 'using' for 'with' to avoid clashing with other 'with' Exporters
+- Fixed bug preventing scalar values from being used as state accumulators
+- Added examples/fib.pl
+
+0.06 2017-03-06
+- No longer creates empty pass-through function when no 'with' is supplied
+
+0.05 2017-03-03
+- Fixed uncheck dereference
+- Greatly improved validation of post-transition state
+
+0.04 2017-03-03
+- Forgot to export term :/
+
+0.03 2017-03-03
+- Debugging no longer emits a serialized version of the state, which was
+  incredibly annoying for debugging with complex state data
+- Made a few minor changes to support the poor folks still using perl 5.8
+- Added alias term for terminal
+
+0.02 2017-03-02
+- Fixed: final state not correctly validated if next state may be terminal
+- More thorough unit tests
+
+0.01 2017-03-01
+- Initial release

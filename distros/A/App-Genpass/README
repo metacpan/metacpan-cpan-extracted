@@ -1,0 +1,251 @@
+SYNOPSIS
+
+        use App::Genpass;
+    
+        my $genpass = App::Genpass->new();
+        print $genpass->generate, "\n";
+    
+        $genpass = App::Genpass->new( readable => 0, length => 20 );
+        print "$_\n" for $genpass->generate(10);
+
+DESCRIPTION
+
+    If you've ever needed to create 10 (or even 10,000) passwords on the
+    fly with varying preferences (lowercase, uppercase, no confusing
+    characters, special characters, minimum length, etc.), you know it can
+    become a pretty pesky task.
+
+    This module makes it possible to create flexible and secure passwords,
+    quickly and easily.
+
+        use App::Genpass;
+        my $genpass = App::Genpass->new();
+    
+        my $single_password    = $genpass->generate(1);  # returns scalar
+        my @single_password    = $genpass->generate(1);  # returns array
+        my @multiple_passwords = $genpass->generate(10); # returns array again
+        my $multiple_passwords = $genpass->generate(10); # returns arrayref
+
+    This distribution includes a program called genpass, which is a command
+    line interface to this module. If you need a program that generates
+    passwords, use genpass.
+
+SUBROUTINES/METHODS
+
+ new
+
+    Creates a new instance. It gets a lot of options.
+
+ new_with_options
+
+    Creates a new instance while reading the command line parameters.
+
+ parse_opts
+
+    Parses the command line options.
+
+ configfile
+
+    An attribute defining the configuration file that will be used. If one
+    is not provided, it tries to find one on its own. It checks for a
+    .genpass.yaml in your home directory (using File::HomeDir), and then
+    for /etc/genpass.yaml.
+
+    If one is available, that's what it uses. Otherwise nothing.
+
+    You must use the new_with_options method described above for this.
+
+  flags
+
+    These are boolean flags which change the way App::Genpass works.
+
+    number
+
+      You can decide how many passwords to create. The default is 1.
+
+      This can be overridden per generate so you can have a default of 30
+      but in a specific case only generate 2, if that's what you want.
+
+    readable
+
+      Use only readable characters, excluding confusing characters: "o",
+      "O", "0", "l", "1", "I", and special characters such as '#', '!', '%'
+      and other symbols.
+
+      You can overwrite what characters are considered unreadable under
+      "character attributes" below.
+
+      Default: on.
+
+    verify
+
+      Verify that every type of character wanted (lowercase, uppercase,
+      numerical, specials, etc.) are present in the password. This makes it
+      just a tad slower, but it guarantees the result. Best keep it on.
+
+      To emphasize how "slower" it is: if you create 500 passwords of 500
+      character length, using verify off, will make it faster by 0.1
+      seconds.
+
+      Default: on.
+
+  attributes
+
+    minlength
+
+      The minimum length of password to generate.
+
+      Default: 8.
+
+    maxlength
+
+      The maximum length of password to generate.
+
+      Default: 10.
+
+    length
+
+      Use this if you want to explicitly specify the length of password to
+      generate.
+
+  character attributes
+
+    These are the attributes that control the types of characters. One can
+    change which lowercase characters will be used or whether they will be
+    used at all, for example.
+
+        # only a,b,c,d,e,g will be consdered lowercase and no uppercase at all
+        my $gp = App::Genpass->new( lowercase => [ 'a' .. 'g' ], uppercase => [] );
+
+    lowercase
+
+      All lowercase characters, excluding those that are considered
+      unreadable if the readable flag (described above) is turned on.
+
+      Default: [ 'a' .. 'z' ] (not including excluded chars).
+
+    uppercase
+
+      All uppercase characters, excluding those that are considered
+      unreadable if the readable flag (described above) is turned on.
+
+      Default: [ 'A' .. 'Z' ] (not including excluded chars).
+
+    numerical
+
+      All numerical characters, excluding those that are considered
+      unreadable if the readable flag (described above) is turned on.
+
+      Default: [ '0' .. '9' ] (not including excluded chars).
+
+    unreadable
+
+      All characters which are considered (by me) unreadable. You can
+      change this to what you consider unreadable characters. For example:
+
+          my $gp = App::Genpass->new( unreadable => [ qw(jlvV) ] );
+
+      After all the characters are set, unreadable characters will be
+      removed from all sets.
+
+      Thus, unreadable characters override all other sets. You can make
+      unreadable characters not count by using the readable => 0 option,
+      described by the readable flag above.
+
+    specials
+
+      All special characters.
+
+      Default: [ '!', '@', '#', '$', '%', '^', '&', '*', '(', ')' ].
+
+      (not including excluded chars)
+
+ generate
+
+    This method generates the password or passwords.
+
+    It accepts an optional parameter indicating how many passwords to
+    generate.
+
+        $gp = App::Genpass->new();
+        my @passwords = $gp->generate(300); # 300 passwords to go
+
+    If you do not provide a parameter, it will use the default number of
+    passwords to generate, defined by the attribute number explained above.
+
+    This method tries to be tricky and DWIM (or rather, DWYM). That is, if
+    you request it to generate only one password and use scalar context (my
+    $p = $gp->generate(1)), it will return a single password.
+
+    However, if you try to generate multiple passwords and use scalar
+    context (my $p = $gp->generate(30)), it will return an array reference
+    for the passwords.
+
+    Generating passwords with list context (my @p = $gp->generate(...))
+    will always return a list of the passwords, even if it's a single
+    password.
+
+ get_config_from_file
+
+    Reads the configuration file using Config::Any.
+
+    Shamelessly lifted from MooseX::SimpleConfig.
+
+AUTHOR
+
+    Sawyer X, <xsawyerx at cpan.org>
+
+DEPENDENCIES
+
+    Carp
+
+    Moo
+
+    MooX::Types::MooseLike
+
+    Getopt::Long
+
+    File::Spec
+
+    Config::Any
+
+    File::HomeDir
+
+    List::AllUtils
+
+BUGS AND LIMITATIONS
+
+    Please report any bugs or feature requests to bug-app-genpass at
+    rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Genpass. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc App::Genpass
+
+    You can also look for information at:
+
+      * Github: App::Genpass repository
+
+      http://github.com/xsawyerx/app-genpass
+
+      * RT: CPAN's request tracker
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Genpass
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/App-Genpass
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/App-Genpass
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/App-Genpass/
+

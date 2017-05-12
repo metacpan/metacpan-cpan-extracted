@@ -1,0 +1,33 @@
+clear
+power on
+regs
+
+memset 0072 55
+
+op c6 72
+
+# memory[$0072] should show 54
+test m:0072 = 54
+
+# Wrap and Negative case -------------
+power on
+memset 0072 00
+
+op c6 72
+
+# Should be: memory[$0072]=FF, S=1
+test m:0072 = ff
+test s = 1
+
+# Zero case -------------------
+power on
+
+memset 0072 01
+
+op c6 72
+
+# Should be: memory[$0072]=00, Z=1
+test m:0072 = 00
+test z = 1
+
+save verify_C6.txt

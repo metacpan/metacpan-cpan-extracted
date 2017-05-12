@@ -1,0 +1,29 @@
+ * More thorough tests of the delta generation.  I've only tried it on
+   a few things, so it's probably full of bugs.
+
+ * It won't work with files bigger than 2Gb, becuase:
+    * COPY operations for more than 2Gb need to be split up into multiple
+      commands.
+    * The COPY opcode 255 (which has a 64 bit offset value) isn't
+      implemented yet in either delta generation or application.
+
+ * There are a few places where the algorithm doesn't choose the optimal
+   delta but where it wouldn't be too hard to help it along.  The ones
+   I've spotted would only save a tiny amount of space though.
+
+ * Document the algorithm, because that will help me know how to improve it.
+
+ * Do something about file buffering.  It could probably make delta
+   generation massively faster if we keep buffers around longer.
+
+ * Add support for passing references to scalars in instead of file
+   handles.  That should be much more efficient than using IO::Scalar.
+   Then remove the note suggesting this from the POD.
+
+ * It probably leaks memory everywhere.  Fix it up and valgrind it.
+
+ * Proper testing of some of the inner bits in test.c
+
+ * require IO::Scalar? or just recommend?
+
+ * Make sure that 2.gdiff is generated during release process automatically.

@@ -1,0 +1,6 @@
+---
+files:
+  Switch.pm: lib/Switch.pm
+dirs-recursive:
+  t/: lib/Switch/t/
+

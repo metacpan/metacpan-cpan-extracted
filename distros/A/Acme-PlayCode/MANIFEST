@@ -1,0 +1,22 @@
+Build.PL
+Changes
+lib/Acme/PlayCode.pm
+lib/Acme/PlayCode/Plugin/Averything.pm
+lib/Acme/PlayCode/Plugin/DoubleToSingle.pm
+lib/Acme/PlayCode/Plugin/ExchangeCondition.pm
+lib/Acme/PlayCode/Plugin/NumberPlus.pm
+lib/Acme/PlayCode/Plugin/PrintComma.pm
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/011-doubleTosingle.t
+t/012-exchangeCondition.t
+t/013-printComma.t
+t/014-numberPlus.t
+t/099-Averything.t
+t/101-heredoc.t
+t/201-exchange_space_bug.t
+t/202-number_plus_bug.t
+t/pod.t
+Makefile.PL

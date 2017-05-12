@@ -1,0 +1,7 @@
+lib/Acme/Scurvy/Whoreson/BilgeRat.pm
+lib/Acme/Scurvy/Whoreson/BilgeRat/Backend/pirate.pm
+test.pl
+Makefile.PL
+MANIFEST
+README
+CHANGES

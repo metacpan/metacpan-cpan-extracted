@@ -1,0 +1,47 @@
+{
+   "abstract" : "ARSperl is an integration kit for Perl5 and the Remedy Action Request System.",
+   "author" : [
+      "ARSPerl Dev Group <arsperl-devel@arsperl.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ARSperl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jeffmurphy/ARSperl/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/jeffmurphy/ARSperl"
+      }
+   },
+   "version" : "1.93"
+}

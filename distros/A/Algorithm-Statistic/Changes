@@ -1,0 +1,9 @@
+0.04
+- added manifest and MYMETA.yaml 
+
+0.03
+- redundant copying from AV* to std::vector removed.
+- compare sub argument moved to the end of args list and has default implementation for numeric SV*.
+- g++ in Makefile movede to c++ for generalization.
+- warns changed on croaks
+- O2 optimizations enabled for c++.

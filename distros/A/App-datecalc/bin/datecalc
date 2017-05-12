@@ -1,0 +1,242 @@
+#!perl
+
+our $DATE = '2016-08-15'; # DATE
+our $VERSION = '0.07'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+#use Log::Any '$log';
+
+sub get_options {
+    require Getopt::Long;
+
+    my %opts;
+    Getopt::Long::GetOptions(
+        '--help|h|?', \$opts{help},
+        '--version|v', \$opts{version},
+
+    );
+
+    if ($opts{help}) {
+        print <<_;
+Usage:
+  datecalc [OPTIONS]
+
+Options:
+  --help, -h, -?
+  --version, -v
+_
+        exit 0;
+    } elsif ($opts{version}) {
+        say "datecalc version $::VERSION";
+        exit 0;
+    }
+}
+
+sub eval_loop {
+    require App::datecalc;
+    require File::HomeDir;
+    require IO::Stty;
+    require Term::ReadLine;
+
+    my $calc = App::datecalc->new;
+    my $term = Term::ReadLine->new('datecalc');
+    my $prompt = "> ";
+    my $OUT = $term->OUT || \*STDOUT;
+
+    my $histfile = File::HomeDir->my_home . "/.datecalc_history";
+
+    # load history from file
+    if ($term->Features->{setHistory} && (-r $histfile)) {
+        #$log->tracef("Loading history from %s ...", $histfile);
+        open(my $fh, '<', $histfile)
+            or die "Can't open history file $histfile: $!\n";
+        chomp(my @history = <$fh>);
+        $term->SetHistory(@history);
+    }
+
+    my $sub_save_hist = sub {
+        require SHARYANTO::List::Util;
+        if ($term->Features->{getHistory}) {
+            my $fh;
+            if (open $fh, ">", $histfile) {
+                print $fh "$_\n" for
+                    SHARYANTO::List::Util::uniq_adj(
+                        grep { length } $term->GetHistory
+                    );
+            }
+        }
+    };
+
+    local $SIG{INT} = sub {
+        # save history when we are interrupted
+        $sub_save_hist->();
+        print STDERR "Interrupted\n";
+        if ($term->ReadLine eq 'Term::ReadLine::Gnu') {
+            IO::Stty::stty(\*STDIN, 'echo');
+        }
+        exit 1;
+    };
+
+    #local $SIG{__DIE__} = sub {
+    #    IO::Stty::stty(\*STDIN, 'echo');
+    #    die @_;
+    #};
+
+    # some workaround for Term::ReadLine
+    my $attribs = $term->Attribs;
+    if ($term->ReadLine eq 'Term::ReadLine::Gnu') {
+        # TR::Gnu traps our INT handler
+        # ref: http://www.perlmonks.org/?node_id=1003497
+        $attribs->{catch_signals} = 0;
+    } elsif ($term->ReadLine eq 'Term::ReadLine::Perl') {
+        # TR::Perl messes up colors
+        # doesn't do anything?
+        #$term->ornaments(0);
+        #$attribs->{term_set} = ["", "", "", ""];
+    }
+
+    while ( defined ($_ = $term->readline($prompt)) ) {
+        my $res;
+        if ($_ eq 'help' || $_ eq '?') {
+            say "Type date expression into the prompt, e.g.: 2014-06-26 + 2 week.";
+            say "For more details on available features, 'man datecalc'.";
+            say "";
+            next;
+        } elsif ($_ eq 'exit' || $_ eq 'quit') {
+            last;
+        }
+        eval { $res = $calc->eval($_) };
+        if ($@) {
+            warn "Error: $@\n";
+        } else {
+            print $OUT $res, "\n";
+        }
+        # double?
+        #$term->addhistory($_) if /\S/;
+    }
+
+    $sub_save_hist->();
+}
+
+### main
+
+get_options();
+eval_loop();
+
+# ABSTRACT: Date calculator
+# PODNAME: datecalc
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+datecalc - Date calculator
+
+=head1 VERSION
+
+This document describes version 0.07 of datecalc (from Perl distribution App-datecalc), released on 2016-08-15.
+
+=head1 SYNOPSIS
+
+ % datecalc
+
+ > today
+ 2014-05-13#Tue
+
+ > tomorrow
+ 2014-05-14#Wed
+
+ > today + 2 days
+ 2014-05-15#Thu
+
+ > 2014-05-13 - 2014-02-14
+ P2M3W6D
+
+ > 2 months 3 weeks 6 days
+ P2M3W6D
+
+ > P10D
+ P1W3D
+
+ > 2014-05-13 + P2D
+ 2014-05-15#Thu
+
+ > 2 * 2 days 10 hours
+ P4DT20H
+
+ > P10D / 2
+ P5D
+
+ > 6d + 8d + 13 min
+ P2WT13M
+
+ > month(today)
+ 5
+
+ > days(P8D)
+ 1
+ > weeks(P8D)
+ 1
+ > P8D
+ P1W1D
+
+=head1 DESCRIPTION
+
+This is a command-line utility to perform date calculations.
+
+For now, for more details, see L<App::datecalc>.
+
+=head1 FAQ
+
+=head2 Why is date addition/subtraction with fractional duration incorrect?
+
+For example:
+
+ > 2001-01-01 + P1.5M
+ 2001-02-01#Thu
+
+One would expect something closer to C<2001-02-16>. But this is how
+L<DateTime::Duration> works. Instead of using fractions in larger units, try
+using smaller units instead. For example:
+
+ > 2001-01-01 + P1M2W
+ 2001-02-15#Thu
+
+=head1 FILES
+
+=head2 ~/.datecalc_history
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-datecalc>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-App-datecalc>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-datecalc>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

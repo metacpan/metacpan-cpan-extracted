@@ -1,0 +1,61 @@
+Revision history for Alien-bison
+
+0.19      2017-03-20 02:27:47 -0400
+  - Remove custon bin_dir no longer necessary
+
+0.18      2017-03-06 00:04:23 -0500
+  - Migrate to Alien::Build + alienfile
+
+0.17      2017-01-18 15:14:26 -0500
+  - Add a %{bison} helper
+
+0.16      2016-02-05 22:52:51 -0500
+  - Prune experimental t/run.t test
+
+0.15      2016-01-29 10:06:11 -0500
+  - Fixed metadata bug where bin_requires were included
+    as configure_requires
+
+0.14      2016-01-28 13:11:36 -0500
+  - Update version of bison to use install from source to 3.0.4
+
+0.12      2016-01-28 12:41:41 -0500
+  - Use Alien::Base::ModuleBuild as configure_requires
+    (instead of Alien::Base)
+
+0.11      2015-04-22 11:38:17 -0400
+  - Require Alien::Base 0.016 (required from alien_stage_install)
+
+0.10      2015-04-22 10:55:21 -0400
+  - use alien_stage_install
+
+0.09      2015-02-18 17:21:21 -0500
+  - Require Alien::Base 0.010
+
+0.08      2015-02-18 17:18:58 -0500
+  - Require Alien::m4 for source builds
+    This in turn requires a version of m4 that AutoConf should
+    find acceptable
+
+0.07      2014-11-19 16:37:23 -0500
+  - fix prereq bug related to Alien::m4 and Alien::patch
+
+0.06      2014-11-19 15:10:02 -0500
+  - registry detection fix for older perls (thanks @vikasnkumar++ GH Alien::Base #93)
+
+0.05      2014-11-19 14:44:52 -0500
+  - first release to CPAN
+  - fix build failure when finding existing bison install
+
+0.04      2014-11-19 13:32:19 -0500
+  - build correctly from source on windows
+
+0.03      2014-11-19 08:54:19 -0500
+  - handle paths with space on MSWin32
+
+0.02      2014-11-19 08:39:17 -0500
+  - add optional registry detection on MSWin32
+  - add optional default path detection on MSWin32
+
+0.01      2014-11-18 13:49:21 -0500
+  - initial version

@@ -1,0 +1,400 @@
+==================================================
+Changes from 2016-02-22 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.008 at 2017-02-21 10:13:32 +0000
+------------------------------------------
+
+  Change: ccc9b9348eddd8c8e7d372c1dfde1525cfbba799
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-02-21 10:00:12 +0000
+
+    Small doc fixes 
+
+  Change: f311936b7492c5b84fdd42d69274997a29568809
+  Author: Jerome Eteve <jeteve@users.noreply.github.com>
+  Date : 2017-02-21 09:48:44 +0000
+
+    Merge pull request #2 from
+    stuartskelton/abstract_away_where_jesp_is_saved
+
+    Abstract away where JESP is stored, as people dont care where it is. 
+
+  Change: 1653d6e9f8a122865dd2d87e24eeae2ddd52cacd
+  Author: Jerome Eteve <jeteve@users.noreply.github.com>
+  Date : 2017-02-21 09:47:23 +0000
+
+    Merge pull request #1 from stuartskelton/update_readme
+
+    Fixed a couple of issues with the readme. 
+
+  Change: d98e714e48cf20192172f8810f0887d06ddbb77b
+  Author: Stuart Skelton <stuarts@broadbean.com>
+  Date : 2017-02-20 22:10:19 +0000
+
+    Abstract away where JESP is stored, as people dont care where it is.
+
+    only that they can get to it. 
+
+  Change: a512a56ded217cae3b8bd393de4a238ec6c75bdb
+  Author: Stuart Skelton <stuarts@broadbean.com>
+  Date : 2017-02-20 22:08:50 +0000
+
+    Fixed a couple of issues with the readme. 
+
+------------------------------------------
+version 0.007 at 2016-09-16 16:23:19 +0000
+------------------------------------------
+
+  Change: 67e293e6ac6fc9d12c1df2587fa24bc765fcf1fb
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-09-16 17:23:19 +0000
+
+    More tests resilience 
+
+  Change: d795f19d9af6ac853bb45bbf0537099945cae9e6
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-09-16 17:19:13 +0000
+
+    Small doc fix 
+
+------------------------------------------
+version 0.006 at 2016-09-01 14:06:49 +0000
+------------------------------------------
+
+  Change: 9af302af77cc55d434ed4d20bdaed2671c6832ca
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-09-01 15:06:49 +0000
+
+    Compatible with perl 5.8 
+
+  Change: 8e45220e37d1e8d5f686952f0d7913ee2f13ba79
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-31 18:28:58 +0000
+
+    More protection against Pg faults 
+
+------------------------------------------
+version 0.005 at 2016-08-28 12:50:18 +0000
+------------------------------------------
+
+  Change: b97a50731245c8947e3e11c2437aa41ceee085b0
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-28 13:50:18 +0000
+
+    Test::PostgreSQL can also fail 
+
+------------------------------------------
+version 0.004 at 2016-08-27 19:52:23 +0000
+------------------------------------------
+
+  Change: f1dd36a70f01f27123a78b9e783b15f43cbdfe79
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-27 20:52:23 +0000
+
+    Protect one more test 
+
+------------------------------------------
+version 0.003 at 2016-08-26 20:08:08 +0000
+------------------------------------------
+
+  Change: 33443e2fd887c13dff5e8301014b3e18f9bbb8aa
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-26 21:08:08 +0000
+
+    Better tests protection 
+
+------------------------------------------
+version 0.002 at 2016-08-23 09:37:38 +0000
+------------------------------------------
+
+  Change: 73694dbfb46cbc37b13163ad2135119d8da62949
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-23 10:37:38 +0000
+
+    Missing dep 
+
+------------------------------------------
+version 0.001 at 2016-08-22 13:44:26 +0000
+------------------------------------------
+
+  Change: 4142416af0cd012017e12c6f71405c09d69a0684
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-22 14:44:26 +0000
+
+    Fixed doc 
+
+  Change: ddb54b45d777414366767cf0c35ee35b6533a67e
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-22 14:40:53 +0000
+
+    Expose force, logonly and patches in the CLI 
+
+  Change: bffc2bc388617a4373a8edaa1669d227bf7c5d90
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-22 09:39:29 +0000
+
+    Fixed test 
+
+  Change: 6abdd56d2296a7821a7de4b21ca620b34c51e886
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-21 18:50:23 +0000
+
+    Added options force, patches, logonly 
+
+  Change: e361999f7fdf722ef9340eca42d755a870435078
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-21 17:49:54 +0000
+
+    Bit nicer doc 
+
+  Change: a963e7f777a26df9cfd9c3f41aa2ad55bd80c5ad
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-21 17:28:23 +0000
+
+    Added deploy command 
+
+  Change: 5e155fea154ca914bd39e3396b029561d5355c76
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-21 17:22:17 +0000
+
+    Count on DZIL to inject version 
+
+  Change: 28b59946a5772d681f15e4095218a41de487be69
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-21 17:18:05 +0000
+
+    Install command 
+
+  Change: 187b23db3b4c71ec4bbedf6a87f894a6e3773c3a
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-21 11:48:33 +0000
+
+    Allow absolute filenames in plan.json 
+
+  Change: 9a2c0512e70cf1b0e4ded6bdebd7a6eec9f7fdc1
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-21 11:21:44 +0000
+
+    Test suite works without any specific DB driver 
+
+  Change: 69852b78df2481024a1a10c87f1c5cc76a7634b1
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-25 13:02:22 +0000
+
+    Quiet test 
+
+  Change: 15fd9b6e66cf58e86c00ee384892bfe1bfd23491
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-25 13:01:57 +0000
+
+    Pick an empty port 
+
+  Change: a2a301adc10456045e2290cc23191f29dd99067b
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-25 12:35:53 +0000
+
+    Extended Pg test 
+
+  Change: 3a97744746e3441e5cb9e7daa1cc3111eeb05070
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 20:26:08 +0000
+
+    Tested mysql with password 
+
+  Change: 3def6f4e85a9a6f9b1675d855efeddf1257a1048
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 20:01:36 +0000
+
+    Better doc and tweaks 
+
+  Change: 2aab2e9ee43ff30eeeea9343ccf4834b26e7b56d
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 19:48:06 +0000
+
+    Tested Postgresql Driver 
+
+  Change: 8db1b98f55b2e982d89128989a934318378f849a
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 19:25:15 +0000
+
+    Fixed syntax 
+
+  Change: 31c30f5803e848e952b42056303d495c2021322d
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 19:23:36 +0000
+
+    No Mysql FULLTEXT in test please 
+
+  Change: 221b02c3fc04ac676668e0a9f40f89d6853fcb8f
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 19:18:59 +0000
+
+    Nicer debug 
+
+  Change: 715065c5b57cbbbcc57b463be83c5ffbcbadb3ed
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 19:15:09 +0000
+
+    Can deploy to mysql 
+
+  Change: 0896f9d06c967332086ecc3390792c7b218e248a
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 15:55:54 +0000
+
+    Fixed test 
+
+  Change: fe59d45011e9858a4a1309cd94978d33951ea107
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 15:53:17 +0000
+
+    Oops DDP 
+
+  Change: 49e977c0db94da9e79114beb3762300b0d91fe2d
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 15:50:41 +0000
+
+    Tested we can deploy triggers in SQLite 
+
+  Change: 76f8ddae3808decb8165df38a50091513fcba846
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 15:03:51 +0000
+
+    Deployment works for SQLite 
+
+  Change: b58980fa1483258087bf15e168a6cde8c646e916
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 14:16:56 +0000
+
+    Protecting select in a canonical way 
+
+  Change: 3310b32c11d1eb36dd7b63405266bd8547f4e43f
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 13:53:24 +0000
+
+    Faster build 
+
+  Change: 454a0fc5d67013b1dafcff972f21b7607698dd7f
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 13:50:48 +0000
+
+    Deploy is only missing the actual deployment 
+
+  Change: 8e1fa99ba1f2f9aabbe0320698813ec42a0a5808
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 13:31:50 +0000
+
+    Forgot File::Slurp 
+
+  Change: 651ceaca3f472ec015c85c2867e2074040c59539
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 13:29:57 +0000
+
+    Can read plan from file; 
+
+  Change: 0df6a36fe7e160cfcd4e2011c4f23d130803e68a
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 12:37:19 +0000
+
+    Effectively test in each DB 
+
+  Change: 99ef88bc367d6db0a21c09191118c44637311781
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-24 12:21:00 +0000
+
+    Bit more doc 
+
+  Change: 261a19a6ba4fd30979a12213b520f317945ff4b6
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-19 17:58:11 +0000
+
+    Test that meta schema is deployable to Postrgresql 
+
+  Change: 8abf4d295d7c683090b9db0d5c04985a38fb3be5
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-19 17:47:20 +0000
+
+    Also test meta schema in MySQL 
+
+  Change: e63cab702bdcf5fe7c62d86017a0a7cabbee85a5
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-19 17:31:21 +0000
+
+    Do not translate SQL, use the standard one for meta schema 
+
+  Change: 4fbf433be8d47bfe587707682b076588251ea9fc
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-17 17:13:05 +0000
+
+    Can build DBIx::Simple 
+
+  Change: 4f90c9dc7b62a9f2174030be675a8babad81ca8a
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-16 15:56:16 +0000
+
+    Immutable 
+
+  Change: 0ae1f92234ae0538f91ceda4677fb11f3964d46c
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-16 15:51:19 +0000
+
+    More caching 
+
+  Change: 44b34fd1bc8d0c30feb904be50602b1a83ef843b
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-16 15:36:20 +0000
+
+    Showing PERL env 
+
+  Change: 67672e4217d45faa57fb8f1f5d8833498af0d99f
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-16 15:32:45 +0000
+
+    Travis caching 
+
+  Change: 3bdf2846b54f31e54d64954bc3f47a8853827c68
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-16 15:25:19 +0000
+
+    Echoing perl version 
+
+  Change: c54b860577fad11146280c7dc12e89f4d660c940
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-16 15:19:26 +0000
+
+    Travis cpanm verbose 
+
+  Change: 28517cdb51aed239a0bde379e25596596ca462aa
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-16 15:09:56 +0000
+
+    LICENSE is added by dzil 
+
+  Change: e07455d93ae416ad47bd372476b9cb8f8eebee83
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-16 15:06:05 +0000
+
+    First test 
+
+  Change: e1caa0f38f67637ecfe66842c46a0df8c4871f7c
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-16 14:54:19 +0000
+
+    Changed dist.ini and travis 
+
+  Change: 5a2d26c0c9a00496d37936a36f527ffbed4b09de
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-07-16 14:48:18 +0000
+
+    Dzil inception 
+
+  Change: 1ac7dc858b2fdab43c1ff0fb86a2994b002b958d
+  Author: Jerome Eteve <jeteve@users.noreply.github.com>
+  Date : 2016-07-16 14:46:06 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

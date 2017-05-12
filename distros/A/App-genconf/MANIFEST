@@ -1,0 +1,12 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.pod
+bin/genconf
+dist.ini
+lib/App/genconf.pm
+t/release-eol.t
+t/release-pod-syntax.t

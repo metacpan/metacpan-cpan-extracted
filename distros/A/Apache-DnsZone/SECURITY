@@ -1,0 +1,17 @@
+Since security related to Dynamic updates in Bind is currently only 
+IP-related and not username and password there are a few things to look
+out for.
+
+Every user on the system will have access to update the zones managed 
+with DnsZone, so you need to either trust these users enough or simply 
+use a machine only to run DnsZone on.
+
+IP-spoofing:
+Should not be a problem, since routers should take care of removing 
+packets that are trying to be spoofed as coming from the local network. 
+IP spoofing from the local lan could be a possibility but generally you
+would trust machines on your local lan.
+
+If you don't trust machines on your local lan you can setup a local 
+network between your DnsZone frontend and the nameserver you want to do
+updates in.

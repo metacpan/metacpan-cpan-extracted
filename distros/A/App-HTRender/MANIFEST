@@ -1,0 +1,10 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README
+ht_render
+t/HTRender.t
+lib/App/HTRender.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

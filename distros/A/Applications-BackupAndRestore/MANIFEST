@@ -1,0 +1,27 @@
+bin/BackupAndRestore
+bin/BackupAndRestore.glade
+bin/FileQuickFind
+Changes
+lib/Applications/BackupAndRestore.pm
+lib/Applications/BackupAndRestore/Helper.pm
+lib/Applications/BackupAndRestore/pod/BackupAndRestore.png
+lib/Applications/BackupAndRestore/pod/BackupInProgressNotification.png
+lib/Applications/BackupAndRestore/pod/RemoveBackupDialog.png
+lib/Applications/BackupAndRestore/pod/RestoreDialog.png
+lib/Applications/BackupAndRestore/pod/RestoreInProgressNotification.png
+lib/Applications/FileQuickFind.pm
+lib/auto/Applications/BackupAndRestore/autosplit.ix
+lib/Gtk2/Ex/FileLocator.pm
+lib/Gtk2/Ex/FileLocator/DropPocket.pm
+lib/Gtk2/Ex/FileLocator/FileChooser.pm
+lib/Gtk2/Ex/FileLocator/Helper.pm
+lib/Gtk2/Ex/FileLocator/PathBar.pm
+lib/Gtk2/Ex/FileLocator/PathnameField.pm
+lib/Gtk2/Ex/FileLocator/RecycleButton.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+share/BackupAndRestore/BackupAndRestore.svg
+t/BackupAndRestore
+t/BackupAndRestore.t
+META.yml                                 Module meta-data (added by MakeMaker)

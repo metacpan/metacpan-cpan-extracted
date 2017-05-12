@@ -1,0 +1,21 @@
+article, section, header, footer {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+body > .container > footer {
+  margin-top: 3em;
+}
+
+a.block-item {
+  display: block;
+}
+
+a.block-item:hover {
+  text-decoration: none;
+}
+
+a.list-group-item>.h3{
+  margin-top: 0px;
+  padding-top: 0px;
+}

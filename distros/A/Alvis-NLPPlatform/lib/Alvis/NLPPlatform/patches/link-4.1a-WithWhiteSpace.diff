@@ -1,0 +1,286 @@
+diff -cr ./include/api.h ../link-4.1a-WithWhiteSpace/include/api.h
+*** ./include/api.h	2004-02-01 21:57:41.000000000 +0100
+--- ../link-4.1a-WithWhiteSpace/include/api.h	2006-11-02 11:32:07.000000000 +0100
+***************
+*** 108,114 ****
+  *****************************************************************************/
+  
+  
+! Sentence     sentence_create(char *input_string, Dictionary dict);
+  void         sentence_delete(Sentence sent);
+  int          sentence_parse(Sentence sent, Parse_Options opts);
+  int          sentence_length(Sentence sent);
+--- 108,114 ----
+  *****************************************************************************/
+  
+  
+! Sentence     sentence_create(char *input_string, Dictionary dict, Parse_Options opts);
+  void         sentence_delete(Sentence sent);
+  int          sentence_parse(Sentence sent, Parse_Options opts);
+  int          sentence_length(Sentence sent);
+diff -cr ./include/api-structures.h ../link-4.1a-WithWhiteSpace/include/api-structures.h
+*** ./include/api-structures.h	2004-02-01 21:57:41.000000000 +0100
+--- ../link-4.1a-WithWhiteSpace/include/api-structures.h	2006-11-02 11:32:07.000000000 +0100
+***************
+*** 83,88 ****
+--- 83,89 ----
+    int display_constituents;     /* if true, output treebank-style constituent structure */
+    int display_bad;              /* if true, bad linkages are displayed */
+    int display_links;            /* if true, a list o' links is printed out */
++   int whitespace; 		/* if true, a whitespace tokenization only is considered */
+  };
+  
+  typedef struct {
+diff -cr ./include/tokenize.h ../link-4.1a-WithWhiteSpace/include/tokenize.h
+*** ./include/tokenize.h	2004-02-01 21:57:42.000000000 +0100
+--- ../link-4.1a-WithWhiteSpace/include/tokenize.h	2006-11-02 11:32:07.000000000 +0100
+***************
+*** 10,15 ****
+  /* with or without modification, subject to certain conditions.                 */
+  /*                                                                              */
+  /********************************************************************************/
+! int separate_sentence(char * s, Sentence sent);
+  int build_sentence_expressions(Sentence sent);
+  int sentence_in_dictionary(Sentence sent);
+--- 10,15 ----
+  /* with or without modification, subject to certain conditions.                 */
+  /*                                                                              */
+  /********************************************************************************/
+! int separate_sentence(char * s, Sentence sent, Parse_Options opts);
+  int build_sentence_expressions(Sentence sent);
+  int sentence_in_dictionary(Sentence sent);
+Files ./parse and ../link-4.1a-WithWhiteSpace/parse differ
+diff -cr ./src/api.c ../link-4.1a-WithWhiteSpace/src/api.c
+*** ./src/api.c	2004-02-01 21:57:54.000000000 +0100
+--- ../link-4.1a-WithWhiteSpace/src/api.c	2006-11-02 11:32:06.000000000 +0100
+***************
+*** 78,83 ****
+--- 78,84 ----
+      po->display_constituents = 0;
+      po->display_bad = FALSE;
+      po->display_links = FALSE;
++     po->whitespace = FALSE;
+  
+      return po;
+  }
+***************
+*** 295,300 ****
+--- 296,309 ----
+      opts->display_union = dummy;
+  }
+  
++ int parse_options_get_whitespace(Parse_Options opts) {
++     return opts->whitespace;
++ }
++ 
++ void parse_options_set_whitespace(Parse_Options opts, int dummy) {
++     opts->whitespace = dummy;
++ }
++ 
+  int parse_options_timer_expired(Parse_Options opts) {
+      return resources_timer_expired(opts->resources);
+  }
+***************
+*** 466,472 ****
+  *
+  ****************************************************************/
+  
+! Sentence sentence_create(char *input_string, Dictionary dict) {
+      Sentence sent;
+      int i;
+  
+--- 475,481 ----
+  *
+  ****************************************************************/
+  
+! Sentence sentence_create(char *input_string, Dictionary dict, Parse_Options opts) {
+      Sentence sent;
+      int i;
+  
+***************
+*** 487,493 ****
+      sent->parse_info = NULL;
+      sent->string_set = string_set_create();
+  
+!     if (!separate_sentence(input_string, sent)) {
+  	string_set_delete(sent->string_set);
+  	xfree(sent, sizeof(struct Sentence_s));
+  	return NULL;
+--- 496,502 ----
+      sent->parse_info = NULL;
+      sent->string_set = string_set_create();
+  
+!     if (!separate_sentence(input_string, sent, opts)) {
+  	string_set_delete(sent->string_set);
+  	xfree(sent, sizeof(struct Sentence_s));
+  	return NULL;
+diff -cr ./src/command-line.c ../link-4.1a-WithWhiteSpace/src/command-line.c
+*** ./src/command-line.c	2004-02-01 21:57:54.000000000 +0100
+--- ../link-4.1a-WithWhiteSpace/src/command-line.c	2006-11-02 11:32:06.000000000 +0100
+***************
+*** 21,26 ****
+--- 21,27 ----
+      int null_block;
+      int islands_ok;
+      int short_length;
++     int whitespace;
+      int batch_mode;  
+      int panic_mode;  
+      int allow_null;
+***************
+*** 64,69 ****
+--- 65,71 ----
+      {"links",        1, "Showing of complete link data",    &local.display_links},
+      {"walls",        1, "Showing of wall words",            &local.display_walls},
+      {"union",        1, "Showing of 'union' linkage",       &local.display_union},
++     {"whitespace",   1, "White space tokenization",         &local.whitespace},
+      {NULL,           1,  NULL,                              NULL}
+  };
+  
+***************
+*** 229,234 ****
+--- 231,237 ----
+      local.display_links = parse_options_get_display_links(opts);
+      local.display_walls = parse_options_get_display_walls(opts);
+      local.display_union = parse_options_get_display_union(opts);
++     local.whitespace = parse_options_get_whitespace(opts);
+  }
+  
+  void put_local_vars_in_opts(Parse_Options opts) {
+***************
+*** 253,258 ****
+--- 256,262 ----
+      parse_options_set_display_links(opts, local.display_links);
+      parse_options_set_display_walls(opts, local.display_walls);
+      parse_options_set_display_union(opts, local.display_union);
++     parse_options_set_whitespace(opts, local.whitespace);
+  }
+  
+  void issue_special_command(char * line, Parse_Options opts, Dictionary dict) {
+diff -cr ./src/parse.c ../link-4.1a-WithWhiteSpace/src/parse.c
+*** ./src/parse.c	2004-02-01 21:57:55.000000000 +0100
+--- ../link-4.1a-WithWhiteSpace/src/parse.c	2006-11-02 11:32:06.000000000 +0100
+***************
+*** 441,447 ****
+  	    label = strip_off_label(input_string);
+  	}
+  
+! 	sent = sentence_create(input_string, dict);
+  
+  	if (sent == NULL) {
+  	    if (verbosity > 0) fprintf(stderr, "%s\n", lperrmsg);
+--- 441,447 ----
+  	    label = strip_off_label(input_string);
+  	}
+  
+! 	sent = sentence_create(input_string, dict, opts);
+  
+  	if (sent == NULL) {
+  	    if (verbosity > 0) fprintf(stderr, "%s\n", lperrmsg);
+diff -cr ./src/tokenize.c ../link-4.1a-WithWhiteSpace/src/tokenize.c
+*** ./src/tokenize.c	2004-02-01 21:57:55.000000000 +0100
+--- ../link-4.1a-WithWhiteSpace/src/tokenize.c	2006-11-02 11:32:07.000000000 +0100
+***************
+*** 15,20 ****
+--- 15,25 ----
+  
+  #define MAX_STRIP 10
+  
++ /* If true, attempt to break words into word text and POS tag parts,
++  * separated by a slash ("/").
++  */
++ static int attempt_to_find_POS_tag = 0;
++ 
+  int post_quote[MAX_SENTENCE];
+  /*static char * strip_left[] = {"(", "$", "``", NULL}; */
+  /*static char * strip_right[] = {")", "%", ",", ".", ":", ";", "?", "!", "''", "'", "'s", NULL};*/
+***************
+*** 376,388 ****
+      return TRUE;
+  }
+  
+! int separate_sentence(char * s, Sentence sent) {
+      /* The string s has just been read in from standard input.
+         This function breaks it up into words and stores these words in
+         the sent->word[] array.  Returns TRUE if all is well, FALSE otherwise.
+         Quote marks are treated just like blanks.
+         */
+      char *t;
+      int i, is_first, quote_found;
+      Dictionary dict = sent->dict;
+  
+--- 381,395 ----
+      return TRUE;
+  }
+  
+! int separate_sentence(char * s, Sentence sent, Parse_Options opts) {
+      /* The string s has just been read in from standard input.
+         This function breaks it up into words and stores these words in
+         the sent->word[] array.  Returns TRUE if all is well, FALSE otherwise.
+         Quote marks are treated just like blanks.
+         */
+      char *t;
++     int st_tokenization=!parse_options_get_whitespace(opts); /* Whether to use the original Sleator&Temperley tokenization routine. */
++     char *tmp_word=(char *) xalloc(MAX_WORD+1);
+      int i, is_first, quote_found;
+      Dictionary dict = sent->dict;
+  
+***************
+*** 401,407 ****
+  	}
+  	if (*s == '\0') break;
+  	for (t=s; !((isspace((int)*t) || (*t == '\"')) || *t=='\0'); t++);
+! 	if (!separate_word(sent, s, t, is_first, quote_found)) return FALSE;
+  	is_first = FALSE;
+  	s = t;
+  	if (*s == '\0') break;
+--- 408,439 ----
+  	}
+  	if (*s == '\0') break;
+  	for (t=s; !((isspace((int)*t) || (*t == '\"')) || *t=='\0'); t++);
+! 	
+! 	if (st_tokenization) {
+! 	    if (!separate_word(sent, s, t, is_first, quote_found)) return FALSE;
+! 	}
+! 	else {
+! 	  /*NOTE: BYPASS ANY ADVANCED TOKENIZATION, ACCEPT A WHITESPACE TOKENIZATION*/
+! 	    if (t-s > MAX_WORD) {
+! 		lperror(SEPARATE, 
+! 		". The word \"%s\" is too long.\n"  
+! 		"A word can have a maximum of %d characters.\n", s, MAX_WORD);
+! 	    }
+! 	    strncpy(tmp_word,s,t-s);
+! 	    tmp_word[t-s]='\0';
+! 
+! 	    /* Testing POS stuff: if we're using ws tokenization, also turn
+! 	     * on POS. TODO: make this settable from outside. 
+! 	     */
+! 	    attempt_to_find_POS_tag = 1;
+! 
+! 	    if (!issue_sentence_word(sent,tmp_word )) return FALSE;
+! 	    /*else {
+! 		printf("Issued a word %s\n\n",tmp_word);
+! 	    }*/
+! 	}
+! 	    
+! 	
+  	is_first = FALSE;
+  	s = t;
+  	if (*s == '\0') break;
+***************
+*** 409,415 ****
+      
+      if (dict->right_wall_defined) 
+  	if (!issue_sentence_word(sent, RIGHT_WALL_WORD)) return FALSE;
+! 
+      return (sent->length > dict->left_wall_defined + dict->right_wall_defined);
+  }
+  
+--- 441,447 ----
+      
+      if (dict->right_wall_defined) 
+  	if (!issue_sentence_word(sent, RIGHT_WALL_WORD)) return FALSE;
+!     xfree(tmp_word,MAX_WORD+1);
+      return (sent->length > dict->left_wall_defined + dict->right_wall_defined);
+  }
+  

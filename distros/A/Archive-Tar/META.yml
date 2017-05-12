@@ -1,0 +1,33 @@
+---
+abstract: 'Manipulates TAR archives'
+author:
+  - 'Jos Boumans <kane[at]cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Archive-Tar
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Compress::Zlib: '2.015'
+  File::Spec: '0.82'
+  IO::Compress::Base: '2.015'
+  IO::Compress::Bzip2: '2.015'
+  IO::Compress::Gzip: '2.015'
+  IO::Zlib: '1.01'
+  Test::Harness: '2.26'
+  Test::More: '0'
+  perl: '5.00503'
+resources:
+  repository: https://github.com/jib/archive-tar-new
+version: '2.24'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

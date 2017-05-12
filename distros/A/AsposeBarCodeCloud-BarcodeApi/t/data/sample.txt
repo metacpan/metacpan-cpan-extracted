@@ -1,0 +1,12 @@
+{
+  "BarcodeBuilders": [
+    {
+      "TypeOfBarcode": "qr",
+      "Text": "Aspose.com"
+    }
+    {
+      "TypeOfBarcode": "qr",
+      "Text": "Aspose.Barcode for Cloud"
+    }
+  ]  
+}

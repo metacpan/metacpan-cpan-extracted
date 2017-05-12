@@ -1,0 +1,28 @@
+ARTISTIC-1.0
+Changes
+GPL-1
+lib/AnyData2.pm
+lib/AnyData2/Format.pm
+lib/AnyData2/Format/CSV.pm
+lib/AnyData2/Format/FileSystem.pm
+lib/AnyData2/Format/Fixed.pm
+lib/AnyData2/Role/AdvancedChanging.pm
+lib/AnyData2/Role/GuessImplementation.pm
+lib/AnyData2/Storage.pm
+lib/AnyData2/Storage/File.pm
+lib/AnyData2/Storage/File/Blockwise.pm
+lib/AnyData2/Storage/File/Linewise.pm
+lib/AnyData2/Storage/FileSystem.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-csv.t
+t/02-filesystem.t
+t/03-fixed.t
+t/data/simple.blocks
+t/data/simple.csv
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

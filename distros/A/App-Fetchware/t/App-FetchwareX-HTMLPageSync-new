@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+# Tests HTMLPageSync's  new() subroutine that uses
+# Term::UI to ask the user questions. This "test script" is called by
+# t/App-FetchwareX-HTMLPageSync.t's test suite using Test::Expect, if its
+# optionally installed. And Test::Expect answer's the questsions that this
+# script asks thereby testing new()'s Q&A interface.
+
+
+use Test::More;
+use Test::Builder;
+use Term::ReadLine;
+
+use App::FetchwareX::HTMLPageSync ':TESTING';
+use App::Fetchware::Fetchwarefile;
+
+my $term = Term::ReadLine->new('testing HTMLPageSync new');
+
+
+my ($page_name, $fetchwarefile) = new($term);
+
+# new() returns $page_name and $fetchwarefile, so add tests for them that
+# actually test something instead of the bullshit below.
+is($page_name, 'test', 'new() returned expected $page_name.');
+# $fetchwarefile returns the stringified Fetchwarefile not the object, so I
+# cannot just use methods on the object to check if the answers are right.
+# Instead, I'm stuck using regexes to fake parse the fetchwarefile.
+like($fetchwarefile, qr/^use App::FetchwareX::HTMLPageSync;/,
+    'checked $fetchwarefile for use line.');
+like($fetchwarefile, qr/page_name 'test';/,
+    'checked $fetchwarefile for page_name.');
+like($fetchwarefile, qr!html_page_url 'http://test.test/test';!,
+    'checked $fetchwarefile for html_page_url.');
+like($fetchwarefile, qr{destination_directory '/tmp';},
+    'checked $fetchwarefile for destination_directory.');
+like($fetchwarefile, qr/keep_destination_directory 'True';/,
+    'checked $fetchwarefile for keep_destination_directory.');
+
+
+# Spit out # of tests run.
+done_testing();
+
+# Print a bogus "prompt" to keep Expect from freaking out, because it presumes
+# the prompt works like it does in a shell, but fetchware new is not a shell.
+print "Bogus shell: \n";
+
+# Because we're in a child process not the same one that is running the main
+# test suite, if any tests fail this failure will not be reported back to our
+# caller. So, we use Test::Builder to check if our tests have passed, and if
+# they have we do nothing and return succes, but if not we throw an exception.
+my $test = Test::Builder->new();
+unless ($test->is_passing()) {
+    diag explain \[$test->details()];
+    die <<EOD;
+new test file for testing new() using Test::Expect has failed! The details()
+method of this process's Test::Builder object should have been printed above to
+help you figure out what went wrong.
+EOD
+}

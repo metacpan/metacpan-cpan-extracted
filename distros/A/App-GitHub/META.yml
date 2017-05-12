@@ -1,0 +1,28 @@
+---
+abstract: 'GitHub Command Tools'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'William Orr <will@worrbase.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300013, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-GitHub
+requires:
+  Carp: 0
+  Getopt::Long: 0
+  IPC::Cmd: 0
+  JSON::XS: 2.232
+  Moose: 0
+  Net::GitHub: 0.43
+  Pod::Usage: 0
+  Term::ReadKey: 0
+  Term::ReadLine: 0
+resources:
+  repository: git://github.com/worr/perl-app-github.git
+version: 1.0.1

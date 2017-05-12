@@ -1,0 +1,348 @@
+
+=for html
+<BODY BGCOLOR="#ffffff" TEXT="#000000" LINK="#4020ff" ALINK="#ff0000" VLINK="#ff2530">
+<CENTER>
+<FONT SIZE="+2">
+Apache2::PageKit Frequently Asked Questions $Id: FAQ.pod,v 1.7 2004/01/06 16:31:47 borisz Exp $
+</FONT>
+<BR>
+<FONT SIZE="-1">
+<I>Last updated: Sep 26th, 2003</I>
+</FONT>
+</CENTER>
+<P>
+
+=head1 NAME
+
+Apache2::PageKit::FAQ -- The Frequently Asked Questions for Apache2::PageKit
+
+=head1 SYNOPSIS
+
+    perldoc Apache2::PageKit::FAQ
+
+=head1 DESCRIPTION
+
+This document serves to answer the most frequently asked questions for I<Apache2::PageKit>.
+
+=head1 Basic Information & Information Sources
+
+=head2 1.1 What is I<Apache2::PageKit>?
+
+PageKit is an mod_perl based application framework that uses HTML::Template and
+XML to separate code, design, and content. Includes session management,
+authentication, form validation, co-branding, and a content management system.
+
+Its goal is to solve all the common problems of web programming, and to make
+the creation and maintenance of dynamic web sites fast, easy and enjoyable.
+
+=head2 1.2 Where can I get it from?
+
+The Comprehensive Perl Archive Network.
+
+I<Apache2::PageKit> may be downloaded from CPAN I<via>:
+
+    http://www.perl.com/cgi-bin/cpan_mod?module=Apache-PageKit
+
+    http://search.cpan.org/search?dist=Apache-PageKit
+
+
+=head2 1.3 I<Apache2::PageKit> uses I<XML>, what is it?
+
+XML (eXtensible Markup Language) is a way to store data and meta-data.
+The meta-data gives applications the ability to 'understand' the data
+and work with it in an intelligent fashion.  For more information check
+the sites below:
+
+  http://www.w3.org/TR/1998/REC-xml-19980210
+  http://www.xml.com/
+
+=head2 1.4 I<Apache2::PageKit> uses I<XSLT>, what is it?
+
+XSLT (eXtensible Stylesheet Language: Transformations)
+
+  http://www.w3.org/TR/xslt
+  http://www.w3.org/Style/XSL/
+  http://www.xslinfo.com/
+  http://www.oasis-open.org/cover/xsl.html
+  http://www.xml.com/
+
+XSLT is a language used to apply transformations to XML.  This powerful
+tool helps seperate Content from the Presentation by changing the way
+the XML is presented to the end user.  It can be used to reformat the
+XML into HTML, WML, XML, PDF, POD or any other template you come up with.
+
+=head2 1.5 Is there a webpage with more information about I<Apache2::PageKit>?
+
+Yes, http://www.pagekit.org and http://sourceforge.net/projects/pagekit/
+
+=head2 1.6 Is there a mailing list?
+
+Yes, one for users and one for developers.
+
+To subscribe look here:
+
+    http://lists.sourceforge.net/mailman/listinfo/pagekit-users
+    http://lists.sourceforge.net/mailman/listinfo/pagekit-devel
+
+=head2 1.7 Is there a mailling list archive?
+
+Yes,
+
+  http://www.geocrawler.com/redir-sf.php3?list=pagekit-users
+  http://www.geocrawler.com/redir-sf.php3?list=pagekit-devel
+
+=head1 Installation
+
+=head2 2.1 Apache segfaults on start, but only with I<Apache2::PageKit>. What is wrong?
+
+
+Apache is often compiled with the expat-lite library which is
+incompatible with the XML::Parser module.  PageKit prior to 1.08
+requires XML::Parser.  You'll have to compile Apache with
+--disable-rule=expat for these early versions of PageKit.
+
+It is recommended that you upgrade to PageKit 1.08 or higher, which
+doesn't require XML::Parser or expat.  However, if your code uses
+XML::Parser Apache will still segfault.  In this case you must recompile
+Apache with --disable-rule=expat or remove dependencies on XML::Parser
+in your code.
+
+The mod_perl guide has an excellect section on compiling mod_perl and
+Apache from source. http://perl.apache.org/guide/
+
+=head2 2.2 Do I really need to recompile Apache? It works without I<Apache2::PageKit>.
+
+No, if you use I<Apache2::PageKit E<gt>= 1.08> and promise to never use C<XML::Parser>. Else yes, you must recompile Apache.
+
+=head2 2.3 perl Makefile.PL result in Can't locate Apache/test.pm in @INC ...
+
+You use I<mod_perl-1.28> or higher. I<Apache::test> is obsolete and renamed to
+Apache::testold. The future is I<Apache::Test>. To get around the error type
+
+  perl -i -pe 's/Apache::test\b/Apache::testold/g' Makefile.PL
+
+Or even better upgrade I<Apache::Pagekit> to a version > 1.11. There we use
+I<Apache::Test>.
+
+=head2 2.4 I can not build libapreq or it stops working after a reboot.
+
+You use perl >= 5.8.1 which includes a new version of ExtUtils::MakeMaker.
+Read more here:
+  http://marc.theaimsgroup.com/?l=perl5-porters&m=105981649201380&w=2
+  http://marc.theaimsgroup.com/?l=apreq-dev&m=106146287323705&w=2
+
+To fix the problem apply this patch from Steve Hay or use I<libapreq-1.3>
+
+
+  --- c/Makefile.PL.orig    2001-04-03 20:24:12.000000000 +0100
+  +++ c/Makefile.PL 2004-08-21 11:31:42.000000000 +0100
+  @@ -34,7 +34,8 @@
+   sub MY::dynamic {
+       my $self = shift;
+       my $string = $self->MM::dynamic;
+  -    $string =~ s/(Makefile\s+).*/$1/g;
+  +    $string =~ s{ \$\(INST_DYNAMIC\)}{}g;
+  +    $string =~ s{ \$\(INST_BOOT\)}{}g;
+       $string;
+   }
+
+=head1 Migrating to I<Apache2::PageKit> from...
+
+=head2 3.1 I already have a website and I want to extend it with Apache2::PageKit. Where can I put my data?
+
+You have several options, some follows.
+
+=over 2
+
+=item *
+
+Copy your whole site into the directory View/Default/. Of the edited eg site of I<Apache2::PageKit>.
+
+=item *
+
+Copy the eg site of I<Apache2::PageKit> to a directory in the rootdir of your site ie:
+
+  cp -R .../Apache-PageKit-x.yz/eg .../htdocs/.../pagekit
+
+edit MyModel/Model.pm, MyModel/Common.pm and Config/Config.xml and add I<Apache2::PageKit> as the
+handler for this dir in yout C<httpd.conf>.
+
+=back
+
+=head1 I<Apache2::PageKit> beginner's FAQ's
+
+=head2 4.1 Can I run more as one site with one Apache Server?
+
+Sure, as long as the Perl Classes don't conflict. (You can't run both production and development
+PageKits on the same server, unless you make sure that the Classes have different names.)
+You will also have to make sure that the PKIT_ROOT and cache_dir configuration
+option are distinct for each server. If cache_dir is not set for either of them,
+that should be fine, since it defaults to PKIT_ROOT/View/pkit_cache.
+
+To set up, use the Apache <Location> or <Files> configuration directives.
+
+=head2 4.2 Can I use I<Apache2::PageKit> inside Apache <VirtualHost> configuration directives?
+
+Sure, you have to provide uniq sets of PageKit-modules and a uniq pkit_cache dir thats all.
+
+=head1 xxxx
+
+=head2 5.1 Is it possible to use expressions in <(MODEL|CONTENT)_(IF|UNLESS|VAR)> tags?
+
+Yes, you have to use I<Apache2::PageKit 1.08> or higher. In your B<Config/Config.xml>
+change or add this line in the global section:
+
+  template_class = "HTML::Template::Expr"
+
+For more information type perldoc HTML::Template::Expr.
+
+=head2 5.2 I'm using loop_context_vars as descriped in the HTML::Template manual within my <CONTENT_(IF|UNLESS)> tags, but it did not work.
+
+As an undocumented feature of HTML::Template, loop_context_vars B<must> be written in lowercase if
+your template is case_sensitive. <CONTENT_...> is case sensitive. So change
+__FIRST__, __LAST__, __INNER__, __ODD__ to  __first__, __last__, __inner__, __odd__.
+
+=head2 5.3 How do I deal with uploads?
+
+If you call C<< $model->apr->upload; >> Then this will return a single
+Apache::Upload object in a scalar context or all Apache::Upload
+objects in an array context. This is because C<< $model->apr >>
+returns a Apache::Request object.
+
+=head2 5.4 My Database busted after some time - What is wrong?
+
+You did not use Apache::DBI. Load (use) Apache::DBI in your startup.pl
+file. If for some reason the use of Apache::DBI is not possible,
+close the connection in the pkit_cleanup methode.
+
+something like this will do:
+
+  sub pkit_cleanup {
+    my $dbh = shift->dbh;
+    $dbh && $dbh->disconnect;
+  }
+
+=head1 PageKit on Operatingsystem X
+
+=head2 6.1 Did PageKit run on my systems?
+
+Pagekit is known to run at least on the following systems:
+
+  Darwin 6.4 powerpc
+  FreeBSD 4.3
+  FreeBSD 4.4
+  FreeBSD 4.5
+  FreeBSD 4.6
+  HP UX 10
+  HP UX 11
+  Linux 2.2
+  Linux 2.4
+  Solaris 7 x86
+  Solaris 8 sparc
+  Solaris 8 x86
+  Solaris 9 sparc
+  Win 2000
+  Win ME
+  Win NT
+
+=head2 6.3 My OS did not support flock, what can i do?
+
+Add
+  *CORE::GLOBAL::flock = sub {1};
+
+to your startup.pl or in your httpd.conf file inside a <Perl> block:
+
+  <Perl>
+    *CORE::GLOBAL::flock = sub {1};
+  </Perl>
+
+=head1 Troubleshooting
+
+=head2 I'm using MySQL Apache::Session store class and I'm getting DBD::mysql::st execute failed: Duplicate entry errors
+
+This appears to be a DBD::mysql issue - see http://rt.cpan.org/NoAuth/Bug.html?id=1717
+A workaround is to stringify the session_id if it is a number.
+
+=head2 My sessions do not work. I'm using perl 5.8 and Apache::SessionX 2.00b3.
+
+Install MD5. It is not part of perl core anymore. Or install this patch:
+
+
+  --- SessionX/Generate/MD5.pm.orig	2002-11-11 08:35:54.000000000 +0100
+  +++ SessionX/Generate/MD5.pm	2002-11-11 08:37:44.000000000 +0100
+  @@ -12,12 +12,12 @@
+
+   use strict;
+   use vars qw($VERSION);
+  -use MD5;
+  +use Digest::MD5;
+
+   $VERSION = '2.1';
+
+   sub generate {
+  -    my $session = shift;
+  +    my $session = shift;
+       my $arg = shift;
+       my $length = 32;
+
+  @@ -26,7 +26,7 @@
+       }
+
+       $session->{data}->{_session_id} =
+  -        substr(MD5->hexhash(MD5->hexhash($arg || (time(). {}. rand(). $$))), 0, $length);
+  +        substr(Digest::MD5::md5_hex(Digest::MD5::md5_hex($arg || (time(). {}. rand(). $$))), 0, $length);
+
+
+   }
+
+
+=head1 VERSION
+
+This document is currently at version I<0.03>, as of I<Feb 10th, 2003>.
+
+=head1 AUTHORS
+
+Boris Zentner (bzm@2bz.de)
+
+TJ Mather (tjmather@tjmater.com)
+
+=head1 CREDITS
+
+Fixes, Bug Reports, Docs have been generously provided by:
+
+  Tomasz Konefal
+  Anton Permyakov
+  Vladimir Bogdanov
+  Rob Starkey
+  Eugene Rachinsky
+
+Parts of this FAQ are taken from the Apache2::PageKit distribution and
+the website at http://www.pagekit.org/.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001 TJ Mather
+Copyright (c) 2002, 2003, 2004 Boris Zentner
+
+=head1 LICENSE
+
+This FAQ is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+__END__
+1. How can I store something under PageKit View/Default directory, what
+PageKit would not try to "execute", e.c. *.jpg files.
+2. The order which PK searches *.tmpl or *.xml files and what PK does if it
+cannot find foo.tmpl or foo.xml.
+3. How does session/cookies works? When session creates itself?
+
+5. How is it possible do automatically user be logged-in (e.c. after his
+successfull registration)? (the answer is a pkit_redirect(), I think...)
+
+section 3.1
+i haven't tried this myself, but is this the only step that needs to be
+performed?  what exactly is data?  does it include any CGI scripts, etc?
+  perhaps there should be a section dedicated to "Migrating to PageKit
+from...".
+

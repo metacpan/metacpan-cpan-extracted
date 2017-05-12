@@ -1,0 +1,8 @@
+<div id="content">
+<h>Login</h1>
+<form action="/authenticate" method="post">
+Username: <input type="text" size=20 name="user"><br/>
+Password: <input type="password" size=20 name="password"><br/>
+<input type="submit" value="Login">
+</form>
+</div>

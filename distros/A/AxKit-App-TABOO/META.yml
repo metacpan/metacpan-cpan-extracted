@@ -1,0 +1,36 @@
+--- #YAML:1.0
+name:                AxKit-App-TABOO
+version:             0.52
+abstract:            Object Oriented Publishing Framework for AxKit
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Apache::AxKit::Plugin::AddXSLParams::Request: 0
+    Apache::AxKit::Plugin::Param::Expr: 0
+    AxKit:                         1.62
+    AxKit::XSP::QueryParam:        0.02
+    AxKit::XSP::Sendmail:          0
+    Class::Data::Inheritable:      0
+    Crypt::GeneratePassword:       0
+    Data::Dumper:                  0
+    DBD::Pg:                       1.32
+    DBI:                           0
+    Encode:                        2.09
+    Exception::Class::DBI:         0
+    HTML::StripScripts:            1.04
+    HTML::StripScripts::LibXML:    0.12
+    HTML::StripScripts::Parser:    1.02
+    IDNA::Punycode:                0
+    MIME::Types:                   0
+    Net::Akismet:                  0.02
+    Session:                       0
+    Text::Unaccent:                1.07
+    Time::Piece:                   0
+    XML::LibXML:                   1.57
+    XML::LibXSLT:                  0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Kjetil Kjernsmo <kjetilk@cpan.org>

@@ -1,0 +1,93 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Acme-Loopy/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "Keyword::Simple"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Acme-Loopy>;
+	doap:created         "2012-12-02"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Acme-Loopy>;
+	doap:homepage        <https://metacpan.org/release/Acme-Loopy>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Acme-Loopy";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Acme-Loopy/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Acme-Loopy/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Acme-Loopy/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Acme-Loopy/v_0-004>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-acme-loopy>;
+	];
+	doap:shortdesc       "loop keyword".
+
+<http://purl.org/NET/cpan-uri/dist/Acme-Loopy/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Acme-Loopy-0.001"^^xsd:string;
+	dc:issued            "2012-12-02"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Loopy-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-Loopy/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Acme-Loopy-0.002"^^xsd:string;
+	dc:issued            "2012-12-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "${^LOOP} is now zero-based. It was previously one-based but that was undocumented. Having it false on the first journey around the loop seems to enable some nice idioms.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Loopy-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-Loopy/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Acme-Loopy-0.003"^^xsd:string;
+	dc:issued            "2012-12-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Test that ${^LOOP} is undefined after the loop has finished.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Perl 5.12 compat";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Loopy-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-Loopy/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Acme-Loopy-0.004"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Loopy-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

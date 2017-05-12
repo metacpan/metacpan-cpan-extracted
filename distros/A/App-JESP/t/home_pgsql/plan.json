@@ -1,0 +1,6 @@
+{
+    "patches": [
+        { "id":"pagila", "file": "patches/pagila1.sql"},
+        { "id":"pagile_more", "file": "patches/pagila2.sql" }
+    ]
+}

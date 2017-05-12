@@ -1,0 +1,58 @@
+---
+abstract: 'Building, finding and using iup + related libraries - L<http://www.tecgraf.puc-rio.br/iup/>'
+author:
+  - 'KMX, kmx@cpan.org'
+build_requires:
+  Archive::Extract: '0'
+  Digest::SHA: '0'
+  ExtUtils::CBuilder: '0'
+  ExtUtils::Command: '0'
+  ExtUtils::Liblist: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::ShareDir: '0'
+  File::Spec: '0'
+  File::Temp: '0.22'
+  IPC::Run3: '0.041'
+  LWP::Simple: '0'
+  Module::Build: '0.36'
+  Test::More: '0'
+  Text::Patch: '0'
+  perl: '5.008008'
+configure_requires:
+  Archive::Extract: '0'
+  Digest::SHA: '0'
+  ExtUtils::CBuilder: '0'
+  ExtUtils::Command: '0'
+  ExtUtils::Liblist: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::ShareDir: '0'
+  File::Spec: '0'
+  File::Temp: '0.22'
+  IPC::Run3: '0.041'
+  LWP::Simple: '0'
+  Module::Build: '0.36'
+  Text::Patch: '0'
+  perl: '5.008008'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-IUP
+provides:
+  Alien::IUP:
+    file: lib/Alien/IUP.pm
+    version: '0.710'
+requires:
+  File::ShareDir: '1.00'
+  File::Spec: '0'
+  perl: '5.008008'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-IUP
+  license: http://opensource.org/licenses/mit-license.php
+  repository: https://github.com/kmx/alien-iup
+version: '0.710'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

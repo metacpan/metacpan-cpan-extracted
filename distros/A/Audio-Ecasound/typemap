@@ -1,0 +1,3 @@
+const char *                T_PV
+long int                    T_IV
+eci_handle_t                T_PTROBJ

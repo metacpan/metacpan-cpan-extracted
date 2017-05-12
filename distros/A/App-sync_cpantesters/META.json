@@ -1,0 +1,68 @@
+{
+   "abstract" : "Sync CPAN testers failure reports to local directories",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-sync_cpantesters",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : 0,
+            "Class::Trigger" : 0,
+            "File::Find" : 0,
+            "File::Path" : 0,
+            "Getopt::Long" : 0,
+            "HTML::FormatText" : 0,
+            "HTML::TreeBuilder" : 0,
+            "LWP::UserAgent::ProgressBar" : 0,
+            "Web::Scraper" : 0,
+            "open" : 0,
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "App::sync_cpantesters" : {
+         "file" : "lib/App/sync_cpantesters.pm",
+         "version" : "1.111470"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-app-sync_cpantesters at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=App-sync_cpantesters"
+      },
+      "homepage" : "http://search.cpan.org/dist/App-sync_cpantesters/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hanekomu/App-sync_cpantesters.git",
+         "web" : "http://github.com/hanekomu/App-sync_cpantesters"
+      }
+   },
+   "version" : "1.111470"
+}
+

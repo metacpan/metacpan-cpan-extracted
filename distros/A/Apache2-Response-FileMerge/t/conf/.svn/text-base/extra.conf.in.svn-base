@@ -1,0 +1,94 @@
+# this is the same as httpd.conf - tune according
+# to your needs
+#
+# some variables are expanded to match your local path.
+# some useful variables are:
+#   @ServerRoot@      the full path to t/
+#   @DocumentRoot@    the full path to t/htdocs
+#   @ACCESS_MODULE@   mod_access.c (1.3 and 2.0) or mod_authz_host.c (2.1)
+#   @AUTH_MODULE@     mod_auth.c (1.3 and 2.0) or mod_auth_basic.c (2.1)
+#
+# for example
+#   <IfModule @AUTH_MODULE@>
+#     AuthUserFile @ServerRoot@/htaccess
+#   </IfModule>
+#
+# if any modules you require use XS, you may need
+# to call this file t/conf/extra.last.conf.in
+#
+
+# for mod_perl 1.0 configuration see t/conf/extra.last.conf.in
+
+# mod_perl 2.0 sample configuration
+# note that coverage doesn't seem to be working all
+# that well with mod_perl 2.0 at the moment
+#
+# also note this configuration can be here because
+# PerlModule execution is delayed with mod_perl 2.0
+# so we don't suffer the same @INC limitations as
+# with mod_perl 1.0
+
+<IfDefine APACHE2>
+  PerlModule Apache2::Response::FileMerge
+  <LocationMatch "\.(?:js|css)$">
+    SetHandler perl-script 
+    PerlResponseHandler Apache2::Response::FileMerge
+  </LocationMatch>
+
+  <LocationMatch "stats/.*\.(?:js|css)$">
+    SetHandler perl-script 
+    PerlSetVar stats 1
+    PerlResponseHandler Apache2::Response::FileMerge
+  </LocationMatch>
+
+  <LocationMatch "minimize/.*\.(?:js|css)$">
+    SetHandler perl-script 
+    PerlSetVar stats 1
+    PerlSetVar minimize 1
+    PerlResponseHandler Apache2::Response::FileMerge
+  </LocationMatch>
+
+  <LocationMatch "cache/.*\.(?:js|css)$">
+    SetHandler perl-script 
+    PerlSetVar stats 1
+    PerlSetVar cache 1
+    PerlResponseHandler Apache2::Response::FileMerge
+  </LocationMatch>
+
+  <LocationMatch "compress/.*\.(?:js|css)$">
+    SetHandler perl-script 
+    PerlSetVar stats 1
+    PerlSetVar compress 1
+    PerlResponseHandler Apache2::Response::FileMerge
+  </LocationMatch>
+
+  <LocationMatch "sep/.*\.(?:js|css)$">
+    SetHandler perl-script 
+    PerlSetVar stats 1
+    PerlSetVar file_separator - 
+    PerlResponseHandler Apache2::Response::FileMerge
+  </LocationMatch>
+
+  <LocationMatch "inc/.*\.(?:js|css)$">
+    SetHandler perl-script 
+    PerlSetVar stats 1
+    PerlSetVar append_inc_name 1 
+    PerlResponseHandler Apache2::Response::FileMerge
+  </LocationMatch>
+
+  <LocationMatch "closure/.*\.(?:js|css)$">
+    SetHandler perl-script 
+    PerlSetVar stats 1
+    PerlSetVar optimize 1 
+    PerlResponseHandler Apache2::Response::FileMerge
+  </LocationMatch>
+
+  <LocationMatch "varsub/.*\.(?:js|css)$">
+    SetHandler perl-script 
+    PerlSetVar stats 1
+    PerlSetVar optimize 1 
+    PerlResponseHandler Apache2::Response::FileMerge
+  </LocationMatch>
+
+</IfDefine>
+

@@ -1,0 +1,31 @@
+---
+abstract: 'Alien package for the pdf2json PDF extraction library'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  IPC::Open3: '0'
+  Symbol: '0'
+  Test::More: '0'
+configure_requires:
+  Alien::Base::ModuleBuild: '0.002'
+  File::ShareDir: '1.03'
+  Path::Class: '0.013'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-pdf2json
+requires:
+  Alien::Base: '0.002'
+  File::ShareDir: '1.03'
+  File::Spec: '0'
+  Path::Class: '0.013'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/project-renard/p5-Alien-pdf2json
+  repository: https://github.com/project-renard/p5-Alien-pdf2json.git
+version: '0.002'

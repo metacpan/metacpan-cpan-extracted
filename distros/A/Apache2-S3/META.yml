@@ -1,0 +1,25 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache2-S3
+version:      0.05
+version_from: lib/Apache2/S3.pm
+installdirs:  site
+requires:
+    Apache2::Const:                0
+    Apache2::Filter:               0
+    Apache2::FilterRec:            0
+    Apache2::RequestRec:           0
+    APR::String:                   0
+    APR::Table:                    0
+    CGI:                           0
+    Digest::HMAC:                  0
+    Digest::SHA1:                  0
+    HTML::Entities:                0
+    MIME::Base64:                  0
+    POSIX:                         0
+    Time::Local:                   0
+    URI::Escape:                   0
+    XML::Parser:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

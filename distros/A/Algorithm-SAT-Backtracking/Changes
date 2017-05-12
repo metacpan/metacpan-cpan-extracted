@@ -1,0 +1,53 @@
+Revision history for Perl extension Algorithm-SAT-Backtracking
+
+0.13 2015-02-06T14:02:24Z
+
+    - small code enhancements to speed up the computation, POD fixes
+
+0.12 2015-02-05T08:38:02Z
+
+    - cleanup, added more benchmarks
+
+0.11 2015-01-31T14:12:49Z
+
+    - fixed benchmark file, versioning for algorithms introduced
+
+0.10 2015-01-31T13:15:16Z
+
+    - tests cleanup
+
+0.09 2015-01-30T18:01:11Z
+
+    - code cleanup
+    - fixing test file for Probabilistic variant
+    - POD fixes and adding POD for Probabilistic variant
+
+0.08 2015-01-25T16:27:13Z
+
+    - POD fixes
+
+0.07 2015-01-25T16:11:36Z
+
+    - Added DPLL Ordered variant, keeps hash ordering when building the solution
+    - updating POD
+
+0.05 2015-01-23T10:42:36Z
+    - code refactoring, added DPLL variant
+
+0.04 2014-12-07T16:50:57Z
+
+    - replacing Logical Defined-Or for legacy perl support
+
+0.03 2014-12-04T14:31:08Z
+
+    - Fixes to Algorithm::SAT::Expression
+
+0.02 2014-12-03T11:30:42Z
+
+    - Added Algorithm::SAT::Expression>
+
+0.01 2014-12-01T14:45:58Z
+
+    - first release
+
+

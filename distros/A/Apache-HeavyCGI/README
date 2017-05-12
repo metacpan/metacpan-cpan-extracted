@@ -1,0 +1,21 @@
+DEAD PROJECT, NOT RECOMMENDED FOR USE.
+
+I WOULD NOT START A NEW PROJECT WITH THIS FRAMEWORK ANYMORE.
+
+Historically interesting, most ideas implemented here were correct,
+but time has moved on and as it has never got up to speed, it just
+bitrotted and is far behind today's solutions.
+
+The only reason I make a new release is to remove the pseudo hashes so
+that I can continue to use it in my old projects with perl 5.10ff.
+
+Upgrade instructions:
+---------------------
+
+Remove 'use fields' and any use of global %FIELDS hashes in your code.
+All HeavyCGI related objects are now ordinary hashes without any bells
+and whistles.
+
+2005-02-02,
+andreas koenig
+

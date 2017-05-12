@@ -1,0 +1,32 @@
+#!/usr/bin/perl -s
+##
+# Give a list of files as command line arguments (i.e. use shell wildcards)
+# The owners of each file is printed alphabetically, with owned files grouped
+# by package. Files are also printed alphabetically.
+# Pass the -q flag to only print the owning package names.
+#
+
+use ALPM::Conf qw(/etc/pacman.conf);
+use File::Spec;
+
+unless(@ARGV){
+    print STDERR "usage: ownzors [file paths]\n";
+    exit 2;
+}
+
+for my $pkg ($alpm->localdb->pkgs) {
+    $who_owns{$_->{'name'}} = $pkg->name for(@{$pkg->files});
+}
+
+push @{$results{$who_owns{$_}}}, $_
+    for(map { s{\A/}{}; $_ } map { File::Spec->rel2abs($_) } @ARGV);
+## Happy A! \o/
+
+if($q){
+    print $_, "\n" for(sort keys %results);
+    exit 0;
+}
+
+for my $pkgname (sort keys %results){
+    print $pkgname, "\n", map { "\t/$_\n" } sort @{$results{$pkgname}};
+}

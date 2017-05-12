@@ -1,0 +1,113 @@
+AnyData - easy access to data in many formats
+
+Revision history for Perl extension AnyData.
+
+0.12	2015-01-28
+
+ * fix various packaging issues (RT#101768, RT#95908, RT#99763, RT#82862)
+ * add missing prereq on CGI (RT#99916)
+ * officially marked as deprecated
+ * tidy up distribution
+ * reformat Changes according to rough spec
+ * fix some meta-data #toolchain pointed out
+
+0.11	2012-12-14
+
+ * new maintainer Sven Dowideit
+ * use Test::More
+ * Fails to retrieve XML data over HTTP (debian#421884) Bart Martens <bartm@knars.be>
+ * Fix syntax error in POD documentation (debian) Ansgar Burchardt <ansgar@43-1.org>
+ * Fix spelling errors (debian) Ansgar Burchardt <ansgar@43-1.org>
+ * adColumn $distinct_flag not handled (RT#6248 & RT#6251) John D. Lima
+ * writing fields containing 0 with AnyData::Format::Fixed (RT#8671) <elodie+cpan [...] pasteur.fr>
+ * weblog request and referer regexs were too greedy, and the referer and client regex's where in the wrong order (RT#34063) and (RT#72334) Wes Brown <wes [...] smellycat.com> and pawal [...] blipp.com
+ * adDump writes out fields containing 0 as empty strings (RT#28006) xcaron [...] gmail.com
+ * A bug in AnyData::Format::Weblog, SQL excuting result is not correct (RT#56962) youngyik@gmail.com
+ * 
+
+0.10	2004-04-19
+
+ * really fixed adConvert, thanks for bug reports - Dan Wright, Scott Godin
+
+0.09	2004-04-18
+
+ * fixed adConvert - many thanks to Dan Wright for a patch
+
+0.08	2003-10-25
+ 
+ * Storage/RAM.pm : added version number
+
+0.07	2003-10-25
+ 
+ * Storage/PassThru.pm : added version number (thanks Randal Schwartz)
+
+0.06	2003-10-25
+
+ * test.pl : omitted XML & HTMLtable tests
+
+0.05	2001-07-17
+
+ There are major changes in the way the tied hash interface
+ does deletions and exporting and in the XML and Weblog format
+ parsers.  If you use the tied hash interface or XML or Weblog
+ (in either interface), please update to this version.
+
+ The Big Stuff:
+
+   * XML now accepts user-supplied tag-to-column mappings.
+
+   * Import now supports cross and outer joins by importing more than
+     one table into the same in-memory table.
+
+ Many minor fixes:
+
+ * fixed adExport to allow flags as documented
+   (thx Matthew Wickline)
+
+ * greatly improved and speeded up deletions from tied hashes
+   and documented how they work (thx *alot* Matthew Wickline)
+
+ * fixed weblog to handle embedded double quotes
+   (thx Bob O'Neill)
+
+ * added documentation to DBD::AnyData on cross joins and full
+   outer joins as part of the import statement
+
+ * fixed tests so they skip XML and HTMLtable if the
+   required extra modules (e.g. XML::Twig) aren't available
+   (thx Malcolm Cook)
+
+ * fixed XML to be able to work with XML::Twig 3.00 as well
+   as earlier versions (meant to do that earlier)
+
+ * fixed README to mention that DBD::AnyData replaces
+   DBD::RAM (thx Mark Whittiker)
+
+ * fixed weblog README to use current method and column names
+   (thx Bob O'Neill)
+
+ * fixed HTMLtable so that it can be used to export even if
+   HTML::TableExtract and HTML::Parser aren't installed
+   (thx Matthew Wickline)
+
+ * fixed bad version number on DBD::AnyData - it reported 0.03
+   instead of 0.04 (hey I caught this one all by myself)
+
+ * added version numbers to all of the submodules and standardized
+   the docs
+
+0.04	2001-06-26
+
+ * Beta release
+
+0.03	2001-03-17
+
+ * second Alpha release
+
+0.02	2001-02-04
+
+ * first Alpha release
+
+0.01	2001-01-17
+
+ * pre Alpha release

@@ -1,0 +1,41 @@
+---
+abstract: 'HTML::FillInForm with Amon2'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amon2-Plugin-Web-FillInForm
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Amon2::Plugin::Web::FillInForm:
+    file: lib/Amon2/Plugin/Web/FillInForm.pm
+    version: '0.02'
+requires:
+  Amon2: '2.28'
+  HTML::FillInForm: '2.00'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Amon2-Plugin-Web-FillInForm/issues
+  homepage: https://github.com/tokuhirom/Amon2-Plugin-Web-FillInForm
+  repository: git://github.com/tokuhirom/Amon2-Plugin-Web-FillInForm.git
+version: '0.02'
+x_contributors:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

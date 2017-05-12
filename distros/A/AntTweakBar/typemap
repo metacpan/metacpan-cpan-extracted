@@ -1,0 +1,16 @@
+TwGraphAPI	 T_IV
+TwBar*           T_PTRREF
+TwType 		 T_UV
+SDL_Event * 	 O_OBJECT
+
+INPUT
+
+O_OBJECT
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) ) {
+        void** pointers = (void**)INT2PTR(void *, SvIV((SV *)SvRV( $arg )));
+        $var = ($type)(pointers[0]);
+    } else if ($arg == 0) {
+        XSRETURN(0);
+    } else {
+        XSRETURN_UNDEF;
+    }

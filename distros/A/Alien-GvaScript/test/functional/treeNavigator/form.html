@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <link href="../../test.css" rel="stylesheet" type="text/css">
+  <link href="../../images/GvaScript.css" rel="stylesheet" type="text/css">
+  <script src="../../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <script>
+    document.observe('dom:loaded', function() {
+      var treeNavigator = new GvaScript.TreeNavigator('TN_tree', {tabIndex: 0}); 
+
+      treeNavigator.keymap.rules.push({
+        RETURN: function(event) {
+          var elem_type = Event.element(event).type;
+          if (/^(text|checkbox|radio|select)$/.test(elem_type))
+            Event.stop(event);
+        }
+      });
+    });
+  </script>
+
+  <style>
+    .TN_node { padding: 8px 2px; background-color: #ddd; border-bottom: 1px solid #aaa;}
+    .TN_label { font-weight: 700; font-size: 1.2em;}
+    .TN_content { background-color: #eee; padding: 0.5em; margin-top: 5px; }
+  </style>
+
+  </head>
+
+  <body>
+
+    <h1>Form Tree Navigator</h1>
+
+    <em>Form fields within a tree navigator: TAB navigation passes
+          smoothly from form fields to node labels and automatically opens
+          the sections. Also in this test,
+          the RETURN key for submitting the form from an input field
+          is canceled.
+    </em>
+
+    <br/><br/>
+
+    <form id='TN_tree' onsubmit="alert('submit'); return false" >
+      <div class="TN_node">
+        <span class="TN_label">section 1 : text</span> 
+        <div class="TN_content">
+          Input text elements: 
+            <input name="text1">
+            <input name="text2">
+          <br>
+          Textarea
+          <br>
+          <textarea rows=3 cols=60>textarea</textarea>
+        </div>
+      </div>
+ 
+     <div class="TN_node TN_closed">
+        <span class="TN_label">section 2 : radio</span>
+        <div class="TN_content">
+          Input radio elements: 
+            <input type="radio" name="radio" value="v1">v1
+            <input type="radio" name="radio" value="v2">v2
+            <input type="radio" name="radio" value="v3">v3
+        </div>
+      </div>
+
+     <div class="TN_node TN_closed">
+        <span class="TN_label">section 3 : checkbox</span>
+        <div class="TN_content">
+          Input checkbox elements: 
+            <input type="checkbox" value="check1">check1
+            <input type="checkbox" value="check2">check2
+            <input type="checkbox" value="check3">check3
+        </div>
+      </div>
+
+     <div class="TN_node TN_closed">
+        <span class="TN_label">section 4 : select</span>
+        <div class="TN_content">
+          select element: 
+          <select name="foo">
+            <option>opt1</option>
+            <option>opt2</option>
+            <option>opt3</option>
+            <option>opt4</option>
+          </select>
+
+        </div>
+      </div>
+
+     <div class="TN_node TN_closed">
+        <span class="TN_label">section 5: buttons</span>
+        <div class="TN_content">
+          <input type="button" onclick="alert('clicked button 1')"
+                     value="button 1">
+          <input type="button" onclick="alert('clicked button 2')"
+                     value="button 2">
+        </div>
+      </div>
+      
+      <br />
+      <input type="submit" value="Submit" />
+      <input type="reset" value="Reset" />
+    </form>
+  </body>
+</html>

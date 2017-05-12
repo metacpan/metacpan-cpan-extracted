@@ -1,0 +1,21 @@
+0.12:
+- Use polling API to get the latest plurks.
+
+0.11:
+- Fixes
+
+0.10:
+- Re-implemented with the official Plurk API
+
+0.04:
+- fix dependency
+
+0.03:
+- fix _tick mis-use of AE::timer, again.
+- update tests for the same reason.
+
+0.02:
+- fix _tick mis-use of AE::timer
+
+0.01:
+- Implement "unread_plurks" event.

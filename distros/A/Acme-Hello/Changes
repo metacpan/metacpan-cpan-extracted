@@ -1,0 +1,29 @@
+[Changes for 0.05 - 2010-10-16]
+
+* More Module::Build, README and test file cleanups.
+
+[Changes for 0.04 - 2010-10-16]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the nullary CC0 1.0 Universal terms:
+
+  To the extent possible under law, 唐鳳 has waived all copyright and
+  related or neighboring rights to Module-Signature.
+
+* Updated Module::Build to 0.36_16, prompted by CPAN testers.
+
+[Changes for 0.03 - 2005-08-09]
+
+* Patch from Alejandro Imass to make Acme::Hello::I18N compliant
+  with newer versions of I18N frameworks.
+
+[Changes for 0.02 - 2002-12-19]
+
+* A shiny new Module::Build pass-thru installer
+* META.yaml is now META.yml
+* Move Build.pm to inc/ so CPAN indexer won't get confused
+
+[Changes for 0.01 - 2002-10-13]
+
+* Initial release of 'Best Practice' Acme::Hello
+

@@ -1,0 +1,63 @@
+
+=head2 archive_entry_set_<%= $name %>
+
+ my $status = archive_entry_set_<%= $name %>($entry, $string)
+
+Sets the <%= $name %> for the archive entry object.
+
+=cut
+
+#ifdef HAS_archive_entry_copy_<%= $name %>
+
+int
+archive_entry_set_<%= $name %>(entry, <%= $name %>)
+    struct archive_entry *entry
+    SV *<%= $name %>
+  CODE:
+    if(SvOK(<%= $name %>))
+    {
+#ifdef HAS_archive_entry_update_<%= $name %>_utf8
+      if(DO_UTF8(<%= $name %>))
+      {
+        RETVAL = archive_entry_update_<%= $name %>_utf8(entry, SvPV_nolen(<%= $name %>));
+        if(RETVAL > 0)
+          RETVAL = ARCHIVE_OK;
+      }
+      else
+      {
+#endif
+        archive_entry_copy_<%= $name %>(entry, SvPV_nolen(<%= $name %>));
+        RETVAL = ARCHIVE_OK;
+#ifdef HAS_archive_entry_update_<%= $name %>_utf8
+      }
+    }
+    else
+    {
+      archive_entry_copy_<%= $name %>(entry, NULL);
+      RETVAL = ARCHIVE_OK;
+    }
+#endif
+  OUTPUT:
+    RETVAL
+
+#endif
+
+=head2 archive_entry_<%= $name %>
+
+ my $string = archive_entry_<%= $name %>($entry);
+
+Retrieve the <%= $name %> for the archive entry object.
+
+=cut
+
+#ifdef HAS_archive_entry_<%= $name %>
+
+string_or_null
+_archive_entry_<%= $name %>(entry)
+    struct archive_entry *entry
+  CODE:
+    RETVAL = archive_entry_<%= $name %>(entry);
+  OUTPUT:
+    RETVAL
+
+#endif

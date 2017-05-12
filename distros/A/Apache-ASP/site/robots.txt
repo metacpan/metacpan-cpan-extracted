@@ -1,0 +1,1 @@
+# stub file with no rules, work around for Googlebot which seems to have a hard time dealing with no robots.txt for chamas.com

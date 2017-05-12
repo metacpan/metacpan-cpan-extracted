@@ -1,0 +1,29 @@
+0.06	2017-02-25
+		- Bug fix for storing of unsuccess requests
+
+0.05	2017-02-24
+		- Path digest change to md5 from sha256
+		- Added hook info to cache files and Downloader::throw()
+		- Improved fastcgi params check
+		- Added imgresize hook max width/height limits, 10000
+		- Added css and js hooks
+		- Added minify hook for css and js
+		- Downloader::throw() fix for uid
+
+0.04	2017-02-23
+		- Bug fixed for path digest creating
+		- Added CDNGET_URI
+		- Added imgcrop hook
+
+0.03	2017-02-22
+		- Improvements
+		- Added hook function
+		- Added imgresize hook
+		- Added log_info
+		- Added terminating forcefully
+
+0.02	2017-02-20
+		- Improved and refactored
+
+0.01	2017-02-15
+		- App::cdnget init

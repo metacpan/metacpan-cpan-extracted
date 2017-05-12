@@ -1,0 +1,38 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'Alien::Base::ModuleBuild' => '0.002',
+                                        'File::ShareDir' => '1.03'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::CleanNamespaces' => '0.15',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Alien::Base' => '0.002',
+                                      'File::ShareDir' => '1.03',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

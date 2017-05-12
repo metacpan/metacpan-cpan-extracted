@@ -1,0 +1,30 @@
+
+ TO DO
+ =====
+
+ List of outstandings bugs, features and ideas for the AFS module.
+ Please note that the thoughts expressed here do not necessarily imply
+ any guaranteed future functionality of the AFS module.  Please contact the
+ maintainer if you wish to help implement anything here.  All help is welcome,
+ but do check first to make sure someone isn't already tackling the item
+ in question.  Any other suggestions, ideas, patches gratefully received.
+
+ Written by Norbert E Gruener <nog@MPA-Garching.MPG.DE>
+
+
+ SHORT TERM
+ ----------
+ * improve the test suites
+
+
+ MID TERM
+ --------
+ * remove the module AFS::KAS
+ * upgrade AFS::KTC_TOKEN
+
+
+ LONG TERM
+ ---------
+ * verify whether all OpenAFS constants are included in the 'constant'
+   function
+ * develop sufficient test suites

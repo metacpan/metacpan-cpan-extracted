@@ -1,0 +1,6 @@
+---
+files:
+  lib/parent.pm: lib/parent.pm
+dirs-recursive:
+  t/: lib/parent/t/
+

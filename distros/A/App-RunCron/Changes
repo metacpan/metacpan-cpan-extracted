@@ -1,0 +1,32 @@
+Revision history for Perl extension App-RunCron
+
+0.08 2014-12-21T07:14:02Z
+    - [feature] Announcer
+    - [feature] Announcer::Command Reporter::Command
+
+0.07 2013-10-30T11:19:55Z
+    - fix deps and tests
+
+0.06 2013-10-30T10:35:58Z
+    - fix test cases
+    - add `print` option (EXPERIMENTAL)
+
+0.05 2013-10-23T11:11:35Z
+    - add Reporter::Fluentd (EXPERIMENTAL)
+    - add `tag` option
+
+0.04 2013-10-23T09:29:44Z
+    - add `common_reporter` option
+    - add writing sperator line process in Reporter::File
+    - `child_signal` and `child_exit_code` return -1 if command is not executed
+    - use Sys::Hostename for portability
+
+0.03 2013-10-22T19:03:28Z
+    - add document of Test::App::RunCron
+
+0.02 2013-10-22T18:52:41Z
+    - add test framework for RunCron
+    - use `mkpath` for more safety in Reporter::File
+
+0.01 2013-10-20T07:28:35Z
+    - original version

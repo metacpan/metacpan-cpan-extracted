@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Attribute/Unimplemented.pm
+t/00_Unimplemented.t

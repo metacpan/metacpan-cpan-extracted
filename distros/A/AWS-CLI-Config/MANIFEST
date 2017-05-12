@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/AWS/CLI/Config.pm
+minil.toml
+t/00_compile.t
+t/01__base_dir.t
+t/02_access_key_id.t
+t/03_output.t
+t/04_config.t
+META.yml
+MANIFEST

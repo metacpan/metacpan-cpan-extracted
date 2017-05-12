@@ -1,0 +1,27 @@
+0.13 12.01.2015 15:14
+    Fixed dispatcher. Updated AUTOLOAD mechanism.
+
+0.12 - 11.01.2015 17:56
+    Fixed dispatcher, added pool_from_dispatcher method.
+
+0.11 - 31.12.2014 00:41
+    Added dispatcher method, added test, updated pod.
+
+0.10 - 31.12.2014 00:01
+    Internal release.
+
+0.09 - 27.12.2014 17:13
+    Fixed tests for cpantesters.
+
+0.08 - 24.12.2014 22:25
+    Removed shebangs from tests.
+
+0.07 - 23.12.2014
+    Removed annoying print.
+
+0.06 - 22.12.2014
+    Updated pod, added github links.
+
+0.05 - 22.12.2014
+    Initial version.
+

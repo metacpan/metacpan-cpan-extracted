@@ -1,0 +1,79 @@
+{
+   "abstract" : "Tools required for autogen scripts in Windows (MSYS2)",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-MSYS2",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Archive::Extract" : "0.48",
+            "HTTP::Tiny" : "0",
+            "IO::Uncompress::UnXz" : "0",
+            "JSON::PP" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06",
+            "perl" : "5.004"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "0",
+            "File::Which" : "0",
+            "JSON::PP" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Suite" : "0.000030",
+            "Test::Alien" : "0.09",
+            "Test::More" : "0.94",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Alien-MSYS2/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Alien::MSYS2",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Alien-MSYS2.git",
+         "web" : "https://github.com/plicease/Alien-MSYS2"
+      }
+   },
+   "version" : "0.02"
+}
+

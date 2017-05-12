@@ -1,0 +1,128 @@
+<project name="extras" default="build" xmlns:ac="antlib:net.sf.antcontrib">
+
+	<property name="buildroot" location="build"/>
+	<property name="classesroot" location="${buildroot}/classes"/>
+	<property name="suiteroot" location="${buildroot}/suite"/>
+	<property name="libroot" location="${suiteroot}/lib"/>
+	
+	<property name="junit2taproot" location="Java/JUnit2TAP"/>
+	<property name="tapgenroot" location="Java/TAPGenerator"/>
+	<property name="jsuiteroot" location="Java/JSuite"/>
+
+	<property name="psuiteroot" location="Perl/PSuite"/>
+
+	<property name="junit-jar" location="path-to-junit-jar"/>
+	<property name="hamcrest-jar" location="path-to-hamcrest-jar"/>
+
+	<target name="build">
+		<ant dir="${junit2taproot}" target="build" usenativebasedir="true" inheritall="false"> 
+			<property name="junit-jar" value="${junit-jar}"/>
+			<property name="hamcrest-jar" value="${hamcrest-jar}"/>
+		</ant>
+		<ant dir="${tapgenroot}" target="build" usenativebasedir="true" inheritall="false"/>
+		<mkdir dir="${classesroot}"/>
+		<mkdir dir="${libroot}"/>
+		
+		<copy todir="${libroot}">
+			<fileset file="${junit2taproot}/build/JUnit2TAP.jar"/>
+			<fileset file="${tapgenroot}/build/TAPGenerator.jar"/>
+			<fileset file="${junit-jar}"/>
+			<fileset file="${hamcrest-jar}"/>
+		</copy>
+
+		<path id="libcp">
+			<fileset dir="${libroot}" includes="*.jar"/>
+		</path>
+
+		<javac srcdir="${jsuiteroot}/src/main/java" destdir="build/classes" includeantruntime="false">
+			<classpath refid="libcp"/>
+		</javac>
+
+		<jar destfile="${libroot}/suiteparts.jar">
+			<fileset dir="${classesroot}">
+				<include name="**/SuitePart*.class"/>
+			</fileset>
+		</jar>
+		
+		<manifestclasspath property="libcpjar" jarfile="${libroot}/cp.jar">
+			<classpath refid="libcp"/>
+		</manifestclasspath>
+
+		<jar destfile="${libroot}/cp.jar">
+			<manifest>
+				<attribute name="Class-Path" value="${libcpjar}"/>
+			</manifest>
+		</jar>
+			
+		<ac:foreach target="-class2execjar" param="testclassfile">
+			<param name="libcpjar" value="${libcpjar}"/>
+			<path>
+				<fileset dir="${classesroot}">
+					<include name="**/*.class"/>
+					<exclude name="**/SuitePart*.class"/>
+				</fileset>
+			</path>
+		</ac:foreach>
+		
+		<copy todir="${suiteroot}">
+			<fileset dir="${psuiteroot}/src/main/perl"/>
+		</copy>
+		
+		<echo file="${suiteroot}/config.testontap">
+id = be5cc88f-dd93-11e6-ba12-bbd85680ace1
+include = not regexp(^lib/)
+parallelizable = regexp(.*)
+		</echo>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${buildroot}"/>
+		<ant dir="Java/TAPGenerator" target="clean" usenativebasedir="true" inheritall="false"/> 
+		<ant dir="Java/JUnit2TAP" target="clean" usenativebasedir="true" inheritall="false"/> 
+	</target>
+	
+	<target name="-class2execjar">
+		
+		<pathconvert dirsep="/" property="testclassfile_fwslash">
+			<path>
+				<pathelement path="${testclassfile}"/>
+			</path>
+		</pathconvert>
+		<pathconvert dirsep="/" property="classesroot_fwslash">
+			<path>
+				<pathelement path="${classesroot}"/>
+			</path>
+		</pathconvert>
+		<ac:propertyregex
+			property="reltestclassfile"
+			input="${testclassfile_fwslash}"
+			regexp="^${classesroot_fwslash}/(.+)\.class$"
+			replace="\1"
+		/>
+		<ac:propertyregex
+			property="pkgclass"
+			input="${reltestclassfile}"
+			regexp="/"
+			replace="."
+			defaultvalue="${reltestclassfile}"
+			global="true"
+		/>
+		<ac:propertyregex
+			property="pkgdir"
+			input="${reltestclassfile}"
+			regexp="(.*)/[^/]+$"
+			replace="\1"
+			defaultvalue=""
+		/>
+		
+		<jar destfile="${suiteroot}/${pkgclass}.jar">
+			<zipfileset file="${testclassfile}" prefix="${pkgdir}"/>
+			<manifest>
+				<attribute name="Main-Class" value="${pkgclass}"/>
+				<attribute name="Class-Path" value="lib/cp.jar"/>
+			</manifest>
+		</jar>
+		
+	</target>
+		
+</project>

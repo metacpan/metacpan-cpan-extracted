@@ -1,0 +1,100 @@
+NAME
+
+    App::CPAN::Dependents - Recursively find all reverse dependencies for a
+    distribution or module
+
+SYNOPSIS
+
+      use App::CPAN::Dependents 'find_all_dependents';
+      my $dependents = find_all_dependents(module => 'JSON::Tiny'); # or dist => 'JSON-Tiny'
+      print "Distributions dependent on JSON::Tiny: @$dependents\n";
+      
+      # From the commandline
+      $ cpan-dependents --with-recommends JSON::Tiny
+      $ cpan-dependents -c JSON-Tiny
+
+DESCRIPTION
+
+    App::CPAN::Dependents provides the function "find_all_dependents"
+    (exportable on demand) for the purpose of determining all distributions
+    which are dependent on a particular CPAN distribution or module.
+
+    This module uses the MetaCPAN API, and must perform several requests
+    recursively, so it may take a long time (sometimes minutes) to
+    complete. If the function encounters HTTP errors (including when
+    querying a nonexistent module or distribution) or is unable to connect,
+    it will die.
+
+    This module will only find distributions that explicitly list
+    prerequisites in metadata; dynamic_config will not be used. Also, it
+    assumes the MetaCPAN API will correctly extract the provided modules
+    for distributions, so any unindexed or unauthorized modules will be
+    ignored.
+
+    See cpan-dependents for command-line usage.
+
+FUNCTIONS
+
+ find_all_dependents
+
+      my $dependents = find_all_dependents(module => 'JSON::Tiny', recommends => 1);
+
+    Find all dependent distributions. Returns an array reference of
+    distribution names. The following parameters are accepted:
+
+    module
+
+      The module name to find dependents for. Mutually exclusive with dist.
+
+    dist
+
+      The distribution to find dependents for. Mutually exclusive with
+      module.
+
+    http
+
+      Optional HTTP::Tiny object to use for building the default
+      MetaCPAN::Client object.
+
+    mcpan
+
+      Optional MetaCPAN::Client object to use for querying MetaCPAN. If not
+      specified, a default MetaCPAN::Client object will be created using
+      "http" if specified.
+
+    recommends
+
+      Boolean value, if true then recommends prerequisites will be
+      considered in the results. Defaults to false.
+
+    suggests
+
+      Boolean value, if true then suggests prerequisites will be considered
+      in the results. Defaults to false.
+
+    develop
+
+      Boolean value, if true then develop phase prerequisites will be
+      considered in the results. Defaults to false.
+
+    debug
+
+      Boolean value, if true then debugging information will be printed to
+      STDERR as it is retrieved.
+
+AUTHOR
+
+    Dan Book, dbook@cpan.org
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2015, Dan Book.
+
+    This library is free software; you may redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+SEE ALSO
+
+    cpan-dependents, Test::DependentModules, MetaCPAN::Client,
+    CPAN::Meta::Spec
+

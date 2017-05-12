@@ -1,0 +1,59 @@
+#!/opt/perl/bin/perl
+use strict;
+use AnyEvent;
+use AnyEvent::XMPP::IM::Connection;
+
+my $DEBUG   = 0;  # set to 1 if you want to see a protocol dump
+my $TIMEOUT = 30; # timeout the whole program after $TIMEOUT seconds
+
+binmode STDOUT, ":utf8";
+
+my ($jid, $pass) = @ARGV;
+
+my $j = AnyEvent->condvar;
+my $con =
+   AnyEvent::XMPP::IM::Connection->new (
+      jid              => $jid,
+      password         => $pass,
+      initial_presence => -5,
+   );
+
+$con->reg_cb (
+   debug_recv => sub { print "< $_[1]\n" },
+   debug_send => sub { print "> $_[1]\n" },
+) if $DEBUG;
+
+my $timer =
+   AnyEvent->timer (
+      after => 10, cb => sub { warn "got timeout, exiting..."; $j->broadcast }
+   );
+
+$con->reg_cb (
+   session_ready => sub {
+      my ($con) = @_;
+   },
+   error => sub {
+      my ($con, $error) = @_;
+      warn "error: " . $error->string . "\n";
+   },
+   disconnect => sub {
+      my ($con, $host, $port, $message) = @_;
+      warn "disconnected from $host:$port: $message\n";
+      $j->broadcast;
+   },
+   roster_update => sub {
+      my ($con, $roster, $contacts) = @_;
+      for my $contact ($roster->get_contacts) {
+         print "contact: " . $contact->jid
+             . ", name: " . $contact->name
+             . ", groups: " . (join ",", $contact->groups)
+             . ", subscription: " . $contact->subscription
+             . ", ask: " . $contact->ask
+             . "\n";
+      }
+      $j->broadcast;
+   }
+);
+
+$con->connect;
+$j->wait;

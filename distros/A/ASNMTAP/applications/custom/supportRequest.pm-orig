@@ -1,0 +1,76 @@
+# ----------------------------------------------------------------------------------------------------------
+# © Copyright 2003-2011 Alex Peeters [alex.peeters@citap.be]
+# ----------------------------------------------------------------------------------------------------------
+# 2011/mm/dd, v3.002.003, module supportRequest.pm for ASNMTAP::Asnmtap::Applications::CGI
+# ----------------------------------------------------------------------------------------------------------
+
+use strict;
+use warnings;           # Must be used in test mode only. This reduces a little process speed
+#use diagnostics;       # Must be used in test mode only. This reduces a lot of process speed
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+BEGIN { if ( $ENV{ASNMTAP_PERL5LIB} ) { eval 'use lib ( "$ENV{ASNMTAP_PERL5LIB}" )'; } }
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+use ASNMTAP::Time qw(&get_datetimeSignal);
+
+use ASNMTAP::Asnmtap::Applications::CGI v3.002.003;
+use ASNMTAP::Asnmtap::Applications::CGI qw(:APPLICATIONS :CGI :DBREADONLY :DBTABLES);
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+sub insertSupportRequest {
+  my ($catalogID, $uKey, $title, $remoteUser, $outageStartDate, $outageStartTime, $description, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID, $debug) = @_;
+
+	my ($succeeded, $alert, $error) = ( 1 );
+  # ...
+  return ($succeeded, $alert, $error);
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+sub getSupportRequest {
+  my ($catalogID, $uKey, $title, $remoteUser, $problemSolved, $list, $updated, $supportRequest, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID, $debug) = @_;
+
+	my ($succeeded, $alert, $error) = ( 1 );
+  # ...
+  return ($succeeded, $alert, $error);
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+sub updateSupportRequest {
+  my ($catalogID, $uKey, $title, $remoteUser, $outageEndDate, $outageEndTime, $description, $supportRequest, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID, $debug) = @_;
+
+	my ($succeeded, $alert, $error) = ( 1 );
+  # ...
+  return ($succeeded, $alert, $error);
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+sub error_SupportRequest {
+  my ($HTML, $error_message, $debug, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, $sessionID) = @_;
+
+  my $subject = "$htmlTitle / error_SupportRequest: " . get_datetimeSignal();
+  my $message = get_datetimeSignal() . "\npagedir   : $pagedir\npageset   : $pageset\nhtml title: $htmlTitle\n\nerror message:\n$error_message\n";
+  my $returnCode = sending_mail ( $SERVERLISTSMTP, $SENDEMAILTO, $SENDMAILFROM, $subject, $message, $debug );
+  print "Problem sending email to the '$APPLICATION' server administrators\n" unless ( $returnCode );
+
+  if ( $refresh == 0 ) {
+    return (0, $error_message, "Error: ...", "String: ...");
+  } elsif ( $refresh == -1 ) {
+    print "<H1>Support Request Error:</H1>\n", $error_message, "\n<BR>";
+    return 0;
+  } else {
+    print_header ($HTML, $pagedir, $pageset, $htmlTitle, $subTitle, $refresh, $onload, 'F', '', $sessionID);
+    print "<H1>Support Request:</H1>\n", $error_message, "\n<BR>";
+    return 0;
+  }
+}
+
+# End supportRequest.pm ------------------------------------------------------------------------------------
+
+1;

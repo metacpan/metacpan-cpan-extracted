@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.14.2;
+
+use Auth::YubiKey::Client::Web;
+
+my $id      = $ENV{YUBI_ID};
+my $apikey  = $ENV{YUBI_APIKEY};
+
+my $yubiauth = Auth::YubiKey::Client::Web->new(
+    id      => $id,
+    api_key => $apikey,
+);
+
+use Data::Printer colored => 1;
+
+my $input = $ARGV[0] || <>;
+my $result = $yubiauth->verify_otp($input);
+say $result->is_success;
+say $result->is_error;
+say p($result);

@@ -1,0 +1,65 @@
+{
+   "abstract" : "Curses interface for reading feeds.",
+   "author" : [
+      "Robin Edwards <robin.ge@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Syndicator",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Any" : "0.20",
+            "Curses::UI" : "0.9607",
+            "DBD::SQLite" : "1.29",
+            "DateTime" : "0.61",
+            "Digest::MD5" : "2.39",
+            "HTML::FormatText::WithLinks" : "0.11",
+            "IO::All" : "0.41",
+            "JSON::Any" : "1.22",
+            "KiokuDB" : "0.49",
+            "KiokuDB::Backend::DBI" : "1.15",
+            "MooseX::ConfigFromFile" : "0.02",
+            "MooseX::Declare" : "0.33",
+            "MooseX::Getopt" : "0.31",
+            "MooseX::Types" : "0.23",
+            "MooseX::Types::DateTime" : "0.05",
+            "MooseX::Types::URI" : "0.02",
+            "Try::Tiny" : "0.06",
+            "XML::Feed::Aggregator" : "0.0400"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "Test::UseAllModules" : "0.12"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robinedwards/App-Syndicator/issues"
+      },
+      "homepage" : "http://search.cpan.org/~rge/App-Syndicator/lib/App/Syndicator.pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robinedwards/App-Syndicator.git",
+         "web" : "https://github.com/robinedwards/App-Syndicator"
+      }
+   },
+   "version" : "0.0061"
+}
+

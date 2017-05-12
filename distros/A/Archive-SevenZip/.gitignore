@@ -1,0 +1,11 @@
+Makefile
+Makefile.old
+*.tar.gz
+*.bak
+pm_to_blib
+blib/
+Archive-SevenZip-*/
+Archive-SevenZip-*
+.releaserc
+cover_db
+MYMETA.*

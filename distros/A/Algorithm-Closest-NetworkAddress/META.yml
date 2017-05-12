@@ -1,0 +1,16 @@
+abstract: finds the closest network address from a defined list
+author: 'Ton Voon C<ton.voon@altinity.com>'
+build_requires:
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: gpl
+name: Algorithm-Closest-NetworkAddress
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Struct: 0
+  perl: 5.8.4
+version: 0.1

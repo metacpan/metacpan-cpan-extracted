@@ -1,0 +1,113 @@
+#!/usr/bin/perl -w
+use strict;
+use Carp;
+
+# This little program generates GDIFF files from textual version of the
+# format.  It's only intended purpose is for generating test files for
+# this module.  See t/data/*.gdiff.txt for example input files.
+
+my %DATA_OPCODE = (
+    ushort => "\xF7",
+    int => "\xF8",
+);
+my %COPY_OPCODE = (
+    ushort_ubyte => "\xF9",
+    ushort_ushort => "\xFA",
+    ushort_int => "\xFB",
+    int_ubyte => "\xFC",
+    int_ushort => "\xFD",
+    int_int => "\xFE",
+    long_int => "\xFF",
+);
+
+binmode STDOUT or die "error setting stdout to binmode: $!";
+
+# The header is always the same.
+print "\xD1\xFF\xD1\xFF\x04";
+
+while (<>) {
+    chomp;
+    next unless /\S/;
+    next if /^\s*#/;
+
+    my ($opcode, @arg) = split ' ';
+    @arg = map { parse_arg($_) } @arg;
+    if ($opcode =~ /^data_(\d+)$/i) {
+        my $n = $1;
+        die "line $.: bad 'data_N' command\n"
+          unless $n >= 1 && $n <= 246 && @arg == 1;
+        die "line $.: wrong amount of data in 'data_N' command\n"
+          unless length $arg[0] == $n;
+        print chr($n), $arg[0];
+    }
+    elsif ($opcode =~ /^data_(ushort|int)$/i) {
+        my $len_type = lc $1;
+        die "line $.: wrong number of args\n" unless @arg == 2;
+        die "line $.: wrong amount of data in second arg\n"
+          unless $arg[0] == length $arg[1];
+        print $DATA_OPCODE{$len_type};
+        write_num($len_type, $arg[0]);
+        print $arg[1];
+    }
+    elsif ($opcode =~ /^copy_(ushort|int|long)_(ubyte|ushort|int)$/i) {
+        my $offset_type = lc $1;
+        my $len_type = lc $2;
+        die "line $.: wrong number of args\n" unless @arg == 2;
+        print $COPY_OPCODE{"${offset_type}_$len_type"};
+        write_num($offset_type, $arg[0]);
+        write_num($len_type, $arg[1]);
+    }
+    else {
+        die "line $.: unrecognized command '$opcode'\n";
+    }
+}
+
+# EOF opcode.
+print "\x00";
+
+
+sub parse_arg
+{
+    local $_ = shift;
+
+    if (/^"(.*)"\z/) {
+        $_ = $1;
+        s/\\n/\n/g;
+        return $_;
+    }
+    elsif (/^0x[\dA-F]+\z/i || /^0\d+\z/) {
+        return oct;
+    }
+    elsif (/^(\d+)\z/) {
+        return $1;
+    }
+    else {
+        die "line $.: bad arg '$_'\n";
+    }
+}
+
+sub write_num
+{
+    my ($type, $num) = @_;
+
+    if ($type eq 'ubyte') {
+        die "line $.: ubyte value out of range\n" if $num > 0xFF;
+        print chr($num);
+    }
+    elsif ($type eq 'ushort') {
+        die "line $.: ushort value out of range\n" if $num > 0xFFFF;
+        print pack('n', $num);
+    }
+    elsif ($type eq 'int') {
+        print pack('N', $num);
+    }
+    elsif ($type eq 'long') {
+        # TODO
+        die "support for 'long' type not implemented yet";
+    }
+    else {
+        croak "bad number type '$type'";
+    }
+}
+
+# vi:ts=4 sw=4 expandtab:

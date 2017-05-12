@@ -1,0 +1,57 @@
+Revision history for Perl extension Acme-CPANAuthors-Korean
+
+0.16 2015-01-28T09:35:55Z
+        - Add POTATOGIM as CPAN author (#4)
+
+0.15 2015-01-20T05:03:46Z
+        - Add RAKJIN
+
+0.14 2013-12-31T03:04:32Z
+        - Add ISJOUNG
+
+0.13 2013-07-24T04:03:29Z
+        - utf8 characters in code require the 'utf8' pragma [github:karenetheridge]
+
+0.12 2013-07-19T09:14:28Z
+        - Add SKYEND
+
+0.11 2013-07-19T01:56:02Z
+        - Add NEWBCODE
+
+0.10   Thu May  2 22:00:00 2013 KST
+        - Fix [rt.cpan.org #84255] Packaging bug: inc directory missing
+
+0.09    Tue Feb 28 11:30:00 2011 KST
+        - Add GYPARK
+
+0.08    Wed Feb  9 00:30:00 2011 KST
+        - Add a repository meta
+
+0.071   Thu Dec  8 11:30:00 2011 KST
+        - Fix DALINAUM and AMORETTE's ID @keedi++
+
+0.07    Fri Feb 11 21:30:00 2011 KST
+        - Add AANOAA
+
+0.061   Sat Feb  5 14:10:00 2011 KST
+        - Fix something
+        
+0.06    Sat Feb  5 14:00:00 2011 KST
+        - Add DALINAUM
+
+0.05    Tue Apr  6  17:30:00 2010 KST
+        - Add AMORRETE
+
+0.04    Wed Mar 10 12:35:00 2010 KST
+        - Add JPJEON
+
+0.03    Wed Mar 10 12:30:00 2010 KST
+        - Add YONGBIN
+
+0.02    Wed Oct  7 15:13:00 2009
+        - Add KHS
+
+0.01    Wed Oct  7 14:32:49 2009
+        - original version
+    - original version
+

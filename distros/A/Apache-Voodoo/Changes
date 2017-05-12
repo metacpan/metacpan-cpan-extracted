@@ -1,0 +1,128 @@
+3.01 - 5/13/2010
+================
+Added A::V::Test which lets you driving an application outside of Apache so
+that you can unit test your apps.
+
+Simplified the Native debugging back end.
+
+Various bug fixes.
+
+3.00 - 2/1/2010
+================
+Added true MVC support.
+
+Abstracted debugging into multiple backends.  The classic mechanism (aka Native) has
+been expanded to handle AJAX requests. added support for FirePHP and Log4Perl.
+
+Added support for serving applications via SOAP and providing WSDLs for those services 
+using Pod::WSDL.
+
+Parameter validation which used to built into Apache::Voodoo::Table has been abstracted out
+into its own stand alone module.
+
+Better exception support via Exception::Class
+
+Documentation pulled out and moved to http://apachevoodoo.com
+
+Revision control moved to github http://github.com/maverick/ApacheVoodoo
+
+2.04 - 8/20/2008
+================
+Abstracted Session handling.  Sessions can either reside on the file system on in mysql.
+
+access_denied now accepts two additional params.  The first is appended to the url as the
+value of error.  This can be used to provide a hint to the receiving module to describe why
+access was denied.  The second param can be used to have the access_denied call redirect somewhere else.
+(based on modifications made by Mike)
+
+pretty_tiem had the wrong array members being used
+
+Per user theme selection works again.
+
+Logout target can be user configured now.
+
+Prettier handling of the maximum upload size.
+
+2.03 - 2/04/2008
+================
+Installer now handles standard Perl modules too.
+
+Added variations of the next, previous and more pages in order to make building ajaxed pagination easier.
+
+Added arbitrary join syntax to the table abstraction layer.
+
+Abstracted Template handling out of the Hander.pm
+
+2.02 - 12/3/2007
+================
+Traced down glitch in Net::DNS (used by Email::Valid), added workaround.  Submitted patch.
+
+Removed dependency on IPC::Shareable
+
+Fixed a rounding error in the window size code.  This bug was only triggered when the window size 
+was set to an odd number; and event which rarely happens.  This has allowed this bug to go 
+unnoticed for 9 years.
+
+
+2.01 - 1/19/2007
+================
+Fixed glitch in upload handling under Apache 2, updated docs.
+
+2.00 - 1/18/2007
+================
+Added support for Apache 2
+
+1.22 - 12/18/2006
+================
+Bug fixes.
+
+1.21 - 11/27/2006
+================
+Bug fixes, improved handling of the apache configuration paths.
+
+1.20 - 02/07/2006
+================
+Added automated install / upgrade process of Voodoo based sites (see voodoo-control for details).
+Unfortunately to make this work cleanly, I had to introduce a backwards-incompatibility.  The
+layout of a site is no longer completely arbitrary as it was before, certain things are expected
+to reside in certain locations.  Completely arbitrary layouts yielded no real benefit, made the docs
+more complex thus raising the initial learning curve, and introduced needless complexities
+and hoop jumping.
+
+Loads of bug fixes:
+	AV::Table is no longer destructive to the incoming configuration structure.
+
+	Made history capture only operate on GET requests.  Capturing POSTs can lead to bad things
+	happening if you happen to redirect back to a posted history event...same thing applies
+	for PUTs.  The side effect is that you now need to be more careful with your form method settings,
+	which we all should be doing anyway :)
+
+1.13 - 9/15/2005
+================
+
+Works with DSO builds of mod_perl.  The PerlRestartHandler isn't called the same way with ia DSO vs build in version of mod_perl
+
+abstracted pagination control object (Apache::Voodoo::Pager)
+
+various bug fixes
+
+1.1.2 - 2/13/2005
+=================
+
+Again with the documentation indexing thing.
+
+1.1.1 - 2/11/2005
+=================
+
+search.cpan.org didn't wanna play nice with my documentation...hopefully this fixes it.
+
+1.1.0 - 2/11/2005
+=================
+
+First public release.
+
+1.0.x
+================
+
+Historic, non-public releases.  I have them if anyone is interested, but they are not
+backwards compatable with the current release

@@ -1,0 +1,58 @@
+clear
+power on
+regs
+
+op a2 55
+
+# IX should now show $55
+test ix = 55
+
+op 8a
+
+# ACC and IX should now show $55
+test acc = 55
+test ix = 55
+
+# Now for the Z flag case --------------------
+power on
+
+op a9 55
+op a2 00
+
+# Use the IY register to reset Z
+op a0 01
+
+# Should be: ACC=55, IX=0, Z=0
+test acc = 55
+test ix = 0
+test z = 0
+
+op 8a 
+
+# Should be: ACC=0, IX=0, Z=1
+test acc = 0
+test ix = 0
+test z = 1
+
+# Now for the S flag case --------------------
+power on
+
+op a9 55
+op a2 f2
+
+# Use the IY register to reset S
+op a0 01
+
+# Should be: ACC=55, IX=F2, S=0
+test acc = 55
+test ix = f2
+test s = 0
+
+op 8a 
+
+# Should be: ACC=F2, IX=F2, S=1
+test acc = f2
+test ix = f2
+test s = 1
+
+save verify_8A.txt

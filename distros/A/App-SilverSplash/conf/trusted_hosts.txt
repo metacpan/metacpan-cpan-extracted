@@ -1,0 +1,5 @@
+# test machine
+#00:26:08:e0:5e:4e
+
+# meraki ap
+00:18:0A:02:1A:00

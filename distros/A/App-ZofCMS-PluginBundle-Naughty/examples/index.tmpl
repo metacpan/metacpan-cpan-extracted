@@ -1,0 +1,15 @@
+{
+    body => \'index.tmpl',
+    title => '',
+
+    plugins => [
+        { Session => 1000 },
+        { Captcha => 2000 },
+    ],
+    plugins2 => [
+        qw/Session/
+    ],
+
+    plug_captcha => {},
+}
+

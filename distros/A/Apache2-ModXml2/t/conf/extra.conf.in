@@ -1,0 +1,26 @@
+# $Id: extra.conf.in 29 2010-03-12 17:38:52Z jo $
+
+# This is _the_ prerequisite
+LoadModule xml2_module /usr/lib/apache2/modules/mod_xml2.so
+LoadModule include_module /usr/lib/apache2/modules/mod_include.so
+
+<Directory @DocumentRoot@/xml2/>
+# Configuration is done in .htaccess
+# SetOutputFilter will be needed
+AllowOverride FileInfo
+
+Options +Includes
+</Directory>
+
+<Directory @DocumentRoot@/sxpath/>
+# Configuration is done in .htaccess
+# SetOutputFilter will be needed
+AllowOverride FileInfo
+
+Options +Includes
+</Directory>
+
+
+LogLevel debug
+
+# vim: ft=apache

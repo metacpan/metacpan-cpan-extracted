@@ -1,0 +1,77 @@
+{
+   "abstract" : "Instagram auth integration for Amon2",
+   "author" : [
+      "ntakanashi <ntakanashi666 at gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.8.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amon2-Auth-Site-Instagram",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Amon2::Auth" : "0.03",
+            "JSON" : "2.59",
+            "LWP::UserAgent" : "6.05",
+            "Mouse" : "1.11",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Amon2::Auth::Site::Instagram" : {
+         "file" : "lib/Amon2/Auth/Site/Instagram.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ntakanashi/Amon2-Auth-Site-Instagram/issues"
+      },
+      "homepage" : "https://github.com/ntakanashi/Amon2-Auth-Site-Instagram",
+      "repository" : {
+         "url" : "git://github.com/ntakanashi/Amon2-Auth-Site-Instagram.git",
+         "web" : "https://github.com/ntakanashi/Amon2-Auth-Site-Instagram"
+      }
+   },
+   "version" : "0.01"
+}

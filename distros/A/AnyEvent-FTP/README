@@ -1,0 +1,100 @@
+NAME
+
+    AnyEvent::FTP - Simple asynchronous FTP client and server
+
+VERSION
+
+    version 0.09
+
+SYNOPSIS
+
+     # For the client
+     use AnyEvent::FTP::Client;
+    
+     # For the server
+     use AnyEvent::FTP::Server;
+
+DESCRIPTION
+
+    This distribution provides client and server implementations for File
+    Transfer Protocol (FTP) in an AnyEvent environment. For the specific
+    interfaces, see AnyEvent::FTP::Client and AnyEvent::FTP::Server for
+    details.
+
+    Before each release, AnyEvent::FTP::Client is tested against these FTP
+    servers using the t/client_*.t tests that come with this distribution:
+
+    Proftpd
+
+    wu-ftpd
+
+    Net::FTPServer
+
+    vsftpd
+
+    Pure-FTPd
+
+    bftpd
+
+    AnyEvent::FTP::Server
+
+    The client code is also tested less frequently against these FTP
+    servers:
+
+    NcFTPd
+
+    Microsoft IIS
+
+    It used to also be tested against the VMS ftp server, so it was
+    verified to work with it, at least at one point. However, I no longer
+    have access to that server.
+
+SEE ALSO
+
+      * AnyEvent::FTP::Client
+
+      * AnyEvent::FTP::Server
+
+      * Net::FTP
+
+      * Net::FTPServer
+
+      * AnyEvent
+
+      * RFC 959 FILE TRANSFER PROTOCOL <http://tools.ietf.org/html/rfc959>
+
+      * RFC 2228 FTP Security Extensions
+      <http://tools.ietf.org/html/rfc2228>
+
+      * RFC 2640 Internationalization of the File Transfer Protocol
+      <http://tools.ietf.org/html/rfc2640>
+
+      * RFC 2773 Encryption using KEA and SKIPJACK
+      <http://tools.ietf.org/html/rfc2773>
+
+      * RFC 3659 Extensions to FTP <http://tools.ietf.org/html/rfc3659>
+
+      * RFC 5797 FTP Command and Extension Registry
+      <http://tools.ietf.org/html/rfc5797>
+
+      * http://cr.yp.to/ftp.html
+
+      * http://en.wikipedia.org/wiki/List_of_FTP_server_return_codes
+
+AUTHOR
+
+    Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Ryo Okamoto
+
+    Shlomi Fish
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2013 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

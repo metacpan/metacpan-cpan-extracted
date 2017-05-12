@@ -1,0 +1,46 @@
+0.020   2014-10-03
+  * Bugfix: a program that expanded into a single cat was broken by
+    cat optimisation
+  * Improve error message: indicate which def failed arg parsing
+  * add "env" def modifier that installs arguments into environment
+  * make shell requoting come in effect on more than just whitespace
+   (in case you have shell metacharacters in your args)
+  * Docs
+
+0.011   2013-03-09
+  * Improve output of tests when they fail
+  * In tests, support echo binaries that don't know about -n
+    (ie solaris/mac os)
+  * Only leave around temp directory if UNLINER_DEBUG >= 2
+  * Pipeline optimisation: spurious cat removals
+  * Add shuffler.unliner example to examples/ directory
+  * Docs
+
+0.010   2013-02-15
+  * Add --help option to display basic usage
+  * Fix test to not rely on GNU head(1)
+
+0.009   2013-02-13
+  * Add missing Template dependency
+  * Gather some more info in prog_on_stdin to debug windows
+    (github issue #1)
+  * Document and complete exec "language" hidden feature
+  * Use $Config{perlpath} instead of $^X as recommended on CPAN
+    testers twiki
+  * Don't include MYMETA files in CPAN distribution
+    (github issue #2)
+
+0.008   2013-01-06
+  * Don't clean-up temp directory when UNLINER_DEBUG is specified.
+    This is so you can go inspect any generated scripts after.
+  * The tests incorrectly hard-coded the name of the perl binary
+    which was caused tests to fail on some systems (thanks CPAN
+    testers). $^X fix suggested by Andreas J. König.
+  * Allow unliner programs to be read from standard input if the
+    unliner script name is omitted or is "-".
+
+0.006   2012-12-04
+  * Documentation updates
+
+0.005   2012-12-03
+  * Initial CPAN release

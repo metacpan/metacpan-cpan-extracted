@@ -1,0 +1,61 @@
+{
+   "abstract" : "Perl library for easy access to Google services via their API",
+   "author" : [
+      "Pavel Serikov <pavelsr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "API-Google",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::JSON" : "0",
+            "Crypt::JWT" : "0",
+            "Data::Dumper" : "0",
+            "Mojo::UserAgent" : "0",
+            "Mojo::Util" : "0",
+            "Mojolicious::Commands" : "0",
+            "Mojolicious::Lite" : "0",
+            "Mojolicious::Plugin::OAuth2" : "0",
+            "Net::EmptyPort" : "0",
+            "Tie::File" : "0",
+            "feature" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pavelsr/API-Google/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pavelsr/API-Google.git",
+         "web" : "https://github.com/pavelsr/API-Google"
+      }
+   },
+   "version" : "0.12",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

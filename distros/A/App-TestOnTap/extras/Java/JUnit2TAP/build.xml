@@ -1,0 +1,28 @@
+<project name="JUnit2TAP" default="build">
+
+	<property name="buildroot" location="build"/>
+	<property name="classesroot" location="${buildroot}/classes"/>
+	
+	<property name="junit-jar" location="path-to-junit-jar"/>
+	<property name="hamcrest-jar" location="path-to-hamcrest-jar"/>
+
+	<path id="classpath.junit">
+		<pathelement location="${junit-jar}"/>
+		<pathelement location="${hamcrest-jar}"/>
+	</path>
+		
+	<target name="build">
+		<mkdir dir="${classesroot}"/>
+		<javac srcdir="src/main/java" destdir="${classesroot}" includeantruntime="false">
+			<classpath>
+				<path refid="classpath.junit"/>
+			</classpath>
+		</javac>
+		<jar destfile="${buildroot}/JUnit2TAP.jar" basedir="${classesroot}"/>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${buildroot}"/>
+	</target>
+	
+</project>

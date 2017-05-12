@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/App/CLI/Toolkit.pm
+t/00-load.t
+t/01-test-app.t
+t/test-app
+LICENSE
+META.yml                                 Module meta-data (added by MakeMaker)

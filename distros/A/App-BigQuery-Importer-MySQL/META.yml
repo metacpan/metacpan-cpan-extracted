@@ -1,0 +1,47 @@
+---
+abstract: 'BigQuery data importer from MySQL tables.'
+author:
+  - 'Tatsuro Hisamori <myfinder@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.98'
+  Test::mysqld: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-BigQuery-Importer-MySQL
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::BigQuery::Importer::MySQL:
+    file: lib/App/BigQuery/Importer/MySQL.pm
+    version: '0.024'
+requires:
+  Config::CmdRC: '0'
+  DBD::mysql: '0'
+  DBI: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/myfinder/app-bigquery-importer-mysql/issues
+  homepage: https://github.com/myfinder/app-bigquery-importer-mysql
+  repository: git://github.com/myfinder/app-bigquery-importer-mysql.git
+version: '0.024'
+x_authority: cpan:MYFINDER
+x_contributors:
+  - 'meru_akimbo <merukatoruayu0@gmail.com>'
+  - 'yoheimuta <yoheimuta@gmail.com>'
+  - 'Tatsuro Hisamori <medianetworks@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

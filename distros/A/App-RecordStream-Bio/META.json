@@ -1,0 +1,69 @@
+{
+   "abstract" : "A collection of record-handling tools related to biology",
+   "author" : [
+      "Thomas Sibley <trsibley@uw.edu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-RecordStream-Bio",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.16",
+            "Dist::Zilla::Plugin::Run::BeforeBuild" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::RecordStream::Operation" : "v4.0.0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "App::RecordStream::Test::OperationHelper" : "v4.0.0",
+            "App::RecordStream::Test::Tester" : "v4.0.0",
+            "File::Temp" : "0",
+            "JSON" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/MullinsLab/App-RecordStream-Bio/issues"
+      },
+      "homepage" : "https://github.com/MullinsLab/App-RecordStream-Bio",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/MullinsLab/App-RecordStream-Bio.git",
+         "web" : "https://github.com/MullinsLab/App-RecordStream-Bio"
+      }
+   },
+   "version" : "0.18"
+}
+

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+inc/Alien/NSS/ModuleBuild.pm
+lib/Alien/NSS.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+patch/nss.patch
+README
+t/01-config.t
+t/02-use.t
+t/03-signature.t
+t/04-build.t
+SIGNATURE    Added here by Module::Build

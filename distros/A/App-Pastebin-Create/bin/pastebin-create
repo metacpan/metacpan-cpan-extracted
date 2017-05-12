@@ -1,0 +1,57 @@
+#!perl
+
+#PODNAME: pastebin-create
+use strict;
+use warnings;
+use WWW::Pastebin::PastebinCom::Create;
+use Getopt::Long qw(GetOptions);
+
+my ($text_input, $format_input, $expiry_input, $privacy_input, $desc_input);
+
+GetOptions(
+	'text=s' => \$text_input,
+	'format=s' => \$format_input,
+	'expiry=s' => \$expiry_input,
+	'private=s' => \$privacy_input,
+	'desc=s' => \$desc_input) or die "Usage: $0 --text 'TEXT' --format 'none' --expiry 10m --private 0 --desc 'DESCRIPTION'";
+
+
+
+my $bin = WWW::Pastebin::PastebinCom::Create->new;
+
+my $uri = $bin->paste(
+	text => $text_input,
+	format => $format_input,
+	expiry => $expiry_input,
+	private => $privacy_input,
+	desc => $desc_input
+) or die "You need at least to declare --text flag. Debug-message-> " . $bin->error;
+
+print "Your paste URL: $bin\n";
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pastebin-create
+
+=head1 VERSION
+
+version 1.0102
+
+=head1 AUTHOR
+
+mfzz <mfzz@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by mfzz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

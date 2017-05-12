@@ -1,0 +1,435 @@
+#!/usr/bin/perl -w
+#
+# Copyright © 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+#                  Elizabeth Cassell <e_a_c@mailsnare.net>
+#
+# $Revision: 1.14 $ $Date: 2004/10/22 15:04:40 $ $Author: alfw $
+#
+
+use blib;
+use strict;
+use AFS::Monitor;
+use Data::Dumper;
+
+my @cmhosts = ("www.openafs.org", "virtue.openafs.org", "andrew.e.kth.se");  # cache manager machines to monitor
+my @fshosts = ("www.openafs.org", "virtue.openafs.org", "andrew.e.kth.se"); # file server machines to monitor
+my $configfilename = 'configs/configfile';
+my $badconfigfile  = 'configs/badconfig';
+my $outputfilename = 'debug_out/outputfile';
+
+my @tests;      # choose which tests to run
+$tests[1] = 1;  # test of FS afsmonitor with detailed output file
+$tests[2] = 2;  # test of CM afsmonitor
+$tests[3] = 0;  # test of invalid file name
+$tests[4] = 0;  # test of detailed flag without output flag
+$tests[5] = 0;  # test of invalid FS host
+$tests[6] = 0;  # test of invalid CM host
+$tests[7] = 0;  # test of no flags
+$tests[8] = 0;  # test of cmhosts and fshosts and config flags all at once
+$tests[9] = 0;  # test of cmhosts and fshosts
+$tests[10] = 0; # test of config file
+$tests[11] = 0; # test of invalid config file
+$tests[12] = 0; # test of config file with output file
+$tests[13] = 0; # test of show and threshold parameters
+
+my $all = 1;    # show all tests
+
+my $showdump = 0;     # print entire contents of hash for each test
+my $readable = 1;     # print readable formatted output (and execute
+                      # threshold handler functions if they exist)
+my $shortoutput = 0;  # print shorter, harder to read output (don't
+                      # execute handlers)
+
+# available options:
+#
+# afsmonitor(
+#            cmhosts  => \@cmhosts,
+#            fshosts  => \@fshosts,
+#            config   => $configfilename,
+#            detailed => 1,
+#            output   => $outputfilename,
+#           );
+#
+# You must give cmhosts and/or fshosts, or a config file which specifies
+# the cm and fs hosts.
+
+
+print "# Starting now... #\n";
+my ($fsinfo, $cminfo);
+
+if ($all || $tests[1]) {
+  print "\n******** TEST 1a: ********\n";
+
+  print "\nafsmonitor -fshosts ", $fshosts[0], "\n\n";
+
+  ($fsinfo, $cminfo) = afsmonitor(fshosts  => $fshosts[0]);
+  parse_results($fsinfo, $cminfo);
+
+  print "\n******** TEST 1b: ********\n";
+
+  print "\nafsmonitor -fshosts ", join(" ", @fshosts),
+        " -output $outputfilename -detailed\n\n";
+
+  ($fsinfo, $cminfo) = afsmonitor(detailed => 1,
+                                  fshosts  => \@fshosts,
+                                  output   => $outputfilename
+                                 );
+  parse_results($fsinfo, $cminfo);
+}
+
+if ($all || $tests[2]) {
+  print "\n******** TEST 2a: ********\n";
+
+  print "\nafsmonitor -cmhosts ", $cmhosts[0], "\n\n";
+
+  ($fsinfo, $cminfo) = afsmonitor(cmhosts => $cmhosts[0]);
+
+  parse_results($fsinfo, $cminfo);
+
+  print "\n******** TEST 2b: ********\n";
+
+  print "\nafsmonitor -cmhosts ", join(" ", @cmhosts), "\n\n";
+
+  ($fsinfo, $cminfo) = afsmonitor(cmhosts => \@cmhosts);
+
+  parse_results($fsinfo, $cminfo);
+}
+
+if ($all || $tests[3]) {
+  print "\n******** TEST 3: ********\n";
+
+  print "\nafsmonitor -cmhosts ", join(" ", @cmhosts), " -output /\n\n";
+
+  ($fsinfo, $cminfo) = afsmonitor(cmhosts => \@cmhosts,
+                                  output  => '/'
+                                 );
+
+  parse_results($fsinfo, $cminfo);
+}
+
+if ($all || $tests[4]) {
+  print "\n******** TEST 4: ********\n";
+
+  print "\nafsmonitor -cmhosts ", join(" ", @cmhosts), " -detailed\n\n";
+
+  ($fsinfo, $cminfo) = afsmonitor(cmhosts  => \@cmhosts,
+                                  detailed => 1
+                                 );
+
+  parse_results($fsinfo, $cminfo);
+}
+
+if ($all || $tests[5]) {
+  print "\n******** TEST 5: ********\n";
+
+  print "\nafsmonitor -fshosts \"something that won't work\"\n\n";
+
+  ($fsinfo, $cminfo) = afsmonitor(fshosts => [ "something that won't work" ]);
+
+  parse_results($fsinfo, $cminfo);
+}
+
+if ($all || $tests[6]) {
+  print "\n******** TEST 6: ********\n";
+
+  print "\nafsmonitor -cmhosts notreal fake\n\n";
+
+  ($fsinfo, $cminfo) = afsmonitor(cmhosts => [ 'notreal', 'fake' ]);
+
+  parse_results($fsinfo, $cminfo);
+}
+
+if ($all || $tests[7]) {
+  print "\n******** TEST 7: ********\n";
+
+  print "\nafsmonitor\n\n";
+
+  ($fsinfo, $cminfo) = afsmonitor();
+
+  parse_results($fsinfo, $cminfo);
+}
+
+if ($all || $tests[8]) {
+  print "\n******** TEST 8: ********\n";
+
+  print "\nafsmonitor -cmhosts ", join(" ", @cmhosts),
+                    " -fshosts ", join(" ", @fshosts),
+                    " -config $configfilename\n\n";
+
+ ($fsinfo, $cminfo) = afsmonitor(cmhosts => \@cmhosts,
+                                 fshosts => \@fshosts,
+                                 config  => $configfilename
+                                );
+
+  parse_results($fsinfo, $cminfo);
+}
+
+if ($all || $tests[9]) {
+  print "\n******** TEST 9: ********\n";
+
+  print "\nafsmonitor -cmhosts ", join(" ", @cmhosts),
+                    " -fshosts ", join(" ", @fshosts), "\n\n";
+
+  ($fsinfo, $cminfo) = afsmonitor(cmhosts => \@cmhosts,
+                                  fshosts => \@fshosts
+                                 );
+
+  parse_results($fsinfo, $cminfo);
+}
+
+if ($all || $tests[10]) {
+  print "\n******** TEST 10: ********\n";
+
+  print "\nafsmonitor -config $configfilename\n\n";
+
+  ($fsinfo, $cminfo) = afsmonitor(config => $configfilename);
+
+  parse_results($fsinfo, $cminfo);
+}
+
+if ($all || $tests[11]) {
+  print "\n******** TEST 11: ********\n";
+
+  print "\nafsmonitor -config $badconfigfile\n\n";
+
+  ($fsinfo, $cminfo) = afsmonitor(config => $badconfigfile);
+
+  parse_results($fsinfo, $cminfo);
+}
+
+if ($all || $tests[12]) {
+  print "\n******** TEST 12: ********\n";
+
+  print "\nafsmonitor -config $configfilename -output $outputfilename\n\n";
+
+  ($fsinfo, $cminfo) = afsmonitor(config => $configfilename,
+                                  output => $outputfilename
+                                 );
+
+  parse_results($fsinfo, $cminfo);
+}
+
+if ($all || $tests[13]) {
+  print "\n******** TEST 13: ********\n";
+
+ ($fsinfo, $cminfo) =
+   afsmonitor(
+              cmhosts  => \@cmhosts,
+              fshosts  => \@fshosts,
+              # show statments
+              cmshow   => ["PerfStats_section", "fs_oc_downDst_more_50"],
+              fsshow   => ["VnodeCache_group", "FetchData_sqr"],
+              # thresholds
+              fsthresh => [
+                            { vcache_S_Entries => 1 },
+                            { vcache_L_Allocs  => 1 },
+                            { host => "andrew.e.kth.se",
+                              vcache_L_Entries => 1,
+                              handler => "scripts/HandlerScript"
+                            },
+                            { host => "www.openafs.org",
+                              vcache_L_Writes => -1,
+                              handler => "scripts/HandlerScript"
+                            },
+                            { host => "virtue.openafs.org",
+                              vcache_L_Writes => 2,
+                              handler => "scripts/HandlerScript"
+                            }
+                          ],
+              cmthresh => [
+                            { host => "www.openafs.org",
+                              numPerfCalls => 1,
+                              handler => "scripts/HandlerScript"
+                            },
+                            { fs_oc_downDst_more_50 => 0 },
+                            { cacheNumEntries => 1,
+                              handler => "scripts/HandlerScript"
+                            },
+                            { host => "virtue.openafs.org",
+                              dlocalAccesses => 1
+                            }
+                          ],
+             );
+
+  parse_results($fsinfo, $cminfo);
+}
+
+
+sub parse_results {
+
+  if ($AFS::CODE) {
+    print "Error case: ", ref($fsinfo), "\n" if (defined($fsinfo));
+    print "Error case: ", ref($cminfo), "\n" if (defined($cminfo));
+    # die("Error: AFS::CODE = $AFS::CODE (", ($AFS::CODE+0), ")\n");
+    print "Error: AFS::CODE = $AFS::CODE (", ($AFS::CODE+0), ")\n";
+    return;
+  }
+
+  if ($showdump) {
+    local $Data::Dumper::Indent = 1;
+    local $Data::Dumper::Quotekeys = 0;
+    local $Data::Dumper::Maxdepth = 2;
+    local $Data::Dumper::Varname = "File Servers ";
+    print Dumper($fsinfo);
+    local $Data::Dumper::Varname = "Cache Managers ";
+    print Dumper($cminfo);
+  }
+
+  if ($readable) {
+    print "\nFile Servers:\n";
+
+    foreach my $host (@$fsinfo) {
+      print "\nFS HOSTNAME: $host->{hostName}\n";
+      if ($host->{probeOK}) {
+        print " probe successful\n";
+
+        foreach my $section (sort keys %$host) {
+          if (ref $host->{$section}) {
+            print "\n $section:\n";
+
+            foreach my $group (sort keys %{$host->{$section}}) {
+              print "\n  $group\n";
+
+              foreach my $item (sort keys %{$host->{$section}->{$group}}) {
+                print "    $item";
+                for (my $i = 0; $i <= 30 - length($item); $i++) {
+                  print " ";
+                }
+                print "$host->{$section}->{$group}->{$item}->{value}";
+                if ($host->{$section}->{$group}->{$item}->{overflow}) {
+                  print " (overflow)\n";
+                  print "     threshold: $host->{$section}->{$group}->{$item}->{threshold}\n";
+                  if ($host->{$section}->{$group}->{$item}->{overflow} ne 1) {
+                    print "\n";
+                    system($host->{$section}->{$group}->{$item}->{overflow});
+                  }
+                }
+                print "\n";
+              }
+            }
+          }
+        }
+      }
+      else {
+        print "\n probe failed";
+      }
+      print "\n";
+    }
+
+
+    print "\nCache Managers:\n";
+
+    foreach my $host (@$cminfo) {
+      print "\nCM HOSTNAME: $host->{hostName}\n";
+      if ($host->{probeOK}) {
+        print " probe successful\n";
+
+        foreach my $section (sort keys %$host) {
+          if (ref $host->{$section}) {
+            print "\n $section:\n";
+
+            foreach my $group (sort keys %{$host->{$section}}) {
+              print "\n  $group\n";
+
+              foreach my $item (sort keys %{$host->{$section}->{$group}}) {
+                print "    $item";
+                for (my $i = 0; $i <= 30 - length($item); $i++) {
+                  print " ";
+                }
+                print "$host->{$section}->{$group}->{$item}->{value}";
+                if ($host->{$section}->{$group}->{$item}->{overflow}) {
+                  print " (overflow)\n";
+                  print "     threshold: $host->{$section}->{$group}->{$item}->{threshold}\n";
+                  if ($host->{$section}->{$group}->{$item}->{overflow} ne 1) {
+                    print "\n";
+                    system($host->{$section}->{$group}->{$item}->{overflow});
+                  }
+                }
+                print "\n";
+              }
+            }
+          }
+        }
+      }
+      else {
+        print "\n probe failed";
+      }
+      print "\n";
+    }
+  }
+
+  if ($shortoutput) {
+    print "\nFile Servers:\n";
+
+    foreach my $host (@$fsinfo) {
+      print "\nHOST: $host->{hostName}";
+      if ($host->{probeOK}) {
+
+        foreach my $section (sort keys %$host) {
+          if (ref $host->{$section}) {
+            print "\n******* $section *******";
+
+            foreach my $group (sort keys %{$host->{$section}}) {
+              print "\n   [[$group]]   ";
+
+              foreach my $item (sort keys %{$host->{$section}->{$group}}) {
+                print "$item $host->{$section}->{$group}->{$item}->{value}";
+                if ($host->{$section}->{$group}->{$item}->{overflow}) {
+                  print " (";
+                  print "thresh: $host->{$section}->{$group}->{$item}->{threshold}";
+                  if ($host->{$section}->{$group}->{$item}->{overflow} ne 1) {
+                    print ", handler";
+                  }
+                  print ")";
+                }
+                print " | ";
+              }
+            }
+          }
+        }
+      }
+      else {
+        print "probe failed\n";
+      }
+      print "\n";
+    }
+
+
+    print "\nCache Managers:\n";
+
+    foreach my $host (@$cminfo) {
+      print "\nHOST: $host->{hostName}";
+      if ($host->{probeOK}) {
+
+        foreach my $section (sort keys %$host) {
+          if (ref $host->{$section}) {
+            print "\n******* $section *******";
+
+            foreach my $group (sort keys %{$host->{$section}}) {
+              print "\n   [[$group]]   ";
+
+              foreach my $item (sort keys %{$host->{$section}->{$group}}) {
+                print "$item $host->{$section}->{$group}->{$item}->{value}";
+                if ($host->{$section}->{$group}->{$item}->{overflow}) {
+                  print " (";
+                  print "thresh: $host->{$section}->{$group}->{$item}->{threshold}";
+                  if ($host->{$section}->{$group}->{$item}->{overflow} ne 1) {
+                    print ", handler";
+                  }
+                  print ")";
+                }
+                print " | ";
+              }
+            }
+          }
+        }
+      }
+      else {
+        print "probe failed\n";
+      }
+      print "\n";
+    }
+  }
+}
+
+print "\n# ...Done #\n";

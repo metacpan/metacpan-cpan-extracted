@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Any-URI-Escape.t
+lib/Any/URI/Escape.pm
+META.yml                                 Module meta-data (added by MakeMaker)

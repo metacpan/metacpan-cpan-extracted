@@ -1,0 +1,240 @@
+NAME
+    Apache::MiniWiki - Miniature Wiki for Apache
+
+DESCRIPTION
+    Apache::MiniWiki is a simplistic Wiki for Apache. It doesn't have much
+    uses besides very simple installations where hardly any features are
+    needed. What is does support though is:
+
+      - storage of Wiki pages in RCS
+      - templates through HTML::Template
+      - text to HTML conversion with HTML::FromText
+      - basic authentication password changes
+      - uploading of binary (pdf, doc, gz, zip, ps)
+      - uploading of images (jpg, jpeg, gif, png)
+      - automatic thumbnailing of large using ImageMagick
+      - sub directories
+      - view any revision of a page
+      - revert back to any revision of the page
+      - basic checks to keep search engine spiders from deleting 
+        all the pages in the Wiki
+
+DEPENDENCIES
+    This module requires these other modules:
+
+      Apache::Htpasswd
+      Apache::Constants
+      CGI
+      Date::Manip
+      Image::Magick (Optional)
+      HTML::FromText
+      HTML::Template
+      Rcs
+
+SYNOPSIS
+    Add this to httpd.conf:
+
+      <Location /wiki>
+         PerlAddVar datadir "/home/foo/db/wiki/"
+         PerlAddVar vroot "/wiki"
+         SetHandler perl-script
+         PerlHandler Apache::MiniWiki
+      </Location>
+
+AUTHENTICATION EXAMPLES
+      Require a password to read/write any page:
+  
+      <Location /wiki>
+         PerlAddVar datadir "/home/foo/db/wiki/"
+         PerlAddVar vroot "/wiki"
+         PerlAddVar authen "/home/foo/db/htpasswd"
+         SetHandler perl-script
+         PerlHandler Apache::MiniWiki
+
+         AuthType Basic
+         AuthName "Sample Wiki"
+         AuthUserFile /home/foo/db/htpasswd 
+         Require valid-user
+      </Location>
+
+      Public can read, but need password to edit/save/revert a page:
+  
+      <Location /wiki>
+         PerlAddVar datadir "/home/foo/db/wiki/"
+         PerlAddVar vroot "/wiki"
+         PerlAddVar authen "/home/foo/db/htpasswd"
+         SetHandler perl-script
+         PerlHandler Apache::MiniWiki
+
+         Require valid-user # or group foo or whatever you want
+         PerlAccessHandler Apache::MiniWiki::access_handler
+
+         AuthType Basic
+         AuthName "Sample Wiki"
+         AuthUserFile /home/foo/db/htpasswd 
+         Require valid-user
+      </Location>
+
+USE AS A CGI SCRIPT
+    Apache::MiniWiki can also be called by an Apache::Registry CGI script.
+    By running it in this manner, absolutely no changes need to be made to
+    the web server's httpd.conf, as long as Apache has mod_perl built in,
+    and the Apache::Registry (or a module that emulates it) is available.
+
+    Copy the example wiki.cgi into your CGI directory and assign it the
+    appropriate permissions. Edit wiki.cgi and add the required options,
+    such as the datadir and vroot variables:
+
+     $r->dir_config->add(datadir => '/home/foo/db/wiki/');
+     $r->dir_config->add(vroot => '/perlcgi/wiki.cgi');
+
+    Note #1: This may be a great way of integrating Apache::MiniWiki into an
+    existing site that already has it's own header/footer template system.
+
+    Note #2: This method assumes that the site administrator is already
+    using Apache::Registry to speed up CGI's on the site. If they aren't,
+    have them set up mod_perl as it was meant to be. See the mod_perl guide,
+    or try this:
+
+      ScriptAlias /perlcgi /path/to/your/cgi-bin/
+      <Location /perlcgi>
+        SetHandler perl-script
+        PerlHandler Apache::Registry
+        Options ExecCGI
+      </Location>
+
+CONFIGURATION
+    If you want to use your own template for MiniWiki, you should place the
+    template in the RCS file template,v in the "datadir". Upon execution,
+    MiniWiki will check out this template and use it. If you make any
+    modifications to the RCS file, a new version will be checked out.
+
+    You can modify the template from within MiniWiki by visiting the URL
+    http://your.server.name/your-wiki-vroot/(edit)/template
+
+    If you don't install a template, a default one will be used.
+
+    The "datadir" variable defines where in the filesystem that the RCS
+    files that MiniWiki uses should be stored. This is also where MiniWiki
+    looks for a template to use.
+
+    The "vroot" should match the virtual directory that MiniWiki runs under.
+
+    If this variable is set, it should point to a standard htpasswd file
+    which MiniWiki has write access to. The function to change a users
+    password is then enabled.
+
+    (Optional) The default timezone is GMT-8 (PST). To change to a different
+    timezone, use the "timediff" variable. Eg, to change to Amsterdam /
+    Rome:
+
+      PerlAddVar timediff 1
+
+    (Optional) By default, only the template called template is used. This
+    becomes the default template for every page. Use the "templates"
+    variable to specify more then one template:
+
+      PerlAddVar templates fvlug linux
+
+    By doing this, pages that contain those words will use the matching
+    template. For example, the /your-wiki-vroot/LinuxDatabases page will
+    then use the template-linux page, instead of template. You will need to
+    create the template by going to
+    /wiki/your-wiki-vroot/(edit)/template-<the_template> first.
+
+    (Optional) To disable file uploads such as binary attachments and inline
+    images, set uploads to no. By default it is yes. Note that inline images
+    requires the Image::Magick module to be installed for generating
+    thumbnails.
+
+      PerlAddVar uploads no
+
+    (Optional) Pre-caching can be done by a periodic (eg every 5 minutes)
+    cronjob to refresh the cached version of the .list* pages (see below) in
+    the background, rather then when Apache::Miniki discovers that the cache
+    is old when a request is done. To eanble:
+
+      PerlAddVar precaching yes
+
+    If you create the pages 'list' or 'listchanges' or 'listlinks', the
+    following will automatically get appended to them:
+
+     - list:        A simple line deliminated list of 
+                    all the pages in the system
+
+     - listchanges: Ordered by date, gives a list of all pages 
+                    including the last comment, the number of lines 
+                    added or removed, and the date of the last change
+
+     - listlinks:   Creates a list of all the inner/outer HTML links on the site,
+                    grouped by page name. By using CSS and some JavaScript in your
+                                    template, it can become very easy to navigate around this way.
+
+    The master 'template' page does not show up in any of these three page
+    listings.
+
+MULTIPLE WIKIS
+    Multiple wiki sites can easily be run on the same server. This can be
+    done by setting up multiple <Location> sections in the httpd.conf, with
+    the appropriate settings.
+
+    For an example of automating this using perl, see
+    conf/httpd-perl-startup.pl in the MiniWiki distribution for a sample
+    mod_perl startup file.
+
+TEMPLATE VARIABLES
+    These variables are passed by Apache::MiniWiki to HTML::Template:
+
+      vroot:
+        virtual root of the wiki installation. E.g.
+              /wiki
+      title:
+        the title of a page. Comes from the first line of text.
+      body:
+        HTMLified version of a wiki page
+      editlink:
+        Link to the edit page. E.g.:
+              http://www.nyetwork.org/wiki/(edit)/MiniWiki
+      loglink:
+        Link to the Archive page. e.g.:
+              http://www.nyetwork.org/wiki/(log)/MiniWiki
+      pageurl:
+        Fully qualified link to the page based on the last request, e.g.:
+              http://nyetwork.org:80/wiki/MiniWiki
+      lastmod:
+        date the page was last changed, e.g.:
+              March 18, 2003 4:25 PM
+
+SEARCH ENGINES
+    Spiders for search engines (Google, OpenFind, etc) love the bounty of
+    links found in a Wiki. Unfortunely, they also follow the Archive,
+    Changes, View, and Revert links. This not only adds to the load on your
+    webserver, but there is a very high chance that pages will get rolled
+    back as the spider goes in circles following links. This has happened!
+    Add these links to your robots.txt so that robots can only view the
+    actual current pages:
+
+    Disallow: /wiki/(edit)/ Disallow: /wiki/(log)/ Disallow: /wiki/(revert)/
+    Disallow: /wiki/(save)/ Disallow: /wiki/(view)/ Disallow:
+    /wiki/lastchanges
+
+    See http://www.nyetwork.org/wiki for an example of this module in active
+    use.
+
+HOME PAGE
+    http://www.nyetwork.org/wiki/MiniWiki
+
+AUTHORS
+    Jonas Oberg, <jonas@gnu.org>
+
+    Wim Kerkhoff, <kerw@cpan.org>
+
+    James Farrell, <jfarrell@telesterion.org>
+
+CONTRIBUTORS
+    Brian Lauer, <fozbaca@yahoo.com>
+
+SEE ALSO
+    perl, Apache::Registry, HTML::FromText, HTML::LinkExtor, HTML::Template,
+    Rcs, CGI, Date::Manip, Image::Magick.
+

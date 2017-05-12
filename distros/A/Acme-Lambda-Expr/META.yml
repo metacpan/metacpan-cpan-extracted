@@ -1,0 +1,27 @@
+---
+abstract: 'Lambda expressions'
+author:
+  - 'Goro Fuji <gfuji(at)cpan.org>'
+build_requires:
+  Test::More: 0.62
+configure_requires:
+  ExtUtils::MakeMaker: 6.44
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Lambda-Expr
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Util: 0.1
+  Exporter: 5.57
+  Moose: 0.57
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

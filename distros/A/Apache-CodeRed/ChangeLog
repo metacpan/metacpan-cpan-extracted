@@ -1,0 +1,26 @@
+2001-08-08  Reuven M. Lerner  <reuven@lerner.co.il>
+
+	* CodeRed.pm (handler): Got DNS lookups working once again.
+	Upped the version to 1.07.
+
+2001-08-07  Reuven M. Lerner  <reuven@lerner.co.il>
+
+	* CodeRed.pm (handler): Changed from $r->log_error to $r->warn,
+	which allows administrators to filter messages out of the error
+	log more easily.
+
+	* README: Put some information in the README.
+
+	* CodeRed.pm: Checked everything into CVS.
+
+	* Makefile.PL: Added prerequisites, so that CPAN.pm and other
+	installation tools will let you know if you need the latest
+	versions of various modules.  Truth be told, I'm not sure what the
+	minimum versions are for the required modules, so I just set them
+	to the current values and will hope for the best.
+
+	* CodeRed.pm: What didn't I do?  I wrote some POD, gave the module
+	a new name (Apache::CodeRed, rather than plain ol' CodeRed),
+	retooled a few basic things, removed some bugs.
+	
+

@@ -1,0 +1,16 @@
+ac.js
+Build.PL
+Changes
+lib/Apache2/Autocomplete.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/autocomplete/pod.t
+t/autocomplete/names.t
+t/autocomplete/names_header.t
+t/conf/extra.conf.in
+t/response/TestAutocomplete/basic.pm
+t/response/TestAutocomplete/names.pm
+t/response/TestAutocomplete/names_header.pm
+t/TEST.PL

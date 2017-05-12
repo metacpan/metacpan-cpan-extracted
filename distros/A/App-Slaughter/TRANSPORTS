@@ -1,0 +1,158 @@
+
+About Transports
+-----------------
+
+When the slaughter client is launched it will fetch policies from a
+central server.  (Depending upon your configuration it may also
+fetch modules and files.)
+
+The remote server might be a host :
+
+    * Running an rsync server.
+    * Running a HTTP/HTTPS server.
+    * Hosting a git/mercurial/subversion repository.
+
+Each of these file-transfer methods is known as a "transport" in Slaughter.
+
+When the client is launched you'll need to specify two things:
+
+    * The location from which the files/modules/polices are to be fetched,
+      this is the server-prefix.
+
+    * The method by which to fetch the files (HTTP-fetch, rsync clone, etc).
+      This is the transport.
+
+
+
+
+local transport
+---------------
+
+The local-transport allows you to test against policies upon the local disk,
+without any remote host being involved.  This is sufficient for testing purposes
+and to allow you to get your feet wet.
+
+Assuming you have the layout:
+
+   /root/slaughter/
+   /root/slaughter/files/
+   /root/slaughter/modules/
+   /root/slaughter/policies/
+   /root/slaughter/policies/default.policy
+
+You may execute the policy by running:
+
+    # slaughter --transport=local --prefix=/root/slaughter/
+
+
+
+
+http transport
+--------------
+
+The HTTP-transport is the simplest of those transports that fetches files
+from a remote location.  All files are retrieved over basic HTTP.
+
+Given this directory tree:
+
+    /var/www/slaughter/
+    /var/www/slaughter/files/
+    /var/www/slaughter/modules/
+    /var/www/slaughter/policies/
+    /var/www/slaughter/policies/default.policy
+
+Then the client will be invoked like this:
+
+    slaughter --transport=http --prefix=http://example.com/slaughter/
+
+Here the prefix is the URL which contains the top-level directories
+"files", "modules", and "policies".
+
+You can test the transfer by running a command such as this:
+
+    curl http://example.com/slaughter/policies/default.policy
+
+
+
+
+rsync transport
+---------------
+
+rsync is an efficient protocol for transferring files, coping well
+with incremental fetches.
+
+Assuming the files are stored on the disk like this:
+
+    /srv/slaughter/
+    /srv/slaughter/files/
+    /srv/slaughter/modules/
+    /srv/slaughter/policies/
+    /srv/slaughter/policies/default.policy
+
+
+The following rsync configuration file would be a sensible starting point.
+
+NOTE: An ACL to prevent fetches from unknown machines is recommended:
+
+    [slaughter]
+        path = /srv/slaughter/
+        comment = slaughter policy files
+        read only = true
+        hosts allow = 1.2.3.0/24 *.example.com
+
+The client will be invoked as follows:
+
+    slaughter --transport=rsync --prefix=rsync://example.com/slaughter/
+
+You can test the transfer by running a command such as this:
+
+    rsync -qazr rsync://example.com/slaughter /tmp/foo
+
+Additional arguments may be passed to rsync via the "--transport-args" flag.
+
+
+
+
+hg transport
+------------
+
+Create a repository which contains the top-level directories "files/",
+"modules/", and "policies/".  Host this repository somewhere that
+mercurial can pull it from, ideally via http/https.
+
+The client will be invoked like so:
+
+    slaughter --transport=hg --prefix=http://example.com/path/to/repo.hg
+
+The client will invoke something similar to this, which may be used to test
+the path is correct.
+
+      hg clone http://example.com/path/to/repo.hg /tmp/foo
+
+Additional arguments may be passed to mercurial via the "--transport-args" flag.
+
+
+
+
+git transport
+-------------
+
+Create a repository which contains the top-level directories "files/",
+"modules/", and "policies/".  Host this repository somewhere that git can
+pull it from, ideally via http/https.
+
+The client will be invoked:
+
+    slaughter --transport=git --prefix=http://example.com/path/to/repo.git
+
+The client will invoke something similar to this, which may be used to
+test the path is correct:
+
+     git clone http://example.com/path/to/repo.hg /tmp/foo
+
+Additional arguments may be passed to the git command line via
+the "--transport-args" flag.
+
+
+
+

@@ -1,0 +1,107 @@
+NAME
+
+Apache::MIMEMapper - associate file extensions with PerlHandlers
+
+SYNOPSIS
+
+PerlModule Apache::MIMEMapper
+PerlTypeHandler Apache::MIMEMapper
+
+AddHandler Apache::RegistryFilter .pl
+AddHandler Apache::SSI .html .pl
+
+Alias /perl-bin/ /usr/local/apache/perl-bin/
+<Location /perl-bin/>
+  SetHandler perl-script
+  PerlHandler Apache::Registry
+  Options +ExecCGI
+  PerlSendHeader On
+</Location>
+
+DESCRIPTION
+
+Apache::MIMEMapper extends the core AddHandler directive to allow you
+to dispatch different PerlHandlers based on the file extension of the
+requested resource.  This means that you can now have .pl
+scripts under htdocs/ (or wherever) without resorting to a
+<Files> based configuration.  
+
+Apache::MIMEMapper also adds the ability to stack PerlHandlers
+transparently using Apache::Filter.  Handlers are added to the
+PerlHandler stack in the order they appear in the httpd.conf file -
+PerlSetVar Filter On is set if more than one extension is associated
+with a specific Perl module.
+
+EXAMPLE
+
+PerlModule Apache::MIMEMapper
+PerlTypeHandler Apache::MIMEMapper
+
+AddHandler Apache::RegistryFilter .pl
+AddHandler Apache::SSI .html .pl
+
+Alias /perl-bin/ /usr/local/apache/perl-bin/
+<Location /perl-bin/>
+  SetHandler perl-script
+  PerlHandler Apache::Registry
+  Options +ExecCGI
+  PerlSendHeader On
+</Location>
+
+In this example, .html files are scheduled for processing with
+Apache::SSI.  Additionally, .pl files outside of /perl-bin are
+handled by Apache::RegistryFilter and Apache::SSI (in that order).
+
+Because the SetHandler directive supercedes all other mod_mime
+directives, all files inside of /perl-bin are processed using 
+Apache::Registry.
+
+NOTES
+
+The current logic checks AddHandler for something that looks like
+a Perl module, so
+
+AddHandler server-parsed .shtml
+
+still works.  The criterion for deciding if Apache::MIMEMapper
+intercepts the request is whether the handler is in the form
+Foo::Bar - it checks for '::'.  This is not ideal, but simple
+and sufficient for most cases.
+
+FEATURES/BUGS
+
+Apache::MIMEMapper is a PerlTypeHandler.  It does just about
+everything that mod_mime does (via MIME::Types).  The only
+place where it interferes is for content-negotiated requests,
+where the AddLanguage and associated directives are 
+necessary.  Should you need these directives, you can install
+Apache::MIMEMapper as a PerlFixupHandler instead.
+
+SEE ALSO
+
+perl(1), mod_perl(1), Apache(3)
+
+AUTHORS
+
+Geoffrey Young E<lt>geoff@modperlcookbook.orgE<gt>
+
+Paul Lindner E<lt>paul@modperlcookbook.orgE<gt>
+
+Randy Kobes E<lt>randy@modperlcookbook.orgE<gt>
+
+COPYRIGHT
+
+Copyright (c) 2001, Geoffrey Young, Paul Lindner, Randy Kobes.  
+
+All rights reserved.
+
+This module is free software.  It may be used, redistributed
+and/or modified under the same terms as Perl itself.
+
+HISTORY
+
+This code is derived from the I<Cookbook::MIMEMapper> module,
+available as part of "The mod_perl Developer's Cookbook".
+
+For more information, visit http://www.modperlcookbook.org/
+

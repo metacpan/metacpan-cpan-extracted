@@ -1,0 +1,100 @@
+=pod
+
+=head1 NAME
+
+ALPM::DB::Sync - Synchronized remote databases.
+
+=head1 OBJECT METHODS
+
+=head2 servers
+
+  $SUCCESS = $DB->add_server($URL)
+  $SUCCESS = $DB->remove_server($URL)
+  $SUCCESS = $DB->set_servers(@URLS)
+  @URLS = $DB->get_servers()
+
+A plethora of accessors and mutators for the repo URLs of databases.
+
+=over 4
+
+=item C<$URL>
+
+The base url where database files are publicly available.
+
+=item C<@URLS>
+
+Like $URL, only more so.
+
+=item C<$SUCCESS>
+
+Returns 1 on success, undef on failure.
+
+=back
+
+=head2 update
+
+  $UPDATE_STATUS = $DB->update()
+  $SUCCESS = $DB->force_update()
+
+Updating the database is like pacman -Su. Forcing an update will download a new
+copy of the database even if it seems that we do not need to.
+
+=over 4
+
+=item C<$UPDATE_STATUS>
+
+Returns 1 on success, -1 if the update was unnecessary, or 0 on error.
+
+=item C<SUCCESS>
+
+Returns 1 on success or 0 on error.
+
+=back
+
+=head1 valid
+
+  $VALID = $DB->valid()
+
+Perform validity checks upon the database, such as a signature check.
+
+=head1 siglvl
+
+  $SIGLEVEL = $DB->siglvl()
+
+Retrieve the signature level requirements that package and database files of this database
+must fulfill.
+
+=head1 unregister
+
+  $SUCCESS = $DB->unregister()
+
+Unregister the sync database. You probably shouldn't try to use the $DB object
+anymore. Right now there are no safety checks.
+
+=over 4
+
+=item C<$SUCCESS>
+
+Returns 1 on success or undef on error.
+
+=back
+
+=head1 SEE ALSO
+
+L<ALPM::DB>, L<ALPM>, L<ALPM::Package>
+
+=head1 AUTHOR
+
+Justin Davis, C<< <juster at cpan dot org> >>
+
+Andrew Gregory <apg@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Justin Davis
+
+Copyright (C) 2015 by Andrew Gregory <apg@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,62 @@
+--- SDL-1.2/configure	2014-04-22 20:52:13.000000000 +0200
++++ SDL-1.2/configure	2014-04-22 20:52:27.000000000 +0200
+@@ -24440,6 +24440,59 @@
+ _ACEOF
+ 
+             fi
++            { echo "$as_me:$LINENO: checking for const parameter to _XData32" >&5
++            echo $ECHO_N "checking for const parameter to _XData32... $ECHO_C" >&6; }
++            have_const_param_xdata32=no
++            cat >conftest.$ac_ext <<_ACEOF
++/* confdefs.h.  */
++_ACEOF
++            cat confdefs.h >>conftest.$ac_ext
++            cat >>conftest.$ac_ext <<_ACEOF
++#include <X11/Xlibint.h>
++extern int _XData32(Display *dpy,register _Xconst long *data,unsigned len);
++
++int
++main ()
++{
++
++
++  ;
++  return 0;
++}
++_ACEOF
++rm -f conftest.$ac_objext conftest$ac_exeext
++if { (ac_try="$ac_link"
++case "(($ac_try" in
++  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
++  *) ac_try_echo=$ac_try;;
++esac
++eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
++  (eval "$ac_link") 2>conftest.er1
++  ac_status=$?
++  grep -v '^ *+' conftest.er1 >conftest.err
++  rm -f conftest.er1
++  cat conftest.err >&5
++  echo "$as_me:$LINENO: \$? = $ac_status" >&5
++  (exit $ac_status); } && {
++	 test -z "$ac_c_werror_flag" ||
++	 test ! -s conftest.err
++       } && test -s conftest$ac_exeext &&
++       $as_test_x conftest$ac_exeext; then
++    have_const_param_xdata32=yes
++    cat >>confdefs.h <<\_ACEOF
++#define SDL_VIDEO_DRIVER_X11_CONST_PARAM_XDATA32 1
++_ACEOF
++else
++  echo "$as_me: failed program was:" >&5
++sed 's/^/| /' conftest.$ac_ext >&5
++
++	have_const_param_xdata32=no
++fi
++
++rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
++      conftest$ac_exeext conftest.$ac_ext
++            { echo "$as_me:$LINENO: result: $have_const_param_xdata32" >&5
++            echo "${ECHO_T}$have_const_param_xdata32" >&6; }
+         fi
+     fi
+ }

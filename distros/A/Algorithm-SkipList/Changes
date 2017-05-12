@@ -1,0 +1,301 @@
+Revision history for Perl extension Algorithm::SkipList. (Changes which may
+not be backwards compatible are marked with an asterisk '*'.)
+
+1.02	Wed Jan  4 2005
+	* removed validate_key and validate_value methods from node types
+	- removed commented-out assertions
+	- added _search_nodes method
+	- keys and values methods rewritten, and can retrieve keys or
+	  values between key ranges ranges 
+	- copy method rewritten
+	- corrected typo in error message
+	- added missing test to MANIFEST
+	- added additional tests
+	- added SIGNATURE to distribution
+
+1.01	Fri Sep  3 2004
+	- minor correction to distribution
+
+1.00    Fri Sep  3 2004
+	- renamed distribution to Algorithm-SkipList
+	- updated version numbers
+	- added deprecation note to List::SkipList abstract
+
+0.73_01 Mon Aug  2 2004
+	- renamed module to Algorithm::SkipList from List::SkipList
+	- Node and Header types are now in separate files
+	- List::SkipList is included, but gives deprecation warnings
+	- header node gives warnings when calling key or value methods
+	- heavy test has less tests for standard dist
+	- renamed test files
+	- minor code changes
+	- corrected typos in POD
+	- removed benchmarking code from etc/
+	- redid version numbering of Node and Header classes, since they
+	  were ignored by PAUSE/CPAN indexers anyway
+	- added PurePerl dummy class
+
+0.73    Mon Jul 26 2004
+	- rebuilt distribution with proper META.yml
+
+0.72    Wed Jun 30 2004
+	- removed List::SkipList::Null type and $NULL variable
+	- moved Test::More from requires to build_requires parameter
+
+0.71	Sat Jun 12 2004
+	- updated POD
+	- redesigned internals of first_key, next_key and last_key
+	* delete now resets last_key
+	* the parameters for last_key are changed (this interface was
+          meant for internal use only, however)
+	- added index_by_key, key_by_index and value_by_index methods
+	- updated documentation on p and k parameters
+	- added support for k parameter
+	- redid probability distribution calculations
+	- fixed bug in benchmarks (was "existing" bogus keys)
+	- added support for duplicate values
+	- added find_duplicates method
+	- corrected typos in POD for new method
+
+0.71_01 Wed Jun  9 2004
+	- fixed bug in benchmarks (was deleting bogus keys)
+	- added some warnings
+	- improved delete method
+	- added truncate method
+	- _search_with_finger now builds correct update vector
+	- append calls _adjust_level_threshold
+	- minor optimizations of node class
+	* renamed internal key {LASTNODE} to {LIST_END} so as not to
+	  be confused with last_key method
+	- _first_node is not autoloading since it's now used by first_key
+	- updated POD to reflect issue with undefined values
+	- improved copy method (undef values handled)
+	- copy method can accept an argument: copy from key
+	* copy method no longer resets first_key
+	* _first_node no longer returns a finger (it was never used)
+	- updated documentation on values for max_level and p
+	- corrected typos in documentation
+	- added tests for deleted greatest bug
+	- fixed bug with greatest method when deleting last node
+	- added _greatest_node method to find the last node as needed
+	- other minor code changes
+
+0.70_01 Sun Jun  6 2004 
+	- tests rewritten (work in progress)
+	- fixed bug with next_key checking node when key was deleted
+	- uses Test::More for tests
+	- fixed "Too late to run INIT block" error with Test::More
+	  use_ok, $NULL is now set in import() method
+	- fixed bug where level sometimes exceeded user-set max level
+	- P and max_level can now be set dynamically
+	- added tests for max_level and p
+	- checks for error when setting max_level or P
+	- fixed bug with definition of List::SkipList::Null
+	- $NULL is now an 'our' variable and accessible from outside
+	- level method was changed to autoload, since it was redundant
+	- minor optimization of _search_with_finger and _search
+	* header method in Node is read-only - it returns a pointer
+	  which can be used to change values anyway
+	* key method in Node is read-only - it should not be
+          changed once it is inside a list
+	- added _adjust_level_threshold method from code that was in
+	  _new_node_level to adjust SIZE_THRESHOLD/SIZE_LEVEL
+	- _adjust_level_threshold is called upon inserts and deletes
+	- SIZE_LEVEL does not decrease under MIN_LEVEL
+	* removed null() method - it was never used
+	* max_level cannot be greater than 32 (cleaner code)
+	- increased coverage of "heavy" test script
+	- minor updates to all test scripts
+
+0.65 Thu June  3 2004
+	- updated README
+
+0.64 Thu June  3 2004
+        - updated examples in documentation of custom node
+	- minor optimizations and code cleanup
+	- commented-out call to prev() in _debug
+	- removed use of Carp::Assert in tests
+	- redesigned benchmark script and included parse-out.pl
+	- updated Benchmark.txt
+	- updated README
+
+0.63  Fri May 28 2004
+	- The default value of P is now 0.25, which appears to yield
+	  better results in tests.
+	* renamed _random_level to _new_node_level
+	- SIZE_THRESHOLD/SIZE_LEVEL now decrease with deletions
+	- additional minor optimizations and code cleanup
+	- optimizations of Header and Null node types
+	- updated tests
+	- Benchmark: re-commented-out delete test for Tree::RedBlack
+          (which was accidentally uncommented in v0.62)
+
+0.62  Tue May 18 2004
+	- fixed typo in (commented-out) assertion
+	- additional minor optimizations and code cleanup
+	- updated tests
+	- corrected README
+
+0.61  Mon May 17 2004
+	* find no longer returns a finger in array context
+	* header is now a special subclass of List::SkipList::Node
+	- added special Null subclass of Header
+	- added null() method to return global null node
+	- a lot of minor code optimizations
+	- added comments
+	- maximum level of new nodes changed so that it is based on size
+          of list
+	- updated Benchmark.txt file
+
+0.60  Sat Apr 24 2004
+	- updates to POD
+	- cleaned up comments
+	- added next function
+	- redid last_key, first_key and next_key functions
+	- last_key accepts arguments to modify LASTKEY
+	- changed calls to die to croak
+	- added experimental hooks to implement prev and prev_key methods
+	- added stub prev_key method
+	- bug fix: reset method called during copy method
+	- added more tests to heavy test script
+	* renamed find to find_with_finger and added find for searches
+          which do not return updated fingers
+	* renamed _search to _search_with_finger and added _search for
+	  searches which do not return updated fingers
+	- modified next_key test to check for initial key of "0"
+	- removed if (CACHE_INSERT_FINGERS) tests
+	- additional optimizations and code cleanup
+	- added test to search for non-existent keys in Benchmark.pl
+
+0.51  Mon Apr 12 2004
+	- fixed bug with next_key method called without first_key
+	- added tests for this bug
+	- added "heavy" test to distribution
+	- minor optimizations of delete method
+	- assertions are no longer required (which leads to ~3% speedup)
+	  and removed section in POD about assertions
+	- removed commented-out references to forward method
+	- minor updates to source code comments
+
+0.50  Mon Mar 29 2004
+	- section about Assertions added to POD
+	- documented level() method
+	- clear method now intitializes initial node header
+	- added various assertions
+	* removed the forward method from *::Node
+	- uses enum module
+	- added test for non-integer keys
+	- clear method now resets LAST_INSRT cache
+	- removed use of LEVEL for List::SkipList::Node
+	* key_cmp method accesses KEY directly rather than uses the key method
+	* calling convention for List::SkipList::Node is changed
+	- various optimizations to List::SkipList and *::Node
+	- added comparison to Tree::RedBlack in Benchmark.pl
+	- minor changes to _search method
+	- added Benchmark.pl script for generating benchmarks in distro
+	- redesigned benchmarking script
+
+0.42  Sat Mar 20 2004
+	- fixed bug with Build.PL not autospliting files
+
+0.41  Fri Mar 19 2004
+	* List::SkipList::Node is now array-based rather than hash-based
+	  to improve speed.
+	- updates to POD, README, Benchmark.txt
+	- added search method as alias to find
+	- renamed Benchmark to Benchmark.txt
+	- optimized deletions
+
+0.40  Wed Mar 17 2004
+	- added Benchmark file to distribution
+	* key_cmp now ignores when key is undefined
+	- _insert returns the value of $node->key_cmp($key)
+	- broke up test cases into separate files
+	- added finger caching to speed up sequential inserts
+	- fixed bugs with values, keys, copy, merge, first_key and next_key
+          methods related to use of search fingers
+	- fixed bug with append method
+	- fixed bug with search fingers: they were not being used
+	- _debug now prints to STDERR
+	* reset method is not called when a new node is added or deleted
+          (which is in accord with documentation)
+	- stub for next method added
+	- List::SkipList::Node ignores invalid and extra arguments
+	- minor optimizations in List::SkipList and List::SkipList::Node
+	- improved speed of _random_level
+	- disabled assertions (for 50% speed improvement!)
+	- inserted corrected comment in README about actual performance in
+	  comparison to trees
+
+0.33  Tue Mar 16 2004
+	- fixed typos in test cases that caused Makefile tests to fail
+	- removed causes of warnings in 01-SkipList.t
+	- replaced explicit package names with __PACKAGE__ placeholder
+
+0.32  Mon Mar 15 2004
+	- renamed test.pl to t/01-SkipList.t
+	- added Build.PL to distribution
+        - updated README
+	- corrected and updated POD
+
+0.31  Fri Feb 13 2004
+	- removed memoized node example from POD
+	- reformatted E-mail addresses in various files to foil
+	  spam harvesters
+	- changes calls to keys to CORE::keys [Bug 5317]
+	- added version to List::SkipList::Node
+	- corrected errors in POD formatting
+	- corrected and updated POD
+	- added META.yml file to distribution
+
+0.30  Tue Dec  2 2003
+	- ability to tie hashes
+	- made some methods autoloading
+	- added last_key and reset methods to allow auto-enumeration
+	- added least, greatest, keys and values methods
+	- added _first_node, merge, append and copy methods
+	- insert now returns a finger
+	- more updates to documentation
+
+0.21  Wed Nov 26 2003
+	- bug fix: first_key method returns a proper finger
+	- added documentation and tests about memoization
+
+0.20  Wed Nov 26 2003
+	- if no last_key specified for next_key, it returns first_key
+	- search fingers added
+	- find, first_key, next_key return a list in list context as part of
+	  support for search fingers
+	- minor changes to documentation
+
+0.13  Wed Nov 19 2003
+	- added call to validate_key in key_cmp in Node
+
+0.12  Wed Nov 19 2003
+	- added validate_key and validate_node methods to Node
+
+0.11  Sun Nov 16 2003
+	- modified test script to better check next_key function
+	- bug fix: next_key did not check that $last_key existed
+
+0.10  Sat Nov 15 01:11:00 2003
+	- updated test script appropriately
+	- added first_key and next_key methods
+	- added ability to customize List::SkipList::Node
+	- moved debug method to after __END__ block
+	- renamed random_level to _random_level
+	- changed type checking to use isa() method
+	- updated documentation
+
+0.02  Fri Nov 14 01:08:00 2003
+	- incorporated experimental code into module
+	- began writing initial test script
+
+0.01  Fri Nov 14 00:50:00 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n List::SkipList -v 0.01
+
+0.00  Wed Nov 12 2003
+	- experimental versions, unreleased.
+
+

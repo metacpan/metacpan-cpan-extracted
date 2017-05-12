@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+use App::Pm2Port;
+
+die "Usage: $0 Module::Name" unless @ARGV;
+my $a = App::Pm2Port->new( module => $ARGV[0] );
+
+$a->run;
+
+=head1 NAME
+
+pm2port - Creates FreeBSD port from Perl module
+
+=head1 SYNOPSYS
+
+    cd port-directory
+    pm2port Variable::Eject
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Andrey Kostenko E<lt>andrey@kostenko.nameE<gt>
+
+=cut

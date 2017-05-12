@@ -1,0 +1,72 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 1fa885a9c71bccfab3e6f7d664769399c6fb1bb0 COPYRIGHT
+SHA1 360b88709262a578d34cb28d20f6a3698219a0a9 CREDITS
+SHA1 89a587487a88167e459f2d536ef44e513cd60650 Changes
+SHA1 a14b5d1c57f8b12a2da117c367937f6872e83615 INSTALL
+SHA1 07979035d1028ff22101063841c8b256374467b9 LICENSE
+SHA1 47b2a8847b9a95dbb4c6778baab02ebace91dff1 MANIFEST
+SHA1 31b6c05da3510cf0ca337b045215eb2b89d4fdc5 META.json
+SHA1 9fb4fb2bdd44d4aaa04d8b5677bc4a4284e08e50 META.yml
+SHA1 3e183cd857d6ee4f2af5ce4d19d0a8111457a830 Makefile.PL
+SHA1 236af8fe3632526f9d885af5437a5c2bb6878505 README
+SHA1 1379f87d7c1e0aa5a1d66b21949ba0081683cc5b dist.ini
+SHA1 6dce831f8502d3eae65334a78826d3e63a9e2f29 doap.ttl
+SHA1 a6143d9885f8f5af2398dbd70237feebb6284a94 lib/AtteanX/Model/SPARQLCache.pm
+SHA1 fef88e80497aa060163f1d769c3412f8e51f9a83 lib/AtteanX/Model/SPARQLCache/LDF.pm
+SHA1 d11e3f172a2f482a7d3e107893e5b8d3ef036fac lib/AtteanX/Plan/LDF/Triple/EnterCache.pm
+SHA1 b641b58993812ecb88b325e919e61afcce194bf1 lib/AtteanX/Query/AccessPlan/Cache.pm
+SHA1 c0450a1293562f3917cc6598eb20e2e3441cd765 lib/AtteanX/Query/AccessPlan/PrefetchLDF.pm
+SHA1 5d16d4dc911a99977d304e450c60fd565c4a1ef1 lib/AtteanX/Query/Cache.pm
+SHA1 67f2772daaaebbb1d3eddacb9dbf9520f1240738 lib/AtteanX/Query/Cache/Analyzer.pm
+SHA1 80c2228972ed458a5644237acd222652ade87fc7 lib/AtteanX/Query/Cache/Analyzer/Model.pm
+SHA1 fdadfc0b392b77efcee5254757e6bd27b4beadaa lib/AtteanX/Query/Cache/Analyzer/QueryPlanner.pm
+SHA1 dac25e31a1326939baa84e76a80adf9e1070ed39 lib/AtteanX/Query/Cache/Retriever.pm
+SHA1 fdd2900be17093ae18b859ae826b1ab3a1b5231c lib/AtteanX/QueryPlanner/Cache.pm
+SHA1 e3bc470773b465b48cd13fb810254618e610a350 lib/AtteanX/QueryPlanner/Cache/LDF.pm
+SHA1 c35268f0367bca0fb72ef06b4ffff70d32a47998 lib/LWP/UserAgent/SemWebCache.pm
+SHA1 73af58b18ec398456153dea85ff287fb1099b10e lib/Plack/App/AtteanX/Query/Cache.pm
+SHA1 55bcb4ab7e2ec4d30dfd5f49c8b01d3862f35fc1 scripts/analyzer
+SHA1 3d9295db8ef44dbd665e4ab4c3bca9093f11c6d9 scripts/prefetcher
+SHA1 6eaba6958e62c5290591a1dad2c9813da8326825 scripts/proxy.psgi
+SHA1 db065d233616d6fd1440b599431d0de99cf1c2c4 t/01basic.t
+SHA1 ae40c5fe306f0beb9bf3588ddb64fc4bc00c574f t/analysis-best-cost.t
+SHA1 cb86da97ae207c7bf05f5e0ce580612a81b94130 t/analysis-count.t
+SHA1 bddc869cabb7254a1f4f3eb7a59b781ab7fe32d7 t/analysis.t
+SHA1 da31526514e6a3cdb884d81bb6c267deb25ddf35 t/caching-ua.t
+SHA1 f9874d6efa1018225a10a291e0737b08e4c9cca7 t/planner-with-tpf-cache.t
+SHA1 9ef952effa9443cf6b9751feff20cf9face55ad3 t/retriever.t
+SHA1 65256abe3485be768cb7da99ddc74aabfa6ad8e1 t/simple-cache-planner.t
+SHA1 335fd9781f078db307e6a4eb8c4c6899af54f8a0 t/simple-sparql-planner.t
+SHA1 8a3e503b4ca98ab467814895fc49373d70448cb2 t/simple-sparql-tpf-planner.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIVAwUBVzeoF3++6N86nkqlAQjVtQ/+JD3r2BJHSesZBxJlgrgKsD7L5v1DJcxg
+sAsCRCUJK76oMu6ukOxHFo1uUXl2036VSF5QGqOcGlvtby9FVr6aTZyjJAdoMEHl
+Wd7+bzumfW+7Zm5xoN3EBRB01HtZfRweFQxZv5uOmF356UtSPaN03cYg2X2qNgmV
+W+VPe5A6JRQZguXt7P3Vl08K29d4I+yMMY6CR445rmf+4A/klMUlxnrqux5iwJiW
+7863emzv412Z7zLv9YhsW7a5tMFzSR+I2l/8yP2haca2yQsaNuW0fYJmR4ieqhr2
+i7cW3qrHPutsmrn8ZOnFZtY7/KmKEHp+SzreRHPU1PtcKyIdQPptdoTB0O3T+xSM
+sbX9uKTQ77DFkqWZ54ri+FvZr/z8vmpyYtu+ztHJPoK+58poGBPzQd5K2MDRzO2i
+Qu/HsTEnGoa+b0Tr5OkpN9g45//gKREYqij7/rKgZdv/rW+IYGxL8/3T1Y0RewrF
+DA3nc0WqbOQKMH8DUwBQuzDht4l8NK8jxoGJa9uIcaSh15pIOYRQjQL8HlD8EF+n
+47/ozPlsD/DBE+679GjC9ljQOUH3HvOjBR3MnSFMJtdSAsV4/BachvwZDKFH2wZz
+xsEeZuqkp6E5qAUEECjYShyticRGc7GiwudY8GymiSAPtGhFV4m/R1uLy9hA2oPB
+h1dZsDmn+Y4=
+=2n3C
+-----END PGP SIGNATURE-----

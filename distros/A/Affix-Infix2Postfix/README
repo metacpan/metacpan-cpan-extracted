@@ -1,0 +1,12 @@
+===============================================================
+Copyright (c) 1999 Arnar M. Hrafnkelsson (addi@umich.edu).
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl
+itself.
+===============================================================
+
+BUGS - The tokenization is pretty broken - nothing can be a prefix
+of anything else.
+
+So stuff like *=, *, <, << and very many others don't work.
+I need to redo the tokenization before this is fixed.

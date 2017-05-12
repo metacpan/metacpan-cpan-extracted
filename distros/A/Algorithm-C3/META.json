@@ -1,0 +1,54 @@
+{
+   "abstract" : "A module for merging hierarchies using the C3 algorithm",
+   "author" : [
+      "Stevan Little <stevan@iinteractive.com>",
+      "Brandon L. Black <blblack@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Algorithm-C3",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0.01",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Algorithm-C3@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Algorithm-C3"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.shadowcat.co.uk/gitmo/Algorithm-C3.git",
+         "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=gitmo/Algorithm-C3.git"
+      }
+   },
+   "version" : "0.10"
+}

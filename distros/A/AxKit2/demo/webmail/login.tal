@@ -1,0 +1,18 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal">
+<head>
+    <title>AxMail Login</title>
+    <link rel="stylesheet" href="css/webmail.css"/>
+</head>
+<body>
+Login.
+<div class="login_error"
+     tal:content="/login/error">A login error occurred</div>
+<div class="login_form">
+<form method="POST" tal:attributes="action $request.uri">
+Login Name: <input type="text" name="login"/><br/>
+Password: <input type="password" name="password"/><br/>
+<input type="submit" value="Login"/>
+</form>
+</div>
+</body>
+</html>

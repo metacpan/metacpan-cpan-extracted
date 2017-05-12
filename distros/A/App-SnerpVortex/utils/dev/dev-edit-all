@@ -1,0 +1,1 @@
+exec gvim `find bin -maxdepth 1 -type f -not -name '*~'` `find lib -name '*.pm'`

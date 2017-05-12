@@ -1,0 +1,22 @@
+Revision history for App-War
+
+0.05 2012-05-15
+   - fixed minimum required version of Graph.pm to 0.84
+
+0.04 2009-10-15
+   - usability upgrades
+
+0.03 2009-10-11
+   - clarified POD in script/war
+   - added Test::Warn dependency to Build.PL
+   - added Pod::Usage dependency
+   - added Getopt::Long dependency
+
+0.02  2009-10-05
+   - added missing dependencies
+   - removed unneeded dependencies
+   - deleted bin/war
+   - fixed build to install script/war instead of bin/war
+
+0.01  2009-10-04
+   - initial release

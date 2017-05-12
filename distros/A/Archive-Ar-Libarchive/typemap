@@ -1,0 +1,25 @@
+TYPEMAP
+struct ar *	T_AR_ARCHIVE
+__LA_INT64_T	T_INT64
+int64_t	T_INT64
+uint64_t	T_UINT64
+
+INPUT
+T_AR_ARCHIVE
+  if (sv_isobject($arg) && sv_derived_from($arg, \"Archive::Ar::Libarchive\"))
+    $var = INT2PTR($type, SvIV((SV *) SvRV($arg)));
+  else
+    Perl_croak(aTHX_ \"$var is not of type Archive::Ar::Libarchive\");
+
+T_INT64
+        $var = SvI64($arg);
+T_UINT64
+        $var = SvU64($arg);
+
+OUTPUT
+T_AR_ARCHIVE
+  sv_setref_pv($arg, \"Archive::Ar::Libarchive\", (void *) $var);
+T_INT64
+        $arg = newSVi64($var);
+T_UINT64
+        $arg = newSVu64($var);

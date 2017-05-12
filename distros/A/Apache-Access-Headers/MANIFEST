@@ -1,0 +1,11 @@
+Changes
+Headers.pm
+MANIFEST
+Makefile.PL
+test.pl
+README
+example/headers_access.conf
+example/httpd_conf_snippet.txt
+example/lwp_test_url.pl
+example/REAME
+

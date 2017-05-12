@@ -1,0 +1,25 @@
+Build.PL
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+lib/Algorithm/SkipList.pm
+lib/Algorithm/SkipList/Header.pm
+lib/Algorithm/SkipList/Node.pm
+lib/Algorithm/SkipList/PurePerl.pm
+lib/List/SkipList.pm
+t/01-basic.t
+t/01-basic-pp.t
+t/02-merge_append.t
+t/03-tie.t
+t/04-greatest.t
+t/05-next_key.t
+t/06-duplicates.t
+t/07-max_level.t
+t/08-p.t
+t/09-index.t
+t/10-deprecated.t
+t/11-keys.t
+t/20-heavy.t
+SIGNATURE    Added here by Module::Build

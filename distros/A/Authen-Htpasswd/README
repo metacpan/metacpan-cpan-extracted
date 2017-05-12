@@ -1,0 +1,99 @@
+NAME
+    Authen::Htpasswd - interface to read and modify Apache .htpasswd files
+
+SYNOPSIS
+        my $pwfile = Authen::Htpasswd->new('user.txt', { encrypt_hash => 'md5' });
+    
+        # authenticate a user (checks all hash methods by default)
+        if ($pwfile->check_user_password('bob', 'foo')) { ... }
+    
+        # modify the file (writes immediately)
+        $pwfile->update_user('bob', $password, $info);
+        $pwfile->add_user('jim', $password);
+        $pwfile->delete_user('jim');
+    
+        # get user objects tied to a file
+        my $user = $pwfile->lookup_user('bob');
+        if ($user->check_password('vroom', [qw/ md5 sha1 /])) { ... } # only use secure hashes
+        $user->password('foo'); # writes to file
+        $user->set(password => 'bar', extra_info => 'editor'); # change more than one thing at once
+    
+        # or manage the file yourself
+        my $user = Authen::Htpasswd::User->new('bill', { hashed_password => 'iQ.IuWbUIhlPE' });
+        my $user = Authen::Htpasswd::User->new('bill', 'bar', 'staff', { encrypt_hash => 'crypt' });
+        print PASSWD $user->to_line, "\n";
+
+DESCRIPTION
+    This module provides a convenient, object-oriented interface to
+    Apache-style .htpasswd files. It supports passwords encrypted via MD5,
+    SHA1, and crypt, as well as plain (cleartext) passwords. It requires
+    Crypt::PasswdMD5 for MD5 and Digest::SHA1 for SHA1. Additional fields
+    after username and password, if present, are accessible via the
+    "extra_info" array.
+
+METHODS
+  new
+        my $pwfile = Authen::Htpasswd->new($filename, \%options);
+
+    Creates an object for a given .htpasswd file. Options:
+
+    encrypt_hash
+        How passwords should be encrypted if a user is added or changed.
+        Valid values are "md5", "sha1", "crypt", and "plain". Default is
+        "crypt".
+
+    check_hashes
+        An array of hash methods to try when checking a password. The
+        methods will be tried in the order given. Default is "md5", "sha1",
+        "crypt", "plain".
+
+  lookup_user
+        my $userobj = $pwfile->lookup_user($username);
+
+    Returns an Authen::Htpasswd::User object for the given user in the
+    password file.
+
+  all_users
+        my @users = $pwfile->all_users;
+
+  check_user_password
+        $pwfile->check_user_password($username,$password);
+
+    Returns whether the password is valid. Shortcut for
+    "$pwfile->lookup_user($username)->check_password($password)".
+
+  update_user
+        $pwfile->update_user($userobj);
+        $pwfile->update_user($username, $password[, @extra_info], \%options);
+
+    Modifies the entry for a user saves it to the file. If the user entry
+    does not exist, it is created. The options in the second form are passed
+    to Authen::Htpasswd::User.
+
+  add_user
+        $pwfile->add_user($userobj);
+        $pwfile->add_user($username, $password[, @extra_info], \%options);
+
+    Adds a user entry to the file. If the user entry already exists, an
+    exception is raised. The options in the second form are passed to
+    Authen::Htpasswd::User.
+
+  delete_user
+        $pwfile->delete_user($userobj);
+        $pwfile->delete_user($username);
+
+    Removes a user entry from the file.
+
+AUTHOR
+    David Kamholz "dkamholz@cpan.org"
+
+    Yuval Kogman
+
+SEE ALSO
+    Apache::Htpasswd.
+
+COPYRIGHT & LICENSE
+            Copyright (c) 2005 the aforementioned authors. All rights
+            reserved. This program is free software; you can redistribute
+            it and/or modify it under the same terms as Perl itself.
+

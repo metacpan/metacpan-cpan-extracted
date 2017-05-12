@@ -1,0 +1,15 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+eg/burn.pl
+eg/lala.pl
+eg/looper.pl
+eg/mary.pl
+eg/midi.pl
+eg/mouse-pitch.pl
+eg/obj.pl
+eg/wobbleBass.pl
+lib/Audio/NoiseGen.pm

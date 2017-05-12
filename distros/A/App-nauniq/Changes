@@ -1,0 +1,74 @@
+Revision history for App-nauniq
+
+0.09    2015-07-30 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Tweak example awk code.
+
+
+0.08    2015-07-30 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add description/comparison to the simpler awk/perl
+	  incantation.
+
+
+0.07    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.06    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.05    2014-05-05 (SHARYANTO)
+
+        - No functional changes.
+
+        - [build] Bump required version of IPC::Cmd (to first version which has
+          run_forked()).
+
+
+0.04    2014-03-25 (SHARYANTO)
+
+        - No functional changes.
+
+        - Skip testing on win because run_forked() is not available [CT].
+
+
+0.03    2014-03-19 (SHARYANTO)
+
+        [REMOVED FEATURES]
+
+        - Remove short option (-n). Aside from -a, I prefer to not adding short
+          options that are not in 'uniq'.
+
+        [INTERNAL]
+
+        - Add tests.
+
+
+0.02    2014-03-18 (SHARYANTO)
+
+        [REMOVED FEATURES]
+
+        - Remove 'uappend' program. I prefer a single program, and this also
+          removes duplicated code between 'uappend' and 'nauniq'.
+
+        [NEW FEATURES]
+
+        - Add --append, --read-ouput, -a options to replace the 'uappend'
+          functionality.
+
+
+0.01    2014-03-14 (SHARYANTO)
+
+        - First release, no tests yet.

@@ -1,0 +1,24 @@
+Apache::AxKit::StyleChooser::Hostname is a module that lets you pick
+a stylesheet based on the domain name of the HTTP request.  To use it,
+simply add this module as an AxKit plugin that will be run before main
+AxKit processing is done.
+
+    AxAddPlugin Apache::AxKit::StyleChooser::Hostname
+
+Then simply by referencing your xml files as follows:
+    http://xml.server.com/myfile.xml
+or
+    http://www.server.com/myfile.xml
+
+or whatever site aliases you have configured.  In the above example,
+the two styles that will be used will be "xml.server.com" and
+"server.com", respectively.
+
+QUICK START:
+
+1) Install.
+perl Makefile.PL && make && make test && make install
+
+2) Add the following to your httpd.conf:
+
+  AxAddPlugin Apache::AxKit::StyleChooser::Hostname

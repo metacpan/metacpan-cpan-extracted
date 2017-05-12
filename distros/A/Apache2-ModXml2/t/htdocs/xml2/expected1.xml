@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $Id: xml2_test.xml 15 2011-09-13 06:58:46Z jo $ --><data class="mod_xml2">
+  <title test="sax &amp; drags" test-length="We want a tag that is longer tha 128 bytes" test-additional="For this we need a bit more nonsense" class="mod_xml2">This is the Cindy 
+  Test Page</title>
+  <filter class="mod_xml2">
+    <first class="mod_xml2">1</first>
+    <second class="mod_xml2"><mod-xml2 class="mod_xml2">mod xml2</mod-xml2>2</second>
+    <third class="mod_xml2">mod_xml2: 3</third><!--mod_xml2-->
+  </filter>
+</data>

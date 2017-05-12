@@ -1,0 +1,96 @@
+2004-04-19  Charles C. Fu  <perl@web-i18n.net>
+
+	* Makefile.PL: release 1.10
+
+	* README:
+	Added a discussion of Apache::Gateway versus some newer approaches
+	now possible.
+
+	* Gateway.pm: Removed use of experimental Regexp module.
+
+	* References.txt: HTTP/1.1 and WebDAV IETF drafts are now RFCs.
+
+1998-08-07  Charles C. Fu  <perl@web-i18n.net>
+
+	* Makefile.PL: release 1.01
+
+	* TODO:
+	Added proposal not to try known bad servers until after all good
+	servers have been tried.
+
+	* ChangeLog: Fixed up ChangeLog.
+
+1998-08-05  Charles C. Fu  <perl@web-i18n.net>
+
+	* Makefile.PL:
+ 	release 1.00
+
+	Arrange for distributions to be gzip'ed.
+
+	* Gateway.pm:
+	Turned Apache::Gateway into a proper module (meaning, it's now an
+	object).  The handler now just creates an Apache::Gateway object if
+	needed and calls its send_request method.
+
+	* MANIFEST, examples, FAQ.txt:
+	initial check-in
+
+	* TODO:
+	Propose eliminating URI::URL.  Consider forwarding the request via
+	Apache's proxy mechanism as an alternative to LWP::UserAgent.
+
+1998-07-29  Charles C. Fu  <perl@web-i18n.net>
+
+	* Gateway.pm:
+	Moved package version into Makefile.PL.  $VERSION in this file now
+	applies only to this file.
+
+	* test.pl: Created a Makefile.PL.
+
+	* README, References.txt, TODO:
+	Moved some documentation into separate files.
+
+	* Makefile.PL: Created a Makefile.PL file.
+
+	* Definitions.txt: Moved some documentation into separate files.
+
+	* Gateway.pm:
+	Moved some documentation into separate files.  Some methods (like
+	file:) don't use ports (and default ports).  Check that ports exist
+	before using them.
+
+1998-07-28  Charles C. Fu  <perl@web-i18n.net>
+
+	* Gateway.pm: Modified to more closely follow perlstyle guidelines.
+
+1998-07-21  Charles C. Fu  <perl@web-i18n.net>
+
+	* Gateway.pm:
+	Added a lot more documentation and used CPAN sites in the examples
+	instead of Debian sites.
+
+	Moved GatewayRoot out of main Apache conf files and into the
+	GatewayConfig files.
+
+	Added GatewayTimeout.
+
+	Adjusted If-Modified-Since time when talking to upstream servers with
+	incorrect timestamps.
+
+	Fixed errors in multiplexing.
+
+	Pass through cache and pragma directives.
+
+	Removed some debugging statements.
+
+	Updated documentation.
+
+	Implemented multiplexing.
+
+	Broke printHeaders into smaller pieces.
+
+1998-07-20  Charles C. Fu  <perl@web-i18n.net>
+
+	* Gateway.pm: Removed directory munging capability.
+	Changed names from 'multiplexer' to 'gateway'.
+	Allow ForceType and similar directives to work.

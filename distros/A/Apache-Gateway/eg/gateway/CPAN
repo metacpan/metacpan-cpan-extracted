@@ -1,0 +1,41 @@
+GatewayRoot /CPAN/
+GatewayTimeout 90
+
+# versioned files (presumably always up-to-date)
+<LocationMatch "\d\.(readme|tar\.gz)$">
+MuxSite ftp://ftp.cdrom.com/pub/perl/CPAN/
+MuxSite ftp://ftp.digital.com/pub/plan/perl/CPAN/
+Site ftp://ftp.orst.edu/pub/packages/CPAN/
+Site ftp://ftp.perl.org/pub/perl/CPAN/
+Site ftp://ftp.funet.fi/pub/languages/perl/CPAN/
+</LocationMatch>
+
+# files that must be current
+<LocationMatch "^(authors|modules)/\d\d">
+Site ftp://ftp.funet.fi/pub/languages/perl/CPAN/
+Site ftp://ftp.perl.org/pub/perl/CPAN/
+</LocationMatch>
+
+# default
+<LocationMatch ".*">
+Site ftp://ftp.perl.org/pub/perl/CPAN/
+MuxSite ftp://ftp.cdrom.com/pub/perl/CPAN/
+MuxSite ftp://ftp.digital.com/pub/plan/perl/CPAN/
+Site ftp://ftp.orst.edu/pub/packages/CPAN/
+Site ftp://ftp.funet.fi/pub/languages/perl/CPAN/
+</LocationMatch>
+
+# servers with broken clocks	     upstream^2 upstream
+# ClockBroken scheme://host:port	  TZ	  TZ
+
+# funet is the master, so it's time is not really off.
+# It appears to use EET always, even in summer.
+#ClockBroken ftp://ftp.funet.fi		EET	EET
+ClockBroken ftp://ftp.cdrom.com		EET	PST8PDT
+ClockBroken ftp://ftp.digital.com	EET	PST8PDT
+ClockBroken ftp://ftp.orst.edu		EET	PST8PDT
+
+# Not sure what's up with perl.org.  Looks like it already
+# tries to correct the timestamp but gets it wrong during
+# Daylight Savings Time.  So try this.
+ClockBroken ftp://ftp.perl.org		CST	CST6CDT

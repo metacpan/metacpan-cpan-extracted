@@ -1,0 +1,16 @@
+[one]
+
+Apple  = "red"
+Pear   = "yellow"
+Orange = "orange"
+
+[two]
+
+Bikes = 2
+Cars  = Volvo
+Cars  = Saab
+
+[three]
+
+Version = $Revision: 1.2 $
+

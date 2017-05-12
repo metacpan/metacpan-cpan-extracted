@@ -1,0 +1,10 @@
+Revision history for Perl extension Apache::Imager::Resize.
+
+0.11  Wed Oct 7
+	- Documentation fixes
+
+0.10  Wed Oct 7
+	- first release factored out of Delivery (a Class::DBI-based CMS that 
+	  performed these functions in much more clumsy ways).
+
+	

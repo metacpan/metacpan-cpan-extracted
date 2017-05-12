@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+	"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<body>
+<head>
+<script>
+function form_submit() {
+	document.getElementById("val").value = "баба";
+	document.getElementById("f").submit();
+}
+
+function click() {
+	alert('Clicked ' + document.cookie);
+}
+</script>
+</head>
+<a id="cla" href="javascript:click();">Click</a>
+<form id="f" action="u">
+[% id %] <br />
+[% val %]
+<input type="submit" />
+</form>
+</body>
+</html>

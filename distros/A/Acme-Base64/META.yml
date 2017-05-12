@@ -1,0 +1,26 @@
+---
+abstract: 'Write Perl in Base64 encoding'
+author:
+  - 'Alan Haggai Alavi <haggai@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Base64
+provides:
+  Acme::Base64:
+    file: lib/Acme/Base64.pm
+    version: v0.0.2
+requires:
+  Filter::Simple: 0
+  MIME::Base64: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/alanhaggai/Acme-Base64.git
+version: v0.0.2

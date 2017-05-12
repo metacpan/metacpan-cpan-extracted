@@ -1,0 +1,11 @@
+0.04    24 Apr  2017 Alexander Nalobin
+        Turn off test of non existant site.
+
+0.03    07 Mar  2016 Alexander Nalobin
+        This module IS DEPRECATED, AnyEvent 7.12 has SNI support.
+
+0.02    03 Aug  2015 Tim Jenkins
+        Workaround for hosts that start with numbers.
+
+0.01    14 Feb  2015 Alexander Nalobin
+        First version, released on an unsuspecting world.

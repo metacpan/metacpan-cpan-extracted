@@ -1,0 +1,146 @@
+
+/* base */
+
+a {
+    text-decoration: none;
+}
+
+th {
+    align: center;
+    text-align: center;
+}
+
+td {
+    align: center;
+    text-align: center;
+}
+
+.top_row {
+    valign: center;
+    align: center;
+}
+
+.top {
+    width: 100%;
+}
+
+.inner {
+    width: 33.333333%;
+}
+
+.inner_aux {
+    width: 33.33333%;
+}
+
+/* main menu */
+
+#time {
+	padding: 10px 20px;
+	background: #c0c0c0;
+	color: #FFF;
+}
+
+.menuHeader {
+	padding: 10px 20px;
+	display: block;
+	text-decoration: none;
+	color: #FFF;
+}
+.menuHeader:hover {
+	background: green;
+}
+
+.menuBackground {
+	background: #c0c0c0;
+	text-align: left;
+}
+.dropDownMenu a {
+	color: #FFF;
+}
+
+.dropDownMenu,
+.dropDownMenu ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.dropDownMenu li {
+	position: relative;
+}
+.dropDownMenu a {
+	padding: 10px 20px;
+	display: block;
+	text-decoration: none;
+}
+.dropDownMenu a:hover {
+	background: green;
+}
+
+/* Level 1 Drop Down */
+.dropDownMenu > li {
+	display: inline-block;
+	vertical-align: top;
+	margin-left: -4px; /* solve the 4 pixels spacing between list-items */
+}
+
+.dropDownMenu > li:first-child {
+	margin-left: 0;
+}
+
+/* Level 2 */
+.dropDownMenu ul {
+	box-shadow: 2px 2px 15px 0 rgba(0,0,0, 0.5);
+}
+.dropDownMenu > li > ul {
+	text-align: left;
+	display: none;
+	background: #c0c0c0;
+	position: absolute;
+	top: 100%;
+	left: 0;
+	width: 240px;
+	z-index: 999999;
+}
+
+/* Level 3 */
+.dropDownMenu > li > ul > li > ul {
+	text-align: left;
+	display: none;
+	background: #c0c0c0;
+	position: absolute;
+	left: 100%;
+	top: 0;
+	z-index: 9999999;
+}
+
+.graph_container {
+	box-sizing: border-box;
+	width: 600px;
+	height: 200px;
+	padding: 20px 15px 15px 15px;
+	margin: 15px auto 30px auto;
+	border: 1px solid #ddd;
+	background: #fff;
+	background: linear-gradient(#f6f6f6 0, #fff 50px);
+	background: -o-linear-gradient(#f6f6f6 0, #fff 50px);
+	background: -ms-linear-gradient(#f6f6f6 0, #fff 50px);
+	background: -moz-linear-gradient(#f6f6f6 0, #fff 50px);
+	background: -webkit-linear-gradient(#f6f6f6 0, #fff 50px);
+	box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+	-o-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+	-ms-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+	-moz-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+	-webkit-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.graph {
+	width: 100%;
+	height: 100%;
+	font-size: 14px;
+	line-height: 1.2em;
+}
+
+.button {
+    width: 200px;
+}
+

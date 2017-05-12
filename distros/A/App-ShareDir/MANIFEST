@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/classfile
+bin/distdir
+bin/distfile
+bin/moduledir
+bin/modulefile
+dist.ini
+lib/App/ShareDir.pm
+t/release-pod-syntax.t

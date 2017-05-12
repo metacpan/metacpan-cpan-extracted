@@ -1,0 +1,79 @@
+Array/LineReader $Revision 0.01$
+================================
+
+DESCRIPTION:
+
+Array::LineReader gives you the possibility to access lines of some file by the
+elements of an array.
+This modul inherites methods from Tie::Array.
+You save a lot of memory, because the file's content is read only on demand, i.e. in 
+the case you access an element of the array. The offset and length of all the lines 
+is hold in memory as long as you tie your array.
+
+The underlying file is opened for reading in binary mode.
+(Yes, there are some OSs, that make a difference in 
+interpreting the EOL-sequence, i.e. End-Of-Line and the EOF-character, i.e.
+End-Of-File what is some times the character "\x1A".
+The bytes read are neigther translated nor suppressed.
+The access may be both sequential and random.
+
+Lines are build up to and including the EOL-sequence.
+The EOL-sequence is assumed to be "\x0D\x0A" or "\x0A\x0D" or "\x0D" or
+"\x0A".
+
+The file is not closed until you untie the array.
+
+It's up to you to define the kind of access:
+
+      use Array::LineReader;
+      my @lines;
+  
+      # Get the content of every line as an element of @lines:
+      tie @lines, 'Array::LineReader', 'filename';
+      print scalar(@lines);         # number of lines in the file
+      print $lines[0];              # content of the first line
+      print $lines[-1];             # content of the last line
+      ...
+  
+      # Get the offset and content of every line as array reference via the elements of @lines:
+      tie @lines, 'Array::LineReader', 'filename', result=>[];
+      print scalar(@lines);         # number of lines in the file
+      print $lines[5]->[0],":",$lines[5]->[1];      # offset and content of the 5th line
+      print $lines[-1]->[0],":",$lines[-1]->[1];    # offset and content of the last line
+      ...
+  
+      # Get the offset and content of every line as hash reference via the elements of @lines:
+      tie @lines, 'Array::LineReader', 'filename', result=>{};
+      print scalar(@lines);         # number of lines in the file
+      print $lines[4]->{OFFSET},":",$lines[4]->{CONTENT};   # offset and content of the 4th line
+      print $lines[-1]->{OFFSET},":",$lines[-1]->{CONTENT}; # offset and content of the last line
+      ...
+
+HISTORY:
+
+ * $Log: README,v $
+ * Revision 1.1  2004/06/10 18:17:23  Horst_Liske
+ * First stable (as seems) version
+ *
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tie::Array
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Bjoern Holsten
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

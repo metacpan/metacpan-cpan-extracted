@@ -1,0 +1,126 @@
+NAME
+    Acme::Web20::Validator - Web 2.0 Validation
+
+SYNOPSIS
+      use Acme::Web20::Validator;
+      my $v = Acme::Web20::Validator->new;
+      $v->add_rule(
+        'Acme::Web20::Validator::Rule::HasAnyFees',
+        'Acme::Web20::Validator::Rule::UseCatalyst',
+        ...
+      );
+      print $v->validation_report('http://web2.0validator.com/');
+      printf "The score is %d out of %d", $validator->ok_count, $v->rule_size;
+
+      ## OR
+
+      my $v = Acme::Web20::Validator->new;
+      $v->set_all_rules;
+      $v->validate('http://web2.0validator.com/');
+      print $v->validation_report;
+
+      ## OR
+      my $v = Acme::Web20::Validator->new;
+      $v->set_all_rules;
+      my @rules = $v->validate('http://web2.0validator.com/');
+      print $_->name . "\t" . $_->is_ok for (@rules);
+
+DESCRIPTION
+    Acme::Web20::Validator is a Web 2.0 Validation module for your
+    website. This module is inspired from Web 2.0 Validator
+    (http://web2.0validator.com/).
+
+    The definition of web 2.0 changes on a daily basis but currently
+    supports are:
+
+      UsePrototype
+      UseCatalyst
+      UseRails
+      MentionsWeb20
+      UseLighttpd
+      HasAnyFeeds
+      ReferToDelicious
+      XHtmlStrict
+      UseCSS
+      UseFeedBurner
+      HasTrackbackURI
+
+    And the Rule is also pluggable with Module::Pluggable, so you can add
+    any rules by yourself. For example:
+
+      package Acme::Web20::Validator::Rule::MyRule;
+      use strict;
+      use warnings;
+      use base qw (Acme::Web20::Validator::Rule);
+      __PACKAGE__->name('Your rule's description');
+
+      sub validate {
+          my $self = shift;
+          my $res = shift; ## HTTP::Response via LWP
+          ...
+          $self->is_ok(1) if ...;
+      }
+
+      1;
+
+METHODS
+  new
+      my $v = Acme::Web20::Validator->new;
+
+    Creates and returns a validator instance.
+
+  add_rule
+      $v->add_rule(
+        'Acme::Web20::Validator::Rule::HasAnyFees',
+        'Acme::Web20::Validator::Rule::UseCatalyst',
+      )
+
+    Adds validation rules to the validator.
+
+  set_all_rules
+      $v->set_all_rules;
+
+    Adds Acme::Web20::Validator::Rule::* to the validator.
+
+  validate
+      my @rules = $v->validate($url);
+      print $rules[0]->name;
+      print $rules[0]->is_ok ? 'Yes!' : 'No';
+
+    Validates the website and returns rules which know the result of each
+    validation and rule's description.
+
+  validation_report
+      print $v->validation_report($url)
+
+      ## OR
+      $v->validate($url);
+      print $v->validation_report;
+
+    Returns a validation report formatted by Text::ASCIITable.
+
+  rules_size
+    Returns a number of rules validator has.
+
+  ok_count
+    Returns a number of OK after validation.
+
+  clear
+      $v->validation_report($url[0]);
+      $v->clear;
+      $v->validation_report($url[1]);
+      $v->clear;
+      ...
+
+    Clears validation result in the instance for reusing. If you want to
+    validate for other rules, create a new instance instead of reusing them.
+
+SEE ALSO
+    Module::Pluggable
+
+AUTHOR
+    Naoya Ito, <naoya@bloghackers.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

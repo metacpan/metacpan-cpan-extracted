@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+use YAML;
+use Algorithm::HITS::Lite;
+
+my $adjm = {
+    alice => { bob => 1 },
+};
+
+my $ah = Algorithm::HITS::Lite->new(network => $adjm);
+
+my ($hub,$auth) = $ah->iterate;
+
+print YAML::Dump($hub, $auth);
+

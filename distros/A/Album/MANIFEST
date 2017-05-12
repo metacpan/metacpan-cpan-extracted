@@ -1,0 +1,14 @@
+README
+CHANGES
+script/album
+helper/README
+helper/shellrun.c
+helper/shellrun.exe
+helper/autorun.inf
+helper/Makefile
+Makefile.PL
+t/basic.t
+MANIFEST
+lib/Album.pm
+lib/Album/Tutorial.pm
+META.yml                                 Module meta-data (added by MakeMaker)

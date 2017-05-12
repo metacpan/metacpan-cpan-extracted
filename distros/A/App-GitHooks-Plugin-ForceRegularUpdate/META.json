@@ -1,0 +1,61 @@
+{
+   "abstract" : "Force running a specific tool at regular intervals.",
+   "author" : [
+      "Guillaume Aubert <aubertg@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-GitHooks-Plugin-ForceRegularUpdate",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Git::Repository" : "0",
+            "Test::Exception" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0.94",
+            "Test::Requires::Git" : "1.005"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::GitHooks" : "0",
+            "Carp" : "0",
+            "File::Slurp" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "App::GitHooks::Plugin::ForceRegularUpdate" : {
+         "file" : "lib/App/GitHooks/Plugin/ForceRegularUpdate.pm",
+         "version" : "v1.0.5"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/guillaumeaubert/App-GitHooks-Plugin-ForceRegularUpdate/issues"
+      },
+      "homepage" : "https://metacpan.org/release/App-GitHooks-Plugin-ForceRegularUpdate",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/guillaumeaubert/App-GitHooks-Plugin-ForceRegularUpdate"
+      }
+   },
+   "version" : "v1.0.5"
+}

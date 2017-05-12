@@ -1,0 +1,222 @@
+/*
+ *  Apache2::WebApp::Toolkit - Admin Control Panel (results.css)
+ *  Copyright (C) 2010 Marc S. Brooks <mbrooks@cpan.org>
+ *
+ *  Licensed under the terms of the BSD License
+ *  http://www.opensource.org/licenses/bsd-license.php
+ */
+
+/*--------------------------------------------------------------------------*/
+/* defaults - override                                                      */
+
+html, body {
+	min-width: 800px;
+	margin-bottom: 10px;
+}
+
+
+/*--------------------------------------------------------------------------*/
+/* shadow                                                                   */
+
+#shadow {
+	background-color: #F0F0F0;
+	border: 1px solid #F3F3F3;
+	clear: both;
+	position: relative;
+	width: 100%;
+}
+
+
+/*--------------------------------------------------------------------------*/
+/* table - container                                                        */
+
+#table {
+	background-color: #FFFFFF;
+	border-collapse: collapse;
+	clear: both;
+	left: -5px;
+	position: relative;
+	text-align: center;
+	top: -5px;
+	width: 100%;
+}
+
+
+/* table - cell properties */
+
+#table td {
+	border-bottom: 1px solid #E5E5E5;
+	height: 30px;
+}
+
+#table td.on {
+	background-color: #F7F7F7;
+	border: 1px solid #787878;
+	border-top: 1px solid #CCCCCC;
+}
+
+#table td.off {
+	background-color: #DDDDDD;
+	border: 1px solid #999999;
+	border-bottom: 1px solid #000000;
+}
+
+#table td.on a, td.off a {
+	display: block;
+	padding: 6px 0px 6px 0px;
+}
+
+#table td.on a.asc, #table td.on a.desc {
+	background-repeat: no-repeat;
+	padding-left: 10px;
+}
+
+#table td.on a.asc {
+	background-image: url( /extras/admin/images/arrow_asc.gif );
+	background-position: 10px 11px;
+}
+
+#table td.on a.desc {
+	background-image: url( /extras/admin/images/arrow_desc.gif );
+	background-position: 10px 10px;
+}
+
+#table td.on a:hover, td.off a:hover {
+	text-decoration: none;
+}
+
+#table td.on strong, td.off strong {
+	font-weight: normal;
+}
+
+#table td.left {
+	border-left: 1px solid #E5E5E5;
+}
+
+#table td.right {
+	border-right: 1px solid #E5E5E5;
+}
+
+#table td.main_1 {
+	text-align: center;
+	width: 100%;
+}
+
+#table td.main_2 {
+	padding-left: 5px;
+	text-align: left;
+	width: 99%; 
+}
+
+#table td.info {
+	padding-left: 8px;
+	text-align: left;
+}
+
+
+/* table - sorting links */
+
+#table a.checkbox {
+	width: 65px;
+}
+
+#table a.date {
+	width: 150px;
+}
+
+#table a.default {
+	width: 150px;
+}
+
+#table a.number {
+	width: 95px;
+}
+
+#table a.select {
+	width: 120px;
+}
+
+#table a.type {
+	width: 65px;
+}
+
+
+/* blanks */
+
+#table span.checkbox {
+	display: block;
+	width: 65px;
+}
+
+#table span.options {
+	display: block;
+	width: 95px;
+}
+
+
+/*--------------------------------------------------------------------------*/
+/* other                                                                    */
+
+/* options */
+
+#navtop {
+	height: 50px;
+	position: relative;
+	top: 10px;
+	width: 100%;
+}
+
+#navtop div.options {
+	float: right;
+	margin-right: 3px;
+}
+
+#navtop div.options span {
+	color: #DDDDDD;
+}
+
+
+/* per page results */
+
+#navtop div.results {
+	float: left;
+}
+
+
+/* clickable page links */
+
+#pages {
+	clear: both;
+	height: 30px;
+	padding: 10px 0px 10px 0px;
+	text-align: center;
+}
+
+#pages p.info, p.links {
+	padding: 5px;
+}
+
+#pages p.info {
+	float: left;
+}
+
+#pages p.links {
+	float: right;
+}
+
+#pages p.links a, p.links span {
+	padding: 2px 5px 2px 5px;
+}
+
+#pages p.links span {
+	font-weight: bold;
+}
+
+
+/* sorting arrows */
+
+.arrow {
+	border: 0px;
+	padding: 0px 1px 0px 1px;
+	vertical-align: 1px;
+}

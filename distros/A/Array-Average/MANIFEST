@@ -1,0 +1,10 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Array/Average.pm
+t/001_load.t
+scripts/Array-Average-example.pl
+META.yml                                 Module meta-data (added by MakeMaker)

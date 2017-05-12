@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 3ef36173b95fafd7e14959b85e78027c69027b1a COPYRIGHT
+SHA1 190cab2550d93455eae3958483ac139c5f3e368c CREDITS
+SHA1 6f6c20996337fc1401966fd8bdaee50df8254c37 Changes
+SHA1 2a9fb0c850d0479c2933fcfa48a4f3db46777c07 INSTALL
+SHA1 41485011b0aa0f1aaea6efbfadcf372cbe199473 LICENSE
+SHA1 7f7b60463812e00ffd1fb90420c38850a114d5f3 MANIFEST
+SHA1 ec9bd3dbb65056f401885d28b9fdfb65ac4fd34f META.json
+SHA1 fc21cd66a57b74bc27d6a1d1c913c36c29318f1d META.yml
+SHA1 48b712b8f7402e8420f59521c5bbc708e1568b89 Makefile.PL
+SHA1 c6c17cca9458e532c5c6f7c0a9dcf0687a398ee5 README
+SHA1 3d147db67b3bc65a4f3a62966a19427f93cfdc5e demo/README
+SHA1 5ea26ffddc8fd7f84fef0536d4abe528208b5033 demo/boot.sh
+SHA1 f5bee6e7c7ddbad82e2ee203cb4bfad91377df42 demo/test.json
+SHA1 df5c13034ed374ebccb93c28fde279a0e57f098f demo/test.pl
+SHA1 11bf16eedb25d61d179e21d184afa5cee51e6136 demo/test.psgi
+SHA1 d20151925212c66c2f583a65b00a704f38542672 demo/test.ttl
+SHA1 8540d9e6c38b153353c17fbc93c80f2ca6af9491 dist.ini
+SHA1 2b0ac81daa1df83b26dab35fda26e37a386118ad doap.ttl
+SHA1 ea70b948b1be6c1566553b2446e66cd398769231 lib/AtteanX/Plan/LDF/Triple.pm
+SHA1 28b51b069ab5d99884f0b252cec84f08ba0d651f lib/AtteanX/Query/AccessPlan/LDF.pm
+SHA1 dda3fff93e0a72909105bd3d55457cfeb93369c9 lib/AtteanX/Store/LDF.pm
+SHA1 2c56e0640831853a35b8004683e38ae2fbdc5e88 lib/Test/Attean/Store/LDF/Role/CreateStore.pm
+SHA1 8f6a7294708b23f1bb35f46317d73f4d8c4c355e t/00-load.t
+SHA1 0d02efc7b8ebb7a59403f8f4fd3074d36ac3acc1 t/planner.t
+SHA1 58eb38070affb27f085837886fa695df643d139e t/triplestore.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIVAwUBVzejwX++6N86nkqlAQjBshAAn1eGzrxSIK6PQQzVeVL9Tx5abx1Km0zg
+iC4jKHx29DIl+QxpOevcJ0dPzGg2Syjfj9UVUH1RDHRW3F4i/qavu5PwZ8DCKg3v
+QpZ0mHYZUGdM2Tip82fvzuTNoIH43x70NPsAzi3SBnHkG2eIklTGIFES8EIbtqur
+ouG2BgpWrov4csBKuqDaYuLFQqdVNsaJfa2koGv4YQY6z9sO7xk244GTP6jSlt7V
+zcykU/cNxlQjbtOffOKK3RAu6QKhvpyzQ2clkRzT+Hhql2NDm12Vv55ImrjCkLqe
+lT3Co+yjCvrmgUN2wd0fD2EXxTIvLQVptZPjQZSWG/9bORR1cRMfv9ujOIEzWyrq
+nXdGjT3hKX4bLAxw2/Hm/iz4U4SkyZwfehT13TI/yuju5bDdrW1ux5c1zjdGfP+v
+mOElKHR27Amn/Sxo9SnPfUshSIpUvsw/EutNVZWxXeB+DgUcI5D6kphmhNP8+yrK
+kYJC5/PCvDk0MB7R7tpGC7tGy7j/qdsIVxmIM7K5D9+hmgn4Pgcv2jfP1udM+DHV
+j+mhhedgs8o58tBRbIl6gKC7OkrnLP6PyOXVLa3PjRqq5wtRT5p8GcAwGhCXxk2m
+Q4b/y8N8Qw74lHpU1uYvu0h7pb/AE6n4WPU5fIZEyNvjGwamtlWlDxOj+iIONwvP
+Kr+8uneuXAc=
+=3g2N
+-----END PGP SIGNATURE-----

@@ -1,0 +1,19 @@
+#!/opt/bin/perl
+
+use AnyEvent;
+use AnyEvent::MP;
+use AnyEvent::MP::Global;
+
+configure;
+
+my $port = port;
+
+grp_reg eg_receivers => $port;
+
+rcv $port, test => sub {
+   my ($data, $reply_port) = @_;
+
+   print "Received data: " . $data . "\n";
+};
+
+AnyEvent->condvar->recv;

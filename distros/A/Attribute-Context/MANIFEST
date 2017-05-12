@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Attribute/Context.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/10arrayref.t
+t/20last.t
+t/30first.t
+t/40count.t
+t/50custom.t
+t/pod-coverage.t
+t/pod.t

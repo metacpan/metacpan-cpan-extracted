@@ -1,0 +1,21 @@
+Revision history for Perl extension Apache::AuthChecker.
+
+0.10  Wed Mar 12 2003
+	- initial version. Ability to block brute force attackers
+	  by IP with URI redirection.
+	  
+0.11  Thr Mar 13 2003
+        - Shared memory locks shrinked in size. Default settings 
+          are revised. Shared memory size is configurable.
+          
+0.20 Wed May 28 2003
+        - Ported to mod_perl2. Some parts are polished.
+
+1.00 Sun Mar 27 2005
+        - Fixed some problems for mod_perl2 installation process
+        - Fixed some problems of backwards compatibility of mod_perl2
+          
+1.01 Mon Dec 10 2007
+        - Fixed some compatibility problems with mod_perl 2.0.2
+          
+

@@ -1,0 +1,4 @@
+{
+    initial_features => { some_tag => 3 },
+}
+

@@ -1,0 +1,27 @@
+building test distribution under .build/ZJhGJGMarR
+[DZ] beginning to build App-KeePass2
+[DZ] guessing dist's main_module is lib/App/KeePass2.pm
+[DZ] extracting distribution abstract from lib/App/KeePass2.pm
+[@GRS/@Filter/ExtraTests] rewriting release test xt/release/unused-vars.t
+[@GRS/@Filter/ExtraTests] rewriting release test xt/release/pod-coverage.t
+[@GRS/@Filter/ExtraTests] rewriting author test xt/author/critic.t
+[DZ] writing App-KeePass2 in .build/ZJhGJGMarR
+Created MYMETA.yml and MYMETA.json
+Creating new 'Build' script for 'App-KeePass2' version '0.04'
+Building App-KeePass2
+t/00-compile.t ............ ok
+t/000-report-versions.t ... ok
+t/App/KeePass2/Icons.t .... ok
+t/author-critic.t ......... 
+Dubious, test returned 1 (wstat 256, 0x100)
+Failed 1/3 subtests 
+t/release-pod-coverage.t .. ok
+t/release-unused-vars.t ... ok
+
+Test Summary Report
+-------------------
+t/author-critic.t       (Wstat: 256 Tests: 3 Failed: 1)
+  Failed test:  2
+  Non-zero exit status: 1
+Files=6, Tests=233, 10 wallclock secs ( 0.03 usr  0.01 sys +  9.41 cusr  0.23 csys =  9.68 CPU)
+Result: FAIL

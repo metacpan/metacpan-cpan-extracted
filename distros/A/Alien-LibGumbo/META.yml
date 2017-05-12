@@ -1,0 +1,30 @@
+---
+abstract: 'gumbo parser library'
+author:
+  - 'Ruslan Zakirov <Ruslan.Zakirov@gmail.com>'
+build_requires: {}
+configure_requires:
+  Alien::Base::ModuleBuild: '0.005'
+  File::ShareDir: '1.03'
+  Module::Build: '0.42'
+  Path::Class: '0.013'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-LibGumbo
+provides:
+  Alien::LibGumbo:
+    file: lib/Alien/LibGumbo.pm
+    version: '0.04'
+requires:
+  Alien::Base: '0.005'
+  File::ShareDir: '1.03'
+  Path::Class: '0.013'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ruz/Alien-LibGumbo
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

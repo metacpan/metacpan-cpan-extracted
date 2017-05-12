@@ -1,0 +1,238 @@
+#!perl -w
+# run this document through perl to check its syntax
+use Pod::Checker;
+podchecker(\*DATA);
+__END__
+
+=head1 NAME
+
+App::adminguide::cvs - Administration Guide for CVS
+
+=head1 DESCRIPTION
+
+The following is a list of installation stories for installing CVS correctly.
+
+=head1 REFERENCES
+
+  CVS Home Page
+    - https://www.cvshome.org/
+  Configuration of xinetd
+    - http://www.sugoi.org/bits/index.php?bit_id=32
+   
+=head1 CVS INSTALLATION : 2004-08-06 : REDHAT LINUX
+
+I wanted to move a CVS installation from a server we were
+decommissioning to a new server, and I wanted to get two
+things right this time (which I had neglected the first
+time around).
+
+  * cvspserver not running as root
+  * cvs using a CVS passwd file, not /etc/passwd
+
+Furthermore, the old installation was on Solaris 2.7 which
+used an inetd configuration.  My new installation would
+by on RedHat Linux 9 (2.4.21 kernel).
+
+=head2 CVS software installation
+
+I checked the version of CVS installed on the system.
+
+  cvs --version
+  rpm -q cvs
+
+and found I had version 1.11.2 installed.
+I checked the CVS home page, and it alerted me to a
+vulnerability in CVS if this were exposed to the 
+internet (which I had some sense I might do).
+
+  http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CAN-2004-0396
+
+So I had to install 1.11.16 or greater (1.11 series) or 1.12.8
+or greater (1.12 series).  The latest releases are 1.12.9 and
+1.11.17.  I decided to go with an rpm installation rather than
+a source-based installation.  I decided to go with the 1.11
+series, which cvshome.org says is the "stable" version rather
+than the 1.12 version which cvshome.org says is an incremental
+feature version.
+
+  su -
+  cd /root
+  mkdir rpm
+  cd rpm
+  wget ftp://rpmfind.net/linux/fedora/core/updates/2/i386/cvs-1.11.17-2.i386.rpm
+  rpm --upgrade cvs-1.11.17-2.i386.rpm
+
+But then "cvs --version" caused the following error.
+
+  cvs: relocation error: cvs: undefined symbol: GSS_C_NT_HOSTBASED_SERVICE
+
+So I decided to go with the RPM from cvshome.org rather than from Fedora.
+
+  wget https://ccvs.cvshome.org/files/documents/19/360/cvs-1.11.17-1.i386.rpm
+  rpm --upgrade cvs-1.11.17-1.i386.rpm
+
+This gave me the following error.
+
+  package cvs-1.11.17-2 (which is newer than cvs-1.11.17-1) is already installed
+
+So I did
+
+  rpm --upgrade --force cvs-1.11.17-1.i386.rpm
+
+and that did the trick, as verified by
+
+  rpm -q cvs
+  cvs --version
+
+If that had not worked, I would have compiled my own version from
+sources, but I would have to be sure to use ./configure --prefix=/usr
+so that the binaries would overwrite the installed binaries rather
+than creating another version in /usr/local.
+
+Somewhere else I read that I need to set the setgid bit on the
+cvs binary.
+
+  chmod 2755 /usr/bin/cvs
+
+=head2 Users and Groups
+
+We use NIS, so I verified that we have both the cvs user and group
+defined.
+
+  ypcat passwd | grep cvs
+  ypcat group | grep cvs
+
+Otherwise, I would have verified that in the /etc/passwd and 
+/etc/group files and created them if necessary.
+
+=head2 CVSROOT
+
+I chose /usr/mycompany/cvs (where "mycompany" is replaced with a
+name for our company) for all CVS files (i.e. CVSROOT).
+
+  cd /usr/mycompany
+  mkdir cvs
+  chown cvs cvs
+  chgrp cvs cvs
+  chmod 775 cvs
+  chmod g+s cvs
+
+We use Bash and Korn shell, so I added the following lines to
+"/etc/profile" so that the CVSROOT variable is available to all
+users.
+
+  CVSROOT=/usr/mycompany/cvs
+  export CVSROOT
+
+Then I ran the same commands in my current shell to set CVSROOT for
+the current session.
+
+=head2 Initializing the CVS Repository
+
+I initialized the CVS Repository (/usr/mycompany/cvs).
+
+  su - cvs
+  cvs init
+
+Then I created the CVS password file.
+
+  cd ~
+  mkdir src
+  cd src
+  cvs co CVSROOT
+  cd CVSROOT
+  touch passwd
+  cvs add passwd
+  cvs update
+  cvs commit -m "new" passwd
+
+  vi checkoutlist
+  # add "passwd" as the last line
+  cvs commit -m "added passwd to list of CVSROOT files" checkoutlist
+
+Then exit as the "cvs" user.
+
+  exit
+
+=head2 Installing cvspasswd and adding users
+
+I got it from here.
+
+  http://www.sugoi.org/bits/download/cvspasswd
+
+But I put it in a distribution on CPAN called App-admin.
+So you can install it this way.
+
+  perl -MCPAN -e "install App-admin"
+
+In any case, make sure it is in your path (i.e. /usr/local/bin).
+Then add users.
+
+  cvspasswd joe    joespw7
+  cvspasswd mike   m1k31sgr3a7
+  cvspasswd nellie whoa_
+
+=head2 Configure xinetd
+
+On Solaris, I just needed to add a line to /etc/inetd.conf which
+looked like this. (This configures "inetd", the internetworking daemon.)
+
+  cvspserver stream tcp nowait root /usr/bin/cvs cvs --allow-root=/usr/mycompany/cvs pserver
+
+However, on Linux I have to configure xinetd (an enhanced version of
+"inetd").
+
+  cd /etc/xinetd.d
+  vi cvs
+
+I put the following in the file, with my server's actual
+IP address instead of "10.10.10.10".
+
+  service cvspserver
+  {
+      disable         = no
+      socket_type     = stream
+      wait            = no
+      user            = cvs
+      group           = cvs
+      log_type        = FILE /var/log/cvspserver
+      protocol        = tcp
+      env             = '$HOME=/usr/mycompany/cvs'
+      bind            = 10.10.10.10
+      log_on_failure += USERID
+      port            = 2401
+      server          = /usr/bin/cvs
+      server_args     = -f --allow-root=/usr/mycompany/cvs pserver
+  }
+
+Then I restart xinetd.
+
+  pkill -HUP xinetd
+
+=head2 Verification
+
+Then I went to another server on the network.
+
+  cd ~
+  mkdir src
+  cd src
+  cvs -d :pserver:mike@cvshost:/usr/mycompany/cvs login
+  cvs -d :pserver:mike@cvshost:/usr/mycompany/cvs co CVSROOT
+  # it worked great, so I can remove it ...
+  rm -rf CVSROOT
+
+=head2 Moving the CVS data
+
+I now had to move the data from my old CVS server.
+
+  ssh oldcvshost
+  su -
+  cd /usr/mycompany/cvs
+  find project1 project2 project3 -print | cpio -ocv | gzip > cvs.cpio.gz
+  scp cvs.cpio.gz mike@cvshost:.
+  ssh mike@cvshost
+  su -
+  cd /usr/mycompany/cvs
+  mv ~mike/cvs.cpio.gz .
+  gunzip < cvs.cpio.gz | cpio -idcuvm
+

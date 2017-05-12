@@ -1,0 +1,438 @@
+#!/usr/bin/env perl
+use Getopt::Long;
+use List::MoreUtils qw(uniq);
+use File::Find::Rule;
+use File::Spec;
+use Log::Dispatch;
+use Getopt::Long;
+use DateTime;
+use warnings;
+use strict;
+$|++;
+
+my $opt_verbose;
+my $opt_very_verbose;
+my $opt_installed;
+my $opt_exclude_parts = "";
+my $opt_include_parts = "";
+my $opt_logfile;
+my $opt_debug;
+my $opt_sudo;
+
+my $opt_gzip;
+my $opt_bzip;
+
+my $opt_help;
+my $opt_dry;
+my $opt_extract;
+
+my $opt_skip_pods;
+my $opt_skip_manpages;
+
+my $opt_result = GetOptions(
+    "exclude=s"     => \$opt_exclude_parts,
+    "include=s"     => \$opt_include_parts,
+    "installed"     => \$opt_installed,       # get installed modules
+    "l|log=s"       => \$opt_logfile,
+    "v|verbose"     => \$opt_verbose,
+    "vv"            => \$opt_very_verbose,
+    "d|debug"       => \$opt_debug,
+
+    "z|gz"          => \$opt_gzip,
+    "j|bz"          => \$opt_bzip,
+
+    "h|help"        => \$opt_help,
+    "sudo"          => \$opt_sudo,
+    "skip-pods"     => \$opt_skip_pods,
+    "skip-manpages" => \$opt_skip_manpages,
+    "dry"           => \$opt_dry,
+    "x|extract"     => \$opt_extract,
+);
+
+$opt_verbose ||= $opt_very_verbose;
+
+if( $opt_help ) {
+    require Pod::Simple::Text;
+    my $pod = Pod::Simple::Text->new;
+    $pod->output_fh( *STDOUT );
+    $pod->parse_file( __FILE__ );
+    exit(0);
+}
+
+
+my $filename = shift;
+unless( $filename ) {
+    print STDERR "To show help message, please use -h option.\n";
+}
+
+if( $opt_installed ) {
+    use ExtUtils::Installed;
+    my ($inst) = ExtUtils::Installed->new();
+    my (@modules) = $inst->modules();
+    print $_ , "\n" for @modules;
+    exit(0);
+}
+elsif( $opt_extract ) {
+    unless ( $filename ) {
+        die('Please specify filename');
+    }
+    my @cmd = ( "tar", "xpf", $filename , "-C /");
+    exit(0);
+}
+
+
+my %bak_parts = (
+    bin => \&backup_bin ,
+    perlbrew => \&backup_perlbrew,
+    minicpan => \&backup_minicpan,
+    'local-lib' => \&backup_locallib,
+    manpages => \&backup_manpages,
+    cpanconfig => \&backup_cpanconfig,
+    libs    => \&backup_libs,
+);
+my @bak_parts = keys %bak_parts;
+my %exclude_parts = map { $_ => 1 } split /,/, $opt_exclude_parts;
+my %include_parts = map { $_ => 1 } (split /,/,$opt_include_parts) || @bak_parts;
+
+my @exclude_pattern = ();
+
+
+my $logger = Log::Dispatch->new(
+        outputs =>  [ 
+            [ 'File' , min_level => 'error' , filename => 'cpanbaker.log' ],
+            [ 'Screen' , min_level => 'debug' ],
+        ]);
+
+sub check_partname {
+    my $name = shift;
+    if( ! $bak_parts{ $name } )  {
+        print STDERR "Invalid part name: $name\n";
+        print STDERR "Valid part name: ", join(', ',@bak_parts) . "\n"; 
+        exit(0);
+    }
+}
+
+
+sub backup_cpanconfig {
+    my %cpandir = ( 
+        cpan => File::Spec->join( $ENV{HOME} , '.cpan' ),
+        cpanplus => File::Spec->join( $ENV{HOME} , '.cpanplus' ),
+        cpanminus => File::Spec->join( $ENV{HOME} , '.cpanm' ),
+    );
+    my @cpandirs = ();
+    for my $type ( keys %cpandir ) {
+        my $dir = $cpandir{ $type };
+        if( -e $dir ) {
+            $logger->info( "Found $type: $dir\n" ) if $opt_verbose;
+            push @cpandirs , $dir;
+        }
+    }
+    return @cpandirs;
+}
+
+sub backup_bin {
+
+    $logger->info( "* Searching perl scripts from \$PATH\n" );
+    $logger->info( $ENV{PATH} . "\n" ) 
+        if $opt_debug;
+
+    my @env_paths = uniq sort split /:/, $ENV{PATH};
+    my @bin_files = ();
+    for my $path ( @env_paths ) {
+
+        $logger->info( "Scanning " . $path . "\n" ) 
+            if $opt_verbose;
+
+        my @files = File::Find::Rule->file->in( $path );
+        for my $file ( @files ) {
+            my $firstline;
+            if( open(FH , "<" , $file) ) {
+                read FH , $firstline, 30;
+                close FH;
+                push @bin_files , $file if $firstline =~ m{perl};
+            } else { 
+                $logger->error( "$file: $!\n");
+                next;
+            }
+        }
+    }
+    return @bin_files;
+}
+
+sub backup_minicpan {
+    my $file = File::Spec->join( $ENV{HOME} , '.minicpanrc' );
+    open my $fh , "<" , $file;
+    my @lines = <$fh>;
+    close $fh;
+    chomp( @lines );
+    my ($local) = grep /^local:\s*/, @lines;
+    if( $local ) {
+        $local =~ s{^local:\s*}{};
+        $logger->info( 'Found minicpan local: ' . $local . "\n" );
+        return $local;
+    }
+    return ();
+}
+
+sub backup_perlbrew {
+    if( $ENV{PERLBREW_ROOT} ) {
+        $logger->info( "Found perlbrew root:" . $ENV{PERLBREW_ROOT} . "\n" ) if $opt_verbose;
+        return $ENV{PERLBREW_ROOT};
+    }
+}
+
+sub backup_locallib {
+    my @paths;
+    push @paths, $ENV{PERL_LOCAL_LIB_ROOT} if $ENV{PERL_LOCAL_LIB_ROOT};
+
+#     PERL_MB_OPT="--install_base /Users/c9s/perl5"
+#     PERL_MM_OPT="INSTALL_BASE=/Users/c9s/perl5"
+    my $mb_opt = $ENV{PERL_MB_OPT};
+    my $mm_opt = $ENV{PERL_MM_OPT};
+    if( $mb_opt && $mb_opt =~ m{--install_base\s+(\S+)} )  {
+        $logger->info( "Found INSTALL_BASE from Module::Build opt: $1\n" ) if $opt_verbose;
+        push @paths , $1;
+    }
+
+    if( $mm_opt && $mm_opt =~ m{INSTALL_BASE=(\S+)} ) {
+        $logger->info( "Found INSTALL_BASE from ExtUtil::MakeMaker opt: $1\n" ) if $opt_verbose;
+        push @paths , $1;
+    }
+
+    return uniq sort @paths;
+}
+
+sub backup_manpages {
+    my $manpath = qx(man -w);
+    $logger->info( "Found manpages path: $manpath\n" );
+
+    my @paths = split /:/,$manpath;
+    my @manfiles = ();
+    for my $p ( @paths ) {
+        my @files = File::Find::Rule->file( "*.3" )->in( $p );
+        for( @files ) {
+            open my $fh, "<", $_;
+            my $firstline = <$fh>;
+            close $fh;
+
+            push @manfiles , $_ if $firstline =~ /Pod::/;
+        }
+    }
+    return @manfiles;
+}
+
+sub backup_libs {
+    my @libdirs = @INC;
+    # when exclude local-lib or .. should remove them from INC paths
+
+    if ( $exclude_parts{'local-lib'} ) {
+        @libdirs = grep !/^$ENV{PERL_LOCAL_LIB_ROOT}/,@libdirs;
+    }
+
+    if ( $exclude_parts{perlbrew} ) {
+        @libdirs = grep !/^$ENV{PERLBREW_ROOT}/, @libdirs;
+    }
+    @libdirs = grep !/^\.$/,uniq sort @libdirs;
+
+    if( $opt_verbose ) {
+        $logger->info( "Perl lib paths:\n" );
+        $logger->info( "\t" . $_ . "\n" ) for @libdirs;
+    }
+    return @libdirs;
+}
+
+
+check_partname( $_ ) for keys %exclude_parts;
+for my $p ( keys %include_parts ) { 
+    check_partname( $p );
+    if( defined $exclude_parts{ $p } )  { 
+        delete $include_parts{ $p };
+    }
+}
+
+print STDERR "Will backup: " . join(', ', keys %include_parts ) . "\n";
+
+
+my @tar_paths;
+for my $part ( keys %include_parts ) {
+
+    $logger->info( "Gathering information of $part ...\n" );
+
+    my $cb = $bak_parts{ $part };
+    my @paths = $cb->( $logger );
+
+    $logger->debug( "\t" . join(' ' , @paths ) . "\n" ) if $opt_debug;
+
+    # use Data::Dumper; warn Dumper( $part , \@paths );
+
+    push @tar_paths, @paths;
+}
+
+my $tarbin = 'tar';
+my $taropts = 'cpf';
+my $tarext = '.tar';
+my $tarname = join(
+        '-',"cpanbak", $^O ,DateTime->now->ymd('-'));
+
+my $tarexclude = ' --exclude "*.log"';
+
+if( $exclude_parts{perlbrew} ) {
+    push @exclude_pattern , $ENV{PERLBREW_ROOT};
+}
+
+push @exclude_pattern, File::Spec->join( $ENV{HOME} , '.cpanm' , 'work' );
+push @exclude_pattern, '*.pod' if $opt_skip_pods;
+push @exclude_pattern, '*.pm3' if $opt_skip_manpages;
+
+$tarexclude .= join ' ' ,map { qq| --exclude "$_"| } @exclude_pattern;
+
+if ($opt_gzip) {
+    $taropts .= 'z';
+    $tarext .= '.gz';
+}
+elsif( $opt_bzip ) {
+    $taropts .= 'j';
+    $tarext .= '.bz2';
+}
+
+my $tarfilename = $filename || ($tarname . $tarext);
+
+$taropts .= 'v' if( $opt_very_verbose || $opt_debug );
+
+my @cmd = (
+    $tarbin,
+    $taropts,
+    $tarfilename,
+    $tarexclude,
+    map { qq|"$_"| } @tar_paths,
+);
+
+unshift @cmd, 'sudo' if( $opt_sudo );
+
+my $cmdstr = join ' ' , @cmd;
+
+$logger->debug( "Executing: \$ " . 
+        substr($cmdstr,0,90) . "...\n" ) if $opt_debug;
+
+$logger->info( "Generating $tarfilename ...\n" );
+system( $cmdstr ) unless $opt_dry;
+$logger->info( "Done\n" );
+
+# TODO:
+#   * clean perlbrew , cpan, cpanm dir before backing up.
+#   * skip log files
+#   * skip build files
+
+# my $logger = Logger::Simple->new( LOG => File::Spec->join( $ENV{HOME} , '.cpanbaker-log' ) );
+# my $log = Log::Any->get_logger( category => __PACKAGE__ );
+# $log->info( 'test test test' );
+__END__
+
+=head1 NAME
+
+cpanbaker - backup your cpan module files.
+
+=head1 OPTIONS
+
+    $ cpanbaker [options] [filename]
+
+    --sudo
+            use sudo to backup files.
+
+    --exclude part,...
+            don't backup ...
+            valid part names are minicpan, bin, local-lib, perlbrew, libs
+
+    --include part,...
+            backup include ...
+            valid part names are minicpan, bin, local-lib, perlbrew, libs
+
+    --dry
+            dry run. do not archive files.
+
+    --installed
+            get installed module list.
+
+    -l file, --log file
+            specify log file.
+
+    --skip-pods
+            skip pod files.
+
+    --skip-manpages
+            skip manpage files.
+
+    -v, --verbose
+            verbose message
+
+    -vv
+            very verbose message
+
+    -z, --gz
+            tar with gzip compression.
+
+    -j, --bz
+            tar with bzip2 compression.
+
+    -d, --debug
+            debug mode.
+
+    -h
+            show help messages
+
+=head1 USAGE
+
+To backup:
+
+    $ cpanbaker 
+
+To backup with gzip compression:
+
+    $ cpanbaker -z
+
+To backup with gzip compression and specify a filename:
+
+    $ cpanbaker -z blah.tar.gz
+
+To backup in dry-run mode:
+
+    $ cpanbaker --dry
+
+With sudo (root permission):
+
+    $ cpanbaker --sudo
+
+To exclude perlbrew stuff:
+
+    $ cpanbaker --exclude=perlbrew
+
+To get installed modules:
+
+    $ cpanbaker --installed > module_list
+    $ cpanm < module_list   # reinstall modules
+
+To exclude minicpan stuff:
+
+    $ cpanbaker --exclude=minicpan
+
+To exclude minicpan and perlbrew:
+
+    $ cpanbaker --exclude=perlbrew,minicpan
+
+To backup perlbrew stuff only:
+
+    $ cpanbaker --include=perlbrew
+
+Verbose mode:
+
+    $ cpanbaker -v
+
+Very verbose mode:
+
+    $ cpanbaker -vv
+
+Debug mode:
+
+    $ cpanbaker -d
+
+=cut

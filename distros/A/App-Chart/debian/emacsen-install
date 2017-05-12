@@ -1,0 +1,55 @@
+#!/bin/sh
+
+# Emacs install: /usr/lib/emacsen-common/packages/install/chart
+
+# Copyright 2005, 2007, 2008, 2009, 2010, 2012, 2016 Kevin Ryde
+# Copyright 1998, 2009 Robert Browning
+#
+# This file is part of Chart.  It was derived from the example code in
+# /usr/share/doc/emacsen-common/debian-emacs-policy.gz of emacsen-common
+# version 1.4.16.  That code is by Rob Browning and covered by the GPL, as
+# described in /usr/share/doc/emacsen-common/copyright.
+
+# Chart is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# Chart is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Chart.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# This uses the "single directory" style.  All the .el files are symlinked
+# into the $FLAVOUR directory and compiled there.  The symlinks are left so
+# that the source is available for the various help tools like
+# `find-function'.  But only chartprog.el is byte compiled, there isn't
+# enough in the others to need it.
+
+set -e
+
+FLAVOR=$1
+echo install/chart: Handling install of emacsen flavor $FLAVOR
+
+byte_compile_options="-q -no-site-file -batch -f batch-byte-compile"
+el_files="chartprog.el" 
+el_dir=/usr/share/emacs/site-lisp/chart
+elc_dir=/usr/share/$FLAVOR/site-lisp/chart
+
+if [ $FLAVOR != emacs ]
+then
+  echo install/chart: byte-compiling for $FLAVOR
+
+  [ -d $elc_dir ] || mkdir $elc_dir
+
+  # Symlink all .el files
+  ln -sf $el_dir/*.el $elc_dir
+
+  # Byte compile selected ones
+  (cd $elc_dir && $FLAVOR $byte_compile_options $el_files )
+fi
+exit 0;

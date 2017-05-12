@@ -1,0 +1,52 @@
+#!/home/rando/perl5/perlbrew/perls/local/bin/perl
+#
+# This file is part of App-csv2sqlite
+#
+# This software is copyright (c) 2012 by Randy Stauner.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
+# ABSTRACT: Import CSV files into a SQLite database
+# PODNAME: csv2sqlite
+
+use strict;
+use warnings;
+
+use App::csv2sqlite;
+App::csv2sqlite->run([@ARGV]);
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=for :stopwords Randy Stauner ACKNOWLEDGEMENTS TODO CSV csv sqlite csv2sqlite --csv
+--csv-file --csv-opt --dbname
+
+=head1 NAME
+
+csv2sqlite - Import CSV files into a SQLite database
+
+=head1 VERSION
+
+version 0.004
+
+=head1 SYNOPSIS
+
+  csv2sqlite apples.csv oranges.csv fruit.sqlite
+
+=head1 AUTHOR
+
+Randy Stauner <rwstauner@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Randy Stauner.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

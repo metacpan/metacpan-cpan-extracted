@@ -1,0 +1,83 @@
+<html>
+<head>
+<title>perl-abook homepage</title>
+</head>
+<h2 align=center>Welcome to perl-abook</h2>
+<h3>Introduction</h3>
+<p>Perl-AddressBook is a collection of perl library modules which provide a unified 
+interface for accessing addressbook entries stored in various types of databases.  
+<p><a name=backend_doc>The following database types are currently supported:</a>
+<ul>
+<li><a href=AddressBook/DB/LDAP.html>AddressBook::DB::LDAP</a>
+<li><a href=AddressBook/DB/LDIF.html>AddressBook::DB::LDIF</a>
+<li><a href=AddressBook/DB/PDB.html>AddressBook::DB::PDB (PalmOS)</a>
+<li><a href=AddressBook/DB/DBI.html>AddressBook::DB::DBI (SQL Databases)</a>
+<li><a href=AddressBook/DB/Text.html>AddressBook::DB::Text</a>
+<li><a href=AddressBook/DB/HTML.html>AddressBook::DB::HTML</a>
+</ul>
+<p>More of these will be added in the future.
+<ul>
+  <li><a href="http://perl-abook.sourceforge.net/ChangeLog">Change History</a>
+  <li><a href="http://www.sourceforge.net/projects/perl-abook">perl-abook project page</a>
+  <li><a href="http://sourceforge.net/mail/?group_id=9692">perl-abook-tech mailing list</a>
+  <li><a href="http://cvs.sourceforge.net/cgi-bin/cvsweb.cgi?cvsroot=perl-abook">perl-abook-tech CVS</a>
+</ul>
+<hr>
+<h3>Features</h3>
+<ul>
+  <li>Configurable attribute mapping
+  <li>Simple methods for moving entries between backend databases.
+  <li>Entries can be <a href=AddressBook.html#sync>synchronized</a> between backend 
+databases of different types.
+  <li>Attributes can be calculated "on the fly" (e.g. based on other attributes).
+</ul>
+<hr>
+<h3>Requirements</h3>
+<p>The following perl library modules are required:
+<ul>
+  <li>XML::DOM
+  <li>Date::Manip
+</ul>
+<p>In addition, different backend drivers have different requirements.  See the appropriate 
+<a href=#backend_doc>backend module documentation</a>.
+<hr>
+<h3>Installation</h3>
+<p>The latest version can be found <a href=ftp://perl-abook.sourceforge.net/pub/perl-abook/AddressBook-0.16.tar.gz>here</a>.
+<ol>
+  <li>download and unpack
+  <li><b>perl Makefile.PL</b>
+  <li><b>make</b>
+  <li><b>make test</b>
+  <li><b>make install</b>
+</ol>
+<hr>
+<h3>Documentation</h3>
+<ul>
+<li><a href=AddressBook.html>AddressBook</a> - The base AddressBook object
+<li><a href=AddressBook/Entry.html>AddressBook::Entry</a> - An AddressBook Entry
+<li><a href=AddressBook/Config.html>AddressBook::Config</a> - The AddressBook configuration object.
+Also configuration file information.
+</ul>
+<p>See also the man pages for the <a href=#backend_doc>different backend databases</a>.
+<hr>
+<h3>Examples</h3>
+<p>The following sample files are provided in the examples directory. 
+<font color=red>Note:  It is highly recommended that you back up your addressbook database 
+before running one of these scripts.</font>
+<table>
+  <tr><td>ldap-abook.conf<td>A sample configuration file which is used by all of the sample scripts
+  <tr><td>abook.palm<td>A PalmOS conduit which synchronizes a palm pilot with an LDAP database.
+  <tr><td>SyncAbook<td>Same as abook.palm, but written as a <a href=http://www.moshpit.org/>PilotManager</a> 
+conduit.
+  <tr><td>phonelist.cgi<td>A cgi script which will generate a list of names and phone numbers from
+an LDAP database.
+</table>
+<hr>
+<h3>See Also</h3>
+<p>The <a href=http://ldap-abook.sourceforge.net>LDAP-Abook Project</a> is a full-featured
+CGI interface, designed to work with an LDAP backend addressbook database.  LDAP-Abook is based
+on the perl-abook library.
+<hr>
+<p><i>Last updated 1/14/2001</i>
+<p align=right>This site is hosted by
+<a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=6383&type=1" alt="SourceForge Logo"></a>

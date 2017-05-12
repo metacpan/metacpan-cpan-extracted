@@ -1,0 +1,53 @@
+Changes to Apache-DBILogin
+
+2.06 Thu Apr 21 11:49:18 EDT 2005
+	- moved call to $r->get_basic_auth_pw to before test for
+	  $r->is_initial_req to fix seg fault in authz handler
+	  per Geoff Young's explanation.
+	  <URL:http://marc.theaimsgroup.com/?l=apache-modperl&m=108799946109520&w=2>
+
+2.05 Tue Apr 19 08:39:20 EDT 2005
+	- documentation fixes per Ron Savage's bug report:
+	  environment variables are prefixed with HTTP_MODPERL_
+
+2.04 Fri Apr 15 14:48:16 EDT 2005
+	- made changes to DBILogin.pm per new API
+	  <URL:http://perl.apache.org/docs/2.0/rename.html>
+	- removed mod_perl prereq from Makefile.PL as it implies MP1
+
+2.03 Wed Dec  8 01:36:24 EST 2004
+	- fixed $VERSION, why must it be defined above "use modperl" ?
+
+2.02 Fri Dec  3 19:06:30 EST 2004
+	- requires mod_perl now in Makefile.PL
+
+2.01 Fri Dec  3 11:56:24 EST 2004
+	- extensive rework of DBILogin.pm for modperl 2.0 support
+	- Makefile.PL now includes DBI as a prereq
+	- added t/01use.t to satisfy CPAN automated testers
+
+2.0 Wed Feb 21 14:11:42 EST 2001
+	- removed HTTP_MODPERL_PASSWORD environment
+	- replaced default handler sub with authen sub
+	- added authz handler
+	- deprecated Auth_DBI_authz_command
+
+1.6 Mon Feb  7 15:57:54 EST 2000
+	- removed the test for Apache::DBI as it will only compile inside the modperl box
+
+1.5 Tue Nov 17 14:02:44 EST 1998
+	- documentation updates
+	- removed HTTPD::UserAdmin prerequisite from Makefile.PL and DBILogin.pm
+	- added environment HTTP_MODPERL_DBILOGIN_PASSWORD, deprecates HTTP_MODPERL_PASSWORD 
+	- added environment HTTP_MODPERL_DBILOGIN_DATA_SOURCE
+	- moved DBILogin.pm to top of source tree and changed MANIFEST
+	- return OK unless first internal request
+
+1.4 Tue Jun  9 15:32:29 EDT 1998
+	- added authorization via DBI do method
+
+1.3 Thu Oct 16 14:43:34 EDT 1997
+	- documentation fixes
+
+1.2 Sat Aug 30 15:06:40 EDT 1997
+	- compliant with ApacheDBI-0.74

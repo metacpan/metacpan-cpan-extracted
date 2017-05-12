@@ -1,0 +1,13 @@
+Changes
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+Makefile.PL
+README
+VERSION
+lib/Authen/Credential.pm
+lib/Authen/Credential/none.pm
+lib/Authen/Credential/plain.pm
+lib/Authen/Credential/x509.pm
+t/1main.t
+t/3pod.t
+t/4podcov.t

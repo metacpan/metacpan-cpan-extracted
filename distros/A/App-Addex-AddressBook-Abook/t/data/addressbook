@@ -1,0 +1,35 @@
+# abook addressbook file
+
+[format]
+program=abook
+version=0.5.6
+
+
+[0]
+name=Joe Smith
+email=jsmith@example.com,joeysmith@example.com
+address=1 Main St
+city=Bethlehem
+state=PA
+zip=18018
+country=USA
+mobile=+1 610-555-1212
+nick=joey
+url=http://example.com/~joeysmith
+custom1=joe
+
+[1]
+name=No Email Guy
+state=NY
+url=http://no-email.example.org/
+
+[2]
+name=Loving Wife
+email=wife.loving@spousemail.example.biz
+address=The Other Side
+address2=The Bed
+city=Homedown
+country=USA
+nick=honey
+custom1=family/wife
+custom3=wife

@@ -1,0 +1,12 @@
+^Array::PrintCols-\d+\.\d+/
+t\.pl$
+^\.git/
+^_build/
+^blib/
+^pm_to_blib$
+.*\.(tmp|out|old|bak|save)$
+^MYMETA\.(yml|json)$
+^Build$
+^Makefile$
+.*\.tar\.gz$
+.*\.shar$

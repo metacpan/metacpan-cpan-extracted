@@ -1,0 +1,97 @@
+#!/usr/bin/perl -w
+
+
+use strict;
+use IO::Socket;
+use Alvis::NLPPlatform;
+use Alvis::NLPPlatform::Annotation;
+
+use Pod::Usage;
+use Config::General;
+#use Data::Dumper;
+use Getopt::Long;
+
+# Process Option
+
+my $man = 0;
+my $help = 0;
+my $rcfile = "";
+
+GetOptions('help|?' => \$help, man => \$man, "rcfile=s" => \$rcfile) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+if (($rcfile eq "") || (!(-f $rcfile))) {
+    pod2usage(1);
+    warn "No such config file or config file is not set\n";
+} 
+
+
+Alvis::NLPPlatform::client($rcfile);
+
+
+__END__
+
+=head1 NAME
+
+alvis-nlp-client - Perl script for the client of the Alvis NLP Platform running in the distributed mode. 
+
+=head1 SYNOPSIS
+
+alvis-nlp-client [options]
+
+=head1 OPTIONS
+
+=over 4
+
+=item    B<--help>            brief help message
+
+=item    B<--man>             full documentation
+
+=item    B<--rcfile=file>     read the given configuration file
+
+=back
+
+=head1 DESCRIPTION
+
+This script is the client part of the ALVIS NLP Platform in 
+distributed mode. It aims at linguistically annotating the document
+sent by the server. The annotated document is returned to the
+server once the annotation process. One document is processed at
+a time.
+
+The linguistic annotation depends on the configuration variables and
+depndencies between annotation levels.
+
+For each connection to the server, the client performs connection ten
+times before exit (one second between each attempt).
+
+The INT signal is ignored during the communication with the server to
+avoid losing documents (see function C<sigint_handler>).
+
+=head1 METHODS
+
+=cut
+
+=head1 PROTOCOL
+
+See the documentation associated to the script server.pl
+
+=head1 SEE ALSO
+
+
+Alvis web site: http://www.alvis.info
+
+=head1 AUTHORS
+
+Thierry Hamon <thierry.hamon@lipn.univ-paris13.fr> and Julien Deriviere <julien.deriviere@lipn.univ-paris13.fr>
+
+=head1 LICENSE
+
+Copyright (C) 2005 by Thierry Hamon and Julien Deriviere
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

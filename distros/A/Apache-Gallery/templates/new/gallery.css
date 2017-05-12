@@ -1,0 +1,78 @@
+body {
+	background-color: #cccccc;
+	color: #666666;
+	font-family: Verdana, Lucida, Arial, serif;
+	font-size: 10px;
+	margin-left: 10px;
+	margin-top: 10px;
+	text-align: center;
+}
+td {
+	font-size: 10px;
+}
+table {
+	margin-left: auto;
+	margin-right: auto;
+}
+#title {
+	font-size: 11px;
+	text-align: left;
+}
+#menu {
+	font-size: 13px;
+	text-align: right;
+	height: 30px;
+	margin-right: 20px;
+}
+#directory {
+	background-color: #ffffff;
+	border: 6px solid #aaaaaa;
+	padding: 20px;
+	text-align: left;
+	top: 0px;
+}
+.folder {
+	float: left;
+	height: 100px;
+	padding: 2px;
+	text-align: center;
+	width: 120px;
+}
+#picture {
+	text-align: center;
+}
+#picture img {
+	border: 6px solid #777777;
+}
+a {
+	color: #5555aa;
+	text-decoration: none;
+}
+a img {
+	border: 3px solid #5555aa;
+}
+a:hover {
+	color: #ff9400;
+}
+a:hover img {
+	border: 3px solid #ff9400;
+}
+.folder img {
+	border: 0px;
+}
+.folder a:hover img {
+	border: 0px;
+}
+#gallery {
+	margin-top: 50px;
+}
+#comment {
+	background-color: #333333;
+	border: 3px solid #555555;
+	color: #999999;
+	width: 400px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 20px;
+	padding: 5px;
+}

@@ -1,0 +1,48 @@
+Revision history for AnyEvent-HTTP-LWP-UserAgent-Determined
+
+v0.05.1.06 2012-11-16 01:27:38 Asia/Tokyo
+    [Non-functional changes]
+        * Use Test::TCP and HTTP::Server::Simple::CGI for network test.
+        * Use DZP::PodWeaver and DZP::Twitter.
+
+v0.04.1.06 2012-10-24
+    * Release v0.04.1.06 - Adjust distribution configuration for Kwalitee.
+    * Enable DZP::License, DZP::NextRelease, DZP::ReadmeAnyFromPod,
+      DZP::MinimumPerl and DZP::Test::Kwalitee::Extra.
+    * Add use warnings.
+
+v0.03.1.06 2012-10-09
+    * Release v0.03.1.06 - Fix missing version bump.
+    * Add Dist::Zilla plugins to avoid missing version bump.
+
+0.02.1.06 2012-10-09
+    * Release 0.02.1.06 - Bug fix version.
+    * Fix #1 on github (missing prereq).
+    * Fix improper use of codes_to_determinate in tests. 
+
+0.01.1.06 2012.10-09
+    * Forked from LWP::Determined::UserAgent 1.06.
+    * Release 0.01.1.06 - First public release.
+
+Original revision history for Perl extension LWP::Determined::UserAgent
+
+2012.05-20 Jesse Vincent <jesse@cpan.org>
+	* Release 1.06
+	* Mock http responses to avoid unnecessary network requests -- Randy Stauner
+
+2011-01-03 Jesse Vincent <jesse@cpan.org>
+    * Release 1.05
+    * Fix for RT#55591: Incorrect default value for 'codes_to_determinate'
+	  from yibe via github.
+
+2009-04-04 Jesse Vincent <jesse@cpan.org>
+	* Release 1.04 -- Keeping pace with LWP updates
+	* New Maintainer
+	* Resolves [cpan #42123] and [cpan #41508]
+
+
+2004-04-08  Sean M. Burke  sburke@cpan.org
+	* Release 1.03 -- just a doc-typo bugfix version.
+	
+2004-04-07  Sean M. Burke  sburke@cpan.org
+	* Release 1.02 -- First public release.

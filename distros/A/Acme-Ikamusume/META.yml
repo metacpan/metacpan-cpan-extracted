@@ -1,0 +1,43 @@
+---
+abstract: 'The invader comes from the bottom of the sea!'
+author:
+  - 'Naoki Tomita <tomita@cpan.org>'
+build_requires:
+  Test::Base: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Ikamusume
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::Ikamusume:
+    file: lib/Acme/Ikamusume.pm
+    version: '0.08'
+requires:
+  Encode: '0'
+  File::ShareDir: '0'
+  Lingua::JA::Kana: '0'
+  Text::Mecabist: '0.02'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/tomill/Acme-Ikamusume/issues
+  homepage: https://github.com/tomill/Acme-Ikamusume
+  repository: git://github.com/tomill/Acme-Ikamusume.git
+version: '0.08'
+x_contributors:
+  - 'Christian Walde <walde.christian@googlemail.com>'

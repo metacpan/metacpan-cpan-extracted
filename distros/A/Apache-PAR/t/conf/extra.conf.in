@@ -1,0 +1,79 @@
+<IfDefine MODPERL2>
+PerlModule Apache2
+</IfDefine>
+PerlSetVar PARInclude @ServerRoot@/par/static.par
+PerlAddVar PARInclude @ServerRoot@/par/registry.par
+PerlAddVar PARInclude @ServerRoot@/par/perlrun.par
+PerlAddVar PARInclude @ServerRoot@/par/unpack.par
+# Should ignore duplicates
+PerlAddVar PARInclude @ServerRoot@/par/perlrun.par
+# Try it this way too for support of old versions
+PerlSetVar PARFile @ServerRoot@/par/module.par
+
+Alias /test/registryroot/ @ServerRoot@/par/registry.par/
+<Location /test/registryroot>
+Options +ExecCGI
+SetHandler perl-script
+PerlHandler Apache::PAR::Registry
+PerlSetVar PARRegistryPath /
+</Location>
+
+Alias /test/registry2/ @ServerRoot@/par/registry.par/
+<Location /test/registry2>
+Options +ExecCGI
+SetHandler perl-script
+PerlHandler Apache::PAR::Registry
+PerlSetVar PARRegistryPath scripts2/
+</Location>
+
+Alias /test/perlrunroot/ @ServerRoot@/par/perlrun.par/
+<Location /test/perlrunroot>
+Options +ExecCGI
+PerlSendHeader on
+SetHandler perl-script
+PerlHandler Apache::PAR::PerlRun
+PerlSetVar PARPerlRunPath /
+</Location>
+
+Alias /test/perlrun2/ @ServerRoot@/par/perlrun.par/
+<Location /test/perlrun2>
+Options +ExecCGI
+PerlSendHeader on
+SetHandler perl-script
+PerlHandler Apache::PAR::PerlRun
+PerlSetVar PARPerlRunPath scripts2/
+</Location>
+
+Alias /test/static2/ @ServerRoot@/par/static.par/
+<Location /test/static2>
+SetHandler perl-script
+PerlHandler Apache::PAR::Static
+PerlSetVar PARStaticFilesPath /
+</Location>
+
+# Need to finish these tests
+#PerlAddVar PARFile @ServerRoot@/par/bad.par
+#PerlAddVar PARFile @ServerRoot@/par/not_found.par
+#PerlAddVar PARDir @ServerRoot@/par/not_dir/
+
+# This is done in the modperl_extra.pl file for Win32 compat
+#PerlModule Apache::PAR
+
+<IfDefine MODPERL2>
+PerlRequire @ServerRoot@/conf/modperl_2.pl
+</IfDefine>
+
+<IfDefine !MODPERL2>
+# FIXME This will break testing on mod_perl 1.x on Win32
+#PerlRequire @ServerRoot@/conf/modperl_1.pl
+PerlModule Apache::PAR
+
+</IfDefine>
+
+# Commented out for now, can't run under both mod_perl 1.x and 2.x
+#<PERL>
+#import Apache::PAR qw(@ServerRoot@/par/registry.par);
+#</PERL>
+
+#PerlModule Apache::PAR
+PerlInitHandler Apache::PAR

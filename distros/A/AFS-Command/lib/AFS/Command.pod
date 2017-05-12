@@ -1,0 +1,121 @@
+#
+# $Id: Command.pod,v 7.1 2004/01/13 19:01:11 wpm Exp $
+#
+# (c) 2003-2004 Morgan Stanley and Co.
+# See ..../src/LICENSE for terms of distribution.
+#
+
+=head1 NAME
+
+AFS::Command -- Wrapper Classes for the AFS Command Line Utilities
+
+=head1 INTRODUCTION
+
+Welcome to the OO Perl API for the AFS Command Line Utilities.  OK,
+enough with formalities....
+
+This set of classes implements a perl API for developing systems
+administration applications for AFS, and is essentially a complete
+rewrite of a similar API developed for perl4 almost a decade ago.
+
+The API is designed to be as intuitive as the underlying command
+themselves.  One of the strengths of the AFS CLI is its consistent
+command line parsing, since all of the utilities share a common
+library, and this API leverages this fact.  The methods available, and
+their available arguments, are determined dynamically by parsing the
+command help strings.
+
+This API is also designed to complement the existing perl5 AFS::*
+namespace, and co-exist with it.
+
+=head1 OBJECT ARCHITECTURE
+
+WARNING: This is an early design phase (1.x) of this API, and it is in
+its infancy, so expect it to change in future releases, and expect to
+change your code to accomodate it.
+
+The entire API is designed to be pure OO, with the following classes:
+
+=head2 AFS::Command::(VOS|BOS|PTS|FS)
+
+These are the primary classes used by applications directly.  All of
+the other objects are used internally to encapsulate the data parsed
+from the underlying commands, and returned by the primary methods.
+
+Each of these classes has a shared constructor (new), and methods that
+correspond to each of the underlying commands.  For example, the "vos"
+utility has a command called "listvldb", and the AFS::Command::VOS
+objects have a "listvldb" method.  Each of the methods such as
+"listvldb" take a list of key/value pairs that correspond to the
+command line options for the "vos listvldb" command.
+
+These classes implement the externally supported interface to the
+entire API.  If you use anything else, you're mucking with internals,
+and you get what you deserver when your code implodes.
+
+For details, see the module documentation for each of the above.
+
+Also, the only reason there is no AFS::Command::KAS is that the
+author's AFS infrastructure is an MIT Kerberos site, and since we
+don't use the kas utility, there has never been a need for such a
+module.
+
+The author would welcome a contributed module to support KAS via the
+same interface, but note that the AFS::KAS module exists as part of
+the existing AFS module suite, although the API is very different.
+
+=head2 AFS::Command::Base
+
+This is the base class for the command suite, which implements the
+shared constructor, and a couple of other useful class and object
+methods.
+
+=head2 AFS::Object
+
+This is the base class for the objects returned from the command
+methods that encapsulate some form of structured data.  Many of the
+methods return simple boolean true/false values (either the command
+worked, or it failed), with no need for any special objects, so we
+don't create them.  Anything that has to return interesting data uses
+this class, or one of its base classes.
+
+The subclasses are associated with data structures such as volume
+headers, a VLDB entry, or a partition on a server.  Each of these
+classes has methods to retrieve the objects they "contain", such as a
+method to query the list of volume names on a partition object, and a
+method to get a list of VLDB entries from a VLDB site.
+
+The data structures, and their varying relationships, are documented
+in details of the methods for each of the commands, and the specific
+interfaces for each object type are documented in the corresponding
+class documentation.
+
+The subclasses for encapsulating the VLDB data are:
+
+    AFS::Object::VLDB
+    AFS::Object::VLDBEntry
+    AFS::Object::VLDBSite
+
+The subclasses for encapsulating the volume headers are:
+
+    AFS::Object::FileServer
+    AFS::Object::VolServer
+    AFS::Object::Partition
+    AFS::Object::Volume
+    AFS::Object::VolumeHeader
+
+The subclasses for encapsulating the bosserver data are:
+
+    AFS::Object::BosServer
+    AFS::Object::Instance
+
+Note that none of these classes are specifically documented, since the
+structure of the classes is subject to change.  The API for accessin
+the results of any given AFS command (eg. vos listvol) is considered
+reasonably stable, but the encapsulation may change radically.
+
+Don't get too attached to these class names, because they will likely
+be rearranged in a future release.
+
+=cut
+

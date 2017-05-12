@@ -1,0 +1,88 @@
+#!/usr/bin/perl -w
+
+# created by thomas@stderr.net (2001/03/23)
+# $Id: en.lang,v 1.10 2001/04/24 22:15:09 thomas Exp $
+
+use strict;
+
+sub lang () {
+    my %text = (
+		'SUBMIT'            => 'Submit',
+		'CANCEL'            => 'Cancel',
+		'HELP'              => 'Help',
+		'EDIT'              => 'Edit',
+		'ADD'               => 'Add',
+		'REMOVE'            => 'Remove',
+		'LOCKED'            => 'Locked',
+		'SETTINGS'          => 'Settings',
+		'LIST_DOMAIN'       => 'Domainlist',
+		'LOGOUT'            => 'Logout',
+		'LANGUAGE'          => 'Language',
+		'EMAIL'             => 'E-mail',
+		'NEW_PASSWORD'      => 'New password',
+		'CONFIRM_PASSWORD'  => 'Confirm password',
+		'AUTH_NS'           => 'Authoritative nameserver',
+		'SERIAL'            => 'Serial number',
+		'ADMIN_EMAIL'       => 'Administrative e-mail',
+		'REFRESH'           => 'Refresh time',
+		'RETRY'             => 'Retry time',
+		'EXPIRE'            => 'Expire time',
+		'TTL'               => 'Time to Live',
+		'HOST'              => 'Host',
+		'IP_ADDRESS'        => 'IP address',
+		'CNAME'             => 'Canonical name',
+		'MX'                => 'Mail exchanger',
+		'PREFERENCE'        => 'Preference',
+		'ZONE'              => 'Zone',
+		'NS'                => 'Nameserver',
+		'TXT'               => 'Text',
+		'DNS'               => 'Domain Name System',
+		'SOA'               => 'Start of Authority',
+		'PAGE_LIST_DOMAIN'  => 'Domains managed with DnsZone',
+		'PAGE_VIEW_DOMAIN'  => 'Viewing domain $domain',
+		'PAGE_HELP'         => 'Help',
+		'PAGE_SETTINGS'     => 'Changing personal settings',
+		'PAGE_EDIT'         => 'Editing $record record under $domain',
+		'PAGE_ADD'          => 'Adding $record record to $domain',
+		'PAGE_DEL'          => 'Deleting $record record under $domain',
+		'ERROR_CORRECT'     => 'Please correct the following error(s):',
+		'ERROR_DUPLICATE'   => 'Duplicate record exists',
+		'ERROR_IP'          => 'Incorrect value for IP address',
+		'ERROR_HOST'        => 'Incorrect value for Host',
+		'ERROR_TTL'         => 'Incorrect value for TTL',
+		'ERROR_CNAME'       => 'Incorrect value for Canonical Name',
+		'ERROR_MX'          => 'Incorrect value for Mail exchanger',
+		'ERROR_PREFERENCE'  => 'Incorrect value for Preference',
+		'ERROR_ZONE'        => 'Incorrect value for Zone',
+		'ERROR_NS'          => 'Incorrect value for Nameserver',
+		'ERROR_TXT'         => 'Incorrect value for Text',
+		'ERROR_EMAIL'       => 'Incorrect value for E-mail',
+		'ERROR_PASSWORD'    => 'Non-matching passwords',
+		'ERROR_ADMIN_EMAIL' => 'Incorrect value for Administrative e-mail',
+		'ERROR_REFRESH'     => 'Incorrect value for Refresh time',
+		'ERROR_RETRY'       => 'Incorrect value for Retry time',
+		'ERROR_EXPIRE'      => 'Incorrect value for Expire time',
+		'FILLOUT_FIELDS'    => 'Please fill out the following fields:',
+		'EDIT_FIELDS'       => 'Please edit fields:',
+		'DELETE_RECORD'     => 'You are about to delete the following record:',
+		'USERNAME'          => 'Username',
+		'PASSWORD'          => 'Password',
+		'LOGIN_BUTTON'      => 'Log In',
+		'PAGE_LOGIN'        => 'Log In page',
+		'LOGIN_NOTE'        => 'Note: Set your browser to accept cookies in order for login to succeed. You will be asked to log in again after some period of time.',
+		'IDLE_TIMEOUT'      => 'Logout reason: Idle timeout',
+		'MALFORMED_TICKET'  => 'Logout reason: Ticket malformed',
+		'INVALID_HASH'      => 'Logout reason: Unknown ticket',
+		'EXPIRED_TICKET'    => 'Logout reason: Ticket has expired',
+		'MISSING_SECRET'    => 'Logout reason: Server secret could not be loaded',
+		'TAMPERED_HASH'     => 'Logout reason: Ticket data tampered with',
+		'PASSWORD_CHANGE'   => 'Password will only be changed if you type anything in the fields below.'
+		);
+    
+    return %text;
+}
+
+1;
+
+
+

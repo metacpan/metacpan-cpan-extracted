@@ -1,0 +1,81 @@
+#!/usr/bin/env perl
+
+# Pragmas.
+use strict;
+use warnings;
+
+# Modules.
+use App::HL7::Dump;
+
+# Version.
+our $VERSION = 0.02;
+
+# Run.
+App::HL7::Dump->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+hl7dump - Script to dump hl7 file message.
+
+=head1 SYNOPSIS
+
+ hl7dump [-c] [-h] [--version] hl7_file
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-c>
+
+ Color mode.
+
+=item * C<-h>
+
+ Print help.
+
+=item * C<--version>
+
+ Print version of script.
+
+=item * C<hl7_file>
+
+ File with HL7 messages.
+
+=back
+
+=head1 EXAMPLE
+
+ hl7dump -h
+
+=head1 REPOSITORY
+
+L<https://github.com/tupinek/App-HL7-Dump>
+
+=head1 AUTHOR
+
+Michal Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+ © 2016 Michal Špaček
+ BSD 2-Clause License
+
+=head1 VERSION
+
+0.02
+
+=cut

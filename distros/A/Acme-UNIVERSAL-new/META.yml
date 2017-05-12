@@ -1,0 +1,15 @@
+---
+name: Acme-UNIVERSAL-new
+version: 0.01
+author:
+  - chromatic <chromatic@wgz.org>
+abstract: the only constructor you ever need
+license: perl
+build_requires:
+  Scalar::Util: 0
+  Test::More: 0
+provides:
+  Acme::UNIVERSAL::new:
+    file: lib/Acme/UNIVERSAL/new.pm
+    version: 0.01
+generated_by: Module::Build version 0.2611

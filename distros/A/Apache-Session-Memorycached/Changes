@@ -1,0 +1,18 @@
+Revision history for Perl extension Apache::Session::Memorycached.
+
+1.0  Sun Oct  3 15:05:46 2004
+	- original version; created by h2xs 1.22 with options
+		-XAn Apache::Session::Memorycached
+
+1.1 Oct 8  2004
+        - Add 'timeout' session parameter 
+
+2.0.0 May 04 2006 
+        - optimize persistant connection
+        - add  memd.pl in scripts directory 
+
+2.1.0  Nov 17  2006
+        - add reverse reference on principal identity  
+2.2.0  Feb 09  2007
+        - add two replication daemons 
+	- add SOAP service 

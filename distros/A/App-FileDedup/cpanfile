@@ -1,0 +1,9 @@
+requires "File::Dedup" => "0";
+requires "MooseX::App::Simple" => "0";
+requires "MooseX::Types::Moose" => "0";
+requires "strict" => "0";
+requires "warnings" => "0";
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};

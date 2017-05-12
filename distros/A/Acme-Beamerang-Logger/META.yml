@@ -1,0 +1,29 @@
+---
+abstract: 'A Simple per-class clan warnlogger loader'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Term::ANSIColor: '2.01'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.013, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Beamerang-Logger
+provides:
+  Acme::Beamerang::Logger:
+    file: lib/Acme/Beamerang/Logger.pm
+    version: '0.001000'
+requires:
+  Log::Contextual: '0'
+  Log::Contextual::WarnLogger::Fancy: '0.002000'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/kentnl/Acme-Beamerang-Logger/issues
+  repository: https://github.com/kentnl/Acme-Beamerang-Logger
+version: '0.001000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

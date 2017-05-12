@@ -1,0 +1,47 @@
+Revision history for Perl extension APISchema
+
+1.24 2016-06-10T10:01:57Z
+   - Fix document
+
+1.23 2016-06-10T09:52:33Z
+   - Inject routes to an existing router object
+
+1.22 2016-04-20T06:08:32Z
+   - Update Valiemon
+
+1.21 2015-11-24T02:35:14Z
+    - Added missing prereqs as reported by CPANTS
+
+1.2 2015-11-20T04:37:28Z
+
+    - X-Error-Cause header indicates whether the response comes from app or validator
+
+1.1 2015-11-19T06:32:07Z
+    - Add method and path info to documentation TOC (Sixeight++)
+
+1.04 2015-10-15T10:38:54Z
+    - mock server feature
+
+1.03 2015-10-06T07:25:49Z
+    - Determine the status code from the detail of failure (aereal++)
+
+1.02 2015-10-06T07:12:24Z
+    - Prettify the output of examples (aereal++)
+
+1.01 2015-09-04T09:32:37Z
+    - Recognize HTTP PATCH method (aereal++)
+
+1.00 2015-08-27T10:48:03Z
+    - Support schema which contains unicode characters
+    - Enable `use utf8` in DSL file
+
+0.03 2015-08-18T02:06:45Z
+    - Validation error has more details. expected: expected schema, actual: actual input data
+
+0.02 2015-03-16T02:35:36Z
+    - Add a status_code parameter to P::MW::AS::RequestValidator
+
+0.01 2015-02-18T10:41:05Z
+
+    - original version
+

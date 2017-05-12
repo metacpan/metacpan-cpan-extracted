@@ -1,0 +1,9 @@
+Revision history for Perl extension Audio::Scrobbler.
+
+0.01  Mon Jan  2 09:12:30 GMT 2006
+	- later changed over to depending on Perl 5.6, since 5.00503
+	  lacks the Unicode/UTF-8 processing features we need;
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.5.3 -n Audio::Scrobbler --skip-exporter
+
+$Id: Changes 86 2006-01-02 09:13:53Z roam $

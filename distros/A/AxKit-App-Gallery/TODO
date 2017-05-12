@@ -1,0 +1,31 @@
+$Id: TODO,v 1.7 2004/02/25 17:25:21 nik Exp $
+
+ * Create imagesheet2rss.xsl
+
+ * Make the log level configurable
+
+ * Decide between RDF::Core and the Redland RDF library
+
+ * Refactor the code that determines the full path to an image's 
+   cache dir
+
+ * Update the documentation to reflect changes
+    
+     * Changes to the imageinfo.rdf format.
+
+ * Investigate using Image::EXIF instead of Image::Info.  Not sure what
+   benefits that would have yet.
+
+ * Different gammas for Mac and PC browsers
+
+ * Support compositing text over the image
+
+ * l10n
+
+ * Nice CSS
+
+ * Add the orange XML icon from:
+ 
+    http://www.nongnu.org/straw/index.html  
+ 
+   to the pages.

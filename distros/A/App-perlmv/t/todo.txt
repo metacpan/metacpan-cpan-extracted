@@ -1,0 +1,6 @@
+- fix recursive test (-R)
+- other options
+  + files (-f)
+  + no-symlinks (-S)
+- autoglobbing in windows
+- overwrite scriptlet

@@ -1,0 +1,32 @@
+{
+   "abstract" : "Stack trace",
+   "author" : [
+      "Josh Jore <jjore@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Stacktrace",
+   "prereqs" : {},
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-App-Stacktrace@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Stacktrace"
+      },
+      "homepage" : "http://search.cpan.org/dist/App-Stacktrace",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jbenjore/App-Stacktrace.git",
+         "web" : "http://github.com/jbenjore/App-Stacktrace"
+      }
+   },
+   "version" : "0.09"
+}
+

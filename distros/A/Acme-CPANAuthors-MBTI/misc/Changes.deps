@@ -1,0 +1,15 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.001002
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.001001 2015-01-18T07:51:34Z
+ [Added / runtime requires]
+ - Acme::CPANAuthors 0.24
+
+ [Removed / configure requires]
+ - perl 5.008
+
+ [Removed / test requires]
+ - perl 5.008

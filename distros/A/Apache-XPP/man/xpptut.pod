@@ -1,0 +1,123 @@
+=head1 NAME
+
+xpptut	- Apache::XPP tutorial
+
+=head1 I. HOW TO USE IT
+
+Apache::XPP lets you embed perl code into html tags. Just like Mason, Perl::ASP, 
+and embperl.
+Syntax:
+
+ <?xpp my $variable = "bleh"; ?>
+
+Tough, eh? There's also a "print" shortcut, which is useful if you don't need to do any funky variable manipulation 
+
+ <FONT SIZE=3>My variable = <?= $variable ?> </FONT><BR>
+
+Even tougher, right?	
+
+It's also possible to split perl blocks between <?xpp ?> tags. 
+This is insanely useful when checking for errors:
+
+ <TABLE><TR>
+ <?xpp if ($object->haserrors()) { ?>
+ <TD BGCOLOR="#FF0000"><= $object->name() ?> has errors</TD>
+ <?xpp } else { ?>
+ <TD BGCOLOR="#000000"?><= $object->name() ?> has no errors</TD>
+ <?xpp } ?>
+ </TR></TABLE>
+
+Basically, anything that's legal in perl is legal in XPP. However, it's usually a 
+good idea to keep all your database connections and object creation to modules. 
+The <A HREF="bingoxtut.xpml">BingoX.pm</A> module was specifically designed to create 
+display objects that can be easily used in this environment.
+
+There are also two methods that let you inlcude other files:
+
+=over 4
+
+=item C<include> ($file)
+
+Includes the $file. Does not parse or buffer the file in any way. It's faster 
+than C<xinclude>(), and well suited for navs, or any other static components 
+that get reused often.  It is recursive, so it's possible to call include() from
+another included file.
+
+=item C<xinclude> ($file,[$object])
+
+Identical to C<include> only this will actually parse XPP tags from within the 
+includes. Since most perl calls will be against a method, it helps to pass 
+$objects as well, but this is not required.
+
+In both cases, the location of $file is relative to the XPPIncludeDir specified
+in your httpd.conf file.
+
+=back
+
+=head1 Custom Tags
+
+Custom tags allow html integrators to use perl in there documents without having
+to know perl syntax. For a tutorial on custom tag creation see L<xpptut>.
+The following tags are already in Apache::XPP::PreParse:
+
+=over 4
+
+=item C<parser_xppcomment>
+
+Used to comment out blocks of xpml code.
+
+Ex:
+ <XPPCOMMENT>
+  <title><?= $obj->title() ?></title>
+ </XPPCOMMENT>
+
+=item C<parser_xppcache>
+
+Cache a block of code using a specific expire/store module. Pass
+the caches name, group, expire, and store. See L<xppcache>
+for more information.
+
+Ex:
+ <XPPCACHE name="mycache" group="cachegroup" store="File" expire="Duration, 10s">
+  ....
+ </XPPCACHE> 
+
+=item C<parser_appmethod>
+
+Assign or print an object method. Ref checks the object before using
+it. Assigns the result to the value of the as tag parameter. If this
+param isn't present the result is printed.
+
+Ex:
+ <XPP app app="$obj" attr="bleh" as="$var">
+ <XPP app app="$obj" attr="bleh">
+
+=item C<parser_print>
+
+Prints the result of an object method.
+
+Ex:
+ <XPP print obj="$obj" attr="bleh">
+
+=item C<parser_xppxinclude>
+
+Calls xinclude with the passed filename and options.
+
+Ex:
+ <XPP xinclude filename="include.xmi" options="$obj1, $obj2">
+
+=item C<parser_xppforeach>
+
+Places the included block within a foreach loop. Assigning each element
+of the array to 'as.' If 'as' is not present it uses $_.
+
+Ex:
+ <XPPFOREACH array="@ary" as="$val">
+ <XPPFOREACH array="@ary">
+
+=back 
+
+=head1 See Also
+
+L<Apache::XPP> 
+L<Apache::XPP::PreParse>

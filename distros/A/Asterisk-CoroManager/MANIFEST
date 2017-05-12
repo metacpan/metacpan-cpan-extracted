@@ -1,0 +1,9 @@
+Build.PL
+CHANGES
+examples/manager-test.pl
+lib/Asterisk/CoroManager.pm
+LICENSE
+MANIFEST			This list of files
+README
+t/coro_manager.t
+META.yml

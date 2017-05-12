@@ -1,0 +1,152 @@
+NAME
+    Apache::EmbeddedPerl::Lite - light weight embedded perl parser
+
+SYNOPSIS
+      PerlModule Apache::EmbeddedPerl::Lite
+
+      <Files *.ebhtml>
+        SetHandler perl-script
+        PerlHandler Apache::EmbeddedPerl::Lite
+        PerlSetVar ContentType text/html
+      </Files>
+
+    or
+
+      use Apache::EmbeddedPerl::Lite qw(
+            embedded
+      };
+
+      $response = embedded($class,$r,$filename,@args)
+
+DESCRIPTION
+    This modules is a light weight perl parser designed to be used in
+    conjunction wit mod_perl and Apache 1 or Apache 2. It may be used as a
+    handler for files containing embedded perl or it may be called as a
+    subroutine to conditionally parse files of your choosing.
+
+    Perl code may be embedded in a file parsed by this module as described
+    below. Each section of perl code is collected and eval'd as a subroutine
+    that is passed the two arguments ($classnam,$r) in its input array @_;
+
+    Embedded perl should have the following format:
+
+      On a line by itself:
+
+      {optional whitespace}  <!-- {whitespace} perl 
+
+      perl code here
+
+    # terminating bracket on a line by itself {optional whitespace} -->
+
+    The beginning and terminating brackets may optionally be followed by a
+    white space and comments, which will be ignored.
+
+      i.e.
+
+      <!--  perl
+    # perl code goes here, it will be executed as a subroutine
+    #
+    # anon_sub($classname,$r) {
+          my($class,$r) = @_;
+          $r->print("Hello World, I am in package $class\n");
+    # }
+      -->
+
+    * $http_response = handler($classname,$r);
+    The function "handler" has the prototype:
+
+            handler ($$) : method {
+
+    which receives the arguments $class, $r from Apache mod_perl.
+
+      input:        class name,     (a scalar, not a ref)
+                    request handle
+
+      return:       Apache response code or undef
+
+      handler is not exported.
+
+    Expected Codes:
+
+              0     OK
+            404     File Not Found
+            500     Server Error
+
+      404 could not find, open, etc... file
+      500 missing closing embedded perl bracket
+          embedded perl has an error
+
+    When a 500 error is returned, a warning will be issued to STDERR
+    providing details about the error.
+
+    A ContentType header will not be sent unless the type is specified as
+    follows:
+
+            PerlSetVar      ContentType     text/html
+
+    mod_perl configuration is as follows:
+
+      PerlModule Apache::EmbeddedPerl::Lite
+
+      <Files *.ebhtml>
+        SetHandler perl-script
+        PerlHandler Apache::EmbeddedPerl::Lite
+        PerlSetVar ContentType text/html
+      </Files>
+
+    * $http_response = embedded($classname,$r,$file,@args);
+    The function "embedded" is similar to "handler" above except that it
+    does not send any headers. Headers are the responsibility of the
+    application "handler", or the embedded code.
+
+    @args are optional arguments that may be passed from your handler to
+    embedded.
+
+      input:        class name,     (a scalar, not a ref)
+                    request handle,
+                    file name
+                    @args   [optional] appication specific
+
+      return:       Apache response code or undef
+
+      ... at startup or .httaccess ...
+
+      use Apache::EmbeddedPerl::Lite qw(embedded);
+
+      ... in the application handler ...
+
+            if ($r->filename =~ /\.ebhtml$/) {
+      ...     set content type, etc...
+
+              $response = embedded(__PACKAGE__,$r,$r->filename);
+            } else {
+              $response = embedded(__PACKAGE__,$r,$someotherfile);
+            }
+            return $response if $response; # contains error
+
+      ...     do something else
+
+PREREQUISITES
+            Apache
+      or
+            Apache2
+            Apache2::RequestRec
+            Apache2::RequestUtil;
+            Apache2::RequestIO;
+    
+EXPORT_OK
+            embedded
+
+AUTHOR
+    Michael Robinton, michael@bizsystems.com
+
+COPYRIGHT
+    Copyright 2013-2014, Michael Robinton & BizSystems This program is free
+    software; you can redistribute it and/or modify it under the same terms
+    of the Apache Software License, a copy of which is included in this
+    distribution.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

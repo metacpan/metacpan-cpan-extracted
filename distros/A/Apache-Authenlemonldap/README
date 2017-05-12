@@ -1,0 +1,38 @@
+NAME
+    Apache::Authenlemonldap - Perl extension for Apache with lemonldap
+    websso
+
+SYNOPSIS
+    In httpd.conf
+
+     <location /doc>
+       Authname "lemonldap web SSO"
+       Authtype Basic
+     # require valid-user  or 
+       require user egerman-cp
+       PerlAuthenHandler Apache::Authenlemonldap
+       Options Indexes FollowSymLinks MultiViews
+     </location>
+
+DESCRIPTION
+     This module can decode lemonldap header .
+     Installing on your apache web server it can deal with a lemonldap frontend
+     It puts user in    $r->connection->user and role in $ENV{ROLE}  
+
+     A line in error.log is added when user get a connection .
+
+     Note: this module works this apache2 , you can use it this apache-1.3nn with minor modifications (use Apache::Log instead use Apache2::Log )  
+
+SEE ALSO
+    Lemonldap websso at http://lemonldap.sourceforge.net
+
+AUTHOR
+    Eric German, <germanlinux@yahoo.fr>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Eric German
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.5 or, at
+    your option, any later version of Perl 5 you may have available.
+

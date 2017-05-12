@@ -1,0 +1,25 @@
+###############################################################################
+#
+# File:    CONFIG
+#
+# Purpose: Specify test configuration parameters (user and password) for
+#          the Authen::Krb5::Simple module.
+#
+###############################################################################
+#
+
+# Uncomment and specify the test realm, username, and password if you want
+# to run a more complete authentication test. Leave them commented out to
+# skip the user authentication test.
+#
+# Note: TEST_REALM is optional.  If omitted, the default realm for the
+#       local system will be used.
+#
+# ** If you use these make sure the realm and user exist and the password
+#    is correct.  Otherwise, the test will fail.
+#
+#TEST_REALM TESTREALM.COM
+#TEST_USER testuser
+#TEST_PASS testpass
+
+###EOF###

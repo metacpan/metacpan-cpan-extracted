@@ -1,0 +1,422 @@
+ApacheMobileFilter 4.20
+Add AMF_BROWSER_TYPE for detect browser
+Add AMF_BROWSER_VERSION for detect browser version
+Deprecate AMF_DEVICE_MOBILE_OS now is AMF_DEVICE_OS
+Deprecate AMF_DEVICE_MOBILE_OS_VERSION now is AMF_DEVICE_OS_VERSION (in this verision extract the version only for mobile)
+
+ApacheMobileFilter 4.12
+Fix bug for detect the correct number version for iOS device
+
+ApacheMobileFilter 4.11
+Fixed bug(thanks to NiFello) https://groups.google.com/forum/#!topic/amf-device-detection/AXeC09XHkXA
+Fixed bug(thanks to fliptop) probably reserve https://groups.google.com/forum/#!topic/amf-device-detection/PvqkAf1bXSA
+
+ApacheMobileFilter 4.10
+Add AMFDownloadParam ( AMFDownloadParamURL is depracated)
+Add AMF_DEVICE_IS_TV for detect smart tv (for AMFLiteDetectionFilter)
+More optimization of download AMF repository 
+
+ApacheMobileFilter 4.09
+Add AMF_DEVICE_MOBILE_OS for detect operative system
+Add AMF_DEVICE_MOBILE_OS_VERSION for detect operative system version
+Optimization of download AMF repository 
+
+ApacheMobileFilter 4.08
+Search for several servers to download AMF repository
+
+ApacheMobileFilter 4.07
+Added new parameter AMFSetProxy for set the proxy default is true
+Added new parameter AMFSetHttpProxy for set the http proxy host
+Added new parameter AMFSetHttpProxyPort for set the http proxy port
+Added new parameter AMFSetGetParameterTimeOut for set the timeout for download parameter
+Fix issue for UserAgent with "Google favicon" thanks to Colt
+Search for mirror server to download AMF repository
+
+ApacheMobileFilter 4.06
+Change source repository for AMFLiteDetect module
+ApacheMobileFilter 4.05
+Fix issue
+
+ApacheMobileFilter 4.04
+Change source repository for AMFLiteDetect module
+
+ApacheMobileFilter 4.03
+Fixed bug (thanks to Juan) ref. https://groups.google.com/forum/#!topic/amf-device-detection/QQgYOTJb2Fs.
+Fixed bug (thanks to Juan) ref. https://groups.google.com/forum/#!topic/amf-device-detection/ZOOSFL6JS4Y.
+
+ApacheMobileFilter 4.02
+Fixed serious bug (thanks to Maarten).
+
+ApacheMobileFilter 4.01
+Fixed serious bug in AMFWebService (thanks to juan).
+
+ApacheMobileFilter 4.00
+Added new capability for LiteDetection now it's possible to detect if device is touch
+Change Architecture for module supports memcached
+
+ApacheMobileFilter 3.54
+Fix serious bug for LiteDetection now it's possible to detect mobile and tablet correctly
+
+ApacheMobileFilter 3.53
+Deprecate webPatchFile
+Parameter LoadWebPatch is deprecated
+Parameter PatchWurflNetDownload is deprecated
+Parameter PatchWurflUrl is deprecated
+
+ApacheMobileFilter 3.52
+Fix minor for AMFImageRendering
+
+ApacheMobileFilter 3.51
+Change logic for be more mod_rewrite compatible
+Added new feature for download directly the premium device repository directly from 51Degrees.mobi site
+Added new parameter Key51Degrees to set premium key
+Added new pre-requisit LWP::Protocol::https for support https connection
+Fixed bug for modules that used memcached
+Fixed bug for AMFSwitcher
+Added parameter TypeRedirect for specify the type of redirect for AMFSwitcher 
+Clean header for AMFImageRendering
+Added environment variable AMF_FORCE_TO_DESKTOP is setted as true that mean you don't want redirect mobile device (mod_rewrite) 
+
+ApacheMobileFilter 3.50
+Added New Module AMF51DegreesFilter and AMF51DegreesFilterMemcached for load 51Degrees DR (http://51Degrees.mobi)
+Fixed bugs for DetectRight modules
+Fixed bugs for AMFCarrierDetection
+
+ApacheMobileFilter 3.40a
+Fixed some minors bugs
+Add AMF Environment variable AMF_DEVICE_ISMOBILE (boolean)
+Add AMF AMFDownloadParamURL parameter for AMFLiteDetection default is true.
+Added New Module AMFLiteDetectionFilter for who don't want to use a commercial DR.
+Added New Module AMFDetectRightFilter and AMFDetectRightFilterMemcached for load DetectRight DR (http://www.detectright.com)
+Added new function that check the last version on line, it's possible enable with AMFCheckVersion parameter on true (default is false)
+Added parameter AMFDeepParse to increase the performance of Device Detection
+
+ApacheMobileFilter 3.33
+AMFCommonLib optimize code for device detection.
+AMFImageRendering correct bugs about fullbrowser. Thanks to Carsten.
+AMFDeviceMonitor support Deflate mode. Carsten rewrite for me parts of code, many thanks.
+
+ApacheMobileFilter 3.32
+Add Alert message for new license of WURFL.
+
+ApacheMobileFilter 3.31
+Change Makefile.PL
+Add info information for image supported
+Add AMFWSCacheControl parameter in AMFWebService, so all proxy cache in middle don’t send many request to webservice. (suggested by juan).
+Fix bugs for Opera (if webpatch is loaded)
+
+ApacheMobileFilter 3.30
+AMFImageRendering now supports animated GIF
+AMFWebService supports deflate mode.
+AMFWebService add new feature called capabilityList, to get specific capability (syntax is capabilityList=brand_name,xhtml_table_support). Thanks to Juan 
+
+ApacheMobileFilter 3.25
+Fixed bugs in AMFSwitcher. Thanks to Christofer.
+Optimize detection logic for iPhone and Apple. Thanks to Dave
+
+ApacheMobileFilter 3.24
+Optimize detection logic
+Introduce new configuration parameter PersonalWurflFileName
+
+ApacheMobileFilter 3.23
+Improve sophoisticated Android Detection (check correct OS version)
+Fixed minor bugs, wrong message for AMFMobileHome.
+
+ApacheMobileFilter 3.22
+Fixed bugs on FallBack function
+Optimize device detection logic.
+Change resize mechanism for jpg and png file, now it's faster and managed transparency images.
+Improve sophisticated Android Detection
+
+ApacheMobileFilter 3.21
+Fixed bugs for mobile bot
+
+ApacheMobileFilter 3.20
+New detection for Android Device
+New detection for bot. Thanks to Cristobal.
+
+ApacheMobileFilter 3.12
+If a useragent is empty now AMF recongize as generic browser. Thanks to Alberto.
+Fixed bugs
+
+ApacheMobileFilter 3.11
+Fixed bug for AMFSwticher, managed correctly 2 virtual host (one mobile and one for fullbrowser). Thanks to Sergio
+Fixed bug for AMFWebService.
+Add new environment variable AMF_PATCHFILEVER
+Added parameter ForceTabletAsFullBrowser for redirect tablet (for example iPad) to the fullbrowser site
+
+ApacheMobileFilter 3.10
+Fixed bugs for some browser. Thanks to Sergio
+
+ApacheMobileFilter 3.09b
+Fixed bugs for chrome
+
+ApacheMobileFilter 3.09
+Device detection it's no more case sensitive for ua mobile devices.
+Fixed minor bugs.
+
+ApacheMobileFilter 3.08
+Added new module AMFWebService, for XML and JSON output. Thanks to Stefano L.
+Added parameter RestMode (default is false) if it's is possible to pass in query string the value of userAgent
+AMFImageRendering not rendering image if its width is less then the width of the device screen, thanks to Emiliano M.
+Added parameter ImageParamPerc for AMFImageRendering.pm to change the default parameter dim.
+Added parameter ImageParamHeight for AMFImageRendering.pm to change the default parameter height.
+Added parameter ImageParamWidth for AMFImageRendering.pm to change the default parameter width.
+Added parmaeter ResizeSmallImage (default is false), if it's true AMFImageRendering resie alse the image smallest of fecvice screen size (low quality).
+Added parameter FullBrowserMobileAccessKey for AMFSwitcher.pm that permit the mobile device to access in fullbrowser mode (for example iPhone).
+Fixed bug for some particular PC user agent. Thanks Danielle K.
+Optimized AMDDeviceMonitor.pm
+
+
+ApacheMobileFilter 3.07
+Fixed Bugs in AMFWURFLFilter.pm, thanks to Siemens
+
+
+ApacheMobileFilter 3.06
+Manage the operamini browser now the filter detect correctly the device and the browser
+
+ApacheMobileFilter 3.05
+Added parameter AMFMobileKeys for patch identify mobile useragent.
+Delete warn in AMFMobileCachingMemcached
+Add new module AMFTrace for trace.
+Added parameter AMFTraceDebug is boolean (false is the default value, and trace only new useragent, true trace the capabilitis setted in AMFTraceCapability.
+Added parameter AMFTraceCapability is the capability name you want to trace (for ex. brand, model, etc....).
+Added parameter AMFTraceFS to set the field separate between the capabilities to trace.
+
+ApacheMobileFilter 3.04
+Deprecated parameter CookieCacheSystem is changed in AMFProductionMode
+Change Makefile.PL
+Fixed bugs. Thanks to Ivancho.
+Fixed bugs for CookieCacheSystem (now AMFProductionMode)
+
+ApacheMobileFilter 3.03
+Deprecated parameter MOBILE_HOME is changed in AMFMobileHome
+Fixed Bug in AMFWURFLFilter. Thanks to Allison.
+Fixed Bug for AMFImageRender (with different virtual host conflic with images with the same name). Thanks to Sergio.
+Fixed Bug for AMFImageRender (with different uri conflict with images with the same name).
+
+ApacheMobileFilter 3.02
+Fixed Bug in AMFWURFLFilter. If  CapabilityList was not setted, caused an "uninitialized value".
+Fixed Bug in AMFSwitcher. (the bug is it only in 3.01) Thanks to Richard W.
+
+ApacheMobileFilter 3.01
+Fixed Bug in AMFCommonLib. Thanks to Amit
+AMFSwitcher.pm: New Parameter called WildCardRedirect that passed the parameter end the url to another site. Thanks to Amit
+AMFSwitcher.pm: New Parameter called SwitcherExclude excludes the url that contains one or more strings that is been specified into the parameter.
+
+ApacheMobileFilter 3.00
+Change name of the package Apache2-WURFLFilter to Apache2-ApacheMobileFilter
+Change name of module WURFFilter.pm in AMFWURFLFilter.pm
+Change name of module ImageRenderFilter.pm in AMFImageRendering.pm
+Create new module called AMFWURFLFilterMemcached.pm to use memcached (http://memcached.org) as shared memory in cluster mode.
+Create new module called AMFMobileCacheMemcached.pm to use memcached (http://memcached.org) as shared memory in cluster mode. This module cash the content for id device
+Fixed bugs WURFLFilter
+Fixed bugs in old called ImageRenderFilter.pm now AMFImageRendering.pm, no more internal redirect.
+
+WURFLFilter 2.21
+Correct Internal Redirect in AMFSwitcher, thanks to Alison
+Created a new module called AMFCommonLib.pm to optimize and better maintenance of the code
+
+WURFLFilter 2.20a
+Correct the documentation into AMFDeviceDetection
+
+WURFLFilter 2.20
+New module: The switcher mode now is in a separated module called AMFSwitcher.pm, this module use the same parameter that before version (FullBrowserUrl, MobileVersionUrl, RedirectTranscoderUrl)
+New module: Create the AMFCarrierDetection to detect by ip address the carrier name and its nation and pass the parameters as environment variable (AMF_CARRIER_NAME, AMF_CARRIER_NATION)
+New module: Create the AMFDeviceMonitor a simple admin tool to see witch type of device has access in your site (beta version)
+Performance increase of WURFLFilter.pm and patched the manage of web_browsers_patch.xml
+ImageFIlterRender set the no cache for the images (for firefox and ie problem)
+
+WURFLFilter 2.11
+Fixed bugs in ImageFilter for extension uppercase thanks to Sergio
+Fixed bugs in ImageFilter for Alias directive thanks to Sergio
+
+WURFLFilter 2.1
+Added Parameter CacheDirectoryStore to set the directory where the data are stored.
+The Cache system use the Cache::FileBackend library, now the capabilities of device data are stored on filesystem. So if the version of WURFL or CapabilityList are not changed at startup Apache don't lost the data stored.
+Fixed Bugs (thanks to Eladio)
+Clear code
+
+WURFLFilter 2.07
+Clear code
+
+WURFLFilter 2.06
+Fixed Bugs for caching system thanks to nobbynobbs 
+For the uknown devices now the AMF_ID return "device_not_found" value (before was null)
+Manage strange headers X-Device-User-Agent for Content Transformation (read more: http://www.w3.org/TR/ct-guidelines/)
+
+ImageRenderingFilter 2.06 
+Clear the code
+
+WURFLFilter 2.05
+WURFLFIlter parameter DownloadZipFile now the Apache Mobile Filter detect automaticaly the file to download is a zip file.
+Add Environment variable AMF_WURFLVER to know which version of WURFL the filter use.
+Optimize the downloading phases of wurfl files.
+ImageRenderFilter fixed bugs
+
+
+WURFLFilter 2.04
+Deprecated parameter Log4WurflNoDeviceDetect, the strange parameter is logged into error_log as warning type
+Deprecated parameter DirWebPatch, now if LoadWebPatch is true and PatchWurflNetDownload is false the Apache Mobile FIlter load the web_browsers_patch.xml file into MOBILE_HOME parameter
+Deprecated parameter ConvertImage this parameter has not sense.
+Deprecated parameter WebAppConvertImages this parameter has not sense.
+Deprecated parameter DetectAccuracy this parameter causes the decrease of filter performance.
+Deprecated parameter RedirectTranscoder this parameter has not sense.
+Complete with more info the POD 
+
+WURFLFilter 2.03
+Added Parameter CookieCacheSystem to enable cookie cache mechanism.
+Cache cookie system
+Clear code
+
+WURFLFilter 2.02
+I leaved (in the same day) the cookie system, and I'm using pnote 
+
+WURFLFilter 2.01
+WURFLFilter pass the dimension of screen size to ImageRenderFilter by cookie system 
+
+WURFLFilter 2.00
+In this version we have separated the module in two parts:
+WURFLFilter.pm that give the information of device capabilities as Apache Environments
+ImageRenderFilter.pm manage the images for the devices
+
+The Apache Mobile Filter pass the parameter with this syntax:
+
+AMF_<upper case wurfl capability names>
+
+for example:
+
+j2me_midp_2_0 is AMF_J2ME_MIDP_2_0
+
+
+if Parameter CapabilityList is setted with value all show all capabilies of wurfl.
+Fixed some BUG
+
+WURFLFilter 1.70
+In this version you can specify on the query string of the URI of an image the 	
+the percentage of width of the  device that the filter must resize 
+
+WURFLFilter 1.61
+Change algorithm to identify the UserAgent
+Added Parameter DetectAccuracy to set the accuracy of device detection (default is false)
+
+
+WURFLFilter 1.60
+Added parameter for setting "Apache Mobile Filter" into httpd.conf
+Added Parameter LoadWebPatch to set if you want to load a patch file (default is false)
+Added Parameter DirWebPatch to set where you set your patch file
+Added Parameter PatchWurflNetDownload to set if you download from net the patch file (default is false)
+Added Parameter PatchWurflUrl to set the url of the patch file
+Added Parameter RedirectTranscoder to set if you want to redirect if it access with a transcoder system
+Added Parameter RedirectTranscoderUrl to set the url where you want to redirect the transcoder 
+
+WURFLFilter 1.55
+Fixed critical bugs now is recognize correctly FullBrowser
+
+WURFLFilter 1.54
+Delete Parameter XML_CONFIG now the configuration of the filter is possible only in httpd.conf file
+
+WURFLFilter 1.53
+Fixed Bugs
+Convert all messages from warn to debug, only warn message is for new o strange User Agent
+
+WURFLFilter 1.52
+Fixed Bugs
+Parse Wurfl.xml method more clean
+
+WURFLFilter 1.51
+Fixed Bugs
+
+WURFLFilter 1.5
+Add a new method call IdentifyUAMethod, with this method increase the performance of device identification
+Deprecated FirstMethod
+Deprecated SecondMethod
+
+WURFLFilter 1.42
+Fixed bug for try to read zip file like an xml file (case is DownloadZipFile setted false)
+
+WURFLFilter 1.41
+Fixed bugs for internal redirect feature and for images mechanism
+
+WURFLFilter 1.4
+Increase performance with a new cache system mechanism
+
+WURFLFilter 1.31
+After talking with Gianugo R. it's possible to configure the filter into httpd.conf file
+Added Parameter XML_CONFIG to set where to read WURFLFilter configuration (to set in httpd.conf)
+Added Parameter CapabilityList the same of the old attribute "capability" in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter XHTMLUrl the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter WMLUrl the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter CHTMLUrl the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter MobileVersionUrl the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter IntelliSwitch  the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter FullBrowserUrl the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter CookieSet the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter PassQueryStringSet the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter ShowDefaultVariable the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter WurflNetDownload the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter DownloadWurflURL the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter DownloadZipFile the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter ConvertImage the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter ResizeImageDirectory the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter WebAppConvertImages the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter WebAppDirectory the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter ConvertOnlyImages the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+Added Parameter Log4WurflNoDeviceDetect the same of the old attribute with the same name in WURFLFilterConfig.configure (to set in httpd.conf)
+
+WURFLFilter 1.21
+Optimized code
+
+WURFLFilter 1.2
+AddedAttribute Log4WurflNoDeviceDetect it's a necessary log for detect new device that WURFL not has included
+Fixed some bugs
+
+WURFLFilter 1.1
+Added Attribute WebAppConvertImages if you use an application server site
+Added Attribute WebAppDirectory for specify the directory of WebApp
+Added Attribute ConvertOnlyImages if you want to use the filter only for the images and not for other content
+
+WURFLFilter 1.0
+Added Attribute DownloadZipFile for download zip file of WURFL DB
+Add function to download zip file and uncompress it
+
+WURFLFilter 0.6
+Added Attribut cHTML for CHTML layout
+
+WURFLFilter 0.54
+Fixed several Bugs
+
+WURFLFilter 0.53
+Fixed several Bugs 
+
+
+WURFLFilter 0.52
+Fixed Bugs if cookie is true now the images is visible
+
+WURFLFilter 0.51
+Fixed Bugs of resize image, now it take the correct capability on WURFL
+Fixed Bugs if image to transform not found return correct message
+Fixed other little bugs
+
+WURFLFilter 0.5
+adaptation function image dynamic for the screen size of the device tested with PNG and GIF image type
+Added Attribute ConvertImage into config file for activate the adaptation image
+Added Attribute ResizeImageDirectory into config file for specify the destination of images
+
+WURFLFilter 0.41
+the filter trace in error_log file the  "user agent" that not are present in WURFL
+
+WURFLFilter 0.4
+Correct fix bugs
+Added Attribute WMLUrl for WML layout
+Change Attribute IntelliUrl in XHTMLUrl for XHTML layout
+
+WURFLFilter 0.3
+Optimization of storage data in memroy
+Correct README file
+
+WURFLFilter 0.2
+Read directly the WURFL.xml file from URL. This option is configurable into WURFLConfig.xml file.
+
+WURFLFilter 0.1
+The First Edition

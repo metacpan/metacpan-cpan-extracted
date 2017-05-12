@@ -1,0 +1,14 @@
+name: Acme-VarMess
+version: 0.01
+abstract: Blow up your variable names
+author: Yung-chung Lin <xern@cpan.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+requires:
+  PPI: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.34

@@ -1,0 +1,163 @@
+
+
+    ARSperl - An ARS v5 - v8.1 / Perl5 Integration Kit
+
+    Copyright (C) 1995-2015
+        Joel Murphy, jmurphy@buffalo.edu
+        Jeff Murphy, jcmurphy@jeffmurphy.org
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms as Perl itself.
+
+    Refer to the file called "Artistic" that accompanies the source distribution
+    of ARSperl (or the one that accompanies the source distribution of Perl
+    itself) for a full description.
+
+    Comments to:  arsperl-users@lists.sourceforge.net
+                  (this is a *mailing list* and you must be
+                   a subscriber before posting)
+
+    Home Page: http://www.arsperl.org
+
+---------------------------------------------------------------------------
+
+This is a perl extension for Remedy's Action Request System. Remedy
+Corporation, Action Request System, and AR System are trademarks of Remedy
+Corporation.
+
+This extension is offered completely for free and without support
+of any kind. Use at you own risk!
+
+
+PREPARATION
+
+You will need to have these already installed:
+
+   o  ARS 5.x, 6.x, 7.x, or 8.x API libraries and includes (header files).
+   o  Perl 5.x with the dynamic loading option compiled in.
+
+Please see:  https://rrr.se/cgi/index?pg=arapi   
+for a pre-packaged archive of API libraries
+(it is also possible to pull all of this together on your own if you have access
+to /opt/bmc/ARSystem on your ARS server)
+
+Note for Linux 64-bit:
+The expansion of the rrr.se targzip's will result in a directory similar to 
+"api764sp5linux" depending on the version of the API. The actual AR System 
+libraries as provided by Remedy need to be found by the linker in the lib 
+subdirectory of the $ARSAPI variable value set in Makefile.PL and with shortened 
+names as follows.
+
+Example:
+
+cp api764sp5linux/bin/* api764sp5linux/lib
+cd api764sp5linux/lib
+ln -s libicudatabmc.so.32 libicudatabmc.so
+ln -s libicui18nbmc.so.32 libicui18nbmc.so
+ln -s libicuiobmc.so.32 libicuiobmc.so
+ln -s libicuucbmc.so.32 libicuucbmc.so
+ln -s libicudatabmc_lx64.so.32 libicudatabmc_lx64.so
+ln -s libicui18nbmc_lx64.so.32 libicui18nbmc_lx64.so
+ln -s libicuiobmc_lx64.so.32 libicuiobmc_lx64.so
+ln -s libicuucbmc_lx64.so.32 libicuucbmc_lx64.so
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<base path>/api764sp5linux/lib
+
+
+TESTED OS'S
+
+This extension has been successfully built and used under the following
+OS versions:
+
+   o  Solaris 2.4 - 8
+   o  Irix 6.2
+   o  HPUX*
+   o  WindowsNT, 2000, XP (But NOT win95)
+   o  Linux (RHEL through v7)
+
+Users of other OS's might encounted problems with compiling. We'd be
+interested in hearing about your experiences and if you got it working
+under a new OS.
+
+
+BUILDING
+
+To build the extension, change into the root directory of the distribution
+and edit the Makefile.PL file. Change the following lines in it to point to
+the location of your ARS API directory (e.g. /u/remedy/api/lib)
+
+$ARSAPI = "/opt/remedy/api764sp5linux";
+$ARCHITECTURE = "lx64";     # Linux 64-bit
+
+Under Sunos 4.1.x, you will also need to add -lntc to $ARS_LIBS.
+Under Irix 6.2, you will need to remove the -lnsl option from $ARS_LIBS.
+Under HP-UX, you will need to build it statically into Perl.
+Under WindowsNT you will need to insert the appropriate libraries
+(arapi.lib and nts.lib) from the API kit included with NT Server,
+and the path to the include files, into Makefile.pl (or the resulting
+Makfile).
+
+then execute the following comands:
+
+> perl Makefile.PL
+> make
+> make install
+
+The first command will construct a Makefile.
+The second comand will compile the source files.
+The third command might require special (i.e. root) access if your
+perl distribution is not owned by your userid.
+
+
+BUILDING ON WINDOWS WITH STRAWBERRY PERL  
+(Note to Windows Developers: While this is the correct procedure, it will not 
+yet provide a stable 64-bit module)
+
+1) Download ARSPerl source and unpack
+
+2) Download and install 32 or 64-bit Strawberry perl from strawberryperl.com
+
+3) Download desired ARS API files from RRR and unpack 
+   (https://rrr.se/cgi/index?pg=arapi)
+
+4) Edit Makefile.PL, and update $ARSAPI to indicate where ARS API files have 
+   been unpacked
+
+5) If compiling for 64-bit, the following lines need updating in Makefile.PL 
+   as well:
+ 
+      $ARS_LIBS = join(' ', map { "$ARSAPI/lib/" . $_ } @{$ra_arlibs});
+
+      change to:
+
+      $ARS_LIBS = join(' ', map { "$ARSAPI/lib64/" . $_ } @{$ra_arlibs});
+     
+
+      $ARS_LDPATH = qq{-L"$ARSAPI/lib"};
+
+      change to:
+
+      $ARS_LDPATH = qq{-L"$ARSAPI/lib64"};
+
+
+      my $ar_lib_dir = join('/', $path_to_api_dir, 'lib');
+
+      change to:
+
+      my $ar_lib_dir = join('/', $path_to_api_dir, 'lib64');
+    
+6) cd to ARSPerl directory and run perl Makefile.PL
+
+7) dmake
+
+8) If desired (and able!), run dmake test
+
+9) dmake install
+
+10) Prior to using the compiled ARSPerl, update %PATH% first.
+
+   %PATH% update notes:
+   -    32-bit: Add the bin and lib directories from where the ARS API files 
+        were unpacked
+   -    64-bit: Add the lib64 directory from where the ARS API files were 
+        unpacked

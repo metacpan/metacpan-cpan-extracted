@@ -1,0 +1,47 @@
+Revision history for Alien-Libbz2
+
+0.22      2017-03-02 06:37:32 +1100
+  - Remove dep on Alien::Base2
+
+0.21      2017-02-08 07:59:42 -0500
+  - Require Alien::Build 0.11 for bugfixes
+
+0.20      2017-02-04 17:32:30 -0500
+  - use Alien::patch for more reliable builds
+  - FFI testing is back on for platforms that
+    build DLLs
+
+0.19      2017-02-04 11:48:19 -0500
+  - Require Alien::Build 0.08 for bugfixes
+
+0.18      2017-02-02 15:18:24 -0500
+  - Fold Alien::bz2 into this distribution as a compatability
+    layer over Alien::Libbz2
+  - Build .so files if possible
+  - Support for Visual C++ (for real)
+
+0.08      2017-02-01 11:59:27 -0500
+  - Support for Strawberry Perl
+
+0.07      2017-01-31 16:53:04 -0500
+  - Require Alien::Build 0.02
+
+0.06      2017-01-30 22:33:39 -0500
+  - Migrate from Alien::Base::ModuleBuild to Alien::Build for installer
+
+0.05      2017-01-26 18:52:03 -0500
+  - Use -fPIC (or equivalent) when building libbz2.a for share
+    install so that it can be linked into a .so file for Perl
+
+0.04      2017-01-18 15:36:03 -0500
+  - Added %{bzip2} helper
+
+0.03      2016-01-28 21:43:49 -0500
+  - Use Alien::Base::ModuleBuild as configure requires
+    instead of Alien::Base
+
+0.02      2015-07-13 09:31:54 -0400
+  - First cpan release!
+
+0.01      2015-07-01 18:18:06 -0400
+  - initial version

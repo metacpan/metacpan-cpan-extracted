@@ -1,0 +1,87 @@
+#!/opt/perl/bin/perl
+use strict;
+use utf8;
+use AnyEvent;
+use AnyEvent::XMPP::Client;
+use AnyEvent::XMPP::Ext::OOB;
+use AnyEvent::XMPP::Ext::Disco;
+
+my $j  = AnyEvent->condvar;
+my $cl = AnyEvent::XMPP::Client->new (debug => 1);
+
+$cl->add_account ('net_xmpp2@jabber.org/oobtest', 'test');
+
+my $disco = AnyEvent::XMPP::Ext::Disco->new;
+my $oob   = AnyEvent::XMPP::Ext::OOB->new;
+
+$cl->add_extension ($disco);
+$cl->add_extension ($oob);
+
+$disco->enable_feature ($oob->disco_feature);
+
+unless (-d 'oobdata') {
+   mkdir "oobdata" or die "Couldn't make directory oobdata/: $!";
+}
+
+my $file = "aaaaaaa";
+while (-e "oobdata/$file") { $file++ }
+
+$oob->reg_cb (oob_recv => sub {
+   my ($oob, $con, $node, $url) = @_;
+   print "receiving url $url->{url} from ".$node->attr ('from')."\n";
+   my $cont = `curl -f \Q$url->{url}\E 2> /dev/null`;
+   my $exitv = $? >> 8;
+
+   if ($exitv) {
+      $oob->reply_failure ($con, $node, 'not-found');
+   } else {
+      if (open OUT, ">oobdata/$file") {
+         print OUT $cont;
+         close OUT;
+         $file++;
+      } else {
+         warn "Couldn't write to oobdata/$file: $!\n";
+      }
+
+      $oob->reply_success ($con, $node);
+   }
+});
+
+$cl->reg_cb (
+   session_ready => sub {
+      my ($cl, $acc) = @_;
+      print "session ready, waiting...\n";
+   },
+   disconnect => sub {
+      my ($cl, $acc, $h, $p, $reas) = @_;
+      print "disconnect ($h:$p): $reas\n";
+   },
+   error => sub {
+      my ($cl, $acc, $err) = @_;
+      print "ERROR: " . $err->string . "\n";
+   },
+   message => sub {
+      my ($cl, $acc, $msg) = @_;
+      print "message from: " . $msg->from . ": " . $msg->any_body . "\n";
+      if ($msg->any_body =~ /^\s*send\s+(.+?)\s*$/) {
+         $oob->send_url (
+            $acc->connection, $msg->from, "http://localhost/$1", "This is file $1",
+            sub {
+               my ($e) = @_;
+               if ($e) {
+                  print "Couldn't send file to " . $msg->from . ": $e\n";
+               } else {
+                  print "Submitted file to " . $msg->from . "\n";
+               }
+            }
+         )
+      }
+   },
+   contact_request_subscribe => sub { # we are automatically subscribing!
+      my ($cl, $acc, $roster, $contact) = @_;
+      $contact->send_subscribe;
+      1
+   }
+);
+$cl->start;
+$j->wait;

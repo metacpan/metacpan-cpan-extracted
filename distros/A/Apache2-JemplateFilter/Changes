@@ -1,0 +1,9 @@
+Revision history for Apache2-JemplateFilter
+
+0.02    Mon May  1 16:57:52 JST 2006
+	- Added: tests. t/01-compile.t t/02-error.t
+	- Fixed: POD
+
+0.01    2006-04-13
+        First version, released on an unsuspecting world.
+

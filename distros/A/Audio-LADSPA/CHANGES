@@ -1,0 +1,101 @@
+0.021 - 
+ * LibraryLoader fix at 0.020 wasn't actually released. It's
+   in this release instead.
+
+0.020 -
+ * Testing if the path used to find plugins actually contains
+   readable directories should work better now.
+ * Added const char* to typemap, which may or may not fix the
+   problems building these modules on 5.6.x perls.
+
+0.019 -
+ * Fixed the tests - there was a dependency on a LADSPA plugin
+   that isn't part of the ladspa dev 
+
+0.018 -
+ * Networks are now subclasses of Class::Publisher instead of
+   Class::Observable.
+
+0.017 
+
+ * NOT RELEASED due to bugs in Class::Observable, see
+   http://rt.cpan.org/Public/Bug/Display.html?id=19507
+ * Audio::LADSPA::Network is now a subclass of Class::Observable 
+ * Added sample_rate and buffer_size methods to Audio::LADSPA::Network
+ * Audio::LADSPA will now only load the first version of any given
+   library it finds in $ENV{LADSPA_PATH}. (this used to throw a 
+   pretty useless exception).
+ * Upgraded ppport.h to the version shipped with perl 5.8.8
+
+0.016 -
+ Some changes to improve automatic builds and tests:
+ * Default build now skips tests if the SDK libraries can't be
+   found
+ * Default build skips playing audio if Audio::Play isn't 
+   installed
+ * Documentation updates.
+
+0.015 -
+ * Audio::LADSPA::Network now works with new (0.5) Graph module
+ * Removed user querying at end of tests so the tests can be run
+   without user intervention
+ * Some additions to Audio::LADSPA::UserGuide
+
+0.014 -
+ * Network now checks wether added plugins are already connected
+   (the documentation already claimed that it did)
+ * *_uniqid methods added (requires Data::Uniqid)
+ * Some documentation additions
+
+0.013 -
+ * Changes to the Audio::LADSPA documentation
+ * Audio::LADSPA->plugins now also returns any loaded
+   perl-based ladspa plugins
+
+0.012 -
+ * Fixed bug in Network code that would trip up Network->disconnect
+   2 times out of 3
+
+0.011 -
+ * added port2index method to plugins
+ * added connections method to Network
+ * added delete method to Network
+ * allowing connections from audio port to control port
+ * added documentation for all the port information methods,
+   slight other improvements to the documentation for
+   Audio::LADSPA::Plugin
+ * added Audio::LADSPA::Plugin::Sequencer4
+
+0.010 -
+ * Oops: added Scalar::Util to the prerequisites in the top-level 
+   Makefile.PL
+ * Now tested with gcc-2.95.4 20011002 (Debian prerelease)
+   this seems to catch the non-C'99 incompatibilities.
+ * Documentation fixes (mainly typos)
+
+0.009 -
+ * All dependencies are now declared in the top-level Makefile.PL
+   (should make CPAN a bit happier)
+ * Some bugs have been fixed
+ * Implemented a non-C'99 compatibility patch by Mike Castle.
+
+0.008 -
+ * Added Audio::LADSPA::UserGuide and expanded the documentation
+   in general.
+ * Added Audio::LADSPA::Plugin::Perl & Audio::LADSPA::Plugin::Play
+ * made Audio::LADSPA::Network a lot more usable.
+
+0.007 -
+ * Removed Port objects - access is now done via Plugin methods
+ * Made test rely in Audio::Play instead of Audio::Wav
+ 
+0.006 -
+ * Added simple buffer arithmatic
+ * Fixed some bugs
+ * Added simpler interface to buffer get/set methods 
+
+0.005 - 
+ * Initial release
+ * Tests make 'beep beep' sound :-)
+ 
+

@@ -1,0 +1,6 @@
+2011-04-17  Steffen Schwigon  <ss5@renormalist.net>
+
+	* v0.01 - first CPAN release
+
+	* based on TAP::Parser features available in the future 3.24
+	  release

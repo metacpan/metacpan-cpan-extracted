@@ -1,0 +1,72 @@
+# optionally source this file from .profile
+
+# path to the perl .git clone, see INSTALL
+alias perl-git='cd /usr/src/perl/blead/perl-git'
+#perl-git='c:/cygwin/usr/src/perl/blead/perl-git'
+
+# default Configure -Dprefix
+# PERLALL_PREFIX=/usr/local
+# where perl5* are expected (default: /usr/local/bin)
+# PERLALL_BINDIR=~/bin
+# default dir to build and tmp. install perls
+# PERLALL_BUILDROOT=/usr/src/perl
+# non-sudo:
+# PERLALL_PREFIX=~/perl5/
+# PERLALL_BUILDROOT=~/perl5/src
+# PERLALL_BINDIR=~/perl5/bin
+# perlbrew alike:
+# PERLALL_PREFIX=~/perl5/perlbrew
+# PERLALL_BUILDROOT=~/perl5/perlbrew/build
+# PERLALL_BINDIR=~/perl5/perlbrew/bin
+
+# use -thr suffix, if not use -nt for "non threaded"
+#usethrsuffix=0
+
+# 1h default. 0 for no timeout
+perlall_timeout=3600
+
+# currently used perl (set by perlall)
+alias p=perl5.15.8d-nt
+
+# for init
+#cpan=cpan
+#cpan=cpanm
+cpan=-MCPAN
+# Note: `cmd` is also expanded for init-modules
+init-modules=YAML DBI DBD::SQLite CPAN::SQLite Devel::Platform::Info \
+   Params::Util Bundle::CPANReporter2 \
+   IPC::Run B::Flags Opcodes Set::Object Math::Round Params::Classify Net::SSLeay IO::Socket::SSL \
+   Bundle::CygwinVendor YAML::XS DBIx::Class SQL::Abstract Module::Find Mouse \
+   MouseX::Types Task::Kensho
+
+# testvm settings taken from default perl (/usr/local/bin/perl, /usr/bin/perl)
+# and remote perlall. e.g. freebsd make=gmake
+# valid [user@]hostnames (manipulate your /etc/hosts)
+# must match the vm machine names if you want to control the vm.
+# all remote hosts, vm or physical.
+#testvm_all="centos4 centos5 centos6 freebsd7 freebsd8 openbsd49 win solaris"
+# when $HOME or File::HomeDir is not available. where are your modules on the vm's
+#testvm_prefix=Perl
+# kvm balancing:
+#testvm_max=6
+# So far only: virsh. TODO: xen-shell, vmrun, VBoXManage
+#testvm_ctl=virsh
+
+
+# just some suggestions
+alias m=make
+alias pb="p -Iblib/arch -Iblib/lib"
+alias pmf="if [ -f Makefile.PL ]; then p Makefile.PL; else rm -rf _build; p Build.PL; fi"
+alias pm='pmf && m'
+alias ppan='p -S cpan'
+alias jpan='ppan -j ~/.cpan/CPAN/nosqlite.pm'
+alias mt='make -j4 test'
+alias mtv='mt TEST_VERBOSE=1'
+alias mtee='mt 2>&1|tee log.test'
+alias smi='sudo make install'
+alias mi='mt && smi'
+#alias perldoc=cpandoc
+# set p alias from Makefile
+function ppm { p=$(perl -ane'print $F[2] if /^FULLPERL =/' Makefile); echo alias p=$p; test -n "$p" && alias p=$p; }
+alias pgrp='pgrep -fl perl'
+alias perlallkill='pkill t/release-testing.sh; pkill perlall; pkill perl'

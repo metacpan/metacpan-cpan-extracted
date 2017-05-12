@@ -1,0 +1,12 @@
+Revision history for Array-Ordered
+
+0.03    24-04-2013
+        Looking at the test results, it seems that some compilations of Perl
+        don't like anonymous subroutine references?
+
+0.02    09-04-2013
+        Cleaned up documentation.
+        Corrected author contact info.
+
+0.01    01-04-2013
+        First release

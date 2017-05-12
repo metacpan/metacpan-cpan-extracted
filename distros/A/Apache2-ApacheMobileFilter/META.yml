@@ -1,0 +1,41 @@
+---
+abstract: unknown
+author:
+  - 'Idel Fuschini (idel@idelfuschini.it)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache2-ApacheMobileFilter
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  APR::Table: '0'
+  Apache2::Connection: '0'
+  Apache2::Const: '0'
+  Apache2::Filter: '0'
+  Apache2::RequestRec: '0'
+  Apache2::RequestUtil: '0'
+  Apache2::SubRequest: '0'
+  CGI::Cookie: '0'
+  Cache::FileBackend: '0'
+  Cache::Memcached: '1.27'
+  Digest::MD5: '0'
+  File::Copy: '0'
+  IO::Uncompress::Gunzip: '0'
+  IO::Uncompress::Unzip: '0'
+  Image::Resize: '0'
+  Image::Scale: '0'
+  Imager: '0'
+  LWP::Protocol::https: '0'
+  LWP::Simple: '0'
+  POSIX: '0'
+version: '4.20'

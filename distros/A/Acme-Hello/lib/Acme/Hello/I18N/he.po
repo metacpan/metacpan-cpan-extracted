@@ -1,0 +1,21 @@
+# Hebrew messages for GNU Hello            -*- coding: hebrew-iso-8bit -*-
+# Copyright (C) 2002 Free Software Foundation, Inc.
+# Eli Zaretskii <eliz@is.elta.co.il>, 2002.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: hello 2.0.50\n"
+"POT-Creation-Date: 2002-05-22 19:23+0200\n"
+"PO-Revision-Date: 2002-02-02 21:35+0200\n"
+"Last-Translator: Eli Zaretskii <eliz@gnu.org>\n"
+"Language-Team: Hebrew <eliz@gnu.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "hello, world\n"
+msgstr "!םלועה לכל םולש\n"
+
+msgid "Hello, world!"
+msgstr "!םלועה לכל םולש"
+

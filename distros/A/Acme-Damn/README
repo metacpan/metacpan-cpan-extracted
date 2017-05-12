@@ -1,0 +1,96 @@
+NAME
+    Acme::Damn - 'Unbless' Perl objects.
+
+SYNOPSIS
+      use Acme::Damn;
+
+      my $ref = ... some reference ...
+      my $obj = bless $ref , 'Some::Class';
+  
+      ... do something with your object ...
+
+         $ref = damn $obj;   # recover the original reference (unblessed)
+
+      ... neither $ref nor $obj are Some::Class objects ...
+
+INSTALLATION
+    To install this module type the following:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    Acme::Damn uses XS to access the internals of Perl for it's magic, and
+    therefore must be compiled to be installed. Also, for testing,
+    Acme::Damn relies on Test::More and Test::Exception.
+
+DESCRIPTION
+    Acme::Damn provides a single routine, damn(), which takes a blessed
+    reference (a Perl object), and *unblesses* it, to return the original
+    reference.
+
+  EXPORT
+    By default, Acme::Damn exports the method damn() into the current
+    namespace. Aliases for damn() (see below) may be imported upon request.
+
+  Methods
+    damn *object*
+        damn() accepts a single blessed reference as its argument, and
+        returns that reference unblessed. If *object* is not a blessed
+        reference, then damn() will "die" with an error.
+
+    bless *reference*
+    bless *reference* [ , *package* ]
+    bless *reference* [ , undef ]
+        Optionally, Acme::Damn will modify the behaviour of "bless" to allow
+        the passing of an explicit "undef" as the target package to invoke
+        damn():
+
+            use Acme::Damn  qw( bless );
+
+            my  $obj = ... some blessed reference ...;
+
+            # the following statements are equivalent
+            my  $ref = bless $obj , undef;
+            my  $ref = damn $obj;
+
+        NOTE: The modification of "bless" is lexically scoped to the current
+        package, and is *not* global.
+
+  Method Aliases
+    Not everyone likes to damn the same way or in the same language, so
+    Acme::Damn offers the ability to specify any alias on import, provided
+    that alias is a valid Perl subroutine name (i.e. all characters match
+    "\w").
+
+      use Acme::Damn qw( unbless );
+      use Acme::Damn qw( foo );
+      use Acme::Damn qw( unblessthyself );
+      use Acme::Damn qw( recant );
+
+    Version 0.02 supported a defined list of aliases, and this has been
+    replaced in v0.03 by the ability to import any alias for "damn()".
+
+WARNING
+    Just as "bless" doesn't call an object's initialisation code, "damn"
+    doesn't invoke an object's "DESTROY" method. For objects that need to be
+    "DESTROY"ed, either don't "damn" them, or call "DESTROY" before
+    judgement is passed.
+
+ACKNOWLEDGEMENTS
+    Thanks to Claes Jacobsson <claesjac@cpan.org> for suggesting the use of
+    aliases, and Bo Lindbergh <blgl@cpan.org> for the suggested modification
+    of "bless".
+
+SEE ALSO
+    bless, perlboot, perltoot, perltooc, perlbot, perlobj.
+
+AUTHOR
+    Ian Brayshaw, <ibb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2003-2016 Ian Brayshaw
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

@@ -1,0 +1,1703 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+
+<title>Contacts</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<style type="text/css" title="currentStyle">
+	@import "<: $demo_page_css_url :>";
+	@import "<: $demo_table_css_url :>";
+</style>
+
+<link rel="stylesheet" type="text/css" href="<: $fancy_table_css_url :>">
+<link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.min.css">
+<link rel="stylesheet" type="text/css" href="<: $homepage_css_url :>">
+
+<style type="text/css">
+.no-close .ui-dialog-titlebar-close
+{
+	display: none;
+}
+</style>
+
+</head>
+<body>
+
+<h3 class="blue_centered">Contacts</h3>
+
+<div class="centered" id="status_div">Status: OK</div>
+
+<div id="global_tab_div" style="visibility:hidden">
+    <ol>
+        <li><a href="#global_search_tab"><span>Search</span></a></li>
+        <li><a href="#global_update_tab"><span>Update</span></a></li>
+        <li><a href="#global_add_tab"><span>Add</span></a></li>
+        <li><a href="#global_report_tab"><span>Reports</span></a></li>
+        <li><a href="#global_error_tab"><span>Errors</span></a></li>
+        <li><a href="#global_about_tab"><span>About</span></a></li>
+    </ol>
+    <div id="global_search_tab"><: $html4search :></div>
+    <div id="global_update_tab">
+		<div id="update_tab_div">
+		    <ol>
+		        <li><a href="#update_person_tab"><span>Person</span></a></li>
+		        <li><a href="#update_org_tab"><span>Organization</span></a></li>
+		    </ol>
+		    <div id="update_person_tab">Search for, and then select, a person to begin updating</div>
+		    <div id="update_org_tab">Search for, and then select, an organization to begin updating</div>
+		</div>
+	</div>
+    <div id="global_add_tab">
+		<div id="add_tab_div">
+		    <ol>
+		        <li><a href="#add_person_tab"><span>Add person</span></a></li>
+		        <li><a href="#add_org_tab"><span>Add organization</span></a></li>
+		    </ol>
+		    <div id="add_person_tab"><: $html4add_person :></div>
+		    <div id="add_org_tab"><: $html4add_organization :></div>
+		</div>
+	</div>
+    <div id="global_report_tab"><: $html4report :></div>
+    <div id="global_error_tab"><: $html4error :></div>
+    <div id="global_about_tab"><: $html4about :></div>
+</div>
+
+<div id="confirm_delete" style="display: none" title="Confirm Delete">Really delete this record and all associated records?</div>
+
+</body>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script type="text/javascript">$.uiBackCompat = false;</script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js"></script>
+<script type="text/javascript" src="<: $datatable_js_url :>"></script>
+
+<script type="text/javascript">
+
+var add_tab_div;
+var global_tab_div;
+var update_tab_div;
+
+function add_occ()
+{
+	var occ_title = $("#add_occ_occ_title").val();
+	var org_name  = $("#add_occ_org_name").val();
+
+	if ( (occ_title == "") || (org_name == "") )
+	{
+		$("#add_occ_occ_title").focus();
+
+		return;
+	}
+
+	$.ajax
+	({
+		data:
+		{
+			occupation_title:  occ_title,
+			organization_name: org_name,
+			person_id:         $("#update_person_id").val(),
+			sid:               $("#update_person_sid").val(),
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Occupation/add_occupation",
+		success: function(response, status, jqXHR)
+		{
+			// Step 1: Check for errors.
+
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			// Step 2: Display updated occupation list.
+
+			$("#occ_list_div")
+			.empty()
+			.append(html);
+
+			$("#status_div").val("Status: Added occupation");
+			$("#add_occ_org_name").val("").focus();
+			$("#add_occ_occ_title").val("");
+
+			// Step 3: Check to see if the organization which was added
+			// as an employer is currently displayed.
+			// If they are visible, their list of staff must be updated.
+
+			var visible_org_id = $("#update_org_id").val();
+
+			if (visible_org_id == null)
+			{
+				return;
+			}
+
+			var ajax_org_id = $xml.find("org_id").text();
+
+			if (visible_org_id == ajax_org_id)
+			{
+				update_staff(org_name, visible_org_id, $("#occ_sid").val() );
+			}
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot add " + occ_title, "HTTP error: " + error);
+		}
+	});
+}
+
+function add_org()
+{
+	$.ajax
+	({
+		data:
+		{
+			communication_type_id:   $("#add_org_communication_type_id").val(),
+			email_address_1:         $("#add_org_email_address_1").val(),
+			email_address_2:         $("#add_org_email_address_2").val(),
+			email_address_3:         $("#add_org_email_address_3").val(),
+			email_address_4:         $("#add_org_email_address_4").val(),
+			email_address_type_id_1: $("#add_org_email_address_type_id_1").val(),
+			email_address_type_id_2: $("#add_org_email_address_type_id_2").val(),
+			email_address_type_id_3: $("#add_org_email_address_type_id_3").val(),
+			email_address_type_id_4: $("#add_org_email_address_type_id_4").val(),
+			facebook_tag:            $("#add_org_facebook_tag").val(),
+			homepage:                $("#add_org_homepage").val(),
+			id:                      $("#add_org_id").val(),
+			name:                    $("#add_org_name").val(),
+			phone_number_1:          $("#add_org_phone_number_1").val(),
+			phone_number_2:          $("#add_org_phone_number_2").val(),
+			phone_number_3:          $("#add_org_phone_number_3").val(),
+			phone_number_4:          $("#add_org_phone_number_4").val(),
+			phone_number_type_id_1:  $("#add_org_phone_number_type_id_1").val(),
+			phone_number_type_id_2:  $("#add_org_phone_number_type_id_2").val(),
+			phone_number_type_id_3:  $("#add_org_phone_number_type_id_3").val(),
+			phone_number_type_id_4:  $("#add_org_phone_number_type_id_4").val(),
+			role_id:                 $("#add_org_role_id").val(),
+			sid:                     $("#add_org_sid").val(),
+			twitter_tag:             $("#add_org_twitter_tag").val(),
+			visibility_id:           $("#add_org_visibility_id").val()
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Organization/add",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			$("#status_div").val(html);
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot add " + $("#add_org_name").val(), "HTTP error: " + error);
+		}
+	});
+}
+
+function add_org_note()
+{
+	var body = $("#org_note").val();
+
+	if (body == "")
+	{
+		$("#org_note").focus();
+
+		return;
+	}
+
+	$.ajax
+	({
+		data:
+		{
+			body:        body,
+			entity_id:   $("#update_org_id").val(),
+			entity_type: "organizations", // Must use name of table.
+			sid:         $("#update_org_sid").val()
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Note/add",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			$("#org_note_list_div")
+			.empty()
+			.append(html);
+
+			$("#org_note")
+			.val("")
+			.focus();
+
+			$("#status_div").val("Status: Added note");
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot add note", "HTTP error: " + error);
+		}
+	});
+}
+
+function add_person()
+{
+	var name = generate_add_persons_name();
+
+	$.ajax
+	({
+		data:
+		{
+			communication_type_id:   $("#add_person_communication_type_id").val(),
+			email_address_1:         $("#add_person_email_address_1").val(),
+			email_address_2:         $("#add_person_email_address_2").val(),
+			email_address_3:         $("#add_person_email_address_3").val(),
+			email_address_4:         $("#add_person_email_address_4").val(),
+			email_address_type_id_1: $("#add_person_email_address_type_id_1").val(),
+			email_address_type_id_2: $("#add_person_email_address_type_id_2").val(),
+			email_address_type_id_3: $("#add_person_email_address_type_id_3").val(),
+			email_address_type_id_4: $("#add_person_email_address_type_id_4").val(),
+			facebook_tag:            $("#add_person_facebook_tag").val(),
+			gender_id:               $("#add_person_gender_id").val(),
+			given_names:             $("#add_person_given_names").val(),
+			homepage:                $("#add_person_homepage").val(),
+			id:                      $("#add_person_id").val(),
+			name:                    name,
+			phone_number_1:          $("#add_person_phone_number_1").val(),
+			phone_number_2:          $("#add_person_phone_number_2").val(),
+			phone_number_3:          $("#add_person_phone_number_3").val(),
+			phone_number_4:          $("#add_person_phone_number_4").val(),
+			phone_number_type_id_1:  $("#add_person_phone_number_type_id_1").val(),
+			phone_number_type_id_2:  $("#add_person_phone_number_type_id_2").val(),
+			phone_number_type_id_3:  $("#add_person_phone_number_type_id_3").val(),
+			phone_number_type_id_4:  $("#add_person_phone_number_type_id_4").val(),
+			preferred_name:          $("#add_person_preferred_name").val(),
+			role_id:                 $("#add_person_role_id").val(),
+			sid:                     $("#add_person_sid").val(),
+			surname:                 $("#add_person_surname").val(),
+			title_id:                $("#add_person_title_id").val(),
+			twitter_tag:             $("#add_person_twitter_tag").val(),
+			visibility_id:           $("#add_person_visibility_id").val()
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Person/add",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			$("#status_div").val(html);
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot add " + name, "HTTP error: " + error);
+		}
+	});
+}
+
+function add_person_note()
+{
+	var body = $("#person_note").val();
+
+	if (body == "")
+	{
+		$("#person_note").focus();
+
+		return;
+	}
+
+	$.ajax
+	({
+		data:
+		{
+			body:        body,
+			entity_id:   $("#update_person_id").val(),
+			entity_type: "people", // Must use name of table.
+			sid:         $("#update_person_sid").val()
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Note/add",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			$("#person_note_list_div")
+			.empty()
+			.append(html);
+
+			$("#person_note")
+			.val("")
+			.focus();
+
+			$("#status_div").val("Status: Added note");
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot add note", "HTTP error: " + error);
+		}
+	});
+}
+
+function add_staff()
+{
+	var occ_title   = $("#add_staff_occ_title").val();
+	var person_name = $("#add_staff_person_name").val();
+
+	if ( (occ_title == "") || (person_name == "") )
+	{
+		$("#add_staff_person_name").focus();
+
+		return;
+	}
+
+	$.ajax
+	({
+		data:
+		{
+			occupation_title: occ_title,
+			organization_id:  $("#update_org_id").val(),
+			person_name:      person_name,
+			sid:              $("#update_org_sid").val()
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Occupation/add_staff",
+		success: function(response, status, jqXHR)
+		{
+			// Step 1: Check for errors.
+
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			// Step 2: Display updated staff list.
+
+			$("#staff_list_div")
+			.empty()
+			.append(html);
+
+			$("#status_div").val("Status: Added staff member");
+			$("#add_staff_person_name").val("").focus();
+			$("#add_staff_occ_title").val("");
+
+			// Step 3: Check to see if the person who was added
+			// to the staff is currently displayed.
+			// If they are visible, their list of occupations must be updated.
+
+			var visible_person_id = $("#update_person_id").val();
+
+			if (visible_person_id == null)
+			{
+				return;
+			}
+
+			var ajax_person_id = $xml.find("person_id").text();
+
+			if (visible_person_id == ajax_person_id)
+			{
+				update_occupations(person_name, visible_person_id, $("#staff_sid").val() );
+			}
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot add " + person_name, "HTTP error: " + error);
+		}
+	});
+}
+
+function delete_occupation(person_name, person_id, organization_id, occupation_id)
+{
+	$("#confirm_delete")
+	.empty()
+	.append("Really delete occupation for " + $("#update_person_name").val() + "?")
+	.dialog
+	({
+		buttons:
+		{
+			Yes: function()
+				{
+					delete_persons_occupation(person_name, person_id, organization_id, occupation_id);
+
+					$(this).dialog("close");
+				},
+			No: function()
+				{
+					$(this).dialog("close");
+				}
+		},
+		dialogClass: "no-close",
+		modal: true
+	});
+}
+
+function delete_org()
+{
+	var name = $("#update_org_name").val();
+	var sid  = $("#update_org_sid").val();
+
+	$.ajax
+	({
+		data:
+		{
+			organization_id: $("#update_org_id").val(),
+			name:            name,
+			sid:             sid
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Organization/delete",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			$("#status_div").val("Status: Deleted " + name);
+
+			// Next, update the occupation list of the displayed person, if any,
+			// and if this organization did indeed employ that person.
+			// Actually we update the occ list without checking for the org explicitly.
+
+			var visible_person_id = $("#update_person_id").val();
+
+			if (visible_person_id != null)
+			{
+				update_occupations($("#update_person_name").val(), visible_person_id, sid);
+			}
+
+			// Lastly, update the search results to remove the deleted organization.
+
+			search();
+
+			// Set focus to Search tab's search_name field.
+
+			global_tab_div.tabs("option", "active", 0);
+			setTimeout(function(){$("#search_name").focus();}, 10);
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot delete organization", "HTTP error: " + error);
+		}
+	});
+}
+
+function delete_org_note(note_id)
+{
+	$("#confirm_delete")
+	.empty()
+	.append("Really delete note for " + $("#update_org_name").val() + "?")
+	.dialog
+	({
+		buttons:
+		{
+			Yes: function()
+				{
+					delete_orgs_note(note_id);
+
+					$(this).dialog("close");
+				},
+			No: function()
+				{
+					$(this).dialog("close");
+				}
+		},
+		dialogClass: "no-close",
+		modal: true
+	});
+}
+
+function delete_orgs_note(note_id)
+{
+	$.ajax
+	({
+		data:
+		{
+
+			entity_id:   $("#update_org_id").val(),
+			entity_type: "organizations", // Must use name of table.
+			note_id:     note_id,
+			sid:         $("#update_org_sid").val()
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Note/delete",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			$("#org_note_list_div")
+			.empty()
+			.append(html);
+
+			$("#org_note")
+			.val("")
+			.focus();
+
+			$("#status_div").val("Status: Deleted note");
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot delete person", "HTTP error: " + error);
+		}
+	});
+}
+
+function delete_person()
+{
+	var sid = $("#update_person_sid").val();
+	var name = generate_update_persons_name();
+
+	$.ajax
+	({
+		data:
+		{
+			given_names: $("#update_person_given_names").val(),
+			name:        name,
+			person_id:   $("#update_person_id").val(),
+			sid:         sid,
+			surname:     $("#update_person_surname").val(),
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Person/delete",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			$("#status_div").val("Status: Deleted " + name);
+
+			// Next, update the staff list of the displayed org, if any,
+			// and if this person was indeed a member of their staff.
+			// Actually we update the staff list without checking for the person explicitly.
+
+			var visible_org_id = $("#update_org_id").val();
+
+			if (visible_org_id != null)
+			{
+				update_staff($("#update_org_name").val(), visible_org_id, sid);
+			}
+
+			// Lastly, update the search results to remove the deleted person.
+
+			search();
+
+			// Set focus to Search tab's search_name field.
+
+			global_tab_div.tabs("option", "active", 0);
+			setTimeout(function(){$("#search_name").focus();}, 10);
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot delete person", "HTTP error: " + error);
+		}
+	});
+}
+
+function delete_person_from_staff(person_name, person_id, organization_id, occupation_id)
+{
+	$.ajax
+	({
+		data:
+		{
+			occupation_id:   occupation_id,
+			organization_id: organization_id,
+			person_id:       person_id,
+			sid:             $("#staff_sid").val()
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Occupation/delete_staff",
+		success: function(response, status, jqXHR)
+		{
+			// Step 1: Check for errors.
+
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			// Step 2: Display updated staff list.
+
+			$("#staff_list_div")
+			.empty()
+			.append(html);
+
+			$("#status_div").val("Status: Deleted staff member");
+
+			// Step 3: Check to see if the person who was deleted
+			// from the staff is currently displayed.
+			// If they are visible, their list of occupations must be updated.
+
+			var visible_person_id = $("#update_person_id").val();
+
+			if (visible_person_id == null)
+			{
+				return;
+			}
+
+			var ajax_person_id = $xml.find("person_id").text();
+
+			if (visible_person_id == ajax_person_id)
+			{
+				update_occupations(person_name, visible_person_id, $("#staff_sid").val() );
+			}
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot delete occupation for " + person_name, "HTTP error: " + error);
+		}
+	});
+}
+
+function delete_person_note(note_id)
+{
+	$("#confirm_delete")
+	.empty()
+	.append("Really delete note for " + $("#update_person_name").val() + "?")
+	.dialog
+	({
+		buttons:
+		{
+			Yes: function()
+				{
+					delete_persons_note(note_id);
+
+					$(this).dialog("close");
+				},
+			No: function()
+				{
+					$(this).dialog("close");
+				}
+		},
+		dialogClass: "no-close",
+		modal: true
+	});
+}
+
+function delete_persons_occupation(person_name, person_id, organization_id, occupation_id)
+{
+	var sid = $("#occ_sid").val();
+
+	$.ajax
+	({
+		data:
+		{
+			occupation_id:   occupation_id,
+			organization_id: organization_id,
+			person_id:       person_id,
+			sid:             sid
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Occupation/delete_occupation",
+		success: function(response, status, jqXHR)
+		{
+			// Step 1: Check for errors.
+
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			// Step 2: Display updated occupation list.
+
+			$("#occ_list_div")
+			.empty()
+			.append(html);
+
+			$("#status_div").val("Status: Deleted occupation");
+
+			// Step 3: Check to see if the organization which was deleted
+			// as an employer is currently displayed.
+			// If they are visible, their list of staff must be updated.
+
+			var visible_org_id = $("#update_org_id").val();
+
+			if (visible_org_id == null)
+			{
+				return;
+			}
+
+			var ajax_org_id = $xml.find("org_id").text();
+
+			if (visible_org_id == ajax_org_id)
+			{
+				update_staff($("#update_org_name").val(), visible_org_id, sid);
+			}
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot delete occupation for " + person_name, "HTTP error: " + error);
+		}
+	});
+}
+
+function delete_persons_note(note_id)
+{
+	$.ajax
+	({
+		data:
+		{
+
+			entity_id:   $("#update_person_id").val(),
+			entity_type: "people", // Must use name of table.
+			note_id:     note_id,
+			sid:         $("#update_person_sid").val()
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Note/delete",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			$("#person_note_list_div")
+			.empty()
+			.append(html);
+
+			$("#person_note")
+			.val("")
+			.focus();
+
+			$("#status_div").val("Status: Deleted note");
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot delete person", "HTTP error: " + error);
+		}
+	});
+}
+
+function delete_staff(person_name, person_id, organization_id, occupation_id)
+{
+	$("#confirm_delete")
+	.empty()
+	.append("Really delete staff member " + person_name + "?")
+	.dialog
+	({
+		buttons:
+		{
+			Yes: function()
+				{
+					delete_person_from_staff(person_name, person_id, organization_id, occupation_id);
+
+					$(this).dialog("close");
+				},
+			No: function()
+				{
+					$(this).dialog("close");
+				}
+		},
+		dialogClass: "no-close",
+		modal: true
+	});
+}
+
+function display_organization(org_id, sid)
+{
+	$.ajax
+	({
+		data:
+		{
+			organization_id: org_id,
+			sid:             sid
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Organization/display",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			status_ok();
+
+			$("#update_org_tab").empty().append(html);
+			$("#add_staff_button, #add_org_note_button, #delete_org_button, #update_org_button").button();
+			$("#update_org_div").tabs
+			({
+				beforeActivate: function(event, tab)
+				{
+					switch (tab.index)
+					{
+						case 0: // Update org tab.
+							setTimeout(function(){$("#update_org_name").focus();}, 10);
+							break;
+						case 1: // Add staff tab.
+							setTimeout(function(){$("#add_staff_person_name").focus();}, 10);
+							break;
+						case 2: // Add note tab.
+							setTimeout(function(){$("#org_note").focus();}, 10);
+							break;
+					}
+				}
+			});
+			global_tab_div.tabs("option", "active", 1); // Update tab within global tabs.
+			update_tab_div.tabs("option", "active", 1); // Organization tab within Update tab.
+
+			// These 2 functions don't work if included globally.
+			// They must follow after the 'response' is inserted into the DOM.
+
+			$(function()
+			{
+				$("#add_staff_occ_title").autocomplete
+				({
+					source: "/AutoComplete?type=occ_title&sid=" + $("#update_org_sid").val(),
+					minLength: 2,
+					select: function(event, ui)
+					{
+						$("#add_staff_occ_title").val(ui.item ? ui.item.value : "-");
+					}
+				});
+			});
+
+			$(function()
+			{
+				$("#add_staff_person_name").autocomplete
+				({
+					source: "/AutoComplete?type=person_name&sid=" + $("#update_org_sid").val(),
+					minLength: 2,
+					select: function(event, ui)
+					{
+						$("#add_staff_person_name").val(ui.item ? ui.item.value : "-");
+					}
+				});
+			});
+
+			$("#add_org_note_button").click(function(e)
+			{
+				add_org_note();
+			});
+
+			$("#add_staff_button").click(function(e)
+			{
+				add_staff();
+			});
+
+			$("#delete_org_button").click(function(e)
+			{
+				$("#confirm_delete")
+				.empty()
+				.append("Really delete " + $("#update_org_name").val() + "?")
+				.dialog
+				({
+					buttons:
+					{
+						Yes: function()
+							{
+								delete_org();
+
+								$(this).dialog("close");
+							},
+						No: function()
+							{
+								$(this).dialog("close");
+							}
+					},
+					dialogClass: "no-close",
+					modal: true
+				});
+			});
+
+			$("#update_org_button").click(function(e)
+			{
+				update_org();
+			});
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot display organization", "HTTP error: " + error);
+		}
+	});
+}
+
+function display_person(person_id, sid)
+{
+	$.ajax
+	({
+		data:
+		{
+			person_id: person_id,
+			sid:       sid
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Person/display",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			status_ok();
+
+			$("#update_person_tab").empty().append(html);
+			$("#add_occ_button, #add_person_note_button, #delete_person_button, #update_person_button").button();
+			$("#update_person_div").tabs
+			({
+				beforeActivate: function(event, tab)
+				{
+					switch (tab.index)
+					{
+						case 0: // Update person tab.
+							setTimeout(function(){$("#update_person_given_names").focus();}, 10);
+							break;
+						case 1: // Add occ tab.
+							setTimeout(function(){$("#add_occ_org_name").focus();}, 10);
+							break;
+						case 2: // Add note tab.
+							setTimeout(function(){$("#person_note").focus();}, 10);
+							break;
+					}
+				}
+			});
+			global_tab_div.tabs("option", "active", 1); // Update tab within global tabs.
+			update_tab_div.tabs("option", "active", 0); // Person tab within Update tab.
+
+			// These 2 functions don't work if included globally.
+			// They must follow after the 'response' is inserted into the DOM.
+
+			$(function()
+			{
+				$("#add_occ_occ_title").autocomplete
+				({
+					source: "/AutoComplete?type=occ_title&sid=" + $("#update_person_sid").val(),
+					minLength: 2,
+					select: function(event, ui)
+					{
+						$("#add_occ_occ_title").val(ui.item ? ui.item.value : "-");
+					}
+				});
+			});
+
+			$(function()
+			{
+				$("#add_occ_org_name").autocomplete
+				({
+					source: "/AutoComplete?type=org_name&sid=" + $("#update_person_sid").val(),
+					minLength: 2,
+					select: function(event, ui)
+					{
+						$("#add_occ_org_name").val(ui.item ? ui.item.value : "-");
+					}
+				});
+			});
+
+			$("#add_occ_button").click(function(e)
+			{
+				add_occ();
+			});
+
+			$("#add_person_note_button").click(function(e)
+			{
+				add_person_note();
+			});
+
+			$("#delete_person_button").click(function(e)
+			{
+				$("#confirm_delete")
+				.empty()
+				.append("Really delete " + generate_update_persons_name() + "?")
+				.dialog
+				({
+					buttons:
+					{
+						Yes: function()
+							{
+								delete_person();
+
+								$(this).dialog("close");
+							},
+						No: function()
+							{
+								$(this).dialog("close");
+
+								return;
+							}
+					},
+					dialogClass: "no-close",
+					modal: true
+				});
+			});
+
+			$("#update_person_button").click(function(e)
+			{
+				update_person();
+			});
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot display person", "HTTP error: " + error);
+		}
+	});
+}
+
+function generate_add_persons_name()
+{
+	return $("#add_person_given_names").val() + " " + $("#add_person_surname").val();
+}
+
+function generate_report()
+{
+	$.ajax
+	({
+		data:
+		{
+			communication_type_id:     $("#report_communication_type_id").val(),
+			gender_id:                 $("#report_gender_id").val(),
+			ignore_communication_type: $("#ignore_communication_type").val(),
+			ignore_gender:             $("#ignore_gender").val(),
+			ignore_role:               $("#ignore_role").val(),
+			ignore_visibility:         $("#ignore_visibility").val(),
+			report_entity_id:          $("#report_entity_id").val(),
+			report_id:                 $("#report_id").val(),
+			role_id:                   $("#report_role_id").val(),
+			sid:                       $("#report_sid").val(),
+			visibility_id:             $("#report_visibility_id").val()
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Report/display",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			status_ok();
+
+			$("#report_result")
+			.empty()
+			.append(html);
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot generate report", "HTTP error: " + error);
+		}
+	});
+}
+
+function generate_update_persons_name()
+{
+	return $("#update_person_given_names").val() + " " + $("#update_person_surname").val();
+}
+
+function search()
+{
+	$.ajax
+	({
+		data:
+		{
+			search_name: $("#search_name").val(),
+			sid:         $("#search_sid").val()
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Search",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			status_ok();
+
+			$("#search_result_div")
+			.empty()
+			.append(html);
+
+			// Turn the HTML table of search results into a DataTables
+			// entity, in case it is a very long list of results.
+
+			$("#result_table").dataTable();
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot perform search", "HTTP error: " + error);
+		}
+	});
+}
+
+function status_error(message, text)
+{
+	$("#status_div")
+	.empty()
+	.append(message)
+	.addClass("error");
+
+	$("#global_error_tab")
+	.empty()
+	.append("<p align='center'>" + text + "</p>");
+
+	global_tab_div.tabs("option", "activate", 4); // Error tab.
+}
+
+function status_ok()
+{
+	$("#status_div")
+	.empty()
+	.append("Status: OK")
+	.removeClass("error");
+}
+
+function update_occupations(person_name, person_id, sid)
+{
+	$.ajax
+	({
+		data:
+		{
+			person_id: person_id,
+			sid:       sid
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Person/get_occupations",
+		success: function(response, status, jqXHR)
+		{
+			// Step 1: Check for errors.
+
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			// Step 2: Display updated occupation list.
+
+			$("#occ_list_div")
+			.empty()
+			.append(html);
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot update occupations for "+ person_name, "HTTP error: " + error);
+		}
+	});
+}
+
+function update_org()
+{
+	var name = $("#update_org_name").val();
+
+	$.ajax
+	({
+		data:
+		{
+			communication_type_id:   $("#update_org_communication_type_id").val(),
+			email_address_1:         $("#update_org_email_address_1").val(),
+			email_address_2:         $("#update_org_email_address_2").val(),
+			email_address_3:         $("#update_org_email_address_3").val(),
+			email_address_4:         $("#update_org_email_address_4").val(),
+			email_address_type_id_1: $("#update_org_email_address_type_id_1").val(),
+			email_address_type_id_2: $("#update_org_email_address_type_id_2").val(),
+			email_address_type_id_3: $("#update_org_email_address_type_id_3").val(),
+			email_address_type_id_4: $("#update_org_email_address_type_id_4").val(),
+			facebook_tag:            $("#update_org_facebook_tag").val(),
+			homepage:                $("#update_org_homepage").val(),
+			name:                    name,
+			organization_id:         $("#update_org_id").val(),
+			phone_number_1:          $("#update_org_phone_number_1").val(),
+			phone_number_2:          $("#update_org_phone_number_2").val(),
+			phone_number_3:          $("#update_org_phone_number_3").val(),
+			phone_number_4:          $("#update_org_phone_number_4").val(),
+			phone_number_type_id_1:  $("#update_org_phone_number_type_id_1").val(),
+			phone_number_type_id_2:  $("#update_org_phone_number_type_id_2").val(),
+			phone_number_type_id_3:  $("#update_org_phone_number_type_id_3").val(),
+			phone_number_type_id_4:  $("#update_org_phone_number_type_id_4").val(),
+			role_id:                 $("#update_org_role_id").val(),
+			sid:                     $("#update_org_sid").val(),
+			twitter_tag:             $("#update_org_twitter_tag").val(),
+			visibility_id:           $("#update_org_visibility_id").val()
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Organization/update",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			$("#status_div").val("Status: Updated " + name);
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot update "+ name, "HTTP error: " + error);
+		}
+	});
+}
+
+function update_org_note(count, note_id)
+{
+	// Convert from my counter (1, ...) to jQuery's (0, ...).
+
+	count--;
+
+	var target_id = "org_note_" + note_id;
+	var body      = $("#org_note_list_div")
+					.find("textarea")
+					.map(function(index)
+					{
+						// Warning: this.val() is not the same as $(this).val().
+						// Also, under Chrome, 'Call stack exceeded' can happen
+						// with either (I forget) this.text() or this.val().
+
+						return index == count ? this : null;
+					});
+
+	// Search failed. This should never happen. There should always be exactly 1.
+
+	if (body.length == 0)
+	{
+		return;
+	}
+
+	$.ajax
+	({
+		data:
+		{
+			body:        body.val(),
+			entity_id:   $("#update_org_id").val(),
+			entity_type: "organizations", // Must use name of table.
+			note_id:     note_id,
+			sid:         $("#update_org_sid").val()
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Note/update",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			$("#org_note_list_div")
+			.empty()
+			.append(html);
+
+			$("#org_note")
+			.val("")
+			.focus();
+
+			$("#org_note_text").val("");
+
+			$("#status_div").val("Status: Updated note");
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot update note", "HTTP error: " + error);
+		}
+	});
+}
+
+function update_person()
+{
+	var name = generate_update_persons_name();
+
+	$.ajax
+	({
+		data:
+		{
+			communication_type_id:   $("#update_person_communication_type_id").val(),
+			email_address_1:         $("#update_person_email_address_1").val(),
+			email_address_2:         $("#update_person_email_address_2").val(),
+			email_address_3:         $("#update_person_email_address_3").val(),
+			email_address_4:         $("#update_person_email_address_4").val(),
+			email_address_type_id_1: $("#update_person_email_address_type_id_1").val(),
+			email_address_type_id_2: $("#update_person_email_address_type_id_2").val(),
+			email_address_type_id_3: $("#update_person_email_address_type_id_3").val(),
+			email_address_type_id_4: $("#update_person_email_address_type_id_4").val(),
+			facebook_tag:            $("#update_person_facebook_tag").val(),
+			gender_id:               $("#update_person_gender_id").val(),
+			given_names:             $("#update_person_given_names").val(),
+			homepage:                $("#update_person_homepage").val(),
+			name:                    name,
+			person_id:               $("#update_person_id").val(),
+			phone_number_1:          $("#update_person_phone_number_1").val(),
+			phone_number_2:          $("#update_person_phone_number_2").val(),
+			phone_number_3:          $("#update_person_phone_number_3").val(),
+			phone_number_4:          $("#update_person_phone_number_4").val(),
+			phone_number_type_id_1:  $("#update_person_phone_number_type_id_1").val(),
+			phone_number_type_id_2:  $("#update_person_phone_number_type_id_2").val(),
+			phone_number_type_id_3:  $("#update_person_phone_number_type_id_3").val(),
+			phone_number_type_id_4:  $("#update_person_phone_number_type_id_4").val(),
+			preferred_name:          $("#update_person_preferred_name").val(),
+			role_id:                 $("#update_person_role_id").val(),
+			sid:                     $("#update_person_sid").val(),
+			surname:                 $("#update_person_surname").val(),
+			title_id:                $("#update_person_title_id").val(),
+			twitter_tag:             $("#update_person_twitter_tag").val(),
+			visibility_id:           $("#update_person_visibility_id").val()
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Person/update",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			$("#status_div").val("Status: Updated " + name);
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot update "+ name, "HTTP error: " + error);
+		}
+	});
+}
+
+function update_person_note(count, note_id)
+{
+	// Convert from my counter (1, ...) to jQuery's (0, ...).
+
+	count--;
+
+	var target_id = "person_note_" + note_id;
+	var body      = $("#person_note_list_div")
+					.find("textarea")
+					.map(function(index)
+					{
+						// Warning: this.val() is not the same as $(this).val().
+						// Also, under Chrome, 'Call stack exceeded' can happen
+						// with either (I forget) this.text() or this.val().
+
+						return index == count ? this : null;
+					});
+
+	// Search failed. This should never happen. There should always be exactly 1.
+
+	if (body.length == 0)
+	{
+		return;
+	}
+
+	$.ajax
+	({
+		data:
+		{
+			body:        body.val(),
+			entity_id:   $("#update_person_id").val(),
+			entity_type: "people", // Must use name of table.
+			note_id:     note_id,
+			sid:         $("#update_person_sid").val()
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Note/update",
+		success: function(response, status, jqXHR)
+		{
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			$("#person_note_list_div")
+			.empty()
+			.append(html);
+
+			$("#person_note")
+			.val("")
+			.focus();
+
+			$("#person_note_text").val("");
+
+			$("#status_div").val("Status: Updated note");
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot update note", "HTTP error: " + error);
+		}
+	});
+}
+
+function update_staff(org_name, org_id, sid)
+{
+	$.ajax
+	({
+		data:
+		{
+			organization_id: org_id,
+			sid:             sid
+		},
+		dataType: "xml",
+		type: "POST",
+		url: "/Organization/get_staff",
+		success: function(response, status, jqXHR)
+		{
+			// Step 1: Check for errors.
+
+			var $xml  = $(response);
+			var error = $xml.find("error").text();
+			var html  = $xml.find("html").text();
+
+			if (error != "")
+			{
+				status_error(error, html);
+
+				return;
+			}
+
+			// Step 2: Display updated occupation list.
+
+			$("#staff_list_div")
+			.empty()
+			.append(html);
+		},
+		error: function(jqXHR, status, error)
+		{
+			status_error("Cannot update staff for "+ org_name, "HTTP error: " + error);
+		}
+	});
+}
+
+$(document).ready(function()
+{
+	// Set up the tabs.
+
+	global_tab_div = $("#global_tab_div")
+	.tabs
+	({
+		beforeActivate: function(event, tab)
+		{
+			switch (tab.index)
+			{
+				case 0: // Search tab.
+					setTimeout(function(){$("#search_name").focus();}, 10);
+					break;
+				case 1: // Add tab.
+					setTimeout(function(){$("#add_org_name").focus();}, 10);
+					setTimeout(function(){$("#add_person_given_names").focus();}, 10);
+					break;
+			}
+		}
+	});
+
+	global_tab_div.tabs().css('visibility','visible');
+
+	update_tab_div = $("#update_tab_div")
+	.tabs();
+
+	add_tab_div = $("#add_tab_div")
+	.tabs
+	({
+		beforeActivate: function(event, tab)
+		{
+			switch (tab.index)
+			{
+				case 0: // Add person tab.
+					setTimeout(function(){$("#add_person_given_names").focus();}, 10);
+					break;
+				case 1: // Add org tab.
+					setTimeout(function(){$("#add_org_name").focus();}, 10);
+					break;
+			}
+		}
+	});
+
+	// Prepare to add orgs.
+
+	$("#add_org_button").button();
+	$("#add_org_button").click(function(e)
+	{
+		add_org();
+	});
+
+	// Prepare to add people.
+
+	$("#add_person_button").button();
+	$("#add_person_button").click(function(e)
+	{
+		add_person();
+	});
+
+	// Prepare for reports.
+
+	$("#generate_report_button").button();
+	$("#generate_report_button").click(function(e)
+	{
+		generate_report();
+	});
+
+	// Start with the focus in the search tab's name field.
+
+	$("#search_name").focus();
+	$("#search_form").submit(function()
+	{
+		search();
+
+		return false;
+	});
+
+	// Handle the checkboxes on the Report tab.
+
+	$("input:checkbox").each(function()
+	{
+		var $t = $(this);
+
+		$t.change(function()
+		{
+			$t.val() == 1 ? $t.val(0) : $t.val(1);
+		});
+	});
+
+});
+
+</script>
+</html>

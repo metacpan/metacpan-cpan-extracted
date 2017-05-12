@@ -1,0 +1,12 @@
+<html>
+<body>
+<a href="../download/r?loid=[% loid %]&ct=text/plain">Get Plain</a>
+<a href="../download/r?loid=[% loid %]">Get Mime</a>
+[% form %]
+[% the_upload %]
+[% mime_upload %]
+[% val %]
+<input type="submit" />
+</form>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+   "recipe" : {
+      "target_pg" : "40",
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "percentage" : "0.6",
+            "tag" : "INW Strawberry"
+         },
+         {
+            "type" : "PG",
+            "percentage" : "5",
+            "tag" : "TFA Strawberry Ripe"
+         },
+         {
+            "percentage" : "1",
+            "type" : "PG",
+            "tag" : "TFA Marshmallow"
+         },
+         {
+            "tag" : "INW Peach",
+            "type" : "PG",
+            "percentage" : "1.5"
+         }
+      ],
+      "target_vg" : 60,
+      "notes" : [],
+      "target_nic_per_ml" : "3",
+      "base_nic_per_ml" : 100,
+      "target_quantity" : "220",
+      "base_nic_type" : "PG"
+   }
+}

@@ -1,0 +1,154 @@
+#!/usr/local/bin/perl
+
+# This script takes as command-line input a time (suitable for
+# Date::Manip and probably quoted), a right ascension (in _degrees_) and
+# declination (also in degrees) and a bunch of TLE data (either on
+# standard in or in files named on the command line) and computes the
+# identity of the object closest to the given position at the given
+# time, as seen from a pre-programmed location. If run with less than 3
+# arguments you get a help message.
+
+use 5.006002;
+
+use strict;
+use warnings;
+
+use Astro::Coord::ECI;
+use Astro::Coord::ECI::TLE;
+use Astro::Coord::ECI::TLE::Set;
+use Astro::Coord::ECI::Utils qw{ deg2rad rad2deg :time };
+
+use Date::Manip;
+use Getopt::Long 2.33;
+use Pod::Usage;
+use POSIX qw{strftime};
+
+our $VERSION = '0.079';
+
+my %opt;
+
+Getopt::Long::Configure( 'pass_through' );  # Numbers may be negative
+GetOptions( \%opt,
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) and @ARGV > 3 or pod2usage( { -verbose => 0 } );
+
+my $station = Astro::Coord::ECI->new(
+    name => 'Parliament House, Canberra ACT, Australia',
+)->geodetic(
+    deg2rad(-35.308232),	# Latitude in radians
+    deg2rad(149.124495),	# Longitude in radians
+    0.603,			# Elevation above sea level in kilometers
+);
+
+my $time = UnixDate($ARGV[0], '%s')
+    or die "Invalid date/time '$ARGV[0]'\n";
+my (undef, $ra, $dec) = splice(@ARGV, 0, 3);
+
+# We arbitrarily set the distance to 10 parsecs to minimize the parallax
+# between the (unknown but much closer) actual location as observed from
+# the center of the Earth (which is what we set with the equatorial()
+# method) and the observed location from the observing station on the
+# surface of the Earth.
+
+my $target = Astro::Coord::ECI->new()->equatorial(
+    deg2rad($ra),
+    deg2rad($dec),
+    30.8568e13,
+    $time,
+);
+
+# We slurp all the files, parse their content into
+# Astro::Coord::ECI::TLE objects, and aggregate all objects with the
+# same OID into a single Astro::Coord::ECI::TLE::Set object. The
+# aggregation step is unnecessary if your input is known to contain only
+# one TLE data set for each OID.
+
+local $/ = undef;
+my @tle = Astro::Coord::ECI::TLE::Set->aggregate(
+    Astro::Coord::ECI::TLE->parse( { station => $station }, <>));
+
+my @closest;	# Closest bodies
+my $separation;	# Separation of closest body
+
+foreach my $body (@tle) {
+    eval {$body->universal($time); 1;} or do {
+	warn $@;
+	next;
+    };
+    my $angle = $station->angle($body, $target);
+    if (!defined $separation) {
+	$separation = $angle;
+	@closest = ($body);
+    } elsif ($angle == $separation) {
+	push @closest, $body;
+    } elsif ($angle < $separation) {
+	$separation = $angle;
+	@closest = ($body);
+    }
+}
+
+@closest or die "No bodies found. Did you look in the library?\n";
+my $fmt = "%6s  %6.2f  %6.2f  %6.2f\n";
+foreach my $body (@closest) {
+    my ( $ra, $dec ) = $body->equatorial_apparent();
+    printf $fmt, $body->get('id'), rad2deg($ra), rad2deg($dec),
+	rad2deg($separation);
+}
+
+__END__
+
+=head1 TITLE
+
+closest - Find body closest to given position at given time
+
+=head1 SYNOPSIS
+
+ closest 'today noon' 53 -25 foo.tle
+ closest -help
+ closest -version
+
+=head1 OPTIONS
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script finds the orbiting body closest to the given position
+at the given time as seen from a pre-programmed location: Parliament
+House, Canberra ACT, Australia.
+
+The arguments are the desired time (in a format suitable for
+Date::Manip), the right ascension (in decimal degrees, not hours), the
+declination (also in decimal degrees), and the names of one or more
+files containing satellite TLE orbital element sets.
+
+The output is the OID of the closest body at the given time, and its
+right ascension, declination, and angular separation from the given
+position in degrees, as seen from the observing station.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

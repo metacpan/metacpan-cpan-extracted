@@ -1,0 +1,11 @@
+Add user defines at the top of the SPEC file
+  --define foo 'bar %{xxx}'
+would add the line:
+   %define  foo   bar %{xxx}
+
+If META has 'provides', make sure that we only use provides for the
+files we actually install.
+
+===
+
+This was written using ideas from cpanspec-1.78.

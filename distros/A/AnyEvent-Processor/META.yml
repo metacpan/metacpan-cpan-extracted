@@ -1,0 +1,28 @@
+---
+abstract: 'Base class to define an event-driven (AnyEvent) task that could periodically be interrupted by a watcher'
+author:
+  - 'Frédéric Demians <f.demians@tamil.fr>'
+build_requires:
+  File::Find: '0'
+  File::Temp: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Processor
+requires:
+  AnyEvent: '0'
+  Glib: '0'
+  Modern::Perl: '0'
+  Moose: '0'
+  Moose::Role: '0'
+resources:
+  repository: http://git.tamil.fr/git/AnyEvent-Processor
+version: '0.006'

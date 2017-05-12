@@ -1,0 +1,61 @@
+#!/usr/local/bin/perl
+
+use v5.10.0;
+use blib;
+use strict;
+use warnings;
+
+use AFS::VOS;
+use Scalar::Util qw(looks_like_number);
+
+my ($vos, $prefix, $server, $part, $exclude, $xprefix, $dry);
+my ($tbackup, $fbackup, $tbcount, $fbcount);
+
+die "Usage: $0 [prefix server partition exclude xprefix dryrun]\n" if $#ARGV > 5;
+
+$dry     = 1 if $#ARGV == -1;
+$prefix  = shift // '';
+$server  = shift // '';
+$part    = shift // '';
+$exclude = shift // 0;
+$xprefix = shift // '';
+$dry     = shift // $dry // 0;
+
+if (defined $exclude and !looks_like_number($exclude)) { warn "$0: EXCLUDE is not an INTEGER ...\n"; }
+else                                                   { $exclude = int($exclude); }
+if (defined $dry     and !looks_like_number($dry))     { warn "$0: DRYRUN is not an INTEGER ...\n"; }
+else                                                   { $dry = int($dry); }
+
+my $would;
+if ($dry) { $would = 'would have'; }
+else      { $would = ''; }
+
+$vos = AFS::VOS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+my @prefix  = ($prefix);
+my @xprefix = ();
+@xprefix = ($xprefix) if $xprefix;
+
+# -prefix <>+ -server <> -partition <> -exclude -xprefix <>+ -dryrun
+($tbackup, $fbackup) = $vos->backupsys(\@prefix, $server, $part, $exclude, \@xprefix, $dry);
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+if (defined $tbackup) { $tbcount = @$tbackup; }
+else                  { $tbcount = 0; }
+if (defined $tbackup) { $fbcount = @$fbackup; }
+else                  { $fbcount = 0; }
+
+if ($tbcount) {
+    foreach (@$tbackup) {
+        print "\t$_\n";
+    }
+}
+
+if ($fbcount) {
+    foreach (@$fbackup) {
+        print "\t$_\n";
+    }
+}
+
+print "Total volumes $would backed up: ", $tbcount, "; $would failed to backup: ", $fbcount, "\n";

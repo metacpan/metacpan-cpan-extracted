@@ -1,0 +1,243 @@
+2012-07-19  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* MANIFEST: Taking out test for obsolete module. 
+
+2012-07-17  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/MasterMind/Consistent_Set.pm (consistent_strings):
+	Adding pod docs for this module.
+
+	* MANIFEST: Adding Consistent_Set , also missing.
+
+2012-07-15  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* MANIFEST: Re-adding some missing files.
+
+2012-07-14  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* MANIFEST: Adding missing files in Distro. 
+	Eliminated Generational_Partitions, sometimes it gets
+	stuck. Removing old test files from the folders too. 
+
+2012-07-10  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/MasterMind.pm: Starting 0.4.1 with a minor version
+	change for A::E.
+
+	* Makefile.PL: Changing Clone to Clone::Fast, more updated. 
+
+2012-06-05  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/MasterMind/EvoD.pm (issue_next): Getting rid of
+	fixed-size consistent sets to use whatever stands unchanged for 5
+	generations. 
+
+2012-06-03  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/MasterMind/EvoC.pm (issue_next): This is
+	positively a hack. Changing the consistent set size to 5 times as
+	much in the first iteration, normal afterwards. The main
+	difference between these with limited set size is that the size
+	decreases more slowly. 
+	(issue_next): Multiplier set to 10 and result:
+
+	real	364m17.528s
+user	363m54.710s
+sys	0m4.060s
+
+
+2012-06-01  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/MasterMind/Partition_Entropy_1st.pm (issue_first):
+	Changed first move to that one with biggest entropy (different
+	letters). 
+	(issue_first): Going back to the first option: Knuth's. It works
+	better. 
+
+2012-05-31  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* app/IEEE-CIG/conf-entropy-4-6.yaml (ID): After adding an Entropy
+	algorithm, checking it with the most basic configuration. 
+
+	Result: 
+real	491m13.892s
+user	490m34.210s
+sys	0m9.330s
+
+2012-05-26  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/MasterMind/Secret.pm (check): Optimizing a bit
+	more by eliminating sub parameter copy. 
+
+2012-05-21  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* app/run_experiment_instances.pl: Adding monitoring of consistent
+	set to make experiments on its evolution. 
+	Trying again after fixing crossover bug and but in monitoring.
+
+2012-05-16  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/MasterMind/Secret.pm (check): This new class will
+	pre-compute part of the stuff needed for secret combinations,
+	speeding up (a bit) that critical part.
+
+2012-05-15  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/MasterMind.pm (check_combination): this is the
+	worst routine for the time being, after eliminating Permutation
+	and improving Tournament as bottlenecks (I was going to say
+	sources of slowness :-) 
+
+	* lib/Algorithm/MasterMind/Evo.pm (initialize): Eliminating
+	default value for permutation_rate, which is incredibly slow.
+
+2011-02-18  Juan Julian Merelo Guervos  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/MasterMind/Evolutionary_Base.pm (reset): Changed
+	population-generation function; now all strings in the population
+	are different. 
+
+2010-12-13  Juan J. Merelo Guervós  <jmerelo@localhost.localdomain>
+
+	* lib/Algorithm/MasterMind/Test_Solver.pm (solve_mastermind):
+	Changed so that it checks that the combination played hasn't
+	occurred before. All tests change
+
+	* lib/Algorithm/MasterMind.pm (start_from): new subroutine for
+	continuing from other algorithm. Test works.
+
+2010-12-07  Juan J. Merelo Guervós  <jmerelo@localhost.localdomain>
+
+	* lib/Algorithm/MasterMind/EvoRank.pm (initialize): Added
+	permutation with default rate 0 to EvoRank, don't know why I
+	eliminated it. 
+
+	* lib/Algorithm/MasterMind.pm: Changed minor to 0.3.1, next
+	release with the new methods.
+	Added version requisite to 0.77, instead of 0, as before. There
+	were a couple of "not available" test results.
+
+	* MANIFEST: Added Evorank_End_Games to the MANIFEST, for testing
+	and release. 
+
+2010-11-27  Juan J. Merelo Guervós  <jmerelo@localhost.localdomain>
+
+	* lib/Algorithm/MasterMind/EvoRank_End_Games.pm (issue_next):
+	Reduced shrinkage when alphabets are reduced...
+
+2010-11-18  Juan J. Merelo  <jmerelo@sheldon>
+
+	* lib/Algorithm/MasterMind/EvoRank.pm (initialize): Taking out magic numbers 
+
+2010-01-27    <jmerelo@localhost.localdomain>
+
+	* MANIFEST: Changed license back to "perl". Mostly, in order to
+	not have to modify all source. Added lots of new files with new
+	algorithms (and rather esoteric, I admit).
+
+2010-01-26    <jmerelo@localhost.localdomain>
+
+	* Makefile.PL: Added license and changed min version of
+	Algorithm::Evolutionary, just uploaded. Changed lots of modules
+	after profiling (check_combination, again), and added more
+	algorithms. 
+
+2009-11-24  Juan Julian Merelo Guervos  <jmerelo@geneura.ugr.es>
+
+	* lib/Algorithm/MasterMind.pm: Changed to 0.2 due to the new
+	modules added.
+
+	* lib/Algorithm/MasterMind/Evolutionary.pm: The new single
+	objective evolutionary works at least as well ad the old
+	EDA. Let's see if we can add partitions to it.
+
+	* lib/Algorithm/MasterMind/Evolutionary_Base.pm (issue_first):
+	Completed motion of some functions to this class. Now on to the
+	evolutionary single_objective.
+
+	* t/06_moga.t: Since this MOGA does not seem to be able to find
+	the solution, I'll just do an iteration.
+
+2009-11-23  Juan Julian Merelo Guervos  <jmerelo@geneura.ugr.es>
+
+	* MANIFEST: Added a multiobjective evolutionary that tries to find
+	the combination via finding consistent combinations.
+
+2009-11-17    <jmerelo@localhost.localdomain>
+
+	* lib/Algorithm/MasterMind.pm: Starting 0.1.1, which will include
+	multiobjective algorithms and most of the stuff we're preparing
+	for EvoStar. Starting with minor doc changes.
+
+2009-11-17  Juan Julian Merelo Guervos  <jmerelo@geneura.ugr.es>
+
+	* MANIFEST: Added several new algorithms, including Knuth's and
+	EDA. 
+	Changed minor to 0.1, since it's quite complete now. 
+
+2009-10-10    <jmerelo@localhost.localdomain>
+
+	* lib/Algorithm/MasterMind.pm (check_combination): Saving around
+	30% of the CPU time via optimization of this subroutine. Still
+	some room for improvement, though:
+	
+[jmerelo@localhost app]$ dprofpp -u
+Total Elapsed Time = 13.84292 Seconds
+         User Time = 12.07292 Seconds
+Exclusive Times
+%Time ExclSec CumulS #Calls sec/call Csec/c  Name
+ 85.4   10.31 10.310 500146   0.0000 0.0000  Algorithm::MasterMind::check_combi
+                                             nation
+ 9.71   1.172 12.806    367   0.0032 0.0349  Algorithm::MasterMind::Random::iss
+                                             ue_next
+ 6.16   0.744 11.625 138572   0.0000 0.0001  Algorithm::MasterMind::matches
+ 5.06   0.611 10.881 499779   0.0000 0.0000  Algorithm::MasterMind::check_rule
+ 0.58   0.070  0.090      1   0.0699 0.0897  YAML::Type::code::BEGIN
+ 0.50   0.060  0.389      7   0.0085 0.0555  main::BEGIN
+ 0.49   0.059  0.195  40252   0.0000 0.0000  YAML::Base::__ANON__
+ 0.49   0.059  0.059    454   0.0001 0.0001  Params::Validate::_validate
+ 0.33   0.040  0.192      7   0.0057 0.0274  DateTime::Locale::BEGIN
+ 0.31   0.038  0.097    449   0.0001 0.0002  DateTime::Locale::_register
+ 0.30   0.036  0.065   5404   0.0000 0.0000  overload::AddrRef
+ 0.24   0.029  0.029    322   0.0001 0.0001  Params::Validate::_validate_pos
+ 0.22   0.026  0.026   5404   0.0000 0.0000  Scalar::Util::blessed
+ 0.18   0.022  0.029   2335   0.0000 0.0000  YAML::Dumper::_emit_str
+ 0.17   0.021  0.086   2235   0.0000 0.0000  YAML::Dumper::_emit_node
+	
+
+2009-10-03    <jmerelo@localhost.localdomain>
+
+	* t/00_functions.t: Fixed typo in test
+
+2009-10-02    <jmerelo@localhost.localdomain>
+
+	* Makefile.PL: Added Algorithm::Combinatorics which is used to
+	compute next combination in the Sequential algorithm
+
+2009-10-02  Juan J. Merelo  <jmerelo@vega>
+
+	* lib/Algorithm/MasterMind.pm (not_in_combination): Starting 0.0.4
+	with adding info to the main module file.
+
+	* MANIFEST: Fixing a distribution but in 0.0.2 and also adding new
+	methods. Fixed bugs in Sequential, and added program to run
+	experiments. 
+
+2009-10-01  Juan Julian Merelo Guervos  <jmerelo@geneura.ugr.es>
+
+	* MANIFEST: Started version 0.0.3 after fixing docs form version
+	one. Still waiting for fail reports.
+
+2009-09-30    <jmerelo@localhost.localdomain>
+
+	* lib/Algorithm/MasterMind.pm (not_in_combination): Changing all
+	documentation to avoid problems, and added a few things.
+
+	* MANIFEST: Added set of files to the MANIFEST, and preparing
+	stuff for initial release 
+
+Revision history for Algorithm-MasterMind
+
+0.0.1  Sun Sep  6 13:54:21 2009
+       Initial release.
+

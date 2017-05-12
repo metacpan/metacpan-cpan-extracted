@@ -1,0 +1,77 @@
+{
+   "abstract" : "Generate strings like title of Evangelion",
+   "author" : [
+      ") <yuki.tannai@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.3",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-EvaTitlenize",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "2.39",
+            "Text::VisualWidth" : "0.02",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::EvaTitlenize" : {
+         "file" : "lib/Acme/EvaTitlenize.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/saisa6153/Acme-EvaTitlenize/issues"
+      },
+      "homepage" : "https://github.com/saisa6153/Acme-EvaTitlenize",
+      "repository" : {
+         "url" : "git://github.com/saisa6153/Acme-EvaTitlenize.git",
+         "web" : "https://github.com/saisa6153/Acme-EvaTitlenize"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Yuuki Tan-nai <yuuki.tannai@gaiax.com>",
+      "papix <mail@papix.net>",
+      "saisa6153 <yuuki@tan-nai.com>"
+   ]
+}

@@ -1,0 +1,7 @@
+Revision history for Perl extension Acme::SOAP::Dodger.
+
+0.01  Tue Jul 17 15:06:20 2007
+	- original version; created in a fit of pique
+
+0.02 Thu Jul 19 08:50:00 2007
+        - Evil Dave doesn't have SOAP::Lite installed, fiddle test

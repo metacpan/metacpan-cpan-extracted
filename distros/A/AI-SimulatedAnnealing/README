@@ -1,0 +1,30 @@
+AI::SimulatedAnnealing version 1.02
+
+DESCRIPTION
+
+    This distribution includes the following modules:
+
+        AI::SimulatedAnnealing - Exports a single public function,
+        anneal(), for optimizing a list of numbers according to a
+        specified cost function.
+
+REQUIREMENTS
+
+    These modules require Perl 5, version 5.10.1 or later.
+
+INSTALLATION
+
+    To install the modules included in this distribution, simply copy
+    the "AI" directory, with "SimulatedAnnealing.pm" inside it, to a
+    location in @INC (for example, "/etc/perl" or "C:\Perl\site\lib").
+
+AUTHOR
+
+    Benjamin Fitch <blernflerkl@yahoo.com>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2010 by Benjamin Fitch
+
+    This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.

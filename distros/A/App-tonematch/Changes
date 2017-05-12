@@ -1,0 +1,11 @@
+-*- org -*-
+
+* Version 0.001
+
+  1. [2016-07-19 Tue] Initial version.
+
+* Version 0.002
+
+  1. [2016-07-26 Tue] USe Tk::MTDial instead of Tk::Knob
+
+

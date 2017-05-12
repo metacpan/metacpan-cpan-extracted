@@ -1,0 +1,116 @@
+NAME
+
+    App::Music::ChordPro - A lyrics and chords formatting program
+
+DESCRIPTION
+
+    ChordPro will read a text file containing the lyrics of one or many songs
+    plus chord information. ChordPro will then generate a photo-ready,
+    professional looking, impress-your-friends sheet-music suitable for
+    printing on your nearest printer.
+
+    To learn more about ChordPro, look for the man page or do "chordpro
+    --help" for the list of options.
+
+    ChordPro is a rewrite of the Chordii program, see
+    <http://www.chordii.org>.
+
+    For more information about ChordPro, see <http://www.chordpro.org>.
+
+MOTIVATION
+
+    Why a rewrite of Chordii?
+
+    Chordii is the de facto reference implementation of the ChordPro file
+    format standard. It implements ChordPro version 4.
+
+    ChordPro version 5 adds a number of new features, and this was pushing the
+    limits of the very old program. Unicode support would have been very hard
+    to add, and the whole program centered around PostScript generation, while
+    nowadays PDF would be a much better alternative.
+
+    So I decided to create a new reference implementation from the ground up.
+    I chose a programming language that is flexible and very good at handling
+    Unicode data. And that is fun to program in.
+
+CURRENT STATUS
+
+    This program provides support for ChordPro version 5. It supports
+    most of the features of Chordii, and a lot more:
+
+    * Native PDF generation.
+
+    * Unicode support (all input is UTF8).
+
+    * User defined chords and tunings, not limited to 6 strings.
+
+    * Support for Nashville Numbering and Roman Numbering.
+
+    * Support for external TrueType and OpenType fonts.
+
+    * Font kerning (with external fonts).
+
+    * Fully customizable layout, fonts and sizes.
+
+    * A basic but effective GUI version (optional).
+
+    * Customizable backends for PDF, ChordPro, LilyPond*, LaTeX* and HTML*.
+      (* = under development)
+
+INSTALLATION
+
+    To run ChordPro, you need Perl, a programming environment that is
+    available for most systems and probably already installed on yours.
+
+    Step one: Open a command prompt and type
+
+      perl --version
+
+    If you get a message similar to this
+
+      This is perl 5, version 24, ...
+
+    You have Perl installed and you can proceed with step two.
+
+    If not, you can get Perl from
+
+      www.strawberryperl.org
+      www.ActiveState.com
+
+    Step two for Linux and Strawberry Perl: at the command prompt,
+    type
+
+      cpan App::cpanminus
+      cpanm wxchordpro
+
+    This will pull in ChordPro from the CPAN archives and install it
+    for you.
+
+    Step two for ActiveState Perl: at the command prompt, type
+
+      ppm App-Music-ChordPro-Wx
+
+    Step three: At the command prompt, type
+
+      wxchordpro
+
+    You can add a desktop icon for easy access.
+
+    Alternatively, you can clone the GitHub repository and run the
+    programs in the scripts directory. You may have to manually add
+    dependencies with "cpan" or "ppm", just as described above.
+
+SUPPORT
+
+    ChordPro (the program) development is hosted on GitHub, repository
+    https://github.com/sciurius/chordpro .
+
+    Please report any bugs or feature requests to the GitHub issue tracker,
+    https://github.com/sciurius/chordpro/issues .
+
+LICENSE
+
+    Copyright (C) 2010,2017 Johan Vromans,
+
+    This module is free software. You can redistribute it and/or modify it
+    under the terms of the Artistic License 2.0.

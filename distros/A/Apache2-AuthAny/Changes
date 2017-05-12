@@ -1,0 +1,11 @@
+Revision history for Apache2-AuthAny
+
+0.19    March 29, 2011
+        Preparing to release on CPAN
+
+0.20    May 9, 2011
+        Initial release on CPAN
+
+0.201   May 15, 2011
+        Added missing LICENSE file
+

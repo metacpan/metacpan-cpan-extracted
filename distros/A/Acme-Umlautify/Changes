@@ -1,0 +1,51 @@
+Revision history for Perl extension Acme::Umlautify.
+
+1.07  2014/03/16
+
+	Moving to UTF (as opposed to Latin-1) thanks to an emailed suggestion
+		by Jeremy Mates <jmates@uw.edu> - this literally allows the
+		addition of umlatus to everything, including spaces.
+
+	Almost concurrently, Nick Wellnhofer <nwellnhof@cpan.org> opened 
+		RT #93530 which suggested a UTF solution to the lack of
+		umlauts for Latin lower-case y.
+
+	Added a terminology section to the documentation.
+
+1.06  2014/03/03
+
+	Updated POD and README text
+	Exporting 'umlautify' by default. Just because.
+
+1.06  2014/03/03
+
+	Corrected a POD error: Now declaring encoding as Latin-1.
+	Added a basic POD test
+
+1.05  2014/02/28
+
+	Corrected Makefile.PL improperly calling for a minimum perl version
+
+1.04  2014/02/27
+    
+	Now auto-generating META.json and META.yml
+	Corrected in-module version tagging
+
+1.03  2014/02/25
+
+	Corrected miscapitalization of 'ACME' in module meta data
+	Updated to new build script with auto-generated meta data
+
+1.02  2014/02/25
+
+	Updating meta information
+	Added LICENSE information into the distribution
+	
+1.01  2004/04/07
+
+	Corrected spelling errors in the documentation
+	Changed "NÄMË" to "NAME" for CPAN to parse the module description.
+
+1.00  2004/04/07
+
+	Developed due to input from Kristy Davis and Chip Salzenburg

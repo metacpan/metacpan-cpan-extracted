@@ -1,0 +1,22 @@
+Revision history for Perl extension Algorithm-EquivalenceSets
+
+1.101420  2010-05-22 13:32:58 Europe/Vienna
+    - re-indented Changes
+
+1.100870  2010-03-28 10:09:48 Europe/Vienna
+    - converted distribution to Dist::Zilla style
+
+0.04  Tue 2010.02.09 23:57:00 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - releng
+
+0.03  Thu Jul 24 20:35:33 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.02  Wed, 28 Nov 2007 11:15:12 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.02
+    - provide abstract line
+
+0.01  Mon, 26 Nov 2007 23:05:32 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

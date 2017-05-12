@@ -1,0 +1,59 @@
+Basic Challenge-Response authentication
+
+This is a perl5 module implementing basic MD5-based challenge/response.
+The authentication method provided, allows for mutual authentications
+of the endpoints of a communication channel provided that a shared
+secret known only to them has been exchanged prior to the session.
+
+If the secret is known to a third party, this authentication mechanism
+is useless (ie, this situation can lead to a man-in-the-middle-attack)
+so its secrecy is very important.
+
+Note that this module does NOT provide security agains eavesdropping or
+hijacking. A positive identification can be followed by an attacker
+stealing the connection or sniffing. Both situations can be detrimental
+to the security.
+
+This module allows for the detection of date-synch issues, such as the
+ones ussually present when an attacker drifts the clock of one of the
+peers to influence other authentication schemes. At run-time, the user
+of the module can define a time-sync-tolerance. Host dates when the
+challenge and response were generated must match to within this
+specified tolerance to be acceptable.
+
+The user can also define a lifespan for the challenge/response
+transaction.
+
+This code is subject to the same restrictions and warranties than
+perl itself.
+
+This implementation depends on MD5.pm to be correctly installed
+on your system. It has been tested on FreeBSD 2.2.5-RELEASE and
+2.2.6-RELEASE as well as on Digital Unix 3.0B. It should work on
+any system where perl's MD5() works correctly.
+
+Installing Authen::Challenge::Basic should be as easy as unpacking the 
+gzipped file and doing
+
+		perl Makefile.PL
+		make
+		make test
+		make install
+
+The tests are very simple. Essentially, if the MD5 module works, 
+this one *should* also work :)
+
+It would be very nice to have more challenge/response methods
+available. They can be created bellow Auth::Challenge.
+
+Please send bugs, queries, suggestions to
+
+Luis E. Munoz, lem@cantv.net
+
+Good luck.
+
+
+
+
+
+

@@ -1,0 +1,996 @@
+#!perl
+
+# Note: This script is a CLI  for Riap function /Calendar/Indonesia/Holiday/list_id_holidays
+# and generated automatically using Perinci::CmdLine::Gen version 0.28
+
+our $DATE = '2016-01-18'; # DATE
+our $DIST = 'App-IndonesianHolidayUtils'; # DIST
+our $VERSION = '0.04'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+# code_before_instantiate_cmdline
+$ENV{ANSITABLE_STYLE_SETS} //= '[["Calendar::Indonesia::Holiday::HolidayType",{"holiday_bgcolor":"330000", "joint_leave_bgcolor":"333300"}]]';
+
+Perinci::CmdLine::Any->new(
+    url => "/Calendar/Indonesia/Holiday/list_id_holidays",
+    program_name => "list-id-holidays",
+)->run;
+
+# ABSTRACT: List Indonesian holidays in calendar
+# PODNAME: list-id-holidays
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-id-holidays - List Indonesian holidays in calendar
+
+=head1 VERSION
+
+This document describes version 0.04 of list-id-holidays (from Perl distribution App-IndonesianHolidayUtils), released on 2016-01-18.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % list-id-holidays [options] [year] [month]
+
+=head1 DESCRIPTION
+
+List holidays and joint leave days ("cuti bersama").
+
+Contains data from years 2002 to 2016 (joint leave days until
+2016).
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for date options
+
+=over
+
+=item B<--date-in-json>=I<s>
+
+Only return records where the 'date' field is in the specified values (JSON-encoded).
+
+See C<--date-in>.
+
+=item B<--date-in>=I<s@>
+
+Only return records where the 'date' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--date-is>=I<s>
+
+Only return records where the 'date' field equals specified value.
+
+=item B<--date-isnt>=I<s>
+
+Only return records where the 'date' field does not equal specified value.
+
+=item B<--date-max>=I<s>
+
+Only return records where the 'date' field is less than or equal to specified value.
+
+=item B<--date-min>=I<s>
+
+Only return records where the 'date' field is greater than or equal to specified value.
+
+=item B<--date-not-in-json>=I<s>
+
+Only return records where the 'date' field is not in the specified values (JSON-encoded).
+
+See C<--date-not-in>.
+
+=item B<--date-not-in>=I<s@>
+
+Only return records where the 'date' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--date-xmax>=I<s>
+
+Only return records where the 'date' field is less than specified value.
+
+=item B<--date-xmin>=I<s>
+
+Only return records where the 'date' field is greater than specified value.
+
+=item B<--date>=I<s>
+
+Only return records where the 'date' field equals specified value.
+
+=back
+
+=head2 Filtering for day options
+
+=over
+
+=item B<--day-in-json>=I<s>
+
+Only return records where the 'day' field is in the specified values (JSON-encoded).
+
+See C<--day-in>.
+
+=item B<--day-in>=I<s@>
+
+Only return records where the 'day' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--day-is>=I<i>
+
+Only return records where the 'day' field equals specified value.
+
+=item B<--day-isnt>=I<i>
+
+Only return records where the 'day' field does not equal specified value.
+
+=item B<--day-max>=I<i>
+
+Only return records where the 'day' field is less than or equal to specified value.
+
+=item B<--day-min>=I<i>
+
+Only return records where the 'day' field is greater than or equal to specified value.
+
+=item B<--day-not-in-json>=I<s>
+
+Only return records where the 'day' field is not in the specified values (JSON-encoded).
+
+See C<--day-not-in>.
+
+=item B<--day-not-in>=I<s@>
+
+Only return records where the 'day' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--day-xmax>=I<i>
+
+Only return records where the 'day' field is less than specified value.
+
+=item B<--day-xmin>=I<i>
+
+Only return records where the 'day' field is greater than specified value.
+
+=item B<--day>=I<i>
+
+Only return records where the 'day' field equals specified value.
+
+=back
+
+=head2 Filtering for decree_date options
+
+=over
+
+=item B<--decree-date-contains>=I<s>
+
+Only return records where the 'decree_date' field contains specified text.
+
+=item B<--decree-date-in-json>=I<s>
+
+Only return records where the 'decree_date' field is in the specified values (JSON-encoded).
+
+See C<--decree-date-in>.
+
+=item B<--decree-date-in>=I<s@>
+
+Only return records where the 'decree_date' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--decree-date-is>=I<s>
+
+Only return records where the 'decree_date' field equals specified value.
+
+=item B<--decree-date-isnt>=I<s>
+
+Only return records where the 'decree_date' field does not equal specified value.
+
+=item B<--decree-date-max>=I<s>
+
+Only return records where the 'decree_date' field is less than or equal to specified value.
+
+=item B<--decree-date-min>=I<s>
+
+Only return records where the 'decree_date' field is greater than or equal to specified value.
+
+=item B<--decree-date-not-contains>=I<s>
+
+Only return records where the 'decree_date' field does not contain specified text.
+
+=item B<--decree-date-not-in-json>=I<s>
+
+Only return records where the 'decree_date' field is not in the specified values (JSON-encoded).
+
+See C<--decree-date-not-in>.
+
+=item B<--decree-date-not-in>=I<s@>
+
+Only return records where the 'decree_date' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--decree-date-xmax>=I<s>
+
+Only return records where the 'decree_date' field is less than specified value.
+
+=item B<--decree-date-xmin>=I<s>
+
+Only return records where the 'decree_date' field is greater than specified value.
+
+=item B<--decree-date>=I<s>
+
+Only return records where the 'decree_date' field equals specified value.
+
+=back
+
+=head2 Filtering for decree_note options
+
+=over
+
+=item B<--decree-note-contains>=I<s>
+
+Only return records where the 'decree_note' field contains specified text.
+
+=item B<--decree-note-in-json>=I<s>
+
+Only return records where the 'decree_note' field is in the specified values (JSON-encoded).
+
+See C<--decree-note-in>.
+
+=item B<--decree-note-in>=I<s@>
+
+Only return records where the 'decree_note' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--decree-note-is>=I<s>
+
+Only return records where the 'decree_note' field equals specified value.
+
+=item B<--decree-note-isnt>=I<s>
+
+Only return records where the 'decree_note' field does not equal specified value.
+
+=item B<--decree-note-max>=I<s>
+
+Only return records where the 'decree_note' field is less than or equal to specified value.
+
+=item B<--decree-note-min>=I<s>
+
+Only return records where the 'decree_note' field is greater than or equal to specified value.
+
+=item B<--decree-note-not-contains>=I<s>
+
+Only return records where the 'decree_note' field does not contain specified text.
+
+=item B<--decree-note-not-in-json>=I<s>
+
+Only return records where the 'decree_note' field is not in the specified values (JSON-encoded).
+
+See C<--decree-note-not-in>.
+
+=item B<--decree-note-not-in>=I<s@>
+
+Only return records where the 'decree_note' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--decree-note-xmax>=I<s>
+
+Only return records where the 'decree_note' field is less than specified value.
+
+=item B<--decree-note-xmin>=I<s>
+
+Only return records where the 'decree_note' field is greater than specified value.
+
+=item B<--decree-note>=I<s>
+
+Only return records where the 'decree_note' field equals specified value.
+
+=back
+
+=head2 Filtering for dow options
+
+=over
+
+=item B<--dow-in-json>=I<s>
+
+Only return records where the 'dow' field is in the specified values (JSON-encoded).
+
+See C<--dow-in>.
+
+=item B<--dow-in>=I<s@>
+
+Only return records where the 'dow' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--dow-is>=I<i>
+
+Only return records where the 'dow' field equals specified value.
+
+=item B<--dow-isnt>=I<i>
+
+Only return records where the 'dow' field does not equal specified value.
+
+=item B<--dow-max>=I<i>
+
+Only return records where the 'dow' field is less than or equal to specified value.
+
+=item B<--dow-min>=I<i>
+
+Only return records where the 'dow' field is greater than or equal to specified value.
+
+=item B<--dow-not-in-json>=I<s>
+
+Only return records where the 'dow' field is not in the specified values (JSON-encoded).
+
+See C<--dow-not-in>.
+
+=item B<--dow-not-in>=I<s@>
+
+Only return records where the 'dow' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--dow-xmax>=I<i>
+
+Only return records where the 'dow' field is less than specified value.
+
+=item B<--dow-xmin>=I<i>
+
+Only return records where the 'dow' field is greater than specified value.
+
+=item B<--dow>=I<i>
+
+Only return records where the 'dow' field equals specified value.
+
+=back
+
+=head2 Filtering for is_holiday options
+
+=over
+
+=item B<--is-holiday>
+
+Only return records where the 'is_holiday' field equals specified value.
+
+=item B<--is-holiday-is>
+
+Only return records where the 'is_holiday' field equals specified value.
+
+=item B<--is-holiday-isnt>
+
+Only return records where the 'is_holiday' field does not equal specified value.
+
+=back
+
+=head2 Filtering for is_joint_leave options
+
+=over
+
+=item B<--is-joint-leave>
+
+Only return records where the 'is_joint_leave' field equals specified value.
+
+=item B<--is-joint-leave-is>
+
+Only return records where the 'is_joint_leave' field equals specified value.
+
+=item B<--is-joint-leave-isnt>
+
+Only return records where the 'is_joint_leave' field does not equal specified value.
+
+=back
+
+=head2 Filtering for month options
+
+=over
+
+=item B<--month-in-json>=I<s>
+
+Only return records where the 'month' field is in the specified values (JSON-encoded).
+
+See C<--month-in>.
+
+=item B<--month-in>=I<s@>
+
+Only return records where the 'month' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--month-is>=I<i>
+
+Only return records where the 'month' field equals specified value.
+
+=item B<--month-isnt>=I<i>
+
+Only return records where the 'month' field does not equal specified value.
+
+=item B<--month-max>=I<i>
+
+Only return records where the 'month' field is less than or equal to specified value.
+
+=item B<--month-min>=I<i>
+
+Only return records where the 'month' field is greater than or equal to specified value.
+
+=item B<--month-not-in-json>=I<s>
+
+Only return records where the 'month' field is not in the specified values (JSON-encoded).
+
+See C<--month-not-in>.
+
+=item B<--month-not-in>=I<s@>
+
+Only return records where the 'month' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--month-xmax>=I<i>
+
+Only return records where the 'month' field is less than specified value.
+
+=item B<--month-xmin>=I<i>
+
+Only return records where the 'month' field is greater than specified value.
+
+=item B<--month>=I<i>
+
+Only return records where the 'month' field equals specified value.
+
+=back
+
+=head2 Filtering for note options
+
+=over
+
+=item B<--note-contains>=I<s>
+
+Only return records where the 'note' field contains specified text.
+
+=item B<--note-in-json>=I<s>
+
+Only return records where the 'note' field is in the specified values (JSON-encoded).
+
+See C<--note-in>.
+
+=item B<--note-in>=I<s@>
+
+Only return records where the 'note' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--note-is>=I<s>
+
+Only return records where the 'note' field equals specified value.
+
+=item B<--note-isnt>=I<s>
+
+Only return records where the 'note' field does not equal specified value.
+
+=item B<--note-max>=I<s>
+
+Only return records where the 'note' field is less than or equal to specified value.
+
+=item B<--note-min>=I<s>
+
+Only return records where the 'note' field is greater than or equal to specified value.
+
+=item B<--note-not-contains>=I<s>
+
+Only return records where the 'note' field does not contain specified text.
+
+=item B<--note-not-in-json>=I<s>
+
+Only return records where the 'note' field is not in the specified values (JSON-encoded).
+
+See C<--note-not-in>.
+
+=item B<--note-not-in>=I<s@>
+
+Only return records where the 'note' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--note-xmax>=I<s>
+
+Only return records where the 'note' field is less than specified value.
+
+=item B<--note-xmin>=I<s>
+
+Only return records where the 'note' field is greater than specified value.
+
+=item B<--note>=I<s>
+
+Only return records where the 'note' field equals specified value.
+
+=back
+
+=head2 Filtering for tags options
+
+=over
+
+=item B<--tags-has-json>=I<s>
+
+Only return records where the 'tags' field is an array/list which contains specified value (JSON-encoded).
+
+See C<--tags-has>.
+
+=item B<--tags-has>=I<s@>
+
+Only return records where the 'tags' field is an array/list which contains specified value.
+
+Can be specified multiple times.
+
+=item B<--tags-is-json>=I<s>
+
+Only return records where the 'tags' field equals specified value (JSON-encoded).
+
+See C<--tags-is>.
+
+=item B<--tags-is>=I<s>
+
+Only return records where the 'tags' field equals specified value.
+
+=item B<--tags-isnt-json>=I<s>
+
+Only return records where the 'tags' field does not equal specified value (JSON-encoded).
+
+See C<--tags-isnt>.
+
+=item B<--tags-isnt>=I<s>
+
+Only return records where the 'tags' field does not equal specified value.
+
+=item B<--tags-json>=I<s>
+
+Only return records where the 'tags' field equals specified value (JSON-encoded).
+
+See C<--tags>.
+
+=item B<--tags-lacks-json>=I<s>
+
+Only return records where the 'tags' field is an array/list which does not contain specified value (JSON-encoded).
+
+See C<--tags-lacks>.
+
+=item B<--tags-lacks>=I<s@>
+
+Only return records where the 'tags' field is an array/list which does not contain specified value.
+
+Can be specified multiple times.
+
+=item B<--tags>=I<s>
+
+Only return records where the 'tags' field equals specified value.
+
+=back
+
+=head2 Filtering for year options
+
+=over
+
+=item B<--year-in-json>=I<s>
+
+Only return records where the 'year' field is in the specified values (JSON-encoded).
+
+See C<--year-in>.
+
+=item B<--year-in>=I<s@>
+
+Only return records where the 'year' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--year-is>=I<i>
+
+Only return records where the 'year' field equals specified value.
+
+=item B<--year-isnt>=I<i>
+
+Only return records where the 'year' field does not equal specified value.
+
+=item B<--year-max>=I<i>
+
+Only return records where the 'year' field is less than or equal to specified value.
+
+=item B<--year-min>=I<i>
+
+Only return records where the 'year' field is greater than or equal to specified value.
+
+=item B<--year-not-in-json>=I<s>
+
+Only return records where the 'year' field is not in the specified values (JSON-encoded).
+
+See C<--year-not-in>.
+
+=item B<--year-not-in>=I<s@>
+
+Only return records where the 'year' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--year-xmax>=I<i>
+
+Only return records where the 'year' field is less than specified value.
+
+=item B<--year-xmin>=I<i>
+
+Only return records where the 'year' field is greater than specified value.
+
+=item B<--year>=I<i>
+
+Only return records where the 'year' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--query>=I<s>, B<-q>
+
+Search.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort>=I<s>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<i>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<i>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-id-holidays list-id-holidays
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-id-holidays 'p/*/`list-id-holidays`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at C<~/.config/list-id-holidays.conf>, C<~/list-id-holidays.conf> or C</etc/list-id-holidays.conf> (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features. 
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+List of available configuration parameters:
+
+ date (see --date)
+ date.in (see --date-in)
+ date.is (see --date-is)
+ date.isnt (see --date-isnt)
+ date.max (see --date-max)
+ date.min (see --date-min)
+ date.not_in (see --date-not-in)
+ date.xmax (see --date-xmax)
+ date.xmin (see --date-xmin)
+ day (see --day)
+ day.in (see --day-in)
+ day.is (see --day-is)
+ day.isnt (see --day-isnt)
+ day.max (see --day-max)
+ day.min (see --day-min)
+ day.not_in (see --day-not-in)
+ day.xmax (see --day-xmax)
+ day.xmin (see --day-xmin)
+ decree_date (see --decree-date)
+ decree_date.contains (see --decree-date-contains)
+ decree_date.in (see --decree-date-in)
+ decree_date.is (see --decree-date-is)
+ decree_date.isnt (see --decree-date-isnt)
+ decree_date.max (see --decree-date-max)
+ decree_date.min (see --decree-date-min)
+ decree_date.not_contains (see --decree-date-not-contains)
+ decree_date.not_in (see --decree-date-not-in)
+ decree_date.xmax (see --decree-date-xmax)
+ decree_date.xmin (see --decree-date-xmin)
+ decree_note (see --decree-note)
+ decree_note.contains (see --decree-note-contains)
+ decree_note.in (see --decree-note-in)
+ decree_note.is (see --decree-note-is)
+ decree_note.isnt (see --decree-note-isnt)
+ decree_note.max (see --decree-note-max)
+ decree_note.min (see --decree-note-min)
+ decree_note.not_contains (see --decree-note-not-contains)
+ decree_note.not_in (see --decree-note-not-in)
+ decree_note.xmax (see --decree-note-xmax)
+ decree_note.xmin (see --decree-note-xmin)
+ detail (see --detail)
+ dow (see --dow)
+ dow.in (see --dow-in)
+ dow.is (see --dow-is)
+ dow.isnt (see --dow-isnt)
+ dow.max (see --dow-max)
+ dow.min (see --dow-min)
+ dow.not_in (see --dow-not-in)
+ dow.xmax (see --dow-xmax)
+ dow.xmin (see --dow-xmin)
+ fields (see --field)
+ format (see --format)
+ is_holiday (see --is-holiday)
+ is_holiday.is (see --is-holiday-is)
+ is_holiday.isnt (see --is-holiday-isnt)
+ is_joint_leave (see --is-joint-leave)
+ is_joint_leave.is (see --is-joint-leave-is)
+ is_joint_leave.isnt (see --is-joint-leave-isnt)
+ month (see --month)
+ month.in (see --month-in)
+ month.is (see --month-is)
+ month.isnt (see --month-isnt)
+ month.max (see --month-max)
+ month.min (see --month-min)
+ month.not_in (see --month-not-in)
+ month.xmax (see --month-xmax)
+ month.xmin (see --month-xmin)
+ naked_res (see --naked-res)
+ note (see --note)
+ note.contains (see --note-contains)
+ note.in (see --note-in)
+ note.is (see --note-is)
+ note.isnt (see --note-isnt)
+ note.max (see --note-max)
+ note.min (see --note-min)
+ note.not_contains (see --note-not-contains)
+ note.not_in (see --note-not-in)
+ note.xmax (see --note-xmax)
+ note.xmin (see --note-xmin)
+ query (see --query)
+ random (see --random)
+ result_limit (see --result-limit)
+ result_start (see --result-start)
+ sort (see --sort)
+ tags (see --tags)
+ tags.has (see --tags-has)
+ tags.is (see --tags-is)
+ tags.isnt (see --tags-isnt)
+ tags.lacks (see --tags-lacks)
+ with_field_names (see --with-field-names)
+ year (see --year)
+ year.in (see --year-in)
+ year.is (see --year-is)
+ year.isnt (see --year-isnt)
+ year.max (see --year-max)
+ year.min (see --year-min)
+ year.not_in (see --year-not-in)
+ year.xmax (see --year-xmax)
+ year.xmin (see --year-xmin)
+
+=head1 ENVIRONMENT
+
+=head2 LIST_ID_HOLIDAYS_OPT => str
+
+Specify additional command-line options
+
+=head1 FILES
+
+~/.config/list-id-holidays.conf
+
+~/list-id-holidays.conf
+
+/etc/list-id-holidays.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-IndonesianHolidayUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-IndonesianHolidayUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianHolidayUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

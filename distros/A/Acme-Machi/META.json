@@ -1,0 +1,53 @@
+{
+   "abstract" : "Awesome Machi here!",
+   "author" : [
+      "Machi Amayadori <Eosin@Syaro.Cafe>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Machi",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.62"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.26",
+            "Cwd" : "3.3902",
+            "Data::Dumper" : "2.13506",
+            "File::Basename" : "2.84",
+            "File::Spec" : "3.3902",
+            "IO::Dir" : "1.1",
+            "namespace::autoclean" : "0.28"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Machi" : {
+         "file" : "lib/Acme/Machi.pm",
+         "version" : "v1.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ]
+   },
+   "version" : "v1.00.1",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

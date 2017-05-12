@@ -1,0 +1,75 @@
+NAME
+    Apache::XPointer - mod_perl handler to address XML fragments.
+
+SYNOPSIS
+     <Directory /foo/bar>
+
+      <FilesMatch "\.xml$">
+       SetHandler   perl-script
+       PerlHandler  Apache::XPointer::XPath
+
+       PerlSetVar   XPointerSendRangeAs    "application/xml"
+      </FilesMatch>
+
+     </Directory>
+
+     #
+
+     my $ua  = LWP::UserAgent->new();
+     my $req = HTTP::Request->new(GET => "http://example.com/foo/bar/baz.xml");
+
+     $req->header("Range"  => qq(xmlns("x=http://example.com#")xpointer(*//x:thingy)));
+     $req->header("Accept" => qq(application/xml));
+
+     my $res = $ua->request($req);
+
+DESCRIPTION
+    Apache::XPointer is a mod_perl handler to address XML fragments using
+    the HTTP 1.1 *Range* and *Accept* headers and the XPath scheme, as
+    described in the paper : *A Semantic Web Resource Protocol: XPointer and
+    HTTP*.
+
+    Additionally, the handler may also be configured to recognize a
+    conventional CGI parameter as a valid range identifier.
+
+    If no 'range' property is found, then the original document is sent
+    unaltered.
+
+    If an *Accept* header is specified with no corresponding match, then the
+    server will return (406) HTTP_NOT_ACCEPTABLE. Successful queries will
+    return (206) HTTP_PARTIAL_CONTENT.
+
+IMPORTANT
+    This package is a base class and not expected to be invoked directly.
+    Please use one of the scheme-specific handlers instead.
+
+SUPPPORTED SCHEMES
+  XPath
+    Consult Apache::XPointer::XPath
+
+  RDF Data Query Language (RDQL)
+    Consult Apache::XPointer::RDQL
+
+MOD_PERL COMPATIBILITY
+    This handler will work with both mod_perl 1.x and mod_perl 2.x.
+
+VERSION
+    1.1
+
+DATE
+    $Date: 2004/11/16 03:56:18 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+SEE ALSO
+    http://www.mindswap.org/papers/swrp-iswc04.pdf
+
+    http://www.w3.org/TR/WD-xptr
+
+LICENSE
+    Copyright (c) 2004 Aaron Straup Cope. All rights reserved.
+
+    This is free software, you may use it and distribute it under the same
+    terms as Perl itself.
+

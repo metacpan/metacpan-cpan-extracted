@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/App/Nopaste/Service/PastebinComAPI.pm
+MANIFEST
+README
+LICENSE
+examples/example.pl
+t/00-load.t
+xt/kwalitee.t
+xt/pod-coverage.t
+xt/pod.t
+Makefile.PL
+META.yml
+META.json

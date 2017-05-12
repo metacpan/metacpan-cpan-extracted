@@ -1,0 +1,7 @@
+lib/Acme/Prereq/A.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/001Basic.t

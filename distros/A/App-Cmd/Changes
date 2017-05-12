@@ -1,0 +1,233 @@
+Revision history for App-Cmd
+
+0.331     2016-07-17 15:56:11-04:00 America/New_York
+        - documentation improvements (thanks, Davor Cubranic!)
+
+0.330     2015-10-23 23:21:35-04:00 America/New_York
+        - do not add "--help" to global opt spec twice (oops!)
+
+0.329     2015-10-07 13:01:34-04:00 America/New_York
+        - bump required version of Pod::Usage
+
+0.328     2015-09-03 20:37:50-04:00 America/New_York
+        - get command description from Pod by default (Jakob Voss)
+        - add a "--help" option to all commands by default (Jakob Voss)
+        - add "command_groups" to group commands in listing (Jakob Voss)
+        - fix the handling of "exit" in App::Cmd::Tester (Matthew Astley)
+        - add 'show_version_cmd' option to enable display of 'version'
+          command in command list. (John Anderson)
+        - minor documentation improvements (Alberto Simões, rjbs)
+
+0.327     2015-02-23 20:05:00-05:00 America/New_York
+        - fix behavior of default command under subdispatch (thanks, Stephen
+          Caldwell and Diab Jerius!)
+        - simplify help and commands commands (thanks, Sergey Romanov)
+        - drop some advice that we didn't feel great about (thanks, Karen
+          Etheridge)
+
+0.326     2014-11-30 08:48:29-05:00 America/New_York
+          fix the path fix because it was broken by a related fix in EUMM
+
+0.325     2014-11-29 20:48:34-05:00 America/New_York
+          fix a path-related test failure on Win32 (thanks, A. Sinan Unur!)
+
+0.324     2014-10-20 18:22:25-04:00 America/New_York
+          note that `cmd help` can take a subcommand in `cmd help help`
+
+0.323     2013-12-07 08:46:51 America/New_York
+          fall back to "(unknown)" for command abstract in more cases (thanks,
+          Jakob Voss!)
+
+0.322     2013-10-28 08:00:35 America/New_York
+          require a newer Getopt::Long to avoid --version conflicts
+
+0.321     2013-10-26 07:44:19 America/New_York
+          avoiding getting [undef] in argument list in Simple apps
+
+          add --version support via version command (thanks, Jakob Voss!)
+
+0.320     2013-01-30 19:37:46 America/New_York
+          when answering "Unknown subcommand," the commands list is sent ot
+          STDERR (#75652)
+
+          tests for using Params::Validate callback and not getting nasty stack
+          trace (thanks, Adam Prime)
+
+0.319     2013-01-25 18:18:21 America/New_York
+          Enable --help option for App::Cmd::Simple (thanks, Ryan Thompson!)
+
+          add the ability to ignore non-commands (Thanks, Kent Fredric!)
+
+          many improvements to tutorial (thanks, mokko!)
+
+0.318     2012-05-04 22:00:34 America/New_York
+          App::Cmd::Tester treats undef code as 0 now (thanks, David Golden)
+
+          piles of documentation improvement also by David Golden
+
+0.317     2012-03-26 10:11:52 America/New_York
+          App::Cmd::Tester now reports exit code 1 for unknown commands, as
+          App::Cmd would exit(1) in that case; addresses
+          https://rt.cpan.org/Public/Bug/Display.html?id=73084 reported by
+          David Golden
+
+0.316     2012-02-11 10:50:46 America/New_York
+          fix the test of "echo" on Win32 (thanks, Chris Williams)
+
+0.315     2012-02-10 09:08:49 America/New_York
+          totally worthless release made by mistake
+
+0.314     2012-01-03 21:38:59 America/New_York
+          adds App::Cmd::Tester::CaptureExternal to capture output from
+          external subcommands (thanks, David Golden)
+
+          if there's no Pod =head1 NAME, a Pod::Weaver-esque #ABSTRACT will be
+          respected (thanks, Andreas Hernitscheck)
+
+0.313     2011-12-23 13:29:53 America/New_York
+          don't load Text::Abbrev until it's needed (thanks, Olivier Mengué)
+
+0.312     2011-08-17 18:02:26 America/New_York
+          typo fixes to docs (thanks, Glenn Fowler)
+
+          add the prepare_argv method (thanks, Ingy döt Net)
+
+0.311     2011-03-17 22:42:19 America/New_York
+          require the correct version of Getopt::Long::Descriptive (thanks,
+          Glen Hinkle)
+
+0.310     2010-12-11
+          classes are now loaded with Class::Load, which should avoid bugs
+          where classes are not succesfully loaded by program execution
+          continues anyway (thanks to Kent Fredric)
+
+          more checking is now done to ensure that plugins are members of the
+          correct base class (thanks, Kent Fredric)
+
+0.309     2010-11-12
+
+          skip a failing test on perl 5.8.x
+
+0.308     2010-11-08
+
+          When App::Cmd::Setup tries to load MyApp::Command, and it exists but
+          will not compile, the exception will now propagate.  Previously, it
+          failed silently and App::Cmd::Command was used instead.  (bug found
+          and fixed and tested for by Kent Fredric; thanks!)
+
+0.307     2010-03-09
+          bump up required version of Getopt::Long::Descriptive
+
+0.306     2010-03-08
+          return the App::Cmd object (when non-Simple) in the Tester result
+          allow App::Cmd::Tester subclasses to chose another Result class
+
+0.305     2010-03-07
+          App::Cmd::Tester now reports (probable?) exit code of tested apps
+          some improvements to the tutorial and other docs
+          added some documentation for App::Cmd::Setup
+          now searches for plugins under App::Cmd::Plugin::; use = to prevent
+
+0.304     2009-12-07
+          remove use of deprecated "-run" from synopsis (thanks, George
+          Hartzell)
+
+0.303     2009-11-27
+          revert behavior of App::Cmd 0.302 -- GLD no longer gives undef opts
+
+0.302     2009-11-27
+          expect undef values for acceptable-but-ungiven options in $opt
+
+0.301     2009-09-02
+          fix App::Cmd::Simple docs to show ->execute (noticed by MIYAGAWA)
+
+0.300     2009-08-28
+          DEPRECATED -run OPTION TO APP CLASS IMPORT
+          "use MyApp -run;" is deprecated; it will be removed after no less
+          than a year
+
+          this led to problems where normal exit-on-error messages confused
+          users by complaining about failing to compile; magic to stop this is
+          not worth the tiny savings
+
+          COMMANDS SHOULD NOW HAVE ->execute RATHER THAN ->run
+          this will not break you code... except:
+
+          WILL BREAK YOUR CODE: App::Cmd::Simple programs must use ->execute
+          rather than ->run
+
+0.207     2009-08-27
+          add option to allow any unambiguous command abbreviation
+          (thanks, Jerome Quelin)
+
+0.206     2009-08-19
+          add a ->description to commands (thanks, Jerome Quelin)
+
+0.205     2009-08-18
+          add the long-missing arg0 and full_arg0 accessors (resolves 35528)
+          thanks to GAISSMAI and Jerome Quelin for reporting
+
+0.204     2009-06-27
+          document the need for calling ->import on Simple apps
+          add tests for Simple-based apps
+          correct a few errors in the tutorial (thanks, Jason Crome)
+
+0.203     2009-01-16
+          add repo info to metadata
+
+0.202     2008-10-16
+          update App::Cmd::Tester to use IO::TieCombine
+
+0.201     2008-10-14
+          fix typos in Tutorial.pod (thanks, HARTZELL!)
+          fix prereq for Sub::Exporter to ensure we have curry_method
+
+0.200     2008-09-14
+          new super-concise ::Setup interface provided by Sub::Exporter
+          added plugin system
+          consult App::Cmd::Tutorial to see the new interface
+          your old code should still work!
+
+0.013     2008-03-19
+          add arg0 and full_arg0 methods
+
+0.012     2007-11-19
+          refresh Module::Install
+
+0.011     2007-10-12
+          BUG FIX: note new prereqs
+
+0.010     2007-10-05
+          MAJORLY NEW: App::Cmd::Simple for one-command apps
+
+0.009     2007-10-05
+          BUG FIX: default_command/_plugin method names were not consistent
+          TRIVIA: come into line with some code writing policies
+
+0.008     2006-11-16
+          documentation fixes
+          perl-critic tests
+
+0.007     2006-08-25
+          documentation improvements
+          refactoring and reordering of code
+
+0.006     2006-08-25
+          gracefully ignore invalid plugins (NUFFIN)
+          some tweaks to "help" (NUFFIN)
+          actually make "help" the default
+          some documenation improvements
+
+0.005     2006-08-23
+          this release brought to you by NUFFIN!
+          allow subcommands (commands beneath commands)
+          add a default "help" command
+          support global options
+          improve documentation and tutorial
+          extensive minor refactorings and improvements
+
+0.002     2006-06-14
+          fix test plan
+
+0.001     2006-06-12
+          first release (not counting Rubric::CLI)

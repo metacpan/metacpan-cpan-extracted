@@ -1,0 +1,9 @@
+name = "App-LJ"
+badges = ["travis"]
+authority="cpan:SONGMU"
+
+module_maker="ModuleBuildTiny"
+readme_from="script/lj"
+
+[FileGatherer]
+exclude_match = ['^author/.*', '^lj$']

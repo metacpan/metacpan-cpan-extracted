@@ -1,0 +1,23 @@
+Revision history for Perl extension Authen::Simple::Passwd
+
+0.6 2006-01-15 00:00
+    - Verify passwd path at construction time.
+    - Deprecated passwd option in favor for path.
+
+0.5 2006-01-13 00:00
+    - Removed allow option
+    - Use Authen::Simple::Password for password verification
+
+0.4 2006-01-12 00:00
+    - Fixed MANIFEST
+
+0.3 2006-01-12 00:00
+    - POD fixes. No functional changes.
+
+0.2 2006-01-04 00:00
+    - Fixed parameters spec.
+    - Flock defaults to d_flock in Config.pm
+    - Added basic tests
+
+0.1 2006-01-03 00:00
+    - First release

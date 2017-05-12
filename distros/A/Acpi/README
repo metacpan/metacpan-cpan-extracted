@@ -1,0 +1,51 @@
+Acpi 0.1 README          SHY(shy@cpan.org)         Sun Jan 09 12:00:00 GMT 2005
+================================================================================
+
+Table of Contents
+------------------------
+
+1.  Introduction
+2.  Prerequisites
+3.  Installation 
+4.  License
+
+1. Introduction
+------------------------
+
+Welcome to Acpi,a quick tool for recuperate information about battery,temperature,etc...
+
+2. Prerequisites
+------------------------
+
+Acpi requires that your kernel is configured with acpi.
+
+3. Installation
+________________________
+
+Do this, in the following order:
+
+        perl Makefile.PL
+	make
+	make install
+
+4. License
+________________________
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Library General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+
+I have test this module only on i386 laptop,so if someone would help !!
+
+Author : shy@cpan.org

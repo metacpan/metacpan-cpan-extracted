@@ -1,0 +1,24 @@
+Revision history for AlignAid
+
+0.0.2  Thu Dec 14 13:55:27 CST 2006
+
+       - Now can use without the PP module being installed (although you
+         won't be able to submit to PP or LSF queues, of course).
+
+       - PP-related tests are skipped if PP is not installed.
+
+       - switched from using FAlite to Bio::SeqIO.
+
+       - POD is now complete.
+
+       - now checks for BPdeluxe 1.0 before allowing the use of
+         validate_blasts().
+
+       - updated README.
+
+       - now using Build.PL to auto-generate Makefile.PL and META.yml.
+
+0.0.1  Wed May  3 13:38:18 2006
+
+       - Initial release.
+

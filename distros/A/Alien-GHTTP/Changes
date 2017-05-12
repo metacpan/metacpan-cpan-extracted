@@ -1,0 +1,20 @@
+Revision history for Alien-GHTTP
+
+0.005     2016-04-29
+  - Patched libghttp to be current with autotools to correct FreeBSD installs
+  - Cleaned up some DZil build stuff
+
+0.004     2016-04-16
+  - Patched the libghttp to ship it out already patched - removes complexity
+
+0.003     2016-04-08
+  - Bundle tarball of version 1.0.9 with the release
+  - Make every attempt to let the world know that the library is deprecated
+
+0.002     2016-04-06
+  - Make Alien::patch a dynamic requirement
+  - Update config.sub and config.guess to the latest from
+    http://git.savannah.gnu.org/cgit/config.git
+
+0.001     2016-04-05
+  - original version

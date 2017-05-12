@@ -1,0 +1,171 @@
+#!/usr/bin/perl -w
+
+use File::Basename;
+use Getopt::Long;
+use Amazon::SQS::Simple;
+
+my %opts;
+GetOptions(
+    \%opts, 
+    'flush', 
+    'timeout=i', 
+    'help', 
+    'delete', 
+    'create', 
+    'info', 
+    'access-key', 
+    'secret-key',
+    'list-queues',
+    'verbose',
+);
+
+my $scr             = basename($0);
+my $queue_name      = shift;
+
+my $AWSAccessKeyId  = $opts{'access-key'} || $ENV{AWS_ACCESS_KEY}; 
+my $SecretKey       = $opts{'secret-key'} || $ENV{AWS_SECRET_KEY};
+
+usage(0) if ($opts{help});
+usage(1) if @ARGV;
+
+sub usage {
+    my $status = shift || 0;
+    print <<USAGE;
+Usage: 
+    $scr --list-queues
+    $scr [OPTIONS] queue-name
+
+OPTIONS:
+    --flush
+        remove all visible messages from queue
+
+    --timeout=SECS
+        set the queue's default visibility timeout in seconds
+
+    --create
+        create a queue with the given name
+
+    --delete
+        delete the queue with the given name
+
+    --info
+        print info about the queue
+
+    --help
+        show this help documentation
+
+    --verbose
+        make output of some operations more verbose
+
+    --access-key=KEY
+        Your AWS access key (or set AWS_ACCESS_KEY env 
+        variable)
+
+    --secret-key=KEY
+        Your AWS secret key (or set AWS_SECRET_KEY env
+        variable)
+USAGE
+
+    exit($status);
+}
+
+use strict;
+
+my $sqs = new Amazon::SQS::Simple($AWSAccessKeyId, $SecretKey);
+my $q;
+
+if ($opts{'list-queues'}) {
+    my $queues = $sqs->ListQueues();
+    if ($queues) {
+        foreach my $queue (@$queues) {
+            (my $name = $queue->Endpoint()) =~ s|.*/||;
+            printf ("%s (Endpoint: %s)\n", $name, $queue->Endpoint());
+        }
+    }
+    else {
+        print "You don't have any queues (use --create to create one)"
+    }
+    exit(0);
+}
+
+usage(1) unless $queue_name;
+
+if ($opts{create}) {
+    $q = q_create($queue_name);
+}
+else {
+    $q = q_find($queue_name);
+}
+
+if ($opts{timeout}) {
+    q_timeout($q, $opts{timeout});
+}
+
+if ($opts{info}) {
+    q_info($q);
+}
+
+if ($opts{flush}) {
+    q_flush($q);
+}
+
+if ($opts{delete}) {
+    q_delete($q);
+}
+
+sub q_find {
+    my $name = shift;
+    my $queues = $sqs->ListQueues(QueueNamePrefix => $name);
+    if ($queues) {
+        my @matches = grep { $_->Endpoint() =~ m|/$name$|} @$queues;
+        if (@matches > 1) {
+            warn "[WARNING] Multiple queues found with name $name\n";
+        }
+        if (@matches) {
+            return $matches[0];
+        }
+    }
+    die "No queue called $name found (try using --list-queues)\n";
+}
+
+sub q_create {
+    my $name = shift;
+    $sqs->CreateQueue($name);
+}
+
+sub q_delete {
+    my $queue = shift;
+    my $href = $queue->Delete();
+}
+
+sub q_info {
+    my $queue = shift;
+    print "Endpoint: $queue\nAttributes:\n";
+    my $attrs = $queue->GetAttributes();
+    for (keys %$attrs) {
+        print "$_ => $attrs->{$_}\n";
+    }
+}
+
+sub q_flush {
+    my $queue = shift;
+    while (my $msg = $queue->ReceiveMessage) {
+        if ($opts{verbose}) {
+            print "Deleting " . $msg->MessageId . "\n";
+        }
+        $queue->DeleteMessage($msg->ReceiptHandle);
+    }
+}
+
+sub q_timeout {
+    my $queue = shift;
+    my $t = shift;
+
+    if (defined $t) { 
+        $queue->SetAttribute('VisibilityTimeout', $t);
+    }
+    else {
+        my $href = $queue->GetAttributes();
+        return $href->{VisibilityTimeout};
+    }
+}

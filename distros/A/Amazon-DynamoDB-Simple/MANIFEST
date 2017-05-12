@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+cpanfile.snapshot
+lib/Amazon/DynamoDB/Simple.pm
+minil.toml
+t/00_compile.t
+xt/amazon/dynamodb/simple.t
+xt/amazon/dynamodb/sync.t
+META.yml
+MANIFEST

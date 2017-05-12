@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<xsp:page xmlns:xsp="http://apache.org/xsp/core/v1" indent-result="yes">
+    <output>
+        Hello World. The time of request is:
+        <xsp:expr>scalar localtime</xsp:expr>
+        <structure>
+            <xsp:expr>
+                { abc => 42, xyz => { goofy => "yes", ugly => "no" } };
+            </xsp:expr>
+        </structure>
+        <querystring>
+            <xsp:expr>
+                [
+                    map { {key => $_, value => [ $cgi->param($_) ] } }
+                        $cgi->param
+                ]
+            </xsp:expr>
+        </querystring>
+    </output>
+</xsp:page>

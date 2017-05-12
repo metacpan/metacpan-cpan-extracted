@@ -1,0 +1,18 @@
+0.04 2016-04-27T20:23:00+02:00
+ - Fix example (implement --version).
+
+0.03 2016-02-15T16:16:15+01:00
+ - Add default value for -r argument.
+ - Fix author requires.
+ - Improve doc.
+ - Update copyright years.
+
+0.02 2015-09-21T22:47:48+02:00
+ - Add tests for constructor.
+ - Fix ERRORS section in App::Translit::String doc.
+ - Move argument processing to run() method.
+ - Move author tests to xt/ directory.
+ - Update README file.
+
+0.01 2015-08-20T10:18:00+02:00
+ - First version.

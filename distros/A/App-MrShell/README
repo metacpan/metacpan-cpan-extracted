@@ -1,0 +1,17 @@
+Mr. Shell runs a command on multiple hosts and returns results meaningfully.
+
+bash$ mrsh -- "uptime; ls -ald /proc/$$"
+
+09:12:17         -- starting: uptime; ls -ald /proc/8078 on razor bubble corky wisp --
+09:12:17 corky:   09:12:17 up 4 days,  2:14, 14 users,  load average: 0.33, 0.22, 0.17
+09:12:17 corky:  dr-xr-xr-x 6 jettero jettero 0 2009-05-05 07:03 /proc/8078
+09:12:18 razor:   09:12:15 up 4 days, 50 min,  9 users,  load average: 0.62, 0.35, 0.31
+09:12:18 razor:  [stderr] ls: cannot access /proc/8078: No such file or directory
+09:12:18 wisp:    09:12:30 up 4 days, 14:05,  5 users,  load average: 0.04, 0.01, 0.00
+09:12:18 wisp:   [stderr] ls: cannot access /proc/8078: No such file or directory
+09:12:18 bubble:  09:12:20 up 56 days, 16:45,  2 users,  load average: 0.15, 0.16, 0.15
+09:12:18 bubble: [stderr] ls: cannot access /proc/8078: No such file or directory
+09:12:19 razor:  -- shell exited with nonzero status: 2 --
+09:12:19 bubble: -- shell exited with nonzero status: 2 --
+09:12:19 wisp:   -- shell exited with nonzero status: 2 --
+

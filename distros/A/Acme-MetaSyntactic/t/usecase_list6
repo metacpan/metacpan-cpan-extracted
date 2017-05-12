@@ -1,0 +1,3 @@
+use Acme::MetaSyntactic 'test_ams_list';
+print metaname();
+

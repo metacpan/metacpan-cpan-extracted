@@ -1,0 +1,93 @@
+use alienfile;
+use Path::Tiny qw( path );
+use File::Glob qw( bsd_glob );
+use Config;
+
+my $compiler_type = meta_prop->{platform}->{compiler_type};
+
+meta_prop->{my_makefile} = $compiler_type eq 'microsoft' ? 'makefile.msc' : 'Makefile';
+
+plugin 'Probe::CBuilder' => (
+  libs    => '-lbz2',
+  version => qr/version = '(.*?)[,']/,
+  program => q{
+#include <bzlib.h>
+#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+  printf("version = '%s'\n", BZ2_bzlibVersion());
+  return 0;
+}
+},
+);
+
+plugin 'Probe::CommandLine' => (
+  command   => 'bzip2',
+  secondary => 1,
+);
+
+share {
+
+  plugin 'Build::MSYS' => () unless $compiler_type eq 'microsoft';
+
+  plugin 'Download' => (
+    url     => 'http://www.bzip.org/downloads.html',
+    version => qr/^bzip2-([0-9\.]+)tar.gz$/,
+  );
+  plugin Extract => 'tar.gz';
+  
+  patch [ '%{patch} -p1 < %{alien.install.patch}/bzip2-1.0.6.diff' ];
+  
+  my @build;
+  
+  push @build,
+    [ '%{make}', -f => '%{alien.meta.my_makefile}', 'all', "CC=%{perl.config.cc}", "CFLAGS=%{perl.config.cccdlflags} %{perl.config.optimize}", ],
+    [ '%{make}', -f => '%{alien.meta.my_makefile}', 'install', 'PREFIX=%{alien.install.prefix}', 'EXE=%{perl.config.exe_ext}' ];
+
+  push @build, sub {
+    my($build) = @_;
+    my($version) = path(".")->absolute->basename =~ /([0-9\.]+)$/;
+    $build->runtime_prop->{version} = $version;
+  };
+  
+  if($^O !~ /^(MSWin32|cygwin|msys)$/)
+  {
+    push @build, [ '%{make}', -f => 'Makefile-libbz2_so', sub {
+    
+      my($build, $det) = @_;
+      
+      if($det->{exit} == 0)
+      {
+        my @dlls = grep { ! -l $_ } bsd_glob 'libbz2*.so*';
+        my $dest = path($build->install_prop->{prefix})->child('dynamic');
+        $dest->mkpath;
+        path($_)->copy($dest->child($_))
+          for @dlls;
+      }
+    }];
+  }
+  
+  build \@build;
+
+  gather sub {
+    my($build) = @_;
+    my $prefix = $build->runtime_prop->{prefix};
+
+    $build->runtime_prop->{cflags}        = "-I$prefix/include ";
+    $build->runtime_prop->{cflags_static} = "-I$prefix/include ";
+
+    if($compiler_type eq 'microsoft')
+    {
+      $build->runtime_prop->{libs}          = "-LIBPATH:$prefix/lib libbz2.lib ";
+      $build->runtime_prop->{libs_static}   = "-LIBPATH:$prefix/lib libbz2.lib ";
+    }
+    else
+    {
+      $build->runtime_prop->{cflags_static} .= ' -DBZ_STATIC=1';
+      $build->runtime_prop->{libs}          = "-L$prefix/lib -lbz2 ";
+      $build->runtime_prop->{libs_static}   = "-L$prefix/lib -lbz2 ";
+    }
+  };
+
+};

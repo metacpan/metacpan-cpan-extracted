@@ -1,0 +1,68 @@
+{
+   "abstract" : "Detect freq of tones in an audio file or stream",
+   "author" : [
+      "Mike Greb <michael@thegrebs.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Audio-Analyzer-ToneDetect",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Audio::Analyzer" : "0",
+            "Sort::Key::Top" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mikegrb/Audio-Analyzer-ToneDetect/issues"
+      },
+      "homepage" : "https://github.com/mikegrb/Audio-Analyzer-ToneDetect",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mikegrb/Audio-Analyzer-ToneDetect.git",
+         "web" : "https://github.com/mikegrb/Audio-Analyzer-ToneDetect"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "Rev Michael Greb <michael@thegrebs.com>",
+      "mikegrb <mgreb@linode.com>"
+   ]
+}
+

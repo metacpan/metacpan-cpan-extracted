@@ -1,0 +1,11 @@
+Changes
+lib/Acme/Lvalue.pm
+MANIFEST
+README
+Makefile.PL
+t/00-load.t
+t/readonly.t
+t/tee.t
+t/wtf.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

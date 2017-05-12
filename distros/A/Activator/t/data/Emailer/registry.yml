@@ -1,0 +1,7 @@
+'Activator::Registry':
+  "Activator::Emailer": 
+    "From": 'activator-emailer@test.com'
+    "email_wrap": 'email_wrap.tt'
+    "html_footer": 'html_footer.tt'
+    "html_header": 'html_header.tt'
+    "mailer_type": 'Sendmail'

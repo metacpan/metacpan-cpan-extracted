@@ -1,0 +1,7 @@
+An example of bad markdown
+
+Text::Markdown will report an error. We should continue anyway.
+
+<http://www.very.long.address.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx>
+

@@ -1,0 +1,13 @@
+DESCRIPTION
+
+    This distribution provides the following command-line utilities related
+    to Module::DataPack:
+
+    #INSERT_EXECS_LIST
+
+SEE ALSO
+
+    Module::DataPack
+
+    App::DataSectionSeekableUtils
+

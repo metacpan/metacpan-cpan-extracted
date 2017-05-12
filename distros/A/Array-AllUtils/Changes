@@ -1,0 +1,14 @@
+Revision history for Array-AllUtils
+
+0.002   2016-04-13 (PERLANCAR)
+
+        - Add firstidx().
+
+        - [build] Build fixes.
+
+        - Add some tests.
+
+
+0.001   2016-04-13 (PERLANCAR)
+
+        - First early release.

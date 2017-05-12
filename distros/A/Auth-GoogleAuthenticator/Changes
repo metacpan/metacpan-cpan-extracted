@@ -1,0 +1,12 @@
+TO DO:
+    . Unbundle the Dancer sample application
+
+0.03 20131121
+    . Fix prerequisites
+
+0.02 20130726
+    + Precedence "return and" fix, spotted and patched
+      by Reini Urban
+
+0.01 20130222
+    + Initial released

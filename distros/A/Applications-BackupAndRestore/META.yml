@@ -1,0 +1,31 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Applications-BackupAndRestore
+version:      0.021
+version_from: lib/Applications/BackupAndRestore.pm
+installdirs:  site
+requires:
+    base:                          2.07
+    Carp:                          1.04
+    CGI:                           3.15
+    Cwd:                           3.12
+    enum:                          1.016
+    Exporter:                      5.58
+    File::Basename:                2.74
+    Glib:                          1.161
+    Gnome2:                        1.04
+    Gnome2::GConf:                 1.043
+    Gnome2::VFS:                   1.08
+    Gtk2:                          1.161
+    Gtk2::GladeXML:                1.006
+    Number::Bytes::Human:          0.07
+    POSIX:                         1.09
+    strict:                        1.03
+    Test::More:                    0.62
+    Tie::DataDumper:               0.03
+    Unicode::MapUTF8:              1.11
+    Unicode::UTF8simple:           1.06
+    warnings:                      1.05
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

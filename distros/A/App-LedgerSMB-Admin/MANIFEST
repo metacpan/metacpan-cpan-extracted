@@ -1,0 +1,27 @@
+bin/lsmb_createdb
+bin/lsmb_reload
+Changes
+ignore.txt
+lib/App/LedgerSMB/Admin.pm
+lib/App/LedgerSMB/Admin/Database.pm
+lib/App/LedgerSMB/Admin/Database/Setting.pm
+lib/App/LedgerSMB/Admin/User.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-paths.t
+t/10-basic-db.t
+t/boilerplate.t
+t/data/mock1/sql/modules/Fixes.sql
+t/data/mock1/sql/modules/LOADORDER
+t/data/mock1/sql/modules/test1.sql
+t/data/mock1/sql/modules/test2.sql
+t/data/mock1/sql/Pg-database.sql
+t/data/mock2/sql/modules/LOADORDER
+t/data/mock2/sql/upgrade/lsmb0.1-0.2.sql
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

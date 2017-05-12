@@ -1,0 +1,22 @@
+Revision history for Perl extension Apache2::Layout
+
+0.06  Fri, 04 Jan 2008 01:19:15 -0000 (Philippe M. Chiasson <gozer@ectoplasm.org>)
+     - Fix a bug that could cause output mangling when stacked with other filters
+
+0.05  Wed, 02 Jan 2008 23:59:48 -0000 (Philippe M. Chiasson <gozer@ectoplasm.org>)
+     - Allocate new buckets from the new brigade, otherwise, things can go leaky
+
+0.04  Wed, 02 Jan 2008 23:04:47 -0000 (Philippe M. Chiasson <gozer@ectoplasm.org>)
+     - Removing a bucket before reading it was a bug.
+
+0.03  Tue, 01 Jan 2008 19:01:33 -0000 (Philippe M. Chiasson <gozer@ectoplasm.org>)
+     - When running sub-requests, make sure to pass them throught the entire initial filter chain
+     - Skip filtering for sub-requests
+
+0.02  Thu, 27 Dec 2007 21:13:07 -0000 (Philippe M. Chiasson <gozer@ectoplasm.org>)
+     - Relayout directory structure
+     - Switch Changes to Module::Changes
+     - Correct a brigade memory leak
+
+0.01  Thu, 27 Dec 2007 06:09:05 -0000 (Philippe M. Chiasson <gozer@ectoplasm.org>)
+     - Initial release

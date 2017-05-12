@@ -1,0 +1,68 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::LiteWeb.
+# Usage: env DEBUG=1 USE_NETWORK=1 tests/liteweb-1
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More tests => 29;
+use_ok("Arch::LiteWeb");
+
+my $web = Arch::LiteWeb->new;
+ok($web && $web->isa('Arch::LiteWeb'), "create web object");
+
+SKIP: {
+
+skip("network tests by default", 27) unless $ENV{USE_NETWORK};
+
+my $content = eval { $web->get("invalid-url"); };
+ok($@,                   "invalid-url causes die");
+ok(!defined $content,    "invalid-url results in undef");
+ok(!defined $web->error, "invalid-url results in no error set");
+
+$content = $web->get("http://unexisting.domain/something");
+ok(!defined $content,    "unexisting.domain results in undef");
+ok($web->error,          "unexisting.domain results in error set");
+ok($web->network_error,  "unexisting.domain results in network error set");
+ok(!$web->response_code, "unexisting.domain results in no response code set");
+
+$content = $web->get($url = "http://localhost:2/something");
+is($web->request_url, $url, "localhost:1 url is parsed as expected");
+ok(!defined $content,       "localhost:1 results in undef");
+ok($web->network_error,     "localhost:1 results in network error set");
+ok(!$web->response_headers, "localhost:1 results in no response headers set");
+
+my $start_url = "http://google.com/robots.txt";
+my $first_url = "http://google.com:80/robots.txt";
+my $redir_url = "http://www.google.com/robots.txt";
+my $final_url = "http://www.google.com:80/robots.txt";
+$content = $web->get($start_url, noredirect => 1);
+is($web->request_url, $first_url, "resulted url is the expected one");
+skip("- seems like you have no network", 15) if $web->network_error;
+ok($content && $content =~ /<html/i, "google.com responds with html content");
+is($web->response_code, 302,         "google.com responds with code 302");
+is($web->response_codestr, "Found",  "google.com responds with code Found");
+my $headers = $web->response_headers || {};
+is($headers->{content_type}, "text/html", "google.com responds text/html");
+ok($headers->{content_length},       "google.com returns Content-Length header");
+is($headers->{location}, $redir_url, "google.com returns Location header");
+
+$content = $web->get($start_url);
+is($web->request_url, $final_url, "redirected url is the expected one");
+ok(!$web->error,                     "google.com responds with no error set");
+$headers = $web->response_headers || {};
+is($headers->{content_type}, "text/plain", "google.com responds text/plain");
+is($web->response_code, 200,         "google.com responds with code 200");
+is($web->response_codestr, "OK",     "google.com responds with code OK");
+ok(!$headers->{location},            "google.com returns no Location header");
+
+my $host = "archzoom.sourcecontrol.net";
+$content = $web->get("http://$host:80/robots.txt");
+is($content, "User-agent: *\nDisallow: /\n\n", "$host: got expected robots.txt");
+$headers = $web->response_headers || {};
+my ($content_type) = split(';', $headers->{content_type});
+is($web->request_url, "http://$host:80/robots.txt", "$host: expected url");
+is($content_type, "text/plain", "$host: got expected Content-Type");
+
+}

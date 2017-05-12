@@ -1,0 +1,15 @@
+--- SDL-1.2/Makefile.in	2012-05-28 13:21:48.000000000 +0200
++++ SDL-1.2/Makefile.in.new	2014-05-04 20:07:10.000000000 +0200
+@@ -72,10 +72,10 @@
+ include $(depend)
+ 
+ $(objects)/$(TARGET): $(OBJECTS)
+-	$(LIBTOOL) --mode=link $(CC) -o $@ $^ $(LDFLAGS) $(EXTRA_LDFLAGS) $(LT_LDFLAGS)
++	$(LIBTOOL) --mode=link $(CC) -o $@ $(OBJECTS) $(LDFLAGS) $(EXTRA_LDFLAGS) $(LT_LDFLAGS)
+ 
+ $(objects)/$(SDLMAIN_TARGET): $(SDLMAIN_OBJECTS)
+-	$(LIBTOOL) --mode=link $(CC) -o $@ $^ $(LDFLAGS) $(EXTRA_LDFLAGS) $(LT_LDFLAGS) $(SDLMAIN_LDFLAGS)
++	$(LIBTOOL) --mode=link $(CC) -o $@ $(OBJECTS) $(LDFLAGS) $(EXTRA_LDFLAGS) $(LT_LDFLAGS) $(SDLMAIN_LDFLAGS)
+ 
+ 
+ install: all install-bin install-hdrs install-lib install-data install-man

@@ -1,0 +1,28 @@
+Revision history for Perl extension Apache::FakeCookie
+
+0.08  Mon Sep 11 11:39:50 PDT 2006
+	modify tests to conform to perl 5.0503
+
+0.07  Fri Jan 17 08:56:01 PST 2003
+	rename to: ApacheFakeCookie
+	from Apache::Test::CookieEmulator
+
+0.06  Thu Jan 16 18:04:38 PST 2003
+	Correct documentation errors in POD
+
+0.05  Fri Sep 13 14:33:32 PDT 2002
+	add complete functionality for 'expires' to
+	set and return date strings like Apache::Cookie
+
+0.04  Tue Sep  3 11:47:15 PDT 2002
+	various small bug fixes and documentation updates
+
+0.03  Tue Sep  3 05:36:05 PDT 2002
+	correct module name in a_cookie.t
+
+0.02  Tue Sep  3 02:00:52 PDT 2002
+	added method 'parse'
+	updated to accept non-scalar values
+
+0.01  Mon Sep  2 15:41:28 PDT 2002
+	initial release

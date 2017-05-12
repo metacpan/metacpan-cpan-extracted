@@ -1,0 +1,77 @@
+NAME
+    Apache2::Tail - mod_perl handler to display the error_log
+
+SYNOPSIS
+      PerlModule Apache2::Tail
+      <Location /tail>
+        SetHandler  modperl
+        PerlHandler Apache2::Tail
+
+        [PerlSetVar Apache2::Tail::ErrorLog /some/other/log/file]
+        [PerlSetVar Apache2::Tail::CSS /css/mystyle.css]
+        [PerlSetVar Apache2::Tail::Count 100]
+
+        Order deny,allow
+        allow from 127.0.0.0/8
+        deny from all
+      </Location>
+
+DESCRIPTION
+    Simple mod_perl handler that displays a pretty html version of the
+    error_log.
+
+  OPTIONS
+    These options can be configured with PerlSetVar
+
+    * Apache2::Tail::ErrorLog
+
+      The file to display, defaults to the current VirtualHost's *error_log*
+
+    * Apache2::Tail::Count
+
+      The default maximum number of lines to display. Defaults to *50*, but
+      can also be overriden at request time with the ?n= query parameter
+
+    * Apache2::Tail::CSS
+
+      The URL to an alternate sylesheet, defaults to some built-in defaults
+
+INTERNAL DOCUMENTATION
+    Quick summary of the internal APIs for anybody interested in subclassing
+    Apache2::Tail.
+
+  handler($class, $r)
+    The main handler, responsible for processing the request
+
+  error_log($class, $r)
+    Must return the full path to the file that needs tailing
+
+  print_header($class, $r)
+    prints the HTML header up to and including the <body> tag
+
+  print_footer($class, $r)
+    prints the HTML footer closing the <body> tag
+
+  tail_cnt($class, $r)
+    returns the maximum number of lines to tail for this request.
+
+  style($class, $r)
+    returns the CSS content for the page
+
+AUTHOR
+    Philippe M. Chiasson <gozer@cpan.org>
+
+ARTWORK
+    Tara Gibbs <tarag@activestate.com>
+
+REPOSITORY
+    http://svn.ectoplasm.org/projects/perl/Apache2-Tail/trunk/
+
+COPYRIGHT
+    Copyright 2007 by Philippe M. Chiasson <gozer@cpan.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

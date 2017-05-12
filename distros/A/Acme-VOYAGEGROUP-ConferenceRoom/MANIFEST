@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+bin/conference_room
+cpanfile
+lib/Acme/VOYAGEGROUP/ConferenceRoom.pm
+lib/Acme/VOYAGEGROUP/ConferenceRoom/Output/Color.pm
+lib/Acme/VOYAGEGROUP/ConferenceRoom/Output/JSON.pm
+lib/Acme/VOYAGEGROUP/ConferenceRoom/Output/MessagePack.pm
+lib/Acme/VOYAGEGROUP/ConferenceRoom/Output/XML.pm
+minil.toml
+t/00_compile.t
+t/01_conference_room.t
+META.yml
+MANIFEST

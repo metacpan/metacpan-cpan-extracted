@@ -1,0 +1,37 @@
+clear
+power on
+regs
+
+# Carry Flag Case -------------------
+op a0 55
+op c0 2b
+
+# Should be: IY=55, C=1, Z=0, S=0
+test iy = 55
+test c = 1
+test z = 0
+test s = 0
+
+# Zero Flag Case --------------------
+power on
+op a0 55
+op c0 55
+
+# Should be: IY=55, C=1, Z=1, S=0
+test iy = 55
+test c = 1
+test z = 1
+test s = 0
+
+# Negative Flag Case ----------------
+power on
+op a0 35
+op c0 55
+
+# Should be: IY=35, C=0, Z=0, S=1
+test iy = 35
+test c = 0
+test z = 0
+test s = 1
+
+save verify_C0.txt

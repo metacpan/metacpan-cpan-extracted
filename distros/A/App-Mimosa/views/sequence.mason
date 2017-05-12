@@ -1,0 +1,4 @@
+<%args>
+    $fasta => 'This sequence is not currently available'
+</%args>
+<% $fasta %>

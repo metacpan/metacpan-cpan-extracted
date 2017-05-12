@@ -1,0 +1,36 @@
+           Audio::RPLD
+          -------------
+
+--- What is Audio::RPLD?
+This is a perl module to control the RoarAudio PlayList Daemon (rpld).
+It supports most commands supported by the rpld.
+This included commands to control playback, the Main Queue, playlists
+and pointer mangement.
+
+--- Building and Installing:
+
+There are no build or runtime depends beside the depend to
+the Perl 5.x core libs.
+
+Some system provide a package for this module.
+The name may be or look simular to: libaudio-rpld-perl.
+
+If your system does not include a package you can install this package
+by paw:
+
+ $ perl Makefile.PL
+ $ make
+
+ now switch to root and type:
+ # make install
+
+ or use sudo:
+ $ sudo make install
+
+--- Docs
+
+After you installed the package you can read the docs by using this command:
+ $ perldoc Audio::RPLD
+
+Before you installed the packaged you can read the docs by using this command:
+ $ perldoc lib/Audio/RPLD.pm

@@ -1,0 +1,9 @@
+bin/prima-repl
+Build.PL
+lib/App/Prima/REPL.pm
+lib/PrimaX/InputHistory.pm
+MANIFEST			This list of files
+META.yml
+META.json
+t/00-load-main.t
+t/01-load-input-history.t

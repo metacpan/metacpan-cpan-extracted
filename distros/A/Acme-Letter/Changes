@@ -1,0 +1,6 @@
+Revision history for Perl extension Acme::Letter.
+
+0.01  Tue Dec 14 15:04:05 2010
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Acme::Letter
+

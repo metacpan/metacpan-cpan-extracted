@@ -1,0 +1,10 @@
+Revision history for Perl extension Algorithm::SpiralSearch.
+
+1.00 Wed Apr 26 16:30:01 2006
+     + Added support for boundry conditions
+
+1.10 Sun May 21 16:13:07 MST 2006
+     + Fixed problem with Makefile.PL
+
+1.20 Mon Nov 24 11:22:40 PST 2008
+     + Minor Perl cleanup, mainly cosmetic

@@ -1,0 +1,32 @@
+---
+abstract: 'Alien module for Unicorn Engine from www.unicorn-engine.org'
+author:
+  - 'Vikas N. Kumar <vikas@cpan.org>'
+build_requires:
+  Alien::Base::ModuleBuild: '0.029'
+  Alien::gmake: '0.11'
+  Module::Build: '0'
+  Test::More: '0'
+configure_requires:
+  Alien::Base::ModuleBuild: '0.029'
+  Archive::Extract: '0'
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-UnicornEngine
+provides:
+  Alien::UnicornEngine:
+    file: lib/Alien/UnicornEngine.pm
+    version: '0.05'
+requires:
+  Alien::Base: '0.029'
+  File::ShareDir: '1.00'
+resources:
+  bugtracker: https://github.com/selectiveintellect/p5-alien-unicorn/issues
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://github.com/selectiveintellect/p5-alien-unicorn
+version: '0.05'

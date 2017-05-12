@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual - ars_SetSchema</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_SetSchema(ctrl, name, schemaHash)</CODE></H2>
+
+      This function modifies an existing schema. You must first
+      populate the <CODE>schemaHash</CODE> before calling this routine.
+      <P><CODE>name</CODE> is the schema name.
+      <P><CODE>schemaHash</CODE> is a partially assigned
+      <A HREF="ds_schema.html">Schema Attributes</a> hash. 
+
+      <P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns 1
+          <DT><B>On failure</B><DD>
+              Returns 0
+      </DL>
+
+      <P>Example:
+
+      <P><BLOCKQUOTE>
+      <I> This example copies an existing schema to a new 
+          schema. I.e. it simply re-saves the schema under
+          a new name. </I></BLOCKQUOTE>
+
+      <PRE>
+      ($a = ars_GetSchema($c, "AL-foobar")) ||
+	    die $ars_errstr;
+      $a->{name} = "Copy of ".$a->{name};
+      ars_SetSchema($c, $name, $a) || die $ars_errstr;
+      </PRE>
+
+<P>
+<I>This function was introduced in version 1.90 of ARSperl</I>
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

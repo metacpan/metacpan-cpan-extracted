@@ -1,0 +1,53 @@
+NOTE: Astro::FITS::CFITSIO v1.11 requires cfitsio library version
+      3.39 or later. It can be obtained from
+      http://heasarc.gsfc.nasa.gov/fitsio
+
+NOTE: gcc takes a very long time to compile CFITSIO.c (created from
+      CFITSIO.xs) with -O2 optimization. With -O0, it takes about one
+      tenth the time. This is the explanation for the optimization
+      flag below.
+
+
+1. Makefile.PL needs to know where the cfitsio library is installed.
+
+   If the ExtUtils::PkgConfig Perl module is installed and the
+   cfitsio.pc file is installed where pkg-config can find it
+   then the library will be automatically discovered.  To test
+   the latter condition, run
+
+      pkg-config --libs cfitsio
+
+   If this is not the case or you wish to override the pkg-config
+   cfitsio metainformation then set the CFITSIO environment variable
+   pointing to the location of your cfitsio library and headers (e.g.,
+   /usr/local/cfitsio), or a prefix with include and lib
+   subdirectories containing the cfitsio headers and library,
+   respectively (e.g., /usr/local).
+
+   $ CFITSIO=/usr/local/cfitsio         # Bourne shell and variants
+   $ export CFITSIO
+
+   % setenv CFITSIO /usr/local/cfitsio  # C shell variants
+
+2. perl Makefile.PL OPTIMIZE=-O0
+
+3. make
+
+4. make test
+
+5. If you want, compare the output of the testprog/testprog*.pl
+   scripts to cfitsio's testprog.c. There is a small shell script -
+   "runtests" - included to make this easier.
+
+6. make install
+
+If compilation fails, please make sure the version of cfitsio you're
+using matches that listed in README as a requirement for this version
+of the module.
+
+If compilaton succeeds but 'make test' fails due to unresolved
+symbols, you should try explicity setting the libcfitsio.a to link
+to. In Makefile.PL, add the following key to the WriteMakefile()
+argument list:
+
+      'MYEXTLIB' => '/path/to/libcfitsio.a',

@@ -1,0 +1,31 @@
+NAME
+    Attribute::Unimplemented - mark unimplemented methods
+
+SYNOPSIS
+      package SomeClass;
+      use Attribute::Unimplemented;
+
+      sub wip : Unimpemented {
+          # this block won't be executed
+          my $self = shift;
+          $self->foo;
+          $self->bar;
+      }
+
+DESCRIPTION
+    Attribute::Unimplemented can be used to mark your methods as
+    unimplemented one.
+
+    With this attribute on, calls to those methods will generate warnings
+    and the real code inside the method won't be executed. That is the only
+    difference with Attribute::Deprecated.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Attribute::Handlers manpage, the Attribute::Deprecated manpage
+

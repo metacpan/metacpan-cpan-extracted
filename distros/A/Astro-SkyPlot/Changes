@@ -1,0 +1,14 @@
+Revision history for Perl extension Astro::SkyPlot.
+
+0.03  Sat Jan  2 20:00 2009
+  - Support for Miller and Sinusoidal projections
+  - Projection example
+  - Many markers
+  - Cleanup
+
+0.02  Wed Dec 30 20:00 2009
+  - dependency fixes
+
+0.01  Tue Dec 29 20:00 2009
+  - original version
+

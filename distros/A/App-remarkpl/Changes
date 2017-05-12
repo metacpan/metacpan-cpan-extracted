@@ -1,0 +1,21 @@
+Revision history for perl distribution App-remarkpl
+
+0.05 2017-04-29T12:43:22+0200
+ - Stopped using deprecated "slurp" function
+
+0.04 2015-11-13T00:28:06+0100
+ - Markdown files need to be UTF-8
+ - Better readability for "inverse" styling
+
+0.03 2015-11-12T22:36:21+0100
+ - Fix remarkpl --print
+ - Fix cpanfile: Requires Mojolicious
+
+0.02 2015-11-12T22:10:32+0100
+ - Will load the presentation from disk on each request
+
+0.01 2015-11-12T21:38:21+0100
+ - Add script/remarkpl
+ - Add example.markdown
+ - Bundled remark.js and default styling
+

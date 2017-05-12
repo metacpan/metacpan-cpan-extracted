@@ -1,0 +1,39 @@
+Changes
+lib/AnyData.pm
+lib/AnyData/Format/Base.pm
+lib/AnyData/Format/CSV.pm
+lib/AnyData/Format/FileSys.pm
+lib/AnyData/Format/Fixed.pm
+lib/AnyData/Format/HTMLtable.pm
+lib/AnyData/Format/Ini.pm
+lib/AnyData/Format/Mp3.pm
+lib/AnyData/Format/Paragraph.pm
+lib/AnyData/Format/Passwd.pm
+lib/AnyData/Format/Pipe.pm
+lib/AnyData/Format/Tab.pm
+lib/AnyData/Format/Text.pm
+lib/AnyData/Format/Weblog.pm
+lib/AnyData/Format/XML.pm
+lib/AnyData/Storage/File.pm
+lib/AnyData/Storage/File.pod
+lib/AnyData/Storage/FileSys.pm
+lib/AnyData/Storage/PassThru.pm
+lib/AnyData/Storage/RAM.pm
+lib/AnyData/Storage/TiedHash.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/56962.log
+t/56962.t
+t/api.t
+t/fixed.t
+t/fixed.tbl
+t/htmltable.t
+t/test.t
+t/weblog.t
+t/weblog.tbl
+t/xml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

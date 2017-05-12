@@ -1,0 +1,78 @@
+{
+   "abstract" : "designate an array as a queue or a stack",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Attribute-QueueStack",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attribute::Handlers" : "0",
+            "Devel::StrictMode" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Attribute::QueueStack" : {
+         "file" : "lib/Attribute/QueueStack.pm",
+         "version" : "0.003"
+      },
+      "Tie::Array::Queue" : {
+         "file" : "lib/Tie/Array/Queue.pm",
+         "version" : "0.003"
+      },
+      "Tie::Array::Stack" : {
+         "file" : "lib/Tie/Array/Stack.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Attribute-QueueStack"
+      },
+      "homepage" : "https://metacpan.org/release/Attribute-QueueStack",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-attribute-queuestack.git",
+         "web" : "https://github.com/tobyink/p5-attribute-queuestack"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Attribute-QueueStack/project"
+   },
+   "version" : "0.003"
+}

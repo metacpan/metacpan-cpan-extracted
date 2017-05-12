@@ -1,0 +1,13 @@
+
+priority 1:
+
+ * custom config directives (remove need for <Perl> section)
+ * smart mapping of application by connector
+
+priority 2:
+
+ * generate httpd.conf include file from server.xml
+
+priority 3:
+
+ * localized messages

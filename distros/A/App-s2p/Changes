@@ -1,0 +1,11 @@
+Revision history for App-s2p
+
+1.002     2014-08-16 13:30:33+02:00 Europe/Amsterdam
+          Fix licensing and attribution
+
+1.001     2013-12-04 00:26:27 Europe/Amsterdam
+          Fixed up provides field in metadata
+
+1.000     2013-12-03 17:13:49 Europe/Amsterdam
+          Released s2p as in blead circa 5.19.6
+          

@@ -1,0 +1,287 @@
+mowyw - mowyw writes your websites (or: Moritz writes your websites ;-)
+
+For license of this file see the notice at the end of the file
+
+mowyw is an offline CMS, that means it process sources files and generates
+output files from them, usually HTML files, but php files and others are
+possible as well (with some limitations though).
+
+For a formal and more complete description see the manpage at
+<http://perlgeek.de/software/mowyw.1>
+
+SHORT HOWTO:
+-----------
+
+choose an empty directory, and there create the three directories 
+includes/
+source/
+online/
+
+The `source/' directory contains the source files that will be processed by
+mowyw. Each file in the `source/' directory is mapped to one file in the 
+`online/'  directory. You should not write files into the `online/' directory
+since they may be deleted or overwritten, and you should not modify existing
+files in that directory since all changes are lost during the next run.
+All files that might be included by others (including menus) should be in the
+`includes' directory.
+
+Now place a file index.html (or whatever you want it to be called) in the
+'source/' directory.
+
+If all your HTML files have a common header/footer, you may want to place them
+in in the files `includes/header' and `includes/footer'.
+
+For example `inlcudes/header' may contain
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" type="text/css" media="screen, projection" href="style.css" />
+<link rel="stylesheet" type="text/css" media="print" href="print.css" />
+
+and `includes/footer' may contain
+
+	</body>
+</html>
+
+and perhaps an additional footer line to be displayed in all pages.
+
+Now write some content in the file `source/index.html' and then run mowyw.
+You should get an output like that:
+
+Processing File 'source/index.html'... DONE.
+
+Now point your browser at source/index.html and see if it worked.
+Files not ending in .html, .htm, .shtml, .xhtml etc. are not processed, just
+copyied.
+
+You can change the default pathes with the following command line options to
+mowyw:
+	--postfix=html
+	--includes-prefix=incl/
+	--source-prefix=src/
+	--destination-prefix=out/
+	--menu-prefix=incl/menu/
+Note that if you want the prefixes to be directories you have to include the
+trailing slash (or whatever the directory separator on your OS is).
+
+If you didn't change any heaer/footer/included files you can save processing
+time by adding the command line option '--make', in which case mowyw will
+compare the timestamps of the source file and designated output file and will
+only process the source file if it is newer.
+
+
+INCLUDES:
+
+So far mowyw didn't do much work for you, it just added header and footer
+sections to all html files.
+But it can do more for you: includes. 
+Just use the line
+
+[[[include foo]]]
+
+or 
+
+[% include foo %]
+
+in your files, and the line will be replaced with the  content of the file 
+`includes/foo'. It works pretty much like #inlcude "includes/foo" with a C pre
+processor or <!-- #include virtual="includes/foo"--> with Server Side Includes
+(SSI).
+
+Note that everywhere the [[[ ... ]]] delimiters can be exchanged by [% .. %].
+
+If the file includes/global exisits, it is processed before each source file.
+Its output is discarded, but options and variables defined in that file are
+available in all source files.
+
+MENUS:
+
+Suppose you want to write a navigation menu in your html files that look like
+this:
+
+menu
+ |
+ +-- foo
+ |
+ +-- bar
+ |
+ +-- baz
+ 
+and if you click on foo, a sub menu opens:
+
+menu
+ |
+ +-- foo
+ |   |
+ |   +-foo1
+ |   +-foo2
+ |   +-foo3
+ |
+ +-- bar
+ |
+ +-- baz
+
+The way you do this with mowyw is simple:
+create a file called `includes/menu-navigation' and fill it with something
+like this:
+
+<div class="menu">
+Navigation:
+<ul>
+	[% item foo <li><a href="foo.html" {{class="#active"}}>foo</a> 
+		{{<ul>
+			<li><a href="foo1">foo1</a></li>
+			<li><a href="foo2">foo2</a></li>
+		</ul>}}</li> %]
+	[% item bar <li><a href="bar.html" {{class="#active"}}>bar</a></li> %]
+	[% item baz <li><a href="baz.html" {{class="#active"}}>baz</a></li> %]
+</ul>
+</div>
+
+now in your file foo.html, you use the line
+[% menu navigation foo %].
+This line will be replaced by mowyw with:
+
+<div class="menu">
+Navigation:
+<ul>
+	<li><a href="foo.html" class="#active">foo</a> 
+		<ul>
+			<li><a href="foo1">foo1</a></li>
+			<li><a href="foo2">foo2</a></li>
+		</ul></li>
+	<li><a href="bar.html" >bar</a></li>
+	<li><a href="baz.html" >baz</a></li>
+</ul>
+</div>
+
+Each menu item looks like this: [% item label1 some_text %]. If it is called as
+[% menu label1 %] it will produce some_text, and all double curly brackets {{ }}
+are simply stripped, but the text between them remains.
+If it is called with a different name, say [% menu label2 %] the curly brackets
+and the text between them are stripped.
+
+SYNTAX HILIGHTING
+
+If you have both the Perl module Text::VimColor and Vim installed, you can use
+the follwing construct to automagically generate syntax hilighted HTML markup:
+
+<pre>[% syntax perl %]
+#!/usr/bin/perl
+
+sub blubb {
+	print "This sub only prints this stupid message\n";
+}
+[% endsyntax %]pre>
+
+If you don't have Text::VimColor installed, the characters '&', '<' and '>'
+will still be automatically escaped.
+
+The only argument to 'syntax' is the language that the code is in, if you use
+a value that vim doesn't know it will try to guess the language.
+
+The standard CSS classes are:
+.synComment    { color: #0000FF }
+.synConstant   { color: #FF00FF }
+.synIdentifier { color: #008B8B }
+.synStatement  { color: #A52A2A ; font-weight: bold }
+.synPreProc    { color: #A020F0 }
+.synType       { color: #2E8B57 ; font-weight: bold }
+.synSpecial    { color: #6A5ACD }
+.synUnderlined { color: #000000 ; text-decoration: underline }
+.synError      { color: #FFFFFF ; background: #FF0000 none }
+.synTodo       { color: #0000FF ; background: #FFFF00 none }
+
+(taken from Text::VimColor)
+
+
+VERBATIM OUTPUT
+
+If your website includes string like [% or %] etc., you can use the
+verbatim-construct to prevent it from parsing:
+
+[% verbatim foobarbaz %]
+Things here inbetween will be printed out exactly as they stand here, you can
+safely write things like 
+"in perl6 [...] returns array refs:
+my $a = [2, [4, 5, [8, 9,10]]];"
+note that the ']]]' will not cause any harm.
+[% endverbatim foobarbaz %]
+
+the name in the verbatim and in the endverbatim-package have to agree exactly
+and my consist of alphabetic characters and numbers.
+
+COMMENTS
+
+You can exclude parts entirly from showing up in the output by putting them
+inside a comment:
+[% comment anything inside here will not show up in the output %]
+In a comment everything but ']]]' is allowed.
+
+
+OMITTING HEADER AND FOOTER
+
+If you include a line like this:
+[% option no-header %]
+the header is _not_ prepended as usual.
+You can achieve the following functionality for the footer with the line
+[% option no-footer %]
+
+
+SETTING AND READING VARIABLES
+
+Suppose you want to add a different <title> to every page, but you want all
+your HTML header to be in one specific place.
+A way to achive this is with the setvar and readvar constructs. Place this in
+your header file:
+<html>
+	<head><title>[% readvar title %]</title>/head>
+	<body>
+(of course you should use a doctype ;-)
+And then in each source file you can use
+[% setvar title This is the title of this stupid page %]
+to set the title. If you forget to set a variable before using it  a warning
+will be emitted.
+
+Scoping:
+Variables are scoped in the sense that when you enter a new scope (by using
+include, menu, item or automatically by including the header and footer) the
+variables from the higher level scope are still available, but if you modify
+them in local scope they will still be unmodified in the outer scope.
+Example:
+	[% setvar foo bar %]
+	[% include somefile %]
+	[% redavar foo %] 	--- gives bar
+In file somfile:
+	[% readvar foo %] 	--- gives bar
+	[% setvar foo baz %]	
+	[% readvar foo %]	--- gives baz
+Therefore you can change the header's and footer's output by defining
+variables in the main source file, but not the other way round.
+
+
+SYNTAX CHANGE
+-------------
+Version 0.0.3 and before used only double square brackets 
+(like [[include foo]]), but I noticed that double closing square brackets 
+are part of a typical CDATA declaration in xml files (and xhtml) like this:
+<style type="text/css">
+/*<![CDATA[*/
+	CSS Declarations
+/*]]>*/
+</style>
+
+Now tripple square brackets (like [[[ include foo]]] ) or, preferred, 
+[% ... %] are used.
+
+
+LICENSE:
+	This README file is covered by the GPL (2 or later), however
+	the code examples in this file are public domain, e.g. you may use it
+	however you like.
+	The program mowyw is published under the GPL, for details see the
+	executable

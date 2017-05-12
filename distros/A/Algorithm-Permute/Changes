@@ -1,0 +1,54 @@
+Revision history for Perl extension Algorithm::Permute.
+
+0.12  Apr 23 2008
+    - Maintenance release. Bugfix #35288.
+
+0.11  Jan 4 2008
+    - Added alternative implementation of the algorithm (enable it using
+      -DUSE_LINKEDLIST)
+    - Added comprehensive benchmarks script, thus replacing the old 
+      stuffs inside bench directory
+
+0.10  Jan 2 2008
+    - Fixed memory error when cleaning up combination struct on Win32
+    - Fixed compile error when using MSVC6
+
+0.09  Jan 2 2008
+    - Added test for die() inside permutation block
+    - Added memory leak tests for A::P destructor
+    - New feature: permutation r of n objects. Combination
+      is implemented using coolex algorithm
+    - Updated docs to reflect this feature
+    - Fixed memory leak in A::P destructor
+
+0.08  Dec 27 2007
+    - Make it pass test #23 (srezic reported crashes on 
+      amd64-freebsd-6.2). Thanks to Yoga Eko P for free login to 
+      freebsd machine.
+
+0.07  Dec 26 2007
+    - Make it work with perl-5.10.0 (RT ticket #27022)
+
+0.06  May 28 2003
+    - Fixed a memory leak in permute()
+    - Fixed bug #2596 : Perl context stack manip done in safer way in permute()
+    - array passed to permute() not marked as R/O. see test #23 for reason
+    - test.pl extended with eval and mem leak tests
+
+0.05  May 16 2003
+	- Added -DPERL_EXT to legalise use of perl-5.9.0's cxinc
+	- Uses PAD_SET_CUR macro when defined, this fixes problem with invalid pad in 5.9.0
+
+0.04  Mar 6 2002
+	- Fixed cross-compiler compatibility problem in the callback hack, by Robin
+
+0.03  Sep 5 2001
+	- Added callback interface by Robin Houston
+	- Fixed bogus benchmark
+
+0.02  Sep 2 2000
+	- Major interface changes. Now object-oriented
+
+0.01  Fri Sep  1 18:05:17 2000
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,863 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: enriched-document.xsd,v 1.1 2007/03/19 09:46:48 ht Exp $ -->
+<!-- This Schema prescribes the format of Alvis enriched document records -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           targetNamespace="http://alvis.info/enriched/"
+           xmlns:enriched="http://alvis.info/enriched/">
+
+  <xs:element name="documentCollection">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:documentRecord"/>
+      </xs:sequence>
+      <xs:attribute name="version" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="documentRecord">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="enriched:acquisition"/>
+        <xs:element minOccurs="0" ref="enriched:linguisticAnalysis"/>
+        <xs:element minOccurs="0" ref="enriched:relevance"/>
+      </xs:sequence>
+      <xs:attribute name="id" use="required"/>
+      <xs:attribute name="action" default="update">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="update"/>
+            <xs:enumeration value="delete"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+
+  <xs:element name="acquisition">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="enriched:acquisitionData"/>
+        <xs:element minOccurs="0" ref="enriched:originalDocument"/>
+        <xs:element ref="enriched:canonicalDocument"/>
+        <xs:element minOccurs="0" ref="enriched:metaData"/>
+        <xs:element minOccurs="0" ref="enriched:links"/>
+        <xs:element minOccurs="0" ref="enriched:analysis"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="acquisitionData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="enriched:modifiedDate"/>
+        <xs:element minOccurs="0" ref="enriched:expiryDate"/>
+        <xs:element minOccurs="0" ref="enriched:checkedDate"/>
+        <xs:element minOccurs="0" ref="enriched:httpServer"/>
+        <xs:element ref="enriched:urls"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="modifiedDate" type="xs:string"/>
+  <xs:element name="expiryDate" type="xs:string"/>
+  <xs:element name="checkedDate" type="xs:string"/>
+  <xs:element name="httpServer" type="xs:string"/>
+  <xs:element name="urls">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:url"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="url" type="xs:string"/>
+
+  <xs:element name="originalDocument">
+    <xs:complexType mixed="true">
+      <xs:attribute name="mimeType" use="required"/> <!-- from IANA's list -->
+      <xs:attribute name="charSet" use="required"/> <!-- from IANA's list -->
+      <xs:attribute name="compression">
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="deflate"/>
+            <xs:enumeration value="gzip"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="encoding">
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="quoted-printable"/>
+            <xs:enumeration value="base64"/>
+            <xs:enumeration value="xml"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="canonicalDocument">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:section"/>
+      </xs:sequence>
+      <xs:attribute name="version"/> <!-- only when this is document element -->
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="section">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="enriched:list"/>
+        <xs:element ref="enriched:ulink"/>
+        <xs:element ref="enriched:section"/>
+      </xs:choice>
+      <xs:attribute name="title"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="list">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:item"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="item">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="enriched:list"/>
+        <xs:element ref="enriched:ulink"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ulink">
+    <xs:complexType mixed="true">
+      <xs:attribute name="url"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="metaData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:meta"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="meta">
+    <xs:complexType mixed="true">
+      <xs:attribute name="name" use="required"/> <!-- Dublin Core element -->
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="links">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:outlinks"/>
+        <xs:element minOccurs="0" ref="enriched:inlinks"/>
+        <xs:element minOccurs="0" ref="enriched:inlinkHosts"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="outlinks">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:link"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="inlinks">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:link"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="inlinkHosts" type="xs:string"/>
+  <xs:element name="link">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:anchorText"/>
+        <xs:element ref="enriched:location"/>
+      </xs:sequence>
+      <xs:attribute name="type" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:NCName">
+            <xs:enumeration value="a"/>
+            <xs:enumeration value="img"/>
+            <xs:enumeration value="frame"/>
+            <xs:enumeration value="text"/>
+            <xs:enumeration value="area"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="anchorText" type="xs:string"/>
+  <xs:element name="location">
+    <xs:complexType mixed="true">
+      <xs:attribute name="documentId"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="analysis">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:property"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:ranking"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:topic"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="property">
+    <xs:complexType mixed="true">
+      <xs:attribute name="name" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ranking">
+    <xs:complexType mixed="true">
+      <xs:attribute name="scheme" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="topic">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="enriched:class"/>
+        <xs:element minOccurs="0" ref="enriched:terms"/>
+      </xs:sequence>
+      <xs:attribute name="absoluteScore" use="required"/>
+      <xs:attribute name="relativeScore" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="class" type="xs:string"/>
+  <xs:element name="terms" type="xs:string"/>
+
+
+  <!-- linguisticAnalysis postponed until below, due to its complexity -->
+
+
+  <xs:element name="relevance">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:scoreset"/>
+	<xs:element minOccurs="0" maxOccurs="1" ref="enriched:staticRank"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="staticRank">
+    <xs:complexType mixed="true">
+      <xs:attribute name="method"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="scoreset">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:score"/>
+      </xs:sequence>
+      <xs:attribute name="type" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="score">
+    <xs:complexType mixed="true">
+      <xs:attribute name="topicId" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- linguistic annotation (ALVIS WP5) -->
+  <xs:element name="linguisticAnalysis">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:anaphora_relation_level"/>
+        <xs:element minOccurs="0" ref="enriched:domain_specific_relation_level"/>
+        <xs:element minOccurs="0" ref="enriched:lemma_level"/>
+        <xs:element minOccurs="0" ref="enriched:log_level"/>
+        <xs:element minOccurs="0" ref="enriched:morphosyntactic_features_level"/>
+        <xs:element minOccurs="0" ref="enriched:phrase_level"/>
+        <xs:element minOccurs="0" ref="enriched:semantic_features_level"/>
+        <xs:element minOccurs="0" ref="enriched:semantic_unit_level"/>
+        <xs:element minOccurs="0" ref="enriched:sentence_level"/>
+        <xs:element minOccurs="0" ref="enriched:syntactic_relation_level"/>
+        <xs:element minOccurs="0" ref="enriched:stem_level"/>
+        <xs:element minOccurs="0" ref="enriched:token_level"/>
+        <xs:element minOccurs="0" ref="enriched:word_level"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- TOKEN LEVEL -->
+  <xs:element name="token_level">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:comments"/>
+        <xs:element maxOccurs="unbounded" ref="enriched:token"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- separator token -->
+  <xs:element name="token">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="enriched:content"/>
+        <xs:element ref="enriched:from"/>
+        <xs:element ref="enriched:id"/>
+        <xs:element ref="enriched:to"/>
+        <xs:element ref="enriched:type"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- content of the token -->
+  <xs:element name="content" type="xs:string"/>
+  <!-- start offset of the token -->
+  <xs:element name="from" type="xs:string"/>
+  <!-- end offset of the token -->
+  <xs:element name="to" type="xs:string"/>
+
+  <!-- WORD LEVEL -->
+  <xs:element name="word_level">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:comments"/>
+        <xs:element maxOccurs="unbounded" ref="enriched:word"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- word -->
+  <xs:element name="word">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:form"/>
+        <xs:element ref="enriched:id"/>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element ref="enriched:list_refid_token"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- id of the element -->
+  <xs:element name="id" type="xs:string"/>
+  <!-- list of the tokens which compose the words -->
+  <xs:element name="list_refid_token">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="enriched:refid_token"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- token id, part of the words -->
+  <xs:element name="refid_token" type="xs:string"/>
+  <!-- form -->
+  <xs:element name="form" type="xs:string"/>
+
+  <!-- SENTENCE LEVEL -->
+  <xs:element name="sentence_level">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:comments"/>
+        <xs:element maxOccurs="unbounded" ref="enriched:sentence"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- sentence -->
+  <xs:element name="sentence">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:form"/>
+        <xs:element ref="enriched:id"/>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element ref="enriched:refid_end_token"/>
+        <xs:element ref="enriched:refid_start_token"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- Reference of the token at the beginning -->
+  <!-- of the sentence -->
+  <xs:element name="refid_start_token" type="xs:string"/>
+  <!-- Reference of the token at the end -->
+  <!-- of the sentence -->
+  <xs:element name="refid_end_token" type="xs:string"/>
+  <!-- word id, part of the word -->
+  <xs:element name="refid_word" type="xs:string"/>
+
+  <!-- PHRASE LEVEL -->
+  <xs:element name="phrase_level">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:comments"/>
+        <xs:element maxOccurs="unbounded" ref="enriched:phrase"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- phrase -->
+  <xs:element name="phrase">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="enriched:id"/>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element ref="enriched:list_refid_components"/>
+        <xs:element minOccurs="0" ref="enriched:form"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- list_refid_components -->
+  <xs:element name="list_refid_components">
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="enriched:refid_word"/>
+        <xs:element ref="enriched:refid_phrase"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <!-- refid_phrase -->
+  <xs:element name="refid_phrase" type="xs:string"/>
+
+  <!-- SEMANTIC UNIT LEVEL -->
+  <xs:element name="semantic_unit_level">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:comments"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:semantic_unit"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- Named entities and terms -->
+  <xs:element name="semantic_unit">
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="enriched:named_entity"/>
+        <xs:element ref="enriched:term"/>
+        <xs:element ref="enriched:undefined"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <!-- named entity -->
+  <xs:element name="named_entity">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:form"/>
+        <xs:element minOccurs="0" ref="enriched:id"/>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:choice minOccurs="0">
+          <xs:element ref="enriched:refid_phrase"/>
+          <xs:element ref="enriched:refid_word"/>
+          <xs:element ref="enriched:list_refid_token"/>
+        </xs:choice>
+        <xs:element minOccurs="0" ref="enriched:canonical_form"/>
+        <xs:element ref="enriched:named_entity_type"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="list_refid_semantic_unit">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="enriched:refid_semantic_unit"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="refid_semantic_unit" type="xs:string"/>
+  <!-- named_entity_type -->
+  <xs:element name="named_entity_type" type="xs:string"/>
+  <!-- term -->
+  <xs:element name="term">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:form"/>
+        <xs:element ref="enriched:id"/>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:choice>
+          <xs:element ref="enriched:refid_phrase"/>
+          <xs:element ref="enriched:refid_word"/>
+          <xs:element ref="enriched:list_refid_token"/>
+        </xs:choice>
+        <xs:element minOccurs="0" ref="enriched:canonical_form"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- undefined semantic unit -->
+  <xs:element name="undefined">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:form"/>
+        <xs:element ref="enriched:id"/>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:choice>
+          <xs:element ref="enriched:refid_phrase"/>
+          <xs:element ref="enriched:refid_word"/>
+          <xs:element ref="enriched:list_refid_token"/>
+        </xs:choice>
+        <xs:element minOccurs="0" ref="enriched:canonical_form"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- LEMMA LEVEL -->
+  <xs:element name="lemma_level">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:comments"/>
+        <xs:element maxOccurs="unbounded" ref="enriched:lemma"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- lemma -->
+  <xs:element name="lemma">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="enriched:canonical_form"/>
+        <xs:element ref="enriched:id"/>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element ref="enriched:refid_word"/>
+        <xs:element minOccurs="0" ref="enriched:form"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- canonical form of the word -->
+  <!-- corresponding to the lemma -->
+  <xs:element name="canonical_form" type="xs:string"/>
+
+  <!-- STEM LEVEL -->
+  <xs:element name="stem_level">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:comments"/>
+        <xs:element maxOccurs="unbounded" ref="enriched:stem"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- stem -->
+  <xs:element name="stem">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="enriched:id"/>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element maxOccurs="unbounded" ref="enriched:stem_form"/>
+        <xs:element ref="enriched:refid_word"/>
+        <xs:element minOccurs="0" ref="enriched:form"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- stem form -->
+  <xs:element name="stem_form" type="xs:string"/>
+
+  <!-- MORPHOSYNTACTIC FEATURES LEVEL -->
+  <xs:element name="morphosyntactic_features_level">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:comments"/>
+        <xs:element maxOccurs="unbounded" ref="enriched:morphosyntactic_features"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- morphosyntactic_features -->
+  <xs:element name="morphosyntactic_features">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="enriched:id"/>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:choice>
+          <xs:element ref="enriched:refid_word"/>
+          <xs:element ref="enriched:refid_phrase"/>
+        </xs:choice>
+        <xs:element ref="enriched:syntactic_category"/>
+        <xs:element minOccurs="0" ref="enriched:type"/>
+        <xs:element minOccurs="0" ref="enriched:gender"/>
+        <xs:element minOccurs="0" ref="enriched:number"/>
+        <xs:element minOccurs="0" ref="enriched:case"/>
+        <xs:element minOccurs="0" ref="enriched:mood_vform"/>
+        <xs:element minOccurs="0" ref="enriched:tense"/>
+        <xs:element minOccurs="0" ref="enriched:person"/>
+        <xs:element minOccurs="0" ref="enriched:degree"/>
+        <xs:element minOccurs="0" ref="enriched:possessor"/>
+        <xs:element minOccurs="0" ref="enriched:formation"/>
+        <xs:element minOccurs="0" ref="enriched:form"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- type -->
+  <!--
+    applicable for nouns, verbs, 
+    adjectives, pronouns, determiners, 
+    adverbs, adpositions, conjunctions, 
+    numerals
+  -->
+  <xs:element name="type" type="xs:string"/>
+  <!-- gender -->
+  <!--
+    applicable for nouns, verbs, 
+    adjectives, pronouns, determiners, 
+    numerals
+  -->
+  <xs:element name="gender" type="xs:string"/>
+  <!-- number -->
+  <!--
+    applicable for nouns, verbs, 
+    adjectives, pronouns, determiners, 
+    numerals
+  -->
+  <xs:element name="number" type="xs:string"/>
+  <!-- case -->
+  <!--
+    applicable for nouns, adjectives,
+    pronouns, determiners, numerals
+  -->
+  <xs:element name="case" type="xs:string"/>
+  <!-- mood_vform -->
+  <!-- applicable for verbs -->
+  <xs:element name="mood_vform" type="xs:string"/>
+  <!-- tense -->
+  <!-- applicable for verbs -->
+  <xs:element name="tense" type="xs:string"/>
+  <!-- person -->
+  <!--
+    applicable for verbs, pronouns,
+    determiners
+  -->
+  <xs:element name="person" type="xs:string"/>
+  <!-- degree -->
+  <!--
+    applicable for adjectives, 
+    adverbs
+  -->
+  <xs:element name="degree" type="xs:string"/>
+  <!-- possessor -->
+  <!--
+    applicable for pronouns,
+    determiners
+  -->
+  <xs:element name="possessor" type="xs:string"/>
+  <!-- formation -->
+  <!-- applicable for adpositions -->
+  <xs:element name="formation" type="xs:string"/>
+  <!-- syntactic_category -->
+  <!-- Multext POS categories -->
+  <!--
+    Noun (N), Verb (V), Adjective (A), Pronoun
+    (P), Determiner (D), Article (T), Adverb
+    (R), Adposition (S) Conjunction (C),
+    Numerals (M), Interjection (I), Unique (U)
+    Resiual (X), Abbreviation (Y)
+  -->
+  <xs:element name="syntactic_category" type="xs:string"/>
+
+  <!-- SYNTACTIC_RELATION_LEVEL -->
+  <xs:element name="syntactic_relation_level">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:comments"/>
+        <xs:element maxOccurs="unbounded" ref="enriched:syntactic_relation"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- syntactic_relation -->
+  <xs:element name="syntactic_relation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="enriched:id"/>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element ref="enriched:syntactic_relation_type"/>
+        <xs:element ref="enriched:refid_head"/>
+        <xs:element ref="enriched:refid_modifier"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- refid_head phrase or word -->
+  <xs:element name="refid_head">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="enriched:refid_word"/>
+        <xs:element ref="enriched:refid_phrase"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <!-- refid_modifier phrase or word -->
+  <xs:element name="refid_modifier">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="enriched:refid_word"/>
+        <xs:element ref="enriched:refid_phrase"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <!-- syntactic_relation_type -->
+  <xs:element name="syntactic_relation_type" type="xs:string"/>
+
+  <!-- SEMANTIC_FEATURES_LEVEL -->
+  <xs:element name="semantic_features_level">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:comments"/>
+        <xs:element maxOccurs="unbounded" ref="enriched:semantic_features"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- semantic_features -->
+  <xs:element name="semantic_features">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="enriched:id"/>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element ref="enriched:semantic_category"/>
+        <xs:element ref="enriched:refid_semantic_unit"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- semantic_category -->
+  <xs:element name="semantic_category">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="enriched:list_refid_ontology_node"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- list_refid_ontology_node -->
+  <xs:element name="list_refid_ontology_node">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="enriched:refid_ontology_node"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- refid_ontology_node -->
+  <xs:element name="refid_ontology_node" type="xs:string"/>
+
+  <!-- DOMAIN_SPECIFIC_RELATION_LEVEL -->
+  <xs:element name="domain_specific_relation_level">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:comments"/>
+        <xs:element maxOccurs="unbounded" ref="enriched:domain_specific_relation"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- domain_specific_relation -->
+  <xs:element name="domain_specific_relation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="enriched:id"/>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element ref="enriched:domain_specific_relation_type"/>
+        <xs:element ref="enriched:list_refid_semantic_unit"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- domain_specific_relation_type -->
+  <xs:element name="domain_specific_relation_type" type="xs:string"/>
+
+  <!-- ANAPHORA_RELATION_LEVEL -->
+  <xs:element name="anaphora_relation_level">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:comments"/>
+        <xs:element maxOccurs="unbounded" ref="enriched:anaphora_relation"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- anaphora_relation -->
+  <xs:element name="anaphora_relation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="enriched:id"/>
+        <xs:element minOccurs="0" ref="enriched:log_id"/>
+        <xs:element ref="enriched:anaphora_relation_type"/>
+        <xs:element ref="enriched:anaphora"/>
+        <xs:element ref="enriched:antecedent"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="antecedent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="enriched:list_refid_semantic_unit"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="anaphora">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="enriched:refid_semantic_unit"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- anaphora_relation_type -->
+  <xs:element name="anaphora_relation_type" type="xs:string"/>
+
+  <!-- LOG LEVEL -->
+  <xs:element name="log_level">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:log_processing"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- log for each processing -->
+  <xs:element name="log_processing">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:comments"/>
+        <xs:element ref="enriched:log_id"/>
+        <xs:element minOccurs="0" ref="enriched:software_name"/>
+        <xs:element minOccurs="0" ref="enriched:command_line"/>
+        <xs:element minOccurs="0" ref="enriched:stamp"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:tagset"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- Log id -->
+  <xs:element name="log_id" type="xs:string"/>
+  <!--
+    Software Name used to carry out the 
+    linguistic analysis
+  -->
+  <xs:element name="software_name" type="xs:string"/>
+  <!-- Command line -->
+  <xs:element name="command_line" type="xs:string"/>
+  <!-- stamp -->
+  <xs:element name="stamp" type="xs:string"/>
+  <!-- free comments -->
+  <xs:element name="comments" type="xs:string"/>
+  <!-- tagset -->
+  <xs:element name="tagset">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="enriched:element_name"/>
+        <xs:element maxOccurs="unbounded" ref="enriched:tag_list"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enriched:comments"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- element_name -->
+  <xs:element name="element_name" type="xs:string"/>
+  <!-- tag_list -->
+  <xs:element name="tag_list">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="enriched:apply_if_tag"/>
+        <xs:element minOccurs="0" ref="enriched:apply_if_tag_value"/>
+        <xs:element ref="enriched:tag_value_list"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- applied_to_tag -->
+  <xs:element name="apply_if_tag" type="xs:string"/>
+  <!-- applied_to_tag_value -->
+  <xs:element name="apply_if_tag_value" type="xs:string"/>
+  <!-- tag_value_list -->
+  <xs:element name="tag_value_list">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="enriched:tag"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <!-- tag -->
+  <xs:element name="tag" type="xs:string"/>
+</xs:schema>

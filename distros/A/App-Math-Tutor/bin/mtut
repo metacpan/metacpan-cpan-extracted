@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::Math::Tutor;
+my $app = App::Math::Tutor->new_with_cmd;

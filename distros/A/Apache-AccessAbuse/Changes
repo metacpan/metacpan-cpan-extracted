@@ -1,0 +1,11 @@
+Revision history for Perl extension Apache::AccessAbuse.
+
+0.001  Tue Apr  8 18:34:46 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n Apache::AccessAbuse
+0.002  Wed Apr  9 10:01:57 2003
+	- I was too agressive: my local network is under restricted
+access too! Add a PerlVar to allow access to the local network.
+
+0.003  Thu Nov  6 18:55:44 2003
+	- Write documentation and upload to PAUSE.

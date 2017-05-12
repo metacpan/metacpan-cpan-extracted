@@ -1,0 +1,4 @@
+Audio::Opusfile             T_PTROBJ
+Audio::Opusfile::Head       T_PTROBJ
+Audio::Opusfile::Tags       T_PTROBJ
+Audio::Opusfile::PictureTag T_PTROBJ

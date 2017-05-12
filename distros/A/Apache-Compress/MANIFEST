@@ -1,0 +1,11 @@
+Build.PL
+Changes
+Compress.pm
+Makefile.PL
+MANIFEST
+META.yml
+t/check/2
+t/check/3
+t/docs/simple.html
+t/lib/Apache/test.pm
+t/real.t

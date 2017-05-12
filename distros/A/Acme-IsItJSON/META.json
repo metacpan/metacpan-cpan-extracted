@@ -1,0 +1,54 @@
+{
+   "abstract" : "Is my variable JSON or a Perl data structure?",
+   "author" : [
+      "Ben Bullock <bkb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-IsItJSON",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::Create" : "0.22",
+            "JSON::Parse" : "0.42",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/benkasminbullock/acme-isitjson/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/benkasminbullock/acme-isitjson.git",
+         "web" : "https://github.com/benkasminbullock/acme-isitjson"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

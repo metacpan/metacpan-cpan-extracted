@@ -1,0 +1,5 @@
+2003-03-03  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Stage.pm: Added a license statement on request of Steve Hay
+
+1997-10-16 original version; created by h2xs 1.18

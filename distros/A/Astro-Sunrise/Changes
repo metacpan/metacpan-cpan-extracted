@@ -1,0 +1,90 @@
+-*- encoding: utf-8; indent-tabs-mode: nil -*-
+
+Revision history for Perl extension sunrise.
+
+0.96  ???
+      - Fix ticket 109992, prevent endless loops
+        (thank you http://geocoder.opencagedata.com/)
+
+0.95  Tuesday 21 April 2015
+      - Some improvements in the POD documentation.
+      - New time_zone parameter to sun_rise and sun_set.
+      - New tests for fork-less systems
+      - New tests to check for parameter checking
+
+0.94  Tuesday 10 March 2015
+      - Fix typos in the POD documentation
+      - Fix problem in the t/03dst.t test file.
+
+0.93  Tuesday 3 March 2015
+      - Stylistic and kwalitee issues: license, distro structure, etc.
+      - Fix ticket 62593 (patch from Slaven Rezic)
+      - Parameters to sunrise can be passed by name (using a hashref)
+      - The upper_limb is not longer hard-coded, it is now a parameter
+      - The behaviour for polar day and polar night can change: no warning,
+        but a special return value.
+      - Make degree-trigonometric functions available for import.
+
+0.92  Monday 8 July 2013
+      New co-maint JFORGET
+      Fix tickets 47049 and 83394: wrong calculations on 19/20/21 March
+      Fix ticket 9377: documentation improvement
+      Minor formatting changes and spelling fixes
+
+0.91  Major update to the test script 001basic.t I have added many tests
+      for cities around the world. Changed the convert_hour sub to format
+      the hour (add a zero).
+
+0.90  Updated the convert_hour sub, This was badly broken Patch from
+      Chris Phillps applied. Added Constants for Altitude provided by
+      Brian dfoy.
+
+0.85  Wed Aug 14 2003
+      Fixed bug in local time conversion (the same bug for 0.05)
+      Changed dependency from Time::Piece to DateTime (Per Joshua Hoblitt)
+      Updated Documentation to reflect DateTime dependency
+
+0.8   Changed the dependency from Time::Object to Time::Piece
+      (shame on me)
+
+0.7   Fri Feb 14 2003
+      Fixed a bug in dependency, Added Iteration function, Added
+      documentation for subs
+
+0.6  Wed Feb 5 2003
+      Performed a complete rewrite of the module to conform with
+      Paul's C code. Fixed a nasty bug the computing the number of days elapsed
+      since 2000 Jan 0.0.
+      Added warnings for no sunrise/sunset
+      Added Rob's enhancements using the time object modules
+      Added new subs sun_rise,sun_set per Rob's recomendation
+      Added Rob's enhancements for selecting different Alt's
+
+0.05  Wed Oct 17 7:00:00 2001
+       - Fixed bug for converting to local time for points east of GMT
+         Thanks to Adrian Blockley [adrian.blockley@environ.wa.gov.au] 
+
+0.04  Sun Mar 11 13:51:22 2001
+    - I've moved the POD around and added a function documentation block for
+      the sunrise() function. And I moved all the variables out of the use
+      vars block at the top, making them my variables, wherever possible.
+      I added a small test suite that leaves a lot of room for future expansion.
+
+      Finally, I moved all of those tiny subs out of the sunrise() function
+      into their own space. They are not really private subs, and they are
+      referencing values as global variables anyway. Oh, yeah, and I generated
+      the README with pod2text so that the README on CPAN will be a little
+      more informative. R.Bowen
+
+0.03  Thurs Feb 15 08:30:00 2001
+        - Added copyright information
+        - fixed bug for converting to local time
+        - updated documentation R.Hill
+
+0.02  Tues Jun 20 08:30:00 2000
+        - Added code to convert to local time. R.Hill
+
+
+0.01  Fri Dec 10 08:13:24 1999
+        - original version; created by h2xs 1.18
+

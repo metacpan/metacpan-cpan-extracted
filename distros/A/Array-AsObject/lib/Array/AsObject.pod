@@ -1,0 +1,628 @@
+=pod
+
+=head1 NAME
+
+Array::AsObject - full set of array and set operations
+
+=head1 SYNOPSIS
+
+   $obj = new Array::AsObject [@list];
+
+=head1 DESCRIPTION
+
+This module attempts to provide a complete set of array operations,
+including set operations. It acts as a standalone module, or is
+available in Template::Toolkit templates using the companion module
+Template::Plugin::ListOps .
+
+It performs many of the same functions as the Set::Array module,
+but has better support for handling duplicate elements in
+lists, and does not require the Want module.  For more
+details, please refer to the HISTORY AND RATIONALE section
+below.
+
+=head1 BASE OBJECT METHODS
+
+=over 4
+
+=item new
+
+   $obj = new Array::AsObject [@list];
+
+This creates a new Array::AsObject object. If @list is passed in, this
+is set to the initial list of elements.
+
+If @list is passed in, the following two are equivalent:
+
+   $obj = new Array::AsObject @list;
+
+and
+
+   $obj = new Array::AsObject;
+   $obj->list(@list);
+
+There is no restriction on the type of elements in @list. They can be
+scalars, references, objects, or undefs.
+
+=item version
+
+   $vers = $obj->version();
+
+Gets the version of this module.
+
+=item err
+
+=item errmsg
+
+   $err = $obj->err();
+
+Check to see if the previous operation produced an error.
+
+   $msg = $obj->errmsg();
+
+If an operation did produce an error, this will get the error message.
+
+=back
+
+=head1 LIST EXAMINATION METHODS
+
+The following methods examine a list but do not modify the object.
+They will all produce an error if the list has not been defined and
+undef is returned.
+
+=over 4
+
+=item as_hash
+
+   %hash = $obj->as_hash();
+
+This returns a hash that describes the scalars in the list contained
+in $obj. References and undef values are ignored.
+
+Every scalar in the list is one of the keys in %hash.  The value of
+%hash is the number of times that element appears in the list.
+
+   ($count,$vals) = $obj->as_hash(1);
+
+This returns two hash references that describe ALL values in the
+list, including references, objects, and undef.
+
+Every unique value in the list is assigned a label (which has no
+significance). The hash %$vals has the labels as keys and the
+actual values as values for the keys.
+
+The hash %$count has the labels as keys and the values are the
+number of times that value appears in the list.
+
+The following example should illustrate this:
+
+   $i = [1,2];
+   $j = [1,2];
+   @l = ('a', $i, 'b', $j, 'a', undef, undef, $i);
+   $o = new Array::AsObject(@l);
+   ($c,$v) = $o->as_hash(1)
+      => $c = { 1 => 2,
+                2 => 2,
+                3 => 1,
+                4 => 1,
+                5 => 2 }
+         $v = { 1 => 'a',
+                2 => [1,2],
+                3 => 'b',
+                4 => [1,2],
+                5 => undef }
+
+Note that the two elements $i and $j are treated as different since
+they point to different references, even though the data is the same
+in those two lists.
+
+=item at
+
+   $ele = $obj->at($n);
+   @ele = $obj->at(@n);
+
+This returns the element at position $n in the list, or a list of the
+elements at the positions given in the list @n.
+
+In scalar context, only a single position may be passed in. In list
+context, any number of positions may be passed in.
+
+Positions follow standard perl conventions with numbering starting at
+0. Negative numbers can also be used to count from the end.  All
+positions must refer to elements in the list (i.e. you may not refer
+to the 6th element in a list containing 5 elements).
+
+=item count
+
+   $num = $obj->count([$val]);
+
+This counts the number of times val appears in the list. If $val
+is not given, it counts the number of undef elements in the list.
+
+=item exists
+
+   $flag = $obj->exists(@val);
+
+This returns 1 if every value exists in the list. If @val is not
+passed in, it tests for undef values.
+
+It returns 0 if any of the values do not exists in the list.
+
+=item first
+
+=item last
+
+   $val = $obj->first();
+   $val = $obj->last();
+
+These return the first or last elements of the list. If the list contains
+no elements, an error is set.
+
+=item index
+
+=item rindex
+
+   $idx = $obj->index([$val]);
+   @idx = $obj->index([$val]);
+
+   $idx = $obj->rindex([$val]);
+   @idx = $obj->rindex([$val]);
+
+In list context, these return the index of every occurrence of $val in
+the list. If $val is not passed in, the indices of all undef elements
+are returned.
+
+If the value is not found, -1 is returned in scalar context, or
+an empty list in list context.
+
+The rindex function returns them in reverse order.
+
+In scalar context, the index and rindex methods return the index of
+the first or last occurrence of $val in the list.
+
+$val can be a scalar, undef, or a reference, and all will work
+as expected. For example:
+
+   $i = [1,2];
+   $j = [1,2];
+   @l = ('a', $i, 'b', $j, 'a', undef, undef, $i);
+   $o = new Array::AsObject(@l);
+   (@idx) = $o->index();
+      => @idx = (5, 6)
+   (@idx) = $o->index($i);
+      => @idx = (1)
+
+=item is_empty
+
+   $flag = $obj->is_empty([$undef]);
+
+This checks to see if the list is empty. If $undef is not passed in,
+a list is empty only if the length is 0.
+
+If $undef is passed in, the list is also empty if it consists only
+of undef values.
+
+=item length
+
+   $num = $obj->length();
+
+Returns the number of elements in the list.
+
+=item list
+
+   @list = $obj->list();
+
+This returns the list stored in the object.
+
+=back
+
+=head1 SIMPLE LIST MODIFICATION METHODS
+
+The following methods will modify the object.
+
+They will all produce an error if the list has not been defined
+and undef is returned.
+
+=over 4
+
+=item clear
+
+   $obj->clear();
+
+This removes all elements from the list (sets it to a zero-length
+list).
+
+   $obj->clear(1);
+
+This sets all elements in the list to be undef (preserving the length).
+The list must be defined or an error results.
+
+=item compact
+
+   $obj->compact();
+
+This removes any undef objects from the list.
+
+=item delete
+
+   $obj->delete($all,$undef,@val);
+
+This deletes occurences of each values from the list.
+
+If $all is 1, all occurences are removed. Otherwise, only the first
+occurence of each value is removed.
+
+If $undef is 1, values are replaced with undef. Otherwise, they
+are completely removed.
+
+=item delete_at
+
+   $obj->delete($undef,@idx);
+
+This deletes elements at the given indices. The order of the
+indices is not important. They will be deleted in the order of
+last to first.
+
+If $undef is 1, values are replaced with undef. Otherwise, they
+are completely removed.
+
+=item fill
+
+   $obj->fill([$val,] [$start,] [$length]);
+
+This sets elements of a list to be $val. If $val is not passed in,
+values are set to undef.
+
+$start can be a positive or negative number. It must be an index
+in the list. It can also be the index of the first element after
+the list. So, if the list contains 3 elements, $start can be -3 to +3.
+Negative values refer to the index from the end as usual. 0 to 2 refer
+to the index of the elements in the list, and 3 is the first element
+after the list. $start defaults to 0.
+
+$length can be any positive value and refers to the number of elements
+that will be set to the value. If $length is omitted, it defaults
+to the number of elements in the list starting at $start, or to 1 if
+$start is the first element after the list.
+
+So if list contains 3 elements, and $start is 1, $length will default
+to 2 (the number of elements in the list starting at index 1.
+
+=item list
+
+   $obj->list(@list);
+
+This sets the object to contain the given list. Any previous list is
+replaced.
+
+=item min
+
+=item max
+
+   $ele = $obj->min([$method [,@args]]);
+   $ele = $obj->max([$method [,@args]]);
+
+These return the first/last value from the list if it were sorted
+with the given method using the Sort::DataTypes module.
+
+By default, if $method is not given, the numerical minimum/maximum
+value is given.
+
+Otherwise, $method can be any sort method available from the
+Sort::DataTypes module.
+
+For example, to get the first word alphabetically, use
+
+   $ele = $obj->min("alphabetic");
+
+=item pop
+
+=item shift
+
+   $val = $obj->pop();
+
+   $val = $obj->shift();
+
+These perform the standard pop/shift operations.
+
+=item push
+
+=item unshift
+
+   $obj->push(@list);
+
+   $obj->unshift(@list);
+
+These perform the standard push/unshift operations.
+
+=item randomize
+
+   $obj->randomize();
+
+This randomly shuffles the list.
+
+=item reverse
+
+   $obj->reverse();
+
+This reverses the list.
+
+=item rotate
+
+   $obj->rotate([$num]);
+
+This rotates the list.
+
+If $num is not included, it defaults to 1.
+
+If $num is a positive number, the first element from the list is
+removed and pushed on to the end a total of $num times.
+
+If $num is a negative number, the last element from the list is
+removed and shifted onto the front a total of $num times.
+
+=item set
+
+   $obj->set($index [,$val]);
+
+This sets the list index to the given value, or undef if no value
+is passedin.
+
+=item sort
+
+   $obj->sort([$method [,@args]]);
+
+This uses any method from the Sort::DataTypes module to sort the
+list.
+
+Method can be of the form "numerical" or "rev_numerical" to do
+forward and reverse sorting.
+
+@args may be passed in if the method requires additional arguments.
+
+If no method is given, it defaults to alphabetical sorting.
+
+=item splice
+
+   @vals = $obj->splice([$start,] [$length,] [@list]);
+
+This performs the perl splice command on a list.
+
+If $start is omitted (or is undefined), it defaults to 0. If $length
+is omitted (or undefined), it defaults to the end of the list.
+
+The values removed are returned, and are replaced with @list if
+present.
+
+=item unique
+
+   $obj->unique();
+
+This removes any duplicates in a list. The first occurrence of each element
+is kept, and the order of those first occurrences is preserved.
+
+=back
+
+=head1 SET METHODS
+
+The following methods work with two Array::AsObject objects. They apply
+a set operation to the two of them and produce a value or a third
+Array::AsObject object containing the results.
+
+If an error occurs, it is set in the returned object, NOT in any of the
+original objects.
+
+The original objects are unmodified in all cases.
+
+=over 4
+
+=item difference
+
+   $obj3 = $obj->difference($obj2 [,$unique]);
+
+This takes two lists and removes the second list from the first.
+
+By default, one occurence of every element in the second list is
+removed from the first list.
+
+If $unique is given, every element in the first list is removed.
+
+For example, the difference of the two lists (a a b b c) and (a)
+is either (a b b c) or (b b c). If $unique is non-zero, the second
+is given.
+
+It should be noted that both "b" elements in the example will be
+kept regardless of the value of $unique because the $unique
+flag only affects elements being removed.
+
+=item intersection
+
+   $obj3 = $obj->intersection($obj2 [,$unique]);
+
+This takes two lists and finds the intersection of the two. The
+intersection are elements that are in both lists. The returned
+list is in the order they appear in the first list.
+
+By default, duplicate elements are treated individually unless
+$unique is passed in.
+
+For example, the intersection of two lists (a a b b c) and (a a c d)
+is either (a a c) or (a c). If $unique is non-zero, the second is
+given.
+
+=item is_equal
+
+=item not_equal
+
+   $flag = $obj->is_equal($obj2 [,$unique]);
+   $flag = $obj->not_equal($obj2 [,$unique]);
+
+These take two lists and test to see if they are equal. If an
+error is encountered, undef is returned, but no error is stored.
+
+The order of the elements is ignored so (a,b) = (b,a).
+
+If $unique is non-zero, the count of each type of element is
+ignored so (a,a,b) = (a,b). Otherwise, the count is important
+so (a,a,b) != (a,b).
+
+=item is_subset
+
+=item not_subset
+
+   $flag = $obj->is_subset($obj2 [,$unique]);
+   $flag = $obj->not_subset($obj2 [,$unique]);
+
+These return 1 if the list in $obj2 is a subset of the list in $obj
+(or is NOT a subset).
+
+If $unique is not passed in, every element in $obj2 must have an
+instance in $obj. So (a a b) is a subset of (a a a b c) but NOT of
+(a b c).
+
+If $unique is passed in, every element in $obj2 must exists in $obj
+but the count is unimportant, so (a a b) is a subset of (a b c).
+
+=item symmetric_difference
+
+   $obj3 = $obj->symmetric_difference($obj2 [,$unique]);
+
+This takes two lists and finds the symmetric difference of the
+two. The symmetric difference are elements that are in either list,
+but not both. The order of the list produced are the elements from
+the first object (order preserved) followed by those from the
+second object.
+
+If $unique is non-zero, one instance of an element cancels out
+all of the instances in the other list.
+
+For example, the symmetric difference between the two lists (a a b b
+c) and (a c) is either (a b b) or (b b). If $unique is non-zero, the
+second is used.
+
+Note that both instances of 'b' are kept because the $unique flag
+only affects elements which exist in both objects.
+
+=item union
+
+   $obj3 = $obj->union($obj2 [,$unique]);
+
+This takes two lists and combines them.
+
+By default, every element is preserved. If $unique is passed in,
+the duplicates are removed.
+
+For example, the union of the two lists (a a b) and (a c) is either
+(a a b a c) or (a b c). The second is returned if $unique is non-zero.
+
+=back
+
+=head1 HISTORY AND RATIONALE
+
+With several other modules out there that do various set and array
+operations, a brief history of why I wrote this module is in order.
+
+The origin of this module came when I needed better list handling
+operations (especially involving lists that might contain duplicate
+elements) inside of a Template::Toolkit template. The built in list
+functions in Template::Toolkit weren't sufficent for my needs, so I
+looked around.
+
+The module that came closest to my needs was Set::Array. Although not
+a perfect match for what I wanted (I really wanted better support for
+lists with duplicate elements), it came close enough, so I wrote a
+wrapper module (Template::Plugin::ListOps) around it to do most of
+what I wanted.
+
+Unfortunately, I discovered almost immediately that Set::Array
+suffered from a fairly serious problem. It depends on the Want
+module which, at the time, had some known problems and would fail
+under some circumstances (older versions of perl if I recall
+correctly, though I could be wrong about that), and unfortunately,
+some of the places I needed my module to run failed due to those
+problems.
+
+I looked at the Want module, but correcting it was beyond my abiltity,
+so the best solution seemed to be to rewrite the module without
+depending on Set::Array. This would also allow me to add the
+functionality that I wanted.
+
+So I did that. I rewrote each function to do the list/set operation
+I wanted instead of calling Set::Array functions.
+
+Almost as soon as I was done (and perhaps even before), I started
+regretting rewriting the module in that way. I should have written a
+standalone module and then had the Template::Plugin::ListOps be a
+wrapper for it instead of Set::Array... but in the interest of time, I
+didn't go back and redo it... until later.
+
+Later, I ran into a case where I wanted the set/list functionality
+from Template::Plugin::ListOps for another perl application. At
+that point, I decided to create the standalone module.
+
+So, this module takes the routines from the original
+Template::Plugin::ListOps module and moves them into a standalone
+module. Template::Plugin::ListOps was then rewritten trivially
+to be a wrapper around this module.
+
+Some other notes:
+
+Since the original version of Template::Plugin::ListOps (which was
+never released) was a wrapper around Set::Array, the naming of the
+functions is very similar, but the functionality differs slightly.
+
+This module was initially named Set::ArrayAlt to indicate that it is
+based on Set::Array, but with a few changes. It has enhanced
+functionality with respect to duplicate elements but is missing some
+of the functionality of Set::Array (especially method chaining and
+operator overloading) which depend on the Want module.  This module
+is not intended to be a drop-in replacement for Set::Array. It is
+also missing a couple functions (join and impose) that are applicable
+only to all-scalar lists.
+
+It may well be that the problems with the Want module have been
+corrected at this point, and that I could have used Set::Array, but
+since some of the functionality I needed was the enhanced duplicate
+element handling, and since creating this module from what I'd already
+written was actually a pretty easy task, I decided to go ahead with
+the creation of this module.
+
+Anyway, that's the history. Hopefully, I'm justified in reinventing
+the wheel.
+
+After a while, I decided I wanted to register this module (which
+basically means to get it put in the official list of perl modules).
+The upside is that the module will get added publicity and use...
+the downside (if you can call it that) is that they expect the name
+of the module to accurately reflect the module.
+
+This module is more accurately thought of as a module for handling
+arrays, than as a module for handling sets. True, it does do set
+operations, but it really works on an array, doing most of the
+operations that you could want to do with an array. Included in
+those operations are a subset of functions where you treat the array
+as a set.
+
+Anyway, it was requested that I rename the module to be in the Array::
+namespace rather than the Set:: namespace (and Array::AsObject was
+suggested), so that's why it's been renamed.
+
+Versions of this module before 1.02 were released under the name
+Set::ArrayAlt. Version 1.02 was released simultaneously under the
+names Set::ArrayAlt and Array::AsObject. Versions after 1.02 will
+only be released under the name Array::AsObject.
+
+=head1 KNOWN PROBLEMS
+
+None at this point.
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut

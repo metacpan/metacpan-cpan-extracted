@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: Apache2::WebApp::Plugin::CGI
+abstract: Common methods for dealing with HTTP requests.
+version: 0.10
+author:
+  - Marc S. Brooks <mbrooks@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  Apache2::WebApp: 0.38
+  Params::Validate: 0
+build_requires:
+  Apache::Test: 0
+  Test::More
+resources:
+  license: http://dev.perl.org/licenses/
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html

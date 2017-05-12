@@ -1,0 +1,26 @@
+#!/usr/local/bin/perl
+
+use v5.10.0;
+use blib;
+use strict;
+use warnings;
+
+use AFS::VOS;
+use Scalar::Util qw(looks_like_number);
+
+my ($vos, $volume, $force, $ok);
+
+die "Usage: $0 volume [force]\n" if $#ARGV < 0;
+
+$volume = shift;
+$force  = shift // 0;
+
+if (defined $force and !looks_like_number($force)) { warn "$0: FORCE is not an INTEGER ...\n"; }
+else                                               { $force = int($force); }
+
+$vos = AFS::VOS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+$ok = $vos->release($volume, $force);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "Released volume $volume successfully \n"; }

@@ -1,0 +1,660 @@
+=head1 NAME
+
+ASNMTAP::Asnmtap::Plugins::Mail is a Perl module that provides Mail functions used by ASNMTAP-based plugins.
+
+=head1 SYNOPSIS
+
+  use ASNMTAP::Asnmtap::Plugins::Mail;
+
+  my $objectNagios = ASNMTAP::Asnmtap::Plugins::Mail->new ();
+
+=head1 Description
+
+Sending and receiving fingerprinted (TXT or XML) mails. It are Mail::Sendmail (an simple platform independent mailer) based functions.
+
+=head1 EXAMPLE
+
+  use ASNMTAP::Asnmtap::Plugins v3.002.003;
+  use ASNMTAP::Asnmtap::Plugins qw(:PLUGINS %STATE);
+
+  my $objectPlugins = ASNMTAP::Asnmtap::Plugins->new (
+    _programName        => 'check_template.pl',
+    _programDescription => "General plugin template for the '$APPLICATION'",
+    _programVersion     => '3.002.003',
+    _programGetOptions  => ['timeout|t:i', 'trendline|T:i'],
+    _timeout            => 30,
+    _debug              => 1);
+
+  use ASNMTAP::Asnmtap::Plugins::Mail v3.002.003;
+
+  my $objectMAIL = ASNMTAP::Asnmtap::Plugins::Mail->new (
+    _asnmtapInherited => \$objectPlugins,
+    _SMTP             => { smtp => qw(smtp.citap.be) },
+    _mailType         => 1,
+    _text             => { SUBJECT => 'uKey=MAIL_P_0001' },
+    _mail             => {
+                           from   => 'alex.peeters@citap.be',
+                           to     => 'asnmtap@citap.com',
+                           status => $APPLICATION .' Status UP',
+                           body   => $body
+                         }
+    );
+
+  $objectPlugins->pluginValues ( { stateValue => $ERRORS{OK}, alert => ':)' }, $TYPE{APPEND} );
+
+  $objectPlugins->exit (7);
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item _asnmtapInherited
+
+A required reference to an ASNMTAP::Asnmtap::Plugins or ASNMTAP::Asnmtap::Plugins::Nagios subclass
+
+Through this way of working we inherited the command line option I<--debug>.
+
+=item _SMTP
+
+is an HASH, with the same parameters like %Mail::Sendmail::mailcfg{} 
+
+=over 4
+
+=item smtp
+
+this is a reference to a list of smtp servers, so if your main server is down, the module tries the next one. If one of your servers uses a special port, add it to the server name with a colon in front, to override the default port (like in my.special.server:2525).
+
+optional, default: localhost
+
+=item port
+
+port used when none is specified in the server name.
+
+optional, scalar value, default: 25
+
+=item from
+
+from address used if you don't supply one in your script. Should not be of type 'user@localhost' since that may not be valid on the recipient's host.
+
+optional, scalar value, default: undefined
+
+=item retries
+
+how many times should the connection to the same SMTP server be retried in case of a failure.
+
+optional, scalar value, default: 3;
+
+=item delay
+
+number of seconds to wait between retries. This delay also happens before trying the next server in the list, if the retries for the current server have been exhausted. For CGI scripts, you want few retries and short delays to return with a results page before the http connection times out. For unattended scripts, you may want to use many retries and long delays to have a good chance of your mail being sent even with temporary failures on your network.
+
+optional, scalar value, default: 1 (second);
+
+=item mime
+
+set this to 0 if you don't want any automatic MIME encoding. You normally don't need this, the module should 'Do the right thing' anyway.
+
+optional, scalar value, default: 0
+
+=item tz
+
+normally, your time zone is set automatically, from the difference between time() and gmtime(). This allows you to override automatic detection in cases where your system is confused.
+
+optional, scalar value, default: undefined (automatic detection at run-time).
+
+=item debug
+
+prints stuff to STDERR. Current maximum is 6, which prints the whole SMTP session, except data exceeding 500 bytes.
+
+optional, scalar value, default: inherited from the parent object command line option -d or --debug
+
+=back
+
+=item _IMAP4
+
+=over 4
+
+=item imap4
+
+IMAP4 host to connect to.
+
+=item port (reserved)
+
+port used when none is specified in the server name.
+
+optional, scalar value, default: 143
+
+=item username
+
+optional, scalar value, default: undef
+
+=item password
+
+optional, scalar value, default: undef
+
+=item timeout
+
+maximum time, in seconds, to wait for a response from the IPAM4 server
+
+optional, scalar value, default: 120 unless inherited from the parent object attribute _timeout
+
+=item debug
+
+debugging information
+
+optional, scalar value, default: inherited from the parent object command line option -d or --debug
+
+=back
+
+=item _POP3
+
+settings used by Net::POP3 - Post Office Protocol 3 Client class (RFC1939)
+
+=over 4
+
+=item pop3
+
+POP3 host to connect to. It may be a single scalar, or an scalar array with hosts to try in turn. 
+
+Syntax for POP3 host is <hostname>[:<port>] where <hostname> can be a hostname or the IP-address on the 'xxx.xxx.xxx.xxx'
+
+ single scalar: pop3 => 'pop3.citap.be', 'pop3.citap.be:110', 'xxx.xxx.xxx.xxx' or 'xxx.xxx.xxx.xxx:110'
+
+required when POP3 used for dowloading the receiving mails, default: undef
+
+=item port (reserved)
+
+port used when none is specified in the server name.
+
+optional, scalar value, default: 110
+
+=item username
+
+optional, scalar value, default: undef
+
+=item password
+
+optional, scalar value, default: undef
+
+=item timeout
+
+maximum time, in seconds, to wait for a response from the POP3 server
+
+optional, scalar value, default: 120 unless inherited from the parent object attribute _timeout
+
+=item debug
+
+debugging information
+
+optional, scalar value, default: inherited from the parent object command line option -d or --debug
+
+=back
+
+=item _mailType
+
+For clients that are sensitive to cookie-based authentication.
+
+optional, mailType can be 0 or 1
+
+  0, TXT formated fingerprint (default)
+  1, XML formated fingerprint
+
+=over 4
+
+=item TXT
+
+Each e-mail exists of an TXT fingerprint. This allows us lateron only to pick up the required e-mails with pop3, because we will filter out the emails with a minimum band width the e-mails desired from the mail box. 
+
+When the status and the header plus the first 7 lines of the e-mail agrees to these fingerprint, the e-mail is picked up, processes, and removed from the mail box.
+
+=over 4
+
+=item Fingerprint
+
+=over 4
+
+=item Subject
+
+ SUBJECT / From: Source_email_address To: Application_Monitor_email_address
+
+ SUBJECT: description can be found lateron into this document.
+
+=item Message
+
+ SUBJECT / From: Source_email_address To: Application_Monitor_email_address
+ <plugin naam> <plugin description>
+ Timestamp <Source email address>: dd-mm-yyyy hh:mm:ss[.hhh]
+ Status <naam from the service up/down>
+
+ SUBJECT: description can be found lateron into this document.
+
+=back
+
+=item Example
+
+ ASNMTAP / From: alex.peeters@citap.com To: asnmtap@citap.com 
+ <mail-xml-citap-com.pl> <Mail XML plugin template for testing the 'Application Monitoring'>
+ Timestamp <alex.peeters@citap.com>: 2006/02/04 11:01:11
+ Status <Application Monitoring Status Down>
+
+=back
+
+=item XML
+
+Each e-mail exists of an XML fingerprint. This allows us lateron only to pick up the required e-mails with pop3, because we will filter out the emails with a minimum band width the e-mails desired from the mail box. 
+
+When the status and the header plus the first 5 lines of the e-mail agrees to these fingerprint, the e-mail is picked up, processes, and removed from the mail box.
+
+=over 4
+
+=item DTD for validation XML
+
+ <?xml version="1.0" encoding="UTF-8"?>
+
+ <!ENTITY AUTHOR  "Alex Peeters">
+ <!ENTITY EMAIL   "Alex.Peeters@citap.com">
+ <!ENTITY PURPOSE "2005/11/15, dtd schema v1.0 for Fingerprint Email by XML">
+
+ <!ELEMENT FingerprintEmail (Schema, Fingerprint)>
+ <!ELEMENT Schema (#PCDATA)>
+ <!ATTLIST Schema Value CDATA #FIXED "1.0">
+ <!ELEMENT Fingerprint (#PCDATA)>
+ <!ATTLIST Fingerprint
+   From CDATA #REQUIRED
+   To CDATA #REQUIRED
+   Destination CDATA #REQUIRED
+   Plugin CDATA #REQUIRED
+   Description CDATA #REQUIRED
+   Environment (PROD|TEST|ACC|DEV|SIM|LOCAL) #REQUIRED
+   Date CDATA #REQUIRED
+   Time CDATA #REQUIRED
+   Epochtime CDATA #REQUIRED
+   Status CDATA #REQUIRED
+ >
+
+=item Example
+
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE FingerprintEmail SYSTEM "dtd/FingerprintEmail-1.0.dtd"><FingerprintEmail><Schema Value="1.0"/><Fingerprint From="alex.peeters@citap.com" To="asnmtap@citap.com" Destination="ASNMTAP" Plugin="mail-fingerprint-xml-citap-com.pl" Description="XML fingerprint Mail plugin template for testing the 'Application Monitoring'" Environment="PROD" Date="2006/2/4" Time="11:1:18" Epochtime="1139047278" Status="Application Monitoring Status UP" /></FingerprintEmail>
+
+=back
+
+=back
+
+=item _text
+
+required textual descriptions
+
+=over 4
+
+=item SUBJECT
+
+SUBJECT is the textual descriptions for the preffix of the subject
+
+required, scalar value, default: 'uKey=ASNMTAP'
+
+When you have more then one mail plugin, then you should use for the subject an unique key. Normally we use 'uKey=MAIL_?_nnnn' where '?' is the environment and 'nnnn' the number to make the SUBJECT unique.
+
+ - P(roduction) : 'uKey=MAIL_P_0001', 'uKey=MAIL_P_0002' ... 'uKey=MAIL_P_nnnn'
+ - S(imulation) : 'uKey=MAIL_S_0001', 'uKey=MAIL_S_0002' ... 'uKey=MAIL_S_nnnn'
+ - A(cceptation): 'uKey=MAIL_A_0001', 'uKey=MAIL_A_0002' ... 'uKey=MAIL_A_nnnn'
+ - T(est)       : 'uKey=MAIL_T_0001', 'uKey=MAIL_T_0002' ... 'uKey=MAIL_T_nnnn'
+ - D(evelopment): 'uKey=MAIL_D_0001', 'uKey=MAIL_D_0002' ... 'uKey=MAIL_D_nnnn'
+ - L(ocal)      : 'uKey=MAIL_L_0001', 'uKey=MAIL_L_0002' ... 'uKey=MAIL_L_nnnn'
+
+The reason for this is that the processing from the emails is much faster, because after the verification from the 'To:', 'From:' and 'Subject:' fields from the HEAD of your email you already know if its the required email to process with this plugin, and you don't read everytime the BODY to be sure.
+
+=item from
+
+is the textual descriptions for from
+
+optional, scalar value, default: 'From:'
+
+=item to
+
+is the textual descriptions for to
+
+optional, scalar value, default: 'To:'
+
+=item subject
+
+is the textual descriptions for the subject
+
+optional, scalar value, default: 'Subject:'
+
+=item status
+
+is the textual descriptions for the status
+
+optional, scalar value, default: 'Status'
+
+=back
+
+=item _mail
+
+required mail parameters
+
+=over 4
+
+=item from
+
+from email address
+
+required, scalar value
+
+=item to
+
+to from email address
+
+required, scalar value
+
+=item status
+
+status message
+
+required, scalar value
+
+=item body
+
+body message for the email
+
+required, scalar value
+
+=back
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item sending_fingerprint_mail()
+
+Sending fingerprint emails. The fingerprints can be formated as TXT or XML.
+
+Returns a status for $returnCode (OK..UNKNOWN).
+
+=over 4
+
+=item perfdataLabel
+
+This means that there performance data for the sending time will be created and the name for the label equals the value from perfdataLabel.
+
+Is an scalar (value is a string), default 'email send'
+
+=back
+
+=item receiving_fingerprint_mail()
+
+=over 4
+
+=item Returns $ERRORS{CRITICAL} when:
+
+- Date or Time into Fingerprint XML are wrong
+
+- Epochtime difference from Date and Time into Fingerprint XML are wrong
+
+- Result into Fingerprint XML are out of date
+
+=item Returns $ERRORS{WARNING} when:
+
+- Result into Fingerprint XML are out of date
+
+=back
+
+=over 4
+
+=item custom
+
+optional, is an reference to your own custom defined function
+
+=over 4
+
+=item $self:
+
+the reference to the current object
+
+=over 4
+
+=item date
+
+date returned from the fingerprint item 'Epochtime'
+
+=item day
+
+day returned from the fingerprint item 'Epochtime'
+
+=item month
+
+month returned from the fingerprint item 'Epochtime'
+
+=item year
+
+year  returned from the fingerprint item 'Epochtime'
+
+=item time
+
+time returned from the fingerprint item 'Epochtime'
+
+=item hour
+
+hour returned from the fingerprint item 'Epochtime'
+
+=item min
+
+min returned from the fingerprint item 'Epochtime'
+
+=item sec
+
+sec returned from the fingerprint item 'Epochtime'
+
+=item numberOfMatches
+
+without an custom defined function is this the number of email that matches te fingerprint.
+
+with an custom defined function do you need to increment the value in your custom defined function everytime you say that this mail matches your request.
+
+$self->{defaultArguments}->{numberOfMatches}++;
+
+=item result
+
+the extracted message from the email starting just after the fingerprint
+
+=back
+
+=item $asnmtapInherited:
+
+A required reference to an ASNMTAP::Asnmtap::Plugins or ASNMTAP::Asnmtap::Plugins::Nagios subclass
+
+Through this way of working we inherited the command line option I<--debug>.
+
+=item $email:
+
+=over 4
+
+=item IMAP4
+
+A new Net::IMAP::Simple object is created and all IMAP4 commands are accessed via method calls on this object.
+
+=item POP3
+
+A new Net::POP3 object is created and all POP3 commands are accessed via method calls on this object.
+
+=back
+
+=item $msgnum:
+
+  sub actionOnReceivingFingerprintMail {
+    my ($self, $asnmtapInherited, $email, $msgnum) = @_;
+
+    no warnings 'deprecated';
+    my $returnCode = $ERRORS{OK};
+
+    # put here your code regarding the MailBody - - - - - - - - - - - - -
+    print "\n\n". $self->{defaultArguments}->{result}. "\n\n";
+
+    $$asnmtapInherited->pluginValues ( { stateValue => $returnCode, alert => '.' }, $TYPE{APPEND} );
+
+    # put here your code for deleting the email from the Mailbox  - - - -
+
+    # IMAP4
+    # $email->delete( $msgnum ) unless ( $$asnmtapInherited->getOptionsValue ('debug') or $$asnmtapInherited->getOptionsValue ('onDemand') );
+
+    # POP3
+    # $email->Delete( $msgnum ) unless ( $$asnmtapInherited->getOptionsValue ('debug') or $$asnmtapInherited->getOptionsValue ('onDemand') );
+
+    $self->{defaultArguments}->{numberOfMatches}++;
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    return ( $returnCode );
+  }
+
+and now with customArguments:
+
+  sub actionOnReceivingFingerprintMail {
+    my ($self, $asnmtapInherited, $email, $msgnum, $arguments) = @_;
+
+    no warnings 'deprecated';
+    my $returnCode = $ERRORS{OK};
+
+    # put here your code regarding the MailBody - - - - - - - - - - - - -
+    print "\n\n". $self->{defaultArguments}->{result}. "\n\n";
+
+    $$asnmtapInherited->pluginValues ( { stateValue => $returnCode, alert => '.' }, $TYPE{APPEND} );
+
+    # put here your code for deleting the email from the Mailbox  - - - -
+
+    # IMAP4
+    # $email->delete( $msgnum ) unless ( $$asnmtapInherited->getOptionsValue ('debug') or $$asnmtapInherited->getOptionsValue ('onDemand') );
+
+    # POP3
+    # $email->Delete( $msgnum ) unless ( $$asnmtapInherited->getOptionsValue ('debug') or $$asnmtapInherited->getOptionsValue ('onDemand') );
+
+    $self->{defaultArguments}->{numberOfMatches}++;
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    return ( $returnCode );
+  }
+
+=back
+
+=item customArguments
+
+optional, when you need to pass parameters to your own custom defined function, this can be done with customArguments.
+
+  customArguments: SCALAR, ARRAY, HASH,
+                   REF SCALAR, REF ARRAY, REF HASH
+
+=item checkFingerprint
+
+can be 0 or 1:
+
+0: email found when when 'From:', 'To:' and 'Subject' matches
+
+1: email found when when 'From:', 'To:', 'Subject' and formated fingerprint matches
+
+optional, scalar value, default 1
+
+=item receivedState
+
+can be 0 or 1:
+
+0: When we receive no mails then the state $ERRORS{CRITICAL} is returned, otherwise the custom function returns $ERRORS{OK..UNKNOWN}
+
+1: When we receive no mails then the state $ERRORS{OK} is returned, otherwise the custom function returns $ERRORS{OK..UNKNOWN}
+
+optinal, scalar value, default 0
+
+=item outOfDate
+
+calculate ...
+
+required when _mailType = 1 (XML), scalar value
+
+=item perfdataLabel
+
+This means that there performance data for the number of matches will be created and the name for the label equals the value from perfdataLabel.
+
+Is an scalar (value is a string), default 'email(s) received'
+
+=back
+
+Returns a status for $returnCode (OK..UNKNOWN).
+
+=back
+
+=head1 EXPORT
+
+=head2 TAGS
+
+=over 4
+
+=item *
+
+ALL
+
+none
+
+=back
+
+=head1 AUTHOR
+
+Alex Peeters [alex.peeters@citap.be]
+
+=head1 SEE ALSO
+
+ASNMTAP::Asnmtap, ASNMTAP::Asnmtap::Plugins
+
+  check_template-mail.pl
+  check_template-mail-fingerprint-xml.pl
+  check_template-mail-xml-fingerprint-xml.pl
+  check_template-mail-xml-fingerprint-xml-monitoring.pl
+  check_template-mail-xml-fingerprint-xml-monitoring-1.1.pl
+  check_template-mail-xml.pl
+  check_template-mail-fingerprint.pl
+
+=head1 DEPENDENCIES
+
+  ASNMTAP::Asnmtap::Plugins
+  ASNMTAP::Time
+  Date::Calc
+  Email::Simple
+  Mail::POP3Client
+  Mail::Sendmail
+  MIME::Base64
+  MIME::Parser
+  MIME::Tools
+  Net::IMAP::Simple
+  Net::POP3
+  Time::Local
+
+=head1 COPYRIGHT NOTICE
+
+(c) Copyright 2000-2011 by Alex Peeters [alex.peeters@citap.be],
+                        All Rights Reserved.
+
+ASNMTAP is based on 'Process System daemons v1.60.17-01', Alex Peeters [alex.peeters@citap.be]
+
+ Purpose: CronTab (CT, sysdCT),
+          Disk Filesystem monitoring (DF, sysdDF),
+          Intrusion Detection for FW-1 (ID, sysdID)
+          Process System daemons (PS, sysdPS),
+          Reachability of Remote Hosts on a network (RH, sysdRH),
+          Rotate Logfiles (system activity files) (RL),
+          Remote Socket monitoring (RS, sysdRS),
+          System Activity monitoring (SA, sysdSA).
+
+'Process System daemons' is based on 'sysdaemon 1.60' written by Trans-Euro I.T Ltd
+
+=head1 LICENSE
+
+This ASNMTAP CPAN library and Plugin templates are free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+The other parts of ASNMTAP may be used and modified free of charge by anyone so long as this copyright notice and the comments above remain intact. By using this code you agree to indemnify Alex Peeters from any liability that might arise from it's use.
+
+Selling the code for this program without prior written consent is expressly forbidden. In other words, please ask first before you try and make money off of my program.
+
+Obtain permission before redistributing this software over the Internet or in any other medium. In all cases copyright and header must remain intact.
+
+=cut

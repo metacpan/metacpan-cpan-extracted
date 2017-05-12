@@ -1,0 +1,153 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+use App::Grepl;
+use Pod::Usage 1.12;
+
+use Getopt::Long;
+GetOptions(
+    "pattern=s" => \my $pattern,
+    "search=s"  => \my $lookfor,
+    "warnings"  => \my $warnings,
+    "l"         => \my $filename_only,
+    'h|help|?'  => sub { pod2usage( { -verbose => 1 } ); exit },
+    'H|man'     => sub { pod2usage( { -verbose => 2 } ); exit },
+);
+
+$lookfor = [ split ',' => ( $lookfor || '' ) ];
+$pattern ||= '';
+
+my @search_in;
+
+if ( !@ARGV ) {
+    @search_in = ( dir => '.' );
+}
+elsif ( 1 == @ARGV && -d $ARGV[0] ) {
+    @search_in = ( dir => $ARGV[0] );
+}
+else {
+    @search_in = ( files => [ @ARGV ] );
+}
+
+my $grepl = App::Grepl->new(
+    {
+        look_for      => $lookfor,
+        pattern       => $pattern,
+        warnings      => $warnings,
+        filename_only => $filename_only,
+        @search_in,
+    }
+);
+$grepl->search;
+
+__END__
+
+=head1 NAME
+
+grepl - grep through Perl documents.
+
+=head1 USAGE
+
+ grepl [options] [files or directory]
+
+=head1 OPTIONS
+
+Options which take arguments
+
+    -p, --pattern  A Perl regular expression to match against.
+                   Default to the empty string.
+    -s, --search   What parts of the Perl document to search in.
+                   Defaults to C<--search quote,heredoc>.
+
+Boolean options
+
+    -w, --warnings Enable warnings
+    -l             Filenames only
+    -h,  --help    Display this help
+    -?,            Display this help
+    -H,  --man     Longer manpage for prove
+
+=head1 C<SEARCHES>
+
+The following parts of Perl documents may be searched for:
+
+=over 4
+
+=item * C<quote>
+
+Matches quoted strings (but not heredocs).
+
+=item * C<heredoc>
+
+Matches heredocs.
+
+=item * C<pod>
+
+Matches POD.
+
+=item * C<comment>
+
+Matches comments.
+
+=back
+
+The C<--search> argument can accept a comma separate list of items to search
+for:
+
+ --search pod,heredoc,quote
+
+We'll add more things you can search for later.
+
+All items may be plural to make them easier to read:
+
+ grepl --search comments,heredocs --pattern 'XXX'
+
+=head1 EXAMPLES
+
+=over 4
+
+=item * Quick 'n dirty SQL Injection attack scanner:
+
+ grepl -pattern '^\s*(?i:select|insert|update|delete).*=\s*'?[\$\@]'
+
+Because we default to searching for 'quote' and 'heredoc' elements, the above
+searches them for things like:
+
+ DELETE FROM table WHERE name='$name'
+
+Due to the nature of SQL injection attacks, the above is very limited.  See
+L<http://www.perlmonks.org/?node_id=632518> for more information.
+
+=item * Search for TODO items in comments
+
+ grepl --search comments --pattern '(?i:XXX|TODO)' lib/
+
+=item * Search for TODO items in comments and POD
+
+ grepl --search comments,pod --pattern '(?i:XXX|TODO)' lib/
+
+=item * Search for '=head3', only listing filenames
+
+Older versions of Perl didn't recognize C<=head3> in POD.
+
+ grepl --search pod --pattern '^=head3' -l
+
+=back
+
+=head1 NOTES
+
+=head2 Default Directory
+
+If C<--dir> or C<--files> are not supplied, assumes we're search from the
+current directory on down.
+
+=head1 SEE ALSO
+
+C<ack>, included with C<App::Ack>.
+
+=head1 CAVEATS
+
+This is alpha code.  You've been warned.
+
+=cut

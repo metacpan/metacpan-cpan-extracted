@@ -1,0 +1,97 @@
+#!perl
+use strict;
+use warnings;
+no warnings 'exec';
+
+our $VERSION;
+
+use App::RecordStream;
+use App::RecordStream::Site;
+use App::RecordStream::Operation;
+use File::Basename 'basename';
+use File::Glob 'bsd_glob';
+use Getopt::Long;
+
+App::RecordStream::Site::bootstrap();
+
+Getopt::Long::Configure(qw( require_order pass_through ));
+GetOptions(
+  'h|help'          => sub { print usage(); exit },
+  'l|list-commands' => sub { print "$_\n" for known_ops(); exit },
+  'version'         => \&version,
+);
+
+my $operation = shift or die usage();
+my $recs = basename($0);
+
+my $loaded_op = eval {
+  App::RecordStream::Operation::load_operation("recs-$operation");
+  1;
+};
+if ($loaded_op and not $@) {
+  # We found a library operation, run it!
+  App::RecordStream::Operation::main("recs-$operation"); # never returns
+}
+else {
+  trace("Failed to load operation class: $@");
+  # Try installed executables for ops in other languages (or implemented
+  # outside of the Perl API)
+  exec { "recs-$operation" } "recs-$operation", @ARGV or do {
+      trace("Failed to exec recs-$operation: $!");
+      print STDERR "$recs: '$operation' is not a recs command.\n\n";
+      print STDERR "Use `$recs --list-commands` to see known commands.\n";
+      exit 1;
+  };
+}
+
+sub usage {
+  <<'.';
+usage: recs command [arguments]
+       recs -l|--list-commands
+       recs -h|--help
+       recs --version
+
+Run `recs examples` to see examples and `recs story` to read a humorous
+introduction to recs.
+.
+}
+
+sub known_ops {
+  my %seen;
+  sort { $a cmp $b }
+  grep { not $seen{$_}++ }
+  _lib_ops(), _path_ops()
+}
+
+sub _lib_ops {
+  sort { $a cmp $b }
+  map  { s/^App::RecordStream::Operation:://; $_ }
+  App::RecordStream->operation_packages
+}
+
+sub _path_ops {
+  my %seen;
+  sort { $a cmp $b }
+  grep { not $seen{$_}++ }
+  map  { $_ = basename($_); s/^recs-//; $_ }
+  grep { -f and -x _ }
+  map  { bsd_glob("$_/recs-*") }
+  split /:/, $ENV{PATH};
+}
+
+sub version {
+  print "recs/" . ($VERSION || $App::RecordStream::VERSION);
+  print " (fatpacked)" if grep { ref =~ /^FatPacked/ } @INC;
+  print "\n";
+  if (my @sites = App::RecordStream::Site::list_sites()) {
+    print "Loaded sites:\n";
+    print "  $_\n" for sort { $a cmp $b } map { $_->{name} } @sites;
+  }
+  exit;
+}
+
+sub trace {
+  return unless $ENV{RECS_TRACE};
+  chomp @_;
+  print STDERR "TRACE: ", @_, "\n";
+}

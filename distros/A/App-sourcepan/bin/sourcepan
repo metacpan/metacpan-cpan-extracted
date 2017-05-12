@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use App::sourcepan;
+use Getopt::Long;
+
+my $TYPE;
+GetOptions(
+   'module' => sub { $TYPE = "module" },
+   'dist'   => sub { $TYPE = "dist" },
+) or exit 1;
+
+# Try to detect dists or modules
+if( !defined $TYPE ) {
+   $TYPE = ( grep { m/\S-\S/ } @ARGV ) ? "dist" : "module";
+}
+
+App::sourcepan->run( $TYPE, @ARGV );

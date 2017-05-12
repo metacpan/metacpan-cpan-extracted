@@ -1,0 +1,47 @@
+Revision history for Perl module Apache2::AuthCASSimple
+
+0.10  Thu, 10 May 2009 11:53:07 +0200
+    - add dep on Crypt::SSLeay
+    - swap clean login_url (0.07 was a bad idea) with uri_escape
+    - fix _post_to_get with $r->read closes  https://rt.cpan.org/Ticket/Display.html?id=45923
+    - add test cases in examples
+
+0.09 Wed, 22 Apr 2009 12:33:26 +0200
+    - revert use of CGI, better fix up for REMOTE_USER bug
+
+0.08 Wed, 22 Apr 2009 08:28:46 +0200
+    - fix REMOTE_USER not set bug 
+    closes cpan http://rt.cpan.org/Ticket/Display.html?id=45202
+    closes debian bug #525097
+
+0.07 Thu, 2 Apr 2009 11:38:26 +0200
+    - parse args with CGI
+    - closes debian bug #521059 (thx to Luk Claes & dam) : 
+        a missing mod_perl1 mod_perl2 translation
+    - clean cookie path (thx to A Ledrezen)
+    - clean login_url
+    - better logs with level debug
+
+0.06 Thu, 11 Dec 2008 17:05:04 +0100
+    - add an HTTPSServer config flag, mod_perl2 can not detect SSL whithout Apache2::ModSSL
+
+0.05 Tue, 13 May 2008 11:52:40 +0200
+    - clean README
+    - add use warnings
+    - move delete_session_data.pl from scripts to examples
+    - add copyright
+    - try to have better META.yml
+
+0.0.4 Sat, 12 Apr 2008 12:51:31 +0200
+    - dh-make-perl don't like perl_version and version_from in Makefile.PL
+
+0.0.3 Fri, 11 Apr 2008 10:31:45 +0200
+    - better Makefile, more pod test
+
+0.0.2 Thu Mar 06 10:58:00 2008
+    - add missing inc and META.yml
+
+0.0.1 Tue Jan 29 16:33:04 2008
+    - original version; created by ExtUtils::ModuleMaker 0.49
+
+

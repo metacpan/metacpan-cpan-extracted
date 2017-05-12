@@ -1,0 +1,6 @@
+name = "App-perl2js"
+# badges = ["travis"]
+authority="cpan:HATZ"
+
+module_maker="ModuleBuildTiny"
+

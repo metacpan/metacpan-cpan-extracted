@@ -1,0 +1,51 @@
+==============================================================================
+									Acme::Labs
+==============================================================================
+
+
+NAME
+
+    Acme::Labs -- When you need an extraordinary plan to Take Over the World
+
+
+VERSION
+
+	1.1 (September 14, 2005)
+	
+
+SYNOPSIS
+
+	use Acme::Labs;
+	
+	print "Egad, brilliant, Brain!\n";
+	print "Oh, wait, no -- it'll never work!";
+
+
+DESCRIPTION
+
+	When you run a program under C<use Acme::Labs>, the module replaces all the 
+	big, complicated words in your source file. The code will still work the way
+	it used to, but it will look something like this:
+
+	use Acme::Labs;
+	
+	BRAIN:	"Are you pondering what I'm pondering?"
+	PINKY:	"I think so, Brain, but where will we find a duck and a hose at this time of night?"
+	
+	
+	zort eGAD ZORt zOrt egAD " NArF ZorT ZORT zoRT,  zORT eGAD ZORt zoRt zoRt ZORt ZORT zOrt egAD,  nARF eGAD ZORT ZORt zOrt!\ zOrt";
+	zort eGAD ZORt zOrt egAD " Narf zorT,  EgaD ZORT ZORt egAD,  zOrt Zort --  ZORt egAD' zoRt zoRt  zOrt ZOrT eGaD ZOrT eGAD  EgaD Zort eGAD ZoRt!";
+
+
+INSTALLATION
+
+	Just stick the .pm file somewhere perl can find it.
+
+
+COPYRIGHT AND LICENCE
+
+	Copyright (C) 2005 David Green
+	This program is free software; you can redistribute 
+	it or modify it under the same terms as Perl itself.
+
+==============================================================================

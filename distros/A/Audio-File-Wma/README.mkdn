@@ -1,0 +1,31 @@
+# NAME
+
+Audio::File::Wma - represents a WMA/ASF audio file
+
+# DESCRIPTION
+
+An extension to Audio::File enabling support for WMA/ASF files.
+
+Uses Audio::WMA internally to parse necessary information from the file.
+
+# INSTALLATION ISSUES
+
+As of version v1.0 of [Ogg::Vorbis::Header::PurePerl](http://search.cpan.org/perldoc?Ogg::Vorbis::Header::PurePerl), there are test failures that will prevent [Audio::File](http://search.cpan.org/perldoc?Audio::File) from installing without --force. There is a patch attached to the bugreport here, but I have not tested it: [https://rt.cpan.org/Public/Bug/Display.html?id=43693](https://rt.cpan.org/Public/Bug/Display.html?id=43693)
+
+# SEE ALSO
+
+[Audio::WMA](http://search.cpan.org/perldoc?Audio::WMA), [Audio::File](http://search.cpan.org/perldoc?Audio::File), [Audio::File::Tag](http://search.cpan.org/perldoc?Audio::File::Tag), [Audio::File::AudioProperties](http://search.cpan.org/perldoc?Audio::File::AudioProperties)
+
+# ACKNOWLEDGEMENTS
+
+Thanks to Florian Ragwitz for writing Audio::File
+
+# AUTHORS
+
+Nathaniel Heinrichs <nheinric@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+    Copyright (c) 2009 Nathaniel Heinrichs.
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.

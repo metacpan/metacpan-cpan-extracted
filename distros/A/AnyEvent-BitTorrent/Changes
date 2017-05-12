@@ -1,0 +1,156 @@
+Changes for AnyEvent::BitTorrent
+
+1.0.2 2016-09-25T16:26:42Z
+
+    Resolved Issues/Bug Fixes:
+      * Minor edge case fixes
+
+1.0.1 2016-09-19T19:56:49Z
+
+    Resolved Issues/Bug Fixes:
+      * When pieces didn't break apart evenly, we were requesting miscalculated blocks
+
+1.0.0 2016-06-14T23:29:24Z
+
+    Documentation/Sample Code/Test Suite:
+     * Fix local peer test
+
+    Notes:
+     * All changes in this version are internal layout changes to ease development
+
+Version 0.2.5 | Four-ish on June 23rd, 2014 | de102f6
+
+    API Changes/Compatibility Information:
+     * Generate peerid in a builder rather than default (more moose stuff)
+
+    Documentation/Sample Code/Test Suite:
+     * Switch to Kubuntu 23.04 torrent in tests
+
+Version 0.2.4 | During the heat of the day on June 21st, 2014 | f6b6a3f
+
+    API Changes/Compatibility Information:
+     * Removed Moo-friendly code (is => 'lazy', etc.); now fully Moose compat
+
+    Documentation/Sample Code/Test Suite:
+      * Convert to Minila
+
+Version 0.2.3 | Just before midnight on October 4th, 2013 | 4a19f5f
+
+    Documentation/Sample Code/Test Suite:
+     * Use Moo and Type::Tiny in tests
+
+Version 0.2.2 | Half past midnight on September 25th, 2013 | f46c4f1
+
+    API Changes/Compatibility Information:
+     * Fix Moo vs Any::Moose derp
+
+Version 0.2.1 | Early evening, September 23rd, 2013 | ac05d7b
+
+    API Changes/Compatibility Information:
+     * Move to Moo and Type::Tiny
+
+Version 0.2.0 | Sometime on September 26th, 2012 | 9d0d7ba
+
+    Resolved Issues/Bug Fixes:
+     * Prevent announce flood on trackers
+
+    Protocol/Behavioral Changes:
+     * Cache ->size() (taking a look at ->wanted() as well)
+
+    Documentation/Sample Code/Test Suite:
+     * Generate trace and info messages using AnyEvent::Log (to be expanded)
+
+Version 0.1.9 | Before leaving work on September 6th, 2012 | 3a981b334f
+
+    Protocol/Behavioral Changes:
+     * Open filehandles timeout:
+       - 500s when opened for read
+       - 500s delay after every read
+       - 60s when opened for write
+       - 120s delay after every write
+
+Version 0.1.8 | After supper on July 20th, 2012 | f35ec1c774
+
+    API Changes/Compatibility Information:
+     * Fix stupid dev code that prevented subclasses of AB from working
+
+Version 0.1.7 | Early morning, July 12th, 2012 | fc6b65c48b
+
+    Protocol/Behavioral Changes:
+     * Small steps forward on IPv6 support
+
+    Documentation/Sample Code/Test Suite:
+     * Document $client->trackers( )
+
+    Notes:
+     * London, baby!
+
+Version 0.1.6 | Late evening on May 4th, 2012 | c32e8a7519
+
+    Resolved Issues/Bug Fixes:
+     * It's spelled "pieces"... oy
+
+    Documentation/Sample Code/Test Suite:
+     * Resolves issue #1
+     * Switch swarm tests to torrent by CC-friendly, punk band Sick of Sarah
+
+Version 0.1.5 | Half past one on December 29th, 2011 | 63d7040198
+
+    Protocol/Behavioral Changes:
+     * Choke packets from fast peers no longer clear outstanding requests
+
+Version 0.1.4 | Seven something on December 27th, 2011 | 407b3316ef
+
+    Protocol/Behavioral Changes:
+     * Basic support for BEP 06 (Fast Peers Ext)
+     * File based download priority (...no public API yet)
+
+    Documentation/Sample Code/Test Suite:
+     * Tiny, local HTTP tracker used in tests should work with Mouse
+
+Version 0.1.3 | December 23rd, 2011 around eightish at night | 8930180a08
+
+    API Changes/Compatibility Information:
+     * New piece_cache( ), seed( ), and complete( ) methods
+     * New state piece_cache parameter to new( )
+     * Calculation of wanted( ) takes file priorities into account (0=!wanted)
+
+    Protocol/Behavioral Changes:
+     * HAVE packets are only sent to non-seed peers
+     * Changed Peer ID format
+
+    Documentation/Sample Code/Test Suite:
+     * Adding test for unchoke and seeding capability
+
+Version 0.1.2 | Early golden time on December 20th, 2011 | afb72191bc
+
+    API Changes/Compatibility Information:
+     * New start( ), stop( ), pause( ), and state( ) methods
+     * New state parameter to new( )
+
+    Resolved Issues/Bug Fixes:
+     * Correct stopped and complete events are sent to tracker when required
+     * Fixed compat on perl 5.010
+     * HTTP trackers function as described in BEP03 and BEP12
+     * Filehandles are cached so we don't reopen files every time we need them
+
+Version 0.1.1 | Early afternoon on December 19th, 2011 | 4de209b886
+
+    API Changes/Compatibility Information:
+     * It exists!
+
+    Resolved Issues/Bug Fixes:
+     * None yet!
+
+    Protocol/Behavioral Changes:
+     * It... exists?
+
+    Documentation/Sample Code/Test Suite:
+     * Guess.
+
+    Notes:
+     * Nothin'...
+
+_ -.-. .... .- -. --. . ... _________________________________________
+For more information, see the commit log:
+    http://github.com/sanko/anyevent-bittorrent/commits/

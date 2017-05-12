@@ -1,0 +1,59 @@
+{
+   "abstract" : "rest-client => Test automation tool for restful web services",
+   "author" : [
+      "Mithun Radhakrishnan <rkmithun@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4206",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "APP-REST-RestTestSuite",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Request" : "0",
+            "LWP::Parallel::UserAgent" : "0",
+            "LWP::UserAgent" : "0",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "APP::REST::ParallelMyUA" : {
+         "file" : "lib/APP/REST/ParallelMyUA.pm",
+         "version" : "0.03"
+      },
+      "APP::REST::RestTestSuite" : {
+         "file" : "lib/APP/REST/RestTestSuite.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/rkmithun/APP-REST-RestTestSuite"
+      }
+   },
+   "version" : "0.03"
+}

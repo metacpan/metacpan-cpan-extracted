@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+#
+# example01 - example of converting bytes to hamming code, and back again.
+#
+# 18-Oct-2003	Brendan Gregg	Created this.
+
+use Algorithm::Hamming::Perl  qw(hamming unhamming);
+
+$data = "Hello";
+
+
+### Hamming
+$hamcode = hamming("$data");
+
+print "input text: $data\n";
+print "input text (as binary)  : ",unpack("B*",$data),"\n";
+print "hamming code (as binary): ",unpack("B*",$hamcode),"\n";
+
+
+### UnHamming
+$unham = unhamming($hamcode);
+
+print "\nretrieved text: $unham\n";

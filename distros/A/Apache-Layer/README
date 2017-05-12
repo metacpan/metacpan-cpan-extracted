@@ -1,0 +1,51 @@
+
+NAME
+    Apache::Layer - Layer content tree over one or more others.
+
+SYNOPSIS
+        #httpd.conf
+        PerlTransHandler Apache::Layer
+
+        # anywhere you can configure a location
+        <Location /project/images>
+            PerlSetVar apache_layer_location /project/images
+            PerlSetVar apache_layer_path     /dir1/root;/dir2/root
+        </Location>
+
+DESCRIPTION
+    This module is designed to allow multiple content trees to be
+    layered on top of each other within the Apache server.
+
+    I developed this module because we produce lots of web sites
+    where a high proportion of the site content is common. But where
+    specific pages / images are tailored to the specific project.
+    This module allows us to layer a sparse directory tree on top of
+    the main complete tree without requiring redirects.
+
+    The essence is that it will cause Apache to deliver content from
+    a series of directories in turn.
+
+    In some ways Apache::Layer is similar to Apache::Stage however
+    it does not require redirects.
+
+COMMON PROBLEMS
+    Apache::Layer is relatively simple. The most common problem is
+    not setting the apache_layer_location parameter correctly. As a
+    rule this parameter should ALWAYS match the parameter within the
+    location i.e. <Location /parameter>.
+
+AUTHOR
+    Simon Matthews <sam@peritas.com>
+
+REVISION
+    $Revision: 1.6 $
+
+COPYRIGHT
+    Copyright (C) 1998 Simon Matthews. All Rights Reserved.
+
+    This module is free software; you can distribute it and/or
+    modify it under the same terms as Perl itself.
+
+SEE ALSO
+    Apache::Stage
+

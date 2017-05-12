@@ -1,0 +1,83 @@
+To Do List
+
+Short term:
+
+- Track multiple historical versions of a schema like VMWare's
+snapshot/clone system.  Store each copy separately on disk for
+efficiency.
+
+- Make RDBMSRules query driver for more stuff (max identifier length,
+reverse engineering, etc.).  This will require an active driver when a
+new schema is created, however.
+
+- Overhaul foreign key objects so that one relationship has one such
+  object, shared by two tables.
+
+- Add constraints to output SQL for MySQL (InnoDB tables
+  will actually use them).
+
+- Make sense of foreign key definitions for InnoDB tables in MySQL.
+
+- Table update & delete.
+
+- Update & delete "handles", to avoid having to regenerate SQL over
+and over.
+
+- Batch insert ?
+
+- Add Alzabo::Runtime::Schema->clone method.
+
+- allow defaults to be marked as functions ( NOW() ) so they're not
+quoted in DDL SQL.
+
+Medium term:
+
+- reconsider MethodMaker's pre/post hooks and try to re-implement in a
+  more flexible/sane manner.
+
+- Abort during Build.PL if supplied username/pw cannot connect to DB
+  (and try to test privs too).  Suggested by Robert Creager.
+
+- Output Dia XML.
+
+- Make a tool to convert schemas from one RDBMS to another.  This will
+  probably require user prompting because some things are unresolvable
+  without a loss of information.
+
+- Add an Alzabo::Database class between the schema and table.  This
+  will allow multiple databases in a schema (on multiple platforms
+  ideally) and allow you to do joins between these databases.  This
+  probably raises all sorts of horrid transactional issues
+  I haven't yet thought of.
+
+- Attempt to guess relationships when reverse engineering a schema
+  without foreign key information.
+
+- More drivers & rules (Oracle, Sybase, Interbase, Solid, and so on)
+
+- Integrate data validation into the code and schema creator in such a
+  way that Alzabo::MethodMaker can automatically create pre_insert and
+  pre_update methods.
+
+- Expand regression tests for core API - SQLMaker, RDBMSRules.
+
+- Give the options to save objects to disk in something a bit more
+  robust than a serialized object form.  Eventually, Alzabo will spit
+  out some sort of XML.
+
+Ongoing:
+
+- Support 'feature probing' via the rules for user interface and to
+  determine whether to try to do things (like use transactions).  This
+  is a broad idea and includes things such as returning a list of
+  possible column types to the user interface or having a flag for
+  supporting transactions.
+
+- Robin Berjon suggested a single documentation 'page' that contains a
+  list of all the method and what objects they apply to.  This exists
+  as Alzabo::QuickRef.
+
+- Support any and all SQL, of arbitrary complexity.  This is fairly
+  far along.
+
+- Non-Mason interface(s) (curses, plain CGI)

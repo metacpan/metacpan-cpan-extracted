@@ -1,0 +1,16 @@
+Revision history for Algorithm::CriticalPath
+
+0.01 	05/06/13
+        First version, released on an unsuspecting world. 
+0.02 	06/06/13
+        Cosmetic changes.  Method rename for critical path attribute.
+0.03 	06/06/13
+        Cosmetic changes to tests.  Silenced some warnings.
+0.04 	10/06/13
+        Set minimum version of Graph to 0.94.
+0.05 	12/08/14
+        Kwalitee.
+0.06 	13/08/14
+        Missing dependency Data::Printer.
+0.07 	13/08/14
+        Wrong version uploaded.

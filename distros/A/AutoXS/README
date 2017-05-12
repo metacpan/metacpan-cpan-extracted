@@ -1,0 +1,73 @@
+NAME
+    AutoXS - Speed up your code after compile time
+
+SYNOPSIS
+      package MyClass;
+      sub blah {...}
+      use AutoXS ':all';
+      # if blah matches one of the patterns, it's running
+      # as XS code now!
+
+DESCRIPTION
+    *Warning:* This module contains some scary code. I'm not even sure it
+    abides by the official Perl API totally. Furthermore, it's my first
+    *real* XS module. It abuses some features of the XS/XSUB syntax. If you
+    break it, you get to keep both halves.
+
+    That being said, the purpose of this module and its plugin modules is to
+    speed up the execution of your program at the expense of a longer
+    startup time. AutoXS::Accessor comes with the same distribution as an
+    example plugin.
+
+    AuotXS plugins use the B and B::Utils modules to scan all subroutines
+    (or methods) in the calling package for certain patterns. If a
+    subroutine complies with such a pattern, it is replaced with an XS
+    subroutine that has the same function.
+
+    The XS subroutines for replacement are *not* compiled at runtime like
+    Inline::C would do. They have been compiled at module build time just
+    like any other XSUBs.
+
+    In a simple minded test, AuotXS::Accessor sped up typical read-only
+    accessors by a factor of 1.6 to a factor of 2.5. Your mileage may vary,
+    of course. Keep in mind mind that accessors can sometimes be part of
+    very tight loops.
+
+    To get an impression of the imposed pre-runtime penalty of using AutoXS,
+    a file containing nine methods (code shown in AutoXS::Accessor) was
+    compiled with and without AutoXS. The test is contrived because all nine
+    methods will be replaced. In normal code, there is much more
+    non-accessor code which will be quickly rejected. Naturally, rejection
+    is faster than successful matching and replacement. The compilation with
+    AutoXS took "74ms" longer than without.
+
+CAVEATS
+    This is alpha code. Beware.
+
+    The module abuses XS syntax constructs.
+
+    The startup penalty may be big and is proportional to the number of
+    subroutines in the calling package.
+
+    The module works its magic at CHECK time. CHECK blocks are not executed
+    in string "eval """ environments. That means this module potentially
+    does not work in a PAR packaged executable. (It should do no harm there,
+    either.)
+
+SEE ALSO
+    AutoXS::Accessor
+
+    AutoXS::Header
+
+    B, B::Utils
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8 or, at your
+    option, any later version of Perl 5 you may have available.
+

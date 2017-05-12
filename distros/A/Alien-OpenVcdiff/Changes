@@ -1,0 +1,6 @@
+0.101   2016-03-01
+  * Depend on Alien::Base::ModuleBuild instead of Alien::Base
+    (thanks Graham Ollis)
+
+0.100   2013-06-15
+  * Initial release

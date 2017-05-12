@@ -1,0 +1,28 @@
+Audio-Moosic version 0.09
+=========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+LWP::Protocol::http::SocketUnix (only if you need to communicate with a local
+moosic server over an UNIX socket.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Florian Ragwitz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

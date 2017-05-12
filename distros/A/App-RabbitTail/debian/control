@@ -1,0 +1,16 @@
+Source: libapp-rabbittail-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5.0.0)
+Build-Depends-Indep: perl (>= 5.8.8-1), libnamespace-autoclean-perl, libmoosex-types-path-class-perl, libanyevent-perl, libmoosex-types-perl, libmoose-perl, libnet-rabbitfoot-perl, libmodule-install-perl, libtest-simple-perl (>= 0.88-1), libmoose-autobox-perl
+Maintainer: Tomas Doran <t0m@state51.co.uk>
+Standards-Version: 3.7.2
+Homepage: http://search.cpan.org/dist/App-RabbitTail/
+
+Package: libapp-rabbittail-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, libnamespace-autoclean-perl, libmoosex-types-path-class-perl, libanyevent-perl, libmoosex-types-perl, libmoose-perl, libnet-rabbitfoot-perl, libmoose-autobox-perl
+Description:  App::RabbitTail
+ .
+ .
+ This description was automagically extracted from the module by dh-make-perl.

@@ -1,0 +1,14 @@
+Revision history for App-TimeTracker-Category
+
+1.002   2016-06-05T21:47:37+0200
+    - do not set category if we dont have one (Thomas Klausner)
+    - fix attrib munging for some startish commands (Thomas Klausner)
+
+
+1.001   2016-01-30T23:07:15
+    - add command "statistic"
+
+
+1.000   2016-01-24T21:25:04
+    - first release
+

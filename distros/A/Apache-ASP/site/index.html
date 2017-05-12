@@ -1,0 +1,328 @@
+
+
+<html>
+<head>
+<title>Apache::ASP</title>
+
+
+		<meta name="keywords" content="">
+		
+		<meta name="description" content="
+Apache::ASP provides an Active Server Pages port to the 
+Apache Web Server with Perl scripting only, and enables developing 
+of dynamic web applications 
+with session management and embedded Perl code.  There are also 
+many powerful extensions, including XML taglibs, XSLT rendering, 
+and new events not originally part of the ASP API!">
+		
+
+<style type="text/css">
+<!--
+      td {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      font {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      .title {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 16px}
+
+
+
+
+-->
+</style>
+
+
+</head>
+<body bgcolor=black link=#063678 alink=#ff5599 vlink=#993399
+marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
+
+
+
+
+<center>
+<table border=0 cellpadding=0 width=99% cellspacing=8>
+<tr><td align=center>
+
+<table border=0 cellpadding=3 width=100% cellspacing=0>
+<tr bgcolor=#063678>
+<td>
+	<table border=0 cellpadding=1 cellspacing=0 width=100%>
+	<tr>
+	<td><img border=0 src=asptitlelogo.gif alt="Apache::ASP" width=267 height=44 ></td>	
+	
+		<td align=right></td>
+	
+	</tr>
+	</table>
+</td>
+</tr>
+<tr>
+  <td bgcolor=#005196 align=center>
+    <b>
+    <font color=#ffffff>&lt;% Web Applications with Apache &amp; mod_perl %&gt;</font>  
+    </b>
+  </td>
+</tr>
+</table>
+
+
+<table border=0 cellpadding=10 cellspacing=0 width=100% bgcolor=#005196>
+<tr>
+<td valign=top width=120 bgcolor=#005196>
+    
+        <table cellpadding=5 cellspacing=0 border=1 bgcolor=white><tr><td>
+
+	<table border=0 cellpadding=0 cellspacing=0 width=105 bgcolor=white>
+	
+	
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>%</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><font color=#993399>INTRO</font></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="install.html" style="text-decoration:none"><font color=#063678>INSTALL</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="config.html" style="text-decoration:none"><font color=#063678>CONFIG</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="syntax.html" style="text-decoration:none"><font color=#063678>SYNTAX</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="events.html" style="text-decoration:none"><font color=#063678>EVENTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="objects.html" style="text-decoration:none"><font color=#063678>OBJECTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="ssi.html" style="text-decoration:none"><font color=#063678>SSI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sessions.html" style="text-decoration:none"><font color=#063678>SESSIONS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="xml.html" style="text-decoration:none"><font color=#063678>XML/XSLT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="cgi.html" style="text-decoration:none"><font color=#063678>CGI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="perlscript.html" style="text-decoration:none"><font color=#063678>PERLSCRIPT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="style.html" style="text-decoration:none"><font color=#063678>STYLE GUIDE</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="faq.html" style="text-decoration:none"><font color=#063678>FAQ</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="tuning.html" style="text-decoration:none"><font color=#063678>TUNING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="kudos.html" style="text-decoration:none"><font color=#063678>CREDITS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="support.html" style="text-decoration:none"><font color=#063678>SUPPORT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sites.html" style="text-decoration:none"><font color=#063678>SITES USING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="testimonials.html" style="text-decoration:none"><font color=#063678>TESTIMONIALS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="resources.html" style="text-decoration:none"><font color=#063678>RESOURCES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="todo.html" style="text-decoration:none"><font color=#063678>TODO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="changes.html" style="text-decoration:none"><font color=#063678>CHANGES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="license.html" style="text-decoration:none"><font color=#063678>LICENSE</font></a></nobr></b></font></td>		
+
+		</tr>
+		<tr><td colspan=2><hr size=1></td></tr>
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="eg/index.html" style="text-decoration:none"><font color=#063678>EXAMPLES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+	</table>
+
+	</td></tr>
+	</table>
+
+		<br>
+		<center>
+		<a href=http://www.apache-asp.org/><img src="powered_by_apache_asp.jpg" width="88" height="31" alt="Powered by Apache::ASP" border="0"></a>
+		<br>
+		<a href=http://perl.apache.org><img src="powered_by_modperl.gif" width="88" height="31" alt="Powered by ModPerl and Apache" border="0"></a>
+		<br>
+		<a href=http://www.perl.com><img src="rectangle_power_perl.gif" width="88" height="31" alt="Powered by Perl" border="0"></a>
+		</center>
+
+</center>
+
+</td>
+
+
+
+<td valign=top bgcolor=white>
+<font size=+0 face=verdana,arial>
+
+<font face=verdana><font class=title size=+1 color=#555555><b>INTRO</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Apache::ASP provides an Active Server Pages port to the 
+Apache Web Server with Perl scripting only, and enables developing 
+of dynamic web applications 
+with session management and embedded Perl code.  There are also 
+many powerful extensions, including XML taglibs, XSLT rendering, 
+and new events not originally part of the ASP API!
+<font face="courier new" size=3><pre>
+</pre></font><table class="noescape" border="0"><tr><td>
+<b>Apache::ASP's features include:</b>
+<font face=verdana,helvetica,arial size=-1>
+<ul>
+<li> Scripting <a href=syntax.html><font size=-1 face=verdana><b>SYNTAX</b></font></a> is Natural and Powerful 
+<li> Rich <a href=objects.html><font size=-1 face=verdana><b>OBJECTS</b></font></a> Developer API
+<li> Web Application <a href=events.html><font size=-1 face=verdana><b>EVENTS</b></font></a> Model
+<li> Modular <a href=ssi.html><font size=-1 face=verdana><b>SSI</b></font></a> Decomposition, Code Sharing
+<li> User <a href=sessions.html><font size=-1 face=verdana><b>SESSIONS</b></font></a>, CIFS & NFS Cluster Ready
+<li> <a href=xml.html><font size=-1 face=verdana><b>XML/XSLT</b></font></a> Rendering & Custom Tag Technology
+<li> <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a> Compatibility
+<li> <a href=perlscript.html><font size=-1 face=verdana><b>PERLSCRIPT</b></font></a> Compatibility
+<li> Great Open Source <a href=support.html><font size=-1 face=verdana><b>SUPPORT</b></font></a>
+</ul>
+</font>
+</table>
+<font face="courier new" size=3><pre>
+</pre></font>This module works under the Apache Web Server
+with the <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a> module enabled. See <a href=http://www.apache.org>http://www.apache.org</a> and
+<a href=http://perl.apache.org>http://perl.apache.org</a> for further information.
+<font face="courier new" size=3><pre>
+</pre></font>This is a portable solution, similar to ActiveState&#39;s <a href=http://www.activestate.com/ActivePerl/><font size=-1 face=verdana><b>PerlScript</b></font></a>
+for <a href=http://www.microsoft.com/iis/><font size=-1 face=verdana><b>NT/IIS</b></font></a> ASP.  Work has been done and will continue to make ports 
+to and from this implementation as smooth as possible.
+<font face="courier new" size=3><pre>
+</pre></font>For Apache::ASP downloading and installation, please read 
+the <a href=install.html><font size=-1 face=verdana><b>INSTALL</b></font></a> section.  For installation troubleshooting
+check the <a href=faq.html><font size=-1 face=verdana><b>FAQ</b></font></a> and the SUPPORT sections.
+<font face="courier new" size=3><pre>
+</pre></font>For database access, ActiveX, scripting languages, and other
+miscellaneous issues please read the FAQ section.</font>
+
+</font>
+</td>
+
+<td bgcolor=white valign=top>
+
+       
+<!-- index_extra.inc -->
+
+&nbsp;
+     
+</td>
+
+</tr>
+<tr bgcolor=#063678>
+	<td colspan=3 align=center width=80%>
+	<font face=verdana color=white size=-1>
+	Copyright &copy; 1998-2008,
+	<a href=http://www.chamas.com><font color=white>Chamas Enterprises Inc.</font></a>
+	</font>
+	</td>
+</tr>
+</table>
+
+</td></tr>
+</table>
+</center>
+
+</body>
+</html>

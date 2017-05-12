@@ -1,0 +1,25 @@
+---
+abstract: 'install bundled apt-pm apt-cpan apt-pm-web dh-make-pm cpan-patches dpkg-scanpmpackages'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+keywords:
+  - alien
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-Debian-Apt-PM
+provides:
+  Alien::Debian::Apt::PM:
+    file: lib/Alien/Debian/Apt/PM.pm
+    version: 0.03
+resources:
+  bugtracker: http://github.com/jozef/Alien-Debian-Apt-PM/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jozef/Alien-Debian-Apt-PM/
+version: 0.03

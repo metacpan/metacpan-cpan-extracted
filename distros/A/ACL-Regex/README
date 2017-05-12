@@ -1,0 +1,13 @@
+This ACL system provides a light framework for supplying regex-style, sys-admin
+friendly access control to any kind of application.
+
+Any application can make use of the module, the example application is a perl
+service that takes postfix style policy server declarations, converts them
+into a native format, and checks them against a database of ACLs.
+
+Note, that this intended for use strictly with Postfix systems, but rather
+any system that requires an ACL: web-application, mail application, etc.
+
+Installation:
+
+ $ perl Makefile.PL && make test install

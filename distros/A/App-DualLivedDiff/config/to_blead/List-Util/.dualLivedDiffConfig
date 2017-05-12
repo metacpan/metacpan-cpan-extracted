@@ -1,0 +1,10 @@
+---
+dirs-recursive:
+  .: ext/List-Util
+exclude-regexes:
+  - '^(?:\.?/)?META.yml$'
+  - '^(?:\.?/)?MANIFEST$'
+  - '^(?:\.?/)?SIGNATURE$'
+  - '^(?:\.?/)?ppport\.h$'
+  - '^(?:\.?/)?inc/'
+  - '^(?:\.?/)?mytypemap$'

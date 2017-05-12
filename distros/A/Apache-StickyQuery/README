@@ -1,0 +1,55 @@
+NAME
+    Apache::StickyQuery - rewrites links using sticky query
+
+SYNOPSIS
+      # in httpd.conf
+      <Location /stickyquery>
+      SetHandler perl-script
+      PerlHandler Apache::StickyQuery
+      </Location>
+
+      # filter aware
+      PerlModule Apache::StickyQuery
+      SetHandler perl-script
+      PerlSetVar Filter On
+      PerlHandler Apache::RegistryFilter Apache::StickyQuery Apache::Compress
+
+DESCRIPTION
+    Suppose page transactions like this:
+
+           foo.cgi       =>   bar.html       =>   baz.cgi
+         ?sid=0123456                           ?sid=0123456
+
+    It is difficult to keep sid query parameter between two cgis without
+    cookies (or mod_rewrite hacks).
+
+    Apache::StickyQuery is a filter that rewrites all links in HTML file using
+    "sticky query". It would be useful in keeping state (ie. like Session IDs)
+    without using Cookies. See the HTML::StickyQuery manpage for details.
+
+    This module is Filter aware, meaning that it can work within
+    Apache::Filter framework without modification.
+
+CONFIGURATION
+    StickyQuery parameters are automatically retrieved via current query
+    string. Options to change this is one of TODOs. (Hint: inherit from
+    Apache::StickyQuery and override `retrieve_param')
+
+    Apache::StickyQuery has the following configuration variables.
+
+      PerlSetVar StickyQueryAbs 0
+      PerlSetVar StickyQueryOverride 1
+      PerlSetVar StickyQueryRegexp ^/cgi-bin/
+
+    each of which corresponds to those of HTML::StickyQuery. See the
+    HTML::StickyQuery manpage for details.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the HTML::StickyQuery manpage, the Apache::Filter manpage
+

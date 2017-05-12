@@ -1,0 +1,56 @@
+{
+   "abstract" : "Command-Line Shared Password Store",
+   "author" : [
+      "Oliver Gorwits <oliver@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-passmanager",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Curses" : 0,
+            "Curses::UI" : 0,
+            "File::Path" : 0,
+            "Git::Wrapper" : 0,
+            "GnuPG::Interface" : 0,
+            "IO::File" : 0,
+            "IO::Handle" : 0,
+            "Moose" : 0,
+            "Moose::Role" : 0,
+            "MooseX::App::Cmd" : 0,
+            "MooseX::App::Cmd::Command" : 0,
+            "Scalar::Util" : 0,
+            "XML::Simple" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-passmanager"
+      },
+      "homepage" : "https://github.com/ollyg/App-passmanager/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ollyg/App-passmanager.git",
+         "web" : "https://github.com/ollyg/App-passmanager"
+      }
+   },
+   "version" : "1.113580"
+}
+

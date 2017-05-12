@@ -1,0 +1,33 @@
+---
+abstract: 'copy MediaWiki page history into a Git repository'
+author:
+  - 'Matthew Astley <mca1001@users.sourceforge.net>'
+build_requires:
+  English: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-MediaWiki2Git
+requires:
+  Carp: 0
+  File::Slurp: 0
+  Git::Repository: 0
+  MediaWiki::API: 0
+  Moose: 0
+  Net::DNS: 0
+  Pod::Usage: 0
+  YAML: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-MediaWiki2Git
+  homepage: https://github.com/mca-wtsi/App-MediaWiki2Git
+  repository: git://github.com/mca-wtsi/App-MediaWiki2Git
+version: 0.003

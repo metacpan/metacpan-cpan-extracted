@@ -1,0 +1,66 @@
+use alienfile;
+use Capture::Tiny qw( capture );
+
+configure { requires 'Capture::Tiny' };
+
+plugin 'Probe::CommandLine' => (
+  command => 'nasm',
+  args    => ['-v'],
+  match   => qr/NASM version/,
+);
+
+share {
+
+  requires 'Path::Tiny';
+  plugin 'Fetch::HTTPTiny' => 'http://www.nasm.us/pub/nasm/releasebuilds';
+  plugin 'Decode::HTML' => ();
+  plugin 'Prefer::SortVersions' => ();
+
+  download sub {
+    my($build) = @_;
+    
+    my $res = $build->decode($build->fetch('http://www.nasm.us/pub/nasm/releasebuilds'));
+
+    $res->{list} = [grep { $_->{filename} =~ /^[0-9\.]+$/ } @{ $res->{list} }];
+    
+    $res = $build->prefer($res);
+    
+    die "unable to find first level candidate"
+      unless @{ $res->{list} } > 0;
+    
+    $res = $build->decode($build->fetch($res->{list}->[0]->{url}));
+    
+    $res->{list} = [grep { $_->{filename} =~ /^nasm-[0-9\.]+\.tar\.gz$/ } @{ $res->{list} }];
+
+    $res = $build->prefer($res);
+
+    die "unable to find second level candidate"
+      unless @{ $res->{list} } > 0;
+    
+    $res = $build->fetch($res->{list}->[0]->{url});
+
+    Path::Tiny->new($res->{filename})->spew_raw($res->{content});
+
+    $build->runtime_prop->{command} = 'nasm';
+  };
+
+  plugin 'Extract' => 'tar.gz';  
+  plugin 'Build::MSYS' => ();
+
+  build [
+    'sh configure --prefix=%{alien.install.prefix}',
+    '%{gmake}',
+    '%{gmake} install',
+  ];
+  
+};
+
+gather sub {
+  my($build) = @_;
+  my($stdout) = capture {
+    system($build->runtime_prop->{command}, '-v');
+  };
+  my($version) = $stdout =~ /NASM version ([0-9\.]+)/;
+  $build->runtime_prop->{version} = $version || 'unknown';
+};
+

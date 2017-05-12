@@ -1,0 +1,44 @@
+=begin private
+
+Keep private so it's not displayed, but will still be indexed by the CPAN
+toolchain.
+
+=head1 Name
+
+sqitchcommands - List of common sqitch commands
+
+=end private
+
+=head1 Usage
+
+  sqitch [--plan-file <file>] [--engine <engine>] [--top-dir <dir> ]
+         [--extension <ext>] [--registry <registry>] [--etc-path]
+         [--quiet] [--verbose] [--version]
+         <command> [<command-options>] [<args>]
+
+=head1 Common Commands
+
+The most commonly used sqitch commands are:
+
+  add        Add a new change to the plan
+  bundle     Bundle a Sqitch project for distribution
+  checkout   Revert, checkout another VCS branch, and re-deploy changes
+  config     Get and set local, user, or system options
+  deploy     Deploy changes to a database
+  engine     Manage database engine configuration
+  help       Display help information about Sqitch commands
+  init       Initialize a project
+  log        Show change logs for a database
+  plan       Show the contents of a plan
+  rebase     Revert and redeploy database changes
+  revert     Revert changes from a database
+  rework     Duplicate a change in the plan and revise its scripts
+  show       Show information about changes and tags, or change script contents
+  status     Show the current deployment status of a database
+  tag        Add or list tags in the plan
+  target     Manage target database configuration
+  upgrade    Upgrade the registry to the current version
+  verify     Verify changes to a database
+
+See C<< sqitch help <command> >> or C<< sqitch help <concept> >> to read about
+a specific command or concept.

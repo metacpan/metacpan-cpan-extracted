@@ -1,0 +1,51 @@
+Algorithm::ExpectationMaximization is a perl5 module for the
+Expectation-Maximization (EM) based clustering of numerical
+data in multidimensional spaces.  Since the module is
+entirely in Perl (in the sense that it is not a Perl wrapper
+around a C library that actually does the clustering), the
+code in the module can easily be modified to experiment with
+several aspects of the EM algorithm.
+
+This module is not meant for very large datafiles.  Being an
+all-Perl implementation, the goal here is not the speed of
+execution.  On the contrary, the goal is to make it easy to
+experiment with the different facets of the EM algorithm
+with regard to its ability to identify the individual
+Gaussians in data that can be modeled as a Gaussian mixture.
+
+This module requires the following three modules:
+
+   Math::Random
+   Graphics::GnuplotIF
+   Math::GSL::Matrix
+
+the first for generating the multivariate random numbers,
+the second for the visualization of the clusters, and the
+third for access to the Perl wrappers for the matrix
+handling portion of the GNU Scientific Library for the
+algebraic manipulation of the matrices that are needed for
+the covariances of the Gaussians.
+
+For installation, do the usual
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+if you have root access.  If not, 
+
+    perl Makefile.PL prefix=/some/other/directory/
+    make
+    make test
+    make install
+
+Contact:
+
+Avinash Kak  
+
+email: kak@purdue.edu
+
+Please place the string "Algorithm EM" in the subject line
+if you wish to write to the author.  Any feedback regarding
+this module would be highly appreciated.

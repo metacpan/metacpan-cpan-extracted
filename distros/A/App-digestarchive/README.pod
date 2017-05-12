@@ -1,0 +1,124 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+digestarchive - display entry hexdigest in archive
+
+=head1 VERSION
+
+0.044
+
+=head1 SYNOPSIS
+
+  digestarchive /path/to/archive.tar.gz
+  # or
+  cat /path/to/archive.tar.gz | digestarchive
+  
+  # output
+  ** can not get digest **          foo/(DIR)
+  ** can not get digest **          foo/bbb -> aaa(SYMLINK)
+  b026324c6904b2a9cb4b88d6d61c81d1  foo/aaa(FILE)
+
+=head1 OPTIONS
+
+=over 4
+
+=item -h, --help
+
+Display help and exit
+
+=item -v, --version
+
+Display vesion and exit
+
+=item --digest-type=<DIGEST_TYPE>
+
+default MD5. you can designate the digest type, MD5 or SHA1
+
+=back
+
+=cut
+
+use strict;
+use warnings;
+use App::digestarchive;
+use Getopt::Long;
+use FindBin qw($Script);
+use Pod::Usage;
+
+our $VERSION = '0.044';
+our %ARCHIVE_ENTRY_TYPES = ( 
+					0 => "FILE",
+					1 => "HARDLINK",
+					2 => "SYMLINK",
+					3 => "CHARDEV",
+					4 => "BLOCKDEV",
+					5 => "DIR",
+					6 => "FIFO",
+					8 => "SOCKET",
+					9 => "UNKNOWN",
+					L => "LONGLINK",
+					V => "LABEL",
+				);
+our %DIGEST_TYPE_LENGTH = (
+					MD5  => 32,
+					SHA1 => 40
+				);
+
+my($version, $help, $digest_type);
+GetOptions(
+	"version"       => \$version,
+	"help"          => \$help,
+	"digest-type=s" => \$digest_type
+);
+if ($version) {
+    pod2usage(-exitval => 0, -verbose => 99, -sections => [qw(VERSION AUTHOR)]);
+}
+if ($help) {
+    pod2usage(-exitval => 0, -verbose => 2);
+}
+
+my $file_or_buffer;
+
+if (!-t STDIN || defined $ARGV[0] && $ARGV[0] eq "-") {
+	$file_or_buffer = do { local $/; <STDIN> };
+} elsif (defined $ARGV[0] && -f $ARGV[0]) {
+    $file_or_buffer = $ARGV[0];
+} else {
+    pod2usage("$Script: No files given");
+}
+
+if (defined $digest_type && !exists $DIGEST_TYPE_LENGTH{$digest_type}) {
+    pod2usage("$Script --digest-type: No support $digest_type yet");
+}
+
+my $app = App::digestarchive->new;
+$app->digest_type($digest_type) if defined $digest_type;
+$app->read($file_or_buffer);
+
+my $length = $DIGEST_TYPE_LENGTH{$app->digest_type};
+my $format = "%-${length}s  %s(%s)\n";
+while (my $f = $app->next) {
+	printf $format, $f->digest, $f->link_or_real_name, $ARCHIVE_ENTRY_TYPES{$f->type};
+}
+
+=pod
+
+=head1 SEE ALSO
+
+L<App::digestarchive>
+
+=head1 AUTHOR
+
+Akira Horimoto <emperor.kurt _at_ gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Copyright (C) 2012 Akira Horimoto
+
+=cut

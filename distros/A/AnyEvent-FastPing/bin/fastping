@@ -1,0 +1,110 @@
+#!/opt/bin/perl
+
+use Getopt::Long;
+
+use AnyEvent;
+use AnyEvent::Socket;
+use AnyEvent::FastPing;
+
+use strict;
+
+sub usage {
+   print STDERR <<EOF;
+Usage: fastping [-w<seconds>] [-r<packets>] [-c[count] [-q] range...
+
+   --wait | -w  after pinging, wait this many seconds on replies [default 0.25]
+   --rate | -r  maximum number of packets send/second [default 0, unlimited]
+   --count | -c how many pings to send to each address [default 1]
+   --quiet | -q do not process and output ping replies (also faster)
+
+   range        low[,high[,bandwidth]]
+                low and high must be either IPv4 or IPv6 addresses, specifying
+                a range of addresses to ping. If high is omitted, it is assumed
+                to be equal to low. The optional bandwidth gives the IP-level
+                maximum bandwidth in kilobytes per second.
+
+Note:
+   * you should almost always specify a packet rate and possible range bandwidths,
+     as the default is to ping as fast as possible.
+
+Output:
+   For each ping reply received, net-fping will output a single line with
+   three space-separated columns, the IP address, the iteration count and
+   the round trip time in seconds (as a float).
+
+Example:
+   ping 10.0.0.1 .. 10.0.0.254 with at most 8 kilobytes/second and
+   11.0.0.1 .. 11.0.0.254 as fast as possible, never exceeding 1000 packets/s,
+   and waiting up to three seconds to wait for delayed replies:
+
+   fastping -w3 -r1000 10.0.0.1,10.0.0.254,8 11.0.0.1,11.0.0.254
+EOF
+   exit shift;
+}
+
+@ARGV or usage 0;
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+
+my $count = 1;
+my $rate  = 0;
+my $wait  = 0.25;
+my $count = 1;
+my $quiet = 0;
+
+GetOptions (
+   "help|h"    => sub { usage 0 },
+   "count|c=i" => \$count,
+   "rate|r=f"  => \$rate,
+   "wait|w=f"  => \$wait,
+   "quiet|q"   => \$quiet,
+) or usage 1;
+
+my @ranges;
+
+for (@ARGV) {
+   my ($lo, $hi, $kbps) = split /,/;
+   my $pktsz;
+
+   $hi = $lo unless $hi;
+
+   $lo = AnyEvent::Socket::parse_address $lo;
+   $hi = AnyEvent::Socket::parse_address $hi;
+
+   (length $lo) and (length $lo == length $hi)
+      or die "ip adress parse error";
+
+   $pktsz = (4 == length $lo)
+            ? AnyEvent::FastPing::icmp4_pktsize
+            : AnyEvent::FastPing::icmp6_pktsize;
+
+   push @ranges, [$lo, $hi, $kbps && $pktsz / ($kbps * 1000)];
+}
+
+{
+   my $pinger = new AnyEvent::FastPing;
+
+   $pinger->interval ($rate && 1 / $rate);
+   $pinger->max_rtt (0);
+
+   $pinger->on_recv (sub {
+      for (@{ $_[0] }) {
+         printf "%s %g\n", AnyEvent::Socket::format_address $_->[0], $_->[1];
+      }
+   }) unless $quiet;
+
+   for my $iter (1 .. $count) {
+      $pinger->add_range (@$_)
+         for @ranges;
+
+      $pinger->on_idle (my $done = AE::cv);
+      $pinger->start;
+      $done->wait;
+   }
+
+   {
+      my $wait_w = AE::timer $wait, 0, my $done = AE::cv;
+      $done->wait;
+   }
+}
+

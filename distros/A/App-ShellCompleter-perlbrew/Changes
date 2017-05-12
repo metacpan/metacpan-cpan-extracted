@@ -1,0 +1,38 @@
+Revision history for App-ShellCompleter-perlbrew
+
+0.006   2016-10-21 (PERLANCAR)
+
+        - Allow script to be dumped by Getopt::Long::Subcommand::Dump.
+
+
+0.005   2016-06-02 (PERLANCAR)
+
+        - [refactor] Move routines to .pm file so they can be reused by other
+          dists.
+
+
+0.004   2016-05-03 (PERLANCAR)
+
+	- Add completion for subcommands alias, lib, exec.
+
+	- Tweak completion of perls to use: only offer version numbers if
+	  word begins with a number.
+
+
+0.003   2016-04-30 (PERLANCAR)
+
+	- Update to perlbrew 0.75: add --no-patchperl and --destdir for
+	  'install'.
+
+
+0.002   2016-04-30 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild, remove COMPLETION section in _perlbrew's POD because
+          _perlbrew itself is a completer script.
+
+
+0.001   2016-04-30 (PERLANCAR)
+
+        - First release.

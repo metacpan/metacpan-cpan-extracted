@@ -1,0 +1,229 @@
+#!/usr/local/bin/perl
+
+eval 'exec /usr/local/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+use warnings;
+use strict;
+use Term::ReadLine;
+use Term::ReadKey;
+use Pod::Usage 1.12;
+use aliased 'AI::Prolog';
+AI::Prolog::Engine->formatted(1);
+# '$Id: aiprolog,v 1.7 2005/08/06 23:28:40 ovid Exp $';
+
+my $term = Term::ReadLine->new('AI::Prolog');
+my $OUT  = $term->OUT || \*STDOUT;
+use Carp;
+$SIG{__DIE__} = \&Carp::confess;
+
+my $file    = shift;
+my $program = '';
+if ($file) {
+    open FH, "< $file" or die "Could not open ($file) for reading: $!";
+    $program = do { local $/; <FH> };
+}
+my $prolog  = Prolog->new($program);
+my $version = Prolog->VERSION;
+
+print $OUT <<"END_WELCOME";
+
+Welcome to AI::Prolog v $version
+Copyright (c) 2005-2006, Curtis "Ovid" Poe.
+AI::Prolog comes with ABSOLUTELY NO WARRANTY.  This library is free software;
+you can redistribute it and/or modify it under the same terms as Perl itself.
+
+Type 'help.' for for a list of built-ins or 'help("\$builtin").' for help on a
+specific built-in.
+
+END_WELCOME
+
+my $COMMAND = qr/^%\s*/;
+my $RESULTS = 0;
+my $MORE    = 1;
+
+while ($prolog->continue) {
+    my $query = $term->readline("?- ");
+    chomp $query;
+    next unless $query;
+    $term->addhistory($query);
+    print $OUT "\n";
+    
+    if ( $query =~ /^\s*\?/ ) {
+        help();
+        next;
+    }
+    elsif ( $query =~ $COMMAND ) {
+        last if $query =~ /$COMMAND?(?:halt|quit|exit|stop)/i;
+        if ($query =~ /$COMMAND(?:help)/i) {
+            help();
+        }
+        elsif ($query =~ /${COMMAND}more/i) {
+            $MORE = 1;
+        }
+        elsif ($query =~ /${COMMAND}no\s*more/i) {
+            $MORE = 0;
+        }
+        next;
+    }
+    
+    eval {$prolog->query($query)};
+    if ($@) {
+        warn $@;
+        next;
+    }
+    $RESULTS = 1;
+    show_results($prolog);
+    while ($MORE && user_wants_more()) {
+        show_results($prolog);
+    }
+}
+
+sub show_results {
+    return unless $RESULTS;
+    my ($prolog) = @_;
+    my $results = $prolog->results;
+    $results ||= ''; # otherwise it's an arrayref
+    print $OUT $results, " ";
+    unless ($results) {
+        print $OUT "No\n";
+        $RESULTS = 0;
+    }
+}
+
+sub user_wants_more {
+    return unless $RESULTS;
+    ReadMode 'cbreak';
+    my $key = ReadKey(0);
+    ReadMode 'normal';
+    if (';' eq $key) {
+        print $OUT ";\n\n";
+        return 1;
+    }
+    print $OUT "\n\nYes\n" if $RESULTS;
+    return;
+}
+
+my $offset;
+sub help {
+    $offset ||= tell DATA;
+    seek DATA, $offset, 0;
+    pod2usage({
+        -verbose => 2, 
+        -input   => \*DATA,
+        -exitval => 'NOEXIT',
+    });
+}
+
+__DATA__
+
+=head1 NAME 
+
+aiprolog --  A simple Prolog shell using AI::Prolog.
+
+=head1 SYNOPSIS
+
+ usage: aiprolog <optional prolog program name>
+
+=head1 DESCRIPTION
+
+C<aiprolog> is a simple prolog shell using L<AI::Prolog> as the backend.
+
+See the documentation for more detail on the Prolog features that L<AI::Prolog>
+currently accepts.
+
+=head2 Commands
+
+Commands specific to aiprolog shell:
+
+ "% more"     -- enables prompting for more results (default)
+ "% no more"  -- disables prompting for more results
+ "% nomore"   -- same as "no more"
+ "% halt"     -- stops the shell
+ "% help"     -- display this message
+
+Note that the percent sign must preceed the command.  The percent sign
+indicates a Prolog comment.  Without that, aiprolog will think you're trying to
+execute a prolog command.
+
+aiprolog-specific commands are case-insensitive.
+
+=head2 Typical session
+
+Save the following to a file named "append.pro":
+
+ append([],X,X).
+ append([W|X], Y, [W|Z]) :- append(X,Y,Z).
+
+Then load it into the C<aiprolog> shell by typing this at a shell:
+
+ aiprolog path/to/append.pro
+
+Alternatively, once in the shell, you can load the program with:
+
+ consult('path/to/append.prog').
+
+In the shell, you should be greeted by a query prompt "?-".  At this prompt,
+you can issue queries against the program.  Try entering the following query:
+
+ append(X,Y,[1,2,3,4]).
+
+The shell should respond with this:
+
+ append([],[1,2,3,4],[1,2,3,4]) ;
+
+It should then appear to hang.  It's waiting for you to type a character.  If
+you type a semi-colon, it will attempt to resatisfy the query.  If you keep
+doing that until there are no more valid results left, you'll see this:
+
+ ?- append(X,Y,[1,2,3,4]).
+
+ append([],[1,2,3,4],[1,2,3,4]) ;
+
+ append([1],[2,3,4],[1,2,3,4]) ;
+
+ append([1,2],[3,4],[1,2,3,4]) ;
+
+ append([1,2,3],[4],[1,2,3,4]) ;
+
+ append([1,2,3,4],[],[1,2,3,4]) ; 
+
+ No
+ 
+ ?-
+
+The "No" is just Prolog's way of telling you there are no more results which
+satisfy your query.  If you stop trying to satisfy results before all solutions
+have been found, you might see something like this:
+
+ ?- append(X,Y,[1,2,3,4]).
+
+ append([],[1,2,3,4],[1,2,3,4]) ;
+
+ append([1],[2,3,4],[1,2,3,4]) ;
+
+ append([1,2],[3,4],[1,2,3,4])
+
+ Yes
+
+ ?-
+
+The "Yes" simply says that Prolog found results for you.
+
+=head2 The game
+
+If you are hoping to use this to play the bundled "Spider" game, I recommend
+the following:
+
+ aiprolog location/of/spider.pro
+
+ ?- % no more
+
+That disables the pause where the shell waits for you to hit a ';' to get more
+results or hit enter to continue.  It gets very annoying while playing the
+game, though it's useful when you really want to program.
+
+Then issue the "start" command (defined in "spider.pro").
+
+ ?- start.
+
+=cut

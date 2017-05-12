@@ -1,0 +1,18 @@
+NAME
+    Algorithm::Metric::Chessboard - Calculate distances on a square grid
+    with optional wormholes (the 'chessboard metric').
+
+DESCRIPTION
+    Calculates minimum number of moves between two points in a game played
+    on a square grid, where one move is a jump from a point to a horizontal,
+    vertical or diagonal neighbour.
+
+    With no other features, the number of moves taken to go from the point
+    "(x1, y1)" to "(x2, y2)" *would* be quite simple:
+
+      d( (x1, y1), (x2, y2) ) = max( abs( x1 - x2 ), abs( y1 - y2) )
+
+    However within the space are "wormholes" which allow you to travel
+    between any two distant points in one move, so the actual number of
+    moves may be smaller than the above. Wormhole travel costs a fixed
+    number of moves.

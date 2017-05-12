@@ -1,0 +1,35 @@
+Revision history for Perl extension Apache::AuthExpire
+
+0.36  Friday September 7 2001
+	- Bug fix in $log->debug() statements
+	- Bug fix in $time_to_die set
+	- Fixed fix in time compare
+	- Fixed bug relating to pages with many subrequests
+
+0.34  Friday September 7 12:50:00 2001
+	- Bug fix in time compare
+
+0.33  Thurs Sep 6 21:00:00 2001 
+	- Updated documentation
+	- Improved logging facilities (uses Apache::Log) 
+	- Improved logging facilities (uses Apache::Log) 
+
+0.31  Thurs Aug 30 18:35:00 2001
+	- Updated documentation, fixed pod
+
+0.30  Wed Jun 14 18:00:00 2000
+	- time files now generated using the $r->server_root_relative() method
+	- removed some useless debugging reporting
+	- updated README with TODO list
+	- inserted call for Apache::src module for future use
+
+0.25  Wed Jun 14 15:20:00 2000
+	- updated version; modified by hand
+	- updated $r-dir_config entry for 'TIMEOUT_DEBUG'.
+	- cleaned up regexp that munges realm names to prevent a realm from being interpretted as a directory
+	- updated README to give credit to plaid from http://www.perlmonks.org/index.pl?node=plaid
+
+0.21  Tue Jun 13 11:32:19 2000
+	- first release version; created by h2xs 1.20 with options
+		-AX -n Apache::AuthExpire
+

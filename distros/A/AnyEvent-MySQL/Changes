@@ -1,0 +1,32 @@
+Revision history for AnyEvent-MySQL
+
+1.1.7   2016.4.12
+        Memorize the callback on AnyEvent::MySQL->new, and use it after
+        each successful reconnect.
+
+1.1.6   2015.9.25
+        Add 'ReadOnly' option on DB handles by clking (clking@github)
+
+1.1.5   2014.12.17
+        Add 'ping' command. Fix a warning on command retry.
+        Patched by Dmitriy Shamatrin (justnoxx@github)
+
+1.1.4   2014.12.9
+        Fix a bug (client default charset field) on handshake protocol.
+        Thanks to nsnake@github for reporting.
+
+1.1.3   2014.5.23
+        Remove feature switch (given..when) to if..elsif..else
+
+1.1.2   2014.5.21
+        Add document for passing POD test
+
+1.1.0   2014.5.20
+        Fix dependency to Devel::StackTrace in Makefile.PL
+
+1.0.1   2014.5.19
+        Fix a word in document.
+
+1.00    2014.5.19
+        First version, released on an unsuspecting world.
+

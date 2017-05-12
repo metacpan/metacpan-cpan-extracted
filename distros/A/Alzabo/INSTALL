@@ -1,0 +1,9 @@
+Alzabo requires Perl 5.6.1 or newer.  The installation process uses
+Module::Build 0.20 or greater.
+
+Installing Alzabo:
+
+ perl Build.PL
+ (answer the questions you're asked)
+ ./Build test
+ ./Build install

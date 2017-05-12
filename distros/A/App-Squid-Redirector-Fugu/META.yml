@@ -1,0 +1,26 @@
+---
+abstract: 'A Squid HTTP redirector.'
+author:
+  - 'Geovanny Junio <geovannyjs@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.017, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Squid-Redirector-Fugu
+requires:
+  BerkeleyDB: '0'
+  Carp: '0'
+  Config::Any: '0'
+  DBI: '0'
+  DateTime: '0'
+  Getopt::Long: '0'
+  Log::Handler: '0'
+  Net::LDAP: '0'
+  strict: '0'
+  warnings: '0'
+version: 0.0.9

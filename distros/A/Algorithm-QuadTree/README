@@ -1,0 +1,171 @@
+NAME
+    Algorithm::QuadTree - A QuadTree Algorithm class in pure Perl.
+
+SYNOPSIS
+        use Algorithm::QuadTree;
+
+        # create a quadtree object
+        my $qt = Algorithm::QuadTree->new(-xmin  => 0,
+                                          -xmax  => 1000,
+                                          -ymin  => 0,
+                                          -ymax  => 1000,
+                                          -depth => 6);
+
+        # add objects randomly
+        my $x = my $tag = 1;
+        while ($x < 1000) {
+          my $y = 1;
+          while ($y < 1000) {
+            $qt->add($tag++, $x, $y, $x, $y);
+
+            $y += int rand 200;
+          }
+          $x += int rand 100;
+        }
+
+        # find the objects enclosed in a given region
+        my $r_list = $qt->getEnclosedObjects(400, 300,
+                                             689, 799);
+
+DESCRIPTION
+    Algorithm::QuadTree implements a quadtree algorithm (QTA) in pure Perl.
+    Essentially, a *QTA* is used to access a particular area of a map very
+    quickly. This is especially useful in finding objects enclosed in a
+    given region, or in detecting intersection among objects. In fact, I
+    wrote this module to rapidly search through objects in a the Tk::Canvas
+    manpage widget, but have since used it in other non-Tk programs
+    successfully. It is a classic memory/speed trade-off.
+
+    Lots of information about QTAs can be found on the web. But, very
+    briefly, a quadtree is a hierarchical data model that recursively
+    decomposes a map into smaller regions. Each node in the tree has 4
+    children nodes, each of which represents one quarter of the area that
+    the parent represents. So, the root node represents the complete map.
+    This map is then split into 4 equal quarters, each of which is
+    represented by one child node. Each of these children is now treated as
+    a parent, and its area is recursively split up into 4 equal areas, and
+    so on up to a desired depth.
+
+    Here is a somewhat crude diagram (those diagrams might not appear unless
+    you run pod2text):
+
+                       ------------------------------
+                      |AAA|AAB|       |              |
+                      |___AA__|  AB   |              |
+                      |AAC|AAD|       |              |
+                      |___|___A_______|      B       |
+                      |       |       |              |
+                      |       |       |              |
+                      |   AC  |   AD  |              |
+                      |       |       |              |
+                       -------------ROOT-------------
+                      |               |              |
+                      |               |              |
+                      |               |              |
+                      |      C        |      D       |
+                      |               |              |
+                      |               |              |
+                      |               |              |
+                       ------------------------------
+
+    Which corresponds to the following quadtree:
+
+                        __ROOT_
+                       /  / \  \
+                      /  /   \  \
+                _____A_  B   C   D
+               /  / \  \
+              /  /   \  \
+        _____AA  AB  AC  AD
+       /  / \  \
+      /  /   \  \
+    AAA AAB AAC AAD
+
+    In the above diagrams I show only the nodes through the first branch of
+    each level. The same structure exists under each node. This quadtree has
+    a depth of 4.
+
+    Each object in the map is assigned to the nodes that it intersects. For
+    example, if we have a rectangular object that overlaps regions *AAA* and
+    *AAC*, it will be assigned to the nodes *ROOT*, *A*, *AA*, *AAA* and
+    *AAC*. Now, suppose we want to find all the objects that intersect a
+    given area. Instead of checking all objects, we check to see which
+    children of the ROOT node intersect the area. For each of those nodes,
+    we recursively check *their* children nodes, and so on until we reach
+    the leaves of the tree. Finally, we find all the objects that are
+    assigned to those leaf nodes and check them for overlap with the initial
+    area.
+
+CLASS METHODS
+    The following methods are public:
+
+    *Algorithm::QuadTree*->new(*options*)
+        This is the constructor. It expects the following options (all
+        mandatory) and returns an Algorithm::QuadTree object:
+
+        -xmin   This is the X-coordinate of the bottom left corner of the
+                area associated with the quadtree.
+
+        -ymin   This is the Y-coordinate of the bottom left corner of the
+                area associated with the quadtree.
+
+        -xmax   This is the X-coordinate of the top right corner of the area
+                associated with the quadtree.
+
+        -ymax   This is the Y-coordinate of the top right corner of the area
+                associated with the quadtree.
+
+        -depth  The depth of the quadtree.
+
+    *$qt*->add(ID, x0, y0, x1, y1)
+        This method is used to add objects to the tree. It has to be called
+        for every object in the map so that it can properly assigned to the
+        correct tree nodes. The first argument is a *unique* ID for the
+        object. The remaining 4 arguments define the outline of the object.
+        This method will recursively traverse the tree and add the object to
+        the nodes that it overlaps with.
+
+        NOTE: The method does *NOT* check if the ID is unique or not. It is
+        up to you to make sure it is.
+
+    *$qt*->delete(ID)
+        This method deletes the object specified by the given ID, and
+        unassigns it from the tree nodes it was assigned to before.
+
+    *$qt*->getEnclosedObjects(x0, y0, x1, y1)
+        This method returns an <anonymous list> of all the objects that are
+        assigned to the nodes that overlap the given area.
+
+    *$qt*->setWindow(x0, y0, scale)
+        This method is useful when you zoom your display to a certain
+        segment of the map. It sets the window to the given region such that
+        any calls to add or getEnclosedObjects will have its coordinates
+        properly adjusted before running. The first two coordinates specify
+        the lower left coordinates of the new window. The third coordinate
+        specifies the new zoom scale.
+
+        NOTE: You are free, of course, to make the coordinate transformation
+        yourself.
+
+    *$qt*->resetWindow()
+        This method resets the window region to the full map.
+
+BUGS
+    None that I am aware of. Please let me know if you find any.
+
+INSTALLATION
+    Either the usual:
+
+            perl Makefile.PL
+            make
+            make install
+
+    or just stick it somewhere in @INC where perl can find it. It is in pure
+    Perl.
+
+AUTHOR
+    Ala Qumsieh *aqumsieh@cpan.org*
+
+COPYRIGHTS
+    This module is distributed under the same terms as Perl itself.
+

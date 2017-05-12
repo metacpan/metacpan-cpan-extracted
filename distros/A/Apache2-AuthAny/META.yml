@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Apache2-AuthAny
+version:             0.201
+abstract:            Authentication with any provider or mechanism
+license:             ~
+author:              
+    - Kim Goldov <kim@goldov.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

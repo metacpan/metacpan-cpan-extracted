@@ -1,0 +1,32 @@
+---
+abstract: 'Perl extension to assign default values to subroutine arguments'
+author:
+  - 'Stephen Nelson <stephenenelson@mac.com>'
+build_requires:
+  Data::Dumper: 0
+  Test::More: 0
+  UNIVERSAL: 0
+  diagnostics: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Attribute-Default
+requires:
+  Attribute::Handlers: 0.79
+  Carp: 0
+  Exporter: 0
+  Symbol: 0
+  attributes: 0
+  base: 0
+  constant: 0
+  perl: 5.0010
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://github.com/stephenenelson/attribute-default
+version: 1.35

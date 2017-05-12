@@ -1,0 +1,13 @@
+#
+# = Class: [% name %]::config
+#
+# Class to configure [% name %].
+#
+# == Parameters
+# <tt>ensure</tt>:: Ensure that configuration is either <code>present</code> or
+#                   <code>absent</code>.
+#
+class [% name %]::config (
+    $ensure = hiera('[% name %]::config::ensure', 'present'),
+) {
+}

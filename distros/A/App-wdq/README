@@ -1,0 +1,11 @@
+NAME
+    App::wdq - command line access to Wikidata Query Service
+
+DESCRIPTION
+    See command line script wdq for documentation.
+
+COPYRIGHT AND LICENSE
+    Copyright Jakob Voss, 2015-
+
+    GPL 2.0
+

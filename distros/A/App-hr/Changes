@@ -1,0 +1,176 @@
+Revision history for App-hr
+
+0.25    2016-06-17 (PERLANCAR)
+
+	- Add hr_r().
+
+
+0.24    2015-12-28 (PERLANCAR)
+
+	- Observe COLUMNS environment variable.
+
+
+0.23    2015-08-26 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated
+          Pod::Weaver::Section::Completion::PerinciCmdLine (0.13) which
+          generates Completion POD section for Perinci::CmdLine::Inline scripts.
+
+
+0.22    2015-08-20 (PERLANCAR)
+
+	- Add options: --space-before (-b) & --space-after (-a).
+
+	- Add option: --height (-H).
+
+
+0.21    2015-08-19 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated App:GenPericmdCompleterScript (0.04)
+          which produces smaller completer script.
+
+
+0.20    2015-08-19 (PERLANCAR)
+
+        - [build] Rebuild with updated DZP:GenPericmdScript (0.23) which now
+          generates a shell completer script for
+          Perinci::CmdLine::Inline-generated scripts.
+
+
+0.19    2015-07-30 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated DZP:GenPericmdScript which now adds
+          prereq to Perinci::CmdLine::Inline for the develop phase, not build
+          (so users do not need to install Perinci::CmdLine::Inline, as should
+          be the case).
+
+
+0.18    2015-07-30 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Perinci::CmdLine::Dump &
+          PWS:Completion::PerinciCmdLine to remove extraneous stuffs from POD
+          (unsupported config/env options, COMPLETION section).
+
+
+0.17    2015-07-30 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Perinci::CmdLine::Dump to let
+          Pod::Weaver::Plugin::Rinci insert more stuffs to the POD.
+
+
+0.16    2015-07-30 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Perinci::CmdLine::Inline to add Abstract.
+
+
+0.15    2015-07-20 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to add build prereq to Perinci::CmdLine::Inline.
+
+
+0.14    2015-07-06 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Build fixes: remove unnecessary dependency to
+          Perinci::CmdLine::Inline, remove mistaken dependency to
+          Code::Embeddable.
+
+        - Update/fix/tweak docs.
+
+
+0.13    2015-07-06 (PERLANCAR)
+
+        - UPDATE: this version is broken (mistakenly dependent to
+          Code::Embeddable).
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Perinci::CmdLine::Inline (0.14).
+
+
+0.12    2015-07-06 (PERLANCAR)
+
+        - UPDATE: this version is broken (mistakenly dependent to
+          Code::Embeddable).
+
+	- Use Rinci function metadata attribute cmdline.skip_format=>1 so
+	  that pericmd-inline skips providing --format, --json, --naked-res
+	  [RT#105641].
+
+	- Replace 'use 5.010' with 'use feature say' to avoid
+	  Data::Dumper's Deparse feature producing 'no feature :all' which
+	  is not supported by perl 5.14-.
+
+	- Use prepend: section to avoid clash in FUNCTIONS POD section.
+
+
+0.11    2015-07-02 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Perinci::CmdLine::Inline (0.13) to fix
+          POD.
+
+
+0.10    2015-07-02 (PERLANCAR)
+
+        - Switch to using Perinci::CmdLine::Inline (startup overhead reduced).
+
+        - Add colors for random color: white, bright_white.
+
+
+0.09    2015-06-17 (PERLANCAR)
+
+        - Replace Term::App::Role::Attrs with Term::Size directly, to reduce
+          startup overhead.
+
+
+0.08    2015-06-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dzil] Use DZP:IfBuilt.
+
+
+0.07    2015-06-17 (PERLANCAR)
+
+	- Add --random-color, --random-pattern, -r.
+
+
+0.06    2015-06-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Document Options.
+
+
+0.05    2015-06-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Show option --color (-c) in Synopsis.
+
+
+0.04    2015-06-17 (PERLANCAR)
+
+        - Add options: --color (-c), --version (-v), --help (-h, -?).
+
+
+0.03    2014-12-10 (PERLANCAR)
+
+        - First release, renamed from SHARYANTO-Term-Util to App-hr.

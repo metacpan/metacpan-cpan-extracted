@@ -1,0 +1,13 @@
+DirectoryIndex index.asp
+<Files ~ \.asp$>
+	SetHandler perl-script
+	PerlHandler Apache::ASP
+	PerlSetVar Global .
+	PerlSetVar GlobalPackage My::Bookmarks
+	PerlSetVar StateDir /tmp/asp_apps_bookmarks
+	PerlSetVar Debug 2
+	PerlSetVar SessionTimeout 15
+	PerlSetVar StatScripts 1
+	PerlSetVar AllowApplicationState 1
+	PerlSetVar AllowSessionState 1
+</Files>

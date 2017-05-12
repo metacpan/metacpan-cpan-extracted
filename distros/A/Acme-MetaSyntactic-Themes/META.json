@@ -1,0 +1,123 @@
+{
+   "abstract" : "The original Acme::MetaSyntactic themes",
+   "author" : [
+      "Philippe Bruhat (BooK) <book@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-MetaSyntactic-Themes",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::MetaSyntactic::Alias" : "0",
+            "Acme::MetaSyntactic::List" : "0",
+            "Acme::MetaSyntactic::Locale" : "0",
+            "Acme::MetaSyntactic::MultiList" : "0",
+            "CPAN" : "0",
+            "CPAN::FirstTime" : "0",
+            "Opcode" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::MetaSyntactic" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-acme-metasyntactic-themes@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-MetaSyntactic-Themes"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/book/Acme-MetaSyntactic-Themes.git",
+         "web" : "http://github.com/book/Acme-MetaSyntactic-Themes"
+      }
+   },
+   "version" : "1.049",
+   "x_contributors" : [
+      "Éric Guirbal <eguirbal@cpan.org>",
+      "Brian Gottreu <gottreu@cpan.org>",
+      "Éric Cassagnard <eric.cassagnard@gmail.com>",
+      "Laurent Gautrot <lgautrot@cpan.org>",
+      "Olivier Mengué <dolmen@cpan.org>",
+      "Simon Myers <smylers@cpan.org>",
+      "Elliot Shank <elliotjs@cpan.org>",
+      "Éric Cholet <cholet@cpan.org>",
+      "David H. Adler <dha@cpan.org>",
+      "Matthew Musgrove <mmusgrove@cpan.org>",
+      "David Golden <dagolden@cpan.org>",
+      "José Castro <cog@cpan.org>",
+      "Gisbert W. Selke <gws@cpan.org>",
+      "Yanick Champoux <yanick@cpan.org>",
+      "Anja Krebber",
+      "Léon Brocard <lbrocard@cpan.org>",
+      "Flavio Poletti <polettix@cpan.org>",
+      "Jan-Pieter Cornet <jpc@cpan.org>",
+      "Michael Scherer <misc@cpan.org>",
+      "Antoine Hulin",
+      "Abigail <abigail@cpan.org>",
+      "Estelle Souche",
+      "Gaal Yahas <gaal@cpan.org>",
+      "Nicholas Clark <nwclark@cpan.org>",
+      "Alberto Manuel Brandão Simões <ambs@cpan.org>",
+      "Martin Vorländer <mvorl@cpan.org>",
+      "Barbie <barbie@cpan.org>",
+      "Mark Fowler <markf@cpan.org>",
+      "Gábor Szabó <szabgab@cpan.org>",
+      "Paul-Christophe Varoutas",
+      "Xavier Caron <xav@cpan.org>",
+      "Guy Widloecher",
+      "Jean Forget <jforget@cpan.org>",
+      "Cédric Bouvier <cbouvi@cpan.org>",
+      "Offer Kaye <offerk@cpan.org>",
+      "Max Maischein <corion@cpan.org>",
+      "Hakim Cassimally <osfameron@cpan.org>",
+      "Ricardo Signes <rjbs@cpan.org>",
+      "Jérôme Fenal <jfenal@cpan.org>",
+      "Aldo Calpini <acalpini@cpan.org>",
+      "Rafaël Garcia-Suarez <rgarcia@cpan.org>",
+      "Michel Rodriguez <mirod@cpan.org>",
+      "Scott Lanning <slanning@cpan.org>",
+      "Mike Castle",
+      "Sébastien Aperghis-Tramoni <saper@cpan.org>",
+      "David Landgren <dland@cpan.org>",
+      "Vahe Sarkissian <vsarkiss@cpan.org>"
+   ]
+}
+

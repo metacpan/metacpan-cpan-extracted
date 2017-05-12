@@ -1,0 +1,15 @@
+The perl module Apache::PHLogin uses Apache mod_perl and the
+Net::PH modules to integrate PH authentication with Apache.
+
+To build and install it, please run
+
+    perl Makefile.PL
+    make
+    make install
+
+This package is Copyright (C) 1998 by John Groenveld. It may be
+copied, used and redistributed under the same terms as perl itself.
+
+Happy Perl'ng,
+John
+groenveld@acm.org

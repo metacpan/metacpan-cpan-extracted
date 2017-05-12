@@ -1,0 +1,77 @@
+/**
+ * Audit::DBI::TT2 v2.3.0
+ * https://metacpan.org/release/Audit-DBI
+ *
+ * Copyright 2010-2017 Guillaume Aubert
+ */
+
+html {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+}
+
+#model_row
+{
+	display: none;
+	clear: both;
+}
+
+#headers,
+#criteria,
+#buttons
+{
+	width: 600px;
+	clear: both;
+}
+#headers h3
+{
+	float: left;
+	width: 300px;
+}
+#criteria .row
+{
+	padding: 6px 0px;
+	overflow:auto;
+}
+#criteria .row div
+{
+	float: left;
+}
+#criteria .row .remove
+{
+	width: 35px;
+}
+#criteria .row .invert
+{
+	width: 75px;
+}
+#criteria .row .criteria
+{
+	width: 190px;
+}
+#criteria .row .values
+{
+	display: none;
+}
+#criteria .row .values .label
+{
+	padding-top: 3px;
+	width: 50px;
+}
+#criteria .row .values .data
+{
+	width: 250px;
+}
+#criteria .row .values_subject_type input,
+#criteria .row .values_ip_address input,
+#criteria .row .values_account_affected input,
+#criteria .row .values_account_logged_in input,
+#criteria .row .values_indexed_data input
+{
+	width: 240px;
+}
+#criteria .row .values_date_range input
+{
+	width: 100px;
+}
+

@@ -1,0 +1,32 @@
+---
+name: App-Relate
+version: 0.10
+author:
+  - 'Joseph Brenner <doom@kzsu.stanford.edu>'
+abstract: simple form of the "relate" script (wrapper around locate)
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Data::Dumper: 0
+  FindBin: 0
+  Test::More: 0
+  lib: 0
+  strict: 0
+  warnings: 0
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Exporter: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  App::Relate:
+    file: lib/App/Relate.pm
+    version: 0.10
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

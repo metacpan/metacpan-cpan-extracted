@@ -1,0 +1,64 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2003.10.11.19.13.01;	author anonymous;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2003.10.11.19.09.52;	author anonymous;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2001.11.03.13.18.46;	author jonas;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checkin
+@
+
+
+1.3
+log
+@added a note
+@
+text
+@Welcome
+
+Welcome to your first Apache::MiniWiki installation. This installation doesn't
+contain very much and is waiting for you to add content to it. You can start
+by modifying the [[template]] page, or perhaps take a look at how to [[edit]]
+pages.
+
+If you wish, you can also create your own [[playground]] by clicking on the
+questionmark after the word playground to create that missing page.
+
+See the provided documentation for further information on customizing your MiniWiki install. For an example of a working MiniWiki site, see http://www.nyetwork.org/wiki/@
+
+
+1.2
+log
+@removing underbars
+@
+text
+@d10 2
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 1
+_Welcome_
+@

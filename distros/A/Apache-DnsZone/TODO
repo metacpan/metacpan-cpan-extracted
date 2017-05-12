@@ -1,0 +1,112 @@
+[In version 2.0] No help or embedded in each individual web page? other place? open in a little window?
+[In version 2.0] help texts (with templates and language independency)(specific to the domain you're looking at (so if it's tty.dk: mail.tty.dk etc))
+[In version 2.0] Soa_serial in the other way (YYYYMMDDNN)
+[In version 2.0] maybe a ever lasting cookie for the language preference? changed every time the language is changed?
+[In version 2.0] do we need check_(chars|host)_(a|cname|mx|ns|txt) and other stuff? to make it easier to implement other stuff later?
+[In version 2.0] prqset yxxrset needs to be implemented? Prerequisits
+[In version 2.0] Layer on top of templates? so it's easier to use the template functions in DnsZone
+[In version 2.0] Accounting of usage
+[In version 2.0] Sync feature? Have the interface perform a zone transfer (if you have more hosts to update from)
+[In version 2.0] Multiuser on the same zone
+
+[Won't fix in this version] Move away from using PerlSetVar's
+[Won't fix in this version] Javascript to highlight login first field!
+
+[Fixed] does ADD actually check (on submit) wheter the user has any more of that record type left?
+[Fixed] Content-Length on all template based pages should be implemented. For allowing keep-alive $r->header_out("Content-Length", length(${$content_ref}));
+[Fixed] when there's no records under a record, what does the template engine output? the wrong thing! when you DO have records left it should output the add thing, but if you don't have any records there and no allowed records it should parse RECORD_RR to blank!
+[Fixed] all add pages have error handling now
+[Fixed] all edit pages have error handling now 
+[Fixed] Settings doesn't have a you-typed-something-wrong page yet
+[Fixed] if there is an error in user input provide a window for people to enter the data again with fields marked red that needs the data again
+[Fixed] on that: add templates need to be able to fill out the fields, otherwise it won't work
+[Fixed] check_lang instead of using check_ttl (in sub settings)
+[Fixed] clear out all references to HINFO
+[Fixed] (output_headers+output_redirect) This implies that you NEED a function for handing out headers!  disable_caching($r) function? or maybe: output_header(Cache=>1)
+[Fixed] . before @ in email? (SOA EDIT)
+[Fixed] check_ip okay!
+[Fixed] check_chars okay!
+[Fixed] check_exchanger okay!
+[Fixed] check_txt okay!
+[Fixed] check_email okay!
+[Fixed] check_ttl okay!
+[Fixed] check_lang okay!
+[Fixed] check_preference okay!
+[Fixed] check_host (now can check a full host with domain
+[Fixed] check_cname_host okay! (as much checking as we can do!)
+[Fixed] If using a star: you can not have anything else in the hostname, *host.domain is =NOT= valid.
+[Fixed] *.domain records needs to work
+[Fixed]   *.domain IN A <ip> 
+[Fixed]   *.domain IN TXT <txt>
+[Fixed]   *.domain IN MX <number> <mailhost>
+[Fixed]   # works round robin style and together
+[Fixed]   *.domain not provided for CNAME (doesn't work with any other *. record)(could be offered if we bother to check for other * records before + before adding other * records)
+[Fixed]   *.domain not provided for NS (seems obvious not to use this)
+[Fixed] Functions that use sql should be moved to Apache::DnsZone::DB::<db>
+[Fixed] Can a preference be 0? (check_preference)
+[Fixed] Allow more chars in check_txt?
+[Fixed] Move around sql queries! so it might not be in the main file
+[Fixed] functions to be implemented: (uid,email,lang_id,lang)get_user_info(username)(OK) (count)dom_count(uid)(OK) (lang_select)lang_select(uid, evt override lang_id)(OK) (1)update_password(uid, password)(OK) (domain, domain_owner_id)domain_stat?(dom_id)(OK) (0/1)get_lock(dom_id, record_id)(OK)
+[Fixed] all the (a|cname|mx|ns|txt)_lookup's have been made - why isn't the program using them? (MESSY!!!)
+[Fixed] functions for the count(id)'s in mysql.pm?
+[Fixed] list_domains need a way to prepare and get an executed statement handle back so the sql goes out of the function - along with view_domains
+[Fixed] check_before*: return 1 if old eq new????? something is wrong with check_before_edit_MX|NS|TXT|A|CNAME
+[Fixed] conflicts checking, rules:
+[Fixed]   A, NS, MX, TXT can reside together.
+[Fixed]   CNAME records can't have anything else associated with the same "name" not, A, NS, TXT, MX
+[Fixed]   no .. in hostnames (checked for in check_host(fq-host))
+[Fixed] already exsisting names? that need to be checked OFTEN! (maybe in check_*)
+[Fixed] better checking on hosts (check_host|fqdn obviously doesn't work at all when you do anything that has an error in it)
+[Fixed] Duplicate records || round robin! + database lookups
+[Fixed] $DEBUG record in templates, for giving information about duplicate hostnames and bad hostnames/ips/whatever Call it $EXPLANATION?
+[Fixed] Clean up after old header outputing stuff
+[Fixed] Check wheter the "edit" submission is the changed at all
+[Fixed] import scripts!
+[Fixed] soa_locks? are soa locks enforced?
+[Fixed] || Apache->request on all handlers
+[Fixed] redo global vars shit! instead of $DnsZone::whatever, just have a global my $whatever
+[Fixed] Ability to set a default language for login page? (DnsZoneLoginLang); Default login language!!
+[Fixed] cookie stuff error codes in language files uc(cookiereturn)
+[Fixed] Implement own Apache::AuthCookie derivate with templates! (use Apache::(AuthTicket|AuthCookieDBI) as examples)
+[Fixed] TimeOut of cookie + 15 minute renewal of each cookie! If not done anything for the last 15 minutes and request another page => re-login; subclass of Apache::AuthCookie; Needs to take defaults from Apache::DnsZone::Config
+[Fixed] Login template needs to be unfucked!
+[Fixed] Maybe a layer above the menu system so that menus and stuff wont be on login page?
+[Fixed] Template system outputter (so menu will only be shown on non-login page && list_domains (maybe even show all the domains you have in the url?))
+[Fixed] logout?
+[Fixed] is_updated_SOA? (Is SOA updated in edit submit request)
+[Fixed] GET/POST where? POST => when submitting forms to avoid 4K limit
+[Fixed] is_updated_* ttl eq and not == ?
+[Fixed] which pages need caching and which don't? All pages should have caching turned off so no pages will be in cache if user is not authenticated
+[Fixed] Settings, Logout, Menu, List domain texts! Menu with list_domains and settings and logout (if appropriate)
+[Fixed] SSL - why would there be any issues with using ssl?
+[Fixed] Login page language should use Accept-Language header if existing in the db otherwise the Login page language from the configuration. (Netscape can change this in preferences for navigator)
+[Fixed] DnsZone::Debug needs to be worked on && export Debug from DnsZone.pm && get rid of DnsZone::Debug
+[Fixed] Update SQL to include authentication tables
+[Fixed] Install documentation
+[Fixed] $VERSION in all files: ($VERSION) = qq$Revision: 1.19 $ =~ /([\d\.]+)/;
+[Fixed] Remove old data in sql/mysql.sql
+[Fixed] Check_before needs Debug?
+[Fixed] Howto make a set of templates?
+[Fixed] Added README
+[Fixed] Cname *'s anyway
+[Fixed] Length of records can be exceeded?
+[Fixed] Color of fields in view_domain should be changeable via PerlSetVar. Apache::DnsZone::Config has defaults, remember to write docs for this
+
+For 1.0 to be released (So far):
+
+[Medium] Use of uninitialized value (SOA)
+[Medium] remove references to /admin and to specific action=blah stuff? $SUBMIT_URL in all templates?
+[Medium] use of uninitialized value in DnsZone.pm (maybe be turned of with PerlWarn off
+
+Documentation/Configuration page on website
+
+Forgotten password feature?
+
+Admintools (change password,)
+
+AAA support
+
+PTR support
+
+Crypted passwords in the database (tools need to use this)
+

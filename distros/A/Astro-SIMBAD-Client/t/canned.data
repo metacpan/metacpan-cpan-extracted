@@ -1,0 +1,71 @@
+{
+    arcturus => {
+	name => 'NAME Arcturus',	# As of 25-Sep-2016
+###	type => 'V* ~                  ',
+	type => 'V* ~',	# As of 1.092, 21-Jul-2008
+	long => '*,PM*,V*,IR,UV',
+	ra => 213.91530029,	# As of 27-Jun-2011
+###	ra_hms => '14 15 39.6720',	# Not used
+	dec => '+19.18240916',	# As of 27-Jun-2011
+###	dec_dms => '+19 10 56.677',	# Not used
+	plx => 88.83,
+	pmra => -1093.39,
+	pmdec => -2000.06,
+	radial => -5.19,
+	redshift => -0.000017,
+	spec => 'K1.5III',
+	bmag => 1.19,
+	vmag => -0.04,
+	ident => <<'EOD',
+USNO-B1.0 1091-00221874
+ASCC  870215
+TYC 1472-1436-1
+NLTT 36756
+LSPM J1415+1910
+2MASS J14153968+1910558
+uvby98 100124897
+[HFE83] 1018
+YPAC  52
+USNO 850
+UBV M  20076
+UBV   12551
+TD1 17351
+SV* ZI  1054
+SRS  30526
+SKY# 26028
+SAO 100944
+ROT  2044
+RAFGL 1693
+PPM 130442
+PMC 90-93   376
+PM 14134-1927
+PM 14134+1927
+PLX 3242
+NSV  6603
+NAME ARCTURUS
+N30 3229
+LTT 14184
+LHS    48
+LFT 1084
+JP11  2486
+IRC +20270
+IRAS 14133+1925
+HR  5340
+HIP  69673
+HIC  69673
+HD 124897
+GJ   541
+GEN# +1.00124897
+GCRV  8341
+GC 19242
+FK5  526
+Ci 20  843
+CSV 101433
+BD+19  2777
+AG+19 1335
+AAVSO 1411+19
+*  16 Boo
+* alf Boo
+EOD
+    },
+}

@@ -1,0 +1,92 @@
+NAME
+    Apache::RandomImage - Lightweight module to randomly display images from
+    a directory.
+
+VERSION
+    Version 0.3
+
+SYNOPSIS
+      Configure this module as a response handler to activate this module. The following
+      examples will result in an image being randomly selected from the "images" directory.
+
+        #mod_perl2 (PerlResponseHandler)
+        <LocationMatch "^/(.+)/images/random-image">
+            SetHandler modperl
+            PerlSetVar Suffixes "gif png jpg"
+            PerlResponseHandler Apache::RandomImage
+        </LocationMatch>
+
+        #mod_perl1 (PerlHandler)
+        <Location "/images/give-random">
+            SetHandler perl-script
+            PerlSetVar Suffixes "gif png jpg tif jpeg"
+            PerlHandler Apache::RandomImage
+        </Location>
+
+DESCRIPTION
+    Apache::RandomImage will randomly select an image from the dirname of
+    the requested location. You need to specify a white-space separated list
+    of Suffixes with *PerlSetVar*, otherwise the request will be declined.
+
+FUNCTIONS
+  handler
+    Apache response handler
+
+Imported constants
+  OK
+    See Apache::Constants or Apache2::Const documentation
+
+  DECLINED
+    See Apache::Constants or Apache2::Const documentation
+
+  NOT_FOUND
+    See Apache::Constants or Apache2::Const documentation
+
+SEE ALSO
+    mod_perl
+    Apache::RandomLocation
+
+AUTHOR
+    Michael Kroell, "<pepl at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-locale-maketext-extract-plugin-xsl at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Locale-Maketext-Extract-
+    Plugin-XSL>. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Apache::RandomImage
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Apache-RandomImage>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Apache-RandomImage>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Apache-RandomImage>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Apache-RandomImage>
+
+ACKNOWLEDGEMENTS
+    Apache::RandomImage was inspired by Apache::RandomLocation
+
+COPYRIGHT
+    Copyright 2003-2009 Michael Kroell, all rights reserved.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

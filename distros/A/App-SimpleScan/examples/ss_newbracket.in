@@ -1,0 +1,3 @@
+%%xx: au es
+http://<xx>.yahoo.com   /yahoo/         Y Yahoo should still be there (<xx>)
+http://yahoo.com/       /yahoo/         Y No xx substitutions

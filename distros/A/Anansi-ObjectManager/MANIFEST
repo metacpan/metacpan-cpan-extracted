@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Anansi-ObjectManager.t
+lib/Anansi/ObjectManager.pm

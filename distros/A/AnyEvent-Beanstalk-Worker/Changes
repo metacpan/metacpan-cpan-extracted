@@ -1,0 +1,15 @@
+Revision history for Perl extension AnyEvent::Beanstalk::Worker.
+
+0.05  Sat May  6 07:47:10 MDT 2017
+        - prepare for 5.26.0 @INC changes
+
+0.04  Sat Nov 29 12:34:08 MST 2014
+        - actually set the context level
+
+0.03  Sat May 10 15:44:37 2014
+	- released to github
+
+0.01  Wed Apr  9 20:16:48 2014
+	- original version; created by h2xs 1.23 with options
+		-AX AnyEvent::Beanstalk::Worker
+

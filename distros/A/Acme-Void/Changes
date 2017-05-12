@@ -1,0 +1,10 @@
+Revision history for Perl extension Acme::Void.
+
+0.02  Tue Sep 27 22:11:00 2005
+	+ now void->foo allowed.
+	* fixed a bug not to include 'ASSIGN' mode with lvalue.
+	* a small addition to pod.
+
+0.01  Mon Sep 19 01:16:09 2005
+	* first release.
+

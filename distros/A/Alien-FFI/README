@@ -1,0 +1,53 @@
+NAME
+
+    Alien::FFI - Build and make available libffi
+
+VERSION
+
+    version 0.16
+
+SYNOPSIS
+
+    In your Build.PL:
+
+     use Alien::FFI;
+     use Module::Build;
+     
+     my $build = Module::Build->new(
+       ...
+       extra_compiler_flags => Alien::FFI->cflags,
+       extra_linker_flags   => Alien::FFI->libs,
+       ...
+     );
+     
+     $build->create_build_script;
+
+DESCRIPTION
+
+    This distribution installs libffi so that it can be used by other Perl
+    distributions. If already installed for your operating system, and it
+    can be found, this distribution will use the libffi that comes with
+    your operating system, otherwise it will download it from the Internet,
+    build and install it for you.
+
+SEE ALSO
+
+    FFI::Platypus
+
+      Write Perl bindings to non-Perl libraries without C or XS
+
+    FFI::CheckLib
+
+      Check that a library is available for FFI
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

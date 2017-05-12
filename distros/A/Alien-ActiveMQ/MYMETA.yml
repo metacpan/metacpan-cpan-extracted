@@ -1,0 +1,39 @@
+---
+abstract: 'Manages installs of versions of Apache ActiveMQ, and provides a standard'
+author:
+  - 'Tomas Doran (t0m) <bobtfish@bobtfish.net>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  Test::MockModule: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.141170'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-ActiveMQ
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Extract: '0'
+  Const::Fast: '0'
+  File::Copy::Recursive: '0'
+  File::ShareDir: '0'
+  File::Temp: '0'
+  IPC::Run: '0'
+  LWP: '0'
+  Method::Signatures::Simple: '0'
+  Moose: '0'
+  MooseX::Getopt: '0'
+  MooseX::Types: '0'
+  MooseX::Types::Path::Class: '0'
+  Net::Stomp: '0'
+  Path::Class: '0'
+  Scope::Guard: '0'
+  Sort::Versions: '0'
+  namespace::autoclean: '0'
+version: '0.00005'

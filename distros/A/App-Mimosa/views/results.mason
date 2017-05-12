@@ -1,0 +1,4 @@
+<%args>
+    $output
+</%args>
+<% $output %>

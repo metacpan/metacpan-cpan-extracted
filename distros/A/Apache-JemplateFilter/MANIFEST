@@ -1,0 +1,22 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Apache/JemplateFilter.pm
+t/00-load.t
+t/01-compile.t
+t/02-error.t
+t/boilerplate.t
+t/config.incl
+t/docs/tmpl/error.tt
+t/docs/tmpl/test.tt
+t/lib/Apache/CacheTest.pm
+t/lib/Apache/ChangeHeader.pm
+t/lib/Apache/Compress.pm
+t/lib/Apache/FHandle.pm
+t/lib/Apache/Reverse.pm
+t/lib/Apache/UC.pm
+t/lib/Apache/test.pm
+t/pod-coverage.t
+t/pod.t

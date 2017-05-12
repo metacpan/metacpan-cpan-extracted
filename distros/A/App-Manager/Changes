@@ -1,0 +1,16 @@
+Revision history for Perl extension App::Manager
+
+0.03  Mon Jun 21 15:14:08 CEST 1999
+	- added fopen, freopen, fopen64, freopen64.
+        - implemented versioning for glibc-2.1.
+        - worked around tmpfile problem in appman.
+
+0.02  Tue Jun 15 21:35:56 CEST 1999
+	- fixed stupid omission of libtracer.c.
+        - lowered version reqs. for File::Spec, as version 0.8
+          is not yet on CPAN (WHY I ASD, WHYYY!!!)
+
+0.01  Sat Jun 12 12:36:57 CEST 1999
+	- original version; created manually.
+      
+

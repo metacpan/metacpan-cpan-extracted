@@ -1,0 +1,39 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Format: 1.8
+Date: Tue, 31 Aug 2010 11:14:20 +0200
+Source: multiarch2
+Binary: multiarch2
+Architecture: source i386
+Version: 1.0-1
+Distribution: unstable
+Urgency: low
+Maintainer: Esteban Manchado Velázquez (Debian packaging) <estebanm@opera.com>
+Changed-By: Esteban Manchado Velázquez (Debian packaging) <estebanm@opera.com>
+Description: 
+ multiarch2 - Multi-architecture package test
+Changes: 
+ multiarch2 (1.0-1) unstable; urgency=low
+ .
+   * First version
+Checksums-Sha1: 
+ 3d31f69856948b4af052af99e3ab8b8146fdfd98 751 multiarch2_1.0-1.dsc
+ 9d8cb6b2328293a8de7ae56f94660a42f1582523 1781 multiarch2_1.0-1.tar.gz
+ 9275056cd65b63f5ca4db84dd0501e8a696667fd 2112 multiarch2_1.0-1_i386.deb
+Checksums-Sha256: 
+ a2a26b01d16f757e4072a0a1dc7ae1f1e1935dd956e11e9949198e559af83e90 751 multiarch2_1.0-1.dsc
+ cac955c249e820aa71c5f5455535f334c6f56e6413bbc08c082c3f01856c73e0 1781 multiarch2_1.0-1.tar.gz
+ e7ef2fd3b1cd278f8bce864a209f1dcfafeea98efc21fa9e6b46c14ac4690246 2112 multiarch2_1.0-1_i386.deb
+Files: 
+ 6608c06981366d8008f16e672ad2e21a 751 misc optional multiarch2_1.0-1.dsc
+ d6867b5dbb1ccdd898d1a563c10cf59a 1781 misc optional multiarch2_1.0-1.tar.gz
+ da4ed75630469ceee97fb79633b02ca8 2112 misc optional multiarch2_1.0-1_i386.deb
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkx8x/AACgkQO6uzhIvE4pokGQCeLvDI4ZEG/r1tAmsCOKTpFkmj
+DFIAn3bAGTyRwISA9yn4kwt7a8Vr9qg0
+=tOhp
+-----END PGP SIGNATURE-----

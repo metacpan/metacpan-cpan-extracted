@@ -1,0 +1,90 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Log parsing.
+
+use Data::Dumper;
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+my $message = <<ENDSTRING;
+Revision: arch-perl--devel--0--patch-3
+Archive: migo\@homemail.com--Perl-GPL
+Creator: Mikhael Goikhman <migo\@homemail.com>
+Date: Sun Jul 18 03:48:56 IDT 2004
+Standard-date: 2004-07-18 00:48:56 GMT
+Modified-files: perllib/Arch/Library.pm
+    perllib/Arch/Session.pm perllib/Arch/Storage.pm
+New-patches: migo\@homemail.com--Perl-GPL/arch-perl--devel--0--patch-3
+Summary: new Arch::Storage method expanded_revisions
+Keywords: 
+
+ENDSTRING
+
+my $expected_desc = {
+	name     => 'patch-3',
+	version  => 'migo@homemail.com--Perl-GPL/arch-perl--devel--0',
+	summary  => 'new Arch::Storage method expanded_revisions',
+	creator  => 'Mikhael Goikhman',
+	email    => 'migo@homemail.com',
+   username => 'migo',
+	date     => '2004-07-18 00:48:56 GMT',
+	kind     => 'cset',
+};
+
+my $expected_dump = <<ENDSTRING;
+{
+  archive => 'migo\@homemail.com--Perl-GPL',
+  body => '',
+  creator => 'Mikhael Goikhman <migo\@homemail.com>',
+  date => 'Sun Jul 18 03:48:56 IDT 2004',
+  keywords => '',
+  modified_files => [
+    'perllib/Arch/Library.pm',
+    'perllib/Arch/Session.pm',
+    'perllib/Arch/Storage.pm'
+  ],
+  new_patches => [
+    'migo\@homemail.com--Perl-GPL/arch-perl--devel--0--patch-3'
+  ],
+  revision => 'arch-perl--devel--0--patch-3',
+  standard_date => '2004-07-18 00:48:56 GMT',
+  summary => 'new Arch::Storage method expanded_revisions'
+}
+ENDSTRING
+
+use Test::More tests => 15;
+use_ok("Arch::Log");
+
+my $log = Arch::Log->new($message);
+
+my $headers = $log->get_headers;
+ok($headers && ref($headers) eq 'HASH' && keys %$headers == 10, "get_headers");
+
+is($log->header('body'), '', "check body");
+
+is($log->header('standard_date'), '2004-07-18 00:48:56 GMT', "standard_date");
+
+my $headers2 = $log->get_headers;
+is($headers, $headers2, "check get_headers consistency");
+is_deeply($headers, $headers2, "the same deeply");
+
+my $mod_files = $headers->{modified_files};
+ok($mod_files && ref($mod_files) eq 'ARRAY' && @$mod_files == 3, "modified_files");
+
+my $revision_desc = $log->get_revision_desc;
+isa_ok($revision_desc, "HASH", "get_revision_desc type");
+delete $revision_desc->{age};
+is_deeply($revision_desc, $expected_desc, "get_revision_desc hash");
+
+is_deeply($headers, eval $expected_dump, "compare expected headers");
+
+my ($version, $patchlevel) = $log->split_version;
+is($version, $expected_desc->{version}, "split_version version");
+is($patchlevel, $expected_desc->{name}, "split_version patchlevel");
+is($log->get_version, $expected_desc->{version}, "get_version");
+is($log->get_revision, "$version--$patchlevel", "get_revision");
+
+SKIP: {
+	skip("old Data::Dumper", 1) unless Data::Dumper->can('Sortkeys');
+	is($log->dump, $expected_dump, "compare expected headers dump");
+}

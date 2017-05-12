@@ -1,0 +1,13 @@
+Changes
+examples/cmd_server.pl
+examples/event_proxy.pl
+lib/Asterisk/AMI.pm
+lib/Asterisk/AMI/Common.pm
+lib/Asterisk/AMI/Common/Dev.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/AMI.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

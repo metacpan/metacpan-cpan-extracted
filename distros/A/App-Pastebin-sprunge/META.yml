@@ -1,0 +1,40 @@
+---
+abstract: 'application for pasting to and reading from sprunge.us'
+author:
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IO::Socket::INET: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::Is: '0'
+  Test::More: '0.82'
+  Test::Output: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Pastebin-sprunge
+no_index:
+  directory:
+    - corpus
+    - inc
+    - examples
+requires:
+  Getopt::Long: '0'
+  Pod::Usage: '0'
+  WWW::Pastebin::Sprunge::Create: '0.010'
+  WWW::Pastebin::Sprunge::Retrieve: '0.010'
+  perl: v5.10.1
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/doherty/App-Pastebin-sprunge/issues
+  homepage: http://metacpan.org/release/App-Pastebin-sprunge/
+  repository: git://github.com/doherty/App-Pastebin-sprunge.git
+version: '0.012'

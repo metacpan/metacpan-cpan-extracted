@@ -1,0 +1,47 @@
+NAME
+    Aspect::Library::Memoize - Cross-cutting memoization
+
+SYNOPSIS
+      # memoize all subs that have '_slow_' in their name, under package MyApp
+      aspect Memoize => call qr/^MyApp::.*_slow_/;
+
+SUPER
+    Aspect::Modular
+
+DESCRIPTION
+    An aspect interface on the Memoize module. Only difference from Memoize
+    module is that you can specify subs to be memoized using pointcuts.
+
+    Works by memoizing on the 1st call, and calling the memoized version on
+    subsequent calls.
+
+SEE ALSO
+    See the Aspect documentation for a guide to the Aspect module.
+
+    You can find an example of using this aspect in the "examples/"
+    directory of the distribution.
+
+SUPPORT
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Aspect-Library-Memoize
+    >.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+    Marcel Grünauer <marcel@cpan.org>
+
+    Ran Eilam <eilara@cpan.org>
+
+SEE ALSO
+    You can find AOP examples in the "examples/" directory of the
+    distribution.
+
+COPYRIGHT AND LICENSE
+    Copyright 2001 by Marcel Grünauer
+
+    Some parts copyright 2009 - 2011 Adam Kennedy.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+use AnyEvent;
+use AnyEvent::IRC::Connection;
+
+my $c = AnyEvent->condvar;
+
+my $con = new AnyEvent::IRC::Connection;
+
+$con->connect ("localhost", 6667);
+
+$con->reg_cb (
+   connect => sub {
+      my ($con) = @_;
+
+      $con->send_msg (NICK => "testbot");
+      $con->send_msg (USER => "testbot", '*', '0', 'testbot');
+   },
+   irc_001 => sub {
+      my ($con, $msg) = @_;
+      print "$msg->{prefix} says i'm in the IRC: $msg->{params}->[-1]!\n";
+      $c->broadcast
+   }
+);
+
+$c->wait;

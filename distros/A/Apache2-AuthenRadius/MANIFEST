@@ -1,0 +1,9 @@
+# $Id: MANIFEST,v 1.1 2005/04/18 17:39:25 jad Exp $
+
+AuthenRadius.pm
+Changes
+MANIFEST
+Makefile.PL
+README
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

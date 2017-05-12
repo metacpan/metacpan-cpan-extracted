@@ -1,0 +1,244 @@
+#!/usr/bin/perl -w
+#
+# Copyright © 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+#                  Elizabeth Cassell <e_a_c@mailsnare.net>
+#
+# $Revision: 1.8 $ $Date: 2006/07/05 22:25:10 $ $Author: alfw $
+#
+
+use blib;
+use strict;
+use AFS::Monitor qw(cmdebug constant);
+use Data::Dumper;
+
+#my $server = "virtue.openafs.org";
+my $server = "afs04.slac.stanford.edu";
+my $port   = 7001;
+
+my @tests;      # choose which tests to run
+$tests[1] = 1;  # test of server $server, port $port, long output
+$tests[2] = 0;  # test of server $server, no port
+$tests[3] = 0;  # test of nonexistant server
+$tests[4] = 0;  # test of server $server, bad port
+$tests[5] = 0;  # test of server $server, port $port
+
+my $all = 0;
+
+my $showdump = 1;   # print entire contents of hash for each test
+my $formatted = 1;  # print output formatted like the c cmdebug program
+
+print "# Starting now... #\n";
+my $locks;
+my $cache_entries;
+
+if ($all || $tests[1]) {
+  print "\n******** TEST 1: ********\n";
+
+  print "\ncmdebug -server $server -port $port -long\n\n";
+
+  ($locks, $cache_entries) = cmdebug(server => $server,
+                                     port   => $port,
+                                     long   => 1
+                                    );
+  parse_result($locks, $cache_entries);
+}
+
+if ($all || $tests[2]) {
+  print "\n******** TEST 2: ********\n";
+
+  print "\ncmdebug -server $server\n\n";
+
+  ($locks, $cache_entries) = cmdebug(server => $server);
+  parse_result($locks, $cache_entries);
+}
+
+if ($all || $tests[3]) {
+  print "\n******** TEST 3: ********\n";
+
+  print "\ncmdebug -server nonexistant\n\n";
+
+  ($locks, $cache_entries) = cmdebug(server => "nonexistant");
+  parse_result($locks, $cache_entries);
+}
+
+if ($all || $tests[4]) {
+  print "\n******** TEST 4: ********\n";
+
+  print "\ncmdebug -server $server -port 7001\n\n";
+
+  ($locks, $cache_entries) = cmdebug(server => $server,
+                                     port   => 7001
+                                    );
+  parse_result($locks, $cache_entries);
+}
+
+if ($all || $tests[5]) {
+  print "\n******** TEST 5: ********\n";
+
+  print "\ncmdebug -server $server -port $port\n\n";
+
+  ($locks, $cache_entries) = cmdebug(server => $server,
+                                     port   => $port
+                                    );
+  parse_result($locks, $cache_entries);
+}
+
+
+sub parse_result {
+  my $l = shift;
+  my $c = shift;
+
+  if ($AFS::CODE) {
+    print "Error case: ", ref($l), "\n" if (defined($l));
+    print "Error case: ", ref($c), "\n" if (defined($c));
+    # die("Error: AFS::CODE = $AFS::CODE (", ($AFS::CODE+0), ")\n");
+    print "Error: AFS::CODE = $AFS::CODE (", ($AFS::CODE+0), ")\n";
+    return;
+  }
+
+  if ($showdump) {
+    local $Data::Dumper::Quotekeys = 0;
+    local $Data::Dumper::Sortkeys = 1;
+    local $Data::Dumper::Varname = "Locks";
+    local $Data::Dumper::Maxdepth = 3;
+    local $Data::Dumper::Indent = 1;
+    print Dumper($l);
+    local $Data::Dumper::Maxdepth = 1;
+    local $Data::Dumper::Indent = 0;
+    local $Data::Dumper::Varname = "Cache Entries";
+    print Dumper($c);
+  }
+
+  if ($formatted) {
+    foreach my $lock (@$l) {
+      printf("Lock %s status: ", $lock->{name});
+      print_lock($lock->{lock});
+      print "\n";
+    }
+
+    foreach my $centry (@$c) {
+      if($centry->{addr} == 0) {
+        printf("Proc %4d sleeping at %08x, pri %3d\n",
+                $centry->{netFid}->{Vnode},
+                $centry->{netFid}->{Volume},
+                $centry->{netFid}->{Unique} - 25);
+        next;
+      }
+      printf("** Cache entry @ 0x%08x for %d.%d.%d.%d",
+              $centry->{addr},
+              $centry->{cell}, $centry->{netFid}->{Volume},
+              $centry->{netFid}->{Vnode},
+              $centry->{netFid}->{Unique});
+      if ((exists $centry->{cellname}) && ($centry->{cellname})) {
+        printf " [%s]\n", $centry->{cellname};
+      }
+      else {
+        print "\n";
+      }
+      if (exists $centry->{lock}) {
+        print "    locks: ";
+        print_lock($centry->{lock});
+        print "\n";
+      }
+      printf("    %d bytes\tDV %d refcnt %d\n",
+               $centry->{Length},
+               $centry->{DataVersion},
+               $centry->{refCount});
+      printf("    callback %08x\texpires %u\n",
+               $centry->{callback},
+               $centry->{cbExpires});
+      printf("    %d opens\t%d writers\n",
+               $centry->{opens},
+               $centry->{writers});
+
+      print "    ";
+      if ($centry->{mvstat} == 0) {
+        print "normal file";
+      }
+      elsif ($centry->{mvstat} == 1) {
+        print "mount point";
+      }
+      elsif ($centry->{mvstat} == 2) {
+        print "volume root";
+      }
+      elsif ($centry->{mvstat} == 3) {
+        print "directory";
+      }
+      elsif ($centry->{mvstat} == 4) {
+        print "symlink";
+      }
+      elsif ($centry->{mvstat} == 5) {
+        print "microsoft dfs link";
+      }
+      elsif ($centry->{mvstat} == 6) {
+        print "invalid link";
+      }
+      else {
+        printf("bogus mvstat %d", $centry->{mvstat});
+      }
+
+      printf("\n    states (0x%x)", $centry->{states});
+      if ($centry->{states} & 1) {
+        print ", stat'd";
+      }
+      if ($centry->{states} & 2) {
+        print ", backup";
+      }
+      if ($centry->{states} & 4) {
+        print ", read-only";
+      }
+      if ($centry->{states} & 8) {
+        print ", mt pt valid";
+      }
+      if ($centry->{states} & 0x10) {
+        print ", pending core";
+      }
+      if ($centry->{states} & 0x40) {
+        print ", wait-for-store";
+      }
+      if ($centry->{states} & 0x80) {
+        print ", mapped";
+      }
+      print "\n";
+    }
+  }
+}
+
+
+sub print_lock {
+  my $lock = shift;
+
+  print "(";
+  if ($lock->{waitStates}) {
+    if($lock->{waitStates} & constant("READ_LOCK")) {
+      print "reader_waiting";
+    }
+    if($lock->{waitStates} & constant("WRITE_LOCK")) {
+      print "writer_waiting";
+    }
+    if($lock->{waitStates} & constant("SHARED_LOCK")) {
+      print "upgrade_waiting";
+    }
+  }
+  else {
+    print "none_waiting";
+  }
+  if ($lock->{exclLocked}) {
+    if ($lock->{exclLocked} & constant("WRITE_LOCK")) {
+       print ", write_locked";
+    }
+    if ($lock->{exclLocked} & constant("SHARED_LOCK")) {
+       print ", upgrade_locked";
+    }
+    printf("(pid:%d at:%d)",
+            $lock->{pid_writer}, $lock->{src_indicator});
+  }
+  if ($lock->{readersReading}) {
+    printf(", %d read_locks(pid:%d)",
+            $lock->{readersReading}, $lock->{pid_last_reader});
+  }
+  if ($lock->{numWaiting}) {
+    printf(", %d waiters", $lock->{numWaiting});
+  }
+  print ")";
+}

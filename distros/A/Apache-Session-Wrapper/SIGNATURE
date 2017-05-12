@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.54.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 863c6a514a547bcfbdab61bf3bc8fd07db1535c3 Build.PL
+SHA1 5cb7b8b61d3202e61f4f909fda32c24919399c37 Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 4d184ceee71ce918d464e8b8ec173c0c9ce430ae MANIFEST
+SHA1 26a211d44c0328f11ae84bdcf6e36d1b7f2197da META.yml
+SHA1 e13c6f91a330d6057ded680bfb12c067ebaa1c1e Makefile.PL
+SHA1 b081931e783c93cb74e2943300e87ff0f0833da4 README
+SHA1 c0726fd607ede8a0192cf3e0484d1cc1d23ca466 lib/Apache/Session/Wrapper.pm
+SHA1 a9822734d9754c39b2fb7798acce8cfd9b9b61d6 t/01-basic.t
+SHA1 91754573ee0fce9249ef22f571f34d850304de6a t/02-register.t
+SHA1 157c4c93c5a1b2325a244c54aa71f790b7addbe5 t/99-pod.t
+SHA1 11e74ab5027643aa27b4abe6a04414f1e91d84f8 t/TEST.PL
+SHA1 fdf3ec189d9ef686fc1162aaded3c20f666092fb t/apache/basic.t
+SHA1 456e0e788ff705db632199c3b1dc061466248d36 t/conf/extra.conf.in
+SHA1 c2655e02dfb348757a22180cc0f449e17c460c6f t/response/TestApache/basic.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2.2 (GNU/Linux)
+
+iD8DBQFFGTdT3Or3ZzQuifMRAtvNAKCzAoGur7SgoTNwVKoBkLzJfqiYBwCfQIH8
+UGQ+3UduZWnKPwUdom95aeI=
+=o1QG
+-----END PGP SIGNATURE-----

@@ -1,0 +1,13 @@
+[Unit]
+Description=Dochazka WWW server
+After=network.target
+
+[Service]
+Type=simple
+User=dochazka-www
+Group=dochazka-www
+ExecStart=/usr/bin/dochazka-www
+#PIDFile=/var/run/dochazka-www.pid
+
+[Install]
+WantedBy=multi-user.target

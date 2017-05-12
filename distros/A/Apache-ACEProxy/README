@@ -1,0 +1,78 @@
+NAME
+    Apache::ACEProxy - IDN compatible ACE proxy server
+
+SYNOPSIS
+      # in httpd.conf
+      PerlTransHandler Apache::ACEProxy # default uses ::UTF8_RACE
+
+DESCRIPTION
+    Apache::ACEProxy is a mod_perl based HTTP proxy server, which handles
+    internationalized domain names correctly. This module automaticaly
+    detects IDNs in HTTP requests and converts them in ACE encoding. Host:
+    headers in HTTP requests are also encoded in ACE.
+
+    Set your browser's proxy setting to Apache::ACEProxy based server, and
+    you can browse web-sites of multilingual domain names.
+
+SUBCLASSING
+    Default ACE conversion is done from UTF8 to RACE. Here's how you
+    customize this.
+
+    *   Declare your ACE encoder class (like DUDE, AMC-ACE-Z).
+
+    *   Inherit from Apache::ACEProxy.
+
+    *   Define "encode()" class method.
+
+    That's all. Here's an example of implementation, extracted from
+    Apache::ACEProxy::UTF8_RACE.
+
+      package Apache::ACEProxy::UTF8_RACE;
+
+      use base qw(Apache::ACEProxy);
+      use Convert::RACE qw(to_race);
+      use Unicode::String qw(utf8);
+
+      sub encode {
+          my($class, $domain) = @_;
+          return to_race(utf8($domain)->utf16);
+      }
+
+    Note that you should define "encode()" method as a class method.
+    Argument $domain is a (maybe UTF8) string that your browser sends to the
+    proxy server.
+
+    At last, remember to add the following line to httpd.conf or so:
+
+      PerlTransHandler Apache::ACEProxy::UTF8_RACE
+
+CAVEATS
+    The default Apache::ACEProxy::UTF8_RACE assumes that input domain names
+    are encoded in UTF8. But currently it's known that:
+
+    *   MSIE's "always send URL as UTF8" preference does NOT ALWAYS send
+        correct UTF8 string.
+
+    *   Netscape 4.x does NOT send URL as UTF8, but in local encodings.
+
+    So, this proxy server doesn't always work well with all the domains for
+    all the browsers. If you figure out how your browser encodes
+    multilingual domain names, you can write your custom translator as in
+    the section on "SUBCLASSING". See also the Apache::ACEProxy::SJIS_RACE
+    manpage if your mother language is Japanese.
+
+    Suggestions, patches and reports are welcome about this issue.
+
+AUTHOR
+    Tastuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    This module comes with NO WARRANTY.
+
+SEE ALSO
+    the Apache::ProxyPassThru manpage, the LWP::UserAgent manpage, the
+    Unicode::String manpage, the Apache::ACEProxy::UTF8_RACE manpage, the
+    Apache::ACEProxy::SJIS_RACE manpage
+

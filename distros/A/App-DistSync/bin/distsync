@@ -1,0 +1,247 @@
+#!/usr/bin/perl -w
+# $Id: distsync 23 2017-05-08 13:44:30Z abalama $
+use strict;
+
+=head1 NAME
+
+distsync - Launcher of synchronization via App::DistSync
+
+=head1 VERSION
+
+Version 1.04
+
+=head1 SYNOPSIS
+
+    distsync [options] [commands]
+
+    distsync -D /var/www/dist init
+    
+    distsync [-d] -D /var/www/dist [-T TIMEOUT] [sync]
+    
+    Type distsync -h or distsync -? for more information
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-d, --debug>
+
+Enable debug mode
+
+=item B<-h, --help>
+
+Show help information
+
+=item B<-?, --man, --longhelp>
+
+Show long help information
+
+=item B<-T secs, --timeout=secs>
+
+Set timeout for HTTP requests
+
+=item B<-v, --ver, --version>
+
+Show version number of program
+
+=item B<-H secs, --hold=secs>
+
+Max amount of seconds before breaking lock (0 for never, default is 3600)
+
+=back
+
+=head1 COMMANDS
+
+=over 8
+
+=item B<init>
+
+Initializing the mirror in the specified directory
+
+=item B<sync>
+
+Synchronization of the specified directory with the remote resources (mirrors)
+
+=back
+
+=head1 DESCRIPTION
+
+Launcher of synchronization via App::DistSync
+
+See C<README> file
+
+=head1 HISTORY
+
+=over 8
+
+=item B<1.00 / Sat Oct  4 10:52:42 2014 GMT>
+
+Init version
+
+=back
+
+See C<CHANGES> file
+
+=head1 DEPENDENCIES
+
+L<LWP>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+Coming soon
+
+=head1 SEE ALSO
+
+C<perl>, L<LWP>
+
+=head1 DIAGNOSTICS
+
+The usual warnings if it can't read or write the files involved.
+
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is distributed under the GNU GPL v3.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+See C<LICENSE> file
+
+=cut
+
+#use Data::Dumper; $Data::Dumper::Deparse = 1;
+
+use constant {
+    PIDFILE     => 'distsync.pid',
+    CMDDEFAULT  => 'sync',
+    COMMANDS    => [qw/ init sync /],
+};
+
+use App::DistSync;
+use App::DistSync::Lock;
+
+use Getopt::Long;
+use Pod::Usage;
+use Cwd;
+use File::Spec;
+
+$SIG{INT} = sub { die "Aborted\n"; };
+
+$| = 1;  # autoflush
+
+our %OPT;
+
+BEGIN {
+    sub say { return unless $OPT{debug} || -t; print STDOUT @_ ? @_ : '',"\n" }
+    sub err { print STDERR @_ ? @_ : '',"\n" }
+    sub tms { sprintf "[%s GMT]", scalar(gmtime(time())) }
+    #sub exception { say "FAILED"; err tms, " ", @_ }
+}
+
+Getopt::Long::Configure ("bundling");
+GetOptions(\%OPT,
+    "help|usage|h",
+    "longhelp|man|m|?",
+    "version|ver|v",
+    "debug|d",
+
+    "directory|dir|D=s",  # Directory
+    "timeout|T=s",        # Timeout
+    "hold|H=i",           # Hold value. 0 - off, 1-n - secs, default - 3600
+    "baz|z=s",            # BAZ
+    
+) || pod2usage(-exitval => 1, -verbose => 0);
+pod2usage(-exitval => 0, -verbose => 1) if $OPT{help};
+pod2usage(-exitval => 0, -verbose => 2) if $OPT{longhelp};
+pod2usage(-exitval => 0, -verbose => 99, -sections => 'NAME|VERSION') if $OPT{version};
+
+# VARS
+my %cmddata;
+my $command   = @ARGV ? shift @ARGV : CMDDEFAULT;
+my @argss = @ARGV ? @ARGV : ();
+my @commands  = @{(COMMANDS)};
+pod2usage(-exitval => 1, -verbose => 99, -sections => 'SYNOPSIS|OPTIONS|COMMANDS')
+    if ( (grep {$_ eq $command} @commands) ? 0 : 1 );
+
+# Directory
+my $root_dir = $OPT{directory} || cwd();
+unless ($root_dir && (-e $root_dir) && (-d $root_dir or -l $root_dir)) {
+    err(sprintf "Directory \"%s\" not exists", $root_dir || '.');
+    exit(1);
+}
+
+# Debugging
+$App::DistSync::DEBUG = 1 if $OPT{debug};
+
+say sprintf("App::DistSync/%s", App::DistSync->VERSION);
+say;
+my $start_tms = tms;
+START: debug("START ", tms);
+#########################
+### START
+#########################
+
+# LOCK & PID
+my $lock = new App::DistSync::Lock(
+        file => File::Spec->catfile($root_dir, App::DistSync::MANILOCK()),
+        hold => $OPT{hold},
+        pid  => $$,
+    );
+if (!$lock->status || $lock->running) {
+    err($lock->error);
+    goto FINISH;
+}
+
+# Main object
+my $ds = new App::DistSync(
+        dir => $root_dir,
+        pid => $$,
+        timeout => $OPT{timeout},
+    );
+
+if ($command eq 'init') {
+    goto FINISH unless $ds->init;
+    say sprintf "Initialization has been completed. Your files located in %s", $root_dir;
+} else {
+    my $status = $ds->sync;
+    if ($status) {
+        say(sprintf("Sync completed successfully\n\tURI:\t\t%s\n\tDirectory:\t%s\n\tStarted at:\t%s\n\tFinished at:\t%s", 
+            (defined($ds->{uri}) ? $ds->{uri} : 'none'),
+            $root_dir,
+            $start_tms,
+            tms
+        ));
+    } else {
+        say(sprintf("Sync completed with errors\n\tDirectory:\t%s", $root_dir));
+    }
+}
+
+# say "Comming soon...";
+
+#########################
+### FINISH
+#########################
+FINISH: debug("FINISH ", tms);
+exit(0);
+
+1;
+__END__

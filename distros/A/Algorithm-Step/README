@@ -1,0 +1,29 @@
+WHAT IS IT
+==========
+
+This is for observing the behavior of algorithms on some algorithm textbooks,
+such as `The Art of Computer Programming', `Introduction to Algorithms'.
+I write it only for fun. I have been thinking of how to embed documents
+in program in a helpful way. I am very eager to hear your ideas on this
+topic.
+
+See `perldoc Algorithm::Step` for usage.
+
+INSTALL
+=======
+
+tar -xvzf Algorithm-Step-<version>.tar.gz
+cd Algorithm-Step-<version>
+perl Build.PL
+perl Build
+perl Build test
+perl Build install
+
+You should have Module::Build installed in your system. If not, try
+
+perl Makefile.PL
+make
+make test
+make install
+
+Enjoy.

@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual - ars_CreateContainer</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_CreateContainer(ctrl, containerHash, removeFlag=TRUE)</CODE></H2>
+
+      This function creates a new container. You must first
+      populate the <CODE>containerHash</CODE> before calling this routine.
+      <P><CODE>containerHash</CODE> is a 
+      <A HREF="ds_container.html">Container Attributes</a> hash. 
+
+      <P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns 1
+          <DT><B>On failure</B><DD>
+              Returns 0
+      </DL>
+
+      <P>Example:
+
+      <P><BLOCKQUOTE>
+      <I> This example copies an existing container to a new 
+          container. I.e. it simply re-saves the active link under
+          a new name. </I></BLOCKQUOTE>
+
+      <PRE>
+      ($ct = ars_GetContainer($c, "C-foobar")) ||
+	    die $ars_errstr;
+      $ct->{name} = "Copy of ".$ct->{name};
+      ars_CreateContainer($c, $ct) || die $ars_errstr;
+      </PRE>
+
+<B>Notes</B>: Hash keys <CODE>helpText, owner</CODE> and 
+<CODE>changeDiary</CODE> are optional when calling this routine.
+<P>
+<I>This function was introduced in version 1.90 of ARSperl</I>
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

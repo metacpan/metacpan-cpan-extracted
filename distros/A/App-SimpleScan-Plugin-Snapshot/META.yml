@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         App-SimpleScan-Plugin-Snapshot
+version:      1.03
+version_from: lib/App/SimpleScan/Plugin/Snapshot.pm
+installdirs:  site
+requires:
+    App::SimpleScan:               1
+    Test::More:                    0
+    WWW::Mechanize::Plugin::Snapshot: 0.12
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

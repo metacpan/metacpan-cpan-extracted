@@ -1,0 +1,30 @@
+0.05
+	cleaned some code to support Authen::PluggableCaptcha::KeyManagerDB
+	documented debug args
+	removed erroneous call to __validate_key_extended , which was deprecated / removed in earlier versions
+	added parameter 'do_not_validate_key' to existing.   this will bypass key validation.
+
+0.04
+	Bugfix to 0.03 release.  
+		consolidated __init_base_captcha into init 
+		removed redundant keymanager creations
+		renamed __init__errors to _init
+		removed keymanger::init_existed, consolidated into validate_publickey
+
+
+0.03
+	Major restructuring , backwards incompatible ( though quick to fix , it should just be changing some flags )
+
+	sorry ;/ 
+	
+	KeyGenerator and KeyValidator replaced by KeyManager , which consolidates all operations.  also has a hook for expire_key
+	
+	all external hash mangling ( $obj->{'render'}->as_string ) now class methods ( $obj->render->as_string )
+	
+	most instances of the keyword args 'render' and 'challenge' have been replaced with 'render_class' and 'challenge_class'
+	
+	
+0.02
+	Added some support questions to the FAQ
+	Added discussion of DB wrapping and a generalized KeyManager
+	Fixed a 0/undef/defined/'' issue

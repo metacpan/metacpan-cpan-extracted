@@ -1,0 +1,17 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::PTS;
+
+print "old name: "; chop(my $old=<STDIN>);
+print "new name: "; chop(my $new=<STDIN>);
+
+my $pts = AFS::PTS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+my $ok = $pts->rename($old, $new);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "success  = $ok\n"; }

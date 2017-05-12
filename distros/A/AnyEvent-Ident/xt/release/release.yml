@@ -1,0 +1,18 @@
+---
+pod_spelling_system:
+  stopwords:
+    - hostname
+    - TCP
+    - ident
+    - IP
+    - MSWin32
+    - MSWin
+    - Ident
+    - IRC
+    - RFC1413
+    - bindport
+    - req
+
+pod_coverage:
+  private:
+    - AnyEvent::Ident.*#new

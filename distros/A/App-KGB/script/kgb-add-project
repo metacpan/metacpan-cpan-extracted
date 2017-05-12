@@ -1,0 +1,205 @@
+#!/usr/bin/perl
+# vim: ts=4:sw=4:et:ai:sts=4
+#
+# KGB - an IRC bot helping collaboration
+# Copyright © 2012 Damyan Ivanov
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 51
+# Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+use strict;
+use warnings;
+use autodie;
+
+use Getopt::Long;
+use Pod::Usage;
+use YAML qw(LoadFile DumpFile Bless);
+
+my $file = '/etc/kgb-bot/kgb.conf';
+my $dir  = '/etc/kgb-bot/kgb.conf.d';
+my $net  = 'oftc';
+my $save = 0;
+
+
+GetOptions(
+    'file=s'        => \$file,
+    'dir=s'         => \$dir,
+    'net|network=s' => \$net,
+    'save|write!'   => \$save,
+) or pod2usage( { -verbose => 1 } );
+
+@ARGV == 3 or pod2usage();
+
+my $yaml = LoadFile($file);
+my $networks = $yaml->{networks};
+
+if ( $dir and -d $dir ) {
+    $yaml = {};
+}
+
+my ( $prj, $chan, $pwd ) = @ARGV;
+
+$yaml->{repositories}{$prj}{password} = $pwd;
+
+unless ( $chan =~ /^[#&+]/ ) {
+    warn "W: Prepending channel name with a hash sign.\n";
+    $chan = "#$chan";
+}
+
+unless ( exists $networks->{$net} ) {
+    warn "W: Network '$net' missing on configuration file.\n";
+}
+
+push @{ $yaml->{channels} }, { name => $chan, network => $net, repos => [ $prj ] };
+
+my $i;
+my %key_order = map( ( $_ => $i++ ),
+    qw(soap queue_limit log_file pid_dir min_protocol_ver
+        debug admins
+        repositories networks channels
+        smart_answers smart_answers_polygen colors) );
+
+Bless($yaml)->keys(
+    [   sort { ( $key_order{$a} // 999 ) <=> ( $key_order{$b} // 999 ) }
+            keys %$yaml
+    ]
+);
+
+foreach ( @{ $yaml->{channels} } ) {
+    Bless($_)->keys(
+        [ sort { $a ne 'name' } keys %$_ ]
+    );
+}
+
+my $outfh = \*STDOUT;
+my ( $uid, $gid, $mode );
+
+if ($save) {
+    $uid  = ( stat($file) )[4];
+    $gid  = ( stat($file) )[5];
+    $mode = ( stat($file) )[2] & 07777;
+    if ( $dir and -d $dir ) {
+        $file = File::Spec->catdir($dir, "$prj.conf");
+    }
+    umask(~$mode & 0777);
+    open( $outfh, '>', $file );
+}
+
+print $outfh YAML::Dump($yaml);
+
+if ($save) {
+    chown $uid, $gid, $file;
+}
+
+__END__
+
+=head1 NAME
+
+kgb-add-project - helper script for adding new projects to kgb-bot configuration file
+
+=head1 SYNOPSIS
+
+B<kgb-add-project> [--file configfile] [--dir configdir] [--net|--networks ircnetwork] [--save|--write] project-id ircchannel password
+
+=head1 DESCRIPTION
+
+B<kgb-add-project> allows one to add new projects to B<kgb-bot>'s configuration
+file from the command line. It writes the new config to stdout unless I<--save|--write> is given.
+
+=head1 ARGUMENTS
+
+=over
+
+=item B<--file> configfile
+
+Optional. Defaults to F</etc/kgb-bot/kgb.conf>.
+
+=item B<--dir> configdir
+
+Optional. Defaults to F</etc/kgb-bot/kgb.conf.d/>.
+Used for writing config snippets for projects with B<--save|--write>.
+
+=item B<--net|network> ircnetwork
+
+Optional. Defaults to B<oftc>. Needs to be in the I<networks> section of the configuration file.
+
+=item B<--save|--write>
+
+Optional. Write new config back to file instead of stdout.
+
+=item B<project-id>
+
+B<project-id> to be added.
+
+=item B<irchannel>
+
+IRC channel where the new project sends its messages. If the channel doesn't
+start with a character denoting IRC channel (C<#&+>), then a hash sign is
+prepended.
+
+=item B<password>
+
+Password for the new project.
+
+=back
+
+=head1 EXAMPLE
+
+B<kgb-add-project> my-project \#projectchannel RudFiarced0
+
+=head1 CAVEATS
+
+=over
+
+=item *
+
+B<kgb-add-project> sorts the top-level sections of the configuration file in
+a fixed order and re-orders the subsections alphabetically.
+
+=item *
+
+The output of B<kgb-add-project> does not contain the comments that were
+present in the source configuration file.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<App::KGB>
+
+=item L<kgb-bot(1)>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 Damyan Ivanov
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 51
+Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+=cut

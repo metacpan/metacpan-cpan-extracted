@@ -1,0 +1,8 @@
+AxKit::XSP::PerForm
+===================
+
+This module is a "magic" forms library for building complex web
+applications. Forms are defined using the tags provided by this
+module, and then for each element on the form, callbacks are used
+for loading values, validating values, and submitting the form.
+

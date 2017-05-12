@@ -1,0 +1,21 @@
+- 0.07
+    - Using Test::More instead of Test::Alien
+
+- 0.06
+    - always build github master
+
+- 0.05
+    - during the make run PREFIX needs to be set
+
+- 0.04
+    - cpantesters failure fix
+
+- 0.03
+    - added README and updated LICENSE
+
+- 0.02
+    - added documentation
+
+- 0.01
+     - updates to the initial commit to get the code to work nicely
+     - Initial commit with a working version

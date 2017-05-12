@@ -1,0 +1,134 @@
+Revision history for Perl module ActiveRecord::Simple
+
+0.21    2013-01-16
+        First public release.
+
+0.25    2013-02-10
+        * Many bug fixes
+        * Improved relations
+        + Added test suite (see sandbox)
+        + Added relation type many-to-many
+
+0.30    2013-07-10
+        * Minor bug bixes
+        + Added ordering methods "order_by", "asc" and "desc"
+
+0.31    2013-07-11
+        * Fixes
+
+0.32    2013-07-12
+        * Fixed typos
+
+0.33    2013-07-12
+        + [EXPERIMENTAL] Added a new method "use_smart_saving".
+
+0.34	2013-08-21
+        + Added tracing queries
+        + Added some tests
+        * Minor fixes
+
+0.35	2013-08-26
+        + Added new "update-on-destroy" feature.
+
+0.40    2013-10-23
+        + Added  methods: limit, offset
+        + Method "find" now works with no arguments
+          (returns all records from db)
+        - Deleted method "get_all"
+        * Bugfixes
+        * Method find() with primary key goes to be named get()
+        * Tests fixes
+        * Improved documentation
+
+0.41	2013-10-24
+	    * Code cleanup
+	    * Bux fixes
+	    * Typo fixes
+
+0.50	2013-11-02
+        + Added ability to change relation instance into object
+        + Added some tests
+        * Fixed "save" method
+        * Many fixes and huge code improvements
+        * Typo fixes
+
+0.51    2013-11-11
+        + Added method's "last" & "first"
+        + Added new class ActiveRecord::Simple::Tutorial with pod-documentation
+        + Implemented schema-loader script called "mars"
+        + Added method "count"
+        + Added method "exists"
+        + Added possibility to creating read-only objects: fetch({ read_only => 1 })
+        + Added new syntax to method "fetch"
+        + Added possibility to select only specific fields ("only")
+        * Improved tests
+        * Improved documentation
+        * Fixed bugs
+
+0.52    2013-11-26
+        * Fixed the `fetch` behavior
+        * Fixed tests
+
+0.53    2014-05-12
+        + Added method "increment" (thnx @lifeofguenter)
+        + Added method "decrement" (thnx @lifeofguenter)
+
+0.60.0  2014-05-19
+        + Added new relationships aliases
+        + Added generic relations
+        * Improved increment/decrement methods
+        * Migrated to semver
+
+0.61.0  2014-09-17
+        + Added schema builder (with method "fields")
+        + Added fields validation (only when "fields" method is used)
+        + Added class method "as_sql"
+        + Added PACKAGE method "index"
+
+0.64    2014-09-19
+        + Improved method "columns"
+        + Improved relationship framework
+        * Fixed bugs
+
+0.65    2014-09-26
+        + Dependancy on SQL::Translator now is optional (thanks to @kberov)
+        + Added Credits - list of contributors (see README)
+        * Fixed bugs
+        * Improved tests
+
+0.70    2015-08-14
+        + Added ARS_TRACE
+        + Created method "update" for quick objects update
+        + New mars command "--upload"
+        * Improved `find` and `count` methods, now you can use find({ id => [1, 2, 3] }) as '.. where id in (1, 2, 3)'
+        * Improved error handling
+        * Method `new` now takes simple hashes (not only hashrefs)
+        * Improved documentation
+
+0.80    2016-01-05
+        + Added method "abstract"
+        + Added method "select"
+        + Added method "update"
+        + Added method "abstract"
+        + Added method "next"
+        + Added "where in ... " condition to find
+        + Added method "connect"
+        * Improved error handling
+        * Improved "new" method
+        + Added LEFT JOIN
+        * Optimization of data fetch
+        * Improved documentation
+        + Added package method "load_info"
+        + "Smart accessors"
+        + Added cookbook
+        * Improved tests
+
+0.84    2016-07-13
+        + Added scalarref as an argument of accessor to set not-quoted data (e.g. to send database-specific functions)
+        + Now multiobject accessor is a "ARS::Find" object too, you can use such method as "order_by", "desc" etc.
+        * Small bugfixes
+
+0.90    2016-07-16
+        + Added "smart accessors" to methods "new", "find", "count".
+        * Small fixes
+        * Improved documentation

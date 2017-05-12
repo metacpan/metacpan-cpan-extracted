@@ -1,0 +1,9 @@
+Things we need to do:
+ * Add support to auto connect to default server locations.
+ * Add support for auth/unauth
+ * Add support for import/export
+
+Things we should do:
+
+Things it would be nice to have:
+ * Write a nice, small demonstration script

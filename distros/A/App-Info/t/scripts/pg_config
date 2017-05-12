@@ -1,0 +1,23 @@
+#!/usr/local/bin/perl -w
+
+eval 'exec /usr/local/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+eval 'exec /usr/local/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+use File::Spec::Functions;
+my $bin_dir = catdir qw(t scripts);
+$bin_dir = catdir(qw(t bin)) unless -d $bin_dir;
+
+if ($ARGV[0] eq '--version') {
+    print "PostgreSQL 8.0.0\n";
+} elsif ($ARGV[0] eq '--bindir') {
+    print "$bin_dir\n";
+} elsif ($ARGV[0] eq '--includedir') {
+    print "t/testinc\n";
+} elsif ($ARGV[0] eq '--libdir' || $ARGV[0] eq '--pkglibdir') {
+    print "t/testlib\n";
+} elsif ($ARGV[0] eq '--configure') {
+    print "\n";
+}

@@ -1,0 +1,63 @@
+Revision history for App-Adenosine
+
+2.001008  2014-08-27 19:28:05-05:00 America/Chicago
+ - Fix tests on win32
+
+2.001007  2014-02-24 13:48:53CST-0600 America/Chicago
+ - Implement the PATCH HTTP verb (thanks @mdi for GH#6)
+
+2.001006  2013-08-14 21:09:39 CST6CDT
+ - Fix tests in Win32 (on the off chance they have curl installed)
+ - Abandon RT
+
+2.001005  2012-12-28 14:36:46 CST6CDT
+ - Put MetaYAML back in dist
+
+2.001004  2012-12-17 09:47:32 CST6CDT
+ - Make Term::ExtendedColor optional with better error
+ - Remove maint/ from CPAN dist (Tommy Stanton)
+ - Fix missing or too low prereqs (Tommy Stanton)
+ - Do not require MRO::Compat for newer perls
+
+2.001003  2012-12-14 08:34:16 CST6CDT
+ - Fix tests when user has an XDG system, and add a way to turn XDG off
+
+2.001002  2012-12-13 15:07:41 CST6CDT
+ - Fix exports in bash
+
+2.001001  2012-12-02 13:38:08 CST6CDT
+ - Fix setting the host for the first time
+
+2.001000  2012-12-01 12:02:45 CST6CDT
+ - Add configuration file (.adenosinerc.yml) for easier enabling of plugins
+ - Put pp back in dist
+
+2.000001  2012-11-24 15:49:06 CST6CDT
+ - Rename to Adenosine
+ - Complete reimplementation in perl because this doesn't actually work in zsh
+   at all
+ - Removed the html filtering (and thus -Z) and converted it to just an
+   separate command (h2t)
+ - Remove pp (temporarily) due to name conflict
+
+1.5  2011-03-20
+ - Curl options can now be specified when calling the resty command to set
+   the URI base. These options will be passed to curl for all subsequent
+   requests, until the next time the resty command is called.
+
+1.4  2011-03-08
+ - Finalized bug fix for zsh users.
+
+1.3  2011-03-04
+ - Attempted bug fix for zsh users that prevented options from being passed
+   correctly to curl.
+
+1.2  2011-02-06
+ - Data is now optional in PUT and POST requests. If the input is not a
+   terminal and no data is specified on the command line, resty won't wait
+   for data on stdin anymore. If you liked the old behavior you can always do
+   something like `cat | POST /Somewhere` for the same effect.
+
+1.1  2011-01-07
+ - Fixed bug where -V option required input on stdin, and would block waiting
+   for it.

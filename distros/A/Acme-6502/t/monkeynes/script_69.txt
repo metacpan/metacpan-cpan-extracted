@@ -1,0 +1,65 @@
+clear
+power on
+regs
+
+# No flags case ----------------------------
+op 18
+op a9 55
+op 69 12
+
+# Should be: ACC=67, C=0, V=0, S=0, Z=0
+test acc = 67
+test c = 0
+test v = 0
+test s = 0
+test z = 0
+
+# Carry flag case --------------------------
+op 18
+op a9 fe
+op 69 e7
+
+# Should be: ACC=E5, C=1, V=0, S=1, Z=0
+test acc = e5
+test c = 1
+test v = 0
+test s = 1
+test z = 0
+
+# Overflow and Negative flag case ----------
+op 18
+op a9 75
+op 69 12
+
+# Should be: ACC=67, C=0, V=1, S=1, Z=0
+test acc = 87
+test c = 0
+test v = 1
+test s = 1
+test z = 0
+
+# Zero flag case ---------------------------
+op 18
+op a9 72
+op 69 8e
+
+# Should be: ACC=0, C=1, V=0, S=0, Z=1
+test acc = 0
+test c = 1
+test v = 0
+test s = 0
+test z = 1
+
+# Use Carry Flag case ----------------------
+op 38
+op a9 55
+op 69 12
+
+# Should be: ACC=68, C=0, V=0, S=0, Z=0
+test acc = 68
+test c = 0
+test v = 0
+test s = 0
+test z = 0
+
+save verify_69.txt

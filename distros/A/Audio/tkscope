@@ -1,0 +1,635 @@
+#!/usr/local/bin/perl -w
+use strict;
+use Tk;
+use Tk::widgets qw(Canvas);
+use Audio::Data qw(solve_polynomial);
+use Audio::Play;
+use Audio::Filter;
+use Tk::Scope;
+use Carp;
+use File::Basename qw(dirname);
+use File::Spec;
+use Cwd;
+my $lcwd = getcwd();
+my $scwd = $lcwd;
+
+sub BORDER () { 2 }
+
+$SIG{__DIE__} = \&Carp::confess;
+# $SIG{INT} = \&Carp::confess;
+
+my $FFT_SIZE  = 256;
+my $LPC_POLES = 10;
+my $do_fft = 1;
+my $do_lpc = 1;
+
+
+my $mw   = MainWindow->new;
+my $menu = $mw->menu;
+
+my ($f,$val) = create_labels($mw,[qw(0 xmax start end cursor1 cursor2)],qw(Freq Samp F0));
+
+
+my $scope = $mw->Scrolled(Scope => -relief => 'ridge', -border => 2,
+                          -width => 640, -height => 129);
+my $over  = $mw->Scope(-border => 2,-relief => 'ridge', -height => 128, -width => 320);
+my $voice = $mw->Scope(-relief => 'ridge', -width => 256, -height => 128);
+my $poles = $mw->Canvas(-width => 130, -height => 130);
+
+$poles->create(oval => [1,1,129,129]);
+$poles->create(line => [1,65,129,65]);
+$poles->create(line => [65,1,65,129]);
+
+
+
+my $xfrm  = $mw->Scope(-border => BORDER, -relief => 'groove', -height => 200,
+                       -yscale => undef,
+		       -range1 => 0,
+                       -access => 'dB',
+                   #   -domain => 'frequency',
+                      );
+		
+my $txt   = $mw->Scrolled(Text => -scrollbars => 's', -width => 25, -height => 14, -wrap => 'none');		
+		
+# Image at the back inside border
+my $simg  = $mw->Photo(-height => 129, -width => 640);
+$scope->create(image => [BORDER,BORDER], -anchor => 'nw', -image => $simg);
+
+my $t_swav = $scope->trace(-fill => 'red');
+my $t_owav = $over->trace(-fill => 'red');
+		
+my $t_fft = $xfrm->trace(-fill => 'orange');		
+my $t_lpc = $xfrm->trace(-fill => 'blue');		
+my $t_aux = $xfrm->trace(-fill => 'cyan');		
+
+my $t_imp = $voice->trace(-fill => 'blue');
+my $t_inv = $voice->trace(-fill => 'red');
+
+
+my $canv  = $scope->Subwidget('scope');
+$canv->Tk::bind('<2>',[\&Spectrum,Ev('x')]);
+$canv->Tk::bind('<B2-Motion>',[\&Spectrum,Ev('x')]);
+
+my $but   = create_buttons($mw);
+
+my $row = 0;
+$but->grid(-row => $row, -column => 0, -columnspan => 3, -sticky => 'ew');
+$mw->gridRowconfigure($row++,-weight => 0);
+
+$f->grid(-row => $row, -column => 0, -columnspan => 3, -sticky => 'ew');
+$mw->gridRowconfigure($row++,-weight => 0);
+
+$scope->grid(-row => $row, -column => 0, -columnspan => 3, -sticky => 'ew');
+$mw->gridRowconfigure($row++,-weight => 0);
+
+$poles->grid(-row => $row, -column => 0);
+$voice->grid(-row => $row, -column => 1, -sticky => 'ew');
+$over->grid(-row => $row, -column => 2, -sticky => 'ew', -columnspan => 2);
+$mw->gridRowconfigure($row++,-weight => 0);
+
+$txt->grid( -row => $row, -column => 0, -columnspan => 1,-sticky => 'nsew');
+$xfrm->grid( -row => $row, -column => 1, -columnspan => 2,-sticky => 'nsew');
+$mw->gridRowconfigure($row++,-weight => 1);
+
+for my $c (0..2)
+ {
+  $mw->gridColumnconfigure($c,-weight => ($c) ? 1 : 0);
+ }
+
+$scope->configure(-command => [\&stats,$scope->Subwidget('scope'),$val,$over]);
+$xfrm->configure(-command => [\&fstats,$xfrm,$val]);
+
+$voice->configure(-command => [\&vstats,$voice,$val]);
+
+$over->configure(-zoomcmd => [doZoom => $scope],
+                 -rangecmd => [doZoom => $scope]);
+
+
+if (@ARGV)
+ {
+  load(shift);
+ }
+
+MainLoop;
+
+sub load
+{
+ my $file = shift;
+ open(my $fh,"$file") || die "Cannot open $file:$!";
+ binmode($fh);
+ warn "Loading $file\n";
+ my $au = Audio::Data->new(Load => $fh);
+ if ($au)
+  {
+   my $dur = $au->duration;
+   $scope->configure(-start => 0, -xmax => $dur, -end => $dur);
+   $over->configure(-start => 0, -xmax => $dur, -end => $dur);
+   $scope->traceconfigure($t_swav, -data => $au);
+   $over->traceconfigure($t_owav, -data => $au);
+   $mw->title($file);
+   $val->{Samp} = $au->rate;
+  }
+ close($fh);
+}
+
+sub Load
+{
+ my $file = $mw->getOpenFile(-defaultextension => '.au',
+                             -filetypes => [[ "Audio Files", [".au"],
+			                    [ "All Files", '*']]
+					   ],					
+			     -initialdir => $lcwd);
+ if ($file)
+  {			
+   $lcwd = dirname($file);			
+   load($file);
+  }			
+}
+
+sub Save
+{
+ my $t1 = $scope->cursor1;
+ my $t2 = $scope->cursor2;
+ if (!defined $t1)
+  {
+   $t1 = $scope->start;
+   $t2 = $scope->end;
+   $scope->configure(-cursor1 => $t1, -cursor2 => $t2);
+  }
+ my $file = $mw->getSaveFile(-defaultextension => '.au',
+                             -filetypes => [[ "Audio Files", [".au"],
+			                    [ "All Files", '*']]
+					   ],					
+			     -initialdir => $scwd);
+ if ($file)
+  {			
+   $scwd = dirname($file);			
+   save($file,$t1,$t2);
+  }			
+}
+
+sub save
+{
+ my ($file,$t1,$t2) = @_;
+ my $au = $scope->audio($t1,$t2);
+ if ($au && $au->duration)
+  {
+   open(my $fh,">$file") || die "Cannot open $file:$!";
+   binmode($fh);
+   warn "Saving $file\n";
+   $au->Save($fh);
+   close($fh);
+  }
+
+}
+
+sub Spectrum
+{
+ my ($c,$x) = @_;
+ my ($tr) = $scope->traces;
+ return unless defined $tr;
+ my $r    = $scope->tracecget($tr,'-data')->rate;
+ my $t;
+ if (@_ > 1)
+  {
+   $t = $c->x2val($x);
+  }
+ else
+  {
+   $t = ($scope->cursor1+$scope->cursor2)/2;
+  }
+ my $dt   = ($FFT_SIZE/2+1)/$r;
+ my $t1 = $t - $dt;
+ my $t2 = $t + $dt;
+ $scope->cursor1($t1);
+ $scope->cursor2($t2);
+ my $au = $scope->audio($t1,$t2,$tr);
+ spectrum($au,$xfrm,$t_fft,$t_lpc);
+}
+
+sub create_buttons
+{
+ my $f = $mw->Frame(-relief => 'groove', -border => 3);
+ my @but;
+ push @but,$f->Button(-text => 'Spectogram', -command => sub {
+                         my $au = $scope->audio($scope->start,$scope->end);
+                         spectogram($au,$simg);
+                       });
+ push @but,$f->Button(-text => 'Clear', -command => sub {
+                         $simg->blank
+                       });
+ push @but,$f->Button(-text => 'Load', -command => \&Load);
+ push @but,$f->Button(-text => 'Save', -command => \&Save);
+		
+ if (1)
+  {		
+   push @but,$f->Label(-text => 'LPC Poles:',-justify => 'right',-anchor => 'e'); 		
+   push @but,$f->Optionmenu(-variable => \$LPC_POLES,
+                            -options => [14,6..13,15..24],
+                            -command => sub { Spectrum($scope->Subwidget('scope')) }
+                           );
+   $LPC_POLES = 14;		
+  }
+ if (1)
+  {
+   push @but,$f->Label(-text => 'FFT_size',-justify => 'right',-anchor => 'e'); 		
+   push @but,$f->Optionmenu(-variable => \$FFT_SIZE,
+                            -options => [256,64,128,512,1024],
+                            -command => sub { Spectrum($scope->Subwidget('scope')) }
+			   ); 		
+   $FFT_SIZE = 256;
+  }
+ if (1)
+  {
+   push @but,$f->Checkbutton(-text => "LPC", -variable => \$do_lpc,
+                            -command => sub { Spectrum($scope->Subwidget('scope')) }
+			   ); 		
+   push @but,$f->Checkbutton(-text => "FFT", -variable => \$do_fft,
+                            -command => sub { Spectrum($scope->Subwidget('scope')) }
+			   ); 		
+  }
+		
+ Tk::grid(@but,-sticky => 'nsew');
+ for my $i (0..$#but)
+  {
+   $f->gridColumnconfigure($i,-weight => 1);
+  }
+ return $f;
+}
+
+sub create_labels
+{
+ my ($mw,$pairs,@other) = @_;
+ my %values;
+ my $f = $mw->Frame(-relief => 'groove', -border => 3);
+ my @but;
+ my @l1;
+ my @l2;
+ my @labels = @$pairs;
+ while (@labels)
+  {
+   my ($start,$end) = splice(@labels,0,2);
+   my $span = 1;
+   foreach my $lab ($start,$end)
+    {
+     push(@l1,$f->Label(-text => $lab, -justify => 'center', -anchor => 'c', -relief => 'ridge'));
+     $values{$lab} = 0;
+     push(@l2,$f->Label(-textvariable => \$values{$lab},
+                      -justify => 'center', -anchor => 'c',-relief => 'ridge'));
+    }
+   push(@but,$f->Button(-text => "$start-$end",
+                        -command => [\&Play,\$values{$start},\$values{$end}])
+       );
+  }
+ while (@other)
+  {
+   my $lab = shift(@other);
+   push(@l1,$f->Label(-text => $lab, -justify => 'center', -anchor => 'c', -relief => 'ridge'));
+   $values{$lab} = 0;
+   push(@l2,$f->Label(-textvariable => \$values{$lab},
+                      -justify => 'center', -anchor => 'c',-relief => 'ridge'));
+  }
+ Tk::grid(@l1,-sticky => 'nsew');
+ Tk::grid(@l2,-sticky => 'nsew');
+ Tk::grid(@but,-sticky => 'nsew',-columnspan => 2);
+ for my $i (0..$#l1)
+  {
+   $f->gridColumnconfigure($i,-weight => 1);
+  }
+ return ($f,\%values);
+}
+
+sub Play
+{
+ my ($sp,$ep) = @_;
+ my $svr = Audio::Play->new;
+ if ($svr)
+  {
+   my $au = $scope->audio($$sp,$$ep);
+   if ($au)
+    {
+     $svr->play($au);
+    }
+  }
+ else
+  {
+   warn "Cannot open audio:$!";
+  }
+}
+
+sub fstats
+{
+ my ($xfrm,$val) = @_;
+ my $max = $xfrm->xmax;
+ return unless defined $max;
+ $val->{Samp} = sprintf("%5d",$max*2);
+ my $f = $xfrm->cursor1;
+ return unless defined $f;
+ $val->{Freq} = sprintf("%5d",$f);
+}
+
+sub vstats
+{
+ my ($voice,$val) = @_;
+ my $t1 = $voice->cursor1;
+ return unless defined $t1;
+ my $t2 = $voice->cursor2;
+ return unless defined $t1;
+ return unless $t2 != $t1;
+ $val->{F0} = sprintf("%5d",1/($t2-$t1));
+}
+
+sub spectogram
+{
+ my ($raw,$img) = @_;
+ my $au = $raw->difference;
+ my $N = ($img->cget('-height')-1)*2;
+ my $w = $img->cget('-width')-2*BORDER;
+ my $n = $au->samples;
+ my $step = int($n/$w);
+ my $s = Audio::Data->new(rate => $au->rate);
+ my ($max,$min);
+ my $st = 0;
+ # warn("N=$N w=$w step=$step\n");
+ for (my $x = 0; $x < $w; $x++)
+  {
+   my $window = $au->hamming($N,$st);
+   $window->r2_fft;
+   my @amp = $window->dB(0,$N/2+1);
+   foreach my $v (@amp)
+    {
+     $max = $v if (!defined($max) || $v > $max);
+     $min = $v if (!defined($min) || $v < $min);
+    }
+   $s .= \@amp;
+   $st += $step;
+  }
+ for (my $x = 0; $x < $w; $x++)
+  {
+   my @amp = $s->amplitude($x*($N/2+1),$N/2+1);
+   for (my $y = 0; $y < @amp; $y++)
+    {
+     my $c = int(255*($amp[$y]-$max)/($min-$max));
+     $c = sprintf("#%02X%02X%02X",$c,$c,$c);
+     $img->put([[$c]], -to => $x, (@amp-1-$y));
+    }
+  }
+}
+
+
+sub stats
+{
+ my ($scope,$val,$over) = @_;
+ $over->cursor1($scope->start);
+ $over->cursor2($scope->end);
+ # warn "$scope ".$scope->Width.' '.$scope->Height."\n";
+ $simg->configure(-width => $scope->Width);
+ foreach my $meth (keys %$val)
+  {
+   next unless ($meth && $meth =~ /^[a-z]/);
+   if ($scope->can($meth))
+    {
+     my $v = $scope->$meth();
+     $val->{$meth} = (defined $v) ? sprintf("%10g",$v) : (' ' x 10);
+
+    }
+   else
+    {
+     warn "$scope cannot $meth\n";
+    }
+  }
+}
+
+sub spectrum
+{
+ my ($raw,$xfrm,$t_fft,$t_lpc) = @_;
+ my $au = $raw->difference;
+ my $window = $au->hamming($FFT_SIZE,0);
+ if ($do_fft)
+  {
+   my $fft = $window->fft($FFT_SIZE);
+   $fft->length($FFT_SIZE/2);
+   $xfrm->traceconfigure($t_fft,-data => $fft, -state => 'normal');
+  }
+ else
+  {
+   $xfrm->traceconfigure($t_fft,-state => 'hidden');
+  }
+ if ($do_lpc)
+  {
+   my ($auto,$ref);
+   my $lpc;
+   if (1)
+    {
+#    my ($auto,$ref);
+     my $levinson = $window->lpc($LPC_POLES,$auto,$ref);
+     roots(levinson => $levinson);
+     inverse($raw,$levinson);
+#    impulse($levinson);
+     $levinson *= -1;
+     $levinson->[0] = 1.0;
+     $levinson->length($FFT_SIZE);
+     # Take fft - gives transfer func of inverse filter (1-Sigma(An*z**-n))
+     # so to approx filter take reciprocal of each point
+     my $lpc = 1.0/$levinson->fft($FFT_SIZE);
+     $lpc->length($FFT_SIZE/2);
+     $xfrm->traceconfigure($t_lpc,-data => $lpc, -state => 'normal');
+    }
+   if (0)
+    {
+     my $auto = $window->autocorrelation($LPC_POLES);
+#    $auto *= ($window->samples-$LPC_POLES);
+     my $durbin   = $auto->durbin;
+     my $gain = $durbin->[0];
+     warn "gain = $gain\n";
+     roots(durbin => $durbin);
+     $durbin *= -1;
+     $durbin->[0] = 1.0;
+     $durbin->length($FFT_SIZE);
+     # Take fft - gives transfer func of inverse filter (1-Sigma(An*z**-n))
+     # so to approx filter take reciprocal of each point
+     my $lpc = 1.0/$durbin->fft($FFT_SIZE);
+     $lpc->length($FFT_SIZE/2);
+     $xfrm->traceconfigure($t_aux,-data => $lpc, -state => 'normal');
+    }
+  }
+ else
+  {
+   $xfrm->traceconfigure($t_lpc,-state => 'hidden');
+  }
+ my $d = $au->rate/2;
+ $xfrm->configure(-xmax => $d, -end => $d, -start => 0);
+}
+
+
+sub inverse
+{
+ my ($au,$lpc) = @_;
+ my @a = map { -$_ } $lpc->data;
+ my $rate = $lpc->rate;
+ my $n = @a-1;
+ $au->length($FFT_SIZE);
+ my $filter = Audio::Filter::FIR->new(rate => $rate);
+ $filter->data(@a);
+ $filter->[0] = 1;
+ $filter->length(2*$n+1);
+ my $response = Audio::Data->new(rate => $rate);
+ $response .= $filter->process($au);
+ my $dur = $response->duration/2;
+
+ $voice->configure(-start => 0, -end => $dur, -xmax => $dur, -yscale => undef);
+ $voice->traceconfigure($t_inv,-data => $response->timerange($dur,2*$dur));
+# my $fresp = $response->fft($FFT_SIZE);
+# $fresp->length($FFT_SIZE/2);
+# $xfrm->traceconfigure($t_aux,-data => $fresp, -state => 'normal');
+}
+
+sub impulse
+{
+ my $lpc = shift;
+ my $rate = $lpc->rate;
+ my @a = $lpc->data;
+ my $n = @a-1;
+ my $filter = Audio::Filter::AllPole->new(rate => $rate);
+ $filter->data(@a);
+ # 0'th entry is gain or error or other "junk".
+ $filter->[0] = 1;
+ $filter->length(2*$n+1);
+ my $response = Audio::Data->new(rate => $rate);
+ # No feed it an impulse i.e. ...
+ $response .= $filter->process(1);    # ... 1 at time 0 and ...
+ for my $i (1..$FFT_SIZE-1)
+  {
+   $response .= $filter->process(0);  # ... 0 otherwise
+  }
+ my $dur = $response->duration;
+ $voice->configure(-start => 0, -end => $dur, -xmax => $dur, -yscale => undef);
+ $voice->traceconfigure($t_imp,-data => $response);
+ my $fresp = $response->fft($FFT_SIZE);
+ $fresp->length($FFT_SIZE/2);
+ $xfrm->traceconfigure($t_aux,-data => $fresp, -state => 'normal');
+}
+
+my @formant;
+my @pole;
+sub pole_pair
+{
+ my @colours = qw(red darkgreen blue magenta brown black);
+ my ($rate,$k,$f,$b,$r,$i) = @_;
+ my $d = $r*$r+$i*$i;
+ my $fresp;
+
+ # chr(0xb1) is +/- sign
+ $txt->insert('end',sprintf("f=%5.0fHz bw=%4.0fHz %.3g %+.3g%c%.3gi\n",
+              $f,$b,1/sqrt($d),$r,0xb1,$i),["f$k"]);
+
+
+ my $zr = 64*$r/$d;
+ my $zi = 64*$i/$d;
+
+ unless ($pole[$k])
+  {
+   my $col  = $colours[$k % @colours];
+   $txt->tagConfigure("f$k",-foreground => $col);
+   my $p = $poles->create(oval =>[0,0,0,0],-fill => $col, -outline => $col);
+   my $m = $poles->create(oval =>[0,0,0,0],-fill => $col, -outline => $col);
+   $pole[$k] =[$p,$m];
+  }
+
+ $poles->coords($pole[$k][0],[65+$zr-1,65+$zi-1,65+$zr+1,65+$zi+1]);
+ $poles->coords($pole[$k][1],[65+$zr-1,65-$zi-1,65+$zr+1,65-$zi+1]);
+ $poles->itemconfigure($pole[$k][0],-state => 'normal');
+ $poles->itemconfigure($pole[$k][1],-state => 'normal');
+
+ if (0)
+  {
+   # Generate impulse response and take FFT
+   my $filter = Audio::Filter::AllPole->new(rate => $rate);
+   $filter->data(1,2*$r/$d,-1/$d);
+   $filter->length(5);
+   my $response = Audio::Data->new(rate => $rate);
+   $response .= $filter->process(1);
+   for my $i (1..$FFT_SIZE-1)
+    {
+     $response .= $filter->process(0);
+    }
+   $fresp = $response->fft($FFT_SIZE);
+  }
+ else
+  {
+   # Get freq response from coeficents
+   my $coef = Audio::Data->new(rate => $rate);
+   $coef->data(1, -2*$r/$d,1/$d);
+   $coef->length($FFT_SIZE);
+   $fresp = 1/$coef->fft($FFT_SIZE);
+  }
+ $fresp->length($FFT_SIZE/2);
+ unless ($formant[$k])
+  {
+   my $col  = $colours[$k % @colours];
+   $formant[$k] = $xfrm->trace(-fill => $col);
+  }
+ my $dash = ($b > 500) ? '.' : '-';
+ $xfrm->traceconfigure($formant[$k],-data => $fresp, -dash => $dash, -state => 'normal');
+}
+
+sub roots
+{
+ my $why = shift;
+ my $durbin = shift;
+ my $rate = $durbin->rate;
+ my @lpc = $durbin->data;
+ my $n = @lpc;
+ # warn "$LPC_POLES => $n\n";
+ # 1st term in @lpc is not interesting, typically a gain term
+ my $err = shift(@lpc);
+ # Remaining terms are A[N] terms in demominator of all-pole
+ # filter equation H(z) = 1/(1-Sigma(1,N,A[i] * z**(-i)))
+ # Form array of coefficients
+ my @poly = (1.0,map { -$_ } @lpc);
+ my @roots = solve_polynomial(@poly);
+ # Values of roots are values of z**-1 i.e. 1/Z
+ # So poles are at 1/root. For 1/root to be inside unit circle
+ # roots above should be outside! i.e. abs(root) > 1
+ my $k = 0;
+ my $pi2 = 2*Audio::Data::PI();
+ my @fmt;
+ if (@roots)
+  {
+   #warn "$why ".join(',',@poly).":\n";
+   while (@roots)
+    {
+     my ($r,$i) = splice(@roots,0,2);
+     if ($i != 0)
+      {
+       my ($r2,$i2) = splice(@roots,0,2);
+       if ($r2 != $r || $i2 != -$i)
+        {
+	 warn "Weird $r+${i}i and $r2${i2}i";
+	 next;
+	}
+       my $f = $rate*atan2($i,$r)/$pi2;
+       my $b = $rate*log($r*$r+$i*$i)/$pi2;
+       push(@fmt,[$f,$b,$r,$i]);
+      }
+     else
+      {
+       # real pole i.e. f=0 - a lowpass term
+       # printf " %.3g\n",$r;
+      }
+    }
+  }
+ $txt->delete('1.0','end');
+ foreach my $f (sort { ($a->[1] > 500) <=> ($b->[1] > 500) || $a->[0] <=> $b->[0] } @fmt)
+  {
+   my ($f,$b,$r,$i) = @$f;
+   pole_pair($rate,$k++,$f,$b,$r,$i);
+  }
+ while ($k < @formant)
+  {
+   $poles->itemconfigure($pole[$k][0],-state => 'hidden');
+   $poles->itemconfigure($pole[$k][1],-state => 'hidden');
+   $xfrm->traceconfigure($formant[$k++],-state => 'hidden');
+  }
+}
+

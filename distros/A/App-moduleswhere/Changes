@@ -1,0 +1,15 @@
+Revision history for App-moduleswhere
+
+0.03   2011-05-09 01:07:36 CST
+
+    add --no-require option.
+
+0.02   2011-04-28 18:21:51 CST
+
+    note about Module::Info.
+    show require error if any.
+
+0.01   2011-04-27 14:34:19 CST
+
+    Initial release.
+

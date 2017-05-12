@@ -1,0 +1,8 @@
+Another release...
+- generate RSA keys
+- sign RDF
+- verify RDF
+- encrypt RDF
+- decrypt RDF
+- sign/verify manifest
+

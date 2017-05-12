@@ -1,0 +1,12 @@
+
+=head1 Schema
+
+    Schema
+        Types (Modules)
+
+        Friendships
+
+=head1
+
+=cut
+

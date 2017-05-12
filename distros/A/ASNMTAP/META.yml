@@ -1,0 +1,76 @@
+--- #YAML:1.0
+name:               ASNMTAP
+version:            3.002003
+abstract:           Application System Network Monitoring Toolkit Alex Peeters
+author:
+    - Alex Peeters <alex.peeters@citap.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Bundle::DBD::mysql:   4.004
+    Bundle::DBI:          1.604
+    Bundle::LWP:          1.11
+    CGI:                  3.37
+    Compress::Zlib:       2.010
+    Config::General:      2.38
+    Config::General::Interpolated:  2.07
+    CPAN:                 1.9205
+    CPANPLUS:             0.84
+    Crypt::OpenSSL::RSA:  0.26
+    Crypt::OpenSSL::X509:  1.2
+    Crypt::SSLeay:        0.56
+    Cwd:                  3.25
+    Data::Dumper:         2.121
+    Date::Calc:           5.4
+    DateTime:             0.37
+    DateTime::Format::Epoch:  0.10
+    DateTime::Format::W3CDTF:  0.04
+    DBD::CSV:             0.26
+    DBIx::Log4perl:       0.18
+    Digest::MD5:          2.36
+    Digest::SHA1:         2.12
+    Dumpvalue:            1.11
+    Email::Simple:        2.003
+    File::Basename:       2.73
+    Getopt::Long:         2.37
+    HTML::Entities:       1.35
+    HTTP::Daemon::SSL:    1.04
+    IO:                   1.23
+    IO::CaptureOutput:    1.0801
+    IO::Socket::SSL:      1.33
+    IO::String:           1.08
+    Log::Log4perl:        1.26
+    Mail::POP3Client:     2.18
+    Mail::Sendmail:       0.79
+    MIME::Base64:         3.08
+    MIME::Tools:          5.420
+    Net::FTP:             2.75
+    Net::Ifconfig::Wrapper:  0.09
+    Net::IMAP::Simple:    1.17
+    Net::SSLeay:          1.32
+    SOAP::Lite:           0.710.08
+    Sys::Hostname::Long:  1.4
+    Test::Pod::Coverage:  1.08
+    Test::Simple:         0.80
+    Text::CSV:            1.16
+    Time::HiRes:          1.9705
+    Time::Local:          1.17
+    URI:                  1.36
+    WSRF::Lite:           0.8.2.7
+    XML::CanonicalizeXML:  0.03
+    XML::DOM:             1.44
+    XML::LibXML:          1.70
+    XML::Parser:          2.36
+    XML::Simple:          2.18
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,7 @@
+lib/AI/NNFlex/Reinforce.pm
+lib/AI/NNFlex/Feedforward.pm
+lib/AI/NNFlex/Backprop.pm
+lib/AI/NNFlex/Hopfield.pm
+lib/AI/NNFlex/Dataset.pm
+lib/AI/NNFlex/Mathlib.pm
+lib/AI/NNFlex.pm

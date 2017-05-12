@@ -1,0 +1,108 @@
+Revision history for Perl extension Apache::Sling.
+
+0.27  Wed Apr 18 21:00:00 2012
+        - Splitting config into config and config_hash to allow subclassing.
+
+0.26  Tue Apr 17 07:42:00 2012
+        - Adjusting command_line / config methods to be easier to subclass.
+        - Removing duplicate command line options in ldap synch.
+
+0.25  Sun Apr 15 15:38:00 2012
+        - Allowing help(), man() and run() to be overridden.
+        - Fixing variable quoting in command line script.
+        - Changing method name to not use reserved word delete.
+
+0.24  Mon Apr 9 07:35:00 2012
+        - Add command line functionality support.
+
+0.23  Fri Apr 6 06:20:00 2012
+        - Fix bug in referer passthrough from subclasses.
+
+0.22  Sun Apr 1 21:15:00 2012
+        - Make it possible to subclass authn successfully.
+
+0.21  Sat Mar 31 06:45:00 2012
+        - Refactoring user login to support subclassing auth.
+
+0.20  Fri Mar 30 06:05:00 2012
+        - Adding support for .infinity.json.
+
+0.19  Wed Mar 28 20:38:00 2012
+        - Improving test coverage.
+        - A small amount of code tidying.
+
+0.18  Thu Jan 26 11:25:00 2012
+        - Adding JSON query Servlet tests.
+        - Removing sakai specific me and sites functionality from code.
+        - Improving user test coverage.
+
+0.17  Tue Jan 24 23:40:00 2012
+        - Adding JSON query Servlet functionality.
+        - Making add eval return success for 200 or 201 code.
+        - Making the use of the phrase member less prevalent in
+          the message output.
+
+0.16  Sat Sep 3 14:00:00 2011
+        - Adding authz functionality.
+
+0.15  Wed Jul 13 13:00:00 2011
+        - Adding support for setting referrer header on the
+          LWP User Agent. This is required for Sakai Nakamura.
+
+0.14  Sat Jul 2 07:45:00 2011
+        - Fixing bug with newline, tab handling - thanks to
+          Daniel Burckhardt for the bug report and patch.
+        - Improved handling of filename variable for file upload.
+        - Tweaked required version of external dependency to an
+          earlier supported version.
+
+0.13  Tue Oct 12 10:45:00 2010
+        - Pulling functionality from user scripts into Sling.pm.
+        - Fixing bugs with user / group additions from file.
+
+0.12  Sat Aug 14 11:35:00 2010
+        - Adding external tests.
+        - Fixing bugs in group membership.
+
+0.11  Tue Aug 10 20:00:00 2010
+        - Moving sakai specific code into Sakai::Nakamura.
+
+0.10  Fri Aug 06 09:20:00 2010
+        - Better conformance to PBP.
+        - Tweaked make file to note relaxed dependencies
+        - fixed syntax bugs in placement of }
+
+0.09  Thu Jul 29 07:25:00 2010
+        - Better conformance to PBP.
+        - Tweaked make file to note dependencies on
+          HTTP::Request::Common, LWP::UserAgent and JSON.
+
+0.08  Sun Jul 25 20:24:00 2010
+        - Better conformance to PBP.
+        - Tweaked make file to note dependency on Net::LDAP.
+
+0.07  Sat Jul 24 11:00:00 2010
+        - Better conformance to PBP.
+        - Tweaked make file to note dependency on Text::CSV.
+
+0.06  Fri Jul 23 14:30:00 2010
+        - Many tests added and some minor bug fixes.
+
+0.05  Fri Jul  2 16:22:00 2010
+        - Adding a library to synchonize sling users with an
+          external LDAP server.
+        - Some minor bug fixes.
+
+0.04  Wed Jun 23 20:10:00 2010
+        - Adding support for group management.
+
+0.03  Wed Jun 23 16:45:00 2010
+        - Adding support for user management. Added a META.yml
+          to define dependencies.
+
+0.02  Wed Jun 23 11:15:00 2010
+        - Tidying up and adherence to perlcritic --harsh
+
+0.01  Wed Jun  2 08:05:00 2010
+        - original version; created by h2xs 1.23 with options
+        -AX Apache::Sling

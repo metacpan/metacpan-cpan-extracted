@@ -1,0 +1,27 @@
+---
+abstract: unknown
+author:
+  - '扶凯 <iakuf@163.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.8, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-Delay
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: 0
+  EV: 0
+  Moo: 0
+  Test::More: 0
+resources:
+  repository: https://github.com/iakuf/AnyEvent-Delay
+version: 0.01

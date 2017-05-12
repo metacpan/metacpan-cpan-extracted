@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+our $VERSION = '0.001'; # VERSION
+
+use App::Spec;
+use App::AppSpec;
+use API::CLI::Cmd;
+use File::Share qw/ dist_file /;
+
+my $specfile = dist_file("API-CLI-Cmd", "apicli-spec.yaml");
+my $spec = App::Spec->read($specfile);
+my $run = $spec->runner;
+$run->run;

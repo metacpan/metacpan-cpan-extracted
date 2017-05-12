@@ -1,0 +1,58 @@
+PerlModule Apache::Filter
+PerlModule Apache::RegistryFilter
+PerlModule Apache::UC
+PerlModule Apache::Reverse
+PerlModule Apache::CacheTest
+PerlModule Apache::FHandle
+PerlModule Apache::ChangeHeader
+
+# A workaround for testing under Mac OS X - see 
+# http://perl.apache.org/docs/1.0/guide/troubleshooting.html#print___doesn_t_send_anything_on_Mac_OS_X
+PerlHeaderParserHandler "sub { tie *STDOUT, 'Apache' unless tied *STDOUT; }"
+
+# Default - this includes directories too
+SetHandler perl-script
+PerlHandler Apache::UC Apache::Reverse
+
+PerlSetVar Filter on
+
+<FilesMatch "\.ur$">
+ SetHandler perl-script
+ PerlHandler Apache::UC Apache::Reverse
+</FilesMatch>
+
+<FilesMatch "\.r$">
+ SetHandler perl-script
+ PerlHandler Apache::Reverse
+</FilesMatch>
+
+<FilesMatch "\.p$">
+ SetHandler perl-script
+ PerlHandler Apache::UC Apache::CacheTest
+</FilesMatch>
+
+<FilesMatch "\.fh$">
+ SetHandler perl-script
+ PerlHandler Apache::FHandle
+</FilesMatch>
+
+<FilesMatch "\.cp$">
+ SetHandler perl-script
+ PerlHandler Apache::RegistryFilter Apache::Compress
+</FilesMatch>
+
+<FilesMatch "\.h$">
+ SetHandler perl-script
+ PerlHandler Apache::ChangeHeader
+</FilesMatch>
+
+<FilesMatch "\.pl$">
+ SetHandler perl-script
+ PerlHandler Apache::RegistryFilter Apache::UC
+</FilesMatch>
+
+<FilesMatch "\.plr$">
+ SetHandler perl-script
+ PerlHandler Apache::RegistryFilter
+</FilesMatch>
+

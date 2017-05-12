@@ -1,0 +1,509 @@
+#!/usr/bin/env perl
+## Copyright © 2011-2015 by Daniel Friesel <derf@finalrewind.org>
+## License: WTFPL:
+##   0. You just DO WHAT THE FUCK YOU WANT TO.
+use strict;
+use warnings;
+use 5.010;
+
+no if $] >= 5.018, warnings => 'experimental::smartmatch';
+
+use App::Raps2;
+use File::BaseDir qw(data_files data_home);
+use File::Slurp qw(read_dir);
+use Getopt::Long qw(:config no_ignore_case);
+
+my ( $chrome, $default_cost, $no_echo, $paste, $pwgen_cmd, $xclip_cmd );
+
+our $VERSION = '0.54';
+
+GetOptions(
+	'c|cost=i'      => \$default_cost,
+	'C|chrome'      => \$chrome,
+	'E|no-echo'     => \$no_echo,
+	'h|help'        => sub { cmd_help(0) },
+	'p|pwgen-cmd=s' => \$pwgen_cmd,
+	'P|paste'       => \$paste,
+	'V|version'     => sub { say "raps2 version ${VERSION}"; exit 0 },
+	'x|xclip-cmd=s' => \$xclip_cmd,
+
+) or cmd_help(1);
+
+if ($chrome) {
+	$xclip_cmd = 'xclip -l 2';
+}
+
+my ( $action, @args ) = @ARGV;
+my $raps2 = App::Raps2->new(
+	cost      => $default_cost,
+	pwgen_cmd => $pwgen_cmd,
+	xclip_cmd => $xclip_cmd,
+);
+
+sub file_must_exist {
+	my ( $file, $name ) = @_;
+
+	if ( not defined $file ) {
+		say STDERR "No such account: ${name}";
+		exit 2;
+	}
+
+	return;
+}
+
+sub file_must_not_exist {
+	my ( $file, $name ) = @_;
+
+	if ( -e $file ) {
+		say STDERR "Account already exists: ${name}";
+		exit 2;
+	}
+
+	return;
+}
+
+sub cmd_add {
+	my ($name) = @_;
+
+	if ( not $name ) {
+		cmd_help( 1, 'add <account>' );
+	}
+
+	my $pwfile = data_home('raps2') . "/${name}";
+
+	file_must_not_exist( $pwfile, $name );
+
+	$raps2->get_master_password();
+
+	my $url   = $raps2->ui->read_line('URL');
+	my $login = $raps2->ui->read_line('Login');
+	my $pass  = $raps2->ui->read_pw( 'Password', 1 );
+	my $extra = $raps2->ui->read_multiline('Additional content');
+
+	if ( length($pass) == 0 ) {
+		$pass = $raps2->generate_password();
+
+		if ( not $pass ) {
+			say STDERR "Password generation failed: ${!}: "
+			  . $raps2->conf('pwgen_cmd');
+			exit 3;
+		}
+
+		if ($paste) {
+			$raps2->ui->to_clipboard( $pass, $raps2->conf('xclip_cmd') );
+		}
+		elsif ( not $no_echo ) {
+			$raps2->ui->output( [ 'Generated password', $pass ] );
+		}
+	}
+
+	$raps2->pw_save(
+		file     => $pwfile,
+		url      => $url,
+		login    => $login,
+		password => $pass,
+		extra    => $extra,
+	);
+
+	return;
+}
+
+sub cmd_dump {
+	my ($name) = @_;
+
+	if ( not $name ) {
+		cmd_help( 1, 'dump <account>' );
+	}
+
+	my $pwfile = data_files("raps2/${name}");
+
+	file_must_exist( $pwfile, $name );
+
+	$raps2->get_master_password();
+
+	my $key = $raps2->pw_load( file => $pwfile );
+
+	$raps2->ui->output(
+		[ 'URL',      $key->{url} ],
+		[ 'Login',    $key->{login} ],
+		[ 'Password', $key->{password} ],
+	);
+	if ( $key->{extra} ) {
+		print $key->{extra};
+	}
+
+	return;
+}
+
+sub cmd_dump_all {
+	my @files = read_dir( data_home('raps2') );
+
+	$raps2->get_master_password();
+
+	for my $file (@files) {
+		my $key = $raps2->pw_load( file => data_files("raps2/${file}") );
+
+		$raps2->ui->output(
+			[ 'Key',      $file ],
+			[ 'URL',      $key->{url} ],
+			[ 'Login',    $key->{login} ],
+			[ 'Password', $key->{password} ],
+		);
+		if ( $key->{extra} ) {
+			print $key->{extra};
+		}
+
+		print "\n";
+	}
+
+	return;
+}
+
+sub cmd_edit {
+	my ($name) = @_;
+
+	if ( not $name ) {
+		cmd_help( 1, 'edit <account>' );
+	}
+
+	my $pwfile = data_files("raps2/${name}");
+
+	file_must_exist( $pwfile, $name );
+
+	$raps2->get_master_password();
+
+	my $key = $raps2->pw_load( file => $pwfile );
+
+	my $salt     = $key->{salt};
+	my $cost     = $key->{cost};
+	my $url      = $raps2->ui->read_line( 'URL', $key->{url} );
+	my $login    = $raps2->ui->read_line( 'Login', $key->{login} );
+	my $pass     = $key->{password};
+	my $new_pass = $raps2->ui->read_pw( 'New password (empty to keep old)', 1 );
+	my $extra    = $key->{extra} // q{};
+
+	if ( length($new_pass) ) {
+		$pass = $new_pass;
+	}
+
+	$raps2->pw_save(
+		file     => $pwfile,
+		salt     => $salt,
+		cost     => $cost,
+		url      => $url,
+		login    => $login,
+		password => $pass,
+		extra    => $extra,
+	);
+
+	return;
+}
+
+sub cmd_get {
+	my ($name) = @_;
+
+	if ( not $name ) {
+		cmd_help( 1, 'get <account>' );
+	}
+
+	my $pwfile = data_files("raps2/${name}");
+
+	file_must_exist( $pwfile, $name );
+
+	$raps2->get_master_password();
+
+	my $key = $raps2->pw_load( file => $pwfile );
+
+	$raps2->ui->to_clipboard( $key->{password}, $raps2->conf('xclip_cmd') )
+	  or die("Could not place password in clipboard: ${!}\n");
+
+	if ( $key->{extra} ) {
+		print $key->{extra};
+	}
+
+	return;
+}
+
+sub cmd_help {
+	my ( $exit_status, $subcmd ) = @_;
+
+	$subcmd //= 'add|get|dump|... [account]';
+
+	say "Usage: raps2 ${subcmd}";
+	say 'See also: "man raps2"';
+
+	exit $exit_status;
+}
+
+sub cmd_info {
+	my ($name) = @_;
+
+	if ( not $name ) {
+		cmd_help( 1, 'info <account>' );
+	}
+
+	my $pwfile = data_files("raps2/${name}");
+
+	file_must_exist( $pwfile, $name );
+
+	my $key = $raps2->pw_load_info( file => $pwfile );
+	$raps2->ui->output( [ 'URL', $key->{url} ], [ 'Login', $key->{login} ], );
+
+	return;
+}
+
+sub cmd_list {
+	my @files = read_dir( data_home('raps2') );
+
+	for my $file ( sort @files ) {
+		my $key = $raps2->pw_load_info( name => $file );
+		$raps2->ui->list(
+			[ 'Account', $file ],
+			[ 'Login',   $key->{login} ],
+			[ 'URL',     $key->{url} ],
+		);
+	}
+
+	return;
+}
+
+sub cmd_remove {
+	my ($name) = @_;
+
+	if ( not $name ) {
+		cmd_help( 1, 'del <account>' );
+	}
+
+	my $pwfile = data_files("raps2/${name}");
+
+	file_must_exist( $pwfile, $name );
+
+	unlink($pwfile)
+	  or die("Could not unlink ${pwfile}: ${!}\n");
+
+	return;
+}
+
+given ($action) {
+	when ('add')      { cmd_add(@args) }
+	when ('del')      { cmd_remove(@args) }
+	when ('dump')     { cmd_dump(@args) }
+	when ('dump-all') { cmd_dump_all(@args) }
+	when ('edit')     { cmd_edit(@args) }
+	when ('get')      { cmd_get(@args) }
+	when ('info')     { cmd_info(@args) }
+	when ('list')     { cmd_list(@args) }
+
+	default { cmd_help(1) }
+}
+
+__END__
+
+=head1 NAME
+
+raps2 - "Right, Another Password Store" take two
+
+=head1 SYNOPSIS
+
+B<raps2> [I<options>] I<action> [I<args ...>]
+
+=head1 VERSION
+
+This manual documents B<raps2> version 0.54
+
+=head1 DESCRIPTION
+
+raps2 is a simple password safe.  You give it a name, a password and optional
+metadata, and it will encrypt and store them for you.  You probably want to
+start with C<< raps2 add accountname >>, and then later use C<< raps2 get
+accountname >> and paste the corresponding password into whatever application
+requires it.  B<raps2> will automatically initialize its store when used for
+the first time.
+
+Supported metadata are "URL", "Login" and the multiline "Extra" field.  URL
+and Login will be saved as plaintext, Extra is encrypted like the password.
+
+=head1 ACTIONS
+
+=over
+
+=item B<add> I<account>
+
+Adds I<account> to the store.  It will ask you for the store's master
+password, some metadata and the new password and then store them.
+
+If you do not provide a password (that is, leave both "Password" and "Verify"
+lines blank), B<raps2> will use the B<pwgen> command to create one for you and
+print the generated password on stdout.
+
+See also the B<-c>, B<-E>, B<-p> and B<-P> options.
+
+=item B<del> I<account>
+
+Remove I<account> from the store.
+
+=item B<dump> I<account>
+
+Dump everything saved for I<account>, including the clear-text password, to
+stdout.
+
+=item B<dump-all>
+
+Dump data for all accounts, including their clear-text passwords, to stdout.
+
+=item B<edit> I<account>
+
+Edit saved data for I<account>.  Note that editing the multiline "extra" field
+is not yet possible.
+
+=item B<get> I<account>
+
+Decrypt I<account>'s password and store it in the primary X Clipboard.  Note
+that it can only be pasted once.  Prints the content of the multiline B<extra>
+field (if present) to stdout.
+
+See also the B<-C> and B<-x> options.
+
+=item B<info> I<account>
+
+Show information about I<account>, does not require the master password.
+
+=item B<list>
+
+List all saved accounts with their respective Logins and URLs
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item B<-c>, B<--cost> I<int>
+
+Key setup cost to use for new passwords, overrides the configuration file.
+Only makes sense with B<raps2 add>.
+
+Please be aware that the key setup time is an exponential function. That is,
+when you increment the cost by 1, the key setup time will double.  See
+Crypt::Eksblowfish(3pm).
+
+Default: 12
+
+=item B<-C>, B<--chrome>
+
+Google Chrome support.  Normally, B<raps2 get> makes sure the password can
+only be pasted once, but Google Chrome (for whatever reason) needs to paste it
+twice.  Do not use this option if you are not going to paste the password into
+a Chrome window.
+
+Basically, this is a shortcut for C<< raps2 -x 'xclip -l 2' >>.  This
+overrides B<-x>.
+
+=item B<-E>, B<--no-echo>
+
+When using the pwgen functionality of B<raps2 add>, do not print the generated
+password on stdout.
+
+=item B<-P>, B<--paste>
+
+When using the pwgen functionality of B<raps2 add>, do not print the generated
+password on stdout.  Place it in the X Clipboard instead.
+
+Note that it can only be pasted once, unless B<-x> or B<-C> is used.
+
+=item B<-p>, B<--pwgen-cmd> I<command>
+
+When the user does not enter a password in B<raps2 add>, it will execute
+I<command> to create one. The first line of output is taken as password.
+If the output contains spaces, anything after the first space (plus the space
+itself) is discarded.
+
+Default: pwgen -s 23 1
+
+=item B<-V>, B<--version>
+
+Show version information.
+
+=item B<-x>, B<--xclip-cmd> I<command>
+
+Command to run for B<raps2 get>.  The password will be available on
+I<command>'s stdin.
+
+Default: xclip -l 1
+
+=back
+
+=head1 EXIT STATUS
+
+zero on success, non-zero otherwise.
+
+=head1 CONFIGURATION
+
+raps2 saves the master password hash in F<~/.config/raps2/password>.
+
+The configuration (key setup cost and pwgen command) is stored in
+F<~/.config/raps2/defaults> in an INI-like format.
+
+Additional encrypted passwords are stored in F<~/.local/share/raps2/>.
+
+These directories can be changed by setting the B<XDG_CONFIG_HOME> and
+B<XDG_DATA_HOME> environment variables.
+
+The following settings are available in F<~/.config/raps2/defaults>:
+
+=over
+
+=item B<cost> = 12
+
+Default key setup cost.  See the B<-c> option.
+
+=item B<pwgen_cmd> = pwgen -s 23 1
+
+Command used to generate passwords.  See the B<-p> option.
+
+=item B<xclip_cmd> = xclip -l 1
+
+Command used to place passwords in the clipboard.  See the B<-x> option.
+
+=back
+
+Note that commandline arguments always override options set in the
+configuration file.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * Config::Tiny
+
+=item * Crypt::CBC
+
+=item * Crypt::Eksblowfish
+
+=item * File::BaseDir
+
+=item * File::Path (usually included with perl core)
+
+=item * File::Slurp
+
+=item * pwgen (if you want C<< raps2 add >> to generate passwords)
+
+=item * xclip (for C<< raps2 get >>)
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+This is alpha software, the store format may change without further notice.
+Backwards-compatibility is not guaranteed.
+
+When running for the first time, raps2 will ask for the master passphrase
+three times. Two would be better.
+
+=head1 AUTHOR
+
+Copyright (C) 2011-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+  0. You just DO WHAT THE FUCK YOU WANT TO.

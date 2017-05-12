@@ -1,0 +1,40 @@
+
+=head1 NAME
+
+AutoCode::AccessorMaker -- making the accessors in the traditional way.
+
+=head1 SYNOPSIS
+
+    use AutoCode::AccessMaker (
+        '$' => [qw(first_name sex)],
+        '@' => ['alias', ['child', 'children']
+    );
+
+    AutoCode::AccessorMaker->make_scalar_accessor('last_name', __PACKAGE__);
+    # If the second argument is omitted, the caller is regarded as default
+    
+    AutoCode::AccessorMaker->make_array_accessor([qw(child children)]);
+
+=head1 DESCRIPTION
+                                                              
+This module is to save the developers to type the same code of accessor     
+day in and day out.                                           
+
+There are two non-exclusive ways to generate the accessors for a module.    
+                                                              
+=over                                                         
+                                                              
+=item 1 using import method                                   
+                                                              
+'import' method is special for Perl module.                   
+It is called when the module get used, like Exporter.         
+And the arguments listed behind the module name are passed into import method.
+                                                              
+This import method requests a hash with limited keys as '$', '@'. 
+The values in the argument hash are the array reference.      
+                                                              
+=head1 AUTHOR                                                 
+                                                              
+Juguang Xiao, juguang at tll.org.sg                           
+                                                              
+=cut 

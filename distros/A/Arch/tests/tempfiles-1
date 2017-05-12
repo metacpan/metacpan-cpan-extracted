@@ -1,0 +1,65 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::TempFiles methods.
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More tests => 22;
+use_ok("Arch::TempFiles", "temp_root", "temp_name");
+
+delete $ENV{TMP_DIR};
+temp_root("/tmp");
+is(temp_root(), "/tmp");
+
+# test 3
+my $file_name1 = temp_name("test");
+ok(!-e $file_name1);
+like($file_name1, qr|/tmp/,,test-\d{6}|);
+
+# test 5
+$ENV{TMP_DIR} = "/tmp/../tmp";
+my $file_name2 = temp_name("test");
+isnt($file_name1, $file_name2);
+ok(!-e $file_name2);
+like($file_name2, qr|/tmp/,,test-\d{6}|);
+
+# test 8
+my $tmp = Arch::TempFiles->new;
+my $root = $tmp->root;
+is($root, "/tmp/../tmp");
+
+# test 9
+my $dir_name1 = $tmp->dir;
+ok(-d $dir_name1);
+like($dir_name1, qr|$root/,,arch-\d{6}|);
+
+# test 11
+$tmp->root($dir_name1);
+my $dir_name2 = $tmp->dir_name("tip-top");
+ok(!-d $dir_name2);
+like($dir_name2, qr|$dir_name1/,,tip-top-\d{6}|);
+ok(mkdir($dir_name2, 0777));
+
+# test 14
+my $file_name3 = $tmp->file_name();
+like($file_name3, qr|$dir_name1/,,arch-\d{6}|);
+ok(!-f $file_name3);
+
+# test 16
+undef $tmp;
+ok(!-f $file_name3);
+ok(!-d $dir_name2);
+ok(!-d $dir_name1);
+
+# test 19
+$tmp = Arch::TempFiles->new;
+is($tmp->root("/tmp"), "/tmp");
+is($tmp->root, "/tmp");
+my $file_name4 = $tmp->file(",,,");
+like($file_name4, qr/,,,,,-/);
+
+# test 22
+undef $tmp;
+ok(!-f $file_name4);
+

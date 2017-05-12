@@ -1,0 +1,21 @@
+Revision history for AnyEvent-Digest
+
+v0.0.5    2013-10-08 23:28:32 Asia/Tokyo
+    - Fix memory leaks by holding a loop sub reference (gh-8) (Thanks Zhou YuanYuan and iakuf@github).
+
+v0.0.4    2013-09-26 16:31:25 Asia/Tokyo
+    [Non-functional changes]
+        - Update DZP::Test::Compile to avoid possible Win32 hangs in tests.
+
+v0.0.3    2013-09-11 23:58:11 Asia/Tokyo
+    [Non-functional changes]
+        - Fix hang of tests on Win32 (close gh-6).
+        - Use eval guard for build_prereq_matchs_use in Kwalitee tests.
+
+v0.0.2    2013-09-08 18:41:19 Asia/Tokyo
+    [Non-functional changes]
+        - Add optional preereqs (close gh-3).
+        - Add a guard for IO::AIO and AnyEvent::AIO to t/03-async-aio.t (close gh-3).
+
+v0.0.1    2013-09-08 01:03:23 Asia/Tokyo
+    - Initial release.

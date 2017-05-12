@@ -1,0 +1,26 @@
+Audio-BASSXS version 0.01
+=========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+DEPENDENCIES
+
+This module needs to have the BASS audio library installed. You can download
+BASS from http://www.un4seen.com/bass.html. To successfully compile this
+module, the bass.h, bass.lib and bass.dll need to be available
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Jouke Visser
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

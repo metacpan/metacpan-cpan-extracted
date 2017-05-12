@@ -1,0 +1,31 @@
+---
+abstract: 'Convert ASCII text into look-somewhat-alike unicode'
+author:
+  - 'Joel Maslak <jmaslak@antelope.net>'
+build_requires:
+  Encode: '0'
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Unicodify
+provides:
+  Acme::Unicodify:
+    file: lib/Acme/Unicodify.pm
+    version: '0.006'
+requires:
+  Carp: '0'
+  File::Slurper: '0.008'
+  Unicode::Normalize: '0'
+  autodie: '0'
+  perl: v5.22.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+version: '0.006'

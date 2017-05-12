@@ -1,0 +1,145 @@
+Acme-GuessNumber Installation Guide
+
+* Table of Contents
+
+   * System Requirements
+   * Installation Instruction
+     ** Install with ExtUtils::MakeMaker
+     ** Install with Module::Build
+     ** Install with the CPAN Shell
+     ** Install with the CPANPLUS Shell
+
+
+* System Requirements
+
+   1. Perl, version 5 or above.  To be a winner of the game you have
+no option but Perl 5.  You can run perl -v to see your current Perl
+version.  If you don't have Perl, or if you have an older version of
+Perl, you can download and install/upgrade it from Perl website.
+
+http://www.perl.com/
+
+      If you are using MS-Windows, you can download and install
+ActiveState ActivePerl.
+
+http://www.activestate.com/
+
+   2. Required Perl modules: None.
+
+   3. Optional Perl modules: none
+
+
+* Installation Instruction
+
+** Install with ExtUtils::MakeMaker
+
+    arclog uses standard Perl installation with ExtUtils::MakeMaker.
+Follow these steps:
+
+    % perl Makefile.PL
+    % make
+    % make test
+    % make install
+
+    When running make install, make sure you have the priviledge to
+write to the installation location.  This usually requires the root
+priviledge.
+
+    If you are using ActivePerl under MS-Windows, you should use
+nmake instead of make. nmake can be obtained from the Microsoft FTP
+site.
+
+ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
+
+    If you want to install into another location, you can set the
+PREFIX.  For example, to install into your home when you are not
+root:
+
+    % perl Makefile.PL PREFIX=/home/jessica
+
+    Refer to the docuemntation of ExtUtils::MakeMaker for more
+installation options (by running perldoc ExtUtils::MakeMaker).
+
+
+** Install with Module::Build
+
+    You can install with Module::Build instead, if you prefer.
+Follow these steps:
+
+    % perl Build.PL
+    % ./Build
+    % ./Build test
+    % ./Build install
+
+    When running ./Build install, make sure you have the priviledge to
+write to the installation location.  This usually requires the root
+priviledge.
+
+    If you want to install into another location, you can set the
+--prefix.  For example, to install into your home when you are not
+root:
+
+    % perl Build.PL --prefix=/home/jessica
+
+    Refer to the docuemntation of Module::Build for more
+installation options (by running perldoc Module::Build).
+
+
+** Install with the CPAN Shell
+
+    You can install with the CPAN shell, if you prefer.  CPAN shell
+takes care of ExtUtils::MakeMaker and Module::Build for you:
+
+    % cpan Acme::GuessNumber
+
+    Make sure you have the priviledge to write to the installation
+location.  This usually requires the root priviledge.  Since CPAN
+shell 1.81 you can set "make_install_make_command" and
+"mbuild_install_build_command" in your CPAN configuration to switch
+to root just before install:
+
+    % cpan
+    cpan> o conf make_install_make_command "sudo make"
+    cpan> o conf mbuild_install_build_command "sudo ./Build"
+    cpan> install Acme::GuessNumber
+
+    If you want to install into another location, you can set the
+"makepl_arg" and "mbuild_arg" in your CPAN configuration.  For
+example, to install into your home when you are not root:
+
+    % cpan
+    cpan> o conf makepl_arg "PREFIX=/home/jessica"
+    cpan> o conf mbuild_arg "--prefix=/home/jessica"
+    cpan> install Acme::GuessNumber
+
+    Refer to the docuemntation of cpan for more CPAN shell commands
+(by running perldoc cpan).
+
+
+** Install with the CPANPLUS Shell
+
+    You can install with the CPANPLUS shell, if you prefer.  CPANPLUS
+shell takes care of ExtUtils::MakeMaker and Module::Build for you:
+
+    % cpanp -i Acme::GuessNumber
+
+    Make sure you have the priviledge to write to the installation
+location.  This usually requires the root priviledge.
+
+    If you want to install into another location, you can set the
+"makemakerflags" and "buildflags" in your CPANPLUS configuration.
+For example, to install into your home when you are not root:
+
+    % cpanp
+    CPAN Terminal> s conf makemakerflags "PREFIX=/home/jessica"
+    CPAN Terminal> s conf buildflags "--prefix=/home/jessica"
+    CPAN Terminal> install Acme::GuessNumber
+
+    Refer to the docuemntation of cpanp for more CPANPLUS shell
+commands (by running perldoc cpanp).
+
+
+imacat
+2008-04-22
+imacat@mail.imacat.idv.tw
+http://www.imacat.idv.tw/

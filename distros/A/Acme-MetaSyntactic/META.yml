@@ -1,0 +1,97 @@
+---
+abstract: 'Themed metasyntactic variables names'
+author:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+build_requires:
+  Cwd: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - metasyntactic
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-MetaSyntactic
+requires:
+  Carp: '0'
+  File::Basename: '0'
+  File::Glob: '0'
+  File::Spec: '0'
+  LWP::UserAgent: '0'
+  List::Util: '0'
+  Test::Builder::Module: '0'
+  Win32::Locale: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-MetaSyntactic
+  repository: http://github.com/book/Acme-MetaSyntactic.git
+version: '1.013'
+x_contributors:
+  - 'Abigail <abigail@cpan.org>'
+  - 'Brian Gottreu <gottreu@cpan.org>'
+  - 'David H. Adler <dha@panix.com>'
+  - 'Éric Cassagnard <eric.cassagnard@gmail.com>'
+  - 'Éric Guirbal <eguirbal@cpan.org>'
+  - 'Jean Forget <jforget@cpan.org>'
+  - 'Laurent Gautrot <l.gautrot@free.fr>'
+  - 'Sébastien Aperghis-Tramoni <saper@cpan.org>'
+  - Abigail
+  - 'Alberto Manuel Brandao Simoes'
+  - 'Aldo Calpini'
+  - 'Anja Krebber'
+  - anonymous
+  - 'Antoine Hulin'
+  - 'Cedric Bouvier'
+  - 'David Golden'
+  - 'David H Adler'
+  - 'David Landgren'
+  - 'Elliot Shank'
+  - 'Eric Cholet'
+  - 'Estelle Souche'
+  - 'Flavio Poletti'
+  - 'Gaal Yahas'
+  - 'Gabor Szabo'
+  - 'Gisbert W Selke'
+  - 'Guy Widloecher'
+  - 'Hakim Cassimally'
+  - 'Jan Pieter Cornet'
+  - 'Jean Forget'
+  - 'Jerome Fenal'
+  - 'Jose Castro'
+  - 'Leon Brocard'
+  - 'Mark Fowler'
+  - 'Martin Vorlander'
+  - 'Matthew Musgrove'
+  - 'Max Maischein'
+  - 'Michael Scherer'
+  - 'Michel Rodriguez'
+  - 'Mike Castle'
+  - 'Miss Barbie'
+  - 'Nicholas Clark'
+  - 'Offer Kaye'
+  - 'Olivier Mengue'
+  - 'Paul Christophe Varoutas'
+  - 'Rafael Garcia Suarez'
+  - 'Ricardo Signes'
+  - 'Scott Lanning'
+  - 'Sebastien Aperghis Tramoni'
+  - 'Simon Myers'
+  - 'Vahe Sarkissian'
+  - 'Xavier Caron'
+  - 'Yanick Champoux'
+x_serialization_backend: 'YAML::Tiny version 1.70'

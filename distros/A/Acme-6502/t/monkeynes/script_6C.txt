@@ -1,0 +1,28 @@
+clear
+power on
+regs
+
+# Normal case -------------------
+memset beef ad
+memset bef0 de
+
+op 6c efbe
+
+# Should be: PC=DEAD
+test pc = dead
+
+# Chip Bug case -----------------
+power on
+memclear
+memset be00 de
+memset beff ad
+memset bf00 88
+
+op 6c ffbe
+
+# Should be: PC=DEAD (Not 88AD)
+regs pc
+test pc = dead
+test pc != 88ad
+
+save verify_6C.txt

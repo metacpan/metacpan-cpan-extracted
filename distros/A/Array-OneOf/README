@@ -1,0 +1,82 @@
+NAME
+
+    Array::OneOf -- checks if an element is in an array
+
+SYNOPSIS
+
+     use Array::OneOf ':all';
+     
+     # this test will pass
+     if (oneof 'a', 'a', 'b', 'c') {
+        # do stuff
+     }
+     
+     # this test will not pass
+     if (oneof 'x', 'a', 'b', 'c') {
+        # do stuff
+     }
+
+DESCRIPTION
+
+    Array::OneOf provides one simple utility, the oneof function. Its use
+    is simple: if the first param is equal to any of the remaining params
+    (in a string comparison), it returns true. Otherwise it returns false.
+
+    In this module, undef is considered the same as undef, and not the same
+    as any defined value. This is different than how most Perl programmers
+    usually expect comparisons to work, so caveat programmer.
+
+ALTERNATIVES
+
+    Array::OneOf is not a particularly efficient way to test if a value is
+    in an array. If efficiency is an important goal you may want to look at
+    List::MoreUtils or Syntax::Keyword::Junction. You may also want to
+    investigate using grep and/or the smart match operator (~~). I use
+    Array::OneOf because it compares values the way my projects need them
+    compared, its simple syntax, and small footprint.
+
+INSTALLATION
+
+    Array::OneOf can be installed with the usual routine:
+
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+TERMS AND CONDITIONS
+
+    Copyright (c) 2012-2013 by Miko O'Sullivan. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. This software comes with NO
+    WARRANTY of any kind.
+
+AUTHOR
+
+    Miko O'Sullivan miko@idocs.com
+
+HISTORY
+
+    Version 1.00 November 22, 2012
+
+      Initial release.
+
+    Version 1.01 November 25, 2012
+
+      Removed dependency on String::Util. Clarified in documentation the
+      advantages and disadvantages of Array::OneOf, and suggested some
+      alternative modules.
+
+    Version 1.02 November 28, 2012
+
+      Cleaned up test.pl so that it compiles on many of the testers'
+      machines.
+
+    Version 1.03 February 5, 2013
+
+      Fixed problem with mismatched newlines.
+
+    Version 1.04 April 25, 2014
+
+      Fixed problem in CPAN package.
+

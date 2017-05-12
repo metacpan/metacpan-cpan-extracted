@@ -1,0 +1,43 @@
+---
+abstract: 'Fetch/build/stash the SamTools headers and libs.'
+author:
+  - 'George Hartzell'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  Alien::Base::ModuleBuild: '0'
+  Module::Build: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-SamTools
+no_index:
+  directory:
+    - t
+provides:
+  Alien::SamTools:
+    file: lib/Alien/SamTools.pm
+    version: '0.002'
+requires:
+  Alien::Base: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/hartzell/alien-samtools/issues
+  homepage: https://github.com/hartzell/alien-samtools
+  repository: https://github.com/hartzell/alien-samtools.git
+version: '0.002'
+x_authority: cpan:HARTZELL

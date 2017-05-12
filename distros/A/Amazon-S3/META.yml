@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               Amazon-S3
+version:            0.45
+abstract:           ~
+author:
+    - Timothy Appnel <tima@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Accessor::Fast:  0
+    Digest::HMAC_SHA1:    0
+    Digest::MD5::File:    0
+    HTTP::Date:           0
+    IO::File:             0
+    LWP::UserAgent::Determined:  0
+    MIME::Base64:         0
+    Test::More:           0.01
+    URI::Escape:          0
+    XML::Simple:          1.08
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

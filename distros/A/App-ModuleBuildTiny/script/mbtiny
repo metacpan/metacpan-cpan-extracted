@@ -1,0 +1,173 @@
+#! perl
+
+use strict;
+use warnings FATAL => 'all';
+use App::ModuleBuildTiny;
+
+modulebuildtiny(@ARGV);
+
+=head1 NAME
+
+mbtiny - A standalone authoring script for Module::Build::Tiny
+
+=head1 VERSION
+
+version 0.019
+
+=head1 SYNOPSIS
+
+ mbtiny listdeps | cpanm
+ mbtiny test --release
+ mbtiny dist
+
+=head1 OVERVIEW
+
+Essentially C<mbtiny> does only one thing: generate the ancillary files of a distribution with L<App::ModuleBuildTiny>. To be more exact, it can generate:
+
+=over 4
+
+=item * Build.PL
+
+This contain the code needed to build the dist using L<Module::Build::Tiny|Module::Build::Tiny>.
+
+=item * MANIFEST
+
+This contains the list of files in this distribution, and optionally descriptions.
+
+=item * META.json
+
+The file containing most meta information about this distributions. Useful for both presenting information to the user as for installing the distribution.
+
+=item * META.yml
+
+This is the legacy meta file. This is mainly useful for bootstrapping on CPAN clients too old to support META.json but recent enough to support configure_requires.
+
+=back
+
+The information for these files is gathered from various sources. The distribution name is taken from the local directory name. The version, abstract and author are taken from the main module of the distribution. Prerequisites are mostly taken from a L<cpanfile>, except when injected explicitly (e.g. a configure dependency on L<Module::Build::Tiny|Module::Build::Tiny>). A C<metamerge.json> or C<metamerge.yml> file can be used to merge any additional meta information you want (including dependencies).
+
+=head1 WORKFLOWS
+
+It supports two different workflows, which I call Feedback and Generator. In both cases, additional tools are used for various other authoring tasks such as perl-reversion, scan-prereqs-cpanfile and cpan-upload.
+
+=head2 Feedback
+
+In this workflow you're commiting the generated files to the filesystem/repository, in particular using the C<regenerate> command.
+
+=head2 Generator
+
+In this workflow the generated files aren't written back to the file system, instead they are generated on every mbtiny command.
+
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item * dist
+
+This creates a distribution tarball.
+
+=item * distdir
+
+This creates a directory containing all of the files of the distribution.
+
+=item * test
+
+This runs all of the tests of a distribution. It takes two options that can both be negated:
+
+=over 4
+
+=item * release
+
+Run release tests. Defaults to false.
+
+=item * author
+
+Run author tests. Defaults to true.
+
+=back
+
+=item * run
+
+Run the specified command in a build distribution. It takes one boolean argument:
+
+=over 4
+
+=item * no-build
+
+This will cause mbtiny not to build the distribution before running the command.
+
+=back
+
+=item * shell
+
+Runs the C<$SHELL>, this is equivalent to C<mbtiny run --no-build $SHELL>. It takes one argument.
+
+=over 4
+
+=item * build
+
+This will cause mbtiny to build the distribution before running the shell.
+
+=back
+
+=item * listdeps
+
+List all dependencies of this distribution. By default it prints a list of modules. If the C<json> option option is given, it's printed as JSON instead.
+
+=item * regenerate <files>
+
+This regenerates the given files. If no files are given, it defaults to the six files it can regenerate: F<Build.PL>, F<MANIFEST>, F<META.json> F<META.yml>, F<LICENSE> and F<README>. You usually want to do this after bumping the version of a module, adding a dependency or adding a file.
+
+=item * mint <distribution>
+
+This creates a new distribution. It takes one mandatory positional argument, the name of the new distribution, and up to five optional named arguments
+
+=over 4
+
+=item * abstract
+
+The abstract of this new distribution. It defaults to an empty string.
+
+=item * author
+
+The name of the author of this distribution. The default value is set in the configuration file.
+
+=item * dirname
+
+The directory name for the new distribution. It defaults to the distribution name.
+
+=item * email
+
+The email address of the author. The default value is set in the configuration file.
+
+=item * license
+
+The license of the new distribution. It default is set in the configuration file, this is usually C<Perl_5>.
+
+=item * version
+
+The initial version of the new distribution. This defaults to C<0.001>.
+
+=back
+
+=item * configure <type>
+
+This creates or update your configuration file (at F<~/.mbtiny/config>). It takes one optional position argument that can take any of the following values:
+
+=over 4
+
+=item * update
+
+This asks you about all configuration items that are currently empty. This is the default.
+
+=item * all
+
+This asks you about all configuration items, even if they currently have a value.
+
+=item * reset
+
+This removes the current configuration file.
+
+=back
+
+=back

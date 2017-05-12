@@ -1,0 +1,8 @@
+Revision history for Perl extension Acme::MomoiroClover.
+
+0.02  Sep 15 2011
+    - calculate age fixed by @sugyan
+    - remove space by @sugyan
+
+0.01  Sep 4 2011
+    - initial release

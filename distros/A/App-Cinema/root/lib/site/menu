@@ -1,0 +1,32 @@
+<!-- BEGIN site/menu -->
+  <ul>
+    <!--<li class="current_page_item"><a href="/">Home</a></li>-->
+    <li><a title="home page" 
+    	HREF="[% Catalyst.uri_for('/menu/home') %]">Home</a></li>
+    [% IF !Catalyst.user_exists %]
+    <li><a title="sign in" 
+    	HREF="[% Catalyst.uri_for('/user/add') %]">Register</a></li>
+    [% END %]
+    <li><a title="manage your account" 
+    	HREF="[% Catalyst.uri_for('/menu/search') %]?sel=user">Account</a></li>
+    <li><a title="programmer's daily log" 
+    	HREF="[% Catalyst.uri_for('/menu/search') %]?sel=news">MyLog</a></li>
+    <li><a title="users' history" 
+    	HREF="[% Catalyst.uri_for("/menu/search") %]?sel=event">event</a></li>
+    <li><a title="comment, author's profile" 
+    	HREF="[% Catalyst.uri_for('/menu/about') %]">About</a></li>
+    <li><span id="search">
+		    <form action="[% Catalyst.uri_for('/menu/search') %]" method="POST">
+				<select id="sel" name="sel" class="options">				
+					<option value="item">MOVIE</option>
+					<option value="news">MYLOG</option>
+					<option value="event">EVENT</option>					
+					<option value="user">USER</option>
+				</select>
+				<input type="text" name="txt" value="[% Catalyst.session.str %]">
+				<input type="submit" value="Search"/>
+			</form>
+		</span>
+	</li> 
+  </ul>
+<!-- END site/menu -->

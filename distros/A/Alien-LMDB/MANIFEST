@@ -1,0 +1,8 @@
+Build.PL
+Changes
+inc/LMDB_0.9.19.tar.gz
+lib/Alien/LMDB.pm
+MANIFEST			This list of files
+META.json
+META.yml
+t/installed.t

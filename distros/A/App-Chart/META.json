@@ -1,0 +1,263 @@
+{
+   "abstract" : "Stock and commodity charting program.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Chart",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "misc",
+         "doc",
+         "po"
+      ],
+      "package" : [
+         "Gtk2::Ex::Datasheet::DBI::CellRendererText"
+      ]
+   },
+   "optional_features" : {
+      "check_isin" : {
+         "description" : "Validate downloaded ISIN values.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Business::ISIN" : "0"
+               }
+            }
+         }
+      },
+      "maximum_diagnostics" : {
+         "description" : "Have as much information as possible in the Help/Diagnostics dialog.",
+         "prereqs" : {
+            "runtime" : {
+               "recommends" : {
+                  "Devel::Arena" : "0"
+               },
+               "requires" : {
+                  "BSD::Resource" : "0",
+                  "Devel::FindBlessedRefs" : "0",
+                  "Devel::Mallinfo" : "0",
+                  "Devel::Peek" : "0",
+                  "Devel::SawAmpersand" : "0"
+               }
+            }
+         }
+      },
+      "maximum_error_info" : {
+         "description" : "Have as much information as possible in the Error dialog.",
+         "prereqs" : {
+            "runtime" : {
+               "recommends" : {
+                  "Devel::StackTrace" : "1.19"
+               },
+               "requires" : {
+                  "Devel::StackTrace" : "0"
+               }
+            }
+         }
+      },
+      "maximum_indicators" : {
+         "description" : "Have as many indicators available as possible.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Finance::TA" : "0",
+                  "GT::Indicators" : "0"
+               }
+            }
+         }
+      },
+      "maximum_sources" : {
+         "description" : "Have as many data sources available as possible.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Finance::Quote" : "0",
+                  "Finance::Quote::TSP" : "0"
+               }
+            }
+         }
+      },
+      "source_FQ" : {
+         "description" : "Finance::Quote data source.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Finance::Quote" : "0"
+               }
+            }
+         }
+      },
+      "source_TSP" : {
+         "description" : "Thrift Savings Plan data source.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Finance::Quote::TSP" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Image::ExifTool" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "I18N::Langinfo::Wide" : "2",
+            "Module::Pluggable" : "4.7",
+            "Set::IntSpan::Fast::XS" : "0.05"
+         },
+         "requires" : {
+            "Class::Singleton" : "1.4",
+            "Class::WeakSingleton" : "0",
+            "DBD::SQLite" : "1.27",
+            "DBI" : "0",
+            "DBI::Const::GetInfoType" : "0",
+            "Date::Calc" : "5.0",
+            "Date::Parse" : "0",
+            "Encode::Locale" : "0",
+            "File::HomeDir" : "0.61",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Glib" : "1.220",
+            "Glib::Ex::ConnectProperties" : "18",
+            "Glib::Ex::FreezeNotify" : "1",
+            "Glib::Ex::ObjectBits" : "12",
+            "Glib::Ex::SignalBits" : "9",
+            "Glib::Ex::SignalIds" : "16",
+            "Glib::Ex::SourceIds" : "2",
+            "Glib::Object::Subclass" : "0",
+            "Gtk2" : "1.220",
+            "Gtk2::Ex::ActionTooltips" : "10",
+            "Gtk2::Ex::AdjustmentBits" : "47",
+            "Gtk2::Ex::CrossHair" : "17",
+            "Gtk2::Ex::Datasheet::DBI" : "0",
+            "Gtk2::Ex::DateSpinner" : "2",
+            "Gtk2::Ex::DateSpinner::CellRenderer" : "0",
+            "Gtk2::Ex::Dragger" : "2",
+            "Gtk2::Ex::EntryBits" : "11",
+            "Gtk2::Ex::ErrorTextDialog" : "2",
+            "Gtk2::Ex::ErrorTextDialog::Handler" : "2",
+            "Gtk2::Ex::GdkBits" : "23",
+            "Gtk2::Ex::History" : "1",
+            "Gtk2::Ex::History::Action" : "1",
+            "Gtk2::Ex::KeySnooper" : "3",
+            "Gtk2::Ex::Lasso" : "1",
+            "Gtk2::Ex::ListModelConcat" : "1",
+            "Gtk2::Ex::MenuBits" : "17",
+            "Gtk2::Ex::MenuView" : "1",
+            "Gtk2::Ex::NoShrink" : "2",
+            "Gtk2::Ex::NumAxis" : "4",
+            "Gtk2::Ex::PixbufBits" : "35",
+            "Gtk2::Ex::Statusbar::Message" : "47",
+            "Gtk2::Ex::Statusbar::MessageUntilKey" : "11",
+            "Gtk2::Ex::TableBits" : "47",
+            "Gtk2::Ex::TextBufferBits" : "18",
+            "Gtk2::Ex::TextView::FollowAppend" : "1",
+            "Gtk2::Ex::TickerView" : "7",
+            "Gtk2::Ex::TreeModel::ImplBits" : "17",
+            "Gtk2::Ex::TreeModelBits" : "16",
+            "Gtk2::Ex::TreeModelFilter::Change" : "9",
+            "Gtk2::Ex::TreeModelFilter::Draggable" : "0",
+            "Gtk2::Ex::TreeViewBits" : "8",
+            "Gtk2::Ex::Units" : "13",
+            "Gtk2::Ex::WidgetBits" : "10",
+            "Gtk2::Ex::WidgetCursor" : "8",
+            "Gtk2::Ex::WidgetEvents" : "21",
+            "Gtk2::Pango" : "0",
+            "HTML::Form" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTML::TableExtract" : "0",
+            "HTML::TreeBuilder" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Message" : "5.814",
+            "HTTP::Request" : "0",
+            "IO::String" : "1.07",
+            "LWP" : "5.814",
+            "LWP::UserAgent" : "0",
+            "Lisp::Printer" : "0",
+            "Lisp::Reader" : "0.04",
+            "Lisp::Symbol" : "0",
+            "List::MoreUtils" : "0.24",
+            "Locale::Messages" : "1.19",
+            "Locale::TextDomain" : "1.19",
+            "Math::Round" : "0",
+            "Module::Find" : "0.06",
+            "Module::Pluggable" : "0",
+            "Module::Util" : "0",
+            "Number::Format" : "1.60",
+            "POSIX::Wide" : "0",
+            "PerlIO::via::EscStatus" : "2",
+            "PerlIO::via::EscStatus::Parser" : "0",
+            "PerlIO::via::EscStatus::ShowAll" : "0",
+            "PerlIO::via::EscStatus::ShowNone" : "0",
+            "Proc::SyncExec" : "0",
+            "Regexp::Common" : "0",
+            "Regexp::Tr" : "0",
+            "Set::IntSpan::Fast" : "1.10",
+            "Software::License::GPL_3" : "0.001",
+            "Spreadsheet::ParseExcel" : "0",
+            "Spreadsheet::ParseExcel::Utility" : "0",
+            "Text::CSV_XS" : "0",
+            "Text::Glob" : "0",
+            "Tie::Cache" : "0",
+            "Tie::IxHash" : "0",
+            "Tie::TZ" : "1",
+            "Time::TZ" : "6",
+            "URI::Escape" : "0",
+            "URI::file" : "0",
+            "constant::defer" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Weaken::Gtk2" : "17"
+         },
+         "suggests" : {
+            "Test::Compile" : "0.08",
+            "Test::MockTime" : "0.03",
+            "Test::MockTime::DateCalc" : "0",
+            "Test::UseAllModules" : "0",
+            "Test::Weaken" : "3",
+            "Test::Weaken::ExtraBits" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/chart/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "260",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

@@ -1,0 +1,39 @@
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use App::Toodledo;
+use App::Toodledo::Task;
+
+# Example program: Add a new task to 'no folder'
+
+my $task = App::Toodledo::Task->new;
+$task->title( 'Put the cat out' );
+
+my $todo = App::Toodledo->new;
+$todo->login_from_rc;
+
+my $id = $todo->add_task( $task );
+
+print "Added as task # $id\n";
+
+
+__END__
+
+=head1 NAME
+
+toodledo_add
+
+=head1 SYNOPSIS
+
+  toodledo_add
+
+=head1 DESCRIPTION
+
+Demonstrate how to add a task to Toodledo.
+
+=head1 AUTHOR
+
+Peter J. Scott, C<< <cpan at psdt.com> >>
+
+=cut

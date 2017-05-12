@@ -1,0 +1,40 @@
+Audio-Scrobbler version 0.01
+============================
+
+The Audio-Scrobbler module provides a Perl and command-line interface
+to Last.fm's AudioScrobbler - http://www.audioscrobbler.com/.
+For the present, only track submission is implemented, but more is
+planned for the future :)
+
+The Perl interface is the Audio::Scrobbler module, and the command-line
+tool is scrobbler-helper; see the respective manual pages for more
+information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Config::IniFiles
+  Digest::MD5
+  Encode (should be provided with the Perl runtime)
+  Getopt::Std (should be provided with the Perl runtime)
+  libwww-perl
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, 2006 by Peter Pentchev
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+$Id: README 88 2006-01-02 09:16:32Z roam $

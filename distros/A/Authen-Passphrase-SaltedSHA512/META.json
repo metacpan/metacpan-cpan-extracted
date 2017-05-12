@@ -1,0 +1,45 @@
+{
+   "abstract" : "Safe, Sane, and Simple passphrase salting,",
+   "author" : [
+      "David Oswald <davido [@at] cpan [d.o.t] org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Authen-Passphrase-SaltedSHA512",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "English" : "0",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.62"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::Passphrase" : "0",
+            "Bytes::Random::Secure" : "0.20",
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {},
+   "version" : "0.07"
+}

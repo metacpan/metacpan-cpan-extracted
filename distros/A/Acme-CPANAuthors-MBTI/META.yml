@@ -1,0 +1,35 @@
+---
+abstract: 'CPAN Authors by MBTI Type'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-CPANAuthors-MBTI
+provides:
+  Acme::CPANAuthors::MBTI:
+    file: lib/Acme/CPANAuthors/MBTI.pm
+    version: '0.001002'
+  Acme::CPANAuthors::MBTI::INTP:
+    file: lib/Acme/CPANAuthors/MBTI/INTP.pm
+    version: '0.001002'
+requires:
+  Acme::CPANAuthors: '0.24'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Acme-CPANAuthors-MBTI/issues
+  homepage: https://github.com/kentnl/Acme-CPANAuthors-MBTI
+  repository: https://github.com/kentnl/Acme-CPANAuthors-MBTI.git
+version: '0.001002'

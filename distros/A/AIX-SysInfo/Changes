@@ -1,0 +1,19 @@
+Revision history for Perl extension AIX::SysInfo.
+
+1.2		2009-06-17 
+		- Fixed the bug with packaging of the module
+		- Added these keys: kernel_type, firmware_ver, proc_type
+
+1.1             2009-06-16
+		sleonov@cpan.org SLEONOV
+                - Rewritten from scratch
+                - Added lpar_info and lpar_id
+                - Changed many functions on how they obtain system information
+                - Dropped support for original sys_arch and model_type due to
+                  the fact it is useless for newer pSeries hardware.
+                  Instead I simply use "uname -M"
+
+
+1.0		2001-07-03
+		- first public release
+

@@ -1,0 +1,24 @@
+Revision history for Perl extension AnyEvent::Lingr
+
+0.07 2013-03-21T11:42:00+09:00
+     - fixed observe event error message was undef on http level error.
+
+0.06 2013-03-19T11:41:00+09:00
+     - added one more missing prereq: URI
+
+0.05 2013-03-18T16:09:00+09:00
+     - fixed a bug that 'cb' parameter of say method should be optional, but not in 0.04
+
+0.04 2013-03-18T09:14:00+09:00
+     - added a missing prereq.
+
+0.03 2013-03-18T09:09:00+09:00
+     - added a callback for say method for getting API response. (xaicron)
+     - fixed some debug messages
+
+0.02 2013-03-15T11:45:00+09:00
+     - change observe event timeout 300 to 60
+     - fixed observe event error message was undef on http level error.
+
+0.01 2013-03-14T18:50:00+09:00
+     - initial version

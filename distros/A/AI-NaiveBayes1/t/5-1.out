@@ -1,0 +1,32 @@
+Model:
+category | P(category) 
+---+---
+spam=N   | 0.15        
+spam=Y   | 0.85        
+---+---
+
+category | html | P( html | category ) 
+---+---+---
+spam=N   | N    | 0.666666666666    
+spam=N   | Y    | 0.333333333333    
+---+---+---
+spam=Y   | N    | 0.058823529411   
+spam=Y   | Y    | 0.941176470588    
+---+---+---
+
+category | morning | P( morning | category ) 
+---+---+---
+spam=N   | N       | 0.333333333333       
+spam=N   | Y       | 0.666666666666       
+---+---+---
+spam=Y   | N       | 0.647058823529       
+spam=Y   | Y       | 0.352941176470       
+---+---+---
+
+category | size | P( size | category )                                    
+---+---+---
+spam=N   | real | Gaussian(mean=1443.3333333333,stddev=1521.3077707463) 
+---+---+---
+spam=Y   | real | Gaussian(mean=2344.6470588235,stddev=1397.4010672126) 
+---+---+---
+

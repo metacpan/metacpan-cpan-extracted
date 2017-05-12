@@ -1,0 +1,74 @@
+Revision history for Apache-AppSamurai
+
+1.01	2008-05-03
+        * REQUIRED CHANGE - The new login form signature check (described
+          below) require changes to login.pl and login.html.  It is
+          recommended that you replace your existing login.pl with
+          examples/htdocs/login.pl.  To preserve your customizations
+          to login.html, it is recommended that you add in changes manually.
+          For most cases, you should be able to add lines right after:
+
+            <input type="hidden" name="destination" value="__URI__" />
+
+          to support the changes.  Add the following to your login.html:
+
+            <input type="hidden" name="nonce" value="__NONCE__" />
+            <input type="hidden" name="sig" value="__SIG__" />
+
+        * Added nonce and signature to login.pl login form and checking
+          in Apache::AppSamurai::login().  All form logins must now provide
+          a valid nonce and signature.  This is a Cross Site Request Forgery
+          style protection, but since the user is not yet logged in, does
+          not ACTUALLY provide CSRF protection.  Instead, it is a additional
+          bar to raise and prevent some types of scripted brute force/DoS
+          attempts.
+
+        * Added AuthSimple.pm, a authentication module for the
+          Authen::Simple authentication framework, which supports
+          numerous authentication methods (Kerberos, LDAP, PAM, etc.)
+
+	* Changed Build.PL to attempt to pre-detect mod_perl version
+          installed, adding requirement for mod_perl 2 if nothing is
+          found
+
+        * Changed Build.PL to attempt to pre-detect cipher module
+          for use with Crypt::CBC, adding requirement for
+          Crypt::Rijndael if none are found
+
+        * Added "use warnings" to all modules
+
+	* Added Pod test (Pod Coverage test left disabled until more methods
+          are documented or set to ignore)
+ 
+1.00	2007-10-01
+	First release with Apache 2.x/mod_perl 2.x support.  Changes
+	include:
+	
+	* Unified Apache 1.x/mod_perl 1.x and Apache 2.x/mod_perl 2.x
+	  support (adds requirement for libapreq)
+
+	* mod_perl 1.x/mod_perl 2.x examples in Apache::AppSamurai
+	  documentation and a unified example in examples/conf/
+
+	* Crypt::CBC used for session data encryption with support for
+	  for Crypt::Rijndael, Crypt::OpenSSL::AES, Crypt::Twofish, or
+	  Crypt::Blowfish as the backend block cipher module.
+
+	* Added SessionSerializeCipher option to specify the block cipher
+	  module to use.  (If undefined, Apache::AppSamurai attempts to
+	  auto-detect a suitable module.)
+
+	* Ships with ExtUtils::MakeMaker Makefile.PL for users without
+	  Module::Build. (Module::Build install is still preferred)
+
+	* All submodules now use their CVS revision for their VERSION.
+
+	* Added LoginDestination and LogoutDestination options to
+	  define specific URIs to send users to after login/logout
+
+	* Added confconfer.pl script (under examples/conf) for easier
+	  configuration based on template examples in examples/conf
+
+0.09    2007-07-14
+        First public version, released on an unsuspecting world.
+

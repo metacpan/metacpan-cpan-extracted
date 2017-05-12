@@ -1,0 +1,8 @@
+Revision history for Perl extension AnyEvent::RabbitMQ::Simple.
+
+0.02   2016-04-05 00:54:11
+    Updated documentation.
+
+0.01   2016-04-05 00:42:43
+    First release.
+

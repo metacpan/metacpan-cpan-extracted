@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - Status Structure</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H2>Status Structure</H2>
+
+<PRE>
+{
+  "messageNum"    =&gt;  integer,
+  "messageType"   =&gt;  string,
+  "messageText"   =&gt;  string,
+  "usePromptingPane" =&gt; integer (boolean: 0 or 1)
+}
+</PRE>
+
+<B>Notes</B>: 
+<UL>
+ <LI>This structure was introduced in ARSperl v1.62.
+ <LI>The "messageType" string is mapped from status return values. 
+	Typical values are "ok" (which means "note"), "warning",
+	"error", and "prompt". Since Remedy uses the AR_STATUS codes
+	as message types instead of providing a distinct decoding in the
+	API, "0" is translated to "ok" instead of "note".
+</UL>
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+Last changes to this page 1 Jun 2000 by jcmurphy<BR>
+&#169; J.C.Murphy, J.W.Murphy 1997 <address>
+ arsperl@arsperl.org
+</address>
+</BODY>
+</HTML>

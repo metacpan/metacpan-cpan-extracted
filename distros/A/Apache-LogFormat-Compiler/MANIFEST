@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/logbench.pl
+lib/Apache/LogFormat/Compiler.pm
+minil.toml
+t/00_compile.t
+t/01_basic.t
+t/02_custom.t
+t/03_extra.t
+t/04_tz.t
+t/Req2PSGI.pm
+META.yml
+MANIFEST

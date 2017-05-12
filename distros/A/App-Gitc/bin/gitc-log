@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-log
+# ABSTRACT: Show a changeset log
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    branch_point
+    current_branch
+    full_changeset_name
+);
+
+my $changeset = $ARGV[0] && $ARGV[0] !~ /^-/ ? shift : undef;
+my $ref = $changeset ? full_changeset_name($changeset) : current_branch();
+my $merge_base = branch_point($ref);
+exec "git log @ARGV $ref ^$merge_base";
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-log - Show a changeset log
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

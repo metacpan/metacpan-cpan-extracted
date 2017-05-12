@@ -1,0 +1,52 @@
+NAME
+
+	App::Manager - installing/managing/uninstalling software packages.
+
+WHAT IT IS
+
+        This module traces any dynamically linked program for
+        filesystem-modifying calls such as rename, open64, unlink, remove
+        etc. It will save all the files before they were modified. It can
+        then undo and redo the changes as often as you want.
+
+        At the moment, Linux is probably the only system that is
+        supported.
+
+EXAMPLE
+
+	Here is a short walk-through:
+
+        Say, you've just compiled gimp (http://www.gimp.org) in
+        /usr/src/gimp and want to install it.  You are not sure wether you
+        want to overwrite your old gimp installation (in case anything
+        breaks), or maybe you want to be able to cleanly uninstall it
+        later, in case you don't like it.
+
+        Ok, so, instead of a plain "make install" you enter:
+
+        appman install gimp make install
+
+        I.e. you start appman with the install command for database "gimp"
+        (database = the place where the diff is stored). The last two
+        arguments are just the standard "make install" command.
+
+        If you want to switch back to the old situation, all you need to do is:
+
+        appman swap gimp
+
+        And the contents of the database gimp are exchanged with the
+        filesystem, i.e. the new gimp files are removed and are being
+        replaced by their old versions (if any). If you call this command
+        again, the installation is re-done (that why it is called "swap").
+
+        "perldoc appman" might be even more enlightening ;)
+
+INSTALLATION
+
+	All databases are (currently) stored in one central directory which defaults
+        to /var/appman. If you do not like this you can overwrite it at configuration time:
+
+        perl Makefile.PL LIBDIR=/some/other/dir
+
+        
+

@@ -1,0 +1,23 @@
+---
+abstract: 'Command line tool to check internet status.'
+author:
+  - 'faraco <skelic3@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-LWP-Online
+requires:
+  LWP::Online: '1.08'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/faraco/App-LWP-Online/issues
+  homepage: https://github.com/faraco/App-LWP-Online
+  repository: https://github.com/faraco/App-LWP-Online.git
+version: 0.0.6
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,113 @@
+NAME
+    Alien::IUP - Building, finding and using iup + related libraries -
+    <http://www.tecgraf.puc-rio.br/iup/>
+
+VERSION
+    *   *iup* library 3.19.1 - see <http://www.tecgraf.puc-rio.br/iup/>
+
+    *   *im* library 3.11 - see <http://www.tecgraf.puc-rio.br/im/>
+
+    *   *cd* library 5.10 - see <http://www.tecgraf.puc-rio.br/cd/>
+
+SYNOPSIS
+    IMPORTANT: This module is not a perl binding for *iup + related*
+    libraries; it is just a helper module. The real perl binding is
+    implemented by IUP module, which is using Alien::IUP to locate *iup +
+    related* libraries on your system (or build it from source codes).
+
+    Alien::IUP installation comprise of:
+
+    *   Downloading *iup* & co. source code tarballs
+
+    *   Building *iup* & co. binaries from source codes (note: static
+        libraries are build)
+
+    *   Installing libs and dev files (*.h, *.a) into *share* directory of
+        Alien::IUP distribution - *share* directory is usually something
+        like this: /usr/lib/perl5/site_perl/5.18/auto/share/dist/Alien-IUP
+
+    Later on you can use Alien::IUP in your module that needs to link with
+    *iup* and/or related libs like this:
+
+     # Sample Makefile.pl
+     use ExtUtils::MakeMaker;
+     use Alien::IUP;
+ 
+     WriteMakefile(
+       NAME         => 'Any::IUP::Module',
+       VERSION_FROM => 'lib/Any/IUP/Module.pm',
+       LIBS         => Alien::IUP->config('LIBS'),
+       INC          => Alien::IUP->config('INC'),
+       # + additional params
+     );
+
+    IMPORTANT: As Alien::IUP builds static libraries the modules using
+    Alien::IUP (e.g. IUP) need to have Alien::IUP just for building, not for
+    later use. In other words Alien:IUP is just "build dependency" not
+    "run-time dependency".
+
+METHODS
+  config()
+    This function is the main public interface to this module.
+
+     Alien::IUP->config('LIBS');
+
+    Returns a string like: '-L/path/to/iupdir/lib -liup -lim -lcd'
+
+     Alien::IUP->config('INC');
+
+    Returns a string like: '-I/path/to/iupdir/include'
+
+     Alien::IUP->config('PREFIX');
+
+    Returns a string like: '/path/to/iupdir' (note: if using the already
+    installed *iup* config('PREFIX') returns undef)
+
+  havelib()
+    Checks the presence of given iup related libraries.
+
+     Alien::IUP->havelib('iupim');
+     #or
+     Alien::IUP->havelib('iupim', 'iupcd', 'iupcontrols');
+
+    Parameter(s): One or more iup related lib names - e.g. iup, cd, im,
+    iupcd, iupim, iupcontrols, iup_pplot, iupimglib, iupgl, iupole.
+
+    Returns: 1 if all libs specified as a param are available; 0 otherwise.
+
+AUTHOR
+    KMX, <kmx at cpan.org>
+
+BUGS
+    Please report any bugs or feature requests to "bug-alien-iup at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-IUP>.
+
+LICENSE AND COPYRIGHT
+    Libraries *iup*, *im* and *cd*: Copyright (C) 1994-2015 Tecgraf,
+    PUC-Rio. <http://www.tecgraf.puc-rio.br>
+
+    Alien::IUP module: Copyright (C) 2015 KMX.
+
+    This program is distributed under the MIT License:
+    <http://www.opensource.org/licenses/mit-license.php>
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

@@ -1,0 +1,13 @@
+git-daemon-export-ok
+^blib/
+^Makefile$
+^Makefile.old$
+^_build
+^pm_to_blib.*
+.*.tar.gz$
+^\.lwpcookies
+^Acme-Study-Perl-
+^cover_db
+^.git
+~$
+^MANIFEST.bak

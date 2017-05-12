@@ -1,0 +1,60 @@
+Revision history for App-MatrixTool
+
+0.08    2016/11/25 19:18:03
+        [CHANGES]
+         * Added 'client sync' and 'client list-rooms' commands
+         * Allow overriding the HTTP 'user_id' query parameter in client
+           commands
+
+0.07    2016/10/13 16:35:27
+        [BUGFIXES]
+         * Workaround for perl5.18's PV swiping bug during 'pairmap'
+         * Don't emit blank lines into '.matrix/server-keys' cache
+
+0.06    2016/10/05 19:09:29
+        [CHANGES]
+         * Much expanded documentation
+         * Improved 'help' command's handling of subcommands
+
+        [BUGFIXES]
+         * Fix typo in "image/png" MIME type
+         * Treat ERR_NO_ADDRESS DNS errors the same as ERR_NO_HOST
+
+0.05    2016/09/23 19:59:34
+        [CHANGES]
+         * Implement 'client upload' for uploading content to media repo
+         * Allow 'client json' to take query parameters
+
+        [BUGFIXES]
+         * Fix unit tests for renamed module
+
+0.04    2016/09/14 21:02:35
+        [CHANGES]
+         * Initial attempt at a 'client' subcommand structure; added
+           'client json' and 'client login'
+         * Added 'directory' command for interfacing with public directory
+           endpoints
+
+        [BUGFIXES]
+         * Actually respect IPv4/IPv6 family restriction
+
+0.03    2016/03/14 14:24:29
+        [CHANGES]
+         * Rename 'perspective' to 'notary' as per matrix-doc policy
+         * Use the HTTP request-generation functions from
+           Protocol::Matrix::HTTP::Federation
+
+        [BUGFIXES]
+         * Update for now-forbidden ARRAY deref in Struct::Dumb
+         * Declare Protocol::Matrix as a requirement
+
+0.02    2015/08/03 19:53:07
+        [CHANGES]
+         * Added 'perspective' command
+         * Much improved help system with arguments and options
+         * Improved (automatic) documentation of arguments and options
+         * Added '--no-store' option to 'server-key' command
+
+0.01    2015/08/03 16:11:28
+        First version, released on an unsuspecting world.
+

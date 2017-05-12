@@ -1,0 +1,82 @@
+#!perl
+
+our $DATE = '2016-11-02'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use strict;
+use warnings;
+
+use HTTP::Tiny;
+
+for (@ARGV) {
+    next unless /\A[A-Za-z0-9_][A-Za-z0-9_-]*\z/;
+    my $resp = HTTP::Tiny->new->get("https://metacpan.org/pod/$_");
+    unless ($resp->{success} and $resp->{content} =~ m!<a itemprop="downloadUrl" href="[^"]+/([^/]+/[^"]+)">!) {
+        warn "Can't get distribution path for script '$_': $resp->{status} - $resp->{reason}\n";
+        next;
+    }
+    $_ = $1;
+}
+
+print join(" ", "cpanm", @ARGV), "\n" if $ENV{DEBUG};
+system {"cpanm"} "cpanm", @ARGV;
+
+# ABSTRACT: Install modules from CPAN (via script name)
+# PODNAME: cpanm-script
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpanm-script - Install modules from CPAN (via script name)
+
+=head1 VERSION
+
+This document describes version 0.001 of cpanm-script (from Perl distribution App-cpanm-script), released on 2016-11-02.
+
+=head1 DESCRIPTION
+
+L<cpanm-script> is a simplistic wrapper over L<cpanm>. This command:
+
+ % cpanm-script -n csvutil
+
+will cause B<cpanm-script> to search for the release tarball that contains the
+script (currently via scraping C<https://metacpan.org/pod/SCRIPTNAME>) and will
+then run:
+
+ % cpanm -n PERLANCAR/App-CSVUtils-0.002.tar.gz
+
+That's about it.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-cpanm-script>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-cpanm-script>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-cpanm-script>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

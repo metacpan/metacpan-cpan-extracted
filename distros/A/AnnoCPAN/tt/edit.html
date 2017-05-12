@@ -1,0 +1,9 @@
+[% PROCESS header.html title='Add a note to ' _ podver.name %]
+[% PROCESS login_form.html %]
+[% PROCESS form.html %]
+
+<p>Add a note to [% podver.pod.name | html %] </p>
+
+[% my_html(podver) %]
+
+[% PROCESS footer.html %]

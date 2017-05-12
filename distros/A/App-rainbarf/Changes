@@ -1,0 +1,109 @@
+Changelog for App-rainbarf
+
+1.4 2016-09-06T09:00:00
+ [Lars Engels <lars.engels@0x20.net>]
+ - Add battery support for FreeBSD.
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Fixed crash on Mac desktop.
+
+1.3 2015-06-22T11:00:00
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Improved battery() subroutine as suggested by Tux;
+ - Properly checking UTF-8 environment in tests;
+ - Cosmetic changes due to boilerplate updates.
+
+1.2 2014-07-10T08:00:00
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Added the --skip option;
+ - Updated CPAN release tests;
+ - Minor code/documentation cleanups;
+ - Now using Travis CI.
+
+1.1 2013-10-30T09:54:00
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Fixed for OS X Mavericks;
+ - Added the --datfile option;
+ - Minor documentation tweaks.
+
+ [Josh Matthews <josh@jmatthews.us>]
+ - Added support for Linux systems without energy_now and energy_full.
+
+1.0 2013-10-21T12:06:00
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Show swap usage (enabled by --swap parameter);
+ - Simple output testing.
+
+ [Henrik Hodne <henrik@hodne.io>]
+ - Add support for /sys/class ACPI.
+
+0.9 2013-07-31T17:28:00
+ [Chris Knadler <takeshi91k@gmail.com>]
+ - Wrap the flags in the readme in code blocks to make them stand out more.
+
+ [Sergey Romanov <complefor@rambler.ru>]
+ - Fix Changes to comply w/ CPAN::Changes Kwalitee.
+
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Compute "unaccounted" memory on Linux (difference between MemTotal value
+   and the sum of all the rest);
+ - Fallback to the plain 16 colors if the installed version of
+   Term::ANSIColor is outdated (also, complain to STDERR).
+
+0.8 2013-04-06T10:55:00
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Config file can be specified via RAINBARF environment variable;
+ - Use select() instead of sleep() for faster execution under Linux;
+ - Documentation enhancements;
+ - Better CPAN compliance.
+
+0.7 2013-03-04T13:15:00
+ [Stanislaw Pusep <stas@sysd.org>]
+ - FreeBSD compatibility;
+ - Code cleanup.
+
+ [Tom Cammann <tom.cammann@vmci.net>]
+ - Allow --nobattery --remaining (show remaining time with no battery
+   symbol).
+
+0.6 2013-02-26T08:15:00
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Added support for the 256-color palette;
+ - Added support for ~/.rainbarf.conf;
+ - Code cleanup.
+
+0.5 2013-02-17T17:36:00
+ [Joe Hassick <joe.hassick@gmail.com>]
+ - Add option that will display the time remaining until the battery is
+   fully charged/empty;
+ - Remove one second delay after executing top;
+ - Add new screenshot to readme.
+
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Bookkeeping.
+
+0.4 2013-02-13T10:43:00
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Bundled with the Module::Build installer;
+ - Updated docs (Installation & Configuration sections);
+ - Released to CPAN!
+
+0.3 2013-02-11T23:39:00
+ [Stanislaw Pusep <stas@sysd.org>]
+ - This release uses the "CPU utilization %" metric instead of the "load
+   average" by default;
+ - CPU/RAM stats are pulled from a single call to top(1) on Mac OS X (Linux
+   still accesses /proc for everything);
+ - Shebang has been changed to use Perl from PATH instead of the hardcoded
+   /usr/bin/perl
+
+0.2 2013-02-04T23:33:00
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Bugfixes;
+ - Screen(1) compatibility;
+ - Fewer dependencies;
+ - A smaller runtime footprint;
+ - Memory allocation bar reordering.
+
+0.1 2013-02-02T11:16:00
+ [Stanislaw Pusep <stas@sysd.org>]
+ - First public release.

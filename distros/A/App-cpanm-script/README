@@ -1,0 +1,14 @@
+DESCRIPTION
+
+    cpanm-script is a simplistic wrapper over cpanm. This command:
+
+     % cpanm-script -n csvutil
+
+    will cause cpanm-script to search for the release tarball that contains
+    the script (currently via scraping https://metacpan.org/pod/SCRIPTNAME)
+    and will then run:
+
+     % cpanm -n PERLANCAR/App-CSVUtils-0.002.tar.gz
+
+    That's about it.
+

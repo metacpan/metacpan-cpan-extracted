@@ -1,0 +1,68 @@
+{
+   "abstract" : "Take a quote file and emit a standalone program that spews a random quote",
+   "author" : [
+      "\u00c3\u0086var Arnfj\u00c3\u00b6r\u00c3\u00b0 Bjarmason <avar@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-QuoteCC",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Section" : 0,
+            "Moose" : 0,
+            "Moose::Role" : 0,
+            "MooseX::Getopt::Dashes" : 0,
+            "Template" : 0,
+            "YAML::Syck" : 0,
+            "namespace::clean" : 0,
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Encode" : 0,
+            "File::Find" : 0,
+            "File::Slurp" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-App-QuoteCC@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-QuoteCC"
+      },
+      "homepage" : "http://search.cpan.org/dist/App-QuoteCC/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/avar/app-quotecc.git",
+         "web" : "http://github.com/avar/app-quotecc"
+      }
+   },
+   "version" : "0.10",
+   "x_authority" : "cpan:AVAR"
+}
+

@@ -1,0 +1,13 @@
+abstract: HITS Algorithm implementation not using PDL
+author: Kang-min Liu (gugod@gugod.org)
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Algorithm-HITS-Lite
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Spiffy: 0
+version: 0.04

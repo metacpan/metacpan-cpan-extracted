@@ -1,0 +1,28 @@
+NAME
+    App::Goto::Amazon - Shorthand way of ssh'ing to AWS EC2 servers
+
+SYNOPSIS
+      use App::Goto::Amazon;
+
+DESCRIPTION
+    App::Goto::Amazon is called by the included 'ssa' script. If no
+    arguments are supplied, ssa will simply print a list of running EC2
+    instances. If arguments are supplied, then the script will look for an
+    instance whose name matches all supplied arguments (in order) and, if it
+    finds one, will ssh to it. If the arguments are ambiguous, the first
+    match will be used
+
+    Requires your Amazon keys in a ~/.ssa file - see ssa.example file for
+    template
+
+AUTHOR
+    Dominic Humphries <dominic@oneandoneis2.com>
+
+COPYRIGHT
+    Copyright 2014- Dominic Humphries
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

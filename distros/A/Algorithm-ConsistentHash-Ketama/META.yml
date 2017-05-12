@@ -1,0 +1,32 @@
+---
+abstract: 'Ketama Consistent Hashing for Perl (XS)'
+author:
+  - 'Christian Muehlhaeuser C<< <chris@last.fm> >>'
+build_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0.84
+  Test::Requires: 0
+configure_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.36
+  ExtUtils::ParseXS: 3.18
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Algorithm-ConsistentHash-Ketama
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  XSLoader: 0.02
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+  repository: ssh://git@github.com/lestrrat/Algorithm-ConsistentHash-Ketama.git
+version: '0.00012'

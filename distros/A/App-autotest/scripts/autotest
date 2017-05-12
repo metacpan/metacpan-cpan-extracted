@@ -1,0 +1,85 @@
+#! perl
+# ABSTRACT: run Perl5 test programs as soon as they are modified or created
+# PODNAME: autotest
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use App::autotest;
+
+my $app = App::autotest->new();
+exit( $app->run ? 0 : 1 );
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+autotest - run Perl5 test programs as soon as they are modified or created
+
+=head1 VERSION
+
+version 0.006
+
+=head1 SYNOPSIS
+
+  autotest
+
+=head1 DESCRIPTION
+
+C<autotest> is a program that runs your test programs whenever you change
+them. Using it you don't have to switch between your editor and the shell
+since your tests are run automatically when you save them.
+
+Think "Continuous Testing".
+
+=head1 EXAMPLE
+
+Go to the directory where your test directory C<t> can be found. Run C<autotest>
+in that directory. It runs all your test programs once when it's starting.
+
+If one of the existing test programs are modified they are run again. Additionally,
+test programs that are created are run as soon as they are found.
+Modifications and creations of test programs are usually found after one second. 
+
+Only failing tests are printed in the console.
+
+When the last run had failing tests and in the current run no test failed, you'll
+see a friendly message that things just got better.
+
+=head1 CONTRIBUTING
+
+The source code for C<autotest> lives on github:
+L<https://github.com/glauschwuffel/perl5-App-autotest>
+
+If you want to contribute a patch, fork my repository, make your change,
+and send me a pull request.
+
+=head1 BUGS
+
+Please report any bugs or feature requests to the issues list at Github:
+<http://github.com/glauschwuffel/perl5-App-autotest/issues>
+
+=head1 SEE ALSO
+
+L<Test::Continuous> has far more features. It runs the tests by running C<prove>
+in an extra process; C<autotest> runs the tests within the same process via L<TAP::Harness>.
+
+=head1 AUTHOR
+
+Gregor Goldbach <glauschwuffel@nomaden.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Gregor Goldbach.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

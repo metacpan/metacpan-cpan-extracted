@@ -1,0 +1,129 @@
+#!/usr/bin/perl
+# ************************************************************************* 
+# Copyright (c) 2014-2016, SUSE LLC
+# 
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+# 
+# 2. Redistributions in binary form must reproduce the above copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution.
+# 
+# 3. Neither the name of SUSE LLC nor the names of its contributors may be
+# used to endorse or promote products derived from this software without
+# specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+# ************************************************************************* 
+#
+# dochazka-ldap-sync-all
+#
+# Does the equivalent of "PUT employee/nick/:nick/ldap" on all employees whose
+# sync property is true.
+#
+
+#!perl
+use 5.012;
+use strict;
+use warnings;
+
+#use App::CELL qw( $CELL $site $log );
+use App::Dochazka::REST qw( init_arbitrary_script $faux_context );
+use App::Dochazka::REST::ConnBank qw( $dbix_conn );
+use App::Dochazka::REST::LDAP qw( ldap_exists );
+use App::Dochazka::REST::Model::Employee qw( get_all_sync_employees );
+use Getopt::Long;
+use Pod::Usage;
+
+
+
+=head1 NAME
+
+dochazka-ldap-sync-all - syncs the profiles of all LDAP-enabled employees
+
+
+
+=head1 SYNOPSIS
+
+Sync all LDAP-enabled Dochazka employees from the LDAP database.
+
+    dochazka-ldap-sync-all [--quiet]
+
+The script should be run on an L<App::Dochazka::REST> server that has been
+configured to use LDAP.
+
+
+
+=head1 DESCRIPTION
+
+The script first queries the Dochazka database for a list of all employees
+whose "sync" property is true ("LDAP-enabled employees").
+
+The script then loops over these employees, syncing each employee from LDAP and
+updating the employee record if anything has changed.
+
+=cut
+
+
+# process command-line options
+my $help = 0;
+my $quiet = 0;
+GetOptions(
+    'help|?' => \$help,
+    'quiet|q' => \$quiet,
+) or pod2usage(2);
+pod2usage(1) if $help;
+
+my $ARGS = {
+    quiet => $quiet,
+};
+init_arbitrary_script( $ARGS );
+
+my $status = get_all_sync_employees( $dbix_conn );
+if ( $status->level eq 'NOTICE' and $status->code eq 'DISPATCH_NO_RECORDS_FOUND' ) {
+    print "No employees to sync\n" unless $quiet;
+    exit( 0 );
+}
+my $emp_list = $status->payload;
+
+foreach ( @$emp_list ) {
+    if ( ! ldap_exists( $_->nick ) ) {
+        print "WARNING: " . $_->nick . " not found in LDAP database!\n" unless $quiet;
+        next;
+    }
+    my $old = $_->clone();
+    $status = $_->ldap_sync();
+    if ( $status->not_ok ) {
+        print "WARNING: could not sync " . $_->nick . " from LDAP\n" unless $quiet; 
+        next;
+    }
+    if ( $old->compare( $_ ) ) {
+        print $_->nick . " existing profile data match LDAP: no action needed\n" unless $quiet;
+        next;
+    }
+    $status = $_->update( $faux_context );
+    if ( $status->ok ) {
+        print $_->nick . " profile updated from LDAP\n" unless $quiet;
+        next;
+    }
+    print "WARNING: could not update " . $_->nick . " employee object (" .
+          $status->text . ")\n" unless $quiet; 
+}
+print "Processed " . scalar( @$emp_list ) . " employees\n" unless $quiet;
+
+exit( 0 );

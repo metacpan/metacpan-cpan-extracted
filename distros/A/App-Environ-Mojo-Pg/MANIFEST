@@ -1,0 +1,11 @@
+Changes
+example/example.pl
+example/pg.yml
+lib/App/Environ/Mojo/Pg.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/01-test.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

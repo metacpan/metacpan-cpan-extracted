@@ -1,0 +1,202 @@
+#!perl 
+use strict;
+use warnings;
+use Acme::MetaSyntactic;
+use Getopt::Long;
+
+my $usage = << 'EOT';
+Usage: metafy [options] [from:]to [file]
+Available options:
+  --in-place     : force in-place edit (clobbers the old files)
+  --force-random : force target words randomisation
+  --help         : print this message and exit
+  --version      : print version information and exit
+  --themes       : print the list of themes and exit
+  --verbose      : print the translations list afterwards
+EOT
+
+my %conf = (
+    'force-random' => 0,
+    verbose        => 0,
+);
+GetOptions( \%conf, 'version', 'themes', 'help', 'verbose|v', 'force-random',
+'in-place')
+  or die $usage;
+
+# find out the themes name
+die "No theme given\n\n$usage" unless @ARGV;
+($conf{from}, $conf{to}) = split /:/, shift, 2;
+$conf{to} = $conf{from} unless $conf{to};
+
+# find the themes/categories
+for my $t (qw( from to )) {
+    my ($theme, $category) = split '/', $conf{$t}, 2;
+    die "Theme '$theme' does not exist!\n\n"
+      . "Available themes: @{[ Acme::MetaSyntactic->themes() ]}\n"
+      unless Acme::MetaSyntactic->has_theme($theme);
+
+   @conf{$t, "${t}_category"} = ($theme, $category);
+}
+
+# informative options
+print STDERR
+"metafy your files, using Acme::MetaSyntactic version $Acme::MetaSyntactic::VERSION\n"
+  if $conf{version};
+print STDERR $usage if $conf{help};
+print map "$_\n", Acme::MetaSyntactic->themes if $conf{themes};
+exit if $conf{themes} || $conf{version} || $conf{help};
+
+# real processing starts here
+my $from =
+  Acme::MetaSyntactic->new( $conf{from}, category => $conf{from_category} );
+my $to = Acme::MetaSyntactic->new( $conf{to}, category => $conf{to_category} );
+my @to = $to->name(0);
+my %to;
+
+# find the origin list
+my $re_from = qr/\b(@{[join'|', sort $from->name( 0 ) ]})\b/;
+
+# modify files in place
+$^I = '' if $conf{'in-place'};
+
+# loop on the files
+while(<>) {
+    s/$re_from/
+        my $repl;
+        if ( $conf{'force-random'} ) { push @{ $to{$1} }, $repl = $to->name() }
+        else { $repl = $to{$1} ||= shift @to; @to = $to->name(0) if !@to }
+        $repl
+    /gei;
+}
+continue { print }
+
+if( $conf{verbose} ) {
+    print STDERR "Translations:\n",
+      $conf{'force-random'}
+      ? map { "\t$_ => @{$to{$_}}\n" } sort keys %to
+      : map { "\t$_ => $to{$_}\n" } sort keys %to;
+}
+
+__END__
+
+=head1 NAME
+
+metafy - Change the metasyntactic words in your text
+
+=head1 SYNOPSIS
+
+B<metafy> [ I<--help> ] [ I<--version> ] [I<--force-random>]
+[I<theme>[I</category>]:]I<theme>[I>category>] [ I<file> ... ]
+
+=head1 DESCRIPTION
+
+B<metafy> filters any metasyntactic word and replace them with words from
+any C<Acme::MetaSyntactic> theme. This script works as a filter or directly
+modifies the files given on the command-line.
+
+A few examples should make it easy to understand what it does and how
+it works:
+
+=over 4
+
+=item *
+
+Replace words from the C<foo> theme by words from the C<batman> theme:
+
+    $ metafy foo:batman
+
+=item *
+
+Replace the French metasyntactic words by the classic English ones:
+    
+    $ metafy foo/fr:foo/en
+
+=item *
+
+Replace any word from the C<batman> theme by a random one from the
+C<donmartin> theme. The replacement will be different every time:
+
+    $ metafy --force-random batman:donmartin
+
+=item *
+
+Replace words from a theme by words from the same theme (for example if you
+didn't like the first run):
+
+   $ metafy batman
+
+In other words, if C<from> is not given, it's the same as C<to>.
+
+=item *
+
+Modify a bunch of files in-place:
+
+    $ metafy --in-place foo:batman *.c
+
+There is currently no way to create backup files (like perl's I<-i> option
+allows).
+
+=back
+
+Each word from the original theme is replaced by the same word of the
+target theme. However, if the target theme does not contain enough words
+to map to the words from the original theme used in the file, then the
+same words maybe used more than once. B<This may break programs!>
+
+The option I<--force-random> will certainly break your stuff.
+
+=head1 COMMAND-LINE OPTIONS
+
+The following command-line options are available (and can all be abbreviated):
+
+=head2 Metasyntactic options
+
+=over 4
+
+=item I<--force-random>
+
+Compute the replacement for each word every time it's needed.
+B<This will definitely break any program!>
+
+=item I<--in-place>
+
+Force in-place edition
+
+=back
+
+=head2 Informative options
+
+The program will exit if any of these options is selected.
+However, these options can be combined.
+
+=over 4
+
+=item I<--themes>
+
+Print the list of available themes.
+
+=item I<--version>
+
+Print version information.
+
+=item I<--help>
+
+Print a short help message.
+
+=back
+
+=head1 AUTHOR
+
+Philippe "BooK" Bruhat, C<< <book@cpan.org> >>.
+
+=head1 COPYRIGHT
+
+Copyright 2006 Philippe 'BooK' Bruhat, All Rights Reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

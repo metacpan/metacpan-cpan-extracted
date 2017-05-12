@@ -1,0 +1,5 @@
+#!/usr/bin/env perl
+
+use lib '../lib';
+use App::Goto2;
+App::Goto2->new_with_options->run;

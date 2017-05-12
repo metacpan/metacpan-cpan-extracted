@@ -1,0 +1,31 @@
+---
+abstract: 'build and install librdkafka'
+author:
+  - unknown
+build_requires:
+  IO::Socket::SSL: '0'
+configure_requires:
+  Alien::Base::ModuleBuild: '0.005'
+  Module::Build: '0.28'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Librdkafka
+provides:
+  Alien::Librdkafka:
+    file: lib/Alien/Librdkafka.pm
+    version: v0.9.5
+requires:
+  Alien::Base: '0.005'
+  File::ShareDir: '1.00'
+resources:
+  bugtracker: https://github.com/trinitum/perl-Alien-Librdkafka/issues
+  homepage: https://github.com/trinitum/perl-Alien-Librdkafka
+  repository: git://github.com/trinitum/perl-Alien-Librdkafka
+version: v0.9.5
+x_contributors:
+  - 'Pavel Shaydo <zwon@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

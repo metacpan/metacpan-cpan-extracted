@@ -1,0 +1,33 @@
+Changes for Perl extension Aspect-Library-Trace
+
+1.00 Thu 26 May 2011
+	- Updating to 1.00 to indicate a stable release synced to Aspect 1.00
+
+0.98 Tue 24 May 2011
+	- Updated to Module::Install 1.01
+	- Updated to syntax changes for Aspect 0.98
+
+0.34 Fri  8 Jan 2010
+	- Added missing Test::NoWarnings dependency
+
+0.33 Fri  8 Jan 2010
+	- Moved from dual before/after advice to a single around advice
+	- Adding Test::NoWarnings to all tests, now that Aspect uses it
+
+0.32 Thu  7 Jan 2010
+	- Updated to match changes in Aspect 0.32
+
+0.31 Thu  7 Jan 2010
+	- Updating to Module::Install::DSL 0.91
+	- Adding support for forever currying
+
+0.16 Tue 19 May 2009
+	- Updating to Module::Install::DSL 0.88
+	- Updating to Aspect 0.16
+	- Synchronise version with Aspect
+
+0.02 Tue 28 Apr 2009
+	- Adding support for an import-based usage
+
+0.01 Tue 28 Apr 2009
+	- Created initial implementation

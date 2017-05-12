@@ -1,0 +1,25 @@
+name: user_edit	
+method: POST
+fields:
+	fname:
+		label: First Name
+		size: 30
+		validate: NAME
+	lname:
+		label: Last Name
+		size: 30		
+		validate: NAME
+	email:
+		label: Email
+		size: 30
+		validate: EMAIL
+		required: 1
+	pwd:
+		label: Password
+		size: 30
+		type: Password
+		required: 1
+	role:
+        label:   Roles
+submit: Save, Cancel
+stylesheet: 1

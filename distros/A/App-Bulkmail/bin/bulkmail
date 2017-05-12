@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use App::Bulkmail;
+
+App::Bulkmail->run();
+
+1;
+
+=head1 NAME
+
+bulkmail - Simple but fleksible bulkmailer
+
+=head1 SYNOPSIS
+
+   bulkmail [--dryrun] [--dump] [--verbose] [--quiet] --recipients <file> --template <file>
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item B<--dryrun>
+
+Do not send any mails
+
+=item B<--dump>
+
+Dump mail in mbox format
+
+=item B<--verbose>
+
+Be more verbose
+
+=item B<--quiet>
+
+Don't say anything implicitely
+
+=item B<--recipients <file>>
+
+File containing list of recipients. Can be formatted as CSV, JSON, YAML or as
+an simple list of email addresses. For CSV files the first line defined a list
+of fields. JSON and YAML files should define a list of hashes or a hash  of
+hashes (The key will be knowsn as 'email' in the template).
+
+=item B<--template <file>>
+
+A file containing a Template Toolkit template
+
+=back
+
+=head1 SEE ALSO
+
+You can find more documentation in the App::Bulkmail documentation with the
+perldoc command.
+
+    perldoc App::Bulkmail
+
+=head1 AUTHOR
+
+Peter Makholm, C<< <peter at makholm.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-app-bulkmail at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Bulkmail>.  I will be
+notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009 Peter Makholm.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut
+

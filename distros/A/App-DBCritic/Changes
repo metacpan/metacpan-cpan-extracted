@@ -1,0 +1,27 @@
+Revision history for App-DBCritic
+
+0.020     2011-09-15 15:32:37 America/New_York
+    rename to App-DBCritic
+0.014     2011-08-30 16:13:33 America/New_York
+    bump up required perl to 5.10.1 to deal with Moo & Sub::Quote issues
+    some minor POD, test and code readability fixes
+0.013     2011-08-16 10:34:11 America/New_York
+    use DBICSC::PolicyType roles for applies_to attributes in policies,
+        should make writing plugins for multiple types of objects as easy
+        as composing multiple roles
+    explicit version requirements for *both* DBIC and DBIC::Schema::Loader
+    experimenting with inlining some defaults with Sub::Quote
+0.012     2011-08-06 18:57:20 America/New_York
+    bump DBIC::Schema::Loader requirement to 0.07007
+    add DBICSC::Policy::DuplicateRelationships (requested by frew++)
+0.011     2011-08-06 13:49:04 America/New_York
+    require more recent version of DBIx::Class
+    fix synopsis (reported by frew++)
+    fill in DBICSC::Policy::NullableTextColumn pod with data types checked
+0.010     2011-07-29 16:44:18 America/New_York
+    converted from Moose to Moo object framework (requested by mst++)
+0.005     2011-07-29 13:04:52 America/New_York
+    dsn is now a required attribute, defaults to schema object's storage.
+    cache stringification of Violation objects
+0.004     2011-07-28 18:29:40 America/New_York
+    initial release

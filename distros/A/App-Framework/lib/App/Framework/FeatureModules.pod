@@ -1,0 +1,48 @@
+=head1 NAME
+
+App::Framework::FeatureModules - Module list for installed Feature modules 
+
+=head1 DESCRIPTION
+
+The following list shows the available Feature:
+
+=over 4
+
+=item * L<App::Framework::Feature::Args>  v1.002
+
+Handle application command line arguments
+
+=item * L<App::Framework::Feature::Config>  v0.10
+
+Configuration file read/write
+
+=item * L<App::Framework::Feature::Data>  v1.000
+
+Handle application setup data
+
+=item * L<App::Framework::Feature::Mail>  v1.000
+
+Send mail
+
+=item * L<App::Framework::Feature::Options>  v1.000
+
+Handle application options
+
+=item * L<App::Framework::Feature::Pod>  v1.001
+
+Application documentation
+
+=item * L<App::Framework::Feature::Run>  v1.003
+
+Execute external commands
+
+
+
+=back
+
+=head1 AUTHOR
+
+Steve Price, C<< <sdprice at cpan.org> >>
+
+=cut
+

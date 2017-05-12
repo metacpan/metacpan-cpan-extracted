@@ -1,0 +1,6 @@
+Revision history for App::Exifpic
+
+0.02    Tue Jan  1 17:03:51 EST 2013
+            * BUGFIX: No longer rotate photos, as the EXIF headers allows
+              display software to do that for us automatically.
+

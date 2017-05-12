@@ -1,0 +1,102 @@
+NAME
+    Apache::AuthenN2 - Authenticate into the NT and NIS+ domains
+
+SYNOPSIS
+    Allow windows and unix users to use their familiar credentials to gain
+    authenticated access to restricted applications and files offered via
+    apache.
+
+       #httpd.conf
+       <Files *challenge*>
+          AuthName 'your nt or nis+ account'
+          AuthType Basic
+          PerlSetVar NISPlus_Passwd_Table passwd.org_dir.yoyodyne.com
+          PerlSetVar NISPlus_Group_Table group.org_dir.yoyodyne.com
+          PerlSetVar NT_Default_Domains 'eng corporate'
+          PerlSetVar NT_Controllers 'bapdc:babdc njpdc:njbdc'
+          PerlAuthenHandler Apache::AuthenN2
+          require group eng
+          require user john larry
+       </Files>
+
+DESCRIPTION
+    Authenticate to one or more pdc:bdc controller pairs; these can be true
+    nt controllers or properly configured samba servers. Only one pdc:bdc
+    pair is required by the module; you can add pairs to increase
+    reliability, or to circumvent domain trust wars. If the user has
+    specified a domain, e.g., sales\john, then just try against that domain;
+    if no domain was specified by the user, try all of the default domains
+    listed in the above config. Failing nt authentication, try nis+. This
+    order (nt then nis+) is simply to boost average apparent performance
+    because the nt population is much larger than the unix population at the
+    author's company. If your population has an opposite demographic, feel
+    free to reverse the order of checking.
+
+    Note that this scheme is quite permissive. Valid nt credentials against
+    any of the controllers or domains, or valid nis+ credentials will allow
+    access. This multiplies exposure to poorly selected passwords.
+
+    <Files *challenge*> is just a way of specifying which files should be
+    protected by this authenticator. In this example, a script named newbug-
+    challenge.pl would be protected, regardless of where it is located in
+    the apache htdocs or cgi directories. If you prefer, you can use the
+    simpler <Location> directive to protect a particular file or directory.
+
+    Instead of requiring specific groups or users, you could just 'require
+    valid-user'.
+
+    The nt part requires the Authen::Smb module. When Authen::Smb supports
+    group authentication, I will add it to this module.
+
+    The nis+ part requires the Net::NISPlus module.
+
+    You just read all you need to know to get started -- but you should read
+    on if you care about nt/nis+ server load, network performance, or
+    response time (as the user perceives it).
+
+    _Every_ time a protected file is requested, this handler is invoked.
+    Depending on your configuration (how many controllers and default
+    domains you specify), and where the matching credentials are, it can
+    take a while. This adds to your network and server load, as well as
+    bothering some users with the wait. It makes sense to cache valid
+    credentials in memory so as to avoid invoking this expensive module
+    every time. Luckily, Jason Bodnar already created AuthenCache. Although
+    written with AuthenDBI in mind, it works beautifully in this case as
+    well. It is _highly_ recommended. After installing it, you need a few
+    more lines in httpd.conf; to expand on the above example:
+
+       PerlModule Apache::AuthenCache
+       <Files *challenge*>
+          AuthName 'your nt or nis+ account'
+          AuthType Basic
+          PerlSetVar NISPlus_Passwd_Table passwd.org_dir.yoyodyne.com
+          PerlSetVar NISPlus_Group_Table group.org_dir.yoyodyne.com
+          PerlSetVar NT_Default_Domains 'eng corporate'
+          PerlSetVar NT_Controllers 'bapdc:babdc nypdc:nybdc'
+          PerlSetVar AuthenCache_casesensitive off
+          PerlAuthenHandler Apache::AuthenCache Apache::AuthenN2 Apache::AuthenCache::manage_cache
+          require group eng
+          require user john larry
+       </Files>
+
+    A couple of tips about AuthenCache: 1 comment out the $r->warn lines
+    that echo the password to the apache error log (they are fine for
+    debugging but not good for production), and 2 keep in mind that the
+    cache has to be established separately in each current httpd child
+    process, so it does not appear to be working consistently until all the
+    children know about the user. This is nothing to panic about; we are
+    just playing the odds: the more active the user is, the more they will
+    benefit from the caching.
+
+AUTHOR
+    valerie at savina dot com (Valerie Delane), originally based more or
+    less on code shamelessly lifted from Doug MacEachern's Apache::AuthNIS
+    and Micheal Parkers's Apache::AuthenSMB.
+
+COPYRIGHT
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    mod_perl(3), Apache(3)
+

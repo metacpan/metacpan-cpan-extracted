@@ -1,0 +1,29 @@
+Revision history for App-upf
+
+0.04    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.03    2015-03-13 (PERLANCAR)
+
+        - No functional changes.
+
+        - [Build] Rebuild with DZP:Rinci::AddPrereqs 0.02 which adds prereqs to
+          Perinci::Sub::ArgEntity::* (for shell completion purposes).
+
+
+0.02    2015-03-06 (PERLANCAR)
+
+        - No functional changes.
+
+        - Minor tweaks, rebuild against Unix::Passwd::File 0.15.
+
+
+0.01    2015-03-06 (PERLANCAR)
+
+        - First release.

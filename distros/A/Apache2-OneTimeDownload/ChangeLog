@@ -1,0 +1,7 @@
+Revision history for Perl extension Apache2::OneTimeDownload.
+
+1.00  Tus Mar 31 14:00:00 2009
+	- original version; ported from Apache::OneTimeDownload
+
+1.01  Fri Apr 03 17:10:00 2009
+	- first CPAN-Version

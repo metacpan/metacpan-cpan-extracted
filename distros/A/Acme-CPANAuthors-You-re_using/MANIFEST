@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Acme/CPANAuthors/You/re_using.pm
+samples/list_authors
+t/00-load.t
+t/10-base.t
+t/11-naughty-version.t
+t/lib/Acme/CPANAuthors/You/re_using/TestNaughtyVersion.pm

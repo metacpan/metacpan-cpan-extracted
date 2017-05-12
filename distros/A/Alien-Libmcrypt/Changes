@@ -1,0 +1,4 @@
+0.002     2017-03-10 13:12:35+08:00 Asia/Shanghai
+        - fix test fail on cygwin,mingw32 and msys
+0.001
+	- initial version

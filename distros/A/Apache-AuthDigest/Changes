@@ -1,0 +1,31 @@
+Revision history for Perl extension Apache::DigestAPI
+
+0.01  09.06.2002
+	- original version
+          lots of feeback from Andrew Ho
+
+0.02  09.06.2002
+        - fixed bug in AuthDigest.pm where the last
+          digest in the password file was returned if
+          no user is found
+
+        - fixed AuthDigestFile so that AuthDigest.pm
+          actually works, as do the tests (note to
+          self: run test suite both with and without
+          mod_digest compiled in httpd)
+
+        - minor tweak to (nonpublic) parse_digest_header()
+
+        - never release on friday, especially friday
+          mornings before coffee is fully consumed
+
+0.021 11.08.2002
+        - indented pod so it is actually readable
+            thanks Barrie
+        - moved to HTTP::Headers::Util::split_header_words() 
+          for header parsing
+            thanks to Rob Giseburt for the push
+
+0.022 12.19.2002
+        - added contrib/ and AuthDigestDBI.pm
+        - added preliminary Multi.pm and tests

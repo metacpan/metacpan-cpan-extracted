@@ -1,0 +1,23 @@
+=head1 NAME
+
+TODO - aspirations for Alias
+
+=head1 DESCRIPTION
+
+=over 4
+
+=item 1.
+
+C<attr> ought to move into perl core when I get around to hacking it in.
+Object attributes can then be lexically scoped instead of dynamically,
+or both.
+
+=item 2. (nonitem)
+
+You'd think C<const> could be made to work for hashes and arrays via 
+XSive code.  But it turns out that the perl source must be heavily
+involved.  Using C<tie> to achieve this is probably simpler.
+
+=back
+
+=cut

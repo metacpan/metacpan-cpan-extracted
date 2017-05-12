@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Collection>
+    <title>Astro::Constants</title>
+    <description>Physical constants for astronomy for use in Astro::Constants v0.10</description>
+    <timestamp>Wed Feb 10 12:01:44 2016</timestamp>
+    <version>v0.10</version>
+    <source>2014 CODATA</source>
+    <link href="http://metacpan.org/pod/Astro::Constants" />
+    <items>
+        <PhysicalConstant>
+            <name type="long">PI</name>
+            <name type="short">A_pi</name>
+            <alternateName />
+            <description>trig constant pi</description>
+            <value>3.14159265358979324</value>
+            <uncertainty type="relative">0.00000000000000001</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?pi" />
+            <categoryList>
+                <category>mathematical</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">EXP</name>
+            <name type="short">A_exp</name>
+            <alternateName />
+            <description>base of natural logarithm</description>
+            <value>2.71828182846</value>
+            <uncertainty type="relative">0.00000000001</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?exp" />
+            <categoryList>
+                <category>mathematical</category>
+            </categoryList>
+        </PhysicalConstant>
+    </items>
+</Collection>

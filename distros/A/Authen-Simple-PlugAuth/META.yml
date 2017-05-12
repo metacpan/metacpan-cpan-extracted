@@ -1,0 +1,26 @@
+---
+abstract: 'Simple PlugAuth authentication'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Authen-Simple-PlugAuth
+requires:
+  Authen::Simple: '0'
+  PlugAuth::Client::Tiny: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/clustericious/Authen-Simple-PlugAuth/issues
+  homepage: http://perl.wdlabs.com/Authen-Simple-PlugAuth
+  repository: git://github.com/clustericious/Authen-Simple-PlugAuth.git
+version: '0.02'

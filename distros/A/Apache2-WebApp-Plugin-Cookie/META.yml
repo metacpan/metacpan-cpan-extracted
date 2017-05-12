@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name: Apache2::WebApp::Plugin::Cookie
+abstract: Common methods for creating and manipulating web browser cookies.
+version: 0.10
+author:
+  - Marc S. Brooks <mbrooks@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  Apache2::WebApp: 0.38
+  Apache2::WebApp::Plugin::Filters: 0.08
+  Params::Validate: 0
+build_requires:
+  Apache::Test: 0
+  Apache2::WebApp::Plugin::CGI: 0.01
+resources:
+  license: http://dev.perl.org/licenses/
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html

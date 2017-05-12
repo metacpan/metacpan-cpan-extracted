@@ -1,0 +1,22 @@
+0.32	Fri Apr  1 13:44:26 CEST 2005
+
+	- fixed bugin NEXTKEY() call in Apache::Session::DBMS
+
+0.31	Thu Mar 24 21:04:54 CET 2005
+
+	- switched back to Storable as default serialization format due to
+	  Perl YAML.pm implementation Unicode deficency mainly.
+
+0.3	Thu Mar 24 18:38:27 CET 2005
+
+	- added YAML serialization and made it default serialization format
+	- made serialization completely customizable ala Apache::Session::Flex
+
+0.2	Wed Mar 23 17:48:10 CET 2005
+
+	- moved custom session-identifier validation and object serialization
+	  into proper packages to let Apache::Session::Flex to use this module
+
+0.1	Wed Mar  9 10:03:27 CET 2005
+
+	- initial release

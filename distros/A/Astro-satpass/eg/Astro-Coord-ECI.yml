@@ -1,0 +1,8 @@
+---
+comment: "Install satpass"
+match:
+    module: "Astro::Coord::ECI::TLE"
+pl:
+    args:
+        - "-y"
+

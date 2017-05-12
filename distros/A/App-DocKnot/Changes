@@ -1,0 +1,32 @@
+                       User-Visible DocKnot Changes
+
+DocKnot 1.01 (2016-12-25)
+
+    Add build and test instructions for Autoconf packages, including
+    details about Kerberos configuration, to the README and README.md
+    templates.  Allow a testing section in the metadata to override the
+    added testing section.  Add a flag to indicate that the package is not
+    intended to be installed, which suppresses some of the template.
+
+    Add support for license notices (the notices metadata file), which
+    should be appended to the end of the stock license statement wherever
+    it is generated.
+
+    Add support for stock building and installation sections for Perl
+    module packages using either Module::Build or ExtUtils::MakeMaker.
+
+    Add thread template support for annotating quotes shorter than 80
+    characters with the "short" class.
+
+    Add support for additional bootstrapping requirements in a separate
+    bootstrap metadata file, appended to the Autotools bootstrapping
+    section (at least for right now).
+
+    Allow markup in the license notices section.
+
+DocKnot 1.00 (2016-10-26)
+
+    Initial public release.  Supports generating text and Markdown README
+    files and a thread index page.  There is some automation of the
+    requirements section, but only automation for the build and test
+    section for Module::Build Perl modules.

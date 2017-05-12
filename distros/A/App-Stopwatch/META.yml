@@ -1,0 +1,26 @@
+---
+abstract: 'simple console stopwatch'
+author:
+  - 'Ivan Bessarabov <ivan@bessarabov.ru>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Stopwatch
+requires:
+  Carp: 0
+  POSIX: 0
+  Pod::Usage: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/bessarabov/App-Stopwatch/issues
+  homepage: https://github.com/bessarabov/App-Stopwatch
+  repository: https://github.com/bessarabov/App-Stopwatch.git
+version: 1.2.0

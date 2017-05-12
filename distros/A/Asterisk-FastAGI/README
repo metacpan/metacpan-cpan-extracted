@@ -1,0 +1,31 @@
+Asterisk-FastAGI version 0.01
+=============================
+
+Asterisk::FastAGI provides a preforking daemon for handling FastAGI
+requests from Asterisk.
+
+Read the L<Net::Server> for more information about the logging
+facilities, configuration, etc.
+
+INSTALLATION
+
+This module requires Asterisk::AGI to work.  However this module isn't
+currently up on CPAN.  This may change shortly.  To download the
+asterisk-perl modules. Go to:
+
+http://asterisk.gnuinter.net/
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2007 by Jason Yates
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,244 @@
+NAME
+    Apache2::UploadProgress - Track the progress and give realtime feedback
+    of file uploads
+
+SYNOPSIS
+    In Apache:
+
+        PerlLoadModule             Apache2::UploadProgress
+        PerlPostReadRequestHandler Apache2::UploadProgress
+
+    In your HTML form:
+
+     <script src="/UploadProgress/progress.js"></script>
+     <link type="text/css" href="/UploadProgress/progress.css"/>
+     <form action="/cgi-bin/script.cgi"
+           method="post"
+           enctype="multipart/form-data"
+           onsubmit="return startEmbeddedProgressBar(this)">
+     <input type="file" name="file"/>
+     <input type="submit" name=".submit"/>
+     </form>
+     <div id="progress"></div>
+
+DESCRIPTION
+    This module allows you to track the progress of a file upload in order
+    to provide a user with realtime updates on the progress of their file
+    upload.
+
+    The information that is provided by this module is very basic. It just
+    includes the total size of the upload, and the current number of bytes
+    that have been received. However, this information is sufficient to
+    display lots of information about the upload to the user. At it's
+    simplest, you can trigger a popup window that will automatically refresh
+    until the upload completes. However, popups can be a problem sometimes,
+    so it is also possible to embed a progress monitor directly into the
+    page using some JavaScript and AJAX calls. Examples using both
+    techniques are discussed below in the EXAMPLES section.
+
+EXAMPLES
+  Simple Popup Upload Monitor
+    The simplest way to add a progress monitor to your forms is to use the
+    popup technique. This will launch a popup window with a progress monitor
+    that will automatically refresh until the upload is complete. The popup
+    will use the XML method by default, and format the page using an
+    included XSL stylesheet (which can be customized to suit your needs). If
+    the browser does not support XML transformations, then content
+    negotiation will automatically fall back on a basic HTML page.
+
+    Here is what you need to do to get the popup technique working:
+
+     <script src="/UploadProgress/progress.js"></script>
+     <form action="/cgi-bin/script.cgi"
+           method="post"
+           enctype="multipart/form-data"
+           onsubmit="return startPopupProgressBar(this, {width : 500, height : 400})">
+     <input type="file" name="file"/>
+     <input type="submit" name=".submit"/>
+     </form>
+
+    So all we have done is add an onsubmit handler on the form that will pop
+    up a new window and load the progress monitor. No changes need to be
+    made to your CGI script, and nothing else needs to be done (apart from
+    the standard Apache configuration directives listed in the SYNOPSIS
+    above)
+
+  Embedded Upload Monitor
+    It is also possible to embed the progress monitor directly into the page
+    and it is just as easy:
+
+     <script src="/UploadProgress/progress.js"></script>
+     <link type="text/css" href="/UploadProgress/progress.css"/>
+     <form action="/cgi-bin/script.cgi"
+           method="post"
+           enctype="multipart/form-data"
+           onsubmit="return startEmbeddedProgressBar(this)">
+     <input type="file" name="file"/>
+     <input type="submit" name=".submit"/>
+     </form>
+     <div id="progress"></div>
+
+    The only difference is that we changed the onsubmit handler to call
+    startEmbeddedProgressBar, and then we added and extra 'div' tag to
+    indicate where we want the progress monitor to appear.
+
+    For complete runable examples please see the scripts in the examples
+    directory.
+
+APACHE CONFIGURATION
+    UploadProgressBaseURI
+        Change the location of the extra support files, so that you can
+        customize them to suit your needs.
+
+         UploadProgressBaseURI /CustomUploadProgess
+         Alias /CustomUploadProgess /var/www/customprogressfiles
+
+        Make sure that you copy all the support files found in the 'extra'
+        directory to this new location and then you can customize them to
+        your liking.
+
+        This currently only affects the urls used in the XML/XSL and HTML
+        mime handlers used in the popup progress monitor.
+
+HANDLERS
+    handler
+        This handler should be run at the PerlPostReadRequestHandler stage,
+        and will detect whether we need to track the upload progress of the
+        current request. There are 5 ways for the handler to determine if
+        the upload progress should be tracked:
+
+        X-Upload-ID
+            There is an incoming header called X-Upload-ID which contains
+            the progess ID
+
+        X-Progress-ID
+            There is an incoming header called X-Progress-ID which contains
+            the progess ID
+
+        Query contains ID
+            The query portion of the URL consists of just a 32 character
+            hexadecimal string (for example
+            http://localhost/upload.cgi?1234567890abcdef1234567890abcdef)
+
+        Query contains progress_id
+            There is a query parameter in the query string called
+            progress_id, and it contains a 32 character hexadecimal number
+            (for example
+            http://localhost/upload.cgi?progress_id=1234567890abcdef12345678
+            90abcdef)
+
+        Query contains upload_id
+            There is a query parameter in the query string called upload_id,
+            and it contains a 32 character hexadecimal number (for example
+            http://localhost/upload.cgi?upload_id=1234567890abcdef1234567890
+            abcdef)
+
+        Note that you can not pass the progress_id as a hidden POST
+        parameter, since the Apache2::UploadProgress module never actually
+        decodes the POST request so it will not be able to determine what
+        the ID is. The reason for this is that we are trying to track the
+        rate at which the POST request takes to upload, so we need that ID
+        before we even start counting the incoming POST request. So the ID
+        must be passed as a header, or as a simple query parameter, as part
+        of the action attribute of the form.
+
+    progress
+        When called, this handler will return the upload progress of the
+        request identified by the given ID. The ID can be provided in
+        exactly the same way as in the handler method given above (Although
+        is usually easiest to just provide is as a query parameter called
+        progress_id).
+
+        This handler can return the results in several different formats. By
+        default, it will return XML data, but that can be changed by
+        altering the Accept header of the request (if multiple mimes are
+        present in the Accept header, they are tried in order of qvalue
+        according to RFC 2616).
+
+        For example, if you set the Accept header to the following:
+
+            Accept:  text/plain; q=0.5, text/x-json
+
+        Then the preferred mime type would be text/x-json, but if it was not
+        available, the data would be sent in text/plain.
+
+        The following formats are currently supported:
+
+        HTML ( text/html application/xhtml+xml )
+        JSON ( text/x-json application/x-json )
+        TEXT ( text/plain )
+        YAML ( text/x-yaml application/x-yaml )
+        XML ( text/xml application/xml )
+
+        For an example of how to alter the incoming Accept header see the
+        example script that is included in the examples directory.
+
+PUBLIC METHODS
+    register_mime( $mime, \&callback )
+            my $callback = sub { 
+                my ( $size, $received, $r ) = @_;
+                return sprintf "Total size: %d\n Received: %d\n", $size, $received;
+            };
+
+            Apache2::UploadProgress->register_mime( 'text/plain' => $callback );
+
+        Register a content handler for a mime. Callback will be called with
+        three positional arguments, size, received and $r. Callback is
+        expected to return a scalar of octets representing the response
+        body. This can be used to override any of the existing content
+        handlers (for example if you wanted a custom HTML response, override
+        'text/html').
+
+INTERNAL METHODS
+    The following internal methods should never need to be called directly
+    but are documented for completeness.
+
+    progress_id( $r )
+            $progress_id = Apache2::UploadProgress->progress_id($r);
+
+        Determine the progress ID for the current request (if it exists)
+
+    fetch_progress( $progress_id )
+            $progress = Apache2::UploadProgress->fetch_progress($progress_id);
+            printf "size:     %d", $progress->[0];
+            printf "received: %d", $progress->[1];
+
+        Pulls the progress values from the cache based on the provided ID
+
+    store_progress( $progress_id, [ $size, $received ] )
+            Apache2::UploadProgress->store_progress( $progress_id, [ $size, $received ] );
+
+        Update the progress values in the cache for the given ID
+
+    track_progress
+        An Input filter handler that totals up the number of bytes that have
+        been sent as part of the current request, and updates the current
+        progress through calls to "store_progress".
+
+BUGS
+    Safari
+        The JavaScript for the embedded progress meter is currently failing
+        in Safari
+
+    Cancelled uploads
+        When a user cancels an upload, but leaves the page with the progress
+        meter active, the progress meter may continue to reload indefinately
+
+SEE ALSO
+    <http://perl.apache.org/docs/2.0/>.
+
+    <http://www.modperlbook.org/>.
+
+    Apache2::Filter.
+
+    Apache2::RequestRec.
+
+AUTHOR(S)
+    Christian Hansen "chansen@cpan.org"
+
+    Cees Hek "ceeshek@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

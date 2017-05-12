@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Redis;
+use LWP::UserAgent::CHICaching;
+use Attean;
+use RDF::Trine;
+use CHI;
+use AtteanX::Query::Cache::Retriever;
+use AtteanX::Store::SPARQL;
+use AtteanX::Store::LDF;
+use AtteanX::Model::SPARQLCache::LDF;
+
+
+my $cache = CHI->new( driver => 'Memory', global => 1 );
+my $sparqlurl = 'http://dbpedia.org/sparql';
+my $ldfurl = 'http://fragments.dbpedia.org/2015/en';
+my $redisserver = 'robin.kjernsmo.net:6379';
+
+RDF::Trine::default_useragent(LWP::UserAgent::CHICaching->new(cache => $cache));
+
+my $sparqlstore = Attean->get_store('SPARQL')->new(endpoint_url => $sparqlurl);
+my $ldfstore    = Attean->get_store('LDF')->new(start_url => $ldfurl);
+
+
+my $redissub = Redis->new(server => $redisserver, name => 'subscriber');
+
+my $model = AtteanX::Model::SPARQLCache::LDF->new(store => $sparqlstore,
+																  cache => $cache,
+																  ldf_store => $ldfstore);
+my $retriever = AtteanX::Query::Cache::Retriever->new(model => $model);
+
+$redissub->subscribe('prefetch.triplepattern', 
+							sub {
+								my $string = shift;
+								my $pattern = Attean::TriplePattern->parse($string)->canonicalize;
+								my $numvars = scalar $pattern->values_consuming_role('Attean::API::Variable');
+								if ($numvars > 0 && $numvars <= 2) {
+									$model->cache->set($string, $retriever->fetch($pattern));
+								}
+							});
+
+$redissub->wait_for_messages(0) while 1;

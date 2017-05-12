@@ -1,0 +1,151 @@
+NAME
+    App::Lingua::BO::Wylie::Transliteration
+
+VERSION
+    version 0.1.0
+
+SYNOPSIS
+    Wylie transliterate can be used to transliterate words from Wylie
+    Transliteration to (Classical) Tibetan (dbu med)
+
+BACKGROUND
+    When you have one (foreign) alphabet and would like to display it in a
+    different alphabet (example: Russian to Latin alphabet), you will want
+    to use a certain transliteration scheme.
+
+    Just compare all the different names you can find "Dostojevski"
+    transliterated to, to see what enourmous differences there will be.
+
+    Now for the Classical Tibetan "dbu med" alphabet there exist two main
+    transliteration schemes:
+
+    *   Library of Congress Transliteration
+
+    *   Wylie Transliteration
+
+    Classical Tibetan alphabet itself works in a really interesting way.
+
+    First, let's have a look at the table of the individual "characters"
+    with their Wylie transliterations:
+
+    <http://en.wikipedia.org/wiki/Tibetan_alphabet>
+
+    A few key observations:
+
+    *   (Almost) all letters represent a consonant, carrying an inherent
+        vocal: "a"
+
+    *   These letters/syllables are sorted according to tonality and
+        aspiration (in pronunciation)
+
+    *   Other vocals will be achieved by adding certain vocal-symbols in the
+        proper places:
+
+       * i.e. you can build the following syllables by adding a vowel sign:
+         * ka -> ko
+         * ka -> ku
+         * ka -> ki
+         * ka -> ke
+
+    The latter is a process of merging symbols to form new symbols (with the
+    merging taking place in the proper places -- 'e' is on top, 'u' will be
+    inserted at the bottom)
+
+    This merging process can be seen as building "ligatures", of which even
+    more exist.
+
+    As we have seen, the vocal symbols (for all vocals except 'a', which is
+    inherent) need to be added in the proper places.
+
+    For the rest of the symbols that can be added, the scheme looks the
+    following:
+
+             b  s  g   r   u   b  s
+             |  |  |   |   |   |  |
+             1  2  3   4   5   6  7
+
+    With the places being the following:
+
+    1) Prescript 2) Superscript 3) The Center piece (carriyng the inherent
+    vocal, mandatory) 4) Subscript 5) The vocal sign 6) Postscript1 7)
+    Postscript2
+
+    Note: Except from the Center piece (3), all other signs are optional.
+
+    Note: Optional character can form ligatures with the character they are
+    combined with.
+
+TECHNICAL BACKGROUND (UNICODE)
+    The Unicode consortium had to decide what they want their code points to
+    look like:
+
+    a) either each altered base syllable is represented (i.e. ka, ko, ke,
+    ki, ku) as a separate character (code point) b) the base syllables are
+    represented and the altered syllables will be merged
+
+    Since it was chosen for the latter, this has a few consequences:
+
+    *   The graphical representation will depend on building ligatures and
+        thus on the font you are using.
+
+    *   That means you have to make sure you have appropriate fonts to
+        display the signs correctly.
+
+    Even if you find the ligatures not mixed together well (e.g. on your
+    shell), you can still copy-paste the results somewhere else where you
+    have a proper font available. Since only the code points are represented
+    and it is up to the font to build the ligatures you will find the
+    copy-pasted result come out very well with a proper font having the
+    ligatures available.
+
+    Copy-pasting your results
+    here(http://www.thlib.org/reference/transliteration/wyconverter.php)
+    might help should the tibetan signs not be rendered correctly on your
+    shell
+
+USAGE
+         echo bsgrubs | wylie-transliterate
+
+    or
+
+       wylie-transliterate <FILE>
+
+MOTIVATION
+    "Nobody needs such a module!" -- you might say. I agree. But the one
+    person who might need it will be more than happy to have. (Given he/she
+    finds it in the webz).
+
+    Still though, let me just say:
+
+    *   I do it because I can
+
+    *   in my studies I visited a course "Classical Tibetan I"
+
+    Really, I didn't learn too much about this interesting language, but a
+    few things just stuck with me, such as the composition of characters to
+    build words.
+
+RESPONSIBILITIES / FEEDBACK
+    I am in no way any expert in Classical Tibetan. I can't even read one
+    sentence.
+
+    But I can decipher one word!
+
+    This module was written in the spirit of my fascination with the
+    interesting system of this language and I would love to learn it for
+    real some day.
+
+    Please, if you are an expert and you find any errors, fixes, whatever --
+    I call it your reponsibility to let me know!
+
+    Please shoot me an email at: dbr @at@ cpan . org, thank you!
+
+AUTHOR
+    DBR <dbr@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by DBR.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

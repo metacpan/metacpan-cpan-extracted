@@ -1,0 +1,120 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc
+# ABSTRACT: The root delegator of all other gitc commands
+our $VERSION = '0.60'; # VERSION
+
+# generally /var/tmp has more space than /tmp  It's possible that /tmp
+# will get full.  If '/var/tmp' doesn't exist on a particular machine,
+# tmpdir() does the right thing and just defaults to /tmp.  Of course, don't
+# override if the user has already set TMPDIR to something he prefers
+BEGIN { $ENV{TMPDIR} ||= '/var/tmp' };
+
+# is it a built in command?
+my $command = shift;
+if ( not defined $command ) {
+    die "Usage: gitc command\n";
+}
+
+# a bit hackish, but certain commands are quite useful to be able to run
+# while a promotion is in progress
+my $check_suspended = 1;
+if ($command =~ /^(show|log)$/) {
+    # however, don't let them run if they're going to update anything
+    my $params = join(':', @ARGV);
+    $check_suspended = 0
+        unless $params and $params =~ /(^|:)-{1,2}f/i; # --fetch
+}
+
+# make sure no gitc commands are suspended
+my $suspend_file = '.git/gitc-suspended-process';
+if ( $check_suspended and -e $suspend_file ) {
+    open my $fh, '<', $suspend_file
+        or die "Unable to open $suspend_file: $!\n";
+    chomp( my $pid = <$fh> );
+    chomp( my $msg = <$fh> );
+    close $fh;
+    die   "$msg\nThe suspended PID is $pid. `jobs -l` might help.\n"
+        . "You can force your way through by deleting $suspend_file.\n"
+        ;
+}
+
+# if this option is enabled then in the event a gitc command doesn't exist we will
+# suggest the 'git' version of that command (if it exists)
+my $should_suggest = `git config --get gitc.suggest-git-on-unknown-command | tr -d '\\n'` || 0;
+if ($should_suggest) {
+    my $gitc_command_exists = `which gitc-$command 2>&1` !~ /no gitc-$command/;
+    my $git_command_exists  = `git help -a|egrep '^  [a-zA-Z0-9]' | grep $command`;
+
+    if ($gitc_command_exists)
+    {
+        exec "gitc-$command", @ARGV;
+    }
+    elsif ($git_command_exists)
+    {
+        # the git version of $command exists. ask the user if they want to run it.
+        my $input;
+        print "Can't exec 'gitc-$command'. Did you mean git $command? [y/n] ";
+        $input = <STDIN>;
+        chomp $input;
+
+        if ($input =~ /^(y)(es)?$/i) {
+            my $cmd = "git $command " . join ' ', @ARGV;
+            print "> $cmd\n";
+            exec $cmd;
+        }
+    }
+    else
+    {
+        print "Can't exec 'gitc-$command' or 'git $command'.\n";
+    }
+}
+else
+{
+    # suggest-git-on-failed-commend is not enabled
+    exec "gitc-$command", @ARGV;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc - The root delegator of all other gitc commands
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

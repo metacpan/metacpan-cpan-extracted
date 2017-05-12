@@ -1,0 +1,28 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "TFA Strawberry",
+            "percentage" : "6"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Sweet Cream",
+            "percentage" : "2"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Banana Cream",
+            "percentage" : "8"
+         }
+      ],
+      "target_pg" : "50",
+      "base_nic_per_ml" : 100,
+      "base_nic_type" : "PG",
+      "target_quantity" : 10,
+      "target_nic_per_ml" : 12,
+      "target_vg" : "50",
+      "notes" : []
+   }
+}

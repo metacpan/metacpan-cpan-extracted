@@ -1,0 +1,63 @@
+{
+   "abstract" : "A featureful IRC bouncer based on POE::Component::IRC",
+   "author" : [
+      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Bondage",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "utils",
+         "example"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Script" : "1.07"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "POE::Component::Client::DNS" : "0.99",
+            "POE::Component::IRC" : "6.06",
+            "POE::Filter::IRCD" : "2.34",
+            "Proc::Daemon" : 0,
+            "YAML::XS" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-App-Bondage@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-Bondage"
+      },
+      "homepage" : "http://search.cpan.org/dist/App-Bondage/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hinrik/app-bondage.git",
+         "web" : "http://github.com/hinrik/app-bondage"
+      }
+   },
+   "version" : "0.4.11",
+   "x_authority" : "cpan:HINRIK"
+}
+

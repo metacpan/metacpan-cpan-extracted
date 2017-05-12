@@ -1,0 +1,40 @@
+NAME
+    Apache::GuessCharset - adds HTTP charset by guessing file's encoding
+
+SYNOPSIS
+      PerlModule Apache::GuessCharset
+      SetHandler perl-script
+      PerlFixupHandler Apache::GuessCharset
+
+      # how many bytes to read for guessing (default 512)
+      PerlSetVar GuessCharsetBufferSize 1024
+
+      # list of encoding suspects
+      PerlSetVar GuessCharsetSuspects euc-jp
+      PerlAddVar GuessCharsetSuspects shiftjis
+      PerlAddVar GuessCharsetSuspects 7bit-jis
+
+DESCRIPTION
+    Apache::GuessCharset is an Apache handler which adds HTTP charset
+    attribute by automaticaly guessing file' encodings via Encode::Guess.
+
+CONFIGURATION
+    This module uses following configuration variables.
+
+    GuessCharsetSuspects
+        a list of encodings for "Encode::Guess" to check. See the
+        Encode::Guess manpage for details.
+
+    GuessCharsetBufferSize
+        specifies how many bytes for this module to read from source file,
+        to properly guess encodings. default is 512.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Encode::Guess manpage, the Apache::File manpage
+

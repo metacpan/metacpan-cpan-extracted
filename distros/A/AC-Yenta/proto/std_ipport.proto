@@ -1,0 +1,13 @@
+// Copyright (c) 2008 AdCopy
+// Author: Jeff Weisberg
+// Created: 2008-Dec-19 13:23 (EST)
+// Function: 
+//
+// $Id$
+
+message ACPIPPort {
+	required fixed32	ipv4		= 1;
+	optional int32		port		= 2;
+        optional string         natdom          = 3;
+}
+

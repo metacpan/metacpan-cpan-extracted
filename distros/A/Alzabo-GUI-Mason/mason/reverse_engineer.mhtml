@@ -1,0 +1,36 @@
+<%args>
+$name
+$username => undef
+$password => undef
+$host => undef
+$port => undef
+$rdbms
+</%args>
+
+<%init>
+
+my $s;
+eval
+{
+    $s = Alzabo::Create::Schema->reverse_engineer( name => $name,
+						   rdbms => $rdbms,
+						   user => $username,
+						   password => $password,
+						   host => $host,
+						   port => $port,
+						 );
+
+    $s->save_to_file;
+};
+
+my $e = $@;
+
+$m->comp( 'exception', $e ) if $e;
+
+$m->redirect( uri( path => 'view_schema' . Alzabo::GUI::Mason::Config::mason_extension(),
+                   query => { schema => $s->name,
+                            },
+                 ),
+            );
+
+</%init>

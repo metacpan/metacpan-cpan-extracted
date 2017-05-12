@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache2::Connection::Arp.
+
+0.01  Wed May  5 17:01:26 2010
+	- original version; created by h2xs 1.23 with options
+		-X Apache2::Connection::Arp
+

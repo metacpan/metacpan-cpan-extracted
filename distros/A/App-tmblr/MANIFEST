@@ -1,0 +1,7 @@
+bin/tmblr
+bin/tmblr-rm
+lib/App/tmblr.pm
+Makefile.PL
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

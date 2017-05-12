@@ -1,0 +1,38 @@
+Revision history for Perl extension Apache::DumpHeaders.
+
+0.94  Fri Mar  8 2002
+    - [ProxyPassThru] Fix proxy when there are multiple headers with
+      the same name. (From Tatsuhiko Miyagawa <miyagawa@edge.co.jp>)
+
+0.93  Mon Aug 20 2001
+    - Cosmetic fix
+    - [ProxyPassThru] Bugfixes from Tatsuhiko Miyagawa <miyagawa@edge.co.jp>
+      - It hangs with POST request
+      - Links are broken when 302 redirect happens
+        LWP::UserAgent::request() automatically handles Redirection.
+
+0.92  Thu Jan 11 2001
+    - Put the contents of DumpHeaders in the log file (except if it's
+      just a number). Useful in combination with DumpHeaders_Conditional 
+      to include the reason you are logging this particular requets.
+
+0.91  Fri Sep 22 2000 (never released)
+    - Fix typo in separator (thanks to Tim Bunce for noticing)
+
+0.90  Thu Aug 18 2000
+    - Added separator with a timestamp before each request
+
+0.20  Fri Apr 28 2000
+    - Added DumpHeaders_Percent option
+    - Added DumpHeaders_Conditional option
+    - Added "use strict"
+    - Included Apache::ProxyPassThru.pm (Not tested very well though)
+
+0.03  Tue Jan 18 2000
+    - Typo in the documentation. Thanks to Stas Bekman
+      <sbekman@stason.org>
+
+0.02  Thu Jan  6 2000
+    - original version; based on Doug's module from the Contrib
+      package
+

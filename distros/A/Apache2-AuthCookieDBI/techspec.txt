@@ -1,0 +1,56 @@
+$Id: techspec.txt,v 1.1 2003/10/10 20:13:33 jacob Exp $
+
+Apache::AuthCookieDBI Technical Specification
+
+* Description.
+
+This module will allow cookie-based authentication backed by a DBI database,
+using usernames and passwords for authentication.
+
+* Authentication.
+
+Authentication is based on a username and password.  These are supplied in
+plaintext by the user in a form submission through Apache::AuthCookie.  These
+are compared against values in a users table in a DBI database.  The password
+field in the database may be plaintext, or hashed with crypt() or md5_hex().
+
+* Tickets.
+
+When a user successfully authenticates, they are issued a cookie with a
+session value.  This value consists of a serialized version of
+the userid, an issue time, an expiration date, and a two-round MD5 checksum
+of the userid and times and a server secret key.  This checksum
+ensures that when the ticket is returned we can see that it has not been
+tampered with since in order to generate the checksum you must have the secret
+key.
+
+This ticket may optionally be encrypted using DES, IDEA or Blowfish to prevent
+the client being able to view the information contained in it.  Note that this
+does not protect against someone intercepting the ticket and using it to
+access the system; use SSL to prevent connection sniffing.
+
+* Ticket authentication.
+
+When this ticket is returned to the server with each request to a protected
+document, it is decrypted if encryption is in use, the fields are broken apart
+and a new checksum is generated of the user, issue time, expire time, and the
+server secret key.  This checksum is compared to the supplied checksum to
+ensure that no tampering has taken place.
+
+The expire time is checked against the current time to ensure that this
+ticket has not expired.
+
+The user is then set from what was supplied in the ticket.
+
+* Authorization.
+
+Group-based authorization is permitted with:
+
+	require group foo bar
+
+directives.  A groups table is used to look up whether the authenticated user
+is a member of any of the supplied groups.  If so access will be permitted.
+This groups table should have one column for the group name and one for
+the user name (in a well-normalized database that has more per-group
+information than this module uses it would be a join table between the
+groups and users tables).

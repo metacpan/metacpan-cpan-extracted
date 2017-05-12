@@ -1,0 +1,69 @@
+Revision history for Perl extension App::OpenVZ::BCWatch.
+
+0.04  2012-12-20  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.03_01  2012-12-05  <schubiger@cpan.org>
+
+ - Fix "Test failures due to hash randomisation in perl 5.17.6"
+   [rt #81605 - Andreas Koenig]
+
+0.03  2010-08-21  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.02_04  2010-08-19  <schubiger@cpan.org>
+
+ - Update vzwatchd's broken license link.
+
+ - Optimize the code populating the report template.
+
+ - Fill in spaces for the report through a zero-width assertion.
+
+ - Store the indexes of changed fields with lexical scope.
+
+0.02_03  2010-08-17  <schubiger@cpan.org>
+
+ - Use non-destructive matching in _get_data_running().
+
+ - Don't match eventually greedy in _get_data_running().
+
+ - Extract field names prior entering the loop in _get_data_running().
+
+ - Avoid code duplication for the comparison subs in _compare_data().
+
+ - Localize $1 in _prepare_report().
+
+ - Always store an empty hash at initialization for the data file.
+
+ - Unlink the data file when vzwatchd stops.
+
+ - Emphasize that default mail address options might need adjustment.
+
+0.02_02  2010-08-14  <schubiger@cpan.org>
+
+ - Update broken license link.
+
+0.02_01  2010-07-30  <schubiger@cpan.org>
+
+ - Mention the supported user_beancounters version.
+
+ - List the user_beancounters version dependency as limitation.
+
+ - Delete some instance data through a hash slice.
+
+ - Rename the report variable in _prepare_report().
+
+ - Comment the use of $VERSION in vzwatchd.
+
+ - Minor whitespace tweaks.
+
+0.02 Tue Sep 22 15:06:25 CEST 2009
+
+ - Set for configuration options of type number or boolean
+   the initial values based upon definedness.
+
+0.01 Wed Nov 12 13:33:54 CET 2008
+
+ - Initial version.

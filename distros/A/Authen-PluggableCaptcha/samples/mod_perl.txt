@@ -1,0 +1,124 @@
+originally this was designed for use in mod_perl
+
+this is how it is currently implemented on FindMeOn.com ( June 2006 ) 
+
+==========
+
+# general captcha init function in utility library
+sub CAPTCHA_init {
+	my 	( $pageObject , $sectionName , $overrideFlag )= @_;
+
+	# pageObject- context object that includes access to session , account, and libapreq
+	# sectionName- the name of the what is requesting a captcha.  ie, your registration page would want to say 'registration', or a general auth page would say 'auth'
+	#	this is used to create a seed, so the user doesn't get an identical captcha on each page
+	# overrideFlag- bool value to force a re-init of the captcha
+
+	if ( $pageObject->{'CaptchaInstance'} && !$overrideFlag ) {
+		return;
+	}
+
+	# the seed for the captcha is a hash of the sectionName and the user's session_id
+	my 	$seed= md5_hex( $sectionName . '|' . $pageObject->PageUser->get_session_id() );
+	
+	# we set/store the publickey to the captcha in the session.  we could show it to people, but honestly we do it like this because store/retrieve is easier than generating/validating every damn time
+	my 	$captcha_key= $pageObject->PageUser->get_session_stored("captcha_publickey__${sectionName}");
+
+	my 	$captcha;
+	if 	( $captcha_key ) {
+		$captcha= Authen::PluggableCaptcha->new( 
+			type=> 'existing' , 
+			site_secret=> $FindMeOn::Config::site_secret , 
+			seed=> $seed ,
+			publickey=> $captcha_key,
+		);
+		if ( $captcha->is_invalid() ) {
+			$captcha_key= undef;
+			$pageObject->{'_CaptchaInvalid'}= 1;
+		} 
+		if ( $captcha->is_expired() ) {
+			$pageObject->{'_CaptchaExpired'}= 1;
+			$captcha_key= undef;
+		} 
+	}
+
+	if 	( !$captcha_key ) {
+		$captcha= Authen::PluggableCaptcha->new( 
+			type=> 'new' , 
+			site_secret=> $FindMeOn::Config::site_secret , 
+			seed=> $seed ,
+		);
+		$captcha_key= $captcha->get_publickey() or die "Error";
+		$pageObject->PageUser->set_session_stored("captcha_publickey__${sectionName}",$captcha_key);
+		$captcha= Authen::PluggableCaptcha->new( 
+			type=> 'existing' , 
+			site_secret=> $FindMeOn::Config::site_secret , 
+			seed=> $seed ,
+			publickey=> $captcha_key,
+		);
+	}
+	$pageObject->{'CaptchaInstance'}= $captcha;
+}
+
+
+# a page that displays / verifies captchas just calls:
+
+	&CAPTCHA_init( $self , 'registration', 1 );
+
+
+# to show a text captcha, we can render this directly into a Petal document
+
+	%PetalPersonalizedHash= (
+		'Captcha'=> {
+			instructions=> undef,
+			user_prompt=> $self->{'CaptchaInstance'}->render( 
+				challenge_class=> 'Authen::PluggableCaptcha::Challenge::DoMath', 
+				render_class=>'Authen::PluggableCaptcha:::Render::Text::HTML' 
+			),
+		},
+	);
+	
+# validate?
+
+	if 	(
+			!$self->{'CaptchaInstance'}->validate_response(
+				challenge_class=> 'Authen::PluggableCaptcha::Challenge::DoMath',
+				user_response=> $self->{'Form'}->get_validated('captcha_response'),
+			)
+		) {
+		$self->{'Form'}->set_error('captcha_response','That answer is not correct, please try again');
+		return $self->FORM_print();
+	}
+	else {
+		# we're valid!
+	}
+
+# so you want to display an image?
+
+	# print the image on one page:
+	
+		my 	$captcha_embed= "<img src="/path/to/captcha/handler?section=registration" />";
+
+
+	# then set a sub to generate it on that url mapping
+
+	# in this example, the captcha generator is in a central location -- /service/captcha/
+	# so we supply the section name as a query arg.  if the captcha generator were locked into a page, then you could just hardcode the section name
+	
+		sub render_image {
+			my 	( $self )= @_ ;
+		
+			my 	$sectionName= $self->PageUser->ApacheRequest->param('section');
+		
+			#initialize the captcha
+			&FindMeOn::Functions::Misc::CAPTCHA_init( $self , $sectionName );
+		
+			$self->PageUser->ApacheRequest->content_type('image/jpeg');
+			$self->{'__BODY'}= $self->{'CaptchaInstance'}->render( 
+				challenge_class=> 'Authen::PluggableCaptcha::Challenge::TypeString', 
+				render_class=>'Authen::PluggableCaptcha::Render::Image::Imager' ,  
+				font_filename=> '/usr/X11R6/lib/X11/fonts/TTF/VeraMoIt.ttf',
+				format=>'jpeg' 
+			);
+			
+			return;
+		}

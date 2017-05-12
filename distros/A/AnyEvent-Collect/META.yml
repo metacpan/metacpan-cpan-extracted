@@ -1,0 +1,23 @@
+---
+abstract: 'Block till one or more events fire'
+author:
+  - 'Rebecca Turner <becca@referencethis.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-Collect
+requires:
+  AnyEvent: 0
+  Event::Wrappable: 0
+  Sub::Exporter: 0
+resources:
+  bugtracker: https://github.com/iarna/AnyEvent-Collect/issues
+  homepage: https://github.com/iarna/AnyEvent-Collect
+  repository: https://github.com/iarna/AnyEvent-Collect.git
+version: 0.1.0

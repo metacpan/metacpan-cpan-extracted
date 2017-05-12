@@ -1,0 +1,25 @@
+Revision history for Perl extension Astro::SkyX.
+
+0.11  Sun Nov 11 2015 //rhw
+        - Updated to support Functions in Script TheSkyX Documentation Version 1.23.
+        - Removed need to update when new read/write properties are added. Someone smarter than me 
+          could probrobably eliminate the need to add new functions...
+0.08  Tue Mar 7 2013 //rhw
+        - Added averagePixelValue to ccdsoftImage class
+0.07  Tue Feb 10 2013 //rhw
+        - Fixed bug where large amounts of returned data could sometimes be incomplete. 
+        - Examples in SkyX_Test.pl on how to send and get results of raw java script.
+0.06  Tue Feb 6 2013 //rhw
+        - Fixed bug in sky6RASCOMTele->SlewToRaDec. Also fixed a bug in all modules where negative numbers
+          would get quoted. Thanks to R Abraham for giving a test case to track down the bugs.
+0.05  Tue Feb 5 2013 //rhw
+        - Replaced ccdsoftImage with ccdsoftCameraImage and ccdsoftAutoguiderImage
+0.04  Sun Jan 30 2013 //rhw
+        - Fixed a bug in sky6RASCOMTele->Asychronous
+0.03  Sun Jan 20 2013 //rhw
+        - Added ccdsoftCamera and ccdsoftImage classes (SkyX 10.2.0 Build 6519 and later)
+0.02  Fri Jan 20 18:31:31 2012
+	- original version; created by h2xs 1.23 with options
+		-AX -n SkyX
+        - Thanks to R Crain for giving a lesson on AUTOLOAD and module building.
+

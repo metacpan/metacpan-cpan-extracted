@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Acme-CPANAuthors-CodeRepos
+version:             0.080522
+abstract:            We are CPAN authors using CodeRepos
+license:             perl
+author:              
+    - Kenichi Ishigaki <ishigaki@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Acme::CPANAuthors:             0.02
+    Test::More:                    0.47
+    Test::UseAllModules:           0.09
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

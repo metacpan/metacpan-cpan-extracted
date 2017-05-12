@@ -1,0 +1,46 @@
+---
+abstract: 'Monitor and debug Future objects'
+author:
+  - 'Tom Molesworth <cpan@perlsite.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Fatal: '0.010'
+  Test::More: '0.98'
+  Test::Refcount: '0.07'
+  perl: '5.010001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-mirai
+recommends:
+  Sereal: '3.000'
+requires:
+  Adapter::Async: '0.011'
+  File::HomeDir: '1.00'
+  File::ShareDir: '0'
+  File::Spec: '0'
+  Future: '0.30'
+  IO::Handle: '0'
+  JSON::MaybeXS: '0'
+  List::UtilsBy: '0'
+  Mixin::Event::Dispatch: '1.006'
+  Socket: '2.000'
+  Tickit::Async: '0'
+  Tickit::DSL: '0.021'
+  Time::HiRes: '0'
+  Variable::Disposition: '0.002'
+  curry: '0'
+  parent: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-mirai
+  homepage: http://search.cpan.org/dist/App-mirai/
+version: '0.003'

@@ -1,0 +1,55 @@
+<html>
+<head>
+  <title>Aw::Util</title>
+</head>
+<body bgcolor="#f0f0f0" link="#cc0000" vlink="brown">
+
+<h1><u>Aw::Util</u></h1>
+
+<table width="90%" border=1 bgcolor="#cccc99">
+<tr bgcolor="#bfbfbf"><th>Method</th><th>Arguments</th><th>Return</th><th>Throws<br>Exception</th></tr>
+<tr align="center"><th align="left"><a name="new"></a>new</th><td>( adapter, [requestEvent, requestDef ] )<br><div align="left">Handle initialization is performed if <code>requestEvent</code> and <code>requestDef</code> are passed.</div></th><td>Aw::Util</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="DESTROY"></a>DESTROY</th><td>( )</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="createEvent"></a>createEvent</th><td>( name )</td><td>Aw::Event</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="createTypedEvent"></a>createTypedEvent</th><td>( name )</td><td>Aw::Event</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="findFieldInfo"></a>findFieldInfo</th><td>( field_name )</td><td>Aw::Event</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="findFieldInfoReq"></a>findFieldInfoReq</th><td>( field_name )</td><td>Aw::Event</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getEventTypeDef"></a>getEventTypeDef</th><td>( event_name )</td><td>Aw::TypeDef</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="deliverAckReplyEvent"></a>deliverAckReplyEvent</th><td>( )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="deliverNullReplyEvent"></a>deliverNullReplyEvent</th><td>( )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="deliverPartialReplyEvent"></a>deliverPartialReplyEvent</th><td>( replyEvent, record, isLast, replyToken )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="deliverReplyEvent"></a>deliverReplyEvent</th><td>( event )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getBooleanInfo"></a>getBooleanInfo</th><td>( field_name )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getBooleanInfoReq"></a>getBooleanInfoReq</th><td>( field_name )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getIntegerInfo"></a>getIntegerInfo</th><td>( field_name )</td><td>Number</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getIntegerInfoReq"></a>getIntegerInfoReq</th><td>( field_name )</td><td>Number</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getStringInfo"></a>getStringInfo</th><td>( field_name )</td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getStringInfoReq"></a>getStringInfoReq</th><td>( field_name )</td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getStringSeqInfo"></a>getStringSeqInfo</th><td>( field_name )</td><td>@String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getStringSeqInfoReq"></a>getStringSeqInfoReq</th><td>( field_name )</td><td>@String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getStructSeqInfo"></a>getStructSeqInfo</th><td>(  field_name )</td><td>@Aw::Event</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getStructSeqInfoReq"></a>getStructSeqInfoReq</th><td>(  field_name )</td><td>@Aw::Event</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="initHandle"></a>initHandle</th><td>( adapter, requestEvent, requestDef )</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="isEventFieldSet"></a>isEventFieldSet</th><td>( event, field_name )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="newSubscription"></a>newSubscription</th><td>( event_type_name, filter, requestEvent, requestDef )<br><b><i>Initialization is done here also. This is probably old code, requestEvent and requestDef should not be required??</b></i></th><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="publish"></a>publish</th><td>( event )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setDateTimeFormat"></a>setDateTimeFormat</th><td>( format )</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setEventField"></a>setEventField</th><td>(event, field_name, typeDef, value)</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setFieldFromString"></a>setFieldFromString</th><td>( event, field_name, typeDef, value )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setStringField"></a>setStringField</th><td>( event, fieldName, value )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setupEventVerify"></a>setupEventVerify</th><td>( canSubscribe, canPublish, supportsNotification )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="toFormattedString"></a>toFormattedString</th><td>( format )</td><td>String</td><td>NO</td></tr>
+<tr bgcolor="#bfbfbf" align="left"><th colspan=4>Inherited Methods</th></tr>
+<tr align="center"><th align="left"><a name="err"></a>err</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="errmsg"></a>errmsg</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="error"></a>error</th><td>( )</td><td>Aw::Error</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="hello"></a>hello</th><td>( )<br><div align="left">Returns the string "hello".  Useful for debugging.</div></td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getWarn"></a>getWarn</th><td>( )<br><div align="left">Returns current warn <b><code>level</code></b>.</div></th><td>Number</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setWarn"></a>setWarn</th><td>( level )<br><div align="left">Sets new warn <b><code>level</code></b>.<dir>0 : No warnings (quiet mode)<br>1 : Terse (uses awErrorToString)<br>2 : Verbose (uses awErrorToCompleteString)</dir>The Aw extensions must be compiled with AWXS_WARNS defined.</div></th><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="warn"></a>warn</th><td>( [string] )<br><div align="left">Warn message is <b><code>string</code></b> if passed, otherwise current err is converted to string.</div></th><td>void</td><td>YES</td></tr>
+</table>
+
+<p><hr size=3 noshade>
+
+</body>
+</html>

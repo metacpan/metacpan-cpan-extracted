@@ -1,0 +1,4 @@
+This is a sample text file for testing Zapzi.
+
+No special formatting here.
+

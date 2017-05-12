@@ -1,0 +1,33 @@
+App::HTRender version 1.00
+==========================
+
+A command line tool to work with HTML::Template templates without 
+requiring a web server.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::Template
+  JSON::Tiny
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Andrew Johnson.
+
+This library is free software; you can redistribute it and/or modify 
+it under the terms of the Artistic License 2.0.  See the included 
+LICENSE file for details.
+
+WARRANTY
+
+This software comes with no warranty of any kind.

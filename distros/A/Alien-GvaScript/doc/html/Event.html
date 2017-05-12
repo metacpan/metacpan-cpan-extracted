@@ -1,0 +1,229 @@
+<html>
+<head>
+  <script src="../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <link href="GvaScript_doc.css" rel="stylesheet" type="text/css">
+  <script>
+    document.observe('dom:loaded', function() { new GvaScript.TreeNavigator('TN_tree'); });
+    function jumpto_href(event) {
+      var label = event.controller.label(event.target);
+      if (label && label.tagName == "A") {
+        label.focus();
+        return Event.stopNone;
+      }
+    }
+  </script>
+</head>
+<body>
+<div id='TN_tree'>
+  <div class="TN_node">
+   <h1 class="TN_label">Alien::GvaScript::Event</h1>
+   <div class="TN_content">
+     <p><em>application-specific events
+</em></p>
+     <div class="TN_node"  onPing="jumpto_href">
+       <h3 class="TN_label">Table of contents</h3>
+       <div class="TN_content">
+         <div class="TN_leaf">
+  <a class="TN_label" href="#NAME">NAME</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#SYNOPSIS">SYNOPSIS</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#DESCRIPTION">DESCRIPTION</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#METHODS">METHODS</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#fireEvent_first_syntax_">fireEvent (first syntax)</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#fireEvent_second_syntax_">fireEvent (second syntax)</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#REGISTERING_AN_EVENT_HANDLER">REGISTERING AN EVENT HANDLER</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Event_structure">Event structure</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+
+       </div>
+     </div>
+     <hr/>
+   </div>
+  </div>
+  <div class="TN_node" id="NAME">
+    <h2 class="TN_label">NAME</h2>
+    <div class="TN_content">
+      <p>Alien::GvaScript::Event - application-specific events</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="SYNOPSIS">
+    <h2 class="TN_label">SYNOPSIS</h2>
+    <div class="TN_content">
+      <pre>  MyConstructor = function (...) {...};
+  
+  MyContructor.prototype = {
+   
+    fireEvent = GvaScript.fireEvent, // copy into the target object
+  
+    someMethod: function(...) {
+      ...
+      this.fireEvent(eventName, target1, target2, ...);
+      // OR ...
+      this.fireEvent({type: eventName,
+                      prop1: value1,
+                      ...            }, target1, target2, ...);
+    }
+  };</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="DESCRIPTION">
+    <h2 class="TN_label">DESCRIPTION</h2>
+    <div class="TN_content">
+      <p>Extension of the HTML event model with specific events. 
+Various <code>GvaScript</code> controllers use this to manage interactions
+between the DOM elements and the controller. Client code
+can register a an event handler either within the 
+HTML code, or through Javascript.</p>
+<p>Events have names specific to the controller
+(for example <code>choiceList</code> uses events <code>Highlight</code> and <code>Ping</code>;
+<code>treeNavigator</code> uses events <code>Close</code>, <code>Open</code>, <code>BeforeLoadContent</code>, etc.).</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="METHODS">
+    <h2 class="TN_label">METHODS</h2>
+    <div class="TN_content">
+        <div class="TN_node" id="fireEvent_first_syntax_">
+    <h3 class="TN_label">fireEvent (first syntax)</h3>
+    <div class="TN_content">
+      <p>If a class needs to fire specific events, it must 
+<i>copy</i> the <code>GvaScript.fireEvent</code> method into its own
+methods (so that "this" is properly bound to an instance
+of that class).</p>
+<p>The first argument to <code>fireEvent</code> is usually an event name. This 
+can be any string, without the <code>on</code> prefix :</p>
+<pre>  this.fireEvent("Ping", this.htmlElement, otherElement1, ...);</pre>
+
+<p>The method will inspect all HTML elements supplied in 
+the argument list, trying to find an <code>onPing</code> handler.
+If none is found, the method also tries to find 
+an <code>onPing</code> property within the calling object (<code>this</code>).</p>
+<p>If an event handler is found, that handler is called
+with an <code>event</code> argument as described below; 
+the return value of the handler becomes the 
+return value of <code>fireEvent</code>. If not handler is found,
+<code>fireEvent</code> returns <code>null</code>.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="fireEvent_second_syntax_">
+    <h3 class="TN_label">fireEvent (second syntax)</h3>
+    <div class="TN_content">
+      <p>For more sophisticated needs, the first argument
+to <code>fireEvent</code> can be an object with several 
+properties. In that case, all properties will be copied
+into the generated event structure. The <code>type</code> property
+should contain the event name, in order to be compatible
+with the first syntax. So for example</p>
+<pre>  this.fireEvent({type  : "Ping",
+                  prop1 : "value1",
+                  prop2 : "value2"}, this.htmlElement, otherElement1, ...);</pre>
+
+<p>will generate "Ping" events with all default properties described
+below, plus the properties <code>prop1</code> and <code>prop2</code>.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="REGISTERING_AN_EVENT_HANDLER">
+    <h2 class="TN_label">REGISTERING AN EVENT HANDLER</h2>
+    <div class="TN_content">
+      <pre>  &lt;div onEventName="doSomethingWith(this)"&gt;
+    &lt;span onEventName="doSomethingMoreSpecificWith(this, controller)"&gt;
+    &lt;span onEventName="doYetAnotherThing"&gt;
+  &lt;/div&gt;
+
+  myController.onEventName = function(event){...};</pre>
+
+<p>There are three ways to register a handler:</p>
+<ul>
+<li><a name="item_javascript_statement_in_an_HTML_attribute"></a><b>javascript statement in an HTML attribute</b>
+<p>This works as for ordinary HTML DOM events. The javascript statement 
+will be evaluated in a context where the following variables are
+defined:</p>
+<ul>
+<li><a name="item_this"></a><b>this</b>
+<p>The object that registered the event handler.</p>
+</li>
+<li><a name="item_target"></a><b>target</b>
+<p>The HTML element that first received the event.</p>
+</li>
+<li><a name="item_currentTarget"></a><b>currentTarget</b>
+<p>The object that registered the event handler (equivalent to <code>this</code>).</p>
+</li>
+<li><a name="item_controller"></a><b>controller</b>
+<p>The GvaScript controller object that generated the event.</p>
+</li>
+<li><a name="item_event"></a><b>event</b>
+<p>A structure containing various information about the generated event,
+described below.</p>
+</li>
+</ul>
+</li>
+<li><a name="item_name_of_a_javascript_function_inside_an_HTML_attribute"></a><b>name of a javascript function inside an HTML attribute</b>
+<p>The given function will be called with a single <code>event</code> argument.</p>
+</li>
+<li><a name="item_property_assigned_from_Javascript"></a><b>property assigned from Javascript</b>
+<p>This works exactly like the previous case : the event handling
+function receives a single <code>event</code> argument.</p>
+</li>
+</ul>
+  <div class="TN_node" id="Event_structure">
+    <h3 class="TN_label">Event structure</h3>
+    <div class="TN_content">
+      <p>The <code>event</code> object passed to event handlers contains the
+following properties :</p>
+<ul>
+<li><a name="item_type"></a><b>type</b>
+<p>name of the triggered event (i.e. "Ping", "Highlight", etc.)</p>
+</li>
+<li><a name="item_target"></a><b>target</b>
+<p>The HTML element that first received the event.</p>
+</li>
+<li><a name="item_srcElement"></a><b>srcElement</b>
+<p>Synonym for <code>target</code>.</p>
+</li>
+<li><a name="item_currentTarget"></a><b>currentTarget</b>
+<p>The object that registered the event handler.</p>
+</li>
+<li><a name="item_controller"></a><b>controller</b>
+<p>The GvaScript controller object that generated the event.</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

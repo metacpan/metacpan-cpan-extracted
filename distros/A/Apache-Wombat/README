@@ -1,0 +1,26 @@
+
+Apache::Wombat - a mod_perl servlet server
+==========================================
+
+Apache::Wombat is a Perl Apache module that embeds a Wombat servlet
+engine inside Apache.
+
+The web site for Apache::Wombat is located at
+<http://wombat.sourceforge.net/>.
+
+To view installation and configuration instructions, look in the docs
+subdirectory.
+
+For comments, questions, bug reports etc, join the mailing list for
+Wombat users by visiting
+<http://lists.sourceforge.net/lists/listinfo/wombat-users>.
+
+Copyright (c) 2001 Brian Moseley <bcm@maz.org>
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README
+file.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

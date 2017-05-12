@@ -1,0 +1,49 @@
+                             Ambrosia framework.
+              Copyright (c) 2012 by Kuritsyn Nikolay <knm@cpan.org>
+
+Project version: 0.10
+Project state: Experimental / Unde construction
+Licension: see LICENSE
+
+"ambrosia" is the script to create project skeleton that implements CRUD.
+
+Before run the "ambrosia" you should have the ready database
+and the installed Apache 1.3 with mod_perl.
+
+You should run: mysql -uUSER_NAME -pPASSWORD < MusicS.sql
+The user USER_NAMWE must have permission to create a new schema.
+
+Also you must have the installed dojotoolkit version 1.7.2, you can download it
+from http://download.dojotoolkit.org/release-1.7.2/dojo-release-1.7.2.tar.gz
+
+Run PATH_TO_SCRIPT/ambrosia and answer some questions.
+
+For example:
+
+Enter the name of project: Music
+Enter the title of project [Music]:The Music Catalogue
+Enter the charset of project for output results [utf-8]:
+Enter the path for root directory of project [/home/Ambrosia/Project/Example]:
+Enter the domain for web server [my.domain]:ambrosia.domain
+Enter the port for web server [8042]:
+Enter the path for perl's lib [empty for done]: /home/Ambrosia/myperllib/CPAN/perl5lib/lib/perl5
+Enter the path for perl's lib [empty for done]: /home/Ambrosia/myperllib/CPAN/perl5lib/lib/perl5/i386-freebsd-64int
+Enter the path for perl's lib [empty for done]: /home/Ambrosia/Project/lib
+Enter the path for perl's lib [empty for done]:
+Enter the path to dojo toolkit:/home/Ambrosia/DOJO/dojo-release-1.7.2
+Choose the database [m(MySQL)|p(PostgresQL)]: m
+Enter the schema of database [Music]:MusicDB
+Enter the host location of database [localhost]:
+Enter the port for connection to database or enter 's' for use UNIX socket [3306]:
+Enter the username of database [root]:
+Enter user's password []:
+Enter the charset of database [utf8]:
+Enter the settings for connecting to the database as a string [database=MusicDB;host=localhost;port=3306]:
+
+Then follow the instructions.
+
+For access to created application you must use 
+    login => 'god',
+    password => 'fv,hjpbz'
+
+You can change it in the PATH_TO_PROJECT/Music/Config/Music.conf

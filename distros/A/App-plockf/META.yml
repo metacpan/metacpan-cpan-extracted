@@ -1,0 +1,24 @@
+---
+abstract: 'execute a command while holding a flock lock'
+author:
+  - 'Slaven Rezic <srezic@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-plockf
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Time::HiRes: 1.9716
+resources:
+  repository: git://github.com/eserte/app-plockf.git
+version: 0.04

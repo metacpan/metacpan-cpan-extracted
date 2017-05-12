@@ -1,0 +1,39 @@
+2002-09-03  heddy Boubaker  <boubaker@cena.fr>
+
+	* v0.9: Fixed that CMD_ERROR, CMD_REJECT bugs.
+
+2000-12-07  heddy Boubaker  <boubaker@cena.fr>
+
+	* v0.9: No more errors when reading empty newsgroups (Jie).
+
+2000-12-04  heddy Boubaker  <boubaker@cena.fr>
+
+	* v0.9: Some documentation cleanup (mainly typos)
+
+2000-11-07  heddy Boubaker  <boubaker@cena.fr>
+
+	* v0.9: Call Net::Cmd functions in a clean manner to make perl 5.6
+	happy. Use IO::Socket too.
+
+2000-10-31  heddy Boubaker  <boubaker@cena.fr>
+
+	* v0.9: Makefile.PL improved to really check used modules
+	versions.
+
+2000-10-30  heddy Boubaker  <boubaker@cena.fr>
+
+	* v0.9: use Apache::Log qw(); added to access to log functions.
+
+2000-10-10  heddy Boubaker  <boubaker@cena.fr>
+
+	* v0.9: Adding more css classes.
+
+2000-10-04  heddy Boubaker  <boubaker@cena.fr>
+
+	* v0.8: First CPAN release.
+
+2000-10-02  heddy Boubaker  <boubaker@cena.fr>
+
+	* original version; created by h2xs 1.20 with options -AX -n
+	Apache::NNTPGateway
+

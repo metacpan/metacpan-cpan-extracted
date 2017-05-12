@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>
+      ARSperl Programmer's Manual
+    </title>
+    <style type="text/css">
+/*<![CDATA[*/
+    body.c2 {background-color: rgb(255, 255, 255);}
+    dt.c1 {font-weight: bold}
+    /*]]>*/
+    </style>
+  </head>
+  <body class="c2">
+    <h2>
+      <code>$version = ars_APIVersion()</code>
+    </h2>
+    <p>
+      This routine returns the "major" version of the API that the ARSperl module was compiled
+      against.
+    </p>
+    <p>
+       The corresponding API and AR System versions are as follows:
+    </p>
+    <ul>
+      <li>API 14 and AR System 7.5
+      </li>
+      <li>API 13 and AR System 7.1
+      </li>
+      <li>API 12 and AR System 7.0
+      </li>
+      <li>API 11 and AR System 6.3
+      </li>
+      <li>API 10 and AR System 6.0
+      </li>
+      <li>API 9 and AR System 5.1
+      </li>
+      <li>API 8 and AR System 5.0
+      </li>
+      <li>API 7 and AR System 4.5
+      </li>
+      <li>API 6 and AR System 4.0
+      </li>
+      <li>API 5 and AR System 3.2
+      </li>
+      <li>API 4 and AR System 3.0 and 3.1
+      </li>
+    </ul>
+    <dl>
+      <dt class="c1">
+        On success
+      </dt>
+      <dd>
+        Returns an integer.
+      </dd>
+      <dt class="c1">
+        On failure
+      </dt>
+      <dd>
+        Returns undef.
+      </dd>
+    </dl>
+    <p>
+      Example:
+    </p>
+    <pre>
+ $v = ars_APIVersion();<br />        print "This installation of ARSperl was compiled against ARS API version $v\n";<br /> 
+</pre><i>ars_APIVersion was introduced in version 1.62 of ARSperl</i>
+    <p>
+      <a href="toc.html">Back to Table of Contents</a>
+    </p>
+    <address>
+      Last changes to this page 24 July 2007 by michiel.beijen@mansolutions.nl<br />
+      © J.C.Murphy, J.W.Murphy 1995-2007 arsperl@arsperl.org
+    </address>
+  </body>
+</html>

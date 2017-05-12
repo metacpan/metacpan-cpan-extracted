@@ -1,0 +1,374 @@
+=head1 NAME
+
+ASNMTAP::Asnmtap::Plugins::SOAP is a Perl module that provides SOAP functions used by ASNMTAP-based plugins.
+
+=head1 SYNOPSIS
+
+ use ASNMTAP::Asnmtap::Plugins v3.002.003;
+ use ASNMTAP::Asnmtap::Plugins qw(:PLUGINS);
+
+ my $objectPlugins = ASNMTAP::Asnmtap::Plugins->new (
+   _programName        => 'check_template-SOAP.pl',
+   _programDescription => "SOAP::LITE plugin template for testing the '$APPLICATION' with Performance Data",
+   _programVersion     => '3.002.003',
+   _programGetOptions  => ['proxy:s', 'trendline|T:i'],
+   _timeout            => 30,
+   _debug              => 0);
+
+ use ASNMTAP::Asnmtap::Plugins::SOAP qw(&get_soap_request);
+
+ use SOAP::Lite;
+ my $proxy      = 'http://services.soaplite.com/hibye.cgi';
+ my $namespace  = 'http://www.soaplite.com/Demo';
+ my $methodName = 'hi';
+ my $method     = SOAP::Data->name($methodName)->attr( {xmlns => $namespace} );
+
+ my %soapService_Register_NS = (
+   'http://schemas.xmlsoap.org/wsdl/mime/' => 'mime',
+   'http://www.w3.org/2001/XMLSchema'      => 's'
+ );
+
+ my $xmlContent;
+ my $params;
+
+ my ($returnCode, $xml) = get_soap_request ( 
+   asnmtapInherited  => \$objectPlugins,
+   proxy             => $proxy,
+   namespace         => $namespace,
+   method            => $method,
+   registerNamespace => \%soapService_Register_NS,
+   xmlContent        => $xmlContent,
+   params            => $params,
+   readable          => 1,
+   cookies           => 1,
+   perfdataLabel     => 'SOAP'
+ );
+
+ ($returnCode, $xml) = get_soap_request ( 
+   asnmtapInherited  => \$objectPlugins,
+   proxy             => 'https://USERNAME:PASSWORD@secure.citap.be/authorization/hibye.cgi',
+   namespace         => $namespace,
+   method            => $method,
+   registerNamespace => \%soapService_Register_NS,
+   xmlContent        => $xmlContent,
+   params            => $params,
+   cookies           => 1,
+   perfdataLabel     => 'SOAP with Basic Authentication'
+ );
+
+ ($returnCode, $xml) = get_soap_request ( 
+   asnmtapInherited  => \$objectPlugins,
+   proxy             => 'https://secure.citap.be/authorization/hibye.cgi',
+   credentials       => [ 'secure.citap.be:443', "ASNMTAP's Authorization Access", 'USERNAME' => 'PASSWORD' ],
+   namespace         => $namespace,
+   method            => $method,
+   registerNamespace => \%soapService_Register_NS,
+   xmlContent        => $xmlContent,
+   params            => $params,
+   cookies           => 1,
+   perfdataLabel     => 'SOAP with Credentials'
+ );
+
+ unless ( $returnCode ) {
+   if (defined $xml) {
+     ...
+   } else {
+     ...
+   }
+ }
+
+ $objectPlugins->exit (7);
+
+=head1 Description
+
+=head2 SOAP::Lite based functions.
+
+SOAP::Lite for Perl is a collection of Perl modules which provides a simple and 
+lightweight interface to the Simple Object Access Protocol (SOAP, also known as 
+Service Oriented Access Protocol) both on client and server side.
+
+=over 4
+
+=item get_soap_request()
+
+SOAP is a simple XML-based protocol to let applications exchange information over HTTP.
+
+More information regarding SOAP can be find at URI: http://www.w3schools.com/soap/
+
+Returns a status for $returnCode (OK..UNKNOWN) and when the status is OK for $xml the extracted XML if exists, otherwise undef.
+
+=over 4
+
+=item asnmtapInherited
+
+A required reference to an ASNMTAP::Asnmtap::Plugins or ASNMTAP::Asnmtap::Plugins::Nagios subclass
+
+Through this way of working we inherited the command line option I<--debug>.
+
+=item custom
+
+optional, is an reference to your own custom defined function
+
+$som: the SOM object provides a simple API for accessing any aspect of
+the response's SOAP envelope, a result object from SOAP::Lite.
+
+ sub actionOnSoapResponse {
+   my ($asnmtapInherited, $som) = @_;
+   return ($returnCode);
+ }
+
+and now with customArguments:
+
+ sub actionOnSoapResponse {
+   my ($asnmtapInherited, $som, $arguments) = @_;
+   return ($returnCode);
+ }
+
+=item customArguments
+
+optional, when you need to pass parameters to your own custom defined function, this can be done with customArguments.
+
+ customArguments: SCALAR, ARRAY, HASH,
+                  REF SCALAR, REF ARRAY, REF HASH
+
+=item proxy
+
+This lets you specify an endpoint (service address) and also loads the required module at the same time.
+
+ proxy: 'http://services.soaplite.com/hibye.cgi'
+
+When using SOAP with basic authentication you can add username and password to your URL as follows:
+
+ proxy: 'http://USERNAME:PASSWORD@services.soaplite.com/hibye.cgi'
+
+a required scalar.
+
+=item credentials
+
+Set the user name and password to be used for a realm.
+
+ credentials: [ $hostname_port, $realm, $username, $password ]
+
+              [ 'secure.citap.be:443', "ASNMTAP's Authorization Access", 'USERNAME' => 'PASSWORD' ]
+
+a optional array.
+
+=item namespace
+
+Sets the URI that will be used as the namespace for the resulting XML entity.
+
+ namespace: 'http://www.soaplite.com/Demo'
+
+a required scalar.
+
+=item registerNamespace
+
+The register_ns subroutine allows users to register a global namespace with the SOAP Envelope.
+
+ registerNamespace:
+
+ %soapService_Register_NS = (
+  'http://schemas.xmlsoap.org/wsdl/mime/' => 'mime',
+   'http://www.w3.org/2001/XMLSchema'      => 's'
+ );
+
+a required hash.
+
+=item method
+
+The name is what the serializer will use for the tag when generating the XML for this object.
+
+ method: SOAP::Data->name(hi)->attr( {xmlns => 'http://www.soaplite.com/Demo'} );
+
+a required SOAP::Data->name definition
+
+=item soapaction
+
+This lets you specify a handler for on_action event. It is triggered when creating SOAPAction. 
+The default handler will set SOAPAction to "uri/method". 
+You can change this behavior, for a particular object to "uri/soapaction".
+To remove the soapaction you say soapaction => '',
+
+optional scalar, soapaction
+
+=item xmlContent
+
+Parsing XML formatted data.
+
+ xmlContent:
+ 
+ <soapRequest>
+   <registrationType>xmlRegistrationType</registrationType>
+   <language>xmlLanguage</language>
+   <orderBy>xmlOrderBy</orderBy>
+ </soapRequest>
+
+optional scalar, xmlContent is one XML
+
+=item params
+
+ params: SOAP::Data->name('req')->type('string')->value(xmlContent);
+
+optional scalar, params is one SOAP::Data->name definition
+
+=item envprefix
+
+optional, envprefix, default 'soapenv'
+
+=item encprefix
+
+optional, encprefix, default 'soapenc'
+
+=item encodingStyle
+
+To change the encodingStyle you say encodingStyle => 'http://schemas.xmlsoap.org/soap/envelope/',
+
+To remove the encodingStyle you say encodingStyle => '',
+
+=item readable
+
+This lets you specify the format for the generated XML code.
+Carriage returns <CR> and indentation will be added for readability.
+Useful in the case you want to see the generated code in a debugger.
+By default, there are no additional characters in generated XML code.
+
+optional, readable can be 0 or 1
+
+ 0, there are no additional characters in generated XML code (default)
+ 1, carriage returns <CR> and indentation will be added for readability
+
+=item cookies
+
+For clients that are sensitive to cookie-based authentication.
+
+optional, cookies can be 0 or 1
+
+ 0, without cookies (default)
+ 1, with cookies
+
+=item perfdataLabel
+
+This means that there performance data will be created and the name for the label equals the value from perfdataLabel.
+
+Is an scalar (value is a string), ex. 'Label x'
+
+=item PATCH_HTTP_KEEPALIVE
+
+optional, PATCH_HTTP_KEEPALIVE can be 0 or 1
+
+ 0, without PATCH_HTTP_KEEPALIVE (default)
+ 1, with PATCH_HTTP_KEEPALIVE
+
+=item WSRF
+
+optional, WSRF can be 0 or 1
+
+ 0, without WSRF::Lite (default)
+ 1, with WSRF::Lite
+
+=item TYPE_ERROR_RETURN
+
+optional, TYPE_ERROR_RETURN can be REPLACE, APPEND, INSERT, COMMA_APPEND or COMMA_INSERT
+
+ REPLACE      : replace error (default)
+ APPEND       : append to error
+ INSERT       : insert to error
+ COMMA_APPEND : add comma and append to error
+ COMMA_INSERT : add comma and insert to error
+
+=back
+
+=back
+
+=head1 EXPORT
+
+=head2 TAGS
+
+=over 4
+
+=item *
+
+ALL
+
+ &get_soap_request
+
+=back
+
+=head1 AUTHOR
+
+Alex Peeters [alex.peeters@citap.be]
+
+=head1 SEE ALSO
+
+ASNMTAP::Asnmtap, ASNMTAP::Asnmtap::Plugins
+
+  check_template-SOAP.pl
+
+=head1 DEPENDENCIES
+
+  ASNMTAP::Asnmtap::Plugins
+  SOAP::Lite
+
+  Dependencies SOAP::Lite:
+  libwww-perl
+  MIME::Base64
+  URI
+  WSRF::Lite
+  XML::Parser
+
+  Dependencies WSRF::Lite:
+  DateTime
+  DateTime::Format::Epoch
+  DateTime::Format::W3CDTF
+  Digest::SHA1
+  Crypt::OpenSSL::RSA
+  Crypt::OpenSSL::X509
+  HTTP::Daemon::SSL
+  Sys::Hostname::Long
+  XML::CanonicalizeXML
+  XML::DOM
+
+  Following modules will be loaded on demand only, and are considered optional:
+  Crypt::SSLeay     HTTPS/SSL support
+  Apache            mod_perl server implementation (included with mod_perl)
+  Net::POP3         POP3 server implementation
+  MIME::Lite        SMTP client implementation
+  IO::File          FTP client and IO server
+  Net::FTP          FTP client
+  MQSeries          MQSeries transport
+  Net::Jabber       Jabber transport
+  FCGI              FastCGI server implementation
+  IO::Socket::SSL   SSL support for TCP transport
+  MIME::Tools       MIME attachment support
+  DIME::Tools       DIME attachment support
+  Compress::Zlib    HTTP compression support
+
+=head1 COPYRIGHT NOTICE
+
+(c) Copyright 2000-2011 by Alex Peeters [alex.peeters@citap.be],
+                        All Rights Reserved.
+
+ASNMTAP is based on 'Process System daemons v1.60.17-01', Alex Peeters [alex.peeters@citap.be]
+
+ Purpose: CronTab (CT, sysdCT),
+          Disk Filesystem monitoring (DF, sysdDF),
+          Intrusion Detection for FW-1 (ID, sysdID)
+          Process System daemons (PS, sysdPS),
+          Reachability of Remote Hosts on a network (RH, sysdRH),
+          Rotate Logfiles (system activity files) (RL),
+          Remote Socket monitoring (RS, sysdRS),
+          System Activity monitoring (SA, sysdSA).
+
+'Process System daemons' is based on 'sysdaemon 1.60' written by Trans-Euro I.T Ltd
+
+=head1 LICENSE
+
+This ASNMTAP CPAN library and Plugin templates are free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+The other parts of ASNMTAP may be used and modified free of charge by anyone so long as this copyright notice and the comments above remain intact. By using this code you agree to indemnify Alex Peeters from any liability that might arise from it's use.
+
+Selling the code for this program without prior written consent is expressly forbidden. In other words, please ask first before you try and make money off of my program.
+
+Obtain permission before redistributing this software over the Internet or in any other medium. In all cases copyright and header must remain intact.
+
+=cut

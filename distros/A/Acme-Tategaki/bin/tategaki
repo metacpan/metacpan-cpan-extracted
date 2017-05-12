@@ -1,0 +1,58 @@
+#!perl
+use strict;
+use warnings;
+use 5.008001;
+use utf8;
+
+use Acme::Tategaki;
+use Encode::Locale;
+
+binmode STDOUT => ':encoding(console_out)';
+Encode::Locale::decode_argv;
+
+unless (scalar @ARGV) {
+    print "Usage: \$ tategaki お前は、すでに、死んでいる。\n";
+    exit 1;
+}
+
+print tategaki(@ARGV);
+print "\n";
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+tategaki - This command makes a text vertically.
+
+=head1 SYNOPSIS
+
+    $ tategaki お前は、すでに、死んでいる。
+    死　す　お
+    ん　で　前
+    で　に　は
+    い　︑　︑
+    る
+    ︒　　　　
+
+=head1 AUTHOR
+
+Kazuhiro Homma E<lt>kazuph@cpan.orgE<gt>
+
+=head1 DEPENDENCIES
+
+L<Array::Transpose>, L<Array::Transpose::Ragged>
+
+=head1 SEE ALSO
+
+L<Acme::Tategaki>, L<flippy|https://rubygems.org/gems/flippy>
+
+=head1 LICENSE
+
+Copyright (C) Kazuhiro Homma.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

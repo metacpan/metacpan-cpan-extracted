@@ -1,0 +1,10 @@
+Revision history for App-CMAM
+
+0.02    Sun Mar  8 22:54:07 WET 2009
+        - Remove extra debug (Pedro Melo)
+        - Idiotic bug: wrong name for the script, new name is the
+          correct one, cmam (Pedro Melo)
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

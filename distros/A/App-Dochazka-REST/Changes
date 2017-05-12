@@ -1,0 +1,3688 @@
+===================================================
+Revision history for App-Dochazka-REST distribution
+===================================================
+
+0.001  2014-06-07 22:35 CEST
+- start distro using 'module-starter'
+- bring in useful scripts from perl-CELL project (release.sh, dev.sh,
+  test.sh)
+- set license to BSD-3-Clause
+- Spec.pm: add technical specification (current state)
+- add empty shells: bin/dochazka-rest, REST.pm, Activity.pm, Employee.pm,
+  History.pm, Interval.pm, Lock.pm, Policy.pm, Status.pm
+- generate a proper README
+
+0.002  2014-06-07 23:07 CEST
+- tweak release script
+- update MANIFEST (put files in alphabetical order)
+
+0.003  2014-06-09 10:53 CEST
+- move outdated top-level README to doc/
+- add a new top-level README stub
+- git repo cleanup
+- t/001-init.t: test for server initialization routine
+- REST.pm: start implementing init routine
+
+0.004  2014-06-09 18:23 CEST
+- REST.pm: produce a more convincing 'init' method
+- t/000-depends.t: check dependencies
+- t/001-init.t: unit tests for the 'init' method
+- t/pod-coverage.t: check pod only in taxative list of modules (i.e.,
+  ignore config/*.pm)
+
+0.005  2014-06-11 10:01 CEST
+- REST.pm: add $REST singleton, flesh out init routine
+
+0.006  2014-06-13 15:38 CEST
+- add project-web.sh script to update http://dochazka.sourceforge.net
+  with contents of Spec.pm
+- Spec.pm: work on "intervals" table -- use tsrange and EXCLUDE constraint
+  with gist index to exclude overlapping intervals for a given employee
+- config/dbinit_Config.pm: fix data_source in DBINIT_CONNECT
+- REST.pm: flesh out initialization routine
+- t/001-init.t: improve initialization routine unit test
+- add missing distro files to MANIFEST
+- add auto-generated README file to top-level git repo
+- get rid of old OBS CI stuff (moved to archive)
+
+0.007  2014-06-13 21:59 CEST
+- config/dbinit_Config.pm: revamp
+- REST.pm: add reset_db routine, make separate connect_db routine that can
+  connect to any database, add create_tables routine
+- t/001-init.t: unit test now drops and re-creates the testing database
+
+0.008  2014-06-19 09:34 CEST
+- REST.pm: minor cleanup in connect_db(), init now optionally takes verbose
+  parameter (and passes it to $CELL->load)
+
+0.009  2014-06-19 15:51 CEST
+- status-strings.pod: Status string verbiage removed from Spec.pm because
+  we will not implement status strings in version 1.0
+- dbinit_Config.pm: add lots more SQL
+- Spec.pm: try to keep documentation in stride with dbinit_Config.pm
+
+0.010  2014-06-19 22:38 CEST
+- add more SQL to dbinit_Config.pm
+- Spec.pm: keep documenting the table definitions
+
+0.011  2014-06-21 16:51 CEST
+- dbinit_Config.pm: AutoCommit default to 1, add nicks table, add
+  current_priv SQL function
+- employee_Config.pm: add configuration file just for employee 
+- t/001-init.t: cleanup
+- t/002-insert-employee.t: new tests
+- REST.pm: improve create_tables
+- Spec.pm: blearily try to write employee-related verbiage
+
+0.012  2014-07-04 02:08 CEST
+- t/: add license boilerplate
+- t/: rename 002-insert-employee.t to 002-nick.t
+- start writing App::Dochazka::REST::Model::Nick
+- release.sh: run bash-ism with bash instead of sh
+
+0.013  2014-07-04 10:17 CEST
+- Nick.pm: make it a little less naive
+- t/002-nick.t: add tests
+
+0.014  2014-07-04 13:37 CEST
+- t/002-nick.t: test for non-existent IDs and nicks
+
+0.015  2014-07-04 16:19 CEST
+- got rid of Nick as a separate entity after figuring out that a simple
+  UNIQUE constraint in the employees table does what I needed
+- create_tables now adds superuser employee with admin privs
+
+0.016  2014-07-06 02:37 CEST
+- Dochazka_Message_en.conf: add "db not reachable" error message
+- break employeehistory table into schedhistory and privhistory
+- add a second round of dbinit SQL statements to ensure that the root
+  employee is immutable
+- Employee.pm: refactoring (WIP)
+- Spec.pm: update verbiage
+- stored procedure 'current_priv' now returns 'passerby' if current priv
+  level cannot be determined
+- t/002-root.t: new tests for immutable root employee
+- t/003-current-priv.t: new tests for current_priv stored procedure
+- t/004-employee.t: skip tests for Employee.pm (WIP)
+
+0.016  2014-07-06 02:41 CEST
+- fix MANIFEST
+
+0.017  2014-07-06 22:17 CEST
+- refactored Employee.pm
+- t/004-employee.pm: new unit tests for Employee.pm
+- dbinit_Config.pm: add remark field to employees table
+
+0.018  2014-07-07 12:30 CEST
+- config/Dochazka_Config.pm: add comments
+- config/employee_Config.pm: add SQL_EMPLOYEE_CURRENT_PRIV
+- Employee.pm: _load now resets employee object, start working on ACL
+  checks
+- t/004-employee.t: finished refactoring old tests
+
+0.019  2014-07-07 14:44 CEST
+- REST.pm: implement connect_db_pristine and set DOCHAZKA_EID_OF_ROOT
+  site param
+- t/: adjust tests for same
+
+0.020  2014-07-07 16:08 CEST
+- Employee.pm: implement UPDATE functionality
+
+0.021  2014-07-07 16:48 CEST
+- Employee.pm: add accessor functions
+- t/004-employee.pm: add tests for accessors
+
+0.022  2014-07-07 19:23 CEST
+- remove Policy.pm as it is only a stub and might not be needed
+- config/dbinit_Config.pm: make a generalized priv_at_timestamp function
+  and change current_priv into a wrapper around that function
+- Priv.pm: move priv_by_eid to the new Priv.pm module
+- Employee.pm: add 'priv' accessor method, edit POD a little
+
+0.023  2014-07-07 20:35 CEST
+- rename Priv.pm to Privhistory.pm
+- Privhistory.pm: start working on insert_priv
+- t/005-privhistory.t: start implementing privhistory tests
+
+0.024  2014-07-07 21:27 CEST
+- fix some nitpicks
+
+0.025  2014-07-08 01:30 CEST
+- employee_Config.pm, Employee.pm: eliminate double DBI call by
+  including call to current_priv() in SELECT statement
+- add stub Timestamp.pm for timestamp-related utilities
+- dbinit_Config.pm: make priv_at_timestamp use '<=' instead of '<'
+- Privhistory.pm, t/005-privhistory.t: add privhistory_by_eid
+
+0.026  2014-07-08 10:46 CEST
+- Employee.pm: make _load return DOCHAZKA_RECORDS_FETCHED when SELECT
+  succeeds
+
+0.027  2014-07-08 12:35 CEST
+- Employee.pm, t/004-employee.pm: fix buggy eid_by_nick function, export
+  it, add test for it
+- Spec.pm: write verbiage for employee Perl API current state
+
+0.028  2014-07-08 22:51 CEST
+- Privhistory.pm: implementing OO interface to privhistory table
+- Factory.pm: add new module under Util/ with 'makereset' function
+- Employee.pm: use new makereset function
+
+0.029  2014-07-08 23:46 CEST
+- Privhistory.pm: use the new function 'makereset', move priv_by_eid to
+  Factory.pm (not sure if it really belongs here, though)
+- Factory.pm: refactor makereset
+
+0.030  2014-07-09 00:29 CEST
+- Factory.pm, Employee.pm, Privhistory.pm: add and use 'make_spawn'
+- t/006-reset.t: add test demonstrating how spawn "validates" the
+  attributes provided in PARAMHASH
+- Privhistory.pm no longer exports any functions
+
+0.031  2014-07-09 01:32 CEST
+- t/005-privhistory.t: add unit tests
+- Privhistory.pm: make 'load' trigger warning if nothing found
+
+0.032  2014-07-09 12:09 CEST
+- make privhistory SQL statements return int_id where appropriate
+- t/005-privhistory.t: add some int_id tests
+- start working on a delete method for privhistory objects
+
+0.033  2014-07-09 14:41 CEST
+- dbinit_Config.pm: fix valid_sched_intvl trigger, add translate_interval
+  function
+- Spec.pm: fix date in sample schedule tsrange (year was wrong)
+- rename privhistory_Config.pm to priv_Config.pm
+
+0.034  2014-07-09 15:07 CEST
+- schedule_Config.pm: add SQL_SCHEDULE_INSERT param
+- add stubby Schedule.pm and Schedintvl.pm in lib/Dochazka/REST/Model
+
+0.035  2014-07-09 23:12 CEST
+- dbinit_Config.pm: rename translate_interval to translate_schedintvl,
+  merge 'schedhistory' table into 'schedules'
+- schedule_Config.pm: add definitions for SQL_SCHEDINTVL_INSERT and
+  SQL_SCHEDINTVL_SELECT
+- add Schedintvl.pm, remove Schedhistory.pm
+- Spec.pm: update schedule verbiage to reflect table structure change
+- Interval.pm: make a stub class for activity intervals
+- t/007-interval.t: add stub unit-test file for interval objects
+
+0.036  2014-07-10 00:48 CEST
+- Model/Schedule.pm: fix up boilerplate, flesh out insert method
+- Util/Timestamp.pm: add qw( $today $yesterday $tomorrow ) exports
+- t/005-privhistory.t: import $today, $yesterday from Timestamp.pm
+- rename t/007-interval.t to t/007-schedule.t 
+- t/007-schedule.t: import $today, $yesterday from Timestamp.pm, add tests for
+  insert method
+
+0.037  2014-07-10 15:57 CEST
+- begin implementing new schedules concept (table structure and other
+  database artifacts, objects, object methods, unit tests)
+- rename Schedintvl.pm to Schedintvls.pm because the object will contain
+  all the intervals that make up a single schedule
+- for now, the new schedules concept is described in tickets/tickets
+  pending re-write of schedule-related verbiage in Spec.pm
+- Factory.pm: make_reset function now calls 'populate' method _iff_ there
+  is one
+- Schedintvls.pm now uses populate method to automatically load a new
+  "scratch SID" every time an object is spawned/reset
+
+0.038  2014-07-10 16:32 CEST
+- Spec.pm: adjust verbiage to accommodate revamped schedule logic
+
+0.039  2014-07-10 17:31 CEST
+- Spec.pm: re-organize sections, add note concerning 'jsonb' type in
+  PostgreSQL 9.4
+- re-generate project web page http://dochazka.sourceforget.net
+
+0.040  2014-07-11 10:03 CEST
+- Schedintvls, t/007-schedule.t: implement basic insert method, start working
+  on a translate method
+- dbinit_Config.pm, schedule_Config.pm: fix translate_schedintvl
+
+0.041  2014-07-11 15:38 CEST
+- schedule_Config.pm: develop SQL_SCHEDINTVLS_SELECT statement
+- Schedintvls.pm: rename translate to load, load now succesfully converts
+  tsranges array to our more-readable schedule format (but doesn't yet sort
+  the array), added json method, started work on sort method
+- t/007-schedule.t: add tests for $schedintvls->load
+
+0.042  2014-07-11 20:27 CEST
+- schedule_Config.pm: add ORDER BY to SQL_SCHEDINTVLS_SELECT, so the intervals
+  come out of the database pre-sorted
+- Schedintvls.pm: get rid of sort method
+- t/007-schedule.t: insert schedule intervals in reverse chronological order 
+  to test sorting functionality
+
+0.043  2014-07-11 22:40 CEST
+- dbinit_Config.pm: add remark field to schedules table, fix a small bug
+  (round_effective trigger applies to schedhistory table, not schedules)
+- schedule_Config.pm: tweak param names, fix SQL_SCHEDULE_INSERT, add
+  SQL_SCHEDULE_SELECT
+- Schedule.pm: fix attributes, revamp insert method
+- t/007-schedule.t: add seven more unit tests
+
+0.044  2014-07-12 22:08 CEST
+- schedule_Config.pm: add SQL_SCHEDHISTORY_INSERT,
+  SQL_SCHEDHISTORY_SELECT_ARBITRARY, and SQL_SCHEDHISTORY_SELECT_CURRENT
+- Schedintvls.pm: add debugging code to populate method
+- t/007-schedule.pm: add unit tests for $schedhistory->insert,
+  $schedhistory->load
+
+0.045  2014-07-13 09:26 CEST
+- schedule_Config.pm: make two schedule SELECT statements: "select sid
+  given schedule" and "select schedule given sid"
+- Schedule.pm: get rid of load method, add get_json exported function
+- t/007-schedule.pm: add tests for get_json
+
+0.046  2014-07-13 10:20 CEST
+- Schedintvls.pm: cleanup; put translated intervals into a separate attribute,
+  $self->{schedule}, instead of overwriting $self->{intvls}
+
+0.047  2014-07-13 11:08 CEST
+- schedule_Config.pm, Schedintvls.pm, t/007-schedule.t: implement and test
+  delete method for Schedintvls objects
+- Spec.pm: clarifications
+
+0.048  2014-07-13 11:46 CEST
+- Spec.pm: write up the "Privilege levels in the Perl API" section
+
+0.049  2014-07-13 13:12 CEST
+- tickets/tickets: add new tickets, clean up old tickets
+- regenerate project webpage
+- REST.pm: rename init -> init_no_db and make a new 'init' that "does
+  everything", including connecting to the database
+- t/: adjust tests to use the new 'init' and 'init_no_db' methods
+
+0.050  2014-07-13 16:15 CEST
+- dbinit_Config.pm: implement schedule_at_timestamp and current_schedule stored
+  procedures
+- employee_Config.pm: have SELECTs get employee's current_schedule
+- t/007-schedule.t: test for presence of schedule attribute in employee object
+
+0.051  2014-07-13 16:55 CEST
+- employee_Config.pm: add SQL_EMPLOYEE_SCHEDULE_AT_TIMESTAMP and
+  SQL_EMPLOYEE_CURRENT_SCHEDULE
+- REST.pm: add 'eid_of_root' method
+- Employee.pm: add 'schedule' accessor
+- Factory.pm: add 'schedule_by_eid' function
+- t/002-root.t: add several 'eid_of_root' unit tests 
+- t/004-employee.t: clean up, add more tests
+
+0.052  2014-07-13 20:27 CEST
+- Spec.pm: update to reflect current state of code
+- dbinit_Config.pm, Schedintvls.pm, t/007-schedule.t: minor cleanup
+
+0.053  2014-07-13 22:24 CEST
+- dbinit_Config.pm: add activities and intervals tables
+- Spec.pm: work on Activities, Intervals, and Locks sections
+
+0.054  2014-07-14 10:08 CEST
+- Activity.pm: adapt existing code from Employee.pm
+- rename 'name' column to 'code' in 'activities' table
+- activity_Config.pm: new file
+
+0.055  2014-07-14 12:10 CEST
+- Spec.pm: change L<...> to C<...> to avoid pod2html's annoying practice of
+  rendering the links as "the ... manpage"
+- bin/dochazka-rest: add license boilerplate
+- moved 'cud' subroutine into new module App::Dochazka::REST::Model::Shared
+  to avoid code duplication in Activity.pm and Employee.pm
+- t/008-activity.t: add stub for activity-related unit tests
+- config/Dochazka_Message_en.conf: add a DOCHAZKA_DBI_ERR message for
+  reporting DBI errors
+- config/employee_Config.pm: add SQL_EMPLOYEE_DELETE
+
+0.056  2014-07-14 12:43 CEST
+- Spec.pm: cleanup
+- config/Dochazka_Config.pm: add DOCHAZKA_ACTIVITY_DEFINITIONS
+- REST.pm: have 'create_tables' insert initial set of activities
+
+0.057  2014-07-14 12:59 CEST
+- config/Dochazka_Messages.conf: remove colon from DOCHAZKA_DBI_ERR
+- model/Shared.pm: fix bug in cud (wasn't returning err status on DBI err)
+- t/008-activity.t: add lots of unit tests
+
+0.058  2014-07-14 15:59 CEST
+- activity_Config.pm: add 'upper' safeguards to make sure no lower-case
+  activity code makes it into the database, yet to accept lower-case in 
+  SELECTs
+- dbinit_Config.pm: add 'code_to_upper' trigger on activities table,
+  split off valid_intvl from valid_schedintvl so it can be applied to 
+  both 'schedintvls' and 'intervals'
+- Spec.pm: update to reflect latest code
+- t/008-activity.t: add more unit tests
+
+0.059  2014-07-14 16:24 CEST
+- Privhistory.pm: block in 'get_privhistory' function
+- rename t/008-activity.t to t/009-activity.t
+- add stub t/008-schedintvls.t for testing "illegal" schedintvls
+
+0.060  2014-07-14 20:38 CEST
+- REST.pm: put 'create_tables' SQL incantations into a transaction
+- Schedintvls: put 'insert' SQL incantations into a transaction that
+  gets rolled back if any of the intervals are bad
+- t/008-schedintvls.t: test with bogus intervals, test that no 
+  intervals are inserted if any of them are bad
+
+0.061  2014-07-15 11:06 CEST
+- t/001-init.t: make diagnostic messages more useful
+- config/sql/interval_Config.pm: new SQL for use in Interval.pm
+- Interval.pm: start developing the stub into something useful
+- dochazka_Config.pm: add DOCHAZKA_ADVANCE_INTERVALS_MAX_DAYS
+- dbinit_Config.pm: rename intervals.int_id to intervals.iid (Interval ID)
+- REST.pm: revamp 'try' code block in 'create_tables'
+- Activity.pm, Employee.pm: use new best practice for 'cud' calls
+- Privhistory.pm, Schedhistory.pm: rewrite insert and delete methods to use 'cud'
+- Schedule.pm: rewrite insert method to use 'cud'
+- Shared.pm: add 'open_transaction' and 'close_transaction', revamp 'cud' to use
+  Try::Tiny
+
+0.062  2014-07-15 13:17 CEST
+- make adjustments so test suite succeeds even if PostgreSQL server not
+  present
+
+0.063  2014-07-15 16:56 CEST
+- dbinit_Config.pm, REST.pm: get rid of DBINIT_AUTOCOMMIT
+- dbinit_Config.pm, Dochazka_Config.pm, REST.pm: use DOCHAZKA_DBNAME
+  instead of DBINIT_DBNAME
+- REST.pm: reset_db now drops/re-creates 'dochazka' user and grants all
+  dochazka database privileges to that user, 'create_tables' runs as 
+  user 'dochazka'
+- REST.pm: connect_db_pristine takes full PARAMHASH
+
+0.064  2014-07-15 17:48 CEST
+- more modifications to ensure test suite doesn't fail on build workers and
+  other automatons (CPAN Testers, Open Build Service)
+
+0.065  2014-07-15 18:00 CEST
+- rename to App::Dochazka::REST
+
+0.066  2014-07-15 18:02 CEST
+- fix current_ver.plx and prepare release script for CPAN
+
+0.067  2014-07-15 22:36 CEST
+- dbinit_Config.pm: fix 'intervals' table definition
+- interval_Config.pm, Interval.pm: add missing 'long_desc' everywhere
+- t/010-interval.t: start unit test file for activity intervals
+- move priv_by_eid and sched_by_eid functions from Factory.pm to Shared.pm,
+  populate 'aclpriv' attribute in each function that consults it, instead of in
+  Factory.pm->make_reset
+- POD cleanup
+- Util/Timestamp.pm, t/011-tsrange_equal.t: add tsrange_equal function
+- Util/Timestamp.pm, t/: split $today into two ($today and $today_ts), and
+  do the same for $yesterday and $tomorrow -- hopefully this makes the code
+  _less_ complicated
+
+0.068  2014-07-16 08:35 CEST
+- Build.PL: add DBD::Pg and DBI dependencies
+
+0.069  2014-07-16 22:11 CEST
+- move 'make_spawn' and 'reset' from Util/Factory.pm to Model/Shared.pm,
+  delete Util/Factory.pm
+
+0.070  2014-07-17 11:42 CEST
+- Shared.pm, REST.pm: get rid of open_transaction and close_transaction as they
+  don't work as expected
+- Schedintvls.pm, t/007-schedule.t: revamp 'delete' method
+- Dochazka_Message_en.conf: add DOCHAZKA_RECORDS_DELETED
+
+0.071  2014-07-17 21:37 CEST
+- dbinit_Config.pm: add locks table
+- Spec.pm: work on Lock section
+- Interval.pm: make load_by_iid also load the long_desc, add 'update' and 
+  'delete' methods
+- Lock.pm: first crack at lock data model
+- Activity.pm: fix order of attributes in update and make delete reset the 
+  object on success
+
+0.072  2014-07-17 21:42 CEST
+- MANIFEST: minor fix
+
+0.073  2014-07-18 08:19 CEST
+- Schedule.pm: add an untested 'delete' method
+- Privhistory.pm, Schedhistory.pm, Schedintvls.pm: add 'no update method' verbiage
+- Shared.pm: when croaking on odd number of arguments, stringify the actual
+  arguments and include them in the error message
+- t/009-activity.pm: add tests for 'update' method
+
+0.074  2014-07-18 08:39 CEST
+- Build.PL: add another missing dependency (JSON.pm)
+
+0.075  2014-07-18 09:44 CEST
+- now that App::Dochazka::REST is on CPAN, and since Spec.pm was getting to
+  be too big, make the following documentation changes:
+  - break out the "... in the database" and "... in the Perl API" sections
+    into the respective data model modules under C<App::Dochazka::REST::Model>
+  - move the rest of the Spec.pm verbiage into L<App::Dochazka::REST>
+
+0.076  2014-07-18 10:20 CEST
+- MANIFEST: update to reflect current state
+- REST.pm, Privhistory.pm, Schedhistory.pm: work on POD
+
+0.077  2014-07-18 13:16 CEST
+- REST.pm: POD cleanup
+- Interval.pm: add missing POD verbiage
+- release.sh: attempt to fix minor brokenness that sometimes causes version
+  numbers to get messed up when switching from one development machine to
+  another
+- Shared.pm: add 'noof' function
+- t/001-init.t: add comments and two unit tests
+- t/003-current_priv.t, t/004-employee.t: rework tests, clean up database
+  when done
+
+0.078  2014-07-18 13:43 CEST
+- Privhistory.pm, etc.: change privhistory.int_id to privhistory.phid
+- Schedhistory.pm, etc.: change schedhistory.int_id to schedhistory.shid
+- schedule_Config.pm: add missing SQL_SCHEDHISTORY_DELETE parameter
+
+0.079  2014-07-18 16:13 CEST
+- schedule_Config.pm: add SQL_SCHEDULE_SELECT and SQL_SCHEDULE_DELETE
+- Schedule.pm: fix bug in 'delete' method, implement 'load_by_sid' method
+- t/: clean up several unit test files (unit test files no longer leave
+  any database artifacts behind, so each one starts from a clean slate
+  and can be run independently)
+
+0.080  2014-07-19 18:03 CEST
+- lock_Config.pm, t/012-lock.t: add the beginnings of some SQL and unit tests
+  for lock objects
+- privhistory_Config.pm: add SQL_PRIVHISTORY_SELECT_BY_PHID and
+  SQL_PRIVHISTORY_SELECT_RANGE
+- Privhistory.pm, t/005-privhistory.t: add load_by_phid method and get_privhistory function
+- Timestamp.pm: add untested functions 'split_tsrange' and 'canonicalize_ts'
+
+0.081  2014-07-21 09:08 CEST
+- minor edit to bump version number as PAUSE refuses to accept version 0.080
+
+0.082  2014-07-21 19:44 CEST
+- Build.PL: add another dependency to appease CPAN Testers
+- bin/*, config/dochazka-rest.psgi, Resource.pm: start working on executable
+  for starting the server
+
+0.083  2014-07-22 10:18 CEST
+- dochazka-rest.psgi: minimize
+- Resource.pm: add POD, work on 'resource_exists' (path dispatcher)
+- Dispatch.pm: put path dispatch state machine into separate module
+
+0.084  2014-07-22 14:32 CEST
+- bin/dochazka-rest: rework into standalone server startup script
+- t/301-psgi.t: start testing web server functionality
+- REST.pm: add POD re: starting server and authentication, include PSGI
+  $app coderef in $REST singleton
+- config/Dochazka_Config.pm, Resource.pm: add DOCHAZKA_REST_HTML param
+  defining the HTML displayed when someone accesses the server from a
+  browser
+- Resource.pm: enable HTTP Basic Authorization for authentication, using a
+  hard-coded dummy username/password pair for now
+- Build.PL, t/000-dependencies.t: update dependencies
+
+0.085  2014-07-23 09:12 CEST
+- t/000-depends.t: fix bug (wrong number of tests)
+- dispatch_Message_en.conf: new file for path dispatch messages
+- Dispatch.pm: work on '_get_response'
+- Resource.pm: use 'expurgate' method (new in App::CELL::Status 0.194)
+- t/301-dispatch.t: rename from 301-psgi.t and add unit tests
+
+0.086  2014-07-23 09:40 CEST
+- REST.pm, Dispatch.pm: document request syntax
+
+0.087  2014-07-23 11:16 CEST
+- Dochazka_Config.pm: improve default HTML (DOCHAZKA_REST_HTML)
+- t/301-dispatch.t: add unit tests
+- Dispatch.pm: remove SYNOPSIS so the meat of the POD starts higher up on
+  the page
+- obs.sh: add OBS CI script
+
+0.088  2014-07-23 12:53 CEST
+- bin/dochazka-rest: load the local sitedir
+- REST.pm: explain current installation/bootstrap process in detail in the
+  "INSTALLATION" section
+
+0.089  2014-07-23 15:19 CEST
+- config/Dochazka_Config.pm: add DOCHAZKA_URI_MAX_LENGTH
+- REST.pm: work on "REST INTERFACE" POD
+- Dispatch.pm: fix methods so they all set "extraneous_url_part" if
+  appropriate
+- Resource.pm: add uri_too_long method
+- t/: rename 301-dispatch.t to 301-resource.t and split off 330-dispatch.t
+  from it, test uri_too_long in 301-resource.t
+
+0.090  2014-07-23 17:23 CEST
+- Employee.pm: add 'expurgate' and 'select_multiple_by_nick' methods
+- Dispatch: add '/lookup/employee/nick' request (doesn't quite work yet)
+- remove all mentions of 'acleid' and 'aclpriv' from data model;
+  authorization will take place at the web resource level
+
+0.091  2014-07-23 23:08 CEST
+- Employee.pm: finally find and fix problem with 'expurgate'
+- t/004-employee.t: add tests for expurgate method
+- REST.pm: get rid of $REST singleton: 'init' now acts as a constructor
+  returning an object
+- lots of modifications to all files to make them work without $REST singleton
+
+0.092  2014-07-24 08:12 CEST
+- Dispatch: deprecate '_get_response' in favor of 'is_auth' which will be
+  called from Response.pm->is_authorized
+
+0.093  2014-07-24 08:18 CEST
+- Build.PL: require perl 5.012 (RT#97442 -- thanks, Slaven!)
+
+0.094  2014-07-24 10:52 CEST
+- bin/: eliminate $REST singleton
+- /version now reports whether server is UP or DOWN
+
+0.095  2014-07-24 11:58 CEST
+- config/: DOCHAZKA_REST_HTML is now a message, no longer a site param,
+  and it also newly reports the version number and server status
+- dbh.pm: add 'status' routine that reports database server status
+- Dispatch.pm: use the new dbh.pm->status routine in '_version'
+- Resource.pm: use the new dbh.pm->status routine in 'render_html'
+
+0.096  2014-07-24 14:19 CEST
+- Employee.pm: revamp load_by_nick and load_by_eid
+  so they now work as both instance and class methods
+- Schedintvls.pm: fix parentage and use dbh.pm->dbh method
+- Shared.pm: spawn no longer sticks dbh into objects
+- Resource.pm: use $CELL->msg in render_html
+- t/: update tests to current state
+
+0.097  2014-07-24 15:37 CEST
+- bin/dochazka-rest: force Plack::Middleware::StackTrace to be used on
+  _all_ errors
+- Resource.pm: make the server display HTML by default, with the
+  JSON response embedded in the HTML
+
+0.098  2014-07-24 17:49 CEST
+- Resource.pm, Dispatch.pm: finished converting to 'is_auth',
+  eliminated deprecated 'resource_exists' and '_get_response'
+  routines, added a 'forbidden' request that always triggers a
+  403
+
+0.099  2014-07-25 14:50 CEST
+- config/Dochazka_Config.pm: add DOCHAZKA_URI and DOCHAZKA_DOCUMENTATION_URI
+  site params
+- REST.pm: work on POD
+- Dispatch.pm: a flurry of modifications
+- Resource.pm: change $self->{'context'} into a hashref, implement a _push
+  method to make it easy to add to it
+- t/: disable all data model tests except 001-init.t, tests can be activated by
+  setting an environment variable
+
+0.100  2014-07-25 17:19 CEST
+- added CSS to our HTML template to enable line wrapping in <pre></pre>
+  blocks
+- Build.PL: require Path::Router 
+
+0.101  2014-07-26 23:24 CEST
+- Resource.pm, Dispatch.pm: major revamp to implement Path::Router
+- Resource.pm, Dispatch.pm, LDAP.pm: authentication
+- Dispatch/Employee.pm: get ready for each resource to have its own controller
+  (dispatch) module
+- Employee.pm: authentication
+- t/: update tests to current state, add some HTTP tests
+
+0.102  2014-07-27 19:18 CEST
+- each major resource will have its own controller, e.g.: 
+  App::Dochazka::REST::Dispatch::Employee
+- each controller will inherit from App::Dochazka::REST::Dispatch, 
+  where the 'init' method will also run the 'init' methods in 
+  all of its sub-controllers (taken from the DISPATCH_CONTROLLERS
+  site param)
+- implement separate Path::Router instances for GET, POST, etc.
+
+0.103  2014-07-27 20:42 CEST
+- Resource.pm, Dispatch.pm, Dispatch/Employee.pm: separate router accessor and
+  router initialization routines so there are separate routers for each HTTP
+  method (just 'GET' and 'POST' for now) -- this is necessary to be able to 
+  handle a GET request for, e.g., '/employee/nick/bud' differently than a
+  POST request for the same path/resource
+
+0.104  2014-07-27 21:03 CEST
+- add GET route /employee/eid/:param
+
+0.105  2014-07-27 22:44 CEST
+- move 'authenticate' from Model/Employee.pm to Resource.pm and rename to
+  '_authenticate')
+- Dispatch/Employee.pm: add default GET target
+- cleanup
+- t/: rename data model tests to 1??-something.t and tweak them so they run
+  cleanly again
+
+0.106  2014-07-28 10:26 CEST
+- cleanup
+- put current employee object in request context
+- Resource.pm, Dispatch*: send entire context to targets and let them pick out
+  what they need from it
+
+0.107  2014-07-28 12:16 CEST
+- add core dependencies to Build.PL
+- clean up test suite
+- t/: fix 3?? tests so they don't break builds in OBS
+
+0.108  2014-07-28 13:16 CEST
+- Resource.pm: expurgate employee objects (to remove passhash and salt)
+  before displaying them; if DOCHAZKA_DEBUG environment variable is set,
+  display the entire context, otherwise display 'entity' only
+- Model/Employee.pm: make 'expurgate' method delete 'passhash' and 'salt'
+  attributes
+- Dispatch/Employee.pm: make 'employee/nick/:param' resource return 
+  an array only when the search finds more than one employee
+
+0.109  2014-07-28 14:28 CEST
+- bring back 'employee/current' resource
+- fix 'link' attribute displayed for each resource by '_get_default' targets
+
+0.110  2014-07-28 16:23 CEST
+- working on LDAP authentication
+
+0.111  2014-07-28 21:12 CEST
+- work on LDAP authentication
+- add a 'privhistory' resource
+- start working on 'privhistory/current' and 'privhistory/current/:tsrange'
+  resources, implement ACL restriction ('active' and 'admin' only)
+- t/332-dispatch-privhistory.t: add tests for 'privhistory' resource, including
+  test of ACL restriction
+
+0.112  2014-07-28 22:25 CEST
+- Privhistory.pm: fix bug "when handed a backwards tsrange, get_privhistory
+  returns 0 records instead of returning DOCHAZKA_DBI_ERR as it should"
+- test for the bug
+
+0.113  2014-07-29 09:46 CEST
+- REST.pm: work on POD (Request-response cycle)
+
+0.114  2014-07-29 17:51 CEST
+- LDAP auth
+- privhistory resource
+- Model/Employee.pm: implement true/false 'nick_exists' exported function
+
+0.115  2014-07-30 09:08 CEST
+- Model/Privhistory.pm: fix bug "DBI errors should not include file and line
+  number in 'catch' block of 'get_privhistory' routine"
+- Model/Employee.pm: add 'eid_exists' exported function; rewrite 'nick_exists';
+  revise load_by_nick, load_by_employee, and _load methods
+- Dispatch/Privhistory.pm: add 'privhistory/nick' and 'privhistory/eid' 
+  resources 
+
+0.116  2014-07-30 14:19 CEST
+- LDAP.pm: get rid of 'Argument "Net::LDAP::LDAP_SUCCESS" isn't numeric'
+  warning (not clear how to properly use this constant); when searching
+  for the user's DN, check 'uid', 'cn', and 'email' fields for matches,
+  instead of just 'uid'
+- rename DOCHAZKA_BASIC_AUTH_REALM for clarity and turn it into a site
+  configuration parameter so it can be overrided
+
+0.117  2014-07-30 15:53 CEST
+- Dispatch/Employee.pm: add proper ACL checks to 'employee/nick' and
+  'employee/eid'
+- Dispatch/ACL.pm: put ACL check code into a separate module
+- Test.pm: put some common testing code into a separate module
+
+0.118  2014-07-30 17:04 CEST
+- resolve two tickets re: "get database handle from parent and eliminate it
+  from function/method calls"
+
+0.119  2014-07-31 02:25 CEST
+- revamp ACL model: ACL profile of resource is now in the 'defaults'
+  attribute of the route object. ACL check reduced to four lines of
+  boilerplate code that are included in each target.
+
+0.120  2014-07-31 03:33 CEST
+- add 'employee/count' and 'employee/count/:priv' resources
+
+0.121  2014-07-31 09:06 CEST
+- Resource.pm: add log messages to _authenticate routine
+
+0.122  2014-07-31 09:27 CEST
+- another ACL revamp: do the ACL check in Resource.pm->forbidden, eliminate
+  boilerplate code in targets
+
+0.123  2014-07-31 15:23 CEST
+- allow site admin to set nick-to-LDAP mapping (DOCHAZKA_LDAP_NICK_MAPPING)
+
+0.124  2014-07-31 15:38 CEST
+- resolve ticket "make LDAP auth switchable so unit testing scripts can
+  disable it" by adding META_DOCHAZKA_UNIT_TESTING meta param and testing
+  for it in Resource.pm
+- LDAP.pm now exports the ldap_exists and ldap_auth functions
+
+0.125  2014-07-31 16:33 CEST
+- t/000-depends.t: add dependency on Params::Validate
+- Build.PL: build_require Test::Fatal, require Params::Validate
+- Model/Activity.pm: add parameter validation code
+
+0.126  2014-08-01 13:23 CEST
+- Model/Activity.pm: load_by_code, load_by_aid, _load now use "best practices"
+  established in Model/Employee.pm
+- start adding parameter validation code using Param::Validate
+- start adding unit tests for the new parameter validation code
+
+0.127  2014-08-01 17:07 CEST
+- cleanup, validate parameters, add some tests that call functions with
+  invalid parameters
+
+0.128  2014-08-01 18:21 CEST
+- Model/Activity.pm, Model/Shared.pm: moved '_load' to shared so code can
+  be re-used
+
+0.129  2014-08-01 18:54 CEST
+- Model/Employee.pm: use the new Shared.pm->load routine
+- Model/Activity.pm, Model/Employee.pm: eliminate deprecated _load routines
+- t/: update tests to current state
+
+0.130  2014-08-01 19:09 CEST
+- Model/Schedule.pm, Model/Shared.pm: use shared 'load' routine for schedules
+- t/: update tests to current state
+
+0.131  2014-08-02 16:34 CEST
+- Shared.pm: modify 'cud' and 'load' so they take named parameters, add
+  parameter validation, add a 'make_accessor' routine
+- t/004-shared-paramvalid.t: elicit lots of fatal errors from Model/Shared.pm
+- Model/: remove all database ping checks (replaced by a single line in
+  dbh.pm), adapt all calls to 'cud' and 'load', replace a lot of spaghetti code
+  with boilerplate
+- t/: adapt tests to current state
+
+0.132  2014-08-02 23:51 CEST
+- dynamically generate routers and default targets from site configuration in
+  dispatch_GET_Config.pm (WIP)
+
+0.133  2014-08-04 10:29 CEST
+- dynamic generation of resources now works, in a global sense, but some 
+  individual resources are broken
+
+0.134  2014-08-04 12:12 CEST
+- REST.pm: enable setting of 'debug_mode' in init routine
+- Model/Employee.pm: 'select_multiple_by_nick' always return payload with
+  result_set and search_key, even when result_set is empty
+- Dispatch/Employee.pm: simplify target routines
+- Dispatch/Shared.pm: fix bug in make_get_default that was causing empty
+  resource list when generating HTTP request via Plack::Test
+- add some calls to $log->debug
+- Test.pm: add 'status_from_json' method to facilitate testing of HTTP
+  response
+- t/330-dispatch.t: add a bunch of tests that examine the HTTP responses
+  returned when various resources are requested
+
+0.135  2014-08-04 15:55 CEST
+- t/330-dispatch.t: fill in missing tests of HTTP response content
+- t/331-dispatch-employee.t: fill in missing tests of HTTP response content
+- t/332-dispatch-privhistory.t: fill in missing tests of HTTP response content
+- Dispatch/Privhistory.t: refactor targets so they make more sense
+- Model/Privhistory.t: work on get_privhistory routine
+- t/105-privhistory.t: update to reflect current code 
+
+0.136  2014-08-04 20:15 CEST
+- REST.pm: add some POD about how the REST interface is self-documenting
+- Dispatch.pm, Dispatch/*.pm: add _post_default routine
+- Shared.pm: rename 'make_get_default' to 'make_default' and adapt it to
+  generate both _get_default and _post_default
+- config/dispatch/dispatch_POST_Config.pm, Resource.pm: start laying groundwork
+  for POST processing
+- POST requests to all resources with _post_default as their target are working
+  but unit tests are missing
+
+0.137  2014-08-04 20:47 CEST
+- t/: add tests for the first POST resources (the really simple ones 
+  like 'help')
+
+0.138  2014-08-04 21:25 CEST
+- Dispatch.pm: implemented '/echo' POST resource, including unit tests
+- t/: renumber and rename dispatch-related unit test files to accommodate
+  new POST code
+
+0.139  2014-08-05 09:44 CEST
+- REST.pm: write some POD
+
+0.140  2014-08-05 12:39 CEST
+- REST.pm: work on POD
+- Dispatch.pm: fix bug in 'echo' POST resource (wasn't handling empty
+  requests)
+- Resource.pm: implement 'known_content_type' and 'malformed_request'
+  routines - requests with body containing anything other than legal JSON will
+  be rejected
+
+0.141  2014-08-05 15:52 CEST
+- implement basic handling of PUT requests
+
+0.142  2014-08-05 21:46 CEST
+- implement 'employee' and 'employee/:nick' (INSERT/UPDATE) PUT resources
+  (ATM without unit tests)
+- Model/Employee.pm: fix bug "'update' routine doesn't work at all"
+- Resource.pm: in 'malformed_request', push JSON from request body onto
+  context _after_ decoding it into a Perl hashref
+- minor cleanup/fixup
+
+0.143  2014-08-06 10:19 CEST
+- working on employee PUT resources: refactor targets, add 'eid' resources
+- Model/Shared.pm: make 'cud' return RETURNING values in payload
+- Model/Employee.pm: make 'insert' and 'update' return payload received from
+  'cud'
+
+0.144  2014-08-06 13:55 CEST
+- Model/Employee.pm: fix bug "'update' returns OK status when called with
+  undefined EID -- should be ERR"
+- config/: rename SQL_EMPLOYEE_UPDATE to SQL_EMPLOYEE_UPDATE_BY_EID to
+  emphasize that EID is required
+- t/317-dispatch-put-employee.t: add lots of unit tests
+
+0.145  2014-08-06 15:08 CEST
+- Dispatch/Employee.pm: GET resource 'employee/nick/:nick' now returns
+  only a single employee record unless nick parameter contains a '%',
+  in which case it returns a result set (JSON array of employee records)
+- t/: adapt tests
+
+0.146  2014-08-07 09:42 CEST
+- config/dispatch/: improve resource descriptions by including method
+- REST.pm: write some POD about POST and PUT
+- staging/: get rid of old ballast, add some new ballast (CLI scripts)
+- minor cleanup
+
+0.147  2014-08-07 11:05 CEST
+- t/317-dispatch-put-employee.t: fix 'keys on reference' oversight
+  that caused build to fail with Perl 5.20
+- staging/cli.plx: work on CLI script
+- split off "pure" data model functions into App::Dochazka so they can
+  be shared with App::Dochazka::CLI
+
+0.148  2014-08-08 10:15 CEST
+- test release script
+- t/: update depends script
+
+0.149  2014-08-08 10:25 CEST
+- test release script once again
+
+0.150  2014-08-10 18:25 CEST
+- Build.PL: add dependencies Plack::Middleware::Session, Plack::Middleware::StackTrace
+- config/sql/: add new 'sessions' table and 'random_number()' SQL function
+
+0.151  2014-08-10 22:49 CEST
+- update dependencies
+- start implementing session management
+
+0.152  2014-08-11 10:02 CEST
+- more work on session management (reconsider idea of storing sessions in
+  database)
+- REST.pm: describe authentication/session management algorithm in POD
+- config/, Dispatch.pm: add a "/session" resource that displays session state
+
+0.153  2014-08-11 13:18 CEST
+- update dependencies
+- config/Dochazka_Config.pm: add 'DOCHAZKA_REST_SESSION_EXPIRATION_TIME'
+  and 'DOCHAZKA_REST_DEBUG_MODE' site params
+- REST.pm: in 'init_no_db', respect 'debug_mode' PARAMHASH key and
+  DOCHAZKA_REST_DEBUG_MODE site param, in that order
+- Resource.pm: finish implementing session management
+- NOTE: since session management doesn't seem to work with Plack::Test, it is
+  completely disabled when META_DOCHAZKA_UNIT_TESTING is true (set this to true
+  in unit tests that use Plack::Test)
+
+0.154  2014-08-11 14:19 CEST
+- add 'Plack::Session' to build_requires, just in case CPAN Testers gets
+  funny ideas
+
+0.155  2014-08-11 16:45 CEST
+- Resource.pm: cleanup
+
+0.156  2014-08-12 10:22 CEST
+- cleanup, documentation
+
+0.157  2014-08-12 15:52 CEST
+- REST.pm: add a 'DEBUGGING' section to POD
+- Util.pm: add a new 'Util.pm' module for miscellaneous utilities
+  and put 'deep_copy' function into it
+- Resource.pm: fix bug "die with StackTrace happens when DOCHAZKA_DEBUG
+  environment variable set"
+
+0.158  2014-08-13 03:21 CEST
+- REST.pm: add parameter validation to init_no_db
+- t/301-resource.t: fix bug found thanks to the above parameter validation
+
+0.159  2014-08-14 14:55 CEST
+- config/REST_Config.pm: add DOCHAZKA_HOST and DOCHAZKA_PORT
+- bin/dochazka-rest: look into how we could allow admin to specify host/port on
+  command line, yet default to values in site configuration if they are not
+  specified there
+
+0.160  2014-08-16 10:17 CEST
+- bin/dochazka-rest: comment out 'die' statement so server runs again
+
+0.161  2014-08-18 10:38 CEST
+- fix bug: "LDAP users can log in with wrong/no password"
+
+0.162  2014-08-21 15:31 CEST
+- t/002-root.t: fix broken unit test
+- bin/dochazka-rest: turn on debug_mode
+- Resource.pm: uncomment session ID debug message in _validate_session
+
+0.163  2014-08-27 17:42 CEST
+- Dispatch/Employee.pm->_put_employee: allow undef as value for optional fields
+  ('fullname', 'email', 'passhash', 'salt', 'remark') 
+- Model/Employee.pm->expurgate: when expurgating employee objects, do not
+  remove 'passhash' and 'salt' properties
+
+0.164  2014-08-28 11:26 CEST
+- Model/Shared.pm: do not put empty strings into the database
+
+0.165  2014-09-01 07:51 CEST
+- Unicode hell
+- add more debug messages
+
+0.166  2014-09-01 16:40 CEST
+- Resource.pm: Unicode hell! /employee/nick/číča is handled correctly when
+  sent by browser, but incorrectly when sent via App::Dochazka::WWW - yet
+  the path_info string is decoded correctly in 'service_available' in both
+  cases! Very strange.
+
+0.167  2014-09-04 17:34 CEST
+- respect DOCHAZKA_REST_LOG_FILE and DOCHAZKA_REST_LOG_FILE_REST core/site
+  config parameters (as is already the case in App::Dochazka::WWW) - no 
+  more chasing temporary files
+
+0.168  2014-09-04 17:41 CEST
+- t/: change default configuration directory (for unit testing purposes) from
+  '/etc/dochazka' to '/etc/dochazka-rest', as the former is ambiguous
+
+0.169  2014-09-17 09:59 CEST
+- REST.pm: modify INSTALLATION section of POD to bring it closer to current
+  reality
+
+0.170  2014-09-17 10:30 CEST
+- REST.pm: add some debug messages
+
+0.171  2014-09-17 10:51 CEST
+- REST.pm: fix bug 'Can't call method "errstr" on an undefined value' when
+  connect_db_pristine can't connect to database; remove debug messages
+
+0.172  2014-09-17 11:13 CEST
+- t/001-init.t: bail out of testing if we cannot connect to database
+
+0.173  2014-09-17 14:28 CEST
+- REST.pm: expand INSTALLATION section of POD with explanation of how to test database
+  connection using 'psql'
+
+0.174  2014-09-24 16:38 CEST
+- try to fix UTF-8 bug, but only make it worse
+
+0.175  2014-09-25 09:29 CEST
+- Resource.pm: encode response body in UTF-8 before sending it out on the line
+
+0.176  2014-10-14 17:31 CEST
+- Dispatch/: add some comments
+- Resource.pm: add debug message; add allow_nonref; find bug #57 
+
+0.177  2014-10-15 10:33 CEST
+- start revamping path dispatch code in light of bug #57 (PUT request to
+  non-existent resource returns HTTP code 200 and null entity body)
+- realize that it makes no sense to return 404 on a PUT request, since the
+  whole idea of PUT is to create a new resource
+- the principal change is in Resource.pm->allowed_methods:
+  - the definition of each resource (in config/dispatch) should contain list of allowed methods
+  - when path is recognized, return the allowed methods from the resource definition
+  - when the path is not recognized _AND_ the method is PUT, return 405 Method Not Allowed
+
+0.178  2014-10-15 16:41 CEST
+- the design change in 0.177 caused a lot of breakage: put the pieces back together (WIP)
+
+0.179  2014-10-15 22:54 CEST
+- Build.PL: require App::CELL 0.197 (for 'get_param')
+- continue fixing brokenness following the design change in 0.177
+
+0.180  2014-10-16 08:40 CEST
+- massage Changes file
+- config/dispatch: make 'help' resources for all four HTTP methods we support
+  (GET, POST, PUT, DELETE)
+- t/: fix or disable all broken tests - test suite running clean again, but
+  many tests are missing
+
+0.181  2014-10-16 10:35 CEST
+- make 'employee/nick' and 'employee/eid' be POST requests (instead of PUT) -
+  we will reserve PUT for unique resources like 'employee/nick/joedavis'
+
+0.182  2014-10-16 10:56 CEST
+- Dispatch.pm: add POD for "" and "help" resources
+
+0.183  2014-10-16 11:12 CEST
+- LDAP.pm: use EXPORT_OK instead of EXPORT
+- Resource.pm: import routines from LDAP.pm explicitly
+
+0.184  2014-10-16 12:59 CEST
+- Resource.pm: implement basic handling of DELETE requests
+
+0.185  2014-10-16 13:37 CEST
+- t/: tweak naming scheme for dispatch unit test files; add unit test files
+  for DELETE method
+- config/dispatch/dispatch_Top_Config.pm: add target for DELETE on 'echo'
+  resource
+
+0.186  2014-10-16 16:44 CEST
+- Dispatch/, t/: work on dispatch-related POD, unit tests
+
+0.187  2014-10-16 17:53 CEST
+- t/: more dispatch tests
+
+0.188  2014-10-16 22:46 CEST
+- t/: add a bunch of tests; refine siteparam and metaparam tests; find
+  App::CELL bug ($meta can be used to access site parameters)
+
+0.189  2014-10-17 11:10 CEST
+- Resource.pm: provide hash to keys, instead of hash reference
+
+0.190  2014-10-17 17:48 CEST
+- Build.PL: require latest App::CELL to avoid bug
+- implement 'bugreport' resource
+- implement PUT method for 'metaparam/:param' resource
+- Dispatch.pm: add POD for more resources
+- t/310-dispatch-top-get.t: add test case for 'bugreport' resource
+- t/312-dispatch-top-put.t: add test case "set meta parameter via REST
+  call"
+
+0.191  2014-10-20 16:53 CEST
+- Hackweek Day 1
+- Build.PL: depend on latest version of App::Dochazka
+- config/dispatch/dispatch_Employee_Config.pm: use refactored employee
+  targets
+- config/sql/employee_Config.pm: do not include 'priv' and 'schedule' in
+  employee objects
+- Dispatch/Employee.pm: refactor employee PUT and POST targets
+- Model/Employee.pm: add 'overlay' method
+- Resource.pm: instead of having 'priv' property directly in the current
+  employee hash, we make a separate 'current_priv' property for it; 
+  push the HTTP method onto the context hash ASAP (in service_available)
+- t/316-dispatch-employee-post.t: add some "real" tests involving inserting
+  and update employee objects
+- t/317-dispatch-employee-put.t: fix broken tests
+
+0.192  2014-10-20 22:15 CEST
+- dispatch/dispatch_Employee_Config.pm: resources into alphabetical order; add
+  'employee/current/priv' resource
+- dispatch/dispatch_Message_en.conf, Dispatch/Employee.pm: add
+  'employee/current/priv' resource
+- Model/Shared.pm: add some log messages in course of debugging a problem with
+  App::Dochazka::CLI
+
+0.193  2014-10-21 08:35 CEST
+- t/: fix accumulated brokenness in data model tests
+- t/315-dispatch-employee-get.t: clean up comments and add a test case
+
+0.194  2014-10-21 09:21 CEST
+- Resource.pm: if method is GET and result is "No records found", return
+  404 instead of 200 + status object
+- t/: adapt tests to this change
+
+0.195  2014-10-21 10:51 CEST
+- Model/Employee.pm->noof_employees_by_priv: if $priv is not a valid
+  privlevel, return 'OK' status + status code DISPATCH_NO_RECORDS_FOUND
+  to trigger a 404 Not Found response; also, put 'count' property in the
+  payload where it belongs
+- t/315-dispatch-employee-get.t: adapt existing test case
+
+0.196  2014-10-21 11:38 CEST
+- config/dispatch_Top_Config.pm: make "echo" work with POST only; put
+  resources in alphabetical order
+- t/: remove 'echo' tests from top-level PUT and DELETE units
+
+0.197  2014-10-21 11:47 CEST
+- work on development-checklist
+- t/: standardize method order (GET, PUT, POST, DELETE); adapt units
+
+0.198  2014-10-21 12:10 CEST
+- Dispatch.pm: document all target subroutines; put into alphabetical order
+  by resource name/path
+
+0.199  2014-10-21 16:31 CEST
+- Hackweek Day 2
+- dispatch_Message_en.conf: add DISPATCH_RESOURCE_NOT_IMPLEMENTED
+- dispatch_Top_Config.pm: implement 'not_implemented' resource
+- Dispatch.pm: implement 'not_implemented' resource, alphabetical order
+  tweak
+- t/: add missing top-level dispatch tests
+- new ../development-checklist chart to clarify and streamline
+  resource-implementation workflow
+
+0.200  2014-10-21 22:29 CEST
+- ../development-checklist: finish implementing top-level resources
+- Dispatch.pm: when getting site and meta params, show file and line
+  number along with other metadata; tweak resource documentation
+- t/: some tests failing due to bug in App::CELL::Config->get_param_meta
+
+0.201  2014-10-22 08:30 CEST
+- Build.PL: require App::CELL 0.200 for bug fix
+- t/: adjust two tests now that PUT metaparam/:param and PUT siteparam/:param
+  are assigning the request body to the parameter directly
+
+0.202  2014-10-22 16:47 CEST
+- Hackweek Day 3
+- lots of refinements to (plus documentation and test cases for) employee
+  resources
+- implement DELETE support for employee resources
+- eliminate problematic "short-cut" 'employee/:nick' and 'employee/:eid'
+  resources
+- make it possible to update an employee property to null
+- eliminate problematic 'overlay' method in Model/Employee.pm
+- improve debug message in Resource.pm
+- add negative and otherwise pathological test cases
+
+0.203  2014-10-22 17:15 CEST
+- t/317-dispatch-employee-post.t: got tests running again
+
+0.204  2014-10-23 10:57 CEST
+- t/: figure out how to run tests using 'prove -r'; make a 't/dispatch/'
+  directory for dispatch tests; merge all top-level dispatch tests into a
+  single file 't/dispatch/top.t'
+
+0.205  2014-10-23 14:02 CEST
+- Hackweek Day 4
+- Build.PL: make Module::Build walk t/ directory recursively
+- REST_MetaConfig.pm: make sure META_DOCHAZKA_VALID_RESOURCES is
+  initialized to an empty hashref
+- add on-line documentation infrastructure
+- config/dispatch/dispatch_Top_Config.pm: add HTML documentation strings
+  to all the top-level resources; add 'docu' resource definition
+- Dispatch.pm: remove POD sections corresponding to the HTML documentation
+  strings added to resource definition file; add target subroutine
+  for 'docu' resource; use heredoc in _forbidden
+- Resource.pm: enable validations to be specified in resource definitions
+  (see Path::Router) -- untested; during path/router initialization build
+  up META_DOCHAZKA_VALID_RESOURCES (hash of valid resources); push
+  'documentation' property onto context
+- t/dispatch/top.t: add tests for 'docu' resource
+
+0.206  2014-10-23 14:31 CEST
+- config/dispatch/dispatch_Employee_Config.pm: add HTML documentation
+  strings to all the employee resources
+- Dispatch/Employee.pm: remove POD documentation that has been moved to the
+  resource definition file
+- find bug "POST docu" returns same string, no matter which resource is
+  specified (should return the documentation string stipulated for the
+  resource in the resource definition)"
+- t/dispatch/top.t: add test cases for the bug
+
+0.207  2014-10-23 15:16 CEST
+- rename meta param META_DOCHAZKA_VALID_RESOURCES to
+  META_DOCHAZKA_RESOURCE_DOCS and store resource documentation strings
+  there during path router initialization
+- in the 'docu' target, get the HTML string from
+  META_DOCHAZKA_RESOURCE_DOCS meta param
+- Resource.pm: no longer need to push documentation HTML string onto the
+  context
+- Test.pm: add a 'docu_check' routine (to automate testing of each resource
+  for presence of documentation in the resource definition)
+- t/dispatch/top.t: run docu_check on each top-level resource
+
+0.208  2014-10-24 08:43 CEST
+- convert portion of employee dispatch tests to new structure
+
+0.209  2014-10-24 10:49 CEST
+- complete development workflow for employee resources
+- dispatch_Employee_Config.pm: add missing documentation
+- Dispatch/Employee.pm: fix bug "DELETE employee/nick/:nick actually
+  inserts a new employee if :nick not found"
+- t/: continue migrating dispatch tests to new structure; disable old
+  units so ./Build test doesn't run them; add new unit
+  t/dispatch/employee/nick.t
+
+0.210  2014-10-24 15:33 CEST
+- Hackweek Day 5
+- implement privhistory resources using new development workflow
+- merge 'privhistory/current' and 'privhistory/current/:tsrange' into a
+  single resource 'privhistory/current/?:tsrange'
+- dispatch/dispatch_Privhistory_Config.pm: put resources in alphabetical
+  order; document resources; add more supported methods
+- t/dispatch/privhistory: add privhistory tests in new structure
+- Dispatch/Privhistory.pm: put targets in order according to their
+  corresponding resources; rename _get_nick and _get_eid to _nick and _eid,
+  respectively, and expand them to support PUT and DELETE
+- Model/Privhistory.pm: add some debug messages
+
+0.211  2014-10-24 22:40 CEST
+- Hackweek Day 5, continued
+- config/sql/dbinit_Config.pm: add UNIQUE (eid, effective) constraint to
+  privhistory table to avoid duplicate entries in a given employee's
+  privhistory listing
+- dispatch_Message_en.conf: add DISPATCH_PRIVHISTORY_COULD_NOT_SPAWN
+- Dispatch/Privhistory.pm: implement support for PUT and DELETE requests in
+  _eid and _nick targets
+- Model/Employee.pm: fix bug "get 500 Server Error when I send a request for
+  bogus resource 'privhistory/eid/asdf'"
+- t/dispatch/privhistory/: add quite a few tests
+
+0.212  2014-10-25 23:23 CEST
+- update MANIFEST to current state
+- change 'privhistory' to 'priv'
+- add new 'priv/current/?:ts' resource
+- t/: start adapting tests
+
+0.213  2014-10-26 22:36 CET
+- config/dispatch/priv_Config.pm: add "priv/current/eid/:eid/?:ts" and
+  "priv/current/nick/:nick/?:ts" resources; unclear how privhistory records
+  will be added and deleted
+- dispatch_Message_en.conf: remove duplicate message
+- Dispatch/Privhistory.pm: repurpose _current_priv so it works for the new
+  resources added in this commit; rename _eid and _nick to _history_eid and
+  _history_nick, respectively
+
+0.214  2014-10-27 13:12 CET
+- config/dispatch/top_Config.pm: add 'cli' property to all top-level
+  resource definitions; put into alphabetical order; rename 'privhistory'
+  to 'priv'
+- Dispatch.pm: make 'docu' resource return "resource => ''" when called
+  without an argument, instead of "resource => undef"; make
+  "not_implemented" resource include HTTP method in payload
+
+0.215  2014-10-27 13:39 CET
+- config/dispatch/employee_Config.pm, config/dispatch/priv_Config.pm: add
+  'cli' properties to all resource definitions
+- ../development-checklist: complete manual CLI testing of all top-level
+  and employee resources
+
+0.216  2014-10-27 14:29 CET
+- config/dispatch/priv_Config.pm: fix 'priv/eid/:eid/?:ts' and
+  'priv/nick/:nick/?:ts' resource definitions
+- config/dispatch_Message_en.conf: add DISPATCH_EMPLOYEE_CURRENT_PRIV_AT_TIMESTAMP
+- Dispatch/Privhistory.pm: fix bugs in _current_priv
+- Model/Shared.pm: fix bugs in priv_by_eid and _st_by_eid
+
+0.217  2014-10-27 17:53 CET
+- config/dispatch/priv_Config.pm: eliminate duplicate 'priv' resource
+  definition that was giving me grief; fix two wrong ACL profiles;
+  eliminate 'priv/history/?:tsrange' and replace it with
+  'priv/history/current/?:tsrange'; add 'priv/history/phid/:phid' resource
+- config/dispatch/top_Config.pm: tweak resource documentation
+- dispatch_Message_en.conf: tweak priv-related messages
+- Dispatch/Privhistory.pm: tweak priv-related messages, add
+  'priv/history/phid/:phid' resource target
+- t/: add new tests; adapt existing tests to current state
+
+0.218  2014-10-27 20:31 CET
+- config/dispatch_Message_en.conf: tweak bad/missing parameter message
+- Dispatch/Employee.pm: handle non-integer EID values more gracefully
+- Test.pm: add descriptions to docu_check tests
+- t/dispatch/employee/eid.t: add descriptions to tests; add some new "negative"
+  test cases
+
+0.219  2014-10-27 22:33 CET
+- t/: clean up units; merge all employee tests into a single unit (employee.t);
+  merge all priv tests into a single unit (priv.t)
+- config/dispatch/priv_Config.pm: alphabetical order tweak
+- Test.pm: export all the test functions (EXPORT instead of EXPORT_OK); bring
+  in create_testing_employee and delete_testing_employee
+- STATUS: all top-level, employee, and priv resources implemented and tested,
+  ready to start work on activity, interval, etc. resources
+
+0.220  2014-10-28 09:35 CET
+- MANIFEST: add Dispatch/Activity.pm
+- config/dispatch/activity_Config.pm: add 'activity/all' resource definition
+- config/dispatch/top_Config.pm: add 'activity' resource definition; rename
+  '_not_implemented' target to 'not_implemented' because we are now exporting
+  it from Dispatch/Shared.pm
+- config/dispatch_Config.pm: uncomment DISPATCH_RESOURCES_ACTIVITY
+- Dispatch.pm: import not_implemented target from Dispatch/Shared.pm
+- Dispatch/Employee.pm: fix debug messages
+- Dispatch/Privhistory.pm: import priv_by_eid from the right module
+- Dispatch/Shared.pm: export 'not_implemented' routine
+- Resource.pm: add 'use App::Dochazka::REST::Dispatch::Activity' so activity
+  targets will work
+
+0.221  2014-10-28 12:08 CET
+- MANIFEST: add t/dispatch/activity.t 
+- config/sql/: add 'SQL_ACTIVITY_SELECT_ALL'; add 'disabled'
+  field to 'activities' table; adapt SQL statements where appropriate
+- t/dispatch/activity.t: new unit for activity dispatch tests
+
+0.222  2014-10-28 21:51 CET
+- config/dispatch/activity_Config.pm: activate 'activity/all' resource for GET
+  requests
+- config/sql/activity_Config.pm: divide 'activity/all' SELECT into two variants
+  (with and without disabled activities)
+- Dispatch/Activity.pm: implement _get_all_without_disabled and
+  _get_all_including_disabled dispatch targets
+- Model/Activity.pm: eliminate superfluous 'use' lines; implement
+  'get_all_activities' routine
+- t/dispatch/activity.t: add tests for GET activity/all
+
+0.223  2014-10-28 22:37 CET
+- REST_MetaConfig.pm: add META_DOCHAZKA_RESOURCE_ACLS
+- config/dispatch/top_Config.pm: bring comments up-to-date
+- Dispatch.pm: modify "_help_post" ('docu' dispatch target) to display ACL
+  profile of queried resource as well as its documentation
+- Resource.pm: modify path initializer to populate META_DOCHAZKA_RESOURCE_ACLS
+
+0.224  2014-10-29 08:07 CET
+- activity_Config.pm: add 'activity/all/disabled' resource definition
+- Dispatch/Activity.pm: comment out 'get_all' target
+- t/dispatch/activity.t: add basic tests for 'activity/all/disabled'; add FIXME
+  lines for future tests
+
+0.225  2014-10-29 09:33 CET
+- dispatch/activity_Config.pm: add 'activity/aid/:aid' resource definition
+- t/dispatch/activity.t: add initial tests for 'activity/aid/:aid'
+
+0.226  2014-10-29 10:34 CET
+- Build.PL: require 0.172 of App::Dochazka (for 'disabled' field)
+- config/sql/activity_Config.pm: make SELECTs return disabled field
+- t/dispatch/activity.t: add some tests for 'activity/aid/:aid' resource (GET)
+- Dispatch/Activity.pm: implement 'activity/aid/:aid' resource for GET requests
+
+0.227  2014-10-29 13:54 CET
+- Dispatch/{Employee,Activity}.pm: fix bug where PUT request with request body
+  consisting of just a number or just a string (e.g. '9', or '"asdf"') was
+  causing the server to vomit 500
+- activity_Config.pm: support PUT and DELETE requests for 'activity/aid/:aid';
+  add resource definition for 'activity/code/:code'
+- dispatch_Message_en.conf: add DISPATCH_CODE_DOES_NOT_EXIST
+- Dispatch/Activity.pm: support PUT and DELETE requests for 'activity/aid/:aid';
+  add support for 'activity/code/:code'
+- Model/Activity.pm: fix 'update' routine to support the new 'disabled' field
+- Model/Shared.pm: make a note in 'cud' routine that order of attrs must match
+  the '?' characters in the SQL statement
+- Test.pm: add 'create_testing_activity' and 'delete_testing_activity'
+- t/dispatch/activity.t: add a bunch of tests
+
+0.228  2014-10-29 16:43 CET
+- Dispatch/Activity.pm: trying to get _insert_activity to deal gracefully with
+  bogus JSON
+- t/: add DELETE tests for 'activity/aid/:aid'; add tests for
+  'activity/code/:code'; tweak tests
+
+0.229  2014-10-30 13:07 CET
+- Build.PL: require App::Dochazka 0.174 for new 'filter' routine
+- config/sql/dbinit_Config.pm: add check constraints for 'nick' (employees) and
+  'code' (activities) fields because folks might try to insert an activity code
+  like '!!!' or commit other similar bogusness
+- Dispatch/Shared.pm: add new 'pre_update_comparison' routine for validating
+  updates
+- Dispatch/Activity.pm: refactor _update_activity and _insert_activity so they
+  filter out bogus properties
+- Dispatch/Employee.pm: refactor _update_employee and _insert_employee so they
+  filter out bogus properties
+- t/: adapt tests to current state; add some tests that attempt to
+  insert/update bogus properties
+
+0.230  2014-10-30 18:21 CET
+- activity_Config.pm: add resource definitions for 'activity/aid' and 'activity/code'
+- t/dispatch/activity.t: add DELETE tests for 'activity/code/:code'
+
+0.231  2014-10-30 19:37 CET
+- Dispatch/Employee.pm: handle an edge case ($eid might be undefined due to
+  bogus user input)
+- t/dispatch/employee.t: label some tests; add tests for some edge cases
+- t/dispatch/activity.t: add tests for some edge cases
+
+0.232  2014-10-30 22:07 CET
+- activity_Config.pm: activate 'activity/code' dispatch target
+- Dispatch/Activity.pm: adapt '_code' dispatch target to handle POST
+- t/dispatch/activity.t: add tests
+
+0.233  2014-10-31 13:30 CET
+- realize that there are resources where the GET method needs ACL profile of,
+  e.g., "active" but the remaining methods (PUT, POST, DELETE) need to be
+  available only to administrators
+- Resource.pm: modify 'forbidden' method to handle resources with ACL profiles
+  defined for each HTTP method separately
+- config/dispatch/activity_Config.pm: define per-method ACL profiles where needed
+- Model/Privhistory.pm: improve documentation of 'get_privhistory' routine
+- Test.pm: add 'req_active', 'req_json_active', 'create_active_employee', and
+  'delete_active_employee' routines
+- t/dispatch/activity.t: adapt tests to use the new routines in Test.pm and to
+  test the per-method ACL profile definitions
+
+0.234  2014-10-31 16:48 CET
+- config/dispatch/: convert 'documentation' property of resource definitions
+  from HTML to POD
+- t/dispatch/activity.t: provide some tests for 'activity/aid' and
+  'activity/code' resources
+
+0.235  2014-10-31 17:29 CET
+- Dispatch.pm: do not chomp off linebreaks when processing resource
+  documentation string
+
+0.236  2014-10-31 21:29 CET
+- Build.PL: require Pod::Simple::HTML (needed by 'docu/html' target)
+- config/dispatch/: activate 'activity/aid' resource for POST; add '=pod' 
+  line at top of documentation string on each resource; rename 'docu' target
+  from '_help_post' to '_docu'; add 'docu/html' resource definition; convert
+  some remaining documentation from HTML to POD
+- Dispatch.pm: add a '_docu_html' target
+- Dispatch/Activity.pm: adapt '_aid' target for POST
+- Test.pm: expand 'docu_check' routine to cover 'docu/html' resource as well as
+  straight 'docu'
+- Util.pm: add a 'pod_to_html' conversion routine
+- t/dispatch/activity.t: fill in remaining tests necessary to meet minimal
+  workflow expectations
+- t/dispatch/top.t: add battery of 'docu/html' tests, mostly plagiarized from
+  'docu'
+
+0.237  2014-11-01 14:11 CET
+- rename Dispatch/Privhistory.pm to Dispatch/Priv.pm to match 'priv' resource
+
+0.238  2014-11-03 10:30 CET
+- add many schedule-related resources to development-checklist
+- in new schedule_Config.pm file with schedule resource definitions
+  copied from priv_Config.pm, edit resource descriptions and documentation
+  strings 
+- in Model/Privhistory.pm, move 'get_privhistory' routine to Model/Shared.pm
+  and generalize into 'get_history'; make 'get_privhistory' and
+  'get_schedhistory' in Model/{Privhistory, Schedhistory}.pm be wrappers for this
+  new shared routine
+- t/: adapt to current state
+
+0.239  2014-11-03 12:15 CET
+- renamed all 'priv/current/...' and 'schedule/current/...' resources
+  to 'priv/self/...' and 'schedule/self/...', respectively
+- Dispatch/Priv.pm: renamed _get_current to _get_history_self; move
+  _current_priv logic to Dispatch/Shared.pm->current because we will call it
+  from Dispatch/Schedule.pm as well;
+- Dispatch/Schedule.pm: ongoing adaptations
+- t/: adapt to current state
+
+0.240  2014-11-03 16:19 CET
+- MANIFEST: add Dispatch/Schedule.pm, t/dispatch/schedule.t
+- activity_Config.pm: add 'activity/help' resource definition
+- priv_Config.pm, etc.: rename some resources and targets
+  (in particular s/current/self/ in resource names)
+- dispatch_Config.pm, Resource.pm: activate schedule resources
+- dispatch_Message_en.pm: add new DISPATCH_EMPLOYEE_SCHEDULE and
+  DISPATCH_EMPLOYEE_SCHEDULE_AS_AT messages
+- config/sql/schedule_Config.pm: add new SQL_SCHEDHISTORY_SELECT_RANGE_BY_EID
+  and SQL_SCHEDHISTORY_SELECT_RANGE_BY_NICK params
+- Dispatch/Shared.pm: adapt 'current' routine to work for both priv and
+  schedule resources
+- Model/Shared.pm: fix some bugs
+- Resource.pm: activate schedule resources
+- t/dispatch/activity.t: add tests for 'activity/help'
+- t/dispatch/schedule.t: add tests for "/schedule/eid/:eid/?:ts",
+  "/schedule/help", "/schedule/nick/:nick/?:ts", and "/schedule/self/?:ts"
+  resources
+
+0.241  2014-11-03 22:32 CET
+- Dispatch/Shared.pm: "numify" $eid in return value payload from dispatch
+  target 'current'; check for hashref instead of scalar now that we are
+  converting the schedule from JSON string into Perl hashref
+- Model/Schedule.pm: rename 'get_json' to 'get_schedule_json' and add
+  'decode_schedule_json' for converting the schedule JSON string into a Perl
+  hashref
+- Model/Shared.pm: return decoded schedule (hashref) from schedule_by_eid
+- t/dispatch/schedule.t: uncomment/adapt some tests
+- t/: get model units to run cleanly again
+
+0.242  2014-11-04 08:30 CET
+- config/dispatch/schedule_Config.pm: put resource definitions in alphabetical order;
+  add missing POD; add missing 'schedule/intervals' resource definition
+
+0.243  2014-11-04 09:56 CET
+- schedule_Config.pm, Dispatch/Schedule.pm: make 'schedule/history/...'
+  resources use "not_implemented" dispatch target so they don't vomit 500
+
+0.244  2014-11-04 11:32 CET
+- schedule_Config.pm: split 'schedule/intervals/?:shid' into two separate
+  resources for parsing clarity
+
+0.245  2014-11-04 17:50 CET
+- Build.PL: require App::Dochazka 0.175 for 'ssid' (instead of 'scratch_sid')
+- schedule_Config.pm: 'schedule/intervals' is POST and DELETE only; activate
+  DELETE on 'schedule/intervals/:sid'; rename ':shid' parameter to ':sid'
+- rename 'scratch_sid' field/property of intervals to 'ssid'
+- dispatch_Message_en.conf: add DISPATCH_SCHEDINTVLS_MISSING,
+  DISPATCH_SCHEDULE_INSERT_OK, DISPATCH_SCHEDULE_NO_UPDATE
+- Dispatch/Schedule.pm: add _intervals_post and _intervals_delete dispatch
+  targets
+- move 'expurgate' logic to Model/Shared.pm and implement a wrapper method
+  in each model module
+- Model/Schedintvls.pm: fix 'insert' method so it returns a sensible status
+  payload
+- Test.pm: in docu_check, run 'payload' tests only if there is a payload;
+  add as-yet untested 'create_testing_schedule' and 'delete_testing_schedule'
+  routines
+- t/: add new 'intervals.t' unit; adapt existing units to current state
+
+0.246  2014-11-04 21:08 CET
+- stabilization after the last commit
+- t/dispatch/intervals.t: add some tests called for by development workflow
+
+0.247  2014-11-04 22:21 CET
+- add 'DISPATCH_SCHEDULE_EXISTS' message
+- add 'schedule/all' and 'schedule/all/disabled' resource definitions
+- add 'disabled' field to 'schedules' table
+- Dispatch/Schedule.pm: when schedule already exists, return
+  'DISPATCH_SCHEDULE_OK'
+- t/dispatch/intervals.t: test for 'DISPATCH_SCHEDULE_OK' when inserting the
+  same schedule a second time
+
+0.248  2014-11-05 11:05 CET
+- Build.PL: require App::Dochazka 0.176 to ensure Schedule objects have a
+  'disabled' property
+- config/dispatch/schedule_Config.pm: activate 'schedule/all' and 
+  'schedule/all/disabled' resources
+- config/sql/schedule_Config.pm: add 'disabled' field to SQL statements;
+  add two new SQL statements to get all schedule records
+- Dispatch/Schedule.pm: import 'get_all_schedules' and
+  'get_all_schedules_including_disabled' routines
+- Model/Schedule.pm: implement 'get_all_schedules' and
+  'get_all_schedules_including_disabled' routines
+
+0.249  2014-11-05 12:18 CET
+- give 'schedule/all/...' dispatch targets more sensible names
+- enable POST on 'schedule/intervals/:sid', including documentation
+- t/dispatch/schedule.t: add 405 tests for 'schedule/all/...'
+
+0.250  2014-11-05 17:54 CET
+- Build.PL: require App::Dochazka 0.177 for TO_JSON method; require
+  App::CELL 0.201 to get rid of Data::Structure::Util
+- Resource.pm: get rid of wacky debug code; add 'convert_blessed' to our
+  JSON 'encode' method call now that we have TO_JSON methods in all models;
+  this obviates the need to call 'unblessed'
+- Data::Structure::Util does not work with perl 5.20, so it needs to go;
+  remove all mentions of it; fix resulting brokenness 
+- Util.pm: get rid of jury-rigged 'deep_copy' routine (use Storable::dclone
+  instead!)
+
+0.251  2014-11-06 09:42 CET
+- Dispatch/Schedule.pm->_intervals_delete was reporting success even when
+  nothing was actually deleted - fixed
+- Model/Schedule.pm->schedule_all was crashing when no records found (because
+  $counter was not initialized) - fixed
+- t/104-employee.t: deprecate expurgate in favor of TO_JSON
+- t/dispatch/intervals.t: when no schedule records are in the database,
+  'schedule/all/...' will return 404 - fixed
+- t/dispatch/schedule.t: add basic tests for 'schedule/all' and
+  'schedule/all/disabled'
+
+0.252  2014-11-06 16:43 CET
+- Build.PL: require App::Dochazka 0.181 for new boilerplate code
+- schedule_Config.pm: rename '/schedule/intervals/:sid' to 
+  '/schedule/sid/:sid'
+- dbinit_Config.pm: add a trigger to make immutable/unupdatable the 'schedule'
+  field of the 'shedules' table 
+- add a 'SQL_SCHEDULE_UPDATE' statement to support updates on the
+  'schedules' table
+- replace calls to 'expurgate' method with 'TO_JSON'
+- Dispatch/Schedule.pm: implement _intervals_get and _schedule_post dispatch
+  targets and '_update_schedule' routine adapted from Employee.pm
+- Model/Shedule.pm: override the boilerplate 'compare' method for this
+  model because the 'disabled' field needs special handling; implement
+  an 'update' method
+- Resource.pm: fix a debug message
+- t/107-schedule.t: add test case for 'update' method
+- t/dispatch/intervals.t: add GET test case for '/schedule/sid/:sid' resource
+
+0.253  2014-11-07 14:33 CET
+- Test.pm: make a new 'req' routine that to replace the current rag-tag
+  collection of kludgey routines for generating HTTP requests against the
+  Plack::Test object
+- t/dispatch/intervals.t: add 'POST schedule/sid/:sid' test cases; migrate the
+  entire unit to the new 'req' routine 
+- t/: move model tests into their own subdirectory and comment out 'skip_all'
+  so they run
+- Model/: remove 'expurgate' method from all model modules (replaced by TO_JSON);
+  remove 'compare' method overlay (replaced by compare_disabled)
+- t/model/activity.t: adapt tests, remove deprecated tests, add new tests
+
+0.254  2014-11-07 16:19 CET
+- t/dispatch/activity.t: migrate to new 'req' function
+
+0.255  2014-11-07 22:12 CET
+- t/dispatch/employee.t: strenuously migrate to the new 'req' routine
+
+0.256  2014-11-08 20:30 CET
+- t/dispatch/priv.t: migrate another unit to 'req'
+
+0.257  2014-11-08 21:35 CET
+- t/dispatch/schedule.t: migrate unit to 'req'
+
+0.258  2014-11-09 09:10 CET
+- t/dispatch/top.t: migrate unit to 'req'
+- Test.pm: deprecate and eliminate kludgey testing routines (replaced by 'req')
+
+0.259  2014-11-10 08:54 CET
+- Model/Shared.pm: finally get up the courage to return 'NOTICE' status level
+  instead of 'OK' when SELECT statements return no records - this makes
+  "nothing found" easy to distinguish from "something found", while keeping "ERR"
+  reserved for DBI errors; add 'make_test_exists' to generate 'nick_exists',
+  'eid_exists', etc. etc. (to be used in all model modules)
+- Dispatch/Activity.pm: adapt to above change
+- Model/Employee.pm: revamp nick_exists and eid_exists (generalize these routines
+  and generate them at runtime for code re-use)
+- Resource.pm: adapt to above change
+- t/dispatch/activity.t: cleanup
+- t/model/employee.t: cleanup
+- not testing cleanly
+
+0.260  2014-11-10 11:29 CET
+- Dispatch/: cleanup
+- Dispatch/Priv.pm: break out common code from _history_eid and _history_nick
+  into a separate '_history_end_game' routine
+- Model/: cleanup
+- Model/Shared.pm: fix make_test_exists; make get_history include both
+  EID and nick in the payload
+- t/: adapt tests to current state
+- tests running cleanly again
+
+0.261  2014-11-10 12:14 CET
+- Model/: add 'aid_exists', 'code_exists', 'iid_exists', etc. runtime-generated
+  boilerplate functions to all models where they make sense
+- Model/Employee.pm: cleanup
+- Model/{Schedule,Shared}.pm: eliminate circular dependency and clean up aftermath
+- t/model/: add test cases for new boilerplate
+
+0.262  2014-11-10 14:02 CET
+- release/: new docgen.plx to auto-generate POD documentation on all resources;
+  adapt release.sh to use the new docgen.plx script
+- docs/Resources.pm: auto-generated POD documentation 
+- config/docgen_Config.pm: special params for use in docgen.plx 
+- config/dispatch/: clean up some of the docs
+- config/dispatch_Config.pm: add POD to DISPATCH_RESOURCE_LISTS
+- Resource.pm: adapt 'init_router' routine to new DISPATCH_RESOURCE_LISTS
+  format
+
+0.263  2014-11-10 14:40 CET
+- REST.pm: eliminate obsolete POD; add new POD about
+  App::Dochazka::REST::Docs::Resources
+- config/dispatch/: add some asterisks
+- config/docgen_Config.pm: add DOCHAZKA_DOCGEN_EPITAPH to make
+  Docs/Resources.pm a valid module
+- ../release/docgen.plx: process the epitaph
+
+0.264  2014-11-10 17:13 CET
+- ../release/docgen.plx, config/docgen_Config.pm: POD module generated by
+  docgen.plx not rendering correctly on metacpan.org - tweak; add DESCRIPTION
+  section
+- Model/Schedule.pm: fix broken schedule_all routine (it wasn't using the right
+  SQL statement)
+- t/dispatch/schedules.t: add proper minimal test cases for 'schedule/all' and
+  'schedule/all/disabled'
+
+0.265  2014-11-11 17:45 CET
+- config/dispatch/schedule_Config.pm: rewrite documentation of
+  'schedule/intervals' resource
+- Dispatch/Schedule.pm: cleanup
+- major refactor of history-related dispatch targets and supporting
+  code for code sharing between Privhistory and Schedhistory
+- lots of regressions; not testing cleanly yet
+- config/dispatch/schedule_Config.pm: activate history resources,
+  etc.
+- experimenting with metacpan POD rendering glitch
+
+0.266  2014-11-11 10:10 CET
+- docgen.plx: flesh out auto-generated resource documentation by adding
+  permitted methods and CLI command
+- more trial-and-error on metacpan POD rendering issue (change all heredocs
+  so the end flags are unique)
+- Model/Shared.pm: implement new 'load_multiple' routine to eliminate some
+  creeping code duplication
+- Model/Activity.pm: make get_all_activities use 'load_multiple'
+- Model/Schedule.pm: replace 'schedule_all' and 'schedule_all_disabled' with 
+  a single 'get_all_schedules' routine based on 'load_multiple'
+- Dispatch/Schedule.pm: adapt to the new routines
+- t/: adapt to current state; add test cases for get_all_activities
+
+0.267  2014-11-11 22:51 CET
+- complete refactor of shared history-related dispatch targets
+- integrate intervals.t into schedule.t
+- split history.t off from priv.t
+- remove history-related tests from schedule.t
+- (now ready to add schedhistory tests to history.t)
+
+0.268  2014-11-12 09:13 CET
+- t/dispatch/history.t: adapt to test both 'priv/history' and
+  'schedule/history' resources
+- ../release/docgen.plx: add ACL profile to each resource; tweak display of
+  HTTP methods
+- t/dispatch/history.t: clean up comments, variable and function names
+
+0.269  2014-11-12 11:15 CET
+- ../release/release.sh not incrementing version number of Docs/Resources.pm -
+  attempt to fix
+
+0.270  2014-11-12 11:39 CET
+- ../release/docgen.plx: tweak POD formatting
+
+0.271  2014-11-12 11:43 CET
+- cleanup distro infrastructure
+
+0.272  2014-11-12 13:38 CET
+- Dispatch/Employee.pm, t/dispatch/employee.t: add current schedule to payload
+  of 'employee/current/priv' resource
+- Docs/Workflow.pm: new POD module describing workflow scenarios from an
+  end-user perspective
+- dispatch_Message_en.conf: add DISPATCH_EMPLOYEE_CURRENT_PRIV
+- Test.pm: add 'create_inactive_employee'; rename 'delete_active_employee' to
+  'delete_employee_by_nick' (complete re-write)
+- t/dispatch/activity.t: add some tests for 'activity/help'; prepare for this
+  resource to handle resources where 'acl_profile' is a HASHREF
+- ../release/docgen.plx: tweak POD formatting some more
+
+0.273  2014-11-12 16:49 CET
+- Dispatch/Shared.pm: make 'make_default' handle resources that use
+  fine-grained acl_profile definition
+- t/dispatch/activity.t: test above handler
+
+0.274  2014-11-13 10:43 CET
+- config/dispatch/: allow 'inactive' to view own priv/schedule history
+- Dispatch/Shared.pm: refactor 'current' routine to use a dispatch table
+- Docs/Workflow.pm: add verbiage
+- Test.pm: create_{active,inactive}_employee return $eid
+- t/: start fixing regressions
+
+0.275  2014-11-13 15:01 CET
+- fix regression: "GET schedule/eid/:eid vomits 500 or returns nonsense"
+- Dispatch/Shared.pm: the regression was caused by not saving the return
+  value from the call to {priv,schedule}_by_eid in the 'current' routine
+- t/dispatch/schedule.t: add test case for this regression 
+
+0.276  2014-11-13 15:37 CET
+- t/dispatch/schedule.t: add more positive tests focused on 'current' dispatch
+  target
+
+0.277  2014-11-13 16:30 CET
+- Dispatch/Schedule.pm: cleanup
+- t/dispatch/schedule.t: add negative tests for 'schedule/eid/:eid/?:ts'
+
+0.278  2014-11-13 22:32 CET
+- t/dispatch/schedule.t: add more negative tests
+- ../development-checklist, Docs/Workflow.pm: start blocking in interval
+  and lock resources; add verbiage
+- config/dispatch/: make 'employee/self' be a synonym for 'employee/current'
+  and enable POST requests on these resources so employees can, e.g., change
+  their own password; update documentation of history resources
+- REST_Config.pm: add 'DOCHAZKA_PROFILE_EDITABLE_FIELDS' for POST requests
+  on 'employee/self' 
+- t/dispatch/employee.t: run all 'employee/current' tests on 'employee/self'
+  as well; realize that if a resource returns 405 it will do so regardless
+  of which user we authenticate as (even non-existent user)
+
+0.279  2014-11-14 10:39 CET
+- Dispatch/Employee.pm: add _post_current (dispatch target for POST
+  'employee/{current, self}'
+- t/dispatch/employee.t: ACL checks are not working for resources with
+  fine-grained ACL profile definition: add a test case for this
+
+0.280  2014-11-14 11:29 CET
+- employee_Config.pm: fix 'employee/self' acl_profile property
+- Dispatch/Employee.pm: request body needs to be a hashref - check for that
+  where we really care about it - in _put_post_delete_employee_by_eid
+- Dispatch/Shared.pm: pre_update_comparison was causing DOCHAZKA_BAD_INPUT to
+  be returned if no fields would actually change on update, but this might be
+  confusing - change it to allow updates in such cases
+- t/dispatch/employee.t: add test cases for POST employee/{current,self} by
+  inactive and active employees; adapt tests to current state
+
+0.281  2014-11-14 16:42 CET
+- finish implementation (including test cases) of POST dispatch
+  target for 'employee/{current,self}' resource
+
+0.282  2014-11-14 21:36 CET
+- dbinit_Config.pm: add trigger clause to make 'sid' field immutable
+- Docs/Workflow.pm: add verbiage
+- t/model/schedule.t: add test case verifying that 'update' method does not
+  change the database even if the 'sid' field is changed
+
+0.283  2014-11-18 07:45 CET
+- REST_Message_en.conf: add finer-grained notice messages for 'cud'
+- Model/Shared.pm: in cud, check return value of '$sth->execute' and
+  return finer-grained notices to distinguish various edge cases
+- t/: adapt to current state
+
+0.284  2014-11-18 11:01 CET
+- unit tests: move existing '002-root' and '003-current-priv' units to 
+  new t/sql directory; add new 't/sql/immutable_id.t' unit to test 
+  new triggers to make 'eid', 'iid', etc. fields immutable
+- config/sql/dbinit_Config.pm: add "immutability" triggers for 'employees.eid',
+  'schedhistory.shid' and 'privhistory.phid'
+
+0.285  2014-11-18 11:53 CET
+- dbinit_Config.pm, t/sql/immutable_id.t: finish making '*id' fields immutable
+
+0.286  2014-11-18 12:49 CET
+- dispatch_Config.pm, interval_Config.pm: add basic set of 'intervals'
+  resources
+
+0.287  2014-11-18 15:33 CET
+- config/dispatch/HTTP_Message_en.conf: make a separate message file for codes
+  that map directly to an HTTP error code
+- config/, lib/: transform DOCHAZKA_BAD_INPUT and DOCHAZKA_INSUFFICENT_PRIV into 
+  special status codes that map directly to HTTP error codes
+- Resource.pm: when target returns certain status codes (see package variable
+  %status_http_map), translate them directly into HTTP error codes
+- t/: adapt to current state
+
+0.288  2014-11-19 10:05 CET
+- Dispatch/Lock.pm: lay groundwork for locks
+- t/dispatch/interval.t: new tests 
+- interval_Config.pm, dispatch_Message_en.conf: minor fixes
+- Dispatch/Interval.pm: add special ACL handling
+- Model/Interval.pm: fix bug (wrong order of properties in call to 'cud')
+- Test.pm: let 'req' handle any user as long as "passhash" property is
+  set the same as "nick"
+
+0.289  2014-11-19 11:08 CET
+- interval_Config.pm: make not-implemented resources use 'not_implemented'
+  dispatch target
+- t/dispatch/interval.pm: add some missing boilerplate tests
+
+0.290  2014-11-19 11:23 CET
+- interval_Config.pm: 'interval/nick/:nick/:tsrange' resource was broken due to
+  missing EOH - fixed
+- t/dispatch/interval.t: $base for 'interval/nick/:nick/:tsrange' resource was
+  set to wrong value - fixed
+
+0.291  2014-11-19 15:19 CET
+- HTTP_Message_en.conf, Resources.pm: add 404 status trigger
+- interval_Config.pm: call the hypothetical error code DISPATCH_TOO_MANY_RECORDS_FOUND
+- top_Config.pm: fix factual error in documentation 
+- dispatch_Message_en.conf: add DISPATCH_TOO_MANY_RECORDS_FOUND definition 
+- Dispatch/Shared.pm->history: trigger 404 when no records found
+- Model/Employee.pm: return DISPATCH_NO_RECORDS_FOUND with status level 'NOTICE'
+- t/dispatch/history.t: explore more possibilities for entering an invalid EID; 
+  adapt to current state (status-triggered 404 errors)
+- t/dispatch/interval.t: add basic tests for 'interval/self/:tsrange'
+
+0.292  2014-11-19 16:40 CET
+- dispatch/interval_Config.pm: enable _fetch_* dispatch targets
+- sql/interval_Config.pm: add SQL_INTERVAL_SELECT_BY_EID_AND_TSRANGE
+- Dispatch/Interval.pm: implement _fetch_* dispatch targets
+- Model/Interval.pm: implement a fetch_by_eid_and_tsrange function
+- Model/Shared.pm: load_multiple had no provision for binding parameters -
+  fixed
+- t/dispatch/interval.t: add some basic tests for
+  '/interval/eid/:eid/:tsrange', 'interval/nick/:nick/:tsrange' and
+  '/interval/self/:tsrange'
+
+0.293  2014-11-19 18:05 CET
+- Dispatch/Interval.pm: let _new set EID to that of current user
+  if no EID specified in request body
+- t/dispatch/interval.t: add tests under 'interval/new' resource
+
+0.294  2014-11-19 22:59 CET
+- Dispatch.pm: adapt _docu* dispatch targets so they expect to receive argument
+  in 'resource' property
+- Dispatch/Interval.pm: pass argument with DISPATCH_PARAMETER_BAD_OR_MISSING to
+  report which property is missing
+- Resource.pm: only that JSON is not malformed that converts into a hashref
+- Test.pm: adapt to current state
+- t/dispatch/intervals.t: add two tests under 'interval/new'
+
+0.295  2014-11-20 11:50 CET
+- rename resource 'schedule/interval' to 'schedule/new'
+- Resource.pm: no longer accept content bodies that do not convert cleanly into
+  a hashref - this required some minor retooling of the following resources that
+  had been accepting bare scalars or JSON arrays:
+  - 'docu' and 'docu/html'
+  - 'metaparam' and 'siteparam'
+  - 'schedule/new'
+- Dispatch.pm->_param_post now saves the pre-change value and attempts to
+  restore it if the new value is not set properly
+- t/: adapt to current state
+
+0.296  2014-11-20 14:01 CET
+- split 'metaparam' / 'metaparam/:param'
+
+0.297  2014-11-20 18:21 CET
+- config/dispatch/lock_Config.pm: add lock resource definitions
+  (very similar to interval_Config.pm)
+- dispatch/interval_Config.pm: adapt to generalized dispatch targets
+- dispatch_Config.pm: enable lock resources
+- sql/lock_Config.pm: add missing SQL statements
+- Dispatch/: remove bogus "use App::Dochazka::REST::Dispatch::ACL qw( check_acl);" 
+  line from all dispatch modules
+- Dispatch/ACL.pm: add 'check_acl_context' routine (shared between interval
+  and lock dispatch targets)
+- Dispatch/{Interval,Shared}.pm: generalize most of the dispatch targets
+- Dispatch/Lock.pm: get it ready for business
+- Model/Lock.pm: add missing fetch_by_eid_and_tsrange routine
+- t/dispatch/: rename 'interval.t' to 'interval_lock.t' and start running
+  each resource's tests in a foreach loop so the same tests are run for 
+  'interval/..' and 'lock/..' counterparts
+
+0.298  2014-11-20 21:51 CET
+- sql/lock_Config.pm: fix typos in SQL_LOCK_UPDATE
+- Dispatch/Lock.pm: in '_new', make eid not required in request body 
+- Dispatch/Shared.pm: fix bugs in interval+lock shared routines
+- add several debug log messages; comment out one debug log message
+- t/dispatch/interval_lock.t: test both 'interval/..' and 'lock/..'
+  for all resources
+
+0.299  2014-11-23 12:13 CET
+- REST.pm: add caveat about tsranges with unbounded intervals
+- Test.pm: add dbi_err routine to eliminate code duplication in units
+- t/dispatch/: use the new 'dbi_err' routine everywhere
+
+0.300  2014-11-23 14:50 CET
+- t/300-ACL.t: add unit to vet the 'check_acl' routine
+- Dispatch/ACL.pm: refactor the 'check_acl' routine
+- Dispatch/Shared.pm: stop re-implementing check_acl in the 'make_default'
+  routine
+- Resource.pm: fix bug: "ACL profile of '/forbidden' resource is set to
+  bogus scalar 'undefined' instead of undef"; adapt to check_acl refactor
+- t/dispatch/history.t: add more tests; improve comments
+
+0.301  2014-11-23 23:24 CET
+- Dispatch/ACL.pm: make 'check_acl_context' return OK status when the
+  request passes its check
+- Dispatch/Shared.pm: block out an 'interval_sanity' routine (WIP)
+- Dispatch/{Interval,Lock}.pm: adapt to current state
+
+0.302  2014-11-24 14:43 CET
+- dbinit_Config.pm: add 'no_intervals_after' and 'intvl_ok' stored PL/pgSQL procedures
+- Dispatch/Interval.pm: make '_insert_interval' validate its arguments using Params::Validate
+- Dispatch/Shared.pm: test attendance and lock intervals for bad string 'infinity';
+  add 'lock_sanity' routine to perform analogous role to 'interval_sanity'
+
+0.303  2014-11-24 16:47 CET
+- config/sql/: globally replace tsrange with tstzrange and TIMESTAMP
+  WITHOUT TIME ZONE to TIMESTAMP WITH TIME ZONE, etc.; add triggers to
+  'intervals' and 'locsk' so all new 'intvl' values are vetted at insert/update
+  using the 'intvl_ok' stored procedure
+- Dispatch/Shared.pm: tweak '_no_infinity'
+- t/: with the change to "WITH TIME ZONE", some return values have "+01"
+  appended, so adapt tests in those cases
+- t/dispatch/interval_lock.t: add a new section tests that examine handling
+  of bogus tstzrange values that might be provided by the user
+
+0.304  2014-11-24 17:13 CET
+- Dispatch/Shared.pm: export lock_sanity
+- Dispatch/Lock.pm: add 'lock_sanity' call to '_new'
+- t/dispatch/interval_lock.t: fix tests broken by migration to 'WITH TIME ZONE';
+  add a positive test illustrating a suspicious-looking interval that is acceptable
+- t/model/: add '+01' to some timestamp literals because they are now timestamptz
+
+0.305  2014-11-24 18:11 CET
+- dbinit_Config.pm: notice that we already have a 'valid_intvl' trigger; revamp
+  'intervals' and 'locks' triggers to use it
+- t/dispatch/interval_lock.t: add a group of tests to keep track of which
+  pathological tsranges ('intervals' in Dochazka terms) we are successfully
+  checking for
+
+0.306  2014-11-26 09:31 CET
+- dbinit_Config.pm: add 'intvl_not_locked' trigger before update or insert on
+  'intervals' table - checks to make sure the interval would not overlap with
+  any existing lock
+- Model/Shared.pm: fix bug where 'load' routine was needlessly adding 
+  'count => 1' to the payload, which is supposed to be just an object
+- t/: some tests started to fail because we were creating intervals and locks
+  with the same intervals - fixed by changing the lock interval
+- t/dispatch/interval_lock.t: now that we have a functioning trigger, add tests
+  that attempt to insert intervals that conflict with a lock
+- t/model/triggers: add new subdirectory for trigger tests
+- t/model/triggers/immutable_id.t: new unit to test triggers that make ID
+  fields immutable
+
+0.307  2014-11-26 16:40 CET
+- Model/: make 'update' methods return 'DOCHAZKA_ID_MISSING_IN_UPDATE' if id
+  property missing
+- Test.pm: add new 'gen_$class' multi-purpose routines
+- t/model/general/id.t: use 'gen_$class' routines
+- t/model/general/reset.t: expand to test 'reset' method in all classes
+
+0.308  2014-11-27 11:11 CET
+- Build.PL: require App::Dochazka 0.184 for 'attrs' and 'get' methods
+- dbinit_Config.pm: add checks for presence of 'infinity' in tsranges
+- Test.pm: bring in 'test_sql_success' and 'test_sql_failure' functions
+  so we aren't duplicating them in the units
+- t/model/employee.t: cleanup; eliminate some duplicated code (low-hanging
+  fruit)
+- t/model/general/reset.t: finishing touches
+- t/sql/: cleanup
+- t/sql/schedintvl.t: new tests for intvl triggers
+
+0.309  2014-11-27 17:09 CET
+- dbinit_Config.pm: have 'schedule_at_timestamp' return NULL instead of {} when
+  there is no schedule in effect
+- Model/Shared.pm: make decode_schedule_json handle the above NULL value
+- t/: fix all the tests that were expecting {} but now get undef instead
+
+0.310  2014-11-27 22:04 CET
+- dbinit_Config.pm: add 'schedule_policy' trigger function to prevent users
+  from introducing intervals in time periods when the employee has no or
+  ambiguous scheduling
+- t/dispatch/interval_lock.t: adapt to the above trigger (ensure testing user
+  has a schedule and the schedule is in effect)
+- t/: disable a bunch of tests broken by introduction of this trigger
+
+0.311  2014-11-27 23:04 CET
+- dbinit_Config.pm: expand no_lock_conflict to handle DELETE as well as INSERT/UPDATE
+- t/model/{interval,lock}.t: adapt to current state
+- t/model/lock.t: add test confirming that it is no longer possible to delete a
+  locked interval
+
+0.312  2014-11-28 11:27 CET
+- t/dispatch/interval_lock.t: add some tests simulating: (1) create interval,
+  (2) lock it, (3) attempt to update it - interval is locked, (4) attempt to
+  delete it - interval is locked
+- dbinit_Config.pm: add another trigger and run into problems because I didn't realize PostgreSQL
+  executes triggers in alphabetical order
+
+0.313  2014-11-28 12:20 CET
+- dbinit_Config.pm: rename triggers so "alphabetical order" is aligned with
+  "order of intended execution"
+- Dispatch/{Interval,Lock,Shared}.pm: since all sanity checks will be
+  implemented via triggers, the sanity stuff we put here before is unnecessary,
+  so delete it
+- t/dispatch/interval_lock.t: we are no longer returning 400 when intervals
+  are malformed or non-compliant
+- t/model/interval.t: now that we have enabled the 'priv_policy' trigger, make
+  sure the testing user has a proper privhistory before attempting to add
+  intervals in his name
+- t/model/: both interval.t and lock.t required the same setup/teardown code,
+  so move the lock tests to interval.t and get rid of lock.t
+
+0.314  2014-11-28 15:23 CET
+- rename t/model/interval.t -> t/model/interval_lock.t
+- dbinit_Config.pm: add 'history_policy' trigger function to ensure that
+  privhistory/schedhistory records are not entered if they conflict with an
+  existing interval
+- t/model/interval_lock.t: add minimal tests for the 'history_policy' trigger
+
+0.315  2014-11-28 16:23 CET
+- got Path::Router validations to work!!!
+- config/dispatch/activity_Config.pm: added validations clauses
+- config/dispatch/employee_Config.pm: added validations clauses
+- config/dispatch_Message_en.conf: delete DISPATCH_AID_DOES_NOT_EXIST and
+  DISPATCH_CODE_DOES_NOT_EXIST
+- dbinit_Config.pm: change 'kosher_code' constraint on 'activities' table to
+  match the validations clause
+- Dispatch/Activity.pm: noticed that we were still returning custom codes (e.g.
+  DISPATCH_AID_DOES_NOT_EXIST) instead of a simple 404 (405 on PUT) -- fixed
+- t/dispatch/activity.t: fix tests broken by the above changes
+
+0.316  2014-11-28 16:48 CET
+- dispatch/employee_Config.pm: add validations clause to the
+  'employee/count/:priv' resource definition
+- Dispatch/Employee.pm: handle upper/mixed case priv strings gracefully
+- Model/Employee.pm: noof_employees_by_priv was written long ago - update it to
+  use best practices
+- t/dispatch/employee.t: add 'employee/count/:priv' test cases
+
+0.317  2014-11-28 17:26 CET
+- dispatch/employee_Config.pm: add validations clause to 'employee/nick/:nick'
+  resource definition
+- sql/dbinit_Config.pm: change 'kosher_nick' constraint to match the above
+  validations clause
+- t/dispatch/: add some more tests demonstrating invalid codes caught
+  by the new validations clauses
+
+0.318  2014-11-28 18:12 CET
+- Build.PL: require latest version of App::CELL
+- dispatch/{interval,lock}_Config.pm: add validations clause
+- dispatch/top_Config.pm: added missing 'interval' and 'lock' top-level
+  resource definitions
+- t/dispatch/interval_lock.t: add some test cases for the above validations
+  clause
+
+0.319  2014-11-28 18:30 CET
+- dispatch/{interval,lock}_Config.pm: add validations clauses
+- t/dispatch/interval_lock.t: adapt existing tests to new validations clauses;
+  add new tests to demonstrate the new validations clauses; one resource 
+  (lock/nick/:nick/:tsrange) was completely missing - added it
+
+0.320  2014-11-28 19:33 CET
+- config/dispatch/: add remaining validations clauses
+- t/: adapt existing tests to the new validations clauses without getting hung
+  up about adding new tests, because if I were to implement tests for all cases
+  I'd never get this thing finished
+
+0.321  2014-11-28 21:59 CET
+- dispatch/employee_Config.pm: adjust ACLs so 'inactive' and 'active' employees
+  can do various operations - trusting that later logic will prevent them from
+  seeing or modifying any data but their own
+- Dispatch/Employee.pm: eliminate _post_current routine after moving ACL code
+  into _put_post_delete_employee_by_eid
+- t/dispatch/employee.t: adapt to current state
+
+0.322  2014-11-29 23:03 CET
+- config/dispatch/employee_Config.pm: change ACL profiles of all the resources
+  for which we want to let 'inactive' and 'active' employees edit certain
+  fields of their own employee profile - this opens something of a bag of worms
+  because we have to let these requests through to Dispatch/Employee.pm
+- config/dispatch_Message_en.conf: eliminate deprecated messages
+- Dispatch/Employee.pm: refactor several routines to let 'inactive' and
+  'active' users update certain fields of their own employee profiles
+- Dispatch/Shared.pm: eliminate deprecated messages
+- t/dispatch/employee.t: adapt existing tests; add some tests to probe the 
+  feature we just added
+- t/dispatch/schedule.t: adapt to current state
+
+0.323  2014-12-01 10:45 CET
+- t/dispatch/interval_lock.t: have an active user try to create a lock on
+  someone else's attendance
+
+0.324  2014-12-03 09:03 CET
+- Build.PL: require App::Dochazka 0.185 so employees have a sec_id property
+- config/dispatch/employee_Config.pm: fix validations clause so it allows %
+  sign, which we use as a wildcard in the GET method
+- config/sql/{dbinit,employee}_Config.pm: add sec_id property to employees table
+- REST.pm: write some POD to explain our approach to ACLs; do not mention a
+  'policies' table since we never implemented it; explain how employees are
+  identified (with mention of 'sec_id')
+- Model/Employee.pm, Dispatch/Employee.pm: enable sec_id 
+- t/dispatch/interval_lock.t: add tests for some lock edge cases
+- t/{dispatch,model}/employee: adapt to the new 'sec_id' property
+
+0.325  2014-12-03 09:40 CET
+- t/dispatch/employee.t: add a basic test for GET employee/nick/:nick with a
+  wildcard in the search key
+
+0.326  2014-12-03 16:46 CET
+- Dispatch/Shared.pm: make it so introspection resources do not return
+  'acl_profile' property because some resources now have "mixed" acl_profiles
+
+0.327  2014-12-03 22:26 CET
+- start a substantial refactor to make each employee have her own database
+  connection (thanks to DBIx::Connector)
+- (test suite failing)
+
+0.328  2014-12-05 08:57 CET
+- REST.pm: refactor database (re-)initialization routines
+- t/001-init.t: adapt to new routines
+- dbh.pm: attempt to make get_conn handle all DBI connection scenarios
+  correctly
+- start migrating modules to new dbh.pm, which will be renamed to ConnBank.pm
+
+0.329  2014-12-05 16:40 CET
+- config/sql/session_Config.pm: delete (deprecated)
+- rename dbh.pm to ConnBank.pm
+- move Timestamp.pm (App::Dochazka::REST::Util::Timestamp) to ../staging/ as it
+  is not used and the DBI calls need to be rewritten
+- removed all mentions of App::Dochazka::REST::dbh from modules outside of Model/
+- config/sql/dbinit_Config.pm: add SQL_NOOF_CONNECTIONS; set DEFAULT PRIVILEGES
+  so user connections will work (in order to be able to revoke a user's
+  privileges, it will be better to set the privileges via a trigger)
+- introduce roles, fix privilege problems so now our "production" roles
+  ('dochazka' and numeric "EID" roles) can see tables, etc.
+
+0.330  2014-12-05 17:11 CET
+- rename DBINIT_CONNECT_USER/DBINIT_CONNECT_AUTH to
+  DBINIT_CONNECT_SUPERUSER/DBINI_CONNECT_SUPERAUTH, respectively
+- ConnBank.pm: remove the $site->DOCHAZKA_DBNAME connection option,
+  which was confusing - either use 'superuser' or the root EID
+- REST.pm: remove deprecated 'connect_db' and 'connect_db_pristine' routines
+- t/001-init.t: adapt to current state
+
+0.331  2014-12-05 18:03 CET
+- embark on a quest to eliminate all instances of the string 'dbh' from the
+  entire codebase
+
+0.332  2014-12-06 07:47 CET
+- Model/Shared.pm: start converting DBI calls to DBIx::Connector; clean up some
+  cruft along the way; add select_single routine for SELECT statements expected
+  to return 0 or 1 record
+- Test.pm: add a 'do_select_single' wrapper for 'select_single'
+- t/sql/current_priv.t: refactor tests to use 'do_select_single'
+
+0.333  2014-12-06 11:59 CET
+- massive refactor ongoing to migrate the codebase to DBIx::Connector
+- restore Timestamp.pm as we need it for unit tests
+- t/004-shared-paramvalid.t, t/011-tsrange_equal.t, t/203-util-timestamp.t - 
+  move three old and probably unnecessary units to staging because I don't have
+  the patience to adapt them to the current state
+- REST.pm: initialize DOCHAZKA_EID_OF_... site params in 'init' 
+- Dispatch.pm: fix _get_dbstatus so the module compiles
+- Dispatch/Schedule.pm, Model/Activity.pm, Model/Schedintvls.pm,
+  Model/Schedule.pm, Model/Shared.pm: adapt to DBIx::Connector; cleanup
+- Test.pm: add 'initialize_unit' routine to mitigate code duplication in the
+  units, adapt 'test_sql_success' and 'test_sql_failure' to DBIx::Connector,
+- t/sql/: adapt all units to DBIx::Connector
+- t/dispatch/: start adapting to DBIx::Connector (WIP)
+
+0.334  2014-12-06 14:39 CET
+- fix Changes munge from last commit
+- config/dispatch/employee_Config.pm, Dispatch/Employee.pm: re-enable 'count'
+  resources
+- Dispatch/: start migration to DBIx::Connector
+- Model/: finish migration to DBIx::Connector
+- Model/Schedule.pm: use 'select_single' in 'insert' method
+- Model/Shared.pm: fix 'DISPATCH_RECORDS_FOUND' statuses; fix { isa =>
+  'DBIx::Connector' } clauses
+- Test.pm: finish migration to DBIx::Connector
+- t/sql/, t/model/: migrate to DBIx::Connector; all tests running cleanly now
+- NEXT: migrate Dispatch methods and t/dispatch/ units to DBIx::Connector
+
+0.335  2014-12-06 21:11 CET
+- REST.pm: deprecate the DOCHAZKA_DBUSER user (we are no longer using it)
+- Dispatch/: migrate all modules to DBIx::Connector
+- Model/Employee.pm: add $SIG{__WARN__} handler; when employee is created,
+  set up the corresponding role
+- Model/Shared.pm: fix bugs in make_test_exists and get_history
+- Resource.pm: fix bugs introduced during migration to DBIx::Connector
+- t/dispatch/activity.t now running cleanly
+
+0.336  2014-12-07 18:37 CET
+- hunt down and fix remaining bugs/errors/typos introduced during migration
+- test suite running cleanly again
+
+0.337  2014-12-08 11:26 CET
+- config/sql/audit_Config.pm: bring in Audit Trigger from 
+  https://wiki.postgresql.org/wiki/Audit_trigger_91plus
+- Build.PL: add 'meta_merge' clause as recommended by Randy Stauner at
+  https://github.com/CPAN-API/metacpan-web/issues/1418#issuecomment-62546169
+- config/sql/dbinit_Config.pm: the DBINIT_CREATE parameter, where we create all
+  tables, functions, triggers, etc., is a bit disorganized -- start adding
+  'COMMENT' statements and taking other cleanup measures 
+- REST.pm: work on documentation; add code to load and create the audit triggers
+- Resource.pm: fixed bug (uncovered by the audit triggers) "all incoming HTTP
+  connections are using PostgreSQL user '1', which should be reserved for the
+  root employee"
+
+0.338  2014-12-08 15:17 CET
+- work on transaction auditing feature:
+  - no more "shadow" db roles
+  - all traffic goes through a single connection (which can be pooled)
+  - pass EID to audit trigger via "SET LOCAL dochazka.eid"
+
+0.339  2014-12-08 22:30 CET
+- after discussions, reconsider my idea of creating a "shadow db role" for each
+  employee; instead, I will try to get the EID into the audit trigger via a
+  custom GUC (session variable)
+- REST.pm: eliminate 'create_tables' routine; all database initialization now
+  takes place in 'reset_db'
+- ConnBank.pm: refactor 'get_conn'
+- adapt all instances of 'get_conn' throughout the code base
+- {Dispatch,Model}/Employee.pm: eliminate 'select_multiple_by_nick' routine;
+  call load_multiple directly from the dispatch target
+- t/: adapt to current state
+
+0.340  2014-12-09 11:09 CET
+- for auditing purposes we need to send not only the DBIx::Connector object,
+  but also the current EID in all 'cud' calls
+- Model/Shared.pm: in cud routine, add 'eid' to PARAMHASH and run
+  SQL_SET_DOCHAZKA_EID_GUC to set 'dochazka.eid' GUC session variable
+- {Dispatch,Model}/Activity.pm: carry out necessary modifications
+
+0.341  2014-12-09 17:17 CET
+- work on getting the current EID into Model/Shared.pm->cud
+- send request context in all 'insert', 'update' and 'delete' method calls on
+  datamodel objects; these methods then split out the DBIx::Connector object
+  and the current EID
+- Model/: make all necessary modifications
+- Test.pm, Dispatch/: deal with cascade effects (WIP)
+- t/sql/, t/model/: adapt tests to current state
+- t/dispatch/: WIP
+
+0.342  2014-12-10 10:52 CET
+- audit_Config.pm: DROP SCHEMA is not necessary here, since the immediately
+  preceding command is DROP DATABASE
+- Dispatch/: completed the migration described above
+- Model/: fix some lingering migration-related issues
+- Test.pm, t/: migration broke lots of tests; we are now expected to send the
+  request context, but with Plack::Test there is none(!); fortunately, it is
+  trivial to simulate such a context ($faux_context)
+- dispatch_Message_en.conf: get rid of
+  DISPATCH_EMPLOYEE_{INSERT,UPDATE,DELETE}_OK message (DOCHAZKA_CUD_OK is
+  sufficient)
+
+0.343  2014-12-10 16:43 CET
+- dbinit_Config.pm: fix names of parameters used to store PostgreSQL superuser
+  credentials for testing purposes
+- ConnBank.pm: refactor the entire module
+- REST.pm: adapt to the new ConnBank.pm code; make 'init' routine return a
+  status object with the Plack application in the payload
+- Dispatch/, Model/, Test.pm, t/: adapt to the new ConnBank.pm code
+
+0.344  2014-12-10 18:01 CET
+- bin/dochazka-rest: adapt to recent modifications to REST.pm->init
+- REST_Message_en.conf: add DOCHAZKA_NO_DBIX_CONNECTOR
+- dbinit_Config.pm: sum(numbackends) is not working for some reason; work
+  around the problem
+- REST/Dispatch.pm: add missing 'use Try::Tiny'; add some debugging messages to
+  '_get_dbstatus'; numify number of connections
+- Test.pm: add some error checking; 
+- t/dispatch/top.t: add subtest for 'dbstatus' resource
+
+0.345  2014-12-11 11:35 CET
+- REST.pm: add verbiage to POD
+- Resource.pm, Dispatch/Employee.pm: prepare for Blowfish
+
+0.346  2014-12-11 18:36 CET
+- hash passwords using Authen::Passphrase::SaltedDigest
+  - App::Dochazka::CLI authentication works fine
+  - tests in t/dispatch/ are broken
+- Dispatch/Employee.pm: implement 'hash_the_password' routine, call it from
+  _insert_employee and _update_employee; export it for use in Test.pm
+- Resource.pm: in _authenticate, compare password with stored salted hash 
+- Test.pm: import hash_the_password and use it in create_testing_employee;
+  adapt calls
+- dbinit_Config.pm, t/sql/root.t: use the real hash+salt instead of the
+  plaintext password
+
+0.347  2014-12-11 20:13 CET
+- REST_Config.pm: modify DOCHAZKA_PROFILE_EDITABLE_FIELDS so inactives and
+  actives can still change their password now that we are hashing
+- config/dispatch/employee_Config.pm: 'GET employee/nick/:nick' acl_profile was
+  set too restrictive - fix
+- dbinit_Config.pm: use real hash/salt when INSERTing 'root' and 'demo'
+  employees
+- Dispatch/Employee.pm: fix hash_the_password function calls
+- Resource.pm: put call to Authen::Passphrase::SaltedDigest into a try/catch
+  block; add some basic error-checking
+- t/: adapt to current state
+
+0.348  2014-12-12 09:39 CET
+- REST_Config.pm: add DOCHAZKA_AUDITING and DOCHAZKA_AUDIT_TABLES to (1) make
+  auditing optional, and (2) give site admin control over which tables are
+audited
+- REST.pm: make auditing optional; implement 'create_audit_triggers' and
+  'delete_audit_triggers' routines to enable auditing to be disabled and
+  re-enabled as and when desired
+
+0.349  2014-12-12 16:43 CET
+- get rid of DOCHAZKA_AUDITING
+- Resource.pm: try to eliminate suspected double-encoding problem
+
+0.350  2014-12-12 18:06 CET
+- config/dispatch/interval_Config.pm: add resource definition for
+  'interval/summary/?:qualifiers'
+- dbinit_Config.pm: work on valid_schedintvl ticket
+- config/REST_Config.pm: add DOCHAZKA_DBHOST, DOCHAZKA_DBPORT,
+  DOCHAZKA_DBSSLMODE params
+- ConnBank.pm: use the new site params in construction of data source string,
+  provided they are set
+- t/dispatch/interval_lock.t: start adding tests for the new
+  'interval/summary/?:qualifiers' resource
+
+0.351  2014-12-12 21:59 CET
+- dbinit_Config.pm: the valid_schedintvl() function we had before was bogus -
+  write a proper one
+- t/model/schedintvls.t: add some tests that try to enter sets of intervals
+  spanning more than 168 hours (which is banned by policy, enforced by the
+  valid_schedintvl function)
+
+0.352  2014-12-13 14:51 CET
+- Build.PL: require Authen::Passphrase::SaltedDigest
+
+0.353  2014-12-13 22:19 CET
+- t/202-qualifiers.t: new unit to test Dispatch/Intervals->process_quals routine
+- Dispatch/Intervals.pm: implmement 'process_quals' routine to parse qualifiers;
+  start writing _get_summary (dispatch target for /interval/summary/?:qualifiers)
+
+0.354  2014-12-14 22:47 CET
+- config/dispatch/interval_Config.pm: activate the new 'interval/summary/..."
+  resource
+- Dispatch/Interval.pm: work on dispatch target for the new resource
+- Util/Timestamp.pm: export '$current_month' and '$current_year'
+
+0.355  2014-12-18 10:07 CET
+- REST.pm: work on POD
+
+0.356  2014-12-18 18:40 CET
+- Resource.pm: add 'finish_request' routine to add 'no_cache' headers
+- t/301-resource.t: test for presence of "no-cache" headers in HTTP response
+
+===============================================
+SPLIT OFF App::MREST into separate distribution
+===============================================
+
+0.357  2015-01-27 11:32 CET
+- eviscerate Resource.pm and rename it to Auth.pm -> most of the Resource.pm
+  functionality has been moved to Web::MREST
+
+0.358  2015-01-29 20:00 CET
+- REST.pm: emasculate init routine
+- Auth.pm: inherit from Web::MREST::Entity; call init routine from is_authorized
+  so we can get access to the database
+- Dispatch.pm: bring in top-level resources from Web::MREST and add a couple of
+  our own
+
+0.359  2015-01-30 10:47 CET
+- REST_MetaConfig.pm: delete deprecated params
+- Dispatch.pm: resource defs and :ALL from Dispatch/Employee.pm
+- Dispatch/Employee.pm: implement 'whoami' resource
+
+0.360  2015-01-30 17:12 CET
+- config/, Employee/Dispatch.pm: migrate four resource definitions
+
+0.361  2015-01-30 21:02 CET
+- Test.pm, t/model/, t/sql/: get all non-resource tests running again
+
+0.362  2015-02-02 10:20 CET
+- Auth.pm, ACL.pm: migrate 'forbidden' method to Web::MREST; handle cases when
+  acl_profile property does not exist, is undefined, is invalid
+- Dispatch.pm: give 'forbidden' resource an invalid acl_profile; add note about
+  this to resource documentation string
+
+0.363  2015-02-02 11:44 CET
+- t/301-resource.t: finish migrating unit to Web::MREST
+- bin/dochazka-rest: migrate server startup script to Web::MREST
+- Dispatch.pm: improve documentation of docu resource
+- Employee.pm: fix typo
+- Test.pm: migrate 'docu_check' routine to Web::MREST
+- t/dispatch/top.t: start migrating unit to Web::MREST
+
+0.364  2015-02-02 17:03 CET
+- migrate 'priv/history/...' resource definitions
+- Dispatch/Priv.pm: migrate '/priv/history/self/?:tsrange' handler (working
+  nicely)
+
+0.365  2015-02-02 21:44 CET
+- Dispatch/Priv.pm: rewrite the main privhistory handler (split into three parts)
+
+0.366  2015-02-03 07:26 CET
+- Dispatch/Priv.pm: get handler_priv_history_post into a working state
+
+0.367  2015-02-03 12:23 CET
+- Dispatch/: split off History.pm from Priv.pm and make it work for both
+  'priv/history/...' and 'schedule/history/...' resources
+- Dispatch.pm: load resource definitions from Dispatch/History.pm
+- remove old, pre-migration code obsoleted by these changes
+
+0.368  2015-02-04 17:04 CET
+- migrate 'schedule/new' resource definition
+- migrate 'schedule/new' resource handler (WIP)
+- t/dispatch/schedule.t: migrate (WIP)
+
+0.369  2015-02-04 18:08 CET
+- Dispatch/History.pm: handle errors
+- Dispatch/Schedule.pm: in handler_schedule_new, do the work in pass two,
+  because in pass one 'request_entity' is not yet populated
+- Test.pm: migrate dbi_err and create_testing_schedule
+- t/dispatch/history.pm: migrate (WIP)
+
+0.370  2015-02-05 09:44 CET
+- Dispatch/History.pm, Dispatch/Shared.pm, t/dispatch/history.t: migrate (WIP)
+
+0.371  2015-02-05 15:10 CET
+- migrate 'priv/...' (non-history) resources (WIP)
+- iron out last bugs, t/dispatch/history.t runs cleanly now
+
+0.372  2015-02-06 06:12 CET
+- Dispatch/Priv.pm: implement separate handler for 'priv/{eid,nick}'
+- Dispatch/Schedule.pm: migrate 'schedule/all' and 'schedule/all/disabled' resources
+- Dispatch/Shared.pm: migrate the not-very-aptly-named 'current' routine
+- t/dispatch/{priv,schedule}.t: remove 'noop'/'help' tests
+- t/dispatch/priv.t: unit runs cleanly
+
+0.373  2015-02-06 15:23 CET
+- migrate 'schedule/...' resources (WIP)
+
+0.374  2015-02-08 19:49 CET
+- Dispatch/Schedule.pm: migrate 'schedule/eid/...' and 'schedule/nick/...';
+  start migrating 'schedule/sid/:sid'
+- Dispatch/Employee.pm: migrate 'employee/count/?:priv'; move hash_the_password
+  to Util.pm
+- t/dispatch/schedule.t: migrate unit tests
+
+0.375  2015-02-09 08:52 CET
+- Dispatch/Shared.pm: make a generalized method ('handler_first_pass_lookup')
+  for fetching objects from the database based on URI mapping
+- start migrating resource handlers to the new method
+
+0.376  2015-02-09 15:15 CET
+- migrating resources to 'handler_first_pass_lookup'
+
+0.377  2015-02-09 20:33 CET
+- debugging WIP
+
+0.378  2015-02-10 08:40 CET
+- migrate 'employee/...' resources (WIP)
+- get rid of 'make_default', which was used to implement 'help' resources
+  but is not compatible with Web::MREST
+
+0.379  2015-02-10 17:29 CET
+- massive reorganization: move handler routines to Dispatch.pm
+
+0.380  2015-02-10 18:27 CET
+- Dispatch.pm: merge 'current' into 'handler_get_privsched'; fix _update_schedule
+- t/dispatch/schedule.t: migrate unit tests - unit runs cleanly again
+
+0.381  2015-02-11 10:42 CET
+- work on employee handlers (PUT employee/eid/:eid and PUT employee/nick/:nick)
+  with two-pass additional ACL check for updates; insert is working, too
+- TODO: migrate rest of employee resources and t/dispatch/employee.t
+
+0.382  2015-02-11 14:41 CET
+- ResourceDefs.pm: new module; move all migrated resource defs into it;
+  add missing acl_profile properties to top-level resource defs; 
+- Test.pm: include location header in return status (a-la Web::MREST)
+- t/dispatch/top.t: migrate unit
+
+0.383  2015-02-11 16:43 CET
+- migrate Employee resources (WIP)
+
+0.384  2015-02-12 07:31 CET
+- support 'employee/search/nick/:key'
+
+0.385  2015-02-12 09:22 CET
+- Dispatch.pm: make 404 explanation in 'handler_get_employee_search_nick' more
+  descriptive
+- move ACL.pm up one level in the directory structure, since the Dispatch/
+  directory will soon be gone
+
+0.386  2015-02-12 09:44 CET
+- Dispatch.pm: in 'GET employee/search/nick/:key', add '%' characters to :key
+  implicitly if none are provided (and note this in resource documentation)
+- Model/Shared.pm: in load_multiple, mention search keys in the result
+
+0.387  2015-02-12 10:13 CET
+- Dispatch.pm: make 404 explanation more descriptive
+- t/dispatch/employee.t: get unit running cleanly
+
+0.388  2015-02-12 11:22 CET
+- move Dispatch/Shared.pm up one directory level
+- convert insert_employee and update_employee into ordinary functions and move
+  them to Shared.pm - to be manageable, Dispatch.pm should contain resource
+  handlers only
+
+0.389  2015-02-12 14:40 CET
+- Dispatch.pm, Shared.pm: migrating shared (non-handler) routines to Shared.pm
+
+0.390  2015-02-12 15:05 CET
+- drop 'test/?:specs' routine, which is specific to Web::MREST testing
+
+0.391  2015-02-12 15:15 CET
+- Dispatch.pm, Shared.pm: move shared employee ACL check routines to Shared.pm
+
+0.392  2015-02-12 16:04 CET
+- Dispatch.pm, Shared.pm: eliminate "history boilerplate" by integrating its
+  functionality directly into two history handlers
+
+0.393  2015-02-12 21:16 CET
+- ResourceDefs.pm, Dispatch.pm: start migrating 'activity/...' resources
+- config/dispatch_Message_en.conf: replace hard-coded strings with message
+  object codes
+- Shared.pm: implement 'shared_entity_check'
+
+0.394  2015-02-13 08:28 CET
+- continue migrating 'activity/...' resources
+- finished moving shared routines from Dispatch.pm to Shared.pm
+
+0.395  2015-02-13 09:04 CET
+- finish migrating 'activity/...' resources
+- cleanup
+
+0.396  2015-02-13 15:15 CET
+- major migration push (just four handlers left to go)
+
+0.397  2015-02-13 21:51 CET
+- migrate last resources
+- cleanup (WIP)
+
+0.398  2015-02-16 08:25 CET
+- Dispatch.pm: fix syntax error
+- ResourceDefs.pm: add missing resources 'activity', 'employee', 'interval', 'lock'
+- Shared.pm: fix function name 'shared_process_quals'
+- t/model/: clean up tests (WIP)
+
+0.399  2015-02-16 11:01 CET
+- all tests running cleanly again
+- ACL.pm, Auth.pm: return to previous behavior where resources default to "403
+  Forbidden" in absence of a valid acl_profile property
+
+0.400  2015-02-16 14:42 CET
+- Test.pm, t/: comment out 'diag' statements so test output is clean
+- docgen.plx, Docs/Resources.pm: first shot at migrating script that generates
+  resource documentation
+- ResourceDefs.pm: fix 'documentation' properties so all resources have a 
+  "preamble"
+
+0.401  2015-02-16 21:59 CET
+- docgen.plx: tweak to extract allowed methods for each resource
+- Docs/Resource.pm: re-generate POD by latest docgen.plx
+
+0.402  2015-02-17 18:30 CET
+- t/model/schedule.t: fix brokenness previously hidden by a stale module file
+  in /usr/lib/perl5/site_perl
+
+0.403  2015-02-18 11:59 CET
+- use normalize_filespec to avoid $ENV{'HOME'}, which does not work on Windows
+  systems
+
+0.404  2015-02-18 17:59 CET
+- dispatch_Messages_en.conf, Auth.pm: define and use DISPATCH_ACL_CHECK_FAILED message
+- Dispatch.pm: remove extraneous 'my'
+
+0.405  2015-02-20 15:24 CET
+- ACL.pm: add 'acl_check_is_me' - generalized check for handlers that have
+  acl_profile "passerby" but may only used to operate on one's own records
+- ResourceDefs.pm, Dispatch.pm: use 'acl_check_is_me' in several handlers
+
+0.406  2015-02-20 20:55 CET
+- config/sql: add SQL_EMPLOYEE_SELECT_BY_SEC_ID
+- ResourceDefs.pm: add employee/sec_id/:sec_id
+
+0.407  2015-02-21 15:30 CET
+- t/dispatch/employee.t: adapt tests to new ACL policy
+
+0.408  2015-02-21 15:58 CET
+- Model/Employee.pm: add load_by_sec_id routine
+- t/model/employee.t: add rudimentary unit tests for load_by_sec_id
+- Shared.pm: change all instances of $self to $d_obj since none of the routines
+  in this module use method calls; add sec_id to shared_first_pass_lookup
+
+0.409  2015-02-22 16:36 CET
+- implement shared_get_employee and use it to implement three resource handlers
+
+0.410  2015-02-23 20:42 CET
+- t/dispatch/employee.t: add rudimentary tests of "employee/sec_id/:sec_id"
+  resource
+
+0.411  2015-02-24 10:55 CET
+- Build.PL: no longer re-create README on each build
+- README: instead, point would-be readers to metacpan.org
+- REST.pm: work on POD
+
+0.412  2015-03-20 21:35 CET
+- config/sql/dbinit_Config.pm: add disabled_to_zero trigger to convert NULL
+  values to "false" in the disabled field
+- t/sql/disabled_to_zero.t: test disabled_to_zero trigger
+
+0.413  2015-03-24 21:30 CET
+- allow single-character nicks
+
+0.414  2015-03-25 16:24 CET
+- Dispatch.pm: convert "hardcoded text as status codes" into proper status
+  codes
+
+0.415  2015-03-30 17:29 CEST
+- require App::Dochazka 0.186 for 'scode' property in schedule class
+- make test suite tolerate 'scode' property
+- t/sql/schedule_Config.pm: add scode property to all SQL statements where it
+  makes sense
+- implement 'schedule/scode/:scode' property with basic test cases
+
+0.416  2015-04-01 09:39 CEST
+- t/dispatch/schedule.t: trying to verify with tests that the new schedule
+  insert logic really does what we want
+
+0.417  2015-04-02 22:06 CEST
+- use TDD to get what we want: POST schedule/new ignores scode value when given
+  schedule exactly matches an existing schedule with a different (non-NULL)
+  scode
+
+0.418  2015-04-03 09:08 CEST
+- SQL: split 'disabled_to_zero' function/triggers into separate variants for
+  insert and update; confidently add 'NOT NULL' constraint to 'disabled' fields
+- t/sql/disabled_to_zero.t: adapt to current state
+- t/model/schedule.t: add notes the way it should have been from the beginning
+
+0.419  2015-04-03 18:06 CEST
+- ResourceDefs.pm: change ACL of 'GET schedule/all' so inactives and actives
+  can do it, too
+- t/dispatch/schedule.t: add appropriate test cases
+
+0.420  2015-04-04 21:18 CEST
+- SQL: implement 'not_before_1892' function to enforce sane timestamp policy
+  (no dates before 1892 in the database)
+- t/: adapt tests; add test cases
+
+0.421  2015-04-05 13:34 CEST
+- REST/Shared.pm: in 'shared_get_privsched', return 404 if no priv/schedule
+  assigned (instead of returning 200 OK with a null priv/schedule) 
+- t/dispatch/schedule.t: adapt tests
+
+0.422  2015-04-05 20:45 CEST
+- dbinit_Config.pm: make schedule_at_timestamp return SID instead of the
+  schedule JSON itself
+- Model/Shared.pm: schedule_by_eid returns SID
+- REST/Shared.pm: shared_get_privsched looks up the SID and returns the
+  entire schedule
+- t/dispatch/schedule.t: adapt tests affected by the above change
+- t/sql/disabled_to_zero.t: clean up after ourselves
+
+0.423  2015-04-06 13:42 CEST
+- REST/Shared.pm: make shared_employee_acl_part2 declare 403 status with a
+  proper App::CELL::Status instead of a hard-coded string
+
+0.424  2015-04-06 18:59 CEST
+- ResourceDefs.pm: allow inactives and actives to view their own privilege
+  and schedule histories; fix spelling of the word 'schedule' in the 'cli'
+  property
+
+0.425  2015-04-06 22:15 CEST
+- ResourceDefs.pm, config/sql/: modifications to allow POST (update) on
+  'priv/history/phid/:phid' and 'schedule/history/shid/:shid'
+- Model/Privhistory.pm, Model/Schedhistory.pm: add update method
+- UPDATE privhistory does not work as it should
+- tests not running cleanly
+
+0.426  2015-04-07 07:15 CEST
+- dbinit_Config.pm: fix bug in 'root_immutable_old' that was causing
+  NEW.* values to be replaced with OLD.* on updates
+- t/sql/privhistory.t: add test case for the above bug
+- t/sql/root.t: replace comments with note()s
+
+0.427  2015-04-07 09:14 CEST
+- dbinit_Config.pm: fix DBINIT_MAKE_ROOT_IMMUTABLE triggers that were causing
+  UPDATE and DELETE operations to silently fail
+- REST/Dispatch.pm: add targets for POST operations on
+  'priv/history/phid/:phid' and 'schedule/history/shid/:shid'
+- REST/Shared.pm: add 'shared_update_history' routine
+- t/dispatch/: adapt tests, add tests
+
+0.428  2015-04-14 15:40 CEST
+- REST/Shared.pm: include nick in error message
+
+0.429  2015-04-14 17:06 CEST
+- fix bug "GET interval/eid/:eid/:tsrange and interval/nick/:nick/:tsrange
+  should work for active employees on themselves"
+  https://rt.cpan.org/Ticket/Display.html?id=103538
+  http://paste.opensuse.org/7703631
+
+0.430  2015-04-16 10:34 CEST
+- fix bug "Unexpected error in t/sql/current.t"
+  https://rt.cpan.org/Ticket/Display.html?id=103766
+  http://paste.opensuse.org/8781484
+
+0.431  2015-04-16 16:01 CEST
+- make "GET interval" operations return the activity code as well as the AID
+  to make life easier for clients
+
+0.432  2015-04-16 18:33 CEST
+- implement priv_during_range and sid_during_range PL/pgSQL functions
+
+0.433  2015-04-16 21:20 CEST
+- tweak SQL code
+- config/sql/employee_Config.pm: add SQL statements for the new
+  priv_during_range and sid_during_range stored procedures
+- Model/Employee.pm: implement priv_during_range and sid_during_range methods 
+- t/model/during_range.t: some basic test cases for priv_during_range and
+  sid_during_range
+
+0.434  2015-04-17 08:55 CEST
+- sql/dbinit_Config.pm: get rid of unused 'stamp' rows; replace yesterday's kludgey
+  functions with shiny new versions
+- sql/employee_Config.pm: provide params for accessing the shiny new SQL functions
+- Dispatch.pm: fix bug "handler_history_post" omits 'remark' property
+- Model/Employee.pm: provide methods for accessing the shiny new SQL functions
+- ResourceDefs.pm: update documentation of 'interval/eid/:eid/:tsrange' and
+  'interval/nick/:nick/:tsrange' resources
+- t/model/during_range.t: adapt to current state
+
+0.435  2015-04-17 11:11 CEST
+- enforce policy on 'interval/eid/:eid/:tsrange',
+  'interval/nick/:nick/:tsrange', and 'interval/self/:tsrange' resources:
+  they only work if the tsrange specified does _NOT_ contain privhistory
+  records (i.e. the employee's privilege level and schedule must be
+  constant over the tsrange, where "constant" is defined as "no history
+  records during the range")
+- Dispatch.pm: refactor to eliminate code duplication
+
+0.436  2015-04-17 13:25 CEST
+- impose a limit on number of attendance intervals returned by SELECT; the
+  limit is configurable and can be set to "no limit"
+
+0.437  2015-04-17 15:40 CEST
+- add three new 'schedule/intervals/...' resources for retrieving the set
+  of attendance intervals that fall within the employee's schedule over a
+  given tsrange (commit includes both resource definitions and handlers,
+  but the latter are returning dummy values ATM)
+
+0.438  2015-04-18 09:43 CEST
+- fix bug ".../nick/:nick resources accept % character"
+  https://rt.cpan.org/Ticket/Display.html?id=103802
+- ResourceDefs.pm: replace repeated literal regexes with references to regex
+  variables (WIP)
+
+0.439  2015-04-18 10:31 CEST
+- Util/Schedule.pm: start new utility module
+- Dispatch.pm: several log messages contained an obsolete resource names or
+  wrong function names-> fixed
+- Model/Employee.pm: refactor for readability
+- Model/Interval.pm: add some debug messages
+
+0.440  2015-04-18 13:05 CEST
+- config/sql/: add privhistory_at_tsrange and schedhistory_at_tsrange
+  stored procedures and SQL_... site params to access them
+- Model/Employee.pm: make privhistory_at_timestamp and
+  schedhistory_at_timestamp accept tsranges, too
+- Dispatch.pm: first try at implementing a handler for 
+  "GET schedule/intervals/..." resources
+- Model/Shared.pm: move canonicalize_ts and canonicalize_tsrange here
+  from Util/Timestamp.pm; use select_single to execute the SQL statements
+- t/util/canonicalize.t: test unit for canonicalize_... functions
+- Util/Schedule.pm: add a new module for the 'intervals_in_schedule'
+  function, which is supposed to return an employee's set of scheduled
+  intervals for a given tsrange (WIP)
+- config/..._Message_en.conf: add some error messages
+- t/model/during_range.t: add test cases
+
+0.441  2015-04-18 17:03 CEST
+- Util/Schedule.pm: yelp if range > one year; change greedy '.*' to non-greedy
+
+0.442  2015-04-18 20:06 CEST
+- rename "schedule/intervals/..." resources to "interval/fillup/..." and make them
+  take lower and upper date bounds instead of tsrange
+
+0.443  2015-04-19 21:11 CEST
+- Model/Interval.pm: canonicalize tsrange in fetch_by_eid_and_tsrange
+  (fixes https://rt.cpan.org/Ticket/Display.html?id=103826)
+
+0.444  2015-05-18 10:46 CEST
+- Dispatch.pm: fix address for reporting bugs
+
+0.445  2015-06-28 11:15 CEST
+- config/dispatch_Config.pm: delete obsolete configuration file
+- config/docgen_Config.pm: fix pointer to resource configuration file
+
+0.446  2015-06-28 11:19 CEST
+- ResourceDefs.pm: remove leading / from interval/fillup resources
+
+0.447  2015-06-28 15:00 CEST
+- ResourceDefs.pm: put priv validation regex in a variable
+- ResourceDefs.pm: add 'employee/list/?:priv' resource definition 
+- dispatch_Message_en.conf: add DISPATCH_LIST_EMPLOYEE_NICKS
+- sql/employee_Config.pm: add SQL statements for getting employee nicks
+- Dispatch.pm: add handler for 'GET employee/list/?:priv' resource
+- Model/Employee.pm: implement list_employees_by_priv() function
+- ResourceDefs.pm: add 'employee/list/?:priv' resource definition
+- t/model/employee.pm: convert comments to notes
+- t/model/employee.pm: add tests for list_employees_by_priv() function
+
+0.448  2015-06-28 17:34 CEST
+- REST/Test.pm: add test_employee_list() generic testing function
+- t/dispatch/employee.t: add basic tests of 'employee/list/?:priv' resource
+- t/model/employee.t: use the new generic test_employee_list() function
+
+0.449  2015-06-28 19:55 CEST
+- REST/Dispatch.pm: add handler_get_employee_team() function
+- REST/Dispatch.pm: use select_set_of_single_scalar_rows()
+- ResourceDefs.pm: add definition of 'employee/team' resource
+- Model/Employee.pm: use select_set_of_single_scalar_rows() to list
+  employees
+- Model/Shared.pm: implement select_set_of_single_scalar_rows()
+
+0.450  2015-06-28 20:56 CEST
+- dbinit_Config.pm: add 'supervisor' field to employees table
+- dispatch_Message_en.conf: add DISPATCH_LIST_EMPLOYEE_NICKS_TEAM
+- Dispatch.pm: fix handler_get_employee_team()
+- Model/Employee.pm: block in get_team_nicks(); fix list_employees_by_priv()
+- Model/Shared.pm: fix select_set_of_single_scalar_rows()
+- t/: add supervisor attribute of Employee class where necessary
+
+0.451  2015-06-28 22:38 CEST
+- t/model/employee.t: add calls to supervisor accessor where appropriate
+- config/sql/employee_Config.pm: add supervisor attribute where needed
+- Model/Employee.pm: implement team_nicks method
+- t/model/employee.t: add basic tests for team_nicks method
+
+0.452  2015-07-01 16:56 CEST
+- Dispatch.pm: make handler_get_employee_team() use team_nicks method
+- add 'employee/eid/:eid/team' and 'employee/nick/:nick/team' resources
+  (implemented using team_nicks method)
+
+0.453  2015-07-04 10:13 CEST
+- tickets: nice things we could add to spec file
+- Model/Employee.pm: revert 2015-06-28 edit that caused a regression
+- t/dispatch/employee.pm: fix test that was silently letting an error go past
+
+0.454  2015-07-04 19:46 CEST
+- bin/dochazka-rest: send local sitedir as third parameter to mrest startup
+  script
+
+0.455  2015-07-04 20:25 CEST
+- REST/Auth.pm: pass context to Employee insert method
+
+0.456  2015-07-04 20:31 CEST
+- Auth.pm: provide faux context to Employee insert method for LDAP autocreate
+
+0.457  2015-07-04 22:28 CEST
+- config/REST_Config.pm: add DOCHAZKA_LDAP_AUTOCREATE_AS
+- Auth.pm: insert initial privhistory record for LDAP-autocreated users
+- Util/Timestamp.pm: get $t, $today etc. from App::Dochazka
+- t/: adapt units to current state
+
+0.458  2015-07-05 11:26 CEST
+- Dispatch.pm, t/: do not use App::Dochazka::REST::Util::Timestamp
+- Test.pm: call init_timepiece() in initialize_unit()
+- Util/Timestamp.pm: cleanup/eliminate last vestiges of $t, $today, etc.
+
+0.459  2015-07-05 13:30 CEST
+- REST_Config.pm: change default value of DOCHAZKA_LDAP_AUTOCREATE_AS to
+  passerby
+- Auth.pm: do not create any priv history record if DOCHAZKA_LDAP_AUTOCREATE_AS
+  is set to passerby
+
+0.460  2015-07-08 07:44 CEST
+- t/dispatch/supervisor.t, MANIFEST: new test (WIP)
+- ACL.pm: implement acl_check_is_my_report()
+- REST/Shared.pm: shared_get_employee() use acl_check_is_my_report()
+- move aid_by_code() from t/dispatch/interval_lock.t to REST/Test.pm
+
+0.461  2015-07-08 08:17 CEST
+- ACL.pm: drop acl_check_iid_lid() function
+- Dispatch.pm: replace acl_check_iid_lid() calls with acl_check_is_me() calls
+- t/dispatch/interval_lock.t: convert comments into note() calls
+
+0.462  2015-07-08 09:59 CEST
+- Dispatch.pm: convert _handler_get_interval() into _handler_get_intlock() and
+  use it for both locks and intervals; eliminate duplicated code; POD cleanup;
+  make separate handler_get_interval_iid() and handler_get_lock_lid() functions
+  so we can allow supervisors to peek
+- ResourceDefs.pm: separate GET handlers for 'interval/iid/:iid' and
+  'lock/lid/:lid'
+
+0.463  2015-07-09 09:56 CEST
+- Build.PL: add App::Dochazka 0.189 as build depenency
+- t/dispatch/supervisor.t: add more tests
+
+0.464  2015-07-10 16:50 CEST
+- ResourceDefs.pm: change ACL profile of GET lock/eid/:eid/:tsrange
+  and GET lock/nick/:nick/:tsrange to 'active', so active employees
+  can view their locks and supervisors can view the locks of their
+  reports
+- t/dispatch/supervisor.t: add more tests
+
+0.465  2015-07-10 17:34 CEST
+- t/dispatch/interval_lock.t: do not rely on IID having a particular value,
+  since this only holds if/when tests are run in a particular order
+
+0.466  2015-07-12 22:24 CEST
+- t/dispatch/supervisor.t: test that inactive supervisors cannot see their
+  peons' attendance data
+
+0.467  2015-07-21 15:27 CEST
+- REST.pm: define $VERSION in top-level module only
+- Adapt to rename of App::Dochazka to App::Dochazka::Common
+- release.sh: new release script
+
+0.468  2015-07-21 16:01 CEST
+- Update Copyright statement to include 2015
+- release.sh: add "osc update"
+
+0.469  2015-07-22 22:17 CEST
+- implement new resources:
+  - GET employee/eid/:eid/minimal
+  - GET employee/nick/:nick/minimal
+  - GET employee/sec_id/:sec_id/minimal
+- t/dispatch/employee.t: add some basic test cases for the new
+  GET employee/.../minimal resources
+- t/: adapt test suite to App::Dochazka::Common rename
+
+0.470  2015-07-23 14:50 CEST
+- t/dispatch/employee.t: disable tests that broke when employees were allowed to modify their email address
+- t/201-LDAP.t: expanded tests
+- ResourceDefs.pm: add employee/nick/:nick/ldap resource
+- LDAP.pm: make ldap_search() look up a property; implement populate_employee()
+- Dispatch.pm: add handler_get_employee_ldap() for GET employee/nick/:nick/ldap
+- Auth.pm: populate certain employee attributes from LDAP upon successful LDAP autocreate
+- REST_Config.pm: default value for DOCHAZKA_LDAP_POPULATE_MATRIX
+- Build.PL: require App::Dochazka::Common 0.191 for "set()" method
+- Dispatch.pm: increase granularity of employee/.../minimal ACL check
+- No longer auto-generate Makefile.PL
+
+0.471  2015-07-23 16:55 CEST
+- t/201-LDAP.t: add simple test cases for GET employee/nick/:nick/ldap
+- ResourceDefs.pm: enable PUT on employee/nick/:nick/ldap
+- LDAP.pm: fix populate_employee() so it returns not_ok if nick is not in LDAP
+- Dispatch.pm: implement handler_get_employee_ldap and handler_put_employee_ldap
+- Auth.pm: fix DOCHAZKA_LDAP_AUTOCREATE_AS code path
+
+0.472  2015-07-24 17:06 CEST
+- doc: config/REST_Config.pm: tell users to not add a nick property to
+  DOCHAZKA_LDAP_POPULATE_MATRIX
+- t/: test POST employee/nick without required nick property
+- Dispatch.pm: return 400 if POST employee/nick without nick property
+  (fixes github issue #2) 
+- Dispatch.pm: handler_put_employee_ldap() return 404 if nick not found in LDAP
+
+0.473  2015-07-25 03:45 CEST
+- REST_SiteConfig.pm: add config file for overriding Web::MREST core params
+  since those are set first
+- REST.pm: add a version() package method
+- GET version now reports App::Dochazka::REST version instead of Web::MREST
+  version (Github issue #3)
+- t/sql/disabled_to_zero.t: fix issue where test was not cleaning up after itself
+- Dispatch.pm: write a debug message if LDAP is enabled
+- MANIFEST: refrain from packaging release script
+
+0.474  2015-07-25 16:33 CEST
+- t/001-init.t: skip all tests if PostgreSQL server unreachable
+- REST/Test.pm: make initialize_unit() do skip_all if PostgreSQL server unreachable
+- ConnBank.pm: catch exceptions in conn_status()
+- REST.pm: init() routine is no longer used; move it to REST/Test.pm
+- bin/dochazka-rest: enable passing of command-line options to mrest script
+  (resolves github issue #4)
+- Build.PL: require Web::MREST 0.274 for bin/mrest command-line options
+- bin/dochazka-rest: process command-line options using GNU getopt
+- REST.pm: update init_no_db() documentation to reflect current state
+- release scripting mods
+
+0.475  2015-07-25 16:57 CEST
+- Build.PL: set repository and bugtracker URLs
+
+0.476  2015-07-25 17:49 CEST
+- REST/Test.pm: use conn_up() instead of conn_status()
+- ConnBank.pm: add conn_up() and rewrite conn_status() as a wrapper
+- Auth.pm: drop obsolete call to App::Dochazka::REST::init()
+- Auth.pm: call App::Dochazka::REST::ConnBank::init_singleton() instead of deprecated App::Dochazka::REST::init()
+- ConnBank.pm: make init_singleton() use values from site configuration
+- ConnBank.pm: make init_singleton() be idempotent
+
+0.477  2015-07-25 20:13 CEST
+- ResourceDefs.pm: change ACL profile to passerby in two places
+- config/dispatch_Message_en.conf: fix DISPATCH_KEEP_TO_YOURSELF message which
+  was no longer accurate
+
+0.478  2015-07-29 17:22 CEST
+- Import normalize_filespec() from Web::MREST::CLI, where it now resides
+- Dispatch.pm: do not report passhash and salt back to users
+
+0.479  2015-07-30 14:41 CEST
+- Build.PL: require Web::MREST 0.279 for early debugging feature
+  Fixes: https://github.com/smithfarm/dochazka-rest/issues/13
+- REST.pm: document the early debugging feature
+- Test.pm: drop call to init_no_db(); use Web::MREST::init() only
+- Dispatch.pm: be more careful with DOCHAZKA_EMPLOYEE_MINIMAL_FIELDS
+- REST.pm: drop init_no_db() which is no longer used
+- Build.PL: require a more recent version of App::CELL
+
+0.480  2015-07-30 21:56 CEST
+- Test.pm: do not send deprecated debug_mode param to Web::MREST::init()
+  (fixes build failure in OBS)
+
+0.481  2015-08-01 18:43 CEST
+- Model/Shared.pm: add functions from deprecated Util/Timestamp.pm
+- Model/{Priv,Sched}history.pm: get_history() is now exported
+- Util/Timestamp.pm: drop deprecated module
+- Build.PL: require Date::Holidays::CZ version 0.08
+
+0.482  2015-08-02 14:14 CEST
+- Implement timestamp_delta_plus() and timestamp_delta_minus()
+- t/util/timestamp_delta.t: add two tests with more complex psqlintervals
+- Implement interval/eid/:eid/:ts/:psqlint and related resources
+  Fixes: https://github.com/smithfarm/dochazka-rest/issues/15
+- t/dispatch/interval_lock.t: add easy-to-implement test cases for 
+  - GET interval/eid/:eid/:ts/:psqlint
+  - GET interval/nick/:nick/:ts/:psqlint
+
+0.483  2015-08-04 09:44 CEST
+- t/dispatch/holiday.t: add test cases
+- Dispatch.pm: handle explicit infinity in handler_holiday_tsrange()
+- Be careful with unbounded tsranges
+- t/model/general/split_tsrange.t: add unit to test split_tsrange() function
+- t/dispatch/holiday.t: lay groundwork for a unit to test GET holiday/:tsrange
+- Implement GET holiday/:tsrange
+- Add infrastructure for GET holiday/:tsrange
+- Dispatch.pm: abstract _tsrange_from_mapping() into a helper function
+
+0.484  2015-08-05 16:32 CEST
+- Util/Holiday.pm: implement holidays_and_weekends() function
+- t/util/holiday.t: add unit to test Util/Holiday.pm
+- Util/Holiday.pm: add is_weekend() and get_tomorrow()
+- t/dispatch/holiday.t: add another test case
+- Util/Holiday.pm: make holidays_in_daterange() put holidays in a hash
+  instead of an array
+- Dispatch.pm: cleanup code and improve documentation
+
+0.485  2015-08-06 21:56 CEST
+- t/dispatch/interval_lock.t: lay groundwork for DELETE on interval/... resources
+- ResourceDefs.pm: lay groundwork for DELETE interval/... resources
+- Dispatch.pm: vet fillup date range using canonicalize_date()
+- Model/Shared.pm: add a canonicalize_date() function
+- Util/Holidays.pm: change structure of holidays_in_daterange() return value
+- Util/Schedule.pm: make intervals_in_schedule() avoid holidays
+  Fixes: https://github.com/smithfarm/dochazka-rest/issues/10
+- Dispatch.pm: intervals_in_schedule() takes a PARAMHASH now
+
+0.486  2015-08-07 20:35 CEST
+- Model/Lock.pm: implement count_locks_in_tsrange() routine including test
+  cases
+- Add parameters to put upper limit of number of intervals that can be
+  deleted at once
+- sql/interval_Config.pm: make interval selects more conservative and add
+  SQL for deleting multiple intervals
+- Model/Shared.pm: add a cud_generic() function for CUD operations on
+  non-objects
+- Model/Interval.pm: working implementation of
+  delete_intervals_by_eid_and_tsrange() with rudimentary test case
+
+0.487  2015-08-09 10:58 CEST
+- t/model/interval_lock.t: add more delete_intervals_by_eid_and_tsrange() test cases
+- Some interval handlers will be used for GET and DELETE; rename them accordingly
+- Dispatch.pm: implement DELETE interval/{eid,nick,self} over tsrange
+  Fixes: https://github.com/smithfarm/dochazka-rest/issues/17
+- Make DISPATCH_NOTHING_IN_TSRANGE message more descriptive by including the
+  tsrange
+
+0.488  2015-08-09 20:59 CEST
+- t/dispatch/interval_fillup.t: add unit for fillup tests (WIP)
+- t/dispatch/interval_lock.t: fix syntax errors
+- ResourceDefs.pm: make fillup resources take tsrange instead of dates
+- dbinit_Config.pm: add tempintvls table (with temp_intvl_seq to prevent race conditions)
+- Build.PL: require latest version of App::Dochazka::Common for Tempintvls class
+- Util/Date.pm: add module canon_to_ymd(), ymd_to_canon(), and canon_date_diff() routines
+- REST_Config.pm: add DOCHAZKA_INTERVAL_FILLUP_LIMIT defaulting to 365 days
+  Fixes: https://github.com/smithfarm/dochazka-rest/issues/8
+- Model/Shared.pm: make split_tsrange() complain when given an unbounded tsrange
+- Model/Tempintvls.pm, t/model/tempintvls.t: start implementing the Tempintvls
+  class (populate, _vet_tsrange methods)
+
+0.489  2015-08-10 15:55 CEST
+- t/model/privhistory.t: fix a lurking bug
+- Move create schedule testing logic to REST/Test.pm so it can be called from
+  other units
+- Util/Schedule.pm: cleanup (remove deprecated function)
+- Model/Tempintvls.pm: implement _vet_employee() with basic test cases
+- Model/Tempintvls.pm: implement _vet_activity() with test cases
+- sql/tempintvl_Config.pm: add configuration file for tempintvls-related SQL
+  statements
+- Util/Schedule.pm: drop deprecated module (replaced by Model/Tempintvls.pm)
+- Test.pm: make test_schedule_model() take schedintvls as an argument
+- Model/Tempintvls.pm: implement fillup()
+
+0.490  2015-08-11 08:25 CEST
+- MANIFEST: add config/sql/tempintvls_Config.pm
+- Test.pm: do not hardcode count in test_schedule_model()
+- Model/Shared.pm: enable noop() on tempintvls table
+- Model/Tempintvls.pm: cleanup, implement delete() method
+- config/sql/tempintvls_Config.pm: fix filename
+- Model/Tempintvls.pm: implement commit() dry run
+
+0.491  2015-08-12 01:02 CEST
+- Drop Test::CheckManifest dependency
+- t/: update to current state
+- Dispatch.pm: re-implement interval/fillup handler
+- Model/Tempintvls.pm: implement vet(), new(), and DESTROY() methods
+- ResourceDefs.pm: clean up 'interval/fillup/...' resource definitions
+  References: https://github.com/smithfarm/dochazka-rest/issues/9
+
+0.492  2015-08-13 12:47 CEST
+- dbinit_Config.pm: add partial_interval_lower() and partial_interval_upper() stored procedures
+- Build.PL: require latest version of App::Dochazka::Common
+- Model/Tempintvls.pm: make _vet_employee() optionally take employee object instead of EID
+- t/model/tempintvls.t: make unit clean up after itself
+- Dispatch.pm: call Tempintvls->new() with employee object instead of EID
+- Tempintvls class: drop superfluous attributes, re-implement commit() to use SQL stored procedure
+- Make 'interval/fillup/...' take tsrange and return partial intervals on overlap
+  Fixes: https://github.com/smithfarm/dochazka-rest/issues/9
+
+0.493  2015-08-14 09:30 CEST
+- t/dispatch/interval_lock.t: make illegal interval regex configurable
+- messages: standardize on DOCHAZKA_UNBOUNDED_TSRANGE
+- Dispatch.pm: make _handler_interval_fillup() return DISPATCH_RECORDS_FOUND
+  with correct count
+- Model/Tempintvls.pm: accept employee object only, not eid
+- global: allow warnings
+- Model/Tempintvls.pm: start mods to enable POST on interval/fillup/...
+  resources
+- dbinit_Config.pm: add stored procedure returning boolean whether two
+  tstzranges overlap
+- t/: update to current state, drop 000-depends.t unit that duplicates work
+  done by the OBS, rename some units for better consistency, consolidate
+  split_tsrange() tests in split_tsrange.t
+
+0.494  2015-08-15 16:30 CEST
+- Model/Tempintvls.pm: make constructor take context hash instead of
+  DBIx::Connector object
+  https://github.com/smithfarm/dochazka-rest/issues/18 Fixes: #18
+- Model/Tempintvls.pm: store the context and DBIx::Connector object in the
+  object, implement several accessors that were missing, drop the vet() method,
+  make constructor return the object itself instead of a status object (put the
+  constructor status in an attribute)
+- Dispatch.pm, t/: update to current state
+- Enable POST on interval/fillup/... resources
+  https://github.com/smithfarm/dochazka-rest/issues/7 Fixes: #7
+
+0.495  2015-08-16 17:12 CEST
+- Model/Tempintvls.pm: return $self even when there is an error
+  https://github.com/smithfarm/dochazka-rest/issues/20 Fixes: #20
+
+0.496  2015-08-18 22:02 CEST
+- Dispatch.pm: handle fillup tsranges that do not have any scheduled attendance
+  intervals
+- Model/Tempintvls.pm: let fillup() take a PARAMHASH that might say
+  include_holidays => 1
+- Model/Tempintvls.pm: fix count in fillup/commit
+- dbinit_Config.pm: fix priv_change_during_range() and
+  schedule_change_during_range() stored procedures
+
+0.497  2015-08-19 22:45 CEST
+- config/: go over all files and clean them up
+- Build.PL: change author email to official @suse.com address
+- Shared.pm: refrain from piecing together App::CELL::Status codes
+- Model/Shared.pm: clean up cud() and cud_generic()
+- t/001-init.t: cleanup, improve tests
+- ACL.pm: cleanup/fixup the check_acl() routine
+
+0.498  2016-08-20 09:55 CEST
+- Test.pm: set log level to debug in initialize_unit()
+  https://github.com/smithfarm/dochazka-rest/issues/16 Fixes: #16
+- t/: more cleanup
+- Model/Tempintvls.pm: implement _is_holiday() correctly
+- config/REST_SiteConfig.pm: override MREST_APPNAME
+
+0.499  2016-12-08 15:42 CEST
+- README.rst: start documenting release workflow
+- README.md: rename to README.rst
+- README: remove deprecated README file
+- Model/Tempintvls.pm: make variable names less confusing
+- t/: cleanup
+- LICENSE: work continues in 2015
+
+0.500 2015-12-08 16:24 CET
+- prerelease.sh: automatically update Changes file, add tag
+- README.rst: describe the new release workflow in more detail
+
+0.501 2015-12-09 14:40 CET
+- README.rst: fix literal code blocks
+- README.rst: add reminder to push using --follow-tags
+- implement Dockerized testing environment
+- docker-test.sh: bootstrap script for Dockerized testing env
+
+0.502 2015-12-10 14:02 CET
+- several Dockerfile tweaks
+- Fix https://github.com/smithfarm/dochazka-rest/issues/26
+  - config/REST_Config.pm: add DOCHAZKA_TIMEZONE config param
+  - t/001-init.t: check DOCHAZKA_TIMEZONE sanity
+  - Test.pm: check DOCHAZKA_TIMEZONE in every unit
+  - Ensure PGTZ environment variable is set
+- Fix https://github.com/smithfarm/dochazka-rest/issues/28
+  - t/: be more careful about timezone
+
+0.503 2015-12-10 21:04 CET
+- Fix https://github.com/smithfarm/dochazka-rest/issues/30
+  - t/001-init.t: bail out if DOCHAZKA_TIMEZONE not set
+- Fix https://github.com/smithfarm/dochazka-rest/issues/31
+  - Test.pm: initialize_unit() return PSGI app instead of status obj
+  - t/: move "pure" unit tests to t/unit/
+  - t/: simplify regression test init boilerplate
+  - tests: rename initialize_unit() to initialize_regression_test()
+
+0.504 2015-12-11 21:40 CET
+- Make release and prerelease scripts executable
+- MANIFEST.bak: remove superfluous file
+- Build.PL: require App::Dochazka::Common 0.194
+- docgen_Config.pm: do not convert warnings into errors
+- tests: use Test::Warning to test for unexpected warnings
+  (except in 001-init.t)
+- dbinit_Config.pm: remove spurious warning
+
+0.505 2016-01-01 15:42 CET
+- doc: minor clarifications
+- REST.pm: add Report Generation section to POD
+- Build.PL: require 0.195 for Component class
+- Add Component class, resources, handlers, basic tests
+- t/dispatch/: add missing LogToFile lines
+- Dispatch.pm: improve error checking
+
+0.506 2016-01-02 02:36 CET
+- MANIFEST: add t/dispatch/component.t
+- REST.pm: name the genreport resource
+- Remove component/path/:path, add component/all
+- t/dispatch/component.t: add path_exists() helper function
+- t/dispatch/component.t: use path_exists() to test
+- component.t: rename path_exists() -> path_exists_by_dispatch()
+- prerelease.sh: fix timestamp
+- Component: check for invalid ACL profile
+- ACL.pm: fix uninitialized value in string eq warnings
+- t/dispatch/employee.t: fix "Wide char in print" warning
+- Implement Feature #37:
+  - Dispatch.pm: add init() function that populates Mason directory
+  - Test.pm: call Dispatch.pm->init() in initialize_regression_test()
+  - t/dispatch/component.t: test the sample component
+
+0.507 2016-01-02 19:39 CET
+- Mason.pm: add module for Mason interpreter singleton
+- Mason.pm->init_singleton(): improve error-checking
+- Mason.pm: add $comp_root package variable
+- Util/Date.pm: drop unused dependency
+- REST/Test.pm: skip tests if Mason initialization fails
+- Implement Feature #39:
+  - REST.pm: implement, use, test reset_mason_dir() routine
+  - REST.pm->reset_mason_dir(): return comp_root in payload
+  - REST.pm->reset_mason_dir(): return payload only on success
+  - Model/Component.pm: add create_file method
+  - Model/Component.pm: call create_file on successful insert and update
+  - Model/Component.pm: add delete_file method
+
+0.508 2016-01-02 20:24 CET
+- Build.PL: add Mason dependency
+- docker: add Mason dependency
+- t/mason.t: skip tests if state directory inaccessible
+
+0.509 2016-01-02 21:56 CET
+- docker: add new dependencies and create state directory
+- ResourceDefs.pm: add genreport resource definition
+- Implement basic "POST genreport" operation
+
+0.510 2016-01-02 23:24 CET
+- Model/Component.pm: improve error handling in generate method
+- Add sample/site_param.mc Mason template
+- Mason.pm: add basic class_header parameter
+- t/dispatch/component.t: do not complain when we add sample templates
+- Dispatch.pm->handler_genreport: pass arguments to generate method
+- Model/Component.pm->generate: accept and process template arguments
+
+0.511 2016-01-04 00:43 CET
+- various documentation fixes
+- bin/docgen.plx: reinstate resource POD generation script (lost in
+  migration from SourceForge to GitHub)
+- REST/Test.pm: use accessors to get employee EID
+- Docs/Workflow.pm: cover report generation and Mason components
+- Model/Shared.pm->tsrange_equal(): return true or false
+- Model/Shared.pm: implement tsrange_intersection()
+- Partial intervals feature (#43)
+  - Build.PL: require Common 0.196 for partial intervals
+  - interval_Config.pm: use overlap instead of contained by
+  - sql: define SQL_INTERVAL_SELECT_BY_EID_AND_TSRANGE_PARTIAL_INTERVALS
+  - sql: make SQL_INTERVAL_SELECT_BY_EID_AND_TSRANGE ignore partial intervals
+  - config/sql/interval_Config.pm: fix syntax error
+  - Model/Interval.pm: get whole and partial intervals
+  - Model/Interval.pm: use tsrange_intersection() to create partial intervals
+  - t/model/interval_lock.t: add partial interval tests
+
+0.512 2016-01-04 11:43 CET
+- Fix "Partial intervals not shown in temporal order" (#46)
+  - bin/create_active_employee.t: script to create employee in empty database
+  - sql/interval_Config.pm: refrain from sorting intervals
+  - Model/Interval.pm: sort concatenated set of intervals
+  - Model/Shared.pm: use tstzrange instead of tsrange
+  - t/model/interval_lock.t: test case for #46
+
+0.513 2016-01-04 20:39 CET
+- Implement feature "No database operations on partial intervals" (#47)
+  - config/: add DOCHAZKA_PARTIAL_INTERVAL_ILLEGAL_OPERATION message
+  - Model/Interval.pm: no database operations on partial intervals
+- Implement "Test function to delete all attendance data" (#49)
+  - REST.pm: split insert initial set of activities code into separate function
+  - Model/Shared.pm->cud_generic(): make bind_params parameter optional
+  - REST/Test.pm: delete_all_attendance_data() function
+  - t/{dispatch,model}: use delete_all_attendance_data()
+
+0.514 2016-01-05 11:41 CET
+- Fix "INTERVAL DELETE operations clobber partial intervals" (#50)
+  - Model/Shared.pm: improve cud() and cud_generic() return status
+  - t/: adapt tests to current state
+  - config: SQL_INTERVAL_DELETE_BY_EID_AND_TSRANGE ignore partial intervals
+- sql/interval_Config.pm: do not apply LIMIT when selecting partial intervals
+- Dispatch.pm: fix a double my
+- REST.pm: rearrange sections; new high-level content; move details to
+  REST/Guide.pm
+
+0.515 2016-01-06 21:15 CET
+- doc: fix GitHub issue tracker URL
+- Model/Interval.pm: drop obsolete comment
+- ResourceDefs.pm: rethink interval/summary/...
+- interval/summary/eid/:eid/:tsrange skeleton implementation
+- Dispatch.pm: make _handler_intlock aware of interval/summary
+- Implement handler for interval/summary/eid/:eid/:tsrange
+- Util/Date.pm: implement calculate_hours() function
+- Model/Activity.pm: implement code_by_aid() function
+- Improve interval/summary/eid/:eid/:tsrange handling
+
+0.516 2016-01-09 20:42 CET
+- cleanup: merge Utils::Date into Utils::Holiday
+- cleanup: move REST::Util::Holiday to REST::Holiday
+- cleanup: refrain from using the /a modifier
+- Component_Config.pm: enclose siteparam template in HTML 4.0
+- doc: improve comments in Util.pm
+- doc: expand documentation of genreport resource
+- Model/Interval.pm: simplify interval summary data structure
+- Dispatch.pm: require 'source', 'acl' properties for insert only
+- t/dispatch/interval_lock.t: add interval/summary tests
+- Implement feature "Component class: add validations property" (#54)
+  - sql/component_Config.pm: add validations to SQL statements
+  - sql/dbinit_Config.pm: add validations to components table
+  - REST.pm->reset_db: add validations to SQL_COMPONENT_INSERT
+  - Model/Component.pm: add validations property
+  - t/dispatch/component.t: add validations property
+  - Build.PL: require App::Dochazka::Common 0.199 for component validations
+- Fix bug "genreport resource does not validate parameters" (#53)
+  - genreport resource: apply validations, if any
+  - REST/Dispatch.pm->handler_genreport(): vet parameters more carefully
+
+0.517 2016-01-11 00:29 CET
+- config/Component_Config.pm: use Data::Dumper in component
+- config/Component_Config.pm: beginnings of monthly report template
+- t/model/tempintvls.t: change Util::Date to Holiday
+- Dispatch.pm->handler_genreport(): refactor function
+- Revamp Docker testing environment:
+  - version.plx: Perl script to print App::Dochazka::REST version
+  - .gitignore: ignore docker/Dockerfile
+  - bin/dochazka-dbinit: add database reset script
+  - docker: Makefile to generate 3 different images from a single
+    Dockerfile.in
+  - docker-test.sh: adapt to current state
+
+0.518 2016-01-11 18:29 CET
+- version.plx: use the right library directory
+- docker/: split into two separate subdirs "production" and "testing"
+- docker/: fix CMD so it runs dochazka-rest --initialize
+- bin/dochazka-rest: finish adding --initialize option
+
+0.519 2016-01-14 19:42 CET
+- docker:
+  - Dockerfile: delete file which should not be here
+  - .gitignore: adapt to current state
+  - Makefile: push the images/tags to dochazka organization
+  - test-drive.sh: rename test drive script and update README
+  - test-drive.sh: remove silly exit statement
+  - test-drive.sh: use longer --link form
+  - test-drive.sh: increase wait times
+- documentation:
+  - ACL.pm: fix POD
+  - Model/Employee.pm: adapt POD to current state
+  - REST/Guide.pm: adapt INSTALLATION chapter to current state
+
+0.520 2016-01-19 15:17 CET
+- dispatch: vastly simplify interval/fillup resource(s)
+- t/dispatch/fillup.t: drop all tests
+- Dispatch: rename handler_post_interval_fillup -> handler_fillup
+- Dispatch.pm: delete employee key fields after employee has been determined
+- dispatch_Message_en.conf: DISPATCH_EMPLOYEE_CANNOT_BE_DETERMINED
+- refactor Tempintvl and Fillup modules
+  - Model/Tempintlvs.pm: support date lists
+  - t/model/tempintvls.t: wipe out database at beginning as well as at end
+  - Model/Interval.pm: tweak POD
+  - Model/Tempintvls.pm: fix syntax error
+  - Model/Tempintvls.pm->new(): add clobber and dry_run parameters
+  - Model/Tempintvls.pm: add tsranges property
+  - Model/Tempintvls.pm: drop include_holidays parameter
+  - Model/Tempintvls.pm: drop deprecated SQL_TEMPINTVLS_SELECT_EXCLUSIVE
+  - Rename Tempintvls->Fillup and add Tempintvl class
+  - Rename ::Model::Fillup to just plain ::Fillup
+  - Fillup.pm: refactor accessors and reset() method
+  - t/unit/holiday.t: add canonicalized interval test case
+  - Holiday.pm->calculate_hours(): return 0 if problem
+  - Fillup.pm, Tempintvl.pm: refactor
+- Build.PL: require latest App::Dochazka::Common
+
+0.521 2016-01-19 16:28 CET
+- Dispatch.pm: remove references to deprecated Tempintvls.pm
+
+0.522 2016-01-20 10:02 CET
+- MANIFEST.SKIP: ignore test-drive.sh
+- Implement "fillup needs to gracefully avoid existing intervals"
+  https://github.com/smithfarm/dochazka-rest/issues/22
+  - Fillup.pm->commit: collect basic statistics (success/failure)
+  - Fillup.pm->new(): correctly set boolean attributes
+  - t/fillup.t: new test case - conflicting interval
+
+0.523 2016-01-20 10:15 CET
+- Docs/Resources.pm: re-generate resource documentation
+- release.sh: automatically fill in OBS commit message
+
+0.524 2016-01-20 15:55 CET
+- WISHLIST: holding area for stale feature requests
+- Fillup.pm->new(): fix date_list and tsrange validations
+- t/fillup.pm: add a date_list test case
+- Fix bug "interval/fillup returns wrong intervals for very short tsrange"
+  https://github.com/smithfarm/dochazka-rest/issues/21
+  - Fillup.pm: remove too-short tsrange check
+  - t/fillup.t: add too-short tsrange test cases
+- Fix bug "fillup: enforce configurable limit on length of date_list"
+  https://github.com/smithfarm/dochazka-rest/issues/65
+  - config/: add "date_list too long" config param and message
+  - Fillup.pm: complain when date_list is too long
+
+0.525 2016-01-22 09:26 CET
+- Fillup.pm: "clobber conflicting intervals" feature
+
+0.526 2016-01-24 23:55 CET
+- Test.pm: add create_testing_interval and delete_testing_interval
+- t/dispatch/interval_lock.t: rename helper function
+- t/dispatch/fillup.t: get ready to start adding test cases
+- Dispatch.pm: re-implement interval/fillup resource (#61)
+- Fix bug "Holiday problems when employee has weekend work scheduled"
+  (#67)
+  - t/fillup-bug-67.t: add test case demonstrating the bug
+  - t/unit/holiday.t: add test confirming bug #67
+  - Holiday.pm: get holidays that fall on weekends
+- Fillup.pm: fix various date_list bugs
+
+0.527 2016-01-30 23:59 CET
+- MANIFEST: add t/fillup-bug-67.t
+- Fillup.pm->commit: return OK even if no intervals created
+- Fillup.pm: give fillup intervals a fig leaf
+- Fillup.pm->commit(): do not overwrite long_desc parameter
+- document the DBIx::Connector object in the request context
+- factory-progress: working document for Factory submission
+
+0.528 2016-02-01 00:58 CET
+- factory-progress: submit Starman to Factory
+- Dispatch.pm: do not reinitialize Path::Router object on every request
+
+0.529 2016-04-23 18:26 CEST
+- factory-progress: add dependencies missing from SLES-12-SP1
+- Guide.pm: add some clarifications from testing on humans
+- systemd: add dochazka-rest.service file (#59)
+- Build.PL: bump Date::Holidays::CZ dependency to 0.12 (#76)
+
+0.530 2016-09-01 23:38 CEST
+- MANIFEST: include dochazka-rest.service (systemd unit file)
+- dispatch/interval_lock.t: add basic supervisor test case
+- tests: rename create_testing_employee to create_bare_employee
+- tests: rename delete_testing_employee to delete_bare_employee
+- Test.pm: improve error reporting and documentation
+- Test.pm: reimplement create_*_employee functions as wrappers
+- t/model/id.t: improve documentation
+- REST/Test.pm: start work on gen_interval()
+- New dbinit paradigm
+- t/001-init.t: drop redundant test file
+
+0.531 2016-09-02 10:28 CEST
+- Rename dbinit-development -> dochazka-resetdb
+- dochazka-resetdb: abort immediately on non-zero exit status
+- dochazka-rest: drop --initialize option
+- dochazka-dbinit: set up logging
+
+0.532 2016-09-03 08:45 CEST
+- release.sh: submitrequest to Application:Dochazka
+- t/001-noauto.t: replacement for t/001-init.t
+
+0.533 2016-09-03 10:03 CEST
+- release: make release scripts generic
+- Drop release scripts
+
+0.534 2016-09-04 22:19 CEST
+- MANIFEST.SKIP: release script helper files
+- Travis CI
+
+0.535 2016-09-05 18:27 CEST
+- README.rst: add Travis CI badges
+- test: skip more gracefully in Travis CI
+- bin/dochazka-rest: no longer require double '--'
+
+0.536 2016-09-08 10:39 CEST
+- Drop "factory-progress" file
+- MANIFEST.SKIP: docker, tickets
+- doc: how to use Starman instead of default web server
+- bin/dochazka-resetdb: do not run the test suite
+- Document how to (re-)initialize the database
+- create ext/ dir and move inside there extra (non-production related) files
+  (Theo Chatzimichos)
+- run systemd service as dochazka user, use starman as webapp server
+  (Theo Chatzimichos)
+- tests: make integration tests run again...
+
+0.537 2016-09-11 21:19 CEST
+- set owner of the db (Theo Chatzimichos)
+- change the systemd user to dochazka-rest (Theo Chatzimichos)
+- build/ops: regenerate Makefile.PL
+- build/ops: set OBS_PROJECT to Application:Dochazka:staging
+
+0.538 2016-09-12 11:33 CEST
+- build/ops: update MANIFEST, MANIFEST.SKIP
+- config: set default DOCHAZKA_STATE_DIR to /var/lib/dochazka-rest
+
+0.539 2016-09-13 08:47 CEST
+- REST.pm: improve DOCHAZKA_STATE_DIR error message
+- build/ops: do not package test-drive.sh
+- test: do not load config params from /etc/dochazka-rest
+
+0.540 2016-09-13 14:23 CEST
+- Add sample configuration file for inclusion in packaging
+- doc: provide more guidance in sample config file
+- doc: append .example to name of sample config file
+- scripts: do not run dochazka-dbinit from dochazka-resetdb
+
+0.541 2016-09-14 12:49 CEST
+- scripts: add executable bits to all scripts in bin/
+- tests: comment out TRAVIS_PERL_VERSION check in init routine
+- set up database in travis for the testsuite (Theo Chatzimichos)
+- Plumb sync property into Employee data model
+- build/ops: make Makefile.PL use File::ShareDir::Install
+- build/ops: create state dir in Travis CI
+- build/ops: require App::Dochazka::Common 0.205
+- tests: dump status when bailing out in t/dispatch/activity.t
+- build/ops: turn DOCHAZKA_AUDITING off in Travis CI
+
+0.542 2016-09-15 09:01 CEST
+- A more-general DOCHAZKA_LDAP_MAPPING parameter
+- Employee sync method
+- tests: comment out DOCHAZKA_STATE_DIR diagnostic
+- tests: run tests non-verbose in Travis CI
+
+0.543 2016-09-17 23:24 CEST
+- tests: present less alarming message when skipping integration test
+- tests: eliminate redundancy in skipped integration test message
+- tests: improve state dir error messages in t/mason.t
+- Add help msg and params support for resetdb script
+- auth: more logging detail for debugging session issues
+- Model/Employee.pm: refactor sync method
+- ldap: refactor (drop populate_employee, add autocreate_employee)
+- dispatch: refactor handler_put_employee_ldap()
+- dispatch: active employees can sync themselves
+- doc: update POD in employee/nick/:nick/ldap resource definition
+- ldap: add sanity checks, respect sync property
+- ldap: set employee sync property in autocreate
+- tests: refactor t/ldap.t
+- scripts: fix dochazka-resetdb --help
+- scripts: add run-tests.sh script
+- Model/Employee.pm: get_all_sync_employees() function
+- REST.pm: new init_arbitrary_script() function
+- scripts: dochazka-ldap-batch-create
+- scripts: clean up end of bin/dochazka-ldap-batch-create
+- Move autocreate_employee() to Model/Employee.pm
+- scripts: dochazka-ldap-sync-all
+- REST.pm: make init_arbitrary_script() take a "quiet" option
+- build/ops: package the new LDAP scripts in CPAN distro
+- build/ops: do not package run-tests.sh script
+
+0.544 2016-09-19 01:07 CEST
+- Drop employee/current and employee/current/priv resources
+- Add resource definitions for {priv,sched}/history/eid/:eid/:ts
+- Add resource definitions for {priv,sched}/history/eid/:eid/now
+- dispatch: distinguish single/multiple in history handler names
+- Shared.pm: include timestamp in shared_get_class_prop_id() return list
+- dispatch: implement GET handler for single-record history resources
+- model: handle undef timestamps in history load_by_eid methods
+- ResourceDefs.pm: better timestamp validation regex
+- tests: add dispatch tests for {priv,schedule}/eid/:eid/{:ts,now}
+- Add resource definitions for employee/{eid,nick}/{:eid,:nick}/full
+- In employee/self/full resource, rename current_emp property to "emp"
+- handlers: make employee/self/full return history objects
+- tests: test for history objects in employee/self/full output
+- dispatch: generalize pass 1 and 2 of GET employee/*/full handler
+- Implement "employee/{eid,nick}/{:eid,:nick}/full" handlers
+- tests: refactor "employee/self/full" dispatch tests
+- tests: functional tests for employee/{eid,nick}/{:eid,:nick}/full
+
+0.545 2016-09-23 14:45 CEST
+- cleanup: reduce log verbosity of load_multile() in Model/Shared.pm
+- Auth.pm: add more debug log messages, session mgmt
+
+0.546 2016-09-25 09:44 CEST
+- Revamp session management
+- doc: update session management section of Guide
+
+0.547 2016-09-26 14:00 CEST
+- run-tests.sh: do not make an empty "1" file
+- Auth.pm: require 'eid' property in _validate_session()
+- model: stricter match for system users in ldap_sync()
+- dispatch: improve error messages generated by LDAP handlers
+
+0.548 2016-11-01 15:43 CET
+- build/ops: move project back to Application:Dochazka (in OBS)
+- Dispatch.pm: fix session resource
+- Implement new "session/terminate" resource
+

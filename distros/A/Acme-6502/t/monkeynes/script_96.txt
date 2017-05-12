@@ -1,0 +1,28 @@
+# *** MODIFIED TEST FROM ORIGINAL MONKEYNES
+# *** Now properly checks $mem[$0002] and not $mem[$0102] as
+# *** zero page mode wraps
+clear
+power on
+regs
+
+# The "stay within zero page" condition
+op a2 55
+op a0 0b
+op 96 be
+
+# Should be: IY=0B, IX=55, mem[$00C9]=55 
+test iy = 0b
+test ix = 55
+test m:00c9 = 55
+
+# The "overshoot the zero page" condition
+op a2 62
+op a0 0b
+op 96 f7
+
+# Should be: IY=0B, IX=62, mem[$0002]=62 
+test iy = 0b
+test ix = 62
+test m:0002 = 62
+
+save verify_96.txt

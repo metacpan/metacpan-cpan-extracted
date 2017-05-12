@@ -1,0 +1,43 @@
+Revision history for perl module Algorithm::DependencySolver
+
+1.01 2015-02-20
+    * Use Test::TempDir::Tiny rather than Test::TempDir in 02-solver.t
+      Thanks Karen "ETHER" Etheridge for reporting via rt#102228
+
+1.00 2013-08-08
+    * No change except for version number bump!
+    * Alexandr Ciornii pointed out that Colin actually released the first
+      version as 0.1 so all my subsequent version numbers have been wrong.
+      That's no good. This fixes that.
+
+0.07 2013-07-18
+    * Updated Changes to conform to CPAN::Changes::Spec
+    * Added a release test via Dist::Zilla::Plugin::Test::CPAN::Changes
+
+0.06 2013-05-21
+    * Updated repository.web and repository.url
+      "kaoru" -> "lokku"
+
+0.05 2013-02-15
+    * Replaced use of smart-match any() for perl 5.8.8
+    * Added test for redundant edge removal
+
+0.04 2013-01-30
+    * Fixed bug in Traversal::dryrun()
+    * Added 03-traversal.t, which tests Traversal::run()
+    * Updated dist.ini to list myself as co-author.
+
+0.03 2013-01-16
+    * Fixed mistake in POD of Solver
+    * Fixed file name sanity check
+    * Added tests for the Operation and Solver modules
+    * [[ Tests for Traversal module will come in 0.04 ]]
+
+0.02 2013-01-10
+    * Dist::Zilla
+    * Git Repository
+    * Tests
+    * etc.
+
+0.01 2010-12-03
+    * initial write up by Colin Horne

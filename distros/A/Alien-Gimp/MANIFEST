@@ -1,0 +1,11 @@
+lib/Alien/Gimp.pm.PL
+lib/Alien/Gimp/Install/Files.pm.PL
+Makefile.PL
+MANIFEST			This list of files
+README
+common.pl
+t/compile.t
+t/inline.t
+t/methods.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

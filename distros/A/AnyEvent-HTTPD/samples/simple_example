@@ -1,0 +1,31 @@
+#!/opt/perl/bin/perl
+use common::sense;
+use AnyEvent;
+use AnyEvent::HTTPD;
+
+my $cvar = AnyEvent->condvar;
+
+my $httpd = AnyEvent::HTTPD->new (port => 19090);
+
+$httpd->reg_cb (
+   '' => sub {
+      my ($httpd, $req) = @_;
+      $req->respond ({ content => ['text/html', <<'CONT']});
+         <html><body><h1>Hello World!</h1>
+         <a href="/test">another test page</a>
+         </body></html>
+CONT
+   },
+   '/test' => sub {
+      my ($httpd, $req) = @_;
+      $httpd->stop_request;
+
+      $req->respond ({ content => ['text/html', <<'CONT']});
+         <html><body><h1>Test page</h1>
+         <a href="/">Back to the main page</a>
+         </body></html>
+CONT
+   },
+);
+
+$cvar->wait;

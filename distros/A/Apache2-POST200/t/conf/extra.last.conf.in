@@ -1,0 +1,141 @@
+PerlLoadModule Apache2::POST200
+
+Include conf/db.inc
+POST200Table p200 session data
+POST200DataBlockSize 1024
+PerlOutputFilterHandler Apache2::POST200::Filter
+
+<Location "/-redirect-">
+  SetHandler modperl
+  PerlResponseHandler Apache2::POST200::Response
+</Location>
+
+<Location "/-redirect-nocheck-">
+  POST200IpCheck Off
+  PerlFixupHandler TESTlib::mp::setip
+  SetHandler modperl
+  PerlResponseHandler Apache2::POST200::Response
+</Location>
+
+<Location "/-redirect-check-">
+  POST200IpCheck On
+  PerlFixupHandler TESTlib::mp::setip
+  SetHandler modperl
+  PerlResponseHandler Apache2::POST200::Response
+</Location>
+
+<Location "/-redirect-default-">
+  PerlFixupHandler TESTlib::mp::setip
+  SetHandler modperl
+  PerlResponseHandler Apache2::POST200::Response
+</Location>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  #RewriteLog "rewrite_log"
+  #RewriteLogLevel 5
+
+  # redirect GET/HEAD requests with a matching QUERY_STRING to
+  # Apache2::POST200::Response
+  RewriteCond %{REQUEST_METHOD} !=POST
+  RewriteCond %{QUERY_STRING} ^-redirect-[A-Za-z0-9@=-]{32}$
+  RewriteRule . /-redirect- [L,PT]
+
+  # redirect GET/HEAD requests with a matching QUERY_STRING to
+  # Apache2::POST200::Response
+  RewriteCond %{REQUEST_METHOD} !=POST
+  RewriteCond %{QUERY_STRING} ^(-redirect-[A-Za-z0-9@=-]{32});check$
+  RewriteRule . /-redirect-check-?%1 [L,PT]
+
+  # redirect GET/HEAD requests with a matching QUERY_STRING to
+  # Apache2::POST200::Response
+  RewriteCond %{REQUEST_METHOD} !=POST
+  RewriteCond %{QUERY_STRING} ^(-redirect-[A-Za-z0-9@=-]{32});nocheck$
+  RewriteRule . /-redirect-nocheck-?%1 [L,PT]
+
+  # redirect GET/HEAD requests with a matching QUERY_STRING to
+  # Apache2::POST200::Response
+  RewriteCond %{REQUEST_METHOD} !=POST
+  RewriteCond %{QUERY_STRING} ^(-redirect-[A-Za-z0-9@=-]{32});default$
+  RewriteRule . /-redirect-default-?%1 [L,PT]
+
+  # This is needed because some applications forget the
+  # action="URL" attribute in their <form>s.
+  # If so we get a POST request with a QUERY_STRING appended.
+  # If it matches our pattern is must be cut off (the '?' in
+  # the RewriteRule).
+  RewriteCond %{REQUEST_METHOD} =POST
+  RewriteCond %{QUERY_STRING} ^-redirect-[A-Za-z0-9@=-]{32}$
+  RewriteRule (.+) $1? [N]
+
+  # yes, it even works on a reverse proxy.
+  RewriteRule ^/proxy/(.+) http://other.host.tld/$1 [P]
+
+  # keep mod_alias (ScriptAlias) happy
+  RewriteRule . - [PT]
+</IfModule>
+
+PerlModule TESTlib::mp
+<Location "/mp/method">
+  SetHandler modperl
+  PerlResponseHandler TESTlib::mp::method
+</Location>
+
+<Location "/mp/chunks">
+  SetHandler modperl
+  PerlResponseHandler TESTlib::mp::chunks
+</Location>
+
+<Location "/mp/big">
+  SetHandler modperl
+  PerlResponseHandler TESTlib::mp::big
+</Location>
+
+<IfModule mod_proxy.c>
+  <Location "/proxy">
+    PerlFixupHandler TESTlib::mp::proxy
+  </Location>
+</IfModule>
+
+<IfModule mod_cgi.c>
+  <IfModule mod_env.c>
+    PassEnv PERL5LIB
+  </IfModule>
+  <Location "/cgi">
+    SetHandler cgi-script
+    Options ExecCGI
+  </Location>
+</IfModule>
+
+<VirtualHost Backend>
+  POST200Storage None
+
+  <Location "/mp/method">
+    SetHandler modperl
+    PerlResponseHandler TESTlib::mp::method
+  </Location>
+
+  <Location "/mp/chunks">
+    SetHandler modperl
+    PerlResponseHandler TESTlib::mp::chunks
+  </Location>
+
+  <Location "/mp/big">
+    SetHandler modperl
+    PerlResponseHandler TESTlib::mp::big
+  </Location>
+
+  <IfModule mod_cgi.c>
+    <IfModule mod_env.c>
+      PassEnv PERL5LIB
+    </IfModule>
+    <Location "/cgi">
+      SetHandler cgi-script
+      Options ExecCGI
+    </Location>
+  </IfModule>
+</VirtualHost>
+
+# Local Variables: #
+# mode: apache #
+# End: #

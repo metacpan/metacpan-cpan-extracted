@@ -1,0 +1,24 @@
+Revision history for Perl extension AnyEvent::ForkObject.
+
+0.01  Fri Feb 25 10:59:06 2011
+	- original version; created by h2xs 1.23 with options
+		-Xn AnyEvent::ForkObject
+0.02  Mon Feb 28 00:00:21 MSK 2011
+        - fixed MANIFEST
+        - added debian infrastructure
+
+0.04  Mon Feb 28 00:40:44 MSK 2011
+        - clean zombies.
+
+0.05  Tue Mar  1 10:14:18 MSK 2011
+        - perldoc
+        - separate global and usual destructor to avoid EV crash
+
+0.06  Wed Mar  2 14:24:59 MSK 2011
+        - destructors work properly
+
+0.07  Fri Mar  4 09:34:26 MSK 2011
+	- test verbose = TRUE
+
+0.08  Sun Mar  6 11:36:52 MSK 2011
+        - detect if child was killed properly (thanks for CPAN testers report).

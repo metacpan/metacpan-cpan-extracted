@@ -1,0 +1,522 @@
+en:D001
+
+this page enables you to put files into and manipulate files on your
+<B>stage</B> area on this server. The following options are currently
+implemented:<UL>
+<LI> <B>Upload:</B> Load files from your disk directly into you <I>stage</I>
+directory
+<LI> <B>Publish:</B> Move files from your stage area to the corresponding
+public directories 
+<LI> <B>Lowercase:</B> Rename files in your <I>stage</I> area to
+the corresponding lowercase names
+<LI> <B>Unzip:</B> Unzip or untar files in your <I>stage</I> directory
+<LI> <B>Linkcheck:</B> Check your files if the links they contain seem OK.
+<LI> <B>Delete:</B> Delete files in your <I>stage</I> directory
+</UL>
+
+de:D001
+
+diese Seite ermöglicht Ihnen einen Zugang zu Ihrem
+<I>Stage</I>-Bereich auf der Kulturbox. Folgende Optionen sind zur
+Zeit implementiert:<UL>
+<LI> <B>Upload:</B> Dateien auf die Kulturbox in Ihr <I>Stage</I>
+Directory laden,
+<LI> <B>Delete:</B> Dateien in Ihrem <I>Stage</I> Directory löschen,
+<LI> <B>Lowercase:</B> Dateien und Directories in Kleinbuchstaben umbenennen,
+<LI> <B>Unzip:</B> Dateien in Ihrem <I>Stage</I> Directory entzippen,
+entcomprimieren oder ent-tar-en,
+<LI> <B>Publish:</B> Dateien von Ihrem <I>Stage</I> in den öffentlich
+sichtbaren Bereich bewegen.
+<LI> <B>Linkcheck:</B> Dateien in Ihrem <I>Stage</I> Bereich auf gültige
+Links überprüfen.
+</UL>
+
+en:D002
+
+Delete
+
+de:D002
+
+Löschen
+
+en:D003
+
+Publish into public area
+
+de:D003
+
+In den öffentlichen Bereich schieben
+
+en:D004
+
+Uncompress/Untar/Unzip
+
+de:D004
+
+Uncompress/Untar/Unzip
+
+de:D005
+
+In Kleinbuchstaben umbenennen
+
+en:D005
+
+Rename file to lowercase
+
+de:D006
+
+Bericht über Links erstellen
+
+en:D006
+
+Report bad links
+
+de:D007
+
+Sie hatten versucht, eine Datei in Ihr Stagedirectory zu überspielen,
+aber der Dateiname wurde nicht übermittelt. Bitte probieren Sie es
+noch einmal oder wenden Sie sich an den Hauswart.
+
+en:D007
+
+You seem to have tried to upload a file into your stage directory but
+the filename was not transmitted. Please try again.
+
+de:D008
+
+Fehler: illegaler Dateiname: %s -- ignoriert<BR>
+
+en:D008
+
+Error: illegal filename: %s -- ignored<BR>
+
+de:D009
+
+Fehler: Datei nicht gefunden: %s -- ignoriert<BR>
+
+en:D009
+
+Error: file not found: %s -- ignored<BR>
+
+de:D010
+
+Sie müssen die Datei(en) anklicken, für welche die Aktion
+"%s" ausgeführt werden soll. Nothing done.
+
+en:D010
+
+You have to click on the file(s) for which you want to have
+action "%s" executed. Nothing done.
+
+de:D011
+
+Illegale Aktion "%s". Nothing done.<BR>
+
+en:D011
+
+Illegal action "%s". Nothing done.<BR>
+
+de:D012
+
+In Ihrer Anfrage war keine Aktion angegeben. Bitte wählen
+sie eine Aktion, bevor Sie auf "%s" klicken. Nothing done.<BR>
+
+en:D012
+
+In your request there was not action spacified. Please
+select an action before you click on "%s". Nothing done.<BR>
+
+de:D013
+
+Aktion ausführen
+
+en:D013
+
+Perform action
+
+de:D014
+
+Sie haben soeben die Datei <A HREF="%s/%s">%s</A>
+in Ihr Directory "%s" eingespielt. Danke, sie ist angekommen.
+Bitte wählen Sie unten weitere Optionen, was mit dieser Datei
+geschehen soll.
+
+en:D014
+
+You have just uploaded the file <A HREF="%s/%s">%s</A> into your
+directory "%s". Please choose below further options for processing.
+
+de:D015
+
+Zur Zeit enthält Ihr Stage Directory die unten aufgelisteten Dateien.
+Bitte wählen Sie sowohl eine Aktion und klicken sie die Dateien an,
+für welche die Aktion ausgeführt werden soll. Klicken Sie dann
+"%s".<BR>
+
+en:D015
+
+Currently your directory contains the files listed below. Please
+select the files by clicking for which an action should be taken,
+choose the action to be taken and press <B>%s</B>.<BR>
+
+en:D016
+
+Select<BR>for action
+
+de:D016
+
+Auswahl<BR>für Aktion
+
+de:D017
+
+Dateiname
+
+en:D017
+
+Filename
+
+de:D018
+
+Größe
+
+en:D018
+
+Size
+
+de:D019
+
+Änderungsdatum
+
+en:D019
+
+Modification Date
+
+de:D020
+
+Keine Dateien in Ihrem STAGE directory gefunden
+
+en:D020
+
+No files in your STAGE directory
+
+de:D021
+
+Kulturbox File Upload
+
+en:D021
+
+Kulturbox File Upload
+
+de:D022
+
+<B>Fehler</B> beim Versuch "%s": %s<BR>
+
+en:D022
+
+<B>Error</B> while trying "%s": "%s"<BR>
+
+de:D023
+
+<B>publish</B> <A HREF="%s">%s</A><BR>
+
+en:D023
+
+<B>publish</B> <A HREF="%s">%s</A><BR>
+
+de:D024
+
+Folgende Transaction wurde aus Sicherheitsgründen nicht
+unmittelbar ausgeführt:
+
+en:D024
+
+For security reasons the following transaction was not executed
+immediately:
+
+de:D025
+
+Die folgenden Transactionen wurden aus Sicherheitsgründen nicht
+unmittelbar ausgeführt:
+
+en:D025
+
+For security reasons the following transactions were not executed
+immediately:
+
+de:D026
+
+Um diese Aktion auszuführen, besuchen Sie bitte den folgenden
+URL innerhalb von 72 Stunden. Wenn Sie die Aktion nicht wünschen,
+brauchen sie nichts zu tun, sie verfällt automatisch nach Zeitablauf.
+
+en:D026
+
+To confirm that you request this activity, please visit the following
+URL within 72 hours. Otherwise, do nothing. The ticket will be
+cancelled automatically after a while.
+
+de:D027
+
+Transaktionsticket
+
+en:D027
+
+Transaction Ticket
+
+de:D028
+
+Sicherheitskritische Transaktionen bedürfen einer separaten
+Bestätigung. Bitte warten Sie auf die Email mit dem Bestätigungs-URL,
+die wir Ihnen soeben an die Adresse &lt;%s&gt;
+zugeschickt haben.
+
+en:D028
+
+Security related transactions need a separate confirmation. Please wait
+for the email with the URL that lets you confirm the requested activity.
+We just sent it to &lt;%s&gt;.
+
+de:D029
+
+Problem beim Senden des Transaktionstickets: %s<P>
+
+en:D029
+
+Problem when trying to send a transaction ticket: %s<P>
+
+de:D030
+
+Ich möchte folgende Datei von meinem Rechner auf den Server laden:
+
+en:D030
+
+I want to upload the following file to the server:
+
+de:D031
+
+Ich möchte diese Datei in folgendem STAGE Directory haben (bitte
+beachten Sie, daß Sie nur in bzw. unter folgenden Directories
+Schreibberechtigung haben:
+
+en:D031
+
+I want the stage directory for this file to be
+the following (please take into account that you only have upload
+permissions for locations below:
+
+de:D032
+
+Lade in mein Directory
+
+en:D032
+
+Load into my directory
+
+de:D033
+
+Hallo
+
+en:D033
+
+Hello
+
+de:D034
+
+Willkommen
+
+en:D034
+
+Welcome
+
+de:D035
+
+Habe die Ehre,
+
+en:D035
+
+Howdi
+
+de:D036
+
+Einen schönen guten Tag,
+
+en:D036
+
+A pleasant day,
+
+de:D037
+
+Angenehm Sie zu sehen,
+
+en:D037
+
+Pleased to meet you,
+
+de:D038
+
+Guten Morgen,
+
+en:D038
+
+Good morning,
+
+de:D039
+
+Guten Abend
+
+en:D039
+
+Good evening
+
+de:D040
+
+Guten Tag!
+
+en:D040
+
+Good day!
+
+de:D041
+
+Mahlzeit
+
+en:D042
+
+Good afternoon
+
+de:D043
+
+Guten AbendMorgenTagNacht,
+
+en:D043
+
+Good mornevenin'nightday,
+
+de:D044
+
+Dateien in Ihrem Stagedirectory verhalten sich genauso als wären sie
+im entsprechenden öffentlichen Directory, d.h. alle Links auf andere
+Dokumente oder Graphiken werden so gezeigt wie sie später, nach einem
+<I>Publish aller Ihrer Dateien</I> aussehen werden. Ebenso können Sie
+das Erscheinungsbild von Dateien, die bereits im öffentlichen Bereich
+liegen, überprüfen, indem Sie sie mit dem STAGE Prefix aufrufen.
+
+en:D044
+
+Files in your stage directory behave exactly as if they were in the
+corresponding public directory, which means all links to other
+documents or graphics are shown exactly as they will look like later
+after a <I>Publish of all your staged files</I>. You can also check
+the appearance of files that are currently in the public directory but
+not in the stage directory by pretending they were in the staging
+area.
+
+en:D045
+
+removed directory %s<BR>
+
+de:D045
+
+Directory %s gelöscht<BR>
+
+de:D046
+
+<B>Fehler</B> beim Versuch "%s":
+Datei nicht vorhanden<BR>
+
+en:D046
+
+<B>Error</B> trying "$doit":
+File not found or not a file<BR>
+
+de:D047
+
+<B>Fehler</B> beim Versuch "%s": Keine Erlaubnis<BR>
+
+en:D047
+
+<B>Error</B> processing "%s": Permission denied<BR>
+
+de:D048
+
+Folgende Aktivitäten wurden aufgrund, Ihres Tickets %s ausgeführt:<BR>
+
+en:D048
+
+The following activities were performed by means of your ticket %s:<BR>
+
+de:D049
+
+Keine Transaktionen zur Nummer %s gefunden. Nothing done.<BR>
+
+en:D049
+
+No transactions found for ticket %s. Nothing done.<BR>
+
+de:D050
+
+<B>Fehler</B> bei unzip mit Befehl "%s" aufgetreten. Fehlermeldung:
+
+en:D050
+
+<B>Error</B> when trying to unzip with "%s". Error message was:
+
+de:D051
+
+<B>unzip</B> mit system call "%s" ausgeführt.<BR>
+
+en:D051
+
+<B>unzip</B> executed with system call "%s".<BR>
+
+de:D052
+
+Weiss nicht, wie ich %s unzippen soll. Nothing done.<BR>
+
+en:D052
+
+Don't know what to do to unzip %s. Nothing done.<BR>
+
+de:D053
+
+<B>Fehler</B>: Keine Schreibberechtigung für Datei %s. Skipping request.<BR>
+
+en:D053
+
+<B>Error</B>: No write permission for %s. Skipping request.<BR>
+
+de:D054
+
+<B>lowercase</B> %s: ist schon lowercase. Nothing done<BR>
+
+en:D054
+
+<B>lowercase</B> %s: is already lowercase. Nothing done<BR>
+
+de:D055
+
+OK
+
+en:D055
+
+OK
+
+de:D056
+
+Nicht OK
+
+en:D056
+
+Not OK
+
+de:D057
+
+<B>lowercase</B> %s -&gt; %s [%s]<BR>
+
+de:D058
+
+Unbekannte Aktion "%s". Nothing done.<BR>
+
+en:D058
+
+Unknown action "%s". Nothing done.<BR>

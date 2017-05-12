@@ -1,0 +1,55 @@
+{
+   "abstract" : "simple IRC bot that tracks time spent in a channel",
+   "author" : [
+      "Marius Gavrilescu <marius@ieval.ro>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Statsbot",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "IRC::Utils" : "0",
+            "POE" : "0",
+            "POE::Component::IRC::State" : "0",
+            "Text::ParseWords" : "0",
+            "Time::Duration" : "0",
+            "Time::Duration::Parse" : "0",
+            "perl" : "5.014000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://git.ieval.ro/?p=app-statsbot.git"
+      }
+   },
+   "version" : "1.000",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

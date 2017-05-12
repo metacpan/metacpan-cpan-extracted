@@ -1,0 +1,23 @@
+---
+abstract: 'Bayesian Spam Filtering Algorithm'
+author:
+  - 'Gea-Suan Lin <gslin@gslin.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Algorithm-Bayesian
+provides:
+  Algorithm::Bayesian:
+    file: lib/Algorithm/Bayesian.pm
+    version: 0.5
+requires:
+  Math::BigFloat: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.5

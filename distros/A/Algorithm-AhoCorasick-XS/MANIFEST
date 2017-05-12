@@ -1,0 +1,17 @@
+ac.hpp
+ac.xs
+lib/Algorithm/AhoCorasick/XS.pm
+Makefile.PL
+MANIFEST			This list of files
+perlobject.map
+ppport.h
+t/basic.t
+t/details.t
+t/edge_cases.t
+t/utf8.t
+t/variation.t
+typemap
+Changes
+README.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

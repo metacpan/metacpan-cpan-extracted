@@ -1,0 +1,14 @@
+Changes
+lib/Acme/Thoroughly/Modern/Perl.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+Todo
+xt/boilerplate.t
+xt/manifest.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

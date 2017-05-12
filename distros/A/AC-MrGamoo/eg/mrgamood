@@ -1,0 +1,33 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+#
+# example mrmagoo daemon
+
+use Getopt::Std;
+use AC::MrMagoo::D;
+use strict;
+
+our %OPT;
+my @saved_argv = @ARGV;
+
+getopts('c:dDfp:', \%OPT) || die "usage...\n";
+# -c config file
+# -d    enable all debugging
+# -f    foreground
+# -p port
+
+
+my $mrm = AC::MrMagoo::D->new(
+    class_filelist	=> 'My::Code::FileList',
+    class_readinput	=> 'My::Code::ReadInput',
+    class_myself	=> 'My::Code::MySelf',
+   );
+
+
+$mrm->daemon( $OPT{c}, {
+    argv	=> \@saved_argv,
+    foreground	=> $OPT{f},
+    debugall	=> $OPT{d},
+    port	=> $OPT{p},
+} );
+

@@ -1,0 +1,54 @@
+
+<conf>
+  <Standard>
+    <Log-Dispatch logdir="/var/app"/>
+  </Standard>
+  <Authen passwd="/etc/passwd" seed="303292"/>
+  <Session>
+    <default>
+      <class>App::Session::CGI</class>
+    </default>
+  </Session>
+  <Repository>
+    <default>
+      <class>App::Repository::DBI</class>
+      <dbidriver>mysql</dbidriver>
+      <dbname>test</dbname>
+      <dbuser>dbuser</dbuser>
+      <dbpass>dbuser7</dbpass>
+    </default>
+    <test>
+      <class>App::Repository::DBI</class>
+      <dbidriver>mysql</dbidriver>
+      <dbname>test</dbname>
+      <dbuser>dbuser</dbuser>
+      <dbpass>dbuser7</dbpass>
+    </test>
+  </Repository>
+  <ResourceLocker>
+    <default>
+      <class>App::ResourceLocker::IPCLocker</class>
+    </default>
+  </ResourceLocker>
+  <Serializer>
+    <conf>
+      <class>App::Serializer::Properties</class>
+    </conf>
+    <properties>
+      <class>App::Serializer::Properties</class>
+    </properties>
+    <xml>
+      <class>App::Serializer::XMLSimple</class>
+    </xml>
+    <ini>
+      <class>App::Serializer::Ini</class>
+    </ini>
+    <perl>
+      <class>App::Serializer::Perl</class>
+    </perl>
+    <stor>
+      <class>App::Serializer::Storable</class>
+    </stor>
+  </Serializer>
+</conf>
+

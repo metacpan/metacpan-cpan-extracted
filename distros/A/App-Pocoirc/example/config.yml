@@ -1,0 +1,21 @@
+nick: foobar1234
+username: foobar
+
+# these plugin objects will get loaded in every IRC Component
+global_plugins:
+  - [CTCP]
+
+# default local plugins, every component gets its own instance
+local_plugins:
+  - [BotTraffic]
+
+networks:
+  freenode:
+    server:   irc.freenode.net
+    # override default local plugins
+    local_plugins:
+      - [AutoJoin, { Channels: ['#foodsfdsf'] } ]
+  magnet:
+    server: irc.perl.org
+    nick:   hlagherf32fr    # use a different nick on this server
+# vim: sw=2

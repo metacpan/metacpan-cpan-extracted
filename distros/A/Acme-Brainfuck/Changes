@@ -1,0 +1,23 @@
+$Id: Changes,v 1.4 2002/09/23 02:26:31 jaldhar Exp $
+Revision history for Perl extension Acme::Brainfuck.
+
+1.1.1 Tue Apr 06 11:59:00 2004
+	Debian package needed a build dependency on libmodule-build-perl
+
+1.1.0 Tue Apr 06 00:37:00 2004
+	Switched to Module::Build.
+	Really uploaded to Debian for the first time.
+	
+1.0.1 Tue Sep 22 22:15:00 2002
+	Uploaded to Debian for the first time.
+	
+1.0.0 Tue Sep 03 14:30:00 2002
+	Finished test suite by adding tests for , . # ~
+	Uploaded to CPAN
+
+0.9.1 Fri Aug 30 23:25:00 2002
+	Optimized sequences of + - < > by merging them into one perl statement.
+
+0.9.0 Thu Aug 29 07:40:00 2002
+	First publicly released version.
+

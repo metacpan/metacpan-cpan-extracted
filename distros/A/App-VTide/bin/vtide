@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+# Created on: 2016-01-28 10:28:45
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use version;
+use App::VTide;
+
+our $VERSION = version->new('0.1.1');
+
+App::VTide->new->run;

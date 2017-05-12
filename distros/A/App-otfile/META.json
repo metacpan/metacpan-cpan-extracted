@@ -1,0 +1,68 @@
+{
+   "abstract" : "Serve a single file, once, via HTTP over the local network.",
+   "author" : [
+      "Mike Greb <michael@thegrebs.com"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-otfile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Kwalitee" : "1.12",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Clipboard" : "0",
+            "File::MMagic" : "0",
+            "Term::Progressbar" : "0",
+            "URI::Escape" : "0",
+            "UUID::Tiny" : "0"
+         },
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mikegrb/One-Time-File/issues"
+      },
+      "homepage" : "https://github.com/mikegrb/One-Time-File",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mikegrb/One-Time-File.git",
+         "web" : "https://github.com/mikegrb/One-Time-File"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "mikegrb <mgreb@linode.com>"
+   ]
+}
+

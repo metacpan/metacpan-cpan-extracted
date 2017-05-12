@@ -1,0 +1,70 @@
+Apache-AuthLLDAPSympa
+
+FILES
+
+Module files are in the following directory : lib/Apache
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SAMPLE CONFIGURATION
+
+To use AuthNSympa and AuthZSympa with your apache server, here is a sample configuration file:
+
+<VirtualHost *:80>
+    ServerAdmin webmaster@dummy-host.example.com
+    DocumentRoot /www/docs/dummy-host.example.com
+    ServerName dummy-host.example.com
+    ErrorLog logs/dummy-host.example.com-error_log
+    CustomLog logs/dummy-host.example.com-access_log common
+    
+    AddHandler cgi-script .cgi .pl
+    PerlModule Apache2::compat
+
+    #the repertory of the libs of sympa
+    PerlSwitches -I/repertory/to/sympa/sympa/bin/
+    #For loading the handler
+    PerlPostReadRequestHandler Apache2::AuthLLDAPSympa
+    #The LDAP host 
+    PerlSetVar LemonLDAPSympaHost            ldpcentraledev.alize:10389
+    #The LDAP Filter
+    PerlSetVar LemonLDAPSympaFilter   	    (objectclass=*)
+    #The LDAP attribute for email
+    PerlSetVar LemonLDAPSympaEmailAttribute  mail
+    #The choice of the email
+    PerlSetVar LemonLDAPSympaEmailSelect  0
+    #The configuration file of sympa (important for secret)
+    PerlSetVar LemonLDAPSympaConfFile    /repertory/to/sympa/sympa/etc/sympa.conf
+    #The configuration file of the cgi wwsympa.pl
+    PerlSetVar LemonLDAPSympaWWConfFile    /repertory/to/sympa/sympa/etc/wwsympa.conf
+    #the Directory of libs of sympa
+    PerlSetVar LemonLDAPSympaDirectory /repertory/to/sympa/sympa/bin/
+    #the name with directory where is the tools.pl
+    PerlSetVar LemonLDAPSympaToolScript /repertory/to/sympa/sympa/bin/tools.pl
+    #The log filename
+    PerlSetVar LemonLDAPSympaLogFile /logs/to/sympa/loghandler.log
+    #The log mode precision
+    PerlSetVar LemonLDAPSympaLogMode INFO
+    #The script wwsympa
+    ScriptAlias /sympa "/repertory/to/sympa/sympa/bin/wwsympa.fcgi"
+</VirtualHost>
+
+ 
+
+
+
+COPYRIGHT AND LICENCE
+
+
+AuthLLDAPSympa is distributed under the GNU General Public License http://www.gnu.org/copyleft/gpl.html. 
+Copyright (C) 2001, 2003, 2004,2005,2006 Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA 
+Verbatim copying and distribution of this entire article are permitted worldwide, without royalty, in any medium, provided this notice, and the copyright notice, are preserved
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. 
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. 
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. 

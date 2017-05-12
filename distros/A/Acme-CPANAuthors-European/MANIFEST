@@ -1,0 +1,10 @@
+lib/Acme/CPANAuthors/European.pm
+Makefile.PL
+MANIFEST
+t/000_basic.t
+t/950_pod.t
+t/960_pod_coverage.t
+Changes
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

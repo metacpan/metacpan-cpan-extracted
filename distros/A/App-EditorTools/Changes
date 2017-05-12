@@ -1,0 +1,87 @@
+Changes for App::EditorTools
+
+1.00 - Sat Aug 16 09:53:38 EDT 2014
+    Bumps to version 1.00. Been stable for several years now.
+
+0.19 - Thu Jun 19 22:35:51 EDT 2014
+    Let users choose their own leader key, simplify menu
+    Since not all vim users might like to use the comma as their leader, we
+    can simply use "<leader>" instead of "," when mapping the editor tools
+    commands. (Thanks to mannih for the patch.)
+
+    Updates pod and makes layout more github friendly.
+
+0.18 - Tue Dec 10 12:25:15 EST 2013
+    Fixes several problems with the emacs file that's installed. Thankes to
+    lackita++ for the patch on github.
+    * If the command failed, the entire contents of the file would be wiped
+    * out, now it just puts a message in the minibuffer.
+    * Extracted some methods to remove duplication and clarify intent.
+    * Introduce temporary variable was using the start column value as the end
+    * column value. 
+    * Rename package was renaming all packages to the file path name.
+
+    Fixes Changes file to adhere to CPAN::Changes spec
+
+0.17 - Mon Oct 22 15:49:29 EDT 2012
+    Fixes bug in the emacs script RT#80315
+    Improves the vim script
+
+0.16 - Tue Jul 19 10:40:04 EDT 2011
+    Bug fix for tests -- missing SKIP: label on a skip block
+
+0.15 - Thu Jul 14 14:40:36 EDT 2011
+    Added ability to renamepackagefrompath to work through symlinks
+    - Bug fixes
+    - Added versions to all Perl files
+    - Misc cleanup
+
+0.14 - Mon Dec  6 14:28:49 EST 2010
+    Fixed bug that may appear with newer versions of App::Cmd. Thanks to
+    kentnl++ for the report and patch (RT#63018).
+
+0.12 - Tue Mar 30 17:29:06 2010
+    Moved vim/emacs script into a share directory (from DATA).
+    Improved the documenation a bit.
+
+0.11 - Thu Mar 25 13:28:50 2010
+    Minor bug fix to install-emacs command.
+
+0.10 - Thu Mar 25 13:20:30 2010
+    Added install-vim and install-emacs command to make binding install
+    easier and more portable. Improved documentation and testing.
+
+0.09 - Thu Dec 10 12:55:30 2009
+    Added version requirement for Test::More in Build.PL so we can use
+    done_testing().
+
+0.08 - Sat Nov 14 16:56:51 2009
+    Convert tests from IPC::Run3 to App::Cmd::Testers to fix tests on certain platforms
+
+0.07 - Fri Nov 13 13:03:23 2009
+    Removed unnecessary FindBin::libs rereq
+
+0.06 - Wed Sep 23 00:00:00 2009
+    Updated to work with App:Cmd 0.301
+    - changed run sub to execute
+    - changed -run to App->run
+
+    Previous:
+    2009-07-20  Mark Grimes <mgrimes@cpan.org>
+    Added a contributors section to Authors pod
+
+    2009-07-20  Shlomi Fish <shlomif@iglu.org.il>
+    Corrected the wrong path for ftplugin/perl.
+
+    2009-07-20  Shlomi Fish <shlomif@iglu.org.il>
+    Corrected a typo - "script" instead of "scrip".
+
+    2009-07-20  Shlomi Fish <shlomif@iglu.org.il>
+    * INSTALL: Corrected the package name.
+
+    2009-07-06  Mark Grimes <mgrimes@cpan.org>
+    script/editortools-vim: Resolved RT 47635/47616/47617
+    - Added Ovid's PickFromList function to editortools.vim
+    - Fixed dep
+    - Added version info to vim script
+    - Changed shebang

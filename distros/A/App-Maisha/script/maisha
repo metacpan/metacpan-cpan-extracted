@@ -1,0 +1,335 @@
+#!/usr/bin/perl -w
+use strict;
+
+#----------------------------------------------------------------------------
+# Library Modules
+
+use File::HomeDir;
+use FindBin;
+use Getopt::Long;
+use Pod::Usage;
+use lib(File::Spec->catdir($FindBin::Bin, File::Spec->updir, 'lib'));
+
+use App::Maisha;
+
+#----------------------------------------------------------------------------
+# Application
+
+{
+    my ($config,%options);
+
+    # Default config file is expected to be in the user's home directory
+    $config = do {
+        my $home = File::HomeDir->my_home;
+        my $file;
+        for my $suffix (qw(ini yml yaml)) {
+            my $test = "$home/.maisha.$suffix";
+            if (-f $test) {
+                $file = $test;
+                last;
+            }
+        }
+        $file;
+    };
+
+    if (! GetOptions(   \%options,
+                        'config|c=s',
+                        'version|v',
+                        'usage|u',
+                        'help|h'
+    )) {
+        usage(1);
+    }
+
+    usage(1) if($options{usage});
+    usage(0) if($options{version});
+
+    if ($options{help}) {
+        pod2usage(-verbose => 2);
+        exit(0);
+    }
+
+    $options{config} ||= $config;
+    usage(1,"No configuration file was specified and a default one could not be found")
+                                                                unless(   $options{config});
+    usage(1,"Configuration file [$options{config}] not found")  unless(-f $options{config});
+
+    App::Maisha->new(config => $options{config})->run;
+}
+
+
+sub usage {
+    my ($full,$mess) = @_;
+
+    print "\n$mess\n"   if($mess);
+
+    if($full) {
+        print "\n";
+        print "Usage: $0 [--config=<file>] [--help|h] [--usage|u] [--version|v] \n\n";
+
+#              12345678901234567890123456789012345678901234567890123456789012345678901234567890
+        print "maisha - Micro-blogging from your command line.\n\n";
+
+        print "Options:\n";
+        print "  [--config=<file>]  # path to config file\n";
+        print "  [--version]        # program version\n";
+        print "  [--usage]          # basic usage help screen\n";
+        print "  [--help]           # displays the man page\n";
+    }
+
+    print "\n$0 v$App::Maisha::VERSION\n\n";
+    exit(0);
+}
+
+__END__
+
+=head1 NAME
+
+maisha - Micro-blogging From Your Command Line
+
+=head1 SYNOPSIS
+
+   maisha
+   maisha -c mymaisha.ini
+   maisha -v
+   maisha -u
+   maisha -h
+
+=head1 DESCRIPTION
+
+maisha gives you access to micro-blogging from your command line
+
+=head1 OPTIONS
+
+=head2 --config | -c
+
+Specify the config file to read from. By default, maisha attempts to read
+a config file named config.ini in the current directory
+
+=head2 --version | -v
+
+Print out the version and exit
+
+=head2 --usage | -u
+
+Prints out a basic usage help screen
+
+=head2 --help | -h
+
+Print out the manual page.
+
+=head1 CONFIGURATION
+
+The configuration file must contain at least one micro-blogging service, with
+your username and password for that service, all other configuration settings 
+are optional.
+
+The configuration file itself can be in several different formats, XML, YAML, 
+JSON, Windows INI files and even pure Perl are all supported, provided you have
+the correct distributions to support those file formats. As a guide the 
+following are known to work with this application:
+
+  Config::Tiny    - INI file format
+  JSON            - JSON file format
+  JSON::Syck      - JSON file format
+  XML::Simple     - XML file format
+  YAML            - YAML file format
+  YAML::Syck      - YAML file format
+
+For further options for other file formats see L<Config::Tiny> for more 
+information. See also examples listed further below.
+
+By default the INI and YAML file formats are used, with the application looking
+for a default configuration file in your $HOME directory, named '.maisha.ini', 
+'.maisha.yml' or '.maisha.yaml'.
+
+=head2 Application Configuration
+
+The configuration for the application itself are contained within a 'CONFIG' 
+section in your configuration file. All settings are optional, and will default
+to sensible values should they not be user defined.
+
+=over 4
+
+=item * prompt
+
+The prompt you wish to see on the command line. This will default to 'maisha>'
+if not configured.
+
+=item * tag
+
+The tag you wish to have added to the end of an update/say command. This will 
+default to '[from maisha]' if not configured. If you do not wish a tag to
+be added at all, set the tag to '.' in the configuration file.
+
+=item * order
+
+Describes the order for printing status messages when a timeline command is
+requested. Will default to 'descending' if not configured. Setting is case
+insensitive and should be set to 'ascending' or 'asc' to reverse the order.
+
+=item * limit
+
+Describes how many status messages should be printed when a timeline command is
+requested. Will default to the last 20 if not configured.
+
+=item * pager
+
+Enables the use of a pager when viewing timelines.  Defaults to true
+if not specified.
+
+=item * format
+
+When printing a list of status messages, the default format of printing the
+username followed by the status message is not always suitable for everyone. As
+such you can define your own formatting.
+
+The default format is "[%U] %M", with the available formatting patterns defined
+as:
+
+  %U - username or screen name
+  %M - status message
+  %T - timestamp (e.g. Sat Oct 13 19:29:17 +0000 2012)
+  %D - datetime  (e.g. 13/10/2012 19:29:17)
+  %d - date only (e.g. 13/10/2012)
+  %t - time only (e.g. 19:29:17)
+  %N - network
+
+=item * chars
+
+As Maisha is run from the command line, it is most likely being run within a 
+terminal window. Unfortunately there isn't currently a detection method for 
+knowing the exact screen width being used. As such you can specify a width for
+the wrapper to use to ensure the messages are correctly line wrapped. The 
+default setting is 80.
+
+=back
+
+=head2 Service Configuration
+
+For each service you have available (the default install includes 'Identica' 
+and 'Twitter') include an associated section in your configuration file, 
+providing a username and password for that service. If any service fails to 
+connect, a warning is emitted. If the application is not able to connect to
+any service, the application will terminate with an error message.
+
+=over 4
+
+=item * username
+
+Your username login to your network service account
+
+=item * password
+
+Your password login to your network service account
+
+=back
+
+=head1 COMMANDS
+
+Note that not all services offer all commands. Where commands are not
+applicable for a service, and appropriate warning message will be emitted.
+
+=over 4
+
+=item * friends
+
+Displays the most recent status messages from each of your friends.
+
+=item * friends_timeline | ft [<limit>]
+
+Displays the most recent status messages within your friends timeline.
+
+=item * public_timeline | pt [<limit>]
+
+Displays the most recent status messages within the public timeline.
+
+=item * followers
+
+Displays the most recent status messages from each of your followers.
+
+=item * replies | re [<limit>]
+
+Displays the most recent reply messages.
+
+=item * direct_messages | dm [<limit>]
+
+Displays the most recent direct messages you have received.
+
+=item * send_message | send | sm <user> <message>
+
+Post a direct message to another user. Include the username of the person you
+wish to send a message to, followed by your message, of upto 140 characters in
+length.
+
+=item * update | say <message>
+
+Posts a new status message, of upto 140 characters in length.
+
+=item * exit | quit | q
+
+Exits the program.
+
+=item * help
+
+Provides help for a specific command, or provides a summary of the commands
+available if requested with no arguments.
+
+=back
+
+=head2 Example Configuration Files
+
+=head3 INI Style Configuration
+
+Requires Config::Tiny to be available.
+
+  [CONFIG]
+  order=asc
+  tag=.
+
+  [Identica]
+  username=yourlogin
+
+  [Twitter]
+  username=yourlogin
+  password=yourpassword
+
+=head3 YAML Style Configuration
+
+Requires YAML or YAML::Syck to be available.
+
+  --- #YAML:1.0
+  CONFIG:
+    order: asc
+    tag: .
+  
+  Twitter:
+    username: yourlogin
+  
+  Identica:
+    username: yourlogin
+    password: yourpassword
+
+=head3 Perl Style Configuration
+
+No additional dependencies required.
+
+  {
+    CONFIG      => {'order': 'asc','tag': '.'},
+    Twitter     => {'username': 'yourlogin'},
+    Identica    => {'username': 'yourlogin','password': 'yourpassword'},
+  }
+
+=head1 AUTHOR
+
+  Barbie, <barbie@cpan.org>
+  for Miss Barbell Productions <http://www.missbarbell.co.uk>.
+
+=head1 COPYRIGHT AND LICENSE
+
+  Copyright (C) 2009-2012 by Barbie
+
+  This module is free software; you can redistribute it and/or
+  modify it under the Artistic License v2.
+
+=cut

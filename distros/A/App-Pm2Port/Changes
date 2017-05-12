@@ -1,0 +1,12 @@
+Revision history for perl2port
+
+0.29    Mon 11 Jan 2010 15:49:31 MSK
+        Module::Build support
+        now submissions using this module are approved be FreeBSD committers :-)
+0.27    Tue 22 Dec 2009 19:41:56 MSK
+        Comment normalization
+0.26    Wed 16 Dec 2009 15:34:27 MSK
+        fixed pkg-plist generation
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

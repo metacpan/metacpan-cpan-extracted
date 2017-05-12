@@ -1,0 +1,60 @@
+NAME
+    App::Pastebin::sprunge - application for pasting to and reading from
+    sprunge.us
+
+VERSION
+    version 0.012
+
+SYNOPSIS
+        use App::Pastebin::sprunge;
+        my $app = App::Pastebin::sprunge->new();
+        $app->run();
+
+DESCRIPTION
+    App::Pastebin::sprunge provides an application interface to
+    WWW::Pastebin::Sprunge::Create and WWW::Pastebin::Sprunge::Retrieve,
+    which allow creating and retrieving pastes on the <http://sprunge.us>
+    pastebin.
+
+    This distribution provides an executable "sprunge", which provides a
+    simple command-line client for <http://sprunge.us> using this library.
+
+METHODS
+  new
+    new() is the constructor, and creates an application object. Takes no
+    parameters.
+
+  run
+    run() runs the application.
+
+    If *lang* is present, the application will append this to the returned
+    URI. <http://sprunge.us> uses Pygments <http://pygments.org> for syntax
+    highlighting.
+
+AVAILABILITY
+    The project homepage is
+    <http://metacpan.org/release/App-Pastebin-sprunge/>.
+
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <https://metacpan.org/module/App::Pastebin::sprunge/>.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/doherty/App-Pastebin-sprunge> and may be cloned from
+    <git://github.com/doherty/App-Pastebin-sprunge.git>
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at <https://github.com/doherty/App-Pastebin-sprunge/issues>.
+
+AUTHOR
+    Mike Doherty <doherty@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Mike Doherty.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

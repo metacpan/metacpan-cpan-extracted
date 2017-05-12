@@ -1,0 +1,15 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::KTC_EKEY;
+
+die "Usage: $0 str cell\n" if ($#ARGV != 1);
+
+my $string = shift;
+my $cell = shift;
+
+my $key = AFS::KTC_EKEY->StringToKey($string, $cell);
+print "KEY = ", $key->string, " \n";

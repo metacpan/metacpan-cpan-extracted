@@ -1,0 +1,15 @@
+Revision history for Perl extension AnyEvent::Google::PageRank.
+
+0.04  Wed Jan 25 22:35:36 2012
+      - warnings noise in perl >= 5.14 removed
+
+0.03  Sat Oct  8 13:08:33 2011
+      - module works again after changes in the PR url
+      - live test added
+
+0.02  Thu Jun  9 17:19:19 2011
+      - tests fixes
+      - documentation fixes
+
+0.01  Wed Jun  8 23:58:57 2011
+      - original version

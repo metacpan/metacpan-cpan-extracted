@@ -1,0 +1,24 @@
+---
+abstract: 'Role-Based Access Control system'
+author:
+  - 'Daniel Brosseau <dab@catapulse.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Authorization-RBAC
+requires:
+  Config::JFDI: '0'
+  DBIx::Class: '0.082820'
+  Moose::Util::TypeConstraints: '2.1404'
+  MooseX::Object::Pluggable: '0.0011'
+  Path::Class: '0.35'
+  SQL::Translator: '0.11021'
+  UNIVERSAL::require: '0.18'
+  YAML: '1.15'
+version: '0.10'

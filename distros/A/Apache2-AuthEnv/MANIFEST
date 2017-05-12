@@ -1,0 +1,8 @@
+README
+INSTALL
+Changes
+MANIFEST
+Makefile.PL
+t/00class.t
+lib/Apache2/AuthEnv.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,54 @@
+[% WRAPPER head %]
+<style>
+  .record_num    { color: #a00; font-weight: bold; font-size: 120% }
+  .groupname     { font-weight: bold; color: navy; font-size: 110% }
+  .record        { border-top: 1px dashed gray }
+  .criteria      { font-size: 90% }
+  .val           { background-color: #efe }
+  .page_links    { font : 90% Arial black }
+  .check_record  { float: right}
+  .pk            { text-decoration: underline }
+  .message       { width: 60%; color: red; border: 1px solid red; 
+                   font-weight: bold; margin-top: 6px}
+  H1             { margin-bottom : 0}
+  H2             { margin-bottom : 0}
+  #TN_tree       { clear: right }
+</style>
+<script>
+  function setup() {  
+      new GvaScript.TreeNavigator('TN_tree');
+  }
+  window.onload = setup;
+</script>
+
+[% END; # WRAPPER head %]
+
+[%# ---------- start body ---------- %]
+
+<div class="actions">
+  [% SET table_url = dsbase _ "table/" _ data.table; %]
+  <a href="[% table_url %]/descr">describe</a> | 
+  <a href="[% table_url %]/search">search</a> this table
+  <br>
+  <br>
+  [% UNLESS c.app.readonly %]
+    <a href="[% table_url %]/update?[% data.where_pk | utf8_url %]">update</a> |
+    <a href="[% table_url %]/delete?[% data.where_pk | utf8_url %]">delete</a> |
+    <a href="[% table_url %]/clone/[% data.pk_val | utf8_url %]">clone</a> this record
+  [% END %]
+</div>
+
+<h1>Record from [% data.table %]</h1>
+
+
+[% # maybe a message coming from the last insert() 
+   SET message_key = "-message";
+   SET message     = c.req_data.$message_key;
+   "<div class='message'>$message</div>" IF message; %]
+
+
+<h2>Primary key [% data.pk_val %]</h2>
+
+<div id="TN_tree">
+      [% INCLUDE src/table/_record.tt row=data.row %]
+</div>

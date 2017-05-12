@@ -1,0 +1,2081 @@
+
+
+<html>
+<head>
+<title>Apache::ASP::Objects</title>
+
+
+
+<style type="text/css">
+<!--
+      td {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      font {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      .title {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 16px}
+
+
+
+
+-->
+</style>
+
+
+</head>
+<body bgcolor=black link=#063678 alink=#ff5599 vlink=#993399
+marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
+
+
+
+
+<center>
+<table border=0 cellpadding=0 width=99% cellspacing=8>
+<tr><td align=center>
+
+<table border=0 cellpadding=3 width=100% cellspacing=0>
+<tr bgcolor=#063678>
+<td>
+	<table border=0 cellpadding=1 cellspacing=0 width=100%>
+	<tr>
+	<td><img border=0 src=asptitlelogo.gif alt="Apache::ASP" width=267 height=44 ></td>	
+	
+		<td align=right></td>
+	
+	</tr>
+	</table>
+</td>
+</tr>
+<tr>
+  <td bgcolor=#005196 align=center>
+    <b>
+    <font color=#ffffff>&lt;% Web Applications with Apache &amp; mod_perl %&gt;</font>  
+    </b>
+  </td>
+</tr>
+</table>
+
+
+<table border=0 cellpadding=10 cellspacing=0 width=100% bgcolor=#005196>
+<tr>
+<td valign=top width=120 bgcolor=#005196>
+    
+        <table cellpadding=5 cellspacing=0 border=1 bgcolor=white><tr><td>
+
+	<table border=0 cellpadding=0 cellspacing=0 width=105 bgcolor=white>
+	
+	
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="index.html" style="text-decoration:none"><font color=#063678>INTRO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="install.html" style="text-decoration:none"><font color=#063678>INSTALL</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="config.html" style="text-decoration:none"><font color=#063678>CONFIG</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="syntax.html" style="text-decoration:none"><font color=#063678>SYNTAX</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="events.html" style="text-decoration:none"><font color=#063678>EVENTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>%</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><font color=#993399>OBJECTS</font></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="ssi.html" style="text-decoration:none"><font color=#063678>SSI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sessions.html" style="text-decoration:none"><font color=#063678>SESSIONS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="xml.html" style="text-decoration:none"><font color=#063678>XML/XSLT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="cgi.html" style="text-decoration:none"><font color=#063678>CGI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="perlscript.html" style="text-decoration:none"><font color=#063678>PERLSCRIPT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="style.html" style="text-decoration:none"><font color=#063678>STYLE GUIDE</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="faq.html" style="text-decoration:none"><font color=#063678>FAQ</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="tuning.html" style="text-decoration:none"><font color=#063678>TUNING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="kudos.html" style="text-decoration:none"><font color=#063678>CREDITS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="support.html" style="text-decoration:none"><font color=#063678>SUPPORT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sites.html" style="text-decoration:none"><font color=#063678>SITES USING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="testimonials.html" style="text-decoration:none"><font color=#063678>TESTIMONIALS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="resources.html" style="text-decoration:none"><font color=#063678>RESOURCES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="todo.html" style="text-decoration:none"><font color=#063678>TODO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="changes.html" style="text-decoration:none"><font color=#063678>CHANGES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="license.html" style="text-decoration:none"><font color=#063678>LICENSE</font></a></nobr></b></font></td>		
+
+		</tr>
+		<tr><td colspan=2><hr size=1></td></tr>
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="eg/index.html" style="text-decoration:none"><font color=#063678>EXAMPLES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+	</table>
+
+	</td></tr>
+	</table>
+
+		<br>
+		<center>
+		<a href=http://www.apache-asp.org/><img src="powered_by_apache_asp.jpg" width="88" height="31" alt="Powered by Apache::ASP" border="0"></a>
+		<br>
+		<a href=http://perl.apache.org><img src="powered_by_modperl.gif" width="88" height="31" alt="Powered by ModPerl and Apache" border="0"></a>
+		<br>
+		<a href=http://www.perl.com><img src="rectangle_power_perl.gif" width="88" height="31" alt="Powered by Perl" border="0"></a>
+		</center>
+
+</center>
+
+</td>
+
+
+
+<td valign=top bgcolor=white>
+<font size=+0 face=verdana,arial>
+
+<font face=verdana><font class=title size=+1 color=#555555><b>OBJECTS</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>The beauty of the ASP Object Model is that it takes the
+burden of <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a> and Session Management off the developer, 
+and puts them in objects accessible from any
+ASP script &amp; include.  For the perl programmer, treat these objects
+as globals accessible from anywhere in your ASP application.
+<font face="courier new" size=3><pre>
+</pre></font>The Apache::ASP object model supports the following:
+<font face="courier new" size=3><pre>
+  Object         Function
+  ------         --------
+  $Session      - user session state
+  $Response     - output to browser
+  $Request      - input from browser
+  $Application  - application state
+  $Server       - general methods
+</pre></font>These objects, and their methods are further defined in the 
+following sections.
+<font face="courier new" size=3><pre>
+</pre></font>If you would like to define your own global objects for use 
+in your scripts and includes, you can initialize them in 
+the global.asa Script_OnStart like:
+<font face="courier new" size=3><pre>
+ use vars qw( $Form $Site ); # declare globals
+ sub Script_OnStart {
+     $Site = My::Site-&gt;new;  # init $Site object
+     $Form = $Request-&gt;Form; # alias form data
+     $Server-&gt;RegisterCleanup(sub { # garbage collection
+				  $Site-&gt;DESTROY; 
+				  $Site = $Form = undef; 
+			      });
+ }
+</pre></font>In this way you can create site wide application objects
+and simple aliases for common functions.</font>
+
+	<hr size=1>
+	<table width=100% border=0 cellpadding=1 cellspacing=3>
+	<tr>
+	<td valign=top><font face="lucida console" size=-1>
+	
+		<tr>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#%24Session%20Obj517fb3b8><font color=white>$Session Object</font></a></b></font>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3EW0307fe16>$Response->Write($data)</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Session-%3E%7BCa919a318>$Session->{CodePage}</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Session-%3E%7BL2343b3bf>$Session->{LCID}</a>
+			</font>
+			</td>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#%24Request%20Objc3cab62e><font color=white>$Request Object</font></a></b></font>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Session-%3E%7BS1049f4e8>$Session->{SessionID}</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Request-%3E%7BM81641f4a>$Request->{Method}</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Session-%3E%7BTf539b225>$Session->{Timeout} [= $minutes]</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Request-%3E%7BT6acbcf5a>$Request->{TotalBytes}</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Session-%3EAbc5f4cea0>$Session->Abandon()</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Request-%3EBi2e1177cf>$Request->BinaryRead([$length])</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Session-%3ELocc872f91>$Session->Lock()  </a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Request-%3ECled50cd44>$Request->ClientCertificate()</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Session-%3EUnc1c1024f>$Session->UnLock()</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Request-%3ECoe6d79e01>$Request->Cookies($name [,$key])</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Request-%3EFi6799fcec>$Request->FileUpload($form_field, $key)</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#%24Response%20Ob5268b3d4><font color=white>$Response Object</font></a></b></font>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Request-%3EFo76659178>$Request->Form($name)</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3E%7B4a870234>$Response->{BinaryRef}</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Request-%3EPa455879ca>$Request->Params($name)</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3E%7Ba1012197>$Response->{Buffer}</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Request-%3EQu7330a0a3>$Request->QueryString($name)</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3E%7B5be79ef4>$Response->{CacheControl}</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Request-%3ESe3a73f873>$Request->ServerVariables($name)</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3E%7Bad3d9995>$Response->{Charset}</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3E%7Bd81fcef3>$Response->{Clean} = 0-9;</a>
+			</font>
+			</td>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#%24Application971dfe6c><font color=white>$Application Object</font></a></b></font>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3E%7Bc7488fa7>$Response->{ContentType} = "text/html"</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Application7d01ce04>$Application->Lock()</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3E%7Bbbff130a>$Response->{Debug} = 1|0</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Application2899ee54>$Application->UnLock()</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3E%7Bf2954302>$Response->{Expires} = $time</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Applicationaeaabc29>$Application->GetSession($sess_id)</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3E%7B0a525d33>$Response->{ExpiresAbsolute} = $date</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Application7441b337>$Application->SessionCount()</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3E%7Bf2167225>$Response->{FormFill} = 0|1</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3E%7Bf284792c>$Response->{IsClientConnected}</a>
+			</font>
+			</td>
+		
+			<td valign=top bgcolor=#005196>
+			<font face="lucida console" size=-1>
+			<font color=white><b><a href=#%24Server%20Objeed08cf85><font color=white>$Server Object</font></a></b></font>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3E%7Bc48a3e9e>$Response->{PICS}</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Server-%3E%7BSc74a89b4a>$Server->{ScriptTimeout} = $seconds</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3E%7B7098f2f6>$Response->{Status} = $status</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Server-%3ECon7d9785f8>$Server->Config($setting)</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3EA8c17d8af>$Response->AddHeader($name, $value)</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Server-%3ECre0144679e>$Server->CreateObject($program_id)</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3EA1b47bb43>$Response->AppendToLog($message)</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Server-%3EExec0fa247a>$Server->Execute($file, @args)</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3EB202b8013>$Response->BinaryWrite($data)</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Server-%3EFileaa99842>$Server->File()</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3EC08958c05>$Response->Clear()</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Server-%3EGetb3d1ac42>$Server->GetLastError()</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3ECd77d06d7>$Response->Cookies($name, [$key,] $value)</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Server-%3EHTMb165f10b>$Server->HTMLEncode( $string || \$string )</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3EDe321f073>$Response->Debug(@args)</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Server-%3EMapd3711f06>$Server->MapInclude($include)</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3EE295b6523>$Response->End()</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Server-%3EMap0fe1ebb5>$Server->MapPath($url);</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3EE0139cee1>$Response->ErrorDocument($code, $uri)</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Server-%3EMai03cc9918>$Server->Mail(\%mail, %smtp_args);</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3EF8d6e0efc>$Response->Flush()</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Server-%3EReg38562b5d>$Server->RegisterCleanup($sub) </a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3EI2a8df2f3>$Response->Include($filename, @args)</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Server-%3ETra98c592dc>$Server->Transfer($file, @args)</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3EIa3beea1e>$Response->Include(\%cache_args, @sub_args) *CACHE API*</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Server-%3EURL3674cef0>$Server->URLEncode($string)</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3EI368566a8>$Response->Include(\$script_text, @args)</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Server-%3EURL6c8bf743>$Server->URL($url, \%params) </a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3EIbe084bb0>$Response->IsClientConnected()</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Server-%3EXSL7df794aa>$Server->XSLT(\$xsl_data, \$xml_data)</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3ER0203b227>$Response->Redirect($url)</a>
+			</font>
+			</td>
+		<td>&nbsp;</td>					
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Response-%3ET13ecbe6d>$Response->TrapInclude($file, @args)</a>
+			</font>
+			</td>
+		<td>&nbsp;</td>					
+		</tr>
+			
+	</table>
+	<hr size=1>
+	<p>
+
+	<p>
+	<a name=%24Session%20Obj517fb3b8></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$Session Object</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>The $Session object keeps track of user and web client state, in
+a persistent manner, making it relatively easy to develop web 
+applications.  The $Session state is stored across HTTP connections,
+in database files in the Global or StateDir directories, and will 
+persist across web server restarts. 
+<font face="courier new" size=3><pre>
+</pre></font>The user session is referenced by a 128 bit / 32 byte MD5 hex hashed cookie, 
+and can be considered secure from session id guessing, or session hijacking.
+When a hacker fails to guess a session, the system times out for a
+second, and with 2**128 (3.4e38) keys to guess, a hacker will not be 
+guessing an id any time soon.  
+<font face="courier new" size=3><pre>
+</pre></font>If an incoming cookie matches a timed out or non-existent session,
+a new session is created with the incoming id.  If the id matches a
+currently active session, the session is tied to it and returned.
+This is also similar to the Microsoft ASP implementation.
+<font face="courier new" size=3><pre>
+</pre></font>The $Session reference is a hash ref, and can be used as such to 
+store data as in: 
+<font face="courier new" size=3><pre>
+    $Session-&gt;{count}++;	# increment count by one
+    %{$Session} = ();	# clear $Session data
+</pre></font>The $Session object state is implemented through MLDBM,
+and a user should be aware of the limitations of MLDBM.  
+Basically, you can read complex structures, but not write 
+them, directly:
+<font face="courier new" size=3><pre>
+  $data = $Session-&gt;{complex}{data};     # Read ok.
+  $Session-&gt;{complex}{data} = $data;     # Write NOT ok.
+  $Session-&gt;{complex} = {data =&gt; $data}; # Write ok, all at once.
+</pre></font>Please see MLDBM for more information on this topic.
+$Session can also be used for the following methods and properties:</font>
+	
+	<p>
+	<a name=%24Session-%3E%7BCa919a318></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Session->{CodePage}</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Not implemented.  May never be until someone needs it.</font>
+	
+	<p>
+	<a name=%24Session-%3E%7BL2343b3bf></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Session->{LCID}</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Not implemented.  May never be until someone needs it.</font>
+	
+	<p>
+	<a name=%24Session-%3E%7BS1049f4e8></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Session->{SessionID}</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>SessionID property, returns the id for the current session,
+which is exchanged between the client and the server as a cookie.</font>
+	
+	<p>
+	<a name=%24Session-%3E%7BTf539b225></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Session->{Timeout} [= $minutes]</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Timeout property, if minutes is being assigned, sets this 
+default timeout for the user session, else returns 
+the current session timeout.  
+<font face="courier new" size=3><pre>
+</pre></font>If a user session is inactive for the full
+timeout, the session is destroyed by the system.
+No one can access the session after it times out, and the system
+garbage collects it eventually.</font>
+	
+	<p>
+	<a name=%24Session-%3EAbc5f4cea0></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Session->Abandon()</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>The abandon method times out the session immediately.  All Session
+data is cleared in the process, just as when any session times out.</font>
+	
+	<p>
+	<a name=%24Session-%3ELocc872f91></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Session->Lock()  </b></font>
+<font face="courier new" size=3><pre>
+</pre></font>API extension. If you are about to use $Session for many consecutive 
+reads or writes, you can improve performance by explicitly locking 
+$Session, and then unlocking, like:
+<font face="courier new" size=3><pre>
+  $Session-&gt;Lock();
+  $Session-&gt;{count}++;
+  $Session-&gt;{count}++;
+  $Session-&gt;{count}++;
+  $Session-&gt;UnLock();  
+</pre></font>This sequence causes $Session to be locked and unlocked only
+1 time, instead of the 6 times that it would be locked otherwise,
+2 for each increment with one to read and one to write.
+<font face="courier new" size=3><pre>
+</pre></font>Because of flushing issues with SDBM_File and DB_File databases,
+each lock actually ties fresh to the database, so the performance
+savings here can be considerable.  
+<font face="courier new" size=3><pre>
+</pre></font>Note that if you have SessionSerialize set, $Session is
+already locked for each script invocation automatically, as if
+you had called $Session-&gt;Lock() in Script_OnStart.  Thus you 
+do not need to worry about $Session locking for performance.
+Please read the section on SessionSerialize for more info.</font>
+	
+	<p>
+	<a name=%24Session-%3EUnc1c1024f></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Session->UnLock()</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>API Extension. Unlocks the $Session explicitly.  If you do not call this,
+$Session will be unlocked automatically at the end of the 
+script.</font>
+	
+	<p>
+	<a name=%24Response%20Ob5268b3d4></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$Response Object</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>This object manages the output from the ASP Application and the 
+client web browser.  It does not store state information like the 
+$Session object but does have a wide array of methods to call.</font>
+	
+	<p>
+	<a name=%24Response-%3E%7B4a870234></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->{BinaryRef}</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>API extension. This is a perl reference to the buffered output of 
+the $Response object, and can be used in the Script_OnFlush
+global.asa event to modify the buffered output at runtime
+to apply global changes to scripts output without having to 
+modify all the scripts.  These changes take place before 
+content is flushed to the client web browser.
+<font face="courier new" size=3><pre>
+ sub Script_OnFlush {
+   my $ref = $Response-&gt;{BinaryRef};
+   $$ref =~ s/\s+/ /sg; # to strip extra white space
+ }
+</pre></font>Check out the <a href=eg/global.asa>./site/eg/global.asa</a> for an example of its use.</font>
+	
+	<p>
+	<a name=%24Response-%3E%7Ba1012197></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->{Buffer}</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Default 1, when TRUE sends output from script to client only at
+the end of processing the script.  When 0, response is not buffered,
+and client is sent output as output is generated by the script.</font>
+	
+	<p>
+	<a name=%24Response-%3E%7B5be79ef4></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->{CacheControl}</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Default &quot;private&quot;, when set to public allows proxy servers to 
+cache the content.  This setting controls the value set
+in the HTTP header Cache-Control</font>
+	
+	<p>
+	<a name=%24Response-%3E%7Bad3d9995></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->{Charset}</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>This member when set appends itself to the value of the Content-Type
+HTTP header.  If $Response-&gt;{Charset} = &#39;ISO-LATIN-1&#39; is set, the 
+corresponding header would look like:
+<font face="courier new" size=3><pre>
+  Content-Type: text/html; charset=ISO-LATIN-1
+</pre></font>
+	
+	<p>
+	<a name=%24Response-%3E%7Bd81fcef3></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->{Clean} = 0-9;</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>API extension. Set the Clean level, default 0, on a per script basis.  
+Clean of 1-9 compresses text/html output.  Please see
+the Clean config option for more information. This setting may
+also be useful even if using compression to obfuscate HTML.</font>
+	
+	<p>
+	<a name=%24Response-%3E%7Bc7488fa7></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->{ContentType} = "text/html"</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Sets the MIME type for the current response being sent to the client.
+Sent as an HTTP header.</font>
+	
+	<p>
+	<a name=%24Response-%3E%7Bbbff130a></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->{Debug} = 1|0</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>API extension.  Default set to value of Debug config.  May be
+used to temporarily activate or inactivate $Response-&gt;Debug()
+behavior.  Something like:
+<font face="courier new" size=3><pre>
+ {
+   local $Response-&gt;{Debug} = 1;
+   $Response-&gt;Debug($values);
+ }
+</pre></font>maybe be used to always log something.  The Debug()
+method can be better than AppendToLog() because it will
+log data in data structures one level deep, whereas
+AppendToLog prints just raw string/scalar values.</font>
+	
+	<p>
+	<a name=%24Response-%3E%7Bf2954302></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->{Expires} = $time</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Sends a response header to the client indicating the $time 
+in SECONDS in which the document should expire.  A time of 0 means
+immediate expiration.  The header generated is a standard
+HTTP date like: &quot;Wed, 09 Feb 1994 22:23:32 GMT&quot;.</font>
+	
+	<p>
+	<a name=%24Response-%3E%7B0a525d33></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->{ExpiresAbsolute} = $date</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Sends a response header to the client with $date being an absolute
+time to expire.  Formats accepted are all those accepted by 
+HTTP::Date::str2time(), e.g.
+<font face="courier new" size=3><pre>
+ &quot;Wed, 09 Feb 1994 22:23:32 GMT&quot;     -- HTTP format
+ &quot;Tuesday, 08-Feb-94 14:15:29 GMT&quot;   -- old rfc850 HTTP format
+
+ &quot;08-Feb-94&quot;       -- old rfc850 HTTP format    
+ &quot;09 Feb 1994&quot;     -- proposed new HTTP format  
+
+ &quot;Feb  3  1994&quot;    -- Unix &#39;ls -l&#39; format
+ &quot;Feb  3 17:03&quot;    -- Unix &#39;ls -l&#39; format
+</pre></font>
+	
+	<p>
+	<a name=%24Response-%3E%7Bf2167225></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->{FormFill} = 0|1</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>If true, HTML forms generated by the script output will
+be auto filled with data from $Request-&gt;Form.  This feature
+requires HTML::FillInForm to be installed.  Please see
+the FormFill <a href=config.html><font size=-1 face=verdana><b>CONFIG</b></font></a> for more information.
+<font face="courier new" size=3><pre>
+</pre></font>This setting overrides the FormFill config at runtime
+for the script execution only.</font>
+	
+	<p>
+	<a name=%24Response-%3E%7Bf284792c></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->{IsClientConnected}</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>1 if web client is connected, 0 if not.  This value
+starts set to 1, and will be updated whenever a
+$Response-&gt;Flush() is called.  If BufferingOn is
+set, by default $Response-&gt;Flush() will only be
+called at the end of the HTML output.  
+<font face="courier new" size=3><pre>
+</pre></font>As of version 2.23 this value is updated correctly
+before global.asa Script_OnStart is called, so 
+global script termination may be correctly handled
+during that event, which one might want to do 
+with excessive user STOP/RELOADS when the web 
+server is very busy.
+<font face="courier new" size=3><pre>
+</pre></font>An API extension $Response-&gt;IsClientConnected
+may be called for refreshed connection status
+without calling first a $Response-&gt;Flush</font>
+	
+	<p>
+	<a name=%24Response-%3E%7Bc48a3e9e></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->{PICS}</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>If this property has been set, a PICS-Label HTTP header will be
+sent with its value.  For those that do not know, PICS is a header
+that is useful in rating the internet.  It stands for 
+Platform for Internet Content Selection, and you can find more
+info about it at: <a href=http://www.w3.org>http://www.w3.org</a></font>
+	
+	<p>
+	<a name=%24Response-%3E%7B7098f2f6></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->{Status} = $status</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Sets the status code returned by the server.  Can be used to
+set messages like 500, internal server error</font>
+	
+	<p>
+	<a name=%24Response-%3EA8c17d8af></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->AddHeader($name, $value)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Adds a custom header to a web page.  Headers are sent only before any
+text from the main page is sent, so if you want to set a header
+after some text on a page, you must turn BufferingOn.</font>
+	
+	<p>
+	<a name=%24Response-%3EA1b47bb43></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->AppendToLog($message)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Adds $message to the server log.  Useful for debugging.</font>
+	
+	<p>
+	<a name=%24Response-%3EB202b8013></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->BinaryWrite($data)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Writes binary data to the client.  The only
+difference from $Response-&gt;Write() is that $Response-&gt;Flush()
+is called internally first, so the data cannot be parsed 
+as an html header.  Flushing flushes the header if has not
+already been written.
+<font face="courier new" size=3><pre>
+</pre></font>If you have set the $Response-&gt;{ContentType}
+to something other than text/html, cgi header parsing (see <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a>
+notes), will be automatically be turned off, so you will not
+necessarily need to use BinaryWrite for writing binary data.
+<font face="courier new" size=3><pre>
+</pre></font>For an example of BinaryWrite, see the binary_write.htm example 
+in <a href=eg/binary_write.htm>./site/eg/binary_write.htm</a>
+<font face="courier new" size=3><pre>
+</pre></font>Please note that if you are on Win32, you will need to 
+call binmode on a file handle before reading, if 
+its data is binary.</font>
+	
+	<p>
+	<a name=%24Response-%3EC08958c05></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->Clear()</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Erases buffered ASP output.</font>
+	
+	<p>
+	<a name=%24Response-%3ECd77d06d7></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->Cookies($name, [$key,] $value)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Sets the key or attribute of cookie with name $name to the value $value.
+If $key is not defined, the Value of the cookie is set.
+ASP CookiePath is assumed to be / in these examples.
+<font face="courier new" size=3><pre>
+ $Response-&gt;Cookies(&#39;name&#39;, &#39;value&#39;); 
+  --&gt; Set-Cookie: name=value; path=/
+
+ $Response-&gt;Cookies(&quot;Test&quot;, &quot;data1&quot;, &quot;test value&quot;);     
+ $Response-&gt;Cookies(&quot;Test&quot;, &quot;data2&quot;, &quot;more test&quot;);      
+ $Response-&gt;Cookies(
+	&quot;Test&quot;, &quot;Expires&quot;, 
+	&amp;HTTP::Date::time2str(time+86400)
+	); 
+ $Response-&gt;Cookies(&quot;Test&quot;, &quot;Secure&quot;, 1);               
+ $Response-&gt;Cookies(&quot;Test&quot;, &quot;Path&quot;, &quot;/&quot;);
+ $Response-&gt;Cookies(&quot;Test&quot;, &quot;Domain&quot;, &quot;host.com&quot;);
+  --&gt;	Set-Cookie:Test=data1=test%20value&amp;data2=more%20test;	\
+ 		expires=Fri, 23 Apr 1999 07:19:52 GMT;		\
+ 		path=/; domain=host.com; secure
+</pre></font>The latter use of $key in the cookies not only sets cookie attributes
+such as Expires, but also treats the cookie as a hash of key value pairs
+which can later be accesses by
+<font face="courier new" size=3><pre>
+ $Request-&gt;Cookies(&#39;Test&#39;, &#39;data1&#39;);
+ $Request-&gt;Cookies(&#39;Test&#39;, &#39;data2&#39;);
+</pre></font>Because this is perl, you can (NOT PORTABLE) reference the cookies
+directly through hash notation.  The same 5 commands above could be compressed to:
+<font face="courier new" size=3><pre>
+ $Response-&gt;{Cookies}{Test} = 
+	{ 
+		Secure	=&gt; 1, 
+		Value	=&gt;	
+			{
+				data1 =&gt; &#39;test value&#39;, 
+				data2 =&gt; &#39;more test&#39;
+			},
+		Expires	=&gt; 86400, # not portable, see above
+		Domain	=&gt; &#39;host.com&#39;,
+		Path    =&gt; &#39;/&#39;
+	};
+</pre></font>and the first command would be:
+<font face="courier new" size=3><pre>
+ # you don&#39;t need to use hash notation when you are only setting 
+ # a simple value
+ $Response-&gt;{Cookies}{&#39;Test Name&#39;} = &#39;Test Value&#39;; 
+</pre></font>I prefer the hash notation for cookies, as this looks nice, and is 
+quite perlish.  It is here to stay.  The Cookie() routine is 
+very complex and does its best to allow access to the 
+underlying hash structure of the data.  This is the best emulation 
+I could write trying to match the Collections functionality of 
+cookies in IIS ASP.
+<font face="courier new" size=3><pre>
+</pre></font>For more information on Cookies, please go to the source at
+<a href=http://home.netscape.com/newsref/std/cookie_spec.html>http://home.netscape.com/newsref/std/cookie_spec.html</a></font>
+	
+	<p>
+	<a name=%24Response-%3EDe321f073></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->Debug(@args)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>API Extension. If the Debug config option is set greater than 0, 
+this routine will write @args out to server error log.  refs in @args 
+will be expanded one level deep, so data in simple data structures
+like one-level hash refs and array refs will be displayed.  CODE
+refs like
+<font face="courier new" size=3><pre>
+ $Response-&gt;Debug(sub { &quot;some value&quot; });
+</pre></font>will be executed and their output added to the debug output.
+This extension allows the user to tie directly into the
+debugging capabilities of this module.
+<font face="courier new" size=3><pre>
+</pre></font>While developing an app on a production server, it is often 
+useful to have a separate error log for the application
+to catch debugging output separately.  One way of implementing 
+this is to use the Apache ErrorLog configuration directive to 
+create a separate error log for a virtual host. 
+<font face="courier new" size=3><pre>
+</pre></font>If you want further debugging support, like stack traces
+in your code, consider doing things like:
+<font face="courier new" size=3><pre>
+ $Response-&gt;Debug( sub { Carp::longmess(&#39;debug trace&#39;) };
+ $SIG{__WARN__} = \&amp;Carp::cluck; # then warn() will stack trace
+</pre></font>The only way at present to see exactly where in your script
+an error occurred is to set the Debug config directive to 2,
+and match the error line number to perl script generated
+from your ASP script.  
+<font face="courier new" size=3><pre>
+</pre></font>However, as of version 0.10, the perl script generated from the 
+asp script should match almost exactly line by line, except in 
+cases of inlined includes, which add to the text of the original script, 
+pod comments which are entirely yanked out, and &lt;% # comment %&gt; style
+comments which have a \n added to them so they still work.
+<font face="courier new" size=3><pre>
+</pre></font>If you would like to see the HTML preceding an error 
+while developing, consider setting the BufferingOn 
+config directive to 0.</font>
+	
+	<p>
+	<a name=%24Response-%3EE295b6523></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->End()</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Sends result to client, and immediately exits script.
+Automatically called at end of script, if not already called.</font>
+	
+	<p>
+	<a name=%24Response-%3EE0139cee1></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->ErrorDocument($code, $uri)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>API extension that allows for the modification the Apache
+ErrorDocument at runtime.  $uri may be a on site document,
+off site URL, or string containing the error message.  
+<font face="courier new" size=3><pre>
+</pre></font>This extension is useful if you want to have scripts
+set error codes with $Response-&gt;{Status} like 401
+for authentication failure, and to then control from
+the script what the error message looks like.
+<font face="courier new" size=3><pre>
+</pre></font>For more information on the Apache ErrorDocument mechanism,
+please see ErrorDocument in the CORE Apache settings,
+and the Apache-&gt;custom_response() API, for which this method
+is a wrapper.</font>
+	
+	<p>
+	<a name=%24Response-%3EF8d6e0efc></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->Flush()</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Sends buffered output to client and clears buffer.</font>
+	
+	<p>
+	<a name=%24Response-%3EI2a8df2f3></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->Include($filename, @args)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>This API extension calls the routine compiled from asp script
+in $filename with the args @args.  This is a direct translation
+of the <a href=ssi.html><font size=-1 face=verdana><b>SSI</b></font></a> tag 
+<font face="courier new" size=3><pre>
+  &lt;!--#include file=$filename args=@args--&gt;
+</pre></font>Please see the SSI section for more on SSI in general.
+<font face="courier new" size=3><pre>
+</pre></font>This API extension was created to allow greater modularization
+of code by allowing includes to be called with runtime 
+arguments.  Files included are compiled once, and the 
+anonymous code ref from that compilation is cached, thus
+including a file in this manner is just like calling a 
+perl subroutine.  The @args can be found in @_ in the
+includes like:
+<font face="courier new" size=3><pre>
+  # include.inc
+  &lt;% my @args = @_; %&gt;
+</pre></font>As of 2.23, multiple return values can be returned from
+an include like:
+<font face="courier new" size=3><pre>
+ my @rv = $Response-&gt;Include($filename, @args);
+</pre></font>
+	
+	<p>
+	<a name=%24Response-%3EIa3beea1e></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->Include(\%cache_args, @sub_args) *CACHE API*</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>As of version 2.23, output from an include may be
+cached with this API and the <a href=config.html><font size=-1 face=verdana><b>CONFIG</b></font></a> settings CacheDir &amp; CacheDB.  This
+can be used to execute expensive includes only rarely
+where applicable, drastically increasing performance in 
+some cases.
+<font face="courier new" size=3><pre>
+</pre></font>This API extension applies to the entire include family:
+<font face="courier new" size=3><pre>
+  my @rv = $Response-&gt;Include(\%cache_args, @include_args)
+  my $html_ref = $Response-&gt;TrapInclude(\%cache_args, @include_args)
+  $Server-&gt;Execute(\%cache_args, @include_args)
+</pre></font>For this output cache to work, you must load Apache::ASP
+in the Apache parent httpd like so:
+<font face="courier new" size=3><pre>
+  # httpd.conf
+  PerlModule Apache::ASP
+</pre></font>The cache arguments are shown here
+<font face="courier new" size=3><pre>
+  $Response-&gt;Include({
+    File =&gt; &#39;file.inc&#39;,
+    Cache =&gt; 1, # to activate cache layer
+    Expires =&gt; 3600, # to expire in one hour
+    LastModified =&gt; time() - 600, # to expire if cached before 10 minutes ago
+    Key =&gt; $Request-&gt;Form, # to cache based on checksum of serialized form data,
+    Clear =&gt; 1, # always executes include &amp; cache output
+  }, @include_args);
+
+  File - include file to execute, can be file name or \$script 
+    script data passed in as a string reference.
+
+  Cache - activate caching, will run like normal include without this
+
+  Expires - only cache for this long in seconds
+
+  LastModified - if cached before this time(), expire
+
+  Key - The cache item identity.  Can be $data, \$data, \%data, \@data, 
+    this data is serialized and combined with the filename &amp; @include_args 
+    to create a MD5 checksum to fetch from the cache with. If you wanted
+    to cache the results of a search page from form data POSTed, 
+    then this key could be 
+
+      { Key =&gt; $Request-&gt;Form }
+
+  Clear - If set to 1, or boolean true, will always execute the include 
+    and update the cache entry for it.
+</pre></font>Motivation: If an include takes 1 second to execute
+because of complex SQL to a database, and you can
+cache the output of this include because it is not realtime data,
+and the cache layer runs at .01 seconds, then you have a 
+100 fold savings on that part of the script.  Site scalability
+can be dramatically increased in this way by intelligently
+caching bottlenecks in the web application.
+<font face="courier new" size=3><pre>
+</pre></font>Use Sparingly: If you have a fast include, then it may execute faster
+than the cache layer runs, in which case you may actually
+slow your site down by using this feature.  Therefore
+try to use this sparingly, and only when sure you really
+need it.  Apache::ASP scripts generally execute very
+quickly, so most developers will not need to use this feature
+at all.</font>
+	
+	<p>
+	<a name=%24Response-%3EI368566a8></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->Include(\$script_text, @args)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Added in Apache::ASP 2.11, this method allows for executing ASP scripts
+that are generated dynamically by passing in a reference to the script
+data instead of the file name.  This works just like the normal
+$Response-&gt;Include() API, except a string reference is passed in
+instead of a filename.  For example:
+<font face="courier new" size=3><pre>
+  &lt;%
+    my $script = &quot;&lt;\% print &#39;TEST&#39;; %\&gt;&quot;;
+    $Response-&gt;Include(\$script);
+  %&gt;
+</pre></font>This include would output TEST.  Note that tokens like
+&lt;% and %&gt; must be escaped so Apache::ASP does not try
+to compile those code blocks directly when compiling
+the original script.  If the $script data were fetched
+directly from some external resource like a database,
+then these tokens would not need to be escaped at all as in:
+<font face="courier new" size=3><pre>
+  &lt;%
+    my $script = $dbh-&gt;selectrow_array(
+       &quot;select script_text from scripts where script_id = ?&quot;,
+       undef, $script_id
+       );
+    $Response-&gt;Include(\$script);
+  %&gt;
+</pre></font>This method could also be used to render other types of dynamic scripts,
+like XML docs using XMLSubs for example, though for complex
+runtime XML rendering, one should use something better suited like XSLT.
+See the $Server-&gt;XSLT API for more on this topic.</font>
+	
+	<p>
+	<a name=%24Response-%3EIbe084bb0></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->IsClientConnected()</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>API Extension.  1 for web client still connected, 0 if 
+disconnected which might happen if the user hits the stop button.
+The original API for this $Response-&gt;{IsClientConnected}
+is only updated after a $Response-&gt;Flush is called,
+so this method may be called for a refreshed status.
+<font face="courier new" size=3><pre>
+</pre></font>Note $Response-&gt;Flush calls $Response-&gt;IsClientConnected
+to update $Response-&gt;{IsClientConnected} so to use this
+you are going straight to the source!  But if you are doing
+a loop like:
+<font face="courier new" size=3><pre>
+  while(@data) {
+    $Response-&gt;End if ! $Response-&gt;{IsClientConnected};
+    my $row = shift @data;
+    %&gt; &lt;%= $row %&gt; &lt;%
+    $Response-&gt;Flush;
+  }
+</pre></font>Then its more efficient to use the member instead of 
+the method since $Response-&gt;Flush() has already updated
+that value for you.</font>
+	
+	<p>
+	<a name=%24Response-%3ER0203b227></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->Redirect($url)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Sends the client a command to go to a different url $url.  
+Script immediately ends.</font>
+	
+	<p>
+	<a name=%24Response-%3ET13ecbe6d></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->TrapInclude($file, @args)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Calls $Response-&gt;Include() with same arguments as
+passed to it, but instead traps the include output buffer
+and returns it as as a perl string reference.  This allows
+one to postprocess the output buffer before sending
+to the client.
+<font face="courier new" size=3><pre>
+  my $string_ref = $Response-&gt;TrapInclude(&#39;file.inc&#39;);
+  $$string_ref =~ s/\s+/ /sg; # squash whitespace like Clean 1
+  print $$string_ref;
+</pre></font>The data is returned as a referenece to save on what
+might be a large string copy.  You may dereference the data
+with the $$string_ref notation.</font>
+	
+	<p>
+	<a name=%24Response-%3EW0307fe16></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Response->Write($data)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Write output to the HTML page.  &lt;%=$data%&gt; syntax is shorthand for
+a $Response-&gt;Write($data).  All final output to the client must at
+some point go through this method.</font>
+	
+	<p>
+	<a name=%24Request%20Objc3cab62e></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$Request Object</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>The request object manages the input from the client browser, like
+posts, query strings, cookies, etc.  Normal return results are values
+if an index is specified, or a collection / perl hash ref if no index 
+is specified.  WARNING, the latter property is not supported in 
+ActiveState <a href=http://www.activestate.com/ActivePerl/><font size=-1 face=verdana><b>PerlScript</b></font></a>, so if you use the hashes returned by such
+a technique, it will not be portable.
+<font face="courier new" size=3><pre>
+</pre></font>A normal use of this feature would be to iterate through the 
+form variables in the form hash...
+<font face="courier new" size=3><pre>
+ $form = $Request-&gt;Form();
+ for(keys %{$form}) {
+	$Response-&gt;Write(&quot;$_: $form-&gt;{$_}&lt;br&gt;\n&quot;);
+ }
+</pre></font>Please see the <a href=eg/server_variables.htm>./site/eg/server_variables.htm</a> asp file for this 
+method in action.
+<font face="courier new" size=3><pre>
+</pre></font>Note that if a form POST or query string contains duplicate
+values for a key, those values will be returned through
+normal use of the $Request object:
+<font face="courier new" size=3><pre>
+  @values = $Request-&gt;Form(&#39;key&#39;);
+</pre></font>but you can also access the internal storage, which is
+an array reference like so:
+<font face="courier new" size=3><pre>
+  $array_ref = $Request-&gt;{Form}{&#39;key&#39;};
+  @values = @{$array_ref};
+</pre></font>Please read the <a href=perlscript.html><font size=-1 face=verdana><b>PERLSCRIPT</b></font></a> section for more information 
+on how things like $Request-&gt;QueryString() &amp; $Request-&gt;Form()
+behave as collections.</font>
+	
+	<p>
+	<a name=%24Request-%3E%7BM81641f4a></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Request->{Method}</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>API extension.  Returns the client HTTP request method, as in
+GET or POST.  Added in version 2.31.</font>
+	
+	<p>
+	<a name=%24Request-%3E%7BT6acbcf5a></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Request->{TotalBytes}</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>The amount of data sent by the client in the body of the 
+request, usually the length of the form data.  This is
+the same value as $Request-&gt;ServerVariables(&#39;CONTENT_LENGTH&#39;)</font>
+	
+	<p>
+	<a name=%24Request-%3EBi2e1177cf></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Request->BinaryRead([$length])</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Returns a string whose contents are the first $length bytes
+of the form data, or body, sent by the client request.
+If $length is not given, will return all of the form data.
+This data is the raw data sent by the client, without any
+parsing done on it by Apache::ASP.
+<font face="courier new" size=3><pre>
+</pre></font>Note that BinaryRead will not return any data for file uploads.
+Please see the $Request-&gt;FileUpload() interface for access
+to this data.  $Request-&gt;Form() data will also be available
+as normal.</font>
+	
+	<p>
+	<a name=%24Request-%3ECled50cd44></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Request->ClientCertificate()</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Not implemented.</font>
+	
+	<p>
+	<a name=%24Request-%3ECoe6d79e01></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Request->Cookies($name [,$key])</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Returns the value of the Cookie with name $name.  If a $key is
+specified, then a lookup will be done on the cookie as if it were
+a query string.  So, a cookie set by:
+<font face="courier new" size=3><pre>
+ Set-Cookie: test=data1=1&amp;data2=2
+</pre></font>would have a value of 2 returned by $Request-&gt;Cookies(&#39;test&#39;,&#39;data2&#39;).
+<font face="courier new" size=3><pre>
+</pre></font>If no name is specified, a hash will be returned of cookie names 
+as keys and cookie values as values.  If the cookie value is a query string, 
+it will automatically be parsed, and the value will be a hash reference to 
+these values.
+<font face="courier new" size=3><pre>
+</pre></font>When in doubt, try it out.  Remember that unless you set the Expires
+attribute of a cookie with $Response-&gt;Cookies(&#39;cookie&#39;, &#39;Expires&#39;, $xyz),
+the cookies that you set will only last until you close your browser, 
+so you may find your self opening &amp; closing your browser a lot when 
+debugging cookies.
+<font face="courier new" size=3><pre>
+</pre></font>For more information on cookies in ASP, please read $Response-&gt;Cookies()</font>
+	
+	<p>
+	<a name=%24Request-%3EFi6799fcec></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Request->FileUpload($form_field, $key)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>API extension.  The FileUpload interface to file upload data is
+stabilized.  The internal representation of the file uploads
+is a hash of hashes, one hash per file upload found in 
+the $Request-&gt;Form() collection.  This collection of collections
+may be queried through the normal interface like so:
+<font face="courier new" size=3><pre>
+  $Request-&gt;FileUpload(&#39;upload_file&#39;, &#39;ContentType&#39;);
+  $Request-&gt;FileUpload(&#39;upload_file&#39;, &#39;FileHandle&#39;);
+  $Request-&gt;FileUpload(&#39;upload_file&#39;, &#39;BrowserFile&#39;);
+  $Request-&gt;FileUpload(&#39;upload_file&#39;, &#39;Mime-Header&#39;);
+  $Request-&gt;FileUpload(&#39;upload_file&#39;, &#39;TempFile&#39;);
+
+  * note that TempFile must be use with the UploadTempFile 
+    configuration setting.
+</pre></font>The above represents the old slow collection interface, 
+but like all collections in Apache::ASP, you can reference
+the internal hash representation more easily.
+<font face="courier new" size=3><pre>
+  my $fileup = $Request-&gt;{FileUpload}{upload_file};
+  $fileup-&gt;{ContentType};
+  $fileup-&gt;{BrowserFile};
+  $fileup-&gt;{FileHandle};
+  $fileup-&gt;{Mime-Header};
+  $fileup-&gt;{TempFile};
+</pre></font>
+	
+	<p>
+	<a name=%24Request-%3EFo76659178></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Request->Form($name)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Returns the value of the input of name $name used in a form
+with POST method.  If $name is not specified, returns a ref to 
+a hash of all the form data.  One can use this hash to 
+create a nice alias to the form data like:
+<font face="courier new" size=3><pre>
+ # in global.asa
+ use vars qw( $Form );
+ sub Script_OnStart {
+   $Form = $Request-&gt;Form;
+ }
+ # then in ASP scripts
+ &lt;%= $Form-&gt;{var} %&gt;
+</pre></font>File upload data will be loaded into $Request-&gt;Form(&#39;file_field&#39;), 
+where the value is the actual file name of the file uploaded, and 
+the contents of the file can be found by reading from the file
+name as a file handle as in:
+<font face="courier new" size=3><pre>
+ while(read($Request-&gt;Form(&#39;file_field_name&#39;), $data, 1024)) {};
+</pre></font>For more information, please see the <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a> / File Upload section,
+as file uploads are implemented via the CGI.pm module.  An
+example can be found in the installation 
+samples <a href=eg/file_upload.asp>./site/eg/file_upload.asp</a></font>
+	
+	<p>
+	<a name=%24Request-%3EPa455879ca></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Request->Params($name)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>API extension. If RequestParams <a href=config.html><font size=-1 face=verdana><b>CONFIG</b></font></a> is set, the $Request-&gt;Params 
+object is created with combined contents of $Request-&gt;QueryString 
+and $Request-&gt;Form.  This is for developer convenience simlar 
+to <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a>.pm&#39;s param() method.  Just like for $Response-&gt;Form, 
+one could create a nice alias like:
+<font face="courier new" size=3><pre>
+ # in global.asa
+ use vars qw( $Params );
+ sub Script_OnStart {
+   $Params = $Request-&gt;Params;
+ }
+</pre></font>
+	
+	<p>
+	<a name=%24Request-%3EQu7330a0a3></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Request->QueryString($name)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Returns the value of the input of name $name used in a form
+with GET method, or passed by appending a query string to the end of
+a url as in <tt>http://localhost/?data=value.</tt>  
+If $name is not specified, returns a ref to a hash of all the query 
+string data.</font>
+	
+	<p>
+	<a name=%24Request-%3ESe3a73f873></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Request->ServerVariables($name)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Returns the value of the server variable / environment variable
+with name $name.  If $name is not specified, returns a ref to 
+a hash of all the server / environment variables data.  The following
+would be a common use of this method:
+<font face="courier new" size=3><pre>
+ $env = $Request-&gt;ServerVariables();
+ # %{$env} here would be equivalent to the cgi %ENV in perl.
+</pre></font>
+	
+	<p>
+	<a name=%24Application971dfe6c></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$Application Object</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Like the $Session object, you may use the $Application object to 
+store data across the entire life of the application.  Every
+page in the ASP application always has access to this object.
+So if you wanted to keep track of how many visitors there where
+to the application during its lifetime, you might have a line
+like this:
+<font face="courier new" size=3><pre>
+ $Application-&gt;{num_users}++
+</pre></font>The Lock and Unlock methods are used to prevent simultaneous 
+access to the $Application object.</font>
+	
+	<p>
+	<a name=%24Application7d01ce04></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Application->Lock()</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Locks the Application object for the life of the script, or until
+UnLock() unlocks it, whichever comes first.  When $Application
+is locked, this guarantees that data being read and written to it 
+will not suddenly change on you between the reads and the writes.
+<font face="courier new" size=3><pre>
+</pre></font>This and the $Session object both lock automatically upon
+every read and every write to ensure data integrity.  This 
+lock is useful for concurrent access control purposes.
+<font face="courier new" size=3><pre>
+</pre></font>Be careful to not be too liberal with this, as you can quickly 
+create application bottlenecks with its improper use.</font>
+	
+	<p>
+	<a name=%24Application2899ee54></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Application->UnLock()</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Unlocks the $Application object.  If already unlocked, does nothing.</font>
+	
+	<p>
+	<a name=%24Applicationaeaabc29></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Application->GetSession($sess_id)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>This NON-PORTABLE API extension returns a user $Session given
+a session id.  This allows one to easily write a session manager if
+session ids are stored in $Application during Session_OnStart, with 
+full access to these sessions for administrative purposes.  
+<font face="courier new" size=3><pre>
+</pre></font>Be careful not to expose full session ids over the net, as they
+could be used by a hacker to impersonate another user.  So when 
+creating a session manager, for example, you could create
+some other id to reference the SessionID internally, which 
+would allow you to control the sessions.  This kind of application
+would best be served under a secure web server.
+<font face="courier new" size=3><pre>
+</pre></font>The <a href=eg/global_asa_demo.asp>./site/eg/global_asa_demo.asp</a> script makes use of this routine 
+to display all the data in current user sessions.</font>
+	
+	<p>
+	<a name=%24Application7441b337></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Application->SessionCount()</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>This NON-PORTABLE method returns the current number of active sessions
+in the application, and is enabled by the SessionCount configuration setting.
+This method is not implemented as part of the original ASP
+object model, but is implemented here because it is useful.  In particular,
+when accessing databases with license requirements, one can monitor usage
+effectively through accessing this value.</font>
+	
+	<p>
+	<a name=%24Server%20Objeed08cf85></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$Server Object</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>The server object is that object that handles everything the other
+objects do not.  The best part of the server object for Win32 users is 
+the CreateObject method which allows developers to create instances of
+ActiveX components, like the ADO component.</font>
+	
+	<p>
+	<a name=%24Server-%3E%7BSc74a89b4a></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Server->{ScriptTimeout} = $seconds</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Not implemented. May never be.  Please see the 
+Apache Timeout configuration option, normally in httpd.conf.</font>
+	
+	<p>
+	<a name=%24Server-%3ECon7d9785f8></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Server->Config($setting)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>API extension.  Allows a developer to read the <a href=config.html><font size=-1 face=verdana><b>CONFIG</b></font></a>
+settings, like Global, GlobalPackage, StateDir, etc.
+Currently implemented as a wrapper around 
+<font face="courier new" size=3><pre>
+  Apache-&gt;dir_config($setting)
+</pre></font>May also be invoked as $Server-&gt;Config(), which will
+return a hash ref of all the PerlSetVar settings.</font>
+	
+	<p>
+	<a name=%24Server-%3ECre0144679e></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Server->CreateObject($program_id)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Allows use of ActiveX objects on Win32.  This routine returns
+a reference to an Win32::OLE object upon success, and nothing upon
+failure.  It is through this mechanism that a developer can 
+utilize ADO.  The equivalent syntax in VBScript is 
+<font face="courier new" size=3><pre>
+ Set object = Server.CreateObject(program_id)
+</pre></font>For further information, try &#39;perldoc Win32::OLE&#39; from your
+favorite command line.</font>
+	
+	<p>
+	<a name=%24Server-%3EExec0fa247a></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Server->Execute($file, @args)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>New method from ASP 3.0, this does the same thing as
+<font face="courier new" size=3><pre>
+  $Response-&gt;Include($file, @args)
+</pre></font>and internally is just a wrapper for such.  Seems like we
+had this important functionality before the IIS/ASP camp!</font>
+	
+	<p>
+	<a name=%24Server-%3EFileaa99842></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Server->File()</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Returns the absolute file path to current executing script.
+Same as Apache-&gt;request-&gt;filename when running under <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a>.
+<font face="courier new" size=3><pre>
+</pre></font>ASP API extension.</font>
+	
+	<p>
+	<a name=%24Server-%3EGetb3d1ac42></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Server->GetLastError()</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Not implemented, will likely not ever be because this is dependent
+on how IIS handles errors and is not relevant in Apache.</font>
+	
+	<p>
+	<a name=%24Server-%3EHTMb165f10b></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Server->HTMLEncode( $string || \$string )</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Returns an HTML escapes version of $string. &amp;, &quot;, &gt;, &lt;, are each
+escapes with their HTML equivalents.  Strings encoded in this nature
+should be raw text displayed to an end user, as HTML tags become 
+escaped with this method.
+<font face="courier new" size=3><pre>
+</pre></font>As of version 2.23, $Server-&gt;HTMLEncode() may take a string reference
+for an optmization when encoding a large buffer as an API extension.
+Here is how one might use one over the other:
+<font face="courier new" size=3><pre>
+  my $buffer = &#39;&amp;&#39; x 100000;
+  $buffer = $Server-&gt;HTMLEncode($buffer);
+  print $buffer;
+    - or -
+  my $buffer = &#39;&amp;&#39; x 100000;
+  $Server-&gt;HTMLEncode(\$buffer);
+  print $buffer;
+</pre></font>Using the reference passing method in benchmarks on 100K of
+data was 5% more efficient, but maybe useful for some.
+It saves on copying the 100K buffer twice.</font>
+	
+	<p>
+	<a name=%24Server-%3EMapd3711f06></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Server->MapInclude($include)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>API extension.  Given the include $include, as an absolute or relative file name to the current
+executing script, this method returns the file path that the include would
+be found from the include search path.  The include search path is the 
+current script directory, Global, and IncludesDir directories.
+<font face="courier new" size=3><pre>
+</pre></font>If the include is not found in the includes search path, then undef, or bool false,
+is returned. So one may do something like this:
+<font face="courier new" size=3><pre>
+  if($Server-&gt;MapInclude(&#39;include.inc&#39;)) {
+    $Response-&gt;Include(&#39;include.inc&#39;);
+  }
+</pre></font>This code demonstrates how one might only try to execute an include if
+it exists, which is useful since a script will error if it tries to execute an include
+that does not exist.</font>
+	
+	<p>
+	<a name=%24Server-%3EMap0fe1ebb5></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Server->MapPath($url);</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Given the url $url, absolute, or relative to the current executing script,
+this method returns the equivalent filename that the server would 
+translate the request to, regardless or whether the request would be valid.
+<font face="courier new" size=3><pre>
+</pre></font>Only a $url that is relative to the host is valid.  Urls like &quot;.&quot; and 
+&quot;/&quot; are fine arguments to MapPath, but <tt>http://localhost</tt> would not be.
+<font face="courier new" size=3><pre>
+</pre></font>To see this method call in action, check out the sample <a href=eg/server.htm>./site/eg/server.htm</a>
+script.</font>
+	
+	<p>
+	<a name=%24Server-%3EMai03cc9918></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Server->Mail(\%mail, %smtp_args);</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>With the Net::SMTP and Net::Config modules installed, which are part of the 
+perl libnet package, you may use this API extension to send email.  The 
+\%mail hash reference that you pass in must have values for at least
+the To, From, and Subject headers, and the Body of the mail message.
+<font face="courier new" size=3><pre>
+</pre></font>The return value of this routine is 1 for success, 0 for failure.  If the MailHost
+SMTP server is not available, this will have a return value of 0.
+<font face="courier new" size=3><pre>
+</pre></font>You could send an email like so:
+<font face="courier new" size=3><pre>
+ $Server-&gt;Mail({
+		To =&gt; &#39;<b>&#115;&#111;&#109;&#101;&#098;&#111;&#100;&#121;&#064;&#121;&#111;&#117;&#114;&#100;&#111;&#109;&#097;&#105;&#110;&#046;&#099;&#111;&#109;&#046;&#102;&#111;&#111;&#098;&#097;&#114;</b>&#39;,
+		From =&gt; &#39;<b>&#121;&#111;&#117;&#114;&#101;&#109;&#097;&#105;&#108;&#064;&#121;&#111;&#117;&#114;&#100;&#111;&#109;&#097;&#105;&#110;&#046;&#099;&#111;&#109;&#046;&#102;&#111;&#111;&#098;&#097;&#114;</b>&#39;,
+		Subject =&gt; &#39;Subject of Email&#39;,
+		Body =&gt; 
+		 &#39;Body of message. &#39;.
+		 &#39;You might have a lot to say here!&#39;,
+		Organization =&gt; &#39;Your Organization&#39;,
+                CC =&gt; &#39;<b>&#121;&#111;&#117;&#114;&#101;&#109;&#097;&#105;&#108;&#099;&#099;&#064;&#121;&#111;&#117;&#114;&#100;&#111;&#109;&#097;&#105;&#110;&#046;&#099;&#111;&#109;&#046;&#102;&#111;&#111;&#098;&#097;&#114;</b>&#39;,
+                BCC =&gt; &#39;<b>&#121;&#111;&#117;&#114;&#101;&#109;&#097;&#105;&#108;&#098;&#099;&#099;&#064;&#121;&#111;&#117;&#114;&#100;&#111;&#109;&#097;&#105;&#110;&#046;&#099;&#111;&#109;&#046;&#102;&#111;&#111;&#098;&#097;&#114;</b>&#39;,
+		Debug =&gt; 0 || 1,
+	       });
+</pre></font>Any extra fields specified for the email will be interpreted
+as headers for the email, so to send an HTML email, you 
+could set &#39;Content-Type&#39; =&gt; &#39;text/html&#39; in the above example.
+<font face="courier new" size=3><pre>
+</pre></font>If you have MailFrom configured, this will be the default
+for the From header in your email.  For more configuration
+options like the MailHost setting, check out the <a href=config.html><font size=-1 face=verdana><b>CONFIG</b></font></a> section.
+<font face="courier new" size=3><pre>
+</pre></font>The return value of this method call will be boolean for
+success of the mail being sent.
+<font face="courier new" size=3><pre>
+</pre></font>If you would like to specially configure the Net::SMTP 
+object used internally, you may set %smtp_args and they
+will be passed on when that object is initialized.
+&quot;perldoc Net::SMTP&quot; for more into on this topic.
+<font face="courier new" size=3><pre>
+</pre></font>If you would like to include the output of an ASP page as the
+body of the mail message, you might do something like:
+<font face="courier new" size=3><pre>
+  my $mail_body = $Response-&gt;TrapInclude(&#39;mail_body.inc&#39;);
+  $Server-&gt;Mail({ %mail, Body =&gt; $$mail_body });
+</pre></font>
+	
+	<p>
+	<a name=%24Server-%3EReg38562b5d></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Server->RegisterCleanup($sub) </b></font>
+<font face="courier new" size=3><pre>
+ non-portable extension
+</pre></font>Sets a subroutine reference to be executed after the script ends,
+whether normally or abnormally, the latter occurring 
+possibly by the user hitting the STOP button, or the web server
+being killed.  This subroutine must be a code reference 
+created like:
+<font face="courier new" size=3><pre>
+ $Server-&gt;RegisterCleanup(sub { $main::Session-&gt;{served}++; });
+   or
+ sub served { $main::Session-&gt;{served}++; }
+ $Server-&gt;RegisterCleanup(\&amp;served);
+</pre></font>The reference to the subroutine passed in will be executed.
+Though the subroutine will be executed in anonymous context, 
+instead of the script, all objects will still be defined 
+in main::*, that you would reference normally in your script.  
+Output written to $main::Response will have no affect at 
+this stage, as the request to the www client has already completed.
+<font face="courier new" size=3><pre>
+</pre></font>Check out the <a href=eg/register_cleanup.asp>./site/eg/register_cleanup.asp</a> script for an example
+of this routine in action.</font>
+	
+	<p>
+	<a name=%24Server-%3ETra98c592dc></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Server->Transfer($file, @args)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>New method from ASP 3.0.  Transfers control to another script.  
+The Response buffer will not be cleared automatically, so if you 
+want this to serve as a faster $Response-&gt;Redirect(), you will need to 
+call $Response-&gt;Clear() before calling this method.  
+<font face="courier new" size=3><pre>
+</pre></font>This new script will take over current execution and 
+the current script will not continue to be executed
+afterwards.  It differs from Execute() because the 
+original script will not pick up where it left off.
+<font face="courier new" size=3><pre>
+</pre></font>As of Apache::ASP 2.31, this method now accepts optional
+arguments like $Response-&gt;Include &amp; $Server-&gt;Execute.  
+$Server-&gt;Transfer is now just a wrapper for:
+<font face="courier new" size=3><pre>
+  $Response-&gt;Include($file, @args);
+  $Response-&gt;End;
+</pre></font>
+	
+	<p>
+	<a name=%24Server-%3EURL3674cef0></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Server->URLEncode($string)</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Returns the URL-escaped version of the string $string. +&#39;s are substituted in
+for spaces and special characters are escaped to the ascii equivalents.
+Strings encoded in this manner are safe to put in urls... they are especially
+useful for encoding data used in a query string as in:
+<font face="courier new" size=3><pre>
+ $data = $Server-&gt;URLEncode(&quot;test data&quot;);
+ $url = &quot;<tt>http://localhost?data=$data&quot;;</tt>
+
+ $url evaluates to <tt>http://localhost?data=test+data,</tt> and is a 
+ valid URL for use in anchor &lt;a&gt; tags and redirects, etc.
+</pre></font>
+	
+	<p>
+	<a name=%24Server-%3EURL6c8bf743></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Server->URL($url, \%params) </b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Will return a URL with %params serialized into a query 
+string like:
+<font face="courier new" size=3><pre>
+  $url = $Server-&gt;URL(&#39;test.asp&#39;, { test =&gt; value });
+</pre></font>which would give you a URL of test.asp?test=value
+<font face="courier new" size=3><pre>
+</pre></font>Used in conjunction with the SessionQuery* settings, the returned
+URL will also have the session id inserted into the query string, 
+making this a critical part of that method of implementing 
+cookieless sessions.  For more information on that topic 
+please read on the setting
+in the <a href=config.html><font size=-1 face=verdana><b>CONFIG</b></font></a> section, and the SESSIONS section too.</font>
+	
+	<p>
+	<a name=%24Server-%3EXSL7df794aa></a>
+	<font face=verdana><font class=title size=-1 color=#555555><b>$Server->XSLT(\$xsl_data, \$xml_data)</b></font>
+<font face="courier new" size=3><pre>
+ * NON-PORTABLE API EXTENSION *
+</pre></font>This method takes string references for XSL and XML data
+and returns the XSLT output as a string reference like:
+<font face="courier new" size=3><pre>
+  my $xslt_data_ref = $Server-&gt;XSLT(\$xsl_data, \$xml_data)
+  print $$xslt_data_ref;
+</pre></font>The XSLT parser defaults to <a href=http://xmlxslt.sourceforge.net/><font size=-1 face=verdana><b>XML::XSLT</b></font></a>, and is configured with the 
+XSLTParser setting, which can also use XML::Sablotron ( support added in 2.11 ), 
+and XML::LibXSLT ( support added in 2.29 ). 
+Please see the <a href=config.html><font size=-1 face=verdana><b>CONFIG</b></font></a> section for more information on the 
+XSLT* settings that drive this API.  The XSLT setting itself 
+uses this API internally to do its rendering.
+<font face="courier new" size=3><pre>
+</pre></font>This API was created to allow developers easy XSLT component
+rendering without having to render the entire ASP scripts
+via XSLT.  This will make an easy plugin architecture for
+those looking to integrate XML into their existing ASP
+application frameworks.
+<font face="courier new" size=3><pre>
+</pre></font>At some point, the API will likely take files as arguments,
+but not as of the 2.11 release.</font>
+	
+
+</font>
+</td>
+
+<td bgcolor=white valign=top>
+&nbsp;
+</td>
+
+</tr>
+<tr bgcolor=#063678>
+	<td colspan=3 align=center width=80%>
+	<font face=verdana color=white size=-1>
+	Copyright &copy; 1998-2008,
+	<a href=http://www.chamas.com><font color=white>Chamas Enterprises Inc.</font></a>
+	</font>
+	</td>
+</tr>
+</table>
+
+</td></tr>
+</table>
+</center>
+
+</body>
+</html>

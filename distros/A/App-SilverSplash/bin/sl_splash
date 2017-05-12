@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings FATAL => 'all';
+
+use Template;
+use Template::Context;
+
+use Config::SL;
+
+my $config = Config::SL->new();
+
+$|++;
+
+if ($ENV{SL_DEBUG}) {
+    print "Starting in DEBUG mode\n";
+    $config->sl_apache_loglevel('debug');
+}
+
+# Fill out the httpd.conf
+my $conf_tmpl   = sprintf("%s/httpd.conf.tmpl", $config->conf_dir);
+my $tmpl_out    = sprintf("%s/httpd.conf", $config->sl_tmp);
+my %tmpl_config = (ABSOLUTE => 1, RELATIVE => 1, INCLUDE_PATH => $config->conf_dir . '/');
+my $template    = Template->new(\%tmpl_config) || die $Template::ERROR, "\n";
+$template->process($conf_tmpl, { cfg => $config }, $tmpl_out)
+  || die $template->error, "\n";
+
+# write the sl root folders
+mkdir($config->sl_tmp);
+mkdir($config->sl_tmp  . "/$_") for qw( logs );
+
+$|++;
+my $cmd = sprintf("%s/bin/httpd -f %s/httpd.conf -k start",
+	$config->sl_httpd_root, $config->sl_tmp);
+
+print "Starting with command: $cmd\n";
+my $started = `$cmd`;
+print $started;
+
+1;

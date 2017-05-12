@@ -1,0 +1,103 @@
+
+!IF "$(CFG)" == "Win64"
+BUILDBITS= 64
+!ELSE
+BUILDBITS= 32
+!ENDIF
+
+PERL   = perl 
+CP     = $(PERL) -MExtUtils::Command -e cp --
+RM_F   = $(PERL) -MExtUtils::Command -e rm_f --
+MKPATH = $(PERL) -MExtUtils::Command -e mkpath --
+
+### GLOBAL PART ###
+
+BUILDNICK= msvc
+
+PREFIX   = ../../_output_
+INCDIR   = $(PREFIX)/include
+LIBDIR   = $(PREFIX)/lib
+
+CF_ALL   = -DTEC_UNAME=vc9 -DTEC_SYSNAME=Win32 -DTEC_LITTLEENDIAN -DTEC_32 -DWIN32 -DNDEBUG -I"$(INCDIR)"
+LF_ALL   = -L../lib/$(BUILDNICK) -L"$(LIBDIR)"
+
+VER_OBJ      = version.o
+VER_RC       = version.rc
+
+BUILD_DIRS   = ../obj/$(BUILDNICK)/cd_zlib ../lib/$(BUILDNICK)
+
+ALL_OBJS     = $(OBJS_cd_zlib)
+
+STATIC_LIBS  = $(SLIB_cd_zlib)
+
+DYNAMIC_LIBS = $(DLIB_cd_zlib) $(ILIB_cd_zlib)
+
+ALL_LIBS     = $(STATIC_LIBS) $(DYNAMIC_LIBS)
+
+all: all-static all-dynamic
+
+
+### START OF cd_zlib ###
+CF_cd_zlib   = -c   -O2 -I../include   -DGCC_WINDRES -DWIN32 $(CF_cd_zlib_EXTRA)
+LF_cd_zlib   = -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_cd_zlib_EXTRA)
+SLIB_cd_zlib = ../lib/$(BUILDNICK)/zlib1.lib
+DLIB_cd_zlib = ../lib/$(BUILDNICK)/libzlib1.dll.a
+ILIB_cd_zlib = ../lib/$(BUILDNICK)/zlib1_alien_.dll
+OBJS_cd_zlib = ../obj/$(BUILDNICK)/cd_zlib/adler32.obj ../obj/$(BUILDNICK)/cd_zlib/crc32.obj ../obj/$(BUILDNICK)/cd_zlib/inffast.obj ../obj/$(BUILDNICK)/cd_zlib/inftrees.obj ../obj/$(BUILDNICK)/cd_zlib/uncompr.obj ../obj/$(BUILDNICK)/cd_zlib/gzclose.obj ../obj/$(BUILDNICK)/cd_zlib/gzlib.obj ../obj/$(BUILDNICK)/cd_zlib/gzread.obj ../obj/$(BUILDNICK)/cd_zlib/gzwrite.obj ../obj/$(BUILDNICK)/cd_zlib/compress.obj ../obj/$(BUILDNICK)/cd_zlib/deflate.obj ../obj/$(BUILDNICK)/cd_zlib/infback.obj ../obj/$(BUILDNICK)/cd_zlib/inflate.obj ../obj/$(BUILDNICK)/cd_zlib/trees.obj ../obj/$(BUILDNICK)/cd_zlib/zutil.obj
+
+../obj/$(BUILDNICK)/cd_zlib/adler32.obj : ./adler32.c ; cl $(CF_ALL) $(CF_cd_zlib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_zlib/crc32.obj : ./crc32.c ; cl $(CF_ALL) $(CF_cd_zlib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_zlib/inffast.obj : ./inffast.c ; cl $(CF_ALL) $(CF_cd_zlib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_zlib/inftrees.obj : ./inftrees.c ; cl $(CF_ALL) $(CF_cd_zlib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_zlib/uncompr.obj : ./uncompr.c ; cl $(CF_ALL) $(CF_cd_zlib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_zlib/gzclose.obj : ./gzclose.c ; cl $(CF_ALL) $(CF_cd_zlib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_zlib/gzlib.obj : ./gzlib.c ; cl $(CF_ALL) $(CF_cd_zlib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_zlib/gzread.obj : ./gzread.c ; cl $(CF_ALL) $(CF_cd_zlib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_zlib/gzwrite.obj : ./gzwrite.c ; cl $(CF_ALL) $(CF_cd_zlib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_zlib/compress.obj : ./compress.c ; cl $(CF_ALL) $(CF_cd_zlib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_zlib/deflate.obj : ./deflate.c ; cl $(CF_ALL) $(CF_cd_zlib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_zlib/infback.obj : ./infback.c ; cl $(CF_ALL) $(CF_cd_zlib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_zlib/inflate.obj : ./inflate.c ; cl $(CF_ALL) $(CF_cd_zlib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_zlib/trees.obj : ./trees.c ; cl $(CF_ALL) $(CF_cd_zlib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_zlib/zutil.obj : ./zutil.c ; cl $(CF_ALL) $(CF_cd_zlib) /Fo$@ $**
+
+$(SLIB_cd_zlib): $(OBJS_cd_zlib)
+	lib /OUT:$@ $**
+
+$(ILIB_cd_zlib) $(DLIB_cd_zlib) : $(OBJS_cd_zlib)
+	xxxg++ -s -shared -o $(ILIB_cd_zlib) $** -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_cd_zlib) $(LF_cd_zlib) $(LF_ALL)
+
+cd_zlib-static: build-dirs $(SLIB_cd_zlib)
+cd_zlib-dynamic: build-dirs $(ILIB_cd_zlib) $(DLIB_cd_zlib) 
+
+### compile RC
+
+$(VER_OBJ) : $(VER_RC) ; windres --define GCC_WINDRES $** -o $@
+
+all-static: build-dirs $(STATIC_LIBS)
+
+all-dynamic: build-dirs $(DYNAMIC_LIBS)
+
+install-all:
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) ../lib/$(BUILDNICK)/*.lib "$(LIBDIR)"
+	$(CP) ../include/*.h "$(INCDIR)"
+
+install-static: all-static
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) $(STATIC_LIBS) "$(LIBDIR)"
+	$(CP) ../include/*.h "$(INCDIR)"
+
+install-dynamic: all-dynamic
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) $(DYNAMIC_LIBS) "$(LIBDIR)"
+	$(CP) ../include/*.h "$(INCDIR)"
+
+build-dirs:
+	$(MKPATH) $(BUILD_DIRS)
+
+clean:
+	$(RM_F) $(ALL_OBJS) $(ALL_LIBS) $(VER_OBJ)

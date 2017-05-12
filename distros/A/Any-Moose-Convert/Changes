@@ -1,0 +1,13 @@
+Revision history for Perl extension Any::Moose::Convert
+
+0.004 2011-05-25 23:03:17
+    - Fix typos in SYNOPSIS (markstos)
+
+0.003 Sun Dec 20 14:34:05 2009
+    - Improve detection of Class::MOP utilities
+
+0.002 Sun Dec  6 12:30:39 2009
+    - Don't touch the repository information (e.g. .git, .hg, etc)
+
+0.001 Sat Nov 28 07:41:31 2009
+    - original version; created by Module::Setup

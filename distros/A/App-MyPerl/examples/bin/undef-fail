@@ -1,0 +1,3 @@
+use UndefFail;
+
+UndefFail::ohdear();

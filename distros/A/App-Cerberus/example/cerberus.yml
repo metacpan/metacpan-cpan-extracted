@@ -1,0 +1,41 @@
+plack:
+    - port:                 5000
+    - server:               Starman
+    - workers:              2
+
+plugins:
+  - GeoIP:                  /opt/geoip/GeoLiteCity.dat
+  - TimeZone
+  - BrowserDetect
+  - Throttle:
+        store:
+            Memcached:
+                namespace:  cerberus
+                servers:
+                    -       localhost:11211
+
+        second_penalty:     5
+        ranges:
+            default:
+                ips:        0.0.0.0/0
+                limit:
+                            - 20 per second
+                            - 100 per minute
+
+            google_bot:
+                group_ips:  1
+                limit:      10 per second
+                ips:
+                            - 64.233.160.0/19
+                            - 66.102.0.0/20
+                            - 66.249.64.0/19
+                            - 72.14.192.0/18
+                            - 74.125.0.0/16
+                            - 209.85.128.0/17
+                            - 216.239.32.0/19
+
+            abusive:
+                limit:      banned
+                ips:
+                            - 205.217.153.73
+                            - 199.19.249.196

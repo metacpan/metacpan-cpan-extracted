@@ -1,0 +1,59 @@
+NAME
+    App::CPANIDX::HTTP::Server - HTTP::Server::Simple based server for
+    CPANIDX
+
+VERSION
+    version 0.08
+
+SYNOPSIS
+      use strict;
+      use warnings;
+      use App::CPANIDX::HTTP::Server;
+
+      my $dsn = 'dbi:SQLite:dbname=cpanidx.db';
+      my $user = '';
+      my $pass = '';
+      my $port = 8082; # the port to listen for requests on
+
+      my $server = App::CPANIDX::HTTP::Server->new( $port );
+      $server->dsn( $dsn, $user, $pass );
+      $server->run();
+
+      # Requests can now be directed to http://nameofyourserver:8082/cpanidx/
+
+DESCRIPTION
+    App::CPANIDX::HTTP::Server is a HTTP::Server::Simple based server for
+    CPANIDX. Use the "cpanidx-gendb" script provided by App::CPANIDX to
+    generate a CPANIDX database and then use this module to serve the
+    associated data.
+
+METHODS
+    "new"
+        Start a new instance of App::CPANIDX::HTTP::Server. Takes one
+        option, the port number to start listening on for requests. If it is
+        not provided will default to 8080.
+
+    "dsn"
+        After running "new", but before calling "run", call this to assign
+        the database details to the server. Takes three arguments: a DBI
+        "DSN" string, a username (if applicable) and a password (if
+        applicable).
+
+    "run"
+        Runs the server and starts handling requests.
+
+    "handle_request"
+        Deals with requests. No user serviceable parts.
+
+SEE ALSO
+    App::CPANIDX
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

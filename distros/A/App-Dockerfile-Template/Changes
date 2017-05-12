@@ -1,0 +1,9 @@
+2.00    2016-02-04
+    * Fix Test for perl v5.18.1
+
+1.01    2016-01-30
+        - Allow inject data points from command arguments
+
+1.00    2015-12-22
+    * First version
+

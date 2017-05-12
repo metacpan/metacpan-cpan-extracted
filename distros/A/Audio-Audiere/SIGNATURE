@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.38.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+
+SHA1 73f1c7e7b844b589f1c04d0b25adc80a5251d922 Audiere_perl.xs
+SHA1 82acb9ea2b6219c14f6b77e76a9ce25502b365ea BUGS
+SHA1 9ca47121fbe7ea8aa55f877d1ef3a0e3165d149a CHANGES
+SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
+SHA1 5f6eedc4f5b550223c7199fabac4fc92df667449 MANIFEST
+SHA1 8d4a94a13c9c5d4704cd925d1439507972c1ff5b META.yml
+SHA1 85a71c2394173b520aba6c5f4993127ce93a745c Makefile.PL
+SHA1 3d26dd8dc32aeaa543be8e263e1fc8463beb825f NEW
+SHA1 31090e7d48f96e2dd23445fc5f9fd79dfaec19ec README
+SHA1 345f1df3285398751244d46ee279205289775375 README.win32
+SHA1 baec0e29183b8a6d07a96249f51ac662b9f4eb08 TODO
+SHA1 35b0d9341d1dcf5349a7d13c05d113a1715c528a examples/3d.pl
+SHA1 3082489f5567eb78ef9ece7c208f9b98a8b43a0a examples/psp
+SHA1 46f0a97c3c50de4cb83638e51fe7906018c8ab4f lib/Audio/Audiere.pm
+SHA1 246f6eb5ae54743ed3b703e2231972baf350678b lib/Audio/Audiere/Error.pm
+SHA1 c4e31d9292f5f817a1448ff54ec290e1acd7bc50 lib/Audio/Audiere/Stream.pm
+SHA1 cad13b6ee19f4ce0b60e85cb5364e7b5a055aa73 lib/Audio/Audiere/Stream/3D.pm
+SHA1 27b8f31cfd8c6fd851f7feaac521e873dc9fbb94 t/audiere.t
+SHA1 a33b6539bc7a10be386fb91e816516ae4f3ead2d t/error.t
+SHA1 eb70885d6b78bf669cf0f9a6beff6599a4170983 t/mute.t
+SHA1 6dbbc38438d5641841c98218b35ea2a0d7ab4f48 t/stream.t
+SHA1 d67d2b4f4ad1aa8cf432bbcf91f53b2683f948b9 t/test.wav
+SHA1 fea0eccd9924b289fb86e6e40926655862af1857 t/tone_noise.t
+SHA1 acff72be0ff4a8b1d8913bbc75383e539bae1e00 typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2-rc1-SuSE (GNU/Linux)
+Comment: When cryptography is outlawed, bayl bhgynjf jvyy unir cevinpl.
+
+iQEVAwUBQGcQe3cLPEOTuEwVAQHMhgf+LUGhcpHgflGyvnVF43x/oEEwAHF25sE3
+sOK+GzysgLfKW+wReIUNw/0ykLHYqKZvfdC2e4cq5RSp0NWTHO47f66KWPZer0sx
+XD+q2UNjMPVa+bYnWUI5ePlZCkEGAS6/H6z9hDX4p9pMoCjAvvFJH+qn/NJhcb3Q
+bjRlA57bJm77sp91dfZ4R3iSR0Sdyb0i2k88/ouOw15RGTC+mPE7hqNZVkSjQ2D4
+hG/zHcEFjGcJBHwMDLXfsq4sw5yApnsZuiFMXvnxHaXL6nXvCykc4nRfp8rST2VT
+EHNu28d6Z69pCR9enE8vLbo9vTDKtgLjmKrKbO5eTjH2TDHGIFofGw==
+=6EAx
+-----END PGP SIGNATURE-----

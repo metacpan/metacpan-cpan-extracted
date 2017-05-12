@@ -1,0 +1,4 @@
+name = "Algorithm-Prefixspan"
+badges = ["travis", 'coveralls']
+module_maker="ModuleBuildTiny"
+

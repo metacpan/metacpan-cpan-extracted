@@ -1,0 +1,17 @@
+NAME
+       Algorithm::HITS - Perl implementation of HITS algorithm
+
+DESCRIPTION
+       This module implements the HITS algorithm (Kleinberg's
+       hypertext-induced topic selection).
+
+       See also <http://www2002.org/CDROM/refer-
+       eed/643/node1.html>
+
+COPYRIGHT AND LICENSE
+       Copyright (C) 2004 by Yung-chung Lin (a.k.a. xern)
+       <xern@cpan.org>
+
+       This package is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself
+

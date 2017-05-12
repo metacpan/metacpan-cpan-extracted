@@ -1,0 +1,30 @@
+# This parameter file is for strongly overlapping classes
+
+Class names:  recession goodtimes
+class priors: 0.5 0.5
+
+feature name: gdp
+value range: 0 - 100
+
+feature name: return_on_invest
+value range: 0 - 100
+
+params for class: recession
+
+    mean: 45.0  45.0
+
+    covariance: 
+
+            20.0  0.0
+            0.0   20.0
+
+params for class: goodtimes
+
+    mean: 55.0  55.0
+
+    covariance:
+
+           20.0  0.0
+           0.0  20.0
+
+

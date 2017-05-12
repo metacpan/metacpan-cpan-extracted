@@ -1,0 +1,32 @@
+#!perl
+use strict;
+use warnings;
+use 5.014;
+
+use Getopt::Long qw(:config gnu_getopt pass_through);
+use App::Multigit qw/mg_each base_branch/;
+use App::Multigit::Script;
+use Future;
+use curry;
+
+my %result = mg_each(
+    sub {
+        my $repo = shift;
+
+        $repo->run(\@ARGV)
+            ->finally($repo->curry::report)
+    })
+->get;
+
+for (sort keys %result) {
+    say $_ unless $App::Multigit::BEHAVIOUR{output_only};
+    say $result{$_};
+}
+
+=head1 SYNOPSIS
+    
+    mg each [command]
+
+Runs `command` in each repository and reports the results.
+
+Use options to C<mg> itself to control the output.

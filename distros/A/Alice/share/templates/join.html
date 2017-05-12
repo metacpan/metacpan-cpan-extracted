@@ -1,0 +1,28 @@
+? my $app = shift;
+
+<div id="join" class="config config_body">
+  <table>
+    <tr>
+      <td>
+        <label for="join_network">Network</label>
+        <select id="join_network">
+          <? my @ircs = sort {$a->name cmp $b->name} $app->connected_ircs ?>
+          <? for my $irc (@ircs) { ?>
+            <option name="<?= $irc->name ?>"><?= $irc->name ?></option>
+          <? } ?>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding-top:0">
+        <label for="join_channel">Channel</label>
+        <input type="text" id="join_channel" style="width:150px" value=""/>
+      </td>
+    </tr>
+  </table>
+
+  <div class="buttons">
+    <button type="submit" onclick="Alice.joinChannel()">Save</button>
+    <button onclick="alice.input.disabled = false; $('join').remove(); return false;">Cancel</button>
+  </div>
+</div>

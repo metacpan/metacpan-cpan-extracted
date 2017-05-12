@@ -1,0 +1,79 @@
+Copyright (c) 2003 Alex Pleiner - zeitform Internet Dienste. 
+alex@zeitform.de - http://www.zeitform.de. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+
+--------
+Abstract
+--------
+
+Apache::AntiSpam::SpamTrap is a subclass of Apache::AntiSpam, filter
+module to prevent e-mail addresses exposed as is on web pages. This
+module adds a Blowfish encrypted string suffix to the local-part of
+e-mail addresses. This string contains a timestamp and the IP address
+of the remote host. This enables you to identify a spammer's address
+harvester by its IP address and take steps to prosecute him.
+
+The encryption prevents faking and may help in a prosecuting attemp.
+
+For example, <apleiner@cpan.org> will be filtered to
+<apleiner-78c1ed6da0322b3a@cpan.org>.
+
+This module is Filter aware, meaning that it can work within
+Apache::Filter framework without modification.
+
+This work is based on the Apache::AntiSpam::* modules provided by
+Tatsuhiko Miyagawa <miyagawa@bulknews.net>. The idea is taken from
+Daniel A. Rehbein (http://daniel.rehbein.net/).
+
+------------
+Requirements
+------------
+
+This module requires:
+ 
+   - Apache::AntiSpam
+   - Crypt::Blowfish
+
+The requirements are encoded in Makefile.PL.  
+
+------------------
+Basic Installation
+------------------
+
+Apache::AntiSpam::SpamTrap may be installed through the CPAN shell in 
+the usual CPAN shell manner.  This typically is:
+
+  $ perl -MCPAN -e 'install Apache::AntiSpam::SpamTrap'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme Apache::AntiSpam::SpamTrap
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install Apache::AntiSpam::SpamTrap
+
+-------------------
+Manual Installation
+-------------------
+
+Apache::AntiSpam::SpamTrap can also be installed manually.  
+
+Download the package from:
+http://alex.zeitform.de/spamtrap/
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+

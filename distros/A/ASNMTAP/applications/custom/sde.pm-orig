@@ -1,0 +1,103 @@
+# ----------------------------------------------------------------------------------------------------------
+# © Copyright 2003-2011 Alex Peeters [alex.peeters@citap.be]
+# ----------------------------------------------------------------------------------------------------------
+# 2011/mm/dd, v3.002.003, module sde.pm for ASNMTAP::Asnmtap::Applications::Display
+# ----------------------------------------------------------------------------------------------------------
+
+use strict;
+use warnings;           # Must be used in test mode only. This reduces a little process speed
+#use diagnostics;       # Must be used in test mode only. This reduces a lot of process speed
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+BEGIN { if ( $ENV{ASNMTAP_PERL5LIB} ) { eval 'use lib ( "$ENV{ASNMTAP_PERL5LIB}" )'; } }
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+use ASNMTAP::Asnmtap::Applications::Display v3.002.003;
+use ASNMTAP::Asnmtap::Applications::Display qw(:APPLICATIONS :DBDISPLAY);
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+sub getTimeperiodRelationshipsSDE {
+  my ($serverName, $checklist, $hash_catalogID_uKey_timeperiodID, $debug) = @_;
+
+  my $CARTO_DATABASE = 'carto';
+  my $CARTO_TABLE = 'TestRelationships';
+
+  my $rv  = 1;
+  my $dbh = DBI->connect("DBI:mysql:$CARTO_DATABASE:$serverName:$SERVERPORTREADWRITE", "$SERVERUSERREADWRITE", "$SERVERPASSREADWRITE") or $rv = errorTrapDBI($checklist, "Cannot connect to the database");
+
+  if ($dbh and $rv) {
+    my $sql = "select SQL_NO_CACHE catalogID, uKey, priority, imw_sunday, imw_monday, imw_tuesday, imw_wednesday, imw_thursday, imw_friday, imw_saturday from $CARTO_TABLE";
+    print "<", $sql, ">\n" if ($debug);
+
+    my $sth = $dbh->prepare( $sql ) or $rv = errorTrapDBI($checklist, "Cannot dbh->prepare: $sql");
+    $sth->execute or $rv = errorTrapDBI($checklist, "Cannot sth->execute: $sql") if $rv;
+
+    if ( $rv ) {
+      # (localtime)[6]: weekday Number of days since Sunday (0 - 6)
+      my %WDAYS = ('sunday'=>'0','monday'=>'1','tuesday'=>'2','wednesday'=>'3','thursday'=>'4','friday'=>'5','saturday'=>'6');
+
+      while (my $ref = $sth->fetchrow_hashref()) {
+        if ( exists $$hash_catalogID_uKey_timeperiodID{$ref->{catalogID}}->{$ref->{uKey}} ) {
+          $$hash_catalogID_uKey_timeperiodID{$ref->{catalogID}}->{$ref->{uKey}}->{SDE_IMW}->{priority}          = ( $ref->{priority}      ) ? $ref->{priority}      : 'P01';
+          $$hash_catalogID_uKey_timeperiodID{$ref->{catalogID}}->{$ref->{uKey}}->{SDE_IMW}->{$WDAYS{sunday}}    = ( $ref->{imw_sunday}    ) ? $ref->{imw_sunday}    : '';
+          $$hash_catalogID_uKey_timeperiodID{$ref->{catalogID}}->{$ref->{uKey}}->{SDE_IMW}->{$WDAYS{monday}}    = ( $ref->{imw_monday}    ) ? $ref->{imw_monday}    : '';
+          $$hash_catalogID_uKey_timeperiodID{$ref->{catalogID}}->{$ref->{uKey}}->{SDE_IMW}->{$WDAYS{tuesday}}   = ( $ref->{imw_tuesday}   ) ? $ref->{imw_tuesday}   : '';
+          $$hash_catalogID_uKey_timeperiodID{$ref->{catalogID}}->{$ref->{uKey}}->{SDE_IMW}->{$WDAYS{wednesday}} = ( $ref->{imw_wednesday} ) ? $ref->{imw_wednesday} : '';
+          $$hash_catalogID_uKey_timeperiodID{$ref->{catalogID}}->{$ref->{uKey}}->{SDE_IMW}->{$WDAYS{thursday}}  = ( $ref->{imw_thursday}  ) ? $ref->{imw_thursday}  : '';
+          $$hash_catalogID_uKey_timeperiodID{$ref->{catalogID}}->{$ref->{uKey}}->{SDE_IMW}->{$WDAYS{friday}}    = ( $ref->{imw_friday}    ) ? $ref->{imw_friday}    : '';
+          $$hash_catalogID_uKey_timeperiodID{$ref->{catalogID}}->{$ref->{uKey}}->{SDE_IMW}->{$WDAYS{saturday}}  = ( $ref->{imw_saturday}  ) ? $ref->{imw_saturday}  : '';
+        }
+      }
+
+      $sth->finish() or $rv = errorTrapDBI($checklist, "Cannot sth->finish: $sql");
+    }
+
+    $dbh->disconnect or $rv = errorTrapDBI($checklist, "Sorry, the database was unable to add your entry.") if ($dbh and $rv);
+  }
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+sub printRelationshipsSDE {
+  my ($serverName, $checklist, $catalogID, $uniqueKey) = @_;
+
+  my $CARTO_DATABASE = 'carto';
+  my $CARTO_TABLE = 'TestRelationships';
+
+  my $dataRelationshipsSDE = '';
+
+  my $rv  = 1;
+  my $dbh = DBI->connect("DBI:mysql:$CARTO_DATABASE:$serverName:$SERVERPORTREADWRITE", "$SERVERUSERREADWRITE", "$SERVERPASSREADWRITE") or $rv = errorTrapDBI($checklist, "Cannot connect to the database");
+
+  if ($dbh and $rv) {
+    my $sql = "select SQL_NO_CACHE code, invoicedOrg, service, impact, priority from $CARTO_TABLE where catalogID = '$catalogID' and uKey = '$uniqueKey'";
+    my $sth = $dbh->prepare( $sql ) or $rv = errorTrapDBI($checklist, "Cannot dbh->prepare: $sql");
+    $sth->execute or $rv = errorTrapDBI($checklist, "Cannot sth->execute: $sql") if $rv;
+
+    if ( $rv ) {
+      my ($code, $invoicedOrg, $service, $impact, $priority);
+
+      while( ($code, $invoicedOrg, $service, $impact, $priority) = $sth->fetchrow_array() ) {
+        $dataRelationshipsSDE .= "<TR><TD BGCOLOR=#000080 ALIGN=RIGHT COLSPAN=2>SDE</TD></TR>";
+        $dataRelationshipsSDE .= "<TR><TD BGCOLOR=#000080 WIDTH=100 ALIGN=RIGHT>Invoiced Organisation</TD><TD BGCOLOR=#0000FF>$invoicedOrg</TD></TR>";
+        $dataRelationshipsSDE .= "<TR><TD BGCOLOR=#000080 WIDTH=100 ALIGN=RIGHT>Service</TD><TD BGCOLOR=#0000FF>$service</TD></TR>";
+        $dataRelationshipsSDE .= "<TR><TD BGCOLOR=#000080 WIDTH=100 ALIGN=RIGHT>Code/CI</TD><TD BGCOLOR=#0000FF>$code</TD></TR>";
+        $dataRelationshipsSDE .= "<TR><TD BGCOLOR=#000080 WIDTH=100 ALIGN=RIGHT>Impact</TD><TD BGCOLOR=#0000FF>$impact</TD></TR>";
+        $dataRelationshipsSDE .= "<TR><TD BGCOLOR=#000080 WIDTH=100 ALIGN=RIGHT>Priority</TD><TD BGCOLOR=#0000FF>$priority</TD></TR>";
+      }
+
+      $sth->finish() or $rv = errorTrapDBI($checklist, "Cannot sth->finish: $sql");
+    }
+
+    $dbh->disconnect or $rv = errorTrapDBI($checklist, "Sorry, the database was unable to add your entry.") if ($dbh and $rv);
+  }
+
+  return $dataRelationshipsSDE;
+}
+
+# End sde.pm -------------------------------------------------------------------------------------
+
+1;

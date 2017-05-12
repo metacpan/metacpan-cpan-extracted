@@ -1,0 +1,6 @@
+Revision history for Perl extension ActionExporter.
+
+0.01  Tue May 21 17:15:00 2003
+	- original version; created
+0.02  Tue May 21 23:45:00 2003
+        - Better behaviour for actions that don't use either a _start sub or an _end sub.

@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+  <link href="../../test.css" rel="stylesheet" type="text/css">
+  <link href="../../images/GvaScript.css" rel="stylesheet" type="text/css">
+  <script src="../../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+
+  <script>
+    var ac1 = new GvaScript.AutoCompleter({
+        json_url: 'http://search.yahooapis.com/WebSearchService/V1/relatedSuggestion?appid=YahooDemo&query=?1&output=json&callback=?2',
+        json_list: 'ResultSet/Result'}, {
+          minimumChars: 2,
+          autoSuggest: true,
+          autoSuggestDelay: 500,
+          typeAhead: true
+        }
+    );
+
+    var ac2 = new GvaScript.AutoCompleter({
+        json_url: 'http://api.flickr.com/services/feeds/photos_public.gne?tags=?1&tagmode=any&format=json&jsoncallback=?2',
+        json_list: 'items'}, {
+          minimumChars: 2,
+          autoSuggest: true,
+          autoSuggestDelay: 500,
+          typeAhead: true,
+          labelField: 'title',
+          valueField: 'link'
+        }
+     );
+
+    var ac3 = new GvaScript.AutoCompleter({
+      json_url: 'http://suggestqueries.google.com/complete/search?hl=en&qu=?1&json=t&jsonp=?2',
+        json_list: '1'}, {
+          minimumChars: 2,
+          autoSuggest: true,
+          autoSuggestDelay: 500,
+          typeAhead: true
+        }
+     );
+
+  </script>
+</head>
+
+<body>
+
+  <h1>JSONP Autocompleters</h1>
+
+  <p>
+  These autocompleters are bound to JSONP services by google, yahoo! and flickr.<br />
+  JSONP is a technique that allows you to transfer JSON data across multiple domains.<br/>
+  </p><br/>
+
+  Google Suggest : <input type="text" autocomplete="off" class="AC_input" onfocus="ac3.autocomplete(this)" /><br />
+            <em>(http://suggestqueries.google.com/complete/search?hl=en&qu=?1&json=t&jsonp=?2)</em>
+            <br/><br/>
+
+  Yahoo Suggest : <input type="text" autocomplete="off" class="AC_input" onfocus="ac1.autocomplete(this)" /><br />
+            <em>(http://search.yahooapis.com/WebSearchService/V1/relatedSuggestion?appid=YahooDemo&query=?1&output=json&callback=?2)</em>
+            <br/><br/>
+
+  Flickr Search : <input type="text" autocomplete="off" class="AC_input" onfocus="ac2.autocomplete(this)" 
+                         onlegalvalue="$('image_pholder').update(new Element('img', {src: event.choice.media.m}))"
+                         size="50"/><br /> 
+            <em>(http://api.flickr.com/services/feeds/photos_public.gne?tags=?1&tagmode=any&format=json&jsoncallback=?2)</em>
+            <br/><br/>
+            <div id="image_pholder"></div> 
+</body>
+
+</html>

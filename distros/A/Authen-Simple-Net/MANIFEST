@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Authen/Simple/FTP.pm
+lib/Authen/Simple/POP3.pm
+lib/Authen/Simple/SMTP.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01use.t
+t/02pod.t
+t/03podcoverage.t

@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/base64
+dist.ini
+lib/App/Base64.pm
+lib/App/Base64/Command/decode.pm
+t/decode.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

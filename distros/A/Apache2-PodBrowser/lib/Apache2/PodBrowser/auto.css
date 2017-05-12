@@ -1,0 +1,72 @@
+BODY {
+    background: white;
+    color: black;
+    font-family: times,serif;
+    margin: 0;
+    padding: 1ex;
+}
+
+pre, code, kbd, samp, tt {
+    font-family: monospace,monospace;
+    font-size: 1em;
+}
+
+TABLE {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border-width: 0;
+    color: inherit;
+}
+
+A:link, A:visited {
+    background: transparent;
+    color: #006699;
+}
+
+PRE {
+    background: #eeeeee;
+    border: 1px solid #888888;
+    color: black;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    white-space: pre;
+}
+
+H1 {
+    background: transparent;
+    color: #006699;
+    font-size: x-large;
+    font-family: tahoma,sans-serif;
+}
+
+H2 {
+    background: transparent;
+    color: #006699;
+    font-size: large;
+    font-family: tahoma,sans-serif;
+}
+
+.block {
+    background: transparent;
+}
+
+TD .block {
+    color: #006699;
+    background: #dddddd;
+    padding: 0.2em;
+    font-size: large;
+}
+
+HR {
+    display: none;
+}
+
+.podindex A {
+    display: inline-block;
+    width: 19em;
+}
+
+.podindex .indexgroup A {
+    width: 2em;
+    text-align: center;
+}

@@ -1,0 +1,355 @@
+2016-03-22  JJ Merelo  <jmerelo@flash>
+
+	* lib/Algorithm/Evolutionary/Utils.pm (consensus): Fixes the consensus string and changes threshold. 
+	Covering also default values.
+	Improving coverage of conditionals and testing new version.
+	Fixes error generating random bitstring: Always generated hashref.
+
+2016-03-21  JJ Merelo  <jmerelo@flash>
+
+	* lib/Algorithm/Evolutionary/Utils.pm: bumping up version to 1.0.1 with generation of seudo-chromosomes
+	
+	* README.md (Algorithm): 3 years after, Utils.pm is spun off to its new location.
+
+2013-01-06  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/Evolutionary/Op/Base.pm: Tried to supress memorize
+	arity. Don't do it. 
+
+2013-01-05  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/Evolutionary/Op/Tournament_Selection.pm (apply):
+	Changed call to subroutine to using hash value for speed. 
+
+2012-12-08  Juan J. Merelo  <jmerelo@sheldon>
+
+	* scripts/tide_float.pl: Changed script to make it end when
+	solution is found.
+
+	* lib/Algorithm/Evolutionary/Op/VectorCrossover.pm (apply): Fixed
+	bug: the incoming parent was modified along with the offspring. 
+
+2012-07-10  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* MANIFEST: Eliminating pod.t also in production code.
+
+2012-07-09  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* MANIFEST: Eliminated pod-coverage.t, which is not needed for
+	production and causes errors in some systems. 
+
+2012-07-08  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* MANIFEST: Adding missing test files
+
+	* lib/Algorithm/Evolutionary.pm: Starting a maintenance version,
+	which will include the bugs fixed since last summer. 
+	Since there's a bug fix, I think I'm going for full 0.78...
+
+2012-05-21  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/Evolutionary/Op/Uniform_Crossover_Diff.pm (apply):
+	Fixing potentially evil bug: this operator shouldn't, but it
+	modified one of the two individuals under crossover, making
+	mutation and crossover rate higher... 
+
+2012-04-18  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/Evolutionary/Op/Breeder_Diverser.pm (apply):
+	Mostly doc changes. 
+
+2011-11-23  Juan Julian Merelo Guervos  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/Evolutionary/Individual/Vector.pm (clone): Change
+	suggested by Cristoph Meissner, comma between fitness and
+	chromosome. 
+
+2011-02-20  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/Evolutionary/Op/Breeder_Diverser.pm (apply): Made
+	even more diverse by not inserting the new individual if it is the
+	same as the parent; refactored also to best practices.
+
+	* lib/Algorithm/Evolutionary/Op/Uniform_Crossover_Diff.pm (apply):
+	Changed to leave at least one difference without change
+
+2011-02-19  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/Evolutionary/Op/Breeder_Diverser.pm (apply):
+	Changed to make diversification higher: offspring is chosen in
+	turn, instead of chosing it randomly, which avoids repeating.
+
+2011-02-16  Juan J. Merelo  <jmerelo@sheldon>
+
+	* lib/Algorithm/Evolutionary.pm: Upgraded to 0.76_2 by eliminating
+	a useless test and changing Clone::Fast to Clone in another test  
+
+2011-02-14  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* lib/Algorithm/Evolutionary/Op/Storing.pm: Eliminating all traces
+	of Clone::Fast (I expect).
+
+2011-02-13  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
+
+	* MANIFEST: Added Breeder_Diverser (with test) to the distro, with
+	Uniform_Crossover_Diff. 
+
+	* lib/Algorithm/Evolutionary.pm (import): Fixed upstream bug in
+	Clone::Fast for Perl 5.12 by changing it by Clone. Thanks to
+	Leandro Hermida and Jérôme Quelin for reports. 
+
+2010-12-18  Juan J. Merelo Guervós  <jmerelo@localhost.localdomain>
+ 
+	* lib/Algorithm/Evolutionary.pm (import): Starting 0.76 with pod
+	editions .
+
+2010-12-16  Juan Julian Merelo Guervos  <jmerelo@usuario-desktop>
+
+	* MANIFEST: Added combined operator and QuadXOver-Diff.
+
+
+2010-12-16  Juan J. Merelo  <jmerelo@sheldon>
+
+	* MANIFEST: Added Breeder (take population and create new one) with test
+
+
+2010-12-08  Juan J. Merelo Guervós  <jmerelo@localhost.localdomain>
+
+	* lib/Algorithm/Evolutionary/Op/QuadXOver.pm (apply): Eliminating
+	type checks for speed
+
+2010-12-07  Juan J. Merelo Guervós  <jmerelo@localhost.localdomain>
+
+	* lib/Algorithm/Evolutionary/Op/Canonical_GA_NN.pm (apply): Fixed
+	QuadXOver to avoid total interchange (initial point = 0 )
+
+	* lib/Algorithm/Evolutionary.pm:  Mainly a maintenance release,
+	with the spin fix below. 
+
+2010-09-28  Juan J. Merelo  <jmerelo@sheldon>
+
+	* lib/Algorithm/Evolutionary.pm: Added tests to see what can make some of them fail
+
+2010-11-24  Juan Julian Merelo Guervos  <jmerelo@usuario-desktop>
+
+	* lib/Algorithm/Evolutionary/Wheel.pm (spin): Changed spin
+	implementation to make it faster and more efficient. It was
+	sucking time out of mastermind EAs
+
+2010-09-25  Juan J. Merelo  <jmerelo@sheldon>
+
+	* lib/Algorithm/Evolutionary/Fitness/Rastrigin.pm (Rastrigin):
+	Fixed formula
+
+	* lib/Algorithm/Evolutionary.pm: Starting 0.74_1 with cosmetic
+	changes and an attempt to fix sporadic test errors.  
+
+2010-09-24  Juan Julian Merelo Guervos  <jmerelo@usuario-desktop>
+
+	* lib/Algorithm/Evolutionary/Fitness/Rastrigin.pm (Rastrigin): Added first floating-point fitness func.
+
+	* lib/Algorithm/Evolutionary/Utils.pm (random_number_array): Added this function
+
+	* lib/Algorithm/Evolutionary/Individual/BitString.pm (from_string): Added from_string ctor
+
+	* lib/Algorithm/Evolutionary/Individual/String.pm (from_string): Changed name and slightly modified
+
+	* t/0002-utils.t: Added this file to test utility functions in the Utils module. 
+
+	* t/ops.t (createAndTest): Added a missing operator
+
+	* Makefile.PL: Updated versions
+
+	* t/general.t: Eliminated some repeated tests.
+
+2010-01-26    <jmerelo@localhost.localdomain>
+
+	* TODO: Updated TODO and version number in A::E. Start 0.73
+
+	* MANIFEST: Fixed some annoying bugs, and added a new module that
+	simplifies using a Canonical Genetic algorithm.
+
+2009-11-17    <jmerelo@localhost.localdomain>
+
+	* lib/Algorithm/Evolutionary/Op/String_Mutation.pm (new): Added
+	this new operator, which does the same that StringRand, but I can
+	at least understand what it does.
+
+	* lib/Algorithm/Evolutionary/Individual/Base.pm (AUTOLOAD): Added
+	AUTOLOAD method for authomatic definition of methods for instance
+	variables. 
+
+2009-10-14    <jmerelo@localhost.localdomain>
+
+	* lib/Algorithm/Evolutionary/Utils.pm (decode_string): Fixed bug
+	when $min != 0 thanks to patch by Mike Gajewski
+x
+2009-09-14  Juan Julian Merelo Guervos  <jmerelo@geneura.ugr.es>
+
+	* t/0601-cga-gif-output.t: Fixed copy/pasted docs for gif-animated-output. 
+
+2009-09-13    <jmerelo@localhost.localdomain>
+
+	* lib/Algorithm/Evolutionary/Op/Population_Output.pm (apply):
+	Starting documentation revision for developer releases.
+
+	* lib/Algorithm/Evolutionary/Op/EDA_step.pm (apply): Added new
+	module implementing estimation of distribution algorithms; added
+	test and example in /examples
+
+2009-07-30  Juan Julian Merelo Guervos  <jmerelo@geneura.ugr.es>
+
+	* lib/Algorithm/Evolutionary.pm: Moved a GUI example to the
+	scripts dir so that it's installed automatically. Expanded
+	documentation to reflect that. Fixed also error (population
+	explosion) in Easy_MO.
+
+2009-07-28  Juan Julian Merelo Guervos  <jmerelo@geneura.ugr.es>
+
+	* lib/Algorithm/Evolutionary.pm: Starting 0.70_1 with the
+	classical documentation fixes. 
+
+	* MANIFEST: 0.70 fixes a bug in Easy.pm and those derived from it:
+	last population element was not eliminated. An animated GIF output
+	has been added, and a bug in Makefile.PL that caused problems with
+	Solaris has also been fixed (Thanks to Alex Muntada).
+
+2009-07-26    <jmerelo@localhost.localdomain>
+
+	* lib/Algorithm/Evolutionary.pm (import): 0.69_1 fixed some
+	problems with missing prerrequisites in the test programs, and
+	some copy/paste stuff left from creating new modules. 0.70 starts
+	with the intention of finally having a GUI.
+
+2009-07-24    <jmerelo@localhost.localdomain>
+
+	* lib/Algorithm/Evolutionary.pm: 0.68 was shortlived, but 0.69
+	more or less the same. 0.69 included missing file and fixed some
+	docs errors; 0.69_1 starts with the same objective, let's see how
+	it ends.
+
+2009-07-24  Juan Julian Merelo Guervos  <jmerelo@geneura.ugr.es>
+
+	* TODO: 0.68 ends with several new test functions added (Trap,
+	ECC), and finally a multiobjective evolutionary algorithm, not
+	very good, but in working order.
+
+2009-03-29    <jmerelo@localhost.localdomain>
+
+	* lib/Algorithm/Evolutionary.pm: 0.68 starts with the usual
+	cosmetic changes to the documentation.  
+
+	* Added "rough consensus" utility as well as a "convergence
+	terminator", which checks whether a part of the population has
+	converged. Upgraded to 0.67. Already!
+
+2009-02-21  jmerelo  <jmerelo@localhost.localdomain>
+
+	* lib/Algorithm/Evolutionary.pm (import): Changing to 0.64_2 to
+	eventually fix  the 0500-generation-skel.t, which was not written
+	correctly. Also fixed some doc problems.
+
+2009-02-18  Juan Julian Merelo Guervos  <jmerelo@geneura.ugr.es>
+
+	* scripts/canonical-genetic-algorithm.pl: Mostly doc changes
+
+2009-02-11  Juan J. Merelo  <jmerelo@vega>
+
+	* t/0500-generation-skel.t: Add test for replacer
+
+	* lib/Algorithm/Evolutionary.pm (import): 0.64_1 set the correct version of Statistics::Basic; <1 does not work.
+
+2009-02-09  jmerelo  <jmerelo@localhost.localdomain>
+
+	* Change to 0.63
+	* lib/Algorithm/Evolutionary.pm (import): fixed pod problem
+	* Added EXE_FILES to Makefile.PL to have examples indexed
+
+2009-02-07  jmerelo  <jmerelo@localhost.localdomain>
+
+	* Changed to 0.62_3
+	* Fixed problems with XML code that made tests fail in some machines (those with XML::Parser::Style::EasyTree installed)
+	
+
+2009-02-06  Juan Julian Merelo Guervos  <jmerelo@geneura.ugr.es>
+
+	* Fixed $VERSION bug that prevented correct indexing in CPAN
+	* Changed to 0.62_2
+	* Moved XML parsing code to a new place, so that it can be fixed more easily.
+
+2009-02-04  jmerelo  <jmerelo@localhost.localdomain>
+
+	* Checked problems with version number, change to 0:62_1
+
+	* Added new operators for the SOCO paper.
+
+2008-06-26  Juan Julián Merelo Guervós <jmerelo@geneura.ugr.es>
+0.62 Oct 2008
+	* Added new fitness functions.
+
+2008-06-26  Juan Julián Merelo Guervós <jmerelo@geneura.ugr.es>
+0.61 Jun 2008
+        * Fixing version numbers in files that prevent indexing. Changing documentation to do so
+        * Updated simulated annealing, with added example
+        * Changed Makefile for separate examples distro
+        * Minor refactoring of old classes
+        * New tests for String added and passed mainly related to Tieing
+        * Added Bit_Vector
+
+2008-07-01  Juan Julián Merelo Guervós <jmerelo@geneura.ugr.es>
+0.60 Jul 2008
+        * Changed clone to Clone::Fast::clone and adapted to it
+        * Fixed bug in canonical-genetic-algorithm
+        * Fixed bug in Makefile.PL; make didn't do anything
+
+2008-06-23  Juan Julián Merelo Guervós <jmerelo@geneura.ugr.es>
+0.59 Jun 2008
+        * Added canonical genetic algorithm demo
+        * Added royal road fitness 
+
+2008-06-23  Juan Julián Merelo Guervós <jmerelo@geneura.ugr.es>
+0.58 Jun 2008
+        * Reverting to old numbering scheme (thanks to bug report)
+        * Added TODO
+
+2008-06-23  Juan Julián Merelo Guervós <jmerelo@geneura.ugr.es>
+0.5.8 Jun 2008
+        * Added base class for String-based fitness functions
+        * Cached evals for all siblings of A::E::F::String
+        * Refactored A::E::F hierarchy
+        * Fixed docs
+
+2008-06-21  Juan Julián Merelo Guervós <jmerelo@geneura.ugr.es>
+0.57 Jun 2008
+        * Added ONEMAX	
+        * Changed Indi::Base; uses self-evaluation
+
+2008-06-18  Juan Julián Merelo Guervós <jmerelo@geneura.ugr.es>
+0.56 Jun 2008
+        * Solved XML::Parser dependence
+        * Doc changes
+
+2008-06-16  Juan Julián Merelo Guervós <jmerelo@geneura.ugr.es>
+0.55 Jun 2008
+        * So many changes I no longer know if it's worth the while to update this
+        * Directory layout changed to standard CPAN
+        * A::E::Fitness hierarchy added
+        * Fixed occasional test failures
+        * Many examples with test functions added
+
+2005-11-14  Juan Julian Merelo Guervos  <jmerelo@localhost>
+0.53_4 Nov 2005
+	* Fixed many problems with DTDs. It should work now.
+	* Fixed Changes and some docs.
+
+Revision history for Perl extension Algorithm::Evolutionary.
+0.51 Sept 22 2002
+	- Fixed some problems with the PODs.
+	- Updated to the version in CVS.
+	- Fixed files missing in the MANIFEST.
+	- Included all files mentioned in the YAPC::Europe presentation
+
+0.01  Fri Jun  7 09:43:33 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Algorithm::Evolutionary
+

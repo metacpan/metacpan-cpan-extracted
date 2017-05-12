@@ -1,0 +1,77 @@
+{
+   "abstract" : "Alien module for ta-lib from http://ta-lib.org",
+   "author" : [
+      "Vikas N. Kumar <vikas@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-TALib",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "Archive::Zip" : "0",
+            "Cwd" : "0",
+            "ExtUtils::CBuilder" : "0",
+            "File::HomeDir" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Which" : "0",
+            "LWP::Simple" : "0",
+            "Module::Build" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "Archive::Zip" : "0",
+            "Cwd" : "0",
+            "File::HomeDir" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Which" : "0",
+            "LWP::Simple" : "0",
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "Archive::Zip" : "0",
+            "Cwd" : "0",
+            "File::HomeDir" : "0",
+            "File::Spec" : "0",
+            "File::Which" : "0",
+            "LWP::Simple" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::TALib" : {
+         "file" : "lib/Alien/TALib.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vikasnkumar/Alien-TALib/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/vikasnkumar/Alien-TALib"
+      }
+   },
+   "version" : "0.08"
+}

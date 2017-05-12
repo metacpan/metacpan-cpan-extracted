@@ -1,0 +1,49 @@
+#!perl
+use strict;
+package
+  redisp; # tricks pause but not dzil...
+# ABSTRACT: Perl redis shell
+use App::redisp;
+use Getopt::Long;
+
+my %opts;
+GetOptions(
+  "server=s" => \$opts{host},
+  "port=i" => \$opts{port},
+  "encoding=s" => \$opts{encoding},
+  "help|h" => \$opts{help}
+) or App::redisp->usage(1);
+App::redisp->usage(2) if $opts{help};
+
+App::redisp->new(
+  map +(defined $opts{$_} ? ($_ => $opts{$_}) : ()), %opts)->run;
+
+
+__END__
+=pod
+
+=head1 NAME
+
+redisp - Perl redis shell
+
+=head1 VERSION
+
+version 0.11
+
+=head1 DESCRIPTION
+
+Perl redis shell, see L<App::redisp>.
+
+=head1 AUTHOR
+
+David Leadbeater <dgl@dgl.cx>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by David Leadbeater.
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Beerware license.
+
+=cut
+

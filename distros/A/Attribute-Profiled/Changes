@@ -1,0 +1,13 @@
+Revision history for Perl extension Attribute::Profiled.
+
+0.03  Wed Sep 19 01:02:22 JST 2001
+	* Now caller works correctly thanks to Hook::LexWrap
+
+0.02  Tue Sep 18 08:39:12 JST 2001
+	- fixed return value bug, added test suite
+	- docs update
+
+0.01  Sun Sep  2 02:23:01 2001
+	- original version; created by h2xs 1.21 with options
+		-AXn Attribute::Profiled
+

@@ -1,0 +1,38 @@
+<form method="POST" action="[% s.uo %]/save" name="form">
+<div class="floatleft">
+<table>
+	<caption>[% s.object %]</caption>
+	<tbody>
+[% FOREACH f IN s.o.fields -%]
+	<tr>
+		<th>[% f.t %]</th>
+		<td>
+	[% IF s.o.menu.${f.k} -%]
+		[% IF f.notnull %]
+			[% s.html_select(s.o.menu.${f.k},f.i,'id','name','') %]
+		[% ELSE %]
+			[% s.html_select(s.o.menu.${f.k},f.i,'id','name','',1) %]
+		[% END %]
+	[% ELSIF f.boolean %]
+		[% s.html_checkbox(f.k,1) %]
+	[% ELSIF f.textarea %]
+		[% s.html_textarea(f.k,'',40,10) %]
+	[% ELSIF f.v %]
+		[% IF f.notnull %]
+			[% s.html_select_basic(f.v,f.k) %]
+		[% ELSE %]
+			[% s.html_select_basic(f.v,f.k,'',1) %]
+		[% END %]
+	[% ELSIF f.calendar %]
+		[% s.html_input_calendar(f.k,'') %]
+	[% ELSE %]
+		[% s.html_input(f.k,'',f.input_size) %]
+	[% END %]
+		</td>
+	</tr>
+	</tbody>
+[% END -%]
+</table>
+<input type="submit" value="Save" style="clear: both;">
+</div>
+</form>

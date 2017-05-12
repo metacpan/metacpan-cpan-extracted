@@ -1,0 +1,37 @@
+#!perl
+use strict;
+use warnings;
+use utf8;
+use App::tldr;
+App::tldr->new->parse_options(@ARGV)->run;
+
+__END__
+
+=head1 NAME
+
+tldr - a perl tldr client
+
+=head1 SYNOPSIS
+
+  $ tldr command
+
+  Options:
+   -o, --os=OS     os (osx, sunos or linux)
+   -h, --help      show this help
+   -v, --version   show version
+
+  Environment variables:
+   * TLDR_REPOSITORY=/path/to/tldr-pages/tldr
+       by default, tldr get man pages from https://github.com/tldr-pages/tldr
+       If you set a local tldr's repository, you'll see man pages quickly.
+   * TLDR_DEBUG=1
+       turn on debug message
+
+  Examples:
+   $ tldr tar
+   $ tldr -o osx brew
+   $ TLDR_REPOSITORY=/path/to/tldr-pages/tldr tldr gzip
+
+=head1 SEE ALSO
+
+L<https://github.com/tldr-pages/tldr>

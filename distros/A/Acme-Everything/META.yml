@@ -1,0 +1,23 @@
+--- 
+abstract: Effectively loads every class in CPAN
+author: 
+  - Adam Kennedy <adamk@cpan.org>
+build_requires: 
+  File::Spec: 0.80
+  Test::More: 0.47
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Acme-Everything
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  CPANPLUS: 0
+  Class::Autouse: 1.03
+  perl: 5.6.0
+version: 1.01

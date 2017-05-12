@@ -1,0 +1,31 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_GetFieldByName(control,schema,field_name)</CODE></H2>
+
+      This is a shortcut function that combine ars_GetListField and
+      ars_GetField.  Given a schema name and field name, it returns
+      the field id.  If you need more than a few field id's, use
+      ars_GetFieldTable. <P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns the field id.
+          <DT><B>On failure</B><DD>
+              Returns <CODE>undef</CODE>.
+      </DL>
+
+      <P>Example:
+
+      <PRE>    
+      $id = ars_GetFieldByName($c, "User", "Login name");
+      </PRE>
+
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

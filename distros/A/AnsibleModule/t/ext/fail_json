@@ -1,0 +1,8 @@
+#!/usr/bin/env perl 
+
+use lib 'lib';
+use AnsibleModule;
+
+my $module=AnsibleModule->new();
+
+$module->fail_json({msg=>"fail_json"});

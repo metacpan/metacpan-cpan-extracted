@@ -1,0 +1,30 @@
+---
+abstract: 'Alien package for the libmagic library'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  Module::Load: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  Alien::Base::ModuleBuild: '0.005'
+  File::ShareDir: '1.03'
+  perl: '5.010'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-LibMagic
+requires:
+  Alien::Base: '0.005'
+  File::ShareDir: '1.03'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/zmughal/p5-Alien-LibMagic
+  repository: https://github.com/zmughal/p5-Alien-LibMagic.git
+version: '0.002'

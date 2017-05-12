@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+# © 2010 David Leadbeater; https://dgl.cx/licence
+# A tee-alike that writes to wmii-lua's message plugin
+
+use Getopt::Std;
+getopts('a');
+@ARGV = "-" unless @ARGV;
+
+for(@ARGV) {
+  if($_ eq '-') {
+    push @out, \*STDOUT;
+  } else {
+    open $out[@out], ">" . ($opt_a && ">"), $_ or die "$_: $!\n";
+  }
+}
+
+while(<STDIN>) {
+  for my $fh(@out) {
+    print $fh $_ or die "$!\n";
+  }
+
+  chomp;
+  s/([\x0-\x1f])/sprintf '\\x%02x', ord $1/eg;
+  open my $wmii, "|-", qw(wmiir write /event) or die $!;
+  print $wmii "msg $_\n";
+}

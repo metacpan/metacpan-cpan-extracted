@@ -1,0 +1,259 @@
+#compdef appspec
+
+_appspec() {
+    local program=appspec
+    typeset -A opt_args
+    local curcontext="$curcontext" state line context
+
+
+        # ---- Command: 
+        _arguments -s  \
+            '1: :->cmd1' \
+            '*: :->args' \
+            && ret=0
+
+
+        case $state in
+        cmd1)
+            _alternative 'args:cmd2:((completion\:"Generate completion for a specified spec file" help\:"Show command help" new\:"Create new app" pod\:"Generate pod" validate\:"Validate spec file"))'
+        ;;
+
+        args)
+            case $line[1] in
+            _complete)
+
+                # ---- Command: _complete
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
+                    '--name[name of the program]:name' \
+                    '--zsh[for zsh]' \
+                    '--bash[for bash]' \
+                    && ret=0
+
+
+            ;;
+            _pod)
+
+                # ---- Command: _pod
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
+                    && ret=0
+
+
+            ;;
+            completion)
+
+                # ---- Command: completion
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->spec_file' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
+                    '--name[name of the program]:name' \
+                    '--zsh[for zsh]' \
+                    '--bash[for bash]' \
+                    && ret=0
+
+                case $state in
+                spec_file)
+_files
+                ;;
+                esac
+
+            ;;
+            help)
+
+                # ---- Command: help
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->cmd2' \
+                    '*: :->args' \
+                    && ret=0
+
+
+                case $state in
+                cmd2)
+                    _alternative 'args:cmd3:((completion new pod validate))'
+                ;;
+
+                args)
+                    case $line[2] in
+                    _complete)
+
+                        # ---- Command: help _complete
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
+                            && ret=0
+
+
+                    ;;
+                    _pod)
+
+                        # ---- Command: help _pod
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
+                            && ret=0
+
+
+                    ;;
+                    completion)
+
+                        # ---- Command: help completion
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
+                            && ret=0
+
+
+                    ;;
+                    new)
+
+                        # ---- Command: help new
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
+                            && ret=0
+
+
+                    ;;
+                    pod)
+
+                        # ---- Command: help pod
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
+                            && ret=0
+
+
+                    ;;
+                    validate)
+
+                        # ---- Command: help validate
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
+                            && ret=0
+
+
+                    ;;
+                    esac
+
+                ;;
+
+                esac
+            ;;
+            new)
+
+                # ---- Command: new
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->path' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
+                    '--name[The (file) name of the app]:name' \
+                    '-n[The (file) name of the app]:name' \
+                    '--class[The main class name for your app implementation]:class' \
+                    '-c[The main class name for your app implementation]:class' \
+                    '--overwrite[Overwrite existing dist directory]' \
+                    '-o[Overwrite existing dist directory]' \
+                    '--with-subcommands[Create an app with subcommands]' \
+                    '-s[Create an app with subcommands]' \
+                    && ret=0
+
+                case $state in
+                path)
+
+                ;;
+                esac
+
+            ;;
+            pod)
+
+                # ---- Command: pod
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->spec_file' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
+                    && ret=0
+
+                case $state in
+                spec_file)
+_files
+                ;;
+                esac
+
+            ;;
+            validate)
+
+                # ---- Command: validate
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->spec_file' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
+                    '--color[output colorized]' \
+                    '-C[output colorized]' \
+                    && ret=0
+
+                case $state in
+                spec_file)
+_files
+                ;;
+                esac
+
+            ;;
+            esac
+
+        ;;
+
+        esac
+
+}
+
+
+__appspec_dynamic_comp() {
+    local argname="$1"
+    local arg="$2"
+    local comp="arg:$argname:(("
+    local line
+    while read -r line; do
+        local name="$line"
+        local desc="$line"
+        name="${name%$'\t'*}"
+        desc="${desc/*$'\t'}"
+        comp="$comp$name"
+        if [[ -n "$desc" && "$name" != "$desc" ]]; then
+            comp="$comp\\:"'"'"$desc"'"'
+        fi
+        comp="$comp "
+    done <<< "$arg"
+
+    comp="$comp))"
+    _alternative "$comp"
+}
+

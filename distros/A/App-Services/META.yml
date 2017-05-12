@@ -1,0 +1,33 @@
+---
+abstract: "Makes reusable services easy\r"
+author:
+  - 'Sean Blanton <sean@blanton.com>'
+build_requires:
+  POSIX: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Services
+requires:
+  Bread::Board: 0
+  Bread::Board::Container: 0
+  Carp: 0
+  DBI: 0
+  KiokuDB: 0
+  KiokuDB::Backend::DBI: 0
+  Log::Dispatch::Screen: 0
+  Log::Log4perl: 0
+  Moo: 0
+  Moo::Role: 0
+  MooX::Types::MooseLike::Base: 0
+  Moose: 0
+  Moose::Role: 0
+  Net::SMTP: 0
+  common::sense: 0
+version: 0.002

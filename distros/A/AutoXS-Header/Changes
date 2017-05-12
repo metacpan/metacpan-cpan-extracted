@@ -1,0 +1,31 @@
+Revision history for Perl extension AutoXS-Header.
+
+1.02  Thu Jun 11 16:42 2009
+        - Fix a warning.
+
+1.01  Sun May 31 18:40 2009
+        - Fix RT #46552: Code should be C89.
+          (Reported and fixed by Ron Blaschke)
+
+1.00  Sun May 17 11:16 2009
+        - Fix prototype issue in previous release.
+
+0.06  Sat May 16 13:40 2009
+        * Incompatible API change! *
+        - Add reverse association containers.
+
+0.05  Tue Dec  9 21:16 2008
+        - Fix documentation to advise a Win32-nmake compatible Makefile.PL
+
+0.04  Sun May  4 19:01 2008
+        - Doh. Make Synopsis work anywhere at all.
+
+0.03  Sun May  4 19:00 2008
+        - Change Synopsis to work on win32.
+
+0.02  Sat May  3 19:00 2008
+        - integer storage for Class::XSAccessor::Array.
+
+0.01  Mon Mar 31 23:34 2008
+        - original version as uploaded to CPAN
+

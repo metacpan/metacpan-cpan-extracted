@@ -1,0 +1,28 @@
+---
+abstract: 'Base class/namespace static web asset distributions on CPAN'
+author:
+  - 'Henry Van Styn <vanstyn@cpan.org>'
+build_requires:
+  File::Spec: 0
+  Test::More: 0
+  base: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-Web
+requires:
+  File::ShareDir: 0
+  Path::Class: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://github.com/vanstyn/Alien-Web.git
+version: 1.1
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -e
+
+command:config() {
+  local config_key= config_value=
+  get-args config_key:empty config_value:empty
+  if [ -z "$config_key" ]; then
+    dump-config || OK=1
+    msg_ok=0
+  elif [ -z "$config_value" ]; then
+    read-config-value "$config_key" || OK=1
+    msg_ok="$value"
+  else
+    write-config-value "$config_key" "$config_value" || OK=1
+    msg_ok="git-hub.$config_key=$config_value"
+  fi
+}
+
+command:config-unset() {
+  get-args config_key
+  delete-config-value "$config_key" || OK=1
+  msg_ok="Config key 'git-hub.$config_key' removed"
+}
+
+# vim: set lisp:

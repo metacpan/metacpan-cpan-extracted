@@ -1,0 +1,55 @@
+Changes for Algorithm::Merge
+----------------------------
+
+0.08 -   21 Mar 2007
+
+  Fixed a problem where certain differences would cause corruption 
+  later in the traverse_sequences3 output.  Reported by Mark Glines.
+
+0.07 -   21 Mar 2007
+
+  Fixed an entry in the internal state mapping that was causing a one-off
+  error in certain cases.  Reported by Mark Glines.
+
+0.06 -   20 Mar 2007
+
+  Fixed outstanding tickets on rt.cpan.org (#11184, #14483).
+
+  Fixed a bug found by Mark Glines.  This resulted in an additional
+  entry in the callback map.
+
+0.05  -   6 Nov 2003
+
+  Added some more entries to the callback map.
+
+  Thanks to Chia-liang Kao for bringing these to our attention.
+
+0.04  -  29 Oct 2003
+
+  Added some more entries to the callback map.
+
+  Thanks to Chia-liang Kao for bringing these to our attention.
+
+0.03  -  22 Apr 2003
+
+  Fixed some bugs in the traverse_sequences3, diff3, and merge routines.
+
+    merge: properly manage conflicts that remain after processing the 
+           diff3 results
+
+    traverse_sequences3: defined some more states in the Callback Map.
+
+    diff3: handle some sequence differences better
+
+  Thanks to Martin Hosken for bringing these to our attention.
+
+0.02  -  19 Feb 2003
+
+  Change from Algorithm::Diff::diff to Algorithm::Diff::traverse_sequences.  
+  Saves a little time and some memory, especially for large sequences.
+
+  Added CHANGES file to track changes.
+
+0.01  -  17 Feb 2003
+
+  Initial beta release.

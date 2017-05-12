@@ -1,0 +1,138 @@
+NAME
+    Apache::DBILogConfig - Logs access information in a DBI database
+
+SYNOPSIS
+     # In httpd.conf
+     PerlLogHandler Apache::DBILogConfig
+     PerlSetVar DBILogConfig_data_source DBI:Informix:log_data
+     PerlSetVar DBILogConfig_username    informix
+     PerlSetVar DBILogConfig_password    informix
+     PerlSetVar DBILogConfig_table       mysite_log
+     PerlSetVar DBILogConfig_log_format  "%b=bytes_sent %f=filename %h=remote_host %r=request %s=status"
+
+DESCRIPTION
+    This module replicates the functionality of the standard Apache module,
+    mod_log_config, but logs information in a DBI-compliant database instead
+    of a file. (Some documentation has been borrowed from the mod_log_config
+    documentation.)
+
+LIST OF TOKENS
+    DBILogConfig_data_source
+        A DBI data source with a format of "DBI::driver:database"
+
+    DBILogConfig_username
+        Username passed to the database driver when connecting
+
+    DBILogConfig_password
+        Password passed to the database driver when connecting
+
+    DBILogConfig_table
+        Table in the database for logging
+
+    DBILogConfig_log_format
+        A string consisting of formats separated by white space that define
+        the data to be logged (see FORMAT STRING below)
+
+FORMAT STRING
+    A format string consists of a string with the following syntax:
+
+    %[conditions][{parameter}]format=field
+
+  format
+
+    Formats specify the type of data to be logged. The following formats are
+    accepted:
+
+    a Remote IP-address
+    A Local IP-address (not yet supported)
+    B Bytes sent, excluding HTTP headers.
+    b Bytes sent, excluding HTTP headers. In CLF format i.e. a '-' rather
+    than a 0 when no bytes are sent.
+    c Connection status when response is completed. 'X' = connection aborted
+    before the response completed. '+' = connection may be kept alive after
+    the response is sent. '-' = connection will be closed after the response
+    is sent. (not yet supported)
+    e The contents of the environment variable specified by parameter
+    f Filename
+    h Remote host
+    H The request protocol
+    i The contents of the header (specified by parameter) in the request
+    sent to the server.
+    l Remote logname (from identd, if supplied)
+    m The request method
+    n The contents of note (specified by parameter) from another module.
+    o The contents of the header (specified by parameter) in the reply.
+    p The canonical Port of the server serving the request
+    P The process ID of the child that serviced the request.
+    q The query string (prepended with a ? if a query string exists,
+    otherwise an empty string)
+    r First line of request
+    s Status. For requests that got internally redirected, this is the
+    status of the *original* request.
+    t Time, in common log format time format or the format specified by
+    parameter, which should be in strftime(3) format.
+    T The time taken to serve the request, in seconds.
+    u Remote user (from auth; may be bogus if return status (%s) is 401)
+    U The URL path requested.
+    v The canonical ServerName of the server serving the request.
+    V The server name according to the UseCanonicalName setting (not yet
+    supported).
+  field
+
+    A database column to log the data to
+
+  parameter
+
+    For formats that take a parameter
+
+    Example: %{DOCUMENT_ROOT}e
+
+  conditions
+
+    Conditions are a comma-separated list of status codes. If the status of
+    the request being logged equals one of the status codes in the condition
+    the data specified by the format will be logged. By placing a '!' in
+    front of the conditions, data will be logged if the request status does
+    not match any of the conditions.
+
+    Example: %!200,304,302s=status will log the status of all requests that
+    did not return some sort of normal status
+
+DEBUGGING
+    Debugging statements will be written to the error log if LOGLEVEL is set
+    to 'warn' or higher
+
+PREREQUISITES
+    * mod_perl >= 1.11_01 with PerlLogHandler enabled
+    * DBI
+    * Date::Format
+INSTALLATION
+    To install this module, move into the directory where this file is
+    located and type the following:
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+    This will install the module into the Perl library directory.
+
+    Once installed, you will need to modify your web server's configuration
+    as above.
+
+NOTE
+    After installing and configuring this module, Apache will continue to
+    log to your regular access log file (if it was previously configured
+    that way). To log accesses only to your database comment out CustomLog
+    or TransferLog or set them to /dev/null.
+
+AUTHOR
+    Copyright (C) 1998, Jason Bodnar <jason@shakabuku.org>. All rights
+    reserved.
+
+    This module is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    perl(1), mod_perl(3)
+

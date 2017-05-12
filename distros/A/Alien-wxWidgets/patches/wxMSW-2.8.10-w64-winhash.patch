@@ -1,0 +1,63 @@
+Index: src/msw/window.cpp
+===================================================================
+--- src/msw/window.cpp	(revisione 63679)
++++ src/msw/window.cpp	(copia locale)
+@@ -3431,11 +3431,17 @@
+ // wxWindow <-> HWND map
+ // ----------------------------------------------------------------------------
+ 
+-wxWinHashTable *wxWinHandleHash = NULL;
++// hash containing all our windows, it uses HWND keys and wxWindow* values
++WX_DECLARE_HASH_MAP(HWND, wxWindow *,
++                    wxPointerHash, wxPointerEqual,
++                    WindowHandles);
+ 
++WindowHandles gs_windowHandles;
++
+ wxWindow *wxFindWinFromHandle(WXHWND hWnd)
+ {
+-    return (wxWindow*)wxWinHandleHash->Get((long)hWnd);
++    WindowHandles::const_iterator i = gs_windowHandles.find((HWND)hWnd);
++    return i == gs_windowHandles.end() ? NULL : i->second;
+ }
+ 
+ void wxAssociateWinWithHandle(HWND hWnd, wxWindowMSW *win)
+@@ -3449,13 +3455,13 @@
+ #endif // __WXDEBUG__
+     if (!oldWin)
+     {
+-        wxWinHandleHash->Put((long)hWnd, (wxWindow *)win);
++        gs_windowHandles[hWnd] = (wxWindow *)win;
+     }
+ }
+ 
+ void wxRemoveHandleAssociation(wxWindowMSW *win)
+ {
+-    wxWinHandleHash->Delete((long)win->GetHWND());
++    gs_windowHandles.erase(GetHwndOf(win));
+ }
+ 
+ // ----------------------------------------------------------------------------
+Index: src/msw/app.cpp
+===================================================================
+--- src/msw/app.cpp	(revisione 63679)
++++ src/msw/app.cpp	(copia locale)
+@@ -321,8 +321,6 @@
+ 
+     RegisterWindowClasses();
+ 
+-    wxWinHandleHash = new wxWinHashTable(wxKEY_INTEGER, 100);
+-
+ #if !defined(__WXMICROWIN__) && !defined(__WXWINCE__)
+     wxSetKeyboardHook(true);
+ #endif
+@@ -494,9 +492,6 @@
+     // unregister the classes now
+     UnregisterWindowClasses();
+ 
+-    delete wxWinHandleHash;
+-    wxWinHandleHash = NULL;
+-
+ #ifdef __WXWINCE__
+     free( wxCanvasClassName );
+     free( wxCanvasClassNameNR );

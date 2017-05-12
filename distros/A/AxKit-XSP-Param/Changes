@@ -1,0 +1,11 @@
+Revision history for Perl extension Apache::AxKit::Language::XSP::Param.
+
+1.4
+    - Updated to AxKit 1.4 API
+
+0.60  Wed Feb 14 2001
+	-import to new namspace
+
+0.01  Sat Feb 10 22:24:44 2001
+	- original version; created by h2xs 1.19
+

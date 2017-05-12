@@ -1,0 +1,53 @@
+TYPEMAP
+struct model * T_LIBLINEAR_MODEL
+
+struct parameter * T_LIBLINEAR_TRAINING_PARAMETER
+
+struct problem * T_LIBLINEAR_PROBLEM
+
+INPUT
+T_LIBLINEAR_MODEL
+    if (SvROK($arg) &&
+          sv_derived_from($arg, \"Algorithm::LibLinear::Model::Raw\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR($type,tmp);
+    }
+    else {
+        Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+            ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+            \"$var\", \"$ntype\");
+    }
+
+T_LIBLINEAR_TRAINING_PARAMETER
+    if (SvROK($arg) &&
+          sv_derived_from($arg, \"Algorithm::LibLinear::TrainingParameter\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR($type,tmp);
+    }
+    else {
+        Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+            ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+            \"$var\", \"$ntype\");
+    }
+
+T_LIBLINEAR_PROBLEM
+    if (SvROK($arg) &&
+          sv_derived_from($arg, \"Algorithm::LibLinear::Problem\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR($type,tmp);
+    }
+    else {
+        Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+            ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+            \"$var\", \"$ntype\");
+    }
+
+OUTPUT
+T_LIBLINEAR_MODEL
+    sv_setref_pv($arg, \"Algorithm::LibLinear::Model::Raw\", (void*)$var);
+
+T_LIBLINEAR_TRAINING_PARAMETER
+    sv_setref_pv($arg, \"Algorithm::LibLinear::TrainingParameter\", (void*)$var);
+
+T_LIBLINEAR_PROBLEM
+    sv_setref_pv($arg, \"Algorithm::LibLinear::Problem\", (void*)$var);

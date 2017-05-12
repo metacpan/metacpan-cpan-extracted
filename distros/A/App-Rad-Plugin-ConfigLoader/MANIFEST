@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/App/Rad/Plugin/ConfigLoader.pm
+t/00-load.t
+t/10-config.t
+t/pod-coverage.t
+t/pod.t
+t/etc/config1.yml
+t/etc/config2.yml
+Makefile.PL
+META.yml

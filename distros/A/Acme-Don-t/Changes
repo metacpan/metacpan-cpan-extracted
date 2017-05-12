@@ -1,0 +1,15 @@
+Revision history for Perl extension Acme::Don't.
+
+1.00  Wed May  1 15:13:31 2002
+	- original version; created by h2xs 1.20 with options
+		-A -P -X -f -n Acme::Don::t
+
+
+
+1.01	Fri May  3 07:17:10 2002
+
+	- Forwent some elegance in the code in order to support
+	  certain platforms that can::t handle apostrophes in
+	  filenames without running home in tears to mamma.
+
+	- Documented limitations and semantics better

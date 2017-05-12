@@ -1,0 +1,45 @@
+---
+abstract: 'Deployment State Manager'
+author:
+  - 'Gryphon Shafer <gryphon@cpan.org>'
+build_requires:
+  Cwd: '0'
+  Exporter: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  blib: '1.01'
+  lib: '0'
+  perl: 5.016_003
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: 5.016_003
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Dest
+requires:
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Copy::Recursive: '0'
+  File::DirCompare: '0'
+  File::Find: '0'
+  File::Path: '0'
+  IPC::Run: '0'
+  Path::Tiny: '0'
+  Pod::Usage: '0'
+  Text::Diff: '0'
+  Try::Tiny: '0'
+  perl: 5.016_003
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/gryphonshafer/dest/issues
+  homepage: https://github.com/gryphonshafer/dest
+  repository: https://github.com/gryphonshafer/dest.git
+version: '1.16'

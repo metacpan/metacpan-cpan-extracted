@@ -1,0 +1,14 @@
+SYNOPSIS
+
+     # erm
+    
+     cpanp -i Acme::CPANPLUS::PreReq::Text::Tabs
+
+DESCRIPTION
+
+    Acme::CPANPLUS::PreReq::Text::Tabs is a fake module that has a prereq
+    on the Text::Tabs module so I can test something in CPANPLUS and
+    CPANPLUS::YACSmoke
+
+    No moving parts and nothing to see.
+

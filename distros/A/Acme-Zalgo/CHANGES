@@ -1,0 +1,8 @@
+0.002	2014-03-03
+	- Works on perl-5.8.9
+	- s/zalgofy/zalgo/g
+	- Configurable via $Acme::Zalgo::ZALGO_REGEX
+
+0.001	2014-03-01
+	- HE COMES
+

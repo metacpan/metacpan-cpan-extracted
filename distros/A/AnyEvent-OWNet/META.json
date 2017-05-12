@@ -1,0 +1,75 @@
+{
+   "abstract" : "Client for 1-wire File System server",
+   "author" : [
+      "Mark Hindess <soft-cpan@temporalanomaly.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-OWNet",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Pod::No404s" : "0",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::Handle" : "0",
+            "AnyEvent::Socket" : "0",
+            "Carp" : "0",
+            "Sub::Name" : "0",
+            "Try::Tiny" : "0",
+            "constant" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent::MockTCPServer" : "0",
+            "Exporter" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "base" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/beanz/anyevent-ownet-perl/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/AnyEvent-OWNet/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/beanz/anyevent-ownet-perl.git",
+         "web" : "https://github.com/beanz/anyevent-ownet-perl"
+      }
+   },
+   "version" : "1.163170",
+   "x_serialization_backend" : "JSON::XS version 3.01"
+}
+

@@ -1,0 +1,20 @@
+README
+COPYING
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+
+lib/AnyEvent/FDpasser.pm
+FDpasser.xs
+
+t/basic_filesystem.t
+t/basic_socketpair.t
+t/buffer_exercise.t
+t/child_dies.t
+t/full_descriptor_table.t
+t/non_blocking_fhs.t
+t/recv_before_send.t
+t/send_before_recv.t
+t/send_passer_over_passer.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

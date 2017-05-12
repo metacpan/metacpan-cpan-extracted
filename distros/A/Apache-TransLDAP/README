@@ -1,0 +1,50 @@
+============================================================================
+            Apache::TransLDAP - A mod_perl Trans Handler Example
+                            by Clayton Donley
+============================================================================
+
+INTRODUCTION
+------------
+
+This module is an example of how you can create an Trans handler for use
+with Apache+mod_perl.  This particular example translates from a user
+virtual directory on the server to the 'labeledURI' attribute for the
+given user.
+
+COPYRIGHT
+---------
+
+(c) Copyright 1998 Clayton Donley - All Rights Reserved
+You may freely distribute this module under the same terms as Perl.
+
+INSTALLATION
+------------
+
+This module requires Net::LDAPapi.  It can be found on my website at
+http://www.wwa.com/~donley/.  I'll be posting a new version that uses
+PerLDAP as I find time.
+
+Uncompress and untar the archive.  Then run the following commands:
+
+% perl Makefile.PL
+% make
+
+Then as root:
+
+# make install
+
+This will install the module in the appropriate place and make it usable
+from your Apache configuration.
+
+USAGE
+-----
+
+See the generated POD documentation for examples of how to use this module
+from your Apache configuration files.
+
+FEEDBACK
+--------
+
+I'm very interested in any ways that you might use this module, or others
+that I have developed.  Please send me email at donley@wwa.com.  Bug reports
+and questions are welcome as well.

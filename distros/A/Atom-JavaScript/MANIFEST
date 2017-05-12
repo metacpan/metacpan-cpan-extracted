@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/XML/Atom/Feed/JavaScript.pm
+t/use.t
+t/file.t
+t/network.t
+t/feed.t
+t/feed.xml
+t/pod.t
+META.yml

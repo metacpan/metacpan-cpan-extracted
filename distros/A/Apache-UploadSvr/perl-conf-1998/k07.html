@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+</head>
+<body BGCOLOR=#ffffff>
+<FONT SIZE="7">
+<HR>
+<A HREF="k06.html"><IMG SRC="leftarrow.png" ALIGN=RIGHT BORDER=0></A>
+<H1>Directory Viewer</H1>
+<UL>
+<LI> Image::Magick for graphics
+<li> Authentication via Files section in httpd.conf
+    <pre>
+ &lt;Files "..."&gt;
+ PerlSetVar DirCache .dircache
+ SetHandler perl-script
+ PerlHandler Apache::UploadSvr::Directory
+ AuthName stadtplandienst
+ AuthType Basic
+ PerlAuthenHandler Apache::AuthenDBI
+ require valid-user
+ &lt;/Files&gt;</pre>
+<li> <a href="http://localhost/...">http://localhost/...</a>
+</UL>
+</FONT>
+<HR>
+<FONT SIZE="-1">
+<ADDRESS>
+Seamless Publishing on the Web<BR>
+The 2nd O'Reilly Perl Conference,
+20 August 1998<br>
+Andreas König
+<TT>
+<A HREF="mailto:andreas.koenig@kulturbox.de">andreas.koenig@kulturbox.de</A><BR>
+</TT>
+</ADDRESS>
+</FONT>
+</body> </html>

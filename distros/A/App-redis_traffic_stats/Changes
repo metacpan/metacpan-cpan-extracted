@@ -1,0 +1,18 @@
+Revision history for App-redis_traffic_stats
+
+1.004     2015-10-27 10:25:30+00:00 UTC
+    [IMPROVEMENTS]
+        - Reduce slow commands (#2 by @chenzhe07)
+
+1.003  2014-10-03 12:58:27 JST
+    [IMPROVEMENTS]
+        - Collect stats for clients that were already connected when the capture starts (#1)
+
+1.001  2014-02-26 13:03:56 JST
+    [PACKAGING]
+        - Refine cpanfile
+
+1.000  2014-02-25 22:16:58 JST
+    [NEW FEATURES]
+        - Initial version
+

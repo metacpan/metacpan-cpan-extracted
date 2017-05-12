@@ -1,0 +1,18 @@
+Revision history for Perl module App::Spec
+
+0.004 Mon Oct 31 18:56:05 CET 2016
+
+    - Lots of refactoring
+    - More documentation
+    - Update schema
+    - Integer validation fix
+    - Feture: allow 'mapping' options and parameters (Like Getopt::Long
+      supports via '%')
+    - Feature: add DSL for defining options
+
+0.003 Thu Oct 13 21:06:00 CEST 2016
+    - Change: refactoring. Apps should now inherit from App::Spec::Run::Cmd
+    - Feature: add 'unique' feature for params/options
+
+0.002 Sun Sep  4 16:57:00 CEST 2016
+    - developer version

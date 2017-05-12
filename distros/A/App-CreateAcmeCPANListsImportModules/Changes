@@ -1,0 +1,41 @@
+Revision history for App-CreateAcmeCPANListsImportModules
+
+0.06    2017-01-06 (PERLANCAR)
+
+	- Allow 'Foo/Bar' or 'Foo::Bar' in module name.
+
+	- Add 'Cache-Control: no-cache' header to get() request to avoid
+	  getting cached compressed data.
+
+	- Observe HTTP_USER_AGENT.
+
+
+0.05    2016-11-07 (PERLANCAR)
+
+	- Allow adding module entries manually via add_modules.
+
+	- Allow extracting from multiple URL's via extract_urls.
+
+
+0.04    2016-07-19 (PERLANCAR)
+
+	- Add option: excluded_unindexed (default on) to exclude module
+	  entries that are not indexed on local CPAN index to avoid false
+	  positive entries.
+
+
+0.03    2016-02-21 (PERLANCAR)
+
+	- Check for duplicate module name.
+
+	- Abort when no module names are found in HTML.
+
+
+0.02    2016-02-21 (PERLANCAR)
+
+	- Allow adding notes.
+
+
+0.01    2016-02-21 (PERLANCAR)
+
+        - First release.

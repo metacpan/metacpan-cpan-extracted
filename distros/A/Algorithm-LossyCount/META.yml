@@ -1,0 +1,25 @@
+---
+abstract: 'Memory-efficient approximate frequency count.'
+author:
+  - 'Koichi SATOH <sekia@cpan.org>'
+build_requires:
+  List::Util: '0'
+  Test::Exception::LessClever: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.140640'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-LossyCount
+requires:
+  Carp: '0'
+  POSIX: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/sekia/Algorithm-LossyCount/issues
+  repository: git://github.com/sekia/Algorithm-LossyCount.git
+version: '0.03'

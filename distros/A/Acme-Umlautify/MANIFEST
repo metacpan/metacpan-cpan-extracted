@@ -1,0 +1,14 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README
+lib/Acme/Umlautify.pm
+t/00_pod.t
+t/01_load.t
+t/02_method.t
+t/03_oo.t
+t/04_latin_m.t
+t/05_latin_oo.t

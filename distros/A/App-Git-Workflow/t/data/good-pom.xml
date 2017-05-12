@@ -1,0 +1,15 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.example</groupId>
+  <artifactId>thing</artifactId>
+  <version>1.92.2</version>
+  <packaging>pom</packaging>
+  <name>Thing</name>
+
+  <scm>
+    <connection>scm:git:https://github.com/ivanwills/git-workflow-tools.git</connection>
+    <developerConnection>scm:git:https://github.com/ivanwills/git-workflow-tools.git</developerConnection>
+    <url>https://github.com/ivanwills/git-workflow-tools/</url>
+    <tag>thing-1.92.2</tag>
+  </scm>
+</project>

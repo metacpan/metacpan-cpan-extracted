@@ -1,0 +1,445 @@
+NAME
+    AI::ExpertSystem::Advanced - Expert System with backward, forward and
+    mixed algorithms
+
+DESCRIPTION
+    Inspired in AI::ExpertSystem::Simple but with additional features:
+
+    *   Uses backward, forward and mixed algorithms.
+
+    *   Offers different views, so user can interact with the expert system
+        via a terminal or with a friendly user interface.
+
+    *   The knowledge database can be stored in any format such as YAML, XML
+        or databases. You just need to choose what driver to use and you are
+        done.
+
+    *   Uses certainty factors.
+
+SYNOPSIS
+    An example of the mixed algorithm:
+
+        use AI::ExpertSystem::Advanced;
+        use AI::ExpertSystem::Advanced::KnowledgeDB::Factory;
+
+        my $yaml_kdb = AI::ExpertSystem::Advanced::KnowledgeDB::Factory->new('yaml',
+            {
+                filename => 'examples/knowledge_db_one.yaml'
+            });
+
+        my $ai = AI::ExpertSystem::Advanced->new(
+                viewer_class => 'terminal',
+                knowledge_db => $yaml_kdb,
+                initial_facts => ['I'],
+                verbose => 1);
+        $ai->mixed();
+        $ai->summary();
+
+Attributes
+    initial_facts
+        A list/set of initial facts the algorithms start using.
+
+        During the forward algorithm the task is to find a list of goals
+        caused by these initial facts (the only data we have in that
+        moment).
+
+        Lets imagine your knowledge database is about symptoms and diseases.
+        You need to find what diseases are caused by the symptoms of a
+        patient, these first symptons are the initial facts.
+
+        Initial facts as also asked and inference facts can be negative or
+        positive. By default the initial facts are positive.
+
+        Keep in mind that the data contained in this array can be the IDs or
+        the name of the fact.
+
+        This array will be converted to initial_facts_dict. And all the data
+        (ids or or names) will be made of only IDs.
+
+            my $ai = AI::ExpertSystem::Advanced->new(
+                    viewer_class => 'terminal',
+                    knowledge_db => $yaml_kdb,
+                    initial_facts => ['I', ['F', '-'], ['G', '+']);
+
+        As you can see if you want to provide the sign of a fact, just
+        *encapsulate* it in an array, the first item should be the fact and
+        the second one the sign.
+
+    initial_facts_dict
+        This dictionary (see AI::ExpertSystem::Advanced::Dictionary has the
+        sasme data of initial_facts but with the additional feature(s) of
+        proviing iterators and a quick way to find elements.
+
+    goals_to_check
+            my $ai = AI::ExpertSystem::Advanced->new(
+                    viewer_class => 'terminal',
+                    knowledge_db => $yaml_kdb,
+                    goals_to_check => ['J']);
+
+        When doing the backward() algorithm it's required to have at least
+        one goal (aka hypothesis).
+
+        This could be pretty similar to initial_facts, with the difference
+        that the initial facts are used more with the causes of the rules
+        and this one with the goals (usually one in a well defined knowledge
+        database).
+
+        The same rule of initial_facts apply here, you can provide the sign
+        of the facts and you can provide the id or the name of them.
+
+        From our example of symptoms and diseases lets imagine we have the
+        hypothesis that a patient has flu, we don't know the symptoms it
+        has, we want the expert system to keep asking us for them to make
+        sure that our hypothesis is correct (or incorrect in case there's
+        not enough information).
+
+    goals_to_check_dict
+        Very similar to goals_to_check (and indeed of initial_facts_dict).
+        We want to make the job easier.
+
+        It will be a dictionary made of the data of goals_to_check.
+
+    inference_facts
+        Inference facts are basically the core of an expert system. These
+        are facts that are found and copied when a set of facts (initial,
+        inference or asked) match with the causes of a goal.
+
+        inference_facts is a AI::ExpertSystem::Advanced::Dictionary, it will
+        store the name of the fact, the rule that caused these facts to be
+        copied to this dictionary, the sign and the algorithm that triggered
+        it.
+
+    knowledge_db
+        The object reference of the knowledge database
+        AI::ExpertSystem::Advanced is using.
+
+    asked_facts
+        During the backward() algorithm there will be cases when there's no
+        clarity if a fact exists. In these cases the backward() will be
+        asking the user (via automation or real questions) if a fact exists.
+
+        Going back to the initial_facts example of symptoms and diseases.
+        Imagine the algorithm is checking a rule, some of the facts of the
+        rule make a match with the ones of initial_facts or inference_facts
+        but some wont, for these *unsure* facts the backward() will ask the
+        user if a symptom (a fact) exists. All these asked facts will be
+        stored here.
+
+    visited_rules
+        Keeps a record of all the rules the algorithms have visited and also
+        the number of causes each rule has.
+
+    verbose
+            my $ai = AI::ExpertSystem::Advanced->new(
+                    viewer_class => 'terminal',
+                    knowledge_db => $yaml_kdb,
+                    initial_facts => ['I'],
+                    verbose => 1);
+
+        By default this is turned off. If you want to know what happens
+        behind the scenes turn this on.
+
+        Everything that needs to be debugged will be passed to the debug()
+        method of your viewer.
+
+    viewer
+        Is the object AI::ExpertSystem::Advanced will be using for printing
+        what is happening and for interacting with the user (such as asking
+        the asked_facts).
+
+        This is practical if you want to use a viewer object that is not
+        provided by AI::ExpertSystem::Advanced::Viewer::Factory.
+
+    viewer_class
+        Is the the class name of the viewer.
+
+        You can decide to use the viewers
+        AI::ExpertSystem::Advanced::Viewer::Factory offers, in this case you
+        can pass the object or only the name of your favorite viewer.
+
+    found_factor
+        In your knowledge database you can give different *weights* to the
+        facts of each rule (eg to define what facts have more *priority*).
+        During the mixed() algorithm it will be checking what causes are
+        found in the inference_facts and in the asked_facts dictionaries,
+        then the total number of matches (or total number of certainity
+        factors of each rule) will be compared versus the value of this
+        factor, if it's higher or equal then the rule will be triggered.
+
+        You can read the documentation of the mixed() algorithm to know the
+        two ways this factor can be used.
+
+    shot_rules
+        All the rules that are shot are stored here. This is a hash, the key
+        of each item is the rule id while its value is the precision time
+        when the rule was shot.
+
+        The precision time is useful for knowing when a rule was shot and
+        based on that you can know what steps it followed so you can compare
+        (or reproduce) them.
+
+Constants
+    * FACT_SIGN_NEGATIVE
+        Used when a fact is negative, aka, a fact doesn't happen.
+
+    * FACT_SIGN_POSITIVE
+        Used for those facts that happen.
+
+    * FACT_SIGN_UNSURE
+        Used when there's no straight answer of a fact, eg, we don't know if
+        an answer will change the result.
+
+Methods
+  shoot($rule, $algorithm)
+    Shoots the given rule. It will do the following verifications:
+
+    *   Each of the facts (causes) will be compared against the
+        initial_facts_dict, inference_facts and asked_facts (in this order).
+
+    *   If any initial, inference or asked fact matches with a cause but
+        it's negative then all of its goals (usually only one by rule) will
+        be copied to the inference_facts with a negative sign, otherwise a
+        positive sign will be used.
+
+    *   Will add the rule to the shot_rules hash.
+
+  is_rule_shot($rule)
+    Verifies if the given $rule has been shot.
+
+  get_goals_by_rule($rule)
+    Will ask the knowledge_db for the goals of the given $rule.
+
+    A AI::ExpertSystem::Advanced::Dictionary will be returned.
+
+  get_causes_by_rule($rule)
+    Will ask the knowledge_db for the causes of the given $rule.
+
+    A AI::ExpertSystem::Advanced::Dictionary will be returned.
+
+  is_fact_negative($dict_name, $fact)
+    Will check if the given $fact of the given dictionary ($dict_name) is
+    negative.
+
+  copy_to_inference_facts($facts, $sign, $algorithm, $rule)
+    Copies the given $facts (a dictionary, usually goal(s) of a rule) to the
+    inference_facts dictionary. All the given goals will be copied with the
+    given $sign.
+
+    Additionally it will add the given $algorithm and $rule to the inference
+    facts. So later we can know how we got to a certain inference fact.
+
+  compare_causes_with_facts($rule)
+    Compares the causes of the given $rule with:
+
+    *   Initial facts
+
+    *   Inference facts
+
+    *   Asked facts
+
+    It will be couting the matches of all of the above dictionaries, so for
+    example if we have four causes, two make match with initial facts, other
+    with inference and the remaining one with the asked facts, then it will
+    evaluate to true since we have a match of the four causes.
+
+  get_causes_match_factor($rule)
+    Similar to compare_causes_with_facts() but with the difference that it
+    will count the "match factor" of each matched cause and return the total
+    of this weight.
+
+    The match factor is used by the mixed() algorithm and is useful to know
+    if a certain rule should be shoot or not even if not all of the causes
+    exist in our facts.
+
+    The *match factor* is calculated in two ways:
+
+    *   Will do a sum of the weight for each matched cause. Please note that
+        if only one cause of a rule has a specified weight then the
+        remaining causes will default to the total weight minus 1 and then
+        divided with the total number of causes (matched or not) that don't
+        have a weight.
+
+    *   If no weight is found with all the causes of the given rule, then
+        the total number of matches will be divided by the total number of
+        causes.
+
+  is_goal_in_our_facts($goal)
+    Checks if the given $goal is in:
+
+    1   The initial facts
+
+    2   The inference facts
+
+    3   The asked facts
+
+  remove_last_ivisited_rule()
+    Removes the last visited rule and return its number.
+
+  visit_rule($rule, $total_causes)
+    Adds the given $rule to the end of the visited_rules.
+
+  copy_to_goals_to_check($rule, $facts)
+    Copies a list of facts (usually a list of causes of a rule) to
+    goals_to_check_dict.
+
+    The rule ID of the goals that are being copied is also stored in the
+    hahs.
+
+  ask_about($fact)
+    Uses viewer to ask the user for the existence of the given $fact.
+
+    The valid answers are:
+
+    + or FACT_SIGN_POSITIVE
+        In case user knows of it.
+
+    - or FACT_SIGN_NEGATIVE
+        In case user doesn't knows of it.
+
+    ~ or FACT_SIGN_UNSURE
+        In case user doesn't have any clue about the given fact.
+
+  get_rule_by_goal($goal)
+    Looks in the knowledge_db for the rule that has the given goal. If a
+    rule is found its number is returned, otherwise undef.
+
+  forward()
+        use AI::ExpertSystem::Advanced;
+        use AI::ExpertSystem::Advanced::KnowledgeDB::Factory;
+
+        my $yaml_kdb = AI::ExpertSystem::Advanced::KnowledgeDB::Factory->new('yaml',
+                {
+                    filename => 'examples/knowledge_db_one.yaml'
+                });
+
+        my $ai = AI::ExpertSystem::Advanced->new(
+                viewer_class => 'terminal',
+                knowledge_db => $yaml_kdb,
+                initial_facts => ['F', 'J']);
+        $ai->forward();
+        $ai->summary();
+
+    The forward chaining algorithm is one of the main methods used in Expert
+    Systems. It starts with a set of variables (known as initial facts) and
+    reads the available rules.
+
+    It will be reading rule by rule and for each one it will compare its
+    causes with the initial, inference and asked facts. If all of these
+    causes are in the facts then the rule will be shoot and all of its goals
+    will be copied/converted to inference facts and will restart reading
+    from the first rule.
+
+  backward()
+        use AI::ExpertSystem::Advanced;
+        use AI::ExpertSystem::Advanced::KnowledgeDB::Factory;
+
+        my $yaml_kdb = AI::ExpertSystem::Advanced::KnowledgeDB::Factory->new('yaml',
+            {
+                filename => 'examples/knowledge_db_one.yaml'
+                });
+
+        my $ai = AI::ExpertSystem::Advanced->new(
+                viewer_class => 'terminal',
+                knowledge_db => $yaml_kdb,
+                goals_to_check => ['J']);
+        $ai->backward();
+        $ai->summary();
+
+    The backward algorithm starts with a set of *assumed* goals (facts). It
+    will start reading goal by goal. For each goal it will check if it
+    exists in the initial, inference and asked facts (see
+    is_goal_in_our_facts()) for more information).
+
+    *   If the goal exist then it will be removed from the dictionary, it
+        will also verify if there are more visited rules to shoot.
+
+        If there are still more visited rules to shoot then it will check
+        from what rule the goal comes from, if it was copied from a rule
+        then this data will exist. With this information then it will see
+        how many of the causes of this given rule are still in the
+        goals_to_check_dict.
+
+        In case there are still causes of this rule in goals_to_check_dict
+        then the amount of causes pending will be reduced by one. Otherwise
+        (if the amount is 0) then the rule of this last removed goal will be
+        shoot.
+
+    *   If the goal doesn't exist in the mentioned facts then the goal will
+        be searched in the goals of every rule.
+
+        In case it finds the rule that has the goal, this rule will be
+        marked (added) to the list of visited rules (visited_rules) and also
+        all of its causes will be added to the top of the
+        goals_to_check_dict and it will start reading again all the goals.
+
+        If there's the case where the goal doesn't exist as a goal in the
+        rules then it will ask the user (via ask_about()) for the existence
+        of it. If user is not sure about it then the algorithm ends.
+
+  mixed()
+    As its name says, it's a mix of forward() and backward() algorithms, it
+    requires to have at least one initial fact.
+
+    The first thing it does is to run the forward() algorithm (hence the
+    need of at least one initial fact). If the algorithm fails then the
+    mixed algorithm also ends unsuccessfully.
+
+    Once the first *run* of forward() algorithm happens it starts looking
+    for any positive inference fact, if only one is found then this ends the
+    algorithm with the assumption it knows what's happening.
+
+    In case no positive inference fact is found then it will start reading
+    the rules and creating a list of intuitive facts.
+
+    For each rule it will get a *certainty factor* of its causes versus the
+    initial, inference and asked facts. In case the certainity factor is
+    greater or equal than found_factor then all of its goals will be copied
+    to the intuitive facts (eg, read it as: it assumes the goals have
+    something to do with our first initial facts).
+
+    Once all the rules are read then it verifies if there are intuitive
+    facts, if no facts are found then it ends with the intuition, otherwise
+    it will run the backward() algorithm for each one of these facts (eg,
+    each fact will be converted to a goal). After each *run* of the
+    backward() algorithm it will verify for any positive inference fact, if
+    just one is found then the algorithm ends.
+
+    At the end (if there are still no positive inference facts) it will run
+    the forward() algorithm and restart (by looking again for any positive
+    inference fact).
+
+    A good example to understand how this algorithm is useful is: imagine
+    you are a doctor and know some of the symptoms of a patient. Probably
+    with the first symptoms you have you can get to a positive conclusion
+    (eg that a patient has *X* disease). However in case there's still no
+    clue, then a set of questions (done by the call of backward()) of
+    symptons related to the initial symptoms will be asked to the user. For
+    example, we know that that the patient has a headache but that doesn't
+    give us any positive answer, what if the patient has flu or another
+    disease? Then a set of these *related* symptons will be asked to the
+    user.
+
+  summary($return)
+    The main purpose of any expert system is the ability to explain: what is
+    happening, how it got to a result, what assumption(s) it required to
+    make, the fatcs that were excluded and the ones that were used.
+
+    This method will use the viewer (or return the result) in YAML format of
+    all the rules that were shot. It will explain how it got to each one of
+    the causes so a better explanation can be done by the viewer.
+
+    If $return is defined (eg, it got any parameter) then the result wont be
+    passed to the viewer, instead it will be returned as a string.
+
+SEE ALSO
+    Take a look AI::ExpertSystem::Simple too.
+
+AUTHOR
+    Pablo Fischer (pablo@pablo.com.mx).
+
+COPYRIGHT
+    Copyright (C) 2010 by Pablo Fischer.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

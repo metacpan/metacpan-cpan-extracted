@@ -1,0 +1,21 @@
+#!/usr/bin/perl -l
+
+use strict;
+use warnings;
+
+use lib qw'../lib lib';
+
+use Acme::LOLCAT;
+
+# This is a simple command line based translater.
+#
+# Have lolcli in your path, and feed it some text:
+#
+# $ lolcli this is some test text, isn't it neat?
+#
+# Output:
+#
+# THIZ AR TEH SUM TEST TET, ISNT IT NEAT?
+
+print translate( join ' ', @ARGV );
+

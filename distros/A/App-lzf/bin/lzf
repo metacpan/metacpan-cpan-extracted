@@ -1,0 +1,212 @@
+#!perl
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+our $VERSION = '0.02'; # VERSION
+
+my %Opts;
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'decompress|uncompress|d' => \$Opts{decompress},
+        'force|f' => \$Opts{force},
+        'pure-perl|pp' => \$Opts{pure_perl},
+        'to-stdout|c' => \$Opts{to_stdout},
+        'help|h'         => sub {
+            print <<USAGE;
+lzf - Compress/decompress using LZF algorithm
+
+Usage:
+  lzf [options] <file> ...
+  lzf --help
+Options:
+  --decompress, --uncompress, -d
+  --force, -f
+  --pure-perl, --pp
+  --to-stdout, -c
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+
+    unless (@ARGV) {
+        warn "lzf: Please specify at least one file\n";
+        exit 99;
+    }
+}
+
+sub run {
+  FILE:
+    for my $file (@ARGV) {
+        if ($Opts{decompress}) {
+            die "lzf: Filename '$file' does not end with .lzf\n"
+                unless $file =~ /\.lzf\z/;
+        } else {
+            die "lzf: Filename '$file' already has .lzf suffix, unchanged\n"
+                if $file =~ /\.lzf\z/ && !$Opts{force};
+        }
+
+        my $fh;
+        my $data;
+        {
+            local $/;
+            open $fh, "<", $file
+                or die "lzf: Can't open '$file' for reading: $!\n";
+            $data = <$fh>;
+        }
+        my @st = stat($fh) or die "lzf: Can't stat '$file': $!\n";
+
+        my $newdata;
+        my $newfile;
+        if ($Opts{decompress}) {
+            if ($Opts{pure_perl}) {
+                require Compress::LZF_PP;
+                $newdata = Compress::LZF_PP::decompress($data);
+            } else {
+                require Compress::LZF;
+                $newdata = Compress::LZF::decompress($data);
+            }
+            $newfile = $file;
+            $newfile =~ s/\.lzf\z//;
+        } else {
+            require Compress::LZF;
+            $newdata = Compress::LZF::compress($data);
+            $newfile = "$file.lzf";
+        }
+
+        if (-e $newfile && !$Opts{to_stdout} && !$Opts{force}) {
+            while (1) {
+                print "lzf: '$file' already exists, overwrite (y/n)? ";
+                my $ans = <STDIN>;
+                chomp($ans);
+                if ($ans eq 'y') {
+                    last;
+                } else {
+                    next FILE;
+                }
+            }
+        }
+
+        if ($Opts{to_stdout}) {
+            print $newdata;
+            next;
+        }
+
+        open $fh, ">", $newfile
+            or die "lzf: Can't open '$file' for writing: $!\n";
+        print $fh $newdata;
+        close $fh;
+        unlink $file or die "lzf: Can't unlink '$file': $!\n";
+        utime $st[8], $st[9], $newfile
+            or die "lzf: Can't set [am]time of '$newfile': $!\n";
+    }
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+# ABSTRACT: Compress/decompress using LZF algorithm
+# PODNAME: lzf
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+lzf - Compress/decompress using LZF algorithm
+
+=head1 VERSION
+
+This document describes version 0.02 of lzf (from Perl distribution App-lzf), released on 2014-07-02.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % lzf [options] <file> ...
+
+=head1 DESCRIPTION
+
+This is a simple command-line front-end for Perl modules L<Compress::LZF>. LZF
+is one of the algorithms where there are currently pure-Perl implementation of
+the decompressor on CPAN. So it is useful in some cases.
+
+=head1 OPTIONS
+
+=over
+
+=item * --decompress, --uncompress, -d
+
+Decompress instead of compress.
+
+=item * --pure-perl, --pp
+
+Use pure-Perl implementation. Currently only for decompression
+(L<Compress::LZF_PP>(.
+
+=item * --force, -f
+
+Compress even though file already has C<.lzf> extension.
+
+Overwrite when target file exists.
+
+=back
+
+=head1 EXIT CODES
+
+0 on success.
+
+255 on I/O error.
+
+99 on command-line options error.
+
+=head1 CAVEATS/BUGS/TODO
+
+Currently data is slurped into memory, so the data to be compressed must fit
+into memory.
+
+=head1 SEE ALSO
+
+L<Compress::LZF>
+
+L<Compress::LZF_PP>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-lzf>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-App-lzf>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-lzf>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Steven Haryanto.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

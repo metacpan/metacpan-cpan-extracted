@@ -1,0 +1,9 @@
+id = a7c01dfe-cd07-11e6-a72a-827aecb88ea6
+
+[DEPENDENCY t1 on t2]
+match = eq(t1.pl)
+dependson = eq(t2.pl)
+
+[DEPENDENCY t2 on t3]
+match = eq(t2.pl)
+dependson = eq(t3.pl)

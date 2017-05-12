@@ -1,0 +1,32 @@
+---
+abstract: "sass command-line tool modeled after the ruby's version"
+author:
+  - 'William Wolf <throughnothing@gmail.com>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120630'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Sass
+requires:
+  Data::Dump: 0
+  File::Slurp: 0
+  Filesys::Notify::Simple: 0
+  Getopt::Long: 0
+  Path::Class: 0
+  Pod::Usage: 0
+  Text::Sass: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/throughnothing/App-Sass/issues
+  repository: git://github.com/throughnothing/App-Sass.git
+version: 0.001

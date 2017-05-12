@@ -1,0 +1,26 @@
+Revision history for Archive-RPM
+
+0.07 Sat Jun 19 2010
+- make MooseX::Types::DateTimeX as an explicit dependency
+
+0.06 Thu May 13 2010
+- with MooseX::Traits now, the better to be TraitFor'ed with
+- minor doc and code updates
+- switch to MooseX::MarkAsMethods, to clean our namespaces while retaining our
+  overloads
+
+0.05 Sat Feb 13 21:05:55 PST 2010
+- explicitly exclude 'nvr' from being handled by _handle; this was breaking
+  with RPM 4.8.x
+
+0.04 Sun Apr 26 00:26:27 PDT 2009
+- drop #! line in t/00-load.t that was confusing koji/mock 
+
+0.03    Tue Mar  3 22:06:44 PST 2009
+- correct license in Makefile.PL
+
+0.02    Sat Feb 28 16:00:13 PST 2009
+- First version, released on an unsuspecting world.
+
+0.01 
+- bundled with Fedora::App::ReviewTool

@@ -1,0 +1,11 @@
+Revision history for Acme-Be-Modern
+
+0.03    Sat Aug 20 08:42:51 2011
+        Missed text of GPL in module (pod) documentation.
+        Need to use Perl 5.14 for building, else metadata is wrong.
+
+0.02    Fri Aug 19 15:49:05 2011
+        Updated to GPL 3 configured Module::Build to generate the LICENSE file.
+
+0.01    Wed Aug 17 15:28:15 2011
+        First version, released on an unsuspecting world.

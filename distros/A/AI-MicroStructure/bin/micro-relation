@@ -1,0 +1,71 @@
+#!/usr/bin/perl -X
+
+use JSON;
+use JSON::XS;
+use Data::Printer;
+use Data::Dumper;
+use WWW::Wikipedia;
+use Try::Tiny;
+my $lang =  $ENV{MICRO_LANG} || "en" ;
+
+my $wiki = WWW::Wikipedia->new(language => $lang);
+
+
+
+use Cache::Memcached::Fast;
+
+         our $memd = new Cache::Memcached::Fast({
+             servers => [ { address => 'localhost:11211', weight => 2.5 }],
+             namespace => 'my:',
+             connect_timeout => 0.2,
+             io_timeout => 0.1,
+             close_on_error => 1,
+             compress_threshold => 100_000,
+             compress_ratio => 0.9,
+             max_failures => 1,
+             max_size => 512 * 1024,
+         });
+
+
+
+
+sub  decruft  {
+  my($file)  =  @_;
+  my($cruftSet)  =  q{%Â§&|#[^+*(]),'";};
+  my  $clean  =  $file;
+  $clean=~s/\Q$_//g  for  split("",$cruftSet);
+
+  return  $clean;
+}
+
+
+sub rel {
+  my $arg = shift;
+  my $lang = shift;
+
+
+  if(defined(my $fromCache = $memd->get($arg))){
+    return $fromCache;
+  }
+
+  my $result = $wiki->search($arg);
+  my $str = "";
+
+  if (defined($result) &&  $result->text() ) {
+
+    try{
+    $str = join( "\n", $result->related() );
+    $str = decruft($str);
+    $memd->set($arg,$str);
+    };
+  }
+  return $str;
+}
+
+try{
+print rel(eval qw{$_}, $lang)  for @ARGV;
+};
+#
+
+1;
+__DATA__

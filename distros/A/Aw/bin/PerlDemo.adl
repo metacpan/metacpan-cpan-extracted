@@ -1,0 +1,255 @@
+_fileVersion = 2.1;
+eventtype PerlDevKit::EventOfDoom {
+    storageType = Persistent;
+    timeToLive = 0;
+    description = "The Doomsday Event";
+
+    boolean b;
+    char c;
+    byte by;
+    double d;
+    float f;
+    date dt;
+    int i;
+    long l;
+    short sh;
+    string s;
+    unicode_char uc;
+    unicode_string us;
+    struct {
+        boolean b;
+        char c;
+        byte by;
+        double d;
+        float f;
+        date dt;
+        int i;
+        long l;
+        short sh;
+        string s;
+        unicode_char uc;
+        unicode_string us;
+        boolean b_array[];
+        byte by_array[];
+        char c_array[];
+        double d_array[];
+        date dt_array[];
+        int i_array[];
+        float f_array[];
+        long l_array[];
+        string s_array[];
+        short sh_array[];
+        unicode_char uc_array[];
+        unicode_string us_array[];
+        struct {
+            boolean b;
+            char c;
+            byte by;
+            double d;
+            float f;
+            date dt;
+            int i;
+            long l;
+            short sh;
+            string s;
+            unicode_char uc;
+            unicode_string us;
+            boolean b_array[];
+            byte by_array[];
+            char c_array[];
+            double d_array[];
+            date dt_array[];
+            int i_array[];
+            float f_array[];
+            long l_array[];
+            string s_array[];
+            short sh_array[];
+            unicode_char uc_array[];
+            unicode_string us_array[];
+        } st;
+    } st;
+    struct {
+        struct {
+            boolean b;
+            char c;
+            byte by;
+            double d;
+            float f;
+            date dt;
+            int i;
+            long l;
+            short sh;
+            string s;
+            unicode_char uc;
+            unicode_string us;
+            boolean b_array[];
+            byte by_array[];
+            char c_array[];
+            double d_array[];
+            date dt_array[];
+            int i_array[];
+            float f_array[];
+            long l_array[];
+            string s_array[];
+            short sh_array[];
+            unicode_char uc_array[];
+            unicode_string us_array[];
+            struct {
+                boolean b;
+                char c;
+                byte by;
+                double d;
+                float f;
+                date dt;
+                int i;
+                long l;
+                short sh;
+                string s;
+                unicode_char uc;
+                unicode_string us;
+                boolean b_array[];
+                byte by_array[];
+                char c_array[];
+                double d_array[];
+                date dt_array[];
+                int i_array[];
+                float f_array[];
+                long l_array[];
+                string s_array[];
+                short sh_array[];
+                unicode_char uc_array[];
+                unicode_string us_array[];
+            } st;
+        } st;
+        boolean b;
+        char c;
+        byte by;
+        double d;
+        float f;
+        date dt;
+        int i;
+        long l;
+        short sh;
+        string s;
+        unicode_char uc;
+        unicode_string us;
+        boolean b_array[];
+        byte by_array[];
+        char c_array[];
+        double d_array[];
+        date dt_array[];
+        int i_array[];
+        float f_array[];
+        long l_array[];
+        string s_array[];
+        short sh_array[];
+        unicode_char uc_array[];
+        unicode_string us_array[];
+    } st_array[];
+    boolean b_array[];
+    byte by_array[];
+    char c_array[];
+    double d_array[];
+    date dt_array[];
+    int i_array[];
+    float f_array[];
+    long l_array[];
+    string s_array[];
+    short sh_array[];
+    unicode_char uc_array[];
+    unicode_string us_array[];
+}
+eventtype PerlDevKit::PerlDemo {
+    storageType = Guaranteed;
+    timeToLive = 0;
+    description = "Demonstration Event for Perl";
+
+    boolean booleanDemo;
+    char charDemo;
+    date dateDemo;
+    float floatDemo;
+    int intDemo;
+    char charSeqDemo[];
+    string stringDemo;
+    int intSeqDemo[];
+    struct {
+        string structString;
+        int structInt;
+    } structADemo;
+    struct {
+        string structString;
+        int structInt;
+    } structBDemo;
+    struct {
+        int intSeqDemo[];
+    } structCDemo;
+    string stringSeqDemo[];
+    struct {
+        struct {
+            string structString;
+            int structInt;
+        } structADemo;
+        int structInt;
+    } structDDemo;
+    struct {
+        int intA;
+        struct {
+            int intB;
+            struct {
+                int intC;
+                string stringC;
+            } structB;
+        } structA;
+    } moreData;
+}
+eventtype PerlDevKit::TicTacToe {
+    storageType = Persistent;
+    timeToLive = 0;
+    description = "";
+
+    int Coordinate;
+    char Board[];
+}
+eventtype PerlDevKit::TicTacToeRequest {
+    storageType = Persistent;
+    timeToLive = 0;
+    description = "CADK Sample Adapter Event Type";
+}
+clientgroup "PerlDemoAdapter" {
+    description = "Events for Perl Demonstration Scripts";
+    lifeCycle = DestroyOnDisconnect;
+    storageType = Volatile;
+    requiredEncryption = None;
+    accessLabelRequired = false;
+    canPublish = {
+        Adapter::ack,
+        Adapter::adapter,
+        Adapter::error,
+        Adapter::errorNotify,
+        PerlDevKit::TicTacToe
+    };
+    canSubscribe = {
+        PerlDevKit::EventOfDoom,
+        PerlDevKit::PerlDemo,
+        PerlDevKit::TicTacToe,
+        PerlDevKit::TicTacToeRequest
+    };
+}
+clientgroup "PerlDemoClient" {
+    description = "Events for Perl Demonstration Scripts";
+    lifeCycle = DestroyOnDisconnect;
+    storageType = Volatile;
+    requiredEncryption = None;
+    accessLabelRequired = false;
+    canPublish = {
+        PerlDevKit::EventOfDoom,
+        PerlDevKit::PerlDemo,
+        PerlDevKit::TicTacToe,
+        PerlDevKit::TicTacToeRequest
+    };
+    canSubscribe = {
+        Adapter::ack,
+        PerlDevKit::TicTacToe,
+        PerlDevKit::TicTacToeRequest
+    };
+}

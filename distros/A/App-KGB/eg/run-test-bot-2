@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -e
+
+PERL5LIB=lib script/kgb-bot --foreground --config eg/test-server-2.conf "$@"

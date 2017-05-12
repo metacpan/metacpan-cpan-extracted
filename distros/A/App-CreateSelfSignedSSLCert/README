@@ -1,0 +1,5 @@
+SYNOPSIS
+
+    This distribution provides command-line utility called
+    create-self-signed-ssl-cert and create-ssl-csr.
+

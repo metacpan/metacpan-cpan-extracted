@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Acpi-Class,
+version 0.003:
+
+  Inspired in Acpi::Battery, this module gets the contents of the directory '/sys/class' in terms of 'classes' (ArrayRef of directories in /sys/class), 'devices' (ArrayRef of subdirectory in class) and 'attributes' (HashRef attributes => values, from the contents of devices directory).
+
+This software is copyright (c) 2013 by Mimosinnet.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

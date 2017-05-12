@@ -1,0 +1,23 @@
+---
+abstract: 'Python like generator powered by Coro'
+author:
+  - 'Rintaro Ishizaki <rintaro@cpan.org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Attribute-Generator
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Attribute::Handlers: 0
+  Coro: 4.91
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

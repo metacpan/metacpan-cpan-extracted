@@ -1,0 +1,29 @@
+---
+abstract: 'Lightweight skkserv implementation for AnyEvent'
+author:
+  - 'Takumi Akiyama E<lt>akiym@cpan.orgE<gt>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-SKKServ
+no_index:
+  directory:
+    - inc
+provides:
+  AnyEvent::SKKServ:
+    file: lib/AnyEvent/SKKServ.pm
+    version: 0.01
+requires:
+  AnyEvent: 7.04
+  perl: 5.008005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

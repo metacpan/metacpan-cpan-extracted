@@ -1,0 +1,54 @@
+---
+abstract: 'Browse SQLite/MySQL/PostgreSQL databases and their tables interactively.'
+author:
+  - 'Matthaeus Kiem <cuer2s@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-DBBrowser
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Clone: '0'
+  Cwd: '0'
+  DBI: '0'
+  Encode: '0'
+  Encode::Locale: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::HomeDir: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  File::Which: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  JSON: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Pod::Usage: '0'
+  Scalar::Util: '0'
+  Spreadsheet::Read: '0'
+  Term::Choose: '1.500'
+  Term::Choose::LineFold: '1.500'
+  Term::Choose::Util: '0.050'
+  Term::Form: '0'
+  Term::TablePrint: '0.053'
+  Text::CSV: '0'
+  bytes: '0'
+  if: '0'
+  perl: '5.008003'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/kuerbis/App-DBBrowser.git
+version: '1.053'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

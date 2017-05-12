@@ -1,0 +1,309 @@
+Revision history for Perl extension Apache::SSI.
+
+2.19  Wed Jan 26 21:57:36 CST 2005
+
+ - We now use $r->print() instead of print() inside SSI.pm, because
+   the latter seemed to have buffering problems.
+
+ - Added a Build.PL for installation via Module::Build.
+
+ - Modified ssi_include() to check for an HTTP_OK status from the
+   subrequest in addition to an OK status from the handler. [Aaron
+   Ross]
+
+ - Fixed an undefined-value warning that occurred in the time-related
+   components when the time zone wasn't set. [Aaron Ross]
+
+ - Made some modernization updates to the Apache::test module we use
+   during testing.
+
+ - Use Test.pm for testing output rather than my custom stuff.
+
+2.18  Tue Jan 22 12:22:16 CST 2002
+   Doing an include can mess up %ENV (and thus the query string, and
+   the table of set variables), so we now make sure we restore it after
+   executing a subrequest.
+
+2.17  Mon Jan 14 13:58:21 CST 2002
+   Added the Apache::FakeSSI class, which implements server-side
+   includes in pure-perl so that its output can be filtered via
+   Apache::Filter.  Note that its <!--#exec cgi="..."--> isn't
+   functional yet.
+
+   Fixed a problem with the MANIFEST - file t/docs.check/16 was missing.
+
+2.16  Sun Dec  3 17:43:20 EST 2000
+   The 'Filter' directive is now properly recognized as case-insensitive.
+
+   We now use POSIX::strftime() instead of Date::Format::strftime() to
+   format dates.  [covertka@muohio.edu (Kent Covert)]
+
+   The 'echo' directives are now filled in using methods instead of
+   subroutines, so derived classes can change the behavior of 'echo'
+   directives and add new variables by creating new methods.  See
+   docs. [covertka@muohio.edu (Kent Covert)]
+
+   DATE_GMT and DATE_LOCAL variables are now properly formatted
+   according to the 'timefmt'.
+
+   We behave properly under a HEAD request.
+
+2.15  Sun Nov  5 00:24:52 EST 2000
+   Updated code to work with Apache::Filter 1.013 and greater.  If
+   you're using Apache::Filter 1.012 or lower, you must use 2.14 or
+   lower of Apache::SSI.  If you don't use Apache::Filter, you don't
+   need to care.
+
+2.14  Fri Nov  3 16:21:45 EST 2000
+   We now use Apache::test for the 'make test' part of installation.
+   Made changes throughout the distribution for this.
+
+   Now correctly sets the DOCUMENT_URI environment variable. 
+   [jacqui.caren@ig.co.uk (Jacqui Caren)]
+
+   Nested if...endif sections now work correctly.  Previously they were
+   not allowed. [dburry@tagnet.org (David Burry)]
+
+   If the structure of if...endif XSSI sections is malformed, we now
+   return an error instead of dying.  This seems better.  Note that
+   mod_include will just continue on without any errors, giving really
+   strange results that are hard to debug.
+
+   The error() method will not attempt to write to the error logs in
+   standalone mode anymore.  This was causing a fatal error in standalone
+   mode.
+
+   Added a test to the test suite that makes sure simple subclassing of
+   Apache::SSI works as expected.
+
+   Added a couple of tests (not exercised yet) for nested if...elsif XSSI
+   structures.  Corresponding code is mostly written, but needs some more
+   scrutiny & testing.
+
+
+2.13  Sun Jun  4 01:34:36 EDT 2000
+   Since HTML::SimpleParse now handles case-sensitivity correctly, we
+   need to be a bit more careful in this module.  If you're using
+   HTML::SimpleParse version 0.09 or greater, you'll need this here
+   version (1.13) of Apache::SSI or greater if you want SSI to work.
+
+   Improved the error message you get when there's no 'file' or 'virtual'
+   attribute of an <!--#include--> tag.
+
+
+2.12  Mon May 15 18:50:37 EDT 2000
+   Don't force content_type to be 'text/html'.  Let the server admin
+   decide that in the httpd.conf file.  [danmcc@metro.net (Dan McCormick)]
+
+   Get the port, user, group, and path to httpd from the user at 'perl
+   Makefile.PL' time.  This stuff is used during the 'make test' step.
+   This module should now behave like Apache::Filter and
+   Apache::AuthCookie with respect to those 4 parameters at test time.
+   [perrin@primenet.com (Perrin Harkins) and Pin-Chieh.Wang@compaq.com
+   (Wang, Pin-Chieh)]
+
+
+2.11  Sun Feb 20 12:03:38 EST 2000
+   - Fixed a bug in which $/ was being set to undef in Perl code called by
+     <!--#perl--> directives (wald@library.ho.lucent.com (Robert Waldstein)).
+
+   - To keep compatibility with mod_include, allow <!--#perl sub=Pack--> as
+     an abbreviation for <!--#perl sub=Pack::handler-->
+     (wald@library.ho.lucent.com (Robert Waldstein)).
+
+   - Made a note in the documentation that calling subroutines by name is
+     usually quite a bit faster than using anonymous subrefs.
+
+2.10  Sun Dec 12 14:32:02 EST 1999
+   - The handler() routine will now respect HEAD requests and not send
+     the entire document in such cases.  Thanks to Kevin Murphy.
+
+2.09  Nov 28 21:55
+   - Added support for the 'timefmt' config directive for formatting
+     time-related output (thanks to Vassilii Khachaturov for the idea
+     & implementation).
+
+2.08  Aug 28 01:29
+   - Forgot to include a couple of files in the distribution - they
+     were files used during the 'make test' phase of installation.  No
+     effect on functionality here. (Thanks to Tony Cox for the spot)
+
+2.07  Aug 10 17:39
+   - Now requires HTML::SimpleParse 0.06, which fixes a bug in
+     backslash-escaping of HTML key-value pairs.
+
+   - Markus Schuh showed me how to fix the warning (line "85") that I
+     introduced in 2.06.  Thanks!
+
+   - For <!--#exec --> stuff, we now check OPT_INCNOEXEC instead of
+     OPT_EXECCGI.
+
+2.06_1  Wed Feb  3 11:31:52 EST 1999
+   - Forgot to include some 'make test' files in the MANIFEST, so they
+     didn't get distributed.  No changes to the code here.
+
+2.06  Wed Feb  3 00:16:12 EST 1999
+   - The boolean expressions of the <!--#if--> and <!--#elsif--> directives
+     are now handled with a Perl eval().  This allows proper parsing of
+     expressions like "!($var)", and even lets you use pre-loaded Perl
+     subroutines in those expressions.  The specific mechanism I'm using to
+     fill in the variables is quite voodooey, I'd appreciate some feedback
+     on how it's working.
+
+   - Sometime in the last few versions I introduced a new "Use of
+     uninitialized value at blib/lib/Apache/SSI.pm line 85" warning, but I
+     can't for the life of me figure out what's uninitialized.  Anyone?
+     That line is:
+        if ($ssi =~ m/^<!--#(.*)-->$/s) {
+     Through my testing, I know $ssi is defined, and that's definitely the
+     line it's complaining about.
+
+   - The arg, args, & pass_request parameters to <!--#perl ...--> are now
+     processed case-insensitively.
+ 
+   - <!--#perl sub="Named::Subroutine"--> had been broken, probably from day
+     one.  Now it's fixed.
+
+2.05  Mon Feb  1 12:12:25 EST 1999
+   - Fixed a bug that was preventing directives from spanning multiple lines
+     [ Thanks, Yury Kuznesov ]
+
+2.04  Sat Jan 30 00:27:54 EST 1999
+   - Removed the %ENV = $r->cgi_env line, since it's not necessary.
+     See http://forum.swarthmore.edu/epigone/modperl/jangblorkand .
+
+   - Added "local $/ = undef;" line to reading input filehandle, which
+     should speed up running under Apache::Filter. [Thanks, Joshua Chamos]
+
+   - Added support for <!--#exec cgi="..."-->.  Please let me know
+     if there are any problems, there are a lot of things to get right
+     (or go wrong).  Thanks to Yury Kuznesov for the urging.
+
+   - Added support for <!--#config ...-->, except the 'timefmt' directive.
+     
+   - With the small exception in 'config' above, I think that now all the 
+     functionality of mod_include is present in Apache::SSI.  Once people have 
+     used it for a while and we've ironed out bugs, I'll declare some version 
+     "officially stable and complete" or something.
+
+2.03  Mon Jan  4 04:43:01 EST 1999
+   - Added support for the #if, #elif, #else, and #endif directives
+
+   - Failed includes now report in the error log the name of the file they
+     were trying to include.
+
+2.02  Fri Nov 27 04:25:00 EST 1998
+   - Added minimal and probably buggy support for variable interpolation in
+     SSI directives.
+
+   - <!--#fsize ...--> should work now.
+
+2.01 Wed Nov 11 18:31:12 EST 1998
+   - Backed out the $r->finfo change from 1.99 because of some reported
+     problems with it.
+
+2.00 (not formally released, because I forgot to add to the Changes file)
+
+1.99  Mon, 09 Nov 1998 07:45:47 GMT
+   - Uses $r->finfo for doing file-test operations, instead of using $r->filename.
+     Supposedly this speeds things up by avoiding an expensive system call (I
+     haven't benchmarked it).  See 
+     http://www.modperl.com/chapters/ch8.html#Client_Request_Methods
+
+   - Checks the return status of the call to $r->filter_input.  If you're
+     using Apache::SSI with Apache::Filter, you'll need to upgrade
+     Apache::Filter to version 0.02 to use this version of Apache::SSI.
+
+1.98  Sat Nov  7 02:19:05 EST 1998
+   - Will now cooperate with Apache::Filter if you've got it.
+
+   - Strips backslashes used in perl subs like these:
+     <!--#perl sub="sub {for (0..10) {print \"very \"}}"-->
+     [thanks, Stephane Bortzmeyer]
+
+   - More verbose error logging when you turn on the debug flags
+     [ibid]
+
+   - When reading the input file (and not using Apache::Filter), we use
+     a lexical variable for the filehandle, instead of the local(*IN)
+     we were using before.
+
+   - Compensates for changes in the rotation of the Earth after Jesse Ventura
+     is elected governor of my state.
+
+1.97  Thu Oct 22 02:43:34 EDT 1998
+   - Fixed DOCUMENT_NAME, DOCUMENT_URI, and LAST_MODIFIED so they return information
+     about the document the user requested, not the document we're currently
+     processing (which might be an <!--#include-->'d file).  Test 7 in real.t
+     witnesses the change.  
+     This behavior is consistent with mod_include, and I think it's also desirable:
+     the browser shouldn't see the names of documents we're including.
+     [thanks, Bruce Hoylman]
+     
+   - Now the three above ENV variables cache their results in the subprocess_env
+     table, which will speed things up if you call them repeatedly.  This is similar
+     to mod_include, but mod_include puts them there at the _beginning_ of the 
+     request, whereas I wait until they're asked for.
+     
+
+1.96  Fri Oct 16 20:10:54 EDT 1998
+   - Added a text() method for getting/setting the contents of the HTML.
+     This fixes a bug when used with Apache::SSIChain.  
+     [thanks, John Armstrong]
+
+1.95  Sun Oct 11 16:04:19 EDT 1998
+
+   - Doesn't rely on HTML::SimpleParse anymore to parse the HTML, but instead just
+     looks for <!--#.*?-->.  This allows nesting: <img src="<!--#whatever-->">,
+     and it should be much faster.  HTML::SimpleParse is still used to parse 
+     the key-value pairs of attributes for SSI directives. 
+     [Randal Schwartz, Rob Hartill]
+     
+   - <!--#flastmod virtual="whatever"--> now works. [Rob Hartill]
+     
+   - <!--#perl --> sections now pass $r as the first argument, and there
+     are two ways to turn off this behavior (PerlSetVar and named parameter).
+     [Ibid]
+     
+   - You can mix & match the "arg" and "args" parameters to <!--#perl--> 
+     sections, like so:
+      <!--#perl sub=something arg="Hi, Ken" args=5,12,13 arg="Bye, Ken"-->
+      &main::something($r, "Hi, Ken", "5", "12", "13", "Bye, Ken");
+     
+   - Added prototypes to several methods, which might conceivably speed them
+     up if the compiler can optimize around it.
+     
+   - In ssi_set, removed workaround for mod_perl 1.12 bug.
+     
+
+1.94  Wed Oct  7 19:57:03 EDT 1998
+   - Apache::SSI can now be subclassed much more easily under mod_perl,
+     because it knows how to deal with PERL_METHOD_HANDLERS=1 scenarios.
+     See the docs' SUMMARY for more info.
+   - The tests have been moved into the t/ directory, and there's a new
+     real.t test that will start an apache server and fetch a few pages.
+
+1.93  Wed Sep 23 15:53:21 EDT 1998
+   - You can now pass multiple arguments to a <!--#perl--> routine.
+
+1.92  Sat Sep 19 01:55:50 EDT 1998
+   - Added a "return;" statement to the ssi_include routine.  Avoids printing
+     an extraneous "1" in the served page.  Don't know how I missed this
+     before.  Thanks to Gil Vidals.
+
+1.91  Sun Jun 28 17:49:29 EDT 1998
+   - In README and Makefile.PL, I've noted that mod_perl must be installed
+     before this module will work.
+   
+   - I've updated everything so that it can use HTML::SimpleParse version 0.03,
+     which requires that each output_* function return its output rather than
+     print it.
+
+1.90  Fri Jun 26 18:07:57 1998
+   - original version; created by h2xs 1.18.  Actually a re-write of Doug
+     MacEachern's original version.
+
+mod_include has this:
+     if (!(allow_options(r) & OPT_INCLUDES)) {
+        return DECLINED;
+    }

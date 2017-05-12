@@ -1,0 +1,28 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "INW Peach",
+            "percentage" : "0.5"
+         },
+         {
+            "type" : "PG",
+            "tag" : "INW Raspberry",
+            "percentage" : "1.5"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Dragonfruit",
+            "percentage" : "0.5"
+         }
+      ],
+      "target_pg" : "30",
+      "base_nic_per_ml" : 100,
+      "base_nic_type" : "PG",
+      "target_quantity" : "160",
+      "target_nic_per_ml" : "3",
+      "target_vg" : 70,
+      "notes" : []
+   }
+}

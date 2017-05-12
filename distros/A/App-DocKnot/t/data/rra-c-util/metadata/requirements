@@ -1,0 +1,36 @@
+Everything requires a C compiler to build and expects an ISO C89 or later
+C compiler and libraries.  Presence of strdup is also assumed, which is
+guaranteed by POSIX 2008 but common in many earlier C libraries as well.
+Otherwise, the files are meant to be copied into packages and the
+requirements depend on which files one copies.
+
+A Kerberos library, either MIT Kerberos or Heimdal, is required to build
+this package as-is, since the Kerberos portability layer is built and
+tested by default.  The other code will run fine without this requirement
+when copied into other packages.
+
+PAM libraries and headers are required to build the package as-is, since
+the PAM supporting library is built and tested by default.  Other code can
+be copied from this package without introducing a PAM dependency.
+
+To build the the kafs portability layer, one of Linux, Mac OS X, Solaris
+11, the kafs library that comes with either Heimdal or KTH Kerberos, the
+kopenafs library that comes with newer OpenAFS, AFS header files (on any
+other platform besides AIX or IRIX), or AFS libraries (on AIX and IRIX) is
+required.  AIX binaries with AFS PAG support may not run on AIX systems
+that do not have an AFS client installed due to how AIX handles system
+calls.
+
+To run the full test suite, and to use the Perl test support libraries,
+Perl 5.6.2 or later is required.  The following additional Perl modules
+will be used if present:
+
+* IPC::System::Simple
+* Test::MinimumVersion
+* Test::Perl::Critic
+* Test::Pod
+* Test::Spelling
+* Test::Strict
+
+All are available on CPAN.  Those tests will be skipped if the modules are
+not available.

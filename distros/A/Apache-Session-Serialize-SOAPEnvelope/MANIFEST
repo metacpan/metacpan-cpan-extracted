@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/Apache/Session/Serialize/SOAPEnvelope.pm
+t/00_compile.t
+t/01_session.t

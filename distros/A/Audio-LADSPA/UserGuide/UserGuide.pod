@@ -1,0 +1,223 @@
+# Audio::LADSPA perl modules for interfacing with LADSPA plugins
+# Copyright (C) 2003 - 2004 Joost Diepenmaat.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# See the COPYING file for more information.
+
+__END__
+
+=head1 NAME
+
+Audio::LADSPA::UserGuide - What you can do with these modules.
+
+=head1 About this document
+
+This document is not finished, and only gives an overview. 
+For exact information look at L<Audio::LADSPA::Plugin> and 
+L<Audio::LADSPA::Network> and proceed from there.
+
+=head2 What is LADSPA
+
+I<Linux Audio Developer's Simple Plugin API>
+
+From http://www.ladspa.org/
+
+I<Many audio synthesis and recording packages are in use or in development on Linux. 
+These work in many different ways. LADSPA provides a standard way for "plugin"
+audio processors to be used with a wide range of these packages.>
+
+These modules provide a way to use LADSPA plugins in Perl programs.
+
+=head2 Overview of the LADSPA plugin API
+
+=head3 LADSPA libraries
+
+A LADSPA library contains the code and description for one or more Plugins,
+each of which can be completely independent. The library is mostly a
+a convenient way of storing multiple plugins in a file.
+
+Basically, the library is just a shared object (.so) file. The Audio::LADSPA
+module creates classes for all available libraries. All these classes inherit
+from L<Audio::LADSPA::Library|Audio::LADSPA::Library>.
+
+You can find the available LADSPA libraries on your system using
+
+ my @libs = Audio::LADSPA->libraries();
+
+This returns a list of all classnames that represent a LADSPA library.
+
+See also L</Loading libraries>.
+
+=head3 LADSPA Plugins
+
+A plugin is an object that can create audio and control streams, based on
+other audio and control streams. In this system, the difference between
+audio and control streams is only in their frequency - an audio stream has
+a fixed sample rate, a control stream can have a variable sample rate.
+
+I<Figure 1: Plugin layout with input (I) and output (O) ports>
+
+    +- Plugin ----+
+    | Description |
+    | I Port 1    |
+    | O Port 2    |
+    | . ...       |
+    +-------------+
+
+A plugin consists of a description, a number of ports that can send or
+recieve audio or control streams, and methods to connect the streams and
+run the plugin etc. See L<Audio::LADSPA::Plugin> for more info.
+
+=head3 Structure diagram
+
+    + Class -----------------+
+    | Audio::LADSPA::Library |
+    +------------------------+
+               ^
+               |
+	      ISA
+	       |
+    + Class -------------------------------+               + Class --------+
+    | Audio::LADSPA::Library::library_name | <- provides - | Audio::LADSPA |
+    +--------------------------------------+               +===============+
+               |                                           | + libraries() |
+	    provides			                   | + plugins()   |
+	       |                                           +---------------+
+	       V                                                    |
+    + Class -----------------------------+                          |
+    | Audio::LADSPA::Plugin::plugin_name |                          |
+    +====================================|                          |
+    | + name()                           |  <-- provides -----------+
+    | + maker()                          |
+    | + is_input( $port )                |
+    |   ...                              |
+    +------------------------------------+
+               |
+	    instantiates
+	       |
+	       V
+    + Object ----------------------------+
+    | Audio::LADSPA::Plugin::plugin_name |
+    +====================================+
+    |   ...                              |
+    | + connect($port, $plugin2, $port2) |
+    | + run($samples)                    |
+    |   ...                              |
+    +------------------------------------+
+
+=head3 The Audio::LADSPA::Buffer
+
+The buffer object implements the audio and control streams. You can connect
+multiple ports from different plugins to a buffer, and they will read from it
+or write to it, according to their port type. The plugin and buffer objects
+do not protect you from making silly (or even dangerous) connections, so take
+care when connecting, or use C<Audio::LADSPA::Network>.
+
+I<Figure 2: Example of plugin/buffer connections>
+
+                               +-Plugin 2-+
+   +-Plugin 1-+                | O Port 1 +-> Buffer3
+   | O Port 1 +--> Buffer1 --> + I Port 2 |
+   | O Port 2 +-+              +----------+
+   +----------+ |
+                |              +-Plugin 3-+
+	        +-> Buffer2 -> + I Port 1 |
+                               +----------+
+
+=head3 Audio::LADSPA::Network
+
+The Audio::LADSPA::Network class contains a plugin network; a number of plugins
+and buffers that are connected and need to be run in sync. The network can take
+care of testing the connections and keeping all plugins running at the same
+sample rate. 
+
+=head2 Loading libraries
+
+By default, the statement
+
+    use Audio::LADSPA;
+
+loads all LADSPA libraries it can find from in the paths defined by the evironment 
+variable C<$LADSPA_PATH>, if it's defined or from "/usr/lib/ladspa" and 
+"/usr/local/lib/ladspa" otherwise.
+
+For each library, it creates a class inheriting from C<Audio::LADSPA::Library>
+and then proceeds to create a class inheriting from C<Audio::LADSPA::Plugin>
+for each plugin in the library.
+
+After that, you can query the loaded libraries by using:
+
+    my @libs = Audio::LADSPA->libraries();
+
+Which will return the class names of all loaded libraries.
+
+Similary, you can get the list of all loaded plugins with:
+
+    my @plugins = Audio::LADSPA->plugins();
+
+Or, get the plugins from a library:
+
+    my ($lib1,$lib2) = Audio::LADSPA->libraries();
+    my @plugins = $lib1->plugins();
+
+Both will return a list of classes (package names) that you can use to
+query the capabilities of the plugins, or instantiate new plugin objects that
+you can use to process some audio data. 
+
+=head2 Querying plugins
+
+Once your libraries are loaded, you can query the plugins - for instance, you
+can ask for the plugin name like:
+
+    my $name = $plugin_class_or_object->name();
+
+Or ask for its input ports like:
+
+    my @ports = grep { $plugin->is_input($_) } $plugin->ports();
+
+See L<Audio::LADSPA::Plugin> for the full story.
+
+=head2 Processing audio data
+
+TODO: This section needs to be written. For now, take a look at L<Audio::LADSPA::Network> and
+L<Audio::LADSPA::Plugin>.
+
+=head1 SEE ALSO
+
+L<pluginfo>
+
+L<Audio::LADSPA::Plugin>
+
+L<Audio::LADSPA::Network>
+
+L<Audio::LADSPA::Library>
+
+L<Audio::LADSPA::Buffer>
+
+=head2 Links
+
+For more information about the LADSPA API, and how to obtain more plugins, see 
+http://www.ladspa.org/
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2003 - 2004 Joost Diepenmaat <jdiepen@cpan.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+

@@ -1,0 +1,222 @@
+acid-soluble	node_18 
+alpha-amylase gene	node_19 
+alpha-amylase synthesis	node_19 
+alpha-helix	node_30 
+alpha subunit	node_33 
+alternative sigma factor	node_20 
+amino acid identity	node_34 
+amino acid	node_33 
+amino acid residue	node_33 
+amino acid sequence	node_33 
+amino acid substitution	node_31 
+amino-terminal domain	node_33 
+amino-terminal	node_33 
+anti-anti-sigma factor	node_20 
+anti-anti-sigma	node_20 
+anti-sigma factor	node_20 
+anti-sigma	node_20 
+ATP-dependent	node_18 
+ATP-dependent protease	node_18 
+bacterial species	node_29 
+base pair	node_35 
+beta-galactosidase activity	node_36 
+beta-galactosidase expression	node_36 
+beta-galactosidase gene	node_36 
+beta-galactosidase synthesis	node_36 
+beta-lactamase gene	node_19 
+beta-lactamase	node_19 
+blot analysis	node_36 
+carbon source	node_14 
+cluster	node_35 
+cognate promoters	node_24 
+compartment-specific	node_10 
+Compartment-specific transcription	node_10 
+consensus sequence	node_34 
+culture medium	node_14 
+deletion analysis	node_37 
+DNA region	node_24 
+DNA sequence	node_32 
+DNA site	node_32 
+early sporulation	node_12 
+early stage of germination	node_12 
+early stationary phase of growth	node_11 
+end of exponential growth	node_11 
+end of logarithmic-phase growth	node_11 
+endospore development	node_11 
+endospore formation	node_11 
+ethanol stress	node_13 
+exponential growth	node_11 
+exponential phase	node_11 
+exponential to stationary phase	node_11 
+expression of the operon	node_22 
+forespore chamber	node_12 
+forespore compartment	node_12 
+forespore septum	node_12 
+forespore-specific	node_12 
+gene cluster	node_35 
+gene expression	node_22 
+gene order	node_35 
+gene organization	node_35 
+gene product	node_23 
+gene region	node_24 
+genetic map	node_35 
+gram-negative bacteria	node_29 
+gram-positive bacteria	node_29 
+gram-positive eubacteria	node_29 
+gram-positive host	node_29 
+gram-positive organism	node_29 
+growth condition	node_14 
+growth cycle	node_14 
+growth medium	node_14 
+heat-inducible	node_13 
+heat induction	node_13 
+heat-shock condition	node_13 
+helix-turn-helix motif	node_30 
+high temperature	node_13 
+homology region	node_24 
+initiation codon	node_27 
+initiation of transcription	node_28 
+insertional mutagenesis	node_37 
+insertion mutation	node_37 
+lacZ gene	node_36 
+level of transcription initiation	node_23 
+minimal glucose medium	node_14 
+minimal medium	node_14 
+mother cell compartment	node_12 
+mother cell cytoplasm	node_12 
+mother-cell-specific	node_12 
+negative regulation	node_21 
+negative regulator	node_21 
+negative regulator of sporulation	node_21 
+Northern blot analysis	node_36 
+Northern blot	node_36 
+nucleotide sequence of the gene	node_32 
+nucleotide sequence of the promoter	node_32 
+nucleotide sequences	node_32 
+null mutant	node_37 
+null mutation	node_37 
+onset of endospore formation	node_12 
+onset of solvent formation	node_12 
+onset of sporulation	node_12 
+onset of stationary phase	node_12 
+open reading frame	node_27 
+operon organization	node_35 
+operon structure	node_35 
+penicillinase gene	node_15 
+penicillin-binding	node_15 
+penicillin-binding protein	node_15 
+phosphate starvation condition	node_13 
+phosphate starvation-inducible promoter	node_13 
+phosphate-starvation induction	node_13 
+phosphoenolpyruvate-dependent	node_15 
+pock formation	node_37 
+point mutation	node_37 
+positive regulator	node_21 
+presence of glucose	node_14 
+promoter activation	node_24 
+promoter recognition	node_24 
+promoter recognition specificity	node_24 
+promoter region	node_24 
+promoter region of a gene	node_24 
+promoter region of the operon	node_24 
+promoter regions	node_24 
+promoter selection	node_24 
+promoter selectivity	node_24 
+promoter sequence of this gene	node_24 
+promoter sequences	node_24 
+promoter site	node_24 
+promoter specificity	node_24 
+promoter strength	node_24 
+promoter structure	node_24 
+promoter utilization	node_24 
+promotor region	node_24 
+reading frame	node_27 
+region of the genome	node_24 
+regions of promoters	node_24 
+regulator gene	node_21 
+regulator of gene expression	node_21 
+regulator protein	node_21 
+regulatory gene	node_21 
+regulatory mechanism	node_21 
+regulatory protein	node_21 
+regulatory region	node_25 
+response element	node_21 
+response regulator family	node_21 
+response-regulator	node_21 
+response to change	node_21 
+response to different stress	node_21 
+response to environmental signal	node_21 
+response to environmental stress	node_21 
+rich medium	node_14 
+S1 mapping analysis	node_36 
+S1 nuclease mapping experiment	node_36 
+S1 nuclease mapping	node_36 
+S1 nuclease protection experiment	node_36 
+S1 protection experiment	node_36 
+salt stress condition	node_13 
+sequence analysis	node_34 
+sequence analysis of deletion	node_34 
+sequence homology	node_34 
+sigma factor activation	node_20 
+sigma factor activity	node_20 
+sigma factor gene	node_20 
+sigma factor	node_20 
+sigma factor production	node_20 
+sigma-like protein	node_20 
+sigma-polypeptide	node_20 
+sigma subunit	node_20 
+single promoter	node_24 
+spore formation	node_12 
+spore germination	node_12 
+sporulation defect	node_16 
+sporulation deficiency	node_16 
+sporulation-deficient phenotype	node_16 
+sporulation gene expression	node_12 
+sporulation genes	node_12 
+stationary phase of growth	node_11 
+strong promoter	node_24 
+strong ribosome-binding site	node_24 
+temperature-sensitive	node_16 
+temperature-sensitive sporulation phenotype	node_16 
+temperature shift	node_16 
+temperature upshift	node_16 
+transcriptional activation	node_20 
+transcriptional activator gene	node_20 
+transcription factor	node_20 
+transcription initiation	node_28 
+transcription initiation nucleotide	node_24 
+transcription initiation region	node_24 
+transcription initiation signal	node_24 
+transcription initiation site	node_24 
+transcription level	node_23 
+transcription of genes	node_28 
+transcription start	node_28 
+transcription start site	node_24 
+transcription termination signal	node_28 
+transcription termination site	node_28 
+transcription terminator sequence	node_28 
+transcript level	node_23 
+unknown function	node_17 
+unknown mechanism	node_17 
+upstream open reading frame	node_24 
+upstream promoter	node_24 
+upstream region of the gene	node_24 
+upstream sequence	node_24 
+upstream site	node_24 
+upstream startpoint	node_24 
+vegetative cell	node_11 
+vegetative growth to sporulation	node_11 
+Western blot analysis	node_36 
+Western blot	node_36 
+wild-type allele	node_37 
+wild-type bacterium	node_37 
+wild-type cells	node_37 
+wild-type complex	node_37 
+wild-type counterpart	node_37 
+wild-type gene	node_37 
+wild-type infection	node_37 
+wild-type level	node_37 
+wild type	node_37 
+wild-type protein	node_37 
+wild-type spores	node_37 
+wild-type strain	node_37 

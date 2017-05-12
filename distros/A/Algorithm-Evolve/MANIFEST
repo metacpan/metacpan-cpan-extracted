@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+lib/Algorithm/Evolve.pm
+lib/Algorithm/Evolve/Util.pm
+examples/StringEvolver.pm
+examples/ArrayEvolver.pm
+examples/rock_paper_scissors.pl
+examples/string_evolver.pl
+examples/breeding_perls.pl
+test.pl

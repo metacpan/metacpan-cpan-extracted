@@ -1,0 +1,44 @@
+Changes file for App-Presto
+
+0.010     2016-07-28 01:33:39-07:00 America/Los_Angeles
+	- fix failing tests (RT Bug #115594)
+	- Add 'exit' command as an alias for 'quit'
+
+0.009     2012-12-03 09:39:12 America/Chicago
+	- use HTTP::Message to dump request/response when in verbose mode
+	- Allow DELETE requests to have a body
+
+0.008     2012-10-31 18:48:59 America/Chicago
+	- fix bug with appending extra params + path suffix
+
+0.007     2012-10-02 20:47:14 America/Chicago
+	- add initial request line to request dumping (i.e. GET /foo)
+	- add HTTP response code to response dumping
+
+0.006     2012-09-27 19:38:39 America/Chicago
+	- Don't send Content-Type header on GET/HEAD/DELETE requests
+	- Allow for unsetting HTTP headers
+
+0.005     2012-09-24 21:52:13 America/Chicago
+	- be more intelligent about when we print request/response bodies to STDOUT (avoid if they are binary)
+	- support for $(FILE) slurping as a command argument
+	- "deserialize" HTML to text when printing to STDOUT
+	- fix broken "form" command
+	- add "scripts" command to list scripts available for sourcing
+	- add support for silent commands in scripts (command is not "echo'd" to STDOUT before executing)
+
+0.004     2012-09-24 11:41:02 America/Chicago
+	- fixed bug with setting the "deserialize_response" config
+
+0.003     2012-09-20 16:26:47 America/Chicago
+	- better tab completion options for various commands
+	- warn on missing content-type header for request
+	- stricter config handling (only certain keys are allowed)
+	- added support for $(PROMPT[hullo?]) expansion
+  - added Changes file
+
+0.002 Tue Sep 18 08:12:48 CDT 2012
+  - added required version for File::Path
+
+0.001  Fri Sep 07 2012
+  - the first release

@@ -1,0 +1,35 @@
+
+
+                       README for Bagging Examples
+
+
+This README is specifically for the code in the ExamplesBagging subdirectory of the
+installation directory.
+
+See the README in the `Examples' subdirectory of the installation directory for the
+main examples for using the DecisionTree module.
+
+
+(1)   bagging_for_classifying_one_test_sample.pl
+
+      In order to become familiar with how the DecisionTree module can be used with
+      bagging, this should be first example you should become familiar with.
+
+      This example uses bagging to classify a single test sample.
+
+
+(2)   bagging_for_bulk_classification.pl
+
+      If you want to use bagging to classify all of the test samples in a disk file in
+      one fell swoop, look carefully at this example.
+
+      An example call for this script:
+
+        bagging_for_bulk_classification.pl  training5.csv  test5.csv   out5.csv
+
+
+      where all of your training data is in the file training5.csv and all the test
+      samples in the file test5.csv.  The calculated class labels for the test samples
+      are written out to the file out5.csv
+
+

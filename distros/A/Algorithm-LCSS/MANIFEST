@@ -1,0 +1,9 @@
+MANIFEST
+Changes
+LCSS.pm
+Makefile.PL
+README
+test.pl
+misc/make_manifest.pl
+html/docs.css
+html/LCSS.html

@@ -1,0 +1,47 @@
+#!/usr/bin/env perl
+use utf8;
+use strict;
+use warnings;
+use Encode qw/decode/;
+use Term::Encoding;
+use Acme::Aheui;
+
+my $encoding = Term::Encoding::get_encoding();
+binmode STDIN, ":encoding($encoding)";
+
+my ($filename) = @ARGV;
+
+my $help = << "__HELP__";
+Acme::Aheui $Acme::Aheui::VERSION
+Usage:
+  aheui filename  : program read from source file
+  aheui           : program read from stdin
+__HELP__
+
+die $help if ($filename && $filename =~ /^--?h(elp)?$/);
+
+my $source;
+if ($filename) {
+    open(FH, $filename) or die "cannot open $filename\n";
+    $source = join '', <FH>;
+    close(FH);
+    $source = decode('utf-8', $source); # expect utf8 by aheui spec
+}
+elsif (-t STDIN and -z STDIN) {
+    print "Acme::Aheui $Acme::Aheui::VERSION ($encoding)\n";
+    print "Type aheui commands or empty line for EOF.\n";
+    my @lines = ();
+    while (1) {
+        print '>>> ';
+        my $line = <>;
+        last if !$line or $line =~ /^\r?\n$/;
+        push @lines, $line;
+    }
+    $source = join '', @lines;
+}
+else {
+    $source = join '', <>;
+}
+
+my $interpreter = Acme::Aheui->new( source => $source );
+exit $interpreter->execute();

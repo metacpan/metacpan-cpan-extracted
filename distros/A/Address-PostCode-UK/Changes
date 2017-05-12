@@ -1,0 +1,51 @@
+Revision history for Address::PostCode::UK
+
+0.13  2017-04-01T02:55:00+01:00
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+      - Fixed typo in the package version.
+
+0.12  2017-03-31T16:40:00+01:00
+      - Added key 'provides' to the Makefile.PL script.
+
+0.11  2017-03-30T12:30:00+01:00
+      - Tidied up test scripts and removed "-T" switch.
+      - Added $AUTHORITY to the packages.
+
+0.10  2015-05-09T21:20:00+01:00
+      - Added method nearest() to the package Address::PostCode::UK.
+      - Added new package Address::PostCode::UK::Location.
+
+0.09  2015-05-07T10:10:00+01:00
+      - Upgraded to use Address::PostCode::UserAgent 0.05.
+
+0.08  2015-03-14T23:25:00+01:00
+      - Upgraded to use Address::PostCode::UserAgent 0.04.
+      - Added LICENSE file.
+
+0.07  2015-01-16T14:30:00+01:00
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.06  2014-11-03T22:40:45+01:00
+      - Checking the US post code format.
+      - Added test case for UK post code format.
+
+0.05  2014-11-02T13:14:20+01:00
+      - Added more unit test.
+      - Validate the response before populating the object.
+      - Minor changes to the pod document.
+
+0.04  2014-10-29T17:45:00+01:00
+      - Tidied up README file.
+
+0.03  2014-10-29T15:34:20+01:00
+      - Updated pod document about usage limit.
+      - Added dependency on package Addesss::PostCode::UserAgent.
+
+0.02  2014-10-28T21:12:00+01:00
+      - Fixed the 'LICENSE' key in the Makefile.PL file.
+      - Corrected the pod document of the package Address::PostCode::UK::Place::Council.
+
+0.01  2014-10-28T18:27:30+01:00
+      - First version, released.

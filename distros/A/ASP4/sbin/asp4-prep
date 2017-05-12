@@ -1,0 +1,88 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings 'all';
+use ASP4::API;
+use HTTP::Date 'time2iso';
+use Getopt::Long;
+
+my $api = ASP4::API->new();
+
+my $result = GetOptions(
+  "exporter=s" => \my $exporter
+);
+
+# Currently only svn is supported.  More exporters are planned for the future (git, tar, etc):
+unless( $exporter )
+{
+  die "Usage: $0 --exporter=svn\n";
+}# end unless()
+
+$exporter = lc($exporter);
+unless( $exporter eq 'svn' )
+{
+  die "Usage: $0 --exporter=svn\n";
+}# end unless()
+
+if( $exporter eq 'svn' )
+{
+  (my $export_root = time2iso()) =~ s{\s+}{_};
+  $export_root =~ s{:}{.}g;
+  chdir("/tmp");
+
+  my $root = $api->config->web->project_root;
+  system("svn ls $root") and die $!;
+  
+  (my $appName = $api->config->web->application_name) =~ s{::}{_}g;
+  `svn export $root "$appName\_$export_root" && tar -cz "$appName\_$export_root" > "$appName\_$export_root.tar.gz" && mv "$appName\_$export_root.tar.gz" $root`;
+  print "$root/$appName\_$export_root.tar.gz";
+}# end if()
+
+=pod
+
+=head1 NAME
+
+asp4-prep - Prepare your ASP4 application for remote deployment.
+
+=head1 USAGE
+
+  % cd /home/darthvader/Projects/deathstar/www
+  % asp4-prep --exporter=svn
+
+=head1 ARGUMENTS
+
+=head2 --exporter=svn
+
+At this time, only "svn" is accepted as a valid value.
+
+=head1 DESCRIPTION
+
+C<asp4-prep> is a convenience tool which will prepare your ASP4 application for 
+remote deployment.
+
+C<asp4-prep> simply makes an C<svn export> of your project folder and uses C<tar> to
+compress the file.
+
+B<This probably will not work very well on Windows.>
+
+=head2 OUTPUT
+
+After a successful run, the filename of the asp4 archive is printed to STDOUT.
+
+=head2 WARNINGS
+
+None.
+
+=head1 BUGS
+
+It's possible that some bugs have found their way into this release.
+
+Use RT L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=ASP4> to submit bug reports.
+
+=head1 HOMEPAGE
+
+Please visit the ASP4 homepage at L<http://0x31337.org/code/> to see examples
+of ASP4 in action.
+
+=cut
+

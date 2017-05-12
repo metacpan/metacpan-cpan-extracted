@@ -1,0 +1,10 @@
+0.501 Tue May 24 10:19:37 EDT 2011
+
+  [ENHANCEMENTS]
+
+  Add support for reading random bytes from all Crypt::URandom supported
+  platforms
+
+0.500 Sat May  7 23:17:51 EDT 2011
+
+  Initial release

@@ -1,0 +1,83 @@
+NAME
+    Algorithm::BestChoice - Choose the best
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+        # Find my favorite food based on color
+        my $chooser = Algorithm::BestChoice->new;
+        $chooser->add( match => red, value => cherry, rank => 1 ) 
+        $chooser->add( match => red, value => apple, rank => 10 ) # Like apples
+        $chooser->add( match => red, value => strawberry, rank => -5 ) # Don't like strawberries
+        $chooser->add( match => purple, value => grape, rank => 20 ) # Delicious
+        $chooser->add( match => yellow, value => banana )
+        $chooser->add( match => yellow, value => lemon rank => -5 ) # Too sour
+
+        my $favorite;
+        $favorite = $chooser->best( red ) # apple is the favorite red
+        $favorite = $chooser->best( [ red, yellow, purple ] ) # grape is the favorite among red, yellow, and purple
+
+DESCRIPTION
+    An Algorithm::BestChoice object is similar to a hash, except it returns
+    a result based on a given key AND relative ranking. That is, you can
+    associate multiple values with a single key, and differentiate them by
+    using a rank (or weight).
+
+METHODS
+  Algorithm::BestChoice->new
+    Create and return a new Algorithm::BestChoice object
+
+  $chooser->add( ... )
+    Add a possible choice to the chooser
+
+    The arguments are:
+
+        match       The key for the choice, can be a string or a regular expression
+        value       The value to associate with the key (what is returned by ->best)
+        rank        An optional numeric weight, the default is 0 (>0 is better, <0 is worse)
+
+  $value = $chooser->best( <criterion> )
+    Given criterion, ->best will return the value that 1. has a matching
+    matcher and 2. has the highest rank
+
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-algorithm-bestchoice
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Algorithm-BestChoice>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Algorithm::BestChoice
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Algorithm-BestChoice>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Algorithm-BestChoice>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Algorithm-BestChoice>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Algorithm-BestChoice/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

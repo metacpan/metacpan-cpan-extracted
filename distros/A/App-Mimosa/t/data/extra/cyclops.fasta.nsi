@@ -1,0 +1,6 @@
+>Cyclops
+# Yes, this is an invalid .nsi file. We are just using this
+# to test autodection of file extensions
+CCCAAAATTTCCCAAAACACCACTACATTAATTGGAATGTTTTCCAATGGCTAATTTGAC
+TTGAAAACCATGCGACCAAATCTTCGATGTAGTTACGTGTCACGGAGGCAACTCCTAATT
+

@@ -1,0 +1,17 @@
+[% classes = diagram.Classes %]
+[% FOREACH class = classes %]
+CREATE TABLE [% class.Name %] (
+	[% FOREACH at = class.Attributes %]
+
+	[% at.name %] [% at.type %] [% IF loop.last %] [% ELSE %], [% END %]
+	[% END %]
+	[% IF class.Operations %]
+	[% FOREACH op = class.Operations %]
+	, [% op.name %] ( [% FOREACH par = op.Param %] [% par.Name %] [% IF loop.last %] ) [% ELSE %], [% END %] [% END %]
+	[% END %]
+	[% END %]
+
+);
+
+
+[% END %]

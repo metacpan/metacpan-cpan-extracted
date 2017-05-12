@@ -1,0 +1,199 @@
+Revision history for Perl extension AxKit::App::TABOO.
+
+0.52    2007-12-01
+	- Use HTML::StripScripts and friends for parsing and combatting
+	  possible XSS problems.
+	- Use Net::Akismet for stories too. 
+	- Add the CSS that has been live for a while to ensure that
+	  pictures doesn't wrap wrongly.
+	- The Person URI is so different from the homepage, that I changed
+	  the text to explicitly say homepage.
+	- Relative URLs for tinyMCE.
+	- Change some debugging levels.
+
+0.51    2006-12-26
+	- Use Net::Akismet on comments. 
+	- Minor stuff in documentation.
+	
+0.5     2006-11-05
+        - Replace Textile input with TinyMCE support.
+	- Correct a bug that allowed anyone to edit the guest user's page...
+	- Add a	XSP tag to find the number of posts that are unapproved,
+	  and add that for the subqueue to the menu
+	- Use - as delimiter instead of _ in storynames (rumours have it
+	  google likes that better).
+	
+	
+0.4     2006-01-20
+	- Remove BasicSession and create my own session stuff.
+	  * AxKit::App::TABOO::Handler::Login to handle logins
+	  * AxKit::App::TABOO::AddXSLParams::Session to make that
+	    available in XSLT.
+	  * Some functions have been stuffed into AxKit::App::TABOO for
+	    the time being.
+	  * Removes login.xsp and guest-login.xsp along with a snippets 
+	    of code.
+	- Use atom:subtitle instead, thus correcting the RDF bug
+	- CSS updates, to support print and handhelds.
+	- Use Text::Unaccent to get better storynames.
+	- Correct primcat bug in classification provider
+	- Add more feedback after post submission.
+	
+0.33	2005-11-22
+	- Make storyname automagically from title
+	  * Adds IDNA::Punycode depend
+	  * removes auto-storyname, it is final
+	  * Checks for existing names
+	  * Reorg incat method of Stor(y|ies)
+	- Set a right sidebar with CSS.
+	- Ensure no entities in Textile output
+	- Can control where the article redirects to.
+	  
+
+
+0.32	2005-08-14 
+	- Long time coming... Has been so many things to attend to...
+	- Mainly about writing articles to DB.
+	  * Numerous things with how files are written.
+	  * store is replaced by store_required for now.
+	  * Supports both upload and textarea entry.
+	- Now works only behind a reverse proxy (will change).
+	- Language data objects and XSP.
+	- New SVN repository
+	- Documentation cleanups and linewraps.
+	- Plurals will check if limit is actually given.
+	- 0.32 because it is released on my 32. birthday! :-)
+	
+	
+0.21	2005-05-01 02:30
+	- Eliminated the need for BasicAuth by setting credential_0 
+	  directly.
+	- Corrected a bug that occured if it was checked if there is
+	  something in a category, and it didn't even exist.
+	- Some smaller cleanups.
+
+0.2	2005-04-19 05:25
+	The changes from 0.1 is really too large to specify in
+	detail, but I'll list some important:
+	- The SQL has changed to use more SERIAL ids, some of the
+	  changes are incompatible with TABOO 0.1. Upgrading isn't hard,
+	  but I dropped everything... 
+	- Article Data objects, Providers and XSP Taglibs.
+	  * Can use many formats, including OpenOffice.org, using that
+	    Provider, or the Formatter provider.
+	- A Classification Provider, which helps with finding content
+	  based on category information.
+	- A lot more XSLT, and quite a few XSP. 
+	- Things that couldn't save before now does.
+	- New dependencies on Encode 2.09, MIME:Types
+	- Nicer CSS.
+
+0.18_14 2005-04-07 05:25
+	- Dev release
+	- Mostly adding the ability to select categories that have content.
+
+0.18_13 2005-03-22 04:03
+	- Dev release. 
+	- The Article Data object now has a save method that works for
+	  new articles.
+	
+0.18_12 2005-03-20 02:55
+	- Dev release. I think it is only the docs that needs writing
+	  before a 0.2 now, though.
+	- Some minor changes to ease adding different types of cats.
+
+0.18_11 2005-03-16 03:16
+	- YA dev release. 
+	- Bugfixing.
+		* Can't use localhost on virtual hosts.
+		* Rewriting a lot about how authors are displayed.
+		* Quite a few smaller things
+		* Need at least one transform on Providers, even if it
+		  doesn't do a lot
+	- More breadcrumbs on articles and categories.
+	- Debian will contain OpenOffice.org DTDs in the XML catalog. Yay.
+
+0.18_10 2005-03-13 02:50
+	- YA dev release. Bugfixing, but also additions of category stuff.
+
+0.18_09 2005-03-08 01:20
+	- Another developer release. Bugfixing over the previous one.
+
+0.18_08 2005-03-07 02:30	
+	- This is another developer release! 
+	- To be thanked this time is tsw of #css for helping me sort
+	  out some stuff that made it look bad on IE.
+
+0.18_05 2005-02-17 14:10
+	- This is a developer release! _Developer_. Got it? :-)
+	- There are huge changes, I'm documenting it later. See the
+	  README too.
+
+
+0.1     2005-02-05 23:58
+	- THE BETA!!!
+		* So, this pretty much does the News stuff!
+		* And it has seen some testing, so I think it can be,
+		  like, used... :-)
+        - Mainly changes in the CSS, it has a design. J. Shirley did
+	  the lion's share of this work, but I did quite some at the
+	  end.
+	- Updated to use the Formatter API v 0.93.
+	- A hidden control should not have more markup added, fixed 
+	  in match-control.xsl
+	- Some new divs in the HTML to assist the CSS.
+	- Quite some documentation clean-ups.
+
+
+
+2005-04-17:
+
+I'm compressing this Changelog, it was getting rather big... Also, I'm
+deleting files in CPAN, for older releases, see my directory at
+backpan: http://backpan.cpan.org/authors/id/K/KJ/KJETILK/
+There has been a lot more releases than this (release often, ya
+know!), but these are some important changes.
+
+Here, a list of important changes can be found:
+
+0.096   Real breadcrumbs code and an SQL reorg.
+	
+0.093	The "Entering comments" initial release.
+
+0.091   Redoing the Comments stuff with Plurals, and Plurals' _load
+	can take POSIX regexs to select records.
+  
+0.086	TABOO now depends on at least Perl 5.7.3	
+
+0.085	Support Textile for formatting
+
+0.082 	New menu system. Changed the i18n behaviour. 
+
+0.08_1	Make the database parameters configurable to allow different
+	configs for different virtual hosts. Removed the webshop stuff. 
+
+0.08	Now the front page actually works!
+
+0.075	Added SIGNATURE (please verify!) and MANIFEST.SKIP
+
+0.07 	AxKit::App::TABOO::Provider::NewsList Provider. 
+	Changes in load methods.
+
+0.06 	TABOO can now be used to edit posts that are allready in the
+	datastore! 
+
+0.05_1	Adding "Plurals" Data subclasses. Started working on a 
+	webshop for TABOO.
+
+0.04	A real ALPHA! Lots of changes.
+
+0.031	Depend on newly released DBD::Pg 1.32
+
+0.03	Reworking the packaging completely
+
+0.021_2	Added version numbers to all files
+
+0.01_01  2003-12-08 18:06:47
+        - First release created.
+
+

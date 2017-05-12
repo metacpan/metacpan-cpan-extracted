@@ -1,0 +1,16 @@
+Revision history for Archive-StringToZip
+
+1.03    2006-10-14 12:44
+        Altered IO::String prereq to version 1.02 and
+        higher in Makefile.PL
+
+1.02    2006-05-28 18:06
+        Added Test::Exception to the prerequisites in
+        Makefile.PL
+
+1.01    2006-05-24 15:55
+        Patched bug with procedural style usage, updated
+        documentation.
+
+1.00    2006-05-20 13:43
+        First version, released on an unsuspecting world.

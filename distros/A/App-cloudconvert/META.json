@@ -1,0 +1,71 @@
+{
+   "abstract" : "Convert files via cloudconvert.org",
+   "author" : [
+      "Jakob Voß <jakob.voss@gbv.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-cloudconvert",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.038"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.8",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON::PP" : "0",
+            "LWP" : "0",
+            "Pod::Usage" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nichtich/App-cloudconvert/issues"
+      },
+      "homepage" : "https://github.com/nichtich/App-cloudconvert",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nichtich/App-cloudconvert.git",
+         "web" : "https://github.com/nichtich/App-cloudconvert"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Jakob Voss <voss@gbv.de>"
+   ]
+}
+

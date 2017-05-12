@@ -1,0 +1,183 @@
+<?xml version="1.0"?>
+<translations
+  xmlns="http://www.kjetil.kjernsmo.net/software/TABOO/NS/I18N/Texts" xml:lang="en">
+
+  <text id="submit-by"> Submitted by </text>
+  <text id="posted-by"> Posted by </text>
+  <text id="by"> By </text>
+  <text id="to-cat"> To Category </text>
+  <text id="on-time"> On </text>
+  <text id="last-changed"> Last changed </text>
+
+
+  <text id="submit-story"> Submit Story </text>
+  <text id="submit-comment"> Submit comment </text>
+  <text id="submit-article"> Submit article </text>
+  <text id="story-stored"> Story Stored </text>
+  <text id="editors-will-check"> If necessary, our editors will read through your contribution and approve it before it appears to all users. </text>
+  <text id="comment-stored"> Comment stored and attached </text>
+  <text id="submit-story-menu"> Submit Story </text>
+  <text id="submit-article-menu"> Submit article </text>
+  <text id="article-descr"> The title of the article </text>
+  <text id="article-title"> Title </text>
+  <text id="comment-descr"> A title for the comment </text>
+  <text id="comment-title"> Title </text>
+
+  <text id="article-description-descr"> A description of the contents of the article. This description will usually occur outside of context and must therefore give meaning only along with the title. Max 254 characters. </text>
+  <text id="article-description"> Description </text>
+
+  <text id="article-file-upload-descr"> You may here upload a file to the server by using this field or write in a text and a short name underneath. </text>
+  <text id="article-file-upload"> File upload </text>
+  <text id="article-filename-descr"> Even if you do not upload a file you will still have to give a name for the article. This will be used in the address etc and must be only lowercase letters and numbers and no spaces. You may concatenate several words. </text>
++  <text id="article-filename"> Article name </text>
++  <text id="article-textstring-descr"> The text of the article itself. </text>
++  <text id="article-textstring"> Article text </text>
+
+  <text id="comment"> comment </text>
+  <text id="comments"> Comments </text>
+  <text id="comments-verb"> comments </text>
+  <text id="you-respond-to"> You respond to this comment: </text>
+  <text id="reply-to-this"> Reply to this </text>
+  <text id="thread-below"> Thread below </text>
+  <text id="everything-linktext"> The whole story and all comments </text>
+
+  <text id="minicontent"> First paragraph </text>
+  <text id="minicontent-descr"> Enter the first paragraph or so
+  here. This will appear on lists of stories, with links on to the rest. </text>
+
+  <text id="content"> The content </text>
+  <text id="content-descr"> Enter the rest of the content. </text>
+
+  <text id="descriptive-image"> A descriptive image </text>
+  <text id="descriptive-image-descr"> The address of a descriptive image. </text>
+
+  <text id="linktext"> Linktext </text>
+  <text id="linktext-descr"> A good, descriptive text to be used for
+  the link to the rest of the story. "Read More" is a common, but very
+  bad choice. </text>
+
+  <text id="categorized-content"> Categorised content </text>
+  <text id="primcat"> Primary Category </text>
+  <text id="primcat-descr"> Give the primary categorization for the
+  story. Uses a controlled vocabulary. </text>
+
+  <text id="language"> Natural language </text>
+  <text id="language-descr"> Give the language in which the article is written. </text>
+
+
+  <text id="article-sectionid"> Section </text>
+  <text id="article-sectionid-descr"> Choose the section to post the
+  article to. </text>
+ <text id="article-sectionid-descr-editorhelp"> A newly posted article will be added to a separate section for editor's approval. The editor must move it over to the appropriate section when the article is approved. </text>
+
+
+  <text id="editorok"> Editor's approval </text>
+  <text id="editorok-descr"> Check to approve for publication. </text>
+
+  <text id="storyname"> Storyname </text>
+  <text id="storyname-descr"> A short, one-word name for the story. </text>
+  <text id="storyname-descr-editorhelp"> When an unprivileged user posts an article, the article will get a random five-digit number. The editor should replace this with a reasonably descriptive word.</text>
+
+  <text id="submitterid"> Submitter ID </text>
+  <text id="submitter"> Submitter </text>
+  <text id="submitterid-descr"> The username of the person who
+  submitted the story. </text>
+
+  <text id="authorid"> Author's ID </text>
+  <text id="authorid-descr"> The username of the author of the article. All authors should be registered within the system. </text>
+
+
+  <text id="user-name"> Full name </text>
+  <text id="username"> Username </text>
+  <text id="user-email"> Email </text>
+  <text id="user-bio"> Biography </text>
+  <text id="uri"> URI </text>
+  <text id="homepage"> Homepage </text>
+  <text id="login"> Login </text>
+  <text id="password"> Password </text>
+  <text id="authlevel"> authorization level </text>
+  <text id="new-password"> New Password </text>
+  <text id="register"> Register </text>
+
+  <text id="suggested-user-exists"> User name is allready in use or is invalid! </text>
+  <text id="suggested-user-stored"> User information was successfully stored! </text>
+
+  <text id="suggested-cat-exists"> The category name is allready in use! </text>
+  <text id="suggested-cat-stored"> Category information was stored! </text>
+  <text id="problem-occured"> Problems occured </text>
+  <text id="unknown-problem"> A problem with unknown cause </text>
+  <text id="either-upload-or-filename"> You must either upload a file, or write a short name and the article text in the text field.</text>
+  <text id="nosave-problem"> The articles was not saved as expected. You may try with a different name or contact webmaster</text>
+
+
+
+  <text id="listing-everything"> Listing all stories </text>
+  <text id="list-noun"> list </text>
+  <text id="overview"> Overview </text>
+  <text id="article-no-comments"> Article without comments </text>
+  <text id="edit"> Edit </text>
+  <text id="send"> Send </text>
+  <text id="search"> Search </text>
+  <text id="preview"> Preview </text>
+  <text id="previous"> previous </text>
+  <text id="update"> Update </text>
+  <text id="change"> Change </text>
+  <text id="repeat"> Repeat </text>
+  <text id="not-found"> not found </text>
+  <text id="suggest"> Suggest </text>
+  <text id="missing"> missing</text>
+
+  <text id="top"> Topp </text>
+  <text id="me"> Me </text>
+  <text id="for"> for </text>
+  <text id="to"> to </text>
+  <text id="or"> or </text>
+  <text id="and"> and </text>
+  <text id="with"> with </text>
+  <text id="just"> just </text>
+  <text id="new"> new </text>
+
+  <text id="stories-title-menu"> News </text>
+  <text id="articles-title-menu"> Articles </text>
+  <text id="sections-menu"> Sections </text>
+  <text id="category-menu"> Classifications categories </text>
+  <text id="angles-menu"> Angles of view </text>
+  <text id="users-title-menu"> User </text>
+  <text id="cats-title-menu"> Categories </text>
+  <text id="subqueue-story-menu"> Review posts </text>
+  <text id="submit-new-user"> New user </text>
+  <text id="user-info"> User Information </text>
+
+  <text id="new-username-descr"> Choose a single-word username. It can be up to 8 characters, and use only lower-case letters from a-z. Your username will also appear in the address of comments you post. </text>
+  <text id="new-fullname-descr"> Give your full name </text>
+  <text id="new-email-descr"> A valid e-mail address. Your password will be sent to this address. </text>
+  <text id="new-uri-descr"> The address of your homepage </text>
+  <text id="new-bio-descr"> A short text that describes you </text>
+
+  <text id="to-change-passwd-descr"> To change password, enter new
+  password twice </text>
+
+  <text id="authlevel-descr"> The authorization level determines what
+  kind of actions you are allowed to do. </text>
+  
+  <text id="password-valid"> The password is recognized as valid. </text>
+  <text id="password-invalid"> The password you gave has not been
+  recognized as valid. </text>
+  <text id="username-not-found"> The username you gave does not match
+  that of any users of this system. </text>
+  <text id="return-to-top-page"> Return to main page of </text>
+  <text id="the-previous-page"> the page you came from </text>
+  <text id="submit-new-category"> New category </text>
+  <text id="catname"> Short version of the category name </text>
+  <text id="new-catname-descr"> Choose a short version of the name for the category. Must be a single word, can be up to 15 characters, and use only lower-case letters from a-z. This name will also often appear in the address of pages. </text>
+
+
+
+  <text id="cat-name"> Category name </text>
+  <text id="new-catfullname-descr"> The name of the category as it will be displayed to readers of the page. </text>  
+  <text id="cat-uri-descr"> To identify things by the use of so-called URIs is an important thing in the future of the web. It is wise to choose terms from e.g. WordNet, but if you really don't know what we're talking about here, you may want to leave it to the administrator. </text>
+  <text id="cattype"> Type of category </text>
+  <text id="new-cattype-descr"> One can make new categories, either as free subject terms, as part of a vocabulary for primary or secondary classification or as a section to the news pages. </text>
+  <text id="cat-description"> Description </text>
+  <text id="cat-description-descr"> A description of the category. This description will often occur outside of context, and should therefore give meaning only along with the name. Max 254 characters. </text>
+</translations>

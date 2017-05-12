@@ -1,0 +1,16 @@
+Acme-MetaSyntactic-cpanauthors
+
+NAME
+    Acme::MetaSyntactic::cpanauthors - We are metasyntactic CPAN authors
+
+DESCRIPTION
+    CPAN authors come in all shapes and sizes. The Acme::CPANAuthors series
+    of modules aims at grouping them by various criteria. These lists are
+    then used to provide statistics on <http://acme.cpanauthors.org/>.
+
+CONTRIBUTOR
+    Philippe Bruhat (BooK)
+
+SEE ALSO
+    Acme::CPANAuthors, Task::CPANAuthors, Acme::MetaSyntactic,
+    Acme::MetaSyntactic::MultiList.

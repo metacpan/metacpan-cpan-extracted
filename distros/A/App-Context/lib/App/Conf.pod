@@ -1,0 +1,401 @@
+
+######################################################################
+## $Id: Conf.pod 3208 2002-09-09 01:34:11Z spadkins $
+######################################################################
+
+=head1 NAME
+
+App::Conf - Load and access configuration data
+
+=head1 SYNOPSIS
+
+   use App::Conf;
+
+   $config = App::Conf->new();
+   $config = App::Conf->new("file" => $file);
+   $config = App::Conf->new("file" => $file, "configClass" => "App::Conf::XML");
+   print $config->dump(), "\n";       # use Data::Dumper to spit out the Perl representation
+
+   # accessors
+   $property_value = $config->get($property_name);
+   $branch = $config->get_branch($branch_name);  # get hashref of properties
+
+   # on-demand loading helper methods (private methods)
+   $config->overlay($config2);        # merge the two config structures using overlay rules
+   $config->overlay($config1, $config2);  # merge $config2 onto $config1
+   $config->graft($branch_name, $config2);  # graft new config structure onto branch
+
+   # By convention, the configurations for each App-Context service will be located
+   # two levels under the hash ref as shown.
+
+   $config->{Conf}             # config settings for all Conf services
+   $config->{Conf}{default}    # config settings for the default Conf service
+   $config->{Security}           # config settings for all Security services
+   $config->{Security}{default}  # config settings for the default Security service
+   $config->{TemplateEngine}{tt} # config settings for the Template service named "tt"
+
+   # The default driver (if "configClass" not supplied) reads in a Perl
+   # data structure from the file.  Alternate drivers can read a Storable,
+   # unvalidated XML, DTD-validated XML, RDF-validated XML, or any other
+   # file format or data source anyone cares to write a driver for.
+
+   $conf = {
+     'Standard' => {
+       'Log-Dispatch' => {
+         'logdir' => '/var/p5ee',
+       }
+     },
+     'Authen' => {
+       'passwd' => '/etc/passwd',
+       'seed' => '303292',
+     },
+   };
+
+   # A comparable unvalidating XML file would look like this.
+
+   <conf>
+     <Standard>
+       <Log-Dispatch logdir="/var/p5ee"/>
+     </Standard>
+     <Authen passwd="/etc/passwd" seed="303292"/>
+   </conf>
+
+   # A comparable ini file (.ini) would look like this.
+
+   [Standard.Log-Dispatch]
+   logdir = /var/p5ee
+   [Authen]
+   passwd = /etc/passwd
+   seed = 303292
+
+   # A comparable Java properties-like file would look like this.
+
+   Standard.Log-Dispatch.logdir = /var/p5ee
+   Authen.passwd = /etc/passwd
+   Authen.seed = 303292
+
+=head1 DESCRIPTION
+
+App::Conf is the class which represents data which is configured
+at application deployment time (not at App-Context development time). 
+
+=cut
+
+#############################################################################
+# CLASS GROUP
+#############################################################################
+
+=head1 Class Group: Conf
+
+The Conf Class Group contains the following classes.
+
+=over
+
+=item * Class: L<C<App::Conf>|"Class: App::Conf">
+
+=item * Class: L<C<App::Conf::File>|App::Conf::File>
+
+Uses any one of Serializers to deserialize the file data to the
+config data structure.
+
+=back
+
+=head2 Requirements
+
+The following are enumerated requirements for the Conf Class Group.
+It forms a high-level feature list. 
+The requirements which have been satisfied
+(or features implemented) have an "x" by them, whereas the requirements
+which have yet-to-be satisfied have an "o" by them.
+
+    x Read from many different file formats including...
+        x Pure perl (Data::Dumper format)
+        o Unvalidated XML
+        o Validated XML
+        o Validated RDF
+        o Windows ini file
+        o Java-style properties
+        o customized
+    x Support fetching configuration from completely customized source
+    o Allow config to be split into multiple files/sources
+        o Load various portions of the config tree on-demand
+        o Overlay configs on top of each other
+        o Splice/graft config trees onto each other
+    o Allow config to be different per authenticated user
+    o Allow config to be same for all authenticated users
+    o Cache config to Storable
+
+=cut
+
+#############################################################################
+# CLASS
+#############################################################################
+
+=head1 Class: App::Conf
+
+ * Throws: App::Exception::Conf
+ * Since:  0.01
+
+=head2 Design
+
+The App::Conf class is a very thin code wrapper around a perl
+data structure.  Although they could access the data directly through 
+the perl structure, this would circumvent the on-demand configuration
+loading feature.  Therefore, they generally use helper functions to get
+to portions of the config structure and then access the attributes using
+a single-level hash reference.
+
+The main function of the class is to load the data into the right structure
+from an appropriately formatted configuration file.
+
+Conceptually, there is one App::Conf instance per "effective userid".
+The process is running with a "real userid", but it is carrying out the
+wishes of the "effective userid" who has been authenticated to the system.
+If no authentication has taken place, the "effective userid" is "guest".
+
+A App::Conf object is also conceptually read-only.
+However, during a process' lifetime, various data which is entirely
+derivable from other data in the config object may be stored there so
+that the next time it is requested, it does not need to be derived
+again.
+
+=cut
+
+#############################################################################
+# CONSTRUCTOR METHODS
+#############################################################################
+
+=head1 Constructor Methods:
+
+=cut
+
+#############################################################################
+# new()
+#############################################################################
+
+=head2 new()
+
+This constructor is used to create all Conf objects.
+Customized behavior for a particular type of Conf
+is achieved by overriding
+the init() method.
+
+    * Signature: $config = App::Conf->new(%named)
+    * Param:     configFile             string
+    * Param:     configSerializerClass  class
+    * Return:    $config                App::Conf
+    * Throws:    App::Exception::Conf
+    * Since:     0.01
+
+    Sample Usage:
+
+    (if you want to instantiate a Conf object, the official way is this)
+    $config = $context->config();
+
+    (internally only)
+    $config = App::Conf->new();
+    $config = App::Conf->new(
+        arg1 => 'value1',
+        arg2 => 'value2',
+    );
+
+=cut
+
+#############################################################################
+# PUBLIC METHODS
+#############################################################################
+
+=head1 Public Methods:
+
+=cut
+
+#############################################################################
+# get()
+#############################################################################
+
+=head2 get()
+
+    * Signature: $property_value = $config->get($property_name);
+    * Param:     $property_name    string
+    * Return:    $property_value   string
+    * Throws:    App::Exception::Serializer
+    * Since:     0.01
+
+    Sample Usage: 
+
+    $dbi    = $config->get("Repository.default.dbi");
+    $dbuser = $config->get("Repository.default.dbuser");
+    $dbpass = $config->get("Repository.default.dbpass");
+
+=cut
+
+#############################################################################
+# get_branch()
+#############################################################################
+
+=head2 get_branch()
+
+    * Signature: $branch = $config->get_branch($branch_name);
+    * Param:     $branch_name  string
+    * Return:    $branch       {}
+    * Throws:    App::Exception::Serializer
+    * Since:     0.01
+
+    Sample Usage: 
+
+    $branch_name = "Repository.default";
+    $branch = $config->get_branch($branch_name);
+    foreach $key (keys %$branch) {
+        $property = "${branch_name}.${key}";
+        print $property, "=", $branch->{$key}, "\n";
+    }
+    $dbi    = $branch->{dbi};
+    $dbuser = $branch->{dbuser};
+    $dbpass = $branch->{dbpass};
+
+
+=cut
+
+#############################################################################
+# dump()
+#############################################################################
+
+=head2 dump()
+
+    * Signature: $perl = $config->dump();
+    * Param:     void
+    * Return:    $perl      text
+    * Throws:    App::Exception::Serializer
+    * Since:     0.01
+
+    Sample Usage: 
+
+    $config = $context->config();
+    print $config->dump(), "\n";
+
+=cut
+
+#############################################################################
+# PROTECTED METHODS
+#############################################################################
+
+=head1 Protected Methods:
+
+The following methods are intended to be called by subclasses of the
+current class.
+
+=cut
+
+#############################################################################
+# init()
+#############################################################################
+
+=head2 init()
+
+The init() method is called from within the standard Conf constructor.
+The init() method in this class does nothing.
+It allows subclasses of the Conf to customize the behavior of the
+constructor by overriding the init() method. 
+
+    * Signature: init($named)
+    * Param:     $named        {}    [in]
+    * Return:    void
+    * Throws:    App::Exception::Conf
+    * Since:     0.01
+
+    Sample Usage: 
+
+    $config->init($args);
+
+=cut
+
+#############################################################################
+# load()
+#############################################################################
+
+=head2 load()
+
+    * Signature: $config_data = $config->load($named);
+    * Param:     void
+    * Param:     configFile     string
+    * Return:    $config_data   {}
+    * Throws:    App::Exception::Conf
+    * Since:     0.01
+
+    Sample Usage: 
+
+    $config_data = $config->load();
+    $config_data = $config->load(
+        configFile => "config.xml",
+    );
+
+=cut
+
+#############################################################################
+# PRIVATE METHODS
+#############################################################################
+
+=head1 Private Methods:
+
+The following methods are intended to be called only within this class.
+
+=cut
+
+#############################################################################
+# overlay()
+#############################################################################
+
+=head2 overlay()
+
+    * Signature: $config->overlay($config2);
+    * Signature: $config->overlay($config1, $config2);
+    * Param:     $config1      {}
+    * Param:     $config2      {}
+    * Return:    void
+    * Throws:    App::Exception::Conf
+    * Since:     0.01
+
+    Sample Usage: 
+
+    # merge the two config structures using overlay rules
+    $config->overlay($config2);
+
+    # merge $config2 onto $config1
+    $config->overlay($config1, $config2);
+
+=cut
+
+#############################################################################
+# graft()
+#############################################################################
+
+=head2 graft()
+
+    * Signature: $config->graft($branch_name, $config2);
+    * Param:     $branch_name   string
+    * Param:     $config2       {}
+    * Return:    void
+    * Throws:    App::Exception::Conf
+    * Since:     0.01
+
+    Sample Usage: 
+
+    # graft new config structure onto branch
+    $config->graft($branch_name, $config2);
+
+=cut
+
+=head1 ACKNOWLEDGEMENTS
+
+ * Author:  Stephen Adkins <stephen.adkins@officevision.com>
+ * License: This is free software. It is licensed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<C<App>|App>,
+L<C<App::Context>|App::Context>
+
+=cut
+
+1;
+

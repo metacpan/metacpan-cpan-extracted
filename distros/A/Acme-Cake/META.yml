@@ -1,0 +1,33 @@
+---
+abstract: 'A CPAN cake on CPAN. '
+author:
+  - 'Mike Greb <michael@thegrebs.com>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.037'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Cake
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  MIME::Base64: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/mikegrb/Acme-Cake/issues
+  homepage: https://github.com/mikegrb/Acme-Cake
+  repository: https://github.com/mikegrb/Acme-Cake.git
+version: '0.01'
+x_contributors:
+  - 'Mike Greb <mikegrb@cpan.org>'

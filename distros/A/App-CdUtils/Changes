@@ -1,0 +1,30 @@
+Revision history for App-CdUtils
+
+0.005   2016-10-28 (PERLANCAR)
+
+	- Add utility: cdtree-backend.
+
+
+0.004   2016-10-28 (PERLANCAR)
+
+	- cdpart: When trying FOO in /a/b/c and after /FOO/b/c doesn't
+	  match, try FOO against /a/b and FOO against /a too.
+
+
+0.003   2016-09-30 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rewording of Description again.
+
+
+0.002   2016-09-29 (PERLANCAR)
+
+        - No functional changes.
+
+        - Fix POD formatting and reword some sentences.
+
+
+0.001   2016-09-29 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,17 @@
+SYNOPSIS
+
+     % perl -MAcme::MetaSyntactic=chinese_zodiac -le 'print metaname'
+     rooster
+    
+     % meta chinese_zodiac 2
+     rooster
+     horse
+    
+     % meta chinese_zodiac/zodiac_element 2
+     fire_dragon
+     wood_pig
+
+SEE ALSO
+
+    Acme::MetaSyntactic
+

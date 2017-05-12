@@ -1,0 +1,89 @@
+#
+# $Id: Object.pod,v 7.1 2004/01/13 19:01:14 wpm Exp $
+#
+# (c) 2003-2004 Morgan Stanley and Co.
+# See ..../src/LICENSE for terms of distribution.
+#
+
+=head1 NAME
+
+AFS::Object - Base class for encapsulating AFS::Command results
+
+=head1 SYNOPSIS
+
+This module is not used directly by applications, only indirectly
+through the return values of the various AFS::Command::* methods.
+
+=head1 DESCRIPTION
+
+This class is used by the various AFS::Command classes to encapsulate
+data returned from any command that has structured return values.  In
+the simplest case, this object just encapsulates a simple list of
+key/value pairs.  Each distinct key is represented as an object
+attribute, and is query-able via one of several methods documented
+below.
+
+There are numerous subclasses of this class, which are used when
+objects must contains other objects, and these subclasses just
+implement special methods for querying the embedded objects.
+
+=head1 METHODS
+
+In all of the example code snippets below, $result is assumed to be an
+AFS::Object object, or an object derived from it.
+
+=head2 listAttributes
+
+This method takes no arguments, and returns a list of the attribute
+names available in the object.
+
+    my @attrs = $result->listAttributes();
+    foreach my $attr ( @attrs ) {
+	my $value = $result->getAttribute($attr);
+	print "Key '$attr' has value '$value\n";
+    }
+
+=head2 getAttribute
+
+This methods takes a single argument, the name of an attribute, and
+returns the value of the attribute, if it exists in the object.
+
+    my $name = $result->getAttribute('name');
+
+NOTE: Attributes may also be queried by calling the method of the same
+name.  If the attribute doesn't exist, then the method will just
+return a false value.  The above example is the same as:
+
+    my $name = $result->name();
+
+BEWARE: It is impossible to tell the difference between a non-existent
+attribute, and one with a false value using this method.  If attribute
+existence is interesting to you (or to your code, I suppose), use the
+hasAttribute method.
+
+=head2 getAttributes
+
+This method takes no arguments, and returns the entire list of
+attributes as list of key/value pairs.
+
+    my %attrs = $result->getAttributes();
+    while ( my ($key,$value) = each %attrs ) {
+	print "Key '$key' has value '$value'\n";
+    }
+
+=head2 hasAttribute
+
+This method takes a single argument, the name of a potentially
+available attribute, and returns a boolean true/false value if the
+attribute exists in the object.
+
+    if ( $result->hasAttribute('name') ) {
+       # Well, then it has a name attribute...
+    }
+
+=head1 SEE ALSO
+
+AFS::Command(1), AFS::Command::Base(1)
+
+=cut
+

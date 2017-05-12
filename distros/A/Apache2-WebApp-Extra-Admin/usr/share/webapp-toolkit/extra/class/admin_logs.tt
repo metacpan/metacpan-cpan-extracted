@@ -1,0 +1,188 @@
+package [% project_title %]::Admin::Logs;
+
+use strict;
+use warnings;
+use base '[% project_title %]::Admin';
+use [% project_title %]::Admin::Users::Error qw( ERROR_ACCESS_DENIED );
+
+our $VERSION = 0.19;
+
+#----------------------------------------------------------------------------+
+# _default(\%controller)
+#
+# Dispatch the action.
+
+sub _default {
+    my ($self, $c) = @_;
+
+    $self->SUPER::_error($c, 'Error', ERROR_ACCESS_DENIED)
+      unless ($c->request->user eq 'admin');
+
+    $self->_list_entries($c);
+}
+
+#----------------------------------------------------------------------------+
+# _list_entries(\%controller)
+#
+# List the log entries.
+
+sub _list_entries {
+    my ($self, $c) = @_;
+
+    my $start = $c->request->param('start') || '0';
+    my $sc    = $c->request->param('sc')    || 'admin_log_username';
+    my $so    = $c->request->param('so')    || 'asc';
+
+    # check the user input
+    my $error;
+    $error = 1 if ($start !~ /^[\d]{1,6}$/);
+    $error = 1 if ($sc    !~ /^[\w]{1,55}$/); 
+    $error = 1 if ($so    !~ /^[\w]{1,4}$/);
+
+    $self->SUPER::_error($c, 'Error', 'Bad Request') if $error;
+
+    # read from database, if available - defaults to file
+    my $data =
+      (defined $c->stash('DBH') )
+        ? $self->_get_entries_from_db($c)
+        : $self->_get_entries_from_file($c);
+
+    my $results = $self->SUPER::_sort_data($sc, $so, $data);
+    my $total   = @$results;
+    my $limit   = $c->config->{custom_items_per_page} || '25';
+
+    $c->request->content_type('text/html');
+
+    $c->template->process(
+        'extras/admin/logs.tt',
+        {
+            %{ $c->config },
+            sc   => $sc,
+            so   => $so,
+            data => $self->SUPER::_gen_results($total, $start, $limit, \@$results),
+        }
+      )
+      or $self->SUPER::_error($c, 'Template process failed', $c->template->error() );
+
+    exit;
+}
+
+#----------------------------------------------------------------------------+
+# _get_entries_from_file(\%controller)
+#
+# Return the log entry file data as a reference to an array.
+
+sub _get_entries_from_file {
+    my ($self, $c) = @_;
+
+    my $logfile = $c->config->{apache_doc_root} . '/logs/admin_log';
+
+    my @data;
+
+    if (-f $logfile) {
+        open (INFILE, $logfile) or die $self->SUPER::_error($c, "Cannot open $logfile: $!");
+        while (<INFILE>) {
+            chomp;
+
+            my ($user, $action, $string, $ip, $epoch) = split(/\t/);
+
+            push @data, {
+                admin_log_username     => $user,
+                admin_log_action       => $action,
+                admin_log_query_string => $string,
+                admin_log_user_ip_addr => $ip,
+                created                => $c->plugin('DateTime')->format_time($epoch, '%m-%d-%Y / %R %p')
+              };
+        }
+        close(INFILE);
+    }
+    else {
+
+        # create the log file
+        open (FILE, ">$logfile") or $self->SUPER::_error("Cannot open file: $!");
+        close(FILE);
+    }
+
+    return \@data;
+}
+
+#----------------------------------------------------------------------------+
+# _get_entries_from_db(\%controller)
+#
+# Return the log entry database as a reference to an array.
+
+sub _get_entries_from_db {
+    my ($self, $c) = @_;
+
+    my $sth;
+
+    eval {
+        $sth = $c->stash('DBH')->prepare(qq{
+            SELECT *,
+              DATE_FORMAT(admin_log_created, '%m-%d-%Y / %H:%i %p') AS created
+              FROM admin_log
+             ORDER BY admin_log_created
+            });
+
+        $sth->execute;
+      };
+
+    if ($@) {
+        $self->SUPER::_error($c, 'Database SELECT failed', $sth->errstr);
+    }
+
+    return $sth->fetchall_arrayref({});
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+[% project_title %]::Admin::Logs - Web based admin control panel module
+
+=head1 SYNOPSIS
+
+  use [% project_title %]::Admin::Logs;
+
+=head1 DESCRIPTION
+
+Base class module that is used to view log entries.
+
+=head1 OBJECT METHODS
+
+=head2 _list_entries
+
+List the log entries.
+
+  $self->_list_entries(\%controller);
+
+=head2 _get_entries_from_file
+
+Return the log entry file data as a reference to an array.
+
+  $self->_get_entries_from_file(\%controller);
+
+=head2 _get_entries_from_db
+
+Return the log entry database as a reference to an array.
+
+  $self->_get_entries_from_db(\%controller);
+
+=head1 SEE ALSO
+
+L<Apache2::WebApp>, L<Apache2::WebApp::Admin>, L<Apache2::WebApp::Plugin::DBI>
+
+=head1 AUTHOR
+
+Marc S. Brooks, E<lt>mbrooks@cpan.orgE<gt> L<http://mbrooks.info>
+
+=head1 COPYRIGHT
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

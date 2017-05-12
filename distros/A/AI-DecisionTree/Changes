@@ -1,0 +1,156 @@
+Revision history for Perl extension AI::DecisionTree.
+
+0.11 - Fri Mar  2 21:26:51 CST 2012
+
+ - Fixed typo in docs - 'leaf_color' should be 'leaf_colors'. [spotted
+   by Julio Fraire]
+
+ - Silence a couple of Perl::Critic warnings 
+
+ - Convert to Dist::Zilla 
+
+0.09 - Sat Jul 26 23:09:44 2008
+
+ - Make a new release so that a META.yml file is generated. [Suggested
+   by Alexandr Ciornii]
+
+ - as_graphviz(%args) wasn't passing %args through properly to the
+   GraphViz->new() method.  Fixed.  [Ian Knopke]
+
+ - get_result() can now take a callback subroutine, rather than just a
+   hash reference, to check the attributes of the given instance.
+   This allows lazy instance checking.
+
+0.08  Mon Jul  7 18:01:16 CDT 2003
+
+ - Added a 'leaf_color' parameter for making GraphViz objects more
+   colorful.
+
+0.07  Fri Jun  6 10:37:51 CDT 2003
+
+ - Created tests for the set_results() and copy_instances() methods.
+
+ - Added documentation for as_graphviz() and increased the information
+   contained in the GraphViz object.
+
+ - Added the ability to limit the absolute depth of the tree when
+   training.
+
+0.06  Wed Sep 18 13:59:24 EST 2002
+
+ - Fixed an XS memory leak that was afflicting all training instances.
+   Added tests to make sure leak stays plugged.
+
+ - Added the 'purge' and 'verbose' parameters to new().
+
+ - add_instance() now accepts a 'name' parameter.
+
+ - Users can now control whether training instances are purged after
+   training, using the 'purge' parameter to new() and/or the
+   do_purge() method.
+
+ - Added the set_results() and copy_instances() methods, which let you
+   re-use training instances from one tree to another.
+
+ - Added the instances() and purge() accessor methods.
+
+0.05  Thu Sep 12 01:22:34 AEST 2002
+
+ - Fixed a concurrency problem that occurred when making more than one
+   decision tree.  All tree data is now stored as member data, not
+   class data.
+
+ - DecisionTree.pm is now pure-perl again (though Instance.pm still
+   has an XS component).
+
+ - Fixed a one-off bug in the Instance.xs code that could create
+   garbage data.
+
+ - Handles "sparse" data better.  Sparse data means that every
+   attribute doesn't have to be defined for every training/test
+   instance.  This can now be a meaningful property - the absence of a
+   value is currently equivalent to a special "<undef>" value.
+
+ - Don't trigger warnings when undefined attribute values are
+   encountered (as happens with sparse data).
+
+ - Added documentation for the 'prune' parameter to new()
+
+ - More consistent with memory allocation in Instance.xs - uses the
+   perl memory macros/functions from `perldoc perlclib` instead of raw
+   malloc/realloc/free.
+
+ - Catches possible infinite loop situations when growing the tree
+   (which shouldn't usually happen, but other mistakes can cause it)
+
+ - The Instance class now has a numeric-only interface, without string
+   translation.  String translation is done in the main DecisionTree
+   class.  This isn't really a user-visible change.
+
+0.04  Wed Sep  4 19:52:23 AEST 2002
+
+ - Now uses regular XS instead of Inline for the C code parts. [patch
+   by Matt Sergeant]
+
+ - Converted the inner loop of the best_attr() method to C code,
+   because it was spending a lot of time in accessor methods for the C
+   structures it was using.  Don't worry, I'm not going C-crazy.  I
+   won't be making many (any?) more of these kinds of changes, but
+   these ones were probably necessary.
+
+ - Removed a bit of debugging code that I left in for 0.03.
+
+0.03  Mon Sep  2 11:41:18 AEST 2002
+
+ - Added a 'prune' parameter to new(), which controls whether the tree
+   will be pruned after training.  This is usually a good idea, so the
+   default is to prune.  Currently we prune using a simple
+   minimum-description-length criterion.
+
+ - Training instances are now represented using a C struct rather than
+   a Perl hash.  This can dramatically reduce memory usage, though it
+   doesn't have much effect on speed.  Note that Inline.pm is now
+   required.
+
+ - The list of instances is now deleted after training, since it's no
+   longer needed.
+
+ - Small speedup to the train() method, achieved by less copying of data.
+
+ - If get_result() is called in a list context, it now returns a list
+   containing the assigned result, a "confidence" score (tentative,
+   subject to change), and the tree depth of the leaf this instance
+   ended up at.
+
+ - Internally, each node in the tree now contains information about
+   how many training examples contributed to training this node, and
+   what the distribution of their classes was.
+
+ - Added an as_graphviz() method, which will help visualize trees.
+   They're not terribly pretty graphviz objects yet, but they're
+   visual.
+
+0.02  Sat Aug 10, 2002 21:02 AEST
+
+ - Added support for noisy data, currently by picking the best (most
+   common) result when noise is encountered.  See the 'noise_mode'
+   parameter to new().
+
+ - Added the rule_tree() method, which returns a data structure
+   representing the tree. [James Smith]
+
+ - Significantly sped up the train() method, especially for large data
+   sets.
+
+ - The get_result() method is no longer implemented recursively, which
+   simplifies it and speeds it up.
+
+ - Reformatted the documentation and added a TO DO section.
+
+ - Documented the nodes() method.
+
+0.01  Sat Jun  8 12:45:03 2002
+
+ - original version; created by h2xs 1.21 with options
+   -XA -n AI::DecisionTree
+

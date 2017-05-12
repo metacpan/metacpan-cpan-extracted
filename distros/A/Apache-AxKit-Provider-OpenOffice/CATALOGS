@@ -1,0 +1,15 @@
+Catalog Support
+===============
+
+If you experience problems with the OpenOffice files trying to
+open non-existant DTD files, then copy the contents of the dtds
+directory to /usr/share/xml/openofficeorg and make sure that the 
+nobody or apache user can read those files. Then add the following
+to /etc/xml/catalog (or copy dtds/rootcatalog to /etc/xml/catalog
+if you don't already have a catalog file there):
+
+  <delegatePublic publicIdStartString="-//OpenOffice.org//" 
+        catalog="file:///usr/share/xml/openofficeorg/catalog.xml"/>
+
+After that, DTDs should "just work". If they do not, please contact
+an AxKit support representative.

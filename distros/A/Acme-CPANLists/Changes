@@ -1,0 +1,66 @@
+Revision history for Acme-CPANLists
+
+0.90.6  2016-12-28 (PERLANCAR)
+
+	- No spec changes.
+
+	- Add recommendation to separate each list into its own module, to
+	  avoid confusing 'lcpan related-mods'.
+
+
+0.90.5  2016-12-28 (PERLANCAR)
+
+	- No spec changes.
+
+	- [dist] Fix expressing follow-spec prereq relationship with
+	  x_spec.
+
+
+0.90.4  2016-12-27 (PERLANCAR)
+
+	- No spec changes.
+
+	- [dist] Use _SPEC:: prefix to express follows-spec relationship.
+
+
+0.90.3  2016-11-07 (PERLANCAR)
+
+	- No spec changes.
+
+	- Mention 'lcpan related-mods'.
+
+
+0.90.2  2016-02-20 (PERLANCAR)
+
+        - No spec changes.
+
+        - Fix formatting typo.
+
+
+0.90.1  2015-10-23 (PERLANCAR)
+
+        - No spec changes.
+
+        - Update version number so it's higher than 0.02 (d'oh).
+
+
+0.9.1   2015-10-23 (PERLANCAR)
+
+	- Introduce 'id' property to list.
+
+
+0.9.0   2015-10-23 (PERLANCAR)
+
+        - No spec changes.
+
+        - Update version number to mark specification v0.9.
+
+
+0.02    2015-10-23 (PERLANCAR)
+
+	- Add some documentation.
+
+
+0.01    2015-10-22 (PERLANCAR)
+
+        - First release, currently empty.

@@ -1,0 +1,31 @@
+App-Slackeria-0.11.tar.gz
+bin/slackeria
+Build.PL
+Changelog
+lib/App/Slackeria/Config.pm
+lib/App/Slackeria/Output.pm
+lib/App/Slackeria/Plugin.pm
+lib/App/Slackeria/Plugin/CPAN.pm
+lib/App/Slackeria/Plugin/Debian.pm
+lib/App/Slackeria/Plugin/FreeBSD.pm
+lib/App/Slackeria/Plugin/Freshmeat.pm
+lib/App/Slackeria/Plugin/Gentoo.pm
+lib/App/Slackeria/Plugin/Git.pm
+lib/App/Slackeria/Plugin/GitHub.pm
+lib/App/Slackeria/Plugin/Ikiwiki.pm
+lib/App/Slackeria/Plugin/OpenPorts.pm
+lib/App/Slackeria/Plugin/OpenSUSE.pm
+lib/App/Slackeria/Plugin/Pkgsrc.pm
+lib/App/Slackeria/Plugin/Ubuntu.pm
+lib/App/Slackeria/Plugin/Whohas.pm
+lib/App/Slackeria/PluginLoader.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+share/template.xhtml
+t/00-compile-pm.t
+t/01-compile-pl.t
+t/05-pod-compile.t
+todo
+SIGNATURE    Added here by Module::Build

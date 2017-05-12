@@ -1,0 +1,5 @@
+# application/x-www-form-urlencoded should not be MIME-decoded
+POST / HTTP/1.0
+Content-Type: application/x-www-form-urlencoded
+
+author=%3d?ISO-8859-1?Q?Fr%3dE9d%3dE9ric%3d20Bri%3dE8re?%3d&auteur=%3d?UTF-8?B?RnLDqWTDqXJpYyBCcmnDqHJl?%3d

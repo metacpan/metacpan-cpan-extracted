@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name: Apache2::WebApp::Plugin::Mail
+abstract: Methods for sending template based multi-format e-mail.
+version: 0.09
+author:
+  - Marc S. Brooks <mbrooks@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  Apache2::WebApp: 0.38
+  MIME::Lite: 0
+  MIME::Lite::TT: 0.02
+  MIME::Lite::TT::HTML: 0.04
+  Params::Validate: 0
+build_requires:
+  Apache::Test: 0
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html

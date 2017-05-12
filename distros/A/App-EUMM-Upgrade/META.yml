@@ -1,0 +1,36 @@
+---
+abstract: Perl tool to upgrade ExtUtils::MakeMaker-based Makefile.PL
+author:
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.56
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - development
+  - upgrade
+  - EU::MM
+  - Makefile.PL
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-EUMM-Upgrade
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::MakeMaker: 6.56
+  File::Slurp: 0
+  Github::Fork::Parent: 0.24
+  Perl::Meta: 0.03
+  Text::FindIndent: 0.08
+  perl: 5.006
+resources:
+  repository: git://github.com/chorny/EUMM-upgrade.git
+version: 1.0
+x_serialization_backend: YAML version 0.73

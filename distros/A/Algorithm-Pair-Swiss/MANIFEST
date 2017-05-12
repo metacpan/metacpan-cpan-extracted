@@ -1,0 +1,15 @@
+Makefile.PL
+Build.PL
+MANIFEST
+MANIFEST.SKIP
+lib/Algorithm/Pair/Swiss.pm 
+META.yml                                 Module meta-data (added by MakeMaker)
+README
+Changes
+t/pairer.t
+t/even.t
+t/odd.t
+t/input.t
+t/pod.t
+t/pod_coverage.t
+

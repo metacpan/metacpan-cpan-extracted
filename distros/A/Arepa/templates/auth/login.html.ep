@@ -1,0 +1,12 @@
+<% if ($self->stash('error')) { %>
+    <div class="warning"><%= $self->stash('error') %></div>
+<% } %>
+<!-- Leave the text below untouched, it's for the functional tests:
+     arepa_test_logged_out
+-->
+<form method="post">
+  <div>Username: <input name="username" /></div>
+  <div>Password: <input name="password" type="password" /></div>
+
+  <div><input type="submit" /></div>
+</form>

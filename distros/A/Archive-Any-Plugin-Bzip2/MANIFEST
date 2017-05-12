@@ -1,0 +1,12 @@
+Changes
+lib/Archive/Any/Plugin/Bzip2.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/01_extract.t
+t/99_pod.t
+t/99_podcoverage.t
+t/lib.tar.bz2
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

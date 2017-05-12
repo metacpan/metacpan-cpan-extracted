@@ -1,0 +1,14 @@
+---
+pg:
+  connectors:
+    main:
+      host: 'db.example.com'
+      port: 5432
+      user: 'main'
+      password: 'main'
+      dbname: 'postgres'
+      options:
+        PrintWarn: 0
+        PrintError: 0
+        RaiseError: 1
+        pg_enable_utf8: 1

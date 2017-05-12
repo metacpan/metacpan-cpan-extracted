@@ -1,0 +1,51 @@
+=pod
+
+=head1 App::Git::Workflow::Extra
+
+This builds on git-workflow-tools to add more commands which may have less
+broad appeal.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this App::Git::Workflow::Extra
+perldoc command.
+
+    perldoc App::Git::Workflow::Extra
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Git-Workflow-Extra
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-Git-Workflow-Extra
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-Git-Workflow-Extra
+
+    Search CPAN
+        http://search.cpan.org/dist/App-Git-Workflow-Extra/
+
+    Source Code
+        git://github.com/ivanwills/git-workflow-extra.git
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

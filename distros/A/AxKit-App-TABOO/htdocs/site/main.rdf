@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<!-- THIS FILE IS AN EXAMPLE! -->
+<!-- The general structure is there, but your own titles, URI, -->
+<!-- descriptions and slogans must be given. -->
+
+<!-- It is quite likely that this file will soon be written using the -->
+<!-- TriX data serialization, as it is designed to allow easier XSLT -->
+<!-- transformations. -->
+
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:atom="http://www.w3.org/2005/10/23/Atom#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/">
+  
+  <rdf:Description rdf:about="http://demo.kjernsmo.net/">
+    <dc:title>
+      <rdf:Alt>
+	<rdf:_1>TABOO Test system</rdf:_1>
+	<rdf:_2>TABOO</rdf:_2>
+      </rdf:Alt>
+    </dc:title>
+    <dc:description>This is a test site for the TABOO framework.</dc:description>
+    <atom:subtitle>TABOO, a great framework for, uhm, everything!</atom:subtitle>
+  </rdf:Description>
+</rdf:RDF>

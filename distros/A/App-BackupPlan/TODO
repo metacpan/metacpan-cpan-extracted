@@ -1,0 +1,16 @@
+List of desired improvements for this module.
+
+In the first column a (*) is this feature is still missing
+or a version number indicating the version in which it has been introduced.
+
+(0.0.1)	Use Tar module instead of relying on system tar executable, particularly needed for Windows integration
+
+(*)	Add validation schema to configuration file
+
+(*) Allow multi-plan (different <plan> tags) in the configuration and pass plan name to input
+
+(*) Add more time frequencies (e.g.) hours, weeks to favour real-time instead of overnight behaviour
+
+(*) Manage synching with external drive, detecting when it becomes connected
+
+(*) Graphical front-end to manage configuration and interactive behaviour

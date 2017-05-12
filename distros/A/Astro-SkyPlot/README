@@ -1,0 +1,118 @@
+NAME
+    Astro::SkyPlot - Create very basic sky plots
+
+SYNOPSIS
+      use Astro::SkyPlot qw/:all/; # export the markers
+      my $plot = Astro::SkyPlot->new(); # use defaults (see below)
+  
+      # specify options yourself:
+      $plot = Astro::SkyPlot->new(
+        xsize       => 200, # mm
+        ysize       => 200,
+        bgcolor     => [0, 0, 0], # RGB => black
+        projection  => 'hammer',
+        axiscolor   => [100, 100, 100], # RGB => grey
+      );
+  
+      $plot->setcolor(255, 0, 0); # RGB => red
+      $plot->plot_lat_long(1, 1); # units: radians
+      $plot->plot_lat_long(1, 1, size => 0.2, marker => MARK_CIRCLE); # units: radians, radians, mm
+      $plot->write(file => "skyplot.eps");
+
+DESCRIPTION
+    A module to create very basic sky plots as EPS documents.
+
+MARKERS
+    There are multiple types of markers that can be plotted into the sky
+    plot. These are defined through constants that can be exported from the
+    module:
+
+      MARK_CIRCLE           => circular markers
+      MARK_CIRCLE_FILLED    => filled circular markers
+      MARK_BOX              => square markers
+      MARK_BOX_FILLED       => filled square markers
+      MARK_TRIANGLE         => triangularmarkers
+      MARK_TRIANGLE_FILLED  => filled triangular markers
+      MARK_DTRIANGLE        => downward triangular markers
+      MARK_DTRIANGLE_FILLED => filled downward triangular markers
+      MARK_CROSS            => cross shaped markers
+      MARK_DIAGCROSS        => diagonal cross shaped markers
+
+METHODS
+  new
+    Constructor. Without arguments, uses the default settings (cf.
+    SYNOPSIS). Supports the following options:
+
+        xsize       => Plot x-size in mm (def: 200mm)
+        ysize       => Plot y-size in mm (def: 200mm)
+        bgcolor     => Background color as array reference
+                       (RGB value 0-255 per component)
+                       (def: black, [0, 0, 0])
+        projection  => Projection type. Default: Hammer projection ('hammer')
+        axiscolor   => Color for the axes. (def: grey, [100, 100, 100])
+
+  setcolor
+    Set a new drawing color. Takes three numbers corresponding to red, green
+    and blue values between 0 and 255.
+
+  plot_lat_long
+    Draw a new latitude/longitude point.
+
+    These may be followed by key/value pairs of options. Supported options:
+
+    "size": the size (radius) of the point (default: 0.1mm)
+
+    "marker": The type of marker to use (see "MARKERS").
+
+  write
+    Write the plot to the specified EPS file.
+
+ACCESSOR METHODS
+    The following are read only accessors unless otherwise noted.
+
+  marker
+    Get/Set the default marker type. The marker type for a single plot
+    operation can be specified as an option to "plot_lat_long".
+
+  ps
+    Returns the internals "PostScript::Simple" object.
+
+  xsize
+    Returns the image's width (in mm).
+
+  ysize
+    Returns the image's height (in mm).
+
+PRIVATE METHODS
+  _draw_bg
+    Draws the plot's background.
+
+  _restore_color
+    Restores the previously saved color.
+
+  _plot_axis
+    Plot the sky-plot axis.
+
+  _project
+    Projects given lat/long to x/y to plot coordinates.
+
+  _draw_marker
+    Draws a marker at the given plot coordinates. Arguments "$x, $y,
+    $markerno, $size".
+
+SEE ALSO
+    For more general information on map projections:
+    <http://en.wikipedia.org/wiki/Map_projection>
+
+    Map projections are implemented in Astro::MapProjection
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

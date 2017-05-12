@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               ASP4x-Linker
+version:            1.003
+abstract:           In-page persistence of widget-specific variables.
+author:
+    - John Drago <jdrago_999@yahoo.com>
+license:            perl
+distribution_type:  module
+test_requires:
+    Test::More:       0
+requires:
+    Carp:             0
+    ASP4:             1.044
+    Router::Generic:  0.016
+recommends:
+    Apache2::RequestRec: 0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       Hand
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,21 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::VOS;
+
+my ($vos, $oldvol, $newvol, $ok);
+
+die "Usage: $0 oldvol newvol\n" if $#ARGV != 1;
+
+$oldvol = shift;
+$newvol = shift;
+
+$vos = AFS::VOS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+$ok = $vos->rename($oldvol, $newvol);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "Renamed volume $oldvol to $newvol\n"; }

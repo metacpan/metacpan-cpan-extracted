@@ -1,0 +1,18 @@
+Revision history for Perl extension Audio::MPEG.
+
+0.04  Sun Jun 17 23:47 2001
+	- fixed ID3 V2 errors (improper handling of lost synchronization)
+	- added err_ok() function to Decode
+
+0.03  Sun Jun 17 11:30 2001
+	- updated documentation (include scalar->array->scalar info)
+	- added more tests
+	- first public release (freshmeat announcement)
+
+0.02  Sat Jun 16 15:30 2001
+	- back ported from Perl 5.6.1 to Perl 5.0 p5l3
+
+0.01  Wed May 30 21:20 2001
+	- original version; created by h2xs 1.21 with options
+		-n Audio::MPEG
+

@@ -1,0 +1,413 @@
+Apache/Dynagzip version 0.16
+============================
+
+mod_perl extension for Apache-1.3.X to compress the response with gzip format.
+
+
+ABSTRACT
+
+This Apache handler provides dynamic content compression of the response data stream
+for HTTP/1.0 and HTTP/1.1 requests.
+
+Standard gzip compression is optionally combined with an extra light compression
+that eliminates leading blank spaces and/or blank lines within the source document.
+This C<extra light> compression could be applied even when the client (browser)
+is not capable to decompress gzip format.
+
+This handler helps to compress the outbound HTML content usually by 3 to 20 times,
+and provides a list of useful features.
+
+This handler is particularly useful for compressing outgoing web content
+that is dynamically generated on the fly (using templates, DB data, XML,
+etc.), when at the time of the request it is impossible to determine the
+length of the document to be transmitted. Support for Perl, Java, and C
+source generators is provided.
+
+Besides the benefits of reduced document size, this approach gains efficiency
+from being able to overlap the various phases of data generation, compression,
+transmission, and decompression. In fact, the browser can start to
+decompress a document, which has not yet been completely generated.
+
+
+INSTALLATION
+
+The installation consists of the two steps:
+
+ - Installation to your Perl Library
+ - Configuration of your Apache Server
+
+Installation to your Perl Library
+---------------------------------
+
+Use the regular procedure to install this module to your Perl Library.
+
+When you have your local copy of the package type the following:
+
+   perl Makefile.PL
+   make; make test
+   make install
+
+Note: You should be a root to succeed with the last step...
+
+To install the package from the CPAN try to run
+
+   perl -MCPAN -e "install Apache::Dynagzip"
+
+on your UNIX machine.
+
+Configuration of your Apache Server
+-----------------------------------
+
+Read "Web Content Compression FAQ" at
+http://perl.apache.org/docs/tutorials/client/compression/compression.html
+
+Use the following examples in order to create your own configuration:
+
+ ======================================================
+ Static html file (size=149208) no light compression:
+ ======================================================
+ httpd.conf:
+
+  PerlModule Apache::Dynagzip
+  <Files ~ "*\.html">
+      SetHandler perl-script
+      PerlHandler Apache::Dynagzip
+  </Files>
+
+ client-side log:
+
+  C05 --> S06 GET /html/wowtmovie.html HTTP/1.1
+  C05 --> S06 Accept: */*
+  C05 --> S06 Referer: http://devl4.outlook.net/html/
+  C05 --> S06 Accept-Language: en-us
+  C05 --> S06 Accept-Encoding: gzip, deflate
+  C05 --> S06 User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows 98)
+  C05 --> S06 Host: devl4.outlook.net
+  C05 --> S06 Pragma: no-cache
+  C05 --> S06 Accept-Charset: ISO-8859-1
+  == Body was 0 bytes ==
+
+  C05 <-- S06 HTTP/1.1 200 OK
+  C05 <-- S06 Date: Fri, 31 May 2002 17:36:57 GMT
+  C05 <-- S06 Server: Apache/1.3.22 (Unix) Debian GNU/Linux mod_perl/1.26
+  C05 <-- S06 X-Module-Sender: Apache::Dynagzip
+  C05 <-- S06 Transfer-Encoding: chunked
+  C05 <-- S06 Expires: Friday, 31-May-2002 17:41:57 GMT
+  C05 <-- S06 Vary: Accept-Encoding
+  C05 <-- S06 Content-Type: text/html; charset=iso-8859-1
+  C05 <-- S06 Content-Encoding: gzip
+  C05 <-- S06 == Incoming Body was 9411 bytes ==
+  == Transmission: text gzip chunked ==
+  == Chunk Log ==
+  a (hex) = 10 (dec)
+  1314 (hex) = 4884 (dec)
+  3ed (hex) = 1005 (dec)
+  354 (hex) = 852 (dec)
+  450 (hex) = 1104 (dec)
+  5e6 (hex) = 1510 (dec)
+  0 (hex) = 0 (dec)
+  == Latency = 0.170 seconds, Extra Delay = 0.440 seconds
+  == Restored Body was 149208 bytes ==
+
+ ======================================================
+ Static html file (size=149208) with light compression:
+ ======================================================
+ httpd.conf:
+
+  PerlModule Apache::Dynagzip
+  <Files ~ "*\.html">
+        SetHandler perl-script
+        PerlHandler Apache::Dynagzip
+        PerlSetVar LightCompression On
+  </Files>
+
+ client-side log:
+
+  C05 --> S06 GET /html/wowtmovie.html HTTP/1.1
+  C05 --> S06 Accept: */*
+  C05 --> S06 Referer: http://devl4.outlook.net/html/
+  C05 --> S06 Accept-Language: en-us
+  C05 --> S06 Accept-Encoding: gzip, deflate
+  C05 --> S06 User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows 98)
+  C05 --> S06 Host: devl4.outlook.net
+  C05 --> S06 Pragma: no-cache
+  C05 --> S06 Accept-Charset: ISO-8859-1
+  == Body was 0 bytes ==
+
+  C05 <-- S06 HTTP/1.1 200 OK
+  C05 <-- S06 Date: Fri, 31 May 2002 17:49:06 GMT
+  C05 <-- S06 Server: Apache/1.3.22 (Unix) Debian GNU/Linux mod_perl/1.26
+  C05 <-- S06 X-Module-Sender: Apache::Dynagzip
+  C05 <-- S06 Transfer-Encoding: chunked
+  C05 <-- S06 Expires: Friday, 31-May-2002 17:54:06 GMT
+  C05 <-- S06 Vary: Accept-Encoding
+  C05 <-- S06 Content-Type: text/html; charset=iso-8859-1
+  C05 <-- S06 Content-Encoding: gzip
+  C05 <-- S06 == Incoming Body was 8515 bytes ==
+  == Transmission: text gzip chunked ==
+  == Chunk Log ==
+  a (hex) = 10 (dec)
+  119f (hex) = 4511 (dec)
+  3cb (hex) = 971 (dec)
+  472 (hex) = 1138 (dec)
+  736 (hex) = 1846 (dec)
+  0 (hex) = 0 (dec)
+  == Latency = 0.280 seconds, Extra Delay = 0.820 seconds
+  == Restored Body was 128192 bytes ==
+
+Default values for the minChunkSizeSource and minChunkSize will be in effect
+in this case. To overwrite them try for example
+
+        <IfModule mod_perl.c>
+                PerlModule Apache::Dynagzip
+		<Files ~ "*\.html">
+                        SetHandler perl-script
+                        PerlHandler Apache::Dynagzip
+			PerlSetVar minChunkSizeSource 36000
+			PerlSetVar minChunkSize 9
+		</Files>
+	</IfModule>
+
+ ===============================================================================
+ GET dynamically generated (by perl script) html file with no light compression:
+ ===============================================================================
+ httpd.conf:
+
+ PerlModule Apache::Filter
+ PerlModule Apache::Dynagzip
+ <Directory /var/www/perl/>
+      SetHandler perl-script
+      PerlHandler Apache::RegistryFilter Apache::Dynagzip
+      PerlSetVar Filter On
+      PerlSendHeader Off
+      PerlSetupEnv On
+      AllowOverride None
+      Options ExecCGI FollowSymLinks
+      Order allow,deny
+      Allow from all
+ </Directory>
+
+ client-side log:
+
+  C05 --> S06 GET /perl/start_example.cgi HTTP/1.1
+  C05 --> S06 Accept: image/gif, image/jpeg, image/pjpeg, */*
+  C05 --> S06 Accept-Language: en-us
+  C05 --> S06 Accept-Encoding: gzip, deflate
+  C05 --> S06 User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows 98)
+  C05 --> S06 Host: devl4.outlook.net
+  C05 --> S06 Accept-Charset: ISO-8859-1
+  == Body was 0 bytes ==
+
+  C05 <-- S06 HTTP/1.1 200 OK
+  C05 <-- S06 Date: Sat, 01 Jun 2002 16:59:47 GMT
+  C05 <-- S06 Server: Apache/1.3.22 (Unix) Debian GNU/Linux mod_perl/1.26
+  C05 <-- S06 X-Module-Sender: Apache::Dynagzip
+  C05 <-- S06 Transfer-Encoding: chunked
+  C05 <-- S06 Expires: Saturday, 01-June-2002 17:04:47 GMT
+  C05 <-- S06 Vary: Accept-Encoding
+  C05 <-- S06 Content-Type: text/html; charset=iso-8859-1
+  C05 <-- S06 Content-Encoding: gzip
+  C05 <-- S06 == Incoming Body was 758 bytes ==
+  == Transmission: text gzip chunked ==
+  == Chunk Log ==
+  a (hex) = 10 (dec)
+  2db (hex) = 731 (dec)
+  0 (hex) = 0 (dec)
+  == Latency = 0.220 seconds, Extra Delay = 0.050 seconds
+  == Restored Body was 1434 bytes ==
+
+ ============================================================================
+ GET dynamically generated (by perl script) html file with light compression:
+ ============================================================================
+ httpd.conf:
+
+  PerlModule Apache::Filter
+  PerlModule Apache::Dynagzip
+ <Directory /var/www/perl/>
+        SetHandler perl-script
+	PerlHandler Apache::RegistryFilter Apache::Dynagzip
+	PerlSetVar Filter On
+	PerlSetVar LightCompression On
+	PerlSendHeader Off
+	PerlSetupEnv On
+	AllowOverride None
+	Options ExecCGI FollowSymLinks
+	Order allow,deny
+        Allow from all
+ </Directory>
+
+ client-side log:
+
+  C05 --> S06 GET /perl/start_example.cgi HTTP/1.1
+  C05 --> S06 Accept: */*
+  C05 --> S06 Accept-Language: en-us
+  C05 --> S06 Accept-Encoding: gzip, deflate
+  C05 --> S06 User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows 98)
+  C05 --> S06 Host: devl4.outlook.net
+  C05 --> S06 Pragma: no-cache
+  C05 --> S06 Accept-Charset: ISO-8859-1
+  == Body was 0 bytes ==
+
+  C05 <-- S06 HTTP/1.1 200 OK
+  C05 <-- S06 Date: Sat, 01 Jun 2002 17:09:13 GMT
+  C05 <-- S06 Server: Apache/1.3.22 (Unix) Debian GNU/Linux mod_perl/1.26
+  C05 <-- S06 X-Module-Sender: Apache::Dynagzip
+  C05 <-- S06 Transfer-Encoding: chunked
+  C05 <-- S06 Expires: Saturday, 01-June-2002 17:14:14 GMT
+  C05 <-- S06 Vary: Accept-Encoding
+  C05 <-- S06 Content-Type: text/html; charset=iso-8859-1
+  C05 <-- S06 Content-Encoding: gzip
+  C05 <-- S06 == Incoming Body was 750 bytes ==
+  == Transmission: text gzip chunked ==
+  == Chunk Log ==
+  a (hex) = 10 (dec)
+  2d3 (hex) = 723 (dec)
+  0 (hex) = 0 (dec)
+  == Latency = 0.280 seconds, Extra Delay = 0.000 seconds
+  == Restored Body was 1416 bytes ==
+
+In order to use your own handler (that might be generating its own HTTP headers)
+inside the Apache::Filter chain, make sure to register your handler with the
+Apache::Filter chain like
+
+  $r->filter_register();
+
+when necessary. See Apache::Filter documentation for details.
+
+ ====================================================================================
+ GET dynamically generated (by C-written binary) html file with no light compression:
+ ====================================================================================
+ httpd.conf:
+
+ PerlModule Apache::Dynagzip
+ <Directory /var/www/cgi-bin/>
+     SetHandler perl-script
+     PerlHandler Apache::Dynagzip
+     AllowOverride None
+     Options +ExecCGI
+     PerlSetupEnv On
+     PerlSetVar BinaryCGI On
+     Order allow,deny
+     Allow from all
+ </Directory>
+
+ client-side log:
+
+  C05 --> S06 GET /cgi-bin/mylook.cgi HTTP/1.1
+  C05 --> S06 Accept: */*
+  C05 --> S06 Accept-Language: en-us
+  C05 --> S06 Accept-Encoding: gzip, deflate
+  C05 --> S06 User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows 98)
+  C05 --> S06 Host: devl4.outlook.net
+  C05 --> S06 Pragma: no-cache
+  C05 --> S06 Accept-Charset: ISO-8859-1
+  == Body was 0 bytes ==
+
+  C05 <-- S06 HTTP/1.1 200 OK
+  C05 <-- S06 Date: Fri, 31 May 2002 23:18:17 GMT
+  C05 <-- S06 Server: Apache/1.3.22 (Unix) Debian GNU/Linux mod_perl/1.26
+  C05 <-- S06 X-Module-Sender: Apache::Dynagzip
+  C05 <-- S06 Transfer-Encoding: chunked
+  C05 <-- S06 Expires: Friday, 31-May-2002 23:23:17 GMT
+  C05 <-- S06 Vary: Accept-Encoding
+  C05 <-- S06 Content-Type: text/html; charset=iso-8859-1
+  C05 <-- S06 Content-Encoding: gzip
+  C05 <-- S06 == Incoming Body was 1002 bytes ==
+  == Transmission: text gzip chunked ==
+  == Chunk Log ==
+  a (hex) = 10 (dec)
+  3cf (hex) = 975 (dec)
+  0 (hex) = 0 (dec)
+  == Latency = 0.110 seconds, Extra Delay = 0.110 seconds
+  == Restored Body was 1954 bytes ==
+
+ =================================================================================
+ GET dynamically generated (by C-written binary) html file with light compression:
+ =================================================================================
+  httpd.conf:
+
+   PerlModule Apache::Dynagzip
+   <Directory /var/www/cgi-bin/>
+       SetHandler perl-script
+       PerlHandler Apache::Dynagzip
+       AllowOverride None
+       Options +ExecCGI
+       PerlSetupEnv On
+       PerlSetVar BinaryCGI On
+       PerlSetVar LightCompression On
+       Order allow,deny
+       Allow from all
+   </Directory>
+
+ client-side log:
+
+  C05 --> S06 GET /cgi-bin/mylook.cgi HTTP/1.1
+  C05 --> S06 Accept: */*
+  C05 --> S06 Accept-Language: en-us
+  C05 --> S06 Accept-Encoding: gzip, deflate
+  C05 --> S06 User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows 98)
+  C05 --> S06 Host: devl4.outlook.net
+  C05 --> S06 Pragma: no-cache
+  C05 --> S06 Accept-Charset: ISO-8859-1
+  == Body was 0 bytes ==
+
+  C05 <-- S06 HTTP/1.1 200 OK
+  C05 <-- S06 Date: Fri, 31 May 2002 23:37:45 GMT
+  C05 <-- S06 Server: Apache/1.3.22 (Unix) Debian GNU/Linux mod_perl/1.26
+  C05 <-- S06 X-Module-Sender: Apache::Dynagzip
+  C05 <-- S06 Transfer-Encoding: chunked
+  C05 <-- S06 Expires: Friday, 31-May-2002 23:42:45 GMT
+  C05 <-- S06 Vary: Accept-Encoding
+  C05 <-- S06 Content-Type: text/html; charset=iso-8859-1
+  C05 <-- S06 Content-Encoding: gzip
+  C05 <-- S06 == Incoming Body was 994 bytes ==
+  == Transmission: text gzip chunked ==
+  == Chunk Log ==
+  a (hex) = 10 (dec)
+  3c7 (hex) = 967 (dec)
+  0 (hex) = 0 (dec)
+  == Latency = 0.170 seconds, Extra Delay = 0.110 seconds
+  == Restored Body was 1862 bytes ==
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Apache::Constants;
+   Apache::File;
+   Apache::Filter 1.019;
+   Apache::Log;
+   Apache::URI;
+   Apache::Util;
+   Fcntl;
+   FileHandle;
+
+   Compress::LeadingBlankSpaces;
+   Compress::Zlib 1.16;
+       
+  Note 1: the Compress::Zlib 1.16 requires the Info-zip zlib 1.0.2 or better
+        (it is NOT compatible with versions of zlib <= 1.0.1).
+        The zlib compression library is available at http://www.gzip.org/zlib/
+  
+  Note 2: it is recommended to have a mod_perl compiled with the EVERYTHING=1
+        switch. However, Apache::Dynagzip uses just fiew phases of the request
+        processing flow:
+              Content generation phase
+              Logging phase
+
+
+AUTHOR
+
+Slava Bizyayev <slava@cpan.org> - Freelance Software Developer & Consultant.
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2002 - 2004 Slava Bizyayev. All rights reserved.
+
+This package is free software. You can use it, redistribute it, and/or modify it
+under the same terms as Perl itself.
+
+The latest version of this module can be found on CPAN.
+

@@ -1,0 +1,162 @@
+#
+# This file is a <project>.yml template. Fill in the missing values for a good time.
+#
+
+#
+# this is the default realm, and by default we don't define realms in this file
+#
+act_config_no_realms: 1
+
+#
+# default to the production realm
+#
+realm: production
+
+#
+# global debug flag: see perldoc Activator::Log for more specifics on debug logging.
+#
+debug: 1
+
+#
+# This is the name of the project, most likely the top of your perl
+# namespace for a catalyst app, i.e.: MyApp
+#
+project_name: 
+
+#
+# this value used for directories and filenames, i.e.: myapp
+#
+project_alias: 
+
+#
+# this is the primary host url. This is normally used as the dir for
+# the apache www root (/var/www/${host_url} for example), and can be
+# otherwise useful to have centrally configured
+#
+host_url: renewaltool.com
+
+################################################################################
+#
+#   Locations for source code and target deployment directories for sync
+#
+
+#
+# This is where the sync'd code comes from. This is the parent to your
+# perl "lib" directory.
+#
+project_codebase : ${HOME}/src/${project_name}
+
+#
+# Activator developers need to sync their working copy of Activator
+# itself from this dir. Unset or comment this out to not sync.
+#
+#activator_codebase: ${HOME}/src/activator-framework
+
+#
+# where project and activator configuration files live.
+#
+conf_path : ${project_codebase}/activator.d
+
+
+#
+# when running "activator.pl sync <project>" , where do you want to put the running code?
+#
+sync_target: ${HOME}/activator.run/${project_alias}
+
+#
+# where PID files should be placed
+#
+sync_run_dir   : ${sync_target}/var/run
+
+#
+# where lock files should be placed
+#
+sync_lock_dir  : ${sync_target}/var/lock
+
+#
+# where project/application configuration files should be placed
+#
+sync_conf_dir  : ${sync_target}/etc/${project_alias}.d
+
+#
+# where project/application log files will be placed
+#
+sync_log_dir  : ${sync_target}/var/log
+
+#
+# if your application needs extra directories created for its
+# functionality, list them here.
+sync_data_dirs :
+    - ${sync_target}/var/lib/${project_alias}
+    - ${sync_target}/var/tmp/${project_alias}
+
+#
+# Files listed here will be copied from ${conf_dir} to ${sync_conf_dir}. Additionally:
+# - If the file looks like a YAML file (ends in .ya?ml), variable
+#   replacement is performed and the file is written as the same name.
+# - If the file looks like a Template Toolkit file (ends in .tt), it
+#   is processed with your project config and written with .tt stripped off.
+#
+# It is OK to have deep dir paths relative to ${conf_dir}. They will be preserved.
+#
+# Note that most projects need at least these two files listed here:
+# one to configure every catalyst thing that is not Activator aware
+# (usually ${project_alias}-catalyst.yml), and one to have the multi-
+# functional project registry (usually ${project_alias}-registry.yml).
+#
+# Note also that this is a great place for a log4perl.conf and your
+# Activator::Dictionary files (but don't list dictionary files here,
+# list them in the Activator: Dictionary: section below)
+#
+sync_config_files:
+    - ${project_alias}-registry.yml
+    - ${project_alias}-catalyst.yml
+
+
+################################################################################
+#
+# Default Activator Module Settings
+#
+
+Activator:
+#  Log:
+#    log4perl : ${sync_conf_dir}/log4perl.conf
+#  DB:
+#    db_connection : ${project_alias}
+#  Dictionary:
+#    dict_files: ${sync_conf_dir}/dict
+ 
+################################################################################
+#
+# Production apache settings. These settings should be suitable for
+# generating a production httpd.conf file, and the
+# conf.d/<catalyst>.conf file. Override these values in <user>.yml or
+# <realm>.yml for dev or QA use. 
+#
+
+apache2:
+  PerlModule   : ${project_name}
+  ServerRoot   : ${sync_target}/etc/httpd
+  PERL5LIB     : ${sync_target}/lib/perl5
+  DocumentRoot : ${sync_target}/var/www/${host_url}
+  User : apache
+  Group: apache
+  ListenPort : 80
+  Listen     : 127.0.0.1
+  PidFile  : ${sync_run_dir}/${project_alias}-httpd.pid
+  LockFile : ${sync_lock_dir}/${project_alias}-httpd.lock
+
+#
+# Any environment variables needed for apache will be set in the
+# conf.d/<catalyst>.conf apache configuration file generated if listed
+# here.
+#
+  env_vars:
+    ACT_LOG_default_level: INFO
+    CATALYST_CONFIG: ${sync_conf_dir}/${project_alias}-catalyst.yml
+    ACT_REG_YAML_FILE: ${sync_conf_dir}/${project_alias}-registry.yml
+
+#
+# "activator.pl sync" needs to know which apache modules dir you want to use.
+#
+  modules: /usr/lib/httpd/modules

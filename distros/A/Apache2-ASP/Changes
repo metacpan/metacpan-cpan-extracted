@@ -1,0 +1,794 @@
+Revision history for Perl extension Apache2::ASP.
+
+2.46    2011-03-25
+  - !!DEPRECATED!! in favor of ASP4.
+  - Please don't use Apache2::ASP for any new development.
+  - Use ASP4 instead; it is much better, faster and maintained.
+  - Upgrading from Apache2::ASP to ASP4 is quite easy - just convert your
+    apache2-asp-config.xml to asp4-config.json, update/remove your GlobalASA.pm
+    and update your httpd.conf.
+
+2.45    2009-11-20
+  - Fixed* a bug that caused deeeeeeeeply nested Master/Child page scenarios to cause
+    the MasterPage's ASP objects ($Response, $Request, etc) to not get initialized.
+    This fixes the dreaded "Cannot call 'Write' on an undefined value - line 1" error.
+    * Involves deleting your page cache before the udpate will take full effect!
+
+2.44    2009-11-17
+  - Got rid of annoying "Software caused connection abort" errors.
+
+2.43    2009-11-16
+  - Requests to handlers that don't exist will now result in a 404 error, not a 500 error.
+
+2.42    2009-11-11
+  - You can now test multiple websites at the same time (eg: Public and Admin websites)
+    from within the same test script.  Example given in POD for Apache2::ASP::API
+
+2.41    2009-10-14
+  - Bugfix: Errors will now appear on-screen, rather than the default Apache error.
+
+2.40    2009-10-14
+  - Enhancement: multipart/form-data posts to MediaManagers no longer require
+    actual files to be uploaded.  Useful for forms that have an optional file upload field.
+
+2.39    2009-08-23
+  - Bugfix:  Deeply-nexted MasterPage setups sometimes did not initialize the
+    intrinsic ASP objects in the root-most MasterPage ($Response, $Session, etc).
+
+2.38    2009-08-09
+  - Bugfix: $Response->Redirect in a handler after $Response->TrapInclude gave
+    errors "Response.Status cannot be changed after headers have been sent" (this
+    is now fixed).
+
+2.37    2009-06-10
+  - API change: Upload hooks are deprecated and all but disabled.
+  - Bugfix: The upload_start event was not getting called for UploadHandler or its subclasses.
+
+2.37_03 2009-05-19
+  - Bugfix: On Apache2 under Gentoo (perhaps others as well) HTTPContext->send_headers
+    was not always called before content was written to the client.  This caused
+    cookies and other headers to not get written to the client.
+
+2.37_02 2009-05-14
+  - Uploads' filehandle was not closed, causing problems where the last few bytes
+    were not flushed to disk.
+
+2.37_01 2009-05-13
+  - Working on removing the dependency on libapreq2.  It is just too much pain.
+  - Several minor fixes and performance tweaks.
+
+2.36  2009-03-21
+  - MediaManager updates.  pnotes has proven unstable.
+  - Upgraded to Module::Install.
+  - Restructured tests into numerically sequential folders.
+  - Added several tests to improve code-coverage.
+  - Removed some unused code from Response.
+  - Server.URLDecode now does the Right Thing for utf-8 characters.
+  - Added 'encoding' from 'Encode' as a prerequisite.
+
+2.35  2009-03-11
+  - Minor updates here and there.
+
+2.34  2009-03-03
+  - Was setting content-length header twice in MediaManager.
+
+2.33  2009-03-03
+  - HTTP headers out were having issues.
+
+2.32  2009-03-01
+  - Added Apache2::ASP::HTTPContext::SubContext
+  - Added t/htdocs/subcontext/*.asp
+  - Added t/handlers/simple.pm
+  - Re-worked the way Response.Include and Response.TrapInclude work on the inside.
+  - No external changes were made.
+
+2.31  2009-02-19
+  - Apache2::ASP::HTTPContext order of operations during setup_request was updated.
+  - Apache2::ASP::ModPerl returns proper error HTTP codes when errors occur.
+  - Requests for non-existent *.asp scripts returns a proper 404.
+  - Apache2::ASP::HTTPContext copes better with syntax errors in handlers.
+  - Missing handlers are coped with better now.
+
+2.30  2009-02-19
+  - Apache2::ASP::ASPPage was misreporting line numbers.
+
+2.29  2009-02-15
+  - Added Apache2::ASP::SessionStateManager::Memcached
+  - Added Apache2::ASP::ApplicationStateManager::Memcached
+  - Both Memcached state managers require Cache::Memcached.
+  - Fixed a few outgoing HTTP header bugs which prevented Safari from handling
+    $Response->Redirect behaviors properly, and caused LWP::UserAgent to give
+    warnings about 'got EOF when chunk expected' and "x-client: died" errors.
+  - Added Apache2::ASP::HTTPContext::FilterResolver
+  - Added Apache2::ASP::HTTPContext::HandlerResolver
+  - Added Apache2::ASP::HTTPContext::HandlerRunner
+  - Major refactoring of Apache2::ASP::HTTPContext
+
+2.28  2009-02-12
+  - Refactored a few things causing big slowdowns.  Devel::NYTProf++!
+
+2.27  2009-02-09
+  - Typo in ConfigParser.pm
+
+2.26  2009-02-09
+  - Forgot the *::NonPersisted state managers in the MANIFEST
+
+2.25  2009-02-09
+  - Added <disable_persistence> element to the XML config. Disabling persistence
+    for high-traffic pages is sometimes necessary and/or desirable.
+
+2.24  2009-02-03
+  - Narrowed the search for leaked open filehandles to Apache2::ASP::SimpleCGI
+    when handling a file upload in test/API mode.  Added DESTROY handler to close
+    any remaining filehandles when the object goes out of scope.
+
+2.23  2009-02-01
+  - "Too many open filehandles" error was popping up.  Attempting to use IO::File
+    to solve this problem.
+  - Added IO::File as a prerequisite file.
+
+2.22  2009-01-31
+  - Apache2::ASP::MediaManager was misbehaving when attempting to delete a file
+    no longer on disk.
+
+2.21  2009-01-31
+  - Apache2::ASP::MediaManager was incorrectly printing the content-disposition
+    header, causing some browsers to append an extra "," to the end of filesnames
+    when they were downloaded.
+
+2.20  2009-01-30
+  - Fixed documentation for Apache2::ASP::Mock::Connection
+
+2.19  2009-01-30
+  - Fixed documentation for Apache2::ASP::Test::Base.
+
+2.18  2009-01-29
+  - Added a lot more documentation.
+  - Under Apache2::ASP::Test::Base and Apache2::ASP::API, $Server->RegisterCleanup now
+    gets called at the end of each request - not when the pool object goes out
+    of scope (which caused some unwanted behavior).
+
+2.17  2009-01-28
+  - More tweaking.  Please upgrade to this version.
+
+2.16  2009-01-28
+  - Apache2::ASP::Mock::RequestRec sometimes confess()ed if Response->Include was called.
+
+2.15  2009-01-28
+  - Made some minor tweaks to the way uploads are handled internally.  No public changes.
+
+2.14  2009-01-25
+  - <asp:Content/> tags inside of pages that use MasterPages were not being passed 
+    TrapInclude or Include arguments (i.e. $Response->Include("/page.asp", { arg1 => "foo" }) ).
+
+2.13  2009-01-25
+  - Apache2::ASP::MediaManager did not provide any content-type header for
+    file types not listed in MIME::Types (eg: *.ogv).  Now "application/octet-stream"
+    is returned when MIME::Types does not return anything.
+
+2.12  2009-01-20
+  - The "Cookies" HTTP header was not properly handled in the Test UserAgent.
+  - Incoming HTTP headers were comingled with outgoing HTTP headers in HTTPContext.
+
+2.11  2009-01-10
+  - Several fixes to cookie behavior problems.
+  - Removed <module>Class::DBI::Lite</module> from apache2-asp-config.xml.
+
+2.10  2009-01-05
+  - The Set-Cookie header for session state no longer includes the domain parameter.
+
+2.09  2008-12-12
+  - Apache2::ASP::API->get("/") or get("/folder-name/") works as expected (without
+    forcing you to include "/index.asp" at the end.
+  - Added 05.00-folder-uri.t to make sure that "/folder-name/" URI's are supported
+    via the programmatic API.
+  - After testing, we remove /tmp/asp_*
+
+2.08  2008-12-10
+  - Updated the POD for Apache2::ASP::API.
+
+2.07  2008-12-10
+  - $ENV{DOCUMENT_ROOT} is persisted between requests when using Apache2::ASP::Test::UserAgent.
+  - Added Apache2::ASP::API
+
+2.06  2008-12-03
+  - Removed a failing test.
+
+2.05  2008-12-03
+  - asphelper adds /etc/properties.yaml and /etc/test_fixtures.yaml, as well as
+    an example "contact form" page, handler and unit test.
+
+2.04  2008-12-02
+  - Updated asphelper script.  It was writing a GlobalASA.pm with a syntax error.
+  - Added more tests.
+
+2.03  2008-12-01
+  - Updated ASPPage to handle parsing MasterPages that include code similar to the following:
+  <asp:ContentPlaceHolder id="meta_description"><meta name="description" content="" /></asp:ContentPlaceHolder>
+  <asp:ContentPlaceHolder id="meta_keywords"><meta name="keywords" content="" /></asp:ContentPlaceHolder>
+
+2.02  2008-12-01
+  - Sometimes @INC would not contain all of the directories specified under <libs>
+    in the config.  This bug should now be fixed.
+
+2.01  2008-11-30
+  - The codebase is solid and has been running several relatively high-traffic
+    websites for several months.  Time for a production release of the 2.x code.
+
+2.00_26   2008-11-20
+  - Fixed a bug that caused problems when a page inheriting from a sub-masterpage
+    overrode a placeholder from a super-masterpage.
+
+2.00_25   2008-11-20
+  - Fixed a bug with nested MasterPages which caused some fatal errors.
+  - Fixed another issue with nested MasterPages which caused the parser to
+    not interpret all <asp:ConentPlaceHolder /> tags (when there were more than one)
+    inside of an <asp:Content /> in a nested MasterPage.  I suppose you really
+    had to be there.
+  - Added tests to check for these problems with nested MasterPages.
+
+2.00_24   2008-11-19
+  - Added Apache2::ASP::Manual::BestPractices.
+
+2.00_23   2008-11-19
+  - Added asphelper.
+  - Moved asphelper and runasp into the sbin/* directory in the distribution.
+  - Added Test::Memory::Cycle to the PREREQ_RPM list in Makefile.PL
+  - Fixed a (hopefully) rare corner-case in which thaw($Application) would return
+    undef - the solution was to default to an empty hashref { }.
+  - Fixed a but in ASPPage in which empty asp:ContentPlaceHolder tags in MasterPages
+    caused the "%s does not define an asp:ContentPlaceHolder with an id of %s" error
+    even for legitimate child pages.
+  - Added Apache2::ASP::ConfigNode::System::Settings.
+  - $Config->system->settings->someSettingName works as expected.
+  - foreach $hashref ( $Config->system->settings ) { } now works as expected.
+  - Added more tests to t/01.03-configloader.t for config testing (by no means complete).
+
+2.00_22   2008-10-10
+  - Fixed a bug which caused GlobalASA to not initialize properly.
+
+2.00_21   2008-11-10
+  - Minor adjustments.
+  - Added some documentation.
+
+2.00_20   2008-11-07
+  - Added missing file t/lib/My/ErrorHandler.pm to MANIFEST.
+
+2.00_19   2008-11-07
+  - Added some /Manual/* documentation.
+  - HTTPContext now correctly traps "unhandled tag" errors.
+
+2.00_18   2008-11-05
+  - New *.pm files in the PAGE_CACHE are chmod 0666.
+  - Added ErrorHandler.  By default, it prints a stacktrace to the browser and
+    sends a copy to the email address specified in the <errors> config.
+  - Added <errors> section to config.
+  - Updated configuration DTD for <errors> section.
+  - Apache2::ASP::ModPerl now correctly returns a 0 value and sets $r->status.
+  - $Server->RegisterCleanup references the correct Apache2::RequestRec object.
+  - Added "runasp," the command-line interface to run ASP scripts.
+
+2.00_17   2008-11-04
+  - Fixed a bug which caused Apache2::ASP::Test::UserAgent to not get the
+    output buffer content from the correct Mock request object (meaning that
+    $s->ua->get('/url.asp')->content was always empty.
+  - Added test to make sure that the above fix stays in place.
+  - Internal changes within HTTPContext WRT self-hash-notation upgraded to get_prop().
+
+2.00_16   2008-11-03
+  - ASPPage mkdir's each missing part of the page cache.
+  - ConfigParser correctly handles configs that don't specify any request filters.
+  - Re-included Apache2::ASP::TransHandler, albeit with different semantics.
+
+2.00_15   2008-11-01
+  - XML Config file schema updated - (settings, env_vars) to support DTD validation.
+  - DTD for XML Config is now included.
+
+2.00_14   2008-10-31
+  - If querystring or form data contains multiple values for the same parameter,
+    that parameter will become an arrayref of values.
+  - Multiple config post-processors can be defined in the config XML file.  They
+    will be executed in the order they are listed in the config XML file.
+  - Nested master pages are now supported.
+
+2.00_13   2008-10-30
+  - Each upload form submission should now include a unique "uploadID=xxx" value.
+  - Multiple concurrent uploads from the same user under the same session are
+    now supported because of the uploadID=xxx logic.
+
+2.00_12   2008-10-29
+  - (handler)->init_asp_objects( $context ) was not getting called correctly.
+
+2.00_11   2008-10-29
+  - ASPPage updated so that pages containing "~" in their text will not cause
+    syntax errors after being parsed.
+  - File uploads are handled correctly by ModPerl, UploadHandler and MediaManager.
+
+2.00_10   2008-10-26
+  - Server.RegisterCleanup(\&subref, \@argref) now fires both from the command-line
+    and within an actual mod_perl environment.
+
+2.00_09   2008-10-24
+  - Pages that use MasterPages are now executed with the correct @_.
+  - Added Apache2::ASP::FormHandler again.
+
+2.00_08   2008-10-23
+  - Apache2::ASP::Apache creates a new HTTPContext from the correct class/subclass now.
+  - Source code is filtered with: s/(\$Response\->End)/return $1/sg;
+
+2.00_07   2008-10-22
+  - Adjustments to HTTPContext to better support massive stack-depths of "inner" HTTPContexts.
+
+2.00_06   2008-10-22
+  - Tweaks in ApplicationStateManager and SessionStateManager to avoid a transaction
+    race condition.
+  - Config initializes itself (rather than the HTTPContext doing it).
+  - Config is now cached in memory on a per-process, per-disk-path basis.
+
+2.00_05   2008-10-20
+  - Apache2::ASP::HTTPContext now handles final config initialization including
+    setting %ENV vars, @INC modifications and loading modules as specified
+    in the config xml file.
+  - Code Coverage: 70.50% (average:stmt+bran+cond+sub)
+  - Bugfix: Application->save was getting called at the beginning and end of 
+    *every* request.  This behavior has been fixed.
+  - Various minor tweaks, removing "vestigial" code chunks.
+  - Subclassing Apache2::ASP::HTTPContext is now possible.
+  - Syntax errors inside of includes are handled better.
+
+2.00_04   2008-10-16
+  - Added missing files to MANIFEST.
+  - Added UploadHandler and MediaManager back to the distribution.
+  - Added some upload tests.
+
+2.00_03   2008-10-16
+  - Added missing files to MANIFEST.
+
+2.00_02   2008-10-15
+  - Partial page caching has been realized.
+
+2.00_01   2008-10-15
+  - Complete rewrite.
+  !!!! BREAKING CHANGES !!!!
+    - XML Config file format is different!  See docs for details!
+    - Apache Config file is different!  See docs for details!
+  - Now "master pages" are supported a la ASP.Net (i.e. named placeholders).
+  - Session and Application are only saved to database if they have been changed
+    during the course of the request:
+  - Major performance increase.  Using master pages instead of includes can
+    further increase performance.
+  - Basic tags support has been suspended for now.
+  - Removed dependency Datetime::Duration.
+  - Removed dependency Sys::Hostname.
+  
+
+1.59 2008-08-16
+  - Added missing file t/htdocs/virtualinclude.asp to the MANIFEST
+    so all tests should pass now.
+
+1.58 2008-08-06
+  - Now <!-- #include virtual="/file.asp" --> and 
+    <!-- #include file="/abs/path/to/file.asp" --> work as you might expect.
+    This means that Apache2::ASP will work nicely with DreamWeaver and other
+    popular WYSIWYG's that can parse that sort of include directive.
+
+1.57 2008-08-06
+  - Removed POD for Request->Document.  Server-side DOM will have to wait.
+  - New in this release is basic "Tags" support.  See Apache2::ASP::Tag for details.
+
+1.56_02 2008-08-02
+  - Added documentation for all Apache2::ASP::DOM::* classes.
+
+1.56_1  2008-08-01
+  - Added preliminary support for "XMLSubs"-esque tags.
+  - Added preliminary (experimental) support for (!simple!) server-side DOM.
+    (**Does not merge $Response->Include()'ed DOM with parent DOM).
+
+1.55 2008-07-13
+  - Apache2::ASP::SessionStateManager now uses the correct database connection.
+    This problem would only come up when multiple Apache2::ASP web applications
+    using different session data sources were running under the same Apache
+    instance.
+  - Ditto for Apache2::ASP::ApplicationStateManager.
+
+1.54 2008-07-05
+  - Adjusted Apache2::ASP::MediaManager so that it will not unlink the /MEDIA
+    directory if someone attempts to delete a file and neglects to specify
+    which file should be deleted.
+  - Also updated Apache2::ASP::MediaManager to more gracefully handle missing
+    uploaded files.
+
+1.53 2008-07-05
+  - Fixed a bug that caused Apache2::ASP::Config to die if no request filters
+    were specified within the <request_filters> element in the config file.
+
+1.52 2008-06-18
+  - While using Apache2::ASP::Test::Base, $ENV{APACHE2_ASP_APPLICATION_ROOT} 
+    is now persisted between requests.  This means that if (somewhere else)
+    you set $ENV{APACHE2_ASP_APPLICATION_ROOT} in your code, it will persist
+    between requests.
+
+1.51 2008-06-12
+  - Speed improvements, up to 100% faster now due to the following:
+  - Added XML::Parser as a requirement.
+  - Caching (in memory) Configuration data on a per-domain basis.
+
+1.49 2008-05-29
+  - Memory leaks are now completely gone.
+  - Speed improvements (20% faster than v1.47).
+
+1.48 2008-05-27
+  - $Request->Form returns a singleton hash for the duration of
+    a request.  This means that modifications to the global $Form
+    object are available to other "areas" of your web application
+    for the rest of the same request.
+
+1.47 2008-05-26
+  - $Request->QueryString('field') returns the querystring value for 'field'.
+  - $Request->QueryString returns $ENV{HTTP_QUERYSTRING}.
+
+1.46 2008-05-21
+  - Apache2::ASP::MediaManager::before_download() must return true
+    before the filehandle is opened (for the file about to be downloaded).
+  - Apache2::ASP::MediaManager's before_delete() and after_delete() methods
+    are now also passed the full path to the file that is to be deleted.
+
+1.45 2008-05-15
+  - Minor adjustments.
+
+1.44 2008-05-14
+  - Minor speed improvements (20% faster).
+  - Miscellaneous fixes here and there.
+
+1.43 2008-05-13
+  - Fixed some damaged documentation.
+
+1.42 2008-05-13
+  - New media manager tests didn't make it in to the last release.
+
+1.41 2008-05-13
+  - Apache2::ASP::GlobalConfig will now also look 1 level "up" from
+    the current working directory (retrieved from Cwd) for the 
+    apache2-asp-config.xml file.  This is important for when you have
+    (for example) an /sbin/ folder with asp-related scripts.
+  - Added method $Server->URLDecode( $str ).
+  - Minor tweaks to Apache2::ASP::MediaManager and Apache2::ASP::Test::UserAgent
+    to allow testing of MediaManager classes/handlers from the command-line.
+  - Added some missing POD for Apache2::ASP::Config and Apache2::ASP::Config::Node.
+  - Added tests for Apache2::ASP::MediaManager.
+  - Added tests for "wizard" functionality (multiple-step forms, anyways).
+  - Skipped v1.40 because of the way CPAN handles version numbers.
+
+1.39 2008-05-03
+  - Apache2::ASP::Response stores the buffer as an array instead of
+    as a string.
+  - Performance enhancements.
+  - Better test coverage for several modules.
+  - More tests.
+
+1.38 2008-03-20
+  - Intrinsic ASP objects (Request, Response, etc) are now
+    initialized for a handler and all of its super-classes.
+    This fixes a bug in which handlers that subclass another
+    handler (that subclasses yet another handler) will no longer
+    receive errors when the parent class does a $Response->Redirect
+    for example.
+  - Apache2::ASP::MediaManager checks the 'mode' parameter and behaves
+    differently based on its value.
+
+1.37 2008-03-16
+  - Updated MANIFEST to include missing file t/lib/MyDBI.pm
+
+1.36 2008-03-04
+  - Rewrote Apache2::ASP::Config and Apache2::ASP::GlobalConfig.
+  - Removed Apache2::ASP::PostConfigHandler.
+  - You no longer need to include the following in your httpd.conf:
+      PerlModule Apache2::ASP::PostConfigHandler
+      PerlPostConfigHandler Apache2::ASP::PostConfigHandler
+  - Minor speed improvements as a result of cleaner config logic.
+
+1.35 2008-02-27
+  - Removed all references to "use CGI" to reduce memory footprint
+    and improve performance.
+  - Added Apache2::ASP::SimpleCGI for use by Apache2::ASP::Test::UserAgent.
+  - Added dependency HTTP::Body for Apache2::ASP::SimpleCGI to function.
+
+1.34 2008-02-26
+  - Minor updates to Apache2::ASP::MediaManager.
+  - Added a workaround to Apache2::ASP::GlobalConfig for the
+    "internal dummy connection" issue.
+    More details at http://wiki.apache.org/httpd/InternalDummyConnection
+
+1.33 2008-02-25
+  - Fixed a bug that caused the intrinsic ASP objects (Request, Response, etc)
+    to not be available at the right point in time for UploadHook subclasses
+    (including subclasses of MediaManager).
+    So now, calling $Response->Redirect(...) from sub after_create() will work.
+
+1.32 2008-02-24
+  - Removed Application_OnStart and added Server_OnStart event to
+    GlobalASA.
+  - Added documentation to Apache2::ASP::Test::Base.
+  - Added documentation to Apache2::ASP::Test::Fixtures.
+
+1.31 2008-02-20
+  - Added $Session->reset() method.
+  - Added Apache2::ASP::Test::Base.
+  - Added dependancy Data::Properties::YAML
+  - Added /etc/properties.yaml
+  - Added Apache2::ASP::Test::Fixtures.
+  - Added /etc/test_fixtures.yaml
+  - Fixed a bug in Apache2::ASP::Request that caused forms with multiple
+    values for the same parameter (i.e. 3 checkboxes named the same, but 
+    with different values) to only return 1 value.
+  - Completely overhauled the test suite.  No longer requires Apache::Test
+    and should run find as root.  More tests are needed, but at least
+    what's there should run correctly.
+  - Fixed a bug in Apache2::ASP::Config that caused errors when a 
+    Session or Application State Manager was not in @INC until
+    after the <settings> section had been initialized.
+
+1.29 2008-02-06
+  - Fixed a bug that caused Response->Include to misbehave when used in
+    conjunction with RequestFilters.
+
+1.28 2008-02-06
+  - Added $Response->Decline and changed the return value of $Response->End
+    and $Response->Redirect to 0 and 302 respectively.
+  - Now inside RequestFilters you can simply say 'return $Response->Declined'
+    or 'return $Response->Redirect("/mypage.asp")' to exit the RequestFilter.
+  - Documentation for RequestFilters and Response needs to be updated to
+    reflect this change.
+
+1.27 2008-02-06
+  - Moved the <request_filters> config section under config/web_application 
+    instead of config/web_application/settings.
+
+1.26 2008-02-05
+  - Hotfix for config.  Was crashing unless settings.request_filters was defined.
+
+1.25 2008-02-05
+  - Added the concept of "Request Filters" as Apache2::ASP::RequestFilter.  These
+    are useful for centralizing authorization code.  Request Filters are stackable.
+  - Added config.web_application.settings.request_filters.filter and documented it in
+    the documentation for Apache2::ASP::RequestFilter.
+  - Request Filters will be considered experimental until v1.26 is released.
+
+1.24 2008-01-17
+  - Fixes a problem with $Request->Cookies( $name ) that caused it to return undef
+    instead of the cookie's value.
+  - When Response->Include( $nonexistent_file ) is called, a simple diagnostic is
+    printed to the buffer ("Cannot Response.Include '$file' - the file does not exist")
+    and Carp::cluck dumps a stacktrace to STDERR.
+  - If $Response->End or $Response->Redirect is called in Script_OnStart then the script
+    is no longer processed.
+
+1.23 2007-12-27
+  - Apache2::ASP::Config now only adds PAGE_CACHE and $Config->handler_root to @INC
+    if they have not already been added before.
+  - Apache2::ASP::Response no longer flushes headers after Response.Include().
+
+1.22 2007-12-18
+  - Fixed a bug that caused changes in the $Session object made
+    from within $Response->Include() and $Response->TrapInclude() to not persist.
+  - Removed warnings like this:
+    Use of uninitialized value in substitution (s///) at /usr/lib/perl5/site_perl/5.8.5/Apache2/ASP/Server.pm line 40.
+  - $Session->save() does not (wastefully) persist $s->{asp} any longer.
+  - Apache2::ASP::Request was handling cookies wrong.  This behavior has been improved.
+    Still does not handle expiration yet (this can be done with $Response->AddHeader(...) ).
+  - Improved (fixed) problems associated with running multiple Apache2::ASP-powered websites
+    under the same Apache server under different VirtualHosts.  Now expects PerlOptions +Parent 
+    and PerlSetEnv APACHE2_ASP_APPLICATION_ROOT /path/to/your/root inside of <VirtualHost> directives.
+
+1.21 2007-12-04
+  - Bugfixes to Apache2::ASP::Request and Apache2::ASP::Response.
+  - *Recommended* upgrade to this version if you are running any previous version.
+
+1.20 2007-10-22
+  - Updated Makefile.PL to compile even if Apache::Test is not installed.
+  - Added requirement Apache2::Directive.
+
+1.19 2007-10-20
+  - Minor updates in preparation for the release of Apache2::ASP::WebApp.
+
+1.18 2007-10-20
+  - Added before_run() and after_run() methods to Apache2::ASP::Handler.
+    These methods can be overridden by subclasses and executed before and
+    after the "run()" method is called.
+
+1.17 2007-10-20
+  - Updates for Apache2::ASP::Test::UserAgent.
+  - Updates for Apache2::ASP::Test::MockRequest.
+
+1.16 2007-10-20
+  - Adjusted Apache2::ASP::Config and Apache2::ASP::GlobalConfig to properly support
+    support running multiple websites under one Apache instance.
+  - Removed "sticky forms" support.
+
+1.15 2007-07-03
+  - Added several new pages to the Manual.
+  - /handlers/My_Handler and /handlers/My/Handler both map to My::Handler
+    for the package and /handlers/My/Handler.pm for the filename.
+  - Updated documentation in several places.
+  - Local GlobalASA.pm class is now required to use web_application.application_name + '::GlobalASA'
+    as its package name.  So if web_application.application_name = "DefaultApp" then
+    it would say:
+    package DefaultApp::GlobalASA;
+    use base 'Apache2::ASP::GlobalASA';
+    ...
+  - Multiple Apache2::ASP web applications can now be run on the same machine.
+  - Successfully installed on Windows, but it requires some work.  And performance is bad.
+
+1.14 2007-06-30
+  - $Form data is only forwarded if a page is posting back to itself 
+    (i.e. - paging through a recordset) or if the form was posted to
+    a FormHandler class.
+
+1.13 2007-06-30
+  - Apache2::ASP::Config is subclassable.
+  - Added <settings> element in config XML file.
+  - Added $Config->settings->(lib|dsn|username|password) to $Config object.
+  - $Config->settings->lib is added to @INC automatically.
+
+1.12 2007-06-29
+  - Stabilized off-line web application testing API.
+
+1.11 2007-06-29
+  - Apache2::ASP::Test::MockRequest was missing Cwd::cwd().
+
+1.09 2007-06-29
+  - Added POD for Apache2::ASP::Test::UserAgent.
+  - ApplicationStateManager and SessionStateManager are both Ima::DBI subclasses.
+  - Added dependency Ima::DBI.
+  - Removed dependency Apache::DBI.
+
+1.08 2007-06-28
+  - Fixed bug "Upload hook failed: Can't call method "isa" on an undefined value at ..."
+  - Fixed bug that resulted in multiple cookies being created on the initial request,
+    when the first ASP script to be rendered contained Include() or TrapInclude() calls.
+  - Added HTML::FillInForm as a dependency.
+  - Added built-in "sticky forms" for all ASP scripts, exclusive of UploadHandler subclasses.
+  - Began new offline test framework.
+  - Added Apache2::ASP::Test::UserAgent.
+  - Added Apache2::ASP::Test::MockRequest.
+  - Updated Apache2::ASP::Request to work within the new test framework.
+  - Removed some tests that need to be rewritten with the new test framework.
+  - Updated some other tests to work with the new test framework as they are.
+  - Added dependencies HTTP::Request::AsCGI, HTML::FillInForm and CGI::Simple.
+
+1.07 2007-06-23
+  - Fixed a bug that caused 404 errors to return a blank page instead of the standard
+    '404 Not Found' message.
+  - Adjusted POD so that Apache2::ASP::Manual::Intro shows up correctly.
+
+1.06 2007-06-23
+  - Fixed a bug in Apache2::ASP::PageHandler that caused a bug in which changed ASP
+    scripts would not be reloaded by other Apache processes after the first Apache
+    process had recompiled the *.pm file as a result of the ASP script being changed.
+
+1.05 2007-06-23
+  - $Application->save() is now called at the end of each (non-error) request.
+
+1.04 2007-06-23
+  - GlobalASA::Script_OnFlush is only called when the current handler
+    isa Apache2::ASP::PageHandler.
+
+1.03 2007-06-23
+  - Updated Apache2::ASP::PageHandler to correctly decide whether an ASP
+    script should be recompiled or not.
+
+1.02 2007-06-23
+  - Apache2::ASP::Manual::Intro was changed from *.pod to *.pm so that CPAN
+    would index it properly.
+
+1.01 2007-06-22
+  - Fixed POD in Apache2::ASP::Config.
+  - Apache2::ASP::Config now verifies the validity of web_application.domain_re values.
+
+0.18 2007-06-22
+  - Completely rewrote almost everything.
+  - Almost everything not rewritten was refactored.
+  - Added tests to achieve nearly 100% code coverage.
+  - Changed the interface for Apache2::ASP::Handler.
+  - Changed the interface for Apache2::ASP::UploadHandler.
+  - Changed the interface for Apache2::ASP::MediaManager.
+  - ASP scripts are converted into *.pm files, then loaded via require().
+  - If the ASP has not changed, we don't recompile the ASP.
+  - If the ASP did change since the *.pm file was written, we recompile the ASP.
+  - I hope to be able to perform code coverage testing on ASP scripts at some point.
+  - Added Apache2::ASP::Config.
+  - Changed the apache2-asp-config.xml format to support Apache2::ASP::Config.
+  - Added Apache2::ASP::PostConfigHandler.
+  - Added Apache2::ASP::PageHandler.
+  - Added Apache2::ASP::ApacheRequest.
+  - Added Apache2::ASP::UploadHook.
+  - Added Apache2::ASP::UploadHookArgs.
+  - Added Apache2::ASP::TransHandler.
+  - Broke out Apache2::ASP::Application into ApplicationStateManager and its 
+    database-specific subclasses (*::SQLite, *::MySQL, etc).
+  - Broke out Apache2::ASP::Session into SessionStateManager and its database-specific
+    subclasses (*::SQLite, *::MySQL, etc).
+  - Added the ability to subclass Apache2::ASP::Base.
+  - Apache2::ASP is now a subclass of Apache2::ASP::Base.
+  - Code coverage (on average) is above 90%
+  - Added requirements that the directory @ServerRoot@/PAGE_CACHE must exist and 
+    must be readable/writable by the server process.
+  - Added the ability to have several web applications defined in one apache2-asp-config.xml file.
+  - Added documentation for all classes.
+
+0.17 2007-06-03
+  - Added the ability to subclass Apache2::ASP::Application
+  - Added the ability to subclass Apache2::ASP::Session
+  - Added the register_mode() method to Apache2::ASP::Handler
+
+0.16 2007-06-02
+  - Added tests for Apache2::ASP::MediaManager.
+  - Updated documentation for Apache2::ASP::MediaManager.
+  - Updated documentation for Apache2::ASP.
+
+0.15 2007-06-02
+  - Added the ability to register "mode" handlers for subclasses
+    of Apache2::ASP::MediaManager.
+
+0.14 2007-05-31
+  - Fixed a bug in the Apache2::ASP::Parser that would cause
+    an error if it encountered a ~ in an ASP script.
+
+0.13 2007-05-31
+  - Extended Apache2::ASP::MediaManager
+  - Updated documentation for Apache2::ASP::MediaManager
+  - Added Apache2::ASP::URLFilter
+  - Updated INSTALLATION instructions in the documentation for Apache2::ASP
+
+0.12 2007-05-30
+  - Added Apache2::ASP::MediaManager
+  - Fixed documentation for Apache2::ASP::UploadHandler
+
+0.11 2007-05-30
+  - Fixed inaccurate documentation about the table structure for Sessions.
+
+0.10 2007-05-30
+  - Minor bugfixes.
+
+0.09 2007-05-30
+  - Updated "Changes"
+  - Updated tests' httpd.conf (removed erroneous comments)
+  - Refactored Apache2::ASP::handler
+
+0.08 2007-05-29
+  - Added Apache2::ASP::UploadHandler
+  - Added Apache2::ASP::CGI
+  - Added tests for UploadHandler
+  - Updated documentation
+  - Added database-persistence for Application state
+  - Added tests for Apache2::ASP::Application
+
+0.07  2007-05-25
+  - Updated documentation for Apache2::ASP::Handler
+
+0.06  2007-05-25
+  - Previous releases did not include the test suite.
+
+0.05  2007-05-25
+  - Condensed Apache2::ASP::Session and Apache2::ASP::Session::Instance
+  - Updated documentation and tests for Session change.
+  - Updated version number to 0.05 across all modules.
+
+0.04  2007-05-25
+  - Updated Apache2::ASP's handling of Handlers.
+  - Updated documentation and tests.
+
+0.03  2007-05-25
+  - Added Apache2::ASP::Handler.
+  - Updated documentation.
+  - Updated tests to include Apache2::ASP::Handler.
+  - Updated Makefile.PL to account for all prerequisites.
+  - Lowered the minimum versions for several prerequisites.
+
+0.02  2007-05-24
+  - Added documentation.
+
+0.01  Wed May 23 13:51:46 2007
+  - original version; created by h2xs 1.23 with options
+    -AXn Apache2::ASP
+

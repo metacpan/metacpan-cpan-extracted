@@ -1,0 +1,22 @@
+---
+abstract: 'The great new Acme::BLACKJ::Utils!'
+author:
+  - 'Jeff Black <jblackx-perl@yahoo.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4004, CPAN::Meta::Converter version 2.130880'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-BLACKJ-Utils
+provides:
+  Acme::BLACKJ::Utils:
+    file: lib/Acme/BLACKJ/Utils.pm
+    version: 0.01
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: 0.01

@@ -1,0 +1,43 @@
+---
+abstract: 'Anti CSRF filter'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+build_requires:
+  HTTP::Session::Store::OnMemory: '0'
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amon2-Plugin-Web-CSRFDefender
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Amon2::Plugin::Web::CSRFDefender:
+    file: lib/Amon2/Plugin/Web/CSRFDefender.pm
+    version: '7.03'
+  Amon2::Plugin::Web::CSRFDefender::Random:
+    file: lib/Amon2/Plugin/Web/CSRFDefender/Random.pm
+requires:
+  Amon2::Util: '0'
+  Digest::SHA: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Amon2-Plugin-Web-CSRFDefender/issues
+  homepage: https://github.com/tokuhirom/Amon2-Plugin-Web-CSRFDefender
+  repository: git://github.com/tokuhirom/Amon2-Plugin-Web-CSRFDefender.git
+version: '7.03'
+x_authority: cpan:TOKUHIROM

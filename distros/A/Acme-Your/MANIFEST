@@ -1,0 +1,11 @@
+README
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+lib/Acme/Your.pm
+lib/Acme/Your/Filter.pm
+t/00basic.t
+t/01multiple.t
+t/02assignment.t
+t/03preexist.t
+t/04multipleassign.t

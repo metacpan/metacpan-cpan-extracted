@@ -1,0 +1,58 @@
+#!perl
+use strict;
+use warnings;
+use utf8;
+
+use Acme::EvaTitlenize;
+use Encode;
+use Getopt::Long qw(:config posix_default no_ignore_case gnu_compat);
+
+my $upper_right;
+
+Getopt::Long::GetOptions(
+    'u' => \$upper_right,
+);
+
+my $str1 = Encode::decode_utf8(shift @ARGV);
+my $str2 = Encode::decode_utf8(shift @ARGV);
+
+if ($upper_right) {
+    print Encode::encode_utf8( Acme::EvaTitlenize::upper_right($str1, $str2) );
+} else {
+    print Encode::encode_utf8( Acme::EvaTitlenize::lower_left($str1, $str2) );
+}
+
+print "\n";
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+eva-titlenize - CLI interface of Acme::EvaTitlenize
+
+=head1 SYNOPSIS
+
+  $ eva-titlenize 奇跡の 価値は
+  # 奇
+  # 跡
+  # の価値は
+
+=head1 DESCRIPTION
+
+THis script generate text like title of Evangelion animation from parameters.
+
+=head1 LICENSE
+
+Copyright (C) Yuuki Tan-nai.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Yuuki Tan-nai(@saisa6153) E<lt>yuki.tannai@gmail.comE<gt>
+
+=cut
+

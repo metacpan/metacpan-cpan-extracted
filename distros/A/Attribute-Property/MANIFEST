@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+Property.pm
+README
+t/1.t
+t/lib/Test/More.pm
+t/lib/Test/Builder.pm

@@ -1,0 +1,476 @@
+#-----------------------------------------------------------------------------
+# RCS-Id: "@(#)$RCS-Id: pod/v2/afsperlbos.pod 2e2ca60 Tue Apr 15 13:04:20 2014 +0200 Norbert E Gruener$"
+#
+# © 2005-2014 Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+# © 2003-2004 Alf Wachsmann <alfw@slac.stanford.edu>,
+#             Venkata Phani Kiran Achanta <neo_phani@hotmail.com>, and
+#             Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<AFS::BOS> - Class to communicate with the B<AFS Basic Overseer Server>
+
+=head1 SYNOPSIS
+
+  use AFS::BOS;
+
+  my $bos = AFS::BOS->new('server');
+
+  my $ok = $bos->addhost('hostname');
+  my ($cell, $hosts) = $bos->listhosts;
+  $ok = $bos->removehost('hostname');
+  $bos->DESTROY;   # destroy server connection
+
+  $bos = AFS::BOS->new('server');
+  $ok = $bos->addkey(11, 'My Secret');
+  my ($date, $keys) = $bos->listkeys;
+  $ok = $bos->removekey([10, 11]);
+
+  $ok = $bos->adduser('username');
+  my @users = $bos->listusers;
+  $ok = $bos->removeuser('username');
+
+  my ($generalTime, $newBinaryTime) = $bos->getrestart;
+  my ($general, $newbinary, $time) = (1, 0, 'sat 4:00');
+  $ok = $bos->setrestart($time, $general, $newbinary);
+
+  $ok = $bos->startup;
+  my $status = $bos->status;
+  $ok = $bos->shutdown;
+
+  $ok = $bos->start(['vlserver']);
+  $ok = $bos->restart(['fs', 'vlserver']);
+  $ok = $bos->restart_bos;
+  $ok = $bos->restart_all;
+  $ok = $bos->stop(['vlserver']);
+
+  my $restricted = $bos->getrestricted;
+  $ok = $bos->setrestricted('on');
+
+  $ok = $bos->create('kaserver', 'simple', ['/usr/afs/bin/kaserver']);
+  $ok = $bos->delete('instance');
+
+  $ok = $bos->exec('/sbin/shutdown -r now');
+
+  my @logentries = $bos->getlog('FileLog');
+
+  my ($all, $bak, $old, $core) = (0, 0, 0, 1);
+  $ok = $bos->prune($all, $bak, $old, $core);
+
+  $ok = $bos->salvage('/vicepa');
+
+  $ok = $bos->setauth('on');
+
+  $ok = $bos->setcellname('newcell.example.com');
+
+=head1 DESCRIPTION
+
+This class is used to communicate with a B<AFS Basic Overseer Server>,
+which runs on every AFS server machine. It monitors and administers
+the other server processes on that machine.  It has also methods to
+maintain system configuration files.
+
+Before you can submit any tasks to a Basic OverSeer (BOS) Server you
+must establish a connection to a BOS Server.  This is done by the
+constructor method I<new> which returns a BOS object.  A BOS object is
+essentially a handle to talk to a Basic OverSeer Server on a given
+server machine.  Such a BOS object is required before any of the other
+BOS instance methods can be called.
+
+=head1 COMPATIBILITY
+
+There was no version 1 implementation and hence there are no version
+conflicts :-)
+
+=head1 METHODS
+
+=over 4
+
+=item B<CONSTRUCTOR>
+
+=item S< >
+
+=item B<$bos = AFS::BOS-E<gt>new(SERVER [, NOAUTH [, LOCALAUTH [, CELL [, ENCRYPT]]]]);>
+
+Creates a new object of the class AFS::BOS and establishes a
+connection to the Basic Overseer Server running on the SERVER machine.
+An AFS::BOS object is essentially a handle to talk to the Basic
+Overseer Server.  Internally an AFS::BOS object is a pointer to a
+rx_connection structure, although this may change and the value
+returned from AFS::BOS::new should always be treaded as an opaque
+handle.
+
+Set LOCALAUTH (default 0) to 1 only when issuing a command on a server
+machine.  If NOAUTH is 1 (default 0) it establishes an unauthenticated
+connection to the server, in which the server treats the issuer as an
+unprivileged user.  CELL (default NULL) specifies the cell in which to
+run the command.  Set ENCRYPT (default 1) to 0 if you want to use an
+unencrypted connection. HANDLE WITH CARE!
+
+=item B<DESTRUCTOR>
+
+=item S< >
+
+=item B<$bos-E<gt>DESTROY;>
+
+Destroys the connection to the Basic Overseer Server and frees the
+rx_connection structure.
+
+=item B<INSTANCE METHODS>
+
+=item S< >
+
+=item B<$ok = $bos-E<gt>addhost(HOST [, CLONE]);>
+
+=item B<$ok = $bos-E<gt>addhost(\@HOST [, CLONE]);>
+
+Adds the given HOST to the local C<CellServDB> file.  HOST is either a
+scalar value or a reference to an array of hosts.  If CLONE is set to
+1 (default 0) the ubik vote of this host does not count.  This
+argument is only available under OpenAFS.  It calls the AFS system
+library function I<BOZO_AddCellHost>.
+
+=item B<$ok = $bos-E<gt>addkey(KVNO [, STRING]);>
+
+B<NOT YET RELEASED>
+
+Constructs a server encryption key from the text STRING provided,
+assigns it the key version number KVNO, and adds it to the local
+C<KeyFile> file.  If STRING is omitted, the BOS Server prompts for the
+string and does not echo it visibly.  It calls the AFS system library
+function I<BOZO_AddKey>.
+
+=item B<$ok = $bos-E<gt>adduser(USER);>
+
+=item B<$ok = $bos-E<gt>adduser(\@USER);>
+
+Adds the given USER to the list of privileged users in the local
+C<UserList> file.  USER is either a scalar value or a reference to an
+array of names.  It calls the AFS system library function
+I<BOZO_AddSUser>.
+
+=item B<$ok = $bos-E<gt>create(PROCESS, TYPE, COMMAND [, NOTIFIER]);>
+
+=item B<$ok = $bos-E<gt>create(PROCESS, TYPE, \@COMMAND [, NOTIFIER]);>
+
+Creates a server PROCESS entry in the local C<BosConfig> file on the
+server machine, sets the process's status to I<Run> in the
+C<BosConfig> file and in memory, and starts the process.  TYPE
+specifies the process's type. Acceptable values are: 'simple', 'cron',
+and 'fs'.  COMMAND is either a scalar value or an array reference
+containing the commands the BOS Server should run to start the
+process.  NOTIFIER specifies the complete pathname of a program that
+the BOS Server invokes when the process terminates.  It calls the AFS
+system library function I<BOZO_CreateBnode>.
+
+=item B<$ok = $bos-E<gt>delete(INSTANCE);>
+
+=item B<$ok = $bos-E<gt>delete(\@INSTANCE);>
+
+Deletes the entry INSTANCE from the local C<BosConfig> file.  INSTANCE
+is either a scalar value or a reference to an array of instance names.
+
+Before using this method, issue the stop method to stop the process
+and set its status flag in the BosConfig file to NotRun. The delete
+method fails with an error message if a process's status flag is Run.
+It calls the AFS system library function I<BOZO_DeleteBnode>.
+
+=item B<$ok = $bos-E<gt>exec(COMMAND);>
+
+Executes the indicated COMMAND on the BOS server machine.  It calls
+the AFS system library function I<BOZO_Exec>.
+
+=item B<@logfile = $bos-E<gt>getlog(LOGFILE);>
+
+Returns an array with the contents of the specified LOGFILE from the
+BOS server.  It calls the AFS system library function
+I<StartBOZO_GetLog>.
+
+=item B<($GTIME, $BTIME) = $bos-E<gt>getrestart;>
+
+Returns the restart times GTIME and BTIME from the local C<BosConfig>
+file.  GTIME is the general restart time at which the BOS Server
+process automatically restarts itself.  BTIME is the binary restart
+time at which the BOS Server automatically restarts any process for
+which the time stamp on the binary file in the local C</usr/afs/bin>
+directory is later than the last restart time for the process.  It
+calls the AFS system library function I<BOZO_GetRestartTime>.
+
+=item B<$restricted = $bos-E<gt>getrestricted;>
+
+Returns the current I<restricted mode> of the BOS server. Return value
+1 means I<restriced mode> enabled, 0 means disabled. This method is
+only available under OpenAFS if the AFS system libraries were compiled
+with the I<Restricted Mode Option>.  It calls the AFS system library
+function I<BOZO_GetRestrictedMode>.
+
+=item B<($CELL, $HOSTS) = $bos-E<gt>listhosts;>
+
+Returns the name of the CELL and an array reference HOSTS
+containing the list of database server machines.  It calls the AFS
+system library function I<BOZO_Listhost>.
+
+You can find an example how to print the entire content of the array
+reference C<$HOSTS> in the C<examples/v2/bos> directory.
+
+=item B<my($DATE, $KEYS) = $bos-E<gt>listkeys([SHOW]);>
+
+Returns the DATE when a key was last added to the local C<KeyFile>
+file and the hash reference KEYS containing the server encryption keys.
+The hash keys are the key version numbers.  Set SHOW to 1 (default
+0) to see the octal digits that constitute each key.  It calls the AFS
+system library function I<BOZO_Listkeys>.
+
+You can find an example how to print the entire content of the hash
+reference C<$KEYS> in the C<examples/v2/bos> directory.
+
+=item B<@users = $bos-E<gt>listusers;>
+
+Returns an array containing a list of the privileged users from the
+local C<UserList> file.  It calls the AFS system library function
+I<BOZO_ListSUsers>.
+
+=item B<$ok = $bos-E<gt>prune([All [,BAK [, OLD [, CORE]]]]);>
+
+Removes files from the local disk of the server machine.
+
+Set BAK to 1 (default 0) to remove all files from the local
+C</usr/afs/bin> directory that have a C<BAK> extension.
+
+Set OLD to 1 (default 0) to remove all files from the local
+C</usr/afs/bin> directory that have an C<OLD> extension.
+
+Set CORE to 1 (default 0) to remove all files from the local
+C</usr/afs/logs> directory that have a C<core> prefix.
+
+Set ALL to 1 (default 0) to remove all three types of files at once.
+
+If none of these flags are set, no files are removed, but a warning
+message is displayed.  It calls the AFS system library function
+I<BOZO_Prune>.
+
+=item B<$ok = $bos-E<gt>removehost(HOST);>
+
+=item B<$ok = $bos-E<gt>removehost(\@HOST);>
+
+Removes the database server machine HOST from the local C<CellServDB>
+file.  HOST is either a scalar value or a reference to an array of
+names.  It calls the AFS system library function
+I<BOZO_DeleteCellHost>.
+
+=item B<$ok = $bos-E<gt>removekey(KVNO);>
+
+=item B<$ok = $bos-E<gt>removekey(\@KVNO);>
+
+B<NOT YET RELEASED>
+
+Removes the server encryption key with the given key version number
+KVNO from the local C<KeyFile> file.  KVNO is either a scalar value or
+a reference to an array of key version numbers.  It calls the AFS
+system library function I<BOZO_DeleteKey>.
+
+=item B<$ok = $bos-E<gt>removeuser(USER);>
+
+=item B<$ok = $bos-E<gt>removeuser(\@USER);>
+
+Removes the privileged USER from the local C<UserList> file. USER is
+either a scalar value or a reference to an array of users.  It calls
+the AFS system library function I<BOZO_DeleteSuser>.
+
+=item B<$ok = $bos-E<gt>restart_bos;>
+
+Stops and immediately restarts all AFS server processes, including the
+BOS Server. A new BOS Server starts immediately, and it starts a new
+instance of each process that is marked with the I<run status flag>.
+
+It calls the AFS system library function I<BOZO_ReBozo>.
+
+=item B<$ok = $bos-E<gt>restart_all;>
+
+Stops and immediately restarts all AFS server processes, except the
+BOS Server, that are marked with the I<run status flag>.
+
+It calls the AFS system library function I<BOZO_RestartAll>.
+
+=item B<$ok = $bos-E<gt>restart(SERVER);>
+
+=item B<$ok = $bos-E<gt>restart(\@SERVER);>
+
+Stops and immediately restarts the SERVER processes on the server
+machine, regardless of its I<run status flag>. SERVER is either a
+scalar value or a reference to an array of server names.
+
+It calls the AFS system library function I<BOZO_Restart>.
+
+=item B<$ok = $bos-E<gt>salvage([PARTITION] ...));>
+
+B<NOT YET RELEASED>
+
+??? The argument list must be completed CORRECTLY  !!!
+
+Salvages (restores internal consistency to) one or more volumes on the
+file server machine
+
+??? Here must be a COMPLETE description of all arguments !!!
+
+If your file server runs MR-AFS, a bunch of additional boolean options
+are supported: debug, nowrite, force, oktozap, rootfiles, salvagedirs,
+blockreads, ListResidencies, SalvageRemote, SalvageArchival,
+IgnoreCheck, ForceOnLine, UseRootDirACL, TraceBadLinkCounts,
+DontAskFS, LogLevel, rxdebug, Residencies.
+
+Internally, a temporary cron job is created via 'BOZO_CreateBnode>.
+
+=item B<$ok = $bos-E<gt>setauth('on' | 'off');>
+
+Enables ('on') or disables('off') authorization checking for all
+server processes on the server machine.  It calls the AFS system
+library function I<BOZO_SetNoAuthFlag>.
+
+=item B<$ok = $bos-E<gt>setcellname(NAME);>
+
+B<NOT YET RELEASED>
+
+Establishes the cell's NAME and makes the server machine a member of
+it.  And it records the NAME in the two local files C<ThisCell> and
+C<CellServDB>.  It calls the AFS system library function
+I<BOZO_SetCellName>.
+
+B<Cautions>
+
+Use this method only when installing the cell's first AFS server
+machine. The I<AFS Quick Beginnings> documentation explains how to
+copy over the C<ThisCell> and C<CellServDB> files from this or another
+appropriate machine during installation of additional server machines.
+
+=item B<$ok = $bos-E<gt>setrestart(TIME [, GENERAL [, NEWBINARY]]);>
+
+Sets the restart TIME at which the BOS Server restarts processes.  Set
+GENERAL to 1 (default 0) to set the restart time of the BOS Server to
+TIME.  This TIME is once per week.  Set NEWBINARY to 1 (default 0) to
+set the binary restart time.  The TIME is once per day.  Only one of
+the arguments GENERAL and NEWBINARY can be set.  It calls the AFS
+system library function I<BOZO_SetRestartTime>.
+
+=item B<$ok = $bos-E<gt>setrestricted(MODE);>
+
+Enables (MODE = 1) or disables (MODE = 0) the I<restricted mode> for
+the BOS server which disables certain bosserver functionality.  This
+method is only available under OpenAFS if the AFS system libraries were
+compiled with the I<Restricted Mode Option>.  It calls the AFS system
+library function I<BOZO_SetRestrictedMode>.
+
+=item B<$ok = $bos-E<gt>shutdown([SERVER, ] [WAIT]);>
+
+=item B<$ok = $bos-E<gt>shutdown([\@SERVER, ] [WAIT]);>
+
+Stops on the server machine either all running server processes,
+excluding the BOS server process or the SERVER process.  SERVER is
+either a scalar value or a reference to an array of process names.  It
+does not change its status flag in the local C<BosConfig> file but
+only in the BOS Server's memory.  Set WAIT to 1 (default 0) to delay
+the program flow until all processes actually stop. Otherwise the
+method returns almost immediately even if all processes are not
+stopped.  It calls the AFS system library function I<BOZO_WaitAll>.
+
+=item B<$ok = $bos-E<gt>start(SERVER);>
+
+=item B<$ok = $bos-E<gt>start(\@SERVER);>
+
+Sets the I<status flag> for each SERVER process to I<Run> in the local
+C<BosConfig> file and in the BOS Server's memory on the server
+machine, then starts it.  If the SERVER process is already running,
+the only effect is to guarantee that the status flag is I<Run>; it
+does not restart the process.  SERVER is either a scalar value or a
+reference to an array of process names.  It calls the AFS system
+library function I<BOZO_SetStatus>.
+
+=item B<$ok = $bos-E<gt>startup([SERVER]);>
+
+=item B<$ok = $bos-E<gt>startup([\@SERVER]);>
+
+Starts on the server machine either all server processes not currently
+running but marked with the I<run status flag> in the local
+C<BosConfig> file or the process SERVER even if its status flag in the
+C<BosConfig> file is I<NotRun>.  SERVER is either a scalar value or a
+reference to an array of process names.  The I<run status flag> in the
+local C<BosConfig> file will not be changed.  It calls the AFS system
+library function I<BOZO_StartupAll> or I<BOZO_SetTStatus>.
+
+=item B<$STATUS = $bos-E<gt>status([LONG [, SERVER]]);>
+
+=item B<$STATUS = $bos-E<gt>status([LONG [, \@SERVER]]);>
+
+Returns the STATUS of either all server processes listed in the local
+C<BosConfig> file or the process SERVER.  SERVER is either a scalar
+value or a reference to an array of process names.  STATUS is a hash
+reference containing the current process status.  Set LONG to 1
+(default 0) to get extended information about the process status.  It
+calls the AFS system library function I<BOZO_GetStatus>.
+
+You can find an example how to print the entire content of the hash
+reference C<$STATUS> in the C<examples/v2/bos> directory.
+
+=item B<$ok = $bos-E<gt>stop(SERVER [, WAIT]);>
+
+=item B<$ok = $bos-E<gt>stop(\@SERVER [, WAIT]);>
+
+Sets the status flag for each SERVER process to I<NotRun> in the local
+C<BosConfig> file on the server machine, then stops it.  SERVER is
+either a scalar value or a reference to an array of process names.
+Set WAIT to 1 (default 0) to delay the program flow until all
+processes actually stop. Otherwise the method returns almost
+immediately even if all processes are not stopped.  It calls the AFS
+system library function I<>.
+
+=back
+
+=head1 AUTHORS
+
+The code and documentation for this class were contributed by Stanford
+Linear Accelerator Center, a department of Stanford University.  This
+documentation were written by
+
+=over
+
+=item Alf Wachsmann E<lt>alfw@slac.stanford.eduE<gt>,
+
+=item Venkata Phani Kiran Achanta E<lt>neo_phani@hotmail.comE<gt>, and
+
+=item Norbert E. Gruener E<lt>nog@MPA-Garching.MPG.deE<gt>
+
+=item S< >
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (c) 2005-2012 Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+ Copyright (c) 2003-2004 Alf Wachsmann <alfw@slac.stanford.edu>,
+                         Venkata Phani Kiran Achanta <neo_phani@hotmail.com>, and
+                         Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+ All rights reserved.
+
+Most of the explanations in this document are taken from the original
+AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ BOS Server Interface
+ Edward R. Zayas
+ Copyright (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ Copyright (c) IBM Corporation 2000.
+ All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DOCUMENT VERSION
+
+Revision $Rev: 1130 $

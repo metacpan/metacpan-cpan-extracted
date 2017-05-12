@@ -1,0 +1,8 @@
+---
+exclude-regexes:
+  - ^(?:\./)?PPPort.pm$
+  - ^(?:\./)?MANIFEST$
+  - ^(?:\./)?META.yml$
+dirs-recursive:
+  .: ext/Devel-PPPort
+

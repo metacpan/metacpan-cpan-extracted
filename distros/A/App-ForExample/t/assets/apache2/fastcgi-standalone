@@ -1,0 +1,22 @@
+# vim: set filetype=apache
+<VirtualHost *:80>
+
+    ServerName eg.localhost
+    ServerAlias www.eg.localhost
+
+    CustomLog "|/usr/bin/cronolog /home/rob/develop/App-ForExample/Eg/log/apache2-eg.localhost-%Y-%m.access.log -S /home/rob/develop/App-ForExample/Eg/log/apache2-eg.localhost.access.log" combined
+    ErrorLog "|/usr/bin/cronolog /home/rob/develop/App-ForExample/Eg/log/apache2-eg.localhost-%Y-%m.error.log -S /home/rob/develop/App-ForExample/Eg/log/apache2-eg.localhost.error.log"
+
+    FastCgiExternalServer /tmp/eg.fcgi -socket /tmp/eg.socket
+
+    Alias / /tmp/eg.fcgi/
+
+
+     <Directory "/home/rob/develop/App-ForExample/Eg/root">
+         Options Indexes FollowSymLinks
+         AllowOverride All
+         Order allow,deny
+         Allow from all
+     </Directory>
+
+</VirtualHost>

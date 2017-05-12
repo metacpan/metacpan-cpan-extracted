@@ -1,0 +1,49 @@
+
+<VirtualHost *:8001>
+	ServerAdmin webmaster@localhost
+	
+	DocumentRoot /var/www/
+	<Directory />
+		Options FollowSymLinks
+		AllowOverride None
+	</Directory>
+	<Directory /var/www/>
+		Options Indexes FollowSymLinks MultiViews
+		AllowOverride None
+		Order allow,deny
+		allow from all
+	</Directory>
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel debug
+
+	CustomLog /var/log/apache2/access.log combined
+	ErrorLog /var/log/apache2/error.log
+
+   PerlOptions +GlobalRequest
+
+    <Location />
+           AuthType Apache2::AuthCASSimple
+           PerlAuthenHandler Apache2::AuthCASSimple
+
+           PerlSetVar CASServerName auth.univ.fr
+           PerlSetVar CASServerPath /
+           # PerlSetVar CASServerPort 443
+           # PerlSetVar CASServerNoSSL 1
+           PerlSetVar CASSessionTimeout 6
+           PerlSetVar CASSessionDirectory /tmp
+           # PerlSetVar CASFixDirectory /
+           # PerlSetVar ModProxy 1
+
+           require valid-user
+   </Location>
+
+# use mason for fun
+   <Location />
+               SetHandler perl-script
+               PerlHandler HTML::Mason::ApacheHandler
+   </Location>
+
+
+</VirtualHost>

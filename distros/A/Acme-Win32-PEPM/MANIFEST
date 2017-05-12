@@ -1,0 +1,19 @@
+Changes
+ex/mod/lib/Win32/PEPM/Test.pm
+ex/mod/Makefile.PL
+ex/mod/MANIFEST
+ex/mod/t/00-load.t
+ex/mod/t/manifest.t
+ex/mod/t/pod-coverage.t
+ex/mod/t/pod.t
+ex/mod/Test.xs
+lib/Win32/PEPM.pm
+lib/Win32/PEPM/Build.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/pod-coverage.t
+t/pod.t
+t/Win32-PEPM.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

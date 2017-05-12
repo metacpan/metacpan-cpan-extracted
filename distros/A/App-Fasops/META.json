@@ -1,0 +1,137 @@
+{
+   "abstract" : "operating blocked fasta files",
+   "author" : [
+      "Qiang Wang <wang-q@outlook.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.7",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Fasops",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AlignDB::IntSpan" : "v1.1.0",
+            "App::Cmd" : "0.330",
+            "App::RL" : "v0.2.23",
+            "Excel::Writer::XLSX" : "0.95",
+            "IO::Zlib" : "0",
+            "List::Util" : "0",
+            "MCE" : "1.810",
+            "Path::Tiny" : "0.076",
+            "Text::CSV_XS" : "1.21",
+            "Tie::IxHash" : "1.23",
+            "YAML::Syck" : "1.29",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Spreadsheet::XLSX" : "0.15",
+            "Test::More" : "0.88",
+            "Test::Number::Delta" : "1.06"
+         }
+      }
+   },
+   "provides" : {
+      "App::Fasops" : {
+         "file" : "lib/App/Fasops.pm",
+         "version" : "v0.5.11"
+      },
+      "App::Fasops::Command::axt2fas" : {
+         "file" : "lib/App/Fasops/Command/axt2fas.pm"
+      },
+      "App::Fasops::Command::check" : {
+         "file" : "lib/App/Fasops/Command/check.pm"
+      },
+      "App::Fasops::Command::concat" : {
+         "file" : "lib/App/Fasops/Command/concat.pm"
+      },
+      "App::Fasops::Command::covers" : {
+         "file" : "lib/App/Fasops/Command/covers.pm"
+      },
+      "App::Fasops::Command::join" : {
+         "file" : "lib/App/Fasops/Command/join.pm"
+      },
+      "App::Fasops::Command::links" : {
+         "file" : "lib/App/Fasops/Command/links.pm"
+      },
+      "App::Fasops::Command::maf2fas" : {
+         "file" : "lib/App/Fasops/Command/maf2fas.pm"
+      },
+      "App::Fasops::Command::names" : {
+         "file" : "lib/App/Fasops/Command/names.pm"
+      },
+      "App::Fasops::Command::refine" : {
+         "file" : "lib/App/Fasops/Command/refine.pm"
+      },
+      "App::Fasops::Command::replace" : {
+         "file" : "lib/App/Fasops/Command/replace.pm"
+      },
+      "App::Fasops::Command::separate" : {
+         "file" : "lib/App/Fasops/Command/separate.pm"
+      },
+      "App::Fasops::Command::slice" : {
+         "file" : "lib/App/Fasops/Command/slice.pm"
+      },
+      "App::Fasops::Command::split" : {
+         "file" : "lib/App/Fasops/Command/split.pm"
+      },
+      "App::Fasops::Command::stat" : {
+         "file" : "lib/App/Fasops/Command/stat.pm"
+      },
+      "App::Fasops::Command::subset" : {
+         "file" : "lib/App/Fasops/Command/subset.pm"
+      },
+      "App::Fasops::Command::xlsx" : {
+         "file" : "lib/App/Fasops/Command/xlsx.pm"
+      },
+      "App::Fasops::Common" : {
+         "file" : "lib/App/Fasops/Common.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wang-q/App-Fasops/issues"
+      },
+      "homepage" : "https://github.com/wang-q/App-Fasops",
+      "repository" : {
+         "url" : "git://github.com/wang-q/App-Fasops.git",
+         "web" : "https://github.com/wang-q/App-Fasops"
+      }
+   },
+   "version" : "0.5.11",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,18 @@
+Revision history for ARGV::URL.
+
+0.93    2011-11-09    DOLMEN (Olivier Mengué)
+	Add tests, just for Kwalitee.
+	More DZ plugins => META.json, perl prereq
+	Add an example: examples/sherlock.pl
+
+0.92    2011-09-04    DOLMEN (Olivier Mengué)
+        Add tests.
+        Fixes a minor POD error.
+
+0.91    2011-08-12    DOLMEN (Olivier Mengué)
+        Fixing mistakes of a release late in the night:
+        - missing $VERSION
+        - missing Github meta
+
+0.90    2011-08-12    DOLMEN (Olivier Mengué)
+	Initial release. No tests yet.

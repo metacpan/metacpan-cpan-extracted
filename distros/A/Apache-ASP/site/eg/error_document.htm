@@ -1,0 +1,30 @@
+#!/usr/bin/perl /usr/bin/asp-perl
+
+<% 
+ if(! $ENV{MOD_PERL}) {
+   print "<b>ERROR:</b> \$Response->ErrorDocument() is not implemented in CGI mode\n";
+   $Response->End;
+ }
+%>
+
+<%
+my $file = DemoASP->new->{file};
+$Response->Status('404');
+my $padding = ' ' x 1000; # IE Error page busting ( 512 bytes needed )
+$Response->ErrorDocument('404', <<ERROR);
+<html><head><title>Custom 404 Error</title></head>
+<body>
+This is a custom response for the <b>404</b> error,
+that this script just created, utilizing the 
+\$Response->ErrorDocument(\$error_code, \$uri) method.
+<p>
+<a href="source.asp?file=$file">
+view this file's source
+</a>
+$padding
+</body>
+</html>
+ERROR
+	;
+%>
+This should not be printed

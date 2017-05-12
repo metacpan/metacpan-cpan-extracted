@@ -1,0 +1,6 @@
+lib/Apache2/Filter/GoogleAnalytics.pm	Main Module File
+README					Introduction text
+ChangeLog				Journal of changes
+Build.PL				Build script
+MANIFEST				This file
+META.yml				Metadata

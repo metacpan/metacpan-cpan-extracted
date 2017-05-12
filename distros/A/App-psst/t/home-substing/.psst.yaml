@@ -1,0 +1,5 @@
+PS1_old: 'cfgd> '
+PS1_substs:
+  -
+    - /path/to
+    - PT

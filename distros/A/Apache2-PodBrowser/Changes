@@ -1,0 +1,29 @@
+0.08	Thu Feb 24 16:36:32 CET 2011
+	- fixing browser issue with monospace font sizes
+	- fix :withtestmore in test files
+
+0.07	Tue Jun 22 16:38:18 CEST 2010
+	- skip tests that need BrowserMatch unless mod_setenvif is present
+	- MMapDB cache for POD index page
+
+0.06	Fri Jun 11 18:12:28 CEST 2010
+	- remaining debug warning eliminated
+	- compatibility with perl 5.12.1
+
+0.05	Mon May  3 14:47:03 CEST 2010
+	- more content tyles for included images; ct parameter
+
+0.04	Tue Apr 20 16:36:57 CEST 2010
+	- implement relative path names for included images
+
+0.03	Sun Jun  7 18:02:56 CEST 2009
+	- Fix most links between perlvar and perlfunc when viewing
+	  single functions or variables
+	- better (???) fancy stylesheet
+
+0.02	Sat Jun  6 14:57:54 CEST 2009
+	- Function and Variables index
+	- perlvar extracts for single variables
+
+0.01	Wed Jun  3 14:23:39 CEST 2009
+	initial version

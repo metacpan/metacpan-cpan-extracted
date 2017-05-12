@@ -1,0 +1,21 @@
+PerlPassEnv APACHE_SWIT_DB_NAME
+LogLevel notice
+<IfModule mod_mime.c>
+	Include "/etc/apache2/mods-enabled/mime.conf"
+</IfModule>
+Include ../blib/conf/httpd.conf
+<Location />
+	PerlInitHandler Apache::SWIT::Test::ResetKids->access_handler
+</Location>
+
+PerlModule T::Session
+<Location /test>
+  PerlAccessHandler T::Session->access_handler
+</Location>
+
+<Location /test/basic_handler>
+  SetHandler perl-script
+  PerlHandler T::Basic
+</Location>
+
+PerlPostConfigRequire @ServerRoot@/conf/sess_startup.pl

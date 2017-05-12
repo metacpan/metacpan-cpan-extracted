@@ -1,0 +1,6 @@
+Revision history for Perl extension AnyEvent::PacketForwarder.
+
+0.01  Wed Sep 11 13:58:45 2013
+	- original version; created by h2xs 1.23 with options
+		-AXn AnyEvent::PacketForwarder
+

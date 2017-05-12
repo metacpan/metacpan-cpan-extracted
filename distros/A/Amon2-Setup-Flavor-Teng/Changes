@@ -1,0 +1,28 @@
+Revision history for Perl extension Amon2::Setup::Flavor::Teng
+
+0.05 2013-04-20T14:19:20Z
+	    [Improvements]
+        - Minillaize
+        [Bug Fixes]
+        - fix typo (yoshidaster)
+
+0.04    Tue Aug 21 19:23:21 2012
+       	[Improvements]
+        - correspond to Teng 0.05 (memememomo)
+        [Bug Fixes]
+        - add dependency Amon2::Plugin::DBI (tokuhirom)
+
+0.03    Mon Nov 21 10:18:32 2011
+        [Bug Fixes]
+        - fix 'Query was empty' error in mysql. (tokuhirom)
+        [Improvements]
+        - cache instance of schema object.      (tokuhirom)
+        - create lib/<<PATH>>/DB.pm by default for extensibility. (tokuhirom)
+
+0.02    Mon Oct 28 12:41:23 2011
+        [Bug Fixes]
+        - fixed generated tests.
+          tests failed if sessions table exists.
+
+0.01    Mon Oct 24 16:59:03 2011
+        - original version

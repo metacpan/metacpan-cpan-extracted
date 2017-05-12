@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      AppSamurai Login
+    </title>
+    <meta http-equiv="content-type" content="text/html; charset=us-ascii" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta name="ROBOTS" content="NOINDEX, NOFOLLOW" />
+    <style type="text/css">
+    /*<![CDATA[*/
+    <!--
+    body
+    {
+    background-color: #ffffff;
+    margin-top: 10px;
+    margin-right: 10px;
+    margin-left: 10px;
+    }
+
+    table.outertable
+    {
+    width: 550px;
+    background-color: #ffffcc;
+    border: 1px solid;
+    }
+
+    h1
+    {
+    margin: 3px;
+    color: #aaaa66;
+    }
+
+    .logintext
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: x-small;
+    font-weight: bold;
+    }
+
+    .textbox
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 8pt;
+    color: #aa0000;
+    background-color: #ffffff;
+    border: 1px solid; 
+    padding: 2px;
+    width: 200px
+    }
+
+    .loginbutton
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 14pt;
+    color: #aa0000;
+    padding: 2px;
+    background-color: #ffffcc;
+    border: 1px dashed;
+    border-color: #000000;
+    }
+
+    td.infoboxtop
+    {
+    width: 100%;
+    }
+
+    td.infoboxmsg
+    {
+    width: 100%;
+    padding: 10px;
+    border-top: 1px solid;
+    border-left: 1px solid;
+    border-bottom: 1px solid;
+    }
+
+    .infonormal
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: x-small;
+    font-weight: bold;
+    }
+
+    .infored
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: x-small;
+    font-weight: bold;
+    color: #cc0000;
+    }
+
+    td.infoboxbot
+    {
+    width: 100%;
+    }
+
+    -->
+    /*]]>*/
+    </style>
+    <script language="JavaScript" type="text/javascript">
+    //<![CDATA[
+    <!-- // Escape from frames and load as the top page
+    if (window != top) top.location.href = location.href;
+    // -->
+    //]]>
+    </script>
+  </head>
+  <body onload="document.forms[0].credential_0.focus()">
+    <table summary="" align="center" border="0" cellspacing="0" cellpadding="0" class="outertable">
+      <tr>
+        <td align="left" valign="bottom">
+          <!-- Replace with your logo, whatever -->
+	  <img src="/AppSamurai/images/AppSamurai-logo1-200x271-trans.png" alt="AppSamurai" />
+        </td>
+        <td valign="bottom">
+          <table summary="" width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+              <td align="center">
+	        <!-- Enter your banner message here, shove in a logo, whatever -->
+                <h1>Sample Form</h1>
+              </td>
+            </tr>
+            <tr>
+              <td align="left" valign="top" class="infobox">
+                <table summary="" width="100%" border="0" cellspacing="0" cellpadding="2">
+                  <tr>
+                    <td class="infoboxtop">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="infoboxmsg"><!-- This is replaced by the status message -->
+                      __MESSAGE__
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="infoboxbot"></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td align="right">
+<!-- The action will be replaced by login.pl.  autocomplete="off" is not valix XHTML, but it is worth it: prevents the autocomplete feature in browsers from caching sensitive info -->
+                <form method="post" action="__FORMACTION__" autocomplete="off">
+                  <table summary="" align="right" border="0" cellspacing="10" cellpadding="3">
+                    <tr>
+                      <td align="right">
+                        <span class="logintext">USERNAME</span>
+                      </td>
+                      <td>
+                        <input type="text" name="credential_0" class="textbox" maxlength="256" value="__USERNAME__" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="right">
+                        <span class="logintext">PASSWORD</span>
+                      </td>
+                      <td>
+                        <input type="password" name="credential_2" class="textbox" maxlength="254" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="right">
+                        <span class="logintext">PASSCODE</span>
+                      </td>
+                      <td>
+                        <input type="password" name="credential_1" class="textbox" maxlength="32" />
+                      </td>
+                    </tr>
+                    <tr align="right" valign="middle">
+                      <td colspan="2">
+		        <input type="hidden" name="destination" value="__URI__" />
+			<input type="hidden" name="nonce" value="__NONCE__" />
+			<input type="hidden" name="sig" value="__SIG__" />
+			
+                        <input type="submit" value="Log In" name="LOGIN" class="loginbutton" />
+                      </td>
+                    </tr>
+                  </table>
+                </form>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

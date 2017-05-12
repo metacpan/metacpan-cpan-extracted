@@ -1,0 +1,328 @@
+NAME
+    App::Bondage - A featureful IRC bouncer based on POE::Component::IRC
+
+SYNOPSIS
+     my $bouncer = App::Bondage->new(
+         Debug    => $debug,
+         Work_dir => $work_dir,
+     );
+
+DESCRIPTION
+    Bondage is an IRC bouncer. It acts as a proxy between multiple IRC
+    servers and multiple IRC clients. It makes it easy to stay permanently
+    connected to IRC. It is mostly made up of reusable components. Very
+    little is made from scratch here. If it is, it will be made modular and
+    reusable, probably as a POE::Component::IRC plugin. This keeps the code
+    short and (hopefully) well tested by others.
+
+  Rationale
+    I wrote Bondage because no other IRC bouncer out there fit my needs.
+    Either they were missing essential features, or they were implemented in
+    an undesirable (if not buggy) way. I've tried to make Bondage stay out
+    of your way and be as transparent as possible. It's supposed to be a
+    proxy, after all.
+
+FEATURES
+  Easy setup
+    Bondage is easy to get up and running. In the configuration file, you
+    just have to specify the port it will listen on, the password, and some
+    IRC server(s) you want Bondage to connect to. Everything else has
+    sensible defaults, though you might want to use a custom nickname and
+    pick some channels to join on connect.
+
+  Logging
+    Bondage can log both public and private messages for you. All log files
+    are saved as UTF-8.
+
+  Stays connected
+    Bondage will reconnect to IRC when it gets disconnected or the IRC
+    server stops responding.
+
+  Recall messages
+    Bondage can send you all the messages you missed since you detached, or
+    it can send you all messages received since it connected to the IRC
+    server, or neither. This feature is based on similar features found in
+    miau, dircproxy, and ctrlproxy.
+
+  Auto-away
+    Bondage will set your status to away when no clients are attached.
+
+  Reclaim nickname
+    Bondage will periodically try to change to your preferred nickname if it
+    is taken.
+
+  Flood protection
+    Bondage utilizes POE::Component::IRC's flood protection to ensure that
+    you never flood yourself off the IRC server.
+
+  NickServ support
+    Bondage can identify with NickServ for you when needed.
+
+  Rejoins channels if kicked
+    Bondage can try to rejoin a channel if you get kicked from it.
+
+  Encrypted passwords
+    Bondage supports encrypted passwords in its configuration file for added
+    security.
+
+  SSL support
+    You can connect to SSL-enabled IRC servers, and make Bondage require SSL
+    for client connections.
+
+  IPv6 support
+    Bondage can connect to IPv6 IRC servers, and also listen for client
+    connections via IPv6.
+
+  Cycles empty channels
+    Bondage can cycle (part and rejoin) channels for you when they become
+    empty in order to gain ops.
+
+  CTCP replies
+    Bondage will reply to CTCP VERSION requests when you are offline.
+
+CONFIGURATION
+    The following options are recognized in the configuration file which is
+    called ~/.bondage/config.yml.
+
+  Global options
+   "listen_host"
+    (optional, default: *"0.0.0.0"*)
+
+    The host that Bondage accepts connections from. This is the host you use
+    to connect to Bondage.
+
+   "listen_port"
+    (required, no default)
+
+    The port Bondage binds to.
+
+   "listen_ssl"
+    (optional, default: *false*)
+
+    Set this to true if you want Bondage to require the use of SSL for
+    client connections. You'll need to have ssl.crt and ssl.key files in
+    Bondage's working directory. More information, see
+    <http://www.akadia.com/services/ssh_test_certificate.html>
+
+   "password"
+    (required, no default)
+
+    The password you use to connect to Bondage. If it is 32 characters, it
+    is assumed to be encrypted (see "bondage -c");
+
+   "networks"
+    (required, no default)
+
+    This should contain a list of network names, each pointing to a list of
+    relevant options as described in the following section.
+
+     networks:
+       freenode:
+         option1: value
+         option2: value
+       ircnet
+         option1: value
+         option2: value
+
+  Network-specific options
+   "bind_host"
+    (optional, default: *"0.0.0.0"*)
+
+    The host that Bondage binds to and connects to IRC from. Useful if you
+    have multiple IPs and want to choose which one to IRC from.
+
+   "server_host"
+    (required, no default)
+
+    The IRC server you want Bondage to connect to.
+
+   "server_port"
+    (optional, default: *6667*)
+
+    The port on the IRC server you want to use.
+
+   "server_pass"
+    (optional, no default)
+
+    The IRC server password, if there is one.
+
+   "use_ssl"
+    (optional, default: *false*)
+
+    Set this to true if you want to use SSL to communicate with the IRC
+    server.
+
+   "nickserv_pass"
+    (optional, no default)
+
+    Your NickServ password on the IRC network, if you have one. Bondage will
+    identify with NickServ with this password on connect, and whenever you
+    switch to your original nickname.
+
+   "nickname"
+    (optional, default: your UNIX user name)
+
+    Your IRC nick name.
+
+   "username"
+    (optional, default: your UNIX user name)
+
+    Your IRC user name.
+
+   "realname"
+    (optional, default: your UNIX real name, if any)
+
+    Your IRC real name, or email, or whatever.
+
+   "flood"
+    (optional, default: *false*)
+
+    Set to a true value to allow flooding (disables flood protection).
+
+   "channels"
+    (optional, no default)
+
+    A list of all your channels and their passwords.
+
+     channels:
+       "chan1" : ""
+       "chan2" : "password"
+       "chan3" : ""
+
+   "recall_mode"
+    (optional, default: *"missed"*)
+
+    How many channel messages you want Bondage to remember, and then send to
+    you when you attach.
+
+    "missed": Bondage will only recall the channel messages you missed since
+    the last time you detached from Bondage.
+
+    "none": Bondage will not recall any channel messages.
+
+    "all": Bondage will recall all channel messages.
+
+    Note: Bondage will always recall private messages that you missed while
+    you were away, regardless of this option.
+
+   "log_public"
+    (optional, default: *false*)
+
+    Set to true if you want Bondage to log all your public messages. They
+    will be saved as ~/.bondage/logs/some_network/#some_channel.log unless
+    you set "log_sortbydate" to true.
+
+   "log_private"
+    (optional, default: *false*)
+
+    Set to true if you want Bondage to log all private messages. They will
+    be saved as ~/.bondage/logs/some_network/some_nickname.log unless you
+    set "log_sortbydate" to true.
+
+   "log_sortbydate"
+    (optional, default: *false*)
+
+    Set to true if you want Bondage to rotate your logs. E.g. a channel log
+    file might look like
+    ~/.bondage/logs/some_network/#channel/2008-01-30.log
+
+   "log_restricted"
+    (optional, default: *false*)
+
+    Set this to true if you want Bondage to restrict the read permissions on
+    created log files/directories so other users won't be able to access
+    them.
+
+   "log_dcc"
+    (optional, default: *false*)
+
+    Set this to true if you want Bondage to log DCC transactions.
+
+   "log_notices"
+    (optional, default: *false*)
+
+    Set this to true if you want Bondage to log NOTICEs in addition to
+    PRIVMSGs.
+
+   "cycle_empty"
+    (optional, default: *false*)
+
+    Set to true if you want Bondage to cycle (part and rejoin) opless
+    channels if they become empty.
+
+   "kick_rejoin"
+    (optional, default: *false*)
+
+    Set to true if you want Bondage to try to rejoin a channel (once) if you
+    get kicked from it.
+
+   "away_poll"
+    (optional, default: *false*)
+
+    The interval, in seconds, in which to update information on channel
+    members' away status.
+
+    Some IRC clients (e.g. xchat) periodically issue a "WHO #channel" to
+    update the away status of channel members. Since Bondage caches this
+    information and replies to such requests without contacting the IRC
+    server, clients like xchat will not get up-to-date information about the
+    away status. On the other hand, this saves lots of traffic if you don't
+    care about that functionality. But if you do make use of it, set this
+    value to, say, 300 (which is what xchat uses).
+
+METHODS
+  "new"
+    Arguments:
+
+    'Work_dir', the working directory for the bouncer. Should include the
+    config file. This option is required.
+
+    'Debug', set to 1 to enable debugging. Default is 0.
+
+DEPENDENCIES
+    The following CPAN distributions are required:
+
+    YAML::XS
+    POE
+    POE-Component-Client-DNS
+    POE-Component-Daemon
+    POE-Component-IRC
+    POE-Component-SSLify (if you need SSL support)
+    POE-Filter-IRCD
+    Socket6 (if you need ipv6 support)
+
+BUGS
+    Report all bugs, feature requests, etc, here:
+    http://rt.cpan.org/Public/Dist/Display.html?Name=App%3A%3ABondage
+
+TODO
+    Look into using POE::Component::Server::IRC as an intermediary for
+    multiple clients.
+
+    Keep recall messages away from prying eyes, instead of in /tmp.
+
+    Generate QuakeNet-specific WHO replies without contacting the IRC
+    server.
+
+    Add proper tests.
+
+AUTHOR
+    Hinrik Örn Sigurðsson, hinrik.sig@gmail.com
+
+LICENSE AND COPYRIGHT
+    Copyright 2008-2009 Hinrik Örn Sigurðsson
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Other useful IRC bouncers:
+
+    <http://miau.sourceforge.net>
+    <http://znc.sourceforge.net>
+    <http://dircproxy.securiweb.net>
+    <http://ctrlproxy.vernstok.nl>
+    <http://www.psybnc.at>
+    <http://irssi.org/documentation/proxy>
+    <http://bip.t1r.net>
+

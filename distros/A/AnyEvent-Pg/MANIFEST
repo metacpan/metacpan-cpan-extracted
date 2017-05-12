@@ -1,0 +1,11 @@
+Changes
+examples/pg_killer.pl
+examples/listen.pl
+lib/AnyEvent/Pg.pm
+lib/AnyEvent/Pg/Pool.pm
+Makefile.PL
+MANIFEST
+README
+t/AnyEvent-Pg.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

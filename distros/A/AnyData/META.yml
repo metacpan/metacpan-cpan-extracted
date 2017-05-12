@@ -1,0 +1,32 @@
+---
+abstract: '(DEPRECATED) easy access to data in many formats'
+author:
+  - 'Jeff Zucker (jeff@vpservices.com)'
+  - 'Sven Dowideit (SvenDowideit@fosiki.com)'
+build_requires:
+  Test::More: '0'
+  Test::Output: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyData
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI: '0'
+resources:
+  Deprecated: 1
+  IRC: irc://irc.perl.org/#dbi
+  MailingList: "mailto:dbi-dev@perl.org'"
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=AnyData
+  homepage: https://metacpan.org/release/AnyData
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/perl5-dbi/AnyData.git
+version: '0.12'

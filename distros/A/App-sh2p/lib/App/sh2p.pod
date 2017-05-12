@@ -1,0 +1,398 @@
+
+=head1 NAME
+
+App::sh2p - Perl program to aid for conversion from UNIX shell to Perl
+
+=head1 SYNOPSIS
+
+  sh2p.pl [-i] [-t] [-f] script-name output-file | script-name [...] output-directory
+
+  -i Do not use integer
+  -t Generate test output.  Each line from the shell script is written, with the prefix
+     '#< ', before the converted line.  This is for testing and not recommended for general use.
+  -f Clobber output files in the output directory
+
+This Perl script, and associated modules in the sh2p directory, 
+will attempt to convert the supplied shell script/s to Perl. 
+
+Only shells based upon the POSIX standard are supported.  This include most popular
+shells like Bourne, Korn, and Bash, but specifically EXCLUDES C shell (csh, tcsh).
+
+Most Korn shell 93 extensions are currently not supported.
+
+CAVEAT: Incorrect shell commands will result in incorrect Perl!
+
+=head1 DESCRIPTION
+
+This program attempts to convert the base syntax of a UNIX shell script to Perl.  
+It does not attempt to redesign the script for Perl but to assist in the conversion 
+process by automating much of the tedium.
+
+It can be run by either supplying the input and output file names, or by supplying
+a list of input file names and an output directory, which must be the right-most 
+parameter and must already exist.  If hyphen ('-') is supplied for either input or output file name
+then STDIN is read or STDOUT written to (not valid as a directory name).
+
+The output file will be overwritten if it exists.  
+If the directory output form is taken then an output file name is generated from the
+input file name, with '.pl' appended (any existing 'extension' will be removed).  If
+this file already exists then the user will be prompted for permission to overwrite it,
+unless the -f (force) option is given.
+
+The generated code will:
+
+Have a #! line generated from $Config{'perlpath'}.
+
+    use integer;
+
+The POSIX shell only supports integer arithmetic, this may be supressed with the -i option
+  
+
+=head2 INSPECT messages
+
+These are output whenever sh2p detects code which requires manual intervention,
+which is often.  A message of the format '**** INSPECT: free-text' is written to 
+the output script as a comment.  A similar message is written to STDERR, prefixed 
+by the line number and grouped by file.
+
+=head3 autoload '$var' ignored
+
+autoload, and typedef -fu, prepares the translator for names which are functions.
+Variable values containing a function name are set at runtime and cannot be used, 
+so are ignored.
+
+=head3 file descriptors not currently supported
+
+=head3 <func> replaced by Perl built-in <new_func>
+
+Advice to replace the specified program with a Perl alternative
+
+=head3 <func> should be replaced by something like <advise>
+
+Advice to replace the specified program with a Perl alternative
+
+=head3 Multiple levels in 'break $level' not supported
+
+=head3 Multiple levels in 'continue $level' not supported
+
+=head3 Suspious conversion from expr
+
+Many expr commands can be repeated as straight Perl - but not all.
+
+=head3 The following line cannot be translated:
+
+A "catch all" message where I give up.  Often when setting shell options
+
+=head3 Pipes/co-processes are not supported, use open
+
+=head3 read through ksh pipes is not supported
+
+The -p option to 'read' has different meanings in Bash and ksh.
+The shell in use is determined from the #! line.  If this is not supplied
+then 'read' assumes the Bash syntax, which is more common.
+
+=head3 Unrecognised shopt argument: 
+
+Only a limited number of the Bash 'shopt' options are relevant to Perl
+
+=head3 sourced file should also be converted
+
+The dot '.' or 'source' command has been used (and converted to 'do') 
+but the sourced file should also be converted.
+
+=head3 Only one option supported for typedef or declare
+
+=head3 Pattern <pattern> not currently supported
+
+=head3 Shell option <option> being set
+
+The Bash shopt built-in has been called.  Shell options are not converted.
+
+=head3 Unable to convert shell pattern matching <$token>
+
+=head3 User function <function-name> called in back-ticks
+
+Shell functions can only return values between 0 and 255.  A common technique
+for returning a string is to 'echo' or 'print' the string to STDOUT, then
+call the function in back-ticks (or $(...)), which, in a decent shell, should
+not produce a child process.  This is inappropriate in Perl and the subroutine
+return value should be revised.  This cannot reasonably be automated (that is to say
+I haven't figured it out yet).
+
+=head3 Writing dir/name.here
+
+See 'Here documents' (below)
+
+=head3 Heredoc replaced by simple redirection
+
+See 'Here documents' (below)
+
+=head3 No conversion routine for <name>
+
+=head3 Pipeline detected
+
+=head3 trap signal calling sh2p_signal_handler
+
+Comment that a signal handler has been invoked.  See trap below.
+
+=head3 Subshell: subshell list
+
+Subshells should not create a child process if possible, and alterations to the environment
+should not affect the 'parent'.  Shells do that using an environment stack, sh2p does it using 
+'local'.  However there are other implications, so the generated code should be inspected.
+
+=head3 Using $PWD is unsafe: use Cwd::getcwd
+
+The environment variable PWD is set when the shell built-in 'cd' is called.
+This variable is only used by the shell and not reliable in any other language.
+
+=head2 Unitialised variable
+
+The shell defaults uninitialised variables to an empty string or zero.  The conversion
+does not emulate this, but leaves them as undef.  The rational is that unitialised
+variables are undesirable and should be fixed.
+
+=head2 Here documents
+
+These work in the shell by writing a temporary file and
+then reading it.  We use a similar method here, except the
+directory used is taken from the environment variable SH2P_HERE_DIR.
+If that is not set then the current directory is used.
+
+The heredoc data is extracted from the script and written to a file named
+label.here, where 'label' is the label used to identify the heredoc.
+With the 'read' command, the file is read by subroutines appended to the generated script.
+
+With heredoc's from builtins, we attempt to use simple redirection but manual intervention is required.
+
+Currently external programs reading from a heredoc require manual intervention.
+Heredocs embedded inside back-ticks (or $(..)) produce a mess (some shells have 
+problems with this as well).
+
+=head2 External programs and built-ins
+
+It is tempting to substitute Perl built-ins for external programs like chmod, rm,
+and so on.  However the return codes are different and require a different testing
+regime.  Therefore these are identified by an INSPECT message.
+
+=head2 Functions
+
+Functions declared externally and loaded dynamically or via '.' will not be known.
+These will generally be seen as unknown commands and default to an external program,
+called using system or back-ticks.  However they may be declared in your script 
+using 'autoload' (or 'typedef -fu'), which will register them as functions with sh2p.
+
+A function name embedded in a variable and then called using that variable will not
+be detected as such and will be treated as an external command.
+
+The 'functions' alias, and 'typedef -f', will generate code to give a list of the 
+subroutines in the main:: namespace (symbol table) at runtime.  This will include any 
+imported names from external modules, and is unconnected with those known at conversion time.
+
+Note that the value of $0 inside functions differs between shell versions.  In sh2p
+$0 is retained to be the name of the current run unit (program), which is the POSIX
+behaviour.
+The Bash specific variable FUNCNAME is converted to 'caller(0))[3]'.
+
+There are two different syntax conventions commonly used with functions:
+
+    name () { ... }         # POSIX (Bourne) syntax
+    function name { ... }   # non-POSIX (Korn) syntax
+
+Bash and Korn shells support both, however they differ in operation when it comes to variable scope.  
+As an extension to the POSIX standard, Bash and Korn shells allow local
+variables to be declared using typeset, declare (Bash), or local.  This is mirrored in
+Perl by the 'my' perfix.  Any variables not so declared are globals.
+
+However there are issues with this.  POSIX never supported this, so the POSIX
+shell syntax should not support it either.  Both Bash and ksh88 (the most common) do support the
+declaration of local variables in both forms of syntax.  Ksh93 "fixed" it by not supporting it 
+in the Bourne syntax ('typedef var' has no effect), but supporting it in the non-POSIX shell syntax only.
+
+Added to that, very few people know about the capability anyway!
+
+A similar mix exists when dealing with signal handling and the 'trap' command.
+
+=head2 Variable scope
+
+If the variable is new (top-down parsing) it is declared with 'my', otherwise we assume it is a global.
+The current state of block nesting is tracked, so the definition of a "new" variable is one which
+has not been declared in this, or a higher-level, block.  This can be problematic if a variable is 
+used for the first time in an inner block.
+
+For example:
+    case "$1" in
+    --new)
+    	NEW=1
+    	;;
+    --update)
+    	NEW=0
+    	;;
+    *)
+    	echo "Usage: $0 --new|--update config-file"
+    	exit 1
+    	;;
+    esac
+    
+gets converted to:
+    $_ = "$ARGV[0]";
+    SWITCH: {
+        /^--new$/ && do {
+            my $NEW = 1;
+            last SWITCH;
+        };
+        /^--update$/ && do {
+            my $NEW = 0;
+            last SWITCH;
+        };
+        /^.*$/ && do {
+            print "Usage: $0 --new|--update config-file\n";
+            exit (1);
+            last SWITCH;
+        };
+    
+    }
+
+To avoid this problem, predefine the variable in the shell script using typeset.
+
+At runtime, the shell checks the environment block for variables before creating its own.
+That behaviour could be converted, but would impose a considerable overhead.  
+Therefore the environment block is not consulted.
+
+=head2 Redirection
+
+When redirection is done in the shell the file is opened, read or written, then closed.
+This is exactly what is generated by the conversion.  It might not be what you want, 
+but at least demonstrates some of the inefficiencies of using a shell.  INSPECT messages
+are not generated for this.
+
+=head2 Pipelines
+
+Some assumptions are made to pipelines.  If the pipeline starts with an echo or print, then
+the string is moved to be an argument to the command which follows.
+When grep follows an external program call, that call is made in back-ticks and the grep
+moved to preceed the call.  This should ease the editing required to use the Perl grep function.
+
+=head1 Know bugs and short comings (TODO):
+
+=head2 Shortcomings
+
+Pipelines have limited support right now.  Hopefully this will improve in future releases.
+typedef/declare support is limited
+Options are not fully supported for export, typedef/define, touch, and tr.
+
+=head3 $?
+
+Currently $? is not traced back to the previous command.
+It is intended to implement a second pass in a future release.
+
+=head3 unset
+
+The assumption is made that the variable is a scalar
+
+=head3 trap
+
+Korn and Bash shell 'trap' commands are converted to Perl %SIG signal handling where possible.
+Pseudo signal EXIT is not supported within a function, and pseudo signal ERR is
+only supported within a function.  The reason for these restrictions is that shells vary in their
+support of signals inside functions, with Bash, ksh93, and Sun's version of ksh88 all taking
+different actions, with differences between POSIX and non-POSIX function syntax (see above).
+Pseudo signals ERR, DEBUG, and RETURN (from Bash 3), are not supported.  Other signals
+are supported by appending handler subroutines to the script.  Currently only one handler
+subroutine for each signal is supported.  This restriction does not apply to '' (IGNORE)
+and '-' (DEFAULT), since subroutines are not required.
+
+=head3 Currently unsupported :
+
+   File descriptors (exec, read -u, print -u, some redirection)
+   Co-processes
+   <(...) process substitution (ksh93 & Bash)
+   Multiple levels in 'break' and 'continue'
+   Nested 'here' documents
+   Nested 'case' statements
+   Options to the 'export' command
+   Some tilde ~ expansions
+   Redirection from if or loop statments, redirection from functions
+
+=head3 The following built-ins are currently not converted:
+
+                 alias    
+                 bg       
+                 bind     
+                 builtin  
+                 command  
+                 eval               
+                 fc       
+                 fg       
+                 getopts  
+                 hash     
+                 jobs         
+                 pwd      
+                 readonly     
+                 time     
+                 times           
+                 ulimit   
+                 unalias   
+                 wait     
+                 whence   
+
+The following compound statements are currently unsupported:
+                  select   
+                  time          
+
+The following operators are currently unsupported:
+                |&
+                 & - this is generally placed at the end of a system command
+
+=head1 FAQ
+
+=head2 Why do my strings have an empty string prefix?
+
+First the Perl 'print' command.  For precedence reasons we often convert to 
+strings that are enclosed in parentheses.  The Perl 'print' command often 
+issues the message 'print (...) interpreted as function' when this is done.
+A fix is to prefix the parentheses with an empty string.
+    
+Another reason is the use of braces with a variable name, for example ${var}.
+While this can be interpolated cleanly by Perl as it stands, braces in a shell
+can also imply expansions, for example ${var%%value*}.  These expansions often
+generate more complex Perl that cannot be interpolated.  The safe path taken
+is that all variables in braces potentially contain expansions.
+    
+Some cleaning-up is done in certain cases where possible, but not all.
+    
+=head2 Why does tr [A-Z] [a-z] get converted to use glob?
+
+Because it should be tr '[A-Z]' '[a-z]'.  The reason it usually works in the shell is because
+you don't normally have file names in the current directory consisting of just one
+alphabetic character.  Most shells treat unsatisfied glob constructs as literals.
+I can't do that, because I don't know what the runtime environment is.
+
+=head2 Why don't environment variables get defined.
+
+Because we have no idea what the runtime envionment is - they might have values
+at runtime.
+
+=head1 SEE ALSO
+
+man pages for sh, ksh, and bash
+
+=head1 AUTHOR
+
+Clive Darke, E<lt>clive.darke@talk21.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008, 2009 by C.B.Darke
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut
+
+
+
+
+

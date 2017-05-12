@@ -1,0 +1,45 @@
+{
+   "abstract" : "Pretty print integer and hex (rgb) color codes",
+   "author" : [
+      "Dylan Cali <calid1984@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-256colors",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Color::ANSI::Util" : "0",
+            "IPC::System::Simple" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/calid/app-256colors/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/calid/app-256colors.git",
+         "web" : "https://github.com/calid/app-256colors"
+      }
+   },
+   "version" : "0.001"
+}
+

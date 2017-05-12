@@ -1,0 +1,3 @@
+# Deny all robots (sorry robots... nothing personal)
+User-agent: *
+Disallow: /

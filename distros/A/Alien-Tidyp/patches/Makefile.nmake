@@ -1,0 +1,51 @@
+# from unpacked tidyp root dir run
+# 32bit: nmake -f Makefile.nmake 
+# 64bit: nmake -f Makefile.nmake CFG=Win64
+
+!IF "$(CFG)" == "Win64"
+LFLAGS   = -nologo -machine:amd64 -nodefaultlib msvcrt.lib kernel32.lib bufferoverflowU.lib
+CFLAGS   = -nologo -GF -W3 -MD -O2 -Isrc -Iinclude -D_WIN32_WINNT=0x0500 -DSUPPORT_ACCESSIBILITY_CHECKS=1 -DSUPPORT_ASIAN_ENCODINGS=1 -DSUPPORT_UTF16_ENCODINGS=1
+!ELSE
+LFLAGS   = -nologo -machine:x86 -nodefaultlib msvcrt.lib kernel32.lib
+CFLAGS   = -nologo -GF -W3 -MD -O2 -Isrc -Iinclude -D_WIN32_WINNT=0x0500 -DSUPPORT_ACCESSIBILITY_CHECKS=1 -DSUPPORT_ASIAN_ENCODINGS=1 -DSUPPORT_UTF16_ENCODINGS=1
+!ENDIF
+
+OBJS     = src/access.obj src/alloc.obj src/attrask.obj src/attrdict.obj src/attrget.obj src/attrs.obj src/buffio.obj \
+           src/clean.obj src/config.obj src/entities.obj src/fileio.obj src/istack.obj src/lexer.obj src/localize.obj \
+	   src/mappedio.obj src/parser.obj src/pprint.obj src/streamio.obj src/tagask.obj src/tags.obj \
+	   src/tidyplib.obj src/tmbstr.obj src/utf8.obj
+EXE1     = tidyp.exe
+EXE1OBJS = src/tidyp.obj
+
+PERL     = perl
+CP       = $(PERL) -MExtUtils::Command -e "cp" --
+MKPATH   = $(PERL) -MExtUtils::Command -e "mkpath" --
+
+PREFIX   = ./_output_
+BINDIR   = $(PREFIX)/bin
+INCDIR   = $(PREFIX)/include
+LIBDIR   = $(PREFIX)/lib
+STATIC_LIB = tidyp.lib
+TARGETS  = $(STATIC_LIB) $(SHARED_LIB) $(EXE1OBJS) $(EXE1)
+
+all: $(TARGETS)
+
+clean:
+	$(RM_F) $(OBJS) $(TARGETS)
+
+$(STATIC_LIB): $(OBJS)
+	lib /OUT:$@ $(OBJS)
+
+$(EXE1): $(EXE1OBJS) $(STATIC_LIB)
+	link /OUT:$@ $(LFLAGS) $**
+
+{src}.c{src}.obj::
+	cl $(CFLAGS) /Fosrc\ /c $<
+
+install: all
+	$(MKPATH) "$(BINDIR)"
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)/tidyp"
+	$(CP) $(STATIC_LIB) "$(LIBDIR)"
+	$(CP) $(EXE1) "$(BINDIR)"
+	$(CP) include/buffio.h include/platform.h include/tidyp.h include/tidypenum.h "$(INCDIR)/tidyp"

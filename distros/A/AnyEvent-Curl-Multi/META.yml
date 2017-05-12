@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         AnyEvent-Curl-Multi
+version:      1.1
+version_from: lib/AnyEvent/Curl/Multi.pm
+installdirs:  site
+requires:
+    AnyEvent:                      5
+    HTTP::Request:                 0
+    HTTP::Response:                0
+    Object::Event:                 1
+    Test::More:                    0
+    WWW::Curl:                     4.14
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Apache2-Connection-XForwardedFor.t
+lib/Apache2/Connection/XForwardedFor.pm
+t/conf/extra.last.conf.in
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,224 @@
+#!perl
+
+our $DATE = '2016-10-01'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use strict;
+use warnings;
+no warnings 'numeric';
+
+use Getopt::Long::Complete;
+use Time::HiRes qw(time);
+
+my %Opts = (
+    si => 0,
+);
+
+sub _with_unit {
+    my ($n2, $n1, $t2, $t1) = @_;
+    if ($t2 == $t1) {
+        return (0, "");
+    } else {
+        my $s = ($n2-$n1) / ($t2-$t1);
+        if ($Opts{si}) {
+            if ($s > 1.5e9) {
+                return ($s/1e9, "Gi/s");
+            } elsif ($s > 1.5e6) {
+                return ($s/1e6, "Mi/s");
+            } elsif ($s > 1.5e3) {
+                return ($s/1e6, "Ki/s");
+            } else {
+                return ($s, "/s");
+            }
+        } else {
+            if ($s > 1.5*2**30) {
+                return ($s/2**30, "G/s");
+            } elsif ($s > 1.5*2**20) {
+                return ($s/2**20, "M/s");
+            } elsif ($s > 1.5*2**10) {
+                return ($s/2**10, "K/s");
+            } else {
+                return ($s, "/s");
+            }
+        }
+    }
+}
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'si!'           => \$Opts{si},
+        'version|v'     => sub {
+            no warnings;
+            print "linespeed version $main::VERSION ($main::DATE)\n";
+            exit 0;
+        },
+        'help|h'        => sub {
+            print <<USAGE;
+Usage:
+  linespeed [OPTIONS]... < INPUT
+  linespeed --version, -v
+  linespeed --help, -h
+Options:
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+}
+
+sub run {
+    $|++;
+    my $num = 0;
+    my $prev_time = time();
+    my $prev_num;
+    my ($first_num, $first_time);
+    my $msg = "";
+    while (<>) {
+        ($num) = /^\s*([+-]?\d+(?:\.\d+)?)/ or last;
+
+        my $time = time();
+
+	unless (defined $prev_num) {
+            $prev_num = $num;
+            $prev_time = time();
+            $first_num = $num;
+            $first_time = $prev_time;
+            next;
+        }
+
+        # don't report speed too often
+        next unless $time - $prev_time >= 0.5;
+
+        my $new_msg = sprintf(
+            "Cur speed: %8.3f%-4s  Avg: %8.3f%-4s",
+            _with_unit($num, $prev_num , $time, $prev_time ),
+            _with_unit($num, $first_num, $time, $first_time),
+        );
+
+        print "\b" x length $msg;
+        print $new_msg, "\e[K"; # clear to EOL
+
+        $msg = $new_msg;
+        $prev_num = $num;
+        $prev_time = $time;
+    }
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Calculate how fast a number is changing
+# PODNAME: numspeed
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+numspeed - Calculate how fast a number is changing
+
+=head1 VERSION
+
+This document describes version 0.001 of numspeed (from Perl distribution App-numspeed), released on 2016-10-01.
+
+=head1 SYNOPSIS
+
+ % ( while true; do du -sb /some/file/being/copied; sleep 1; done ) | numspeed
+ Cur speed: 4.5M/s  Avg: 4.1M/s_
+
+=head1 DESCRIPTION
+
+C<numspeed> reads a number from standard input repeatedly. It then calculates
+how fast that number is changing (increasing/decreasing). It can be used to
+measure, e.g. how fast a file is being copied by feeding the sizes of the file
+to it.
+
+It exits if it cannot read a number from input.
+
+=head1 TODO
+
+Show speed in the last minute, 5 mins, 15 mins (or customizable).
+
+=head1 OPTIONS
+
+=head2 --si
+
+Instead of the default 1024, use power of 1000.
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C numspeed numspeed
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete numspeed 'p/*/`numspeed`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-numspeed>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-numspeed>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-numspeed>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<linespeed>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

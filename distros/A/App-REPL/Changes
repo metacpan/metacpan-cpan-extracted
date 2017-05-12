@@ -1,0 +1,15 @@
+Revision history for App-REPL
+
+0.01    16 Mar 2007
+        Initial release.
+
+0.011   17 Mar 2007
+        Move scoped_eval about to get slightly saner treatment of
+        variables in iperl.
+
+        Makefile.PL now has an ABSTRACT
+
+	App::REPL points towards the README for real documentation.
+
+0.012	11 Apr 2007
+	Very small changes to support colorless operation.

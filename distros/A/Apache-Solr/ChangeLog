@@ -1,0 +1,118 @@
+
+===== version history for Apache::Solr
+
+All modifications are made by Mark Overmeer, unless explicitly stated
+differently.
+
+version 1.04: Mon 23 May 09:24:40 CEST 2016
+
+	Fixes:
+	- regression test fails on hash randomization [cpantesters]
+
+version 1.03: Sat 21 May 09:32:33 CEST 2016
+
+	Fixes:
+	- expandSelect() over-eager to protect generic configuration
+	  flags to be used as specific field flags.  [Mark Elrod]
+
+version 1.02: Tue Mar  8 19:47:39 CET 2016
+
+	Fixes:
+	- implement the update attribute [Mark Elrod]
+	- boost float accept rounding error.
+
+version 1.01: Thu Dec 11 15:54:03 CET 2014
+
+	Fixes:
+	- _getResult -> _getResults in selected()
+	 rt.cpan.org#100860 [Kristian Gray]
+
+version 1.00: Wed Dec  3 17:48:07 CET 2014
+
+	Changes:
+	- understand and simplify response/docs structure, results of
+	  facet'd queries.  rt.cpan.org#100662 [Douglas Early]
+
+version 0.99: Mon Mar  3 10:27:02 CET 2014
+
+	Changes:
+	- ::XML add basic field types date, text, and double.  Their
+	  values are now included in the HASH by name, not by type.
+	  So, date => { name => 'xyz', _ => $ts } becomes  xyz => $ts
+	  [Andrew Beverley]
+
+	Improvements:
+	- change documentation style
+
+version 0.98: Wed Jan 22 17:00:02 CET 2014
+
+	Fixes:
+	- extractDocument(content_type) [Andrew Beverley]
+	- extractDocument character encoding on text [Andrew Beverley]
+	- extractDocument more use of ref on data.
+
+version 0.97: Fri Nov 15 15:11:30 CET 2013
+
+	Changes:
+	- undefined value for boolean becomes 'missing', not 'false'
+	  [Andrew Beverley]
+
+	Fixes:
+	- handling result without hits.
+
+	Improvements:
+	- expandExtract() accepts SCALAR
+	- ignore fields with undefined content
+
+version 0.96: Thu Oct 10 15:42:25 CEST 2013
+	Improvements:
+	- adding a few new configuration fields, from 4.0.0 -> 4.5
+
+version 0.95: Fri Feb  1 16:47:38 CET 2013
+	Fixes:
+	- ::Result::selected() deep recursion.
+
+	Improvements:
+	- new ::Result::nextSelected()
+	- ::Result::selected() does not need the optional $solr object anymore
+
+version 0.94: Thu Jan 31 15:12:34 CET 2013
+	Fixes:
+	- extractDocument(string) did not work.
+
+	Improvements:
+	- catch and check deprecation warning in t/12facet.t
+	- accept parameter hashes for fmap, resource and boost in expandExtract
+	- honour autocommit in extractDocument()
+	- the user agent will be default be shared when multiple Solr objects
+	  are created.
+	- do not die on HTML answers: put it in $result->success
+	- add \n to ::Results::errors()
+	- add ::coreStatus, ::coreReload, and ::coreUnload
+
+version 0.93: Wed Jan 30 15:53:08 CET 2013
+	Improvements:
+	- support perl pre-5.10 by removal single use of //
+	- ::Document::boost() now also for fields
+	- further documentation improvements
+	- much better error reporting, use $result->errors()
+	- surpress early warning about connection errors.
+	- take filename from extractDocument() even if the data is
+	  specified as string.
+	- extended the power of expandExtract()
+
+version 0.92: Thu Dec  6 09:48:18 CET 2012
+	- fix delete()
+	- no multiple deletes in JSON available (it seems)
+	- implement extractDocument()
+	- avoid added wt=> for select more than one
+
+version 0.91: Tue Dec  4 09:41:10 CET 2012
+	- ::Document field lookups by hash, not grep.
+	- ::Result::selected() returns ::Document, not HASH.  Then, ask
+	  for highlighed info via ::Result::highlighted($doc)
+	- many more tricks with a ::Document
+	- extractDocument() is work in progress
+
+version 0.90: Mon Dec  3 11:46:27 CET 2012
+	- initial implementation

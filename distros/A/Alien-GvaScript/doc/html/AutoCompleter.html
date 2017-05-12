@@ -1,0 +1,579 @@
+<html>
+<head>
+  <script src="../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <link href="GvaScript_doc.css" rel="stylesheet" type="text/css">
+  <script>
+    document.observe('dom:loaded', function() { new GvaScript.TreeNavigator('TN_tree'); });
+    function jumpto_href(event) {
+      var label = event.controller.label(event.target);
+      if (label && label.tagName == "A") {
+        label.focus();
+        return Event.stopNone;
+      }
+    }
+  </script>
+</head>
+<body>
+<div id='TN_tree'>
+  <div class="TN_node">
+   <h1 class="TN_label">Alien::GvaScript::Autocompleter</h1>
+   <div class="TN_content">
+     <p><em>autocompletion on form input fields
+</em></p>
+     <div class="TN_node"  onPing="jumpto_href">
+       <h3 class="TN_label">Table of contents</h3>
+       <div class="TN_content">
+         <div class="TN_leaf">
+  <a class="TN_label" href="#NAME">NAME</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#SYNOPSIS">SYNOPSIS</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#DESCRIPTION">DESCRIPTION</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#BEHAVIOUR">BEHAVIOUR</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#CONSTRUCTOR">CONSTRUCTOR</a>
+  <div class="TN_content"><div class="TN_node">
+  <a class="TN_label" href="#Datasources">Datasources</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Origin">Origin</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#Format_of_suggestions_returned_by_datasources">Format of suggestions returned by datasources</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#Options">Options</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#METHODS">METHODS</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#autocomplete_inputField_">autocomplete(inputField)</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#detach_inputField_">detach(inputField)</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#displayMessage_messageText_">displayMessage(messageText)</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#EVENTS">EVENTS</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#onBind">onBind</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#onLeave">onLeave</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#onComplete">onComplete</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#onLegalValue">onLegalValue</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#onIllegalValue">onIllegalValue</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#onHighlight">onHighlight</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#onCancel">onCancel</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+
+       </div>
+     </div>
+     <hr/>
+   </div>
+  </div>
+  <div class="TN_node" id="NAME">
+    <h2 class="TN_label">NAME</h2>
+    <div class="TN_content">
+      <p>Alien::GvaScript::Autocompleter - autocompletion on form input fields</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="SYNOPSIS">
+    <h2 class="TN_label">SYNOPSIS</h2>
+    <div class="TN_content">
+      <p>In Javascript :</p>
+<pre>  var autocompleter1 = new GvaScript.Autocompleter(
+      "http::/some/url", 
+      {minimumChars : 2, 
+       strict       : true, 
+       onBind       : doSomething,
+       onLeave      : doSomethingElse}  );
+
+  var autoCompleter2 = new GvaScript.Autocompleter(
+        ["foo", "bar", ...], options);
+
+  var autoCompleter3 = new GvaScript.Autocompleter(
+        [{label: "foo", value: "f", otherValue: 123},
+         {label: "bar", value: "b", otherValue: 456}, ...], options);
+
+  var autoCompleter4 = new GvaScript.Autocompleter(
+        myCompletionFunction, options);</pre>
+
+<p>Then, in HTML :</p>
+<pre>  &lt;input onfocus="autoCompleter1.autocomplete(this)"&gt;</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="DESCRIPTION">
+    <h2 class="TN_label">DESCRIPTION</h2>
+    <div class="TN_content">
+      <p>Component designed both as an "autocompleter" (anticipating
+further key events by users) and as a replacement for HTML <code>SELECT</code>
+form items.</p>
+<p>An autocompleter instance encapsulates a datasource (which may be an
+inline object, a callback function or an Ajax request), together with
+some behavioral options (detailed below).  That autocompleter may then
+be <i>bound</i> to one or several input fields in a form (but only one at
+a time), and will take care of capturing user input, navigating in the
+suggestion list, and filling the field with the chosen value.</p>
+<p>An event model is associated with the autocompleter, so that
+client code can insert hooks to various steps of
+the autocompletion behaviour.</p>
+<p>The list of suggestions may contain arbitrary HTML, including rich
+formatting options.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="BEHAVIOUR">
+    <h2 class="TN_label">BEHAVIOUR</h2>
+    <div class="TN_content">
+      <p>When the input field gets focus, the autocompleter starts listening
+for key events. As soon as <code>minimumChars</code> have been typed, or if the
+user presses the <code>DOWN</code> arrow key, the autocompleter gets a list of
+suggestions from the datasource, and displays them in a dropdown list.</p>
+<p>The dropdown list can be navigated through arrow keys. Selecting a
+suggestion in the list is done either by a click, or by pressing the
+<code>RETURN</code> key (this is handled by the
+<i>Alien::GvaScript::ChoiceList</i> component of
+GvaScript). Then the value of that suggestion fills the input field
+value, dependent fields (if any) are updated, and the <code>onLegalValue</code>
+event is triggered.</p>
+<p>A number of variations on this behaviour may be controlled by the options
+described below.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="CONSTRUCTOR">
+    <h2 class="TN_label">CONSTRUCTOR</h2>
+    <div class="TN_content">
+      <pre>  var myAutocompleter = new GvaScript.Autocompleter(datasource, options);</pre>
+
+  <div class="TN_node" id="Datasources">
+    <h3 class="TN_label">Datasources</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="Origin">
+    <h4 class="TN_label">Origin</h4>
+    <div class="TN_content">
+      <p>A datasource may be</p>
+<ul>
+<li><a name="item_a_plain_string"></a><b>a plain string</b>
+<p>The string is taken as a base URL. Whenever a suggestion list is needed,
+the autocompleter will send an Ajax requests to that URL, concatenated with 
+the current value in the associated field. So for example if we have</p>
+<pre>  var ac = new GvaScript.Autocompleter("/myapp/completion?search=");
+  ..
+  &lt;input name="someInput" onfocus="ac.complete(this)"&gt;</pre>
+
+<p>and user has typed <code>ab</code> in the input field, then an Ajax request
+will be sent to <code>/myapp/completion?search=ab</code>.</p>
+<p>The server should return a JSON array, in the format explained below.</p>
+</li>
+<li><a name="item_a_callback_function"></a><b>a callback function</b>
+<p>That function will be called, with the current value of the field
+as single argument.</p>
+</li>
+<li><a name="item_an_array"></a><b>an array</b>
+<p>The array is taken as in-memory datasource. The returned suggestion
+list is either the complete array (when <code>options.ignorePrefix</code> is true)
+or just the list of items that are prefixed by the current value 
+of the field. See also <code>options.caseSensitive</code>.</p>
+</li>
+<li><a name="item_an_object__JSONP_"></a><b>an object (JSONP)</b>
+<p>Useful when accessing data on a different domain via JSONP services.</p>
+<pre>  Ex :   { json_url: 'http://search.yahooapis.com/WebSearchService/V1/relatedSuggestion?appid=YahooDemo&amp;query=?1&amp;output=json&amp;callback=?2',
+           json_list: 'ResultSet/Result' }</pre>
+
+<p>The object should hold details of the JSONP service to be called.</p>
+<p><code>json_url</code> : url to call with placeholders (?1, ?2) for value to look for and callback method respectively.</p>
+<p><code>json_list</code> : path to the list in the json response</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Format_of_suggestions_returned_by_datasources">
+    <h4 class="TN_label">Format of suggestions returned by datasources</h4>
+    <div class="TN_content">
+      <p>Datasources should return a list of suggestions in the form
+of a Javascript array (in case of Ajax requests, the response 
+should be a JSON body containing a single array).</p>
+<p>For each suggestion in the array, the autocompleter needs
+a <i>label</i> (an HTML fragment to display in suggestion
+dropdown lists) and a <i>value</i> (a plain string to put into
+the text field when the suggestion is selected). So 
+each suggestion may be either</p>
+<ul>
+<li><a name="item_a_plain_string"></a><b>a plain string</b>
+<p>this string will be used both as label and as value.</p>
+</li>
+<li><a name="item_an_inline_object"></a><b>an inline object</b>
+<p>this object is supposed to have a <code>label</code> property and a 
+<code>value</code> property. Actually, these are the default names for
+the properties; they can be changed in the constructor options.</p>
+<p>The <code>label</code> property may contain rich HTML, i.e. including
+formatting tags.</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Options">
+    <h3 class="TN_label">Options</h3>
+    <div class="TN_content">
+      <p>The options to construct an autocompleter object are :</p>
+<ul>
+<li><a name="item_minimumChars"></a><b>minimumChars</b>
+<p>How many characters are needed before trying to find suggestions.</p>
+</li>
+<li><a name="item_labelField"></a><b>labelField</b>
+<p>Name of the field that contains the HTML to display
+(default is <code>label</code>).</p>
+</li>
+<li><a name="item_valueField"></a><b>valueField</b>
+<p>Name of the field that contains the value to put in input element
+(default is <code>value</code>).</p>
+</li>
+<li><a name="item_autoSuggest"></a><b>autoSuggest</b>
+<p>Boolean value; toggles whether suggestions are displayed automatically
+when available (true by default). If false, suggestions are only
+displayed when the <code>ARROW_DOWN</code> key is pressed.</p>
+</li>
+<li><a name="item_autoSuggestDelay"></a><b>autoSuggestDelay</b>
+<p>How many milliseconds to wait after a keypress before displaying 
+suggestions. Default is 200.</p>
+</li>
+<li><a name="item_typeAhead"></a><b>typeAhead</b>
+<p>If true (the default), the current suggestion will be automatically 
+inserted into the input element.</p>
+</li>
+<li><a name="item_maxHeight"></a><b>maxHeight</b>
+<p>Maximum height for the suggestion DIV (in pixels).
+Default is 200.</p>
+</li>
+<li><a name="item_minWidth"></a><b>minWidth</b>
+<p>Minimum width for the suggestion DIV (in pixels)
+Default is 200.</p>
+</li>
+<li><a name="item_offsetX"></a><b>offsetX</b>
+<p>Offset (in pixels) from the left border of the 
+input element to the left border of the 
+suggestion DIV.
+Default is 0.</p>
+</li>
+<li><a name="item_strict"></a><b>strict</b>
+<p>If this option is true and the user 
+leaves the field with an illegal value
+(not in the suggestion list), 
+the field is marked with a red background.
+Default is false.</p>
+</li>
+<li><a name="item_blankOK"></a><b>blankOK</b>
+<p>If this option is defined and false, 
+the field is marked with a red background
+when left with an empty value.
+Default is true.</p>
+</li>
+<li><a name="item_ignorePrefix"></a><b>ignorePrefix</b>
+<p>If true, and if the datasource is a Javascript array, then
+that whole array is always displayed as suggestions, 
+whatever may be typed in the input field (so the field
+behaves more or less like a SELECT).
+Default is false.</p>
+</li>
+<li><a name="item_caseSensitive"></a><b>caseSensitive</b>
+<p>This option only applies if the datasource is a Javascript array
+and if <code>ignorePrefix</code> is false.
+If true (the default), filtering of the datasource array 
+from the current value of the input field
+will be case-sensitive.</p>
+</li>
+<li><a name="item_colorIllegal"></a><b>colorIllegal</b>
+<p>Which color to put in the background when a "strict" field contains 
+an illegal value (default is red).</p>
+</li>
+<li><a name="item_scrollCount"></a><b>scrollCount</b>
+<p>How many items to skip when hitting the 
+<code>PAGE_UP</code> or <code>PAGE_DOWN</code> keys. 
+Default is 5</p>
+</li>
+<li><a name="item_htmlWrapper"></a><b>htmlWrapper</b>
+<p>See the <code>ChoiceList</code> documentation.</p>
+</li>
+<li><a name="item_choiceItemTagName"></a><b>choiceItemTagName</b>
+<p>See the <code>ChoiceList</code> documentation.</p>
+</li>
+<li><a name="item_classes"></a><b>classes</b>
+<p>Classes that will be assigned at various stages
+to autocompleter DOM elements .
+Possible classes are</p>
+<ul>
+<li><a name="item_loading"></a><b>loading</b>
+<p>Class added to the  input or textarea field while an Ajax
+request is pending. Default is <code>AC_loading</code>, a class that displays
+an Ajax-loading icon.</p>
+</li>
+<li><a name="item_dropdown"></a><b>dropdown</b>
+<p>Class for the dropdown div that displays the autocompletion choices.
+Default is <code>AC_dropdown</code>.</p>
+</li>
+<li><a name="item_message"></a><b>message</b>
+<p>Class for displaying warning messages.
+Default is <code>AC_message</code>.</p>
+</li>
+</ul>
+</li>
+<li><a name="item_additional_params"></a><b>additional_params</b>
+<p>Other parameters to be added in the Ajax query for autocompletion.
+Can be either an array or an already encoded string (see <code>Ajax.Options</code> in
+<code>prototype.js</code>).
+[TODO: should be camelCase to be consistent with other options; 
+check dependencies in DMWeb].</p>
+</li>
+<li><a name="item_dependentFields"></a><b>dependentFields</b>
+<pre>  var ac =  new GvaScript.Autocompleter(url, {
+              dependentFields : {
+                foo : "firstname",
+                bar : "lastname",
+                id  : "id"
+              } } );</pre>
+
+<p>Inline object that specifies dependencies between the field
+controlled by the autocompleter, and other fields in the same form.
+When leaving the autocompleted field (<code>onBlur</code>), the dependent fields
+will be updated automatically. This only works for autocompleters
+in strict mode.</p>
+<p>Each key in the inline object specifies the name of a field related
+to the autocompleted field. If field names are in dotted notation, 
+then the related field is taken as a path relative to the autocompleted
+field : so for example if the autocompleted field has name
+<code>some.very.3.long.2.path</code>, then the <code>foo</code> entry in
+<code>dependentFields</code> will refer to field <code>some.very.3.long.2.foo</code>.</p>
+<p>The corresponding value (in our example above: <code>firstname</code>) is
+the name of a property to extract from the <code>choice</code> member
+that validated the current input. However, the autocompleted field
+may also contain an empty value (in which case the related fields
+are also emptied), or an illegal value (in which case the related
+fields are filled with string <code>ILLEGAL_***</code>, where <code>***</code> is the 
+key from the inline object).</p>
+<p>If the <code>choice</code> member is not an object, but just a string,
+then that string is copied to the dependent field, therefore ignoring
+the hash value (<code>firstname</code> in our example).</p>
+<p>As a special case, if the hash value is an empty string,
+then the dependent field is emptied, ignoring whatever
+information may be in the <code>choice</code> element.</p>
+<p>The dependent fields structure might also be specified as
+an HTML attribute <code>ac:dependentFields</code>, instead of an option 
+to the Javascript object :</p>
+<pre>  &lt;input name="some.very.3.long.2.path"
+         onfocus="ac.autocomplete(this)"
+         ac:dependentFields="{foo:'firstname',bar:'lastname',id:'id'}" /&gt;
+  ...
+  &lt;input type="hidden"
+         name="some.very.3.long.2.id" /&gt;</pre>
+
+</li>
+</ul>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="METHODS">
+    <h2 class="TN_label">METHODS</h2>
+    <div class="TN_content">
+        <div class="TN_node" id="autocomplete_inputField_">
+    <h3 class="TN_label">autocomplete(inputField)</h3>
+    <div class="TN_content">
+      <p>Returns an event handler to be bound to the <code>onfocus</code> event on
+an input field, i.e.</p>
+<pre>  &lt;input name="someInput" onfocus="myAutoCompleter.complete(this)"&gt;</pre>
+
+<p>The autocompleter will automatically register 
+<code>onblur</code>, <code>onclick</code> and <code>onkeydown</code> handlers on the same field, so avoid
+setting your own, which may cause unpredictable interactions.
+However the autocompleter has its own event model 
+to which you can bind your handling code
+(see the <i>EVENTS</i> section below).</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="detach_inputField_">
+    <h3 class="TN_label">detach(inputField)</h3>
+    <div class="TN_content">
+      <p>Permanently detaches the input field from the autocompleter object
+(i.e. removes <code>onblur</code> and <code>onkeypress</code> handlers
+that were previously set by the first invocation of the 
+<code>autocomplete</code> method).</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="displayMessage_messageText_">
+    <h3 class="TN_label">displayMessage(messageText)</h3>
+    <div class="TN_content">
+      <p>Displays the given message within 
+a newly created dropdown DIV under the input field.
+Used internally to warn for example about illegal values.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="EVENTS">
+    <h2 class="TN_label">EVENTS</h2>
+    <div class="TN_content">
+      <p>For a general explanation on registering handlers
+for GvaScript events, see the <i>event</i> documentation.
+In short, you can register handlers either on the 
+HTML input element, as in</p>
+<pre>  &lt;input name="someInput" onfocus = "myAutoCompleter.complete(this)"
+                          onBind  = "bindHandler(this, event)"
+                          onLeave = "leaveHandler"&gt;</pre>
+
+<p>or on the javascript object, as in</p>
+<pre>   myAutocompleter.onBind = function(event) {
+        bindHandler(event.target, event)
+   };
+   myAutocompleter.onLeave = leaveHandler;</pre>
+
+<p>Below is the list of events generated by
+autocompleter objects.</p>
+  <div class="TN_node" id="onBind">
+    <h3 class="TN_label">onBind</h3>
+    <div class="TN_content">
+      <p>This event is triggered whenever the autocompleter object 
+becomes associated with an input field; typically this
+occurs when the input field receives focus and then
+calls the <a href="#autocomplete">/"autocomplete"</a> method.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="onLeave">
+    <h3 class="TN_label">onLeave</h3>
+    <div class="TN_content">
+      <p>This event is triggered whenever the autocompleter object 
+cuts the association with an input field; typically this
+occurs when the input field loses focus.</p>
+<p>If in strict mode, the autocompleter object will also
+check if the final value is legal or illegal with respect
+to the list of available choices. This may require an
+additional Ajax call, so the <code>onLeave</code> event may be
+triggered <i>before</i> the <code>onLegalValue</code> or <code>onIllegalValue</code> events.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="onComplete">
+    <h3 class="TN_label">onComplete</h3>
+    <div class="TN_content">
+      <p>[OBSOLETE; use <code>onLegalValue</code> or <code>onIllegalValue</code> instead]</p>
+<p>This event is triggered whenever the user has chosen
+an item in the displayed suggestion list.
+The event handler may use <code>event.index</code> to know the index of the
+selected choice.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="onLegalValue">
+    <h3 class="TN_label">onLegalValue</h3>
+    <div class="TN_content">
+      <p>This event is triggered when the autocompleter is in strict mode,
+the input field has just been left (<code>onBlur</code> event), and the 
+autocompleter was able to verify that the current input value
+belongs to the list of available choices.</p>
+<p>The event contains a <code>value</code> property (current value in the 
+input element), and a <code>choice</code> property (member of the 
+<code>choices</code> array that matches the current value).
+The <code>controller</code> property is null because the event may
+occur after the autocompleter object has been detached from the input
+field and has been perhaps already bound to another field, so interacting 
+with the autocompleter from the event handler would lead to inconsistencies.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="onIllegalValue">
+    <h3 class="TN_label">onIllegalValue</h3>
+    <div class="TN_content">
+      <p>This event is triggered when the autocompleter is in strict mode,
+the input field has just been left (<code>onBlur</code> event), and the 
+autocompleter was not able to verify that the current input value
+belongs to the list of available choices.</p>
+<p>The event only contains a <code>value</code> property (current value in the 
+input element). The <code>controller</code> property is null (same reasons
+as <code>onLegalValue</code> above).</p>
+<p>return <code>true</code> in onIllegalValue handler to override the illegal behavior; i.e. coloring the 
+input in red and invalidating the dependentFields.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="onHighlight">
+    <h3 class="TN_label">onHighlight</h3>
+    <div class="TN_content">
+      <p>This event is triggered when a choice in the dropdown list
+of choices is highlighted.
+The event handler may use <code>event.index</code> to know the index of the
+highlighted choice.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="onCancel">
+    <h3 class="TN_label">onCancel</h3>
+    <div class="TN_content">
+      <p>This event is triggered when the user presses the <code>ESCAPE</code> key.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

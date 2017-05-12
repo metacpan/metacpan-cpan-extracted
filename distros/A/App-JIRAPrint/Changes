@@ -1,0 +1,169 @@
+==================================================
+Changes from 2014-10-15 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.003 at 2015-10-15 13:03:37 +0000
+------------------------------------------
+
+  Change: 114f037a115530a889fc0c233d048586e9977750
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-15 13:59:46 +0000
+
+    Fetch up to 100 tickets by default 
+
+  Change: 2249fe173053aceda9aea95bcc1746f9dd4c0fe9
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-14 12:33:40 +0000
+
+    Fixed test 
+
+  Change: bffd8747c4240b4dc810863cff80b27e0b405460
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-14 12:24:39 +0000
+
+    Added qrcode and ticket type 
+
+  Change: 847be8e07b562c1a9151c8bc624b056b46ef27d7
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-14 10:25:19 +0000
+
+    Remove more cruft 
+
+  Change: 7c79e62542feb3ec73c0856ea0b83d8897a84cae
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-12 18:16:50 +0000
+
+    More doc 
+
+  Change: 2f258c31bcc6505cb0feca4d1e538ad859b9707d
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-12 17:00:37 +0000
+
+    Missing dependencies on fresh OS X install 
+
+------------------------------------------
+version 0.002 at 2015-10-12 12:54:27 +0000
+------------------------------------------
+
+  Change: ae9462e611141a90aa12eb570c26d6bdccf93e49
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-12 13:54:27 +0000
+
+    Removed warning 
+
+  Change: 582be3953713ee9a91d43052cda8a41390287a56
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-12 13:44:03 +0000
+
+    Added Moose dependency 
+
+------------------------------------------
+version 0.001 at 2015-10-12 10:52:00 +0000
+------------------------------------------
+
+  Change: f7dbb9a489b2b4deda368db2b275b8f2568ea492
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-12 11:52:00 +0000
+
+    Better doc 
+
+  Change: 36e881f3f943a31eaa92ed7bd8da2cef4978eb35
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-12 11:49:02 +0000
+
+    Nicer doc 
+
+  Change: 0aff9889ab48f0523e0e46284c8ac59c7980c602
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-12 11:47:12 +0000
+
+    Better doc, nicer config 
+
+  Change: 335d094605ce187cc36654cf01ebbccfb81c6d9f
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-12 10:24:55 +0000
+
+    Better latex 
+
+  Change: 433eba83efd03a9b2eb4bf6913c64a9b17825201
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-12 10:17:51 +0000
+
+    Good latex 
+
+  Change: d3894095805c5e526b0b5c8336f4183e73786334
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-09 18:19:53 +0000
+
+    Getting there 
+
+  Change: 00f7fa55e7ed7f2e35eb830e7aa0f0ae58ed926f
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-09 15:07:08 +0000
+
+    Force latex mode 
+
+  Change: 88d94a73a45f74c85834717348a2d02615803da1
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-09 14:46:34 +0000
+
+    First full working LaTeX 
+
+  Change: a55317e2df6395cb779311c93da483e07fad4b20
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-09 12:51:20 +0000
+
+    First running script 
+
+  Change: 1ba9efbba0e3d0864a07bdcb442341d53d8c7b56
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-09 12:48:16 +0000
+
+    Process default template to generate a latex string 
+
+  Change: 342896e00772f74acd4cba6bb5626e1c54a84c8e
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-09 11:40:26 +0000
+
+    Test full config 
+
+  Change: a52f314e610ab5ac6f9b68708da4797754192b3a
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-09 11:33:45 +0000
+
+    Added travis 
+
+  Change: d228546b7fe97d3783d2c4b8eae2d8c5d7c29715
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-09 11:32:40 +0000
+
+    Tested fields and issues fetching 
+
+  Change: 608abdf282dcaf870933b02c3aece6e5565583d8
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-09 11:04:04 +0000
+
+    Build jira client object 
+
+  Change: a3eb8c67b9001d892c6891b3ea5cab8fbc7b3119
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-09 10:41:02 +0000
+
+    Can read config 
+
+  Change: 7d8a1269cc2585da719de271fc53895d160ac59c
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-09 10:16:39 +0000
+
+    Can build 
+
+  Change: 19b6abb4e9a9161da0b623cbdeb738ef57857a53
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-09 10:11:02 +0000
+
+    Inception 
+
+================
+End of releases.
+================

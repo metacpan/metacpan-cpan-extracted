@@ -1,0 +1,36 @@
+Revision history for App-ParseNetstat
+
+0.14    2016-10-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention Parse::Netstat.
+
+
+0.13    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD rendering.
+
+
+0.12    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.11    2014-12-02 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with Parse::Netstat 0.11.
+
+
+0.10    2014-12-01 (PERLANCAR)
+
+        - First release, split from Parse-Netstat to reduce Parse::Netstat's
+          dependencies.

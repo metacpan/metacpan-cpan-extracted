@@ -1,0 +1,40 @@
+---
+abstract: 'Checkout, watch and upload theme assets for buuilt.it'
+author:
+  - 'Jens Gassmann <jens.gassmann@atomix.de>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Buuilt-CLI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Buuilt::CLI:
+    file: lib/App/Buuilt/CLI.pm
+    version: '0.02'
+requires:
+  AnyEvent: '0'
+  AnyEvent::Filesys::Notify: '0'
+  Archive::Zip: '0'
+  EV: '0'
+  Mojo::Asset::File: '0'
+  Mojo::UserAgent: '0'
+  Moo: '0'
+  Path::Class: '0'
+  perl: '5.008001'
+version: '0.02'

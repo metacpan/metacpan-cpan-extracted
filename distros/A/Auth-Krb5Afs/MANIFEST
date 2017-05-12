@@ -1,0 +1,8 @@
+authkrb5afs
+authkrb5afs.pod
+Changes
+Krb5Afs.pm
+Makefile.PL
+MANIFEST
+README
+test.pl

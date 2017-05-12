@@ -1,0 +1,63 @@
+{
+   "abstract" : "Simple Wx-based GUI wrapper for ChordPro.",
+   "author" : [
+      "Johan Vromans <jvromans@squirrel.nl>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown",
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Music-ChordPro-Wx",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "lib/App/Music/ChordPro/Wx"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Music::ChordPro" : "0.70",
+            "Wx" : "0.9912"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Music::ChordPro::Wx" : {
+         "file" : "lib/App/Music/ChordPro/Wx.pm",
+         "version" : "0.74"
+      },
+      "wxchordpro" : {
+         "file" : "script/wxchordpro",
+         "version" : "0.74"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.chordpro.org"
+   },
+   "version" : "0.74",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

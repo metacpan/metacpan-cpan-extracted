@@ -1,0 +1,60 @@
+
+0.31 Thu 25 Nov 2010 03:58:47 PM CST
+
+  * doc update
+
+0.3 Wed 24 Nov 2010 01:32:10 AM CST
+
+  * new cascading attribute for subcommands. thanks to @shelling++.
+
+0.2 Tue 23 Nov 2010 10:51:32 PM CST
+
+  * New Feature: Cascading Subcommand
+  * Deprecated Feature: Long Option Subcommand (still work)
+  * Abundant DOCs
+
+0.103 - Mon 25 Oct 2010 12:08:58 AM CST
+
+  * Release
+
+0.102 - Wed 20 Oct 2010 02:02:56 AM JST
+
+  * Re-upload
+
+0.10 - 19 Oct 2010
+
+  * Update document
+
+0.09 - 17 Oct 2010
+
+  * Fix the command pattern used in help.
+
+* 0.08 - 25 Feb 2009
+
+  * Allow commands to be provided as inner packages
+
+* 0.07 - 24 Nov 2006
+
+  * Don't use Carp without actually loading it.
+
+* 0.06 - 30 Jun 2006
+
+  * Really fix signatures.
+
+* 0.05 - 5 Jun 2006
+
+  * Fix signatures.
+
+* 0.04 - 11 Apr 2006
+
+  * Delay loading Pod::Simple::Text.
+
+* 0.03 - 27 Dec 2005
+
+  * Forgot to bundle Command::Help.
+
+* 0.02 - 25 Dec 2005
+
+  * Factored out Help system from SVK
+  * Factored out more command base stuff from SVK
+  (Thanks to Alex Vandiver)

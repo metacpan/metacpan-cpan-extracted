@@ -1,0 +1,40 @@
+Revision history for Perl extension App::derived
+
+0.10    Wed Feb 20 16:21:34 2013
+        - skips delayed commands. do not busy loop
+
+0.09    Wed Feb 20 1:09:31 2013
+        - use relative "bash" path instead of absolute path.
+          some *BSD system install bash to /usr/bin or other
+
+0.08    Tue Feb 19 9:51:33 2013
+        - lower compatibility
+          If no plugins are loaded, Memcached plugins will be loaded by default
+
+0.07    Tue Feb 19 00:58:26 2013
+        - requires LWP
+        - supports prefix in GrowthForecast
+
+0.06    Tue Feb 19 00:34:03 2013
+        - supports match_key in GrowthForecast
+        - generates unique tagname for plugins
+
+0.05    Mon Feb 18 17:24;02 2013
+        - [IMPORTANT] imcompatible change
+          Changed command options of derived
+          Added Pluggable system. New plugins are Memcached, GrowthForecast and Dumper.
+
+0.04    Thu Feb 14 11:28:37 2013
+        - randomize timing of starting command worker
+        - stopped use preforking server
+        - can get last values with ':latest' suffix
+
+0.03    Tue Feb 12 23:32:27 2013
+        - initialize persec with 0E0.
+          IF there is no previous data to calculate rate, the server returns "0E0"
+
+0.02    Tue Feb 12 11:31:57 2013
+        - requires '/bin/bash'
+
+0.01    Thu Feb  7 09:52:05 2013
+        - original version

@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4ee622ca2b2e172a14fa57c29be9096653d2a6b4 Changes
+SHA1 00eaadb414014cf623faad51905546663627c204 MANIFEST
+SHA1 43019d2a9c4a238d556f2fc22d8654cc178e2e13 MANIFEST.SKIP
+SHA1 0cfc5e87799d572c6cd6434aaa6bfecca9514b3f Makefile.PL
+SHA1 fdc0be334ed478ce0a23512f1a7354184561e5b7 README
+SHA1 89f7c56763b2ad4a212546f7fda1fa01cafb6d59 bin/selenium-rc
+SHA1 0bb5ddbe64424d40536acdee2f09e853ab39087d inc/Module/AutoInstall.pm
+SHA1 e28cf2d3ba35f6ca3a448acc7bee191b7c390379 inc/Module/Install.pm
+SHA1 d7013668911c86af441cad115b897fc675a472de inc/Module/Install/AutoInstall.pm
+SHA1 e7c1c86f57b6778f4bdc7fd8c1b950e60ef41bc0 inc/Module/Install/Base.pm
+SHA1 e1829448769445cdaac384a888bf9ccf42e0d89a inc/Module/Install/Can.pm
+SHA1 70aa5e2055e8e38b4eecc5fc8c91762c0e97f551 inc/Module/Install/Fetch.pm
+SHA1 8d88f2cb120f2e64f374136df2e25d0bb6f0595b inc/Module/Install/Include.pm
+SHA1 8ac832baf4f9e8e72d3e8f103cee6e8a94ac80e1 inc/Module/Install/Makefile.pm
+SHA1 0807e79d6dbfda4fcd3db0fc7df2e33e0cba263b inc/Module/Install/Metadata.pm
+SHA1 567fde53d9f24db2ab823d1031dec5e48f55def6 inc/Module/Install/Scripts.pm
+SHA1 4da0a1fce2339cc3f8c296c7716480d2564d9470 inc/Module/Install/Win32.pm
+SHA1 9a903a1d178954ad864c7dcc98f9fa5c005d1553 inc/Module/Install/WriteAll.pm
+SHA1 b83458ef73586e38ba4efef5a7c36e1bd1977171 lib/Alien/SeleniumRC.pm
+SHA1 2d6e593b3db4aed0b43d4b7532a6248b05963fda lib/Alien/SeleniumRC/selenium-server.jar
+SHA1 c7df99a51d63cb56ebc44e29d69f87468e861c6a t/script.t
+SHA1 f7394488f7cd7b10fce0a3e8c00e1739ee5d514f t/seleniumrc.t
+SHA1 e419c115df69d398e4012edc109cb4fdba035dc8 t/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.17 (Darwin)
+Comment: GPGTools - http://gpgtools.org
+
+iQEcBAEBAgAGBQJVyEfxAAoJEHnWMYF0kUHvWHMH/R//zJHWI8cuRaW5FCPpcpv6
+JE9EzN4OurPE21iix4YY5e+6Ls9kk0hS69IZH7F4hg+a81KIQdYG60ucO0LeLbpp
+E+/FyrRI11zLQENtnKeflhcrQe9ctmKW+ii6JlbrrNjhHrpY8Jmk8OW1ue8AJk8S
+nWlgGpOytFQ9GXcmOW8drlLQMNZwg0oN4nPOUvWg0PxNAhTTKR6iiGyAIGomgTXL
+lSktVgBxp79Ur7U8Dj7asYcB6mknG78BIz41Obvnya/X4w0fsgo6VMn3DwY818fH
+vBohUJLD+7f4tbOrBwNNlpDI7C8j+cePWOuxNyh3FTUX3S8R6dFCrGMDWhA82k0=
+=nraU
+-----END PGP SIGNATURE-----

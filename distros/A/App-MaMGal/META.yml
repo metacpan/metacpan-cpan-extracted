@@ -1,0 +1,45 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-MaMGal
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Cwd: 0
+  Exception::Class: 0
+  Fcntl: 0
+  File::Basename: 0
+  File::Temp: 0
+  File::stat: 0
+  FileHandle: 0
+  HTML::Entities: 0
+  Image::EXIF::DateTime::Parser: 0
+  Image::ExifTool: 0
+  Image::Info: 0
+  Image::Magick: 0
+  Locale::gettext: 0
+  POSIX: 0
+  Scalar::Util: 0
+  Test::Class: 0
+  Test::Exception: 0
+  Test::Files: 0
+  Test::HTML::Content: 0
+  Test::MockObject: 0
+  Test::More: 0
+  Test::Warn: 0
+  URI::file: 0
+version: 1.6

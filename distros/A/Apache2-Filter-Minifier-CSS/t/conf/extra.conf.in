@@ -1,0 +1,87 @@
+PerlSwitches -w
+LogLevel debug
+DirectoryIndex test.css
+
+<Location />
+    PerlSetVar              CssMinifier     CSS::Minifier
+</Location>
+
+Alias /raw @DocumentRoot@
+<Location /raw>
+    PerlOutputFilterHandler Apache2::Filter::Minifier::CSS
+</Location>
+
+<Location /mimetypes/single>
+    SetHandler              modperl
+    PerlResponseHandler     MY::PlainHandler
+    PerlOutputFilterHandler Apache2::Filter::Minifier::CSS
+    PerlAddVar              CssMimeType text/plain
+</Location>
+
+<Location /mimetypes/multiple>
+    SetHandler              modperl
+    PerlResponseHandler     MY::PlainHandler
+    PerlOutputFilterHandler Apache2::Filter::Minifier::CSS
+    PerlAddVar              CssMimeType application/octet-stream
+    PerlAddVar              CssMimeType text/plain
+</Location>
+
+<Location /content-type/charset>
+    SetHandler              modperl
+    PerlResponseHandler     MY::CharsetHandler
+    PerlOutputFilterHandler Apache2::Filter::Minifier::CSS
+</Location>
+
+<Location /content-type/missing>
+    SetHandler              modperl
+    PerlResponseHandler     MY::NoCTypeHandler
+    PerlOutputFilterHandler Apache2::Filter::Minifier::CSS
+    DefaultType             text/missing
+</Location>
+
+<Location /decline_uc>
+    SetHandler              modperl
+    PerlResponseHandler     MY::PlainHandler
+    PerlOutputFilterHandler Apache2::Filter::Minifier::CSS MY::UpperCase
+</Location>
+
+<Location /dynamic/plain>
+    SetHandler              modperl
+    PerlResponseHandler     MY::PlainHandler
+    PerlOutputFilterHandler Apache2::Filter::Minifier::CSS
+</Location>
+
+<Location /dynamic/css>
+    SetHandler              modperl
+    PerlResponseHandler     MY::CSSHandler
+    PerlOutputFilterHandler Apache2::Filter::Minifier::CSS
+</Location>
+
+Alias /cgi-bin @ServerRoot@/cgi-bin
+<Location /cgi-bin>
+    SetHandler              cgi-script
+    PerlOutputFilterHandler Apache2::Filter::Minifier::CSS
+    Options                 +ExecCGI
+</Location>
+
+Alias /perl-bin @ServerRoot@/perl-bin
+<Location /perl-bin>
+    SetHandler              perl-script
+    PerlResponseHandler     ModPerl::Registry
+    PerlOutputFilterHandler Apache2::Filter::Minifier::CSS
+    Options                 +ExecCGI
+</Location>
+
+<Location /explicit/pp>
+    SetHandler              modperl
+    PerlResponseHandler     MY::CSSHandler
+    PerlOutputFilterHandler Apache2::Filter::Minifier::CSS
+    PerlSetVar              CssMinifier     CSS::Minifier
+</Location>
+
+<Location /explicit/xs>
+    SetHandler              modperl
+    PerlResponseHandler     MY::CSSHandler
+    PerlOutputFilterHandler Apache2::Filter::Minifier::CSS
+    PerlSetVar              CssMinifier     CSS::Minifier::XS
+</Location>

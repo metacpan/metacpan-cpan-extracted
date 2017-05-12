@@ -1,0 +1,12 @@
+ChangeLog
+lib/Astro/Telescope.pm
+t/mpc.t
+t/pal.t
+t/simple.t
+Build.PL
+MANIFEST
+README
+tmpl/MPC.dat
+tmpl/README
+META.yml
+META.json

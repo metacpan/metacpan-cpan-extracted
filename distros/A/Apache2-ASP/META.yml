@@ -1,0 +1,40 @@
+--- #YAML:1.0
+name:               Apache2-ASP
+version:            2.46
+abstract:           ASP for Perl, reloaded.
+author:
+    - John Drago <jdrago_999@yahoo.com>
+license:            artistic
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    CGI::Apache2::Wrapper:  0.215
+    CGI::Simple:          1.106
+    Cwd:                  3.2701
+    Data::Properties::YAML:  0.02
+    DBD::SQLite:          1.14
+    DBI:                  1.607
+    Digest::MD5:          2.36
+    HTML::Form:           5.817
+    HTTP::Body:           1.04
+    HTTP::Date:           5.81
+    HTTP::Request::AsCGI:  0.5
+    Ima::DBI:             0.35
+    IO::File:             1.14
+    Mail::Sendmail:       0.79
+    MIME::Types:          1.24
+    Storable:             2.18
+    Test::Memory::Cycle:  1.04
+    Test::More:           0.84
+    Time::HiRes:          1.9715
+    XML::Parser:          2.36
+    XML::Simple:          2.18
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

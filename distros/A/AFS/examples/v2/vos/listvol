@@ -1,0 +1,189 @@
+#!/usr/local/bin/perl
+
+use v5.10.0;
+use blib;
+use strict;
+use warnings;
+
+use AFS::VOS;
+use Time::localtime;
+use Scalar::Util qw(looks_like_number);
+
+my ($vos, $server, $part, $fast, $extend, $Debugging, $long, $shift);
+
+$Debugging = 0;
+$long      = 0;
+$shift     = 0;
+
+if (defined @ARGV and $ARGV[0] eq '-d') { $Debugging = 1; $shift++; }
+if (defined @ARGV and $ARGV[0] eq '-l') { $long      = 1; $shift++; }
+$shift && shift;
+die "Usage: $0 server [partition [fast [extended]]]\n" if $#ARGV < 0;
+
+$server = shift;
+$part   = shift // '';
+$fast   = shift // 0;
+$extend = shift // 0;
+
+if (defined $fast   and !looks_like_number($fast))   { warn "$0: FAST is not an INTEGER ...\n"; }
+else                                                 { $fast = int($fast); }
+if (defined $extend and !looks_like_number($extend)) { warn "$0: EXTENDED is not an INTEGER ...\n"; }
+else                                                 { $extend = int($extend); }
+
+$vos = AFS::VOS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+my $partlist = $vos->listvol($server, $part, $fast, $extend);
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+if    ($fast)      { print_fast($partlist); }
+elsif ($extend)    { print_ext($partlist); }
+elsif ($Debugging) { print_debug($partlist); }
+elsif ($long)      { print_long($partlist); }
+else { print_default($partlist); }
+
+sub print_fast {
+    my $partlist = shift;
+
+    my $totvol = 0;
+    foreach my $part (sort keys %$partlist) {
+        foreach my $vol (sort keys %{$partlist->{$part}}) {
+            if    ($vol =~ /totalBusy/)  { next; }
+            elsif ($vol =~ /totalNotOK/) { next; }
+            $totvol++;
+            if ($vol !~ /total/) {
+                foreach my $key (sort keys %{$partlist->{$part}->{$vol}}) {
+                    print "$partlist->{$part}->{$vol}->{$key}\n";
+                }
+            }
+        }
+    }
+    print "Total number of volumes on server $server partition /vicep$part: $totvol \n";
+}
+
+sub print_ext {
+    my $partlist = shift;
+
+    foreach my $part (sort keys %$partlist) {
+        print "Partition $part:\n";
+        foreach my $vol (sort keys %{$partlist->{$part}}) {
+            if ($vol !~ /total/) {
+                if ($vol =~ /volume_busy/)  {
+                    print "\t**** Volume $partlist->{$part}->{$vol}->{volid} is busy **** \n";
+                }
+                elsif ($vol =~ /volume_notok/) {
+                    print "\t**** Could not attach volume $partlist->{$part}->{$vol}->{volid} **** \n";
+                }
+                else {
+                    print "\t$vol:\n";
+                }
+                foreach my $key (sort keys %{$partlist->{$part}->{$vol}}) {
+                    if ($key =~ /(Reads|Writes|>1wk|1day-1wk|1hr-1day|10min-1hr|1-10min|0-60sec)/) {
+                        print "\t\tKey $key:\n";
+                        foreach (sort keys %{$partlist->{$part}->{$vol}->{$key}}) {
+                            print "\t\t\tKey: $_, Value: $partlist->{$part}->{$vol}->{$key}->{$_}\n";
+                        }
+                    }
+                    elsif ($key =~ /(updateDate|creationDate)/) {
+                        print "\t\tKey: $key, Value: ", ctime($partlist->{$part}->{$vol}->{$key}), "\n";
+                    }
+                    else {
+                        print "\t\tKey: $key, Value: $partlist->{$part}->{$vol}->{$key}\n";
+                    }
+                }
+                print "\n";
+            }
+        }
+        print "\ttotalOK: $partlist->{$part}->{' totalOK'}\n";
+        print "\ttotalBusy: $partlist->{$part}->{' totalBusy'}\n";
+        print "\ttotalNotOK: $partlist->{$part}->{' totalNotOK'}\n";
+    }
+}
+
+sub print_long {
+    my $partlist = shift;
+
+    foreach my $part (sort keys %$partlist) {
+        print "$part:\n";
+        foreach my $vol (sort keys %{$partlist->{$part}}) {
+            if ($vol !~ /total/) {
+                if ($vol =~ /volume_busy/)  {
+                    print "\t**** Volume $partlist->{$part}->{$vol}->{'volid'} is busy **** \n";
+                }
+                elsif ($vol =~ /volume_notok/) {
+                    print "\t**** Could not attach volume $partlist->{$part}->{$vol}->{'volid'} **** \n";
+                }
+                else {
+                    print "\t$vol:\n";
+                }
+                foreach my $key (sort keys %{$partlist->{$part}->{$vol}}) {
+                    if ($key =~ /(updateDate|creationDate)/) {
+                        printf "\t\t%-12s: %s\n", $key, ctime($partlist->{$part}->{$vol}->{$key});
+                    }
+                    else {
+                        printf "\t\t%-12s: %s\n", $key, $partlist->{$part}->{$vol}->{$key};
+                    }
+                }
+                print "\n";
+            }
+        }
+        print "\ttotalOK: $partlist->{$part}->{' totalOK'}\n";
+        print "\ttotalBusy: $partlist->{$part}->{' totalBusy'}\n";
+        print "\ttotalNotOK: $partlist->{$part}->{' totalNotOK'}\n";
+    }
+}
+
+sub print_default {
+    my $partlist = shift;
+
+    my $totvol = 0;
+    foreach my $part (sort keys %$partlist) {
+        print "List of volumes on server $server Partition $part: \n";
+        foreach my $vol (sort keys %{$partlist->{$part}}) {
+            if    ($vol =~ /totalOK/)      { next; }
+            elsif ($vol =~ /totalBusy/)    { next; }
+            elsif ($vol =~ /totalNotOK/)   { next; }
+            elsif ($vol =~ /volume_busy/)  {
+                print "**** Volume $partlist->{$part}->{$vol}->{'volid'} is busy **** \n";
+                next;
+            }
+            elsif ($vol =~ /volume_notok/) {
+                print "**** Could not attach volume $partlist->{$part}->{$vol}->{'volid'} **** \n";
+                next;
+            }
+            else { $totvol++; printf "%-30s ", $vol; }
+            print "  $partlist->{$part}->{$vol}->{'volid'}";
+            print "  $partlist->{$part}->{$vol}->{'type'}";
+            printf "  %10s K", $partlist->{$part}->{$vol}->{'size'};
+            print "  $partlist->{$part}->{$vol}->{'inUse'}";
+            print "\n";
+#             foreach (keys %{$partlist->{$part}->{$vol}}) {
+#                 print "\t\tKey: $_, Value: $partlist->{$part}->{$vol}->{$_}\n";
+#             }
+        }
+        print "\nTotal volumes onLine $partlist->{$part}->{' totalOK'} ;";
+        print "\tTotal volumes offLine $partlist->{$part}->{' totalNotOK'} ;";
+        print "\tTotal busy $partlist->{$part}->{' totalBusy'} \n";
+    }
+}
+
+sub print_debug {
+    my $partlist = shift;
+
+    foreach my $part (sort keys %$partlist) {
+        print "$part:\n";
+        foreach my $vol (sort keys %{$partlist->{$part}}) {
+            if ($vol =~ /total/) {
+                print "\t$vol: $partlist->{$part}->{$vol}\n";
+            }
+            else {
+                print "\t$vol:\n";
+                foreach (sort keys %{$partlist->{$part}->{$vol}}) {
+                    print "\t\tKey: $_, Value: $partlist->{$part}->{$vol}->{$_}\n";
+                }
+            }
+        }
+    }
+    print "\n\n";
+
+}

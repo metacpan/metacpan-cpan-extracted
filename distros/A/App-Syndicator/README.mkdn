@@ -1,0 +1,52 @@
+# NAME
+
+App::Syndicator
+
+# VERSION
+
+version 0.0061
+
+# NAME
+
+App::Syndicator - Curses interface for reading feeds.
+
+# USAGE
+
+ # first run
+ $ syndicator --init
+
+ # add your own feeds
+ $ vim ~/.syndicator/config.json 
+
+ # run
+ $ syndicator 2> errors.log
+
+ $ syndicator --config=config.any --db=sqlite.db
+
+## EXAMPLE CONFIG
+
+ {
+    "sources": [
+            "http://blogs.perl.org/atom.xml",
+            "http://www.perl.org/pub/atom.xml",
+            "http://planet.perl.org/rss20.xml",
+            "http://ironman.enlightenedperl.org/atom.xml",
+            "http://rss.slashdot.org/Slashdot/slashdot",
+            "http://www.theregister.co.uk/software/headlines.atom"
+    ]
+}
+
+# SEE ALSO
+
+[XML::Feed::Aggregator](http://search.cpan.org/perldoc?XML::Feed::Aggregator)
+
+# AUTHOR
+
+Robin Edwards <robin.ge@gmail.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Robin Edwards.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

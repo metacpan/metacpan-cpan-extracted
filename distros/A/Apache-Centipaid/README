@@ -1,0 +1,96 @@
+Apache::Centipaid Version 1.3.1
+Author: Adonis El Fakih (me@centipaid.com)
+
+Introudction
+============
+
+Apache::Centipaid
+-----------------
+This is the perl centipaid micro payment module as an apache add-on.  It runs 
+on any Apache web server with mod_perl support. It allows content providers 
+to collect small transaction fees as payment for accessing  parts of 
+their website.  The module checks for payment in the URL or HTTP header 
+information, and grants or declines access to the paid content.  Declined
+connections are forwarded to centipaid's payment gateway to make the requiered
+payment, and they are checked for autheticity when the payment has been 
+completed.
+
+The module also keeps track of payments and grants access to returning users
+that are permitted to access the paid sections for a pre-determined amount 
+of time.
+
+Centipaid.com
+-------------
+Centipaid.com provides a complete micro payment solution to content providers 
+wishing to charge their customers nominal fees for accessing their online 
+resources.  For example, a site could charge customers $1 to use their search 
+facility for seven days, and $0.05 to access a public forum for one day, without 
+having to redesign their website, or integrate complex subscription applications. 
+
+Apache::Centipaid allows content and service providers to seamlessly accept 
+micro payments from online visitors without changing their website design.  
+The micro payment system relies on specially designed internet stamps which 
+are used by their visitors to make payments online quickly and securely. Paying 
+with an Internet stamp is secure and easy, there are no usernames, or 
+password to enter.  No financial or personal information is used or transmitted 
+while making a payment.  When paying with an internet stamp, a user only provides 
+the stamp itself. There is no need to provide a credit card number or any other 
+form of identification
+
+Internet stamps
+---------------
+Internet stamps are specially crafted electronic images containing encrypted 
+information required for clearing payments through Centipaid. The stamps are 
+assembled using our patent-pending process to create steganographically encrypted 
+stamps used in making secure and anonymous micro payments online.
+
+Each internet stamp is unique from an electronic point of view, having an 
+individual serial number.  Each one is treated as a virtual pre-paid card and 
+is uploaded to Centipaid whenever payment is requested.  This parallels the 
+swiping of a credit cards through a card reader at a physical store location.  
+By uploading the stamp, there is no need to remember, enter, or jot down 
+usernames, passwords, or credit card numbers. 
+
+Latest Version
+==============
+Please check for the latest version of this software for important fixes and
+added features at http://www.centipaid.com/download/apache_centipaid.html
+
+Support
+=======
+Centipaid maintains current support issues in the Knowledgebase at 
+http://www.centipaid.com/faq/ and the support forums at
+http://www.centipaid.com/centi/forum/
+
+
+Installation
+============
+To install:
+
+A. Create table in existing database, or create a new database 
+   and table
+
+B. Compile the Apache::Centipaid module
+    cd Apache-Centipaid=x.xx
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+C. Insert configuration in httpd.com or .htaccess
+    Edit either the httpd.conf or htaccess depending
+    on your preference, to refelect the rate you want to 
+    charge for access to your site.  
+    
+    Ideally httpd.conf is used to set a rate for a site
+    or a major part of the site, while .htaccess files 
+    are designed for sites that have many different rates 
+    for different sections, so they can have the desired
+    reseved for paid customers
+
+
+Bugs
+====
+Bugs can be email to <bugs /at/ centipaid . com>
+
+

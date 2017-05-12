@@ -1,0 +1,81 @@
+Revision history for Perl extension App-scan_prereqs_cpanfile
+
+1.03 2015-02-26T08:29:19Z
+
+    - Do not hang on fifo
+      (@powerman)
+
+1.02 2014-07-16T06:47:07Z
+
+    - Added experimental --scan-test-requires option.
+      (songmu)
+
+1.01 2014-05-02T01:33:31Z
+
+    - ignore ./.build/
+
+1.00 2014-04-02T22:49:36Z
+
+    - Make Perl::PrereqScanner::Lite as the default scanner.
+      (moznion)
+
+0.10 2014-03-21T10:14:20Z
+
+    - --fast option
+      (moznion)
+
+0.09 2014-02-26T05:45:47Z
+
+    commit 8b855a107aedf0248fc7b6e42f7a981e3ec0f340
+    Author: HIROSE Masaaki <hirose31@gmail.com>
+    Date:   Wed Feb 26 14:37:58 2014 +0900
+
+        Treat t/(author|release)-*.t as develop files
+
+0.08 2013-06-17T06:28:03Z
+
+    - Do not use /usr/bin/env
+      (Reported by moznion++)
+
+0.07 2013-06-17T04:28:43Z
+
+    - Ignore unix socket
+      (Reported by Songmu++)
+
+0.06 2013-04-26T10:50:13Z
+
+    - Document --ignore option.
+      (tokuhirom)
+    - Ignore `local` directory by default.
+      (tokuhirom)
+
+0.05 2013-04-16T12:30:30Z
+
+    - add 'ignore' option (append ignore dirs)
+      (Kan Fushihara)
+
+0.04 2013-04-04T05:48:20Z
+
+    - Ignore fatlib/ and ignore fatpacked files.
+      (tokuhirom)
+
+0.03 2013-04-04T03:07:39Z
+
+    - Fixed deps: Module::CPANfile 0.9020
+      (Syohei YOSHIDA)
+    - Do not include prereqs determined by 'recommends'
+      (tokuhirom)
+    - Ignore build dir like Dist-Name-0.01/.
+      (tokuhirom)
+
+0.02 2013-04-03T21:03:10Z
+
+    - Documentation enhancements
+    - Added `--include-empty` option
+    - Move `xt/` deps to 'develop' deps instead of 'test' deps.
+    - Ignore eg/, examples/ and share/
+
+0.01 2013-04-03T20:38:35Z
+
+    - original version
+

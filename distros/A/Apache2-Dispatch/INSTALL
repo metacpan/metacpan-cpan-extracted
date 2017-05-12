@@ -1,0 +1,34 @@
+------------------------------------------------------------------------------
+Install Apache::Dispatch for mod_perl 1.
+
+perl Makefile.PL -httpd /path/to/my/httpd
+make && make test && make install
+
+------------------------------------------------------------------------------
+Install Apache2::Dispatch for mod_perl 2.
+
+perl Makefile.PL -httpd /path/to/my/httpd -apxs /path/to/my/apxs
+make && make test && make install
+
+------------------------------------------------------------------------------
+
+Install Apache2::Dispatch explicitly for mod_perl2.
+
+perl Makefile.PL MOD_PERL=2
+make && make test && make install
+
+------------------------------------------------------------------------------
+
+Install Apache::Dispatch explicitly for mod_perl1.
+
+perl Makefile.PL MOD_PERL=1
+make && make test && make install
+
+------------------------------------------------------------------------------
+
+Install Apache::Dispatch explicitly for mod_perl1, using PerlSetVar for
+Dispatch configuration.
+
+export DISPATCH_PUREPERL=1
+perl Makefile.PL MOD_PERL=1
+make && make test && make install

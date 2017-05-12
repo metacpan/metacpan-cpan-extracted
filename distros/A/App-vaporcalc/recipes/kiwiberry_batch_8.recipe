@@ -1,0 +1,28 @@
+{
+   "recipe" : {
+      "target_quantity" : 240,
+      "target_pg" : 30,
+      "notes" : [],
+      "base_nic_per_ml" : 100,
+      "target_vg" : 70,
+      "target_nic_per_ml" : 3,
+      "flavor_array" : [
+         {
+            "percentage" : "4",
+            "tag" : "TFA Double Kiwi",
+            "type" : "PG"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Strawberry Ripe",
+            "percentage" : "3"
+         },
+         {
+            "tag" : "INW Strawberry",
+            "percentage" : "0.5",
+            "type" : "PG"
+         }
+      ],
+      "base_nic_type" : "PG"
+   }
+}

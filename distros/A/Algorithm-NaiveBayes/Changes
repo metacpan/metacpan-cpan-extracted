@@ -1,0 +1,39 @@
+Revision history for Perl extension Algorithm::NaiveBayes.
+
+ - Fixed a runtime error in the Gaussian model - the code died looking
+   for a rescale() function, which I had forgotten to import. [Manju Putcha]
+
+ - Added save_state() and restore_state() methods, which will help
+   consumers (like AI::Categorizer) avoid a pesky "can't find method"
+   error when using a restored model.
+
+0.03  Mon May 17 22:11:00 CDT 2004
+
+ - The double-loop inside the predict() method has been turned
+   inside-out, so that the outer loop is now over the new attributes,
+   rather than over the different labels in the training set.
+
+ - Some internal changes for making customization easier: moved the
+   model-creation code to new internal classes, making it easier to
+   write additional classes that handle model creation differently.
+
+ - Moved some of the numerical utility functions to a
+   Algorithm::NaiveBayes::Util module.
+
+ - We now use sum() and max() from List::Util rather than implementing
+   our own.  The ones in List::Util are considerably faster.
+
+ - Added a copyright and license statement. [Spotted by Alexey Tourbin]
+
+
+0.02  Fri May 23 13:36:48 CDT 2003
+
+ - The do_purge() method was called during training regardless of
+   whether the 'purge' flag was set.  This has been fixed.
+
+
+0.01  Tue Mar 18 18:45:34 2003
+
+ - original version; created by extracting the NaiveBayes code out of
+   AI::Categorizer::Learner::NaiveBayes
+

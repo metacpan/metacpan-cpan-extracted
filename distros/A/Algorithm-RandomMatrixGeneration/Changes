@@ -1,0 +1,36 @@
+Revision history for Perl extension Algorithm::RandomMatrixGeneration.
+
+0.06  Thu Mar 27, 2008
+
+	- Modified Makefile.PL to require Math::BigFloat 1.58
+
+0.05  Tue Mar 25, 2008
+
+	- relaxed Perl version requirement to 5.6
+	- Modified Makefile.PL to better support META.yml
+
+0.04  Wed May 17, 2006
+
+	- Modified the requirement of Perl 5.8.5 to 5.8
+	- Corrected the t/*.t files
+
+0.03  Mon May 15, 2006
+
+	- Handles the case of negative marginals - if a marginal of the 
+	given matrix is negative then generates appropriate positive and 
+	negative cell values such that the marginal of the resultant 
+	row/column is the required negative value.
+
+0.02  Mon Apr 24, 2006
+
+	- Generates real valued matrix only if either of the input 
+	marginals is real valued else generates integer valued matrix.
+
+	- Stores the matrix in sparse format. That is, not every value 
+	of the returned array is defined but only non-zero values are 
+	stored in the matrix.
+
+0.01  Sat Mar 18 20:06:48 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Algorithm::RandomMatrixGeneration
+

@@ -1,0 +1,8 @@
+ChangeLog
+MANIFEST
+Build.PL
+lib/Astro/WaveBand.pm
+t/waveband.t
+README
+META.yml
+META.json

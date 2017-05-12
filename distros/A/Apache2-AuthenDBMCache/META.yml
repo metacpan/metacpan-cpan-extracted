@@ -1,0 +1,20 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache2-AuthenDBMCache
+version:      0.01
+version_from: AuthenDBMCache.pm
+installdirs:  site
+requires:
+    Apache2::Access:               0
+    Apache2::Const:                0
+    Apache2::Log:                  0
+    Apache2::RequestRec:           0
+    Apache2::RequestUtil:          0
+    APR::Table:                    0
+    Carp:                          0
+    Digest::MD5:                   0
+    mod_perl2:                     0
+    strict:                        0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,20 @@
+SYNOPSIS
+
+    See lcpan script.
+
+HISTORY
+
+    This application began as CPAN::SQLite::CPANMeta, an extension of
+    CPAN::SQLite. CPAN::SQLite parses 02packages.details.txt.gz and
+    01mailrc.txt.gz and puts the parse result into a SQLite database.
+    CPAN::SQLite::CPANMeta parses the META.json/META.yml files in
+    individual release files and adds it to the SQLite database.
+
+    In order to simplify things for the users (one-step indexing) and get
+    more freedom in database schema, lcpan skips using CPAN::SQLite and
+    creates its own SQLite database. It also parses
+    02packages.details.txt.gz but does not parse distribution names from it
+    but instead uses META.json and META.yml files extracted from the
+    release files. If no META.* files exist, then it will use the module
+    name.
+

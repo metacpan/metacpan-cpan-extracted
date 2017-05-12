@@ -1,0 +1,17 @@
+ENVIRONMENT
+
+ HTTP_USER_AGENT => str
+
+    Set default for user_agent argument.
+
+SEE ALSO
+
+    Acme::CPANLists
+
+    Some Acme::CPANLists::Import::* modules which utilize this during
+    building: Acme::CPANLists::Import::NEILB,
+    Acme::CPANLists::Import::SHARYANTO, Acme::CPANLists::Import::RSAVAGE,
+    Acme::CPANLists::Import, and so on.
+
+    App::lcpan, lcpan, especially the related-mods subcommand.
+

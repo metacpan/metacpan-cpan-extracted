@@ -1,0 +1,79 @@
+NAME
+    Apache::OneTimeDownload - Tolerant mechanism for expiring downloads
+
+  DESCRIPTION
+    Allows you to distribute files that expire a given time after the first
+    download
+
+  SYNOPSIS
+    In your Apache config:
+
+     PerlModule Apache::OneTimeDownload
+ 
+     <Location /download>
+                    PerlHandle Apache:OneTimeDownload
+                    SetHandler perl-script
+                    PerlSetVar OneTimeDb  /home/sheriff/download_access.db
+                    PerlSetVar OneTimeWindow 3600
+                    PerlSetVar OneTimeDownloadDirectory /home/sheriff/downloads/
+            </Location>
+
+    Example authorize.pl...
+
+            #!/usr/bin/perl
+        
+            use Apache::OneTimeURL;
+        
+            my $file = $ARGV[0];
+            my $comment = $ARGV[1-];
+            my $db = '/opt/secret/access.db'
+
+            print Apache::OneTimeURL::authorize( $db, $comment, $file );
+
+    and then:
+
+     % authorize.pl TopSecret.pdf Given out on IRC...
+     2c61de78edd612cf79c0d73a3c7c94fb
+
+    Which might mean:
+
+            http://www.sheriff.com/download/2c61de78edd612cf79c0d73a3c7c94fb
+
+CONFIG
+  OneTimeDb
+    The location of the DB file where key->file mappings will be kept
+
+  OneTimeWindow
+    The amount of time after a download you wish the file to remain before
+    it expires. An hour is a good sized window...
+
+  OneTimeDownloadDirectory
+    The directory from which you're serving your file downloads - probably
+    not one that's accessible from the web...
+
+&authorize
+    Adds a key to the db. Accepts these arguments, in this order:
+
+  db name
+    Absolute path of the database
+
+  comment
+    Plain text comments about the file
+
+  file
+    Location of the file - this has the download directory stuck at the
+    beginning of it when it comes to download time...
+
+  expires
+    Time in seconds until the file expires before anyone has downloaded it.
+    Defaults to a week.
+
+AUTHOR
+    Pete Sergeant -- "onetimedownload@clueball.com"
+
+COPYRIGHT
+    Copyright 2004 Pete Sergeant.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

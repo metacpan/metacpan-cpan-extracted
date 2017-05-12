@@ -1,0 +1,60 @@
+NAME
+    Acme::CPANAuthors::Indonesian - We are Indonesian CPAN authors (Kami
+    para penulis CPAN Indonesia)
+
+VERSION
+    This document describes version 0.04 of Acme::CPANAuthors::Indonesian
+    (from Perl distribution Acme-CPANAuthors-Indonesian), released on
+    2014-09-09.
+
+SYNOPSIS
+       use Acme::CPANAuthors;
+       use Acme::CPANAuthors::Indonesian;
+
+       my $authors = Acme::CPANAuthors->new('Indonesian');
+
+       my $number   = $authors->count;
+       my @ids      = $authors->id;
+       my @distros  = $authors->distributions('HASANT');
+       my $url      = $authors->avatar_url('EDPRATOMO');
+       my $kwalitee = $authors->kwalitee('SHARYANTO');
+
+DESCRIPTION
+    This class is used to provide a hash of Indonesian CPAN author's PAUSE
+    id/name to Acme::CPANAuthors.
+
+MAINTENANCE
+    If you are an Indonesian CPAN author not listed here, please send me
+    your id/name via email or RT so we can always keep this module up to
+    date. If there's a mistake and you're listed here but are not Indonesian
+    (or just don't want to be listed), sorry for the inconvenience: please
+    contact me and I'll remove the entry right away.
+
+SEE ALSO
+    Acme::CPANAuthors - Main class to manipulate this one
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANAuthors-Indonesian>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANAuthors-Indonesian>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANAuthors-Indo
+    nesian>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

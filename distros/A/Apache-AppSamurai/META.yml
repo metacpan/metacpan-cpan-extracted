@@ -1,0 +1,70 @@
+---
+name: Apache-AppSamurai
+version: 1.01
+author:
+  - 'Paul M. Hirsch <paul@voltagenoir.org>'
+abstract: Web application/reverse proxy authenticating front end
+license: perl
+resources:
+  MailingList: mailto:appsamurai-misc@lists.sourceforge.net
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Apache-AppSamurai
+  homepage: http://appsamurai.sourceforge.net
+  license: http://dev.perl.org/licenses/
+requires:
+  Apache::Request: 0
+  Apache::Session: 0
+  CGI::Cookie: 0
+  Carp: 0
+  Crypt::CBC: 2.17
+  Digest::SHA: 0
+  MIME::Base64: 0
+  Storable: 0
+  Test::More: 0
+  Time::HiRes: 0
+  URI: 0
+  mod_perl: 1.07
+recommends:
+  Apache::Test: 0
+  Authen::Radius: 0
+  Authen::Simple: 0
+  Crypt::Blowfish: 0
+  Crypt::OpenSSL::AES: 0
+  Crypt::Rijndael: 0
+  Crypt::Twofish: 0
+  HTTP::Request: 0
+  LWP::UserAgent: 0
+provides:
+  Apache::AppSamurai:
+    file: lib/Apache/AppSamurai.pm
+    version: 1.01
+  Apache::AppSamurai::AuthBase:
+    file: lib/Apache/AppSamurai/AuthBase.pm
+    version: 1.15
+  Apache::AppSamurai::AuthBasic:
+    file: lib/Apache/AppSamurai/AuthBasic.pm
+    version: 1.18
+  Apache::AppSamurai::AuthRadius:
+    file: lib/Apache/AppSamurai/AuthRadius.pm
+    version: 1.15
+  Apache::AppSamurai::AuthSimple:
+    file: lib/Apache/AppSamurai/AuthSimple.pm
+    version: 1.2
+  Apache::AppSamurai::Session:
+    file: lib/Apache/AppSamurai/Session.pm
+    version: 1.9
+  Apache::AppSamurai::Session::Generate::HMAC_SHA:
+    file: lib/Apache/AppSamurai/Session/Generate/HMAC_SHA.pm
+    version: 1.9
+  Apache::AppSamurai::Session::Serialize::CryptBase64:
+    file: lib/Apache/AppSamurai/Session/Serialize/CryptBase64.pm
+    version: 1.18
+  Apache::AppSamurai::Tracker:
+    file: lib/Apache/AppSamurai/Tracker.pm
+    version: 1.11
+  Apache::AppSamurai::Util:
+    file: lib/Apache/AppSamurai/Util.pm
+    version: 1.21
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,47 @@
+<form id="<: $context :>_org_form">
+
+<table align="center">
+	<tr>
+		<td align="center" colspan="2"><span class="blue_centered"><: $ucfirst_context :> organization</span></td>
+	</tr>
+	<tr>
+		<td>Name</td><td><input type="text" id="<: $context :>_org_name" size="40" value="<: $name :>"></td>
+	</tr>
+</table>
+
+<br>
+<: $phone_field :>
+<br>
+<: $email_field :>
+<br>
+
+<table align="center">
+	<tr>
+		<td>Homepage</td><td><input type="text" id="<: $context :>_org_homepage" size="40" value="<: $homepage :>"></td>
+		<td>Role</td><td><: $roles :></td>
+	</tr>
+	<tr>
+		<td>Facebook tag</td><td><input type="text" id="<: $context :>_org_facebook_tag" size="40" value="<: $facebook_tag :>"></td>
+		<td>Twitter tag</td><td><input type="text" id="<: $context :>_org_twitter_tag" size="40" value="<: $twitter_tag :>"></td>
+	</tr>
+	<tr>
+		<td>Visibility</td><td><: $visibility_id :></td>
+		<td>Contact via</td><td><: $communication_type_id :></td>
+	</tr>
+</table>
+
+<hr>
+
+<table align="center" width="100%">
+	<tr>
+		<td align="center"><span id="<: $context :>_org_button"><: $ucfirst_context :></span></td>
+		: if $context == "update" {
+		<td align="center"><span id="delete_org_button">Delete</span></td>
+		: }
+		<td align="center"><input id="reset_<: $context :>_org_button" type="reset" value="Reset"></td>
+	</tr>
+</table>
+
+<input type="hidden" id="<: $context :>_org_id" value="<: $org_id :>">
+<input type="hidden" id="<: $context :>_org_sid" value="<: $sid :>">
+</form>

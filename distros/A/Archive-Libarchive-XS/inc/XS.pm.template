@@ -1,0 +1,345 @@
+package Archive::Libarchive::XS;
+
+use strict;
+use warnings;
+use Encode qw( decode );
+
+# note: this file is generated, the original
+# template comes with the dist in
+#  inc/XS.pm.template
+
+BEGIN {
+
+# ABSTRACT: Perl bindings to libarchive via XS
+# VERSION
+
+  unless($^O eq 'MSWin32')
+  {
+    require Alien::Libarchive;
+    Alien::Libarchive->import;
+  }
+
+  require XSLoader;
+  XSLoader::load('Archive::Libarchive::XS', $VERSION);
+
+}
+
+=head1 SYNOPSIS
+
+list archive filenames
+
+ use Archive::Libarchive::XS qw( :all );
+ 
+ my $archive = archive_read_new();
+ archive_read_support_filter_all($archive);
+ archive_read_support_format_all($archive);
+ # example is a tar file, but any supported format should work
+ # (zip, iso9660, etc.)
+ archive_read_open_filename($archive, 'archive.tar', 10240);
+ 
+ while(archive_read_next_header($archive, my $entry) == ARCHIVE_OK)
+ {
+   print archive_entry_pathname($entry), "\n";
+   archive_read_data_skip($archive);
+ }
+ 
+ archive_read_free($archive);
+
+extract archive
+
+ use Archive::Libarchive::XS qw( :all );
+ 
+ my $archive = archive_read_new();
+ archive_read_support_filter_all($archive);
+ archive_read_support_format_all($archive);
+ my $disk = archive_write_disk_new();
+ archive_write_disk_set_options($disk, 
+   ARCHIVE_EXTRACT_TIME   |
+   ARCHIVE_EXTRACT_PERM   |
+   ARCHIVE_EXTRACT_ACL    |
+   ARCHIVE_EXTRACT_FFLAGS
+ );
+ archive_write_disk_set_standard_lookup($disk);
+ archive_read_open_filename($archive, 'archive.tar', 10240);
+ 
+ while(1)
+ {
+   my $r = archive_read_next_header($archive, my $entry);
+   last if $r == ARCHIVE_EOF;
+   
+   archive_write_header($disk, $entry);
+   
+   while(1)
+   {
+     my $r = archive_read_data_block($archive, my $buffer, my $offset);
+     last if $r == ARCHIVE_EOF;
+     archive_write_data_block($disk, $buffer, $offset);
+   }
+ }
+ 
+ archive_read_close($archive);
+ archive_read_free($archive);
+ archive_write_close($disk);
+ archive_write_free($disk);
+
+write archive
+
+ use File::stat;
+ use File::Slurp qw( read_file );
+ use Archive::Libarchive::XS qw( :all );
+ 
+ my $archive = archive_write_new();
+ # many other formats are supported ...
+ archive_write_set_format_pax_restricted($archive);
+ archive_write_open_filename($archive, 'archive.tar');
+ 
+ foreach my $filename (@filenames)
+ {
+   my $entry = archive_entry_new();
+   archive_entry_set_pathname($entry, $filename);
+   archive_entry_set_size($entry, stat($filename)->size);
+   archive_entry_set_filetype($entry, AE_IFREG);
+   archive_entry_set_perm($entry, 0644);
+   archive_write_header($archive, $entry);
+   archive_write_data($archive, scalar read_file($filename));
+   archive_entry_free($entry);
+ }
+ archive_write_close($archive);
+ archive_write_free($archive);
+
+=head1 DESCRIPTION
+
+This module provides a functional interface to libarchive.  libarchive is a
+C library that can read and write archives in a variety of formats and with a 
+variety of compression filters, optimized in a stream oriented way.  A familiarity
+with the libarchive documentation would be helpful, but may not be necessary
+for simple tasks.  The documentation for this module is split into four separate
+documents:
+
+=over 4
+
+=item L<Archive::Libarchive::XS>
+
+This document, contains an overview and some examples.
+
+=item L<Archive::Libarchive::XS::Callback>
+
+Documents the callback interface, used for customizing input and output.
+
+=item L<Archive::Libarchive::XS::Constant>
+
+Documents the constants provided by this module.
+
+=item L<Archive::Libarchive::XS::Function>
+
+The function reference, includes a list of all functions provided by this module.
+
+=back
+
+If you are linking against an older version of libarchive, some functions
+and constants may not be available.  You can use the C<can> method to test if
+a function or constant is available, for example:
+
+ if(Archive::Libarchive::XS->can('archive_read_support_filter_grzip')
+ {
+   # grzip filter is available.
+ }
+ 
+ if(Archive::Libarchive::XS->can('ARCHIVE_OK'))
+ {
+   # ... although ARCHIVE_OK should always be available.
+ }
+
+=cut
+
+sub _define_constant ($) {
+  my($name) = @_;
+  my $value = eval { _constant($name) };
+  return if $@;
+  eval qq{ sub $name() { $value }; 1 };
+}
+
+require Archive::Libarchive::XS::Callback;
+require Archive::Libarchive::XS::Common;
+% foreach my $name (@$pathtypes) {
+
+sub archive_entry_<%= $name %>
+{
+  decode(archive_perl_codeset(),_archive_entry_<%= $name %>(@_));
+}
+% }
+
+*archive_entry_copy_mac_metadata = \&archive_entry_set_mac_metadata
+  if __PACKAGE__->can('archive_entry_set_mac_metadata');
+
+eval q{
+  use Exporter::Tidy
+    func  => [grep /^archive_/, keys %Archive::Libarchive::XS::],
+    const => [grep { _define_constant($_) } qw(
+% foreach my $constant (@$constants) {
+      <%= $constant %>
+% }
+  )],
+}; die $@ if $@;
+
+1;
+
+=head1 EXAMPLES
+
+These examples are translated from equivalent C versions provided on the
+libarchive website, and are annotated here with Perl specific details.
+These examples are also included with the distribution.
+
+=head2 List contents of archive stored in file
+
+# EXAMPLE: example/list_contents_of_archive_stored_in_file.pl
+
+=head2 List contents of archive stored in memory
+
+# EXAMPLE: example/list_contents_of_archive_stored_in_memory.pl
+
+=head2 List contents of archive with custom read functions
+
+# EXAMPLE: example/list_contents_of_archive_with_custom_read_functions.pl
+
+=head2 A universal decompressor
+
+# EXAMPLE: example/universal_decompressor.pl
+
+=head2 A basic write example
+
+# EXAMPLE: example/basic_write.pl
+
+=head2 Constructing objects on disk
+
+# EXAMPLE: example/constructing_objects_on_disk.pl
+
+=head2 A complete extractor
+
+# EXAMPLE: example/complete_extractor.pl
+
+=head2 Unicode
+
+Libarchive deals with two types of string like data.  Pathnames, user and
+group names are proper strings and are encoded in the codeset for the
+current POSIX locale.  Content data for files stored and retrieved from in
+raw bytes.
+
+The usual operational procedure in Perl is to convert everything on input
+into UTF-8, operate on the UTF-8 data and then convert (if necessary) 
+everything on output to the desired output format.
+
+In order to get useful string data out of libarchive, this module translates
+its input/output using the codeset for the current POSIX locale.  So you must
+be using a POSIX locale that supports the characters in the pathnames of
+the archives you are going to process, and it is highly recommend that you
+use a UTF-8 locale, which should cover everything.
+
+ use strict;
+ use warnings;
+ use utf8;
+ use Archive::Libarchive::XS qw( :all );
+ use POSIX qw( setlocale LC_ALL );
+ 
+ # substitute en_US.utf8 for the correct UTF-8 locale for your region.
+ setlocale(LC_ALL, "en_US.utf8"); # or 'export LANG=en_US.utf8' from your shell.
+ 
+ my $entry = archive_entry_new();
+ 
+ archive_entry_set_pathname($entry, "привет.txt");
+ my $string = archive_entry_pathname($entry); # "привет.txt"
+ 
+ archive_entry_free($entry);
+
+If you try to pass a string with characters unsupported by your
+current locale, the behavior is undefined.  If you try to retrieve
+strings with characters unsupported by your current locale you will
+get C<undef>.
+
+Unfortunately locale names are not portable across systems, so you should
+probably not hard code the locale as shown here unless you know the correct
+locale name for all the platforms that your script will run.
+
+There are two Perl only functions that give information about the
+current codeset as understood by libarchive.
+L<archive_perl_utf8_mode|Archive::Libarchive::XS::Function#archive_perl_utf8_mode>
+if the currently selected codeset is UTF-8.
+
+ use strict;
+ use warnings;
+ use Archive::Libarchive::XS qw( :all );
+ 
+ die "must use UTF-8 locale" unless archive_perl_utf8_mode();
+
+L<archive_perl_codeset|Archive::Libarchive::XS::Function#archive_perl_codeset>
+returns the currently selected codeset.
+
+ use strict;
+ use warnings;
+ use Archive::Libarchive::XS qw( :all );
+ 
+ my $entry = archive_entry_new();
+ 
+ if(archive_perl_codeset() =~ /^(ISO-8859-5|CP1251|KOI8-R|UTF-8)$/)
+ {
+   archive_entry_set_pathname($entry, "привет.txt");
+   my $string = archive_entry_pathname($entry); # "привет.txt"
+ }
+ else
+ {
+   archive_entry_set_pathname($entry, "privet.txt");
+   my $string = archive_entry_pathname($entry); # "privet.txt"
+ }
+
+Because libarchive reads and writes file content within an archive using
+raw bytes, if your file content has non ASCII characters in it, then
+you need to encode them
+
+ use Encode qw( encode );
+ 
+ archive_write_data($archive, encode('UTF-8', "привет.txt");
+ # or
+ archive_write_data($archive, encode('KOI8-R', "привет.txt"); 
+
+read:
+
+ use Encode qw( decode );
+ 
+ my $raw;
+ archive_read_data($archive, $raw, 10240);
+ my $decoded_content = decode('UTF-8', $raw);
+ # or
+ my $decoded_content = decode('KOI8-R', $raw);
+
+=head1 SUPPORT
+
+If you find bugs, please open an issue on the project GitHub repository:
+
+L<https://github.com/plicease/Archive-Libarchive-XS/issues?state=open>
+
+If you have a fix, please open a pull request.  You can see the CONTRIBUTING
+file for traps, hints and pitfalls.
+
+=head1 CAVEATS
+
+Archive and entry objects are really pointers to opaque C structures
+and need to be freed using one of 
+L<archive_read_free|Archive::Libarchive::XS::Function#archive_read_free>, 
+L<archive_write_free|Archive::Libarchive::XS::Function#archive_write_free> or 
+L<archive_entry_free|Archive::Libarchive::XS::Function#archive_entry_free>, 
+in order to free the resources associated with those objects.
+
+Proper Unicode (or non-ASCII character support) depends on setting the
+correct POSIX locale, which is system dependent.
+
+The documentation that comes with libarchive is not that great (by its own
+admission), being somewhat incomplete, and containing a few subtle errors.
+In writing the documentation for this distribution, I borrowed heavily (read:
+stole wholesale) from the libarchive documentation, making changes where 
+appropriate for use under Perl (changing C<NULL> to C<undef> for example, along 
+with the interface change to make that work).  I may and probably have introduced 
+additional subtle errors.  Patches to the documentation that match the
+implementation, or fixes to the implementation so that it matches the
+documentation (which ever is appropriate) would greatly appreciated.
+
+=cut

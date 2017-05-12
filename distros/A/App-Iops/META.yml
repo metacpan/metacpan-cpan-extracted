@@ -1,0 +1,18 @@
+---
+abstract: 'Show process I/O operations'
+author:
+  - 'Josh Jore <jjore@cpan.org>'
+build_requires:
+  ExtUtils::CBuilder: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Iops
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Iops
+  homepage: http://search.cpan.org/dist/App-Iops
+  repository: git://github.com/jbenjore/App-Iops.git
+version: 0.006

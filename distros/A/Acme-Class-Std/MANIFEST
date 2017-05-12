@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Acme-Class-Std.t
+t/acmified_is_best.t
+Std.pm
+META.yml                                 Module meta-data (added by MakeMaker)

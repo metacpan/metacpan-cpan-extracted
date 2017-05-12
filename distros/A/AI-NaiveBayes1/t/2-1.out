@@ -1,0 +1,34 @@
+Model:
+category | P(category) 
+---+---
+spam=N   | 0.15        
+spam=Y   | 0.85        
+---+---
+
+category | html | P( html | category ) 
+---+---+---
+spam=N   | N    | 0.666666666666    
+spam=N   | Y    | 0.333333333333    
+---+---+---
+spam=Y   | N    | 0.058823529411   
+spam=Y   | Y    | 0.941176470588    
+---+---+---
+
+category | morning | P( morning | category ) 
+---+---+---
+spam=N   | N       | 0.333333333333       
+spam=N   | Y       | 0.666666666666       
+---+---+---
+spam=Y   | N       | 0.647058823529       
+spam=Y   | Y       | 0.352941176470       
+---+---+---
+
+category | size1 | P( size1 | category ) 
+---+---+---
+spam=N   | L     | 0.333333333333     
+spam=N   | S     | 0.666666666666     
+---+---+---
+spam=Y   | L     | 0.588235294117     
+spam=Y   | S     | 0.411764705882     
+---+---+---
+

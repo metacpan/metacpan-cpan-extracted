@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Acme-Crap
+version:             0.001002
+abstract:            Carp with more feeling
+license:             ~
+author:              
+    - Damian Conway <DCONWAY@CPAN.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::More:                    0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

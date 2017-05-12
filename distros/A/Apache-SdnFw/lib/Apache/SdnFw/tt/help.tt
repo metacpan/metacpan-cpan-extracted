@@ -1,0 +1,10 @@
+<div class="floatleft">
+<table>
+	<caption>Help for <a href="[% s.ubase %]/[% s.function %]">[% s.function %]</a></caption>
+	<tbody>
+		<tr>
+			<td width="500">[% s.help_text %]</td>
+		</tr>
+	</tbody>
+</table>
+</div>

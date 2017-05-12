@@ -1,0 +1,9 @@
+Revision history for Audio-ConvTools
+
+0.05    2006-08-18
+        First version who is ready for the CPAN
+0.07    2006-10-28
+        Bug found in 0.06: see rt.cpan.org 21496: this was a bug in File::Temp.
+        Perhaps corrected in File::Temp 0.17
+0.08    2006-10-28
+        Changed my email address

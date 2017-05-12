@@ -1,0 +1,20 @@
+pod2text Apache::SWIT.pm > README
+
+to install Apache::SWIT on barebones Ubuntu Hardy:
+- apt-get install build-essential unzip libclass-accessor-perl \
+	libfile-slurp-perl libyaml-perl libclass-singleton-perl \
+	libapache2-request-perl libapache-db-perl libclass-dbi-pg-perl \
+	libipc-run-perl libwww-mechanize-perl libpackage-alias-perl \
+	libdatetime-perl libcrypt-blowfish-perl \
+	libdatetime-format-strptime-perl libtemplate-perl \
+	libmath-combinatorics-perl libcrypt-cbc-perl libdigest-crc-perl \
+	libfile-mmagic-perl libdatetime-format-pg-perl \
+	libmodule-pluggable-perl libmodule-build-perl apache2-prefork-dev
+- as postgres: createuser $USER
+
+perl Makefile.PL
+make
+make test
+make install
+
+This module is not supposed to run on windows box.

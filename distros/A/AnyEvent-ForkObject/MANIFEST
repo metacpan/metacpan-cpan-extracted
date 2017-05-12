@@ -1,0 +1,13 @@
+Changes
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+lib/AnyEvent/ForkObject.pm
+Makefile.PL
+MANIFEST
+README
+t/01_fo.t
+t/02_dbi.t
+META.yml                                 Module meta-data (added by MakeMaker)

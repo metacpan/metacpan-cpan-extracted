@@ -1,0 +1,3 @@
+implement Apache::AuthDigest::API::Full to RFC 2617 compliance
+  (see LWP::Authen::Digest for some code to swipe)
+

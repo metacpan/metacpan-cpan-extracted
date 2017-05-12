@@ -1,0 +1,75 @@
+---
+abstract: 'Information about software packages on a system'
+author:
+  - 'David E. Wheeler <david@justatheory.com>'
+build_requires:
+  Module::Build: 0.2701
+  Test::More: 0.17
+configure_requires:
+  Module::Build: 0.2701
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Info
+provides:
+  App::Info:
+    file: lib/App/Info.pm
+    version: 0.57
+  App::Info::HTTPD:
+    file: lib/App/Info/HTTPD.pm
+    version: 0.57
+  App::Info::HTTPD::Apache:
+    file: lib/App/Info/HTTPD/Apache.pm
+    version: 0.57
+  App::Info::Handler:
+    file: lib/App/Info/Handler.pm
+    version: 0.57
+  App::Info::Handler::Carp:
+    file: lib/App/Info/Handler/Carp.pm
+    version: 0.57
+  App::Info::Handler::Print:
+    file: lib/App/Info/Handler/Print.pm
+    version: 0.57
+  App::Info::Handler::Prompt:
+    file: lib/App/Info/Handler/Prompt.pm
+    version: 0.57
+  App::Info::Lib:
+    file: lib/App/Info/Lib.pm
+    version: 0.57
+  App::Info::Lib::Expat:
+    file: lib/App/Info/Lib/Expat.pm
+    version: 0.57
+  App::Info::Lib::Iconv:
+    file: lib/App/Info/Lib/Iconv.pm
+    version: 0.57
+  App::Info::Lib::OSSPUUID:
+    file: lib/App/Info/Lib/OSSPUUID.pm
+    version: 0.57
+  App::Info::RDBMS:
+    file: lib/App/Info/RDBMS.pm
+    version: 0.57
+  App::Info::RDBMS::PostgreSQL:
+    file: lib/App/Info/RDBMS/PostgreSQL.pm
+    version: 0.57
+  App::Info::RDBMS::SQLite:
+    file: lib/App/Info/RDBMS/SQLite.pm
+    version: 0.57
+  App::Info::Request:
+    file: lib/App/Info/Request.pm
+    version: 0.57
+  App::Info::Util:
+    file: lib/App/Info/Util.pm
+    version: 0.57
+recommends:
+  Test::Pod: 1.41
+requires:
+  File::Spec: 0
+resources:
+  bugtracker: http://github.com/theory/app-info/issues/
+  homepage: http://search.cpan.org/dist/App-Info/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/theory/app-info/
+version: 0.57

@@ -1,0 +1,13 @@
+This is the debian package for the App-RabbitTail module.
+It was created by Tomas Doran <t0m@state51.co.uk> using dh-make-perl.
+
+It was downloaded from http://search.cpan.org/dist/App-RabbitTail/
+
+This copyright info was automatically extracted from the perl module.
+It may not be accurate, so you better check the module sources
+if don't want to get into legal troubles.
+
+
+
+The Debian packaging is (C) 2010, Tomas Doran <t0m@state51.co.uk> and
+is licensed under the same terms as the software itself (see above).

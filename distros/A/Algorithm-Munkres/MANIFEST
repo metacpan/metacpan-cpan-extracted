@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Fractions.t
+t/LargeMatrix.t
+t/Negative.t
+t/Normal.t
+t/Obvious.t
+t/Unit.t
+t/Ill_Formed.t
+t/Rect_Matrix2.t
+t/Horz_Matrix.t
+t/Rect_Matrix1.t 
+t/Rect_Unit.t
+t/Vert_Matrix.t
+t/DoubleInvoke.t
+lib/Algorithm/Munkres.pm
+META.yml                                 Module meta-data (added by MakeMaker)

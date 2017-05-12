@@ -1,0 +1,83 @@
+AI::Evolve::Befunge
+=====================================
+
+This is an evolutionary algorithm module written in Perl.  It produces small
+programs in a language named Befunge, which have been determined to fit a
+specified set of criteria.
+
+It is designed to provide a practical means of evolving useful AI programs.
+It takes a while to run but has verifiable results.
+
+Please see the POD documentation included in the AI::Evolve::Befunge module
+itself, for the details.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   sudo ./Build install
+
+You can copy the config file, example.conf, to /etc/ai-evolve-befunge.conf and
+edit it to your heart's content.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+perl 5.10.0
+Algorithm::Evolutionary::Wheel
+aliased
+Class::Accessor::Fast
+Language::Befunge >= 4.10
+Language::Befunge::Storage::Generic::Vec::XS >= 0.02
+Language::Befunge::Vector::XS >= 1.1.0
+LWP::UserAgent
+Parallel::Iterator
+Perl6::Export::Attrs
+Task::Weaken
+Test::Exception
+Test::MockRandom
+Test::Output
+UNIVERSAL::require
+YAML
+
+In addition to the above, the test suite can optionally use Test::Pod and
+Devel::Leak.  Without each of these, it will skip a portion of the tests.
+Note: the Devel::Leak tests result in a lot of ugly hexspam, so it probably
+isn't worth the trouble.  The Pod test is nice though.
+
+
+AUTHOR
+
+    Mark Glines <mark-befunge@glines.org>
+
+
+CONTACT
+
+You can either email me at the above address, or find me on irc.magnet.net with
+the nickname "Infinoid".  If you want to tell me how much the module rules or
+sucks, or if you have any questions about it, that's a good place to start.  If
+you have a specific bug or feature you want to tell me about (or better yet, a
+patch), you can send it to:
+
+    bug-AI-Evolve-Befunge@rt.cpan.org
+
+That will add it to the issue tracker so it won't get lost.
+
+
+COPYRIGHT AND LICENSE
+
+This module is copyright (c) 2007-2009 Mark Glines.
+
+It is distributed under the terms of the Artistic License 2.0.
+For more details, see the full text of the license in the file LICENSE.
+
+Special note: from the perspective of this module, the generated Befunge
+programs are simply data.  They are products of the way in which you decided
+to run this module, and random chance.  So from a licensing perspective, they
+are NOT considered to be a derived work of this perl module.

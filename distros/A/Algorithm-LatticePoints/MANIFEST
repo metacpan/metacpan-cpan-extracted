@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Algorithm-LatticePoints.t
+lib/Algorithm/LatticePoints.pm
+META.yml                                 Module meta-data (added by MakeMaker)

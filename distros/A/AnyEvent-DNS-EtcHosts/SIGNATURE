@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 71f96612e2ee91f64895e215f27f0e63288730c3 Build.PL
+SHA1 bee0b9fd8d0eefaa99c0905b95bc11294d29223d Changes
+SHA1 e4853d65249bb28a5e25d47d8cbf76fb84dbab51 LICENSE
+SHA1 9c7f555e543e0d11ab4181eba79209dc4beca4d6 MANIFEST
+SHA1 8db1be1ca479d3b130569f025fba70fbe7e7f075 MANIFEST.SKIP
+SHA1 5e7e286faac3d897337cfa6fc01cb856846aa70d META.json
+SHA1 ee41f2e2b673f3070a11595bbf5ad59be226059c META.yml
+SHA1 a8cc5d0a2c488d314600e59337ccc925bbc0d1b5 Makefile.PL
+SHA1 da0e6d8f2e80f1d92af9b038e27ff98a80a7e4fa README
+SHA1 e3c8fad785ebb7e0cc9708d765e92f852b9d2da5 README.md
+SHA1 f8f755cf01d16f25b1fcc06f4287267e2c053f1d examples/dns.pl
+SHA1 f1167e0c1a51fda7c562c933504935896675a30e examples/lexical.pl
+SHA1 247d8d6f8e52e34bbe634df273bbd06c6fcdae41 examples/socket.pl
+SHA1 ae249d17201e4fabc0b96bbd8fb77e0490904b64 lib/AnyEvent/DNS/EtcHosts.pm
+SHA1 bf400b74cc1aefb14b06836ff810331d46ac1c95 t/010_use.t
+SHA1 de0e28c041938b2233b58ca6bf0ebc500ddab5d3 t/100_dns.t
+SHA1 aa3cc668ae157287ceda17a11197d26d6767ffb9 t/200_socket.t
+SHA1 90353a99ac0f719b6f3e58029804d8556cedc2ab xt/check_changes.t
+SHA1 1c27e5840b0154e44120bc2edc02fbb507c76819 xt/consistent_version_numbers.t
+SHA1 67bb4c141ea95809f3db2d526ce91d9e6d894756 xt/copyright.t
+SHA1 650dccfa9b6f5a98cf731c89041bea8935dbc623 xt/cover.pl
+SHA1 88601c7f543229c6a47c92ec14d4088b4db85385 xt/cpan_changes.t
+SHA1 4f8f90e1c421bfd592e6806ec4d0a75f3d56406a xt/cpan_meta.t
+SHA1 48a67f01c35122165bb633264cba72d984d7a89e xt/dist_manifest.t
+SHA1 f5aac658ae1888964274e68d179413782082b7ad xt/distribution.t
+SHA1 af47b82dbac975ba494dfe6849d17d1e02941ac6 xt/eol.t
+SHA1 0f31d18a6a5d14438f2b9748183c120449ce2f02 xt/kwalitee.t
+SHA1 6e7f9dde7560793bcb40acc41561e07d163ad6d1 xt/minimumversion.t
+SHA1 1a1cd76027c4cc73ec56beadaf56680bbac1fd4a xt/no_tabs.t
+SHA1 e8daa0c73cfc304c240fad2d2c2b1b628175a89d xt/perlcritic.t
+SHA1 5e60329c6ac52d4a908052914566f5f5a7a3f884 xt/perlcriticrc
+SHA1 46aa111935ff192343c30b72d28da1a71ef4abf0 xt/pod_coverage.t
+SHA1 bef7d46eb5cbc3e67956d4e823ec199f41ab9268 xt/pod_spell.t
+SHA1 da8f6c508b631f6a2e9895522fe6b6807f139a08 xt/pod_spellrc
+SHA1 87cb53d4ad0162a872d5c70013fc41719e030555 xt/pod_syntax.t
+SHA1 f2dd15ffc2836703f46f2622702e1676891eed21 xt/portability_files.t
+SHA1 a38994922fda6d64e2ee75198fadc464a221fea9 xt/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlPEIVgACgkQhMHHe8CxClvy1gCdHMTKluCq+hGwYQCkwPxg422j
+04wAoNSCHAqVsprm5/SSfvT45F+jsw0B
+=z0uP
+-----END PGP SIGNATURE-----

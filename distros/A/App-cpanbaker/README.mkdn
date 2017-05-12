@@ -1,0 +1,106 @@
+# NAME
+
+cpanbaker - backup your cpan module files.
+
+# OPTIONS
+
+    $ cpanbaker [options] [filename]
+
+    --sudo
+            use sudo to backup files.
+
+    --exclude part,...
+            don't backup ...
+            valid part names are minicpan, bin, local-lib, perlbrew, libs
+
+    --include part,...
+            backup include ...
+            valid part names are minicpan, bin, local-lib, perlbrew, libs
+
+    --dry
+            dry run. do not archive files.
+
+    --installed
+            get installed module list.
+
+    -l file, --log file
+            specify log file.
+
+    --skip-pods
+            skip pod files.
+
+    --skip-manpages
+            skip manpage files.
+
+    -v, --verbose
+            verbose message
+
+    -vv
+            very verbose message
+
+    -z, --gz
+            tar with gzip compression.
+
+    -j, --bz
+            tar with bzip2 compression.
+
+    -d, --debug
+            debug mode.
+
+    -h
+            show help messages
+
+# USAGE
+
+To backup:
+
+    $ cpanbaker 
+
+To backup with gzip compression:
+
+    $ cpanbaker -z
+
+To backup with gzip compression and specify a filename:
+
+    $ cpanbaker -z blah.tar.gz
+
+To backup in dry-run mode:
+
+    $ cpanbaker --dry
+
+With sudo (root permission):
+
+    $ cpanbaker --sudo
+
+To exclude perlbrew stuff:
+
+    $ cpanbaker --exclude=perlbrew
+
+To get installed modules:
+
+    $ cpanbaker --installed > module_list
+    $ cpanm < module_list   # reinstall modules
+
+To exclude minicpan stuff:
+
+    $ cpanbaker --exclude=minicpan
+
+To exclude minicpan and perlbrew:
+
+    $ cpanbaker --exclude=perlbrew,minicpan
+
+To backup perlbrew stuff only:
+
+    $ cpanbaker --include=perlbrew
+
+Verbose mode:
+
+    $ cpanbaker -v
+
+Very verbose mode:
+
+    $ cpanbaker -vv
+
+Debug mode:
+
+    $ cpanbaker -d

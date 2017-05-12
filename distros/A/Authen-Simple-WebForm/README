@@ -1,0 +1,371 @@
+NAME
+    Authen::Simple::WebForm - Simple authentication against existing web
+    based forms.
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+        use Authen::Simple::WebForm;
+
+        my $webform = Authen::Simple::WebForm->new(
+            login_url       => 'http://host.company.com/login.pl',
+            login_expect    => 'Successful Login',
+        );
+
+        if ($webform->authenticate( $username, $password ) ) {
+            # successful authentication
+        }
+
+        # or as a mod_perl Authen handler
+        
+    PerlModule Authen::Simple::Apache
+        PerlModule Authen::Simple::WebForm
+
+        PerlSetVar AuthenSimpleWebForm_login_url "http://host.company.com/login.pl"
+        PerlSetVar AuthenSimpleWebForm_login_expect "Successful Login"
+
+        <Location /protected>
+          PerlAuthenHandler Authen::Simple::WebForm
+          AuthType          Basic
+          AuthName          "Protected Area"
+          Require           valid-user
+        </Location>
+
+DESCRIPTION
+    Authentication against a variety of login forms. This wraps up the LWP
+    (libwww-perl) calls needed to attempt a login to a site that uses an
+    HTML form for logins. It supports logins that require cookies, various
+    form variables, special headers, and more.
+
+    You can also subclass this to make it easier to setup, such as the
+    Authen::Simple::OWA2003 module.
+
+    There are a log of options, but they all have sane defaults. In most
+    cases, you'll only need to use the following:
+
+    login_url
+    login_expect
+    uesrname_field
+    password_field
+    extra_fields
+
+    Also helpful may be the "trace" option, which may help you to configure
+    your settings. It will print out the response code, cookies, and the
+    resulting page to STDERR.
+
+INSTALLATION
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+METHODS
+  new
+    This method takes a hash of parameters. The following options are
+    accepted:
+
+    initial_url
+        A URL to go to prior to logging in.
+
+        If the login page requires you to go to some page prior to posting,
+        use this. It will accept and store any cookies returned, and use
+        this page as the referrer when submitting to the login form.
+
+        Off by default.
+
+    initial_expect
+        String or a compiled regex (eg. "qr/please\s+login/i").
+
+        If you want to make sure the page you got is the login form, you can
+        set a string here to check for. The page content will be tested
+        against this, and authentication will fail (with a logged error) if
+        this doesn't match.
+
+        With this, you can make sure the server isn't returning a sorry
+        server page, or similar.
+
+        Off by default.
+
+    initial_expect_cookie
+        String or a compiled regex (eg. "qr/please\s+login/i").
+
+        Similar to initial_expect, but checks the cookies returned by the
+        page.
+
+        NOTE: this matches the cookie key, and the value must simple have
+        some length.
+
+        Off by default.
+
+    check_initial_status_code
+        Boolean, set to 0 to disable.
+
+        Set to undef to skip checking the response status code from the
+        initial page. Otherwise, it must match HTTP::Status->is_success.
+
+        Defaults to enabled (1).
+
+    initial_request_method
+        This can be either "GET" or "POST".
+
+        How the initial url will be sent to the server, either via HTTP GET
+        request, or HTTP POST.
+
+        Defaults to "GET".
+
+    login_url
+        REQUIRED
+
+        The URL to which the login credentials will be submitted.
+
+        For example: https://host.company.com/login.pl
+
+    login_expect
+        String or a compiled regex (eg. "qr/login\s+successful/i").
+
+        Set to a unique string to expect in the resulting page when the
+        login was successful.
+
+        Be default, this is not turned on. If you do not set this, then as
+        long as the server returns a successful status code (see
+        HTTP::Status::is_success), then the user will be authenticated. Most
+        form based login systems return a successful status code even when
+        the login fails, so you'll probably want to set this.
+
+        A notable exception is the use of something like Apache::AuthCookie,
+        which will return a 403 Forbidden error code when authentication
+        fails.
+
+        Off by default.
+
+    login_expect_cookie
+        String or a compiled regex (eg. "qr/please\s+login/i").
+
+        Similar to login_expect, but checks the cookies returned by the
+        page. If you are also using "initial_url", please be aware that an
+        cookies set by that page will also test true here (ie. this checks
+        our cookie jar, not the content of the page). The cookie jar is
+        reset on every authentication request, so you don't have to worry
+        about stale cookies from previous authentication attempts.
+
+        NOTE: this matches the cookie key, and the value must simple have
+        some length.
+
+        Off by default.
+
+    check_login_status_code
+        Boolean, set to 0 to disable.
+
+        Set to undef to skip checking the response status code from the
+        login page. Otherwise, it must match HTTP::Status->is_success.
+
+        Defaults to enabled (1).
+
+    login_request_method
+        This can be either "GET" or "POST".
+
+        How the initial url will be sent to the server, either via HTTP GET
+        request, or HTTP POST.
+
+        Defaults to "POST".
+
+    username_prefix
+        Username prefix string.
+
+        With this, you can automatically prefix your the submitted username
+        with some string. This can can be useful if loging into a windows
+        domain, for example. In that case, you would set it to something
+        like "MyDomain\".
+
+        Off be default.
+
+    username_field
+        Form field name for the username.
+
+        Defaults to "username".
+
+    password_field
+        Form field name for the password.
+
+        Defaults to "password".
+
+    extra_fields
+        Array reference of key => value pairs, representing additional form
+        fields to submit.
+
+        Often when submitting to a login form, other form fields are
+        expected by the login script. You may specify any number of them,
+        and their repsective values, using this option.
+
+        Example:
+
+            extra_fields => [
+                'language' => 'en_US',
+                'trusted'  => 1
+                ],
+
+        None submitted by default.
+
+    extra_headers
+        Array reference of key => value pairs, representing additional HTTP
+        headers.
+
+        You can use this if you need to further mask your client to appear
+        as a popular web browser. Some misbehaved servers may reject your
+        script if these are not set.
+
+        Example: (pose as netscape)
+
+            extra_headers => [
+               'User-Agent' => 'Mozilla/4.76 [en] (Win98; U)',
+               'Accept' => 'image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, image/png, */*',
+               'Accept-Charset' => 'iso-8859-1,*,utf-8',
+               'Accept-Language' => 'en-US'
+                ],
+
+        None submitted by default.
+
+    lwp_user_agent
+        The HTTP User Agent string to submit to the server in the HTTP
+        headers.
+
+        Some servers may restrict access to certain user agents (ie. limit
+        only to MS Internet Explorer and Mozilla clients). You can forge a
+        user agent string with this.
+
+        Example:
+
+            lwp_user_agent => 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.14) Gecko/2009090216 Ubuntu/9.04 (jaunty) Firefox/3.0.14',
+
+        Defaults to "Authen::Simple::WebForm/$VERSION".
+
+    lwp_timeout
+        Timeout in seconds. Set to zero to disable.
+
+        This is how long the script will wait for a response for each page
+        fetch.
+
+        Defaults to "15" seconds.
+
+    lwp_protocols_allowed
+        Array reference of protocols to allow.
+
+        This will limit what protocols will be fetched. You're already
+        setting the URLS that will be loaded, but if you allow redirects
+        (via lwp_requests_redirectable) then those may go to a different
+        protocol. For example, you may submit to an SSL protected site
+        (https) but be redirected to an unprotected page (http).
+
+        Defaults to ["http", "https"]
+
+    lwp_use_conn_cache
+        Boolean, set to 0 to disable.
+
+        Whether to use connection caching. See LWP::ConnCache for details,
+        as well as the "conn_cache" option to LWP.
+
+        Defaults to enabled (1).
+
+    lwp_requests_redirectable
+        Array reference of request names for which we will automatically
+        redirect.
+
+        See LWP option requests_redirectable for details. This affects the
+        responses we get from the server. For example, if you are posting
+        form data (login_request_method == POST), and the successful login
+        page returns a redirect to some other page, "POST" would be needed
+        here. We allow GET and POST by default, so you only need to set this
+        is if do not want this behavior.
+
+        Defaults to ["GET", "POST"]
+
+    trace
+        Boolean, set to 1 to enable.
+
+        If set to true, the data we recieve will be dumped out to STDERR.
+        This can be useful while you're trying to determine what fields need
+        passed, and what might be going wrong. When running your test
+        scripts, assuming your are starting from a test script, simply dump
+        STDERR to a file:
+
+            perl test.pl 2>somefile.txt
+
+        Defaults to disabled (0).
+
+  log
+    Any object that supports "debug", "info", "error" and "warn".
+
+        log => Log::Log4perl->get_logger('Authen::Simple::WebForm')
+
+    See Authen::Simple::Log for a simple logging class you may use, or
+    Log::Log4perl for more advanced logging.
+
+  authenticate( $username, $password )
+    Returns true on success and false on failure.
+
+  check($user, $pass)
+    Internal method used to do the actual authentication check.
+
+TODO
+    Add lwp_cookie_jar option(s) so that it may use a file.
+
+    Add a debug mode. It's often difficult to determine what content is
+    being returned, and what to look for. The debug mode should print each
+    step out to STDERR, and include the relevant response information from
+    the page.
+
+    Write tests using HTTP::Daemon as a local webserver. See LWP test
+    t/local/http.t and t/local/chunked.t for example.
+
+AUTHOR
+    Joshua I. Miller, "<unrtst at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-authen-simple-webform
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Authen-Simple-WebForm>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Authen::Simple::WebForm
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Authen-Simple-WebForm>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Authen-Simple-WebForm>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Authen-Simple-WebForm>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Authen-Simple-WebForm>
+
+SEE ALSO
+    Authen::Simple
+
+    Authen::Simple::OWA2003
+
+    examples/ex1.pl (an example that can be used to auth against
+    freshmeat.net).
+
+    LWP
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Joshua I. Miller, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

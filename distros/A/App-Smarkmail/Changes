@@ -1,0 +1,13 @@
+Revision history for App-Smarkdown
+
+0.004     2013-07-01 18:24:54 America/New_York
+          repackage, update bug tracker
+
+0.003     2009-01-16
+          use released Email::Sender API
+
+0.002     2008-02-24
+          packaging improvements
+
+0.001     2008-02-23
+          first release

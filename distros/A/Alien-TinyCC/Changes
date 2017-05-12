@@ -1,0 +1,83 @@
+Put changes under the appropriate header. Headers can include API CHANGES,
+DIFFERENT BEHAVIOR, BUG FIXES, DEPENDENCIES, ENHANCEMENTS, NEW FEATURES, and
+OTHER. Entries should be in chronological order, i.e. oldest at the top
+
+0.06  Sat, Aug 1, 2015
+
+  [ENHANCEMENTS]
+  
+  * Include functions to generate ExtUtils::MakeMaker arguments, ported from
+    Alien::TinyCC.
+
+
+0.05  Mon, Sep 2, 2013
+
+  [BUG FIXES]
+  
+  * The patch function in the build system now sets execution bit on all new
+    files. This fixes the build issues for BSD boxes, which patch configure,
+    rendering it non-executable.
+  
+  [OTHER]
+  
+  * Added Travis CI integration.
+
+0.04  Thu, Aug 29, 2013
+
+  [ENHANCEMENTS]
+  
+  * Created a general patching function, used now by Windows and BSD build
+    systems, and used to patch the test files for all systems.
+  
+  [BUG FIXES]
+  
+  * Patched MidnightBSD detection.
+  
+  * Added -fPIC flag for systems whose Perl was compiled with it.
+  
+  * Fixed stdarg.h issues for older gcc header collections.
+  
+  * Added method to detect, and patch if necessary, the proper path for
+    ucontext.h (either #include <ucontext.h> or #include <sys/ucontext.h>).
+  
+  [OTHER]
+  
+  * Added a commit hook (and instructions in the README for activation) which
+    should help keep this file up-to-date. :-)
+  
+  * Updated the dist Build command to reset the files under src/ before
+    building the dist.
+  
+  * Added various dev Build commands to make it easier to get a clean setup.
+
+0.03  Sun, Aug 25, 2013
+
+  [ENHANCEMENTS]
+  
+  * Added work-around for Mac smoke tester's erroneous configuration.
+  
+  * Included tcc's test suite.
+  
+  [BUG FIXES]
+  
+  * Tweaked BSD make invocation.
+  
+  * Fixed Windows compiler detection code.
+
+0.02  Wed, Aug 21, 2013
+
+  [BUG FIXES]
+  
+  * Fixed incorrect MANIFEST issues and other build system problems.
+
+0.01  Wed, Aug 21, 2013
+
+  Initial release!
+  
+  * Compiles and installs tcc on Windows, Linux, and Mac OSX.
+  
+  * Installs to a sharedir location, and is Perl-specific.
+  
+  * Provides simple mechanisms for use in Build.PL files.
+  
+  * "use Alien::TinyCC" modifies PATH so tcc can be found.

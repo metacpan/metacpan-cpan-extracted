@@ -1,0 +1,108 @@
+#!/usr/local/bin/perl
+
+use 5.008;
+
+use strict;
+use warnings;
+
+use Astro::App::Satpass2;
+
+Astro::App::Satpass2->run(@ARGV);
+
+__END__
+
+=head1 TITLE
+
+satpass2 - Script to wrap Astro::App::Satpass2 satellite prediction functionality.
+
+=head1 SYNOPSIS
+
+ satpass2
+ satpass2 'st spaceflight -all -eff' pass exit
+ satpass2 <canned_commands.txt
+ satpass2 -help
+ satpass2 -version
+
+=head1 OPTIONS
+
+The available options are those of the L<Astro::App::Satpass2|Astro::App::Satpass2>
+L<run()|Astro::App::Satpass2/run> method. Briefly and non-definitively,
+
+=over
+
+=item -filter
+
+This option asserts that F<satpass2> is being run as a Unix filter, and
+suppresses the front matter. It can be negated by specifying
+C<-nofilter>. It is asserted by default if C<STDIN> is not an
+interactive terminal.
+
+=item -initialization_file filename
+
+This option specifies an alternative initialization file. The synonym
+C<-initfile> can also be used.
+
+=item -gmt
+
+This option specifies that times are to be displayed in GMT.
+
+=item -help
+
+This option causes the L<Astro::App::Satpass2|Astro::App::Satpass2>
+L<help()|Astro::App::Satpass2/help> method to be run. The script then exits.
+
+=item -version
+
+This option causes the front matter (version and copyright) to be
+displayed. The script then exits.
+
+=back
+
+=head1 DETAILS
+
+This script is a wrapper for the L<Astro::App::Satpass2|Astro::App::Satpass2> package.
+All it really does is to load the C<Astro::App::Satpass2> package and then call
+its L<run()|Astro::App::Satpass2/run> method.
+
+What you get is an application similar to the C<satpass> script packaged
+with L<Astro::Coord::ECI|Astro::Coord::ECI>, but (hopefully!) more
+flexible and easier to maintain.
+
+The core functionality is the prediction of satellite passes over a
+given location, plus the prediction of Iridium flares.
+
+There are also a number of support functions. You can download orbital
+data (via L<Astro::SpaceTrack|Astro::SpaceTrack>) from a number of
+sources, or you can load it from a file or store it in a file. You can
+define your own commands in terms of the existing ones. In the United
+States, you can geocode observing locations to latitude and longitude,
+and download your height above sea level from the U. S. Geological
+Survey via module
+L<Geo::WebService::Elevation::USGS|Geo::WebService::Elevation::USGS>.
+
+Besides the restructuring of the code into an object, the largest change
+from F<satpass> is the extremely flexible templating system used to
+produce output. This should allow broad customization of output to meet
+personal needs. See
+L<Astro::App::Satpass2::Format::Classic|Astro::App::Satpass2::Format::Classic> for the
+(unfortunately) gory details.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010-2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

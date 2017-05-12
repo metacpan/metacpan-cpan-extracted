@@ -1,0 +1,34 @@
+App-Notifier-Service
+====================
+
+This distribution provides a Dancer-based web service for handling
+notifications (e.g: for completion of events). See
+https://metacpan.org/release/App-Notifier-Client for a sample command line
+client to invoke notifications.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+after you install all of its dependencies.
+
+Alternatively use the CPAN.pm module:
+
+    # perl -MCPAN -e 'install App::Notifier::Service'
+
+Or the CPANPLUS.pm module
+
+    # perl -MCPANPLUS -e 'install App::Notifier::Service'
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Shlomi Fish
+
+This library is free software; you can redistribute it and/or modify
+it under the MIT X11 license. (see the file COPYING for its text.)
+

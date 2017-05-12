@@ -1,0 +1,28 @@
+#!/usr/local/bin/perl -w
+
+use Audio::Data;
+use Audio::Play;
+
+open(F,"Data/t/test.au") || die;
+
+my $au = Audio::Data->new(Load => \*F);
+
+close(F);
+
+print $au->comment,"\n";
+
+foreach $rate (8000, 9600, 11025, 16000, 18900, 22050, 32000, 37800,44100)
+ {
+  open(F,">out$rate.au") || die;
+  $au->rate($rate);
+  $au->Save(F,"Resampled to $rate Hz");
+  close(F);
+ }
+
+exit;
+
+my $n;
+foreach $n ($au->data)
+ {
+  print "$n\n";
+ }

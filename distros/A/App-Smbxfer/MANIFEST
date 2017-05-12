@@ -1,0 +1,17 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/smbxfer
+lib/App/Smbxfer.pm
+t/00.load.t
+t/pod-coverage.t
+t/pod.t
+t/xfer_essentials.t
+t/test_resources/dir_to_upload/d0/t0
+t/test_resources/dir_to_upload/d1/t1
+t/test_resources/dir_to_upload/d1/d2/t2
+t/test_resources/dir_to_upload/d1/d3/t3
+t/test_resources/dir_to_upload/d1/d3/d4/t4
+META.yml                                 Module meta-data (added by MakeMaker)

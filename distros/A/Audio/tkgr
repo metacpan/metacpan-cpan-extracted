@@ -1,0 +1,341 @@
+#!/tools/local/perl -w
+use strict;
+use Tk;
+use Tk::PNG;
+use GD::Graph::lines;
+use GD::Graph::bars;
+use Audio::Data;
+use Audio::Play;
+sub PI () { 3.14159265358979323846 }
+# use Audio::Filter;
+
+my $mw = MainWindow->new;
+
+my $N = 512;
+my $rate = 8000;
+
+my $svr = Audio::Play->new;
+
+use Audio::Filter;
+
+my @data;
+
+sub nat_glot
+{
+ my $nopen = 4*30;
+ my $pole2 = Audio::Resonator->new(rate => $rate);
+ my $pole = Audio::Resonator->new(rate => $rate);
+ my $tmpf = $nopen * 0.00833;
+ $pole->setpole(0,$rate/$nopen,$tmpf*$tmpf);
+ $pole2->setpole(0,950*$rate/10000,630*$rate/10000);
+ my @natglot = (
+ 1200, 1142, 1088, 1038, 991, 948, 907, 869, 833, 799,
+ 768, 738, 710, 683, 658, 634, 612, 590, 570, 551,
+ 533, 515, 499, 483, 468, 454, 440, 427, 415, 403,
+ 391, 380, 370, 360, 350, 341, 332, 323, 315, 307,
+ 300, 292, 285, 278, 272, 265, 259, 253, 247, 242,
+ 237, 231, 226, 221, 217, 212, 208, 204, 199, 195,
+ 192, 188, 184, 180, 177, 174, 170, 167, 164, 161,
+ 158, 155, 153, 150, 147, 145, 142, 140, 137, 135,
+ 133, 131, 128, 126, 124, 122, 120, 119, 117, 115,
+ 113, 111, 110, 108, 106, 105, 103, 102, 100, 99,
+ 97, 96, 95, 93, 92, 91, 90, 88, 87, 86,
+ 85, 84, 83, 82, 80, 79, 78, 77, 76, 75,
+ 75, 74, 73, 72, 71, 70, 69, 68, 68, 67,
+ 66, 65, 64, 64, 63, 62, 61, 61, 60, 59,
+ 59, 58, 57, 57, 56, 56, 55, 55, 54, 54,
+ 53, 53, 52, 52, 51, 51, 50, 50, 49, 49,
+ 48, 48, 47, 47, 46, 46, 45, 45, 44, 44,
+ 43, 43, 42, 42, 41, 41, 41, 41, 40, 40,
+ 39, 39, 38, 38, 38, 38, 37, 37, 36, 36,
+ 36, 36, 35, 35, 35, 35, 34, 34, 33, 33,
+ 33, 33, 32, 32, 32, 32, 31, 31, 31, 31,
+ 30, 30, 30, 30, 29, 29, 29, 29, 28, 28,
+ 28, 28, 27, 27);
+ my $natb = $natglot[$nopen - 40];
+ my $nata = ($natb * $nopen) * 0.333;
+ my $decay = 0.33;
+ my $onemd = 1.0 - $decay;
+ my $vwave = 0.0;
+ my $vlast = 0.0;
+ my $en    = 13000000;
+ print "nopen=$nopen a=$nata b=$natb\n";
+ my $nper = 0;
+ for my $s (0..$N-1)
+  {
+   my $voice;
+   for my $i (0..3)
+    {
+     if (1)
+      {
+       if ($nper < $nopen)
+        {
+         $nata -= $natb;
+         $vwave += $nata;
+         $voice = $vwave * 0.028;
+        }
+       else
+        {
+         $vwave = 0.0;
+         $voice = 0.0;
+        }
+      }
+     else
+      {
+       $vwave = ($nper == 1) ? $en : ($nper == 2) ? -$en : 0;
+       $voice = $pole->process($vwave);
+      }
+     $voice = $pole2->process($voice);
+     $nper++;
+    }
+   $voice = $voice * $onemd + $vlast * $decay;
+   $vlast = $voice;
+   push(@data,$voice);
+  }
+}
+
+sub pole_zero
+{
+ my $nopen = 4*30;
+ my $tmpf = $nopen * 0.00833;
+ my $pole = Audio::Resonator->new(rate => $rate);
+ my $pole2 = Audio::Resonator->new(rate => $rate);
+ my $zero = Audio::AntiResonator->new(rate => $rate);
+ $pole->setpole(0,$rate/$nopen,$tmpf*$tmpf);
+ $pole2->setpole(0,950*$rate/10000,630*$rate/10000);
+ #$zero->setzero(1875,150);
+
+ push(@data,$pole2->process($pole->process(0.0)));
+ push(@data,$pole2->process($pole->process(1.0)));
+ push(@data,$pole2->process($pole->process(-1.0)));
+ for my $i (3..$N-1)
+  {
+   push(@data,$pole2->process($pole->process(0.0)));
+  }
+ # print join(',',$pole->data),"\n";
+}
+
+sub fir
+{
+ my $fir = Audio::Filter::FIR->new(rate => $rate);
+ my @h;
+ $h[0] = $h[19] = -0.03257;
+ $h[1] = $h[18] =  0.04384;
+ $h[2] = $h[17] =  0.02071;
+ $h[3] = $h[16] = -0.05702;
+ $h[4] = $h[15] = -0.00516;
+ $h[5] = $h[14] =  0.07675;
+ $h[6] = $h[13] = -0.02234;
+ $h[7] = $h[12] = -0.12071;
+ $h[8] = $h[11] =  0.11191;
+ $h[9] = $h[10] =  0.48459;
+ push(@h,(0) x 19);
+ $fir->data(@h);
+ push(@data,$fir->process(1.0));
+ for my $i (1..$N-1)
+  {
+   push(@data,$fir->process(0));
+  }
+}
+
+sub impulse
+{
+ return  (1,(0) x ($N-1));
+}
+
+my %formants = (
+N  => [[480,40,35],[1780,300,35],[2620,360,35]],
+OR => [[490,60,50.75],[820,90,45.5],[2500,150,22,75]],
+EE => [[250,60,50.75],[2350,90,33.25],[3200,150,36.75]],
+);
+
+sub dB
+{
+ my $dB = shift;
+ return 32767*10**(($dB-87)/20-3);
+}
+
+sub formants
+{
+ my $f  = $formants{'EE'};
+ my @impulse = impulse();
+ if (1)
+  {
+   my $f1 = Audio::Resonator->new(rate => $rate)->setpole(@{$f->[0]}[0,1]);
+   my $f2 = Audio::Resonator->new(rate => $rate)->setpole(@{$f->[1]}[0,1]);
+   my $f3 = Audio::Resonator->new(rate => $rate)->setpole(@{$f->[2]}[0,1]);
+   push(@data,$f3->process($f2->process($f1->process(@impulse))));
+  }
+ else
+  {
+   my $f1 = Audio::Resonator->new(rate => $rate)->setpole(@{$f->[0]}[0,1],dB($f->[0][2]));
+   my $f2 = Audio::Resonator->new(rate => $rate)->setpole(@{$f->[1]}[0,1],dB($f->[1][2]));
+   my $f3 = Audio::Resonator->new(rate => $rate)->setpole(@{$f->[2]}[0,1],dB($f->[2][2]));
+   foreach my $s (@impulse)
+    {
+     push(@data,$f3->process($s)+$f2->process($s)+ $f1->process($s));
+    }
+  }
+}
+
+my $last = 0.0;
+sub lowpass
+{
+ my $val = shift;
+ $val = $val + 0.75 * $last;
+ $last = $val;
+ return $val;
+}
+
+sub hipass
+{
+ my $val = shift;
+ my $out = $val - $last;
+ $last = $val;
+ return $out;
+}
+
+#pole_zero();
+
+nat_glot();
+
+sub hilo
+{
+
+ foreach my $val (sqrt($rate),(0) x ($N-1))
+  {
+   push(@data,hipass($val));
+  }
+
+ my $energy = 0.0;
+ foreach my $v (@data)
+  {
+   $energy += ($v*$v)/$rate;
+  }
+
+ printf "energy %g power=%g\n",$energy,$energy/($N*$rate);
+
+}
+
+
+
+#formants();
+
+my $sound = Audio::Data->new(rate => $rate, silence => 0.5);
+my @sound;
+my $f0 = 150;
+my $samp = int($rate/$f0);
+for (my $i = 0; $i < $rate/2; $i += $samp)
+ {
+  splice(@sound,$i,80,@data[0..$samp-1]);
+ }
+$sound->data(@sound);
+
+sub play
+{
+ $svr->play($sound);
+ $svr->flush;
+}
+
+
+#fir();
+
+my $au = new Audio::Data rate => $rate;
+$au->data(@data);
+
+
+my $org = Audio_image($mw,$au, Method => 'amplitude',  Xfunc => \&datax,
+           x_label           => 'Time',
+           x_label_skip      => 5*$N/64,
+#          x_tick_number     => 'auto',
+           y_label           => 'Amp',
+           title             => 'Original');
+$au->r2_fft;
+my $ffta = Audio_image($mw,$au, Class => 'bars',
+#          Method => 'dB',
+           Method => 'amplitude',
+           Xfunc => \&fftx,
+           Range             => [0,$N/2],
+           x_label           => 'Freq',
+           x_label_skip      => 5*$N/64,
+           x_ticks           => 0,
+           y_number_format   => sub { sprintf("%6.1f",$_[0]) },
+           y_label           => 'Amp',
+           title             => 'FFT');
+my $fftp = Audio_image($mw,$au, Class => 'bars', Method => 'phase',     Xfunc => \&fftx,
+           Range             => [0,$N/2],
+           x_label           => 'Freq',
+           x_label_skip      => 5*$N/64,
+           y_label           => 'Phase',
+           y_number_format   => sub { sprintf("%6.1f",$_[0]*180/PI) },
+           y_min_value       => -PI(),
+           y_max_value       => PI,
+           y_tick_number     => 8,
+           title             => 'FFT');
+$mw->Button(-text => 'Play', -command => \&play)->pack;
+$mw->Label(-image => $org,-anchor => 'e')->pack(-anchor => 'e',-fill => 'x');
+$mw->Label(-image => $ffta,-anchor => 'e')->pack(-anchor => 'e',-fill => 'x');
+$mw->Label(-image => $fftp,-anchor => 'e')->pack(-anchor => 'e',-fill => 'x');
+MainLoop;
+
+sub xfftx
+{
+ my ($x,$au,$v) = @_;
+ my $n = $au->samples;
+ my $f = $au->rate;
+ unless ($au->amplitude($x) > 1e-3)
+  {
+   # undef $_[2];
+   return '';
+  }
+ return $x * $f / $N;
+}
+
+sub fftx
+{
+ my ($x,$au,$v) = @_;
+ my $n = $au->samples;
+ my $f = $au->rate;
+ return $x * $f / $N;
+}
+
+sub datax
+{
+ my ($x,$au) = @_;
+ my $n = $au->samples;
+ my $f = $au->rate;
+ return 1000 * $x / $f;
+}
+
+sub Audio_image
+{
+ my ($mw,$au,%args) = @_;
+ my $meth  = delete $args{Method};
+ my $xfunc = delete $args{Xfunc};
+ my $range = delete $args{Range} || [0,$au->samples-1];
+ my $class = delete($args{Class}) || 'lines';
+ my $graph = "GD::Graph::$class"->new(640,240);
+
+ $meth ||= 'data';
+ $graph->set(%args);
+ my @data = $au->$meth(@$range);
+ my $n    = @data;
+ my @x    = (0..$n-1);
+ if (defined $xfunc)
+  {
+   foreach my $x (@x)
+    {
+     $x = &$xfunc($x,$au,$data[$x]);
+    }
+  }
+ my $gd = $graph->plot([\@x,\@data]);
+ my $file = "temp$$.png";
+ open(IMG, ">$file") or die "Cannot open $file:$!";
+ binmode IMG;
+ print IMG $gd->png;
+ close IMG;
+ my $img = $mw->Photo(-format => 'png', -file => $file);
+ unlink($file);
+ return $img;
+}
+

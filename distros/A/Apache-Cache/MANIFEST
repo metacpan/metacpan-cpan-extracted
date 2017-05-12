@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Apache/Cache.pm
+t/load.t

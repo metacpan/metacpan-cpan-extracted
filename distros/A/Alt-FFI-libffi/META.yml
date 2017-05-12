@@ -1,0 +1,30 @@
+---
+abstract: 'Perl Foreign Function interface based on libffi'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alt-FFI-libffi
+no_index:
+  file:
+    - lib/FFI.pm
+    - lib/FFI/Library.pm
+requires:
+  FFI::Platypus: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/plicease/Alt-FFI-libffi/issues
+  homepage: http://perl.wdlabs.com/Alt-FFI-libffi
+  repository: git://github.com/plicease/Alt-FFI-libffi.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.69'

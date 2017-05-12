@@ -1,0 +1,24 @@
+Version history for Perl module Alien::Box2D
+
+0.105	20/01/2012
+	- another fix for -fpic (can be "-DPIC -fPIC") [FROGGS]
+
+0.104	13/01/2012
+	- fixed -fpic issue (can be -fPIC, -fpic, -DPIC, ...) [FROGGS]
+
+0.103	16/06/2011
+	- release (same as 0.102_5)
+
+0.102_*	31/05-09/06/2011
+	- tuning up cmake-less version [kmx, FROGGS]
+
+0.102	28/05/2010
+	- disabled build of examples [FROGGS]
+	- LIBS: linking to libm for e.g. openbsd [FROGGS]
+	- DEPS: using Alien::CMake 0.03 [FROGGS]
+
+0.101	25/05/2010
+	- used install_name_tool to update libBox2D.dylib search path for darwin [jtpalmer, FROGGS]
+
+0.1	16/05/2010
+	- initial version

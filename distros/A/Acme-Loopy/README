@@ -1,0 +1,49 @@
+NAME
+    Acme::Loopy - loop keyword
+
+SYNOPSIS
+            loop {
+                    my @row = get_data() or last;
+                
+                    # First iteration only
+                    print table_headers(\@row) unless ${^LOOP};
+                
+                    # All iterations
+                    print table_row(\@row);
+            }
+
+DESCRIPTION
+    This is really just a test/experiment with Keyword::Simple. It gives you a
+    keyword `loop` which acts like a while(1) loop - that is, it loops
+    infinitely until an explicit `last`. This is quite similar to ikegami's
+    Syntax::Feature::Loop.
+
+    Within the loop, the variable `${^LOOP}` can be used to obtain the current
+    iteration count. This is a zero-based count, so is zero (false) on the
+    first journey around the loop.
+
+    Keyword::Simple made defining the `loop` keyword itself so easy that
+    `${^LOOP}` became the tricky part. (Or rather making it work with nested
+    loops did!)
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Acme-Loopy>.
+
+SEE ALSO
+    Keyword::Simple, Syntax::Feature::Loop.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

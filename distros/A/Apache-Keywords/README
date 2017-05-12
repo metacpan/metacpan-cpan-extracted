@@ -1,0 +1,137 @@
+NAME
+       Apache::Keywords - Store keywords as a personal profile in
+       a cookie.
+
+CONTENTS
+       The package Apache::Keywords contains:
+
+       Makefile.PL
+       lib/Apache/Keywords.pm 
+       README
+       MANIFEST
+
+PREREQUISITES
+       You need Apache::Constants and Apache::Cookie to use
+       Apache::Keywords.
+
+INSTALLATION
+       tar zxf Apache-Keywords-0.1.tar.gz
+       perl Makefile.PL
+       make 
+       make install
+
+SYNOPSIS
+       In a dynamic mod_perl source-file:
+
+           use Apache::Keywords;
+
+           # Create a keywords object
+           $k = new Apache::Keywords;
+
+           # Set different parameters
+           $k->name('PersonalProfile');
+           $k->expires('+1M');
+           $k->path("/");
+           $k->domain('xxx.com');
+
+           # Get parameters
+           print $k->expires;
+           print $k->path;
+           ...
+
+           # Add new keywords to the profile
+           $k->new_keywords($r,"horse, dog");
+           # Special version for Apache::ASP
+           $k->new_keywords_asp($Request,"cars, motorcycles");
+
+           # Return the content of the cookie profile
+           $hashref = $k->profile($r);
+           print $hashref->{'horse'};
+           %hash = %$hashref;
+           # Special version for Apache::ASP
+           $k->profile_asp($Request);
+
+
+       In a the .htaccess for apache static-files, e.g. .html-
+       files:
+           <Files ~ (\.html)>
+               SetHandler perl-script
+               PerlFixupHandler Apache::Keywords
+               PerlSetVar KeywordsName "PersonalProfile"
+
+
+
+17/Feb/2000            perl 5.005, patch 03                     1
+
+
+
+
+
+lib::Apache::Keywords(3)ributed Perl Documentationhe::Keywords(3)
+
+
+               PerlSetVar KeywordsExpires "+1M"
+               PerlSetVar KeywordsPath "/"
+               PerlSetVar KeywordsDomain "xxx.com"
+           </Files>
+
+DESCRIPTION
+       An Apache::Keywords class object will generate/update a
+       cookie. The cookie contains a personal profile, e.g.
+       counts the different keywords that are added to it. The
+       module could be configured as a "PerlFixupHandler" for a
+       static file in mod_perl, e.g. HTML-files. It could also be
+       used in web scripts, like mod_perl scripts that uses
+       Apache::ASP or Apache::Registry. In the static version,
+       Apache::Keywords fetches the keywords from phrases like
+       <META NAME="keywords" CONTENT="cars, motorcycles">.
+
+METHODS
+       The following methods could be use in dynamic web scripts:
+
+       $k = new Apache::Keywords;
+            Make a new Apache::Keywords object and return it.
+
+       $k->name(<name>);
+            Sets the name of the cookie that is used for the
+            personal profile.  Without argument, the function
+            returns the name of the cookie.
+
+       $k->expires(<expiration time>);
+            Sets the cookie parameter for expiration. Without
+            argument, the function returns the expiration time
+            already set.
+
+       $k->path(<path>);
+            Sets the path to be associated with the cookie.
+            Without argument, the function returns the path
+            already set.
+
+       $k->domain(<domain name>);
+            Sets the domain name to be associated with the
+            cookie.  Without argument, the function returns the
+            domain name already set.
+
+       $k->new_keywords($r,<string with keywords>);
+            Add the new keywords of this HTTP-call. The argument
+            is a string with the different words separated with
+            space. $r is the Apache mod_perl request object.
+
+       $k->new_keywords_asp($Request,<string with keywords>);
+            A special version of the new_keywords() suited for
+            Apache::ASP. The $Request object is special for
+            Apache::ASP.
+
+       $k->profile;
+            Return the profile in a hash reference, e.g.
+            profile->{'horse'} == 3, profile->{'dog'} == 2.
+
+       $k->profile_asp
+            A special version of profile() suited for
+            Apache::ASP. The $Request is special for Apache::ASP.
+
+AUTHOR
+       Copyright 2000 Magnus Cedergren, mace@lysator.liu.se
+
+       This library is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.

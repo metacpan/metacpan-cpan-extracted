@@ -1,0 +1,158 @@
+---
+abstract: 'All about Japanese pop star "Morning Musume"'
+author:
+  - '=over 4'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.142690'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-MorningMusume
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::MorningMusume:
+    file: lib/Acme/MorningMusume.pm
+    version: '0.20'
+  Acme::MorningMusume::AbeNatsumi:
+    file: lib/Acme/MorningMusume/AbeNatsumi.pm
+    version: '0.20'
+  Acme::MorningMusume::Base:
+    file: lib/Acme/MorningMusume/Base.pm
+    version: '0.20'
+  Acme::MorningMusume::FujimotoMiki:
+    file: lib/Acme/MorningMusume/FujimotoMiki.pm
+    version: '0.20'
+  Acme::MorningMusume::FukudaAsuka:
+    file: lib/Acme/MorningMusume/FukudaAsuka.pm
+    version: '0.20'
+  Acme::MorningMusume::FukumuraMizuki:
+    file: lib/Acme/MorningMusume/FukumuraMizuki.pm
+    version: '0.20'
+  Acme::MorningMusume::GotohMaki:
+    file: lib/Acme/MorningMusume/GotohMaki.pm
+    version: '0.20'
+  Acme::MorningMusume::HagaAkane:
+    file: lib/Acme/MorningMusume/HagaAkane.pm
+    version: '0.20'
+  Acme::MorningMusume::IchiiSayaka:
+    file: lib/Acme/MorningMusume/IchiiSayaka.pm
+    version: '0.20'
+  Acme::MorningMusume::IidaKaori:
+    file: lib/Acme/MorningMusume/IidaKaori.pm
+    version: '0.20'
+  Acme::MorningMusume::IikuboHaruna:
+    file: lib/Acme/MorningMusume/IikuboHaruna.pm
+    version: '0.20'
+  Acme::MorningMusume::IkutaErina:
+    file: lib/Acme/MorningMusume/IkutaErina.pm
+    version: '0.20'
+  Acme::MorningMusume::IshidaAyumi:
+    file: lib/Acme/MorningMusume/IshidaAyumi.pm
+    version: '0.20'
+  Acme::MorningMusume::IshiguroAya:
+    file: lib/Acme/MorningMusume/IshiguroAya.pm
+    version: '0.20'
+  Acme::MorningMusume::IshikawaRika:
+    file: lib/Acme/MorningMusume/IshikawaRika.pm
+    version: '0.20'
+  Acme::MorningMusume::KagoAi:
+    file: lib/Acme/MorningMusume/KagoAi.pm
+    version: '0.20'
+  Acme::MorningMusume::KameiEri:
+    file: lib/Acme/MorningMusume/KameiEri.pm
+    version: '0.20'
+  Acme::MorningMusume::KonnoAsami:
+    file: lib/Acme/MorningMusume/KonnoAsami.pm
+    version: '0.20'
+  Acme::MorningMusume::KudohHaruka:
+    file: lib/Acme/MorningMusume/KudohHaruka.pm
+    version: '0.20'
+  Acme::MorningMusume::KusumiKoharu:
+    file: lib/Acme/MorningMusume/KusumiKoharu.pm
+    version: '0.20'
+  Acme::MorningMusume::LiChun:
+    file: lib/Acme/MorningMusume/LiChun.pm
+    version: '0.20'
+  Acme::MorningMusume::MakinoMaria:
+    file: lib/Acme/MorningMusume/MakinoMaria.pm
+    version: '0.20'
+  Acme::MorningMusume::MichishigeSayumi:
+    file: lib/Acme/MorningMusume/MichishigeSayumi.pm
+    version: '0.20'
+  Acme::MorningMusume::MitsuiAika:
+    file: lib/Acme/MorningMusume/MitsuiAika.pm
+    version: '0.20'
+  Acme::MorningMusume::NakazawaYuko:
+    file: lib/Acme/MorningMusume/NakazawaYuko.pm
+    version: '0.20'
+  Acme::MorningMusume::NiigakiRisa:
+    file: lib/Acme/MorningMusume/NiigakiRisa.pm
+    version: '0.20'
+  Acme::MorningMusume::NonakaMiki:
+    file: lib/Acme/MorningMusume/NonakaMiki.pm
+    version: '0.20'
+  Acme::MorningMusume::OdaSakura:
+    file: lib/Acme/MorningMusume/OdaSakura.pm
+    version: '0.20'
+  Acme::MorningMusume::OgataHaruna:
+    file: lib/Acme/MorningMusume/OgataHaruna.pm
+    version: '0.20'
+  Acme::MorningMusume::OgawaMakoto:
+    file: lib/Acme/MorningMusume/OgawaMakoto.pm
+    version: '0.20'
+  Acme::MorningMusume::QianLin:
+    file: lib/Acme/MorningMusume/QianLin.pm
+    version: '0.20'
+  Acme::MorningMusume::SatohMasaki:
+    file: lib/Acme/MorningMusume/SatohMasaki.pm
+    version: '0.20'
+  Acme::MorningMusume::SayashiRiho:
+    file: lib/Acme/MorningMusume/SayashiRiho.pm
+    version: '0.20'
+  Acme::MorningMusume::SuzukiKanon:
+    file: lib/Acme/MorningMusume/SuzukiKanon.pm
+    version: '0.20'
+  Acme::MorningMusume::TakahashiAi:
+    file: lib/Acme/MorningMusume/TakahashiAi.pm
+    version: '0.20'
+  Acme::MorningMusume::TanakaReina:
+    file: lib/Acme/MorningMusume/TanakaReina.pm
+    version: '0.20'
+  Acme::MorningMusume::TsujiNozomi:
+    file: lib/Acme/MorningMusume/TsujiNozomi.pm
+    version: '0.20'
+  Acme::MorningMusume::YaguchiMari:
+    file: lib/Acme/MorningMusume/YaguchiMari.pm
+    version: '0.20'
+  Acme::MorningMusume::YasudaKei:
+    file: lib/Acme/MorningMusume/YasudaKei.pm
+    version: '0.20'
+  Acme::MorningMusume::YoshizawaHitomi:
+    file: lib/Acme/MorningMusume/YoshizawaHitomi.pm
+    version: '0.20'
+requires:
+  Class::Accessor: '0'
+  DateTime: '0'
+resources:
+  bugtracker: https://github.com/kentaro/perl-acme-morningmusume/issues
+  homepage: https://github.com/kentaro/perl-acme-morningmusume
+  repository: git://github.com/kentaro/perl-acme-morningmusume.git
+version: '0.20'
+x_contributors:
+  - 'Kentaro Kuribayashi <kentarok@gmail.com>'
+  - 'kazusuke sasezaki <sasezaki+github@gmail.com>'
+  - 'catatsuy <catatsuy@catatsuy.org>'

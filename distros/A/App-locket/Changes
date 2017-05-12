@@ -1,0 +1,38 @@
+TODO:
+    - Make cfg 0600, check to see if 0600?
+
+0.0022 Wednesday July 13 23:25:01 PDT 2011:
+    - Squashed some bugs
+    - Better and more consistent interface
+    - Documentation fixup
+
+0.0021 Saturday July 09 23:14:41 PDT 2011:
+    - Don't backspace away the prompt
+    - Reload properly after cfg/setup
+    - Reload properly after an edit
+    - Better display post-edit, post-cfg
+
+0.0020 2011 July 5
+    - Better navigation (interface overhaul)
+    - Better querying /, //, .., .
+    - More: help, reset, show, copy, show #, copy #, etc.
+    - Added randomart fingerprint of configuration
+    - Added lock/unlock option for configuration (but recommend VM)
+    - Code cleanup, reorganization
+    - Added tests
+
+0.0015:
+    - Made $PATH more restrictive (/bin:/usr/bin)
+
+0.0014 Friday June 24 10:13:51 PDT 2011:
+    - Added read command to emit plainstore onto stdout
+    - Added --safety command to prompt before emitting sensitive data
+
+0.0013 Thursday June 23 19:48:53 PDT 2011:
+    - Allow custom cfg location
+    - Added some security considerations
+    - Sanitize $PATH before reading
+
+0.0001 Thursday June 23 2011:
+    - Initial release
+

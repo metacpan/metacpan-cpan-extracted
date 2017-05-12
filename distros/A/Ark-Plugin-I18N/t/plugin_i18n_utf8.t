@@ -1,0 +1,34 @@
+use utf8;
+use strict;
+use warnings;
+use Test::More;
+use Test::Requires 'Locale::Maketext::Lexicon', 'Locale::Maketext::Simple';
+
+use FindBin;
+use lib "$FindBin::Bin/plugin_i18n/lib";
+
+use Ark::Test 'TestApp';
+use Encode;
+
+# test Lexicon
+{
+    my $expected = 'Bonjour';
+    my $request  =
+        HTTP::Request->new( GET => '/maketext/Hello' );
+
+    $request->header( 'Accept-Language' => 'ja' );
+
+    ok( my ($response, $c) = ctx_request($request), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->code, 200, 'Response Code' );
+    is( $response->content, encode_utf8('こんにちは'), 'response encoded ok');
+
+    is(utf8::is_utf8($c->stash->{body}), 1, 'utf-8 flagged ok');
+
+    # also with arguments
+    my $r = $c->localize('logined as [_1]', '名無し');
+    is $r, '名無し としてログインしています', 'localize response ok';
+    is utf8::is_utf8($r), 1, 'utf-8 ok';
+}
+
+done_testing;

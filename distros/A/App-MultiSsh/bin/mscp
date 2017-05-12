@@ -1,0 +1,159 @@
+#!/usr/bin/perl
+
+# Created on: 2015-03-29 19:26:51
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use App::MultiSsh qw/hosts_from_map is_host multi_run shell_quote/;
+
+our $VERSION = '0.19';
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+my %option = (
+    verbose => 0,
+    man     => 0,
+    help    => 0,
+    VERSION => 0,
+);
+
+main();
+exit 0;
+
+sub main {
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'host|h=s@',
+        'group|g=s@',
+        'recurse|r=s',
+        'test|t!',
+        'verbose|v+',
+        'man',
+        'help',
+        'VERSION!',
+    ) or pod2usage(2);
+
+    if ( $option{'VERSION'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+    elsif ( @ARGV < 2 ) {
+        pod2usage( -verbose => 1 );
+    }
+
+    # do stuff here
+    if ($option{group}) {
+        push @{ $option{host} }, App::MultiSsh::get_groups($option{group});
+    }
+    elsif (!$option{host}) {
+        (undef, $option{host}) = $ARGV[-1] =~ s/^( [^@]+ [@])? ( [^:]+ ) : //xms;
+    }
+
+    my $dest = pop @ARGV;
+    my @hosts = hosts_from_map($option{host});
+    my @cmd   = qw/scp/;
+
+    push @cmd, qw/-r/ if $option{recurse};
+
+    for my $host (@hosts) {
+        print join ' ', @cmd, @ARGV, "$host:$dest\n" if $option{verbose} || $option{test};
+        system @cmd, @ARGV, "$host:$dest" if !$option{test};
+    }
+
+    return;
+}
+
+__DATA__
+
+=head1 NAME
+
+mscp - Multi host scp (send files to multiple hosts only)
+
+=head1 VERSION
+
+This documentation refers to mscp version 0.19.
+
+=head1 SYNOPSIS
+
+   mscp [option] src (src2 ...) (--host|-h) [user@]host (--host host2...) dest
+
+ OPTIONS:
+  src           Source file(s)
+  dest          Destination file or directory (if more than one source file
+                then dest must be a directory as per usual scp rules)
+  -r --recurse  Recurse into subdirectories
+
+  -v --verbose  Show more detailed option
+     --version  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for mscp
+
+=head1 DESCRIPTION
+
+The C<mscp> command allows copying files to multiple hosts at once.
+
+=head2 Examples
+
+ # copy ~/.bashrc to servers test01, test02, test03 and test04
+ mscp -h test0[1-4] ~/.bashrc .
+ # equivalent scp commands
+ scp ~/.bashrc test01:.
+ scp ~/.bashrc test02:.
+ scp ~/.bashrc test03:.
+ scp ~/.bashrc test04:.
+
+ # copy the data directory in the current directory to remote /opt/data directories
+ mscp -r -h test0[1,2] data /opt/data
+ # equivalent scp commands
+ scp -r data test01:/opt/data
+ scp -r data test02:/opt/data
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2015 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

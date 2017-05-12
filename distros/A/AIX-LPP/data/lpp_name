@@ -1,0 +1,26 @@
+4 R I freeware.xftp {
+freeware.xftp.rte 02.01.0000.0001 01 N U en_US LLNL XFTP Motif-based FTP client
+[
+*prereq X11.base.rte 4.1.0.0
+*prereq bos.rte 4.3.0.0
+%
+/usr 5
+/usr/local 7
+/usr/local/bin 975
+/usr/local/lib 3
+/usr/local/lib/xftp-2.1 54
+/usr/local/man 3
+/usr/local/man/man1 68
+/usr/lpp 5
+/usr/lpp/freeware.xftp 1
+/usr/lpp/X11 3
+/usr/lpp/X11/lib 3
+/usr/lpp/X11/lib/X11 3
+/usr/lpp/X11/lib/X11/app-defaults 20
+INSTWORK 13 13
+%
+%
+%
+%
+]
+}

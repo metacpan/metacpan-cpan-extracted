@@ -1,0 +1,18 @@
+PerlSwitches -w 
+
+PerlSetVar		HTTunnelFifo				@ServerRoot@/httunnel.sock
+PerlSetVar		HTTunnelMaxReadLength		131072
+PerlSetVar		HTTunnelMaxReadTimeout		15
+PerlSetVar		HTTunnelConnectionTimeout	900
+
+PerlPostConfigRequire	Apache/HTTunnel.pm
+
+<Location "/httunnel">
+  SetHandler			perl-script
+  PerlResponseHandler	Apache::HTTunnel 
+  PerlSetVar			HTTunnelAllowedTunnels  "\
+	localhost             => @Port@, \
+	localhost.localdomain => @Port@, \
+	"
+</Location>
+

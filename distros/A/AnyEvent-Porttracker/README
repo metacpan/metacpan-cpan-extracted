@@ -1,0 +1,288 @@
+NAME
+    AnyEvent::Porttracker - Porttracker/PortIQ API client interface.
+
+SYNOPSIS
+       use AnyEvent::Porttracker;
+
+       my $api = new AnyEvent::Porttracker
+          host => "10.0.0.1",
+          user => "admin",
+          pass => "31331",
+          tls  => 1,
+       ;
+
+       # Example 1
+       # a simple request: ping the server synchronously
+
+       my ($timestamp, $pid) = $api->req_sync ("ping");
+
+       # Example 2
+       # find all realms, start a discovery on all of them
+       # and wait until all discovery processes have finished
+       # but execute individual discoveries in parallel,
+       # asynchronously
+
+       my $cv = AE::cv;
+
+       $cv->begin;
+       # find all realms
+       $api->req (realm_info => ["gid", "name"], sub {
+          my ($api, @realms) = @_;
+
+          # start discovery on all realms
+          for my $realm (@realms) {
+             my ($gid, $name) = @$realm;
+
+             $cv->begin;
+             $api->req (realm_discover => $gid, sub {
+                warn "discovery for realm '$name' finished\n";
+                $cv->end;
+             });
+          }
+
+          $cv->end;
+       });
+
+       $cv->recv;
+
+       # Example 3
+       # subscribe to realm_poll_stop events and report each occurance
+
+       $api->req (subscribe => "realm_poll_stop", sub {});
+       $api->on (realm_poll_stop_event => sub {
+          my ($api, $gid) = @_;
+          warn "this just in: poll for realm <$gid> finished.\n";
+       });
+
+       AE::cv->recv; # wait forever
+
+DESCRIPTION
+    Porttracker (<http://www.porttracker.com/>) is a product that (among
+    other things) scans switches and routers in a network and gives a
+    coherent view of which end devices are connected to which switch ports
+    on which switches and routers. It also offers a JSON-based client API,
+    for which this module is an implementation.
+
+    In addition to Porttracker, the PortIQ product is also supported, as it
+    uses the same protocol.
+
+    If you do not have access to either a Porttracker or PortIQ box then
+    this module will be of little value to you.
+
+    This module is an AnyEvent user, you need to make sure that you use and
+    run a supported event loop.
+
+    To quickly understand how this module works you should read how to
+    construct a new connection object and then read about the event/callback
+    system.
+
+    The actual low-level protocol and, more importantly, the existing
+    requests and responses, are documented in the official Porttracker API
+    documentation (a copy of which is included in this module as
+    AnyEvent::Porttracker::protocol.
+
+THE AnyEvent::Porttracker CLASS
+    The AnyEvent::Porttracker class represents a single connection.
+
+    $api = new AnyEvent::Porttracker [key => value...]
+        Creates a new porttracker API connection object and tries to connect
+        to the specified host (see below). After the connection has been
+        established, the TLS handshake (if requested) will take place,
+        followed by a login attempt using either the "none",
+        "login_cram_md6" or "login" methods, in this order of preference
+        (typically, "login_cram_md6" is used, which shields against some
+        man-in-the-middle attacks and avoids transferring the password).
+
+        It is permissible to send requests immediately after creating the
+        object - they will be queued until after successful login.
+
+        Possible key-value pairs are:
+
+        host => $hostname [MANDATORY]
+            The hostname or IP address of the Porttracker box.
+
+        port => $service
+            The service (port) to use (default: "porttracker=55").
+
+        user => $string, pass => $string
+            These are the username and password to use when authentication
+            is required (which it is in almost all cases, so these keys are
+            normally mandatory).
+
+        tls => $bool
+            Enables or disables TLS (default: disables). When enabled, then
+            the connection will try to handshake a TLS connection before
+            logging in. If unsuccessful a fatal error will be raised.
+
+            Since most Porttracker/PortIQ boxes will not have a
+            sensible/verifiable certificate, no attempt at verifying it will
+            be done (which means man-in-the-middle-attacks will be trivial).
+            If you want some form of verification you need to provide your
+            own "tls_ctx" object with "verify => 1, verify_peername => [1,
+            1, 1]" or whatever verification mode you wish to use.
+
+        tls_ctx => $tls_ctx
+            The AnyEvent::TLS object to use. See "tls", above.
+
+        on_XYZ => $coderef
+            You can specify event callbacks either by sub-classing and
+            overriding the respective methods or by specifying code-refs as
+            key-value pairs when constructing the object. You add or remove
+            event handlers at any time with the "event" method.
+
+    $api->req ($type => @args, $callback->($api, @reply))
+        Sends a generic request of type $type to the server. When the server
+        responds, the API object and the response arguments (without the
+        success status) are passed to the callback, which is the last
+        argument to this method.
+
+        If the request fails, then a fatal error will be raised. If you want
+        to handle failures gracefully, you need to use "->req_failok"
+        instead.
+
+        The available requests are documented in the Porttracker API
+        documentation (a copy of which is included in this module as
+        AnyEvent::Porttracker::protocol.
+
+        It is permissible to call this (or any other request function) at
+        any time, even before the connection has been established - the API
+        object always waits until after login before it actually sends the
+        requests, and queues them until then.
+
+        Example: ping the porttracker server.
+
+           $api->req ("ping", sub {
+              my ($api, $ok, $timestamp, $pid) = @_;
+              ...
+           });
+
+        Example: determine the product ID.
+
+           $api->req (product_id => sub {
+              my ($api, $ok, $branding, $product_id) = @_;
+              ...
+           });
+
+        Example: set a new license.
+
+           $api->req (set_license => $LICENSE_STRING, sub {
+              my ($api, $ok) = @_;
+
+              $ok or die "failed to set license";
+           });
+
+    @res = $api->req_sync ($type => @args)
+        Similar to "->req", but waits for the results of the request and on
+        success, returns the values instead (without the success flag, and
+        only the first value in scalar context). On failure, the method will
+        "croak" with the error message.
+
+    $api->req_failok ($type => @args, $callback->($api, $success, @reply))
+        Just like "->req", with two differences: first, a failure will not
+        raise an error, second, the initial status reply which indicates
+        success or failure is not removed before calling the callback.
+
+    $api->on (XYZ => $callback)
+        Overwrites any currently registered handler for "on_XYZ" or installs
+        a new one. Or, when $callback is undef, unregisters any
+        currently-registered handler.
+
+        Example: replace/set the handler for "on_discover_stop_event".
+
+           $api->on (discover_stop_event => sub {
+              my ($api, $gid) = @_;
+              ...
+           });
+
+EVENTS/CALLBACKS
+    AnyEvent::Porttracker connections are fully event-driven, and naturally
+    there are a number of events that can occur. All these events have a
+    name starting with "on_" (example: "on_login_failure").
+
+    Programs can catch these events in two ways: either by providing
+    constructor arguments with the event name as key and a code-ref as
+    value:
+
+       my $api = new AnyEvent::Porttracker
+          host => ...,
+          user => ..., pass => ...,
+          on_error => sub {
+             my ($api, $msg) = @_;
+             warn $msg;
+             exit 1;
+          },
+       ;
+
+    Or by sub-classing "AnyEvent::Porttracker" and overriding methods of the
+    same name:
+
+       package MyClass;
+
+       use base AnyEvent::Porttracker;
+
+       sub on_error {
+          my ($api, $msg) = @_;
+          warn $msg;
+          exit 1;
+       }
+
+    Event callbacks are not expected to return anything and are always
+    passed the API object as first argument. Some might have default
+    implementations (for example, "on_error"), others are ignored unless
+    overriden.
+
+    Description of individual events follow:
+
+    on_error $api, $msg
+        Is called for every (fatal) error, including "error" notifies. The
+        default prints the message and destroys the object, so it is highly
+        advisable to override this event.
+
+    on_login $api, $method
+        Called after a successful login, after which commands can be send.
+        It is permissible to send commands before a successful login: those
+        will be queued and sent just before this event is invoked. $method
+        is the auth method that was used.
+
+    on_login_failure $api, $msg
+        Called when all login attempts have failed - the default raises a
+        fatal error with the error message from the server.
+
+    on_hello_notify $api, $version, $authtypes, $nonce
+        This protocol notification is used internally by
+        AnyEvent::Porttracker - you can override it, but the module will
+        most likely not work.
+
+    on_info_notify $api, $msg
+        Called for informational messages from the server - the default
+        implementation calls "warn" but otherwise ignores this notification.
+
+    on_error_notify $api, $msg
+        Called for fatal errors from the server - the default implementation
+        calls "warn" and destroys the API object.
+
+    on_start_tls_notify $api
+        Called when the server wants to start TLS negotiation. This is used
+        internally and - while it is possible to override it - should not be
+        overridden.
+
+    on_event_notify $api, $eventname, @args
+        Called when the server broadcasts an event the API object is
+        subscribed to. The default implementation (which should not be
+        overridden) simply re-issues an "on_eventname_event" event with the
+        @args.
+
+    on_XYZ_notify $api, ...
+        In general, any protocol notification will result in an event of the
+        form "on_NOTIFICATION_notify".
+
+    on_XYZ_event $api, ...
+        Called when the server broadcasts the named (XYZ) event.
+
+SEE ALSO
+    AnyEvent, <http://www.porttracker.com/>,
+    <http://www.infoblox.com/en/products/portiq.html>.
+
+AUTHOR
+     Marc Lehmann <marc@nethype.de>
+

@@ -1,0 +1,25 @@
+Build.PL
+Changes
+lib/Apache2/Ajax.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/ajax/error_fn.t
+t/ajax/error_html.t
+t/ajax/formdump.t
+t/ajax/chained.t
+t/ajax/no_build.t
+t/ajax/show_js.t
+t/ajax/pod.t
+t/ajax/subs.t
+t/conf/extra.conf.in
+t/response/TestAjax/basic.pm
+t/response/TestAjax/error_fn.pm
+t/response/TestAjax/error_html.pm
+t/response/TestAjax/formdump.pm
+t/response/TestAjax/chained.pm
+t/response/TestAjax/no_build.pm
+t/response/TestAjax/show_js.pm
+t/response/TestAjax/subs.pm
+t/TEST.PL

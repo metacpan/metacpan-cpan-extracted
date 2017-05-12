@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution App-makedpkg,
+version 0.05:
+
+  Facilitate building Debian packages with templates
+
+This software is copyright (c) 2014 by Jakob Voß.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

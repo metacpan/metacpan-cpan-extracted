@@ -1,0 +1,188 @@
+# NAME
+
+Archive::RPM - Work with a RPM
+
+# SYNOPSIS
+
+	use Archive::RPM;
+    my $rpm = Archive::RPM->new('foo-1.2-1.noarch.rpm');
+
+    # RPM2 header functions...
+
+    # other functions...
+
+# DESCRIPTION
+
+Archive::RPM provides a more complete method of accessing an RPM's meta- and
+actual data.  We access this information by leveraging [RPM2](http://search.cpan.org/perldoc?RPM2) where we can,
+and by "exploding" the rpm (with rpm2cpio and cpio) when we need information
+we can't get through RPM2.
+
+# TRAITS
+
+This package allows for the application of various "TraitFor" style traits
+through the with_traits() function, e.g.:
+
+    Archive::RPM->with_traits('Foo')->new(...);
+
+By default, we look for traits in the "Archive::RPM::TraitsFor" namespace,
+though this can be overridden by prepending a "+" to the full package name of
+the trait.
+
+# METHODS
+
+An object of this class represents an actual RPM, somewhere on the filesystem.
+We provide all the methods [RPM2::Header](http://search.cpan.org/perldoc?RPM2::Header) does, as well as additional
+functions to manipulate/extract the rpm itself (but not to install).
+
+Right now, our documentation is horrible.  Please see [RPM2](http://search.cpan.org/perldoc?RPM2) for the methods
+provided by "RPM2::Header", and the source for the other functions we have
+defined.  We support all methods provided by RPM2::Header, except the "files"
+method (that's handled by other bits).
+
+- __new('file.rpm') | new(rpm => 'file.rpm', ...)__
+
+Creates a new Archive::RPM object.  Note that the rpm parameter is required,
+and if it is the only one being passed the "rpm =>" may be omitted.
+
+    - __rpm => 'filename'|Path::Class::File__
+
+    Required.  Takes either a filename or a Path::Class::File object pointing to the rpm.
+
+    - __auto_cleanup => 0|1__
+
+    Default is 1; if the rpm is extracted to the filesystem, purge this
+    automatically.
+
+- __rpm__
+
+Returns a [Path::Class::File](http://search.cpan.org/perldoc?Path::Class::File) object representing the rpm we're working with.
+
+- __extracted_to__
+
+Returns a [Path::Class::Dir](http://search.cpan.org/perldoc?Path::Class::Dir) object representing where the rpm has been
+exploded to.  If the rpm has not been exploded, it will be.
+
+- __has_been_extracted__
+
+Returns true if the rpm has been exploded; false if not.
+
+- __is_source_package | is_srpm | is_source__
+
+Returns true if this is a source rpm; false if not.
+
+- __has_files__
+
+True if this rpm contains any files. (Some, e.g. Fedora's "perl-core" package,
+are "meta-packages" and do not deliver files; they simply ensure a given set
+of dependencies exist on a system.  Sort of like Task::* CPAN dists.)
+
+- __num_files__
+
+Returns the number of files delivered.
+
+- __grep_files__
+
+Grep over the array of files; e.g.
+
+    my ($spec) = $srpm->grep_files(sub { /\.spec$/ });
+
+- __map_files__
+
+- __files__
+
+Returns an array of all the dir/files delievered by the rpm.  Note that these
+are returned as Path::Class objects, and we use the directories and files
+present on the filesystem after exploding the rpm rather than the list
+described by the rpm itself.
+
+- __first_file__
+
+- __last_file__
+
+- __join_files__
+
+- __num_changelog_entries__
+
+Returns the total number of changelog entries.
+
+- __changelog_entries__
+
+Returns an array of all the changelog entries.
+
+- __first_changelog_entry__
+
+Returns the first changelog entry; note that changelogs are stored in reverse
+chronological order.  That is, the first changelog entry is the newest entry.
+
+- __last_changelog_entry__
+
+Returns the oldest changelog entry.
+
+- __get_changelog_entry(Int)__
+
+Get a specific changelog entry.
+
+- __map_changelog_entries__
+
+- __find_changelog_entry__
+
+- __grep_changelog_entries__
+
+# DIAGNOSTICS
+
+We tend to complain and die loudly on any errors.
+
+# SEE ALSO
+
+[RPM2](http://search.cpan.org/perldoc?RPM2)
+
+# LIMITATIONS
+
+Our documentation and test suite is clearly lacking, sadly.
+
+We also have to explode the rpm for anything more intense than simply looking
+at the header for info.  While this isn't really a _horrible_ thing, it's
+annoying to have to, say, explode a 100MB ooffice rpm just to get a count of
+how many files there are in it.
+
+We do the "exploding" using external rpm2cpio and cpio binaries.  While we
+could have used [Archive::Cpio](http://search.cpan.org/perldoc?Archive::Cpio) to handle the cpio extraction, it seemed a
+touch overkill; as there does not appear to be a Perl library to handle the
+"rpm2cpio" part, we may as well use the cpio bin.  (It's not like it's missing
+from many systems, anyways.
+
+# BUGS 
+
+All complex software has bugs lurking in it, and this module is no
+exception.  If you find a bug please either email me, or (preferred) 
+to this package's RT tracker at `bug-Archive-RPM@rt.cpan.org`.
+
+Patches are welcome.
+
+# AUTHOR
+
+Chris Weyl  <cweyl@alumni.drew.edu>
+
+
+
+# LICENSE AND COPYRIGHT
+
+Copyright (c) 2009, 2010 Chris Weyl <cweyl@alumni.drew.edu>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the 
+
+    Free Software Foundation, Inc.
+    59 Temple Place, Suite 330
+    Boston, MA  02111-1307  USA

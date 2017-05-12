@@ -1,0 +1,6 @@
+1.02   -Syntax error fixes (pull request from unixtastic)
+       -Added Date::Parse dependency (pull request from MartinMcGrath)
+
+1.01   -Improvements to the region guessing algorithm to support s3 virtual hosts
+
+1.00   -Basic module written.

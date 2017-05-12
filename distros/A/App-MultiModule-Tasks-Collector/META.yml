@@ -1,0 +1,34 @@
+---
+abstract: 'collector base class'
+author:
+  - 'Dana M. Diederich <dana@realms.org>'
+build_requires:
+  File::Slurp: 0
+  File::Temp: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-MultiModule-Tasks-Collector
+requires:
+  App::MultiModule::Task: 0
+  Data::Dumper: 0
+  HTTP::Server::Simple::CGI: 0
+  IPC::Transit: 0
+  Message::Match: 0
+  POSIX: 0
+  Test::More: 0
+  parent: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dana/perl-App-MultiModule-Tasks-Collector/issues
+  homepage: https://github.com/dana/perl-App-MultiModule-Tasks-Collector
+  repository: https://github.com/dana/perl-App-MultiModule-Tasks-Collector.git
+version: 1.143110

@@ -1,0 +1,205 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use autodie;
+use v5.10;
+
+use Getopt::Long qw();
+
+use App::plackbench;
+
+my $opts = _parse_argv(\@ARGV);
+
+unless ( $opts->{psgi_path} && $opts->{uri} ) {
+    say "Usage: $0 -n <num requests> /path/to/app.psgi <uri>";
+    exit 1;
+}
+$opts->{post_data} &&= _post_data( $opts->{post_data} );
+
+if ($opts->{fixup}) {
+    my $sub = eval("sub { \$_ = shift; $opts->{fixup} }");
+    $opts->{fixup} = [$sub];
+}
+
+my $bench = App::plackbench->new(%{$opts});
+
+if ($opts->{fixup_files}) {
+    $bench->add_fixup_from_file($opts->{fixup_files});
+}
+
+my $stats = $bench->run();
+_report($stats);
+
+exit 0;
+
+sub _parse_argv {
+    my $argv = shift;
+
+    my %opts;
+
+    Getopt::Long::Configure('bundling');
+    Getopt::Long::GetOptionsFromArray(
+        $argv,
+        'n=i'    => \$opts{count},
+        'warm'   => \$opts{warm},
+        'post=s' => \$opts{post_data},
+        'e=s'    => \$opts{fixup},
+        'f=s'    => \$opts{fixup_files},
+    );
+
+    ( $opts{psgi_path}, $opts{uri} ) = @{$argv};
+
+    for (keys %opts) {
+        delete $opts{$_} unless defined $opts{$_};
+    }
+
+    return \%opts;
+}
+
+sub _post_data {
+    my $file = shift;
+
+    my @bodies;
+    if ( $file eq '-' ) {
+        say 'Enter POST data. <Ctrl-D> when finished.';
+        @bodies = <STDIN>;
+    }
+    else {
+        open( my $fh, $file );
+        @bodies = <$fh>;
+        close($fh);
+    }
+
+    return [ grep $_, map { chomp; $_ } @bodies ];
+}
+
+sub _report {
+    my $stats = shift;
+
+    print "Request times (seconds):\n";
+    printf( "%8s %8s %8s %8s %8s\n", 'min', 'mean', 'sd', 'median', 'max' );
+    printf( "%8.3f %8.3f %8.3f %8.3f %8.3f\n\n",
+        $stats->min(), $stats->mean(), $stats->standard_deviation(), $stats->median(), $stats->max() );
+
+    print "Percentage of requests within a certain time (seconds):\n";
+    for my $percent ( 50, 66, 75, 80, 90, 95, 98, 99, 100 ) {
+        my $value = $stats->percentile( $percent );
+        printf( "%4d%% %8.3f\n", $percent, $value );
+    }
+}
+
+=pod
+
+=head1 NAME
+
+plackbench - Benchmarking/Debugging tool for Plack web requests
+
+=head1 SYNOPSIS
+
+    # Make a request 5 times, and print some stats
+    $ plackbench -n 5 /path/to/app.psgi '/search?q=stuff'
+
+    # Debug the same request
+    $ PERL5OPT=-d plackbench -n 5 /path/to/app.psgi '/search?q=stuff'
+
+    # Profile the same request
+    $ PERL5OPT=-d:NYTProf plackbench -n 5 /path/to/app.psgi '/search?q=stuff'
+    $ nytprofhtml -m
+
+=head1 DESCRIPTION
+
+This script benchmarks a web request. It hits the Plack app directly without
+going through a web server.
+
+This is somewhat useful on it's own for getting an idea of the time spent in
+Perl-land for a web request. But it's mostly a harness for a debugger or
+profiler.
+
+=head1 USAGE
+
+  plackbench /path/to/app.psgi URI
+
+The first positional argument is the path to a .psgi file. The second is the
+URL to request.
+
+The URI is relative to the application root.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -n
+
+Number of times to execute the request. Defaults to 1.
+
+=item --warm
+
+Make an initial request that won't be included in the stats.
+
+=item --post=<file>
+
+Make a POST request instead of a GET. Pass the path to a file with the raw
+URL-encoded POST data. If the file contains multiple lines, each will be used a
+separate POST request.
+
+If the file is a '-', the POST body will be read from STDIN.
+
+=item -e <code>
+
+Pre-process the request using the Perl code passed. C<$_> will be set to a
+L<HTTP::Request> object.
+
+For example, to set the User-Agent:
+
+    plackbench -e '$_->header("User-Agent" => "Mozilla")' /path/to/app.psgi /
+
+=item -f <file>
+
+Like C<-e>, however the code is read from a file. Should return a code
+reference, which will be passed a C<HTTP::Request> object.
+
+A simple example:
+
+    sub {
+        my $request = shift;
+        $request->header( Cookie => 'session=mysid' );
+        return;
+    }
+
+The file can contain any valid Perl code, but the last statement in the file
+must be a subroutine reference.
+
+=back
+
+=head1 Using with L<Devel::NYTProf>
+
+Just invoking the script through NYTProf is all that's necessary:
+
+    PERL5OPT=-d:NYTProf plackbench /path/to/app.psgi '/search?q=stuff'
+
+In some applications, startup costs can overshadow the actual request in the
+report. If this happens prevent NYTProf from starting by default:
+
+    NYTPROF=start=no PERL5OPT=-d:NYTPRof plackbench /path/to/app.psgi '/search?q=stuff'
+
+The script will call C<DB::enable_profile()> to start NYTProf before executing
+any requests. Which removes the startup code from the final report.
+
+If the C<--warm> flag is used, C<DB::enable_profile()> will be called after the
+initial request.
+
+See L<Devel::NYTProf> for more information.
+
+=head1 AUTHOR
+
+Paul Boyd <boyd.paul2@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Paul Boyd.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

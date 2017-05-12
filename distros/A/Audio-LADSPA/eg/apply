@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+use strict;
+$|=1;
+use blib;
+use Audio::LADSPA;
+
+die "Usage: $0 plugin [plugin-options] <instream >outstream\n" unless @ARGV == 1;
+
+my $name = shift;
+
+my $plugin;
+for (Audio::LADSPA->plugins) {
+    if ($_ eq $name || $_->id eq $name || $_->label eq $name || $_->name eq $name) {
+	$plugin = $_->new(44100);
+	last;
+    }
+}
+$plugin or die "Cannot find plugin $name\n";
+
+
+my @buffers;
+for ($plugin->ports) {
+    my $buf = Audio::LADSPA::Buffer->new(1);
+    $_->connect($buf);
+    push @buffers,$buf;
+}
+
+

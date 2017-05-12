@@ -1,0 +1,138 @@
+NAME
+    App::Siesh - interactive sieve shell
+
+SYNOPSIS
+            App::Siesh->run(
+                debug => 0,
+                user  => 'dom',
+                host  => 'imap',
+                tls   => 'require',
+                port  => '2000',
+                password => 'secret',
+            );
+
+DESCRIPTION
+    App::Siesh provides a shell-like interface for manipulating sieve
+    scripts using the ManageSieve protocol. If you search a command line
+    utility, take a look at siesh.
+
+OPTIONS
+    debug
+        Enable debugging.
+
+    user
+        Specifies the username to use when logging into the sieve server.
+        This option defaults to the value of the environment variable
+        "USER".
+
+    host
+        Specifies the machine to connect to. Defaults to "imap".
+
+    port
+        Specifies the remote port to connect to. Defaults to 2000.
+
+    tls Specifies whether TLS is required ("require"), optional ("auto") or
+        disables ("off"). Defaults to *auto*.
+
+    file
+        If an IO::Handle object is provdided, App::Siesh won't read commands
+        from the command line prompt, but from that filehandle.
+
+    password
+        Specifies the password to login.
+
+COMMANDS
+    list
+        Prints a list of all scripts on the server. The currently active
+        script, if any, is marked by a *** (astersik).
+
+        Synonyms: ls, dir
+
+    delete *script-name* *...*
+        Deletes all listed scripts. It's not possible to delete the
+        currently active script, so please use deactivate first. There's no
+        way to undelete a deleted script.
+
+        If you specify *** (asterisk) as first argument to delete, the
+        active script is deactivated and all scripts are deleted.
+
+        Synonyms: rm
+
+    edit *script-name*
+        Edits a script on the server without downloading it explicitly to
+        your disk first. Under the hood it creates a temporary file, puts
+        the script content in it and calls $ENV{EDITOR} on it. After that
+        the script is uploaded back. It's also possible to create and edit a
+        new script with this command.
+
+        If your script is syntactical incorrect, you will be prompted to
+        re-edit the file or throw away your changes.
+
+        Synonyms: vi
+
+    copy *script-name* *script-name*
+        Copies the contents of the source script-name to a target script.
+        The contents of the target script are overridden.
+
+        Synonyms: cp
+
+    move *script-name* *script-name*
+        Moves script to a destination script. The destination script is
+        overridden.
+
+        Synonyms: mv
+
+    activate *script-name*
+        Activates the listed script. User may have multiple Sieve scripts on
+        the server, yet only one script may be used for filtering of
+        incoming messages. This is called the active script. Users may have
+        zero or one active scripts
+
+        Synonyms: set
+
+    deactivate
+        Deactivate all scripts. Deactivation of all your scripts results in
+        no filtering at all.
+
+        Synonyms: unset
+
+    cat *script-name*
+        Print script on the standard output.
+
+        Synonyms: type
+
+    view *script-name*
+        Calls $ENV{PAGER} or "less" on script. In case of any error, we fall
+        back to use cat.
+
+        Synonyms: more
+
+    quit
+        Terminates the sessiion with the remote SIEVE server. An end of file
+        will also terminate the session and exit.
+
+        Synonyms: q, logout
+
+    help
+        Print a short description of all commands.
+
+        Synonyms: h
+
+    put *file-name* *script-name*
+        Store a local file as script on the remote machine.
+
+    get *file-name* *local-name*
+        Retrieve a remote script and store it on the local machine.
+
+SEE ALSO
+    siesh, Net::ManageSieve::Siesh, Net::ManageSieve
+
+AUTHOR
+    Mario Domgoergen <dom@math.uni-bonn.de>
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Mario Domgoergen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

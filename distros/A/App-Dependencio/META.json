@@ -1,0 +1,84 @@
+{
+   "abstract" : "Simple utility to find perl modules dependencies recursively in your project.",
+   "author" : [
+      "dani remeseiro, <jipipayo at cpan dot org<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Dependencio",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd::Simple" : "0",
+            "Cwd" : "0",
+            "Data::Printer" : "0",
+            "File::Find" : "0",
+            "List::MoreUtils" : "0",
+            "Module::Extract::Use" : "0",
+            "Term::ANSIColor" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::Dependencio" : {
+         "file" : "lib/App/Dependencio.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jipipayo/Dependencio/issues"
+      },
+      "homepage" : "https://github.com/jipipayo/Dependencio",
+      "repository" : {
+         "url" : "git://github.com/jipipayo/Dependencio.git",
+         "web" : "https://github.com/jipipayo/Dependencio"
+      }
+   },
+   "version" : "0.09",
+   "x_contributors" : [
+      "natlibfi-arlehiko <natlibfi-arlehiko@users.noreply.github.com>",
+      "jipipayo <daniel.remeseiro@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

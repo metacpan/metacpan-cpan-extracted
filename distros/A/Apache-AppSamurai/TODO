@@ -1,0 +1,41 @@
+AppSamurai TODO
+---------------
+* doc - A Howto?
+* doc - Clean up Pod.  (Lots of overlong lines)
+* doc - Add method documentation to modules.  (Missing on many, including
+        "alterlist" related methods.)  Add skips for any that don't
+        warrant full docs and then enable t/99-pod-coverage.t
+
+* usability - RealmThingThisThatJimmyCrackCorn... bleh.. need to add some
+              nicer config syntax like: Realm.Thing1.Subthing = Whatever
+* feature - Add "last access" tracker and complementary stale session data
+            cleaner.  (Could use for in-prog audit trail, too, just don't log
+            anything sensitive)
+* feature - Add more auth modules (volunteers?)  Potential candidates:
+        = Web form - Use LWP::UserAgent to attempt login to a form login based
+                     web page
+        = TACACS+ - Using Net::TacacsPlus?
+        = CAPTCHA - Using Authen::PluggableCaptcha or Authen::Captcha?
+        = OpenID - Using Net::OpenID::Consumer?
+        = ** AuthSimple (using Authen::Simple) support most other major
+             authentication options
+* feature - Add multi-stage login support (for challenge/response, next
+            tokencode mode, NTLM/Kerberos integrated  IE auth, etc.)
+* feature - CheckUrl is weak and more extensive URL/header sanity filtering
+            is needed
+* feature - Logout is crude and blocks application's native logout.  Add a
+            capture system to send logout request to backend, then bundle into
+            session kill and send back to browser.
+* feature - Add alterlist configuration options (for Apache config)
+* feature - Should refactor the Session, Tracker, and AlterList into individual
+            modules.  AppSamurai.pm is WAY too fat a pig.
+* feature - Modularize/generalize the Tracker feature to be like Auth system.
+* feature - Add a tracker based filter for dynamic rule based filtering, and
+            a small Perl tool to modify the tracker externally.  Example use:
+            Blocking a specific Windows Mobile device ID.
+
+* uber-feature - Filter server responses. (Would require skipping mod_proxy
+                 in Apache 1.x and doing a direct fetch)
+
+----
+$Id: TODO,v 1.28 2008/05/03 06:43:22 pauldoom Exp $

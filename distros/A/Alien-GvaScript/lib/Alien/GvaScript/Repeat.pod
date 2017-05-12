@@ -1,0 +1,256 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+Alien::GvaScript::Repeat - Support for repeated sections
+
+=head1 SYNOPSIS
+
+  <div repeat="foo">
+    <h2>Foo #{foo.count}</h2>
+    This is the repeated foo section
+    <table>
+      <tr repeat="bar">
+        <td>Item #{bar.count}</td>
+        <td><input name="#{bar.path}.buz"></td>
+        <td><button onclick="GvaScript.Repeat.remove('#{bar.path}')">
+              Remove this row
+            </button></td>
+      </tr>
+    </table>
+     <button onclick="GvaScript.Repeat.add('#{foo.path}.bar')">
+        Add a bar
+     </button>
+  </div>  
+  <button onclick="GvaScript.Repeat.add('foo')">Add a foo</button>
+
+  <script>
+    GvaScript.Repeat.init(document.body);
+  </script
+
+
+=head1 DESCRIPTION
+
+This module of L<Alien::GvaScript> implements a mechanism for repeated
+elements within an HTML page. The main use is within forms, for
+dynamic expansion of subforms, so it is quite likely that you will
+want to use the L<Alien::GvaScript::Form> API instead of calling the
+present module directly. However, the repeat mechanism will work for
+any kind of HTML element.
+
+The design is partially inspired by the C<Web Forms 2.0> proposal
+(L<http://www.whatwg.org/specs/web-forms/current-work/>), but is 
+not an attempt to implement the proposed specification: there are
+some differences both in syntax and in semantics.
+
+
+=head2 Terminology
+
+At initialization stage, the DOM is inspected for finding
+I<repeat elements> (elements having a C<repeat> attribute).
+These elements are removed from the DOM and replaced
+by I<placeholders> (empty DOM elements, just marking where
+the repetition blocks should be inserted).
+Each placeholder stores a I<template>, which is 
+a plain string representation of the repeat element, with 
+special markup for template instanciation. 
+The template may then be dynamically instanciated into
+I<repetition blocks> by calling the L</add> method.
+
+
+=head1 HTML 
+
+=head2 Markup of repeat elements
+
+  <div repeat="foo" repeat-start="3" repeat-min="2" repeat-max="6" 
+                    repeat-prefix="">
+    <!-- content to be repeated, using #{foo.ix}, #{foo.path}, etc. -->
+  </div>
+
+Any element marked with a non-empty C<repeat> attribute is
+a I<repeat element>; the value of that attribute defines
+the I<repeat name>. Repeat elements can be nested, and their
+repeat names are used to distinguish at which level a repetition
+block should be instanciated.
+
+Other attributes of the repetion model all start with 
+the C<repeat> prefix, as listed below; these attributes are optional. 
+
+=over
+
+=item repeat
+
+marks the element as a repeat element, and defines the repeat name.
+
+=item repeat-start
+
+defines how many repetition blocks should be automatically
+created as initialization time. Default is 1.
+
+=item repeat-min
+
+minimum number of repetition blocks. Prevents deletion
+of repetition blocks under that number. Default is 0.
+
+=item repeat-max
+
+maximum number of repetition blocks. Prevents addition
+of repetition blocks over that number. Default is 99.
+
+=item repeat-prefix
+
+defines the initial fragment of the C<repeat path> (see 
+explanation below). Only valid for top-level repetition elements, 
+because nested repetition elements are automatically prefixed
+by their parent repetition element. Default is the empty string.
+
+=back
+
+
+=head2 String substitutions within repeat elements
+
+The content of a repeat element may contain special markup
+for repetition variables, which will be replaced by values
+when the element is instanciated into a repetition block.
+
+Variables are written C<< #{<repetition name>.<variable>} >>, like for
+example C<#{foo.ix}>, C<#{foo.count}> or C<#{bar.path}>. The
+repetition name is the value of the C<repeat> attribute of the repeat
+element, as explained above; in this namespace, the following
+variables are defined
+
+=over
+
+=item count
+
+current number of repetition blocks for that repeat element, starting at 1.
+
+=item ix 
+
+integer index of the current repetition block, starting at 0.
+
+=item path
+
+cumulated list of repetition name and repetition indices, separated
+by dots. 
+
+=item min
+
+value of the C<repeat-min> attribute.
+
+=item max
+
+value of the C<repeat-max> attribute.
+
+=back
+
+The C<path> is unique within any nesting of repeat elements,
+and therefore is typically used for ids or for
+names of input elements :
+
+  <tr repeat="bar">
+    <td>Item #{bar.count}</td>
+    <td><input name="#{bar.path}.buz"></td>
+  </tr>
+
+Within the 3rd repetition block of C<bar>, nested
+within the 2nd repetition block of C<foo>, the value of
+C<#{bar.path}> will be C<foo.2.bar.3> and therefore
+in this example the input name would be
+C<foo.2.bar.3.buz>.
+
+
+I<Implementation note>: the C<< #{...} >> syntax for
+variables is borrowed from C<prototype.js>'s C<Template>
+class; however, the implementation of substitutions
+is done in plain javascript, without calling
+C<Template.evaluate()> method.
+
+=head1 METHODS
+
+=head2 init
+
+  GvaScript.Repeat.init(element)
+
+Walks down the DOM under the given element, finds all 
+elements having a C<repeat> attribute, replaces these
+by placeholders.
+
+The C<element> argument will be fed to C<prototype.js>'s
+C<$()> function, so it can be either a DOM element or
+an id string.
+
+=head2 add
+
+  GvaScript.Repeat.add(repeat_name, count)
+
+Creates one or several new repetition blocks in the DOM, 
+after the current blocks, by instanciating
+the repeat element C<repeat_name> (including prefix).
+The  C<count> argument is optional and states how many blocks
+should be added; default is 1. Returns the final number of 
+repetition blocks for that repeat element.
+
+If the repeat structure looks like
+
+  <div repeat="foo" repeat-prefix="top">
+     <div repeat="bar">
+
+then a new C<foo> repetition block is instanciated
+through C<add('top.foo')>, and a new C<bar> repetition
+block is instanciated through C<add('#{foo.path}.bar')>.
+
+
+
+
+=head2 remove
+
+  GvaScript.Repeat.remove(repetition_block[, live_update])
+
+Removes a repetition block from the DOM. The argument is either
+a DOM element or a string containing the element id.
+
+param C<Boolean> live_update: flag to indicate whether the 'remaining'
+repeatable sections are to be also removed from DOM, recreated by re-merging
+the data with repeat template, then finally re-appended to the DOM.
+Default true.
+
+All repetition blocks below the removed block are renumbered,
+leaving no hole in the index sequence. To do so, these
+blocks are also removed from the DOM, and then added
+again through the L</add> method.
+
+If the repetition block is within a form, you probably
+want to call L<Alien::GvaScript::Form/remove> instead
+of the present method, in order to properly preserve
+current form data.
+
+=head1 EVENTS
+
+For a general explanation on registering handlers
+for GvaScript events, see the L<event> documentation.
+
+=head2 onAdd
+
+  <div repeat="Foo" 
+       onAdd="alert('a new Foo is born with index #{Foo.ix}')">
+
+This event is triggered whenever a new repetition block
+is created through the L</add> method
+(including when the L</init> method
+instantiates C<repeat-start> initial repetition blocks).
+
+=head2 onRemove
+
+  <div repeat="Foo" 
+       onRemove="alert(event.target.id + ' is removed')">
+
+This event is triggered whenever a repetition block
+is removed through the L</remove> method.
+Since this method also removes all repetition blocks
+above the requested block, the event will be triggered
+once for each block.
+
+=head1 SEE ALSO
+
+L<Alien::GvaScript>

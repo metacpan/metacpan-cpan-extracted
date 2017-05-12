@@ -1,0 +1,37 @@
+#!perl
+use strict;
+use warnings;
+
+use App::KV2JSON;
+print App::KV2JSON->run(@ARGV);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+kv2json - command line utility for building json
+
+=head1 SYNOPSIS
+
+    % kv2json var=baz fruits[]=apple,orange aa[bb]=cc
+    {"fruits":["apple","orange"],"var":"baz","aa":{"bb":"cc"}}
+
+=head1 DESCRIPTION
+
+kv2json is command line utility for building json.
+
+=head1 LICENSE
+
+Copyright (C) Songmu.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Songmu E<lt>y.songmu@gmail.comE<gt>
+
+=cut
+

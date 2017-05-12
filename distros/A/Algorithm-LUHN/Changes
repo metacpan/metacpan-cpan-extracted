@@ -1,0 +1,39 @@
+Revision history for Perl module Algorithm::LUHN
+
+1.02 2014-06-30 NEILB
+    - Updated github repo URL after changing my github username
+    - Added Algorithm::Damm and Math::CheckDigits to SEE ALSO
+    - Fixed errors in pod: using c<...> instead of C<...> and
+      not escaping the > character.
+    - Added [MetaJSON] to dist.ini so META.json is included in releases
+
+1.01 2014-06-30 NEILB
+
+    - Added SEE ALSO section with links to other LUHN modules.
+    - Renamed CHANGES to Changes and reformatted as per CPAN::Changes::Spec
+    - Moved LUHN.pm to lib/Algorithm/LUHN.pm, as per convention
+    - Switched to Dist::Zilla and set min perl version to 5.006
+    - Improved doc for is_valid(), in response to RT#43842
+    - Added github repo to pod
+
+1.00 2002-03-26 TAYERS
+
+    - Fixed linguistic problem in error message
+      ("not correct" vs.  "incorrect").
+
+0.13 2001-05-03 TAYERS
+
+    - Changed is_valid to always return 1 or '' (instead of 0 or
+      sometimes undef) and it sets $ERROR when the check_digit doesn't match.
+    - Small change to the calculation of the return value of check_digit.
+      Purely for aesthetic reasons.
+
+0.12 2001-05-02 TAYERS
+
+    - Replaced the ill-conceived C<die> call in check_digit with the
+      $ERROR variable that contains the reason for the "failure."
+
+0.10 2001-05-01 TAYERS
+
+    - First release to CPAN
+

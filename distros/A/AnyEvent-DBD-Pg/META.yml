@@ -1,0 +1,37 @@
+---
+abstract: "AnyEvent interface to DBD::Pg's async interface"
+author:
+  - 'Mons Anderson, C<< <mons@cpan.org> >>'
+  - 'Mons Anderson <mons@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  lib::abs: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-DBD-Pg
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  AnyEvent::DBD::Pg:
+    file: lib/AnyEvent/DBD/Pg.pm
+    version: 0.03
+requires:
+  AnyEvent: 5
+  DBD::Pg: 0
+  DBI: 0
+  Scalar::Util: 0
+  common::sense: 3
+  perl: 5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

@@ -1,0 +1,129 @@
+#!/usr/bin/env perl
+package
+    mvr;
+use v5.14.0;
+use strict;
+use warnings;
+our $VERSION = '0.005'; # VERSION
+# PODNAME: mvr
+# ABSTRACT: like mv, but clever
+
+use Pod::Usage qw(pod2usage);
+use Getopt::Long;
+use App::mvr;
+
+
+my $verbose = 1;
+my %opts = ( quiet => sub { $verbose = 0 }, verbose => \$verbose, deduplicate => 1 );
+GetOptions( \%opts,
+    'help|?',
+    'version',
+    'verbose|v+',
+    'quiet!',
+    'deduplicate!',
+) or pod2usage( -verbose => 1 );
+pod2usage( -verbose => 2 ) if $opts{help};
+
+if ($opts{version}) {
+    say __PACKAGE__ . ' version ' . (__PACKAGE__->VERSION // 'dev');
+    exit;
+}
+
+my @source;
+push @source, shift
+    while @ARGV > 1;
+pod2usage( -verbose => 0, -exitval => 1) unless @ARGV;
+
+my $dest = shift;
+
+local $App::mvr::VERBOSE = $verbose;
+mvr( source => \@source, dest => $dest, deduplicate => $opts{deduplicate} );
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mvr - like mv, but clever
+
+=head1 VERSION
+
+version 0.005
+
+=head1 SYNOPSIS
+
+    mv source.txt dest.txt
+    mv source{1,2,3}.txt dest # don't care if source1.txt already exists
+    mv DSC*.jpg ~/Pictures    # don't care if DSC0001.jpg already exists
+
+=head1 DESCRIPTION
+
+Renames source files like C<mv>, but gives them a unique name if the
+name you tried to use was already taken.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--deduplicate>, --no-deduplicate
+
+Whether to enable deduplication. If enabled (the default), then upon
+encountering a name conflict, the script will check whether the source and
+destination files have the same contents. If they do, the source file will
+simply be removed, rather than adding another copy of the file to the
+destination. Use C<--no-deduplicate> to disable this behaviour.
+
+=item B<--verbose>, --quiet
+
+Provides output describing operations. Use C<--quiet> to silence all
+non-error output.
+
+=item B<--help>, -?
+
+Show this documentation.
+
+=item B<--version>
+
+Show version information.
+
+=back
+
+=head1 NAMING
+
+C<mvr> is like C<mv>, but also does automatic renaming for uniqueness, so
+C<mvr> actually means "move-rename" but has the added coincidental feature of
+being the word "mover" with the vowels removed for Maximum Trendiness.
+
+=head1 AVAILABILITY
+
+The project homepage is L<http://metacpan.org/release/App-mvr/>.
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<https://metacpan.org/module/App::mvr/>.
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/doherty/App-mvr>
+and may be cloned from L<git://github.com/doherty/App-mvr.git>
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://github.com/doherty/App-mvr/issues>.
+
+=head1 AUTHOR
+
+Mike Doherty <doherty@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Mike Doherty.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

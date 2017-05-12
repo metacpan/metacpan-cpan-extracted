@@ -1,0 +1,438 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-submit
+# ABSTRACT: Submit a changeset for code review
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    branch_basis
+    branch_point
+    confirm
+    current_branch
+    fetch_tags
+    full_changeset_name
+    guarantee_a_clean_working_directory
+    get_user_name
+    get_user_email
+    git
+    git_config
+    git_fetch_and_clean_up
+    is_auto_fetch
+    is_valid_ref
+    its_for_changeset
+    let_user_edit
+    meta_data_add
+    meta_data_rm
+    project_config
+    project_name
+    user_lookup_class
+);
+use App::Gitc::Reversible;
+use Getopt::Long;
+use List::MoreUtils qw( any );
+
+my $self_review = 0;
+my $keep = 0;
+my $skip_email = 0;
+my $skip_edit = 0;
+my $auto_rebase = 1;
+GetOptions(
+    'keep'       => \$keep,
+    'skip-email' => \$skip_email,
+    'skip-edit'  => \$skip_edit,
+    'skip-auto-rebase' => sub { $auto_rebase = 0 },
+);
+
+my $reviewer = find_reviewer( shift @ARGV );
+my $changeset = current_branch();
+die   "You may not submit $changeset for review.\n"
+    . "Perhaps you should checkout a changeset branch first.\n"
+    if $changeset =~ m/^(master|test|stage|prod)$/;
+
+# make sure the local repository is up to date
+git_fetch_and_clean_up() if is_auto_fetch();
+
+# the changeset has to have changes before submitting
+my $branch_point = branch_point( full_changeset_name($changeset) );
+my @commit_ids   = git "rev-list HEAD ^$branch_point";
+die "You haven't committed anything to this changeset yet!\n"
+    if not @commit_ids;
+
+# should the changeset be rebased?
+launch_auto_rebase($branch_point) if $auto_rebase;
+
+my $its = its_for_changeset($changeset);
+
+my $stash;
+reversibly {
+    failure_warning "\nCanceling gitc submit\n";
+
+    $stash = guarantee_a_clean_working_directory();
+    to_undo { git "stash apply $stash" if $stash; $stash = undef };
+
+    if ( my @conflicts = find_merge_conflicts($changeset) ) {
+        my $conflicts = join ', ', @conflicts;
+        warn  "\nThis changeset will have merge conflicts when promoted\n"
+            . "to $conflicts.  In your submit email, please provide the\n"
+            . "reviewer with any instructions he might need to correctly\n"
+            . "resolve the conflicts.\n"
+            . "Press ENTER to continue.\n";
+            ;
+        my $junk = <STDIN>;
+    }
+
+    # export the patch emails and let the user edit the cover
+    my ( $tmpdir, $cover_letter ) = export_patches($changeset);
+    let_user_edit($cover_letter) unless ($skip_email || $skip_edit);
+
+    # die if the user deleted the entire cover letter
+    die "Aborting submit at the user's request\n" if -s $cover_letter <= 10;
+    update_email_headers( $tmpdir, $cover_letter );
+
+
+    # record the submit action in meta data
+    my $id = meta_data_add({
+        action    => 'submit',
+        changeset => $changeset,
+        reviewer  => $reviewer,
+    });
+    to_undo { meta_data_rm(id => $id, changeset => $changeset) };
+
+    # record the review action for self-review
+    if ( $self_review ) {
+        my $id = meta_data_add({
+            action    => 'review',
+            changeset => $changeset,
+        });
+        to_undo { meta_data_rm(id => $id, changeset => $changeset) };
+    }
+
+    # put the changeset branch where others can see it
+    if ( not $self_review ) {
+        git "push --force origin $changeset:pu/$changeset";
+        to_undo { git "push origin :pu/$changeset" };
+    }
+
+    # delete the local branch
+    if ( not $keep ) {
+        git "checkout master";
+        to_undo { git "checkout -f $changeset" };
+        local $@;
+        eval { # failing in here is ok
+            my $sha1 = is_valid_ref($changeset);
+            git "branch -D $changeset";
+            to_undo { git "branch $changeset $sha1" };
+        };
+        warn "Unable to delete branch $changeset: $@\n" if $@;
+    }
+
+    # blast out the emails
+    git "send-email --to " . get_user_email($reviewer)
+      . '           --from "' . author_email() . '"'
+      . '           --no-chain-reply-to'
+      . '           --signed-off-by-cc'
+      . '           --suppress-cc author'
+      . '           --suppress-from'
+      . '           --quiet'
+      . '           --no-validate'
+      . "           $tmpdir/*.patch"
+      if not $skip_email
+      ;
+
+    if ($its) {
+        # update the Issue status
+        my $issue = $its->get_issue($changeset, reload => 1);
+        my $project = project_name();
+        my $what_happened = $its->transition_state({
+            command   => 'submit',
+            issue     => $issue,
+            reviewer  => $reviewer,
+            message   => "Submitted $project#$changeset to $reviewer for code review",
+            changeset => $changeset,
+        });
+    }
+    return;
+};
+
+# reinstate any changes present when we started
+git "stash apply $stash" if $stash;
+exec "gitc pass --from-self-review" if $self_review;
+exit;
+
+################################ helper subs ########################
+
+# decide who should review this changeset
+sub find_reviewer {
+    my $reviewer = shift or die "You must specify a reviewer\n";
+
+    # handle self-review for dataload projects
+    my $current_user = get_user_name();
+    if ( $reviewer eq $current_user ) {
+        if ( project_config()->{'self submit'} ) {
+            $self_review = 1;
+            $skip_email  = 1;
+            $keep        = 1;
+            return $reviewer;
+        }
+    }
+
+    validate_reviewer($reviewer);
+    return $reviewer;
+}
+
+# determine whether the given reviewer is valid.  if not, suggest
+# an alternative based on possible mis-spellings
+sub validate_reviewer {
+    my ($reviewer) = @_;
+   
+    fetch_tags(); 
+    my @users = user_lookup_class()->users();
+
+    return if any { $_ eq $reviewer } @users;
+
+    # an invalid reviewer.  make some suggestions
+    require Text::Levenshtein;
+    require List::Util;
+    my @suggestions =
+        map  { $_->[0] }
+        sort { $a->[1] <=> $b->[1] }
+        grep { $_->[1] < 4 }           # only "close" matches
+        map  { [ $_, scalar Text::Levenshtein::distance( $reviewer, $_ ) ] }
+        @users;
+    my @short_list = @suggestions[ 0 .. List::Util::min($#suggestions, 2) ];
+
+    my $msg = "The user name '$reviewer' is invalid. ";
+    if (@suggestions) {
+        $msg   .= "Perhaps you meant one of:\n";
+        $msg   .= "  - $_\n" for @short_list;
+    }
+    else {
+        $msg .= "\n";
+    }
+    die $msg;
+}
+
+# Execute a rebase (and never return) if this changeset hasn't accounted
+# for the most recent commits on its 'onto' branch.
+sub launch_auto_rebase {
+    my ($branch_point) = @_;
+
+    # are there new commits since the changeset branch?
+    my $basis = branch_basis($branch_point);
+    return if $basis !~ /^(master|test|stage|prod)$/;
+    my @upstream = git "rev-list --first-parent origin/$basis ^HEAD";
+    return if not @upstream;
+
+    # yup, so start a rebase
+    my $count = @upstream;
+    my $s = $count == 1 ? '' : 's';
+    warn "Uh oh, $basis has $count commit$s since you started.\n"
+        . "I'm rebasing for you.  When it's done, resubmit.\n"
+        . "\n"
+        ;
+    exec "git rebase --onto origin/$basis $branch_point";
+}
+
+sub export_patches {
+    my ($changeset) = @_;
+
+    # generate the patches
+    require File::Temp;
+    my $tmpdir = File::Temp::tempdir(
+        'gitc-submit-XXXXX',
+        TMPDIR  => 1,
+        CLEANUP => 1,
+    );
+    my $project = project_name();
+    git "format-patch -o $tmpdir"
+      . "             --thread"
+      . "             --no-numbered"
+      . "             --cover-letter"
+      . "             --no-color"
+      . "             --no-binary"
+      . "             -M -C --no-ext-diff"
+      . "             --no-prefix"
+      . "             --subject-prefix='$project#$changeset'"
+      . "             " . branch_point($changeset)
+      ;
+
+    # CONFIGURE (optional)
+    # Add any local custom headers to the call above 
+    # TODO This should be pulled in from a configuration file
+
+    # adjust the cover-letter subject line
+    my @patches = glob("$tmpdir/*.patch");
+    if ( @patches > 2 and $its ) {
+        fill_in_subject_line($tmpdir, $changeset);
+        return ( $tmpdir, "$tmpdir/0000-cover-letter.patch" );
+    }
+
+    # there's only one real patch, so send it
+    unlink "$tmpdir/0000-cover-letter.patch";
+    my ($patch) = glob("$tmpdir/*.patch");
+    if ($its) {
+        my $uri = $its->issue_changeset_uri( $its->get_issue($changeset) );
+        if ($uri) {
+            my $content = do {
+                open my $fh, '<', $patch or die "Couldn't open $patch: $!";
+                local $/;
+                <$fh>;
+            };
+            $content =~ s{\n\n}{\n\n$uri\n\n};
+            open my $fh, '>', $patch or die "Couldn't write to $patch: $!";
+            print $fh $content;
+        }
+    }
+    return ( $tmpdir, $patch );
+}
+
+sub fill_in_subject_line {
+    my ($tmpdir, $changeset) = @_;
+    my $file = "$tmpdir/0000-cover-letter.patch";
+
+    # read in the current cover letter
+    open my $fh, '<', $file or die "Couldn't read cover letter : $?";
+    my $content = do { local $/; <$fh> };
+    close $fh;
+
+    # replace the default subject line
+    my $its_name = $its->label_service;
+    my $its_label = $its->label_issue;
+    my $issue = $its->get_issue($changeset);
+    my $subject = eval {
+        print STDERR "Looking for $its_name $its_label...";
+        my $summary = $its->issue_summary($issue);
+        print STDERR "done\n";
+        return $summary;
+    } || "Submitted for Review";
+    warn "Problem obtaining the $its_label summary: $@" if $issue and $@;
+    $content =~ s/\Q*** SUBJECT HERE ***\E/$subject/;
+
+    # remove the default blurb line
+    my $uri = $its->issue_changeset_uri($issue);
+    $content =~ s/\Q*** BLURB HERE ***\E/$uri/;
+
+    # save the new version
+    open $fh, '>', $file or die "Couldn't write cover letter : $?";
+    print $fh $content;
+    close $fh;
+
+    return;
+}
+
+sub update_email_headers {
+    my ( $tmpdir, $cover_letter ) = @_;
+    return if $cover_letter !~ m/0000-cover-letter/;
+    require Email::Simple;
+
+    # find headers we want to set
+    my @blacklist = qw(
+        date
+        from
+        in-reply-to
+        message-id
+        references
+        subject
+    );
+    my $cover = Email::Simple->new( slurp($cover_letter) );
+    my %extra_headers;
+    for my $header ( $cover->header_names ) {
+        next if $header =~ m/^from /i;
+        $extra_headers{ lc $header } = $cover->header($header);
+    }
+    delete @extra_headers{@blacklist};
+
+    # process each patch email
+    for my $file ( glob "$tmpdir/*.patch" ) {
+        next if $file =~ m/0000-cover-letter/;
+        my $email = Email::Simple->new( slurp($file) );
+        while ( my ( $name, $value ) = each %extra_headers ) {
+            $email->header_set( $name, $value );
+        }
+
+        open my $fh, '>', $file or die "Unable to write to $file: $!";
+        print $fh $email->as_string;
+    }
+
+    return;
+}
+
+# this might be worth factoring out to App::Gitc::Util at some point
+sub author_email {
+    my $name       = get_user_name();
+    my $email      = get_user_email();
+    return "$name <$email>";
+}
+
+# Returns a list of environments that will have merge conflicts if
+# this changeset is promoted.
+sub find_merge_conflicts {
+    my ($changeset) = @_;
+
+    warn "Looking for merge conflicts...\n";
+    git "checkout -q --no-track -b test-merges origin/master";
+    my @conflicts;
+    for my $environment (qw( master )) {
+        git "reset -q --hard origin/$environment";
+        my $output = git "merge --quiet --no-stat --no-ff $changeset";
+        push @conflicts, $environment if $output =~ m/Automatic merge failed/;
+    }
+
+    git "reset --hard";  # clean up after any failed merges
+    git "checkout -q -f $changeset";
+    my $output = git "branch -D test-merges"; # there is no --quiet option
+    return @conflicts;
+}
+
+# read the entire contents of a file into memory
+sub slurp {
+    my ($filename) = @_;
+    open my $fh, '<', $filename
+        or die "Unable to open $filename: $!";
+    my $content = do { local $/; <$fh> };
+    return $content;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-submit - Submit a changeset for code review
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

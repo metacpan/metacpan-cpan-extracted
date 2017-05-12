@@ -1,0 +1,75 @@
+{
+   "abstract" : "Built or find libtool 2.4.x",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-libtool24",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0.023",
+            "Capture::Tiny" : "0",
+            "File::ShareDir" : "1.03",
+            "File::chdir" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "YAML::XS" : "0"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.023",
+            "File::ShareDir" : "1.03",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Alien-libtool24/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/Alien-libtool24",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Alien-libtool24.git",
+         "web" : "https://github.com/plicease/Alien-libtool24"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.04"
+}
+

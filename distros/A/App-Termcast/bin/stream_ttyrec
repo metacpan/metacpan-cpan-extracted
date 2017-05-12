@@ -1,0 +1,113 @@
+#!perl
+use strict;
+use warnings;
+use App::Termcast;
+use Getopt::Long qw(:config pass_through);
+eval { require Term::TtyRec::Plus }
+    || die "This script requires the Term::TtyRec::Plus module";
+# PODNAME: stream_ttyrec
+# ABSTRACT: play a ttyrec to a termcast channel
+
+
+my ($speed, $clamp, $peek) = (1, undef, 0);
+GetOptions(
+    'speed=f' => \$speed,
+    'clamp=f' => \$clamp,
+    'peek'    => \$peek,
+    'nowait'  => sub { $clamp = 0 },
+);
+my $tc = App::Termcast->new_with_options;
+my @argv = @{ $tc->extra_argv };
+@argv = (\*STDIN) unless @argv;
+
+foreach my $file (@argv) {
+    my $ttyrec = Term::TtyRec::Plus->new(
+        (ref($file)
+            ? (filehandle => $file)
+            : (infile     => $file)),
+        (defined($clamp)
+            ? (time_threshold => $clamp)
+            : ()),
+    );
+
+    if ($peek) {
+        my $fh = $ttyrec->filehandle;
+        seek $fh, 0, 2 unless $fh == \*STDIN;
+        while (1) {
+            seek $fh, 0, 1 unless $fh == \*STDIN;
+            my $frame_ref = $ttyrec->next_frame;
+            $tc->write_to_termcast($frame_ref->{data})
+                if $frame_ref;
+
+            select undef, undef, undef, 0.1;
+        }
+    }
+    else {
+        while (my $frame_ref = $ttyrec->next_frame) {
+            select undef, undef, undef, ($frame_ref->{diff} / $speed);
+            $tc->write_to_termcast($frame_ref->{data});
+        }
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+stream_ttyrec - play a ttyrec to a termcast channel
+
+=head1 VERSION
+
+version 0.13
+
+=head1 SYNOPSIS
+
+  stream_ttyrec [options] [ttyrec_file]
+
+=head1 DESCRIPTION
+
+This program will stream a ttyrec file to the given termcast channel. The
+ttyrec file may be given on the command line, or it will be read from STDIN.
+See L<App::Termcast> for options documentation.
+
+This program also accepts some additional options:
+
+=over 4
+
+=item C<< --speed <n> >>
+
+Set a multiplier for how fast the ttyrec should be played back (C<--speed 2>
+means twice as fast).
+
+=item C<< --clamp <n> >>
+
+Set the maximum delay between any two frames in the ttyrec. If unset, there is
+no maximum (the ttyrec will be streamed as written).
+
+=item C<< --nowait >>
+
+Disable all delays between frames (equivalent to C<--clamp 0>).
+
+=item C<< --peek >>
+
+"Peek" at a ttyrec that is currently being written. This will seek to the end
+of the file and stream new ttyrec frames as they become available.
+
+=back
+
+=head1 AUTHOR
+
+Jesse Luehrs <doy@tozt.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Jesse Luehrs.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

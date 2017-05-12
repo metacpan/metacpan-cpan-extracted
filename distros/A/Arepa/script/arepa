@@ -1,0 +1,264 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use English qw(-no_match_vars);
+use Carp;
+use Getopt::Long;
+
+use Arepa::Repository;
+use Arepa::CommandManager;
+
+sub show_help {
+    print STDERR <<EOD;
+SYNTAX: arepa [-c|--config=config.yml] <command> [options]
+where <command> is one of:
+  build
+  queue
+  requeue
+  showqueue
+  sign
+  sync
+
+arepa build --pending
+arepa build --recompile 3
+arepa build source_package distro
+arepa build source_package distro arch
+arepa build source_package.dsc builder_name
+
+arepa queue source_package.dsc
+arepa queue source_package.dsc mydistro
+
+arepa requeue 3
+
+arepa showqueue
+arepa showqueue --status pending   # equivalent to previous
+arepa showqueue --status compilationfailed
+arepa showqueue --status compiling
+arepa showqueue --status compiled
+
+arepa importgpgkey key.gpg
+
+arepa sign
+arepa sign --sync
+
+arepa sync
+
+arepa issynced
+EOD
+    exit 1;
+}
+
+my ($r);
+my $config_file = '/etc/arepa/config.yml';
+
+Getopt::Long::Configure('pass_through');
+$r = GetOptions('config|c=s', \$config_file);
+Getopt::Long::Configure('default');
+if (!$r) {
+    print STDERR "Invalid global options\n";
+    show_help;
+}
+
+my $config = Arepa::Config->new($config_file);
+
+my $command = shift || do {
+    print STDERR "ERROR: I need a command\n";
+    show_help;
+};
+if ($command eq 'build') {
+    my ($pending, $recompile) = (0, undef);
+    $r = GetOptions('pending'     => \$pending,
+                    'recompile=i' => \$recompile);
+    if (!$r) {
+        print STDERR "Invalid options for build command\n";
+        exit 1;
+    }
+
+    my $command_manager = Arepa::CommandManager->new($config_file);
+    if ($pending) {
+        $command_manager->build_pending;
+    }
+    elsif (defined $recompile) {
+        $command_manager->recompile_request($recompile);
+    }
+    elsif (-r $ARGV[0]) {
+        my ($dsc_file, $builder) = @ARGV;
+        $command_manager->build_dsc($builder, $dsc_file);
+    }
+    elsif (@ARGV == 2 || @ARGV == 3) {
+        my ($source_pkg, $distro, $arch) = @ARGV;
+        $command_manager->request_source_pkg_compilation($source_pkg,
+                                                         $distro,
+                                                         $arch);
+    }
+    else {
+        show_help;
+    }
+}
+elsif ($command eq 'queue') {
+    my ($dsc_file, $distro) = @ARGV;
+    if (!defined $dsc_file) {
+        print STDERR "I need a dsc_file to queue\n";
+        exit 1;
+    }
+    $distro ||= 'unstable';
+
+    my %source_attrs = (distribution => $distro);
+    open F, $dsc_file or croak("Can't open dsc file '$dsc_file'");
+    while (my $line = <F>) {
+        if ($line =~ /^Source: (.+)/) {
+            $source_attrs{name} ||= $1;
+        }
+        elsif ($line =~ /^Architecture: (.+)/) {
+            $source_attrs{architecture} ||= $1;
+        }
+        elsif ($line =~ /^Version: (.+)/) {
+            $source_attrs{full_version} ||= $1;
+        }
+    }
+    close F;
+
+    print "Source package: $source_attrs{name} $source_attrs{full_version} ";
+    print "(arch: $source_attrs{architecture}, ";
+    print "distribution: $source_attrs{distribution})\n";
+
+    # Queue the source package for compilation
+    my $pdb = Arepa::PackageDb->new($config->get_key('package_db'));
+    my $source_id = $pdb->insert_source_package(%source_attrs);
+    $pdb->request_compilation($source_id, $source_attrs{architecture},
+                                          $source_attrs{distribution});
+}
+elsif ($command eq 'requeue') {
+    my ($queue_id) = @ARGV;
+    if (!defined $queue_id) {
+        print STDERR "I need a queue id to requeue\n";
+        exit 1;
+    }
+    my $pdb    = Arepa::PackageDb->new($config->get_key('package_db'));
+    my %compilation_attrs = ();
+    eval {
+        %compilation_attrs = $pdb->get_compilation_request_by_id($queue_id);
+    };
+    if ($EVAL_ERROR) {
+        print STDERR "Can't find compilation request '$queue_id'\n";
+        print STDERR "Check with arepa showqueue\n";
+        exit 1;
+    }
+
+    if ($compilation_attrs{status} eq 'pending') {
+        print "The compilation request $queue_id is already pending\n";
+    }
+    else {
+        $pdb->mark_compilation_pending($queue_id);
+    }
+}
+elsif ($command eq 'showqueue') {
+    my $status = 'pending';
+    $r = GetOptions('status=s'     => \$status);
+    if (!$r) {
+        print STDERR "Invalid options for 'showqueue' command\n";
+        show_help;
+    }
+    my $pdb    = Arepa::PackageDb->new($config->get_key('package_db'));
+    foreach my $elt ($pdb->get_compilation_queue(status => $status)) {
+        my %source = $pdb->get_source_package_by_id($elt->{source_package_id});
+        print $elt->{id}, ": $source{name} $source{full_version} ";
+        print "$elt->{architecture} $elt->{distribution}\n";
+    }
+}
+elsif ($command eq 'importgpgkey') {
+    my ($gpg_key_path) = @ARGV;
+    my $gpg_homedir = $config->get_key('web_ui:gpg_homedir');
+    system("gpg --homedir '$gpg_homedir' --no-default-keyring " .
+                "--import '$gpg_key_path'");
+}
+elsif ($command eq 'sign') {
+    my $sync = 0;
+    $r = GetOptions('sync' => \$sync);
+    if (!$r) {
+        print STDERR "Invalid options for 'sign' command\n";
+        show_help;
+    }
+
+    # Sign all the Release files
+    my $repository = Arepa::Repository->new($config_file);
+    foreach my $distribution ($repository->get_distributions) {
+        my $distro_name = $distribution->{codename};
+        print "Signing $distro_name...\n";
+        if (! $repository->sign_distribution($distro_name)) {
+            print STDERR "ERROR: couldn't sign Release file for '$distro_name'\n";
+            exit 1;
+        }
+    }
+
+    # If --sync was passed, sync too
+    if ($sync) {
+        if (! $repository->sync_remote) {
+            print STDERR "ERROR: rsync command failed\n";
+        }
+    }
+}
+elsif ($command eq 'sync') {
+    my $repository = Arepa::Repository->new($config_file);
+    if (! $repository->sync_remote) {
+        print STDERR "ERROR: rsync command failed\n";
+    }
+}
+elsif ($command eq 'issynced') {
+    my $repository = Arepa::Repository->new($config_file);
+    exit ($repository->is_synced ? 0 : 1);
+}
+else {
+    print STDERR "ERROR: Unknown command '$command'\n";
+    exit 1;
+}
+
+__END__
+
+=head1 AUTHOR
+
+Esteban Manchado Velázquez <estebanm@opera.com>.
+
+=head1 LICENSE AND COPYRIGHT
+
+This code is offered under the Open Source BSD license.
+
+Copyright (c) 2010, Opera Software. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+=over 4
+
+=item
+
+Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+=item
+
+Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+=item
+
+Neither the name of Opera Software nor the names of its contributors may
+be used to endorse or promote products derived from this software without
+specific prior written permission.
+
+=back
+
+=head1 DISCLAIMER OF WARRANTY
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

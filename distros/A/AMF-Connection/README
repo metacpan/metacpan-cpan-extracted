@@ -1,0 +1,41 @@
+AMF-Connection
+==============
+
+A simple module to write AMF [1] clients to invoke remote services as used by Flex/AIR RIAs.
+
+The module includes basic support for synchronous HTTP/S based RPC request-response access, where 
+the client sends a request to the server to be processed and the server returns a response to the client
+containing the processing outcome. Data is sent back and forth in AMF binary format (AMFChannel). Other access patterns
+such as pub/sub and channels transport are out of scope of this inital release.
+
+[1] http://en.wikipedia.org/wiki/Action_Message_Format
+
+See public github repo http://github.com/areggiori/AMF-Connection
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Storable::AMF ( for serialisation/deserialisation of AMF )
+  LWP::UserAgent ( for RPC services over HTTP/S POST )
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2010 by Alberto Attilio Reggiori
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

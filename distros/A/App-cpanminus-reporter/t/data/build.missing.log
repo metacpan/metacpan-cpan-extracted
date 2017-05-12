@@ -1,0 +1,93 @@
+cpanm (App::cpanminus) 1.7009 on perl 5.021004 built for darwin-2level
+Work directory is /Users/ether/.cpanm/work/1411320668.3763
+You have make /usr/bin/make
+You have LWP 6.08
+You have /usr/bin/tar: bsdtar 2.8.3 - libarchive 2.8.3
+You have /usr/bin/unzip
+Checking if you have ExtUtils::MakeMaker 6.58 ... Yes (6.98)
+Checking if you have ExtUtils::Install 1.46 ... Yes (2.04)
+Searching Test::Tester on cpanmetadb ...
+--> Working on Test::Tester
+Fetching http://www.cpan.org/authors/id/F/FD/FDALY/Test-Tester-0.109.tar.gz
+-> OK
+Unpacking Test-Tester-0.109.tar.gz
+Entering Test-Tester-0.109
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (6.98)
+Configuring Test-Tester-0.109
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Test::Tester
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Test::Builder 0 ... Yes (1.001006)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (6.98)
+Building and testing Test-Tester-0.109
+Manifying blib/man3/Test::Tester.0
+Manifying blib/man3/Test::Tester::Capture.0
+Manifying blib/man3/Test::Tester::CaptureRunner.0
+PERL_DL_NONLAZY=1 /Users/ether/perl5/perlbrew/perls/21.4/bin/perl5.21.4 "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/auto.t ......... ok
+t/capture.t ...... ok
+t/depth.t ........ ok
+t/check_tests.t .. ok
+t/run_test.t ..... ok
+All tests successful.
+Files=5, Tests=169,  0 wallclock secs ( 0.04 usr  0.01 sys +  0.15 cusr  0.02 csys =  0.22 CPU)
+Result: PASS
+Manifying blib/man3/Test::Tester.0
+Manifying blib/man3/Test::Tester::Capture.0
+Manifying blib/man3/Test::Tester::CaptureRunner.0
+Installing /Users/ether/.perlbrew/libs/21.4@std/lib/perl5/Test/Tester.pm
+Installing /Users/ether/.perlbrew/libs/21.4@std/lib/perl5/Test/Tester/Capture.pm
+Installing /Users/ether/.perlbrew/libs/21.4@std/lib/perl5/Test/Tester/CaptureRunner.pm
+Installing /Users/ether/.perlbrew/libs/21.4@std/lib/perl5/Test/Tester/Delegate.pm
+Installing /Users/ether/.perlbrew/libs/21.4@std/man/man3/Test::Tester.0
+Installing /Users/ether/.perlbrew/libs/21.4@std/man/man3/Test::Tester::Capture.0
+Installing /Users/ether/.perlbrew/libs/21.4@std/man/man3/Test::Tester::CaptureRunner.0
+Appending installation info to /Users/ether/.perlbrew/libs/21.4@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Test-Tester-0.109
+Installing /Users/ether/.perlbrew/libs/21.4@std/lib/perl5/darwin-2level/.meta/Test-Tester-0.109/MYMETA.json
+Installing /Users/ether/.perlbrew/libs/21.4@std/lib/perl5/darwin-2level/.meta/Test-Tester-0.109/install.json
+Searching ok on cpanmetadb ...
+--> Working on ok
+Fetching http://www.cpan.org/authors/id/A/AU/AUDREYT/Test-use-ok-0.11.tar.gz
+-> OK
+Unpacking Test-use-ok-0.11.tar.gz
+Entering Test-use-ok-0.11
+Checking configure dependencies from META.yml
+Checking if you have ExtUtils::MakeMaker 6.36 ... Yes (6.98)
+Configuring Test-use-ok-0.10
+Running Makefile.PL
+Cannot determine author info from lib/Test/use/ok.pm
+Cannot determine license info from lib/Test/use/ok.pm
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Test::use::ok
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 6.36 ... Yes (6.98)
+Building and testing Test-use-ok-0.10
+Manifying blib/man3/Test::use::ok.0
+Manifying blib/man3/ok.0
+PERL_DL_NONLAZY=1 /Users/ether/perl5/perlbrew/perls/21.4/bin/perl5.21.4 "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'inc', 'blib/lib', 'blib/arch')" t/*.t
+t/01-basic.t .. ok
+All tests successful.
+Files=1, Tests=3,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.02 cusr  0.00 csys =  0.05 CPU)
+Result: PASS
+Installing /Users/ether/.perlbrew/libs/21.4@std/lib/perl5/ok.pm
+Installing /Users/ether/.perlbrew/libs/21.4@std/lib/perl5/Test/use/ok.pm
+Installing /Users/ether/.perlbrew/libs/21.4@std/man/man3/Test::use::ok.0
+Installing /Users/ether/.perlbrew/libs/21.4@std/man/man3/ok.0
+Appending installation info to /Users/ether/.perlbrew/libs/21.4@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Test-use-ok-0.10
+Installing /Users/ether/.perlbrew/libs/21.4@std/lib/perl5/darwin-2level/.meta/Test-use-ok-0.11/MYMETA.json
+Installing /Users/ether/.perlbrew/libs/21.4@std/lib/perl5/darwin-2level/.meta/Test-use-ok-0.11/install.json
+2 distributions installed

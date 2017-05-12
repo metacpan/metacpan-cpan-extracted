@@ -1,0 +1,199 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#ABSTRACT">ABSTRACT</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#GLOBAL-OPTIONS">GLOBAL OPTIONS</a></li>
+      <li><a href="#SUBCOMMANDS">SUBCOMMANDS</a>
+        <ul>
+          <li><a href="#config">config</a></li>
+          <li><a href="#convert">convert</a></li>
+          <li><a href="#cook">cook</a></li>
+          <li><a href="#palindrome">palindrome</a></li>
+          <li><a href="#weather">weather</a></li>
+          <li><a href="#weather-cities">weather cities</a></li>
+          <li><a href="#weather-countries">weather countries</a></li>
+          <li><a href="#weather-show">weather show</a></li>
+          <li><a href="#help">help</a></li>
+          <li><a href="#meta">_meta</a></li>
+          <li><a href="#meta-completion">_meta completion</a></li>
+          <li><a href="#meta-completion-generate">_meta completion generate</a></li>
+          <li><a href="#meta-pod">_meta pod</a></li>
+          <li><a href="#meta-pod-generate">_meta pod generate</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>myapp - My Very Cool App</p>
+
+<h1 id="ABSTRACT">ABSTRACT</h1>
+
+<p>This app can do very cool things</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is a very useful description for myapp. This is a very useful description for myapp. This is a very useful description for myapp. This is a very useful description for myapp.</p>
+
+<h2 id="GLOBAL-OPTIONS">GLOBAL OPTIONS</h2>
+
+<pre><code>    --verbose -v   [] be verbose (flag; multiple)
+    --help -h         Show command help (flag)   </code></pre>
+
+<h2 id="SUBCOMMANDS">SUBCOMMANDS</h2>
+
+<h3 id="config">config</h3>
+
+<pre><code>    myapp  config [options]</code></pre>
+
+<p>configuration</p>
+
+<p>Options:</p>
+
+<pre><code>    --set   {} key=value pair(s) (multiple; mapping)</code></pre>
+
+<h3 id="convert">convert</h3>
+
+<pre><code>    myapp  convert &lt;type&gt; &lt;source&gt; &lt;value&gt; &lt;target&gt;+</code></pre>
+
+<p>Various unit conversions</p>
+
+<p>Parameters:</p>
+
+<pre><code>    type    *    The type of unit to convert    
+    source  *    The source unit to convert from
+    value   *    The value to convert           
+    target  * [] The target unit (multiple)     </code></pre>
+
+<h3 id="cook">cook</h3>
+
+<pre><code>    myapp  cook [options] &lt;drink&gt;</code></pre>
+
+<p>Cook something</p>
+
+<p>Options:</p>
+
+<pre><code>    --with        Drink with ...  
+    --sugar -s    add sugar (flag)</code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    drink  *  What to drink</code></pre>
+
+<h3 id="palindrome">palindrome</h3>
+
+<pre><code>    myapp  palindrome &lt;string&gt;</code></pre>
+
+<p>Check if a string is a palindrome</p>
+
+<p>Parameters:</p>
+
+<pre><code>    string  *  </code></pre>
+
+<h3 id="weather">weather</h3>
+
+<pre><code>    myapp  weather &lt;subcommands&gt;</code></pre>
+
+<p>Weather</p>
+
+<h3 id="weather-cities">weather cities</h3>
+
+<pre><code>    myapp weather cities [options]</code></pre>
+
+<p>show list of cities</p>
+
+<p>Options:</p>
+
+<pre><code>    --country -c   [] country name(s) (multiple)</code></pre>
+
+<h3 id="weather-countries">weather countries</h3>
+
+<pre><code>    myapp weather countries</code></pre>
+
+<p>show list of countries</p>
+
+<h3 id="weather-show">weather show</h3>
+
+<pre><code>    myapp weather show [options] &lt;country&gt; &lt;city&gt;+</code></pre>
+
+<p>Show Weather forecast</p>
+
+<p>Options:</p>
+
+<pre><code>    --temperature -T    show temperature (flag)              
+    --celsius -C        show temperature in celsius (flag)   
+    --fahrenheit -F     show temperature in fahrenheit (flag)</code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    country  *    Specify country                  
+    city     * [] Specify city or cities (multiple)</code></pre>
+
+<h3 id="help">help</h3>
+
+<pre><code>    myapp  help &lt;subcommands&gt; [options]</code></pre>
+
+<p>Show command help</p>
+
+<p>Options:</p>
+
+<pre><code>    --all     (flag)</code></pre>
+
+<h3 id="meta">_meta</h3>
+
+<pre><code>    myapp  _meta &lt;subcommands&gt;</code></pre>
+
+<p>Information and utilities for this app</p>
+
+<h3 id="meta-completion">_meta completion</h3>
+
+<pre><code>    myapp _meta completion &lt;subcommands&gt;</code></pre>
+
+<p>Shell completion functions</p>
+
+<h3 id="meta-completion-generate">_meta completion generate</h3>
+
+<pre><code>    myapp _meta completion generate [options]</code></pre>
+
+<p>Generate self completion</p>
+
+<p>Options:</p>
+
+<pre><code>    --name    name of the program (optional, override name in spec)
+    --zsh     for zsh (flag)                                       
+    --bash    for bash (flag)                                      </code></pre>
+
+<h3 id="meta-pod">_meta pod</h3>
+
+<pre><code>    myapp _meta pod &lt;subcommands&gt;</code></pre>
+
+<p>Pod documentation</p>
+
+<h3 id="meta-pod-generate">_meta pod generate</h3>
+
+<pre><code>    myapp _meta pod generate</code></pre>
+
+<p>Generate self pod</p>
+
+
+</body>
+
+</html>
+
+

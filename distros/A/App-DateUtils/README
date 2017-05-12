@@ -1,0 +1,11 @@
+SYNOPSIS
+
+    This distribution provides the following command-line utilities related
+    to date/time:
+
+    #INSERT_EXECS_LIST
+
+append:SEE ALSO
+
+    App::datecalc
+

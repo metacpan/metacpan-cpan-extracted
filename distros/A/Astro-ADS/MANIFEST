@@ -1,0 +1,20 @@
+README
+MANIFEST
+Makefile.PL
+GPL
+ChangeLog
+adsquery.PL
+ADS.pm
+Query/Query.pm
+Query/Makefile.PL
+Result/Result.pm
+Result/Makefile.PL
+Result/Paper/Paper.pm
+Result/Paper/Makefile.PL
+t/00-load.t
+t/01-lwp.t
+t/query.t
+t/result.t
+t/paper.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

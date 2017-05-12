@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<demo>
+    <title>This is the title</title>
+    <users>
+        <user>
+            <first>Larry</first>
+            <last>Wall</last>
+        </user>
+        <user>
+            <first>Audrey</first>
+            <last>Tang</last>
+        </user>
+        <user>
+            <first>chromatic</first>
+        </user>
+        <user>
+            <first>Matt</first>
+            <last>Sergeant</last>
+        </user>
+    </users>
+</demo>

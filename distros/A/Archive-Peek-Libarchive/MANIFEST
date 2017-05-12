@@ -1,0 +1,18 @@
+Build.PL
+CHANGES
+examples/search_cpan.pl
+inc/Devel/CheckLib.pm
+lib/Archive/Peek/Libarchive.pm
+lib/Archive/Peek/Libarchive.xs
+lib/Archive/Peek/ppport.h
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/archive.tar.bz2
+t/archive.tgz
+t/archive.zip
+t/pod.t
+t/simple.t
+SIGNATURE    Added here by Module::Build

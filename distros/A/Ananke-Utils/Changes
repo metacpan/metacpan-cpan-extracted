@@ -1,0 +1,11 @@
+Revision history for Perl extension Ananke::Utils.
+
+1.0.2 Mon Jan 27 17:03:14 BRST 2003
+	- Removed warning for diferent keyboard layout
+
+1.0.1 Thu Jul 25 10:20:21 BRT 2002
+	- Fix: &getForm - value * is ok
+	- Add: &replace_chars - new chars to convert
+
+1.0  Wed Apr  3 11:10:49 2002
+	- First Version

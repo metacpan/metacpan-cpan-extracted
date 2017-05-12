@@ -1,0 +1,68 @@
+{
+   "abstract" : "Use C<pm-website> to render and maintain an up-to-date info page",
+   "author" : [
+      "Andrew Grangaard <spazm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-PM-Website",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd" : "0",
+            "App::Cmd::Command" : "0",
+            "Config::YAML" : "0",
+            "Data::Dumper" : "0",
+            "Date::Parse" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "File::Path" : "2.07",
+            "File::Spec" : "0",
+            "HTTP::DAV" : "0",
+            "IO::TieCombine" : "0",
+            "Lingua::EN::Numbers::Ordinate" : "0",
+            "Net::Netrc" : "0",
+            "POSIX" : "0",
+            "Template" : "0",
+            "Template::Plugin::DateTime" : "0",
+            "Template::Plugin::Gravatar" : "0",
+            "Template::Plugin::String::Compare" : "0",
+            "YAML::Any" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "App::Cmd::Tester" : "0",
+            "Test::Class" : "0",
+            "Test::Class::Load" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://lowlevelmanager.com/",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/spazm/app-pm-website.git",
+         "web" : "http://github.com/spazm/app-pm-website"
+      }
+   },
+   "version" : "0.131611"
+}
+

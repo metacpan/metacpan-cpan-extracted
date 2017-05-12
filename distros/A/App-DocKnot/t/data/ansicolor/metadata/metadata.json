@@ -1,0 +1,56 @@
+{
+    "name": "Term::ANSIColor",
+    "version": "4.06",
+    "synopsis": "simple ANSI text attribute control module",
+    "maintainer": "Russ Allbery <rra@cpan.org>",
+    "copyrights": [
+        {
+            "holder": "Russ Allbery <rra@cpan.org>",
+            "years": "1996-1998, 2000-2002, 2005-2006, 2008-2016",
+        },
+        {
+            "holder": "Zenin",
+            "years": "1996",
+        },
+        {
+            "holder": "Kurt Starsinic <kstarsinic@gmail.com>",
+            "years": "2012",
+        },
+    ],
+    "license": "Perl",
+    "build": {
+        "lancaster": true,
+        "type": "ExtUtils::MakeMaker",
+    },
+    "support": {
+        "cpan": "Term-ANSIColor",
+        "email": "rra@cpan.org",
+        "web": "https://www.eyrie.org/~eagle/software/ansicolor/",
+    },
+    "vcs": {
+        "type": "Git",
+        "url": "https://git.eyrie.org/git/perl/ansicolor.git",
+        "browse": "https://git.eyrie.org/?p=perl/ansicolor.git",
+        "github": "rra/ansicolor",
+    },
+    "quote": {
+        "author": "Dave van Domelen",
+    },
+    "distribution": {
+        "section": "devel",
+        "tarname": "Term-ANSIColor",
+        "version": "term-ansicolor",
+    },
+    "docs": {
+        "user": [
+            {
+                "name": "docs",
+                "title": "Module documentation",
+            },
+            {
+                "name": "thanks",
+                "title": "Thanks and credits",
+            },
+        ],
+    },
+}

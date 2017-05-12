@@ -1,0 +1,61 @@
+<title>Mowyw example</title>
+[%include head2%]
+
+<h2>A Word on the Design</h2>
+
+<p>This design is "stolen" from Dimiter Petrov, it is published on <a
+href="http://www.oswd.org/">oswd.org</a> under the name "Ordered
+Boxes".</p>
+
+<p>As far as I understand it is public domain, but he kindly asks anybody
+using this design to keep his name in the footer line.</p>
+
+<h2>Lore Ipsum</h2>
+
+<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed ut dui ac
+lacus egestas vehicula. Quisque faucibus, risus id consequat porta, orci
+ligula condimentum mi, ac commodo leo libero eget tortor. Maecenas a ligula in
+nibh luctus gravida. Praesent vehicula rhoncus tortor. <a href="#">Donec porta
+rutrum dui.</a> Donec dignissim congue mauris. Sed rhoncus laoreet sem. Nam
+dui pede, vestibulum convallis, posuere ut, dictum eu, diam. Phasellus nunc.
+Ut eget ante a ipsum porttitor scelerisque. Quisque auctor elit vitae massa.
+Vestibulum massa risus, gravida quis, hendrerit sit amet, bibendum sit amet,
+enim. Fusce nulla. Quisque vulputate metus vitae orci. Pellentesque
+at arcu. Ut sed neque.</p>
+
+<h2>Some Tests</h2>
+
+<p>These tests only tests some properties of the parser, you can safly ignore
+and delete them.</p>
+
+<h3>Parse test</h3>
+<p>Double braces should be ignored outside of an item: }} foo bar {{ {{.</p>
+
+<h3>Option parsing</h3>
+<p>Option items should be stripped, so the there should be no "option foo"
+output on the next line.</p>
+[%option foo%]
+
+<h3>Verbose tests</h3>
+<p>[%verbatim foobar%]Text between [%verbatim $marker%] and [%endverbatim
+$marker%] should be treated as plain text, e.g. tags inbetween should be
+ignored: [%include foo%][%endverbatim foobar%].</p>
+
+<h3>Global include file</h3>
+
+<p>If the quotes are empty, the global include file has not been parsed
+correctly: "[%readvar site_title%]"</p>
+
+<h3>Datasource test</h3>
+
+[% bind news type:xml file:news.xml root:news foo:'bar\' baz'%]
+
+[% for i in news %]
+    <h4>[% readvar i.date %]: <strong>[% readvar i.headline %]</strong></h4>
+    <p>[% readvar i.msg %]</p>
+[% endfor %]
+
+
+</div>
+
+[%menu nav home%]

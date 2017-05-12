@@ -1,0 +1,43 @@
+.appveyor.yml
+Changes
+corpus/lib/Alien/Foo1.pm
+corpus/lib/Alien/Foo1/ConfigData.pm
+corpus/lib/Alien/Foo2.pm
+corpus/lib/Alien/Foo2/ConfigData.pm
+corpus/lib/Alien/libfoo1.pm
+corpus/lib/Alien/libfoo2.pm
+corpus/lib/auto/share/dist/Alien-Foo2/lib/libfoo2-3.2.1/include/foo2.h
+corpus/lib/auto/share/dist/Alien-Foo2/lib/libfoo2.a
+corpus/lib/auto/share/dist/Alien-Foo2/README
+corpus/lib/auto/share/dist/Alien-libfoo1/_alien/alien.json
+corpus/lib/auto/share/dist/Alien-libfoo1/_alien/for_libfoo1
+corpus/lib/auto/share/dist/Alien-libfoo2/_alien/alien.json
+corpus/lib/auto/share/dist/Alien-libfoo2/_alien/for_libfoo2
+corpus/lib/auto/share/dist/Alien-libfoo2/bin/foo-config
+corpus/lib/auto/share/dist/Alien-libfoo2/dynamic/libfoo.so
+corpus/lib/auto/share/dist/Alien-libfoo2/dynamic/libfoo.so.2
+corpus/lib/auto/share/dist/Alien-libfoo2/include/foo.h
+corpus/lib/auto/share/dist/Alien-libfoo2/lib/libfoo.a
+corpus/pkgconfig/libbar1.pc
+corpus/pkgconfig/libfoo1.pc
+corpus/system_installed/lib/MyTest.pm
+corpus/system_installed/MANIFEST
+lib/Alien/Base.pm
+lib/Alien/Base/Authoring.pod
+lib/Alien/Base/FAQ.pod
+LICENSE
+maint/install-ab-mb.bat
+maint/install-ab-mb.sh
+maint/install-perl.sh
+maint/min-perl.pl
+maint/releaseprep
+maint/test-destdir.sh
+maint/test-upgrade.sh
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_diag.t
+t/alien_base.t
+t/alien_base__system_installed.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

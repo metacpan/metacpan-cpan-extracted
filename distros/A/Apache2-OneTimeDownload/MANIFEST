@@ -1,0 +1,10 @@
+ChangeLog
+Makefile.PL
+MANIFEST
+OneTimeDownload.pm
+README
+t/db.db
+t/01_database_sanity.t
+t/02_authorise.t
+.shipit
+META.yml                                 Module meta-data (added by MakeMaker)

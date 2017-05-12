@@ -1,0 +1,6 @@
+This directory contains example files. Specifically, these are:
+
+README - this file
+
+query_utdf - A very simple interactive tool for examining data in a UTDF
+file. The 'help' command gets you help, and 'exit' terminates the tool.

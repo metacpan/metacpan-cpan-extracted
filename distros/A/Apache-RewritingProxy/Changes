@@ -1,0 +1,22 @@
+Revision history for Perl extension Apache::RefererBlock.
+
+----------------------------
+revision 1.3
+date: 1999/11/05 20:10:28;  author: khhaga01;  state: Exp;  lines: +32 -2
+Fixed some of the meta refresh pages.  I now see that
+tag and rewrite the URL properly.  Cookies are still a
+major problem.  It looks like I may have to build some
+sort of cookie database and give the client a cookie poining
+to his/her entry in that database. Looks like the safest way to go.
+----------------------------
+revision 1.2
+date: 1999/11/04 20:34:39;  author: khhaga01;  state: Exp;  lines: +5 -0
+Added the version number and some other silliness I didn't know about
+real perl modules.  Fixed Makefile.PL to actually check for the necessary
+modules.
+----------------------------
+revision 1.1
+date: 1999/11/04 20:09:00;  author: khhaga01;  state: Exp;
+RewritingProxy.pm created.  Renamed from invisibleProxy.pm which
+was not a terribly informative or relavant name.
+=============================================================================

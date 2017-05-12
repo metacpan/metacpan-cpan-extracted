@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/AnyEvent/CallbackStack.pm
+lib/AE/CS.pm
+t/00-load.t
+t/10-basic-add-start.t
+t/10-basic-start-add-cv-cb.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

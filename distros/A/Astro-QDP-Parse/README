@@ -1,0 +1,50 @@
+Astro-QDP-Parse
+
+This module provides functions for parsing data from QDP files.  More
+information on B<QDP> is available via its web page at
+L<http://wwwastro.msfc.nasa.gov/qdp/>.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Required Modules:
+
+    Clone
+    IO::File
+    Regexp::Common
+    List::Util
+    List::MoreUtils
+    Params::Validate;
+
+Optional Modules:
+
+    PDL::Core
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2008 The Smithsonian Astrophysical Observatory
+
+Astro-QDP-Parse is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

@@ -1,0 +1,47 @@
+<html>
+<head>
+  <title>Aw::ConnectionDescriptor</title>
+</head>
+<body bgcolor="#f0f0f0" link="#cc0000" vlink="brown">
+
+<h1><u>Aw::ConnectionDescriptor</u></h1>
+
+<table width="90%" border=1 bgcolor="#cccc99">
+<tr bgcolor="#bfbfbf"><th>Method</th><th>Arguments</th><th>Return</th><th>Throws<br>Exception</th></tr>
+<tr align="center"><th align="left"><a name="new"></a>new</th><td>( )</td><td>Aw::ConnectionDescriptor</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="DESTROY"></a>DESTROY</th><td>( )</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="copy"></a>copy</th><td>( )</td><td>Aw::ConnectionDescriptor</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getAccessLabelHint"></a>getAccessLabelHint</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getAutomaticReconnect"></a>getAutomaticReconnect</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getConnectionShare"></a>getConnectionShare</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getSharedEventOrdering"></a>getSharedEventOrdering</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getSSLCertificate"></a>getSSLCertificate</th><td>( )</td><td>@String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getSSLCertificateDns"></a>getSSLCertificateDns</th><td>( certificate_file, password )</td><td>@String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getSSLCertificateFile"></a>getSSLCertificateFile</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getSSLDistinguishedName"></a>getSSLDistinguishedName</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getSSLEncrypted"></a>getSSLEncrypted</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getSSLEncryptionLevel"></a>getSSLEncryptionLevel</th><td>( )</td><td>Number</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getSSLRootDns"></a>getSSLRootDns</th><td>( certificate_file, password )</td><td>@String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getStateShare"></a>getStateShare</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setAccessLabelHint"></a>setAccessLabelHint</th><td>( hint )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setAutomaticReconnect"></a>setAutomaticReconnect</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setConnectionShare"></a>setConnectionShare</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setSharedEventOrdering"></a>setSharedEventOrdering</th><td>( ordering )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setSSLCertificate"></a>setSSLCertificate</th><td>( certificate_file, password, distinguished_name )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setSSLEncrypted"></a>setSSLEncrypted</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setStateShare"></a>setStateShare</th><td>( value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="toString"></a>toString</th><td>( )</td><td>String</td><td>NO</td></tr>
+<tr bgcolor="#bfbfbf" align="left"><th colspan=4>Inherited Methods</th></tr>
+<tr align="center"><th align="left"><a name="err"></a>err</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="errmsg"></a>errmsg</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="error"></a>error</th><td>( )</td><td>Aw::Error</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="hello"></a>hello</th><td>( )<br><div align="left">Returns the string "hello".  Useful for debugging.</div></td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getWarn"></a>getWarn</th><td>( )<br><div align="left">Returns current warn <b><code>level</code></b>.</div></td><td>Number</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setWarn"></a>setWarn</th><td>( level )<br><div align="left">Sets new warn <b><code>level</code></b>.<dir>0 : No warnings (quiet mode)<br>1 : Terse (uses awErrorToString)<br>2 : Verbose (uses awErrorToCompleteString)</dir>The Aw extensions must be compiled with AWXS_WARNS defined.</div></td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="warn"></a>warn</th><td>( [string] )<br><div align="left">Warn message is <b><code>string</code></b> if passed, otherwise current err is converted to string.</div></td><td>void</td><td>YES</td></tr>
+</table>
+
+<p><hr size=3 noshade>
+
+</body>
+</html>

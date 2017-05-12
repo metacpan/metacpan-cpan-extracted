@@ -1,0 +1,8 @@
+Build.PL
+lib/AnyEvent/WebArchive.pm
+MANIFEST			This list of files
+README
+t/001-use.t
+t/002-normalization.t
+Makefile.PL
+META.yml

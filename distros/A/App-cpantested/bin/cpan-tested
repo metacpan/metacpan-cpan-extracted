@@ -1,0 +1,250 @@
+#!/usr/bin/env perl
+# ABSTRACT: delegate testing to the cloud
+# PODNAME: cpan-tested
+use 5.008;
+use strict;
+use utf8;
+use warnings qw(all);
+
+use CPAN::DistnameInfo;
+use Carp qw(carp croak);
+use Config;
+use Data::Dumper;
+use File::Spec::Functions;
+use Getopt::Long;
+use HTTP::Tiny;
+use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
+use JSON::PP qw(decode_json);
+use Pod::Usage qw(pod2usage);
+
+$Data::Dumper::Sortkeys = 1;
+
+our $VERSION = '0.003'; # VERSION
+
+
+# parse the options file
+my $rcname = catfile($ENV{HOME}, q(.cpan-tested.conf));
+if (open(my $rcfile, q(<), $rcname)) {
+    while (<$rcfile>) {
+        s/\#.*$//x;
+        s/^\s+|\s+$//gx;
+        next unless $_;
+        my @pair = split /\s+/x, $_, 2;
+        $pair[0] = q(--) . $pair[0];
+        unshift @ARGV, @pair;
+    }
+    close $rcfile;
+}
+
+
+my %match = (
+    archname    => 0,
+    osname      => 1,
+    osvers      => 0,
+    version     => 1,
+);
+Getopt::Long::GetOptions(
+    q(h|help)       => \my $help,
+    q(b|blacklist=s)=> \my @blacklist,
+    q(v|verbose)    => \my $verbose,
+    q(archname!)    => \$match{archname},   # "x86_64-linux"
+    q(osname!)      => \$match{osname},     # "linux"
+    q(osvers!)      => \$match{osvers},     # "3.0.0-26-generic"
+    q(perl!)        => \$match{version},    # "5.14.2"
+) or pod2usage(-verbose => 1);
+pod2usage(-verbose => 2) if $help;
+
+%match = map {
+    $match{$_}
+        ? ($_ => $Config{$_})
+        : ()
+} keys %match;
+$match{status} = q(PASS);   # cine qua non
+
+print STDERR Dumper \%match
+    if $verbose;
+
+my $ua = HTTP::Tiny->new(
+    agent           => q(cpan-tested/) . $main::VERSION,
+    default_headers => { q(Accept-Encoding) => q(gzip) },
+);
+
+while (my $name = <>) {
+    chomp $name;
+    my $d = CPAN::DistnameInfo->new($name);
+    my %prop = $d->properties;
+    next unless defined $prop{dist};
+
+    # do not update blacklisted modules
+    next if grep { $prop{dist} =~ /^$_$/x } @blacklist;
+
+    my $json = fetch_results($prop{dist});
+    my $versions = $json->{$prop{distvname}};
+    if (q(ARRAY) ne ref $versions) {
+        carp qq($prop{distvname} not tested yet);
+        next;
+    }
+
+    for my $test (@{$versions}) {
+        $test->{version} = delete $test->{perl};
+
+        my $ok = 0;
+        while (my ($property, $value) = each %match) {
+            ++$ok
+                if defined $test->{$property}
+                and $value eq $test->{$property};
+        }
+
+        if ($ok == keys %match) {
+            print STDERR Dumper $test
+                if defined $verbose;
+
+            print $name, qq(\n);
+            last;
+        }
+    }
+}
+
+sub fetch_results {
+    my ($dist) = @_;
+
+    my $url = sprintf
+        q(http://cpantesters.org/static/distro/%s/%s.js),
+        substr($dist, 0, 1),
+        $dist;
+
+    print STDERR "$url\n"
+        if defined $verbose;
+
+    my $res = $ua->get($url);
+    croak qq($url: $res->{reason})
+        unless $res->{success};
+
+    my $content;
+    if (defined $res->{headers}->{q(content-encoding)}
+            and $res->{headers}->{q(content-encoding)} eq q(gzip)) {
+
+        my $tmp;
+        gunzip \$res->{content} => \$tmp
+            or croak qq($url: $GunzipError);
+
+        $content = $tmp;
+    } else {
+        $content = $res->{content};
+    }
+
+    ($content) = $content =~ /\bvar\s+results\s*=\s*({.*?});/sx;
+    $content =~ s/([{,])(\w+):/$1"$2":/gsx;
+    my $json = eval { decode_json($content) };
+    croak qq($url: $@)
+        if $@
+        or q(HASH) ne ref $json;
+
+    return $json;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpan-tested - delegate testing to the cloud
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+    cpan-outdated | cpan-tested [options] | cpanm
+
+=head1 DESCRIPTION
+
+Pre-filter the output from the L<cpan-outdated> utility, joining it with the results from the L<CPAN Testers Reports|http://cpantesters.org/>.
+
+=head1 CONFIGURATION FILE
+
+C<~/.cpan-tested.conf> can be used to persistently store L</OPTIONS>, in a quasi-L<perltidy> fashion:
+
+    # installed manually; don't mess
+    blacklist libintl-perl
+    blacklist IO-Socket-SSL
+    archname    # same architecture
+    perl        # same Perl version
+    no-osname   # ignore OS name string
+    no-osvers   # ignore OS version string
+
+=head1 OPTIONS
+
+=over 4
+
+=item --help
+
+This.
+
+=item --blacklist=regexp
+
+Force skipping of the module which I<dist> name matches C<regexp>.
+Can be issued multiple times.
+
+=item --[no]archname
+
+Expect B<PASS> from testers with the same C<$Config{archname}>.
+Disabled by default.
+
+=item --[no]osname
+
+Expect B<PASS> from testers with the same C<$Config{osname}>.
+
+=item --[no]osvers
+
+Expect B<PASS> from testers with the same C<$Config{osvers}>.
+Disabled by default.
+
+=item --[no]perl
+
+Expect B<PASS> from testers with the same C<$Config{perl}>.
+
+=item --verbose
+
+Dump what's happening to C<STDERR>.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<cpan-outdated>
+
+=item *
+
+L<cpanm>
+
+=item *
+
+L<cpant>
+
+=item *
+
+L<CPAN Testers Reports|http://cpantesters.org/>
+
+=back
+
+=head1 AUTHOR
+
+Stanislaw Pusep <stas@sysd.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Stanislaw Pusep.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

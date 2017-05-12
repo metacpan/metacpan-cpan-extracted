@@ -1,0 +1,32 @@
+# config-file-type: JSON 1
+
+{ 
+  "roles" : 
+    [
+      "ingest",
+      "mixer",
+      "record",
+      "stream"
+    ],
+  "nickname" : "test",
+  "room" : "room1",
+  "record_path" : "/tmp",
+  "mixer" : 
+    {
+      "port":"1234", 
+      "host":"localhost"
+    },
+  "devices" : "all", 
+  "device_control" : 
+    {
+      "video0" : {"run":"0"},
+    },
+  "run" : "0",
+  "stream" :
+    {
+      "host" : "",
+      "port" : "",
+      "password" : "",
+      "stream" : ""
+    }
+}

@@ -1,0 +1,20 @@
+Revision history for App-Starter
+
+0.13    2008-04-06/23:26
+        - bug fix. replace and ignore data was not marged between yaml and parameter...
+
+0.12    2008-04-06/17:27
+        - forget to Test:Spelling :add prerequired 
+
+0.11    2008-04-06/16:17 
+        - add spelling.t 
+
+0.09    2008-04-06/10:54
+        - Fix type
+
+0.08    2008-03-29/15:24
+        replace sample.
+
+0.07    2008-03-29/12:47
+        First version, released on an unsuspecting world.
+

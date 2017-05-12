@@ -1,0 +1,6 @@
+---
+backend:
+    - name: "YAML"
+      args:
+        - "t/resource/backends/yaml/def1.yaml"
+    - name: "MailCap"

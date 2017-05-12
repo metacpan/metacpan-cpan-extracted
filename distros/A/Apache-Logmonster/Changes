@@ -1,0 +1,359 @@
+Logmonster ChangeLog
+
+5.36 - Sep 2014
+    version bump, for consistent version numbers in all packages
+
+3.12 - Apr 2013
+    testing changes, to resolve test errors on Windows
+
+3.11 - Apr 2013
+    testing & packing changes
+
+3.09 - Apr 2013
+    packaging changes
+
+3.08 - Dec 2012
+    added missing URL dependency
+    updated bin/install_deps.pl
+
+3.07 - Oct 2012
+    removed Perl.pm
+    updated Utility.pm to v 5.35
+    stripped out apache httpd.conf parsing. Instead, detect vhosts from the log files (works with any http server)
+    added confdir (path to processor config files)
+    statsdir is now a full path to a directory
+    the 'drop logs into vhost docroot" feature is gone, pending a clever way to reliably deduce the vhost document root for various web servers.
+    removed vhost config option
+    added default_vhost option
+    moved _progress subs into Logmonster.pm
+    removed get_domains_list, check_stats_dir, get_domains_list_from_directories, get_vhosts_from_file, install_default_awstats_conf, turn_domains_into_sort_key
+    abstracted new subs: get_log_files, spam_check, open_vhost_handle, report_matches, report_spam_hits, report_bad_hits,
+    added lighttpd config entries to instructions
+
+3.05 - Sep 2008
+
+    removed inc/* from distribution
+    updated Makefile.PL, adding LICENSE and missing dependencies
+    moved logmonster.pl into bin dir
+    replaced bin/install_freebsd_deps.sh with install_deps.pl
+    added 'make deps' target to Makefile.PL
+
+3.04 - Nov 2007
+
+    included "inc"' in modules
+    Utility.pm - only attempt to use sudo as a last resort
+    Utility.pm & Utility.t- synced with Mail::Toaster
+    moved Regexp::Log to inc dir
+
+3.03 - Feb 17, 2007
+
+    Utility.pm - only attempt to use sudo as a last resort
+    bin/install_freebsd_deps.sh - install Regexp::Log port
+
+3.02 - Feb 16, 2007
+
+    added support for detecting dynamic mass virtual hosting
+    evaluate log for referrer spam and discard the referral spam.
+    optional referral spam reporting
+    the hits-per-vhost was only counting the number of hits for the master domain. Domain alias hits weren't showing up in the hits-per-vhost report.
+    added bin/install_freeebsd_deps.sh installer
+    default log location is now /var/log/http (was /var/log/apache)
+    added Regexp::Log::Logmonster - uses a compiled regexp to parse log entries (very useful for evaluate for referrer spam).
+
+  3.01  - Feb 2, 2007
+    Added Params::Validate dependency to Makefile.PL
+
+    Fixed bug where time offset was being ignored.
+
+    Checks more locations for awstats.pl (needs to become a config file
+    settings).
+
+    Removed an unnecessary dependency on Mail::Toaster in Utility.pm.
+
+  3.00rc2 - Oct 14, 2006
+    *   updated usage examples
+
+    *   added FAQ
+
+    *   updated META.yml to new format
+
+    *   email report formatting
+
+        added OUTPUT_AUTOFLUSH b/c printing to *STDERR flushes immediately
+        and mixed print statements did not. Email report is better formatted
+        now.
+
+    *   added inc/Module/Install
+
+    *   added Build.PL
+
+    *   added examples/daily_email_report.txt
+
+    *   Logmonster.pm
+
+        debug was not being set properly, report formatting tweaks
+
+    *   Utility.pm
+
+            added _progress sub
+
+  3.00rc1 - Oct 02, 2006 (no public release)
+   massive code overhaul
+    This new version is mostly about code quality and maintainability (not
+    new features). The large chunks of code have been modularized into
+    smaller subroutines and tests have been written to test the
+    functionality of each sub. There are now 102 different tests (was 23) in
+    the test suite. Added t/Test-coverage.pl, t/Logmonster.t, t/pod.t,
+    t/pod-coverage, t/00.load
+
+    Nearly all the "working" code has been moved into
+    lib/Apache/Logmonster.pm. Logmonster.pl is now a "shell" consisting of a
+    little bit of code and a lot of documentation.
+
+    All the functions are now Object Oriented. Time will tell if that is a A
+    Good Thing[TM] but it makes reading the code and understanding where all
+    the calls are going much, much easier. added doc/*
+
+    The documentation has been significantly updated, addressing many of the
+    common questions and comments I have received.
+
+    The reporting has been overhauled. You still get the same information
+    but by default, if everything is okay it runs entirely silently. A
+    single -v will output status messages that make for a nice birds eye
+    view of your web log traffic. You can add additional -v options for even
+    more verbose reporting.
+
+    Interface change: instead of -m for month, -d for day, and -h for hour,
+    you use a -i [hour|day|month] option. The old -mdh options are
+    officially deprecated but will continue to work for the indefinte
+    future.
+
+    synced lib/Apache/Logmonster/Perl & Utility with Mail::Toaster 5
+    versions.
+
+  2.77 - no public release
+    *   create daily userlogs
+
+        new feature submitted by Gernot Hueber.
+
+    *   autogenerate vhost stat dirs
+
+        new feature funded by Lewis Bergman: statsdir can be automatically
+        created if it does not exist. Set statsdir_policy = create in
+        logmonster.conf to enable this feature.
+
+    *   incremental awstats config files.
+
+        New feature by Lewis: Instead of having a full awstats.conf file for
+        each vhost, each vhost has its own file that contains only specific
+        info for that vhost and includes the generic
+        /etc/awstats/awstats.conf file with the "global" settings.
+
+    *   added loguser and loggroup to .conf
+
+  2.76 - Jun 04, 2005
+    statsdir can now be an absolute path
+        statsdir can now be an absolute path (ex: /var/www/html). If so,
+        processor output will be stored in statsdir/vhost. Otherwise, it
+        works as it used to and output goes to vhost/statsdir. This is
+        useful if you have a seperate machine (not the web server) that does
+        the processing and that system does not have access to the vhost
+        docroot.
+
+  2.75 - Feb 05, 2005
+    * you can now select which stats processor is used for each virtual
+    host. Create a .processor file in the stats dir and place the name of
+    the processor on the first line.
+
+    * test to make sure the log file exists before trying to compress it
+    (supresses spurious warnings)
+
+    * If vhosts are all in a directory, skip any files that end with ~ (vim)
+    or .bak (user).
+
+    * the code that hashed the domain list collected the settings from
+    httpd.conf and stuffed them into a hash with the name of the vhost. This
+    worked great, as long as ServerName was the first declaration in your
+    httpd.conf. I discovered this fails otherwise. Now it stuffs the
+    settings into a hash and then, after all the data is collected, moves
+    the data into a new hash keyed off the vhost servername. The function
+    now works regardless of order in the vhost container.
+
+    * If a perl module was missing, the script would fail after attempting
+    to load Mail::Toaster::Perl (which may not exist) Added
+    Apache::Logmonster::Perl to distro
+
+  2.74  - Nov 26, 2004
+     package is now named Apache::Logmonster to fit nicely into a CPAN category
+     bundled up for CPAN & freshmeat release
+       Makefile.PL
+         updated package NAME
+         removed MATT::* dependency, added Compress::Zlib dep
+       logmonster.pl
+         updated package name
+       added more example settings to logmonster.conf
+       cleaned up pod docs for prettier web page formatting
+       added TODO file
+       remove MATT::Bundle reference from FAQ
+
+  2.73  - Nov 12, 2004
+      updated lib/Logmonster/Utility to latest
+      fixed get_the_date bug in Utility
+      added many more tests for Utility
+      fixed a bug in my fileparse call (File::Basename)
+
+  2.72  - Nov 11, 2004
+      Removed MATT::Utility dependency
+      added lib/logmonster/Utility (logmonster::Utility)
+      removed Exporter
+      updates for use with logmonster::Utility
+      replaced StripLastDirFromPath with File::Basename
+
+  2.71  - Oct 22, 2004
+      Raymond Dijkxhoorn suggested not sorting the files if 
+        there is only one host. Shucks, that's a reasonable enough 
+        thing to do, for those of you with only one web server. ;-)
+      Logmonster will now dutifully skip sorting logs if only
+        one hostname is configured in logmonster.conf
+
+  2.70  - 0ct 22, 2004
+      allow for ServerName to have a :80 style suffix
+      added verbose (-v) flag.
+      fixed up reporting so quiet mode is really quiet
+         unless there are errors
+      normal output is prettier
+      debugging output is much prettier
+      apache config file parsing is now much more versatile
+         if you have a folder full of files for vhosts, you can
+         have multiple vhosts within a file now
+      misc internal changes for efficiency
+      prototyped all subroutines
+      added additional comments here and there
+      added test for FileHandle
+
+  2.6.6 - Jun 16, 2004
+      Added inline documentation to a few of the subs
+      Modified SortVhostLogs so that it uses much less memory
+         by writing to the log file as we sort instead of building
+         an array and then writing the array contents to the file
+         in GetDomainList, I forgot to add domains without aliases
+         to %domains 
+      GetServerName: made the regexp search more reliable (no
+         known problems but the potential existed).
+
+  2.6.5 - Jun 10, 2004
+     Switched date parsing regexp from / / to /\s+/ in 
+       SortVhostLogs per Earl Ruby (eruby@switchmanagement.com)
+       for compatibility with Apache::Registry
+
+  2.6.4 - Apr 14, 2004
+      Added regexp notes
+      Added additional debugging
+      Check for files locally before trying to compress them
+
+  2.6.3 - Mar 28, 2004
+      Updated regexp to support numeric vhosts
+      Updated logmonster.pl pod documentation
+      Updated Makefile.PL, added README, FAQ files
+      Added BSD copyright
+
+  2.6.2 - Mar 11, 2004
+      Corrected a typo in the logmonster.pl config file.
+
+  2.6.1 - Feb 24, 2004
+      Fixed problem where paths with caps weren't detected 
+       (search string was lower cased)
+
+  2.6   - Feb 21, 2004
+      Updated documentation and web site. More informative.
+
+  2.5.2 - Sep 24, 2003
+      Added a strip leading spaces function to GetVhostsFromFile
+      Adjusted so FindTheBin will find awstats in its default
+        location (/usr/local/www/cgi-bin/awstats.pl)
+
+  2.5   - Sep 15, 2003
+      Fixed a problem with HitsPerVHost not getting written
+      Fixed a mis-feature where running logmonster -r was 
+        clobbering the active log processing dir. Oops.
+      Fixed a couple problems related to interaction between
+        script and MATT::Utility
+      Made quite a few failures more graceful. This later proved
+        to be only beneficial from a theoretical standpoint
+        as it didn't solve the problem I was tracking down.
+
+  2.4   - Aug 14, 2003
+      Updated FetchLogFiles so that you don't need to ssh to localhost
+      Updated URLs from matt.simerson.net to tnpi.biz
+      Moved configuration from script to logmonster.conf
+      Added Changes to the CVS depot
+      Added support for AWStats log processor
+      Added lots of documentation to logmonster.conf
+
+  2.3   - Jul 10, 03
+      Added pod documentation.  
+      Cleaned up SysCmd calls and now SysCmd calls use MATT::Utility
+
+  2.2   - Mar 24, 03
+      Moved many subs out of script into modules
+
+  2.1.1 - Mar 18, 03
+      Report hit counts (-r designed to be used with SNMP and RRDutil)
+
+  2.1   - Mar 17, 03
+      Moved code out of FetchLogFiles to GetTheLogDir for reuse
+      Writes counters to $logdir/HitsPerVhost.txt
+      Writes activity log to $logdir/Logmonster.txt
+      Renamed $logdir to $logbase
+
+  2.0.3 - Mar 07, 03
+      Moved FAQ and Changelog to web site.
+      Created web page for logmonster.
+      Added support for http-analyze. It should work but I
+        haven't used http-analzye in about 5 years so I 
+        might be forgetting something.
+
+  2.0.2 - Mar 06, 03
+      Added the httpd.conf parsing stuff. Now works with a vhost
+        directory or parses out of your httpd.conf - cool :)
+
+  2.0.1 - Mar 06, 03
+      Moved vhost log pre-processer checks out of FeedTheMachine
+        into CheckStatsDir. Run it before SortVhostLogs so we 
+        skip sorting any logs that we aren't going to store.
+      Count up invalid lines in log files and report them instead
+        of dying when we encounter them.
+      Print out prettier logs.
+
+  2.0   - Mar 04, 03
+      An entire re-write
+      Logic is much cleaner now and way more efficient
+      Pulls most settings out of apache config files
+      Reporting is much better :)
+      Added -b (process archived logs) feature
+      Added -h & -m (hourly & monthly processing)
+      Added -n (dry run) so you can preview what it'll do
+      Now clean enough that I'll make it publicly available
+
+  1.4   - Feb 22, 03
+      Major code cleanups
+      Reworked fetch_the_files
+      Added system_command
+      Added FindTheBin
+
+  1.3   - Nov 25, 02
+      Added use strict (forced code cleanup)
+      Added getopt::std instead of custom parser
+      Moved $quiet to $opt_q, $debug to $opt_v
+
+  1.2.1 - Dec 14, 01
+      Made it work with matt.simerson.net
+
+  1.2   - Jun 28, 01
+      Cleaned up the code, added debug flag, expanded logic
+        so v1.2 can replicate 1.0 & 1.1 behaviour with options
+
+  1.1   - Feb 14, 01
+      Added support for multiple domains
+
+  1.0   - Oct 29, 00 - Origin

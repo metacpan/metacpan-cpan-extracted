@@ -1,0 +1,10 @@
+<html>
+<body>
+request [% request.pnotes('SWITSession').get_persbox %] <br />
+[% moo %] <br />
+<form action="u">
+box: [% persbox %]
+<input type="submit" />
+</form>
+</body>
+</html>

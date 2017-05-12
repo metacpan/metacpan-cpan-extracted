@@ -1,0 +1,19 @@
+0.005     2012-03-04 01:49:24 Europe/London
+	Code cleanup and make it easier to provide a custom format.
+
+0.004     2011-06-11 17:31:35 Europe/London
+	Provide on_bad_data_event so that unparsable lines can be handled separately.
+	Includes some extra code for parsing data as UTF8, including unescaping URLS - currently commented out since
+	 in most cases it's either not useful, or just wrong.
+
+0.003     2011-02-20 18:20:53 Europe/London
+	Improve filtering support, basic callbacks for things that need to know when new URL packets etc. are seen,
+	 and apply post processing before sending the log line event.
+
+0.002     2011-02-20 04:28:50 Europe/London
+	Handle partial incoming data streams for expanding, and avoid sending timestamp
+	 for filtered entries.
+
+0.001     2011-02-20 01:12:14 Europe/London
+	Initial CPAN upload
+

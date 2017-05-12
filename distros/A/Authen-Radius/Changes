@@ -1,0 +1,148 @@
+Revision history for Perl extension Radius.
+
+0.26 Mon Dec 12 13:12:32 2016
+    - Tag 0.25.1 as 0.26, because 0.25.1 is considered as 0.025001 (less than existing 0.25)
+
+0.25.1 Thu Dec 08 14:38:44 2016
+    - Require Perl v5.10+
+    - Fixed warnings in tests
+    - Fix sublist attribute type encoding
+
+0.25 Tue Dec 06 12:25:00 2016
+    - Added support for Status-Server requests (RFC 5997)
+    - Added support for IPv6 (RFC 3162)
+    - Added support for integer64 type (RFC 6929)
+    - Fixed warning of using uninitialized value $vendor_name (RT 99161)
+    - Added support for date and time types (RT 91408)
+    - Improved support for FreeRADIUS and GNU Radius dictionary files
+    - Added support for tagged attributes (RFC 2868)
+
+0.24 Wed Oct 30 13:21:00 2013
+    - Added support for changing I/O activity timeouts, so that
+      custom retransmission policies can be implemented
+    - Added ACCESS_CHALLENGE packet type definition (thanks to
+      Stephane Billiart for the patch)
+    - Fix the excessive wait on processing broadcasts when
+      at least one of the nodes in node list did not listen on
+      the requested port (a side-effect is that it is now possible
+      to set timeout in floating seconds since the epoch)
+
+0.23 Sat Aug 17 21:48:00 2013
+    - Clear authenticator as a part of clear_attibutes(), so
+      multiple requests, sent using the same object, will have
+      different authenticators (as they should)
+
+0.22 Wed Nov 07 20:27:00 2012
+    - Fix the excessive "types mismatch" warnings on PoD packets
+
+0.21 Mon Oct 29 09:00:00 2012
+    - Added support for attribute values for byte and short attribute types
+
+0.20 Tue Nov 09 22:45:59 2010
+    - Fixed the bug with the incorrect encoding of Cisco AVPair attributes
+
+0.19 Tue Nov 02 00:07:00 2010
+    - Improved support for CoA (thanks Oleg Gawriloff and Matej Vela)
+    - Ability to work with dictionaries in FreeRADIUS format
+        (thanks to Alexandr Kovalenko and Matej Vela)
+    - Support (partial) for WIMAX attributes
+
+0.18 Sun Oct 05 01:00:00 2010 (this version was not released to CPAN,
+    only used for internal testing)
+    - Support for a list of multiple RADIUS servers (RADIUS cluster)
+
+0.17 Thu Jan 14 09:20:00 2010
+    - Support for RFC3579 - Message-Authenticator
+
+0.16 Mon Dec 14 13:34:00 2009
+    - Generate random authenticators
+    - Support for CoA request (thanks to Oleg Gawriloff for the patch)
+    - Ability to specify the source IP/port for outgoing packets
+
+0.15 Mon Oct 05 12:00:00 2009
+    - Bugfixes in error handling
+
+0.14 Mon Aug 17 15:00:00 2009
+    - Authen::Radius is now distributed under the Perl Artistic
+        License v2.0
+    - Support for RADIUS retransmits
+    - For the "check_pwd" method plance the local socket's "real"
+        IP address into the NAS-IP-Address attribute
+        instead of 127.0.0.1
+
+0.13 Mon Feb 19 22:09:00 2006
+    - Packet-of-disconnect support (thanks to Kostas Kalevras for
+        the patch)
+    - Print hexdump of packets to STDERR (thanks to Kevin Steves)
+
+0.12 Fri Dec 17 19:00:00 2004
+    - Include the default set of radius dictionaries with the module,
+        so it can be used on the generic system without having to
+        install extra components from the RADIUS server.
+
+0.11 Mon Mar 22 22:51:00 2004
+    - Fixed incorrect constant definition for ACCESS_REJECT
+        (thanks to Alexey Antipov for the error report)
+
+0.10 Fri Mar 05 21:00:00 2004
+    - Authenticator for the accounting requests (Thanks to
+        Brian Andrus for the patch provided)
+    - Support for password, longer than 16 characters (Thanks to
+        Will LaSala and Robert Tuttle for the problem report
+        and patches)
+    - Include NAS-IP-Address into the check_pwd to avoid error
+        "non-RFC packet error" from some of the RADIUS servers (Thanks
+        to Jacinta Alice Richardson, Bill Schoolfield and Ed Kubaitis
+        for the problem report and patches)
+    - Modify the example in perldoc to avoid confusion with the
+        User-Pasword vs Password attribute. (Thanks to Didier
+        Conchaudron for the problem report)
+    - Limit the maximum value length for string and avpair attributes
+
+0.09 Thu Jun 19 22:00:00 2003
+    - Replaced obsolete MD5 module with the Digest::MD5 (Thanks
+        Jonathan Earle for his patch).
+    - More careful handling of the return values in check_pwd to
+        avoid "Use of uninitialized value" warnings. (Thanks to
+        Kelsey Cummings for the notice).
+
+0.08 Sun Mar 24 23:00:00 2003
+    - Extra debug message when adding a new attribute
+
+0.07 Thu Feb 06 14:00:00 2003
+    - Support for the include command in the dictionaries
+    - Support for Digest-Attributes
+    - Bugfix for the Password attribute (attribute with id=2 should
+        be encrypted only for the undefined [default] vendor)
+    - Asked CPAN maintainers to be granted ownership on this module,
+        since the original author seem to be unavailable for quite
+        long time.
+    - Debug possibility (hexdump of the outgoing and incoming packets)
+
+0.06  Tue May 28 13:05:00 2002 (this version was never released to CPAN)
+    - Vendor support in the dictionaries
+    - Cisco AV pair attribute support
+
+0.05  Thu May 01 12:08:12 1997
+    - Bugfix to pad passwords up to nearest multiple of 16 (thanks to
+      "Mark R. Levinson" <mrl@isc.upenn.edu>)
+
+0.04  Mon Mar 31 20:04:33 1997
+    - changed module name to Authen::Radius
+    - added check_pwd() wrapper method (doesn't need a dictionary!) for
+      quick & easy username+password verification
+    - added actual timeout test on the IO recv() call
+    - remote socket port now defaults to 1645 if no port is specified and
+      there is no 'radius' entry in /etc/services
+    - added documentation on all interface methods (perldoc Authen::Radius)
+
+0.03  Tue Mar 25 19:51:23 1997
+    - added errors
+
+0.02  Mon Mar 24 11:51:23 1997
+    - replaced socket() & family with IO::Socket calls
+    - made new() method accept a single hash instead of multiple scalars
+
+0.01  Sun Mar 23 23:05:23 1997
+    - original version;
+

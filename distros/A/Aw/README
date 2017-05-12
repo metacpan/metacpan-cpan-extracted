@@ -1,0 +1,171 @@
+SPECIAL NOTICE
+==============
+0.16.0 offers compatibility with Perl 5.6 - 5.8.  The package builds and
+the bin/ scripts pass with Perl 5.8 but it is not optimized for 5.8.  Mostly
+this impacts better Unicode support in Perl 5.6 and later.  This enhanced
+support is not yet taken advantage of in the Aw package.
+
+0.15 introduces the setting and getting event type definitions as hashes.
+
+See bin/typedef-test1.pl and bin/typedef-test2.pl for examples of hash
+and typedef usage.  bin/eod-autotest.pl has become a "tour de force" of
+sorts of what the package is capable of admin wise and for basic client use.
+bin/index.html provides a summary of what each script does.
+
+The mod_perl TicTacToe example is again a part of the distribution, found
+in the bin/apache directory.
+
+
+INTRODUCTION
+============
+The Aw.pm module provides a Perl interface to the ActiveWorks libraries.
+The Perl script writer may instantiate new Perl objects for ActiveWorks
+adapters, broker clients, server clients, events, event types, type defs,
+etc, with a class hierarchy nearly identical to that of the Java API while
+maintaining the expected norms and conveniences of Perl.
+
+
+Changes
+=======
+See the "Changes" file provided with each release.
+
+
+INSTALLATION
+============
+See the "INSTALL" file.
+
+
+DOCUMENTATION
+=============
+POD is forthcoming, see the doc/index.html file for a class and method list.
+See also the Java and C CADK manuals of ActiveWorks.
+
+
+LICENSE
+=======
+GNU GPL version 2.0 or later.
+
+
+DISCLAIMERS
+===========
+In addition to the disclaimers in the GPL: this interface to the ActiveWorks
+libraries is NOT in any way endorsed by ActiveSoft or WebMethods.
+
+
+FEATURES
+========
+"Events are Hashes, Hashes are Events"
+
+No need to fuss with adapter config files unless you really want to (I don't).
+
+
+What it Can Do..
+--------------
+The provided classes and their methods are sufficient to run simple
+clients and adapters.  See the scripts in the bin/ directory for examples.
+
+The Aw:: package should be compatible with any Perl system, no limitations
+have been encountered.  The package embeds readily in Apache with mod_perl.
+See the bin/apache directory for examples.
+
+Works with either ActiveWorks 3.0 or 4.x libraries.  Comment/Uncomment the
+appropriate lines in the Makefile.PL.  The package has only been used under
+Solaris 2.6 and 8.0 with Perl versions 5.004_04, 5.005_03, 5.6 and 5.8.
+Reliability on other systems is unkown.  Please submit any success stories
+on other systems.
+
+
+What it Can't Do..
+----------------
+Multiple adapters running simultaneously (threaded) in a single script are
+not guaranteed to operate sanely.
+
+Not every API that has been mapped into Perl has actually been used.
+There will likely be bugs waiting to snip at the first person to invoke
+said methods.
+
+Has not been tested against the ActiveWorks 3.1 libraries.
+
+
+TODO
+====
+
+ *  Make sure that it is thread safe when multiple adapters live
+    in a single script.
+ *  Update for newer breeds of Perl and WebMethods Enterprise Server.
+
+
+AUTHOR'S COMMENTS
+=================
+As the Perl slogan goes: "There is more than one way to do it!".
+I have certainly found this to be true when working with Perl
+primitives for object design.  The initial approach in this
+release is to follow the Java API which has the conveniences
+of:
+
+  1) Is presumably a well thought out object interface.
+  2) Having a design.
+  3) It's already documented ;-)
+  4) Will look familiar to Java converts.
+
+However the Java API is not always going to be the most natural
+to Perl developers and some Perlisms may occasionally be in 
+order.  When a Perl shortcut is taken the rule followed is to
+provide the shortcut in addition to the Java analog.  This rule
+is broken when for how error handling is treated.  No BrokerError
+objects are provided.  Instead the Mysql package model is applied.
+
+Finally, the AdapterUtil class is still mysterious in purpose to
+me.  In C they seem to be a way to work with callback data
+("handles").  In Java there seems to be a bit more to it.  I have
+converted some of the routines that expect handles into adapters
+methods so the programmer isn't burdened with making implicit
+data explicit.  The AdapterUtil class with the same methods is
+however provided.
+
+
+Error Policy
+------------
+Superimposing the Java API on a Perl API using a C API bore
+at least one casualty.  Or enhancement depending on your point
+of view.
+
+Like C, Perl does not support the concept of thrown exceptions.
+Every Aw Perl method will record broker errors by pointing to
+( obj->err ) BrokerErrors returned by the underlying C APIs.
+These BrokerError data types are not the default return types
+into Perl space.  $! will be set to the value of
+awErrorToCompleString starting from the v0.13 release.
+
+Many of the Java methods were "void" in return type while leaving
+errors to be detected in the thrown exception.  In such instances
+the Perl method will return a boolean  (the "awaBool" type
+specifically mapped onto Perl's T_BOOL) to indicate the presence
+of errors.  This would be in keeping with other methods that in
+both the C and Java APIs do return booleans for success or failure.
+
+Other methods that might return strings or integers likewise set
+up error results in the objects error pointer.  In cases where a
+new object was the expected return type, an "undef" is returned
+on failure.  The cause of the failure may be analyzed by invoking
+Aw::Error methods as functions (e.g. $ec = Aw::Error::getCode(); )
+or by instantiating a new error object using "last" (vs "new")
+$err = last Aw::Error;   In both cases an internal global error
+pointer is applied that always points to the last error created
+in the XS layer.  Or just check $! as of v0.13.
+
+Classes derived from the Aw::Basic class will have these error
+methods available:
+
+	::err  		returns a boolean to indicate the presence of an error.
+
+	::errmsg	returns a string describing the error message equivalent
+			to "awErrorToCompleteString".
+
+	::error		returns a Aw::Error object from which addition
+			details about the error can be garnered.
+
+
+
+
+Comments and suggestions to:  Yacob@wMUsers.Com

@@ -1,0 +1,265 @@
+version 0.008; 2012-02-04
+
+  * bugfix: avoid passing magic variables $1 et al into functions where
+    they might unexpectedly change value
+
+  * bugfix: in A::P::SaltedDigest, when loading digest modules, use
+    bugfixed version of Module::Runtime (which works around a bug in
+    Perl 5.8 and 5.10 regarding loading context-sensitive modules)
+
+  * in base class documentation, indicate which algorithms should be
+    preferred for new applications, and discuss side-channel attacks
+
+  * in A::P::BlowfishCrypt documentation, discuss selection of cost
+    parameter
+
+  * for A::P::MySQL41, get sha1() from Digest::SHA rather than
+    Digest::SHA1, because Digest::SHA is included in the core distribution
+
+  * add many cross links in documentation
+
+  * documentation typo fixes
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .cvsignore
+
+version 0.007; 2010-07-30
+
+  * bugfix: in A::P::SaltedDigest, use "[0-9a-zA-Z_]" instead of "\w"
+    in regexps where only ASCII characters are desired
+
+  * bugfix: in A::P::BlowfishCrypt, require bugfixed version of
+    Crypt::Eksblowfish (for memory leak fix)
+
+  * bugfix: in A::P::SaltedDigest, require bugfixed version of
+    Module::Runtime (for ASCII restriction of module name syntax)
+
+  * in A::P::EggdropBlowfish, use Crypt::Eksblowfish::Uklblowfish instead
+    of Crypt::Blowfish to remove limitation on passphrase length
+
+  * abandon use of the "fields" module
+
+  * use simpler "parent" pragma in place of "base"
+
+  * in documentation, use the term "truth value" instead of the less
+    precise "boolean"
+
+  * in A::P documentation, add MooseX::Types::Authen::Passphrase to
+    "see also" list
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.006; 2009-03-07
+
+  * bugfix: in A::P::SaltedDigest, use "[0-9]" instead of "\d" in regexps
+    where only ASCII digits are desired
+
+  * bugfix: require bugfixed versions of Authen::DecHpwd,
+    Crypt::Eksblowfish::Bcrypt, and Crypt::UnixCrypt_XS (for UTF8 scalar
+    handling)
+
+  * bugfix: require bugfixed version of Authen::DecHpwd (for not crashing)
+
+  * bugfix: require bugfixed version of Module::Runtime (for $SIG{__DIE__}
+    handling)
+
+  * avoid "\x{}" in regexp character classes, for compatibility with
+    perl v5.6
+
+  * in documentation for A::P::SaltedDigest, briefly discuss the new
+    generation of hash algorithms
+
+  * test POD syntax and coverage, and rename some internal functions to
+    satisfy the coverage test
+
+  * drop prototypes from method subs (where the prototypes have no effect)
+
+  * in tests, avoid unreliable "\S" regexp element
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * more precise Crypt::Eksblowfish::Bcrypt dependency instead of
+    Crypt::Eksblowfish dependency
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.005; 2007-01-21
+
+  * avoid "my __PACKAGE__", for compatibility with perl v5.6
+
+  * point to Crypt::SaltedHash from documentation for A::P::SaltedDigest
+
+  * remove bogus link to Crypt::Passwd from documentation for
+    A::P::SaltedDigest
+
+  * grammar fix in documentation for A::P::LANManager
+
+  * punctuation fix in documentation for A::P::Crypt16
+
+version 0.004; 2006-09-01
+
+  * implement Eggdrop blowfish.mod algorithm in
+    Authen::Passphrase::EggdropBlowfish based on the Crypt::Blowfish
+    module; initially limited to passphrases up to 56 bytes
+
+  * in A::P::VMSPurdy, change ->hash_hex method to output in uppercase,
+    as used in crypt strings
+
+  * in A::P::VMSPurdy, add a "salt_hex =>" constructor parameter and a
+    ->salt_hex method, handling salt in the hexadecimal format used in
+    crypt strings
+
+  * in documentation for A::P::DESCrypt, move the security warning to
+    apply to both the traditional and extended schemes
+
+  * in documentation for A::P::MySQL323, be more explicit about storage
+    format
+
+  * documentation markup fix in A::P::BlowfishCrypt
+
+version 0.003; 2006-08-31
+
+  * implement VMS Purdy polynomial algorithm family (crypt identifiers
+    $VMS1$, $VMS2$, and $VMS3$) in Authen::Passphrase::VMSPurdy based
+    on the Authen::DecHpwd module
+
+  * implement phpass algorithm (crypt identifier $P$) in
+    Authen::Passphrase::PHPass
+
+  * implement MySQL v3.23 algorithm in Authen::Passphrase::MySQL323
+    based on the Crypt::MySQL module
+
+  * implement MySQL v4.1 algorithm in Authen::Passphrase::MySQL41
+
+  * in from_crypt, when handling known but unimplemented schemes, say so
+    instead of not recognising the scheme identifier
+
+  * move from_crypt and from_rfc2307 parsing code from Authen::Passphrase
+    into scheme-specific modules
+
+  * put all data stored in objects into canonical form, to avoid
+    propagating dualvars or other oddities
+
+  * document {CRYPT16}, ambiguously used by Exim
+
+  * make {CRYPT} documentation more explicit
+
+  * fix a bogus reference to DES in the documentation of
+    A::P::BlowfishCrypt
+
+version 0.002; 2006-08-12
+
+  * implement LAN Manager hash scheme (RFC 2307 identifiers {LANMAN}
+    and {LANM}) in Authen::Passphrase::LANManager, along with separable
+    halves (crypt identifier $LM$) in Authen::Passphrase::LANManagerHalf
+
+  * implement Netscape Mail Server's MD5-based scheme (RFC 2307 identifier
+    {NS-MTA-MD5}) in Authen::Passphrase::NetscapeMail
+
+  * implement crypt16 from Ultrix in Authen::Passphrase::Crypt16
+
+  * implement bigcrypt from Digital Unix in Authen::Passphrase::BigCrypt
+
+  * implement RFC 2307 scheme identifier {MD4} (plain MD4)
+
+  * implement RFC 2307 scheme identifier {RMD160} (plain RIPEMD-160)
+
+  * implement RFC 2307 scheme identifier {MSNT} (NT-Hash)
+
+  * implement crypt scheme identifier $NT$ (NT-Hash with a different
+    textual format from $3$)
+
+  * implement RFC 2307 scheme identifier {WM-CRY} (synonym for {CRYPT})
+
+  * add a "passphrase =>" constructor parameter to
+    A::P::BlowfishCrypt->new, A::P::DESCrypt->new, A::P::MD5Crypt->new,
+    A::P::NTHash->new, and A::P::SaltedDigest->new (such a parameter
+    also exists in the new A::P::BigCrypt->new, A::P::Crypt16->new,
+    A::P::LANManager->new, A::P::LANManagerHalf->new, and
+    A::P::NetscapeMail->new)
+
+  * add a "salt_random =>" constructor parameter to
+    A::P::BlowfishCrypt->new, A::P::DESCrypt->new, A::P::MD5Crypt->new,
+    and A::P::SaltedDigest->new (such a parameter also exists in the new
+    A::P::BigCrypt->new, A::P::Crypt16->new and A::P::NetscapeMail->new)
+
+  * in A::P::SaltedDigest, accept bare package names and related forms,
+    and references to blessed objects, as algorithm identifiers
+
+  * in the from_crypt and from_rfc2307 constructors, reject strings
+    containing spaces or control characters
+
+  * in Authen::Passphrase::MD5Crypt, refuse to put a space character
+    into a crypt string
+
+  * in Authen::Passphrase::Clear, refuse to put spaces or control
+    characters into an RFC 2307 string
+
+  * in Authen::Passphrase::MD5Crypt, check that the salt string contains
+    only bytes
+
+  * prohibit the base class from_crypt and from_rfc2307 constructors
+    being called on subclasses
+
+  * in testing Authen::Passphrase::NTHash, check case handling
+
+  * rewrite the from_crypt constructor to use scheme identifiers as such,
+    the way from_rfc2307 already does
+
+  * in documentation for the from_crypt constructor, list all known
+    scheme identifiers
+
+  * in documentation for the from_rfc2307 constructor, list known
+    pseudo-schemes (where instead of a passphrase hash there is a
+    reference to some other authentication mechanism)
+
+  * discuss resistance to brute force attacks in documentation
+
+  * more realistic example salts in the synopsis of A::P::MD5Crypt and
+    A::P::SaltedDigest
+
+version 0.001; 2006-08-06
+
+  * implement Blowfish-based crypt() scheme (crypt identifiers $2$
+    and $2a$) in Authen::Passphrase::BlowfishCrypt, based on the new
+    Crypt::Eksblowfish::Bcrypt module
+
+  * include MIME::Base64 in dependency list in Makefile.PL
+
+  * versioned dependencies
+
+  * add test t/intdescrypt.t for the full DESCrypt interface
+
+  * test full SaltedDigest interface in t/smd5.t and t/ssha.t
+
+  * test full NTHash interface in t/nthash.t
+
+  * use "=> 0" instead of "=> undef" in unversioned dependencies in
+    Makefile.PL
+
+  * in the Authen::Passphrase constructors, note the effects of the
+    runtime loading of specific recogniser class modules
+
+  * comment on the origins of the MD5-based and Blowfish-based crypt()
+    schemes
+
+  * corrected copyright year in README
+
+version 0.000; 2006-05-23
+
+  * initial released version

@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use App::UnANSI;
+# PODNAME: unansi
+# ABSTRACT: Remove ANSI coloring from output or files
+
+exit App::UnANSI->new_with_options()->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+unansi - Remove ANSI coloring from output or files
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+    unansi my_file-colored.txt > my_file-uncolored.txt
+    cat my_file-colored.txt | unansi
+
+=head1 DESCRIPTION
+
+This application simply removes all ANSI coloring from either stdin or from
+a given file. It prints everything to screen.
+
+=head1 AUTHOR
+
+Sawyer X
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Sawyer X.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

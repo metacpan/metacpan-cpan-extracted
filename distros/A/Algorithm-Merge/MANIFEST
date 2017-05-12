@@ -1,0 +1,9 @@
+CHANGES
+MANIFEST
+Makefile.PL
+Merge.pm
+README
+t/00basic.t
+t/10merge.t
+t/20diff.t
+META.yml                                 Module meta-data (added by MakeMaker)

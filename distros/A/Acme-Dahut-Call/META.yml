@@ -1,0 +1,20 @@
+--- 
+abstract: replicates the melodious sound of the wild Dahut ... in Text.
+author: Chris Prather  C<< <perigrin@cpan.org> >>
+build_requires: 
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Acme-Dahut-Call
+no_index: 
+  directory: 
+    - demos
+    - inc
+    - t
+requires: 
+  Moose: 0.20
+version: 0.03

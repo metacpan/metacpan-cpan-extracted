@@ -1,0 +1,21 @@
+1.162230  2016-08-10 16:07:16-07:00 America/Los_Angeles
+    - Fixed a nasty bug that was causing the wrong return code to come back
+
+1.161400  2016-05-19 15:51:17-07:00 America/Los_Angeles
+    - Fixed a shallow bug that caused a crash when a sub-program was
+      called with no arguments.
+
+1.161240  2016-05-03 06:31:40-07:00 America/Los_Angeles
+    - Added HASH program args, which makes it easy to Message::Transform
+      dynamic arguments into programs.
+
+1.161190  2016-04-27 18:36:41-07:00 America/Los_Angeles
+    - Added default handling when passing in no arguments attribute
+
+1.161170  2016-04-26 15:39:26-07:00 America/Los_Angeles
+    - BUG: the process cache didn't handle cases where processes were
+      killed externally.
+
+1.161160  2016-04-25 15:56:10-07:00 America/Los_Angeles
+    - initial release
+

@@ -1,0 +1,83 @@
+    PerlModule Apache::VMonitor
+    <IfDefine MODPERL2>
+        # 2.0 configuration
+        <Location /vmonitor>
+            SetHandler perl-script
+            PerlResponseHandler Apache::VMonitor
+            PerlOptions -GlobalRequest
+            PerlOptions -SetupEnv
+        </Location>
+    </IfDefine>
+    <IfDefine !MODPERL2>
+        # 1.0 configuration
+        <Location /vmonitor>
+            SetHandler perl-script
+            PerlHandler Apache::VMonitor
+        </Location>
+    </IfDefine>
+
+<VirtualHost vhost1>
+    PerlModule Apache::VMonitor
+    <IfDefine MODPERL2>
+        # 2.0 configuration
+        <Location /vmonitor>
+            SetHandler perl-script
+            PerlResponseHandler Apache::VMonitor
+            PerlOptions -GlobalRequest
+            PerlOptions -SetupEnv
+        </Location>
+    </IfDefine>
+    <IfDefine !MODPERL2>
+        # 1.0 configuration
+        <Location /vmonitor>
+            SetHandler perl-script
+            PerlHandler Apache::VMonitor
+        </Location>
+    </IfDefine>
+</VirtualHost>
+
+
+<VirtualHost vhost2>
+    PerlModule Apache::VMonitor
+    <IfDefine MODPERL2>
+        # 2.0 configuration
+        <Location /vmonitor>
+            SetHandler perl-script
+            PerlResponseHandler Apache::VMonitor
+            PerlOptions -GlobalRequest
+            PerlOptions -SetupEnv
+        </Location>
+    </IfDefine>
+    <IfDefine !MODPERL2>
+        # 1.0 configuration
+        <Location /vmonitor>
+            SetHandler perl-script
+            PerlHandler Apache::VMonitor
+        </Location>
+    </IfDefine>
+</VirtualHost>
+
+<IfModule mod_status.c>
+  ExtendedStatus On
+  <Location /server-status>
+      SetHandler server-status
+  </Location>
+</IfModule>
+
+#<IfModule worker.c>
+#    StartServers         3
+#    MaxClients           30
+#    MinSpareThreads      30
+#    MaxSpareThreads      30
+#    ThreadsPerChild      10
+#    MaxRequestsPerChild  0
+#</IfModule>
+
+
+#<IfModule prefork.c>
+#    StartServers         30
+#    MaxClients           30
+#    MinSpareServers      30
+#    MaxSpareServers      30
+#    MaxRequestsPerChild  0
+#</IfModule>

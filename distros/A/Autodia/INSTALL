@@ -1,0 +1,45 @@
+INSTALL
+-------
+
+Autodia is a perl application and requires that perl is installed on your system. It should work with native unix perl or
+activestate's perl on windows.
+
+Vanilla Install
+
+If you are running autodia against perl, c++ or PHP source code then you can install using the usual perl
+technique :
+
+% perl Makefile.PL
+% make
+% make test
+% su
+# make install
+
+when you run perl Makefile.PL you may see a warning that requisites Inline and Inline::Java are not installed. This is fine if you 
+do not need use Autodia with java.
+
+the autodia program is called using 'autodia.pl' with arguments as required, if no arguments are passed then it will display
+instructions.
+
+for more detailed usage of autodia and developer documentation read the DEVELOP file and perldoc Autodia
+
+Java Install
+
+if You want to use autodia against java then you require some extra perl modules
+- Inline
+- Inline::Java
+
+You will also need to copy the file named autodia_java over the file name autodia
+
+so your installation would go :
+
+% perl -MCPAN -e 'install Inline'
+% perl -MCPAN -e 'install Inline::Java'
+% cp autodia_java.pl autodia.pl
+% perl Makefile.PL
+% make
+% make test
+% su
+# make install
+
+

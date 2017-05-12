@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/AnyEvent-Semaphore.t
+lib/AnyEvent/Semaphore.pm
+t/pods.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,44 @@
+Apache/AliasList version 0.07
+=============================
+
+TITLE
+
+Apache::AliasList - Apache translation handler to process lists of aliases
+
+SYNOPSIS
+
+In httpd.conf:
+
+ PerlTransHandler Apache::AliasList
+ PerlSetVar AliasList /path/to/alias.list
+
+In alias.list:
+
+ # Comment lines ignored
+ /alias   /full/uri/spec.html
+
+If http://domain/alias is requested, the document at
+http://domain/full/uri/spec.html will be delivered.
+
+Please see the module's documentation for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Requires a mod_perl enabled installation of Apache.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Jon Allen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

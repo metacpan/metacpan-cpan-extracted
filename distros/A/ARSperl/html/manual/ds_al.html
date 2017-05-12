@@ -1,0 +1,93 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - Active Link Attributes Structure</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H2>Active Link Attributes Structure</H2>
+
+This structure is returned by function 
+<A HREF="ars_GetActiveLink.html">ars_GetActiveLink</a>.
+<p>
+For ARS version 4.5:
+<PRE>
+{
+ "actionList"      =&gt; <i>list</i> of references to <A HREF="ds_alas.html">Active Link Action Structure</a>,
+ "controlField     =&gt; integer,
+ "elseList"        =&gt; <i>list</i> of references to <A HREF="ds_alas.html">Active Link Action Structure</a>,
+ "enable"          =&gt; integer enumeration,
+ "executeMask"     =&gt; integer bitmask,
+ "focusField"      =&gt; integer,
+ "groupList"       =&gt; <i>list</i> of integer,
+ "helpText"        =&gt; string,
+ "lastChanged"     =&gt; string,
+ "name"            =&gt; string,
+ "order"           =&gt; integer,
+ "owner"           =&gt; string,
+ "query"           =&gt; reference to internal struct,
+ <font color='red'>"schemaList"      =&gt; <i>list</I> of one or more strings</font>,
+ "timestamp"       =&gt; integer
+ "changeDiary"     =&gt; <i>list</i> of references to <a href="ds_diaryentry_hash.html">Diary Entry Structures</a>
+ <font color='red'>"objPropList"     =&gt; <I>list</I> of references to <a href="ds_prop_hash.html">Property Hash</a></font>
+}
+</PRE>
+
+For ARS version 3.x and 4.0.x:
+<PRE>
+{
+ "actionList"      =&gt; <i>list</i> of references to <A HREF="ds_alas.html">Active Link Action Structure</a>,
+ "controlField     =&gt; integer,
+ "elseList"        =&gt; <i>list</i> of references to <A HREF="ds_alas.html">Active Link Action Structure</a>,
+ "enable"          =&gt; integer enumeration,
+ "executeMask"     =&gt; integer bitmask,
+ "focusField"      =&gt; integer,
+ "groupList"       =&gt; <i>list</i> of integer,
+ "helpText"        =&gt; string,
+ "lastChanged"     =&gt; string,
+ "name"            =&gt; string,
+ "order"           =&gt; integer,
+ "owner"           =&gt; string,
+ "query"           =&gt; reference to internal struct,
+ "schema"          =&gt; string,
+ "timestamp"       =&gt; integer
+ "changeDiary"     =&gt; <i>list</i> of references to <a href="ds_diaryentry_hash.html">Diary Entry Structures</a>
+}
+</PRE>
+For ARS 2.1 and earlier:
+<PRE>
+{
+ "actionList"      =&gt; <i>list</i> of references to <A HREF="ds_alas.html">Active Link Action Structure</a>,
+ "displayList"     =&gt; <i>list</i> of references to <A HREF="ds_ds.html">Display Structure</a>,
+ "enable"          =&gt; integer enumeration,
+ "executeMask"     =&gt; integer bitmask,
+ "field"           =&gt; integer,
+ "groupList"       =&gt; <i>list</i> of integer,
+ "helpText"        =&gt; string,
+ "lastChanged"     =&gt; string,
+ "name"            =&gt; string,
+ "order"           =&gt; integer,
+ "owner"           =&gt; string,
+ "query"           =&gt; reference to internal struct,
+ "schema"          =&gt; string,
+ "timestamp"       =&gt; integer
+ "changeDiary"     =&gt; <i>list</i> of references to <a href="ds_diaryentry_hash.html">Diary Entry Structures</a>
+}
+</PRE>
+
+Example:<P>
+
+<PRE>
+      $attrib = ars_GetActiveLink($ctrl,$activelink);
+      $help = $attrib-&gt;{"helpText"};
+</PRE>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 16th July 1997 by d.j.adams@soton.ac.uk<br>
+</address>
+</BODY>
+</HTML>

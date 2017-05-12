@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/Acme/NamespaceRoulette.pm
+t/Acme-NamespaceRoulette.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

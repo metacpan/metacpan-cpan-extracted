@@ -1,0 +1,25 @@
+{
+    "comment": "Population data from Wolfram|Alpha",
+    "cities": [
+        {
+            "name": "Los Angles",
+            "country": "USA",
+            "population": 3793000
+        },
+        {
+            "name": "New York",
+            "country": "USA",
+            "population": 8175000
+        },
+        {
+            "name": "Tokyo",
+            "country": "Japan",
+            "population": 8477000
+        },
+        {
+            "name": "Taipei",
+            "country": "Taiwan",
+            "population": 2607000
+        }
+    ]
+}

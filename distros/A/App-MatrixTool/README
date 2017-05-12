@@ -1,0 +1,21 @@
+NAME
+
+    App::MatrixTool - commands to interact with a Matrix home-server
+
+SYNOPSIS
+
+    Usually this would be used via the matrixtool command
+
+     $ matrixtool server-key matrix.org
+
+DESCRIPTION
+
+    Provides the base class and basic level support for commands that
+    interact with a Matrix home-server. See individual command modules,
+    found under the App::MatrixTool::Command:: namespace, for details on
+    specific commands.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,0 +1,5 @@
+PerlModule Apache2::Tail
+<Location /tail>
+  SetHandler  modperl
+  PerlHandler Apache2::LogNotify
+</Location>

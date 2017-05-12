@@ -1,0 +1,16 @@
+Overview of tasks
+=================
+
+Change way terminal windows are created
+=======================================
+
+Set up terminal windows in Tk to embed termainal session into it, such 
+as with xterm:
+
+  xterm -wid <wid> ....
+
+This may limit what terminals can be used, though
+
+See also:
+http://www.perlmonks.org/?node_id=359764
+http://www.perlmonks.org/?node_id=643221

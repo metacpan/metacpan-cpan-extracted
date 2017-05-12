@@ -1,0 +1,267 @@
+Revision history for Perl extension Aw.
+
+0.16.7 Thu Feb 20 09:21:12 EST 2003
+	
+	- README updated to reflect changes in INSTALL.
+	- moved old CLASSES into doc/.
+
+0.16.6 Thu Feb 20 08:38:26 EST 2003
+	
+	- INSTALL instructions are expanded.
+
+0.16.5 Sun Feb  9 13:19:10 EST 2003
+
+	- bin/PerlDemo.data renamed bin/PerDemo.adl
+
+0.16.4 Wed Feb  5 22:31:16 EST 2003
+
+	- bin/ttt_client.pl: now derived from Aw::Client.
+
+0.16.3 Sat Feb  1 23:05:59 EST 2003
+
+	- bin/ttt_client.pl: unused $eventDate removed.
+	- dates fixed in this Changes file.
+
+0.16.2 Fri Jan 31 22:14:44 EST 2003
+
+	- format cleanup for demo scripts.
+
+0.16.1 Wed Jan 29 10:04:02 EST 2003
+
+	- xs/Aw/Admin.xs fixed double frees of BrokerDates in both sessions
+	  and Aw::Dates.  Fixed with awCopyDate for Aw::Dates.
+
+0.16.0 Thu Jan 23 10:04:02 EST 2003
+
+	- c/Makefile.PL  updated for Perl >= 5.8.
+	- Av_CharPtrPtr.[ch] updated for extra arg for Perl >= 5.8.
+          The arg is ignored.
+	- xs/Aw.xs, xs/Aw/Admin.xs count_charPtrPtr added for Perl >= 5.8.
+
+0.15.1 Mon Jan 20 14:17:24 EST 2003
+
+	- documentation tweaks only.
+
+0.15.0 Sun Jan 19 21:41:51 EST 2003
+
+	- xs/Aw.xs removed a stray ;
+	- xs/Aw/Admin.xs fix in joinTerritory.
+	- bin/ documentation added to many scripts.
+	- bin/index.html added to list bin contents.
+	- bin/apache TicTacToe files have returned.
+	- doc/ tweaks to a few files.
+	- c/EventToHash.c uncommented code that skips created keys
+          for unset fields.
+	- lib/Aw/Client.pm removed merged "EZ" method into bases.
+
+0.15.0-120402 Fri April 12 16:36:40 EDT 2002
+
+	- bin/eod-autotest.pl added.
+	- c/TypeDefToHash.c include/TypeDefToHash.h
+	- ripped out the TypedHash stuff, probably not so useful after all.
+
+0.15.0-110402 Thu April 11 21:01:02 EDT 2002
+
+	* ...just in case i'm hit by a truck before i can complete 0.15 :-)
+	- Aw::Admin::TypeDef creation with %hashes!
+	- bin/typedef-test1.pl, bin/typedef-test2.pl
+	- c/HashToTypeDef.c, include/HashToType.h
+
+0.14.1 Wed Apr 10 11:07:44 EDT 2002
+
+	- last arg of setFieldType dropped since by definition it isn't used 
+	- getBrokers map fixed in Aw::Admin::ServerClient
+	- territory_name and description not set in hash key getBrokers when NULL
+
+0.14.0 Thu Apr  4 18:22:54 EST 2002
+
+	- Aw::Admin reference web pages added.
+	- many leaks plugged over last release.
+	- Aw::Info added for awadmin.h structures that are otherwise represented
+	  as hashes but can benefit from their respective "ToString" functions.
+	- some code clean up with XS "CLEANUP".
+
+0.13.7 Tue Feb 26 16:40:50 EST 2002
+
+	- fixed numerous small Aw::Admin problems in methods not used previously 
+	- Aw::Admin base class methods added, one day maybe integrate with Aw:: base class.
+	- bin/client_finger.pl and bin/terr_finger.pl added (not fun work in C or Java).
+	- added Aw::Adapter::exit to delete client component.
+	- decided to package include/porbit-perl.h. 
+	- decided the v0.14 criteria will be getting doc/Aw/Admin_*.html complete.
+
+0.13.6 Fri May  4 16:25:30 EDT 2001
+
+	- typemap path is set.
+	- setErrMsg fixes.
+	- AWXS_*CLEARERROR clears $@ correctly.
+
+0.13.5 Fri Apr  6 17:51:21 EDT 2001
+
+	- get<foo>Info methods working for Aw::Adapter, Aw::Util, and Aw::EventType.
+	- Aw/EventType.pm added.
+	- constant function added for Admin.xs.
+	- wantarray checking for char ** return types.
+	- "Please specify prototyping behavior" error is gone.
+
+0.13.4 Thu Apr  5 17:45:39 EDT 2001
+
+	- Introduction of Aw::Admin classes.
+	- Reorganized code for Aw.so and Admin.so to share functions.
+	- Changed back to setting $@ instead of $! which turned out to be
+	  unreliable.
+	  
+0.13.3 Wed Feb  7 16:02:19 EST 2001
+
+	- Aw::Adapter::createTypeEvent accepts an initialization hash as a last
+	  argument (like Aw::Event::new).  Clobbered this by mistake in previous
+	  release.
+
+0.13.2 Mon Feb  5 14:06:27 EST 2001
+
+	- $! should be used through out the package now wherever a BrokerError
+	  is possible.
+
+0.13.1 Mon Jan 29 15:19:18 EST 2001
+
+	- initialized all BrokerErrors to null in HashToEvent.c and EventToHash.c.
+
+0.13 Tue Jan 23 17:40:57 EST 2001
+
+	- $! is set to awErrorToCompleteString when functions return a BrokerError.
+	- numerous minor fixes.
+	- packaging updated.
+
+0.12 Fri Jul  7 11:30:42 EDT 2000
+
+	- First release for AW 4.0, maintains backwards compatibility.
+	- Aw::Properties are replaced with hashes.
+	- Aw::Adapter objects can be instantiated with all args in a hash.
+	- New Methods for Aw4 Compliance
+
+	Available in 4.0 only
+		Aw::Adapter::initSessions       ( ala awAdapterInitSessions )
+		Aw::Adapter::isSessions         ( ala awAdapterIsSessions )
+		Aw::Adapter::isSessionManager   ( ala awAdapterIsSessionManager )
+		Aw::Adapter::usesSessionManager ( ala awAdapterUsesSessionManager )
+		Aw::Adapter::dispatchToSession  ( ala awAdapterDispatchToSession )
+		Aw::Util::dispatchToSession     ( ala awAdapterDispatchToSession )
+
+		Aw::Client::getBrokerVersionNumber ( aka awGetBrokerVersionNumber )
+		Aw::Client::deliverEventsWithAck   ( aka awDeliverEventsWithAck )
+		Aw::Client::publishEventsWithAck   ( aka awPublishEventsWithAck )
+
+		Aw::ConnectionDescriptor::getSharedEventOrdering ( aka awSetDescriptorSharedEventOrdering )
+		Aw::ConnectionDescriptor::setSharedEventOrdering ( aka awSetDescriptorSharedEventOrdering )
+
+		Aw::Event::getUCStringFieldAsA ( aka awGetUCStringFieldAsA )
+		Aw::Event::setUCStringFieldAsA ( aka awSetUCStringFieldAsA )
+
+
+	Available in 3.0 but not 3.1/4.0
+		Aw::Log::parseOptions ( aka awAdapterParseLoggingOption )
+		Aw::Log::startLogging no longer also does "awAdapterSetLoggingProperties"
+
+0.11 Fri Apr 20 10:31:41 EDT 2000
+
+	- C version of toHash in EventToHash.c.
+	- setFields.c is now HashToEvent.c.
+	- setSequence type methods use EventToHash code.
+	- numerous fixes for return of arrays of references.
+	- Aw::Event::getEnvelope method added.
+	- Aw::Event::getPubId method added.
+	- Aw::Event::getField now returns a generic SV.
+	- Aw::Event::getFIELD returns a hash with "value" and "type" keys.
+	- added BEGIN blocks throughout.
+
+0.10b Tue Mar 14 12:40:07 EST 2000
+
+	- some memory leaks for variables in callbacks pushed onto Perl's stack.
+	- The Aw::Log data type now includes maxMessagesize which has a default
+	  value of 2048.  Methods getMessageSize and setMessageSize are provided
+	  to manipulate this value.
+	- "strict" added to all .pm files.
+	- Makefile.PL is smart enough to know where default libraries and include
+	  files reside.
+	- Apache::Toe and tictactoe adapter added.
+	- fixes here and there.
+
+0.10a Mon Jan 17 16:14:29 EST 2000
+
+	- too many to mention.
+	- Highlights are:
+	  +  Conversion between Events and Hashes.
+	  +  More reference materials.
+	  +  New Demo scripts.
+	  +  Using Corba::Long data type for longs.
+	  +  Unicode is UTF8 only.
+
+0.06 Mon Nov 15 17:26:59 EST 1999
+
+	- ::DESTORY methods are now in BaseClass
+	- ::toString methods are now in BaseClass
+
+	- Aw::Adapter   Java API completed.
+	- Aw::AdapterET Java API completed.
+
+	- Aw::TypeDef extended.
+
+	- New Classes:
+	  Aw::ConnectionDescriptor
+	  Aw::Field
+	  Aw::Filter
+	  Aw::Format
+	  Aw::SSLCertificate
+	  Aw::Subscription
+	  Aw::TypeDefCache
+
+0.05  Wed Nov 03 11:24:53 EST 1999
+	- Comes with initial version of the ENET:: module
+
+	- bin/Injector.pl used to test enet_adapter.pl by sending
+	  predefined events with predifined data. 
+
+	- bin/Injector-Old.pl more general purpose, reads args and event
+	  data from stdin.
+
+	- code reduction thru aliasing.
+
+	- New Classes:
+	  Aw::AdapterLog
+	  Aw::BasicClass
+	  Aw::Error
+	  Aw::TypeDef
+
+	- Oodles more methods.
+
+0.04  Wed Oct 13 10:53:18 EDT 1999
+	- New now requires a "Version" and the properties are optional.
+	- adapter->loadProperites provided.
+	- properites must be passed by array reference.
+	- CharPtrPtr unpacking ellimintated.
+
+0.03  Mon Oct 11 13:30:57 EDT 1999
+	- First internal release.
+
+	- New Classes:
+	  Aw::AdapterET
+	  Aw::AdapterUtil
+	  Aw::Date
+
+	- Callbacks work as over-ridable methods.
+
+	- Oodles of internal changes.
+
+0.02  Mon Sep 27 15:46:35 EDT 1999
+	- major over haul from the proof-of-concent code
+
+	- Java API model is in use:
+	  Aw::Adapter
+	  Aw::Client
+	  Aw::Event
+
+	- Mysql error message handling style employed
+
+0.01  Wed Sep  8 11:06:13 1999
+	- original version
+

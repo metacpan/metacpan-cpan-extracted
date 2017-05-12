@@ -1,0 +1,1782 @@
+2.035006 - 2017-04-29
+
+  [BUG FIXES]
+
+  * Add SSL development library to OS base requirements install doc
+
+2.035005 - 2017-04-29
+
+  [NEW FEATURES]
+
+  * New report for Port VLAN Mismatches (M. Bernstein)
+
+  [ENHANCEMENTS]
+
+  * Add note to docs about reinstall after OS upgrade
+
+  [BUG FIXES]
+
+  * Do not attempt to UTF-8 decode OUI retrieved by curl/wget
+
+2.035004 - 2017-04-25
+
+  [BUG FIXES]
+
+  * Fix for relocated DB schema files
+
+2.035003 - 2017-04-24
+
+  [BUG FIXES]
+
+  * Add IO::Socket::SSL requirement for OUI/MIB download
+  * Fix for MIB download through an HTTP proxy
+
+2.035002 - 2017-04-24
+
+  [BUG FIXES]
+
+  * Fix DB schema files location with Module::Build
+
+2.035001 - 2017-04-19
+
+  [ENHANCEMENTS]
+
+  * #302 Device searching now searches on module serial numbers
+  * #298 NXOS SSHCollector and note in docs about VRFs
+
+2.034003 - 2017-04-14
+
+  [ENHANCEMENTS]
+
+  * #27 add SNMP tips for Huawei, CloudEngine, Linksys (stoatwblr)
+  * Add GAIA Embedded SSH collector (not the same as VSX, apparently)
+  * Add another community FreeBSD install guide
+  * Move to Github hosted IEEE OUI data and MIBs release
+
+  [BUG FIXES]
+
+  * #296 Fix occasional empty macsuck when run in daemon
+  * use File::Slurper instead of File::Slurp to better handle UTF8 in oui.txt
+
+2.034002 - 2017-01-06
+
+  [ENHANCEMENTS]
+
+  * Add documentation note about SNMPv3 configuration on Cisco IOS
+  * Update repository and issue tracker links for GitHub
+
+2.034001 - 2016-11-20
+
+  [NEW FEATURES]
+
+  * Add validate_remote_user setting to check proxied users are known
+
+  [ENHANCEMENTS]
+
+  * Add Linux SNMP, LLDP setup docs (S. Hobson)
+  * Add note on SLES 11 SP4 install workaround (C. Ramseyer)
+
+  [BUG FIXES]
+
+  * Remove some odd behaviour of cached SNMP config hints (L. Ferguson)
+
+2.034000 - 2016-10-03
+
+  [NEW FEATURES]
+
+  * FreeBSD sshcollector support (H. Teulahti)
+  * Check Point VSX sshcollector support (M. Kosmach)
+  * Allow port name to be changed on pseudo devices
+
+  [ENHANCEMENTS]
+
+  * systemd deployment guide
+  * Document env var for https reverse proxy (B. Marshall)
+  * [#279] Web sessions use cookies instead of files on disk (M. Johnson)
+  * Strip realm from username (B. Marshall)
+  * Mention netdisco-users mail list in docs (C. Goldsmith)
+  * Avoid pathological delete mac for millions of nodes (S. Xu)
+  * Documentation fixes (S. Elipot)
+  * [#265] Default sort for Nodes discovered through LLDP/CDP (mzac)
+
+  [BUG FIXES]
+
+  * Improve security of REMOTE_USER handling (B. Marshall)
+  * portcontrol and power jobs using device instance instead of IP address
+  * [#266] netdisco subnet utilization report div by zero (V. Puchkov)
+  * Missing display name for device when device has no DNS
+  * [#270] ports search vlan column not populated in CSV output
+
+2.033006 - 2016-03-20
+
+  [ENHANCEMENTS]
+
+  * Toubleshooting tip for Cisco 37xx single item
+  * Update MCE dependency
+
+  [BUG FIXES]
+
+  * Fix regexp for HP switches
+
+2.033005 - 2016-02-02
+
+  [NEW FEATURES]
+
+  * Login Logo image can be configured to appear alongisde the Log In form
+
+  [BUG FIXES]
+
+  * [#255] undefined host error in netdisco-do psql
+  * [#250] Linux SSHColletor cannot handle uppercase MACs
+  * Return from device discover if device is unknown
+  * Safely continue macsuck if neighbor cannot be resolved
+  * [#261] String replace failed in reports (M. Kosmach)
+  * Support more than one plugin in the device details tab (B. Marshall)
+
+2.033004 - 2015-11-16
+
+  [BUG FIXES]
+
+  * snmpretries setting not working if unset (S. Xu)
+
+2.033003 - 2015-10-04
+
+  [ENHANCEMENTS]
+
+  * Filter by VLAN in Pors with Multiple Nodes report
+
+  [BUG FIXES]
+
+  * Non-admin reports require admin login
+
+2.033002 - 2015-09-29
+
+  [ENHANCEMENTS]
+
+  * Clarify question in DB schema deploy script
+
+  [BUG FIXES]
+
+  * [#247] Fix storing VLAN membership on switch ports
+
+2.033001 - 2015-08-27
+
+  [BUG FIXES]
+
+  * Update OUI download link
+
+2.033000 - 2015-08-26
+
+  [NEW FEATURES]
+
+  * [#237] Show IPv4 and/or IPv6 nodes separately in Device Ports table
+
+  [ENHANCEMENTS]
+
+  * Expose the created, last login and note fields for User managment
+  * Add IRC channel to package metadata
+
+  [BUG FIXES]
+
+  * Reduce suggested LDAP logging to level 0 (J. Sonstroem)
+
+2.032007 - 2015-07-30
+
+  [ENHANCEMENTS]
+
+  * [#244] Node search results doesn't include "(on vlan X)" (R. Kerr)
+
+  [BUG FIXES]
+
+  * Skip VLANs undef or zero (reported by Brian van Baekel)
+  * [#243] Node search results do not include &prefer=port (R. Kerr)
+
+2.032006 - 2015-07-18
+
+  [BUG FIXES]
+
+  * [#234] Cisco voice vlan conflicts with same number normal vlan on DB INSERT
+  * [#xxx] Lost Device DNS setting in previous refactor
+  * Syntax error in DB version 8 deployment script (S. Xu)
+
+2.032005 - 2015-05-18
+
+  [BUG FIXES]
+
+  * Fix newlines in IP Inventory CSV output
+
+2.032004 - 2015-05-17
+
+  [NEW FEATURES]
+
+  * Support for connecting to external databases for custom Reports/Plugins
+
+  [ENHANCEMENTS]
+
+  * Allow "hidden" option (from menu) in Custom Reports config
+  * Improve documentation for netdisco-sshcollector
+
+  [BUG FIXES]
+
+  * [#230] Config ACL using device property:regex
+
+2.032003 - 2015-05-05
+
+  [ENHANCEMENTS]
+
+  * THANK YOUs
+  * [#197] Allow renumber of device to one of its alias IPs in netdisco-do
+  * [#216] Ability to enter IP prefix in "Discover" form in web
+  
+  [BUG FIXES]
+
+  * [#211] Additional check for undefined SNMP::Info instance
+  * [#212] Discover SQL error on returning multiple rows
+  * [#217] find changed to search to handle missing row in queue
+  * [#219] unblessed reference causes ajax/userlog issue
+  * Re-set hostname on device after renumber
+
+2.032002 - 2015-04-03
+
+  [ENHANCEMENTS]
+
+  * Update development doc to mention cpanm installdeps
+  * Update troubleshooting doc to mention four key actions
+
+  [BUG FIXES]
+
+  * [#209] AUTO broken in tasks specification
+
+2.032001 - 2015-03-24
+
+  [NEW FEATURES]
+
+  * macsuck_unsupported setting to allow node gathering on delinquent switches
+  * netdisco-do -d accepts IP prefixes (subnet in CIDR format)
+  * [#110] rules for IP Phone and Wireless AP identification now configurable
+  * [#119] netdisco-do expirenodes (ND1 expirenodes & expire-nodes-subnet)
+
+  [ENHANCEMENTS]
+
+  * Show page and total records number on DataTables tables
+  * Be more strict about Node Search matching ports/wifi within date range
+  * Allow filtering out of Device Ports on Node (MAC) search
+  * Display Voice VLAN on Cisco devices
+  * [#202] Detect failed OUI and MIB downloads
+  * [#208] Always show port log icon
+
+  [BUG FIXES]
+
+  * Only exclude discover_no on Undiscovered Neighbors report when few (<50) results
+  * Mention expire in netdisco-do docs
+  * [#207] Reject 0.0.0.0 from netdisco-do device or renumber
+
+2.031012 - 2015-02-28
+
+  [ENHANCEMENTS]
+
+  * Linux (arp) support in netdisco-sshcollector (M. Sheinberg)
+
+2.031011 - 2015-02-27
+
+  [BUG FIXES]
+
+  * [#204] Regression of [#157]
+
+2.031010 - 2015-02-25
+
+  [ENHANCEMENTS]
+
+  * Support enable password in ASA sshcollector (M. Sheinberg)
+
+2.031009 - 2015-02-25
+
+  [ENHANCEMENTS]
+
+  * Support NETDISCO_DBNAME env var to override database name
+
+  [BUG FIXES]
+
+  * Permit whitespace in usernames (for LDAP support)
+
+2.031008 - 2015-02-22
+
+  [ENHANCEMENTS]
+
+  * Device operating system added to inventory links and search sidebar
+
+  [BUG FIXES]
+
+  * Add documentation to netdisco-do for all/*walk and graph
+
+2.031007 - 2015-02-18
+
+  [BUG FIXES]
+
+  * Updates to sshcollector ASA module (B. Ellenbeck)
+  * Document the config item for displaying all VLANs on device ports
+
+2.031006 - 2015-02-15
+
+  [ENHANCEMENTS]
+
+  * Avoid displaying all VLANs on device ports when there are 1000s
+
+  [BUG FIXES]
+
+  * Fix headings on IP Inventory CSV report (J. Binks)
+
+2.031005 - 2015-02-06
+
+  [ENHANCEMENTS]
+
+  * Change netdisco-do "delete" command to use -p param for archive (preserve)
+  * Add documentation to Troubleshooting page explaining devices/nodes
+
+  [BUG FIXES]
+
+  * Fix netdisco-do "power" action to accept yes/no in -e param
+  * Fix undef error when printing netdisco-do help
+  * Minor documentation fixes
+
+2.031004 - 2015-02-05
+
+  [ENHANCEMENTS]
+
+  * New Troubleshooting documentation
+  * Renamed --reset to --redeploy-all in netdisco-db-deploy
+
+2.031003 - 2015-02-04
+
+  [NEW FEATURES]
+
+  * "psql" option to netdisco-do to open an interactive SQL terminal
+
+  [BUG FIXES]
+
+  * [#199] Missing schema changes when user has no permissions on DB
+  * [#196] Documentation for snmp_auth to explain list emulation of "community"
+
+2.031002 - 2015-02-04
+
+  [BUG FIXES]
+
+  * [#192] Fix rejection of set_* actions in netdisco-do
+  * Update dependency on SNMP::Info to 3.24 to pick up bug fixes
+
+2.031000 - 2015-02-04
+
+  [NEW FEATURES]
+
+  * [#171] Log files now rotate at 10MB up to seven times
+  * Delete device from CLI with new "delete" option to netdisco-do
+  * [#197] Change IP address of device with "renumber" option to netdisco-do
+
+  [ENHANCEMENTS]
+
+  * [#179] Catch failure to get uptime from device
+  * [#128] Added some Juniper interface examples to the Port sort test
+  * Improve documentation for netdisco-do
+
+  [BUG FIXES]
+
+  * Update NetAddr::MAC dependency to fix IPv6 misidentification bug
+  * [#191] Fix error when stopping stopped web daemon
+  * [#174] LDAP users should not be able to change password
+  * [#182] SSID and PoE showing in wrong Device Port columns
+  * [#181] AP Client Count report was broken
+  * [#195] Fix CGI params parsing rows limit when "All" selected
+  * Delete device was not using the custom handler and respecting node archive
+
+2.030000 - 2015-01-08
+
+  [NEW FEATURES]
+
+  * [#4] Allow comment on device port in the log, for any user
+  * [#18] Inventory by Model by OS Report
+
+  [ENHANCEMENTS]
+
+  * Request net-snmp-devel on Fedora/Red-Hat builds
+  * [#101] Add BSD install notes
+  * Update IP Inventory to show MAC address and have working Last Used sort
+
+  [BUG FIXES]
+
+  * Fix for node search on some formats of IPv6 addr being seen as MAC
+  * [#190] Ignore entries in the discover form that don't look like IP/hostname
+  * Delete all job queue entries (regardless of status) when deleting device
+  * [#15] Undiscovered Neighbor report JOIN fixed, and updated to include
+    the ports where Macsuck saw the MAC address of a known Device
+  * [#193] DBI Exception for Cisco ACE MacAddr format
+
+2.029014 - 2014-11-19
+
+  [ENHANCEMENTS]
+
+  * [#133] Custom reports respect sorting in SQL
+  * [#159] Macsuck archive behaviour same as ND1 (unseen nodes remain active)
+  * [#161] Updated IOS-XR SSHCollector
+  * [#162] Change from Net::MAC to NetAddr::MAC
+  * [#164] Workers should restart periodically
+  * [#165] Mention system clock in docs
+  * [#168] Jobs requested via web UI are treated as high priority
+  * [#170] Show device SNMP::Info class in web interface
+  * Add "Run Expire Job" to the Admin Menu
+  * Discovered devices are polled for ARP and MAC immediately
+
+  [BUG FIXES]
+
+  * [#156] Only delete node_ip and node_nbt when no active nodes reference
+  * [#157] Device Port Log being emptied by device discover
+  * [#160] Job Queue fatal error on num_slots
+  * [#169] Remove ref to force install of Dancer and DBIC
+  * [#172] Native VLAN change compatible with Cisco (trunk/access) and Others
+  * Fix for latest DBIx::Class (deploy)
+  * Fix for latest Dancer (YAML::XS)
+
+2.029012 - 2014-10-09
+
+  [BUG FIXES]
+
+  * [#152] HP devices with port names "D##" not sorted by portsort.js
+
+2.029011 - 2014-10-07
+
+  [BUG FIXES]
+
+  * Fix typo in the Device By Location report template
+
+2.029010 - 2014-10-07
+
+  [NEW FEATURES]
+
+  * Administration (SSH, Telnet, Web) links for devices
+  * [#143] Pass parameter(s) to custom reports via bind_params config
+
+  [BUG FIXES]
+
+  * Require old DBIC version to fix deploy problem
+
+2.029009 - 2014-09-27
+
+  [ENHANCEMENTS]
+
+  * Defaults now exist for all expire tasks
+  * Added expire_jobs to remove jobs queue items after 14 days
+
+  [BUG FIXES]
+
+  * Require new DBIC version to fix duplicate DB connection problem
+
+2.029008 - 2014-09-23
+
+  [ENHANCEMENTS]
+
+  * [#144] Setting for items in number of records per table page menu (table_showrecordsmenu).
+
+  [BUG FIXES]
+
+  * Add Dancer import to SSHCollector Platforms
+  * Add note to docs to workaround current Dancer/YAML::XS issue
+
+2.029007 - 2014-09-12
+
+  [ENHANCEMENTS]
+
+  * [#123] Allow devices with no LLDP/CDP to be found as Nodes
+  * Accept host names to netdisco-do show
+  * [#139] Add PaloAlto and IOS-XR support to netdisco-sshcollector
+
+  [BUG FIXES]
+
+  * Skip device aliases which cannot be parsed as IPs
+  * [#137] do not attempt DNS resolution on bad IPs
+
+2.029006 - 2014-08-25
+
+  [NEW FEATURES]
+
+  * netdisco-sshcollector script to get ARP data on devices without SNMP (C. Ramseyer)
+  * Add Nodes discovered through LLDP/CDP report (replaces IP Phones report)
+
+  [ENHANCEMENTS]
+
+  * Port search also searches on the Remote ID and Type
+
+2.029005 - 2014-08-13
+
+  [ENHANCEMENTS]
+
+  * Custom portsort plug-in for DataTables
+
+  [BUG FIXES]
+
+  * Filter undefined entries from user log
+
+2.029004 - 2014-08-11
+
+  [BUG FIXES]
+
+  * Do not autoload all modules in a namespace... picks up old/bad code.
+
+2.029002 - 2014-08-10
+
+  [ENHANCEMENTS]
+
+  * New netdisco-daemon code (better CPU & RAM usage)
+
+2.029001 - 2014-08-10
+
+  [NEW FEATURES]
+
+  * [#108] Port Bounce port control feature (down and up in succession)
+  * Support for stuffing other locations into @INC at runtime
+  * New netdisco-do command "show" for diagnostic reporting
+  * Additional debug levels for netdisco-do to show DBIx::Class and net-snmp
+  * [#107] navbar_autocomplete config item to disable main navbar autocomplete
+
+  [ENHANCEMENTS]
+
+  * Reports config is now a list (see ReleaseNotes)
+  * Add "AP" as a hint for WAP support
+  * Attempt to keep PID and logfile as netdisco user even when running as root
+  * Show netdisco-do docs on options error
+  * Do not leak SNMP community string into debug output (unless SHOW_COMMUNITY=1)
+  * Process tree updated to show daemon worker status/activity
+  * Handle management IP of one device being in use on another device
+  * Log at debug the vlan reindexing in macsuck
+  * Add docs note about database backups
+  * Always set DBIC_TRACE_PROFILE=console in environment
+  * Push a row into Device Modules for the chassis even if no module info
+
+  [BUG FIXES]
+
+  * Missing action to netdisco-do should not throw Perl error
+  * Sort CDP/LLDP data to be more consistent when multiple neighbors on a port
+  * Fix POD errors in Nbtstat and ResultSet::Device (thanks cpants :)
+  * UTF-8 encoding for Port Name (description)
+  * Allow process grouping to work portably again (daemon config watch)
+  * Only start scheduler when schedule config exists
+  * Update to DataTables 1.10.2 for latest Chrome
+  * Clean up duplicate node entries on vlan 0
+  * NBTname search with wildcards fixed
+  * Update Sourceforge links in metadata, add DESCRIPTION for CPAN (N. Bowers)
+  * [#131] More correct network space utilization (M. Kosmach)
+
+2.028013 - 2014-07-31
+
+  [ENHANCEMENTS]
+
+  * [#122] CDP/LLDP discovery for some HP switches (M. Kosmach)
+
+  [BUG FIXES]
+
+  * Fix when Interactives number set to zero
+  * [#121] Daemon crash when restarting with in-progress jobs and many workers
+
+2.028012 - 2014-07-22
+
+  [BUG FIXES]
+
+  * UTF8 decode the remote type string in neighbor protocol
+
+2.028011 - 2014-07-22
+
+  [BUG FIXES]
+
+  * Load Graph modules only if available
+
+2.028010 - 2014-07-22
+
+  [NEW FEATURES]
+
+  * Node Monitor admin panel and netdisco-do action (beta)
+
+  [BUG FIXES]
+
+  * Hash deref in Nbtstat.pm
+
+2.028008 - 2014-07-22
+
+  [BUG FIXES]
+
+  * Encode NetBIOS name, domain, user as UTF-8
+
+2.028007 - 2014-07-21
+
+  [ENHANCEMENTS]
+
+  * Add 'graph' option to netdisco-do
+
+  [BUG FIXES]
+
+  * DNS Mismatch report incorrectly trimmed domain_suffix
+  * Fake one device aliases entry for devices not providing ip_index
+  * DataTables render function should check for type
+
+2.028006 - 2014-07-21
+
+  [ENHANCEMENTS]
+
+  * Asynchronous NBTstat
+
+  [BUG FIXES]
+
+  * Device DNS Mismatch report: use name in the name column, and fix link
+
+2.028005 - 2014-07-17
+
+  [BUG FIXES]
+
+  * Custom path handling for DataTables ajax calls
+  * [#116] Log true client IP when running through a proxy
+  * Use /etc/hosts for all forward/reverse DNS
+
+2.028004 - 2014-07-16
+
+  [BUG FIXES]
+
+  * Close socket upon completion of async DNS resolution
+
+2.028003 - 2014-07-15
+
+  [NEW FEATURES]
+
+  * GraphViz graph export (beta)
+
+  [BUG FIXES]
+
+  * No default for interactives made daemon die (H. Weber)
+
+2.028001 - 2014-07-13
+
+  [NEW FEATURES]
+
+  * portctl_nameonly to limit port control to name only (F. Schiavarelli)
+  * add by_hostname config option to netdisco-rancid-export
+
+  [BUG FIXES]
+
+  * [ND1#117] unknown devices missing from inventory
+  * [#118] Fix table rendering on port search tab when VLAN is null
+  * Fix truncated port description change (F. Schiavarelli)
+  * Fix device port ordering in DataTables when Port Control is enabled
+
+2.028000 - 2014-07-01
+
+  [NEW FEATURES]
+
+  * HTML tables now use DataTables, table plug-in for jQuery, to support
+    pagination, results filtering, and multi-column ordering
+
+  [ENHANCEMENTS]
+
+  * Web daemon will drop root status always if --port is not given
+  * Ignore devices with "phone" in their CDP/LLDP platform description
+  * Change log format to contain UTC timestamp
+  * Link to VLAN search by name from VLAN Inventory report
+  * Neighbor device links to both device and port (fragfutter)
+  * Optimization of multiple SQL queries to improve report performance
+  * VendorMap and Delimiter enhancements to RANCID generator (LesB)
+
+  [BUG FIXES]
+
+  * Subnets report date range fixed, & (unnecessary?) "not" option removed
+  * Track how many times the device uptime wrapped (F. Schiavarelli)
+  * Fix for device counts in VLAN Inventory report
+  * Forward port housekeeping/schedule and expiry/expire legacy config
+  * Store started timestamp on job completion
+  * Set UTF-8 mode on Pg database connection
+  * Identify changes in device type after initial discover
+  * Add netdisco-rancid-export to installed scripts
+  * Template INCLUDE path stuffing broken for plugins [#103]
+
+2.027007 - 2014-05-27
+
+  [BUG FIXES]
+
+  * allow get_user_details to return truthy when it's OK to have no user
+
+2.027006 - 2014-05-27
+
+  [BUG FIXES]
+
+  * fix another bug in call to Daemon::Contol redirect_filehandles
+
+2.027005_002 - 2014-05-22
+
+  [ENHANCEMENTS]
+
+  * Increase default snmptimeout from 1 to 3 seconds
+  * Add documentation note about non-standard pg port
+
+  [BUG FIXES]
+
+  * Unrouted VLAN interfaces have numbers on Cisco - ignore them
+  * fix undefined key in Discover
+
+2.027005_001 - 2014-05-21
+
+  [ENHANCEMENTS]
+
+  * Support offline update of oui.txt and MIBs bundle
+  * Support Dancer::Debug at runtime with DANCER_DEBUG=1 env var
+  * Merge pluggable job queue branch
+
+  [BUG FIXES]
+
+  * Improve VLAN Inventory performance and show all VLANs (C. Stromsoe)
+
+2.027004 - 2014-05-15
+
+  [BUG FIXES]
+
+  * fix bug in call to Daemon::Contol redirect_filehandles (M. Planck)
+
+2.027003 - 2014-05-14
+
+  [BUG FIXES]
+
+  * fixed use of password instead of pass for Dancer::Plugin::DBIC
+  * another check for macsuck_bleed (J. Leonhardt)
+
+2.027002 - 2014-05-04
+
+  [BUG FIXES]
+
+  * revert use password instead of pass for Dancer::Plugin::DBIC
+
+2.027001 - 2014-05-03
+
+  [BUG FIXES]
+
+  * get_port_macs returns all port MACs
+
+2.027000 - 2014-04-30
+
+  [ENHANCEMENTS]
+
+  * Add FRU filter option to Module Inventory Report
+  * Display Phone and Wifi icon on nodes even when not discovered as neighbors
+  * Sort connected nodes first by VLAN
+  * Add docs note about RC scripts
+
+  [BUG FIXES]
+
+  * Search for localenv could not find $HOME
+  * Fixes to allow output of get_init_file to be used as init script
+  * Legitimate for same MAC to be in two VLANs on same switchport
+  * Fix for broken [#82] (/etc/hosts check during ARP IP resolv)
+  * Discover nodes on ports which have broken near-edge topology
+  * Use password instead of pass for Dancer::Plugin::DBIC
+
+2.025001 - 2014-04-08
+
+  [NEW FEATURES]
+
+  * Web and Backend daemons will restart when deployment.yml is updated
+  * Web and Backend daemons will drop privilege to same uid/gid as their
+    on-disk files (to allow run-control symlink as non-root)
+
+  [ENHANCEMENTS]
+
+  * Use daterange for IP Subnets (same as IP Inventory)
+  * Run daemons as target binary's owning user (supports run control)
+  * Clean up library path fiddling across all scripts
+  * Rename housekeeping expiry task to be expire
+  * Refactor nbtstat to group probes by device where node was arped
+  * Add note about pgtune to install docs
+
+  [BUG FIXES]
+
+  * Suggest installation of perl-core RPM (arguably Red Hat's bug not ours!)
+  * FATAL warnings considered harmful
+  * Only show STP blocked icon if port is UP
+  * Store device model and serial via UTF8 conversion
+  * Only set housekeeping default if user has enabled
+
+2.024004 - 2014-03-04
+
+  [BUG FIXES]
+
+  * Fix Login and Logout that were broken with SSL
+
+2.024003_001 - 2014-03-03
+
+  [ENHANCEMENTS]
+
+  * Wildcard support on Device Port MAC Search
+  * Wildcard support on Node name/MAC Search
+  * User Reports appear in "My Reports" menu if no category is given
+  * (beta) Support for data munging in User Reports
+  * Permit clipboard copy of device IP from Job Queue rows
+  * Failed Job Device IPs link to Discover form with pre-filled Discover IP
+  * Unknown device page has pre-filled Discover IP
+  * Set form focus to Username field on login form
+  * Database host is commented out in example config
+
+2.024003 - 2014-02-27
+
+  [BUG FIXES]
+
+  * Cope with no defined User Reports
+
+2.024002 - 2014-02-27
+
+  [NEW FEATURES]
+
+  * User Reports via config, without requiring HTML or Perl
+  * Add netdisco-rancid-export script
+
+  [ENHANCEMENTS]
+
+  * Option to display Port SSID in Device Ports view
+
+2.024001 - 2014-02-25
+
+  [BUG FIXES]
+
+  * Fix NetBIOS report with search on blank domain
+  * Fix database MAC lookup when MAC not returned by nbtstat
+  * Fix partial name match on Node search
+
+2.024000 - 2014-02-22
+
+  [NEW FEATURES]
+
+  * [#75] Device module inventory report / search
+  * [#70] SSID Search (port)
+  * [#72] Search on Vendor / OUI 
+  * Password Change form for all users
+
+  [ENHANCEMENTS]
+
+  * Kwalitee fixes
+  * Change default number of pollers to 10
+  * Default netmap depth set to 8
+  * Add a "waiting" message to the netmap whilst the data loads
+  * Add a spinner to all waiting messages
+  * Try to make the Job Queue page a little faster
+  * Require the Net::LDAP module for all installs
+  * Move system information to the Netdisco "home" page
+  * Show all subnets (scrollable), and sort, in sidebar Prefix search
+
+  [BUG FIXES]
+
+  * Workaround for https://rt.cpan.org/Ticket/Display.html?id=93244
+  * Fix for crash when selecting Last Change column in device ports view
+  * Fix IP Inventory Report to work without daterange
+  * Fix "list IPs never seen" to work without daterange in IP Inventory Report
+  * Correct "Archive" status of nodes in IP Inventory Report
+  * Do not trigger userlog popups for all/walk jobs
+  * No longer show warning notification when userlog retrieve fails
+
+2.023002 - 2014-02-17
+
+  [BUG FIXES]
+
+  * Deploy new admin user did not use resultset
+
+2.023001 - 2014-02-14
+
+  [ENHANCEMENTS]
+
+  * Display clean version of creation stamp on port log
+  * Make sure only to check for admins in deploy script
+  * Allow Port Control users to see Port Config Log report
+
+  [BUG FIXES]
+
+  * [89] Password fields in User Management panel should be masked
+
+2.023000 - 2014-02-10
+
+  [NEW FEATURES]
+
+  * [#86] Use Vendor abbrevs to enhance node display in device port view
+  * [#74] Device Name / DNS mismatches report
+  * [#71] Node search by date (but not time)
+  * [#73] NetBIOS Poller (nbtstat and nbtwalk), Node search by NetBIOS name,
+    NetBIOS Node Report, and provide information when available in Node
+    and Port views
+  * [#56] Support API call to /login
+
+  [ENHANCEMENTS]
+  
+  * [#69] Add search by layers to device search
+  * [#77] Log user access 
+  * Try to help users more easily get a default login
+  * Support upgrade from Netdisco version 0.x
+  * [#54] jobqueue_refresh config for number of seconds betwen queue refresh
+
+  [BUG FIXES]
+
+  * [#84] No longer use dns as a key into devices; cope with dupe dns (LT)
+  * Correct date formatting and logic in IP Inventory report
+  * Fix redirect when accessing a deep link when unauthenticated
+  * [#46] Sorting on Inventory page same as ND1
+  * Quieten AnyEvent::DNS::EtcHosts check on PERL_ANYEVENT_HOSTS env var
+
+2.022000 - 2014-01-26
+
+  [NEW FEATURES]
+
+  * Support for Link Aggregation (port-channel, etherchannel, "trunking", etc)
+  * [#68] Devices orphaned by missing topology info report 
+
+  [ENHANCEMENTS]
+
+  * [#82] Check /etc/hosts before DNS when doing arp entry name lookup
+  * [#59] Arpnip tries to resolve link local IPv6 addresses 
+
+  [BUG FIXES]
+
+  * [#85] device property in _no/_only fails with error (R. Kerr)
+  * Also prefer port filter when linking to connected devices
+  * Fix SQL logic in PortMAC.pm (imperfectus)
+  * Fix snmpv3 autovivication bug setting priv strings (LT)
+
+2.021001
+
+  [NEW FEATURES]
+
+  * [#81] Identify wireless nodes and provide information when available 
+  * [#13] Support IP address ranges in *_only/*_no configuration
+  * [#14] Support partial DNS names in *_only/*_no (via regexp)
+
+  [ENHANCEMENTS]
+
+  * [#32] Show device layers in Details tab
+  * [#66] Remove reference to "native" VLAN in code and replace with "untagged"
+  * [#66] DB Schema update to add "native" column to PK of device_port_vlan table
+  * [#64] Addition of Wireshark abbreviations for OUI manufacturers
+  * [#79] Support perlbrew environment as alternative to localenv
+  * [#52] Check is neighbour remote_id is a MAC (R. Kerr)
+
+  [BUG FIXES]
+
+  * Correct is_discoverable check in Undiscovered Neighbors report
+  * Correct macsuck for Q-BRIDGE-MIB based devices
+  * Allow cached SNMP community hint to override SNMP version cycle
+  * [#76] Don't include wireless in ports with multiple nodes attached report 
+
+2.021000 - 2014-01-08
+
+  [NEW FEATURES]
+
+  * Add IP Phones discovered through LLDP/CDP report
+  * Add device/node/vlan/port specific search from Navbar
+  * Add Undiscovered Neighbors admin report
+  * [#3] [#47] Device Neighbor Map can have max depth and VLAN filter
+  * [#31] get_community now supported
+  * [#19] Ask for Reason when changing Port up/down Status, or VLAN
+  * [#30] Support for expire_devices, expire_nodes, and expire_nodes_archive
+  * Port Log viewable via an icon by device port name (Port Control rights req'd)
+  * [#1] Subnet Utilization report (J. van Ingen)
+  * Support for snmpforce_v1, snmpforce_v2, snmpforce_v3
+
+  [ENHANCEMENTS]
+
+  * Require SNMP::Info 3.10+, use new c_cap method to tag device remote_type
+    as 'IP Phone:' or 'AP:' when those capabilities are advertised by LLDP
+    or CDP
+  * Port MAC query now only returns distinct MAC's
+  * Keep a hint to SNMP community if new style snmp_auth config is in use
+  * [#43] Add doc note about PostgreSQL MD5 authN
+  * [#49] Allow device port searching with preference for port/name/vlan.
+    This is to support some devices (HP?) which have plain numbers for port names
+    and Netdisco defaults to assuming this is a VLAN number (R. Kerr)
+  * Upgrade floatThead JS plugin to improve performance for large tables
+  * Don't queue devices which are excluded by configuration or don't have the
+    layers to support the operation
+
+  [BUG FIXES]
+
+  * [#61] Arpnip debug text says it is resolving aliases instead of ARP
+    entries (Robert Kerr)
+  * [#60] Incorrect format string in store_vlans (Robert Kerr)
+  * Fix form reset icon on ports tab when using custom path (Daniel Tuecks)
+  * Don't store failed SNMP community in the database
+  * [#51] Support DBD::Pg default for "host" field as local socket (R. Kerr)
+  * [#58] Search by VLAN name now works (R. Kerr)
+  * Make "Not" option work for vlan number search in Device Ports
+  * [#48] Fix for netmap links when domain_suffix is set (R. Kerr)
+  * [#57] Port sort order for Extreme switches "1:10" format
+  * [#65] Ignore smmp_ver in DB when reconnecting to a device.
+
+2.020002 - 2013-12-11
+
+  [NEW FEATURES]
+
+  * Support for Device Details plugins (see X::RANCID)
+  * Add Slow Devices (for polling) report
+
+  [ENHANCEMENTS]
+
+  * Improvements in arpnip/arpwalk and macsuck/macwalk performance 
+
+  [BUG FIXES]
+
+  * Respect macsuck_bleed on broken topology detection
+  * Correct logic to prevent duplicate queuing of jobs during discover due
+    to previous change in admin table
+
+2.020001 - 2013-12-08
+
+  [BUG FIXES]
+
+  * Plugin CSS and JS included file fix
+
+2.020000 - 2013-12-08
+
+  [NEW FEATURES]
+
+  * Add Device PoE status report
+  * Add Nodes with multiple IP addresses report
+  * Add Device addresses with DNS entries report
+  * Add Ports with multiple nodes attached report
+  * Add Ports administratively disabled report
+  * Add Ports that are blocking report
+  * Add Access Point client count report
+  * Move Obserivum plugin outside of this dist, into App::NetdiscoX::
+
+  [ENHANCEMENTS]
+
+  * Can now set untagged VLAN on trunking and non-trunking ports
+  * Add user activity log to frontend admin menu
+  * Add Poller Performance admin report
+  * Add Slow Devices admin report
+  * Add PoE module status in Device details
+
+  [BUG FIXES]
+
+  * Set of Port Name (description) fixed to assume OK dialog response
+  * Default class of a PoE port is 0 if not otherwise defined
+  * Don't try to convert negative mW to dBm in AP power report
+  * LDAP login fix (Daniel Tuecks)
+  * Custom path handling corrections (Daniel Tuecks)
+
+2.019003 - 2013-10-27
+
+  [ENHANCEMENTS]
+
+  * Use cursor to greatly speed up macsuck/arpnip startup code (jeneric)
+
+  [BUG FIXES]
+
+  * Fix redirect in Dancer to not forcibly apply scheme+host
+
+2.019002 - 2013-10-24
+
+  [BUG FIXES]
+
+  * Fix HTTP redirects when running under HTTP/S
+
+2.019001 - 2013-10-22
+
+  [BUG FIXES]
+
+  * Fix syntax error in Util/SNMP.pm
+
+2.019000 - 2013-10-22
+
+  [ENHANCEMENTS]
+
+  * Ports with active nodes are set to be "up" immediately (closes #9)
+  * Avoid returning to the DB for every MAC on a neighbor port
+
+  [BUG FIXES]
+
+  * Update Print media CSS to handle new UI components
+  * Deadlock in Discover over access to the device_ports table
+  * Set canonical IP failed on synthesized cols (and was wrong anyway) (closes #35)
+  * Remove dupe restriction on job queue, try for smarter *all queuing (closes #41)
+  * Remove scary message from Auth::Extensible (closes #38)
+  * Return first port neighbor match, if multiple devices claim the IP (closes #42)
+  * Should handle empty ports preferences (closes #39)
+  * Decode more entPhysicalEntry columns as UTF-8 (closes #37)
+  * Lock device_port table when updating Device Ports (closes #40)
+  * Fix missing node age column in device ports CSV (closes #33)
+
+2.018000 - 2013-10-08
+
+  [NEW FEATURES]
+
+  * Add VLAN Inventory Report
+  * Add Wireless SSID Inventory Report
+  * Add Device Inventory by Location Report
+  * Node DNS names resolved in their own job - see nodenames_no and nodenames_only
+
+  [ENHANCEMENTS]
+
+  * Respect ignore_interfaces and i_ignore when detecting wrapped device uptime
+  * Try NodeIp OUI company name search if no node results found
+  * Format About page numbers
+
+  [BUG FIXES]
+
+  * Update NodeWireless entries which match both MAC and SSID found, only
+  * Fix SSL-proxy behaviour by using only path+query in links (W. Gould)
+  * Avoid macsuck generated SQL bug when cleaning NULL VLAN (W. Gould)
+  * During macsuck get VLAN from Q-BRIDGE if available (jeneric)
+  * OK to include device ports when doing arpnip (jeneric)
+  * Correct bulkwalk_off logic
+  * Silence warnings when ports don't support i_lastchange
+  * Correct *_only and *_no setting logic
+  * Correct the instructions for runing dev instance of web and daemon
+
+2.017000 - 2013-09-23
+
+  [NEW FEATURES]
+
+  * CSV download support for plugins
+  * CSV download option for many reports and search/device results tabs
+  * Icon in device port sidebar to reset to display defaults
+  * Add "not" option in device port sidebar to invert Port/Name/VLAN filter
+
+  [ENHANCEMENTS]
+
+  * Try to make clear the intent of the navbar search and sidebar search
+  * Device port sidebar legen display improvements
+  * Minor CSS tweaks
+  * Better logic for wildcarding on partial device port name match
+  * Show manual topology links in device port table (yellow icon)
+  * Change order or user tasks menu to have logout at the bottom
+  * Show SNMP::Info version in the about page (if installed)
+  * Navbar background image :-)
+  * Documentation of the following features:
+    Main App::Netdsisco page:
+      - How to migrate from Netdisco 1.x
+      - Suggest enable "housekeeping" setting in config after install
+    Manual::Development:
+      - How to git clone and run web server in dev mode
+    Manual::WritingPlugins:
+      - Plugins can return CSV data
+      - Dancer route handler Role Based Access Control
+      - ~/site_plugins INC dir supported for locally developed Plugins
+      - App::NetdiscoX::Web::Plugin:: namespace for non-core Plugins
+      - How to load Javascript and CSS files in <head> from a Plugin
+      - Advice on supporting config settings (deployment.yml) in Plugins
+      - Device Port column Plugins
+      - Observium plugin (an example of a device port column plugin)
+
+  [BUG FIXES]
+
+  * Depend on newer Starman to avoid nasty EPIPE bug
+  * Page title update fixes
+  * Make sure navbar search field is always filled when internally linking
+  * Fix APs channel list collapse when more than 10 APs
+  * Make navbar search strikethrough work in more corner cases
+  * Treat ifStatus "dormant" interfaces as "up"
+  * Remove collision in "vendor" query string param name
+  * Clear port remote_* details when manual topology is deleted
+  * Misnamed no_port_control option is renamed to check_userlog
+
+2.016003 - 2013-09-12
+
+  [BUG FIXES]
+
+  * Fix for Node Age being very broken.
+  * Port status icon logic was incorrect for some up/down states.
+
+2.016002 - 2013-09-11
+
+  [BUG FIXES]
+
+  * Fix device and device_port delete not to kill nodes during Discovery
+
+2.016001 - 2013-09-11
+
+  [BUG FIXES]
+
+  * Fix for broken free port status
+
+2.016000 - 2013-09-10
+
+  [NEW FEATURES]
+
+  * Wireless AP Reports (jeneric)
+  * About page (jeneric)
+  * Allow port list filtering by port state (up/down/etc)
+  * Explicit partial match setting for port filter
+
+  [ENHANCEMENTS]
+
+  * Store port control and device delete log messages
+
+  [BUG FIXES]
+
+  * z-index fix for modals
+  * Better toastr message on device delete
+  * Delete manual topology on device delete
+  * Fix Node age stamp option in ports
+  * Prevent cascade operations on virtual tables in DBIC
+
+2.015000 - 2013-09-06
+
+  [NEW FEATURES]
+
+  * Device Modules tab (jeneric)
+  * Half Duplex Ports Report
+  * Remember device ports columns and display options in a Cookie
+  * Delete device button for admins
+
+  [ENHANCEMENTS]
+
+  * Change icon for shutdown ports
+  * Modal confirm dialog boxes for dangerous admin actions
+
+  [BUG FIXES]
+
+  * Check device is in storage before comparing last_* times with *_min_age
+  * Handle UTF-8 data in device module hw_ver, sw_ver, fw_ver, model
+
+2.014000 - 2013-08-26
+
+  [NEW FEATURES]
+
+  * Support store_modules config (default true)
+  * Support for discover_min_age, macsuck_min_age, arpnip_min_age
+  * Support for macsuck_no, macsuck_only, arpnip_no, arpnip_only
+  * Support for macsuck_no_vlan and macsuck_no_devicevlan
+  * Support for nonincreasing, bulkwalk_* settings and also property:match values
+
+  [ENHANCEMENTS]
+
+  * Display port descriptions in topology editing form
+
+  [BUG FIXES]
+
+  * Wireless node counters should be bigint
+
+2.013001 - 2013-08-23
+
+  [BUG FIXES]
+
+  * Typo in authN module which prevented local auth
+
+2.013000 - 2013-08-23
+
+  [NEW FEATURES]
+
+  * LDAP authentication support - see Configuration POD for details
+
+  [ENHANCEMENTS]
+
+  * Display "Auto" when there is no discovered duplex setting
+  * Add suggest_guest option to display login banner offering Guest acct
+
+2.012006 - 2013-08-23
+
+  [BUG FIXES]
+
+  * Duplicate port names are handled without error
+
+2.012005 - 2013-08-16
+
+  [ENHANCEMENTS]
+
+  * Improved handling of automatic macsuck/arpnip after initial discover
+
+  [BUG FIXES]
+
+  * Fix no_auth to work with new Auth::Extensible plugin
+  * Remove done job from local queue regardless of exit status
+  * Set last arpnip timestamp
+
+2.012002 - 2013-08-07
+
+  [BUG FIXES]
+
+  * Tidy up Device IP after deleting a pseudo device
+
+2.012001 - 2013-08-06
+
+  [BUG FIXES]
+
+  * Add missing dependency on Dancer::Plugin::Auth::Extensible
+
+2.012000 - 2013-08-06
+
+  [ENHANCEMENTS]
+
+  * Use icons for port status and archive presentation
+  * Always offer to discover device on site homepage
+  * Device re-discover/arpnip/macsuck is async with toastr notify
+  * Implement extensible authN and role based access control
+  * RW snmp community strings now in the "community" table
+
+  [BUG FIXES]
+
+  * Floating table headers not compatible with in-header drop-down menus
+  * Fix blur events on editable cells
+  * Pseudo device ports being counted properly since Port Utilization report
+  * Manual topology is preserved when re-discovering neighbors
+
+2.011000 - 2013-07-29
+
+  [NEW FEATURES]
+
+  * Port Utilization report
+  * User Management (for admins only)
+
+  [ENHANCEMENTS]
+
+  * Add docs note about SSL support
+  * Button to empty the job queue, and improve display when the queue is empty
+  * Table headers float on the page when scrolling
+
+  [BUG FIXES]
+
+  * REMOTE_USER is an env var, not an HTTP Header
+  * Swap play/pause icons in jobqueue
+  * Find the RW snmp community string correctly now
+
+2.010004 - 2013-07-24
+
+  [BUG FIXES]
+
+  * Navbar query box was being cleared sometimes under admin task panels
+
+2.010002 - 2013-07-23
+
+  [ENHANCEMENTS]
+
+  * Nullify unused schema changes
+
+  [BUG FIXES]
+
+  * Fix FF bug with forms embedded in tables
+  * Fix bugs in topo update code
+
+2.010001_003 - 2013-06-20
+
+  [BUG FIXES]
+
+   * Pass event param to all js functions which require it
+   * Handle UTF-8 data in the device port remote_id
+
+2.010000 - 2013-06-16
+
+  [NEW FEATURES]
+
+  * Support for delegated authentication with REMOTE_USER and X-REMOTE_USER
+  * Ask to set up guest user for Admin/Port Control rights in deploy script
+  * Job Queue page play/pause/refresh controls
+
+  [ENHANCEMENTS]
+
+  * Database config simplified to only four essential settings
+  * Use DBIx::Class new collapsed query support when we can
+  * Add discoverall, macwalk, arpwalk items to the Admin Tasks menu
+  * Increase default frequency of job queue polling to 2 seconds
+  * Add tooltip showing the job queue item logged status message
+
+  [BUG FIXES]
+
+  * Macwalk and Arpwalk job defer fixed
+  * Sort VLANs, MACs, IPs properly in Device Port view
+  * Fix hyperlinks when running behind reverse proxy on custom path
+  * Add workaround for https://github.com/PerlDancer/Dancer/issues/935
+  * Fix Plack middleware config for Expiry
+
+2.008002 - 2013-06-11
+
+  [ENHANCEMENTS]
+
+  * Initial (bootstrap) discover now queues an arpwalk and macwalk as well
+
+  [BUG FIXES]
+
+  * Fix logging when daemonized
+  * Remove bad constraint on device_ip table
+  * Limit queueing of discovery to things which can be discovered
+
+2.008001 - 2013-06-11
+
+  [BUG FIXES]
+
+  * More fixes for localenv discovery in scripts
+
+2.008000 - 2013-06-09
+
+  [BUG FIXES]
+
+  * localenv discovery in scripts is now more reliable
+
+2.007000_002 - 2013-06-03
+
+  [NEW FEATURES]
+
+  * Finally we have a discover/refresh/arpnip/macsuck daemon jobs :)
+  * Also... a Scheduler which removes need for crontab installation
+  * The netdisco-do script can queue any one-off job
+  * Select MAC Address display format on Node and Device Port search
+  * Helper script to import the Netdisco 1.x Topology file to the database
+  * Support for pseudo devices (useful for dummy device links)
+  * Manual Topology editing via the web
+  * Job Queue view and delete page
+  * Empty device table prompts initial discover on homepage
+  * Support for App::NetdiscoX::Web::Plugin namespace
+  * Plugins can add columns to Device Ports display
+  * Observium Sparklines port column plugin
+  * Plugins can have CSS and Javascript loaded within <head>
+
+  [ENHANCEMENTS]
+
+  * SNMP connection now uses cached info if available
+  * Better handling of MIBs home location in deploy script
+  * Port filter in device port display is now highlighted green
+  * Navbar search is fuzzier
+  * Phone node icon is a little phone handset
+  * User icon color indicates port_control/admin ability
+  * Buttons for discover/macsuck/arpnip on device details page
+  * Support 'path' config option as alternative to --path /mountpoint
+  * Local plugins can be placed in ${NETDISCO_HOME}/site_plugins/...
+  * Missing mibdirs causes all MIBs to be loaded (with a warning)
+  * Include qtip2 libraries
+
+  [BUG FIXES]
+
+  * Rename plugins developer doc to .pod
+  * Update to latest Bootstrap and JQuery, and temp. fix #7326 in Bootstrap
+  * Partial Name in Port search now working
+  * Add unique constraints to topology table
+  * Handle whitespace ahead of OUI data
+  * Wasn't using Bootstrap table class properly
+
+2.007000_001 - 2013-03-17
+
+  [NEW FEATURES]
+
+  * Reports are implemented (as plugins) - new Duplex Mismatch plugin
+  * Plugins can now 'register_template_path' and supply their own HTML templates
+
+  [ENHANCEMENTS]
+
+  * Upgraded to Twitter Bootstrap 2.3.1 - customized for 13px font 18px line
+
+  [BUG FIXES]
+
+  * Convert useless die to error+return in Plugin.pm
+  * Documentation fixups
+
+2.006000 - 2013-03-07
+
+  [BUG FIXES]
+
+  * Documentation fixups
+
+2.005000_004 - 2013-03-05
+
+  [BUG FIXES]
+
+  * Documentation fixups
+
+2.005000_003 - 2013-03-05
+
+  [NEW FEATURES]
+
+  * Partial Match option when searching on device port name
+  * web,daemon,deploy scripts will try to find "localenv" automatically
+  * Scripts can be run from a git clone
+  * New NETDISCO_HOME env var to override Netdisco's HOME
+
+  [ENHANCEMENTS]
+
+  * random() and LIMIT the number of daemon jobs requested from Netdisco queue
+  * Remove Daemon's job queue DBIC schema from user config
+  * Add log messages to the Daemon
+  * Use Path::Class for path and file name construction consistently
+  * All links and redirects are now relative
+  * More documentation on developing and deployment
+
+  [BUG FIXES]
+
+  * Avoid use of DNS when looking up devices in DB by IP
+  * Search by device port MAC no longer fatal
+  * URI and HTML escape template variables
+  * Prevent duplicate requets caused by favicon.ico link
+  * DB Schema upgrades are now all single-step in case user has applied any already
+
+2.005000_002 - 2013-02-10
+
+  [ENHANCEMENTS]
+
+  * When linking to devices, use the DNS name in preference to the IP
+    (makes for more attractive navigation search bar, but need to watch for aliases)
+  * In general, device names do not have domain_suffix trimmed, but nodes do
+  * Search on device interface alias now works for typeahead and device redirect
+
+  [BUG FIXES]
+
+  * Updated the print CSS
+  * Minor fixes to POD
+
+2.005000_001 - 2013-02-09
+
+  [NEW FEATURES]
+
+  * Support for Web Plugins (see App::Netdisco::Web::Plugin)
+
+  [ENHANCEMENTS]
+
+  * Do not include inventory items which don't have full OS details
+  * Hide Legend item relating to port control if not an admin
+  * No-Wrap on port name column
+
+  [BUG FIXES]
+
+  * Change port ordering for Arista and Foundry platforms
+
+2.004002 - 2013-01-30
+
+  [BUG FIXES]
+
+  * Typo in one of the schema migration files
+
+2.004001 - 2013-01-29
+
+  [ENHANCEMENTS]
+
+  * Device Port filter by vlan includes both tagging and untagged (closes #37)
+  * Change colour and name of Port Control toggle option in Device Port View
+  * Incorporate latest DB schema changes from upstream
+  * Add some doc clarifcations
+
+  [BUG FIXES]
+
+  * No longer prompt for demo/demo credentials (closes #38) (J. Binks)
+  * Display IP in Vlan search if device has no DNS (closes #36) (J. Binks)
+
+2.004000 - 2013-01-14
+
+  [BUG FIXES]
+
+  * Very naughty typo in netmap code, which I forgot to merge a fix for.
+  * Typo in installation docs (S. Gupta)
+
+2.002000 - 2013-01-06
+
+  [BUG FIXES]
+
+  * Syntax error in netdisco-daemon-fg
+  * Missing installation of netdisco-web-fg
+
+2.001000_001 - 2013-01-06
+
+  [NEW FEATURES]
+
+  * Added daemonized version of the web-app server also using Daemon::Control
+
+  [ENHANCEMENTS]
+
+  * Daemons now log to ~/logs/netdisco-{web,daemon}.log
+  * Finally wrote the DEVELOPING.pod documentation
+  * Removed the MCE workarounds as upstream merged fixes
+
+  [BUG FIXES]
+
+  * Fix sloppy schema calls which broke netmap
+
+2.01_001 - 2013-01-05
+
+  [ENHANCEMENTS]
+
+  * Rewrite of the daemon to use Daemon::Control and MCE (cleaner netdisco
+    code and fewer deps)
+  * Version bump so that we'll be releasing odd numbered beta dists
+
+2.00_012 - 2012-12-21
+
+  [ENHANCEMENTS]
+
+  * Move Changes file to be in CPAN Dist
+  * Update install docs to use URL for package until we are CPAN-indexed
+
+2.00_011 - 2012-12-20
+
+  [ENHANCEMENTS]
+
+  * store daemon db in the netdisco home area
+  * confirm db schema deployed
+
+  [BUG FIXES]
+
+  * fix mistake in docs for schema file name
+  * bug with using last inside try{}
+  * bug with txn_do in Manager worker
+
+2.00_010 - 2012-12-20
+
+  [NEW FEATURES]
+
+  * new netdisco-deploy script to do all deployment tasks at once
+
+  [ENHANCEMENTS]
+
+  * update README with full deployment instructions
+  * add SNMP settings for daemon to environment
+
+  [BUG FIXES]
+
+  * upgrade db incrementally
+  * rename schema files to be App-*
+  * fix for older Perl which warns about a bug in File::Slurp
+  * fix bug with empty DANCER_APPDIR
+  * fix version strings for platform warning
+  * add missing JSON dependency
+  * fix sharedir to use dist dir not module dir
+  * remove redundant lines in Makefile.PL
+
+2.00_009 - 2012-12-17
+
+  [NEW FEATURES]
+
+  * Relocate into App::Netdisco namespace
+  * Make a proper CPAN-ready dist using Module::Install
+  * Update OUI data when the DB schema is deployed/upgraded
+
+2.00_008 - 2012-12-16
+
+  [NEW FEATURES]
+
+  * Refactor to make less webby and more suitable to be a complete Netdisco app
+  * Network Map now shows all device neighbors and allows click-through nav
+  * Add new netdisco-daemon to handle port_control actions
+  * Add PoE control to port_control (+ up/down,vlan,name,location,contact)
+
+  [ENHANCEMENTS]
+
+  * eradicate checks for dns column in node_ip table - now assumed to be there
+  * remove .pl from script names
+  * no longer deploy FK constraints with DB schema as they upset legacy netdisco.pm
+
+  [BUG FIXES]
+
+  * port cotrol user log check now looks for all actions
+  * node search switchport link shows connected nodes again
+  * show device IP in search results when DNS is not available
+
+0.7 - 2012-11-25
+
+  [NEW FEATURES]
+
+  * Add Port Control (admin table) features to web
+  * Implement DBIx::Class::Schema::Versioned support - DB schema is now versioned
+  * Navbar query for device with single hit redirects to Device details page
+  * Show device name on device details views (closes #30)
+  * Migrated to Font Awesome for a wider range of icon fonts
+  * Simple network map showing *some* links between devices
+  * Individual column selections for connected nodes and devices
+
+  [ENHANCEMENTS]
+
+  * Move DBIC virtual tables into Virtual:: namespace (closes #19)
+  * Maintain node search options when changing navbar query (closes #27)
+  * Device port connected devices now off, Display Cols shown by default
+  * Remove various dummy <a> tags that were encouraged by Bootstrap
+  * Node search link enables connected devices column (closes #31)
+  * Better layout of sidebar pinning
+
+  [BUG FIXES]
+
+  * Fix netgear port ordering (closes #26)
+  * Fix Foundry 10GE port ordering
+
+0.6 2012-08-28
+
+  [NEW FEATURES]
+
+  * Icon to copy Navbar search text to Device Search Options field (closes #11)
+  * Typeahead on the main navbar search (for devices only)
+  * Support for have_nodeip_dns_col setting (closes #14)
+  * Set focus to navbar search on initial login or when changing to home (closes #24)
+  * Port filter supports basic */?/%/_ wildcards (closes #25)
+
+  [ENHANCEMENTS]
+
+  * Native copy of the Netdisco sort_port routine (#17)
+  * Refactor begin hooks (closes #16)
+  * Re-engineer link generation to ensure sane defaults and remembered options.
+    This came as a side-effect of removing JS-only links (closes #21)
+  * Replace jquery-collapser with Bootstrap's collapser
+  * Upgraded to Twitter Bootstrap 2.1.0 - customized for 13px font 18px line
+  * Factor out inventory queries to the Device ResultSet (closes #20)
+  * Clicking on a port to restrict search now uses AJAX instead of page get
+
+  [BUG FIXES]
+
+  * Fix sidebar hiding not making main content reflow to full window width (#15)
+
+0.5 2012-03-09
+
+  [NEW FEATURES]
+
+  * Inventory page
+  * Migrate to Twtitter Bootstrap v2.x (thanks Eric Miller!)
+
+  [ENHANCEMENTS]
+
+  * Device Ports table port name is clickable to limit to that port only
+  * Tidy up display of Device Port Neighbors
+  * Refactor all SQL/DBIC to be smarter and more efficient
+
+  [BUG FIXES]
+
+  * Fix Net::MAC explosion (#8)
+  * Fix partial IP Addr explosion (#7)
+  * Set distinct on device search (#12)
+  * Fix strikethrough on tab change (#9)
+
+0.4 2012-02-19
+
+  [NEW FEATURES]
+
+  * Sidebar can be pinned in place to keep it visible when scrolling.
+
+0.3  2011-02-03
+
+  [NEW FEATURES]
+
+  * Browser History is updated with each tab change (HTML5 State). Also
+    the browser url is updated, meaning the Bookmark icon is no longer
+    necessary.
+
+  * Sidebar is now on the right hand side of the window, and is only
+    displayed when there are options for the current tab.
+
+  [ENHANCEMENTS]
+
+  * Refactor Javascript to place most in a static file, speed templating.
+  * Refactor Stylsheets to better organise and comment the settings.
+  * When Device Search sidebar is in use, strikethrough the navbar search.
+
+0.2  2011-01-22
+
+  [NEW FEATURES]
+
+  * "Show All Ports" in Device Ports view:
+    A little sweeping brush icon appears when the ports view is filtered.
+    Clicking the icon will clear the filter and resubmit the form.
+
+  * Sidebar can be hidden and unhidden to assist viewing of wide tables.
+
+  * Added Print Stylesheet (hides navbar and sidebar).
+
+  [ENHANCEMENTS]
+
+  * Added this Changes file.
+  * Reorganised TT template file names and locations.
+  * Connected device Age is now rounded to the minute.
+
+  [BUG FIXES]
+
+  * Join type to OUI table is now "LEFT" to allow empty OUI table.
+  * Device Ports Legend show/hide arrow was pointing the wrong way.
+  * Increase TT WHILE_MAX to allow very long lists of ports.
+
+0.1  2011-01-18
+
+  * Initial release on an unsuspecting world.

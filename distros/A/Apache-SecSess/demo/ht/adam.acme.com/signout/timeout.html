@@ -1,0 +1,28 @@
+<& /index.comp, title => 'Session Timeout', content => $content &>
+
+<%init>
+my %messages = (
+	idle => 
+	'<b>Idle Timeout:</b> your session remained inactive for too long.',
+	expire => 
+	'<b>Expiration:</b> your session has expired.',
+	notvalid => 
+	'<b>No Longer Valid:</b> your session credentials are no longer valid.',
+	unknown => 
+	'<b>Unknown Reason.</b>'
+);
+
+my $content = <<"ENDCONTENT";
+<font color="#f42424" size=5>Session Timeout.</font><p>
+Your login session has timed out due to the following reason:
+<ul>
+	<li> $messages{$type}
+</ul>
+Please log in again.
+ENDCONTENT
+
+</%init>
+
+<%args>
+$type => 'unknown'
+</%args>

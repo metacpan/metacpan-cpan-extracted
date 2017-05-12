@@ -1,0 +1,124 @@
+Revision history for Perl extension Audio::FLAC.
+
+2.4  Sat Sep 18 06:40:38 PDT 2010
+	- Fix _write_PP method. Now writes out vendor string, sorts padding.
+	  Which fixes bugs: https://rt.cpan.org/Ticket/Display.html?id=42305
+	  and https://rt.cpan.org/Ticket/Display.html?id=42306
+
+	- Memory leak fixes in XS.
+
+	- Patch from Nick for https://rt.cpan.org/Ticket/Display.html?id=44930
+	  Allows PP only version.
+
+	- Patch from Nick for https://rt.cpan.org/Ticket/Display.html?id=44943
+	  _parseStreamInfo - Fix incorrect decoding of metadata
+
+	- Better (hopefully) handling of VENDOR string.
+	  * Add set_vendor_string method.
+	  * Write out vendor string in XS.
+	  * Don't hardcode vendor string on read in XS.
+
+2.3  Sat Nov  8 15:36:38 PST 2008
+	- Patch from Nick Hall to fix allpictures XS & Debian crash.
+
+2.2  Sat May 17 00:42:06 PDT 2008
+	- Patches from Nick Hall to allow allpictures XS partity & multiple ID3 tag fixes
+	- RT #36000 - Don't add vendor string, or change case of tags.
+	- RT #36048 - Segfault if FLAC file doesn't contain VENDOR tag.
+
+2.1  Sat May 17 00:42:06 PDT 2008
+	- Try and abort cpansmoke before it sends me email.
+
+2.0  Sat Feb 23 13:32:54 PST 2008
+	- RT #32691: Picture $type incorrectly defaults to 3 for valid input 0 - "Other"
+	- RT #32631: t/pod-coverage.t fails with Pod::Coverage 0.19
+	- RT #32693: Will not retrieve multiple pictures of the same picture type
+	- RT #32630: Test failure on several architectures (64-bit problems) XS
+	- Fixed compile warnings.
+
+1.9  Sun Dec 2  09:44:22 PST 2007
+	- Fix Test::Pod::Coverage usage.
+	- XS: RT #30532 - Bug when writing tags when only two tags are left
+
+1.8  Thu Jul 26 14:02:51 PDT 2007
+
+        - XS: Fix reading MD5 when leading with 00. Add tests.
+        - Update Documentation to reflect return value reality.
+
+1.7  Fri Jan  5 15:50:46 PST 2007
+
+	- XS: RT #15415 - use the block length when storing the application block.
+	- Add POD & POD Coverage tests.
+	- Fix META.yml
+	- Use Module::Install
+
+1.6  Thu Jan  4 19:09:35 PST 2007
+
+	- Remove extraneous debugging
+
+1.5  Thu Jan  4 14:44:37 PST 2007
+
+	- PP: Large refactor to improve performance. Only parse blocks we encounter.
+	- PP: Don't parse the SEEKTABLE block as it's really slow and not that useful.
+	- PP & XS: Parse the PICTURE metadata block from FLAC 1.1.3
+	- XS: Implement writing vorbis comments.
+
+	- Updated tests
+
+1.4  Sat Feb 19 16:24:05 PST 2005
+
+	- Fix win32 build problems. stat() == _stat()
+
+	- Other minor fixes to stop warnings.
+
+1.3  Wed Feb 16 13:59:40 PST 2005
+
+	- Skip ID3 tags in the XS code.
+
+	- Add additional tests for ID3 tag skipping.
+
+1.2  Tue Nov 16 14:29:25 PST 2004
+
+	- Make PADDING blocks be filled will nulls, not spaces.
+
+	- Always write out the fLaC header.
+
+	- Add in a hack to make write() work again.
+
+1.1  Fri Oct  1 21:50:33 PDT 2004
+
+        - Fixed application ID parsing in XS code.
+
+	- Added more tests for application ID.
+
+1.0   Tue Sep 28 23:54:53 PDT 2004
+
+        - Implemented an XS binding to the metadata interface in libFLAC,
+          resulting in a much faster parser.
+
+	- Try to use the XS code first, but fall back to Pure Perl.
+
+0.8   Sat Jul 10 15:03:52 PDT 2004
+
+        - Add application block parsing from Michael Turner.
+
+0.7   Thu Jan 29 08:44:20 PST 2004
+
+        - Added more debug info when we can't get data.
+
+        - Fixed some bugs from Jason Holtzapple.
+
+0.6   Mon Jan 26 20:10:26 PST 2004
+
+	- Added cuesheet parsing from Michael.
+
+	- Continue if there is no vorbis comment, which is valid.
+
+0.5   Mon Dec 15 08:28:12 2003
+
+	- Add ID3 skipping code, return hashrefs, writeTag code.
+
+0.01  Tue Nov 25 16:07:46 2003
+	- original version; created by h2xs 1.23 with options
+		-A -X -b 5.5.3 -c -n Audio::FLAC --skip-warnings
+

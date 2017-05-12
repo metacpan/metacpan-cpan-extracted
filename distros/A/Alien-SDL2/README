@@ -1,0 +1,154 @@
+NAME
+    Alien::SDL2 - building, finding and using SDL2 binaries
+
+VERSION
+    Version 0.002
+
+SYNOPSIS
+    Alien::SDL2 tries (in given order) during its installation:
+
+    *   When given "--with-sdl2-config" option use specified sdl2-config
+        script to locate SDL2 libs.
+
+         perl Build.PL --with-sdl2-config=/opt/sdl2/bin/sdl2-config
+
+        or using default script name 'sdl2-config' by running:
+
+         perl Build.PL --with-sdl2-config
+
+        IMPORTANT NOTE: Using --with-sdl2-config avoids considering any
+        other build methods; no prompt with other available build options.
+
+    *   Locate an already installed SDL2 via 'sdl2-config' script.
+
+    *   Download prebuilt SDL2 binaries (if available for your platform).
+
+    *   Build SDL2 binaries from source codes (if possible on your system).
+
+    Later you can use Alien::SDL2 in your module that needs to link agains
+    SDL2 and/or related libraries like this:
+
+        # Sample Makefile.pl
+        use ExtUtils::MakeMaker;
+        use Alien::SDL2;
+
+        WriteMakefile(
+          NAME         => 'Any::SDL2::Module',
+          VERSION_FROM => 'lib/Any/SDL2/Module.pm',
+          LIBS         => Alien::SDL2->config('libs', [-lAdd_Lib]),
+          INC          => Alien::SDL2->config('cflags'),
+          # + additional params
+        );
+
+DESCRIPTION
+    Please see Alien for the manifesto of the Alien namespace.
+
+    In short "Alien::SDL2" can be used to detect and get configuration
+    settings from an installed SDL2 and related libraries. Based on your
+    platform it offers the possibility to download and install prebuilt
+    binaries or to build SDL2 & co. from source codes.
+
+    The important facts:
+
+    *   The module does not modify in any way the already existing SDL2
+        installation on your system.
+
+    *   If you reinstall SDL2 libs on your system you do not need to
+        reinstall Alien::SDL2 (providing that you use the same directory for
+        the new installation).
+
+    *   The prebuild binaries and/or binaries built from sources are always
+        installed into perl module's 'share' directory.
+
+    *   If you use prebuild binaries and/or binaries built from sources it
+        happens that some of the dynamic libraries (*.so, *.dll) will not
+        automaticly loadable as they will be stored somewhere under perl
+        module's 'share' directory. To handle this scenario Alien::SDL2
+        offers some special functionality (see below).
+
+METHODS
+  config()
+    This function is the main public interface to this module. Basic
+    functionality works in a very similar maner to 'sdl2-config' script:
+
+        Alien::SDL2->config('prefix');   # gives the same string as 'sdl2-config --prefix'
+        Alien::SDL2->config('version');  # gives the same string as 'sdl2-config --version'
+        Alien::SDL2->config('libs');     # gives the same string as 'sdl2-config --libs'
+        Alien::SDL2->config('cflags');   # gives the same string as 'sdl2-config --cflags'
+
+    On top of that this function supports special parameters:
+
+        Alien::SDL2->config('ld_shared_libs');
+
+    Returns a list of full paths to shared libraries (*.so, *.dll) that will
+    be required for running the resulting binaries you have linked with SDL2
+    libs.
+
+        Alien::SDL2->config('ld_paths');
+
+    Returns a list of full paths to directories with shared libraries (*.so,
+    *.dll) that will be required for running the resulting binaries you have
+    linked with SDL2 libs.
+
+        Alien::SDL2->config('ld_shlib_map');
+
+    Returns a reference to hash of value pairs '<libnick>' =>
+    '<full_path_to_shlib'>, where '<libnick>' is shortname for SDL2 related
+    library like: SDL2, SDL2_gfx, SDL2_net, SDL2_sound ... + some non-SDL2
+    shortnames e.g. smpeg, jpeg, png.
+
+    NOTE: config('ld_<something>') return an empty list/hash if you have
+    decided to use SDL2 libraries already installed on your system. This
+    concerns 'sdl2-config' detection.
+
+  check_header()
+    This function checks the availability of given header(s) when using
+    compiler options provided by "Alien::SDL2->config('cflags')".
+
+        Alien::SDL2->check_header('SDL2.h');
+        Alien::SDL2->check_header('SDL2.h', 'SDL2_net.h');
+
+    Returns 1 if all given headers are available, 0 otherwise.
+
+  get_header_version()
+    Tries to find a header file specified as a param in SDL2 prefix
+    direcotry and based on "#define" macros inside this header file tries to
+    get a version triplet.
+
+        Alien::SDL2->get_header_version('SDL_mixer.h');
+        Alien::SDL2->get_header_version('SDL_version.h');
+        Alien::SDL2->get_header_version('SDL2_gfxPrimitives.h');
+        Alien::SDL2->get_header_version('SDL_image.h');
+        Alien::SDL2->get_header_version('SDL_mixer.h');
+        Alien::SDL2->get_header_version('SDL_net.h');
+        Alien::SDL2->get_header_version('SDL_ttf.h');
+        Alien::SDL2->get_header_version('smpeg.h');
+
+    Returns string like '1.2.3' or undef if not able to find and parse
+    version info.
+
+  havelib()
+    Checks the presence of given SDL2 related libraries.
+
+     Alien::SDL2->havelib('SDL2');
+     #or
+     Alien::SDL2->havelib('SDL2', 'SDL2_image', 'SDL2_mixer');
+
+    Parameter(s): One or more SDL2 related lib names - e.g. SDL2,
+    SDL2_mixer, SDL2_image, ...
+
+    Returns: 1 if all libs specified as a param are available; 0 otherwise.
+
+AUTHOR
+        Kartik Thakore
+        CPAN ID: KTHAKORE
+        Thakore.Kartik@gmail.com
+        http://yapgh.blogspot.com
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

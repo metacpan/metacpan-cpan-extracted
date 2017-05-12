@@ -1,0 +1,33 @@
+NAME
+
+    Alien::Libmcrypt
+
+VERSION
+
+    version 0.002
+
+SYNOPSIS
+
+        require Alien::Libmrypt;
+
+DESCRIPTION
+
+    Alien::Libmrypt installs the C library libmcrypt v2.5.8,which is a
+    patched version of libmcrypt-2.5.8 with CTR and nCFB modes enabled and
+    supports building on cygwin, mingw and msys.
+
+SEE ALSO
+
+      * https://osdn.net/projects/mcrypt/
+
+AUTHOR
+
+    Li ZHOU <lzh@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 Li ZHOU <lzh@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

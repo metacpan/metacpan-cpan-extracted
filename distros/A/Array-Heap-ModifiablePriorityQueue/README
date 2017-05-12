@@ -1,0 +1,31 @@
+README for Array::Heap::ModifiablePriorityQueue
+
+This module implements a priority queue, which is a data structure that can
+efficiently locate the item with the lowest weight at any time. This is useful
+for writing cost-minimizing and shortest-path algorithms.
+
+Why another priority queue module? First, unlike many similar modules, this one
+allows you to modify the queue. Items can be removed from the queue or have
+their weight changed after they are added.
+
+Second, it simple to use. Items in the queue don't have to implement any
+specific interface. Just throw them in there along with a weight value and
+the module will keep track of everything.
+
+Finally, it has good performance on large datasets. This is because it is
+based on a partially-ordered heap data structure. Many other priority
+queue modules are based on fully sorted lists (even ones that claim to be
+heaps). Keeping the items only partially sorted saves time when there are
+are a large number of them (several thousand or so).
+
+This module is a Perl wrapper around Array::Heap, a lightweight and fast
+heap management module implemented in XS.
+
+Use this set of instructions to install the module:
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

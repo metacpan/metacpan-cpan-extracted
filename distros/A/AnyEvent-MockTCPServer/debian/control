@@ -1,0 +1,17 @@
+Source: libanyevent-mocktcpserver-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5)
+Build-Depends-Indep: perl (>= 5.6.10-12)
+Maintainer: Mark Hindess <soft-debian@temporalanomaly.com>
+Standards-Version: 3.9.1.0
+Homepage: http://search.cpan.org/dist/AnyEvent-MockTCPServer/
+
+Package: libanyevent-mocktcpserver-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, libanyevent-perl
+Description: AnyEvent::MockTCPServer Perl Module
+ This module provides a TCP server with a set of defined behaviours for
+ use in testing of TCP clients.  It is intended to be use when testing
+ AnyEvent TCP client interfaces.
+

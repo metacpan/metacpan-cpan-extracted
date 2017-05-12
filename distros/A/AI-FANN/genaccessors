@@ -1,0 +1,163 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+$| = 1;
+
+my %struct = ( 'AI::FANN' => 'struct fann *',
+               'AI::FANN::TrainData' => 'struct fann_train_data *' );
+
+sub accessor {
+    my ($name, $type, $getter, $setter, @ixs) = @_;
+	
+    my ($package, $method) = $name =~ /^(?:(.*)::)?(.*)$/
+        or die "wrong accessor name $name";
+
+    $package = $package ? "AI::FANN::$package" : 'AI::FANN';
+    my $struct = $struct{$package}
+        or die "wrong package name $package";
+
+    push @ixs, 'value' unless grep /^value$/, @ixs;
+    my @ixs1 =  grep !/^value$/, @ixs;
+
+    my $nixs = @ixs;
+
+    my $types = join("\n    ", "$struct self;", map "unsigned int $_;", @ixs1);
+    my $args = join(', ', 'self', @ixs1);
+    my $setargs = join(', ', 'self', @ixs);
+
+    if ($getter) {
+        if ($getter =~ /^->/) {
+            $getter = "self->$getter"
+        }
+        else {
+            $getter = "$getter($args)"
+        }
+    }
+
+    if ($setter) {
+        if ($setter =~ /^->/) {
+            $setter = "self->$setter = value"
+        }
+        else {
+            $setter = "$setter($setargs)"
+        }
+    }
+
+
+    print <<HEAD;
+
+MODULE = AI::FANN    PACKAGE = $package    PREFIX = accessor_
+HEAD
+
+    if ($setter and $getter) {
+        print <<EOA
+
+$type
+accessor_$method($args, value = NO_INIT)
+    $types
+    $type value
+  CODE:
+    if (items > $nixs) {
+        $setter;
+    }
+    RETVAL = $getter;
+  OUTPUT:
+    RETVAL
+EOA
+
+    }
+    elsif ($getter) {
+        print <<EOA;
+
+$type
+accessor_$method($args)
+	$types
+  CODE:
+    RETVAL = $getter;
+  OUTPUT:
+    RETVAL
+EOA
+
+    }
+    elsif ($setter) {
+        print <<EOA;
+void
+accessor_$method($args, value)
+    $types
+    $type value;
+  CODE:
+    $setter;
+EOA
+
+    }
+    else {
+        die "both setter and getter are null"
+    }
+
+    print <<EOA;
+  CLEANUP:
+    _check_error(aTHX_ (struct fann_error *)self);
+
+EOA
+}
+
+
+while(<DATA>) {
+	chomp;
+	next if /^\s*(?:#.*)?$/;
+	my (@args) = split /\s*,\s*/;
+	@args > 2 or die "wrong number of arguments: $_";
+
+	accessor(@args);
+}
+
+__DATA__
+
+training_algorithm, enum fann_train_enum, fann_get_training_algorithm, fann_set_training_algorithm
+train_error_function, enum fann_errorfunc_enum, fann_get_train_error_function, fann_set_train_error_function
+train_stop_function, enum fann_stopfunc_enum, fann_get_train_stop_function, fann_set_train_stop_function
+learning_rate, double, fann_get_learning_rate, fann_set_learning_rate
+learning_momentum, double, fann_get_learning_momentum, fann_set_learning_momentum
+bit_fail_limit, fann_type, fann_get_bit_fail_limit, fann_set_bit_fail_limit
+quickprop_decay, double, fann_get_quickprop_decay, fann_set_quickprop_decay
+quickprop_mu, double, fann_get_quickprop_mu, fann_set_quickprop_mu
+rprop_increase_factor, double, fann_get_rprop_increase_factor, fann_set_rprop_increase_factor
+rprop_decrease_factor, double, fann_get_rprop_decrease_factor, fann_set_rprop_decrease_factor
+rprop_delta_min, double, fann_get_rprop_delta_min, fann_set_rprop_delta_min
+rprop_delta_max, double, fann_get_rprop_delta_max, fann_set_rprop_delta_max
+num_inputs, unsigned int, fann_get_num_input
+num_outputs, unsigned int, fann_get_num_output
+total_neurons, unsigned int, fann_get_total_neurons
+total_connections, unsigned int, fann_get_total_connections
+connection_rate, double, fann_get_connection_rate
+MSE, double, fann_get_MSE
+bit_fail, unsigned int, fann_get_bit_fail
+cascade_output_change_fraction, double, fann_get_cascade_output_change_fraction, fann_set_cascade_output_change_fraction
+cascade_output_stagnation_epochs, double, fann_get_cascade_output_stagnation_epochs, fann_set_cascade_output_stagnation_epochs
+cascade_candidate_change_fraction, double, fann_get_cascade_candidate_change_fraction, fann_set_cascade_candidate_change_fraction
+cascade_candidate_stagnation_epochs, unsigned int, fann_get_cascade_candidate_stagnation_epochs, fann_set_cascade_candidate_stagnation_epochs
+cascade_weight_multiplier, fann_type, fann_get_cascade_weight_multiplier, fann_set_cascade_weight_multiplier
+cascade_candidate_limit, fann_type, fann_get_cascade_candidate_limit, fann_set_cascade_candidate_limit
+cascade_max_out_epochs, unsigned int, fann_get_cascade_max_out_epochs, fann_set_cascade_max_out_epochs
+cascade_max_cand_epochs, unsigned int, fann_get_cascade_max_cand_epochs, fann_set_cascade_max_cand_epochs
+cascade_num_candidates, unsigned int, fann_get_cascade_num_candidates
+cascade_num_candidate_groups, unsigned int, fann_get_cascade_num_candidate_groups, fann_set_cascade_num_candidate_groups
+neuron_activation_function, enum fann_activationfunc_enum, fann_get_activation_function, fann_set_activation_function, value, layer, neuron_index
+layer_activation_function, enum fann_activationfunc_enum, , fann_set_activation_function_layer, value, layer
+hidden_activation_function, enum fann_activationfunc_enum, , fann_set_activation_function_hidden
+output_activation_function, enum fann_activationfunc_enum, , fann_set_activation_function_output
+neuron_activation_steepness, fann_type, fann_get_activation_steepness, fann_set_activation_steepness, value, layer, neuron
+layer_activation_steepness, fann_type, , fann_set_activation_steepness_layer, value, layer
+hidden_activation_steepness, fann_type, , fann_set_activation_steepness_hidden
+output_activation_steepness, fann_type, , fann_set_activation_steepness_output
+layer_num_neurons, unsigned int, fann_get_num_neurons, , layer
+num_layers, unsigned int, fann_get_num_layers
+
+# neuron, struct fann_neuron *, fann_get_neuron, , layer, neuron_index
+
+TrainData::num_inputs, unsigned int, fann_train_data_num_input
+TrainData::num_outputs, unsigned int, fann_train_data_num_output
+TrainData::length, unsigned int, fann_train_data_length
+

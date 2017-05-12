@@ -1,0 +1,52 @@
+{
+   "abstract" : "Twitter.com API Client",
+   "author" : [
+      "Al Newkirk <anewkirk@ana.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "API-Twitter",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "API::Client" : "0.03",
+            "Data::Object" : "0.57",
+            "Mojolicious" : "6.22",
+            "Net::OAuth" : "0.28",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "perl" : "v5.14.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/alnewkirk/API-Twitter/issues"
+      },
+      "homepage" : "http://metacpan.org/release/API-Twitter/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/alnewkirk/API-Twitter.git",
+         "web" : "https://github.com/alnewkirk/API-Twitter"
+      }
+   },
+   "version" : "0.05",
+   "x_authority" : "cpan:AWNCORP"
+}
+

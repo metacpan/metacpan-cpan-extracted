@@ -1,0 +1,13 @@
+0.003000 - 2013-07-20
+  - Add script-modules and script-dev-modules for top level only code
+
+0.002000 - 2013-05-23
+  - Add ~/.myperl support
+  - Add MYPERL_HOME, MYPERL_CONFIG and MYPERL_DEBUG directives
+  - Add if::minus_e for oneliners
+
+0.001001 - 2013-02-23
+  - Fix bin/ rewriting
+
+0.001000 - 2013-02-23
+  - Unleashed on an unsuspecting world

@@ -1,0 +1,34 @@
+TYPEMAP
+
+SVM *				T_SVM
+DataSet*			T_DATASET
+
+
+OUTPUT
+
+T_SVM
+	if( $var == NULL )	XSRETURN_UNDEF;
+	sv_setref_pv( $arg, "Algorithm::SVM", (void*)$var );
+
+T_DATASET
+	if( $var == NULL )	XSRETURN_UNDEF;
+	sv_setref_pv( $arg, "Algorithm::SVM::DataSet", (void*)$var );
+
+INPUT
+
+T_SVM
+	if( sv_isobject($arg) && sv_isa($arg, \"Algorithm::SVM\") ) {
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	} else {
+		warn( \"${Package}::$func_name() -- $var is not an Algorithm::SVM object\" );
+		XSRETURN_UNDEF;
+	}
+
+T_DATASET
+	if( sv_isobject($arg) && sv_isa($arg, \"Algorithm::SVM::DataSet\") ) {
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	} else {
+		warn( \"${Package}::$func_name() -- $var is not an Algorithm::SVM::DataSet object\" );
+		XSRETURN_UNDEF;
+	}
+

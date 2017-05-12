@@ -1,0 +1,16 @@
+App::ThinPacker is development tool that enables simple Perl scripts
+to autoinstall their dependencies.
+
+Usage:
+
+	% thinpack your-script.pl > your-script-dist.pl
+	%
+
+your-script-dist.pl will first check if all needed dependencies are
+installed and will try to install missing ones using built-in tiny
+HTTP client.
+
+thinpack-ed scripts are easy to distribute.
+
+BUGS:
+	No Windows support. Rudimentary parsing. Default --sudo for cpanm. Donwloading cpanminus from third-party source. Patches are welcome.

@@ -1,0 +1,7 @@
+Audio::RaveMP - Perl interface to Sensory Science RaveMP player
+
+ravemp.c derived from "ravemp-0.0.2" by:
+The Snowblind Alliance: http://www.world.co.uk/sba/
+
+---
+Doug MacEachern <dougm@pobox.com>

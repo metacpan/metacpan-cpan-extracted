@@ -1,0 +1,21 @@
+DESCRIPTION
+
+This is an extension of Apache::AuthDBI by Edmund Mergl. Its purpose is to add a degree of protection against brute force attacks and password sharing. To accomplish this LoggedAuthDBI makes use of a log table that records IP, username, status and time of any given login attempt handled by this module.
+
+LINCENSE
+
+This program is free software;  you can redistribute it and/or modify it under the same terms as Perl itself.
+
+PREREQUISITES
+
+Apache::AuthDBI is required. This implies that minimum requirements for that
+module must be met.
+
+INSTALLATION
+
+The usual make Makefile.PL, make, make test, make install
+
+RECENT CHANGES
+
+Module was made CPAN compatible in this latest version (0.11)
+

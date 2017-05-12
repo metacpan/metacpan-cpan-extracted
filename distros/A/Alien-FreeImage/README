@@ -1,0 +1,55 @@
+NAME
+    Alien::FreeImage - Building freeimage library
+    <http://freeimage.sourceforge.net/>
+
+SYNOPSIS
+    This module is not a perl binding for *freeimage* library; it is just a
+    helper module that makes dev files (*.h, *.a) available for linking by
+    other modules.
+
+    Alien::FreeImage installation comprise of these steps:
+
+    *   Build freeimage-3.16.0 static library (*.a) from source codes (that
+        are bundled with this module)
+
+    *   Install dev files (*.h, *.a) into *share* directory of
+        Alien::FreeImage distribution
+
+    Later on you can use Alien::FreeImage in your module that needs to link
+    with *freeimage* like this:
+
+     # Sample Makefile.PL
+     use ExtUtils::MakeMaker;
+     use Alien::FreeImage;
+
+     WriteMakefile(
+       NAME         => 'Any::FreeImage::Module',
+       VERSION_FROM => 'lib/Any/FreeImage/Module.pm',
+       LIBS         => Alien::FreeImage->config('LIBS'),
+       INC          => Alien::FreeImage->config('INC'),
+       # + additional params
+     );
+
+METHODS
+  config()
+    This function is the main public interface to this module.
+
+     Alien::FreeImage->config('LIBS');
+
+    Returns a string like: '-L/path/to/freeimage/dir -lfreeimage'
+
+     Alien::FreeImage->config('INC');
+
+    Returns a string like: '-I/path/to/freeimage/dir'
+
+     Alien::FreeImage->config('PREFIX');
+
+    Returns a string like: '/path/to/freeimage/dir'
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+COPYRIGHT
+    2014+ KMX <kmx@cpan.org>
+

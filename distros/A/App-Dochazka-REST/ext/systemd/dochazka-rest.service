@@ -1,0 +1,13 @@
+[Unit]
+Description=Dochazka REST server
+After=network.target
+
+[Service]
+Type=simple
+User=dochazka-rest
+Group=dochazka-rest
+ExecStart=/usr/bin/dochazka-rest -- --server Starman
+#PIDFile=/var/run/dochazka-rest.pid
+
+[Install]
+WantedBy=multi-user.target

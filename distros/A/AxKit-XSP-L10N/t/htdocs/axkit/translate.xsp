@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: /local/CPAN/AxKit-XSP-L10N/t/htdocs/axkit/translate.xsp 1396 2005-03-25T03:58:41.995755Z claco  $ -->
+<xsp:page xmlns:xsp="http://apache.org/xsp/core/v1"
+	xmlns:l10n="http://today.icantfocus.com/CPAN/AxKit/XSP/L10N"
+>
+	<body>
+		<en><l10n:translate lang="en" value="Language"/></en>
+		<fr><l10n:translate lang="fr" value="Language"/></fr>
+		<en>
+			<l10n:translate>
+				<l10n:lang>en</l10n:lang>
+				<l10n:value>Language</l10n:value>
+			</l10n:translate>
+		</en>
+		<fr>
+			<l10n:translate>
+				<l10n:lang>fr</l10n:lang>
+				<l10n:value>Language</l10n:value>
+			</l10n:translate>
+		</fr>
+	</body>
+</xsp:page>

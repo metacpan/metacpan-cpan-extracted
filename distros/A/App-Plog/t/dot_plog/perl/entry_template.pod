@@ -1,0 +1,29 @@
+
+=head1 Title
+
+=over 2
+
+=item Tags: tag1 tag2
+
+=back
+
+blahh
+
+blahhh
+
+=begin html
+
+<img src="mini_plog.png" align=center >
+
+=end html
+
+=head2 Code
+
+dklfjldjf
+
+ dflmlk
+ dsfdf
+ dsfdf
+
+
+

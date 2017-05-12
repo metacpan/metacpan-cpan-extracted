@@ -1,0 +1,9 @@
+# define a couple variables
+%%foo bar baz
+%%zorch glonk freen
+
+http://sample.org/<foo> /<zorch>/ Y Should substitute both
+
+%%forget foo
+
+http://sample.org/<foo> /<zorch>/ Y zorch but not foo

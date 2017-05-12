@@ -1,0 +1,23 @@
+DESCRIPTION
+===========
+This module starts a new process. It allows connecting file descriptor in the 
+new process to files or handles (both to perl handles or to AnyEvent:Handles).
+
+It is possible to monitor the process execution using watchdog callback or kill
+the process after defined time.
+
+See lib/AnyEvent/Process.pm for details.
+
+INSTALLATION
+============
+Install following prerequisites:
+
+  AnyEvent
+
+and run following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+

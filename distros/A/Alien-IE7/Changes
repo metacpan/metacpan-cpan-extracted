@@ -1,0 +1,21 @@
+Revision history for Perl extension Alien::IE7.
+
+0.9.3   Fri Apr 23 22:19 PDT 2010
+    - switch to Git
+
+0.9.2   Tue Oct  2 11:44 PDT 2007
+    - added POD coverage tests
+    - rewritten install routine
+    - fixed build dependency issue on Archive::Zip; its a -build- requirement,
+      not a -configuration- requirement
+    - added "passthrough" Makefile.PL; we -NEED- to have Module::Build
+      installed, auto-generated compatibility Makefile.PLs are insufficient
+
+0.9.1   Sun Sep 30 13:24 PDT 2007
+    - added POD docs to Alien::IE7
+    - added "--quiet" command line argument to "ie7-install"
+    - changed versioning to "${IE7_version}.${alien_release}", so that releases
+      could be issued out of sync with upstream IE7.
+
+0.9     Wed Jul 25 12:17 PDT 2007
+    - First public version.  Installs IE7 0.9

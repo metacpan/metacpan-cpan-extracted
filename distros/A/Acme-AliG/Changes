@@ -1,0 +1,12 @@
+Revision history for Acme-AliG
+
+0.0102  2013-08-14
+        Moved README.pod -> README.md
+
+0.0101  2011-10-25
+        Adding /g flag to all substitutions.
+
+0.0100  2011-10-25
+        Added "Is it becoz I is black?" when /?/.
+        Added ", boyakasha!" when /!/.
+

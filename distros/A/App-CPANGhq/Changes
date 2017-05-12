@@ -1,0 +1,20 @@
+Revision history for Perl extension App-CPANGhq
+
+0.10 2014-08-05T11:25:13Z
+
+    - use MetaCPAN API (miyagawa)
+    - depend on App::CPANRepo and remove resolve_repo() method
+    - remove --cpanfile option. It is enough only doing `cpan-ghq $(cpanfile-dump)`.
+
+0.02 2014-06-07T02:27:10Z
+
+    - care strange format of distribution directory name (e.g. Hoge-Fuga-1.02a)
+    - care core modules
+    - add test
+    - don't force install the module even if not installed
+    - fix error handling
+
+0.01 2014-06-06T16:29:54Z
+
+    - original version
+

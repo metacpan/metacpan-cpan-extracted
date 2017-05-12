@@ -1,0 +1,6 @@
+---
+dirs-recursive:
+  .: ext/Time-Piece
+exclude-regexes:
+  - '^(?:\.?/)?META.yml$'
+  - '^(?:\.?/)?MANIFEST(?:\.SKIP)?$'

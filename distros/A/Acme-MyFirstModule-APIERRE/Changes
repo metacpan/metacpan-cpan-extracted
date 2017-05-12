@@ -1,0 +1,6 @@
+Revision history for Perl extension Acme::MyFirstModule::APIERRE.
+
+0.01  Sat Jun  6 10:24:15 2015
+	- original version; created by h2xs 1.23 with options
+		-AXn Acme::MyFirstModule::APIERRE '--author='alden.pierre@gmail.com''
+

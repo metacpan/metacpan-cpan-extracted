@@ -1,0 +1,30 @@
+Revision history for Perl extension AI::NeuralNet::Mesh.
+
+0.20  Tue Aug 22 18:01:04 2000
+        - Original version; created by Josiah Bryan
+        - Complete core re-write of AI::NeuralNet::BackProp
+        - 23% More accuracy in learning
+        - Increased learning speed
+        - Better connection topology
+
+0.31  Fri Aug 25 05:10:11 20000
+        - Second release, by Josiah Bryan
+        - 3 Major features:
+                - seperate layer sizes
+                - custom node activations
+                - increased learning speed
+
+0.43  Wed Sep 14 03:13:01 20000
+        - Third release, by Josiah Bryan
+        - Several bug fixes
+                - fixed 'flag' option on learn_set()
+                - fixed multiple-output bug
+                - fixed learning gradient error
+        - Improved learning function to not degrade increment automatically
+        - Added CSV-style dataset loader
+        - Added Export tags
+        - Added four custom node activations, including range and ramp
+        - Added several misc. extra functions
+        - Added ALN example demo
+
+

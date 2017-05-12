@@ -1,0 +1,83 @@
+Revision history for Amazon-SQS-Simple
+
+0.1     26 June 2007
+        First version, running against SQS version 2007-05-01
+
+0.2     29 June 2007
+        Added full POD docs
+
+0.3     17 July 2007
+        Added Amazon::SQS::Simple::Base, Amazon::SQS::Simple::Message
+
+0.4     17 July 2007
+        Mended POD docs in Base and Message classes
+
+0.5     06 August 2007
+        Fixed bug in Queue.pm where RetrieveMessage could attempt to
+        bless a null reference.
+
+0.6     06 February 2008
+        Updated to be compatible with the latest version of SQS
+        (2008-01-01). NOTE: This version introduces non-backwards
+        compatible changes! See this URL for details of the API change:
+        http://developer.amazonwebservices.com/connect/entry.jspa?externalID=1148
+
+0.7     14 Feb 2008
+        Documentation fixes
+
+0.8     31 Jul 2008
+        Documentation fixes 
+
+0.9     25 Sep 2008
+        Added ability to call old API versions
+
+1.00    28 Oct 2008
+        Fixed bug rt.cpan.org#34120
+        (http://rt.cpan.org/Public/Bug/Display.html?id=34120)
+
+1.01    1 Nov 2008
+        Improved error reporting when using old API versions
+
+1.02    21 Nov 2008
+        Fixed bug where interpolating an Amazon::SQS::Simple object in string
+        context threw an error.
+        
+1.03    21 Nov 2008
+        Fixed ReceiveMessages when called with MaxNumberOfMessages > 1
+        
+1.04    23 May 2009
+        Added support for API version 2009-02-01
+        Removed support for API version 2007-05-01
+
+1.05    14 Nov 2009
+        Minor tweak to improve the lives of folks using strict and mod_perl
+        (Thanks to Stephen Sayre)
+
+1.06    31 Mar 2010
+        Added Timeout constructor arg
+
+2.00	22 May 2013
+		New Maintainer (PENFOLD)
+		ReceiveMessage now always returns the first message in scalar context, irrespective of how many there are.
+		    (previously if there were more than one, it would return a count)
+		Updated to support and default to SignatureVersion 2, stub SignatureVersion 3 (Roland Walker)
+		Proxy Support (James Neal)
+		Added SendMessageBatch, ReceiveMessageBatch (Chris Jones)
+		
+2.01	1 Jul 2013
+		Fix bug with SendMessageBatch and single messages :D
+		
+2.02	1 Jul 2013
+		As above with updated Changes file :D
+		
+2.04	1 Sep 2013
+		Retry 500 errors (on advice from AWS support)
+		Handle ARN-style endpoints (https://sqs.<host>.amazonaws.com/<nnn>/<queue>)
+
+2.05    16 Jan 2017
+        Add v4 signature support (rustyconover)
+        Better tracking of retries (cjhamil)
+        Retry 503s as well (Chris Jones)
+        
+2.06    20 May 2017
+        Fix 500/503 retry code so it actually works

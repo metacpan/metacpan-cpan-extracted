@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/App/cpanoutdated/coro.pm
+script/cpan-outdated-coro
+t/00_compile.t
+META.yml
+MANIFEST

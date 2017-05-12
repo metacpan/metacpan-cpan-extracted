@@ -1,0 +1,12 @@
+0.0102  2014-02-01      Piotr Roszatycki <dexter@cpan.org>
+
+* Search perlbrew in default directory (~/perl5/bin) so it doesn't need to be
+  in PATH.
+
+0.0101  2014-01-02      Piotr Roszatycki <dexter@cpan.org>
+
+* More descriptive documentation for App::perluse
+
+0.0100  2014-01-01      Piotr Roszatycki <dexter@cpan.org>
+
+* First CPAN release.

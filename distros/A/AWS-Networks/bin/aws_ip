@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use AWS::Networks;
+use Net::CIDR::Set;
+
+my $ip = $ARGV[0] or die "Usage $0 IP\n";
+
+my $nets = AWS::Networks->new;
+
+my @matches = grep { Net::CIDR::Set->new($_->{ip_prefix})->contains($ip) } @{ $nets->networks };
+
+if (not @matches) {
+  print "This IP range doesn't seem to belong to AWS\n";
+  exit 1;
+} else {
+  foreach my $range (@matches) {
+    print "Service: $range->{service}\n";
+    print " Region: $range->{region}\n";
+    print "  Block: $range->{ip_prefix}\n";
+    print "\n";
+  }
+  exit 0;
+}

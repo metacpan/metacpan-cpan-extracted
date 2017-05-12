@@ -1,0 +1,26 @@
+<h2>News</h2>
+<table>
+	<CONTENT_LOOP NAME="news">
+	<tr>
+		<td valign="top">
+			<b><CONTENT_VAR NAME="date"></b>
+		</td>
+		<td>
+			<b><CONTENT_VAR NAME="title"></b><br>
+			<CONTENT_VAR NAME="description">
+		</td>
+	</tr>
+	</CONTENT_LOOP>
+</table>
+	Test of Content_if, etc.<p>
+	<CONTENT_IF NAME="html_title">
+		html_title exists
+	<CONTENT_ELSE>
+		html_title doesn't exist
+	</CONTENT_IF>
+	<p>
+	<CONTENT_UNLESS NAME="title">
+		title doesn't exist
+	<CONTENT_ELSE>
+		title exists
+	</CONTENT_UNLESS>

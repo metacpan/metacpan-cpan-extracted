@@ -1,0 +1,19 @@
+# This file provides instructions for packaging.
+
+`Ask`
+	perl_version_from m`Ask`;
+	version_from      m`Ask`;
+	readme_from       m`Ask`;
+	test_requires     p`Test::More 0.61`;
+	requires          p`Module::Runtime`;
+	requires          p`Moo 1.000006`;
+	requires          p`namespace::sweep 0.006`;
+	requires          p`Sub::Exporter::Progressive`;
+	requires          p`Lingua::Boolean::Tiny 0.003`;
+	recommends        p`File::Which`;
+	recommends        p`System::Command`;
+	recommends        p`Gtk2`;
+	recommends        p`Tk`;
+	recommends        p`Wx`;
+.
+

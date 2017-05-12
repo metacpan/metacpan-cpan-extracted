@@ -1,0 +1,153 @@
+{
+   "abstract" : "Add index and search methods to Apache::Session",
+   "author" : [
+      "Xavier Guimard, E<lt>x.guimard@free.frE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Apache-Session-Browseable",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DBI" : "0",
+            "Net::LDAP" : "0.38"
+         },
+         "requires" : {
+            "Apache::Session" : "0",
+            "JSON" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Apache::Session::Browseable" : {
+         "file" : "lib/Apache/Session/Browseable.pm",
+         "version" : "v1.2.5"
+      },
+      "Apache::Session::Browseable::DBI" : {
+         "file" : "lib/Apache/Session/Browseable/DBI.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::File" : {
+         "file" : "lib/Apache/Session/Browseable/File.pm",
+         "version" : "v1.2.3"
+      },
+      "Apache::Session::Browseable::Informix" : {
+         "file" : "lib/Apache/Session/Browseable/Informix.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::LDAP" : {
+         "file" : "lib/Apache/Session/Browseable/LDAP.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::MySQL" : {
+         "file" : "lib/Apache/Session/Browseable/MySQL.pm",
+         "version" : "v1.2.5"
+      },
+      "Apache::Session::Browseable::Oracle" : {
+         "file" : "lib/Apache/Session/Browseable/Oracle.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::PgHstore" : {
+         "file" : "lib/Apache/Session/Browseable/PgHstore.pm",
+         "version" : "v1.2.5"
+      },
+      "Apache::Session::Browseable::PgJSON" : {
+         "file" : "lib/Apache/Session/Browseable/PgJSON.pm",
+         "version" : "v1.2.5"
+      },
+      "Apache::Session::Browseable::Postgres" : {
+         "file" : "lib/Apache/Session/Browseable/Postgres.pm",
+         "version" : "v1.2.5"
+      },
+      "Apache::Session::Browseable::Redis" : {
+         "file" : "lib/Apache/Session/Browseable/Redis.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::SQLite" : {
+         "file" : "lib/Apache/Session/Browseable/SQLite.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::Store::DBI" : {
+         "file" : "lib/Apache/Session/Browseable/Store/DBI.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::Store::File" : {
+         "file" : "lib/Apache/Session/Browseable/Store/File.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::Store::Informix" : {
+         "file" : "lib/Apache/Session/Browseable/Store/Informix.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::Store::LDAP" : {
+         "file" : "lib/Apache/Session/Browseable/Store/LDAP.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::Store::MySQL" : {
+         "file" : "lib/Apache/Session/Browseable/Store/MySQL.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::Store::Oracle" : {
+         "file" : "lib/Apache/Session/Browseable/Store/Oracle.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::Store::Postgres" : {
+         "file" : "lib/Apache/Session/Browseable/Store/Postgres.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::Store::Redis" : {
+         "file" : "lib/Apache/Session/Browseable/Store/Redis.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::Store::SQLite" : {
+         "file" : "lib/Apache/Session/Browseable/Store/SQLite.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::Store::Sybase" : {
+         "file" : "lib/Apache/Session/Browseable/Store/Sybase.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Browseable::Sybase" : {
+         "file" : "lib/Apache/Session/Browseable/Sybase.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Generate::SHA256" : {
+         "file" : "lib/Apache/Session/Generate/SHA256.pm",
+         "version" : "v1.2.2"
+      },
+      "Apache::Session::Serialize::Hstore" : {
+         "file" : "lib/Apache/Session/Serialize/Hstore.pm",
+         "version" : "v1.2.5"
+      },
+      "Apache::Session::Serialize::JSON" : {
+         "file" : "lib/Apache/Session/Serialize/JSON.pm",
+         "version" : "v1.2.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.2.5",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

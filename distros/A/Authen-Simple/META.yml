@@ -1,0 +1,34 @@
+---
+abstract: 'Simple Authentication'
+author:
+  - 'Christian Hansen C<chansen@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Authen-Simple
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Accessor::Fast: 0
+  Class::Data::Inheritable: 0
+  Crypt::PasswdMD5: 0
+  Digest::MD5: 0
+  Digest::SHA: 0
+  MIME::Base64: 0
+  Params::Validate: 0
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/chansen/p5-authen-simple
+version: 0.5

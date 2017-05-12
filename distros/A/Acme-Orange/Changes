@@ -1,0 +1,14 @@
+Revision history for Perl extension Acme::Orange.
+
+0.01  Fri Jun  6 20:12:37 2003
+	- original version; created by h2xs 1.22 with options
+		-b 5.4.0 --omit-XS -A -n Acme::Orange
+
+0.02  Sat Jun  7 00:35:12 BST 2003
+	Pod bug spotted by Kake
+
+0.03  Tue Nov 29 09:54:34 GMT 2005
+	Update because Léon has renamed his undocumented private methods.
+	As you do :-)
+	Actually have a README.
+	Mention Acme:::Tango in the SEE ALSO

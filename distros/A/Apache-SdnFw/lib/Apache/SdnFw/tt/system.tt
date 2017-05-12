@@ -1,0 +1,165 @@
+<div style="width: 600px;">
+<h1>Smalldog Net Solutions System Information :: [% s.server_name %]</h1>
+
+<h2>Synopsis</h2>
+
+<p>This document should tell you all you need to know in the unlikely case that Chris is no
+longer available to maintain or develop this system any longer.  In this document are lots of
+technical information, but in the proper hands, it should be more than enough to keep the 
+system running for a long time.</p>
+
+<h2>When to use this information</h2>
+
+<p>This information is meant to be used when something either really good (Chris won the lottery)
+or something really bad happened, not for the times when maybe just the server has crashed.</p>
+
+<p>If your system is hosted at M5 (see below), then they can (and do) deal with server crashes.
+Also, if something happens to the M5 server, emails get sent all over the place including to 
+Chris's iPhone.  If for some reason you lost his phone number, it's 206-355-3055.  You can
+also try Kate's phone in an emergency as well, 206-355-4393.</p>
+
+<h2>System Parts</h2>
+
+<p>This system runs on the <a href="http://www.centos.org/">Centos OS</a> Linux Distrubution, 
+which is derived from and basically the same thing as Enterprise Red-Hat Linux, except without 
+any support.</p>
+
+<p>On top of this are the webserver application <a href="http://www.apache.org">Apache</a>
+and the database application <a href="http://www.postgresql.org">PostgreSQL</a>.</p>
+
+<p>The application logic that runs between apache and the database is written in
+<a href="http://www.perl.org">Perl</a>, and the template language is
+<a href="http://template-toolkit.org/">Template Toolkit</a>.</p>
+
+<h2>Specific System Setting</h2>
+
+<p>The information below shows you the specific details about exactly where this system is
+running, and where all the code, database, and static files for the site live.</p>
+
+<div class="floatleft">
+<table>
+	<caption>System Parameters</caption>
+	<tbody>
+		<tr>
+			<th>Server</th>
+			<td>[% s.env.APACHE_SERVER_NAME %]</td>
+		</tr>
+		<tr>
+			<th>IP Address</th>
+			<td>[% s.env.IP_ADDR %]</td>
+		</tr>
+		<tr>
+			<th>Base URL</th>
+			<td>[% s.self_url %]</td>
+		</tr>
+		<tr>
+			<th>Postgresql Database</th>
+			<td>[% s.obase %]</td>
+		</tr>
+		<tr>
+			<th>Apache Path</th>
+			<td>[% s.env.HTTPD_ROOT %]</td>
+		</tr>
+		<tr>
+			<th>Data Path</th>
+			<td>/data/[% s.obase %]</td>
+		</tr>
+		<tr>
+			<th>Code Path</th>
+			<td>/code/[% s.obase %]</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+
+<h2 style="clear: both;">Root</h2>
+
+<p>In order to do anyting to your system, you need root access to the server above.  Root is the 
+administrator account on Linux.  There is no way to login to server under the root account using 
+a password, instead you need a ssh key, or you need direct access to the server.</p>
+
+<h2>Server Hosting Location</h2>
+
+<p>If the <b>Server</b> above is <b>server.smalldognet.com</b> then that means this site
+is hosted on the Smalldog Net Solutions dedicated server which is hosted at
+<a href="http://www.m5hosting.com">M5 Hosting</a>.  If you call their support line, they
+will be able to get root access to the server if Chris is no longer available.
+Your site is running on a server under the Smalldog Net Solutions account.</p>
+
+<p>If the server is NOT server.smalldognet.com, then that means you have your own server
+you are paying for and managing.  You probably have a contact at your hosting company who 
+can gain access to the server directly to get root access, but hopefully Chris already
+walked you through setting up your own ssh key to get access to the server.  Remember, 
+that id_dsa.pub file?</p>
+
+<h2>Gaining Root Access</h2>
+
+<p>This is the command to login to root: <code>ssh -p 6056 root@[% s.env.APACHE_SERVER_NAME %]</code></p>
+
+<p>Normally the ssh service runs under port 22, but for an additional level of security I have
+moved the service to run under port 6056, hence the "-p 6056".</p>
+
+<p>If you get a "connection refused", then maybe your ssh is not setup on port 6056, so try 
+connecting without the -p: <code>ssh root@[% s.env.APACHE_SERVER_NAME %]</code></p>
+
+<p>The ONLY way to login to root is with an ssh key.  If it asks for a password, it doesn't
+matter what you try, it will never let you in.</p>
+
+<h2>No SSH key</h2>
+
+<p>If you can not login as root using the above command, then you need the hosting company
+to add your key to the root account on the server.  First you need to create yourself a key.</p>
+
+<p>On a Mac, you need to open the terminal program.  Once there run the following command: 
+<code>ssh-keygen -d</code></p>
+
+<p>When you run the command, you will be asked where you want to save the key file.  Just hit 
+enter and accept the default location (probably something like /Users/chrissutton/.ssh/id_dsa).</p>
+
+<p>Next it will ask for a password.  Just skip that and hit enter.  Also hit enter again for the
+password confirm.</p>
+
+<p>Now you should have a couple of files, one private (id_dsa), and the other public (id_dsa.pub).
+You need to give the public key to the hosting company.</p>
+
+<p>Run this command to get your key: <code>ssh-keygen -d -y</code></p>
+
+<p>This command should output something that looks like this:</p>
+
+<code>ssh-dss AAAAB3NzaC1kc3MAAACBAJ//L8EFLM+A1VvoA506SFEbB2DF934uGRSl8UpzPH
+/Hi5R2VHk9Rg0i8d7GQSsf2sG4Rg2F4JlYoCHs8Y7qOWRaqm3Qwjsv72rbLKmEJhk6gnYaCrou9r
+PUBpgGfEIsAMsUcbZ2lbVYEv8ISh8s+23z79zQNixWT4RHgE17Atm7AAAAFQCVTCmqxUowfGjRP+
+1TjfHabyS1AQAAAIB8ZICe9qrDfUlSCZJq6tSJEA4wiTQTEalNDiIjT/5cRDiplU3+schqsq0/fk
+WLIdNv5OfALhtvuNdLa2/USi0lMknsQg0Bc14BzWOtBpwmzU0/ETT1J7IE65I7CUGKw==</code>
+
+<p>Copy that garbydy gook (not the stuff above, the stuff that the ssh-keygen printed) and email it to
+the hosting company, and tell them to put this into /root/.ssh/authorized_keys, and make sure
+the permission on the file are 600 (they should know what this means).  Once this is done you 
+should be able to use the gaining root access command above to get into the server.</p>
+
+<p>If you are on something other than a Mac and don't know how to create a keypair or use ssh, then 
+you need to do some <a href="http://www.google.com/search?q=windows+create+ssh2+keypair">googling</a>
+or find someone to help you.</p>
+
+<h2>Getting Help</h2>
+
+<p>Once you can gain access to the root account on your server, then the rest of this information
+is only going to be helpful to a developer or linux system administrator. Some places you might 
+look for help: <a href="http://jobs.perl.org/">jobs.perl.org</a>, 
+<a href="http://www.guru.com/">guru.com</a>.</p>
+
+<h2>Install Notes</h2>
+
+<p>Below are notes if you need to reinstall all the software needed to run the system from scratch.
+You need to start from a CentosOS install, with the development packages.  Then login as root and
+run through these install notes.</p>
+
+<pre>
+[% INCLUDE install.txt %]
+</pre>
+
+<h2>System Setup</h2>
+
+<p>Once you have the base system installed, now it's time to put some more stuff in place into
+the /code and /data directories and also to setup some special apache config files.</p>
+</div>

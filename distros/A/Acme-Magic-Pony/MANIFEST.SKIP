@@ -1,0 +1,12 @@
+\..*.swp
+\..*.swo
+t\/01-magic-pony\.t
+^_build\/.*
+.cvsignore
+^MANIFEST\.bak$
+^Build$
+^blib\/*
+\.svn\/*
+\/.*\.svn\/*
+\.tar\.gz$
+

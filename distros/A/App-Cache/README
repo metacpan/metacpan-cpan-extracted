@@ -1,0 +1,123 @@
+NAME
+    App::Cache - Easy application-level caching
+
+SYNOPSIS
+      # in your class:
+      my $cache = App::Cache->new({ ttl => 60*60 });
+      $cache->delete('test');
+      my $data = $cache->get('test');
+      my $code = $cache->get_code("code", sub { $self->calculate() });
+      my $html = $cache->get_url("http://www.google.com/");
+      $cache->set('test', 'one');
+      $cache->set('test', { foo => 'bar' });
+      my $scratch = $cache->scratch;
+      $cache->clear;
+
+DESCRIPTION
+    The App::Cache module lets an application cache data locally. There are
+    a few times an application would need to cache data: when it is
+    retrieving information from the network or when it has to complete a
+    large calculation.
+
+    For example, the Parse::BACKPAN::Packages module downloads a file off
+    the net and parses it, creating a data structure. Only then can it
+    actually provide any useful information for the programmer.
+    Parse::BACKPAN::Packages uses App::Cache to cache both the file download
+    and data structures, providing much faster use when the data is cached.
+
+    This module stores data in the home directory of the user, in a dot
+    directory. For example, the Parse::BACKPAN::Packages cache is actually
+    stored underneath "~/.parse_backpan_packages/cache/". This is so that
+    permisssions are not a problem - it is a per-user, per-application
+    cache.
+
+METHODS
+  new
+    The constructor creates an App::Cache object. It takes three optional
+    parameters:
+
+    *   ttl contains the number of seconds in which a cache entry expires.
+        The default is 30 minutes.
+
+          my $cache = App::Cache->new({ ttl => 30*60 });
+
+    *   application sets the application name. If you are calling new() from
+        a class, the application is automagically set to the calling class,
+        so you should rarely need to pass it in:
+
+          my $cache = App::Cache->new({ application => 'Your::Module' });
+
+    *   directory sets the directory to be used for the cache. Normally this
+        is just set for you and will be based on the application name and be
+        created in the users home directory. Sometimes for testing, it can
+        be useful to set this.
+
+          my $cache = App::Cache->new({ directory => '/tmp/your/cache/dir' });
+
+    *   enabled can be set to 0 for testing, in which case you will always
+        get cache misses:
+
+          my $cache = App::Cache->new({ enabled => 0 });
+
+  clear
+    Clears the cache:
+
+      $cache->clear;
+
+  delete
+    Deletes an entry in the cache:
+
+      $cache->delete('test');
+
+  get
+    Gets an entry from the cache. Returns undef if the entry does not exist
+    or if it has expired:
+
+      my $data = $cache->get('test');
+
+  get_code
+    This is a convenience method. Gets an entry from the cache, but if the
+    entry does not exist, set the entry to the value of the code reference
+    passed:
+
+      my $code = $cache->get_code("code", sub { $self->calculate() });
+
+  get_url
+    This is a convenience method. Gets the content of a URL from the cache,
+    but if the entry does not exist, set the entry to the content of the URL
+    passed:
+
+      my $html = $cache->get_url("http://www.google.com/");
+
+  scratch
+    Returns a directory in the cache that the application may use for
+    scratch files:
+
+      my $scratch = $cache->scratch;
+
+  set
+    Set an entry in the cache. Note that an entry value may be an arbitrary
+    Perl data structure:
+
+      $cache->set('test', 'one');
+      $cache->set('test', { foo => 'bar' });
+
+  directory
+    Returns the full path to the cache directory. Primarily useful for when
+    you are writing tests that use App::Cache and want to clean up after
+    yourself. If you are doing that you may want to explicitly set the
+    'application' constructor parameter to avoid later cleaning up a cache
+    dir that was already in use.
+
+      my $dir = $cache->directory;
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2005-7, Leon Brocard
+
+LICENSE
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

@@ -1,0 +1,120 @@
+#!/perl
+use App::iTan;
+my $cmd = App::iTan->new_with_command;
+$cmd->execute;
+
+=head1 NAME
+
+itan - Secure management of iTans for online banking
+
+=head1 USAGE
+
+ itan [command] [options]
+
+=head1 COMMANDS
+
+=head2 import
+
+Imports a list of iTans into the database. 
+
+ itan import --file IMPORT_FILE [--deletefile] [--overwrite]
+
+=over
+
+=item * file
+
+Path to a file containing the iTans to be imported. The file must contain
+two columns (separated by any non numeric characters). The first 
+column must be the index number. The second column must be the tan 
+number. If your online banking appication does not use index numbers just set
+the first column to zero.
+
+ 10 434167
+ 11 937102
+ OR
+ 0 320791
+ 0 823602
+
+=item * deletefile
+
+Option to delete the import file after a successful import
+
+=item * overwrite 
+
+Index numbers must be unique. Default behaviour is to skip duplicate iTan
+indices. When this flag is enabled the duplicate iTans will be overwritten.
+
+=back
+
+=head2 get
+
+Fetches an iTan an mark it as used. If possible the iTan is also copied
+to the clipboard.
+
+ itan get [--next] OR [--index INDEX [--lowerinactive]]  [--memo MEMO]
+
+You will be prompted a password to decrypt the selected iTan.
+
+=over
+
+=item * next
+
+Fetches the next available iTan
+
+=item * index
+
+Fetches the iTan with the given index
+
+=item * lowerinvalid
+
+Marks all iTans lower than --index as invalid (Only in conjunction with
+--index).
+
+=item * memo
+
+Optional memo on iTan usage
+
+=back
+
+=head2 info
+
+Returns information on the given iTan.
+
+ itan info --index INDEX
+
+You will be promted a password to decrypt the selected iTan.
+
+=over
+
+=item * index
+
+Fetches the iTan with the given index
+
+=back
+
+=head2 list
+
+List of all either used or still available iTans
+
+ itan list
+
+=head2 reset
+
+Mark all unused iTans as invalid
+
+=head2 delete
+
+Delete all invalid iTans
+
+=head2 help
+
+ itan help 
+ itan help COMMAND
+
+Display help text.
+
+=head2 commands
+
+ itan commands 
+
+Display a list of all available commands

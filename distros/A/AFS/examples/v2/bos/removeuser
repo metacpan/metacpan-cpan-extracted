@@ -1,0 +1,26 @@
+#!/usr/local/bin/perl
+
+use v5.10.0;
+use blib;
+use strict;
+use warnings;
+
+use AFS::BOS;
+
+my (@users, $user, $server, $cellname, $bos);
+
+die "Usage: $0 user server [cell]\n" if $#ARGV < 1;
+
+$user     = shift;
+$server   = shift;
+$cellname = shift // '';
+
+if ($cellname) { $bos = AFS::BOS->new($server, 0, 0, $cellname); }
+else           { $bos = AFS::BOS->new($server); }
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+@users = split (/ /, $user);
+my $ok = $bos->removeuser(\@users);
+print "Error Code: $AFS::CODE\n" if ($AFS::CODE);
+
+$bos->DESTROY;

@@ -1,0 +1,19 @@
+SYNOPSIS
+
+     use Acme::LastWords;
+    
+     my $obj = Acme::LastWords->new;
+    
+     undef $obj; # will print e.g. "Dictionary."
+
+    Use your own last words:
+
+     my $obj = Acme::LastWords->new("It's now or never");
+
+DESCRIPTION
+
+    This object is for testing only.
+
+    PS: Do you want to know who uttered a particular last words? Use the
+    source.
+

@@ -1,0 +1,224 @@
+/*
+ *  Apache2::WebApp::Toolkit - Admin Control Panel (form.css)
+ *  Copyright (C) 2010 Marc S. Brooks <mbrooks@cpan.org>
+ *
+ *  Licensed under the terms of the BSD License
+ *  http://www.opensource.org/licenses/bsd-license.php
+ */
+
+/*--------------------------------------------------------------------------*/
+/* form - container                                                         */
+
+#form {
+	clear: both;
+	font-size: 13px;
+	margin: 10px 0px 10px 0px;
+	width: 475px;
+}
+
+
+/* form - fieldset */
+
+#form fieldset {
+	border: 1px solid #DDDDDD;
+	color: #999999;
+	margin-bottom: 20px;
+	padding: 10px 0px 10px 20px;
+}
+
+
+/* form - legend */
+
+#form legend {
+	background-color: #FFFFFF;
+	color: #787878;
+	border: 1px solid #EEEEEE;
+	padding: 2px 5px 2px 5px;
+}
+
+
+/* form - text labels */
+
+#form label {
+	clear: both;
+	color: #999999;
+	float: left;
+	margin-top: 8px;
+	width: 145px;
+}
+
+#form label strong {
+	color: #000000;
+	font-weight: normal;
+}
+
+#form label span {
+	padding-left: 7px;
+}
+
+
+/* form - fields */
+
+#form input.field0, input.field1, input.field2, input.field3, select, textarea {
+	margin: 5px;
+	padding: 1px;
+}
+
+#form input.field0 {
+	width: 280px;
+}
+
+#form input.field1 {
+	margin-right: 0px;
+	width: 215px;
+}
+
+#form input.field2 {
+	width: 100px;
+}
+
+#form input.field3 {
+	width: 45px;
+}
+
+#form select {
+	margin: 5px;
+	width: 285px;
+}
+
+#form select option.highlight {
+	background-color: #FFFF00;
+	color: #000000;
+}
+
+#form textarea {
+	height: 150px;
+	width: 425px;
+}
+
+#form textarea.text0 {
+	height: 120px;
+	width: 280px;
+}
+
+
+/* form - buttons */
+ 
+#form input.button0, #form input.button1 {
+	padding: 0px 5px 0px 5px;
+}
+
+#form input.button0 {
+	display: block; 
+	margin: 20px auto 20px auto;
+}
+
+#form input.button1 {
+	margin: 5px 0px 5px 0px;
+	width: 60px;
+}
+
+
+/* form - elements */
+
+#form div.check input {
+	margin: 5px;
+	padding: 1px;
+}
+
+#form div.check0 {
+	margin: 20px 0px 20px 0px;
+	text-align: center;
+}
+
+#form div.check0 input {
+	border: 0px;
+}
+
+#form div.check0 span, div.check1 span {
+	font-size: 12px;
+	padding-left: 5px;
+}
+
+#form div.check1 {
+	float: left;
+	margin: 5px 0px 5px 0px;
+	padding: 5px;
+}
+
+#form div.options {
+	padding: 5px;
+}
+
+#form div.options input {
+	border: 0px;
+}
+
+#form div.inline input {
+	margin: 5px;
+	padding: 1px;
+}
+
+#form div.inline span {
+	padding-left: 5px;
+	vertical-align: 4px;
+}
+
+
+/* form - captcha */
+
+#form div.captcha {
+	border: 0px;
+	margin: 0px auto 0px auto;
+	padding: 2px;
+	width: 150px;
+}
+
+#form div.captcha img {
+	border: 0px;
+	height: 35px;
+	width: 150px;
+}
+
+#form div.captcha div {
+	text-align: center;
+}
+
+
+/* form - textarea counter */
+
+#form span.counter {
+	background-color: #FFFFFF;
+	border: 1px solid #CCCCCC;
+	left: 400px;
+	padding: 1px;
+	position: absolute;
+}
+
+
+/* form - other */
+
+#form p.notes, #form p.alert {
+	display: block;
+	font-size: 12px;
+	text-align: center;
+}
+
+#form p.notes {
+	color: #888888;
+	padding: 6px 0px 4px 0px;
+	width: 430px;
+}
+
+#form p.alert {
+	margin: 20px 0px 20px 0px;
+}
+
+
+/* field error */
+
+#form input.error , select.error, textarea.error {
+	background-color: #FFFFFF;
+	color: #FF0000;
+	cursor: pointer;
+}

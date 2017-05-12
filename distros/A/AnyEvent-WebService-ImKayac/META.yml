@@ -1,0 +1,47 @@
+---
+abstract: 'connection wrapper for im.kayac.com'
+author:
+  - 'taiyoh <sun.basix@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+  Test::Requires: 0
+  Test::TCP: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.3, CPAN::Meta::Converter version 2.131490'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-WebService-ImKayac
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  AnyEvent::WebService::ImKayac:
+    file: lib/AnyEvent/WebService/ImKayac.pm
+    version: 0.01
+requires:
+  AnyEvent::HTTP: 0
+  Digest::SHA: 0
+  Filter::Util::Call: 0
+  HTTP::Request::Common: 0
+  JSON: 0
+resources:
+  bugtracker: https://github.com/soh335/AnyEvent-WebService-ImKayac/issues
+  homepage: https://github.com/soh335/AnyEvent-WebService-ImKayac
+  repository: git://github.com/soh335/AnyEvent-WebService-ImKayac.git
+version: 0.01
+x_contributors:
+  - 'sugyan <sugi1982@gmail.com>'
+  - 'soh335 <sugarbabe335@gmail.com>'

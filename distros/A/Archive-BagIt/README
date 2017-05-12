@@ -1,0 +1,139 @@
+NAME
+    Archive::BagIt
+
+VERSION
+    version 0.052
+
+SYNOPSIS
+    This modules will hopefully help with the basic commands needed to
+    create and verify a bag. My intention is not to be strict and enforce
+    all of the specification. The reference implementation is the java
+    version and I will endeavour to maintain compatibility with it.
+
+        use Archive::BagIt;
+
+        #read in an existing bag:
+        my $bag_dir = "/path/to/bag";
+        my $bag = Archive::BagIt->new($bag_dir);
+
+
+        #construct bag in an existing directory
+        my $bag2 = Archive::BagIt->make_bag($bag_dir);
+
+        # Validate a BagIt archive against its manifest
+        my $bag3 = Archive::BagIt->new($bag_dir);
+        my $is_valid = $bag3->verify_bag();
+
+WARNING
+    This is experimental software for the moment and under active
+    development. I hope to have a beta version available soon.
+
+    We use it fairly widely in-house, but it doesn't necessarily implement
+    all of the specs.
+
+    Email me with anything you need done urgently.
+
+    Also: Check out Archive::BagIt::Fast if you are willing to add some
+    extra dependendies to get better speed by mmap-ing files.
+
+NAME
+    Archive::BagIt - An interface to make and verify bags according to the
+    BagIt standard
+
+SUBROUTINES
+  new
+   An Object Oriented Interface to a bag. Opens an existing bag.
+  make_bag
+   A constructor that will make and return a bag from a directory
+       If a data directory exists, assume it is already a bag (no checking for invalid files in root)
+
+  verify_bag
+    An interface to verify a bag.
+
+    You might also want to check Archive::BagIt::Fast to see a more direct
+    way of accessing files (and thus faster).
+
+  get_checksum
+       This is the checksum for the bag, md5 of the manifest-md5.txt
+
+  version
+       Returns the bagit version according to the bagit.txt file.
+
+  payload_files
+      Returns an array with all of the payload files (those files that are below the data directory)
+
+  non_payload_files
+      Returns an array with files that are in the root of the bag, non-manifest files
+
+  manifest_files
+      return an array with the list of manifest files that exist in the bag
+
+  tagmanifest_files
+      return an array with the list of tagmanifest files
+
+AUTHOR
+    Robert Schmidt, <rjeschmi at gmail.com> William Wueppelmann, <william at
+    c7a.ca>
+
+BUGS
+    Please report any bugs or feature requests to "bug-archive-bagit at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Archive-BagIt>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Archive::BagIt
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Archive-BagIt>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Archive-BagIt>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Archive-BagIt>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Archive-BagIt/>
+
+COPYRIGHT
+    Copyright (c) 2012, the above named author(s).
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <https://metacpan.org/module/Archive::BagIt/>.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/rjeschmi/Archive-BagIt> and may be cloned from
+    <git://github.com/rjeschmi/Archive-BagIt.git>
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at <https://github.com/rjeschmi/Archive-BagIt/issues>.
+
+AUTHOR
+    Rob Schmidt <rjeschmi@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Rob Schmidt and William
+    Wueppelmann.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

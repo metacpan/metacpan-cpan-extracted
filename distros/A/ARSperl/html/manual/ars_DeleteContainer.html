@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - ars_DeleteContainer</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_DeleteContainer(ctrl, name)</CODE></H2>
+
+	Delete the given container (specified by name) on the server connected to in
+	the given control structure.  
+        <FONT COLOR="#FF0000">Requires Administrator privs to use.</FONT> <P>
+
+      <DL>
+         <DT><B>On success</B><DD>
+                Returns 1. 
+         <DT><B>On failure</B><DD>
+                Returns 0.
+      </DL>
+
+      <P>Example:
+
+      <PRE>
+      ars_DeleteContainer($ctrl, "FilterGuide-FooBar") || die "$ars_errstr";
+      </PRE>
+
+<I>ars_DeleteContainer was introduced in version 1.86 of ARSperl</I>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 23rd November 2005 by tstapff@users.sourceforge.net<BR>
+</address>
+</BODY>
+</HTML>

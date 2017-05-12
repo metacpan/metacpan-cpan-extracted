@@ -1,0 +1,65 @@
+NAME
+
+    Alien::UnicornEngine - Perl extension to install Unicorn-Engine from
+    www.unicorn-engine.org
+
+SYNOPSIS
+
+    Alien::UnicornEngine is a perl module that enables the installation of
+    the open source disassembly library Unicorn-Engine from
+    http://www.unicorn-engine.org on the system or locate the existing
+    installation if any. It is currently setup to use the Github master
+    branch.
+
+    You can use it in the Build.PL file if you're using Module::Build or
+    Makefile.PL file if you're using ExtUtils::MakeMaker.
+
+                my $unicorn= Alien::UnicornEngine->new;
+                my $build = Module::Build->new(
+                    ...
+                    extra_compiler_flags => $unicorn->cflags(),
+                    extra_linker_flags => $unicorn->libs(),
+                    ...
+                );
+
+VERSION
+
+    0.05
+
+METHODS
+
+    new
+
+      Creates the object. Refer Alien::Base for more information.
+
+    cflags
+
+      This method provides the compiler flags needed to use the library on
+      the system.
+
+    libs
+
+      This method provides the linker flags needed to use the library on
+      the system.
+
+SEE ALSO
+
+    Alien::Base
+
+AUTHORS
+
+    Vikas N Kumar <vikas@cpan.org>
+
+REPOSITORY
+
+    https://github.com/selectiveintellect/p5-alien-unicorn.git
+
+COPYRIGHT
+
+    Copyright (C) 2016. Selective Intellect LLC
+    <github@selectiveintellect.com>. All Rights Reserved.
+
+LICENSE
+
+    This is free software under the MIT license.
+

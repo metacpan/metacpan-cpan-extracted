@@ -1,0 +1,112 @@
+NAME
+    Apache2::WebApp::Plugin::Validate - Plugin providing data validation
+    methods
+
+SYNOPSIS
+      my $result = $c->plugin('Validate')->method( ... );     # Apache2::WebApp::Plugin::Validate->method()
+
+DESCRIPTION
+    Common methods used for validating user input.
+
+PREREQUISITES
+    This package is part of a larger distribution and was NOT intended to be
+    used directly. In order for this plugin to work properly, the following
+    packages must be installed:
+
+      Apache2::WebApp
+      Date::Calc
+      Data::Validate::URI
+      Email::Valid
+      HTTP::BrowserDetect
+      Net::DNS::Check
+      Params::Validate
+
+INSTALLATION
+    From source:
+
+      $ tar xfz Apache2-WebApp-Plugin-Validate-0.X.X.tar.gz
+      $ perl MakeFile.PL PREFIX=~/path/to/custom/dir LIB=~/path/to/custom/lib
+      $ make
+      $ make test
+      $ make install
+
+    Perl one liner using CPAN.pm:
+
+      $ perl -MCPAN -e 'install Apache2::WebApp::Plugin::Validate'
+
+    Use of CPAN.pm in interactive mode:
+
+      $ perl -MCPAN -e shell
+      cpan> install Apache2::WebApp::Plugin::Validate
+      cpan> quit
+
+    Just like the manual installation of Perl modules, the user may need
+    root access during this process to insure write permission is allowed
+    within the installation directory.
+
+OBJECT METHODS
+  browser
+    Check if the request is from a browser.
+
+      my $result = $c->plugin('Validate')->browser();
+
+  currency
+    Check the currency format (0.00)
+
+      my $result = $c->plugin('Validate')->currency($total);
+
+  date
+    Check the date format (YYYY-MM-DD)
+
+      my $result = $c->plugin('Validate')->date($date);
+
+  date_is_future
+    Is the date in the future? (YYYY-MM-DD)
+
+      my $result = $c->plugin('Validate')->date_is_future($date);
+
+  date_is_past
+    Is the date in the past? (YYYY-MM-DD)
+
+      my $result = $c->plugin('Validate')->date_is_past($date);
+
+  domain
+    Check the domain name format; verify the domain status using a DNS
+    query.
+
+      my $result = $c->plugin('Validate')->domain($name);
+
+  email
+    Check the e-mail address format; verify the domain status using a DNS
+    query.
+
+      my $result = $c->plugin('Validate')->email( $address, $mx_check );
+
+  integer
+    Check for a integer.
+
+      my $result = $c->plugin('Validate')->integer($value);
+
+  html
+    Check for HTML markup.
+
+      my $result = $c->plugin('Validate')->html($markup);
+
+  url
+    Check the URL.
+
+      my $result = $c->plugin('Validate')->url($string);
+
+SEE ALSO
+    Apache2::WebApp, Apache2::WebApp::Plugin, Data::Validate::URI,
+    Email::Valid, HTTP::BrowserDetect, Net::DNS::Check
+
+AUTHOR
+    Marc S. Brooks, <mbrooks@cpan.org> - <http://mbrooks.info>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://dev.perl.org/licenses/artistic.html>
+

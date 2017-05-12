@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+
+use App::MyPerl::Rewrite;
+
+App::MyPerl::Rewrite->run_if_script;
+
+=head1 NAME
+
+myperl-rewrite - rewrite .pm, .t and bin/ files with your myperl settings
+
+=head1 SYNOPSIS
+
+  $ myperl-rewrite dir1 dir2
+
+More likely:
+
+  sub MY::postamble {
+    q{distdir: myperl_rewrite
+  myperl_rerite: create_distdir
+  	myperl-rewrite $(DISTVNAME)
+  };
+  }
+
+=head1 AUTHOR
+
+See L<App::MyPerl>
+
+=head1 COPYRIGHT
+
+See L<App::MyPerl>
+
+=head1 LICENSE
+
+See L<App::MyPerl>
+
+=cut

@@ -1,0 +1,239 @@
+=====================================================
+Revision history for App-Dochazka-Common distribution
+=====================================================
+
+0.147  2014-08-07 15:57 CEST
+- split off from App::Dochazka::REST into a separate distro
+
+0.148  2014-08-08 08:59 CEST
+- t/100-model-shared.t: add unit testing script for Model/Shared.pm
+- t/: add stub testing scripts for other modules in Model/
+- ../release: adapt scripts
+
+0.149  2014-08-08 10:11 CEST
+- test release script
+- t/: add some tests
+
+0.150  2014-08-08 10:58 CEST
+- Model/Shared.pm: make_accessor now takes an optional TYPE argument, 
+  which must be a type constant from Params::Validate; so the accessors
+  are no longer hardcoded to take only SCALAR values
+- t/: add some tests
+
+0.151  2014-08-08 11:03 CEST
+- Build.PL: fix requires and build_requires
+
+0.152  2014-08-08 11:35 CEST
+- Build.PL: add 'dist_abstract' line
+
+0.153  2014-08-08 11:40 CEST
+- testing release script
+
+0.154  2014-08-08 12:13 CEST
+- Build.PL: more adjustments of build_requires, requires, release scripts
+
+0.155  2014-08-08 12:14 CEST
+- add a sleep to release script to allow NFS to settle
+
+0.156  2014-08-10 18:40 CEST
+- Model/Employee.pm: add 'priv' and 'schedule' accessors
+- t/: update to current state
+
+0.157  2014-08-10 22:07 CEST
+- add Session class to the data model
+
+0.158  2014-08-15 15:59 CEST
+- rename Model/Shared.pm to Shared.pm and refactor
+- bring in HTTP.pm from App-Dochazka-CLI (LWP and session code will be used 
+  by both ::CLI and ::WWW)
+
+0.159  2014-08-16 07:53 CEST
+- HTTP.pm: wholesale refactor
+
+0.160  2014-08-16 10:11 CEST
+- HTTP.pm: fix multiple bugs
+
+0.161  2014-08-21 12:42 CEST
+- MANIFEST: add missing HTTP.pm
+
+0.162  2014-08-24 20:22 CEST
+- minor cleanup
+
+0.163  2014-08-28 11:59 CEST
+- HTTP.pm->rest_req: encode/decode UTF-8 when encoding/decoding JSON
+
+0.164  2014-08-29 13:19 CEST
+- HTTP.pm: make 'rest_req' return hashref with the HTTP::Response object
+  from the REST server (stripped of the body), along with JSON body as
+  before
+
+0.165  2014-09-01 07:53 CEST
+- Unicode hell
+
+0.166  2014-09-01 16:41 CEST
+- Unicode hell
+
+0.167  2014-09-02 17:55 CEST
+- HTTP.pm: run 'encode_utf8' on the path before calling LWP::UserAgent with it
+
+0.168  2014-09-03 17:31 CEST
+- HTTP.pm: use Encode->encode_utf8 to encode the JSON string instead of 
+  JSON->new->utf8
+
+0.169  2014-09-10 16:25 CEST
+- delete HTTP.pm after moving it to App-MFILE distro
+
+0.170  2014-10-20 16:04 CEST
+- Model/Employee.pm: remove 'priv' and 'schedule' properties
+- t/: adapt tests
+
+0.171  2014-10-29 10:15 CET
+- Model/Activity.pm: add 'disabled' field to activity object
+
+0.172  2014-10-29 10:19 CET
+- do a better job of adding the 'disabled' field to activity objects
+
+0.173  2014-10-30 11:08 CET
+- Model.pm: add 'make_filter' subroutine generator
+- Model/: in all model modules, generate 'filter' routine using make_filter
+- t/: add two test cases for make_filter
+
+0.174  2014-10-30 12:32 CET
+- Model/: correct omissions from last commit
+
+0.175  2014-11-04 13:33 CET
+- rename 'scratch_sid' (part of Schedintvls object) to 'ssid'
+
+0.176  2014-11-05 09:42 CET
+- Model/Schedule.pm: add 'disabled' property to Schedule object
+
+0.177  2014-11-05 17:08 CET
+- Model.pm: add make_TO_JSON generator
+- Model/: modify all model modules so the list of attributes (object
+  properties) appears only once per module (use constant ATTRS);
+  generate TO_JSON methods for all models/classes
+- get rid of Session.pm (deprecated)
+
+0.178  2014-11-06 14:18 CET
+- Model.pm: add new method generators 'make_compare' and 'make_clone'
+
+0.179  2014-11-06 14:27 CET
+- t/: remove last mention of Session.pm
+
+0.180  2014-11-06 14:43 CET
+- refactor 'make_compare' to use Test::Deep::NoTest for the comparison
+
+0.181  2014-11-06 16:33 CET
+- Model/Shared.pm: write new boilerplate code
+- Model/: apply new boilerplate code in all the model modules
+
+0.182  2014-11-07 11:16 CET
+- after giving the matter some thought, eliminate Model/Shared.pm with its 'eval' kludge
+- Model.pm: implement a proper 'boilerplate' function; add a 'make_compare_disabled'
+  method generator
+- Model/: adapt all model modules
+- t/: add some tests
+
+0.183  2014-11-26 09:09 CET
+- Model.pm: make accessors accept UNDEF as well as SCALAR
+
+0.184  2014-11-26 14:01 CET
+- Model.pm: add 'attrs' and 'get' methods to all model classes
+
+0.185  2014-12-03 08:23 CET
+- Model/Employee.pm: add a 'sec_id' property
+- t/: adapt to the new property
+
+0.186  2015-03-30 15:44 CEST
+- Model/Schedule.pm: add 'scode' property
+
+0.187  2015-04-16 15:59 CEST
+- Model/Interval.pm: add a 'code' property to the Interval class
+
+0.188  2015-06-28 20:31 CEST
+- add 'supervisor' attribute to the Employee class
+
+0.189  2015-07-04 21:56 CEST
+- Dochazka.pm: implement init_timepiece() and $today, etc. here
+  instead of in App::Dochazka::CLI, so we can access them from
+  App::Dochazka::REST as well
+
+0.190  2015-07-20
+- Remove version number info from submodules
+- README changes
+- Rename modules from App::Dochazka to App::Dochazka::Common
+- t/: adapt test suite to new module names
+
+0.191  2015-07-23 12:54 CEST
+- Model.pm: add set() boilerplate method
+- release.sh: new, simplified release script
+- MANIFEST: add LICENSE
+- Copyright (c) 2014-2015, SUSE LLC globally
+
+0.192  2015-08-09 17:06 CEST
+- README.md: fix MetaCPAN URL
+- Build.PL: update repository and bugtracker resources
+- add prerelease.sh script
+- add Tempintvls class
+
+0.193  2015-08-12 09:57 CEST
+- Tempintvls class: drop superfluous attribute
+
+0.194  2015-03-11 10:03 CET
+- t/reset.t: new unit moved over from App::Dochazka::REST
+- t/: cleanup and reorganize
+- t/: do not convert warnings into errors
+- Update release and prelease scripts and make them executable
+- Add policy class/model
+- README: convert to reStructuredTest
+
+0.195 2015-05-30 14:05 CET
+- MANIFEST: add the new policy model
+- Add Component class/model
+
+0.196 2016-12-03 22:42 CET
+- Model/Interval.pm: add "partial" property
+
+0.197 2016-12-05 11:58 CET
+- Common.pm: move DATA MODEL doc section from App::Dochazka::REST
+
+0.198 2016-12-09 16:56 CET
+- Component class: add parameters property
+
+0.199 2016-01-09 17:13 CET
+- prerelease.sh: fix date template
+- Component class: rename property from 'parameters' to 'validations'
+
+0.200 2016-01-16 21:09 CET
+- make warnings non-fatal
+- Model/Tempintvls.pm: add attributes required by wip-feature-60
+- Model.pm->make_accessor(): create hash key if missing
+
+0.201 2016-01-17 22:11 CET
+- Model/Tempintvls.pm: add clobber and dry_run attributes
+- Tempintvls: drop clobber and tsrange attributes
+
+0.202 2016-01-17 23:31 CET
+- Model/Tempintvls.pm: reinstate tsrange property
+
+0.203 2016-01-18 00:47 CET
+- Rename Tempintvls -> Tempintvl
+
+0.204 2016-01-19 15:14 CET
+- Model.pm: make make_accessor more useful
+- Model/Tempintvl.pm: add int_id accessor
+
+0.205 2016-09-14 09:35 CEST
+- Travis CI
+- Add sync property to Employee class
+
+0.206 2016-09-24 12:44 CEST
+- build/ops: change OBS_PROJECT to Application:Dochazka:staging
+- Session.pm: boilerplate for new module
+- Session.pm: implement get_session() function
+- MANIFEST: add the new Session.pm module
+
+0.207 2017-03-02 10:33 CET
+- Drop Session.pm module (it doesn't belong here)
+- Add scode to schedhistory model
+

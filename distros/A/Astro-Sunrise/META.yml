@@ -1,0 +1,26 @@
+---
+abstract: 'Perl extension for computing the sunrise/sunset on a given day'
+author:
+  - 'Ron Hill <rkhill@firstlight.net>'
+  - 'Jean Forget <JFORGET@cpan.org>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Astro-Sunrise
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Astro::Sunrise:
+    file: lib/Astro/Sunrise.pm
+    version: 0.96
+recommends:
+  DateTime: 0.16
+resources:
+  repository: https://github.com/jforget/Astro-Sunrise.git
+version: 0.96

@@ -1,0 +1,64 @@
+{
+   "abstract" : "AnyEvent crontab with DateTime::Event::Cron",
+   "author" : [
+      "Clinton Gormley <drtech@cpan.org>",
+      "Andy Gorman <agorman@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-DateTime-Cron",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "DateTime" : "0",
+            "DateTime::Event::Cron" : "0",
+            "DateTime::Event::Cron::Quartz" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/agorman/AnyEvent-DateTime-Cron/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/agorman/AnyEvent-DateTime-Cron.git",
+         "web" : "https://github.com/agorman/AnyEvent-DateTime-Cron"
+      }
+   },
+   "version" : "0.08"
+}
+

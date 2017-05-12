@@ -1,0 +1,17 @@
+---
+name: Audio-Ofa
+version: 1.01
+author:
+  - 'Christoph Bussenius <pepe@cpan.org>'
+abstract: Bindings for libofa
+license: gpl
+build_requires:
+  Compress::Zlib: 0
+  ExtUtils::PkgConfig: 0
+  Module::Build: 0
+  Test::More: 0
+provides:
+  Audio::Ofa:
+    file: lib/Audio/Ofa.pm
+    version: 1.01
+generated_by: Module::Build version 0.26

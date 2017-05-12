@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7f12abf60939d5a1fda1a06c7d2157e020c357fe Build.PL
+SHA1 c49f00a7c107b40962fdc4386e51455400986c4d Changes
+SHA1 eb08564e4aba3f662e592e590940c8c00c19083c INSTALL
+SHA1 85b3d45587e15302798ac6106d0e095fb67d5039 MANIFEST
+SHA1 6bb1fab0a4fa356eedb450aa88c1a47daba33c52 MANIFEST.SKIP
+SHA1 471f4a579e325f6de1d1df6cc05eb135d15a85f2 META.json
+SHA1 f927b8fff2dacf2540a28039a265fe8807bcd82f META.yml
+SHA1 84ed757df8b7e0e2bfd98a77ae072d6df4f4f007 Makefile.PL
+SHA1 b64f1a7d620a4170e7e35bdf791c17db41d7e31b README.pod
+SHA1 aa1832095e5f623d0eb8241ba7d1f14d706f2487 bin/altsql
+SHA1 75ddc7815e91690524941a1eb4c3a573e47ede6e lib/App/AltSQL.pm
+SHA1 e18339173ff3033042c0fb904d906630f28b565c lib/App/AltSQL/Model.pm
+SHA1 254fb95f45dc78aec7c94acf146c5c4c7e7ae7cb lib/App/AltSQL/Model/MySQL.pm
+SHA1 e224676d6be2c6ea090facddf63ef987f423d0f2 lib/App/AltSQL/Plugin/Dump.pm
+SHA1 901f7f7721b30578ffde0888c12622b173017ae4 lib/App/AltSQL/Plugin/Dump/Format.pm
+SHA1 c3bb24535586a9bae74435c3f0f820318457544a lib/App/AltSQL/Plugin/Dump/Format/csv.pm
+SHA1 9c2e9bd5f848ed7b1cdc910244beef72ba11b21c lib/App/AltSQL/Plugin/Dump/Format/html.pm
+SHA1 2def7043838bb2f38b378265665e632156de0ce3 lib/App/AltSQL/Plugin/Dump/Format/json.pm
+SHA1 19715fc6d5ef0d0a60554e3cd13ea01e66f03b9f lib/App/AltSQL/Plugin/Dump/Format/perl.pm
+SHA1 b1ff6a8dd48a2ba24d4c14d0a01e9a9b33c9705b lib/App/AltSQL/Plugin/Dump/Format/sql.pm
+SHA1 7e2b96c7285a09512c10802aa302be7474acfea4 lib/App/AltSQL/Plugin/Dump/Format/xls.pm
+SHA1 61c0898be4c19d5051b1d0f7145465df36518767 lib/App/AltSQL/Plugin/Dump/Format/xml.pm
+SHA1 9bc9cd39d410ffee3776cba263442ad3951eb08e lib/App/AltSQL/Plugin/Dump/Format/yaml.pm
+SHA1 3777b4e109f92b1c23133e2b8d0c0d9d3921a3af lib/App/AltSQL/Plugin/Tail.pm
+SHA1 f6f428f3638ce210530ae2f0bd0ca013fca1d5f3 lib/App/AltSQL/Role.pm
+SHA1 77e74e69405edaf19d1e754a76f819ace1f4c66c lib/App/AltSQL/Term.pm
+SHA1 e2317928d205a77cb468b6b62467309da14c65c0 lib/App/AltSQL/Term/Plugin/SyntaxHighlight.pm
+SHA1 6f33fba35b8fba9fc394433b758d5ad75ff93d3e lib/App/AltSQL/View.pm
+SHA1 fcedef0e932f6fb7075a3efb972f1d0024ca7d4a lib/App/AltSQL/View/Plugin/Color.pm
+SHA1 b9fc3f044721e50774eee7f6d1237372a9ddbdd2 lib/App/AltSQL/View/Plugin/UnicodeBox.pm
+SHA1 1ab97c3a0aed03f82381e8f93d28786e58c05008 lib/App/AltSQL/View/Plugin/VerticalSorted.pm
+SHA1 9bdf133e2624f3313301047fb9f3fa6cd04a90fe t/001_arguments.t
+SHA1 23bfff35f585a5ed0b41663d10a170c394a4e13a t/002_my_cnf.t
+SHA1 2dc4a0db89a14e56f423730c5ed7f33d495c847e t/003_custom_prompt.t
+SHA1 f766cc9f9823bb28809c7c5110754941b8428599 t/sql/sakila-data.sql
+SHA1 4c2ea3fd4b8dfd1b9fb8bf40df59dca068673708 t/sql/sakila-schema.sql
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk/I8+8ACgkQHHIpFH/pKkIRKgCfYW0r4GZn9VRB/h0lCjsWOMC3
+XOAAn06qVRa/QLTufTRIB/Ux+glV+JGr
+=6Whb
+-----END PGP SIGNATURE-----

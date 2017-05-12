@@ -1,0 +1,124 @@
+#!/usr/bin/perl
+# initdb - initialize account database
+#
+# $Id: initdb,v 1.6 2002/05/06 06:33:17 pliam Exp $
+#
+
+use DBI;
+
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# Configuration Data
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+#
+
+%groups = (
+	admin => 'Administrative privileges',
+	transact => 'Transaction privileges',
+	confidential => 'Sensitivity privilege: confidential data',
+	secret => 'Sensitivity privilege: secret data',
+	topsecret => 'Sensitivity privilege: top secret data',
+	super => 'Sensitivity privilege: all data',
+);
+
+%authens = ( # authid => [<description>, <maximum failure count>]
+	unixpw => ['Unix password crypt', 100],
+	x509email => ['X.509 certificate (signed by us)', 0],
+	pin => ['Personal Identity Number (PIN)', 10]
+);
+
+%users = (
+	bob => { name => 'Col. Robert Bobtight', group => 'bob',
+		groups => [qw(super admin transact confidential secret topsecret)],
+		unixpw => crypt('sekret', 'Mq'),
+		x509email => 'bob@acme.com',
+		pin => '0918'
+	},
+	guest => { name => 'Guest Account', group => 'guest',
+		unixpw => crypt('johnanon', '4C')
+	}
+);
+
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# Process into tables
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+#
+
+#
+# open database
+#
+$dbifile = 'dbilogin.txt';
+open(DBIFILE, $dbifile) || die "Cannot open DBI file '$dbifile'\n";
+chomp($dbistr = <DBIFILE>);
+chomp($dbiusr = <DBIFILE>);
+chomp($dbipw = <DBIFILE>);
+$dbh = DBI->connect($dbistr, $dbiusr, $dbipw)
+	or die "Cannot connect to Postgres: $DBI::errstr.";
+
+#
+# populate tables
+#
+
+## groups
+$gsth = $dbh->prepare(<<'ENDSQL');
+	INSERT INTO groups VALUES (?, ?)
+ENDSQL
+for $gid (keys %groups) {
+	$gsth->execute($gid, $dbh->quote($groups{$gid}));
+}
+
+## authen-methods
+$asth = $dbh->prepare(<<'ENDSQL');
+	INSERT INTO authens VALUES (?, ?, ?)
+ENDSQL
+for $aid (keys %authens) {
+	$asth->execute($aid, $dbh->quote($authens{$aid}[0]), $authens{$aid}[1]);
+}
+
+## users
+$usth = $dbh->prepare(<<'ENDSQL');
+	INSERT INTO users VALUES (?, ?, ?, ?, ?)
+ENDSQL
+$ugsth = $dbh->prepare(<<'ENDSQL');
+	INSERT INTO usergroup VALUES (?, ?)
+ENDSQL
+$uasth = $dbh->prepare(<<'ENDSQL');
+	INSERT INTO userauthen VALUES (?, ?, ?, ?)
+ENDSQL
+for $uid (keys %users) {
+	## get user record
+	$urec = $users{$uid};
+	## add user record to users
+	$defgrp = $urec->{group};
+	if ($groups{$defgrp}) { die "Default group for user '$uid' in use.\n"; }
+	$usth->execute($uid, quote($urec->{name}), $defgrp, 'enabled', time);
+	## process default group in groups and usergroup tables
+	$gsth->execute($uid, "Default group: $defgrp");
+	$ugsth->execute($uid, $defgrp);
+	## process other group memberships
+	if (defined($gref = $urec->{groups})) {
+		for $gid (@{$gref}) {
+			$ugsth->execute($uid, $gid);
+		}
+	}
+	## process authentication methods
+	for $auth (keys %authens) {
+		next unless $urec->{$auth};
+		$uasth->execute($uid, $auth, quote($urec->{$auth}), 0);
+	}
+}
+
+#
+# disconnect
+#
+$dbh->disconnect 
+	or warn "Postgres disconnect failed $DBI::errstr.";
+
+
+# DB-quote an item or list
+sub quote {
+	my @a = @_;
+	map($_ = $dbh->quote($_), @a);
+	return @a;
+}

@@ -1,0 +1,9 @@
+Build
+_build
+^MYMETA\.yml$
+^\.git/
+^\.gitignore$
+blib
+AnyEvent-CacheDNS-.*
+^\.DS_Store$
+^MYMETA\.json$

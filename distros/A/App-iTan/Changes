@@ -1,0 +1,29 @@
+Revision history for Perl module App::iTan
+
+1.06 Sat Apr 2 2016
+    - Dist housekeeping
+
+1.05 Mon Jan 27 2014
+    - Dist housekeeping
+    - Fix warning
+    - Fix perl 5.18 warnings
+
+1.04 Sun Jun 03 2012
+    - Also accept '0' as tan index
+    - Make list output sortable
+    - Dist cleanup (no more M::I::ReadmeMarkdownFromPod and version,
+      use Class::Load, remove dead code, ...)
+    - Switch from MooseX::App::Cmd to MooseX::App
+
+1.03 Sat Oct 10 2009
+    - Fix broken makefile
+
+1.02 Sat Oct 10 2009
+    - Copy itan to clipboard (as suggested by Aldo 'Dada' Calpini)
+
+1.01 Sat Oct 3 2009
+    - Fixed dependencies in Makefile
+    - Typos/dist housekeeping
+
+1.00 Sat Oct 3 2009
+    - First stable release

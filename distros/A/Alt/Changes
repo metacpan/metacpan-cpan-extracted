@@ -1,0 +1,58 @@
+0.19 Mon Dec 29 14:24:59 PST 2014
+ - Add PERL_ALT_INSTALL to docs
+
+0.18 Mon Dec 29 08:03:15 PST 2014
+ - Update docs regarding versioning
+
+0.17 Sun Dec 28 19:50:06 PST 2014
+ - Update docs with new best practices
+
+0.16 Sat Aug 16 14:52:27 PDT 2014
+ - Fix Meta copyright
+
+0.15 Sat Aug 16 14:41:50 PDT 2014
+ - Change Meta email
+
+0.14 Sat Aug 16 10:42:42 PDT 2014
+ - Meta 0.0.2
+
+0.13 Fri Aug 15 19:51:14 PDT 2014
+ - Add t/000-require-modules.t
+
+0.12 Fri Aug 15 17:50:02 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.11 Sat Aug  2 09:55:57 PDT 2014
+ - Fix Copyright years.
+
+0.10 Thu Jul 31 10:35:30 PDT 2014
+ - Fix Pod encoding bug. dolmen++
+
+0.09 Wed Jul 30 15:33:29 PDT 2014
+ - Fix Meta and add Contributing
+ - Switch IRC to
+
+0.08 Tue Jul  1 10:59:19 PDT 2014
+ - Trying the reindex again. Unfortunately messed up last time.
+
+0.07 Mon Jun 23 15:23:36 PDT 2014
+ - Attempt to reindex after deleting 0.05 and waiting 3 days.
+
+0.06 Wed Jun 18 10:51:06 PDT 2014
+ - Add test prereq Test::Exception
+
+0.05 Sun Jun 15 14:06:36 PDT 2014
+ - Switch to Zilla-Dist
+
+0.04 Wed Jul 25 21:08:53 PDT 2012
+ - Add no_index advice to the doc.
+
+0.03 Sun Jul 15 15:45:27 PDT 2012
+ - Change POD encoding to utf8
+
+0.02 Sun Jul 15 15:12:46 PDT 2012
+ - Wrote the first real doc revision.
+
+0.01 Sun Jul 15 13:15:49 PDT 2012
+ - First release.
+

@@ -1,0 +1,7 @@
+CHANGES
+MANIFEST
+Makefile.PL
+README
+lib/Apache/Handlers.pm
+t/load.t
+t/phases.t

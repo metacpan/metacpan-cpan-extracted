@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7d06199eb13a9cb916722a3d7e96334c26a79185 Changes
+SHA1 b48bff4ee1d73db253c2eb73749a4e2daddfc944 MANIFEST
+SHA1 4faf77381c483cc19900be7db592bcb97a706c67 META.yml
+SHA1 1e28aad8580dd64a2ebd4e7f07515353a9c71880 Makefile.PL
+SHA1 de8d083e1b78301598ca1cf3ac1525ae1a926c02 README
+SHA1 06d883487127fa0026311904e7c4867e850c505c inc/Module/Install.pm
+SHA1 2771d5c5033e94c4789c66a0aad4e21c62985ce9 inc/Module/Install/Base.pm
+SHA1 b5e2d5fc07b92d042c97631d2b00f61f974fc164 inc/Module/Install/Can.pm
+SHA1 c3747aa4bd8faa530c974b78f729c67f15c6f928 inc/Module/Install/Fetch.pm
+SHA1 d8bc0d6e0a82d2b7533bdd3de467593094cc8b2c inc/Module/Install/Makefile.pm
+SHA1 6fca1d05c6b9a8f10865de5be4fefb9bfa7a52e9 inc/Module/Install/Metadata.pm
+SHA1 6b051a6d3ed824df40343a7ff09b66282e1783c3 inc/Module/Install/Win32.pm
+SHA1 77f82ce7c623e05304ac9aae05bcd1a5558fadbb inc/Module/Install/WriteAll.pm
+SHA1 0a55bae41ed08b4bdac7f6c35694308c7045256e lib/Apache/Session/SQLite3.pm
+SHA1 4cc80f00485821e7d665c3d09eb573fcc7c34361 lib/Apache/Session/Store/SQLite3.pm
+SHA1 6049b763901c2600adc57b55ded9e1d6ad3686d1 t/1-basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (FreeBSD)
+
+iD8DBQFCAKITtLPdNzw1AaARAuFZAKCfOu4NkW9Ny2eOTQyw/b2wKfxZLACdHRdK
+z+qDX5lvxbJITfjjE7K3Onw=
+=xCJK
+-----END PGP SIGNATURE-----

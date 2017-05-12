@@ -1,0 +1,33 @@
+---
+abstract: 'Replay a Subversion dump into Git/Filesystem/etc.'
+author:
+  - 'Rocco Caputo <rcaputo@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-SnerpVortex
+no_index:
+  directory:
+    - t
+    - utils
+requires:
+  DBD::SQLite: 1.29
+  DBI: 1.613
+  Digest::MD5: 2.36
+  File::Copy: 2.11
+  File::Path: 2.04
+  Moose: 1.10
+  SVN::Dump: 0.04
+  Storable: 2.18
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-SnerpVortex
+  homepage: http://search.cpan.org/dist/App-SnerpVortex
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/rcaputo/snerp-vortex.git
+version: 1.000

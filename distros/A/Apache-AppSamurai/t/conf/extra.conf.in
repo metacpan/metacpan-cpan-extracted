@@ -1,0 +1,150 @@
+# $Id: extra.conf.in,v 1.1 2007/08/23 07:46:51 pauldoom Exp $
+
+<IfDefine APACHE2>
+  PerlSwitches -I@ServerRoot@/lib
+</IfDefine>
+
+PerlRequire @ServerRoot@/startup.pl
+PerlModule Apache::AppSamurai
+
+PerlSetVar WhatEverPath /
+PerlSetVar WhatEverLoginScript /docs/login.pl
+PerlSetVar WhatEverDebug 3
+
+PerlSetVar WhatEverCookieName CakeNotCookie
+PerlSetVar WhatEverSecure 1
+
+# Map Basic auth password into 3 credentials, separated by
+# semicolons and reverse mapped for fun!
+PerlSetVar WhatEverBasicAuthMap "3,2,1=(.+);([^;]+);([^;]+)"
+
+# Please, don't use these auth modules... they kinda suck.
+# (Note that the names hint to the static password for each.
+# You know that ain't cool.)
+PerlSetVar WhatEverAuthMethods "AuthTestFLUFFY,AuthTestPASSWORD,AuthTest123456"
+
+# Some trackers and tracker system setup
+PerlSetVar WhatEverAuthUnique 1
+PerlSetVar WhatEverIPFailures "2:10"
+PerlSetVar WhatEverTrackerCleanup 30
+
+# Encryption is on by default
+PerlSetVar WhatEverSessionServerPass "The Password is PASSWORD"
+
+# File store used for testing
+PerlSetVar WhatEverSessionDirectory @ServerRoot@/tmp
+PerlSetVar WhatEverSessionLockDirectory @ServerRoot@/tmp
+
+<Directory @ServerRoot@>
+    AllowOverride All
+</Directory>
+
+# These documents require user to be logged in.
+<Location /docs/protected>
+ AuthType Apache::AppSamurai
+ AuthName WhatEver
+ PerlAuthenHandler Apache::AppSamurai->authenticate
+ PerlAuthzHandler Apache::AppSamurai->authorize
+ require user programmer
+</Location>
+
+# must satisfy any requirement
+<Location /docs/authany>
+ PerlSetVar WhatEverSatisfy Any
+ AuthType Apache::AppSamurai
+ AuthName WhatEver
+ PerlAuthenHandler Apache::AppSamurai->authenticate
+ PerlAuthzHandler Apache::AppSamurai->authorize
+ Require user some-user
+ Require user programmer
+</Location>
+
+# must satisfy all requirements
+<Location /docs/authall>
+ PerlSetVar WhatEverSatisfy All
+ AuthType Apache::AppSamurai
+ AuthName WhatEver
+ PerlAuthenHandler Apache::AppSamurai->authenticate
+ PerlAuthzHandler Apache::AppSamurai->authorize
+ Require user some-user
+ Require user programmer
+</Location>
+
+<Location /docs/stimeout>
+ PerlSetVar WhatEverSessionTimeout +10m
+ AuthType Apache::AppSamurai
+ AuthName WhatEver
+ PerlAuthenHandler Apache::AppSamurai->authenticate
+ PerlAuthzHandler Apache::AppSamurai->authorize
+ Require user some-user
+ Require user programmer
+</Location>
+
+# These documents don't require logging in, but allow it.
+<FilesMatch "\.cgi$">
+ AuthType Apache::AppSamurai
+ AuthName WhatEver
+ PerlFixupHandler Apache::AppSamurai->recognize_user
+</FilesMatch>
+
+# Basic auth protected area
+<Location /docs/basic>
+ # Test the custom keysource, too.
+ PerlAddVar WhatEverKeysource header:User-agent
+ PerlAddVar WhatEverKeysource arg:JerryOnly
+
+ # ...it's not just for C64s...
+ AuthType Basic
+ AuthName WhatEver
+ PerlAuthenHandler Apache::AppSamurai->authenticate
+ PerlAuthzHandler Apache::AppSamurai->authorize
+ Require valid-user
+</Location>
+
+# AppSamurai form login
+<IfDefine APACHE2>
+ PerlModule ModPerl::Registry
+
+ <FilesMatch "\.pl$">
+  SetHandler perl-script
+  PerlResponseHandler ModPerl::Registry
+  Options +ExecCGI
+  AuthType Apache::AppSamurai
+  AuthName WhatEver
+ </FilesMatch>
+</IfDefine>
+<IfDefine APACHE1>
+ PerlModule Apache::Registry
+
+ <FilesMatch "\.pl$">
+  SetHandler perl-script
+  PerlHandler Apache::Registry
+  Options +ExecCGI
+  AuthType Apache::AppSamurai
+  AuthName WhatEver
+ </FilesMatch>
+</IfDefine>
+
+# This is the action of the login.pl script above.
+<Files LOGIN>
+ AuthType Apache::AppSamurai
+ AuthName WhatEver
+ SetHandler perl-script
+ <IfDefine APACHE1>
+   PerlHandler Apache::AppSamurai->login
+ </IfDefine>
+ <IfDefine APACHE2>
+   PerlResponseHandler Apache::AppSamurai->login
+ </IfDefine>
+</Files>
+
+
+
+# !!! Should add sections for filter, alterlist, trackers, etc. !!!
+
+<IfDefine APACHE1>
+ <Location /perl-status>
+  SetHandler perl-script
+  PerlHandler Apache::Status
+ </Location>
+</IfDefine>

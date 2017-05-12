@@ -1,0 +1,39 @@
+<HTML>
+ <HEAD> 
+  <TITLE>ARSperl Utilities: DelUsersFromGroup.pl</TITLE>
+ </HEAD> 
+ <BODY BGCOLOR="#FFFFFF">
+ <H2>DelUsersFromGroup.pl</H2>
+
+ <H3> Purpose </H3>
+
+ This utility helps you remove one or more users from a specified group. It's
+ most useful when removing many users from a group. Normally, you'd modify 
+ each record in the User schema using the User Tool. With this script, you
+ can specify all of the usernames to remove from the group and it will modify
+ each User schema record for you.
+
+ <H3> Notes </H3>
+
+ You may need to run <code>arreload</code> after using this script to
+ cause a reload of the group permissions.
+
+ <H3> Author </H3>
+ Jeff Murphy<BR>
+ <A HREF="mailto:jcmurphy@buffalo.edu">jcmurphy@buffalo.edu</A>
+
+ <H3> Usage </H3>
+
+ <PRE>
+ EXAMPLE
+    DelUsersFromGroup server username password group user1 user2 ...
+
+ NOTES
+    This might require that "username" have special priviledges in 
+    order to modify User schema records.
+ </PRE>
+
+ <HR>
+ <A HREF="mailto:arsperl@arsperl.org">arsperl@arsperl.org</A>
+ </BODY>
+</HTML>

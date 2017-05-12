@@ -1,0 +1,514 @@
+
+
+<html>
+<head>
+<title>Apache::ASP::Cgi</title>
+
+
+
+<style type="text/css">
+<!--
+      td {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      font {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      .title {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 16px}
+
+
+
+
+-->
+</style>
+
+
+</head>
+<body bgcolor=black link=#063678 alink=#ff5599 vlink=#993399
+marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
+
+
+
+
+<center>
+<table border=0 cellpadding=0 width=99% cellspacing=8>
+<tr><td align=center>
+
+<table border=0 cellpadding=3 width=100% cellspacing=0>
+<tr bgcolor=#063678>
+<td>
+	<table border=0 cellpadding=1 cellspacing=0 width=100%>
+	<tr>
+	<td><img border=0 src=asptitlelogo.gif alt="Apache::ASP" width=267 height=44 ></td>	
+	
+		<td align=right></td>
+	
+	</tr>
+	</table>
+</td>
+</tr>
+<tr>
+  <td bgcolor=#005196 align=center>
+    <b>
+    <font color=#ffffff>&lt;% Web Applications with Apache &amp; mod_perl %&gt;</font>  
+    </b>
+  </td>
+</tr>
+</table>
+
+
+<table border=0 cellpadding=10 cellspacing=0 width=100% bgcolor=#005196>
+<tr>
+<td valign=top width=120 bgcolor=#005196>
+    
+        <table cellpadding=5 cellspacing=0 border=1 bgcolor=white><tr><td>
+
+	<table border=0 cellpadding=0 cellspacing=0 width=105 bgcolor=white>
+	
+	
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="index.html" style="text-decoration:none"><font color=#063678>INTRO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="install.html" style="text-decoration:none"><font color=#063678>INSTALL</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="config.html" style="text-decoration:none"><font color=#063678>CONFIG</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="syntax.html" style="text-decoration:none"><font color=#063678>SYNTAX</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="events.html" style="text-decoration:none"><font color=#063678>EVENTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="objects.html" style="text-decoration:none"><font color=#063678>OBJECTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="ssi.html" style="text-decoration:none"><font color=#063678>SSI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sessions.html" style="text-decoration:none"><font color=#063678>SESSIONS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="xml.html" style="text-decoration:none"><font color=#063678>XML/XSLT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>%</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><font color=#993399>CGI</font></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="perlscript.html" style="text-decoration:none"><font color=#063678>PERLSCRIPT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="style.html" style="text-decoration:none"><font color=#063678>STYLE GUIDE</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="faq.html" style="text-decoration:none"><font color=#063678>FAQ</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="tuning.html" style="text-decoration:none"><font color=#063678>TUNING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="kudos.html" style="text-decoration:none"><font color=#063678>CREDITS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="support.html" style="text-decoration:none"><font color=#063678>SUPPORT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sites.html" style="text-decoration:none"><font color=#063678>SITES USING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="testimonials.html" style="text-decoration:none"><font color=#063678>TESTIMONIALS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="resources.html" style="text-decoration:none"><font color=#063678>RESOURCES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="todo.html" style="text-decoration:none"><font color=#063678>TODO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="changes.html" style="text-decoration:none"><font color=#063678>CHANGES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="license.html" style="text-decoration:none"><font color=#063678>LICENSE</font></a></nobr></b></font></td>		
+
+		</tr>
+		<tr><td colspan=2><hr size=1></td></tr>
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="eg/index.html" style="text-decoration:none"><font color=#063678>EXAMPLES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+	</table>
+
+	</td></tr>
+	</table>
+
+		<br>
+		<center>
+		<a href=http://www.apache-asp.org/><img src="powered_by_apache_asp.jpg" width="88" height="31" alt="Powered by Apache::ASP" border="0"></a>
+		<br>
+		<a href=http://perl.apache.org><img src="powered_by_modperl.gif" width="88" height="31" alt="Powered by ModPerl and Apache" border="0"></a>
+		<br>
+		<a href=http://www.perl.com><img src="rectangle_power_perl.gif" width="88" height="31" alt="Powered by Perl" border="0"></a>
+		</center>
+
+</center>
+
+</td>
+
+
+
+<td valign=top bgcolor=white>
+<font size=+0 face=verdana,arial>
+
+<font face=verdana><font class=title size=+1 color=#555555><b>CGI</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>CGI has been the standard way of deploying web applications long before
+ASP came along.  In the CGI gateway world, CGI.pm has been a widely
+used module in building CGI applications, and Apache::ASP is compatible
+with scripts written with CGI.pm.  Also, as of version 2.19, Apache::ASP
+can run in standalone CGI mode for the Apache web server without
+<a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a> being available.  See &quot;Standalone CGI Mode&quot; section below.
+<font face="courier new" size=3><pre>
+</pre></font>Following are some special notes with respect to compatibility with CGI
+and CGI.pm.  Use of CGI.pm in any of these ways was made possible through 
+a great amount of work, and is not guaranteed to be portable with other perl 
+ASP implementations, as other ASP implementations will likely be more limited.</font>
+
+	<hr size=1>
+	<table width=100% border=0 cellpadding=1 cellspacing=3>
+	<tr>
+	<td valign=top><font face="lucida console" size=-1>
+	
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Standalone%20Cbddd74cc>Standalone CGI Mode, without mod_perl</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#CGI%20headers>CGI headers</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#CGI.pm>CGI.pm</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#print%28%29ing%20C99232b52>print()ing CGI</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Query%20Object4fef5875>Query Object Initialization</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#File%20Upload>File Upload</a>
+			</font>
+			</td>
+							
+		</tr>
+			
+	</table>
+	<hr size=1>
+	<p>
+
+	<p>
+	<a name=Standalone%20Cbddd74cc></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Standalone CGI Mode, without mod_perl</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>As of version 2.19, Apache::ASP scripts may be run as standalone
+<a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a> scripts without mod_perl being loaded into Apache.  Work
+to date has only been done with mod_cgi scripts under Apache on a
+Unix platform, and it is unlikely to work under other web servers 
+or Win32 operating systems without further development.
+<font face="courier new" size=3><pre>
+</pre></font>To run the ./site/eg scripts as CGI scripts, you copy the 
+./site directory to some location accessible by your web
+server, in this example its /usr/local/apache/htdocs/aspcgi, 
+then in your httpd.conf activate Apache::ASP cgi
+scripts like so:
+<font face="courier new" size=3><pre>
+ Alias /aspcgi/ /usr/local/apache/htdocs/aspcgi/
+ &lt;Directory /usr/local/apache/htdocs/aspcgi/eg/ &gt;
+   AddType application/x-httpd-cgi .htm
+   AddType application/x-httpd-cgi .html
+   AddType application/x-httpd-cgi .asp
+   AddType application/x-httpd-cgi .xml
+   AddType application/x-httpd-cgi .ssi
+   AllowOverride None
+   Options +ExecCGI +Indexes
+ &lt;/Directory&gt;
+</pre></font>Then install the asp-perl script from the distribution 
+into /usr/bin, or some other directory.  This is 
+so the CGI execution line at the top of those scripts
+will invoke the asp-perl wrapper like so:
+<font face="courier new" size=3><pre>
+ #!/usr/bin/perl /usr/bin/asp-perl
+</pre></font>The asp-perl script is a cgi wrapper that sets up the 
+Apache::ASP environment in lieu of the normal mod_perl
+handler request.  Because there is no Apache-&gt;dir_config()
+data available under mod_cgi, the asp-perl script will load
+a asp.conf file that may define a hash %Config of
+data for populating the dir_config() data.  An example
+of a complex asp.conf file is at <a href=eg/asp.conf>./site/eg/asp.conf</a>
+<font face="courier new" size=3><pre>
+</pre></font>So, a trivial asp.conf file might look like:
+<font face="courier new" size=3><pre>
+ # asp.conf
+ %Config = (
+   &#39;Global&#39; =&gt; &#39;.&#39;,
+   &#39;StateDir&#39; =&gt; &#39;/tmp/aspstate&#39;,
+   &#39;NoState&#39; =&gt; 0,
+   &#39;Debug&#39; =&gt; 3,
+ );
+</pre></font>The default for NoState is 1 in CGI mode, so one must
+set NoState to 0 for objects like $Session &amp; $Application
+to be defined.</font>
+	
+	<p>
+	<a name=CGI.pm></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>CGI.pm</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>CGI.pm is a very useful module that aids developers in 
+the building of these applications, and Apache::ASP has been made to 
+be compatible with function calls in CGI.pm.  Please see cgi.htm in the 
+./site/eg directory for a sample ASP script written almost entirely in CGI.
+<font face="courier new" size=3><pre>
+</pre></font>As of version 0.09, use of CGI.pm for both input and output is seamless
+when working under Apache::ASP.  Thus if you would like to port existing
+cgi scripts over to Apache::ASP, all you need to do is wrap &lt;% %&gt; around
+the script to get going.  This functionality has been implemented so that
+developers may have the best of both worlds when building their 
+web applications.
+<font face="courier new" size=3><pre>
+</pre></font>For more information about CGI.pm, please see the web site
+<font face="courier new" size=3><pre>
+  <a href=http://stein.cshl.org/WWW/software/CGI/>http://stein.cshl.org/WWW/software/CGI/</a>
+</pre></font>
+	
+	<p>
+	<a name=Query%20Object4fef5875></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Query Object Initialization</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>You may create a <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a>.pm $query object like so:
+<font face="courier new" size=3><pre>
+	use CGI;
+	my $query = new CGI;
+</pre></font>As of Apache::ASP version 0.09, form input may be read in 
+by CGI.pm upon initialization.  Before, Apache::ASP would 
+consume the form input when reading into $Request-&gt;Form(), 
+but now form input is cached, and may be used by CGI.pm input
+routines.</font>
+	
+	<p>
+	<a name=CGI%20headers></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>CGI headers</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Not only can you use the <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a>.pm $query-&gt;header() method
+to put out headers, but with the CgiHeaders config option
+set to true, you can also print &quot;Header: value\n&quot;, and add 
+similar lines to the top of your script, like:
+<font face="courier new" size=3><pre>
+ Some-Header: Value
+ Some-Other: OtherValue
+
+ &lt;html&gt;&lt;body&gt; Script body starts here.
+</pre></font>Once there are no longer any cgi style headers, or the 
+there is a newline, the body of the script begins. So
+if you just had an asp script like:
+<font face="courier new" size=3><pre>
+    print join(&quot;:&quot;, %{$Request-&gt;QueryString});
+</pre></font>You would likely end up with no output, as that line is
+interpreted as a header because of the semicolon.  When doing
+basic debugging, as long as you start the page with &lt;html&gt;
+you will avoid this problem.</font>
+	
+	<p>
+	<a name=print%28%29ing%20C99232b52></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>print()ing CGI</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>CGI is notorious for its print() statements, and the functions in CGI.pm 
+usually return strings to print().  You can do this under Apache::ASP,
+since print just aliases to $Response-&gt;Write().  Note that $| has no
+affect.
+<font face="courier new" size=3><pre>
+	print $query-&gt;header();
+	print $query-&gt;start_form();
+</pre></font>
+	
+	<p>
+	<a name=File%20Upload></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>File Upload</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>CGI.pm is used for implementing reading the input from file upload.  You
+may create the file upload form however you wish, and then the 
+data may be recovered from the file upload by using $Request-&gt;Form().
+Data from a file upload gets written to a file handle, that may in
+turn be read from.  The original file name that was uploaded is the 
+name of the file handle.
+<font face="courier new" size=3><pre>
+	my $filehandle = $Request-&gt;Form(&#39;file_upload_field_name&#39;);
+	print $filehandle; # will get you the file name
+	my $data;
+	while(read($filehandle, $data, 1024)) {
+		# data from the uploaded file read into $data
+	};
+</pre></font>Please see the docs on CGI.pm (try perldoc CGI) for more information
+on this topic, and <a href=eg/file_upload.asp>./site/eg/file_upload.asp</a> for an example of its use.
+Also, for more details about CGI.pm itself, please see the web site:
+<font face="courier new" size=3><pre>
+    <a href=http://stein.cshl.org/WWW/software/CGI/>http://stein.cshl.org/WWW/software/CGI/</a>
+</pre></font>Occasionally, a newer version of CGI.pm will be released which breaks
+file upload compatibility with Apache::ASP.  If you find this to occur,
+then you might consider downgrading to a version that works.  For example,
+one can install a working CGI.pm v2.78 for a working version, and to 
+get old versions of this module, one can go to BACKPAN at:
+<font face="courier new" size=3><pre>
+    <a href=http://backpan.cpan.org/modules/by-authors/id/L/LD/LDS/>http://backpan.cpan.org/modules/by-authors/id/L/LD/LDS/</a>
+</pre></font>There is also $Request-&gt;FileUpload() API extension that you can use to get 
+more data about a file upload, so that the following properties are
+available for querying:
+<font face="courier new" size=3><pre>
+  my $file_upload = $Request-&gt;{FileUpload}{upload_field};
+  $file_upload-&gt;{BrowserFile}
+  $file_upload-&gt;{FileHandle}
+  $file_upload-&gt;{ContentType}
+
+  # only if FileUploadTemp is set
+  $file_upload-&gt;{TempFile}	
+
+  # whatever mime headers are sent with the file upload
+  # just &quot;keys %$file_upload&quot; to find out
+  $file_upload-&gt;{?Mime-Header?}
+</pre></font>Please see the $Request section in <a href=objects.html><font size=-1 face=verdana><b>OBJECTS</b></font></a> for more information.</font>
+	
+
+</font>
+</td>
+
+<td bgcolor=white valign=top>
+&nbsp;
+</td>
+
+</tr>
+<tr bgcolor=#063678>
+	<td colspan=3 align=center width=80%>
+	<font face=verdana color=white size=-1>
+	Copyright &copy; 1998-2008,
+	<a href=http://www.chamas.com><font color=white>Chamas Enterprises Inc.</font></a>
+	</font>
+	</td>
+</tr>
+</table>
+
+</td></tr>
+</table>
+</center>
+
+</body>
+</html>

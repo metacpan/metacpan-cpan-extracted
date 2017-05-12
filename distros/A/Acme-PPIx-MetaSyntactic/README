@@ -1,0 +1,112 @@
+NAME
+    Acme::PPIx::MetaSyntactic - rename functions and variables in a
+    PPI::Document using Acme::MetaSyntactic
+
+SYNOPSIS
+     my $acme = "Acme::PPIx::MetaSyntactic"->new(document => \<<'END');
+     use v5.010;
+     use constant PLACE => "World";
+ 
+     sub join_spaces {
+        return join " ", @_;
+     }
+ 
+     my @greetings = qw(Hello);
+ 
+     say join_spaces($greetings[0], PLACE);
+     END
+ 
+     say $acme->document;
+
+    Example output:
+
+     use v5.010;
+     use constant VULTURE => "World";
+ 
+     sub fraud {
+        return join " ", @_;
+     }
+ 
+     my @gang_of_thieves = qw(Hello);
+ 
+     say fraud($gang_of_thieves[0], VULTURE);
+
+DESCRIPTION
+    This module uses PPI to parse some Perl source code, find all the
+    variables and function names defined in it, and reassign them random names
+    using Acme::MetaSyntactic.
+
+  Constructor
+    This module is object-oriented, though there's really very little reason
+    for it to be.
+
+    `new(%attributes)`
+        Moose-style constructor.
+
+  Attributes
+    All attributes are read-only.
+
+    `document`
+        The PPI::Document that will be munged.
+
+        Can be coerced from a `Str` (filename), `ScalarRef[Str]` (string of
+        Perl source), `ArrayRef[Str]` (lines of Perl source) or `FileHandle`.
+
+        Required.
+
+        Once the `document` attribute has been set, a trigger automatically
+        runs the relabelling.
+
+    `theme`
+        The Acme::MetaSyntactic object that will be used to obtain new names.
+        If your source code is more than a couple of lines; choose one that
+        provides a large selection of names.
+
+        Can be coerced from `Str` (theme name).
+
+        Defaults to the "haddock" theme.
+
+    `local_subs`
+        HashRef where the keys are the names of subs which are considered
+        locally defined (i.e. not Perl built-ins, and not imported) and thus
+        available for relabelling. Values are expected to all be "1".
+
+        Can be coerced from `ArrayRef[Str]`.
+
+        Defaults to a list built by scanning the `document` with PPI.
+
+    `names`
+        HashRef mapping old names to new names. This will be populated by the
+        relabelling process, but you may supply some initial values.
+
+        Defaults to empty hashref.
+
+    `already_used`
+        HashRef keeping track of names already used in remapping, to avoid
+        renaming two variables the same thing.
+
+        Defaults to a hashref populated from `names`.
+
+        This attribute cannot be provided to the constructor.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Acme-PPIx-MetaSyntactic>.
+
+SEE ALSO
+    PPI, Acme::MetaSyntactic, Acme::MetaSyntactic::RefactorCode.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

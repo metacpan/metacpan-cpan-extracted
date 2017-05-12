@@ -1,0 +1,11 @@
+Revision history for Perl extension App-Ikaros
+
+0.02 2013-11-17T17:43:16Z
+
+    - support testing coverage
+    - support profiling
+
+0.01 2013-11-07T15:51:07Z
+
+    - original version
+

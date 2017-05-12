@@ -1,0 +1,82 @@
+App::Getconf
+
+Singleton-like config store for command-line applications.
+
+
+SYNOPSIS
+
+  package My::Module;
+
+  use App::Getconf;
+
+  sub do_something {
+    my ($self, %args) = @_;
+
+    my $opts = App::Getconf->getopt;
+
+    if ($opts->verbose) {
+      print "Entering function do_something()\n";
+    }
+
+    # ...
+  }
+
+
+DESCRIPTION
+
+This module is yet another command line options parser. But not only.
+Actually, it's an option container. It's a response to a question: after
+parsing options (from command line and from config file), how do I pass them
+down the function call stack?
+
+There are two classic approaches. One utilizes global variables. This is not
+that convenient, because introduces some names treated in special way (not
+defined inside the current function). The other requires passing option
+container as an argument to each and every function (you can't always tell in
+advance that the function will never use the options on one hand, and API
+changes are tedious on the other).
+
+App::Getconf tries a different way, which is not entirely new: the inspiration
+for this module was Log::Log4perl, which is Perl port of log4j Java library.
+The idea is simple: you need a value accessible similarly to a global
+variable, but declared locally.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::Getconf
+
+You can also look for information at:
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-Getconf
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-Getconf
+
+    Search CPAN
+        http://search.cpan.org/dist/App-Getconf/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Stanislaw Klekot
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

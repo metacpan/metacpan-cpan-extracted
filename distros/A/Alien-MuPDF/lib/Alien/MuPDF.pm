@@ -1,0 +1,72 @@
+package Alien::MuPDF;
+$Alien::MuPDF::VERSION = '0.007';
+use strict;
+use warnings;
+
+use parent qw(Alien::Base);
+use File::Spec;
+
+sub mutool_path {
+  my ($self) = @_;
+  File::Spec->catfile( $self->dist_dir , 'bin', 'mutool' );
+}
+
+sub inline_auto_include {
+	return  [ 'mupdf/fitz.h' ];
+}
+
+sub cflags {
+	my ($self) = @_;
+	my $top_include = File::Spec->catfile( $self->dist_dir, qw(include) );
+	# We do not include $self->SUPER::cflags() because that adds too many
+	# header files to the path. In particular, it adds -Imupdf/fitz, which
+	# leads to "mupdf/fitz/math.h" being included when trying to include
+	# the C standard "math.h" header.
+	return "-I$top_include";
+}
+
+1;
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Alien::MuPDF - Alien package for the MuPDF PDF rendering library
+
+=head1 VERSION
+
+version 0.007
+
+=head1 METHODS
+
+=head2 mutool_path
+
+Returns a C<Str> which contains the absolute path
+to the C<mutool> binary.
+
+=head1 Inline support
+
+This module supports L<Inline's with functionality|Inline/"Playing 'with' Others">.
+
+=head1 SEE ALSO
+
+L<MuPDF|http://mupdf.com/>
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Zakariyya Mughal.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__END__
+# ABSTRACT: Alien package for the MuPDF PDF rendering library
+

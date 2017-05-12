@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+lib/Acme/CPANAuthors/Acme/CPANAuthors/Authors.pm
+scripts/author_info.pl
+scripts/basic_info.pl
+t/00-load.t
+t/release-pod-syntax.t

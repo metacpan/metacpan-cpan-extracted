@@ -1,0 +1,93 @@
+Apache Notes
+============
+This package allows you to create a complex site authorization system where
+specific actions on resources are given custom rules. It extends
+Apache::AuthCookie to track sessions. It has been tested with Apache 1 and 2,
+and seems to work well. There are sample sites in the samples directory. The
+differences in the two apache environments require slightly different setups,
+so be sure to use the proper sample for your configuration.
+
+Use Apache2::SiteControl for apache 2.x.
+
+Description
+===========
+
+There are two levels of control in Apache::SiteControl. 
+
+The first is managed by Apache::SiteControl, and determines if a valid user
+has logged in. If so, it makes a user object available to the request
+processor. This is done using Apache::SiteControl::UserFactory (a good base
+implementation is already written).  The underlying code associates this user
+with a session, and manages the browser interaction.
+
+The second level of control is supplied by an application level
+PermissionManager. The user objects are passed to this object, along
+with the requested action and an opaque resource (of any type). Rules are
+installed in the PM that determine if a specific action is allowed for a given
+user and resource.
+
+   if($manager->can($currentUser, "change", $dnsrecord)) {
+      ...
+   }
+
+where the PM applies the various installed rules (user-defined) and returns
+true if the action is allowed, false otherwise. In this example, one of the 
+rules might detect that the resource (dnsrecord) is a row from a DNS tracking
+table. It might then check to see if the currentUser is associated with 
+DNS management and return true if they are, false otherwise. The top level 
+application could then use this in a pretty abstract way. For example, if there
+is a generic section of code that allows users to modify a row from a table,
+the same code could be used:
+
+   if($manager->can($currentUser, "change", $thisRecord)) {
+      ...
+   }
+
+The application doesn't have to figure out what thisRecord is...the rules can
+sense them. This allows the top-level application to be written in very
+generic terms, and rules to be written based on the actual logic involved.
+
+A rule might include code like this:
+
+   sub grants
+   {
+      $this = shift;
+      $user = shift;
+      $action = shift;
+      $resource = shift;
+
+      if($action eq "change") {
+         if($resource->isa("DNS::Record")) 
+         {
+            if($resource->getContactEMail() eq $user->getAttribute("email"))
+            {
+               return "permission granted by DNSRule";
+            }
+         }
+      }
+      return 0;
+   }
+
+which would detect the proper types that it knows how to handle, and do a check
+that would indicate if permission is to be granted.
+
+Comments on Rules
+
+How would you make a system that allows everything, unless something is
+specifically denied?
+   Have a GrantAll rule that always grants permission.
+   Add rules that never grant, but deny on specific cases.
+
+How to make a system that denies everything except things that have been
+checked out:
+   Write rules that grant on your specific cases. The default is to deny
+   permission if no rules have anything else to say about the request.
+
+A rule can take several approaches:
+
+Relative rule: It grants but never denies. Or it denies, but never grants.
+
+Absolute rule: If it grants, then it does not deny. If it does not grant, then
+it denies.
+
+Read the manual pages for more information.

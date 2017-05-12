@@ -1,0 +1,9 @@
+Revision history for Perl extension Apache::AxKit::Language::XSP::ESQL.
+
+1.4
+    - Updated to AxKit 1.4 API
+    - Added transactions='no' attribute/option to <esql:driver> tag.
+
+0.01  Sat Feb 10 12:07:06 2001
+	- original version; created by h2xs 1.19
+

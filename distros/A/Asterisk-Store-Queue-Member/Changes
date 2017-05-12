@@ -1,0 +1,6 @@
+Revision history for Perl extension Asterisk::Store::Queue::Member.
+
+0.01  Wed May 16 13:17:52 2007
+	- original version; created by h2xs 1.23 with options
+		-Xn Asterisk::Store::Queue::Member
+

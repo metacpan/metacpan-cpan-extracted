@@ -1,0 +1,38 @@
+#!/opt/perl/bin/perl
+use strict;
+use AnyEvent;
+use AnyEvent::EditText;
+
+# An AnyEvent condition variable, see perldoc AnyEvent
+my $condvar = AnyEvent->condvar;
+
+# Here just a simple periodic timer is generated which will
+# print the ticks to stdout.
+my $cnt = 0;
+my $t;
+my $timer; $timer = sub {
+   $t = AnyEvent->timer (after => 1, cb => sub {
+      print "Tick " . ($cnt++) . "\n";;
+      $timer->();
+   });
+};
+$timer->();
+
+my $content = "This is\nA simple\nExample!\n";
+
+AnyEvent::EditText::set_editor ('rxvt', '-e', 'vim');
+
+# The interesting stuff happens here:
+AnyEvent::EditText::edit ($content, sub {
+   my ($newcontent, $has_changed) = @_;
+
+   if ($has_changed) {
+      print "Content was changed:\n$newcontent";
+   } else {
+      print "No change has been made!\n";
+   }
+
+   $condvar->broadcast;
+});
+
+$condvar->wait;

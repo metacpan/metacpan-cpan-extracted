@@ -1,0 +1,9 @@
+MANIFEST
+Build.PL
+Changes
+README.md
+lib/App/PerlCalc.pm
+pc
+t/basic.t
+t/output.t
+META.yml

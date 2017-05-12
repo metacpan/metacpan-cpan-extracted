@@ -1,0 +1,164 @@
+#! /usr/bin/perl
+#---------------------------------------------------------------------
+# awp2txt
+# Copyright 1996 Christopher J. Madsen
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either the
+# GNU General Public License or the Artistic License for more details.
+#
+# ABSTRACT: Convert AppleWorks word processor files to text files
+#---------------------------------------------------------------------
+
+use 5.006;
+use strict;
+use warnings;
+
+our $VERSION = '0.201'; # VERSION
+# This file is part of AppleII-LibA2 0.201 (September 12, 2015)
+
+foreach my $filename (@ARGV) {
+    die "$filename: not a normal file" unless -f $filename;
+    if (-e "$filename.txt") {
+        print STDERR "$filename.txt already exists, skipping it...\n";
+        next;
+    }
+
+    open(IN, '<', $filename) or die "Can't open `$filename'";
+    binmode IN;
+
+    my $header = '';
+    read(IN,$header,300) == 300 or die "$filename: unexpected end-of-file";
+
+    if (substr($header,4,1) ne "\x4F") {
+        print STDERR "$filename is not an AppleWorks word processor file\n";
+        next;
+    }
+
+    open(OUT, '>', "$filename.txt") or die "Can't write `$filename.txt'";
+
+    print STDERR "Converting $filename to $filename.txt...\n";
+
+    if (substr($header,183,1) ne "\0") {
+        #print STDERR "AppleWorks 3.0 or later\n";
+        seek(IN,2,1);           # Skip over invalid line record (two bytes)
+    }
+
+    my $line = 0;
+
+    while (1) {
+        my $record = '';
+        read(IN,$record,2) == 2 or die "$filename: unexpected end-of-file";
+        my ($byte0, $byte1) = unpack('C2',$record);
+        if ($byte1 == 0xD0) {
+            ++$line;
+            print OUT "\n";     # CR record
+        } elsif ($byte1 > 0xD0) {
+            last if $record eq "\xFF\xFF";
+            next;               # Command record
+        } elsif ($byte1 == 0) {
+            # Text record
+            ++$line;
+            my ($data,$byte2,$byte3) = '';
+            read(IN,$data,$byte1*0x100 + $byte0) or die"$filename: read error";
+            ($byte2,$byte3,$data) = unpack('C2A*',$data);
+            next if $byte2 == 0xFF; # Tab ruler
+            # Untabify & delete special codes:
+            $data =~ tr/\x16\x17\x01-\x1F/  /d;
+            print OUT ' ' x ($byte2 & 0x7F), $data, "\n";
+        } else {
+            die sprintf("%s: unknown record type %02X%02X after line %d",
+                        $filename, $byte0, $byte1, $line);
+        }
+    } # end forever
+
+    close IN;
+    close OUT;
+} # end foreach $filename
+
+__END__
+
+=head1 NAME
+
+awp2txt - Convert AppleWorks word processor files to text files
+
+=head1 VERSION
+
+This document describes version 0.201 of
+awp2txt, released September 12, 2015
+as part of AppleII-LibA2 version 0.201.
+
+=head1 SYNOPSIS
+
+  awp2txt FILE [FILE ...]
+
+=head1 DESCRIPTION
+
+B<awp2txt> converts AppleWorks word processor files to plain text
+files.  For each FILE specified on the command line, it writes the
+contents to FILE.txt.  The original files are not changed.  If
+FILE.txt already exists, it is I<not> overwritten.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+awp2txt requires no configuration files or environment variables.
+
+=head1 DEPENDENCIES
+
+awp2txt is a stand-alone utility.
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+=head1 AUTHOR
+
+Christopher J. Madsen  S<C<< <perl AT cjmweb.net> >>>
+
+Please report any bugs or feature requests
+to S<C<< <bug-AppleII-LibA2 AT rt.cpan.org> >>>
+or through the web interface at
+L<< http://rt.cpan.org/Public/Bug/Report.html?Queue=AppleII-LibA2 >>.
+
+You can follow or contribute to AppleII-LibA2's development at
+L<< https://github.com/madsen/perl-libA2 >>.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut

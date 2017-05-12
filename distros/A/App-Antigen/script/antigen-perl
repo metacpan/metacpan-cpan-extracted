@@ -1,0 +1,148 @@
+#! /usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Spec;
+use App::Antigen;
+use YAML::Tiny;
+
+=head1 NAME
+
+antigen-perl - CLI plugin manager tool for Zsh
+
+=head1 SYNOPSIS
+
+  # In ~/.zsh/config.yml
+  plugins:
+    - github: TBSliver/zsh-theme-steeef
+    - github: TBSliver/zsh-settings-completion
+    - github: TBSliver/zsh-plugin-extract
+    - github: TBSliver/zsh-plugin-colored-man
+    - github: TBSliver/zsh-plugin-tmux-simple
+
+  # Elsewhere, in a shell near you...
+  antigen-perl
+
+  # and in your ~/.zshrc
+  source ~/.antigen-perl/antigen-perl.sh
+
+=head1 COMMANDS
+
+The following commands are available on the command line
+
+=over
+
+=item (arguments)
+
+The first argument is for specifying the config file. If this is not present,
+it will default to ~/.zsh/config.yml:
+
+  # use ~/.zsh/config.yml
+  antigen-perl
+
+  # be verbose
+  antigen-perl ~/.zsh/config.yml
+
+  # use a custom config place
+  antigen-perl ~/.files/zsh/custom.yml
+
+=item -o --output
+
+This defines the directory to which all output files will be put. If this is the
+only extra argument set, then the repos folder and output file will be under
+this directory. This defaults to '~/.antigen-perl'.
+
+=item -r --repo
+
+This defines the directory to which the repos will be put. If this is not
+defined then the directory will be '/repos' under the output directory.
+
+=item -f --output_file
+
+This defines the output file which will contain all the source and fpath calls
+to the various plugins. defaults to 'antigen-perl.sh' under the output directory.
+
+=back
+
+=head1 CONFIG
+
+The config file can contain all of the following sections, although MUST
+contain a 'plugin' section. This file is currently in YAML format, although
+this may change in the future - although will likely be compatible with YAML
+and more.
+
+=over
+
+=item plugins
+
+This section is mandatory, although using a plugin manager without specifying
+any plugins is sort of a silly idea, isnt it? this section also defines how the
+plugin is stored - currently this only supports github, but it only needs the
+username and repository name as shown below
+
+  plugins:
+    - github: TBSliver/zsh-theme-steeef
+    - github: TBSliver/zsh-settings-completion
+    - github: TBSliver/zsh-plugin-extract
+    - github: TBSliver/zsh-plugin-colored-man
+    - github: TBSliver/zsh-plugin-tmux-simple
+
+=item output
+
+This is the same option as is available with the command line, and specifies
+the folder into which you can put all the repositories. To define it, set it as
+follows
+
+  output: /path/to/folder
+
+This is optional, and if not set will default to '~/.antigen-perl'
+
+=item repo
+
+This is the same as is available with the command line, and specifies the
+directory to which the repositories will be cloned. It can be set as follows
+
+  repo: /path/to/folder
+
+Note that if this is set, it will not be put inside the output folder, but to
+the absolute path you pass to it.
+
+=item output_file
+
+This is the same as the option available on the command line, and specifies the
+filename for the list of plugins to be 'sourced' inside. Set it as follows
+
+  output_file: /path/to/file.sh
+
+This is also the file which the application will tell you to source in your
+~/.zshrc file.
+
+=back
+
+=head1 AUTHOR
+
+Tom Bloor E<lt>tom.bloor@googlemail.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2014- Tom Bloor
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<App::Antigen>, L<MooX::Options>
+
+=cut
+
+my $config_filename = $ARGV[0] || File::Spec->catfile( $ENV{HOME}, '.zsh', 'config.yml' );
+
+my $config = YAML::Tiny->read( $config_filename )->[0];
+
+my $app = App::Antigen->new_with_options( %$config );
+
+$app->run;

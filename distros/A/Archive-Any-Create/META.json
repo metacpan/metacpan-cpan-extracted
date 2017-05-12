@@ -1,0 +1,70 @@
+{
+   "abstract" : "Abstract API to create archives (tar.gz and zip)",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Archive-Any-Create",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "Archive::Zip" : "0",
+            "Exception::Class" : "0",
+            "IO::Zlib" : "0",
+            "UNIVERSAL::require" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.90"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/miyagawa/Archive-Any-Create/issues"
+      },
+      "homepage" : "https://github.com/miyagawa/Archive-Any-Create",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/miyagawa/Archive-Any-Create.git",
+         "web" : "https://github.com/miyagawa/Archive-Any-Create"
+      }
+   },
+   "version" : "0.03",
+   "x_contributors" : [
+      "Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>",
+      "miyagawa <miyagawa@65690182-5df0-0310-9871-95da5a3706e7>"
+   ]
+}
+

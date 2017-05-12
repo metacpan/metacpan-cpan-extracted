@@ -1,0 +1,126 @@
+Revision history for AnyEvent::IRC
+
+0.97    Sun Mar 17 19:20:30 CET 2013
+        - corrected minor spelling fixes thanks to an rt patch.
+        - fixed AnyEvent::IRC::Connection::is_connected to actually return true
+          when connected.
+        - AE::IRC::Client::connect can now also connect only with a timeout without
+          having to register.
+        - Server reply of 001 is now also considered as "successfully registered".
+          Thanks for Lee to spot this.
+        - "quit" event gets the right parameter from the message now. Thanks to Lee!
+
+0.96    Tue Mar  1 08:23:09 CET 2011
+        - fixed pod in AE::IRC::Util.
+        - applied patches from tokuhirom for the kick event.
+        - small fix in anymsg_cb.
+        - fixed documentation problems, for example w.r.t. channel_change.
+        - added "support" for broken IRC servers, which send multiple
+          carriage returns on line endings.
+
+0.95    Thu Nov  5 00:15:55 CET 2009
+        - added away_status method and events for tracking your away status.
+        - implemented send_long_message.
+        - added send_initial_whois option to ::Client constructor.
+        - added dependency to Encode.
+        - fixed a bug in ident handling, it now also detects nick changes.
+
+0.9     Mon Sep 28 14:51:29 CEST 2009
+        - made AnyEvent::IRC::Client connection object reusable.
+        - documented that the 'heap' member of the AE::IRC::* objects
+          can be used to store any data.
+
+0.81    Mon Aug 10 09:43:29 CEST 2009
+        - fixed some sample scripts.
+        - added 'common::sense' to all the scripts and module files.
+
+0.8     Fri Jun 26 15:29:06 CEST 2009
+        - added enable_ssl to AnyEvent::IRC::Connection to enable
+          TLS handshake after TCP connect.
+        - added send event for hooking into sending a message.
+        - Implemented DCC in AnyEvent::IRC::Client.
+        - Implemented the DCC CHAT protocol.
+        - fixed bug in AnyEvent::IRC::Client::nick_modes.
+        - added dcc chat test.
+
+0.7     Wed Jan 21 20:46:39 CET 2009
+        - removed autocork hack, as AnyEvent ignores SIGPIPE now.
+        - removed maintainer tests from distribution.
+        - removed JSON dependency.
+
+0.6     Tue Sep 23 14:41:43 CEST 2008
+        - deprecated Net::IRC3, use this module in future!
+        - connect is done non blocking
+        - major semantic change: you can't reuse a connection object,
+          after the 'disconnect' event has been issued you have to recreate
+          it and reconnect the new object. All event handlers are cleared
+          after the 'disconnect' event has been issued too.
+        - major api change for channel_add and channel_remove
+        - added CTCP support
+        - implemented automatic pinging (on user request)
+          see Net::IRC3::Client::Connection::enable_ping
+        - Changed mk_msg, send_msg and send_srv and parse_irc_msg considerably,
+          no reversed arguments anymore!
+        - Added support for ISUPPORT and CASEMAPPING
+	- Renamed from Net::IRC3 to AnyEvent::IRC
+        - Using Object::Event, AnyEvent::Socket and AnyEvent::Handle
+        - added buffer_empty event, to detect when the write buffer is empty.
+        - changed send_msg() in that way that the prefix can't be given anymore,
+          as AnyEvent::IRC is specialized on clients anyway.
+        - Renamed AnyEvent::IRC::Client::Connection to AnyEvent::IRC::Client
+        - Implemented prefix<=>mode mapping for nicks
+        - Added test utility module and first automated connect test
+        - Added debug_console example
+        - Added mode tracking for users on channels, with NAMESX support
+        - channel_list() now also optionally accepts the channel as first argument
+        - the connect method of AnyEvent::IRC::Client now accepts an additional parameter
+          where you can pass the register information for automatic registration.
+        - the 'registered' event is now only emitted when the irc
+          commands 376 or 422 have been seen.
+        - added ctcp_auto_reply() method to AnyEvent::IRC::Client interface.
+        - Util::mk_msg does NOT append "\015\012" anymore.
+        - send_srv queue is now flushed in an event callback.
+
+0.5     Sun Mar 11 23:54:10 CET 2007
+        - added server password support
+        - fixed a bug with nick-changing
+        - added topic support
+        - fixed problem in prefix matching
+        - fixed a bug where channel_add was called with already
+          joined nicks, these duplicates are now prevented.
+        - found a bug in prefix_host with the tests
+        - added some tests
+        - disconnect now also does send channel_add/remove events
+        - enhanced connection handling a bit
+        - added connect and connect_error events to Net::IRC3::Connection
+        - fixed a bug where too many channel_remove events were generated on QUIT
+        - fixed case handling with channels
+        - added functionality to change the nick automatically
+          when it is already taken when registering an IRC connection.
+          (Net::IRC3::Client::Connection)
+        - added reply number <=> reply name mapping to Net::IRC3::Util
+          accessible through rfc_code_to_name
+        - added error event to Net::IRC3::Client::Connection
+        - fixed bugs in nick handling and added support for the NICK
+          change command in Net::IRC3::Client::Connection
+        - Net::IRC3::Client::Connection->channel_list now returns channel and nick
+          information in the servers cAsE.
+        - fixed a bug in send_srv and send_chan where messages
+          could have been sent twice.
+
+0.4     Tue Nov 28 17:13:01 CET 2006
+        - fixed broken PONG reply before 001
+        - made channel_list return an empty hash instead undef when no channel is joined
+
+0.3     Mon Jul 17 13:43:13 UTC 2006
+        - Refactored the code: Remove Client.pm, and make the connections
+          to standalone objects.
+        - Added nickname tracing for channels
+
+0.2     Sun Jul 16 12:58:06 CEST 2006
+        - Code got a little bit refactored and wrote documentation.
+          It seems ready for a first release.
+
+0.1     Sat Jul 15 23:46:49 UTC 2006
+        - First version, released on an unsuspecting world.
+

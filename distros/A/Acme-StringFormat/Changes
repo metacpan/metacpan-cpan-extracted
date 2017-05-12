@@ -1,0 +1,18 @@
+Revision history for Acme-StringFormat
+
+0.04 Fri Aug 22 16:51:48 2008
+	- fix some bugs
+	- improve efficiency
+	- add examples in other languages (C++, Ruby, Python)
+
+0.03 Tue Aug 12 11:34:23 2008
+	- update Module::Install
+	- use PERL_NO_GET_CONTEXT for efficiency
+
+0.02 Wed Jul 23 15:35:51 2008
+	- fix to work with overloaded right-hand operand
+	- fix to work with tainted left-hand operand
+
+0.01  Fri Jul 18 15:09:37 2008
+	- original version; created by Module::Starter
+

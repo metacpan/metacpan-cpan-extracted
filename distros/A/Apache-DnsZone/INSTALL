@@ -1,0 +1,177 @@
+Before you install DnsZone you should be sure to have your database of 
+choice ready. You probably want to have a special user for the database.
+
+It's advisable to read the SECURITY notes in the distribution. 
+
+You need a running Apache/mod_perl server compiled with all the bells and
+whistles. I normally do this something like this:
+Get the latest mod_perl from http://perl.apache.org/dist/
+Get the latest apache from http://httpd.apache.org/dist/httpd/
+(This assumes Apache 1.3.20 and mod_perl 1.25)
+$ tar -zxf apache_1.3.20.tar.gz
+$ tar -zxf mod_perl-1.25.tar.gz
+$ cd mod_perl-1.25.tar.gz
+$ perl Makefile.PL \
+    DO_HTTPD=1 \
+    APACHE_SRC=../apache_1.3.20 \
+    USE_APACI=1 \
+    EVERYTHING=1 \
+    APACHE_PREFIX=/usr/local/modperl
+$ make
+$ make test
+$ make install
+
+That should get your mod_perl running.
+
+Recommended modules to install before installing DnsZone: Bundle::Apache,
+Apache::Request, Apache::AuthCookie, Apache::AuthTicket, Net::DNS,'
+CGI::FastTemplate, Email::Valid, Bundle::ABH.
+
+You might be forced to download Apache::Request 0.3103 by hand and
+install it, the package is available from:
+http://www.cpan.org/authors/id/J/JI/JIMW/libapreq-0.31_03.tar.gz
+
+To install DnsZone:
+
+$ perl Makefile.PL
+$ make
+$ make install
+
+To create the language dbm file you type:
+
+$ make language
+create a directory called dnszone under your apache installation
+$ cp lang/DnsZoneLang /path/to/your/apache/dnszone
+If you experience problems with the dbm file it could be a permission
+issue, so a chmod 666 DnsZoneLang might come handy.
+
+To install the templates:
+
+create a directory under the dnszone directory in your apache 
+installation called 'template'.
+$ cp -R templates/standard/* /path/to/your/apache/dnszone/template
+
+After DnsZone is installed you need to activate it by adding some 
+directives to your Apache configuration files (sample configuration 
+also available as conf/dnszone.conf): 
+
+PerlModule Apache::DBI 
+# for persistant connections
+PerlModule Apache::DnsZone
+PerlModule Apache::DnsZone::DB::MySQL 
+# or your db of choice
+
+<VirtualHost [your.ip]>
+  ServerAdmin  you@yourdomain
+  DocumentRoot /usr/local/modperl/htdocs
+  ServerName   dnszone.at.yourdomain
+  ErrorLog     logs/dnszone-error_log
+  TransferLog  logs/dnszone-access_log
+  PerlSetVar   DnsZoneDBsrc               'dbi:mysql:dnszone'
+  PerlSetVar   DnsZoneDBuser              'dnszone'
+  PerlSetVar   DnsZoneDBpass              '*******'
+  PerlSetVar   DnsZoneDebugLevel          1
+  PerlSetVar   DnsZoneLangDir             '/usr/local/modperl/dnszone'
+  PerlSetVar   DnsZoneTemplateDir         '/usr/local/modperl/dnszone/template'
+  PerlSetVar   DnsZoneLoginLang           'en'
+  # or 'de' 'se' 'dk' 'fr' 'it' 
+  # DnsZoneLoginLang is used if the browser doesn't send an 'Accept-Language' header and the language isn't in DnsZone already
+  PerlModule   Apache::DnsZone::AuthCookie
+  PerlSetVar   DnsZoneTicketTable         'tickets:ticket_hash:ts'
+  PerlSetVar   DnsZoneTicketUserTable     'users:username:password'
+  PerlSetVar   DnsZoneTicketPasswordStyle cleartext
+  PerlSetVar   DnsZoneTicketSecretTable   'ticketsecrets:sec_data:sec_version'
+  PerlSetVar   DnsZoneTicketExpires       60
+  PerlSetVar   DnsZoneTicketLogoutURI     /
+  PerlSetVar   DnsZoneTicketLoginHandler  /login
+  PerlSetVar   DnsZoneTicketIdleTimeout   10
+  PerlSetVar   DnsZonePath                /
+  PerlSetVar   DnsZoneLoginScript         /loginform
+  <Location /admin>
+    SetHandler        perl-script
+    PerlHandler       Apache::DnsZone
+    AuthType          Apache::DnsZone::AuthCookie
+    AuthName          DnsZone
+    PerlAuthenHandler Apache::DnsZone::AuthCookie->authenticate
+    PerlAuthzHandler  Apache::DnsZone::AuthCookie->authorize
+  </Location>
+  <Location /loginform>
+    SetHandler        perl-script
+    Perlhandler       Apache::DnsZone::AuthCookie->login_screen
+    AuthType          Apache::DnsZone::AuthCookie
+    AuthName          DnsZone
+  </Location>
+  <Location /login>
+    SetHandler        perl-script
+    PerlHandler       Apache::DnsZone::AuthCookie->login
+    AuthType          Apache::DnsZone::AuthCookie
+    AuthName          DnsZone
+  </Location>
+</VirtualHost>
+
+Copy the contents of htdocs/ to /path/to/your/apache/htdocs
+
+$ cp -R htdocs/* /path/to/your/apache/htdocs
+
+Now you need to import the tables that DnsZone needs into your database.
+
+for mysql:
+
+$ mysql -udnszone -p dnszone < sql/mysql.sql
+
+Before you can start using DnsZone you need to set your nameserver to
+allow transfers and updates on the domain you want to make changes to 
+through DnsZone.
+
+In named.conf:
+
+zone "example.com" {
+	type master;
+	allow-transfer { 127.0.0.1; your.ip; };
+   	allow-update { your.ip; };
+        file "example.com";
+};
+
+To create a new user in DnsZone:
+
+$ cd bin/mysql
+$ perl adduser.pl
+Username to add: test
+Password for test:
+Password again:
+Users email: test@example.com
+Language: en
+test(test@example.com:en) added...
+
+To add a domain to the user:
+
+$ perl addzone.pl
+Domain for inserting into DnsZone: example.com
+User to add example.com for: test
+From which nameserver do you want to transfer the zone for example.com: yourname.server
+Performing Zone transfer...
+Which restrictions do you want to place on the user:
+How many A records can he have: 10
+How many CNAME records can he have: 10
+How many MX records can he have: 10
+How many NS records can he have: 10
+How many TXT records can he have: 10
+Do you want the SOA to be locked (n):
+Inserting records into db...
+NS: example.com yourname.server 86400
+Do you want this record to be locked (n): y
+MX: example.com mail.example.com 10 86400
+Do you want this record to be locked (n):
+A: mail.example.com 192.168.1.1 86400
+Do you want this record to be locked (n): 
+example.com succesfully imported
+
+You should now be set for accessing the webinterface, fire up your
+favorite browser and point it to the host you created in apache.
+
+If the software is complaining about missing modules you need to 
+install those.
+
+If you encounter any bugs please report them so they can be fixed.
+
+

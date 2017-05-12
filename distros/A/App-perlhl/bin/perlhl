@@ -1,0 +1,142 @@
+#!/usr/bin/env perl
+package perlhl;
+use strict;
+use warnings;
+use v5.10.1;
+use App::perlhl;
+use Getopt::Long;
+use Pod::Usage;
+
+# ABSTRACT: command-line syntax highlighter for Perl source code
+our $VERSION = '0.007'; # VERSION
+
+my %opts = ();
+GetOptions( \%opts,
+    'help|?',
+    'version',
+    'html',
+);
+
+pod2usage(
+    -verbose => 2,
+) if $opts{help};
+
+
+if (delete $opts{version}) {
+    my $this = __PACKAGE__;
+    my $this_ver = (defined __PACKAGE__->VERSION ? __PACKAGE__->VERSION : 'dev');
+    say "$this version $this_ver" and exit;
+}
+
+my $mode    = delete $opts{version} ? 'version' : 'highlight';
+my $output  = delete $opts{html}    ? 'html'    : 'ansi';
+
+App::perlhl->new($output)->run($mode, @ARGV);
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+perlhl - command-line syntax highlighter for Perl source code
+
+=head1 VERSION
+
+version 0.007
+
+=head1 SYNOPSIS
+
+    perlhl < bin/perlhl | less -R
+    perlhl bin/perlhl lib/App/perlhl.pm
+
+=head1 DESCRIPTION
+
+B<perlhl> is a command line syntax highlighter for Perl code.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help>, -h, -?
+
+Opens this man page and exits.
+
+=item B<--version>
+
+Prints the version of this program and supporting libraries.
+
+=item B<--html>
+
+Output HMTL fragment instead of ANSI terminal escapes.
+
+=back
+
+=head1 USE
+
+Provide input on stdin to B<perlhl> to highlight it to stdout with ANSI colour
+escapes.
+
+    perlhl < script.pl
+
+It is not recommended to provide multiple files on stdout, since they'll be
+concatenated. This makes it impossible to know where one ends and the next
+begins, and will yield inferior syntax highlighting results. To highlight
+multiple files, provide filenames on the command line:
+
+    perlhl lib/My/Module.pm lib/My/Module/Again.pm
+
+Provide the B<--html> option to output an HTML fragment. In
+the future, this option might print a whole valid document.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Syntax::Highlight::Perl::Improved>
+
+=item * L<Term::ANSIColor>
+
+=item * L<Text::Highlight>
+
+=back
+
+There is a one-liner that can do something comparable:
+
+    perl -MText::Highlight -E 'my $h = Text::Highlight->new(ansi => 1);
+    > my $text = do { local $/; open my $fh, "<", $ARGV[0]; <$fh> };
+    > say $h->highlight("Perl", $text);
+    > ' bin/perlhl
+
+=head1 AVAILABILITY
+
+The project homepage is L<http://metacpan.org/release/App-perlhl/>.
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<https://metacpan.org/module/App::perlhl/>.
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/doherty/App-perlhl>
+and may be cloned from L<git://github.com/doherty/App-perlhl.git>
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://github.com/doherty/App-perlhl/issues>.
+
+=head1 AUTHOR
+
+Mike Doherty <doherty@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Mike Doherty.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

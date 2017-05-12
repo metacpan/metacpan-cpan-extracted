@@ -1,0 +1,16 @@
+---
+name: Acme-Dot
+version: 1.10
+author:
+  - Curtis "Ovid" Poe <ovid@cpan.org>
+abstract: Call methods with the dot operator
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0.6
+provides:
+  Acme::Dot:
+    file: lib/Acme/Dot.pm
+    version: 1.10
+generated_by: Module::Build version 0.2702

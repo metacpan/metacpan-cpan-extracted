@@ -1,0 +1,90 @@
+commit 6ff4a305fdc3f10a0da6a8c297973cd0432363af (HEAD, master)
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Mar 3 14:31:25 2010 +0100
+
+    CHANGED: bumped version
+
+commit 1302ba350aaefe2babf0fc1757c45f934932fa7a
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Feb 15 13:12:17 2009 +0100
+
+    FIXED: removed dependency on Package::Generator
+
+commit 31250a458837cc5d5eb1b69329c08e38271f45ba
+Author: nadim khemir <nkh@cpan.org>
+Date:   Fri Feb 13 11:03:38 2009 +0100
+
+    CHANGED: format of the information displayed to user
+
+commit 2fa43fcc87ef984c86682a2d59fad3fa6a40c202
+Author: nadim khemir <nkh@cpan.org>
+Date:   Fri Feb 13 10:39:57 2009 +0100
+
+    FIXED: initialized variables before using them
+
+commit 3e7138c1bae12240cc60e13035383b1d67eede2e
+Author: nadim khemir <nkh@cpan.org>
+Date:   Fri Feb 13 10:21:49 2009 +0100
+
+    CHANGED: removed extremely short frame handling for smoother replay
+
+commit d87e21a7ad503b2c2c764c75b1cdbbe502c0e9c9
+Author: nadim khemir <nkh@cpan.org>
+Date:   Thu Feb 12 00:31:07 2009 +0100
+
+    ADDED: some documentationt to the VT102 subroutines
+
+commit f3ef2ec1f9765e9896829a3418e9a0630dc4bd85
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Feb 11 23:26:39 2009 +0100
+
+    FIXED: PBP warnings
+
+commit c04f0e12b9deaeb08b50a0f77063e1556d0f6bea
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Feb 11 21:35:13 2009 +0100
+
+    CHANGED: status is displayed at the bottom of the textcast
+
+commit a8522c3756917b875298e94257587d018220160c
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Feb 11 20:59:50 2009 +0100
+
+    ADDED: sub documentation
+    CHANGED: call croak instead for exit
+
+commit b2412f6dca87e3452fe95421312322d8ee047463
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Feb 9 22:14:24 2009 +0100
+
+    CHANGED: moved code from scripts to module
+
+commit d503d3b35f7dbb1cfff4904ac00e119f461f474c
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Feb 8 01:54:46 2009 +0100
+
+    FIXED: Build.pm error
+
+commit 7a32051e81eed2d4a7c080d4b05892e520436435
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Feb 8 01:47:02 2009 +0100
+
+    CHANGED: more VT code refactoring
+
+commit 0190dfb7d99c18b45a9cd00414bbb5f45e5756bf
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Feb 8 00:41:14 2009 +0100
+
+    CHANGED: refactored VT code
+
+commit 2ee5c83a360f533cd1ba45f12b5efb6223dd283d
+Author: nadim khemir <nkh@cpan.org>
+Date:   Fri Feb 6 15:17:08 2009 +0100
+
+    ADDED: taint mode
+
+commit 0cfc88ef397432ff98535fc5ff29809c143f1f6a
+Author: nadim khemir <nkh@cpan.org>
+Date:   Tue Feb 3 13:09:58 2009 +0100
+
+    ADDED: Initial commit

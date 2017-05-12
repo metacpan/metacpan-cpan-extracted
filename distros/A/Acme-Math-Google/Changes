@@ -1,0 +1,13 @@
+#
+# Revision history for Perl extension Acme::Math::Google.
+# 
+$Revision: 0.2 $ $Date: 2006/05/20 01:54:58 $
+! lib/Acme/Math/Google.pm
+  Mentioned WWW::Google::Calculator.
+  Darn! why do I keep reinventing wheels?
+  My wheel is lighter, though.
+
+0.01  Sat May 20 10:02:46 2006
+	- original version; created by h2xs 1.23 with options
+		-XA Acme::Math::Google
+

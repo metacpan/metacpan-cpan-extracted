@@ -1,0 +1,4 @@
+---
+readme: "Place the .vpk file in your custom directory (<steam root>/SteamApps/common/Team Fortress 2/tf/custom/)"
+sort_order: [Scout, Soldier, Pyro, Demoman, Heavy, Engineer, Medic, Sniper, Spy, Sounds, Model]
+dir: work

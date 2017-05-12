@@ -1,0 +1,34 @@
+---
+abstract: unknown
+author:
+  - "æ\x89¶å\x87¯ <iakuf@163.com>"
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  HTTP::Server::Simple::CGI: '0'
+  Test::More: '0'
+  Test::TCP: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-MultiDownload
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AE: '0'
+  AnyEvent::Digest: v0.0.5
+  AnyEvent::HTTP: '2.21'
+  Asset::File: '0'
+  EV: '0'
+  List::Util: '0'
+  Moo: '0'
+  Test::More: '0'
+resources:
+  repository: https://github.com/iakuf/anyevent-multidownload
+version: '1.13'

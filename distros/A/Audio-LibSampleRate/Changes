@@ -1,0 +1,11 @@
+Revision history for Perl extension Audio::LibSampleRate.
+
+0.002001 2016-12-25T14:04+02:00
+ - Fix incorrect INC in Makefile.PL
+
+0.002 2016-12-24T20:43+02:00
+ - Bundle libsamplerate
+ - Relicense from GPL to Perl license
+
+0.001 2015-08-31T17:50+03:00
+ - Initial release

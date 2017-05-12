@@ -1,0 +1,17 @@
+lib/Array/Each/Override.pm
+Override.xs
+Changes
+MANIFEST
+Makefile.PL
+README
+t/01_load.t
+t/02_basic.t
+t/03_reset.t
+t/04_import.t
+t/05_hash.t
+t/06_leak.t
+t/98_pod.t
+t/99_pod_coverage.t
+benchmark.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,333 @@
+Revision history for Perl extension App::Info.
+
+0.57  2011-06-19T06:14:46
+      - Removed `Makefile.PL`. It used Module::Build internally, which is
+        deprecated.
+      - Moved repository to [GitHub](https://github.com/theory/app-info/).
+      - Added repository and bug reporting metadata.
+
+0.56  2011-02-22T21:02:39
+      - Added `cgibin_physical()` and `cgibin_virtual()` to
+        SVN::Notify::HTTPD::Apache. Patch from Martin Thurn.
+      - Removed some superfluous `use Config;`s.
+      - Added workaround for a bizarre crash when accessing `%Config` via
+        `grep` on ActivePerl
+        ([bug](http://bugs.activestate.com/show_bug.cgi?id=89447)). Thanks to
+        Christian Walde for the analysis.
+      - Fixed warning in `t/apache_info.t`.
+
+0.55  2008-07-18T16:18:12
+      - Fixed some test failures on Windows boxes with PostgreSQL installed.
+        Patch from Taro Nishino.
+
+0.54  2008-05-18T04:01:50
+      - Added the doc_root() method to App::Info::HTTPD::Apache. Patch
+        from Martin Thurn.
+      - Added an undistributed spell-checking test, which means that the
+        documentation has many fewer spelling errors.
+
+0.53  2008-05-05T17:47:18
+      - Added the "configure_requires" and "build_requires" parameters to
+        Build.PL.
+      - Updated Copyright.
+
+0.52  2007-08-13T18:24:54
+      - Fixed test failures on Win32 in 't/util.t.' Reported by Alex Chorny
+        via the cpan-testers mail list.
+      - Fixed test failure in 't/util.t' for those who happen to have an
+        INTERCAL compiler installed. Reported by David Cantrell.
+
+0.51  2006-09-25T17:52:53
+      - Really fixed the unsorted test failure by putting the sort in the
+        right place.
+      - The code that creates the 't/scripts' directory now runs during the
+        'code' action rather than the 'build' action, allowing the tests to
+        run properly when the 'build' action has not been run. Reported By
+        Alex Chorny (Ticket # 21281).
+      - Fixed test failures under bleedperl where Carp was not properly
+        loaded. Reported by Andreas Koenig (Ticket # 21641).
+      - "OS-Dependent" skipped tests in 't/util.t' are no longer OS dependent
+        or skipped.
+
+0.50  2006-09-15T23:52:17
+      - Fixed test failures due to lack of sorting of files and directories
+        returned by files_in_dir() on some platforms.
+      - Fixed documentation in App::Info::HTTPD::Apache so that a line of hash
+        symbols (#s) doesn't show up in the docs. This actually created an
+        error in man pages. Reported by Nacho Barrientos.
+
+0.49  2006-04-08T05:35:31
+      - Fixed typos in App::Info::HTTPD::Apache.
+      - Changed keys for Apache executables such as apxs from, e.g., "apache
+        apxs" to "path to apxs".
+      - Added the value returned by Apache2::BuildConfig->new->{APXS_BINDIR},
+        if Apache2::Build config is installed, to the list of bin directories
+        returned by search_bin_dirs() in App::Info::HTTPD::Apache.
+      - Added "httpd2" to the list of names returned by search_exe_names() in
+        App::Info::HTTPD::Apache.
+      - Fixed tests in t/apache_info.t to pass on Windows.
+
+0.48  2006-02-05T03:09:38
+      - Added support for Apache2 to App::Info::HTTPD::Apache.
+      - Added files_in_dir() method to App::Info::Util to get a list of all of
+        the files in a directory.
+      - Added shared_mods() method to App::Info::HTTPD::Apache for getting a
+        list of shared object libraries compiled for Apache.
+      - The mod_perl() method of App::Info::HTTPD::Apache now also checks the
+        shared object libraries to determine whether mod_perl is supported by
+        the installed Apache.
+      - Corrected some documentation pastos in App::Info::Lib::OSSPUUID.
+      - Added perl_module() method to App::Info::Lib::OSSPUUID, since the OSSP
+        library might be installed, but not OSSP::uuid.
+
+0.47  2005-12-05T22:56:12
+      - Fixed "use lib" line in Makefile.PL caused by a bug in Module::Build.
+
+0.46  2005-12-05T22:43:20
+      - Added App::Info::Lib::OSSPUUID for information about the OSSP
+        UUID library.
+
+0.45  2005-11-08T05:57:05
+      - Added "key" attribute to handler request objects.
+      - Changed the handler key names for each subclass to more command-line
+        friendly versions, such as "path to httpd" instead of just
+        "executable". Just `tr/ /-/` to make them into command-line options.
+
+0.44  2005-01-08T00:29:03
+      - Yet another fix for test failures on Win32, this time for PostgreSQL.
+      - Fixed SQLite tests for DBD::SQLite (which is used to collect
+        informationto when the SQLite executable can't be found) work
+        properly.
+      - Added workaround for strange bug on Perl 5.005_04 where handlers
+        assigned to an App::Info object after its creation would be
+        prompty forgotten. Reported by Yuval Kogman, who also gave me
+        a login to a server with Perl 5.005_04 to fix the problem.
+
+0.43  2004-12-14T19:45:52
+      - Added "search_*_name" parameters and methods for searching for
+        PostgreSQL and Apache executables other than the main one,
+        which is already handed by "search_exe_names".
+      - Fixed "apache.t", "iconv.t", "postgres.t", and "sqlite3.t" tests
+        on Win32.
+
+0.42  2004-12-07T00:40:53
+      - Fixed last Win32 test failure in "apache.t".
+      - Added "executable()" method to return the main executable of an app or
+        library, if there is one.
+      - Added other executable methods to App::Info::RDBMS::PostgreSQL,
+        including "postgres()", "createdb()", "createuser()", and others.
+      - Added other executable methods to App::Info::HTTPD::Apache,
+        including "ab()", "apachectl()", "apxs()", and others.
+      - Changed behavior of App::Info::HTTPD::Apache->bin_dir to just return
+        the name of the directory in which the httpd executable is stored,
+        rather than a possible "bin" directory under the httpd_root.
+
+0.41  2004-11-28T20:01:57
+      - Fixed Apache, SQLite, and Iconv tests to pass under Win32.
+      - Fixed "bin_dir()" method for Apache module to return the same
+        directory as "httpd_root()" on Win32.
+
+0.40  2004-11-27T19:45:01
+      - Eliminated "Odd number of elements in hash assignment" warning when
+        creating an App::Info::Handler::Prompt object.
+      - Changed SQLite event messages to simply refer to "SQLite" instead
+        of "sqlite3 or sqlite".
+      - Added new parameters to "new()", along with accompanying accessors to
+        collect their values: "search_exe_names", "search_bin_dirs",
+        "search_lib_names", "search_so_lib_names", search_lib_dirs",
+        "search_inc_names", and "search_inc_dirs". These are array references,
+        and their values are used to search for application files on the local
+        file system. Users can now override the directories ande files that
+        the classes search for with their own values. Subclasses override the
+        accessor methods to provide such values.
+      - Updated subclases to use the new "search" methods.
+      - Added "search_conf_names" and "search_conf_dirs" parameters and
+        methods to App::Info::HTTPD::Apache to allow users to affect the
+        file names paths used to search for Apache configuration files.
+      - Added support for finding iconv on Win32.
+
+0.30  2004-11-20T19:10:55
+      - Fixed number of tests to skip in "sqlite_info.t" for systems that
+        don't have SQLite installed. Reported by numerous CPAN testers.
+      - Fixed carp.t to be compatable with older Perls.
+      - Added new C<lib_dirs()> method to App::Info::Util to centrally handle
+        the parsing and returning of typical library directories as defined by
+        the "libsdirs" and "loclibpth" Config settings.
+      - Added /sw/lib to the list of library diretories to search for
+        SQLite libraries.
+      - Only loading DBI in App::Info::RDBMS::SQLite if a version of
+        DBD::SQLite is known to be installed, rather than at compile
+        time.
+      - Fixed tests in sqlite_info.t to work properly on Windows.
+
+0.29  2004-11-20T00:09:22
+      - Added App::Info::RDBMS::SQLite to the MANIFEST so that it will
+        actually show up in the distribution!
+
+0.28  2004-11-19T23:35:25
+      - Added App::Info::RDBMS::SQLite.
+
+0.27  2004-11-19T02:27:50
+      - Now using quotes when passing an executable path to `` in the
+        Apache and PostgreSQL libraries so that they work properly when
+        there are spaces in the path (such as on Windows). Reported by
+        Geoff Richards.
+      - Added "configure()" method to the PostgreSQL library. From the
+        DBD::Pg project.
+      - Added Windows support to the PostgreSQL module.
+
+0.26  2004-11-03T17:53:58
+      - Added new path to list of paths to search for PostgreSQL. The new
+        path, /usr/lib/postgresql/bin, is used by at least one Debian package.
+        Submitted by Cinly Ooi.
+      - Added support for Apache on Windows. Patch from Ron Savage.
+
+0.25  Thu Dec 11 20:50:43 2004
+      - Fixed parsing of version numbers for new releases of PostgreSQL,
+        which don't include the ".0" patch version in their version numbers.
+
+0.24  Tue Aug 26 00:58:55 2004
+      - Fixed broken link in App::Info::Request documentation.
+      - Added PostgreSQL environment variables to the paths to search
+        for pg_config in App::Info::RDBMS::PostgreSQL. Patch from
+        Greg Sabino Mullane.
+      - Added handling of PostgreSQL beta version numbers to
+        App::Info::RDBMS::PostgreSQL. Patch from Greg Sabino Mullane.
+      - Switched to Module::Build.
+
+0.23  Thu Aug  8 19:32:42 2002
+      - Fixed tests that check Apache info events so that they're more
+        flexible about the name of the Apache executable. Thanks to Dave
+        Rolsky for the spot.
+      - Fixed "NAME" section in App::Info::Request so that it has the right
+        name and therefore renders properly on search.cpan.org.
+      - Updated or added "BUGS" section of documentation in all modules to
+        point to the CPAN Request Tracker.
+
+0.22  Wed Jul  3 17:31:53 2002
+      - Fixed tests that use Handler::Prompt so that they fake it into
+        always thinking there's a TTY.
+
+0.21  Tue Jul  2 19:14:44 2002
+      - Fixed bug in Handler::Prompt where the prompt failed to simply
+        return when the user accepted the default value (with confirm
+        events).
+      - Changed email address in AUTHOR section so that it's a link.
+      - Added tests for confirm events.
+
+0.20  Thu Jun 27 20:28:34 2002
+      - Major upgrade. Some backwards compatibility broken. Namely, the
+        error parameter no longer exists. See event handling instead.
+      - Added App::Info::Handler. Classes derived from this class handle
+        events triggered by App::Info subclasses.      
+      - Added event handling methods to App::Info base class. The methods
+        are on_info(), on_error(), on_unknown(), and on_confirm(). They
+        have constructor parameters, too, of the same names. Pass in a
+        list of event handlers to any one of these methods to handle
+        events of that type.
+      - Added example event handling classes. They are
+        App::Info::Handler::Carp, App::Info::Handler::Print, and
+        App::Info::Handler::Prompt. Objects of these classes may be passed
+        to any of the event handling methods listed above.
+      - Added App::Info::Request. Objects of this class are passed to event
+        handler objects' handler() method as the sole argument. The request
+        object holds significant information about the request so that a
+        handler knows what to do with a a request.
+      - Added protected event triggering methods to App::Info. These are
+        info(), error(), unknown(), and confirm(). If a subclass calls one
+        of these methods, a request will be created and passed off to the
+        list of available handlers (if any) to process the request and,
+        in the case of unknown() and confirm(), return data to the App::Info
+        subclass.
+      - Refactored example subclasses to use the new event methods. Changed
+        subclasses are App::Info::HTTPD::Apache, App::Info::RDBMS::PostgreSQL,
+        App::Info::Lib::Expat, and App::Info::Lib::Iconv.
+      - Wrote extensive documentation describing how to use the event methods
+        both in App::Info subclasses and in App::Info clients.
+      - Incremented all version numbers to 0.20.
+      - Wrote extensive tests to test all features.
+
+0.13  Sat Jun  8 21:17:40 2002
+      - Fixed Lib::Iconv so that version() would properly return undef when
+        no include directory was found.
+
+0.12  Sat Jun  8 20:32:38 2002
+      - Now more silly-proof! Fixed util.t test so that people who actually
+        have directories named, e.g., "/foo", will still have their tests
+        pass. Thanks to Arthur Bergman for the spot.
+      - Fixed Lib::Expat so that version() would properly return undef when
+        no include directory was found. Thanks to Arthur Bergman for the spot.
+      - Fixed $VERSION in Info.pm to be available to pre-5.6.0 perls.
+
+0.11  Sat Jun  8 05:49:40 2002
+      - Improved validation for the error_level parameter.
+      - In distribution tests, no longer testing to see that user and group
+        methods in HTTP::Apache return values when Apache is installed, as
+        sometimes folks don't have User and Group directives set in their
+        httpd.conf files. Grrr...
+      - Fixed bare word references in Makefile.PL.
+
+0.10  Wed Jun  5 23:58:54 2002
+      - Added new error_level parameter to new(). This tells App::Info objects
+        how to handle errors on an object-by-object basis. The new base class
+        method error() is for subclasses to use for throwing errors, and
+        last_error() is for client code to access the last error in non-fatal
+        error modes. See App::Info for complete documentation. This is the
+        major change the triggered the (mild) version number jump.
+      - Reworked all application subclasses to use the new error() method.
+      - Changed all application subclasses so that they're no longer singleton
+        classes. Each new object construction looks for application metadata
+        all over again.
+      - Updated documentation on subclassing to reflect changes.
+      - Added first_exe() and first_cat_exe() to App::Info::Util. Changed
+        RDBMS::PostgreSQL, HTTP::Apache, and Lib::Iconv to use them.
+      - Added more directories in which to search for the Apache server
+        executable, thanks to work by Dave Rolsky.
+
+0.06  Wed Jun  5 15:36:36 2002
+      - Fixed all version tests in test scripts to check for definedness
+        rather than truth, so that version numbers that are "0" will be
+        ok. Thanks to Andy Lester for the spot.
+      - Util now properly loads File::Spec rather than File::Spec::Functions.
+      - Changed how the version number gets stored in Lib::Expat so that it
+        only gets saved if all three version number parts are found.
+
+0.05  Wed Jun  5 00:01:57 2002
+      - Eliminated possible "Use of uninitialized value in concatenation (.)
+        or string" warning from Lib::Expat.
+      - Eliminated possible "Use of uninitialized value in hex" warning from
+        Lib::Iconv.
+      - Fixed issue where RDBMS::PostgreSQL would try to execute pg_config
+        even when it didn't exist.
+      - Added To Do list.
+      - Made iconv.t and expat.t tests for version numbers safer for CPAN
+        distribution. Patches with improved methods of determining version
+        numbers for those libraries are welcome.
+
+0.04  Tue Jun  4 01:03:58 2002
+      - Wrote documentation on subclassing App::Info.
+      - Added httpd_root() abstract method to App::Info::HTTPD abstract
+        base class.
+      - Added httpd_conf(), user(), group(), and port() methods to
+        App::Info::HTTPD::Apche.
+      - Added and corrected documentation in App::Info::HTTPD,
+        App::Info::RDBMS, and App::Info::Lib.
+      - Made minor documentation fixes to other classes.
+      - Fixed methods in App::Info::Util to return undef in a scalar context
+        if there were no regular expression matches.
+
+0.03  Mon Jun  3 18:37:50 2002
+      - Private release.
+      - Changed first_cat_file() to first_cat_path() in App::Info::Util.
+      - Added internal tests for various subclasses.
+      - Fixed a bunch of bugs.
+      - Added better support for Fink-installed libraries on Darwin.
+
+0.02  Mon Jun  3 04:38:24 2002
+      - Private release.
+      - Added Expat.pm.
+      - Many changes to Util.
+
+0.01  Fri May 31 07:54:55 2002
+      - Original version.
+      - Private release.

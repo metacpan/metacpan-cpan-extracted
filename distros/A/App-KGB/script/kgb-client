@@ -1,0 +1,599 @@
+#!/usr/bin/perl
+use utf8;
+require v5.10.0;
+use feature 'switch';
+# vim: ts=4:sw=4:et:ai:sts=4
+#
+# KGB - an IRC bot helping collaboration
+# Copyright © 2008 Martín Ferrari
+# Copyright © 2009, 2011, 2012 Damyan Ivanov
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 51
+# Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+use strict;
+use warnings;
+
+=head1 NAME
+
+kgb-client - relay commits to KGB servers
+
+=head1 SYNOPSIS
+
+=over
+
+=item B<kgb-client> --conf I</path/to/config> [I<other-option> ...]
+
+=item B<kgb-client> --uri I<http://some.server:port/service>
+                    --password I<password>
+                    --repo-id I<repository>
+                    --repository I<svn|git|cvs>
+                    --timeout I<timeout-in-seconds>
+                    --single-line-commits I<off|forced|auto>
+                    --use-irc-notices
+                    --web-link I<template>
+                    --short-url-service I<service>
+                    --status-dir I<directory>
+                    --[no]-use-color
+                    --message-template I<template>
+                    --batch-messages
+
+=item B<kgb-client> I<option>... I</svn/repo> I<revision>
+
+=item B<kgb-client> I<option>... I<old-rev> I<new-rev> I<ref-name>
+
+=item B<kgb-client> I<option>... $CVSROOT "%p"
+
+=item B<kgb-client> I<option>... --fake
+
+=item B<kgb-client> I<option>... --relay-msg I<message>...
+
+=item B<kgb-client> --help
+
+=item B<kgb-client> --man
+
+=back
+
+=head1 DESCRIPTION
+
+B<kgb-client> is the client counterpart of L<kgb-bot(1)>. It is intended to be
+used as a hook in your version control system, executed after the repository
+gets updated. It analyzes the commit(s) and then relays the information to the
+KGB server, which will show it on IRC.
+
+=head1 CONFIGURATION
+
+=over
+
+=item B<--conf> I<configuration file>
+
+Specifies the path to kgb-client configuration file.
+
+=back
+
+Configuration options (except B<--conf>, B<--fake> and B<--relay-msg>) may be
+specified both in the configuration file and on the command line. Usually you
+want to have all the
+options in a configuration file, because having passwords on the command line
+is insecure. The configuration file also gives more control, for example it
+supports multiple servers and multiple ways of detection of branch and module
+names.
+
+See L<kgb-client.conf(5)> for available configuration options. Unless noted
+otherwise, all the options in the configuration file can also be used on
+command line, prefixing them with two dashes. E.g. C<repo-id> becomes
+C<--repo-id>.
+
+Options given on the command line take precedence over configuration file.
+
+=head1 FAKE COMMIT MODE
+
+If invoked with the B<--fake> option, B<kgb-client> will send a fake commit to
+the servers. This is useful for testing client-server communication
+independently from VCS setup.
+
+=head1 MESSAGE RELAY MODE
+
+When the B<--relay-msg> option is given, there is no repository to be
+inspected. Instead, the non-option command line arguments are passed verbatim
+to the bot to display on IRC. This can be used for real-time notification about
+other events like bug submissions etc.
+
+=head1 SUPPORTED VERSION CONTROL SYSTEMS
+
+=head2 Subversion
+
+Installation requires calling B<kgb-client> with two command line arguments,
+like this:
+
+    /path/to/kgb-client "$REPOS" "$REV"
+
+=over
+
+=item I<path to the subversion repository>
+
+This is the physical path to the Subversion repository. Something like I</srv/svn/my-repo>
+
+=item I<revision>
+
+This is the revision number of the commit, that has triggered the hook.
+
+=back
+
+Both these arguments are supplied to the standard Subversion post-commit hooks.
+
+=head2 Git
+
+B<kgb-client> shall be installed as a B<post-receive> hook. Something along the
+following shall do:
+
+    #!/bin/sh
+    exec /path/to/kgb-client --conf /path/to.conf ...
+
+By default, B<kgb-client> will read the reflog information from standard input
+as any standard Git post-receive hook. See B<--git-reflog> option if something
+else is wanted.
+
+There are other ways to give kgb-client information about Git reflog, mostly
+useful when debugging on in unusual situations. See L<App::KGB::Client::Git>.
+
+The following settings can be configured via L<git-config(1)>:
+
+=over
+
+=item conf
+
+=item web-link
+
+=back
+
+=head2 CVS
+
+B<kgb-client> shall be installed in the F<loginfo> file in the C<CVSROOT>
+module of the CVS repository. It shall be given two arguments -- the repository
+root, and the directory in which the changes are being made.
+
+For example:
+
+    ALL /path/to/kgb-client --conf /path/to.conf ... "$CVSROOT" "%p"
+
+=head1 SEE ALSO
+
+=over
+
+=item L<kgb-client.conf(5)>
+
+=item L<App::KGB::Client>
+
+=item L<App::KGB::Client::Subversion>
+
+=item L<App::KGB::Client::Git>
+
+=item L<App::KGB::Client::CVS>
+
+=back
+
+=cut
+
+use App::KGB::Client::ServerRef;
+use Carp;
+use Getopt::Long;
+use Pod::Usage;
+use YAML ();
+
+# option settings may come from three sources:
+# 1. defaults
+# 2. configuration file
+# 3. command line
+# Sources are evaluated in this order. Every source overrides previous ones
+
+my $debug;
+
+my ($conf_file,      $uri,        $proxy,
+    $repo_id,        $password,   $timeout,
+    $verbose,        $repo_type,  @br_mod_re, @mod_br_re,
+    $br_mod_re_swap, $module,     $ignore_branch,
+    @servers,        $git_reflog, $single_line_commits,
+    $status_dir,     $web_link,   $short_url_service,
+    $fake,           $protocol,   $relay_msg,
+    $help,           $man,        $use_irc_notices,
+    $use_color,      %colors,     $msg_template,
+    $batch_messages,
+
+    # Git
+    $squash_threshold, $squash_msg_template,
+    $branch_ff_msg_template,
+    $enable_branch_ff_notification,
+    $tag_squash_threshold, $tag_squash_msg_template,
+);
+
+# defaults
+$single_line_commits = 'auto';
+$use_color           = 1;
+$msg_template = '${{author-name} }${{branch} }${{commit} }${{module}}${ {changes}}${ {log-first-line}}${ * {web-link}}';
+# multi-line notifications
+# $msg_template = '${{author-name} }${{branch} }${{commit} }${{project}/}${{module}}${ {changes}}${ * {web-link}}${\n{log}}';
+
+Getopt::Long::Configure('pass_through');
+
+GetOptions(
+    'conf=s'  => \$conf_file,
+    'help|?'  => \$help,
+    'man'     => \$man,
+    'debug!'  => \$debug,
+) or pod2usage(2);
+pod2usage(0) if $help;
+pod2usage(-exitval => 0, -verbose => 2) if $man;
+
+# configuration file
+my $conf;
+
+sub from_conf {
+    my ( $setting, $ref, $descr ) = @_;
+    return unless exists $conf->{$setting};
+    ref($ref) or die "Internal error -- expecting reference ($setting)";
+
+    my $descr_name;
+    if ($descr) {
+        if ( ref($descr) eq 'ARRAY' ) {
+            $descr_name = 'lists';
+        }
+        elsif ( ref($descr) eq 'HASH' ) {
+            $descr_name = 'maps';
+        }
+        else { confess "Should not happen ($_)"; }
+    }
+
+    my $value = $conf->{$setting};
+    if ( ref($ref) eq 'SCALAR' ) {
+        die "'$setting' configuration option must be scalar"
+            if ref($value);
+        $$ref = $value;
+    }
+    elsif ( ref($ref) eq 'ARRAY' ) {
+        die "'$setting' configuration option must be array"
+            unless ref($value)
+            and ref($value) eq 'ARRAY';
+
+        for (@$value) {
+            my $ref_name;
+            if ( ref($_) eq 'ARRAY' ) {
+                $ref_name = 'list';
+            }
+            elsif ( ref($_) eq 'HASH' ) {
+                $ref_name = 'map';
+            }
+            else {
+                $ref_name = 'plain value';
+            }
+
+            if ( $descr and ( not ref($_) or ref($_) ne ref($descr) ) ) {
+                warn "'$setting' must be a list of $descr_name. "
+                    . "Found a $ref_name. Entry ignored.\n";
+                next;
+            }
+
+            if ( not $descr and ref($_) ) {
+                warn "'$setting' must be a list of plain values. "
+                    . "Found a $ref_name. Entry ignored.\n";
+                next;
+            }
+
+            push @$ref, $_;
+        }
+    }
+    elsif ( ref($ref) eq 'HASH' ) {
+        die "'$setting' configuration option must be map"
+            unless ref($value)
+            and ref($value) eq 'HASH';
+
+        while ( my ( $k, $v ) = each %$value ) {
+            my $ref_name;
+            if ( ref($v) eq 'ARRAY' ) {
+                $ref_name = 'list';
+            }
+            elsif ( ref($v) eq 'HASH' ) {
+                $ref_name = 'map';
+            }
+            else {
+                $ref_name = 'plain value';
+            }
+
+            if ( $descr and ( not ref($v) or ref($v) ne ref($descr) ) ) {
+                warn "'$setting' must be a map having $descr_name as values. "
+                    . "Found a $ref_name in the '$k' element. Entry ignored.\n";
+                next;
+            }
+
+            if ( not $descr and ref($v) ) {
+                warn "'$setting' must be a map having plain values. "
+                    . "Found a $ref_name in the '$k' element. Entry Ignored.\n";
+                next;
+            }
+
+            $ref->{$k} = $v;
+        }
+    }
+    else {
+        die "Internal error -- unknown reference ($setting)";
+    }
+}
+
+# detect repository type
+if ( exists $ENV{GIT_DIR} ) {
+    die "Unable to determine repository type\n"
+        . "both GIT_DIR and CVSROOT present in the environment.\n"
+        . "Please use --repository to force repository type.\n"
+        if exists $ENV{CVSROOT};
+
+    $repo_type = 'git';
+
+    warn "Repository type detected to be 'Git' from the environment\n"
+        if $debug;
+
+    # default configuration file
+    unless ($conf_file) {
+        $conf_file = `git config kgb.conf`;
+        chomp($conf_file);
+        warn "Config file from git-config: $conf_file\n"
+            if $debug;
+    }
+}
+elsif ( exists $ENV{CVSROOT} ) {
+    $repo_type = 'cvs';
+}
+else {
+    $repo_type = 'svn';
+}
+
+
+if( $conf_file ) {
+    $conf = YAML::LoadFile($conf_file)
+        or die "Error loading config from $conf_file\n";
+
+    if ( ref($conf) ne "HASH" ) {
+        die "Invalid configuration: root element must be a map.\n";
+    }
+    from_conf( uri                         => \$uri );
+    from_conf( proxy                       => \$proxy );
+    from_conf( 'repo-id'                   => \$repo_id );
+    from_conf( password                    => \$password );
+    from_conf( timeout                     => \$timeout );
+    from_conf( 'branch-and-module-re'      => \@br_mod_re );
+    from_conf( 'module-and-branch-re'      => \@mod_br_re );
+    from_conf( 'branch-and-module-re-swap' => \$br_mod_re_swap );
+    from_conf( 'ignore-branch'             => \$ignore_branch );
+    from_conf( module                      => \$module );
+    from_conf( repository                  => \$repo_type );
+    from_conf( 'single-line-commits'       => \$single_line_commits );
+    from_conf( 'use-irc-notices'           => \$use_irc_notices );
+    from_conf( 'status-dir'                => \$status_dir );
+    from_conf( 'web-link'                  => \$web_link );
+    from_conf( 'short-url-service'         => \$short_url_service );
+    from_conf( protocol                    => \$protocol );
+    from_conf( 'relay_msg'                 => \$relay_msg );
+    from_conf( 'use-color'                 => \$use_color );
+    from_conf( 'servers'                   => \@servers, {} );
+    from_conf( 'color-scheme'              => \%colors );
+    from_conf( 'message-template'          => \$msg_template );
+    from_conf( 'batch-messages'            => \$batch_messages );
+
+    # Git-specific stuff
+    from_conf( 'squash-threshold'       => \$squash_threshold );
+    from_conf( 'squash-msg-template'    => \$squash_msg_template );
+    from_conf( 'branch-ff-msg-template' => \$branch_ff_msg_template );
+    from_conf(
+        'enable-branch-ff-notification' => \$enable_branch_ff_notification );
+    from_conf( 'tag-squash-threshold'    => \$tag_squash_threshold );
+    from_conf( 'tag-squash-msg-template' => \$tag_squash_msg_template );
+}
+
+
+Getopt::Long::Configure('no_pass_through');
+
+GetOptions(
+    'uri=s'                      => \$uri,
+    'proxy=s'                    => \$proxy,
+    'repo-id=s'                  => \$repo_id,
+    'pass|password=s'            => \$password,
+    'timeout=s'                  => \$timeout,
+    'branch-and-module-re=s'     => \@br_mod_re,
+    'br-mod-re=s'                => \@br_mod_re,
+    'module-and-branch-re=s'     => \@mod_br_re,
+    'mod-br-re=s'                => \@mod_br_re,
+    'branch-and-module-re-swap!' => \$br_mod_re_swap,
+    'module=s'                   => \$module,
+    'ignore-branch=s'            => \$ignore_branch,
+    'repository=s'               => \$repo_type,
+    'verbose!'                   => \$verbose,
+    'git-reflog=s'               => \$git_reflog,
+    'single-line-commits=s'      => \$single_line_commits,
+    'use-irc-notices!'           => \$use_irc_notices,
+    'status-dir=s'               => \$status_dir,
+    'web-link=s'                 => \$web_link,
+    'short-url-service=s'        => \$short_url_service,
+    'fake!'                      => \$fake,
+    'protocol=s'                 => \$protocol,
+    'relay-msg'                  => \$relay_msg,
+    'use-color!'                 => \$use_color,
+    'message-template=s'         => \$msg_template,
+    'batch-messages!'            => \$batch_messages,
+    'squash-threshold=s'         => \$squash_threshold,
+    'squash-msg-template=s'      => \$squash_msg_template,
+    'branch-ff-msg-template=s'   => \$branch_ff_msg_template,
+    'enable-branch-ff-notification!' => \$enable_branch_ff_notification,
+    'tag-squash-threshold=s'     => \$tag_squash_threshold,
+    'tag-squash-msg-template'    => \$tag_squash_msg_template,
+) or pod2usage(2);
+
+if ( $br_mod_re_swap ) {
+    push @mod_br_re, @br_mod_re;
+    @br_mod_re = ();
+}
+
+undef($use_irc_notices)
+    if $use_irc_notices and $use_irc_notices =~ /^(?:no|false)$/i;
+
+push @servers, { uri => $uri } if $uri;
+
+@servers = map {
+    App::KGB::Client::ServerRef->new(
+        {   password => $password,
+            timeout  => $timeout,
+            verbose  => $verbose,
+            %$_
+        }
+        )
+} @servers;
+
+die "no servers defined. use 'uri' or 'servers' configuration options\n"
+    unless @servers;
+
+die "repo-id not given\n" unless $repo_id;
+
+$single_line_commits =~ m/^(?:off|forced|auto)$/
+    or die "Unknown value for the --single-line-commits option "
+    . "('$single_line_commits')\n";
+
+if ( $relay_msg ) {
+    die "--relay-msg cannot be used together with --fake\n" if $fake;
+
+    $repo_type = 'IGNORED';
+    $relay_msg = join( ' ', @ARGV );
+
+    my $ok = eval {
+        $relay_msg = Encode::decode_utf8( $relay_msg, $Encode::FB_CROAK );
+        1;
+    };
+
+    die "--relay-msg supports only UTF-8 arguments\n" unless $ok;
+}
+
+use Cwd();
+use File::Spec;
+
+my @client_args = (
+    repo_id             => $repo_id,
+    servers             => \@servers,
+    br_mod_re           => \@br_mod_re,
+    mod_br_re           => \@mod_br_re,
+    module              => $module,
+    ignore_branch       => $ignore_branch,
+    verbose             => $verbose,
+    single_line_commits => $single_line_commits,
+    use_irc_notices     => $use_irc_notices,
+    use_color           => $use_color,
+    status_dir          => $status_dir,
+    web_link            => $web_link,
+    short_url_service   => $short_url_service,
+    protocol            => $protocol,
+    colors              => \%colors,
+    msg_template        => $msg_template,
+    batch_messages      => $batch_messages,
+);
+
+push @client_args, ( relay_message => $relay_msg ) if $relay_msg;
+
+if ($fake) {
+    warn "Sending fake commit notification\n";
+
+    require App::KGB::Client::Fake;
+
+    my $client = App::KGB::Client::Fake->new( {@client_args} );
+    $client->process();
+
+    exit 0;
+}
+
+if ( $relay_msg ) {
+    eval { require App::KGB::Client::RelayMsg; 1 }
+        or die "Message relay support unavailable\n"
+        . "Error loading App::KGB::Client::RelayMsg:\n"
+        . $@;
+
+    my $client = App::KGB::Client::RelayMsg->new( { @client_args } );
+    $client->process;
+}
+elsif ( $repo_type eq 'svn' ) {
+    my($path, $rev) = @ARGV;
+    die "Repository path and revision must be given as arguments\n"
+        unless $path and $rev;
+
+    print "Processing r$rev of SVN repository $path\n"
+        if $verbose;
+
+    eval { require App::KGB::Client::Subversion; 1; }
+        or die "Subversion support unavailable\n"
+        . "Error loading App::KGB::Client::Subversion:\n"
+        . $@;
+
+    my $client = App::KGB::Client::Subversion->new(
+        {   @client_args,
+            repo_path      => $path,
+            revision       => $rev,
+        }
+    );
+
+    $client->process();
+}
+elsif ( $repo_type eq 'git' ) {
+    print "Processing Git receive pack\n"
+        if $verbose;
+
+    eval { require App::KGB::Client::Git; 1; }
+        or die "Git support unavailable\n"
+        . "Error loading App::KGB::Client::Git:\n"
+        . $@;
+
+    my $client = App::KGB::Client::Git->new(
+        {   @client_args,
+            reflog                        => $git_reflog,
+            squash_threshold              => $squash_threshold,
+            squash_msg_template           => $squash_msg_template,
+            branch_ff_msg_template        => $branch_ff_msg_template,
+            enable_branch_ff_notification => $enable_branch_ff_notification,
+            tag_squash_threshold          => $tag_squash_threshold,
+            tag_squash_msg_template       => $tag_squash_msg_template,
+        }
+    );
+
+    $client->process();
+
+}
+elsif ( $repo_type eq 'cvs' ) {
+    print "Processing CVS commit\n"
+        if $verbose;
+
+    eval { require App::KGB::Client::CVS; 1; }
+        or die "CVS support unavailable\n"
+        . "Error loading App::KGB::Client::CVS:\n"
+        . $@;
+
+    my $cvs_root = shift(@ARGV);
+    my $dir = shift(@ARGV);
+    my $client = App::KGB::Client::CVS->new(
+        {   @client_args,
+            cvs_root  => $cvs_root,
+            author    => $ENV{USER},
+            directory => $dir,
+            files     => [@ARGV],
+        }
+    );
+
+    $client->process();
+}
+else {
+    die "Repository type '$repo_type' not supported\n";
+}
+

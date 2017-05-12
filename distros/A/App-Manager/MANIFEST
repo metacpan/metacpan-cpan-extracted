@@ -1,0 +1,15 @@
+README
+Changes
+MANIFEST
+COPYING.Artistic
+COPYING.GNU
+COPYING
+BUGS
+TODO
+Makefile.PL
+t/load.t
+Manager.pm
+Manager.xs
+libtracer.c
+gensym
+appman

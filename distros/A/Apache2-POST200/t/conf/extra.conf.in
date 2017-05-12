@@ -1,0 +1,6 @@
+PerlSwitches -I@ServerRoot@
+
+# Local Variables: #
+# mode: apache #
+# End: 
+#

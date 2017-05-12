@@ -1,0 +1,27 @@
+---
+abstract: 'Group equal elements of an ordered array, or list.'
+author:
+  - 'Sam Brain <samb@stanford.edu>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Array-GroupBy
+provides:
+  Array::GroupBy:
+    file: lib/Array/GroupBy.pm
+    version: v0.0.4
+requires:
+  Carp: 1.25
+  List::Util: 1.23
+  Params::Validate: 1
+  Test::More: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.4

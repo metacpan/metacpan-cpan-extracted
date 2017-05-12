@@ -1,0 +1,31 @@
+#!/opt/perl/bin/perl
+use common::sense;
+use AnyEvent::HTTPD;
+
+my $httpd = AnyEvent::HTTPD->new (port => 19090);
+
+my $t;
+
+$httpd->reg_cb (
+   '' => sub {
+      my ($httpd, $req) = @_;
+
+      my $html =
+         "<html><body><h1>Hello World!</h1>"
+         . "<a href=\"/test\">another test page</a>"
+         . "</body></html>";
+
+      $req->respond ({ content => ['text/html', $html] });
+   },
+   '/test' => sub {
+      my ($httpd, $req) = @_;
+      $httpd->stop_request;
+
+      $t = AnyEvent->timer (after => 2, cb => sub {
+         my $txt = "CPU info:\n\n" . `cat /proc/cpuinfo`;
+         $req->respond ([200, "ok", { 'Content-Type' => 'text/plain' }, $txt]);
+      });
+   },
+);
+
+$httpd->run;

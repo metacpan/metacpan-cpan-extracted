@@ -1,0 +1,10 @@
+Build.PL
+Changes
+inc/LuaJIT-2.0.2.tar.gz
+inc/Makefile
+lib/Alien/LuaJIT.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+t/00_load.t

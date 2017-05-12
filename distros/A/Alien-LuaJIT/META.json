@@ -1,0 +1,45 @@
+{
+   "abstract" : "Alien module for asserting a luajit is available",
+   "author" : [
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-LuaJIT",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base" : "0.003",
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "File::ShareDir" : "1.00",
+            "parent" : "0",
+            "perl" : "v5.14.0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::LuaJIT" : {
+         "file" : "lib/Alien/LuaJIT.pm",
+         "version" : "v2.0.2.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v2.0.2.1"
+}

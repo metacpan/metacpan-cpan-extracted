@@ -1,0 +1,74 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Gtk2;
+use Glib;
+
+use Audio::GtkGramofile;
+use Audio::GtkGramofile::Settings;
+use Audio::GtkGramofile::GUI;
+use Audio::GtkGramofile::Signals;
+use Audio::GtkGramofile::Logic;
+
+my $gtkgramofile = Audio::GtkGramofile::Settings->new;
+my $gtkgramofile_gui = Audio::GtkGramofile::GUI->new;
+my $gtkgramofile_signals = Audio::GtkGramofile::Signals->new;
+my $gtkgramofile_logic = Audio::GtkGramofile::Logic->new;
+
+$gtkgramofile->gui($gtkgramofile_gui);
+$gtkgramofile->signals($gtkgramofile_signals);
+$gtkgramofile->logic($gtkgramofile_logic);
+
+$gtkgramofile_signals->set_gtkgramofile($gtkgramofile);
+$gtkgramofile_gui->set_gtkgramofile($gtkgramofile);
+$gtkgramofile_logic->set_gtkgramofile($gtkgramofile);
+
+$gtkgramofile->load_settings;
+Gtk2->init;
+$gtkgramofile_gui->create_stock_buttons;
+$gtkgramofile_gui->initialise;
+
+$gtkgramofile_gui->load_settings_to_interface;
+$gtkgramofile_gui->connect_signals;
+$gtkgramofile_gui->{gramofile}->show;
+$gtkgramofile_gui->message("Audio::GtkGramofile $Audio::GtkGramofile::VERSION, by Bob Wilkinson <bob\@fourtheye.org>");
+
+Gtk2->main;
+exit 0;
+
+__END__
+
+#===============================================================================
+#==== Documentation
+#===============================================================================
+=pod
+
+=head1 NAME
+
+gtkgramo - a Gtk2::Perl wrapper for libgramofile, see http://sourceforge.net/projects/libgramofile/ which is based on
+Gramofile - see http://www.opensourcepartners.nl/~costar/gramofile/
+
+=head1 SYNOPSIS
+
+gtkgramo
+
+=head1 DESCRIPTION
+
+gtkgramo is a Gtk2::Perl application for splitting long wav files, typically obtained from recording vinyl albums. It
+can split the files at inter-track silences, and then do user-configurable signal processing on the resultant tracks.
+
+=head1 BUGS
+
+Probably.
+
+=head1 SEE ALSO
+
+gramofile.
+
+=head1 AUTHOR
+
+Bob Wilkinson <bob\@fourtheye.org>
+
+=cut

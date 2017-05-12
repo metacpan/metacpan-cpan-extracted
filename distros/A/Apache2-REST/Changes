@@ -1,0 +1,42 @@
+Revision history for Apache2-REST
+
+0.07_01
+        Added support for streaming and multipart responses.    
+        Added Scott Thoman in authors.
+
+0.06    
+        Added options for error output.
+        Log errors server side by using log_error (and Apache2::Log)
+
+0.05    24 Nov 2009
+        Remove pod coverage to avoid build failure.
+           due to Apache2::const::*
+        Return 401 HTTP code when method unauthorized
+         instead of 405. This is a compatibility issue for
+         APIs implemented with a former version.
+        Fixed response status when method not implemented
+        Better error 500 reporting
+        Better error 501 reporting
+
+0.04    11 Nov 2009
+        Added dependency on Digest::MD5
+        Added Content-Length
+        cleanup response before writing out.
+        yaml writer returns correct mimetype text/yaml
+        Implemented Accept header writer selection.
+        Improved documentation
+
+0.03    
+        Added special writer (bin) to handle binary responses.
+        Proper management of binary output of unicode values.
+        Added requestedFormat to Apache2::REST::Request
+        Implemented option Apache2RESTWriterRegistry
+        Implemented option Apache2RESTWriterDefault
+        Added example with unicode characters
+
+0.02    09 Nov 2009
+        Added a link to the Google project page
+
+0.01    06 Nov 2009
+        First version.
+

@@ -1,0 +1,64 @@
+
+# Cant use T_PTROBJ since we want to specify the class name
+
+const char *          T_PV
+
+AstroCatalog *         O_OBJECT
+AstroQuery *           O_QOBJECT
+AstroCatalogOpen *     O_OBJECT
+CatalogInfoEntry *     O_WCS
+QueryResult *          O_QR
+
+WorldOrImageCoords *   O_WCS
+WorldCoords *          O_WCS
+
+AcHandle              T_PTROBJ
+
+
+
+OUTPUT
+# The Perl object is blessed into 'CLASS', which should be a
+# char* having the name of the package for the blessing.
+O_OBJECT
+    sv_setref_pv( $arg, "Astro::SkyCat::Catalog", (void*)$var );
+O_QOBJECT
+    sv_setref_pv( $arg, "Astro::SkyCat::Query", (void*)$var );
+O_QR
+    sv_setref_pv( $arg, "Astro::SkyCat::QueryResult", (void*)$var );
+O_WCS
+    sv_setref_pv( $arg, "${Package}", (void*)$var );
+
+INPUT
+O_OBJECT
+        if (sv_derived_from($arg, \"Astro::SkyCat::Catalog\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type,tmp);
+        }
+        else
+            croak(\"$var is not of type Astro::SkyCat::Catalog\")
+
+
+O_QR
+        if (sv_derived_from($arg, \"Astro::SkyCat::QueryResult\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type,tmp);
+        }
+        else
+            croak(\"$var is not of type Astro::SkyCat::QueryResult\")
+
+O_WCS
+        if (sv_derived_from($arg, \"${Package}\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type,tmp);
+        }
+        else
+            croak(\"$var is not of type ${Package}\")
+
+
+O_QOBJECT
+        if (sv_derived_from($arg, \"Astro::SkyCat::Query\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type,tmp);
+        }
+        else
+            croak(\"$var is not of type ${Package}\")

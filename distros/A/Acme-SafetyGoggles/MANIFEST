@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Acme/SafetyGoggles.pm
+t/dash-M.t
+t/safe.t
+t/unsafe.t
+t/use-no.t
+t/SafeSourceFilter.pm
+t/ToggledSourceFilter.pm
+t/UnsafeSourceFilter.pm
+t/my_code.pl
+t/my_safe_code.pl
+t/my_unsafe_code.pl
+t/use-no.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

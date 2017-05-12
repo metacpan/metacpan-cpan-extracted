@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Apache-AxKit-Plugin-NotFoundIfPathInfo.t
+t/pod.t
+lib/Apache/AxKit/Plugin/NotFoundIfPathInfo.pm
+META.yml                                 Module meta-data (added by MakeMaker)

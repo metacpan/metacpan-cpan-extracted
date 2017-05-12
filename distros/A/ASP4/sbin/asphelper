@@ -1,0 +1,569 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings 'all';
+use Getopt::Long;
+use Term::ReadKey;
+use File::Path;
+use DBI;
+use Cwd 'cwd';
+
+*make_path = \&File::Path::make_path;
+
+
+my (
+  $appName,
+  $domain,
+  $dbName,
+  $dbHost,
+  $dbUser,
+  $dbPass,
+  $email,
+);
+
+
+my $result = GetOptions(
+  "app=s"     => \$appName, # Required
+  "domain=s"  => \$domain,  # Required
+  "email=s"   => \$email,   # Required
+  "db=s"      => \$dbName,
+  "user=s"    => \$dbUser,
+  "host=s"    => \$dbHost,
+);
+
+$appName && $domain && $email or die "Usage: $0 --app=AppName --domain=domain.com --email=you\@your-email.com [--host=dbhost --db=dbname  --user=dbusername]\n";
+$dbHost ||= "localhost";
+
+if( $dbName && $dbUser )
+{
+  print STDERR "Enter your database password: ";
+  ReadMode('noecho');
+  chomp($dbPass = <STDIN>);
+  ReadMode('restore');
+  print "\n";
+}# end if()
+
+my @DSN = (
+  "DBI:mysql:$dbName:$dbHost",
+  $dbUser,
+  $dbPass
+);
+
+my $drh = DBI->install_driver("mysql");
+my $rc = $drh->func('createdb', $dbName, $dbHost, $dbUser, $dbPass, 'admin');
+
+my $dbh = eval { DBI->connect( @DSN, {RaiseError => 1} ) };
+if( $@ )
+{
+  (my $error = $@) =~ s/\sat\s\Q$0\E\s+line.*//;
+  die "[ERROR]: $error\n";
+}# end if()
+
+# Setup folder structure:
+(my $project_path = lc($appName)) =~ s{::}{_}sg;
+make_path($project_path);
+chdir($project_path);
+my $cwd = cwd();
+my $appFolder = join( '/',  split(/::/, $appName) );
+make_path("common/lib/$appFolder/db");
+make_path("common/sbin");
+make_path('www/t/010-basic');
+make_path('www/conf');
+make_path('www/etc');
+make_path('www/htdocs');
+make_path('www/handlers');
+
+
+
+# Write the ddl.sql file:
+unless( -f "common/sbin/ddl.sql" )
+{
+  warn "common/sbin/ddl.sql\n";
+  open my $ofh, '>', "common/sbin/ddl.sql"
+    or die "Cannot open 'common/sbin/ddl.sql' for writing: $!";
+  print $ofh <<"SQL";
+
+set foreign_key_checks = 0;
+drop table if exists asp_sessions;
+set foreign_key_checks = 1;
+
+create table asp_sessions (
+  session_id   char(32) not null primary key,
+  session_data blob,
+  created_on   datetime default null,
+  modified_on  datetime default null
+) engine=innodb charset=utf8;
+
+SQL
+  close($ofh);
+  open my $ifh, "common/sbin/ddl.sql"
+    or die "Cannot open 'common/sbin/ddl.sql' for reading: $!";
+  local $/ = ';';
+  while( my $cmd = <$ifh> )
+  {
+    $cmd =~ s/^\s+//s;
+    $cmd =~ s/\s+$//s;
+    next unless $cmd;
+    $dbh->do($cmd);
+  }# end while()
+  close($ifh);
+}# end unless()
+
+
+# Write our configs:
+unless( -f "www/conf/asp4-config.json" )
+{
+  warn "www/conf/asp4-config.json\n";
+  open my $ofh, '>', "www/conf/asp4-config.json"
+    or die "Cannot open 'www/conf/asp4-config.json' for writing: $!";
+  my $json = generic_config( $dbName && $dbUser );
+  $json =~ s/\%CWD\%/$cwd/igs;
+  $json =~ s/\%domain\%/$domain/igs;
+  $json =~ s/\%appName\%/$appName/igs;
+  $json =~ s/\%dbName\%/$dbName/igs;
+  $json =~ s/\%dbHost\%/$dbHost/igs;
+  $json =~ s/\%dbUser\%/$dbUser/igs;
+  $json =~ s/\%dbPass\%/$dbPass/igs;
+  $json =~ s/\%email\%/$email/igs;
+  print $ofh $json;
+  close($ofh);
+}# end unless()
+
+
+unless( -f "www/conf/httpd.conf" )
+{
+  warn "www/conf/httpd.conf\n";
+  open my $ofh, '>', "www/conf/httpd.conf"
+    or die "Cannot open 'www/conf/httpd.conf' for writing: $!";
+  my $conf = generic_httpconf();
+  $conf =~ s/\%CWD\%/$cwd/igs;
+  $conf =~ s/\%domain\%/$domain/igs;
+  $conf =~ s/\%appName\%/$appName/igs;
+  $conf =~ s/\%dbName\%/$dbName/igs;
+  $conf =~ s/\%dbHost\%/$dbHost/igs;
+  $conf =~ s/\%dbUser\%/$dbUser/igs;
+  $conf =~ s/\%dbPass\%/$dbPass/igs;
+  $conf =~ s/\%email\%/$email/igs;
+  print $ofh $conf;
+  close($ofh);
+}# end unless()
+
+
+# Test page:
+make_path("www/htdocs");
+unless( -f "www/htdocs/index.asp" )
+{
+  warn "www/htdocs/index.asp\n";
+  open my $ofh, '>', "www/htdocs/index.asp"
+    or die "Cannot open 'www/htdocs/index.asp' for writing: $!";
+  print $ofh <<'ASP';
+<html>
+<body>
+<h1>ASP4 Test Page</h1>
+<p>
+  The date and time is <%= scalar(localtime()) %>.
+</p>
+<p>
+  You have visited this page <%= $Session->{count}++ %> time(s) recently.
+</p>
+</body>
+</html>
+ASP
+  close($ofh);
+}# end unless()
+
+
+(my $hPath = lc($appName)) =~ s/::/\//g;
+my $hClass = lc($appName);
+make_path("www/handlers/$hPath/www");
+unless( -f "www/handlers/$hClass/www/echo.pm" )
+{
+  open my $ofh, '>', "www/handlers/$hPath/www/echo.pm"
+    or die "Cannot open 'www/handlers/$hPath/www/echo.pm' for writing: $!";
+  print $ofh <<"CODE";
+
+package $hClass\::www::echo;
+
+use strict;
+use warnings 'all';
+use base 'ASP4::FormHandler';
+use vars __PACKAGE__->VARS;
+use Data::Dumper;
+
+sub run
+{
+  my (\$s, \$context) = \@_;
+  
+  \$Response->Write("<h1>Form Contents:</h1><pre>" . Dumper(\$Form) . "</pre>");
+}# end run()
+
+1;# return true:
+
+CODE
+  close($ofh);
+}# end unless()
+
+# Only write the base Model class if we have Class::DBI::Lite
+my $CDBIL_Version = 0;
+eval {
+  require Class::DBI::Lite;
+  $CDBIL_Version = $Class::DBI::Lite::VERSION = $Class::DBI::Lite::VERSION;
+};
+if( $dbName && $Class::DBI::Lite::VERSION )
+{
+  unless( -f "common/lib/$appFolder/db/model.pm" )
+  {
+    warn "common/lib/$appFolder/db/model.pm\n";
+    open my $ofh, '>', "common/lib/$appFolder/db/model.pm"
+      or die "Cannot open 'common/lib/$appFolder/db/model.pm' for writing: $!";
+    print $ofh <<"CODE";
+
+@{[ 'package' ]} @{['']} $appFolder\::db::model;
+
+use strict;
+use warnings 'all';
+use base 'Class::DBI::Lite::mysql';
+use ASP4::ConfigLoader;
+
+my \$Config = ASP4::ConfigLoader->load();
+my \$conn = \$Config->data_connections->main;
+__PACKAGE__->connection(
+  \$conn->dsn,
+  \$conn->username,
+  \$conn->password
+);
+
+1;# return true:
+
+\=pod
+
+\=head1 NAME
+
+$appName\::db::model - Base class for all $appName entity classes.
+
+\=head1 SYNOPSIS
+
+  # In your class:
+  
+  package $appName\::db::thing;
+  
+  use strict;
+  use warnings 'all';
+  use base '$appName\::db::model';
+  
+  __PACKAGE__->set_up_table('things');
+  
+  1;# return true:
+
+\=head1 DESCRIPTION
+
+This module was generated by $0 on @{[ scalar(localtime()) ]}.
+
+B<***IT IS SAFE to make changes to this file, as it will not be overwritten.***>.
+
+\=head1 SEE ALSO
+
+L<Class::DBI::Lite>
+
+\=cut
+
+CODE
+    close($ofh);
+  }# end unless()
+}# end if()
+
+
+unless( -f "www/t/010-basic/010-compile.t" )
+{
+  warn "www/t/010-basic/010-compile.t\n";
+  open my $ofh, '>', "www/t/010-basic/010-compile.t"
+    or die "Cannot open 'www/t/010-basic/010-compile.t' for writing: $!";
+  print $ofh <<"TEST";
+#!/usr/bin/perl -w
+
+use strict;
+use warnings 'all';
+use Test::More 'no_plan';
+use ASP4::API;
+my \$api = ASP4::API->new;
+
+TEST
+
+  if( $CDBIL_Version )
+  {
+print $ofh <<"MORE";
+@{[ $dbName ? qq(use_ok('$appName\::db::model');) : '' ]}
+MORE
+  }# end if()
+  
+  print $ofh <<"TEST";
+
+my \$res = \$api->ua->post("/handlers/$hClass.www.echo", {
+  hello => "world"
+});
+like \$res->content, qr('hello'\\s+\\=\>\\s+'world'), "/handlers/$hClass.www.echo?hello=world works";
+
+ok( \$res = \$api->ua->get("/"), "Got '/'.");
+ok( \$res->is_success, "GET / is successful.");
+ok( \$res->content, "Got some content also.");
+
+
+TEST
+
+  if( $dbName && $dbUser )
+  {
+    print $ofh <<"TEST";
+for( 0..10 )
+{
+  like \$res->content, qr(visited this page \$_ time), "Simple session counter: \$_ visits recorded.";
+  \$res = \$api->ua->get("/");
+}# end for()
+
+TEST
+  }# end if()
+
+
+    print $ofh <<"TEST";
+
+# More tests can go here or in other files.
+
+TEST
+  close($ofh);
+}# end unless()
+
+warn "="x60, "\n";
+warn "    Running Initial Test Suite...\n";
+warn "="x60, "\n";
+chdir("www");
+`asp4 /` =~ m{You have visited this page}
+  or die "Warning: ASP script contents (/index.asp) not what we expected!";
+system("prove -rv t");
+
+# Talk about the config now:
+warn <<"END";
+
+!!!!!!!!!!!!!!!!!!!!!! CONGRATULATIONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+*** Update your Apache Config ***
+  Include $cwd/www/conf/httpd.conf
+
+*** Add This to your /etc/hosts File ***
+  127.0.0.1     $domain
+
+*** Restart Apache ***
+  Maybe:  sudo /etc/init.d/httpd restart
+  Or:     sudo /etc/init.d/apache2 restart
+  Or:     service apache2 restart
+
+*** To Test it in Your Browser ***
+  Navigate to http://$domain
+
+*** To Run the Unit Tests ***
+  cd $cwd/www
+  prove -rv t
+
+*** To Run an ASP Script From the Command Line ***
+  cd $cwd/www
+  asp4 /index.asp
+
+END
+
+
+sub generic_config
+{
+  my ($has_db) = @_;
+
+  my $str = <<'EOF';
+{
+  "system": {
+    "post_processors": [
+    ],
+    "libs": [
+      "@ServerRoot@/lib",
+      "@ProjectRoot@/common/lib"
+    ],
+    "load_modules": [
+    ],
+    "env_vars": {
+    },
+    "settings": {
+    }
+  },
+  "errors": {
+    "error_handler":    "ASP4::ErrorHandler",
+    "mail_errors_to":   "%email%",
+    "mail_errors_from": "root@localhost",
+    "smtp_server":      "localhost"
+  },
+  "web": {
+    "application_name": "%appName%",
+    "application_root": "@ServerRoot@",
+    "www_root":         "@ServerRoot@/htdocs",
+    "handler_root":     "@ServerRoot@/handlers",
+    "page_cache_root":  "/tmp/PAGE_CACHE",
+    "handler_resolver": "ASP4::HandlerResolver",
+    "handler_runner":   "ASP4::HandlerRunner",
+    "filter_resolver":  "ASP4::FilterResolver",
+    "request_filters": [
+    ],
+    "routes": [
+    ],
+    "disable_persistence": [
+    ]
+  },
+  "data_connections": {
+EOF
+
+  if( $has_db )
+  {
+    $str .= <<'EOF';
+    "session": {
+      "manager":          "ASP4::SessionStateManager",
+      "cookie_name":      "session-id",
+      "cookie_domain":    "*",
+      "session_timeout":  "*",
+      "dsn":              "DBI:mysql:%dbName%:%dbHost%",
+      "username":         "%dbUser%",
+      "password":         "%dbPass%"
+    },
+    "main": {
+      "dsn":              "DBI:mysql:%dbName%:%dbHost%",
+      "username":         "%dbUser%",
+      "password":         "%dbPass%"
+    }
+EOF
+  }
+  else
+  {
+    $str .= <<'EOF';
+    "session": {
+      "manager":          "ASP4::SessionStateManager::NonPersisted",
+      "cookie_name":      "session-id",
+      "cookie_domain":    "*",
+      "session_timeout":  "*",
+      "dsn":              "DBI:mysql:dbname:hostname",
+      "username":         "admin",
+      "password":         "swordfish"
+    },
+    "main": {
+      "dsn":              "DBI:mysql:dbname:hostname",
+      "username":         "admin",
+      "password":         "swordfish"
+    }
+EOF
+  }# end if()
+
+$str .= <<'EOF';
+  }
+}
+EOF
+
+  return $str;
+}
+
+
+sub generic_httpconf {
+  <<'EOF';
+
+# Load up some important modules:
+PerlModule DBI
+PerlModule DBD::mysql
+PerlModule ASP4::ModPerl
+
+# Apache2::Reload does not play well with ASP4.
+# Uncomment the following line if you get Apache2::Reload errors:
+#PerlSetVar ReloadAll Off
+
+# Admin website:
+<VirtualHost *:80>
+
+  ServerName    %domain%
+  DocumentRoot  %CWD%/www/htdocs
+  
+  # Set the directory index:
+  DirectoryIndex index.asp
+  
+  # All *.asp files are handled by ASP4::ModPerl
+  <Files ~ (\.asp$)>
+    SetHandler  perl-script
+    PerlResponseHandler ASP4::ModPerl
+    SetEnv no-gzip dont-vary
+  </Files>
+  
+  # !IMPORTANT! Prevent anyone from viewing your *.pm files:
+  <Files ~ (\.pm$)>
+    Order allow,deny
+    Deny from all
+  </Files>
+  
+  # All requests to /handlers/* will be handled by their respective handler:
+  <Location /handlers>
+    SetHandler  perl-script
+    PerlResponseHandler ASP4::ModPerl
+    SetEnv no-gzip dont-vary
+  </Location>
+  
+</VirtualHost>
+
+EOF
+}
+
+
+
+
+
+=pod
+
+=head1 NAME
+
+asphelper - Generate an ASP4 skeleton web application
+
+=head1 USAGE
+
+  asphelper --app=AppName --domain=example.com --email=you@your-email.com [--host=dbhost --db=dbname  --user=dbusername]
+
+If you specify C<--dbname> and C<--dbuser> it will ask you for a database password - completely optional.
+
+=head1 DESCRIPTION
+
+The C<asphelper> program offers a way to get up-and-running quickly with a new ASP4 web application.
+
+After successfully answering its questions, C<asphelper> will generate a skeleton web application
+including config files, full directory structure and a simple unit test.
+
+Use the resulting application as a starting-point for your own development.
+
+If executed with the following arguments:
+
+  asphelper --app=Foo --domain=www.foo.local --email=foo@bar.com --host=localhost --db=foo --user=root
+
+You will get an application matching what is listed below:
+
+  .
+    `-- foo
+        |-- common
+        |   |-- lib
+        |   |   `-- Foo
+        |   |       `-- db
+        |   |           `-- model.pm
+        |   `-- sbin
+        |       `-- ddl.sql
+        `-- www
+            |-- conf
+            |   |-- asp4-config.json
+            |   `-- httpd.conf
+            |-- etc
+            |-- handlers
+            |   `-- foo
+            |       `-- www
+            |           `-- echo.pm
+            |-- htdocs
+            |   `-- index.asp
+            `-- t
+                `-- 010-basic
+                    `-- 010-compile.t
+
+B<NOTE:> If L<Class::DBI::Lite> is installed, a base Model class will be created based on
+L<Class::DBI::Lite>.  See L<Class::DBI::Lite> for details on how to use it.
+
+=cut
+

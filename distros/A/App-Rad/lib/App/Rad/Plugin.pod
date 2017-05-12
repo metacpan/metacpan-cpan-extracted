@@ -1,0 +1,126 @@
+=head1 NAME
+
+App::Rad::Plugin - Extend the App::Rad framework!
+
+
+=head1 SYNOPSIS
+
+This document is intended to help developers write their own App::Rad plugins. For specific usage on any given plugin, please refer to it's actual documentation.
+
+
+=head1 WARNING!
+
+Since the plugin API is very new, there might be some changes in the future. Please drop me an email or RT wishlist if you feel something can be done to make plugin creation even better. Thanks!
+
+
+=head1 PLUGIN CREATION BASICS
+
+Creating App::Rad plugins is very easy.
+
+   package App::Rad::Plugin::MyPlugin;
+
+and create your subs as if they were methods of the App::Rad's C<< $c >> variable.
+
+   sub newmethod {
+       my $c = shift;
+
+       # ...
+   }
+
+If a user invokes your plugin, she can use your new methods at any point in their program:
+
+   use App::Rad  qw(MyPlugin);
+   App::Rad->run();
+
+   sub default {
+       my $c = shift;
+
+       $c->newmethod();    # this works!
+   }
+
+you can also extend App::Rad's functionality by overriding methods, such as C<< getopt >> or C<< config >>.
+
+
+=head1 CREATING INTERNAL (HELPER) SUBS
+
+App::Rad will only import methods not starting with an underscore:
+
+   package App::Rad::Plugin::YetAnother;
+
+   sub something {
+       my $c = shift;
+
+       _internal( $c->stash->{somevalue} );
+   }
+
+   sub _internal {
+       my $value = shift;
+       #...
+   }
+
+So you can safely create several internal subs for your plugin.
+
+   use App::Rad  qw(YetAnother);
+
+   sub default {
+       my $c = shift;
+
+       $c->something()    # this works!
+
+       $c->_internal()    # this won't...
+   }
+
+
+=head1 RESERVED SUB NAMES
+
+Currently there are no reserved names for your plugin subs. However, they might be added in the future to be called on some predefined times in the App::Rad command workflow. Let me know if you feel this would improve your plugin's usability. Thanks!
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc App::Rad::Plugin
+
+
+=head1 AUTHOR
+
+Breno G. de Oliveira, C<< <garu at cpan.org> >>
+
+
+=head1 ACKNOWLEDGEMENTS
+
+Lots of thanks to Fernando Correa (FCO) for his help with this module.
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2009 Breno G. de Oliveira C<< <garu at cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See L<perlartistic>.
+
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

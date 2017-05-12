@@ -1,0 +1,49 @@
+<VirtualHost *:11080>
+	ServerName authany.cirg.washington.edu
+	ServerAdmin kgoldov@uw.edu
+
+	ErrorLog /home/kgoldov/aa/var/log/apache2/authany.cirg.washington.edu-error.log
+	CustomLog /home/kgoldov/aa/var/log/apache2/authany.cirg.washington.edu-access.log combined
+
+	DocumentRoot /srv/www/authany.cirg.washington.edu/htdocs
+
+	<Directory /srv/www/authany.cirg.washington.edu/htdocs>
+		Order allow,deny
+		Allow from all
+	</Directory>
+
+	<Location /aa_auth/basic*/*>
+              AuthType Basic
+              AuthName AABasic
+              AuthUserFile /etc/authany/htpasswd
+              Require valid-user
+	</Location>
+
+	<Location /aa_auth/ldap*/*>
+             AuthType Basic
+             AuthName AALDAP
+             AuthBasicProvider ldap
+             AuthLDAPURL "ldaps://ldap1.example.com ldap2.example.com/ou=people,ou=AuthAny Folks,dc=acme,dc=us"
+             Require valid-user
+	</Location>
+
+	<Location /aa_auth/uw>
+            AuthType shibboleth
+            ShibRequireSessionWith UW
+            ShibRequestSetting forceAuthn 1
+            Require valid-user
+	</Location>
+
+	<Location /aa_auth/protectnetwork>
+             AuthType shibboleth
+             ShibRequireSessionWith ProtectNetwork
+             ShibRequestSetting forceAuthn 1
+             Require valid-user
+	</Location>
+
+	<Location /aa_auth/openid>
+             AuthOpenIDEnabled On
+	</Location>
+
+
+</VirtualHost>

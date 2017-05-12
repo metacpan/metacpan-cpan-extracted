@@ -1,0 +1,53 @@
+App::Changelog2x - Utilities to transform ChangeLogML using Perl
+
+Version: 0.11
+
+WHAT IS IT
+
+This package is a sample application using Perl, that transforms project
+change-log data written as ChangeLogML into various types of output. It
+can produce clean XHTML output, as well as plain-text that closely resembles
+traditional "Changes" files.
+
+
+USING App::Changelog2x
+
+See the docs for the changelog2x script that is installed along with the
+module.
+
+
+BUILDING/INSTALLING
+
+This package provides a Makefile.PL file as is typical of CPAN modules.
+Building and installing is as easy as:
+
+        perl Makefile.PL
+        make
+        make test
+        # If tests pass
+        make install
+
+(The "make install" step may require super-user privileges.)
+
+
+PROBLEMS/BUG REPORTS
+
+Problems, bug reports, or suggestions for enhancements can be sent directly
+to me, <rjray@blackperl.com>. Alternately, you can use the RT instance set
+up for all CPAN-based distributions:
+
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Changelog2x
+
+
+CHANGES
+
+Transaction revision: 18
+* bin/changelog2x
+* lib/App/Changelog2x.pm
+Added warnings pragma.                                          
+
+Transaction revision: 19
+* bin/changelog2x
+* lib/App/Changelog2x.pm
+Documentation clean-up and better specification of the required 
+Perl version.                                                   

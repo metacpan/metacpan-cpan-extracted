@@ -1,0 +1,34 @@
+---
+abstract: 'Log tailer which broadcasts log lines into RabbitMQ exchanges.'
+author:
+  - 'Tomas Doran (t0m) C<< <bobtfish@bobtfish.net> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.99'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-RabbitTail
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  AnyEvent: 0
+  AnyEvent::RabbitMQ: 1.03
+  Moose: 0
+  Moose::Autobox: 0
+  MooseX::Types: 0
+  MooseX::Types::Path::Class: 0
+  Net::RabbitFoot: 1.03
+  Try::Tiny: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bobtfish/App-RabbitTail.git
+version: 0.002

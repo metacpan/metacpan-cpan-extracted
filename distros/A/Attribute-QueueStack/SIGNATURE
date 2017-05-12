@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 725184209a0010ea4de311ab43230f4653eea922 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 0a78e354923ee91ed32e7ac97ab73fbebbd455ef Changes
+SHA1 de4e4350f4b7105baca4920f270055094b6e99d3 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 c9fc60c5f184aac3442829050c9d49287afcf720 MANIFEST
+SHA1 2c62c89ec4b42b4e0d48db3231018f8fc10085ce META.json
+SHA1 67f3ab7c4edce4695dd539af16ff6e6bc9c06191 META.yml
+SHA1 66839c8d4f5880332902c7ce3860b216bc38c30f Makefile.PL
+SHA1 c7204b7a45b0105697b6a477919b7b528c98f85f README
+SHA1 efbae3ec4dc6ddd434b4f0bcb43fcd2537ad5e19 dist.ini
+SHA1 f572e19252fa59bb95ebf74ae2ad65d4fb9cdf1f doap.ttl
+SHA1 7f47ca6c45310c8ed4e18b3872a5b4036d57cedd lib/Attribute/QueueStack.pm
+SHA1 ee7e93709d6d3864c7e8c8693f91dd2d1ebe4d06 lib/Tie/Array/Queue.pm
+SHA1 c05a79f2e738e341e80691f055b955dccf9c1fc0 lib/Tie/Array/Stack.pm
+SHA1 779acdb91c1600ebb3284b4223a14d21937f8ed9 t/01basic.t
+SHA1 774752a9104283fa30031fe18fc9af2b583267c0 t/02armed.t
+SHA1 aac73da0a2162e04fa590c3c09066d905384f9b7 t/03disarmed.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEUEARECAAYFAlQb1EUACgkQzr+BKGoqfTkcbgCbB3Rqn1HHSwMNCmec1Jw94EV8
+vdsAmOPduFiDCjRrLsW4453MdvBxGhQ=
+=VpDV
+-----END PGP SIGNATURE-----

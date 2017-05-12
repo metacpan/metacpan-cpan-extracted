@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/AnyEvent/RabbitMQ/PubSub.pm
+lib/AnyEvent/RabbitMQ/PubSub/Consumer.pm
+lib/AnyEvent/RabbitMQ/PubSub/Publisher.pm
+minil.toml
+t/00_compile.t
+xt/integration_test.t
+xt/republish.t
+META.yml
+MANIFEST

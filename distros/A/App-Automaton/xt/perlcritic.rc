@@ -1,0 +1,3 @@
+# This is purely for the inlined WWW::Download::YouTube
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs

@@ -1,0 +1,978 @@
+Revision history for Acme-MetaSyntactic
+
+1.013 2017-04-17 BOOK
+    [ENHANCEMENTS]
+    - Test::MetaSyntactic now prints a summary of failed themes at the end of
+      the all_themes_ok test suite
+    [TESTS]
+    - ensure the test suite works when @INC does not contain '.'
+    [PACKAGING]
+    - switch to Dist::Zilla for maintaining the distribution
+    [DOCUMENTATION]
+    - add quotes and links for two blogs posts about Acme::MetaSyntactic
+    - update a link to the Perl source history (from Perforce to Git)
+    [THEME UPDATE]
+    - contributors
+
+1.012 2013-10-14 BOOK
+    [ENHANCEMENTS]
+    - Test::MetaSyntactic now tries to load each theme in isolation
+    [TESTS]
+    - do not use blib in t/50usecase.t
+    - fix the t/usecase_list8 script to not trigger CPAN.pm
+      recursion detection (when loading pause_id)
+      (this should fix a long standing installation bug)
+
+1.011 2013-09-16 BOOK
+    [ENHANCEMENTS]
+    - the name() method now accepts a "$theme/$category" parameter,
+      instead of just "$theme"
+
+1.010 2013-08-12 BOOK
+    [ENHANCEMENTS]
+    - flip the executable bit on script/metafy
+
+1.009 2013-08-12 BOOK
+    [ENHANCEMENTS]
+    - Test::MetaSyntactic now enforces stricter rules on themes:
+      a theme will fail if it is empty, or if it returns the empty
+      string as a name
+
+1.008 2013-01-13 BOOK
+    [ENHANCEMENTS]
+    - the load_data() method now closes the DATA filehandle when done.
+      Many themes use __DATA__ to store their names, which could cause
+      problems ("Too many open files"), when loading a lot of themes.
+      (see http://www.cpantesters.org/cpan/report/25449004)
+
+1.007 2012-10-08 BOOK
+    [ENHANCEMENTS]
+    - Test::MetaSyntactic now supports RELEASE_TESTING
+      (and keeps supporting AUTHOR_TESTING for backwards compatibility)
+
+1.006 2012-08-26 BOOK
+    [ENHANCEMENTS]
+    - add support for end-of-line comments in the __DATA__ section
+      (in the load_data() method)
+
+1.005 2012-07-24 BOOK
+    [TESTS]
+    - fix t/31any.t to work with themes having very few items
+
+1.004 2012-06-28 BOOK
+    [ENHANCEMENTS]
+    - add support for POST request in Acme::MetaSyntactic::RemoteList
+
+1.003 2012-06-12 BOOK
+    [ENHANCEMENTS]
+    - Acme::MetaSyntactic::List now automatically removes duplicate
+      items from the initialisation data,
+    - thus making obsolete the subtest_uniq test in Test::MetaSyntactic
+    - give Test::MetaSyntactic a shorter timeout to check for the network
+    - fix some encoding issues (fixes RT #77657)
+
+1.002 2012-05-21 BOOK
+    [TESTS]
+    - ensure theme names used in tests are unlikely to conflict
+      with themes existing in the wild
+
+1.001 2012-05-14 BOOK
+    [ENHANCEMENTS]
+    - new subtest in Test::MetaSyntactic: subtest_encoding
+    - extract() for MultiList lists that have remote lists
+      can now behave differently for each category (the category
+      is passed as a parameter)
+    [DOCUMENTATION]
+    - add links to meta(1) from Acme::MetaSyntactic's documentation
+      (fixes RT #77060)
+    [THEME UPDATES]
+    - new contributor added to contributors theme
+
+1.000 2012-05-07 BOOK
+    [NEW THEME 2012/05/07]
+    - contributors
+    [ENHANCEMENTS]
+    - eta.pm provided as a shortcut for one-liners (perl -Meta)
+      (closed RT #28849)
+    [THEME UPDATES]
+    - all themes but foo (the default) and any moved to another
+      distribution: Acme-MetaSyntactic-Themes
+
+0.99_05 2012-05-04 BOOK
+    [ENHANCEMENTS]
+    - Acme::MetaSyntactic::MultiList init() now accepts an argument.
+      (closed RT #40116)
+    [TESTS]
+    - made sure no tests depend on included themes
+
+0.99_04 2012-04-10 BOOK
+    [TESTS]
+    - improved version of Test::MetaSyntactic, with more subtests
+
+0.99_03 2012-03-31 BOOK
+    [TESTS]
+    - moved all tests common to all themes in the Test::MetaSyntactic module
+    - remove possible duplicates in unicode theme
+
+0.99_02 2011-11-10 BOOK
+    [TESTS]
+    - clean up some "Name used only once" warnings
+    - fix pod coverage tests for unicode theme
+
+0.99_01 2011-10-18 BOOK
+    [TESTS]
+    - fix tests that used to break with Perl >= 5.10
+      (thanks to Florian Ragwitz and Randy Stauner for patches)
+
+0.99 2006-11-06 BOOK
+    [NEW WEEKLY THEME 2006/11/06]
+    - summerwine (Smylers)
+    [TOOLS]
+    - metafy is a new script that can search metasyntactic terms and
+      replace them by others
+    [THEME UPDATES]
+    - pause_id
+    - pokemon
+    - pm_groups
+
+0.98 2006-10-30 BOOK
+    [NEW WEEKLY THEME 2006/10/30]
+    - magma
+    [THEME UPDATES]
+    - dilbert
+    - linux
+    - pause_id
+
+0.97 2006-10-24 BOOK
+    [NEW WEEKLY THEME 2006/10/23]
+    - good_omens (Jean Forget)
+    [THEME UPDATES]
+    - dilbert
+    - linux
+    - pause_id
+
+0.96 2006-10-16 BOOK
+    [NEW WEEKLY THEME 2006/10/16]
+    - thunderbirds (Abigail)
+    [THEME UPDATES]
+    - browser (Rafaël Garcia-Suarez added "iceweasel")
+    - pause_id
+
+0.95 2006-10-09 BOOK
+    [NEW WEEKLY THEME 2006/10/09]
+    - linux
+    [THEME UPDATES]
+    - pause_id
+    - pm_groups
+
+0.94 2006-10-02 BOOK
+    [NEW WEEKLY THEME 2006/10/02]
+    - nis (Abigail)
+    [THEME UPDATES]
+    - pause_id
+
+0.93 2006-09-26 BOOK
+    [NEW WEEKLY THEME 2006/09/25]
+    - jabberwocky (Abigail)
+    [ENHANCEMENTS]
+    - Acme::MetaSyntactic::MultiList now has a has_category() method
+      to test if a given theme contains a certain category
+    [THEME UPDATES]
+    - pause_id
+    - pm_groups
+
+0.92 2006-09-16 BOOK
+    [NEW WEEKLY THEME 2006/09/18]
+    - invasions (Jean Forget)
+    [THEME UPDATES]
+    - dilbert
+    - pause_id
+    - vcs (Abigail)
+
+0.91 2006-09-10 BOOK
+    [NEW WEEKLY THEME 2006/09/11]
+    - vcs (Éric Cholet)
+    [ON TO VERSION 1.00]
+    - the DATES file now lists all planned themes until version 1.00
+    [TICKET CLOSED]
+    - #21325 on rt.cpan.org (update metro with Chicago lines)
+    [THEME UPDATES]
+    - dilbert
+    - metro (Chicago by Elliot Shank, London, Rotterdam, Toronto by Abigail)
+    - pause_id
+    - phonetic (Dutch list by Abigail)
+    - pm_groups
+    - punctuation (update from wikipedia by Abigail)
+    - yapc (new YAPC by Abigail)
+
+0.90 2006-09-03 BOOK
+    [NEW WEEKLY THEME 2006/09/04]
+    - state_flowers (Abigail)
+    [THEME UPDATES]
+    - pause_id
+    - yapc (Vienna and Houston were selected for 2007)
+
+0.89 2006-08-28 BOOK
+    [NEW WEEKLY THEME 2006/08/28]
+    - pause_id
+    [THEME UPDATES]
+    - dilbert
+    - planets (Pluto is not a planet anymore)
+    - pornstars
+
+0.88 2006-08-22 BOOK
+    [NEW WEEKLY THEME 2006/08/21]
+    - metro
+    [AND FOR THE LAST TIME, METRO IS NOT NEW!]
+    - ... but is has changed so much, that is just like it was.
+    - From now on, Acme::MetaSyntactic has exactly 100 * $VERSION
+      themes. Version 0.99 (the last beta) will ship with 99 themes.
+    - No more cheap tricks to reduce the headcount, yay!
+    [TESTS]
+    - t/31any.t has been updated to work correctly if other themes
+      are installed
+    - t/41count.t is back (and works correctly if other themes are
+      installed)
+    [TICKET CLOSED]
+    - #21028 on rt.cpan.org (David Adler noticed that t/31any.t failed)
+    [THEME UPDATE]
+    - space_missions (new categories: manned_spacecraft, launch_vehicles
+      and victims)
+
+0.87 2006-08-08 BOOK
+    [NEW WEEKLY THEME 2006/08/14]
+    - sins (Abigail)
+    [THEME UPDATE]
+    - pm_groups
+    [OOPS]
+    - space_missions was not listed in the MANIFEST file for the
+      previous version, and was therefore not included...
+
+0.86 2006-08-04 BOOK
+    [NEW WEEKLY THEME 2006/08/07]
+    - pie (Nicholas Clark)
+    [TESTS]
+    - removed t/41count.t from the public tests, as it may break
+      when older versions of Acme::MetaSyntactic are already installed
+      (that's because some themes have been renamed or removed)
+    [THEME UPDATES]
+    - apollo (augmented and renamed space_missions)
+    - space_missions (Jean Forget)
+
+0.85 2006-08-02 BOOK
+    [NEW WEEKLY THEME 2006/07/31]
+    - foo
+    [GUESS WHAT? FOO IS NOT NEW!]
+    - foo was made multilingual (see the change log for 0.26, 0.38,
+      0.55, 0.70 and 0.73 for the whole list of cheap justifications)
+    - only one more of those, and we'll have the version number correspond
+      to the total number of themes
+    [THEME UPDATES]
+    - toto (removed and merged into foo)
+    [OOPS]
+    - Due to holidays and bad connection, this list was two days late.
+
+0.84 2006-07-23 BOOK
+    [NEW WEEKLY THEME 2006/07/24]
+    - tour_de_france (Abigail)
+    [THEME UPDATES]
+    - donmartin
+    - services (added a link to the IANA list)
+    - simpsons (made updatable with a link provided by Matthew Musgrove)
+
+0.83 2006-07-11 BOOK
+    [NEW WEEKLY THEME 2006/07/17]
+    - metro
+
+0.82 2006-07-07 BOOK
+    [NEW WEEKLY THEME 2006/07/10]
+    - olympics (Abigail)
+    [THEME UPDATES]
+    - dilbert
+    - groo (fixed a typo)
+    - pm_groups
+    - pokemon
+
+0.81 2006-07-03 BOOK
+    [NEW WEEKLY THEME 2006/07/03]
+    - swords (Jean Forget)
+    [THEME UPDATE]
+    - dilbert
+
+0.80 2006-06-24 BOOK
+    [NEW WEEKLY THEME 2006/06/26]
+    - pgpfone (David Golden)
+    [THEME UPDATES]
+    - dilbert
+    - norse_mythology (Jean Forget added new categories names, places
+      humans, norns and events, and also added a few dwarves, gods,
+      giants and valkyries)
+
+0.79 2006-06-19 BOOK
+    [NEW WEEKLY THEME 2006/06/19]
+    - lotr (Jean Forget)
+    [THEME UPDATES]
+    - pm_groups
+    - pornstars
+
+0.78 2006-06-08 BOOK
+    [NEW WEEKLY THEME 2006/06/12]
+    - scooby_doo (Michel Rodriguez)
+    [TESTS FIX]
+    - the alias use cases were not included in the MANIFEST file
+      and therefore not in the distribution. They are now.
+    [THEME UPDATE]
+    - dilbert
+
+0.77 2006-06-05 BOOK
+    [NEW WEEKLY THEME 2006/06/05]
+    - colors
+    [ENHANCEMENTS]
+    - Acme::MetaSyntactic::Alias improves lazyness by allowing a
+      theme to be the exact copy of another one, with no work
+      (the colors theme is an alias of the colours theme)
+    [THEME UPDATE]
+    - colours (Abigail provided many English color names)
+    - pm_groups
+
+0.76 2006-05-25 BOOK
+    [NEW WEEKLY THEME 2006/05/22]
+    - colours (José Castro)
+    [THEME UPDATE]
+    - jamesbond (Abigail added several categories)
+
+0.75 2006-05-22 BOOK
+    [NEW WEEKLY THEME 2006/05/22]
+    - norse_mythology (Abigail)
+    [THEME UPDATE]
+    - pornstars
+
+0.74 2006-05-15 BOOK
+    [NEW WEEKLY THEME 2006/05/15]
+    - userfriendly (Abigail)
+    [DOCUMENTATION]
+    - one more success story in the meta(1) documentation
+    [THEME UPDATES]
+    - dwarves (Abigail, 9 new languages)
+    - phonetic (Gisbert W. Selke, German typo)
+    - planets (Abigail, update to 42 languages)
+    - pornstars
+    - weekdays (Gisbert W. Selke, 10 new languages)
+
+0.73 2006-04-30 BOOK
+    [NEW WEEKLY THEME 2006/05/08]
+    - planets
+    [GUESS WHAT? PLANETS IS NOT NEW!]
+    - planets was made multilingual (see the change log for
+      0.26, 0.38, 0.55 and 0.70 for the whole list of cheap
+      justifications)
+    [ENHANCEMENTS]
+    - Acme::MetaSyntactic::Locale is now a subclass of
+      Acme::MetaSyntactic::MultiList, and supports territories.
+
+0.72 2006-04-28 BOOK
+    [NEW WEEKLY THEME 2006/05/01]
+    - pantagruel (Rafaël Garcia-Suarez)
+    [THEME UPDATES]
+    - pm_groups
+    - pornstars
+
+0.71 2006-04-26 BOOK
+    [NEW WEEKLY THEME 2006/04/24]
+    - sql
+    [THEME UPDATE]
+    - pornstars
+
+0.70 2006-04-16 BOOK
+    [NEW WEEKLY THEME 2006/04/17]
+    - jamesbond (Abigail)
+    [HEY, JAMESBOND IS NOT NEW! IT WAS ADDED IN VERSION 0.07!!]
+    - You know the story, now... (If not, see the change log for
+      versions 0.26, 0.38 and 0.55.) This time I turned a simple
+      list into one with categories.
+    [ENHANCEMENTS]
+    - The meta script can now be called with "meta theme/category"
+      instead of "meta --category category theme". (Abigail)
+    - meta now accepts a --sources switch, that lists the sources
+      used by a remote list. (Abigail)
+    [THEME UPDATES]
+    - browser (Rafaël Garcia-Suarez added a new item)
+    - pornstars
+    [TICKET CLOSED]
+    - #18700 on rt.cpan.org (update to the browser theme)
+
+0.69 2006-04-09 BOOK
+    [NEW WEEKLY THEME 2006/04/10]
+    - pornstars (Sébastien Aperghis-Tramoni)
+    [ENHANCEMENTS]
+    - New behaviour Acme::MetaSyntactic::MultiList allows themes
+      to be organised in categories and sub-categories. Usage is
+      similar to Acme::MetaSyntactic::Locale (except that the
+      constructor parameter is named 'category')
+    - the first theme to use this feature is... pornstars
+    - Acme::MetaSyntactic::RemoteList has a new method sources()
+      that can report the source URLs for subcategories (for
+      Acme::MetaSyntactic::RemoteList)
+    - the meta script accepts a new --category option, to select
+      a category within an Acme::MetaSyntactic::MultiList theme
+    [TESTS]
+    - Since 0.59, Acme::MetaSyntactic::RemoteList could accept
+      serveral sources. This functionality is now fully tested.
+    - tests for Acme::MetaSyntactic::MultiList
+    - skip a few more tests if LWP::UserAgent is not installed
+    [THEME UPDATE]
+    - hhgg (updated a reference link)
+
+0.68 2006-03-24 BOOK
+    [NEW WEEKLY THEME 2006/04/03]
+    - pop2
+    [THEME UPDATE]
+    - counting_rhyme (Anja Krebber and Yanick Champoux provided
+      a German version)
+    - dilbert
+    - services (now uses a very large online list)
+
+0.67 2006-03-23 BOOK
+    [NEW WEEKLY THEME 2006/03/27]
+    - pop3
+
+0.66 2006-03-19 BOOK
+    [NEW WEEKLY THEME 2006/03/20]
+    - smtp (Abigail)
+
+0.65 2006-03-12 BOOK
+    [NEW WEEKLY THEME 2006/03/13]
+    - contrade (Estelle Souche)
+
+0.64 2006-03-05 BOOK
+    [NEW WEEKLY THEME 2006/03/06]
+    - trigan (Abigail)
+    [FILE UPDATE]
+    - DATES lists all planned themes until version 0.68.
+    [THEME UPDATES]
+    - pm_groups
+    - pokemon
+    - pooh (Abigail provided a few more characters)
+
+0.63 2006-02-16 BOOK
+    [NEW WEEKLY THEME 2006/02/27]
+    - planets (Abigail)
+
+0.62 2006-02-16 BOOK
+    [NEW WEEKLY THEME 2006/02/20]
+    - garfield (Abigail)
+
+0.61 2006-02-12 BOOK
+    [NEW WEEKLY THEME 2006/02/13]
+    - pooh (Abigail & Leon Brocard)
+    [THEME UPDATE]
+    - pm_groups
+
+0.60 2006-02-05 BOOK
+    [NEW WEEKLY THEME 2006/02/06]
+    - gems (Abigail)
+    [THEME UPDATES]
+    - dilbert
+    - pm_groups
+
+0.59 2006-01-30 BOOK
+    [NEW WEEKLY THEME 2006/01/30]
+    - chess (Abigail)
+    [ENHANCEMENTS]
+    - Acme::MetaSyntactic::RemoteList now supports having several sources
+      (but will parse them all in the same manner), thanks to Abigail
+    [TESTS]
+    - t/23length.t checks that items are not longer than 251 characters,
+      and are therefore valid Perl identifiers
+    [THEME UPDATES]
+    - donmartin (Flavio Poletti noted that the list was incomplete.
+      I put up a more accurate list instead of adding the missing item.)
+    - haddock (Jan Pieter Cornet provided a Dutch version of the list)
+    - pokemon (added two pokemons that the parsing code didn't catch)
+    - tmnt (the lists sources are on the web)
+    - yapc (some more YAPC were announced for 2006)
+
+0.58 2006-01-22 BOOK
+    [NEW WEEKLY THEME 2006/01/23]
+    - tmnt (Abigail)
+    [THEME UPDATE]
+    - pm_groups
+    
+0.57 2006-01-15 BOOK
+    [NEW WEEKLY THEME 2006/01/16]
+    - barbarella (Abigail)
+    [ENHANCEMENTS]
+    - meta now has a --check method that fetches the remote list and
+      shows which items were added or removed (thanks to Abigail).
+    [THEME UPDATES]
+    - dilbert
+    - pokemon
+    - us_presidents (Abigail spotted a typo and provided a code patch)
+
+0.56 2005-12-29 BOOK
+    [NEW WEEKLY THEME 2006/01/09]
+    - pokemon (Abigail)
+    [THEME UPDATE]
+    - pm_groups (28 groups died, 4 were created)
+
+0.55 2005-12-27 BOOK
+    [NEW WEEKLY THEME 2006/01/02]
+    - weekdays
+    [HEY, WEEKDAYS IS NOT NEW! IT WAS ADDED IN VERSION 0.51!!]
+    - Well, the theme has changed enough that I can consider it
+      new: it's now a subclass of Acme::MetaSyntactic::Locale
+      and supports Basque, Catalan, Corsican, Danish, Dutch, English,
+      Estonian, Finnish, French, German, Italian, Latin, Latvian,
+      Polish, Portuguese, Spanish, Swahili, Swedish, Welsh and Yiddish
+      lists (as well as the Pataphysical calendar).
+    - You've being doing this three times already! What does it mean?
+    - I must admit that it's the only way I've found to add something
+      new each week and still manage to have only 100 themes when I
+      reach version 1.00...
+
+0.54 2005-12-22 BOOK
+    [NEW WEEKLY THEME 2005/12/26]
+    - barbapapa (Abigail)
+
+0.53 2005-12-19 BOOK
+    [NEW WEEKLY THEME 2005/12/19]
+    - opcodes (Abigail)
+    [ENHANCEMENTS]
+    - the list of themes (as returned by themes() is still computed
+      at startup, but if new themes appear while the current script
+      is running, they can be "required" without a restart
+    [THEME UPDATE]
+    - dilbert
+
+0.52 2005-12-11 BOOK
+    [NEW WEEKLY THEME 2005/12/12]
+    - us_presidents (Abigail)
+    [THEME UPDATE]
+    - dilbert
+
+0.51 2005-12-04 BOOK
+    [NEW WEEKLY THEME 2005/12/05]
+    - weekdays (Abigail)
+    [ENHANCEMENTS]
+    - Added support for empty lists (prevents AMS from falling into
+      an infinite loop), thanks to Abigail
+    - Better support in Acme::MetaSyntactic::Locale for language
+      tags longer than 2 characters
+    - Acme::MetaSyntactic::RemoteList now uses LWP::UserAgent to fetch
+      remote lists
+    [THEME UPDATES]
+    - booze (see below)
+    - dilbert
+    - unicode (better support for various Perl versions and a very basic
+      default list)
+    [TICKET CLOSED]
+    - #16256 on rt.cpan.org (David Landgren provided 11 new beverages
+      and corrected a typo in AMS::booze)
+
+0.50 2005-11-26 BOOK
+    [NEW WEEKLY THEME 2005/11/28]
+    - unicode
+    [ENHANCEMENTS]
+    - Acme::MetaSyntactic::List and Acme::MetaSyntactic::Locale-based
+      theme can now supply their lists to __PACKAGE__->init(), instead
+      of storing them in __DATA__. The data format must be the same
+      as the one that load_data() returns.
+    [FILE UPDATE]
+    - Oops. The DATES file was not listed in the MANIFEST file, 
+      and therefore not included in version 0.49.
+    - DATES now lists all planned themes for 2005.
+
+0.49 2005-11-20 BOOK
+    [NEW WEEKLY THEME 2005/11/21]
+    - pm_groups
+    [THEME UPDATES]
+    - dilbert (thanks to Acme::MetaSyntactic::RemoteList, see below)
+    - yapc (YAPC::NA 2006 will be in Chicago)
+    [ENHANCEMENTS]
+    - name() is now a class method for Acme::MetaSyntactic::List and
+      Acme::MetaSyntactic::Locale
+    - A new class, Acme::MetaSyntactic::RemoteList, makes it possible
+      to fetch the source list for the theme from a given URL.
+      The associated test script spots new items and warns me about it.
+    - The first themes with a remote list are viclones, dilbert and
+      pm_groups.
+    - meta now has a --remote option that prints the remote list of items
+    [NEW FILE]
+    - the DATES file lists all themes added since the beginning,
+      with date and version information, as well as planned
+      additions. This version lists all themes up to version 0.50.
+
+0.48 2005-11-01 BOOK
+    [NEW WEEKLY THEME 2005/11/14]
+    - dwarves (Antoine Hulin, Abigail & Xavier Caron)
+
+0.47 2005-10-31 BOOK
+    [NEW WEEKLY THEME 2005/11/07]
+    - facecards (Estelle Souche)
+    [THEME UPDATES]
+    - counting_rhyme (Dutch couting rhyme by Abigail)
+    - discworld (Jean Forget added 35 new items)
+    - yapc (Missing cities added by Abigail)
+    [NEW FILE]
+    - the CONTRIBUTORS file lists all the people who helped me
+      with Acme::MetaSyntactic. Thanks to you all!
+
+0.46 2005-10-24 BOOK
+    [NEW WEEKLY THEME 2005/10/31]
+    - antlers (Gaal Yahas)
+
+0.45 2005-10-23 BOOK
+    [NEW WEEKLY THEME 2005/10/24]
+    - booze (Nicholas Clark)
+    [THEME UPDATE]
+    - jamesbond (new movie title is public)
+
+0.44 2005-10-14 BOOK
+    [NEW WEEKLY THEME 2005/10/17]
+    - constellations
+
+0.43 2005-10-09 BOOK
+    [NEW WEEKLY THEME 2005/10/10]
+    - roman (Alberto Manuel Brandão Simões)
+
+0.42 2005-10-02 BOOK
+    [NEW WEEKLY THEME 2005/10/03]
+    - discworld (Martin Vorländer)
+
+0.41 2005-09-25 BOOK
+    [NEW WEEKLY THEME 2005/09/26]
+    - apollo (Jean Forget)
+    [THEME UPDATES]
+    - pynchon (David Landgren gave me 70 new items)
+    [ENHANCEMENTS]
+    - Win32::Locale is now the last after $ENV{LANGUAGE} and $ENV{LANG}
+      under Win32 (it was previously the only possibility)
+    [TICKET CLOSED]
+    - #14691 on rt.cpan.org (thanks to Barbie, who ran the tests
+      under Win32, I discovered I didn't really knew %INC, and
+      that I forgot that use = require + import)
+
+0.40 2005-09-11 BOOK
+    [NEW WEEKLY THEME 2005/09/19]
+    - yapc (Mark Fowler)
+    [TESTS]
+    - increased coverage for the theme() method
+
+0.39 2005-09-08 BOOK
+    [NEW WEEKLY THEME 2005/09/12]
+    - stars (Rafael Garcia-Suarez)
+    [THEME UPDATES]
+    - counting_rhyme (David Landgren spotted a typo)
+    - phonetic (Gábor Szabó had a test failure)
+    [ENHANCEMENTS]
+    - Each theme now has a theme() method, for reflexion
+    [TESTS]
+    - the list validity is now tested for all locales for subclasses
+      of Acme::MetaSyntactic::Locale (thanks to Gábor Szabó)
+
+0.38 2005-08-24 BOOK
+    [NEW WEEKLY THEME 2005/09/05]
+    - phonetic
+    [HEY, PHONETIC IS NOT NEW! IT WAS ADDED IN VERSION 0.08!!]
+    - Well, the theme has changed enough that I can consider it
+      new: it's now a subclass of Acme::MetaSyntactic::Locale,
+      and supports Swahili, French, English, German and Italian
+      lists (as well as the good old NATO).
+    [TICKET CLOSED]
+    - #14276 on rt.cpan.org (multilingual phonetic, with unofficial
+      Swahili alphabet)
+
+0.37 2005-08-23 BOOK
+    [NEW WEEKLY THEME 2005/08/29]
+    - jerkcity (Rafael Garcia-Suarez)
+
+0.36 2005-08-23 BOOK
+    [NEW WEEKLY THEME 2005/08/23]
+    - currency
+    [THEME UPDATES]
+    - batman (link to photos of the onomatopoeias)
+    [OOPS]
+    - Due to holidays, this list was a day late. I hope this wasn't
+      needed in production! ;-)
+
+0.35 2005-08-13 BOOK
+    [NEW WEEKLY THEME 2005/08/15]
+    - garbage (Jérôme Fenal)
+    [ENHANCEMENTS]
+    - the meta(1) command-line now has an usage line
+      and recognises the --help option
+
+0.34 2005-08-07 BOOK
+    [NEW WEEKLY THEME 2005/08/08]
+    - peanuts
+
+0.33 2005-07-31 BOOK
+    [NEW WEEKLY THEME 2005/08/01]
+    - services
+
+0.32 2005-07-24 BOOK
+    [NEW WEEKLY THEME 2005/07/25]
+    - octothorpe
+    [ENHANCEMENTS]
+    - Correctly defined the import() method for each AMS subclass.
+      Using any Acme::MetaSyntactic::theme with the empty list () will
+      now prevent the metatheme() function to be created.
+    [COVERAGE]
+    - Coverage is not 100% any more (99.6% under Linux and 99.4% under
+      Windows), but I think I'll mostly blame Devel::Cover ;-)
+
+0.31 2005-07-17 BOOK
+    [NEW WEEKLY THEME 2005/07/18]
+    - monty_spam
+
+0.30 2005-07-10 BOOK
+    [NEW WEEKLY THEME 2005/07/11]
+    - counting_rhyme (Xavier Caron & Paul-Christophe Varoutas)
+
+0.29 2005-07-03 BOOK
+    [NEW WEEKLY THEME 2005/07/04]
+    - punctuation
+    [THEME UPDATES]
+    - dilbert
+    [RAISE MY KWALITEE]
+    - added "use strict;" to AMS::elements and AMS::quantum
+
+0.28 2005-06-26 BOOK
+    [NEW WEEKLY THEME 2005/06/27]
+    - oulipo
+    [THEME UPDATES]
+    - hhgg (Jean Forget provided a few links)
+    - crypto (Guy Widloecher provided new items and links)
+
+0.27 2005-06-19 BOOK
+    [NEW WEEKLY THEME 2005/06/20]
+    - groo
+
+0.26 2005-06-13 BOOK
+    [NEW WEEKLY THEME 2005/06/13]
+    - simpsons
+    [HEY, SIMPSONS IS NOT NEW! IT WAS ADDED IN VERSION 0.04!!]
+    - Sorry, the theme disappeared in version 0.12, when I made
+      the change to the behaviour-based architecture
+    - What's the point of having 100% coverage, when things like
+      this happen?
+    - Hey, nobody complained until now!
+
+0.25 2005-06-06 BOOK
+    [NEW WEEKLY THEME 2005/06/06]
+    - pasta
+    [BUG FIX]
+    - magicroundabout had a BUG, which is now fixed (sorry about that)
+
+0.24 2005-05-29 BOOK
+    [NEW WEEKLY THEME 2005/05/30]
+    - magicroundabout (Cédric Bouvier)
+    [THEME UPDATE]
+    - magic8ball (4 items were missing)
+    [ENHANCEMENT]
+    - meta now supports a --themes option that lists all the available
+      themes
+
+0.23 2005-05-16 BOOK
+    [NEW WEEKLY THEME 2005/05/23]
+    - teletubbies
+    [DOCUMENTATION]
+    - added SUCCESS STORIES to the meta(1) documentation
+
+0.22 2005-05-12 BOOK
+    [NEW WEEKLY THEME 2005/05/16]
+    - quantum (Sébastien Aperghis-Tramoni)
+
+0.21 2005-05-08 BOOK
+    [NEW WEEKLY THEME 2005/05/09]
+    - alphabet
+    [ENHANCEMENTS]
+    - Acme::MetaSyntactic::any's constructor now accepts parameters,
+      which can modify the behaviour of the chosen themes (e.g.
+      the themes derived from Acme::MetaSyntactic::Locale)
+    - Acme::MetaSyntactic::any now ensures there will be no repetition
+      in a given theme until all items from the theme have been seen.
+    [DOCUMENTATION]
+    - Acme::MetaSyntactic::Locale is now listed among the available
+      behaviours in Acme::MetaSyntactic
+
+0.20 2005-05-02 BOOK
+    [NEW WEEKLY THEME 2005/05/02]
+    - debian
+
+0.19 2005-04-24 BOOK
+    [NEW WEEKLY THEME 2005/04/25]
+    - magic8ball
+
+0.18 2005-04-11 BOOK
+    [NEW WEEKLY THEME 2005/04/18]
+    - amber (Offer Kaye)
+
+0.17 2005-04-10 BOOK
+    [NEW WEEKLY THEME 2005/04/11]
+    - elements (Sébastien Aperghis-Tramoni)
+    [ENHANCEMENTS]
+    - now looks for Acme::MetaSyntactic themes everywhere in @INC
+      (not only in the directory where Acme::MetaSyntactic is installed)
+    - better documentation for Acme::MetaSyntactic::Locale
+    [BUGFIX]
+    - load_data() does not destroy $_ any more
+    - the bugfix in 0.16 did not fix the "whitespace in install dir" bug,
+      but the @INC enhancement did (thanks to Olivier Mengué for pointing
+      me to File::Glob)
+
+0.16 2005-04-01 BOOK
+    [NEW WEEKLY THEME 2005/04/04]
+    - haddock (Jérôme Fenal)
+    [ENHANCEMENTS]
+    - The new Acme::MetaSyntactic::Locale allows for multilingual themes
+    - The first theme to use this behaviour is "haddock"
+    - Still 100% coverage (even cover Win32 code under Unix)
+    [BUGFIX]
+    - Corrected a bug that only appeared if Acme::MetaSyntactic
+      was installed in directories containing whitespace
+      (thanks to Max Maischein for testing under such conditions!)
+
+0.15 2005-03-17 BOOK
+    [NEW WEEKLY THEME 2005/03/28]
+    - python (Ricardo Signes)
+    [THEME UPDATES]
+    - dancers (removed bad characters)
+    - dilbert (removed duplicates)
+    - donmartin (removed duplicates)
+    - robin (removed duplicates)
+    [ENHANCEMENTS]
+    - cleaned up the result of load_data()
+    [ANNOUNCE]
+    - This module is a dependency for two other modules!
+      + Bot::MetaSyntactic is the base for the meta bot on #perlfr
+      + Acme::MetaSyntactic::RefactorCode will replace your boring
+        metasyntactic variables with shiny new ones
+
+0.14 2005-03-14 BOOK
+    [NEW WEEKLY THEME 2005/03/21]
+    - pumpkings (Rafael Garcia-Suarez)
+    [THEME UPDATE]
+    - hhgg
+
+0.13 2005-03-06 BOOK
+    [NEW WEEKLY THEME 2005/03/14]
+    - loremipsum (Jérôme Fenal)
+
+0.12 2005-03-06 BOOK
+    [ENHANCEMENTS]
+    - To prevent endless growth of the Acme::MetaSyntactic module,
+      and support various theme behaviours, support for behaviour
+      classes has been added.
+    - The first behaviour class is Acme::MetaSyntactic::List, which
+      reproduces the previous behaviour of selecting a number
+      of random items from a list, with no repetition until
+      the list is exhausted.
+    - The 17 existing themes have been converted to the new scheme.
+    [USAGE]
+    - Acme::MetaSyntactic is a dependency for a least one module!
+      Praise Bot::MetaSyntactic, which is the core of the meta bot
+      running on irc://irc.perl.org/perlfr
+    [INCOMPATIBILITIES]
+    - the API has changed a little:
+      + Acme::MetaSyntactic does not has methods named after the
+        themes any more
+      + The name() method now accept the theme name as its first
+        parameter
+      + name( [ $theme, ] 0 ) now returns the full list of names
+    [COVERAGE]
+    - Code coverage is still 100%, but I had to resort to a hack
+      to achieve this feat.
+    [NEW BEHAVIOURS]
+    - Acme::MetaSyntactic::List is the classic "random item from a list"
+      that existed until now
+    [ANNOUNCE]
+    - More behaviour subclasses will follow!
+    [NEW WEEKLY THEMES 2005/03/07]
+    - any     [a metatheme (!) that returns names from a random theme]
+    - dancers [a birthday gift and homage to my wife,
+               who was born on March 7th, 30 years ago]
+    [THEME UPDATE]
+    - toto (Jérôme Fenal)
+
+0.11 2005-02-22 BOOK
+    [NEW WEEKLY THEME 2005/02/28]
+    - hhgg (Aldo Calpini)
+
+0.10 2005-02-10 BOOK
+    [NEW WEEKLY THEME 2005/02/21]
+    - viclones
+
+0.09 2005-02-06 BOOK
+    [NEW WEEKLY THEME 2005/02/14]
+    - buffy (Rafael Garcia-Suarez)
+
+0.08 2005-01-18 BOOK
+    [NEW WEEKLY THEME 2005/02/07]
+    - phonetic (Michel Rodriguez)
+
+0.07 2005-01-18 BOOK
+    [NEW WEEKLY THEME 2005/01/31]
+    - jamesbond (heh)
+
+0.06 2005-01-18 BOOK
+    [BIG FUX]
+    - themes() didn't work correctly in scalar context.
+    [SMILL FAX]
+    - meta did issue a warning when called without arguments.
+      Rafael Garcia-Suarez provided a patch, which I modified
+      so that no args means default theme.
+    [NEW WEEKLY THEME 2005/01/24]
+    - tld (Scott Lanning suggested ISO 3166 country codes)
+
+0.05 2005-01-16 BOOK
+    [ANNOUNCE]
+    - From now on, releases should happen on a weekly
+      basis, every monday morning (CET)... A new list every week!
+    - Email me with suggestions (and lists).
+    [STUPID ME]
+    - 0.04 was released too soon, so this version:
+      + puts the coverage back at 100% (one missing test in 0.04
+        had the coverage fall to 97.8%. Darn.)
+      + removes the compromising "log" file (which was there since 0.01)
+      + removes the "Build" file (which was there since 0.01, as well)
+    [TOOLS]
+    - script/meta is a simple front-end, useful with $EDITOR
+    [THEMES]
+    - New theme:
+      + browser (with a little help from Sébastien Aperghis-Tramoni)
+
+0.04 2005-01-15 BOOK
+    - Correct a typo in Markefile.PL (thanks to Mike Castle)
+    - The method themes() returns the sorted list of available themes
+    - New themes:
+      + crypto (anonymous)
+      + simpsons
+    - closed ticket #9725 on rt.cpan.org (wishlist)
+
+0.03 2005-01-14 BOOK
+    - Documentation patches
+    - Put everything in __DATA__ to make adding new themes easier
+    - New themes (the names in parentheses indicate who suggested
+      the theme and/or provided the list):
+      + dilbert (Sébastien Aperghis-Tramoni)
+      + donmartin (Vahe Sarkissian)
+      + pynchon (David Landgren)
+      + robin
+    - closed ticket #9731 on rt.cpan.org (discussion)
+
+0.02 2005-01-14 BOOK
+    - The module now exports all meta* functions.
+    - If many items are requested, the module will supply as many
+      as requested, as randomly as possible.
+
+0.01 2005-01-13 BOOK
+    - First version, with only an OO interface.
+    - 100% test coverage (Devel::Cover rules!)
+    - Themes:
+      + batman
+      + flintstones
+      + foo
+      + shadok
+      + toto
+

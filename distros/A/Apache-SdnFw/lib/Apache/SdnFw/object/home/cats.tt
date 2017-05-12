@@ -1,0 +1,26 @@
+<form method="POST" action="[% s.uof %]">
+<input type="hidden" name="save" value="1">
+<div class="floatleft">
+<table>
+	<caption>Object Categories</caption>
+	<thead>
+		<tr>
+			<th>Name</th>
+		</tr>
+	</thead>
+	<tbody>
+[% FOREACH l IN list %]
+		<tr>
+			<td><input name="[% l.object_cat_id %]:name" value="[% l.name %]"></td>
+		</tr>
+[% END %]
+[% FOREACH i IN [1,2,3,4,5,6] %]
+		<tr>
+			<td><input name="new[% i %]:name" value=""></td>
+		</tr>
+[% END %]
+	</tbody>
+</table>
+<input type="submit" value="Save">
+</div>
+</form>

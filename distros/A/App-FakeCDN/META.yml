@@ -1,0 +1,47 @@
+---
+abstract: 'fake CDN server emulator'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-FakeCDN
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::FakeCDN:
+    file: lib/App/FakeCDN.pm
+    version: 0.01
+requires:
+  Cache::Memory::Simple: 0
+  Getopt::Long: 0
+  Mouse: 0
+  Mouse::Util::TypeConstraints: 0
+  Path::Tiny: 0
+  Plack::Loader: 0
+  Plack::MIME: 0
+  Plack::Runner: 0
+  Pod::Usage: 0
+  perl: 5.010001
+resources:
+  bugtracker: https://github.com/Songmu/p5-App-FakeCDN/issues
+  homepage: https://github.com/Songmu/p5-App-FakeCDN
+  repository: git://github.com/Songmu/p5-App-FakeCDN.git
+version: 0.01

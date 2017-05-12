@@ -1,0 +1,132 @@
+NAME
+    `Algorithm::Cron' - abstract implementation of the cron(8) scheduling
+    algorithm
+
+SYNOPSIS
+     use Algorithm::Cron;
+
+     my $cron = Algorithm::Cron->new(
+        base => 'local',
+        crontab => "*/10 9-17 * * *",
+     );
+
+     my $time = time;
+     while(1) {
+        $time = $cron->next_time( $time );
+
+        sleep( time - $time );
+
+        print "Do something\n";
+     }
+
+DESCRIPTION
+    Objects in this class implement a time scheduling algorithm such as used
+    by cron(8). Objects are stateless once constructed, and represent a
+    single schedule as defined by a crontab(5) entry. The object implements
+    a method `next_time' which returns an epoch timestamp value to indicate
+    the next time included in the crontab schedule.
+
+  Crontabs
+    The schedule is provided as a set of acceptable values for each field of
+    the broken-down time (as returned by `localtime' or `gmtime'), either in
+    a single string called `crontab' or by a set of named strings, each
+    taking the name of a crontab(5) field.
+
+     my $cron = Algorithm::Cron->new(
+        base => 'local',
+        crontab => '0 9 * * mon-fri',
+     );
+
+
+
+     my $cron = Algorithm::Cron->new(
+        base => 'local',
+        min  => 0,
+        hour => 9,
+        wday => "mon-fri",
+     );
+
+    A `crontab' field containing a single asterisk (`*'), or a missing named
+    field, indicates that any value here is included in the scheduled times.
+    To restrict the schedule, a value or set of values can be provided. This
+    should consist of one or more comma-separated numbers or ranges, where a
+    range is given as the start and end points, both inclusive.
+
+     hour => "3-6"
+     hour => "3,4,5,6"
+
+    Ranges can also be prefixed by a value to give the increment for values
+    in that range.
+
+     min => "*/10"
+     min => "0,10,20,30,40,50"
+
+    The `mon' and `wday' fields also allow symbolic month or weekday names
+    in place of numeric values. These names are always in the C locale,
+    regardless of the system's locale settings.
+
+     mon => "mar-sep"
+
+     wday => "mon,wed,fri"
+
+    Specifying `sun' as the end of a `wday' range, or giving the numeric
+    value of `7' is also supported.
+
+     wday => "fri-sun"
+     wday => "5-7"
+     # Both equivalent to: wday => "0,5,6"
+
+    As per cron(8) behaviour, this algorithm looks for a match of the `min',
+    `hour' and `mon' fields, and at least one of the `mday' or `mday'
+    fields. If both `mday' and `wday' are specified, a match of either will
+    be sufficient.
+
+    As an extension, seconds may be provided either by passing six
+    space-separated fields in the `crontab' string, or as an additional
+    `sec' field. If not provided it will default to `0'. If six fields are
+    provided, the first gives the seconds.
+
+  Time Base
+    `Algorithm::Cron' supports using either UTC or the local timezone when
+    comparing against the given schedule.
+
+CONSTRUCTOR
+  $cron = Algorithm::Cron->new( %args )
+    Constructs a new `Algorithm::Cron' object representing the given
+    schedule relative to the given time base. Takes the following named
+    arguments:
+
+    base => STRING
+            Gives the time base used for scheduling. Either `utc' or
+            `local'.
+
+    crontab => STRING
+            Gives the crontab schedule in 5 or 6 space-separated fields.
+
+    sec => STRING, min => STRING, ... mon => STRING
+            Optional. Gives the schedule in a set of individual fields, if
+            the `crontab' field is not specified.
+
+METHODS
+  @seconds = $cron->sec
+  @minutes = $cron->min
+  @hours = $cron->hour
+  @mdays = $cron->mday
+  @months = $cron->mon
+  @wdays = $cron->wday
+    Accessors that return a list of the accepted values for each scheduling
+    field. These are returned in a plain list of numbers, regardless of the
+    form they were specified to the constructor.
+
+    Also note that the list of valid months will be 0-based (in the range 0
+    to 11) rather than 1-based, to match the values used by `localtime',
+    `gmtime', `mktime' and `timegm'.
+
+  $time = $cron->next_time( $start_time )
+    Returns the next scheduled time, as an epoch timestamp, after the given
+    timestamp. This is a stateless operation; it does not change any state
+    stored by the `$cron' object.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

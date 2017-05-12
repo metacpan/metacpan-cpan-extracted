@@ -1,0 +1,8 @@
+Revision history for Perl extension Authen::HOTP.
+
+0.01  Thu Jun 29 04:42:22 2006
+	- original version; created by h2xs 1.23 with options
+		-AcXn Authen::HOTP
+
+0.02  Wed Oct 24 11:36:23 2007
+	- fix for missing leading 0's, thanks to Michael DeCandia <Michael.DeCandia@vonage.com>

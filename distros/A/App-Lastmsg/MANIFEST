@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lastmsg
+t/App-Lastmsg.t
+t/inbox
+t/lastmsg.config
+t/sent
+lib/App/Lastmsg.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

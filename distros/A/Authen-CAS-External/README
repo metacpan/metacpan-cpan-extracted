@@ -1,0 +1,55 @@
+Authen-CAS-External version 0.08
+================================
+
+INSTALLATION
+------------
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DESCRIPTION
+-----------
+
+Authen::CAS::External is an implementation of a client for use with
+web sites that use JA-SIG's Central Authentication Service.
+
+More information about the CAS protocol can be found at the
+[JA-SIG CAS homepage](http://www.jasig.org/cas).
+
+SUPPORT AND DOCUMENTATION
+-------------------------
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Authen::CAS::External
+
+You can also look for information at:
+
+*   [RT, CPAN's request tracker](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Authen-CAS-External)
+
+*   [AnnoCPAN, Annotated CPAN documentation](http://annocpan.org/dist/Authen-CAS-External)
+
+*   [CPAN Ratings](http://cpanratings.perl.org/d/Authen-CAS-External)
+
+*   [Search CPAN](http://search.cpan.org/dist/Authen-CAS-External/)
+
+
+COPYRIGHT AND LICENCE
+---------------------
+
+Copyright 2009 Douglas Christopher Wilson.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of either:
+
+*   the GNU General Public License as published by the Free
+    Software Foundation; either version 1, or (at your option) any
+    later version, or
+
+*   the Artistic License version 2.0.
+

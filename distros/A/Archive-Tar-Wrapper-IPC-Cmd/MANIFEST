@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Archive/Tar/Wrapper/IPC/Cmd.pm
+t/001Basic.t
+t/002Mult.t
+t/003Dirs.t
+t/004Utf8.t
+t/005Cwd.t
+t/006DirPerms.t
+t/data/bar.tar
+t/data/foo.tgz

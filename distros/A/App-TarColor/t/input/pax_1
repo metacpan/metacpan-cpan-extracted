@@ -1,0 +1,9 @@
+-rwxr-xr-x  1 1505     203            146 Jul 10  2009 lesspipe-1.72/testok/cabinet.cab
+-rw-r--r--  1 1505     203          20673 Jul 10  2009 lesspipe-1.72/testok/a b.tgz
+-rw-r--r--  1 1505     203            114 Jul 10  2009 lesspipe-1.72/testok/onefile.7za
+-rw-r--r--  1 1505     203             35 Jul 10  2009 lesspipe-1.72/testok/a`data.gz
+-rw-r--r--  1 1505     203             29 Jul 10  2009 lesspipe-1.72/testok/a[b.gz
+-rw-r--r--  1 1505     203            219 Jul 10  2009 lesspipe-1.72/testok/azip.tlz
+lrwxrwxrwx  1 1505     203              0 Nov 17 00:28 lesspipe-1.72/testok/symlink => a b
+-rw-r--r--  1 1505     203             45 Jul 10  2009 lesspipe-1.72/testok/perlstorable.gz
+pax: ustar vol 1, 47 files, 542720 bytes read, 0 bytes written.

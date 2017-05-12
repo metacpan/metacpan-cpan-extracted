@@ -1,0 +1,151 @@
+{
+   "abstract" : "A drop in replacement to the MySQL prompt with a pluggable Perl interface",
+   "author" : [
+      "Eric Waters <ewaters@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-AltSQL",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::Structure::Util" : "0",
+            "File::Temp" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Any" : "0",
+            "DBD::mysql" : "0",
+            "DBI" : "0",
+            "Data::Dumper" : "0",
+            "Getopt::Long" : "2.38",
+            "Hash::Union" : "0",
+            "JSON" : "0",
+            "Moose" : "0",
+            "MooseX::Object::Pluggable" : "0",
+            "Params::Validate" : "0",
+            "Sys::SigAction" : "0",
+            "Term::ANSIColor" : "0.04",
+            "Term::ReadLine::Zoid" : "0",
+            "Text::CharWidth" : "0",
+            "Text::UnicodeBox" : "0.03",
+            "YAML" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::AltSQL" : {
+         "file" : "lib/App/AltSQL.pm",
+         "version" : "0.05"
+      },
+      "App::AltSQL::Model" : {
+         "file" : "lib/App/AltSQL/Model.pm",
+         "version" : 0
+      },
+      "App::AltSQL::Model::MySQL" : {
+         "file" : "lib/App/AltSQL/Model/MySQL.pm",
+         "version" : 0
+      },
+      "App::AltSQL::Plugin::Dump" : {
+         "file" : "lib/App/AltSQL/Plugin/Dump.pm",
+         "version" : 0
+      },
+      "App::AltSQL::Plugin::Dump::Format" : {
+         "file" : "lib/App/AltSQL/Plugin/Dump/Format.pm",
+         "version" : 0
+      },
+      "App::AltSQL::Plugin::Dump::Format::csv" : {
+         "file" : "lib/App/AltSQL/Plugin/Dump/Format/csv.pm",
+         "version" : 0
+      },
+      "App::AltSQL::Plugin::Dump::Format::html" : {
+         "file" : "lib/App/AltSQL/Plugin/Dump/Format/html.pm",
+         "version" : 0
+      },
+      "App::AltSQL::Plugin::Dump::Format::json" : {
+         "file" : "lib/App/AltSQL/Plugin/Dump/Format/json.pm",
+         "version" : 0
+      },
+      "App::AltSQL::Plugin::Dump::Format::perl" : {
+         "file" : "lib/App/AltSQL/Plugin/Dump/Format/perl.pm",
+         "version" : 0
+      },
+      "App::AltSQL::Plugin::Dump::Format::sql" : {
+         "file" : "lib/App/AltSQL/Plugin/Dump/Format/sql.pm",
+         "version" : 0
+      },
+      "App::AltSQL::Plugin::Dump::Format::xls" : {
+         "file" : "lib/App/AltSQL/Plugin/Dump/Format/xls.pm",
+         "version" : 0
+      },
+      "App::AltSQL::Plugin::Dump::Format::xml" : {
+         "file" : "lib/App/AltSQL/Plugin/Dump/Format/xml.pm",
+         "version" : 0
+      },
+      "App::AltSQL::Plugin::Dump::Format::yaml" : {
+         "file" : "lib/App/AltSQL/Plugin/Dump/Format/yaml.pm",
+         "version" : 0
+      },
+      "App::AltSQL::Plugin::Tail" : {
+         "file" : "lib/App/AltSQL/Plugin/Tail.pm",
+         "version" : 0
+      },
+      "App::AltSQL::Role" : {
+         "file" : "lib/App/AltSQL/Role.pm",
+         "version" : 0
+      },
+      "App::AltSQL::Term" : {
+         "file" : "lib/App/AltSQL/Term.pm",
+         "version" : 0
+      },
+      "App::AltSQL::Term::Plugin::SyntaxHighlight" : {
+         "file" : "lib/App/AltSQL/Term/Plugin/SyntaxHighlight.pm",
+         "version" : 0
+      },
+      "App::AltSQL::View" : {
+         "file" : "lib/App/AltSQL/View.pm",
+         "version" : 0
+      },
+      "App::AltSQL::View::Plugin::Color" : {
+         "file" : "lib/App/AltSQL/View/Plugin/Color.pm",
+         "version" : 0
+      },
+      "App::AltSQL::View::Plugin::UnicodeBox" : {
+         "file" : "lib/App/AltSQL/View/Plugin/UnicodeBox.pm",
+         "version" : 0
+      },
+      "App::AltSQL::View::Plugin::VerticalSorted" : {
+         "file" : "lib/App/AltSQL/View/Plugin/VerticalSorted.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/ewaters/altsql-shell/issues?labels=bug"
+      },
+      "homepage" : "http://ewaters.github.com/altsql-shell",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/ewaters/altsql-shell"
+      }
+   },
+   "version" : "0.05"
+}

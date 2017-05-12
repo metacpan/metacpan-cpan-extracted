@@ -1,0 +1,56 @@
+Revision history for Array-AsHash
+
+0.32    2006-08-02
+        - Removed Class::Std.  Now it's just a regular blessed hash :(
+          This is in response to
+          http://rt.cpan.org/Public/Bug/Display.html?id=20765, first reported
+          by "Venky Iyer" <venky@berkeley.edu>
+        - Cleaned up some minor POD nits.
+
+0.31    2006-04-25
+        - Added "clear()" method (David Wheeler).
+        - Fixed doc typo in "push()" (David Wheeler).
+
+0.30    2006-03-02
+        - Added key_at() and value_at() methods.
+        - Minor documentation fixes.
+
+0.21    2005-10-15
+        - Iterator is now object blessed into its own class.  This allows us
+          to call "first" and "last" methods directly on the object.
+
+0.20    2005-10-15
+        - "strict' mode added.  Using non-existent keys is fatal.
+        - "strict" method also added.
+        - Reorganized the docs to be a bit cleaner.
+
+0.12    Not released (these are all in 0.20, though)
+        - "put" can now accept an even-sized list of pairs.
+        - "get" can now take a list of keys.
+        - Did a bit of an internals cleanup.
+        - each() now returns an iterator in scalar context
+             Thanks to Adrian Howard for the suggestion.
+        - Added "rename" method.
+        - Overloaded stringification as a debugging aid.
+
+0.11    2005-10-14
+        - Added "default" method.
+        - Added "get_pairs" method.
+        - Added "first" and "last" methods.
+        - Included test libs.
+        - Renamed t/10-basic.t to t/10-hash.t.
+
+0.10    2005-10-12
+        - Added "array-like" methods.
+        - Updated docs and split tests into hash and array tests.
+
+0.02    2005-10-12
+        - Overloaded boolean context so an empty array object returns false.
+        - Deleting a single key in scalar context now returns the value.
+        - Added clone() method.
+        - Fixed bug where setting a false value with insert_(before|after)
+          would corrupt internal indices.
+        - Updated docs and tests.
+
+0.01    2005-10-10
+        - First version, released on an unsuspecting world.

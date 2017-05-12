@@ -1,0 +1,34 @@
+---
+abstract: 'Flexible non-blocking STOMP client'
+author:
+  - 'Eugene Ponizovsky <ponizovsky@gmail.com>'
+build_requires:
+  Test::Fatal: '0.013'
+  Test::MockObject: '1.20150527'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Stomper
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '6.01'
+  Carp: '0'
+  List::MoreUtils: '0.410'
+  Scalar::Util: '0'
+  perl: '5.008000'
+  version: '0.77'
+resources:
+  bugtracker: https://github.com/iph0/AnyEvent-Stomper/issues
+  homepage: https://github.com/iph0/AnyEvent-Stomper
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/iph0/AnyEvent-Stomper
+version: '0.34'

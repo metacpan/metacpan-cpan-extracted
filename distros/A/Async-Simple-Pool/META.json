@@ -1,0 +1,75 @@
+{
+   "abstract" : "Simple manager of asyncronous tasks",
+   "author" : [
+      "ANTONC <antonc@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Async-Simple-Pool",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Modern::Perl" : "0",
+            "Module::Metadata" : "0",
+            "POSIX" : "0",
+            "Pod::Coverage" : "0",
+            "Test::CheckManifest" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Spec" : "0",
+            "Time::HiRes" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Modern::Perl" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "Clone" : "0",
+            "Data::Dumper" : "0",
+            "Data::Serializer" : "0",
+            "Modern::Perl" : "0",
+            "Moose" : "0",
+            "Time::HiRes" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "provides" : {
+      "Async::Simple::Pool" : {
+         "file" : "lib/Async/Simple/Pool.pm",
+         "version" : "0.06"
+      },
+      "Async::Simple::Task" : {
+         "file" : "lib/Async/Simple/Task.pm",
+         "version" : "0.06"
+      },
+      "Async::Simple::Task::Fork" : {
+         "file" : "lib/Async/Simple/Task/Fork.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,98 @@
+NAME
+    Apache2::ModSSL - a Perl Interface to mod_ssl functions
+
+SYNOPSIS
+     use Apache2::ModSSL;
+
+     my $c=$r->connection;
+     if( $c->is_https ) {
+       $dn=$c->ssl_var_lookup('SSL_SERVER_S_DN');
+       $nsComment=$c->ssl_ext_lookup(0, '2.16.840.1.113730.1.13');
+     }
+
+ABSTRACT
+    "Apache2::ModSSL" adds a few functions that are exported from "mod_ssl"
+    to the "Apache2::Connection" class.
+
+METHODS
+    $c->is_https
+        "is_https()" returns 1 if the connection is SSL-encrypted, 0 if it
+        is not encrypted but mod_ssl is available in the apache binary or
+        "undef" if mod_ssl is not loaded.
+
+    $c->ssl_var_lookup(NAME)
+        "ssl_var_lookup()" returns the value of an SSL variable. If mod_ssl
+        is not loaded "undef" is returned. A query for an unknown variable
+        returns an empty string.
+
+        For a list of known variables please refer to the mod_ssl
+        documentation or mod_ssl source code
+        ("httpd-2.0.52/modules/ssl/ssl_engine_vars.c"). At the time of this
+        writing this list includes (not complete):
+
+        HTTPS
+        API_VERSION
+        SSL_VERSION_PRODUCT
+        SSL_VERSION_INTERFACE
+        SSL_VERSION_LIBRARY
+        SSL_PROTOCOL
+        SSL_SESSION_ID
+        SSL_CIPHER
+        SSL_CLIENT_CERT_CHAIN_n (where n is a number)
+        SSL_CLIENT_VERIFY
+        SSL_(CLIENT|SERVER)_M_VERSION
+        SSL_(CLIENT|SERVER)_M_SERIAL
+        SSL_(CLIENT|SERVER)_V_START
+        SSL_(CLIENT|SERVER)_V_END
+        SSL_(CLIENT|SERVER)_(S|I)_DN
+        SSL_(CLIENT|SERVER)_(S|I)_DN_C
+        SSL_(CLIENT|SERVER)_(S|I)_DN_ST
+        SSL_(CLIENT|SERVER)_(S|I)_DN_SP
+        SSL_(CLIENT|SERVER)_(S|I)_DN_L
+        SSL_(CLIENT|SERVER)_(S|I)_DN_O
+        SSL_(CLIENT|SERVER)_(S|I)_DN_OU
+        SSL_(CLIENT|SERVER)_(S|I)_DN_CN
+        SSL_(CLIENT|SERVER)_(S|I)_DN_T
+        SSL_(CLIENT|SERVER)_(S|I)_DN_I
+        SSL_(CLIENT|SERVER)_(S|I)_DN_G
+        SSL_(CLIENT|SERVER)_(S|I)_DN_S
+        SSL_(CLIENT|SERVER)_(S|I)_DN_D
+        SSL_(CLIENT|SERVER)_(S|I)_DN_UID
+        SSL_(CLIENT|SERVER)_(S|I)_DN_Email
+        SSL_(CLIENT|SERVER)_A_SIG
+        SSL_(CLIENT|SERVER)_A_KEY
+        SSL_(CLIENT|SERVER)_CERT
+
+    $c->ssl_ext_lookup(WHERE, OID)
+        "ssl_ext_lookup()" returns the value of an SSL certificate
+        extension. "WHERE" specifies whether to look in the WEB server
+        certificate ("WHERE==0") or in the client certificate ("WHERE==1").
+        "OID" is the Object Identifier for the extension in dotted notation,
+        e.g. 2.16.840.1.11330.1.13 for "Netscape Comment" or 2.5.29.19 for
+        "X509v3 Basic Constraints".
+
+EXPORTS
+    none.
+
+SEE ALSO
+    <http://perl.apache.org/docs/2.0/api/Apache2/Connection.html>,
+    <http://httpd.apache.org/docs-2.0/mod/mod_ssl.html>
+
+AUTHOR
+    Torsten Foertsch, <torsten.foertsch@gmx.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004-2008 by Torsten Foertsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+INSTALLATION
+     perl Makefile.PL -apxs /path/to/apxs
+     make
+     make test
+     make install
+
+DEPENDENCIES
+    mod_perl 2.0.0-RC5, httpd 2.0.52, perl 5.8.0
+

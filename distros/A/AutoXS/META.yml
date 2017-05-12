@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                AutoXS
+version:             0.04
+abstract:            Speed up your code after compile time
+license:             perl
+author:              
+    - Steffen Mueller <smueller@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    B::Generate:                   0
+    B::Utils:                      0.05_06
+    Class::XSAccessor:             0.02
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

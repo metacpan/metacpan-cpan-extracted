@@ -1,0 +1,82 @@
+App::Icli 0.48 - Fri Jun 13 2014
+
+    * New dependencies: DateTime, DateTime::Format::Strptime, DateTime::TimeZone
+    * NOT BACKWARDS COMPATIBLE: Add -a/--action option to invoke generic
+      actions on selected services. This replaces -a/--acknowledge with
+      -aa/ -a acknowledge, -r/--recheck with -ar / -a recheck and
+      -u/--force-recheck wiht -aR / -a force_recheck
+    * add -ad / -a downtime option to schedule host/service downtimes
+    * Also show service downtimes when using -ld, improve its output
+    * Show service comments when using -vvv
+    * Rename package to App::Icli to avoid CPAN namespace conflicts
+
+icli 0.47 - Thu May 29 2014
+
+    * Remove autodie dependency, improve error messages
+    * Allow build-time specification of icinga paths
+      (perl Build.PL --icli-xyz-file=..., see README)
+    * Do not throw warnings when encountering empty contact groups
+    * Do not require --recheck when using --force-recheck
+    * Support --force-recheck with a host-only argument to immediately recheck
+      all services on a host (closses #15)
+    * Fix -lh not showing serviceless hosts (closes #14)
+
+icli 0.46 - Sun Sep 29 2013
+
+    * Fix !o filter not matching pending services
+    * Add p filter (pending hosts/services)
+    * Show pending hosts/services with --overview
+    * Remove Date::Format dependency (now uses POSIX::strftime)
+
+icli 0.45 - Tue Sep 17 2013
+
+    * Fix --filter N and --filter !N
+    * Ignore 'serviceescalation' field in the icinga status file
+    * fix smartmatch warnings on perl >= 5.018
+
+icli 0.44 - Sat Mar 16 2013
+
+    * Ignore 'module' field in the icinga status file
+    * Add -o / --overview option to display a 'tactical overview'-style
+      host and service listing
+
+icli 0.43 - Tue Aug 28 2012
+
+    * Add missing documentation for -a / --acknowledge
+    * Add -m / --match option to select on plugin output
+
+icli 0.42 - Fri Jun 01 2012
+
+    * Add -U / --as-contact option to only operate on services visible to a
+      certain contact
+    * New dependency List::MoreUtils
+
+icli 0.41 - Sun Apr 15 2012
+
+    * Add "icli host/service" as "icli -h host -s service" shortcut
+    * Add -u / --force-recheck option (Patch by Hugh Brown)
+
+icli 0.4 - Mon Jan 31 2011
+
+    * icli -vvv lists hosts/services with maximum verbosity
+    * Acknowledging of host/service problems
+    * Cut off or break long lines with -x (improves output readability)
+    * Print long plugin output in -vv/-vvv (if available)
+    * Fix -C (didn't remove all colours)
+
+icli 0.3 - Sun Nov 21 2010
+
+    * Show service flags with -v -ls (acknowledged, flapping etc.)
+    * Filter hosts/services by check state or various flags
+    * icli -vv lists hosts/services in an even more detailed manner
+
+icli 0.2 - Mon Nov 08 2010
+
+    * List downtimes and check queue
+    * Reschedule service checks
+    * Filter by host/hostgroup and/or service name
+
+icli 0.1 - Thu Jul 29 2010
+
+    * First release
+    * listing of service/host states, filtered by hosts/hostgroups

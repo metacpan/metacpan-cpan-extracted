@@ -1,0 +1,61 @@
+AlignAid version 0.0.2
+
+AlignAid is a simple module which makes it easy to run sequence alignment
+programs either locally or on a queue-based compute cluster. The user
+specifies which alignment program to use, the queries and the database, and
+what compute resources are available, and AlignAid takes care of the rest.
+
+This capability is especially useful when you need to perform a large number
+of alignments and have a compute cluster queue available; AlignAid will split
+the task into multiple queue jobs, track their completion, and collate the
+results.
+
+The straightforward interface also comes in handy when you want to program to
+adjust to the compute resources available to it. Using AlignAid, the program
+could check for a queue and use it if available or run the alignments locally
+if not.
+
+For complete instructions, see the documentation for AlignAid by typing:
+
+	perldoc AlignAid
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+Bio::SeqIO   - part of BioPerl, available at bioperl.org
+version      - available from CPAN
+PP           - This is an optional dependency, needed if you want to submit
+               jobs to a compute cluster queueing system like LSF.
+BPdeluxe 1.0 - This is an optional dependency, needed only if you want to use
+               the validate_blasts() method. Available from Jarret Glasscock
+               (glasscock_cpan at mac dot com).
+
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006, Dave Messina <dave-pause@davemessina.net>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

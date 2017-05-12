@@ -1,0 +1,22 @@
+           Installation instructions for AI::Categorizer
+
+To install this module, follow the standard steps for installing most
+Perl modules:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Or you may use the CPAN.pm module, which will automatically execute
+these steps for you, and help you get the prerequisite dependencies
+installed as well.
+
+Alternatively, you can use the new Module::Build-style installer:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+ -Ken

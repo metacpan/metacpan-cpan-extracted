@@ -1,0 +1,65 @@
+{
+   "abstract" : "HTTP service to notify that an event happened.",
+   "author" : [
+      "Shlomi Fish <shlomif@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "keywords" : [
+      "notify",
+      "notifier",
+      "alert",
+      "finish",
+      "cue"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Notifier-Service",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.39"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "1.3097",
+            "Errno" : "0",
+            "File::Spec" : "0",
+            "JSON::MaybeXS" : "0",
+            "List::MoreUtils" : "0",
+            "POSIX" : "0",
+            "YAML" : "0",
+            "YAML::XS" : "0",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "provides" : {
+      "App::Notifier::Service" : {
+         "file" : "lib/App/Notifier/Service.pm",
+         "version" : "0.0401"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.shlomifish.org/open-source/projects/App-Notifier/",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/app-notifier"
+      }
+   },
+   "version" : "0.0401"
+}

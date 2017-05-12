@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Acme/CPANAuthors/Israeli.pm
+LICENSE
+MANIFEST
+README
+t/00-load.t
+t/01-misc.t
+t/cpan-changes.t
+t/pod-coverage.t
+t/pod.t
+t/style-trailing-space.t
+Makefile.PL
+META.yml
+META.json

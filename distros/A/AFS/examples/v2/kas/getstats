@@ -1,0 +1,44 @@
+#!/usr/local/bin/perl
+
+use blib;
+use AFS::KAS;
+use AFS::KTC_PRINCIPAL;
+use AFS::KTC_TOKEN;
+use AFS::KTC_EKEY;
+use AFS qw(raise_exception);
+
+die "Usage: admin \n" if ($#ARGV != 0);
+
+raise_exception(1);
+
+my $princ = AFS::KTC_PRINCIPAL->new(shift);
+my $key   = AFS::KTC_EKEY->ReadPassword($princ->name."'s Password:");
+my $token = AFS::KTC_TOKEN->GetAdminToken($princ, $key, 300);
+
+my $kas   = AFS::KAS->AuthServerConn($token, &AFS::KA_MAINTENANCE_SERVICE);
+
+my ($num_admins, $stats, $dstats) = $kas->getstats;
+print "\n\ngetstats:\n";
+print "num_admins = $num_admins\n";
+print"stats-----\n";
+foreach my $tp_key (sort keys %$stats) {
+    printf("%20s  %s\n",$tp_key, $$stats{$tp_key});
+}
+
+print"dynamic stats-----\n";
+foreach my $tp_key (sort keys %$dstats) {
+    printf("%20s  %s\n",$tp_key, $$dstats{$tp_key});
+}
+
+($num_admins, $stats, $dstats) = $kas->KAM_GetStats(&AFS::KAMAJORVERSION);
+print "\n\nKAM_GetStats:\n";
+print "num_admins = $num_admins\n";
+print"stats-----\n";
+foreach my $tp_key (sort keys %$stats) {
+    printf("%20s  %s\n",$tp_key, $$stats{$tp_key});
+}
+
+print"dynamic stats-----\n";
+foreach my $tp_key (sort keys %$dstats) {
+    printf("%20s  %s\n",$tp_key, $$dstats{$tp_key});
+}

@@ -1,0 +1,10 @@
+Revision history for Perl extension AxKit::XSP::QueryParam.
+
+0.02  Tue Jan 27 16:31:49 PST 2004
+    - Added <param:count/>
+    - Made <param:get/> understand indexes
+    - Made <param:enumerate/> optionally limit it's output to just
+      one parameter name
+
+0.01  Tue Sep  9 12:56:21 PDT 2003
+    - Finally rolled this package into a CPAN module

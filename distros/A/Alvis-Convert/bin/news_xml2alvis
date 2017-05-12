@@ -1,0 +1,276 @@
+#!/usr/bin/perl -w
+
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Pod::Usage;
+
+use Alvis::Convert;
+
+use strict;
+
+my $PrintManual=0;
+my $PrintHelp=0;
+my $Warnings=1;
+my $XMLSuffix='xml';
+my $MetaSuffix='meta';
+my $ODir='.';  
+my $NPerOurDir=1000;
+my $MetaEncoding='iso-8859-1';
+my $IncOrigDoc=1;
+my $OrigSuffix='original'; # not used atm 
+
+GetOptions('help|?'=>\$PrintHelp, 
+	   'man'=>\$PrintManual,
+	   'warnings!'=>\$Warnings,
+	   'xml-ext=s'=>\$XMLSuffix,
+	   'meta-ext=s'=>\$MetaSuffix,
+	   'out-dir=s'=>\$ODir,
+	   'N-per-out-dir=s'=>\$NPerOurDir,
+	   'meta-encoding=s'=>\$MetaEncoding,
+	   'original!'=>\$IncOrigDoc) or 
+    pod2usage(2);
+pod2usage(1) if $PrintHelp;
+pod2usage(-exitstatus => 0, -verbose => 2) if $PrintManual;
+pod2usage(1) if (@ARGV!=1);
+
+my $SDir=shift @ARGV;
+
+$|=1;
+
+my $C=Alvis::Convert->new(outputRootDir=>$ODir,
+			  outputNPerSubdir=>$NPerOurDir,
+			  outputAtSameLocation=>0,
+			  metaEncoding=>$MetaEncoding,
+			  includeOriginalDocument=>$IncOrigDoc);
+
+my %Seen;
+$C->init_output();
+if (!&_convert_collection($SDir,{xmlSuffix=>$XMLSuffix,
+				 metaSuffix=>$MetaSuffix,
+				 origSuffix=>$OrigSuffix}))
+{
+    die("Conversion failed. " . $C->errmsg());
+}
+
+
+sub _parse_entries
+{
+    my $entries=shift;
+    my $options=shift;
+    my $news_xml_entries=shift;
+    
+    for my $e (@$entries)
+    {
+	if ($Seen{$e})
+	{
+	    next;
+	}
+	
+	$Seen{$e}=1;
+	if (-d $e)
+	{
+	    my @entries=glob("$e/*");;
+	    &_parse_entries(\@entries,$options,$news_xml_entries);
+	    next;
+	}
+
+	my ($basename,$suffix);
+	if ($e=~/^(.*)\.([^\.]+)$/)
+	{
+	    $basename=$1;
+	    $suffix=$2;
+	}
+	else
+	{
+	    warn "Skipping non-suffixed non-directory entry \"$e\".";
+	    next;
+	}
+	
+	if ($suffix eq $options->{metaSuffix})
+	{
+	    $news_xml_entries->{$basename}{metaF}=$e;
+	}
+	elsif ($suffix eq $options->{xmlSuffix})
+	{
+	    $news_xml_entries->{$basename}{xmlF}=$e;
+	}
+	elsif ($suffix eq $options->{origSuffix})
+	{
+	    $news_xml_entries->{$basename}{origF}=$e;
+	}
+    }
+}
+
+sub _convert_collection
+{
+    my $root_dir=shift;
+    my $options=shift;
+
+    my @entries=glob("$root_dir/*");
+    my %news_xml_entries=();
+    %Seen=();
+    print "Parsing the source directory entries...\r";
+    &_parse_entries(\@entries,$options,\%news_xml_entries);	
+    print "                                       \r";
+
+    for my $base_name (keys %news_xml_entries)
+    {
+	my ($meta_txt,$xml_txt);
+
+	if (exists($news_xml_entries{$base_name}{metaF}))
+	{
+	    $meta_txt=$C->read_meta($news_xml_entries{$base_name}{metaF});
+	    if (!defined($meta_txt))
+	    {
+		warn "Reading meta file " .
+		    "\"$news_xml_entries{$base_name}{metaF}\" failed. " .
+		    $C->errmsg();
+		$C->clearerr();
+		next;
+	    }
+	}
+	else # no meta file
+	{
+	    warn "No Meta file for basename \"$base_name\".";
+	    next;
+	}
+
+	my $alvisXMLs;
+	
+	if (exists($news_xml_entries{$base_name}{xmlF}))
+	{
+	    $xml_txt=$C->read_news_XML($news_xml_entries{$base_name}{xmlF});
+	    if (!defined($xml_txt))
+	    {
+		warn "Reading the news XML for basename \"$base_name\" failed. " .
+		    $C->errmsg();
+		$C->clearerr();
+		next;
+	    }
+	}
+	else
+	{
+	     warn "No XML file for basename \"$base_name\".";
+	     next;
+	}
+
+	$alvisXMLs=$C->newsXML($xml_txt,$meta_txt);
+	if (!defined($alvisXMLs))
+	{
+	    warn "Obtaining the Alvis versions of the documents inside " .
+		"\"$base_name\"'s XML file failed. " . $C->errmsg();
+	    $C->clearerr();
+	    next;
+	}
+
+	if (!$C->output_Alvis($alvisXMLs,$base_name))
+	{
+	    warn "Outputting the Alvis records for base name \"$base_name\" failed. " . $C->errmsg();
+	    $C->clearerr();
+	    next;
+	}
+    }
+
+    return 1;
+}
+
+
+__END__
+
+=head1 NAME
+    
+    news_xml2alvis.pl - news XML to Alvis XML converter
+    
+=head1 SYNOPSIS
+    
+    news_xml2alvis.pl [options] [source directory ...]
+
+  Options:
+
+    --xml-ext            XML file identifying filename extension
+    --meta-ext           meta file identifying filename extension
+    --out-dir            output directory
+    --N-per-out-dir      # of records per output directory
+    --meta-encoding      the encoding of the meta files
+    --help               brief help message
+    --man                full documentation
+    --[no]warnings       warnings output flag
+    
+=head1 OPTIONS
+    
+=over 8
+
+=item B<--xml-ext>
+
+    Sets the XML file identifying filename extension. 
+    Default value: 'xml'.
+
+=item B<--meta-ext>
+
+    Sets the  meta file identifying filename extension.
+    Default value: 'meta'.
+
+=item B<--out-dir>
+
+    Sets the output directory. Default value: '.'.
+
+=item B<--N-per-out-dir>
+
+    Sets the # of records per output directory. Default value: 1000.
+
+=item B<--meta-encoding>
+
+    Specifies the encoding of the meta files. Default value 'iso-8859-1'.
+
+=item B<--help>
+
+    Prints a brief help message and exit.
+
+=item B<--man>
+
+    Prints the manual page and exits.
+
+=item B<--[no]warnings>
+
+    Output (or suppress) warnings. Default value: yes.
+
+=back
+
+=head1 DESCRIPTION
+
+    Goes recursively through the files under the source directory
+    and converts them to Alvis XML files. Meta information (such
+    as the URL or the detected character set, title of the document
+    etc.) can be given in a separate meta file, one per each document,
+    recognized by the shared basename. E.g. the XML document is
+    called foo.news and the meta information is in foo.meta.
+    In this case news_xml2alvis.pl should be called like this:
+   
+          news_xml2.alvis.pl --xml-ext news --meta-ext meta  
+    
+    The news XML files are expected to be of the format
+
+    <DOCUMENT>
+      <article>
+        <date></date>
+        <iso-date></iso-date>
+        <title></title>
+        <content></content>
+        <links>
+            <link type="a">
+                <location></location>
+            </link>
+        </links>
+      </article>
+
+    and meta files of the format 
+
+          <feature name>\t<feature value>\n
+
+    Special features are url,title,date,detectedCharSet.
+
+=cut
+
+
+
+

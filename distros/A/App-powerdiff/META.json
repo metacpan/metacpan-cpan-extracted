@@ -1,0 +1,74 @@
+{
+   "abstract" : "Prepare a diff between two given directories",
+   "author" : [
+      "Alex Efros <powerman@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.032, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-powerdiff",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Devel::AssertOS" : "0",
+            "Devel::CheckOS" : "1.63",
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.14",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "App::powerdiff" : {
+         "file" : "lib/App/powerdiff.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/powerman/powerdiff/issues"
+      },
+      "homepage" : "https://github.com/powerman/powerdiff",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/powerman/powerdiff.git",
+         "web" : "https://github.com/powerman/powerdiff"
+      }
+   },
+   "version" : "v1.0.0"
+}
+

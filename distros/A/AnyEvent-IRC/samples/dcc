@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+# Just a small sample script on how DCC is used.
+#
+use common::sense;
+use AnyEvent;
+use AnyEvent::IRC::Client;
+
+my $c = AnyEvent->condvar;
+
+my $con = new AnyEvent::IRC::Client;
+
+$con->connect ("localhost", 6667, { nick => 'testdcc' });
+
+$con->reg_cb (
+   registered => sub {
+      my ($con) = @_;
+      $con->dcc_initiate ("root", "chat", 20);
+   },
+   dcc_request => sub {
+      my ($con, $id, $src, $type, $arg, $addr) = @_;
+      warn "DCC REQ $id/$type\n";
+
+      $con->dcc_accept ($id);
+   },
+   dcc_connected => sub {
+      my ($con, $id, $type, $hdl) = @_;
+      warn "DCC CONN $id/$type\n";
+
+      if ($type eq 'chat') {
+         $con->send_dcc_chat ($id, "Hi!");
+      }
+   },
+   dcc_accepted => sub {
+      my ($con, $id, $type) = @_;
+      warn "DCC ACC $id/$type\n";
+
+      if ($type eq 'chat') {
+         $con->send_dcc_chat ($id, "Hi!");
+      }
+   },
+   dcc_close => sub {
+      my ($con, $id, $type, $reason) = @_;
+      warn "DCC $type [$id] CLOSE: $reason\n";
+   },
+   dcc_chat_msg => sub {
+      my ($con, $id, $msg) = @_;
+      warn "DCC $id> $msg\n";
+      $con->send_dcc_chat ($id, "<$msg>?");
+   },
+);
+
+$c->wait;

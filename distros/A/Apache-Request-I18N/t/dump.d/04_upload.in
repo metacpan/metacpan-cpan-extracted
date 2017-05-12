@@ -1,0 +1,10 @@
+# Basic file upload
+POST / HTTP/1.0
+Content-Type: multipart/form-data; boundary="FOO FOO"
+
+--FOO FOO
+Content-Disposition: form-data; name="foo"; filename="foo.txt"
+
+bar
+--FOO FOO--
+

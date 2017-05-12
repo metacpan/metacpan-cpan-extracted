@@ -1,0 +1,19 @@
+---
+abstract: 'Fake module with a configure prereq that fails for testing CPANPLUS'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires: {}
+configure_requires:
+  Acme::CPANPLUS::Module::With::Core::PreReq: 0
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-CPANPLUS-Module-With-Failing-Configure-Requires
+resources:
+  homepage: http://github.com/bingos/acme-cpanplus-module-with-failing-configure-requires
+  repository: http://github.com/bingos/acme-cpanplus-module-with-failing-configure-requires
+version: 0.02

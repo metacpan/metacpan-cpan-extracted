@@ -1,0 +1,11 @@
+server {
+    server_name eg.localhost;
+    access_log /home/rob/develop/App-ForExample/Eg/log/nginx-eg.localhost.access.log;
+    error_log /home/rob/develop/App-ForExample/Eg/log/nginx-eg.localhost.error.log;
+    location / {
+        include fastcgi_params;
+        
+        fastcgi_pass 127.0.0.1:45450;
+        
+    }
+}

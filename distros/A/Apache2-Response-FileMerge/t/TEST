@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+# WARNING: this file is generated, do not edit
+# generated on Mon Nov 29 15:25:40 2010
+# 01: /usr/lib/perl5/Apache/TestConfig.pm:955
+# 02: /usr/lib/perl5/Apache/TestConfig.pm:1045
+# 03: /usr/lib/perl5/Apache/TestRun.pm:1284
+# 04: Makefile.PL:10
+
+BEGIN { eval { require blib && blib->import; } }
+
+use strict;
+use warnings FATAL => 'all';
+
+use lib qw(
+);
+
+
+use Apache::TestRunPerl ();
+
+package Apache::TestRunPerl;
+sub bug_report { print '+-------------------------------------------------------------------+
+| you probably got a coredump or something.  this is not my fault.  |
+|                                                                   |
+| see the README for more information and caveats                   |
++-------------------------------------------------------------------+
+' }
+
+Apache::TestRunPerl->new->run(@ARGV);

@@ -1,0 +1,200 @@
+NAME
+    App::ForExample - A guide through Catalyst, Apache, lighttpd, nginx,
+    monit, ..., configuration hell
+
+VERSION
+    Version 0.024
+
+SYNOPSIS
+        # To output a FastCGI (ExternalServer)/Apache configuration (with monit stub and start-stop script), run:
+        for-example catalyst/fastcgi apache2 standalone --class My::App --hostname example.com --output my-app
+
+        # The above command would have created the following:
+
+            my-app.apache2      The Apache2 virtual host configuration (hosted at (www.)example.com)
+            my-app.start-stop   The start/stop script to launch the FastCGI process
+            my-app.monit        A monit stub used for monitoring the FastCGI process
+
+        # This will generate a basic, stripped-down monit configuration (monitrc) suitable for a non-root user:
+        for-example monit --home $HOME/monit --output $HOME/monit/monitrc
+
+        # A mod_perl configuration for Catalyst:
+        for-example catalyst/mod_perl --class Project::Xyzzy --hostname xyzzy.com --home Project-Xyzzy
+
+DESCRIPTION
+    App::ForExample is a command-line tool for generating sample
+    configurations. It is not designed to do configuration management, but
+    rather as a guide to get you 80% of the way there
+
+    Besides the usual Apache, lighttpd, nginx, and FastCGI configurations,
+    App::ForExample can create a FastCGI start-stop script and a monit
+    configuration for monitoring those processes
+
+USAGE
+        Usage: for-example ACTION
+
+        Where ACTION can be
+
+        (Note: Every option below is, well, optional. If not specified, a fun default will be chosen/guessed for you)
+
+            catalyst/fastcgi ...
+
+                Generate a Catalyst FastCGI configuration (for monit, start-stop, or the specified http daemon and fastcgi method)
+
+                --class             The Catalyst class for your application (e.g. Project::Xyzzy or My::App)
+                --home              The path to your Catalyst home directory, default: . (The current directory)
+                --log-home          The directory to log into, default: <home>/log (Below the directory given by --home)
+                --base              The base for your application, default: / (At the root)
+                --hostname          The hostname from which your application is served (e.g. example.com)
+
+                --bare              Do not output anything BUT the configuration (no monit, no start-stop)
+                --output -          Print output to stdout
+                --output <path>     Write output to <path> (which can be either a directory or file)
+                                    This will split output appropiately (e.g. <file>.apache2, <file>.start-stop, <file>.monit)
+
+                --fastcgi-script                The <path> to the Catalyst fastcgi script (e.g. script/xyzzy_fastcgi.pl)
+                --fastcgi-socket <path>         Have fastcgi use <path> for the file socket
+                --fastcgi-socket <host:port>    Have fastcgi use <host:port> for the socket
+                --fastcgi-pid-file <path>       Store the pid for the process in <path>
+
+                apache2 standalone  Apache2 with standalone FastCGI (mod_fastcgi)
+                apache2 static      Apache2 with static FastCGI (mod_fastcgi)
+                apache2 dynamic     Apache2 with dynamic FastCGI (mod_fastcgi)
+
+                lighttpd standalone lighttpd with dynamic FastCGI
+                lighttpd static     lighttpd with static FastCGI
+
+                nginx               nginx with standalone FastCGI (the only kind supported)
+
+                monit               A monit configuration for a standalone FastCGI setup
+                start-stop          A start-stop script for a standalone FastCGI setup
+                
+        catalyst/mod_perl
+
+                Generate a mod_perl2 (for Apache2) Catalyst configuration
+
+                --class             The Catalyst class for your application (e.g. Project::Xyzzy or My::App)
+                --home              The path to your Catalyst home directory, default: . (The current directory)
+                --log-home          The directory to log into, default: <home>/log (Below the directory given by --home)
+                --base              The base for your application, default: / (At the root)
+                --hostname          The hostname from which your application is served (e.g. example.com)
+
+            monit
+
+                Generate a basic, stripped-down monit configuration suitable for a non-root user
+
+                --home              The directory designated monit home (containing the pid file, log, rc, ...)
+
+TUTORIAL
+  Apache2 with FastCGI on Ubuntu
+    Install apache2, mod_fastcgi, and FCGI
+
+        sudo apt-get install apache2 libapache2-mod-fastcgi
+
+        cpan -i FCGI
+
+    Create the Catalyst application "My::App"
+
+        catalyst.pl My::App
+
+    Use App::ForExample to generate the configuration
+
+        cd My-App
+        for-example catalyst/fastcgi apache2 standalone --class My::App --hostname my-app.localhost --output my-app
+
+    Make the log directory
+
+        mkdir log
+
+    Install the apache2 configuration
+
+        sudo cp my-app.apache2 /etc/apache2/sites-enabled
+
+    Enable the fastcgi start-stop script (with execute permissions)
+
+        chmod +x my-app.start-stop
+
+    Add a "my-app.localhost" entry to "/etc/hosts"
+
+        127.0.0.1       my-app.localhost
+
+    Start your application
+
+        ./my-app.start-stop start
+        sudo /etc/init.d/apache restart
+
+    Visit your application at <http://my-app.localhost>
+
+INSTALL
+    You can install App::ForExample by using CPAN:
+
+        cpan -i App::ForExample
+
+    If that doesn't work properly, you can find help at:
+
+        http://sial.org/howto/perl/life-with-cpan/
+        http://sial.org/howto/perl/life-with-cpan/macosx/ # Help on Mac OS X
+        http://sial.org/howto/perl/life-with-cpan/non-root/ # Help with a non-root account
+
+CONTRIBUTE
+    You can contribute or fork this project via GitHub:
+
+    <http://github.com/robertkrimen/App-ForExample/tree/master>
+
+        git clone git://github.com/robertkrimen/App-ForExample.git
+
+SEE ALSO
+    <http://dev.catalystframework.org/wiki/deployment>
+
+    Catalyst::Engine::Apache
+
+    Catalyst::Engine::FastCGI
+
+ACKNOWLEDGEMENTS
+    All the people that have put effort into the Catalyst documentation,
+    including the pod, advent, and wiki
+
+    Dan Dascalescu, Jay Shirley, Tomas Doran, Daniel Austin, Jason Felds,
+    Moritz Onken, and Brian Friday, who all put effort into the deployment
+    wiki, which formed the basis for many parts of this tool
+
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-app-forexample at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-ForExample>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc App::ForExample
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-ForExample>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/App-ForExample>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/App-ForExample>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/App-ForExample/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

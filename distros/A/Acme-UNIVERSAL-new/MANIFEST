@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+SIGNATURE
+lib/Acme/UNIVERSAL/new.pm
+t/00-load.t
+t/0-signature.t
+t/pod-coverage.t
+t/pod.t
+t/base.t
+SIGNATURE    Added here by Module::Build

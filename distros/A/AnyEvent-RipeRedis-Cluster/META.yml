@@ -1,0 +1,35 @@
+---
+abstract: 'Non-blocking Redis Cluster client'
+author:
+  - 'Eugene Ponizovsky <ponizovsky@gmail.com>'
+build_requires:
+  Clone: '0.38'
+  Test::Fatal: '0.013'
+  Test::MockObject: '1.20150527'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-RipeRedis-Cluster
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '6.01'
+  AnyEvent::RipeRedis: '0.38'
+  Carp: '0'
+  List::MoreUtils: '0.410'
+  Scalar::Util: '0'
+  perl: '5.008000'
+resources:
+  bugtracker: https://github.com/iph0/AnyEvent-RipeRedis-Cluster/issues
+  homepage: https://github.com/iph0/AnyEvent-RipeRedis-Cluster
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/iph0/AnyEvent-RipeRedis-Cluster
+version: '0.26'

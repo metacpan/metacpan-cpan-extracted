@@ -1,0 +1,21 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/AlignAid.pm
+t/00.load.t
+t/AlignAid.t
+t/pod-coverage.t
+t/pod.t
+t/test.fa
+t/test.fa.xnd
+t/test.fa.xns
+t/test.fa.xnt
+t/test1.fa
+t/test1.fa.xnd
+t/test1.fa.xns
+t/test1.fa.xnt

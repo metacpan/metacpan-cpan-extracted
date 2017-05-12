@@ -1,0 +1,92 @@
+=pod
+
+=head1 NAME
+
+Apache::Voodoo - or just Voodoo for short; is a web application framework
+for Apache 1.3 and 2.0.
+
+=head1 SYNOPSIS
+
+Voodoo provides a fast, flexible and powerful framework for website development.
+It's goal is to handle all the repetitious, tricky and difficult interactions with mod_perl for you.
+
+Some features include:
+
+=over 4
+
+=item * Abstraction of mod_perl and Apache interaction away from the user's code
+
+=item * MVC (default views for HTML via HTML::Template, and JSON)
+
+=item * Dynamic reloading of modules upon change (bypass-able for production sites)
+
+=item * Automatic session management
+
+=item * Automatic database connection and persistence
+
+=item * Powerful database abstraction system vi L<Apache::Voodoo::Table>
+
+=item * Integrated debugging tools plus support for FirePHP and Log4perl
+
+=item * Tansparently add SOAP access and WSDL to your code
+
+=item * Simple enough API that the learning curve is pretty shallow
+
+=back
+
+=head1 Documentation Index
+
+I like pod as much as the next as the next JAPH, but its limitations start to show when
+you need to document something more complex or extensive than module.  The documentation
+is located here:
+
+http://www.apachevoodoo.com
+
+=head1 BUGS
+
+The Native debug template may not work in all versions of Internet Explorer.
+I didn't put much effort into making it work in IE; I don't use it and quiet frankly,
+neither should anyone else :)
+
+Any sort of feedback is most welcome.
+
+=head1 HISTORY
+
+This creature first came to life sometime between 2000 and 2001.  At the time, there was nothing
+available that really suited my needs, so I wrote what I wanted :)  Voodoo has been in use and
+refinement by myself and a small group of my colleagues ever since.  It has always been my intent
+to release this thing into the wild, but I could never seem to find the time to clean up a few
+ugly parts and write all the much needed documentation.
+
+=head1 CREDITS
+
+Fixes, bug reports, ideas and suggestions have been contributed by:
+
+=over 4
+
+=item Paul Tinsley
+
+=item Jeff Anderson L<http://www.perlmonks.org/index.pl?node=jeffa>
+
+=item Kevin Smith
+
+=item Mike Semich
+
+=item Eduardo Arino de la Rubia
+
+=item Doug Gruber L<http://search.cpan.org/~dougthug/>
+
+=back
+
+=head1 AUTHOR
+
+Maverick, /\/\averick@smurfbaneDOTorg
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005 Steven Edwards.  All rights reserved.
+
+You may use and distribute Voodoo under the terms described in the LICENSE file included with
+this package or L<Apache::Voodoo::license>.  The summary is it's a legalese version of the
+Artistic License :)
+

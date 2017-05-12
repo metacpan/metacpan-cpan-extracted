@@ -1,0 +1,33 @@
+Revision history for Perl extension Apache::ReverseProxy
+0.07 Fri Jan 21 16:56:08 PST 2005
+	- Added patch from Penny Leach to pass client Host header
+	  to destination server.
+
+0.06 Thu Mar  8 02:38:12 PST 2001
+	- Applied patch from Ward Vandewege <ward@pong.be> to
+	  fix a hanging problem that occurs with HTML forms
+	  that have a user defined encoding type.
+	  (example: enctype="multipart/form-data")
+
+0.05 Thu Jan 20 18:20:27 PST 2000
+	- Added patch from David Jao <djao@sc-24018.fas.harvard.edu>
+	  to allow the proxy to return chunks of the entity-body as it
+	  receives data from the web server, instead of retrieving the
+	  entire entity-body and then returning it to the client.
+
+0.04 Wed Nov 17 15:57:23 PST 1999
+	- Forwards multiple headers with the same header name
+	  back to the client, often used by Set-cookie when
+	  setting multiple cookies in one HTTP response.
+
+0.03 Fri Nov  5 15:34:01 PST 1999
+	- Forwards the client's user-agent, content-type, and
+	  entity body.
+
+0.02 Mon Nov  1 16:08:46 PST 1999
+	- Exact parameter matches query strings too.
+	- Proxy chaining added.
+
+0.01 Wed Oct 27 02:34:52 PDT 1999
+	- original version; created by h2xs 1.16
+

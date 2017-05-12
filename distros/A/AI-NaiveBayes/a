@@ -1,0 +1,32 @@
+name    = AI-NaiveBayes
+author  = Zbigniew Lukasiak <zlukasiak@opera.com>
+author  = Tadeusz Sośnierz <tsosnierz@opera.com>
+author  = Ken Williams <ken@mathforum.org>
+[Git::Contributors]
+license = Perl_5
+copyright_holder = Opera Software ASA
+copyright_year   = 2012
+version = 0.04
+[@Basic]
+[AutoPrereqs]
+[Prereqs]
+Moose = 1.15
+MooseX::Storage = 0.25
+File::Find::Rule = 0.32
+[TestRelease]
+[PkgVersion]
+[MetaNoIndex]
+directory = t/lib
+directory = examples
+[InstallGuide]
+[MetaJSON]
+[MetaResources]
+repository.web   = http://github.com/zby/AI-NaiveBayes
+repository.type  = git
+
+[NextRelease]
+format = %-9v %{yyyy-MM-dd}d
+[CheckChangeLog]
+[PodSyntaxTests]
+[PodCoverageTests]
+[PodWeaver]

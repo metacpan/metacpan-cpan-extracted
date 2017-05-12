@@ -1,0 +1,37 @@
+This directory contains examples of how to use Astro::SpaceTrack. The
+following examples are provided:
+
+celestrak
+    This script retrieves data from Celestrak.com. By default, it
+    retrieves the list of 100 (or so) brightest. You can also
+    specify one or more lists to retrieve on the command line. If
+    you specify a non-existent list you will get an error stating
+    what lists are available.
+
+spaceflight
+    This script retireves data from NASA's manned spaceflight
+    web site. By default, it retrieves the current data. If you
+    give command option -all, it retrieves all data, past and
+    future. The option -help gets you brief help.
+
+spacetrack-identity
+    This script prints the username and password in a format appropriate
+    to create environment variable SPACETRACK_USER via a shell eval.
+
+sh_script
+    This shell script illustrates the retrieval of data for the
+    International Space Station directly from the Space Track web site
+    using the SpaceTrack application. Output can be redirected to a
+    file. This script requires environment variable SPACETRACK_USER to
+    be set to a valid Space Track username/password (separated by "/"),
+    and will complain if this is not done. It also requires file
+    sh_data to be in the default directory.
+
+sh_data
+    This text file contains the SpaceTrack commands used by sh_script.
+
+SpaceTrackTk
+    This Perl script is a Perl/Tk client for the Space Track
+    functionality.
+
+# ex: set filetype=text textwidth=72 autoindent :

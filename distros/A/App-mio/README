@@ -1,0 +1,27 @@
+NAME
+    mio - Executable for App::mio
+
+VERSION
+    version 0.1.0
+
+SYNOPSIS
+    Just a simple executable to commify your numbers.
+
+USAGE
+    Simply pipe your input in:
+
+         wc -l *.txt | mio
+
+WARNING
+    No special care is taken for non-integers.
+
+AUTHOR
+    DBR <dbr@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by DBR.
+
+    This is free software, licensed under:
+
+      DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+

@@ -1,0 +1,130 @@
+# PODNAME: Archive::Libarchive::XS::Function
+# ABSTRACT: libarchive function reference
+# VERSION
+
+=head1 SYNOPSIS
+
+ use Archive::Libarchive::XS qw( :func );
+
+=head1 DESCRIPTION
+
+This is the function reference for the Perl bindings to libarchive.  
+
+This document provides example calls to each function with argument and return
+value variable names that infer their types.  Functions that take multiple 
+arguments or return multiple values of the same type will use numbered suffixes
+to distinguish them (example: $archive1, $archive2).
+
+=over 4
+
+=item $archive
+
+An archive object identifier (actually a pointer to the C structure used by
+libarchive as the archive object).
+
+These are created with L<#archive_read_new>, L<#archive_write_new> or
+L<#archive_write_disk_new> and deleted with L<#archive_read_free> or 
+L<#archive_write_free>.
+
+=item $entry
+
+An archive entry identifier (actually a pointer to the C structure used by
+libarchive as the archive entry object).
+
+These are created with L<#archive_entry_new> and deleted with
+L<#archive_entry_free>.  They can also be returned by L<#archive_read_next_header>,
+but in that case libarchive will handle the allocation and freeing of
+resources for the entry.
+
+=item $status
+
+Integer value indicating the success or failure of an operation.  Most functions
+use this as their return value.  This value may be compared to any of these
+constants:
+
+=over 4
+
+=item ARCHIVE_OK
+
+Operation was successful
+
+=item ARCHIVE_EOF
+
+Fond end of archive
+
+=item ARCHIVE_RETRY
+
+Retry might succeed
+
+=item ARCHIVE_WARN
+
+Partial success
+
+=item ARCHIVE_FAILED
+
+Current operation cannot complete
+
+=item ARCHIVE_FATAL
+
+No more operations are possible
+
+=back
+
+(There are additional non-status code constants provided by libarchive,
+see L<Archive::Libarchive::XS::Constant> for a full listing).
+
+=item $count_or_status
+
+Returns the number of bytes read/written on success (or 0 at EOF),
+returns a negative status value (see $status above) on error or
+warning.
+
+=item $callback
+
+A code reference pointing to a Perl callback subroutine.  The arguments
+that are passed into the callback and the return values expected from
+the callback are documented in L<Archive::Libarchive::XS::Callback>.
+
+=item $string
+
+A plain string scalar value.
+
+=item $bool
+
+A boolean value, either 0 or 1 (probably not C<undef> for return values).
+
+=back
+
+If you are linking against an older version of libarchive, some of these 
+functions may not be available.  You can use the C<can> method to test if
+a function or constant is available, for example:
+
+ if(Archive::Libarchive::XS->can('archive_read_support_filter_grzip')
+ {
+   # grzip filter is available.
+ }
+
+Functions with the prefix C<archive_perl_> are not part of libarchive
+and are provided with this module for perl specific needs when operating
+with the library.
+
+=head1 FUNCTIONS
+
+% foreach my $function (sort keys %$functions) {
+<%= $functions->{$function} %>
+
+% }
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Archive::Libarchive::XS>
+
+=item L<Archive::Libarchive::XS::Constant>
+
+=item L<Archive::Libarchive::XS::Callback>
+
+=back
+
+=cut
+

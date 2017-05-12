@@ -1,0 +1,49 @@
+Audio-aKodePlayer
+
+This module provides an interface to the aKode library (or rather its
+Player class) used in the KDE projects and elsewhere
+http://carewolf.com/akode.
+
+REQUIREMENTS
+
+    libakode.so
+    libakode header files
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Audio::aKodePlayer
+
+You can also look for information at:
+
+    aKode project
+        http://carewolf.com/akode/
+
+    Search CPAN
+        http://search.cpan.org/dist/Audio-aKodePlayer
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Audio-aKodePlayer
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Audio-aKodePlayer
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Audio-aKodePlayer
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Petr Pajas
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

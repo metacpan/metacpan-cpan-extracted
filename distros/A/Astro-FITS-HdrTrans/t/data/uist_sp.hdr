@@ -1,0 +1,222 @@
+
+                                 Identification:
+TELESCOP= 'UKIRT             ' / Telescope name
+INSTRUME= 'UIST              ' / Instrument
+DHSVER  = 'UKDHS 2002 Mar 15 ' / Data handling version
+HDTFILE = 'uist_spec.hdt     ' / Name of hdt file
+OBSERVER= 'nobody  '           / Observers names
+USERID  = 'nobody  '           / Userid logged in as
+OBSREF  = '00      '           / PATT or other reference
+PROJECT = 'U/05A/46'           / Time-allocation code
+MSBID   = 'dbe9ac6aa19f00007448f5648b16670a' / Id min.-schedulable block
+
+                                 eStar headers:
+RMTAGENT= 'none    '           / Name of remote agent
+AGENTID = 'none    '           / Unique identifier for remote agent
+
+OBJECT  = 'NGC 2964'           / Object name from telescope
+
+                                 Data Reduction:
+RECIPE  = 'EXTENDED_SOURCE'    / Data reduction recipe to be used
+OBSNUM  =                   24 / Observation number
+GRPNUM  =                   19 / Group number applied to all members
+GRPMEM  =                    T / Group membership
+STANDARD=                    F / Is the target a standard star observation?
+NOFFSETS=                    4 / Number of offset positions in a pattern
+OBSTYPE = 'OBJECT  '           / Type (BIAS|DARK|ARC|FLAT|OBJECT|SKY)
+
+                                 Astrometric and time information:
+UTDATE  = '20050307'           / UT date as integer in yyyymmdd format
+DATE-OBS= '2005-03-07T05:52:44Z' / Date and time (UTC) of start of observation
+DATE-END= '2005-03-07T05:56:47Z' / Date and time (UTC) of end   of observation
+WCSAXES =                    3 / Number of axes in world co-ordinate system
+RADESYS = 'FK5     '           / Mean IAU 1984 equatorial co-ordinates
+EQUINOX =             2000.000 / #[yr] Equinox of object position
+CTYPE1  = 'WAVE    '           / Wavelength axis with no distortion
+CTYPE2  = 'RA---TAN'           / RA tangent-plane axis with no distortion
+CTYPE3  = 'DEC--TAN'           / Dec tangent-plane axis with no distortion
+COMMENT  The wavelength axis is only the linear approximation.
+CRVAL1  =               1.5225 / [um] Wavelength value at the reference pixel
+CUNIT1  = 'um      '           / Unit of wavelength co-ordinates
+CDELT1  =           -0.0002000 / [um/pixel] Wavelength co-ordinate increment
+CRPIX1  =                512.5 / [pixel] Reference pixel along wavelength axis
+PC1_1   =                  1.0 / Transformation matrix element
+
+CRVAL2  =          145.7189803 / [deg] Right ascension at the reference pixel
+CUNIT2  = 'deg     '           / Unit of Right ascension co-ordinates
+CDELT2  =           0.00003339 / [deg/pixel] Right ascension co-ord increment
+CRPIX2  =                480.5 / [pixel] Reference pixel along the slit
+PC2_2   =        -7.071070E-01 / Transformation matrix element
+PC2_3   =        -7.071070E-01 / Transformation matrix element
+
+CRVAL3  =           31.8414684 / [deg] Declination at the reference pixel
+CUNIT3  = 'deg     '           / Unit of Declination co-ordinates
+CDELT3  =          -0.00003339 / [deg/pixel] Declination co-ordinate increment
+CRPIX3  =                480.5 / [pixel] Reference pixel along Declination axis
+PC3_2   =         7.071070E-01 / Transformation matrix element
+PC3_3   =        -7.071070E-01 / Transformation matrix element
+
+RABASE  =            9.7150611 / [h] Right ascension of base position
+DECBASE =           31.8473611 / [deg] Declination of base position
+TRAOFF  =              -21.213 / [arcsec] Right ascension telescope offset
+TDECOFF =              -21.213 / [arcsec] Declination telescope offset
+AMSTART =                1.402 / Airmass at start of observation
+AMEND   =                1.382 / Airmass at end of observation
+
+                                 Instrument aperture:
+APER_X  =               -5.098 / [arcsec] Aperture X axis coordinate
+APER_Y  =                7.008 / [arcsec] Aperture Y axis coordinate
+
+ISU2PORT= 'South   '           / ISU2 port name
+ISU2POFF=                  175 / ISU2 port offset
+ISU2TOFF=                   50 / ISU2 tilt offset
+GUIDFFOC=               -0.953 / Fast guider CCD fine focus
+
+IZ5     =             1275.000 / Astigmatism: IZ5
+HZ5SH   =             -890.000 / Astigmatism: HZ5SH
+HZ5CH   =              110.000 / Astigmatism: HZ5CH
+HZ5SD   =            -1530.000 / Astigmatism: HZ5SD
+HZ5CD   =                0.000 / Astigmatism: HZ5CD
+IZ6     =            -1462.000 / Astigmatism: IZ6
+HZ6SH   =             -846.000 / Astigmatism: HZ6SH
+HZ6CH   =              200.000 / Astigmatism: HZ6CH
+HZ6SD   =              165.000 / Astigmatism: HZ6SD
+HZ6CD   =              930.000 / Astigmatism: HZ6CD
+Z7      =             -739.000 / Coma: Z7
+Z8      =             1063.000 / Coma: Z8
+WEBEAM  =             -739.000 / Topend: W-E beam
+NSBEAM  =               45.000 / Topend: N-S beam
+IZ9     =             -358.000 / Trefoil: IZ9
+HZ9SH   =              125.000 / Trefoil: HZ9SH
+HZ9CH   =                0.000 / Trefoil: HZ9CH
+HZ9SD   =               90.000 / Trefoil: HZ9SD
+HZ9CD   =                0.000 / Trefoil: HZ9CD
+IZ10    =              285.000 / Trefoil: IZ10
+HZ10SH  =              114.000 / Trefoil: HZ10SH
+HZ10CH  =                0.000 / Trefoil: HZ10CH
+HZ10SD  =             -117.000 / Trefoil: HZ10SD
+HZ10CD  =                0.000 / Trefoil: HZ10CD
+Z11     =              300.000 / Spherical: Z11
+AAMP    =             1216.503 / Astigmatism: amplitude
+APHI    =                4.237 / Astigmatism: angle
+TAMP    =              426.647 / Trefoil: Amplitude
+TPHI    =               53.712 / Trefoil: angle
+AGFREQ  =              100.000 / Autoguider: Frequency
+FGMODE  = 'Fast Guider'        / Fast guider mode
+
+
+                                 Chopping and nodding configuration:
+NOD_BEAM= 'MIDDLE  '           / Chopping beam name (A|B|MIDDLE)
+CHPDWELL=             0.500000 / [s] Chop dwell
+CHPDELAY=             0.100000 / [s] Chop delay
+CHPANGLE=                0.000 / [deg] Position angle of the chop
+CHPTHROW=                0.000 / [arcsec] Throw of the chop wrt middle position
+CHOPFREQ=             0.000000 / [Hz] Chop frequency
+
+                                 Instrument detector configuration:
+DETECTOR= 'ALADDIN'            / Detector array used
+NINT    =                    1 / Number of integrations in observation
+DROWS   =                 1024 / [pixel] Number of detector rows
+DCOLUMNS=                 1024 / [pixel] Number of detector columns
+RDOUT_X1=                    1 / Start column of array readout
+RDOUT_X2=                 1024 / Start column of array readout
+RDOUT_Y1=                    1 / Start row    of array readout
+RDOUT_Y2=                 1024 / Start row    of array readout
+
+                                 Instrument optical configuration:
+CAMLENS = '0.12    '           / Camera name (0.12|0.06+IJM|0.06+HKL|pupil)
+INSTMODE= 'spectroscopy'       / Mode (imaging|spectroscopy|ifu)
+PIXLSIZE=               0.1202 / [arcsec] Pixel size
+FILTER  = 'H_spectral'         / Combined filter name
+FILTER1 = 'open    '           / Filter in wheel 1
+FILTER2 = 'H_spectral'         / Filter in wheel 2
+GRISM   = 'short_H '           / Combined grism name
+GRISM1  = 'short_H '           / Grism in wheel 1
+GRISM2  = 'open    '           / Grism in wheel 2
+SLITNAME= '4_pix_wide_120'     / Slit name
+SLITLEN =             120.0000 / [arcsec] Length of slit (120|20)
+SLITWID =               4.0000 / [pixel] Width of slit
+SLITANG =                0.000 / [deg] Angle of slit in wheel
+SLIT_PA =              45.0000 / [deg] Position angle on the sky, E of N
+DISPAXIS=                    1 / Dispersion axis
+RESOLUTN=                 1903 / Resolution lambda/delta-lambda
+DISPERSN=            0.0002000 / [um/pixel] Dispersion
+CENWAVL =               1.5225 / [um] Central wavelength
+FOC_MM  =               3.3488 / [mm] Focus position
+LAMP    = 'off     '           / Name of calibration lamp (off|BB|H|Ar|Kr)
+BBTEMP  =             1073.000 / [K] Blackbody temperature
+CALAPER = 'BB_Blank'           / [mm] Aperture for black body
+WPLANGLE=                0.000 / [deg] Waveplate angle
+POLARISE=                    F / Whether or not using polariser
+
+                                 Detector controller:
+COMMENT                          An integration can consist of one or more
+COMMENT                          exposures, specified by NEXP.
+COMMENT                          Each exposure can contain one or more reads
+COMMENT                          of the array, specified by NREADS.
+NULL_CYC=                    0 / Cycles prior to data taking
+NULL_EXP=                    0 / Exposures prior to data taking
+NULL_NDR=                    1 / ND reads prior to data taking
+WAVEFORM= 'uist_starev11'      / Waveform set name
+PIXELMON=                    F / Whether pixel monitoring enabled
+DET_MODE= 'NDSTARE '           / Observing mode (STARE|NDSTARE|NDCHOP|CHOP)
+NREADS  =                  241 / Number of reads per exposure
+EXP_TIME=           240.000000 / [s] Integration time per exposure
+NEXP    =                    1 / Number of exposures in integration
+READINT =             1.000000 / [s] Interval between reads
+DET_NRST=                    1 / No of det resets before 1st exp
+DET_RSTD=             0.110000 / [s] Interval between final reset & 1st read
+MULTIRDS=                    6 / No of samples/pixel
+GAIN    =                 15.0 / [electrons/ADU] Detector gain
+
+                                 Environment:
+AIRTEMP =              -65.546 / [degC] Air temperature
+BARPRESS=              615.727 / Ambient pressure
+DEWPOINT=              -75.584 / [degC] Dewpoint
+DOMETEMP=                0.332 / [degC] Dome temperature
+HUMIDITY=               23.001 / Relative Humidity
+MIRR_NE =                0.383 / [degC] Mirror temperature NE
+MIRR_NW =                0.709 / [degC] Mirror temperature NW
+MIRR_SE =                0.010 / [degC] Mirror temperature SE
+MIRR_SW =                0.016 / [degC] Mirror temperature SW
+MIRRBTNW=                2.381 / [degC] Mirror bottom temp. SW
+MIRRTPNW=                1.175 / [degC] Mirror top temp. SW
+SECONDAR=                0.656 / [degC] Temperature of secondary
+TOPAIRNW=                0.949 / [degC] Top air NW
+TRUSSENE=                1.608 / [degC] Truss leg ENE
+TRUSSWSW=               -0.284 / [degC] Truss leg WSW
+WIND_DIR=              246.832 / [deg] Wind direction, azimuth
+WIND_SPD=               33.534 / [km/s] Wind speed
+CSOTAU  =                0.067 / Tau at 225 GHz from CSO
+TAUDATE = '2005-03-07T05:41'   / Time and date of Tau reading
+TAUSRC  = 'CSO225GHZ'          / Source of opacity data
+
+
+                                 Engineering:
+CNFINDEX=             31932972 / Configuration index
+DET_TEMP=                29.00 / [K] Array temperature
+WFPERIOD=              1560.00 / [nSec] Waveform state period
+VDETCOM =               -3.400 / [V] Bias voltage: vdetcom
+VDDUC   =               -4.000 / [V] Bias voltage: vdduc
+VNROW   =               -6.000 / [V] Bias voltage: vnrow
+VNCOL   =               -6.000 / [V] Bias voltage: vncol
+VSSCM   =                0.000 / [V] Bias voltage: vsscm
+VDDOUT  =               -1.500 / [V] Bias voltage: vddout
+VREF    =               -2.500 / [V] Bias voltage: vref
+VLOAD   =                0.000 / [V] Bias voltage: vload
+BIAS8   =                0.000 / [V] Bias voltage: bias8
+BIAS9   =                0.000 / [V] Bias voltage: bias9
+BIAS10  =                0.000 / [V] Bias voltage: bias10
+BIAS11  =                0.000 / [V] Bias voltage: bias11
+BIAS12  =                0.000 / [V] Bias voltage: bias12
+BIAS13  =                0.000 / [V] Bias voltage: bias13
+VDDCL   =               -3.800 / [V] Bias voltage: vddcl
+VROWOFF =                0.000 / [V] Bias voltage: vrowoff
+VGGCLLO =                0.000 / [V] Bias voltage: vggcl_low
+VGGCLHI =                0.000 / [V] Bias voltage: vggcl_hi
+VROWONLO=               -6.000 / [V] Bias voltage: vrowon_low
+VROWONHI=               -6.000 / [V] Bias voltage: vrowon_hi
+VRSTONLO=                0.000 / [V] Bias voltage: vrstoff_low
+VRSTONHI=                0.000 / [V] Bias voltage: vrstoff_hi
+VRSTOFFL=               -6.000 / [V] Bias voltage: vrstoff_low
+VRSTOFFH=                0.000 / [V] Bias voltage: vrstoff_hi

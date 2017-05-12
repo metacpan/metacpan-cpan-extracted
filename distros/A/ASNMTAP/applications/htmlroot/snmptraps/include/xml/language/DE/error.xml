@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<error>
+   <authentification>
+      <message>Konnte Logdatei nicht lesen - Sie scheinen nicht die benötigten Rechte zu besitzen!</message>
+         <description>
+            <line1>Bitte _u_berpr_u_fen Sie die Schreib-/Leserechte des Webservers sowie die </line1>
+            <line2>Authentifizierungsoptionen in den Konfigurationsdateien</line2>
+         </description>
+   </authentification>
+   <dbConnection>
+      <message>Datenbankfehler</message>
+      <description>
+	     <line1>Konnte keine Verbindung zur Datenbank herstellen!</line1>
+	     <line2>Bitte _u_berpr_u_fen Sie die Konfiguration...</line2>
+      </description> 
+   </dbConnection>
+   <dbTable>
+      <message>Datenbankfehler</message>
+      <description>
+	     <line1>Die Tabelle konnte nicht ausgewaehlt werden!</line1>
+	     <line2>Bitte _u_berpr_u_fen Sie die Konfiguration...</line2>
+      </description> 
+   </dbTable>
+   <dbHandleTrap>
+      <message>Datenbankfehler</message>
+      <description>
+	     <line1>Update oder Delete-Queuery fehlgeschlagen!</line1>
+	     <line2>Bitte _u_berpr_u_fen Sie die Konfiguration...</line2>
+      </description> 
+   </dbHandleTrap>
+   <dbReadTrap>
+      <message>Datenbankfehler</message>
+      <description>
+	     <line1>SELECT Befehl fehlgeschlagen - Das Query konnte nicht ausgef_u_hrt werden</line1>
+	     <line2>Bitte _u_berpr_u_fen Sie die Konfiguration...</line2>
+      </description> 
+   </dbReadTrap>
+   <dbReadCategory>
+      <message>Datenbankfehler</message>
+      <description>
+	     <line1>Kategorie konnte nicht ausgewählt werden!</line1>
+	     <line2>Bitte _u_berpr_u_fen Sie die Konfiguration...</line2>
+      </description> 
+   </dbReadCategory>
+</error>

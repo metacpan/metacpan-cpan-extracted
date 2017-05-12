@@ -1,0 +1,101 @@
+NAME
+    ACL::Lite - Liteweight and flexible ACL checks
+
+VERSION
+    Version 0.0004
+
+SYNOPSIS
+        use ACL::Lite;
+
+        $acl = ACL::Lite->new(permissions => 'foo,bar');
+
+        $acl->check('foo');
+
+        if ($ret = $acl->check([qw/baz bar/])) {
+            print "Check successful with permission $ret\n";
+        }
+
+        unless ($acl->check('baz')) {
+            print "Permission denied\n";
+        }
+
+        $acl = ACL::Lite->new(uid => 666);
+
+        $acl->check('authenticated');
+
+DESCRIPTION
+    `ACL::Lite' is a simple permission checker without any prerequisites.
+
+    `ACL' stands for "Access Control Lists".
+
+  DEFAULT PERMISSION
+    The default permission depends on whether you pass a `uid'
+    (authenticated) or not (anonymous).
+
+CONSTRUCTOR
+  new
+    Creates an ACL::Lite object by passing the following parameters:
+
+    uid User identifier for authenticated users.
+
+    permissions
+        Granted permissions.
+
+    separator
+        Separator used to parse permission strings. Defaults to `,'.
+
+  check $permissions, $uid
+    Checks whether any of the permissions in $permissions is granted.
+    Returns first permission which grants access.
+
+  permissions
+    Returns permissions as hash reference:
+
+        $perms = $acl->permissions;
+
+    Returns permissions as list:
+
+        @perms = $acl->permissions;
+
+CAVEATS
+    Please anticipate API changes in this early state of development.
+
+AUTHOR
+    Stefan Hornburg (Racke), `racke@linuxia.de'
+
+BUGS
+    Please report any bugs or feature requests to `bug-acl-lite at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ACL-Lite. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc ACL::Lite
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=ACL-Lite
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/ACL-Lite
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/ACL-Lite
+
+    * Search CPAN
+        http://search.cpan.org/dist/ACL-Lite/
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2011-2013 Stefan Hornburg (Racke).
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

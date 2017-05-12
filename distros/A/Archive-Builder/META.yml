@@ -1,0 +1,39 @@
+---
+abstract: 'File generation and archiving framework'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Archive::Builder
+name: Archive-Builder
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Archive::Tar: 1.30
+  Archive::Zip: 1.18
+  Class::Autouse: 1.27
+  Class::Inspector: 1.12
+  File::Flat: 1.00
+  File::Spec: 0.80
+  IO::String: 1.08
+  IO::Zlib: 0
+  List::Util: 1.15
+  Params::Util: 0.22
+  perl: 5.005
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Archive-Builder
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Archive-Builder
+version: 1.16

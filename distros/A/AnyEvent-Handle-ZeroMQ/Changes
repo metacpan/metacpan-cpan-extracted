@@ -1,0 +1,32 @@
+Revision history for AnyEvent-Handle-ZeroMQ
+
+0.09    2011.9.4
+        Fix a bug occured when busy on both reading and writing.
+
+0.08    2011.7.23
+        Documented more.
+
+0.07    2011.7.23
+        Change the ZMQ_EVENTS test order, to avoid ZMQ keeps in calling the handler steadily.
+
+0.06    2011.7.6
+        Lost files
+
+0.05    2011.6.29
+        Add on_error to AnyEvent::Handler::ZeroMQ to catch errors occurs in the
+        reading handler.
+
+0.04    2011.6.27
+        Add AnyEvent::Handle::ZeroMQ::Dealer & AnyEvent::Handle::ZeroMQ::Router that dispatch corresponding
+        requests and replies automatically.
+
+0.03    2011.6.21
+        Add on_drain
+
+0.02    2011.6.19
+        Add a DESTROY hook to ZeroMQ::Socket when there's no such one,
+	to close Socket when it was destroyed.
+
+0.01
+        First version, released on an unsuspecting world.
+

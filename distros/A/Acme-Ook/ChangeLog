@@ -1,0 +1,102 @@
+2006-12-07  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Fix for
+	[rt.cpan.org #23837] Unable to over-ride Acme::Ook::_compile in child classes (patch attached)
+	Patch applies as-is *except* that the access to the %Ook
+	vtable/VM was given a proper API.
+	
+	* Fix for
+	[rt.cpan.org #23841] ook example scripts installed with make install (fix included)
+	(add PMLIBDIRS => ['lib'] to Makefile.PL to avoid the *.ook
+	 example scripts being copied to Perl library)
+
+Tue Dec 31 02:39:16 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* An optimizer for the intermediate language from Nicholas Clark.
+
+	* Two more sample programs from Nicholas Clark: coffee and bananas.
+	
+	* Release 0.10.
+
+Sun Dec 29 02:12:44 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* A fix from Nicholas Clark so that e.g. "Ook? Ook?" is trapped.
+	
+	* Test the "ok" test.
+	
+	* Release 0.09.
+
+Sun Dec 29 01:31:59 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Add Nicholas Clark's "ok" test.
+
+	* Cleanup README (the mention of hello.t no more relevant)
+
+	* Release 0.08.
+
+Sun Dec 29 01:20:23 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* The -S flag was not working.
+	
+	* The 0.06 had lost once again the error reporting.
+	
+	* Release 0.07.
+
+Sun Dec 29 01:14:17 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Nicholas Clark found a way to make the compilation
+	  code more compact.
+	
+	* Nicholas Clark found a way to kludge around the problem
+	  with hello.t in older (pre-5.8.0) Perls.
+	
+	* Do not require 5.6 to kludge around 5.6-introduced problems.
+	
+	* Release 0.06.
+
+Sun Dec 29 00:53:37 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Nicholas Clark found a problem where in newer Perls
+	  "Ook! Ook." might start producing Unicode.
+	
+	* Release 0.05.
+
+Sun Dec 29 00:06:51 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Rewrite the new() and Ook() compile interfaces
+	  to accept either strings, Ook! filenames, or
+	  IO globs.
+	
+	* Release 0.04.
+
+Sat Dec 28 22:10:43 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Document the Perl 5.00503 silliness in Acme::Ook.
+	
+	* Release 0.0301.
+
+Sat Dec 28 22:07:40 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Ookify Acme::Ook, from Nicholas Clark.
+
+	* +xify ook, suggested by Nicholas Clark. 
+
+	* Move ook to bin.
+
+	* Move *.ook to ook.
+
+	* Document the Perl 5.00503 silliness in README.
+	
+	* Release 0.03.
+
+Sat Dec 28 21:16:09 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Changed the language specification URL to point to
+	  the original specification, not to the .Net version.
+	
+	* Release 0.02.
+
+Sat Dec 28 19:56:50 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Relase 0.01.
+

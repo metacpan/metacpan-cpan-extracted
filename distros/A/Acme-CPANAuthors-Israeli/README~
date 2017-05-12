@@ -1,0 +1,41 @@
+Acme-CPANAuthors-Israeli
+
+List the Israeli Authors on CPAN. A subclass of Acme-CPANAuthors .
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Acme::CPANAuthors::Israeli
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-CPANAuthors-Israeli
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Acme-CPANAuthors-Israeli
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Acme-CPANAuthors-Israeli
+
+    Search CPAN
+        http://search.cpan.org/dist/Acme-CPANAuthors-Israeli
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Shlomi Fish
+
+This program is released under the following license: MIT/X11 Licence. 
+

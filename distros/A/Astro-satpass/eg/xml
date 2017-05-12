@@ -1,0 +1,342 @@
+#!/usr/local/bin/perl
+
+use 5.006002;
+
+use strict;
+use warnings;
+
+use Astro::Coord::ECI;
+use Astro::Coord::ECI::TLE qw{ :constants };
+use Astro::Coord::ECI::Utils qw{ deg2rad rad2deg TWOPI };
+use Astro::SpaceTrack;
+use DateTime;
+use Getopt::Long 2.33;
+use Pod::Usage;
+use XML::Writer;
+
+our $VERSION = '0.079';
+
+my %opt = (
+    latitude => 52.069858,	# Degrees north of Equator
+    longitude => 4.291111,	# Degrees east of Greenwich
+    height => 4,		# Meters above Sea Level
+
+    horizon	=> 10,		# Prediction horizon
+    twilight	=> -3,		# Twilight (degrees _above_ horizon)
+
+    more	=> 0,		# Level of detail.
+    time_zone	=> 'Europe/Amsterdam',	# Output time zone
+
+    pretty	=> 1,
+);
+
+GetOptions( \%opt,
+    qw{ latitude=f longitude=f height=f horizon=f twilight=f more+
+    time_zone|time-zone|zone=s pretty! },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+my $now = time;		# The time the script was run.
+my $start_time;		# The start time for the prediction
+if ( my $time = shift @ARGV ) {
+    require Date::Manip;
+    $start_time = Date::Manip::UnixDate( $time, '%s' )
+	or die "Invalid start time $time\n";
+} else {
+    $start_time = $now;
+}
+my $days = shift @ARGV || 7;	# Number of days to predict
+
+# Retrieve the TLE data from Celestrak.
+
+my $getter = Astro::SpaceTrack->new( direct => 1, with_name => 1 );
+my $resp = $getter->celestrak( 'stations' );
+$resp->is_success()
+    or die 'Failed to retrieve TLE data: ', $resp->status_line();
+
+# Parse the TLE data, eliminating any Progress or Soyuz modules, or
+# whatever else may be in the same data set.
+
+my ( $iss ) = grep { 25544 == $_->get( 'id' ) }
+    Astro::Coord::ECI::TLE->parse( $resp->content() );
+
+# Set up our location
+
+my $sta = Astro::Coord::ECI->new(
+)->geodetic(
+    deg2rad( $opt{latitude} ),
+    deg2rad( $opt{longitude} ),
+    $opt{height} / 1000,
+);
+
+# Configure the TLE object as desired for the pass prediction, based on
+# the option values.
+
+$iss->set(
+    horizon	=> deg2rad( $opt{horizon} ),
+    pass_variant => ( $opt{more} ?
+	PASS_VARIANT_NONE :
+	PASS_VARIANT_VISIBLE_EVENTS | PASS_VARIANT_FAKE_MAX |
+	    PASS_VARIANT_START_END
+    ),
+    station	=> $sta,
+    twilight	=> deg2rad( $opt{twilight} ),
+    visible	=> $opt{more} < 2,
+);
+
+# Compute the passes.
+
+my @passes = $iss->pass( $start_time, $start_time + $days * 86400 );
+
+# Put the output into UTF-8 mode, since that is what we intend to use.
+# This gets eval'ed to hide it if we're using Perl 5.6.
+
+$] ge '5.008'
+    and eval "binmode STDOUT, ':encoding(utf-8)'";
+
+# Now fire up the XML generator.
+
+my $xw = XML::Writer->new(
+    DATA_MODE	=> $opt{pretty},
+    DATA_INDENT => 4,
+    ENCODING	=> 'utf-8',
+);
+
+# Start the XML.
+
+$xw->xmlDecl();	# The declaration
+$xw->startTag( 'transits',	# The document tag
+    latitude => $opt{latitude},
+    longitude => $opt{longitude},
+    altitude => $opt{height},
+    timezone => $opt{time_zone},
+    days => $days,
+    gmtnow => DateTime->from_epoch(
+	epoch => $now,
+	time_zone => 'GMT',
+    )->strftime( '%Y-%m-%dT%H:%M:%S' ),
+    object => $iss->get( 'name' ),
+    oid => $iss->get( 'id' ),
+);
+
+# For each pass,
+
+my $pass_number = 1;
+foreach my $pass ( @passes ) {
+
+    # Emit the start tag for the pass
+
+    $xw->startTag( 'pass',
+	number => $pass_number++,
+	date => DateTime->from_epoch(
+	    epoch => $pass->{events}[0]{time},
+	    time_zone => $opt{time_zone},
+	)->strftime( '%Y-%m-%d' ),
+    );
+
+    # For each event in the pass
+
+    foreach my $event ( @{ $pass->{events} } ) {
+
+	# Emit a tag representing the event itself
+
+	$xw->startTag( $event->{event} );
+
+	# Emit the time of the event
+
+	$xw->dataElement( time => DateTime->from_epoch(
+		epoch => $event->{time},
+		time_zone => $opt{time_zone},
+	    )->strftime( '%H:%M:%S' ),
+	);
+
+	# Emit the elevation of the event
+
+	$xw->dataElement(
+	    elevation	=> sprintf(
+		'%.2f', rad2deg( $event->{elevation} ) ),
+	);
+
+	# Emit the azimuth of the event
+
+	$xw->dataElement(
+	    azimuth	=> format_azimuth( $event->{azimuth} ),
+	);
+
+	# If at least one -more was seen, emit the illumination of the
+	# event
+
+	$opt{more}
+	    and $xw->dataElement(
+	    illumination => $event->{illumination},
+	);
+
+	# Emit an end tag for the event
+
+	$xw->endTag( $event->{event} );
+
+    }
+
+    # Emit the end tag for the pass
+
+    $xw->endTag( 'pass' );
+}
+
+# End the XML
+
+$xw->endTag( 'transits' );
+$xw->end();
+
+# Convert azimuth to compass bearing
+
+my @bearing;
+
+BEGIN {
+    @bearing = qw{
+	N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW
+    };
+}
+
+sub format_azimuth {
+    my ( $azimuth ) = @_;
+    return $bearing[ int( $azimuth * @bearing / TWOPI + 0.5 ) % @bearing ];
+}
+
+__END__
+
+=head1 TITLE
+
+xml - Represent a series of ISS passes in XML
+
+=head1 SYNOPSIS
+
+ eg/xml
+ eg/xml '06-Jun-2011 noon CET' 3 -time_zone GMT
+ eg/xml -help
+ eg/xml -version
+
+=head1 OPTIONS
+
+The following options are recognized:
+
+=over
+
+=item -latitude
+
+This option specifies the latitude of the observer, in degrees north of
+the Equator. Latitudes south of the Equator are negative.
+
+The default is 52.069858, which is the latitude of The Hague.
+
+=item -longitude
+
+This option specifies the longitude of the observer, in degrees east of
+Greenwich. Longitudes west of Greenwich are negative.
+
+The default is 4.291111, which is the longitude of The Hague.
+
+=item -height
+
+This option specifies the height of the observer above sea level, in
+meters. Heights below sea level are negative.
+
+The default is 4, which is the height of The Hague above sea level.
+
+=item -horizon
+
+This option specifies the observing horizon in degrees above the
+geometric horizon. Passes that do not achieve this elevation above the
+horizon will not be reported. Negative elevations may be specified.
+
+The default is 10, which is the value Heavens Above appears to use.
+
+=item -twilight
+
+This option specifies the beginning or end of twilight, in degrees of
+the upper limb of the Sun B<above> the geometric horizon. Normally this
+will be a negative value. Passes will not be reported unless the Sun is
+below this elevation for at least part of the pass.
+
+The default is -3, which is more or less consistent with Heavens Above.
+
+=item -more
+
+This option specifies that more information be presented. If specified
+once, all events in a pass will be provided; the tags will be the event
+names. If specified twice, all passes will be provided, whether or not
+the International Space Station is visible at any time during the pass.
+If specified at all, the C<< <illumination> >> tag will be added to the
+data emitted for each event.
+
+=item -time_zone
+
+This option specifies the time zone for the output time. The value must
+be compatable with the L<DateTime|DateTime> module.
+
+You can also specify this as C<-time-zone>, or as just C<-zone>.
+
+The default is C<'Europe/Amsterdam'>.
+
+=item -pretty
+
+This option specifies whether white space and line breaks should be
+inserted between the XML elements for readability.
+
+The default is C<-pretty>, but you can turn this off by specifying
+C<-nopretty>.
+
+=item -help
+
+This option displays the documentation, and then exits.
+
+=item -version
+
+This option displays the version number of this script, and then exits.
+
+=back
+
+=head1 DETAILS
+
+This Perl script computes passes of the International Space Station over
+a pre-programmed location (The Hague, Netherlands).
+
+It takes up to three arguments: the start date and time of the
+prediction interval, the number of days in the interval, and the time
+zone to use to report the times of the passes. These default to the
+current time, seven days, and C<'Europe/Amsterdam'> respectively. If you
+specify a start time other than C<''> or C<0>, the
+L<Date::Manip|Date::Manip> module will be loaded and used to parse it.
+If you specify a time zone, it must be acceptable to
+L<DateTime|DateTime>.
+
+The orbital data needed to make the prediction are downloaded from
+Celestrak (L<http://celestrak.com/>) using
+L<Astro::SpaceTrack|Astro::SpaceTrack>.
+
+Passes are reported on the entrance/exit scheme. That is, a pass is held
+to have started when the ISS rises, or when it passes out of the Earth's
+shadow, or when twilight ends, whichever is latest. It ends when the
+ISS sets, or passes into the Earth's shadow, or when twilight starts,
+whichever is earliest. If the maximum elevation above the horizon is not
+reportable by these criteria, a 'fake' maximum is inserted just after
+the start or before the end, as the case may be.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011-2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

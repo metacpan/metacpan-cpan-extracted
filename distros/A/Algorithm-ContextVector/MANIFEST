@@ -1,0 +1,8 @@
+Build.PL
+Makefile.PL
+lib/Algorithm/ContextVector.pm
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+META.json

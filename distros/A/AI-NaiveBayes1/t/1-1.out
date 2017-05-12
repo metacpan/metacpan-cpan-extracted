@@ -1,0 +1,25 @@
+Model:
+category  | P(category) 
+---+---
+repairs=Y | 0.38        
+repairs=N | 0.62        
+---+---
+
+category  | model | P( model | category ) 
+---+---+---
+repairs=Y | H     | 0.631578947368     
+repairs=Y | T     | 0.368421052631     
+---+---+---
+repairs=N | H     | 0.209677419354     
+repairs=N | T     | 0.790322580645     
+---+---+---
+
+category  | place | P( place | category ) 
+---+---+---
+repairs=Y | B     | 0.684210526315     
+repairs=Y | N     | 0.315789473684     
+---+---+---
+repairs=N | B     | 0.193548387096     
+repairs=N | N     | 0.806451612903     
+---+---+---
+

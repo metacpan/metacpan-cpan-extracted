@@ -1,0 +1,7 @@
+Revision history for Perl extension Algorithm::ChooseSubsets.
+
+0.01  Tue Apr 30 09:36:34 2002
+	- original version
+
+0.02 Wed Oct 19 2005 
+    - fixed harmless off-by-one typo

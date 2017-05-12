@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - ars_GetListVUI</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_GetListVUI(ctrl, schema, changedSince=0)</CODE></H2>
+
+	Retrieve a list of VUI id's that are associated with a given schema.
+
+      <DL>
+         <DT><B>On success</B><DD>
+		Returns an array.
+         <DT><B>On failure</B><DD>
+                Returns undef.
+      </DL>
+
+      <P>Example:
+
+      <PRE>
+	(@a = ars_GetListVUI($ctrl, "HD:HelpDesk")) || 
+		die "$ars_errstr";
+      </PRE>
+
+<I>ars_GetListVUI was introduced in version 1.5 of ARSperl</I>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 21st July 1997 by jcmurphy@arsperl.org<BR>
+&#169; J.C.Murphy, J.W.Murphy 1997 arsperl@arsperl.org
+</address>
+</BODY>
+</HTML>

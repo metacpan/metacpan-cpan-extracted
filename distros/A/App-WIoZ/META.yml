@@ -1,0 +1,25 @@
+---
+abstract: 'App::WIoZ create a SVG or PNG image of a word cloud from a simple text file'
+author:
+  - 'Yves Agostini <yvesago@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-WIoZ
+requires:
+  Cairo: 0
+  Color::Mix: 0
+  Graphics::ColorNames: 0
+  Math::PlanePath::HilbertCurve: 0
+  Moose: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+version: 0.004

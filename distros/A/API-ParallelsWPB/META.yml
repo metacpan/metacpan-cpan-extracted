@@ -1,0 +1,56 @@
+---
+abstract: 'client for Parallels Presence Builder API'
+author:
+  - 'Alexander Ruzhnikov <a.ruzhnikov@reg.ru>'
+  - 'Polina Shubina <shubina@reg.ru>'
+build_requires:
+  File::Spec: 0
+  File::Temp: 0
+  HTTP::Response: 6.04
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::Fatal: 0.010
+  Test::More: 0.98
+  Test::Pod: 1.22
+  Test::Warnings: 0.010
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: API-ParallelsWPB
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - examples
+    - corpus
+  namespace:
+    - t::lib
+  package:
+    - DB
+provides:
+  API::ParallelsWPB:
+    file: lib/API/ParallelsWPB.pm
+    version: 0.03
+  API::ParallelsWPB::Requests:
+    file: lib/API/ParallelsWPB/Requests.pm
+    version: 0.03
+  API::ParallelsWPB::Response:
+    file: lib/API/ParallelsWPB/Response.pm
+    version: 0.03
+requires:
+  Carp: 0
+  JSON::XS: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  perl: 5.008009
+  strict: 0
+  warnings: 0
+resources: {}
+version: 0.03
+x_authority: cpan:IMAGO

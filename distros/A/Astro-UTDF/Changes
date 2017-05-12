@@ -1,0 +1,91 @@
+0.006		2016-01-07	T. R. Wyant
+  Add GitHub repository to metadata.
+
+0.005		2014-10-26	T. R. Wyant
+  No changes since 0.004_01
+
+0.004_01	2014-10-19	T. R. Wyant
+  Housekeeping connected with conversion to Git. No code changes.
+
+0.004		2013-10-20	T. R. Wyant
+  Correct README file.
+  Make the authortest build target set environment variable
+    AUTHOR_TESTING to 1.
+
+0.003		2012-01-05	T. R. Wyant
+  Bring Changes file into compliance with Test::CPAN::Changes. Add test
+    xt/author/changes.t to be sure it stays that way.
+  Build now requires Test::More 0.88.
+
+0.002		2011-11-27	T. R. Wyant
+  Update LICENSES/Copying (GNU GPL) to have current FSF address.
+
+0.001_90	2011-11-16	T. R. Wyant
+  Get serious about dependencies; mention everything, including core.
+  Drop dependency on Params::Util. I was only using _INSTANCE(), and
+    that can be managed usig Scalar::Util blessed(). Since I already use
+    Scalar::Util, this means fewer dependencies.
+  Various structural re-organizations of the kit.
+
+0.001		2010-03-28	T. R. Wyant
+  Initial CPAN release. No changes from 0.000_03 except version number.
+    And this note.
+
+0.000_03	2010-03-22	T. R. Wyant
+  Require Perl 5.006.
+  Correct the code in the SYNOPSIS.
+  Add NOTICE to the pod, declaring this alpha code.
+  Generate own UTDF data for testing purposes.
+  Add accessor range().
+  Make factor_K() and factor_M() public methods, and make them
+    accessor/mutators so that the user can override the generated
+    values if needed.
+  Add accessor/mutators data_interval(),
+    is_angle_corrected_for_misalignment(),
+    is_angle_corrected_for_refraction(), is_destruct_doppler(),
+    is_range_corrected_for_refraction(), is_side_lobe(), mutators
+    receive_antenna_diameter_code(), receive_antenna_geometry_code(),
+    transmit_antenna_diameter_code(), transmit_antenna_geometry_code(),
+    and transponder_latency().
+  Make agc(), azimuth(), data_validity(), doppler_count(), elevation(),
+    frequency_band_and_transmission_type(), front(), measurement_time(),
+    microseconds_of_year(), mode(), range_delay(), rear(),
+    receive_antenna_padid(), receive_antenna_type(), router(),
+    seconds_of_year(), sic(), tdrss_only(),
+    tracker_type_and_data_rate(), tracking_mode(),
+    transmit_antenna_padid(), transmit_antenna_type(),
+    transmit_frequency(), vid(), and year() mutators as well as
+    accessors.
+  Add various accessors to the decode() method.
+
+0.000_02	2010-03-03	T. R. Wyant
+  Corrected conversion of azimuth and elevation values to radians.
+  Make the following accessors into accessor/mutators: frequency_band(),
+    is_angle_valid(), is_doppler_valid(), is_range_valid(),
+    tracker_type() and transmission_type().
+  Add accessor/mutator is_last_frame().
+  Add hex_record() as accessor/mutator wrapping raw_record().
+  Recode slurp() in terms of new( raw_record => $buffer, ... ). You can
+    pass slurp() attribute_name/value pairs to override those read from
+    the file.
+  Make raw_record() a mutator as well as an accessor. As mutator, it
+    sets the values of all attributes contained in the UTDF record. As
+    accessor it constructs the record out of the attribute values.
+  Add methods new() and clone(). Both take attribute_name/value pairs as
+    arguments.
+  Have accessors that are not (yet) mutators croak when given an
+    argument.
+  Added dependency on Params::Util (for prior_record() validation).
+  Added method prior_record() to retrieve or set the prior record for
+    the purpose of computing Doppler shift. Doppler shift is now
+    computed on demand using prior_record().
+  Removed caching of computed results.
+  Added functionality test t/utdf.t.
+  Angle, range delay and doppler methods now return data even if the
+    relevant valid bit is not set, unless enforce_validity() is true.
+  Add accessor/mutator enforce_validity().
+
+0.000_01	2010-02-24	T. R. Wyant
+  Initial source-controlled version.
+
+# ex: set textwidth=72 autoindent :

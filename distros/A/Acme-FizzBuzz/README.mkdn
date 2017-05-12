@@ -1,0 +1,29 @@
+# NAME
+
+Acme::FizzBuzz - The FizzBuzz program can be written shortest
+
+# SYNOPSIS
+
+  $ perl -MAcme::FizzBuzz -e ''
+
+or
+
+  $ export PERL5OPT="-MAcme::FizzBuzz"
+  $ echo '' | perl
+
+# DESCRIPTION
+
+Acme::FizzBuzz is The FizzBuzz program can be written shortest.
+
+# AUTHOR
+
+Kazuhiro Osawa <yappo {{{{}}}} shibuya {ddddoooott} pl>
+
+# SEE ALSO
+
+[http://www.codinghorror.com/blog/archives/000781.html](http://www.codinghorror.com/blog/archives/000781.html)
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

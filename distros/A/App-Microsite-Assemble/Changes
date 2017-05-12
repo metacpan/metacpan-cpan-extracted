@@ -1,0 +1,9 @@
+0.03 2013-08-27
+    Fragments are now treated as templates, so you can include other fragments (sartak)
+
+0.02 2013-08-27
+    Automatically create fragments and fragment dirs in CMS mode in example (sartak)
+    Mark output from missing_fragment as raw (sartak)
+
+0.01 2013-08-22
+    Initial release

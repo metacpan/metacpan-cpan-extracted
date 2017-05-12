@@ -1,0 +1,14 @@
+Revision history for App-Standby
+
+0.04    2014-07-08
+        Improve docs.
+
+0.03    2013-05-31
+        Add missing dependency on DBD::SQLite
+
+0.02    2013-05-27
+        Migrate to Bootstrap
+
+0.01    2012-12-10
+        First version, released on an unsuspecting world.
+

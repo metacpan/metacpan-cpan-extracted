@@ -1,0 +1,46 @@
+<html>
+<title>Example of AMF::Perl in action</title>
+<body>
+
+<center>
+<table cellspacing=10><tr>
+<td align=left width=400 valign=top>
+<H2>This is an example of <a href=http://www.simonf.com/amfperl/>AMF::Perl</a> in action.</H2>
+<br>
+<p>
+Download Flash 7 player from <a href="http://www.macromedia.com/shockwave/download/alternates/">here</a> if you don't have it. It even works on Linux!
+<p>
+This shows various data types passed through AMF to the perl backend and sent back.
+The most interesting this is not so much what it does, but how it works. The Perl script utilizes the "service discovery" approach - you simply put Perl modules into a certain directory, and they are automatically registered as services.
+<br><br>
+This example also shows how to throw exceptions, handled by functionName_onStatus in the Flash client (as opposed to functionName_onResult, which is called normally). Simply include in your Perl code
+<pre>
+use AMF::Perl qw/amf_throw/;
+</pre>
+
+and then call <em>amf_throw()</em> with a string or an arbitrary object as a parameter.
+<br><br>
+If you call <em>die "Error message"</em>, it will be also caught in the same way and sent as an error to Flash.
+
+<br><br>
+<a href=basic.pl>This is the server-side Perl script basic.pl.</a>
+<a href=basicservices/DataEcho.pm>This is a sample service DataEcho.pm.</a>
+</td>
+<td width=600>
+&nbsp;&nbsp;&nbsp;
+<OBJECT classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0" id="basic" width=550 height=350>
+<PARAM NAME=movie VALUE="basic.swf"> 
+<PARAM NAME=quality VALUE=high>
+<PARAM NAME=bgcolor VALUE=#FFFFFF>
+
+<EMBED src="basic.swf" quality=high bgcolor=#FFFFFF width=550 height=350
+NAME="basic" ALIGN="" TYPE="application/x-shockwave-flash" 
+PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
+</EMBED>
+</OBJECT>
+</td>
+</tr></table>
+</center>
+</body>
+</html>

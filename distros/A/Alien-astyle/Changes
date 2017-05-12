@@ -1,0 +1,48 @@
+Revision history for Alien::astyle.
+
+0.009000 2017-04-14 Codename Good Shepherd
+
+    - HOLIDAY EDITION: Happy Good Friday!
+    - Upgrade To Alien::Build v0.36
+
+0.008000 2017-02-14 Codename Casanova
+
+    - HOLIDAY EDITION: Happy Saint Valentine's Day!
+    - Upgrade To Alien::Base 0.032
+
+0.007000 2017-01-13 Codename Bond, James Bond
+
+    - Upgrade To Alien::gmake v0.17
+    - Perl v5.8 Minimum Required
+
+0.006000 2017-01-12
+
+    - MS Windows, Utilize AStyle.exe Executable File
+    - Perl v5.25 Support
+    - Travis-CI & AppVeyor, 100% Tests Pass
+
+0.005000 2017-01-11
+
+    - Include IO::Socket::SSL Dependency, May Be Missing On Fresh Perl Installs
+
+0.004000 2017-01-09
+
+    - Use IPC::Cmd::can_run() To Locate `astyle` Executable Path During Testing
+    - Fix Improper Use Of bin_dir()
+    - Travis-CI, Enable Both share & system Tests (Thanks to plicease AKA Graham Ollis)
+    - MS Windows, Enable msys & install (Thanks to plicease AKA Graham Ollis)
+
+0.003000 2017-01-07
+
+    - Use IPC::Cmd::can_run() To Locate `astyle` Executable Path During Installation
+
+0.002000 2017-01-07
+
+    - Fix Broken CPAN Metadata URLs (Thanks to plicease AKA Graham Ollis)
+    - FreeBSD Support (Thanks to plicease AKA Graham Ollis)
+    - Clang Support (Thanks to plicease AKA Graham Ollis)
+
+0.001000 2017-01-07
+
+    - Initial Release!
+    - Linux Support

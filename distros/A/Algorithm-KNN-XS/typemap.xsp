@@ -1,0 +1,7 @@
+%typemap{LibANNInterface*}{simple};
+%typemap{bool}{simple};
+%typemap{std::string}{simple};
+%typemap{std::vector<double>};
+%typemap{std::vector<std::vector<double>>};
+
+%exception{invalidParameterValue}{InvalidParameterValueException}{stdmessage};

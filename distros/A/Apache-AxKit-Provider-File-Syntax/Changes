@@ -1,0 +1,22 @@
+Revision history for Perl extension Apache::AxKit::Provider::File::Syntax
+
+0.06  Tue Dec 14 14:08:10 PST 2004
+  - Added <syn:Line> wrapper around lines
+  - Added attribute to <syn:syntax> to indicate the file type
+
+0.05  Fri Jul 16 04:10:59 PDT 2004
+  - Fixed a stupid bug in the Makefile.PL
+
+0.04  Thu Jul 15 21:08:26 PDT 2004
+  - More changes from Yanick, this time making File::MimeInfo optional
+  - Adopted ExtUtils::AutoInstall to accomodate installing File::MimeInfo if
+    it isn't available
+
+0.03  Thu Jul 15 10:05:06 PDT 2004
+  - Made more resilient to a lack of mime info; patch from Yanick <yanick@istop.com>
+
+0.02  Wed Jul 14 10:34:06 PDT 2004
+  - First release
+
+0.01  Sat Feb 28 13:31 2004
+  - Original version

@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>launch</title>
+  <script type='text/javascript'>
+    function launch() {
+        var left_pos =  window.screen.width - 250;
+        window.open('/app/index.html', 'AV Status', 'width=250,height=542,location=no,menubar=no,status=no,titlebar=no,toolbar=no,top=20,left=' + left_pos );
+        window.close();
+    }
+  </script>
+</head>
+<body onload='launch()'>
+</body>
+</html>

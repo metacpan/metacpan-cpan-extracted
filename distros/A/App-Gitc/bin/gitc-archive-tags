@@ -1,0 +1,173 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-archive-tags
+# ABSTRACT: Archive changeset tags
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    git
+    git_config
+    git_dir
+    open_packed_refs
+    project_name
+    project_root
+);
+use Getopt::Long;
+
+my ($full, $preserve);
+GetOptions( 'full' => \$full, 'preserve' => \$preserve );
+
+# make sure .git/packed-refs has a proper header (see commit)
+git 'pack-refs';
+
+my ( $tags_fh, $new_tags_fh, $new_tags_filename )
+    = open_packed_refs('gitc-archive-tags');
+exit if not $tags_fh;  # refs to process
+
+# normally we don't access dbh directly, but we need a transaction,
+# so we need the database handle itself.
+my $dbh = App::Gitc::Util::dbh();
+$dbh->begin_work;
+
+# which changesets are old?
+my $is_old              = find_old_changesets($dbh);
+my $is_already_archived = find_archived_tags($dbh);
+
+my $n = 0;
+TAG:
+while ( my $tag_line = <$tags_fh> ) {
+    chomp $tag_line;
+    my ( $sha1, $tag_name ) = split / /, $tag_line;
+
+    # keep non-changeset tags
+    my ($changeset) = $tag_name =~ m{^refs/tags/cs/([^/]+)};
+    if ( not defined $changeset ) {
+        print $new_tags_fh "$tag_line\n";
+        next TAG;
+    }
+
+    # is this tag too young?
+    if ( not $is_old->{$changeset} ) {
+        print $new_tags_fh "$tag_line\n";
+        next TAG;
+    }
+
+    # do we need to archive the tag?
+    my $archived_sha1 = $is_already_archived->{$tag_name};
+    if ($archived_sha1) {
+        if ( $archived_sha1 ne $sha1 ) {
+            warn "Local and archived tags for $tag_name differ\n";
+            warn "  local:    $sha1\n";
+            warn "  archived: $archived_sha1\n";
+            if ( $preserve ) {
+                warn "Keeping local\n";
+                print $new_tags_fh "$tag_line\n";
+                next TAG;
+            }
+            else {
+                warn "Removing local\n";
+            }
+        }
+    }
+    elsif ($full) {
+        my $sql = q{
+            INSERT INTO tag_archive (project,tag_name,sha1)
+            VALUES (?,?,?)
+        };
+        my $rc = $dbh->do( $sql, undef, project_name(), $tag_name, $sha1 );
+        if ( $rc != 1 ) {
+            warn "Problem archiving $tag_name, keeping it locally\n";
+            print $new_tags_fh "$tag_line\n";
+            next TAG;
+        }
+    }
+    else {  # tag could be archived but we're keeping it anyway
+        print $new_tags_fh "$tag_line\n";
+        next TAG;
+    }
+    $n++;
+    if ( $n && $n % 1000 == 0 ) {
+        print STDERR "Archived $n tags\r";
+    }
+
+    # don't store the tag in $new_tags_fh (aka delete the tag locally)
+}
+print STDERR "Archived $n tags\n" if $n;
+$dbh->commit;
+
+close $new_tags_fh;
+rename $new_tags_filename, git_dir() . '/packed-refs';
+
+exit;
+
+sub find_old_changesets {
+    my ($dbh) = @_;
+    my $sql = q{
+        SELECT  DISTINCT changeset
+        FROM    changeset_log
+        WHERE   project = ?
+          AND   action = 'promote'
+          AND   target = 'prod'
+          AND   stamp  < DATE_SUB( CURRENT_TIMESTAMP, INTERVAL 60 DAY )
+    };
+    my %old_changesets = map { $_ => 1 }
+        @{ $dbh->selectcol_arrayref( $sql, undef, project_name() ) };
+    return \%old_changesets;
+}
+
+# returns a hashref like { 'refs/tags/cs/e1234/head' => 'a123ef...', ... }
+sub find_archived_tags {
+    my ($dbh) = @_;
+    my $sql = q{
+        SELECT  tag_name, sha1
+        FROM    tag_archive
+        WHERE   project = ?
+    };
+    my $rows = $dbh->selectall_arrayref( $sql, undef, project_name() );
+    my %archived_tags = map { $_->[0] => $_->[1] } @$rows;
+    return \%archived_tags;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-archive-tags - Archive changeset tags
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

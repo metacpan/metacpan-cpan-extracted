@@ -1,0 +1,45 @@
+GatewayRoot /debian/
+GatewayTimeout 90
+
+# versioned files (presumably always up-to-date)
+<LocationMatch "\.(deb|dsc|(diff|orig\.tar)\.gz)$">
+Site ftp://ftp.fuller.edu/debian/
+Site ftp://ftp.cdrom.com/pub/linux/debian/
+Site ftp://ftp.debian.org/debian/
+Site ftp://linux.eecs.umich.edu/pub/linux/debian/
+</LocationMatch>
+
+# unimportant, slowly changing files
+<LocationMatch "README">
+Site ftp://ftp.debian.org/debian/
+MuxSite ftp://ftp.cdrom.com/pub/linux/debian/
+MuxSite ftp://ftp.caldera.com/pub/mirrors/debian/
+Site ftp://ftp.fuller.edu/debian/
+Site ftp://linux.eecs.umich.edu/pub/linux/debian/
+</LocationMatch>
+
+# some directories
+<LocationMatch "^dists$|/$">
+Site ftp://ftp.debian.org/debian/
+Site ftp://ftp.fuller.edu/debian/
+Site ftp://linux.eecs.umich.edu/pub/linux/debian/
+</LocationMatch>
+
+# default
+<LocationMatch ".*">
+Site ftp://ftp.debian.org/debian/
+Site http://www.fuller.edu:81/debian/
+Site ftp://ftp.fuller.edu/debian/
+Site ftp://linux.eecs.umich.edu/pub/linux/debian/
+</LocationMatch>
+
+# servers with broken clocks	     upstream^2 upstream
+# ClockBroken scheme://host:port	  TZ	  TZ
+#ClockBroken ftp://ftp.debian.org	EST5EDT	EST5EDT
+#ClockBroken ftp://ftp.rge.com		EST5EDT	EST5EDT
+#ClockBroken ftp://linux.eecs.umich.edu	EST5EDT	EST5EDT
+ClockBroken ftp://ftp.caldera.com	EST5EDT	MST7MDT
+ClockBroken ftp://ftp.fuller.edu	EST5EDT	PST8PDT
+ClockBroken http://www.fuller.edu:81	EST5EDT	PST8PDT
+ClockBroken ftp://ftp.oro.net		EST5EDT	PST8PDT
+ClockBroken ftp://ftp.cdrom.com		EST5EDT	PST8PDT

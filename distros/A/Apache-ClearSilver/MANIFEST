@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Apache/ClearSilver.pm
+t/00_compile.t
+t/00_compile.t
+t/01_query.t
+t/02_set_value.t
+t/03_content_type.t
+t/TEST.PL
+t/conf/extra.conf.in
+t/htdocs/test1.cs
+t/htdocs/test2.cs
+t/htdocs/test3.cs

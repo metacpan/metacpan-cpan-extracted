@@ -1,0 +1,37 @@
+0.0300  2016-03-31
+    - Add an "-m" option for the command line client as a shortened form
+    of "--msg".
+
+0.0204  2015-05-30
+    - Add a link to the VCS repository (in bitbucket.org).
+
+0.0203  2014-01-26
+    - Add a minimum version of perl in META.yml/Build.PL (and in the
+    modules).
+        - Kwalitee
+    - Add a test for trailing space.
+
+0.0202  2014-01-25
+    - Add $VERSION for the .pm files under lib/ .
+        - Kwalitee and good style.
+    - Check for CPAN::Changes compatibility.
+
+0.0201  2014-01-21
+    - Minimum dependency on Getopt::Long-2.36.
+        - Fix tests such as http://www.cpantesters.org/cpan/report/75553bd6-81e9-11e3-b4a0-401c3071082f
+
+0.0200  2014-01-16
+    - Add the --msg command line argument.
+
+0.0102  2012-07-20
+    - Add "use YAML::XS" for LoadFile.
+        - it threw an error previously.
+
+0.0101  2012-07-20
+    - Removed temporary files (ending with "*~") from the distribution.
+    - Add the "Changes" file.
+    - Add the "README" file.
+    - Now installing bin/notifier to /usr/local/bin/ or a similar path.
+
+0.0100 2012-07-20
+    First release.

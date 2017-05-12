@@ -1,0 +1,33 @@
+---
+abstract: 'Implemented in Perl.'
+author:
+  - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: ActiveResource
+name: ActiveResource
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Accessor::Lvalue: 0
+  Class::Data::Inheritable: 0
+  Hash::AsObject: 0
+  LWP::UserAgent: 0
+  Lingua::EN::Inflect: 0
+  URI: 0
+  XML::Hash: 0
+  parent: 0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 0.01

@@ -1,0 +1,394 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <title>AMF::Perl - Flash Remoting in Perl and Python</title>
+  <style>
+body {  
+	scrollbar-3d-light-color:		#000000; 
+	scrollbar-arrow-color:			#000066; 
+	scrollbar-base-color:			#003366; 
+	scrollbar-dark-shadow-color:	#FFFFFF; 
+	scrollbar-face-color:			#003366; 
+	scrollbar-highlight-color:		#FFFFFF; 
+	scrollbar-shadow-color:			#000000;
+	color: 							#000000;
+	font-family: 					verdana, arial, helvetica, sans-serif;
+	font-size: 						12px;
+	margin:							0px; 
+}
+
+span.text {
+	font-family: 	verdana, arial, helvetica, sans-serif;
+	font-size: 		12px;
+	color: 			#003366;
+}
+
+span.red {
+	font-family: 	verdana, arial, helvetica, sans-serif;
+	font-size: 		12px;
+	font-weight: 	bold;
+	color: 			#990000;
+}
+
+div.notes {
+	background: 	#dddddd;
+	font-family: 	Verdana, Arial, helvetica, sans-serif; 
+	font-size: 		12px; 
+	margin-left: 	10px; 
+	margin-right: 	10px; 
+	padding: 		5px; 
+	border-color: 	#000000;
+}
+
+div.tableSub {
+	background: 	#CCCCFF;
+	font-family: 	Verdana, Arial, helvetica, sans-serif;  
+	font-size: 		13px; 
+	color: 			#003366;
+	margin-left: 	0px; 
+	margin-right: 	0px; 
+	padding: 		2px; 
+	border-color: 	#000099;
+	border-size: 	2px;
+}
+	
+pre {
+	color: 			#000000; 
+	margin-left: 	40px; 
+	margin-right: 	40px; 
+	padding: 		10px; 
+	font-size: 		12px;
+}
+
+P {
+	font-family: 	Verdana, Arial, helvetica, sans-serif; 
+	font-size: 		11px;
+	color: 			#000000;
+}
+
+A:link    { color: #3366AA; text-decoration: none; }
+A:visited { color: #3366CC; text-decoration: none; }
+A:active  { color: #00CC99; text-decoration: none; }
+A:hover   { color: #FFFFFF; text-decoration: none; background-color: #6699CC; }
+
+A.noDec:link    { color: #000099; font-weight: bold; text-decoration: none; }
+A.noDec:visited { color: #000099; font-weight: bold; text-decoration: none; }
+A.noDec:active  { color: #000099; font-weight: bold; text-decoration: none; }
+A.noDec:hover   { color: #3366AA; font-weight: bold; text-decoration: underline; background-color: transparent; }
+
+A.plain:link    { color: #000033;  text-decoration: none; }
+A.plain:visited { color: #000033;  text-decoration: none; }
+A.plain:active  { color: #000033;  text-decoration: none; }
+A.plain:hover   { color: #3366AA;  text-decoration: none; background-color: transparent; }
+
+h2 {
+	color: 			#333333; 
+	font-size: 		20 px; 
+	font-weight: 	bold; 
+}
+
+h3 {
+	color: 			#333333; 
+	font-size: 		18 px; 
+	font-weight: 	bold; 
+}
+
+h4 {
+	color: 			#0066CC; 
+	font-size: 		14px; 
+	font-weight: 	bold;
+}	
+
+  </style>
+</head>
+<body
+ style="background-image: url(orn5.gif);">
+<div style="position: absolute; left: 20px;">
+<h1>AMF::Perl - Flash Remoting in Perl and Python<br>
+</h1>
+<table cellpadding="2" cellspacing="2" border="0"
+ style="text-align: left; width: 600px;">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><big><span
+ style="font-weight: bold;">To use AMF::Perl, download it  
+and install in the usual way (perl Makefile.PL; make; make install).<br><br>
+To build/export .swf files with "Flash Remoting" you need to install
+<a href=http://www.macromedia.com/software/flashremoting/downloads/components/>
+Flash Remoting MX Components </a> (free download).
+
+This will install the files "NetServices.as" and "NetDebug.as" that are
+used in the ActionScript.
+      </span></big><br>
+      <hr style="width: 100%; height: 2px;"><big><span
+ style="font-weight: bold;"></span></big>
+      <h2>Sample code that uses Flash Remoting <br>
+      </h2>
+(See also examples that are distributed with the module).
+<br>
+<a href=encoding.html>Read this</a> if you want to send and receive strings in non-English encodings.
+      <br><br>
+Client code:<br>
+      <br>
+<textarea cols=50 rows=30>
+//Obligatory includes
+#include "NetServices.as"
+#include "NetDebug.as"
+
+//Get a connection object
+NetServices.setDefaultGatewayURL("http://host/cpu.pl");
+connection = NetServices.createGatewayConnection();
+
+//Get a pointer to a service
+remoteService = connection.getService("Foo", this);
+
+//Call a remote method on that service
+remoteService.bar();
+
+//or... send arguments to the server:
+remoteService.bar(arg1, arg2);
+
+//This callback function will be invoked
+function bar_result(value)
+{
+	//do something with the value
+}
+</textarea>
+&nbsp; <br>
+      <h3> Server code, option A - service registration.</h3><br>
+Use in simple applications.<br>
+<table>
+<tr><th>Perl</th><th>Python</th></tr>
+    <tr>
+<td valign=top>
+   
+<textarea cols=50 rows=40>
+use AMF::Perl;
+
+package Foo;
+
+sub new
+{
+    my ($proto)=@_;
+    my $self={};
+    bless $self, $proto;
+    return $self;
+}
+
+sub bar
+{
+	my ($self, $arg1, $arg2) = @_;
+	my $value;
+
+	#Compute a return value
+	#...
+
+	return $value;
+}
+
+#Create the gateway object
+my $gateway = AMF::Perl-&gt;new; 
+
+#Register a service that provides methods.
+#You can register more than one service.
+#This can happen during server startup (if running under mod_perl).
+$gateway-&gt;registerService("Foo",new Foo());
+
+#Let the gateway figure out who will be called.
+$gateway-&gt;service();
+ 
+</textarea>      
+</td>
+<td valign=top>
+File cpu.py:
+<textarea cols=50 rows=10>
+import AMF
+import cpuUsage
+import sys
+
+gateway = AMF.AMFPython.AMFPython()
+
+gateway.registerService("CpuUsage",cpuUsage.cpuUsage())
+
+gateway.service()
+</textarea>
+
+File cpuUsage.py:
+
+<textarea cols=50 rows=20>
+import os
+import sys
+import string
+
+class cpuUsage:
+    
+    def getCpuUsage(self, arg):
+    
+        child = os.popen("uptime")
+        output = child.read()
+        tokens = output.split()
+        
+        #Remove commas.
+        map(lambda x: x.replace(',', ''),  tokens)
+        
+        array = []
+        hash = {'Name' : 'L 1', 'Value' : tokens[9]}
+        array.append(hash)
+        hash = {'Name' : 'L 5', 'Value' : tokens[10]}
+        array.append(hash)
+        hash = {'Name' : 'L 15', 'Value' : tokens[11]}
+        array.append(hash)
+        return array
+
+</textarea>
+</td>
+</tr></table>
+<h3> Server code, option B - limited service discovery.</h3><br>
+Use in complex applications.<br>
+      <br>
+<h3>Part 1.&nbsp; The gateway script.</h3><br>
+      <br>
+<table>
+<tr><th>Perl</th><th>Python</th></tr>
+    <tr>
+<td valign=top>
+   
+<textarea cols=50 rows=20>
+	
+use AMF::Perl;
+
+
+#Create the gateway object
+
+my $gateway = AMF::Perl-&gt;new; 
+
+#Set a directory that will contain Perl package.
+#Each package will correspond to one service -
+#there can be as many as you want!
+#You can set only one class path, though.
+
+$gateway-&gt;setBaseClassPath("./basicservices/");
+
+#Let the gateway figure out who will be called.
+
+$gateway-&gt;service();
+</textarea>
+
+</td>
+<td valign=top>
+<textarea cols=50 rows=20>
+#!/usr/bin/python
+
+from AMF import AMF
+import sys
+import os
+
+gateway = AMF.AMF()
+
+gateway.setRelativeBaseClassPath("/basicservices")
+
+gateway.service()
+</textarea>
+</td></tr></table>
+<br>
+<h3>Part 2.&nbsp; Sample class in the registered directory.</h3>
+<table>
+<tr><th>Perl</th><th>Python</th></tr>
+    <tr>
+<td valign=top>
+   
+<textarea cols=50 rows=40>
+package DataEcho;
+
+sub new
+{
+    my ($proto)=@_;
+    my $self={};
+    bless $self, $proto;
+    return $self;
+}
+
+sub echoNormal
+{
+    my ($self, $data) = @_;
+    return $data;
+}
+sub echoDate
+{
+    my ($self, $data) = @_;
+    return $data;
+}
+sub echoXML
+{
+    my ($self, $data) = @_;
+    return $data;
+}
+
+sub methodTable
+{
+    return {
+        "echoNormal" =&gt; {
+            "description" =&gt; "Echoes the passed argument back to Flash (no need to set the return t
+ype)",
+            "access" =&gt; "remote", # available values are private, public, remote
+        },
+        "echoDate" =&gt; {
+            "description" =&gt; "Echoes a Flash Date Object (the returnType needs setting)",
+            "access" =&gt; "remote", # available values are private, public, remote
+            "returns" =&gt; "date"
+        },
+        "echoXML" =&gt; {
+            "description" =&gt; "Echoes a Flash XML Object (the returnType needs setting)",
+            "access" =&gt; "private", # available values are private, public, remote
+            "returns" =&gt; "xml"
+        }
+    };
+}
+
+1;
+</textarea>
+</td>
+<td valign=top>
+<textarea cols=50 rows=40>
+import sys
+class DataEcho:
+    
+    def echoNormal(self, arg):
+        return arg
+
+    def echoDate(self, arg):
+        return arg
+
+    def echoXML(self, arg):
+        return arg
+
+    def methodTable(self):
+        table = {}
+        table["echoNormal"]= {
+                    "description" : "Echoes the passed argument back to Flash (no need to set the return type)",
+                    "access" : "remote", # available values are private, public, remote
+            }
+        table["echoDate"] = {
+                    "description" : "Echoes a Flash Date Object (the returnType needs setting)",
+                    "access" : "remote", # available values are private, public, remote
+                    "returns" : "date"
+            }
+        table["echoXML"] = {
+                    "description" : "Echoes a Flash XML Object (the returnType needs setting)",
+                    "access" : "private", # available values are private, public, remote
+                    "returns" : "xml"
+            }
+        return table
+</textarea>
+</td></tr></table>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<br>
+</body>
+</html>

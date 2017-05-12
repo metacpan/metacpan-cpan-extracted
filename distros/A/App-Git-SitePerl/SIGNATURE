@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 18a062f88eeb43d6f9ba00e8d6de030a0573cb85 MANIFEST
+SHA1 606bd6424682249397d63caf905f651178a4d6cc MANIFEST.SKIP
+SHA1 8a2b4dee7a249d809a8fd51a049afc6a7edcf393 META.yml
+SHA1 11af91d47ba2acb82aaf5ab18187bdb6dd22010f Makefile.PL
+SHA1 427c64492990c9fbbc69621808921d4233e703d8 README.mkdn
+SHA1 2299f624a797762d9c65295eea93f198fd320ebd lib/App/Git/SitePerl.pm
+SHA1 7871cbf545b1af1b6125065eea50062249976e73 script/git-site-perl-commit
+SHA1 b91fd2fd7bb1aa69b8add91b515dbc26d35da66e script/git-site-perl-init
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.12 (Darwin)
+
+iEYEARECAAYFAkru1JsACgkQVCwRwOvSdBgXLgCgql/ciUPLXqrnzyQE2lUA2bue
+FkQAn3G3TwgNLZDyBy0wtJB4hvoEGL36
+=TlpY
+-----END PGP SIGNATURE-----

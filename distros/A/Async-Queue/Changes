@@ -1,0 +1,10 @@
+Revision history for Async-Queue
+
+0.021   2013/01/06
+        Fix the bug: Async::Queue would push many stack frames
+        if many synchronous tasks are executed in series.
+        Test t/30-tons_of_sync added and passed.
+
+0.01    2012/11/11
+        First release.
+

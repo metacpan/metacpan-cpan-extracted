@@ -1,0 +1,10 @@
+Revision history for Perl extension Audio::File::Wma
+
+0.01  Thu Jan 22 2009
+    - Initial release;
+0.01a Thu Jan 22 2009
+    - Fixed silly errors in test file;
+0.02 Tue Jan 17 2011
+    - First look for ALBUMTITLE in hash from Audio::Wma, then fallback to ALBUM
+        * Reference: https://rt.cpan.org/Public/Bug/Display.html?id=47869
+    - Add POD warning about build failues for Ogg::Vorbis::Header::PurePerl

@@ -1,0 +1,11 @@
+MANIFEST
+META.yml
+README
+Changes
+lib/Acme/Pills.pm
+t/base.t
+t/pod.t
+t/pod-coverage.t
+t/lib/BreakMe.pm
+Build.PL
+Makefile.PL

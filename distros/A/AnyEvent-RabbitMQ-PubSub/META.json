@@ -1,0 +1,91 @@
+{
+   "abstract" : "Publish and consume RabbitMQ messages.",
+   "author" : [
+      "Miroslav Tynovsky <tynovsky@avast.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-RabbitMQ-PubSub",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "Minilla" : "0",
+            "Module::Build::Tiny" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::RabbitMQ" : "0",
+            "Moose" : "0",
+            "Promises" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "AnyEvent::RabbitMQ::PubSub" : {
+         "file" : "lib/AnyEvent/RabbitMQ/PubSub.pm",
+         "version" : "v3.1.2"
+      },
+      "AnyEvent::RabbitMQ::PubSub::Consumer" : {
+         "file" : "lib/AnyEvent/RabbitMQ/PubSub/Consumer.pm"
+      },
+      "AnyEvent::RabbitMQ::PubSub::Publisher" : {
+         "file" : "lib/AnyEvent/RabbitMQ/PubSub/Publisher.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tynovsky/AnyEvent-RabbitMQ-PubSub/issues"
+      },
+      "homepage" : "https://github.com/tynovsky/AnyEvent-RabbitMQ-PubSub",
+      "repository" : {
+         "url" : "git://github.com/tynovsky/AnyEvent-RabbitMQ-PubSub.git",
+         "web" : "https://github.com/tynovsky/AnyEvent-RabbitMQ-PubSub"
+      }
+   },
+   "version" : "3.1.2",
+   "x_authority" : "cpan:TYNOVSKY",
+   "x_contributors" : [
+      "tynovsky <tynovsky@seznam.cz>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

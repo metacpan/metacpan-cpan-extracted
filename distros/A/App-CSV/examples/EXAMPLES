@@ -1,0 +1,10 @@
+# Some command line invocations.
+
+
+# clean up a CSV file.
+csv < dirty.csv > clean.csv
+
+# convert a CSV file to TSV
+csv --input file.csv --output file.tsv
+
+

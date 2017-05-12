@@ -1,0 +1,10 @@
+Revision history for Perl extension AWS-CLI-Config
+
+0.02 2017-05-09T00:25:42Z
+
+    - Fix handling named profiles (#2) @jjatria
+
+0.01 2014-12-23T02:28:46Z
+
+    - original version
+

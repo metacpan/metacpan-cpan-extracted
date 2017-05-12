@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Audio-Ardour-Control.t
+lib/Audio/Ardour/Control.pm
+META.yml                                 Module meta-data (added by MakeMaker)

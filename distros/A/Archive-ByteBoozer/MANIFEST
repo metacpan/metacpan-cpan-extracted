@@ -1,0 +1,18 @@
+bb.h
+ByteBoozer.xs
+Changes
+cruncher.c
+cruncher.h
+file.h
+Makefile.PL
+MANIFEST
+README
+typemap
+lib/Archive/ByteBoozer.pm
+t/01-basic.t
+t/02-param-check.t
+t/03-cruncher.t
+t/04-decruncher.t
+t/05-relocate-output-up-to.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

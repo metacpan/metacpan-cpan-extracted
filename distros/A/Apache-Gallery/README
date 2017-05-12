@@ -1,0 +1,333 @@
+NAME
+    Apache::Gallery - mod_perl handler to create an image gallery
+
+SYNOPSIS
+    See the INSTALL file in the distribution for installation instructions.
+
+DESCRIPTION
+    Apache::Gallery creates an thumbnail index of each directory and allows
+    viewing pictures in different resolutions. Pictures are resized on the
+    fly and cached. The gallery can be configured and customized in many
+    ways and a custom copyright image can be added to all the images without
+    modifying the original.
+
+CONFIGURATION
+    In your httpd.conf you set the global options for the gallery. You can
+    also override each of the options in .htaccess files in your gallery
+    directories.
+
+    The options are set in the httpd.conf/.htaccess file using the syntax:
+    PerlSetVar OptionName 'value'
+
+    Example: PerlSetVar GalleryCacheDir '/var/cache/www/'
+
+    GalleryAutoRotate
+        Some cameras, like the Canon G3, can detect the orientation of a the
+        pictures you take and will save this information in the
+        'Orientation' EXIF field. Apache::Gallery will then automatically
+        rotate your images.
+
+        This behavior is default but can be disabled by setting
+        GalleryAutoRotate to 0.
+
+    GalleryCacheDir
+        Directory where Apache::Gallery should create its cache with scaled
+        pictures. The default is /var/cache/www/ . Here, a directory for
+        each virtualhost or location will be created automatically. Make
+        sure your webserver has write access to the CacheDir.
+
+    GalleryTemplateDir
+        Full path to the directory where you placed the templates. This
+        option can be used both in your global configuration and in
+        .htaccess files, this way you can have different layouts in
+        different parts of your gallery.
+
+        No default value, this option is required.
+
+    GalleryInfo
+        With this option you can define which EXIF information you would
+        like to present from the image. The format is: '<MyName =>
+        KeyInEXIF, MyOtherName => OtherKeyInEXIF'
+
+        Examples of keys: ShutterSpeedValue, ApertureValue, SubjectDistance,
+        and Camera
+
+        You can view all the keys from the EXIF header using this
+        perl-oneliner:
+
+        perl "-e" 'use Data::Dumper; use Image::Info qw(image_info); print
+        Dumper(image_info(shift));' filename.jpg
+
+        Default is: 'Picture Taken => DateTimeOriginal, Flash => Flash'
+
+    GallerySizes
+        Defines which widths images can be scaled to. Images cannot be
+        scaled to other widths than the ones you define with this option.
+
+        The default is '640 800 1024 1600'
+
+    GalleryThumbnailSize
+        Defines the width and height of the thumbnail images.
+
+        Defaults to '100x75'
+
+    GalleryThumbnailSizeLS
+        If set to '1', GalleryThumbnailSize is the long and the short side
+        of the thumbnail image instead of the width and height.
+
+        Defaults to '0'.
+
+    GalleryCopyrightImage
+        Image you want to blend into your images in the lower right corner.
+        This could be a transparent png saying "copyright my name 2001".
+
+        Optional.
+
+    GalleryWrapNavigation
+        Make the navigation in the picture view wrap around (So Next at the
+        end displays the first picture, etc.)
+
+        Set to 1 or 0, default is 0
+
+    GalleryAllowOriginal
+        Allow the user to download the Original picture without resizing or
+        putting the CopyrightImage on it.
+
+        Set to 1 or 0, default is 0
+
+    GallerySlideshowIntervals
+        With this option you can configure which intervals can be selected
+        for a slideshow. The default is '3 5 10 15 30'
+
+    GallerySortBy
+        Instead of the default filename ordering you can sort by any stat
+        attribute. For example size, atime, mtime, ctime.
+
+    GalleryDirSortBy
+        Set this variable to sort directories differently than other items,
+        can be set to size, atime, mtime and ctime; setting any other value
+        will revert to sorting by name.
+
+    GalleryMemoize
+        Cache EXIF data using Memoize - this will make Apache::Gallery
+        faster when many people access the same images, but it will also
+        cache EXIF data until the current Apache child dies.
+
+    GalleryUseFileDate
+        Set this option to 1 to make A::G show the files timestamp instead
+        of the EXIF value for "Picture taken".
+
+    GallerySelectionMode
+        Enable the selection mode. Select images with checkboxes and get a
+        list of filenames.
+
+    GalleryEXIFMode
+        You can choose how Apache::Gallery should display EXIF info from
+        your images.
+
+        The default setting is 'namevalue'. This setting will make
+        Apache::Gallery print out the names and values of the EXIF values
+        you configure with GalleryInfo. The information will be parsed into
+        $INFO in pictureinfo.tpl.
+
+        You can also set it to 'values' which will make A::G parse the
+        configured values into the var $EXIFVALUES as 'value | value |
+        value'
+
+        If you set this option to 'variables' the items you configure in
+        GalleryInfo will be available to your templates as $EXIF_<KEYNAME>
+        (in all uppercase). That means that with the default setting
+        "Picture Taken => DateTimeOriginal, Flash => Flash" you will have
+        the variables $EXIF_DATETIMEORIGINAL and $EXIF_FLASH available to
+        your templates. You can place them anywhere you want.
+
+    GalleryRootPath
+        Change the location of gallery root. The default is ""
+
+    GalleryRootText
+        Change the name that appears as the root element in the menu. The
+        default is "root:"
+
+    GalleryMaxThumbnailsPerPage
+        This options controls how many thumbnails should be displayed in a
+        page. It requires $BROWSELINKS to be in the index.tpl template file.
+
+    GalleryImgFile
+        Pattern matching the files you want Apache::Gallery to view in the
+        index as thumbnails.
+
+        The default is '\.(jpe?g|png|tiff?|ppm)$'
+
+    GalleryDocFile
+        Pattern matching the files you want Apache::Gallery to view in the
+        index as normal files. All other filetypes will still be served by
+        Apache::Gallery but are not visible in the index.
+
+        The default is
+        '\.(mpe?g|avi|mov|asf|wmv|doc|mp3|ogg|pdf|rtf|wav|dlt|txt|html?|csv|
+        eps)$'
+
+    GalleryTTFDir
+        To use the GalleryCopyrightText feature you must set this option to
+        the directory where your True Type fonts are stored. No default is
+        set.
+
+        Example:
+
+                PerlSetVar      GalleryTTFDir '/usr/share/fonts/'
+
+    GalleryTTFFile
+        To use the GalleryCopyrightText feature this option must be set to
+        the name of the True Type font you wish to use. Example:
+
+                PerlSetVar      GalleryTTFFile 'verdanab.ttf'
+
+    GalleryTTFSize
+        Configure the size of the CopyrightText that will be inserted as
+        copyright notice in the corner of your pictures.
+
+        Example:
+
+                PerlSetVar      GalleryTTFSize '10'
+
+    GalleryCopyrightText
+        The text that will be inserted as copyright notice.
+
+        Example:
+
+                PerlSetVar      GalleryCopyrightText '(c) Michael Legart'
+
+    GalleryCopyrightColor
+        The text color of your copyright notice.
+
+        Examples:
+
+        White: PerlSetVar GalleryCopyrightColor '255,255,255,255'
+
+        Black: PerlSetVar GalleryCopyrightColor '0,0,0,255'
+
+        Red: PerlSetVar GalleryCopyrightColor '255,0,0,255'
+
+        Green: PerlSetVar GalleryCopyrightColor '0,255,0,255'
+
+        Blue: PerlSetVar GalleryCopyrightColor '0,0,255,255'
+
+        Transparent orange: PerlSetVar GalleryCopyrightColor '255,127,0,127'
+
+    GalleryCopyrightBackgroundColor
+        The background-color of a GalleryCopyrightText
+
+        r,g,b,a - for examples, see GalleryCopyrightColor
+
+    GalleryQuality
+        The quality (1-100) of scaled images
+
+        This setting affects the quality of the scaled images. Set this to a
+        low number to reduce the size of the scaled images. Remember to
+        clear out your cache if you change this setting. Quality seems to
+        default to 75, at least in the jpeg and png loader code in Imlib2
+        1.1.0.
+
+        Examples:
+
+        Quality at 50: PerlSetVar GalleryQuality '50'
+
+    GalleryUnderscoresToSpaces
+        Set this option to 1 to convert underscores to spaces in the listing
+        of directory and file names, as well as in the alt attribute for
+        HTML <img> tags.
+
+    GalleryCommentExifKey
+        Set this option to e.g. ImageDescription to use this field as
+        comments for images.
+
+    GalleryEnableMediaRss
+        Set this option to 1 to enable generation of a media RSS feed. This
+        can be used e.g. together with the PicLens plugin from
+        http://piclens.com
+
+FEATURES
+    Rotate images
+        Some cameras, like the Canon G3, detects the orientation of a
+        picture and adds this info to the EXIF header. Apache::Gallery
+        detects this and automatically rotates images with this info.
+
+        If your camera does not support this, you can rotate the images
+        manually, This can also be used to override the rotate information
+        from a camera that supports that. You can also disable this behavior
+        with the GalleryAutoRotate option.
+
+        To use this functionality you have to create file with the name of
+        the picture you want rotated appended with ".rotate". The file
+        should include a number where these numbers are supported:
+
+                "1", rotates clockwise by 90 degree
+                "2", rotates clockwise by 180 degrees
+                "3", rotates clockwise by 270 degrees
+
+        So if we want to rotate "Picture1234.jpg" 90 degrees clockwise we
+        would create a file in the same directory called
+        "Picture1234.jpg.rotate" with the number 1 inside of it.
+
+    Ignore directories/files
+        To ignore a directory or a file (of any kind, not only images) you
+        create a <directory|file>.ignore file.
+
+    Comments
+        To include comments for a directory you create a <directory>.comment
+        file where the first line can contain "TITLE: New title" which will
+        be the title of the page, and a comment on the following lines. To
+        include comments for each picture you create files called
+        picture.jpg.comment where the first line can contain "TITLE: New
+        title" which will be the title of the page, and a comment on the
+        following lines.
+
+        Example:
+
+                TITLE: This is the new title of the page
+                And this is the comment.<br />
+                And this is line two of the comment.
+
+        The visible name of the folder is by default identical to the name
+        of the folder, but can be changed by creating a file
+        <directory>.folder with the visible name of the folder.
+
+        It is also possible to set GalleryCommentExifKey to the name of an
+        EXIF field containing the comment, e.g. ImageDescription. The EXIF
+        comment is overridden by the .comment file if it exists.
+
+DEPENDENCIES
+    Perl 5
+    Apache with mod_perl
+    URI::Escape
+    Image::Info
+    Image::Size
+    Text::Template
+    Image::Imlib2
+    X11 libraries (ie, XFree86)
+    Imlib2 Remember the -dev package when using rpm, deb or other package
+    formats!
+
+AUTHOR
+    Michael Legart <michael@legart.dk>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2001-2011 Michael Legart <michael@legart.dk>
+
+    Templates designed by Thomas Kjaer <tk@lnx.dk>
+
+    Apache::Gallery is free software and is released under the Artistic
+    License. See http://www.perl.com/language/misc/Artistic.html for
+    details.
+
+    The video icons are from the GNOME project. http://www.gnome.org/
+
+THANKS
+    Thanks to Thomas Kjaer for templates and design of
+    http://apachegallery.dk Thanks to Thomas Eibner and other for patches.
+    (See the Changes file)
+
+SEE ALSO
+    perl, mod_perl, Image::Imlib2, CGI::FastTemplate, Image::Info, and
+    Image::Size.
+

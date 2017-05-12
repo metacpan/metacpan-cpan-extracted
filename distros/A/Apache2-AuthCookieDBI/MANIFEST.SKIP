@@ -1,0 +1,13 @@
+.*.bak
+.*.tar.gz$
+.cvsignore
+.git/*
+.project
+Apache2-AuthCookieDBI-*
+Build
+CVS/*
+META.json
+MYMETA.*
+Makefile
+_build
+blib*

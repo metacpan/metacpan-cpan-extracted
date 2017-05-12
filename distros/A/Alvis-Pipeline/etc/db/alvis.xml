@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: alvis.xml,v 1.1 2005/06/17 15:45:56 mike Exp $ -->
+<anytype:container xmlns:anytype="http://alvis.info/schema/anytype/1.0/">
+<documentCollection>
+  <documentRecord id="12345678">
+
+    <!-- Information generated during the initial acquision of the
+    document, whether by a web crawler, MS-Word converter, etc. -->
+    <acquisition>
+
+      <!-- Information, in the current WP7 format, to do with the
+      acquisions process: acquision date, URLs where the document was
+      found, expiry date, size, etc. -->
+      <acquisitionData>
+        <modifiedDate>2001-04-19</modifiedDate>
+        <expiryDate>2004-11-06</expiryDate>
+        <checkedDate>2004-10-06</checkedDate>
+        <httpServer>WebSTAR/4.4(SSL) ID/72915</httpServer>
+        <urls>
+          <url>http://www.snomnh.ou.edu/pdf/2000/00-27.pdf</url>
+        </urls>
+      </acquisitionData>
+
+      <!-- Original document represented as cleaned HTML, or text
+      extracted from MSWord, PS, PDF, etc.  May be a binary format, with
+      an attribute specifying base64 or quoted-printable encoding -->
+      <originalDocument mimeType="text/plain" charSet="us-ascii">
+	...
+      </originalDocument>
+
+      <!-- Visible text from document, together with what internal
+      structure we can express through canonical markup -->
+      <canonicalDocument>
+        <!-- As in previous example -->
+      </canonicalDocument>
+
+      <!-- Information, in the current WP7 format, that is _about_ the
+      document rather than part of it: e.g., author, title, subject, DOI -->
+      <metaData>
+        <meta name="dc.author">Wedel, Mathew J.</meta>
+        <meta name="dc.date">2000</meta>
+        <meta name="dc.title">Sauroposeidon proteles, a new sauropod from
+                the Early Cretaceous of Oklahoma</meta>
+      </metaData>
+
+      <!-- Link information from WP7 format. All URLs will contain an
+      internal ID (not guaranteed to be unique across multiple crawler
+      instances) -->
+      <links>
+        <outlinks> <!-- links to external pages -->
+          <link type="a"> <!-- repeatable -->
+            <anchorText>Text from this document</anchorText>
+            <location documentId="...">URL</location>
+          </link>
+        </outlinks>
+        <inlinks> <!-- links from external pages -->
+          <link type="a"> <!-- repeatable -->
+            <anchorText>PDF ( 1 MB)</anchorText>
+            <location documentId="...">http://www.snomnh.ou.edu/publications/Articles/index.shtml</location>
+          </link>
+        </inlinks>
+        <!-- Number of unique other hosts with links pointing to this page -->
+        <inlinkHosts> ... </inlinkHosts>
+      </links>
+
+      <!-- Results of analysis done as part of the acquisition process,
+      e.g. genre intuited from top-level domain name of the site from
+      which a Web document was crawled -->
+      <analysis>
+        <!-- analysis also containes other analysed properties (mainly from
+             the URL) with property name as tag and content as value -->
+        <property name="topLevelDomain">edu</property>
+        <property name="language">en</property>
+        <property name="genre">article</property>
+        <ranking scheme="..."> ... </ranking> <!-- repeatable -->
+        <topic absoluteScore="150" relativeScore="570">
+          <class>ALL</class>
+        </topic>
+        <topic absoluteScore="100" relativeScore="380">
+          <class>CP</class>
+          <terms>carnivorous plant[^\s]*, carnivor[^\s]*, </terms>
+        </topic>
+        <topic absoluteScore="50" relativeScore="190">
+          <class>CP.Dionaea</class>
+          <terms>flytrap[^\s]*, venus flytrap[^\s]*, </terms>
+        </topic>
+      </analysis>
+    </acquisition>
+
+    <!-- Annotations from WP5 -->
+    <linguisticAnalysis>
+      <!-- Details omitted: see Deliverable D5.1 -->
+    </linguisticAnalysis >
+
+    <!-- Relevance information added from WP2 -->
+    <relevance>
+      <scoreset type="ranking">
+	<score topicId="1">8.36536</score>
+	<score topicId="4">4.25395</score>
+	<score topicId="19">0.44538</score>
+	<score topicId="36">2.35349</score>
+      </scoreset>
+      <scoreset type="content">
+	<score topicId="1">40.25395</score>
+	<score topicId="4">2.947</score>
+	<score topicId="17">0.44538</score>
+	<score topicId="23">1.4629</score>
+	<score topicId="36">2.35349</score>
+      </scoreset>
+    </relevance>
+  </documentRecord>
+</documentCollection>
+</anytype:container>

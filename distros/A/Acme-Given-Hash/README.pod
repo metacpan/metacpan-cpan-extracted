@@ -1,0 +1,60 @@
+=head1 NAME 
+
+Acme::Given::Hash - you like given but it's too much typing.
+
+=head1 SYNOPSIS
+
+  use Acme::Given::Hash;
+  my $result = $given ~~ gvn { $value1 => $scalar
+                             , $value2 => do { ... }
+                             , $value3 => sub{ ... }
+                             } || $default ;
+
+  # is going to result in the same thing as: 
+  my $result; 
+  given($given) {
+    when ($value1) { $result = $scalar }
+    when ($value2) { $result = do{ ... }}
+    when ($value3) { $result = sub{...}->() }
+    default        { $result = $default }
+  };
+
+
+  # if you use an arrayref you can do more complex matching
+  $result = $given ~~ gvn [ 'scalar' => 'still works, just like the hash'
+                          , qr{reg}  => [qw{also works}]
+                          , [1..5]   => 'works too'
+                          , {a=>b,c=>d} => 'same here'
+                          , sub{$_>100} => 'for subs $_ is localized to the value of $given.'
+                          , gvn { foo => 'bar' } => 'also works but "bar" will be seen as a true value rather then the thing to match'
+                          ];
+
+=head1 EXPORTED FUNCTIONS
+
+=head2 gvn
+
+  my $given_hash_obj  = gvn {...}; 
+  my $given_array_obj = gvn [...]; 
+
+This is really just a simple constructor that blesses the given structure in to an object where ~~ is overridden as to trip the value of the structure.
+
+=head1 TODO
+
+All on Github: https://github.com/notbenh/Acme-Given-Hash/issues
+
+=head1 AUTHORS
+
+NOTBENH <ben hengst> wrote this but it was heavly inspired by the team over at Puppet Labs as they have something like this, Also I could not have done this with out the smart match op, thanks team perl.
+
+=head1 SOURCE
+
+All on Github: https://github.com/notbenh/Acme-Given-Hash
+
+=head1 BUGS
+
+Issues on Github: https://github.com/notbenh/Acme-Given-Hash/issues
+
+=head1 COPYRIGHT
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+See http://www.perl.com/perl/misc/Artistic.html

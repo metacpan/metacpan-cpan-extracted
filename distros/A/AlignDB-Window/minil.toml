@@ -1,0 +1,2 @@
+name = "AlignDB-Window"
+badges = ['travis', 'codecov', 'metacpan']

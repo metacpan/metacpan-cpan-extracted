@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+README
+lib/Apache/Session/Generate/UUID.pm
+t/00-compile.t
+t/04-pod.t
+t/05-pod_coverage.t
+t/06-perl_critic.t
+t/11-new.t

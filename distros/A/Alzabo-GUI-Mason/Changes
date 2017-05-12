@@ -1,0 +1,108 @@
+0.1201  2007-09-08
+
+- Fixed my stupid syntax errors that were in 0.12.
+
+
+0.12    2007-09-08
+
+- Missed a couple spots where I was using "old-style" redirects,
+  rather than something more modern.
+
+
+0.11    2007-08-25
+
+- Setting the default to the string "''" from the web UI will make the
+  default an empty string at the Perl-level ('').
+
+- Modernized a bit so that it no longer reinvents quite so many
+  low-level wheels. Require a reasonably new Mason (1.10).
+
+- Made it work under Catalyst (sort of) or mod_perl.
+
+
+0.10    2004-06-29
+
+- If an Alzabo::Exception::RDBMSRules exception is thrown, the full
+  exception (with stack trace) is now output to STDERR.  This helps
+  debugging in case the exception is due to an error in Alzabo, as
+  opposed to user error.
+
+- Some submission handling components were redirecting to the wrong
+  place after handling a RDBMSRules exception.
+
+- Expanded the size of the comment textarea fields.
+
+- Escape attributes in display.
+
+
+0.09    2003-10-20
+
+- Fixes so that the GUI still works with pre 0.79_02 versions of
+Alzabo.
+
+- Added a SIGNATURE file.
+
+
+0.08    2003-10-17
+
+- Support for table attributes (with Alzabo 0.79_02 +).
+
+- Support for functional indexes (with Alzabo 0.79_02 +).
+
+- Improved the formatting of the front page's schema list when it
+  expands to two columns.
+
+- Improved the formatting of the table and column name lists
+
+- Tried to make the installation process a little clearer,
+  specifically in terms of saying what the component root is, since
+  not all users are going to be previously familiar with Mason.
+  Suggested by Mark Stosberg.
+
+
+0.07    2003-10-08
+
+- Offer two styles of graph layout (neato & dot).
+
+- There were still a couple of spots using
+  Alzabo::Config::mason_extension().  Reported by Barry Hoggard.
+
+
+0.06    2003-10-06
+
+- Add "pk" after primary key colums in column list.
+
+- The installer was ignoring the user-provided extension, and simply
+  giving all files the default ".mhtml" extension.  Reported by Barry
+  Hoggard.
+
+
+0.05    2003-10-04
+
+- Renamed to Alzabo::GUI::Mason.
+
+
+0.04    2003-09-24
+
+- Cleaned up look of a couple pages (post SQL-execute pages).
+
+- Added an AlzaboGUI/Mason.pm file so CPAN indexes this distro.
+
+
+0.03    2003-09-20
+
+- Add back foreign key & index functionality.
+
+
+0.02    2003-09-20
+
+- Include a passthrough Makefile.PL
+
+
+0.01    2003-09-20
+
+- Initial release of new Mason interface.
+
+- Among other improvements, the GraphViz-generated schema graph is now
+  much nicer.  These improvements were based in part on the code in
+  SQL Fairy.

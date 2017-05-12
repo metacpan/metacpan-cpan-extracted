@@ -1,0 +1,11 @@
+Revision history for App-SSH-Cluster
+
+0.004       2015-08-11
+
+0.003       2015-08-11
+    - replace incorrect import; List::MoreUtils qw(all) for List::Util qw(all)
+0.002       2015-08-06
+    - changed minimum Perl version to 5.14 
+0.001       2015-07-30
+    - initial release
+    - runs a single command on a remote server and dumps the STDOUT of that command to the STDOUT of the calling process in a hostname delimited format

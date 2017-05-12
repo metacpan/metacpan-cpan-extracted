@@ -1,0 +1,206 @@
+#!/usr/bin/perl
+# -*- Mode: perl -*-
+# file: feedback
+# Provide feedback to data curator(s)
+
+use strict;
+
+use CGI 2.42 qw(:standard);
+use Ace::Browser::AceSubs qw(:DEFAULT Header DB_Name);
+use vars '@FEEDBACK_RECIPIENTS';
+
+# This page called with the parameters:
+#      recipients- numeric index(es) for recipients of message
+#      name    - name of object to update
+#      class   - class of object to update
+#      from    - sender's e-mail address
+#      subject - subject of mail message
+#      remark  - body of e-mail message
+
+my $object_name  = param('name');
+my $object_class = param('class');
+my $where_from   = param('referer') || referer();
+
+if (param('return') && $where_from !~ /\/feedback/ ) {
+    print redirect($where_from);
+    exit 0;
+}
+
+PrintTop(undef,undef,'Feedback Page');
+
+if (Configuration->Feedback_recipients) {
+  @FEEDBACK_RECIPIENTS = @{Configuration->Feedback_recipients};
+
+  if (param('submit') && send_mail($object_name,$object_class,$where_from)) {
+    print_confirmation();
+  } else {
+    print start_form;
+    print_instructions();
+    print_form( $object_name,$object_class,DB_Name(),$where_from );
+    print end_form;
+  }
+} else {
+  print p("No recipients for feedback are defined.");
+  print start_form(),
+	    hidden(-name=>'referer',-value=>$where_from),br,
+            submit(-name=>'return',-value=>'Cancel & Return',-class=>'error'),
+	      end_form();
+}
+PrintBottom;
+
+
+sub print_top {
+    my $title = 'Data Submissions and Comments';
+    print start_html (
+		      '-Title'   => $title,
+		      '-style'   => Style(),
+		    ),
+	Header,
+	h1($title);
+}
+
+sub print_instructions {
+  my @defaults;
+  for (my $i=0; $i<@FEEDBACK_RECIPIENTS; $i++) {
+    push @defaults,$i if $FEEDBACK_RECIPIENTS[$i][2];
+  }
+  print
+    p({-class=>'small'},
+      "Use this form to send new data or corrections to",
+      "the maintainers of this database.  An e-mail message",
+      "will be sent to the individuals selected from the list",
+      "below."),
+	blockquote({-class=>'small'},
+		   checkbox_group(-name    => 'recipients',
+				  -Values  => [(0..$#FEEDBACK_RECIPIENTS)],
+				  -Labels  => { map {
+				    $_=>"$FEEDBACK_RECIPIENTS[$_]->[0] ($FEEDBACK_RECIPIENTS[$_]->[1])"
+				  } (0..$#FEEDBACK_RECIPIENTS) },
+				  -defaults=>\@defaults,
+				  -linebreak=>1));
+}
+
+sub print_bottom {
+    print Footer;
+}
+
+sub print_form {
+    my ($name,$class,$db,$where_from) = @_;
+    print
+	table(
+	      TR(th({-align=>'RIGHT'},"Your full name:"),
+		 td({-align=>'LEFT'},textfield(-name=>'full_name',-size=>40))),
+	      
+	      TR(th({-align=>'RIGHT'},"Your institution:"),
+		 td({-align=>'LEFT'},textfield(-name=>'institution',-size=>40))),
+
+	      TR(th({-align=>'RIGHT'},"Your e-mail address:"),
+		 td({-align=>'LEFT'},textfield(-name=>'from',-size=>40))),
+
+	      TR(th({-align=>'RIGHT'},"Subject:"),
+		 td({-align=>'LEFT'},textfield(-name=>'subject',
+					       -value=>$class && $name ?
+					       "Comments on $class $name ($db db)": '',
+					       -size=>60))),
+
+	      TR(th({-colspan=>2,-align=>'LEFT'},'Comment or Correction:')),
+
+	      TR(td({-colspan=>2},textarea(-name=>'remark',
+					   -rows=>12,
+					   -cols=>80,
+					   -wrap=>'VIRTUAL'
+					   ))),
+	      ),
+            hidden(-name=>'name',-value=>$name),
+	    hidden(-name=>'class',-value=>$class),
+	    hidden(-name=>'db',-value=>$db),
+	    hidden(-name=>'referer',-value=>$where_from),br,
+            submit(-name=>'return',-value=>'Cancel & Return',-class=>'error'),
+            submit(-name=>'submit',-value=>'Submit Data');
+}
+
+sub send_mail {
+    my ($obj_name,$obj_class,$where_from) = @_;
+    $obj_name   ||= '(unknown name)';
+    $obj_class  ||= '(unknown class)';
+    $where_from ||= '(unknown)';
+
+    my @addresses = map { $FEEDBACK_RECIPIENTS[$_] ? 
+			      $FEEDBACK_RECIPIENTS[$_]->[0]
+				  : () } param('recipients');
+    my @missing;
+    push @missing,"At least one message recipient"
+	unless  @addresses;
+    push @missing,"Your full name (needed for proper attribution)"
+	unless my $name = param('full_name');
+    push @missing,"Your institution (needed for proper attribution)"
+	unless my $institution = param('institution');
+    push @missing,"Your e-mail address"     
+	unless my $from = param('from');
+    push @missing,"A properly formatted e-mail address"
+	if $from && $from !~ /.+\@[\w.]+/;
+    push @missing,"A subject line"          
+	unless my $subject = param('subject');
+    push @missing,"A comment or correction" 
+	unless my $remark = param('remark');
+    if (@missing) {
+	print
+	    p({-class=>'error'},
+	      "Your submission could not be processed because",
+	      "the following information was missing:"),
+	    ol({-class=>'error'},
+	       li(\@missing)),
+	    p({-class=>'error'},
+	      "Please fill in the missing fields and try again.");
+	return;
+    }
+
+
+    my $error = <<END;
+Unable to send mail.  Please try again later.  
+If the problem persists, contact the site\'s webmaster.
+END
+    ;
+    unless (open (MAIL,"|/usr/lib/sendmail -oi -t")) {
+	AceError($error);
+	return;
+    }
+    my $to = join(", ",@addresses);
+    print MAIL <<END;
+From: $from ($name via ACEDB feedback page)
+To: $to
+Subject: $subject
+
+Full name:   $name
+Institution: $institution
+Address:     $from
+
+DATABASE RECORD: $obj_class: $obj_name
+
+SUBMITTED FROM PAGE: $where_from
+
+COMMENT TEXT:
+$remark
+END
+    ;
+    
+    unless (close MAIL) {
+	AceError($error);
+	return;
+    }
+    return 1;
+}
+
+sub print_confirmation {
+    print 
+	p("Thank you for taking the time to submit this information.",
+	  "Please use the buttons below to submit more reports or to",
+	  "return to the database.",
+	  ),
+	start_form,
+	submit(-name=>'restart',-label=>'Submit Another Report'),
+	hidden('referer'),
+	submit(-name=>'return',-label=>'Return to Database'),
+	end_form;
+}
+

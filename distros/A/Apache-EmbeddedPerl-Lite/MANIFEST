@@ -1,0 +1,21 @@
+ApacheSoftwareLicense
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+Lite.pm
+t/badperl.t
+t/badsyntax.t
+t/goodperl_1.t
+t/goodperl_2.t
+t/goodperl_3.t
+t/nofile.t
+t/noperl.t
+testfiles/badperl.html
+testfiles/badsyntax.html
+testfiles/goodperl_1.html
+testfiles/goodperl_2.html
+testfiles/goodperl_3.html
+testfiles/noperl.html
+META.yml                                 Module meta-data (added by MakeMaker)

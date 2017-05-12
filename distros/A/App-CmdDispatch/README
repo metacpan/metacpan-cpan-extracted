@@ -1,0 +1,73 @@
+NAME
+    App::CmdDispatch - Handle commands with a dispatch table
+    
+VERSION
+    Version 0.41
+
+SYNOPSIS
+
+    use App::CmdDispatch;
+
+    my %cmds = (
+        start => {
+            code => sub { my $app = shift; print "start: @_\n"; },
+            synopsis => 'start [what]',
+            help => 'Start whatever is to be run.',
+        },
+        stop => {
+            code => sub { my $app = shift; print "stop @_\n"; },
+            synopsis => 'stop [what]',
+            help => 'Stop whatever is to be run.',
+        },
+        stuff => {
+            code => sub { my $app = shift; print "stuff: @_\n"; },
+            synopsis => 'stuff [what]',
+            help => 'Stuff to do.',
+        },
+        jump => {
+            code => sub { my $app = shift; print "jump: @_\n"; },
+            synopsis => 'jump [what]',
+            help => 'Start whatever is to be run.',
+        },
+    );
+
+    my $processor = App::CmdDispatch->new( \%cmds );
+    $processor->run( @ARGV );
+
+DESCRIPTION
+    One way to map a series of command strings to the code to execute for that
+    string is a dispatch table. The simplest dispatch table maps strings
+    directly to code refs. A more complicated dispatch table maps strings to
+    objects that provide a wider interface than just a single function call. I
+    often find I want more than a single function and less than a full object.
+
+    App::CmdDispatch falls in between these two extremes. One thing I always
+    found that I needed with my dispatch table-driven scripts was decent help
+    that covered all of the commands. App::CmdDispatch makes each command map
+    to a hash containing a code reference and a pair of help strings.
+
+    Since beginning to use git, I have found git's alias feature to be
+    extremely helpful. App::CmdDispatch supports reading aliases from a config
+    file.
+
+INSTALLATION
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+DEPENDENCIES
+    Config::Tiny
+    Term::Readline
+
+AUTHOR
+    G. Wade Johnson, <wade at cpan.org>
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2012, G. Wade Johnson
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

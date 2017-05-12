@@ -1,0 +1,20 @@
+Revision history for Perl extension Apache2::Imager::Resize.
+
+0.16  Thu Aug 19 08:38:24 2010
+    - fixed a bug that shrunk images if the 'enlarge' parameter hasn't been set
+
+0.15  Wed May 26 10:17:04 2010
+    - added qtype parameter
+
+0.14  Mon Sep 21 11:28:15 2009
+	- added scaletype parameter
+
+0.12  Wed Apr 15 16:22:34 2009
+	- Typo
+
+0.11  Wed Apr 15 15:42:12 2009
+	- Fixed broken error handling.
+
+0.10  Tue Apr  7 11:49:29 2009
+	- Initial Version working with Apache2.
+

@@ -1,0 +1,21 @@
+NAME
+    Alt::Module::Runtime::ButEUMM - alternative distribution of
+    Module::Runtime, using ExtUtils::MakeMaker
+
+SYNOPSIS
+       use Module::Runtime;
+
+DESCRIPTION
+    This is an alternative distribution of Module::Runtime, allowing easier
+    deployment on very old versions of Perl. If you have had no problems
+    installing Module::Runtime, then you do not need this module!
+
+    Version 0.001 of Alt::Module::Runtime::ButEUMM includes version 0.014 of
+    Module::Runtime.
+
+SEE ALSO
+    Alt, Module::Runtime.
+
+COPYRIGHT, LICENCE, AND DISCLAIMER OF WARRANTIES
+    This file is distributed under the same conditions as Module::Runtime.
+

@@ -1,0 +1,6 @@
+lbcd is a daemon that runs on a UNIX system and answers UDP queries with
+information about system load, number of logged-on users, uptime, and free
+/tmp space.  This information can be used to accumulate system status
+across a cluster with light-weight queries or can be used as input to a
+load-balancing system to choose the best system to which to direct new
+incoming connections.

@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache2::ModXml2.
+
+0.01  Wed Jul 27 14:23:54 2011
+	- original version; created by h2xs 1.23 with options
+		-A -n Apache2::ModXml2
+

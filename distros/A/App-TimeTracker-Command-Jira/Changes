@@ -1,0 +1,22 @@
+Revision history for App-TimeTracker-Command-Jira
+
+0.5       2016-01-07 11:05:03+01:00 Europe/Vienna
+
+   - Allow to specifiy multiple starting states for transitioning to "Start Progress"
+   - Fixed github issue #1
+
+0.4       2014-10-08 10:22:39+02:00 Europe/Vienna
+
+   - Assignee is set automatically by Jira when starting a ticket
+
+0.3       2014-09-22 16:46:56+02:00 Europe/Vienna
+
+   - Re-added accidently removed init_jira_ticket() method
+
+0.2       2014-09-12 23:34:21+02:00 Europe/Vienna
+
+    - Fixed CPAN namespace
+
+0.1       2014-09-12 23:16:59+02:00 Europe/Vienna
+
+    - Initial release

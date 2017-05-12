@@ -1,0 +1,315 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.010;
+use AnyEvent;
+use AnyEvent::FTP::Server;
+use Getopt::Long qw( GetOptions );
+use URI;
+use Pod::Usage qw( pod2usage );
+
+# PODNAME: aeftpd
+# ABSTRACT: FTP Server
+our $VERSION = '0.09'; # VERSION
+
+
+my $port;
+my $host;
+my $inet = 0;
+my $stderr;
+my $chroot = 0;
+my $verbose = 0;
+my $cred;
+my $simple_auth_class;
+my @simple_auth_args;
+my $default_context = 'FSRW';
+
+GetOptions(
+  'port=i'      => \$port,
+  'hostname=s'  => \$host,
+  'inet'        => \$inet,
+  'stderr=s'    => \$stderr,
+  'pam=s'       => sub { $simple_auth_class = 'PAM'; push @simple_auth_args, service => $_[1] },
+  'chroot'      => \$chroot,
+  'verbose'     => \$verbose,
+  'cred=s'      => \$cred,
+  'context=s'   => \$default_context,
+  'auth=s'      => sub { $_[1] =~ /^(.*?)=(.*)$/ ? (push @simple_auth_args, $1 => $2) : ($simple_auth_class = $_[1]) },
+  'help|h'      => sub { pod2usage({ -verbose => 2}) },
+  'version'     => sub { say 'aeftp/AnyEvent::FTP version ', ($AnyEvent::FTP::Server::VERSION // 'dev'); exit 1 },
+) || pod2usage(1);
+
+$0 = 'aeftpd';
+
+$port //= ($> && $^O !~ /^(cygwin|MSWin32)$/) ? undef : 21;
+
+if($stderr)
+{
+  open STDERR, '>>', $stderr;
+}
+
+$cred = 'random'
+  if ! defined($cred) && ! defined($simple_auth_class);
+
+if(defined $cred && $cred eq 'random')
+{
+  $cred = {
+    user => (join '', map { chr(ord('a') + int rand(26)) } (1..10)),
+    pass => (join '', map { chr(ord('a') + int rand(26)) } (1..10)),
+  };
+}
+elsif(defined $cred)
+{
+  my($user,$pass) = split /:/, $cred;
+  unless(defined $pass)
+  {
+    say STDERR "password not provided for --cred option";
+    exit 2;
+  }
+  $cred = {
+    user => $user,
+    pass => $pass,
+  };
+}
+
+$default_context = "AnyEvent::FTP::Server::Context::$default_context"
+  unless $default_context =~ /::/;
+
+my $server = AnyEvent::FTP::Server->new(
+  hostname        => $host,
+  port            => $port,
+  inet            => $inet,
+  default_context => $default_context,
+);
+
+unless($inet)
+{
+  $server->on_bind(sub {
+    my $uri = URI->new('ftp:');
+    $uri->host($host // 'localhost');
+    $uri->port(shift);
+    $uri->userinfo(join ':', $cred->{user}, $cred->{pass})
+      if defined $cred;
+    say $uri;
+  });
+}
+
+if($verbose)
+{
+  $server->on_connect(sub {
+    my $con = shift;
+
+    $con->on_request(sub {
+      my $raw = shift;
+      say STDERR "CLIENT: $raw";
+    });
+  
+    $con->on_response(sub {
+      my $raw = shift;
+      $raw =~ s/\015?\012$//g;
+      say STDERR "SERVER: $raw";
+    });
+    
+    $con->on_close(sub {
+      say STDERR "DISCONNECT";
+    });
+    
+    say STDERR "CONNECT";
+  });
+}
+
+if($cred)
+{
+  $server->on_connect(sub {
+    my $con = shift;
+    $con->context->authenticator(sub {
+      my($name, $pass) = @_;
+      return $name eq $cred->{user}
+      &&     $pass eq $cred->{pass};
+    });
+  });
+}
+elsif($simple_auth_class)
+{
+  eval 'use Authen::Simple::' . $simple_auth_class;
+  if($@)
+  {
+    say STDERR "install Authen::Simple::$simple_auth_class in order to use $simple_auth_class authentication";
+    exit 2;
+  }
+  
+  my $pam = "Authen::Simple::$simple_auth_class"->new(
+    @simple_auth_args,
+  );
+  
+  $server->on_connect(sub {
+    my $con = shift;
+    
+    my $user_class;
+    if($inet && $< == 0 && $^O !~ /^(cygwin|MSWin32)$/)
+    {
+      $user_class = 'AnyEvent::FTP::Server::OS::UNIX';
+      eval "use $user_class"; die $@ if $@;
+    }
+    
+    $con->context->authenticator(sub {
+      my($name, $pass) = @_;
+      
+      $name = 'ftp' if $name eq 'anonymous';
+     
+      my $user;
+      if(defined $user_class)
+      {
+        $user = eval { $user_class->new($name) };
+        return 0 if $@;
+      }
+
+      return 0 if $name ne 'ftp' && ! $pam->authenticate( $name, $pass );
+      
+      if(defined $user)
+      {
+        $user->jail if $chroot || $name eq 'ftp';
+        $user->drop_privileges;
+      }
+    });
+    
+    $con->context->bad_authentication_delay(0);
+      
+    1;
+    
+  });
+}
+else
+{
+  print STDERR "must specify at least one of --pam, --cred or --auth";
+  exit 2;
+}
+
+$server->start;
+
+AnyEvent->condvar->recv;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+aeftpd - FTP Server
+
+=head1 VERSION
+
+version 0.09
+
+=head1 SYNOPSIS
+
+ % aeftpd [ --port port ] 
+          [ --hostname hostname ] 
+          [ --inet ] 
+          [ --stderr path ] 
+          [ --context context ]
+          [ --chroot ] 
+            --pam service | 
+            --cred user:pass |
+            --cred random |
+            --auth class [ --auth key=val ] 
+          [ --verbose ]
+ % aeftpd --version
+ % aeftpd --help
+
+=head1 DESCRIPTION
+
+This program starts an FTP daemon using the perl library L<AnyEvent::FTP::Server>.
+
+=head1 OPTIONS
+
+=head2 --port I<port>
+
+The TCP port to listen to.
+
+=head2 --hostname I<hostname>
+
+The hostname or IP address to listen on.
+
+=head2 --inet
+
+Run in inet mode.  By default C<aeftpd> runs as a single process in standalone mode.
+By using this option you can run C<aeftp> from C<inetd>, C<xinetd> or similar daemon.
+Here is a line for /etc/inetd.conf which was tested on Debian Wheezy, and may work
+for you if your operating system supports PAM and you have L<Authen::Simple::PAM>
+installed.
+
+ ftp stream tcp nowait root /usr/sbin/tcpd aeftpd --inet --stderr /tmp/aeftp.log --pam login
+
+=head2 --stderr I<path>
+
+Redirect stderr from the daemon to the file specified by the given path
+
+=head2 --chroot
+
+Use C<chroot> to restrict the user to only his home directory once he has logged
+in.  This option requires the C<chroot> function, which is supported by Perl on
+most UNIX and UNIX like operating systems.
+
+=head2 --cred [ I<user>:I<pass> | random ]
+
+Allow authentication with the given username and password.  If you specify C<random>
+then a randomly generated username and password will be used.
+
+=head2 --auth I<class>
+
+Specify a L<Authen::Simple> class to use for authentication.  You should NOT
+include the Authen::Simple prefix when specifying the class (that is use 
+C<PAM> instead of C<Authen::Simple::PAM>).
+
+=head2 --auth I<key>=I<val>
+
+Specify an argument to pass into the chosen L<Authen::Simple> object.
+
+=head2 --pam I<service>
+
+Use PAM for authentication.  This option is simply a shortcut.  This:
+
+ % aeftpd --pam login
+
+is the same as
+
+ % aeftpd --auth PAM --auth service=login
+
+=head2 --verbose
+
+Print all FTP commands and their responses to stderr.
+
+=head2 --context I<context>
+
+Set the default context.  The default is FSRW.
+
+=head2 --version
+
+Print out the L<AnyEvent::FTP> version to stdout and exit.
+
+=head2 --help
+
+Display the usage for this command.
+
+=head1 AUTHOR
+
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Ryo Okamoto
+
+Shlomi Fish
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Graham Ollis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

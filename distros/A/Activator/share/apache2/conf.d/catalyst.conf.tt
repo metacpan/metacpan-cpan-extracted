@@ -1,0 +1,23 @@
+LoadModule perl_module modules/mod_perl.so
+PerlSwitches -I[% apache2.PERL5LIB %]
+
+[%- FOREACH var IN apache2.env_vars.keys %]
+PerlSetEnv [% var %] '[% apache2.env_vars.$var %]'
+[% END -%]
+
+[%- IF Activator.Emailer.mailer_type == 'Sendmail' %]
+# put sendmail bin in the path: this is probably the wrong way to do it.
+# TODO: remove this requirement when Activator::Emailer allows direct socket connections 
+PerlSetEnv PATH '/bin:/usr/bin/:/usr/sbin'
+[%- END -%]
+
+<VirtualHost [% apache2.Listen %]:[% apache2.ListenPort %]>
+
+PerlModule [% apache2.PerlModule %]
+
+<Location />
+    SetHandler          modperl
+    PerlResponseHandler [% apache2.PerlModule %]
+</Location>
+
+</VirtualHost>

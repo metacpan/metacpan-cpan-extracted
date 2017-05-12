@@ -1,0 +1,23 @@
+---
+abstract: 'Carp and cluck in a more fun way.'
+author:
+  - 'Rob Hoelz <rob@hoelz.ro>'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300014, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Emoticarp
+requires:
+  parent: 0
+  perl: v5.8.8
+resources:
+  bugtracker: https://github.com/hoelzro/acme-emoticarp/issues
+  homepage: https://github.com/hoelzro/acme-emoticarp
+  repository: https://github.com/hoelzro/acme-emoticarp.git
+version: 0.02

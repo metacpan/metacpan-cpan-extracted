@@ -1,0 +1,31 @@
+NAME
+    Acme::24 - Your favourite TV-show Acme module
+
+SYNOPSIS
+      use Acme::24;
+
+      # Tell me some random quote about Jack Bauer
+      print Acme::24->random_jackbauer_fact();
+
+      # Returns an arrayref with 25 random facts
+      my $facts = Acme::24->random_jackbauer_facts();
+
+      # Every call collects 25 random facts in a text file
+      # called `/tmp/superhero.txt'
+      Acme::24->collect_facts('/tmp/superhero.txt');
+
+DESCRIPTION
+    This module was written because I'm somewhat crazy, and I'm also
+    passionate about the 24 tv-show, but in particular of the
+    B<KingOfTheAssKickers(tm)>, something between Duke Nukem and Chuck Norris.
+
+BUGS
+    One probably: this module should not really be on CPAN, it takes space,
+    although fortunately only a little.
+
+AUTHOR
+    Cosimo Streppone, L<cosimo@cpan.org>
+
+LICENSE
+    Artistic License, same as Perl itself.
+

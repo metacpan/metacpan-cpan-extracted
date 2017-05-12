@@ -1,0 +1,36 @@
+---
+abstract: 'tiny implementation of Moose-like "has" keyword'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Types::Standard: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Has-Tiny
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Acme::Has::Tiny:
+    file: lib/Acme/Has/Tiny.pm
+    version: '0.002'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Acme-Has-Tiny/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Acme-Has-Tiny
+  homepage: https://metacpan.org/release/Acme-Has-Tiny
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-acme-has-tiny.git
+version: '0.002'

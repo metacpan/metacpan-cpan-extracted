@@ -1,0 +1,411 @@
+# -----------------------------------------------------------------------
+# © Copyright 2003-2011 by Alex Peeters [alex.peeters@citap.be]
+# -----------------------------------------------------------------------
+
+# General - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Author       : Alex Peeters [alex.peeters@citap.be]
+Latest update: dd month 2011
+Version      : 3.002.003
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# INSTALL - DRAFT v1.1  - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+fixRights.sh
+------------
+
+vi fixRights.sh and change when needed
+AMPATH=/opt/asnmtap-3.001.xxx	       # path where ASNMTAP is installed
+ASNMTAPUSER=asnmtap                    # use for the ASNMTAP::Application
+WWWUSER=apache                         # nobody
+...
+
+chmod 755 fixRights.sh
+
+./fixRights.sh
+
+
+Symbolic link:
+--------------
+
+ln -s /opt/asnmtap-3.001.xxx-new asnmtap
+
+
+-------------------------------------------------------------------------
+- ASNMTAP/Nagios PLUGINS                                                -
+-------------------------------------------------------------------------
+
+Information about the ASNMTAP/Nagios Plugins can be found at:
+  man ASNMTAP::Asnmtap
+
+  Asnmtap.cnf
+  -----------
+
+  mv $AMPATH/Asnmtap.cnf-orig $AMPATH/Asnmtap.cnf
+
+  vi $AMPATH/Asnmtap.cnf and modify at least <COMMON>...</COMMON>
+  ...
+  # Common variables - - - - - - - - - - - - - - - - - - - - - - - - - -
+  <COMMON>
+    APPLICATION     Application Monitoring
+    BUSINESS        CITAP
+    DEPARTMENT      Development
+    COPYRIGHT       2003-2011
+    SENDEMAILTO     alex.peeters@citap.be
+  # TYPEMONITORING  central                      # central or distributed
+  # RUNCMDONDEMAND  localhost                    # localhost or probe
+  </COMMON>
+  ...
+
+
+Information about how to build ASNMTAP Plugins can be found at:
+  - man ASNMTAP::Asnmtap::Plugins
+  - man ASNMTAP::Asnmtap::Plugins::IO
+  - man ASNMTAP::Asnmtap::Plugins::Modem
+  - man ASNMTAP::Asnmtap::Plugins::Mail
+  - man ASNMTAP::Asnmtap::Plugins::Nagios
+  - man ASNMTAP::Asnmtap::Plugins::SOAP
+  - man ASNMTAP::Asnmtap::Plugins::WebTransact
+  - man ASNMTAP::Asnmtap::Plugins::XML
+  - man ASNMTAP::Time
+
+
+Information about how to build NAGIOS Plugins can be found at:
+  - man ASNMTAP::Asnmtap::Plugins::Nagios
+  - man ASNMTAP::Time
+  
+
+When you use ASNMTAP only form building plugins. This is all.
+
+
+-------------------------------------------------------------------------
+- ASNMTAP Application Monitor                                           -
+-------------------------------------------------------------------------
+  
+Information about the configuration for ASNMTAP Applications can be found at:
+  man ASNMTAP::Asnmtap::Applications
+
+  Applications.cnf
+  ----------------
+
+  mv $AMPATH/applications/Applications.cnf-orig $AMPATH/applications/Applications.cnf
+
+  vi $AMPATH/applications/Applications.cnf and modify at least <COMMON>...</COMMON> and <DATABASE_ACCOUNT>...</DATABASE_ACCOUNT>
+  ...
+  # Common variables - - - - - - - - - - - - - - - - - - - - - - - - - -
+  <COMMON>
+     SMTPUNIXSYSTEM  1
+     SERVERLISTSMTP  localhost
+     SERVERSMTP      localhost
+     SENDMAILFROM    asnmtap@localhost
+ 
+     HTTPSSERVER     asnmtap.localhost
+     REMOTE_HOST     localhost
+     REMOTE_ADDR     127.0.0.1
+
+     OPTIONS         --bodyimage /opt/asnmtap/applications/htmlroot/img/logos/bodyimage.gif --charset iso-8859-1 --format pdf14 --size A4 --landscape --browserwidth 1280 --top 10mm --bottom 10mm --left 10mm --right 10mm --fontsize 10.0 --fontspacing 1.2 --headingfont Helvetica --bodyfont Helvetica --headfootsize 10.0 --headfootfont Helvetica --embedfonts --pagemode fullscreen --permissions no-copy,print --no-links --color --quiet --webpage
+  </COMMON>
+  ...
+  <DATABASE_ACCOUNT>
+    ...
+  </DATABASE_ACCOUNT>
+  ...
+
+
+  SSH access for the 'Application Monitor'
+  ----------------------------------------
+
+  cd ~/.ssh
+  chown -R asnmtap:asnmtap .ssh
+  #           |-------|------- user for the ASNMTAP::Application
+
+  ssh-keygen -q -t rsa -f /home/asnmtap/.ssh/ssh -N ''
+
+  chmod 700 .ssh
+  chmod go-rwx .ssh/*
+
+  chmod 644 ssh.pub
+  chown asnmtap:asnmtap ssh.pub
+
+  chmod 600 ssh
+  chown apache:asnmtap ssh
+  #        |------- user for web server
+
+  cat /home/asnmtap/.ssh/ssh.pub >> /home/asnmtap/.ssh/authorized_keys
+  chmod 600 /home/asnmtap/.ssh/authorized_keys
+
+  vi /home/asnmtap/.ssh/authorized_keys
+  add command='/opt/asnmtap/applications/sbin/sshWrapperASNMTAP.pl' before ssh.pub
+
+
+  httpd.conf
+  ----------
+
+  vi /etc/httpd/conf.d/asnmtap.conf add the following content, and modify where needed like ServerName, ServerAlias, ErrorLog and CustomLog
+  AddHandler cgi-script .cgi .pl
+
+  DirectoryIndex index.htm index.html index.html.var index.shtml index.cfm index.pl
+
+  <VirtualHost *:80>
+    ServerName asnmtap.citap.com
+    ServerAlias asnmtap.citap.be
+    ServerAdmin webmaster@citap.com
+    DocumentRoot /opt/asnmtap/applications/htmlroot
+    ErrorLog /var/log/httpd/asnmtap.citap.com-error.log
+    CustomLog /var/log/httpd/asnmtap.citap.com-combined.log combined
+    IndexIgnore *.png *nok.txt *all.txt *.html
+    IndexOptions NameWidth=* FancyIndexing FoldersFirst SuppressDescription
+    IndexOrderDefault Ascending Name
+
+    # when ASNMTAP is not installed into '/opt/asnmtap/' you need to add SetEnv ASNMTAP_PATH
+    # SetEnv ASNMTAP_PATH /opt/asnmtap/
+
+    Alias /asnmtap "/opt/asnmtap/applications/htmlroot"
+
+    <Directory "/opt/asnmtap/applications/htmlroot">
+      AllowOverride AuthConfig
+      Options FollowSymLinks
+      Order allow,deny
+      Allow from all
+    </Directory>
+
+    Alias /results "/opt/asnmtap/results"
+
+    <Directory "/opt/asnmtap/results">
+      HeaderName HEADER.html
+      ReadmeName FOOTER.html
+      AllowOverride AuthConfig
+      Options Indexes
+    # Options Indexes FollowSymLinks
+      Order allow,deny
+      Allow from all
+    </Directory>
+
+    Alias /config "/opt/asnmtap/applications/tmp/config"
+
+    <Directory "/opt/asnmtap/applications/tmp/config">
+      HeaderName HEADER.html
+      ReadmeName FOOTER.html
+      AllowOverride AuthConfig
+      Options Indexes
+    # Options Indexes FollowSymLinks
+      Order allow,deny
+      Allow from all
+    </Directory>
+
+    ScriptAlias /asnmtap/cgi-bin/ "/opt/asnmtap/applications/htmlroot/cgi-bin/"
+
+    <Directory "/opt/asnmtap/applications/htmlroot/cgi-bin">
+      AllowOverride AuthConfig
+      Options ExecCGI
+      Order allow,deny
+      Allow from all
+    </Directory>
+  </VirtualHost>
+
+
+  restart your web server
+
+
+  Install MySQL client need to be installed
+  -----------------------------------------
+
+  MySQL version 4.x
+    mysql -u root -p  < /opt/asnmtap/applications/tools/mysql/asnmtap-3.002.003.sql
+   or
+    mysql -u root -p  < /opt/asnmtap/applications/tools/mysql/asnmtap-3.002.003-distributed.sql
+
+  MySQL version 5.0.x
+    mysql -u root -p  < /opt/asnmtap/applications/tools/mysql/asnmtap-3.002.003_mysql-v5.0.x.sql
+   or
+    mysql -u root -p  < /opt/asnmtap/applications/tools/mysql/asnmtap-3.002.003_mysql-v5.0.x-distributed.sql
+
+  
+  ASNMTAP Web Access is now possible
+  ----------------------------------
+
+  1) Server Administrator at http://asnmtap.citap.com/asnmtap/cgi-bin/sadmin/index.pl
+
+  - Servers (to define the different application monitoring servers) 
+  
+  - Pagedirs (where the Display writes the different views) 
+  - Resultdirs (where the Collector writes the returned data from a plugin) 
+  - Display Groups (to define the group titles that are used by the Display) 
+  
+  - Display Daemons (to define the different daemons used for the Display) 
+  - Collector Daemons (to define the different daemons used for the Collector) 
+  
+  - Plugins (to define the plugins that are executed by the Collector) 
+  
+  - Views (to define the different views used by the Display daemons) 
+  - Crontabs (to define the different crontabs used by the Collector daemons) 
+  
+  - Configurations (for the Archiver, Display, Collector and Rsync Mirroring) 
+
+
+  2) Administrator at http://asnmtap.citap.com/asnmtap/cgi-bin/admin/index.pl
+
+  - Languages 
+  - Countries 
+  
+  - Holidays
+  - Holidays Bundle
+  - Timeperiods
+  
+  - Users 
+  
+  - Reports (to define the 'Detailed Statistics & Report Generation' that are generated by the Archiver) 
+
+
+  3) Moderator at http://asnmtap.citap.com/asnmtap/cgi-bin/moderator/index.pl
+
+  - Session Console (for the Display) 
+
+  - Status Console (for the Collector/Display) 
+  
+  - Trendline Correction Reports (for the Collector) 
+  
+  - Plugin Crontab Scheduling Reports (for the Collector) 
+  - Collector Crontab Scheduling Reports (for the Collector) 
+  - Collector Daemon Scheduling Reports (for the Collector) 
+
+  - Plugins (to edit short description, trendline, holiday bundle and uploading plugindoc)
+
+
+  4) Guest and members at http://asnmtap.citap.com/asnmtap/nav/index/
+
+    ... TODO ...
+
+
+  RSYNC tussen PROBE en CENTRALE servers
+  --------------------------------------
+
+    ... TODO ... NO PART OF NORMAL SETUP ...
+
+
+  Install ChartDirector 4.x for Perl 
+  -----------------------------------
+
+    download chartdir_perl_linux.tar.gz from http://www.advsofteng.com/
+    wget http://www.advsofteng.com/chartdir_perl_linux.tar.gz
+    mv chartdir_perl_linux.tar.gz /opt/.
+    tar -xvzf chartdir_perl_linux.tar.gz
+    rm chartdir_perl_linux.tar.gz
+
+    ASNMTAP configuration
+    ---------------------
+
+    Applications.cnf
+
+    <COMMON>
+    ...
+      <CHARTDIRECTOR>
+        LIB             /opt/ChartDirector/lib/.
+      </CHARTDIRECTOR>
+    ...
+    </COMMON>
+ 
+
+  Perfparse integration
+  ---------------------
+
+    download latest snapshot from http://wiki.perfparse.org/cvs_snapshots/
+    bzip2 -d perfparse-06-mm-dd.tar.bz2
+    tar -xvf perfparse-06-mm-dd.tar
+    cd perfparse-all
+
+    ./configure --prefix=/opt/asnmtap/perfparse --with-imagedir=/opt/asnmtap/applications/htmlroot/img/ --with-cgidir=/opt/asnmtap/applications/htmlroot/cgi-bin --with-http_image_path=/asnmtap/img --with-data-source=asnmtap
+    make
+    make install-strip
+
+
+  SNMPTT integration 
+  ------------------
+
+    Install net-snmp 5.4.x
+
+    ... TODO ... NO PART OF NORMAL SETUP ...
+
+    MySQL 5.0.x
+
+     SQLyog -> Db -> Import from SQL Statements ... -> \opt\asnmtap-3.001.xxx\plugins\templates\snmptt\snmptt-3.002.003-v5.0.x.sql
+     SQLyog -> Db -> Import from SQL Statements ... -> \opt\asnmtap-3.001.xxx\plugins\templates\snmptt\create_weblogic_configuration_database_with_SNMP-3.002.003_mysql-v5.0.x.SQL
+     or
+     mysql -u root -p  < /opt/asnmtap/plugins/templates/snmptt/snmptt-3.002.003-v5.0.x.sql
+     mysql -u root -p  < /opt/asnmtap/plugins/templates/snmptt/create_weblogic_configuration_database_with_SNMP-3.002.003_mysql-v5.0.x.SQL
+
+    ... TODO ... NO PART OF NORMAL SETUP ...
+
+  NagTrap integration 
+  -------------------
+
+    ... TODO ... NO PART OF NORMAL SETUP ...
+
+    more /opt/asnmtap/applications/htmlroot/snmptraps/.htaccess
+    AuthName "CITAP's Nagios Access"
+    AuthType Basic
+    AuthUserFile /etc/httpd/conf/nagios-htpasswd.users
+    require valid-user
+
+    ... TODO ... NO PART OF NORMAL SETUP ...
+
+
+  Install HTML to PDF converter for Perl 
+  --------------------------------------
+
+    HTMLDOC: http://www.htmldoc.org/
+
+    Downloading the Software 
+    Get the software from http://www.htmldoc.org/
+    wget http://ftp.easysw.com/pub/htmldoc/1.8.25/htmldoc-1.8.25-source.tar.gz
+
+    Installing the Software
+    tar -xvzf htmldoc-1.8.27-source.tar.gz
+    cd htmldoc-1.8.27
+    ./configure
+    make
+    make install
+
+    Licensing the Software 
+    The HTMLDOC License window is shown the first time you run the software.
+
+    Click on the Update License button to add a license to your system
+
+    perl -MCPAN -e 'install HTML::HTMLDoc'
+
+    ln -s /usr/bin/htmldoc /opt/asnmtap/applications/htmlroot/cgi-bin/htmldoc.cgi
+
+    vi httpd.conf
+    AcceptPathInfo On
+    AddHandler cgi-script .cgi .pl
+    Options ExecCGI FollowSymLinks
+
+
+  mv $AMPATH/applications/archive.sh-orig $AMPATH/applications/archive.sh
+  mv $AMPATH/applications/bin/generateCollectorDaemonSchedulingReports.sh-orig $AMPATH/applications/bin/generateCollectorDaemonSchedulingReports.sh
+  mv $AMPATH/applications/bin/generateReports.sh-orig $AMPATH/applications/bin/generateReports.sh
+  mv $AMPATH/applications/bin/holidayBundleSetDowntimes.sh-orig $AMPATH/applications/bin/holidayBundleSetDowntimes.sh
+  cp ../your-logo.gif $AMPATH/applications/htmlroot/img/logos/bodyimage.gif
+  - man ASNMTAP::Asnmtap::Applications::Collector
+  - man ASNMTAP::Asnmtap::Applications::Display
+  - man ASNMTAP::Asnmtap::Applications::CGI
+
+
+Information about the integration from ASNMTAP with HTMLDOC and Perfparse can be found at:
+  - man ASNMTAP::Asnmtap::Applications
+
+
+./fixRights.sh
+
+-------------------------------------------------------------------------
+
+How do I install a ASNMTAP module into my home directory?
+
+If you're not the Perl administrator you probably don't have permission to install a module to its default location.
+Then you should install it for your own use into your home directory like so:
+
+  perl Makefile.PL INSTALL_BASE=~
+
+-------------------------------------------------------------------------

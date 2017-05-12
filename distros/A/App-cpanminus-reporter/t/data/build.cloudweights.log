@@ -1,0 +1,591 @@
+cpanm (App::cpanminus) 1.7001 on perl 5.019009 built for darwin-2level
+Work directory is /Users/garu/.cpanm/work/1395072113.15830
+You have make /usr/bin/make
+You have LWP 6.05
+You have /usr/bin/tar: bsdtar 2.8.3 - libarchive 2.8.3
+You have /usr/bin/unzip
+Searching Data::CloudWeights on cpanmetadb ...
+--> Working on Data::CloudWeights
+Fetching http://www.cpan.org/authors/id/P/PJ/PJFL/data-cloudweights/Data-CloudWeights-0.12.1.tar.gz
+-> OK
+Unpacking Data-CloudWeights-0.12.1.tar.gz
+Entering Data-CloudWeights-0.12.1
+Checking configure dependencies from META.json
+Checking if you have version 0.88 ... Yes (0.9908)
+Checking if you have Module::Build 0.4004 ... Yes (0.4205)
+Checking if you have Module::Build 0.36 ... Yes (0.4205)
+Configuring Data-CloudWeights-0.12.1
+Running Build.PL
+Checking prerequisites...
+  requires:
+    !  Type::Tiny is not installed
+    !  namespace::sweep is not installed
+
+ERRORS/WARNINGS FOUND IN PREREQUISITES.  You may wish to install the versions
+of the modules indicated above before proceeding with this installation
+
+Created MYMETA.yml and MYMETA.json
+Creating new 'Build' script for 'Data-CloudWeights' version 'v0.12.1'
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Test::Requires 0.06 ... Yes (0.07)
+Checking if you have version 0.88 ... Yes (0.9908)
+Checking if you have Moo 1.003000 ... Yes (1.004002)
+Checking if you have namespace::sweep 0.006 ... No
+Checking if you have Type::Tiny 0.012 ... No
+Checking if you have Module::Build 0.4004 ... Yes (0.4205)
+==> Found dependencies: namespace::sweep, Type::Tiny
+Searching namespace::sweep on cpanmetadb ...
+--> Working on namespace::sweep
+Fetching http://www.cpan.org/authors/id/F/FR/FRIEDO/namespace-sweep-0.006.tar.gz
+-> OK
+Unpacking namespace-sweep-0.006.tar.gz
+Entering namespace-sweep-0.006
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.30 ... Yes (6.88)
+Configuring namespace-sweep-0.006
+Running Makefile.PL
+Warning: prerequisite Sub::Identify 0.04 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for namespace::sweep
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Test::More 0 ... Yes (1.001002)
+Checking if you have Package::Stash 0.33 ... Yes (0.36)
+Checking if you have strict 0 ... Yes (1.08)
+Checking if you have List::Util 0 ... Yes (1.38)
+Checking if you have warnings 0 ... Yes (1.22)
+Checking if you have overload 0 ... Yes (1.22)
+Checking if you have B::Hooks::EndOfScope 0.09 ... Yes (0.13)
+Checking if you have Carp 0 ... Yes (1.32)
+Checking if you have Sub::Name 0 ... Yes (0.05)
+Checking if you have Scalar::Util 0 ... Yes (1.38)
+Checking if you have Sub::Identify 0.04 ... No
+Checking if you have Data::Dumper 0 ... Yes (2.150)
+==> Found dependencies: Sub::Identify
+Searching Sub::Identify on cpanmetadb ...
+--> Working on Sub::Identify
+Fetching http://www.cpan.org/authors/id/R/RG/RGARCIA/Sub-Identify-0.04.tar.gz
+-> OK
+Unpacking Sub-Identify-0.04.tar.gz
+Entering Sub-Identify-0.04
+Checking configure dependencies from META.yml
+Configuring Sub-Identify-0.04
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Sub::Identify
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (6.88)
+Checking if you have Test::More 0 ... Yes (1.001002)
+Building and testing Sub-Identify-0.04
+cp lib/Sub/Identify.pm blib/lib/Sub/Identify.pm
+Running Mkbootstrap for Sub::Identify ()
+chmod 644 Identify.bs
+/Users/garu/perl5/perlbrew/perls/perl-5.19.9/bin/perl5.19.9 /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/5.19.9/ExtUtils/xsubpp  -typemap /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/5.19.9/ExtUtils/typemap  Identify.xs > Identify.xsc && mv Identify.xsc Identify.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector -O3   -DVERSION=\"0.04\" -DXS_VERSION=\"0.04\"  "-I/Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/5.19.9/darwin-2level/CORE"   Identify.c
+rm -f blib/arch/auto/Sub/Identify/Identify.bundle
+env MACOSX_DEPLOYMENT_TARGET=10.3 cc  -bundle -undefined dynamic_lookup -fstack-protector Identify.o  -o blib/arch/auto/Sub/Identify/Identify.bundle 	\
+	     	\
+	  
+chmod 755 blib/arch/auto/Sub/Identify/Identify.bundle
+/Users/garu/perl5/perlbrew/perls/perl-5.19.9/bin/perl5.19.9 -MExtUtils::Command::MM -e 'cp_nonempty' -- Identify.bs blib/arch/auto/Sub/Identify/Identify.bs 644
+Manifying blib/man3/Sub::Identify.3
+Running Mkbootstrap for Sub::Identify ()
+chmod 644 Identify.bs
+PERL_DL_NONLAZY=1 /Users/garu/perl5/perlbrew/perls/perl-5.19.9/bin/perl5.19.9 "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01basic.t ................ ok
+t/02errors.t ............... ok
+t/10pureperl-basic.t ....... ok
+t/20attributes.t ........... ok
+t/21attributes-pureperl.t .. ok
+t/pod.t .................... skipped: Test::Pod 1.14 required for testing POD
+All tests successful.
+
+Test Summary Report
+-------------------
+t/20attributes.t         (Wstat: 0 Tests: 3 Failed: 0)
+  TODO passed:   1
+t/21attributes-pureperl.t (Wstat: 0 Tests: 3 Failed: 0)
+  TODO passed:   1
+Files=6, Tests=75,  0 wallclock secs ( 0.03 usr  0.01 sys +  0.12 cusr  0.02 csys =  0.18 CPU)
+Result: PASS
+Files found in blib/arch: installing files in blib/lib into architecture dependent library tree
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/auto/Sub/Identify/Identify.bundle
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/Sub/Identify.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Sub::Identify.3
+Appending installation info to /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/5.19.9/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Sub-Identify-0.04
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/Sub-Identify-0.04/install.json
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/Sub-Identify-0.04/MYMETA.json
+Building and testing namespace-sweep-0.006
+cp lib/namespace/sweep.pm blib/lib/namespace/sweep.pm
+Manifying blib/man3/namespace::sweep.3
+PERL_DL_NONLAZY=1 /Users/garu/perl5/perlbrew/perls/perl-5.19.9/bin/perl5.19.9 "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/ns_a_also.t ........ ok
+t/ns_a_basic.t ....... ok
+t/ns_a_cleanee.t ..... ok
+t/ns_a_matchclean.t .. ok
+t/overload.t ......... ok
+t/pkg.t .............. ok
+t/pkg_symbol.t ....... ok
+t/x-moo.t ............ ok
+t/x-moose-mouse.t .... skipped: This test requires Moose and Mouse
+t/x-moose.t .......... ok
+t/x-mouse.t .......... skipped: This test requires Moose
+All tests successful.
+Files=11, Tests=42,  1 wallclock secs ( 0.05 usr  0.02 sys +  0.74 cusr  0.09 csys =  0.90 CPU)
+Result: PASS
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/namespace/sweep.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/namespace::sweep.3
+Appending installation info to /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/5.19.9/darwin-2level/perllocal.pod
+-> OK
+Successfully installed namespace-sweep-0.006
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/namespace-sweep-0.006/install.json
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/namespace-sweep-0.006/MYMETA.json
+Searching Type::Tiny on cpanmetadb ...
+--> Working on Type::Tiny
+Fetching http://www.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-0.040.tar.gz
+-> OK
+Unpacking Type-Tiny-0.040.tar.gz
+Entering Type-Tiny-0.040
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.17 ... Yes (6.88)
+Checking if you have CPAN::Meta::Requirements 2.000 ... Yes (2.125)
+Configuring Type-Tiny-0.040
+Running Makefile.PL
+Warning: prerequisite Exporter::Tiny 0.026 not found.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Type::Tiny
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Test::More 0.96 ... Yes (1.001002)
+Checking if you have Exporter::Tiny 0.026 ... No
+==> Found dependencies: Exporter::Tiny
+Searching Exporter::Tiny on cpanmetadb ...
+--> Working on Exporter::Tiny
+Fetching http://www.cpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-0.036.tar.gz
+-> OK
+Unpacking Exporter-Tiny-0.036.tar.gz
+Entering Exporter-Tiny-0.036
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.17 ... Yes (6.88)
+Configuring Exporter-Tiny-0.036
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Exporter::Tiny
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Test::More 0.47 ... Yes (1.001002)
+Building and testing Exporter-Tiny-0.036
+cp lib/Exporter/Shiny.pm blib/lib/Exporter/Shiny.pm
+cp lib/Exporter/Tiny.pm blib/lib/Exporter/Tiny.pm
+Manifying blib/man3/Exporter::Shiny.3
+Manifying blib/man3/Exporter::Tiny.3
+PERL_DL_NONLAZY=1 /Users/garu/perl5/perlbrew/perls/perl-5.19.9/bin/perl5.19.9 "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01basic.t ....... ok
+t/02renaming.t .... ok
+t/03generators.t .. ok
+t/04into.t ........ ok
+t/05shiny.t ....... ok
+All tests successful.
+Files=5, Tests=15,  1 wallclock secs ( 0.03 usr  0.01 sys +  0.11 cusr  0.02 csys =  0.17 CPU)
+Result: PASS
+Manifying blib/man3/Exporter::Shiny.3
+Manifying blib/man3/Exporter::Tiny.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Exporter/Shiny.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Exporter/Tiny.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Exporter::Shiny.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Exporter::Tiny.3
+Appending installation info to /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/5.19.9/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Exporter-Tiny-0.036
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/Exporter-Tiny-0.036/install.json
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/Exporter-Tiny-0.036/MYMETA.json
+Building and testing Type-Tiny-0.040
+cp lib/Types/Common/String.pm blib/lib/Types/Common/String.pm
+cp lib/Types/Standard/ArrayRef.pm blib/lib/Types/Standard/ArrayRef.pm
+cp lib/Type/Tiny/Duck.pm blib/lib/Type/Tiny/Duck.pm
+cp lib/Types/Standard/ScalarRef.pm blib/lib/Types/Standard/ScalarRef.pm
+cp lib/Eval/TypeTiny.pm blib/lib/Eval/TypeTiny.pm
+cp lib/Type/Parser.pm blib/lib/Type/Parser.pm
+cp lib/Types/Standard/Dict.pm blib/lib/Types/Standard/Dict.pm
+cp lib/Type/Coercion.pm blib/lib/Type/Coercion.pm
+cp lib/Types/Standard/HashRef.pm blib/lib/Types/Standard/HashRef.pm
+cp lib/Type/Coercion/Union.pm blib/lib/Type/Coercion/Union.pm
+cp lib/Type/Tiny/Manual/Libraries.pod blib/lib/Type/Tiny/Manual/Libraries.pod
+cp lib/Type/Tiny/Class.pm blib/lib/Type/Tiny/Class.pm
+cp lib/Reply/Plugin/TypeTiny.pm blib/lib/Reply/Plugin/TypeTiny.pm
+cp lib/Devel/TypeTiny/Perl58Compat.pm blib/lib/Devel/TypeTiny/Perl58Compat.pm
+cp lib/Error/TypeTiny/Compilation.pm blib/lib/Error/TypeTiny/Compilation.pm
+cp lib/Error/TypeTiny/Assertion.pm blib/lib/Error/TypeTiny/Assertion.pm
+cp lib/Type/Tiny/Manual/Policies.pod blib/lib/Type/Tiny/Manual/Policies.pod
+cp lib/Test/TypeTiny.pm blib/lib/Test/TypeTiny.pm
+cp lib/Type/Tiny/Manual/Coercions.pod blib/lib/Type/Tiny/Manual/Coercions.pod
+cp lib/Type/Coercion/FromMoose.pm blib/lib/Type/Coercion/FromMoose.pm
+cp lib/Types/TypeTiny.pm blib/lib/Types/TypeTiny.pm
+cp lib/Types/Common/Numeric.pm blib/lib/Types/Common/Numeric.pm
+cp lib/Type/Utils.pm blib/lib/Type/Utils.pm
+cp lib/Type/Tiny/Union.pm blib/lib/Type/Tiny/Union.pm
+cp lib/Type/Tiny/_HalfOp.pm blib/lib/Type/Tiny/_HalfOp.pm
+cp lib/Type/Tiny/Manual/UsingWithMouse.pod blib/lib/Type/Tiny/Manual/UsingWithMouse.pod
+cp lib/Type/Tiny/Role.pm blib/lib/Type/Tiny/Role.pm
+cp lib/Types/Standard/Tuple.pm blib/lib/Types/Standard/Tuple.pm
+cp lib/Error/TypeTiny.pm blib/lib/Error/TypeTiny.pm
+cp lib/Type/Tiny/Manual/UsingWithMoose.pod blib/lib/Type/Tiny/Manual/UsingWithMoose.pod
+cp lib/Types/Standard/Map.pm blib/lib/Types/Standard/Map.pm
+cp lib/Type/Tiny/Manual.pod blib/lib/Type/Tiny/Manual.pod
+cp lib/Error/TypeTiny/WrongNumberOfParameters.pm blib/lib/Error/TypeTiny/WrongNumberOfParameters.pm
+cp lib/Type/Params.pm blib/lib/Type/Params.pm
+cp lib/Type/Tiny/Manual/Params.pod blib/lib/Type/Tiny/Manual/Params.pod
+cp lib/Type/Tiny.pm blib/lib/Type/Tiny.pm
+cp lib/Type/Tiny/Enum.pm blib/lib/Type/Tiny/Enum.pm
+cp lib/Type/Tiny/Manual/UsingWithOther.pod blib/lib/Type/Tiny/Manual/UsingWithOther.pod
+cp lib/Type/Tiny/Manual/UsingWithMoo.pod blib/lib/Type/Tiny/Manual/UsingWithMoo.pod
+cp lib/Type/Registry.pm blib/lib/Type/Registry.pm
+cp lib/Type/Library.pm blib/lib/Type/Library.pm
+cp lib/Devel/TypeTiny/Perl56Compat.pm blib/lib/Devel/TypeTiny/Perl56Compat.pm
+cp lib/Type/Tiny/Intersection.pm blib/lib/Type/Tiny/Intersection.pm
+cp lib/Types/Standard.pm blib/lib/Types/Standard.pm
+Manifying blib/man3/Devel::TypeTiny::Perl56Compat.3
+Manifying blib/man3/Devel::TypeTiny::Perl58Compat.3
+Manifying blib/man3/Error::TypeTiny.3
+Manifying blib/man3/Error::TypeTiny::Assertion.3
+Manifying blib/man3/Error::TypeTiny::Compilation.3
+Manifying blib/man3/Error::TypeTiny::WrongNumberOfParameters.3
+Manifying blib/man3/Eval::TypeTiny.3
+Manifying blib/man3/Reply::Plugin::TypeTiny.3
+Manifying blib/man3/Test::TypeTiny.3
+Manifying blib/man3/Type::Coercion.3
+Manifying blib/man3/Type::Coercion::FromMoose.3
+Manifying blib/man3/Type::Coercion::Union.3
+Manifying blib/man3/Type::Library.3
+Manifying blib/man3/Type::Params.3
+Manifying blib/man3/Type::Parser.3
+Manifying blib/man3/Type::Registry.3
+Manifying blib/man3/Type::Tiny.3
+Manifying blib/man3/Type::Tiny::Class.3
+Manifying blib/man3/Type::Tiny::Duck.3
+Manifying blib/man3/Type::Tiny::Enum.3
+Manifying blib/man3/Type::Tiny::Intersection.3
+Manifying blib/man3/Type::Tiny::Manual.3
+Manifying blib/man3/Type::Tiny::Manual::Coercions.3
+Manifying blib/man3/Type::Tiny::Manual::Libraries.3
+Manifying blib/man3/Type::Tiny::Manual::Params.3
+Manifying blib/man3/Type::Tiny::Manual::Policies.3
+Manifying blib/man3/Type::Tiny::Manual::UsingWithMoo.3
+Manifying blib/man3/Type::Tiny::Manual::UsingWithMoose.3
+Manifying blib/man3/Type::Tiny::Manual::UsingWithMouse.3
+Manifying blib/man3/Type::Tiny::Manual::UsingWithOther.3
+Manifying blib/man3/Type::Tiny::Role.3
+Manifying blib/man3/Type::Tiny::Union.3
+Manifying blib/man3/Type::Tiny::_HalfOp.3
+Manifying blib/man3/Type::Utils.3
+Manifying blib/man3/Types::Common::Numeric.3
+Manifying blib/man3/Types::Common::String.3
+Manifying blib/man3/Types::Standard.3
+Manifying blib/man3/Types::Standard::ArrayRef.3
+Manifying blib/man3/Types::Standard::Dict.3
+Manifying blib/man3/Types::Standard::HashRef.3
+Manifying blib/man3/Types::Standard::Map.3
+Manifying blib/man3/Types::Standard::ScalarRef.3
+Manifying blib/man3/Types::Standard::Tuple.3
+Manifying blib/man3/Types::TypeTiny.3
+PERL_DL_NONLAZY=1 /Users/garu/perl5/perlbrew/perls/perl-5.19.9/bin/perl5.19.9 "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'inc', 'blib/lib', 'blib/arch')" t/*.t t/20-unit/Devel-TypeTiny-Perl56Compat/*.t t/20-unit/Devel-TypeTiny-Perl58Compat/*.t t/20-unit/Error-TypeTiny-Assertion/*.t t/20-unit/Error-TypeTiny/*.t t/20-unit/Eval-TypeTiny/*.t t/20-unit/Test-TypeTiny/*.t t/20-unit/Type-Coercion-FromMoose/*.t t/20-unit/Type-Coercion-Union/*.t t/20-unit/Type-Coercion/*.t t/20-unit/Type-Library/*.t t/20-unit/Type-Params/*.t t/20-unit/Type-Parser/*.t t/20-unit/Type-Registry/*.t t/20-unit/Type-Tiny-Class/*.t t/20-unit/Type-Tiny-Duck/*.t t/20-unit/Type-Tiny-Enum/*.t t/20-unit/Type-Tiny-Intersection/*.t t/20-unit/Type-Tiny-Role/*.t t/20-unit/Type-Tiny-Union/*.t t/20-unit/Type-Tiny-_HalfOp/*.t t/20-unit/Type-Tiny/*.t t/20-unit/Type-Utils/*.t t/20-unit/Types-Common-Numeric/*.t t/20-unit/Types-Common-String/*.t t/20-unit/Types-Standard/*.t t/30-integration/Class-InsideOut/*.t t/30-integration/Exporter-Tiny/*.t t/30-integration/Function-Parameters/*.t t/30-integration/Kavorka/*.t t/30-integration/Moo/*.t t/30-integration/Moops/*.t t/30-integration/Moose/*.t t/30-integration/MooseX-Types/*.t t/30-integration/Mouse/*.t t/30-integration/MouseX-Types/*.t t/30-integration/Object-Accessor/*.t t/30-integration/Return-Type/*.t t/30-integration/Sub-Quote/*.t t/30-integration/Switcheroo/*.t t/30-integration/Type-Tie/*.t t/30-integration/Validation-Class-Simple/*.t t/30-integration/match-simple/*.t t/40-regression/*.t
+# Required:
+# 
+#   Perl                              5.019009
+#   Exporter::Tiny                    0.036
+#   Scalar::Util                      1.38
+#   Test::More                        1.001002
+#   Text::Balanced                    2.02
+# 
+# Optional:
+# 
+#   Class::ISA                        undef
+#   Devel::LexAlias                   undef
+#   Devel::StackTrace                 1.31
+#   Function::Parameters              undef
+#   Moo                               1.004002
+#   Moose                             2.1204
+#   MooseX::Types                     0.41
+#   Mouse                             undef
+#   MouseX::Types                     undef
+#   Role::Tiny                        1.003002
+# 
+# Environment:
+# 
+#   $AUTOMATED_TESTING                undef
+#   $NONINTERACTIVE_TESTING           "1"
+#   $EXTENDED_TESTING                 undef
+#   $AUTHOR_TESTING                   undef
+#   $RELEASE_TESTING                  undef
+# 
+#   $PERL_TYPES_STANDARD_STRICTNUM    undef
+#   $MOO_XS_DISABLE                   undef
+#   $MOOSE_ERROR_STYLE                undef
+#   $MOUSE_XS                         undef
+#   $MOUSE_PUREPERL                   undef
+#   $PERL_ONLY                        undef
+# 
+t/00-begin.t ....................................... ok
+t/01-compile.t ..................................... ok
+t/02-api.t ......................................... ok
+t/03-leak.t ........................................ skipped: Test requires module 'Test::LeakTrace' but it's not found
+t/20-unit/Devel-TypeTiny-Perl56Compat/basic.t ...... ok
+t/20-unit/Devel-TypeTiny-Perl58Compat/basic.t ...... ok
+t/20-unit/Error-TypeTiny-Assertion/basic.t ......... ok
+t/20-unit/Error-TypeTiny/stacktrace.t .............. ok
+t/20-unit/Eval-TypeTiny/basic.t .................... ok
+t/20-unit/Eval-TypeTiny/lexical-subs.t ............. ok
+t/20-unit/Test-TypeTiny/basic.t .................... ok
+t/20-unit/Test-TypeTiny/extended.t ................. ok
+t/20-unit/Type-Coercion-FromMoose/basic.t .......... ok
+t/20-unit/Type-Coercion-Union/basic.t .............. ok
+t/20-unit/Type-Coercion/basic.t .................... ok
+t/20-unit/Type-Coercion/frozen.t ................... ok
+t/20-unit/Type-Coercion/inlining.t ................. ok
+t/20-unit/Type-Coercion/parameterized.t ............ ok
+t/20-unit/Type-Library/assert.t .................... ok
+t/20-unit/Type-Library/inheritance.t ............... ok
+t/20-unit/Type-Library/is.t ........................ ok
+t/20-unit/Type-Library/to.t ........................ ok
+t/20-unit/Type-Library/types.t ..................... ok
+t/20-unit/Type-Params/badsigs.t .................... ok
+t/20-unit/Type-Params/carping.t .................... ok
+t/20-unit/Type-Params/coerce.t ..................... ok
+t/20-unit/Type-Params/methods.t .................... ok
+t/20-unit/Type-Params/mixednamed.t ................. ok
+t/20-unit/Type-Params/multisig.t ................... ok
+t/20-unit/Type-Params/named.t ...................... ok
+t/20-unit/Type-Params/noninline.t .................. ok
+t/20-unit/Type-Params/optional.t ................... ok
+t/20-unit/Type-Params/positional.t ................. ok
+t/20-unit/Type-Params/slurpy.t ..................... ok
+t/20-unit/Type-Parser/basic.t ...................... ok
+t/20-unit/Type-Parser/moosextypes.t ................ skipped: Test requires module 'MooseX::Types::Common' but it's not found
+t/20-unit/Type-Registry/basic.t .................... ok
+t/20-unit/Type-Registry/moosextypes.t .............. skipped: Test requires module 'MooseX::Types::Common' but it's not found
+t/20-unit/Type-Tiny-_HalfOp/overload-precedence.t .. ok
+t/20-unit/Type-Tiny-Class/basic.t .................. ok
+t/20-unit/Type-Tiny-Class/plus-constructors.t ...... ok
+t/20-unit/Type-Tiny-Duck/basic.t ................... ok
+t/20-unit/Type-Tiny-Enum/basic.t ................... ok
+t/20-unit/Type-Tiny-Intersection/basic.t ........... ok
+t/20-unit/Type-Tiny-Role/basic.t ................... ok
+t/20-unit/Type-Tiny-Union/basic.t .................. ok
+t/20-unit/Type-Tiny/arithmetic.t ................... ok
+t/20-unit/Type-Tiny/basic.t ........................ ok
+t/20-unit/Type-Tiny/coercion-modifiers.t ........... ok
+t/20-unit/Type-Tiny/parameterization.t ............. ok
+t/20-unit/Type-Tiny/smartmatch.t ................... ok
+t/20-unit/Type-Tiny/syntax.t ....................... ok
+t/20-unit/Type-Utils/dwim-moose.t .................. ok
+t/20-unit/Type-Utils/dwim-mouse.t .................. skipped: Test requires module 'Mouse' but it's not found
+t/20-unit/Type-Utils/match-on-type.t ............... ok
+t/20-unit/Types-Common-Numeric/basic.t ............. ok
+t/20-unit/Types-Common-String/basic.t .............. ok
+t/20-unit/Types-Common-String/coerce.t ............. ok
+t/20-unit/Types-Common-String/unicode.t ............ ok
+t/20-unit/Types-Standard/basic.t ................... ok
+t/20-unit/Types-Standard/deep-coercions.t .......... ok
+t/20-unit/Types-Standard/mxtmlb-alike.t ............ ok
+t/20-unit/Types-Standard/optlist.t ................. ok
+t/20-unit/Types-Standard/overload.t ................ ok
+t/20-unit/Types-Standard/strmatch.t ................ ok
+t/20-unit/Types-Standard/structured.t .............. ok
+t/20-unit/Types-Standard/tied.t .................... ok
+t/30-integration/Class-InsideOut/basic.t ........... skipped: Test requires module 'Class::InsideOut' but it's not found
+t/30-integration/Exporter-Tiny/basic.t ............. ok
+t/30-integration/Exporter-Tiny/installer.t ......... skipped: Test requires module 'Sub::Exporter::Lexical' but it's not found
+t/30-integration/Exporter-Tiny/role-conflict.t ..... ok
+t/30-integration/Function-Parameters/basic.t ....... skipped: Test requires module 'Function::Parameters' but it's not found
+t/30-integration/Kavorka/basic.t ................... skipped: Test requires module 'Kavorka' but it's not found
+t/30-integration/match-simple/basic.t .............. skipped: Test requires module 'match::simple' but it's not found
+t/30-integration/Moo/basic.t ....................... ok
+t/30-integration/Moo/coercion.t .................... ok
+t/30-integration/Moo/exceptions.t .................. ok
+t/30-integration/Moo/inflation.t ................... ok
+t/30-integration/Moo/inflation2.t .................. ok
+t/30-integration/Moops/basic.t ..................... skipped: Test requires module 'Moops' but it's not found
+t/30-integration/Moops/library-keyword.t ........... skipped: Test requires module 'Moops' but it's not found
+t/30-integration/Moose/accept-moose-types.t ........ ok
+t/30-integration/Moose/basic.t ..................... ok
+t/30-integration/Moose/coercion.t .................. ok
+t/30-integration/MooseX-Types/basic.t .............. ok
+t/30-integration/MooseX-Types/extending.t .......... ok
+t/30-integration/MooseX-Types/more.t ............... ok
+t/30-integration/Mouse/basic.t ..................... skipped: Test requires module 'Mouse' but it's not found
+t/30-integration/Mouse/coercion.t .................. skipped: Test requires module 'Mouse' but it's not found
+t/30-integration/MouseX-Types/basic.t .............. skipped: Test requires module 'MouseX::Types' but it's not found
+t/30-integration/Object-Accessor/basic.t ........... skipped: Test requires module 'Object::Accessor' but it's not found
+t/30-integration/Return-Type/basic.t ............... skipped: Test requires module 'Return::Type' but it's not found
+t/30-integration/Sub-Quote/basic.t ................. ok
+t/30-integration/Switcheroo/basic.t ................ skipped: Test requires module 'Switcheroo' but it's not found
+t/30-integration/Type-Tie/basic.t .................. skipped: Test requires module 'Type::Tie' but it's not found
+t/30-integration/Validation-Class-Simple/basic.t ... skipped: Test requires module 'Validation::Class' but it's not found
+t/40-regression/73f51e2d.t ......................... skipped: your perl does not support ithreads
+t/40-regression/gh1.t .............................. ok
+t/40-regression/rt85911.t .......................... ok
+t/40-regression/rt86004.t .......................... ok
+t/40-regression/rt86233.t .......................... ok
+t/40-regression/rt86239.t .......................... ok
+t/40-regression/rt90096-2.t ........................ ok
+t/40-regression/rt90096.t .......................... ok
+t/40-regression/rt92571-2.t ........................ ok
+t/40-regression/rt92571.t .......................... ok
+t/40-regression/rt92591.t .......................... ok
+t/99-moose-std-types-test.t ........................ skipped: set EXTENDED_TESTING to true if you want to run this test
+All tests successful.
+Files=108, Tests=1471, 10 wallclock secs ( 0.44 usr  0.17 sys +  9.04 cusr  0.79 csys = 10.44 CPU)
+Result: PASS
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Devel/TypeTiny/Perl56Compat.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Devel/TypeTiny/Perl58Compat.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Error/TypeTiny.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Error/TypeTiny/Assertion.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Error/TypeTiny/Compilation.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Error/TypeTiny/WrongNumberOfParameters.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Eval/TypeTiny.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Reply/Plugin/TypeTiny.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Test/TypeTiny.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Coercion.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Library.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Params.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Parser.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Registry.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Utils.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Coercion/FromMoose.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Coercion/Union.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/_HalfOp.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/Class.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/Duck.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/Enum.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/Intersection.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/Manual.pod
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/Role.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/Union.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/Manual/Coercions.pod
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/Manual/Libraries.pod
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/Manual/Params.pod
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/Manual/Policies.pod
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/Manual/UsingWithMoo.pod
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/Manual/UsingWithMoose.pod
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/Manual/UsingWithMouse.pod
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Type/Tiny/Manual/UsingWithOther.pod
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Types/Standard.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Types/TypeTiny.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Types/Common/Numeric.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Types/Common/String.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Types/Standard/ArrayRef.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Types/Standard/Dict.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Types/Standard/HashRef.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Types/Standard/Map.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Types/Standard/ScalarRef.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Types/Standard/Tuple.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Devel::TypeTiny::Perl56Compat.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Devel::TypeTiny::Perl58Compat.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Error::TypeTiny.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Error::TypeTiny::Assertion.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Error::TypeTiny::Compilation.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Error::TypeTiny::WrongNumberOfParameters.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Eval::TypeTiny.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Reply::Plugin::TypeTiny.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Test::TypeTiny.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Coercion.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Coercion::FromMoose.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Coercion::Union.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Library.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Params.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Parser.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Registry.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::_HalfOp.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::Class.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::Duck.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::Enum.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::Intersection.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::Manual.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::Manual::Coercions.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::Manual::Libraries.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::Manual::Params.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::Manual::Policies.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::Manual::UsingWithMoo.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::Manual::UsingWithMoose.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::Manual::UsingWithMouse.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::Manual::UsingWithOther.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::Role.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Tiny::Union.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Type::Utils.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Types::Common::Numeric.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Types::Common::String.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Types::Standard.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Types::Standard::ArrayRef.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Types::Standard::Dict.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Types::Standard::HashRef.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Types::Standard::Map.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Types::Standard::ScalarRef.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Types::Standard::Tuple.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Types::TypeTiny.3
+Appending installation info to /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/5.19.9/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Type-Tiny-0.040
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/Type-Tiny-0.040/install.json
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/Type-Tiny-0.040/MYMETA.json
+Building and testing Data-CloudWeights-0.12.1
+Building Data-CloudWeights
+
+OS: darwin, Host: brenos-macbook-air.local
+Required:
+
+  Perl                              5.019009
+  version                           0.9908
+  Module::Build                     0.4205
+
+Optional:
+
+  App::cpanminus                    undef
+
+Environment:
+
+  $AUTHOR_TESTING                   undef
+  $AUTOMATED_TESTING                undef
+  $EXTENDED_TESTING                 undef
+  $NONINTERACTIVE_TESTING           1
+  $PERL_CPAN_REPORTER_CONFIG        undef
+  $PERL_CR_SMOKER_CURRENT           undef
+  $PERL5_CPAN_IS_RUNNING            undef
+  $PERL5_CPANPLUS_IS_VERSION        undef
+  $TEST_CRITIC                      undef
+  $TEST_SPELLING                    undef
+t/01always_pass.t .. ok
+t/02pod.t .......... skipped: POD test only for developers
+t/03podcoverage.t .. skipped: POD coverage test only for developers
+t/05kwalitee.t ..... skipped: Kwalitee test only for developers
+t/06yaml.t ......... skipped: YAML test only for developers
+t/07podspelling.t .. skipped: POD spelling test only for developers
+t/10test_script.t .. ok
+All tests successful.
+Files=7, Tests=19,  1 wallclock secs ( 0.04 usr  0.02 sys +  0.45 cusr  0.07 csys =  0.58 CPU)
+Result: PASS
+Building Data-CloudWeights
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Data/CloudWeights.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Data::CloudWeights.3
+-> OK
+Successfully installed Data-CloudWeights-0.12.1
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/Data-CloudWeights-0.12.1/install.json
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/Data-CloudWeights-0.12.1/MYMETA.json
+5 distributions installed

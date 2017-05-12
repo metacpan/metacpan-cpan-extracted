@@ -1,0 +1,30 @@
+bin/changelog2x
+ChangeLog
+ChangeLog.xml
+ex/black-white.css
+ex/changelogml.css
+ex/README
+lib/App/Changelog2x.pm
+lib/App/changelog2x/changelog2div.xslt
+lib/App/changelog2x/changelog2dl.xslt
+lib/App/changelog2x/changelog2html.xslt
+lib/App/changelog2x/changelog2htmlnewest.xslt
+lib/App/changelog2x/changelog2htmlversion.xslt
+lib/App/changelog2x/changelog2text.xslt
+lib/App/changelog2x/changelog2textnewest.xslt
+lib/App/changelog2x/changelog2textversion.xslt
+lib/App/changelog2x/changelog2ul.xslt
+lib/App/changelog2x/ChangeLogML.xsd
+lib/App/changelog2x/common-text.xslt
+lib/App/changelog2x/common-xhtml.xslt
+lib/App/changelog2x/common.xslt
+lib/App/changelog2x/svnxml2changes.xslt
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00_load.t
+t/01_pod.t
+t/02_pod_coverage.t
+Makefile.PL
+SIGNATURE    Added here by Module::Build

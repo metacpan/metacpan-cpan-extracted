@@ -1,0 +1,35 @@
+---
+abstract: 'Global Jup options'
+author:
+  - 'Adam Stokes <adamjs@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Jup
+requires:
+  App::CharmKit: '0'
+  App::Cmd::Setup: '0'
+  Carp: '0'
+  DDP: '0'
+  Import::Into: '0'
+  Modern::Perl: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Pod::Markdown: '0'
+  Pod::Weaver::Plugin::Exec: '0'
+  bareword::filehandles: '0'
+  indirect: '0.16'
+resources:
+  bugtracker: https://github.com/battlemidget/jup/issues
+  homepage: https://github.com/battlemidget/jup
+  repository: https://github.com/battlemidget/jup.git
+version: '1.01'
+x_serialization_backend: 'YAML::Tiny version 1.69'

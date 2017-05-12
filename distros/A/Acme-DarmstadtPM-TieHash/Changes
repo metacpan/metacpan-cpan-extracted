@@ -1,0 +1,19 @@
+Revision history for Perl extension Tie::Hash::DarmstadtPM.
+===========================================================
+
+0.4  2014-01-04T08:59:11
+
+      - switch to dist.ini
+      - fix Changes file
+      - fix CPANTS issues
+
+0.3  2006-11-26T12:40:33
+      - bugfix: manifest.t
+
+0.2  2006-11-23T15:48:37
+        - Minor improvements on documentation
+
+0.1  2006-10-25T10:06:42
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.1 -XA -n Tie::Hash::DarmstadtPM
+

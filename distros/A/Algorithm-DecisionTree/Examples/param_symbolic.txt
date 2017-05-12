@@ -1,0 +1,36 @@
+
+# comment line
+
+class names:  malignant benign
+class priors: 0.4 0.6
+
+feature: smoking
+values: heavy medium light never
+
+feature: exercising
+values: never occasionally regularly
+
+feature: fatIntake
+values: low medium heavy
+
+feature: videoAddiction
+values:  none low medium heavy
+
+
+bias:  class: malignant 
+
+          smoking:    heavy=0.7
+          exercising: regularly=0.1 
+          fatIntake:  heavy=0.7
+          videoAddiction: 
+
+bias:  class: benign
+
+          smoking:     heavy=0.2
+          exercising:  regularly=0.7
+          fatIntake:   heavy=0.2
+          videoAddiction: 
+
+          
+
+

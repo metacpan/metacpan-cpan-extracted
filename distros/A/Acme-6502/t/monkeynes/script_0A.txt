@@ -1,0 +1,49 @@
+clear
+power on
+regs
+
+# No Flags Case -------------------------
+regset acc 35
+
+op 0a
+
+# Should be: ACC=6A, C=0, Z=0, S=0
+test acc = 6a
+test c = 0
+test z = 0
+test s = 0
+
+# Carry Case ----------------------------
+regset acc ba
+
+op 0a
+
+# Should be: ACC=74, C=1, Z=0, S=0
+test acc = 74
+test c = 1
+test z = 0
+test s = 0
+
+# Zero Case -----------------------------
+regset acc 80
+
+op 0a
+
+# Should be: ACC=0, C=1, Z=1, S=0
+test acc = 0
+test c = 1
+test z = 1
+test s = 0
+
+# Negative Case -------------------------
+regset acc 4c
+
+op 0a
+
+# Should be: ACC=6A, C=0, Z=0, S=1
+test acc = 98
+test c = 0
+test z = 0
+test s = 1
+
+save verify_0A.txt

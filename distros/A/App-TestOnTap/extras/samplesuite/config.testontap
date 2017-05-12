@@ -1,0 +1,31 @@
+# required to identify this suite
+#
+id = 143364a2-cc11-11e6-be89-8ea39edadb5b
+
+# all tests are potentially parallelizable
+#
+parallelizable = regexp(.*)
+
+# avoid incomplete stuff and the readme
+#
+skip = regexp(^incomplete/) or eq(README.txt)
+
+# use the 'natural' sorting order strategy by default
+#
+order = natural
+
+[DEPENDENCY All depends on init]
+match = not eq(init.pl)
+dependson = eq(init.pl)
+
+[DEPENDENCY File handling]
+match = regexp(filehandl/.*)
+dependson = eq(basic_file_handling_setup.pl)
+
+[DEPENDENCY Picture processing]
+match = regexp(picproc/.*)
+dependson = eq(basic_picture_processing_setup.pl)
+
+[EXECMAP]
+match10 = regexp(\.pl$)
+cmd10 = perl

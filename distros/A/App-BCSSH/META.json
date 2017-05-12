@@ -1,0 +1,57 @@
+{
+   "abstract" : "Back channel SSH messaging",
+   "author" : [
+      "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-BCSSH",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Browser::Open" : "0",
+            "File::Temp" : "0.19",
+            "IO::Select" : "0",
+            "IO::Socket::UNIX" : "0",
+            "JSON" : "2",
+            "Module::Find" : "0",
+            "Module::Reader" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "0",
+            "MooX::CaptainHook" : "0",
+            "Package::Variant" : "0",
+            "Pod::Perldoc" : "0",
+            "Pod::Simple" : "0",
+            "Safe::Isa" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.008001",
+            "strictures" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.002002"
+}

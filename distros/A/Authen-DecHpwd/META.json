@@ -1,0 +1,72 @@
+{
+   "abstract" : "DEC VMS password hashing",
+   "author" : [
+      "Shawn Clifford",
+      "Davide Casale",
+      "Mario Ambrogetti",
+      "Terence Lee",
+      "Jean-loup Gailly",
+      "Solar Designer",
+      "Mike McCauley <mikem@open.com.au>",
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Authen-DecHpwd",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : 0,
+            "Scalar::String" : 0,
+            "Test::More" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "XSLoader" : 0
+         },
+         "requires" : {
+            "Data::Integer" : "0.003",
+            "Digest::CRC" : "0.14",
+            "Exporter" : 0,
+            "Scalar::String" : 0,
+            "constant" : 0,
+            "parent" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Authen::DecHpwd" : {
+         "file" : "lib/Authen/DecHpwd.pm",
+         "version" : "2.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ]
+   },
+   "version" : "2.006"
+}

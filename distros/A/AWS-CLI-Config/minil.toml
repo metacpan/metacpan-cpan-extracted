@@ -1,0 +1,6 @@
+name = "AWS-CLI-Config"
+# badges = ["travis"]
+authority="cpan:KEYAMB"
+
+module_maker="ModuleBuildTiny"
+

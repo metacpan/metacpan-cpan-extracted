@@ -1,0 +1,19 @@
+SYNOPSIS
+
+    See the included upf-* scripts.
+
+DESCRIPTION
+
+    This distribution includes CLI scripts upf-*, one for each
+    corresponding function in Unix::Passwd::File:
+
+    # INSERT_EXECS_LIST
+
+SEE ALSO
+
+    Unix::Passwd::File
+
+    App::upf, which includes a single CLI script upf containing
+    subcommands, instead of one script for each function like included in
+    this distribution.
+

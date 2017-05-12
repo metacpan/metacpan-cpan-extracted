@@ -1,0 +1,6 @@
+name = "Amon2-Plugin-Web-CSRFDefender"
+# badges = ["travis"]
+authority="cpan:TOKUHIROM"
+
+module_maker="ModuleBuildTiny"
+

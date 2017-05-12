@@ -1,0 +1,10 @@
+    # stash the database object for later use
+    my $dbh = $c->plugin('DBI')->connect({
+        driver   => $c->config->{database_driver},
+        host     => $c->config->{database_host},
+        name     => $c->config->{database_name},
+        user     => $c->config->{database_user},
+        password => $c->config->{database_password},
+      });
+    
+    $c->stash('DBH', $dbh);

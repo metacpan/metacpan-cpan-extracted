@@ -1,0 +1,10 @@
+Revision history for Perl extension Algorithm::GaussianElimination::GF2.
+
+0.02  Jul 9, 2012
+        - update documentation, it was using add_equation instead of
+          new_equation (bug report by Michael Stahl)
+
+0.01  Wed Nov 30 17:13:48 2011
+	- original version; created by h2xs 1.23 with options
+		-AXn Algorithm::GaussianElimination::GF2
+

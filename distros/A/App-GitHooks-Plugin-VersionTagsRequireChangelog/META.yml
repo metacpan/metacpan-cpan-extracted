@@ -1,0 +1,33 @@
+---
+abstract: 'Require git version tags to have a matching changelog entry.'
+author:
+  - 'Guillaume Aubert <aubertg@cpan.org>'
+build_requires:
+  Test::FailWarnings: '0'
+  Test::More: '0.94'
+  Test::Requires::Git: '1.005'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-GitHooks-Plugin-VersionTagsRequireChangelog
+provides:
+  App::GitHooks::Plugin::VersionTagsRequireChangelog:
+    file: lib/App/GitHooks/Plugin/VersionTagsRequireChangelog.pm
+    version: v1.1.0
+requires:
+  App::GitHooks: '0'
+  CPAN::Changes: '0'
+  Log::Any: '0'
+  Try::Tiny: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/guillaumeaubert/App-GitHooks-Plugin-VersionTagsRequireChangelog/issues
+  homepage: https://metacpan.org/release/App-GitHooks-Plugin-VersionTagsRequireChangelog
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/guillaumeaubert/App-GitHooks-Plugin-VersionTagsRequireChangelog
+version: v1.1.0

@@ -1,0 +1,23 @@
+Revision history for App-Goto
+
+0.07  2013-04-01 10:12:42 BST
+        - Added prereq detection due to CPAN testers reports
+
+0.06  2013-03-30 17:08:30 GMT
+        - Minor documentation update
+
+0.05  2013-03-30 17:04:45 GMT
+        - Update to allow nickname & hostname to be used in remote command
+        - Change command modifier string in config file from %s to mod
+
+0.04  2013-03-30 09:15:57 GMT
+        - Corrected other default attributes
+
+0.03  2013-03-29 22:16:21 GMT
+        - Correction to Moo attribute to be a coderef
+
+0.02  2013-03-29 18:57:23 GMT
+        - Minor tweak
+
+0.01  2013-03-29 18:50:31 GMT
+        - Initial release

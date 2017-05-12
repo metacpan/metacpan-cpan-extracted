@@ -1,0 +1,44 @@
+---
+abstract: 'upgrade / downgrade project'
+author:
+  - 'Alex Efros <powerman@cpan.org>'
+build_requires:
+  Path::Tiny: '0.060'
+  Test::Exception: '0'
+  Test::More: '0.96'
+  Test::Output: '1.02'
+configure_requires:
+  Devel::AssertOS: '0'
+  Devel::CheckOS: '1.63'
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-migrate
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  App::migrate:
+    file: lib/App/migrate.pm
+    version: v0.2.5
+requires:
+  File::Temp: '0'
+  Getopt::Long: '0'
+  List::Util: '1.33'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/powerman/migrate/issues
+  homepage: https://github.com/powerman/migrate
+  repository: https://github.com/powerman/migrate.git
+version: v0.2.5
+x_contributors:
+  - 'Mikko Koivunalho <mikko.koivunalho@iki.fi>'

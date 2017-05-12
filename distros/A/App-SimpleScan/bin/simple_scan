@@ -1,0 +1,432 @@
+#!/usr/bin/env perl
+use 5.008;
+use warnings;
+use strict;
+$|++;
+
+our $VERSION = "1.02";
+
+use App::SimpleScan;
+
+my $app = new App::SimpleScan;
+exit $app->go;
+
+__END__
+
+=head1 NAME
+
+simple_scan - scan a set of Web pages for strings present/absent
+
+=head1 ABSTRACT
+
+App::SimpleScan - Mini-language for website testing
+
+=head1 SYNOPSIS
+
+  simple_scan [--generate] [--run] 
+              [--define key="value value ..." ] [--override] [--defer]
+              [--debug]
+              [--warn]
+              [--no-agent]
+              [--autocache]
+              [--status]
+              {file file file ...}
+
+=head1 USAGE
+
+  # Run the tests in the files supplied on the command line.
+  # --run (or -run; we're flexible) is assumed if you give no switches.
+  % simple_scan file1 file2 file3
+
+  # Generate a set of tests and save them, then run them.
+  % <complex pipe> | simple_scan --generate > pipe_scan.t
+
+  # Run one simple test
+  % echo "http://yahoo.com yahoo Y Look for yahoo.com"  | simple_scan -run
+
+=head1 DESCRIPTION
+
+C<simple_scan> is an extensible "little language" for static web page 
+testing. It allows you to define tests in terms of I<test specs> (which
+tell C<simple_scan> where to go and what to look for there) and I<pragmas>
+(which define string substitutions, or alter the way that C<simple_scan>
+runs its tests). 
+
+C<simple_scan> is designed to be easy to use. If you know where your page
+is (what URL) and can write a basic regular expression to match text on 
+that page, you can use C<simple_scan>. 
+
+C<simple_scan> itself is based on a I<pluggable> Perl class; more
+sophisticated users can install plugins to extend the language itself,
+or even the command-line options that the C<simple_scan> command accepts.
+
+Low-level access to web pages is done via C<WWW::Mechanize::Pluggable>
+and C<Test::WWW::Simple>, so it's even possible to build new methods to
+access your data into the language by writing plugins for Mech and
+C<simple_scan>.
+
+C<simple_scan> is meant to be a I<simple> web testing language, so it
+doesn't implement any control structures. You declare what tests are to
+be run, and C<simple_scan> then runs them all, telling you at the end
+which tests passed and which didn't. It uses TAP (Test Anything
+Protocol) to report on the tests, meaning that any C<Test::Harness>-based
+program can read and interpret the output.
+
+=head1 BASICS
+
+C<simple_scan> reads either files supplied on the command line, or standard
+input. It creates and runs, or prints, or even both, a L<Test::WWW::Simple>
+test for the criteria supplied to it.
+
+C<simple_scan>test specs should be in the following format, starting in
+column 1:
+
+  <URL> <pattern> <Y|N> <comment>
+
+The I<URL> is any URL; I<pattern> is a Perl regular expression, delimited by
+slashes; I<Y|N> is C<Y> if the pattern should match, or C<N> if the pattern 
+should B<not> match; and I<comment> is any arbitrary text you like (as long 
+as it's all on the same line as everything else).
+
+C<simple_scan>will do its best to try to interpret your pattern; if it can't
+parse it as a regular expression, it will assume you meant to match against
+a literal character string instead; so a pattern like
+
+   /<b>this</b>/
+
+would be interpreted as the literal string "<b>this</b>".
+
+=head1 COMMAND-LINE SWITCHES
+
+We use L<Getopt::Long> to get the command-line options, so we're really very
+flexible as to how they're entered. You can use either one dash (as in
+C<-foo>) or two (as in C<--bar>). You only need to enter the minimum number
+or characters to match a given switch.
+
+=over 4
+
+=item C<--run>
+
+C<--run> tells C<simple_scan> to immediately run the tests it's created. Can
+be abbreviated to C<-r>.
+
+This option is mosst useful for one-shot tests that you're not planning to
+run repeatedly.
+
+=item C<--generate>
+
+C<--generate> tells C<simple_scan> to print the test it's generated on the
+standard output.
+
+This option is useful to build up a test suite to be reused later.
+
+=back
+
+Both C<-r> and C<-g> can be specified at the same time to run a test and print 
+it simultaneously; this is useful when you want to save a test to be run later 
+as well as right now without having to regenerate the test.
+
+=over 4
+
+=item C<--define>
+
+C<--define> allows you to predefine substitutions to be used during a 
+C<simple_scan> run. To define a substitution, use this syntax:
+
+  --define foo=bar --define baz="one two three"
+
+The first example defines a single substitution; the second defines a
+multiple substitution. In conjunction with C<--override>, C<--define>
+can make C<simple_scan> ignore any definitions for variables in the
+C<simple_scan> input file. Conversely, if C<--defer> is specified, 
+any definitions on the command line will be altered if a definition
+for the variable is found in the input file.
+
+Note that C<%%forget> can still make C<simple_scan> forget a definition 
+(if C<App::SimpleScan::Plugin::Forget> is installed).
+
+Also note that you define a variable with multiple values like this:
+
+  --define foo="bar baz quux"
+
+but B<not> like this:
+
+  --define foo=bar --define foo=baz --define foo=quux
+
+since multiple definitions of a single substitution use only the
+I<last> substitution defined; the example directly above (with
+the three "--define" entries) defines "foo" as "quux" and only 
+as "quux".
+
+=item C<--override>
+
+Makes any definitions entered on the command line override definitions 
+found in the input file.
+
+=item C<--defer>
+
+Makes any definitions entered on the command line defer to defintions
+found in the input file - the variables in question will be redefined 
+by the command file.
+
+=item C<--debug>
+
+Enables debugging for you C<simple_scan> input file; this outputs a 
+lot of extra code which, when executed by C<simple_scan --run>, shows
+a lot more information as to what actually happened.
+
+Currently, the only extra debugging information is a list of variables
+which were I<not> altered by substitution pragmas when C<--override>
+was specified on the command line.
+
+=item C<--warn>
+
+Causes simple_scan to output code that gives you warnings (via diag())
+in the run file about syntax errors, etc.
+
+=item C<--no-agent>
+
+Tells simple_scan to not set up a default user agent. Some applications
+(e.g., mobile applications) actually go into a debug mode when talking to
+a detectable (known) browser. This turns off simple_scan's assumption that
+you want to look like a browser.
+
+=item C<--autocache>
+
+Turns on caching immediately, whether or not the input file specifies
+C<%%cache> or not. Note that a C<%%nocache> in the input file will 
+turn caching I<off> again. 
+
+=item c<--status>
+
+Turns on status reporting. Sometimes C<simple_scan> takes a while to 
+run (especially if you've defined a lot of variables). This causes it
+to pop out a new status message as each input line is processed.
+
+=back
+
+=head1 PRAGMAS
+
+Pragmas are ways to influence what C<simple_scan> does when generating tests.
+They are specified with C<%%> in column 1 and the pragma name immediately
+following. Any arguments are supplied after a colon, like this:
+
+   %%foo: bar baz
+
+This invokes the C<foo> pragma with the argument C<bar baz>. If you're really
+lazy, you can even leave out the colon.
+
+=head2 Substitutions
+
+Any pragma that's otherwise unrecognized by C<simple_scan> is treated as a 
+substitution. Substitutions assume that you have a name and a set of strings
+following it; these strings wil be substituted into the test specs occuring
+between this set of substitutions and the next set. Any variables not
+redefined will continue to have their old values.
+
+Here's a basic example. 
+
+   %% user dconway chromatic petdance
+   %% use_perl_id Ovid pemungkah
+   http://search.cpan.org/~<user>
+   http://use.perl.org/~<use_perl_id>/journal/
+   http://search.yahoo.com/
+   ...
+   
+This would fetch the CPAN index page for the users dconway, chromatic, and 
+petdance, and the use.perl journals for users Ovid and pemungkah. Finally,
+it would (just once) fetch the Yahoo! search page - because there are no
+substitutions in that line, it would only be evaluated once.
+
+Substitutions can occur anywhere in the line, including in the comment.
+
+Here's another example: internationalization. For instance,
+let's assume that you want to substitute each of a list of two-character 
+country codes into a string (most likely somewhere in the URL, but possibly 
+in the comment too). 
+
+C<simple_scan> will do this for you, creating a test for each country code
+you specify. For instance:
+
+   %%xx: es au my jp
+   http://<xx>.mysite.com/     /blargh/  Y  look for blargh (<xx>)
+
+This would generate 4 tests, for C<es.mysite.com>, C<au.mysite.com>, 
+c<my.mysite.com>, and C<jp.mysite.com>, all looking to match C<blargh> 
+somewhere on the page.
+
+=head2 Multiple substitutions in a single line
+
+If you define multiple variables and use them in a test spec, 
+C<simple_scan> will create all of the unique combinations of the
+values and substitute them into your test spec. For example:
+
+%%foo bar baz
+%%quux zorch thud
+http://<foo>.yoursite.com?zz=<quux> /Search found/ Y check <quux> search
+
+would generate all four alternatives and run tests for each one:
+
+http://bar.yoursite.com?zz=zorch /Search found/ Y check zorch search
+http://baz.yoursite.com?zz=zorch /Search found/ Y check zorch search
+http://bar.yoursite.com?zz=thud  /Search found/ Y check thud search
+http://baz.yoursite.com?zz=thud  /Search found/ Y check thud search
+
+This makes it very easy to generate many tests from very few input lines.
+simple_scan's substitution engine tracks the values of the variables and
+ensures that, for any given line, the substitution values stay consistent.
+
+=head2 Nested substitutions
+
+Substitutions can also reference other substitutions, so something 
+like this is also possible:
+
+%%mirror blonk whiz thud crunch
+%%welcome_msg 'Welcome to <mirror>'
+http://<mirror>.yoursite.org/ /<welcome_msg>/ Y <mirror> welcome
+
+When the test spec is expanded, the string 'Welcome to <mirror>'
+is substituted in first, then the test spec is expanded again to
+create a test for each one of the mirrors.
+
+Note that at present, checking for circular substitutions is not
+yet complete; if you write something like this:
+
+%%foo <bar>
+%%bar <foo>
+http://<foo>.com /check/ Y  Infinite loop
+
+C<simple_scan> will substitute "<bar>" for "<foo>, then "<foo>"
+for "<bar>", and will continue to happily do so until you kill 
+the process. At the moment, try not to do this; we'll have a fix
+in an upcoming release.
+
+=head2 Single-quotes, double-quotes, and backticks
+
+You can use single-quoted strings in substitutions to get exact
+strings containing spaces or tabs:
+
+   %%searchtext 'this one' 'that one' 'another one'
+
+The spaces will be preserved in the values assigned to C<searchtext>.
+
+If you want to C<eval> the contents of a string as if it were Perl code
+and use that as the value of a substitution, put double quotes around it:
+
+   %%language "$ENV{LANGUAGE}"
+   %%now      "@{[scalar localtime]}"
+
+The first example allows you to pass in a value from the environment
+variable C<$LANGUAGE>; the second gets the current date and time as a string (so its 
+value would be something like "Tue Feb 14 14:21:56 2006").
+
+Lastly, you can use backticked strings to denote a command to be
+executed by the shell; the command's output will be used in place of
+the quoted string.
+
+As an example, if we have the script C<languages> which looks like this:
+
+  #!/bin/sh
+  echo "perl java python ruby"
+
+and the substitution
+
+  %%language `languages`
+
+then the values finally assigned to C<language> would be 
+C<perl java ruby python>.
+
+All of the different forms can be mixed on one line, so
+
+  %%try `some_command "value one" value2
+
+would set C<try> to the output of C<some_command>,
+C<value one>, and C<value2>.
+
+Finally, since quoted strings are embedded exactly as provided, it's 
+possible to parameterize your test specs by using environment variables,
+like this:
+
+   %%language $ENV{LANGUAGE}
+   http://<language>.org/ /language/i Y <language> should be on the page
+
+Now setting the enviroment variable C<LANGUAGE> in your shell to 'perl'
+will propagate 'perl' into the test spec as the language we're testing for.
+
+=head1 OTHER PRAGMAS DEFINED BY SIMPLE_SCAN
+
+There are a few other pragmas defined directly by C<simple_scan>. These
+are not plugins, but are implemented directly in the code.
+
+=head2 agent
+
+The C<agent> pragma allows you to switch user agents during the test. 
+C<Test::WWW::Simple>'s default is C<Windows IE 6>, but you can switch it
+to any of the other user agent aliases supported by C<WWW::Mechanize>.
+
+   http://gemal.dk/browserspy/basic.html /Explorer/ Y Should be Explorer
+   %%agent: Mac Safari
+   http://gemal.dk/browserspy/basic.html /Safari/ Y Should be Safari
+
+(Note: gemal.dk actually does tell you what browser you're running, so
+feel free to try this test yourself.)
+
+=head2 cache
+
+The C<cache> pragma turns on URL caching; once enabled, the page returned
+on the I<first> access to a URL is returned directly from a memory cache,
+without its being reaccessed from the Web.
+
+Using C<cache> can result in major speedups for tests which repeatedly
+hit the same page. 
+
+=head2 nocache
+
+The C<nocache> pragma turns I<off> URL caching; this is useful if you
+have something like a REST interface that may return different values 
+from repeated accesses to the same URL.
+
+=head1 PLUGINS
+
+simple_scan is extended via plugins in the C<App::SimpleScan::Plugin>
+namespace. Currently-released plugins:
+
+=over 4
+
+=item * C<App::SimpleScan::Plugin::Cache> - disk-based caching
+
+=item * C<App::SimpleScan::Plugin::Snapshot> - HTML snapshots of tests
+
+=item * C<App::SimpleScan::Plugin::Plaintext> - check un-marked-up page text
+
+=item * C<App::SimpleScan::Plugin::Retry> - retries HTTP failures
+
+=item * C<App::SimpleScan::Plugin::LinkCheck> - link counting/presence/absence
+
+=item * C<App::SimpleScan::Plugin::Forget> - discard a substitution
+
+Read the documentation for these plugin classes for information on 
+pragmas and/or command-line options that they provide.
+
+=back 
+
+=head1 BUGS AND LIMITATIONS
+
+Substitutions, especially when there are large numbers of variables 
+with multiple values, are slow. (Welcome to the world of combinatory
+explosion.) A future release should use the dependency tree we're 
+going to need anyway to detect circular references to eliminate 
+variables that cannot possibly be substituted into the current 
+string, thereby decreasing the load on the combination checker.
+
+=head1 AUTHOR
+
+Joe McMahon E<lt>mcmahon@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2005, 2006 by Yahoo!
+
+This script is free software; you can redistribute it or modify it under the
+same terms as Perl itself, either Perl version 5.6.1 or, at your option, any
+later version of Perl 5 you may have available.

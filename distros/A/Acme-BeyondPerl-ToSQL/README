@@ -1,0 +1,30 @@
+Acme/BeyondPerl/ToSQL version 0.01
+==================================
+
+Your RDBMS will calculate instead of Perl thanks to this module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+DBI, 
+Test::More (for test),
+DBD::SQLite (for test)
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2005 by Makamaka Hannyaharamitu (makamaka[at]donzoko.net)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

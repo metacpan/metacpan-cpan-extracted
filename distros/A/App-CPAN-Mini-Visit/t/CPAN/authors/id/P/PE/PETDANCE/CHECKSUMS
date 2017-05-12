@@ -1,0 +1,11 @@
+# CHECKSUMS file written on Mon Feb  4 15:50:30 2008 GMT by CPAN::Checksums (v1.064)
+$cksum = {
+  'Test-Harness-2.62.tar.gz' => {
+    'md5' => '4e62bf6e872ffa5eae6ce1dd2cc45a6e',
+    'md5-ungz' => '74f91dc11e218373a467d80df5a483ef',
+    'mtime' => '2008-02-04',
+    'sha256' => '94c619bc6adc9a6acb51455c08e4b6bb62e4c9465a26ec077b9a6e82900dc9f2',
+    'sha256-ungz' => '9c44c974e249f567c301379cad4a022038b226b3d27f9f689633def0c47ce648',
+    'size' => 967
+  }
+};

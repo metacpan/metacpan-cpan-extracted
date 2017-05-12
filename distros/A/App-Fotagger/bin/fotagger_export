@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use 5.010;
+use App::Fotagger::Export;
+use Data::Dumper;
+App::Fotagger::Export->new_with_options->export;
+
+__END__
+
+=head1 NAME
+
+fotagger_export - export fotos
+
+=head1 SYNOPSIS
+
+  fotagger_export --target some/dir --star >=3 --tags foo --resize 1050x1600
+
+=head1 DESCRIPTION
+
+export images into a target dir
+
+=head2 OPTIONS
+
+TODO
+
+=head1 AUTHOR
+
+Thomas Klausner E<lt>domm {at} cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+App::Fotagger::Deleter
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,77 @@
+From: Marius Gavrilescu <marius@ceata.org>
+To: marius@ceata.org
+Subject: Contains pubkey
+Date: Thu, 10 Jul 2014 00:17:20 +0300
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="------------010501030105000001010800"
+
+This is a multi-part message in MIME format.
+--------------010501030105000001010800
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+This mail contains a public key.
+
+--------------010501030105000001010800
+Content-Type: application/pgp-keys;
+ name="0x69137654.asc"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="0x69137654.asc"
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v1
+
+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
+=RZHG
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------010501030105000001010800--
+

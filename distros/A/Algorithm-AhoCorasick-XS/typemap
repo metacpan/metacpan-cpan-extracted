@@ -1,0 +1,98 @@
+TYPEMAP
+AhoCorasick::Matcher* O_OBJECT
+
+string T_STD_STRING
+vector<string> T_STD_VECTOR_STRING
+
+vector<AhoCorasick::match> T_STD_VECTOR_MATCH
+
+INPUT
+T_STD_STRING
+  if (!SvOK($arg)) {
+    $var = std::string();
+  } else {
+    $var = std::string(SvPV_nolen($arg), SvCUR($arg));
+  }
+
+// From ExtUtils::Typemap::STL::Vector.
+// Accept an arrayref
+T_STD_VECTOR_STRING
+  if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+    AV* av = (AV*)SvRV($arg);
+    const unsigned int alen = av_len(av)+1;
+    $var = std::vector<std::string>(alen);
+    STRLEN len;
+    char* tmp;
+    SV** elem;
+    
+    for (unsigned int i = 0; i < alen; i++) {
+      elem = av_fetch(av, i, 0);
+      if (elem != NULL) {
+        tmp = SvPV(*elem, len);
+        ${var}[i] = std::string(tmp, len);
+      }
+      else
+        ${var}[i] = std::string(\"\");
+    }
+  }
+  else
+    Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+               \"$var\");
+
+OUTPUT
+T_STD_STRING
+  $arg = sv_2mortal(newSVpvn($var.c_str(), $var.length()));
+
+// Output a list.
+T_STD_VECTOR_STRING
+   {
+	    U32 ix_$var;
+        size_t size_$var = $var.size();
+        SSize_t extend_size =
+            /* The weird way this is written is because g++ is dumb
+                * enough to warn "comparison is always false" on something
+                * like:
+                *
+                * sizeof(a) > sizeof(b) && a > B_t_MAX
+                *
+                * (where the LH condition is false)
+                */
+            (size_$var > (sizeof(size_$var) > sizeof(SSize_t)
+                            ? AV_SIZE_MAX : size_$var))
+            ? -1 : (SSize_t)size_$var;
+	    EXTEND(SP, extend_size);
+	    for (ix_$var = 0; ix_$var < size_$var; ix_$var++) {
+    		ST(ix_$var) = sv_2mortal(newSVpvn(${var}[ix_$var].c_str(), ${var}[ix_$var].length()));
+	    }
+        // xsubpp adds 'ST(0) = RETVALSV' which is undef, screwing this up
+        XSRETURN(size_$var);
+    }
+
+// Output a list
+T_STD_VECTOR_MATCH
+  {
+    U32 ix_$var;
+    size_t size_$var = $var.size();
+    SSize_t extend_size =
+        (size_$var > (sizeof(size_$var) > sizeof(SSize_t)
+                        ? AV_SIZE_MAX : size_$var))
+        ? -1 : (SSize_t)size_$var;
+    EXTEND(SP, extend_size);
+    for (ix_$var = 0; ix_$var < size_$var; ix_$var++) {
+        // Build a hashref from the match object
+        const AhoCorasick::match &m = ${var}[ix_$var];
+        HV *hv = newHV();
+
+        STRLEN klen = m.keyword.length();
+
+        // 7=strlen("keyword"), 0=tell hv_store to calculate the hash
+        hv_store(hv, "word", 4, newSVpv(m.keyword.c_str(), klen), 0);
+        hv_store(hv, "start", 5, newSViv(m.start), 0);
+        hv_store(hv, "end", 3, newSViv(m.end), 0);
+
+        ST(ix_$var) = newRV_noinc((SV *)hv);
+    }
+    XSRETURN(size_$var);
+  }
+

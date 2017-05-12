@@ -1,0 +1,368 @@
+#!/usr/bin/perl -w
+# -*- perl -*-
+
+#
+# Author: Slaven Rezic
+#
+# Copyright (C) 2016,2017 Slaven Rezic. All rights reserved.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# Mail: slaven@rezic.de
+# WWW:  http://www.rezic.de/eserte/
+#
+
+use strict;
+use Errno;
+use Fcntl ();
+use Getopt::Long;
+
+use vars qw($VERSION);
+$VERSION = "0.04";
+
+# sysexits(3) constants
+use constant EX_USAGE       => 64;
+use constant EX_UNAVAILABLE => 69;
+use constant EX_SOFTWARE    => 70;
+use constant EX_OSERR       => 71;
+use constant EX_CANTCREAT   => 73;
+use constant EX_TEMPFAIL    => 75;
+
+sub set_impl ();
+sub handle_error ($);
+sub progname ();
+
+sub usage (;$) {
+    my $msg = shift;
+    if ($msg) {
+	warn $msg, "\n";
+    }
+    warn "usage: " . progname . " [-kns] [-t seconds] file command [arguments]\n";
+    exit EX_USAGE;
+}
+
+my $timeout;
+my $keep;
+my $silent;
+my $nocreat;
+
+Getopt::Long::Configure('require_order');
+GetOptions(
+	   'help|h|?' => sub { usage },
+	   'k'        => \$keep,
+	   'n'        => \$nocreat,
+	   's'        => \$silent,
+	   't=f'      => \$timeout,
+	   'v|version'            => sub {
+	       print "plockf version $VERSION\n";
+	       exit 0;
+	   },
+	  );
+
+if (defined $timeout && $timeout < 0) {
+    usage "Timeout must be positive";
+}
+
+my $lock_file = shift
+    or usage "Lock file is not specified";
+my $cmd = shift
+    or usage "Command is not specified";
+
+set_impl;
+
+my $timed_out;
+my $alarm;
+if (defined $timeout && $timeout > 0) {
+    $SIG{ALRM} = sub { $timed_out = 1 };
+    if ($timeout !~ m{^\d+$} && eval { require Time::HiRes; Time::HiRes->VERSION(1.9716); Time::HiRes->import('ualarm'); 1 }) { # do we need and can we do floating point timeouts?
+	$alarm = \&Time::HiRes::alarm;
+    } else {
+	if ($timeout < 1) { $timeout = 1 }
+	$alarm = sub { alarm($_[0]) };
+    }
+    $alarm->($timeout);
+}
+
+my $lock_fh = acquire_lock(0);
+while (!$lock_fh && !$timed_out && (!defined $timeout || $timeout > 0)) {
+    if ($^O eq 'MSWin32') {
+	# systems where alarm() does not work with blocking syscalls
+	wait_for_lock_nonblocking();
+	$lock_fh = acquire_lock(0);
+    } elsif ($keep) {
+	$lock_fh = acquire_lock(1);
+    } else {
+	wait_for_lock();
+	$lock_fh = acquire_lock(0);
+    }
+}
+
+if ($alarm) {
+    $alarm->(0);
+}
+
+if (!$lock_fh) {
+    handle_error EX_TEMPFAIL;
+}
+
+my $do_cleanup = !$keep;
+
+$SIG{TERM} = sub { exit }; # would run END block
+
+system { $cmd } $cmd, @ARGV;
+if ($? == -1) {
+    warn progname . ": calling '$cmd @ARGV' failed: $!\n";
+    exit EX_OSERR;
+} elsif ($? & 127) {
+    exit EX_SOFTWARE;
+} else {
+    my $exit_code = $? >> 8;
+    exit $exit_code;
+}
+
+END {
+    if ($do_cleanup) {
+	unlink $lock_file;
+    }
+}
+
+sub set_impl () {
+    my($block) = @_;
+    if      (   ($] <  5.010 && eval { &Fcntl::O_EXLOCK } && eval { &Fcntl::O_NONBLOCK })
+	     || ($] >= 5.010 && defined &Fcntl::O_EXLOCK && defined &Fcntl::O_NONBLOCK)) {
+	*acquire_lock  = \&acquire_lock_bsd;
+	*wait_for_lock = \&wait_for_lock_bsd;
+    } elsif (   ($] <  5.010 && eval { &Fcntl::LOCK_EX } && eval { &Fcntl::LOCK_NB })
+	     || ($] >= 5.010 && defined &Fcntl::LOCK_EX && defined &Fcntl::LOCK_NB)) {
+	*acquire_lock  = \&acquire_lock_other;
+	*wait_for_lock = \&wait_for_lock_other;
+    } else {
+	die "Can't lock on this operating system";
+    }
+}
+
+sub acquire_lock_bsd {
+    my($block) = @_;
+    my $lock_fh;
+    if (!sysopen $lock_fh, $lock_file, &Fcntl::O_RDONLY|($block ? 0 : &Fcntl::O_NONBLOCK)|&Fcntl::O_EXLOCK|($nocreat ? 0 : &Fcntl::O_CREAT), 0666) {
+	if ($!{EAGAIN} || $!{EINTR}) {
+	    return undef;
+	}
+	if ($nocreat && $!{ENOENT}) {
+	    handle_error EX_UNAVAILABLE;
+	} else {
+	    handle_error EX_CANTCREAT;
+	}
+    }
+    return $lock_fh;
+}
+
+sub wait_for_lock_bsd {
+    sysopen my $fh, $lock_file, &Fcntl::O_EXLOCK;
+    # no error handling needed; probably same failure will happen in acquire_lock_bsd
+}
+
+sub acquire_lock_other {
+    my($block) = @_;
+    my $lock_fh;
+    if (!sysopen $lock_fh, $lock_file, &Fcntl::O_RDONLY|($nocreat ? 0 : &Fcntl::O_CREAT), 0666) {
+	if ($!{EAGAIN} || $!{EINTR}) {
+	    return undef;
+	}
+	if ($nocreat && $!{ENOENT}) {
+	    handle_error EX_UNAVAILABLE;
+	} else {
+	    handle_error EX_CANTCREAT;
+	}
+    }
+    if (!flock $lock_fh, ($block ? 0 : &Fcntl::LOCK_NB)|&Fcntl::LOCK_EX) {
+	return undef;
+    }
+    if (!$keep) {
+	my @stat_file = stat $lock_file;
+	if (!@stat_file) {
+	    # file was unlinked in the meantime
+	    return undef;
+	}
+	if ($^O ne 'MSWin32') { # ino+dev are not meaningful on Windows systems
+	    my @stat_fh = stat $lock_fh;
+	    if ($stat_fh[1] != $stat_file[1] || $stat_fh[0] != $stat_file[0]) {
+		# file was unlinked in the meantime and another plockf process was faster
+		return undef;
+	    }
+	}
+    }
+    return $lock_fh;
+}
+
+sub wait_for_lock_other {
+    if (sysopen my $fh, $lock_file, &Fcntl::O_RDONLY) {
+	flock $fh, &Fcntl::LOCK_EX;
+    }
+}
+
+sub wait_for_lock_nonblocking {
+    while () {
+	last if $timed_out;
+	if (sysopen my $fh, $lock_file, &Fcntl::O_RDONLY) {
+	    return if flock $fh, &Fcntl::LOCK_EX|&Fcntl::LOCK_NB;
+	}
+	sleep 1;
+    }
+}
+
+sub handle_error ($) {
+    my $exit = shift;
+    unless ($silent) {
+	if ($exit == EX_UNAVAILABLE) {
+	    warn progname . ": cannot open $lock_file: $!\n";
+	} else {
+	    warn progname . ": $lock_file: already locked\n";
+	}
+    }
+    exit $exit;
+}
+
+sub progname () {
+    require File::Basename;
+    File::Basename::basename($0);
+}
+
+__END__
+
+=head1 NAME
+
+plockf - execute a command while holding a file lock
+
+=head1 SYNOPSIS
+
+    plockf [-kns] [-t seconds] file command [arguments]
+
+=head1 DESCRIPTION
+
+B<plockf> is a perl port of the FreeBSD utility L<lockf(1)>.
+
+The B<plockf> utility acquires an exclusive lock on a I<file>, creating
+it if necessary, and removing the file on exit unless explicitly told
+not to. While holding the lock, it executes a I<command> with optional
+I<arguments>. After the I<command> completes, B<plockf> releases the
+lock, and removes the I<file> unless the C<-k> option is specified.
+BSD-style locking is used, as described in L<flock(2)>; the mere
+existence of the I<file> is not considered to constitute a lock.
+
+If the B<plockf> utility is being used to facilitate concurrency
+between a number of processes, it is recommended that the C<-k> option
+be used. This will guarantee lock ordering, as well as implement a
+performance enhanced algorithm which minimizes CPU load associated
+with concurrent unlink, drop and re-acquire activity. It should be
+noted that if the C<-k> option is not used, then no guarantees around
+lock ordering can be made.
+
+The following options are supported:
+
+=over
+
+=item C<-k>
+
+Causes the lock I<file> to be kept (not removed) after the command
+completes.
+
+=item C<-s>
+
+Causes B<plockf> to operate silently. Failure to acquire the lock is
+indicated only in the exit status.
+
+=item C<-n>
+
+Causes B<plockf> to fail if the specified lock I<file> does not exist.
+If C<-n> is not specified, B<plockf> will create I<file> if necessary.
+
+=item C<-t I<seconds>>
+
+Specifies a timeout for waiting for the lock. By default, B<plockf>
+waits indefinitely to acquire the lock. If a timeout is specified with
+this option, B<plockf> will wait at most the given number of I<seconds>
+before giving up. A timeout of 0 may be given, in which case B<plockf>
+will fail unless it can acquire the lock immediately. When a lock
+times out, I<command> is not executed.
+
+Unlike the original L<lockf> utility, L<plockf> may handle also
+floating point timeouts on systems which implement
+C<Time::HiRes::alarm>; on Windows systems only integer timeouts are
+supported.
+
+=back
+
+In no event will B<plockf> break a lock that is held by another
+process.
+
+=head2 IMPLEMENTATION DETAILS
+
+On systems where L<open(2)> handles C<O_EXLOCK> and C<O_NONBLOCK>
+(most notably on *BSD systems) the implementation follows quite
+closely the original C implementation of L<lockf(1)>.
+
+On other systems (e.g. Linux) there's a possible race condition
+between creation and locking of the lock I<file>. Here an extra check
+is done if the lock filehandle is really done on the lock I<file>, and
+the lock procedure is re-done if not. Here it's especially recommended
+to use the C<-k> option.
+
+On Windows systems this extra check is incomplete, so it's even more
+recommended to use C<-k>.
+
+On Windows systems C<alarm()> cannot interrupt blocking system calls,
+i.e. C<flock()> (see L<perlport/alarm>). Here the timeout handling is
+implemented by periodically checking if the lock can be acquired
+(currently the interval is one second).
+
+=head1 EXIT STATUS
+
+If B<plockf> successfully acquires the lock, it returns the exit status
+produced by I<command>. Otherwise, it returns one of the exit
+codes defined in L<sysexits(3)>, as follows:
+
+=over
+
+=item C<EX_TEMPFAIL> (75)
+
+The specified lock I<file> was already locked by another process.
+
+=item C<EX_CANTCREAT> (73)
+
+The B<plockf> utility was unable to create the lock I<file>, e.g.,
+because of insufficient access privileges.
+
+=item C<EX_UNAVAILABLE> (69)
+
+The C<-n> option is specified and the specified lock I<file> does not
+exist.
+
+=item C<EX_USAGE> (64)
+
+There was an error on the B<plockf> command line.
+
+=item C<EX_OSERR> (71)
+
+A system call (e.g., fork(2)) failed unexpectedly.
+
+=item C<EX_SOFTWARE> (70)
+
+The I<command> did not exit normally, but may have been signaled or
+stopped.
+
+C<EX_SOFTWARE> is not reported on Windows systems.
+
+=back
+
+=head1 SEE ALSO
+
+L<flock(1)>, L<flock(2)>, L<open(2)>, L<sysexits(3)>, L<Fcntl>.
+
+=head1 AUTHORS
+
+Author of the perl port: Slaven Rezic <srezic@cpan.org>
+
+Author of the original FreeBSD utility: John Polstra <jdp@polstra.com>
+
+=cut

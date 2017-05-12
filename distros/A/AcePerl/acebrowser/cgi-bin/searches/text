@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+use strict;
+use vars qw/$DB $URL/;
+
+use Ace 1.51;
+use CGI 2.42 qw/:standard :html3 escape/;
+use CGI::Carp qw/fatalsToBrowser/;
+use Ace::Browser::AceSubs;
+use Ace::Browser::SearchSubs;
+
+# zero globals in utilities
+my $pattern        = param('query');
+my $search_type    = param('type');
+my $offset         = AceSearchOffset();
+
+$URL = url();
+$URL=~s!^http://[^/]+!!;
+
+# fetch database handle
+$DB = OpenDatabase() || AceError("Couldn't open database.");
+
+my ($objs,$count);
+($objs,$count) = do_search($pattern,$offset,$search_type) if $pattern;
+DoRedirect(@$objs) if $count==1;
+
+PrintTop(undef,undef,'AceDB Text Search');
+display_search_form();
+display_search($objs,$count,$offset,$pattern) if $pattern;
+PrintBottom();
+
+exit 0;
+
+sub display_search_form {
+  print p({-class=>'small'},
+	  "Type in text or keywords to search for.",
+	  "The * and ? wildcard characters are allowed.");
+  print 
+      start_form,
+      table(
+	    TR(
+	       td("Search text: "),
+	       td(textfield(-name=>'query',-size=>40)),
+	       td(submit(-label=>'Search'))),
+	    TR(
+	       td(),
+	       td({-colspan=>2},
+		  radio_group(-name=>'type',
+			      -value=>[qw/short long/],
+			      -labels=>{'short'=>'Fast search',
+					'long' =>'In-depth search'}
+			      )
+		  )
+	       )
+	  ),
+        end_form;
+}
+
+sub do_search {
+  my ($pattern,$offset,$type) = @_;
+  my $count;
+  my (@objs) = $DB->grep(-pattern=> $pattern,
+			 -count  => MAXOBJECTS,
+			 -offset => $offset,
+			 -total => \$count,
+			 -long  => $type eq 'long',
+			 );
+  return unless @objs;
+  return (\@objs,$count);
+}
+
+sub display_search {
+    my ($objs,$count,$offset,$pattern) = @_;
+    my $title = p(strong($count),"objects contain the keywords \"$pattern\"");
+	if(!$objs) {
+		 print "<b>No matches were found.</b><p>\n";
+		 return;
+	}
+    my @objects = map { ObjectLink($_,font({-color=>'red'},$_->class) . ": $_") }
+                      sort { $a->class cmp $b->class } @$objs;
+    AceResultsTable(\@objects,$count,$offset,$title) if @objects;
+}

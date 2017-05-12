@@ -1,0 +1,14 @@
+---
+name: Acme-Incorporated
+version: 1.00
+author: ~
+abstract: ~
+license: perl
+requires:
+  IO::File: ''
+  Test::Simple: 0.47
+provides:
+  Acme::Incorporated:
+    file: lib/Acme/Incorporated.pm
+    version: 1.00
+generated_by: Module::Build version 0.2611

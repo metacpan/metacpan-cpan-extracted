@@ -1,0 +1,12 @@
+0.103   2016-09-22
+  * Upgrade to electron 1.4.1
+  * Document required X11 environment variable on linux (thanks dtoso-skymesh)
+
+0.102   2016-05-12
+  * Upgrade to electron 1.0.1
+
+0.101   2015-04-30
+  * Attempt to download with curl if wget is not present
+
+0.100   2015-04-26
+  * Initial CPAN release

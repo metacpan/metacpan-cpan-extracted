@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+Persistent.pm
+t/01_setup.t
+t/02_execute.t
+META.yml                                 Module meta-data (added by MakeMaker)

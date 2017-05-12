@@ -1,0 +1,83 @@
+{
+   "abstract" : "Interface to access AWS CLI configs and credentials",
+   "author" : [
+      "YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AWS-CLI-Config",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Tiny" : "0",
+            "Object::Tiny" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "AWS::CLI::Config" : {
+         "file" : "lib/AWS/CLI/Config.pm",
+         "version" : "0.02"
+      },
+      "AWS::CLI::Config::Profile" : {
+         "file" : "lib/AWS/CLI/Config.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/key-amb/perl5-AWS-CLI-Config/issues"
+      },
+      "homepage" : "https://github.com/key-amb/perl5-AWS-CLI-Config",
+      "repository" : {
+         "url" : "git://github.com/key-amb/perl5-AWS-CLI-Config.git",
+         "web" : "https://github.com/key-amb/perl5-AWS-CLI-Config"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:KEYAMB",
+   "x_contributors" : [
+      "José Joaquín Atria <jjatria@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

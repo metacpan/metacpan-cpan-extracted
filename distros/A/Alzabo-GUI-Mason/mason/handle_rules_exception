@@ -1,0 +1,18 @@
+<%args>
+$e
+$comp
+</%args>
+
+<%init>
+delete @ARGS{ 'e', 'comp' };
+
+if ( $e && UNIVERSAL::isa( $e, 'Alzabo::Exception::RDBMSRules' ) )
+{
+    warn $e;
+
+    $m->redirect( uri( path => $comp . Alzabo::GUI::Mason::Config::mason_extension(),
+                       query => { errors => $e->error, %ARGS },
+                     ),
+                );
+}
+</%init>

@@ -1,0 +1,34 @@
+This directory contains the following examples of the use of
+Astro::SIMBAD::Client:
+
+csv
+	This script queries SIMBAD 4 about the objects named in the
+	command line, returning the results one object per line,
+	comma-separated. If the -parse option is asserted, the output
+	will be parsed by a simple CSV parser and displayed using
+	Data::Dumper. Option -help gets you brief help.
+
+parsevo
+	This script parses the VOTable files named in the input,
+	displaying the results using Data::Dumper. This is really a tool
+	used for debugging Parse_VO_Table.
+
+query
+	This script queries SIMBAD 4 about the objects named in the
+	command line, returning the results as text.
+
+script
+	This script submits the script files given on the command line
+	to SIMBAD 4, displaying the results on STDOUT.
+
+votable
+	This script queries SIMBAD 4 for the objects named on the
+	command line, returning the results as a VOTable. There are
+	options to parse the VOTable and display the parsed data in
+	either Data::Dumper or YAML format. Option -help gets you brief
+	help.
+
+votree
+	This script queries SIMBAD 4 for the objects named on the
+	command line, returning the results as a VOTable. The parse tree
+	is displayed.

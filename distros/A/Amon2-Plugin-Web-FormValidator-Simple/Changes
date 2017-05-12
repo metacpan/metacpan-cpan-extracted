@@ -1,0 +1,10 @@
+Revision history for Perl extension Amon2::Plugin::Web::FormValidator::Simple
+
+0.04    Sun Sep  9 16:33:00 2012
+        - arrange dist tar.gz
+
+0.03    Sun Sep  2 13:00:00 2012
+        - first CPAN upload
+
+0.01    Sat Sep  1 09:51:51 2012
+        - original version

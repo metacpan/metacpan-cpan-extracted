@@ -1,0 +1,9 @@
+#!/usr/local/bin/perl
+    eval 'exec /usr/local/bin/perl -S $0 ${1+"$@"}'
+	if $running_under_some_shell;
+
+# copy of "pod2html" script taken from Pod::Html module version 1.0504
+# to avoid problems with command PATH in the "pod/v2/Makefile"
+
+use Pod::Html;
+pod2html @ARGV;

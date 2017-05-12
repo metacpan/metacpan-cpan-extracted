@@ -1,0 +1,43 @@
+[% USE JSON %]
+<form method="post">
+  <h1>
+    Edit
+  </h1>
+
+  <div class="form-group">
+    <label>Location</label>
+    <pre
+      class   = "form-control-static"
+    >[%- raw.location -%]</pre>
+  </div>
+
+  <div class="form-group">
+    <label for="meta">Meta</label>
+    <textarea
+      name  = "meta"
+      class = "form-control"
+    >[%- raw.meta.json -%]</textarea>
+  </div>
+
+  <div class="form-group">
+    <label
+      for = content"
+    >Content</label>
+    <textarea
+      name  = "content"
+      class = "form-control"
+      rows  = "20"
+    >[%- raw.content -%]</textarea>
+  </div>
+
+  <div class="form-group">
+    <button
+      class = "btn btn-default submit-form-preview"
+    >Preview</button>
+    <button
+      type  = "submit"
+      class = "btn btn-primary submit-form"
+    >Update</button>
+  </div>
+
+</form>

@@ -1,0 +1,10 @@
+Revision history for Authen-Simple-WebForm
+
+0.02    2009-11-04 19:28:00
+        Add better example.
+        Added "trace" option.
+        Split lwp_request_method out to initial_request_method and
+        login_request_method.
+0.01    2009-11-04 11:05:00
+        Initial version.
+

@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Asm-X86
+version:             0.25
+abstract:            List of instructions and registers of Intel x86-compatible processors,
+license:             ~
+author:              
+    - Bogdan Drozdowski <bogdandr@op.pl>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

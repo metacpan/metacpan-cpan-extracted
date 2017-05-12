@@ -1,0 +1,22 @@
+Apache::AuthzCache is designed to work with a mod_perl
+authorization module to provide caching of group membership for
+site users. For a list of mod_perl authorization modules see:
+ 
+http://www.cpan.org/modules/by-module/Apache/apache-modlist.html
+ 
+When a request that requires authorization is received,
+Apache::AuthzCache looks up the REMOTE_USER in a shared-memory
+cache (using IPC::Cache) and compares the list of groups in the
+cache against the groups enumerated within the "require"
+configuration directive. If a match is found, the handler returns
+OK and clears the downstream Authz handlers from the
+stack. Otherwise, it returns DECLINED and allows the next
+PerlAuthzHandler in the chain to be called.
+ 
+After the primary authorization handler completes with an OK,
+Apache::AuthzCache::manage_cache adds the new group (listed in
+REMOTE_GROUP) to the cache.
+
+See AuthzCache.pm pod for detailed documentation.
+
+$Id: README,v 1.1 2000/09/26 20:11:50 cgilmore Exp $

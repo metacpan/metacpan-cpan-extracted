@@ -1,0 +1,13 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use App::Goto::Amazon;
+use feature 'say';
+
+my $name = '';
+for my $arg (@ARGV) {
+    $name .= '.*' . $arg;
+    }
+
+App::Goto::Amazon->new({ name => $name });

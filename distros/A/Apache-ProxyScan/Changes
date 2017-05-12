@@ -1,0 +1,56 @@
+Revision history for Perl extension Apache::ProxyScan.
+
+0.92  Thu Sep 30 2004
+   -  fixed handling of POST requests
+   -  fixed contact addresses 
+
+0.91  Wed Sep 29 2004
+    - first beta for use with Apache 2.0 (mod_perl 1.99_12 minimum)
+
+0.31  Sun Apr  6 2003
+    - added configuration question for mime.magic file
+
+0.30  Sat Apr  5 2003
+    - major changes on the download procedure 
+    - added a special handling for large files
+    - added short circuit configurations to speed up handling
+    - added logging into error log
+    - updated man-page and README
+
+0.26  Tue Feb 18 2003
+    - fixed prereqs in Makefile
+    - removed debugging from ProxyScan.pm
+
+0.25  Mon Feb 17 2003
+    - fixed url/file mapping with urls larger than 255 characters
+
+0.24  Wed Jan 01 2003
+    - fixed Version variable before first upload to CPAN
+    - removed debugging from rav.pl
+    - added new year to copyright message
+
+0.23  Mon Nov 26 2002
+    - fixed header bugs in ProxyScan.pm special messages
+    - fixed Version in ProxyScan.pm (forgot this in 0.22 and 0.21)
+
+0.22  Mon Nov 25 2002
+    - removed debug lines from eg/rav.pl
+    - ravlin8 fails on empty files, did workaround
+
+0.21  Sun Nov 24 2002
+    - clean up for public cpan release
+    - added README 
+    - added wrapper for rav and mcafee
+
+0.20  Thu Nov 14 2002
+    - made the interface more generally
+    - added the wrapper scripts concept and interface
+    - added wrapper for sophos and clamav
+
+0.11  Wed Nov 13 2002
+    - fixed filehandle usage
+    - changed post handling
+
+0.10  Tue Nov 12 2002
+    - original version; based Apache-DumpHeader 
+

@@ -1,0 +1,180 @@
+---
+abstract: 'lightweight web application framework'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Requires: '0.06'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amon2
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Amon2:
+    file: lib/Amon2.pm
+    version: '6.13'
+  Amon2::Config::Simple:
+    file: lib/Amon2/Config/Simple.pm
+  Amon2::ContextGuard:
+    file: lib/Amon2/ContextGuard.pm
+  Amon2::Declare:
+    file: lib/Amon2/Declare.pm
+  Amon2::Plugin::Web::FillInFormLite:
+    file: lib/Amon2/Plugin/Web/FillInFormLite.pm
+  Amon2::Plugin::Web::JSON:
+    file: lib/Amon2/Plugin/Web/JSON.pm
+  Amon2::Plugin::Web::NoCache:
+    file: lib/Amon2/Plugin/Web/NoCache.pm
+  Amon2::Plugin::Web::PlackSession:
+    file: lib/Amon2/Plugin/Web/PlackSession.pm
+  Amon2::Plugin::Web::Streaming:
+    file: lib/Amon2/Plugin/Web/Streaming.pm
+  Amon2::Plugin::Web::Streaming::Writer:
+    file: lib/Amon2/Plugin/Web/Streaming.pm
+  Amon2::Plugin::Web::WebSocket:
+    file: lib/Amon2/Plugin/Web/WebSocket.pm
+  Amon2::Setup::Asset::Blueprint:
+    file: lib/Amon2/Setup/Asset/Blueprint.pm
+  Amon2::Setup::Asset::Bootstrap:
+    file: lib/Amon2/Setup/Asset/Bootstrap.pm
+  Amon2::Setup::Asset::ES5Shim:
+    file: lib/Amon2/Setup/Asset/ES5Shim.pm
+  Amon2::Setup::Asset::MicroDispatcherJS:
+    file: lib/Amon2/Setup/Asset/MicroDispatcherJS.pm
+  Amon2::Setup::Asset::MicroLocationJS:
+    file: lib/Amon2/Setup/Asset/MicroLocationJS.pm
+  Amon2::Setup::Asset::MicroTemplateJS:
+    file: lib/Amon2/Setup/Asset/MicroTemplateJS.pm
+  Amon2::Setup::Asset::SprintfJS:
+    file: lib/Amon2/Setup/Asset/SprintfJS.pm
+  Amon2::Setup::Asset::StrftimeJS:
+    file: lib/Amon2/Setup/Asset/StrftimeJS.pm
+  Amon2::Setup::Asset::XSRFTokenJS:
+    file: lib/Amon2/Setup/Asset/XSRFTokenJS.pm
+  Amon2::Setup::Asset::jQuery:
+    file: lib/Amon2/Setup/Asset/jQuery.pm
+  Amon2::Setup::Flavor:
+    file: lib/Amon2/Setup/Flavor.pm
+  Amon2::Setup::Flavor::Basic:
+    file: lib/Amon2/Setup/Flavor/Basic.pm
+    version: '6.13'
+  Amon2::Setup::Flavor::Large:
+    file: lib/Amon2/Setup/Flavor/Large.pm
+    version: '6.13'
+  Amon2::Setup::Flavor::Minimum:
+    file: lib/Amon2/Setup/Flavor/Minimum.pm
+    version: '6.13'
+  Amon2::Setup::VC::Git:
+    file: lib/Amon2/Setup/VC/Git.pm
+  Amon2::Trigger:
+    file: lib/Amon2/Trigger.pm
+  Amon2::Util:
+    file: lib/Amon2/Util.pm
+  Amon2::Web:
+    file: lib/Amon2/Web.pm
+  Amon2::Web::Dispatcher::Lite:
+    file: lib/Amon2/Web/Dispatcher/Lite.pm
+  Amon2::Web::Dispatcher::RouterBoom:
+    file: lib/Amon2/Web/Dispatcher/RouterBoom.pm
+  Amon2::Web::Dispatcher::RouterSimple:
+    file: lib/Amon2/Web/Dispatcher/RouterSimple.pm
+  Amon2::Web::Request:
+    file: lib/Amon2/Web/Request.pm
+  Amon2::Web::Response:
+    file: lib/Amon2/Web/Response.pm
+  Amon2::Web::Response::Callback:
+    file: lib/Amon2/Web/Response/Callback.pm
+  Amon2::Web::WebSocket:
+    file: lib/Amon2/Web/WebSocket.pm
+recommends:
+  Teng: '0.18'
+requires:
+  Digest::SHA: '0'
+  Encode: '0'
+  Exporter: '0'
+  File::Copy::Recursive: '0'
+  File::ShareDir: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  HTML::FillInForm::Lite: '0'
+  HTTP::Headers: '0'
+  HTTP::Session2: '0'
+  Hash::MultiValue: '0'
+  JSON: '2'
+  MIME::Base64: '0'
+  MRO::Compat: '0'
+  Module::CPANfile: '0.9020'
+  Plack: '0.9982'
+  Plack::Request: '0'
+  Plack::Response: '0'
+  Plack::Session: '0'
+  Plack::Util: '0'
+  Pod::Usage: '0'
+  Router::Boom: '0.07'
+  Scalar::Util: '0'
+  Text::Xslate: '2.0010'
+  Time::HiRes: '0'
+  Try::Tiny: '0.06'
+  URI: '1.54'
+  URI::Escape: '0'
+  URI::QueryParam: '0'
+  parent: '0.223'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Amon/issues
+  homepage: https://github.com/tokuhirom/Amon
+  repository: git://github.com/tokuhirom/Amon.git
+version: '6.13'
+x_contributors:
+  - 'noblejasper <nobjas@gmail.com>'
+  - 'noblejasper <jasper@main.noble-jasper.com>'
+  - 'hiratara <hiratara@cpan.org>'
+  - 's-aska <s.aska.org@gmail.com>'
+  - 'Kentaro Kuribayashi <kentarok@gmail.com>'
+  - 'Yuki Ibe <yibe@yibe.org>'
+  - 'mattn <mattn.jp@gmail.com>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'rightgo09 <skyarrow09@gmail.com>'
+  - 'hatyuki <hatyuki29@gmail.com>'
+  - 'Keiji, Yoshimi <walf443@gmail.com>'
+  - 'Nishibayashi Takuji <takuji31@gmail.com>'
+  - 'dragon3 <ryuzo.yamamoto@gmail.com>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 'issm <issmxx@gmail.com>'
+  - 'hisaichi5518 <hisada.kazuki@gmail.com>'
+  - 'Adrian <adrian@investometrica.com>'
+  - 'Fuji, Goro <gfuji@cpan.org>'
+  - 'ITO Nobuaki <daydream.trippers@gmail.com>'
+  - 'Geraud CONTINSOUZAS <geraud@hyaku.nijuu.nana>'
+  - 'Geraud <geraud@genta.nealab.net>'
+  - 'Katsuhiro Konishi <konishika@gmail.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Kazuhiro Osawa <yappo@shibuya.pl>'
+  - 'Takafumi Ono <ono_pm@amber.plala.or.jp>'
+  - 'moznion <moznion@gmail.com>'
+  - 'wata <w.nagasawa@gmail.com>'
+  - 'magnolia <magnolia.k@me.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Hiroyuki Akabane <hirobanex@gmail.com>'
+  - 'Ichito Nagata <i.nagata110@gmail.com>'
+  - 'Geraud CONTINSOUZAS <geraud@scsi.nc>'
+  - 'karupanerura <karupa@cpan.org>'
+  - 'tokubass <tokubass@cpan.org>'
+  - 'clicktx <clicktx@gmail.com>'
+  - 'Koichi SATOH <r.sekia@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,709 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use 5.006002;
+
+use Astro::Coord::ECI;
+use Astro::Coord::ECI::TLE qw{ :constants };
+use Astro::Coord::ECI::TLE::Set;
+use Astro::Coord::ECI::Utils qw{ deg2rad rad2deg };
+use Astro::SpaceTrack 0.052;
+use Getopt::Long 2.32;
+use Pod::Usage;
+use POSIX qw{ strftime };
+use Time::Local;
+
+our $VERSION = '0.079';
+
+# Map -want-events values to TLE event codes.
+my %wanted_event_map = (
+    r	=> [ PASS_EVENT_RISE, PASS_EVENT_SET ],
+    m	=> [ PASS_EVENT_MAX ],
+    l	=> [ PASS_EVENT_SHADOWED, PASS_EVENT_LIT ],
+    t	=> [ PASS_EVENT_DAY ],
+);
+
+# The effect of the event on the number of satellites above the horizon.
+my %delta_number_up = (
+    &PASS_EVENT_RISE => 1,
+    &PASS_EVENT_SET => -1,
+);
+
+# Option values, with defaults.
+my %opt = (
+    'body-template'	=> '%N%t',
+    'dump-headers'	=> 0,
+    'event-template'	=> '%V %L %T',
+    finish		=> '+7',
+    geometric		=> 0,
+    height		=> 0,
+    horizon		=> 0,
+    join		=> '%n%t',
+    start		=> 'today',
+    'time-format'	=> '%d-%b-%Y %H:%M:%S',
+    twilight		=> 6,
+    'want-events'	=> 'rmlt',
+);
+
+# The usual options, since we GetOptions() more than once.
+my @lgl_opt = (
+    'help|?' => sub { pod2usage( { verbose => 2 } ) },
+    qw{
+	body-template=s dump-headers event-template=s finish=s
+	geometric! gmt!  height=f horizon=f join=s latitude=f
+	longitude=f password=s split start=s time-format=s twilight=f
+	username=s want-events=s visible!
+    }
+);
+
+my $up = 0;	# Number of bodies in sky after current event.
+my %want_event;	# Desired events.
+my %want_oid;	# Desired OID, with names if any.
+
+# Process the initialization file.
+{
+    my $fn =
+    $^O eq 'darwin' ? "$ENV{HOME}/Library/Application Support/passes.ini" :
+    $^O eq 'MSWin32' ? "$ENV{APPDATA}/passes.ini" :
+    $^O eq 'VMS' ? 'SYS$LOGIN:passes.ini' :
+	"$ENV{HOME}/.risesetrc";
+    -f $fn and load_file( $fn );
+}
+
+# Parse the -file option off the command line. If found, load the file.
+Getopt::Long::Configure( qw{ pass_through auto_version } );
+GetOptions( \%opt, qw{ file=s } )
+    or die "Bad options. Use -help for help.\n";
+Getopt::Long::Configure( qw{ no_pass_through } );
+$opt{file} and load_file( $opt{file} );
+
+# Finally, process the command line. If we do not have the required
+# information by this time, die.
+GetOptions( \%opt, @lgl_opt )
+    and $opt{username} and $opt{password}
+    and defined $opt{latitude} and defined $opt{longitude}
+    or die "Bad options. Use -help for help.\n";
+
+foreach my $evt ( split qr{}smx, $opt{'want-events'} ) {
+    exists $wanted_event_map{$evt}
+	or die "Bad -want-events code '$evt'. Use -help for help.\n";
+    foreach my $ec ( @{ $wanted_event_map{$evt} } ) {
+	$want_event{$ec} = 1;
+    }
+}
+
+# Load the hash of wanted OIDs (and optional substitute names) with
+# whatever is left in the command line.
+load_want( @ARGV );
+
+# Determine the start and end times for the calculation.
+my $start = parse_iso_time( $opt{start} );
+my $finish = $opt{finish} =~ m/ \A [+] \d+ \z /smx ?
+    ( $start + $opt{finish} * 86400 ) :
+    parse_iso_time( $opt{finish} );
+
+# Convert horizon to radians.
+my $horizon = deg2rad( $opt{horizon} );
+
+# Convert twilight to radians, and negate.
+my $twilight = deg2rad( - $opt{twilight} );
+
+# Instantiate an object to access the Space Track web site.
+my $st = Astro::SpaceTrack->new(
+    username => $opt{username},
+    password => $opt{password},
+    dump_headers => ( $opt{'dump-headers'} ? 15 : 0 ),
+    with_name => 1,
+);
+
+# Retrieve the desired data from Space Track. The ad-hocery is in case
+# the user is trying to do historical studies.
+my $rslt = $st->retrieve(
+    ( $finish < time() ?
+	{
+	    start_epoch => $start - 86400,
+	    end_epoch => $finish,
+	} : () ),
+    keys %want_oid
+);
+$rslt->is_success()
+    or die "Failed to retrieve Space Track data: ", $rslt->status_line();
+
+# Create an object to represent the observer's location
+my $station = Astro::Coord::ECI->new()->geodetic(
+    deg2rad( $opt{latitude} ),
+    deg2rad( $opt{longitude} ),
+    $opt{height} / 1000,
+);
+
+# Parse the data into TLE objects.
+my @of_interest = Astro::Coord::ECI::TLE::Set->aggregate(
+    Astro::Coord::ECI::TLE->parse( {
+	    geometric => $opt{geometric},	# Rise/set vs. geometric horizon
+	    horizon => $horizon,	# Horizon.
+	    station => $station,	# Observer
+	    twilight => $twilight,	# Twilight.
+	    visible => $opt{visible},	# Visible passes only if true.
+	},
+	$rslt->content() ) );
+
+my @events_found;	# Rise and set data.
+
+# Iterate through TLE objects
+foreach my $tle ( @of_interest ) {
+
+    # Override the common name retrieved from Space Track, if desired.
+    if ( defined ( my $name = $want_oid{ $tle->get( 'id' ) } ) ) {
+	$tle->set( name => $name );
+    }
+
+    $tle->validate( $start, $finish )	# Sanity-check the data, and
+	or next;			# punt if we can not use it.
+
+    # Iterate through each pass over the station.
+    foreach my $pass ( $tle->pass( $start, $finish ) ) {
+	
+	# Record the appropriate data.
+	if ( $opt{split} ) {
+	    # If -split is asserted, we pull out and record the
+	    # individual events.
+	    push @events_found, grep { $want_event{$_->{event}} } @{
+		$pass->{events} };
+	} else {
+	    # If -split is not asserted, we just record the whole pass.
+	    push @events_found, $pass;
+	}
+    }
+}
+
+# Sort the data by time, run it through the templating system, and
+# print.
+my $join = template( $opt{join} );
+foreach my $data ( sort { $a->{time} <=> $b->{time} } @events_found ) {
+    defined $data->{event}
+	and $up += ( $delta_number_up{ $data->{event} } || 0 );
+    print template( $opt{'body-template'}, $data ), join( $join,
+	map { template( $opt{'event-template'}, $_ ) }
+	$opt{split} ? $data : grep { $want_event{$_->{event}} } @{
+	    $data->{events} }
+    ), "\n";
+}
+
+# ------------------------ Subroutines ---------------------
+
+# $string = format_time( $time );
+# Format the time appropriately.
+sub format_time {
+    my ( $time ) = @_;
+    return strftime( $opt{'time-format'},
+	( $opt{gmt} ? gmtime $time : localtime $time ) );
+}
+
+# load_file( $file_name );
+# Load the contents of a file.
+sub load_file  {
+    my ( $fn ) = @_;
+    my $fh;
+    open $fh, '<', $fn	## no critic (RequireBriefOpen)
+	or die "Unable to open $fn: $!\n";
+    local @ARGV;
+    while ( <$fh> ) {
+	s/ \s+ \z //smx;
+	'' eq $_ and next;
+	s/ \A \s+ //smx;
+	'#' eq substr $_, 0, 1 and next;
+	push @ARGV, $_;
+    }
+    close $fh;
+    GetOptions( \%opt, @lgl_opt )
+	or die "Bad options. Use -help for help.\n";
+    load_want( @ARGV );
+    return;
+}
+
+# Load arguments into the %want_oid hash. Arguments are expected to be
+# of the form 'oid' or 'oid=name'.
+sub load_want {
+    my @args = @_;
+    foreach ( @args ) {
+	my ( $oid, $name ) = split qr{ \s*=\s* }smx, $_, 2;
+	defined $oid or next;
+	$want_oid{$oid} = $name;
+    }
+    return;
+}
+
+{
+    my $errstr;
+    my %offset;
+    my $rel_re;
+
+    BEGIN {
+	$errstr = "Invalid ISO time '%s'\n";	# sprintf format
+	%offset = (		# Seconds relative to today midnight.
+	    yesterday	=> -86400,
+	    today	=> 0,
+	    tomorrow	=> 86400,
+	);
+	$rel_re = qr/ @{[ join( '|', keys %offset ) ]} /smx;
+    }
+
+    # $time = parse_iso_time( $string );
+    # Parse an iso-8601-ish time. See the -start documentation for the
+    # format.
+    sub parse_iso_time {
+	my ( $string ) = @_;
+	my $time;
+	local $@;
+
+	# Numeric time
+	if ( $string =~ m/ \A
+	    ( \d{4} ) \D*				# Year
+	    (?: ( \d{2} ) \D*				# Month
+		(?: ( \d{2} ) \D*			# Day
+		    (?: ( \d{2} ) \D*			# Hour
+			(?: ( \d{2} ) \D*		# Minute
+			    (?: ( \d{2} ) \D* )?	# Second
+			)?
+		    )?
+		)?
+	    )? \z /smx ) {
+	    my ( $yr, $mo, $da, $hr, $mi, $sc ) = ( $1, $2, $3, $4, $5, $6 );
+	    defined $mo and --$mo;
+	    $yr -= 1900;
+	    $time = eval { time_assemble( $sc, $mi, $hr, $da, $mo, $yr ) };
+	# Relative time ('yesterday', 'today', 'tomorrow')
+	} elsif ( $string =~ m/ \A
+	    ( $rel_re ) \D*				# Relative day
+	    (?: ( \d{2} ) \D*				# Hour
+		(?: ( \d{2} ) \D*			# Minute
+		    (?: ( \d{2} ) \D* )?		# Second
+		)?
+	    )? \z /smx ) {
+	    my ( $off, $hr, $mi, $sc ) = ( $1, $2, $3, $4 );
+	    $time = eval { time_assemble( $sc, $mi, $hr, today() ) +
+		$offset{$off} };
+	}
+	defined $time
+	    and return $time;
+	die sprintf $errstr, $string;
+    }
+
+}
+
+{
+    my %effector;
+    my @event;
+    BEGIN {
+	%effector = (
+	    a => sub { return sprintf '%.1f', rad2deg( $_[0]{azimuth} ) },
+	    e => sub { return sprintf '%.1f', rad2deg( $_[0]{elevation} ) },
+	    i => sub { return $_[0]{body}->get( 'international' ) },
+	    l => sub { return $_[0]{illumination} + 0; },
+	    L => sub { return $_[0]{illumination} . '' },
+	    n => sub { return "\n"; },
+	    N => sub { return $_[0]{body}->get( 'name' ) },
+	    o => sub { return $_[0]{body}->get( 'id' ) },
+	    t => sub { return "\t" },
+	    T => sub { return format_time( $_[0]{time} ) },
+	    u => sub { return $up },
+	    v => sub { return $_[0]{event} + 0; },
+	    V => sub { return $_[0]{event} . ''; },
+	);
+	@event = qw{ set pass rise };
+    }
+
+    # $string = template( $template, $data )
+    # Format the event or pass data according to the $template value.
+    sub template {
+	my ( $template, $data ) = @_;
+	$template =~ s/ % ( . ) /
+	    $effector{$1} ? $effector{$1}->( $data ) : $1 /smxeg;
+	return $template;
+    }
+}
+
+# ( $day, $month, $year ) = today()
+# Return the current Perl day, month and year. This will be the local
+# day unless -gmt was specified.
+sub today {
+    my @time = $opt{gmt} ? gmtime : localtime;
+    return ( @time[ 3, 4, 5 ] );
+}
+
+{
+
+    my @default;
+    BEGIN {
+	@default = ( 0, 0, 0, 1, 0 );
+    }
+
+    # $time = time_assemble( $sec, $min, $hr, $day, $mon, $yr );
+    # Assemble a time from the given Perl time components. They will be
+    # interpreted as local time unless -gmt was specified.
+    sub time_assemble {
+	my @args = @_;
+	foreach my $inx ( 0 .. $#default ) {
+	    defined $args[$inx] or $args[$inx] = $default[$inx];
+	}
+	return $opt{gmt} ? timegm( @_ ) : timelocal( @_ );
+    }
+
+}
+
+__END__
+
+=head1 NAME
+
+passes - Compute satellite rise and set times
+
+=head1 SYNOPSIS
+
+ passes -user yehudi -pass menuhin -lat 42 -lon -90 25544=ISS
+ passes -file driver.txt
+ passes -help
+ passes -version
+
+=head1 DESCRIPTION
+
+This Perl script downloads TLE data for specified satellites from the
+Space Track web site, and uses these data to predict passes of the
+satellites over the observer during the desired period of time. Output
+is normally chronological by culmination time. If C<-split> is
+specified, output is chronological by individual event time. Location-
+and user-specific options such as observing location and Space Track
+account information can be specified in a configuration file.
+
+The configuration of this script consists of L</OPTIONS> (documented
+below) and the OID numbers to be displayed. You can override Space
+Track's common name for the object by suffixing C<=your_desired_name> to
+the OID. An example of this occurs in the L</SYNOPSIS>.
+
+By default, output is one line per pass. You can get an event per line
+by specifying the C<-split> option.
+
+By default, the reporting period is the seven days beginning at midnight
+on the current day. You can change this using the C<-start> and
+C<-finish> options.
+
+Output is controlled by a templating system. In general the output line
+consists of satellite-specific data followed by event-specific data. The
+satellite-specific data are specified by the C<-body-template> option.
+The event-specific data are specified by the C<-event-template> option.
+Time formats (for C<strftime(3)>) are set using the C<-time-format>
+option.  The string used to separate multiple events on the same line is
+specified by the C<-join> option.
+
+=head1 OPTIONS
+
+Several options are available. Option names may be abbreviated down to
+the shortest unique abbreviation, but the shortest abbreviation may
+change if new options are added.
+
+Not all the options are in fact optional. Some of them specify
+information this script needs to run. You must provide values for
+options C<-username> and C<-password> to obtain satellite information,
+and C<-latitude> and C<-longitude> to provide the location of the
+observer. You may wish to provide the C<-height> for the observer as
+well. You need not specify these if you specify C<-help> or
+C<-version>, since both cause the script to exit after they are
+encountered.
+
+Other options may be of particular interest. To change the reporting
+period, use C<-start> and C<-finish>. To report only passes which can
+actually be seen from the ground, use C<-visible>. To report rises and
+sets separately, use C<-split>.
+
+=over
+
+=item -body-template template_string
+
+This option specifies the template used to insert information about the
+satellite into the output. The templating system is described under the
+C<-event-template> option, below.
+
+The %a (azimuth) and %e (elevation) specifications do nothing useful in
+a C<-body-template>.
+
+The default is '%N%t' (i.e. the name of the satellite, followed by a
+horizontal tab).
+
+=item -event-template output_template
+
+This option specifies the template used to insert information about an
+individual pass event into the output.
+
+All characters in the template are output verbatim, except for the '%',
+which is magic. Data from the event are substituted into the output
+according to the character that follows the '%', as follows:
+
+ a - azimuth of event in degrees from north;
+ e - elevation of event in degrees above geometric horizon;
+ i - international launch designator of satellite;
+ l - illumination (lit or not, PASS_EVENT_* numeric code,
+     undefined in -body-template);
+ L - illumination (string, if available, undefined in
+     -body-template);
+ n - a literal newline;
+ N - name of satellite;
+ o - OID (SATCAT ID) of satellite;
+ t - a literal horizontal tab;
+ T - event time (or culmination time in -body-template);
+ u - number of satellites up after event (undefined if
+     -split is not asserted);
+ v - event (Astro::Coord::ECI::TLE PASS_EVENT_* numeric code);
+ V - event (string, if available from Astro::Coord::ECI::TLE);
+ % - a literal '%'.
+
+The behavior when any other character follows the '%' is undefined. The
+word 'undefined' does not mean that you get a literal C<undef> under
+those circumstances. It means that the behavior (whatever it is) may not
+be what you expect or want, and that it may change without notice.
+
+All times are formatted according to the value of the C<-time-format>
+option.
+
+The default template is '%V %L %T' (that is, the name of the event,
+whether the satellite is lit or shadowed, and the time of the event).
+
+=item -finish iso_time_or_days
+
+This option specifies the finish time. It is either an ISO-8601-ish
+string such as is legal for C<-start>, or a plus sign followed by an
+integer, which is the number of days after the C<-start> time.
+
+The default is '+7'.
+
+=item -geometric
+
+This option specifies that rise and set take place when the satellite
+crosses the geometric horizon, regardless of the setting of the
+C<-horizon> option. If not asserted, rise and set take place when the
+satellite crosses the elevation specified by the C<-horizon> option.
+
+This option can be negated by specifying C<-nogeometric>.
+
+The default is C<-nogeometric>
+
+=item -gmt
+
+This option specifies that times be either GMT (if asserted) or local
+(if negated). It can be negated by specifying C<-nogmt>.
+
+The default is C<-nogmt>.
+
+=item -height meters_above_geoid
+
+This option specifies the observer's height in meters above the WGS84
+geoid.
+
+The default is 0.
+
+=item -horizon degrees_of_elevation
+
+This option specifies the effective horizon in degrees above (or below,
+if negative) the geometric horizon.
+
+The default is 0.
+
+=item -join joining_string
+
+This option specifies the string to be inserted between events in the
+output. This string is run through the templating system before use, but
+the only supported characters after a percent sign are 't' to insert a
+horizontal tab, 'n' to insert a newline, and '%' to insert a literal
+percent sign.  The results of using any other character after a percent
+sign are undefined.
+
+The default is '%n%t' (that is, a newline followed by a horizontal tab).
+
+=item -latitude degrees_north_of_equator
+
+This option specifies the observer's latitude in degrees. South
+latitudes are negative.
+
+This option must be specified. There is no default.
+
+=item -longitude degrees_east_of_prime_meridian
+
+This option specifies the observer's longitude in degrees east of
+Greenwich England. West longitudes are negative.
+
+This option must be specified. There is no default.
+
+=item -password spacetrack_password
+
+This option specifies the Space Track password.
+
+This option must be specified. There is no default.
+
+=item -split
+
+This option reports individual events of a pass separately. This may be
+more useful for telling how many satellites are above the horizon at a
+given time. If negated (which is the default, and which can be specified
+explicitly by C<-nosplit>) you get all events for the pass on the same
+line.
+
+The default is C<-noevent>.
+
+=item -start iso_time
+
+This option specifies the start time as an ISO-8601-ish time. Only the
+year-month-day-hour-minute-second version of the specification is
+implemented. Years must be 4 digits, and all other fields must be two
+digits. Trailing fields can be omitted, and default to 00 or 01 as
+appropriate. Non-numeric characters may appear between fields, and after
+the final field. So, for example,
+
+ -start 2010-04-01:00:00:00
+
+specifies a start at midnight of April 1 2010. In fact, so does
+
+ -start 201004
+
+As a convenience, the date portion can be replaced by one of the strings
+C<yesterday>, C<today>, or C<tomorrow>. So data starting today at noon
+can be specified as
+
+ -start today12
+
+The default is 'today', meaning midnight, since all the time fields
+default to 0.
+
+=item -split
+
+If asserted, this option causes each event of the pass to be reported on
+a separate line of output.
+
+The default is C<-nosplit>.
+
+=item -time-format strftime_format
+
+This option sets the strftime(3) format used to format the time in the
+output.
+
+The default is '%d-%b-%Y %H:%M:%S' (that is, day, month name, four-digit
+year, hour, minute, second).
+
+=item -twilight degrees_below_horizon
+
+This options sets the number of degrees the Sun is below the horizon at
+the beginning or end of twilight. Unlike the C<satpass> script, you must
+specify a number.
+
+The default is 6, which corresponds to civil twilight.
+
+=item -username spacetrack_username
+
+This option specifies the Space Track user name.
+
+This option must be specified. There is no default.
+
+=item -visible
+
+If asserted, this option causes only visible passes to be reported. A
+pass is considered visible if the satellite is sunlit and the observer
+is in darkness during some portion of the pass. The rise or set may
+actually not be visible.
+
+This option can be negated by specifying C<-novisible>.
+
+The default is C<-novisible>.
+
+=item -want-events event_types
+
+This option specifies what pass events are wanted in the output. The
+value is a string composed of one or more individual event type codes,
+as follows:
+
+ r = rise and set;
+ m = maximum elevation (culmination);
+ l = illumination (passing into sunlight or shadow);
+ t = beginning or end of twilight
+
+=back
+
+The default is 't'.
+
+=head1 FILES
+
+Configuration for this script can be done by a file as well as on the
+command line. Configuration information is taken in the following order:
+
+=over
+
+=item 1) The default configuration file, if any.
+
+=item 2) The file specified by the C<-file> command option, if any.
+
+=item 3) The command line.
+
+=back
+
+In the case of command options, the last-specified value of a given
+option is the one used. Boolean options (e.g. C<-gmt>) can be negated by
+prefixing 'no' (e.g. C<-nogmt>).
+
+The lists of OIDs from the above sources are simply concatenated.
+
+Blank lines and lines beginning with '#' are ignored in configuration
+files, as are leading and trailing whitespace on a line. Each non-blank
+non-comment line in a configuration file goes to make up a single token
+in a command line that is built internally and parsed.
+
+This means that each option must be specified on a line by itself, as
+must each OID. If an option takes a value, that value must either be
+joined to the option name by an equals sign, or appear on the next line.
+
+An example configuration file might look like this:
+
+ # Observing location:
+ # Elysee Palace, Rue Faubourg Saint-Honore, Paris
+ -latitude=48.870727
+ -longitude=2.316925
+ -height=32
+ #
+ # Space Track login
+ -username=nicolas
+ -password=sarkozy
+
+The name and location of the default configuration file depend on the
+host operating system.
+
+For Darwin (Mac OS X) the default configuration file is
+F<$HOME/Library/Application Support/passes.ini>.
+
+For MSWin32 the default configuration file is F<%APPDATA%/passes.ini>.
+
+For VMS the default configuration file is F<SYS$LOGIN:passes.ini>.
+
+For any other operating system, the default configuration file is
+F<$HOME/.risesetrc>.
+
+=head1 BUGS
+
+Bugs can be reported to the author by mail, or through
+L<http://rt.cpan.org/>.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III (F<wyant at cpan dot org>)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010-2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

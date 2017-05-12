@@ -1,0 +1,103 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Util run-cmd related functions.
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More tests => 40;
+
+use_ok("Arch::Util", "save_file", "load_file");
+use_ok("Arch::TempFiles");
+use_ok("Arch::Session");
+use_ok("IO::Handle");
+
+my $tmp = Arch::TempFiles->new;
+my $dir = $tmp->dir;
+die "Internal: Arch::TempFiles::dir didn't create dir\n" unless $dir && -d $dir;
+
+sub run_func (@) {
+	my $func = shift;
+	my $cmd = "$func(" . join(", ", map { "'" . (ref($_) || $_) . "'" } @_) . ")";
+	$func = "Arch::Util::$func";
+	my ($result_assign, $result, @result) = ("");
+	if (defined wantarray && !wantarray) {
+		$result_assign = '$result = ';
+		$cmd .= " (scalar context)";
+	} elsif (wantarray) {
+		$result_assign = '@result = ';
+		$cmd .= " (list context)";
+	}
+	eval "$result_assign$func(" . (@_ ? '@_' : '') . ");";
+	if ($@) {
+		fail($cmd . ": $@");
+	} else {
+		pass($cmd);
+	}
+	return unless defined wantarray;
+	return wantarray? @result: $result;
+}
+
+SKIP: {
+skip("no valid /bin/ls and /bin/cp", 29) unless -x "/bin/ls" && -x "/bin/cp";
+my ($ls_output, @ls_output);
+
+$ls_output = run_func("run_cmd", "ls $dir");
+@ls_output = run_func("run_cmd", "ls $dir");
+is($ls_output, "",                "check ls empty_dir (scalar)");
+ok(!@ls_output,                   "check ls empty_dir (list)");
+
+my $content = "Some unimportant content\n";
+my $file1 = "$dir/file1";
+my $file2 = "$dir/file2";
+my $file3 = "$dir/file3";
+save_file($file1, $content);
+ok(-f $file1,                     "check save_file creation");
+
+$ls_output = run_func("run_cmd", "ls $dir");
+@ls_output = run_func("run_cmd", "ls $dir");
+is($ls_output, "file1\n",         "check ls single_file_dir (scalar)");
+is_deeply(\@ls_output, ["file1"], "check ls single_file_dir (list)");
+
+run_func("run_cmd", "cp $file1 $file2");
+run_func("run_cmd", "cp", $file1, $file3);
+ok(-f $file2,                     "check cp file creation 1");
+ok(-f $file3,                     "check cp file creation 2");
+is(load_file($file2), $content,   "check cp content 1");
+is(load_file($file3), $content,   "check cp content 2");
+
+$ls_output = run_func("run_cmd", "ls $dir");
+@ls_output = run_func("run_cmd", "ls $dir");
+is($ls_output, "file1\nfile2\nfile3\n", "check ls three_file_dir (scalar)");
+is_deeply(\@ls_output, [qw(file1 file2 file3)], "check ls three_file_dir (list)");
+
+my $ls_output2 = run_func("run_cmd", "ls $dir $dir");
+my @ls_output2 = run_func("run_cmd", "ls $dir $dir");
+my $ls_output3 = run_func("run_cmd", "ls", $dir, $dir);
+my @ls_output3 = run_func("run_cmd", "ls", $dir, $dir);
+$ls_output2 =~ s/^(.*:|)\n//mg;
+$ls_output3 =~ s/^(.*:|)\n//mg;
+@ls_output2 = grep { !/^(.*:|)$/ } @ls_output2;
+@ls_output3 = grep { !/^(.*:|)$/ } @ls_output3;
+is($ls_output2, $ls_output x 2,   "check ls three_file_dir x 2 (scalar)");
+is(@ls_output2, @ls_output * 2,   "check ls three_file_dir x 2 (list)");
+is($ls_output3, $ls_output x 2,   "check ls three_file_dir x 2 (scalar)");
+is(@ls_output3, @ls_output * 2,   "check ls three_file_dir x 2 (list)");
+
+my $fh = run_func("run_pipe_from", "ls", $dir);
+my @files = map { chomp; $_ } $fh->getlines;
+is_deeply(\@files, \@ls_output,   "check ls pipe lines");
+$fh->close;
+}
+
+my $arch_backend = run_func("arch_backend");
+my $is_tla_functional = run_func("is_tla_functional");
+
+SKIP: {
+	skip "No functional arch backend", 5 unless $is_tla_functional;
+	run_func("run_tla", "-h");
+	my $tla_output = run_func("run_tla", "--version");
+	my @tla_output = run_func("run_tla", "--version");
+	like($tla_output, qr/\b(Tom Lord|Arch|Bazaar|tla|baz)\b/, "check $arch_backend --version output (scalar)");
+	ok(@tla_output > 0,               "check $arch_backend --version output (list)");
+}

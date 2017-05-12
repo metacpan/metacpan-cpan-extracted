@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_compile.t
+t/01_static.t
+lib/Attribute/Static.pm
+META.yml                                 Module meta-data (added by MakeMaker)

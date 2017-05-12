@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/App/mimi.pm
+lib/App/mimi/db.pm
+mimi.fatpack
+minil.toml
+script/mimi
+t/db.t
+t/lib/TestDB.pm
+t/migrator.t
+util/fatpack.sh
+META.yml
+MANIFEST

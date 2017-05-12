@@ -1,0 +1,252 @@
+$Author: mil $ $Rev: 335 $
+$Date: 2011-06-08 20:47:46 +0200 (Wed, 08 Jun 2011) $
+
+Revision history for Perl extension Apache::Gallery.
+
+1.0.2 Wed Jun  8 20:47:16 CEST 2011
+
+	- Extended GalleryUnderscoresToSpaces to filenames as well.
+	  (Debian bug #348724, Francesco PotortÃ¬)
+	- Added txt to GalleryDocFile, the code in Gallery.pm already
+	  allowed it.  (Luca Capello)
+	- Added text-html.png and text-txt.png icons.
+	  (Debian bug #423004, Luca Capello)
+	- Fixed counter typo for <directory>.folder in next directory
+	  menu item.  (Luca Capello)
+	- Added support to ignore items through <directory|file>.ignore.
+ 	  (Debian bug #619625, Luca Capello)
+	- Fixed spelling typos in Gallery.pm and README.  (Luca Capello)
+	- GalleryCacheDir defaults to /var/cache/www/ per the FHS-2.3.
+	  (Debian bug #337197, Luca Capello)
+	- Fixed two minor POD errors (Michael Legart)
+
+1.0.1 Wed Feb 23 20:45:38 CET 2011
+
+	- Added missing template files to MANIFEST
+
+1.0 Tue Feb 22 21:54:31 CET 2011
+
+	- Handle files that match both GalleryDocFile and GalleryImgFile
+	  correctly. (Claus Faerber)
+	- Only respond to HEAD and GET requests, enabling users to use
+	  WebDAV for upload (Andreas Plesner)
+	- Added new option GalleryCommentExifKey to get comments from
+	  EXIF data (Michael Legart)
+	- Added new option GalleryEnableMediaRss to enable generation of
+	  a media RSS feed for each directory listing. This works with
+	  e.g. the plugin from http://piclens.com to enable 3D viewing
+	  of your gallery. (Michael Legart)
+	- Make browser-caching work with mod_perl 2. Supports If-None-Match
+	  and If-Modified-Since headers. Sets Last-Modified-Date and
+	  ETag headers. (Michael Legart)
+
+1.0RC3 Fri Sep 16 10:27:48 CEST 2005
+
+	- Add watermark even when picture doesn't need to be rescaled
+	  (Andreas Plesner)
+	- Fix logging to work in Apache 1.3 (Andreas Plesner)
+	- Bugfix: If only one GallerySize was specified, the image's
+	  max width was autmatically added to GallerySizes
+	  (Andreas Plesner)
+	- Bugfix: Locate thm files if they are called .thm or .THM 
+		(Michael Legart)
+
+1.0RC2 Wed Jun  1 09:11:50 CEST 2005
+
+	- Added access keys for navigation (Michael Knudsen)
+
+1.0RC1 Tue May 24 13:31:50 CEST 2005
+
+	- Added submit button to form in selection mode (Vlad Marchenko)
+	- Added new option GalleryRootPath for use when the gallery
+	  is not running from the root of the virtual host (Lubomir Host)
+	- Report proper errors when there are problems with templates (Don Armstrong)
+	- Support newest mod_perl2 version (Philip Paeps)
+
+0.9.1 Sat Sep 11 23:52:16 CEST 2004
+
+	- Fix mod_perl 1 support that was broken with 0.9 (Michael Legart)
+
+0.9 Sat Sep 11 22:03:20 CEST 2004
+
+	- Handle .thm for all filetypes and not just tiff, gif and png
+		(Michael Legart)
+	- Make GallerySortBy work for directories (Michael Legart)
+	- Make GalleryDirSortBy override GallerySortBy for directories
+	  (Andreas Plesner)
+	- Report 404 for HEAD requests to non-existing files or directories
+	  (Michael Legart)
+	- Scale images when they are requested from the cache instead of
+	  before the index is displayed. (Michael Legart)
+	- Sort pictures the same way when viewing images as when viewing
+	  directories (Andreas Plesner)
+	- Make the "back" link on the error page work in IE (Michael Legart)
+	- Fixed the TITLE tag for folder comments (Ondra Kudlik)
+	- New option GalleryUnderscoresToSpaces to convert underscores to
+	  spaces in the listing of directories. (Ondra Kudlik)
+	- Bugfix for when running outside a virtual host (Jeffrey Hartmann)
+	- Support Apache2 on FreeBSD (Jesper Dalberg)
+	- Avoid false 404 errors when running under mod_perl 2 (Tom Brown)
+
+0.8 Sun Mar  7 11:22:00 CET 2004
+
+	- Remember choosen width by setting a cookie (Rene Joergensen)
+	- Fixed a bug where $EXIFVALUES was left blank if a picture
+	  had a comment. (Michael Legart)
+	- Fixed a bug where one line comments was showed as $COMMENT
+	  (Jesper Skriver)
+	- Fixed a bug where comments did not get shown when using
+	  the variables exif mode (Thomas L. Kjeldsen)
+	- Added two new configuration options GalleryDocFile and
+	  GalleryImgFile that makes it possible to configured which
+	  filetypes should be displayed. See the documentation for
+	  details. (Guillaume Rousse)
+	- Added new option GalleryThumbnailSizeLS. If set to 1,
+	  GalleryThumbnailSize is the long and the short side
+	  of the thumbnail image instead of the width and height.
+	  (Don Armstrong)
+	- Switched to use Text::Template instead of CGI::FastTemplate,
+	  see the UPGRADE file for details. (Don Armstrong)
+	- Create copyright notices on pictures using truetype fonts
+    instead of png images. Font, color and size can be configured
+    (Thomas Petersen, Michael Legart)
+
+0.7 Mon Sep  8 22:30:35 CEST 2003
+
+	- Support mod_perl version 1 and 2 (1.99) (Michael Legart)	
+	- Send status code 500 on errors, 404 on file not found and
+	  make IE show our own errorpage. (Thomas L. Kjeldsen)
+	- Bugfix for directories named "0" (Andreas Plesner Jacobsen)
+	- Added "selection mode". Select images with checkboxes and
+	  get a list of filenames. (Peter Andreasen)
+	- Fix to let the module work with perl 5.005 (Aaron)
+	- Do not allow scaling pictures to sizes above their
+	  original size (Aaron)
+	- Added GalleryUseFileDate option to make A::G show
+	  the files timestamps instead of using the EXIF value (Dennis Haney)
+	- Remember display size when turning Slideshow off (Hans Joergensen)
+	- Nice new layout (Thomas Kjaer)
+	- New option GalleryEXIFMode to control the way EXIF
+	  info is displayed. See docs for details (Michael Legart)
+	- Support for the FNumber EXIF value (Thomas Corell)
+	- Added GalleryRootText option to allow changing the name of
+	  the root element in the menu (Christopher Knight)
+	- Use Image::Imlib2 instead of Inline::C (Andreas Plesner Jacobsen)
+	- New option GalleryMaxThumbnailsPerPage to limit the number
+	  of thumbnails displayed per page. Disabled by default
+	  and requires templates update. (Michael Legart)
+	- Bugfix for the GalleryThumbnailSize option. Both height and
+	  width max sizes are now obeyed. (David Gee)
+
+0.6 Tue Apr 22 10:24:40 CEST 2003
+
+	- Apache now internally handles image dispatch which enables
+	  use of all Apache caching possibilities (Thomas Eibner)
+	- Documentation and better implementation of the .folder
+	  feature. (Jesper Skriver)
+	- Support the EXIF Orientation key for automatic rotate,
+	  if your camera supports that - like Canon G3. You can
+	  disable this by setting GalleryAutoRotate to 0 (Me)
+	- Works with Inline > 0.42 (Andreas Plesner)
+	- Show nice icons and allow downloads for doc,mp3,ogg,rtf,wav
+	  and wmv in addition to the current movie types (Me)
+	- Now displays nice values for Aperture,FocalLength,ShutterSpeed
+	  exif values (Thomas Eibner) 
+	- Directory comments added (Hans Joergensen)
+	- New GallerySortBy option to allow sort by time, size etc (Iain Wade)
+	- Set width/height on thumbnail images for better performance (Iain Wade) 
+
+0.5.1 Sat Nov  9 11:49:29 CET 2002
+
+	- InlineDir is no longer configurable using PerlSetVar, which
+	  fixes make test. (Me)
+	- Added test-suite (Me, Andreas Plesner Jacobsen)
+	- Write to the error log if unable to open files in the cache (Me)
+	- cache_dir changed to use File::Spec to make Apache::Gallery
+	  more portable. It may even run under Windows now? (Andreas Plesner Jacobsen)
+
+0.5 Sun Sep 15 11:55:56 CEST 2002
+
+	- Added slideshow feature (Me)	
+	- Code cleanup (Me)
+	- Moved the cache to one single directory outside the webscope (Rene Joergensen)
+	- Allow user to customize the "No info found" message (Me)
+
+0.4.1 Sun Aug 11 17:48:09 CEST 2002
+
+	- URI Escape image URL in the size selection URLs. (Me)
+	- Fixed bug where .cache directory was not created when requesting images directly (Me)
+	- Don't allow scaling images more than their original size (Jan Chrillesen)
+	- Handle already rotated images correct (Jan Chrillesen, Me)
+	- Fix bug when rotating pictures and a .thm file was present (Thomas Eibner)
+	- Apache::Gallery now allows for regular files to be served correctly (Thomas Eibner)
+	- Support for detailed flash information from Image::Info 1.11 (Me, Allan Joergensen)
+	- Moved Apache::Gallery into subversion revision control instead of CVS (Me)
+
+0.4 Sun Jun  2 13:11:09 CEST 2002
+
+	- Round height and width to integers when scaling to avoid
+	  widths like 640x479.393939393939 (Me)
+	- Regenerate scaled pictures and thumbnails if the original
+	  image has changed, the image.rotate file has been added or
+	  changed or if the copyright image was added og changed. (Me)
+	- Don't show files starting with "." in the thumbnail index (Yann Kerhervé)
+	- Made thumbnailsizes configurable with the GalleryThumbnailSize
+	  option. (Me)
+	- Print "Unknown" instead of $INFO in the imageinfo field if
+	  unable to find any EXIF information. (Me)
+	- Added perldoc documentation of the module and a installationguide. (Me)
+	- Always list directories before images (Me)
+	- Allow textfiles (ie, robots.txt) (Me)
+	- Fixed a bug where $FILES was printed instead of "Empty directory"
+	  if directory contained unsupported files (.txt, .htaccess etc) (Me)
+	- New templates where folders doesn't get displayed one on each line (Thomas Kjaer)
+	- Works without a VirtualHost now (Does not use DocumentRoot) (Peter Breton) 
+	- New option GalleryWrapNavigation to enable a new feature in the
+	  pictureview where "Next" at the end displays the first picture etc
+		(Peter Breton/Me)
+	- New option AllowOriginal for the user to be able to download the
+	  original picture, not enabled by default (Thomas Eibner)
+	- TIFF and PPM support (Thomas Eibner)
+	- Initial movie support - download movie clips (Rene Joergensen)
+
+0.3.1 Thu Jan 10 15:47:39 CET 2002
+
+	- Fixed a huge memoryleak.
+
+0.3 Wed Jan  2 00:25:21 CET 2002
+
+	- Made Inline dir configurable. (Tim Coleman)
+	- Made it configurable which information about the image
+	  should be viewed. (Thomas Eibner)
+	- Added GallerySizes option. You can now choose which
+	  resolutions the user can scale between. The Gallery
+	  will not allow scaling to 641x480 if you only configured
+	  640x480. (To prevent evil people filling up your disk) (Me)
+	- Handle spaces in files and directories correct. 
+	- Now possible to rotate pictures on the fly. (Thomas Eibner)
+	- Copyright picture can be included on each picture (Thomas Eibner)
+	- Comments for each picture changed to be in 
+	  picture.jpg.comments (Thomas Eibner)
+  - Scale thumbnails correct when images are rotated 90-degrees. (Me)
+
+0.2 Sun Oct 14 19:57:06 2001
+	- addcomments.pl renamed to gallery-editcomments.pl
+	- Added "viewing picture X of Y" when viewing images
+	- Switched to using Imlib2 instead of GD. Apache::Gallery
+	  now supports all the image formats Imlib2 supports.
+	- Added gallery-buildcache.pl script to generated thumbnails
+	  (Usefull if your browser times out the first time you
+		visit a new gallery)
+
+0.1.1 Sat Sep 30 01:10:03 2001
+	- Added src/addcomments.pl script for editing picture
+	  comments.
+
+	- Templates have been updated by Erwin Lansing and 
+	  Thomas Kjaer and are now much nicer by default!
+
+0.1  Mon Aug 20 19:38:31 2001
+	- original version; created by h2xs 1.21 with options
+		-XA -n Apache::Gallery
+

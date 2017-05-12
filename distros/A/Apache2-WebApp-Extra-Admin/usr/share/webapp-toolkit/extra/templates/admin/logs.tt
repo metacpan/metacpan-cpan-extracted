@@ -1,0 +1,201 @@
+[%#
+   Apache2::WebApp::Toolkit - Admin Control Panel (logs.tt)
+   Copyright (C) 2010 Marc S. Brooks <mbrooks@cpan.org>
+
+   Licensed under the terms of the BSD License
+   http://www.opensource.org/licenses/bsd-license.php
+-%]
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Logs</title>
+
+	<meta http-equiv="pragma" content="no-cache" />
+
+	<script type="text/javascript" src="/extras/admin/js/disable.js"></script>
+
+	<style type="text/css">
+		@import url( /extras/admin/css/base.css );
+		@import url( /extras/admin/css/content.css );
+		@import url( /extras/admin/css/form.css );
+		@import url( /extras/admin/css/results.css );
+	</style>
+</head>
+<body>
+
+<noscript>
+	<h2>
+		To use this admin you must have a JavaScript-enabled browser
+	</h2>
+</noscript>
+
+
+<!-- page begin -->
+
+<div id="page">
+	<div class="print">
+		<a onClick="window.print()" title="Print">
+			Print
+		</a>
+	</div>
+
+	<h2 class="title">
+		Logs
+	</h2>
+</div>
+
+<!-- page end -->
+
+
+<div id="split">
+	<hr></hr>
+</div>
+
+
+<!-- navtop begin -->
+
+<div id="navtop">
+
+
+	<!-- results begin -->
+
+	<div class="results">
+
+	[% IF data.results.total %]
+		Listing [% data.results.first %] - [% data.results.last %] of [% data.results.total %] entries
+	[% ELSE %]
+		No results found..
+	[% END %]
+
+	</div>
+
+	<!-- results end -->
+
+
+</div>
+
+<!-- navtop end -->
+
+
+[% IF data.pages.total > 1 %]
+<form method="post" action="/app/admin/logs" name="view">
+<input type="hidden" name="cmd" value="submit" />
+<input type="hidden" name="start" value="" />
+<input type="hidden" name="sc" value="[% sc %]" />
+<input type="hidden" name="so" value="[% so %]" />
+
+</form>
+
+<script type="text/javascript">
+<!--//
+function startWith(num) {
+	document.view.start.value = num;
+	document.view.submit();
+}
+//-->
+</script>
+
+
+<!-- pages begin -->
+
+<div id="pages">
+	<p class="info">
+		Page [% data.pages.current %] of [% data.pages.total %]
+	</p>
+
+	<p class="links">
+		[% data.pages.links %]
+	</p>
+</div>
+
+<!-- pages end -->
+[% END %]
+
+
+[% IF data.results.total %]
+<div id="shadow">
+
+<!-- table begin -->
+
+<table id="table">
+	<tr>
+		<td class="[% IF sc == 'admin_log_username' %]on[% ELSE %]off[% END %]">
+			<a class="[% IF so == 'desc' %]desc[% ELSE %]asc[% END %] default" href="/app/admin/logs/?sc=admin_log_username&so=[% IF sc == 'admin_log_username' && so == 'desc' %]asc[% ELSE %]desc[% END %]&start=[% start %]" title="Sort [% IF so == 'desc' %]Desc[% ELSE %]Asc[% END %]">
+				<strong>
+					User Name
+				</strong>
+			</a>
+		</td>
+		<td class="[% IF sc == 'admin_log_action' %]on[% ELSE %]off[% END %]">
+			<a class="[% IF so == 'desc' %]desc[% ELSE %]asc[% END %] main_1" href="/app/admin/logs/?sc=admin_log_action&so=[% IF sc == 'admin_log_action' && so == 'desc' %]asc[% ELSE %]desc[% END %]&start=[% start %]" title="Sort [% IF so == 'desc' %]Desc[% ELSE %]Asc[% END %]">
+				<strong>
+					Action
+				</strong>
+			</a>
+		</td>
+		<td class="[% IF sc == 'admin_log_user_ip_addr' %]on[% ELSE %]off[% END %]">
+			<a class="[% IF so == 'desc' %]desc[% ELSE %]asc[% END %] default" href="/app/admin/logs/?sc=admin_log_user_ip_addr&so=[% IF sc == 'admin_log_user_ip_addr' && so == 'desc' %]asc[% ELSE %]desc[% END %]&start=[% start %]" title="Sort [% IF so == 'desc' %]Desc[% ELSE %]Asc[% END %]">
+				<strong>
+					IP Address
+				</strong>
+			</a>
+		</td>
+		<td class="[% IF sc == 'created' %]on[% ELSE %]off[% END %]">
+			<a class="[% IF so == 'desc' %]desc[% ELSE %]asc[% END %] date" href="/app/admin/logs/?sc=created&so=[% IF sc == 'created' && so == 'desc' %]asc[% ELSE %]desc[% END %]&start=[% start %]" title="Sort [% IF so == 'desc' %]Desc[% ELSE %]Asc[% END %]">
+				<strong>
+					Created
+				</strong>
+			</a>
+		</td>
+	</tr>
+
+<!-- loop begin -->
+
+[% FOREACH row IN data.results.loop %]
+	<tr onMouseOver="this.bgColor='#FFFF00'" onMouseOut="this.bgColor='#FFFFFF'">
+		<td class="left default">
+			[% row.admin_log_username %]
+		</td>
+		<td class="main_2">
+			[% row.admin_log_action %]
+		</td>
+		<td>
+			[% row.admin_log_user_ip_addr %]
+		</td>
+		<td class="right">
+			[% row.created %]
+		</td>
+	</tr>
+[% END %]
+
+<!-- loop end -->
+
+</table>
+
+<!-- table end -->
+
+
+</div>
+[% END %]
+
+[% IF data.pages.total > 1 %]
+<!-- pages begin -->
+
+<div id="pages">
+	<p class="info">
+		Page [% data.pages.current %] of [% data.pages.total %]
+	</p>
+
+	<p class="links">
+		[% data.pages.links %]
+	</p>
+</div>
+
+<!-- pages end -->
+[% END %]
+
+</body>
+</html>

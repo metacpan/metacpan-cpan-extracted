@@ -1,0 +1,153 @@
+
+				Authen::PAM 
+
+				Version 0.16
+
+				2005-Sep-20
+
+
+	Copyright (c) 1998-2005 Nikolay Pelov. All rights reserved.
+	This program is free software; you can redistribute it and/or
+	modify it under the same terms as Perl itself.
+
+
+DESCRIPTION
+===========
+
+This module provides a Perl interface to the PAM library.
+
+Home site: <http://nik.pelov.name/Authen-PAM/>
+
+After installing the module you can read a small faq with
+examples by typing 'perldoc Authen::PAM::FAQ'.
+
+
+PREREQUISITES
+=============
+
+Before you can build Authen::PAM you need to have the following
+things installed on your system:
+
+  * Perl, at least version 5.003_23
+  * This module is known to work with the following or newer 
+    implementations of the PAM library:
+    - Linux-PAM  <http://www.kernel.org/pub/linux/libs/pam/>
+    - Solaris 2.6
+    - FreeBSD 3.1
+    - OpenPAM <http://openpam.sourceforge.net/>
+    - HP-UX 11.0
+    - Darwin 6.0 and Mac OS X 10.2
+
+
+BUILDING AND INSTALLING THE MODULE
+==================================
+
+Assuming you have met all the prerequisites, you can built the module 
+using the standard sequence of commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+By default the module is build using the compiler and options used to build
+the perl executable itself. If you want to change the C compiler then set
+the CC environment variable, for example like this:
+
+    CC=gcc perl Makefile.PL
+
+However, besides changing the compiler, it is still not possible to change
+any other options (for example CFLAGS). If you want to do this then you
+should edit by hand the generated Makefile.
+
+If you have any problems in building and installing the module then
+you should first check on the home page of the Authen::PAM module for
+the latest development version (if any) which could possibly fix your
+problems. If none is available or the problems remain then you can
+write me a mail which includes the following information:
+  * the version of your unix - `uname -a'
+  * the configuration of the perl - `perl -V'
+  * if you are on linux:
+    - the name and version of the distribution you are using
+    - the version of the pam - `ls /lib/libpam.so*' or `ls /usr/lib/libpam.so*'
+  * the description of the "login" service from your pam configuration -
+    usually found in `/etc/pam.conf' file or in the file `/etc/pam.d/login'
+  * the output of the `perl Makefile.PL', `make' and `make test'
+  * any relevant messages produced by the syslogd daemon -
+    usually found in `/var/log/messages'
+  * if the problem is in a perl script which uses the Authen::PAM module then
+    the source of this script (even if it is a slight modification of some
+    of the source code provided with this module)
+
+
+KNOWN PROBLEMS
+==============
+
+  Missing PAM header files
+  ------------------------
+
+  I know that this is trivial, but some people actually report this.
+  If you get an error like
+
+	PAM.xs:11: security/pam_appl.h: No such file or directory
+
+  this means that either you don't have the PAM library installed on
+  your system or at least the PAM header files are missing. If your
+  distribution provides the PAM library as packages then you should
+  check that you also have installed the pam-dev or pam-devel package.
+
+
+  FreeBSD 4.x
+  -----------
+  Several people have reported the following error during 'make test':
+    not ok 10 (28 - Module is unknown)
+  I've tracked down the problem to the dynamic loader of FreeBSD not
+  exporting some symbols in dlopen()'d modules. I've submitted a bug 
+  report - http://www.freebsd.org/cgi/query-pr.cgi?pr=25059
+  It seems that this bug has been fixed already and starting
+  from the next release of FreeBSD (probably 4.6) the module should
+  work again.
+
+
+  Solaris 2.8
+  -----------
+  Some users are reporting the following error during 'make test':
+    Segmentation Fault - core dumped
+    make: *** [test_dynamic] Error 139
+  The problem seems to be related with the use of Kerberos
+  authentication (pam_krb5 or pam_krb54). At this moment I don't have
+  any explanation for it.
+
+
+  Login Restrictions
+  ------------------
+  Most of the current configurations of the 'login' service include a
+  module 'pam_securetty' or 'pam_access' which restrict the login of 
+  some users (especially root) depending on the tty or the host name
+  they are logging from. The configuration files of these two modules
+  are /etc/securetty and  /etc/security/access.conf respectively.
+  So, if you are running 'make test' and get an error 
+  '(Authentication failure)' on test 10 then this might be due to
+  login restrictions of PAM.
+
+
+  Deprecated
+  ----------
+
+  The following problems occured on old versions of libraries and OSes
+  and are not included in the README file anymore. If you experience them,
+  check the README file in older versions of the PAM library (0.14 or less).
+  - Solaris 2.6 buggy PAM library
+  - Perl 5.004_03
+  - RedHat 6.1 (Authentication failure)
+  - RedHat 8.0 (Segmentation fault (core dumped))
+
+
+
+AUTHOR
+======
+
+  Nikolay Pelov <NIKIP at cpan dot org>
+
+  Web page: <http://nik.pelov.name/Authen-PAM/>
+

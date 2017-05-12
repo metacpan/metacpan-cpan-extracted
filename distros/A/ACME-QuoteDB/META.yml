@@ -1,0 +1,51 @@
+---
+name: ACME-QuoteDB
+version: 0.1.2
+author:
+  - 'David Wright <david_v_wright@yahoo.com>'
+abstract: 'API implements CRUD for a Collection of Quotes (adages/proverbs/sayings/epigrams, etc)'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Carp: 1.04
+  Class::DBI: 3.0.17
+  Cwd: 3.25
+  DBD::SQLite: 1.14
+  Data::Dumper: 2.121
+  File::Basename: 2.74
+  File::Copy: 2.11
+  File::Spec: 3.2501
+  HTML::TokeParser: 2.37
+  Module::Build: 0.280801
+  Readonly: 1.03
+  Test::More: 0.8
+  Text::CSV: 1.06
+  aliased: 0.22
+  version: 0.7
+provides:
+  ACME::QuoteDB:
+    file: lib/ACME/QuoteDB.pm
+    version: 0.1.2
+  ACME::QuoteDB::DB::Attribution:
+    file: lib/ACME/QuoteDB/DB/Attribution.pm
+    version: 0.1.0
+  ACME::QuoteDB::DB::Category:
+    file: lib/ACME/QuoteDB/DB/Category.pm
+    version: 0.1.0
+  ACME::QuoteDB::DB::DBI:
+    file: lib/ACME/QuoteDB/DB/DBI.pm
+    version: 0.1.2
+  ACME::QuoteDB::DB::Quote:
+    file: lib/ACME/QuoteDB/DB/Quote.pm
+    version: 0.1.0
+  ACME::QuoteDB::DB::QuoteCatg:
+    file: lib/ACME/QuoteDB/DB/QuoteCatg.pm
+    version: 0.1.0
+  ACME::QuoteDB::LoadDB:
+    file: lib/ACME/QuoteDB/LoadDB.pm
+    version: 0.1.1
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,26 @@
+---
+abstract: "All about Japanese lock star \"Momoiro Clover\""
+author:
+  - 'Yuichi Tateno, <hotchpotch@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-MomoiroClover
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor: 0
+  Date::Simple: 0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: git://github.com/hotchpotch/perl-acme-momoiroclover.git
+version: 0.13

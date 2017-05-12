@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Archive-StringToZip
+version:             1.03
+abstract:            Transforms a string to a zip
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Archive::Zip:                  0
+    IO::String:                    0
+    Test::Exception:               0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Robbie Bow <robbiebow@canada.com>

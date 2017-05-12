@@ -1,0 +1,77 @@
+{
+   "abstract" : "Let's together with Lou Ohshiba ",
+   "author" : [
+      "Naoki Tomita <tomita@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Lou",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Exporter" : "0",
+            "File::ShareDir" : "0",
+            "Text::Mecabist" : "0.02",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Base" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Lou" : {
+         "file" : "lib/Acme/Lou.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tomill/Acme-Lou/issues"
+      },
+      "homepage" : "https://github.com/tomill/Acme-Lou",
+      "repository" : {
+         "url" : "git://github.com/tomill/Acme-Lou.git",
+         "web" : "https://github.com/tomill/Acme-Lou"
+      }
+   },
+   "version" : "0.04"
+}

@@ -1,0 +1,13 @@
+0.03    2017-01-29 (PERLANCAR)
+
+	- [ux] view-pod-in-browser: Accept STDIN.
+
+
+0.02    2017-01-29 (PERLANCAR)
+
+        - Add utility: elide-pod.
+
+
+0.01    2016-02-20 (PERLANCAR)
+
+        - First release.

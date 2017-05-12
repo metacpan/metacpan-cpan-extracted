@@ -1,0 +1,2 @@
+# Basic GET request
+GET ?foo=bar HTTP/1.0

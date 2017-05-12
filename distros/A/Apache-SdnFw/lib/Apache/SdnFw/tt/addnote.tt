@@ -1,0 +1,16 @@
+<div class="floatleft">
+<table>
+	<caption>[% s.object %]&nbsp;[% s.in.${s.o.id} %]&nbsp;add note</caption>
+	<tbody>
+	<tr>
+		<td>
+<form method="POST" action="[% s.ubase %]/[% s.object %]/addnote">
+<input type="hidden" name="[% s.o.id %]" value="[% s.in.${s.o.id} %]">
+<textarea name="note_text" cols="60" rows="10"></textarea><br>
+<input type="submit" value="Add Note">
+</form>
+		</td>
+	</tr>
+	</tbody>
+</table>
+</div>

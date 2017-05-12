@@ -1,0 +1,261 @@
+=pod
+
+-----------------------------------------
+| Multidimensional Requirement Database |
+-----------------------------------------
+
+Unprocessed notes...
+
+
+----- Definitions & Dimensions -----
+
+* Definitions:
+- A root requirement is a requirement that is not a subrequirement of another requirement.
+
+- Document (as used in MKS and Doors)
+Is there a need to group requirments once you have mergeable requirement databases, root requirements and categories? On what entity (category, root requirement etc) are baselines needed?
+
+Option1) Corresponds to one requirement database, that can refer to, be referenced to and presented together with other requirement databases. Use another concept for requirement database?
+
+Option2) Corresponds to one category. Each root category may then have the same or similar subcategory tree structure.
+
+Option3) Individual items organized into groups or sets - subsystems?
+
+Option4) A view
+
+* Dimensions:
+- Breakdown
+  Breakdown of one or several root requirements where each forms its own tree.
+  In a "pure" breakdown view, the top level consists of one and only instance of each root requirement. Subrequirements may occur in several root requirement trees. Hence, in pratice this means a graph.
+
+- Category
+  Categories represents a functional grouping of requirements.
+
+- Abstraction level
+  Abstraction level represents one slice of the breakdown structure. The level may exist at different breakdown depths for different root requirement trees.
+  Examples: Use case (high level), System, Architectural module, User story
+
+- Importance
+  Importance highlights features critical within or representative of the system being described by the requirements.
+  These may be picked from any level in the breakdown structure, from a subset of categories and without representing every root requirement breakdown tree.
+
+- Project? Product?
+  The same requirement can be used in several parallell projects or products.
+  One way is to handle them as values of an attribute.
+  Another way is to allow branches of a requirement that belong to different projects. Probably unnecessary complex - bad idea?
+
+* Hierarchy "rules":
+- A subrequirement can have several parents.
+
+- A requirement can belong to several categories. Both implicitly through several parents and explicitly through categories defined within the requirement.
+
+- A subrequirement that explicitly defines categories which is not a subcategory of a parent's category, can be presented as a top requirement within those categories.
+
+- Possible use of abstraction level "system":
+  Each root requirement has abstraction level "system".
+
+- If an explicitly defined category, within a subrequirement, is a subcategory of the parent's category, when presenting:
+  merge, i.e. keep only the subcategory within the requirement
+
+- Within one subcategory, all requirements must be on the same category level.
+  > Problem: This will be unpractical if e.g. 50 requirements have been written in one subcategory and the 51:st is placed in a subcategory. Add a new subcategory in all the existing 50?
+  > Solution: use a generic subcategory inserted on the fly when generating a view, something like General, Generic, Miscellaneous, ...
+
+
+----- Versions, baselines and history -----
+
+* History
+Describes the audit trail for an individual item. All changes made to the item, whether it is to data, metadata or relationships, are captured in its history.
+
+* Version
+Represents a meaningful point in an individual item’s history. Not all change to an artefact is significant and warrants a new version of the requirement.
+
+* Baseline
+The baseline consists of:
+- Source: requirement database identity. If the complete requirement database consists of several individual databases, the baseline can extend to more than one.
+- Version per source.
+- Filter or branch per source.
+- Common filter (applied after "merge") or branch.
+
+Option1) Snapshot in time
+Similar concept to version but a different scope, it applies to groups or sets of requirements (in some tools called document) at a specifif point in time.
+
+Option2) Goal-oriented
+Some organizations use baseline as rather than being a snapshot in time for a given document, it is a goal to work towards. MKS calls this goal-oriented baseline a milestone.
+
+* Version management tool
+Enable use of more or less any version control system to handle versioning of the requirement database.
+
+Enable also use of a simple file system structure were each baseline is stored in a separate folder (possibly only the difference in each folder).
+Why?
+1) Enables easy manual investigation of different baselines.
+2) Enables generation of difference reports with existing (simple) tools.
+
+
+----- Hierarchy of requirements and responsibilities -----
+
+MD = Marketing Department
+PO = Product Owner
+
+Marketing requirements (very high level; MD)           -
+     |                                                 |
+High-level Use Cases (PO)                              | Regalutory & standards (MD; PO; R&D)
+     |                                                 | 
+    SRS (R&D)                                          |
+     |                                                 | Feature list, strategically
+Subrequirements (R&D)                                  |  important features (MD; PO)
+     |                                                 |
+ User stories (R&D)                                    -
+
+Feature list: in this example it corresponds to the "importance" dimension. A strictly hierarchical PRS it would fit between the MR and UC or between UC and SRS.
+
+Observation: If an SRS requirment don't map to a higher level (MR, UC or feature list) it's not traceable.
+- Is that a problem?
+- Would a solution be to add marketing requirements like "The product quality shall be good enough for the mass volume market" or "The product quality shall be top-notch"? That is, some marketing characteristic or product strategy sets overall principles to follow.
+
+
+----- Application Lifecycle Management (ALM) -----
+
+* Types of items in a complete Application Lifecycle Management (ALM) approach:
+- requirement
+- test case
+- test plan
+- design specification
+- development task
+- time plan
+- release plan
+
+* Complete hierarchy
+These items can be connected into a hierarchy based on the requirement hierarchy, thereby catching most or all aspects of a development project.
+
+Types of relations:
+- structure: breakdown, consists of
+- history; derived from, revision of
+- conceptual links or traces: satisfies
+- references
+
+* Work flow
+Each item type can be associated with its own work flow, which defines how an individual item is to be processed and enables tracking of progress (by developers, project managers, managers etc).
+
+* Time plan
+Timeplans can be automatically created from:
+- start dates
+- available man power
+- requirement priorities
+- requirement dependencies
+- release scope
+
+Timeplans are automatically updated based on:
+- states of current work flows
+
+
+----- Views -----
+
+Views based on hierarchies or attribute values:
+ - standard: ...TBD...
+ - single top level requirement breakdown
+ - requirement breakdown with references (alphabetical order)
+ - requirement breakdown with references sorted by category
+ - requirement complete breakdown, i.e. requirements with multiple parents are displayed more than once
+ - abstraction level (alphabetical order)
+ - abstraction level sorted by category
+ - category
+   1.use explicitly defined categories (no breakdown)
+   2.without explicit category: use parent´s, display broken down
+ - analysis:
+ 	> text patterns
+ 	> statistics 1: # req's in different categories
+ 	> statistics 2: # words in individual req's
+ 	> statistics 3: # links/relations in individual req's
+ - importance ~fetaure list?
+
+Filters:
+ - views are a kind of filters but here filter means an addition on top of the views
+ - basically any attribute can be used to filter
+ - state: to be able to see e.g. released requirements (may infer stricter change control)
+
+
+----- Metadata -----
+
+- Unique id per requirement - UUID
+- Type: use case, requirement
+- Name
+- Abstraction level
+- Origin (database, etc)
+- Creator (author)
+- Category
+- Description
+- Long description
+- Rationale
+- Fit/test criteria
+- Satisfaction
+- Dissatisfaction
+- Related requirement
+- Subrequirement
+- State
+- (Possibly) Implementation priority
+- Branches/projects/products...
+- ...
+
+
+----- Mapping/linking between different item types -----
+
+Test case mapping
+- Where shall the link be placed:
+	 from test case file/script to requirement?
+	 from test case tool/db to requirement?
+	 from requirement to test case?
+- Automatically create map
+- Automatically create status report:
+  summary: # tested & approved
+           # untested
+           # tested but failed
+- navigate from summary to list of requirements based on one of the views
+
+
+---- Reuse ----
+
+* Share
+Share an item between projects, documents or other work efforts could be considered a form of reuse. This is not real reuse.
+
+* Copy content
+This is not real reuse.
+
+* Plain breakdown or relation reference (subrequirement or dependent)
+Refer to a requirement and use "change traceability" to handle ripple effects.
+
+* Refer to a requirement in another document/project with Change Notification
+A requirement and all related information (data, metadata and relationships) is reused in its entirety.
+Any change to requirements in a reuse scenario causes a ripple effect, flagging all artefacts related to those requirements as suspect.
+
+Is this relevant?
+
+* Refer to a requirement in another document with Change Control
+A requirement and all related information (data, metadata and relationships) is reused in its entirety.
+The difference between this and Change Notification is that two projects sharing the same requirement only share it until the point in time where one project needs to change it. When the information changes a new version/branch is created and only items referencing that new version are declared suspect. All other projects or documents are unaffected.
+
+Is this relevant?
+
+* Share requirement data with Annotations
+Reuse only some of the information belonging to a requirement. The rest of the information is specific to the project or document. Each instance of the requirement being reused has its own metadata and relationships. New versions of the requirement are automatically created when the shared information in the repository is changed. These changes that trigger new revisions can suspect other references, as well as other items in the system, by the ripple effect of that change.
+
+Is this relevant?
+
+* Share requirement data with Annotations and Change Management
+Similar to a CCB process built into the tool.
+Incorporate a process on top of sharing and branching and control how and when requirements can be modified and reused enables you to reap these benefits without unnecessarily branching and versioning objects but only doing so when it is authorized and appropriate to do so.
+
+Is this relevant?
+
+
+----- Change traceability & visualisation -----
+
+When a requirement is changed, visualise how other requirements are affected (due to references).
+
+
+----- Baseline diff -----
+
+Create a difference report betweeen two baselines.
+
+=cut
+

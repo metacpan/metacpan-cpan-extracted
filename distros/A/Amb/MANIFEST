@@ -1,0 +1,9 @@
+MANIFEST
+Makefile.PL
+Amb.pm
+Amb.xs
+t/01_load.t
+t/02_amb.t
+t/98_pod.t
+t/99_pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

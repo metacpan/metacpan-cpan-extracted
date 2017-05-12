@@ -1,0 +1,10 @@
+Changes
+
+Mar 1, 2014:
+   - Updated copyright, added github links.
+   - Added this Changes file.
+   - sorted the array items or hash keys since key ordering is indeterminant
+   - Released v2.3
+
+Jan 18, 1998:
+   - release version 2.1 to CPAN

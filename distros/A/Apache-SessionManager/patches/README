@@ -1,0 +1,25 @@
+This directory contains various perl modules patches
+
+- Apache-Session-File-Lock1.54-patch
+
+This patch fixs a bug in Apache::Session::Lock::File 'clean' method
+when it checks lockfiles last access time
+To apply the patch do (before installing Apache::Session 1.54):
+
+   $> cd /path/to/src/Apache-Session-1.54
+   $> patch -p0 < /path/to/Apache-Session-File-Lock1.54-patch
+
+Note: Since Apache::Session >= 1.60 has been fixed, isn't necessary to patch it.
+
+- PLP-3.18.patch
+
+This patch allows you to use directly a global variable $session in your PLP
+pages. To apply the patch do (before installing PLP 3.18):
+
+   $> cd /path/to/src/PLP-3.18
+   $> patch -p0 < /path/to/PLP-3.18.patch
+
+However you could use session management even without patching PLP.pm at
+the cost of a bit of extra code in your CGI scripts.
+See Apache::SessionManager::cookpod's "Apache::SessionManager WITH PLP" for
+more info and examples.

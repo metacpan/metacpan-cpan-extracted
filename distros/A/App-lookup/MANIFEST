@@ -1,0 +1,13 @@
+bin/lookup
+Build.PL
+Changes
+etc/lookup.el
+lib/App/lookup.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/01-basic.t
+t/config.ini

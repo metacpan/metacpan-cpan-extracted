@@ -1,0 +1,36 @@
+AxKit::XSP::Wiki Changes
+
+0.07
+    - Added search
+    - Added email diffs
+    - Split view file into view and edit, so you can apply
+      security to the edit XSP page
+
+0.06
+    - Code cleanups
+    - Many XSLT fixes - should mostly work out of the box
+    - Added in missing files
+    - Fixed up the .htaccess file a bit
+
+0.05
+    - Added history (including restore)
+    - Added preview
+    - Fixed a few issues in how redirecting worked
+    - Cleaned up some of the code in the XSP page
+
+0.04
+    - 0.03 went out with quite a few bugs. Fixed them.
+    
+0.03
+    - Use Text::WikiFormat::SAX for WikiText formatting
+    - A number of stylesheet cleanups
+    - A few minor bug fixes
+
+0.02
+    - Allow Perl module names and a few other characters as links
+    - Fixed some relative URI "bugs"
+    - Make sure all <h1>'s have a <a name="..."> wrapper
+    - Few other misc bug fixes
+
+0.01
+    - Initial CPAN release

@@ -1,0 +1,249 @@
+=head1 NAME
+
+AI::Prolog::Cookbook - Recipes for common Prolog problems
+
+=head1 REVISION
+
+ $Id: Cookbook.pod,v 1.1 2005/08/06 23:28:40 ovid Exp $
+
+=head1 DESCRIPTION
+
+Logic programming can take some time to get used to.  This document is intended
+to provide solutions to common problems encountered in logic programming.  Many
+of the predicates listed here will depend on other predicates defined here.  If
+in doubt, see L<AI::Prolog::Builtins|AI::Prolog::Builtins> for which predicates
+L<AI::Prolog|AI::Prolog> supports directly.
+
+Like most predicates in Prolog, the following predicates can be reused in ways
+to generate answers that a human could logically infer from the data presented.
+However, many times those "answers" can result in infinite loops.  For example,
+in the C<gather/3> predicate listed below, we can gather the items from a list
+which match the supplied list of indices.
+
+ gather([1,3], [a,b,c,d], Result). % Result is [a,c]
+
+Or we can figure out which indices in a list match the resulting values:
+
+ gather(Indices, [a,b,c,d], [a,d]). % Indices is [1,4]
+
+However, if we wish to understand which lists will have the given lists for the
+given indices, we have an infinite result set.  L<AI::Prolog|AI::Prolog> and
+(other Prolog implementations) will return one result and then enter an
+infinite loop if you request the goal be resatisfied (i.e., if you ask for
+another result).  If you see behavior such as this in your programs, you can
+issue the C<trace.> command to see how Prolog is internally attempting to
+satisfy your goal.  C<notrace.> will turn off tracing.
+
+=head1 THE PROBLEMS
+
+=head2 Append two lists.
+
+Usage:  C<append(List1, List2, Result).>
+
+ append([], X, X). % appending an empty list to X yields X
+ append([W|X], Y, [W|Z]) :-
+    append(X, Y, Z).
+
+=head2 Does a list contain a given term?
+
+Usage:  C<member(Item, List).>
+
+ member(X, [X|_]).
+ member(X, [_|Tail]) :-
+    member(X, Tail). 
+
+=head2 Pick a list member by index.
+
+Usage:  C<member(Index, Item, List).>
+
+ member(1, SearchFor, [SearchFor|_]).
+ member(Index, SearchFor, [_|Tail]) :-
+    member(Previous, SearchFor, Tail),
+    Index is Previous + 1.
+
+Please note that assignment in Prolog is via the C<is/2> infix operator.  The
+above code will fail if you use C<=/2>.  This is a common source of bugs for
+programmers new to Prolog.  The C<=/2> predicate will unify the right hand side
+with the left hand side.  It will I<not> evaluate the left hand side.  Thus:
+
+ X = 3 + Y.
+ % X is now plus(3,Y) (the internal form of the +/2 infix operator.)
+
+If you prefer your list indices start with zero, alter the first clause as
+follows:
+
+  member(0, SearchFor, [SearchFor|_]).
+
+=head2 Gather elements from a list by indices.
+
+Usage:  C<gather(Indices, FromList, Result).>
+
+This definition depends on the C<member/3> predicate defined in this document.
+
+ gather([], _, []).
+ gather([First|Remaining], FromList, [ResultHead|ResultTail]) :-
+    member(First, ResultHead, FromList),
+    gather(Remaining, FromList, ResultTail).
+
+Example queries:
+
+ gather([2,4], [a,b,c,d,e], Result).      % Result = [b,d]
+ gather(FromIndices, [a,b,c,d,e], [b,d]). % FromIndices = [2,4]
+
+This example is tricky when one realizes that one can reuse predicates.  In
+this case, it might be tempting to see I<which> lists from which one can
+gather certain values from certain indices.  The first time you try it, you
+may get results as follows:
+
+ gather([2,4], WhichList, [x,y]).
+
+This query, when executed in the C<aiprolog> shell will output a response
+similar to this:
+
+ gather([2,4], [A,x,B,y|C], [b,d]).
+
+When examining this, we see that the first, third, and fifth elements (and
+beyond) of the list are variables.  Unfortunately, as an infinite number of
+lists will satisfy this goal, attempting to fetch the a second result from the
+same query will result in an infinite loop.
+
+=head2 Determine the intersection of two lists.
+
+Usage: C<intersection(List1, List2, Intersection).>
+
+This definition depends on the C<member/2> predicate defined in this document.
+
+ intersection([H|T], L, [H|U]) :-
+    member(H,L),
+    intersection(T,L,U).
+ intersection([_|T], L, U) :-
+    intersection(T,L,U).
+ intersection(_,_,[]).
+
+The C<intersection/3> predicate will compute the intersection of two lists.
+You probably only want the first result from this predicate.  See C<trace/0>
+to understand why it returns more than one intersection.
+
+=head2 Reverse a list.
+
+Usage:  C<reverse(List, ReversedList).>
+
+ reverse(List, Reverse) :-
+    reverse_accumulate(List, [], Reverse).
+ reverse_accumulate([], List, List).
+ reverse_accumulate([Head|Tail], Accumulate, Reverse) :-
+    reverse_accumulate(Tail, [Head|Accumulate], Reverse).
+
+Reversing a list is tricky.  If this predicate were written in an imperative
+manner, it might look something like this:
+
+ sub reverse {
+   my @list = @_;
+   my @reverse;
+   while (my $element = shift @list) {
+     unshift @reverse, $element;
+   }
+   return @reverse;
+ }
+
+This method of reversing a list runs in C<O(n)> time.  However, new Prolog
+programmers often  write what is known as the "naive reverse" which uses the
+C<append/3> predicate to reverse a list:
+
+ reverse([],[]).
+ reverse([Head|Tail], Reverse) :- 
+    reverse(Tail, ReverseTail), 
+    append(ReverseTail, [Head], Reverse).
+
+For this, you take the tail of the list, reverse it and append the head of the
+list to it.  However, this runs in C<O(N^2)>.  This runs so slowly that
+reversing a 30 element list takes 496 logical inferences.  As a result, the
+naive reverse is frequently used as a benchmarking tool for logic programs.
+
+If reversing a 30 element list via the naive reverse takes .1 seconds, we can
+say that the Prolog implementation is running at about 5000 logical inferences
+per second.  This is known by the unfortunate acronym of LIPS, the standard
+measure of the speed of logic programs.  Modern Prolog implementations
+frequently measure their performance in MLIPS, or MegaLIPS.  By contrast, the
+human mind is frequently estimated to run between 1 to 4 LIPS.  This
+demonstrates that there's much more to cognition than logic.
+
+=head2 Checking if a list is a subset of another list.
+
+Usage:  C<subset(Subset, List).>
+
+This definition depends on the C<member/2> predicate defined in this document.
+
+ subset([Head|Tail], List) :-
+    member(Head, List),
+    subset(Tail, List).
+ subset([], _). % The empty list is a subset of all lists
+
+=head2 Delete all occurences of a term from a list, giving a new list.
+
+Usage:  C<delete(Term, List, Result).>
+
+ delete(_,[],[]). % deleting anything from an empty list yields an empty list
+ delete(Term, [Term|Tail], Result) :- 
+    delete(Term, Tail, Result).
+ delete(Term, [Head|Tail], [Head|TailResult]) :- 
+    delete(Term, Tail, TailResult).
+
+=head2 Partition a list where list values <= Value.
+
+Usage: C<partition(Value, List, LHS, RHS).>
+
+Note that the term at I<Value> will be included in the I<LHS>.
+
+ partition(Value, [Head|Tail], [Head|LHS], RHS) :-
+    Head <= Value,
+    partition(Value, Tail, LHS, RHS).
+ partition(Value, [Head|Tail], LHS, [Head|RHS]) :-
+    partition(Value, Tail, LHS, RHS).
+ partition(_,[],[],[]).
+
+=head2 Quicksort.
+
+Usage: C<sort(List, Sorted).>
+
+This definition depends on the C<partition/4> and C<append/3> predicates
+defined in this document.
+
+ sort([], []).
+ sort([Head|Tail], Sorted) :-
+    partition(Head, Tail, LHS, RHS),
+    sort(LHS, Temp1),
+    sort(RHS, Temp2),
+    append(Temp1, [Head|Temp2], Sorted).
+
+Note that (currently), this will only sort numeric values.
+
+=head1 SEE ALSO
+
+L<AI::Prolog>
+
+L<AI::Prolog::Builtins>
+
+L<AI::Prolog::Introduction>
+
+W-Prolog:  L<http://goanna.cs.rmit.edu.au/~winikoff/wp/>
+
+X-Prolog:  L<http://www.iro.umontreal.ca/~vaucher/XProlog/>
+
+Roman BartE<225>k's online guide to programming Prolog:
+L<http://kti.ms.mff.cuni.cz/~bartak/prolog/index.html>
+
+=head1 AUTHOR
+
+Curtis "Ovid" Poe, E<lt>moc tod oohay ta eop_divo_sitrucE<gt>
+
+Reverse the name to email me.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005 by Curtis "Ovid" Poe
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

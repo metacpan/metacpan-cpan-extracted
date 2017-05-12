@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Acme/Moose.pm
+lib/Acme/t/00_load.t
+lib/Acme/t/01_base.t

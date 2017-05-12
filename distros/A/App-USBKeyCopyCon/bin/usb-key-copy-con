@@ -1,0 +1,140 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Pod::Usage;
+use Getopt::Long qw(GetOptions);
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use App::USBKeyCopyCon;
+
+my(%opt);
+
+if(!GetOptions(\%opt, App::USBKeyCopyCon->commandline_options)) {
+    pod2usage(-exitval => 1,  -verbose => 0);
+}
+
+pod2usage(-exitstatus => 0, -verbose => 2) if $opt{help};
+
+
+App::USBKeyCopyCon->new(options => \%opt)->run;
+
+exit 0;
+
+
+__END__
+
+=head1 NAME
+
+usb-key-copy-con - GUI console for copying USB flash drives
+
+=head1 SYNOPSIS
+
+  sudo usb-key-copy-con
+
+  Options:
+
+   --no-root-check|n       skip the check for root permissions
+   --profile|p <name>      specify the copying profile
+   --profile-dir|d <path>  directory where custom profile scripts live
+   --help|?                detailed help message
+
+=head1 DESCRIPTION
+
+This program provides a GUI console for managing the process of bulk-copying
+USB flash drives ('keys').  Launch the program and then:
+
+=over 4
+
+=item 1
+
+insert a 'master' USB key when prompted - the contents of the key will be
+copied into a temporary directory on the hard drive, after which the key can be
+removed
+
+=item 2
+
+insert blank keys into all available USB ports - the app will detect when each
+new key is inserted, start the copy process and alert the user on completion
+
+=item 3
+
+repeat step 2 as required
+
+=back
+
+The program must be run as root in order to mount/unmount and format the
+blank flash drives.
+
+The console window allows you to specify filtering parameters for recognising
+USB keys as they are inserted.  If a key is inserted which matches the filter
+then the copy process will start without requiring user interaction.  If a key
+is inserted which does not match the filter then it will be ignored (the
+console will display a greyed-out icon).  By default the filter parameters will
+be set to exactly match the vendor name and drive capacity of the master key.
+
+The default profile will format the blanks keys with a VFAT filesystem and the
+volume label from the master key.  A file-by-file copy will be used to populate
+the key and then MD5 checksums will be used to verify the copied files.
+
+It is possible to create your own profiles that do anything you want with the
+blank keys.  See L<App::USBKeyCopyCon> for more details.
+
+=head2 Desktop Media Automount
+
+While this program is running, it attempts to disable the GNOME desktop
+environment's media automount behaviour - which would intefere with the copying
+process.  If you're not running GNOME you may need to manually disable the
+equivalent function in your desktop of choice.
+
+On exit, the original state of the media automount function should be restored.
+In the event of a crash, you can turn it back on with this command:
+
+  gconftool-2 --type bool --set \
+    /apps/nautilus/preferences/media_automount true
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--no-root-check> (alias: -n)
+
+Normally the application will refuse to run unless either it is executed with
+root permissions or sudo (or gksudo) is available.  Use this option to skip
+this check.  With the default profile failure will occur later when attempting
+to mount filesystems but the option may be useful with a custom profile or with
+an appropriate sudo setup.
+
+=item B<< --profile <name> >>  (alias: -p)
+
+Specify the profile name for selecting reader/writer scripts.  The default
+profile name is 'copyfiles'.
+
+=item B<< --profile-dir <path> >>  (alias: -d)
+
+If your custom scripts are in a non-standard directory, use this option to add
+that directory to the list which will be scanned for profile scripts.
+
+=item B<< --help >> (alias -?)
+
+Display this documentation.
+
+=back
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009 Grant McLean, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+=cut
+
+
+

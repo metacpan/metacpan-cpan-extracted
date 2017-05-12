@@ -1,0 +1,8 @@
+Revision history for Perl extension Radio::XM::PCR.
+
+0.01  Thu May 27 17:47:43 2004
+	- original version; created by h2xs 1.23 with options
+		-A -n Radio::XM::PCR
+0.02 Mon Jan 31 13:22:23 MST 2005
+        - First CPAN version - still alpha
+

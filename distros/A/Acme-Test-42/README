@@ -1,0 +1,31 @@
+Acme::Test::42 - Test the answer to ultimate question
+
+/*
+	Description
+*/
+
+Acme::Test::42 provides a mechanism, based on Test::Builder, for probing if the answer is correct.
+
+/*
+	Installation
+*/
+
+perl Makefile.PL
+make
+make test
+make install
+
+/*
+	Author
+*/
+
+Andrew Shitov <andy@shitov.ru>
+
+Please feel free to contact me via e-mail.
+
+/*
+	Copyright
+*/
+
+Acme::Test::42 module is a free software. 
+You may redistribute and (or) modify it under the same terms as Perl whichever version it is.

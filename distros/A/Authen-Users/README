@@ -1,0 +1,42 @@
+NAME
+
+Authen::Users
+
+LANGUAGE
+
+Pure Perl
+
+ABSTRACT
+
+Local DBI based user password authentication
+
+DESCRIPTION
+
+General password authentication using DBI-capable databases. Currently supports
+MySQL and SQLite databases. The default is to use a SQLite database to store 
+and access user information. 
+
+This module is not an authentication protocol. For that see something such as
+Authen::AuthenDBI.
+
+SYNOPSIS
+
+use Authen::Users;
+
+my $authen = new Athen::Users(dbtype => 'SQLite', dbname => 'mydbname');
+
+my $a_ok = $authen->authenticate($group, $user, $password);
+
+my $result = $authen->add_user(
+	$group, $user, $password, $fullname, $email, $question, $answer);
+
+
+
+Use this set of instructions to install the module...
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

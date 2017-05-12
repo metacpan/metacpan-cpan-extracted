@@ -1,0 +1,25 @@
+Revision history for App-VersionUtils
+
+0.004   2016-09-01 (PERLANCAR)
+
+	- [ux] compare-version: show result in CLI as a sentence e.g. 'V1
+	  is greater than V2' and show both original and normalized
+	  version.
+
+
+0.003   2016-08-31 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Rinci::AddPrereqs
+          which fixed missing some prereqs.
+
+
+0.002   2016-08-25 (PERLANCAR)
+
+	- Add utility: sort-versions.
+
+
+0.001   2016-07-25 (PERLANCAR)
+
+        - First release.

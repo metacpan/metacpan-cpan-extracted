@@ -1,0 +1,216 @@
+#!/usr/bin/env perl
+
+package    ## Hide from PAUSE and Dist::Zilla
+  svc;
+
+use strict;
+use warnings;
+
+use AnyEvent;
+use AnyEvent::Socket;
+use AnyEvent::Handle;
+use Getopt::Std;
+use YAML::Tiny;
+
+# ABSTRACT: Service controller for App::Sv
+# VERSION
+# AUTHORITY
+
+my %opt;
+getopts('c:', \%opt);
+
+my $conf;
+my $cf;
+my $args;
+
+# process agruments
+if (scalar @ARGV > 0) {
+	$args = join(" ", @ARGV);
+}
+else {
+	_usage();
+	exit;
+}
+
+# read config
+$cf = $opt{c} ? $opt{c}
+	: $ENV{SV_CONF} ? $ENV{SV_CONF}
+	: $ENV{SV_HOME} ? "$ENV{SV_HOME}/sv.yml"
+	: "$ENV{HOME}/.sv/sv.yml";
+die "No config file found" unless -f $cf;
+my $yt = YAML::Tiny->new();
+$conf = $yt->read($cf) or die "Cannot open config file \'$cf\': $!";
+$conf = $conf->[0];
+die "No \'listen\' directive found in config" 
+	unless $conf->{global}->{listen};
+
+my $cv = _connect($conf->{global}->{listen}, $args);
+print $cv->recv;
+
+# connect to socket
+sub _connect {
+	my ($listen, $args) = @_;
+	
+	my $cv = AE::cv;
+	my ($host, $port) = parse_hostport($conf->{global}->{listen});
+	tcp_connect $host, $port, sub {
+		my ($fh, $host, $port) = @_ 
+			or return $cv->send("Unable to connect to $host:$port: $!\n");
+		
+		my $res;
+		my $hdl; $hdl = AnyEvent::Handle->new(
+			fh => $fh,
+			timeout => 5,
+			on_eof => sub {
+				$hdl->destroy();
+				$cv->send($res);
+			},
+			on_error => sub {
+				$hdl->destroy();
+				$cv->send("error\n");
+			}
+		);
+
+		$hdl->push_write("$args\n");
+		$hdl->on_read(sub {
+			my $hdl = shift;
+			
+			$hdl->push_read(line => sub {
+				my ($hdl, $ln) = @_;
+				$res .= $ln ? "$ln\n" : '';
+			});
+		});
+		$hdl->push_write(".\n");
+	};
+	
+	return $cv;
+}
+
+sub _usage {
+	print <<END;
+Usage:
+	$0 [options] command [service]
+	
+Options:
+	-c        Configuration file
+
+Service commands:
+	up        Start the service; restart it if it stops
+	once      Start the service; do not restart it
+	down      Stop the service; do not restart it
+	status    Print service status
+	pause     Send SIGSTOP to the service
+	cont      Send SIGCONT to the service
+	hup       Send SIGHUP to the service
+	alarm     Send SIGALRM to the service
+	int       Send SIGINT to the service
+	quit      Send SIGQUIT to the service
+	usr1      Send SIGUSR1 to the service
+	usr2      Send SIGUSR2 to the service
+	term      Send SIGTERM to the service
+	kill      Send SIGKILL to the service
+	
+Other commands:
+	status    Print a status for all services
+
+END
+}
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+svc - Service controller for App::Sv
+
+=head1 SYNOPSIS
+
+    # Make sure you export SV_HOME or SV_CONFIG
+    $ cat sv.yml
+    ---
+    global:
+      listen: unix/:/tmp/sv.sock
+      daemon: 0
+      umask: 077
+    run:
+      x: 'plackup -p 3010 ./sites/x/app.psgi'
+      y:
+        cmd: 'plackup -p 3011 ./sites/y/app.psgi'
+        restart_delay: 1
+        start_retries: 5
+        umask: 027
+        user: www
+        group: www
+        
+    $ svc down x
+    
+=head1 DESCRIPTION
+
+The C<svc> command is a service controller for App::Sv.
+
+It connects to the server's socket, issues the commands supplied as its
+arguments and displays the server's response.
+
+=head1 ARGUMENTS
+
+The script accepts the following arguments.
+
+=over 4
+
+=item status [service]
+
+Requests a status about the service, showing its name, state, PID and uptime.
+When called without arguments it displays a status for all the services.
+
+=item up <service>
+
+Starts the specified service. If it stops, restart it.
+
+=item once <service>
+
+Starts the specified service. Do not restart it if it stops.
+
+=item down <service>
+
+If the service is running, send it the TERM signal. After it stops do not
+restart it.
+
+=item pause|cont|hup|alarm|int|quit|usr1|usr2|term|kill <service>
+
+If the service is running, send it the STOP, CONT, HUP, ALRM, INT, QUIT, USR1,
+USR2, TERM, or KILL signal respectively.
+
+=back
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item -c config_file
+
+Specify the configuration file to read. If this isn't specified, the script
+searches $ENV{SV_CONFIG}, $ENV{SV_HOME}/sv.yml and $ENV{HOME}/.sv/sv.yml or
+dies upon failure to find a valid configuration file in one of those places.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item SV_HOME
+
+Specifies the default home directory where C<svc> searches for the config
+file.
+
+=item SV_CONF
+
+The full path to the supervisor's configuration file.
+
+=back
+
+=head1 SEE ALSO
+
+L<App::Sv>

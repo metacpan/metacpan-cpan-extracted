@@ -1,0 +1,39 @@
+This file documents the revision history for Perl extension AnyEvent::Ping
+
+0.011 2015-10-30 00:00:00
+         - Removed experimental commit that broke everything
+
+0.010 2015-10-25 00:00:00
+         - MYMETA.yml and MYMETA.json removed from distribution
+            as suggested by Alexandr Ciornii
+            http://weblog.bulknews.net/post/44251476706/stop-shipping-mymeta-to-cpan
+
+0.009 2015-03-19 00:00:00
+         - end() now forces the end of unfinished pings
+
+0.008 2015-03-17 00:00:00
+         - make test pass on Win32 system (sdeseille)
+
+0.007 2015-02-11 00:00:00
+         - fixed malformed issue
+         - ping.pl script
+
+0.006 2014-12-04 00:00:00
+         - fixed version in META
+
+0.005 2014-11-04 00:00:00
+         - control packet size and data
+         - default packet size changed to 54
+         - on_prepare to "tune" the socket
+
+0.004 2014-23-03 00:00:00
+         - Fixed socket close after work (qsimpleq)
+
+0.003 2013-29-11 00:00:00
+         - Fixed error handling that were caused by broadcast requests
+
+0.002 2012-02-11 00:00:00
+         - Fixed accessors
+
+0.001 2012-02-11 00:00:00
+         - First release

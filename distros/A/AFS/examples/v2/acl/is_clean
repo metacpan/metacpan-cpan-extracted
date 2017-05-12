@@ -1,0 +1,19 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::ACL;
+
+die "Usage: $0 path\n" if ($#ARGV==-1);
+
+my $path = shift;
+
+my $acl = AFS::ACL->retrieve($path);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else {
+    my $ok  = $acl->is_clean($path);
+    if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+    else            { print "$path = ", $ok == 1 ? "clean\n" : "unclean\n"; }
+}

@@ -1,0 +1,87 @@
+2006-06-20 Alasdair Allan <aa@astro.ex.ac.uk> 
+
+        * VOEvent.pm: Bug fix to what() so it return undef if there isn't a
+          <What> tag rather than returning an error.
+
+2006-06-19 Alasdair Allan <aa@astro.ex.ac.uk> 
+
+	* VOEvent.pm: Modified <How> support to validate against the 1.1 draft.
+	
+	* t/2_how.t: Tests for above modifications.
+
+2006-06-07 Alasdair Allan <aa@astro.ex.ac.uk> 
+
+	* VOEvent.pm: Reduced minimum hash for an event message down to
+	  Role and ID, removed requirement for WhereWhen or Ref. Put an
+	  if() blovk around WhereWhen so it doesn't get automagically
+	  created.
+
+2006-05-22  Alasdair Allan <aa@astro.ex.ac.uk> (VOEvent-v1.1-060519.xsd)
+
+	* VOEvent.pm: Fixed problem with STC block, documents built with the
+	  module now fully validate against the v1.1-060519 schema.
+	  
+2006-05-19  Alasdair Allan <aa@astro.ex.ac.uk>
+
+	* VOEvent.pm: Fixed <Who> block, doesn't seem as flexible as the
+	  tags we initially inherited from RTML. Tried to preserve the
+	  old API, but added a new API for v1.1 as well. Both are supported
+	  to build messages, but both emit the new tags. Also fixed the
+	  <Citation> block from <EventID> to <EventIVORN>. Also moved to
+	  unqualifed namespace for XPath queries.
+	  
+2006-05-16  Alasdair Allan <aa@astro.ex.ac.uk>
+
+       * VOEvent.pm: Modified the <WhereWhen> parsing and generation to
+         use the new "default" V1.1 standard way of doing things. Also
+	 added parsing for several different STC co-ordinate representations
+	 that have been seen in the wild so far with the prototypes.
+	 
+       * VOEvent.pm: More STC fixes for <ObservatoryLocation> and the
+         <AstroCoordSystem> tag support.	 
+	 
+2006-04-30  Alasdair Allan <aa@astro.ex.ac.uk>
+
+       * VOEvent.pm: Modified to handle <VOEvent ivorn=""> and to have
+         some backwards support for <VOEvent id="">. 
+
+2006-03-21  Alasdair Allan <aa@astro.ex.ac.uk>
+
+       * VOEvent.pm: Fixed <WhereWhen type="simple"> representation to
+         account for lack of error in the RA and Dec positions. Updated
+         the <Why> to be compliant with VOEvent v1.1 standard. Updated the
+         standard version tags to 1.1x and HTN/0.2 repsectively. Removed
+         <WhereWhen type="stc"> tag to make the messages validate!
+         
+2005-12-28  Alasdair Allan <aa@astro.ex.ac.uk>
+
+       * VOEvent.pm: modifed time() method so it looks in <Who> if there
+         isn't a valid datestamp in the <WhereWhen> tag.
+ 
+2005-12-19  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * VOEvent.pm: Fixed casing problem for <WhereWhen type="simple">,
+          added parsing for date stamp from <WhereWhen>
+
+2005-12-16  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * VOEvent.pm: Added further parsing support
+	
+2005-12-15  Alasdair Allan <aa@astro.ex.ac.uk>
+
+	* VOEvent.pm: Moved to XML::Simple for parsing.
+        
+        * VOEvent.pm: Limited STC support.
+	
+2005-07-27  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * VOEvent.pm: Support for "simple" positions, synced with RAPTOR
+	  parser for interoperability between the networks.
+
+2005-05-03  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Import into Sourceforge CVS
+
+2005-04-22  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Original version.

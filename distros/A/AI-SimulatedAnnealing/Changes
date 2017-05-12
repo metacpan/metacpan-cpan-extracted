@@ -1,0 +1,11 @@
+
+Revision history for the AI-SimulatedAnnealing distribution:
+
+    Version    Date          Description
+    -------    ----          -----------
+
+    1.01       2010-10-06    Initial upload
+
+    1.02       2010-10-09    In t/annealing_tests.t, added a missing
+                             "exit" call that will never get used but
+                             looked incorrect when it was missing :-)

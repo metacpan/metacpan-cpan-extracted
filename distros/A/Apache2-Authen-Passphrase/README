@@ -1,0 +1,32 @@
+Apache2-Authen-Passphrase version 0.002002
+==========================================
+
+Apache2::Authen::Passphrase is a perl module which provides easy-to-use Apache2 authentication. It exports some utility functions and it contains a PerlAuthenHandler.
+
+Please read the Apache2::Authen::Passphrase POD for detailed information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* mod_perl2 (optional)
+* Authen::Passphrase
+* YAML::Any
+* IO::Prompter
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013-2015 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.

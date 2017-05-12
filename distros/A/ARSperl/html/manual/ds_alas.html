@@ -1,0 +1,41 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - Active Link Action Structure</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H2>Active Link Action Structure</H2>
+
+<PRE>
+{
+ "macro"            =&gt; reference to <A HREF="ds_alms.html">Active Link Macro Structure</A>,
+      <I>or</I> 
+ "assign_fields"    =&gt; reference to <A HREF="ds_fas.html">Field Assign Structure</A>,
+      <I>or</I> 
+ "process"          =&gt; string,
+      <I>or</I> 
+ "message"          =&gt; <A HREF="ds_statstruct_hash.html">Status Structure</A>, <B>(2.x - 3.x)</B>
+ "message"          =&gt; <A HREF="ds_msgstruct_hash.html">Message Structure</A>, <B>(4.x)</B>
+      <I>or</I> 
+ "characteristics"  =&gt; <A HREF="ds_fc.html">Field Characteristics</A>,
+      <I>or</I> 
+ "dde"              =&gt; not implemented,
+      <I>or</I> 
+ "none"             =&gt; undef
+}
+</PRE>
+
+<B>Notes</B>: The <CODE>message</CODE> member of this hash was previously 
+a string. As of ARSperl v1.50, this is no longer true.
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 7 Dec 98 by jcmurphy<BR>
+&#169; J.C.Murphy, J.W.Murphy 1997 arsperl@arsperl.org
+</address>
+</BODY>
+</HTML>

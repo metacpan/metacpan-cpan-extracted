@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/bn-wishlist
+lib/App/BarnesNoble/WishListMinder.pm
+lib/Web/Scraper/BarnesNoble/WishList.pm
+t/00-all_prereqs.t
+t/00-load.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

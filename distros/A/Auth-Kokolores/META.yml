@@ -1,0 +1,43 @@
+---
+abstract: 'an alternative saslauthd'
+author:
+  - 'Markus Benning <ich@markusbenning.de>'
+build_requires:
+  Crypt::Eksblowfish::Bcrypt: '0'
+  Crypt::PBKDF2: '0'
+  DBD::SQLite: '0'
+  Digest::Bcrypt: '0'
+  File::Find: '0'
+  IO::String: '0'
+  Test::Exception: '0'
+  Test::MockObject: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Auth-Kokolores
+requires:
+  Cache::Memcached: '0'
+  Config::General: '0'
+  DBI: '0'
+  Data::Dumper: '0'
+  Digest::MD5: '0'
+  Getopt::Long: '0'
+  MIME::Base64: '0'
+  Moose: '0'
+  MooseX::Singleton: '0'
+  Net::Server::PreFork: '0'
+  Tie::IxHash: '0'
+  base: '0'
+  perl: v5.8.5
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/benningm/kokolores/issues
+  repository: https://github.com/benningm/kokolores
+version: '1.01'

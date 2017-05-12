@@ -1,0 +1,20 @@
+libanyevent-aggressiveidle-perl (0.04-1) unstable; urgency=low
+
+  * New upstream version.
+  * Use pipe instead tempfile.
+  * Add guards into idle callback.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 01 Mar 2011 12:40:10 +0300
+
+libanyevent-aggressiveidle-perl (0.02-1) unstable; urgency=low
+
+  * Supports AE::Impl::EV.
+  * New upstream version.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sat, 19 Feb 2011 21:46:50 +0300
+
+libanyevent-aggressiveidle-perl (0.01-1) unstable; urgency=low
+
+  * Initial release. (Closes: #XXXXXX)
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sat, 19 Feb 2011 17:57:12 +0300

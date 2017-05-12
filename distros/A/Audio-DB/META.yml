@@ -1,0 +1,11 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Audio-DB
+version:      0.01
+version_from: 
+installdirs:  site
+requires:
+    CGI:                           3.00
+    DBI:                           1.38
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

@@ -1,0 +1,93 @@
+{
+   "abstract" : "A porting of L<memcached/memcached-tool|https://github.com/memcached/memcached/blob/master/scripts/memcached-tool>",
+   "author" : [
+      "YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Memcached-Tool",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Pod::Markdown::Github" : "0.01"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::Memcached::Tool" : {
+         "file" : "lib/App/Memcached/Tool.pm",
+         "version" : "v0.9.4"
+      },
+      "App::Memcached::Tool::CLI" : {
+         "file" : "lib/App/Memcached/Tool/CLI.pm",
+         "version" : "v0.9.4"
+      },
+      "App::Memcached::Tool::Constants" : {
+         "file" : "lib/App/Memcached/Tool/Constants.pm",
+         "version" : "v0.9.4"
+      },
+      "App::Memcached::Tool::DataSource" : {
+         "file" : "lib/App/Memcached/Tool/DataSource.pm"
+      },
+      "App::Memcached::Tool::Util" : {
+         "file" : "lib/App/Memcached/Tool/Util.pm",
+         "version" : "v0.9.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/key-amb/perl5-App-Memcached-Tool/issues"
+      },
+      "homepage" : "https://github.com/key-amb/perl5-App-Memcached-Tool",
+      "repository" : {
+         "url" : "git://github.com/key-amb/perl5-App-Memcached-Tool.git",
+         "web" : "https://github.com/key-amb/perl5-App-Memcached-Tool"
+      }
+   },
+   "version" : "v0.9.4",
+   "x_authority" : "cpan:KEYAMB"
+}

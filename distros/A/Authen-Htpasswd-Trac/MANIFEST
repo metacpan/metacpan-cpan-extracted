@@ -1,0 +1,25 @@
+Changes
+inc/Module/Install.pm   
+inc/Module/Install/Base.pm  
+inc/Module/Install/Can.pm   
+inc/Module/Install/Fetch.pm     
+inc/Module/Install/Include.pm   
+inc/Module/Install/Makefile.pm  
+inc/Module/Install/Metadata.pm  
+inc/Module/Install/Win32.pm     
+inc/Module/Install/WriteAll.pm  
+inc/Test/More.pm
+lib/Authen/Htpasswd/Trac.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_compile.t
+t/01_basic.t
+t/02_core.t
+t/03_edit.t
+t/99_pod.t
+t/data/htpasswd
+t/data/passwd.txt
+t/data/trac.db
+

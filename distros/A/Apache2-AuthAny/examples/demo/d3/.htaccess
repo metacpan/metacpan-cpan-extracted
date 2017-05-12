@@ -1,0 +1,6 @@
+# d3
+# The user must sign in with any mechanism/provider however
+# the user need not be in the identity table
+
+AuthType auth-any
+Require valid-user

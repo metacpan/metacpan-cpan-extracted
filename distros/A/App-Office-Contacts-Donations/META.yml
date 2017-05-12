@@ -1,0 +1,81 @@
+---
+abstract: 'A web-based donations manager'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::Pod: 1.41
+  Test::Simple: 0.94
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Office-Contacts-Donations
+provides:
+  App::Office::Contacts::Donations:
+    file: lib/App/Office/Contacts/Donations.pm
+    version: 1.10
+  App::Office::Contacts::Donations::Controller:
+    file: lib/App/Office/Contacts/Donations/Controller.pm
+    version: 1.10
+  App::Office::Contacts::Donations::Controller::Donations:
+    file: lib/App/Office/Contacts/Donations/Controller/Donations.pm
+    version: 1.10
+  App::Office::Contacts::Donations::Controller::Initialize:
+    file: lib/App/Office/Contacts/Donations/Controller/Initialize.pm
+    version: 1.10
+  App::Office::Contacts::Donations::Controller::Notes:
+    file: lib/App/Office/Contacts/Donations/Controller/Notes.pm
+    version: 1.10
+  App::Office::Contacts::Donations::Controller::Organization:
+    file: lib/App/Office/Contacts/Donations/Controller/Organization.pm
+    version: 1.10
+  App::Office::Contacts::Donations::Controller::Person:
+    file: lib/App/Office/Contacts/Donations/Controller/Person.pm
+    version: 1.10
+  App::Office::Contacts::Donations::Controller::Report:
+    file: lib/App/Office/Contacts/Donations/Controller/Report.pm
+    version: 1.10
+  App::Office::Contacts::Donations::Controller::Search:
+    file: lib/App/Office/Contacts/Donations/Controller/Search.pm
+    version: 1.10
+  App::Office::Contacts::Donations::Database:
+    file: lib/App/Office/Contacts/Donations/Database.pm
+    version: 1.10
+  App::Office::Contacts::Donations::Database::Donations:
+    file: lib/App/Office/Contacts/Donations/Database/Donations.pm
+    version: 1.10
+  App::Office::Contacts::Donations::Database::Util:
+    file: lib/App/Office/Contacts/Donations/Database/Util.pm
+    version: 1.10
+  App::Office::Contacts::Donations::Util::Config:
+    file: lib/App/Office/Contacts/Donations/Util/Config.pm
+    version: 1.10
+  App::Office::Contacts::Donations::Util::Create:
+    file: lib/App/Office/Contacts/Donations/Util/Create.pm
+    version: 1.10
+  App::Office::Contacts::Donations::Util::Validator:
+    file: lib/App/Office/Contacts/Donations/Util/Validator.pm
+    version: 1.10
+  App::Office::Contacts::Donations::View:
+    file: lib/App/Office/Contacts/Donations/View.pm
+    version: 1.10
+  App::Office::Contacts::Donations::View::Donations:
+    file: lib/App/Office/Contacts/Donations/View/Donations.pm
+    version: 1.10
+  App::Office::Contacts::Donations::View::Report:
+    file: lib/App/Office/Contacts/Donations/View/Report.pm
+    version: 1.10
+  App::Office::Contacts::Donations::View::Role::Report:
+    file: lib/App/Office/Contacts/Donations/View/Role/Report.pm
+    version: 1.10
+requires:
+  App::Office::Contacts: 1.1
+  Moose: 0.98
+  Scalar::Util: 1.23
+  namespace::autoclean: 0.09
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 1.10

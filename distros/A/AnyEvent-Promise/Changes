@@ -1,0 +1,9 @@
+Revision history for AnyEvent-Promise
+
+0.02    2014-03-26
+        Finalized on promise chain structure, fixed tests and added
+        documentation
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

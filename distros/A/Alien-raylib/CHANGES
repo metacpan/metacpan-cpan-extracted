@@ -1,0 +1,59 @@
+==================================================
+Changes from 2016-01-17 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2017-01-16 13:15:27 +0000
+------------------------------------------
+
+  Change: 15d8de300664a9e8f3d417cc318f59893e9ae815
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-01-16 14:15:17 +0000
+
+    updated REAMDE.pod 
+
+  Change: 782600338494ca2cc9d88e9340e25e20f17afa3a
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-01-16 14:13:08 +0000
+
+    Merge pull request #1 from manwar/fix-cpants-issues
+
+    Fix cpants issues 
+
+  Change: 8e4ec47904cea82024c963be1d3acaea2f6ccbfa
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2017-01-16 12:17:57 +0000
+
+    Add mininmum perl version using dzil plugin [MinimumPerlFast]. 
+
+  Change: 5e0743c44e331831d41eed244aa19d411fb20b99
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2017-01-16 12:16:44 +0000
+
+    Auto generate META.json using dzil plugin [MetaJSON]. 
+
+  Change: 12e652000837c8cba3983922a46e95da19957b80
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2017-01-16 12:15:42 +0000
+
+    Fix pod error 
+
+------------------------------------------
+version 0.001 at 2017-01-15 21:37:16 +0000
+------------------------------------------
+
+  Change: ea699305f7da7e9d24675b942b53931c22088c3d
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-01-15 22:37:16 +0000
+
+    Added 2 tests 
+
+  Change: d1a7541a898a94e9c422569e281a8d461aea6cec
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-01-12 03:19:11 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

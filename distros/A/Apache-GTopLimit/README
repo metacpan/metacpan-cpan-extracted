@@ -1,0 +1,163 @@
+NAME
+    Apache::GTopLimit - Limit Apache httpd processes
+
+SYNOPSIS
+    This module allows you to kill off Apache httpd processes if they grow
+    too large or have too little of shared memory. You can choose to set up
+    the process size limiter to check the process size on every request:
+
+        # in your startup.pl:
+        # ___________________
+
+        use Apache::GTopLimit;
+
+        # Control the life based on memory size
+        # in KB, so this is ~10MB
+        $Apache::GTopLimit::MAX_PROCESS_SIZE = 10000; 
+
+        # Control the life based on Shared memory size
+        # in KB, so this is ~4MB 
+        $Apache::GTopLimit::MIN_PROCESS_SHARED_SIZE = 4000;
+
+        # Control the life based on UnShared memory size
+        # in KB, so this is ~6MB 
+        $Apache::GTopLimit::MAX_PROCESS_UNSHARED_SIZE = 6000;
+
+        # in your httpd.conf:
+        # ___________________
+
+        # debug mode must be set before the module is loaded
+        PerlSetVar Apache::GTopLimit::DEBUG 1
+
+        # register handler
+        PerlFixupHandler Apache::GTopLimit
+        # you can set this up as any Perl*Handler that handles 
+        # part of the request, even the LogHandler will do.
+
+    Or you can just check those requests that are likely to get big or
+    unshared. This way of checking is also easier for those who are mostly
+    just running Apache::Registry scripts:
+
+        # in your handler/CGI script
+        use Apache::GTopLimit;
+          # Max Process Size in KB
+        Apache::GTopLimit->set_max_size(10000);     
+
+    and/or
+
+        use Apache::GTopLimit;
+           # Min Shared process Size in KB
+        Apache::GTopLimit->set_min_shared_size(4000);
+
+    and/or
+
+        use Apache::GTopLimit;
+           # Min UnShared process Size in KB
+        Apache::GTopLimit->set_max_unshared_size(6000);
+
+    Since accessing the process info might add a little overhead, you may
+    want to only check the process size every N times. To do so, put this in
+    your startup.pl or CGI:
+
+        $Apache::GTopLimit::CHECK_EVERY_N_REQUESTS = 2;
+
+    This will only check the process size every other time the process size
+    checker is called.
+
+    Note: The "MAX_PROCESS_SIZE", "MIN_PROCESS_SHARED_SIZE" and
+    "MAX_PROCESS_UNSHARED_SIZE" are independent, and each will be checked if
+    only set. So if you set the first two -- the process can be killed if it
+    grows beyond the limit or its shared memory goes below the limit. It's
+    better not to mix "MAX_PROCESS_UNSHARED_SIZE" with the first two.
+
+DESCRIPTION
+    This module will run on platforms supported by GTop.pm a Perl interface
+    to libgtop (which in turn needs libgtop : See
+    http://home-of-linux.org/gnome/libgtop/ ).
+
+    This module was written in response to questions on the mod_perl mailing
+    list on how to tell the httpd process to exit if:
+
+    *   its memory size goes beyond a specified limit
+
+    *   its shared memory size goes below a specified limit
+
+    *   its unshared memory size goes beyond a specified limit
+
+  Limiting memory size
+
+    There are two big reasons your httpd children will grow. First, it could
+    have a bug that causes the process to increase in size dramatically,
+    until your system starts swapping. Second, your process just does stuff
+    that requires a lot of memory (or leaks memory) , and the more different
+    kinds of requests your server handles, the larger the httpd processes
+    grow over time.
+
+    This module will not really help you with the first problem. For that
+    you should probably look into Apache::Resource or some other means of
+    setting a limit on the data size of your program. BSD-ish systems have
+    setrlimit() which will croak your memory gobbling processes. However it
+    is a little violent, terminating your process in mid-request.
+
+    This module attempts to solve the second situation where your process
+    slowly grows over time. The idea is to check the memory usage after
+    every request, and if it exceeds a threshold, exit gracefully.
+
+    By using this module, you should be able to discontinue using the Apache
+    configuration directive MaxRequestsPerChild, although for some folks,
+    using both in combination does the job. Personally, I just use the
+    technique shown in this module and set my MaxRequestsPerChild value to
+    6000.
+
+  Limiting shared memory size
+
+    We want the reverse the above limit for a shared memory limitation and
+    kill the process when its hs too little of shared memory.
+
+    When the same memory page is being shared between many processes, you
+    need less physical memory relative to the case where the each process
+    will have its own copy of the memory page.
+
+    If your OS supports shared memory you will get a great benefit when you
+    deploy this feature. With mod_perl you enable it by preloading the
+    modules at the server startup. When you do that, each child uses the
+    same memory page as the parent does, after it forks. The memory pages
+    get unshared when a child modifies the page and it can no longer be
+    shared, that's when the page is being copied to the child's domain and
+    then modified as it pleased to. When this happens a child uses more real
+    memory and less shared.
+
+    Because of Perl's nature, memory pages get unshared pretty fast, when
+    the code is being executed and it's internal data is being modified.
+    That's why as the child gets older the size of the shared memory goes
+    down.
+
+    You can tune your server to kill off the child when its shared memory is
+    too low, but it demands a constant retuning of the configuration
+    directives if you do any heavy updates in the code the server executes.
+    This module allows you to save up the time to make this tuning and
+    retuning, by simply specifying the minimum size of the shared memory for
+    each process. And when it crosses the line, to kill it off.
+
+    Finally instead of trying to tune the memory size and shared memory
+    thresholds, it's much easier to only specify the amount of unshared
+    memory that can be tolerated and kill the process which has too much of
+    unshared memory.
+
+AUTHOR
+    Stas Bekman <stas@stason.org>
+
+    An almost complete rewrite of "Apache::SizeLimit" toward using GTop
+    module (based on crossplatfom glibtop). The moment glibtop will be
+    ported on all the platforms "Apache::SizeLimit" runs at (I think only
+    Solaris is missing) "Apache::SizeLimit" will become absolete.
+
+    Doug Bagley wrote the original "Apache::SizeLimit"
+
+CHANGES
+    See external file 'Changes'.
+
+COPYRIGHT
+    The "Apache::GTopLimit" module is free software; you can redistribute it
+    and/or modify it under the same terms as Perl itself.
+

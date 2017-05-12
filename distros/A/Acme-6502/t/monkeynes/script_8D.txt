@@ -1,0 +1,12 @@
+clear
+power on
+regs
+
+op a9 55
+op 8d efbe
+
+# mem[$BEEF] and ACC should = $55
+test acc = 55
+test m:beef = 55
+
+save verify_8D.txt

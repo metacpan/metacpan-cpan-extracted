@@ -1,0 +1,23 @@
+Revision history for Alien-Autotools
+
+v0.0.6    2012-04-06 04:21:42 America/Chicago
+	- Increased perl version requirement to v5.10.1.
+
+v0.0.5    2012-04-04 11:48:10 America/Chicago
+	- Handled single smoke test failure on a BSD box where a version regexp
+	  match failed.
+	- Promoted to full release.
+
+v0.0.4    2012-04-04 00:58:51 America/Chicago
+	- Changed *_path() functions to *_dir().
+
+v0.0.3    2012-04-03 22:06:19 America/Chicago
+	- Forced glob call into list context
+	- Added "share/bin" directory to $ENV{PATH} during build process so
+	  automake can use the newly made autoconf.
+
+v0.0.2    2012-04-02 12:36:50 America/Chicago
+	- Fixed configure dependencies
+
+v0.0.1    2012-04-02 00:40:01 America/Chicago
+	- First trial version, released on an unsuspecting world.

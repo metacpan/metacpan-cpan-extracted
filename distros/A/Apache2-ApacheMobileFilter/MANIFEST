@@ -1,0 +1,22 @@
+.DS_Store
+lib/Apache2/AMFWURFLFilter.pm
+lib/Apache2/AMFWURFLFilterMemcached.pm
+lib/Apache2/AMFDetectRightFilter.pm
+lib/Apache2/AMFDetectRightFilterMemcached.pm
+lib/Apache2/AMF51DegreesFilter.pm
+lib/Apache2/AMF51DegreesFilterMemcached.pm
+lib/Apache2/AMFImageRendering.pm
+lib/Apache2/AMFSwitcher.pm
+lib/Apache2/AMFCarrierDetection.pm
+lib/Apache2/AMFDeviceMonitor.pm
+lib/Apache2/AMFCommonLib.pm
+lib/Apache2/AMFMobileCachingMemcached.pm
+lib/Apache2/AMFTrace.pm
+lib/Apache2/AMFWebService.pm
+lib/Apache2/AMFLiteDetectionFilter.pm
+Makefile.PL
+MANIFEST
+CHANGE
+README
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

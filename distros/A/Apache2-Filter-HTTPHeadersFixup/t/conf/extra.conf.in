@@ -1,0 +1,10 @@
+# make sure that we test under Taint + warnings mode
+PerlSwitches -wT
+
+##### DEVMODE: Remove in production ###
+PerlModule Apache2::Reload
+PerlInitHandler Apache2::Reload
+PerlSetVar ReloadAll Off
+PerlSetVar ReloadModules "Apache2::Filter::HTTPHeadersFixup TestManip::*"
+#PerlSetVar ReloadDebug On
+

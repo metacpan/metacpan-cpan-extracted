@@ -1,0 +1,51 @@
+#!/opt/perl/bin/perl
+use strict;
+use utf8;
+use EV;
+use AnyEvent;
+use AnyEvent::XMPP::Client;
+use AnyEvent::XMPP::Ext::VCard;
+
+my $j = AnyEvent->condvar;
+my $cl = AnyEvent::XMPP::Client->new (debug => 1);
+$cl->add_account (@ARGV, undef, undef, {
+   initial_presence => -1, dont_retrieve_roster => 1
+});
+my $ex = AnyEvent::XMPP::Ext::VCard->new;
+
+$ex->reg_cb (
+   vcard => sub {
+      my ($ex, $jid, $vcard) = @_;
+      if (my $vc = $ex->my_vcard ($jid)) {
+         open my $av, ">/tmp/net_xmpp2_avatar" or die "couldn't open avatarfile: $!";
+         binmode $av;
+         print $av $vc->{_avatar};
+         close $av;
+         system ("display /tmp/net_xmpp2_avatar");
+      }
+   }
+);
+$cl->reg_cb (
+   stream_ready => sub {
+      my ($cl, $acc) = @_;
+      $ex->hook_on ($acc->connection);
+   },
+   session_ready => sub {
+      my ($cl, $acc) = @_;
+      print "session ready\n";
+   },
+   disconnect => sub {
+      my ($cl, $acc, $h, $p, $reas) = @_;
+      print "disconnect ($h:$p): $reas\n";
+   },
+   error => sub {
+      my ($cl, $acc, $err) = @_;
+      print "ERROR: " . $err->string . "\n";
+   },
+   message => sub {
+      my ($cl, $acc, $msg) = @_;
+      print "message from: " . $msg->from . ": " . $msg->any_body . "\n";
+   }
+);
+$cl->start;
+$j->wait;

@@ -1,0 +1,6 @@
+This directory contains samples for Plack-App-AutoCRUD.
+
+To run the demo, enter the following commands :
+
+  perl download_db.pl # download free SQLite databases "Chinook" and "Sakila"
+  plackup             # run the app

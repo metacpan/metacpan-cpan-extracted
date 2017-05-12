@@ -1,0 +1,87 @@
+---
+abstract: 'Specification for commandline app'
+author:
+  - 'Tina Müller <cpan2@tinita.de>'
+build_requires:
+  File::Spec: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  blib: '1.01'
+  constant: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Spec
+provides:
+  App::Spec:
+    file: lib/App/Spec.pm
+    version: '0.004'
+  App::Spec::Argument:
+    file: lib/App/Spec/Argument.pm
+    version: '0.004'
+  App::Spec::Completion:
+    file: lib/App/Spec/Completion.pm
+    version: '0.004'
+  App::Spec::Completion::Bash:
+    file: lib/App/Spec/Completion/Bash.pm
+    version: '0.004'
+  App::Spec::Completion::Zsh:
+    file: lib/App/Spec/Completion/Zsh.pm
+    version: '0.004'
+  App::Spec::Option:
+    file: lib/App/Spec/Option.pm
+    version: '0.004'
+  App::Spec::Parameter:
+    file: lib/App/Spec/Parameter.pm
+    version: '0.004'
+  App::Spec::Pod:
+    file: lib/App/Spec/Pod.pm
+    version: '0.004'
+  App::Spec::Run:
+    file: lib/App/Spec/Run.pm
+    version: '0.004'
+  App::Spec::Run::Cmd:
+    file: lib/App/Spec/Run/Cmd.pm
+    version: '0.004'
+  App::Spec::Run::Output:
+    file: lib/App/Spec/Run/Output.pm
+    version: '0.004'
+  App::Spec::Run::Response:
+    file: lib/App/Spec/Run/Response.pm
+    version: '0.004'
+  App::Spec::Run::Validator:
+    file: lib/App/Spec/Run/Validator.pm
+    version: '0.004'
+  App::Spec::Subcommand:
+    file: lib/App/Spec/Subcommand.pm
+    version: '0.004'
+requires:
+  Data::Dumper: '0'
+  Getopt::Long: '0'
+  List::MoreUtils: '0'
+  List::Util: '1.33'
+  Moo: '0'
+  Ref::Util: '0'
+  Storable: '0'
+  Term::ANSIColor: '0'
+  Text::Table: '0'
+  YAML::XS: '0'
+  base: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/perlpunk/App-Spec-p5/issues
+  repository: git://github.com/perlpunk/App-Spec-p5.git
+version: '0.004'
+x_serialization_backend: 'YAML::Tiny version 1.69'

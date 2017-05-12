@@ -1,0 +1,38 @@
+Revision history for Perl extension Anansi::Actor.
+
+0.01  Wed Apr 10 17:45:53 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Anansi::Actor
+0.02  Wed Apr 10 19:17:01 2013
+	- modified README with prerequisite modules.
+0.03  Wed Apr 10 20:10:53 2013
+	- modified the POD.
+0.04  Sun Apr 15 00:08:43 2013
+	- modified the POD.
+0.05  Wed May 15 17:04:13 2013
+	- modified "modules" to use a temporary file.
+	- modified the POD for "modules".
+0.06  Mon May 20 10:54:56 2013
+	- modified the POD.
+	- corrected HASH reference deprecations.
+	- modified "modules" to use a timestamped file.
+0.07  Sat May 25 02:29:52 2013
+	- modified the POD to reflect more concise examples and include method parameter.
+0.08  Tue May 28 19:48:52 2013
+	- modified the POD.
+0.09  Tue May 28 22:09:50 2013
+	- modified the POD.
+0.10  Wed May 29 10:12:30 2013
+	- modified the POD.
+0.11  Wed May 29 11:52:06 2013
+	- modified "modules" to correctly delete the old temporary files.
+	- made the POD more interactive.
+0.12  Fri May 31 15:30:54 2013
+	- modified "modules" to enable dynamic module updates.
+	- modified "modules" to incorporate user defined timestamp intervals.
+	- modified "modules" to incorporate package existence verification.
+	- modified the POD.
+0.13  Fri Aug 02 13:17:32 2013
+	- modified the POD.
+0.14  Thu Aug 08 12:52:39 2013
+	- modified the POD to reflect changes to "Anansi::Class".

@@ -1,0 +1,27 @@
+.dimconfig
+.shipit
+.travis.yml
+Changes
+cpanfile
+inc/Module/Install.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Repository.pm
+inc/Module/Install/WriteAll.pm
+lib/Amon2/Web/Dispatcher/RouterSimple/Extended.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+README.md
+t/00_compile.t
+t/01_router_simple_extended.t
+xt/perlcritic.t
+xt/pod.t
+xt/podcoverage.t
+xt/podspell.t
+xt/podsynopsis.t

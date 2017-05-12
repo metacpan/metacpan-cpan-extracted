@@ -1,0 +1,20 @@
+
+Data in test files:
+
+Domain: TEST.ORG
+Master password: MITiys4K5!
+
+Principals:
+
+    name			password	policy
+    ----			--------	------
+    foo@TEST.ORG		abc123		default
+    bar@TEST.ORG		abc123		max-two-months
+    baz@TEST.ORG		abc123		none
+    admin/admin@TEST.ORG	abc123		none
+
+Policies:
+
+    default
+    max-two-months
+

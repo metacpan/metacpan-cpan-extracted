@@ -1,0 +1,305 @@
+#!perl
+
+# Note: This script is a CLI  for Riap function /App/CalcAccumulatedDiscounts/calc_accumulated_discounts
+# and generated automatically using Perinci::CmdLine::Gen version 0.45
+
+our $DATE = '2017-03-21'; # DATE
+our $DIST = 'App-CalcAccumulatedDiscounts'; # DIST
+our $VERSION = '0.06'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => "/App/CalcAccumulatedDiscounts/calc_accumulated_discounts",
+    program_name => "calc-accumulated-discounts",
+)->run;
+
+# ABSTRACT: Calculate multi-year discounts from a per-year discount rate
+# PODNAME: calc-accumulated-discounts
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+calc-accumulated-discounts - Calculate multi-year discounts from a per-year discount rate
+
+=head1 VERSION
+
+This document describes version 0.06 of calc-accumulated-discounts (from Perl distribution App-CalcAccumulatedDiscounts), released on 2017-03-21.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % calc-accumulated-discounts [options]
+
+Examples:
+
+ % calc-accumulated-discounts
+ +------------------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
+ | Disc p.a. \ Year | 5y    | 10y   | 15y   | 20y   | 25y   | 30y   | 35y   | 40y   | 45y   | 50y   |
+ | 0.25%            | 1.2%  | 2.5%  | 3.7%  | 4.9%  | 6.1%  | 7.2%  | 8.4%  | 9.5%  | 10.7% | 11.8% |
+ | 0.50%            | 2.5%  | 4.9%  | 7.2%  | 9.5%  | 11.8% | 14.0% | 16.1% | 18.2% | 20.2% | 22.2% |
+ | 0.75%            | 3.7%  | 7.3%  | 10.7% | 14.0% | 17.2% | 20.2% | 23.2% | 26.0% | 28.7% | 31.4% |
+ | 1.00%            | 4.9%  | 9.6%  | 14.0% | 18.2% | 22.2% | 26.0% | 29.7% | 33.1% | 36.4% | 39.5% |
+ | 1.25%            | 6.1%  | 11.8% | 17.2% | 22.2% | 27.0% | 31.4% | 35.6% | 39.5% | 43.2% | 46.7% |
+ | 1.50%            | 7.3%  | 14.0% | 20.3% | 26.1% | 31.5% | 36.5% | 41.1% | 45.4% | 49.3% | 53.0% |
+ | 1.75%            | 8.4%  | 16.2% | 23.3% | 29.7% | 35.7% | 41.1% | 46.1% | 50.6% | 54.8% | 58.6% |
+ | 2.00%            | 9.6%  | 18.3% | 26.1% | 33.2% | 39.7% | 45.5% | 50.7% | 55.4% | 59.7% | 63.6% |
+ | 2.25%            | 10.8% | 20.4% | 28.9% | 36.6% | 43.4% | 49.5% | 54.9% | 59.8% | 64.1% | 67.9% |
+ | 3.00%            | 14.1% | 26.3% | 36.7% | 45.6% | 53.3% | 59.9% | 65.6% | 70.4% | 74.6% | 78.2% |
+ | 3.50%            | 16.3% | 30.0% | 41.4% | 51.0% | 59.0% | 65.7% | 71.3% | 76.0% | 79.9% | 83.2% |
+ | 4.00%            | 18.5% | 33.5% | 45.8% | 55.8% | 64.0% | 70.6% | 76.0% | 80.5% | 84.1% | 87.0% |
+ | 4.50%            | 20.6% | 36.9% | 49.9% | 60.2% | 68.4% | 74.9% | 80.0% | 84.1% | 87.4% | 90.0% |
+ | 5.00%            | 22.6% | 40.1% | 53.7% | 64.2% | 72.3% | 78.5% | 83.4% | 87.1% | 90.1% | 92.3% |
+ +------------------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
+
+Modify years and discount rates to generate:
+
+ % calc-accumulated-discounts --discounts 1,2,2.5 --years 5,10
+ +------------------+-------+-------+
+ | Disc p.a. \ Year | 5y    | 10y   |
+ | 1.00%            | 4.9%  | 9.6%  |
+ | 2.00%            | 9.6%  | 18.3% |
+ | 2.50%            | 11.9% | 22.4% |
+ +------------------+-------+-------+
+
+=head1 DESCRIPTION
+
+This routine generates a table of accumulated discounts over a period of several
+years, given the annual discount rates.
+
+I first wrote this to see the accumulated fees when choosing mutual funds
+products. The moral of the story is, if you plan to hold a fund for a long time
+(e.g. 5-10 years or longer) you should pick funds that are low in annual fees
+(e.g. 1% or lower). Otherwise, the annual management fees will eat up most, if
+not all, your potential profits.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--discounts-json>=I<s>
+
+See C<--discounts>.
+
+=item B<--discounts>=I<f@>
+
+Default value:
+
+ [0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.25,3,3.5,4,4.5,5]
+
+Can be specified multiple times.
+
+=item B<--years-json>=I<s>
+
+See C<--years>.
+
+=item B<--years>=I<i@>
+
+Default value:
+
+ [5,10,15,20,25,30,35,40,45,50]
+
+Can be specified multiple times.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C calc-accumulated-discounts calc-accumulated-discounts
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using L<shcompgen>) at installation time,
+so you can immediately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete calc-accumulated-discounts 'p/*/`calc-accumulated-discounts`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/calc-accumulated-discounts.conf>, F<~/calc-accumulated-discounts.conf>, or F</etc/calc-accumulated-discounts.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ discounts (see --discounts)
+ format (see --format)
+ naked_res (see --naked-res)
+ years (see --years)
+
+=head1 ENVIRONMENT
+
+=head2 CALC_ACCUMULATED_DISCOUNTS_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/calc-accumulated-discounts.conf>
+
+F<~/calc-accumulated-discounts.conf>
+
+F</etc/calc-accumulated-discounts.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CalcAccumulatedDiscounts>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CalcAccumulatedDiscounts>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CalcAccumulatedDiscounts>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

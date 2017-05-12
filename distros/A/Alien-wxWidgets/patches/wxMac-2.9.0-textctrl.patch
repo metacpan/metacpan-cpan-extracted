@@ -1,0 +1,55 @@
+--- src/osx/cocoa/textctrl.mm	2009-09-04 06:53:00.000000000 +0200
++++ src/osx/cocoa/textctrl.mm	2009-10-18 20:47:57.000000000 +0200
+@@ -141,7 +141,7 @@
+ 
+ - (void) keyDown:(NSEvent*) event
+ {
+-    wxWidgetCocoaImpl* impl = (wxWidgetCocoaImpl* ) wxWidgetImpl::FindFromWXWidget( [self delegate] );
++    wxWidgetCocoaImpl* impl = (wxWidgetCocoaImpl* ) wxWidgetImpl::FindFromWXWidget( (WXWidget) [self delegate] );
+     lastKeyDownEvent = event;
+     if ( impl == NULL || !impl->DoHandleKeyEvent(event) )
+         [super keyDown:event];
+@@ -150,14 +150,14 @@
+ 
+ - (void) keyUp:(NSEvent*) event
+ {
+-    wxWidgetCocoaImpl* impl = (wxWidgetCocoaImpl* ) wxWidgetImpl::FindFromWXWidget( [self delegate] );
++    wxWidgetCocoaImpl* impl = (wxWidgetCocoaImpl* ) wxWidgetImpl::FindFromWXWidget( (WXWidget) [self delegate] );
+     if ( impl == NULL || !impl->DoHandleKeyEvent(event) )
+         [super keyUp:event];
+ }
+ 
+ - (void) flagsChanged:(NSEvent*) event
+ {
+-    wxWidgetCocoaImpl* impl = (wxWidgetCocoaImpl* ) wxWidgetImpl::FindFromWXWidget( [self delegate] );
++    wxWidgetCocoaImpl* impl = (wxWidgetCocoaImpl* ) wxWidgetImpl::FindFromWXWidget( (WXWidget) [self delegate] );
+     if ( impl == NULL || !impl->DoHandleKeyEvent(event) )
+         [super flagsChanged:event];
+ }
+@@ -170,7 +170,7 @@
+ 
+ - (void) insertText:(id) str
+ {
+-    wxWidgetCocoaImpl* impl = (wxWidgetCocoaImpl* ) wxWidgetImpl::FindFromWXWidget( [self delegate] );
++    wxWidgetCocoaImpl* impl = (wxWidgetCocoaImpl* ) wxWidgetImpl::FindFromWXWidget( (WXWidget) [self delegate] );
+     if ( impl == NULL || lastKeyDownEvent==nil || !impl->DoHandleCharEvent(lastKeyDownEvent, str) )
+     {
+         [super insertText:str];
+@@ -318,7 +318,7 @@
+     
+     [m_scrollView setDocumentView: tv];
+ 
+-    [tv setDelegate: w];
++    [tv setDelegate: (WXWidget) w];
+     
+     InstallEventHandler(tv);    
+ }
+@@ -433,7 +433,7 @@
+ wxNSTextFieldControl::wxNSTextFieldControl( wxTextCtrl *wxPeer, WXWidget w ) : wxWidgetCocoaImpl(wxPeer, w)
+ {
+     m_textField = (NSTextField*) w;
+-    [m_textField setDelegate: w];
++    [m_textField setDelegate: (WXWidget) w];
+     m_selStart = m_selEnd = 0;
+     m_hasEditor = [w isKindOfClass:[NSTextField class]];
+ }

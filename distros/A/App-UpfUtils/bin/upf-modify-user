@@ -1,0 +1,313 @@
+#!perl
+
+# Note: This script is a CLI  for Riap function /Unix/Passwd/File/modify_user
+# and generated automatically using Perinci::CmdLine::Gen version 0.28
+
+our $DATE = '2016-01-18'; # DATE
+our $DIST = 'App-UpfUtils'; # DIST
+our $VERSION = '0.05'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => "/Unix/Passwd/File/modify_user",
+    program_name => "upf-modify-user",
+)->run;
+
+# ABSTRACT: Modify an existing user
+# PODNAME: upf-modify-user
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+upf-modify-user - Modify an existing user
+
+=head1 VERSION
+
+This document describes version 0.05 of upf-modify-user (from Perl distribution App-UpfUtils), released on 2016-01-18.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % upf-modify-user [options] <user>
+
+=head1 DESCRIPTION
+
+Specify arguments to modify corresponding fields. Unspecified fields will not be
+modified.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--backup>
+
+Whether to backup when modifying files.
+
+Backup is written with `.bak` extension in the same directory. Unmodified file
+will not be backed up. Previous backup will be overwritten.
+
+
+=item B<--encpass>=I<s>
+
+Encrypted password.
+
+=item B<--etc-dir>=I<s>
+
+Specify location of passwd files.
+
+Default value:
+
+ "/etc"
+
+=item B<--expire-date>=I<i>
+
+The date of expiration of the account, expressed as the number of days since Jan 1, 1970.
+
+=item B<--gecos>=I<s>
+
+Usually, it contains the full username.
+
+=item B<--gid>=I<unix_gid>
+
+Numeric primary group ID for this user.
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--home>=I<s>
+
+User's home directory.
+
+=item B<--last-pwchange>=I<i>
+
+The date of the last password change, expressed as the number of days since Jan 1, 1970..
+
+=item B<--max-pass-age>=I<i>
+
+The number of days after which the user will have to change her password.
+
+=item B<--min-pass-age>=I<i>
+
+The number of days the user will have to wait before she will be allowed to change her password again.
+
+=item B<--pass-inactive-period>=I<i>
+
+The number of days after a password has expired (see max_pass_age) during which the password should still be accepted (and user should update her password during the next login).
+
+=item B<--pass-warn-period>=I<i>
+
+The number of days before a password is going to expire (see max_pass_age) during which the user should be warned.
+
+=item B<--shell>=I<s>
+
+User's shell.
+
+=item B<--uid>=I<unix_uid>
+
+Numeric user ID.
+
+=item B<--user>=I<unix_user>*
+
+User (login) name.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C upf-modify-user upf-modify-user
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete upf-modify-user 'p/*/`upf-modify-user`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at C<~/.config/upf-modify-user.conf>, C<~/upf-modify-user.conf> or C</etc/upf-modify-user.conf> (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features. 
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+List of available configuration parameters:
+
+ backup (see --backup)
+ encpass (see --encpass)
+ etc_dir (see --etc-dir)
+ expire_date (see --expire-date)
+ format (see --format)
+ gecos (see --gecos)
+ gid (see --gid)
+ home (see --home)
+ last_pwchange (see --last-pwchange)
+ max_pass_age (see --max-pass-age)
+ min_pass_age (see --min-pass-age)
+ naked_res (see --naked-res)
+ pass_inactive_period (see --pass-inactive-period)
+ pass_warn_period (see --pass-warn-period)
+ shell (see --shell)
+ uid (see --uid)
+ user (see --user)
+
+=head1 ENVIRONMENT
+
+=head2 UPF_MODIFY_USER_OPT => str
+
+Specify additional command-line options
+
+=head1 FILES
+
+~/.config/upf-modify-user.conf
+
+~/upf-modify-user.conf
+
+/etc/upf-modify-user.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-UpfUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-UpfUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-UpfUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

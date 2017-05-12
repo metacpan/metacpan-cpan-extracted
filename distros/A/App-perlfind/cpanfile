@@ -1,0 +1,10 @@
+requires 'Class::Trigger';
+requires 'Module::Pluggable';
+requires 'Pod::Cpandoc';
+requires 'Pod::Functions';
+requires 'parent';
+
+on test => sub {
+    requires 'Test::Compile';
+    requires 'Test::Differences';
+};

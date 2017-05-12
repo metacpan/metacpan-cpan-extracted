@@ -1,0 +1,64 @@
+{
+   "abstract" : "Dochazka ATT system web client",
+   "author" : [
+      "Smithfarm <presnypreklad@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Dochazka-WWW",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Params::Validate" : "1.06",
+            "Test::Fatal" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.37",
+            "Software::License" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::CELL" : "0.196",
+            "App::MFILE" : "0.181",
+            "App::MFILE::WWW" : "0.156",
+            "File::ShareDir" : "1.00",
+            "File::Temp" : "0",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "provides" : {
+      "App::Dochazka::WWW" : {
+         "file" : "lib/App/Dochazka/WWW.pm",
+         "version" : "0.147"
+      },
+      "App::Dochazka::WWW::Dispatch" : {
+         "file" : "lib/App/Dochazka/WWW/Dispatch.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/smithfarm/dochazka-www/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/App::Dochazka::WWW",
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ],
+      "repository" : {
+         "url" : "https://github.com/smithfarm/dochazka-www"
+      }
+   },
+   "version" : "0.147"
+}

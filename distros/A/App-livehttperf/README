@@ -1,0 +1,85 @@
+NAME
+    App::livehttperf - Real life web performance testing tool
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+        livehttperf --help
+
+DESCRIPTION
+    livehttperf is a web performance testing tool using recorded sessions
+    from LiveHTTP headers Firefox extension
+    <http://livehttpheaders.mozdev.org/>.
+
+INSTALLATION
+        cpanm App::livehttperf
+
+HOW TO USE
+    This tool is intended to be used to compare how the changes of your web
+    application front/back-end impact user experience and the overall
+    performance of your web server.
+
+  Create repeatable test scenario
+    Therefore you need to create a *typical* user session (browse a bit, add
+    products to basket, fill some forms, let some AJAX calls to be
+    executed), which you can then replay on the new version of your website.
+
+    I'd recommend Selenium IDE <http://seleniumhq.org/projects/ide/> to do
+    so.
+
+    Remember to manually add *pause* commands if you want to add delays
+    between navigating to other pages.
+
+  Record live requests/responses
+    Execute Selenium's test case with *LiveHTTP headers* capturing live
+    traffic.
+
+    Save to a file which will be used as input file for "livehttperf".
+
+  Prepare web / database server(s) for tests
+    Start some system monitoring tool on those servers to measure impact of
+    your test.
+
+    Install one (or both) packages:
+
+    *   sysstat
+
+            man sar
+
+    *   procps
+
+            man vmstat
+
+  Prepare your client server
+    Disable any processes that could impact the client server performance.
+
+    Use same tools as above to measure the impact of test.
+
+  Execute your tests
+        livehttperf --help
+
+    Specify configuration options and run your tests.
+
+    Use LibreOffice Calc to open saved result file (XLSX format).
+
+SEE ALSO
+    *   livehttperf
+
+    *   LiveHTTP headers Firefox extension
+        <http://livehttpheaders.mozdev.org/>
+
+    *   Selenium IDE <http://seleniumhq.org/projects/ide/>
+
+    *   httperf <http://www.hpl.hp.com/research/linux/httperf/docs.php>
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

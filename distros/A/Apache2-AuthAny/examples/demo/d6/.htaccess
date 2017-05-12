@@ -1,0 +1,7 @@
+# d6
+# The user "aatest1|basic" is allowed. Users with either the 
+# role "admin" are also allowed through.
+
+AuthType auth-any
+Require user aatest1|basic julian.assange@gmail.com|google
+Require role admin topsecret

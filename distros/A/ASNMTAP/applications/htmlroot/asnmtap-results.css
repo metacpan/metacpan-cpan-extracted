@@ -1,0 +1,367 @@
+BODY         {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: normal;
+     background-color: #000000;
+     color: #D8D8BF;
+     scrollbar-base-color: darkblue;
+     scrollbar-arrow-color: blue;
+     scrollbar-face-color: darkblue;
+     scrollbar-highlight-color: darkblue;
+     scrollbar-shadow-color: darkblue;
+     scrollbar-darkshadow-color: blue;
+}
+
+H1           {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 12pt;
+     font-weight: normal;
+     color: #D8D8BF;
+}
+
+H2           {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 11pt;
+     font-weight: normal;
+     color: blue;
+}
+
+H3           {
+     font-family: Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: normal;
+     color: yellow;
+}
+
+TH           {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: bold;
+     color: #000000;
+     background-color: #787878;
+}
+
+TD            {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: normal;
+     color: #D8D8BF;
+}
+
+.HeaderTitel  {
+     font-family: "Comic Sans MS", sans-serif;
+     font-size: 16pt;
+     font-weight: bold;
+     text-align: center;
+     color: #3366FF;
+     border: none;
+}
+
+.HeaderSubTitel  {
+     font-family: Geneva, Arial, Helvetica, sans-serif;
+     font-size: 12pt;
+     font-weight: normal;
+     text-align: right;
+     border: none;
+}
+
+.LegendCopyright  {
+     font-family: Tahoma, Arial, Helvetica, sans-serif;
+     font-size: -1pt;
+     font-weight: normal;
+     text-align: left;
+     color: #ffffff;
+     border: none;
+}
+
+.LegendIcons  {
+     font-family: Tahoma, Arial, Helvetica, sans-serif;
+     font-size: -1pt;
+     font-weight: normal;
+     text-align: center;
+     border: none;
+}
+
+.LegendLastUpdate  {
+     font-family: Tahoma, Arial, Helvetica, sans-serif;
+     font-size: -1pt;
+     font-weight: normal;
+     text-align: right;
+     color: #ffffff;
+     border: none;
+}
+
+.DataDirectory  {
+	font-family: "Courier New", monospace;
+	font-size: 10pt;
+	font-weight: normal;
+	text-decoration: none;
+	color: Lime;
+}
+
+.HelpPluginFilename {
+     font-family: Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: normal;
+     text-align: center;
+     color: yellow;
+     border: none;
+}
+
+.ReportItem {
+     font-family: Arial, Helvetica, sans-serif;
+     font-size: 12pt;
+     font-weight: bold;
+     text-decoration: none;
+     text-align: center;
+     color: #D8D8BF;
+}
+
+.GroupHeader {
+     font-family: Tahoma, Arial, Helvetica, sans-serif;
+     font-size: 12pt;
+     font-weight: normal;
+     text-align: left;
+     color: #3366FF;
+     border: none;
+}
+
+.GroupMessage {
+     font-family: Tahoma, Arial, Helvetica, sans-serif;
+     font-size: 12pt;
+     font-weight: normal;
+     text-align: left;
+     color: #3366FF;
+     border: none;
+}
+
+.GroupFooter {
+     font-family: Tahoma, Arial, Helvetica, sans-serif;
+     font-size: 12pt;
+     font-weight: normal;
+     text-align: left;
+     color: #3366FF;
+     border: none;
+}
+
+.ItemHeader {
+     font-family: Tahoma, Arial, Helvetica, sans-serif;
+     font-size: -1pt;
+     font-weight: normal;
+     text-align: left;
+     color: #D8D8BF;
+     border: none;
+}
+
+.ItemHeaderTest {
+     font-family: Tahoma, Arial, Helvetica, sans-serif;
+     font-size: -1pt;
+     font-weight: normal;
+     text-align: left;
+     color: #FFFFCC;
+     border: none;
+}
+
+.ItemStatus {
+     font-family: Tahoma, Arial, Helvetica, sans-serif;
+     font-size: -1pt;
+     font-weight: normal;
+     text-align: left;
+     border: none;
+}
+
+.ItemFooter {
+     font-family: Tahoma, Arial, Helvetica, sans-serif;
+     font-size: -1pt;
+     font-weight: normal;
+     text-align: left;
+     color: #D8D8BF;
+     border: none;
+}
+
+.StatusHeader {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 9pt;
+     font-weight: normal;
+     text-align: center;
+     color: #D8D8BF;
+}
+
+.StatusItem {
+     font-family: Tahoma, Arial, Helvetica, sans-serif;
+     font-size: -1pt;
+     font-weight: normal;
+     text-align: left;
+     border: none;
+     color: #FFFF44;
+     vertical-align: top;
+}
+
+.StatusMessage {
+     font-family: Tahoma, Arial, Helvetica, sans-serif;
+     font-size: -1pt;
+     font-weight: normal;
+     text-align: left;
+     border: none;
+     color: #FFFFCC;
+     vertical-align: top;
+}
+
+.StatusMessageError {
+     font-family: Tahoma, Arial, Helvetica, sans-serif;
+     font-size: -1pt;
+     font-weight: normal;
+     text-align: left;
+     border: none;
+     color: #99CCFF;
+     vertical-align: top;
+}
+
+.RunCmdOnDemandHtmlTitle {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 11pt;
+     font-weight: normal;
+     text-align: left;
+     color: blue;
+}
+
+.RunCmdOnDemandCommand {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 11pt;
+     font-weight: normal;
+     text-align: left;
+     color: yellow;
+}
+
+.RunCmdOnDemandCaptureHeader {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: normal;
+     text-align: left;
+     color: white;
+}
+
+.RunCmdOnDemandCaptureTrue {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: normal;
+     color: yellow;
+}
+
+.RunCmdOnDemandCaptureLong {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: normal;
+     background-color: #FFFFFF;
+     color: green;
+}
+
+.RunCmdOnDemandCaptureHtml {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: normal;
+     color: blue;
+}
+
+.RunCmdOnDemandCaptureDebug {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: normal;
+     color: green;
+}
+
+.RunStatusOnDemandHtmlTitle {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 11pt;
+     font-weight: normal;
+     text-align: left;
+     color: blue;
+}
+
+.RunStatusOnDemandCommand {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 11pt;
+     font-weight: normal;
+     text-align: left;
+     color: yellow;
+}
+
+.RunStatusOnDemandCaptureHeader {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: bold;
+     text-align: center;
+     background-color: #665555;
+     color: white;
+}
+
+.RunStatusOnDemandCaptureRunning {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: bold;
+     text-align: left;
+     color: green;
+}
+
+.RunStatusOnDemandCaptureNotRunning {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: bold;
+     text-align: left;
+     color: red;
+}
+
+.RunStatusOnDemandCaptureParent {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: normal;
+     text-align: left;
+     background-color: #D8D8BF;
+     color: blue;
+}
+
+.RunStatusOnDemandCaptureParentAction {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: normal;
+     text-align: center;
+     background-color: #F0F0F0;
+     color: blue;
+}
+
+.RunStatusOnDemandCaptureChild {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: normal;
+     text-align: left;
+     background-color: #F0F0F0;
+     color: blue;
+}
+
+.RunStatusOnDemandCaptureChildAction {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: normal;
+     text-align: center;
+     background-color: #D8D8BF;
+     color: blue;
+}
+
+.RunStatusOnDemandCaptureSubChild {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: normal;
+     text-align: left;
+     background-color: #FFFFFF;
+     color: blue;
+}
+
+.RunStatusOnDemandCaptureDebug {
+     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 10pt;
+     font-weight: normal;
+     text-align: left;
+     background-color: #335566;
+     color: white;
+}
+

@@ -1,0 +1,33 @@
+{
+   "recipe" : {
+      "target_nic_per_ml" : 3.0,
+      "target_vg" : 70,
+      "target_quantity" : 180.0,
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "percentage" : "3",
+            "tag" : "TFA Vanilla Swirl"
+         },
+         {
+            "type" : "PG",
+            "tag" : "Vanillin (10%)",
+            "percentage" : "2"
+         },
+         {
+            "percentage" : "4",
+            "tag" : "TFA VBIC",
+            "type" : "PG"
+         },
+         {
+            "type" : "PG",
+            "percentage" : "1",
+            "tag" : "TFA Bavarian Cream"
+         }
+      ],
+      "base_nic_type" : "PG",
+      "target_pg" : 30,
+      "notes" : [],
+      "base_nic_per_ml" : 100
+   }
+}

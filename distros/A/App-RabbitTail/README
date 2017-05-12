@@ -1,0 +1,52 @@
+NAME
+    App::RabbitTail - Log tailer which broadcasts log lines into RabbitMQ
+    exchanges.
+
+SYNOPSIS
+        See the rabbit_tail script shipped with the distribution for simple CLI useage.
+
+        use App::RabbitTail;
+        use AnyEvent; # Not strictly needed, but you probably want to
+                      # use it yourself if you're doing this manually.
+
+        my $tailer = App::RabbitTail->new(
+            # At least 1 filename must be supplied
+            filename => [qw/ file1 file2 /],
+            # Optional args, defaults below
+            routing_key => [qw/ # /],
+            host => 'localhost',
+            port => 5672,
+            user => 'guest',
+            pass => 'guest',
+            vhost => '/',
+            exchange_type => 'direct',
+            exchange_name => 'logs',
+            exchange_durable => 0,
+            max_sleep => 10,
+        );
+        # You can setup other AnyEvent io watchers etc here.
+        $tailer->run; # enters the event loop
+        # Or:
+        $tailer->tail;
+
+DECRIPTION
+    App::RabbitTail is a trivial file tail implementation using AnyEvent IO
+    watchers, which emits lines from the tailed files into
+    <http://www.rabbitmq.com/> via the Net::RabbitFoot client.
+
+    Note that this software should be considered experimental.
+
+BUGS
+    Plenty. Along with error conditions not being handled gracefully etc.
+
+    They will be fixed in due course as I start using this more seriously,
+    however in the meantime, patches are welcome :)
+
+AUTHOR
+    Tomas Doran (t0m) "<bobtfish@bobtfish.net>"
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2010 Tomas Doran
+
+    Licensed under the same terms as perl itself.
+

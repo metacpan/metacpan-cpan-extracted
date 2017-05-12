@@ -1,0 +1,42 @@
+---
+name: Apache-Auth-UserDB
+version: v0.120
+author:
+  - 'Julian Mehnle <julian@mehnle.net>'
+abstract: Manipulation of Apache user authentication databases
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Digest::MD5: 0
+  perl: v5.6
+  version: 0
+build_requires:
+  Module::Build: 0
+  Test::More: 0
+provides:
+  Apache::Auth::User:
+    file: lib/Apache/Auth/User.pm
+    version: v0.120
+  Apache::Auth::User::Basic:
+    file: lib/Apache/Auth/User/Basic.pm
+    version: v0.120
+  Apache::Auth::User::Digest:
+    file: lib/Apache/Auth/User/Digest.pm
+    version: v0.120
+  Apache::Auth::UserDB:
+    file: lib/Apache/Auth/UserDB.pm
+    version: v0.120
+  Apache::Auth::UserDB::File:
+    file: lib/Apache/Auth/UserDB/File.pm
+    version: v0.120
+  Apache::Auth::UserDB::File::Basic:
+    file: lib/Apache/Auth/UserDB/File/Basic.pm
+    version: v0.120
+  Apache::Auth::UserDB::File::Digest:
+    file: lib/Apache/Auth/UserDB/File/Digest.pm
+    version: v0.120
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

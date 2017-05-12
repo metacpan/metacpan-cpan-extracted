@@ -1,0 +1,34 @@
+---
+abstract: 'Wrap git command-line interface without blocking'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Sort::Versions: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Git-Wrapper
+recommends:
+  EV: '0'
+requires:
+  AnyEvent: '0'
+  AnyEvent::Open3::Simple: '0.83'
+  File::pushd: '0'
+  Git::Wrapper: '0.045'
+  Scalar::Util: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/plicease/AnyEvent-Git-Wrapper/issues
+  homepage: https://metacpan.org/pod/AnyEvent::Git::Wrapper
+  repository: git://github.com/plicease/AnyEvent-Git-Wrapper.git
+version: '0.10'
+x_serialization_backend: 'YAML::Tiny version 1.70'

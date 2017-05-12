@@ -1,0 +1,98 @@
+{
+   "abstract" : "Simple DBI wrapper",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amon2-DBI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp::Clan" : "0",
+            "DBI" : "1.616",
+            "DBIx::TransactionManager" : "1.09",
+            "SQL::Interp" : "1.10",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Amon2::DBI" : {
+         "file" : "lib/Amon2/DBI.pm",
+         "version" : "0.33"
+      },
+      "Amon2::DBI::db" : {
+         "file" : "lib/Amon2/DBI.pm"
+      },
+      "Amon2::DBI::dr" : {
+         "file" : "lib/Amon2/DBI.pm"
+      },
+      "Amon2::DBI::st" : {
+         "file" : "lib/Amon2/DBI.pm"
+      },
+      "Amon2::Plugin::DBI" : {
+         "file" : "lib/Amon2/Plugin/DBI.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Amon2-DBI/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Amon2-DBI",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Amon2-DBI.git",
+         "web" : "https://github.com/tokuhirom/Amon2-DBI"
+      }
+   },
+   "version" : "0.33",
+   "x_contributors" : [
+      "Masahiro Nagano <kazeburo@gmail.com>",
+      "makamaka <makamaka.donzoko@gmail.com>",
+      "Neil Bowers <neil@bowers.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

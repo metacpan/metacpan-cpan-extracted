@@ -1,0 +1,7 @@
+Revision history for Perl extension Apache2::AuthCookieDBImg 
+See the pod for more revision details.
+
+2.1  Feb 2006
+        Initial release based on Apache2::AuthCookieDBI v2.03
+        by Lance P. Cleveland, Charleston Software Associates
+

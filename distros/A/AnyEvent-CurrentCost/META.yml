@@ -1,0 +1,38 @@
+---
+abstract: 'AnyEvent module for reading from Current Cost energy meters'
+author:
+  - 'Mark Hindess <soft-cpan@temporalanomaly.com>'
+build_requires:
+  IO::Pipe: 0
+  Test::More: 0
+  Test::Requires: 0
+  Test::SharedFork: 0
+  Test::Warn: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-CurrentCost
+requires:
+  AnyEvent: 0
+  AnyEvent::Handle: 0
+  AnyEvent::SerialPort: 1.130171
+  Carp: 0
+  Device::CurrentCost: 1.130190
+  Device::CurrentCost::Constants: 0
+  Getopt::Long: 0
+  List::Util: 0
+  Pod::Usage: 0
+  Sub::Name: 0
+  base: 0
+  constant: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/beanz/anyevent-current-cost-perl/issues
+  repository: git://github.com/beanz/anyevent-current-cost-perl.git
+version: 1.130190

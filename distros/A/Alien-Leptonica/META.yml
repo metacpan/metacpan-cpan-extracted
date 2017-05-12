@@ -1,0 +1,29 @@
+---
+abstract: 'Alien package for the Leptonica image processing library'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  File::Basename: '0'
+  File::Spec: '0'
+  Module::Load: '0'
+  Test::More: '0'
+configure_requires:
+  Alien::Base::ModuleBuild: '0.006'
+  File::ShareDir: '1.03'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Leptonica
+requires:
+  Alien::Base: '0.006'
+  File::ShareDir: '1.03'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/EntropyOrg/p5-Alien-Leptonica
+  repository: https://github.com/EntropyOrg/p5-Alien-Leptonica.git
+version: '0.007'

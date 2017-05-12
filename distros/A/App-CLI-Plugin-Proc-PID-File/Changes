@@ -1,0 +1,12 @@
+Revision history for Perl extension App::CLI::Plugin::Proc::PID::File
+
+1.3  Mon Sep 19 11:09:01 JST 2011
+        - change dependencies module Class::Accessor::Grouped (before Class::Data::Accessor)
+1.2   Mon Jan  4 01:50:49 2010
+        - mini fix
+1.1   Sun Dec 13 15:16:12 2009
+        - Version of the Proc::PID::File to use some of it less than 1.27
+1.0   Sun Dec 13 00:16:22 2009
+        - it's new
+0.01  Sun Nov 15  0:21:36 2009
+        - original version

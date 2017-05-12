@@ -1,0 +1,32 @@
+---
+abstract: 'Create an EPUB ebook'
+author:
+  - 'Mathias Weidner <mamawe@cpan.org>'
+build_requires:
+  Probe::Perl: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-MakeEPUB
+provides:
+  App::MakeEPUB:
+    file: lib/App/MakeEPUB.pm
+    version: v0.3.1
+requires:
+  Archive::Zip: 0
+  File::Basename: 0
+  File::Find: 0
+  File::Path: 0
+  File::Spec: 0
+  HTML::TreeBuilder: 0
+  perl: v5.10.1
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.3.1

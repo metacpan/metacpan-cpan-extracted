@@ -1,0 +1,11 @@
+libanyevent-serialize-perl (0.05-1) unstable; urgency=low
+
+  * Fixed build-depend.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 04 Mar 2011 09:10:07 +0300
+
+libanyevent-serialize-perl (0.04-1) unstable; urgency=low
+
+  * Initial release. (Closes: #616142)
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 02 Mar 2011 22:53:32 +0300

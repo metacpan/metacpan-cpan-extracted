@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache::Hadoop::Watcher.
+
+0.01  Tue Aug 18 10:37:38 2015
+	- Initial version
+	- added conf, jmx and hdfs dfs contexts
+

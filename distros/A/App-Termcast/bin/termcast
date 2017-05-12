@@ -1,0 +1,48 @@
+#!perl
+use strict;
+use warnings;
+use App::Termcast;
+# PODNAME: termcast
+# ABSTRACT: broadcast your terminal sessions for remote viewing
+
+
+my $tc = App::Termcast->new_with_options;
+my @argv = @{ $tc->extra_argv };
+push @argv, ($ENV{SHELL} || '/bin/sh') if !@argv;
+$tc->run(@argv);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+termcast - broadcast your terminal sessions for remote viewing
+
+=head1 VERSION
+
+version 0.13
+
+=head1 SYNOPSIS
+
+  termcast [options] [command]
+
+=head1 DESCRIPTION
+
+Runs C<command> (or a shell, if the command isn't given), while broadcasting it
+to a termcast server. See L<App::Termcast> for options documentation.
+
+=head1 AUTHOR
+
+Jesse Luehrs <doy@tozt.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Jesse Luehrs.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

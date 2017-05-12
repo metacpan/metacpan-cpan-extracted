@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+PatternMatcher.pm
+t/segment_match.t
+t/single_match.t
+t/varmatch.t
+t/subseq.t
+t/rest.t
+t/undef.t

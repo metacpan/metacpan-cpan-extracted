@@ -1,0 +1,26 @@
+; vim: syntax=dosini
+name    = Asset-Pack
+author  = James Laver <james.laver@gmail.com>
+license = Perl_5
+copyright_holder = James Laver on time generously donated by Anomalio
+
+[@Author::KENTNL]
+; twitter_extra_hash_tags = 
+normal_form       = numify
+mantissa          = 6
+toolkit           = eumm
+toolkit_hardness  = soft
+bumpversions      = 1
+srcreadme         = pod
+-remove           = Author::KENTNL::RecommendFixes
+-remove           = MetaData::BuiltWith
+PodWeaver.replacer = replace_with_comment
+PodWeaver.post_code_replacer = replace_with_blank
+
+[Munge::Whitespace]
+filename = LICENSE
+
+;authordep Pod::Weaver::Section::Contributors = 0
+
+[Prereqs / TestRecommends]
+App::FatPacker = 0.009017

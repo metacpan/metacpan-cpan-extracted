@@ -1,0 +1,39 @@
+Application::BackupAndRestore
+=============================
+
+Backup and Restore your Files and Folders incrementally.
+
+APPLICATION NAME
+
+	BackupAndRestore
+
+INSTALLATION
+
+To install this module open a terminal window, cd into the directory and
+type the following:
+
+	perl Makefile.PL
+   make
+   make test
+   sudo make install
+
+DEPENDENCIES
+
+This module requires
+
+	tar
+	file-roller
+
+A Locale of en_GB.utf8 is needed and probably installed
+
+SYSTEM REQUIREMENTS
+
+Linux or äquivalent Unix System. Tested under Ubuntu (Hardy Heron)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Holger Seelig
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

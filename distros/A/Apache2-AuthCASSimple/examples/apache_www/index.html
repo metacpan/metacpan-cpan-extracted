@@ -1,0 +1,25 @@
+<html>
+<head></head>
+<body>
+% my $noun = 'World';
+           Hello <% $noun %>!
+           How are ya?
+<form action='' method='post'>
+<input type='text' name='test' value='<% $noun %> <% $test %>'>
+<input type='text' name='test2' value='2 <% $noun %> <% $test2 %>'>
+<input type='submit'>
+</form>
+<br><b>REMOTE_USER:</b> -<% $ENV{REMOTE_USER} %>-
+<br><b>$r->user():</b> -<% $r->user() %>-
+<p> <b>Direct link:</b> <a href="?test=yyyy&test2=aaa">?test=yyyy&test2=aaa</a>
+<pre>
+% foreach my $key (sort keys %ENV) {
+% print $key .' = '. $ENV{$key}."\n"; 
+% }
+</pre>
+</body>
+</html>
+<%args>
+$test => undef
+$test2 => undef
+</%args>

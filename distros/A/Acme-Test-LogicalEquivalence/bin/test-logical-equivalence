@@ -1,0 +1,111 @@
+#!perl
+# ABSTRACT: Test if expressions are logically equivalent
+# PODNAME: test-logical-equivalence
+
+
+use 5.008;
+use warnings FATAL => 'all';
+use strict;
+
+use Test::More;
+use Acme::Test::LogicalEquivalence qw(is_logically_equivalent);
+
+sub usage {
+    print <<END;
+$0 EXPR1 EXPR2
+Test if two simple expressions are logically equivalent.
+
+Exactly two expressions must be given.
+
+Example: $0 '\$a || \$b' '\$b || \$a'
+Remember that you may need to escape special characters like "\$" from your shell.
+END
+    exit 1;
+}
+
+sub find_num_vars {
+    my $expr = shift;
+
+    my $highest = -1;
+
+    # check for scalars that look like $a or $b
+    for my $varname ($expr =~ /\$([a-z])/g) {
+        my $num = ord($varname) - 97;
+        $highest = $num if $highest < $num;
+    }
+
+    # check for scalars that index $_
+    for my $varname ($expr =~ /\$_\[(\d+)\]/g) {
+        my $num = $varname;
+        $highest = $num if $highest < $num;
+    }
+
+    return $highest + 1;
+}
+
+my $expr1 = shift or usage;
+my $expr2 = shift or usage;
+
+my $numvars1 = find_num_vars($expr1);
+my $numvars2 = find_num_vars($expr2);
+my $num = $numvars1 > $numvars2 ? $numvars1 : $numvars2;
+
+if ($num < 1) {
+    print STDERR 'No variables detected. Variables should be one or more of $a, $b, ..., $z', "\n";
+    exit 2;
+}
+
+# convert $a-style vars to $_[0]-style to support more than just $a and $b
+$expr1 =~ s/\$([a-z])/'$_['.(ord($1) - 97).']'/ge;
+$expr2 =~ s/\$([a-z])/'$_['.(ord($1) - 97).']'/ge;
+
+my $sub1 = eval "sub { $expr1 }" or die "Expression 1: $@\n";   ## no critic (ProhibitStringyEval)
+my $sub2 = eval "sub { $expr2 }" or die "Expression 2: $@\n";   ## no critic (ProhibitStringyEval)
+
+plan tests => (2 ** $num);
+note "Testing for logical equivalence of two expressions with $num variable(s)...";
+
+my $equivalence = is_logically_equivalent($num, $sub1, $sub2);
+note $equivalence ? 'Logical equivalence proved!' : 'Bummer...';
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+test-logical-equivalence - Test if expressions are logically equivalent
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+    # be sure to escape $ and other special characters from your shell
+    test-logical-equivalence '$a && $b' '$b && $a'
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Acme::Test::LogicalEquivalence>
+
+=back
+
+=head1 AUTHOR
+
+Charles McGarvey <chazmcgarvey@brokenzipper.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Charles McGarvey.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

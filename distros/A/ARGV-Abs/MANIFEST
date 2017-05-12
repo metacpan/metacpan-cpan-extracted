@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/01.pl
+lib/ARGV/Abs.pm
+t/00-compile.t
+t/00_compile.t
+t/90-pod.t
+t/91-pod-coverage.t
+t/release-kwalitee.t

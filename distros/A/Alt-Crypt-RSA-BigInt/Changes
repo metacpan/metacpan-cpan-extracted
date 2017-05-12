@@ -1,0 +1,128 @@
+Revision history for Perl module Alt::Crypt::RSA::BigInt
+
+0.06  2017-04-26
+
+  - Typo fixes from dsteinbrunner.
+
+  - Use new Math::Prime::Util with a CSPRNG, remove Bytes::Random::Secure.
+
+  - Add check in key gen for p/q distance (FIPS, ANSI), for size over 256.
+
+  - Use BPSW + Frobenius + 3 random-base M-R instead of BPSW + 46 fixed M-R.
+    No practical difference, but a little faster.
+
+
+0.05  2013-02-22
+
+  - Fixed some perlcritic issues -- mainly returning undef and changing to the
+    three argument open using a lexical file handle.
+
+  - Doh -- Alt's package name was Bigint not BigInt.
+
+  - Speed up testing for Calc backend (only do 384-bits in test 11 if not
+    using GMP or Pari backends).
+
+  - Switch to Bytes::Random::Secure's OO interface, and allow plugging in a
+    different irand function to the generator.
+
+  - Use the new generator interface in all tests.  The suite went from
+    3328 bits of blocking randomness to 1536.
+
+
+0.04  2013-01-14
+
+  - Change from random_maurer_prime to random_nbit_prime.  This is much faster
+    and yields more possible primes (Maurer's algorithm only outputs about 10%
+    of possible primes in the range).  The downside is that the primes are not
+    proven prime, however they will have passed a strong BPSW test and a set of
+    Miller-Rabin tests for the first 46 prime bases.  The BPSW test alone is
+    really enough for these sizes (~600 digits or smaller).
+
+  - Ask for Math::BigInt 1.78 to ensure we have 'try'.
+    Thanks to brian carlson.
+
+  - Reduce key sizes in 06 and 11 when not using GMP or Pari.  Some build
+    systems were timing out (e.g. ActiveState).
+
+
+0.03  2012-12-30
+
+  - Add tests for SHA384 and SHA512.
+
+  - Add optional support for RIPEMD160.
+
+  - Add more data to meta file, including git repository.
+
+  - All tests converted to Test::More.
+
+  - Rewrite Key/Private/SSH.pm, and add tests.  I don't think it ever worked.
+    Now supports IDEA, DES, DES3, Blowfish, Twofish, CAST5, Rijndael, RC6, and
+    Camelia (only the first 4 are guaranteed -- the others depend on having a
+    module installed).  Multiple alternative modules are allowed for some.
+    This fixes:
+
+     RT 69376  Bug in Crypt::RSA::Key::Private::SSH serialize function
+
+  - FindBin is no longer used.  You'll need to do:
+       perl -Iblib/lib -Iblib/arch ...
+    to get the version in this directory.  'make test' does this for us.
+    use 'prove -l -b' to prove using the local version.
+
+    I think FindBin is great for example files and such, but I don't think
+    it is appropriate in the .pm files or in tests.  If we do use it, it has
+    to be added to the dependency list.
+
+
+0.02  2012-12-28
+
+  - Fix a decrypt issue setting keys
+
+  - Add SHA224 support
+
+  - Added strict and warnings to all .pm files.
+
+  - Converted RSA.pm to UTF-8 and added POD directive
+
+  - Make pretty maurer prime generation output with Verbosity.
+
+
+0.01  2012-12-28
+
+  - Add test for h2osp, pss sign and verify with salt.
+
+  - Faster versions of some of the helper functions.
+
+  - Switch from Digest::SHA1 to Digest::SHA, and add SHA256.
+
+  - The following Crypt::RSA 1.99 defects have been fixed or made irrelevant
+    due to no longer using Math::Pari:
+
+     RT 52689  consider moving Crypt::RSA to Math::BigInt?
+     RT 76655  Version 1.99's META.yml says version is 1.97
+     RT 63007  Move to later version of Math-PARI
+     RT  4877  Crypt::RSA test 11 fails with a segmentation fault
+     RT 61392  Crypt::RSA::Key::Private::check not checking that q is an integer
+     RT 64883  Make errstr from check after write more intuitive
+     RT 45533  Crypt::RSA bug in mgf1 function
+
+    These fixable possible defects remain, but should be resoved soon.
+
+     RT 69376  Bug in Crypt::RSA::Key::Private::SSH serialize function
+
+    as well as these that aren't clear:
+
+     RT 50356  Crypt-RSA-1.99
+     RT 59923  changing the passphrase on key
+
+  - Makefile.PL will look for GMP and Pari, and install the Math::BigInt::GMP
+    or Math::BigInt::Pari modules if possible.  It complains otherwise, but
+    everything should still work -- it just runs really slow.
+
+  - Completely removed Pari.
+
+  - Replaced modules:
+
+       Crypt::Random  =>  Bytes::Random::Secure
+       Crypt::Primes  =>  Math::Prime::Util
+
+  - Started with Vipul's Crypt::RSA.

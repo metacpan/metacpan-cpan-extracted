@@ -1,0 +1,16 @@
+Revision history for App-Devel-MAT-Explorer-GTK
+
+0.03    2016/09/09 17:13:06
+        [BUGFIXES]
+         * Fix for 'bytes2size' function reference
+         * Complain louder and more obviously if gdk-pixbuf can't load SVGs
+
+0.02    2016/06/06 15:53:49
+        [CHANGES]
+         * Beginning of code split into multiple .pm files
+         * Display ifileno/ofileno information from Devel::MAT 0.23
+         * Set a distribution abstract description
+
+0.01    2016/04/05 16:30:03
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,29 @@
+---
+abstract: 'An AtomPub server for messaging.'
+author:
+  - 'Naveed Massjouni <naveedm9@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AtomBus
+requires:
+  Atompub: 0
+  Capture::Tiny: 0
+  DBD::SQLite: 0
+  DBIx::Class: 0.08115
+  Dancer: 1.2002
+  Dancer::Plugin::DBIC: 0.1504
+  SQL::Translator: 0.11006
+  UUID::Tiny: 0.02
+  XML::Atom: 0
+  XML::XPath: 0
+resources:
+  bugtracker: http://github.com/ironcamel/AtomBus/issues
+  repository: git://github.com/ironcamel/AtomBus.git
+version: 1.0405

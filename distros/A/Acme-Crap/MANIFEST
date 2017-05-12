@@ -1,0 +1,10 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Acme/Crap.pm
+t/00.load.t
+t/pod.t
+t/warnings.t
+META.yml                                 Module meta-data (added by MakeMaker)

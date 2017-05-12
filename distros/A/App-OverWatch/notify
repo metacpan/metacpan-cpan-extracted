@@ -1,0 +1,263 @@
+#!/usr/bin/env perl
+#
+# notify - Manage App::OverWatch notifications
+#
+use strict;
+use warnings;
+
+use App::OverWatch;
+use App::OverWatch::Notify;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my $Options = {
+    config        => undef,
+
+    check         => 0,
+    create_lock   => 0,
+    create_table  => 0,
+    force_unlock  => 0,
+    list          => 0,
+    lock          => 0,
+    print         => 0,
+    unlock        => 0,
+    update        => 0,
+    print         => 0,
+
+    worker        => undef,
+    text          => undef,
+    system        => undef,
+    expiry        => undef,
+
+    help          => 0,
+    verbose       => 0,
+};
+
+GetOptions($Options,
+           qw( config=s
+               check create_lock create_table force_unlock list lock print unlock update
+               system=s worker=s text=s expiry=s
+               help verbose
+         )) or die "Bad options\n";
+
+pod2usage({
+    -exitval => 0,
+    -verbose => 2,
+})
+    if ($Options->{help});
+
+my $OverWatch = App::OverWatch->new();
+
+$OverWatch->load_config($Options->{config});
+
+my %commands = (
+    check        => \&do_check,
+    create_lock  => \&do_create_lock,
+    create_table => \&do_create_table,
+    force_unlock => \&do_force_unlock,
+    list         => \&do_list,
+    lock         => \&do_lock,
+    print        => \&do_print,
+    unlock       => \&do_unlock,
+    update       => \&do_update,
+);
+
+my $rh_required_options = {
+    check        => [ qw( system ) ],
+    create_lock  => [ qw( system ) ],
+    create_table => [ ],
+    force_unlock => [ qw( system ) ],
+    list         => [ ],
+    lock         => [ qw( system worker text ) ],
+    print        => [ qw( system ) ],
+    unlock       => [ qw( system worker ) ],
+    update       => [ qw( system worker text ) ],
+};
+
+my $cmd = $OverWatch->check_options({
+    options          => $Options,
+    valid_commands   => [ keys %commands ],
+    required_options => $rh_required_options,
+});
+
+my $Notify = $OverWatch->notify();
+
+$commands{$cmd}->();
+exit(0);
+
+sub do_check {
+    my $Lock = $Notify->get_lock({
+        system => $Options->{system},
+    });
+    exit(0) if ($Lock->is_locked());
+    exit(1);
+}
+
+sub do_create_lock {
+    my $system = $Options->{system};
+    if ($Notify->create_lock({
+        system => $system,
+    })) {
+        print "Created lock '$system'\n";
+    }
+}
+
+sub do_create_table {
+    if ($Notify->create_table()) {
+        print "Created table for Notify.\n";
+    }
+}
+
+sub do_force_unlock {
+    my $system = $Options->{system};
+    my $Lock = $Notify->get_lock({
+        system => $system,
+    });
+
+    die "Error: Lock '$system' is not currently locked!\n"
+        if (!$Lock->is_locked());
+
+    if ($Notify->force_unlock({
+        system => $system,
+    })) {
+        print "Force unlocked '$system'\n";
+    }
+}
+
+sub do_list {
+    my @Locks = $Notify->get_all_locks();
+    foreach my $Lock (@Locks) {
+        $Lock->print();
+        print "\n";
+    }
+}
+
+sub do_lock {
+    my $system = $Options->{system};
+    if ($Notify->try_lock({
+        system => $system,
+        worker => $Options->{worker},
+        text   => $Options->{text},
+        expiry => $Options->{expiry},
+    })) {
+        print "Locked '$system'\n";
+    } else {
+        die "Could not lock '$system'\n";
+    }
+}
+
+sub do_print {
+    my $Lock = $Notify->get_lock({
+        system => $Options->{system},
+    });
+    $Lock->print();
+}
+
+sub do_unlock {
+    my $system = $Options->{system};
+    if ($Notify->try_unlock({
+        system => $system,
+        worker => $Options->{worker},
+    })) {
+        print "Unlocked '$system'\n";
+    } else {
+        die "Could not unlock '$system'\n";
+    }
+}
+
+sub do_update {
+    my $system = $Options->{system};
+    if ($Notify->try_update({
+        system => $system,
+        worker => $Options->{worker},
+        text   => $Options->{text},
+        expiry => $Options->{expiry},
+    })) {
+        print "Updated lock on '$system'\n";
+    } else {
+        die "Could not update lock on '$system'\n";
+    }
+}
+
+=head1 NAME
+
+notify - Interface to App::OverWatch DB locks
+
+=head1 SYNOPSIS
+
+  notify [OPTIONS] COMMAND
+
+  Commands:
+
+    --check
+    --create
+    --force_unlock
+    --list
+    --lock
+    --print
+    --unlock
+    --update
+
+  Options:
+
+    --system
+    --worker
+    --text
+    --expiry
+    --help
+    --verbose
+
+=head1 EXAMPLE
+
+Create the Notify table 'notifys':
+
+  # notify --create_table
+
+Create a lock named 'global':
+
+  # notify --create_lock --system global
+
+Check whether 'global' is locked (flagged by exit status):
+
+  # notify --check --system global
+
+Attempt to lock the 'global' lock:
+
+  # notify --lock --system global --worker myworkerid --text 'testing lock'
+
+  # notify --lock --system global --worker myworkerid --text 'testing lock' --expiry 60
+
+Unlock:
+
+  # notify --unlock --system global --worker myworkerid
+
+Force an unlock
+
+  # notify --force_unlock --system global
+
+Print details about a lock:
+
+  # notify --print --system global
+
+List all available locks:
+
+  # notify --list
+
+=head1 DESCRIPTION
+
+notify is used to create and manipulate locks in a backend database. It
+provides a simple example interface to the Perl App::OverWatch::Notify
+module.
+
+=head1 SEE ALSO
+
+L<servicelock>
+
+L<eventlog>
+
+=head1 AUTHOR
+
+Chris Hughes
+
+=cut

@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache::AxKit::Provider::RDBMS.
+
+0.01  Fri Feb 11 14:30:11 2005
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Apache::AxKit::Provider::RDBMS
+

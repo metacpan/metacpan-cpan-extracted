@@ -1,0 +1,46 @@
+title 'BMI API';
+description 'The API to calculate BMI';
+
+resource figure => {
+    type => 'object',
+    description => 'Figure, which includes weight and height',
+    properties => {
+        weight  => {
+            type => 'number',
+            description => 'Weight(kg)',
+            example => 50,
+        },
+        height  => {
+            type => 'number',
+            description => 'Height(m)',
+            example => 1.6,
+        },
+    },
+    required => ['weight', 'height'],
+};
+
+resource bmi => {
+    type => 'object',
+    description => 'Body mass index',
+    properties => {
+        value  => {
+            type => 'number',
+            description => 'bmi value',
+            example => 19.5,
+        },
+    },
+    required => ['value'],
+};
+
+POST '/bmi' => {
+    title           => 'BMI API',
+    description     => 'This API calculates your BMI.',
+    destination     => {
+        controller  => 'BMI',
+        action      => 'calculate',
+    },
+    request         => 'figure',
+    response        => 'bmi',
+}, {
+    on_match => sub { 1 },
+};

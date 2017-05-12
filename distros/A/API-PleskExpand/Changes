@@ -1,0 +1,21 @@
+Revision history for Perl extension API::PleskExpand.
+
+1.00 May 25 20:08:15 SAMST 2008
+    - The first public release
+1.01 Jun 1 19:07:04 SAMST 2008
+    - Fix syntax error in Build.PL :(
+    - Fix errors in documentation
+1.02 Jun 8 13:32:18 SAMST 2008
+    - Full support all ways of choosing a Plesk server, where the client will be created (autoselect and manual)
+1.03 Jun 14 12:16:24 SAMST 2008 
+    - Fix documentation, add tests
+1.04 Jun 22 05:21:18 SAMST 2008
+    - Add ability to attaching domains and accounts to templates
+1.05 Jul 29 23:33:12 SAMST 2008
+    - New function -- get all domains from Expand
+1.06 Jul 31 17:34:55 SAMST 2008
+    - Fixed Build.pl ( Test::LongString not in prereqs_build  list but required )
+    - Add URI.pm as required module
+1.07 Sep 12 01:04:09 SAMST 2008
+    - New function -- get all accounts from Expand
+    - Fix function "get all domains from Expand" -- bug with one field answer

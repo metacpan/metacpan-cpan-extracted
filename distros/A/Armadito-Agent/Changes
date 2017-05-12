@@ -1,0 +1,47 @@
+Revision history for Perl extension Armadito::Agent.
+
+0.1.0_02 24/08/2016
+	- Add ArmaditoAV api RESTful client implementation
+	- State task with ArmaditoAV
+	- Scan task with ArmaditoAV
+	- Fix basic perlcritic policy violations
+	- Beautify code with PerlTidy
+	- Add perlcritic test
+	- Add tidyall test
+	- update perlpod documentation
+
+0.1.0_01 10/08/2016
+	- Add RESTful API client-side implementation
+	- Add Getjobs task
+	- Add Runjobs task
+	- Enrollment with fingerprint
+	- Build and Install from sources on Win32
+	- Add --setup option
+	- Add empty Scan and Alert tasks
+	- Refactor dynamic class loading
+
+0.0.3_03 30/06/2016
+	- reorganize tasks with more inheritance, allowing possibilties to implements tasks for other antiviruses in the future
+	- refactor armadito-agent cli script
+	- fix some naming errors
+
+0.0.3_02 29/06/2016
+	- fix doc mistakes
+
+0.0.3_01 28/06/2016
+	- fix versioning
+	- fix naming problems
+
+0.0.3  28/06/2016
+	- add previous work from fusioninventory-agent' 2.3.x-armadito branch
+	- set documentation in each existing classes
+	- renaming according to new code structure
+
+0.0.2  27/06/2016
+	- add basic perl module stuff
+	- add GPLv2+ license
+
+0.0.1  27/06/2016
+	- original version; created by h2xs 1.23 with options
+                -XAn Armadito::Agent -b 5.8.0
+

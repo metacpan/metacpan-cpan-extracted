@@ -1,0 +1,41 @@
+{
+   "abstract" : "Some utility functions for me, Spinodal",
+   "author" : [
+      "Michael Wambeek <mikewambeek@hotmail.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Spinodal-Utils",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Spinodal::Utils" : {
+         "file" : "lib/Acme/Spinodal/Utils.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "0.03"
+}

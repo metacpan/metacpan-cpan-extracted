@@ -1,0 +1,64 @@
+README for Algorithm::MarkovChain 0.05
+
+=head1 NAME
+
+Algorithm::MarkovChain - Object oriented Markov chain generator
+
+=head1 SYNOPSIS
+
+  use Algorithm::MarkovChain;
+
+  my $chain = Algorithm::MarkovChain::->new();
+
+  # learn about things from @symbols
+  $chain->seed(symbols => \@symbols,
+               longest => 6);
+
+  # attempt to tell me something about the sky
+  my @newness = $chain->spew(length   => 20,
+                             complete => [ qw( the sky is ) ]);
+
+
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 0.06	Sunday 9th March, 2004
+
+	Fix for rt.cpan.org #6259
+	Converted to Module::Build
+
+
+=item 0.03  Tue Oct 31 16:22:56 2000
+
+	- change in spew behavior, prevents infinite loops in the case
+	  that a chainset is self-referential
+
+
+=item 0.02  Mon Oct 09 17:54:00 2000
+
+	- test for existence of chains in spew to prevent looping
+
+
+=back
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net>
+
+=head1 SEE ALSO
+
+perl(1).
+

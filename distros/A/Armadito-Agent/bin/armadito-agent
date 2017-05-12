@@ -1,0 +1,297 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use lib './lib';
+
+use English qw(-no_match_vars);
+use Getopt::Long;
+use Pod::Usage;
+use UNIVERSAL::require;
+use IPC::System::Simple qw(capture);
+use Data::Dumper;
+use Try::Tiny;
+use Cwd 'abs_path';
+
+BEGIN {
+	if ($OSNAME eq 'MSWin32'){
+		use lib "../lib";
+	}
+}
+
+use Armadito::Agent;
+
+our $VERSION = 0.1;
+
+my $options = {};
+
+if( !$ARGV[0] ){ pod2usage(-verbose => 0, -exitstatus => 0) }
+
+GetOptions(
+    $options,
+    'get-agentid',
+    'get-schedulerid',
+    'server|s=s',
+    'task|t=s',
+    'antivirus|av=s',
+    'conf-file=s',
+    'conf-reload-interval=i',
+    'config=s',
+    'setup',
+    'key|k=s',
+    'wait|w=i',
+    'wait-rand|wr=i',
+    'list-tasks',
+    'list-avs',
+    'ca-cert-dir=s',
+    'ca-cert-file=s',
+    'no-ssl-check',
+    'proxy|P=s',
+    'user|u=s',
+    'password|p=s',
+    'timeout=i',
+    'help|h',
+    'version|v',
+    'debug|d=i',
+) or pod2usage(-verbose => 0);
+
+if( $options->{help} ){ pod2usage(-verbose => 0, -exitstatus => 0) }
+
+if ($options->{version}) {
+    print "armadito-agent $Armadito::Agent::VERSION\n";
+    exit 0;
+}
+
+my $prefix = ".\/";
+if($OSNAME eq "MSWin32"){
+	$prefix  = abs_path($0);
+	$prefix  =~ s/(.*\/)bin\/armadito-agent.*$/$1/;
+}
+
+my %setup = (
+    confdir => $prefix.'etc/',
+    datadir => $prefix.'share/',
+    libdir  => $prefix.'lib/',
+    vardir  => $prefix.'var/'
+);
+
+if ($options->{setup}) {
+    foreach my $key (keys %setup) {
+        print "$key: $setup{$key}\n";
+    }
+    exit 0;
+}
+
+my $agent = Armadito::Agent->new(%setup);
+
+if ($options->{'list-tasks'}) {
+   $agent->displaySupportedTasks();
+   exit 0;
+}
+
+if ($options->{'list-avs'}) {
+   $agent->displaySupportedAVs();
+   exit 0;
+}
+
+if ($options->{"wait"}) {
+    sleep $options->{"wait"};
+}
+
+if ($options->{"wait-rand"}) {
+    sleep int(rand($options->{"wait-rand"}));
+}
+
+try {
+
+	$agent->init(options => $options);
+
+    if ($options->{'get-agentid'}) {
+       print $agent->{agent_id};
+       exit 0;
+    }
+
+    if ($options->{'get-schedulerid'}) {
+       print $agent->{scheduler_id};
+       exit 0;
+    }
+
+    $agent->runTask( $options->{task} );
+
+} catch {
+    print STDERR "Execution failure:\n";
+    print STDERR $_;
+    exit(1);
+};
+
+exit(0);
+__END__
+
+=head1 NAME
+
+armadito-agent - command line interface script used for Armadito Agent.
+
+=head1 SYNOPSIS
+
+armadito-agent --server <server> --task <task>
+
+  Options:
+    --help                 this menu
+    --wait|w               Sleep during given seconds.
+    --debug|d  level       Activate debug mode with given level (0,1,2)
+    --get-agentid          Get current agent id
+    --get-schedulerid      Get current scheduler id
+
+  Target definition options:
+    --server server        Armadito Plugin for GLPI server URL
+
+  Task selection options:
+    --task task            Task to be executed
+	--list-tasks           List supported tasks
+
+  Antivirus selection options:
+    --antivirus antivirus  Antivirus to be managed
+	--list-avs             List supported antiviruses
+
+  Enrollment options:
+    --key|k enrollmentkey   Enrollment key string (format: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX)
+
+  Configuration options:
+    --conf-reload-interval=<SECONDS>   number of seconds between two
+                                         configuration reloadings
+  Network options:
+    -P --proxy=PROXY               proxy address
+    -u --user=USER                 user name for server authentication
+    -p --password=PASSWORD         password for server authentication
+    --ca-cert-dir=DIRECTORY        CA certificates directory
+    --ca-cert-file=FILE            CA certificates file
+    --no-ssl-check                 do not check server SSL certificate
+    --timeout=TIME                 connection timeout, in seconds (180)
+
+=head1 EXAMPLES
+
+	% armadito-agent --task "Enrollment"
+	% armadito-agent -s http://armadito-glpi --task "State"
+	% armadito-agent --server http://armadito-glpi --task "Getjobs"
+	% armadito-agent --task "Enrollment"
+	% armadito-agent --task "State"
+	% armadito-agent --task "GetJobs"
+	% armadito-agent --task "RunJobs" -w 5
+	% armadito-agent --task "Alerts"
+
+=head1 DESCRIPTION
+
+F<armadito-agent> is the command line interface for Armadito Agent.
+
+=head1 OPTIONS
+
+Some options are available in a I<short> form and a I<long> form.  For
+example, the two lines below are all equivalent:
+
+    % armadito-agent -s localhost
+    % armadito-agent --server localhost
+
+=head2 Target definition options
+
+=over
+
+=item B<-s>, B<--server>=I<URI>
+
+Send the results of tasks execution to given server.
+
+In general, Armadito plugin URLs are like the following:
+    http://servername/glpi/plugins/armadito/index.php
+
+=back
+
+=head2 Task selection options
+
+=over
+
+=item B<--list-tasks>
+
+List all available tasks and exit
+
+=item B<--task>=I<TASK>
+
+Run given task immediately.
+
+See option I<--list-tasks> for the list of available tasks.
+
+=back
+
+=head2 Antivirus selection options
+
+=over
+
+=item B<--list-avs>
+
+List all available antiviruses and exit
+
+=item B<--antivirus>=I<ANTIVIRUS>
+
+Manage the given Antivirus
+
+See option I<--list-avs> for the list of available antiviruses.
+
+=back
+
+=head2 Enrollment options
+
+=over
+
+=item B<--key|-k>=I<KEY>
+
+Enrollment key string (format: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX).
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--conf-reload-interval>=I<SECONDS>
+
+SECONDS is the number of seconds between two configuration reloadings.
+Default value is 0, which means that configuration is never reloaded.
+Minimum value is 60. If given value is less than this minimum, it is set to
+this minimum. If given value is less than 0, it is set to 0.
+
+=back
+
+=head2 Network options
+
+=over
+
+=item B<-P>, B<--proxy>=I<PROXY>
+
+Use I<PROXY> as HTTP proxy.
+
+By default, the agent uses HTTP_PROXY environment variable.
+
+=item B<-u> I<USER>, B<--user>=I<USER>
+
+Use I<USER> for server authentication.
+
+=item B<-p>, B<--password>=I<PASSWORD>
+
+Use I<PASSWORD> for server authentication.
+
+=item B<--ca-cert-dir>=I<DIRECTORY>
+
+CA certificates directory.
+
+=item B<--ca-cert-file>=I<FILE>
+
+CA certificates file.
+
+=item B<--no-ssl-check>
+
+Do not check server SSL certificate.
+
+=item B<--timeout>=I<TIME>
+
+Timeout for server connections.
+
+=back
+

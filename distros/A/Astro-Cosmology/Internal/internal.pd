@@ -1,0 +1,363 @@
+# -*- perl -*-
+#
+# $Id: cosmo.pd,v 0.84 2001/08/02 12:53:48 dburke Exp $
+#
+# Check in with:
+#   ci -u<revision> cosmo.pd
+#   (rcs -U cosmo.pd to ensure no locking)
+#
+# Have split up code so that PDL code is in this file and the
+# perl-only object code is in ../Cosmology.pm
+#
+# To do:
+#   .) would be nice to allow lookback_time() to go to infinity
+#   .) add ability to define return units - eg Mpc or cm for distances
+#      this would make luminosity/flux code a lot nicer, for instance
+#   .) remove the exported constants
+#   .) provide access to the "type" of cosmology (ie the value of
+#      $self->{}) ? If we switched to using bits to flag the various
+#      types then might be more awkward (or at least the interface
+#      would have to be thought about)
+#
+# Notes:
+#   .) perhaps should replace distance code (MATTER_OPEN|CLOSED) by
+#      dl = (cz/H0) * ( 1 + z(1-q0)/[ sqrt(1+2 q0 z) + 1 + q0 z] )
+#      { well, something like this anyway }
+#      which is apparently better behaved at low q0z
+#
+
+# we don't want to be messing with the PDL:: namespace in this module
+pp_bless( 'Astro::Cosmology::Internal' );
+
+use strict;
+
+# set up the constants used below (in both the PM and C code)
+#
+# - perhaps should do it with bitwise manipulation?
+use constant UNKNOWN       =>  0;
+use constant EMPTY         =>  1;
+use constant MATTER_FLAT   =>  2;
+use constant MATTER_OPEN   =>  3;
+use constant MATTER_CLOSED =>  4;
+use constant LAMBDA_FLAT   => 10;
+use constant LAMBDA_OPEN   => 11;
+use constant LAMBDA_CLOSED => 12;
+
+# PM stuff
+pp_addpm('
+use strict;
+
+## Variables
+
+# used in determining what sort of a cosmology we have
+
+use constant UNKNOWN       =>  ' . UNKNOWN . ';
+use constant EMPTY         =>  ' . EMPTY . ';
+use constant MATTER_FLAT   =>  ' . MATTER_FLAT . ';
+use constant MATTER_OPEN   =>  ' . MATTER_OPEN . ';
+use constant MATTER_CLOSED =>  ' . MATTER_CLOSED . ';
+use constant LAMBDA_FLAT   => ' . LAMBDA_FLAT . ';
+use constant LAMBDA_OPEN   => ' . LAMBDA_OPEN . ';
+use constant LAMBDA_CLOSED => ' . LAMBDA_CLOSED . ';
+
+');
+
+####################################################################
+
+## XS stuff
+#
+pp_addhdr('
+#include <math.h>   /* for sqrt(), sin(), sinh(), asinh(), fabs() */
+
+/* declare external C code */
+#include "romberg.h"
+#include "utils.h"
+
+/* used in determining what sort of a cosmology we have */
+
+#define UNKNOWN        ' . UNKNOWN . '
+
+#define EMPTY          ' . EMPTY . '
+#define MATTER_FLAT    ' . MATTER_FLAT . '
+#define MATTER_OPEN    ' . MATTER_OPEN . '
+#define MATTER_CLOSED  ' . MATTER_CLOSED . '
+
+#define LAMBDA_FLAT   ' . LAMBDA_FLAT . '
+#define LAMBDA_OPEN   ' . LAMBDA_OPEN . '
+#define LAMBDA_CLOSED ' . LAMBDA_CLOSED . '
+
+');
+
+####################################################################
+#
+# distance measures: PP code
+#
+####################################################################
+
+# not convinced what the correct thing to do with OtherPars and float/double
+# parameters
+#
+#my $opar = "$TFD(float,double)";  # NO - unsurprisingly, OtherPars is not checked for macros
+#my $opar = "double";
+my $opar = "float";
+
+#
+# the luminosity distance calculation is just a big switch statement
+# to select the cosmology (defined by the p_method parameter)
+# and then a threadloop on the redshifts to calculate
+# the results
+#
+pp_def( '_lum_dist',
+        Doc => undef,
+        Pars => 'z(); [o] d();',
+        OtherPars => "int p_method; $opar p_om; $opar p_ol; $opar p_kappa; $opar p_abstol; $opar p_convert;",
+        GenericTypes => ['D', 'F'],
+        Code => '$GENERIC() zz, zzp1;
+                 $GENERIC() int_fn, int_fn_err;
+
+                 $GENERIC() om      = $COMP( p_om );
+                 $GENERIC() ol      = $COMP( p_ol );
+                 $GENERIC() kappa   = $COMP( p_kappa );
+                 $GENERIC() abstol  = $COMP( p_abstol );
+                 $GENERIC() convert = $COMP( p_convert );
+
+                 int method  = $COMP( p_method );
+
+                 switch( method ) {
+                   case EMPTY:
+                     threadloop %{
+                        zz   = $z();
+                        $d() = 0.5 * convert * zz * ( 2.0 +  zz );
+                     %}
+                     break;
+
+                   case MATTER_FLAT:
+                     threadloop %{
+                        zzp1 = 1.0 + $z();
+                        $d() = 2.0 * convert * ( zzp1 - sqrt( zzp1 ) );
+                     %}
+                     break;
+
+                   case MATTER_OPEN:
+                   case MATTER_CLOSED:
+                     threadloop %{
+                        zz   = $z();
+                        $d() = 2.0 * convert *
+                              ( om * zz + (om - 2.0) * ( sqrt( 1.0 + om * zz ) - 1.0 ) ) /
+                              ( om * om );
+                     %}
+                     break;
+
+                   case LAMBDA_CLOSED:
+                     threadloop %{
+                        zz   = $z();
+                        zzp1 = 1.0 + zz;
+                        if ( ! $TFD(romberg_f,romberg_d) (
+                                 $TFD(comov_dist_fn_f,comov_dist_fn_d),
+                                 om, ol, 0.0, zz, abstol, &int_fn, &int_fn_err ) ) {
+			    croak( "Unable to integrate comoving distance.\n" );
+			}
+                        $d() = convert * zzp1 * sin( kappa * int_fn ) / kappa;
+                     %}
+                     break;
+
+                   case LAMBDA_OPEN:
+                     threadloop %{
+                        zz   = $z();
+                        zzp1 = 1.0 + zz;
+                        if ( ! $TFD(romberg_f,romberg_d) (
+                                 $TFD(comov_dist_fn_f,comov_dist_fn_d),
+                                 om, ol, 0.0, zz, abstol, &int_fn, &int_fn_err ) ) {
+			    croak( "Unable to integrate comoving distance.\n" );
+			}
+                        $d() = convert * zzp1 * sinh( kappa * int_fn ) / kappa;
+                     %}
+                     break;
+
+                   case LAMBDA_FLAT:
+                     threadloop %{
+                        zz   = $z();
+                        zzp1 = 1.0 + zz;
+                        if ( ! $TFD(romberg_f,romberg_d) (
+                                 $TFD(comov_dist_fn_f,comov_dist_fn_d),
+                                 om, ol, 0.0, zz, abstol, &int_fn, &int_fn_err ) ) {
+			    croak( "Unable to integrate comoving distance.\n" );
+			}
+                        $d() = convert * zzp1 * int_fn;
+                     %}
+                     break;
+
+                   default:
+                     croak( "Currently can not handle method == %2d\n", method ); /* should not occur */
+
+                 } /* end of switch */'
+        );
+
+
+# could be clever here -- ie make use of _COSMOLOGY value -- but I haven't the energy
+pp_def( '_comov_dist',
+        Doc => undef,
+        Pars => 'z(); [o] d();',
+        OtherPars => "$opar p_om; $opar p_ol; $opar p_abstol; $opar p_convert;",
+        GenericTypes => ['D', 'F'],
+        Code => '$GENERIC() int_fn, int_fn_err;
+
+                 $GENERIC() om      = $COMP( p_om );
+                 $GENERIC() ol      = $COMP( p_ol );
+                 $GENERIC() abstol  = $COMP( p_abstol );
+                 $GENERIC() convert = $COMP( p_convert );
+
+                 threadloop %{
+                    if ( ! $TFD(romberg_f,romberg_d) (
+                             $TFD(comov_dist_fn_f,comov_dist_fn_d),
+                             om, ol, 0.0, $z(), abstol, &int_fn, &int_fn_err ) ) {
+		        croak( "Unable to integrate comoving distance.\n" );
+		    }
+                    $d() = convert * int_fn;
+                 %}'
+        );
+
+# the differential proper motion distance stuff is currently only used
+# by differential_comoving_volume()
+#
+pp_def( '_dpmot',
+        Doc => undef,
+        Pars => 'z(); dm(); [o] answer();',
+        OtherPars => "$opar p_cosmo; $opar p_om; $opar p_ol; $opar p_ok;",
+        GenericTypes => ['D', 'F'],
+        Code => '$GENERIC() cosmo   = $COMP( p_cosmo );
+                 $GENERIC() om      = $COMP( p_om );
+                 $GENERIC() ol      = $COMP( p_ol );
+                 $GENERIC() absok   = fabs( $COMP( p_ok ) );
+
+                 $GENERIC() ddm;
+
+                 threadloop %{
+                    $answer() = $TFD(comov_dist_fn_f,comov_dist_fn_d) ( $z(), om, ol );
+                 %}
+
+                 if ( cosmo != MATTER_FLAT && cosmo != LAMBDA_FLAT  ) {
+                    threadloop %{
+                       ddm        = $dm();
+                       $answer() *= sqrt( 1.0 + absok * ddm * ddm );
+                    %}
+                 }'
+        );
+
+####################################################################
+#
+# volume measures: PP code
+#
+####################################################################
+
+#
+# the comoving volume calculation is just a big switch statement
+# to select the cosmology (defined by the p_method parameter)
+# and then a threadloop on the proper-motion distance (which is
+# in units of the Hubble distance) to calculate the volumes
+#
+pp_def( '_comov_vol',
+     Doc => undef,
+     Pars => 'dm(); [o] v();',
+     OtherPars => "int p_method; $opar p_om; $opar p_ol; $opar p_ok; $opar p_kappa; $opar p_convert;",
+     GenericTypes => ['D', 'F'],
+     Code => '$GENERIC() ddm;
+
+              $GENERIC() om      = $COMP( p_om );
+              $GENERIC() ol      = $COMP( p_ol );
+              $GENERIC() ok      = $COMP( p_ok );
+              $GENERIC() kappa   = $COMP( p_kappa );
+              $GENERIC() convert = $COMP( p_convert );
+
+              int    method  = $COMP( p_method );
+
+              /* NOTE: here dm is in units of the hubble distance */
+
+              switch( method ) {
+                case MATTER_FLAT:
+                case LAMBDA_FLAT:
+                  convert /= 3.0;
+                  threadloop %{
+                     ddm  = $dm();
+                     $v() = convert * ddm * ddm * ddm;
+                  %}
+                  break;
+
+                case EMPTY:
+                case MATTER_OPEN:
+                case LAMBDA_OPEN:
+                  convert /= ( 2.0 * ok );
+                  threadloop %{
+                     ddm  = $dm();
+                     $v() = convert *
+                            ( ddm * sqrt(1.0 + ok*ddm*ddm) - asinh( ddm * kappa ) / kappa );
+                  %}
+                  break;
+
+                case MATTER_CLOSED:
+                case LAMBDA_CLOSED:
+                  convert /= ( 2.0 * ok );
+                  threadloop %{
+                     ddm  = $dm();
+                     $v() = convert *
+                            ( ddm * sqrt(1.0 + ok*ddm*ddm) - asin( ddm * kappa ) / kappa );
+                  %}
+                  break;
+
+                default:
+                  croak( "Currently can not handle method == %2d\n", method ); /* should not occur */
+
+              } /* end of switch */'
+     );
+
+pp_def( '_dcomov_vol',
+     Doc => undef,
+     Pars => 'dm(); ddmdz(); [o] dv();',
+     OtherPars => "$opar p_ok; $opar p_convert;",
+     GenericTypes => ['D', 'F'],
+     Code => '$GENERIC() ddm;
+
+              $GENERIC() ok      = $COMP( p_ok );
+              $GENERIC() convert = $COMP( p_convert );
+
+              threadloop %{
+                 ddm   = $dm();
+                 $dv() = convert * ddm * ddm * $ddmdz() / sqrt( 1.0 + ok*ddm*ddm );
+              %}'
+     );
+
+####################################################################
+#
+# time measures: PP code
+#
+####################################################################
+
+pp_def( '_lookback_time',
+        Doc => undef,
+        Pars => 'zl(); zh(); [o] t();',
+        OtherPars => "$opar p_om; $opar p_ol; $opar p_abstol; $opar p_convert;",
+        GenericTypes => ['D', 'F'],
+        Code => '
+                 $GENERIC() om      = $COMP( p_om );
+                 $GENERIC() ol      = $COMP( p_ol );
+                 $GENERIC() abstol  = $COMP( p_abstol );
+                 $GENERIC() convert = $COMP( p_convert );
+
+                 $GENERIC() int_fn, int_fn_err;
+
+                 threadloop %{
+                    if ( ! $TFD(romberg_f,romberg_d) (
+                                $TFD(lookback_time_fn_f,lookback_time_fn_d),
+                                om, ol, $zl(), $zh(), abstol, &int_fn, &int_fn_err ) ) {
+                       croak( "ERROR: Unable to integrate lookback time.\n" );
+                    }
+                    $t() = convert * int_fn;
+                 %}'
+        );
+
+# end
+
+pp_export_nothing();
+
+pp_done();
+

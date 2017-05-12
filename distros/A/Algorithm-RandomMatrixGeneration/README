@@ -1,0 +1,400 @@
+NAME
+    Algorithm::RandomMatrixGeneration - Generate internal cell values for a
+    matrix given fixed marginal totals.
+
+SYNOPSIS
+      use Algorithm::RandomMatrixGeneration;
+      my @result = generateMatrix(\@row_marginals, \@col_marginals);
+
+  Example: Negative Integer Valued Marginals:
+      use Algorithm::RandomMatrixGeneration;
+      my @rmar = ('-5','5','-3');
+      my @cmar = ('2','3','-2','-6');
+      my @result = generateMatrix(\@rmargs, \@cmargs, "-");
+        
+      Output matrix could be:
+      0 -1 1 3 2 -5 3 -2
+      0 5
+      0 -2 2 3 3 -4
+
+  Example: Positive Real Valued Marginals:
+      use Algorithm::RandomMatrixGeneration;
+      my @rmargs = (13.01,11,13,13,12,13);
+      my @cmargs = (23.005,32.005,10,10);
+      my @result = generateMatrix(\@rmargs, \@cmargs, 3);
+        
+      Output matrix could be:
+      0 2.694  1 9.665  2 0.393  3 0.258
+      0 6.539  1 0.910  2 2.209  3 1.342
+      0 8.469  1 3.565  2 0.839  3 0.127
+      0 2.719  1 2.748  2 0.604  3 6.929
+      0 0.946  1 3.771  2 5.939  3 1.344
+      0 1.638  1 11.346  2 0.016
+
+INPUTS
+    The generateMatrix function can take 4 parameters:
+
+    1. Single dimensional array containing row marginals (Can be real valued
+    or integers) =item 2. Single dimensional array containing column
+    marginals (Can be real valued or integers) =item 3. Precision: For the
+    integer valued marginal specifying "-". For real valued marginals
+    specify the required precision for the generated matrix values.
+    (Recommended Precision = 4) =item 4. Seed: Seed for the random number
+    generator (Default: None) (Optional parameter) =back
+
+OUTPUT
+        The generateMatrix function returns a two dimensional array
+        containing the generated random matrix. The generated matrix is
+        stored in sparse format in this returned array. That is, only
+        non-zero values are stored in this matrix. Thus to access the values
+        in the returned matrix one can use:
+
+          for(my $row=0; $i<=$num_rows; $i++)
+          {
+                  for(my $col=0; $j<=$num_cols; $j++)
+                  {
+                          if(defined $returned_matrix[$row][$col])
+                          {
+                                  print "$col $returned_matrix[$row][$col]  ";
+                          }
+                  }
+                  print "\n";
+          }     
+
+DESCRIPTION
+        This module generates a random matrix given the row and column
+        marginals in such a way that the row and column marginals of the
+        resultant matrix are same as the given marginals.
+
+        If the given marginals are real valued then the generated cell
+        values are real too. If the given marginals are integer valued then
+        the generated cell values are integers. If any of the marginals are
+        negative then few/all of the generated cell values would be negative
+        too.
+
+FURTHER DETAILS
+        For example, given the following marginals this module would
+        generate the appropriate values for "x"s such that the row and the
+        column marginals are held fixed.
+
+          x    x    x    x    x    |  3
+          x    x    x    x    x    |  2
+          x    x    x    x    x    |  3
+          x    x    x    x    x    |  2
+          ------------------------------
+          2    2    2    2    2    |  10
+
+        The algorithm we have used here: For each cell while traversing the
+        matrix in in row-major interpretation. 1. Generate random number
+        using the steps given below. 2. Reduce row and column marginals by
+        value of generated value. End for. Done.
+
+        Random number generation algorithm: for each cell C(i,j) { # Find
+        the range (min, max) for the random number generation max =
+        MIN(row_marg[i], col_marg[j])
+
+            # If max !=0 then decide the min.
+            # To decide min value sum together the col_marginals for all
+            # the columns past the current column - this sum gives the total
+            # of the column marginals yet to be satisfied beyond the current col.
+            # Subtract this sum from the current row_marginal to compute
+            # the lower bound on the random number. We do this because if we
+            # do not set this lower bound and thus a number smaller than this
+            # bound is generated then we will have a situation where satisfying
+            # both row_marginal and column marginals will be impossible.
+
+            if(max != 0)
+            {
+                2_term = 0
+                for each col k > j
+                {
+                    2_term = 2_term + col_marg[k]
+                }
+                min = row_marg[i] - 2_term
+                        if(marginals positive)
+                        {
+                        if(min < 0)
+                        {
+                        min = 0
+                        }
+                        }
+            }
+            else
+            {
+                min = max = 0   # If max = 0 then min = 0
+            }
+
+            # Generate random number between the range   
+            random_num = rand(min, max)
+        }
+
+        Example:
+
+          Cell 0:
+          max = MIN(3,2) = 2
+          2_term = 2 + 2 + 2 + 2 = 8
+          min = 3 - 8 = -5
+          therefore: min = 0
+          (min, max) = (0,2) = 0
+          0    x    x    x    x    |  3
+          x    x    x    x    x    |  2
+          x    x    x    x    x    |  3
+          x    x    x    x    x    |  2
+          ----------------------------------------------
+          2    2    2    2    2    |
+
+          Cell 1:
+          max = MIN(3,2) = 2
+          2_term = 2 + 2 + 2 = 6
+          min = 3 - 6 = -3
+          therefore: min = 0
+          (min, max) = (0,2) = 0
+          0    0    x    x    x    |  3
+          x    x    x    x    x    |  2
+          x    x    x    x    x    |  3
+          x    x    x    x    x    |  2
+          ----------------------------------------------
+          2    2    2    2    2    |
+
+          Cell 2:
+          max = MIN(3,2) = 2
+          2_term = 2 + 2 = 4
+          min = 3 - 4 = -1
+          therefore: min = 0
+          (min, max) = (0,2) = 0
+          0    0    0    x    x    |  3
+          x    x    x    x    x    |  2
+          x    x    x    x    x    |  3
+          x    x    x    x    x    |  2
+          ----------------------------------------------
+          2    2    2    2    2    |
+
+          Cell 3:
+          max = MIN(3,2) = 2
+          2_term = 2
+          min = 3 - 2 = 1
+          (min, max) = (1,2) = 1
+          0    0    0    1    x    |  2
+          x    x    x    x    x    |  2
+          x    x    x    x    x    |  3
+          x    x    x    x    x    |  2
+          ----------------------------------------------
+          2    2    2    1    2    |
+
+          Cell 4:
+          max = MIN(2,2) = 2
+          2_term = 0
+          min = 2 - 0 = 2
+          (min, max) = (2,2) = 2
+          0    0    0    1    2    |  0
+          x    x    x    x    x    |  2
+          x    x    x    x    x    |  3
+          x    x    x    x    x    |  2
+          ----------------------------------------------
+          2    2    2    1    0    |
+
+          Cell 5:
+          max = MIN(2,2) = 2
+          2_term = 2 + 2 + 1 + 0 = 5
+          min = 3 - 5 = -2
+          therefore, min = 0
+          (min, max) = (0,2) = 1
+          0    0    0    1    2    |  0
+          1    x    x    x    x    |  1
+          x    x    x    x    x    |  3
+          x    x    x    x    x    |  2
+          ----------------------------------------------
+          1    2    2    1    0    |
+
+          Cell 6:
+          max = MIN(1,2) = 1
+          2_term = 2 + 1 + 0 = 3
+          min = 1 - 3 = -2
+          therefore, min = 0
+          (min, max) = (0,1) = 0
+          0    0    0    1    2    |  0
+          1    0    x    x    x    |  1
+          x    x    x    x    x    |  3
+          x    x    x    x    x    |  2
+          ----------------------------------------------
+          1    2    2    1    0    |
+
+          Cell 7:
+          max = MIN(1,2) = 1
+          2_term = 1 + 0 = 1
+          min = 1 - 1 = 0
+          (min, max) = (0,1) = 1
+          0    0    0    1    2    |  0
+          1    0    1    x    x    |  0
+          x    x    x    x    x    |  3
+          x    x    x    x    x    |  2
+          ----------------------------------------------
+          1    2    1    1    0    |
+
+          Cell 8:
+          max = MIN(0,1) = 0
+          min = 0
+          (min, max) = (0,0) = 0
+          0    0    0    1    2    |  0
+          1    0    1    0    x    |  0
+          x    x    x    x    x    |  3
+          x    x    x    x    x    |  2
+          ----------------------------------------------
+          1    2    1    1    0    |
+
+          Cell 9:
+          max = MIN(0,0) = 0
+          min = 0
+          (min, max) = (0,0) = 0
+          0    0    0    1    2    |  0
+          1    0    1    0    0    |  0
+          x    x    x    x    x    |  3
+          x    x    x    x    x    |  2
+          ----------------------------------------------
+          1    2    1    1    0    |
+
+          Cell 10:
+          max = MIN(3,1) = 1
+          2_term = 2 + 1 + 1 + 0 = 4
+          min = 3 - 4 = -1
+          therefore, min = 0
+          (min, max) = (0,1) = 1
+          0    0    0    1    2    |  0
+          1    0    1    0    0    |  0
+          1    x    x    x    x    |  2
+          x    x    x    x    x    |  2
+          ----------------------------------------------
+          0    2    1    1    0    |
+
+          Cell 11:
+          max = MIN(2,2) = 2
+          2_term = 1 + 1 + 0 = 2
+          min = 2 - 2 = 0
+          (min, max) = (0,2) = 0
+          0    0    0    1    2    |  0
+          1    0    1    0    0    |  0
+          1    0    x    x    x    |  2
+          x    x    x    x    x    |  2
+          ----------------------------------------------
+          0    2    1    1    0    |
+
+          Cell 12:
+          max = MIN(2,1) = 1
+          2_term = 1 + 0 = 1
+          min = 2 - 1 = 1
+          (min, max) = (1,1) = 1
+          0    0    0    1    2    |  0
+          1    0    1    0    0    |  0
+          1    0    1    x    x    |  1
+          x    x    x    x    x    |  2
+          ----------------------------------------------
+          0    2    0    1    0    |
+
+          Cell 13:
+          max = MIN(1,1) = 1
+          2_term = 0 = 0
+          min = 1 - 0 = 1
+          (min, max) = (1,1) = 1
+          0    0    0    1    2    |  0
+          1    0    1    0    0    |  0
+          1    0    1    1    x    |  0
+          x    x    x    x    x    |  2
+          ----------------------------------------------
+          0    2    0    0    0    |
+
+          Cell 14:
+          max = MIN(0,0) = 0
+          min = 0
+          (min, max) = (0,0) = 0
+          0    0    0    1    2    |  0
+          1    0    1    0    0    |  0
+          1    0    1    1    0    |  0
+          x    x    x    x    x    |  2
+          ----------------------------------------------
+          0    2    0    0    0    |
+
+          Cell 15:
+          max = MIN(2,0) = 0
+          min = 0
+          (min, max) = (0,0) = 0
+          0    0    0    1    2    |  0
+          1    0    1    0    0    |  0
+          1    0    1    1    0    |  0
+          0    x    x    x    x    |  2
+          ----------------------------------------------
+          0    2    0    0    0    |
+
+          Cell 16:
+          max = MIN(2,2) = 2
+          2_term = 0 + ... = 0
+          min = 2 - 0 = 2
+          (min, max) = (2,2) = 2
+          0    0    0    1    2    |  0
+          1    0    1    0    0    |  0
+          1    0    1    1    0    |  0
+          0    2    x    x    x    |  0
+          ----------------------------------------------
+          0    0    0    0    0    |
+
+          Cell 17:
+          max = MIN(0,0) = 0
+          min = 0
+          (min, max) = (0,0) = 0
+          0    0    0    1    2    |  0
+          1    0    1    0    0    |  0
+          1    0    1    1    0    |  0
+          0    2    0    x    x    |  0
+          ----------------------------------------------
+          0    0    0    0    0    |
+
+          Cell 18:
+          max = MIN(0,0) = 0
+          min = 0
+          (min, max) = (0,0) = 0
+          0    0    0    1    2    |  0
+          1    0    1    0    0    |  0
+          1    0    1    1    0    |  0
+          0    2    0    0    x    |  0
+          ----------------------------------------------
+          0    0    0    0    0    |
+
+          Cell 19:
+          max = MIN(0,0) = 0
+          min = 0
+          (min, max) = (0,0) = 0
+          0    0    0    1    2    |  0
+          1    0    1    0    0    |  0
+          1    0    1    1    0    |  0
+          0    2    0    0    0    |  0
+          ----------------------------------------------
+          0    0    0    0    0    |
+
+          Done!!
+
+  EXPORT
+        generateMatrix
+
+AUTHOR
+         Anagha Kulkarni, Carnegie-Mellon University
+         anaghak at cs.cmu.edu
+
+         Ted Pedersen, University of Minnesota, Duluth
+         tpederse at d.umn.edu
+
+COPYRIGHT AND LICENSE
+        Copyright (C) 2006-2008 by Anagha Kulkarni, Ted Pedersen
+
+        This library is free software; you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation; either version 2 of the License, or
+        (at your option) any later version. This program is distributed in
+        the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+        even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+        PARTICULAR PURPOSE. See the GNU General Public License for more
+        details.
+
+        You should have received a copy of the GNU General Public License
+        along with this program; if not, write to the Free Software
+        Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+        02111-1307, USA.
+

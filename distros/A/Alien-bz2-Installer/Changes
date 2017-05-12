@@ -1,0 +1,17 @@
+Revision history for Alien-bz2-Installer
+
+0.05      2014-10-14 08:55:13 -0400
+  - fix sometimes test failure in system_install.t
+
+0.04      2014-10-08 14:26:42 -0400
+  - fixes for Strawberry 5.20
+
+0.03      2014-06-17 03:46:50 -0400
+  - install MSWin32 needs the libbz2.dll.a file
+    needed for libarchive dll
+
+0.02      2014-06-11 15:32:01 -0400
+  - Alien::MSYS is a build_requires on MSWin32
+
+0.01      2014-06-11 07:59:11 -0400
+  - initial version

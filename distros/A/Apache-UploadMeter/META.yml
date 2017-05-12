@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Apache-UploadMeter
+version:             0.9915
+abstract:            Apache module which implements an upload meter for form-based uploads
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Apache2::Request:              2.08
+    Cache::Cache:                  0.09
+    Date::Format:                  0.01
+    mod_perl2:                     2.000003
+    Number::Format:                0.01
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Issac Goldstand <margol@beamartyr.net>

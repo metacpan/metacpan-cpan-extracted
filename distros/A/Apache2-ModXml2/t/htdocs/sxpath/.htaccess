@@ -1,0 +1,31 @@
+# $Id: .htaccess 15 2011-09-13 06:58:46Z jo $
+
+AddOutputFilter node .html
+
+<Files *.html>
+XML2Parse html
+</Files>
+
+PerlModule TestSXPath
+
+<Files test3.html>
+    SetHandler modperl
+    PerlOutputFilterHandler TestSXPath 
+</Files>
+
+<Files test4.html>
+    # we need to control the order of processing
+    RemoveOutputFilter html 
+    SetOutputFilter INCLUDES;node
+    SetHandler modperl
+    PerlOutputFilterHandler TestSXPath::log 
+    PerlOutputFilterHandler TestSXPath 
+</Files>
+
+AddOutputFilter node .osm
+<Files test5.osm>
+    SetHandler modperl
+    PerlOutputFilterHandler TestSXPath::osm
+</Files>
+
+

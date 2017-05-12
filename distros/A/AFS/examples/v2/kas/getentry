@@ -1,0 +1,59 @@
+#!/usr/local/bin/perl
+
+use blib;
+use AFS::KAS;
+use AFS::KTC_PRINCIPAL;
+use AFS::KTC_TOKEN;
+use AFS::KTC_EKEY;
+
+die "Usage: user admin cell\n" if ($#ARGV != 2);
+
+my $Debug = 0;
+
+my $usr  = shift;
+my $adm  = shift;
+my $cell = shift;
+
+my $princ = AFS::KTC_PRINCIPAL->new($adm, '', $cell);
+$Debug && print "AFS::CODE 1 = $AFS::CODE \n";
+my $string = AFS::KTC_EKEY->UserReadPassword('Password:');
+my $key = AFS::KTC_EKEY->StringToKey($string, $cell);
+$Debug && print "AFS::CODE 2 = $AFS::CODE \n";
+my $reason = '';
+my $token = AFS::KTC_TOKEN->GetAdminToken($princ, $key, 300, 1, $reason);
+$Debug && print "AFS::CODE 3 = $AFS::CODE \n";
+$Debug && print "Reason = $reason \n";
+my $kas   = AFS::KAS->AuthServerConn($token, &AFS::KA_MAINTENANCE_SERVICE, $cell);
+$Debug && print "AFS::CODE 4 = $AFS::CODE \n";
+
+my $user = AFS::KTC_PRINCIPAL->new($usr);
+$Debug && print "AFS::CODE 5 = $AFS::CODE \n";
+my $entry = $kas->getentry($user->name, $user->instance);
+$Debug && print "AFS::CODE 6 = $AFS::CODE \n";
+print "\n\ngetentry:\n User data for ", $user->name, $user->instance, ": \n";
+foreach my $tp_key (sort keys %$entry) {
+    printf("%20s  %s\n",$tp_key, $$entry{$tp_key});
+    if ($tp_key =~ 'misc_auth_bytes') {
+        if ($$entry{$tp_key}) {
+            my $packed    = $$entry{$tp_key};
+            my $pwexpire  = (($packed >> 24) & 0xff);
+            my $is_locked = (($packed >> 16) & 0xff);
+            my $nfail     = (($packed >>  8) & 0xff);
+            my $locktime  = (($packed >>  0) & 0xff);
+            print "\t\t pwexpire  $pwexpire\n";
+            print "\t\t nfail     $nfail\n";
+            print "\t\t locktime  $locktime\n";
+            print "\t\t is_locked $is_locked\n";
+        }
+    }
+    if ($tp_key =~ 'passwd_reuse') {
+        my $reused = $$entry{'passwd_reuse'} - 0x12340000;
+        print "\t\t permit password reuse $reused \n";
+    }
+}
+
+$entry = $kas->KAM_GetEntry($user->name, $user->instance);
+print "\n\nKAM_GetEntry:\n User data for ", $user->name, $user->instance, ": \n";
+foreach my $tp_key (sort keys %$entry) {
+    printf("%20s  %s\n",$tp_key, $$entry{$tp_key});
+}

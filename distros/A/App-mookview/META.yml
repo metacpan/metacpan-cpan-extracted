@@ -1,0 +1,45 @@
+---
+abstract: "View Markdown texts as a \"Mook-Book\" style"
+author:
+  - 'Yusuke Wada <yusuke@kamawada.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-mookview
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::mookview:
+    file: lib/App/mookview.pm
+    version: 0.03
+requires:
+  File::ShareDir: 0
+  Number::Format: 0
+  Path::Tiny: 0
+  Plack: 0
+  Text::Markdown::Discount: 0
+  Text::Xslate: 0
+  Try::Tiny: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/yusukebe/App-mookview/issues
+  homepage: https://github.com/yusukebe/App-mookview
+  repository: git://github.com/yusukebe/App-mookview.git
+version: 0.03

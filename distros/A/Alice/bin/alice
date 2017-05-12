@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin;
+
+BEGIN {
+  my $bin = $FindBin::Bin; 
+
+  # running from source dir
+  if (-e "$bin/../Makefile.PL") {
+    eval "use lib '$bin/../lib'";
+
+    # extlib present
+    if (-e "$bin/../extlib") {
+      eval "use lib '$bin/../extlib/lib/perl5'";
+      eval "use local::lib '$bin/../extlib'";
+    }
+  }
+  require Alice::Standalone;
+}
+
+$0 = "aliced\0";
+binmode(STDERR, ":utf8");
+binmode(STDOUT, ":utf8");
+  
+Alice::Standalone->new->run;

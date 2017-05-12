@@ -1,0 +1,39 @@
+Audio::Radio::Sirius - Control a Sirius satellite radio tuner
+
+Sirius satellite radio (http://www.sirius.com) is a US based satellite radio serice. 
+While none of the tuners they make have serial or USB connectors, it has been found that 
+generation 2.5 tuners (Sportster, Starmate, * Replay, Sirius Connect, and others) have a 
+common tuner module. Furthermore this tuner module generally has a serial interface.
+
+Once your tuner is connected to your system and accessible via a serial port like device, you can 
+use this module to access it:
+
+  use Audio::Radio::Sirius;
+  use Win32::SerialPort; # or Device::SerialPort on Linux
+
+  my $serial = new Win32::SerialPort('com1');
+  my $tuner = new Audio::Radio::Sirius;
+
+  $tuner->connect($serial);
+  $tuner->power(1);
+  $tuner->channel(184); # tune in the preview channel
+
+This alpha release is not feature complete.  Please expect (possibly code breaking) changes.  Any 
+such changes will be documented in the CHANGES file.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Jamie Tatum
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

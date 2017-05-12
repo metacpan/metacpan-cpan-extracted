@@ -1,0 +1,11 @@
+Changes for Perl extensions Algorithm-Dependency-MapReduce
+
+0.03 Tue 13 Apr 2009
+	- Updated to Module::Install::DSL 0.83
+
+0.02 Wed  9 Apr 2009
+	- Updated to Module::Install::DSL 0.82
+
+0.01 Wed 25 Mar 2009
+	- Created initial implementation
+	- Converted to Module::Install::DSL 0.81

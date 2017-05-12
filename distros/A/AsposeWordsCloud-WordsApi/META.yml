@@ -1,0 +1,250 @@
+---
+abstract: 'Aspose.Words Cloud SDK for Perl'
+author:
+  - 'Farooq Sheikh <farooq.sheikh@aspose.com>'
+build_requires:
+  Test::More: '0.10'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AsposeWordsCloud-WordsApi
+provides:
+  AsposeWordsCloud::ApiClient:
+    file: lib/AsposeWordsCloud/ApiClient.pm
+  AsposeWordsCloud::Configuration:
+    file: lib/AsposeWordsCloud/Configuration.pm
+  AsposeWordsCloud::Object::BaseObject:
+    file: lib/AsposeWordsCloud/Object/BaseObject.pm
+  AsposeWordsCloud::Object::Bookmark:
+    file: lib/AsposeWordsCloud/Object/Bookmark.pm
+  AsposeWordsCloud::Object::BookmarkData:
+    file: lib/AsposeWordsCloud/Object/BookmarkData.pm
+  AsposeWordsCloud::Object::BookmarkResponse:
+    file: lib/AsposeWordsCloud/Object/BookmarkResponse.pm
+  AsposeWordsCloud::Object::Bookmarks:
+    file: lib/AsposeWordsCloud/Object/Bookmarks.pm
+  AsposeWordsCloud::Object::BookmarksResponse:
+    file: lib/AsposeWordsCloud/Object/BookmarksResponse.pm
+  AsposeWordsCloud::Object::Border:
+    file: lib/AsposeWordsCloud/Object/Border.pm
+  AsposeWordsCloud::Object::Color:
+    file: lib/AsposeWordsCloud/Object/Color.pm
+  AsposeWordsCloud::Object::CommentDto:
+    file: lib/AsposeWordsCloud/Object/CommentDto.pm
+  AsposeWordsCloud::Object::CommentResponse:
+    file: lib/AsposeWordsCloud/Object/CommentResponse.pm
+  AsposeWordsCloud::Object::CommentsCollection:
+    file: lib/AsposeWordsCloud/Object/CommentsCollection.pm
+  AsposeWordsCloud::Object::CommentsResponse:
+    file: lib/AsposeWordsCloud/Object/CommentsResponse.pm
+  AsposeWordsCloud::Object::Document:
+    file: lib/AsposeWordsCloud/Object/Document.pm
+  AsposeWordsCloud::Object::DocumentEntry:
+    file: lib/AsposeWordsCloud/Object/DocumentEntry.pm
+  AsposeWordsCloud::Object::DocumentEntryList:
+    file: lib/AsposeWordsCloud/Object/DocumentEntryList.pm
+  AsposeWordsCloud::Object::DocumentFormat:
+    file: lib/AsposeWordsCloud/Object/DocumentFormat.pm
+  AsposeWordsCloud::Object::DocumentPositionDto:
+    file: lib/AsposeWordsCloud/Object/DocumentPositionDto.pm
+  AsposeWordsCloud::Object::DocumentProperties:
+    file: lib/AsposeWordsCloud/Object/DocumentProperties.pm
+  AsposeWordsCloud::Object::DocumentPropertiesResponse:
+    file: lib/AsposeWordsCloud/Object/DocumentPropertiesResponse.pm
+  AsposeWordsCloud::Object::DocumentProperty:
+    file: lib/AsposeWordsCloud/Object/DocumentProperty.pm
+  AsposeWordsCloud::Object::DocumentPropertyResponse:
+    file: lib/AsposeWordsCloud/Object/DocumentPropertyResponse.pm
+  AsposeWordsCloud::Object::DocumentResponse:
+    file: lib/AsposeWordsCloud/Object/DocumentResponse.pm
+  AsposeWordsCloud::Object::DocumentStatData:
+    file: lib/AsposeWordsCloud/Object/DocumentStatData.pm
+  AsposeWordsCloud::Object::DrawingObjects:
+    file: lib/AsposeWordsCloud/Object/DrawingObjects.pm
+  AsposeWordsCloud::Object::DrawingObjectsResponse:
+    file: lib/AsposeWordsCloud/Object/DrawingObjectsResponse.pm
+  AsposeWordsCloud::Object::FieldDto:
+    file: lib/AsposeWordsCloud/Object/FieldDto.pm
+  AsposeWordsCloud::Object::FieldNames:
+    file: lib/AsposeWordsCloud/Object/FieldNames.pm
+  AsposeWordsCloud::Object::FieldNamesResponse:
+    file: lib/AsposeWordsCloud/Object/FieldNamesResponse.pm
+  AsposeWordsCloud::Object::FieldResponse:
+    file: lib/AsposeWordsCloud/Object/FieldResponse.pm
+  AsposeWordsCloud::Object::Font:
+    file: lib/AsposeWordsCloud/Object/Font.pm
+  AsposeWordsCloud::Object::FontResponse:
+    file: lib/AsposeWordsCloud/Object/FontResponse.pm
+  AsposeWordsCloud::Object::FormField:
+    file: lib/AsposeWordsCloud/Object/FormField.pm
+  AsposeWordsCloud::Object::FormFieldResponse:
+    file: lib/AsposeWordsCloud/Object/FormFieldResponse.pm
+  AsposeWordsCloud::Object::HttpResponseMessage:
+    file: lib/AsposeWordsCloud/Object/HttpResponseMessage.pm
+  AsposeWordsCloud::Object::HttpStatusCode:
+    file: lib/AsposeWordsCloud/Object/HttpStatusCode.pm
+  AsposeWordsCloud::Object::Hyperlink:
+    file: lib/AsposeWordsCloud/Object/Hyperlink.pm
+  AsposeWordsCloud::Object::HyperlinkResponse:
+    file: lib/AsposeWordsCloud/Object/HyperlinkResponse.pm
+  AsposeWordsCloud::Object::Hyperlinks:
+    file: lib/AsposeWordsCloud/Object/Hyperlinks.pm
+  AsposeWordsCloud::Object::HyperlinksResponse:
+    file: lib/AsposeWordsCloud/Object/HyperlinksResponse.pm
+  AsposeWordsCloud::Object::LineNumberRestartMode:
+    file: lib/AsposeWordsCloud/Object/LineNumberRestartMode.pm
+  AsposeWordsCloud::Object::LineStyle:
+    file: lib/AsposeWordsCloud/Object/LineStyle.pm
+  AsposeWordsCloud::Object::Link:
+    file: lib/AsposeWordsCloud/Object/Link.pm
+  AsposeWordsCloud::Object::LinkElement:
+    file: lib/AsposeWordsCloud/Object/LinkElement.pm
+  AsposeWordsCloud::Object::LoadWebDocumentData:
+    file: lib/AsposeWordsCloud/Object/LoadWebDocumentData.pm
+  AsposeWordsCloud::Object::MetafileRenderingOptionsData:
+    file: lib/AsposeWordsCloud/Object/MetafileRenderingOptionsData.pm
+  AsposeWordsCloud::Object::ModificationOperationResult:
+    file: lib/AsposeWordsCloud/Object/ModificationOperationResult.pm
+  AsposeWordsCloud::Object::NodeLink:
+    file: lib/AsposeWordsCloud/Object/NodeLink.pm
+  AsposeWordsCloud::Object::NumberStyle:
+    file: lib/AsposeWordsCloud/Object/NumberStyle.pm
+  AsposeWordsCloud::Object::Object:
+    file: lib/AsposeWordsCloud/Object/Object.pm
+  AsposeWordsCloud::Object::Orientation:
+    file: lib/AsposeWordsCloud/Object/Orientation.pm
+  AsposeWordsCloud::Object::PageBorderAppliesTo:
+    file: lib/AsposeWordsCloud/Object/PageBorderAppliesTo.pm
+  AsposeWordsCloud::Object::PageBorderDistanceFrom:
+    file: lib/AsposeWordsCloud/Object/PageBorderDistanceFrom.pm
+  AsposeWordsCloud::Object::PageNumber:
+    file: lib/AsposeWordsCloud/Object/PageNumber.pm
+  AsposeWordsCloud::Object::PageSetup:
+    file: lib/AsposeWordsCloud/Object/PageSetup.pm
+  AsposeWordsCloud::Object::PageStatData:
+    file: lib/AsposeWordsCloud/Object/PageStatData.pm
+  AsposeWordsCloud::Object::PageVerticalAlignment:
+    file: lib/AsposeWordsCloud/Object/PageVerticalAlignment.pm
+  AsposeWordsCloud::Object::PaperSize:
+    file: lib/AsposeWordsCloud/Object/PaperSize.pm
+  AsposeWordsCloud::Object::Paragraph:
+    file: lib/AsposeWordsCloud/Object/Paragraph.pm
+  AsposeWordsCloud::Object::ParagraphLink:
+    file: lib/AsposeWordsCloud/Object/ParagraphLink.pm
+  AsposeWordsCloud::Object::ParagraphLinkCollection:
+    file: lib/AsposeWordsCloud/Object/ParagraphLinkCollection.pm
+  AsposeWordsCloud::Object::ParagraphLinkCollectionResponse:
+    file: lib/AsposeWordsCloud/Object/ParagraphLinkCollectionResponse.pm
+  AsposeWordsCloud::Object::ParagraphResponse:
+    file: lib/AsposeWordsCloud/Object/ParagraphResponse.pm
+  AsposeWordsCloud::Object::ProtectionData:
+    file: lib/AsposeWordsCloud/Object/ProtectionData.pm
+  AsposeWordsCloud::Object::ProtectionDataResponse:
+    file: lib/AsposeWordsCloud/Object/ProtectionDataResponse.pm
+  AsposeWordsCloud::Object::ProtectionRequest:
+    file: lib/AsposeWordsCloud/Object/ProtectionRequest.pm
+  AsposeWordsCloud::Object::ReplaceTextRequest:
+    file: lib/AsposeWordsCloud/Object/ReplaceTextRequest.pm
+  AsposeWordsCloud::Object::ReplaceTextResponse:
+    file: lib/AsposeWordsCloud/Object/ReplaceTextResponse.pm
+  AsposeWordsCloud::Object::ReportType:
+    file: lib/AsposeWordsCloud/Object/ReportType.pm
+  AsposeWordsCloud::Object::ResponseMessage:
+    file: lib/AsposeWordsCloud/Object/ResponseMessage.pm
+  AsposeWordsCloud::Object::RevisionsModificationResponse:
+    file: lib/AsposeWordsCloud/Object/RevisionsModificationResponse.pm
+  AsposeWordsCloud::Object::Run:
+    file: lib/AsposeWordsCloud/Object/Run.pm
+  AsposeWordsCloud::Object::RunResponse:
+    file: lib/AsposeWordsCloud/Object/RunResponse.pm
+  AsposeWordsCloud::Object::SaaSposeResponse:
+    file: lib/AsposeWordsCloud/Object/SaaSposeResponse.pm
+  AsposeWordsCloud::Object::SaveOptionsData:
+    file: lib/AsposeWordsCloud/Object/SaveOptionsData.pm
+  AsposeWordsCloud::Object::SaveResponse:
+    file: lib/AsposeWordsCloud/Object/SaveResponse.pm
+  AsposeWordsCloud::Object::SaveResult:
+    file: lib/AsposeWordsCloud/Object/SaveResult.pm
+  AsposeWordsCloud::Object::SearchResponse:
+    file: lib/AsposeWordsCloud/Object/SearchResponse.pm
+  AsposeWordsCloud::Object::SearchResult:
+    file: lib/AsposeWordsCloud/Object/SearchResult.pm
+  AsposeWordsCloud::Object::SearchResultsCollection:
+    file: lib/AsposeWordsCloud/Object/SearchResultsCollection.pm
+  AsposeWordsCloud::Object::Section:
+    file: lib/AsposeWordsCloud/Object/Section.pm
+  AsposeWordsCloud::Object::SectionLink:
+    file: lib/AsposeWordsCloud/Object/SectionLink.pm
+  AsposeWordsCloud::Object::SectionLinkCollection:
+    file: lib/AsposeWordsCloud/Object/SectionLinkCollection.pm
+  AsposeWordsCloud::Object::SectionLinkCollectionResponse:
+    file: lib/AsposeWordsCloud/Object/SectionLinkCollectionResponse.pm
+  AsposeWordsCloud::Object::SectionPageSetupResponse:
+    file: lib/AsposeWordsCloud/Object/SectionPageSetupResponse.pm
+  AsposeWordsCloud::Object::SectionResponse:
+    file: lib/AsposeWordsCloud/Object/SectionResponse.pm
+  AsposeWordsCloud::Object::SectionStart:
+    file: lib/AsposeWordsCloud/Object/SectionStart.pm
+  AsposeWordsCloud::Object::SplitDocumentResponse:
+    file: lib/AsposeWordsCloud/Object/SplitDocumentResponse.pm
+  AsposeWordsCloud::Object::SplitDocumentResult:
+    file: lib/AsposeWordsCloud/Object/SplitDocumentResult.pm
+  AsposeWordsCloud::Object::StatDataResponse:
+    file: lib/AsposeWordsCloud/Object/StatDataResponse.pm
+  AsposeWordsCloud::Object::StoryChildNodes:
+    file: lib/AsposeWordsCloud/Object/StoryChildNodes.pm
+  AsposeWordsCloud::Object::String:
+    file: lib/AsposeWordsCloud/Object/String.pm
+  AsposeWordsCloud::Object::StyleIdentifier:
+    file: lib/AsposeWordsCloud/Object/StyleIdentifier.pm
+  AsposeWordsCloud::Object::TextEffect:
+    file: lib/AsposeWordsCloud/Object/TextEffect.pm
+  AsposeWordsCloud::Object::TextItem:
+    file: lib/AsposeWordsCloud/Object/TextItem.pm
+  AsposeWordsCloud::Object::TextItems:
+    file: lib/AsposeWordsCloud/Object/TextItems.pm
+  AsposeWordsCloud::Object::TextItemsResponse:
+    file: lib/AsposeWordsCloud/Object/TextItemsResponse.pm
+  AsposeWordsCloud::Object::TiffSaveOptionsData:
+    file: lib/AsposeWordsCloud/Object/TiffSaveOptionsData.pm
+  AsposeWordsCloud::Object::Underline:
+    file: lib/AsposeWordsCloud/Object/Underline.pm
+  AsposeWordsCloud::Object::WatermarkText:
+    file: lib/AsposeWordsCloud/Object/WatermarkText.pm
+  AsposeWordsCloud::WordsApi:
+    file: lib/AsposeWordsCloud/WordsApi.pm
+    version: v1.0.1
+requires:
+  AsposeStorageCloud::StorageApi: '0'
+  Carp: '0'
+  Data::Dumper: '0'
+  Date::Parse: '0'
+  DateTime: '0'
+  Digest::HMAC_SHA1: '0'
+  Exporter: '0'
+  File::Slurp: '0'
+  HTTP::Headers: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Response: '0'
+  HTTP::Status: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Log::Any: '0'
+  MIME::Base64: '0'
+  Module::Runtime: '0'
+  Scalar::Util: '0'
+  Test::Exception: '0'
+  URI::Escape: '0'
+  URI::Query: '0'
+  perl: v5.6.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: v1.0.1

@@ -1,0 +1,18 @@
+.travis.yml
+bin/dapper
+Changes
+lib/App/Dapper.pm
+lib/App/Dapper/Defaults.pm
+lib/App/Dapper/Filters.pm
+lib/App/Dapper/Init.pm
+lib/App/Dapper/Utils.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/01-manifest.t
+t/02-new.t
+t/03-init.t
+t/04-build.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,156 @@
+#!/usr/bin/perl -w
+# $Id: sendalertsms 8 2014-09-19 13:51:01Z abalama $
+use strict;
+
+=head1 NAME
+
+sendalertsms - App::MonM script for sending Alert SMS
+
+=head1 VERSION
+
+Version 1.02
+
+=head1 SYNOPSIS
+
+    sendalertsms [-n DSN | -s SID] [-u USER] [-p PASSWORD] [-q SQL] 
+        <79XXXXXXXXX> <subject> <message>
+
+    Type sendalertsms -h or sendalertsms -? for more information
+
+=head1 DESCRIPTION
+
+Example:
+
+    sendalertsms -s SID -u USER -p PASSWORD
+        -q "SELECT PP.CC_JOBSMS.CREA('[PHONE]', 12780 ,'[MESSAGE]') FROM DUAL"
+        79037011110 "Test subject" "Test message"
+
+SQL Example:
+
+    SELECT '[PHONE]' PHONE, '[SUBJECT]' SUBJECT, '[MESSAGE]' MESSAGE FROM DUAL
+
+=head1 DEPENDENCES
+
+L<DBI>, L<DBD::Oracle>
+
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is distributed under the GNU GPL v3.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+See C<LICENSE> file
+
+=cut
+
+use DBI;
+use Getopt::Long;
+use Pod::Usage;
+use constant {
+    DSN      => "", # 'DBI:Oracle:SID'
+    SID      => "",
+    LOGIN    => "",
+    PASSWORD => "",
+    SQL      => q/SELECT '[PHONE]' PHONE, '[SUBJECT]' SUBJECT, '[MESSAGE]' MESSAGE FROM DUAL/,
+    SIDPFX   => 'DBI:Oracle:',
+};
+
+use vars qw/$VERSION/;
+$VERSION = '1.02';
+
+$SIG{INT} = sub { die "ABORTED\n"; };
+
+$| = 1;  # autoflush
+
+our %OPT;
+
+BEGIN {
+    sub debug { goto &say if $OPT{debug} }
+    sub say { return unless -t; print STDOUT @_ ? @_ : '',"\n" }
+    sub err { print STDERR @_ ? @_ : '',"\n" }
+    sub tms { sprintf "[%s GMT]", scalar(gmtime(time())) }
+    sub exception { say "FAILED"; err tms, " ", @_ }
+}
+
+Getopt::Long::Configure("bundling");
+GetOptions(\%OPT,
+    "help|usage|h",
+    "longhelp|man|m|?",
+    "debug|d",
+    "user|login|oralogin|orauser|u=s",                   # Oracle Login
+    "password|passwd|orapassword|orapass|orapasswd|p=s", # Oracle Password
+    "dsn|n=s",                                           # DSN
+    "sid|tns|orasid|oraname|oratns|tnsname|s=s",         # SID
+    "sql|orarequest|orasql|q=s",                         # SQL
+) || pod2usage(-exitval => 1, -verbose => 0);
+pod2usage(-exitval => 0, -verbose => 1) if $OPT{help};
+pod2usage(-exitval => 0, -verbose => 2) if $OPT{longhelp};
+my $sid         = $OPT{sid} || SID || '';
+my $dsn         = $OPT{dsn} || DSN || SIDPFX.$sid;
+my $login       = $OPT{user} || LOGIN || '';
+my $password    = $OPT{password} || PASSWORD || '';
+my $sql         = $OPT{sql} || SQL || 'SELECT SYSDATE FROM DUAL';
+
+my @args = @ARGV ? @ARGV : (); # Аргументы команды
+my $phone   = shift(@args) || '';
+my $subject = shift(@args) || 'nosubject';
+my $message = shift(@args) || 'nomessage';
+$phone      =~ s/[^\+0-9]//g;
+$message    =~ s/\r*\n/ /g;
+$message    =~ s/\'|\"|\\//g;
+pod2usage(-exitval => 1, -verbose => 0) unless $phone && $phone =~ /^\+?(79\d{9})$/;
+$sql = _dft($sql,{PHONE=>$1,SUBJECT=>$subject,MESSAGE=>$message});
+
+say "App::MonM sendalertsms/$VERSION";
+say;
+debug sprintf(">PHONE   : \"%s\"", $phone);
+debug sprintf(">SUBJECT : \"%s\"", $subject);
+debug sprintf(">MESSAGE : \"%s\"", $message);
+debug sprintf(">SQL     : \"%s\"", $sql);
+debug;
+START: say "START TRANSACTION ", tms;
+my $ora = DBI->connect($dsn,$login,$password,{PrintError => 0}) or exception($DBI::errstr) && goto(FINISH);
+my $sth = $ora->prepare($sql) or exception($ora->errstr) && goto(FINISH);
+my $rv  = $sth->execute() or exception($ora->errstr) && goto(FINISH);
+my $result = $sth->fetchrow_arrayref or exception($ora->errstr || 'No fetch data') && goto(FINISH);
+    exception($sth->errstr) if $sth->err && goto(FINISH);
+$sth->finish or exception($ora->errstr || 'Finishing error') && goto(FINISH);
+$ora->disconnect or exception($ora->errstr) && goto(FINISH);
+FINISH: say "FINISH TRANSACTION ", tms;
+say;
+if ($result) {
+    if ($result && ref($result) eq 'ARRAY') {
+        debug "RESULT:";
+        debug "  ", join("; ",map({defined $_ ? "\"$_\"" : "\"\""} @$result));
+    }
+    say "OK";
+    print "OK" unless -t;
+} else {
+    say "FAILED";
+    print "FAILED" unless -t;
+}
+exit 0;
+
+sub _dft {
+    my $fmt = shift || '';
+    my $fd = shift || {};
+    $fmt =~ s/\[(.+?)\]/(defined $fd->{uc($1)}?$fd->{uc($1)}:'')/eg;
+    return $fmt
+}
+__END__

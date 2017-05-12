@@ -1,0 +1,12 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+dist.ini
+examples/test.pl
+lib/AnyEvent/Campfire/Client.pm
+t/00_compile.t
+weaver.ini

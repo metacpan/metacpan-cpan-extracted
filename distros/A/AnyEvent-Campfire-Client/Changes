@@ -1,0 +1,13 @@
+go to https://github.com/aanoaa/AnyEvent-Campfire-Client/issues for the roadmap and known issues.
+
+0.0.2    Mon Oct 15 18:37:23 2012 KST
+    - add general method `get`, `post`, `put`, `delete` and use them
+    - implements api features
+        + get_account
+        + recent
+        + get_rooms
+        + put_room
+        + lock
+        + unlock
+    - improve examples
+    - fix incorrect SYNOPSIS

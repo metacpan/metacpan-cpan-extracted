@@ -1,0 +1,31 @@
+Revision history for Perl extension App-GitHubWebhooks2Ikachan
+
+0.10 2014-04-07T02:29:11Z
+
+    - Support `commit_comment` and `pull_request_review_comment` event
+
+0.06 2014-04-01T03:39:10Z
+
+    - Improve function to squash duplicated commits
+
+0.05 2014-03-14T08:33:30Z
+
+    - Suppress stack trace on accident
+    - Support debug mode
+
+0.04 2014-03-11T04:39:11Z
+
+    - Change handling of PATH_INFO
+
+0.03 2014-03-11T04:21:08Z
+
+    - Up version of dependent module (Getopt::Long)
+
+0.02 2014-03-10T03:02:39Z
+
+    - Complement leading sharp in path info for channel name
+
+0.01 2014-03-09T11:21:40Z
+
+    - original version
+

@@ -1,0 +1,48 @@
+{
+    "liste": [
+        {
+            "CLE_LANGUE":"PUS",
+            "LIB_LANGUE":["afghan","pachtou","pachto"],
+            "MNT_HEURE_LANGUE":"80.00"
+        },
+        {
+            "CLE_LANGUE":"LUA",
+            "LIB_LANGUE":["tschiluba","tchilouba","aka chiluba","luba-kasa\u00ef","luba-lula"],
+            "MNT_HEURE_LANGUE":"80.00"
+        },
+        {
+            "CLE_LANGUE":"ALB",
+            "LIB_LANGUE":["albanais"],
+            "MNT_HEURE_LANGUE":"80.00"
+        },
+        {
+            "CLE_LANGUE":"GER",
+            "LIB_LANGUE":["allemand"],
+            "MNT_HEURE_LANGUE":"60.00"
+        },
+        {
+            "CLE_LANGUE":"AMH",
+            "LIB_LANGUE":["amharique"],
+            "MNT_HEURE_LANGUE":"80.00"
+        },
+        {
+            "CLE_LANGUE":"ENG",
+            "LIB_LANGUE":["anglais"],
+            "MNT_HEURE_LANGUE":"60.00"
+        },
+        {
+            "CLE_LANGUE":"ARA",
+            "LIB_LANGUE":["arabe"],
+            "MNT_HEURE_LANGUE":"80.00"
+        },
+        {
+            "CLE_LANGUE":"ARM",
+            "LIB_LANGUE":["arm\u00e9nien"],
+            "MNT_HEURE_LANGUE":"80.00"
+        }
+    ], 
+    "rights": {
+        "can_create": "1"
+    },
+    "total":"14"
+}

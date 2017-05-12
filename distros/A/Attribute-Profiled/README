@@ -1,0 +1,33 @@
+NAME
+    Attribute::Profiled - Profiles specific methods in class
+
+SYNOPSIS
+      package SomeClass;
+      use Attribute::Profiled;
+
+      sub long_running_method : Profiled { }
+
+DESCRIPTION
+    Attribute::Profiled provides a way to profile specific methods with
+    attributes. This module uses Benchmark::Timer to profile elapsed times
+    for your calls to the methods with Profiled attribute on.
+
+    Profiling report will be printed to STDERR at the end of program
+    execution.
+
+TODO
+    *   Options where to print profiling report.
+
+    *   Allows public way to get reports in any timing other than the end of
+        execution. Currently you can do it by explicitly calling report() on
+        $Attribute::Profiled::_Profiler.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Attribute::Handlers manpage, the Benchmark::Timer manpage
+

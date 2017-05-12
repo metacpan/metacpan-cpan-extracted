@@ -1,0 +1,56 @@
+---
+abstract: 'Critique a database schema for best practices'
+author:
+  - 'Mark Gardner <mjgardner@cpan.org>'
+build_requires:
+  DBICx::TestDatabase: 0
+  DBIx::Class::Core: 0
+  DBIx::Class::Schema: 0
+  File::Find: 0
+  File::Temp: 0
+  FindBin: 0
+  Path::Class: 0
+  Test::More: 0.94
+  Test::Most: 0
+  Test::Script: 0
+  base: 0
+  local::lib: 0
+  perl: 5.006
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112580'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-DBCritic
+requires:
+  Algorithm::Combinatorics: 0
+  Carp: 0
+  Const::Fast: 0
+  DBI: 0
+  DBIx::Class: 0.08125
+  DBIx::Class::Schema::Loader: 0.07007
+  Data::Compare: 0
+  Devel::Symdump: 0
+  English: 0
+  Getopt::Long::Descriptive: 0
+  List::MoreUtils: 0
+  Modern::Perl: 0
+  Module::Pluggable: 0
+  Moo: 0
+  Moo::Role: 0
+  Scalar::Util: 0
+  Sub::Quote: 0
+  namespace::autoclean: 0
+  overload: 0
+  perl: 5.010001
+  strict: 0
+  utf8: 0
+resources:
+  bugtracker: https://github.com/mjgardner/dbcritic/issues
+  homepage: http://mjgardner.github.com/dbcritic/
+  repository: git://github.com/mjgardner/dbcritic.git
+version: 0.020

@@ -1,0 +1,35 @@
+Revision history for Perl extension Abstract::Meta::Class.
+
+0.11  Sun Sep 07 2007
+        - added array storage type
+        - fix required value for arra and hash perl type attribute
+
+0.10  Sun Jun 08 2008
+	-  fix deserialization bug
+
+0.09  Sun Jun 01 2008
+	-  fix test
+
+0.08  Sat May 31 2008
+	-  added on_validate trigger
+
+0.07  Sat May 31 2008
+	-  fix test
+
+0.06  Sun May 25 2008
+	-  Added has_<accessr>, reset_<accessor> methods for association attributes
+
+0.05  Sun May 25 2008
+	-  Fix Makefile.PL (Test::Pod, Test::Pod::Coverage)
+
+0.04  Sat May 24 2008
+	-  Fix pod documentation.
+	-  Storage key option fix
+	
+0.03  Mon May 05 2008
+	-  Fix pod documentation.
+
+
+0.02  Mon May 05 2008
+	-  Initial import to CPAN.
+

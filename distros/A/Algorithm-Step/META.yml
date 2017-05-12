@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Algorithm-Step
+version: 0.02
+author:
+  - Chaoji Li <lichaoji@gmail.com>
+abstract: Trace execution steps of an algorithm
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

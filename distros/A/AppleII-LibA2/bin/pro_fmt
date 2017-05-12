@@ -1,0 +1,192 @@
+#! /usr/bin/perl
+#---------------------------------------------------------------------
+# pro_fmt
+# Copyright 1996-2006 Christopher J. Madsen
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either the
+# GNU General Public License or the Artistic License for more details.
+#
+# ABSTRACT: Create a blank Apple II ProDOS disk image file
+#---------------------------------------------------------------------
+
+use 5.006;
+use strict;
+use warnings;
+
+use AppleII::Disk 0.04;
+use AppleII::ProDOS 0.04;
+use Getopt::Long 2.10;
+
+our $VERSION = '0.201'; # VERSION
+# This file is part of AppleII-LibA2 0.201 (September 12, 2015)
+
+#---------------------------------------------------------------------
+my $blocks = 280;
+my $volume = 'NEWDISK';
+my $order  = '';
+my ($bootFrom, $extendToFullSize, $force);
+
+Getopt::Long::config(qw(bundling no_getopt_compat));
+GetOptions(
+    'boot-from|b=s'   => \$bootFrom,
+    'size|s=i'        => \$blocks,
+    'dos-order|d'     => sub { $order = 'd' },
+    'extend|e'        => \$extendToFullSize,
+    'force|f'         => \$force,
+    'prodos-order|p'  => sub { $order = 'p' },
+    'volume|v=s'      => \$volume,
+    'help'            => \&usage,
+    'version'         => \&usage
+) or usage();
+
+my $filename = shift @ARGV;
+defined($filename) or usage();
+
+sub usage {
+    our $VERSION ||= '(development version)';
+    print "pro_fmt $VERSION\n";
+    exit if $_[0] and $_[0] eq 'version';
+    print "\n" . <<'';
+Usage:  pro_fmt [options] FILE
+  -b, --boot-from=FILE  Copy boot blocks from disk image FILE
+  -e, --extend          Extend FILE to its maximum size
+  -f, --force           Overwrite an existing file
+  -d, --dos-order       Make a DOS 3.3-order image file
+  -p, --prodos-order    Make a ProDOS-order image file
+  -s, --size=BLOCKS     Make the image BLOCKS blocks in size (default 280)
+  -v, --volume=NAME     Use NAME for the ProDOS volume name (default NEWDISK)
+      --help            Display this help message
+      --version         Display version information
+
+    exit;
+} # end usage
+
+#=====================================================================
+if (not $force and -e $filename) {
+  print STDERR "pro_fmt: $filename already exists (use --force to overwrite)\n";
+  exit 1;
+}
+
+my $vol = AppleII::ProDOS->new($volume, $blocks, $filename, $order);
+
+$vol->disk->fully_allocate if $extendToFullSize;
+
+if ($bootFrom) {
+  my $boot = eval { AppleII::Disk->new($bootFrom, 'r') };
+  if ($@) {
+    my $err = $@;
+    $err =~ s! at \Q$0\E line \d+\n!!;
+    die "$err\nDisk image $filename is not bootable, but is otherwise ok.\n";
+  }
+
+  $vol->disk->write_block(0, $boot->read_block(0));
+  $vol->disk->write_block(1, $boot->read_block(1));
+} # end if $bootFrom
+
+__END__
+
+=head1 NAME
+
+pro_fmt - Create a blank Apple II ProDOS disk image file
+
+=head1 VERSION
+
+This document describes version 0.201 of
+pro_fmt, released September 12, 2015
+as part of AppleII-LibA2 version 0.201.
+
+=head1 SYNOPSIS
+
+  pro_fmt [options] FILE
+
+=head1 DESCRIPTION
+
+B<pro_fmt> creates blank ProDOS disk images.  The images are NOT
+bootable, because they lack the necessary code in the boot blocks,
+unless you use the "--boot-from" option to copy the boot blocks from a
+bootable disk image.
+
+Note that some emulators cannot deal with image files that are smaller
+than their nominal size.  That is, they expect a 280 block disk image
+file to be 143,360 bytes long.  Always use the "--extend" option when
+creating image files for such emulators.
+
+=head1 OPTIONS
+
+ -b, --boot-from=FILE  Copy boot blocks from disk image FILE
+ -e, --extend          Extend FILE to its maximum size
+ -f, --force           Overwrite an existing file
+ -d, --dos-order       Make a DOS 3.3-order image file
+ -p, --prodos-order    Make a ProDOS-order image file
+ -s, --size=BLOCKS     Make the image BLOCKS blocks in size
+                         (default 280)
+ -v, --volume=NAME     Use NAME for the ProDOS volume name
+                         (default NEWDISK)
+     --help            Display this help message
+     --version         Display version information
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+pro_fmt requires no configuration files or environment variables.
+
+=head1 DEPENDENCIES
+
+pro_fmt requires the modules L<AppleII::ProDOS> and L<AppleII::Disk>,
+which are included with AppleII-LibA2.
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+=head1 AUTHOR
+
+Christopher J. Madsen  S<C<< <perl AT cjmweb.net> >>>
+
+Please report any bugs or feature requests
+to S<C<< <bug-AppleII-LibA2 AT rt.cpan.org> >>>
+or through the web interface at
+L<< http://rt.cpan.org/Public/Bug/Report.html?Queue=AppleII-LibA2 >>.
+
+You can follow or contribute to AppleII-LibA2's development at
+L<< https://github.com/madsen/perl-libA2 >>.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut

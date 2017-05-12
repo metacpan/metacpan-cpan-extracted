@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Apache-AxKit-Language-LibXSLTEnhanced.t
+lib/Apache/AxKit/Language/LibXSLTEnhanced.pm
+lib/Apache/AxKit/Util/LibXSLTAddonFunction.pm

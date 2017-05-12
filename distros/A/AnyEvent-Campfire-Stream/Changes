@@ -1,0 +1,12 @@
+go to https://github.com/aanoaa/AnyEvent-HTTP-ScopedClient/issues for the roadmap and known issues.
+
+0.0.3    Mon Oct 15 14:54:35 2012 KST
+    - bug fix
+      - type check before execute callback
+    - escape character at POD
+    - fix wrong info README
+
+0.0.2    Thu Oct 11 16:04:29 2012 KST
+    - independent `AnyEvent::Campfire` for base class
+    - fixed bug BUILD must return $self
+    - improve exception for decode_json

@@ -1,0 +1,31 @@
+0.03	January 13 2008
+	Correct potential issue with forks::shared namespace if user loaded threads::shared in
+	a PerlRequire (startup.pl) script.
+
+	Added support for forks::BerkeleyDB (Apache::forks::BerkeleyDB).
+	
+	General improvements to framework for better module load order control.
+	
+	Various POD updates.
+	
+	Added more examples to distribution directory 'eg'.
+
+0.022	January 7 2008
+	Minor POD updates.
+
+0.021	January 7 2008
+	Improved internal load order of mod_perl modules for improved stability.
+	
+0.02	January 7 2008
+	Improved mod_perl 1.x support.
+	
+	Fixed a few bugs in child handler.
+	
+	Silenced some warnings.
+	
+	Added a few new sections to the POD.
+	
+	Updated test suite to correctly support forks 0.24+ standard threads exit() behavior.
+
+0.01	1 May 2007
+	First public version.

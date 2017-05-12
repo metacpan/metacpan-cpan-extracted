@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+
+# PODNAME: rssfilter
+# ABSTRACT: command-line interface to App::Rssfilter
+
+use strict;
+use warnings;
+use feature qw( :5.14 );
+use App::Rssfilter::Cmd;
+
+App::Rssfilter::Cmd->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rssfilter - command-line interface to App::Rssfilter
+
+=head1 VERSION
+
+version 0.07
+
+=head1 OVERVIEW
+
+See L<App::Rssfilter> for examples of configuring & running C<rssfilter>.
+
+=head1 AUTHOR
+
+Daniel Holz <dgholz@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Daniel Holz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

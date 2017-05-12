@@ -1,0 +1,14 @@
+DESCRIPTION
+
+    This distribution includes a few utility scripts related to table data.
+
+    #INSERT_EXECS_LIST
+
+    The main CLI, tabledata, is currently split into its own distribution.
+
+SEE ALSO
+
+    App::tabledata
+
+    TableDef
+

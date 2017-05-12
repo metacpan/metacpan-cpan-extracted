@@ -1,0 +1,23 @@
+? my ($app, @windows) = @_;
+        <script type="text/javascript">
+          document.observe("dom:loaded", function () {
+            alice.connection.msgid = <?= $_[0]->msgid ?>;
+            var orig_hash = window.location.hash;
+            <? for my $window (@windows) { ?>
+              alice.openWindow(
+                '<?= $window->id ?>',
+                '<?= $window->title ?>',
+                <?= $window->{active} ? "true" : "false" ?>,
+                '<?= $window->hashtag ?>'
+              );
+            <? } ?>
+            alice.focusHash(orig_hash);
+            // required due to browser weirdness with scrolltobottom on initial focus
+            setTimeout(function(){alice.activeWindow().scrollToBottom(true)}, 1);
+          });
+        </script>
+      </div>
+    </div>
+    <?= $_mt->render_file('help.html', $_[0]) ?>
+  </body>
+</html>

@@ -1,0 +1,66 @@
+#!/usr/bin/perl /usr/bin/asp-perl
+
+<%
+	# This code was ripped almost straight out of CGI.pm, by Lincoln Stein.
+	# The code was the bulk of the SYNOPSIS section of CGI.pm v2.46
+    ;
+use strict;
+use CGI qw(:standard);
+
+my $query = new CGI;
+my $cookie;
+my $name;
+
+if($name = param('name')) {
+    $cookie = cookie(-name=>'name',
+		     -value=>$name,
+		     -expires=>'+1h',
+		    );
+}
+$name ||= cookie('name');
+print header(-cookie=>$cookie);
+%>
+<!--#include file=header.inc-->
+<% print
+    h1('A Simple Example'),
+    start_form,
+    "What's your name? ",textfield('name'),p,
+    "What's the combination?", p,
+    checkbox_group(-name=>'words',
+		   -values=>['eenie','meenie','minie','moe'],
+		   -defaults=>['eenie','minie']), p,
+    "What's your favorite color? ",
+    popup_menu(-name=>'color',
+	       -values=>['red','green','blue','chartreuse']),p,
+    submit,
+    end_form,
+    hr;
+
+if (param()) {
+    print "Your name is ",em($name),p,"\n",
+    "The keywords are: ",em(join(", ",param('words'))),p,"\n",
+    "Your favorite color is ",em(param('color')),"\n",
+    hr;
+}
+
+%>
+
+This script is a demonstration of using the CGI.pm library
+in an ASP script.  Please remember that using CGI.pm will 
+probably NOT be portable with PScript and PerlScript.
+<p>
+As of version 0.09, you may use CGI for reading form input
+without any change to regular use of CGI.  Before, you couldn't
+do a <pre> use CGI; </pre> by itself, as it would try to read
+form input that had already been loaded into $Request->Form().
+Form input is now cached, and may be loaded into CGI as well.
+In short, use of CGI.pm is now transparent in Apache::ASP,
+as both output and input have been merged seemlessly.
+<p>    
+<a href="source.asp?file=<%=$Request->ServerVariables("SCRIPT_NAME")%>">
+view this file's source
+
+<%
+	print end_html;
+%>
+

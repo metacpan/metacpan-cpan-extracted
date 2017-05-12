@@ -1,0 +1,29 @@
+Revision history for Archive-TAP-Convert
+
+0.007     2014-11-25 21:27:32+01:00 Europe/Zurich
+
+0.007     2014-11-25 18:20:57+01:00 Europe/Zurich (TRIAL RELEASE)
+          - accepts formatter object as an option (thx to maspalio)
+          - corrected head title in Changes file
+          - updated dist.ini to dzil v5 (encoding plugin)
+
+0.006     2013-10-15 11:34:06 Europe/Zurich
+          - added keyword "perl programming language" to the docs
+
+0.005     2013-09-27 11:09:15 Europe/Zurich
+          - renamed to Archive::TAP::Convert from Convert::TAP::Archive
+
+0.004     2013-08-02 11:25:55 Europe/Berlin
+          - added option to pack JS and CSS inside HTML head
+          - BREAK BACKWARDS COMPATIBILITY: added named paramters
+
+0.003     2013-07-09 09:29:55 Europe/Berlin
+          - added test-prereq, thx CpanReporters, once again!
+
+0.002     2013-07-08 12:31:33 Europe/Berlin
+          - fix bug which printed archive to stdout
+          - added basic tests
+          - updated documentation
+
+0.001     2013-07-05 16:43:21 Europe/Berlin
+          - initial release

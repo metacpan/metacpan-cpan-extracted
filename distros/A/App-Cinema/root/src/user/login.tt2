@@ -1,0 +1,3 @@
+[% META title = "LOG IN" %]
+<!--<a href="[% Catalyst.uri_for('/user/add') %]">Register</a> an account if you don't have one.-->
+[% FormBuilder.render %]

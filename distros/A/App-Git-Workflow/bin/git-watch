@@ -1,0 +1,127 @@
+#!/usr/bin/perl
+
+# Created on: 2014-03-11 20:58:59
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use App::Git::Workflow::Command::Watch;
+
+App::Git::Workflow::Command::Watch->run();
+
+__DATA__
+
+=head1 NAME
+
+git-watch - Watch for changes in repository up-stream
+
+=head1 VERSION
+
+This documentation refers to git-watch version 1.0.1
+
+=head1 SYNOPSIS
+
+   git-watch show [-1|--once] [(-f|--file) file ...]
+   git-watch [do] [-1|--once] [(-f|--file) file ...] [--] cmd
+
+ SUB-COMMAND
+  show          Simply show when a file
+  do            Execute a shell script cmd when a change occurs
+
+ OPTIONS:
+  -1 --once     Run once then exit
+  -R --runs[=]int
+                Run at most this number of times.
+  -p --pull     Before checking if anything has changed do a git pull to the
+                current branch. (see notes below)
+  -P --pull-options[=]flags
+                When using --pull add these options to the pull command.
+  -f --file[=]regex
+                Watch file any files changing that match "regex"
+  -b --branch[=]regex
+                Watch for any changes to branches matching "regex"
+                by default looks only at local branches
+  -r --remote   With --branch only look at remote branches
+  -a --all      With --branch look at all branches (local and remote)
+  -m --max[=]int
+                Look only --max changes back in history to see what is
+                happening (Default 10)
+  -s --sleep[=]int
+                Sleep time between fetches (devault 60s)
+  -q --quiet    Suppress notifying of what files and branches have changed
+  -v --verbose  Show more detailes
+     --version  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for git-watch
+
+=head1 DESCRIPTION
+
+The C<git-watch> command allows you to run a command when something changes.
+The simple option is C<show> which just shows what has changed when it changes
+and nothing else, this is useful for seeing what is happening in the
+repository. The the C<do> sub-command actually runs a script every time a
+change is detected.
+
+=head2 show
+
+The output of C<show> is changed with the C<--quiet> and C<--verbose> options to
+show more or less information.
+
+=head2 do
+
+When the C<do> sub-command runs it sets the environment variables C<$WATCH_SHA>,
+C<$WATCH_FILES> and C<$WATCH_BRANCHES> with the latest commit SHA, the files
+that have changed and the branches that have changed respectively. The files
+and branches are comma separated for your command to inspect.
+
+A simple example:
+
+  git watch 'echo $WATCH_FILES'
+
+This would just echo the files that have changed with each change.
+
+=head2 Notes
+
+If trying to watch a branch that is connected to a remote branch the C<--pull>
+isn't currently working as expected. The workaround is to watch the remote
+branch and do the pull your self. eg
+
+ $ git watch do -rb origin/master -- 'git pull --ff -r; your-command'
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2014 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

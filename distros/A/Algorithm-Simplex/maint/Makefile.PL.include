@@ -1,0 +1,7 @@
+BEGIN { -e 'Distar' or system("git clone git://git.shadowcat.co.uk/p5sagit/Distar.git") }
+use lib 'Distar/lib';
+use Distar;
+
+author 'mateu - Mateu X. Hunter (cpan:MATEU) <hunter@missoula.org>';
+
+1;

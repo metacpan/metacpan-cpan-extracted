@@ -1,0 +1,41 @@
+0.24      2014-05-21 15:53:27 Europe/Amsterdam
+
+  * fix typo
+
+0.23      2013-12-24 02:06:03 Europe/Paris
+  * *really* don't depend on namespace::autoclean, duh...
+
+0.22      2013-12-21 23:46:15 Europe/Amsterdam
+  * don't depend on Test::Most, Test::Pretty and namespace::autoclean
+
+0.21      2013-02-11 11:47:44 Europe/Paris
+  * fix initial_term_index, plus test
+
+0.20      2013-02-08 18:34:46 Europe/Paris
+  * fix doc
+
+0.19      2013-02-08 16:53:40 Europe/Paris
+  * fixed wrong returned value when called in list context,
+  * added more parameters passed to retry and on failure code
+
+0.18      2013-02-05 18:16:10 Europe/Paris
+
+0.17      2013-01-25 00:20:11 Europe/Paris
+
+0.16      2013-01-24 21:12:08 Europe/Paris
+
+0.15      2013-01-24 10:04:23 Europe/Paris
+
+0.14      2013-01-24 10:01:03 Europe/Paris
+
+0.13      2013-01-21 13:05:20 Europe/Paris
+
+0.12      2013-01-17 17:32:50 Europe/Paris
+
+0.11      2013-01-17 16:01:36 Europe/Paris
+
+0.10      2013-01-17 12:43:09 Europe/Paris
+  * first implementation
+  * non-blocking mode
+  * fibonacci, linear mode
+  

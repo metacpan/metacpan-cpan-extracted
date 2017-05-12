@@ -1,0 +1,21 @@
+buildtools/gen_hip_struct.pl
+buildtools/memory_bench.pl
+buildtools/read_bench.pl
+Changes
+examples/draw_hammer_proj.pl
+examples/draw_projection.pl
+examples/simple_selection.pl
+Hipparcos.xs
+lib/Astro/Hipparcos.pm
+lib/Astro/Hipparcos/Record.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+perlobject.map
+ppport.h
+README
+t/01basic.t
+t/data/hip_test.dat
+typemap
+typemap.xsp
+META.yml                                 Module meta-data (added by MakeMaker)

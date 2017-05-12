@@ -1,0 +1,23 @@
+AI-NeuralNet-SOM
+================
+
+Yet another implementation of Kohonen's SOMs (self organizing maps):
+multidimensional vector samples in, 2-dimensional out, clusters become
+visible. Nice.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Copyright (C) 2007 by Robert Barta
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

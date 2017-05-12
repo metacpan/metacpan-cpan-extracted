@@ -1,0 +1,151 @@
+Overview
+--------
+
+
+ There are several phases to the execution of slaughter upon a client machine:
+
+  - Determining information about the local system.
+  - Reading the configuration file and parsing the command line options.
+  - Fetching the remote policy/policies.
+  - Wrapping the retrieved policy-code to make it valid Perl.
+  - Executing the wrapped code.
+  - Cleanup.
+
+Because the code is wrapped in a little magic the primitives we've provided
+are available.  These primitives are nothing more than exported subroutines
+which become available due to this in the wrapped file:
+
+    use Slaughter;
+
+The Slaughter module is a stub which loads the pure-perl implementation
+of our primitives from Slaughter::API::generic, and then attempts to
+load a platform-specific implementations module, via the use of the
+ perl $^O variable.
+
+So, for example, on a GNU/Linux system "use Slaughter" actually becomes:
+
+    use Slaughter::API::generic
+    use Slaughter::API::linux
+
+If no platform-specific module can be found then the user is restricted
+to the 100% pure & portable perl primitives.  The platform-specific ones
+will merely print "Not implemented".
+
+To allow users to provide their own local primitives the module also attempts
+to load the module "Slaughter::API::Local::$^O".  If this loading fails then
+no error or warning is reported - in the general case this module will not
+be present.
+
+
+
+
+System Information
+------------------
+
+When the slaughter client runs it gathers some meta-information about
+the host it is executing upon.
+
+All the meta-information is gleaned at runtime, by loading a specific
+module, which must provide the method "getInformation" to populate and
+return a hash-reference of system-information.  Again the provided information
+may be augmented by the use of a module in the Slaughter::Info::Local
+namespace.
+
+The type of information is not specified, but we assume that it contains
+at least basic information about the current system.
+
+You can view the implementation in lib/Slaughter/Info/*.pm
+
+
+
+
+Package Installation
+--------------------
+
+Package installation is also abstracted into a library of its own
+beneath the "Slaughter::Packages::" prefix.
+
+Currently we support several systems :
+
+    Slaughter::Packages::linux
+     -> Recongizes apt-get + yum
+
+    Slaughter::Packages::openbsd
+    Slaughter::Packages::netbsd
+     -> Recognizes pkg_add/pkg_info/etc.
+
+Adding support for a new packaging system, in a new environment should
+be a simple task.
+
+
+
+
+Hacking Directions
+------------------
+
+Brief pointers on where you need to look to do different things - note that
+each directory containing library code has a file API in it, describing the
+required methods.
+
+Here are pointers for adding new functionality to the slaughter tool:
+
+   Hacking: Variables
+   ------------------
+    If you'd like to make a new variable available to all policy scripts you'll
+   need to investigate the slaughter code if it is common to all environments
+   (see the function "defaultOptions").  If the variable is specific to a
+   particular operating-sytem it should be added to the relevant module beneath
+   lib/Slaughter/Info/*.pm.
+
+   Hacking: Primitives
+   -------------------
+   If you'd like to make a new primitive available you have two choices:
+    1.  Implement it in 100% pure & portable perl in Slaughter::API::generic
+    2.  Implement it in an OS-specific fashion in Slaughter::API::* - after
+      making the generic module merely output an error message.
+    If your primitive(s) are purely local you may implement them in the
+   Slaughter::API::Local namespace where they will be automatically loaded.
+   (for example lib/Slaughter/API/Local/linux.pm)
+
+   Hacking: Packages
+   ------------------
+    The interface to the system's packaging is implemented in a module
+   beneath the Slaughter::Packages:: namespace.  If you add support for
+   another platform you follow a similar naming scheme.  You'll need to
+   update the platform-specific module to invoke your local package module.
+
+   Hacking: Transports
+   -------------------
+    If you'd like to add a new transport mechanism you should be able to do
+   so copying one of the libraries in lib/Slaughter/Transport/.  Implement
+   the required methods, such that the test cases pass and you're golden.
+    Transports based on revision control software, or binaries, are particularly trivial
+   to implement using the base-class provided.  (Consult git.pm/hg.pm for examples.)
+
+   Hacking: Porting to new OS
+   --------------------------
+    First of all determine which operating system your perl installation calls itself:
+        perl -e 'print $^O . "\n"'
+    Whatever that name is you'll want to implement two/three modules with that name:
+        Slaughter::API::$name
+        Slaughter::Info::$name
+        Slaughter::Packages::$name  [optional]
+    Each of these can be modelled on the code already present in linux.pm/openbsd.pm
+   If you need help don't hesitate to get in touch though.
+
+
+
+
+Submitting Patches
+------------------
+
+Patches are welcome, as are suggestions without any corresponding code.
+
+Note that patches will be more likely to be accepted if they contain
+corresponding test-code, test-cases, and documentation.
+
+
+
+Steve
+--
+

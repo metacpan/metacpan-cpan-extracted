@@ -1,0 +1,70 @@
+{
+   "abstract" : "We are CPAN authors who have authored Acme::CPANAuthors modules",
+   "author" : [
+      "Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-CPANAuthors-Acme-CPANAuthors-Authors",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.020"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::CPANAuthors::Register" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sanko/acme-cpanauthors-acme-cpanauthors-authors/issues"
+      },
+      "homepage" : "https://github.com/sanko/acme-cpanauthors-acme-cpanauthors-authors",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sanko/acme-cpanauthors-acme-cpanauthors-authors.git",
+         "web" : "https://github.com/sanko/acme-cpanauthors-acme-cpanauthors-authors"
+      }
+   },
+   "version" : "v1.0.0",
+   "x_contributors" : [
+      "Karen Etheridge <ether@cpan.org>",
+      "Sergey Romanov <complefor@rambler.ru>"
+   ]
+}
+

@@ -1,0 +1,75 @@
+#!perl
+use strict;
+use warnings;
+use App::Edge;
+
+my $edge = App::Edge->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+edge - show the edge of logs with conditional grep
+
+=head1 SYNOPSIS
+
+    $ edge [options] FILE_PATH
+
+=head2 OPTIONS
+
+    -t   --total-count  also show the total line count
+    -g   --grep         grep condition
+    -gv  --grepv        invert grep condition
+    -f   --file         file path
+
+=head2 EXAMPLES
+
+Here is the 4 lines 'error.log' file.
+
+    2014/06/27 08:43:00,not found
+    2014/06/27 08:43:01,not found
+    2014/06/27 08:43:02,not found
+    2014/06/27 08:43:03,no auth
+
+Then you execute the C<edge> command.
+
+    $ edge error.log
+    1: 2014/06/27 08:43:00,not found
+    4: 2014/06/27 08:43:03,no auth
+
+The first line and the last line are output with a line number.
+
+The below command is the other example of C<edge> with match condition.
+
+    $ edge --grep found error.log
+    1: 2014/06/27 08:43:00,not found
+    3: 2014/06/27 08:43:02,not found
+
+The above command is mostly same as below commands.
+
+    $ cat error.log | grep found | head -n1
+    $ cat error.log | grep found | tail -n1
+    $ cat error.log | grep found | wc -l
+
+You can get total line count too.
+
+    $ edge -t --grep found error.log
+    1: 2014/06/27 08:43:00,not found
+    3: 2014/06/27 08:43:02,not found
+    total: 4 lines
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<App::Edge>
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=cut

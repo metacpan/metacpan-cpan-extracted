@@ -1,0 +1,19 @@
+                    Singleton Example
+                    =================
+
+An example of using the singleton aspect. Shows how an AOP solution
+requires less code, and suffers from less EEK, compared with an OOP
+solution.
+
+
+oop.pl - we want to make sure users create only one printer, per Perl
+         interperter. And we don't want to pass it around in argument
+         lists all over the place. So we make it into a singleton. The
+         OOP solution suffers from EEK: clients and the singleton
+         itself, are both aware of the singleton requirement.
+
+
+aop.pl - the AOP solution is exactly like the solution before the
+         singleton requirement was added, except for setting up the
+         aspect. The only place in the system where the singleton
+         requirement is specified is in the aspect.

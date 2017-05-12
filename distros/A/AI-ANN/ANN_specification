@@ -1,0 +1,33 @@
+ANN
+	implements an artificial neural network
+	from caller, $network = new ANN( $inputcount, [{ iamanoutput => 0, inputs => {$inputid => $weight, ...}, neurons => {$neuronid => $weight}}, ...])
+	from caller, $network->execute( [$input0, $input1, ...] ) runs the network with the provided inputs and returns the outputs as an arrayref
+	from caller, $network->get_state() returns three arrayrefs, [$input0, ...], [$neuron0, ...], [$output0, ...]
+	from caller, $network->get_input_count() returns the number of inputs
+	from caller, $network->get_internals() returns the original arrayref format - for the evolver, perhaps
+	from caller, $network->readable() returns a text-based human-readable and diffable description of the network:
+		Neuron 0:
+			Input from input 0, weight is 0.34232
+			Input from input 1, weight is -0.21231
+			Input from neuron 21, weight is 0.3213
+			This neuron is a network output
+	it should be noted that the network need not be feed-forward. ANN should use $self->{'network'}->ready() to determine if input conditions are satisfied. If it is impossible to complete the run by using ready(), then the network should store a list of not ready() neurons, execute() all not ready() neurons, update_neuron() all not ready() neurons, and repeat until outputs stabilize. 
+
+ANN::Neuron
+	implements an individual neuron from the neural network
+	from ann, $self->{'network'}->[$n]->{'object'} = new ANN::Neuron( $thisid, {$inputid => $weight, ...}, {$neuronid => $weight})
+	from ann, $self->{'network'}->[$n]->{'object'}->ready( [$input0, $input1, ...], {$neuronid => $neuronvalue, ...} ) returns 1 if all inputs are available, 0 otherwise
+	from ann, $self->{'network'}->[$n]->{'object'}->execute( [$input0, $input1, ...], {$neuronid => $neuronvalue, ...} ) returns the output value of the neuron
+	in addition, get_inputs and get_neurons are available. There return the respective original hashrefs. 
+
+ANN::Evolver
+	evolves the ann
+	from caller, $handofgod = new ANN::Evolver({$mutationchance, $mutationamount, $addlinkchance, $killlinkchance, $subcrossoverchance}) add should be zero if you want to preserve feed-forwardness
+	from caller, $handofgod->crossover($network1, $network2) returns $network3, which inherits 50% of each parent's traits. Each neuron has $subcrossoverchance to inherit 50% of its traits from each parent.
+	from caller, $handofgod->mutate($network3) introduces some random mutations into neuron weights. Has a $mutationchance to change each weight by up to $mutationamount, a $addlinkchance to change an input from zero to up to $mutationamount, and a $killlinkchance to change an input from absolute value less than $mutationamount to zero.
+
+ANN::SimWorld
+	uses an ANN object to attempt to survive in a virtual world, which must be defined by the caller
+	from caller, $world = new ANN::SimWorld( //stuff here )
+	from caller, $world->($network) returns a fitness variable
+

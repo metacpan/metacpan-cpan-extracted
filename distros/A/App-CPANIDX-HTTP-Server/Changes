@@ -1,0 +1,51 @@
+==============================
+2011-11-10 14:47:43 +0000 0.08
+==============================
+
+  commit 8cda102472f15e9ba1bc70693cc092cb5513d6f2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Nov 10 14:47:43 2011 +0000
+  
+    Bump version to 0.08
+
+  commit b49dfbd2278daf2ce4f9210769b3499c4a910734
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Nov 10 14:44:31 2011 +0000
+  
+    Added sanity check for case-sensitivity in module names 
+
+==============================
+2011-01-03 14:31:33 +0000 0.06
+==============================
+
+  commit f1e666eab93b8228894bc083383d989731944357
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Jan 3 14:31:33 2011 +0000
+  
+    School-boy errors fixed.
+
+  commit 83bbf316018ed24bcfab73db454879176bdba351
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Jan 3 14:27:11 2011 +0000
+  
+    Make the error handling more robust so it doesn't kill the server 
+
+==============================
+2011-01-01 22:33:53 +0000 0.04
+==============================
+
+  commit 71ece539b5b1721a05a5fd57bd1ec697e551dfdb
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sat Jan 1 22:33:53 2011 +0000
+  
+    Should be requiring 0.28
+
+  commit ccfb621f3f5ce4baebed5d0eb07e9d834e270916
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sat Jan 1 22:32:35 2011 +0000
+  
+    Updates for new App::CPANIDX 
+
+====================================
+End of changes in the last 1825 days
+====================================

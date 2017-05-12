@@ -1,0 +1,9 @@
+Changes
+lib/Audio/DSS.pm
+Makefile.PL
+MANIFEST
+README
+t/1.t
+eg/dumpdss.pl
+eg/dss_is_cool.dss
+META.yml                                Module meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+---
+abstract: 'Gets the version info about a module'
+author:
+  - 'Curtis Jewell, <csjewell@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-module-version
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  English: 0
+  Getopt::Long: 2.13
+  Pod::Usage: 0
+  Test::More: 0
+  perl: 5.008009
+version: 1.004

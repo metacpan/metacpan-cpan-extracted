@@ -1,0 +1,34 @@
+Revision history for Alt-Alien-FFI-System
+
+0.16      2017-03-23 08:02:18 -0400
+  - Production release identical to 0.15_01
+
+0.15_01   2017-03-16 17:48:29 -0400
+  - Use the same test as the real Alien::FFI
+  - Configure step no longer does a compile/link test
+  - Honor PKG_CONFIG environment variable
+  - Try pkgconf if pkg-config is not available
+
+0.14      2016-03-01 12:53:58 -0500
+  - New version to match current Alien::FFI
+
+0.12      2015-07-13 12:58:29 -0400
+  - Drop required perl down to 5.8.1
+
+0.11      2015-05-01 15:06:35 -0400
+  - New version to match current Alien::FFI
+
+0.10      2015-04-22 07:33:20 -0400
+  - New version to match current Alien::FFI
+
+0.09      2015-03-27 18:53:32 -0400
+  - New version to match current Alien::FFI
+
+0.08      2015-02-24 12:29:29 -0500
+  - Add dist_dir method that just croaks (compat with Alien::FFI)
+
+0.07      2015-02-16 18:17:42 -0500
+  - Do a compile/link (but not run) test at configure time
+
+0.06      2015-02-16 09:42:03 -0500
+  - initial version

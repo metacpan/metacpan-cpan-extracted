@@ -1,0 +1,108 @@
+{
+   "abstract" : "operates ranges and links of ranges on chromosomes",
+   "author" : [
+      "Qiang Wang <wang-q@outlook.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Rangeops",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AlignDB::IntSpan" : "v1.0.7",
+            "App::Cmd" : "0.330",
+            "App::Fasops" : "v0.4.8",
+            "App::RL" : "v0.2.32",
+            "Graph" : "0.9704",
+            "IPC::Cmd" : "0",
+            "List::MoreUtils" : "0.413",
+            "MCE" : "1.708",
+            "Path::Tiny" : "0.076",
+            "YAML::Syck" : "1.29",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "App::Rangeops" : {
+         "file" : "lib/App/Rangeops.pm",
+         "version" : "v0.1.0"
+      },
+      "App::Rangeops::Command::circos" : {
+         "file" : "lib/App/Rangeops/Command/circos.pm"
+      },
+      "App::Rangeops::Command::clean" : {
+         "file" : "lib/App/Rangeops/Command/clean.pm"
+      },
+      "App::Rangeops::Command::connect" : {
+         "file" : "lib/App/Rangeops/Command/connect.pm"
+      },
+      "App::Rangeops::Command::create" : {
+         "file" : "lib/App/Rangeops/Command/create.pm"
+      },
+      "App::Rangeops::Command::filter" : {
+         "file" : "lib/App/Rangeops/Command/filter.pm"
+      },
+      "App::Rangeops::Command::merge" : {
+         "file" : "lib/App/Rangeops/Command/merge.pm"
+      },
+      "App::Rangeops::Command::sort" : {
+         "file" : "lib/App/Rangeops/Command/sort.pm"
+      },
+      "App::Rangeops::Common" : {
+         "file" : "lib/App/Rangeops/Common.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wang-q/App-Rangeops/issues"
+      },
+      "homepage" : "https://github.com/wang-q/App-Rangeops",
+      "repository" : {
+         "url" : "git://github.com/wang-q/App-Rangeops.git",
+         "web" : "https://github.com/wang-q/App-Rangeops"
+      }
+   },
+   "version" : "0.1.0",
+   "x_authority" : "cpan:WANGQ",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

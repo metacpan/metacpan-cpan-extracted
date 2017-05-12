@@ -1,0 +1,78 @@
+<HTML>
+<HEAD>
+<TITLE>Apache::Wombat::Logger - Apache server logger class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Apache::Wombat::Logger - Apache server logger class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Apache::Log ();
+  my $slog = Apache-&gt;server()-&gt;log();</PRE>
+<PRE>
+  my $logger = Apache::Wombat::Logger-&gt;new($slog);
+  $logger-&gt;log(&quot;this will show up in the httpd ErrorLog&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Logger class that writes messages to the Apache ErrorLog.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new($slog)</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Apache::Wombat::Logger</STRONG> instance using
+the specified Apache server log.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_write"><CODE>write($string)</CODE></A></STRONG><BR>
+<DD>
+Write the specified string to the Apache server log.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24string">$string</A></STRONG><BR>
+<DD>
+the string to write
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A>,
+<A HREF="../../../api/Wombat/Logger/LoggerBase.html">the Wombat::Logger::LoggerBase manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

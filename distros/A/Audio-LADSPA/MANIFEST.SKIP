@@ -1,0 +1,17 @@
+\.tar\.gz$
+Makefile$
+Makefile\.old$
+sine.wav
+MANIFEST.bak
+\/CVS\/
+^CVS\/
+META.yml
+\.cvsignore$
+\.c$
+\.o$
+\.bs$
+blib
+~~$
+release.sh
+tags
+cover_db

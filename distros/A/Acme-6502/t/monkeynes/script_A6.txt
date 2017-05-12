@@ -1,0 +1,31 @@
+clear
+power on
+regs
+
+# Normal condition ------------
+
+memset 0072 55
+op a6 72
+
+# Should be: IX=55
+test ix = 55
+
+# Zero condition ------------
+
+memset 0072 00
+op a6 72
+
+# Should be: IX=0, Z=1
+test ix = 0
+test z = 1
+
+# Negative condition ------------
+
+memset 0072 f2
+op a6 72
+
+# Should be: IX=F2, S=1
+test ix = f2
+test s = 1
+
+save verify_A6.txt

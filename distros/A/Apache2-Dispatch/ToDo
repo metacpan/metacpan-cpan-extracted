@@ -1,0 +1,128 @@
+cache method calls as valid methods if seen previously to avoid can()
+overhead?  Turns out that this is _much_ slower than just letting
+perl handle it (by about 30% - ack)
+
+make class/method available to pre/post/error handlers
+  Tatsuhiko Miyagawa
+
+test suite
+
+serious benchmarking...
+
+I tried to do some quick benchmarking using a real handler - I used a
+method handler so it runs under Apache::Dispatch and normal mod_perl 
+without modification.
+
+the handler did the following:
+  run an Oracle stored procedure (using Apache::DBI with connect_on_init)
+  fill in a simple template using Text::Template
+  output results
+
+I think the results look pretty promising in a real world scenario
+
+Joshua Chamas ran some Hello World benchmarks that included Dispatch.pm - 
+the results are down at the bottom of the page...
+
+----------------------------------------------------------------------
+using a single <Location> directive with a method handler
+
+[gyoung@account-test bin]$ ./ab -n10000 -c10 \
+-C'MYA::Authenticate_=quality:12568' \
+http://account-test.laserlink.net/test
+
+This is ApacheBench, Version 1.3c <$Revision: 1.2 $> apache-1.3
+Copyright (c) 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Copyright (c) 1998-1999 The Apache Group, http://www.apache.org/
+
+Server Software:        Apache/1.3.12                                      
+Server Hostname:        account-test.laserlink.net
+Server Port:            80
+
+Document Path:          /test
+Document Length:        8703 bytes
+
+Concurrency Level:      10
+Time taken for tests:   697.210 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      88548854 bytes
+HTML transferred:       87038703 bytes
+Requests per second:    14.34
+Transfer rate:          127.00 kb/s received
+
+Connnection Times (ms)
+              min   avg   max
+Connect:        0     1   372
+Processing:    99   695  2110
+Total:         99   696  2482
+ 
+----------------------------------------------------------------------
+using Apache::Dispatch with DispatchISA On
+
+[gyoung@account-test bin]$ ./ab -n10000 -c10 \
+-C'MYA::Authenticate_=quality:12568' \
+http://account-test.laserlink.net/scripts/Plan/show
+
+This is ApacheBench, Version 1.3c <$Revision: 1.2 $> apache-1.3
+Copyright (c) 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Copyright (c) 1998-1999 The Apache Group, http://www.apache.org/
+
+Server Software:        Apache/1.3.12                                      
+Server Hostname:        account-test.laserlink.net
+Server Port:            80
+
+Document Path:          /scripts/Plan/show
+Document Length:        8703 bytes
+
+Concurrency Level:      10
+Time taken for tests:   725.533 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      88540000 bytes
+HTML transferred:       87030000 bytes
+Requests per second:    13.78
+Transfer rate:          122.03 kb/s received
+
+Connnection Times (ms)
+              min   avg   max
+Connect:        0     0   263
+Processing:    91   724  2072
+Total:         91   724  2335
+
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+here are Josh's benchmark results (thanks Josh!):
+
+Geoffrey Young wrote:
+> 
+> here's a patch against the bench.pl you sent...  I already knew that
+> Apache::Dispatch didn't do too well in hello world type stuff.  oh, well...
+> 
+> I tried to get a mod_perl method handler going, but it seems not to work
+> unless there is a physical .pm around as part of its internal checks...
+> 
+
+What you gave me is good.  What do you mean "didn't do too well"? 
+It screamed!  I'm only seeing a .00035 sec diff between it and a 
+normal modperl handler on my system.
+
+--Josh
+
+Test Name                 Test File    Hits/sec     Total Hits   Total Time   sec/Hits     
+------------              ------------ ------------ ------------ ------------ ------------ 
+Apache::ASP               hello.asp     410.4       24623 hits   60.00 sec    0.002437     
+Apache::Dispatch handler  dispatch/tes  658.7       39524 hits   60.00 sec    0.001518     
+Apache::Registry CGI Raw  hello_raw.re  717.3       43036 hits   60.00 sec    0.001394     
+Apache::Registry CGI.pm   hello.reg     479.2       28756 hits   60.00 sec    0.002087     
+Apache::SSI               hello.shtml   481.4       28885 hits   60.00 sec    0.002077     
+HTML static               hello.html   1183.7       50000 hits   42.24 sec    0.000845     
+HTML::Embperl             hello.epl     487.7       29266 hits   60.00 sec    0.002050     
+HTML::Mason               hello.mas     367.5       22052 hits   60.00 sec    0.002721     
+Template Toolkit          hello.tt      537.9       32275 hits   60.00 sec    0.001859     
+mod_include SSI           hello.shtml   916.6       50000 hits   54.55 sec    0.001091     
+mod_perl handler          hello.bench   856.0       50000 hits   58.41 sec    0.001168
+
+Josh's official Linux Hello World 2000 benchmark results posting can be seen at
+http://forum.swarthmore.edu/epigone/modperl/sercrerdprou/3A56F551.4EADEB43@chamas.com
+

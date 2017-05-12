@@ -1,0 +1,13 @@
+.cvsignore
+adm/.cvsignore
+adm/MANIFEST.SKIP
+adm/release
+Changes
+eg/info
+lib/AOLserver/CtrlPort.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/001.t
+t/002.t

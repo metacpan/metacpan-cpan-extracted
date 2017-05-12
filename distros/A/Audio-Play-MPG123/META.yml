@@ -1,0 +1,10 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Audio-Play-MPG123
+version:      0.63
+version_from: MPG123.pm
+installdirs:  site
+requires:
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.23

@@ -1,0 +1,190 @@
+Revison History for App::Fetchware
+
+1.016     2016-10-07 00:22:33-04:00 America/New_York
+    * BREAKING CHANGE: fetchware now manually changes its umask to 0022. This is
+      to prevent too lenient umasks from causing fetchware's test suite to fail
+      due to security checks failing.
+        * These security checks are important, because without them other users
+          in your group could modify your Fetchwarefiles or fetchware packages,
+          and change the Fetchwarefile in malicious ways.
+        * This should fix some CPAN Tester FAILs.
+    - Fixed t/bin-fetchware-clean.t's use of cwd() instead of a tempdir(). This
+      should fix some CPAN Tester FAILs.
+
+1.015     2016-09-30 19:45:58-04:00 America/New_York
+    - Fixed many of fetchware author tests that were holding up development.
+        - Including many fixes for fetchware when fetchware is run as root.
+    * Behavior change! Now when fetchware fails due to error and returns nonzero
+      it will not clean up its tempdir so that you can more easily troubleshoot
+      a failed run of fetchware by examining its tempdir.
+        * Previously, when fetchware failed it deleted everything out from under
+          you with no way to keep it. This may cause some build up of annoying
+          fetchware directories in your temp dir (just fetchware clean them),
+          but thats better then not being able to troubleshoot failures when
+          they do happen, and you care about them.
+        * A --keep-temp command line option was added that uses File::Temp's
+          global, $File::Temp::KEEP_ALL, to turn off deleting any temporary
+          files and directores that had CLEANUP or UNLINK turned on.
+        * Fetchware's CTRL-C signal handler still cleans up after fetchware,
+          because when you type CTRL-C you typically just want the program dead
+          and gone without a directory you still have to cleanup. 
+    - Fixed github#5 in commit a3abee63 by making the regex more generic, but
+      still good enough to test what it needs to test.
+    - During testing all tests that add packages to your fetchware database
+      instead add them to a temporary database that is deleted during testing.
+      This avoids any problems of weird "testing" packages remaining in your
+      fetchware database due to a botched test or two.
+    - Fixed a bug that caused Fetchwarefiles with no_install turned on to avoid
+      installing your program, but they would still eroneously create and add a
+      fetchware package to your fetchware database, which cause any upgrade-all
+      runs to actually install this fetchware package. Now, no_install means no
+      install.
+    - Fixed all annoying "Use of uninitialized value" warnings in test suite,
+      and am commited to not let any more back in. I love taking advantage of
+      undef, but these warnings stink. Don't get too excited as some warnings
+      were left, because they happen mostly when exceptions get thrown or
+      directly because of how things are tested in the test suite. Furthermore, 
+      I took my training wheels off, and finally ditched use diagnostics in each
+      test file. I don't need it anymore, and it makes CPAN Tester reports extra
+      annoying.
+
+1.014     2014-09-12 20:55:16-04:00 America/New_York
+    - Fixed more CPAN Tester FAIL reports.
+        - Added File::HomeDir version 0.93+ as a dependency, because that's the
+          first production release that supported the my_dist_data() method that
+          Fetchware uses to store non-root fetchware database path.
+        - Switched to pretty much always using a tempdir for the fetchware
+          database path instead of the real fetchware database path. This should
+          fix some upgrade CPAN Tester FAILs.
+        - Gave up trying to test using Test::Expect if its installed. That's
+          still in the code, but now skip_all_unless_relase_testing() is in
+          front of it, so pretty much just me is the only who is ever going to
+          test any of the Test::Expect stuff, which is probably a good thing,
+          since its test reliability seems iffy.
+
+1.013     2014-09-06 22:01:01-04:00 America/New_York
+    - Fixed dozens of CPAN Tester FAIL reports. These reports FAILed mostly
+      beause they were run under a smoker, which is a different environment, then
+      I test Fetchware under.
+        - Fixed the upgrade tests actually using the users own fetchware package
+          path. Now a temp file is used instead.
+        - Switch use of $^X to $Config{perlpath}, which solves some bugs in some
+          smoker configurations.
+        - Fixed a hilarious bug due to localizations. I used a direct string
+          comparison where $! was in the string, and I guess under different
+          locales you can get languages other than english to come from using $!
+          in a string.
+
+1.012     2014-09-05 21:23:55-04:00 America/New_York
+    - Fixed botched use of $ENV{AUTOMATED_TESTING} to skip the interactive new
+      command tests.
+    - Fixed last of my use of smartmatch since its sadly been marked
+      experimental.
+
+1.011     2014-09-05 00:59:30-04:00 America/New_York
+    - Added support for the new command to the Fetchware API, so Fetchware
+      extensions can now easily implement the new command to also help their
+      users easily make Fetchwarefiles.
+    - Also added check_syntax() to the Fetchware API providing Fetchware-level
+      Fetchwarefile syntax checking. No parsing of Perl is done as that's best
+      left to perl itself.
+    - The upgrade() subroutine was also added to the Fetchware API allowing
+      Fetchware extensions to easily change Fetchware's definition of when your
+      Fetchware package should be upgraded.
+    - Added support for these new API subroutines to Fetchware's example
+      Fetchware extension App::FetchwareX::HTMLPageSync.
+    - Added perl 5.10.1 as an "official" dependency. Each Perl file always had a
+      "use 5.010001;" line, but it was never declared in dist.ini.
+    - Many minor doc fixes and tweaks, and the Fetchware extension documentation
+      was updated to cover the new API subroutines new(), new_install(),
+      check_syntax(), and upgrade().
+
+1.010     2013-12-14 04:10:18 America/New_York
+    - Fixed github#4 by added a more reliable checksum parser that should be
+      generic enough to parse anything simple and reasonable.
+    - Fixed a bug related to github#4 that caused ftp timestamp parsing to fail
+      if file listing had symbolic links in it.
+    - Also fixed the "uninitialized variables" bug again. The previous fix was
+      horrible. It took a few tries to figure it out, and almost resulted in
+      breaking fetchware's command line interface again, but my command line
+      tests saved me from that nightmare. Tests rule!
+
+1.009     2013-12-11 22:41:13 America/New_York
+    - Fixed github#2-3 for good by introducing tests for both run() and actually
+      running the program with arguments to check its command line arguments.
+      Now, if I break the user interface, and fetchware becomes useless, I'll
+      actually know from just its own tests.
+    - Created a new testing helper subroutine, fork_ok(). All it does is fork,
+      execute the specified coderef, and pass or fail based on the forked
+      proces's exit status. Used in the test suite testing mentioned above.
+    - Fixed a typo that caused fetchware's -h, --help, and -? command line
+      options to not work at all. Until this release fetchware was calling the
+      help() subroutine, which no longer exists. It was renamed cmd_help() a
+      long time ago. This is now fixed, and tested for.
+    - Fixed an annoying bug that caused App-Fetchware-$VERSION.fpkg to be left
+      in user's fetchware package directory. Fetchware's test suite creates a
+      few test packages, and copies them to the user's fetchware database
+      directory. These packages are then deleted, because they are only used for
+      testing, so they do not need to be left there with the user wondering
+      where they came from.
+    - And a number of small bug fixes and typos as well.
+
+1.008     2013-11-30 04:46:59 America/New_York
+    - Fixed github#1 by fixing mistakenly commented out code that was poorly
+      half refactored.
+    - Fixed github#2 and 3 by fixing botched removal of given/when in
+      bin/fetchware's run() subroutine.
+    - Fixed 2 miscellaneous bugs while fixing github#1-3.
+        - Fixed a bizarre HEREDOC parsing bug, caused by perl not parsing the
+          HEREDOC properly. Vim's syntax highlighting were also confused.
+          Perhaps the bug was my code? Probably was. Not bothering p5p with it.
+        - Fixed bug leaving test-dists in user's fetchware package database.
+          These really should be deleted, because test-dist and friends made by
+          Util's make_test_dist() subroutine do *not* actually install anything
+          or touch your computer at all. They just contain fake build and
+          install commands that just print to your screen to support testing
+          building and installing software without actually building or
+          installing stuff.
+
+1.007     2013-11-25 23:53:58 America/New_York
+    - Fixed a bunch of CPAN Testers FAILs. Including:
+        - Weird t/bin-fetchware-upgrade.t test-dist fail bug.
+        - Added SKIP block unless -t to t/bin-fetchware-new.t testing.
+        - Fixed sort block returning undef bug, and added extra tests too.
+
+1.006     2013-11-25 02:59:52 America/New_York
+    - Fixed Test::Expect CPAN Testers FAILs by switching from use to requires.
+
+1.005     2013-11-24 01:19:18 America/New_York
+    - Another attempt at fixing the indexing being messed up. Turns out my
+      dist.init is missing a [PkgVersion] directive. I use Pod::Weaver, so I
+      probably removed it when I removed [PodVersion], but I should not have,
+      because it is still needed.
+
+1.004     2013-11-23 02:19:58 America/New_York
+    - Attempt to fix bin/fetchware not properly being indexed again :)
+      bin/fetchware was missing a shebang line. This has been fixed. Perhaps
+      this is the snag preventing bin/fetchware from being indexed properly.
+
+1.003     2013-11-23 01:42:54 America/New_York
+    - Fix in 1.002 failed to fix bin/fetchware indexing. Going to try giving
+      package fetchware; a blank line around itself maybe that will do the
+      trick.
+
+1.002     2013-11-23 01:23:55 America/New_York
+    - Fixed bin/fetchware not being properly indexed by PAUSE due to using both
+      # PODNAME and a package fetchware; in the same file.
+
+1.001     2013-11-23 00:31:02 America/New_York
+    - Fixed numerous simple test failures reported automatically from CPAN
+      Testers.
+      - See: http://www.cpantesters.org/distro/A/App-Fetchware.html for listing
+        of failed test reports. All of them failed :) Be sure to select the
+        reports for version 1.00, which corresponds to the version of fetchware
+        that was tested.
+    - Replaced given/when with regular ifs due to 5.18 deprecation of given/when. 
+      - RIP given/when and smartmatch and ~~. With any luck you'll be
+        reincarnated soon.
+
+1.000     2013-11-20 00:29:13 America/New_York
+    - Initial release!

@@ -1,0 +1,33 @@
+[%# vars: notepos, note, sect %]
+
+[% UNLESS all_notepos; note_index = 0; all_notepos = []; END;
+next_note_index = note_index + 1; prev_note_index = note_index - 1 %]
+
+[% UNLESS notepos && ! notepos.is_visible %]
+<div class="note [% notepos.score_class %]" id="note_[% note.id %]">
+<div class="note_header">
+    <div class="note_data">
+    [% link_user(note.user) %]
+    ([% YMD_HMS.format(note.time) %])
+    <a class="button u_[% note.user.id %]" href="[% root_uri_rel %]/e/?mode=edit;notepos=[% notepos.id %]#noteform">[edit]</a>
+    <a class="button u_[% note.user.id %]" href="[% root_uri_rel %]/e/?mode=move;notepos=[% notepos.id %]#[% notepos.section.pos %]">[move]</a>
+    </div>
+    <div class="note_nav">
+    [% IF note_index > 0 %]<a href="#note_[% all_notepos.$prev_note_index.note.id %]" title="Previous note">«</a>[% END %]
+    <a href="[% podver_uri(podver) %]#note_[% note.id %]" title="Bookmarkable link to this note">§</a>
+    [% IF note_index < all_notepos.size - 1 %]<a href="#note_[% all_notepos.$next_note_index.note.id %]" title="Next note">»</a>[% END %]
+    </div>
+</div> <!-- note_header -->
+<div class="note_body">
+        [% IF log.size > 0 %]
+        <ul class="message">
+        [% FOR m = log %]
+        <li>[% m %]</li>
+        [% END %]
+        </ul>
+        [% END %]
+    [% note.html %]
+</div>
+</div> <!-- note -->
+[% END %]
+[% note_index = note_index + 1 %]

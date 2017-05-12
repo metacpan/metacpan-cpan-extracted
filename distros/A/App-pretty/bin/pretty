@@ -1,0 +1,232 @@
+#!perl
+
+our $DATE = '2016-03-10'; # DATE
+our $VERSION = '0.05'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+my %Opts = (
+    input  => 'json',
+    output => 'Console',
+);
+my $Input;
+my @Output;
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'input|i=s'  => \$Opts{input},
+        'output|o=s' => \$Opts{output},
+        'version|v'  => sub {
+            say "pretty version ", ($main::VERSION // '?');
+            exit 0;
+        },
+        'help|h'     => sub {
+            print <<USAGE;
+Usage:
+  pretty [OPTIONS] < INPUT
+  pretty --version
+  pretty --help
+Examples:
+  pretty -o YAML data.json
+Options:
+  --input=s, -i   Input format (json, yaml, perl; default is json).
+  --output=s, -o  Output format (json, yaml, perl, or any formatter module name;
+                  default is Console).
+Consult manpage/documentation for more details.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+}
+
+sub get_input {
+    local $/;
+    if ($Opts{input} eq 'json') {
+        require JSON::MaybeXS;
+        $Input = JSON::MaybeXS->new->allow_nonref->decode(~~<>);
+    } elsif ($Opts{input} eq 'yaml') {
+        require YAML::Syck;
+        $Input = YAML::Syck::Load(~~<>);
+    } elsif ($Opts{input} eq 'perl') {
+        $Input = eval(~~<>);
+    } else {
+        warn "Unknown input format, ".
+            "refer to documentation for available formats\n";
+        exit 99;
+    }
+}
+
+sub show_output {
+    my $module;
+    if ($Opts{output} eq 'json') {
+        $module = 'JSON';
+    } elsif ($Opts{output} eq 'yaml') {
+        $module = 'YAML';
+    } elsif ($Opts{output} eq 'perl') {
+        $module = 'Perl';
+    } elsif ($Opts{output} !~ /\A[A-Za-z0-9_]+\z/) {
+        die "Invalid output format, ".
+            "refer to documentation for available formats\n";
+        exit 99;
+    } else {
+        $module = $Opts{output};
+    }
+    require Data::Format::Pretty;
+    print Data::Format::Pretty::format_pretty($Input, {module=>$module});
+}
+
+# MAIN
+
+parse_cmdline();
+get_input();
+show_output();
+
+1;
+# ABSTRACT: Format data structure prettily
+# PODNAME: pretty
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pretty - Format data structure prettily
+
+=head1 VERSION
+
+This document describes version 0.05 of pretty (from Perl distribution App-pretty), released on 2016-03-10.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % pretty [OPTIONS] < INPUT
+
+Examples:
+
+ % echo '[1..5]' | pretty -i perl
+ .----.
+ |  1 |
+ |  2 |
+ |  3 |
+ |  4 |
+ |  5 |
+ `----'
+
+ % cat celine-dion-album-sales.json
+ [
+   {
+     "lang": "en",
+     "sales": 3000000,
+     "title": "unison",
+     "year": 1990
+   },
+   {
+     "lang": "en",
+     "sales": 5300000,
+     "title": "celine dion",
+     "year": 1992
+   },
+   {
+     "lang": "en",
+     "sales": 16600000,
+     "title": "the color of my love",
+     "year": 1993
+   },
+   ...
+ ]
+
+ % pretty celine-dion-album-sales.json
+ .--------------------------------------------------------------.
+ | lang      sales   tags        title                     year |
+ |                                                              |
+ | en      3000000               unison                    1990 |
+ | en      5300000               celine dion               1992 |
+ | en     16600000               the color of my love      1993 |
+ | en     30300000               falling into you          1996 |
+ | en     32100000               let's talk about love     1997 |
+ | en     12100000   christmas   these are special times   1998 |
+ | en     10500000               a new day has come        2002 |
+ | en      5100000               one heart                 2003 |
+ | en      2600000               miracle                   2004 |
+ | en      3400000               taking chances            2007 |
+ | en      1300000               loved me back to life     2013 |
+ `--------------------------------------------------------------'
+
+=head1 DESCRIPTION
+
+This script formats data structure using L<Data::Format::Pretty>. You can use it
+to quickly visualize a data structure on a console. See documentation of
+Data::Format::Pretty for more details.
+
+It accepts input as JSON, or several other alternative formats (see the C<-i>
+option). It by default outputs the data using the C<Console> formatter module
+(L<Data::Format::Pretty::Console>), but you can use the other modules.
+
+=head1 EXIT CODES
+
+0 on success.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=over
+
+=item * --input=STR, -i
+
+Pick input format. Available formats: json (parsed using L<JSON>), yaml (parsed
+using L<YAML::Syck>), perl. Default is json.
+
+=item * --output=STR, -o
+
+Pick output format. Available formats: json, yaml, perl, or any of the available
+C<Data::Format::Pretty::*> (for example, specifying C<Ruby> will use
+the L<Data::Format::Pretty::Ruby> formatter module).
+
+=back
+
+=head1 FAQ
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-pretty>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-pretty>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-pretty>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Data::Format::Pretty>
+
+L<pretty-res>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

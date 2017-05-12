@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+README
+lib/Apache2/Mogile/Dispatch.pm
+t/00-compile.t
+t/05-pod.t
+t/06-pod_coverage.t
+doc/Subclassing.pod
+doc/examples/Cookie.pm
+doc/examples/HTTPConfig.pm
+doc/examples/Large.pm
+doc/examples/SSI.pm

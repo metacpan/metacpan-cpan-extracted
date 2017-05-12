@@ -1,0 +1,10 @@
+Build.PL
+Changes
+Interval2Prefix.pm
+MANIFEST
+META.yml
+Makefile.PL
+README
+t/basic.t
+t/pod.t
+t/regex.t

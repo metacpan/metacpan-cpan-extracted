@@ -1,0 +1,160 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+
+use IO::Socket::INET;
+use IO::Select;
+use Getopt::Long;
+
+use AI::Evolve::Befunge::Util;
+
+=head1 NAME
+
+    migrationd - AI::Evolve::Befunge migration server
+
+
+=head1 SYNOPSIS
+
+    migrationd [-q|v|d] [-h host/IP] [-p port]
+
+
+=head1 DESCRIPTION
+
+This script acts as a server to link multiple instances of
+AI::Evolve::Befunge together for the purposes of migration.  This is
+a cheap, easy form of parallel processing - migration allows useful
+traits to propagate without requiring any synchronization, and using
+minimal bandwidth.
+
+It will run until it is killed.
+
+Please be aware that this protocol is subject to change over time -
+the whole migration process will be adapted to use Net::Cluster when
+that becomes available.  Until this feature has stabilized, no
+guarantee is made that newer versions of AI::Evolve::Befunge will be
+able to talk to this version of the server.
+
+
+=head1 COMMAND LINE ARGUMENTS
+
+=head2 -h <host/IP>, --host=<host/ip>
+
+Hostname or IP address to listen on.  By default, connections will be
+accepted on all available IPs.
+
+
+=head2 -p <port>, --port=<port>
+
+TCP port to listen on.  The default port is 29522.
+
+
+=head2 -q, --quiet
+
+Enable quiet mode.  This will reduce the amount of output.
+
+
+=head2 -v, --verbose
+
+Enable verbose mode.  This will increase the amount of output.
+
+=cut
+
+
+=head2 -d, --debug
+
+Enable debug mode.  This will increase the amount of output.
+
+=cut
+
+
+# default command line options
+my $quiet   = 0;
+my $verbose = 0;
+my $debug   = 0;
+my $help    = 0;
+my $host    = '0.0.0.0';
+my $port    = 29522;
+
+die("Usage: $0 [-q|v|d] [-h host] [-p port]\n") unless GetOptions(
+    'debug'   => \$debug,
+    'quiet'   => \$quiet,
+    'verbose' => \$verbose,
+    'help'    => \$help,
+    'host=s'  => \$host,
+    'port=i'  => \$port,
+);
+
+exec("perldoc $0") if $help;
+
+push_quiet($quiet);
+push_verbose($verbose);
+push_debug($debug);
+
+verbose("opening socket\n");
+my $listener = IO::Socket::INET->new(
+    Proto     => 'tcp',
+    Listen    => 1,
+    LocalHost => $host,
+    LocalPort => $port,
+    ReuseAddr => 1,
+);
+
+nonquiet("Listening on $host:$port.\n");
+
+die("Could not create socket: $!\n") unless defined $listener;
+
+my $select = IO::Select->new($listener);
+
+while(1) {
+    my @handles = $select->can_read(1);
+    foreach my $handle (@handles) {
+        if($handle == $listener) {
+            my $new = $listener->accept();
+            $new->blocking(0);
+            $select->add($new);
+            if($debug) {
+                my ($port, $ip) = sockaddr_in($new->peername);
+                $ip = inet_ntoa($ip);
+                debug("New connection from $ip:$port\n");
+            }
+        } else {
+            my $data = '';
+            $handle->recv($data, 100000, 0);
+            if(length($data)) {
+                $data =~ s/\r/\n/g; # turn CRs into LFs
+                $data =~ s/\n\n/\n/g; # remove redundant LFs
+                my $linesize;
+                while(($linesize = index($data, "\n")) > -1) {
+                    my $line = substr($data, 0, $linesize+1, '');
+                    if($debug) {
+                        my ($port, $ip) = sockaddr_in($handle->peername);
+                        $ip = inet_ntoa($ip);
+                        debug("line from $ip:$port: $line");
+                    }
+                    foreach my $recipient ($select->handles) {
+                        next if $recipient == $listener;
+                        next if $recipient == $handle;
+                        $recipient->send($line, 0);
+                    }
+                }
+            } else {
+                if($debug) {
+                    my ($port, $ip) = sockaddr_in($handle->peername);
+                    $ip = inet_ntoa($ip);
+                    debug("closing connection from $ip:$port due to EOF\n");
+                }
+                $select->remove($handle);
+            }
+        }
+    }
+    @handles = $select->has_exception(0);
+    foreach my $handle (@handles) {
+        die("exception on listener socket\n") if $handle == $listener;
+        if($debug) {
+            my ($port, $ip) = sockaddr_in($handle->peername);
+            $ip = inet_ntoa($ip);
+            debug("closing connection from $ip:$port due to exception\n");
+        }
+        $select->remove($handle);
+    }
+}

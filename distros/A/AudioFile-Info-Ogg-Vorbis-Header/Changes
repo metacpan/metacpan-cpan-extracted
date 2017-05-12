@@ -1,0 +1,121 @@
+2016-12-08  Dave Cross <dave@dave.org.uk>
+
+  * Build.PL: Packaging fixes
+
+  * lib/AudioFile/Info/Build.pm, lib/AudioFile/Info/Ogg/Vorbis/Header.pm:
+  Remove SVN artifacts. Correct versions.
+
+2016-10-03  Dave Cross <dave@dave.org.uk>
+
+  * .travis.yml: Ignore Build.pm in coverage reports
+
+  * t/1_read.t: Switch anothe test file to using Test::More  How old were these
+  tests?!!
+
+  * t/2_write.t: Fix test
+
+  * t/2_write.t: Update tests to use Test::More
+
+2016-10-02  Martin Schimandl <martin.schimandl@gmail.com>
+
+  * .travis.yml: Fix travis build issue
+
+2016-07-02  Dave Cross <dave@dave.org.uk>
+
+  * .travis.yml: Added back the dev libraries
+
+  * .travis.yml: Change the vorbis library that we use
+
+  * .travis.yml: Add Perl 5.22 to testing.
+
+  * Build.PL: Ensure we require a version of Ogg::Vorbis::Header that actually
+  works
+
+2016-06-16  Dave Cross <dave@dave.org.uk>
+
+  * lib/AudioFile/Info/Build.pm, lib/AudioFile/Info/Ogg/Vorbis/Header.pm,
+  t/1_read.t: Some fixes to make the tests pass again.
+
+2015-07-20  Dave Cross <dave@dave.org.uk>
+
+  * .travis.yml: Another try at getting libogg and libvorbis installed.
+
+2015-07-19  Dave Cross <dave@dave.org.uk>
+
+  * .travis.yml: Ok. That didn't work. More investigation needed.
+
+  * .travis.yml: Install libogg and libvorbis as well
+
+  * .travis.yml: Install libogg-dev and libvorbis-dev before Travis run
+
+  * .travis.yml: Force new Travis run
+
+2015-07-18  Dave Cross <dave@dave.org.uk>
+
+  * .gitignore, .travis.yml: Added .gitignore and .travis.yml
+
+2015-07-17  Dave Cross <dave@dave.org.uk>
+
+  * MANIFEST: Added META.json to MANIFEST
+
+2008-04-20  Dave Cross <dave@dave.org.uk>
+
+  * t/test.ogg: Set svn:mime-type to application/ogg. Removed svn:eol-style and
+  svn:executable.
+
+  * Build.PL: Tidy Build.PL. Add dist_version. Add YAML tp prereqs.
+
+  * lib/AudioFile/Info/Build.pm, lib/AudioFile/Info/Ogg/Vorbis/Header.pm:
+  Switched to using svn version numbers. Added $VERSION to
+  AudioFile::Info::Build.
+
+  * Build.PL, MANIFEST, README: Removed svn:executable from MANFEST, Build.PL
+  and README.
+
+2006-06-15  Dave Cross <dave@dave.org.uk>
+
+  * MANIFEST, lib/AudioFile/Info/Build.pm,
+  lib/AudioFile/Info/Ogg/Vorbis/Header.pm, t/4_pod_coverage.t: Added
+  t/4_pod_coverage.t. Added pod to Build.pm and Header.pm
+
+2005-03-01  Dave Cross <dave@dave.org.uk>
+
+  * MANIFEST, lib/AudioFile/Info/Ogg/Vorbis/Header.pm, t/3_pod.t: Added pod
+  tests
+
+2004-02-25  Dave Cross <dave@dave.org.uk>
+
+  * lib/AudioFile/Info/Ogg/Vorbis/Header.pm: Fixed check for attribute
+  existence
+
+  * Makefile.PL: Removed
+
+2004-02-17  Dave Cross <dave@dave.org.uk>
+
+  * lib/AudioFile/Info/Ogg/Vorbis/Header.pm: Added ability to write data.
+
+  * lib/AudioFile/Info/Build.pm: Changed feature weightings
+
+  * Build.PL, MANIFEST: Various build changes.
+
+  * t/1_read.t, t/2_write.t: New test files.
+
+  * t/1.t: Replaced by 1_read.t
+
+2003-09-29  Dave Cross <dave@dave.org.uk>
+
+  * lib/AudioFile/Info/Ogg/Vorbis/Header.pm: Fixed config defintion.
+
+  * Build.PL: Fixed config definition.
+
+  * lib/AudioFile/Info/Ogg/Vorbis/Header.pm: Fixed docs.
+
+  * Changes, META.yml: Not needed in CVS.
+
+  * lib/AudioFile/Info/Build.pm: Retrieve config details from note.
+
+  * Build.PL: Moved config section to a note.
+
+  * Build.PL, Changes, MANIFEST, META.yml, Makefile.PL, README,
+  lib/AudioFile/Info/Build.pm, lib/AudioFile/Info/Ogg/Vorbis/Header.pm, t/1.t,
+  t/test.ogg: Initial revision

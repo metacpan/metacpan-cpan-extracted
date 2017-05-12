@@ -1,0 +1,276 @@
+{
+   "abstract" : "a moer tolernat verison of mehtod location",
+   "author" : [
+      "Ricardo SIGNES <rjbs@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amce-CNA",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::ISA" : "0",
+            "Sub::Exporter" : "0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rjbs/Amce-CNA/issues"
+      },
+      "homepage" : "https://github.com/rjbs/Amce-CNA",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rjbs/Amce-CNA.git",
+         "web" : "https://github.com/rjbs/Amce-CNA"
+      }
+   },
+   "version" : "0.066",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.019005"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Git::GatherDir",
+            "name" : "@Filter/Git::GatherDir",
+            "version" : "2.017"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckPrereqsIndexed",
+            "name" : "@Filter/CheckPrereqsIndexed",
+            "version" : "0.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckExtraTests",
+            "name" : "@Filter/CheckExtraTests",
+            "version" : "0.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PromptIfStale",
+            "name" : "@Filter/RJBS-Outdated",
+            "version" : "0.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PromptIfStale",
+            "name" : "@Filter/CPAN-Outdated",
+            "version" : "0.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@Filter/@Filter/PruneCruft",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@Filter/@Filter/ManifestSkip",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@Filter/@Filter/MetaYAML",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@Filter/@Filter/License",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@Filter/@Filter/Readme",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@Filter/@Filter/ExecDir",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@Filter/@Filter/ShareDir",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "name" : "@Filter/@Filter/MakeMaker",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@Filter/@Filter/Manifest",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@Filter/@Filter/TestRelease",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@Filter/@Filter/ConfirmRelease",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@Filter/@Filter/UploadToCPAN",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "@Filter/AutoPrereqs",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::NextVersion",
+            "name" : "@Filter/Git::NextVersion",
+            "version" : "2.017"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@Filter/PkgVersion",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@Filter/MetaConfig",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@Filter/MetaJSON",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::ChangesHasContent",
+            "name" : "@Filter/Test::ChangesHasContent",
+            "version" : "0.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@Filter/PodSyntaxTests",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReportVersions::Tiny",
+            "name" : "@Filter/ReportVersions::Tiny",
+            "version" : "1.10"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "@Filter/TestMoreWithSubtests",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "config" : {
+               "Dist::Zilla::Plugin::PodWeaver" : {
+                  "config_plugin" : "@RJBS",
+                  "finder" : [
+                     ":InstallModules",
+                     ":ExecFiles"
+                  ]
+               }
+            },
+            "name" : "@Filter/PodWeaver",
+            "version" : "4.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GithubMeta",
+            "name" : "@Filter/GithubMeta",
+            "version" : "0.42"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "name" : "@Filter/@Git/Check",
+            "version" : "2.017"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "name" : "@Filter/@Git/Commit",
+            "version" : "2.017"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "name" : "@Filter/@Git/Tag",
+            "version" : "2.017"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "name" : "@Filter/@Git/Push",
+            "version" : "2.017"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "5.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "5.006"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "5.006"
+      }
+   }
+}
+

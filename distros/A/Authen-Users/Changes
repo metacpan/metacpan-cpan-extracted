@@ -1,0 +1,51 @@
+Revision history for Perl module Authen::Users
+
+0.010 Fri Feb  6 18:44:46 2004
+	- original version; created by ExtUtils::ModuleMaker 0.31229
+
+0.020 Mon Feb  9 12:10:33 2004
+	- fixed MySQL syntax in SQL code
+	- changed testing for MySQL back end
+	
+0.021 Tue Feb 10 08:35:11 2004 
+	- revised docs and prerequisites
+
+0.028 Wed Feb 11 08:35:11 2004 
+	- cleaned some debugging code from routines
+	
+0.030 Thu Feb 12 15:30:12 2004
+	- changed digest algorithm style to allow more options, default to 256 bits
+
+0.032 Fri Feb 13 22:56:11 2004
+	- changed a warning when user not in database during authentication
+
+0.034 Tue Feb 24 2004 23:02:37 2004
+	- POD changes
+	- change sql call in update_user_all
+	- add password timestamp code
+
+0.035 Sat Mar 13 19:34:51 2004
+	- Win32 test issue fix
+
+0.10  Thu May 27 2004
+    - Pod revisions
+    - It's working in production long and well enough to call a full 0.10	
+
+0.11  Thu June 3 2004
+    - some error checking code from code contributed by vad at lernet .ru (Thanks Vadim!)
+
+0.12  Sat Aug 14 2004
+    - POD correction
+
+0.14  Sun 20 April 2008
+    - POD revisions, tests for POD
+    
+0.15  Fri 29 Jan 2010
+    - fix for new DBD::SQLite version table_info defaults, thanks to Eric E.
+
+0.16  Wed 16 Feb 2011
+    - add random salt to digest methods
+
+0.17  Fri 18 Feb 2011
+	- backward compatibility additions
+

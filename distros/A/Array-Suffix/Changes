@@ -1,0 +1,21 @@
+Revision history for Perl extension Array::Suffix.
+
+0.1  Mon Jan  5 15:48:26 2004
+	- original version; created by h2xs 1.22 with options
+		-X -n Array::Suffix
+
+0.2 Tue Mar 23 11:25:31 2004
+	- updated the Perldoc and Readme documentation
+	- removed the normal-op.pl tests 
+	- added array-suffix-driver.pl program
+
+0.3 Tue Apr 20 13:08:03 2004
+	- updated the Perldoc documentation
+	- reorganized file structure
+
+0.4 Fri Apr 30 10:28:42 2004
+	- updated documentation in driver program
+
+0.5 Tue Aug 28 15:52:10 2007
+	- modified Makfile to die if the version of 
+	  Perl used is less than 5.8.5

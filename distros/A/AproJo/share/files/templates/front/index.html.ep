@@ -1,0 +1,30 @@
+% layout 'default';
+% title 'Testpage AproJo';
+% my $form = form_handler('User')->name;
+% form_handler('User')->from_schema(schema);
+
+<div class="container">                                 
+<div class="row">
+<div class="span12"> 
+
+<h2>Testpage for AproJo</h2>
+
+<p>It works!</p>
+
+<p><%= $form %></p>
+
+<p><a href="/front/serverinfo">Serverinfo</a></p>
+
+% my @sources = schema->sources;
+% for my $source (sort @sources) {
+<p><a href="/admin/show/<%= $source %>">Admin <%= $source %></a></p>
+% }
+
+
+
+<p>Hi and Ho</p>
+
+
+</div>
+</div>
+</div>

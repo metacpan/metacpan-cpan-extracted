@@ -1,0 +1,7 @@
+AxKit Provider for HTML, allowing you to use HTML as
+the source for your AxKit driven components.
+
+Useful for content entry systems, where the users might
+not want to have to enter XHTML.
+
+Works only off the filesystem though.

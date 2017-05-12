@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Acme/Machi.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/boilerplate.t
+t/Acme-Machi.t
+Makefile.PL
+META.yml
+META.json

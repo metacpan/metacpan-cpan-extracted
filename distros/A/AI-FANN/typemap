@@ -1,0 +1,62 @@
+TYPEMAP
+struct fann *	T_PTROBJ_MAGIC
+struct fann_train_data *	T_PTROBJ_MAGIC
+
+fann_type	T_DOUBLE
+
+fta_input	T_FTA_INPUT
+fta_output	T_FTA_OUTPUT
+
+enum fann_train_enum	T_UV
+enum fann_stopfunc_enum	T_UV
+enum fann_errorfunc_enum	T_UV
+enum fann_activationfunc_enum	T_UV
+
+enum fann_train_enum    T_FANN_TRAIN_ENUM
+enum fann_activationfunc_enum   T_FANN_ACTIVATIONFUNC_ENUM
+enum fann_errorfunc_enum    T_FANN_ERRORFUNC_ENUM
+enum fann_stopfunc_enum T_STOPFUNC_ENUM
+
+INPUT
+
+T_PTROBJ_MAGIC
+	$var = ($type)_sv2obj(aTHX_ $arg, \"${type}\", 1);
+
+T_FTA_INPUT
+	$var = _sv2fta(aTHX_ $arg, self->num_input, WANT_MORTAL, \"${var}\");
+
+T_FTA_OUTPUT
+	$var = _sv2fta(aTHX_ $arg, self->num_output, WANT_MORTAL, \"${var}\");
+
+T_FANN_TRAIN_ENUM
+    $var = _sv2fann_train_enum($arg)
+
+T_FANN_ACTIVATIONFUNC_ENUM
+    $var = _sv2fann_activationfunc_enum($arg)
+
+T_FANN_ERRORFUNC_ENUM
+    $var = _sv2fann_errorfunc_enum($arg)
+
+T_STOPFUNC_ENUM
+    $var = _sv2fann_stopfunc_enum($arg)
+
+
+OUTPUT
+
+T_PTROBJ_MAGIC
+	$arg = _obj2sv(aTHX_ $var, ST(0), "$type");
+
+T_FTA_OUTPUT
+	$arg = _fta2sv(aTHX_ $var, self->num_output);
+
+T_FANN_TRAIN_ENUM
+    $arg = _fann_train_enum2sv($var);
+
+T_FANN_ACTIVATIONFUNC_ENUM
+    $arg = _fann_activationfunc_enum2sv($var);
+
+T_FANN_ERRORFUNC_ENUM
+    $arg = _fann_errorfunc_enum2sv($var);
+
+T_STOPFUNC_ENUM
+    $arg = _fann_stopfunc_enum2sv($var);

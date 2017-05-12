@@ -1,0 +1,55 @@
+{
+   "abstract" : "AnyEvent::Handle subclass with user-defined up/down bandwidth cap",
+   "author" : [
+      "Sanko Robinson <sanko@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Conversion, Software version 7.0",
+   "keywords" : [
+      "AnyEvent",
+      "Handle",
+      "Throttle",
+      "bandwidth",
+      "limit",
+      "cap",
+      "throughput"
+   ],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-Handle-Throttle",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "example",
+         "inc"
+      ]
+   },
+   "provides" : {
+      "AnyEvent::Handle::Throttle" : {
+         "file" : "lib/AnyEvent/Handle/Throttle.pm",
+         "version" : "0.000002005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "sanko@cpan.org",
+         "web" : "http://github.com/sanko/anyevent-handle-throttle/issues"
+      },
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sanko/anyevent-handle-throttle.git",
+         "web" : "http://github.com/sanko/anyevent-handle-throttle"
+      },
+      "x_ChangeLog" : "http://github.com/sanko/anyevent-handle-throttle/commits/master"
+   },
+   "version" : "0.000002005"
+}

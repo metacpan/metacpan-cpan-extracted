@@ -1,0 +1,11 @@
+#!perl -w
+use strict;
+use lib qw(lib);
+use Benchmark qw(cmpthese);
+use Algorithm::GenerateSequence;
+my $seq1 = Algorithm::GenerateSequence->new( ([1..100]) x 100 );
+my $seq2 = Algorithm::GenerateSequence->new( ([1..100]) x 100 );
+cmpthese( -2 => {
+    sub  => sub { $seq1->() },
+    meth => sub { $seq2->next },
+});

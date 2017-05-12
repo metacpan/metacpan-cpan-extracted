@@ -1,0 +1,368 @@
+#!/usr/bin/perl
+# relate                   doom@kzsu.stanford.edu
+#                          15 Mar 2010
+
+=head1 NAME
+
+relate - list files matching the given search terms (a wrapper around locate)
+
+=head1 SYNOPSIS
+
+   An example:
+
+      relate bozotech lib report data
+
+   Would match:
+
+      /usr/lib/bozotech/data/report
+      /usr/lib/reports/bozotech/data
+      /usr/local/lib/bozotech/report/data
+
+=head2 usage
+
+  relate [options] term1 [ term2 [ term3 ... ]]
+
+  Options:
+     -i                 ignore case
+     --ignore-case      same
+     -a                 all results (suppresses standard filter)
+     --all              same
+     -d                 only list directories
+     -dirs              same
+     -f                 only list files
+     -files             same
+     -l                 only list symlinks
+     --links            same
+     -r                 treat even the first term as a regexp (albeit POSIX)
+     --regexp           same
+     -D                 debug messages on
+     --debug            same
+     -h                 help (show usage)
+     -v                 show version
+     --version          same
+
+     --database '...'   Use alternative locate database(s)
+     --locate   '...'   Invoke locate program differently (default: 'locate').
+
+=cut
+
+use warnings;
+use strict;
+$|=1;
+use Data::Dumper;
+
+use File::Path     qw( mkpath );
+use File::Basename qw( fileparse basename dirname );
+use File::Copy     qw( copy move );
+use Fatal          qw( open close mkpath copy move );
+use Cwd            qw( cwd abs_path );
+
+use Env qw(HOME);
+
+our $VERSION = 0.10;
+my  $prog    = basename($0);
+
+use Getopt::Long qw(:config no_ignore_case bundling require_order );
+my $DEBUG       = 0;
+my $ignore_case = 0;
+my $all_results = 0;
+my $regexp      = 0;
+my ($dirs_only, $files_only, $links_only, $database, $locate);
+GetOptions ("D|debug"        => \$DEBUG,
+            "v|version"      => sub{ say_version(); },
+            "h|?|help|man"   => sub{ say_usage();   },
+            "i|ignore-case"  => \$ignore_case,
+            "a|all"          => \$all_results,
+            "r|regexp"       => \$regexp,
+            "d|dirs"         => \$dirs_only,
+            "f|files"        => \$files_only,
+            "l|links"        => \$links_only,
+            "database=s"     => \$database,
+            "locate=s"       => \$locate,
+           ) or say_usage();
+
+use FindBin qw($Bin);
+use lib ("$Bin/../lib/");
+use App::Relate qw(:all) ;
+
+# default settings
+my $default_config =
+  { filter =>
+    ['~$', '/\#', '\.\#', ',v$', '/RCS$', '/CVS/', '/CVS$', '\.elc$' ] };
+my $config = get_config_from_dot_file( $default_config );
+my $skipdull = $config->{ filter };
+
+my $opts = {
+            ignore_case => $ignore_case,
+            all_results => $all_results,
+            regexp      => $regexp,
+            dirs_only   => $dirs_only,
+            files_only  => $files_only,
+            links_only  => $links_only,
+            database    => $database,
+            locate      => $locate,
+            DEBUG       => $DEBUG,
+           };
+
+my @search_terms = @ARGV;
+($DEBUG) && print STDERR "$prog running on: ", Dumper( \@search_terms ), "\n";
+my $result = relate( \@search_terms, $skipdull, $opts );
+
+foreach my $line (@{ $result }) {
+  print $line, "\n";
+}
+
+
+### end main, into the subs
+
+sub say_usage {
+  my $usage=<<"USEME";
+   $prog <-options> <arguments>
+     TODO fill-in usage statement
+USEME
+  print "$usage\n";
+  exit;
+}
+
+sub say_version {
+  print "Running $prog version: $VERSION\n";
+  exit 1;
+}
+
+# Read in config file "~/.relate" *or* create it if it doesn't exist
+# (Allows easy editing of default settings later).
+sub get_config_from_dot_file {
+  my $default_config = shift;
+
+  my $dot_file = "$HOME/.relate";
+  my $config = {};
+  if ( -f $dot_file ) {
+    undef $/;
+    open my $fh_in, '<', $dot_file or die "$!";
+    my $dot_code = <$fh_in>;
+    eval "$dot_code";
+    if ( $@ ) {
+      croak "Problem with eval of $dot_file...:$@";
+    }
+  } else {
+    open my $fh_out, '>', $dot_file or die "$!";
+    $config = $default_config;
+    print {$fh_out} Data::Dumper->Dump( [ $config ], [ qw(config) ] );
+  }
+  return $config;
+}
+
+
+__END__
+
+
+=head1 DESCRIPTION
+
+The mnemonic is that B<relate> makes the file system a little
+more relational and a little less hierarchical (but L<relate isn't really>).
+
+Instead of typing this:
+
+  locate this | egrep "with_this" | egrep "and_this" | egrep -v "but_not_this"
+
+You can just type:
+
+  relate this with_this and_this -but_not_this
+
+So essentially this script is the equivalent of
+
+  locate primary_term | egrep term2 | egrep term3 [....| termN]
+
+Though it also has a few other features, B<relate>:
+
+  o  screens out "uninteresting" files by default (emacs backups, CVS/RCS files)
+  o  has options to restrict reports to files, directories or symlinks.
+
+An important performance hint: you can speed up relate
+tremendously by using a relatively unique first term.  For
+example, if you're on a unix box, you don't want to start
+with something like "home" or "lib" which is going to match
+a huge number of files in the locate database. You'll find
+that "relate gdk lib" is faster than "relate lib gdk".
+
+The first term should be a simple string (unless you've used the
+"-r" option), but all the following terms are perl regexps.
+If you do use the "-r" option, than the first term is a POSIX
+regexp (it has no effect on the following terms).
+
+(This inelegant state of affairs is the result of working as a
+wrapper around the locate command; the first term is fed to it
+directly, then the output is filtered using perl pattern
+matches.)
+
+=head2 reverse match
+
+A leading minus can be used to indicate a reverse match
+(just as with many web search engines).  This is much like a
+"grep -v": it filters out lines that match it.
+This can't be used on the first term, only on the secondary ones.
+
+For example:
+
+   relate my_site index -htm$
+
+will screen out files ending in "htm" (but not "html").
+
+=head2 standard filter
+
+This script has the extremely useful feature of automatically
+omitting uninteresting files, but it's guaranteed that you'll
+be confused by this some day, so don't say I didn't warn you.
+
+Remember that there's a "-a" option (also called "--all")
+which overrides the default filter and returns all matches.
+
+As of this writing, by default files are ignored that match
+these patterns:
+
+      '~$'       # emacs backups
+      '/\#'      # emacs autosaves
+      ',v$'      # cvs/rcs repository files
+      '/CVS$'
+      '/CVS/'
+      '/RCS$'
+      '\.elc$'   # compiled elisp
+
+The default filter can be changed by editing the ~/.relate file.
+(This is created the first time you run B<relate>.  It is perl code
+generated by Data::Dumper, which is evaled when you run relate
+(so be careful with the permissions on this file).
+
+=head2 directory or file types
+
+The -f (--files) and -d (--dirs) options can restrict the reported
+results to just plain files, or to just directoires, respectively.
+
+There is also a -l (--links) option, that will restrict the listing
+to just symlinks.
+
+It's expected that you will use these type restrictions one-at-a-time.
+At present, when multiple ones are used, one will always win-out.
+This behavior may change in the future.
+
+=head2 dwim upcarets
+
+The use of a leading "^" achor in a pattern is allowed, but it is
+silently transformed into a boundary match: "\b".  Otherwise "^"
+wouldn't be very useful (consider that with full paths *all*
+listings match "^/").  An embedded or trailing "^" is left alone.
+Ditto for a "^" in front of a slash: if you ask for '^/usr/lib',
+maybe that's really what you want.
+
+This feature does not (at present) work well with a minus for
+negation.
+
+=head2 relate isn't really
+
+I like this slogan as a mnemonic: "relate makes the file
+system a little more relational", though really this is an
+abuse of the term "relational".
+
+The point though, is that using "relate" is something like
+doing a database query where you specify certain constraints in
+any order and get all records that match them. But if you can't
+relate, that's okay.
+
+(Just be glad I don't think of it as "feeling your way
+around".)
+
+=head2 database option
+
+There's a special B<--database> option that allows you to use
+a non-standard locate database (e.g. for testing purposes).
+See L<locate>.
+
+
+=head1 NOTES
+
+=head2 backwards incompatibility
+
+This version of relate (and App::Relate) are somewhat
+incompatible with the earlier releases which were based on
+List::Filter.
+
+The casual user may not notice any difference (outside of the
+speed improvement).  The primary difference is in the change
+of the name and format of the configuration file:
+it is now "~/.relate" in Data::Dumper format (i.e. perl code).
+Formerly it was "~/.list-filter/filters.yaml" using Yaml.
+
+The goal of these changes was to reduce non-core dependencies
+(for the downtrodden masses without CPAN.pm/CPANPLUS.pm/cpanminus),
+and to improve speed.
+
+The older versions are still available on CPAN, though they've
+been re-named L<App::Relate::Complex> and L<relate_complex>.
+
+=head3 speed
+
+Some simple benchmarking shows that this script is about twice as
+fast as the old List::Filter based version of relate (running on
+my AMD64 linux box).
+
+=head1 TROUBLESHOOTING
+
+=head2 Problem with eval of .relate
+
+If you see an error message something like B<Problem with eval of .relate>,
+it could be you happen to have a "~/.relate" file that wasn't generated
+by Data::Dumper (or you might've introduced a syntax error by manual editing).
+
+If all else fails consider just deleting it (or moving it out of the way).
+The B<relate> will create a new one you can start over with (though any
+user customizations will have been lost).
+
+=head2 Can't exec "locate"
+
+The error message B<Can't exec "locate"> makes it sound like you don't
+have a "locate" program installed on your system, but it could be it's
+just not located in your PATH, or it may even be named differently.  You
+can experiment with different names and/or explicit paths using the
+"--locate" option.
+
+=head2 Can't locate object method "new"
+
+An error message like this:
+
+  Can't locate object method "new" via package "App::Relate" at /usr/bin/relate line 83.
+
+May very well mean that you've managed to run the old version of the "relate"
+script (from a pre-0.04 cpan package) with the new version of App::Relate
+(from version 0.04 or later).  Try to clean-up any old versions, and re-install
+the App::Relate package.
+
+=head1 SEE ALSO
+
+L<App::Relate>
+L<locate>
+
+Information on perl regexps:
+L<perlre>
+
+L<App::Relate>
+
+=head1 AUTHOR
+
+Joseph Brenner, E<lt>doom@kzsu.stanford.eduE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Joseph Brenner
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=head1 BUGS
+
+  o  The "dwim upcarets" feature (the ^ => \b regexp variation)
+     doesn't work well with leading minus (negation).
+
+=cut

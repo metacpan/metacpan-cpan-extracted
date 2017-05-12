@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+MikMod.pm
+MikMod.xs
+README
+test.pl
+typemap
+demo/2ND_PM.S3M
+demo/Pixmaps.pm
+demo/fx1.wav
+demo/mikmod.xpm
+demo/player
+demo/player-gtk-fork
+demo/player-gtk-ipc
+demo/player-gtk-thread

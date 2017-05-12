@@ -1,0 +1,26 @@
+---
+abstract: 'Basic functions to compare and filter arrays '
+author:
+  - 'H. Klausing <h.klausing (AT) gmx.de>'
+build_requires:
+  Devel::Cover: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Array-CompareAndFilter
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.010'
+version: v1.100

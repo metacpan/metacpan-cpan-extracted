@@ -1,0 +1,45 @@
+Audio-Opusfile version 0.005001
+===============================
+
+Opus is a totally open, royalty-free, highly versatile audio codec.
+Opus is unmatched for interactive speech and music transmission over
+the Internet, but is also intended for storage and streaming
+applications. It is standardized by the Internet Engineering Task
+Force (IETF) as RFC 6716 which incorporated technology from Skype's
+SILK codec and Xiph.Org's CELT codec.
+
+libopusfile is a library for decoding and basic manipulation of Ogg
+Opus files.
+
+Audio::Opusfile is an interface to libopusfile. It exports nearly all
+of the functions for obtaining metadata of an Opus file or buffer in
+that library. Future versions will additionally provide functions for
+decoding Opus data into PCM.
+
+The API might change in future versions.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* Devel::CheckLib
+* libopusfile
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016-2017 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

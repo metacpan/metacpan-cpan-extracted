@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Algorithm/DistanceMatrix.pm
+t/00-compile.t
+t/distancematrix.t

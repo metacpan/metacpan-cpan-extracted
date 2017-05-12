@@ -1,0 +1,145 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: command line file finding utility that understands TPath
+
+# PODNAME: tfind
+
+
+use v5.10;
+use strict;
+use warnings;
+use Getopt::Long::Descriptive;
+use Pod::Usage;
+use Cwd;
+use App::tfind;
+
+my ( $opt, $usage ) = describe_options(
+    '%c %o <path> [<dir>+]',
+    [ 'case-insensitive|i' => 'match case insensitively' ],
+    [ 'one-based|o'        => 'use one-based (xml-style) index predicates' ],
+    [ 'all|a'              => 'include hidden files and directories' ],
+    [ 'perl|p'             => 'include all the @INC directories' ],
+    [],
+    [ 'help|h|?'  => 'print usage information' ],
+    [ 'version|v' => 'print program version' ]
+);
+pod2usage(
+    -message  => $usage->text,
+    -verbose  => 99,
+    -sections => 'SYNOPSIS|DESCRIPTION|SEE ALSO'
+  ),
+  exit
+  if $opt->help;
+say("tpath version $App::tfind::VERSION"), exit if $opt->version;
+
+my ( $path, @directories ) = @ARGV;
+error('no path expression provided') unless $path;
+
+require TPath::Forester::File;
+
+my %args =
+  ( case_insensitive => $opt->case_insensitive, one_based => $opt->one_based );
+my $arborist = TPath::Forester::File->new(%args);
+$arborist->add_test( sub { $_[1]->name !~ /^\./ } ) unless $opt->all;
+eval { $path = $arborist->path($path) };
+error($@) if $@;
+
+push @directories, getcwd unless @directories;
+push @directories, @INC if $opt->perl;
+my %files;
+for my $d (@directories) {
+    my @files = $path->select($d);
+    for my $f (@files) {
+        print $f, "\n" unless $files{$f};
+        $files{$f} = 1;
+    }
+}
+
+sub error {
+    my $msg  = shift;
+    my $body = $usage->text;
+    print(<<END), exit;
+$msg
+
+$body
+END
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+tfind - command line file finding utility that understands TPath
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+  > tfind //@f[@uid = @me]       # all the current user's files in the current directory
+  /home/fred/this.txt
+  /home/fred/that.php
+  /home/fred/the/other/file.c
+  ...
+  > tfind //~\.txt$~             # all files with the .txt extension
+  /home/fred/this.txt
+  /home/fred/yon/glorious/file.txt
+  ...
+  > tfind //@bin                 # all binary files
+  /home/fred/java.class
+  /home/fred/c.o
+  /home/fred/and/another/c.o
+  ...
+  > tfind //@bin foo bar baz     # all binary files in the foo, bar, and baz directories
+  /home/fred/foo/java.class
+  /home/fred/bar/c.o
+  /home/fred/baz/parrot.pbc
+  ...
+  > tfind //Some/Perl/Module.pm         # Some::Perl::Module
+  /home/fred/perl5/lib/Some/Perl/Module.pm
+  > tfind --perl //Some/Perl/Module.pm  # Some::Perl::Module in ~ or @INC
+  /usr/lib/perl5/Some/Perl/Module.pm
+  /home/fred/perl5/lib/Some/Perl/Module.pm
+  > tfind --help                 # usage info
+  ...
+
+=head1 DESCRIPTION
+
+The C<tfind> utility applies TPath expressions to directory hierarchies to find files. It
+expects a TPath expression and zero or more directories (or files). If no directory is
+supplied, it uses the current directory. It's options are minimal. For option details, type
+
+  tfind --help
+
+Most information will be supplied via the expression, not options.
+
+Unless the C<--all> flag is specified, files and directories whose name begins
+with a dot will be ignored.
+
+=head1 SEE ALSO
+
+L<TPath>, L<TPath::Attributes::Standard>, L<TPath::Forester::File::Attributes>.
+You should be able to obtain this information using either C<perldoc> or C<man>:
+
+  man TPath
+  perldoc TPath::Attributes::Standard
+
+The first of these, L<TPath>, will describe the syntax of tpath expressions. The
+second two will list the attributes available for expressions understood by
+C<tfind>.
+
+=head1 AUTHOR
+
+David F. Houghton <dfhoughton@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by David F. Houghton.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

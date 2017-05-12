@@ -1,0 +1,12 @@
+#! /bin/bash
+for i in $@; do
+wn $i  -hypon -hypen -synsv -synsn -hypen -synsv -synsn -synsa -grepn -grepa -grepv -synsa -perta -deria -famla -grepv -derin -famln |
+ sed 's/[[:space:]]*=> / /' | sed 's/HAS INSTANCE//g' | egrep -v "(Synonyms|Hypernyms|Grep|The |*.[ ]of[ ].*|Overview|Hyponyms|noun|[1-9]|^(\W+))" |
+sed '/^$/d' | sed 's/ /_/g'| sed 's/,_/\n/g' | sort -u | egrep "(^$i|[_]$i)";
+done;
+
+
+#
+#echo -e "\n"$i,$xx;
+#
+#

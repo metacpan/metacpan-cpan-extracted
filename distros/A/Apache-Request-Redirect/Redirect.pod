@@ -1,0 +1,225 @@
+=head1 NAME
+
+Apache::Request::Redirect - An Apache mod_perl module to redirect url request
+
+=head1 SYNOPSIS
+
+  use Apache::Request::Redirect;
+
+  No synopsis till now
+
+=head1 DESCRIPTION
+
+The purpose of this module is to give a tool to route local request to other web sites.
+
+This module handles locale HTTP requests and it transfer them, pratically unchanged, 
+to other destination.
+
+One of the use of this module is to permit to incapsulate, inside your own web site
+structure , of external web application.
+
+It's possible to use this module to route local request to other web site recovering
+from this the relating html working out and incapsulating inside a different 
+graphical structure permitting insteed the navigation of the remote web site 
+as it was local.
+
+To do this, every required url from client could be changed and remapping to a 
+different one to which it will be give pratically the same HTTP request originally 
+send from browser. Remote HTTP response can be totally worked out and then send to
+browser in changed form.
+
+This module requires mod_perl and can be used like an Apache module, a standalone CGI or
+inside an embedded perl like HTML::Mason.
+
+=head2 ORIGIN OF THIS MODULE
+
+This module has been developed for using inside some web sites wrote in HTML::Mason where
+there was necessity to incapsulate all web pages inside an homogeneous graphical structure.
+
+To do this had been created a framework that catchs the request page and incalpsulates it
+inside a shared template that holds a lateral navigational menu and an header with a logo
+factory to simulate frames in a single html page (pseudo-frame).
+
+All is right untill pages run under Mason that is until pages are html or Mason scrips. 
+But we would to use some applications already present in the opensource world to 
+implement things like forums and webmail. The programs that satisfy us were 
+unfortunately wrote in lite PERL or PHP.
+
+Solutions to show this external programs inside our Mason template was to redirect 
+request to this scripts to another virtual local site.
+
+In the main site PERL CGIs and PHP scripts are handled to Mason. In Mason "autohandler"
+file request to PHP and PERL scripts are routed, changed the host of the original url, to
+two other virtual web site that point to the same filesystem structure of the main web site
+(same DocumentRoot Apache directive). 
+
+On this virtual website PERL and PHP scripts run respectivly under mod_perl and PHP engine and
+so the response to local request is the right page. Response to browser was built using the
+received HTTP stream from virtual sites merging HTTP headers and incapsulate HTTP content 
+in the pseudoframe structure.
+
+=head1 CLASS INTERFACE
+
+=head2 CONSTRUCTORS
+
+The C<new> constructor return an istance of C<Apache::Request::Redirect> object. It has three
+optional parameters which you can set here or directly using relative methods before 
+calling L<"item_redirect"|redirect> method.
+
+  $redirect = new Apache::Request::Redirect(
+                                             [args      => $args]
+                                             [host      => $host],
+                                             [url       => $url],
+                                           );
+
+=over 4 
+
+=item B<PARAMETERS>
+
+
+=item args
+
+It's an hash ref to all form args that have been passed to routed request (see also the
+L<"item_args"|args> method
+
+=item host
+
+It's the uri host part of the site where original request will be routed (see also the
+L<"item_host"|host> method
+
+=item url
+
+It's the uri path part of the site where original request will be routed (see also the
+L<"item_url"|url> method.
+
+=item B<EXAMPLE>
+
+  $redirect = new Apache::Request::Redirect(
+                                             args      => {$r->args},
+                                             host      => "php_engine.yourdomain.com,
+                                             url       => $r->uri->path
+                                           );
+
+This example redirect client request from
+
+  http://www.yourdomain.com/your_path/your_file.htm 
+
+to
+
+  http://php_engine.yourdomain.com/your_path/your_file.htm.
+
+=back
+
+
+
+=head2 PUBLIC METHODS
+
+=over 4
+
+=item apachereq
+
+This module runs under mod_perl. This method set/get a reference to Apache object.
+It's not required to set a reference to Apache object because module automatically
+detect it.
+
+=item args
+
+This is a reference to an hash of form params that have been passed to the real site
+
+=item host
+
+This method set/get the host part of the uri used to route the browser request. This
+value is also the rempote address used to open the HTTP socket.
+
+=item redirect
+
+This method send the browser request to
+
+  http://$self->host/$self->url
+
+getting the response and return it as a HTTP::Response object.
+
+=item url
+
+This is the path part of the uri used to route the browser request.
+
+=back
+
+=head2 PUBLIC VARIABLES
+
+=over 4
+
+=item C<$Apache::Request::Redirect::LOG>
+
+If set to a value different from 0 it enables request/response logs to 
+C</tmp/Apache_Request_Redirect.log> file.
+
+If set to -1 enabled all logs.
+
+If set to C<$LOG_REQUEST> logs only request informations.
+
+If set to C<$LOG_RESPONSE> logs only response informations.
+
+See also L<LOG::SimpleFile>.
+
+=back
+
+=head1 SUPPORTED PROTOCOLS
+
+I've tested this module with this protocols:
+
+=over 4
+
+=over 4
+
+=item * 
+
+HTTP GET with or without query string
+
+=item * 
+
+HTTP POST in application/x-www-form-urlencoded
+
+=item * 
+
+HTTP POST in multipart/form-data with files upload
+
+=back
+
+=back
+
+=head1 DIAGNOSTICS
+
+No diagnostics error returned.
+
+=head1 EXPORT
+
+=over 4
+
+=item C<$LOG_REQUEST>
+
+Used like a value for C<$Apache::Request::Redirect::LOG> enables request logging.
+
+=item C<$LOG_RESPONSE>
+
+Used like a value for C<$Apache::Request::Redirect::LOG> enables response logging.
+
+=back
+
+=head1 REQUIRES 
+
+HTTP::Response, HTTP::Request, HTTP::Headers, LWP::UserAgent, URI, Log::SimpleFile (opt.)
+
+=head1 AUTHOR
+
+Emiliano Bruni, E<lt>info/at/ebruni_dot_it<gt>
+
+=head1 SEE ALSO
+
+L<HTTP::Request> , L<HTTP::Response>, L<Apache::Request>, L<HTML::Template>, 
+L<HTML::Template::Extension::HEAD_BODY> 
+
+To see some web sites that use this package take a look to http://www.micso.fr 
+and http://www.micso.com
+
+=cut

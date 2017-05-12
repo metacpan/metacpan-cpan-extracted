@@ -1,0 +1,27 @@
+---
+abstract: 'Content-Type header informed by shared-mime-info'
+author:
+  - 'Dorian Taylor, C<< <dorian at cpan.org> >>, Dorian Taylor <dorian@cpan.org>'
+build_requires:
+  Apache::Test: '0'
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7, CPAN::Meta::Converter version 2.120921'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache2-MimeInfo
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::MimeInfo: '0'
+  IO::Scalar: '0'
+  mod_perl2: '0'
+  perl: '5.010'
+version: '0.06'

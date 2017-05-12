@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<content>
+<pkit_nav_title>Login</pkit_nav_title>
+<html_title>PageKit.org | Login</html_title>
+
+      <demo_desc>
+	<feature>Authentication</feature>
+
+	<description>This login form logs a user in.</description>
+
+      </demo_desc>
+
+    
+</content>

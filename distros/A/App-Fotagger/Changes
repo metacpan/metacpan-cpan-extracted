@@ -1,0 +1,8 @@
+Revision history for Perl extension App::Fotagger
+
+0.001.1	 2009-06-01 12:27:55
+    - removed double 'requires' directice in Build.PL
+
+
+0.001.0  2009-05-31 17:12:22
+    - first cpan release

@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use lib qw(./lib);
+
+use SVN::Analysis;
+
+my $analysis = SVN::Analysis->new();
+$analysis->init_from_xml_string(do { local $/; <STDIN> });
+
+print $analysis->as_xml_string();

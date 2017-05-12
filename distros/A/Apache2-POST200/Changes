@@ -1,0 +1,9 @@
+Revision history for Perl extension Apache2::POST200.
+
+0.01  Tue Dec  6 19:12:08 2005
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.8.0 -n Apache2::POST200 -XS
+
+0.04  Wed Jun  7 11:12:32 CEST 2006
+	- update to new interface of Crypt::CBC
+	- test suite is now compatible to Apache 2.0

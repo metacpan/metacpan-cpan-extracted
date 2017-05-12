@@ -1,0 +1,863 @@
+#!perl
+
+our $DATE = '2016-05-17'; # DATE
+our $VERSION = '0.09'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+use Log::Any::IfLOG qw($log);
+
+# early loading to avoid target module being loaded before the patch
+use Perinci::Access::Base::Patch::PeriAHS;
+
+use File::HomeDir;
+use File::Write::Rotate;
+use Module::List qw(list_modules);
+use Module::Load qw(load autoload);
+use Perinci::CmdLine::Any;
+use Perinci::Gen::ForModule qw(gen_meta_for_module);
+use Plack::Builder;
+use Plack::Runner;
+
+our %SPEC;
+
+$SPEC{serve} = {
+    v => 1.1,
+    summary => 'Serve Perl modules over HTTP(S) using Riap::HTTP protocol',
+    description => <<'_',
+
+This is a simple command-line front-end for making Perl modules accessible over
+HTTP(S), using the Riap::HTTP protocol. First the specified Perl modules will be
+loaded. Modules which do not contain Rinci metadata will be equipped with
+metadata using Perinci::Sub::Gen::ForModule. After that, a PSGI application will
+be run with the Gepok or Starman PSGI server. The PSGI application serves
+requests for function calls (or other kinds of Riap request) over HTTP. Perl
+modules not specified in the command-line arguments will not be accessible,
+since Perinci::Access::Schemeless is used with load=>0.
+
+Modules can be accessed using URL:
+
+ http://HOSTNAME:PORT/api/MODULE/SUBMOD/FUNCTION?ARG1=VAL1&...
+
+This program is mainly for testing, not recommended to be used in production,
+and there are not many configuration options provided. For production, it is
+recommended that you construct your own PSGI application and compose the
+Plack::Middleware::PeriAHS::* middlewares directly.
+
+_
+    args => {
+        module_or_package => {
+            schema => ['array*' => {
+                of => 'str*',
+                min_len => 1,
+            }],
+            req => 1,
+            pos => 0,
+            greedy => 1,
+            summary => 'List of modules to load (or package to allow and search)',
+            description => <<'_',
+
+Either specify exact module name like `Foo::Bar`, or a wildcard pattern of
+modules like `Foo::Bar::*` (in which `Module::List` will be used to load all
+modules under `Foo::Bar::`) or a package name using `+Foo::Bar` syntax. If you
+specify package name, module with the same name will not be loaded. Can be used
+to allow and search an already loaded package (e.g. through `-M` or through
+other modules).
+
+_
+            cmdline_on_getopt => sub {
+                my %args = @_;
+                my $val  = $args{value};
+                my $args = $args{args};
+
+                # put it here for function later
+                $args->{-modules}  //= [];
+                $args->{-packages} //= [];
+
+                if ($val =~ /(.+::)\*$/) {
+                    $log->debugf('Listing all modules in %s ...', $val);
+                    my $res = list_modules($1, {list_modules=>1});
+                    push @{ $args->{-modules}  }, sort keys %$res;
+                } elsif ($val =~ s/^\+//) {
+                    push @{ $args->{-packages} }, $val;
+                } else {
+                    push @{ $args->{-modules}  }, $val;
+                }
+            },
+        },
+        riap_access_log_path => {
+            schema => ['str' => {}],
+            summary => 'Path for Riap request access log file',
+            description => <<'_',
+
+Default is ~/peri-htserve-riap_access.log
+
+_
+        },
+        riap_access_log_size => {
+            schema => ['int' => {}],
+            summary => 'Maximum size for Riap request access log file',
+            description => <<'_',
+
+Default is to use File::Write::Rotate's default (10485760, a.k.a. 10MB).
+
+If size exceeds this, file will be rotated.
+
+_
+        },
+        riap_access_log_histories => {
+            schema => ['int' => {}],
+            summary => 'Number of old Riap request access log files to keep',
+            description => <<'_',
+
+Default is to use File::Write::Rotate's default (10).
+
+_
+        },
+        server => {
+            schema => ['str*' => {
+                in => [qw/Starman Gepok/],
+                default => 'Gepok',
+            }],
+            summary => 'Choose PSGI server',
+            description => <<'_',
+
+Currently only Starman or Gepok is supported. Default is Gepok.
+
+_
+        },
+        starman_host => {
+            schema => ['str' => {}],
+            summary => 'Will be passed to Starman',
+        },
+        starman_port => {
+            schema => ['int' => {}],
+            summary => 'Will be passed to Starman',
+        },
+        gepok_http_ports => {
+            schema => ['str' => {}],
+            summary => 'Will be passed to Gepok',
+        },
+        gepok_https_ports => {
+            schema => ['str' => {}],
+            summary => 'Will be passed to Gepok',
+        },
+        gepok_unix_sockets => {
+            schema => ['str' => {}],
+            summary => 'Will be passed to Gepok',
+        },
+        gepok_ssl_key_file => {
+            schema => ['str' => {}],
+            summary => 'Will be passed to Gepok',
+        },
+        gepok_ssl_cert_file => {
+            schema => ['str' => {}],
+            summary => 'Will be passed to Gepok',
+        },
+        gepok_start_servers => {
+            schema => ['int' => {}],
+            summary => 'Will be passed to Gepok',
+        },
+        daemonize => {
+            schema => ['bool' => {
+                default => 0,
+            }],
+            summary => 'If true, will daemonize into background',
+            cmdline_aliases => {D=>{}},
+        },
+        library => {
+            schema => ['array' => {
+                of => 'str*',
+            }],
+            summary => 'Add directory to library search path, a la Perl\'s -I',
+            description => <<'_',
+
+Note that some modules are already loaded before this option takes effect. To
+make sure some directories are processed, you can use `PERL5OPT` or explicitly
+use `perl` and use its `-I` option.
+
+_
+            cmdline_aliases => {I=>{}},
+            cmdline_on_getopt => sub {
+                my %args = @_;
+                require lib;
+                lib->import($args{value});
+            },
+        },
+        use => {
+            schema => ['array' => of => 'str*'],
+            summary => 'Use a Perl module, a la Perl\'s -M',
+            cmdline_aliases => {M=>{}},
+            cmdline_on_getopt => sub {
+                my %args = @_;
+                my $val = $args{value};
+                if (my ($mod, $imp) = $val =~ /(.+?)=(.+)/) {
+                    load $mod;
+                    $mod->import(split /,/, $imp);
+                } else {
+                    autoload $val;
+                }
+            },
+        },
+        require => {
+            schema => ['array' => of => 'str*'],
+            summary => 'Require a Perl module, a la Perl\'s -m',
+            cmdline_aliases => {m=>{}},
+            cmdline_on_getopt => sub {
+                my %args = @_;
+                load $args{val};
+            },
+        },
+
+        parse_form => {
+            schema => ['bool'],
+            summary => 'Passed to Plack::Middleware::PeriAHS::ParseRequest',
+        },
+        parse_reform => {
+            schema => ['bool'],
+            summary => 'Passed to Plack::Middleware::PeriAHS::ParseRequest',
+        },
+        parse_path_info => {
+            schema => ['bool'],
+            summary => 'Passed to Plack::Middleware::PeriAHS::ParseRequest',
+        },
+        user => {
+            schema => ['str*'],
+            summary => 'Protect with HTTP authentication, specify username',
+        },
+        password => {
+            schema => ['str*'],
+            summary => 'Protect with HTTP authentication, specify password',
+        },
+        enable_logging => {
+            schema  => ['bool', default=>1],
+            summary => 'Can be used to test server with no support for logging',
+        },
+
+        metadb => {
+            summary => 'Path to SQLite Rinci metadata database',
+            schema  => 'str*',
+            description => <<'_',
+
+This is an experimental option for testing serving metadata from database. If
+set, will use `Perinci::Access::Schemeless::DBI` (with option
+`fallback_on_completion`) instead of `Perinci::Access::Schemeless` for the Riap
+client.
+
+_
+        },
+    },
+    'x.perinci.sub.wrapper.disable_validate_args' => 1,
+};
+sub serve {
+    my %args = @_; # VXALIDATE_ARGS
+
+    my $server = $args{server} // 'Gepok';
+    #$log->tracef("TMP: modules/packages: %s", $args{module_or_package});
+    $log->infof("Starting server (using %s) ...", $server);
+
+    my $riap_access_log_path = $args{riap_access_log_path} //
+        File::HomeDir->my_home . "/peri-htserve-riap_access.log";
+
+    $log->debugf("Modules to load: %s", $args{-modules});
+    for my $m (@{$args{-modules}}) {
+        $log->infof("Loading module %s ...", $m);
+        eval { load $m };
+        return [500, "Failed to load module $m: $@"] if $@;
+        gen_meta_for_module(module=>$m, load=>0);
+    }
+
+    my $fwr;
+    {
+        my ($dir, $leaf) = $riap_access_log_path =~ m!(.+)/(.+)!;
+        if (!$dir) { $dir = "."; $leaf = $riap_access_log_path }
+        $fwr = File::Write::Rotate->new(
+            dir       => $dir,
+            prefix    => $leaf,
+            size      => $args{riap_access_log_size},
+            histories => $args{riap_access_log_histories},
+        );
+    }
+
+    my @pkgs = (@{ $args{-modules} // [] }, @{ $args{-packages} // [] });
+
+    # let's only allow access to perl modules (and not other schemes like http).
+    # let's not dynamically load modules except the ones explicitly specified
+    # and loaded above. let's only allow seeing the specified modules.
+    my $pa;
+    {
+        my $class;
+        my %extra_opts;
+        if ($args{metadb}) {
+            $class = "Perinci::Access::Schemeless::DBI";
+            $extra_opts{fallback_on_completion} = 1;
+
+            require DBI;
+            my $dbh = DBI->connect(
+                "dbi:SQLite:dbname=$args{metadb}", "", "", {RaiseError=>1});
+            $extra_opts{dbh} = $dbh;
+        } else {
+            $class = "Perinci::Access::Schemeless";
+        }
+        load $class;
+        $pa = $class->new(
+            load => 0,
+            allow_paths => [map {s!::!/!g; "/$_"} @pkgs],
+            %extra_opts,
+        );
+    }
+
+    my $app = builder {
+        enable(
+            "PeriAHS::LogAccess",
+            dest => $fwr,
+        );
+
+        #enable "PeriAHS::CheckAccess";
+
+        if (defined($args{user}) && defined($args{password})) {
+            enable(
+                "Auth::Basic",
+                authenticator => sub {
+                    my ($user, $pass, $env) = @_;
+
+                    if ($user eq $args{user} && $pass eq $args{password}) {
+                        #$env->{"REMOTE_USER"} = $user; # isn't this already done by webserver?
+                        return 1;
+                    }
+                    return 0;
+                }
+            );
+        }
+
+        enable(
+            "PeriAHS::ParseRequest",
+            parse_path_info => $args{parse_path_info},
+            parse_form      => $args{parse_form},
+            parse_reform    => $args{parse_reform},
+            riap_client     => $pa,
+        );
+
+        enable (
+            "PeriAHS::Respond",
+            enable_logging => $args{enable_logging},
+        );
+    };
+
+    my @argv;
+    push @argv, "-s", $server;
+    my @root_urls; # for hint
+    if ($server eq 'Starman') {
+        for (qw/host port/) {
+            push @argv, "--$_", $args{"starman_$_"} if $args{"starman_$_"};
+        }
+
+        my $host = $args{starman_host} // 'localhost';
+        my $port = $args{starman_port} // 8080;
+        push @root_urls, "http://$host:$port/";
+    } else {
+        if (!$args{gepok_http_ports} &&
+                !$args{gepok_https_ports} &&
+                    !$args{gepok_unix_sockets}) {
+            $args{gepok_http_ports} = "*:5000";
+        }
+        for (qw/http_port https_ports unix_sockets
+                ssl_key_file ssl_cert_file start_servers/) {
+            push @argv, "--$_", $args{"gepok_$_"} if defined $args{"gepok_$_"};
+        }
+
+        my ($host, $port) = @_;
+        if ($args{gepok_http_ports}) {
+            if ($args{gepok_http_ports} =~ /(.+?):(\d+)/) {
+                $host = $1; $host = 'localhost' if $host eq '*';
+                $port = $2;
+            } elsif ($args{gepok_http_ports} =~ /(\d+)/) {
+                $host = 'localhost';
+                $port = $1;
+            }
+            push @root_urls, "http://$host:$port/";
+        }
+        if ($args{gepok_https_ports}) {
+            if ($args{gepok_https_ports} =~ /(.+?):(\d+)/) {
+                $host = $1; $host = 'localhost' if $host eq '*';
+                $port = $2;
+            } elsif ($args{gepok_https_ports} =~ /(\d+)/) {
+                $host = 'localhost';
+                $port = $1;
+            }
+            push @root_urls, "https://$host:$port/";
+        }
+        if ($args{gepok_unix_sockets}) {
+            if ($args{gepok_unix_sockets} =~ /(.+?)(?:,|\z)/) {
+                push @root_urls, "http:$1//";
+            }
+        }
+    }
+
+    # display hint for user
+    if (@root_urls) {
+        my @ep_urls; # api endpoints
+        for my $root_url (@root_urls) {
+            for my $pkg (@pkgs) {
+                my $pkgp = $pkg; $pkgp =~ s!::!/!g;
+                push @ep_urls, $root_url . "api/$pkgp/";
+            }
+        }
+        say "Try accessing one of the following URLs with curl/riap/etc:";
+        print map { "- $_\n" } @ep_urls;
+        say "";
+    }
+
+    push @argv, "-D" if $args{daemonize};
+    my $runner = Plack::Runner->new;
+    $runner->parse_options(@argv);
+    $runner->run($app);
+
+    # never reached though
+    [200, "OK"];
+}
+
+Perinci::CmdLine::Any->new(url => '/main/serve')->run;
+
+# ABSTRACT: Serve Perl modules over HTTP(S) using Riap::HTTP protocol
+# PODNAME: peri-htserve
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+peri-htserve - Serve Perl modules over HTTP(S) using Riap::HTTP protocol
+
+=head1 VERSION
+
+This document describes version 0.09 of peri-htserve (from Perl distribution App-PerinciUtils), released on 2016-05-17.
+
+=head1 SYNOPSIS
+
+ # serve modules over HTTP, using default options (HTTP port 5000)
+ $ peri-htserve Foo::Bar Baz::*
+
+ # you can now do
+ $ curl 'http://localhost:5000/api/Baz/SubMod/func1?arg1=1&arg2=2'
+ [200,"OK",{"The":"result","...":"..."}]
+
+ # or use the Perl client
+ $ perl -MPerinci::Access -e'
+     my $pa = Perinci::Access->new;
+     my $res = $pa->request(call=>"http://localhost:5000/api/Foo/Bar/func2");'
+
+
+ ### some other peri-htserve options:
+
+ # change ports/etc (see http_ports, https_ports, and unix_sockets in Gepok doc)
+ $ peri-htserve --http-ports "localhost:5000,*:80" ...
+
+ # see all available options
+ $ peri-htserve --help
+
+=head1 DESCRIPTION
+
+For now, please see source code for more details (or --help).
+
+=head1 QUICK TIPS
+
+=head2 Complex argument
+
+In raw HTTP, you can send complex argument by encoding it in JSON, e.g.:
+
+ $ curl 'http://localhost:5000/api/Foo/Bar/func?array:j=[1,2,3]'
+
+Notice the ":j" suffix after parameter name.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--daemonize>, B<-D>
+
+If true, will daemonize into background.
+
+=item B<--disable-logging>
+
+=item B<--gepok-http-ports>=I<s>
+
+Will be passed to Gepok.
+
+=item B<--gepok-https-ports>=I<s>
+
+Will be passed to Gepok.
+
+=item B<--gepok-ssl-cert-file>=I<s>
+
+Will be passed to Gepok.
+
+=item B<--gepok-ssl-key-file>=I<s>
+
+Will be passed to Gepok.
+
+=item B<--gepok-start-servers>=I<i>
+
+Will be passed to Gepok.
+
+=item B<--gepok-unix-sockets>=I<s>
+
+Will be passed to Gepok.
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--library-json>=I<s>, B<-I>
+
+Add directory to library search path, a la Perl's -I (JSON-encoded).
+
+See C<--library>.
+
+=item B<--library>=I<s@>
+
+Add directory to library search path, a la Perl's -I.
+
+Note that some modules are already loaded before this option takes effect. To
+make sure some directories are processed, you can use `PERL5OPT` or explicitly
+use `perl` and use its `-I` option.
+
+
+Can be specified multiple times.
+
+=item B<--metadb>=I<s>
+
+Path to SQLite Rinci metadata database.
+
+This is an experimental option for testing serving metadata from database. If
+set, will use `Perinci::Access::Schemeless::DBI` (with option
+`fallback_on_completion`) instead of `Perinci::Access::Schemeless` for the Riap
+client.
+
+
+=item B<--module-or-package-json>=I<s>
+
+List of modules to load (or package to allow and search) (JSON-encoded).
+
+See C<--module-or-package>.
+
+=item B<--module-or-package>=I<s@>*
+
+List of modules to load (or package to allow and search).
+
+Either specify exact module name like `Foo::Bar`, or a wildcard pattern of
+modules like `Foo::Bar::*` (in which `Module::List` will be used to load all
+modules under `Foo::Bar::`) or a package name using `+Foo::Bar` syntax. If you
+specify package name, module with the same name will not be loaded. Can be used
+to allow and search an already loaded package (e.g. through `-M` or through
+other modules).
+
+
+Can be specified multiple times.
+
+=item B<--parse-form>
+
+Passed to Plack::Middleware::PeriAHS::ParseRequest.
+
+=item B<--parse-path-info>
+
+Passed to Plack::Middleware::PeriAHS::ParseRequest.
+
+=item B<--parse-reform>
+
+Passed to Plack::Middleware::PeriAHS::ParseRequest.
+
+=item B<--password>=I<s>
+
+Protect with HTTP authentication, specify password.
+
+=item B<--require-json>=I<s>, B<-m>
+
+Require a Perl module, a la Perl's -m (JSON-encoded).
+
+See C<--require>.
+
+=item B<--require>=I<s@>
+
+Require a Perl module, a la Perl's -m.
+
+Can be specified multiple times.
+
+=item B<--riap-access-log-histories>=I<i>
+
+Number of old Riap request access log files to keep.
+
+Default is to use File::Write::Rotate's default (10).
+
+
+=item B<--riap-access-log-path>=I<s>
+
+Path for Riap request access log file.
+
+Default is ~/peri-htserve-riap_access.log
+
+
+=item B<--riap-access-log-size>=I<i>
+
+Maximum size for Riap request access log file.
+
+Default is to use File::Write::Rotate's default (10485760, a.k.a. 10MB).
+
+If size exceeds this, file will be rotated.
+
+
+=item B<--server>=I<s>
+
+Choose PSGI server.
+
+Default value:
+
+ "Gepok"
+
+Valid values:
+
+ ["Starman","Gepok"]
+
+Currently only Starman or Gepok is supported. Default is Gepok.
+
+
+=item B<--starman-host>=I<s>
+
+Will be passed to Starman.
+
+=item B<--starman-port>=I<i>
+
+Will be passed to Starman.
+
+=item B<--use-json>=I<s>, B<-M>
+
+Use a Perl module, a la Perl's -M (JSON-encoded).
+
+See C<--use>.
+
+=item B<--use>=I<s@>
+
+Use a Perl module, a la Perl's -M.
+
+Can be specified multiple times.
+
+=item B<--user>=I<s>
+
+Protect with HTTP authentication, specify username.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C peri-htserve peri-htserve
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete peri-htserve 'p/*/`peri-htserve`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at ~/.config/peri-htserve.conf, ~/peri-htserve.conf or /etc/peri-htserve.conf (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> (filter by profile). Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=foo ...]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ daemonize (see --daemonize)
+ enable_logging (see --disable-logging)
+ format (see --format)
+ gepok_http_ports (see --gepok-http-ports)
+ gepok_https_ports (see --gepok-https-ports)
+ gepok_ssl_cert_file (see --gepok-ssl-cert-file)
+ gepok_ssl_key_file (see --gepok-ssl-key-file)
+ gepok_start_servers (see --gepok-start-servers)
+ gepok_unix_sockets (see --gepok-unix-sockets)
+ library (see --library)
+ metadb (see --metadb)
+ module_or_package (see --module-or-package)
+ naked_res (see --naked-res)
+ parse_form (see --parse-form)
+ parse_path_info (see --parse-path-info)
+ parse_reform (see --parse-reform)
+ password (see --password)
+ require (see --require)
+ riap_access_log_histories (see --riap-access-log-histories)
+ riap_access_log_path (see --riap-access-log-path)
+ riap_access_log_size (see --riap-access-log-size)
+ server (see --server)
+ starman_host (see --starman-host)
+ starman_port (see --starman-port)
+ use (see --use)
+ user (see --user)
+
+=head1 ENVIRONMENT
+
+=head2 PERI_HTSERVE_OPT => str
+
+Specify additional command-line options
+
+=head1 FILES
+
+~/.config/peri-htserve.conf
+
+~/peri-htserve.conf
+
+/etc/peri-htserve.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-PerinciUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-PerinciUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PerinciUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Riap::HTTP>
+
+L<Perinci::Access>, L<Perinci::Access::HTTP::Client>
+
+PSGI servers used: L<Gepok>, L<Starman>
+
+L<Plack::Runner>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

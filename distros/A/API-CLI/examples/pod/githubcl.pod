@@ -1,0 +1,2918 @@
+=head1 NAME
+
+githubcl - GitHub
+
+=head1 ABSTRACT
+
+
+
+=head1 DESCRIPTION
+
+
+
+=head2 GLOBAL OPTIONS
+
+    --data-file     File with data for POST/PUT/PATCH/DELETE requests
+    --debug -d      debug (flag)                                     
+    --verbose -v    verbose (flag)                                   
+    --help -h       Show command help (flag)                         
+
+
+=head2 SUBCOMMANDS
+
+=head3  DELETE
+
+    githubcl  DELETE <subcommands>
+
+DELETE call
+
+
+=head3 DELETE /gists/:id
+
+    githubcl DELETE /gists/:id <id>
+
+Delete a gist.
+
+Parameters:
+
+    id  *  Id of gist.
+
+=head3 DELETE /gists/:id/comments/:commentId
+
+    githubcl DELETE /gists/:id/comments/:commentId <id> <commentId>
+
+Delete a comment.
+
+Parameters:
+
+    id         *  Id of gist.   
+    commentId  *  Id of comment.
+
+=head3 DELETE /gists/:id/star
+
+    githubcl DELETE /gists/:id/star <id>
+
+Unstar a gist.
+
+Parameters:
+
+    id  *  Id of gist.
+
+=head3 DELETE /notifications/threads/:id/subscription
+
+    githubcl DELETE /notifications/threads/:id/subscription <id>
+
+Delete a Thread Subscription.
+
+Parameters:
+
+    id  *  Id of thread.
+
+=head3 DELETE /orgs/:org/members/:username
+
+    githubcl DELETE /orgs/:org/members/:username <org> <username>
+
+Remove a member.
+
+Parameters:
+
+    org       *  Name of organisation.
+    username  *  Name of the user.    
+
+=head3 DELETE /orgs/:org/public_members/:username
+
+    githubcl DELETE /orgs/:org/public_members/:username <org> <username>
+
+Conceal a user's membership.
+
+Parameters:
+
+    org       *  Name of organisation.
+    username  *  Name of the user.    
+
+=head3 DELETE /repos/:owner/:repo
+
+    githubcl DELETE /repos/:owner/:repo <owner> <repo>
+
+Delete a Repository.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 DELETE /repos/:owner/:repo/collaborators/:user
+
+    githubcl DELETE /repos/:owner/:repo/collaborators/:user <owner> <repo> <user>
+
+Remove collaborator.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    user   *  Login of the user.       
+
+=head3 DELETE /repos/:owner/:repo/comments/:commentId
+
+    githubcl DELETE /repos/:owner/:repo/comments/:commentId <owner> <repo> <commentId>
+
+Delete a commit comment
+
+Parameters:
+
+    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  Id of comment.           
+
+=head3 DELETE /repos/:owner/:repo/contents/:path
+
+    githubcl DELETE /repos/:owner/:repo/contents/:path <owner> <repo> <path>
+
+Delete a file.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    path   *                           
+
+=head3 DELETE /repos/:owner/:repo/downloads/:downloadId
+
+    githubcl DELETE /repos/:owner/:repo/downloads/:downloadId <owner> <repo> <downloadId>
+
+Deprecated. Delete a download.
+
+Parameters:
+
+    owner       *  Name of repository owner.
+    repo        *  Name of repository.      
+    downloadId  *  Id of download.          
+
+=head3 DELETE /repos/:owner/:repo/git/refs/:ref
+
+    githubcl DELETE /repos/:owner/:repo/git/refs/:ref <owner> <repo> <ref>
+
+Delete a Reference
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    ref    *                           
+
+=head3 DELETE /repos/:owner/:repo/hooks/:hookId
+
+    githubcl DELETE /repos/:owner/:repo/hooks/:hookId <owner> <repo> <hookId>
+
+Delete a hook.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    hookId  *  Id of hook.              
+
+=head3 DELETE /repos/:owner/:repo/issues/:number/labels
+
+    githubcl DELETE /repos/:owner/:repo/issues/:number/labels <owner> <repo> <number>
+
+Remove all labels from an issue....
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         
+
+=head3 DELETE /repos/:owner/:repo/issues/:number/labels/:name
+
+    githubcl DELETE /repos/:owner/:repo/issues/:number/labels/:name <owner> <repo> <number> <name>
+
+Remove a label from an issue.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         
+    name    *  Name of the label.       
+
+=head3 DELETE /repos/:owner/:repo/issues/comments/:commentId
+
+    githubcl DELETE /repos/:owner/:repo/issues/comments/:commentId <owner> <repo> <commentId>
+
+Delete a comment.
+
+Parameters:
+
+    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  ID of comment.           
+
+=head3 DELETE /repos/:owner/:repo/keys/:keyId
+
+    githubcl DELETE /repos/:owner/:repo/keys/:keyId <owner> <repo> <keyId>
+
+Delete a key.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    keyId  *  Id of key.               
+
+=head3 DELETE /repos/:owner/:repo/labels/:name
+
+    githubcl DELETE /repos/:owner/:repo/labels/:name <owner> <repo> <name>
+
+Delete a label.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    name   *  Name of the label.       
+
+=head3 DELETE /repos/:owner/:repo/milestones/:number
+
+    githubcl DELETE /repos/:owner/:repo/milestones/:number <owner> <repo> <number>
+
+Delete a milestone.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of milestone.     
+
+=head3 DELETE /repos/:owner/:repo/pulls/comments/:commentId
+
+    githubcl DELETE /repos/:owner/:repo/pulls/comments/:commentId <owner> <repo> <commentId>
+
+Delete a comment.
+
+Parameters:
+
+    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  Id of comment.           
+
+=head3 DELETE /repos/:owner/:repo/releases/:id
+
+    githubcl DELETE /repos/:owner/:repo/releases/:id <owner> <repo> <id>
+
+Users with push access to the repository can delet...
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    id     *                           
+
+=head3 DELETE /repos/:owner/:repo/releases/assets/:id
+
+    githubcl DELETE /repos/:owner/:repo/releases/assets/:id <owner> <repo> <id>
+
+Delete a release asset
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    id     *                           
+
+=head3 DELETE /repos/:owner/:repo/subscription
+
+    githubcl DELETE /repos/:owner/:repo/subscription <owner> <repo>
+
+Delete a Repository Subscription....
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 DELETE /teams/:teamId
+
+    githubcl DELETE /teams/:teamId <teamId>
+
+Delete team.
+
+Parameters:
+
+    teamId  *  Id of team.
+
+=head3 DELETE /teams/:teamId/members/:username
+
+    githubcl DELETE /teams/:teamId/members/:username <teamId> <username>
+
+The "Remove team member" API is deprecated and is ...
+
+Parameters:
+
+    teamId    *  Id of team.      
+    username  *  Name of a member.
+
+=head3 DELETE /teams/:teamId/memberships/:username
+
+    githubcl DELETE /teams/:teamId/memberships/:username <teamId> <username>
+
+Remove team membership.
+
+Parameters:
+
+    teamId    *  Id of team.      
+    username  *  Name of a member.
+
+=head3 DELETE /teams/:teamId/repos/:owner/:repo
+
+    githubcl DELETE /teams/:teamId/repos/:owner/:repo <teamId> <owner> <repo>
+
+In order to remove a repository from a team, the a...
+
+Parameters:
+
+    teamId  *  Id of team.                
+    owner   *  Name of a repository owner.
+    repo    *  Name of a repository.      
+
+=head3 DELETE /user/emails
+
+    githubcl DELETE /user/emails
+
+Delete email address(es).
+
+
+=head3 DELETE /user/following/:username
+
+    githubcl DELETE /user/following/:username <username>
+
+Unfollow a user.
+
+Parameters:
+
+    username  *  Name of user.
+
+=head3 DELETE /user/keys/:keyId
+
+    githubcl DELETE /user/keys/:keyId <keyId>
+
+Delete a public key. Removes a public key. Require...
+
+Parameters:
+
+    keyId  *  ID of key.
+
+=head3 DELETE /user/starred/:owner/:repo
+
+    githubcl DELETE /user/starred/:owner/:repo <owner> <repo>
+
+Unstar a repository
+
+Parameters:
+
+    owner  *  Name of a repository owner.
+    repo   *  Name of a repository.      
+
+=head3 DELETE /user/subscriptions/:owner/:repo
+
+    githubcl DELETE /user/subscriptions/:owner/:repo <owner> <repo>
+
+Stop watching a repository
+
+Parameters:
+
+    owner  *  Name of the owner. 
+    repo   *  Name of repository.
+
+=head3  GET
+
+    githubcl  GET <subcommands>
+
+GET call
+
+
+=head3 GET /emojis
+
+    githubcl GET /emojis
+
+Lists all the emojis available to use on GitHub....
+
+
+=head3 GET /events
+
+    githubcl GET /events
+
+List public events.
+
+
+=head3 GET /feeds
+
+    githubcl GET /feeds
+
+List Feeds.
+
+
+=head3 GET /gists
+
+    githubcl GET /gists [options]
+
+List the authenticated user's gists or if called a...
+
+Options:
+
+    --q-since    Timestamp in ISO 8601 format YYYY-MM-DDTHH:MM:SSZ.    
+                 Only gists updated at or after this time are returned.
+
+
+=head3 GET /gists/:id
+
+    githubcl GET /gists/:id <id>
+
+Get a single gist.
+
+Parameters:
+
+    id  *  Id of gist.
+
+=head3 GET /gists/:id/comments
+
+    githubcl GET /gists/:id/comments <id>
+
+List comments on a gist.
+
+Parameters:
+
+    id  *  Id of gist.
+
+=head3 GET /gists/:id/comments/:commentId
+
+    githubcl GET /gists/:id/comments/:commentId <id> <commentId>
+
+Get a single comment.
+
+Parameters:
+
+    id         *  Id of gist.   
+    commentId  *  Id of comment.
+
+=head3 GET /gists/:id/star
+
+    githubcl GET /gists/:id/star <id>
+
+Check if a gist is starred.
+
+Parameters:
+
+    id  *  Id of gist.
+
+=head3 GET /gists/public
+
+    githubcl GET /gists/public [options]
+
+List all public gists.
+
+Options:
+
+    --q-since    Timestamp in ISO 8601 format YYYY-MM-DDTHH:MM:SSZ.    
+                 Only gists updated at or after this time are returned.
+
+
+=head3 GET /gists/starred
+
+    githubcl GET /gists/starred [options]
+
+List the authenticated user's starred gists....
+
+Options:
+
+    --q-since    Timestamp in ISO 8601 format YYYY-MM-DDTHH:MM:SSZ.    
+                 Only gists updated at or after this time are returned.
+
+
+=head3 GET /gitignore/templates
+
+    githubcl GET /gitignore/templates
+
+Listing available templates.
+
+
+=head3 GET /gitignore/templates/:language
+
+    githubcl GET /gitignore/templates/:language <language>
+
+Get a single template.
+
+Parameters:
+
+    language  *  
+
+=head3 GET /issues
+
+    githubcl GET /issues [options]
+
+List issues.
+
+Options:
+
+    --q-filter     *  Issues assigned to you / created by you / mentioning you / you're       
+                      subscribed to updates for / All issues the authenticated user can see   
+    --q-state      *                                                                          
+    --q-labels     *  String list of comma separated Label names. Example - bug,ui,@high.     
+    --q-sort       *                                                                          
+    --q-direction  *                                                                          
+    --q-since         Optional string of a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                      Only issues updated at or after this time are returned.                 
+
+
+=head3 GET /legacy/issues/search/:owner/:repository/:state/:keyword
+
+    githubcl GET /legacy/issues/search/:owner/:repository/:state/:keyword <keyword> <state> <owner> <repository>
+
+Find issues by state and keyword....
+
+Parameters:
+
+    keyword     *  The search term.                                                          
+    state       *  Indicates the state of the issues to return. Can be either open or closed.
+    owner       *                                                                            
+    repository  *                                                                            
+
+=head3 GET /legacy/repos/search/:keyword
+
+    githubcl GET /legacy/repos/search/:keyword [options] <keyword>
+
+Find repositories by keyword. Note, this legacy me...
+
+Options:
+
+    --q-order         The sort field. if sort param is provided. Can be either asc or desc.                      
+    --q-language      Filter results by language                                                                 
+    --q-start_page    The page number to fetch                                                                   
+    --q-sort          The sort field. One of stars, forks, or updated. Default: results are sorted by best match.
+
+Parameters:
+
+    keyword  *  The search term
+
+=head3 GET /legacy/user/email/:email
+
+    githubcl GET /legacy/user/email/:email <email>
+
+This API call is added for compatibility reasons o...
+
+Parameters:
+
+    email  *  The email address
+
+=head3 GET /legacy/user/search/:keyword
+
+    githubcl GET /legacy/user/search/:keyword [options] <keyword>
+
+Find users by keyword.
+
+Options:
+
+    --q-order         The sort field. if sort param is provided. Can be either asc or desc.                      
+    --q-start_page    The page number to fetch                                                                   
+    --q-sort          The sort field. One of stars, forks, or updated. Default: results are sorted by best match.
+
+Parameters:
+
+    keyword  *  The search term
+
+=head3 GET /meta
+
+    githubcl GET /meta
+
+This gives some information about GitHub.com, the ...
+
+
+=head3 GET /networks/:owner/:repo/events
+
+    githubcl GET /networks/:owner/:repo/events <owner> <repo>
+
+List public events for a network of repositories....
+
+Parameters:
+
+    owner  *  Name of the owner. 
+    repo   *  Name of repository.
+
+=head3 GET /notifications
+
+    githubcl GET /notifications [options]
+
+List your notifications.
+
+Options:
+
+    --q-all              True to show notifications marked as read.                                       
+    --q-participating    True to show only notifications in which the user is directly participating      
+                         or mentioned.                                                                    
+    --q-since            The time should be passed in as UTC in the ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                         Example: "2012-10-09T23:39:01Z".                                                 
+
+
+=head3 GET /notifications/threads/:id
+
+    githubcl GET /notifications/threads/:id <id>
+
+View a single thread.
+
+Parameters:
+
+    id  *  Id of thread.
+
+=head3 GET /notifications/threads/:id/subscription
+
+    githubcl GET /notifications/threads/:id/subscription <id>
+
+Get a Thread Subscription.
+
+Parameters:
+
+    id  *  Id of thread.
+
+=head3 GET /orgs/:org
+
+    githubcl GET /orgs/:org <org>
+
+Get an Organization.
+
+Parameters:
+
+    org  *  Name of organisation.
+
+=head3 GET /orgs/:org/events
+
+    githubcl GET /orgs/:org/events <org>
+
+List public events for an organization....
+
+Parameters:
+
+    org  *  Name of organisation.
+
+=head3 GET /orgs/:org/issues
+
+    githubcl GET /orgs/:org/issues [options] <org>
+
+List issues.
+
+Options:
+
+    --q-filter     *  Issues assigned to you / created by you / mentioning you / you're       
+                      subscribed to updates for / All issues the authenticated user can see   
+    --q-state      *                                                                          
+    --q-labels     *  String list of comma separated Label names. Example - bug,ui,@high.     
+    --q-sort       *                                                                          
+    --q-direction  *                                                                          
+    --q-since         Optional string of a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                      Only issues updated at or after this time are returned.                 
+
+Parameters:
+
+    org  *  Name of organisation.
+
+=head3 GET /orgs/:org/members
+
+    githubcl GET /orgs/:org/members <org>
+
+Members list.
+
+Parameters:
+
+    org  *  Name of organisation.
+
+=head3 GET /orgs/:org/members/:username
+
+    githubcl GET /orgs/:org/members/:username <org> <username>
+
+Check if a user is, publicly or privately, a membe...
+
+Parameters:
+
+    org       *  Name of organisation.
+    username  *  Name of the user.    
+
+=head3 GET /orgs/:org/public_members
+
+    githubcl GET /orgs/:org/public_members <org>
+
+Public members list.
+
+Parameters:
+
+    org  *  Name of organisation.
+
+=head3 GET /orgs/:org/public_members/:username
+
+    githubcl GET /orgs/:org/public_members/:username <org> <username>
+
+Check public membership.
+
+Parameters:
+
+    org       *  Name of organisation.
+    username  *  Name of the user.    
+
+=head3 GET /orgs/:org/repos
+
+    githubcl GET /orgs/:org/repos [options] <org>
+
+List repositories for the specified org....
+
+Options:
+
+    --q-type    
+
+Parameters:
+
+    org  *  Name of organisation.
+
+=head3 GET /orgs/:org/teams
+
+    githubcl GET /orgs/:org/teams <org>
+
+List teams.
+
+Parameters:
+
+    org  *  Name of organisation.
+
+=head3 GET /rate_limit
+
+    githubcl GET /rate_limit
+
+Get your current rate limit status...
+
+
+=head3 GET /repos/:owner/:repo
+
+    githubcl GET /repos/:owner/:repo <owner> <repo>
+
+Get repository.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/:archive_format/:path
+
+    githubcl GET /repos/:owner/:repo/:archive_format/:path <owner> <repo> <archive_format> <path>
+
+Get archive link.
+
+Parameters:
+
+    owner           *  Name of repository owner.                 
+    repo            *  Name of repository.                       
+    archive_format  *                                            
+    path            *  Valid Git reference, defaults to 'master'.
+
+=head3 GET /repos/:owner/:repo/assignees
+
+    githubcl GET /repos/:owner/:repo/assignees <owner> <repo>
+
+List assignees.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/assignees/:assignee
+
+    githubcl GET /repos/:owner/:repo/assignees/:assignee <owner> <repo> <assignee>
+
+Check assignee.
+
+Parameters:
+
+    owner     *  Name of repository owner.
+    repo      *  Name of repository.      
+    assignee  *  Login of the assignee.   
+
+=head3 GET /repos/:owner/:repo/branches
+
+    githubcl GET /repos/:owner/:repo/branches <owner> <repo>
+
+Get list of branches
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/branches/:branch
+
+    githubcl GET /repos/:owner/:repo/branches/:branch <owner> <repo> <branch>
+
+Get Branch
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    branch  *  Name of the branch.      
+
+=head3 GET /repos/:owner/:repo/collaborators
+
+    githubcl GET /repos/:owner/:repo/collaborators <owner> <repo>
+
+List.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/collaborators/:user
+
+    githubcl GET /repos/:owner/:repo/collaborators/:user <owner> <repo> <user>
+
+Check if user is a collaborator...
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    user   *  Login of the user.       
+
+=head3 GET /repos/:owner/:repo/comments
+
+    githubcl GET /repos/:owner/:repo/comments <owner> <repo>
+
+List commit comments for a repository....
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/comments/:commentId
+
+    githubcl GET /repos/:owner/:repo/comments/:commentId <owner> <repo> <commentId>
+
+Get a single commit comment.
+
+Parameters:
+
+    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  Id of comment.           
+
+=head3 GET /repos/:owner/:repo/commits
+
+    githubcl GET /repos/:owner/:repo/commits [options] <owner> <repo>
+
+List commits on a repository.
+
+Options:
+
+    --q-since     The time should be passed in as UTC in the ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                  Example: "2012-10-09T23:39:01Z".                                                 
+    --q-sha       Sha or branch to start listing commits from.                                     
+    --q-path      Only commits containing this file path will be returned.                         
+    --q-author    GitHub login, name, or email by which to filter by commit author.                
+    --q-until     ISO 8601 Date - Only commits before this date will be returned.                  
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/commits/:ref/status
+
+    githubcl GET /repos/:owner/:repo/commits/:ref/status <owner> <repo> <ref>
+
+Get the combined Status for a specific Ref...
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    ref    *                           
+
+=head3 GET /repos/:owner/:repo/commits/:shaCode
+
+    githubcl GET /repos/:owner/:repo/commits/:shaCode <owner> <repo> <shaCode>
+
+Get a single commit.
+
+Parameters:
+
+    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    shaCode  *  SHA-1 code of the commit.
+
+=head3 GET /repos/:owner/:repo/commits/:shaCode/comments
+
+    githubcl GET /repos/:owner/:repo/commits/:shaCode/comments <owner> <repo> <shaCode>
+
+List comments for a single commitList comments for...
+
+Parameters:
+
+    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    shaCode  *  SHA-1 code of the commit.
+
+=head3 GET /repos/:owner/:repo/compare/:baseId...:headId
+
+    githubcl GET /repos/:owner/:repo/compare/:baseId...:headId <owner> <repo> <baseId> <headId>
+
+Compare two commits
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    baseId  *                           
+    headId  *                           
+
+=head3 GET /repos/:owner/:repo/contents/:path
+
+    githubcl GET /repos/:owner/:repo/contents/:path [options] <owner> <repo> <path>
+
+Get contents.
+
+Options:
+
+    --q-path    The content path.                                              
+    --q-ref     The String name of the Commit/Branch/Tag. Defaults to 'master'.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    path   *                           
+
+=head3 GET /repos/:owner/:repo/contributors
+
+    githubcl GET /repos/:owner/:repo/contributors [options] <owner> <repo>
+
+Get list of contributors.
+
+Options:
+
+    --q-anon  *  Set to 1 or true to include anonymous contributors in results.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/deployments
+
+    githubcl GET /repos/:owner/:repo/deployments <owner> <repo>
+
+Users with pull access can view deployments for a ...
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/deployments/:id/statuses
+
+    githubcl GET /repos/:owner/:repo/deployments/:id/statuses <owner> <repo> <id>
+
+Users with pull access can view deployment statuse...
+
+Parameters:
+
+    owner  *  Name of repository owner.                   
+    repo   *  Name of repository.                         
+    id     *  The Deployment ID to list the statuses from.
+
+=head3 GET /repos/:owner/:repo/downloads
+
+    githubcl GET /repos/:owner/:repo/downloads <owner> <repo>
+
+Deprecated. List downloads for a repository....
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/downloads/:downloadId
+
+    githubcl GET /repos/:owner/:repo/downloads/:downloadId <owner> <repo> <downloadId>
+
+Deprecated. Get a single download....
+
+Parameters:
+
+    owner       *  Name of repository owner.
+    repo        *  Name of repository.      
+    downloadId  *  Id of download.          
+
+=head3 GET /repos/:owner/:repo/events
+
+    githubcl GET /repos/:owner/:repo/events <owner> <repo>
+
+Get list of repository events.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/forks
+
+    githubcl GET /repos/:owner/:repo/forks [options] <owner> <repo>
+
+List forks.
+
+Options:
+
+    --q-sort    
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/git/blobs/:shaCode
+
+    githubcl GET /repos/:owner/:repo/git/blobs/:shaCode <owner> <repo> <shaCode>
+
+Get a Blob.
+
+Parameters:
+
+    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    shaCode  *  SHA-1 code.              
+
+=head3 GET /repos/:owner/:repo/git/commits/:shaCode
+
+    githubcl GET /repos/:owner/:repo/git/commits/:shaCode <owner> <repo> <shaCode>
+
+Get a Commit.
+
+Parameters:
+
+    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    shaCode  *  SHA-1 code.              
+
+=head3 GET /repos/:owner/:repo/git/refs
+
+    githubcl GET /repos/:owner/:repo/git/refs <owner> <repo>
+
+Get all References
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/git/refs/:ref
+
+    githubcl GET /repos/:owner/:repo/git/refs/:ref <owner> <repo> <ref>
+
+Get a Reference
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    ref    *                           
+
+=head3 GET /repos/:owner/:repo/git/tags/:shaCode
+
+    githubcl GET /repos/:owner/:repo/git/tags/:shaCode <owner> <repo> <shaCode>
+
+Get a Tag.
+
+Parameters:
+
+    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    shaCode  *                           
+
+=head3 GET /repos/:owner/:repo/git/trees/:shaCode
+
+    githubcl GET /repos/:owner/:repo/git/trees/:shaCode [options] <owner> <repo> <shaCode>
+
+Get a Tree.
+
+Options:
+
+    --q-recursive    Get a Tree Recursively. (0 or 1)
+
+Parameters:
+
+    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    shaCode  *  Tree SHA.                
+
+=head3 GET /repos/:owner/:repo/hooks
+
+    githubcl GET /repos/:owner/:repo/hooks <owner> <repo>
+
+Get list of hooks.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/hooks/:hookId
+
+    githubcl GET /repos/:owner/:repo/hooks/:hookId <owner> <repo> <hookId>
+
+Get single hook.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    hookId  *  Id of hook.              
+
+=head3 GET /repos/:owner/:repo/issues
+
+    githubcl GET /repos/:owner/:repo/issues [options] <owner> <repo>
+
+List issues for a repository.
+
+Options:
+
+    --q-filter     *  Issues assigned to you / created by you / mentioning you / you're       
+                      subscribed to updates for / All issues the authenticated user can see   
+    --q-state      *                                                                          
+    --q-labels     *  String list of comma separated Label names. Example - bug,ui,@high.     
+    --q-sort       *                                                                          
+    --q-direction  *                                                                          
+    --q-since         Optional string of a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                      Only issues updated at or after this time are returned.                 
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/issues/:number
+
+    githubcl GET /repos/:owner/:repo/issues/:number <owner> <repo> <number>
+
+Get a single issue
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         
+
+=head3 GET /repos/:owner/:repo/issues/:number/comments
+
+    githubcl GET /repos/:owner/:repo/issues/:number/comments <owner> <repo> <number>
+
+List comments on an issue.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         
+
+=head3 GET /repos/:owner/:repo/issues/:number/events
+
+    githubcl GET /repos/:owner/:repo/issues/:number/events <owner> <repo> <number>
+
+List events for an issue.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         
+
+=head3 GET /repos/:owner/:repo/issues/:number/labels
+
+    githubcl GET /repos/:owner/:repo/issues/:number/labels <owner> <repo> <number>
+
+List labels on an issue.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         
+
+=head3 GET /repos/:owner/:repo/issues/comments
+
+    githubcl GET /repos/:owner/:repo/issues/comments [options] <owner> <repo>
+
+List comments in a repository.
+
+Options:
+
+    --q-direction    Ignored without 'sort' parameter.                                                
+    --q-sort                                                                                          
+    --q-since        The time should be passed in as UTC in the ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                     Example: "2012-10-09T23:39:01Z".                                                 
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/issues/comments/:commentId
+
+    githubcl GET /repos/:owner/:repo/issues/comments/:commentId <owner> <repo> <commentId>
+
+Get a single comment.
+
+Parameters:
+
+    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  ID of comment.           
+
+=head3 GET /repos/:owner/:repo/issues/events
+
+    githubcl GET /repos/:owner/:repo/issues/events <owner> <repo>
+
+List issue events for a repository....
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/issues/events/:eventId
+
+    githubcl GET /repos/:owner/:repo/issues/events/:eventId <owner> <repo> <eventId>
+
+Get a single event.
+
+Parameters:
+
+    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    eventId  *  Id of the event.         
+
+=head3 GET /repos/:owner/:repo/keys
+
+    githubcl GET /repos/:owner/:repo/keys <owner> <repo>
+
+Get list of keys.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/keys/:keyId
+
+    githubcl GET /repos/:owner/:repo/keys/:keyId <owner> <repo> <keyId>
+
+Get a key
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    keyId  *  Id of key.               
+
+=head3 GET /repos/:owner/:repo/labels
+
+    githubcl GET /repos/:owner/:repo/labels <owner> <repo>
+
+List all labels for this repository....
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/labels/:name
+
+    githubcl GET /repos/:owner/:repo/labels/:name <owner> <repo> <name>
+
+Get a single label.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    name   *  Name of the label.       
+
+=head3 GET /repos/:owner/:repo/languages
+
+    githubcl GET /repos/:owner/:repo/languages <owner> <repo>
+
+List languages.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/milestones
+
+    githubcl GET /repos/:owner/:repo/milestones [options] <owner> <repo>
+
+List milestones for a repository....
+
+Options:
+
+    --q-state        String to filter by state.       
+    --q-direction    Ignored without 'sort' parameter.
+    --q-sort                                          
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/milestones/:number
+
+    githubcl GET /repos/:owner/:repo/milestones/:number <owner> <repo> <number>
+
+Get a single milestone.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of milestone.     
+
+=head3 GET /repos/:owner/:repo/milestones/:number/labels
+
+    githubcl GET /repos/:owner/:repo/milestones/:number/labels <owner> <repo> <number>
+
+Get labels for every issue in a milestone....
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of milestone.     
+
+=head3 GET /repos/:owner/:repo/notifications
+
+    githubcl GET /repos/:owner/:repo/notifications [options] <owner> <repo>
+
+List your notifications in a repository...
+
+Options:
+
+    --q-all              True to show notifications marked as read.                                       
+    --q-participating    True to show only notifications in which the user is directly participating      
+                         or mentioned.                                                                    
+    --q-since            The time should be passed in as UTC in the ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                         Example: "2012-10-09T23:39:01Z".                                                 
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/pulls
+
+    githubcl GET /repos/:owner/:repo/pulls [options] <owner> <repo>
+
+List pull requests.
+
+Options:
+
+    --q-state    String to filter by state.                                                 
+    --q-head     Filter pulls by head user and branch name in the format of 'user:ref-name'.
+                 Example: github:new-script-format.                                         
+    --q-base     Filter pulls by base branch name. Example - gh-pages.                      
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/pulls/:number
+
+    githubcl GET /repos/:owner/:repo/pulls/:number <owner> <repo> <number>
+
+Get a single pull request.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              
+
+=head3 GET /repos/:owner/:repo/pulls/:number/comments
+
+    githubcl GET /repos/:owner/:repo/pulls/:number/comments <owner> <repo> <number>
+
+List comments on a pull request....
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              
+
+=head3 GET /repos/:owner/:repo/pulls/:number/commits
+
+    githubcl GET /repos/:owner/:repo/pulls/:number/commits <owner> <repo> <number>
+
+List commits on a pull request....
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              
+
+=head3 GET /repos/:owner/:repo/pulls/:number/files
+
+    githubcl GET /repos/:owner/:repo/pulls/:number/files <owner> <repo> <number>
+
+List pull requests files.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              
+
+=head3 GET /repos/:owner/:repo/pulls/:number/merge
+
+    githubcl GET /repos/:owner/:repo/pulls/:number/merge <owner> <repo> <number>
+
+Get if a pull request has been merged....
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              
+
+=head3 GET /repos/:owner/:repo/pulls/comments
+
+    githubcl GET /repos/:owner/:repo/pulls/comments [options] <owner> <repo>
+
+List comments in a repository.
+
+Options:
+
+    --q-direction    Ignored without 'sort' parameter.                                                
+    --q-sort                                                                                          
+    --q-since        The time should be passed in as UTC in the ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                     Example: "2012-10-09T23:39:01Z".                                                 
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/pulls/comments/:commentId
+
+    githubcl GET /repos/:owner/:repo/pulls/comments/:commentId <owner> <repo> <commentId>
+
+Get a single comment.
+
+Parameters:
+
+    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  Id of comment.           
+
+=head3 GET /repos/:owner/:repo/readme
+
+    githubcl GET /repos/:owner/:repo/readme [options] <owner> <repo>
+
+Get the README.
+
+Options:
+
+    --q-ref    The String name of the Commit/Branch/Tag. Defaults to master.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/releases
+
+    githubcl GET /repos/:owner/:repo/releases <owner> <repo>
+
+Users with push access to the repository will rece...
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/releases/:id
+
+    githubcl GET /repos/:owner/:repo/releases/:id <owner> <repo> <id>
+
+Get a single release
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    id     *                           
+
+=head3 GET /repos/:owner/:repo/releases/:id/assets
+
+    githubcl GET /repos/:owner/:repo/releases/:id/assets <owner> <repo> <id>
+
+List assets for a release
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    id     *                           
+
+=head3 GET /repos/:owner/:repo/releases/assets/:id
+
+    githubcl GET /repos/:owner/:repo/releases/assets/:id <owner> <repo> <id>
+
+Get a single release asset
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    id     *                           
+
+=head3 GET /repos/:owner/:repo/stargazers
+
+    githubcl GET /repos/:owner/:repo/stargazers <owner> <repo>
+
+List Stargazers.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/stats/code_frequency
+
+    githubcl GET /repos/:owner/:repo/stats/code_frequency <owner> <repo>
+
+Get the number of additions and deletions per week...
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/stats/commit_activity
+
+    githubcl GET /repos/:owner/:repo/stats/commit_activity <owner> <repo>
+
+Get the last year of commit activity data....
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/stats/contributors
+
+    githubcl GET /repos/:owner/:repo/stats/contributors <owner> <repo>
+
+Get contributors list with additions, deletions, a...
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/stats/participation
+
+    githubcl GET /repos/:owner/:repo/stats/participation <owner> <repo>
+
+Get the weekly commit count for the repo owner and...
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/stats/punch_card
+
+    githubcl GET /repos/:owner/:repo/stats/punch_card <owner> <repo>
+
+Get the number of commits per hour in each day....
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/statuses/:ref
+
+    githubcl GET /repos/:owner/:repo/statuses/:ref <owner> <repo> <ref>
+
+List Statuses for a specific Ref....
+
+Parameters:
+
+    owner  *  Name of repository owner.                                                    
+    repo   *  Name of repository.                                                          
+    ref    *  Ref to list the statuses from. It can be a SHA, a branch name, or a tag name.
+
+=head3 GET /repos/:owner/:repo/subscribers
+
+    githubcl GET /repos/:owner/:repo/subscribers <owner> <repo>
+
+List watchers.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/subscription
+
+    githubcl GET /repos/:owner/:repo/subscription <owner> <repo>
+
+Get a Repository Subscription.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/tags
+
+    githubcl GET /repos/:owner/:repo/tags <owner> <repo>
+
+Get list of tags.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/teams
+
+    githubcl GET /repos/:owner/:repo/teams <owner> <repo>
+
+Get list of teams
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repos/:owner/:repo/watchers
+
+    githubcl GET /repos/:owner/:repo/watchers <owner> <repo>
+
+List Stargazers. New implementation....
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 GET /repositories
+
+    githubcl GET /repositories [options]
+
+List all public repositories.
+
+Options:
+
+    --q-since    The time should be passed in as UTC in the ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                 Example: "2012-10-09T23:39:01Z".                                                 
+
+
+=head3 GET /search/code
+
+    githubcl GET /search/code [options]
+
+Search code.
+
+Options:
+
+    --q-order     The sort field. if sort param is provided. Can be either asc or desc.      
+    --q-q      *  The search terms. This can be any combination of the supported code        
+                  search parameters:                                                         
+                  'Search In' Qualifies which fields are searched. With this qualifier       
+                  you can restrict the search to just the file contents, the file path,      
+                  or both.                                                                   
+                  'Languages' Searches code based on the language it's written in.           
+                  'Forks' Filters repositories based on the number of forks, and/or          
+                  whether code from forked repositories should be included in the results    
+                  at all.                                                                    
+                  'Size' Finds files that match a certain size (in bytes).                   
+                  'Path' Specifies the path that the resulting file must be at.              
+                  'Extension' Matches files with a certain extension.                        
+                  'Users' or 'Repositories' Limits searches to a specific user or repository.
+    --q-sort      Can only be 'indexed', which indicates how recently a file has been indexed
+                  by the GitHub search infrastructure. If not provided, results are sorted   
+                  by best match.                                                             
+
+
+=head3 GET /search/issues
+
+    githubcl GET /search/issues [options]
+
+Find issues by state and keyword. (This method ret...
+
+Options:
+
+    --q-order     The sort field. if sort param is provided. Can be either asc or desc.                           
+    --q-q      *  The q search term can also contain any combination of the supported issue search qualifiers:    
+    --q-sort      The sort field. Can be comments, created, or updated. Default: results are sorted by best match.
+
+
+=head3 GET /search/repositories
+
+    githubcl GET /search/repositories [options]
+
+Search repositories.
+
+Options:
+
+    --q-order     The sort field. if sort param is provided. Can be either asc or desc.       
+    --q-q      *  The search terms. This can be any combination of the supported repository   
+                  search parameters:                                                          
+                  'Search In' Qualifies which fields are searched. With this qualifier you    
+                  can restrict the search to just the repository name, description, readme,   
+                  or any combination of these.                                                
+                  'Size' Finds repositories that match a certain size (in kilobytes).         
+                  'Forks' Filters repositories based on the number of forks, and/or whether   
+                  forked repositories should be included in the results at all.               
+                  'Created' and 'Last Updated' Filters repositories based on times of         
+                  creation, or when they were last updated.                                   
+                  'Users or Repositories' Limits searches to a specific user or repository.   
+                  'Languages' Searches repositories based on the language they are written in.
+                  'Stars' Searches repositories based on the number of stars.                 
+    --q-sort      If not provided, results are sorted by best match.                          
+
+
+=head3 GET /search/users
+
+    githubcl GET /search/users [options]
+
+Search users.
+
+Options:
+
+    --q-order     The sort field. if sort param is provided. Can be either asc or desc.    
+    --q-q      *  The search terms. This can be any combination of the supported user      
+                  search parameters:                                                       
+                  'Search In' Qualifies which fields are searched. With this qualifier you 
+                  can restrict the search to just the username, public email, full name,   
+                  location, or any combination of these.                                   
+                  'Repository count' Filters users based on the number of repositories they
+                  have.                                                                    
+                  'Location' Filter users by the location indicated in their profile.      
+                  'Language' Search for users that have repositories that match a certain  
+                  language.                                                                
+                  'Created' Filter users based on when they joined.                        
+                  'Followers' Filter users based on the number of followers they have.     
+    --q-sort      If not provided, results are sorted by best match.                       
+
+
+=head3 GET /teams/:teamId
+
+    githubcl GET /teams/:teamId <teamId>
+
+Get team.
+
+Parameters:
+
+    teamId  *  Id of team.
+
+=head3 GET /teams/:teamId/members
+
+    githubcl GET /teams/:teamId/members <teamId>
+
+List team members.
+
+Parameters:
+
+    teamId  *  Id of team.
+
+=head3 GET /teams/:teamId/members/:username
+
+    githubcl GET /teams/:teamId/members/:username <teamId> <username>
+
+The "Get team member" API is deprecated and is sch...
+
+Parameters:
+
+    teamId    *  Id of team.      
+    username  *  Name of a member.
+
+=head3 GET /teams/:teamId/memberships/:username
+
+    githubcl GET /teams/:teamId/memberships/:username <teamId> <username>
+
+Get team membership.
+
+Parameters:
+
+    teamId    *  Id of team.      
+    username  *  Name of a member.
+
+=head3 GET /teams/:teamId/repos
+
+    githubcl GET /teams/:teamId/repos <teamId>
+
+List team repos
+
+Parameters:
+
+    teamId  *  Id of team.
+
+=head3 GET /teams/:teamId/repos/:owner/:repo
+
+    githubcl GET /teams/:teamId/repos/:owner/:repo <teamId> <owner> <repo>
+
+Check if a team manages a repository...
+
+Parameters:
+
+    teamId  *  Id of team.                
+    owner   *  Name of a repository owner.
+    repo    *  Name of a repository.      
+
+=head3 GET /user
+
+    githubcl GET /user
+
+Get the authenticated user.
+
+
+=head3 GET /user/emails
+
+    githubcl GET /user/emails
+
+List email addresses for a user....
+
+
+=head3 GET /user/followers
+
+    githubcl GET /user/followers
+
+List the authenticated user's followers...
+
+
+=head3 GET /user/following
+
+    githubcl GET /user/following
+
+List who the authenticated user is following....
+
+
+=head3 GET /user/following/:username
+
+    githubcl GET /user/following/:username <username>
+
+Check if you are following a user....
+
+Parameters:
+
+    username  *  Name of user.
+
+=head3 GET /user/issues
+
+    githubcl GET /user/issues [options]
+
+List issues.
+
+Options:
+
+    --q-filter     *  Issues assigned to you / created by you / mentioning you / you're       
+                      subscribed to updates for / All issues the authenticated user can see   
+    --q-state      *                                                                          
+    --q-labels     *  String list of comma separated Label names. Example - bug,ui,@high.     
+    --q-sort       *                                                                          
+    --q-direction  *                                                                          
+    --q-since         Optional string of a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                      Only issues updated at or after this time are returned.                 
+
+
+=head3 GET /user/keys
+
+    githubcl GET /user/keys
+
+List your public keys.
+
+
+=head3 GET /user/keys/:keyId
+
+    githubcl GET /user/keys/:keyId <keyId>
+
+Get a single public key.
+
+Parameters:
+
+    keyId  *  ID of key.
+
+=head3 GET /user/orgs
+
+    githubcl GET /user/orgs
+
+List public and private organizations for the auth...
+
+
+=head3 GET /user/repos
+
+    githubcl GET /user/repos [options]
+
+List repositories for the authenticated user. Note...
+
+Options:
+
+    --q-type    
+
+
+=head3 GET /user/starred
+
+    githubcl GET /user/starred [options]
+
+List repositories being starred by the authenticat...
+
+Options:
+
+    --q-direction    Ignored without 'sort' parameter.
+    --q-sort                                          
+
+
+=head3 GET /user/starred/:owner/:repo
+
+    githubcl GET /user/starred/:owner/:repo <owner> <repo>
+
+Check if you are starring a repository....
+
+Parameters:
+
+    owner  *  Name of a repository owner.
+    repo   *  Name of a repository.      
+
+=head3 GET /user/subscriptions
+
+    githubcl GET /user/subscriptions
+
+List repositories being watched by the authenticat...
+
+
+=head3 GET /user/subscriptions/:owner/:repo
+
+    githubcl GET /user/subscriptions/:owner/:repo <owner> <repo>
+
+Check if you are watching a repository....
+
+Parameters:
+
+    owner  *  Name of the owner. 
+    repo   *  Name of repository.
+
+=head3 GET /user/teams
+
+    githubcl GET /user/teams
+
+List all of the teams across all of the organizati...
+
+
+=head3 GET /users
+
+    githubcl GET /users [options]
+
+Get all users.
+
+Options:
+
+    --q-since    The integer ID of the last User that you've seen.
+
+
+=head3 GET /users/:username
+
+    githubcl GET /users/:username <username>
+
+Get a single user.
+
+Parameters:
+
+    username  *  Name of user.
+
+=head3 GET /users/:username/events
+
+    githubcl GET /users/:username/events <username>
+
+If you are authenticated as the given user, you wi...
+
+Parameters:
+
+    username  *  Name of user.
+
+=head3 GET /users/:username/events/orgs/:org
+
+    githubcl GET /users/:username/events/orgs/:org <username> <org>
+
+This is the user's organization dashboard. You mus...
+
+Parameters:
+
+    username  *  Name of user.
+    org       *               
+
+=head3 GET /users/:username/followers
+
+    githubcl GET /users/:username/followers <username>
+
+List a user's followers
+
+Parameters:
+
+    username  *  Name of user.
+
+=head3 GET /users/:username/following/:targetUser
+
+    githubcl GET /users/:username/following/:targetUser <username> <targetUser>
+
+Check if one user follows another....
+
+Parameters:
+
+    username    *  Name of user.
+    targetUser  *  Name of user.
+
+=head3 GET /users/:username/gists
+
+    githubcl GET /users/:username/gists [options] <username>
+
+List a users gists.
+
+Options:
+
+    --q-since    The time should be passed in as UTC in the ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                 Example: "2012-10-09T23:39:01Z".                                                 
+
+Parameters:
+
+    username  *  Name of user.
+
+=head3 GET /users/:username/keys
+
+    githubcl GET /users/:username/keys <username>
+
+List public keys for a user.
+
+Parameters:
+
+    username  *  Name of user.
+
+=head3 GET /users/:username/orgs
+
+    githubcl GET /users/:username/orgs <username>
+
+List all public organizations for a user....
+
+Parameters:
+
+    username  *  Name of user.
+
+=head3 GET /users/:username/received_events
+
+    githubcl GET /users/:username/received_events <username>
+
+These are events that you'll only see public event...
+
+Parameters:
+
+    username  *  Name of user.
+
+=head3 GET /users/:username/received_events/public
+
+    githubcl GET /users/:username/received_events/public <username>
+
+List public events that a user has received...
+
+Parameters:
+
+    username  *  Name of user.
+
+=head3 GET /users/:username/repos
+
+    githubcl GET /users/:username/repos [options] <username>
+
+List public repositories for the specified user....
+
+Options:
+
+    --q-type    
+
+Parameters:
+
+    username  *  Name of user.
+
+=head3 GET /users/:username/starred
+
+    githubcl GET /users/:username/starred <username>
+
+List repositories being starred by a user....
+
+Parameters:
+
+    username  *  Name of user.
+
+=head3 GET /users/:username/subscriptions
+
+    githubcl GET /users/:username/subscriptions <username>
+
+List repositories being watched by a user....
+
+Parameters:
+
+    username  *  Name of user.
+
+=head3  PATCH
+
+    githubcl  PATCH <subcommands>
+
+PATCH call
+
+
+=head3 PATCH /gists/:id
+
+    githubcl PATCH /gists/:id <id>
+
+Edit a gist.
+
+Parameters:
+
+    id  *  Id of gist.
+
+=head3 PATCH /gists/:id/comments/:commentId
+
+    githubcl PATCH /gists/:id/comments/:commentId <id> <commentId>
+
+Edit a comment.
+
+Parameters:
+
+    id         *  Id of gist.   
+    commentId  *  Id of comment.
+
+=head3 PATCH /notifications/threads/:id
+
+    githubcl PATCH /notifications/threads/:id <id>
+
+Mark a thread as read
+
+Parameters:
+
+    id  *  Id of thread.
+
+=head3 PATCH /orgs/:org
+
+    githubcl PATCH /orgs/:org <org>
+
+Edit an Organization.
+
+Parameters:
+
+    org  *  Name of organisation.
+
+=head3 PATCH /repos/:owner/:repo
+
+    githubcl PATCH /repos/:owner/:repo <owner> <repo>
+
+Edit repository.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 PATCH /repos/:owner/:repo/comments/:commentId
+
+    githubcl PATCH /repos/:owner/:repo/comments/:commentId <owner> <repo> <commentId>
+
+Update a commit comment.
+
+Parameters:
+
+    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  Id of comment.           
+
+=head3 PATCH /repos/:owner/:repo/git/refs/:ref
+
+    githubcl PATCH /repos/:owner/:repo/git/refs/:ref <owner> <repo> <ref>
+
+Update a Reference
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    ref    *                           
+
+=head3 PATCH /repos/:owner/:repo/hooks/:hookId
+
+    githubcl PATCH /repos/:owner/:repo/hooks/:hookId <owner> <repo> <hookId>
+
+Edit a hook.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    hookId  *  Id of hook.              
+
+=head3 PATCH /repos/:owner/:repo/issues/:number
+
+    githubcl PATCH /repos/:owner/:repo/issues/:number <owner> <repo> <number>
+
+Edit an issue.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         
+
+=head3 PATCH /repos/:owner/:repo/issues/comments/:commentId
+
+    githubcl PATCH /repos/:owner/:repo/issues/comments/:commentId <owner> <repo> <commentId>
+
+Edit a comment.
+
+Parameters:
+
+    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  ID of comment.           
+
+=head3 PATCH /repos/:owner/:repo/labels/:name
+
+    githubcl PATCH /repos/:owner/:repo/labels/:name <owner> <repo> <name>
+
+Update a label.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    name   *  Name of the label.       
+
+=head3 PATCH /repos/:owner/:repo/milestones/:number
+
+    githubcl PATCH /repos/:owner/:repo/milestones/:number <owner> <repo> <number>
+
+Update a milestone.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of milestone.     
+
+=head3 PATCH /repos/:owner/:repo/pulls/:number
+
+    githubcl PATCH /repos/:owner/:repo/pulls/:number <owner> <repo> <number>
+
+Update a pull request.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              
+
+=head3 PATCH /repos/:owner/:repo/pulls/comments/:commentId
+
+    githubcl PATCH /repos/:owner/:repo/pulls/comments/:commentId <owner> <repo> <commentId>
+
+Edit a comment.
+
+Parameters:
+
+    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  Id of comment.           
+
+=head3 PATCH /repos/:owner/:repo/releases/:id
+
+    githubcl PATCH /repos/:owner/:repo/releases/:id <owner> <repo> <id>
+
+Users with push access to the repository can edit ...
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    id     *                           
+
+=head3 PATCH /repos/:owner/:repo/releases/assets/:id
+
+    githubcl PATCH /repos/:owner/:repo/releases/assets/:id <owner> <repo> <id>
+
+Edit a release asset
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    id     *                           
+
+=head3 PATCH /teams/:teamId
+
+    githubcl PATCH /teams/:teamId <teamId>
+
+Edit team.
+
+Parameters:
+
+    teamId  *  Id of team.
+
+=head3 PATCH /user
+
+    githubcl PATCH /user
+
+Update the authenticated user.
+
+
+=head3  POST
+
+    githubcl  POST <subcommands>
+
+POST call
+
+
+=head3 POST /gists
+
+    githubcl POST /gists
+
+Create a gist.
+
+
+=head3 POST /gists/:id/comments
+
+    githubcl POST /gists/:id/comments <id>
+
+Create a commen
+
+Parameters:
+
+    id  *  Id of gist.
+
+=head3 POST /gists/:id/forks
+
+    githubcl POST /gists/:id/forks <id>
+
+Fork a gist.
+
+Parameters:
+
+    id  *  Id of gist.
+
+=head3 POST /markdown
+
+    githubcl POST /markdown
+
+Render an arbitrary Markdown document...
+
+
+=head3 POST /markdown/raw
+
+    githubcl POST /markdown/raw
+
+Render a Markdown document in raw mode...
+
+
+=head3 POST /orgs/:org/repos
+
+    githubcl POST /orgs/:org/repos <org>
+
+Create a new repository for the authenticated user...
+
+Parameters:
+
+    org  *  Name of organisation.
+
+=head3 POST /orgs/:org/teams
+
+    githubcl POST /orgs/:org/teams <org>
+
+Create team.
+
+Parameters:
+
+    org  *  Name of organisation.
+
+=head3 POST /repos/:owner/:repo/commits/:shaCode/comments
+
+    githubcl POST /repos/:owner/:repo/commits/:shaCode/comments <owner> <repo> <shaCode>
+
+Create a commit comment.
+
+Parameters:
+
+    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    shaCode  *  SHA-1 code of the commit.
+
+=head3 POST /repos/:owner/:repo/deployments
+
+    githubcl POST /repos/:owner/:repo/deployments <owner> <repo>
+
+Users with push access can create a deployment for...
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 POST /repos/:owner/:repo/deployments/:id/statuses
+
+    githubcl POST /repos/:owner/:repo/deployments/:id/statuses <owner> <repo> <id>
+
+Create a Deployment Status
+
+Parameters:
+
+    owner  *  Name of repository owner.                   
+    repo   *  Name of repository.                         
+    id     *  The Deployment ID to list the statuses from.
+
+=head3 POST /repos/:owner/:repo/forks
+
+    githubcl POST /repos/:owner/:repo/forks <owner> <repo>
+
+Create a fork.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 POST /repos/:owner/:repo/git/blobs
+
+    githubcl POST /repos/:owner/:repo/git/blobs <owner> <repo>
+
+Create a Blob.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 POST /repos/:owner/:repo/git/commits
+
+    githubcl POST /repos/:owner/:repo/git/commits <owner> <repo>
+
+Create a Commit.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 POST /repos/:owner/:repo/git/refs
+
+    githubcl POST /repos/:owner/:repo/git/refs <owner> <repo>
+
+Create a Reference
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 POST /repos/:owner/:repo/git/tags
+
+    githubcl POST /repos/:owner/:repo/git/tags <owner> <repo>
+
+Create a Tag Object.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 POST /repos/:owner/:repo/git/trees
+
+    githubcl POST /repos/:owner/:repo/git/trees <owner> <repo>
+
+Create a Tree.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 POST /repos/:owner/:repo/hooks
+
+    githubcl POST /repos/:owner/:repo/hooks <owner> <repo>
+
+Create a hook.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 POST /repos/:owner/:repo/hooks/:hookId/tests
+
+    githubcl POST /repos/:owner/:repo/hooks/:hookId/tests <owner> <repo> <hookId>
+
+Test a push hook.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    hookId  *  Id of hook.              
+
+=head3 POST /repos/:owner/:repo/issues
+
+    githubcl POST /repos/:owner/:repo/issues <owner> <repo>
+
+Create an issue.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 POST /repos/:owner/:repo/issues/:number/comments
+
+    githubcl POST /repos/:owner/:repo/issues/:number/comments <owner> <repo> <number>
+
+Create a comment.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         
+
+=head3 POST /repos/:owner/:repo/issues/:number/labels
+
+    githubcl POST /repos/:owner/:repo/issues/:number/labels <owner> <repo> <number>
+
+Add labels to an issue.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         
+
+=head3 POST /repos/:owner/:repo/keys
+
+    githubcl POST /repos/:owner/:repo/keys <owner> <repo>
+
+Create a key.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 POST /repos/:owner/:repo/labels
+
+    githubcl POST /repos/:owner/:repo/labels <owner> <repo>
+
+Create a label.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 POST /repos/:owner/:repo/merges
+
+    githubcl POST /repos/:owner/:repo/merges <owner> <repo>
+
+Perform a merge.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 POST /repos/:owner/:repo/milestones
+
+    githubcl POST /repos/:owner/:repo/milestones <owner> <repo>
+
+Create a milestone.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 POST /repos/:owner/:repo/pulls
+
+    githubcl POST /repos/:owner/:repo/pulls <owner> <repo>
+
+Create a pull request.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 POST /repos/:owner/:repo/pulls/:number/comments
+
+    githubcl POST /repos/:owner/:repo/pulls/:number/comments <owner> <repo> <number>
+
+Create a comment.
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              
+
+=head3 POST /repos/:owner/:repo/releases
+
+    githubcl POST /repos/:owner/:repo/releases <owner> <repo>
+
+Create a release
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 POST /repos/:owner/:repo/statuses/:ref
+
+    githubcl POST /repos/:owner/:repo/statuses/:ref <owner> <repo> <ref>
+
+Create a Status.
+
+Parameters:
+
+    owner  *  Name of repository owner.                                                    
+    repo   *  Name of repository.                                                          
+    ref    *  Ref to list the statuses from. It can be a SHA, a branch name, or a tag name.
+
+=head3 POST /user/emails
+
+    githubcl POST /user/emails
+
+Add email address(es).
+
+
+=head3 POST /user/keys
+
+    githubcl POST /user/keys
+
+Create a public key.
+
+
+=head3 POST /user/repos
+
+    githubcl POST /user/repos
+
+Create a new repository for the authenticated user...
+
+
+=head3  PUT
+
+    githubcl  PUT <subcommands>
+
+PUT call
+
+
+=head3 PUT /gists/:id/star
+
+    githubcl PUT /gists/:id/star <id>
+
+Star a gist.
+
+Parameters:
+
+    id  *  Id of gist.
+
+=head3 PUT /notifications
+
+    githubcl PUT /notifications
+
+Mark as read.
+
+
+=head3 PUT /notifications/threads/:id/subscription
+
+    githubcl PUT /notifications/threads/:id/subscription <id>
+
+Set a Thread Subscription.
+
+Parameters:
+
+    id  *  Id of thread.
+
+=head3 PUT /orgs/:org/public_members/:username
+
+    githubcl PUT /orgs/:org/public_members/:username <org> <username>
+
+Publicize a user's membership.
+
+Parameters:
+
+    org       *  Name of organisation.
+    username  *  Name of the user.    
+
+=head3 PUT /repos/:owner/:repo/collaborators/:user
+
+    githubcl PUT /repos/:owner/:repo/collaborators/:user <owner> <repo> <user>
+
+Add collaborator.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    user   *  Login of the user.       
+
+=head3 PUT /repos/:owner/:repo/contents/:path
+
+    githubcl PUT /repos/:owner/:repo/contents/:path <owner> <repo> <path>
+
+Create a file.
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    path   *                           
+
+=head3 PUT /repos/:owner/:repo/issues/:number/labels
+
+    githubcl PUT /repos/:owner/:repo/issues/:number/labels <owner> <repo> <number>
+
+Replace all labels for an issue....
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         
+
+=head3 PUT /repos/:owner/:repo/notifications
+
+    githubcl PUT /repos/:owner/:repo/notifications <owner> <repo>
+
+Mark notifications as read in a repository....
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 PUT /repos/:owner/:repo/pulls/:number/merge
+
+    githubcl PUT /repos/:owner/:repo/pulls/:number/merge <owner> <repo> <number>
+
+Merge a pull request (Merge Button's)...
+
+Parameters:
+
+    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              
+
+=head3 PUT /repos/:owner/:repo/subscription
+
+    githubcl PUT /repos/:owner/:repo/subscription <owner> <repo>
+
+Set a Repository Subscription
+
+Parameters:
+
+    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+
+=head3 PUT /teams/:teamId/members/:username
+
+    githubcl PUT /teams/:teamId/members/:username <teamId> <username>
+
+The API (described below) is deprecated and is sch...
+
+Parameters:
+
+    teamId    *  Id of team.      
+    username  *  Name of a member.
+
+=head3 PUT /teams/:teamId/memberships/:username
+
+    githubcl PUT /teams/:teamId/memberships/:username <teamId> <username>
+
+Add team membership.
+
+Parameters:
+
+    teamId    *  Id of team.      
+    username  *  Name of a member.
+
+=head3 PUT /teams/:teamId/repos/:org/:repo
+
+    githubcl PUT /teams/:teamId/repos/:org/:repo <teamId> <org> <repo>
+
+In order to add a repository to a team, the authen...
+
+Parameters:
+
+    teamId  *  Id of team.            
+    org     *  Name of a organization.
+    repo    *  Name of a repository.  
+
+=head3 PUT /user/following/:username
+
+    githubcl PUT /user/following/:username <username>
+
+Follow a user.
+
+Parameters:
+
+    username  *  Name of user.
+
+=head3 PUT /user/starred/:owner/:repo
+
+    githubcl PUT /user/starred/:owner/:repo <owner> <repo>
+
+Star a repository.
+
+Parameters:
+
+    owner  *  Name of a repository owner.
+    repo   *  Name of a repository.      
+
+=head3 PUT /user/subscriptions/:owner/:repo
+
+    githubcl PUT /user/subscriptions/:owner/:repo <owner> <repo>
+
+Watch a repository.
+
+Parameters:
+
+    owner  *  Name of the owner. 
+    repo   *  Name of repository.
+
+=head3  help
+
+    githubcl  help <subcommands> [options]
+
+Show command help
+
+Options:
+
+    --all     (flag)
+
+
+=head3  _meta
+
+    githubcl  _meta <subcommands>
+
+Information and utilities for this app
+
+
+=head3 _meta completion
+
+    githubcl _meta completion <subcommands>
+
+Shell completion functions
+
+
+=head3 _meta completion generate
+
+    githubcl _meta completion generate [options]
+
+Generate self completion
+
+Options:
+
+    --name    name of the program (optional, override name in spec)
+    --zsh     for zsh (flag)                                       
+    --bash    for bash (flag)                                      
+
+
+=head3 _meta pod
+
+    githubcl _meta pod <subcommands>
+
+Pod documentation
+
+
+=head3 _meta pod generate
+
+    githubcl _meta pod generate
+
+Generate self pod
+
+
+
+

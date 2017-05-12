@@ -1,0 +1,147 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use App::CopyrightImage;
+use Getopt::Long;
+
+my %opts;
+
+GetOptions(
+    "i|image=s" => \$opts{src},
+    "c|check"   => \$opts{check},
+    "n|name=s"  => \$opts{name},
+    "e|email=s" => \$opts{email},
+    "d|dst=s"   => \$opts{dst},
+    "r|remove"  => \$opts{remove},
+    "f|force"   => \$opts{force},
+);
+
+my %err = imgcopyright(%opts);
+
+for my $k (sort keys %err){
+    print "$k: $err{$k}\n";
+}
+1;
+__END__
+
+=head1 NAME
+
+imgcopyright - Easily add copyright information to your images
+
+=for html
+<a href="http://travis-ci.org/stevieb9/p5-app-copyrightimage"><img src="https://secure.travis-ci.org/stevieb9/p5-app-copyrightimage.png"/></a>
+<a href="https://ci.appveyor.com/project/stevieb9/p5-app-copyrightimage"><img src="https://ci.appveyor.com/api/projects/status/br01o72b3if3plsw/branch/master?svg=true"/></a>
+<a href='https://coveralls.io/github/stevieb9/p5-app-copyrightimage?branch=master'><img src='https://coveralls.io/repos/stevieb9/p5-app-copyrightimage/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
+
+=head1 SYNOPSYS
+
+Modified copy of images will be placed into a new C<ci> directory within the
+directory you specify. If no directory is specified, we'll create it in the
+current working directory. All new images will be prefixed with C<ci_>.
+
+    # set copyright
+
+    imgcopyright -i picture.jpg -n "Steve Bertrand" -e "steveb@cpan.org"
+
+    # all pics in a directory
+
+    imgcopyright -i /home/user/Pictures -n "Steve Bertrand"
+
+    # find images without copyright info
+
+    imgcopyright -i /home/user/Pictures -c
+
+    # specify an alternate output directory
+
+    imgcopyright -i /home/user/Pictures -n "steve" -d ~/mypics
+
+    # replace a previous copyright
+
+    imgcopyright -i picture.jpg -n "steve" -f
+
+=head1 DESCRIPTION
+
+This C<imgcopyright> application allows you to add copyright information to
+the EXIF data within image files. It also allows you to check images for
+missing copyright info and remove info.
+
+It works on individual files, as well as recurses (top-level only) of a
+supplied directory.
+
+It does NOT modify the original file (except for C<remove>). We create a 
+subdirectory named C<ci> in whatever path you specify (current working directory
+if a path is not sent in), and we then take a copy of each original file, modify
+it, prefix the filename with a C<ci_>, and place it into the new C<ci> 
+directory.
+
+=head1 ARGUMENTS
+
+=head2 -i, --image
+
+Mandatory in all cases.
+
+Name of a single image file, or a directory containing image files. In the case
+of a directory, we'll iterate over the top level, and work on all image files
+found.
+
+=head2 -n, --name
+
+Mandatory, unless using C<--check>.
+
+This is the name that will be used in the copyright string for the C<Copyright>
+EXIF tag, as well as the C<Creator> tag.
+
+=head2 -e, --email
+
+Optional.
+
+This is appended to the C<--name> when populating the C<Creator> EXIF tag if
+it is sent in.
+
+=head2 -c, --check
+
+Optional.
+
+Checks for missing C<Copyright> and/or C<Creator> EXIF tags in the image(s)
+sent in with the C<--image> option.
+
+=head2 -d, --dst
+
+Optional.
+
+By default, we use the directory sent in with C<--image> (current working
+directory if a path isn't provided), and put all modified images in a new C<ci>
+directory under it. 
+
+Send in a directory path with this option and we'll put the image files there
+instead.
+
+=head2 -r, --remove
+
+Optional.
+
+WARNING: This option DOES edit the original file, and does NOT make a copy
+first.
+
+Removes copyright EXIF information for files sent in with C<--image>.
+
+=head2 -f, --force
+
+By default, if an image already has EXIF copyright information, we skip
+over it and do nothing. Set this option to overwrite any found copyright
+info.
+
+=head1 AUTHOR
+
+Steve Bertrand, C<< <steveb at cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016 Steve Bertrand.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.

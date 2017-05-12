@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name: Apache2::WebApp::Plugin::Session::File
+abstract: Store persistent data on the filesystem
+version: 0.14
+author:
+  - Marc S. Brooks <mbrooks@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  Apache::Session::File: 1.01
+  Apache::Session::Lock::File: 1.01
+  Apache2::WebApp: 0.38
+  Apache2::WebApp::Plugin::Cookie: 0.09
+  Apache2::WebApp::Plugin::Session: 0.14
+  Params::Validate: 0
+build_requires:
+  Apache::Test: 0
+resources:
+  license: http://dev.perl.org/licenses/
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html

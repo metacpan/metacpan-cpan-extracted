@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Acme/Dot.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/10dot.t
+t/pod-coverage.t
+t/pod.t

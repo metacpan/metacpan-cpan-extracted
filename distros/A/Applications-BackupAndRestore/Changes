@@ -1,0 +1,16 @@
+Revision history for Perl application BackupAndRestore.
+
+0.011  Sa 21. Jun 10:07:09 CEST 2008
+	- added some information and reorder and clean up of folders
+	- added a test
+	- added -run; so you can now write 'use Application:BackupAndRestore -run;'
+	- correcly handling exit code 512; The 512 exit status means tar thinks
+	  it failed for some reason. This could be caused by files with no permission.
+	- added drag an drop support for for exclude file and exclude folder widget
+	- added remove backup for last backup
+	- backup dialog is now of type notifiction
+	- added a Restore Backup Notification
+
+0.010  Jan CEST 2007
+	- original version; created
+

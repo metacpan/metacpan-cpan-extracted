@@ -1,0 +1,14 @@
+Revision history for Perl extension Smirch.
+	
+0.01  Fri Nov 24 11:15:42 2000
+	- original version
+
+0.02  Thu Mar  1 10:12:44 2001
+	- removed need for multiple interpreter calls
+
+0.90  Sat May 19 14:30:11 2001
+	- a bit of platform independence
+
+0.91  Tue May 22 22:40:10 2001
+	- desmirched the CPAN namespace to Acme::Smirch
+

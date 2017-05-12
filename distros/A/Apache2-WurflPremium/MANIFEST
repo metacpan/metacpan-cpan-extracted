@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Apache2/Wurfl/Parameters.pm
+lib/Apache2/WurflPremium.pm
+t/01_use.t

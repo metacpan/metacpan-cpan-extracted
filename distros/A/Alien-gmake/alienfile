@@ -1,0 +1,66 @@
+use alienfile;
+
+plugin 'Probe::CommandLine' => (
+  command => $_,
+  args    => ['--version'],
+  match   => qr/GNU Make/,
+) for qw( gmake make );
+
+if($^O eq 'MSWin32')
+{
+  if(`gmake --version` !~ /GNU Make/ && `gmake --version` !~ /GNU Make/)
+  {
+    probe sub {
+      my($build) = @_;
+      $build->runtime_prop->{my_use_msys} = 1;
+      'system';
+    };
+
+    sys {
+      requires 'Alien::MSYS';
+      requires 'Path::Tiny';
+    };
+  }
+}
+
+
+share {
+
+  plugin 'Download' => (
+    url     => 'http://ftp.gnu.org/gnu/make',
+    version => qr/^make-([0-9\.]+)\.tar\.gz$/,
+  );
+
+  plugin 'Extract' => 'tar.gz';
+
+  plugin 'Build::Autoconf' => ();
+  
+  build [
+    '%{configure} --program-prefix=g --disable-shared',
+    '%{make}',
+    '%{make} install',
+    sub {
+      my($build) = @_;
+      $build->runtime_prop->{command} = 'gmake';
+    },
+  ];
+
+};
+
+requires 'Capture::Tiny';
+
+gather sub {
+  my($build) = @_;
+
+  if($build->runtime_prop->{my_use_msys})
+  {
+    $build->runtime_prop->{command} = Path::Tiny->new(Alien::MSYS::msys_path())->child('make.exe')->stringify;
+  }
+  
+  my($stdout) = Capture::Tiny::capture(sub {
+    system($build->runtime_prop->{command}, '--version');
+  });
+  
+  my($version) = $stdout =~ /GNU Make ([0-9\.]+)/;
+  $build->runtime_prop->{version} = $version || 'unknown';  
+}

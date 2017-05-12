@@ -1,0 +1,21 @@
+Revision history for Perl extension Apache2::UploadProgress
+
+0.2  2006-04-23 23:36
+    - Simplified the usage to the point of only needing to call
+      one js function from an onsubmit handler in the upload form
+    - All support files (js/css/xsl) are automatically Aliased in
+      Apache, to the /UploadProgress location (can be altered using
+      UploadProgressBaseURI directive in Apache, if you want to
+      customize the js/css/xsl files)
+    - Simplified Apache configuration by automatically setuping the
+      content handler that provides progress updates to
+      /UpdateProgress in Apache
+    - include an XSL stylesheet to render XML doc in a popup (will
+      automatically fall back to plain HTML if XSL transforms not
+      supported by browser)
+    - Added a public method to register new mime handlers, ->register_mime
+    - remove the need for prototype.js from the examples to cut down the
+      size of the js support code needed
+
+0.1  2006-04-10 13:40
+    - Initial version

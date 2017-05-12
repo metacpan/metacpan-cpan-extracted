@@ -1,0 +1,218 @@
+#!/usr/bin/perl
+# Copyright (c) 2003-2009 David Caldwell -*- cperl -*-
+
+use strict;
+use warnings;
+
+sub revstr($) { join "", reverse split //, $_[0] } # Reverse the characters in a string.
+sub comma($$) { revstr join(",", unpack("(A$_[1])*", revstr($_[0]))) }
+
+sub compute ($) {
+    $_[0] =~ s/\b([\d.]+)([kmgtpezyKMGTPEZY])[bB]?/($1*1024**(index("kmgtpezy",lc "$2")+1))/g;
+    my $a = eval($_[0]); die unless defined $a;
+    my $i = eval("use bigint; $_[0];"); $i = $a unless defined $i;
+    my $n = eval("use bignum; $_[0];"); $n = $a unless defined $n;
+    my $r = eval("use bigrat; $_[0];"); $r = $a unless defined $r;
+    my $is = "";
+    eval { $is = $i->copy()->bfloor().""; };
+    $is = int $i if $@;
+    my $hs = eval { $i->as_hex; } || sprintf "%#x", $i;
+    my $ic = comma($is,3);
+    my $hc = "0x". comma(($hs =~ /0x(.*)/)[0], 4);
+    print "$ic";
+    print " $is" if $ic ne $is;
+    print " $hc";
+    print " $hs" if $hc ne $hs;
+    printf " %#o", $a;
+    if ($n > 1024) {
+        use POSIX;
+        use List::Util 'min';
+        my @pow2 = qw(B KB MB GB TB PB EB ZB YB);
+        # This is weird because we can't use a bigint directly since log(bigint(1<<400))
+        # takes hours (literally). So we convert into a perl scalar so we can use fast
+        # floating point log() (the precision we lose going to a scalar doesn't matter
+        # in the context of log()) and then convert back to a bigint for the pow().
+        my $exp = Math::BigFloat->new(min($#pow2, POSIX::floor(log($n->numify)/log(1024))));
+        my $coeff = $n / (1024 ** $exp);
+        if ($coeff >= 100000) {
+            printf " %6.2e%s", $coeff, $pow2[$exp];
+        } elsif ($coeff->copy->bfloor() * 1024 ** $exp == $n) {
+            print " $coeff",$pow2[$exp];
+        } else {
+            printf " %.2f%s", $coeff, $pow2[$exp];
+        }
+    }
+    printf " %.15s",$n if $is ne $n."";
+    print  " $r"       if $is ne $r."" && $n."" ne $r."";
+    printf " '%c'",$a  if $a >= ord ' ' && $a <= ord '~';
+    printf " %b", $i   if $i < 0x10000;
+    print  "\n";
+}
+
+if ($#ARGV != -1) {
+    compute $_ foreach (@ARGV);
+} else {
+    if (eval "use Term::ReadLine;1;") {
+        my $term = new Term::ReadLine 'Perl Calc';
+        while (defined ($_ = $term->readline('pc] '))) {
+            next unless /\S/;
+            eval { compute($_) };
+            print "$@" if $@;
+            $term->addhistory($_);
+        }
+        print "\n";
+    } else {
+        while (<>) {
+            compute($_);
+        }
+    }
+}
+
+__END__
+
+=head1 NAME
+
+PC - A simple but feature filled command line Perl calculator
+
+=head1 SYNOPSIS
+
+  pc 11+3
+
+=head1 DESCRIPTION
+
+C<pc> is a quick and dirty command line perl calculator. Pass it an
+expression on the command line and it will print the result in a number of
+different formats. You can also run C<pc> with no command line parameters
+and it will run an interactive loop (using C<L<Term::ReadLine>> if you have it
+installed).
+
+C<pc> is designed to give you all the output you ever could want without
+having to memorize any stupid command line switches. There are none, in
+fact. It also doesn't overload you with redundant data. If the floating
+point answer is the same as the integer answer then it doesn't show it to
+you. Same with the fractions.
+
+=head1 TUTORIAL
+
+=head2 The basics
+
+  $ pc 11+3
+  14 0xe 016
+
+The first number is the integer result, followed by the hex and octal
+representations. Simple enough.
+
+=head2 Order of operations
+
+This shows that C<pc> uses Perl's order of operations (operator precedence if
+you are in a programming mood):
+
+  $ pc 1+3*2
+  7 0x7 07
+
+=head2 ASCII
+
+  $ pc 1+3*20
+  61 0x3d 075 '='
+
+Here we see an extra field was printed. In this case C<pc> detected the final
+integer value was in the ASCII range and printed the character represented
+by the value 61, an equal sign.
+
+=head2 Bitwise Operations
+
+We also get Perl (and C) style bitwise operators:
+
+  $ pc '1+3*20<<2 & 0xff'
+  244 0xf4 0364
+
+Also notice that I had to quote it since (a) I put a space in the
+expression and (b) I used the '<' and '&' characters which mean something to
+the shell.
+
+=head2 Floating point
+
+Of course it's not restricted to only integers, it can handle floats too:
+
+  $ pc 1+3*20/55
+  2 0x2 02 2.0909090909090 23/11
+
+You'll notice it shows the result of the floating point math in addition to
+the integer math.
+
+=head2 Fractions
+
+You might have noticed a fraction in the output of the previous example. C<pc>
+uses Perl's "bigrat" library to do fractions:
+
+  $ pc 3/4+1/2
+  0 0x0 01 1.25 5/4
+
+=head2 Human readable
+
+  $ pc 1000*2000
+  2,000,000 2000000 0x1e,8480 0x1e8480 07502200 1.90MB
+
+You'll notice that the integer and hex results are printed twice--one with
+commas and one without. The one with commas is so that you the human can
+read the output easily. The one without commas is for copying and
+pasting. You should also notice that C<pc> helpfully told you the number was
+1.90MB. If a number is bigger than 1024 (1KB) it will print it in human
+readable byte quantity.
+
+=head2 Power of 2 magnitude suffixes
+
+It also accepts magnitude suffixes on the input:
+
+  $ pc 16m
+  16,777,216 16777216 0x100,0000 0x1000000 0100000000 16MB
+
+The following suffixes are allowed: kmgtpezy (lower or upper case, with or
+without a trailing "b"). Note that the human readable output "16MB" doesn't
+have a decimal point. It will remove the decimal point if the number is
+exactly that value. So:
+
+  $ pc 16m+1
+  16,777,217 16777217 0x100,0001 0x1000001 0100000001 16.0MB
+
+Since "16.0MB" has a decimal point, we know the value isn't exactly 16
+megabytes.
+
+=head2 Large numbers
+
+C<pc> uses Perl's bigint so that it can handle numbers bigger than 32 bits:
+
+  $ pc '1<<40'
+  1,099,511,627,776 1099511627776 0x100,0000,0000 0x10000000000 020000000000000 1TB
+
+=head2 Trancendental and trignomentric functions
+
+C<pc> gives you access to all the Perl math functions:
+
+  $ pc 'sin(3.141592) ** .5'
+  1 0x1 0 0.0008084490047 1.772453666531229808666207156690905830337 1
+
+=head2 Random Perl code
+
+  $ pc 'ord("a")'
+  0x61 0141 97 'a'
+
+Since C<pc> uses Perl's eval you can do arbitrary perl code too. Though frankly
+the only thing I've ever used is ord().
+
+=head1 SEE ALSO
+
+L<http://porkrind.org/missives/pc-perl-calculator>
+
+=head1 COPYRIGHT
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Copyright (C) 2003-2009 David Caldwell
+
+=head1 AUTHOR
+
+David Caldwell <david@porkrind.org>
+
+=cut

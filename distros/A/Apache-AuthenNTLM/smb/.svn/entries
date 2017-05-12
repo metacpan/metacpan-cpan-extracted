@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="9"
+   name=""
+   committed-date="2004-09-21T10:22:21.291102Z"
+   url="file:///home/speeves/svn/modperl/authenntlm/trunk/smb"
+   last-author="root"
+   kind="dir"
+   uuid="55723fa2-1fe4-0310-95fb-f6aa04edc561"
+   revision="15"/>
+<entry
+   name="smbval"
+   kind="dir"/>
+<entry
+   committed-rev="9"
+   name="MANIFEST"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="ac29f041110ed13261b162543603f106"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:46.000000Z"/>
+<entry
+   committed-rev="9"
+   name="INSTALL"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="1bc6c614931e553ffa83045eee261485"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:46.000000Z"/>
+<entry
+   committed-rev="9"
+   name="Makefile.PL"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="f6d213627bf2c6fdbfc443a88556c163"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:46.000000Z"/>
+<entry
+   committed-rev="9"
+   name="Changes"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="f5e94b4b01661c5f7ebca680d9a4c3ae"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:46.000000Z"/>
+<entry
+   committed-rev="9"
+   name="test.pl"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="6e7262688605168c9a291bae256d8e45"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:46.000000Z"/>
+<entry
+   committed-rev="9"
+   name="Smb.xs"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="db8572a50d2327b91a824c4fe9562a70"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:46.000000Z"/>
+<entry
+   committed-rev="9"
+   name="Smb.pm"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="544a9a2f8231863fac6ed2ecdde6c017"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:46.000000Z"/>
+<entry
+   committed-rev="9"
+   name="README"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="09d1083dc5087c7fc00633d8008227e9"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:46.000000Z"/>
+</wc-entries>

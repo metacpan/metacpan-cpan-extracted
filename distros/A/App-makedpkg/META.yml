@@ -1,0 +1,30 @@
+---
+abstract: 'Facilitate building Debian packages with templates'
+author:
+  - 'Jakob Voß'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-makedpkg
+provides:
+  App::makedpkg:
+    file: lib/App/makedpkg.pm
+    version: 0.05
+requires:
+  App::Cmd: 0.323
+  Config::Any: 0.24
+  File::ShareDir: 1.0
+  Text::Template: 0
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/nichtich/App-makedpkg/issues
+  homepage: https://github.com/nichtich/App-makedpkg
+  repository: https://github.com/nichtich/App-makedpkg.git
+version: 0.05

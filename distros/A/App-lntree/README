@@ -1,0 +1,34 @@
+NAME
+    App::lntree - Create a best-effort symlink-based mirror of a directory
+
+VERSION
+    version 0.0013
+
+SYNOPSIS
+        lntree ~/project1 target/
+        lntree ~/project2 target/
+
+        # target/ is now a combination of project1 & project2, with project2 taking precedence
+
+DESCRIPTION
+    App::lntree is a utility for making a best-effort symlink-based mirror
+    of a directory. The algorithm is:
+
+        - Directories are always recreated, NOT symlinked
+        - A symlink conflict will be resolved by removing the original symlink
+        - Regular files (including directories) are left untouched
+
+USAGE
+  lntree <source> <target>
+    Create a symlink mirror of <source> into <target>, creating <target> if
+    necessary
+
+AUTHOR
+    Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

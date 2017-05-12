@@ -1,0 +1,60 @@
+Revision history for Acme-6502
+
+0.77 2012-08-28
+ - Fixed 0x76 to be proper "ROR zp, x" instruction
+ - Fixed some instruction label comments
+ - Fixed RTI instruction
+ - Fixed 0x61 to be proper "ADC (zp, x)" instruction
+
+0.76 2011-03-08
+ - Remove Class::Std dependency
+
+0.75 2009-05-29
+ - Remove Makefile.PL
+ - Move to GitHub
+
+0.74 2008-12-10
+ - Fix indirect JMP bug emulation so it only applies to indirect JMPs
+
+0.73 2008-09-24
+ - Oops. Added NES tests to MANIFEST
+
+0.72 2008-09-24
+ - Added a test suite pulled from the monkeynes project
+    * patched script_7C.txt to work properly
+    * patched script_94.txt to test proper mem location
+    * patched script_95.txt to test proper mem location
+    * patched script_96.txt to test proper mem location
+    * patched all branching tests to do proper negative branches
+    * patched script_40.txt and script_00.txt with proper diag info and proper
+      PC storage on BRK
+ - Fix PLP to clear B flag instead of setting it
+ - Fix TSX to set N and Z flag based on the value of X
+ - Emulate a page boundary bug in JMP instructions
+ - Fix BRK to set B flag
+
+0.71 2007-11-08
+ - A new dawn in the struggle to free ourselves from the shackles of version 
+   number oppression.
+
+0.70 2007-11-07
+ - An end to version number madness. I hope.
+
+0.0.6 2007-02-23
+ - Added machine readable license.
+
+0.0.5 2006-12-19
+ - Replaced hardwired tracing with signals thrown before / after OS calls
+
+0.0.4 2006-12-19
+ - Fixed module name in POD for Acme::6502::Tube
+
+0.0.3 2006-12-18
+ - Added kludgy OSRDCH support. Forth sort of works now.
+ - Added OSCALL tracing to Tube.pm
+
+0.0.2 2006-12-18
+ - Added Class::Std to prereqs
+
+0.0.1 2006-12-18
+ - Initial release.

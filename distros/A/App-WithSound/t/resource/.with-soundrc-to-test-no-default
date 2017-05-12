@@ -1,0 +1,4 @@
+[cmd]
+SUCCESS=cmd_foo
+FAILURE=cmd_bar
+RUNNING=cmd_baz

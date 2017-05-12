@@ -1,0 +1,217 @@
+use 5.16.0;
+use strict;
+use warnings;
+
+use Mojolicious::Lite;
+use URI::Encode qw/uri_decode/;
+use List::AllUtils qw/uniq/;
+use Map::Metro;
+
+my $mapmetro = undef;
+my %maps => ();
+
+get '/' => sub {
+    my $c = shift;
+    $mapmetro = Map::Metro->new;
+    my @available_maps = $mapmetro->available_maps;
+    $c->render('index', layout => 'default', cities => [ map { my $city = $_; $city =~ s{^Map::Metro::Plugin::Map::}{}m; $city } grep { !/::Lines/ } @available_maps ]);
+};
+
+get '/:city' => [format => 'json'] => sub {
+    my $c = shift;
+
+    my $city = $c->param('city');
+    return if map_checker($c, $city);
+
+    $c->render(json => { stations => [map { [ $_->name => $_->id ] } sorted_stations_in($city)] });
+};
+
+get '/:city' => sub {
+    my $c = shift;
+
+    my $city = $c->param('city');
+    return if map_checker($c, $city);
+
+    $c->render('city', layout => 'default', stations => [map { [ $_->name => $_->id ] } sorted_stations_in($city)]);
+};
+
+get '/:city/:origin/:destination' => [format => 'txt'] => sub {
+    my $c = shift;
+
+    my $city = uri_decode($c->param('city'));
+    my $origin = uri_decode($c->param('origin'));
+    my $destination = uri_decode($c->param('destination'));
+
+    return if map_checker($c, $city);
+
+    my $map = $maps{ $city };
+    my $output = outputter_txt($map->routing_for($origin, $destination));
+
+    $c->render(text => $output);
+};
+
+get '/:city/:origin/:destination' => sub {
+    my $c = shift;
+
+    my $city = uri_decode($c->param('city'));
+    my $origin = uri_decode($c->param('origin'));
+    my $destination = uri_decode($c->param('destination'));
+
+    return if map_checker($c, $city);
+
+    my $map = $maps{ $city };
+    my $output = outputter_txt($map->routing_for($origin, $destination));
+
+    $c->render('routing', layout => 'default', output => $output, city => $city, stations => [map { [ $_->name => $_->id ] } sorted_stations_in($city)]);
+};
+
+sub map_checker {
+    my $c = shift;
+    my $city = shift;
+    my $map = $maps{ $city };
+
+    if(!defined $map) {
+        $map = Map::Metro->new($city)->parse;
+        if(!defined $map) {
+            return $c->app->send_error(404, sprintf 'No such map <%s>', $city);
+        }
+        $maps{ $city } = $map;
+    }
+    return 0;
+}
+
+sub sorted_stations_in {
+    my $city = shift;
+
+    return sort { $a->name cmp $b->name } $maps{ $city }->all_stations;
+}
+
+sub station_to_text {
+    my $station = shift;
+    return sprintf '%3s. %s', $station->id, $station->name;
+}
+
+sub outputter_txt {
+    my $routing = shift;
+
+    my $header = sprintf q{From %s to %s} => $routing->origin_station->name, $routing->destination_station->name;
+
+    my @rows = ('', $header, '=' x length $header, '');
+
+    my $route_count = 0;
+    my $longest_length = 0;
+
+    ROUTE:
+    foreach my $route ($routing->ordered_routes) {
+
+        my $line_name_length = $route->longest_line_name_length;
+        $longest_length = $line_name_length if $line_name_length > $longest_length;
+
+        push @rows => sprintf '-- Route %d (cost %s) ----------', ++$route_count, $route->weight;
+
+        STEP:
+        foreach my $step ($route->all_steps) {
+            push @rows =>  sprintf "[ %1s %-${line_name_length}s ] %s" => ($step->was_line_transfer && !$step->was_station_transfer ? '*' : ''),
+                                                                           $step->origin_line_station->line->name,
+                                                                           join '/' => $step->origin_line_station->station->name_with_alternative;
+            if($step->is_station_transfer) {
+                push @rows =>  sprintf "[ %1s %-${line_name_length}s ] %s" => ($step->is_station_transfer ? '+' : ''),
+                                                                           ' ' x length $step->origin_line_station->line->name,
+                                                                           join '/' => $step->destination_line_station->station->name_with_alternative;
+            }
+            if(!$step->has_next_step) {
+                push @rows =>  sprintf "[ %1s %-${line_name_length}s ] %s" => '',
+                                                                         $step->destination_line_station->line->name,
+                                                                         join '/' => $step->destination_line_station->station->name_with_alternative;
+            }
+        }
+        push @rows => '';
+    }
+
+    my @lines_in_routing = uniq sort { $a->name cmp $b->name } map { $_->origin_line_station->line } map { $_->all_steps } $routing->all_routes;
+
+    LINE:
+    foreach my $line (@lines_in_routing) {
+        push @rows => sprintf "%-${longest_length}s  %s", $line->name, $line->description;
+    }
+
+    push @rows => '', '*: Transfer to other line', '+: Transfer to other station', '';
+
+    return join "\n" => @rows;
+}
+
+app->start;
+__DATA__
+
+@@ index.html.ep
+        <ul>
+%   foreach my $city (@$cities) {
+            <li><a href="/<%= $city %>"><%= $city %></a></li>
+%   }
+
+        </ul>
+
+@@ city.html.ep
+        <p><a href="/">&lt;&lt; Choose city</a></p>
+        <h1><%= $city %></h1>
+        %= form_for 'cityorigindestination', begin
+            %= select_field 'origin' => $stations, id => 'origin'
+            %= select_field 'destination' => $stations, id => 'destination'
+        % end
+
+@@ routing.html.ep
+%= include 'city', city => $city, stations => $stations
+<pre><%= $output %></pre>
+
+@@ layouts/default.html.ep
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                $('select').on('change', function(e) {
+                    e.preventDefault();
+                    var origin = $('#origin').val();
+                    var destination = $('#destination').val();
+
+                    var paths = location.pathname.split('/');
+                    location.pathname = '/' + paths[1] + '/' + origin + '/' + destination;
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <%= content %>
+    </body>
+</html>
+
+
+
+__END__
+#use Mojolicious::Lite;
+#
+## Documentation browser under "/perldoc"
+#plugin 'PODRenderer';
+#
+#get '/' => sub {
+#  my $c = shift;
+#  $c->render('index');
+#};
+#
+#app->start;
+#__DATA__
+#
+#@@ index.html.ep
+#% layout 'default';
+#% title 'Welcome';
+#Welcome to the Mojolicious real-time web framework!
+#
+#@@ layouts/default.html.ep
+#<!DOCTYPE html>
+#<html>
+#  <head><title><%= title %></title></head>
+#  <body><%= content %></body>
+#</html>
+#

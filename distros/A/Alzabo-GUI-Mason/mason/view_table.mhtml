@@ -1,0 +1,165 @@
+  <td>
+
+<div class="right">
+<h2>Delete</h2>
+
+<form action="delete_table<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="hidden" name="table" value="<% $t->name %>">
+ <input type="submit" value="Delete table">
+</form>
+</div>
+
+<div class="right">
+<h2>Name</h2>
+
+<form action="change_table_name<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="hidden" name="table" value="<% $t->name %>">
+ <input type="text" name="name" value="<% $t->name %>">
+ <input type="submit" value="Change name">
+</form>
+
+</div>
+
+% if ( Alzabo::Table->can('attributes') ) {
+<div class="right">
+ <h2>Change/add attributes/constraints:</h2>
+
+ (to delete an attribute simply erase it)
+<form action="change_table_attributes<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="hidden" name="table" value="<% $t->name %>">
+
+% foreach my $a (sort $t->attributes) {
+ <input type="textfield" name="attributes" value="<% $a | h %>" size="40"><br />
+% }
+ <input type="textfield" name="attributes" size="40"><br />
+ <input type="textfield" name="attributes" size="40"><br />
+ <input type="submit" value="Change attributes">
+</form>
+
+</div>
+% }
+
+<div class="right">
+<h2>Comment</h2>
+
+<form action="change_table_comment<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="hidden" name="table" value="<% $t->name %>">
+ <textarea rows="5" cols="40" name="comment"><% $t->comment | h %></textarea><br>
+ <input type="submit" value="Change comment">
+</form>
+
+</div>
+
+<div class="right">
+<h2>Add column</h2>
+
+<form action="add_column<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="hidden" name="table" value="<% $t->name %>">
+  <h4>Name:</h4>
+  <input type="textfield" name="column_name" size="20"><br />
+
+  <h4>Comment:</h4>
+  <textarea name="comment"></textarea><br />
+
+  <h4>Type:</h4>
+  <select name="type">
+% foreach ( $s->rules->column_types ) {
+   <option value="<% $_ %>"><% $_ %></option>
+% }
+  </select>
+% if ( $s->rules->feature('extended_column_types') ) {
+  <br>
+  <h4>Enter your type if it is not on the list:</h4>
+  <input type="textfield" name="extended_type" size="20">
+% }
+  <br>
+
+  <h4>Length/precision:</h4>
+  <input type="textfield" name="length" size="5">,
+  <input type="textfield" name="precision" size="5"><br />
+
+  <h4>Default:</h4>
+
+  <input type="textfield" name="default" size="20"><br />
+
+  <h4>Attributes/Constraints:</h4>
+
+  <input type="textfield" name="attributes" size="40"><br />
+  <input type="textfield" name="attributes" size="40"><br />
+
+  <table>
+   <tr valign="top">
+    <td>
+     <h4>Primary key:</h4>
+    </td>
+    <td>
+     <input type="checkbox" name="primary_key" value="1">
+    </td>
+   </tr>
+   <tr valign="top">
+    <td>
+     <h4>Sequenced:</h4>
+    </td>
+    <td>
+     <input type="checkbox" name="sequenced" value="1">
+    </td>
+   </tr>
+   <tr valign="top">
+    <td>
+     <h4>Allow nulls:</h4>
+    </td>
+    <td>
+     <input type="checkbox" name="nullable" value="1">
+    </td>
+   </tr>
+  </table>
+
+% if ($t->columns) {
+  <h4>After column:</h4>
+  <select name="after">
+%   foreach my $c (@columns) {
+   <option value="<% $c->name %>"<% $c->name eq $last->name ? ' selected' : '' %>><% $c->name %></option>
+%   }
+  </select>
+% }
+  <br />
+
+  <input type="submit" value="Submit">
+
+ </form>
+</div>
+
+% if ( (my @tables = $s->tables) > 2) {
+<div class="right">
+<h2>Move</h2>
+
+<form action="move_table<% Alzabo::GUI::Mason::Config::mason_extension() %>" method="post">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="hidden" name="table" value="<% $t->name %>">
+ <h4>After table:</h4>
+ <select name="after">
+%   foreach my $t (@tables) {
+  <option value="<% $t->name %>"><% $t->name %></option>
+%   }
+ </select>
+ <input type="submit" value="Submit">
+</form>
+</div>
+% }
+
+  </td>
+
+<%args>
+$s
+$t
+</%args>
+
+<%init>
+my @columns = $t->columns;
+my $last = $columns[-1];
+</%init>

@@ -1,0 +1,4 @@
+MAILTO=chris@smalldognet.com
+
+5 0 * * * root /code/sdnfw/bin/rotatelogs.pl
+

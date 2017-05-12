@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+# WARNING: this file is generated, do not edit
+# 01: /usr/lib/perl5/Apache/TestConfig.pm:940
+# 02: /usr/lib/perl5/Apache/TestConfig.pm:1030
+# 03: /usr/lib/perl5/Apache/TestMM.pm:135
+# 04: Makefile.PL:8
+
+BEGIN { eval { require blib && blib->import; } }
+#!perl
+
+use strict;
+use warnings FATAL => 'all';
+
+use Apache::TestRunPerl ();
+
+Apache::TestRunPerl->new->run(@ARGV);

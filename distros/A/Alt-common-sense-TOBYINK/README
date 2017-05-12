@@ -1,0 +1,60 @@
+NAME
+    Alt::common::sense::TOBYINK - provides a clean-room reimplementation of
+    common::sense
+
+VERSION
+    This is Alt::common::sense::TOBYINK 0.001, but it aims at compatibility
+    with common::sense 3.73.
+
+SYNOPSIS
+       use common::sense;
+   
+       # your code goes here
+
+DESCRIPTION
+    Importing common::sense is roughly equivalent to:
+
+       use utf8;
+       use strict qw(vars subs);
+       use feature qw(say state switch);
+       use feature qw(unicode_strings current_sub fc evalbytes);
+       no feature qw(array_base);
+       no warnings;
+       use warnings qw(FATAL closed threads internal debugging pack
+                       portable prototype inplace io pipe unpack malloc
+                       deprecated glob digit printf layer
+                       reserved taint closure semicolon);
+       no warnings qw(exec newline unopened);
+
+    Unfortunately the installation process (and to a lesser extent, the
+    implementation) for common::sense is fairly crazy.
+
+    Alt::common::sense::TOBYINK is an Alt implementation of common::sense. To
+    use it, continue to `use common::sense` in your code, but to install it,
+    do:
+
+       cpanm Alt::common::sense::TOBYINK
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Alt-common-sense-TOBYINK>.
+
+SEE ALSO
+    Alt, common::sense.
+
+    Similar: Modern::Perl, strictures.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

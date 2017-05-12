@@ -1,0 +1,104 @@
+=begin html
+
+<a href="https://travis-ci.org/ivanwills/App-JenkinsCli"><img src="https://travis-ci.org/ivanwills/App-JenkinsCli.png" alt="App-JenkinsCli"></a>
+<a href="https://coveralls.io/r/ivanwills/App-JenkinsCli?branch=master"><img src="https://coveralls.io/repos/ivanwills/App-JenkinsCli/badge.svg?branch=master" alt="Coverage Status" /></a>
+
+=head1 App-JenkinsCli
+
+This module provide the C<jenkins-cli> command to allow interactions with a
+Jenkins server via the command line.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    # from CPAN
+    # with cpanm client (https://cpanmin.us/)
+    cpanm [--sudo] App::JenkinsCli
+    # with cpan client
+    cpan App::JenkinsCli
+
+    # from source
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=head1 SYNOPSIS
+
+   jenkins-cli [option] command
+
+ OPTIONS:
+  -b --base-url[=]str
+                The base url of the Jenkins instance to talk to
+  -U --username[=]str
+                The username to interact with Jenkins
+  -P --password[=]str
+                The passowrd of --username
+
+  -v --verbose  Show more detailed option
+     --version  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for jenkins-cli
+
+ COMMANDS:
+  ls|list [search]
+                List jenkins jobs
+  start job     Start the Jenkins job "job"
+  stop job      Stop a Jenkins job (not yet implemented)
+  tail job      Tail a jenkins job (not yet implemented)
+  disable job   Diable a job
+  enable job    Enable a job
+  wipe job      Wipeout workspace for job (not yet implemented)
+  queue         Show the current job build queue
+  history job   Show a jobs build history (not yet implemented)
+  config job    Show a config for a job
+  create job config.xml
+                Create a new job from "config.xml"
+
+=head1 CONFIGURATION
+
+You can save your configuration into C<~/.jenkins-cli.yml> so that you don't
+have to enter them each time. The following is an example of what the file
+looks like:
+
+  ---
+  base_url: http://localhost:8080/
+  username: admin
+  password: my-secrent-password
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::JenkinsCli
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-JenkinsCli
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-JenkinsCli
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-JenkinsCli
+
+    Search CPAN
+        http://search.cpan.org/dist/App-JenkinsCli/
+
+    Source Code
+        git://github.com/ivanwills/App-jenkins-cli.git
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2016 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

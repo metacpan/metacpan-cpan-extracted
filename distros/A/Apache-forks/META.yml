@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Apache-forks
+version:             0.03
+abstract:            Transparent Apache ithreads interface using forks
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Devel::Required:               0.07
+    forks:                         0.26
+    mod_perl:                      0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Eric Rybski (rybskej@yahoo.com)

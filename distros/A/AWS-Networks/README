@@ -1,0 +1,99 @@
+NAME
+    AWS::Networks - Parse and query official AWS network ranges
+
+SYNOPSIS
+      use AWS::Networks;
+
+      my $nets = AWS::Networks->new();
+
+      say $nets->sync_token->iso8601;
+
+      foreach my $cidr (@{ $nets->cidrs }){
+        say $cidr
+      }
+
+DESCRIPTION
+    This module parses the official public IP network information published
+    by Amazon Web Services at https://ip-ranges.amazonaws.com/ip-ranges.json
+
+    Please read and understand the information can be found at
+    http://docs.aws.amazon.com/general/latest/gr/aws-ip-ranges.html to make
+    sense of the data retured by this module.
+
+USAGE
+    Instance an object, and use it to filter information of interest to you
+    with the attributes and methods provided.
+
+METHODS
+  new([ url => 'http....' ])
+    Standard Moose constructor. Can specify a custom URL to download a
+    document that follows the same schema
+
+  url
+    Returns the URL from which the information was retrieved. Returns undef
+    on filtered datasets
+
+  sync_token
+    Returns a DateTime object created from the current timestamp of the
+    syncToken reported from the service
+
+  networks
+    Returns an ArrayRef with HashRefs following the following structure:
+
+    { ip_prefix => '0.0.0.0/0', region => '...', service => '...' }
+
+    The keys and values in the HashRefs are the ones returned by the Network
+    service
+
+    service can be one of: AMAZON | EC2 | CLOUDFRONT | ROUTE53 |
+    ROUTE53_HEALTHCHECKS, but expect new values to appear
+
+    region can be one of: ap-northeast-1 | ap-southeast-1 | ap-southeast-2 |
+    cn-north-1 | eu-central-1 | eu-west-1 | sa-east-1 | us-east-1 |
+    us-gov-west-1 | us-west-1 | us-west-2 | GLOBAL, but expect new values to
+    appear
+
+  services
+    Returns an ArrayRef of the different services present in the current
+    dataset
+
+  regions
+    Returns an ArrayRef of the different regions present in the current
+    dataset
+
+  cidrs
+    Returns an ArrayRef with the CIDR blocks in the dataset
+
+  by_region($region)
+    Returns a new AWS::Networks object with the data filtered to only the
+    objects in the specified region
+
+  by_service($service)
+    Returns a new AWS::Networks object with the data filtered to only the
+    services specified
+
+CONTRIBUTE
+    The source code is located here: https://github.com/pplu/aws-networks
+
+  SEE ALSO
+    The dist is bundled with a couple of sample scripts in bin that play
+    around with the information returned by this module, these scripts try
+    to determine the number of IP addresses that AWS has, and given an IP
+    address, if it pertains to AWS, and what service.
+
+AUTHOR
+        Jose Luis Martinez
+        CPAN ID: JLMARTIN
+        CAPSiDE
+        jlmartinez@capside.com
+        http://www.pplusdomain.net
+
+COPYRIGHT
+    Copyright (c) 2014 by Jose Luis Martinez Torres
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

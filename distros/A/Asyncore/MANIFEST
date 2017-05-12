@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Asyncore.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+script/server.pl
+script/TimeChannel.pm
+script/TimeServer.pm

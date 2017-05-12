@@ -1,0 +1,127 @@
+#------------------#
+# This is Todo.txt #
+#------------------#
+
+use Text::Aspell, seems that the implementation to find errors in the file name is broken
+	get user dictionary from ~/.ra
+	
+requirements are expected to have a .txt extension
+	change to .rat allowing it to be associated with ra_edit
+
+merge check_requirement_violation and chek_requirement_contents
+
+allow a requirement template that is free form but checked with the perl requirement tempalte
+	allow free form template perl user/project
+
+all the scripts options are taken from a single file to allow project wide setting
+	cli overrides projects settings
+	
+RELEASE
+	dependencies
+	list all files in manifest
+	all sub documentation
+	document the script and put the right =head fields in them
+
+remove NO_CATEGORIES from the flat requirement document
+
+reference 
+	http://www.techinsurance.com/blog/project-management-documents/10%20Requirements%20Hand%20Out.pdf
+	http://www.techwr-l.com/techwhirl/magazine/writing/softwarerequirementspecs.html
+
+Do something with this: 
+3  Specific Requirements
+    3.1  External interface requirements
+    3.1.1 	User interfaces
+    3.1.2 	Hardware interfaces
+    3.1.3 	Software interfaces
+    3.1.4 	Communications interfaces
+    3.2 	Functional requirements
+    	3.2.1  Information flows
+		    3.2.1.1  Data flow diagram 1
+		    3.2.1.1.1 	Data entities
+		    3.2.1.1.2 	Pertinent processes
+		    3.2.1.1.3 	Topology
+		    	 3.2.1.2  Data flow diagram 2
+			 3.2.1.2.1 	Data entities
+			 3.2.1.2.2 	Pertinent processes
+			 3.2.1.2.3 	Topology
+			               .....
+				       	 3.2.1.n Data flow diagram n
+					 	3.2.1.n.1 Data entities
+							3.2.1.n.2 Pertinent processes
+								3.2.1.n.3 Topology
+								       3.2.2 Process descriptions
+								       3.2.2.1 	Process 1
+								       3.2.2.1.1 	Input data entities
+								       3.2.2.1.2 	Algorithm or formula of process
+								       3.2.2.1.3 	Affected data entities
+								            3.2.2.2 Process 2
+									            3.2.2.2.1 Input data entities
+										            3.2.2.2.2 Algorithm or formula of process
+											            3.2.2.2.3 Affected data entities
+												            ...
+													         3.2.2.m Process m
+														         3.2.2.m.1 Input data entities
+															         3.2.2.m.2 Algorithm or formula of process
+																              3.2.2.m.3 Affected data entities
+
+
+
+
+
+
+
+
+split load_and_filter_requirements
+
+explain why this module
+
+
+add output section in the application documentation
+
+master template and master categories when requirements come from different project
+	shall we merge or verify each requirement to its own masters?
+
+show  all the files (and structure) needed to run the applications
+
+can we have commands that can be  piped into each other?
+
+	ra select r1 | ra select directory/  | ra check --templates | ra check --script | ra filter- something | ra merge | ra filter- something | ra show --dhtml
+	
+	can we keep a server instance up to avoid reloading or re-evalauating requirements?
+		we could also implement the pipes ourselves
+	
+	
+ra check should keep a cache of checked requirements (passed and fail) and simply handle the requirement name out
+
+does ra merge have to 'merge'?
+	can't it create a parralel data structure to  be merged when necessary only?
+	
+ra filter can be used on the unmerged requirements and on the merged requirements
+	since the filters that are used are most probably the same from a run to another, the filtering result
+	can be cached
+
+can the ra_show_* scripts use the same base functionality more and can they be
+	called through the ra_show command + arguments
+	
+asciio diagram can't be loaded in latest asciio
+
+gtk based UI for requirement creation and manipulation
+
+better handling of fit criteria
+	list not string
+	link to real tests
+	use for traceability to tests
+		may impact test granularity
+	
+way of working
+	define 
+		a project vision
+		categories
+		term definition
+			
+links to oos project and other tools
+
+Arch.pm should implement the front end to the commands which should be defined in App::R::A::Commands::*
+
+merge the todo files!

@@ -1,0 +1,39 @@
+Revision history for App-Framework-Lite
+
+1.09    Thu Jul 28 07:44:0 2016
+		Bug Fix: corrected POD in modules
+
+1.08    Thu Mar 22 08:05:0 2012
+		Fix: removed use of "defined(@array)" to eliminate Perl "deprecated" error message
+
+1.07    Tue Dec 21 12:39:0 2010
+		Bug fix: Skip any module content after __END__
+		Limit line length to 5000 characters so that Clearcase does not treat script as binary
+
+1.06    Thu Mar 11 11:20:0 2010
+		Bug fix: Set the perl path as first line of output
+
+1.05    Thu Mar 04 16:06:0 2010
+		Now output the main package at the end of the file to remove problems with loading Exporter modules
+		Bug fix: No longer rely on File::Which module
+		Bug fix: corrected prt_data subroutine
+		
+1.04    Mon Feb 15 15:01:00 2010
+		Bug fix: corrected regexp checking for string 'package' in embedded module variables
+		
+1.03    Mon Dec 07 12:47:00 2009
+		Various tweaks, fixes, and test updates
+		(Added run & logging as undocumented features - need to update documentation!)
+		
+1.02    Wed Nov 25 12:47:00 2009
+		Added missing files to MANIFEST
+		Added capability for module to embed hierarchy of modules
+		Added App::Framework::Lite::Object to optionally provide simple object support for user modules
+	
+1.01    Mon Nov 23 09:19:00 2009
+		Various fixes to correct CPAN test failures on other platforms
+	
+1.00    Thu Nov 19 13:45:00 2009
+		New module
+	
+

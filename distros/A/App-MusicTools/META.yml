@@ -1,0 +1,52 @@
+---
+abstract: 'command line utilities for music composition and analysis'
+author:
+  - 'Jeremy Mates <jmates@cpan.org>'
+build_requires:
+  Pod::Coverage: '0.18'
+  Test::Cmd: '0'
+  Test::Exception: '0'
+  Test::Most: '0'
+  Test::Pod: '1.22'
+  Test::Pod::Coverage: '1.08'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+  strict: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-MusicTools
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  IPC::Run3: '0'
+  JSON: '0'
+  List::Util: '0'
+  Music::AtonalUtil: '1.14'
+  Music::Canon: '2'
+  Music::Chord::Positions: '0'
+  Music::LilyPondUtil: '0.1'
+  Music::Scala: '0.84'
+  Music::Scales: '0'
+  Music::Tempo: '0'
+  Music::Tension: '0.6'
+  Parse::Range: '0'
+  Scalar::Util: '0'
+  Text::Roman: '0'
+  Text::Wrap: '0'
+  Try::Tiny: '0'
+  perl: '5.014000'
+resources:
+  repository: git://github.com/thrig/App-MusicTools.git
+version: '1.29'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,19 @@
+Revision history for App-GenModEmbedder
+
+0.003   2016-12-26 (PERLANCAR)
+
+	- Add option --as to rename embedded module to something else.
+
+        - Add test.
+
+        - Bug fixes.
+
+
+0.002   2016-12-26 (PERLANCAR)
+
+	- [ux] Add completion for 'module'.
+
+
+0.001   2016-12-26 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,62 @@
+# astroconst.dat
+#   v2.3.9,	13 Feb 2003
+#   Jeremy Bailin (jbailin@as.arizona.edu)
+#	year and day additions by Boyd (wait for change in official release)
+#
+# Format: variable<tab>description<tab>CGS value<tab>MKS value
+#    or   variable<tab>description<tab>value
+#
+A_c	speed of light in a vacuum	2.997925e10	2.997925e8
+A_k	Boltzmann's constant	1.380658e-16	1.380658e-23
+A_G	universal gravitational constant	6.67259e-8	6.67259e-11
+A_me	mass of electron	9.1093897e-28	9.1093897e-31
+A_mp	mass of proton	1.672631e-24	1.672631e-27
+A_amu	atomic mass unit	1.6605402e-24	1.6605402e-27
+A_eV	electron volt	1.6021772e-12	1.6021772e-19
+A_h	Planck's constant	6.6260755e-27	6.6260755e-34
+A_hbar	Planck's constant /2pi	1.0545727e-27	1.0545727e-34
+A_e	electron charge (defined positive)	4.8032e-10	1.602e-19
+A_mn	neutron mass	1.6749286e-24	1.6749286e-27
+A_mH	mass of Hydrogen atom	1.6733e-24	1.6733e-27
+A_pc	parsec	3.08567758e18	3.08567758e16
+A_msun	solar mass	1.99e33	1.99e30
+A_rsun	solar radius	6.96e10	6.96e8
+A_AU	astronomical unit	1.496e13	1.496e11
+A_ly	light year	9.463e17	9.463e15
+A_Lsun	solar luminosity	3.9e33	3.9e26
+A_mearth	mass of Earth	5.976e27	5.976e24
+A_rearth	radius of Earth	6.378e8	6.378e6
+A_AA	Angstrom	1e-8	1e-10
+A_Jy	Jansky	1e-23	1e-26
+A_rhoc	critical density /h^2	1.8791e-29	1.8791e-26
+A_sigma	Stefan-Boltzmann constant	5.67040e-5	5.67040e-8
+A_arad	radiation density constant	7.5646e-15	7.5646e-16
+A_sigmaT	Thomson cross-section	6.6524585e-25	6.6524585e-29
+A_re	classical electron radius	2.817941e-13	2.817941e-15
+A_a0	Bohr radius	5.29177208e-9	5.29177208e-11
+A_Wien	Wien displacement law constant	2.897769e-1	2.897769e-3
+A_alpha	fine structure constant	(1.0/137.03599)
+A_NA	Avogadro's number	6.0221367e23
+A_yr	year	3.155692608e7
+A_yrsid	Sidereal year	3.155815296e7
+A_day	Mean solar day	86400
+A_daysid	Sidereal day	86164.09
+A_tH	Hubble time *h	3.0853056e17
+A_Tsun	surface temperature of sun	5780
+A_TCMB	cosmic microwave background temperature	2.726
+A_pi	trig constant pi	3.14159265358979324
+A_exp	base of natural logarithm	2.71828182846
+A_dsun	mean solar density	1.408	1408
+A_dearth	mean Earth density	5.515	5515
+A_gsun	solar surface gravity	27400	274
+A_gearth	Earth surface gravity	978	9.78
+A_Vsun	solar V magnitude	-26.74
+A_MVsun	solar absolute V magnitude	4.83
+A_Z0	characteristic impedance of vacuum	376.730313461
+A_eps0	permittivity of free space	1	8.854187817e-12
+A_mu0	permeability of free space	1	1.256637061e-6
+A_rmoon	lunar radius	1738e5	1738e3
+A_mmoon	lunar mass	7.348e25	7.348e22
+A_amoon	lunar orbital semi-major axis	3.844e10	3.844e8
+A_emoon	lunar orbital eccentricity	0.0549
+

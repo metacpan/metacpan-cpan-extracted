@@ -1,0 +1,14 @@
+
+#	We assume username and password set by environment variable.
+
+set with_name 1
+
+
+#	We retrieve the ISS data.
+
+retrieve 25544
+
+#	Done.
+
+exit
+

@@ -1,0 +1,91 @@
+Apache::AuthenNTLM - Perform Microsoft NTLM and Basic User Authentication
+--------------------------------------------------------------------------
+
+Copyright (c) 2002 Gerald Richter / ecos gmbh (www.ecos.de)
+
+You may distribute under the terms of either the GNU General Public 
+License or the Artistic License, as specified in the Perl README file.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+$Id: README,v 1.5 2002/04/19 04:06:02 richter Exp $
+
+
+OVERVIEW
+========
+
+The purpose of this module is to perform a user authentication via Microsoft's
+NTLM protocol. This protocol is supported by all versions of the Internet
+Explorer and is mainly useful for intranets. Depending on your preferences
+setting, IE will supply your windows logon credentials to the web server
+when the server asks for NTLM authentication. This saves the user to type in
+his/her password again.
+
+The NTLM protocol performs a challenge/response to exchange a random number
+(nonce) and get back a md4 hash, which is built form the users password
+and the nonce. This makes sure that no password goes over the wire in plain text,
+so it's more secure than basic authentication, which doesn't mean it's
+a real secure authentication scheme. ;)
+
+Some information about NTLM can be found at:
+
+http://msdn.microsoft.com/library/default.asp?url=/library/en-us/com/htm/security_9qgg.asp
+http://davenport.sourceforge.net/ntlm.html
+
+More detailed implementation details are available from:
+
+http://www.opengroup.org/comsource/techref2/NCH1222X.HTM
+http://www.innovation.ch/java/ntlm.html
+
+A lot of ideas and information are taken from the similar Apache module mod_ntlm,
+which can be found at http://sourceforge.net/projects/modntlm/ 
+
+The main advantage of the Perl implementation is, that it can be easily extended
+to verify the user/password against other sources than a windows domain controller.
+The default implementation is to go to the domain controller for the given domain 
+and verify the user. If you want to verify the user against another source, you
+can inherit from Apache::AuthenNTLM and override its methods.
+
+To support users that aren't using Internet Explorer, Apache::AuthenNTLM can
+also perform basic authentication depending on it's configuration.
+
+
+Apache::AuthenNTLM contains an extended version of Authen::Smb, which exposes
+some more functions to Perl. 
+
+
+INSTALLATION
+============
+
+MIME::Base64 must be installed, then run
+
+perl Makefile.PL
+make install
+
+For configuration and more information see perldoc Apache::AuthenNTLM
+
+SUPPORT
+=======
+
+Speeves: Thanks to everyone that is helping to find bugs, etc. in this module.  Please, feel free to contact me and let me know of any strange things are going on with this module.  Also, please copy the modperl@perl.apache.org mailing list, as there are probably many others that are experiencing the same problems as you, and they may be able to return an answer faster than I can by myself.  Thanks :)
+
+SEE ALSO
+========
+                                                                                                                           
+An implementation of this module which uses cookies to cache the session.
+                                                                                                                           
+Apache-AuthCookieNTLM - Leo Lapworth
+http://search.cpan.org/~llap/Apache-AuthCookieNTLM/
+
+AUTHOR
+======
+
+G. Richter (richter@dev.ecos.de)
+Ported by Shannon Eric Peevey (speeves@unt.edu)
+
+Development of this package, versions 0.01-0.13 was sponsored by:
+Siemens: http://www.siemens.com
+
+

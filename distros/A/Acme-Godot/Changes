@@ -1,0 +1,10 @@
+Revision history for Acme-Godot
+
+0.001010
+       Converted dist to Dist::Zilla
+
+0.001001
+       Update module dependency recommendations, add a test
+
+0.001000
+       Initial release.

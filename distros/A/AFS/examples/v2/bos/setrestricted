@@ -1,0 +1,31 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::BOS;
+
+my ($server, $cellname, $bos);
+
+die "Usage: $0 server [cell]\n" if $#ARGV < 0;
+
+$server   = shift;
+$cellname = shift;
+
+if ($cellname) { $bos = AFS::BOS->new($server, 0, 0, $cellname); }
+else           { $bos = AFS::BOS->new($server); }
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+my $mode = $bos->getrestricted;     # save old mode
+
+my $ok = $bos->setrestricted(1);    # switch it on
+print "Error Code-2: $AFS::CODE\n" if ($AFS::CODE);
+
+$ok = $bos->setrestricted(0);       # switch it off
+print "Error Code-3: $AFS::CODE\n" if ($AFS::CODE);
+
+$ok = $bos->setrestricted($mode);    # reset it to old mode
+print "Error Code-4: $AFS::CODE\n" if ($AFS::CODE);
+
+$bos->DESTROY;

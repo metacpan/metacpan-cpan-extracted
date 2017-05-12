@@ -1,0 +1,4 @@
+# name
+#Records. This is not added, because it'll be there already.
+Donations by amount
+Donations by date

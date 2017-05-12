@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Algorithm-Interval2Prefix
+version: 0.02
+license: perl
+distribution_type: module
+requires:
+  Test::More: 0
+  Test::Pod: 0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Algorithm::Interval2Prefix:
+    file: Interval2Prefix.pm
+    version: 0.02
+generated_by: Module::Build version 0.21

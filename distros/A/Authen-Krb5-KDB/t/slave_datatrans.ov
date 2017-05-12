@@ -1,0 +1,10 @@
+OpenV*Secure V1.0	
+princ	admin/admin@TEST.ORG		0	0	0	2
+princ	bar@TEST.ORG	max-two-months	800	0	0	2
+princ	baz@TEST.ORG		0	0	0	2
+princ	foo@TEST.ORG	default	800	0	0	2
+princ	kadmin/admin@TEST.ORG		0	0	0	2
+princ	kadmin/changepw@TEST.ORG		0	0	0	2
+princ	kadmin/history@TEST.ORG		0	0	0	2
+policy	default	0	0	5	2	5	1
+policy	max-two-months	0	5266800	5	2	5	1

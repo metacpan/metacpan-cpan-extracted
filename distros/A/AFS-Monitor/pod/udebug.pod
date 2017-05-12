@@ -1,0 +1,353 @@
+#------------------------------------------------------------------------------
+# udebug.pod
+#
+# Copyright © 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+#                  Elizabeth Cassell <e_a_c@mailsnare.net>
+#
+# This library is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<udebug> - Reports status of Ubik process associated with a database server process
+
+=head1 SYNOPSIS
+
+  use AFS::Monitor qw(udebug);
+
+  my $udb = udebug(server => "hostName",
+                   port   => 7002,
+                   long   => 1
+                  );
+
+  $udb = udebug(server => "hostName",
+                port   => 7021
+               );
+
+=head1 DESCRIPTION
+
+The B<udebug> function returns the status of the lightweight
+Ubik process for the database server process identified by
+the B<port> argument that is running on the database server
+machine named by the B<server> argument. The output identifies
+the machines where peer database server processes are running,
+which of them is the synchronization site (Ubik coordinator),
+and the status of the connections between them.
+
+=head1 OPTIONS
+
+=over
+
+=item B<server>
+
+Names the database server machine that is running the process
+for which to collect status information. Provide the machine's
+IP address in dotted decimal format, its fully qualified host
+name (for example, B<fs1.abc.com>), or the shortest abbreviated
+form of its host name that distinguishes it from other machines.
+Successful use of an abbreviated form depends on the availability
+of a name resolution service (such as the Domain Name Service
+or a local host table) at the time the function is issued.
+
+=item B<port>
+
+Identifies the database server process for which to collect
+status information, either by its process name or port number.
+Provide one of the following values:
+
+=over
+
+=item *
+
+B<buserver> or B<7021> for the Backup Server
+
+=item *
+
+B<kaserver> or B<7004> for the Authentication Server
+
+=item *
+
+B<ptserver> or B<7002> for the Protection Server
+
+=item *
+
+B<vlserver> or B<7003> for the Volume Location Server
+
+=back
+
+=item B<long>
+
+Reports additional information about each peer of the machine
+named by the B<server> argument. The information appears by
+default if that machine is the synchronization site.
+
+=back
+
+=head1 OUTPUT
+
+Returns a reference to a hash containing all of the collected data.
+Below is a list of keys that the hash may contain:
+
+=over
+
+=item B<interfaceAddr>
+
+A reference to an array containing the IP addresses that are
+configured with the operating system on the machine specified
+by the B<server> argument.
+
+=item B<now>
+
+The time according to the clock on the database server machine
+specified by the B<server> argument, measured in seconds since the
+Epoch (00:00:00 UTC, January 1, 1970). For correct Ubik operation,
+the database server machine clocks must agree on the time.
+
+=item B<lastYesHost>, B<lastYesTime> and B<lastYesClaim>
+
+If the B<udebug> function was issues during the coordinator election
+process and voting has not yet begun, this key will not exist.
+Otherwise, this key indicates which peer this Ubik process last voted
+for as coordinator (it can vote for itself). The key B<lastYesTime>
+contains the time (in seconds since the Epoch), of the vote. The key
+B<lastYesClaim> contains the time (in seconds since the Epoch) that the
+Ubik coordinator requested confirming votes from the secondary sites.
+Usually, the B<lastYesTime> and B<lastYesClaim> values are the same;
+a difference between them can indicate clock skew or a slow network
+connection between the two database server machines. A small difference
+is not harmful.
+
+=item B<localVersion>
+
+A reference to a hash containing information about the current
+version number of the database maintained by this Ubik process.
+It has two entries:
+
+=over
+
+=item B<epoch>
+
+This field is based on a timestamp that reflects when the database
+first changed after the most recent coordinator election.
+
+=item B<counter>
+
+This field indicates the number of changes since the election.
+
+=back
+
+=item B<amSyncSite>, B<syncSiteUntil> and B<nServers>
+
+Indicates whether the Ubik process is the coordinator or not.
+If there are multiple database sites, and the B<server> argument
+names the coordinator (synchronization site), then the B<syncSiteUntil>
+entry indicates the time (in seconds since the Epoch) the site will
+remain coordinator even if the next attempt to maintain quorum fails.
+The entry B<nServers> indicates how many sites are participating
+in the quorum.
+
+=item B<recoveryState>
+
+If there are multiple database sites, and the B<server> argument
+names the coordinator (synchronization site), then this entry will
+contain a hexadecimal number that indicates the current state of the quorum.
+A value of C<1f> indicates complete database synchronization, whereas a value
+of C<f> means that the coordinator has the correct database but cannot contact
+all secondary sites to determine if they also have it. Lesser values are
+acceptable if the B<udebug> function is issued during coordinator election, but
+they denote a problem if they persist. The individual flags have the
+following meanings:
+
+=over
+
+=item C<0x1>
+
+This machine is the coordinator
+
+=item C<0x2>
+
+The coordinator has determined which site has the database with the highest
+version number
+
+=item C<0x4>
+
+The coordinator has a copy of the database with the highest version number
+
+=item C<0x8>
+
+The database's version number has been updated correctly
+
+=item C<0x10>
+
+All sites have the database with the highest version number
+
+=back
+
+=item B<activeWrite>, B<epochTime> and B<tidCounter>
+
+Indicates whether the B<udebug> function was issued while the coordinator was
+writing a change into the database. The entries B<epochTime> and B<tidCounter>
+identify the transaction.
+
+=item B<isClone>
+
+True if the machine named by the B<server> argument is a clone, which can
+never become sync site.
+
+=item B<lowestHost> and B<syncHost>
+
+The B<lowestHost> is the lowest IP address of any peer from which the
+Ubik process has received a message recently, whereas the B<syncHost>
+is the IP address of the current coordinator. If they differ, the machine
+with the lowest IP address is not currently the coordinator. The Ubik
+process continues voting for the current coordinator as long as they
+remain in contact, which provides for maximum stability. However, in
+the event of another coordinator election, this Ubik process votes for
+the B<lowestHost> site instead (assuming they are in contact), because
+it has a bias to vote in elections for the site with the lowest IP address.
+
+=item B<lowestTime>
+
+The time (in seconds since the Epoch) that the B<lowestHost> (see above) was set.
+
+=item B<syncTime>
+
+The time (in seconds since the Epoch) that the B<syncHost> (see above) was set.
+
+=item B<syncVersion>
+
+A reference to a hash containing two entries, B<epoch> and B<counter>,
+indicating the version number of the database at the synchronization site,
+which needs to match the version number of the local databse, indicated
+by B<localVersion> (see above).
+
+=item B<lockedPages> and B<writeLockedPages>
+
+Indicates how many VLDB records are currently locked for any operation
+or for writing in particular. The values are nonzero if the B<udebug> function
+is issued while an operation is in progress.
+
+=item B<anyReadLocks> and B<anyWriteLocks>
+
+These values are true if there are any read or write locks on database records.
+
+=item B<currentTrans> and B<writeTrans>
+
+These values are true if there are any read or write transactions in
+progress when the B<udebug> function is issued.
+
+=item B<syncTid>
+
+A reference to a hash containing two entries, B<epoch> and B<counter>, indicating
+the transaction tid for the transaction indicated by B<currentTrans> or B<writeTrans>
+above.
+
+=item B<epochTime>
+
+If the machine named by the B<server> argument is the coordinator,
+this reports the time (in seconds since the Epoch) the current coordinator
+last updated the database.
+
+=item B<servers>
+
+If the machine named by the B<server> argument is the coordinator, B<servers>
+will contain a reference to an array with an entry for each secondary site
+that is participating in the quorum, in the format of hash references
+containing the following entries:
+
+=over
+
+=item B<addr>
+
+The site's IP address
+
+=item B<remoteVersion>
+
+A hash reference containing the entries B<epoch> and B<counter>,
+indicating the version number of the database it is maintaining.
+
+=item B<isClone>
+
+True if the site is only a clone.
+
+=item B<lastVoteTime>
+
+The time, in seconds since the Epoch, the coordinator last received a vote
+message from the Ubik process at the site.
+If the B<udebug> function is issued during the coordinator election process
+and voting has not yet begun, this will be 0.
+
+=item B<lastBeaconSent>
+
+The time, in seconds since the Epoch, the coordinator last requested a vote message.
+If the B<udebug> function is issued during the coordinator election process
+and voting has not yet begun, this will be 0.
+
+=item B<lastVote>
+
+True if the last vote was yes; false if the last vote was no.
+
+=item B<currentDB>
+
+1 if the site has the database with the highest version number, 0 if it does not.
+
+=item B<up>
+
+1 if the Ubik process at the site is functioning correctly, 0 if it is not.
+
+=item B<beaconSinceDown>
+
+1 if the site has responded to the coordinator's last request for votes, 0 if it has not
+
+=back
+
+Including the B<long> flag produces peer entries even when the B<server>
+argument names a secondary site, but in that case only the ip address is
+guaranteed to be accurate. For example, the value in the B<remoteVersion> field
+is usually 0.0, because secondary sites do not poll their peers for this
+information. The values in the B<lastVoteTime> and B<lastBeaconSent> fields
+indicate when this site last received or requested a vote as coordinator; they
+generally indicate the time of the last coordinator election.
+
+=back
+
+For further details of interpreting the contents of the returned hash
+reference, and an example of printing its entire contents in a readable
+format, refer to the B<udebug> script in the B<examples> directory.
+
+=head1 AUTHORS
+
+The code and documentation for this class were contributed by Stanford
+Linear Accelerator Center, a department of Stanford University.  This
+documentation was written by
+
+=over
+
+=item Elizabeth Cassell <e_a_c@mailsnare.net> and
+
+=item Alf Wachsmann <alfw@slac.stanford.edu>
+
+=back
+
+=head1 COPYRIGHT AND DISCLAIMER
+
+ Copyright 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+                Elizabeth Cassell <e_a_c@mailsnare.net>
+ All rights reserved.
+
+ Most of the explanations in this document are taken from the original
+ AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ Volume Server/Volume Location Server Interface
+ Edward R. Zayas
+ (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ (c) IBM Corporation 2000.
+ All rights reserved.
+
+ This library is free software; you can redistribute it and/or modify it
+ under the same terms as Perl itself.

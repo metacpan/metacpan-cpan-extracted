@@ -1,0 +1,12 @@
+Apache::PSP is a module which allows Perl Server Pages to be used within an
+Apache/mod_perl environment. Perl Server Pages allow arbitrary Perl to be
+embedded in HTML pages, which are compiled into Perl programs and executed
+persistently. PSP pages can also define and use custom HTML-like tags which
+provide shortcuts to program functions.
+
+Perl Server Pages are explored in more detail in Chapter 12 of Perl for the Web
+(New Riders 2001).
+
+Copyright (c) 2002-2004 Chris Radcliff. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same terms 
+as Perl itself.

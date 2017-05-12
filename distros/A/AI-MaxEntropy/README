@@ -1,0 +1,322 @@
+NAME
+    AI::MaxEntropy - Perl extension for learning Maximum Entropy Models
+
+SYNOPSIS
+      use AI::MaxEntropy;
+
+      # create a maximum entropy learner
+      my $me = AI::MaxEntropy->new; 
+  
+      # the learner see 2 red round smooth apples
+      $me->see(['round', 'smooth', 'red'] => 'apple' => 2);
+  
+      # the learner see 3 yellow long smooth bananas
+      $me->see(['long', 'smooth', 'yellow'] => 'banana' => 3);
+
+      # and more
+
+      # samples needn't have the same numbers of active features
+      $me->see(['rough', 'big'] => 'pomelo');
+
+      # the order of active features is not concerned, too
+      $me->see(['big', 'rough'] => 'pomelo');
+
+      # ...
+
+      # and, let it learn
+      my $model = $me->learn;
+
+      # then, we can make predictions on unseen data
+
+      # ask what a red thing is most likely to be
+      print $model->predict(['red'])."\n";
+      # the answer is apple, because all red things the learner have ever seen
+      # are apples
+  
+      # ask what a smooth thing is most likely to be
+      print $model->predict(['smooth'])."\n";
+      # the answer is banana, because the learner have seen more smooth bananas
+      # (weighted 3) than smooth apples (weighted 2)
+
+      # ask what a red, long thing is most likely to be
+      print $model->predict(['red', 'long'])."\n";
+      # the answer is banana, because the learner have seen more long bananas
+      # (weighted 3) than red apples (weighted 2)
+
+      # print out scores of all possible answers to the feature round and red
+      for ($model->all_labels) {
+          my $s = $model->score(['round', 'red'] => $_);
+          print "$_: $s\n";
+      }
+  
+      # save the model
+      $model->save('model_file');
+
+      # load the model
+      $model->load('model_file');
+
+CONCEPTS
+  What is a Maximum Entropy model?
+    Maximum Entropy (ME) model is a popular approach for machine learning.
+    From a user's view, it just behaves like a classifier which classify
+    things according to the previously learnt things.
+
+    Theorically, a ME learner try to recover the real probability
+    distribution of the data based on limited number of observations, by
+    applying the principle of maximum entropy.
+
+    You can find some good tutorials on Maximum Entropy model here:
+
+    <http://homepages.inf.ed.ac.uk/s0450736/maxent.html>
+
+  Features
+    Generally, a feature is a binary function answers a yes-no question on a
+    specified piece of data.
+
+    For examples,
+
+      "Is it a red apple?"
+
+      "Is it a yellow banana?"
+
+    If the answer is yes, we say this feature is active on that piece of
+    data.
+
+    In practise, a feature is usually represented as a tuple "<x, y>". For
+    examples, the above two features can be represented as
+
+      <red, apple>
+
+      <yellow, banana>
+
+  Samples
+    A sample is a set of active features, all of which share a common "y".
+    This common "y" is sometimes called label or tag. For example, we have a
+    big round red apple, the correpsonding sample is
+
+      {<big, apple>, <round, apple>, <red, apple>}
+
+    In this module, a samples is denoted in Perl code as
+
+      $xs => $y => $w
+
+    $xs is an array ref holding all "x", $y is a scalar holding the label
+    and $w is the weight of the sample, which tells how many times the
+    sample occurs.
+
+    Therefore, the above sample can be denoted as
+
+      ['big', 'round', 'red'] => 'apple' => 1.0
+
+    The weight $w can be ommited when it equals to 1.0, so the above
+    denotation can be shorten to
+
+      ['big', 'round', 'red'] => 'apple'
+
+  Models
+    With a set of samples, a model can be learnt for future predictions. The
+    model (the lambda vector essentailly) is a knowledge representation of
+    the samples that it have seen before. By applying the model, we can
+    calculate the probability of each possible label for a certain sample.
+    And choose the most possible one according to these probabilities.
+
+FUNCTIONS
+    NOTE: This is still an alpha version, the APIs may be changed in future
+    versions.
+
+  new
+    Create a Maximum Entropy learner. Optionally, initial values of
+    properties can be specified.
+
+      my $me1 = AI::MaxEntropy->new;
+      my $me2 = AI::MaxEntropy->new(
+          algorithm => { epsilon => 1e-6 });
+      my $me3 = AI::MaxEntropy->new(
+          algorithm => { m => 7, epsilon => 1e-4 },
+          smoother => { type => 'gaussian', sigma => 0.8 }
+      );
+
+  see
+    Let the Maximum Entropy learner see a sample.
+
+      my $me = AI::MaxEntropy->new;
+
+      # see a sample with default weight 1.0
+      $me->see(['red', 'round'] => 'apple');
+  
+      # see a sample with specified weight 0.5
+      $me->see(['yellow', 'long'] => 'banana' => 0.5);
+
+    The sample can be also represented in the attribute-value form, which
+    like
+
+      $me->see({color => 'yellow', shape => 'long'} => 'banana');
+      $me->see({color => ['red', 'green'], shape => 'round'} => 'apple');
+
+    Actually, the two samples above are converted internally to,
+
+      $me->see(['color:yellow', 'shape:long'] => 'banana');
+      $me->see(['color:red', 'color:green', 'shape:round'] => 'apple');
+
+  forget_all
+    Forget all samples the learner have seen previously.
+
+  cut
+    Cut the features that occur less than the specified number.
+
+    For example,
+
+      ...
+      $me->cut(1)
+
+    will cut all features that occur less than one time.
+
+  learn
+    Learn a model from all the samples that the learner have seen so far,
+    returns an AI::MaxEntropy::Model object, which can be used to make
+    prediction on unlabeled samples.
+
+      ...
+
+      my $model = $me->learn;
+
+      print $model->predict(['x1', 'x2', ...]);
+
+PROPERTIES
+  algorithm
+    This property enables client program to choose different algorithms for
+    learning the ME model and set their parameters.
+
+    There are mainly 3 algorithm for learning ME models, they are GIS, IIS
+    and L-BFGS. This module implements 2 of them, namely, L-BFGS and GIS.
+    L-BFGS provides full functionality, while GIS runs faster, but only
+    applicable on limited scenarios.
+
+    To use GIS, the following conditions must be satisified:
+
+    1. All samples have same number of active features
+
+    2. No feature has been cut
+
+    3. No smoother is used (in fact, the property "smoother" is simplly
+    ignored when the type of algorithm equal to 'gis').
+
+    This property "algorithm" is supposed to be a hash ref, like
+
+      {
+        type => ...,
+        progress_cb => ...,
+        param_1 => ...,
+        param_2 => ...,
+        ...,
+        param_n => ...
+      }
+
+   type
+    The entry "type => ..." specifies which algorithm is used for the
+    optimization. Valid values include:
+
+      'lbfgs'       Limited-memory Broyden-Fletcher-Goldfarb-Shanno (L-BFGS)
+      'gis'         General Iterative Scaling (GIS)
+
+    If ommited, 'lbfgs' is used by default.
+
+   progress_cb
+    The entry "progress_cb => ..." specifies the progress callback
+    subroutine which is used to trace the process of the algorithm. The
+    specified callback routine will be called at each iteration of the
+    algorithm.
+
+    For L-BFGS, "progress_cb" will be directly passed to "fmin" in
+    Algorithm::LBFGS. f(x) is the negative log-likelihood of current lambda
+    vector.
+
+    For GIS, the "progress_cb" is supposed to have a prototype like
+
+      progress_cb(i, lambda, d_lambda, lambda_norm, d_lambda_norm)
+
+    "i" is the number of the iterations, "lambda" is an array ref containing
+    the current lambda vector, "d_lambda" is an array ref containing the
+    delta of the lambda vector in current iteration, "lambda_norm" and
+    "d_lambda_norm" are Euclid norms of "lambda" and "d_lambda"
+    respectively.
+
+    For both L-BFGS and GIS, the client program can also pass a string
+    'verbose' to "progress_cb" to use a default progress callback which
+    simply print out the progress on the screen.
+
+    "progress_cb" can also be omitted if the client program do not want to
+    trace the progress.
+
+   parameters
+    The rest entries are parameters for the specified algorithm. Each
+    parameter will be assigned with its default value when it is not given
+    explicitly.
+
+    For L-BFGS, the parameters will be directly passed to Algorithm::LBFGS
+    object, please refer to "Parameters" in Algorithm::LBFGS for details.
+
+    For GIS, there is only one parameter "epsilon", which controls the
+    precision of the algorithm (similar to the "epsilon" in
+    Algorithm::LBFGS). Generally speaking, a smaller "epsilon" produces a
+    more precise result. The default value of "epsilon" is 1e-3.
+
+  smoother
+    The smoother is a solution to the over-fitting problem. This property
+    chooses which type of smoother the client program want to apply and sets
+    the smoothing parameters.
+
+    Only one smoother have been implemented in this version of the module,
+    the Gaussian smoother.
+
+    One can apply the Gaussian smoother as following,
+
+      my $me = AI::MaxEntropy->new(
+          smoother => { type => 'gaussian', sigma => 0.6 }
+      );
+
+    The parameter "sigma" indicates the strength of smoothing. Usually,
+    sigma is a positive number no greater than 1.0. The strength of
+    smoothing grows as sigma getting close to 0.
+
+SEE ALSO
+    AI::MaxEntropy::Model, AI::MaxEntropy::Util
+
+    Algorithm::LBFGS
+
+    Statistics::MaxEntropy, Algorithm::CRF, Algorithm::SVM, AI::DecisionTree
+
+AUTHOR
+    Laye Suen, <laye@cpan.org>
+
+COPYRIGHT AND LICENSE
+    The MIT License
+
+    Copyright (C) 2008, Laye Suen
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+REFERENCE
+    A. L. Berge, V. J. Della Pietra, S. A. Della Pietra. A Maximum Entropy
+    Approach to Natural Language Processing, Computational Linguistics,
+    1996.
+    S. F. Chen, R. Rosenfeld. A Gaussian Prior for Smoothing Maximum Entropy
+    Models, February 1999 CMU-CS-99-108.
+

@@ -1,0 +1,26 @@
+Revision history for App-Provision-Tiny
+
+0.0402 2014-08-30
+    - Fixed POD
+
+0.0401 2014-03-16
+    - Enabled --release specification/requirement.
+    - Improved documentation.
+
+0.04  2014-03-15
+    - Used meet() instead of whatever_the_plugin_is_named().
+    - Allowed --force.
+    - Vastly improved existing plugin logic.
+    - Added plugins for Cpanm, Sourcetree & Wget.
+    - Added the beginnings of dependency meeting.
+
+0.03  2014-03-12
+    - Replaced App::Provision::Foo::foo() with the meet() method.
+    - Improved documentation.
+
+0.02  2014-02-26
+    - Added multi system recipe definition (currently osx and apt).
+
+0.01  2014-02-23
+    - Imported functionality from devel repo.
+    - Minted by Dist::Zilla

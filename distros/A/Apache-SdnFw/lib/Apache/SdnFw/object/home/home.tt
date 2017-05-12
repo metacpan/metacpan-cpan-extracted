@@ -1,0 +1,21 @@
+<div class="floatleft">
+<table>
+[% cat = 0 %]
+[% FOREACH l IN list %]
+	[% IF s.employee.object.exists(l.code) %]
+		[% IF cat != l.cat_name %]
+			[% IF cat == 0 %]
+			<caption>[% l.cat_name %]</caption><tbody>
+			[% ELSE %]
+			</tbody></table></div><div class="floatleft"><table><caption>[% l.cat_name %]</caption><tbody>
+			[% END %]
+			[% cat = l.cat_name %]
+		[% END %]
+		<tr>
+			<td><a href="[% s.ubase %]/[% l.code %]">[% l.name %]</a></td>
+		</tr>
+	[% END %]
+[% END %]
+	</tbody>
+</table>
+</div>

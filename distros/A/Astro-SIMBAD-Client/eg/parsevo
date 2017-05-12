@@ -1,0 +1,62 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use Astro::SIMBAD::Client;
+use Data::Dumper;
+
+foreach (@ARGV) {
+    print Dumper (parse ($_));
+}
+
+sub parse {
+    my $fn = shift;
+    -e $fn or die "Error - File $fn does not exist.\n";
+    open (my $fh, '<', $fn) or die <<eod;
+Error - Failed to open $fn
+        $!
+eod
+    local $/ = undef;
+    my $data = <$fh>;
+    close $fh;
+    return [Astro::SIMBAD::Client::Parse_VO_Table ($data)];
+}
+__END__
+
+=head1 TITLE
+
+parsevo - Parse a F<votable> file and dump the result
+
+=head1 SYNOPSIS
+
+ vparsevo arcturus.vo
+
+=head1 OPTIONS
+
+None.
+
+=head1 DETAILS
+
+This script uses the L<Astro::SIMBAD::Client|Astro::SIMBAD::Client>
+L<Parse_VO_Table()|Astro::SIMBAD::Client/Parse_VO_Table> subroutine to
+parse one or more files in C<votable> format, and display the result in
+L<Data::Dumper|Data::Dumper> format.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006, 2008, 2010-2016 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+# ex: set textwidth=72 :

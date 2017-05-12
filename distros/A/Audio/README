@@ -1,0 +1,38 @@
+This is the beginings of Audio manipulation routines for perl.
+
+Currently can load or save Sun/Next .au/.snd files and play them 
+via Network Audio Server (from ftp.x.org) or native /dev/audio
+on Suns. 
+
+Now also works on Win32.
+
+There is an attempt at several other drivers as well but I have no 
+way of testing them.
+
+Anyone who knows how to configure RedHat Linux 5.1 to work with 
+Ensoniq AudioPCI (as in my Gateway G6-400) please let me know ;-)
+
+Copyright (c) 1996-1998 Nick Ing-Simmons. All rights reserved.  
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.              
+
+This license is inherited from Win32 audio driver which has been adapted from
+the one for Timidity.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+Three trivial "applications" are included : 
+
+   pplay example.au  # play .au files
+   morse perl5       # sound out string in morse code
+   dial  123456      # sound touchtone dial tones

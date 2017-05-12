@@ -1,0 +1,2 @@
+w1: perl -e 'print time(),"\n"'
+w2: perl -e 'print time(),"\n"'

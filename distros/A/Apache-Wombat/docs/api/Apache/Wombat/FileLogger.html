@@ -1,0 +1,126 @@
+<HTML>
+<HEAD>
+<TITLE>Apache::Wombat::FileLogger - Apache file logger class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#lifecycle methods">LIFECYCLE METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Apache::Wombat::FileLogger - Apache file logger class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  my $logger = Apache::Wombat::FileLogger-&gt;new();
+  $logger-&gt;setFileName(&quot;/var/log/wombat/wombat.log&quot;);
+  $logger-&gt;log(&quot;this will show up in the log file&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Logger class that uses <STRONG>Apache::LogFile</STRONG> to write to a log file.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::Logger::FileLogger</STRONG> instance,
+initializing fields appropriately. If subclasses override the
+constructor, they must be sure to call
+<PRE>
+  $self-&gt;SUPER::new();</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getFilename"><CODE>getFilename()</CODE></A></STRONG><BR>
+<DD>
+Return the name of the file that is the log destination.
+<P></P>
+<DT><STRONG><A NAME="item_setFilename"><CODE>setFilename($filename)</CODE></A></STRONG><BR>
+<DD>
+Set the name of the file that is the log destination.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24filename">$filename</A></STRONG><BR>
+<DD>
+the name of the file
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_write"><CODE>write($string)</CODE></A></STRONG><BR>
+<DD>
+Write the specified string to the log destination. The default
+implementation does nothing. Subclasses must override this method.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24string">$string</A></STRONG><BR>
+<DD>
+the string to write to the log destination
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="lifecycle methods">LIFECYCLE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_start"><CODE>start()</CODE></A></STRONG><BR>
+<DD>
+Prepare for the beginning of active use of this Logger by opening the
+file.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Wombat%3A%3ALifecycleException"><STRONG>Wombat::LifecycleException</STRONG></A></STRONG><BR>
+<DD>
+if the file cannot be opened
+<P></P></DL>
+<DT><STRONG><A NAME="item_stop"><CODE>stop()</CODE></A></STRONG><BR>
+<DD>
+Gracefully terminate the active use of this Logger by closing the
+file.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Wombat::LifecycleException</STRONG></STRONG><BR>
+<DD>
+if the file cannot be closed
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Apache/LogFile.html">the Apache::LogFile manpage</A>,
+<A HREF="../../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A>,
+<A HREF="../../../api/Wombat/Logger/LoggerBase.html">the Wombat::Logger::LoggerBase manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

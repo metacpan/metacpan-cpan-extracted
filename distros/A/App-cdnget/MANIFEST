@@ -1,0 +1,14 @@
+Changes
+lib/App/cdnget.pm
+lib/App/cdnget/Downloader.pm
+lib/App/cdnget/Exception.pm
+lib/App/cdnget/Worker.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+t/App-cdnget.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

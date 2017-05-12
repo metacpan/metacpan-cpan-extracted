@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - ars_GetListServer</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_GetListServer()</CODE></H2>
+
+      This function determines what servers are available from the machine
+      that the script is running on.<P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns an array of one or more servers as defined in 
+              the <CODE>/etc/ar</CODE> file.
+          <DT><B>On failure</B><DD>
+              Returns <CODE>undef</CODE>.
+      </DL>
+
+      <P>Example:
+
+<PRE>
+      @servers = ars_GetListServer();
+      for($i = 0; $i &lt;= $#servers ; $i++) {
+           print "$servers[$i]\n";
+      }
+</PRE>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 26th June 1997 by d.j.adams@soton.ac.uk<br>
+&#169; J.C.Murphy, J.W.Murphy 1997 arsperl@arsperl.org
+</address>
+</BODY>
+</HTML>

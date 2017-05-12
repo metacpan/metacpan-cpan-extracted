@@ -1,0 +1,17 @@
+DESCRIPTION
+
+    This distribution is only for testing (originally, to test
+    Dist::Zilla::Plugin::Rinci::AddPrereqs).
+
+    This distribution includes the following CLI utilities:
+
+    #INSERT_EXECS_LIST
+
+    They are Perinci::CmdLine::Lite-based versions of the same CLI
+    utilities distributed in App::ZodiacUtils (which are
+    Perinci::CmdLine::Inline-based).
+
+SEE ALSO
+
+    App::ZodiacUtils
+

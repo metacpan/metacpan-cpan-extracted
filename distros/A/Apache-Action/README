@@ -1,0 +1,146 @@
+NAME
+    Apache::Action - A method dispatch mechanism for Apache
+
+SYNOPSIS
+            # An Apache handler to manage the cycle.
+            package My::Apache::Handler;
+            my $ah = new HTML::Mason::ApacheHandler...);
+            sub handler {
+                    my ($r) = @_;
+                    ...
+                    tie %SESSION, 'Apache::Session::....';
+                    my $state = new Apache::Action::State(  # Or custom state class
+                            Request => $r,
+                            Session => \%SESSION,
+                                    );
+                    my $action = new Apache::Action(
+                            Request => $r,
+                            Session => \%SESSION,
+                            State   => $state,
+                                    );
+                    my $status = eval { $action->run; };
+                    if ($@) { $state->error($@); $status = SERVER_ERROR; }
+                    unless ($status == OK) {
+                            my $subreq = $r->lookup_uri('/error.html');
+                            $r->filename($subreq->filename);
+                    }
+                    return $ah->handle_request($r);
+            }
+
+            # A set of action handlers
+            package My::Apache::Actions;
+            use base 'Apache::Action';
+            __PACKAGE__->register('AppName', 'ObjectName',
+                    action0 => \&handler0,
+                    action1 => \&handler1,
+                    ...
+                            );
+            sub handler0 {
+                    my ($self) = @_;
+                    # my $user = $self->state->user;        # If user defined.
+            }
+
+DESCRIPTION
+    This module reads values out of the HTTP submission and dispatches to
+    code as appropriate. The architecture requires four elements:
+
+    The apache request
+        This is normally a singleton instance of Apache::Request.
+
+    The persistent session
+        This is usually an Apache::Session, but anything which provides a
+        hashref will do. The session stores the persistent data, and may be
+        serialised by any method desired.
+
+    A request state
+        This is usually a subclass of Apache::Action::State and stores
+        nonserialisable and per-request data.
+
+    An action dispatcher.
+        This is an Apache::Action instance.
+
+    It is normal to write a class which inherits Apache::Action::State,
+    which generates and caches nonserialisable or non-normalised data on
+    demand. Things like user id may be stored in the session, and the state
+    may then provide a 'user' method which reads the user-id from the
+    session and retrieves the user from the database, caching the object for
+    the duration of the request. See eg/State.pm in this distribution for an
+    example.
+
+    Loaded modules may register actions with Apache::Action using the
+    'register' call, as described above. When an Apache::Action is 'run', it
+    looks for the field 'action' in the HTTP request parameters. This field
+    is of the form "application/module/action". It will then call the
+    appropriate subref, passing itself as the one and only parameter.
+
+    When using this module with HTML::Mason, it is normal to exoprt the
+    state and the session into the HTML::Mason::Commands namespace so that
+    they can be accessed by pages.
+
+METHODS
+    Apache::Action->register($app, $module, $action)
+        Register a new action with Apache::Action. This is a class method
+        and is designed to be called from the top level of any loaded Perl
+        module. See eg/Feedback.pm for an example.
+
+    Apache::Action->new(...)
+        Construct a new Action object. This reqires three parameters:
+        Request, Session and State. The Request is an Apache::Request
+        instance. The Session is usually an Apache::Session instance but may
+        be any session hash. The State is an instance of
+        Apache::Action::State;
+
+    $action->run()
+        Search the HTTP arguments in the Request, and run an action, if
+        appropriate.
+
+    $action->param($name)
+        Return the HTTP parameter named.
+
+    $action->params($name)
+        Return a hashref of all HTTP parameters, copying the data.
+
+    $action->upload
+        Return an Apache::Upload object as named.
+
+    $action->session($name)
+        Return data from the session hash, as named.
+
+    $action->session($name, $value)
+        Store data in the session hash, as named.
+
+    $action->error($error)
+        Record that an error happened during this execution. The action
+        object will add the errors to the state object at the end of the
+        run. It is the responsibility of the Apache handler writer to check
+        whether any errors were recorded in the action object before
+        continuing. This method merely provides a log.
+
+    $action->errors()
+        Return a list of errors recorded in this execution.
+
+BUGS
+    Mostly documentation. This code has been pulled out of a running system
+    and patched up for CPAN, so patches welcome if it doesn't run as
+    smoothly as expected outside of that system.
+
+    This module is quite hard to test outside Apache.
+
+SUPPORT
+    Mail the author at <cpan@anarres.org>
+
+AUTHOR
+            Shevek
+            CPAN ID: SHEVEK
+            cpan@anarres.org
+            http://www.anarres.org/projects/
+
+COPYRIGHT
+    Copyright (c) 2004 Shevek. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Apache::Action::State Apache::Session HTML::Mason
+

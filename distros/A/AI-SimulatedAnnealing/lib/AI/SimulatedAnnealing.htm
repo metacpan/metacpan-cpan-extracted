@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>AI::SimulatedAnnealing &#8211; optimize a list of numbers
+      according to a specified cost function.</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <link href="mailto:" rev="made"/>
+  </head>
+  <body style="background-color: white">
+    <ul>
+      <li><a href="#name">NAME</a></li>
+      <li><a href="#synopsis">SYNOPSIS</a></li>
+      <li><a href="#description">DESCRIPTION</a></li>
+      <li><a href="#prerequisites">PREREQUISITES</a></li>
+      <li><a href="#methods">METHODS</a></li>
+      <li><a href="#author">AUTHOR</a></li>
+      <li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+    </ul>
+    <hr/>
+    <h1><a name="name">NAME</a></h1>
+    <p>AI::SimulatedAnnealing &#8211; optimize a list of numbers according
+      to a specified cost function.</p>
+    <hr/>
+    <h1><a name="synopsis">SYNOPSIS</a></h1>
+    <pre>
+  <span class="keyword">use</span> <span class="variable">AI::SimulatedAnnealing</span><span class="operator">;</span>
+</pre>
+    <pre>
+  <span class="variable">$optimized_list</span> <span class="operator">=</span> <span class="variable">anneal</span><span class="operator">(</span><span class="variable">$number_specs</span><span class="operator">,</span> <span class="variable">$cost_function</span><span class="operator">,</span> <span class="variable">$cycles_per_temperature</span><span class="operator">);</span>
+</pre>
+    <hr/>
+    <h1><a name="description">DESCRIPTION</a></h1>
+    <p>This module provides a single public function, <a
+      href="#anneal"><code>anneal()</code></a>, that optimizes a list of
+      numbers according to a specified cost function.</p>
+    <p>Each number to be optimized has a lower bound, an upper bound, and a
+      precision, where the precision is an integer in the range 0&#8211;4
+      that specifies the number of decimal places to which all instances of
+      the number will be rounded. The upper bound must be greater than the
+      lower bound but not greater than 10 to the power of
+      <code>(4&#160;-&#160;p)</code>, where <code>p</code> is the precision.
+      The lower bound must be not less than <code>-1</code> times the result
+      of taking 10 to the power of <code>(4&#160;-&#160;p)</code>.</p>
+    <p>A bound that has a higher degree of precision than that specified for
+      the number to which the bound applies is rounded inward (that is,
+      downward for an upper bound and upward for a lower bound) to the
+      nearest instance of the specified precision.</p>
+    <p>The attributes of a number (bounds and precision) are encapsulated
+      within a number specification, which is a reference to a hash
+      containing <code>&quot;LowerBound&quot;</code>,
+      <code>&quot;UpperBound&quot;</code>, and
+      <code>&quot;Precision&quot;</code> fields.</p>
+    <p>The <a href="#anneal"><code>anneal()</code></a> function takes a
+      reference to an array of number specifications, a cost function, and a
+      positive integer specifying the number of randomization cycles per
+      temperature to perform. The <code>anneal()</code> function returns a
+      reference to an array having the same length as the array of number
+      specifications. The returned list represents the optimal list of
+      numbers matching the specified attributes, where &quot;optimal&quot;
+      means producing the lowest cost.</p>
+    <p>The cost function must take a reference to an array of numbers that
+      match the number specifications. The function must return a single
+      number representing a cost to be minimized.</p>
+    <p>In order to work efficiently with the varying precisions, the
+      <code>anneal()</code> function converts each bound to an integer by
+      multiplying it by 10 to the power of the precision; then the function
+      performs the temperature reductions and randomization cycles (which
+      include tests performed via calls to the cost function) on integers in
+      the resulting ranges. When passing an integer to the cost function or
+      when storing the integer in a collection of numbers to be returned by
+      the function, <code>anneal()</code> first converts the integer back to
+      the appropriate decimal number by dividing the integer by 10 to the
+      power of the precision.</p>
+    <p>The initial temperature is the size of the largest range after the
+      bounds have been converted to integers. During each temperature
+      reduction, the <code>anneal()</code> function multiplies the
+      temperature by 0.95 and then rounds the result down to the nearest
+      integer (if the result isn&#39;t already an integer). When the
+      temperature reaches zero, annealing is immediately terminated.</p>
+    <p style="margin-left: 13px;"><b>Note:</b>  Annealing can sometimes
+      complete before the temperature reaches zero if, after a particular
+      temperature reduction, a brute-force optimization approach (that is,
+      testing every possible combination of numbers within the subranges
+      determined by the new temperature) would produce a number of tests
+      that is less than or equal to the specified cycles per temperature.
+      In that case, the <code>anneal()</code> function performs the
+      brute-force optimization to complete the annealing process.</p>
+    <p>After a temperature reduction, the <code>anneal()</code> function
+      determines each new subrange such that the current optimal integer
+      from the total range is as close as possible to the center of the new
+      subrange. When there is a tie between two possible positions for the
+      subrange within the total range, a &quot;coin flip&quot; decides.</p>
+    <hr/>
+    <h1><a name="prerequisites">PREREQUISITES</a></h1>
+    <p>This module requires Perl 5, version 5.10.1 or later.</p>
+    <hr/>
+    <h1><a name="methods">METHODS</a></h1>
+    <dl>
+      <dt><strong><a class="item" name="anneal">anneal($number_specs,
+        $cost_function, $cycles_per_temperature);</a></strong></dt>
+      <dd>
+        <p>The <code>anneal()</code> function takes a reference to an array
+          of number specifications (which are references to hashes
+          containing <code>&quot;LowerBound&quot;</code>,
+          <code>&quot;UpperBound&quot;</code>, and
+          <code>&quot;Precision&quot;</code> fields), a code reference
+          pointing to a cost function (which takes a list of numbers
+          matching the specifications and returns a number representing a
+          cost to be minimized), and a positive integer specifying the
+          number of randomization cycles to perform at each temperature.</p>
+        <p>The function returns a reference to an array containing the
+          optimized list of numbers.</p>
+      </dd>
+    </dl>
+    <hr/>
+    <h1><a name="author">AUTHOR</a></h1>
+    <p>Benjamin Fitch, &lt;<a
+      href="mailto:blernflerkl@yahoo.com">blernflerkl@yahoo.com</a>&gt;</p>
+    <hr/>
+    <h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+    <p>Copyright 2010 by Benjamin Fitch.</p>
+    <p>This library is free software; you can redistribute it and/or modify
+      it under the same terms as Perl itself.</p>
+  </body>
+</html>

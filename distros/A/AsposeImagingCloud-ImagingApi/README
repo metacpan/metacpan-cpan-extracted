@@ -1,0 +1,46 @@
+Aspose.Imaging Cloud SDK for Perl
+================================
+
+This repository contains Aspose.Imaging Cloud SDK for Perl source code. This SDK allows you to work with Aspose.Imaging Cloud REST APIs in your perl applications quickly and easily. 
+
+How to use the SDK?
+===================
+
+The complete source code is available in this repository folder. For more details, please visit our documentation website(http://www.aspose.com/docs/display/imagingcloud/How+to+Setup+Aspose.Imaging+Cloud+SDK+for+Perl).
+
+Quick SDK Tutorial
+==================
+
+use lib 'lib';
+use strict;
+use warnings;
+use File::Slurp; # From CPAN
+
+use AsposeImagingCloud::ImagingApi;
+use AsposeImagingCloud::ApiClient;
+use AsposeImagingCloud::Configuration;
+
+$AsposeImagingCloud::Configuration::app_sid = 'XXX';
+$AsposeImagingCloud::Configuration::api_key = 'XXX';
+
+$AsposeImagingCloud::Configuration::debug = 1;
+
+#Instantiate Aspose.Imaging API SDK
+my $imagingApi = AsposeImagingCloud::ImagingApi->new();
+
+my $data_path = '../data/';
+
+#set input file name
+my $name = 'sample.bmp';
+my $bitsPerPixel = 24;
+my $horizontalResolution = 300;
+my $verticalResolution = 300;
+
+#invoke Aspose.Imaging Cloud SDK API to update BMP specific properties without using cloud storage
+my $response = $imagingApi->PostImageBmp(bitsPerPixel => $bitsPerPixel, horizontalResolution => $horizontalResolution, verticalResolution => $verticalResolution, file => $data_path.$name);
+
+if($response->{'Status'} eq 'OK'){
+
+    my $output_file = 'C:/temp/'. $name;
+	write_file($output_file, { binmode => ":raw" }, $response->{'Content'});
+}

@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Apache/Session/Memcached.pm
+lib/Apache/Session/Store/Memcached.pm
+t/00base.t
+t/01cache.t
+t/02flex.t
+t/CONFIG
+t/testlib.pl
+META.yml                                 Module meta-data (added by MakeMaker)

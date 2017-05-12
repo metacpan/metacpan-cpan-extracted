@@ -1,0 +1,25 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::FS qw(mkmount);
+
+my ($mountp, $volume, $rw, $cell, $ok);
+
+die "Usage: $0 mountp volume [rw [cell]]\n" if ($#ARGV < 1);
+
+$mountp = shift;
+$volume = shift;
+$rw     = shift;
+$cell   = shift;
+
+#warn ">$mountp< >$volume< >$rw< >$cell< \n";
+
+if (defined $cell)  { $ok  = mkmount($mountp, $volume, $rw, $cell); }
+elsif (defined $rw) { $ok  = mkmount($mountp, $volume, $rw); }
+else                { $ok  = mkmount($mountp, $volume); }
+
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "ok = $ok\n"; }

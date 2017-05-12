@@ -1,0 +1,95 @@
+{
+   "abstract" : "All about Japanese metal idol unit \"BABYMETAL\"",
+   "author" : [
+      "Hondallica <hondallica@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-BABYMETAL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "DateTime" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::BABYMETAL" : {
+         "file" : "lib/Acme/BABYMETAL.pm",
+         "version" : "0.03"
+      },
+      "Acme::BABYMETAL::Base" : {
+         "file" : "lib/Acme/BABYMETAL/Base.pm",
+         "version" : "0.03"
+      },
+      "Acme::BABYMETAL::MOAMETAL" : {
+         "file" : "lib/Acme/BABYMETAL/MOAMETAL.pm",
+         "version" : "0.03"
+      },
+      "Acme::BABYMETAL::SU_METAL" : {
+         "file" : "lib/Acme/BABYMETAL/SU_METAL.pm",
+         "version" : "0.03"
+      },
+      "Acme::BABYMETAL::YUIMETAL" : {
+         "file" : "lib/Acme/BABYMETAL/YUIMETAL.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hondallica/p5-Acme-BABYMETAL/issues"
+      },
+      "homepage" : "https://github.com/hondallica/p5-Acme-BABYMETAL",
+      "repository" : {
+         "url" : "git://github.com/hondallica/p5-Acme-BABYMETAL.git",
+         "web" : "https://github.com/hondallica/p5-Acme-BABYMETAL"
+      }
+   },
+   "version" : "0.03",
+   "x_authority" : "cpan:HONDALLIC",
+   "x_contributors" : [
+      "Ben Bullock <benkasminbullock@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

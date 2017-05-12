@@ -1,0 +1,45 @@
+Array-Splice
+
+This module does splicing of arrays for real.  That is it exports
+funtions the do exactly the same as the builtin splice() function and
+the push()/unsift() functions except that the inserted elements are
+existing scalar values not copies of them.
+
+This same functionality is provided by Data::Alias.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Array::Splice
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Array-Splice
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Array-Splice
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Array-Splice
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Array-Splice
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Brian McCauley
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

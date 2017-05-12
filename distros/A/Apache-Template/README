@@ -1,0 +1,105 @@
+NAME
+    Apache::Template - Apache/mod_perl interface to the Template Toolkit
+
+SYNOPSIS
+        # add the following to your httpd.conf
+        PerlModule          Apache::Template
+
+        # set various configuration options, e.g.
+        TT2Trim             On
+        TT2PostChomp        On
+        TT2EvalPerl         On
+        TT2IncludePath      /usr/local/tt2/templates
+        TT2IncludePath      /home/abw/tt2/lib
+        TT2PreProcess       config header
+        TT2PostProcess      footer
+        TT2Error            error
+
+        # now define Apache::Template as a PerlHandler, e.g.
+        <Files *.tt2>
+            SetHandler      perl-script
+            PerlHandler     Apache::Template
+        </Files>
+
+        <Location /tt2>
+            SetHandler      perl-script
+            PerlHandler     Apache::Template
+        </Location>
+
+DESCRIPTION
+    The Apache::Template module provides a simple interface to the Template
+    Toolkit from Apache/mod_perl. The Template Toolkit is a fast, powerful
+    and extensible template processing system written in Perl. It implements
+    a general purpose template language which allows you to clearly separate
+    application logic, data and presentation elements. It boasts numerous
+    features to facilitate in the generation of web content both online and
+    offline in "batch mode".
+
+    This documentation describes the Apache::Template module, concerning
+    itself primarily with the Apache/mod_perl configuration options (e.g.
+    the httpd.conf side of things) and not going into any great depth about
+    the Template Toolkit itself. The Template Toolkit includes copious
+    documentation which already covers these things in great detail. See
+    Template and Template::Manual for further information.
+
+INSTALLING Apache::Template
+    The Apache::Template module is installed using the familiar incantation:
+
+        $ perl Makefile.PL
+        $ make
+        $ make test
+        # make install                  # as root
+
+UPGRADING FROM EARLIER VERSIONS OF Apache::Template
+    If you are upgrading from an earlier version of Apache::Template (e.g.
+    0.08 or earlier) then you should pay particular attention to the changes
+    in the TT2Headers option in version 0.09.
+
+    The Content-Type header can now be controlled by the TT2Headers option
+    (to enable or disable it) and by the TT2ContentType option (to set a
+    specific Content-Type).
+
+    If you don't specify any TT2Headers option, then it will default to
+    sending the Content-Type header only, emulating the existing behaviour
+    of Apache::Template 0.08 and earlier. Thus the default is equivalent to
+    the following:
+
+        TT2Headers      type              # default 
+
+    If you do specify a TT2Headers option, then you must now explicitly add
+    the 'type' value to have Apache::Template send the Content-Type header.
+
+        TT2Headers      type length
+
+    If you don't specify 'type' in the TT2Headers option then
+    Apache::Template will not add a Content-Type header.
+
+    The default value for Content-Type is 'text/html' but can now be changed
+    using the TT2ContentType option.
+
+        TT2ContentType  text/xml
+
+CONFIGURATION
+    See 'perldoc Apache::Template' for full details of all the configuration
+    options.
+
+AUTHOR
+    Andy Wardley <abw@wardley.org>, with contributions from Darren
+    Chamberlain (who wrote the 'Grover' module which was integrated into
+    Apache::Template), Mark Fowler, Randal Schwartz, Tony Payne and Rick
+    Myers.
+
+VERSION
+    This is version 0.09 of the Apache::Template module.
+
+COPYRIGHT
+        Copyright (C) 1996-2004 Andy Wardley.  All Rights Reserved.
+        Copyright (C) 1998-2002 Canon Research Centre Europe Ltd.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    For further information about the Template Toolkit, see Template or
+    http://www.template-toolkit.org/
+

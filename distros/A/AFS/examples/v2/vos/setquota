@@ -1,0 +1,30 @@
+#!/usr/local/bin/perl
+
+use v5.10.0;
+use blib;
+use strict;
+use warnings;
+
+use AFS::VOS;
+use Scalar::Util qw(looks_like_number);
+
+my ($vos, $volume, $quota, $clear, $ok);
+
+die "Usage: $0 volume quota [ clear ]\n" if $#ARGV < 1;
+
+$volume = shift;
+$quota  = shift;
+$clear  = shift // 0;
+
+if (defined $quota and !looks_like_number($quota)) { warn "$0: QUOTA is not an INTEGER ...\n"; }
+else                                               { $quota = int($quota); }
+if (defined $clear and !looks_like_number($clear)) { warn "$0: CLEAR is not an INTEGER ...\n"; }
+else                                               { $clear = int($clear); }
+
+$vos = AFS::VOS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+if ($clear) { $ok = $vos->setquota($volume, $quota, $clear); }
+else        { $ok = $vos->setquota($volume, $quota); }
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { printf "Task %s \n", $ok ? "done" : "failed"; }

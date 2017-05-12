@@ -1,0 +1,44 @@
+---
+abstract: 'App Module ad utilities for appspec tool'
+author:
+  - 'Tina Müller <cpan2@tinita.de>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-AppSpec
+provides:
+  App::AppSpec:
+    file: lib/App/AppSpec.pm
+    version: '0.002'
+  App::AppSpec::Schema::Validator:
+    file: lib/App/AppSpec/Schema/Validator.pm
+    version: '0.002'
+requires:
+  App::Spec: '0'
+  App::Spec::Run::Cmd: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Path: '0'
+  File::Share: '0'
+  JSON::Validator: '0'
+  List::Util: '1.33'
+  Moo: '0'
+  Term::ANSIColor: '0'
+  YAML::XS: '0'
+  base: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/perlpunk/App-AppSpec-p5
+version: '0.002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

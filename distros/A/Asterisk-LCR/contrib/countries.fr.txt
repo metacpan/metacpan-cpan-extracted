@@ -1,0 +1,2956 @@
+93 : L'Afghanistan
+9370,L'Afghanistan / Mobile
+9366,L'Afghanistan / Asabadad (Kumar)
+9359,L'Afghanistan / Aybak (Samargan)
+9326,L'Afghanistan / Bam'an
+9344,L'Afghanistan / Chapcharan (Ghear)
+9328,L'Afghanistan / Charkar (Parsan)
+9354,L'Afghanistan / Faisabad (Badakhshan)
+9344,L'Afghanistan / Farah
+9338,L'Afghanistan / Gardiz (Palcka)
+9335,L'Afghanistan / Ghazni
+9340,L'Afghanistan / Herat
+9342,L'Afghanistan / Herat
+9343,L'Afghanistan / Herat
+9360,L'Afghanistan / Jallelabad (Nargarhar)
+9361,L'Afghanistan / Jallelabad (Nargarhar)
+9362,L'Afghanistan / Jallelabad (Nargarhar)
+9363,L'Afghanistan / Jallelabad (Nargarhar)
+9364,L'Afghanistan / Jallelabad (Nargarhar)
+9320,L'Afghanistan / Kabul
+9321,L'Afghanistan / Kabul
+9322,L'Afghanistan / Kabul
+9323,L'Afghanistan / Kabul
+9324,L'Afghanistan / Kabul
+9325,L'Afghanistan / Kabul
+9330,L'Afghanistan / Kandahar
+9331,L'Afghanistan / Kandahar
+9332,L'Afghanistan / Kandahar
+9333,L'Afghanistan / Kandahar
+9334,L'Afghanistan / Kandahar
+9369,L'Afghanistan / Khest (Paktla)
+9365,L'Afghanistan / Khost
+9356,L'Afghanistan / Kunduz
+9336,L'Afghanistan / Lashkar Gah (Helmand)
+9327,L'Afghanistan / Mahmud-e Regi (Kap'sa)
+9350,L'Afghanistan / Mazar-I-Sherif (Bakh)
+9351,L'Afghanistan / Mazar-I-Sherif (Bakh)
+9352,L'Afghanistan / Mazar-I-Sherif (Bakh)
+9353,L'Afghanistan / Mazar-I-Sherif (Bakh)
+9367,L'Afghanistan / Mehtar Lam (Lagham)
+9329,L'Afghanistan / Meydan Shahr (Warcak)
+9344,L'Afghanistan / Meymerah (Faryab)
+9355,L'Afghanistan / Pol-e Khormi (Baclan)
+9368,L'Afghanistan / Pol-e-Alam (Lowgar)
+9339,L'Afghanistan / Qafat (Zabol)
+9344,L'Afghanistan / Qal'sh-ye (Badch's)
+9344,L'Afghanistan / Sar-e-Pol (Sar-a-Pol)
+9357,L'Afghanistan / Shebarghan (Scazjan)
+9358,L'Afghanistan / Tacqan (Takhar)
+9337,L'Afghanistan / Tarin Kost (Onagan)
+9344,L'Afghanistan / Zaranj (Nimaraz)
+355 : L'Albanie
+355232,L'Albanie / Bajram Burri
+355623,L'Albanie / Berat
+35552,L'Albanie / Durres
+355545,L'Albanie / Elbasan
+355726,L'Albanie / Gjirokastra
+355574,L'Albanie / Kavaja
+355824,L'Albanie / Korce
+355224,L'Albanie / Shkodra
+35542,L'Albanie / Tirana
+35563,L'Albanie / Vlora
+213 : L'Algérie
+21361,L'Algérie / Mobile
+2132,L'Algérie / Algiers
+21338,L'Algérie / Annaba
+21333,L'Algérie / Batna
+21349,L'Algérie / B�char
+21334,L'Algérie / Bejaia
+21333,L'Algérie / Biskra
+21325,L'Algérie / Blida
+21335,L'Algérie / Bord Bou Arreridj
+21324,L'Algérie / Boumerdes
+21327,L'Algérie / Chlef
+21331,L'Algérie / Constantine
+21332,L'Algérie / El-oued
+21329,L'Algérie / Ghardaia
+21337,L'Algérie / Guelma
+21334,L'Algérie / Jijel
+21332,L'Algérie / Khenchela
+21329,L'Algérie / Laghouat
+21345,L'Algérie / Mascara
+21325,L'Algérie / M�d�a
+21331,L'Algérie / Mila
+21345,L'Algérie / Mostaganem
+21341,L'Algérie / Oran
+21329,L'Algérie / Ouargla
+21332,L'Algérie / Oum-El-Bouaghi
+21346,L'Algérie / Relizane
+21348,L'Algérie / Saida
+21336,L'Algérie / S�tif
+21348,L'Algérie / Sidi Bel Abbes
+21338,L'Algérie / Skikda
+21329,L'Algérie / Tamanrasset
+21346,L'Algérie / Tiaret
+21349,L'Algérie / Tindouf
+21324,L'Algérie / Tipaza
+21326,L'Algérie / Tizi-Ouzou
+21343,L'Algérie / Tlemcen
+244 : L'Angola
+24431,L'Angola / Cabinda
+24472,L'Angola / Lobito
+2442,L'Angola / Luanda
+24461,L'Angola / Lubango
+24464,L'Angola / Namibe
+24465,L'Angola / Ondjiva
+244155,L'Angola / Other areas via Operator Services
+1264 : Anguilla
+672 : Territoire Antarctique D'Aus
+672106,Territoire Antarctique D'Aus / Davis Base
+672139,Territoire Antarctique D'Aus / Macquarie Island
+672117,Territoire Antarctique D'Aus / Mawson Base
+1268 : Le Antigua et le Barbuda
+599 : Les Antilles
+54 : L'Argentine
+541776,L'Argentine / Avellaneda
+5491,L'Argentine / Bahia Blanca
+542266,L'Argentine / Balcarce
+541,L'Argentine / Buenos Aires
+5411,L'Argentine / Capital Federal
+543833,L'Argentine / Catamarca
+5451,L'Argentine / Cordoba
+543717,L'Argentine / Formosa
+5421,L'Argentine / La Plata
+54351,L'Argentine / Las Calera
+5423,L'Argentine / Mar del Plata
+5461,L'Argentine / Medoza
+54299,L'Argentine / Neuquen
+54343,L'Argentine / Parana
+542932,L'Argentine / Punta Alta
+54722,L'Argentine / Resistencia
+54586,L'Argentine / Rio Cuarto
+542964,L'Argentine / Rio Grande
+54341,L'Argentine / Rosario
+54387,L'Argentine / Salta
+5464,L'Argentine / San Juan
+543476,L'Argentine / San Lorenzo
+54381,L'Argentine / San Miguel de Tucum�n
+543329,L'Argentine / San Pedro
+542627,L'Argentine / San Rafael
+5442,L'Argentine / Santa F�
+542954,L'Argentine / Santa Rosa
+54293,L'Argentine / Tandil
+542901,L'Argentine / Ushuaia
+542920,L'Argentine / Viedma
+543487,L'Argentine / Zarate
+374 : L'Arménie
+3742,L'Arménie / Erevan
+37469,L'Arménie / Leninakan
+297 : Aruba
+247 : Île D'Ascension
+61 : L'Australie
+61881,L'Australie / Adelaide, SA
+61884,L'Australie / Adelaide, SA
+6160,L'Australie / Albury
+6189,L'Australie / Alice Springs
+6167,L'Australie / Armidale
+6153,L'Australie / Ballerat
+61263,L'Australie / Bathurst
+61354,L'Australie / Bendigo
+6173,L'Australie / Brisbane, QLD
+61880,L'Australie / Broken Hill
+6171,L'Australie / Bundaberg
+61741,L'Australie / Bundaberg
+61740,L'Australie / Cairns
+61246,L'Australie / Campbelltown
+6162,L'Australie / Canberra, ACT
+61891,L'Australie / Cocos Island
+6189,L'Australie / Darwin, NT
+61364,L'Australie / Devonport
+61268,L'Australie / Dubbo
+6152,L'Australie / Geelong
+61899,L'Australie / Geraldton
+61248,L'Australie / Goulburn
+6155,L'Australie / Hamilton
+61362,L'Australie / Hobart, TAS
+61890,L'Australie / Kalgoorlie
+61363,L'Australie / Launceston
+61749,L'Australie / Mackay
+61888,L'Australie / Maitland
+6139,L'Australie / Melbourne
+61887,L'Australie / Mt Gambier
+61249,L'Australie / Newcastle
+61263,L'Australie / Orange
+61247,L'Australie / Penrith
+619,L'Australie / Perth, WA
+6179,L'Australie / Rockhampton
+612,L'Australie / Sydney,NSW
+61267,L'Australie / Tamworth
+6176,L'Australie / Toowoomba
+6177,L'Australie / Townsville
+61269,L'Australie / Wagga Wagga
+6142,L'Australie / Wollongong
+43 : L'Autriche
+432252,L'Autriche / Baden b. Wien
+435574,L'Autriche / Bregenz
+43732,L'Autriche / Donau
+435572,L'Autriche / Dornbirn
+437612,L'Autriche / Gmunden
+43316,L'Autriche / Graz
+43512,L'Autriche / Innsbruck
+435356,L'Autriche / Kitzb�hel
+43463,L'Autriche / Klagenfurt
+432732,L'Autriche / Krems an der Donau
+433842,L'Autriche / Leoben
+436582,L'Autriche / Leogang
+436583,L'Autriche / Leogang
+435285,L'Autriche / Mayrhofen
+437252,L'Autriche / Salzburg
+435446,L'Autriche / St. Anton
+432742,L'Autriche / St. P�lten
+437252,L'Autriche / Steyr
+437221,L'Autriche / Traun
+437229,L'Autriche / Traun
+43732,L'Autriche / Traun
+431,L'Autriche / Vienna
+434242,L'Autriche / Villach
+437242,L'Autriche / Wels
+437243,L'Autriche / Wels
+432622,L'Autriche / Wiener Neustadt
+435238,L'Autriche / Zirl
+994 : L'Azerbaïdjan
+99412,L'Azerbaïdjan / Baku
+994136,L'Azerbaïdjan / Nakhichevan
+994153,L'Azerbaïdjan / Neftechala
+351 : Les Açores
+1242 : Les Bahamas
+973 : Le Bahrain
+880 : Le Bangladesh
+880401,Le Bangladesh / Bagerhat
+880431,Le Bangladesh / Barisal
+88051,Le Bangladesh / Bogra
+88031,Le Bangladesh / Chittagong
+88081,Le Bangladesh / Comilla
+8802,Le Bangladesh / Dhaka
+880531,Le Bangladesh / Dinajpur
+880981,Le Bangladesh / Jamalpur
+880421,Le Bangladesh / Jessore
+88041,Le Bangladesh / Khulna
+88071,Le Bangladesh / Kushtia
+880861,Le Bangladesh / Moulvi Bazar
+88091,Le Bangladesh / Mymensingh
+880671,Le Bangladesh / Narayanganj
+880441,Le Bangladesh / Patvakhali
+880721,Le Bangladesh / Rajshahi
+880821,Le Bangladesh / Sylhet
+1246 : Les Barbades
+32 : La Belgique
+3247,La Belgique / Mobile
+3248,La Belgique / Mobile
+3249,La Belgique / Mobile
+3253,La Belgique / Alost
+323,La Belgique / Antwerp
+3263,La Belgique / Arlon
+3268,La Belgique / Ath
+3262,La Belgique / Bastogne
+3250,La Belgique / Blankenberge
+3250,La Belgique / Bruges
+322,La Belgique / Brussels
+3271,La Belgique / Charleroi
+3260,La Belgique / Chimay
+3283,La Belgique / Ciney
+3256,La Belgique / Courtrais
+3252,La Belgique / Dendermonde
+3213,La Belgique / Diest
+3282,La Belgique / Dinant
+3286,La Belgique / Durbuy
+3258,La Belgique / Furnes
+329,La Belgique / Ghent
+3211,La Belgique / Hasselt
+3214,La Belgique / Herentals
+3285,La Belgique / Huy
+3284,La Belgique / Jemelle
+3250,La Belgique / Knokke
+3264,La Belgique / La Louviere
+3216,La Belgique / Leuven
+3261,La Belgique / Libramont
+324,La Belgique / Liege
+3215,La Belgique / Malines
+3265,La Belgique / Mons
+3281,La Belgique / Namur
+3254,La Belgique / Ninove
+3267,La Belgique / Nivelles
+3259,La Belgique / Ostend
+3255,La Belgique / Renaix
+3251,La Belgique / Roeselare
+323,La Belgique / Saint Nicolas
+328,La Belgique / Stavelot
+3216,La Belgique / Tirlemont
+3212,La Belgique / Tongres
+3269,La Belgique / Tournai
+3214,La Belgique / Turnhout
+3287,La Belgique / Verviers
+3258,La Belgique / Veurne
+3256,La Belgique / Waregem
+3219,La Belgique / Waremme
+3210,La Belgique / Wavre
+3257,La Belgique / Ypres
+3250,La Belgique / Zeebrugge
+375 : Belarus
+375162,Belarus / Brest
+37523,Belarus / Gomel
+37515,Belarus / Grodno
+37517,Belarus / Minsk
+37522,Belarus / Mogilev
+37521,Belarus / Vitebsk
+501 : Belize
+5012,Belize / Belize City
+5018,Belize / Belmopan
+50193,Belize / Benque Viejo
+50128,Belize / Burrel Boom
+50122,Belize / Caye Caulker
+5014,Belize / Corozal
+5015,Belize / Dangriga
+5016,Belize / Independence
+50125,Belize / Ladyville
+5013,Belize / Orange Walk
+5017,Belize / Punta Gorda
+50192,Belize / San Ignacio
+5014,Belize / San Joaquin
+50126,Belize / San Pedro
+229 : Le Bénin
+1441 : Les Bermudes
+975 : Le Bhutan
+9756,Le Bhutan / Gelephu
+9753,Le Bhutan / Jakar
+9758,Le Bhutan / Paro
+9755,Le Bhutan / Phuntsholing
+9757,Le Bhutan / Samdrupjongkhar
+9755,Le Bhutan / Samise
+9754,Le Bhutan / Tashigang
+9752,Le Bhutan / Thimphu
+9753,Le Bhutan / Trongsa
+591 : La Bolivie
+59146,La Bolivie / Beni
+591932,La Bolivie / Buena Vista
+59143,La Bolivie / Cochabamba
+591388,La Bolivie / Cotoca
+591924,La Bolivie / Gral. Saavedra
+591923,La Bolivie / La Belgica
+5912,La Bolivie / La Paz
+591924,La Bolivie / Mineros
+59192,La Bolivie / Montero
+59152,La Bolivie / Oruro
+591924,La Bolivie / Portachuelo
+59162,La Bolivie / Potosi
+591924,La Bolivie / Saavedra
+5913,La Bolivie / Santa Cruz
+59164,La Bolivie / Sucre
+59166,La Bolivie / Tarija
+59146,La Bolivie / Trinidad
+591684,La Bolivie / Villamontes
+591923,La Bolivie / Warnes
+387 : La Bosnie Hercegovina
+38766,La Bosnie Hercegovina / Mobile
+38751,La Bosnie Hercegovina / Banja Luka
+38736,La Bosnie Hercegovina / Mostar
+38771,La Bosnie Hercegovina / Sarajevo
+38735,La Bosnie Hercegovina / Tuzla
+267 : Le Botswana
+267348,Le Botswana / Mochudi
+267529,Le Botswana / Mochudi
+267591,Le Botswana / Molepolole
+267538,Le Botswana / Ramotswa
+267539,Le Botswana / Ramotswa
+267393,Le Botswana / Ramotswa
+55 : Le Brésil
+5579,Le Brésil / Aracaju
+5591,Le Brésil / Belem
+5531,Le Brésil / Belo Horizonte
+5561,Le Brésil / Brasilia
+5519,Le Brésil / Campinas
+5541,Le Brésil / Curitiba
+5521,Le Brésil / Duque de Caxias
+5585,Le Brésil / Fortaleza
+55248,Le Brésil / Itaperuna
+5583,Le Brésil / Jo�o Pessoa
+5543,Le Brésil / Londrina
+5582,Le Brésil / Maceio
+5592,Le Brésil / Manaus
+5584,Le Brésil / Natal
+55242,Le Brésil / Petropolis
+5551,Le Brésil / Porto Alegre
+5581,Le Brésil / Recife
+5511,Le Brésil / Ribeir�o Preto
+5521,Le Brésil / Rio de Janeiro
+5571,Le Brésil / Salvador
+55132,Le Brésil / Santos
+5598,Le Brésil / S�o Luis
+5511,Le Brésil / S�o Paulo
+673 : Brunei Darussalam
+6732,Brunei Darussalam / Bandar Seri Begawan
+6733,Brunei Darussalam / Kuala Belait
+6733,Brunei Darussalam / Seria
+6735,Brunei Darussalam / Temburong
+6734,Brunei Darussalam / Tutony
+226 : Bukina Faso
+359 : La Bulgarie
+35987,La Bulgarie / Mobile
+35998,La Bulgarie / Mobile
+35973,La Bulgarie / Blagoevgrad
+35956,La Bulgarie / Burgas
+359519,La Bulgarie / Devnya
+35966,La Bulgarie / Gabrovo
+35968,La Bulgarie / Lovech
+35932,La Bulgarie / Plovdiv
+35982,La Bulgarie / Rousse
+359301,La Bulgarie / Smoliyan
+3592,La Bulgarie / Sofia
+35942,La Bulgarie / Stara Zagora
+35952,La Bulgarie / Varna
+35962,La Bulgarie / Veliko T�rnovo
+257 : Le Burundi
+2578,Le Burundi / Mobile
+25742,Le Burundi / Bubanza
+2572,Le Burundi / Bujumbura
+25750,Le Burundi / Bururi
+25741,Le Burundi / Cibitoke
+25740,Le Burundi / Gitega
+25743,Le Burundi / Muramvya
+25730,Le Burundi / Ngozi
+237 : Le Cameroun
+855 : Le Cambodge
+85523,Le Cambodge / Phnom Penh
+1 : Le Canada
+1204,Le Canada / Brandon
+1519,Le Canada / Brantford
+1403,Le Canada / Calgary
+1902,Le Canada / Charlottetown
+1709,Le Canada / Corner brook
+1780,Le Canada / Edmonton
+1506,Le Canada / Fredericton
+1709,Le Canada / Gander
+1709,Le Canada / Goosebay
+1519,Le Canada / Guelph
+1902,Le Canada / Halifax
+1905,Le Canada / Hamilton
+1905,Le Canada / iagara Falls
+1613,Le Canada / Kingston (ont)
+1519,Le Canada / Kitchener
+1403,Le Canada / Lethbridge
+1519,Le Canada / London
+1403,Le Canada / Medicine Hat
+1506,Le Canada / Moncton
+1514,Le Canada / Montreal
+1306,Le Canada / Moose Jaw
+1604,Le Canada / New Westminster
+1905,Le Canada / Oshawa
+1613,Le Canada / Ottawa
+1705,Le Canada / Peterborough
+1250,Le Canada / Prince George
+1418,Le Canada / Quebec
+1403,Le Canada / Red Deer
+1306,Le Canada / Regina
+1306,Le Canada / Saskatoon
+1705,Le Canada / Sault Ste Marie
+1819,Le Canada / Sherbrooke
+1905,Le Canada / St. Catherines
+1506,Le Canada / St. John, NB
+1709,Le Canada / St. Johns, Nfld
+1705,Le Canada / Sudbury
+1902,Le Canada / Sydney
+1807,Le Canada / Thunder Bay
+1905,Le Canada / Toronto (all other parts)
+1416,Le Canada / Toronto (Metropolitan)
+1604,Le Canada / Vancouver
+1250,Le Canada / Victoria (BC)
+1519,Le Canada / Windsor (Ont)
+1204,Le Canada / Winnipeg
+238 : Îles Du Cap Vert
+23891,Îles Du Cap Vert / Mobile
+23826,Îles Du Cap Vert / Garca, Santo Antao
+23835,Îles Du Cap Vert / Juncalinho, Santo Nicolau
+23832,Îles Du Cap Vert / Mindelo, Santo Vicente
+23825,Îles Du Cap Vert / P. Sol, Santo Antao
+23822,Îles Du Cap Vert / Porto Novo, Santo Antao
+23838,Îles Du Cap Vert / Praia Branca, Santo Nicolau
+236 : La République centrafricaine
+23661,La République centrafricaine / Bangui
+1345 : Les Iles Cayman
+235 : Le Tchad
+56 : Le Chili
+5655,Le Chili / Antofagasta
+5658,Le Chili / Arica
+5642,Le Chili / Chillan
+5641,Le Chili / Concepcion
+5651,Le Chili / Coquimbo
+5657,Le Chili / Iquique
+5651,Le Chili / La Serena
+5673,Le Chili / Linares
+5661,Le Chili / Punta Arenas
+562,Le Chili / Santiago
+5645,Le Chili / Temuco
+5632,Le Chili / Valparaiso
+5632,Le Chili / Vina del Mar
+86 : La Chine
+8610,La Chine / Beijing
+86411,La Chine / Dalian
+86591,La Chine / Fuzhou
+8620,La Chine / Guangzhou
+86898,La Chine / Haikou City
+86513,La Chine / Nantong
+86532,La Chine / Qingdao
+8621,La Chine / Shanghai
+8624,La Chine / Shenyang
+86755,La Chine / Shenzen
+8622,La Chine / Tianjin
+86577,La Chine / Wenzhou
+86592,La Chine / Xiamen
+672 : Île De Noël
+672 : Île De Cocos
+57 : La Colombie
+573,La Colombie / Mobile
+5767,La Colombie / Armenia
+5753,La Colombie / Baranquilla
+571,La Colombie / Bogota
+5776,La Colombie / Bucaramanga
+572,La Colombie / Cali
+575,La Colombie / Cartagena
+5775,La Colombie / Cucuta
+5768,La Colombie / Manizales
+574,La Colombie / Medellin
+269 : Les Comores
+26971,Les Comores / Anjouan
+26972,Les Comores / Mohali
+26973,Les Comores / Moroni
+242 : Le Congo
+682 : Îles Cook
+506 : Le Costa Rica
+225 : D'Ivoire de Cote
+385 : La Croatie
+38598,La Croatie / Mobile
+38599,La Croatie / Mobile
+38543,La Croatie / Bjelovar
+38540,La Croatie / Cakovec
+38520,La Croatie / Dubrovnik
+38553,La Croatie / Gospic
+38577,La Croatie / Internet
+38547,La Croatie / Karlovac
+38548,La Croatie / Koprivnica
+38549,La Croatie / Krapina
+38531,La Croatie / Osijek
+38597,La Croatie / Pagers
+38552,La Croatie / Pazin
+38534,La Croatie / Pozega
+38551,La Croatie / Rijeka
+38522,La Croatie / Sibenik
+38544,La Croatie / Sisak
+38535,La Croatie / Slavonski Brod
+38521,La Croatie / Split
+38542,La Croatie / Varazdin
+38532,La Croatie / Vinkovci
+38533,La Croatie / Virovitica
+38523,La Croatie / Zadar
+3851,La Croatie / Zagreb
+53 : Le Cuba
+5359,Le Cuba / Agramonte
+5333,Le Cuba / Ciego de Avila
+5343,Le Cuba / Cienfuegos
+53432,Le Cuba / Cienfuegos
+53225,Le Cuba / Cruce de Bacos
+53335,Le Cuba / Enrique G Varona
+53335,Le Cuba / Florencia
+5323,Le Cuba / Gramma
+53686,Le Cuba / Guanajay
+537,Le Cuba / Havana
+53225,Le Cuba / J.A. Mella
+5359,Le Cuba / Jaguey Grande
+5331,Le Cuba / Lastunas
+53225,Le Cuba / Mangos de Baragua
+535,Le Cuba / Matanzas
+5352,Le Cuba / Matanzas
+53335,Le Cuba / Maximo Gomez
+53335,Le Cuba / Moron
+53225,Le Cuba / Plama Soriano
+5359,Le Cuba / Playa Giron
+5359,Le Cuba / Playa Larga
+5359,Le Cuba / San Jose de Marcos
+53422,Le Cuba / Santa Clara
+5322,Le Cuba / Santiago de Cuba
+53226,Le Cuba / Santiago de Cuba
+53335,Le Cuba / Tamarindo
+5359,Le Cuba / Torriente
+5342,Le Cuba / Villa Clara
+90392 : La Chypre (nord)
+357 : la Chypre (sud)
+420 : République Tchèque
+4205,République Tchèque / Brno
+42038,République Tchèque / Ceske Budejovice
+42049,République Tchèque / Hradec Kralove
+42017,République Tchèque / Karlovy Vary
+42068,République Tchèque / Olomouc
+42069,République Tchèque / Ostrava
+42040,République Tchèque / Pardubice
+42019,République Tchèque / Plz�n
+4202,République Tchèque / Prague
+42047,République Tchèque / Usti nad Labem
+246 : Diego Garcia
+253 : Djibouti
+45 : Le Danemark
+452,Le Danemark / Copenhagen
+1767 : Dominica
+1809 : Rebublic Dominicain
+593 : L'Equateur
+5933,L'Equateur / Ambato
+5935,L'Equateur / Baba
+5937,L'Equateur / Cuenca
+5936,L'Equateur / Esmeraldas
+5934,L'Equateur / Febres Cordero
+5935,L'Equateur / Guayaquil
+5937,L'Equateur / Machala
+5935,L'Equateur / Manta
+5934,L'Equateur / Mapasingue
+5935,L'Equateur / Mocache
+5935,L'Equateur / Portoviejo
+5932,L'Equateur / Quito
+5933,L'Equateur / Riobamba
+20 : L'Egypte
+203,L'Egypte / Alexandria
+2015,L'Egypte / Ashara Ramadan
+2097,L'Egypte / Aswan
+2088,L'Egypte / Asy�t
+2018,L'Egypte / Auseem
+2018,L'Egypte / Badrasheen
+2013,L'Egypte / Benha
+2082,L'Egypte / Beni Suef
+202,L'Egypte / Cairo
+2045,L'Egypte / Damanh�r
+2057,L'Egypte / Damietta
+2068,L'Egypte / El Arish
+2066,L'Egypte / El Gameel
+2093,L'Egypte / El Mahrosa
+2086,L'Egypte / El Minya
+2093,L'Egypte / El Zawaida
+2088,L'Egypte / Elakal
+2084,L'Egypte / Fayoum
+202,L'Egypte / Giza
+202,L'Egypte / Heliopolis
+2065,L'Egypte / Iiurgada
+2064,L'Egypte / Ism�iliya
+2047,L'Egypte / Kafr El Sheik
+2040,L'Egypte / Kafr El Zaiat
+2095,L'Egypte / Luxor
+203,L'Egypte / Maeria
+2043,L'Egypte / Manhalla el Kubra
+2050,L'Egypte / Mansoura
+2086,L'Egypte / Minia
+2010,L'Egypte / Mobile & Pagers
+2012,L'Egypte / Mobile & Pagers
+2092,L'Egypte / Oases
+2066,L'Egypte / Port Said
+202,L'Egypte / Pyramids
+2096,L'Egypte / Quena
+2016,L'Egypte / Sacheia
+2049,L'Egypte / Sadat City
+2016,L'Egypte / Salheiya City
+2048,L'Egypte / Shebeen El Koom
+2093,L'Egypte / Soh�g
+2062,L'Egypte / Suez
+2040,L'Egypte / Tanta
+2055,L'Egypte / Zagazig
+240 : Guinée équatoriale
+2409,Guinée équatoriale / Malabo
+291 : Eritrea
+2911,Eritrea / Asmara
+291552,Eritrea / Massawa
+372 : L'Estonie
+37247,L'Estonie / Haapsalu
+37277,L'Estonie / J�geva
+37246,L'Estonie / K�rdla
+37233,L'Estonie / Kohtla-J�rve
+37245,L'Estonie / Kurhssaare
+37235,L'Estonie / Narva
+37238,L'Estonie / Paide
+37244,L'Estonie / P�rnu
+37279,L'Estonie / Polva
+37232,L'Estonie / Rakvere
+37248,L'Estonie / Rapla
+37239,L'Estonie / Sillam�e
+3722,L'Estonie / Tallinn
+3726,L'Estonie / Tallinn
+3727,L'Estonie / Tartu
+37276,L'Estonie / Valga
+37243,L'Estonie / Viljandi
+37278,L'Estonie / Voru
+251 : L'Ethiopie
+2511,L'Ethiopie / Addis Ababa
+2514,L'Ethiopie / Adigrat
+2514,L'Ethiopie / Adwa
+2513,L'Ethiopie / Assab
+2514,L'Ethiopie / Axum
+2513,L'Ethiopie / Combolcah
+2511,L'Ethiopie / Debre Zeit
+2513,L'Ethiopie / Dessie
+2515,L'Ethiopie / Dire Dawa
+2518,L'Ethiopie / Gondar
+2515,L'Ethiopie / Harrar
+2515,L'Ethiopie / Jijiga
+2517,L'Ethiopie / Jimma
+2514,L'Ethiopie / Mekele
+2512,L'Ethiopie / Metechara
+2514,L'Ethiopie / Michew
+2512,L'Ethiopie / Nazareth
+2516,L'Ethiopie / Shashemene
+2514,L'Ethiopie / Shire Enda Selassi
+2513,L'Ethiopie / Weldia
+500 : Les Malouines
+298 : Îles De Faroe
+679 : Les Îles fidji
+358 : La Finlande
+35818,La Finlande / Aland Islands
+3583,La Finlande / H�me
+3585,La Finlande / Hamina
+3589,La Finlande / Helsinki
+35819,La Finlande / Hyvink��
+3585,La Finlande / Imatra
+35813,La Finlande / Joensuu
+35814,La Finlande / Jyv�skyl�
+35814,La Finlande / Keski-Suomi
+3585,La Finlande / Kotka
+35817,La Finlande / Kuopio
+3585,La Finlande / Kymi
+3583,La Finlande / Lahti
+35816,La Finlande / Lapland
+3585,La Finlande / Lappeenranta
+35815,La Finlande / Mikkeli
+35813,La Finlande / North Karelia
+3588,La Finlande / Oulu
+3582,La Finlande / Pori-Bjorneborg
+35819,La Finlande / Porvoo-Borg�
+3583,La Finlande / Tampere
+35816,La Finlande / Tornio
+3582,La Finlande / Turku and Pori
+35819,La Finlande / Uusimaa
+3586,La Finlande / Vaasa
+33 : La France
+336,La France / Mobile
+33442,La France / Aix in Provence
+33322,La France / Amiens
+33241,La France / Angers
+33545,La France / Angouleme
+33490,La France / Arles
+33490,La France / Avignon
+33495,La France / Bastia
+33559,La France / Bayonne
+33381,La France / Besancon
+33467,La France / Beziers
+33559,La France / Biarritz
+33556,La France / Bordeaux
+33231,La France / Caen
+33493,La France / Cannes
+33233,La France / Cherbourg
+33473,La France / Clermont-ferrand
+33495,La France / Corsica
+33380,La France / Dijon
+33596,La France / Fort-de-France
+33476,La France / Grenoble
+33235,La France / Le Havre
+33243,La France / Le Mans
+33320,La France / Lille
+33555,La France / Limoges
+33562,La France / Lourdes
+33472,La France / Lyon
+33478,La France / Lyon
+33491,La France / Marseilles
+33387,La France / Metz
+33467,La France / Montpellier
+33389,La France / Mulhouse
+33383,La France / Nancy
+33240,La France / Nantes
+33493,La France / Nice
+33466,La France / Nimes
+333,La France / North East (Lille, Strasbourg, etc)
+332,La France / North West (Nantes, Rouen, etc)
+33238,La France / Orlean
+331,La France / Paris
+33559,La France / Pau
+33468,La France / Perpignan
+33326,La France / Rheims
+33320,La France / Roubaix
+33235,La France / Rouen
+334,La France / South East (Lyon, Marseilles, etc)
+335,La France / South West (Bordeaux, Toulouse, etc)
+33477,La France / St. Etienne
+33494,La France / St. Tropez
+33388,La France / Strasbourg
+33494,La France / Toulon
+33561,La France / Toulouse
+33320,La France / Tourcoing
+33247,La France / Tours
+33329,La France / Verdun
+33139,La France / Versailles
+33470,La France / Vichy
+594 : La Guyane française Française
+594694,La Guyane française Française / Mobile
+689 : Polynésie française
+689983,Polynésie française / Anaa
+689961,Polynésie française / Apataki
+689984,Polynésie française / Fakarava
+689972,Polynésie française / Fangatu
+689964,Polynésie française / Manihi
+689974,Polynésie française / Puka-Puka
+689975,Polynésie française / Tatakoto
+241 : Le Gabon
+2412,Le Gabon / Mobile
+2413,Le Gabon / Mobile
+241696,Le Gabon / Akieni
+24196,Le Gabon / Bitam
+24193,Le Gabon / Booue
+24142,Le Gabon / Cocobeach
+24167,Le Gabon / Franceville
+24150,Le Gabon / Gamba
+24140,Le Gabon / Kango
+24165,Le Gabon / Koulamoutou
+24158,Le Gabon / Lambarene
+24164,Le Gabon / Lastourville
+241699,Le Gabon / Leconi
+24190,Le Gabon / Makokou
+24183,Le Gabon / Mayumba
+24192,Le Gabon / Mekambo
+24186,Le Gabon / Mouila
+24162,Le Gabon / Mounana
+24159,Le Gabon / Ndjole
+24142,Le Gabon / Ntoum
+241693,Le Gabon / Okondja
+24154,Le Gabon / Omboue
+24198,Le Gabon / Oyem
+24182,Le Gabon / Tchibanga
+220 : La Gambie
+995 : La Géorgie
+995222,La Géorgie / Batumi
+995122,La Géorgie / Sukhumi
+99532,La Géorgie / Tbilisi
+49 : L'Allemagne
+49241,L'Allemagne / Aachen
+49821,L'Allemagne / Augsburg
+496172,L'Allemagne / Bad Homburg
+4930,L'Allemagne / Berlin
+49521,L'Allemagne / Bielefeld
+49234,L'Allemagne / Bochum
+49228,L'Allemagne / Bonn
+492041,L'Allemagne / Bottrop
+49531,L'Allemagne / Braunschweig
+49421,L'Allemagne / Bremen
+49471,L'Allemagne / Bremerhaven
+49371,L'Allemagne / Chemnitz
+49221,L'Allemagne / Cologne
+49355,L'Allemagne / Cottbus
+496151,L'Allemagne / Darmstadt
+49340,L'Allemagne / Dessau
+49231,L'Allemagne / Dortmund
+49351,L'Allemagne / Dresden
+49203,L'Allemagne / Duisburg
+49211,L'Allemagne / D�sseldorf
+49163,L'Allemagne / E-Plus
+49177,L'Allemagne / E-Plus
+49178,L'Allemagne / E-Plus
+493691,L'Allemagne / Eisenach
+49361,L'Allemagne / Erfurt
+49201,L'Allemagne / Essen
+4969,L'Allemagne / Frankfurt
+49761,L'Allemagne / Freiburg im-Bresigau
+49209,L'Allemagne / Gelsenkirchen
+49365,L'Allemagne / Gera
+492331,L'Allemagne / Hagen
+49345,L'Allemagne / Halle
+4940,L'Allemagne / Hamburg
+49511,L'Allemagne / Hanover
+496221,L'Allemagne / Heidelberg
+492323,L'Allemagne / Herne
+493641,L'Allemagne / Jena
+499353,L'Allemagne / Karl-Stadt
+49721,L'Allemagne / Karlsruhe
+49561,L'Allemagne / Kassel
+49431,L'Allemagne / Kiel
+49261,L'Allemagne / Koblenz
+49341,L'Allemagne / Leipsic
+49214,L'Allemagne / Leverkusen
+49451,L'Allemagne / L�beck
+49621,L'Allemagne / Ludwigshafen/Rhein
+492166,L'Allemagne / M'gladbach-Rheydt
+49391,L'Allemagne / Magdeburg
+49621,L'Allemagne / Mannheim
+496131,L'Allemagne / Mayence
+492161,L'Allemagne / M�nchengladbach
+49208,L'Allemagne / M�lheim/Ruhr
+4989,L'Allemagne / Munich
+49251,L'Allemagne / M�nster
+49395,L'Allemagne / Neubrandenburg
+492131,L'Allemagne / Neuss
+49911,L'Allemagne / Nuremberg
+49911,L'Allemagne / Nurnberg
+49208,L'Allemagne / Oberhausen
+4969,L'Allemagne / Offenbach/Main
+49441,L'Allemagne / Oldenburg, Oldb
+49541,L'Allemagne / Osnabr�ck
+493741,L'Allemagne / Plauen
+49331,L'Allemagne / Potsdam
+49150,L'Allemagne / Quam
+492361,L'Allemagne / Recklinghausen
+49941,L'Allemagne / Regensburg
+492191,L'Allemagne / Remscheid
+49381,L'Allemagne / Rostock
+4938223,L'Allemagne / Saal
+49681,L'Allemagne / Saarbr�cken
+49385,L'Allemagne / Schwerin
+49212,L'Allemagne / Solingen
+493831,L'Allemagne / Stralsund
+49711,L'Allemagne / Stuttgart
+493681,L'Allemagne / Suhl
+49160,L'Allemagne / T-Mobile
+49170,L'Allemagne / T-Mobile
+49171,L'Allemagne / T-Mobile
+49175,L'Allemagne / T-Mobile
+493421,L'Allemagne / Torgau
+49651,L'Allemagne / Triers
+49176,L'Allemagne / Viag Interkom (GSM 1800)
+49179,L'Allemagne / Viag Interkom (GSM 1800)
+49162,L'Allemagne / Vodafone (GSM 900/1800)
+49172,L'Allemagne / Vodafone (GSM 900/1800)
+49173,L'Allemagne / Vodafone (GSM 900/1800)
+49174,L'Allemagne / Vodafone (GSM 900/1800)
+49611,L'Allemagne / Wiesbaden
+494421,L'Allemagne / Wilhelmshaven
+49202,L'Allemagne / Wuppertal
+49931,L'Allemagne / W�rzburg
+493441,L'Allemagne / Zeitz
+49375,L'Allemagne / Zwickau
+233 : Le Ghana
+23327,Le Ghana / Mobile
+23328,Le Ghana / Mobile
+23321,Le Ghana / Accra
+23341,Le Ghana / Agona Swedru
+233632,Le Ghana / Bechem
+23372,Le Ghana / Bolgatanga
+23342,Le Ghana / Cape Coast
+23391,Le Ghana / Ho
+23381,Le Ghana / Koforidua
+23351,Le Ghana / Kumasi
+233742,Le Ghana / Navorongo
+23331,Le Ghana / Sekondi
+233858,Le Ghana / Suhuum
+23361,Le Ghana / Sunyani
+23331,Le Ghana / Takoradi
+23371,Le Ghana / Tamale
+23322,Le Ghana / Tema
+233744,Le Ghana / Yendi
+350 : Le Gibraltar
+30 : La Grèce
+30551,La Grèce / Alexandroupolis
+30681,La Grèce / Arta
+301,La Grèce / Athens
+30271,La Grèce / Chios
+30661,La Grèce / Corfu (City)
+3081,La Grèce / Iraklion (Crete)
+30721,La Grèce / Kalamata
+3051,La Grèce / Kavala
+3041,La Grèce / Larissa
+3093,La Grèce / Mobile (7 digit number)
+3094,La Grèce / Mobile (7 digit number)
+30289,La Grèce / Mykonos
+30251,La Grèce / Mytilini
+3061,La Grèce / Patrai (Patras)
+301,La Grèce / Piraeus
+30242,La Grèce / Pylion
+30621,La Grèce / Pyrgos Llias
+30241,La Grèce / Rhodes (Rodos)
+30273,La Grèce / Samos
+30281,La Grèce / Syros
+30593,La Grèce / Thassos
+3031,La Grèce / Thessaloniki
+3071,La Grèce / Tripolis
+30421,La Grèce / Volos
+30695,La Grèce / Zakynthos
+299 : Le Groenland
+1473 : Le Grenada
+590 : La Guadeloupe
+590690,La Guadeloupe / Mobile
+1671 : La Guam
+502 : Le Guatemala
+502932,Le Guatemala / Antigua
+5022,Le Guatemala / Guatemala City
+50297,Le Guatemala / Mazatenango
+502961,Le Guatemala / Quezaltenango
+224 : Guinée
+245 : Guinée - Bissau
+592 : La Guyane
+592455,La Guyane / Bartica
+592338,La Guyane / Benab
+592328,La Guyane / Cottage
+592229,La Guyane / Cove and John
+5922,La Guyane / Georgetown
+592441,La Guyane / Ituni
+592444,La Guyane / Linden
+592228,La Guyane / Mahaica
+592333,La Guyane / New Amsterdam
+592260,La Guyane / Tuschen
+592264,La Guyane / Vreed en Hoop
+592337,La Guyane / Whim
+509 : Le Haïti
+852 : Hong Kong
+504 : Le Honduras
+36 : La Hongrie
+3672,La Hongrie / Bak�ca
+3687,La Hongrie / Balatonf�red
+3632,La Hongrie / B�tonyterenye
+3666,La Hongrie / B�k�scsaba
+361,La Hongrie / Budapest
+3652,La Hongrie / Debrecen
+3636,La Hongrie / Eger
+3637,La Hongrie / Gy�ngy�s
+3696,La Hongrie / Gy�r
+3632,La Hongrie / Homokterenye
+3664,La Hongrie / Kalasca
+3682,La Hongrie / Kaposvar
+3676,La Hongrie / Kecskem�t
+3632,La Hongrie / M�tramindszent
+3632,La Hongrie / M�tranov�k
+3672,La Hongrie / Mindszentgodisa
+3646,La Hongrie / Miskolc
+3632,La Hongrie / N�dujfalu
+3642,La Hongrie / Nyiregyhaza
+3627,La Hongrie / �rbotty�n
+3672,La Hongrie / Pecs
+3633,La Hongrie / Pilismar�t
+3632,La Hongrie / Salg�tarj�n
+3699,La Hongrie / Sopron
+3662,La Hongrie / Szeged
+3622,La Hongrie / Sz�kesfeh�rv�r
+366,La Hongrie / Szolnok
+3694,La Hongrie / Szombathely
+3649,La Hongrie / Tiszaujv�ros
+3672,La Hongrie / Torm�s
+3688,La Hongrie / Veszpr�m
+3692,La Hongrie / Zalaegerszeg
+354 : L'Islande
+972 : L'Israel
+9724,L'Israel / Afula
+9728,L'Israel / Ashdod
+9728,L'Israel / Ashkelon
+9723,L'Israel / Bat Yam
+9728,L'Israel / Beer Sheva
+9723,L'Israel / Ben Gurion Airport
+9722,L'Israel / Bethlehem
+9723,L'Israel / Bnei Brak
+9728,L'Israel / Eilat
+9728,L'Israel / Gaza
+9724,L'Israel / Hadera
+9724,L'Israel / Haifa
+9729,L'Israel / Herzeliya
+9722,L'Israel / Hevron
+9723,L'Israel / Holon
+9723,L'Israel / Jaffa
+9722,L'Israel / Jericho
+9722,L'Israel / Jerusalem
+9729,L'Israel / Kfar Saba
+9724,L'Israel / Nablus
+9729,L'Israel / Nahariya
+9724,L'Israel / Natanya
+9723,L'Israel / Nazareth
+9729,L'Israel / Petah Tikva
+9729,L'Israel / Raanana
+9723,L'Israel / Ramalla
+9723,L'Israel / Ramat Gan
+9723,L'Israel / Rehovot
+9724,L'Israel / Rishon le Zion
+9724,L'Israel / Safed (Zefat)
+9723,L'Israel / Tel Aviv
+9724,L'Israel / Tiberias
+62 : L'Indonésie
+62911,L'Indonésie / Ambona
+62361,L'Indonésie / Bali
+62542,L'Indonésie / Balik Papan
+6222,L'Indonésie / Bandung
+62511,L'Indonésie / Banjarmasin
+62342,L'Indonésie / Blitar
+62255,L'Indonésie / Cipanas
+62361,L'Indonésie / Denpasar
+6221,L'Indonésie / Jakarta
+62341,L'Indonésie / Malang
+62431,L'Indonésie / Manado
+6261,L'Indonésie / Medan
+62751,L'Indonésie / Padang
+62711,L'Indonésie / Palembang
+6224,L'Indonésie / Semarang
+62271,L'Indonésie / Solo City
+6231,L'Indonésie / Surabaya
+62411,L'Indonésie / Ujung Pandang
+62274,L'Indonésie / Yogyakarta
+91 : L'Inde
+9179,L'Inde / Ahmedabad
+9180,L'Inde / Bangalore
+9122,L'Inde / Bombay
+9133,L'Inde / Calcutta
+91172,L'Inde / Chandigarh
+9144,L'Inde / Chennai
+9111,L'Inde / Delhi/New Delhi
+9140,L'Inde / Hyderabad
+91141,L'Inde / Jaipur
+91181,L'Inde / Jullunder
+91512,L'Inde / Kanpur
+9133,L'Inde / Kolkata
+91522,L'Inde / Lucknow
+9144,L'Inde / Madras
+9122,L'Inde / Mumbai (Bombay)
+91712,L'Inde / Nagpur
+91832,L'Inde / Panjim (Goa)
+9120,L'Inde / Poona
+91281,L'Inde / Rajkot
+91832,L'Inde / South Goa
+91261,L'Inde / Surat
+91542,L'Inde / Varanasi
+98 : L'Iran
+98631,L'Iran / Abadan
+98611,L'Iran / Ahvaz
+98262,L'Iran / Arak
+98111,L'Iran / Baboi
+98431,L'Iran / Bakhtaran
+98811,L'Iran / Hamad�n
+98311,L'Iran / Isfahan
+9851,L'Iran / Kerman
+9851,L'Iran / Mashad
+98711,L'Iran / Shiraz
+9841,L'Iran / Tabriz
+9821,L'Iran / Tehran
+964 : L'Irak
+96443,L'Irak / Amara
+9641,L'Irak / Baghdad
+96425,L'Irak / Baquba
+96440,L'Irak / Basrah
+96436,L'Irak / Diwaniya
+96462,L'Irak / Duhok
+96466,L'Irak / Erbil
+96430,L'Irak / Hilla
+96432,L'Irak / Kerbala
+96423,L'Irak / Kut
+96460,L'Irak / Nainawa
+96433,L'Irak / Najaf
+96442,L'Irak / Nasiriya
+96424,L'Irak / Ramadi
+96437,L'Irak / Samawa
+96453,L'Irak / Sulaimaniya
+96421,L'Irak / Tkrit
+353 : République de l'Irlande de
+353402,République de l'Irlande de / Arklow
+353902,République de l'Irlande de / Athlone
+35396,République de l'Irlande de / Ballina
+35323,République de l'Irlande de / Bandon
+35372,République de l'Irlande de / Bundoran
+353503,République de l'Irlande de / Carlow
+35394,République de l'Irlande de / Castlebar
+35349,République de l'Irlande de / Cavan
+35352,République de l'Irlande de / Clonmel
+35321,République de l'Irlande de / Cork
+35373,République de l'Irlande de / Donegal
+35341,République de l'Irlande de / Drogheda
+3531,République de l'Irlande de / Dublin
+35342,République de l'Irlande de / Dundalk
+35365,République de l'Irlande de / Ennis
+35354,République de l'Irlande de / Enniscorthy
+35391,République de l'Irlande de / Galway
+35329,République de l'Irlande de / Kanturk
+35356,République de l'Irlande de / Kilkenny
+35364,République de l'Irlande de / Killarney
+35374,République de l'Irlande de / Letterkenny
+35361,République de l'Irlande de / Limerick
+35343,République de l'Irlande de / Longford
+35322,République de l'Irlande de / Mallow
+35347,République de l'Irlande de / Monaghan
+35344,République de l'Irlande de / Mullingar
+35345,République de l'Irlande de / Naas
+35345,République de l'Irlande de / Navan
+35367,République de l'Irlande de / Nenagh
+353502,République de l'Irlande de / Portlaoise
+35363,République de l'Irlande de / Rathluire
+353903,République de l'Irlande de / Roscommon
+35353,République de l'Irlande de / Rosslare
+35361,République de l'Irlande de / Shannon
+35371,République de l'Irlande de / Sligo
+353504,République de l'Irlande de / Thurles
+35362,République de l'Irlande de / Tipperary
+35366,République de l'Irlande de / Tralee
+35393,République de l'Irlande de / Tuam
+353506,République de l'Irlande de / Tullamore
+35351,République de l'Irlande de / Waterford
+35398,République de l'Irlande de / Westport
+35353,République de l'Irlande de / Wexford
+353404,République de l'Irlande de / Wicklow
+35324,République de l'Irlande de / Youghal
+39 : L'Italie
+3989,L'Italie / Amalfi
+3971,L'Italie / Ancona
+3980,L'Italie / Bari
+3935,L'Italie / Bergamo
+3951,L'Italie / Bologna
+39471,L'Italie / Bolzano
+3930,L'Italie / Brescia
+39831,L'Italie / Brindisi
+3970,L'Italie / Cagliari
+3981,L'Italie / Capri
+3995,L'Italie / Catania
+3931,L'Italie / Como
+39532,L'Italie / Ferrara
+3955,L'Italie / Florence
+3910,L'Italie / Genoa
+39187,L'Italie / La Spezia
+39832,L'Italie / Lecce
+39586,L'Italie / Livorno
+39583,L'Italie / Lucca
+3990,L'Italie / Messina
+392,L'Italie / Milan
+3959,L'Italie / Modena
+3981,L'Italie / Naples
+3949,L'Italie / Padova
+3991,L'Italie / Palermo
+39923,L'Italie / Pantelleria
+39521,L'Italie / Parma
+3975,L'Italie / Perugia
+3985,L'Italie / Pescara
+39523,L'Italie / Piacenza
+3950,L'Italie / Pisa
+3981,L'Italie / Pompei
+39185,L'Italie / Portofino
+39544,L'Italie / Ravenna
+39965,L'Italie / Reggio Calabria
+39522,L'Italie / Reggio Emilia
+39541,L'Italie / Rimini
+396,L'Italie / Rome
+3989,L'Italie / Salerno
+39184,L'Italie / SanRemo
+3979,L'Italie / Sassari
+39931,L'Italie / Syracuse
+3999,L'Italie / Taranto
+39744,L'Italie / Terni
+3940,L'Italie / Trieste
+3911,L'Italie / Turin
+396,L'Italie / Vatican City
+3941,L'Italie / Venice
+3945,L'Italie / Verona
+39444,L'Italie / Vicenza
+225 : La Côte d'Ivoire voient le d'Ivorie de Cote
+1876 : La Jamaïque
+81 : Le Japon
+81188,Le Japon / Akita (Akita)
+8196,Le Japon / Akita (Kumamoto)
+81472,Le Japon / Chiba
+8192,Le Japon / Fukuoka
+8182,Le Japon / Hiroshima
+8144,Le Japon / Kawasaki (Kanagawa)
+81224,Le Japon / Kawasaki (Miyagi)
+8178,Le Japon / Kobe
+8175,Le Japon / Kyoto
+81958,Le Japon / Nagasaki
+8152,Le Japon / Nagoya
+81862,Le Japon / Okayama
+816,Le Japon / Osaka
+81722,Le Japon / Sakai
+8111,Le Japon / Sapparo
+8122,Le Japon / Sendai
+813,Le Japon / Tokyo
+8145,Le Japon / Yokohama
+962 : La Jordanie
+96279,La Jordanie / Mobile
+9622,La Jordanie / Ajlon
+9626,La Jordanie / Amman
+9623,La Jordanie / Aqaba
+9625,La Jordanie / Balqa
+9622,La Jordanie / Irbid
+9622,La Jordanie / Jerash
+9623,La Jordanie / Karak
+9623,La Jordanie / Ma'an
+9628,La Jordanie / Madaba
+9622,La Jordanie / Mafraq
+9625,La Jordanie / Salt
+9623,La Jordanie / Tafila
+9626,La Jordanie / Um Alamad
+9629,La Jordanie / Zarqa
+65 : Katsina
+7 : Kazakhstan
+73272,Kazakhstan / Almaty (Alma-Ata)
+73212,Kazakhstan / Karaganda
+73152,Kazakhstan / Petropavlovsk
+731122,Kazakhstan / Uralsk
+73232,Kazakhstan / Ust-Kamenogorsk
+254 : Le Kenya
+254150,Le Kenya / Athi River
+254360,Le Kenya / Bomet
+254337,Le Kenya / Bungoma
+254333,Le Kenya / Butcre
+254166,Le Kenya / Chuka
+254127,Le Kenya / Diani Beach
+254321,Le Kenya / Eldoret
+254251,Le Kenya / Gatura
+254166,Le Kenya / Igoji
+254328,Le Kenya / Kabarnet
+254163,Le Kenya / Kagio
+254383,Le Kenya / Keroka
+254164,Le Kenya / Kianjai
+254162,Le Kenya / Kiritiri
+254151,Le Kenya / Kirwara
+254381,Le Kenya / Kissi
+25435,Le Kenya / Kisumu
+254163,Le Kenya / Kutus
+254325,Le Kenya / Kwanza
+254361,Le Kenya / Londiani
+2543801,Le Kenya / Magonbo
+254337,Le Kenya / Malakisi
+254123,Le Kenya / Malindi
+25411,Le Kenya / Mombasa
+254171,Le Kenya / Mukurweini
+254142,Le Kenya / Mwingi
+2542,Le Kenya / Nairobi
+25437,Le Kenya / Nakuru
+254176,Le Kenya / Nanyuki
+254366,Le Kenya / Ngarua
+2543870,Le Kenya / Nyamtiro
+254171,Le Kenya / Nyeri
+254334,Le Kenya / Sidindi
+254361,Le Kenya / Sosiot
+254151,Le Kenya / Thika
+254323,Le Kenya / Turbo
+254148,Le Kenya / Wundanyi
+850 : La Corée (nord)
+850155,La Corée (nord) / Other areas via Operator Services
+8502,La Corée (nord) / Pyongyang
+82 : La Corée (Sud)
+8264,La Corée (Sud) / Cheju-Do
+8242,La Corée (Sud) / Dae-Jon
+8253,La Corée (Sud) / Daegu
+8232,La Corée (Sud) / In-Chun
+8263,La Corée (Sud) / Kwang-Ju
+821,La Corée (Sud) / Mobiles & Pagers
+8251,La Corée (Sud) / Pusan (Busan)
+822,La Corée (Sud) / Seoul
+8252,La Corée (Sud) / Ulsan
+965 : Le Kowéit
+996 : Kyrghyzstan
+996502,Kyrghyzstan / Mobile
+996517,Kyrghyzstan / Mobile
+9963312,Kyrghyzstan / Bishkek
+996686,Kyrghyzstan / Kiribati
+856 : Le Laos
+371 : La Lettonie
+37164,La Lettonie / Mobile
+37151,La Lettonie / Aizkraukle
+37143,La Lettonie / Aluksne
+37145,La Lettonie / Balvi
+37139,La Lettonie / Bauska
+37141,La Lettonie / Cesis
+37154,La Lettonie / Daugavpils
+37137,La Lettonie / Dobele
+37144,La Lettonie / Gulbene
+37152,La Lettonie / Jekabpils
+37130,La Lettonie / Jelgava
+37156,La Lettonie / Kraslava
+37133,La Lettonie / Kuldiga
+37134,La Lettonie / Liepaja
+37140,La Lettonie / Limbazi
+37157,La Lettonie / Ludza
+37148,La Lettonie / Madona
+37150,La Lettonie / Ogre
+37153,La Lettonie / Preili
+37146,La Lettonie / Rezekne
+37127,La Lettonie / Riga
+37138,La Lettonie / Saldus
+37132,La Lettonie / Talsi
+37131,La Lettonie / Tukums
+37147,La Lettonie / Valka
+37142,La Lettonie / Valmiera
+37136,La Lettonie / Ventspils
+961 : Le Liban
+9611,Le Liban / Grand Beirut
+9619,Le Liban / Kerswan and Jbeil
+9616,Le Liban / Lebanon, North
+9617,Le Liban / Lebanon, South
+9614,Le Liban / Mount Lebanon, North
+9615,Le Liban / Mount Lebanon, South
+9617,Le Liban / Saida
+9616,Le Liban / Tripoli
+9617,Le Liban / Tyr
+9618,Le Liban / Zahle
+266 : Le Lesotho
+231 : Le Libéria
+23164,Le Libéria / Mobile
+23165,Le Libéria / Mobile
+423 : La Liechtenstein
+370 : La Lithuanie
+37037,La Lithuanie / Elektrenai
+3707,La Lithuanie / Kaunas
+3706,La Lithuanie / Klaipeda
+3705,La Lithuanie / Panevezys
+3701,La Lithuanie / Siauliai
+37038,La Lithuanie / Trakai
+3702,La Lithuanie / Vilnius
+352, 26, 40 : Le Luxembourg
+352, 26, 40021,Le Luxembourg / Mobile
+352, 26, 40028,Le Luxembourg / Mobile
+352, 26, 40091,Le Luxembourg / Mobile
+352, 26, 40098,Le Luxembourg / Mobile
+352, 26, 4045,Le Luxembourg / Diedrich
+352, 26, 4084,Le Luxembourg / Han/Lesse
+352, 26, 40352,Le Luxembourg / Howard
+352, 26, 40352,Le Luxembourg / Kirchberg
+352, 26, 40352,Le Luxembourg / Plateau de Kirchberg
+352, 26, 40352,Le Luxembourg / Rameldange
+218 : Lybia
+2189121,Lybia / Mobile
+2189161,Lybia / Mobile
+2189171,Lybia / Mobile
+2189184,Lybia / Mobile
+2189191,Lybia / Mobile
+21861,Lybia / Benghazi
+21863,Lybia / Benina
+21881,Lybia / Derna
+21824,Lybia / Sabratha
+21821,Lybia / Tripoli
+21822,Lybia / Tripoli (Int Airport)
+21823,Lybia / Zawia
+21825,Lybia / Zuara
+265 : Le Malawi
+389 : Macédoine
+38970,Macédoine / Mobile
+38947,Macédoine / Bitola
+38945,Macédoine / Kicevo
+38933,Macédoine / Kocani
+38931,Macédoine / Kumanovo
+38946,Macédoine / Ohrid
+3892,Macédoine / Skopje
+38932,Macédoine / Stip
+38934,Macédoine / Strumica
+38944,Macédoine / Tetovo
+38943,Macédoine / Titov Veles
+853 : Le Macao
+85362,Le Macao / Mobile
+85363,Le Macao / Mobile
+853650,Le Macao / Mobile
+853651,Le Macao / Mobile
+85366,Le Macao / Mobile
+85368,Le Macao / Mobile
+261 : Le Madagascar
+26130,Le Madagascar / Mobile
+26131,Le Madagascar / Mobile
+26132,Le Madagascar / Mobile
+26133,Le Madagascar / Mobile
+261 202 (centre),Le Madagascar / Antananarivo
+261204,Le Madagascar / Antananarivo
+261208,Le Madagascar / Antsiranana
+261207,Le Madagascar / Fianarantsoa
+261206,Le Madagascar / Mahajanga
+261205,Le Madagascar / Toamasina
+261209,Le Madagascar / Tollara
+60 : La Malaisie
+605,La Malaisie / Ipoh
+607,La Malaisie / Johor Bahru
+6088,La Malaisie / Kota Kinabalu
+603,La Malaisie / Kuala Lumpur
+609,La Malaisie / Kuantan
+6082,La Malaisie / Kuching
+606,La Malaisie / Malacca (Melaka)
+604,La Malaisie / Penang
+606,La Malaisie / Port Dickson
+6089,La Malaisie / Sandakan
+6084,La Malaisie / Sibu
+605,La Malaisie / Taiping
+960 : Les Maldives
+223 : Le Mali
+22370,Le Mali / Mobile
+22374,Le Mali / Mobile
+22375,Le Mali / Mobile
+356 : Malte
+35679,Malte / Mobile
+35699,Malte / Mobile
+3562165,Malte / B'Buga
+3562144,Malte / B'Kara
+3562147,Malte / B'Kara
+3562148,Malte / B'Kara
+3562149,Malte / B'Kara
+3562155,Malte / Gozo
+3562156,Malte / Gozo
+3562163,Malte / M'Scala
+356 2122,Malte / Marsa
+3562125  ,Malte / Marsa
+3562152,Malte / Mellieha
+3562141,Malte / Mosta
+3562143,Malte / Mosta
+3562145,Malte / Rabat
+3562131,Malte / Sliema
+3562134,Malte / Sliema
+356 2135,Malte / St. George's
+3562137,Malte / St. George's
+3562138,Malte / St. George's
+3562157,Malte / St. Paul's
+3562158,Malte / St. Paul's
+3562146,Malte / Zebbug
+3562161,Malte / Zejtun
+3562166,Malte / Zejtun
+3562169,Malte / Zejtun
+3562180,Malte / Zejtun
+3562182,Malte / Zejtun
+3562189 ,Malte / Zejtun
+3562164,Malte / Zurrieq
+692 : Les Îles Marshall
+692329,Les Îles Marshall / Ebeye
+596 : La Martinique
+222 : La Mauritanie
+230 : Les îles Maurice
+269 : Mayotte
+52 : Le Mexique
+52744,Le Mexique / Acapulco
+52449,Le Mexique / Aguascalientes
+52981,Le Mexique / Campeche
+52614,Le Mexique / Chihuahua
+52644,Le Mexique / Ciudad Obreg�n
+52777,Le Mexique / Cuernavaca
+52667,Le Mexique / Culiacan
+52618,Le Mexique / Durango
+5233,Le Mexique / Guadalajara
+52662,Le Mexique / Hermosillo
+52462,Le Mexique / Irapuato
+52228,Le Mexique / Jalapa Ver�cruz
+52477,Le Mexique / Le�n
+52868,Le Mexique / Matamoros (Tamaulipas)
+52669,Le Mexique / Mazatl�n
+52999,Le Mexique / M�rida
+52686,Le Mexique / Mexicali
+5255,Le Mexique / Mexico City
+5281,Le Mexique / Monterrey
+52443,Le Mexique / Morelia
+52631,Le Mexique / Nogales (Sonora)
+52867,Le Mexique / Nuevo Laredo
+52951,Le Mexique / Oaxaca
+52222,Le Mexique / Puebla
+52899,Le Mexique / Reynosa
+52844,Le Mexique / Saltillo
+52444,Le Mexique / San Luis Potosi
+52833,Le Mexique / Tampico
+52664,Le Mexique / Tijuana
+52722,Le Mexique / Toluca
+52871,Le Mexique / Torre�n
+52783,Le Mexique / Tuxpan (Veracruz)
+52229,Le Mexique / Veracruz
+52993,Le Mexique / Villahermosa
+691 : La Micronésie
+691370,La Micronésie / Kosrae
+691320,La Micronésie / Ponape
+691330,La Micronésie / Truk
+691350,La Micronésie / Yap
+373 : Moldovia
+3732,Moldovia / Kishinev
+377 : Le Monaco
+976 : La Mongolie
+9761,La Mongolie / Ulaan Bataar
+664 : Montserrat
+212 : Le Maroc
+2128,Le Maroc / Agadir
+2122,Le Maroc / Casablanca
+21234,Le Maroc / El Jadida
+21247,Le Maroc / Essaouira
+2125,Le Maroc / Fes
+2127,Le Maroc / Kenitra
+21291,Le Maroc / Larache
+2124,Le Maroc / Marrakech
+2125,Le Maroc / Meknes
+21232,Le Maroc / Mohammedia
+21268,Le Maroc / Oujda
+2127,Le Maroc / Rabat
+2124,Le Maroc / Safi
+2127,Le Maroc / Sale
+2129,Le Maroc / Tangier
+2129,Le Maroc / Tetouan
+2124,Le Maroc / Tinrhir
+2124,Le Maroc / Zagora
+258 : La Mozambique
+2583,La Mozambique / Beira
+25851,La Mozambique / Chimoio
+25821,La Mozambique / Chokwe
+2581,La Mozambique / Maputo
+2586,La Mozambique / Nampula
+2584,La Mozambique / Quelimane
+25852,La Mozambique / Tete
+25822,La Mozambique / Xai Xai
+95 : Myanmar (Birmanie)
+9542,Myanmar (Birmanie) / Bassein
+952,Myanmar (Birmanie) / Mandalay
+9532,Myanmar (Birmanie) / Mawlamying
+9532,Myanmar (Birmanie) / Moulmein
+9542,Myanmar (Birmanie) / Pathein
+951,Myanmar (Birmanie) / Yangon (Rangoon)
+264 : La Namibie
+26467,La Namibie / Anker
+26467,La Namibie / Bagani
+26467,La Namibie / Biermanskool
+26461,La Namibie / Gobabis
+26467,La Namibie / Grootfontein
+26461,La Namibie / Industria
+26463,La Namibie / Keetmanshoop
+26467,La Namibie / Klein Waterberg
+26463,La Namibie / Luderitz
+26465,La Namibie / Ruacana
+26464,La Namibie / Swakopmund
+264671,La Namibie / Tsumeb
+26464,La Namibie / Walvis Bay
+26461,La Namibie / Windhoek
+264626,La Namibie / Windhoek Airport
+674 : Le Nauru
+977 : Le Népal
+97771,Le Népal / Bhairawa
+9771,Le Népal / Bhaktapur
+97751,Le Népal / Birgunj
+97721,Le Népal / Buratnagar
+97771,Le Népal / Butwal
+9771,Le Népal / Chabahil
+97791,Le Népal / Dhangarhi
+97741,Le Népal / Janakpur
+9771,Le Népal / Kathmandu
+97781,Le Népal / Nepalgunj
+9771,Le Népal / Patan
+97761,Le Népal / Pokhara
+687 : La Nouvelle-Calédonie
+64 : La Nouvelle Zélande
+643,La Nouvelle Zélande / Ashburton
+649,La Nouvelle Zélande / Auckland
+643,La Nouvelle Zélande / Blenheim
+643,La Nouvelle Zélande / Christchurch
+643,La Nouvelle Zélande / Dunedin
+646,La Nouvelle Zélande / Gisborne
+643,La Nouvelle Zélande / Gore
+647,La Nouvelle Zélande / Hamilton
+646,La Nouvelle Zélande / Hastings
+643,La Nouvelle Zélande / Invercargill
+643,La Nouvelle Zélande / Lyttelton
+646,La Nouvelle Zélande / Marton
+646,La Nouvelle Zélande / Masterton
+646,La Nouvelle Zélande / Napier
+643,La Nouvelle Zélande / Nelson
+646,La Nouvelle Zélande / New Plymouth
+646,La Nouvelle Zélande / Palmerston North
+647,La Nouvelle Zélande / Rotorua
+647,La Nouvelle Zélande / Taupo
+647,La Nouvelle Zélande / Tauranga
+643,La Nouvelle Zélande / Timaru
+643,La Nouvelle Zélande / Waitangi (Chatham Island)
+646,La Nouvelle Zélande / Wanganui
+644,La Nouvelle Zélande / Wellington
+649,La Nouvelle Zélande / Whangarei
+227 : Le Niger
+505 : Le Nicaragua
+50582,Le Nicaragua / Bluefields
+505341,Le Nicaragua / Chinandega
+505342,Le Nicaragua / Corinto
+50542,Le Nicaragua / Diriamba
+50555,Le Nicaragua / Granada
+50563,Le Nicaragua / Jinotega
+505311,Le Nicaragua / Leon
+5052,Le Nicaragua / Managua
+50552,Le Nicaragua / Masaya
+50561,Le Nicaragua / Matagalpa
+505461,Le Nicaragua / Rivas
+50543,Le Nicaragua / San Marcos
+234 : Le Nigéria
+23490,Le Nigéria / Mobile
+234132,Le Nigéria / Mobile
+23439,Le Nigéria / Abeokuta
+2349,Le Nigéria / Abuja
+23434,Le Nigéria / Akure
+2341,Le Nigéria / Amuwo
+23456,Le Nigéria / Asaba
+23477,Le Nigéria / Bauchi
+23452,Le Nigéria / Benin City
+23468,Le Nigéria / Birnin-Kebbi
+23487,Le Nigéria / Calabar
+2341,Le Nigéria / Ebute-Metta
+23442,Le Nigéria / Enugu
+23422,Le Nigéria / Ibadan
+2341,Le Nigéria / Ikeja
+23431,Le Nigéria / Ilorin
+23473,Le Nigéria / Jos
+23462,Le Nigéria / Kaduna
+23464,Le Nigéria / Kano
+2341,Le Nigéria / Lagos
+23476,Le Nigéria / Maiduguri
+23444,Le Nigéria / Makurdi
+23466,Le Nigéria / Minna
+23483,Le Nigéria / Owerri
+23438,Le Nigéria / Oyo
+23484,Le Nigéria / Port Harcourt
+2341,Le Nigéria / Shomolu
+23460,Le Nigéria / Sokoto
+23475,Le Nigéria / Yola
+23469,Le Nigéria / Zaria
+683 : Niue
+31 : Pays Bas
+3161,Pays Bas / Mobile
+3162,Pays Bas / Mobile
+3163,Pays Bas / Mobile
+3164,Pays Bas / Mobile
+3165,Pays Bas / Mobile
+3123,Pays Bas / Aerdenhout
+3172,Pays Bas / Alkmaar
+31546,Pays Bas / Almelo
+3136,Pays Bas / Almere
+3133,Pays Bas / Amersfoort
+3120,Pays Bas / Amstelveen
+3120,Pays Bas / Amsterdam
+3155,Pays Bas / Apeldoorn
+3126,Pays Bas / Arnhem
+31592,Pays Bas / Assen
+31164,Pays Bas / Bergen op zoom
+3130,Pays Bas / Bilthoven
+3176,Pays Bas / Breda
+3135,Pays Bas / Bussum
+3115,Pays Bas / Delft
+31596,Pays Bas / Delfzijl
+31223,Pays Bas / Den Helder
+3173,Pays Bas / DenBosch
+31570,Pays Bas / Deventer
+3178,Pays Bas / Dordrecht
+3140,Pays Bas / Eindhoven
+31591,Pays Bas / Emmen
+3153,Pays Bas / Enschede
+31341,Pays Bas / Ermelo
+3146,Pays Bas / Geleen
+3113,Pays Bas / Goirle
+31182,Pays Bas / Gouda
+3150,Pays Bas / Groningen
+3123,Pays Bas / Haarlem
+31517,Pays Bas / Harlingen
+3123,Pays Bas / Heemstede
+3145,Pays Bas / Heerlen
+31492,Pays Bas / Helmond
+3174,Pays Bas / Hengelo
+3135,Pays Bas / Hilversum
+31174,Pays Bas / Hoek van Holland
+31255,Pays Bas / Ijmuiden
+3138,Pays Bas / Kampen
+3171,Pays Bas / Katwijk a/d Rijn
+3145,Pays Bas / Kerkrade
+3158,Pays Bas / Leeuwarden
+3171,Pays Bas / Leiden
+3110,Pays Bas / Maassluis
+3143,Pays Bas / Maastricht
+31118,Pays Bas / Middelburg
+3124,Pays Bas / Nijmegen
+31412,Pays Bas / Oss
+31317,Pays Bas / Renkum
+3126,Pays Bas / Rheden
+31345,Pays Bas / Rijswijk (Gelderland)
+3170,Pays Bas / Rijswijk z�Holland
+31475,Pays Bas / Roermond
+31165,Pays Bas / Roosendaal
+3110,Pays Bas / Rotterdam
+3170,Pays Bas / s�-Gravenhage
+3170,Pays Bas / Scheveningen
+3110,Pays Bas / Schidam
+3146,Pays Bas / Sittard
+3135,Pays Bas / Soest
+31115,Pays Bas / Terneuze
+3170,Pays Bas / The Hague
+31344,Pays Bas / Tiel
+3113,Pays Bas / Tilburg
+3176,Pays Bas / Ulvenhout
+3130,Pays Bas / Utrecht
+31598,Pays Bas / Veendam
+3177,Pays Bas / Venlo
+3110,Pays Bas / Vlaardingen
+31118,Pays Bas / Vlissingen
+3170,Pays Bas / Voorburg
+3170,Pays Bas / Wassenaar
+31495,Pays Bas / Weert
+3175,Pays Bas / Zaandam
+3130,Pays Bas / Zeist
+3179,Pays Bas / Zoetermeer
+31575,Pays Bas / Zutphen
+3138,Pays Bas / Zwolle
+599 : Pays Bas Antilles
+5997,Pays Bas Antilles / Bonaire
+5999,Pays Bas Antilles / Cura�ao
+5994,Pays Bas Antilles / Saba
+5993,Pays Bas Antilles / St. Eustacius
+5995,Pays Bas Antilles / St. Maarten
+1670 : Les Marianne Nordiques
+1670532,Les Marianne Nordiques / Rota
+1670322,Les Marianne Nordiques / Saipan (Capitol Hill)
+1670234,Les Marianne Nordiques / Saipan (Susupe City)
+1670433,Les Marianne Nordiques / Tinian
+47 : La Norvège
+672 : Île De la Norfolk
+968 : L'Oman
+92 : Le Pakistan
+9241,Le Pakistan / Faisalabad
+92431,Le Pakistan / Gujranwala
+92221,Le Pakistan / Hyderabad
+9251,Le Pakistan / Islamabad
+92541,Le Pakistan / Jhelum
+9221,Le Pakistan / Karachi
+9242,Le Pakistan / Lahore
+9261,Le Pakistan / Multan
+9291,Le Pakistan / Peshawar
+9281,Le Pakistan / Quetta
+9251,Le Pakistan / Rawalpindi
+92432,Le Pakistan / Sialkot
+9271,Le Pakistan / Sukkur
+680 : Palau
+507 : Le Panama
+675 : Papua-new.guinea
+595 : Le Paraguay
+59521,Le Paraguay / Asuncion
+59561,Le Paraguay / Ciudad Del Este
+59531,Le Paraguay / Concepcion
+595521,Le Paraguay / Coronel Oviedo
+59571,Le Paraguay / Encarnacion
+59536,Le Paraguay / P.J. Cabellero
+595541,Le Paraguay / Villarrica
+51 : Le Pérou
+5184,Le Pérou / Abancay
+5154,Le Pérou / Arequipa
+5144,Le Pérou / Cajamarca
+5164,Le Pérou / Cerro de Pasco
+5174,Le Pérou / Chiclayo
+5184,Le Pérou / Cuzco
+5194,Le Pérou / Iquitos
+511,Le Pérou / Lima
+5174,Le Pérou / Piura
+5194,Le Pérou / Tarapoto
+5144,Le Pérou / Trujillo
+63 : Philippines
+6334,Philippines / Bacolod
+638822,Philippines / Cagayan De Oro
+6332,Philippines / Cebu
+6375,Philippines / Dagupan
+6382,Philippines / Davao
+6333,Philippines / Iloilo
+632,Philippines / Manila
+6393,Philippines / San Pablo
+48 : La Pologne
+48501,La Pologne / Mobile
+48601,La Pologne / Mobile
+48602,La Pologne / Mobile
+48603,La Pologne / Mobile
+48604,La Pologne / Mobile
+48605,La Pologne / Mobile
+48606,La Pologne / Mobile
+4890,La Pologne / Mobile
+4854,La Pologne / Aleksandr�w Kujawski
+4832,La Pologne / Bedzin
+4885,La Pologne / Bialystok
+4889,La Pologne / Biskupiec
+4852,La Pologne / Bydgoszcz
+4874,La Pologne / Bystrzyca Klodzka
+483,La Pologne / Bytom
+4856,La Pologne / Chelmno
+48531,La Pologne / Chojnice
+4832,La Pologne / Chorz�w
+4832,La Pologne / Chrzan�w
+4834,La Pologne / Czestochowa
+4874,La Pologne / Dzierzoni�w
+4855,La Pologne / Elblag
+4858,La Pologne / Gdansk
+4858,La Pologne / Gdynia
+4832,La Pologne / Gliwice
+4856,La Pologne / Grudziadz
+4832,La Pologne / Katowice
+4841,La Pologne / Kielce
+4874,La Pologne / Klodzko
+483912,La Pologne / Komertel
+4812,La Pologne / Krak�w
+4824,La Pologne / Leczyca
+4865,La Pologne / Leszno
+4817,La Pologne / Lezajsk
+4854,La Pologne / Lipno
+4842,La Pologne / L�dz
+4881,La Pologne / Lublin
+4889,La Pologne / Morag
+4832,La Pologne / Myslowice
+4862,La Pologne / Pleszew
+4824,La Pologne / Plock
+4861,La Pologne / Poznan
+4848,La Pologne / Radom
+4832,La Pologne / Ruda Slaska
+4832,La Pologne / Rybnik
+4817,La Pologne / Rzesz�w
+4825,La Pologne / Siedlce
+4859,La Pologne / Slupskie
+4858,La Pologne / Sopot
+4832,La Pologne / Sosnowiec
+4874,La Pologne / Swidnica
+4891,La Pologne / Szczecin
+4814,La Pologne / Tarn�w
+4856,La Pologne / Torun
+4832,La Pologne / Tychy
+4856,La Pologne / Wabrzezno
+4874,La Pologne / Walbrzych
+4822,La Pologne / Warsaw
+4854,La Pologne / Wloclawek
+4871,La Pologne / Wroclaw
+4874,La Pologne / Zabkowice Slaskie
+4832,La Pologne / Zabrze
+351 : Le Portugal
+351241,Le Portugal / Abrantes
+35121,Le Portugal / Almada
+35121,Le Portugal / Amadora
+351255,Le Portugal / Amarante
+351295,Le Portugal / Angra Do Heroismo (Azores)
+351258,Le Portugal / Arcos de Valdevez
+351235,Le Portugal / Arganil
+351234,Le Portugal / Aveiro
+35121,Le Portugal / Barreiro
+351284,Le Portugal / Beja
+351253,Le Portugal / Braga
+351273,Le Portugal / Bragan�a
+351262,Le Portugal / Caldas da Rainha
+351272,Le Portugal / Castelo Branco
+351286,Le Portugal / Castro Verde
+351276,Le Portugal / Chaves
+351239,Le Portugal / Coimbra
+351275,Le Portugal / Covilh�
+351268,Le Portugal / Elvas
+351268,Le Portugal / Estremoz
+351266,Le Portugal / �vora
+351289,Le Portugal / Faro
+351233,Le Portugal / Figueira da Foz
+351275,Le Portugal / Fundao
+351271,Le Portugal / Guarda
+351253,Le Portugal / Guimaraes
+351292,Le Portugal / Horta (Azores)
+351277,Le Portugal / Idanha-a-Nova
+351282,Le Portugal / Lagos
+351254,Le Portugal / Lamego
+351244,Le Portugal / Leiria
+35121,Le Portugal / Lisbon
+351289,Le Portugal / Loule
+351291,Le Portugal / Madeira
+351261,Le Portugal / Mafra
+35122,Le Portugal / Matosinhos
+351231,Le Portugal / Mealhada
+351278,Le Portugal / Mirandela
+3519,Le Portugal / Mobile & Pagers
+351279,Le Portugal / Moncorvo
+351285,Le Portugal / Moura
+351283,Le Portugal / Odemira
+351255,Le Portugal / Penafiel
+351254,Le Portugal / Peso da R�gua
+351236,Le Portugal / Pombal
+351296,Le Portugal / Ponta Delgada (Azores)
+351242,Le Portugal / Ponte de Sor
+351245,Le Portugal / Portalgere
+351282,Le Portugal / Portim�o
+35122,Le Portugal / Porto
+351274,Le Portugal / Proen�a-a-Nova
+351256,Le Portugal / S. Jo�o da Madeira
+351295,Le Portugal / Santa Cruz (Graciosa)
+351243,Le Portugal / Santar�m
+351269,Le Portugal / Santiago do Cac�m
+351238,Le Portugal / Seia
+351265,Le Portugal / Set�bal
+351281,Le Portugal / Tavira
+351249,Le Portugal / Torres Novas
+351261,Le Portugal / Torres Vedras
+351251,Le Portugal / Valen�a
+351258,Le Portugal / Viano do Castelo
+351296,Le Portugal / Vila Do Porto
+351263,Le Portugal / Vila Franca de Xira
+351252,Le Portugal / Vila Nova Famalic�o
+351259,Le Portugal / Vila Real
+351232,Le Portugal / Viseu
+48 : Prilep
+787 : Le Porto Rico
+974 : Le Qatar
+262 : La Réunion
+262692,La Réunion / Mobile
+40 : La Roumanie
+4090,La Roumanie / Mobile
+4091,La Roumanie / Mobile
+4095,La Roumanie / Mobile
+4058,La Roumanie / Alba
+4057,La Roumanie / Arad
+4048,La Roumanie / Arges
+4034,La Roumanie / Bacau
+4062,La Roumanie / Baia Mare
+4059,La Roumanie / Bihor
+4063,La Roumanie / Bistrita
+4031,La Roumanie / Botosani
+4039,La Roumanie / Braila
+4068,La Roumanie / Brasov
+401,La Roumanie / Bucharest
+4038,La Roumanie / Buzau
+4042,La Roumanie / Calarasi
+4055,La Roumanie / Caras-Severin
+4064,La Roumanie / Cluj-Napoca
+4041,La Roumanie / Constanta
+4067,La Roumanie / Corvasna
+4051,La Roumanie / Craiova
+4045,La Roumanie / Dambovita
+4051,La Roumanie / Dolj
+4037,La Roumanie / Focsani
+4045,La Roumanie / Gaesti
+4036,La Roumanie / Galati
+4046,La Roumanie / Giurgiu
+4053,La Roumanie / Gorj
+4066,La Roumanie / Harghita
+4054,La Roumanie / Hunedoara
+4043,La Roumanie / Ialomita
+4032,La Roumanie / Iasi
+4056,La Roumanie / Lugoj
+4041,La Roumanie / Mamaia
+4062,La Roumanie / Maramures
+4052,La Roumanie / Mehedinti
+4065,La Roumanie / Mures
+4033,La Roumanie / Neamt
+4049,La Roumanie / Olt
+4059,La Roumanie / Oradea
+4054,La Roumanie / Petrosani
+4048,La Roumanie / Pitesti
+4044,La Roumanie / Ploiesti
+4044,La Roumanie / Prahova
+4033,La Roumanie / Roman
+4068,La Roumanie / Sacele
+4060,La Roumanie / Salaj
+4061,La Roumanie / Satu-Mare
+4069,La Roumanie / Sibiu
+4030,La Roumanie / Suceava
+4047,La Roumanie / Teleorman
+4056,La Roumanie / Timisoara
+4065,La Roumanie / Tirgu-Mures
+4064,La Roumanie / Turda
+4050,La Roumanie / Valcea
+4035,La Roumanie / Vaslui
+4037,La Roumanie / Vrancea
+4040,La Roumanie / Yulcea
+4068,La Roumanie / Zarnesti
+7 : La Russie
+7877,La Russie / Adygeyskaya (Maykop)
+7385,La Russie / Altay (Barnaul)
+7416,La Russie / Amurskaya (Blagoveshchensk)
+7818,La Russie / Arkhangelsk
+7851,La Russie / Astrakhan
+7347,La Russie / Bashkir (Ufa)
+7336,La Russie / Baykonur (Territory of Kazakhstan)
+772,La Russie / Belgorod
+783,La Russie / Bryansk
+7301,La Russie / Buryat (Ulan-Ude)
+7871,La Russie / Chechen (Grozny)
+7351,La Russie / Chelyabinsk
+7820,La Russie / Cherepovets
+7302,La Russie / Chita
+7427,La Russie / Chukot (Anadyr)
+7835,La Russie / Chuvash (Cheboksary)
+7872,La Russie / Dagestan (Makhachkala)
+7343,La Russie / Ekaterinburg
+7388,La Russie / Gorno-Altaysk
+7873,La Russie / Ingush (Nazran)
+7395,La Russie / Irkutsk
+793,La Russie / Ivanovo
+7426,La Russie / Jewish (Birobidzhan)
+7866,La Russie / Kabardino-Balkariya (Nalchik)
+711,La Russie / Kaliningrad
+7847,La Russie / Kalmyk (Elista)
+784,La Russie / Kaluga
+7415,La Russie / Kamchatka (Petropavlovsk-Kamchatski)
+7878,La Russie / Karachayevo-Cherkesiya
+7814,La Russie / Kareliya (Petrozavodsk)
+7384,La Russie / Kemerovo
+7421,La Russie / Khabarovsk
+7390,La Russie / Khakasskaya (Abakan)
+7833,La Russie / Kirov
+7821,La Russie / Komi (Syktyvkar)
+794,La Russie / Kostroma
+7861,La Russie / Krasnodar
+7391,La Russie / Krasnoyarsk
+7352,La Russie / Kurgan
+771,La Russie / Kursk
+774,La Russie / Lipetsk
+7413,La Russie / Magadan
+7836,La Russie / Mary (Ioshkar-Ola)
+7879,La Russie / Mineranye Vody
+7834,La Russie / Mordovian (Saransk)
+795,La Russie / Moscow
+796,La Russie / Moscow area
+7815,La Russie / Murmansk
+7855,La Russie / Naberezhnye Chelny
+7831,La Russie / Nizhni Novgorod
+7816,La Russie / Novgorod
+7383,La Russie / Novosibirsk
+7381,La Russie / Omsk
+786,La Russie / Orel
+7353,La Russie / Orenburg
+7841,La Russie / Penza
+7342,La Russie / Perm
+7423,La Russie / Primorskiy (Vladivostok)
+7811,La Russie / Pskov
+7863,La Russie / Rostov
+791,La Russie / Ryazan
+7812,La Russie / Saint Petersburg
+7424,La Russie / Sakhalin (Yuzhno-Sakhalinsk)
+7846,La Russie / Samara
+7845,La Russie / Saratov
+7867,La Russie / Severnaya-Osetiya (Vladikavkaz)
+781,La Russie / Smolensk
+7862,La Russie / Sochi
+7865,La Russie / Stavropol
+7346,La Russie / Surgut
+775,La Russie / Tambov
+7843,La Russie / Tatar (Kazan)
+7848,La Russie / Tolyatti
+7382,La Russie / Tomsk
+787,La Russie / Tula
+7394,La Russie / Tuva (Kizil)
+782,La Russie / Tver
+7345,La Russie / Tyumen
+7341,La Russie / Udmurt (Izhevsk)
+7842,La Russie / Ulyanovsk
+792,La Russie / Vladimir
+7844,La Russie / Volgograd
+7817,La Russie / Vologda
+773,La Russie / Voronezh
+7411,La Russie / Yakut (Yakutsk)
+785,La Russie / Yaroslavl
+250 : Le Rwanda
+27 : L'Afrique du sud
+277,L'Afrique du sud / Mobile
+278,L'Afrique du sud / Mobile
+2751,L'Afrique du sud / Aliwal North
+2757,L'Afrique du sud / Allanridge
+2731,L'Afrique du sud / Amanzimtoti
+27201,L'Afrique du sud / Beaufort West
+2721,L'Afrique du sud / Bellville
+2717,L'Afrique du sud / Bethal
+2758,L'Afrique du sud / Bethlehem
+2740,L'Afrique du sud / Bisho (Ciskei)
+2751,L'Afrique du sud / Bloemfontein
+2756,L'Afrique du sud / Bothaville
+2712,L'Afrique du sud / Brits
+2728,L'Afrique du sud / Caledon
+2721,L'Afrique du sud / Cape Town
+2723,L'Afrique du sud / Ceres
+2748,L'Afrique du sud / Cradock
+2734,L'Afrique du sud / Dannhauser
+2753,L'Afrique du sud / De Aar
+2741,L'Afrique du sud / Despatch
+2734,L'Afrique du sud / Dundee
+2731,L'Afrique du sud / Durban
+2743,L'Afrique du sud / East London
+2735,L'Afrique du sud / Empangeni
+2717,L'Afrique du sud / Ermelo
+2721,L'Afrique du sud / Firgrove
+2744,L'Afrique du sud / George
+2734,L'Afrique du sud / Glencoe
+2721,L'Afrique du sud / Gordon�s Bay
+2749,L'Afrique du sud / Graff. Reinett
+2746,L'Afrique du sud / Grahamstown
+27151,L'Afrique du sud / Heidelberg
+2711,L'Afrique du sud / Johannesburg
+2753,L'Afrique du sud / Kimberley
+2743,L'Afrique du sud / King William�s Town
+2718,L'Afrique du sud / Klerksdorp
+2756,L'Afrique du sud / Kroonstad
+2736,L'Afrique du sud / Ladysmith
+2718,L'Afrique du sud / Lichtenburg
+2713,L'Afrique du sud / Lydenburg
+2722,L'Afrique du sud / Malmesbury
+2749,L'Afrique du sud / Middelburg, Cape Province
+2713,L'Afrique du sud / Middelburg, Tvl.
+2744,L'Afrique du sud / Mosselbaai
+2734,L'Afrique du sud / Newcastle
+2744,L'Afrique du sud / Oudtshoorn
+2721,L'Afrique du sud / Paarl
+2721,L'Afrique du sud / Parow
+2756,L'Afrique du sud / Parys
+2733,L'Afrique du sud / Pietermaritzburg
+2715,L'Afrique du sud / Pietersburg
+2731,L'Afrique du sud / Pinetown
+2741,L'Afrique du sud / Port Elizabeth
+2718,L'Afrique du sud / Portchefstroom
+2712,L'Afrique du sud / Pretoria
+2745,L'Afrique du sud / Queenstown
+2714,L'Afrique du sud / Rustenburg
+2716,L'Afrique du sud / Sasolburg
+2739,L'Afrique du sud / Scottburgh
+2721,L'Afrique du sud / Simon's Town
+2721,L'Afrique du sud / Somerset West
+2717,L'Afrique du sud / Standerton
+2721,L'Afrique du sud / Stellenbosch
+2721,L'Afrique du sud / Strand
+2715,L'Afrique du sud / Thohoyandou (Venda)
+2741,L'Afrique du sud / Uitenhage
+2747,L'Afrique du sud / Umtata (Transkei)
+2716,L'Afrique du sud / Vanderbijlpark
+2716,L'Afrique du sud / Vereeniging
+2757,L'Afrique du sud / Virginia
+275391,L'Afrique du sud / Vryburg
+2734,L'Afrique du sud / Vryheid
+2757,L'Afrique du sud / Welkom
+2721,L'Afrique du sud / Wellington
+2723,L'Afrique du sud / Worcester
+2722,L'Afrique du sud / Yzerfontein
+503 : Le Salvador
+685 : Le Samoa Occidental
+378 : Le Saint-Marin
+239 : Le Principe de S?Tom?nd
+966 : L'Arabie Saoudite
+9665299,L'Arabie Saoudite / Mobile
+9667,L'Arabie Saoudite / Abha
+9663,L'Arabie Saoudite / Abqaiq
+9666,L'Arabie Saoudite / Bukayriyah
+9663,L'Arabie Saoudite / Dammam
+9663,L'Arabie Saoudite / Dhahran
+9666,L'Arabie Saoudite / Hail
+9662,L'Arabie Saoudite / Hawiyah
+9663,L'Arabie Saoudite / Hofuf
+9662,L'Arabie Saoudite / Jeddah
+9663,L'Arabie Saoudite / Jubail
+9661,L'Arabie Saoudite / Layla
+9662,L'Arabie Saoudite / Mecca
+9664,L'Arabie Saoudite / Medina
+9663,L'Arabie Saoudite / Qatif
+9662,L'Arabie Saoudite / Rabigh
+9663,L'Arabie Saoudite / Ras Tanurah
+9661,L'Arabie Saoudite / Riyadh
+9661,L'Arabie Saoudite / Shaqra
+9664,L'Arabie Saoudite / Tabuk
+9662,L'Arabie Saoudite / Taif
+9664,L'Arabie Saoudite / Yanbu
+221 : Le Sénégal
+248 : Les Seychelles
+232 : La Sierra Leone
+65 : Singapour
+421 : La Slovaquie
+421901,La Slovaquie / Mobile
+421903,La Slovaquie / Mobile
+421904,La Slovaquie / Mobile
+421905,La Slovaquie / Mobile
+421907,La Slovaquie / Mobile
+42148,La Slovaquie / Bansk� Bystrica
+42154,La Slovaquie / Bardejov
+4212,La Slovaquie / Bratislava
+42141,La Slovaquie / Bytca
+42143,La Slovaquie / Dolny Kubin
+42142,La Slovaquie / Dubnica nad Vahom
+42153,La Slovaquie / Gelnica
+42154,La Slovaquie / Giraltovce
+42157,La Slovaquie / Humenn�
+42152,La Slovaquie / Ke marok
+42155,La Slovaquie / Ko�ice
+42156,La Slovaquie / Kr� ovsk� Chlmec
+42153,La Slovaquie / Levoca
+42144,La Slovaquie / Liptovsky Mikulas
+42143,La Slovaquie / Martin
+42156,La Slovaquie / Michalovce
+42155,La Slovaquie / Moldava nad Bodvou
+42143,La Slovaquie / Namestovo
+42137,La Slovaquie / Nitra
+42152,La Slovaquie / Poprad
+42142,La Slovaquie / Povazska Bystrica
+42151,La Slovaquie / Pre�ov
+42142,La Slovaquie / Puchov
+42141,La Slovaquie / Rajec
+42143,La Slovaquie / Rev�ca
+42158,La Slovaquie / Roznava
+42144,La Slovaquie / Ruzomberok
+42151,La Slovaquie / Sabinov
+42157,La Slovaquie / Snina
+42156,La Slovaquie / Sobrance
+42152,La Slovaquie / Spisska Nova Ves
+42152,La Slovaquie / Star� ubov a
+42152,La Slovaquie / Star� Smokovec
+42154,La Slovaquie / Stropkov
+42154,La Slovaquie / Svidn�k
+42156,La Slovaquie / Trebi�ov
+421831,La Slovaquie / Trencin
+42157,La Slovaquie / Vranov nad Toplou
+42141,La Slovaquie / Zilina
+386 : La Slovénie
+38631,La Slovénie / Mobile
+38640,La Slovénie / Mobile
+38641,La Slovénie / Mobile
+38650,La Slovénie / Mobile
+38670,La Slovénie / Mobile
+3863,La Slovénie / Celje
+386880,La Slovénie / Internet
+386889,La Slovénie / Internet
+3865,La Slovénie / Koper
+3864,La Slovénie / Kranj
+3867,La Slovénie / Krsko
+3861,La Slovénie / Ljubljana
+3862,La Slovénie / Maribor
+3862,La Slovénie / Murska Sobota
+3865,La Slovénie / Nova Gorica
+3867,La Slovénie / Novo Mesto
+3865,La Slovénie / Postojna
+3862,La Slovénie / Ravne na Koroskem
+3863,La Slovénie / Trbovlje
+677 : Îles Salomon
+252 : La Somalie
+2523,La Somalie / Belethawo
+252776,La Somalie / Belethawo
+2526,La Somalie / Beletweyne
+252771,La Somalie / Beletweyne
+2522,La Somalie / Berbera
+252751,La Somalie / Berbera
+2528723,La Somalie / Borama
+25252,La Somalie / Bossaso
+25222,La Somalie / Burao
+2524764,La Somalie / Dhusamareb
+25254,La Somalie / Galkyo
+25221,La Somalie / Hargeisa
+2523781,La Somalie / Kismayo
+2521711,La Somalie / Mogadishu
+2525793,La Somalie / Qardho
+34 : L'Espagne
+346,L'Espagne / Mobile
+34700,L'Espagne / Mobile
+34904,L'Espagne / Mobile
+34968,L'Espagne / Aguilas
+34967,L'Espagne / Albacete
+3496,L'Espagne / Alcira
+3496,L'Espagne / Alcoy
+34956,L'Espagne / Algeciras
+3496,L'Espagne / Alicante
+34950,L'Espagne / Almeria
+34928,L'Espagne / Arrecife
+34920,L'Espagne / Avila
+3498,L'Espagne / Aviles
+34924,L'Espagne / Badajoz
+3493,L'Espagne / Badalona
+3493,L'Espagne / Barcelona
+3496,L'Espagne / Benidorm
+3494,L'Espagne / Bilbao
+34947,L'Espagne / Burgo
+34927,L'Espagne / Caceres
+34956,L'Espagne / Cadiz
+34968,L'Espagne / Cartagena
+34964,L'Espagne / CastellondelaPlana
+34956,L'Espagne / Ceuta
+34926,L'Espagne / CiudadReal
+34957,L'Espagne / C�rdoba
+34969,L'Espagne / Cuenca
+3496,L'Espagne / Gandia
+34972,L'Espagne / Gerona
+3498,L'Espagne / Gijon
+34958,L'Espagne / Granada
+34949,L'Espagne / Guadalajara
+34959,L'Espagne / Huelva
+34971,L'Espagne / Ibiza
+34943,L'Espagne / Irun
+34953,L'Espagne / Jaen
+34956,L'Espagne / Jerez de la Frontera
+34981,L'Espagne / LaCoruna
+34928,L'Espagne / Lanzarote
+34928,L'Espagne / Las Palmas
+34987,L'Espagne / Le�n
+34973,L'Espagne / Lerida
+34953,L'Espagne / Linares
+34941,L'Espagne / Logrono
+34968,L'Espagne / Lorca
+34982,L'Espagne / Lugo
+3491,L'Espagne / Madrid
+34971,L'Espagne / Mahon
+3495,L'Espagne / Malaga
+34971,L'Espagne / Mallorca
+3495,L'Espagne / Marbella
+34924,L'Espagne / Merida
+34968,L'Espagne / Murcia
+34988,L'Espagne / Ourense
+3498,L'Espagne / Oviedo
+34979,L'Espagne / Palencia
+34971,L'Espagne / Palma de Mallorca
+34948,L'Espagne / Pamplona
+34986,L'Espagne / Pontevedra
+34977,L'Espagne / Reus
+3493,L'Espagne / Sabadell
+3496,L'Espagne / Sagunto
+3492,L'Espagne / Salamanca
+3493,L'Espagne / San Feliu de Llobregat
+34943,L'Espagne / San Sebastian
+34922,L'Espagne / Santa Cruz de Tenerife
+34942,L'Espagne / Santander
+34981,L'Espagne / Santiago de Compostela
+34921,L'Espagne / S�govie
+3495,L'Espagne / Seville
+34977,L'Espagne / Tarragona
+3493,L'Espagne / Tarrassa
+34922,L'Espagne / Tenerife
+34978,L'Espagne / Terval
+34925,L'Espagne / Toledo
+3495,L'Espagne / Torremolinos
+34977,L'Espagne / Tortosa
+3496,L'Espagne / Valencia
+34983,L'Espagne / Valladolid
+34986,L'Espagne / Vigo
+34945,L'Espagne / Vitoria
+34980,L'Espagne / Zamora
+349976,L'Espagne / zaragoza
+94 : Le Sri Lanka
+9467,Le Sri Lanka / Akkaraipattu
+941,Le Sri Lanka / Colombo (Central)
+941,Le Sri Lanka / Dehiwela
+949,Le Sri Lanka / Galle
+9421,Le Sri Lanka / Jaffna
+9465,Le Sri Lanka / Kalmunai
+9465,Le Sri Lanka / Kaluwanchikudy
+948,Le Sri Lanka / Kandy
+9437,Le Sri Lanka / Kurunegala
+9466,Le Sri Lanka / Laggala Pallegana
+941,Le Sri Lanka / Moratuwa
+9454,Le Sri Lanka / Nawalapitiya
+9431,Le Sri Lanka / Negombo
+9452,Le Sri Lanka / Nuwara Eliya
+9434,Le Sri Lanka / Panadura
+948,Le Sri Lanka / Peradeniya
+948,Le Sri Lanka / Pilimaialawa
+9451,Le Sri Lanka / Pundaluoya
+948,Le Sri Lanka / Talatuoya
+9426,Le Sri Lanka / Trincomalee
+290 : La Ste.Hélène
+1869 : Rue Kitts et Nevis
+1869469,Rue Kitts et Nevis / Nevis
+1869465,Rue Kitts et Nevis / St. Kitts
+1758 : Rue Lucia
+508 : Rue Pierre et Miquelon
+1784 : Rue Vincent et les grenadines
+249 : Le Soudan
+24981,Le Soudan / El Obied
+24911,Le Soudan / Khartoum
+24931,Le Soudan / Port Sudan City
+24951,Le Soudan / Wad Medani
+597 : Le Surinam
+268 : Le Souaziland
+46 : La Suède
+46589,La Suède / Arboga
+4633,La Suède / Bor�s
+4616,La Suède / Eskilstuna
+46346,La Suède / Falkenburg
+4623,La Suède / Falun
+4626,La Suède / G�lve-Sandviken
+4631,La Suède / Gothenburg
+4635,La Suède / Halmstad
+46611,La Suède / H�rn�sand
+4642,La Suède / Helsingborg
+46650,La Suède / Hudiksvall
+4636,La Suède / J�nk�ping
+46923,La Suède / Kalix
+46480,La Suède / Kalmar
+46454,La Suède / Karlshamn
+46455,La Suède / Karlskrona
+4654,La Suède / Karlstad
+4644,La Suède / Kristianstad
+46418,La Suède / Landskrona
+46510,La Suède / Lidk�ping
+46920,La Suède / Lule�
+4646,La Suède / Lund
+4640,La Suède / Malm�
+46501,La Suède / Mariestad
+4611,La Suède / Norrk�ping
+46155,La Suède / Nyk�ping
+4619,La Suède / �rebro
+46660,La Suède / �rnskildsvik
+46491,La Suède / Oskarshamn
+4663,La Suède / �stersund
+46155,La Suède / Oxel�sund
+46911,La Suède / Pite�
+46457,La Suède / Ronneby
+46910,La Suède / Skellefte�
+46500,La Suède / Sk�vde
+46270,La Suède / S�derhamn
+46755,La Suède / S�dert�lje
+468,La Suède / Stockholm
+46526,La Suède / Str�mstad
+4630,La Suède / Sundsvall
+46410,La Suède / Trelleborg
+46520,La Suède / Trollh�tten
+46522,La Suède / Uddevalla
+4690,La Suède / Ume�
+4618,La Suède / Uppsala
+46340,La Suède / Varberg
+4621,La Suède / V�ster�s
+46490,La Suède / V�stervik
+46498,La Suède / Visby Voir Gotland
+46411,La Suède / Ystad
+41 : La Suisse
+4164,La Suisse / Aarau
+4124,La Suisse / Aigle
+4156,La Suisse / Baden
+4161,La Suisse / Basle
+4191,La Suisse / Bellinzona
+4131,La Suisse / Berne
+4132,La Suisse / Bienne
+4127,La Suisse / Brig
+4134,La Suisse / Burgdorf
+4132,La Suisse / Chaux de Fonds, La
+4181,La Suisse / Chur
+4181,La Suisse / Davos
+4191,La Suisse / Faido
+4152,La Suisse / Frauenfeld
+4126,La Suisse / Fribourg
+4122,La Suisse / Geneva
+4132,La Suisse / Grenchen
+4133,La Suisse / Grindelwald
+4171,La Suisse / Herisau
+4133,La Suisse / Interlaken
+4131,La Suisse / Koniz
+4162,La Suisse / Langenthal
+4121,La Suisse / Lausanne
+4191,La Suisse / Locarno
+4139,La Suisse / Locle, Le
+4141,La Suisse / Lucerne
+4191,La Suisse / Lugano
+4121,La Suisse / Montreux
+4132,La Suisse / Neuch�tel
+4162,La Suisse / Olten
+4155,La Suisse / Rapperswill
+4171,La Suisse / Rorschach
+4152,La Suisse / Schaffhausen
+4141,La Suisse / Schwyz
+4127,La Suisse / Sion
+4132,La Suisse / Solothurn
+4171,La Suisse / St. Gallen
+4181,La Suisse / St. Moritz
+4141,La Suisse / Sursee
+4133,La Suisse / Thun
+411,La Suisse / Uster
+4121,La Suisse / Vevey
+4152,La Suisse / Winterthur
+4124,La Suisse / Yverdon
+4127,La Suisse / Zermatt
+4141,La Suisse / Zug
+411,La Suisse / Z�rich
+4133,La Suisse / Zweisimmen
+963 : La Syrie
+96321,La Syrie / Aleppo
+96343,La Syrie / Banias
+96311,La Syrie / Damascus
+96351,La Syrie / Deir Ezzor
+96351,La Syrie / Deraa
+96323,La Syrie / Edleb
+96333,La Syrie / Hama
+96352,La Syrie / Hassakah
+96331,La Syrie / Homs
+96341,La Syrie / Jebleh
+96344,La Syrie / Jisr Ash-Shughur
+96353,La Syrie / Kamichly
+96344,La Syrie / Kordaha
+96314,La Syrie / Kuneitra
+96341,La Syrie / Lattakia
+96324,La Syrie / Ma'arret Al Nouman
+96325,La Syrie / Manbej
+96312,La Syrie / Nabek
+96334,La Syrie / Palmayra
+96322,La Syrie / Raqqah
+96332,La Syrie / Safita
+96316,La Syrie / Sweida
+96343,La Syrie / Tartous
+96313,La Syrie / Zabadani
+886 : Taiwan
+88638,Taiwan / Hualien
+8867,Taiwan / Kaohsiung
+88632,Taiwan / Keelung
+88649,Taiwan / Nantou
+8868,Taiwan / Pingtung
+8864,Taiwan / Taichung
+8866,Taiwan / Tainan
+8862,Taiwan / Taipei
+7 : Tajikistan
+791,Tajikistan / Mobile
+731,Tajikistan / Dushanbe
+735,Tajikistan / Khorog
+734,Tajikistan / Khujand
+733,Tajikistan / Kuliab Area
+732,Tajikistan / Kurgan-Tube
+255 : La Tanzanie
+255741,La Tanzanie / Mobile
+255742,La Tanzanie / Mobile
+255743,La Tanzanie / Mobile
+255744,La Tanzanie / Mobile
+255747,La Tanzanie / Mobile
+25527,La Tanzanie / Arusha
+25524,La Tanzanie / Chake Chake
+25522,La Tanzanie / Dar es Salaam
+25526,La Tanzanie / Dodoma
+25526,La Tanzanie / Iringa
+25526,La Tanzanie / Kihesa
+25525,La Tanzanie / Mbalizi
+25525,La Tanzanie / Mbeya
+25524,La Tanzanie / Mkoani
+25523,La Tanzanie / Morogoro
+25527,La Tanzanie / Moshi
+25523,La Tanzanie / Mtwara
+25528,La Tanzanie / Mwanza
+25526,La Tanzanie / Njombe
+25526,La Tanzanie / Ruaha
+25525,La Tanzanie / Rujewa
+25525,La Tanzanie / Songea
+25525,La Tanzanie / Sumbawanga
+25526,La Tanzanie / Tabora
+25527,La Tanzanie / Tanga
+25525,La Tanzanie / Tukuyu
+25525,La Tanzanie / Uyole
+25524,La Tanzanie / Wete
+25524,La Tanzanie / Zanzibar
+66 : La Thaïlande
+662,La Thaïlande / Bangkok
+6653,La Thaïlande / Chieng Mai
+6643,La Thaïlande / Khon Kaen
+6634,La Thaïlande / Nakhon Pathom
+6644,La Thaïlande / Nakhon Ratchasima
+6635,La Thaïlande / Suphan Buri
+6642,La Thaïlande / Udon Thani
+670 : Timor oriental
+228 : Le Togo
+228945,Le Togo / Mobile
+228946,Le Togo / Mobile
+228947,Le Togo / Mobile
+228948,Le Togo / Mobile
+228949,Le Togo / Mobile
+690 : Le Tokélao
+676 : Le Tonga
+868 : Le Trinidad Et Le Tobago
+216 : La Tunisie
+21672,La Tunisie / Bizerte
+21671,La Tunisie / Carthage
+21675,La Tunisie / Gabes
+21672,La Tunisie / Hammamet
+21672,La Tunisie / Haouaria
+21677,La Tunisie / Kairouan
+21673,La Tunisie / Mahdia
+21671,La Tunisie / Marsa
+21672,La Tunisie / Menzel Bourguiba
+21673,La Tunisie / Monastir
+21672,La Tunisie / Nabeul
+21674,La Tunisie / Sfax
+21673,La Tunisie / Sousse
+21671,La Tunisie / Tunis
+90 : La Turquie
+90522,La Turquie / Mobile
+90532,La Turquie / Mobile
+90536,La Turquie / Mobile
+90542,La Turquie / Mobile
+90322,La Turquie / Adana
+90416,La Turquie / Adiyaman
+90272,La Turquie / Afyon
+90472,La Turquie / Agri
+90382,La Turquie / Aksaray
+90358,La Turquie / Amasya
+90312,La Turquie / Ankara
+90242,La Turquie / Antalya
+90478,La Turquie / Ardahan
+90466,La Turquie / Artvin
+90256,La Turquie / Aydin
+90266,La Turquie / Balikesir
+90378,La Turquie / Bartin
+90488,La Turquie / Batman
+90458,La Turquie / Bayburt
+90228,La Turquie / Bilecik
+90426,La Turquie / Bing�l
+90434,La Turquie / Bitlis
+90374,La Turquie / Bolu
+90248,La Turquie / Burdur
+90224,La Turquie / Bursa
+90286,La Turquie / �anakkale
+90376,La Turquie / �ankiri
+90364,La Turquie / �orum
+90258,La Turquie / Denizili
+90412,La Turquie / Dlyarbakir
+90284,La Turquie / Edirne
+90424,La Turquie / Elazig
+90446,La Turquie / Erzincan
+90442,La Turquie / Erzurum
+90222,La Turquie / Eskisehir
+90342,La Turquie / Gaziantep
+90454,La Turquie / Giresun
+90456,La Turquie / G�m�shane
+90438,La Turquie / Hakkari
+90326,La Turquie / Hatay
+90324,La Turquie / I�el (Mersin)
+90476,La Turquie / Igdir
+90246,La Turquie / Isparta
+90216,La Turquie / Istanbul (Anatolia)
+90212,La Turquie / Istanbul (Thrace)
+90232,La Turquie / Izmir
+90344,La Turquie / K. Maras
+90344,La Turquie / Kahramanmaras
+90370,La Turquie / Karab�k
+90338,La Turquie / Karaman
+90474,La Turquie / Kars
+90366,La Turquie / Kastamonu
+90352,La Turquie / Kayseri
+90348,La Turquie / Kilis
+90318,La Turquie / Kirikkale
+90288,La Turquie / Kirklareli
+90386,La Turquie / Kirsehir
+90262,La Turquie / Kocaeli (Izmit)
+90332,La Turquie / Konya
+90274,La Turquie / K�tahya
+90422,La Turquie / Malatya
+90236,La Turquie / Manisa
+90482,La Turquie / Mardin
+90252,La Turquie / Mugla
+90436,La Turquie / Mus
+90384,La Turquie / Nevsehir
+90388,La Turquie / Nigde
+90452,La Turquie / Ordu
+90328,La Turquie / Osmanive
+90512,La Turquie / Pagers
+90464,La Turquie / Rize
+90264,La Turquie / Sakarya (Adapazari)
+90362,La Turquie / Samsun
+90414,La Turquie / Sanliurfa
+90484,La Turquie / Siirt
+90368,La Turquie / Sinop
+90486,La Turquie / Sirnak
+90346,La Turquie / Sivas
+90282,La Turquie / Tekirdag
+90356,La Turquie / Tokat
+90800,La Turquie / Toll-Free
+90462,La Turquie / Trabzon
+90428,La Turquie / Tunceli
+90392,La Turquie / Turkish Republic of Northern Cyprus
+90276,La Turquie / Usak
+90432,La Turquie / Van
+90226,La Turquie / Yalova
+90354,La Turquie / Yozgat
+90372,La Turquie / Zonguldak2
+993 : Turkmenistan
+971 : Les Emirats Arabes Unis
+97150,Les Emirats Arabes Unis / Mobile
+9712,Les Emirats Arabes Unis / Abu Dhabi
+9716,Les Emirats Arabes Unis / Ajman
+9713,Les Emirats Arabes Unis / Al Ain
+9714,Les Emirats Arabes Unis / Al Saad
+9716,Les Emirats Arabes Unis / Aweer
+9714,Les Emirats Arabes Unis / Dhayd
+9719,Les Emirats Arabes Unis / Dubai
+9714,Les Emirats Arabes Unis / Fujairah
+97181,Les Emirats Arabes Unis / Jebel Ali
+9719,Les Emirats Arabes Unis / Jebel Dhana
+9719,Les Emirats Arabes Unis / Kalba
+9719,Les Emirats Arabes Unis / Khor Fakkan
+9714,Les Emirats Arabes Unis / Lihbab
+9712,Les Emirats Arabes Unis / Madinat Zayed
+9717,Les Emirats Arabes Unis / Ras al Khaimah
+9712,Les Emirats Arabes Unis / Ruwais
+9712,Les Emirats Arabes Unis / Sadiyat
+9716,Les Emirats Arabes Unis / Sharjah
+9716,Les Emirats Arabes Unis / Umm al Quwain
+256 : L'Ouganda
+25671,L'Ouganda / Mobile
+25675,L'Ouganda / Mobile
+25676,L'Ouganda / Mobile
+25677,L'Ouganda / Mobile
+25678,L'Ouganda / Mobile
+256476,L'Ouganda / Arua
+25641,L'Ouganda / Bombo
+256485,L'Ouganda / Bushenyi
+25645,L'Ouganda / Busia
+25641,L'Ouganda / Entebbe
+25642,L'Ouganda / Entebbe
+256483,L'Ouganda / Fort Portal
+256465,L'Ouganda / Hoima
+25643,L'Ouganda / Iganga
+25643,L'Ouganda / Jinja
+256486,L'Ouganda / Kabale
+25643,L'Ouganda / Kakira
+256481,L'Ouganda / Kalisizo
+25641,L'Ouganda / Kampala
+256496,L'Ouganda / Kamuli
+25645,L'Ouganda / Kapchorwa
+256483,L'Ouganda / Kasese
+256486,L'Ouganda / Kisoro
+25645,L'Ouganda / Kumi
+256473,L'Ouganda / Lira
+25641,L'Ouganda / Lugazi
+25641,L'Ouganda / Luwero
+25645,L'Ouganda / Malaba
+256481,L'Ouganda / Masaka
+256465,L'Ouganda / Masindi
+25645,L'Ouganda / Mbale
+256486,L'Ouganda / Mbarara
+25646,L'Ouganda / Mityana
+25641,L'Ouganda / Mpigi
+25646,L'Ouganda / Mubende
+256486,L'Ouganda / Rukungiri
+25641,L'Ouganda / Semuto
+25645,L'Ouganda / Soroti
+25645,L'Ouganda / Tororo
+25641,L'Ouganda / Wobulenzi
+44 : Le Royaume-Uni
+441224,Le Royaume-Uni / Aberdeen
+441225,Le Royaume-Uni / Bath
+441232,Le Royaume-Uni / Belfast
+44121,Le Royaume-Uni / Birmingham
+44117,Le Royaume-Uni / Bristol
+441222,Le Royaume-Uni / Cardiff
+4424,Le Royaume-Uni / Coventry
+441332,Le Royaume-Uni / Derby
+441382,Le Royaume-Uni / Dundee
+44131,Le Royaume-Uni / Edinburgh
+441392,Le Royaume-Uni / Exeter
+44141,Le Royaume-Uni / Glasgow
+44113,Le Royaume-Uni / Leeds
+44116,Le Royaume-Uni / Leicester
+44151,Le Royaume-Uni / Liverpool
+44171,Le Royaume-Uni / London
+44181 ,Le Royaume-Uni / London
+441504,Le Royaume-Uni / Londonderry
+44161,Le Royaume-Uni / Manchester
+44191,Le Royaume-Uni / Newcastle uponTyne
+441603,Le Royaume-Uni / Norwich
+44115,Le Royaume-Uni / Nottingham
+441865,Le Royaume-Uni / Oxford
+441733,Le Royaume-Uni / Peterborough
+441752,Le Royaume-Uni / Plymouth
+441772,Le Royaume-Uni / Preston
+44114,Le Royaume-Uni / Sheffield
+441703,Le Royaume-Uni / Southampton
+441782,Le Royaume-Uni / Stoke-on-Trent
+441792,Le Royaume-Uni / Swansea
+441793,Le Royaume-Uni / Swindon
+441902,Le Royaume-Uni / Wolverhampton
+441904,Le Royaume-Uni / York
+380 : L'Ukraine
+380472,L'Ukraine / Cherkassy
+380652,L'Ukraine / Crimea
+380562,L'Ukraine / Dnipropetrovsk
+380622,L'Ukraine / Donetsk
+3803422,L'Ukraine / Ivano-Frankiusk
+380572,L'Ukraine / Kharkov (Kharkiv)
+38044,L'Ukraine / Kiev
+380322,L'Ukraine / Lvov (Lviv)
+380482,L'Ukraine / Odessa
+38069,L'Ukraine / Sevastopol
+38065,L'Ukraine / Simferopol
+3803522,L'Ukraine / Ternopil
+3804744,L'Ukraine / Umani
+380432,L'Ukraine / Vinnytsia
+38065,L'Ukraine / Yalta
+38041,L'Ukraine / Zhitomir
+598 : L'Uruguay
+5982,L'Uruguay / Las Piedras
+59842,L'Uruguay / Maldonado
+598462,L'Uruguay / Melo
+598532,L'Uruguay / Mercedes
+598442,L'Uruguay / Minas
+5982,L'Uruguay / Montevideo
+5982,L'Uruguay / Pando
+598722,L'Uruguay / Paysandu
+59842,L'Uruguay / Punta del Este
+598622,L'Uruguay / Rivera
+598732,L'Uruguay / Salto
+5982,L'Uruguay / San Jose De Carrasco
+598632,L'Uruguay / Tacuarembo
+1 : Les Etats-Unis
+1907,Les Etats-Unis / Alaska
+1505,Les Etats-Unis / Albuquerque, NM
+1907,Les Etats-Unis / Anchorage
+1404,Les Etats-Unis / Atlanta, GA
+1609,Les Etats-Unis / Atlantic City, NJ
+1512,Les Etats-Unis / Austin, TX
+1410,Les Etats-Unis / Baltimore, MD
+1504,Les Etats-Unis / Baton Rouge, LA
+1616,Les Etats-Unis / Battle Creek, MI
+1205,Les Etats-Unis / Birmingham, AL
+1201,Les Etats-Unis / Bloomfield, NJ
+1617,Les Etats-Unis / Boston, MA
+1203,Les Etats-Unis / Bridgeport, CT
+1716,Les Etats-Unis / Buffalo, NY
+1818,Les Etats-Unis / Burbank, CA
+1802,Les Etats-Unis / Burlington, VR
+1508,Les Etats-Unis / Cape Cod, MA
+1803,Les Etats-Unis / Charleston, SC
+1704,Les Etats-Unis / Charlotte, NC
+1423,Les Etats-Unis / Chattanooga, TN
+1312,Les Etats-Unis / Chicago, IL
+1513,Les Etats-Unis / Cincinnati, OH
+1216,Les Etats-Unis / Cleveland, OH
+1719,Les Etats-Unis / Colorado Springs, CO
+1803,Les Etats-Unis / Columbia, SC
+1601,Les Etats-Unis / Columbus, MS
+1614,Les Etats-Unis / Columbus, OH
+1512,Les Etats-Unis / Corpus Christi, TX
+1214,Les Etats-Unis / Dallas, TX
+1303,Les Etats-Unis / Denver, CO
+1515,Les Etats-Unis / Des Moines, IO
+1313,Les Etats-Unis / Detroit, MI
+1915,Les Etats-Unis / El Paso, TX
+1954,Les Etats-Unis / Fort Lauderdale, F/A
+1817,Les Etats-Unis / Fort Worth, TX
+1616,Les Etats-Unis / Grand Rapids, MI
+1860,Les Etats-Unis / Hartford, CT
+1808,Les Etats-Unis / Hawaii
+1213,Les Etats-Unis / Hollywood, CA
+1808,Les Etats-Unis / Honolulu, HI
+1713,Les Etats-Unis / Houston, TX
+1317,Les Etats-Unis / Indianapolis, IN
+1601,Les Etats-Unis / Jackson, MS
+1201,Les Etats-Unis / Jersey City, NJ
+1816,Les Etats-Unis / Kansas City, MO
+1702,Les Etats-Unis / Las Vegas, NV
+1310,Les Etats-Unis / Long Beach, CA
+1213,Les Etats-Unis / Los Angeles, CA
+1502,Les Etats-Unis / Louisville, KY
+1901,Les Etats-Unis / Memphis, TN
+1305,Les Etats-Unis / Miami, FL
+1414,Les Etats-Unis / Milwaukee, WI
+1612,Les Etats-Unis / Minneapolis, MN
+1334,Les Etats-Unis / Mobile, AL
+1406,Les Etats-Unis / Montana
+1615,Les Etats-Unis / Nashville, TN
+1203,Les Etats-Unis / New Haven, CT
+1504,Les Etats-Unis / New Orleans, LO
+1718,Les Etats-Unis / New York City (Bronx), NY
+1718,Les Etats-Unis / New York City (Brooklyn), NY
+1212,Les Etats-Unis / New York City (Manhattan), NY
+1718,Les Etats-Unis / New York City (Queens), NY
+1718,Les Etats-Unis / New York City (Staten Island), NY
+1201,Les Etats-Unis / Newark, NJ
+1804,Les Etats-Unis / Norfolk, VA
+1405,Les Etats-Unis / Oklahoma City, OK
+1402,Les Etats-Unis / Omaha, NE
+1619,Les Etats-Unis / Palm Springs, CA
+1818,Les Etats-Unis / Pasadena, CA
+1215,Les Etats-Unis / Philadelphia, PA
+1602,Les Etats-Unis / Phoenix, AZ
+1412,Les Etats-Unis / Pittsburgh, PA
+1503,Les Etats-Unis / Portland, OR
+1401,Les Etats-Unis / Providence, RI
+1804,Les Etats-Unis / Richmond, VA
+1716,Les Etats-Unis / Rochester, NY
+1815,Les Etats-Unis / Rockford, IL
+1916,Les Etats-Unis / Sacramento, CA
+1801,Les Etats-Unis / Salt Lake City, UT
+1619,Les Etats-Unis / San Diego, CA
+1415,Les Etats-Unis / San Francisco, CA
+1206,Les Etats-Unis / Seattle, WA
+1413,Les Etats-Unis / Springfield, MA
+1314,Les Etats-Unis / St. Louis, MO
+1612,Les Etats-Unis / St. Paul, MN
+1315,Les Etats-Unis / Syracuse, NY
+1813,Les Etats-Unis / Tampa (Inner), FL
+1941,Les Etats-Unis / Tampa (Outer), FL
+1419,Les Etats-Unis / Toledo, OH
+1918,Les Etats-Unis / Tulsa, OK
+1202,Les Etats-Unis / Washington, DC
+1316,Les Etats-Unis / Wichita, KS
+1302,Les Etats-Unis / Wilmington, DE
+1914,Les Etats-Unis / Yonkers, NY
+1330,Les Etats-Unis / Youngstown, OH
+998 : Uzbekistan
+678 : Vanuatu
+58 : Le Venezuela
+84 : Le Vietnam
+1284 : Les Îles Vierges (R-U)
+1340 : Les Îles Vierges (USA)
+967 : Le Yémen
+381 : La Yougoslavie
+243 : Le Zaïre
+260 : La Zambie
+263 : Le Zimbabwe

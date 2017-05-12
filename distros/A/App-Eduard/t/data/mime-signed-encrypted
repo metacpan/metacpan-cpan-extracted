@@ -1,0 +1,39 @@
+From: Eduard <eduard@ceata.org>
+To: Eduard <eduard@ceata.org>
+Subject: MIME Signed & Encrypted
+MIME-Version: 1.0
+Content-Type: multipart/encrypted; boundary="=-=-=";
+	protocol="application/pgp-encrypted"
+
+--=-=-=
+Content-Type: application/pgp-encrypted
+
+Version: 1
+
+--=-=-=
+Content-Type: application/octet-stream
+
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v1
+
+hQEMAzLKYfkz3zGcAQgA1q4eoIqc/soA8vczuNvwdlEitJ+bIvpbp6UCegPr8nJi
+4k3faParZu2EMGuQBfzDPYSXZN7CVztwARoKpxy17ZvT4tZFEiJRGAQyU5fz3NOL
+rrf/MKIkcxA38+FokbdNIf9XKI2piDl2REeK48yqzBscTeYYFZpTKIYdvJheyLHv
+YyT8vqzmzmOCzl7fZc/wJM9mKTZ9/+DD1H4UoBpRx7HmpXE8m0bfLzJnperZh5KF
+4rq4rXlXau0KtDxQ2g8gXXVKTMgu2lZqFTWya/eNZUS3RWRvfu1tJSsdoSXOqt8f
+z3CQgoQ23uRlnT3cE785PYGcnJyDcvhKbLgHbYje4tLBOwHx4EKeXQkXDeWxW5Or
+s3vPDjV6lyfoohyrl7+mb84A6+2ZBSJHBMxPb9MQUZfEoB7XKy8LpjF1IvX6ZXYk
+ASb1j60HGAimVORI0ifod+Adw39wfFDI2EH+e8BzQnocKuqDJhd3kyLUxDCeNIl+
+wo8w5rU+hHGiBsqA0XnbziIXYP2uVfM7HuX6SsaB6FWGSv/evHoAJwvqwWaAGpbK
+gfWHz4kgwOQvcoEECGMGxxtz+WoR7TsGRwOOgIt5ZE2FXBm6NQj9Coe06Qxi5cQL
+K/LOql/XGGWc4IdF6R+ERTDiKX6fjNh4Bq7AnLaoxlOPisJ8bIpWnZr7lncgHnk4
+SmLMZd4SRA5r3/Teth55x26Fraht5VEGdPGeuQNpkONdxN+Vju+1Mgurxi0FghPc
+1MLt0zpIh4Ng7N/wtvlW2sSV0dFXoXypkk4DDBUumeh3YTPhhJ6hyViAa0ci4TFY
++LEc2TlQawqeTxaWrYbXL5p+yYWE6iBafF//+HB6IwV/z4it/nCnwskDOsYtjL3C
+gpR9Y5U3TugCUY1NJ/5hj39eOJ6UO0sXXMUBxIrsq4nrD4HGdbUqwDEiSmMFPGCk
+7xjKo2LpgpxT9mDyY2DIUwupgaB4IMWC9iySZ466N1yxTopm5xzXq5PinVUuIZyY
+2Xf3kWxMQOGkQlf4Wg==
+=4jVV
+-----END PGP MESSAGE-----
+--=-=-=--
+

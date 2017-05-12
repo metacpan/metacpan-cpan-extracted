@@ -1,0 +1,26 @@
+---
+abstract: 'ElasticSearch command line client.'
+author:
+  - 'Mickey Nasriachi <mickey75@gmail.com>, Kang-min Liu <gugod@gugod.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-es
+requires:
+  ElasticSearch: 0
+  File::Slurp: 0
+  JSON: 0
+  List::MoreUtils: 0
+  Pod::Usage: 0
+  Term::ANSIColor: 0
+  encoding: 0
+  strict: 0
+  warnings: 0
+version: 0.1

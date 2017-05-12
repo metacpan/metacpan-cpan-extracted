@@ -1,0 +1,855 @@
+<perl>
+# 
+# Automatic Form Fill tag library
+# 
+# Copyright 2003 Console Inc. 
+# All rights reserved
+#
+# Version 1.1 - December 2003
+# 
+# Last updated 01 Dec 2003 (CCR)
+#
+
+use Date::Calc qw(Today);
+
+</perl>
+
+<tag name="autoformfill" body="1" global="1" 
+     accepts="module, method, values">
+<perl>
+
+=head2 AutoFill form fill tag
+
+The C<autoformfill> tag gets values from the specified module and method in order to fill AutoFill form fields.
+
+Usage: 
+
+  <autoformfill module="My::Test" method="filltestform" />
+  
+  or
+  
+  <autoformfill values="$values" />
+
+=cut
+
+if ($values)
+{
+  setpvar('autofill_data', $values);
+}
+else
+{
+  # include the specified module
+  eval qq{use $module;};
+  
+  if ($@)
+  {
+    die "The autoformfill tag can't load module ($module): $@\n";
+  }
+  
+  my $autofill_data = $module->$method;
+  
+  # check for errors
+  unless ($autofill_data)
+  {
+  }
+  
+  setpvar( 'autofill_data', $autofill_data );
+}
+
+</perl>
+</tag>
+
+<tag name="autotext" body="1" global="1" 
+     accepts="name, diff, size, maxlength">
+<perl>
+
+=head2 AutoFill text tag
+
+The C<autotext> tag fills in a form field.
+
+Usage: 
+
+  <autotext name="full_nm" size="20" maxlength="50" />
+
+=cut
+
+my $af = getpvar('autofill_data');
+
+my $value = $af->{'field'}->{$name} || '';
+
+# differentiate the field name
+$diff = '_' . $af->{'field'}{$diff} if $diff;
+
+# translate characters to make them form-safe
+$value =~ s/"/&quot;/g;
+
+print qq{<input type="text" name="${name}${diff}" value="$value" size="$size" maxlength="$maxlength" />};
+
+</perl>
+</tag>
+
+<tag name="automessage" body="1" global="1" 
+     accepts="name,lookup">
+<perl>
+
+=head2 AutoFill message tag
+
+The C<automessage> tag displays a non-editable field.
+
+Usage: 
+
+  <automessage name="full_nm" />
+
+=cut
+
+my $af = getpvar('autofill_data');
+
+my $value = $af->{'field'}->{$name} || '&nbsp;';
+
+if ($lookup)
+{
+  $value = $af->{'lookup'}{$lookup}{$value};
+}
+
+# translate characters to make value HTML-safe
+$value =~ s/</&lt;/g;
+$value =~ s/>/&gt;/g;
+
+print qq{$value};
+print qq{$body};
+
+</perl>
+</tag>
+
+<tag name="autolink" body="1" global="1"
+     accepts="name, href, fields, cond">
+<perl>
+
+=head2 AutoFill link tag
+
+The C<autolink> tag displays a non-editable link.
+
+Usage:
+
+  <autolink href="view_user.psp" name="full_nm" />
+
+=cut
+
+print "\n";
+my $af = getpvar('autofill_data');
+
+my @fields = split /\s?,\s?/, $fields;
+my $value = $body || $af->{'field'}->{$name};
+my $query = '';
+my $display_link = $cond ? 0 : 1;
+
+# add the specified fields as query variables
+foreach my $f (@fields)
+{
+  # translate characters to make value URL-safe
+  my $value = $af->{'field'}->{$f};
+  my $url_value = CGI::Minimal->url_encode($value);
+  $query .= "$f=$url_value&";
+  if ($cond eq $f and $value)
+  {
+    $display_link = 1;
+  }
+}
+  
+# display the link unless a condition isn't met
+if ($display_link)
+{
+  print qq{<a href="$href?$query">$value</a>};
+}
+elsif ($cond eq $name)
+{
+  # don't print anything if there's nothing to print
+  print qq{};
+}
+else
+{
+  print qq{$value};
+}
+
+</perl>
+</tag>
+
+<tag name="autoforward" body="1" global="1"
+     accepts="href, fields">
+<perl>
+
+=head2 AutoFill forward tag
+
+The C<autoforward> tag displays a non-editable link.
+
+Usage:
+
+  <autoforward href="view_user.psp" fields="" />
+
+=cut
+
+print "\n";
+my $af = getpvar('autofill_data');
+
+my $query = '';
+
+foreach my $f (keys %QUERY)
+{
+  foreach my $value (split /\0/, $QUERY{$f})
+  {
+    # translate characters to make value URL-safe
+    my $url_value = CGI::Minimal->url_encode($value);
+    $query .= "$f=$url_value&";
+  }
+}
+  
+print qq{<a href="$href?$query">$body</a>};
+
+</perl>
+</tag>
+
+<tag name="autoqueryhidden" body="1" global="1"
+     accepts="fields">
+<perl>
+
+=head2 AutoFill query forwarding tag
+
+The C<autoqueryhidden> tag adds query variables as hidden form fields.
+
+Usage:
+
+  <autoqueryhidden />
+
+=cut
+
+print "\n";
+my $af = getpvar('autofill_data');
+
+my $query = '';
+
+foreach my $f (keys %QUERY)
+{
+  foreach my $value (split /\0/, $QUERY{$f})
+  {
+    # translate characters to make value HTML-safe
+    $value =~ s/&/&amp;/g;
+    $value =~ s/</&lt;/g;
+    
+    print qq{<input type="hidden" name="$f" value="$value" />\n};
+  }
+}
+
+</perl>
+</tag>
+
+<tag name="autoselect" body="1" global="1" 
+     accepts="name, multiple, lookup, sortby, size, diff">
+<perl>
+
+=head2 AutoFill drop-down (select) tag
+
+The C<autoselect> tag fills in a form field.
+
+Usage: 
+
+  <autoselect name="color" multiple="yes" lookup="color" />
+
+=cut
+
+print "\n";
+my $af = getpvar('autofill_data');
+
+# set the array of values
+my $value = $af->{'field'}{$name};
+my @values;
+if (ref($value) eq 'ARRAY')
+{
+  @values = @$value;
+}
+else
+{
+  @values = ($value);
+}
+
+# record the values in the selected hash
+my %selected;
+if ($multiple)
+{
+  foreach my $v (@values)
+  {
+    $selected{$v} = 'selected';
+  }
+}
+else
+{
+  $selected{$values[0]} = 'selected';
+}
+
+# get the lookup values
+# and determine the sort order
+$lookup ||= $name;
+my @lookup_keys;
+my @lookup_values;
+
+# sort by value by default
+$sortby ||= 'value';
+
+my $lookup_ref = $af->{'lookup'}{$lookup};
+if (ref($lookup_ref) eq 'ARRAY')
+{
+  @lookup_keys   = @$lookup_ref;
+  @lookup_values = @$lookup_ref;
+}
+elsif (ref($lookup_ref) eq 'HASH')
+{
+  if ($sortby eq 'value')
+  {
+    # sort the values by hash key
+    my %lookup = %$lookup_ref;
+    @lookup_keys = sort { $a <=> $b } keys %lookup;
+    foreach my $k (@lookup_keys)
+    {
+      push (@lookup_values, $lookup_ref->{$k});
+    }
+  }
+  elsif ($sortby eq 'name')
+  {
+    # sort the values by hash value
+    my %lookup = %$lookup_ref;
+    @lookup_keys = sort { $lookup{$a} cmp $lookup{$b} } keys %lookup;
+    foreach my $k (@lookup_keys)
+    {
+      push (@lookup_values, $lookup{$k});
+    }
+  }
+  elsif ($sortby =~ /^(array_\w+)$/)
+  {
+    # sort the values based on another array
+    @lookup_keys = @{$af->{'lookup'}{$1}};
+    foreach my $k (@lookup_keys)
+    {
+      push (@lookup_values, $lookup_ref->{$k});
+    }
+  }
+  else
+  {
+    # get keys and values as given
+    @lookup_keys = keys %$lookup_ref;
+    foreach my $k (@lookup_keys)
+    {
+      push (@lookup_values, $lookup_ref->{$k});
+    }
+  }  
+}
+else
+{
+  @lookup_keys   = ($lookup_ref);
+  @lookup_values = ($lookup_ref);
+}
+
+# differentiate the field name
+$diff = '_' . $af->{'field'}{$diff} if $diff;
+
+# display the form field 
+if ($multiple)
+{
+  print qq{<select name="$name$diff" multiple="$multiple" size="$size">\n};
+}
+else
+{
+  print qq{<select name="$name$diff">\n};
+}
+
+my $k = scalar(@lookup_keys) - 1;
+for my $i (0..$k)
+{
+  my $key   = $lookup_keys[$i];
+  my $value = $lookup_values[$i];
+  print qq{<option value="$key" $selected{$key}>$value</option>\n};
+}
+print qq{</select>\n};
+
+
+</perl>
+</tag>
+
+<tag name="autotextarea" body="1" global="1" 
+     accepts="name, rows, cols, wrap">
+<perl>
+
+=head2 AutoFill textarea tag
+
+The C<autotextarea> tag fills in a form field.
+
+Usage: 
+
+  <autotextarea name="explain" rows="5" cols="30" wrap="virtual" />
+
+=cut
+
+print "\n";
+my $af = getpvar('autofill_data');
+
+# set the value
+my $value = $af->{'field'}{$name};
+
+# escape any HTML-like characters
+$value =~ s/&/&amp;/g;
+$value =~ s/</&lt;/g;
+
+print qq{<textarea name="$name" rows="$rows" cols="$cols">$value</textarea>\n};
+
+</perl>
+</tag>
+
+<tag name="autoradio" body="1" global="1" 
+     accepts="name, lookup, sortby">
+<perl>
+
+=head2 AutoFill radio button tag
+
+The C<autoradio> tag fills in a form field.
+
+Usage: 
+
+  <autoradio name="kidding" 
+             lookup="yesno" 
+             sortby="value" />
+
+=cut
+
+print "\n";
+my $af = getpvar('autofill_data');
+
+# set the array of values
+my $value = $af->{'field'}{$name};
+my @values;
+if (ref($value) eq 'ARRAY')
+{
+  @values = @$value;
+}
+else
+{
+  @values = ($value);
+}
+
+# record the values in the selected hash
+my %selected;
+$selected{$values[0]} = 'checked';
+
+# get the lookup values
+# and determine the sort order
+$lookup ||= $name;
+my @lookup_keys;
+my @lookup_values;
+
+my $lookup_ref = $af->{'lookup'}{$lookup};
+if (ref($lookup_ref) eq 'ARRAY')
+{
+  @lookup_keys   = @$lookup_ref;
+  @lookup_values = @$lookup_ref;
+}
+elsif (ref($lookup_ref) eq 'HASH')
+{
+  if ($sortby eq 'name')
+  {
+    # sort the values by hash key
+    @lookup_keys = sort keys %$lookup_ref;
+    foreach my $k (@lookup_keys)
+    {
+      push (@lookup_values, $lookup_ref->{$k});
+    }
+  }
+  elsif ($sortby eq 'value')
+  {
+    # sort the values by hash value
+    my %lookup = %$lookup_ref;
+    @lookup_keys = sort { $lookup{$a} cmp $lookup{$b} } keys %lookup;
+    foreach my $k (@lookup_keys)
+    {
+      push (@lookup_values, $lookup{$k});
+    }
+  }
+  elsif ($sortby =~ /^(array_\w+)$/)
+  {
+    # sort the values based on another array
+    @lookup_keys = @{$af->{'lookup'}{$1}};
+    foreach my $k (@lookup_keys)
+    {
+      push (@lookup_values, $lookup_ref->{$k});
+    }
+  }
+  else
+  {
+    # get keys and values as given
+    @lookup_keys = keys %$lookup_ref;
+    foreach my $k (@lookup_keys)
+    {
+      push (@lookup_values, $lookup_ref->{$k});
+    }
+  }  
+}
+else
+{
+  @lookup_keys   = ($lookup_ref);
+  @lookup_values = ($lookup_ref);
+}
+
+# display the form field 
+my $k = scalar(@lookup_keys) - 1;
+for my $i (0..$k)
+{
+  my $key   = $lookup_keys[$i];
+  my $value = $lookup_values[$i];
+  print qq{<input type="radio" name="$name" value="$key" $selected{$key} /> $value\n};
+}
+
+</perl>
+</tag>
+
+<tag name="autocheckbox" body="1" global="1" 
+     accepts="name, lookup, sortby">
+<perl>
+
+=head2 AutoFill check box tag
+
+The C<autocheckbox> tag fills in a form field.
+
+Usage: 
+
+  <autocheckbox name="really_kidding" lookup="yesno" sort="1" sortby="array_yesno" />
+
+=cut
+
+print "\n";
+my $af = getpvar('autofill_data');
+
+# set the array of values
+my $value = $af->{'field'}{$name};
+my @values;
+if (ref($value) eq 'ARRAY')
+{
+  @values = @$value;
+}
+else
+{
+  @values = ($value);
+}
+
+# record the values in the selected hash
+my %selected;
+foreach my $v (@values)
+{
+  $selected{$v} = 'checked';
+}
+
+# get the lookup values
+# and determine the sort order
+$lookup ||= $name;
+my @lookup_keys;
+my @lookup_values;
+
+my $lookup_ref = $af->{'lookup'}{$lookup};
+if (ref($lookup_ref) eq 'ARRAY')
+{
+  @lookup_keys   = @$lookup_ref;
+  @lookup_values = @$lookup_ref;
+}
+elsif (ref($lookup_ref) eq 'HASH')
+{
+  if ($sortby eq 'value')
+  {
+    # sort the values by hash key
+    my %lookup = %$lookup_ref;
+    @lookup_keys = sort { $a <=> $b } keys %lookup;
+    foreach my $k (@lookup_keys)
+    {
+      push (@lookup_values, $lookup_ref->{$k});
+    }
+  }
+  elsif ($sortby eq 'name')
+  {
+    # sort the values by hash value
+    my %lookup = %$lookup_ref;
+    @lookup_keys = sort { $lookup{$a} cmp $lookup{$b} } keys %lookup;
+    foreach my $k (@lookup_keys)
+    {
+      push (@lookup_values, $lookup{$k});
+    }
+  }
+  elsif ($sortby =~ /^(array_\w+)$/)
+  {
+    # sort the values based on another array
+    @lookup_keys = @{$af->{'lookup'}{$1}};
+    foreach my $k (@lookup_keys)
+    {
+      push (@lookup_values, $lookup_ref->{$k});
+    }
+  }
+  else
+  {
+    # get keys and values as given
+    @lookup_keys = keys %$lookup_ref;
+    foreach my $k (@lookup_keys)
+    {
+      push (@lookup_values, $lookup_ref->{$k});
+    }
+  }  
+}
+else
+{
+  @lookup_keys   = ($lookup_ref);
+  @lookup_values = ($lookup_ref);
+}
+
+# display the form field 
+my $k = scalar(@lookup_keys) - 1;
+for my $i (0..$k)
+{
+  my $key   = $lookup_keys[$i];
+  my $value = $lookup_values[$i];
+  print qq{<input type="checkbox" name="$name" value="$key" $selected{$key} /> $value\n};
+}
+
+</perl>
+</tag>
+
+<tag name="autohidden" body="1" global="1" 
+     accepts="name">
+<perl>
+
+=head2 AutoFill hidden field tag
+
+The C<autohidden> tag fills in a form field.
+
+Usage: 
+
+  <autohidden />
+
+=cut
+
+print "\n";
+my $af = getpvar('autofill_data');
+
+# get the array of field names
+my @names;
+if ($name)
+{
+  @names = ($name);
+}
+else
+{
+  my $hidden_fields = $af->{'hidden_fields'};
+  if (ref($hidden_fields) eq 'ARRAY')
+  {
+    @names = @$hidden_fields;
+  }
+  elsif ($hidden_fields)
+  {
+    @names = ($hidden_fields);
+  }
+}
+
+foreach my $name (@names)
+{
+  # set the array of values
+  my $value = $af->{'field'}{$name};
+  my @values;
+  if (ref($value) eq 'ARRAY')
+  {
+    @values = @$value;
+  }
+  else
+  {
+    @values = ($value);
+  }
+  
+  foreach my $v (@values)
+  {
+    print qq{<input type="hidden" name="$name" value="$value" />\n};
+  }
+}
+</perl>
+</tag>
+
+<tag name="autodate" body="1" global="1"
+     accepts="name, diff, style, default, form">
+<perl>
+
+=head2 AutoFill date drop-down (select) tag
+
+The C<autodate> tag fills in a set of form fields for the date.
+Note: dates passed to this tag MUST be in one of the following formats:
+
+ 'YYYY-MM-DD'
+ 'YYYY-MM-DD HH:MI:SS'
+ 'YYYYMMDDHHMISS'
+
+Usage:
+
+  <autodate name="birthday" diff="user_id" style="dropdown" default="today" form="autoform3" />
+
+=cut
+
+print "\n";
+my $af = getpvar('autofill_data');
+
+$form ||= 'autoform';
+
+# differentiate the field name
+$diff = '_' . $af->{'field'}{$diff} if $diff;
+
+# set the value
+my $value = $af->{'field'}{$name};
+my %date;
+
+if ($default eq 'today' and !$value)
+{
+  # use today as the default
+  ($date{year}, $date{month}, $date{day}) = Today();
+}
+elsif ($value =~ /-/)
+{
+  # MySQL date or datetime format
+  ($date{year}, $date{month}, $date{day}) = split /\D/, $value;
+}
+else
+{
+  # MySQL datestamp format
+  $date{year}  = substr($value, 0, 4);
+  $date{month} = substr($value, 4, 2);
+  $date{day}   = substr($value, 6, 2);
+}
+
+$value = $date{year} ? sprintf( '%04d-%02d-%02d', $date{year}, $date{month}, $date{day} ) : '';
+
+if ($style eq 'dropdown')
+{
+  my %lookups = 
+  (
+    'day'    => ['', 01..31],
+    'month'  => ['', 01..12],
+    'year'   => ['', 2001..2010],
+  );
+  
+  foreach my $part ('month', 'day', 'year')
+  {
+    my $value = $date{$part};
+    
+    # record the value in the selected hash
+    my %selected;
+    $selected{$value} = 'selected';
+    
+    # get the lookup values
+    # and determine the sort order
+    my @lookup_keys;
+    my @lookup_values;
+    
+    my $lookup_ref = $lookups{$part};
+    if (ref($lookup_ref) eq 'ARRAY')
+    {
+      @lookup_keys   = @$lookup_ref;
+      @lookup_values = @$lookup_ref;
+    }
+    elsif (ref($lookup_ref) eq 'HASH')
+    {
+      # sort the values by hash key
+      @lookup_keys = sort keys %$lookup_ref;
+      foreach my $k (@lookup_keys)
+      {
+        push (@lookup_values, $lookup_ref->{$k});
+      }
+    }
+    else
+    {
+      @lookup_keys   = ($lookup_ref);
+      @lookup_values = ($lookup_ref);
+    }
+    
+    # display the form field
+    print qq{<select name="${name}_${part}${diff}">\n};
+    
+    my $k = scalar(@lookup_keys) - 1;
+    for my $i (0..$k)
+    {
+      my $key   = $lookup_keys[$i];
+      my $value = $lookup_values[$i];
+      print qq{<option value="$key" $selected{$key}>$value</option>\n};
+    }
+    print qq{</select>};
+  
+    print '/' unless $part eq 'year';
+  }
+}
+else
+{
+  my $fname = $name . $diff;
+  
+  # display a text box with a date javascript
+  print qq{<nobr><input type="text" name="$fname" size="10" maxlength="10" value="$value" /> };
+  print qq{<a href="javascript:show_calendar('$form.$fname');" } .
+        qq{onmouseover="window.status='Date Picker';return true;" } .
+        qq{onmouseout="window.status='';return true;">};
+  print qq{<img src="/images/calendar.gif" /></a></nobr>\n};
+}
+
+</perl>
+</tag>
+
+<tag name="autofilltest" accepts="nothing">
+<perl>
+my $result =
+{
+  'field' =>
+  {
+    'full_nm'        => 'Bill Gates',
+    'quest'          => 'stupid',
+    'color'          => ['green', 'orange'],
+    'explain'        => 'I grew up with a silver spoon in my mouth. That\'s why I founded a giant software company.',
+    'kidding'        => 0,
+    'really_kidding' => 1,
+    'sign'           => 'Aquarius',
+    'problem'        => 'megalomania',
+  },
+  'hidden_fields' =>
+  [
+    'sign',
+    'problem',
+  ],
+  'lookup' =>
+  {
+    'color' =>
+    [
+      'green',
+      'blue',
+      'red',
+      'orange',
+      'purple',
+    ],
+    'yesno' =>
+    {
+      '1' => 'Yes',
+      '0' => 'No',
+    },
+    'quest' =>
+    {
+      'stupid' => 'Dominate the Universe',
+      'dumb'   => 'Trash the Planet',
+      'silly'  => 'Save the Planet',
+      'mild'   => 'Read a Book',
+      'good'   => 'Write some Perl',
+      'great'  => 'Buy Stuff for Chuck',
+    },
+    'array_yesno' =>
+    [
+      '1',
+      '0',
+    ],
+  },
+};
+
+setpvar('autofill_data', $result);
+</perl>
+
+</tag>
+

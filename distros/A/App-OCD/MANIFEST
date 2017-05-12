@@ -1,0 +1,8 @@
+Makefile.PL
+README
+t/App-OCD.t
+lib/App/OCD.pm
+MANIFEST
+MANIFEST.skip
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

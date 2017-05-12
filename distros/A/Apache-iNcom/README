@@ -1,0 +1,101 @@
+Apache::iNcom
+=============
+
+Version: 0.09
+
+Requirements
+------------
+
+        - DBI 1.13
+        - mod_perl 1.21
+        - libapreq 0.31
+        - HTML::Embperl 1.2.1
+        - Apache::Session 1.03 + generate_id patch
+        - MIME::Base64
+        - Locale::Maketext 0.17   + currency patch
+        - apache 1.3.6 or later
+        - Database which supports transactions. (tested with PostgreSQL 6.5.x)
+
+Description
+-----------
+
+    Apache::iNcom is an e-commerce framework. It is not a ready-to-run
+    merchant system. It is an integration of different
+    components needed for e-commerce into a coherent whole.
+
+    The primary design goals of the framework are flexibility and
+    security. Most merchant systems will make assumptions in the way
+    your catalog's data, customer's data are structured or on how
+    your order process works. Most also imposes severe restrictions
+    on how the user will interface to your electronic catalog. This
+    is precisely the kind of constraints that Apache::iNcom was
+    designed to avoid.
+
+    Apache::iNcom provides the following infrastructure :
+
+        - Session Management
+        - Cart Management
+        - Input Validation
+        - Order management
+        - User management
+        - << Easy >> database access
+        - Internationalization
+        - Error handling
+
+    Most of the base functionalities of Apache::iNcom are realized
+    by leveraging standard and well known modules like DBI(3) for
+    generic SQL database access, HTML::Embperl(3) for dynamic page
+    generation, Apache::Session(3) for session management,
+    mod_perl(3) for Apache integration and Locale::Maketext(3) for
+    localization.
+
+    Here are its assumptions :
+
+        - Data is in a SQL database which supports transactions.
+        - Interface is in HTML.
+        - Session is managed through cookies.
+
+Installation
+------------
+
+    After installing the requirements, you can use the standard
+
+    perl Makefile.PL
+    make
+    make install
+
+Configuration
+-------------
+
+    Apache::iNcom is configured using standard the Apache directives
+    PerlSetVar. Activating Apache::iNcom for a particular virtual
+    host is a simple as
+
+        <VirtualHost 192.168.1.1>
+            PerlInitHandler Apache::iNcom
+            PerlSetVar INCOM_URL_PREFIX /incom/
+            PerlSetVar INCOM_ROOT       pages
+        </VirtualHost>
+
+    This will make all URL starting with `/incom/' served
+    dynamically by Apache::iNcom.
+
+    Additionnaly different modules used by Apache::iNcom will be
+    configured by profile files. Consult the appropriate module
+    documentation for details.
+
+Bugs
+----
+
+Send bug reports and suggestions to francis.lacoste@iNsu.COM.
+
+Copyright
+---------
+
+Copyright (c) 1999,2000 Francis J. Lacoste and iNsu Innovations. Inc.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+

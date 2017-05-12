@@ -1,0 +1,10 @@
+clear
+power on
+regs
+
+op 4c efbe
+
+# Should be: PC=BEEF
+test pc = beef
+
+save verify_4C.txt

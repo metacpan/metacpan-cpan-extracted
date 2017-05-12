@@ -1,0 +1,63 @@
+{
+   "abstract" : "Mojolicious::Lite webapp that lets you search (with regexp) and display CPAN modules documentation",
+   "author" : [
+      "Ahmad Syaltut <syaltut@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-perldolicious",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Zlib" : "1.10",
+            "Module::CoreList" : "2.91",
+            "Module::Path" : "0.09",
+            "Mojo::JSON" : "0",
+            "Mojo::UserAgent" : "0",
+            "Mojolicious" : "4.07",
+            "Pod::Cpandoc" : "0.15",
+            "Scalar::Util" : "0",
+            "Storable" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::perldolicious" : {
+         "file" : "lib/App/perldolicious.pm",
+         "version" : "0.011"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/Syaltut/perl-App-perldolicious",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/Syaltut/perl-App-perldolicious.git"
+      }
+   },
+   "version" : "0.011",
+   "x_test_requires" : {
+      "File::Spec" : "0",
+      "File::Which" : "0",
+      "FindBin" : "0",
+      "Test::Mojo" : "0",
+      "Test::More" : "0"
+   }
+}

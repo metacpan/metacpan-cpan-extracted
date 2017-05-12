@@ -1,0 +1,18 @@
+libanyevent-ownet-perl (1.110430-1) unstable; urgency=low
+
+  * Reduce perl version requirement to 5.8.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sat, 12 Feb 2011 10:27:04 +0000
+
+libanyevent-ownet-perl (1.110180-1) unstable; urgency=low
+
+  * Add higher level file visitor method.
+  * Make test less platform-specific (thx CPAN testers).
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Tue, 18 Jan 2011 16:58:06 +0000
+
+libanyevent-ownet-perl (1.110050-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Wed,  5 Jan 2011 22:22:05 +0000

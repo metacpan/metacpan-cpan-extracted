@@ -1,0 +1,72 @@
+---
+abstract: 'making wrapper script for crontab'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  File::pushd: '0'
+  Test::Exit: '0'
+  Test::More: '0.98'
+  Test::Requires: '0'
+  Test::Tester: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-RunCron
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::RunCron:
+    file: lib/App/RunCron.pm
+    version: '0.08'
+  App::RunCron::Announcer::Code:
+    file: lib/App/RunCron/Announcer/Code.pm
+  App::RunCron::Announcer::Command:
+    file: lib/App/RunCron/Announcer/Command.pm
+  App::RunCron::CLI:
+    file: lib/App/RunCron/CLI.pm
+  App::RunCron::Reporter:
+    file: lib/App/RunCron/Reporter.pm
+  App::RunCron::Reporter::Code:
+    file: lib/App/RunCron/Reporter/Code.pm
+  App::RunCron::Reporter::Command:
+    file: lib/App/RunCron/Reporter/Command.pm
+  App::RunCron::Reporter::File:
+    file: lib/App/RunCron/Reporter/File.pm
+  App::RunCron::Reporter::Fluentd:
+    file: lib/App/RunCron/Reporter/Fluentd.pm
+  App::RunCron::Reporter::None:
+    file: lib/App/RunCron/Reporter/None.pm
+  App::RunCron::Reporter::Stdout:
+    file: lib/App/RunCron/Reporter/Stdout.pm
+  Test::App::RunCron:
+    file: lib/Test/App/RunCron.pm
+recommends:
+  PerlIO::Util: '0'
+requires:
+  Class::Accessor::Lite: '0'
+  Test::Mock::Guard: '0'
+  Time::Piece: '0'
+  YAML::Tiny: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Songmu/p5-App-RunCron/issues
+  homepage: https://github.com/Songmu/p5-App-RunCron
+  repository: git://github.com/Songmu/p5-App-RunCron.git
+version: '0.08'

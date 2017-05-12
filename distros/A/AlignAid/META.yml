@@ -1,0 +1,30 @@
+---
+name: AlignAid
+version: v0.0.2
+author:
+  - 'Dave Messina <dave-pause@davemessina.net>'
+abstract: easily run sequence alignments locally or on a cluster
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Bio::SeqIO: 0
+  version: 0
+build_requires:
+  Test::More: 0
+recommends:
+  BPdeluxe: 1
+  PP: 0
+provides:
+  AlignAid:
+    file: lib/AlignAid.pm
+    version: !!perl/hash:version
+      qv: 1
+      version:
+        - 0
+        - 0
+        - 2
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,94 @@
+NAME
+    AnyEvent::EditText - An easy way to startup a text editor
+
+VERSION
+    Version 0.2
+
+SYNOPSIS
+       my $content = "Hello There!";
+
+       AnyEvent::EditText::edit ($content, sub {
+          my ($newcontent, $has_changed) = @_;
+
+          if ($has_changed) {
+             print "the content was edited";
+          }
+       });
+
+DESCRIPTION
+    This little module will start a text editor in a seperate process
+    without stopping the current process. Usually something like a terminal
+    with a vim instance running in it will be started, but also a graphical
+    editor could be used (like *gedit* or *gvim*).
+
+    The editor will get the content passed to the "edit" routine as
+    temporary file, and after you are done editing it (closed the editor)
+    the callback will be called with the possibly new content.
+
+FUNCTIONS
+  set_editor (@sysargs)
+    This function configures the editor used. @sysargs is a list of
+    arguments for the "system" function, which will be called like this by
+    "edit":
+
+       system (@sysargs, $filename);
+
+    The default editor used will be:
+
+       AnyEvent::EditText::set_editor ("rxvt", "-e", "vim");
+
+  edit ($content, $callback)
+    This routine will write $content to a temporary file, fork and call the
+    editing process. After the process terminates the temporary file is read
+    and erased.
+
+    After that the content is sent back to the calling process, where the
+    $callback is called with two arguments: The first will be the new
+    content and the second a flag indicating whether the content has
+    changed.
+
+AUTHOR
+    Robin Redeker, "<elmex at ta-sa.org>"
+
+TODO
+    This module should probably first look in the environment to determine
+    which editor and terminal to use. This will be fixed in the next
+    release.
+
+BUGS
+    Please report any bugs or feature requests to "bug-text-edit at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Edit>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc AnyEvent::EditText
+
+    You can also look for information at:
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Text-Edit>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Text-Edit>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Edit>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Text-Edit>
+
+COPYRIGHT & LICENSE
+    Copyright 2007 Robin Redeker, all rights reserved. Copyright 2008 Robin
+    Redeker, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

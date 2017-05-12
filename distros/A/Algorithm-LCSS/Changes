@@ -1,0 +1,6 @@
+Revision history for Perl extension Algorithm::LCSS.
+
+0.01  Wed Sep 10 02:15:25 2003
+    - original version; created by h2xs 1.21 with options
+        -X Algorithm::LCSS
+

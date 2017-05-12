@@ -1,0 +1,45 @@
+Apache::Motd $Revision: 1.2 $
+=====================
+
+DESCRIPTION
+-----------
+
+This is an Apache module designed to be used with the Apache web server
+and the mod_perl environment. It allows web administrators to add motd
+(Message of the Day) functionality to a webserver.
+
+
+PRE-REQUISITES
+--------------
+
+To use this module, you will need:
+Apache, v 1.3+
+mod_perl, 1.2+
+Apache::Cookie
+
+INSTALLATION
+------------
+
+Install using the normal technique for perl modules:
+
+ $ perl Makefile.PL
+ $ make
+ $ make install
+
+   
+ Or copy Motd.pm into your private lib/Apache directory
+
+Full documentation on the module is available in POD format within the .pm file.
+
+AUTHOR
+------
+
+	Carlos Ramirez <carlos@quantumfx.com>
+
+COPYING
+-------
+
+	       Copyright 1998-2001, C. Ramirez
+
+       This module is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.     

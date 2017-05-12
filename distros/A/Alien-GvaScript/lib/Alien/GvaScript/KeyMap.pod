@@ -1,0 +1,351 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+Alien::GvaScript::KeyMap - Manage maps of handlers for key events 
+
+=head1 SYNOPSIS
+
+  var rules = {
+  
+    // attach handlers to specific keys
+    RETURN: function(event){doSomethingWith(event)},  
+    C_DOWN: ctrlArrowDownHandler,       
+    C_S_F7: ctrlShiftF7Handler,
+  
+    // special rules using regular expressions
+    REGEX: [ ["",   /^[0-9]$/,      digitHandler  ],
+             ["C_", /^[aeiou]$/i, ctrlVowelHandler] ], 
+  
+    // use Ctrl-X as a prefix for another set of rules
+    C_X: KeyMap.Prefix({R: ctrlX_R_handler,
+                        4: ctrlX_4_handler})
+  };
+  
+  // create a keymap object
+  var aKeyMap = new KeyMap(rules);
+
+  // attach the corresponding handler to the keydown event (on document)
+  aKeyMap.observe("keydown");
+  
+  // other way to attach : manually insert handler
+  document.onkeydown = aKeyMap.eventHandler({preventDefault: true,
+                                             ignoreShift   : true});
+
+  // dynamically change the map
+  aKeyMap.rules.push(new_rules);
+  
+  // idem, temporarily ignore all keys
+  aKeyMap.rules.push(KeyMap.MapAllKeys(function(){}));
+  
+  // back to previous handling state
+  aKeyMap.rules.pop();
+
+
+=head1 DESCRIPTION
+
+Provides an abstraction layer for associating handlers
+with HTML key events, in a browser-independent way. 
+
+A I<keymap> is a stack of collections of rules. Each rule has a 
+I<key specification>
+or a I<regexp specification>, and a I<handler> to be called whenever the
+specification is met. The keymap object as a whole can then be
+registered as a usual HTML event handler associated to some DOM
+element (most often the I<document> element), and will dispatch key
+events to appropriate handlers.
+
+Key specifications look like B<A> (key 'A'),
+ B<C_S_A> (control-shift-A), B<A_DELETE> (alt-Delete).
+They are formed from :
+
+=over
+
+=item keynames
+
+For printable characters, the keyname is just that character; for special
+editing keys such as backspace, arrow up, etc., names are taken 
+from the following list of builtins :
+
+  BACKSPACE ESCAPE     TAB    RETURN LINEFEED SPACE 
+  PAGE_UP   PAGE_DOWN  END    HOME 
+  LEFT      UP         RIGHT  DOWN
+  INSERT    DELETE     PAUSE  WINDOWS  PRINT_SCREEN
+  CAPS_LOCK NUM_LOCK   SCROLL_LOCK
+  F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12
+  CTRL      SHIFT      ALT
+
+=item modifiers
+
+Modifiers are specified through prefixes B<C_>, B<S_> and B<A_>, corresponding
+to key modifiers I<control>, I<shift> and I<alt>. 
+Several prefixes may be combined, but must appear in the order just given
+(so for example B<S_C_A> would be illegal).
+
+=back
+
+Alternatively, key specifications may also formed from key codes
+instead of key names, so for example C<C_13> is equivalent to C<C_RETURN>.
+For key codes  0-9, and additional '0' is required to avoid confusion
+with digits: so C<C_09> is equivalent to C<C_TAB>, while C<C_9> means
+"control-numeric 9".
+
+In addition, keymap objects can also manage I<regex rules> that
+cover several possible key events; details are given below.
+
+=head1 WRITING HANDLERS
+
+Following the W3C event model, handlers called from the keymap object 
+receive an I<event object> as argument. This is the usual HTML event
+object, augmented with two properties C<keyName> and C<keyModifiers>, 
+computed according to the specifications given above. So for 
+example a simple handler can be 
+
+  var myHandler = function (event) {
+    alert(event.keyName + " was pressed with modifiers " + 
+          event.keyModifiers);
+  }
+
+Further propagation of the event to other handlers is cancelled by
+default : W3C methods C<event.stopPropagation()> and
+C<event.preventDefault()> are called automatically by the keymap
+object (or, if running under Microsoft Internet Explorer, property
+C<cancelBubble> is set to true and and property C<returnValue> is set
+to false). This default behaviour can be disabled if necessary, 
+as explained below.
+
+=head1 ATTACHING TO HTML ELEMENTS
+
+Keymaps may be attached to HTML elements on the 
+C<keydown>, C<keypress> or C<keyup> event types.
+Choosing the proper event type is important, as it
+affects not only the time at which events are fired, 
+but also the returned keycodes :
+
+=over
+
+=item C<keydown> and C<keyup>
+
+These are "low-level" event types that capture almost every key on 
+the keyboard, including special keys like ESCAPE, F1, PAGE UP, etc.
+Returned key codes remain at a raw level, i.e. they are not translated
+into characters. This means that if Shift-1 is marked on your keyboard
+as an exclamation mark, a plus sign, or some other special character, 
+you will not receive that keycode when capturing C<keydown> events : 
+rather, you will receive keycode 49 (ASCII character '1'). Similarly,
+all letters are received as uppercase.
+
+=item C<keypress>
+
+By contrast, the C<keypress> event type is higher-level in that it 
+performs the translation from keys to characters, according to your
+specific keyboard. However, this event type only fires for 
+printable characters, so you cannot observe C<keypress> if
+you intend to capture special keys such as arrow keys, function keys, etc.
+
+=back
+
+In theory, attributes such as C<onkeydown> or C<onkeypress> may be
+used with most HTML elements; but in practice, most of them will actually
+never fire the key events! So the most common and most sensible way
+for capturing key events is to attach to the C<document> element.
+
+Events C<keypress> and C<keydown> will repeat if the
+key is held down.
+
+
+In order to attach the keymap to an element, you can either
+use the supplied L</"observe"> method, or call the 
+L</"eventHandler"> method to get the keymap event handler, and
+then use your favorite technique to attach that handler
+to an element.
+
+
+
+=head1 METHODS
+
+=head2 C<KeyMap>
+
+  var myKeyMap = new KeyMap(rules);
+
+Constructor for a keymap object. 
+
+=head3 Single-key rules
+
+The rules argument is a map from key specifications to handlers, like
+for example 
+
+  { A:     function() {alert("pressed 'A'");},
+    S_TAB: function() {alert("pressed 'Shift-Tab'");},
+    CTRL:  function() {alert("pressed the 'Ctrl' key");},
+    10:    function() {alert("pressed 'Linefeed' or maybe 'Ctrl-Return'");}
+  }
+
+Each key specification in the map corresponds to exacly one key
+combination, so for example C<S_TAB> will not fire if the user pressed
+C<Ctrl-Shift-Tab>.  
+
+=head3 Regex rules
+
+For situations where several key combination will
+fire the same handler, you can insert a C<REGEX> entry in the map.
+This should be an array of triplets, where each triplet is of shape
+C<[modifiers, regex, handler]>, like for example
+
+  var regexRules = [["C_",   "[0-9]",             myCtrlDigitHandler],
+                    ["C_S_", /^[AEIOU]$/,         myCtrlShiftVowelHandler],
+                    [null,   "RETURN|TAB|ESCAPE", someOtherHandler]   ];
+
+Whenever a key event is received, it is converted into a keyname, and 
+then that keynames is compared against the regex rules, in order : the 
+first rule that matches calls the corresponding handler and terminates
+the event handling process.
+
+More specifically, the members of rule triplets are :
+
+=over
+
+=item modifiers
+
+A string specifiying the key modifiers for which the rule will fire;
+the string a concatenation of B<C_>, B<S_> and B<A_>, as explained above.
+An empty string means that the rule only fires when no modifiers
+are pressed. By contrast, a C<null> value specifies that
+modifiers are ignored (the rule fires in any case).
+
+=item regex
+
+Either a string containing a regular expression, or an already built
+Javascript RegExp object. Strings will be automatically converted
+to regular expressions, with start anchor C<^> and end anchor C<$>
+automatically added. If you supply an already built RegExp object,
+make sure to deal properly with the anchors; otherwise the rule
+might fire in unexpected cases (for example the plain regex C</[AEIOU]/>
+would match any builtin keyname like C<RETURN> or C<ESCAPE>, which
+is probably not the intended meaning of the rule).
+
+=item handler
+
+The function to be called when the rule succeeds.
+
+=back
+
+
+=head3 Antiregex rules
+
+An C<ANTIREGEX> entry in the map
+works exactly like a C<REGEX>, except that
+the handler is called when the regex does
+B<not> match. This is useful if you want to 
+catch most key events, except 
+a given set.
+
+
+
+=head2 C<eventHandler>
+
+  document.onkeydown = aKeyMap.eventHandler(options);
+
+Generates an event handler that can be attached to an HTML element.
+This method is called internally by the L</"observe"> method.
+Use C<eventHandler> directly if you need fine control
+on how the handler is attached to the dynamic HTML model.
+
+The C<options> argument is optional. If present, it should be an
+inline object containing truth values for the following
+keys :
+
+=over
+
+=item C<ignoreCtrl>
+
+ignore the C<Ctrl> keyboard modifier
+
+=item C<ignoreShift>
+
+ignore the C<Shift> keyboard modifier
+
+=item C<ignoreAlt>
+
+ignore the C<Alt> keyboard modifier
+
+=item C<stopPropagation>
+
+stop propagation of the event
+
+=item C<preventDefault>
+
+prevent default navigator behaviour on that event
+
+=back
+
+For example if C<ignoreCtrl> is true, then the key 
+specification C<"C_S_TAB"> would
+never fire, because Ctrl-Shift-TAB key events would be encoded merely
+as C<"S_TAB">.
+
+
+=head2 C<observe>
+
+  aKeyMap.observe(eventType, htmlElement, options);
+
+This is the preferred way for attaching the keymap object to an HTML
+element, on a given event type (C<keydown>, C<keypress> or C<keyup>).
+Arguments are optional. The default event type is C<"keydown">,
+and the default element is C<document>.
+
+Options are passed to the L</"eventHandler"> method.
+If not explicitly given, the options default
+to C<undefined> except for event type C<keypress>, where
+C<ignoreShift> defaults to C<true>. The reason is that the Shift
+modifier heavily depends on which keyboard the user is using, and
+often the user really has no choice on pressing or not the Shift key
+(this would generate a different keycode). So it makes sense to just
+stop paying attention to the Shift key for C<keypress> events.
+
+
+=head2 C<rules>
+
+  aKeyMap.rules.push(new_rules);
+  
+  aKeyMap.rules.pop();
+
+A DHTML application may need to temporarily change the key handlers (for 
+example when switching from navigation mode to editing mode).
+Therefore, a keymap object actually holds a I<stack> of rules
+and publishes this stack in its C<rules> property.
+Rules pushed on top of that stack will take precedence over 
+pre-existing rules; conversely, popping from the stack
+restores the keymap to its previous state.
+
+
+=head2 C<MapAllKeys>
+
+  // grab all keys
+  aKeyMap.rules.push(KeyMap.MapAllKeys(my_handler)); 
+  
+  // ignore all keys
+  aKeyMap.rules.push(KeyMap.MapAllKeys(function (){}));
+
+Convenience function to build a regex rule that matches all keys.
+
+
+=head2 C<Prefix>
+
+  main_rules = {C_X: KeyMap.Prefix({R: ctrlX_R_handler,
+                                    4: ctrlX_4_handler})};
+
+Specifies that a key (here C<Ctrl-X>) is a prefix to another
+set of rules : the next key event will be passed to these rules,
+and after that the main rules resumes normal behaviour.
+Hence you can attach handlers to sequences of keys, like for
+example in Emacs.
+
+=head2 C<destroy>
+
+  aKeyMap.destroy();
+
+This method will remove the keymap handler attached the element/document.
+Call this method when the concerned element is removed from the DOM
+or to deactivate the keymap handler.
+

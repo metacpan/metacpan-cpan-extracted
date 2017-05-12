@@ -1,0 +1,25 @@
+Revision history for App-adr2org
+
+0.04    2014-10-15 (PERLANCAR)
+
+	- No functional changes.
+
+        - Rename dist from App-ConvertOperaBookmarksToOrg to App-adr2org (former
+          name too cumbersomely long).
+
+
+0.03    2014-10-12 (PERLANCAR)
+
+	- Add option: exclude_trash.
+
+
+0.02    2014-10-12 (PERLANCAR)
+
+	- [Bugfix] Fix level closing in .adr generation.
+
+	- Provide shorter aliases for scripts: adr2org & org2adr.
+
+
+0.01    2014-10-03 (PERLANCAR)
+
+        - First release.

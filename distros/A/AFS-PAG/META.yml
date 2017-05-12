@@ -1,0 +1,30 @@
+---
+abstract: 'Perl bindings for AFS PAG manipulation'
+author:
+  - 'Russ Allbery <rra@cpan.org>'
+build_requires:
+  ExtUtils::CBuilder: 0
+configure_requires:
+  Config::AutoConf: 0
+  Module::Build: 0.28
+  autodie: 0
+  perl: 5.010
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AFS-PAG
+provides:
+  AFS::PAG:
+    file: lib/AFS/PAG.pm
+    version: 1.02
+requires:
+  autodie: 0
+  perl: 5.010
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=AFS-PAG
+  license: http://opensource.org/licenses/mit-license.php
+  repository: git://git.eyrie.org/afs/afs-pag.git
+version: 1.02

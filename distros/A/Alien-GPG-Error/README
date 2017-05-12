@@ -1,0 +1,28 @@
+NAME
+    Alien::GPG::Error - Install and make available libgpg-error
+
+VERSION
+    version 1.21.0
+
+SYNOPSIS
+        use Alien::GPG::Error;
+
+        my $cflags = Alien::GPG::Error->cflags;
+        my $libs = Alien::GPG::Error->libs;
+
+DESCRIPTION
+    Alien::GPG::Error installs the C library "libgpg-error" v1.21.
+
+SEE ALSO
+    *   <https://www.gnupg.org/related_software/libgpg-error/index.html>
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2016 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

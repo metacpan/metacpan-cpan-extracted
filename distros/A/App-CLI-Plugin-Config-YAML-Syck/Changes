@@ -1,0 +1,18 @@
+Revision history for Perl extension App::CLI::Extension::Plugin::Config::YAML::Syck
+
+1.2  Mon Jan  4 01:31:27 2010
+       - mini fix
+1.1  nothing
+       - 
+1.0  Sat Dec 12 23:30:13 2009
+       - it's new
+0.3   Thu Nov  8 23:45:59 2009
+        - change command option --config_file => --configfile
+0.2   Thu Sep 10 23:20:21 2009
+        - fixed invalid pod
+0.1   Wed Sep  9 07:57:21 2009
+        - non use Path::Class
+0.02  Mon Sep 15 14:57:21 2008
+        - fixed invalid pod
+0.01  Sun Sep 14 22:54:48 2008
+        - original version

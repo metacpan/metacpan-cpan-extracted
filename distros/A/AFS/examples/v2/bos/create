@@ -1,0 +1,36 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::BOS;
+
+my ($server, $process, $type, $commands, @commands, $notifier, $bos, $ok);
+
+die "Usage: $0 server process type commands [notifier]\n" if $#ARGV < 3;
+
+$server   = shift;
+$process  = shift;
+$type     = shift;
+$commands = shift;
+$notifier = shift;
+
+#warn ">$server< >$process< >$type< >$commands< >$notifier< \n";
+if (defined $commands and $commands =~ / /) { @commands = split / /, $commands; }
+
+$bos = AFS::BOS->new($server);
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+if (@commands) {
+    if ($notifier) { $ok = $bos->create($process, $type, \@commands, $notifier); }
+    else           { $ok = $bos->create($process, $type, \@commands); }
+}
+else {
+    if ($notifier) { $ok = $bos->create($process, $type, $commands, $notifier); }
+    else           { $ok = $bos->create($process, $type, $commands); }
+}
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "OK = $ok \n"; }
+
+$bos->DESTROY;

@@ -1,0 +1,7 @@
+1998-11-20 v0.3 Dominique Dumont  <domi@barrayar.grenoble.hp.com>
+
+	* Group.pm : - bug fix (trace)
+	- added printEvent method for tracing
+	- added getCbRef method
+
+

@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>AnnoCPAN Help</title>
+    <link rel="stylesheet" type="text/css" href="[% root_uri_rel %]/annocpan.css">
+    <style type="text/css">
+      body { padding: 0;}
+    </style>
+</head>
+
+<body>
+
+<div id="note_help">
+<h2>Note formatting</h2>
+
+<p>Notes can be formatted using a POD subset. Examples:</p>
+
+<table>
+<tr><th>POD</th><th>Result</th></tr>
+<tr><td>B&lt;bold&gt;</td><td><b>bold</b></td></tr>
+<tr><td>I&lt;italic&gt;</td><td><i>italic</i></td></tr>
+<tr><td>C&lt;code&gt;</td><td><code>code</code></td></tr>
+<tr><td>C&lt;&lt; $code-&gt;with_gt &gt;&gt;</td><td><code>$code-&gt;with_gt</code></td></tr>
+<tr><td>L&lt;My::Module&gt;</td><td>[% link_perldoc_name('My::Module') %]</td></tr>
+<tr><td>L&lt;http://perl.org&gt;</td><td><a href="http://perl.org">http://perl.org</a></td></tr>
+</table>
+
+<pre>
+  $lines-&gt;that_begin( with_a_space() ) {
+      are_formatted_verbatim; 
+      "Useful for code samples."
+  }
+</pre>
+
+<p>For more details, see [% link_perldoc_name('perlpod') %]. POD commands such
+as <code>=head1</code>, <code>=over</code>, and <code>=item</code> are
+<strong>not</strong> supported.</p>
+
+<h2>Editing actions</h2>
+
+<dl>
+
+<dt>Save</dt>
+
+<dd>Save this note. It will apply to this paragraph, or a similar one,
+<em>for all versions of the current document</em>
+</dd>
+
+<dt>Move</dt>
+
+<dd>Move this note to another paragraph for <em>this version of the current document
+only</em>.</dd>
+
+<dt>Hide</dt>
+
+<dd>Hide this note to <em>for this version of the current document only</em>. Notes may
+be unhidden later.</dd>
+
+<dt>Delete</dt>
+
+<dd>Remove this note globally, <em>for all versions of the current document</em>.
+<strong>This action is irreversible!</strong> </dd>
+
+</dl>
+
+</div>
+</body>
+</html>

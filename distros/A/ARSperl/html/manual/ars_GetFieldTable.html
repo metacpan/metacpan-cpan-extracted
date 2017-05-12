@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_GetFieldTable(control,schema)</CODE></H2>
+
+      This function is a combination of ars_GetListField and ars_GetField.
+      It populates a hash (associative array) with field names and
+      values. The keys of the hash are the field names, and the values of the
+      hash are the field ids. <P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns a hash of all fields in the schema.
+          <DT><B>On failure</B><DD>
+              Returns <CODE>undef</CODE>.
+      </DL>
+
+      <P>Example:
+
+      <PRE>
+      (%fields = ars_GetFieldTable($c, "User")) || die $ars_errstr;
+      $id = $fields{"Login name"};
+      </PRE>
+
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

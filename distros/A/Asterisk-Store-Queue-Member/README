@@ -1,0 +1,36 @@
+Asterisk-Store-Queue-Member version 0.01
+========================================
+
+This module provides a data type for Asterisk queue members.
+The datatype is built to mirror as closely as possible the output
+you get from the Asterisk Manager Interface.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Log::Log4perl
+  Log::Dispatch::Screen
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Derek Carter
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+BUGS
+
+There aren't any of course. :)
+But if you find any undocumented "features" shoot me an email:
+          goozbach@neverblock.com

@@ -1,0 +1,69 @@
+{
+   "abstract" : "random filter for STDIN",
+   "author" : [
+      "Dai Okabayashi <bayashi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Randf",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Pluggable::CPANfile" : "0.04"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40",
+            "Module::Build::Pluggable" : "0",
+            "Module::Build::Pluggable::CPANfile" : "0.04"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::CmdRC" : "0.07",
+            "Getopt::Long" : "2.42",
+            "Pod::Usage" : "0",
+            "perl" : "5.008005",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "App::Randf" : {
+         "file" : "lib/App/Randf.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/bayashi/App-Randf/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/bayashi/App-Randf"
+      },
+      "x_IRC" : {
+         "url" : "irc://chat.freenode.org/#bayadev",
+         "web" : "http://webchat.freenode.net/?channels=%23bayadev"
+      }
+   },
+   "version" : "0.02"
+}

@@ -1,0 +1,48 @@
+#!/opt/perl/bin/perl
+use strict;
+use utf8;
+use AnyEvent;
+use AnyEvent::XMPP::IM::Connection;
+
+unless (@ARGV >= 3) { die "sendmsg <account jid> <password> <destination jid>\n" }
+
+my $msg  = do { local $/; <STDIN> };
+my $dest = $ARGV[2];
+
+my $j = AnyEvent->condvar;
+
+my $con =
+   AnyEvent::XMPP::IM::Connection->new (
+      jid      => $ARGV[0],
+      password => $ARGV[1],
+      initial_presence => -10,
+      debug    => 1
+   );
+
+$con->reg_cb (
+   session_ready => sub {
+      my ($con) = @_;
+      print "Connected as " . $con->jid . "\n";
+      print "Sending message to $dest:\n$msg\n";
+      my $immsg = AnyEvent::XMPP::IM::Message->new (to => $dest, body => $msg);
+      $immsg->send ($con);
+   },
+   message => sub {
+      my ($con, $msg) = @_;
+      print "Message from " . $msg->from . ":\n" . $msg->any_body . "\n---\n";
+   },
+   error => sub {
+      my ($con, $error) = @_;
+      warn "Error: " . $error->string . "\n";
+   },
+   disconnect => sub {
+      my ($con, $h, $p, $reason) = @_;
+      warn "Disconnected from $h:$p: $reason\n";
+      $j->broadcast;
+   }
+);
+
+print "Trying to connect...\n";
+$con->connect ();
+
+$j->wait;

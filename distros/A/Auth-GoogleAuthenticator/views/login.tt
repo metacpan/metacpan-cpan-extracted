@@ -1,0 +1,21 @@
+<div id="page">
+      <div id="content">
+        <div id="header">
+          <h1><a href="<% request.uri_base %>/auth/login">Log in</a></h1>
+          <% IF user %>
+          <h1><a href="<% request.uri_base %>/auth/logout">Log out</a></h1>
+          <h1><a href="<% request.uri_base %>/auth/setup">Configure authentication</a></h1>
+          <% ELSE %>
+          Available users are <tt>test</tt>, <tt>test2</tt> and <tt>admin</tt>.
+          <% END %>
+        </div>
+        <h3>Log in</h3>
+        <form name="login" method="POST" action="<% request.uri_base %>/auth/login"
+            enctype="multipart/data">
+            <label for="user">User</label><input type="text" name="user" id="user">
+            <label for="pass">Password</label><input type="password" name="pass" id="pass">
+            <label for="otp">OTP code</label><input type="text" name="otp" id="otp">
+            <input type="submit" id="login" name="login" value="Log in">
+        </form>
+      </div>
+</div>

@@ -1,0 +1,366 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+ct2
+
+=head1 DESCRIPTION
+
+Convert my modified version of markdown into various document formats
+
+this will create a ~/.ct2 directory and add some files to it, such as your
+basic config and the initial templates
+
+    $ ct2 --help
+
+    Syntax: ct2 [options] filename
+
+    About:  Convert my modified markdown text files into other formats, by
+    default will create HTML in same directory as the input file, will only
+    process .md files.
+    If there is no output option used the output will be to file of same name
+    as the input filename but  with an extension (if provided) from the
+    document, use format: keyword (pdf html doc).
+
+    [options]
+        -h, -?, --help        Show help
+        -c, --clean           Clean up the cache before use
+        -e, --embed           Embed images into HTML, do not use this if
+            converting to doc/odt
+        -o, --output          Filename to store the output as, extension will
+            control conversion
+        -p, --prince          Convert to PDF using princexml, can handle
+            embedded images
+        -s, --template        name of template to use
+        -v, --verbose         verbose mode
+        -w, --wkhtmltopdf     Convert to PDF using wkhtmltopdf, can handle
+            embedded images
+
+=head1 AUTHOR
+
+ kevin mulholland, moodfarm@cpan.org
+
+=cut
+
+use v5.10;
+use strict;
+use warnings;
+use Data::Printer;
+use POSIX qw(strftime);
+use Try::Tiny;
+use Path::Tiny;
+use App::Basis;
+use App::Basis::Config;
+use App::Basis::ConvertText2;
+
+# -----------------------------------------------------------------------------
+
+my $MARKUP_DIR = "$ENV{HOME}/." . get_program();
+$MARKUP_DIR = $ENV{MARKUP_DIR} if ( $ENV{MARKUP_DIR} );
+
+my $CACHE_DIR = "/tmp/" . getpwuid($>) . "/cache";
+
+my $TEMPLATE = <<EOD;
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>%TITLE%</title>
+        <meta name="Created" content="%DATE%" />
+        <meta name="Author" content="%AUTHOR%" />
+        <meta name="Copyright" content="%COPYRIGHT%" />
+        <meta name="summary" content="%SUMMARY%" />
+        <meta name="keywords" content="%KEYWORDS%" />
+        <meta name="revision" content="%REVISION%" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <style type='text/css'>
+            \@page { 
+                size: %PAGE_SIZE% %ORIENTATION% ; 
+                margin: 90pt 30pt 40pt 30pt ;
+                \@top { 
+                    margin: -10pt 0pt 0pt -90pt ;
+                }
+                \@bottom-right { content: counter(page) ;}
+            }            }
+            body {font-style: sans-serif;}
+            /* toc */
+            #toc { 
+              padding: 0.4em;
+              page-break-after: always;
+            }
+            #toc p {
+                font-weight: bold;
+                font-size: 32;
+            }
+            #toc h3 {
+              text-align: center
+            }
+            #toc ul {
+              columns: 1;
+            }
+            #toc ul, #toc li {
+              list-style: none;
+              margin: 0;
+              padding: 0;
+              padding-left: 10px ;
+            }
+            #toc a::after {
+              content: leader('.') target-counter(attr(href), page);
+              font-style: normal;
+            }
+            #toc a {
+                text-decoration: none ;
+                color: black;
+            }
+
+            /* tables*/
+            table { page-break-inside: avoid ;}
+            table.footer { font-size: 10px; width: 100%;}
+            table.footer td.commercial { 
+                font-weight: bold; 
+                font-size: 12px;
+                text-align: center;
+            }
+            /* nice markup for source code */
+            table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+                margin: 0; padding: 0; vertical-align: baseline; border: none; 
+            }
+            table.sourceCode { width: 100%; line-height: 100%; }
+            td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+            td.sourceCode { padding-left: 5px; }
+            code > span.kw { color: #007020; font-weight: bold; }
+            code > span.dt { color: #902000; }
+            code > span.dv { color: #40a070; }
+            code > span.bn { color: #40a070; }
+            code > span.fl { color: #40a070; }
+            code > span.ch { color: #4070a0; }
+            code > span.st { color: #4070a0; }
+            code > span.co { color: #60a0b0; font-style: italic; }
+            code > span.ot { color: #007020; }
+            code > span.al { color: #ff0000; font-weight: bold; }
+            code > span.fu { color: #06287e; }
+            code > span.er { color: #ff0000; font-weight: bold; }
+
+        </style>
+    </head>
+    <body>
+        <h1>%TITLE%</h1>
+        <!-- uncomment this if you need a Table of Contents -->
+        <!-- <div id='toc' >
+            %TOC%
+        </div> -->
+
+        %_CONTENTS_%
+
+        <table class='footer' width='100%'>
+            <tr><td>(c) %COPYRIGHT%</td><td align='right'>%DATE%</td>
+        </table>
+    </body>
+</html>
+EOD
+
+# -----------------------------------------------------------------------------
+
+sub other_debug {
+    my ( $state, $debug ) = @_;
+
+    # return if ( $state ne 'DEBUG' );
+
+    my $msg = $state;
+    $msg .= " $debug" if ($debug);
+
+    say STDERR localtime() . " " . get_program() . " $msg";
+}
+
+# -----------------------------------------------------------------------------
+
+sub create_defaults {
+    my ( $dir, $verbose ) = @_;
+    my $default = "$dir/templates/default";
+    my ( $r, $o, $e );
+
+    die "dir option required" if ( !$dir );
+
+    if ( !-d $default ) {
+
+        # create the defaults if they do not exist
+        try { path($default)->mkpath } catch {};
+        msg_exit("Could not create default templates dir in $dir") if ( !-d $default );
+    }
+
+    # create HTML template
+    path("$default/template.html")->spew_utf8($TEMPLATE) if ( !-f "$default/template.html" );
+
+    my $config = App::Basis::Config->new( filename => "$default/config" );
+
+    # if there is no data in the config then lets create some
+    if ( !$config->has_data() ) {
+        $config->set( '/page/size',        'A4' );
+        $config->set( '/page/orientation', 'Portrait' );
+        my $author = getpwuid($>);
+        $config->set( '/author',    $author );
+        $config->set( '/copyright', "Property of $author 2014" );
+        $config->store();
+    }
+}
+
+# -----------------------------------------------------------------------------
+
+sub read_settings {
+    my ( $template, $dir ) = @_;
+    my %settings;
+
+    die "dir option required" if ( !$dir );
+
+    $template ||= 'default';
+    $template =~ s/\v//g;
+    my $templatedir = "$dir/templates/$template";
+    if ( !-d $templatedir ) {
+        debug( "INFO", "Template '$template' does not exist, using default" );
+        $templatedir = "$dir/templates/default";
+    }
+    $settings{config} = App::Basis::Config->new( filename => "$templatedir/config" );
+
+    $settings{template}     = $template;
+    $settings{template_dir} = $templatedir;
+    $settings{template}     = path("$templatedir/template.html")->slurp_utf8;
+
+    return \%settings;
+}
+
+# -----------------------------------------------------------------------------
+# main
+
+my %opt = init_app(
+    help_text => "Convert my modified markdown text files into other formats, by 
+    default will create HTML in same directory as the input file, will only 
+    process .md files. 
+    If there is no output option used the output will be to file of same name 
+    as the input filename but with an extension (if provided) from the
+    document, use format: keyword (pdf html doc).",
+    help_cmdline => "filename",
+    options      => {
+        'verbose|v'     => 'verbose mode',
+        'clean|c'       => 'Clean up the cache before use',
+        'template|s=s'  => 'name of template to use',
+        'embed|e'       => 'Embed images into HTML, do not use this if converting to doc/odt',
+        'prince|p'      => 'Convert to PDF using princexml, can handle embedded images',
+        'wkhtmltopdf|w' => 'Convert to PDF using wkhtmltopdf, can handle embedded images',
+        'output|o=s'    => {
+            desc    => 'Filename to store the output as, extension will control conversion',
+            default => "",
+        }
+    }
+);
+
+set_debug( \&other_debug ) if ( $opt{verbose} );
+
+show_usage( "You cannot use both prince and wkhtmltopdf options") if( $opt{prince} && $opt{wkhtmltopdf}) ;
+
+$opt{config_dir} ||= $MARKUP_DIR;
+create_defaults( $opt{config_dir} );
+
+$opt{filename} = $ARGV[0];
+$opt{filename} =~ s/^~/$ENV{HOME}/ if ( $opt{filename} );
+
+if ( $opt{filename} ne '-' && !( -f $opt{filename} && $opt{filename} =~ /\.md$/i ) ) {
+    show_usage("filename must exist and be .md");
+}
+
+my ( $story, $basedir );
+if ( $opt{filename} eq '-' ) {
+    $story = do { local $/; <STDIN> };
+    $basedir = Path::Tiny->cwd;
+}
+else {
+    $story   = path( $opt{filename} )->slurp_utf8;
+    $basedir = path( $opt{filename} )->dirname;
+}
+
+show_usage("Bad markup file $opt{filename}") if ( !$story );
+
+# anything in the replace hash will get replaced in the final document
+my $replace = {
+
+    # '%TITLE%'   => '',    # this comes from the first markdown level 1 header
+    # '%DATE%' => strftime( "%Y-%m-%d", gmtime() ),    # :date in document overrides
+    # '%COPYRIGHT%'   => $settings->{config}->get("copyright")        || '',    # :copyright in document overrides
+    # '%AUTHOR%'      => $settings->{config}->get("author")           || '',    # :author in document overrides
+    # '%PAGE_SIZE%'   => $settings->{config}->get("page/size")        || '',
+    # '%ORIENTATION%' => $settings->{config}->get("page/orientation") || '',
+    # '%KEYWORDS%' => '',   # get from document :keywords or :tags
+    # '%SUMMARY%' => '',   # get from document :summary
+    # '%REVISION%' => '',   # get from document :revision
+};
+
+# get any template from the stop of the story
+my $settings;
+my ($template) = ( $story =~ /^template:\s?(.*?)$/sm );
+
+# document template overwritten by the command line option
+$template = $opt{template} if ( $opt{template} );
+$settings = read_settings( $template, $opt{config_dir} );
+
+# add in template defaults if needed
+$replace->{DATE} ||= strftime( "%Y-%m-%d", gmtime() );
+$replace->{COPYRIGHT}   ||= $settings->{config}->get("copyright");
+$replace->{AUTHOR}      ||= $settings->{config}->get("author");
+$replace->{PAGE_SIZE}   ||= $settings->{config}->get("page/size");
+$replace->{ORIENTATION} ||= $settings->{config}->get("page/orientation");
+
+my $format = App::Basis::ConvertText2->new(
+    name      => get_program(),
+    basedir   => $basedir,
+    use_cache => 1,
+    cache_dir => $CACHE_DIR,
+    template  => $settings->{template},
+    replace   => $replace,
+    verbose   => $opt{verbose},
+    embed     => $opt{embed},
+);
+$format->clean_cache() if ( $opt{clean} );
+
+# be in the same dir as the input file in case there are an files in plugins
+# that act on relative paths
+my $current = Path::Tiny->cwd;
+chdir($basedir);
+
+my $data = $format->parse($story);
+
+# decide on output filename from any format keyword
+# all the keywords are in UPPER-CASE
+my $keywords = $format->replace;
+if ( !$opt{output} && $keywords->{FORMAT} ) {
+
+    # same name as input
+    $opt{output} = $opt{filename};
+
+    # change extension
+    $opt{output} =~ s/\.md$/.$keywords->{FORMAT}/i;
+}
+
+if ( $opt{output} ) {
+    my $pdfconvertor;
+
+    if ( $opt{prince} ) {
+        $pdfconvertor = 'prince';
+    }
+    elsif ($opt{wkhtmltopdf})  {
+        $pdfconvertor = 'wkhtmltopdf';
+    }
+
+    my $status = $format->save_to_file( $opt{output}, $pdfconvertor);
+
+    if ( $opt{verbose} && $status ) {
+        say "Created $opt{output}";
+    }
+    elsif ( !$status ) {
+        say "Failed to create $opt{output}";
+    }
+}
+else {
+    say STDERR "Ignoring $opt{filename}, could not determine a filename to output to, no :format option in file?" if ( $opt{verbose} );
+}
+
+# return to where we came from
+chdir($current);

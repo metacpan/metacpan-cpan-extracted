@@ -1,0 +1,45 @@
+{
+   "abstract" : "App::TimeTracker Trello plugin",
+   "author" : [
+      "Thomas Klausner <domm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-TimeTracker-Command-Trello",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::TimeTracker" : "2.020",
+            "WWW::Trello::Lite" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://timetracker.plix.at",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/domm/App-TimeTracker-Trello.git",
+         "web" : "https://github.com/domm/App-TimeTracker-Trello"
+      }
+   },
+   "version" : "1.005"
+}
+

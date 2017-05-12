@@ -1,0 +1,15 @@
+.travis.yml
+Build.PL
+Changes
+lib/Acme/Alien/DontPanic.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-use.t
+t/command.t
+t/eud.t
+t/ffi.t
+t/static_link.t
+t/static_link/main.c
+t/xs.t

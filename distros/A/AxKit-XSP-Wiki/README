@@ -1,0 +1,23 @@
+AxKit::XSP::Wiki
+================
+
+This is an AxKit XSP based Wiki.
+
+At the moment it only allows you to write Wiki pages in POD (some
+may consider this a good thing). However in the future I'm sure it
+will support regular Wiki-text.
+
+It supports multiple Wikis (via multiple databases). Each Wiki can
+have an infinite number of pages (up to 2G database).
+
+Installation requires a working AxKit install, and a httpd with
+.htaccess enabled for the directory you want your Wiki in.
+
+After doing the regular "make install" for the module, simply copy
+the files in webstuff to the directory you want your Wiki in. Make
+sure you also copy the .htaccess file too.
+
+That's all - you should be able to point the browser at the directory
+where the Wiki is, and you'll be up and running.
+
+Edit the XSL stylesheets to your heart's content.

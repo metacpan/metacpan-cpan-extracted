@@ -1,0 +1,30 @@
+# This file contains general metadata about the project.
+
+@prefix : <http://usefulinc.com/ns/doap#>.
+
+`Acme-Perl-Consensual`
+	:programming-language "Perl" ;
+	:shortdesc            "check that your version of Perl is old enough to consent";
+	:homepage             <https://metacpan.org/release/Acme-Perl-Consensual>;
+	:download-page        <https://metacpan.org/release/Acme-Perl-Consensual>;
+	:bug-database         <http://rt.cpan.org/Dist/Display.html?Queue=Acme-Perl-Consensual>;
+	:repository           [ a :GitRepository; :browse <https://github.com/tobyink/p5-acme-perl-consensual> ];
+	:created              2012-07-01;
+	:license              <http://dev.perl.org/licenses/>;
+	:maintainer           cpan:TOBYINK;
+	:developer            cpan:TOBYINK, cpan:MSCHWERN.
+
+<http://dev.perl.org/licenses/>
+	dc:title  "the same terms as the perl 5 programming language system itself".
+
+cpan:TOBYINK
+	foaf:name  "Toby Inkster";
+	foaf:mbox  <mailto:tobyink@cpan.org>.
+
+cpan:MSCHWERN
+	foaf:name  "Michael G Schwern";
+	foaf:mbox  <mailto:mschwern@cpan.org>.
+
+cpan:MAUKE
+	foaf:name  "Lukas Mai";
+	foaf:mbox  <mailto:mauke@cpan.org>.

@@ -1,0 +1,24 @@
+NAME
+    Acme::MetaSyntactic::legolotr - LEGO Lord of the Rings theme
+
+VERSION
+    version 0.02
+
+DESCRIPTION
+    Characters from the LEGO Lord of the Rings game as gleaned from the
+    <http://www.gamefaqs.com/> walkthroughs.
+
+    *And in the darkness bind them*
+
+SEE ALSO
+    Acme::MetaSyntactic, Acme::MetaSyntactic::List.
+
+AUTHOR
+    Chris Williams
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

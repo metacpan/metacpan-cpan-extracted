@@ -1,0 +1,124 @@
+#!/usr/bin/env perl
+
+use strict;
+
+use Session::Token;
+use Getopt::Long;
+
+my @opt_spec = (
+  ## Used by Session::Token constructor
+
+  'alphabet=s',
+  'entropy=i',
+  'length=i',
+  'seed=s',
+  
+  ## Special
+
+  'num|n=i',
+  'infinity',
+  'help|h|?',
+  'null-seed',
+);
+
+my $opt = {};
+
+GetOptions($opt, @opt_spec) || die "GetOptions failed";
+
+
+if ($opt->{help}) {
+  require Pod::Perldoc;
+  @ARGV = ('-F', $0);
+  Pod::Perldoc->run();
+}
+
+
+$opt->{seed} = "\x00"x1024 if $opt->{'null-seed'};
+
+my $generator = Session::Token->new(%$opt);
+
+
+if (exists $opt->{num} && exists $opt->{infinity}) {
+  die "can't specify both num and infinity"
+} elsif (exists $opt->{infinity}) {
+  while(1) {
+    print $generator->get(), "\n";
+  }
+} else {
+  my $iters = $opt->{num};
+
+  $iters = 1 if !defined $iters;
+
+  for (1 .. $iters) {
+    print $generator->get(), "\n";
+  }
+}
+
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+session-token - command-line script for generating session tokens
+
+=head1 USAGE
+
+    $ session-token
+    ATXOpAxCu57sVZvoBiWgHg
+
+    $ session-token --entropy 256
+    hk0No9bjuknBxmpIujW3bZvnFmryTvEbTPNitd8L9kC
+
+    $ session-token --length 5 --alphabet ACGT --num 3
+    GAATT
+    ACCAT
+    AATTG
+
+    ## If you don't know how many tokens you need at the start of the pipeline...
+    $ session-token --infinity | ... | head
+
+
+=head1 DESCRIPTION
+
+This module came about because I found myself frequently running the following command:
+
+    $ perl -MSession::Token -E 'say Session::Token->new->get'
+    YwXYXGLMMnudk33MbClseQ
+
+Before I wrote L<Session::Token> I used to run the following command:
+
+    $ openssl rand -base64 16
+    fjxhL/LmZEUQ+NCldQbHgA==
+
+They both perform essentially the same task however C<session-token> has various advantages:
+
+It is more flexible regarding the alphabet used since it supports any alphabet that L<Session::Token> does via the C<--alphabet> switch. Its default alphabet is the (IMO) nice base-62 versus C<openssl rand>'s base-64.
+
+It can efficiently generate a large number of random tokens with the C<--num> switch. Calling C<openssl rand> for each token would fork a lot of processes and open and read from C</dev/urandom> in each one.
+
+If cross-platform determinism is required, the C<--seed> or C<--null-seed> switches are available and they don't require seed files or anything. Note that you should only use these switches for benchmarks or simulations and never for applications requiring secure randomness since the generated sequence of tokens will be the same for each run.
+
+C<openssl rand> does some weirdness with reading from/writing to the C<~/.rnd> file in your home directory as a potential entropy source/store. C<session-token> will always fail noisily if it can't read from C</dev/urandom>.
+
+Finally, C<session-token> is easier to remember and type don't you think?
+
+
+=head1 SEE ALSO
+
+L<App-Session-Token github repo|https://github.com/hoytech/App-Session-Token>
+
+L<Session::Token>
+
+=head1 AUTHOR
+
+Doug Hoyte, C<< <doug@hcsw.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2014-2016 Doug Hoyte.
+
+This module is licensed under the same terms as perl itself.
+
+=cut

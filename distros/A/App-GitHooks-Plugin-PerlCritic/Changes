@@ -1,0 +1,17 @@
+Revision history for App-GitHooks-Plugin-PerlCritic
+
+v1.1.0  2017-03-19
+        - Switched to Test::Requires::Git instead of the now obsolete
+          Test::Git::has_git(). Thank you, Philippe Bruhat!
+        - Relicensed under Perl 5 terms.
+        - Cleaned up dependencies.
+
+v1.0.2  2014-06-08
+        - Made git test safer to run.
+
+v1.0.1  2014-06-04
+        - Noted git version in tests to help troubleshooting.
+        - Required git v1.7.4.1.
+
+v1.0.0  2014-05-31
+        - Public release.

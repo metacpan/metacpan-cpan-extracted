@@ -1,0 +1,16 @@
+INSTALL
+LICENSE
+MANIFEST
+README
+Changes
+Makefile.PL
+META.yml
+lib/Apache2/WebApp/Plugin/CGI.pm
+t/001_load.t
+t/002_basic.t
+t/app/Basic/Test.pm
+t/conf/extra.conf.in
+t/conf/extra.last.conf.in
+t/conf/startup.pl.in
+t/conf/webapp.in
+t/TEST.PL

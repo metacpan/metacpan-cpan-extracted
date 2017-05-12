@@ -1,0 +1,15 @@
+# TODO
+
+## nearest version
+
+## next versions
+
+ * Add Test::Whitespaces
+ * make dist::zilla add version number to file `is_git_synced` and make that
+   file independent from lib/App/IsGitSynced.pm
+ * minimize running external programms. Just once run `git status --porcelain`
+   and parce the output
+ * output detailed info about what branch has changes
+ * maybe I should not store lib/App/IsGitSynced.pm in git repo because it is
+   generated from the script? and maybe I can remote that file. The same
+   question about README, but it is needed for pretty view in github.

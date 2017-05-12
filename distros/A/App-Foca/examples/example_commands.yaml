@@ -1,0 +1,10 @@
+commands_dirs:
+    - /some/path/over/there/bin
+
+commands:
+    df_path:
+        cmd: '/bin/df {%foca_args%} | tail -n1'
+    uptime:
+        cmd: '/usr/bin/uptime'
+    'true':
+        cmd: '/bin/true'

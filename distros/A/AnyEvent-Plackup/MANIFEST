@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/google-oauth.pl
+eg/stream.pl
+lib/AnyEvent/Plackup.pm
+lib/AnyEvent/Plackup/Request.pm
+t/00_compile.t
+t/01_plackup.t
+xt/02_perlcritic.t
+xt/04_pod_coverage.t
+xt/perlcriticrc
+META.yml
+MANIFEST

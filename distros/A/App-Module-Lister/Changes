@@ -1,0 +1,19 @@
+# Changes for App::Module::Lister
+
+0.15 - Mon Dec  2 10:16:05 2013
+	* Hide a package from PAUSE
+
+0.14 - Fri Nov 15 23:17:37 2013
+	* Update name in module abstract (RT #90363)
+
+0.13 - Mon Sep 22 14:59:39 2008
+	* Minor cleanups and a move to git
+
+0.11 - Sat Dec 22 12:33:12 2007
+	* Bump to release version number
+
+0.10_01 - Wed Dec 19 18:18:58 2007
+	* First release: distro-fied it, but you really just need lib/Lister.pm.
+	It's a modulino, so you can rename it and run it directly.
+
+

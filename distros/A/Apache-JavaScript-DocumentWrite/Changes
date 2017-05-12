@@ -1,0 +1,7 @@
+Revision history for Perl extension Apache::JavaScript::DocumentWrite
+
+0.02  Wed Dec 17 15:51:31 JST 2003
+	* Fixes document.writeln() is now issued on each lines.
+
+0.01  Wed Sep 24 15:22:48 2003
+	- original version

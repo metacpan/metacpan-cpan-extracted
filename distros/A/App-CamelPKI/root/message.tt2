@@ -1,0 +1,5 @@
+[% META title = 'Error' -%]
+
+<p>
+[% message %]
+</p>

@@ -1,0 +1,41 @@
+---
+abstract: "ASCII Art of sudden death (çª\x81ç\x84¶ã\x81®æ­») generator"
+author:
+  - 'papix <mail@papix.net>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-SuddenlyDeath
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::SuddenlyDeath:
+    file: lib/Acme/SuddenlyDeath.pm
+    version: '0.09'
+requires:
+  Exporter: '0'
+  Text::VisualWidth: '0.02'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: ssh://git@github.com/papix/Acme-SuddenlyDeath/issues
+  homepage: ssh://git@github.com/papix/Acme-SuddenlyDeath
+  repository: ssh://git@github.com/papix/Acme-SuddenlyDeath.git
+version: '0.09'

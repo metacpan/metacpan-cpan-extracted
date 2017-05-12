@@ -1,0 +1,75 @@
+{
+   "abstract" : "Simple in-memory cache for AnyEvent applications",
+   "author" : [
+      "Daisuke (yet another) Maki <maki.daisuke@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.8.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-InMemoryCache",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Time::Duration::Parse" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "AnyEvent::InMemoryCache" : {
+         "file" : "lib/AnyEvent/InMemoryCache.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Maki-Daisuke/p5-AnyEvent-InMemoryCache/issues"
+      },
+      "homepage" : "https://github.com/Maki-Daisuke/p5-AnyEvent-InMemoryCache",
+      "repository" : {
+         "url" : "https://github.com/Maki-Daisuke/p5-AnyEvent-InMemoryCache",
+         "web" : "https://github.com/Maki-Daisuke/p5-AnyEvent-InMemoryCache"
+      }
+   },
+   "version" : "0.01"
+}

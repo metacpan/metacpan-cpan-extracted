@@ -1,0 +1,20 @@
+Changelog for Archive::SelfExtract
+
+* v1.3 - Fri May 14 2004
+
+ - Added options to mkselfextract.
+ - Fixed line termination/binmode issue for Win32.
+
+* v1.2 - Fri May 07 2004
+
+ - Wrong module name in bin/mkselfextract.  Author feels dumb.
+
+* v1.1 - Fri May 07 2004
+
+ - DATA filehandle should be opened with binmode().  This fixes a
+   corrupted-zipfile-like symptoms under Redhat 8 with its default
+   locale settings (likely Win32 also).
+
+* v1.0 - Mon Mar 22 2004
+
+ - initial release

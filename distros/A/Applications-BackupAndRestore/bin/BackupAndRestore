@@ -1,0 +1,13 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+
+our $VERSION = 0.02;
+
+#printf "*** %s\n", $0;
+
+use Applications::BackupAndRestore;
+run Applications::BackupAndRestore;
+
+0;
+__END__

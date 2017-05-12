@@ -1,0 +1,33 @@
+---
+abstract: 'AnyEvent hiredis API'
+author:
+  - 'Whitney Jackson'
+build_requires:
+  Exporter: '0'
+  File::Which: '0'
+  FindBin: '0'
+  POSIX: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::TCP: '0'
+  base: '0'
+  ok: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Hiredis
+requires:
+  AnyEvent: '0'
+  AnyEvent::Redis: '0'
+  Benchmark: '0'
+  Hiredis::Async: '0'
+  feature: '0'
+  namespace::autoclean: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.06'

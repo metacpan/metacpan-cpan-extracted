@@ -1,0 +1,99 @@
+#!perl
+use strict;
+use warnings;
+use App::FromUnixtime;
+
+App::FromUnixtime->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+from_unixtime - to convert from unixtime to date suitably
+
+=head1 SYNOPSIS
+
+replace unixtime args
+
+    $ from_unixtime 1419702037
+    1419702037(Sun, 28 Dec 2014 02:40:37 +0900)
+
+or filter unixtime suitably
+
+    $ cat sql_result
+    id    1
+    value         1419702037
+    created_at    1419702037
+    updated_at    1419702037
+
+    $ cat sql_result | from_unixtime
+    id    1
+    value         1419702037
+    created_at    1419702037(Sun, 28 Dec 2014 02:40:37 +0900)
+    updated_at    1419702037(Sun, 28 Dec 2014 02:40:37 +0900)
+
+=head2 OPTIONS
+
+    -f   --format       date format // '%a, %d %b %Y %H:%M:%S %z'
+
+    --start-bracket     change start bracket // '('
+    --end-bracket       change end bracket   // ')'
+
+    --re                additional column condition
+    --no-re             no replace condition(this option has overriding priority)
+    --min-time          no replace if the value is smaller than this option
+    --replace           not to add the date to unixtime but to be replaced it
+
+=head3 EXAMPLES
+
+To edit the date format.
+
+    $ cat sql_result | from_unixtime --format '%Y/%m/%d %H:%M:%S'
+    id    1
+    value         1419702037
+    created_at    1419702037(2014/12/28 02:40:37)
+    updated_at    1419702037(2014/12/28 02:40:37)
+
+Also replace C<value> line with '--re' option.
+
+    $ cat sql_result | from_unixtime --re value
+    id    1
+    value         1419702037(Sun, 28 Dec 2014 02:40:37 +0900)
+    created_at    1419702037(Sun, 28 Dec 2014 02:40:37 +0900)
+    updated_at    1419702037(Sun, 28 Dec 2014 02:40:37 +0900)
+
+If you do not want to replace then you use '--no-re' option
+
+    $ cat sql_result | from_unixtime --no-re updated
+    id    1
+    value         1419702037
+    created_at    1419702037(Sun, 28 Dec 2014 02:40:37 +0900)
+    updated_at    1419702037
+
+
+=head2 CONFIGURATION
+
+`from_unixtime` command will look for a configuration file before reading its command line parameters. This function depends on L<Config::CmdRC>.
+
+The configuration file is `.from_unixtimerc`. And the location of a configuration file is C</etc> or C<$HOME> but if the C<CMDRC_DIR> environment variable is set, `from_unixtime` will look for configuration file in that directory or C<current directory>.
+
+A sample configuration file might read:
+
+    format: %Y/%m/%d %H:%M:%S
+    start-bracket: ' ('
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<App::FromUnixtime>, L<Config::CmdRC>
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=cut

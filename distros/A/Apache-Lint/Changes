@@ -1,0 +1,13 @@
+Revision history for Apache-Lint
+
+0.10    Mon Nov 22 16:36:43 CST 2004
+
+        [ENHANCEMENTS]
+        * Brand new distribution, recreated from scratch with
+          Module::Starter.  Still don't have tests for it, other than
+          the defaults.
+
+        * Correctly and quietly passes along output if the previous
+          filter isn't happy, or is a redirect.
+
+0.02    Ancient history, not even worth noting here.

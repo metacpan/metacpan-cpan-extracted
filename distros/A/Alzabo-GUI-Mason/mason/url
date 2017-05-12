@@ -1,0 +1,4 @@
+<%init>
+my $url = uri( %ARGS );
+</%init>
+<% $url %>

@@ -1,0 +1,33 @@
+clear
+power on
+regs
+
+memset 0072 55
+
+op e6 72
+
+# memory[$0072] should show 56
+test m:0072 = 56
+
+# Wrap and Zero case -------------
+power on
+memset 0072 ff
+
+op e6 72
+
+# Should be: memory[$0072]=0, Z=1
+test m:0072 = 0
+test z = 1
+
+# Negative case -------------------
+power on
+
+memset 0072 7f
+
+op e6 72
+
+# Should be: memory[$0072]=80, S=1
+test m:0072 = 80
+test s = 1
+
+save verify_E6.txt

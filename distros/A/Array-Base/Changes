@@ -1,0 +1,95 @@
+version 0.005; 2012-02-01
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for
+    compatibility with early-loaded warnings.pm) and invoke it earlier
+    to make sure it takes effect in time
+
+  * in doc, refer to String::Base for string index offsetting
+
+  * update documentation for $[ changes in Perl 5.15.3 and 5.15.5
+
+  * in Build.PL, declare incompatibility with pre-0.19
+    B::Hooks::OP::Check, which doesn't play nicely around op check hooking
+
+  * convert .cvsignore to .gitignore
+
+version 0.004; 2011-07-27
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for
+    working around [perl #73174])
+
+  * document that Perls prior to 5.9.3 don't propagate the right lexical
+    state into string eval
+
+version 0.003; 2011-04-09
+
+  * bugfix: correctly detect a type of malformed op tree that the module
+    can't process
+
+  * document that $[ is now due to disappear in Perl 5.15, changed
+    from 5.13
+
+  * on Perl 5.13.6+, use new API function op_contextualize() instead of
+    the core's private functions
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * jump through hoops to avoid compiler warnings
+
+  * use full stricture in test suite
+
+  * in test suite, make all numeric comparisons against $] stringify it
+    first, to avoid architecture-dependent problems with floating point
+    rounding giving it an unexpected numeric value
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.002; 2010-04-11
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for
+    passing package through to required code in pure-Perl version of
+    Lexical::SealRequireHints)
+
+  * in XS, use macros to avoid explicit passing of aTHX, in the manner
+    of the core
+
+  * in XS, avoid using "class" as a variable name, for compatibility
+    with C++ compilers
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.001; 2009-10-21
+
+  * bugfix: correct behaviour of array slicing in scalar context
+
+  * bugfix: also influence list slicing and array splicing, as $[ does
+
+  * for Perl 5.11, also influence the new array keys() and each()
+    operators
+
+  * reorganise documentation, particularly expanding the comparison
+    with $[
+
+  * use integer arithmetic operators for efficiency
+
+  * test all combinations of scalar and list contexts
+
+  * in documentation, correct statement about when $[ is likely to be
+    removed from the core
+
+  * split test suite into one file per affected opcode
+
+  * check for required Perl version at runtime
+
+version 0.000; 2009-09-27
+
+  * initial released version

@@ -1,0 +1,157 @@
+{
+   "abstract" : "Aspose.Imaging Cloud SDK for Perl",
+   "author" : [
+      "Farooq Sheikh <support@aspose.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AsposeImagingCloud-ImagingApi",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.10"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AsposeStorageCloud::StorageApi" : "0",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Date::Parse" : "0",
+            "DateTime" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "Exporter" : "0",
+            "File::Slurp" : "0",
+            "HTTP::Headers" : "0",
+            "HTTP::Request::Common" : "0",
+            "HTTP::Response" : "0",
+            "HTTP::Status" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Log::Any" : "0",
+            "MIME::Base64" : "0",
+            "Module::Runtime" : "0",
+            "Scalar::Util" : "0",
+            "Test::Exception" : "0",
+            "URI::Escape" : "0",
+            "URI::Query" : "0",
+            "perl" : "v5.6.0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "AsposeImagingCloud::ApiClient" : {
+         "file" : "lib/AsposeImagingCloud/ApiClient.pm"
+      },
+      "AsposeImagingCloud::Configuration" : {
+         "file" : "lib/AsposeImagingCloud/Configuration.pm"
+      },
+      "AsposeImagingCloud::ImagingApi" : {
+         "file" : "lib/AsposeImagingCloud/ImagingApi.pm",
+         "version" : "1.01"
+      },
+      "AsposeImagingCloud::Object::BaseObject" : {
+         "file" : "lib/AsposeImagingCloud/Object/BaseObject.pm"
+      },
+      "AsposeImagingCloud::Object::BmpProperties" : {
+         "file" : "lib/AsposeImagingCloud/Object/BmpProperties.pm"
+      },
+      "AsposeImagingCloud::Object::ExifData" : {
+         "file" : "lib/AsposeImagingCloud/Object/ExifData.pm"
+      },
+      "AsposeImagingCloud::Object::GifProperties" : {
+         "file" : "lib/AsposeImagingCloud/Object/GifProperties.pm"
+      },
+      "AsposeImagingCloud::Object::HttpResponseMessage" : {
+         "file" : "lib/AsposeImagingCloud/Object/HttpResponseMessage.pm"
+      },
+      "AsposeImagingCloud::Object::HttpStatusCode" : {
+         "file" : "lib/AsposeImagingCloud/Object/HttpStatusCode.pm"
+      },
+      "AsposeImagingCloud::Object::ImagingResponse" : {
+         "file" : "lib/AsposeImagingCloud/Object/ImagingResponse.pm"
+      },
+      "AsposeImagingCloud::Object::JfifData" : {
+         "file" : "lib/AsposeImagingCloud/Object/JfifData.pm"
+      },
+      "AsposeImagingCloud::Object::JpegExifData" : {
+         "file" : "lib/AsposeImagingCloud/Object/JpegExifData.pm"
+      },
+      "AsposeImagingCloud::Object::JpegProperties" : {
+         "file" : "lib/AsposeImagingCloud/Object/JpegProperties.pm"
+      },
+      "AsposeImagingCloud::Object::LineNumberRestartMode" : {
+         "file" : "lib/AsposeImagingCloud/Object/LineNumberRestartMode.pm"
+      },
+      "AsposeImagingCloud::Object::NumberStyle" : {
+         "file" : "lib/AsposeImagingCloud/Object/NumberStyle.pm"
+      },
+      "AsposeImagingCloud::Object::Orientation" : {
+         "file" : "lib/AsposeImagingCloud/Object/Orientation.pm"
+      },
+      "AsposeImagingCloud::Object::PageBorderAppliesTo" : {
+         "file" : "lib/AsposeImagingCloud/Object/PageBorderAppliesTo.pm"
+      },
+      "AsposeImagingCloud::Object::PageBorderDistanceFrom" : {
+         "file" : "lib/AsposeImagingCloud/Object/PageBorderDistanceFrom.pm"
+      },
+      "AsposeImagingCloud::Object::PageVerticalAlignment" : {
+         "file" : "lib/AsposeImagingCloud/Object/PageVerticalAlignment.pm"
+      },
+      "AsposeImagingCloud::Object::PaperSize" : {
+         "file" : "lib/AsposeImagingCloud/Object/PaperSize.pm"
+      },
+      "AsposeImagingCloud::Object::PngProperties" : {
+         "file" : "lib/AsposeImagingCloud/Object/PngProperties.pm"
+      },
+      "AsposeImagingCloud::Object::PsdProperties" : {
+         "file" : "lib/AsposeImagingCloud/Object/PsdProperties.pm"
+      },
+      "AsposeImagingCloud::Object::ReportType" : {
+         "file" : "lib/AsposeImagingCloud/Object/ReportType.pm"
+      },
+      "AsposeImagingCloud::Object::ResponseMessage" : {
+         "file" : "lib/AsposeImagingCloud/Object/ResponseMessage.pm"
+      },
+      "AsposeImagingCloud::Object::SaaSposeResponse" : {
+         "file" : "lib/AsposeImagingCloud/Object/SaaSposeResponse.pm"
+      },
+      "AsposeImagingCloud::Object::SectionStart" : {
+         "file" : "lib/AsposeImagingCloud/Object/SectionStart.pm"
+      },
+      "AsposeImagingCloud::Object::StyleIdentifier" : {
+         "file" : "lib/AsposeImagingCloud/Object/StyleIdentifier.pm"
+      },
+      "AsposeImagingCloud::Object::TextEffect" : {
+         "file" : "lib/AsposeImagingCloud/Object/TextEffect.pm"
+      },
+      "AsposeImagingCloud::Object::TiffProperties" : {
+         "file" : "lib/AsposeImagingCloud/Object/TiffProperties.pm"
+      },
+      "AsposeImagingCloud::Object::Underline" : {
+         "file" : "lib/AsposeImagingCloud/Object/Underline.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "1.01"
+}

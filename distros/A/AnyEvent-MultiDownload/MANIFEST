@@ -1,0 +1,12 @@
+bin/md-request
+Changes
+lib/AnyEvent/MultiDownload.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00_compile.t
+t/01_simple_get.t
+t/02_exception_nofind.t
+t/03_exception_nobody.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

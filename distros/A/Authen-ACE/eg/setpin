@@ -1,0 +1,116 @@
+#! /ipl/perl5/bin/perl
+
+# $Id: setpin,v 1.3 1997/09/19 16:40:14 carrigad Exp $
+
+# Copyright (C), 1997, Interprovincial Pipe Line Inc.
+
+# This program will allow a user to set his PIN if his card has been
+# put into New PIN Mode. 
+
+use strict;
+use Authen::ACE;
+
+eval "use Term::ReadKey";
+if ($@) {
+  print STDERR "Warning!! Couldn't load Term::ReadKey module!\n";
+  print STDERR "          PINs will be entered in the clear!\n";
+  print STDERR "          To fix this, get Term::ReadKey from CPAN.\n\n";
+  eval "sub ReadMode {}";
+}
+
+my($username, $token) = @ARGV;
+
+die "usage: $0 username token\n" if ($username eq "" || $token eq "");
+
+my $ace = new Authen::ACE;
+
+my ($result, $nt) = $ace->Check($token, $username);
+
+die "Sorry, but this token is not in new PIN mode.\n" 
+  unless $result == ACM_NEW_PIN_REQUIRED;
+
+my $pin = $nt->{"system_pin"};
+if ($nt->{"user_selectable"} == CANNOT_CHOOSE_PIN) {
+  if (!accept_pin($pin)) {
+    $ace->PIN($pin, 1);
+    print "Wait for the token to change, then re-run this program.\n";
+    exit(0);
+  }
+} elsif ($nt->{"user_selectable"} == USER_SELECTABLE) {
+  if (getyn("Do you want the system to generate a PIN for you?")) {
+    if (!accept_pin($pin)) {
+      $ace->PIN($pin, 1);
+      print "Wait for the token to change, then re-run this program.\n";
+      exit(0);
+    }
+  } else {
+    $pin = get_pin($nt);
+  }
+} else {
+  $pin = get_pin($nt);
+}
+if ($ace->PIN($pin) == ACM_NEW_PIN_ACCEPTED) {
+  print "Success: the new PIN has been accepted.\n";
+} else {
+  print "Sorry: the new PIN was rejected.\n";
+}
+
+sub accept_pin {
+  my $pin = shift;
+  print "The system has assigned the PIN ``$pin'' to you.\n";
+  return getyn("Enter y to acept it; anything else to reject it:");
+}
+
+sub getyn {
+  my $prompt = shift;
+  print "$prompt ";
+  my $ans = <STDIN>;
+  return $ans =~ /^y/i;
+}
+
+sub get_pin {
+  my $pinparms = shift;
+
+  my $ct;
+
+  my $pin;
+
+  print "You may now enter a new PIN.\n";
+  if ($pinparms->{"alphanumeric"}) {
+    print "Your PIN can consist of letters and numbers.\n";
+    $ct = "characters";
+  } else {
+    print "Your PIN must consist only of numbers.\n";
+    $ct = "digits";
+  }
+  if ($pinparms->{"min_pin_len"} == $pinparms->{"max_pin_len"}) {
+    printf "Your PIN must be exactly %d $ct long.\n", $pinparms->{"min_pin_len"};
+  } else {
+    printf "Your PIN must be from %d to %d $ct long.\n",
+    $pinparms->{"min_pin_len"}, $pinparms->{"max_pin_len"};
+  }
+  while (1) {
+    my $confirm;
+
+    ReadMode(2);
+
+    print "Enter your new PIN: ";
+    $pin = <STDIN>;
+    chomp $pin;
+
+    if (defined $Term::ReadKey::VERSION) {
+      print "\nConfirmation: ";
+      $confirm = <STDIN>;
+      chomp $confirm;
+      print "\n";
+    } else {
+      $confirm = $pin;
+    }
+
+    ReadMode(0);
+
+    last if $pin eq $confirm;
+    print "Sorry, they don't match. Please try again.\n";
+  }
+  return $pin;
+}

@@ -1,0 +1,14 @@
+# Supported non-production server types
+%%non_prod staging beta
+
+# Base server names
+%%server_base server.yahoo.com
+%%base_intl able baker charlie dog easy fox 
+%%<base_intl>_production_server <base_intl>.<server_base>
+%%<base_intl>_<non_prod>_server <base_intl>.<non_prod>.<server_base>
+%%server '<<intl>_<release>_server>'
+
+%%intl  able dog fox 
+%%server_main     'http://<server>'
+<server_main> /Copyright &copy; 2006/ Y Will cross-product <intl>
+http://<server> /Copyright &copy; 2006/ Y Won't cross-product <intl>

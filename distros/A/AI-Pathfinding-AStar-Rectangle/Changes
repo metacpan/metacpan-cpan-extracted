@@ -1,0 +1,38 @@
+Revision history for Perl extension AI::Pathfinding::AStar::Rectangle.
+
+0.01  Wed Apr  1 13:54:05 2009
+	- original version; created by h2xs 1.23 with options
+		-A -n AI::Pathfinding::AStar::Rectangle
+
+0.02  Wed Apr  1 13:54:05 2009
+    -   Some bugfixes
+0.16  September 25  23:34 2010
+    -  foreach_xy foreach_xy_set implemented in PP.
+    -  added clone. 
+    -  added test for this functions
+
+0.17  September 26  14:34 2010
+    -  begin_x, end_x, last_x, last_y
+    -  added typemap. 
+    -  added test 06 for this functions
+    -  remove some duplicated code
+    
+0.18  September 26  15:24 2010
+    -  added clone_rect for selection rectangle
+
+0.19  September 28  05:35 2010
+    - added test for dastar algorithm
+    - Some doc fix
+
+0.20  September 28  06:10 2010
+    - Get rid of some warnings && MSVS compiler staff( inline )
+
+0.21  September 28  06:10 2010
+    - Some perl 5.8.8 are bad. ( Create own croak_xs_usage )
+
+0.22  October   3  21:10 2010
+    - Some perl 5.8.8 are still bad. ( next try )
+    - remove some other warnings
+
+0.23  October   12  21:10 2010
+    - Makefile.PL && LICENSE

@@ -1,0 +1,43 @@
+---
+name: Agent-TCLI-Package-Net
+version: 0.031
+author:
+  - 'Eric Hacker <hacker@cpan.org>'
+abstract: Network tools for TCLI agents
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Agent::TCLI: 0.03
+  Email::MIME::Creator: 0
+  File::Slurp: 0
+  FormValidator::Simple::Plugin::NetAddr::IP: 0.01
+  POE::Component::Client::HTTP: 0
+  POE::Component::Client::Keepalive: 0
+  POE::Component::Client::Ping: 0
+  POE::Component::Client::SMTP: 0
+  POE::Component::Client::Traceroute: 0
+  POE::Component::Server::SimpleHTTP: 0
+provides:
+  Agent::TCLI::Package::Net:
+    file: lib/Agent/TCLI/Package/Net.pm
+    version: 0.031
+  Agent::TCLI::Package::Net::HTTP:
+    file: lib/Agent/TCLI/Package/Net/HTTP.pm
+    version: 0.030.0074
+  Agent::TCLI::Package::Net::HTTPD:
+    file: lib/Agent/TCLI/Package/Net/HTTPD.pm
+    version: 0.030.0074
+  Agent::TCLI::Package::Net::Ping:
+    file: lib/Agent/TCLI/Package/Net/Ping.pm
+    version: 0.030.0074
+  Agent::TCLI::Package::Net::SMTP:
+    file: lib/Agent/TCLI/Package/Net/SMTP.pm
+    version: 0.030.0074
+  Agent::TCLI::Package::Net::Traceroute:
+    file: lib/Agent/TCLI/Package/Net/Traceroute.pm
+    version: 0.030.0074
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

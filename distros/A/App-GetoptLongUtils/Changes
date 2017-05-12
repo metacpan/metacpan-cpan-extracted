@@ -1,0 +1,25 @@
+Revision history for App-GetoptLongUtils
+
+0.005   2016-10-30 (PERLANCAR)
+
+	- Add utility: gen-getopt-long-spec-from-getopt-std-spec.
+
+
+0.004   2016-10-27 (PERLANCAR)
+
+	- Add utility: detect-getopt-long-script.
+
+
+0.003   2016-10-21 (PERLANCAR)
+
+	- Add utility: dump-getopt-long-script.
+
+
+0.002   2016-09-14 (PERLANCAR)
+
+	- Fix package name.
+
+
+0.001   2016-09-14 (PERLANCAR)
+
+        - First release.

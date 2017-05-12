@@ -1,0 +1,35 @@
+#!/usr/local/bin/perl
+
+use v5.10.0;
+use blib;
+use strict;
+use warnings;
+
+use AFS::VOS;
+use Scalar::Util qw(looks_like_number);
+
+my ($vos, $volid, $server, $part, $volume, $maxquota, $vid, $rovid);
+
+die "Usage: $0 server partition volume [max_quota [volid rovolid]]\n" if $#ARGV < 2;
+
+$server   = shift;
+$part     = shift;
+$volume   = shift;
+$maxquota = shift;
+$vid      = shift // 0;
+$rovid    = shift // 0;
+
+if (defined $maxquota and !looks_like_number($maxquota)) { warn "$0: MAXQUOTA is not an INTEGER ...\n"; }
+else                                                     { $maxquota = int($maxquota); }
+if (defined $vid      and !looks_like_number($vid))      { warn "$0: VID is not an INTEGER ...\n"; }
+else                                                     { $vid = int($vid); }
+if (defined $rovid    and !looks_like_number($rovid))    { warn "$0: ROVID is not an INTEGER ...\n"; }
+else                                                     { $rovid = int($rovid); }
+
+$vos = AFS::VOS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+if ($maxquota) { $volid = $vos->create($server, $part, $volume, $maxquota, $vid, $rovid); }
+else           { $volid = $vos->create($server, $part, $volume); }
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { printf "Volume %u created on partition /vicep%s of %s\n", $volid, $part, $server; }

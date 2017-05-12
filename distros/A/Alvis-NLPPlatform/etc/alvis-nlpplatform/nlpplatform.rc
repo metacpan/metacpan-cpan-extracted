@@ -1,0 +1,231 @@
+# definition of the linguistic annotation steps
+
+ALVISTMP	= $HOME/tmp
+
+PLATFORM_ROOT	= $HOME/Platform
+
+AWK		= /usr/bin/awk
+
+DEBUG           = 0
+
+<alvis_connection>
+	HARVESTER_PORT	= 6234
+	NEXTSTEP	= 0
+	NEXTSTEP_HOST	= localhost
+	NEXTSTEP_PORT	= 7345
+	SPOOLDIR	= $HOME/tmp/spool
+	OUTDIR		= $HOME/tmp/Outdir
+</alvis_connection>
+
+<NLP_connection>
+	SERVER			= localhost
+	PORT			= 1510
+	RETRY_CONNECTION	= 10
+</NLP_connection>
+
+<XML_INPUT>
+    PRESERVEWHITESPACE = 0
+    LINGUISTIC_ANNOTATION_LOADING = 0
+</XML_INPUT>
+
+
+<XML_OUTPUT>
+    FORM = 1
+    ID = 1
+    TOKEN_LEVEL = 1
+    SEMANTIC_UNIT_NAMED_ENTITY_LEVEL	= 1
+    WORD_LEVEL	= 1
+    SENTENCE_LEVEL = 1
+    MORPHOSYNTACTIC_FEATURE_LEVEL	= 1
+    LEMMA_LEVEL	= 1
+    SEMANTIC_UNIT_TERM_LEVEL	= 1
+    SEMANTIC_UNIT_LEVEL	= 1
+    SYNTACTIC_RELATION_LEVEL	= 1
+
+    NO_STD_XML_OUTPUT = 0
+
+    YATEA = 1
+</XML_OUTPUT>
+
+<linguistic_annotation>
+	ENABLE_TOKEN	= 1
+	ENABLE_NER	= 1
+	ENABLE_WORD	= 1
+	ENABLE_SENTENCE = 1
+	ENABLE_POS	= 1
+	ENABLE_LEMMA	= 1
+	ENABLE_TERM_TAG	= 1
+	ENABLE_SYNTAX	= 0
+	ENABLE_SEMANTIC_TAG	= 0
+</linguistic_annotation>
+
+<NLP_misc>
+	NLP_resources	= $PLATFORM_ROOT/Resources
+	SAVE_IN_OUTDIR	= 1
+	TERM_LIST_EN	= $NLP_resources/terms.txt.sav
+	TERM_LIST_FR	= $NLP_resources/terms_FR.txt
+    # valid tags for each language
+    <POSTAG_LIST>
+        <EN>
+	    CC = 1
+	    CD = 1
+    	    DT = 1
+            EX = 1
+            FW = 1
+            IN = 1
+            JJ = 1
+            JJR = 1
+            JJS = 1
+            LS = 1
+            MD = 1
+            NN = 1
+            NNS = 1
+            NP = 1
+            NPS = 1
+            PDT = 1
+            POS = 1
+            PP = 1
+            PP$ = 1
+            RB = 1
+            RBR = 1
+            RBS = 1
+            RP = 1
+            SYM = 1
+            TO = 1
+            UH = 1
+            VB = 1
+            VBD = 1
+            VBG = 1
+            VBN = 1
+            VBP = 1
+            VBZ = 1
+            VV = 1
+            VVD = 1
+            VVG = 1
+            VVN = 1
+            VVP = 1
+            VVZ = 1
+            WDT = 1
+            WP = 1
+            WP$ = 1
+            WRB = 1
+        </EN>
+        
+        <FR>
+            ABR = 1
+            ADJ = 1
+            ADV = 1
+            DET:ART = 1
+            DET:POS = 1
+            INT = 1
+            KON = 1
+            NAM = 1
+            NOM = 1
+            NUM = 1
+            PRO = 1
+            PRO:DEM = 1
+            PRO:IND = 1
+            PRO:PER = 1
+            PRO:POS = 1
+            PRO:REL = 1
+            PRP = 1
+            PRP:det = 1
+            PUN = 2
+            PUN:cit = 2
+            SENT = 2
+            SYM = 1
+            VER:cond = 1
+            VER:futu = 1
+            VER:impe = 1
+            VER:impf = 1
+            VER:infi = 1
+            VER:pper = 1
+            VER:ppre = 1
+            VER:pres = 1
+            VER:simp = 1
+            VER:subi = 1
+            VER:subp = 1
+        </FR>
+        
+    </POSTAG_LIST>
+</NLP_misc>
+
+NLP_tools_root = $PLATFORM_ROOT/NLPtools
+
+SEMTAG_EN_DIR = $NLP_tools_root/AlvisSemTag-0.4
+ONTOLOGY = $SEMTAG_EN_DIR/share/Subtilis_Molecular_Biology-v2.rdf
+CANONICAL_DICT = $SEMTAG_EN_DIR/share/canonical_head_variants.dict.trish2 # optional
+PARENT_DICT = $SEMTAG_EN_DIR/share/Subtilis_Molecular_Biology-v2.parent.trish2 # optional
+
+<NLP_tools>
+	NETAG_EN		= "$NLP_tools_root/TagEN/tagen -t -y :bio"
+	NETAG_FR		= "$NLP_tools_root/TagEN/tagen -t -y :equer"
+	WORDSEG_EN		= "$AWK -f $NLP_tools_root/WordSeg/words-en.awk"
+	# WORDSEG_EN		= "$NLP_tools_root/WordSeg/sentences.pl"
+	WORDSEG_FR		= "$AWK -f $NLP_tools_root/WordSeg/words-fr.awk"
+	POSTAG_EN		= "$NLP_tools_root/TreeTagger/bin/tree-tagger $NLP_tools_root/TreeTagger/lib/english.par -token -lemma -sgml -no-unknown"
+	#POSTAG_EN		= "(cd $NLP_tools_root/geniatagger-2.0.1; sed 's/ /___/g' | tr '\n' ' '| ./geniatagger -nt | cut -f 1,2,3|sed 's/\([^\t]*\t\)\([^\t]*\)\t\([^\t]*\)/\1\3\t\2/g' | sed 's/___/ /g' | grep -v '^$')"
+	POSTAG_FR		= "$NLP_tools_root/TreeTagger/bin/tree-tagger $NLP_tools_root/TreeTagger/lib/french.par -token -lemma -sgml -no-unknown"
+	SYNTACTIC_PATH_EN	= "$NLP_tools_root/link-4.1b"
+	# SYNTACTIC_PATH_EN       = "$NLP_tools_root/biolgForAlvis/biolg-1.1.7b"
+	SYNTACTIC_PATH_FR	= ""
+	SYNTACTIC_ANALYSIS_EN	= "cd $SYNTACTIC_PATH_EN ; $SYNTACTIC_PATH_EN/parse"
+
+# 	SYNTACTIC_PATH_EN_SUPPL       = "/home/thierry/Recherche/Logiciels/LP2LP"
+#         SYNTACTIC_ANALYSIS_EN_LP2LP_CLEAN       = "cd $SYNTACTIC_PATH_EN_SUPPL ; $SYNTACTIC_PATH_EN_SUPPL/clean_BioLG_output_for_lp2lp.pl"
+#         SYNTACTIC_ANALYSIS_EN_LP2LP     = "cd $SYNTACTIC_PATH_EN_SUPPL ; $SYNTACTIC_PATH_EN_SUPPL/lp2lp/lp2lp -r $SYNTACTIC_PATH_EN_SUPPL/lp2lp/test/lp2lp.conf"
+
+	# SYNTACTIC_ANALYSIS_EN	= "cd $SYNTACTIC_PATH_EN ; $SYNTACTIC_PATH_EN/parse -xmlin"
+	SYNTACTIC_ANALYSIS_FR	= ""
+	TERM_TAG_FR		= ""
+	TERM_TAG_EN		= ""
+        SEMTAG_EN               = "$SEMTAG_EN_DIR/src/AlvisSemTag -c $CANONICAL_DICT -p $PARENT_DICT -o $ONTOLOGY"
+        SEMTAG_FR               = ""
+        YATEARC                 = "/etc/yatea/yatea.rc"
+        YATEAOUTPUT             = "$ALVISTMP"
+</NLP_tools>
+
+<CONVERTERS>
+text/plain = text2xhtml  <
+
+text/html = 
+
+www/unknown = 
+#text/plain ; ; GuessText
+
+text/x-tex = tth -g -w1 -r <  
+
+application/x-tex =  tth -g -w1 -r < 
+#text/x-tex ; untex -a -e -giso ; TeXText
+#application/x-tex ; untex -a -e -giso ; TeXText
+#text/x-tex ;  ; TeX
+#application/x-tex ; ; TeX
+
+application/pdf = pdftohtml -i -noframes -nomerge -stdout 
+#application/pdf ; pstotext ; Text
+application/postscript = pstotext 
+application/msword = antiword -t 
+
+application/vnd.ms-excel =  xlhtml -fw 
+
+application/vnd.ms-powerpoint = ppthtml 
+application/powerpoint = ppthtml 
+
+application/rtf = unrtf --nopict --html 
+# image/gif ; ; Image
+# image/jpeg ; ; Image
+# image/tiff ; ; Image
+application/xml = 
+
+<STYLESHEET>
+
+default = xsltproc /etc/alvis-nlpplatform/xsl/Default.xsl
+
+</STYLESHEET>
+
+SupplMagicFile = /etc/alvis-nlpplatform/mime/magic.TeX
+
+StoreInputFiles = 0
+
+</CONVERTERS>
+

@@ -1,0 +1,15 @@
+Revision history for Perl extension AnyEvent::FileLock.
+
+0.03  Jun 25, 2013
+        - add some randomness into delay to avoid having multiple
+          contenders for the lock trying to lock it at exactly the
+          same time
+
+0.02  Apr 16, 2013
+        - locking with fcntl was not working
+        - add more references in documentation "See also" section
+
+0.01  Wed Apr 10 14:53:29 2013
+	- original version; created by h2xs 1.23 with options
+		-AXn AnyEvent::FileLock
+

@@ -1,0 +1,25 @@
+---
+abstract: 'Parse and query official AWS network ranges'
+author:
+  - 'Jose Luis Martinez <jlmartinez@capside.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AWS-Networks
+requires:
+  DateTime: '0'
+  File::Slurp: '0'
+  HTTP::Tiny: '0'
+  IO::Socket::SSL: '0'
+  JSON: '0'
+  Moose: '0'
+  Net::CIDR::Set: '0'
+version: '0.01'

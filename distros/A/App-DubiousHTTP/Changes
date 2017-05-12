@@ -1,0 +1,193 @@
+2016/06/20 0.033
+- If the firewall supports it use eicar.zip for tests because this might
+  trigger different behavior (binary, ZIP instead of text). If this gets
+  successfully blocked retry with eicar.txt though.
+- download names are now generic instead of eicar.txt and novirus.txt so
+  that one could not just block based on this name
+- detect if firewall/AV matches eicar+junk or junk+eicar which is not
+  allowed according to EICAR usage requirements
+- mark some tests as COMMON_INVALID to show that these are invalid but still
+  commonly used in practive. Issue a warning if harmless content of this
+  type gets blocked.
+- some small tests added as variations of existing. These should probably not
+  cause any problems but are used to detect blocking of invalid responses
+  which are nevertheless commonly seen in practice.
+
+2016/04/20 0.032
+- fixed debug function in Javascript which caused the final submission to fail
+
+2016/04/20 0.031
+- Each tests now has a fixed ID which will not change over the development of
+  the program, i.e. if tests gets added, deleted.... This ID can also be used
+  directly, i.e. http://host/161/eicar.txt
+- More tests:
+  - hide data in gzip FEXTRA, made possible by using
+    https://bugzilla.mozilla.org/show_bug.cgi?id=1244535
+  - make use of too tolerant deflate/zlib handling in Chrome, Safari and FF.
+    See commit 54ec8a6b8ce for details
+  - FF uses strtoul to parsechunk size which accepts various prefixes and also
+    signed data
+  - some more status lines - chrome accepts almost anything
+  - use ICY instead of HTTP/1.0 (FF only)
+  - playing with 1xx preliminary response followed by real
+  - Chrome accepts data partially compressed with gzip, rest uncompressed
+  - Variations of HTTP version together with chunked and gzip
+  - various kinds of white spaces, junk before header...
+
+2016/01/03 0.030
+- Extend pcap mode to write single file and to filter based on reports
+    - Extend pcap export mode: all streams into one file, filter...
+    - new test for chunking with junk at the end, but content-length with
+      the size of the good content. Edge will ignore the junk
+- tool bin/test-sanitizing.pl to look how good a proxy will sanitize the traffic
+  against strange requests typically understood by browsers but not by
+  firewalls, /manifest/ URL to just get a listing of possible tests as plain
+  text
+- More tests:
+  - combining chunked and gzip
+  - tests with brotli (Firefox 44, https)
+  - combine gzip header with RFC1950 (zlib) instead of RC1951 (deflate)
+  - HTTP header containing TE chunked without a status line
+  - chunked body:
+    - chunking with junk and content-length limited to good data
+    - Various browsers accept data after the chunk size
+    - Especially Firefox accepts lots of data before the chunk size, even "\r\n\r\n"
+    - Various browsers accept junk at the end, like "0\r\nfoobar\r\n"
+  - status codes:
+    - Variations on 204: 0204, 2040, 204 with chunked encoding. IE and Edge
+      continue to accept 204 with body. 2040 is usually accepted but download
+      not necessarily works.
+    - Code 299: usually treated the same as 200
+  - Content-length:
+    - Chrome/Opera accept "," before length
+    - all browsers accept "," after length
+    - most browser accept anything after length, even something like "68A","68.9"...
+  - tricky ends of HTTP header:
+     - \n\r\r\n - Safari, IE, Edge
+     - \n\r\r\n\r\n - others
+     - IE and Edge accept "\n<space>\n" or "\n\t\n"
+  - line folding after key and before colon, i.e. Transfer-Encoding\n\t:chunked
+    This will be accepted by Safari.
+  - broken "white-space" and line folding:
+    Chrome treats \n\000chunked as proper line folding, while the others don't
+  - characters before and after the field or the colon
+    - While Safari accepts anything before and after "chunked" (tested in
+      Chunked.pm) it only accepts some characters before/after gzip and deflate.
+      Among these are \v,\f,";" and \240 (latin1 non-breaking space)
+    - FF, Chrome accept "," before and after chunked|gzip|deflate
+  - \000 is nearly everywhere in the header ignored by Chrome (inside, before
+    and after key and value...)
+  - broken status lines
+    - "HTTP/1.1foobar" (no status code etc) gets accepted by Chrome, Opera and
+      Firefox.
+  - various tests with invalid characters or UTF-8
+  - extend compression tests with various kinds of sync between deflated parts
+
+2015/11/12 0.029
+- bulk testing of iframe tags with HTML inside
+2015/11/08 0.028
+- bulk testing of behavior regarding Javascript and Image loading (instead
+  of only XHR)
+2015/10/31 0.027
+- way more tests of broken responses
+- add tests for gzip compression flags and features
+- add support for lzma compression, supported by at least Opera
+- option --fast-feedback so that results  gets submitted in parts once they grow to big
+- new script bin/normalize-logs.pl to normalize log files
+2015/10/01 0.026
+- add optional SSL and IPv6 support
+- add more tests and fixed some 
+- add more detailed output
+2015/09/14 0.025
+- some more tests
+- better description for some tests
+- enforce download via download attribute for eicar.txt etc
+- according to RFC2616 a content-encoding header with 'identity' should not
+  be used, moved to UNCOMMON_INVALID and added variations with double
+  encoding etc
+- complain if the firewall blocks sane response without virus, because that
+  might indicate that they employ a URL filter only or similar
+- If one evasion failed re-check with novirus.txt if it failed because of the
+  firewall or because the browser considered the response invalid. Also add
+  these information to the summary for the user and tell the user again how to
+  check for false positives and how EICAR looks like.
+- give summary and offer a way to give feedback with product details
+- log response header we got for initial innocent and test virus request
+2015/09/04 0.024
+- if in the automated evasion test the initial simple request to eicar.txt
+  results in the expected failure add the error message to the results sent
+  in /submit_results
+- track different request headers, i.e order of fields etc to distinguish browsers 
+  and changes done by proxies
+- by default garble URLs so firewalls can not simply block all URLs with 
+  eicar.txt inside, switch off with --no-garble-url. It will still accept
+  ungarbled URLs but produce garbled ones.
+- with http://host/broken/ALL/testid etc one will get the test line with
+  image, script, html ... for only this test (i.e http://host/broken/ALL/302).
+2015/08/21 0.023
+- lots of beautification and documentation
+- added tests for script include behavior too (which shows that Chrome is more
+  strict when including scripts)
+2015/08/05 0.022
+- add some more tests
+- offer to show src of response in auto-mode
+- fix content-length header in Broken.pm
+2015/07/29 0.021
+- make sure we always send some kind of length (Content-length or chunked)
+  because some firewalls don't scan content with unspecified length which
+  would then distort test results
+- some more tests and documentation fixes
+2015/06/26 0.020
+- yet more broken HTTP responses
+- fix closing after response in some cases
+- fix load limitation of server
+2015/06/26 0.019
+- fix deflate
+- add broken tests with 30x without Location and other strange codes with body
+2015/06/25 0.018
+- works with 5.8.9 now
+- no longer needs AnyEvent and Compress::Zlib (less dependecies),
+  make dependency for Compress::Raw::Zlib explicit in Makefile.PL
+- Net::PcapWriter now optional, i.e. only needed when writing pcaps
+- count evasions and add number during submission
+- use accept header from original request inXHR or use custom accept header
+- increase timeout to 5s
+- compatibility with MSIE8 by adding try{..} around console.log
+2015/06/24 0.017
+- support for MSIE autodetect starting with MSIE8
+- better distinction between valid and invalid uncommon responses
+- better structured tests
+2015/06/23 0.016
+- improved Ajax based bulk detection: timeouts, progress indicator...
+2015/06/22 0.015
+- Ajax based bulk detection of browser quirks and evasion possibilities
+- better color coding of responses for non-ajax tests
+2015/06/18 0.014
+- add tests for more broken stacks, check for HTTP/0.9
+2015/05/13 0.013
+- add even more tests for dubious content-length
+2015/05/03 0.012
+- add more tests with chunking and more dubious content-length
+2013/07/09 0.011
+- added tests with dubious content-length
+2013/07/02 0.010
+- add script to ping back within iframe to see, if iframe was loaded unchanged
+2013/07/02 0.009
+- simplify code, remove redundant code
+- log access with timestamp 
+- add ping back via xmlhttrequest to check if script can get loaded
+2013/07/02 0.008
+- added tests with unknown content-encodings
+2013/07/01 0.007
+- added tests with multiple content-encodings
+2013/07/01 0.006
+- added tests with content-encoding and transfer-encoding with various
+  compressions
+2013/06/30 0.005
+- single part response with content-transfer-encoding base64
+2013/06/24 0.004
+- work with "normalized" urls, where "," got URL-encoded
+2013/06/24 0.003
+- added test for range header
+2013/06/10 0.002
+- first workable version: tests for chunking and multipart messages

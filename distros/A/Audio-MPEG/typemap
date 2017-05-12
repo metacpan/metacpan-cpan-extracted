@@ -1,0 +1,66 @@
+#
+# $Id: typemap,v 1.1.1.1 2001/06/17 01:37:51 ptimof Exp $
+#
+# Copyright (c) 2001 Peter Timofejew. All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#############################################################################
+TYPEMAP
+
+Audio_MPEG_Decode 			T_OBJECTPTR
+struct mad_stream *			T_PTROBJ
+struct mad_frame *			T_PTROBJ
+struct mad_synth *			T_PTROBJ
+struct mad_pcm *			T_PTROBJ
+
+Audio_MPEG_Output 			T_OBJECTPTR
+enum audio_mpeg_output_type	T_PTROBJ
+
+Audio_MPEG_Encode 			T_OBJECTPTR
+
+#############################################################################
+INPUT
+
+T_OBJECT
+	if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")) {
+	    STRLEN len;
+	    char  *s = SvPV((SV*)SvRV($arg), len);
+
+	    if (len != sizeof($var))
+		croak(\"Size %d of packed data != expected %d\",
+			len, sizeof($var));
+	    $var = *($type *)s;
+	}
+	else
+	    croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")
+
+T_OBJECTPTR
+	if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")) {
+		IV tmp = SvIV((SV*)SvRV($arg));
+		$var = ($type)tmp;
+	}
+	else
+		croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")
+
+#############################################################################
+OUTPUT
+
+T_OBJECT
+	sv_setref_pvn($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\",
+		(char *)&$var, sizeof($var));
+
+T_OBJECTPTR
+	sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\", (void*)$var);

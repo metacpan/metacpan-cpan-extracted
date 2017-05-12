@@ -1,0 +1,6 @@
+DESCRIPTION
+
+    This is a base class for Acme::MetaSyntactic::* module that wants to
+    get their meta names for a wordlist in corresponding WordList::*
+    module. An example of such module is Acme::MetaSyntactic::countries.
+

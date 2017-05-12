@@ -1,0 +1,21 @@
+lib/Apache/Admin/Config.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+UPGRADE-0.10
+t/comment.t
+t/comment_delete.t
+t/comment_insert.t
+t/directive.t
+t/directive_delete.t
+t/directive_insert.t
+t/handle.t
+t/httpd.conf-dist
+t/isin.t
+t/section.t
+t/section_delete.t
+t/section_insert.t
+t/save.t
+t/value.t
+META.yml                                 Module meta-data (added by MakeMaker)

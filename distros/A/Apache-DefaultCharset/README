@@ -1,0 +1,53 @@
+NAME
+    Apache::DefaultCharset - AddDefaultCharset configuration from mod_perl
+
+SYNOPSIS
+      use Apache::DefaultCharset;
+
+      # This module adds "add_default_charset_name" method
+      $charset = $r->add_default_charset_name;
+      $r->add_default_charset_name('euc-jp');
+
+      # via Apache::DefaultCharset object
+      $charset = Apache::DefaultCharset->new($r);
+      print "default_charset_name is ", $charset->name;
+      # or print "default charset is $charset"; will do (overload)
+      $charset->name('euc-jp');
+
+DESCRIPTION
+    Apache::DefaultCharset is an XS wrapper for Apache Core's
+    "AddDefaultCharset" configuration.
+
+EXAMPLES
+  Unicode Handling
+
+    Suppose you develop multi-language web application, and transparently
+    decode native encodings into Unicode string inside Perl (5.8 or over
+    would be better). First you should add
+
+      AddDefaultCharset euc-jp
+
+    in your "httpd.conf", then leave off "send_http_header" arguments just
+    to text/html. Then you can get the current configuration with this
+    module when you use "Encode" or "Text::Iconv" to decode the HTTP request
+    query into Unicode.
+
+  Modification of DefaultCharset
+
+    Suppose you want to add utf-8 for XML files, and Shift_JIS for HTML
+    files as HTTP charset attribute by default ("By default" means that if
+    you set "content_type" explicitly in content-generation phase, that will
+    be prior to the defalut). This module enables you to write
+    "PerlFixupHandler" to configure "add_default_charset_name" in run-time.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Apache::DefaultCharset manpage
+
+    mod_perl cookbook at http://www.modperlcookbook.org/
+

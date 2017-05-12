@@ -1,0 +1,37 @@
+This software is currently in BETA.  Feedback/comments/flames welcome.  lloyd@drlabs.org
+If you find this module useful/useless also feel free to let me know :)
+
+
+To install... (assuming you have installed the prerequesites below). 
+
+
+perl Makefile.PL
+make
+make install
+
+
+And for those who RTFM... 
+
+man Apache::Bwlog
+
+
+
+PACKAGES REQUIRED :
+
+mod_perl 
+
+You must have a working version of mod_perl installed with your apache server.  You must also have the log handler 
+enabled for mod_perl.  This is NOT installed by default.  While installing your mod_perl, you can be certain you have 
+everything you need by passing the EVERYTHING=1 flag.
+
+IPC::Sharelite
+
+This perl module is to support the bit bucket concept (shared mem space between child process's)  Very cool module.
+
+to grab this module from cpan :
+
+perl -MCPAN -e shell
+install IPC::Sharelite
+
+
+

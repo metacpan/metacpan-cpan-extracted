@@ -1,0 +1,43 @@
+---
+abstract: 'Web interface to Map::Metro maps'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Map-Metro
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  App::Map::Metro:
+    file: lib/App/Map/Metro.pm
+    version: '0.0100'
+  Map::Metro::Cmd::Mroute:
+    file: lib/Map/Metro/Cmd/Mroute.pm
+    version: '0.0100'
+requires:
+  HTTP::Tiny: '0'
+  List::AllUtils: '0'
+  Map::Metro: '0.2206'
+  Mojolicious::Lite: '5.00'
+  MooseX::App::Command: '0'
+  URI::Encode: '0'
+  perl: '5.016000'
+resources:
+  bugtracker: https://github.com/Csson/p5-App-Map-Metro/issues
+  homepage: https://metacpan.org/release/App-Map-Metro
+  repository: https://github.com/Csson/p5-App-Map-Metro.git
+version: '0.0100'

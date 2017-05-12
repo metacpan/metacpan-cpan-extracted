@@ -1,0 +1,124 @@
+#!/usr/bin/perl
+# ************************************************************************* 
+# Copyright (c) 2014-2016, SUSE LLC
+# 
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+# 
+# 2. Redistributions in binary form must reproduce the above copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution.
+# 
+# 3. Neither the name of SUSE LLC nor the names of its contributors may be
+# used to endorse or promote products derived from this software without
+# specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+# ************************************************************************* 
+#
+# dochazka-ldap-batch-create
+#
+# Creates employee records for an arbitrary number of LDAP users, whose nicks
+# (usernames) are supplied as arguments on the command line.
+#
+
+#!perl
+use 5.012;
+use strict;
+use warnings;
+
+#use App::CELL qw( $CELL $site $log );
+use App::Dochazka::REST qw( init_arbitrary_script $faux_context );
+use App::Dochazka::REST::ConnBank qw( $dbix_conn );
+use App::Dochazka::REST::LDAP qw( ldap_exists );
+use App::Dochazka::REST::Model::Employee qw( nick_exists );
+use Getopt::Long;
+use Pod::Usage;
+
+
+
+=head1 NAME
+
+dochazka-ldap-batch-create - create Dochazka employee records for a list of LDAP users
+
+
+
+=head1 SYNOPSIS
+
+Quickly create three Dochazka employees, provided they are already in LDAP:
+
+    dochazka-ldap-batch-create [one or more usernames]
+
+For example:
+
+    dochazka-ldap-batch-create perry
+    dochazka-ldap-batch-create hans mojo avenger
+
+The script should be run on an L<App::Dochazka::REST> server that has been
+configured to use LDAP.
+
+
+
+=head1 DESCRIPTION
+
+Sometimes there is a need to quickly create Dochazka employee records for an
+arbitrary number of LDAP users.
+
+For example, if "hans", "mojo", and "avenger" are valid LDAP users and the
+local L<App::Dochazka::REST> instance has been properly configured to work with
+an LDAP database, the following command will create three employees with nicks
+"hans", "mojo", and "avenger":
+
+    dochazka-ldap-batch-create hans mojo avenger
+
+The employee's "sync" property will be set to true.
+
+=cut
+
+
+# process command-line options
+my $help = 0;
+GetOptions(
+    'help|?' => \$help,
+) or pod2usage(2);
+pod2usage(1) if $help;
+
+init_arbitrary_script();
+
+foreach ( @ARGV ) {
+    if ( nick_exists( $dbix_conn, $_ ) ) {
+        print "$_ already exists in Dochazka database; skipping\n";
+        next;
+    }
+    if ( ! ldap_exists( $_ ) ) {
+        print "WARNING: $_ not found in LDAP database!\n";
+        next;
+    }
+    my $emp = App::Dochazka::REST::Model::Employee->spawn(
+        nick => $_,
+        sync => 1,
+    );
+    my $status = $emp->insert( $faux_context );
+    if ( $status->ok ) {
+        print "$_ inserted successfully\n";
+    } else {
+        print "$_ not inserted because " . $status->text;
+    }
+}
+
+exit( 0 );

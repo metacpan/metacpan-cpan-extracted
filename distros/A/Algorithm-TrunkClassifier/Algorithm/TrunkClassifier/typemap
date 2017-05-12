@@ -1,0 +1,65 @@
+double **	doubleMatrix
+char **		stringArray
+
+INPUT
+
+doubleMatrix
+	AV* array;
+	AV* temprow;
+	I32 numRows;
+	I32 numCols;
+	I32 rowIndex;
+	I32 colIndex;
+	SV** tempSV;
+	double** matrix;
+	
+	if(!SvROK($arg) || SvTYPE(SvRV($arg)) != SVt_PVAV)
+	    Perl_croak(aTHX_ \"First argument is not an array reference\");
+	array = (AV*) SvRV($arg);
+	numRows = av_len(array) + 1;
+	tempSV = av_fetch(array, 0, 0);
+	
+	if(tempSV == NULL || !SvROK(*tempSV) || SvTYPE(SvRV(*tempSV)) != SVt_PVAV)
+			Perl_croak(aTHX_ \"Error: Invalid row in data matrix given to FeatureSelection\");
+	temprow = (AV*) SvRV(*tempSV);
+	numCols = av_len(temprow) + 1;
+	matrix = (double **) malloc((numRows+1) * sizeof(double*));
+	
+	for(rowIndex = 0; rowIndex < numRows; rowIndex++){
+		tempSV = av_fetch(array, rowIndex, 0);
+		if(tempSV == NULL || !SvROK(*tempSV) || SvTYPE(SvRV(*tempSV)) != SVt_PVAV)
+			Perl_croak(aTHX_ \"Error: Invalid row in data matrix given to FeatureSelection\");
+		temprow = (AV*) SvRV(*tempSV);
+		matrix[rowIndex] = (double *) malloc(numCols * sizeof(double));
+		
+		for(colIndex = 0; colIndex < numCols; colIndex++){
+			tempSV = av_fetch(temprow, colIndex, 0);
+			if(tempSV == NULL || !SvNOK(*tempSV))
+				Perl_croak(aTHX_ \"Error: Invalid column in data matrix given to FeatureSelection\");
+			matrix[rowIndex][colIndex] = (double) SvNV(*tempSV);
+		}
+	}
+	matrix[rowIndex] = NULL;
+	$var = matrix;
+
+stringArray
+	AV* arrayBuffer;
+	I32 numNames;
+	I32 nameIndex;
+	SV** tempEle;
+	char** names;
+	
+	if(!SvROK($arg) || SvTYPE(SvRV($arg)) != SVt_PVAV)
+	    Perl_croak(aTHX_ \"Forth argument is not an array reference\");
+	arrayBuffer = (AV*) SvRV($arg);
+	numNames = av_len(arrayBuffer) + 1;
+	
+	names = (char **) malloc((numNames+1)*sizeof(char *));
+	for(nameIndex = 0; nameIndex < numNames; nameIndex++){
+		tempEle = av_fetch(arrayBuffer, nameIndex, 0);
+		if(tempEle == NULL || !SvPOK(*tempEle))
+			Perl_croak(aTHX_ \"Error: Invalid name in class vector given to FeatureSelection\");
+		names[nameIndex] = (char *) SvPV_nolen(*tempEle);
+	}
+	names[nameIndex] = NULL;
+	$var = names;

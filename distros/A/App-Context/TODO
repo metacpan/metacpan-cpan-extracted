@@ -1,0 +1,11 @@
+######################################################################
+## File: $Id: TODO 9422 2007-04-17 12:16:06Z spadkins $
+######################################################################
+
+To get to Version 1.0
+ o go over the documentation which has been completely neglected
+ o sort out my exception strategy (die vs. a class)
+ o remove dependency on 'Exception::Class', 'Class::Data::Inheritable', 'Devel::StackTrace'
+ o App::Context::SOAP
+ o App::Context::XMLRPC
+

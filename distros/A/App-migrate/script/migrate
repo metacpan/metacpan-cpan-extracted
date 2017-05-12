@@ -1,0 +1,226 @@
+#!/usr/bin/env perl
+use 5.010001;
+use warnings;
+use strict;
+use utf8;
+
+our $VERSION = 'v0.2.1';
+
+use App::migrate;
+use Getopt::Long qw( GetOptionsFromArray );
+
+
+main(@ARGV) if !caller;
+
+
+sub err { die "migrate: @_\n" };
+
+sub usage {
+        print <<'EOUSAGE';
+migrate [-B <cmd>] [-R <cmd>] [-V <cmd>] [[-f <file>] ...] <from_ver> <to_ver>
+migrate [-B <cmd>] [-R <cmd>] [-V <cmd>] [[-f <file>] ...] -p <ver1> <ver2> ...
+migrate -c [<file>]
+migrate -h|--help
+EOUSAGE
+        exit 1;
+}
+
+sub main {
+        my $b_cmd       = 'echo No backup command defined, skip backup';
+        my $r_cmd       = 'false';
+        my $v_cmd       = 'echo Current version is $MIGRATE_NEXT_VERSION';
+        my @files       = qw( migrate );
+        my $is_path     = 0;
+        my $is_check    = 0;
+        GetOptionsFromArray(\@_,
+                'B=s'   => \$b_cmd,
+                'R=s'   => \$r_cmd,
+                'V=s'   => \$v_cmd,
+                'f=s@'  => \@files,
+                'p'     => \$is_path,
+                'c'     => \$is_check,
+                'h|help'=> \&usage,
+        ) or usage();
+        if ($is_check) {
+                usage() if 2 <= @_;
+        }
+        elsif ($is_path) {
+                usage() if 2 >= @_;
+        }
+        else {
+                usage() if 2 != @_;
+        }
+        my @versions = @_;
+
+        if ($is_check) {
+                App::migrate->new->load($_[0] // 'migrate');
+                return;
+        }
+        elsif ($versions[0] eq $versions[-1]) {
+                return;
+        }
+
+        my $migrate = App::migrate->new;
+        for (@files) {
+                $migrate->load($_);
+        }
+
+        if ($is_path) {
+                $migrate->get_steps(\@versions);
+        }
+        else {
+                my @paths = $migrate->find_paths($versions[0], $versions[1]);
+                if (0 == @paths) {
+                        err "unable to find migration path from $versions[0] to $versions[1]";
+                }
+                elsif (1 == @paths) {
+                        @versions = @{ $paths[0] };
+                }
+                else {
+                        err join "\n",
+                                'found more than one upgrade path, use one of these options to choose a path:',
+                                map {"\t-p @{$_}"} @paths;
+                }
+        }
+
+        $migrate->on(BACKUP  => sub { system($b_cmd) == 0 or die "BACKUP failed\n"  })
+                ->on(RESTORE => sub { system($r_cmd) == 0 or die "RESTORE failed\n" })
+                ->on(VERSION => sub { system($v_cmd) == 0 or die "VERSION failed\n" })
+                ->run(\@versions);
+
+        return;
+}
+
+
+1;
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+migrate - upgrade / downgrade project
+
+
+=head1 VERSION
+
+This document describes migrate version v0.2.5
+
+
+=head1 USAGE
+
+  migrate [-B <cmd>] [-R <cmd>] [-V <cmd>] [[-f <file>] ...] <from_ver> <to_ver>
+  migrate [-B <cmd>] [-R <cmd>] [-V <cmd>] [[-f <file>] ...] -p <ver1> <ver2> ...
+  migrate -c [<file>]
+  migrate -h|--help
+
+
+=head1 DESCRIPTION
+
+To use this tool to migrate your project between any versions you should
+provide:
+
+  - one or more *.migrate files, which will define known versions of your
+    project and commands needed to migrate between these versions
+  - command which will create backup of your project (and keep these backups
+    to make it possible to restore any of previous project versions)
+  - command which will restore project from backup of any version (if such
+    backup exists)
+  - (optional) command which will record somewhere current version of
+    project after each successful migration
+
+See L<App::migrate> for details.
+
+
+=head1 OPTIONS
+
+=over
+
+=item -B
+
+Define command to be run L<App::migrate/"on"> BACKUP event.
+
+=item -R
+
+Define command to be run L<App::migrate/"on"> RESTORE event.
+
+=item -V
+
+Define command to be run L<App::migrate/"on"> VERSION event.
+
+=item -f
+
+L<App::migrate/"load"> given file(s).
+
+=item -p
+
+Select upgrade path. Usually needed only when there are several possible
+upgrade paths for given C<< <from_ver> <to_ver> >>.
+
+=item -c
+
+Check syntax of given migrate file.
+
+=back
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/migrate/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/migrate>
+
+    git clone https://github.com/powerman/migrate.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=App-migrate>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/App-migrate>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/App-migrate>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=App-migrate>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/App-migrate>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros E<lt>powerman@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+
+=cut

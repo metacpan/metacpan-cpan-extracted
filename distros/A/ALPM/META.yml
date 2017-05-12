@@ -1,0 +1,24 @@
+---
+abstract: "readonly access to pacman's libalpm."
+author:
+  - 'Andrew Gregory <apg@cpan.org>'
+  - 'Justin Davis <juster at cpan dot org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ALPM
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  repository: http://github.com/andrewgregory/perl-alpm
+version: '3.06'

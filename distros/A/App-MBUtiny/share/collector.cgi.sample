@@ -1,0 +1,12 @@
+#!/usr/bin/perl -w
+use strict;
+
+use WWW::MLite;
+my $mlite = new WWW::MLite(
+        prefix  => 'collector',
+        name    => 'Collector',
+        module  => 'App::MBUtiny::Collector',
+        config_file => '/path/to/mbutiny/extra/collector.conf',
+        register => ['App::MBUtiny::Collector::Root'],
+    );
+$mlite->show;

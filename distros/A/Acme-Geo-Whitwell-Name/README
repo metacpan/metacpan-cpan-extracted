@@ -1,0 +1,62 @@
+Acme-Geo-Whitwell-Name
+
+This module allows you to convert latitudes and longitudes to Steadman
+Whitwell's "rational geographic nomeclature": unique place names that 
+are generated directly from the latitude and longitude.[1] Whitwell 
+despaired of the many duplicate Springfields and Washingtons in the 
+United States, and proposed this nomenclature to prevent duplicate
+placenames.
+
+The system is set up to use latitudes and longitudes precise to two
+decimal places; using standard maximum measurements for latitude and
+longitude[2], this allows a grid of approximately 800 feet by 1300 feet
+to be overlaid on the globe. Most towns and villages are at least this big,
+so 2-decimal precision is sufficient to give each one a unique name.
+
+Allowing for the utter lunacy of the whole scheme, it has a certain
+obsessive charm.
+
+This module is at its core a simple text transformation, so it requires very
+little beyond core Perl functions. It does not at present do geocoding, so
+you will have to determine the latitude and longitude yourself.
+
+[1] New Harmony Gazette, Vol. I, pp. 226-227.
+[2] http://www.colorado.edu/geography/gcraft/warmup/aquifer/html/distance.html
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Acme::Geo::Whitwell::Name
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-Geo-Whitwell-Name
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Acme-Geo-Whitwell-Name
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Acme-Geo-Whitwell-Name
+
+    Search CPAN
+        http://search.cpan.org/dist/Acme-Geo-Whitwell-Name
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Joe McMahon
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

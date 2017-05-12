@@ -1,0 +1,10 @@
+Revision history for Algorithm::BinPack::2D
+
+0.03    Tue Jan 29 13:43:33 2013
+    - Optimize result with improving a sort function
+
+0.02    Mon Jan 28 21:00:08 2013
+    - Add LICENSE to POD
+
+0.01    Mon Jan 28 19:28:34 2013
+    - Initial version

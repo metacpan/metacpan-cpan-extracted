@@ -1,0 +1,62 @@
+--- 
+description: "Example of a pipeline\n    Same as running:\n       echo 'abXcd' | tee /tmp/str | wc -c ; cat -n /tmp/str | tr -d X | wc -c\n    but every stage is stored in a file\n  "
+name: String Manipulation
+version: '0.4'
+steps: 
+  s1: 
+    name: echo
+    args: 
+      in: 
+        type: unnamed
+        value: abXcd
+      out: 
+        type: redir
+        value: s1.txt
+    next: 
+      - s2
+      - s3
+  s2: 
+    name: wc
+    args: 
+      c: 
+      in: 
+        type: redir
+        value: s1.txt
+      out: 
+        type: redir
+        value: s2.count
+  s3: 
+    name: cat
+    args: 
+      in: 
+        type: redir
+        value: s1.txt
+      n: 
+      out: 
+        type: redir
+        value: s3_mod.txt
+    next: 
+      - s4
+  s4:
+    name: tr
+    args:
+      d: X
+      in:
+        type: redir
+        value: s3_mod.txt
+      out:
+        type: redir
+        value: s4_tr.txt
+    next: 
+      - s5
+
+  s5: 
+    name: wc 
+    args: 
+      c: 
+      in: 
+        type: redir
+        value: s4_tr.txt
+      out: 
+        type: redir
+        value: s5.count

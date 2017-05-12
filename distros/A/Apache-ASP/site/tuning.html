@@ -1,0 +1,585 @@
+
+
+<html>
+<head>
+<title>Apache::ASP::Tuning</title>
+
+
+
+<style type="text/css">
+<!--
+      td {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      font {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      .title {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 16px}
+
+
+
+
+-->
+</style>
+
+
+</head>
+<body bgcolor=black link=#063678 alink=#ff5599 vlink=#993399
+marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
+
+
+
+
+<center>
+<table border=0 cellpadding=0 width=99% cellspacing=8>
+<tr><td align=center>
+
+<table border=0 cellpadding=3 width=100% cellspacing=0>
+<tr bgcolor=#063678>
+<td>
+	<table border=0 cellpadding=1 cellspacing=0 width=100%>
+	<tr>
+	<td><img border=0 src=asptitlelogo.gif alt="Apache::ASP" width=267 height=44 ></td>	
+	
+		<td align=right></td>
+	
+	</tr>
+	</table>
+</td>
+</tr>
+<tr>
+  <td bgcolor=#005196 align=center>
+    <b>
+    <font color=#ffffff>&lt;% Web Applications with Apache &amp; mod_perl %&gt;</font>  
+    </b>
+  </td>
+</tr>
+</table>
+
+
+<table border=0 cellpadding=10 cellspacing=0 width=100% bgcolor=#005196>
+<tr>
+<td valign=top width=120 bgcolor=#005196>
+    
+        <table cellpadding=5 cellspacing=0 border=1 bgcolor=white><tr><td>
+
+	<table border=0 cellpadding=0 cellspacing=0 width=105 bgcolor=white>
+	
+	
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="index.html" style="text-decoration:none"><font color=#063678>INTRO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="install.html" style="text-decoration:none"><font color=#063678>INSTALL</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="config.html" style="text-decoration:none"><font color=#063678>CONFIG</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="syntax.html" style="text-decoration:none"><font color=#063678>SYNTAX</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="events.html" style="text-decoration:none"><font color=#063678>EVENTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="objects.html" style="text-decoration:none"><font color=#063678>OBJECTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="ssi.html" style="text-decoration:none"><font color=#063678>SSI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sessions.html" style="text-decoration:none"><font color=#063678>SESSIONS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="xml.html" style="text-decoration:none"><font color=#063678>XML/XSLT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="cgi.html" style="text-decoration:none"><font color=#063678>CGI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="perlscript.html" style="text-decoration:none"><font color=#063678>PERLSCRIPT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="style.html" style="text-decoration:none"><font color=#063678>STYLE GUIDE</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="faq.html" style="text-decoration:none"><font color=#063678>FAQ</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>%</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><font color=#993399>TUNING</font></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="kudos.html" style="text-decoration:none"><font color=#063678>CREDITS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="support.html" style="text-decoration:none"><font color=#063678>SUPPORT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sites.html" style="text-decoration:none"><font color=#063678>SITES USING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="testimonials.html" style="text-decoration:none"><font color=#063678>TESTIMONIALS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="resources.html" style="text-decoration:none"><font color=#063678>RESOURCES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="todo.html" style="text-decoration:none"><font color=#063678>TODO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="changes.html" style="text-decoration:none"><font color=#063678>CHANGES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="license.html" style="text-decoration:none"><font color=#063678>LICENSE</font></a></nobr></b></font></td>		
+
+		</tr>
+		<tr><td colspan=2><hr size=1></td></tr>
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="eg/index.html" style="text-decoration:none"><font color=#063678>EXAMPLES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+	</table>
+
+	</td></tr>
+	</table>
+
+		<br>
+		<center>
+		<a href=http://www.apache-asp.org/><img src="powered_by_apache_asp.jpg" width="88" height="31" alt="Powered by Apache::ASP" border="0"></a>
+		<br>
+		<a href=http://perl.apache.org><img src="powered_by_modperl.gif" width="88" height="31" alt="Powered by ModPerl and Apache" border="0"></a>
+		<br>
+		<a href=http://www.perl.com><img src="rectangle_power_perl.gif" width="88" height="31" alt="Powered by Perl" border="0"></a>
+		</center>
+
+</center>
+
+</td>
+
+
+
+<td valign=top bgcolor=white>
+<font size=+0 face=verdana,arial>
+
+<font face=verdana><font class=title size=+1 color=#555555><b>TUNING</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>A little tuning can go a long way, and can make the difference between
+a web site that gets by, and a site that screams with speed.  With
+Apache::ASP, you can easily take a poorly tuned site running at
+10 hits/second to 50+ hits/second just with the right configuration.
+<font face="courier new" size=3><pre>
+</pre></font>Documented below are some simple things you can do to make the 
+most of your site.</font>
+
+	<hr size=1>
+	<table width=100% border=0 cellpadding=1 cellspacing=3>
+	<tr>
+	<td valign=top><font face="lucida console" size=-1>
+	
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Online%20Resou0d275bc2>Online Resources</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Precompile%20Sfb36ef6e>Precompile Scripts</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Tuning%20%26%20Ben0cdacf8c>Tuning & Benchmarking</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#No%20.htaccessc4c9e884>No .htaccess or StatINC</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24Application941f90bf>$Application & $Session State</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Turn%20off%20Debe0bab100>Turn off Debugging</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Low%20MaxClien5a8237ea>Low MaxClients</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Memory%20Sparia73a9626>Memory Sparing, NoCache</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#High%20MaxRequ0724a06d>High MaxRequestsPerChild</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Resource%20Limfd66f2d8>Resource Limits</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Precompile%20M39676a96>Precompile Modules</a>
+			</font>
+			</td>
+		<td>&nbsp;</td>					
+		</tr>
+			
+	</table>
+	<hr size=1>
+	<p>
+
+	<p>
+	<a name=Online%20Resou0d275bc2></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Online Resources</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>For more tips &amp; tricks on tuning Apache and <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a>, please see the tuning
+documents at:
+<font face="courier new" size=3><pre>
+  <a href="http://perl.apache.org/guide/">Stas Bekman&#39;s mod_perl guide</a>
+</pre></font>Written in late 1999 this article provides an early look at 
+how to tune your Apache::ASP web site.  It has since been
+updated to remain current with Apache::ASP v2.29+
+<font face="courier new" size=3><pre>
+  <a href="http://www.chamas.com/asp/articles/perlmonth3_tune.html">Apache::ASP Site Tuning</a>
+</pre></font>
+	
+	<p>
+	<a name=Tuning%20%26%20Ben0cdacf8c></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Tuning & Benchmarking</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>When performance tuning, it is important to have a tool to
+measure the impact of your tuning change by change.
+The program ab, or Apache Bench, provides this functionality
+well, and is freely included in the apache distribution.
+<font face="courier new" size=3><pre>
+</pre></font>Because performance tuning can be a neverending affair,
+it is a good idea to establish a threshold where performance
+is &quot;good enough&quot;, that once reached, tuning stops.</font>
+	
+	<p>
+	<a name=%24Application941f90bf></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$Application & $Session State</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Use NoState 1 setting if you don&#39;t need the $Application or $Session
+objects. State objects such as these tie to files on disk and will incur a
+performance penalty.
+<font face="courier new" size=3><pre>
+</pre></font>If you need the state objects $Application and $Session, and if 
+running an OS that caches files in memory, set your &quot;StateDir&quot; 
+directory to a cached file system.  On WinNT, all files 
+may be cached, and you have no control of this.  On Solaris, /tmp is
+a RAM disk and would be a good place to set the &quot;StateDir&quot; config 
+setting to.  When cached file systems are used there is little 
+performance penalty for using state files.  Linux tends to do a good job 
+caching its file systems, so pick a StateDir for ease of system 
+administration.
+<font face="courier new" size=3><pre>
+</pre></font>On Win32 systems, where <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a> requests are serialized, you 
+can freely use SessionSerialize to make your $Session requests
+faster, and you can achieve similar performance benefits for
+$Application if you call $Application-&gt;Lock() in your 
+global.asa&#39;s Script_OnStart.</font>
+	
+	<p>
+	<a name=Low%20MaxClien5a8237ea></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Low MaxClients</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Set your MaxClients low, such that if you have that
+many httpd servers running, which will happen on busy site,
+your system will not start swapping to disk because of 
+excessive RAM usage.  Typical settings are less than 100
+even with 1 gig RAM!  To handle more client connections,
+look into a dual server, mod_proxy front end.</font>
+	
+	<p>
+	<a name=High%20MaxRequ0724a06d></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>High MaxRequestsPerChild</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Set your max requests per child thread or process (in httpd.conf) high, 
+so that ASP scripts have a better chance being cached, which happens after 
+they are first compiled.  You will also avoid the process fork penalty on 
+UNIX systems.  Somewhere between 50 - 500 is probably pretty good.
+You do not want to set this too high though or you will risk having
+your web processes use too much RAM.  One may use Apache::SizeLimit
+or Apache::GTopLimit to optimally tune MaxRequestsPerChild at runtime.</font>
+	
+	<p>
+	<a name=Precompile%20M39676a96></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Precompile Modules</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>For those modules that your Apache::ASP application uses,
+make sure that they are loaded in your sites startup.pl
+file, or loaded with PerlModule in your httpd.conf, so 
+that your modules are compiled pre-fork in the parent httpd.</font>
+	
+	<p>
+	<a name=Precompile%20Sfb36ef6e></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Precompile Scripts</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Precompile your scripts by using the Apache::ASP-&gt;Loader() routine
+documented below.  This will at least save the first user hitting 
+a script from suffering compile time lag.  On UNIX, precompiling scripts
+upon server startup allows this code to be shared with forked child
+www servers, so you reduce overall memory usage, and use less CPU 
+compiling scripts for each separate www server process.  These 
+savings could be significant.  On a PII300 Solaris x86, it takes a couple seconds
+to compile 28 scripts upon server startup, with an average of 50K RAM
+per compiled script, and this savings is passed on to the ALL child httpd 
+servers, so total savings would be 50Kx28x20(MaxClients)=28M!
+<font face="courier new" size=3><pre>
+</pre></font>Apache::ASP-&gt;Loader() can be called to precompile scripts and
+even entire ASP applications at server startup.  Note 
+also that in modperl, you can precompile modules with the 
+PerlModule config directive, which is highly recommended.
+<font face="courier new" size=3><pre>
+ Apache::ASP-&gt;Loader($path, $pattern, %config)
+</pre></font>This routine takes a file or directory as its first argument.  If
+a file, that file will be compiled.  If a directory, that directory
+will be recursed, and all files in it whose file name matches $pattern
+will be compiled.  $pattern defaults to .*, which says that all scripts
+in a directory will be compiled by default.  
+<font face="courier new" size=3><pre>
+</pre></font>The %config args, are the config options that you may want set that affect 
+compilation.  These options include: Debug, Global, GlobalPackage, 
+DynamicIncludes, IncludesDir, InodeNames, PodComments, StatINC, StatINCMatch, UseStrict, 
+XMLSubsPerlArgs, XMLSubsMatch, and XMLSubsStrict. If your scripts are later run 
+with different config options, your scripts may have to be recompiled.
+<font face="courier new" size=3><pre>
+</pre></font>Here is an example of use in a *.conf file:
+<font face="courier new" size=3><pre>
+ &lt;Perl&gt; 
+ Apache::ASP-&gt;Loader(
+	&#39;/usr/local/proj/site&#39;, &quot;(asp|htm)\$&quot;, 
+	&#39;Global&#39; =&gt; &#39;/proj/perllib&#39;,
+	&#39;Debug&#39; =&gt; -3, # see system output when starting apache
+
+	# OPTIONAL configs if you use them in your apache configuration
+	# these settings affect how the scripts are compiled and loaded
+	&#39;GlobalPackage&#39; =&gt; &#39;SomePackageName&#39;,
+	&#39;DynamicIncludes&#39; =&gt; 1,	
+	&#39;StatINC&#39; =&gt; 1,		
+        &#39;StatINCMatch&#39; =&gt; &#39;My&#39;,
+        &#39;UseStrict&#39; =&gt; 1,
+        &#39;XMLSubsMatch&#39; =&gt; &#39;my:\w+&#39;,
+        &#39;XMLSubsStrict&#39; =&gt; 0 || 1,
+	);
+ &lt;/Perl&gt;
+</pre></font>This config section tells the server to compile all scripts
+in c:/proj/site that end in asp or htm, and print debugging
+output so you can see it work.  It also sets the Global directory
+to be /proj/perllib, which needs to be the same as your real config
+since scripts are cached uniquely by their Global directory.  You will 
+probably want to use this on a production server, unless you cannot 
+afford the extra startup time.
+<font face="courier new" size=3><pre>
+</pre></font>To see precompiling in action, set Debug to 1 for the Loader() and
+for your application in general and watch your error_log for 
+messages indicating scripts being cached.</font>
+	
+	<p>
+	<a name=No%20.htaccessc4c9e884></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>No .htaccess or StatINC</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Don&#39;t use .htaccess files or the StatINC setting in a production system
+as there are many more files touched per request using these features.  I&#39;ve
+seen performance slow down by half because of using these.  For eliminating
+the .htaccess file, move settings into *.conf Apache files.
+<font face="courier new" size=3><pre>
+</pre></font>Instead of StatINC, try using the StatINCMatch config, which 
+will check a small subset of perl libraries for changes.  This
+config is fine for a production environment, and if used well
+might only incur a 10-20% performance penalty, depending on the
+number of modules your system loads in all, as each module
+needs to be checked for changes on a per request basis.</font>
+	
+	<p>
+	<a name=Turn%20off%20Debe0bab100></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Turn off Debugging</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Turn off system debugging by setting Debug to 0-3.  Having the system 
+debug config option on slows things down immensely, but can be useful
+when troubleshooting your application.  System level debugging is 
+settings -3 through -1, where user level debugging is 1 to 3.  User level
+debugging is much more light weight depending on how many $Reponse-&gt;Debug()
+statements you use in your program, and you may want to leave it on.</font>
+	
+	<p>
+	<a name=Memory%20Sparia73a9626></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Memory Sparing, NoCache</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>If you have a lot (1000&#39;s+) of scripts, and limited memory, set NoCache to 1,
+so that compiled scripts are not cached in memory.  You lose about
+10-15% in speed for small scripts, but save at least 10K RAM per cached
+script.  These numbers are very rough and will largely depend on the size
+of your scripts and includes.</font>
+	
+	<p>
+	<a name=Resource%20Limfd66f2d8></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Resource Limits</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Make sure your web processes do not use too many resources
+like CPU or RAM with the handy Apache::Resource module.
+Such a config might look like:
+<font face="courier new" size=3><pre>
+ PerlModule Apache::Resource
+ PerlSetEnv PERL_RLIMIT_CPU  1000
+ PerlSetEnv PERL_RLIMIT_DATA 60:60
+</pre></font>If ever a web process should begin to take more than 60M ram
+or use more than 1000 CPU seconds, it will be killed by 
+the OS this way.  You only want to use this configuration
+to protect against runaway processes and web program errors,
+not for terminating a normally functioning system, so set
+these limits HIGH!</font>
+	
+
+</font>
+</td>
+
+<td bgcolor=white valign=top>
+&nbsp;
+</td>
+
+</tr>
+<tr bgcolor=#063678>
+	<td colspan=3 align=center width=80%>
+	<font face=verdana color=white size=-1>
+	Copyright &copy; 1998-2008,
+	<a href=http://www.chamas.com><font color=white>Chamas Enterprises Inc.</font></a>
+	</font>
+	</td>
+</tr>
+</table>
+
+</td></tr>
+</table>
+</center>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+---
+abstract: 'A web-based contacts manager'
+author:
+  - 'C<App::Office::Contacts> was written by Ron Savage I<<ron@savage.net.au>> in 2009.'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Office-Contacts
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  CGI: 3.63
+  CGI::Snapp: 1.03
+  CGI::Snapp::Dispatch: 1.02
+  Config::Tiny: 2.12
+  DBI: 1.611
+  DBIx::Admin::CreateTable: 2.04
+  DBIx::Simple: 1.35
+  Data::Session: 1.13
+  Data::Verifier: 0.31
+  DateTime: 0.55
+  Digest::SHA: 5.82
+  Encode: 2.47
+  File::Copy: 2.14
+  File::ShareDir: 1.03
+  FindBin: 1.49
+  Getopt::Long: 2.38
+  JSON::XS: 2.29
+  Lingua::ENG::Inflect: 0.0577
+  List::Compare: 0.37
+  Log::Handler::Output::DBI: 0.12
+  Moo: 1.001
+  Moo::Role: 0
+  Path::Iterator::Rule: 1.005
+  Path::Tiny: 0.004
+  Perl6::Slurp: 0.03
+  Pod::Usage: 1.51
+  Sub::Exporter: 0.982
+  Text::CSV::Encoded: 0.1
+  Text::Xslate: 1.6002
+  Time::Stamp: 1.3
+  Try::Tiny: 0.12
+  Unicode::Collate: 0.97
+  charnames: 1.18
+  feature: 1.2
+  open: 1.08
+  parent: 0.218
+  perl: 5.14.0
+  strict: 0
+  utf8: 1.09
+  warnings: 0
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: 2.03

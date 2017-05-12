@@ -1,0 +1,26 @@
+Acme-Goedelize version 0.01
+===========================
+
+Acme::Goedelize transforms text into one big number and vice versa.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+No dependencies.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Todor Todorov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

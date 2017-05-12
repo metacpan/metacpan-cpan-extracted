@@ -1,0 +1,5 @@
+%%server production
+%%cn_production 'China production'
+%%cn_staging 'China staging'
+%%cn_beta 'China beta'
+http://yahoo.com /Yahoo!/ Y check <cn_<server>>

@@ -1,0 +1,86 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin;
+FindBin::again();
+use Path::Class 'dir';
+
+BEGIN {
+  # stuff useful locations into @INC
+  unshift @INC,
+    dir($FindBin::RealBin)->parent->subdir('lib')->stringify,
+    dir($FindBin::RealBin, 'lib')->stringify;
+}
+
+use App::Netdisco;
+use Dancer ':script';
+use Dancer::Plugin::DBIC 'schema';
+
+use App::Netdisco::DB;
+use Getopt::Long;
+
+=head1 NAME
+
+nd-dbic-versions - Create DB Schema Versions for Netdisco
+
+=head1 USAGE
+
+This script creates SQL DDL files of the Netdisco database schema.
+
+If called without any CLI options, it makes one SQL DDL file which will
+initialize the complete schema to the current DBIx::Class specification.
+
+If called with the "-p <version>" option, upgrade SQL DDL command files
+are created between the specified version and the current DBIx::Class
+specification.
+
+=head1 NEW VERSION
+
+=over 4
+
+=item 1.
+
+Alter the DBIC DDL files as you wish.
+
+=item 2.
+
+Increment the Schema's C<$VERSION> number.
+
+=item 3.
+
+Run this script with "C<-p $current_db_version>".
+
+=back
+
+=cut
+
+my $sql_dir = $App::Netdisco::DB::schema_versions_dir;
+my $version = schema('netdisco')->schema_version;
+
+my ( $preversion, $help );
+GetOptions(
+  'p|preversion:s'  => \$preversion,
+) or do {
+  print <<ENDHELP;
+    $0 [-p <version>]
+
+    This script creates SQL DDL files of the Netdisco database schema.
+
+    If called without any CLI options, it makes one SQL DDL file which will
+    initialize the complete schema to the current DBIx::Class specification.
+
+    If called with the "-p <version>" option, upgrade SQL DDL command files
+    are created between the specified version and the current DBIx::Class
+    specification.
+
+    SQL DDL files are stored in:
+$sql_dir
+ENDHELP
+  exit(1);
+};
+
+schema('netdisco')->create_ddl_dir(
+  'PostgreSQL', $version, $sql_dir, $preversion );
+

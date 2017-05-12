@@ -1,0 +1,8 @@
+<table align="center">
+<tr><td><tmpl_var name=message></td></tr>
+<tmpl_if name=error>
+<tr><td><span class="error">Errors:</span></td></tr>
+<tmpl_loop name=tr_loop><tr><td><tmpl_var name=td></td></tr>
+</tmpl_loop>
+</tmpl_if>
+</table>

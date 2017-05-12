@@ -1,0 +1,44 @@
+#!/www/perl-5.6.1/bin/perl -Tw
+# Example Oracle authentication via SQL*Plus program.
+#
+# NOTE: Runs in taint mode because it is usually
+#       invoked by other programs (mainly CGIs).
+
+
+# ------ pragmas
+use strict;
+
+# ------ define variables
+my $database = "";	# Oracle TNS database name
+my @output   = ();	# output of SQL*Plus command
+my $password = "";	# password for $username
+my $sqlplus		# Oracle SQL*Plus interactive query program
+ = "/www/oracle/u01/app/oracle/product/7.3.4/bin/sqlplus";
+my $username = "";	# Oracle username to authenticate with
+
+# ------ force secure PATH
+$ENV{"PATH"} = "/bin:/usr/bin";
+
+# ------ extract username + password + database
+if (scalar(@ARGV) < 3) {
+    die "usage: oralogon username password TNSname\n";
+}
+$ARGV[0]  =~ m#([^`']+)#;
+$username =  $1;
+$ARGV[1]  =~ m#([^`']+)#;
+$password =  $1;
+$ARGV[2]  =~ m#(([a-zA-Z0-9]|-|\+|_|\.)+)#;
+$database =  $1;
+
+# ------ run Oracle SQL*Plus, check that authentication succeeded
+@output =<<`endSQLPLUS`;
+$sqlplus $username/$password\@$database<<endCMD
+$password
+quit
+endCMD
+endSQLPLUS
+if (grep(/Connected to:/, @output)) {
+    print "OK: Oracle login succeeded.\n";
+} else {
+    print "FAILURE:\n@output\n";
+}

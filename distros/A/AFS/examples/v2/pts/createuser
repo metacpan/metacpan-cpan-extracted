@@ -1,0 +1,19 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::PTS;
+
+die "Usage: $0 user id\n" if $#ARGV != 1;
+
+my $user= shift;
+my $id = shift;
+
+my $pts = AFS::PTS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+$id = $pts->createuser($user, $id);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "   ID number = $id \n"; }

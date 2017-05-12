@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+examples/eigenvector_initialization.pl
+examples/load_save.pl
+t/som.t
+t/rect.t
+t/hexa.t
+t/torus.t
+t/pods.t
+lib/AI/NeuralNet/SOM.pm
+lib/AI/NeuralNet/SOM/Rect.pm
+lib/AI/NeuralNet/SOM/Hexa.pm
+lib/AI/NeuralNet/SOM/Torus.pm
+lib/AI/NeuralNet/SOM/Utils.pm
+META.yml                                 Module meta-data (added by MakeMaker)

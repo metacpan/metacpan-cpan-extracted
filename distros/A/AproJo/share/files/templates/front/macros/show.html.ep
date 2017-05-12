@@ -1,0 +1,37 @@
+% my $form = form_handler($table);
+% my $schema = schema;
+% my $columns = $form->from_schema($schema,$table)->ordered_elements;
+% my $order = $form->order_by;
+% my $id_field = $form->id_field;
+% my $object = $table;
+% my $result = schema->resultset($table)->search(undef, {order_by => { -asc => $order }});
+%= tag table => class => "table table-striped table-bordered table-condensed" => begin
+  %= tag tr => begin
+    % for my $header (@$columns) {
+      % unless ($form->elements->{$header}->{hidden}) {
+        %= tag th =>  l $header
+      % } 
+    % }
+    %= tag th =>  l 'action' 
+  %= end
+  % while (my $record = $result->next) {
+    % my $id = $record->$id_field;
+    %= tag tr => begin
+      % for my $col (@$columns) {
+        % my $col_base = $col;
+        % if ($form->elements->{$col}->{type} eq 'Block' ) {
+          % my $relation = $form->elements->{$col}->{nested_name};
+          % my $related_col = $form->elements->{$col}->{elements}->[0]->{name};
+          %= tag td => $record->$relation->$related_col
+        % }
+        % elsif (!$form->elements->{$col}->{hidden}) {
+          %= tag td => $record->$col
+        % }
+      % }
+      %= tag td => begin
+        %= tag a => href => "/admin/change/$object/$id" =>  l 'edit' 
+      %= end
+    %= end
+  % }
+%= end
+

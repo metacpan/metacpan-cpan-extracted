@@ -1,0 +1,3 @@
+Comment mesurer la couverture d'une ressource terminologique pour un corpus ?
+
+Cet article propose une définition formelle de la notion de couverture lexicale. Celleci repose sur un ensemble de quatre métriques qui donnent une vue globale de l'adéquation d'une ressource lexicale à un corpus et permettent ainsi de guider le choix d'une ressource en fonction d'un corpus donné. Les métriques proposées sont testées dans le contexte de l'analyse de corpus spécialisés en génomique : 5 terminologies différentes sont confrontées à 4 corpus. La combinaison des valeurs obtenues permet effectivement de discerner différents types de relations entre ressources et corpus. Ces premiers résultats montrent l'intérêt de cette approche tout en ouvrant des voies d'amélioration.

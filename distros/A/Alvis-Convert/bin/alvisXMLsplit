@@ -1,0 +1,201 @@
+#!/usr/bin/perl
+
+use strict;
+use Encode;
+use Pod::Usage;
+
+use Alvis::Utils qw(open_file); 
+
+###################### CONFIGURATION #####################
+
+my $report = 0;    #  switch off STDERR status
+my $CollectionHeader="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" .
+               "<documentCollection  xmlns=\"http://alvis.info/enriched/\" version=\"1.1\">\n";
+
+#  NOTE:  also documentRecord and documentCollection are hardwired
+#         into matches and such below
+
+###################### END CONFIGURATION #####################
+
+# static used by get_next_rec()
+my $recleft = "";
+
+#   input parameters from command line args
+my $bz = 0;
+my $bz_in = 0;
+my $offset=1;
+my $F=shift @ARGV;
+my $gotarg = 1;
+while ( $F && ($gotarg==1) ) {
+  if ( $F eq "--bzip2" ) {
+    $bz = 1;
+  } elsif ($F eq '--bzip2-in') {
+    $bz_in = 1;
+  } elsif ($F eq '--start') {
+    $offset = int(shift @ARGV);
+    if ( $offset <1  ) {
+      pod2usage(1);
+    }
+  } else {
+    $gotarg = 0;
+  }
+  if ( $gotarg ) {
+    $F=shift @ARGV;
+  }
+}
+
+pod2usage(1) if @ARGV != 2;
+
+my $Size=shift @ARGV;
+my $ODir=shift @ARGV;
+$report = 0;    #  switch off STDERR status
+
+use encoding 'utf8';
+use open ':utf8';
+
+#  have to make sure documentRecord elements one per line
+if ( $bz || $bz_in ) {
+  open(W,"bzcat $F | perl -p -e \"s/<documentRecord/\n<documentRecord/g;\" |") 
+    || die("Unable to open \"$F\"");
+} else {
+	*W = open_file($F);
+  #open(W,"perl -p -e \"s/<documentRecord/\n<documentRecord/g;\" $F |") 
+  #  || die("Unable to open \"$F\"");
+} 
+
+system("mkdir -p $ODir");
+
+my $N = 1;
+my $Collection = $CollectionHeader;
+while (my $record=&get_next_rec(*W))
+{
+    $Collection.=$record;
+    if ($N%$Size==0)
+    {
+ 	$Collection.="</documentCollection>\n";
+	my $FN = int($N/$Size) + $offset - 1;
+	my $out_f="$ODir/$FN.xml";
+	open(OUT,">:utf8",$out_f) || die("Unable to open $out_f");
+	print OUT $Collection;
+	close(OUT);
+	if ( $bz ) {
+		system("bzip2 $out_f");
+        }
+	$Collection=$CollectionHeader;
+    }
+    if ( $report ) { print STDERR "$N\r"; }
+    $N++;
+}
+if ( $report ) { print STDERR "\n"; }
+
+if (($N-1)%$Size)
+{
+    $Collection.="</documentCollection>\n";
+    my $FN = int($N/$Size) + $offset;
+    my $out_f="$ODir/$FN.xml";
+    open(OUT,">:utf8",$out_f) || die("Unable to open $out_f");
+    print OUT $Collection;
+    close(OUT);
+    if ( $bz ) {
+      system("bzip2 $out_f");
+    }
+}
+
+
+sub get_next_rec
+{
+    my $fh=shift;
+    my $rec = "";
+
+    if ( $recleft =~/<documentRecord/ ) {
+      $rec = $recleft;
+    } else {
+      my $l;
+      while ($rec eq "" &&  ($l=<$fh>)) {
+	# print "IN: $l";
+	if ($l=~/<documentRecord/) {
+	  $rec=$l;
+	}
+      }
+    }
+    if ( $rec =~/<documentRecord[^>]+\/>/ ) {
+      $recleft = $rec;
+      $recleft =~ s/.*<documentRecord[^>]+\/>//; 
+      $rec =~ s/(<documentRecord[^>]+\/>).*/$1/; 
+      return $rec . "\n";
+    }
+    # print STDERR "Start 1 with $rec\n"; 
+    $recleft = "";
+    while (my $l=<$fh>) {
+      # print "IN: $l";
+      if ($l=~/<\/documentRecord/)
+	{
+	  $recleft = $l;
+	  $recleft =~ s/.*<\/documentRecord>//;
+	  $l =~ s/<\/documentRecord>.*/<\/documentRecord>/;
+	  $rec.=$l;
+	  # print STDERR "Got 1, left $recleft\n"; 
+	  if ( $rec !~ /\n$/ ) {
+	    $rec .= "\n";
+	  }
+	  return $rec;
+	} else {
+	  $rec.=$l;
+	}
+    }
+  }
+
+__END__
+
+=pod
+
+=head1 NAME
+    
+  alvisXMLsplit -- splits a big file into pieces in a directory for easier processing.
+
+=head1 SYNOPSIS
+    
+  alvisXMLsplit [--bzip2] [--start N] <Alvis XML file> <N per file> <out-dir>
+
+=head1 DESCRIPTION
+
+B<--bzip2>   Split a large file into N documentRecords per file into a directory.  Both input and output are bzip2'ed
+
+B<--start N> Begin output at N.xml instead of 1.xml
+
+Script to split a big file into pieces in a directory for easier processing.
+Algorithm is simple, but a bit slow because each document is
+built up in memory before being dumped, and this is
+not efficient in Perl.
+
+Output file is UTF8 and Perl friendly, so one <documentRecord> or
+</documentRecord> per line to facilitate processing.
+
+=head1 AUTHOR
+
+Wray Buntine
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 Wray Buntine
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+=head1 SEE ALSO
+
+alvisSource.pl, alvisSink.pl, alvisXMLsplit.pl, alvisXMLjoin.pl
+
+=cut

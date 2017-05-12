@@ -1,0 +1,30 @@
+#PerlLoadModule Apache2::SQLRequest
+PerlLoadModule TestApache::subclass
+
+DSN         dbi:CSV:f_dir=@ServerRoot@/csv
+#DSN         dbi:Oracle:MING
+#DBUser      mail_user
+#DBPassword  plQ18eubdf
+<Location /TestApache__conf>
+SQLQuery response "SELECT DUMMY FROM DUAL"
+SetHandler modperl
+PerlResponseHandler TestApache::conf
+</Location>
+
+<Location /TestApache__call>
+SQLQuery response "SELECT DUMMY FROM DUAL"
+SetHandler modperl
+PerlResponseHandler TestApache::call
+</Location>
+
+<Location /TestApache__self>
+SQLQuery self "SELECT DUMMY FROM DUAL"
+SetHandler modperl
+PerlResponseHandler Apache2::SQLRequest
+</Location>
+
+<Location /TestApache__subclass>
+SQLQuery subclass "SELECT DUMMY FROM DUAL"
+SetHandler modperl
+PerlResponseHandler TestApache::subclass
+</Location>

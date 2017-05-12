@@ -1,0 +1,25 @@
+---
+abstract: 'watch for appointments in org-mode files'
+author:
+  - 'Slaven Rezic <srezic@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-orgdaemon
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IPC::Run: 0
+  Tk: 0
+resources:
+  repository: git://github.com/eserte/org-daemon.git
+version: 1.04

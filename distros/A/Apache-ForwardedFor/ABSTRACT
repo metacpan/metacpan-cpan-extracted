@@ -1,0 +1,1 @@
+Transfer X-Forwarded-For or Forwarded-For header to the remote_ip so requests will have the original client's IP when running behind a reverse proxy server.

@@ -1,0 +1,10 @@
+apple => orange
+orange => peach
+orange => strawberry
+strawberry => peach
+plum => peach
+peach => plum
+peach => grape
+grape => banana
+banana => orange
+pinapple => apple

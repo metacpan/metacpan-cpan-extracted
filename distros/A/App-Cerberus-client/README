@@ -1,0 +1,68 @@
+NAME
+    App::Cerberus::Client - A multi-server client for speaking to
+    App::Cerebrus
+
+VERSION
+    version 0.08
+
+SYNOPSIS
+        use App::Cerberus::Client;
+
+        my $client = App::Cerberus::Client->new(
+            servers => 'http://localhost:5000',
+        );
+
+        my $client = App::Cerberus::Client->new(
+            servers => [
+                'http://host1:5000',
+                'http://host2:5000',
+            ],
+            timeout => 0.2
+        );
+
+        my $info = $client->request(
+            ip => '80.1.2.3,
+            ua => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+        );
+
+DESCRIPTION
+    App::Cerberus::Client is a simple HTTP client for talking to an
+    App::Cerberus server. If more than one server is specified, they will be
+    rotated in round robin fashion, and if any server fails, the next one
+    will be tried until one responds succesfully, or all servers have
+    failed.
+
+METHODS
+  new()
+        $client = App::Cerberus::Client->new(
+            servers => 'http://host1:5000',
+         OR servers => [ 'http://host1:5000', 'http://host2:5000' ],
+
+            timeout => 0.1,
+        );
+
+    The "servers" params accepts a single server or an array ref of servers.
+    The "timeout" param is in seconds (defaults to 0.1 seconds). Keep this
+    low as you don't want an overloaded App::Cerberus server to become a
+    bottleneck.
+
+  request()
+        $info = $client->request(%params);
+
+    Sends a request to one of the configured servers, failing over to the
+    next server if there is any error. If all servers fail, it returns an
+    empty hash-ref.
+
+SEE ALSO
+    App::Cerberus
+    Dancer::Plugin::Cerberus
+
+AUTHOR
+    Clinton Gormley <drtech@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Clinton Gormley.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

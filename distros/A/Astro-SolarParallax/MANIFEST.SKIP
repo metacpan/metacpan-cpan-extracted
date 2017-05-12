@@ -1,0 +1,11 @@
+#defaults
+^Makefile$
+^blib/
+^blibdirs$
+^pm_to_blib$
+~$
+.bak$
+.tmp$
+tar.gz$
+lib/Astro/SolarParallax/ModPerlHandler.dic
+lib/Astro/SolarParallax/ModPerlHandler.pm

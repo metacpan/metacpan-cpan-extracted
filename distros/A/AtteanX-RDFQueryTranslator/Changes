@@ -1,0 +1,11 @@
+AtteanX::RDFQueryTranslator
+===========================
+
+Created:      2014-09-27
+Home page:    <http://search.cpan.org/dist/AtteanX::RDFQueryTranslator/>
+Bug tracker:  <https://github.com/kasei/atteanx-rdfquerytranslator/issues>
+
+0.001  2016-05-02
+
+ - (Addition) Initial release (forked from the Attean package).
+

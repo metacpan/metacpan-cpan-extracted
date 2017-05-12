@@ -1,0 +1,53 @@
+Authen/Tcpdmatch version 0.01
+=============================
+
+
+This module implements the core functionality of tcpdmatch: it consults hosts.allow
+and hosts.deny to decide if service should be granted. 
+
+Due to its tiny size, approx. 2k bytes, this module is best suited for 
+embedded environments.  Although it is not a full-feature re-implementation 
+of tcpdmatch(1), I hope it will still do most of what you want. In particular, 
+it supports the following capabilities:
+
+ A. ALL and LOCAL wildcards.
+ B. Recursive EXCEPT  modifier
+ C. Leading and trailing dot patterns
+ D. Net masks
+ E. Skipping of lines with faulty syntax, comments, or blanks
+
+It does not support shell commands,  client lookups, endpoint patterns, spoofing attacks,
+and expansions. If these features are important to you,
+perhaps you should consider using libwarp.so and Authen::Libwrap .
+
+ There are two parsers that do the same thing. One first parser is based on 
+RecDescent, and the other is based on Yapp . THe Yapp parses is several times
+faster and is used by default. None of these parsers are re-entrant; although,
+with a tiny effort (15 minutes) the Yapp-based parser could easily become 
+re-entrant -- I chose not to implement this on purpose: I would rather have less 
+words in the code since I don't care about being re-entrant.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Parse::RecDescent
+Attribute::Handlers
+NetAddr::IP
+ 
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003 Ioannis Tambouras <ioannis@earthlink.net> . All rights reserved.
+LICENSE:  Latest version of GPL. Read licensing terms at  http://www.fsf.org .
+

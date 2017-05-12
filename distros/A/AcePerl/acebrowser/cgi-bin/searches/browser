@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+use strict;
+use vars qw($DB);
+
+use lib '..';
+
+use Ace 1.76;
+use CGI::Carp qw/fatalsToBrowser/;
+use CGI 2.42 qw/:standard :html3 escape/;
+use Ace::Browser::AceSubs qw(:DEFAULT ResolveUrl DoRedirect);
+use Ace::Browser::SearchSubs;
+
+my $search_class   = param('class');
+my $search_pattern = param('query');
+my $offset         = AceSearchOffset();
+
+# fetch database handle
+$DB = OpenDatabase() || AceError("Couldn't open database.");
+
+# here's where the search happens
+my ($objs,$count);
+$search_pattern ||= '*';
+($objs,$count) = do_search($search_class,$search_pattern || '*',$offset) if $search_class;
+DoRedirect(@$objs) if $count==1;
+
+PrintTop(undef,undef,'Acedb Class Search');
+
+display_search($objs,$count,$offset,$search_class,$search_pattern) if defined $search_class;
+display_search_form();  
+PrintBottom;
+
+sub display_search_form {
+  my @classlist = $DB->classes;
+  my $name = Configuration()->Name;
+  AceSearchTable("$name Class Browser",
+		 table({-align=>'CENTER'},
+		       TR({-valign=>'MIDDLE'},
+			  td(td({-class=>'large',-rowspan=>2},scrolling_list(-name=>'class',
+									     -Values=>\@classlist,-size=>10,
+									    ))),
+			  td({-align=>'LEFT',-valign=>'TOP'},
+			     table({-border=>0},
+				   TR(td('Search pattern (optional):',textfield(-name=>'query'))),
+				   TR(td({-align=>'RIGHT'},submit(-label=>'Search ACE')))))
+			 )
+		      )
+		);
+}
+
+sub do_search {
+  my ($class,$pattern,$offset) = @_;
+  my $count;
+  my (@objs) = $DB->fetch(-class=>$class,-pattern=>$pattern,
+			  -count=>MAXOBJECTS,-offset=>$offset,
+			  -total=>\$count);
+  return unless @objs;
+  return (\@objs,$count);
+}
+
+sub display_search {
+  my ($objs,$count,$offset,$class,$pattern) = @_;
+  my $title;
+  $title = $count > 0 ? p(strong($count),"objects of type",strong($class),"contain pattern",strong($pattern))
+    :p({-class=>'error'},'No matching objects found');
+  my @objects = map { ObjectLink($_) } @$objs;
+  AceResultsTable(\@objects,$count,$offset,$title);
+}

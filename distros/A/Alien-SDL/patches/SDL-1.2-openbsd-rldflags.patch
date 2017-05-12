@@ -1,0 +1,11 @@
+--- SDL-1.2/configure	2012-01-19 07:30:12.000000000 +0100
++++ SDL-1.2/configure	2012-06-12 00:41:50.000000000 +0200
+@@ -30242,7 +30242,7 @@
+ # Set runtime shared library paths as needed
+ 
+ if test "x$enable_rpath" = "xyes"; then
+-  if test $ARCH = bsdi -o $ARCH = freebsd -o $ARCH = irix -o $ARCH = linux -o $ARCH = netbsd; then
++  if test $ARCH = bsdi -o $ARCH = openbsd -o $ARCH = freebsd -o $ARCH = irix -o $ARCH = linux -o $ARCH = netbsd; then
+     SDL_RLD_FLAGS="-Wl,-rpath,\${libdir}"
+   fi
+   if test $ARCH = solaris; then

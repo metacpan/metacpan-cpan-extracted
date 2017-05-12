@@ -1,0 +1,381 @@
+Changelog for Audio-MPD
+
+2.004     2016-05-20 14:05:55+02:00 Europe/Paris
+ - fix rt#99762 - support for mpd on a Unix socket (smcv)
+
+2.003     2016-05-20 14:01:00+02:00 Europe/Paris
+ - fix rt#114136 - allow mpd-dynamic to run without a ratings.db
+
+2.002     2016-04-28 20:35:51+02:00 Europe/Paris
+ - fix rt#100300 - test support for mpd 0.19 (Debian)
+
+2.001     2016-04-28 20:27:01+02:00 Europe/Paris
+ - mpd-dynamic: simplify code & logic
+ - new script mpd-dump-ratings
+
+2.000     2014-06-11 14:31:10+02:00 Europe/Paris
+ - adapt to new Moose (rt#90682)
+ - fix test breakages due to mpd output changes (rt#91082)
+ - migrated to @AUthor::JQUELIN
+
+1.120610  2012-03-01 09:31:01 Europe/Paris
+ - fix rt#75436 - mpd-rate and mpd-dynamic should fail gracefully when
+   no song is playing (florian)
+ - fix rt#75437 - fix mpd-rate and mpd-dynamic pod names
+
+1.113280  2011-11-24 15:07:47 Europe/Paris
+ - fix rt#68357 - ipv6 support
+ - fix rt#71201 - url handlers can vary with mpd installation
+ - fix rt#71202 - requiring software mixer for tests
+ - tests for all_genres, artists_by_genre (sebastien nobili)
+ - better namespace for scripts
+
+1.112670  2011-09-24 11:40:44 Europe/Paris
+ - collection: new method all_genres (sebastien nobili)
+ - collection: new method artists_by_genre (sebastien nobili)
+
+1.111200  2011-04-30 10:21:31 Europe/Paris
+ - removing misleading example in pod
+
+1.110560  2011-02-25 15:28:59 Europe/Paris
+ - new command available: outputs
+
+1.102260  2010-08-14 19:21:51 Europe/Paris
+ - new script mpd-rate to rate a song / display current rating
+
+1.100430  2010-02-12 12:51:18 Europe/Paris
+ - WARNING: no more makefile.pl supplied, only a build.pl
+ - sub::exporter no more used internally
+
+1.093170 Fri Nov 13 19:06:54 2009
+ - removed no more used prereq class::accessor
+ - revamped pod with podweaver
+ - introducing audio::mpd::types
+ - using moosex::has::sugar
+
+1.092950 Thu Oct 22 19:34:35 2009
+ - module is quite stable now, bumping to 1.yydddn version
+ - migrated to moose
+ - password() method renamed to set_password()
+ - no more vars exported, use 'reuse' and 'once' strings for conntype
+
+**
+
+0.19.10 Wed Oct 21 14:20:09 2009
+ - update list of static prereqs, not caught by autoprereq
+ - bump min version for test-corpus-audio-mpd
+
+0.19.9 Sun Oct 18 11:49:57 2009
+ - using test::corpus::audio::mpd for tests (regains mpd 0.15.x compatibility)
+
+0.19.8 Wed Oct 14 18:05:29 2009
+ - migrated to dist-zilla (transparent for end-user)
+
+0.19.7 Wed Sep 30 16:56:37 2009
+ - fix #50109 problem with newer class::accessor
+
+0.19.6 Sat Feb 14 13:03:22 CET 2009
+ - doc update (catched by streamingmeemee)
+
+0.19.5 Mon Jan  5 15:31:29 CET 2009
+ - updated to match mpd 0.14 behaviour
+ - doc update
+
+0.19.4 Sat Aug 16 10:38:12 CEST 2008
+ - doc update
+ - listing mpd-dynamic script prereqs as module prereqs
+
+0.19.3 Tue Aug 12 19:04:23 CEST 2008
+ - version() reports *protocol* version, not real mpd version
+ - fix some tests that failed because of detection method not precise
+   enough (timing issues)
+
+0.19.2 Tue Jun 17 19:24:16 CEST 2008
+ - mpd-dynamic should lookup ratings with utf8 encoded pathes
+
+0.19.1 Mon Dec  3 18:23:58 CET 2007
+ - new method all_playlists() (courtesy of Joey Hess)
+ - fix for filenames / playlists beginning with a space (courtesy of
+   Joey Hess)
+
+0.19.0 Thu Nov 29 20:10:18 CET 2007
+ - changed constructor api: using a hash for options instead of
+   positional paraemters
+ - new conntype param for constructor to change the way connection is
+   handled
+ - MPD_HOST env var supports password@host
+ - mpd-dynamic daemonizes after mpd connection to trap problems
+
+**
+
+0.18.3 Mon Nov 26 12:51:40 CET 2007
+ - kwalitee/cpants release
+
+0.18.2 Tue Nov 13 20:20:59 CET 2007
+ - fixing bug 29232 (courtesy of David Bitseff)
+
+0.18.1 Thu May 31 20:57:47 CEST 2007
+ - fixing mantis bug #556: support for multiple $path in playlist->add
+
+0.18.0 Wed May 30 12:29:11 CEST 2007
+ - moved to perl license
+ - using common classes outsourced in audio::mpd::common, namely: item*,
+   stats, status and time.
+ - new methods AM::Collection::all_songs()
+
+**
+
+0.17.2 Sun Apr  8 15:35:43 CEST 2007
+ - introducing AM::Stats for better encapsulation
+
+0.17.1 Sun Apr  8 12:23:53 CEST 2007
+ - introducing AM::Time for better encapsulation
+ - thus, removed get_time_info() and get_time_format()
+ - test coverage up to 100% \o/
+
+0.17.0 Fri Apr  6 16:54:07 CEST 2007
+ - introducing AM::Playlist for better segregation of playlist handling
+ - completed tests to cover all playlist operations, AM is now 95.1% covered
+
+**
+
+0.16.2 Tue Apr  3 19:02:29 CEST 2007
+ - utf-8 support generalized
+
+0.16.1 Mon Apr  2 18:26:17 CEST 2007
+ - new internal _cooked_command_*() methods, allowing for better code
+   factorization - and thus, better code coverage (100% achieved for
+   am::collection, 89.3% overall)
+
+0.16.0 Thu Mar 29 19:04:34 CEST 2007
+ - script to listen your music endlessly: mpd-dynamic
+
+ **
+
+0.15.4 Tue Mar 27 18:42:58 CEST 2007
+ - AM::Test more robust regarding fake mpd startup
+ - AM::Test quicker if no tests performed
+ - new methods in AM::Collection:
+    . songs_with_filename_partial()
+    . songs_by_artist_partial()
+    . songs_from_album_partial()
+    . songs_with_title_partial()
+
+0.15.3 Wed Mar 21 18:08:06 CET 2007
+ - requiring perl 5.8.x minimum
+
+0.15.2 Tue Mar 20 17:24:59 CET 2007
+ - fixed bug #25553 (on rt.cpan.org)
+
+0.15.1 Sun Mar 18 19:06:57 CET 2007
+ - added Readonly as prereq
+
+0.15.0 Sat Mar 17 17:49:50 CET 2007
+ - implementation of Audio::MPD::Collection: this class will act as the entry
+   point to look up in mpd's collection
+ - thus, following AM methods removed (see AM::Collection for the replacement):
+   . list()
+   . listall()
+   . listallinfo()
+   . lsinfo()
+   . search()
+   . searchadd()
+ - now that AM::Collection is here, AM's test coverage is up to 82.5% \o/
+
+**
+
+0.14.0 Sat Mar 17 13:29:57 CET 2007
+ - implementation of Audio::MPD::Item: instead of returning some random hash
+   reference, Audio::MPD now returns AMI objects.
+ - renamed methods:
+   . get_current_song()      -> current()
+   . get_song_info()         -> song()
+   . get_song_info_from_id() -> songid()
+   . get_title()             -> AMI::Song::as_string()
+   . pl_changes()            -> pl_changes()
+ - pl_changes() now return an array ref instead of a hash with positions as key
+ - test coverage of Audio::MPD up to 66.5%
+
+**
+
+0.13.5 Thu Mar  8 20:22:32 CET 2007
+ - get_urlhandlers() renamed to urlhandlers()
+ - seekid() defaults to current song
+ - pod enhancement
+ - test coverage of Audio::MPD up to 36.1%
+
+0.13.4 Tue Mar  6 20:05:21 CET 2007
+ - new method password() to change mpd password
+ - bug fix in deleteid() (was issuing "delete") and crop() (should be done in
+   reverse order to keep mpd happy)
+ - test coverage of Audio::MPD up to 36.1%
+
+0.13.3 Sun Mar  4 19:30:24 CET 2007
+ - bug fix on volume() method
+
+0.13.2 Sun Mar  4 10:17:50 CET 2007
+ - Makefile.PL now uses ExtUtils::MakeMaker instead of perverting Module::Builder
+ - bugfix in play() / playid()
+ - testing Audio::MPD::Status up to 100%
+ - testing Audio::MPD = 24.5%
+
+0.13.1
+ - status() now returns an Audio::MPD::Status object, for better encapsulation
+ - added dependancy on Class::Accessor
+
+0.13.0 Fri Mar  2 12:55:38 CET 2007
+ - connection completely reworked to get rid of the most obvious problems
+   note: this does not mean that we're completely clean, but at least it's
+         better than what it was.
+ - is_connected() and close_connection() are no more needed, and thus removed
+ - error handling is now done via die - get_error() is gone
+ - play(), delete(), move(), get_song_info(), seek() & swap() do not accept a
+   third fromid parameter anymore
+ - pause() now toggle pause status if no parameter is sent
+ - renamed methods:
+    . kill_mpd()           -> kill()
+    . get_server_version() -> version()
+    . set_fade()           -> fade()
+    . set_random()         -> random()
+    . set_repeat()         -> repeat()
+    . set_volume()         -> volume()
+ - new methods: stats(), status()
+ - delete() and deleteid() can take more than one song to delete
+
+**
+
+0.12.4 Thu Jan 25 21:52:05 CET 2007 [JQ]
+ - grouped pod in sections for easier reading
+ - corrected pod typos here and there
+ - added contact information
+ - new tests for pod correctness and pod coverage
+ - added missing pod for 3 subs
+
+0.12.3 (Nicholas J Humfrey)
+ - Added Makefile.PL support
+
+0.12.2 (Nicholas J Humfrey)
+ - Fixed bug in parsing parmeters in pause()
+
+0.12.0-rc7+njh (Nicholas J Humfrey)
+ - Moved $sock and @playlists into object so that you can talk to
+   multiple MPDs in the same script.
+ - Added Module::Build based build/install system
+ - Changed namespace to Audio::MPD so that it can be added to CPAN
+ - Documented class
+ - Changing 'END' handler to 'DESTROY'
+ - Changed <$sock> to $sock->getline
+ - Changed print $sock "foo" to $sock->print("foo")
+ - Corrected pause() so that it didn't use depricated lack of argument
+ - Added optional path parameter to updatedb()
+
+0.12.0-rc7
+ - better password-handling, including possibility to connect to
+ password@mpdhost (William Pettersson)
+ - made get_time_info work, and added more to the output
+ - made ALLOW_TOGGLE_STATES 1 by default
+
+0.12.0-rc6
+ - get_song_info() now uses current song, if none is specified
+ - mpc.pl now says that 'seek' is in seconds instead of percentage
+ - Fixed bug in close()
+ - Removed warn() in _get_playlist()
+ - Made MPD.pm more backwards compatible (Martin Stolle)
+ - Added get_current_song_info() (Martin Stolle)
+ - Made internal sub _process_feedback() more robust (Martin Stolle)
+ - Update get_title() to be more flexible (Martin Stolle)
+
+0.12.0-rc5 (No more fires!-release)
+ - Fixed bug in save() (Laurent Monrouzies)
+ - Removed annoying line in set_random() (Dale Francum)
+ - Added get_time_info (Thanks Dale Francum)
+ - Removed 'use Data::Dumper;' from mpc.pl and MPD.pm
+ - Added support for new MPD-functions:
+ 'outputs', 'enableoutputs', 'disableoutputs', 'commands' and 'notcommands'
+ - Fixed bug in get_title() where old title would get returned
+ - Fixed bug where playlist was not updated (hannes)
+ - Added playlist_changes() so clients can update their playlist (hannes)
+ - Updated _get_playlist() (hannes)
+
+0.12.0-rc4
+ - Old bug where $playlist[0] contained undef removed again :)
+ - crop() function added (removes all songs but the playing)
+ - Fixed some bugs and errorhandling in mpc.pl
+
+0.12.0-rc3
+ - (almost) total rewrite of module
+
+0.12.0-rc2
+ - Changed default port to 6600
+ - Removed UNPAUSE_ON_PLAY setting, as this is now default in MPD
+ - Added urlhandlers()
+ - Fixed seek()
+ - Small bugfixes
+ - Bugfixes in mpc.pl (playlist() and volume())
+ - Updated ACK-error handling (geterror() changed, seterror() added)
+ - Add 'plchanges'-support in getplaylist()
+ - Added $config{'ALLOW_TOGGLE_STATES'}
+ - Added deleteid() / moveid() / playid() / seekid() / swapid()
+ - Removed deprecated 'unpause-on-play'-code
+
+**
+
+0.10.0-rc1
+ - No changes
+
+0.10.0-alpha7
+ - Major speedup. Playlist was fetched way too many times
+ - Another major speedup. Playlist is now only fetched when needed!
+ - Added %config, for changing default behavior
+ - Old $number-- in play() was removed.
+ - Stupid bug where last song was not saved in @playlist removed
+ - Rewrote searchadd() to utilize 'command_list_begin'/'command_list_end'
+   (Much faster now)
+ - Fixed bug where search() didn't return the last song found
+ - Small rewrite in setrepeat() and setrandom()
+ - Typos
+ - Fixed bugs and bugs and bugs and bugs
+ - Added a destructor
+ - Rewrote all pod-documentation
+ - Tabindented all
+ - Removed 'unfinished subs' and 'todo'
+ - Probably more stuff
+
+0.10.0-alpha6
+ - Changed @playlist syntax ($pl[song-number]{info-to-get} eg. $pl[42]{'file'})
+ - Removed deprecated getsonginfo()
+ - Moved gettitle() and gettimeformat() to 'Custom subs'
+ - Altered gettitle()'s errorhandling a bit
+
+0.10.0-alpha5
+ - Made getsonginfo() return a hash instead of an array
+ - Streamlined add()/delete()/move()/swap()
+ - Made (almost) all functions undef on succes and 1 on error. Last error can
+   be retrieved by $self->geterror()
+ - search() now accepts filenames too (thanks sbh)
+ - delete() can take ranges (thanks sbh)
+ - Added the 'Custom functions'-part
+ - Added searchadd() (thanks sbh)
+ - Repaired add()
+ - Added playlist()
+
+0.10.0-alpha4
+ - Fixed bug where last song on playlist was not present
+ - Made getstatus() call playlistinfo if playlist had changed
+ - Implemented getsonginfo() for returning information from @playlist (Thanks msells)
+ - Added $self->{module_version}
+ - Empties @playlist, when renewing it
+ - A bit of optimizing and cleanup around getplaylist (Thanks msells)
+
+0.10.0-alpha3
+ - Fixed error in add()-comments
+ - Moved $host and $port parameter to new() - It finally works!
+
+0.10.0-alpha2
+ - Added nextinfo() and changed lsinfo() and listallinfo()
+ - Changed version-numbering to fit MPD standards
+
+**
+
+0.1
+ - Initial release

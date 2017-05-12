@@ -1,0 +1,36 @@
+---
+abstract: 'generate dependency graph using Perl::PrereqScanner'
+author:
+  - 'Neil Bowers <neil@bowers.com>'
+build_requires:
+  Devel::FindPerl: '0'
+  File::Compare: '0'
+  File::Spec::Functions: '0'
+  FindBin: '0.05'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-PrereqGrapher
+requires:
+  Carp: '0'
+  Getopt::Long: '0'
+  Graph::Easy: '0'
+  Graph::Easy::As_svg: '0'
+  Module::CoreList: '0'
+  Module::Path: '0'
+  Moo: '0'
+  Perl::PrereqScanner: '0'
+  Pod::Usage: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilb/App-PrereqGrapher
+  repository: https://github.com/neilb/App-PrereqGrapher.git
+version: '0.14'

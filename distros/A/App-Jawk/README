@@ -1,0 +1,137 @@
+NAME
+    jawk -- like awk, but post-modern and perly. AKA, Josh's Awk.
+
+SYNOPSIS
+    jawk [-x] [-e 'code'] [-d delim] fieldspec [fieldspec...] [--
+    (FILES..)]:
+
+    If you haven't seen awk, then jawk can be described as a flexible tool
+    for extracting columns of data from text files.
+
+    If you've seen 'awk', then we can describe jawk as a replacement for
+    statements like
+
+      awk '{print $N}' 
+
+    which supports ranges, indexing columns by negative numbers, a perl
+    mode, and more.
+
+DESCRIPTION
+    jawk 1 is somewhat like awk '{print $1}'. Let's start with a fairly
+    complex example. Suppose you have a file called 'users.txt' with lines
+    of data in this format:
+
+       Bob Elmer, 2716 Fremont Blvd, New York, NY, 12344, ID:91818, CanastaRating:3.1415
+       Elmer Fudd, 1 Bunny Hill Drive, Tarrytown, NY, 87654, ID:1, CanastaRating:123456789
+
+    This statement would pull out the 1st, and 3rd through last columns,
+    using ', ' as an input delimiter (we've put two spaces between options,
+    for clarity):
+
+      jawk  -d', '  1  3..-1  --  users.txt 
+
+    Note the use of negative indexes, the non-default element delimiter via
+    `-d', and the `--' anti-option (which indicates that following arguments
+    should be considered files to read).
+
+    jawk also allows ranges using the `..' sequence. For example, a field
+    specification can look like `A', `A..B', `A..', or `..B', where (`A' and
+    `B' can be negative or positive integers.
+
+    Negative values for A and B count backwards, so -1 is the last field.
+
+    Use -- or - FILENAME.txt to read from files. '--' is needed to treat
+    FILENAME.txt as file and not fieldspec. See examples below.
+
+    Where you might previously use a command like
+
+      grep pattern file.txt | awk '{print $2}'
+
+    to pull out the 2nd column from a file, you can now do:
+
+      grep pattern file.txt | jawk 2
+
+    jawk offers many other improvements. Here are examples:
+
+    select out the 1st, 3rd, and 4th columns from file
+
+      cat file | jawk 1 3 4
+
+    select all columns except the 1st, and 9th through remaining. Uses the
+    -x option for an 'except' meaning.
+
+       cat file | jawk -x 1 9..-1
+      
+    select out the first through third, and the second to last, and last
+    cols from a file.
+
+      cat file | jawk 1..3 -2 -1
+
+    Same as above, but using : as an input delimiter instead of whitespace.
+    Note use of -- to start list of files to read from @ARGV, so we can pass
+    `file' to jawk directly instead of through `cat'.
+
+      jawk -d: 1..3 -2 -1 -- file 
+
+    There is also a -exe='perlcode' mode where you access the args via @F,
+    and not via named positional args. Like so:
+
+      cat file | jawk -e 'print "@F\n";'
+
+OPTIONS
+    Here's an explation of all the command-line options:
+
+    `NON-ZERO INTEGER'
+        A field specification option indicating that this particular column
+        should (or should not, depending on -x, be output).
+
+        Negative indexes count from the right, like in perl, so the
+        right-most column is number `-1'.
+
+    `RANGE OF NON-ZERO INTEGERS'
+        Integer ranges are specified with `..', and given that A and B are
+        non-zero integers, can look like
+
+         A..B
+         A..
+         ..B
+
+        If you specify ranges in reverse order from their source, like `cat
+        file | jawk -1..1' or `cat file | jawk 8-2' you'll get the fields in
+        reverse order, like you asked.
+
+    -d delimiter (or -d=delimiter)
+        Specify an alternate delimiter in place of '\s+'. If not ' ', the
+        delimiter is processed through perl's quotemeta() function and used
+        as a regular expression to match between input fields.
+
+    -j joiner (or -j=joiner)
+        Specify an alternate join character sequence in place of 'space'.
+
+    -x  Exclude the chosen columns, negating their meaning. Does not
+        interoperate with -e 'perlcode' option.
+
+    -e='perlcode' or -e 'perlcode'
+        Use perl code passed to process parsed items. Fields come in through
+        the @F array, and are 0-indexed (like in perl) instead of 1-indexed
+        (like in jawk and cut). A simple example, which shows the first and
+        second columns of input, is
+
+           cat file.txt | jawk -e 'print "$F[0] $F[1]\n"'
+
+    -w  Run perl code used with -e option with warnings on. (Strictness is
+        always enabled but can be disabled by putting 'no strict' in your
+        script).
+
+    --  Ends argument parsing. Used to pass filenames to read from stdin.
+        See examples above.
+
+BUGS
+    None known
+
+COPYRIGHT
+    Copyright (c) 2011-2012 Josh Rabinowitz, All Rights Reserved.
+
+AUTHORS
+    Josh Rabinowitz
+

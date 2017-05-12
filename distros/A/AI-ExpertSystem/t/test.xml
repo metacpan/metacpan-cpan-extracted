@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE knowledgebase SYSTEM "sie-1.0.dtd">
+<knowledgebase>
+ <goal>
+  <attribute>thegoal</attribute>
+  <text>You have set the goal to thegoal</text>
+ </goal>
+ <rules>
+  <rule>
+   <name>1</name>
+   <conditions>
+    <condition>
+     <attribute>one</attribute>
+     <value>yes</value>
+    </condition>
+   </conditions>
+   <actions>
+    <action>
+     <attribute>thegoal</attribute>
+     <value>pretzel</value>
+    </action>
+   </actions>
+  </rule>
+  <rule>
+   <name>2</name>
+   <conditions>
+    <condition>
+     <attribute>two</attribute>
+     <value>yes</value>
+    </condition>
+   </conditions>
+   <actions>
+    <action>
+     <attribute>one</attribute>
+     <value>yes</value>
+    </action>
+   </actions>
+  </rule>
+ </rules>
+ <questions>
+  <question>
+   <attribute>two</attribute>
+   <text>Answer yes to make this work</text>
+   <response>yes</response>
+   <response>no</response>
+  </question>
+ </questions>
+</knowledgebase>

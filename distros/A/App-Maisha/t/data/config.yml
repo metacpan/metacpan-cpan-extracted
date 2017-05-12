@@ -1,0 +1,7 @@
+--- #YAML:1.0
+CONFIG:
+  tag: .
+  pager: 0
+  limit: 100
+  chars: 72
+  format: "[%t,%U] %M"

@@ -1,0 +1,70 @@
+Revision history for perl module App::highlight
+
+0.14 2013-08-17
+    * Added Windows suppot via Win32::Console::ANSI
+    * Added thanks to Github user aero for Windows patch
+
+0.13 2013-07-18
+    * Reformatted this file to conform to CPAN::Changes::Spec
+    * Added Test::CPAN::Changes test
+    * Thanks Neil Bowers for the patch and pull request
+
+0.12 2013-07-17
+    * Added --version flag
+    * Increased Getopt::Long requirement to 2.39 (2.38 captures --version!!)
+
+0.11 2013-07-17
+    * Added missing POD for --ignore-case mode
+    * Avoid uninitialized value warning
+
+0.10 2013-04-19
+    * Updated dist.ini and added .travis.yml for travis-ci
+
+0.09 2013-01-27
+    * Added --ignore-case (-i) mode
+    * Added tests for the --ignore-case mode
+    * (Hopefully) made sure that the --ignore-case mode is backwards compatible
+      back to Perl 5.8.8 by using $^V.
+
+0.08 2011-08-26
+    * removed accidental use of "//" in tests
+      - want to support 5.8.8 still :-)
+
+0.07 2011-08-23
+    * added new option --show-bad-spaces (-b)
+      - similar to the behaviour of "git diff"
+    * changed the shorthands and names of some options
+    * added "see POD for more info" message to --help output
+    * added more tests
+
+0.06 2010-12-06
+    * fixed typo in prerequisites
+
+0.05 2010-12-05
+    * added help message (--help flag)
+    * made it so that --escape/--noescape
+      and --color/--nocolor are mutually exclusive
+
+0.04 2010-12-05
+    * added support for --no-color
+    * made --no-color the default when Term::ANSIColor is not installed
+    * removed Term::ANSIColor as a required module
+    * changed --color and --escape parameters
+      to allow positive and negative forms
+    * split tests up into smaller files
+
+0.03 2010-12-02
+    * added explicit module versions to combat failing test
+    http://www.cpantesters.org/cpan/report/c52b1b66-fd4f-11df-94a1-c5f5cbcffce0
+
+0.02 2010-11-29
+    * added the --one-color parameter
+    * more tests
+
+0.01 2010-11-28
+    * basic highlight functionality
+    * --no-escape
+    * --full-line
+    * some POD
+    * compile test
+

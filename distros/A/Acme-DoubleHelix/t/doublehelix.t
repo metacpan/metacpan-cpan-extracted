@@ -1,0 +1,252 @@
+use Acme::DoubleHelix;
+
+ CG
+T--A
+A---T
+A----T
+ C----G
+  T----A
+   A---T
+    G--C
+     AT
+     CG
+    C--G
+   G---C
+  G----C
+ C----G
+A----T
+C---G
+G--C
+ TA
+ AT
+A--T
+T---A
+G----C
+ C----G
+  A----T
+   T---A
+    G--C
+     GC
+     CG
+    C--G
+   G---C
+  C----G
+ T----A
+C----G
+G---C
+A--T
+ GC
+ TA
+G--C
+A---T
+A----T
+ C----G
+  A----T
+   C---G
+    A--T
+     CG
+     AT
+    G--C
+   A---T
+  T----A
+ A----T
+C----G
+T---A
+C--G
+ AT
+ CG
+T--A
+C---G
+A----T
+ G----C
+  A----T
+   T---A
+    A--T
+     AT
+     AT
+    T--A
+   A---T
+  A----T
+ T----A
+G----C
+G---C
+C--G
+ TA
+ CG
+G--C
+C---G
+A----T
+ C----G
+  A----T
+   T---A
+    C--G
+     TA
+     AT
+    C--G
+   C---G
+  A----T
+ A----T
+C----G
+G---C
+C--G
+ GC
+ TA
+T--A
+C---G
+G----C
+ C----G
+  A----T
+   T---A
+    G--C
+     AT
+     AT
+    C--G
+   A---T
+  A----T
+ C----G
+C----G
+A---T
+G--C
+ AT
+ TA
+A--T
+C---G
+T----A
+ C----G
+  A----T
+   C---G
+    T--A
+     CG
+     AT
+    G--C
+   A---T
+  T----A
+ A----T
+A----T
+A---T
+T--A
+ AT
+ GC
+C--G
+C---G
+A----T
+ A----T
+  A----T
+   C---G
+    A--T
+     TA
+     CG
+    T--A
+   G---C
+  C----G
+ C----G
+A----T
+A---T
+A--T
+ AT
+ CG
+A--T
+A---T
+A----T
+ C----G
+  A----T
+   A---T
+    A--T
+     CG
+     AT
+    A--T
+   A---T
+  C----G
+ A----T
+A----T
+A---T
+C--G
+ AT
+ AT
+A--T
+C---G
+A----T
+ A----T
+  A----T
+   C---G
+    A--T
+     AT
+     AT
+    C--G
+   A---T
+  A----T
+ A----T
+T----A
+G---C
+C--G
+ AT
+ TA
+G--C
+G---C
+C----G
+ C----G
+  G----C
+   C---G
+    T--A
+     CG
+     GC
+    A--T
+   G---C
+  T----A
+ G----C
+A----T
+A---T
+C--G
+ AT
+ CG
+A--T
+C---G
+A----T
+ T----A
+  T----A
+   C---G
+    G--C
+     TA
+     CG
+    C--G
+   G---C
+  A----T
+ A----T
+C----G
+A---T
+A--T
+ GC
+ CG
+A--T
+T---A
+T----A
+ G----C
+  G----C
+   A---T
+    T--A
+     GC
+     GC
+    C--G
+   T---A
+  C----G
+ G----C
+C----G
+A---T
+C--G
+ AT
+ TA
+C--G
+T---A
+A----T
+ C----G
+  C----G
+   A---T
+    A--T
+     GC
+     TA
+    T--A
+   G---C
+  C----G
+ C----G
+A----T
+A---T

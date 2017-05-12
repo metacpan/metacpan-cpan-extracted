@@ -1,0 +1,79 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - ars_GetListContainer</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<PRE>
+<H2><CODE>ars_GetListContainer(
+         ctrl, changedSince=0, attributes=0,      # standard
+         [ ownerObjList ],                        # OPTIONAL
+         containerType1,containerType2,...)       # OPTIONAL</CODE></H2>
+</PRE>
+
+<P>
+Retrieves a list of containers on the specified server. You can retrieve all
+(accessible) containers or limit the list to containers of a particular type 
+or containers modified after a specified time.</P>
+
+<P> See also:
+<A HREF="ds_getlistcontainer_hash.html">GetListContainer Hash Values</A>.</P>
+
+<DL>
+<DT><CODE>[ ownerObjList ]</CODE></DT>
+<DD> is an optional array reference; the list is a list of HASH references. These hash
+references must contain a <i>type</i> and an <i>ownerName</i> parameter. The <i>type</i>
+must be "none", "all" or "schema". If <i>type</i> is "schema", the <i>ownerName</i> contains
+the name of the owning schema; otherwise the <i>ownerName</i> should be an empty string
+(see example below).</DD>
+<DT>attributes</DT>
+<DD>Specify &amp;ARS::AR_HIDDEN_INCREMENT for this parameter to retrieve both
+visible and hidden containers. Specify NULL for this parameter to retrieve only
+visible containers.</DD>
+<DT>containerTypes</DT>
+<DD>Specify a list of values indicating the container types to retrieve.
+Values are:
+  <ul><table width =" 75%">
+  <tr><td><B>Value</B></td><td><B>Meaning</B></td></tr>
+  <tr><td>0</td><td>Retrieve all container types (ARCON_ALL).</td></tr>
+  <tr><td>1</td><td>Retrieve all guide containers (ARCON_GUIDE).</td></tr>
+  <tr><td>2</td><td>Retrieve all application containers (ARCON_APP).</td></tr>
+  <tr><td>3</td><td>Retrieve all packing list containers (ARCON_PACK).</td></tr>
+  <tr><td>4</td><td>Retrieve all filter guide containers (ARCON_FILTER_GUIDE).</td></tr>
+  <tr><td>5</td><td>Retrieve all web service containers (ARCON_WEBSERVICE).</td></tr>
+  </table></ul></DD>
+</DL>
+<DL>
+<DT><B>On success</B></DT>
+<DD>Returns an array of HASH references.</DD>
+<DT><B>On failure</B></DT>
+<DD>Returns undef.</DD>
+</DL>
+
+<P>Example 1 (retrieve all active link guides):</P>
+
+      <PRE>
+	@list = ars_GetListContainer($ctrl, 0, &amp;ARS::AR_HIDDEN_INCREMENT, &ARS::ARCON_GUIDE);
+	die "$ars_errstr" if $ars_errstr;
+      </PRE>
+
+<P>Example 2 (retrieve all globally owned containers plus all containers of a specific schema):</P>
+
+      <PRE>
+	@list = ars_GetListContainer($ctrl, 0, &amp;ARS::AR_HIDDEN_INCREMENT, [
+			{type => 'all',    ownerName => ''},
+			{type => 'schema', ownerName => 'Sample:Schema'},
+		] );
+	die "$ars_errstr" if $ars_errstr;
+      </PRE>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+&#169; Ian Trimnell 2005 i.d.trimnell@open.ac.uk
+</address>
+</BODY>
+</HTML>

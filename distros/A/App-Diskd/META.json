@@ -1,0 +1,52 @@
+{
+   "abstract" : "An example POE-based, peer-to-peer disk finder/announcer",
+   "author" : [
+      "Declan Malone <idablack@users.sorceforge.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.74, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Diskd",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::Multicast" : "0",
+            "Net::Nslookup" : "0",
+            "POE" : "0",
+            "POE::Filter::Line" : "0",
+            "POE::Session" : "0",
+            "POE::Wheel::ReadLine" : "0",
+            "POE::Wheel::ReadWrite" : "0",
+            "POE::Wheel::Run" : "0",
+            "POE::Wheel::SocketFactory" : "0",
+            "Socket" : "0",
+            "Sys::Hostname" : "0",
+            "YAML::XS" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01"
+}

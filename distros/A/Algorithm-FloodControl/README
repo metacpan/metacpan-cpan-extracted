@@ -1,0 +1,50 @@
+Algorithm-FloodControl
+
+
+Algorithm::FloodControl - Limit event processing to count/time ratio.
+
+DESCRIPTION
+
+"Flood control" method is used to restrict the number of events to happen or 
+to be processed in specific perion of time. Few examples are: web server can 
+limit requsets number to a page or you may want to receive no more than 10 SMS 
+messages on your GSM Phone per hour. Applications of this method are unlimited.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Algorithm::FloodControl
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Algorithm-FloodControl
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Algorithm-FloodControl
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Algorithm-FloodControl
+
+    Search CPAN
+        http://search.cpan.org/dist/Algorithm-FloodControl
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Andrey Kostenko
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

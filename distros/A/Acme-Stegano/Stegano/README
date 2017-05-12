@@ -1,0 +1,27 @@
+Acme/Stegano version 0.01
+=========================
+
+Theres no special instalation, no xs. Just play with it and improvements 
+will be welcome.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module dos not requires nothing.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Anarion <anarion@7a69ezine.org> 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,20 @@
+Changes -- list of user visible changes			-*- outline -*-
+
+* Acme::Filter::Kenny 1.01 -- 2004-05-14
+
+** Added a heuristic :iq_kenny mode
+
+When used with the `:iq_kenny' tag (like "use Acme::Filter::Kenny
+qw/:iq_kenny/;"), the module tries to only dekennyfy those lines that
+actually look like kenny-speak, and leave the rest unchanged.
+
+** Added a script to kennyfy Perl code
+
+There is a new script, bin/kennyfy (written in Kenny-speak, no
+less!), that can be used to translate Perl code to Kenny-speak.
+
+* Acme::Filter::Kenny 1.00 -- 2004-05-13
+
+Initial release.
+
+# arch-tag: dd95791e-a717-4e39-afd2-992e9c648df6

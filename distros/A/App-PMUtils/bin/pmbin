@@ -1,0 +1,374 @@
+#!perl
+
+our $DATE = '2017-02-01'; # DATE
+our $VERSION = '0.67'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use App::PMUtils;
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+$SPEC{pmbin} = {
+    v => 1.1,
+    summary => 'List scripts that come with the same distribution '.
+        'of a Perl module',
+    description => <<'_',
+
+Does this happen often with you: you install a CPAN module:
+
+    % cpanm -n Finance::Bank::ID::BCA
+
+The CPAN distribution is supposed to contain some CLI utilities, but it is not
+obvious what the name is. So you do:
+
+    % man Finance::Bank::ID::BCA
+
+to find out, and even the module's POD doesn't give the name of the utility
+sometimes. You might even open your browser and go to MetaCPAN. Or
+download+extract+view the tarball just to find out.
+
+Now there's a simpler alternative:
+
+    % pmbin Finance::Bank::ID::BCA
+    download-bca
+    parse-bca-statement
+
+Show full path, process multiple modules at once:
+
+    % pmbin -P Finance/Bank/ID/BCA Finance::Bank::ID::Mandiri
+    /home/user/perl5/perlbrew/perls/perl-5.18.2/bin/download-bca
+    /home/user/perl5/perlbrew/perls/perl-5.18.2/bin/parse-bca-statement
+    /home/user/perl5/perlbrew/perls/perl-5.18.2/bin/download-mandiri
+    /home/user/perl5/perlbrew/perls/perl-5.18.2/bin/parse-mandiri-statement
+
+You even get tab completion for free.
+
+<prog:pmbin> works by locating the `.packlist` file for the module (which contains
+the list of installed files) and filter only the `/(bin,scripts?)/` ones.
+
+_
+    args => {
+        module => $App::PMUtils::arg_module_multiple,
+        full_path => {
+            summary => 'Show full path instead of just filenames',
+            schema => 'bool',
+            cmdline_aliases => {P=>{}},
+        },
+    },
+};
+sub pmbin {
+    require Dist::Util;
+    my %args = @_;
+
+    my $mods = $args{module};
+    my $res = [];
+
+    my $has_ok;
+    my $has_nok;
+    for my $mod (@{$mods}) {
+        my $path = Dist::Util::packlist_for($mod);
+        unless ($path && (-f $path)) {
+            $has_nok++;
+            next;
+        }
+
+        $has_ok++;
+        open my $fh, "<", $path or do {
+            warn "Can't open $path: $!\n";
+            next;
+        };
+        for (<$fh>) {
+            chomp;
+            next unless m!/(bin|scripts?)/!;
+            s!.+/!! unless $args{full_path};
+            push @$res, $_;
+        }
+    }
+
+    if ($has_ok && $has_nok) {
+        [207, "Some OK", $res];
+    } elsif ($has_ok) {
+        [200, "All OK", $res];
+    } elsif ($has_nok) {
+        [404, "Can't find .packlist for module(s)"];
+    } else {
+        [200, "No items"];
+    }
+}
+
+Perinci::CmdLine::Any->new(
+    url => '/main/pmbin',
+)->run;
+
+# ABSTRACT: List scripts that come with the same distribution of a Perl module
+# PODNAME: pmbin
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pmbin - List scripts that come with the same distribution of a Perl module
+
+=head1 VERSION
+
+This document describes version 0.67 of pmbin (from Perl distribution App-PMUtils), released on 2017-02-01.
+
+=head1 SYNOPSIS
+
+Basic usage:
+
+ % pmbin Some::Module
+
+Return full path instead of just names:
+
+ % pmbin -P Some::Module
+
+=head1 DESCRIPTION
+
+Does this happen often with you: you install a CPAN module:
+
+ % cpanm -n Finance::Bank::ID::BCA
+
+The CPAN distribution is supposed to contain some CLI utilities, but it is not
+obvious what the name is. So you do:
+
+ % man Finance::Bank::ID::BCA
+
+to find out, and even the module's POD doesn't give the name of the utility
+sometimes. You might even open your browser and go to MetaCPAN. Or
+download+extract+view the tarball just to find out.
+
+Now there's a simpler alternative:
+
+ % pmbin Finance::Bank::ID::BCA
+ download-bca
+ parse-bca-statement
+
+Show full path, process multiple modules at once:
+
+ % pmbin -P Finance/Bank/ID/BCA Finance::Bank::ID::Mandiri
+ /home/user/perl5/perlbrew/perls/perl-5.18.2/bin/download-bca
+ /home/user/perl5/perlbrew/perls/perl-5.18.2/bin/parse-bca-statement
+ /home/user/perl5/perlbrew/perls/perl-5.18.2/bin/download-mandiri
+ /home/user/perl5/perlbrew/perls/perl-5.18.2/bin/parse-mandiri-statement
+
+You even get tab completion for free.
+
+L<pmbin> works by locating the C<.packlist> file for the module (which contains
+the list of installed files) and filter only the C</(bin,scripts?)/> ones.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--full-path>, B<-P>
+
+Show full path instead of just filenames.
+
+=item B<--module-json>=I<s>
+
+See C<--module>.
+
+=item B<--module>=I<s@>*
+
+Can be specified multiple times.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+The script comes with a companion shell completer script (L<pmbin>)
+for this script.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C pmbin pmbin
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using L<shcompgen>) at installation time,
+so you can immediately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete pmbin 'p/*/`pmbin`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/pmbin.conf>, F<~/pmbin.conf>, or F</etc/pmbin.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ format (see --format)
+ full_path (see --full-path)
+ module (see --module)
+ naked_res (see --naked-res)
+
+=head1 ENVIRONMENT
+
+=head2 PMBIN_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/pmbin.conf>
+
+F<~/pmbin.conf>
+
+F</etc/pmbin.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-PMUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-App-PMUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PMUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,36 @@
+commit 809adfa6bb8e763b541c040f72a2b249ca2cce45 (HEAD, master)
+Author: nadim khemir <nkh@cpan.org>
+Date:   Thu Apr 29 21:00:04 2010 +0200
+
+    FIXED: removed spurious code chunk
+
+commit 0f0f8253936518f251c92ef557ef77409404ac2c
+Author: nadim khemir <nkh@cpan.org>
+Date:   Thu Apr 29 20:31:06 2010 +0200
+
+    CHANGED: module documentation and added complete examples
+
+commit dc966405e1d6180b1d75671e2430a551b77bc29c
+Author: nadim khemir <nkh@cpan.org>
+Date:   Thu Apr 29 07:38:42 2010 +0200
+
+    ADDED: examples for a wrapped module and application
+
+commit 59cd5c8ee00afc8a1b0187096b7a8b8155e99916
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Apr 28 11:41:15 2010 +0200
+
+    CHANGED: removed sub app description verification as it is done dynamically
+
+commit c1d189b2bb39346d3b54aabde3424f76e902a5d6
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Apr 26 08:33:16 2010 +0200
+
+    CHANGED: completion script is output in two part. bash to stderr and perl to stdout
+    FIXED: derived class options made part of the completion
+
+commit 252e8679f12ee71a6a545d72f0340acc3dd31c84
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Apr 26 00:28:11 2010 +0200
+
+    ADDED: INITIAL COMMIT

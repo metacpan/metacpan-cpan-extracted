@@ -1,0 +1,57 @@
+#!/bin/bash
+#
+# Startup script for httunnel
+#
+# chkconfig: - 85 15
+# description: httunnel is a universal HTTP tunnel
+# processname: httunnel
+# pidfile: /var/run/httunnel.pid
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Path to the apachectl script, server binary, and short-form for messages.
+httunnel=/usr/bin/httunnel
+prog=httunnel
+RETVAL=0
+
+ARGS="/etc/httunnel.d -d"
+
+start() {
+	echo -n $"Starting $prog: "
+	daemon $httunnel $ARGS
+	RETVAL=$?
+	echo
+	[ $RETVAL = 0 ] && touch /var/lock/subsys/httunnel
+	return $RETVAL
+}
+stop() {
+	echo -n $"Stopping $prog: "
+	killproc $httunnel -TERM
+	RETVAL=$?
+	echo
+	[ $RETVAL = 0 ] && rm -f /var/lock/subsys/httunnel /var/run/httunnel.pid
+}
+
+# See how we were called.
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  status)
+	status $httunnel
+	RETVAL=$?
+	;;
+  restart)
+	stop
+	start
+	;;
+  *)
+	echo $"Usage: $prog {start|stop|restart|status}"
+	exit 1
+esac
+
+exit $RETVAL

@@ -1,0 +1,68 @@
+{
+   "abstract" : "One-page asynchronous grow room environment control web application",
+   "author" : [
+      "Steve Bertrand <steveb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-RPi-EnvUI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Async::Event::Interval" : "0",
+            "Crypt::SaltedHash" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "Dancer2" : "0.203001",
+            "Dancer2::Plugin::Auth::Extensible" : "0",
+            "Dancer2::Plugin::Auth::Extensible::Provider::Base" : "0",
+            "Dancer2::Session::JSON" : "0",
+            "DateTime" : "0",
+            "Digest::SHA1" : "0",
+            "JSON::XS" : "0",
+            "Logging::Simple" : "1.01",
+            "Mock::Sub" : "1.07",
+            "Plack::Test" : "0",
+            "RPi::DHT11" : "1.01",
+            "RPi::WiringPi::Constant" : "0.02",
+            "Test::More" : "0",
+            "WiringPi::API" : "1.04"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevieb9/app-rpi-envui/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevieb9/app-rpi-envui.git",
+         "web" : "https://github.com/stevieb9/app-rpi-envui"
+      }
+   },
+   "version" : "0.28"
+}

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Asterisk-Store-Queue.t
+lib/Asterisk/Store/Queue.pm
+log/.exists

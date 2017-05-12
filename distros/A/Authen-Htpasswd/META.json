@@ -1,0 +1,46 @@
+{
+   "abstract" : "Interface to read and modify Apache .htpasswd files",
+   "author" : [
+      "David Kamholz <dkamholz@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Authen-Htpasswd",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : 0,
+            "Crypt::PasswdMD5" : 0,
+            "Digest" : 0,
+            "Digest::SHA1" : 0,
+            "IO::LockedFile" : 0,
+            "Scalar::Util" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.171"
+}

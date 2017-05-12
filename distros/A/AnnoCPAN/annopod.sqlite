@@ -1,0 +1,25 @@
+create table note (
+    id          integer not null primary key,
+    note        text,
+    user        varchar(255),
+    time        integer
+);
+
+create table notepos (
+    id          integer not null primary key,
+    note        integer,
+    podver      integer,
+    pos         integer
+);
+
+create index notepos_index_note on notepos(note);
+create index notepos_index_podver on notepos(podver);
+
+create table podver (
+    id          integer not null primary key,
+    name        varchar(255),
+    signature   varchar(255)
+);
+create index podver_index_name on podver(name);
+create index podver_index_signature on podver(signature);
+

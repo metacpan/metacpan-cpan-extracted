@@ -1,0 +1,24 @@
+Algorithm-StringHash-FromCSharp35-XS version 0.04
+=================================================
+
+This module implement the C#'s getHashCode function in V3.5.
+The algorithm always produce a unsigned int for any string and always return the same unsigned int for the same string.
+Comparison with other string hash algorithm, it is characterized by fast.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries.
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.

@@ -1,0 +1,56 @@
+---
+abstract: "About \"SPEED\" is Japanese female vocal/dance group"
+author:
+  - '@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.5, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Speed
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::Speed:
+    file: lib/Acme/Speed.pm
+    version: 0.01
+  Acme::Speed::Member::ArakakiHitoe:
+    file: lib/Acme/Speed/Member/ArakakiHitoe.pm
+    version: 0
+  Acme::Speed::Member::Base:
+    file: lib/Acme/Speed/Member/Base.pm
+    version: 0
+  Acme::Speed::Member::ImaiEriko:
+    file: lib/Acme/Speed/Member/ImaiEriko.pm
+    version: 0
+  Acme::Speed::Member::ShimabukuroHiroko:
+    file: lib/Acme/Speed/Member/ShimabukuroHiroko.pm
+    version: 0
+  Acme::Speed::Member::UeharaTakako:
+    file: lib/Acme/Speed/Member/UeharaTakako.pm
+    version: 0
+requires:
+  Class::Accessor: 0
+  DateTime: 0
+resources:
+  bugtracker: https://github.com/kitak/p5-Acme-Speed/issues
+  homepage: https://github.com/kitak/p5-Acme-Speed
+  repository: https://github.com/kitak/p5-Acme-Speed.git
+version: 0.01
+x_contributors:
+  - 'Keisuke KITA <kei.kita2501@gmail.com>'

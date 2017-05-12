@@ -1,0 +1,13 @@
+SYNOPSIS
+
+    This distribution includes the following CLI utilities:
+
+    #INSERT_EXECS_LIST
+
+    Currently these utilities are just some wrappers/helpers for the mtp-*
+    CLI utilities distributed in mtp-tools.
+
+SEE ALSO
+
+    mtp-tools from libmtp, http://libmtp.sourceforge.net
+

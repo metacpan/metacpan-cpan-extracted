@@ -1,0 +1,46 @@
+---
+abstract: 'A simple parallel processing fork manager with AnyEvent'
+author:
+  - 'Kenta Sato <karupa@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+  Test::SharedFork: '0.31'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-ForkManager
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  AnyEvent::ForkManager:
+    file: lib/AnyEvent/ForkManager.pm
+    version: '0.06'
+requires:
+  AnyEvent: '0'
+  Class::Accessor::Lite: '0.04'
+  List::Util: '0'
+  Scalar::Util: '0'
+  Time::HiRes: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/karupanerura/p5-AnyEvent-ForkManager/issues
+  homepage: https://github.com/karupanerura/p5-AnyEvent-ForkManager
+  repository: git://github.com/karupanerura/p5-AnyEvent-ForkManager.git
+version: '0.06'
+x_contributors:
+  - 'かるぱねるら <karupanerura@karupas-mbp.local>'
+  - 'E. Choroba <choroba@matfyz.cz>'
+  - 'karupanerura <karupanerura@users.noreply.github.com>'

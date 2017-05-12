@@ -1,0 +1,8 @@
+#!/home/ivan/bin/perl
+use strict;
+use warnings;
+use AnnoCPAN::Dump;
+
+my $file = shift or die "pls give a filename\n";
+
+AnnoCPAN::Dump->read_dump($file);

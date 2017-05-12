@@ -1,0 +1,81 @@
+<table align="center">
+<tr><td><div id="<tmpl_var name=context>_organization_result"><tmpl_var name=result escape=html></div></td></tr>
+<tr><td><hr /></td></tr>
+</table>
+<form name="<tmpl_var name=context>_organization_form" id="<tmpl_var name=context>_organization_form" action="" method="post" onSubmit="return <tmpl_var name=context>_organization_onsubmit()">
+<table align="center">
+<tr>
+<td>Name</td><td><input type="text" name="name" id="name" size="40" value="<tmpl_var name=name escape=html>" /></td><td></td>
+<td>Home page</td><td><input type="text" name="home_page" id="home_page" size="40" value="<tmpl_var name=home_page escape=html>" /></td><td></td>
+</tr>
+<tr>
+<td>Broadcast</td><td><tmpl_var name=broadcasts></td><td></td>
+</tr>
+<tr>
+<td>Communicate</td><td><tmpl_var name=communication_types></td><td></td>
+<td>Role</td><td><tmpl_var name=roles></td><td></td>
+</tr>
+<tr>
+<td align="center" colspan="6"><hr /></td>
+</tr>
+<tr>
+<td>Phone 1</td><td><input type="text" name="phone_1" id="phone_1" size="40" value="<tmpl_var name=phone_1>" /></td><td><tmpl_var name=phone_number_types_1></td>
+<td>Phone 2</td><td><input type="text" name="phone_2" id="phone_2" size="40" value="<tmpl_var name=phone_2>" /></td><td><tmpl_var name=phone_number_types_2></td>
+</tr>
+<tr>
+<td>Phone 3</td><td><input type="text" name="phone_3" id="phone_3" size="40" value="<tmpl_var name=phone_3>" /></td><td><tmpl_var name=phone_number_types_3></td>
+<td>Phone 4</td><td><input type="text" name="phone_4" id="phone_4" size="40" value="<tmpl_var name=phone_4>" /></td><td><tmpl_var name=phone_number_types_4></td>
+</tr>
+<tr>
+<td align="center" colspan="6"><hr /></td>
+</tr>
+<tr>
+<td>Email 1</td><td><input type="text" name="email_1" id="email_1" size="40" value="<tmpl_var name=email_1>" /></td><td><tmpl_var name=email_address_types_1></td>
+<td>Email 2</td><td><input type="text" name="email_2" id="email_2" size="40" value="<tmpl_var name=email_2>" /></td><td><tmpl_var name=email_address_types_2></td>
+</tr>
+<tr>
+<td>Email 3</td><td><input type="text" name="email_3" id="email_3" size="40" value="<tmpl_var name=email_3>" /></td><td><tmpl_var name=email_address_types_3></td>
+<td>Email 4</td><td><input type="text" name="email_4" id="email_4" size="40" value="<tmpl_var name=email_4>" /></td><td><tmpl_var name=email_address_types_4></td>
+</tr>
+<tr>
+<td align="center" colspan="6"><hr /></td>
+</tr>
+</table>
+<table align="center" width="100%">
+<tr>
+<tmpl_if name=reset_button>
+<td align="center"><input type="reset" name="reset" value="Reset" /></td>
+<tmpl_else>
+<td align="center"><input type="button" id="close_organization_form" name="close_organization_form" onClick="tab_set.removeTab(organization_tab); organization_tab=null; tab_set.set('activeTab', search_tab)" value="Close tab"/></td>
+<td align="center"><input type="submit" name="submit_organization_delete" id="submit_organization_delete" value="Delete" onClick="document.<tmpl_var name=context>_organization_form.action.value=202" /></td>
+<td align="center"><input type="submit" name="submit_organization_donations" id="submit_organization_donations" value="Donations" onClick="document.<tmpl_var name=context>_organization_form.action.value=203" /></td>
+<td align="center"><input type="submit" name="submit_organization_notes" id="submit_organization_notes" value="Notes" onClick="document.<tmpl_var name=context>_organization_form.action.value=204" /></td>
+<td align="center"><!-- <input type="submit" name="submit_organization_sites" id="submit_organization_sites" value="Sites" onClick="document.<tmpl_var name=context>_organization_form.action.value=206" /> --></td>
+</tmpl_if>
+<td align="center"><input type="submit" name="submit_organization_<tmpl_var name=context>" id="submit_organization_<tmpl_var name=context>" value="<tmpl_var name=go>" onClick="document.<tmpl_var name=context>_organization_form.action.value=<tmpl_var name=action>" /></td>
+</tr>
+</table>
+<input type="hidden" name="action" id="action" value="0" />
+<input type="hidden" name="target_id" id="target_id" value="<tmpl_var name=target_id>" />
+<input type="hidden" name="sid" id="sid" value="<tmpl_var name=sid>" />
+</form>
+
+<tmpl_if name=people_loop>
+<form name="update_organization_staff_form" id="update_organization_staff_form" action="" method="post" onSubmit="return update_organization_staff_onsubmit()">
+<table align="center">
+<tr>
+<td align="center" colspan="5"><hr /></td>
+</tr>
+<tmpl_loop name=people_loop>
+<tr>
+<td>Person: </td><td><tmpl_var name=name>.</td><td>Occupation: </td><td><tmpl_var name=title></td>
+<td><input type="checkbox" name="occupation_id_<tmpl_var name=occupation_id>" id="occupation_id_<tmpl_var name=occupation_id>" value="<tmpl_var name=occupation_id>" /></td>
+</tr>
+</tmpl_loop>
+<tr>
+<td align="center" colspan="5"><input type="submit" name="submit_staff_delete" id="submit_staff_delete" value="Delete staff" onClick="document.update_organization_staff_form.action.value=2" /></td>
+</tr>
+</table>
+<input type="hidden" name="action" id="action" value="0" />
+</form>
+</tmpl_if>

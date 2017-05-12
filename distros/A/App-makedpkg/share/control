@@ -1,0 +1,11 @@
+Source: {$name}
+Section: {$section}
+Priority: {$priority}
+Maintainer: {$author}
+Build-Depends: {$build_depends}
+Standards-Version: 3.8.4
+ 
+Package: {$name}
+Architecture: {$architecture}
+Depends: {$binary_depends}
+Description: {$description}

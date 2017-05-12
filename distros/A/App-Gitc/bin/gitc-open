@@ -1,0 +1,191 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-open
+# ABSTRACT: Open a new changeset
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    changeset_group
+    changeset_merged_to
+    confirm
+    current_branch
+    full_changeset_name
+    git
+    git_fetch_and_clean_up
+    guarantee_a_clean_working_directory
+    history
+    history_owner
+    history_status
+    is_auto_fetch
+    is_valid_ref
+    its_for_changeset
+    meta_data_add
+    meta_data_rm
+    project_config
+    project_name
+    state_blocked
+);
+use App::Gitc::Reversible;
+use Getopt::Long;
+use List::MoreUtils qw( none );
+
+my $onto;
+GetOptions( 'onto=s' => \$onto );
+
+my $changeset_name = shift or die "You must specify a changeset name\n";
+
+exec 'gitc-quickfix', if $changeset_name eq 'quickfix';
+
+die "You may not create a changeset named '$changeset_name'\n"
+    if $changeset_name =~ m/^(master|test|stage|prod)$/;
+
+my $its = its_for_changeset($changeset_name);
+if ($its) {
+    my $issue = $its->get_issue($changeset_name);
+    my $state = $its->issue_state($issue);
+    if ($issue && state_blocked('open', $state)) {
+        my $its_label = $its->label_issue;
+        die "gitc-open aborting\n"
+            unless confirm("$its_label is @{[ uc $state ]}.  Proceed?");
+    }
+}
+
+my $history = history($changeset_name);
+if (@$history) {
+    my $owner = history_owner($history);
+    my $status = history_status($history);
+    die   "A changeset named '$changeset_name' already exists.\n"
+        . "It was created by $owner and currently has status $status.\n"
+        . "For more details, try 'gitc history $changeset_name'\n"
+        ;
+}
+
+
+git_fetch_and_clean_up() if is_auto_fetch();
+$onto = validate_onto_argument( $changeset_name, $onto );
+my $branch = current_branch();
+
+my $stash;
+reversibly {
+    failure_warning "\nCanceling gitc open\n";
+
+    $stash = guarantee_a_clean_working_directory();
+    to_undo { git "stash apply $stash" if $stash; $stash = undef };
+
+    # create a new branch for this changeset
+    git "checkout --no-track -b $changeset_name $onto";
+    to_undo {
+        git "checkout -f master";
+        git "reset --hard HEAD";
+        git "branch -D $changeset_name";
+    };
+
+    # make a note about opening the changeset
+    my $id = meta_data_add({
+        action    => 'open',
+        changeset => $changeset_name,
+    });
+    to_undo { meta_data_rm(id => $id, changeset => $changeset_name) };
+};
+
+if ($its) {
+    # update the ITS status (fail with a warning)
+    my $its_name = $its->label_service;
+    eval {
+        print STDERR "Updating $its_name...";
+        my $project = project_name();
+        my $what_happened = $its->transition_state({
+            command   => 'open',
+            message   => "Opened a new changeset: $project#$changeset_name",
+            changeset => $changeset_name,
+        });
+        print STDERR "done\n";
+        warn $what_happened;
+    };
+    warn "Updating $its_name failed! $@\n" if $@;
+}
+
+# reinstate any changes present when we started
+git "stash apply $stash" if $stash;
+
+
+###################### helper subs ######################
+
+# validates and defaults the --onto command line argument
+# most of this code has to do with choosing an intelligent default
+sub validate_onto_argument {
+    my ($changeset, $onto) = @_;
+    return "origin/$onto" if $onto and $onto =~ m/^(master|test|stage|prod)$/;
+
+    # default e1234c to e1234b (unless e1234b is far enough along)
+    if ( not defined $onto ) {
+        if ( my $previous = find_previous_changeset($changeset) ) {
+            my @merged_to = changeset_merged_to($previous);
+            my $default_onto = project_config()->{ open_onto };
+            $onto = $previous if not @merged_to;
+            $onto = $previous if none { $_ eq $default_onto } @merged_to;
+        }
+    }
+
+    # use the project's default starting branch
+    if ( not defined $onto ) {
+        my $default_onto = project_config()->{ open_onto };
+        return "origin/$default_onto";
+    }
+
+    my $ref = full_changeset_name($onto);
+    return $ref if $ref;
+    die "Invalid value for 'onto' option: $onto\n";
+}
+
+# return the changeset before this one in the group
+sub find_previous_changeset {
+    my ($changeset) = @_;
+    my $group = changeset_group($changeset);
+    return if @$group == 0;
+    return $group->[-1];
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-open - Open a new changeset
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

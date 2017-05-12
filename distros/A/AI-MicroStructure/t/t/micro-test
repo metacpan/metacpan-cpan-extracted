@@ -1,0 +1,10 @@
+#!/usr/bin/perl -X
+
+use strict;
+use warnings;
+use Acme::MetaSyntactic::germany;
+use Data::Printer;
+
+my $h = Acme::MetaSyntactic::germany->new(lang=> 'Berlin' );
+my @h = $h->name(lan=>'Berlin' ,0);
+p @h;

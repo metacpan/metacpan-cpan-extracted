@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Any-Renderer-Data-Printer
+version:            0.04
+abstract:           Render data structures through Data::Printer
+author:
+    - Kevin McGrath <kmcgrath@baknet.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Any::Renderer:  1.014
+    Data::Printer:  0.18
+    Test::More:     0
+resources:
+    repository:  https://github.com/kmcgrath/perl5-Any-Renderer-Data-Printer
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

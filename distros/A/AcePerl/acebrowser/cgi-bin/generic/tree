@@ -1,0 +1,127 @@
+#!/usr/bin/perl
+
+# generic tree display
+# should work with any data model
+
+use strict;
+use vars qw/$DB $URL $NAME $CLASS/;
+
+use Ace 1.51;
+use CGI 2.42 qw/:standard :html3 escape/;
+use CGI::Carp qw/fatalsToBrowser/;
+use Ace::Browser::AceSubs qw(:DEFAULT Url);
+use Ace::Browser::TreeSubs;
+
+my $obj = GetAceObject();
+
+unless ($obj) {
+  AceError(<<END) if param() && !param('name') && !param('class')
+Call this script with URL parameters of
+<VAR>name</VAR> and <VAR>class,</VAR> where
+"name" and "class" correspond to the name and class of the
+Ace object of interest.
+END
+}
+
+PrintTop($obj);
+print_prompt();
+AceNotFound() unless $obj;
+display_object($obj);
+PrintBottom();
+
+sub print_prompt {
+  print
+    start_form(-name=>'question'),
+      table(
+	    TR (th('Name'),td(textfield(-name=>'name')),
+		th('Class'),td(textfield(-name=>'class',-size=>15,-onChange=>'document.question.submit()')),
+		td(submit({-style=>'background: white',-name=>'Change'}))),
+	   ),
+     end_form;
+}
+
+sub display_object {
+  my $obj = shift;
+  my $name  = $obj->name;
+  my $class = $obj->class;
+  my ($n,$c) = (escape($name),escape($class));
+  my $myimage = ($class =~ /^Picture/ ? $obj->Pick_me_to_call->right->right : 'No_Image') ;
+  if ($class eq 'LongText'){
+    print $obj->asHTML(sub { pre(shift) });
+  }
+  else{
+    print  $obj->asHTML(\&to_href) || strong('No more text information
+     about this object in the database'), "\n";
+  }
+}
+
+sub to_href {
+  my $obj = shift;
+
+  unless ($obj->isObject or $obj->isTag) {
+    if ($obj=~/\S{50}/){         # if you have >50 chars without a space
+      $obj=~s/(\S{50})/$1\n/g; # add some
+      $obj = "<pre>$obj</pre>";# and assume preformatted (e.g. seq)
+    } else {
+      $obj =~s/\\n/<BR>/g;
+    }
+    return ($obj,0);
+  }
+
+  # if we get here, we're dealing with an object or tag
+  my $name = $obj->name;
+
+  # modperl screws up with subroutine references for some reason
+  my $page_name = param('name');
+  my $page_class = param('class');
+  my %squash = map { $_ => 1; } grep($_ ne '',param('squash'));
+  my %expand = map { $_ => 1; } grep($_ ne '',param('expand'));
+
+  my ($n,$c) = (escape($name),escape($obj->class));
+  my ($pn,$pc) = (escape($page_name),escape($page_class));
+  my $cnt = $obj->col;
+
+  # here's a hack case for external images
+  if ($obj->isTag && $name eq 'Pick_me_to_call' && $obj->right(2)=~/\.(jpg|jpeg|gif)$/i) {
+      return (td({-colspan=>2},img({-src=>AceImageHackURL($obj->right(2))})),1,1);
+  }
+
+  my $title = $name;
+  if ($cnt > 1) {
+    if ($squash{$name} || ($cnt > MAXEXPAND && !$expand{$name})) {
+      my $to_squash = join('&squash=',map { escape($_) } grep $name ne $_,keys %squash);
+      my $to_expand = join('&expand=',map { escape($_) } (keys %expand,$name));
+      return (a({-href=>Url(url(-relative=>1),"name=$pn&class=$pc")
+		 . ($to_squash ? "&squash=$to_squash" : '') 
+		 . ($to_expand ? "&expand=$to_expand" : '')
+		 . "#$name",
+		 -name=>"$name",
+		 -target=>"_self"},
+		b(font({-color=>CLOSEDCOLOR},"$title ($cnt)"))),
+	      1);
+    } else {
+      my $to_squash = join('&squash=',map { escape($_) } (keys %squash,$name));
+      my $to_expand = join('&expand=',map { escape($_) } grep $name ne $_,keys %expand);
+      return (a({-href=>Url(url(-relative=>1), "name=$pn&class=$pc")
+		 . ($to_squash ? "&squash=$to_squash" : '') 
+		 . ($to_expand ? "&expand=$to_expand" : '')
+		 . "#$name",
+		 -name=>"$name",
+		 -target=>"_self"},
+		b(font({-color=>OPENCOLOR},"$title"))),
+	      0);
+    }
+  }
+
+  return i($title) if $obj->isComment;
+
+  if ($obj->isObject) {
+      my $href = Object2URL($obj);
+      return (a({ -href=>$href},$title), 0);
+  }
+
+  if ($obj->isTag) {
+    return ("<B>$title</B>",0);
+  }
+  # shouldn't ever get here.
+}

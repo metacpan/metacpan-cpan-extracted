@@ -1,0 +1,27 @@
+[Changes for 0.10E0 - December 24, 2007]
+
+* This release is identical the '0.10' release in October 14, 2007
+  with the changes listed below, except it fixes the double-indexing
+  caused two '0.10' releases.
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the permissive "MIT" license.
+
+* Corrected diagnostics to match the documentation.
+
+* Tidied up source code, test files, and this changelog.
+
+[Changes for 0.10 - December 12, 2005]
+
+* Gaal Yahas reported a typo error in the module's POD that
+  incorrectly mentioned Acme::ComeFrom.
+
+* Modernise build system again.
+
+[Changes for 0.03 - November 8, 2003]
+
+* Modernise build system.
+
+[Changes for 0.01 - July 11, 2003]
+
+* Initial release.

@@ -1,0 +1,42 @@
+Revision history for Perl extension Apache::Recorder.
+
+0.07 Sun Oct 13, 1:00:00 2002
+        - Changed the PREREQ_PM value for the CGI::Cookie key to 1.21.
+	  CGI::Cookie 1.18 has a bug in the parse method -- unescape
+	  is erroneously attributed to CGI, rather than CGI::Util,
+	  and this was causing one of the tests in t/get_id.t to fail.
+	- Updated the description in Recorder.pm to include a more
+	  generic statement of what Apache::Recorder does.
+
+0.06 Thu Jul 18 16:30:00 2002
+        - updated README
+	- update POD for Mock::Apache::Request
+        - Added PREREQ_PM to Makefile.PL to ensure that all necessary
+	  modules get installed.
+
+0.05 Tue Jul 16 12:08:00 2002
+        - added 20 new tests and a new mock class which emulates Apache::Request.
+	- minor optimizations to the handler, and removed some cruft.
+	- improved the documentation.
+	- added a call to $r->no_cache(1) to turn off cacheing for all but the most
+	  agressive proxy server and browser settings.
+
+0.04 Mon Mar 01 11:33:00 2002
+        - test.pl still referenced HTTP::TestEngine, which caused installation 
+	  to die during cpan-testing.
+
+0.03 Wed Feb 27 14:02:00 2002
+        - changed name of HTTP::TestEngine to Apache::Recorder
+        - changed name of HTTP::SessionConfig to HTTP::RecordedSession, and 
+	  moved into its own package
+
+0.02  Thu Jan 22 10:08:00 2002
+        - updated documentation
+	- added use Apache::Log
+	- updated directory organization during install
+	- added 4 tests to test.pl to check for required libraries
+	- fixed bug which returned no data if not part of a series of 
+	  chained handlers
+
+0.01  Mon Nov  5 06:56:41 2001
+	- original version; created by h2xs 1.19

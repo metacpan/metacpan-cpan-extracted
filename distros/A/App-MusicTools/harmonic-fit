@@ -1,0 +1,332 @@
+#!perl
+
+# Fits a sequence of lilypond notes to a frequency chart of roman numeral
+# progressions starting on each root pitch of the 12-tone scale. This may
+# reveal what keys a sequence of notes likely belong to. This script is
+# distributed with the App::MusicTools perl module.
+#
+# Run perldoc(1) on this file for additional documentation.
+
+use strict;
+use warnings;
+
+use Getopt::Long qw/GetOptions/;
+use JSON                ();
+use Music::LilyPondUtil ();
+use Music::Scales qw/get_scale_nums/;
+
+my $json = JSON->new;
+my $lyu  = Music::LilyPondUtil->new;
+
+my $DEG_IN_SCALE = 12;
+
+GetOptions( 'chart=s' => \my $chart_file );
+
+my $fh = \*DATA;
+if ( defined $chart_file ) {
+  open $fh, '<', $chart_file or die "error: could not open '$chart_file': $!\n";
+}
+
+my $lookup = $json->decode(
+  do { local $/; readline $fh }
+);
+
+die "Usage: harmonic-fit [--chart=chart-file] lilypond-notes...\n" if !@ARGV;
+
+my @melody;
+for my $input (@ARGV) {
+  push @melody, grep { defined && length > 0 } split /\s+/, $input;
+}
+
+my @pitches = $lyu->notes2pitches( \@melody );
+
+if (!@pitches) {
+  warn "could not parse any pitches\n";
+  die "Usage: harmonic-fit [--chart=chart-file] lilypond-notes...\n";
+}
+
+my @matches;
+
+$lyu->ignore_register(1);
+$lyu->keep_state(0);
+
+for my $root ( 0 .. $DEG_IN_SCALE - 1 ) {
+  my $match = 0;
+
+  my @numerals;
+  for my $pitch (@pitches) {
+    push @numerals, abs( $pitch - $root ) % $DEG_IN_SCALE;
+  }
+  for my $i ( 1 .. $#numerals ) {
+    $match += $lookup->{ join ',', $numerals[ $i - 1 ], $numerals[$i] };
+  }
+  push @matches, [ $match, $lyu->p2ly($root) ] if $match > 0;
+}
+
+for my $match ( sort { $b->[0] <=> $a->[0] } @matches ) {
+  print join( "\t", @$match ), "\n";
+}
+
+exit 0;
+
+=head1 NAME
+
+harmonic-fit - fits melody to common-practice progressions
+
+=head1 SYNOPSIS
+
+  $ harmonic-fit c g | head -3
+  84    c
+  27    g
+  8     f
+
+  $ atonal-util gen_melody
+  ees f e d g des c b aes a ges bes
+  $ harmonic-fit ees f e d g des c b aes a ges bes
+  189   g
+  95    c
+  71    d
+  60    a
+  53    f
+  48    dis
+  40    cis
+  40    e
+  37    b
+  30    ais
+  22    fis
+  18    gis
+
+=head1 DESCRIPTION
+
+Fits a sequence of lilypond notes to a frequency chart of roman
+numeral progressions starting on each root pitch of the 12-tone scale.
+This may reveal what keys a sequence of notes likely belong to, and if
+so how strongly.
+
+Care must be taken in what this program is fed; too much input may span
+several keys or key areas, and thus the fit will be less specific. Use
+short phrases, or analyze a specific number of measures, and if
+necessary input just the downbeat notes or otherwise implied harmony.
+This will require care, consistency, and good judgement. Comparison
+between different phrases should only be made if they are of the same
+length; otherwise, compensation will be necessary to normalize the
+resulting numbers.
+
+This utility may also assist atonal analysis; the above example shows
+that the random phrase may tend towards G-something, which may or may
+not be desirable.
+
+=head1 OPTIONS
+
+This program supports the following command line switches:
+
+=over 4
+
+=item B<--chart>=I<chart-file>
+
+Optional chart file. JSON format; consult the C<DATA> section of this
+program for details on what is used by default.
+
+=back
+
+=head1 BUGS
+
+Lack of input validation, notably, and not much testing to see if the
+results make sense or are usable for any purpose.
+
+If the bug is in the latest version, send a report to the author.
+Patches that fix problems or add new features are welcome.
+
+L<http://github.com/thrig/App-MusicTools>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+http://www.theory.esm.rochester.edu/temperley/kp-stats/
+
+=item *
+
+L<http://www.lilypond.org/>
+
+=item *
+
+L<https://en.wikipedia.org/wiki/Roman_numeral_analysis>
+
+=back
+
+=head1 AUTHOR
+
+Jeremy Mates
+
+=head1 COPYRIGHT
+
+Copyright (C) 2013,2015 by Jeremy Mates
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.16 or, at your option, any
+later version of Perl 5 you may have available.
+
+=cut
+
+########################################################################
+#
+# Translation table of "kp-chord-list-2" via "A Statistical Analysis of
+# Tonal Harmony" by David Temperley. It represents an analysis of common-
+# practice music, so may not suit the needs of other musical styles, or
+# may not properly distinguish Major from minor, etc. But this is merely
+# a starting point, a rough yard-stick for the lay of the land.
+#
+# This is a hash, key of numeral1,numeral2 with the value being the
+# count of progressions between the two numerals. For numerals, 0 => I,
+# 1 => bII, etc. So 0,7 is I to V, with a count of 84, a relatively
+# frequent progression.
+__DATA__
+{
+   "0,0" : "0",
+   "0,1" : "7",
+   "0,2" : "31",
+   "0,3" : "1",
+   "0,4" : "4",
+   "0,5" : "45",
+   "0,6" : "2",
+   "0,7" : "84",
+   "0,8" : "11",
+   "0,9" : "17",
+   "0,10" : "3",
+   "0,11" : "19",
+   "1,0" : "2",
+   "1,1" : "0",
+   "1,2" : "8",
+   "1,3" : "0",
+   "1,4" : "0",
+   "1,5" : "0",
+   "1,6" : "1",
+   "1,7" : "3",
+   "1,8" : "0",
+   "1,9" : "0",
+   "1,10" : "0",
+   "1,11" : "1",
+   "2,0" : "5",
+   "2,1" : "3",
+   "2,2" : "0",
+   "2,3" : "1",
+   "2,4" : "4",
+   "2,5" : "1",
+   "2,6" : "7",
+   "2,7" : "62",
+   "2,8" : "2",
+   "2,9" : "8",
+   "2,10" : "0",
+   "2,11" : "6",
+   "3,0" : "1",
+   "3,1" : "1",
+   "3,2" : "0",
+   "3,3" : "0",
+   "3,4" : "0",
+   "3,5" : "0",
+   "3,6" : "0",
+   "3,7" : "4",
+   "3,8" : "4",
+   "3,9" : "0",
+   "3,10" : "0",
+   "3,11" : "0",
+   "4,0" : "1",
+   "4,1" : "0",
+   "4,2" : "2",
+   "4,3" : "0",
+   "4,4" : "0",
+   "4,5" : "7",
+   "4,6" : "0",
+   "4,7" : "1",
+   "4,8" : "0",
+   "4,9" : "7",
+   "4,10" : "0",
+   "4,11" : "1",
+   "5,0" : "27",
+   "5,1" : "2",
+   "5,2" : "10",
+   "5,3" : "0",
+   "5,4" : "4",
+   "5,5" : "0",
+   "5,6" : "3",
+   "5,7" : "16",
+   "5,8" : "0",
+   "5,9" : "1",
+   "5,10" : "1",
+   "5,11" : "4",
+   "6,0" : "3",
+   "6,1" : "0",
+   "6,2" : "0",
+   "6,3" : "0",
+   "6,4" : "0",
+   "6,5" : "0",
+   "6,6" : "0",
+   "6,7" : "13",
+   "6,8" : "0",
+   "6,9" : "0",
+   "6,10" : "0",
+   "6,11" : "0",
+   "7,0" : "166",
+   "7,1" : "0",
+   "7,2" : "8",
+   "7,3" : "1",
+   "7,4" : "2",
+   "7,5" : "4",
+   "7,6" : "0",
+   "7,7" : "0",
+   "7,8" : "7",
+   "7,9" : "6",
+   "7,10" : "0",
+   "7,11" : "2",
+   "8,0" : "3",
+   "8,1" : "2",
+   "8,2" : "8",
+   "8,3" : "0",
+   "8,4" : "1",
+   "8,5" : "3",
+   "8,6" : "0",
+   "8,7" : "4",
+   "8,8" : "0",
+   "8,9" : "3",
+   "8,10" : "2",
+   "8,11" : "0",
+   "9,0" : "4",
+   "9,1" : "2",
+   "9,2" : "28",
+   "9,3" : "0",
+   "9,4" : "1",
+   "9,5" : "4",
+   "9,6" : "2",
+   "9,7" : "1",
+   "9,8" : "0",
+   "9,9" : "0",
+   "9,10" : "0",
+   "9,11" : "1",
+   "10,0" : "0",
+   "10,1" : "0",
+   "10,2" : "0",
+   "10,3" : "5",
+   "10,4" : "0",
+   "10,5" : "0",
+   "10,6" : "0",
+   "10,7" : "1",
+   "10,8" : "0",
+   "10,9" : "0",
+   "10,10" : "0",
+   "10,11" : "0",
+   "11,0" : "26",
+   "11,1" : "0",
+   "11,2" : "0",
+   "11,3" : "0",
+   "11,4" : "3",
+   "11,5" : "0",
+   "11,6" : "1",
+   "11,7" : "2",
+   "11,8" : "1",
+   "11,9" : "0",
+   "11,10" : "0",
+   "11,11" : "0"
+}

@@ -1,0 +1,28 @@
+NAME
+    Acme::Spider - frighten some other modules
+
+SYNOPSIS
+      use Acme::Spider;
+
+DESCRIPTION
+    Damian Conway is afraid of spiders, and all his code is afraid of this
+    spider.
+
+TODO
+    As the spider evolves, it will become better at recognising Damian's
+    modules.  It's a pity evolution doesn't happen without some help.
+
+AUTHORS
+    Marty Pauley <marty@kasei.com> Karen Pauley <karen@kasei.com>
+
+COPYRIGHT
+      Copyright (C) 2006 Marty and Karen
+
+      This program is free software; you can redistribute it and/or modify it under
+      the terms of either the GNU General Public License; either version 2 of the
+      License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful, but WITHOUT
+      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+      FOR A PARTICULAR PURPOSE.
+

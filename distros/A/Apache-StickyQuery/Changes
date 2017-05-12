@@ -1,0 +1,8 @@
+Revision history for Perl extension Apache::StickyQuery.
+
+0.02  Thu Oct 18 11:36:05 JST 2001
+	- fixed bug that 0 value config is ignored
+
+0.01  Thu Oct 18 02:55:32 2001
+	- original version; created by h2xs 1.19
+

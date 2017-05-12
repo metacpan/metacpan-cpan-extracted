@@ -1,0 +1,23 @@
+Revision history for Perl module Acme-MakeMoneyAtHome
+
+1.004001 2015-08-05
+
+  - Make Alex Reinhart (Capn_Refsmmat) happy by fixing monthly pay math
+
+1.003001 2015-07-17
+
+  - Subject & Activity expansion
+
+1.002002 2015-07-11
+
+  - Fix dupes in subject list (thanks, popl)
+
+  - Fix gender identification
+
+1.002001 2015-07-11
+
+  - Be more specific about genders to avoid microaggressive-nanotriggering
+
+1.001001 2015-06-20
+
+  - Initial release

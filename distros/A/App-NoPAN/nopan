@@ -1,0 +1,100 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+
+use 5.008;
+use App::NoPAN;
+use Getopt::Long;
+use Pod::Usage;
+
+our $VERSION = '0.01';
+
+my %opts = %App::NoPAN::Defaults;
+my ($opt_help, $opt_version);
+GetOptions(
+    help           => \$opt_help,
+    version        => \$opt_version,
+    'install'      => sub { $opts{opt_install} = 1 },
+    'I|no-install' => sub { $opts{opt_install} = undef },
+    test           => sub { $opts{opt_test} = 1 },
+    'T|no-test'    => sub { $opts{opt_test} = 0 },
+) or pod2usage(1);
+if ($opt_help) {
+    pod2usage(0);
+} elsif ($opt_version) {
+    print "$VERSION\n";
+    exit 0;
+}
+die "no args"
+    unless @ARGV;
+
+my $nopan = App::NoPAN->new(%opts);
+$nopan->run($_)
+    for @ARGV;
+
+__END__
+
+=head1 NAME
+
+nopan - download software from source-code repository and install
+
+=head1 SYNOPSIS
+
+% nopan [options] http://svn-or-git-repository
+
+=over 4
+
+=item -i, --install
+
+=item -I, --no-install
+
+installs (or does not install) the repository (default: yes)
+
+=item -t, --test
+
+=item -T, --no-test
+
+runs (or does not run) the test suit (default: depends on the type of the repository)
+
+=back
+
+=head1 DESCRIPTION
+
+Nopan downloads software from a subversion repository or a git repository using HTTP, and automatically installs the software.
+
+Nopan currently supports following types of software repositories.
+
+=over 4
+
+=item autotools-based repositories
+
+repositories with `configure' script or `configure.(ac|in)' are considered as autotools-based repositories and are installed using: ./configure && make all && make install.  If only `configure.(ac|in)' exists, autoreconf -i will be run prior to generate `configure'.
+
+=item perl repositories
+
+repositories that have Makefile.PL are considered as perl module repositories and are installed using: perl Makefile.PL && make all test && make install.
+
+=item Makefile-only repositories
+
+if the repository does not match either of the rules above, but has a `Makefile', nopan will try to install the repository by running: make all && sudo make install.
+
+=back
+
+=head1 AUTHOR
+
+Kazuho Oku
+
+=head1 CONTRIBUTORS
+
+tokuhirom
+
+mattn
+
+xaicron
+
+=head1 LICENSE
+
+BSD
+
+=cut

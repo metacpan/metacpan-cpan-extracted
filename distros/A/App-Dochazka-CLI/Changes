@@ -1,0 +1,1149 @@
+Revision history for App-Dochazka-CLI
+
+0.001  2014-08-08 14:09 CEST
+- first public release of embryonic CLI script
+
+0.002  2014-08-08 14:17 CEST
+- break parser out into a module
+
+0.003  2014-08-08 14:31 CEST
+- debugging
+
+0.004  2014-08-08 15:35 CEST
+- CLI.pm: add DESCRIPTION section to POD
+
+0.005  2014-08-10 14:45 CEST
+- fix bug "init routine not loading App-Dochazka-CLI sharedir"
+- expand GET EMPLOYEE command:
+  - GET EMPLOYEE still returns current employee
+  - GET EMPLOYEE $INTEGER returns employee with EID $INTEGER
+  - GET EMPLOYEE $STRING returns employee with nick $STRING
+  - GET EMPLOYEE $STRING-CONTAINING-% runs a 'LIKE' search for multiple employees
+- add ReadLine/History support using Term::ReadLine::Perl5
+- split off 'send_req' routine into new App::Dochazka::CLI::HTTP module
+- fix bug "'get employee NON-EXISTENT-NICK' should produce an error message;
+  instead, it says 'undef'"
+
+0.006  2014-08-10 18:37 CEST
+- Build.PL: add dependency HTTP::Cookies
+- bin/dochazka-cli: use App::Dochazka::Model::Employee instead of inheriting from it
+- HTTP.pm: construct LWP::UserAgent object with cookie_jar
+- config/CLI_Config.pm: make a proper _Config.pm file for the application
+
+0.007  2014-08-10 20:12 CEST
+- bin/dochazka-cli: prompt for nick/password if not given in site configuration
+- HTTP.pm: add 'init_ua' and 'cookie_jar' functions, use nick/password
+  prompted from user if not given in site config
+- Parser.pm: add GET COO[KIES]
+- Build.PL: update dependencies
+
+0.008  2014-08-10 22:51 CEST
+- fix bug "bin/dochazka-cli throws 'Odd number of arguments' error at startup"
+
+0.009  2014-08-10 22:56 CEST
+- Parser.pm: add GET SES[SION]
+
+0.010  2014-08-11 16:15 CEST
+- goodbye 'Term::ReadLine::Perl5' (depends on 'rlib' which cannot be
+  packaged due to licensing issues), hello 'Term::ReadLine::Gnu'
+
+0.011  2014-10-17 23:01 CEST
+- Build.PL: add Getopt::Long dependency 
+- get user and password from command-line options instead of from site
+  configuration
+
+0.012  2014-10-18 10:06 CEST
+- process command-line options: 'help', 'user', 'password'
+- add dependencies: Getopt::Long, Pod::Usage
+- log to $HOME/.dochazka-cli.log by default, user can override in /etc/dochazka-cli
+- prompt for password if none specified on command line
+
+0.013  2014-10-19 07:55 CEST
+- CLI.pm: document commands and their syntax
+- Parser.pm: work on top-level GET commands
+
+0.014  2014-10-19 08:44 CEST
+- move command POD to Parser.pm where it belongs
+- Parser.pm: add a couple more top-level GET commands
+
+0.015  2014-10-19 13:35 CEST
+- HTTP.pm: fix send_req so it is capable of sending requests with methods other
+  than GET
+- Parser.pm: add PUT and PUT HELP commands
+
+0.016  2014-10-19 13:53 CEST
+- HTTP.pm, Parser.pm: cleanup
+
+0.017  2014-10-19 22:33 CEST
+- implement more resources
+
+0.018  2014-10-20 08:32 CEST
+- Parser.pm: fix brokenness in 'GET WHOAMI' and 'PUT EMPLOYEE'
+
+0.019  2014-10-20 17:23 CEST
+- Parser.pm: fix a silly bug
+
+0.020  2014-10-20 22:09 CEST
+- Parser.pm: add 'GET CURRENT PRIV' command
+- bin/dochazka-cli: fix privilege brokenness; add status text to command output
+
+0.021  2014-10-21 10:44 CEST
+- Parser.pm: add 'GET EMPLOYEE COUNT' and get rid of conflicting 'GET
+  EMPLOYEE [STRING]'
+
+0.022  2014-10-21 16:26 CEST
+- bin/dochazka-cli: show response body on NOTICE status as well as OK
+- HTTP.pm: explicitly import GET PUT POST DELETE from HTTP::Request::Common
+- Parser.pm: properly implement 'metaparam/:param' and 'not_implemented'
+  resources
+
+0.023  2014-10-21 22:24 CEST
+- Parser.pm: fix $anything regex variable; support 'forbidden' resource; add
+  other missing top-level resources so now all are supported
+
+0.024  2014-10-22 16:42 CEST
+- Parser.pm: add POST EMPLOYEE EID command
+
+0.025  2014-10-23 10:55 CEST
+- Parser.pm: eliminate "POST METAPARAM"; fix "DELETE METAPARAM" so it will
+  actually work if/when implemented in the REST server
+
+0.026  2014-10-23 13:54 CEST
+- Parser.pm: make $anything really be anything; add "POST DOCU [RESOURCE]"
+  command
+
+0.027  2014-10-24 10:58 CEST
+- complete development workflow for employee resources
+- Parser.pm: add missing documentation and commands
+
+0.028  2014-10-24 15:27 CEST
+- Parser.pm: add privhistory commands
+
+0.029  2014-10-24 22:34 CEST
+- bin/dochazka-cli: fix bug "hitting ENTER at CLI prompt causes over a
+  screenful of error messages to be displayed"
+- Parser.pm: document and implement commands: 
+  - PUT PRIVHISTORY EID 
+  - PUT PRIVHISTORY NICK
+  - DELETE PRIVHISTORY EID 
+  - DELETE PRIVHISTORY NICK
+
+0.030  2014-10-25 12:05 CEST
+- bin/dochazka-cli: write a proper SYNOPSIS; add an optional 'sitedir'
+  command-line option; fix bug "dochazka-cli refuses to start unless
+  /etc/dochazka-cli directory exists and contains an empty file named
+  CLI_SiteConfig.pm"
+
+0.031  2014-10-25 23:20 CEST
+- Parser.pm: decide to move CLI documentation into REST resources; start
+  eliminating POD and streamlining the code; change 'privhistory' to 'priv'
+
+0.032  2014-10-26 22:31 CET
+- Parser.pm: embark on significant redesign of parse_tokens routine (WIP)
+
+0.033  2014-10-27 09:35 CET
+- Parser.pm: continue with wholesale refactor to make the parser more efficient
+  and maintainable
+
+0.034  2014-10-27 12:45 CET
+- Parser.pm: initial refactor complete; start (manual) testing
+
+0.035  2014-10-27 13:09 CET
+- Parser.pm: fix broken 'docu' command
+
+0.036  2014-10-27 14:26 CET
+- Parser.pm: tweak comments; fix "priv/current", "priv/eid/:eid/?:ts", and
+  "/priv/nick/:nick/?:ts" resource handlers
+
+0.037  2014-10-27 17:49 CET
+- Parser.pm: fix 'priv' handlers
+
+0.038  2014-10-28 09:29 CET
+- Parser.pm: handle activity resources; add '$method activity all' commands
+
+0.039  2014-10-29 09:31 CET
+- Parser.pm: support 'activity/all/disabled' resource
+
+0.040  2014-10-29 10:31 CET
+- Parser.pm: support 'activity/aid/:aid'
+
+0.041  2014-10-29 13:50 CET
+- Parser.pm: support PUT and DELETE requests for 'activity/aid/:aid'
+
+0.042  2014-10-29 16:40 CET
+- Parser.pm: support "/activity/code/:code"
+
+0.043  2014-10-29 22:53 CET
+- Parser.pm: support POST on 'activity/aid/:aid' and 'activity/code/:code',
+  even if just to verify 405 result
+
+0.044  2014-10-30 18:20 CET
+- Parser.pm: support 'activity/aid' and 'activity/code' resources
+
+0.045  2014-10-31 21:20 CET
+- Parser.pm: support 'docu/html' resource; fix 'post activity aid' command
+
+0.046  2014-11-03 12:19 CET
+- Parser.pm: change '/priv/current/...' and '/priv/history/current/...' to 
+  '/priv/self/...' and '/priv/history/self/...', respectively
+
+0.047  2014-11-03 13:06 CET
+- Parser.pm: cleanup and add 'activity/help'
+
+0.048  2014-11-03 15:54 CET
+- Parser.pm: support "/schedule/eid/:eid/?:ts", "/schedule/help",
+  "/schedule/nick/:nick/?:ts", and "/schedule/self/?:ts" resources
+
+0.049  2014-11-04 09:54 CET
+- Parser.pm: activate '$method schedule history ...' commands; put some stanzas
+  into alphabetical order by resource name
+
+0.050  2014-11-04 11:30 CET
+- Parser.pm: support 'schedule/intervals' and 'schedule/intervals/:shid'
+  resources
+
+0.051  2014-11-04 17:46 CET
+- Parser.pm: 'schedule/intervals' JSON body might start with either { or [
+
+0.052  2014-11-05 10:28 CET
+- Parser.pm: support 'schedule/all' and 'schedule/all/disabled' resources
+
+0.053  2014-11-06 16:35 CET
+- Parser.pm: support '/schedule/sid/:sid' resource
+
+0.054  2014-11-13 22:22 CET
+- Parser.pm: make 'employee/self' and 'employee/self/priv' be synonyms for
+  'employee/current' and 'employee/current/priv', respectively
+
+0.055  2014-11-14 10:06 CET
+- Parser.pm: handle POST requests on 'employee/{current,self}'
+
+0.056  2014-11-19 09:43 CET
+- Parser.pm: let parser recognize '$method interval help' and '$method interval new'
+
+0.057  2014-11-19 11:06 CET
+- Parser.pm: handle more interval resources
+
+0.058  2014-11-19 11:27 CET
+- Build.PL: admit two important dependencies
+
+0.059  2014-11-19 15:13 CET
+- Parser.pm: handle 'interval/self/:tsrange' resource
+
+0.060  2014-11-19 22:55 CET
+- Parser.pm: Resources.pm no longer accepts non-hash JSON - adapt 'post docu'
+  and 'post docu html' to wrap argument in { "resource" : ... }
+
+0.061  2014-11-20 13:59 CET
+- Parser.pm: handle both 'metaparam' and 'metaparam/:param' after split
+
+0.062  2014-11-20 18:14 CET
+- Parser.pm: handle lock resources
+
+0.063  2014-12-03 22:24 CET
+- Parser.pm: support the new 'dbstatus' top-level resource
+
+0.064  2014-12-10 09:07 CET
+- Parser.pm: '/schedule/new' was missing - add it
+
+0.065  2014-12-12 16:41 CET
+- do battle with UTF-8 problem
+
+0.066  2014-12-12 17:31 CET
+- Parser.pm: handle 'interval/summary/?:qualifiers' resource
+
+0.067  2014-12-30 18:32 CET
+- add an '-n' option to disable authentication so we can use App::Dochazka::CLI
+  with Web::MREST
+
+0.068  2014-12-30 21:22 CET
+- HTTP.pm: change how we process the response body, to better handle various
+  scenarios
+
+0.069  2014-12-31 16:07 CET
+- HTTP.pm: include Web::Machine trace in our output
+
+0.070  2014-12-31 22:58 CET
+- Parser.pm: pass request entity (if any) on 'help' to the server
+
+0.071  2015-01-05 15:59 CET
+- HTTP.pm, bin/dochazka-cli: expose Location header and "real" HTTP status code
+- Parser.pm: implement 'test/post_is_create/:bool'
+
+0.072  2015-01-06 13:28 CET
+- introduce DOCHAZKA_CLI_SUPPRESSED_HEADERS site param and including a listing
+  of all non-suppressed headers with each response
+
+0.073  2015-01-10 08:30 CET
+- Parser.pm: support bare 'test' URI path
+
+0.074  2015-01-13 18:28 CET
+- Parser.pm: adapt to new 'param/:type/:param' resource
+
+0.075  2015-01-14 06:13 CET
+- Parser.pm: enable 'docu/text' resource
+
+0.076  2015-01-15 09:23 CET
+- Parser.pm: 'docu/...' fix code for adding missing double-quotes; 'param/...'
+  do not attempt to add missing double quotes
+
+0.077  2015-01-21 06:46 CET
+- (CLI) HTTP.pm: make send_req die on error
+
+0.078  2015-01-29 21:13 CET
+- CLI: start migrating dochazka-cli to Web::MREST
+
+0.079  2015-01-30 17:40 CET
+- Parser.pm: separate 'employee/current' from 'employee/self'
+
+0.080  2015-02-02 10:13 CET
+- bin/dochazka-cli: tweak how responses are displayed
+
+0.081  2015-02-02 11:16 CET
+- Parser.pm: enable queries like ->get docu "foobar"<-
+
+0.082  2015-02-02 15:22 CET
+- bin/dochazka-cli: handle common failure scenarios "connection refused" and
+  "authentication failed" more gracefully
+
+0.083  2015-02-05 07:52 CET
+- Parser.pm: improve parsing of 'priv/history/eid/...' and 'priv/history/nick/...'
+
+0.084  2015-02-06 06:08 CET
+- Parser.pm: handle 0 arguments better in 'priv/...' resources
+
+0.085  2015-02-07 11:26 CET
+- Parser.pm: fix issue where timestamps were not getting appended properly
+
+0.086  2015-02-11 13:52 CET
+- Build.PL: require latest version of App::CELL
+- Parser.pm: recognize root resource
+
+0.087  2015-02-12 07:31 CET
+- Parser.pm: support 'employee/search/...'
+
+0.088  2015-02-16 08:23 CET
+- Parser.pm: add fallback to 'employee/search' noop
+
+0.089  2015-02-18 13:33 CET
+- bin/dochazka-cli, Help.pm: add infrastructure for displaying help messages
+- Parser.pm: add a 'SHOW' command
+
+0.090  2015-02-18 13:51 CET
+- Parser.pm: move all the HTTP testing stuff to a separate routine
+
+0.091  2015-02-18 16:45 CET
+- start implementing SHOW EMPLOYEE command
+
+0.092  2015-02-18 17:57 CET
+- CLI.pm: add exported storage for current date, employee object, privlevel
+- Show.pm: use 'GET employee/eid/:eid' to get the profile, since we might
+  be "masquerading" as a different employee
+
+0.093  2015-02-20 20:52 CET
+- Show.pm: continue implementing SHOW EMPLOYEE [$KEY] - take an optional argument
+  and apply heuristics in the look-up: first try nick, then sec_id, then eid
+  (no point in forcing the user to specify which one is intended)
+- Parser.pm: refinements; start to add support for SET EMPLOYEE
+
+0.094  2015-02-21 15:59 CET
+- bin/dochazka-cli: use normalize_filespec
+- Show.pm: handle undefined search key
+
+0.095  2015-02-23 20:58 CET
+- add fields to SHOW EMPLOYEE output
+
+0.096  2015-02-24 10:23 CET
+- Show.pm: fix bug in SHOW EMPLOYEE heuristics
+
+0.097  2015-02-24 17:53 CET
+- refactor for better maintainability and prepare to implement Term::ReadLine
+  custom completer (WIP)
+
+0.098  2015-03-02 15:28 CET
+- refactoring in progress
+
+0.098  2015-03-02 22:03 CET
+- refactoring WIP
+
+0.098  2015-03-03 14:36 CET
+- bin/dochazka-cli: display the right error message when parser dies
+  unexpectedly
+- CLI.pm: fix get_next_token, add debug messages to it
+- Level0/, Level1/: get parser working
+
+0.099  2015-03-03 18:21 CET
+- implement --debug|-d option
+
+0.100  2015-03-05 10:34 CET
+- CLI.pm: refactor lexer, syntaxer routines
+- t/parser/: start writing parser unit tests
+
+0.101  2015-03-05 16:49 CET
+- CLI.pm: new parser taking shape
+- t/parser/: add unit tests
+
+0.102  2015-03-05 18:07 CET
+- MANIFEST: add CommandMap.pm; deprecate Level[012]/
+- CLI.pm: parser refinements -- eliminate global variables
+- TokenMap.pm: move look_up_token from CLI.pm
+- t/parser/: adapt to current state
+
+0.103  2015-03-05 21:41 CET
+- CommandMap.pm: start work on dispatch table
+- Command/Activity.pm: re-implement some activity-related commands
+
+0.104  2015-03-06 07:32 CET
+- CLI/Commands/Activity.pm: implement activity commands
+- CLI/Commands/Top.pm: start implementing top-level commands
+- CLI.pm: work on remainder routine; deprecate get_next_token
+- CLI/CommandMap.pm: WIP
+- t/parser/look_up_command.t: test look_up_command routine
+- t/parser/remainder.t: test remainder routine
+
+0.105  2015-03-06 14:02 CET
+- CommandMap.pm: add entries for "top-level" commands
+- Commands/Activity.pm: instead of dying with send_req, die with reference to
+  an array that can be passed to send_req later (for easier testing of each
+  command implementation)
+- Commands/Top.pm: implement top-level commands
+- t/parser/look_up_command.t: test all implemented commands in two foreach
+  loops -- with and without JSON string
+
+0.106  2015-03-06 19:26 CET
+- Commands/: make it so command target functions return an arrayref instead of
+  dying with one
+- t/parser/look_up_command.t: adapt tests
+
+0.107  2015-03-07 12:01 CET
+- CommandMap.pm, Commands/: add $METHOD ACTIVITY and $METHOD EMPLOYEE
+  commands
+
+0.108  2015-03-07 18:03 CET
+- CLI.pm: yet another modification to the parser design
+- t/parse.t: TDD on the new parser
+
+0.109  2015-03-08 11:39 CET
+- complete revamp of the semantic analysis (command recognition) part
+  (WIP)
+
+0.110  2015-03-08 18:00 CET
+- revamped possible_words to use auto-generated semantic tree
+- get $METHOD commands to parse properly (WIP)
+
+0.111  2015-03-08 21:24 CET
+- various adjustments, t/parse.t now running cleanly
+- NEXT: implement priv, schedule commands
+
+0.112  2015-03-09 12:08 CET
+- Commands/: implement priv and schedule commands
+- TokenMap.pm: add _TIMESTAMP regex
+- t/parse.t: add basic tests for all new commands
+
+0.113  2015-03-09 16:22 CET
+- TokenMap.pm: fix bug in _NUM regex (single digits not recognized as numbers)
+- t/parse.t: add test case for single-digit _NUM
+- bin/dochazka-cli: use the new routines (parse, look_up_command, etc.)
+- CommandMap.pm: add EXIT
+- Commands/Top.pm: fix bugs
+
+0.114  2015-03-10 10:59 CET
+- bin/dochazka-cli: adapt to new setup
+- CLI.pm: now just a shell for storing package variables
+- Parser.pm: move parser routines here from CLI.pm
+- Commands/Show.pm: adapt to new setup
+- remove Test::Deep dependency (K.I.S.S.)
+
+0.115  2015-03-11 17:28 CET
+- implement SHOW ACTIVITY . . . commands
+- implement SET EMPLOYEE SEC_ID _TERM command
+
+0.116  2015-03-13 06:12 CET
+- HTTP.pm: delete deprecated module (using Web::MREST::CLI::UserAgent now)
+- Util.pm: new module for reusable routines such as rest_error
+- bin/dochazka-cli: fix two bugs
+- CommandMap.pm, Commands/Set.pm: implement EMPLOYEE_SPEC SET SEC_ID _TERM
+- Commands/Show.pm: use rest_error
+- TokenMap.pm: regex tweaks
+
+0.117  2015-03-13 20:30 CET
+- implement SET EMPLOYEE FULLNAME and EMPLOYEE_SPEC SET FULLNAME
+- minor cleanup
+
+0.118  2015-03-18 17:55 CET
+- bin/dochazka-cli, Parser.pm: make command processing testable
+  (process_command)
+- Util.pm: fix bug in lookup_employee, make rest_error return a string
+  instead of printing directly to STDOUT
+
+0.119  2015-03-19 10:13 CET
+- bin/dochazka-cli, Util.pm: move "authenticate_to_server", "init_cli_client",
+  and "init_logger" from the startup script to Util.pm so we can call them from
+  the test suite
+- t/commands/show.t: unit tests for "SHOW EMPLOYEE"
+
+0.120  2015-03-19 21:17 CET
+- Util.pm: make 'rest_error' return a status object with code 'DOCHAZKA_CLI_REST_ERROR'
+- t/commands/show.t: add 'SHOW ACTIVITY ALL' unit that tests for this
+
+0.121  2015-03-20 07:23 CET
+- t/001-init.t: add "tests" that create users with inactive and active
+  privlevels idempotently
+- t/cmd_active/: command tests as active user
+- t/cmd_inactive/: command tests as inactive user
+- t/cmd_admin/: command tests as admin user
+- t/cmd_passerby/: command tests as passerby user
+- bin/dochazka-cli: tweak how "authenticate_to_server" is called
+- Commands/: standardize that normal completion of CLI commands will return
+  status object with level OK and code DOCHAZKA_CLI_NORMAL_COMPLETION
+- Util.pm: make "authenticate_to_server" take a PROPLIST instead of positional
+  parameters
+
+0.122  2015-03-21 13:47 CET
+- Commands/RestTest/: move HTTP testing routines out of the way
+- rearrange code to implement new command syntax
+- adapt tests
+
+0.123  2015-03-24 09:03 CET
+- discovered a token-matching bug
+
+0.124  2015-03-24 17:49 CET
+- fix bugs introduced by last commit
+
+0.125  2015-03-24 18:29 CET
+- t/cmd_...: rearrange tests by new command categories (activity, employee,
+  etc.)
+- Util.pm: in rest_error, derive the return status from the REST server's
+  return status
+
+0.126  2015-03-24 21:35 CET
+- Build.PL: make it look more like the Build.PL from App::Dochazka::REST
+- t/cmd_...: add some very basic EMPLOYEE_SPEC tests
+
+0.127  2015-03-25 07:05 CET
+- t/cmd_..: make tests handle EIDs properly
+
+0.128  2015-03-25 15:26 CET
+- Parser.pm: make process_command distinguish REST test commands from normal
+  CLI commands and handle them accordingly
+- return the real status and not some dumb DOCHAZKA_CLI_NORMAL_COMPLETION
+- implement $METHOD employee search nick $SEARCH_KEY
+
+0.129  2015-03-25 16:22 CET
+- implement "GET schedule all" and "GET schedule all disabled" commands
+
+0.130  2015-03-26 07:44 CET
+- t/parse.t: add tests for newly supported rest_test commands
+- came up with idea for building up new schedules in memory
+- CommandMap.pm: add new SCHEDULE _DOW ... commands
+- Parser.pm: add support for multiple instances of the same token within a
+  single command
+- TokenMap.pm: add support for new _DOW and _TIME tokens
+
+0.131  2015-03-27 08:58 CET
+- Commands/Schedule.pm: basic infrastructure for building up a schedule in
+  memory for submission to the REST server
+
+0.132  2015-03-27 21:33 CET
+- add DUMP and MEMORY tokens
+- add "SCHEDULE DUMP", "SCHEDULE MEMORY", and "SCHEDULE NEW" commands
+- basic schedule-building and schedule-inserting functionality seems to work,
+  but no tests yet
+
+0.133  2015-03-28 20:21 CET
+- bin/dochazka-cli: improve reporting of non-OK statuses
+- CommandMap.pm, RestTest/Schedule.pm, t/parse.t: add missing REST test command
+  "$METHOD SCHEDULE SID $NUMBER"
+- Commands/Schedule.pm: do not push duplicate schedule entries into memsched
+- TokenMap.pm: include an "ALL" day of week (meaning replicate this interval to
+  all five days MON-FRI)
+
+0.134  2015-03-28 20:44 CET
+- bin/dochazka-cli: further refine reporting of errors
+- CLI_Message_en.conf: add an error message for when "schedule/new" is called
+  on empty memsched
+- CommandMap.pm: add "SCHEDULE ALL _TIMERANGE" for accelerated schedule entry
+  in cases when the schedule for MON-FRI is the same on each day
+- Commands/Schedule.pm: make sure there are memsched entries to begin with,
+  before sending REST call; implement "SCHEDULE ALL _TIMERANGE" command
+
+0.135  2015-03-30 08:57 CEST
+- implement "SCHEDULE CLEAR"
+- cleanup, tweaks
+
+0.136  2015-03-30 15:11 CEST
+- resolve two tickets
+- TokenMap.pm: expand EMPLOYEE_SPEC so we can do "nick=...", "sec_id=..." and
+  "eid=..."
+- Util.pm: make "lookup_employee" handle expanded EMPLOYEE_SPEC 
+- t/cmd_admin/employee.t: add test cases for expanded EMPLOYEE_SPEC
+
+0.137  2015-03-30 23:11 CEST
+- start adding scode support
+
+0.138  2015-03-31 17:18 CEST
+- implement 'SCHEDULE FETCH ALL' command
+- Commands/Schedule.pm: in 'schedule_new', give the user feedback when schedule
+  is successfully inserted (WIP: feedback should include info whether schedule
+  was actually inserted or only updated - if updated, there might be a conflict
+  between new scode and the original one; not clear what the program should do
+  in such a case)
+
+0.139  2015-04-03 07:05 CEST
+- implement 'SCHEDULE FETCH ALL DISABLED'
+
+0.140  2015-04-03 19:47 CEST
+- make 'SCHEDULE FETCH ALL [DISABLED]' display remarks, if present, and clearly
+  mark disabled schedules as such
+
+0.141  2015-04-04 15:27 CEST
+- implement commands:
+  - SCHEDULE_SPEC [SHOW]
+  - SCHEDULE_SPEC REMARK
+  - SCHEDULE_SPEC SCODE _TERM
+
+0.142  2015-04-04 21:46 CEST
+- start working on PRIV HISTORY and SCHEDULE HISTORY handlers
+- TokenMap.pm: add privlevels and _PRIVLEVEL
+- cleanup
+
+0.143  2015-04-05 11:34 CEST
+- add Text::Table dependency
+- lay groundwork for "PRIV", "EMPLOYEE_SPEC PRIV", "SCHEDULE", "EMPLOYEE_SPEC SCHEDULE",
+  "EMPLOYEE_SPEC PRIV HISTORY", and "EMPLOYEE_SPEC SCHEDULE HISTORY"
+- Commands/History.pm: implement handler for "[EMPLOYEE_SPEC] PRIV HISTORY"
+- Commands/Employee.pm: use 'App::Dochazka::REST::Model::Employee' instead of
+  'App::Dochazka::Model::Employee'
+
+0.144  2015-04-05 13:32 CEST
+- Commands/History.pm: add "print_schedule_history" routine
+- Commands/Priv.pm: new module containing "show_current_priv" handler routine
+- implement "[EMPLOYEE_SPEC] PRIV" and "[EMPLOYEE_SPEC] SCHEDULE" handlers
+
+0.145  2015-04-05 20:59 CEST
+- add Shared.pm with shared routines (priv/schedule etc.)
+- Commands/History.pm: look up and display scode and remark in schedule history
+  table
+
+0.146  2015-04-06 18:41 CEST
+- implement commands for adding priv and schedule history records
+
+0.147  2015-04-06 22:15 CEST
+- add commands for changing priv and schedule history remarks
+
+0.148  2015-04-07 09:29 CEST
+- Util.pm: in rest_error, handle case when payload is a string
+
+0.149  2015-04-07 11:51 CEST
+- CommandMap.pm: add synonyms
+- Commands/History.pm: fix typo bug in set_history_remark
+
+0.150  2015-04-07 13:38 CEST
+- Util.pm: add a 'truncate_to' function for limiting table columns that might
+  run on, and on, and on...
+- History.pm: use truncate_to; in _add_history look up sid when scode is given;
+  in print_schedule_history print the right remark; remove quotes in
+  set_history_remark
+- Schedule.pm: make schedule_new return status object with http_status property
+- t/001-init.t: create a schedule so we don't have to create one manually all
+  the time
+
+0.151  2015-04-07 17:08 CEST
+- Guide.pm: start writing proper CLI documentation
+- CLI.pm: move verbiage to Guide and link to it
+- Parser.pm: fix RT#102671 (Trailing '0' was throwing the parser)
+  https://rt.cpan.org/Ticket/Display.html?id=102671
+- cleanup
+
+0.152  2015-04-07 18:39 CEST
+- TokenMap.pm: add PASSWORD token and distinguish it from PASSERBY
+- CommandMap.pm: add some synonyms; add password-reset commands 'EMPLOYEE
+  PASSWORD' and 'EMPLOYEE_SPEC PASSWORD'
+- Commands/Employee.pm: add dummy handlers for the above commands
+- Guide.pm: document some commands
+
+0.153  2015-04-07 22:08 CEST
+- Commands/Employee.pm: implement password change handlers
+
+0.154  2015-04-09 10:13 CEST
+- Build.PL: acknowledge Web::MREST dependency
+- Guide.pm: document more commands/workflows
+
+0.155  2015-04-09 10:20 CEST
+- change all instances of 'App::Dochazka::REST::Model' to 'App::Dochazka::Model'
+
+0.156  2015-04-09 10:27 CEST
+- RestTest/Top.pm: fix dependency
+
+0.157  2015-04-09 10:30 CEST
+- t/cmd_admin/history.t: remove last vestiges of 'App::Dochazka::REST::Model'
+  (replace with App::Dochazka::Model) because we want the CLI to be independent
+  of the REST server
+
+0.158  2015-04-10 20:07 CEST
+- lay some groundwork for adding intervals
+
+0.159  2015-04-13 11:16 CEST
+- CommandMap.pm: add some command variants for entering new intervals
+- Commands/Activity.pm: set up a command handler for "parse test"
+- Commands/Interval.pm: add placeholder command handlers
+- Guide.pm: mention the new commands
+- Util.pm: implement 'parse_test' function; in 'truncate_to', do not attempt 
+  truncate operation unless string is really longer than the maximum length
+
+0.160  2015-04-13 13:43 CEST
+- Test.pm: new module for reusable test components, ATM mainly do_parse_test
+- Commands/Activity.pm: finesse how parse_test is called from command handler
+- Util.pm: fix parse_test
+- t/parser/commands.t: use do_parse_test
+
+0.161  2015-04-13 13:45 CEST
+- release.sh: suppress mv errors
+
+0.162  2015-04-13 14:37 CEST
+- Commands/Employee.pm: add parse_test boilerplate, re-arrange so command
+  handlers are separated from helper functions; make sure names of helper
+  functions start with _
+
+0.163  2015-04-13 14:51 CEST
+- found out that I had been (somewhat stupidly) sending the raw command string
+  to parse_test, but this will not work with commands like "EMPLOYEE=worker" --
+  should have been using the normalized command from the beginning -> fix
+
+0.164  2015-04-13 17:40 CEST
+- Commands/: reorganize routines and add parse_test support in remaining modules
+- t/: add more do_parse_test calls
+
+0.165  2015-04-13 18:01 CEST
+- add more equivalent variants of INTERVAL NEW commands
+- add parser support for INTERVAL SHOW commands
+- add lots of gratuitous test cases
+
+0.166  2015-04-14 08:38 CEST
+- add more intuitive command syntax for adding new intervals
+- Commands/Interval.pm: start working on a handler implementation
+
+0.167  2015-04-14 12:48 CEST
+- add t/util/ for testing the Util.pm module
+- Util.pm: come up with two new functions: tsrange_from_timestamps and
+  normalize_timestamp; write some documentation
+- Util.pm, t/util/ts.t: implement normalize_timestamp using TDD
+- TokenMap.pm: in _TIMESTAMP, recognize "TODAY", "TOMORROW", and "YESTERDAY"
+  and use named capture groups to extract the date part and time part
+- Parser.pm: add and comment out some print statements for debugging
+
+0.168  2015-04-14 13:52 CEST
+- Commands/History.pm: change _TIMESTAMP to _DATESTAMP where necessary
+- Commands/Interva.pm: implement handlers for adding new intervals
+- Util.pm: implement tsrange_from_timestamps routine
+- t/util/ts.t: add test cases for tsrange_from_timestamps 
+
+0.169  2015-04-14 15:39 CEST
+- t/cmd_active/001-init.t: new unit that creates a schedule history record for
+  employee "worker", so he can insert attendance intervals
+- Commands/History.pm: SCHEDULE_SPEC can be either scode or sid, but we forgot
+  to convert to lowercase => fix
+- Util.pm: truncate_to was generating a warning => fix
+- t/cmd_admin/history.t: add schedule history test case
+
+0.170  2015-04-15 09:36 CEST
+- Guide.pm: add section on creating new employees
+- Commands/Employee.pm: allow new password to be specified on the command line
+  and be more verbose when asking employee to repeat it
+
+0.171  2015-04-15 10:15 CEST
+- make history commands take _DATE only (instead of deprecated _DATESTAMP)
+
+0.172  2015-04-15 10:30 CEST
+- get rid of _DATESTAMP completely, replace it with _TIMESTAMP
+- replace the old _TIMESTAMP with _TIMESTAMPDEPR
+
+0.173  2015-04-15 20:08 CEST
+- Build.PL: bring in Date::Calc dependency
+- CLI.pm, bin/dochazka-cli: re-name "prompt date" package variable from
+  $current_date to $prompt_date
+- Util.pm, t/util/ts.t: split normalize_timestamp into normalize_date and
+  normalize_time; handle offsets
+- CommandMap.pm, Commands/Interval.pm, t/parser/commands.t: re-vamp interval
+  insertion commands; use normalize_date and normalize_time
+
+0.174  2015-04-16 07:12 CEST
+- Commands/Interval.pm: eliminate some code duplication
+- CommandMap.pm: add some new interval insertion commands
+- CLI_Message_en.conf: add some proper error messages
+- Util.pm: make argument processing more robust
+- t/parser/commands.t: add basic parse tests for missing interval commands;
+  update existing tests to current state
+
+0.175  2015-04-16 09:51 CEST
+- t/cmd_active/interval.t: start developing functional tests of INTERVAL
+  commands
+- Commands/Interval.pm: eliminate more code duplication; arrive at a name
+  _tsrange_from_dates_and_times for helper function; add _print_interval helper
+  function
+- Util.pm: make 'init_cli_client' call init_timepiece()
+
+0.176  2015-04-16 14:07 CEST
+- bin/dochazka-cli, Util.pm: special handling of REST_ERROR status code
+- CommandMap.pm: re-vamp commands for fetching intervals
+- Commands/Interval.pm: implement "interval_fetch_promptdate" handler,
+  "_print_intervals_tsrange" helper function
+- TokenMap.pm: add months of the year
+
+0.177  2015-04-16 15:13 CEST
+- Commands/Misc.pm: new module for miscellaneous command handlers
+- add commands (PROMPT, PROMPT DATE) for changing the prompt date
+- Util.pm: add write 'determine_employee' routine
+- CommandMap.pm, Commands/Interval.pm: add "EMPLOYEE_SPEC ..." variants for
+  "INTERVAL", "INTERVAL FETCH", and "INTERVAL _DATE"
+- Commands/Employee.pm: eliminate code duplication by using determine_employee
+- t/parser/commands.t: adapt to current state
+
+0.178  2015-04-16 18:31 CEST
+- Commands/Interval.pm: display fetched intervals in table form
+
+0.179  2015-04-17 13:22 CEST
+- add lots more commands for fetching/displaying attendance intervals
+
+0.180  2015-04-17 13:50 CEST
+- t/parser/commands.t: add basic parse tests for the new interval fetching
+  commands
+- CommandMap.pm: fix typo uncovered by the new parse tests
+
+0.181  2015-04-17 15:32 CEST
+- add "REST Test" commands for the new 'schedule/intervals/...' resources
+
+0.182  2015-04-18 18:16 CEST
+- rename "SCHEDULE INTERVALS" commands, resources, etc. to "INTERVAL FILLUP"
+
+0.183  2015-04-18 18:35 CEST
+- make "INTERVAL FILLUP" REST-test commands take lower and upper date bounds
+  instead of tsrange
+
+0.184  2015-04-18 20:03 CEST
+- bin/dochazka-cli: use Data::Dumper to display payload when status is OK and
+  payload is not a number or string
+- add INTERVAL FILLUP commands (piggyback on INTERVAL FETCH)
+
+0.185  2015-04-27 16:59 CEST
+- give active testing employee a schedule already in t/001-init.t;
+  get rid of unintuitive t/cmd_active/001-init.t
+- use prompt date (century, year, month, etc.) instead of current date
+  (century, year, month, etc.)
+- Test.pm: add a 'delete_interval' test routine
+- t/cmd_active/interval.t: expand unit; use imported 'delete_interval' routine;
+  test that "PROMPT 2015-01-01" does change all the $prompt_... variables
+
+0.186  2015-04-28 17:34 CEST
+- t/util/: add two new units auth.t and determine_employee.t
+- Util.pm: abolish 'quiet' parameter to authenticate_to_server and make routine
+  completely mute; validate a parameter; document routines better; refactor
+  authenticate_to_server for code readability and more reasonable return value;
+  lookup_employee: fix bugs uncovered by unit testing
+- bin/dochazka-cli: move in authentication announcement from
+  authenticate_to_server
+
+0.187  2015-04-29 19:47 CEST
+- Util.pm, t/util/ts.t: more documentation improvement; remove deprecated
+  tsrange_from_timestamps routine; use $prompt_year instead of $current_year;
+  eliminate deprecated $current_{year,century,month} package variables
+- CommandMap.pm, Parser.pm: move functions from CommandMap.pm to Parser.pm;
+  improve description of the semantic tree
+- t/cmd_active/interval.t: add tests to fetch intervals created by this unit
+- t/parser/: test generate_semantic_tree documentation
+
+0.188  2015-04-29 20:43 CEST
+- CLI.pm, Test.pm: improve readability
+- t/util/truncate.t: unit tests for 'truncate_to'
+
+0.189  2015-05-01 12:00 CEST
+- Test.pm: rename delete_interval -> delete_interval_test; add fetch_interval_test
+- t/cmd_active/interval.t: use fetch_interval_test
+
+0.190  2015-06-28 15:29 CEST
+- CommandMap.pm: put employee REST test commands in alphabetical order
+- CommandMap.pm: add REST test commands for 'employee/list/?:priv' resource
+- RestTest/Employee.pm: add dispatch targets for 'employee/list/?:priv' resource
+- TokenMap.pm: add LIST token 
+
+0.191  2015-06-28 16:15 CEST
+- CommandMap.pm: add EMPLOYEE LIST and EMPLOYEE LIST _TERM targets
+- Commands/Employee.pm: implement the employee_list() function
+- Guide.pm: document the EMPLOYEE LIST and EMPLOYEE LIST _TERM targets
+
+0.192  2015-06-30 18:46 CEST
+- t/cmd_admin/employee.t: convert comments to notes
+- t/cmd_admin/employee.t: add basic tests of EMPLOYEE LIST command
+- t/boilerplate.t: this unit's usefulness is questionable; drop it
+- t/util/auth.t: avoid running any tests before first call to
+  authenticate_to_server(), because it might result in "plan skip_all"
+
+0.193  2015-07-01 17:13 CEST
+- implement REST test and normal commands for 'employee/team',
+  'employee/eid/:eid/team' and 'employee/nick/:nick/team' resources
+
+0.194  2015-07-01 22:39 CEST
+- implement "EMPLOYEE TEAM" and "EMPLOYEE_SPEC TEAM" commands
+
+0.195  2015-07-04 19:43 CEST
+- bin/dochazka-cli: honor sitedir option; prompt for password
+
+0.196  2015-07-04 22:12 CEST
+- bin/dochazka-cli: use init_prompt() instead of init_timepiece()
+- bin/dochazka-cli: initialize prompt date every time prompt is displayed
+- Util.pm: import init_timepiece() from App::Dochazka
+- Util.pm: implement init_prompt()
+- Commands/Misc.pm: use init_prompt() instead of init_timepiece()
+
+0.197  2015-07-05 14:19 CEST
+- bin/dochazka-cli: $sitedir fall back to /etc/dochazka-cli
+- require latest version of App::Dochazka for $today
+- change Supervisor: to Reports to: in EMPLOYEE PROFILE output
+
+0.198  2015-07-21 16:13 CEST
+- Define $VERSION only in CLI.pm and Guide.pm
+- Rename App::Dochazka::Common and update copyright statement
+
+0.199  2015-07-22 14:51 CEST
+- Convert MREST_CLI_URI_BASE to a meta param
+- bin/dochazka-cli
+    - get home directory using File::HomeDir
+    - add --version option and take optional URL as argument
+    - prompt for username and password if not supplied
+
+0.200  2015-07-23 08:54 CEST
+- Util.pm: modify lookup_employee() to take hash of properties ...
+- t/: make sure config is loaded in test suite
+- Util.pm and t/: Rename App::Dochazka to App::Dochazka::Common
+- Build.PL: rename App::Dochazka to App::Dochazka::Common
+- bin/dochazka-cli: do not display password as it is typed and ignore password
+  stored in config if username not taken from config
+- Do not generate Makefile.PL anymore
+
+0.201  2015-07-23 18:47 CEST
+- t/: adapt to current state
+- Util.pm: use GET employee/.../minimal in determine_employee()
+- TokenMap.pm: add LDAP token
+- Commands/RestTest/Employee.pm: implement employee/nick/:nick/ldap resource
+- Commands/Employee.pm: implement employee_ldap()
+- CommandMap.pm: enable LDAP commands
+- Commands/Employee.pm: display supervisor nick instead of EID
+
+0.202  2015-07-25 04:09 CEST
+- release scripting modifications
+- cleanup: Commands/Activity.pm: display "Entering (etc.)" only in debug mode.
+- Implement EMPLOYEE_SPEC LDAP IMPORT command
+- Commands/Employee.pm: report to admins whether LDAP user is also a Dochazka
+  user
+- t/: put config load test in the right place
+- Commands/Employee.pm: export employee_ldap() function
+
+0.203  2015-07-25 19:01 CEST
+- Util.pm: make refresh_current_emp() handle server insanity more robustly
+- Commands/Employee.pm: implement determine_priv() helper function
+- t/: adapt test suite to current state
+- t/cmd_passerby/employee.t: convert comments to note() calls
+- CommandMap/Employee.pm: implement EMPLOYEE_SPEC SUPERVISOR _TERM command
+- CommandMap.pm: add EMPLOYEE_SPEC SUPERVISOR _TERM command
+- TokenMap.pm: add SUPERVISOR token
+- Build.PL: update repository and bugtracker resources
+- config/CLI_Config.pm: suppress more headers
+
+0.204  2015-07-25 23:33 CEST
+- Util.pm: in lookup_employee(), do not go on to sec_id check when nick check
+  returns 403
+- Shared.pm: rename show_current() to show_as_at() to generalize it
+- Commands/: rename current routines to as_at in Priv.pm and Schedule.pm
+- CommandMap.pm: rename current routines to as_at and add PRIV and SCHEDULE
+  commands with _DATE parameter
+- Util.pm: expose determine_employee() argument in debug log
+
+0.205  2015-07-27 10:14 CEST
+- Build.PL: require a recent version of Web::MREST
+- bin/dochazka-cli: use JSON->encode, instead of Data::Dumper, to format
+  statuses for display to user
+- Add boilerplate for SCHEDULE ALL and SCHEDULE ALL DISABLED commands
+- Shared.pm: refrain from displaying time in show_as_at()
+
+0.206  2015-07-27 13:58 CEST
+- CommandMap.pm: change second _DATE to _DATE1
+  (fixes Github issue #5)
+
+0.207  2015-07-27 14:08 CEST
+- Build.PL: change Web::MREST dependency to Web::MREST::CLI
+
+0.208  2015-07-27 14:43 CEST
+- Util.pm: import normalize_filespec() from Web::MREST::CLI::UserAgent
+
+0.209  2015-07-27 21:34 CEST
+- Util.pm: make CRIT log message more reasonable
+- Commands/Employee.pm: use Term::ReadKey noecho mode when user types his
+  password
+- Commands/Employee.pm: fix a regression in lookup_employee()
+
+0.210  2015-07-28 12:32 CEST
+- Improve error message when user enters attempts to enter a new interval with
+  a non-existent activity code
+  Fixes: https://github.com/smithfarm/dochazka-cli/issues/10
+
+0.211  2015-07-30 15:23 CEST
+- Util.pm: drop init_cli_client() in favor of the one from Web::MREST::CLI
+- bin/dochazka-cli: enable --early-debug option
+- t/: drop superfluous boilerplate units
+- Routines that were in Web::MREST::CLI::UserAgent are now in Web::MREST::CLI
+
+0.212  2015-07-30 16:14 CEST
+- Commands/Employee.pm: make a _display_employee_ok() helper function
+  to assemble the OK return staus from EMPLOYEE PROFILE
+- t/cmd_admin/employee.t: add test cases for EMPLOYEE_SPEC SUPERVISOR _TERM
+- Commands/Employee.pm: make EMPLOYEE_SPEC SUPERVISOR _TERM output prett
+
+0.213  2015-07-31 11:14 CEST
+- Commands/Interval.pm: implement a _fillup_dry_run() function to help fetch
+  and format fillup intervals
+- bin/dochazka-cli: reinstate --debug parameter
+
+0.214  2015-07-31 23:22 CEST
+- work on https://github.com/smithfarm/dochazka-cli/issues/12
+  - Commands/Interval.pm: fix syntax errors introduced in 0.213
+  - Commands/Interval.pm: make _fillup_dry_run() return prettier output
+
+0.215  2015-08-02 16:57 CEST
+- Build.PL: require latest version of Web::MREST:CLI
+
+0.216  2015-08-11 19:05 CEST
+- Commands/Interval.pm: add _interval_fillup_delete_print() helper function
+- Commands/Interval.pm: remove "fetch_" from function names
+- Build.PL: require newest App::Dochazka::Common
+- Implement GET HOLIDAY $TSRANGE command
+
+0.217  2015-08-16 23:23 CEST
+- Implement INTERVAL FILLUP _TSRANGE command
+- Commands/Interval.pm: temporary fix for _fillup_dry_run() exception
+- CommandMap.pm: interval/fillup resources now take a tsrange instead of two dates
+- t/parser/rest_test.t: interval/fillup resources take a tsrange now
+- Add INTERVAL FETCH ... COMMIT commands
+- Commands/Interval.pm: make handlers commit-aware
+
+0.218  2015-12-11 12:13 CET
+- t/cmd_active/employee.t: fix check for ACL_VIOLATION
+- prerelease.sh: copy new prerelease script from REST
+- global: do not convert warnings into errors
+- tests: use Test::Warnings to check for unexpected warnings
+- update release and prerelease scripts
+
+0.219  2016-01-06 21:11 CET
+- Guide.pm: tell how to look up individual schedules
+- Commands/Interval.pm: be aware of partial intervals
+- Commands/Interval.pm: get count from $status->{'count'}
+- CommandMap.pm: fix INTERVAL DELETE
+- plumb in INTERVAL SUMMARY commands
+- bin/dochazka-cli: tweak how NON_OK error statuses are displayed
+
+0.220  2016-01-09 22:14 CET
+- COMPONENT PATH command: first draft (commented out for now)
+- prerelease.sh: fix date template
+- GENERATE REPORT: implement new command
+
+0.221  2016-01-11 22:40 CET
+- Build.PL: require latest version of App::Dochazka::Common
+- INTERVAL REPORT: basic implementation
+- INTERVAL REPORT: more advanced implementation
+- bin/dochazka-cli: become aware of non-interactive usage
+
+0.222 2016-01-12 00:41 CET
+- MANIFEST.SKIP: avoid docker/ directory
+- docker/: add Dockerization
+- Testers.pm: a place to hold instructions for volunteer testers
+- Testers.pm: first test is to meet the prerequisites
+
+0.223 2016-01-12 15:26 CET
+- Testers.pm: have them first login with demo/demo
+- bin/dochazka-cli: show prompt/commands in non-interactive mode
+- CLI/Testers.pm: add testing session 1
+
+0.224 2016-01-14 13:10 CET
+- Build.PL: require Web::MREST::CLI 0.279 for bugfixes
+- bin/dochazka-cli: add rudimentary custom completion function
+  https://github.com/smithfarm/dochazka-cli/issues/27 Fixes: #27
+- CLI/Guide.pm: remove VERSION
+
+0.225 2016-01-14 17:19 CET
+- bin/dochazka-cli: tell JSON to not decode UTF-8
+  https://github.com/smithfarm/dochazka-cli/issues/24 Fixes: #24
+
+0.226 2016-01-14 19:54 CET
+- Build.PL: require Web::MREST::CLI 0.280 for UTF-8 bugfix
+- Testers.pm: in PREREQUISITES describe non-Docker way
+
+0.227 2016-01-14 20:16 CET
+- Revert "Drop VERSION from CLI/Guide.pm"
+
+0.228 2016-01-15 00:50 CET
+- tests:
+  - t/cmd_admin/employee.t: improve debuggability (log to file, etc.)
+  - t/cmd_admin/employee-utf8.t: new test
+- bin/dochazka-cli: beginnings of tab completion
+
+0.229 2016-01-15 22:25 CET
+- Extend copyright into 2016
+- tab completion:
+  - TokenMap.pm: rename $regex_map -> $token_map, add $completion_map
+  - Completion.pm: working custom completion
+  - custom completion: fix various issues
+  - CommandMap: add some noop commands to fix tab completion
+
+0.230 2016-01-16 20:35 CET
+- tab completion:
+  - fix some minor glitches
+  - add tab completion tests
+  - drop a senseless dependency
+- CLI/Testers.pm: clarify PREREQUISITES
+
+0.231 2016-01-25 23:25 CET
+- release.sh: save some typing by automating version number to OBS
+- bin/dochazka-cli: make debug-level log messages visible in log
+- Util.pm: put datelist helper functions in Util.pm
+- Util.pm: stabilize and test datelist_from_token()
+- TokenMap.pm: add _DATELIST (for use with INTERVAL FILLUP)
+- CommandMap.pm: adapt FILLUP commands to redesigned REST resource
+- Refactor INTERVAL FILLUP commands
+- Commands/Interval.pm: basic INTERVAL FILLUP functionality
+
+0.232 2016-01-26 07:47 CET
+- Util.pm: use debug log level
+- t/util/datelist.t: cleanup, initialize logger
+
+0.233 2016-01-30 23:45 CET
+- Remove INTERVAL FILLUP DATELIST ambiguity
+- Commands/Interval.pm: expand statistics reported by INTERVAL FILLUP
+- simplify INTERVAL FILLUP command syntax by removing _MONTH
+- bin/dochazka-cli: drop annoying "Payload: undef" from output of certain commands
+- Completion.pm: eliminate tab completion warning
+- pod (Testers.pm): add sessions 2, 3, 4, and 5
+
+0.234 2016-02-01 00:42 CET
+- Testers.pm: add subsection headings in session 5
+- bin/dochazka-cli: use Dumper to display non-scalar payloads
+
+0.235 2016-02-02 10:39 CET
+- Testers.pm: rewrite database initialization step
+- Testers.pm: tell users to start the server; work on session 6
+
+0.236 2016-02-04 11:17 CET
+- doc: Guide.pm: fix activity disable/re-enable examples
+- Testers.pm: finish session 6, start session 7
+- Util.pm->normalize_date(): check sanity of resulting date
+- Commands/Interval.pm: remove confusing partial interval message
+
+0.237 2016-09-04 20:12 CEST
+- Parser.pm: provide better parser state dumps in debug mode
+- RestTest: implement GET configinfo
+- Util.pm: report logfile location to user at startup
+- Saner sitedir handling
+- Travis CI
+
+0.238 2016-09-15 13:33 CEST
+- cleanup: drop ignore.txt
+- build/ops: new file CLI_SiteConfig.pm.example
+

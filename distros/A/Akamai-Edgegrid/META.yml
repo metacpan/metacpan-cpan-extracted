@@ -1,0 +1,28 @@
+---
+abstract: 'Akamai {OPEN} Edgegrid Authentication'
+author:
+  - 'Jonathan Landis <jlandis@akamai.com>'
+build_requires:
+  JSON: 0
+  Test::More: 0
+  Test::Pod: 1.22
+  Test::Pod::Coverage: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Akamai-Edgegrid
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config::IniFiles: 0
+  Data::UUID: 0
+  LWP: 5.834
+  perl: 5.006
+version: v1.0.5

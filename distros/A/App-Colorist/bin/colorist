@@ -1,0 +1,134 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use App::Colorist;
+
+# PODNAME: colorist
+# ABSTRACT: Add colors to your plain old output
+
+my $app = App::Colorist->new_with_options;
+$app->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+colorist - Add colors to your plain old output
+
+=head1 VERSION
+
+version 0.150460
+
+=head1 SYNOPSIS
+
+  colorist [ options ] files...
+
+  Options:
+      -c --configuration - name the configuration to use
+      -R --ruleset       - name the colorist ruleset to use
+      -C --colorset      - name the colorist colorset to use
+      -I --include       - add a directory to the config search path
+      -e --execute       - the remaining arguments are a command to run
+      -E --stderr        - when running a command, colorize STDERR too
+      --debug            - turn on debugging (you probably don't want to)
+
+=head1 DESCRIPTION
+
+Before this application will work, it must be configured. See L<App::Colorist> for information on getting started with existing configuration or writing your own.
+
+This is a script to colorize a file or command output in place. There are three basic ways to use this command.
+
+=over
+
+=item 1.
+
+The common intended use is to work as a tool for running other programs and capturing their output. For example, to colorize the output of the C<cpanm> program, you can perform the following (if you have the configuration for this command available in your F<.colorist> directory):
+
+  alias cpanm="colorist -E cpanm"
+  cpanm App::Colorist
+
+Now, anytime C<cpanm> is run, it will have it's output colorized.
+
+=item 2.
+
+You can colorize arbitrary files, so if you want to colorize a log file you have configured:
+
+  colorist -c errorlog error.log error-20140622.log error-20140621.log
+
+Each file on the command-line will be read and colorized in order. You might want to pipe to C<less> after doing this. When doing this, you must use the C<-c> option to name which colorist configuration should be used to colorize the lines.
+
+=item 3.
+
+You can colorize any input piped into the program as well:
+
+  cat error.log | colorist -c errorlog
+
+As with the previous example, you must pass the C<-c> option to name the configuration to use.
+
+=back
+
+=head1 OPTIONS
+
+=head2 -c --configuration
+
+For example,
+
+  -c cpanm
+
+This names the set of configuration files to use. This is the name of the sub-directory containing the rulesets and colorsets used to configure F<colorist>. The actual locations of the directories containing colorist configuration are described in L<App::Colorist/Finding Configuration>.
+
+=head2 -R --ruleset
+
+For example,
+
+  -R rules
+
+Each named configuration may contain more than one ruleset. If this option is not set, the ruleset named "rules" will be used.
+
+=head2 -C --colorset
+
+For example,
+
+  -C colors
+
+Each named configuration may contain more than one colorset (or color theme, if you prefer). If this option is not set, the colorset named "colors" will be used.
+
+=head2 -I --include
+
+  -I $HOME/colorist-configs
+
+Normally, only F</etc/colorist> and F<~/.colorist> are searched for colorist configuration. With this option set, it will look in other directories you name.
+
+=head2 -e --execute
+
+If this flag is set, the additional arguments on the command line are treated as a command name and arguments to pass to it during execution. The standard output stream of the command will be captured and colored.
+
+=head2 -E --stderr
+
+This flag implies C<-e>. In addition to capturing standard out, this will also capture standard error and colorize it too.
+
+=head2 --debug
+
+You probably don't want to bother with this. It is primarily helpful for testing, though it might be helpful in testing colorist configurations. Instead of colorizing the output, the output will have notation like "{10}" added where each color would be. The number inside is the ANSI color number that would have been used normally. Also "{reset}" is used when the ANSI reset code would be sent.
+
+=head1 ENVIRONMENT VARIABLES
+
+This application will read a single environment variable, C<COLORIST_CONFIG>, which is basically identical to passing an C<--include> option to the command-line. It is a colon-separated list of paths that will be searched for configuration.
+
+=head1 AUTHOR
+
+Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Qubling Software LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

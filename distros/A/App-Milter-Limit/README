@@ -1,0 +1,55 @@
+milter-limit
+============
+
+This distribution contains the milter-limit program and its modules.  This is a
+sendmail milter for limiting message send rate by sender.
+
+INSTALLATION
+
+To install the milter type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+*** YOU MUST ALSO INSTALL A PLUGIN BACKEND TO STORE STATISTICS ***
+
+App::Milter::Limit needs a plugin to store mail statistics.  Two plugins
+maintained by myself are App::Milter::Limit::Plugin::SQLite, and
+App::Milter::Limit::Plugin::BerkeleyDB, which use an SQLite database, and a
+BerkeleyDB database respectively to store the statistics used by
+App::Milter::Limit.  You MUST install one of these plugins to use
+App::Milter::Limit.
+
+Download your desired plugin from CPAN, and follow their instructions to
+install them.
+
+CONFIGURATION
+
+copy the configuration file conf/milter-limit.conf to
+/etc/mail/milter-limit.conf and edit it to suit your needs.
+
+The default configuration will use the SQLite plugin and stores statistics in
+/var/db/milter-limit.
+
+You also need to tell sendmail about the milter.  Add something like the
+following to your sendmail.mc and generate a new sendmail.cf:
+
+INPUT_MAIL_FILTER(`milter-limit', `S=local:/var/run/milter-limit.sock')
+
+Finally, you need to arrage for the milter to start at boot time.  some init
+scripts are available in the contrib directory.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 Michael Schout.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either:
+
+    *   the GNU General Public License as published by the Free Software
+        Foundation; either version 1, or (at your option) any later
+        version, or
+
+    *   the Artistic License version 2.0.
+

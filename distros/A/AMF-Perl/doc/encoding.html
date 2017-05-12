@@ -1,0 +1,15 @@
+<h2>Using non-standard encoding</h2>
+Kostas Chatzikokolakis submitted a patch with the following explanation:
+<br>
+All data in flash remoting are sent as unicode. However, database data
+and scripts are usually in a local encoding. I made some enhacements to
+AMF::Perl so that it automatically converts all strings to utf8 when sending
+and back to the given encoding when receiving. The usage is:
+<pre>
+my $gateway = new AMF::Perl;
+$gateway->encoding("iso-8859-7");
+$gateway->setBaseClassPath("Services/");
+$gateway->service();
+</pre>
+
+<a href=index.html>Go back to the AMF::Perl documentation</a>

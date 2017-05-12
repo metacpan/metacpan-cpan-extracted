@@ -1,0 +1,100 @@
+# PODNAME: WritingHooks
+# ABSTRACT: How to write a Juju charm hook
+
+__END__
+
+=pod
+
+=head1 NAME
+
+WritingHooks - How to write a Juju charm hook
+
+=head1 Writing a hook
+
+We'll start with an example of a F<config-changed> hook and break down the
+code piece by piece
+
+  #!/usr/bin/env perl
+  BEGIN {
+      # Install charmkit
+      system "curl -L http://charmkit.pl/setup.sh | sh";
+  }
+
+  use charm;
+
+C<use charm> is the entrypoint to exposing charm routines useful for deploying
+the service. This provides facilities such as installing packages, printing logs,
+getting relation information, and configuring service level options.
+
+  my $port = config 'port';
+
+C<config> routine will pull config options defined in F<config.yaml>.
+
+  # close existing bitlbee port
+
+  ( my $output = qq{BITLBEE_PORT=$port
+  BITLBEE_OPTS="-F"
+  BITLBEE_DISABLED=0
+  BITLBEE_UPGRADE_DONT_RESTART=0
+  } );
+
+  file "/etc/default/bitlebee", content => $output;
+
+  service 'bitlbee' => 'restart';
+
+C<service> is another helper for start/stopping services on the system
+where the charm is placed.
+
+  run "open-port $port";
+
+C<open_port> exposes a port accessible publicly, and its opposite C<close_port> will
+remove that accessibility.
+
+=head1 Adding custom libraries
+
+There are cases where you want to write reusable subroutines to be used
+throughout your charm hooks. charmkit will automatically search in your toplevel
+project searching for a B<lib> directory. Similar to how you write Perl modules.
+
+For example, your directory structure
+
+The structure your project should look similar to:
+
+  charm-project/
+    hooks/
+      install
+      config-changed
+      start
+      stop
+      upgrade-charm
+    tests/              # Functional
+      00-basic.test
+    lib/                # Add lib to toplevel charm directory
+      bitlbee.pm
+    t/                  # Unit
+      01-test-bitlbee.t
+    config.yaml
+    metadata.yaml
+    LICENSE
+    README.md
+
+Now in your hook file you can just call:
+
+  #!/usr/bin/env perl
+  use charm;
+
+  plugin 'bitlbee';
+  $bb->syntax_check_config;
+
+=head1 AUTHOR
+
+Adam Stokes <adamjs@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Adam Stokes.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

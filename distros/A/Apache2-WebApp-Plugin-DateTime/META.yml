@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name: Apache2::WebApp::Plugin::DateTime
+abstract: Common methods for dealing with Date/Time.
+version: 0.07
+author:
+  - Marc S. Brooks <mbrooks@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  Apache2::WebApp: 0.38
+  Date::Calc: 5.4
+  Date::Format: 2.22
+  Date::Manip: 5.54
+  Params::Validate: 0
+  Time::ParseDate: 2003.0211
+build_requires:
+  Apache::Test: 0
+resources:
+  license: http://dev.perl.org/licenses/
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html

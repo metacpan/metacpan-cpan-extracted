@@ -1,0 +1,39 @@
+Revision history for Camel-PKI
+
+0.07	2008/11/21
+		Modification of views to give more information
+		Added templates for OpenVPN clients and servers
+		Tests refactoring in App::CamelPKI::CertTemplate::VPN
+
+0.06	2008/11/16
+		Correction of a bug in getting the CRL in DER format
+
+0.05	2008/11/15
+		Refactoring of tests
+		Correction of function using json due to deprecation of the old-ones
+		Adding detection of environment in order to run tests ... or not :)
+		App::Info::HTTPD::Apache is used to test if apach is installed
+
+0.04	2007/08/08
+		Modification of view to consult revoked certificates
+		Correction of a bug in SSLClient (to authenticate to server)
+
+0.03	2007/07/25
+		Integration of errors in the web interface
+		Tests added to test revocation through Forms (SSL and VPN)
+		Tests added for crl
+		Page to consult a certificate's information based on its serial
+		Configuration file enables configuration of the dns name of the webserver
+		Correction of a bug in revocation using forms
+		Page to display revoked certificates (in a human-readable style)
+		Page to display valid and issued certificates added (in a human-readable style)
+		Welcome page added
+		Functionnalities to view/download CRL added
+		Pages to issue/revoke certificates added
+
+0.02	2007/07/04
+		Correction of bugs to pass tests.
+
+0.01    2007/06/26
+        First version, released on an unsuspecting world.
+

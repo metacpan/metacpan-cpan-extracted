@@ -1,0 +1,25 @@
+Acme-Constructor-Pythonic
+=========================
+
+Created:      2012-10-21
+Home page:    <https://metacpan.org/release/Acme-Constructor-Pythonic>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Acme-Constructor-Pythonic>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2014-04-22	Almost total rewrite
+
+ [ Test Suite ]
+ - Test exported subs using Sub::Identify if it's available.
+
+ [ Packaging ]
+ - use Dist::Inkt.
+
+ [ Other ]
+ - Exceptions thrown in the wrapped constructor will report slightly more
+   useful line numbers and so on in their stack traces.
+ - Exported subs should run slightly faster as they are compiled from
+   strings rather than being closures.
+ - Exported subs will have a more consistent refaddr.
+ - Updated: Use Exporter::Tiny instead of Sub::Install+Data::OptList.
+
+0.001	2012-10-22	Initial release

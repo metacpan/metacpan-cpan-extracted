@@ -1,0 +1,64 @@
+=head1 NAME
+
+Apache2::Filter::HTTPHeadersFixup Changes file
+
+=over
+
+
+=item 0.06 - 
+
+Take Maintainership 
+[Philip M. Gollucci <pgollucci@p6m7g8.com>]
+
+Update to the mp2 post RC5 API
+[Philip M. Gollucci <pgollucci@p6m7g8.com>]
+
+=item 0.05 - Mon Jan  3 01:03:12 EST 2005
+
+sync APR::Bucket->new API with mp-1.99_17 and require it
+
+pass non-data META buckets through 
+
+fix the (temporary request/connection long) memory s/remove/delete/.
+APR::Bucket::delete requires mp1.99_16
+
+
+
+=item 0.04 - Fri Aug 20 12:33:39 PDT 2004
+
+adjust the code to use the latest mod_perl 2.0 API (require 1.99_15
+for mp2 builds)
+
+require at least Apache::Test 0.13 (changed order of t_cmp)
+
+use the faster $bb->flatten to get the data in output filter handler
+(instead of manually traversing bb)
+
+
+
+=item 0.03 - Wed Apr 14 13:21:07 PDT 2004
+
+fix the headers resetting bug [John D.Lima <lima@5cats.org>]
+
+
+
+=item 0.02 - Mon Mar  1 19:01:42 PST 2004
+
+by default disable the debug calls (which were consuming time even
+when debug level was low)
+
+now works over KeepAlive connections (adjust tests to test that)
+
+documenations fixes [Adam Sjøgren <asjo@koldfront.dk>]
+
+
+
+=item 0.01 - Mon Dec 22 13:06:25 PST 2003
+
+first version
+
+=back
+
+
+
+=cut

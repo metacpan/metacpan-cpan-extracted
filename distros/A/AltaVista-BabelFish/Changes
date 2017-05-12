@@ -1,0 +1,9 @@
+Revision history for Perl extension AltaVista::BabelFish.
+
+42.0.2  Sun Apr  1 00:00:09 2007
+	- resolved prereq that was actually optional (rt 26000, thanks Andreas Koenig)
+
+42.0.1  Sun Feb  6 11:42:29 2005
+	- original version; created by h2xs 1.22 with options
+		-AXc -n AltaVista::BabelFish
+

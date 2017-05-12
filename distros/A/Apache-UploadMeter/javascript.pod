@@ -1,0 +1,288 @@
+=head1 NAME
+
+JavaScript_Guide for Apache::UploadMeter
+
+=head1 SYNOPSIS
+
+    // Register a global callback
+    UploadMeter.Responders.register({
+        onCreate: function (meter) {
+            Element.update(meter.desc, "Please wait...");
+        }
+    });
+    
+    // Create a new UploadMeter
+    var um = new UploadMeter(el, meter_id, meter_url, {
+        // Callback to be executed every time we get a status update
+        onUpdate: function (status, last) {
+            Element.update('file', "Now uploading: " + status.filename);
+            Element.update('bytes', status.seen + "/" + status.total + "  bytes transfered (" + Util.formatDec(status.currentrate) + " bytes/sec)");
+            Element.update('time', Util.formatTime(status.elapsed) + " elapsed (" + Util.formatTime(status.remaining) + " remaining)"); 
+        },
+        onFinished: function(status, last) {
+        // Callback to be executed when we've detected a complete upload and stop the meter
+            Element.show('closeme');
+        }
+    });
+    
+    // Start our uploadmeter - only do this once the corresponding upload has started (or is about to start)
+    um.start();
+    
+    // Stop (or pause) a previouslky start()ed meter
+    um.stop();
+    
+    // Un-register the default pop-up window behavior 
+    Event.stopObserving(aum_el, 'submit', aum_popup);
+
+=head1 DESCRIPTION
+
+Apache::UploadMeter includes several JavaScript objects to help quickly create
+a customized GUI interface for Apache::UploadMeter using the JSON meter type
+
+=head1 DOM, JavaScript and Cascading StyleSheet rules
+
+Although we aim to give maximum customizability, in order to keep a balance between
+ease of initial set-up and basic usage, and customizability, the built-in UploadMeter
+includes JS code and CSS rules for a simple graphical progress-bar.  At the
+current moment, the constructor for the UploadMeter object requires a reference
+to a DOM node as one of the parameters, to be used as the base for creating this
+progress bar.  If you don't want to use the built-in progress-bar, but also don't
+want to muck with the UploadMeter object to get around this, just create an empty
+DIV on your page, set the style to hidden (eg, display: none), and pass that to
+the UploadMeter object.  If you do wish to use this built-in object, ensure that
+the CSS class of this div is "uploadmeter" (and don't hide it!)
+
+Also, it is worth noting that the default behavior looks for an element class
+named "uploadform" and attempts to add to the onSubmit code for it, to trigger
+the bundled default pop-up window.  If you don't want this to happen, just run:
+
+C<Event.stopObserving(aum_el, 'submit', aum_popup);>
+
+
+=head1 API Documentation
+
+=head3 UploadMeter Object
+
+This is where most of the action happens.  The public interface to this object
+consists of a constructor, start and stop methods, and some callbacks that can 
+be used to do extra stuff at various key points in the UploadMeter's lifetime.
+
+=over
+
+=item *
+UploadMeter(I<Element>, I<Meter-Id>, I<Meter-URL>, I<options>)
+
+This is the default constructor for a new UploadMeter instance.  It accepts 3
+mandatory parameters and a hash of additional options.  The first parameter,
+I<Element> is a DIV element under which to create a graphical progress-bar (see
+L<DOM, JavaScript and Cascading StyleSheet rules> above).  The second parameter
+is the unique identifier of the uploadmeter data you wish to use.  If you're using
+MeterType JSON, this will be embedded in your JavaScript as I<meter_id>.  The
+third parameter is the URL of the meter-status URL.  If you're using
+MeterType JSON, this will be embedded in your JavaScript as I<meter_url>.
+
+The final parameter is a hash of additional optional configuration directives and
+callback routines.
+
+=over
+
+=item *
+Parameters
+
+=over
+
+=item *
+delay
+
+The delay (in seconds or partial seconds) between meter updates.  The default
+value (3) should probably be good enough for you.  As a warning, if you set this
+too high, your users will not have a good feel for what's happening.  Too low and
+(besided the extra traffic to your server), the animation for the progress-bar
+may garble (this is known to happen if 2 animation requests happen simultaniously.
+While this will likely eventually be fixed, as of the time of writing, it's not.
+
+=back
+
+=item *
+Callback routines
+
+The callback routines all contain zero, one or two parameters.  The parameter
+order will always be I<status>, I<last>.
+
+I<status> contains the current status of the upload.  I<last> always contains
+the B<previous> status of the uploadmeter, such that on a repeating callback
+such as onUpdate, the value of any given request's I<last> will always be the
+same as the previous callback's I<status>.
+
+The parameters contain the following information:
+
+=over
+
+=item *
+meter_id
+
+Contains the meter_id for the current upload
+
+=item *
+filename
+
+Contains the filename (as supplied by the client) of the currently uploading file
+
+=item *
+finished
+
+Contains a boolean value which will be set to 1 once the upload is complete
+
+=item *
+status
+
+=over
+
+=item *
+timestamp
+
+Current timestamp from server, as seconds since the epoch
+
+=item * 
+start
+
+Timestamp (as seconds since the epoch) when upload was started
+
+=item *
+received
+
+Number of bytes received so far
+
+=item *
+total
+
+Total number of bytes in the upload (more accurately, of the upload B<request>
+including other form information)
+
+=back
+
+=item *
+total
+
+This is a shortcut for C<status.total>
+
+=item *
+seen
+
+This is a shortcut for C<status.received>
+
+=item *
+progress
+
+A value between 0 and 100, representing the percentage of the upload that has
+been completed.
+
+=item *
+currentrate
+
+The approximate current upload rate (in bytes/second)
+
+=item *
+elapsed
+
+The time (in seconds) which has elapsed since the upload started
+
+=item *
+remaining
+
+The approximate time (in seconds) remaining in the upload
+
+=back
+
+The callbacks currently available are:
+
+=over
+
+=item *
+onCreate(I<>)
+
+This callback is called once just before the first AJAX call is made.  As such,
+it doesn't happen on construction; it happens after um.start(), but before the
+initial AJAX request is made.  I know it's not really well named, but you're
+welcom to suggest something better.
+
+=item *
+onInitialize(I<status>, I<last>)
+
+This callback is called once after the initial AJAX response is received and
+parsed.  While I<last> is generally useless at this point (it's a subset of
+I<status> right now), it's provided in case you want to change the value of
+anything in it.
+
+=item *
+onUpdate(I<status>, I<last>)
+
+This callback is called every time data is updated from meter URL.  It can be
+utilized to update other GUI elements, such as is done in the default pop-up.
+
+=item *
+onFinished(I<status>, I<last>)
+
+This callback is called after onUpdate if the upload is determined to be complete
+(eg, C<tatus.finished == 1>)
+
+=back
+
+=back
+
+=back
+
+=head3 UploadMeter.Responders
+
+In addition to adding handlers to individual UploadMeter objects, as described
+above, you can also add global callbacks which will be called for *every* uploadmeter
+on the page.  This might be useful, for example, for Web 2.0 applications that
+allow for multiple asynchronous uploads in separate requests.  In such a case,
+rather than registering identical handlers for each UploadMeter instance,
+you can register a single function globally and it will be called for the appropriate
+callback for all UploadMeter instances running on the page.
+
+Callbacks that are registered this way will receive, as the first parameter,
+the UploadMeter object of the instance which is currently calling into it.
+
+=head3 Util
+
+The Util namespace is not an object, but rather a namespace to group some helper
+utility functions that may make your life a bit easier when creating your custom
+user interface.
+
+=over
+
+=item *
+Util.formatTime(I<timestamp>)
+
+This function takes a single parameter, I<timestamp> which is a numeric value
+corresponding to a number of seconds.  This is not necessarily a "unix timestamp"
+(the number of seconds since the epoch) but rather an arbitrary number of seconds.
+
+The function will return a formatted string returning the number of seconds in
+HH:mm:ss format
+
+=item *
+Util.formatDec(I<value>)
+
+This function takes a numeric (decimal/floating point) value as a parameter
+and returns a string containing the number and 2 decimal points.
+
+=back
+
+=head1 AUTHOR AND COPYRIGHT
+
+Copyright (c) 2001-2007 Issac Goldstand E<lt>margol@beamartyr.netE<gt> - All rights reserved.
+
+This library is free software. It can be redistributed and/or modified
+under the same terms as Perl itself.
+
+This software contains third-party components licensed under BSD and MIT style
+open-source licenses.
+
+=head1 SEE ALSO
+
+L<Apache::UploadMeter>
+
+=cut

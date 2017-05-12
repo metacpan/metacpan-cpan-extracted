@@ -1,0 +1,20 @@
+Revision history for Perl extension Algorithm::BinPack.
+
+0.5  Wed Mar 16 10:53:29 PST 2005
+    - add_item can handle specified bin number
+    - deprecated prefill_bin
+
+0.4  Fri Mar 11 20:26:52 PST 2005
+    - prefill_bin method (thanks to Andrew 'Terra' Gillespie)
+    - new tests
+
+0.3  Thu Sep  9 12:59:18 PDT 2004
+    - do not add items with missing fields
+    - test suit fixups
+
+0.2  Wed Sep  8 15:38:58 2004
+    - fudge factor
+    - natural sorting order
+
+0.1  Fri Sep  3 13:54:12 2004
+	- initial version

@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use App::RunCron::CLI;
+App::RunCron::CLI->new(@ARGV)->run;
+
+__END__
+
+=head1 NAME
+
+runcron - cron-runner
+
+=head1 SYNOPSIS
+
+    % runcron [options] -- [command]
+        --logfile=s         # log file               (Optional)
+        --timestamp         # add timestamp or not   (Default: undef)
+        --announcer=s       # announcer              (Optional)
+        --reporter=s        # reporter               (Default: None)
+        --error_reporter=s  # error_reporter         (Default: Stdout)
+        --common_reporter=s # common_reporter        (Optional)
+        --tag=s             # identifier of the job  (Optional)
+        --config|c=s        # configuration file     (Default: runcron.yml (Optional))
+        command             # command to be executed (Required)
+
+=head1 DESCRIPTION
+
+runcron is wrapper command for cron jobs inspired by L<cronlog|https://github.com/kazuho/kaztools/blob/master/cronlog>.
+
+Default behaviour is same like cronlog.
+
+=head1 CONFIUGRATION FILE
+
+like as follows.
+
+    timestamp: 1
+    reporter:  Stdout
+    error_reporter:
+      - Stdout
+      - "+MyApp::Reporter::IRC"
+
+=head3 SEE ALSO
+
+L<App::RunCron>, L<cronlog|https://github.com/kazuho/kaztools/blob/master/cronlog>

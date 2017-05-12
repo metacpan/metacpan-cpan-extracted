@@ -1,0 +1,80 @@
+<!ELEMENT application ( manager, dsn, username, password ) >
+
+<!ELEMENT application_name ( #PCDATA ) >
+
+<!ELEMENT application_root ( #PCDATA ) >
+
+<!ELEMENT class ( #PCDATA ) >
+
+<!ELEMENT configuration ( system, errors, web, data_connections ) >
+
+<!ELEMENT cookie_domain ( #PCDATA ) >
+
+<!ELEMENT cookie_name ( #PCDATA ) >
+
+<!ELEMENT data_connections ( session, application, main ) >
+
+<!ELEMENT dsn ( #PCDATA ) >
+
+<!ELEMENT env_vars ( var* ) >
+
+<!ELEMENT filter ( (uri_match | uri_equals), class ) >
+
+<!ELEMENT handler_root ( #PCDATA ) >
+
+<!ELEMENT lib ( #PCDATA ) >
+
+<!ELEMENT libs ( lib* ) >
+
+<!ELEMENT load_modules ( module* ) >
+
+<!ELEMENT main ( dsn, username, password ) >
+
+<!ELEMENT manager ( #PCDATA ) >
+
+<!ELEMENT media_manager_upload_root ( #PCDATA ) >
+
+<!ELEMENT module ( #PCDATA ) >
+
+<!ELEMENT name ( #PCDATA ) >
+
+<!ELEMENT page_cache_root ( #PCDATA ) >
+
+<!ELEMENT password ( #PCDATA ) >
+
+<!ELEMENT post_processors ( class* ) >
+
+<!ELEMENT request_filters ( filter* ) >
+
+<!ELEMENT session ( manager, cookie_domain, cookie_name, dsn, username, password, session_timeout ) >
+
+<!ELEMENT session_timeout ( #PCDATA ) >
+
+<!ELEMENT setting ( name, value ) >
+
+<!ELEMENT settings ( setting* ) >
+
+<!ELEMENT system ( post_processors, libs, load_modules, env_vars, settings ) >
+
+<!ELEMENT uri_equals ( #PCDATA ) >
+
+<!ELEMENT uri_match ( #PCDATA ) >
+
+<!ELEMENT username ( #PCDATA ) >
+
+<!ELEMENT value ( #PCDATA ) >
+
+<!ELEMENT var ( name, value ) >
+
+<!ELEMENT web ( application_name, application_root, handler_root, media_manager_upload_root, www_root, page_cache_root, request_filters ) >
+
+<!ELEMENT www_root ( #PCDATA ) >
+
+<!ELEMENT smtp_server ( #PCDATA ) >
+<!ELEMENT mail_errors_to ( #PCDATA ) >
+<!ELEMENT mail_errors_from ( #PCDATA ) >
+<!ELEMENT error_handler ( #PCDATA ) >
+
+<!ELEMENT errors ( error_handler, mail_errors_to, mail_errors_from, smtp_server ) >
+
+

@@ -1,0 +1,35 @@
+#!/bin/bash
+if [ -z "${1}" ]; then
+    search='oil'
+else
+    search=${1}
+fi
+if [ -z "${2}" ]; then
+    from='en'
+else
+    from=${2}
+fi
+
+if [ -z "${3}" ]; then
+    to='de'
+else
+    to=${3}
+fi
+
+onetwo='.{1,2}'
+re="$1"
+re="${re//[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]/.}"
+re="${re//ue/$onetwo}"
+re="${re//ae/$onetwo}"
+re="${re//oe/$onetwo}"
+re="${re//ss/$onetwo}"
+
+# have to use perl for grepping because of umlauts
+
+q=$(lynx -dump -nolist  'http://dict.leo.org/'$from$to'?lp='$from$to'&lang='$from'&searchLoc=0&cmpType=strict&sectHdr=on&spellToler=on&search='$search'&relink=on' | perl -n -e "print if /$re/i")
+#perl -MHTML::Entities  -le ' print \$q,encode_entities(\$q),\n';
+
+#echo "$q";
+
+perl  -MEncode -le "print decode('utf-8','$q');";
+

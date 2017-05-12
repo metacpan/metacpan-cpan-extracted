@@ -1,0 +1,28 @@
+body {
+	background-color: #272B30;
+	color: #CBCBCB;
+	padding-left: 1em;
+}
+
+ul {
+	list-style-type: none;
+}
+
+.level1 > span.name {
+	font-size: 150%;
+}
+
+.level2 > span.name {
+	font-weight: bold;
+	display: block;
+}
+
+.level2 {
+	display: inline-block;
+	margin: 0.5em;
+	width: 18em;
+}
+
+#list > ul {
+	padding-left: 0;
+}

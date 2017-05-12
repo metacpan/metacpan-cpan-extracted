@@ -1,0 +1,27 @@
+Revision history for Articulate
+
+v0.005 2014-03-04
+ - Functional constructors change their names: response => new_response
+ - Explicitly require 5.10.1 - thanks to http://www.cpantesters.org/
+ - Fix to example so it doesn't require Template::Plugin::YAML
+ - Improved test coverage, minor bugfixes
+ - Documentation fixes
+
+v0.004 2014-02-26
+ - Meta and content retrieved from storage is now cached (gh #30)
+ - Fix to Dancer2 example config so it doesn't complain about not having a YAML engine (which didn't work)
+ - Validation now works on items (gh #34)
+ - Documentation fixes
+
+v0.003 2015-02-22
+ - Fix for gh #33; now works on 5.10.x - thanks to http://www.cpantesters.org/
+ - Documentation fixes - amazing what you notice when it's formatted differently!
+
+v0.002 2015-02-21
+ - Fix for gh #32 "keys and push on reference is experimental" - thanks to Slaven Rezić
+ - Various dependencies added to Makefile.PL
+ - skip_all on t/pod-coverage.t unless Test::POD::Coverage is installed
+ - "use Dancer" removed from Articulate::Serialisation::Asset and Articulate::Syntax::Routes
+
+v0.001 2015-02-21
+ - First release to CPAN. It's all very alpha.

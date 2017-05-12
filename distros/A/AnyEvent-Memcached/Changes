@@ -1,0 +1,42 @@
+Revision history for AnyEvent-Memcached
+
+0.08    2016-11-29
+        * Fix cv-begin/end
+
+0.06    2011-07-08
+        * Fix typo in incadd
+
+0.05    2010-07-11
+        * Fix META
+        * Try to fix tests
+
+0.04    2010-07-10
+        * Remove missed dep
+
+0.03    2010-07-09
+        * Publish previous changes
+
+0.02_02 2010-03-31
+        * Fix rget support flag for the first fail by timeout
+        * Add default timeout = 3
+
+0.02_01 2010-03-31
+        * Add gets/cas methods
+        * Add incget method
+        * Add options to rget
+        * Rewrite/enhance tests
+        * Remove excess dependencies
+        * Fix documentation
+
+0.02    2009-12-18
+        * First non-dev release
+
+0.01_7  2009-11-19
+        * Make hashing pluggable, add alternative hashing algorithm
+        * Separate noreply commands in another connection
+        * Some generalizations for pluggable hashing
+        * Fixed decr (decr worked as incr)
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

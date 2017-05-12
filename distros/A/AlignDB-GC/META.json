@@ -1,0 +1,78 @@
+{
+   "abstract" : "GC-related analysises",
+   "author" : [
+      "Qiang Wang <wang-q@outlook.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.7",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AlignDB-GC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AlignDB::IntSpan" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "YAML::Syck" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Number::Delta" : "1.06"
+         }
+      }
+   },
+   "provides" : {
+      "AlignDB::GC" : {
+         "file" : "lib/AlignDB/GC.pm",
+         "version" : "v1.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wang-q/AlignDB-GC/issues"
+      },
+      "homepage" : "https://github.com/wang-q/AlignDB-GC",
+      "repository" : {
+         "url" : "git://github.com/wang-q/AlignDB-GC.git",
+         "web" : "https://github.com/wang-q/AlignDB-GC"
+      }
+   },
+   "version" : "1.1.0",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

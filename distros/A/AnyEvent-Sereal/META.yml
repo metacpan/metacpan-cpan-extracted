@@ -1,0 +1,30 @@
+---
+abstract: 'Sereal stream serializer/deserializer for AnyEvent'
+author:
+  - 'Maxime SoulE<eacute> <btik-cpan@scoubidou.com>'
+build_requires:
+  AnyEvent::Impl::Perl: 0
+  AnyEvent::Util: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-Sereal
+requires:
+  AnyEvent: 0
+  AnyEvent::Handle: 0
+  Sereal::Decoder: 0.09
+  Sereal::Encoder: 0.09
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/maxatome/p5-anyevent-sereal/issues
+  repository: git://github.com/maxatome/p5-anyevent-sereal.git
+version: 0.004

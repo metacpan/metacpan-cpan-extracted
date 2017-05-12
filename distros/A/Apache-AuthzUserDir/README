@@ -1,0 +1,48 @@
+Please send comments/suggestions to ninjaz@webexpress.com
+
+NAME
+      Apache::AuthzUserDir - mod_perl UserDir authorization module
+
+SYNOPSIS
+
+      <Directory /home/*/public_html>
+
+      PerlAuthzHandler Apache::AuthzUserDir
+
+      # This is the standard authentication stuff.
+      # Any can be used, but basic .htpasswd authentication
+      # is shown for simplicity.
+      AuthName "Foo Bar Authentication"
+      AuthType Basic
+      AuthUserFile /usr/local/apache/.htpasswd-userdirs
+
+      # This tells apache to only let in users whose
+      # http login name matches the * in /home/*/public_html
+      require valid-user
+
+      </Directory>
+
+
+      These directives can also be used in the <Location> directive or in
+      an .htaccess file.
+
+
+DESCRIPTION
+     Apache::AuthzUserDir is designed to work with mod_perl and 
+     Apache's mod_user such that a single systemwide <Directory> 
+     block and .htpasswd file can be used to allow authenticated
+     users only into their own UserDir (typically, public_html)
+     directories.
+
+     This is especially useful with mod_dav and mod_ssl running on an
+     alternate port for users to upload to their public webspace.
+
+AUTHOR
+     Peter Clark <ninjaz@webexpress.com>
+
+COPYRIGHT
+     Copyright (C) 2002, Peter Clark
+     All Rights Reserved
+
+     This module is free software; you can redistribute it 
+     and/or modify it under the same terms as Perl itself.

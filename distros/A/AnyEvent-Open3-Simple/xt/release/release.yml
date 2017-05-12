@@ -1,0 +1,20 @@
+---
+pod_spelling_system:
+  stopwords:
+    - AnyEvent
+    - stderr
+    - API
+    - MSWin32
+    - MSWin
+    - Scaffidi
+    - prereq
+    - OpenBSD
+    - Wiersdorf
+    - open3
+    - suboptimal
+    - mojo
+
+pod_coverage:
+  private:
+    - ".*#new"
+

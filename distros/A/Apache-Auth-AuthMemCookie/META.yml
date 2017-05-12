@@ -1,0 +1,26 @@
+---
+abstract: 'mod_perl replacement for Apache2 authmemcookie authentication module'
+author:
+  - 'Piers Harding <piers@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Apache-Auth-AuthMemCookie
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Apache2::Const: 0
+  Apache2::Log: 0
+  CGI::Cookie: 0
+  Cache::Memcached: 0
+  Test::More: 0
+version: 0.04

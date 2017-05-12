@@ -1,0 +1,32 @@
+#!/opt/perl/bin/perl
+use strict;
+use Encode;
+use AnyEvent::Feed;
+use AnyEvent;
+
+$XML::Atom::ForceUnicode = 1;
+
+my $cv = AnyEvent->condvar;
+
+my $f = AnyEvent::Feed->new (
+      url      => 'https://mail.google.com/mail/feed/atom/unread/',
+      username => $ARGV[0],
+      password => $ARGV[1],
+      interval => 60,
+      on_fetch => sub {
+         my ($fee, $ent, $feed, $er) = @_;
+
+         if (defined $er) {
+            warn "ERROR: $er\n";
+            $cv->send;
+            return;
+         }
+
+         for (@$ent) {
+            printf "New mail found:\n   %s\n   => %s\n",
+                   encode ('utf-8', $_->[1]->title),
+                   $_->[1]->link;
+         }
+      });
+
+$cv->recv;

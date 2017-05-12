@@ -1,0 +1,18 @@
+Changes
+lib/App/FQStat.pm
+lib/App/FQStat/Actions.pm
+lib/App/FQStat/Colors.pm
+lib/App/FQStat/Config.pm
+lib/App/FQStat/Debug.pm
+lib/App/FQStat/Drawing.pm
+lib/App/FQStat/Input.pm
+lib/App/FQStat/Menu.pm
+lib/App/FQStat/PAR.pm
+lib/App/FQStat/Scanner.pm
+lib/App/FQStat/System.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+script/fqstat.pl
+t/App-FQStat.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,24 @@
+Revision history for Archive-Libarchive-Any
+
+0.0900    2015-10-15 15:25:19 -0400
+  - New constant ARCHIVE_EXTRACT_SECURE_NOABSOLUTEPATHS
+
+0.0801    2014-11-05 22:48:27 -0500
+  - Fixed prereqs
+
+0.0800    2014-06-10 16:34:40 -0400
+  - update tests with Archive::Libarchive::XS/FFI 0.0800
+
+0.07      2014-02-10 18:56:56 -0500
+  - alias namespace instead of copying to conserve memory
+  - prefer FFI for MidnightBSD where as it is more reliable
+  - update tests with Archive::Libarchive::XS/FFI 0.07
+
+0.06      2014-02-05 15:16:29 -0500
+  - update tests with Archive::Libarchive::XS/FFI 0.06
+
+0.05      2014-02-04 16:07:01 -0500
+  - documentation tweaks
+
+0.04      2014-02-04 13:26:24 -0500
+  - first CPAN release

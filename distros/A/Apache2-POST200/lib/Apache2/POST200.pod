@@ -1,0 +1,336 @@
+=head1 NAME
+
+Apache2::POST200 - Converting code 200 responses to POST requests to 302
+
+=head1 SYNOPSIS
+
+  LoadModule perl_module ...
+  PerlLoadModule Apache2::POST200;
+
+  POST200Storage dbi:mysql:db=db:localhost user password
+  POST200Table p200 session data
+  PerlOutputFilterHandler Apache2::POST200::Filter
+  <Location "/-redirect-">
+    SetHandler modperl
+    PerlResponseHandler Apache2::POST200::Response
+  </Location>
+
+  RewriteEngine On
+
+  # redirect GET/HEAD requests with a matching QUERY_STRING to
+  # Apache2::POST200::Response
+  RewriteCond %{REQUEST_METHOD} !=POST
+  RewriteCond %{QUERY_STRING} ^-redirect-[A-Za-z0-9@=-]{32}$
+  RewriteRule . /-redirect- [L,PT]
+
+  # This is needed because some applications forget the
+  # action="URL" attribute in their <form>s.
+  # If so we get a POST request with a QUERY_STRING appended.
+  # If it matches our pattern is must be cut off (the '?' in
+  # the RewriteRule).
+  RewriteCond %{REQUEST_METHOD} =POST
+  RewriteCond %{QUERY_STRING} ^-redirect-[A-Za-z0-9@=-]{32}$
+  RewriteRule (.+) $1? [N]
+
+  # yes, it even works on a reverse proxy.
+  RewriteRule ^/proxy/(.+) http://other.host.tld/$1 [P]
+
+  # keep mod_alias (ScriptAlias) happy
+  RewriteRule . - [PT]
+
+ or
+
+  # This is now a forward proxy setup.
+
+  Listen localhost:8080
+  <VirtualHost localhost:8080>
+    POST200Storage dbi:mysql:db=db:localhost user password
+    POST200Table p200 session data
+    PerlOutputFilterHandler Apache2::POST200::Filter
+    <Location "/-localhost-8080-">
+      SetHandler modperl
+      PerlResponseHandler Apache2::POST200::Response
+    </Location>
+
+    # defined a prefix instead of "-redirect-"
+    POST200Label -localhost-8080-
+
+    RewriteEngine On
+
+    # redirect GET/HEAD requests with a matching QUERY_STRING to
+    # Apache2::POST200::Response
+    RewriteCond %{REQUEST_METHOD} !=POST
+    RewriteCond %{QUERY_STRING} ^-localhost-8080-[A-Za-z0-9@=-]{32}$
+    RewriteRule . /-localhost-8080- [L,PT]
+
+    # This is needed because some applications forget the
+    # action="URL" attribute in their <form>s.
+    # If so we get a POST request with a QUERY_STRING appended.
+    # If it matches our pattern is must be cut off (the '?' in
+    # the RewriteRule). Then proxy it.
+    RewriteCond %{REQUEST_METHOD} =POST
+    RewriteCond %{THE_REQUEST} ^\w+\s(https?://[^\s\?]+)\?-localhost-8080-[A-Za-z0-9@=-]{32}(?:\s|$)
+    RewriteRule . %1? [P]
+
+    # Proxy all other. This is an alternative to the ProxyRequests
+    # statement.
+    RewriteCond %{THE_REQUEST} ^\w+\s(https?://\S+)
+    RewriteRule . %1 [P]
+  </VirtualHost>
+
+=head1 DESCRIPTION
+
+A typical WEB application workflow is often similar to this:
+
+  browser shows a form (1)
+        |
+        v
+  user clicks submit (2)
+        |
+        v
+  browser sends a POST request (3)
+        |
+        v
+  server processes the form and replies with a temporary redirect (4)
+        |
+        v
+  browser follows the redirect (5)
+        |
+        v
+  server replies with HTTP code 200 (6)
+
+Steps 4 and 5 are necessary to let the user reload the page shown without
+having the server to reprocess the form.
+
+With this module the workflow is shortened from the point of view of the
+WEB server to this:
+
+  browser shows a form (1)
+        |
+        v
+  user clicks submit (2)
+        |
+        v
+  browser sends a POST request (3)
+        |
+        v
+  server processes the form and replies with HTTP code 200 (4)
+
+Apache2::POST200 intercepts the server reply, stores the response
+in a database and sends a temporary redirect to the browser. It also
+intercepts the following request from the browser and sends the stored
+reply.
+
+=head2 How it works
+
+This module inserts an request output filter that looks for replies for
+POST requests with a HTTP code of 200. If it finds one it saves the reply
+in a database and replaces the complete output with a temporary redirect
+(HTTP code 302) to the same URL but with a special marked query string
+appended.
+
+When the browser follows the redirect the module recognizes the query
+string and routes the request to its own response handler. The handler
+then reads the saved page from the database and sends it to the browser.
+
+Well, the request routing is actually done by a tricky translation
+handler such as mod_rewrite or Apache2::Translation.
+
+Note: the redirect must go to the same URL because some WEB application
+forget the C<action> attribute in their C<E<lt>formE<gt>> definitions.
+
+=head2 Configuration
+
+The module itself is loaded from the Apache configuration file via a
+C<PerlLoadModule> directive. It then provides a few configuration
+directives of its own. All directives are allowed in server config,
+virtual host and directory contexts.
+
+=over 4
+
+=item B<Post200Storage dsn user password>
+
+C<Post200Storage> describes the database to be used. All 3 parameter
+are passed to the DBI::connect method, see L<DBI>. User and password
+can be omitted if the database supports it.
+
+C<Post200Storage None> disables the output filter. That means replies
+with a HTTP code 200 to a POST request are delivered as is.
+
+=item B<Post200Table table key-column data-column>
+
+C<Post200Table> describes the table to be used. The C<key> column must be
+able to hold a 41-byte string of printable ascii characters. The key length
+may be extented in future versions of this module but a key will always
+consist of printable characters.
+
+For best performance create an index on the C<key> column.
+
+The C<data> column must be able to hold a variable size data block. The
+maximum size can be limited using C<Post200DataBlockSize>. If
+C<Post200DataBlockSize> is not used the size completely depends on your
+response handlers. If possible use a BLOB type as C<data> column.
+
+Although not used by the module it makes sense to add a 3rd column to the
+table. It should be a timestamp column with the default attribute set to
+C<now()>. Without it it's difficult to decide which records can be deleted.
+
+With a MySQL database a suitable table is created by:
+
+ create table p200 (
+   session varchar(50) primary key unique not null,
+   data blob,
+   tm timestamp not null default 'now'
+ );
+ create index p200_tm_idx on p200(tm);
+
+Deletion of expired pages is best done by a simple cron job, e.g.
+
+ 45 * * * * echo 'delete from p200 where now()-tm>3600' | mysql post200
+
+=item B<Post200Label marker>
+
+By means of this marker the response handler recognizes a redirected
+request that it is responsible for. When the output filter generates
+a query string it starts with the C<marker> as prefix.
+
+If omitted C<-redirect-> is used.
+
+If the module is used on a forward proxy to repair external WEB applications
+choose a string here that is very likely to be used only by your proxy.
+
+=item B<Post200Secret secret initvector>
+
+To make sure the key provided by the browser via the query string was
+generated by the filter it is encrypted. C<secret> and C<initvector>
+are arbitrary strings, see L<Crypt::Blowfish>.
+
+If omitted 2 strings are used that once came out of /dev/random on my
+box.
+
+=item B<Post200IpCheck On|Off>
+
+With this directive set the response handler sends a page only to the
+same client where the redirect was sent to. This prevents that
+redirected URLs are mailed around as long as the 2 clients are not
+connected through the same proxy.
+
+Default is On.
+
+=item B<Post200DataBlockSize Bytes>
+
+This directive defines the maximum size of a data item written to the
+database.
+
+If omitted the blocksize depends on the response handler.
+
+=back
+
+=head1 Some Considerations
+
+=head2 Simple sessions
+
+One way to look at this module is that it provides some simple session.
+Often a WEB application is simply a collection of forms gathering
+some information. And only after the last form is filled out all of it
+is to be written to a data store.
+
+With C<Apache2::POST200> you can save the information gathered so far in
+hidden fields rather than saving them in a session structure at server side.
+
+Well, the database that this module uses is such a session structure at server
+side, but forget about the internals for now. Look at it from another
+level, ;-).
+
+=head2 Simpler developement
+
+C<Apache2::POST200> frees your application from handling the refreshing
+problem by its own. Hence, developement becomes simpler.
+
+=head2 Performance
+
+Using C<Apache2::POST200> might even lead to a performance gain. Often the
+application logic is almost the same (authentication, authorization,
+fetching application data and so on) be it for the generation of the
+Location header or for the redirected request. With this module these
+checks are done only once.
+
+=head2 Frontend / Backend
+
+Here comes the most valuable point. WEB applications often use a frontend /
+backend setup, where the backend serves the dynamic content. The
+frontend is a lightweight WEB server that serves static content and
+delegates request for dynamic content as a proxy to the backend.
+
+This setup is chosen because generating dynamic content often leads to very
+memory consuming processes and, thus, the necessity to limit their number.
+But such a setup does not forbid using mod_perl also in the frontend.
+Only the memory consumption must be small and limited. Since
+C<Apache2::POST200> reads the data from the database one block at a time
+it meets this condition.
+
+Now look at what happens without C<Apache2::POST200>. The initial POST
+request as well as the redirected GET occupy a frontend and a backend
+instance. If C<Apache2::POST200> is used at the frontend only the
+initial POST involves both frontend and backend. The subsequent GET
+is handled exclusively by the frontend.
+
+C<Apache2::POST200> may be used even at frontend and backend. The output
+filter runs at the backend inserting data in the database. The response
+handler runs at the frontend. Limit the block size in this case with
+C<Post200DataBlockSize> to avoid bloating the frontend.
+
+=head2 Repair external WEB applications
+
+Another useful application of C<Apache2::POST200> is to repair external
+applications. Suppose you have a WEB application written in some closed
+language or running on an external server that emits code 200 replies to
+POST requests. Setup a reverse or even forward proxy with C<Apache2::POST200>.
+It repairs the application without having access to it.
+
+=head1 TODO
+
+=over 4
+
+=item B<Caching>
+
+With a keep-alive connection the redirected request is most likely to
+come in over the same connection. Thus, some caching in a connection
+pnote would be good.
+
+=item B<User check>
+
+Client IP checking may not be sufficient. The filter could check
+C<$r-E<gt>user>, set a special flag in the redirect param and save the user
+name. The rewrite rules could then check the flag and require a valid-user.
+Then the response handler can verify C<$r-E<gt>user> against the saved user.
+
+=back
+
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Apache2::Translation>
+
+=back
+
+=head1 AUTHOR
+
+Torsten Foertsch, E<lt>torsten.foertsch@gmx.netE<gt>
+
+=head1 SPONSORING
+
+Sincere thanks to Arvato Direct Services (http://www.arvato.com/) for
+sponsoring this module.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 by Torsten Foertsch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut

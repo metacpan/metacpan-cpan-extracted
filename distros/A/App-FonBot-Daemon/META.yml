@@ -1,0 +1,47 @@
+---
+abstract: 'FonBot daemon'
+author:
+  - 'Marius Gavrilescu <marius@ieval.ro>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-FonBot-Daemon
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Apache2::Authen::Passphrase: '0'
+  DB_File: '0'
+  Email::MIME: '0'
+  Email::Sender::Simple: '0'
+  Email::Simple: '0'
+  File::Glob: '0'
+  File::Slurp: '0'
+  HTTP::Status: '0'
+  IRC::Utils: '0'
+  JSON: '0'
+  Linux::Inotify2: '0'
+  Log::Log4perl: '0'
+  MIME::Base64: '0'
+  POE: '0'
+  POE::Component::IRC: '0'
+  POE::Component::IRC::Plugin::AutoJoin: '0'
+  POE::Component::IRC::Plugin::Connector: '0'
+  POE::Component::IRC::Plugin::NickServID: '0'
+  POE::Component::SSLify: '0'
+  POE::Component::Server::HTTP: '0'
+  Storable: '0'
+  Text::ParseWords: '0'
+  perl: '5.014000'
+resources:
+  IRC: irc://irc.oftc.net/#fonbot
+  repository: https://git.ieval.ro/?p=app-fonbot-daemon.git
+version: '0.001'

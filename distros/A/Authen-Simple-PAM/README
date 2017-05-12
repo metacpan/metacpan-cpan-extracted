@@ -1,0 +1,61 @@
+NAME
+    Authen::Simple::PAM - Simple PAM authentication
+
+SYNOPSIS
+        use Authen::Simple::PAM;
+    
+        my $pam = Authen::Simple::PAM->new(
+            service => 'login'
+        );
+    
+        if ( $pam->authenticate( $username, $password ) ) {
+            # successfull authentication
+        }
+    
+        # or as a mod_perl Authen handler
+
+        PerlModule Authen::Simple::Apache
+        PerlModule Authen::Simple::PAM
+
+        PerlSetVar AuthenSimplePAM_service "login"
+
+        <Location /protected>
+          PerlAuthenHandler Authen::Simple::PAM
+          AuthType          Basic
+          AuthName          "Protected Area"
+          Require           valid-user
+        </Location>
+
+DESCRIPTION
+    PAM authentication.
+
+METHODS
+    * new
+        This method takes a hash of parameters. The following options are
+        valid:
+
+        * service
+                PAM service. Defaults to "login".
+
+                    service => 'sshd'
+
+        * log   Any object that supports "debug", "info", "error" and
+                "warn".
+
+                    log => Log::Log4perl->get_logger('Authen::Simple::PAM')
+
+    * authenticate( $username, $password )
+        Returns true on success and false on failure.
+
+SEE ALSO
+    Authen::Simple.
+
+    Authen::PAM.
+
+AUTHOR
+    Christian Hansen "ch@ngmedia.com"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

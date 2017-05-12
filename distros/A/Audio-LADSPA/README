@@ -1,0 +1,66 @@
+Audio::LADSPA
+==============
+
+This is a set of extensions to host LADSPA plugins,
+you can query them, or apply them to audio data.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or, if you prefer the CPAN installer, type:
+
+   perl -MCPAN -e'install Audio::LADSPA'
+
+Which will fetch, make and install the module for you.
+
+DEPENDENCIES
+
+LADSPA dependencies:
+
+ The tests specifically need the demo plugins from the
+ ladspa_sdk package, with LADSPA_PATH pointing to the
+ directory where they are installed.
+
+ You do not have to set the LADSPA_PATH environment variable
+ if your LADSPA plugins are located in either /usr/lib/ladspa
+ or /usr/local/lib/ladspa, but you will be warned when the
+ modules are loaded. You'll probably want to set it anyway,
+ because most other LADSPA hosts need it.
+
+ You can download the sdk from from http://www.ladspa.org/
+ Debian users can use "apt-get install ladspa-sdk"
+
+ Alternatively, you can skip the tests, but these modules
+ are of no use without at least SOME plugins installed.
+
+CPAN dependencies:
+
+Also, this extension requires the following Perl modules;
+
+  Test::More, Audio::Play, Scalar::Util, Data::Uniqid
+  and Graph::Directed
+   
+Install them first from CPAN. Alternatively, if you're
+installing using the CPAN or CPANPLUS shell, this can be taken
+care of automatically.
+
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 - 2005 Joost Diepenmaat
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+See the COPYING file for more information
+

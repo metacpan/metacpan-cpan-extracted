@@ -1,0 +1,52 @@
+---
+abstract: 'Fusing together AnyEvent and Net::SIP'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  Cwd: 0
+  Data::Dumper: 0
+  Digest::MD5: 0
+  File::Find: 0
+  File::Temp: 0
+  IO::Socket: 0
+  List::Util: 0
+  Module::Build: 0.3601
+  Net::SIP: 0
+  Net::SIP::Blocker: 0
+  Net::SIP::Debug: 0
+  Net::SIP::Dropper: 0
+  Net::SIP::Dropper::ByField: 0
+  Net::SIP::Dropper::ByIPPort: 0
+  Net::SIP::Leg: 0
+  Net::SIP::NATHelper::Client: 0
+  Net::SIP::NATHelper::Local: 0
+  Net::SIP::NATHelper::Server: 0
+  Net::SIP::ReceiveChain: 0
+  Net::SIP::SDP: 0
+  Test::More: 0
+  base: 0
+  fields: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-SIP
+no_index:
+  file:
+    - README.pod
+requires:
+  AnyEvent: 0
+  AnyEvent::AggressiveIdle: 0
+  Net::SIP::Dispatcher::Eventloop: 0
+  Net::SIP::Util: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://github.com/xsawyerx/anyevent-sip/issues
+  repository: http://github.com/xsawyerx/anyevent-sip
+version: 0.002

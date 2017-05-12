@@ -1,0 +1,80 @@
+NAME
+
+    Alien::Build::MB - Alien::Build installer class for Module::Build
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+    In your Build.PL:
+
+     use Alien::Build::MB;
+     
+     Alien::Build::MB->new(
+       module_name => 'Alien::MyLibrary',
+       ...
+     );
+
+DESCRIPTION
+
+    This is a Module::Build subclass that uses Alien::Build to help create
+    Alien distributions. The author recommends Alien::Build::MM, which uses
+    ExtUtils::MakeMaker instead. The primary rationale for this class, is
+    to prove independence from any particular installer, so that other
+    installers may be added in the future if they become available. If you
+    really do prefer to work with Module::Build though, this may be the
+    installer for you!
+
+CONSTRUCTOR
+
+ new
+
+     my $abmb = Alien::Build::MB->new(%args);
+
+    Takes the usual Module::Build arguments.
+
+METHODS
+
+ alien_build
+
+     my $build = $abmb->alien_build;
+
+    Returns a freshly deserialized instance of Alien::Build. If you make
+    any changes to this object's install_prop or runtime_prop properties be
+    sure that you also call $build->checkpoint!
+
+ACTIONS
+
+    These actions should automatically be called during the normal install
+    process. For debugging you may want to call them separately.
+
+ ACTION_alien_download
+
+     ./Build alien_download
+
+    Downloads the package from the internet. For a system install this does
+    not do anything.
+
+ ACTION_alien_build
+
+     ./Build alien_build
+
+    Build the package from source.
+
+SEE ALSO
+
+    Alien::Build, Alien::Build::MM, Alien::Base::ModuleBuild
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

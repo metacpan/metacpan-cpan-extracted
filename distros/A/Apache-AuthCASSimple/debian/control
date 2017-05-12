@@ -1,0 +1,19 @@
+Source: libapache-authcassimple-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5.0.0), perl (>= 5.8.8-7etch1)
+Maintainer: AGOSTINI Yves <agostini@univ-metz.fr>
+Standards-Version: 3.7.2
+
+Package: libapache-authcassimple-perl
+Architecture: any
+Depends: ${perl:Depends}, ${shlibs:Depends}, ${misc:Depends}, libapache-mod-perl, libapache-mod-perl, libapache-session-wrapper-perl, libapache-mod-perl
+Description: Apache module to authentificate trough a CAS server
+ Apache::AuthCASSimple is a module for Apache/mod_perl. It allow you to
+ authentificate users trough a CAS server. It means you don't need
+ to give login/password if you've already be authentificate by the CAS
+ server, only tickets are exchanged between Web client, Apache server
+ and CAS server. If you not're authentificate yet, you'll be redirect
+ on the CAS server login form.
+ .
+ This description was automagically extracted from the module by dh-make-perl.

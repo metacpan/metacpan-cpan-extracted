@@ -1,0 +1,16 @@
+Revision history for Apache2-AuthenNTLM-Cookie
+
+1.02     05.08.2010
+  Dropped inheritance from Apache2::AuthenNTLM
+  Directly deal with missing NTLM header, to avoid polluting error log
+
+1.01    29.07.2010
+  Fix: APR::Request chokes on multipart/form-data with empty content
+
+1.00    22.06.2010
+  Fixed bug on POST requests due to MSIE sending empty data
+
+0.01    25.05.2008
+  Initial release
+
+

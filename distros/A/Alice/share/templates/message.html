@@ -1,0 +1,17 @@
+? my ($app, $msg) = @_;
+? my $classes = join " ", (
+?   grep {$msg->{$_}} qw/highlight self consecutive monospaced avatar/,
+? );
+
+<li class="message <?= $classes ?>" id="msg-<?= $msg->{msgid} ?>"<?= $msg->{avatar} ? " avatar=$msg->{avatar}" : "" ?>>
+    <div class="timehint timestamp"><?= $msg->{timestamp} ?></div>
+    <div class="left">
+      <a href="javascript:alice.connection.requestWindow('<?= $msg->{nick} ?>','<?= $msg->{window}{id} ?>')" class="nick"<?= $msg->{source} ? " title=$msg->{source}" : "" ?>>
+        <span class="nick"><?= $msg->{nick} ?></span>
+
+      </a>
+    </div>
+    <div class="msg">
+      <?= $msg->{html} ?>
+    </div>
+</li>

@@ -1,0 +1,77 @@
+#!/usr/bin/cow
+#
+# NAME
+#
+#   fibonacci.cow - print the Fibonacci sequence
+#
+# SYNOPSIS
+#
+#   fibonacci.cow
+#
+# DESCRIPTION
+#
+#   This program prints the Fibonacci sequence to the standard output.
+#
+# EXAMPLES
+#
+#   $ ./fibonacci-commented.cow
+#   1
+#   1
+#   2
+#   3
+#   5
+#   8
+#   13
+#   21
+#   34
+#   55
+#   ...
+#
+# COPYRIGHT
+#
+#   Copyright 2007-2010 Peter John Acklam.
+#
+#   This library is free software; you can redistribute it and/or modify
+#   it under the same terms as Perl itself, either Perl version 5.8.0 or,
+#   at your option, any later version of Perl 5 you may have available.
+#
+# AUTHOR
+#
+#   Author:      Peter John Acklam
+#   Time-stamp:  2010-03-26 20:26:11 +01:00
+#   E-mail:      pjacklam@online.no
+#   URL:         http://home.online.no/~pjacklam
+
+# The program initializes by placing the number 1 in memory blocks 0 and 1.
+# Then, in each round, the number in memory block 0 is copied into memory
+# block 2, using the registry as temporary storage. Then the number in
+# memory block 1 is copied into memory block 0. The number in memory block 2
+# is used as a loop counter for incrementing the number in memory block 1
+# until it becomes the next Fibonacci number.
+
+MoO         # increment value of memory block 0 by 1, from 0 to 1
+moO         # move memory position forward from block 0 to 1
+MoO         # increment value of memory block 0 by 1, from 0 to 1
+mOo         # move memory position back one block, from 1 to 0
+MOO         # beginning of main (outer) loop
+OOM         #     print value of memory block 0 as an integer
+MMM         #     copy value of memory block 0 into the register
+moO moO     #     move memory position forward from block 0 to 2
+MMM         #     copy value from register into memory block 2
+mOo         #     move memory position backwards, from 2 to 1
+MMM         #     copy value of memory block 1 into the register
+mOo         #     move memory position backwards, from 1 to 0
+MMM         #     copy value from register into memory block 0
+moO moO     #     move memory position forward from block 0 to 2
+MOO         #     beginning of inner loop
+MOo         #         decrement value of memory block 2 by 1
+mOo         #         move memory position backwards, from 2 to 1
+MoO         #         increment value of memory block 1 by 1
+moO         #         move memory position forward from block 1 to 2
+moo         #     end of inner loop
+mOo mOo     #     move memory position backwards, from 2 to 0
+moo         # end of main (outer) loop
+
+# Emacs Local Variables:
+# Emacs mode: sh
+# Emacs End:

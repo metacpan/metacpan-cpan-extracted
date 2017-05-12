@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+indie.txt
+lib/Acme/MetaSyntactic/legoindianajones.pm
+t/00-compile.t
+t/01_metasyntactic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

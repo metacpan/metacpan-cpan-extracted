@@ -1,0 +1,122 @@
+Apache2::WURFLMobile is an implementation of the Apache filter in Perl, The module detects the mobile device and passes the WURFL capabilities on to the other web application as environment variables. It can also be used to resize images on the fly to adapt to the screen size of the mobile device.
+A good point to start is: <http://wurfl.sourceforge.net>
+I don't try to install in Win32 platform, but I suppose it's run well.
+
+PREREQUISITES
+
+This suite requires Perl 5; I tested it only under Perl 5.8.8.
+
+mod_perl 2.0 for Apache 2.X.X
+
+Apache 2.x.x
+WURFL.xml
+
+Knowledge about Apache configuration
+
+Library I have used:
+
+Apache2::Filter
+Apache2::RequestRec
+Apache2::RequestUtil
+Apache2::Connection
+Apache2::Log
+CGI::Cookie
+APR::Table
+LWP::Simple
+Image::Resize
+Apache2::Const
+IO::Uncompress::Unzip
+File::Copy
+Cache::FileBackend
+
+INSTALLATION
+You need to install and configure Apache 2.x
+
+Before you start to use my module you need to install mod_per 2.x and configure your Apache, this is the right link:
+
+Download - http://perl.apache.org/download/index.html
+Documentation - http://perl.apache.org/docs/index.html
+The second step is to install the other packages, you can found here:
+
+http://search.cpan.org/
+
+Now you can start to install my package:
+
+
+1) perl Makefile.PL
+2) sudo make install
+
+
+3) open the file conf/httpd.conf and add this few commands:
+
+#
+#Apache Mobile Filter parameter
+# 
+PerlSetEnv MOBILE_HOME <home path of AMF>
+PerlSetEnv CookieCacheSystem <for persist the data (normaly /tmp)>
+#
+#configure to activate Apache Mobile filter  
+# 
+PerlModule Apache2::WURFLFilter
+PerlTransHandler +Apache2::WURFLFilter
+# This is indicate to the filter were are stored the high definition images
+PerlSetEnv ResizeImageDirectory /transform 
+
+
+
+#
+#configure to activate AMFCarrierDetection 
+# 
+
+PerlSetEnv CarrierNetDownload true
+PerlSetEnv CarrierUrl http://www.andymoore.info/carrier-data.txt
+
+PerlTransHandler +Apache2::AMFCarrierDetection
+
+#
+#configure to activate AMFSwitcher  
+# 
+
+PerlSetEnv RedirectTranscoderUrl http://www.cnn.com
+PerlSetEnv FullBrowserUrl http://www.repubblica.it
+
+PerlTransHandler +Apache2::AMFSwitcher
+
+
+
+
+#
+#configure to activate ImageRenderFilter  
+# 
+
+<Location /mobile/*>
+    SetHandler modperl
+    PerlInputFilterHandler Apache2::ImageRenderFilter 
+</Location> 
+
+4) Follow the Instructions the URL is:
+
+http://www.idelfuschini.it/it/apache-mobile-filter-v2x.html
+
+5) Remember to define where to keep the Device Repository WURFL you have two option:
+
+1) Download WURFL.xml here: http://wurfl.sourceforge.net/wurfl.zip and copy into directory you have define into MOBILE_HOME 
+2) define a URL where you can download the WURFL.xml, good if you need to manage several mobile web server, or to have the last WURFL.xml version (http://downloads.sourceforge.net/wurfl/wurfl-latest.zip)
+
+
+
+
+AVAILABILITY
+
+The latest version of Apache2::WURFLMobile is available from the
+CPAN <http://search.cpan.org/> 
+
+
+COPYRIGHT
+
+Copyright 2009 Idel Fuschini <idel.fuschini@gmail.com>
+
+This package is free software and is provided "as is" without express
+or implied warranty.  You can redistribute it and/or modify it under 
+the same terms as Perl itself.
+

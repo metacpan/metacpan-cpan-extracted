@@ -1,0 +1,381 @@
+#! /usr/bin/perl -w
+use strict;
+use warnings;
+use Prima qw(Application Buttons Outlines Label MsgBox Utils ImageViewer Sliders);
+use Prima::IPA qw(Point Misc);
+use Time::HiRes qw(time);
+
+my $image_buf;
+my $live_video = 1;
+my $w;
+my $counter  = 0;
+my $exp_path = "/home/visitor/Desktop/Exp";
+my $disable_check_dir;
+my $fps = 0;
+my $last_time = time;
+
+sub mask_to_filename
+{
+	my ($number, $msk, $ct)= @_;
+	my $prev = 0;
+	for (my $i = 0; $i < $number; $i++ ){
+		my $r = int(($ct-$prev)/(10**($number-$i-1)));
+		$prev += ($r *(10**($number-$i-1)));
+		$msk =~ s|#|$r|o;
+	}
+	return $msk;
+}
+
+sub init_video
+{
+	system "v4l2-ctl ".
+		"-s 3 ". # pal bg
+		"-i 1 ". # composite
+		"-v width=768,height=576,pixelformat=GREY ". # pixelformat
+		"";
+	unless (open VIDEO, '<', '/dev/video0') {
+		message("Error initializing video:$!");
+		exit;
+	}
+	binmode VIDEO;
+	local $/;
+
+	$image_buf = Prima::Image->new(
+		width => 768,
+		height => 576,
+		type => im::Byte,
+	);
+	$w->Video->image($image_buf);
+}
+
+sub read_frame
+{
+	my $c = '';
+	if ( $w->menu->AverageVideo->checked) {
+		my @img;
+		for ( 1 .. $w->average->value) {
+			my $img = $image_buf->dup;
+			my $n = sysread VIDEO, $c, 768*576;
+			warn "$n:$!" if $n != 768*576;
+			$img->data($c);
+			push @img, $img;
+		}
+		my $aimg = Prima::IPA::Point::average(\@img);
+		$image_buf->data($aimg->data);
+	} else {
+		my $n = sysread VIDEO, $c, 768*576;
+		warn "$n:$!" if $n != 768*576;
+		$image_buf->data($c);
+	}
+	$image_buf->size(768,-576);
+	if ($w->equalize->checked) {
+		my $p = Prima::IPA::Point::equalize($image_buf);
+		$image_buf->data($p->data);
+	}
+}
+
+sub do_save
+{
+	my $path = $w->DirList->path;
+	return message("Can't find # in the mask of files") unless $w->ipl1->text =~ /#/;
+
+	# count number of #s
+	my $mask   = $w->ipl1->text;
+	my $number = ($mask=~ tr /#/#/);
+	my $max    = 10 ** $number;
+	return message("Recorded $max images already") if $counter >= $max;
+
+	my $file = mask_to_filename($number, $mask, $counter);
+	if (-f $w->DirList->path.'/'.$file) {
+		return if message_box($file, "file $file already exists! Overwrite?", mb::YesNo) == mb::No;
+	}
+
+	$w->msg->text("Recorded $file file");
+
+	$counter++;
+	if ($counter < $max) {
+		my $next = mask_to_filename($number, $w->ipl1->text, $counter);
+		$w->will->text("Will record $next file");
+	} else {
+		$w->will->text('');
+	}
+
+	read_frame();
+	message("Cannot save $file : $@") unless $image_buf->save($w->DirList->path.'/'.$file);
+	system "beep -f 320 -l 100";
+#	Prima::Utils::sound( 329, 100);
+}
+
+
+sub check_dir
+{
+	return if $disable_check_dir;
+	if ($w->DirList->path !~ /^\Q$exp_path\E/) {
+		Prima::Utils::post( sub { 
+			message("You can save results only in '$exp_path' folder" . $w->DirList->path);
+			$w->DirList->path($exp_path);
+		});
+	}
+}
+
+$w = Prima::MainWindow->create(
+	  size => [1060, 620],
+	  minSize => [1060, 620],
+	  text => 'MOREC 2',
+	  font     => {size => 12},
+	  growMode => gm::Center,
+	  menuItems => [
+		['~Commands' => [
+	  		["~Create directory in $exp_path.." => sub {
+	  	      	my $dir = input_box('Please enter new directory name','Directory name','');
+	  	      	return unless defined $dir;
+	  	      	if (mkdir "$exp_path/$dir") {
+	  	      		$disable_check_dir = 1;
+	  	      		$w->DirList->init_tree;
+	  	      		$w->DirList->path("$exp_path/$dir");
+	  	      		$disable_check_dir = 0;
+	  	      	} else {
+	  	      		message("Error:$!");
+	  	      	}
+	  	      }],
+	  	      ['~Open folder', 'Ctrl+O','^O', sub { system "nautilus", $w->DirList->path }],
+	  	      ['~Refresh folder view', 'Ctrl+R','^R', sub {
+	  	      		$disable_check_dir = 1;
+	  	      		my $f = $w->DirList->path;
+	  	      		$w->DirList->init_tree;
+				if (-d $f) {
+	  	      			$w->DirList->path($f);
+				} else {
+	  	      			$w->DirList->path($exp_path);
+				}
+	  	      		$disable_check_dir = 0;
+		      }],
+	  	      [],
+	  	      ["~Record image", 'F2', kb::F2, \&do_save ],
+	  	      ["Toggle e~qualize image", 'Esc', kb::Esc, sub { $w->equalize->toggle }],
+	  	      [AverageVideo => "Show ~averaged video", "Ctrl+A", "^A", sub { shift->menu->toggle(shift) }],
+	  	      [FPS => "Show ~fps rate", sub { shift->menu->toggle(shift) }],
+	  	      [],
+	  	      ['E~xit', 'Alt+X', '', sub { $::application->close }],
+	  	]],
+		['~Zoom' => [
+			['~Increase' => 'Ctrl +' => km::Ctrl|ord('+') => sub { zoom($w->Video->zoom*1.1) }],
+			['~Decrease' => 'Ctrl -' => km::Ctrl|ord('-') => sub { zoom($w->Video->zoom*0.9) }],
+			['~Set to 100%' => sub { zoom(1) }],
+		]],
+	],
+);
+
+$w->insert(Timer=>
+	timeout => 30,
+	onTick => sub {
+		return unless $live_video;
+		read_frame();
+		my $t = time;
+		my $dt = $t - $last_time;
+		$last_time = $t;
+		$fps = sprintf("%.1f", 1/$dt);
+		$w->Video->repaint;
+	},
+)->start;
+
+my $fs = $w->font->height;
+
+$w->insert( Label=>
+	origin    => [10, 15],
+	text      => "",
+	name      => 'will',
+);
+
+$w->insert(Label=>
+	origin    => [10, 50],
+	name      => 'msg',
+	text      => '',
+);
+
+$w-> insert( DirectoryOutline =>
+	origin    => [10, 320],
+	size      => [ 200, 250 ],
+	onChange  => sub {
+		$counter = 0;
+		$w->msg->text('');
+		$w->will->text('');
+		check_dir();
+	},
+	onSelectItem => sub {
+		$counter= 0;
+		$w->msg->text('');
+		$w->will->text('');
+		check_dir();
+	},
+	name     => 'DirList',
+	hScroll  => 1,
+	wScroll  => 1,
+	path     => '/home/visitor/Desktop/Exp',
+	growMode => gm::GrowHiY|gm::GrowHiX,
+);
+
+$w->insert(Label  =>
+	origin    => [10, $w->DirList->top + 10],
+	text      => 'Select ~directory',
+	focusLink => $w->DirList,
+	growMode => gm::Ceiling,
+);
+
+$w->insert(Button=>
+	text     => 'R~ecord (F2)',
+	origin   => [10, 260],
+	onClick  => \&do_save,
+	name     => 'record',
+);
+
+$w->insert(Button=>
+	text     => 'E~xit',
+	onClick  => sub{ $w->close },
+	origin   => [ $w->record->right + 10, 260],
+	name     => 'exit',
+);
+$w->DirList->width( $w->exit->right - $w->DirList->left );
+
+$w->insert(InputLine =>
+	origin   => [10, 90],
+	width    => $w->DirList->width,
+	name     => 'ipl1',
+	text     => 'ch##.gif',
+	onChange => sub{
+		my $self = shift;
+		my $txt = $self->text;
+		$self->text($txt) if $txt =~ s#/##g;
+		$self->text($txt.'.gif') if $txt !~ /\.gif$/;
+		$counter = 0;
+	},
+);
+
+$w->insert(Label =>
+	origin    => [10, 120],
+	text      => '~Mask of files',
+	focusLink => $w->ipl1,
+);
+
+
+$w->insert(SpinEdit =>
+	origin   => [10, 155],
+	name     => 'average',
+	value    => 5,
+	min      => 1,
+	max      => 20,
+	width    => $w->DirList->width,
+	onChange => sub {
+	        my $self= shift;
+	        my $txt= $self->text;
+	        $self->text($txt) if $txt =~ s/\D//g;
+	        $self->text('5')  if $txt eq '';
+	},
+);
+
+$w->insert(Label =>
+	origin    => [10, 185],
+	text      => 'Number for ~averaging',
+	focusLink => $w->average,
+);
+
+
+$w->insert(CheckBox =>
+	origin     =>[10, 220],
+	name       => 'equalize',
+	text       => 'E~qualize',
+	selectable => 1,
+);
+
+sub iv_mousedown
+{
+	my ( $self, $btn, $mod, $x, $y) = @_;
+	return if $self-> {drag} || $btn != mb::Left;
+	$self-> {drag}=1;
+	$self-> {x} = $x;
+	$self-> {y} = $y;
+	$self-> {wasdx} = $self-> deltaX;
+	$self-> {wasdy} = $self-> deltaY;
+	$self-> capture(1);
+}
+
+sub iv_mouseup
+{
+	my ( $self, $btn, $mod, $x, $y) = @_;
+	return unless $self-> {drag} && $btn == mb::Left;
+	$self-> {drag}=0;
+	$self-> capture(0);
+}
+
+sub iv_mousemove
+{
+	my ( $self, $mod, $x, $y) = @_;
+	return unless $self-> {drag};
+	my ($dx,$dy) = ($x - $self-> {x}, $y - $self-> {y});
+	$self-> deltas( $self-> {wasdx} - $dx, $self-> {wasdy} + $dy);
+}
+
+sub iv_mousewheel
+{
+	my ( $self, $mod, $x, $y, $z) = @_;
+	zoom( $w->Video->zoom * (($z > 0) ? 1.1 : 0.9));
+}
+
+$w->insert( ImageViewer =>
+	name      => 'Video',
+	size      => [768, 576],
+	origin    => [ 270, 24],
+	backColor => 0,
+	alignment => ta::Center,
+	valignment => ta::Center,
+	growMode  => gm::YCenter|gm::GrowLoX,
+	onPaint   => sub {
+		my ( $self, $canvas ) = @_;
+		$self->on_paint($canvas);
+		if ($w->menu->FPS->checked) {
+			$canvas->color(cl::LightGreen);
+			$canvas->text_out( $fps, 5, $canvas->height - $canvas->font->height - 5);
+		}
+	},
+	onMouseDown  => \&iv_mousedown,
+	onMouseUp    => \&iv_mouseup,
+	onMouseMove  => \&iv_mousemove,
+	onMouseWheel => \&iv_mousewheel,
+);
+
+sub zoom
+{
+	my $zoom = shift;
+	$w->msg->text("zoom: ".int($zoom * 100 + .5)."%");
+	$w->Video->zoom($zoom);
+}
+
+$w->insert( Button =>
+	text      => '+',
+	origin    => [ 982, 604 ],
+	size      => [ 15, 15 ],
+	font      => { height => 10 },
+	growMode  => gm::GrowLoX|gm::GrowLoY,
+	onClick   => sub { zoom($w->Video->zoom * 1.1) },
+);
+
+$w->insert( Button =>
+	text      => '-',
+	origin    => [ 1002, 604 ],
+	size      => [ 15, 15 ],
+	font      => { height => 10 },
+	growMode  => gm::GrowLoX|gm::GrowLoY,
+	onClick   => sub { zoom($w->Video->zoom * 0.9) },
+);
+
+$w->insert( Button =>
+	text      => '0',
+	origin    => [ 1022, 604 ],
+	size      => [ 15, 15 ],
+	font      => { height => 10 },
+	growMode  => gm::GrowLoX|gm::GrowLoY,
+	onClick   => sub { zoom(1) },
+);
+
+init_video();
+run Prima;

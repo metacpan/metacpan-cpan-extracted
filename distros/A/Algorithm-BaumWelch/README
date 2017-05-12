@@ -1,0 +1,38 @@
+Algorithm-BaumWelch version 0.0.2
+
+The Baum-Welch algorithm is used to compute the parameters (transition and emission probabilities) of an HMM. The
+algorithm calculates the forward and backwards probabilities for each HMM state and then re-estimates the parameters of
+the model. 
+
+This module has been tested with a number of 2-hidden state cases but as yet has been subject to almost no testing with >2 hidden states.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+'Carp'                      => '1.08', 
+'Math::Cephes'              => '0.47', 
+'List::Util'                => '1.19', 
+'Text::SimpleTable'         => '2.0',
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, Daniel S. T. Hughes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

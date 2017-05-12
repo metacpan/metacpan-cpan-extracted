@@ -1,0 +1,62 @@
+#!/usr/bin/env perl
+use warnings;
+use Data::Printer;
+use JSON;
+use Try::Tiny;
+use File::Copy;
+use Data::Dumper;
+
+my $file = shift;
+my $encoder = JSON->new->allow_blessed->pretty(0);
+
+sub soundex
+{
+
+    #my $dir = shift;
+    my $file = shift;
+    push @_,$file;
+    local( @res ) = map {$_=$_}@_; local($i, $t,$_);
+    for ( @res ) { tr/a-zA-Z//cd; tr/a-zA-Z/A-ZA-Z/s;
+        ($i,$t) = /(.)(.*)/;
+       $t =~ tr/BFPVCGJKQSXZDTLMNRAEHIOUWY/111122222222334556/sd;
+       $_ = substr(($i||'Z').$t.'000', 0, 4 );
+
+    }
+#    move($file,$targetdir);
+    return {$file=>[grep(!/000/,@res)]};
+}
+
+
+
+open my $info, $file or die "Could not open $file: $!";
+
+my @line = map{try{$encoder->decode($_)};}<$info>;
+close $info;
+
+
+my $i = $#line;
+print $i;
+my $ret = {};
+foreach(@line){
+my $duration  = $_->{_end} -$_->{_start};
+
+my @test = split /\/|\.| |-/,$_->{name};
+
+
+   $ret->{$_->{application}}->{$_->{name}}  =     [$ret->{$_->{application}}->{$_->{name}}  ? 
+      $ret->{$_->{application}}->{$_->{name}} + 1 : 1 ,$duration];
+
+}
+
+p $ret;
+1;
+__DATA__
+application   "other",
+category      "other",
+class         ""konsole", "Konsole"",
+command       "{ "/usr/bin/konsole" }",
+_end          1415148737,
+id            "0x804e33",
+name          ""~/repos/app-chronos : perl"",
+role          ""MainWindow#3"",
+_start        1415148732

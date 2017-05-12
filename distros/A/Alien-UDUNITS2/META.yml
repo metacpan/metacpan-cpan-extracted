@@ -1,0 +1,36 @@
+---
+abstract: 'Alien package for the UDUNITS-2 physical unit manipulation and conversion library'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  File::Basename: '0'
+  Inline: '0.67'
+  Inline::C: '0.62'
+  Module::Load: '0'
+  Test::More: '0'
+  Test::Number::Delta: '0'
+  perl: '5.006'
+configure_requires:
+  Alien::Base::ModuleBuild: '0.005'
+  File::ShareDir: '1.03'
+  perl: '5.006'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-UDUNITS2
+requires:
+  Alien::Base: '0.006'
+  Exporter: '0'
+  File::ShareDir: '1.03'
+  File::Spec: '0'
+  Perl::OSType: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/EntropyOrg/p5-Alien-UDUNITS2
+  repository: https://github.com/EntropyOrg/p5-Alien-UDUNITS2.git
+version: '0.006'

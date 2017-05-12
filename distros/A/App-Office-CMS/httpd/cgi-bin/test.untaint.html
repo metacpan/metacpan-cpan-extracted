@@ -1,0 +1,37 @@
+<html>
+<head>
+<title>Untaint</title>
+</head>
+<body>
+<h3>Untaint</h3>
+
+<form action="/cgi-bin/test.untaint.cgi" enctype="multipart/form-data" method="post" name="test">
+
+<table>
+
+<tr>
+<td>Input filename:</td>
+<td><: $filename :></td>
+</tr>
+
+<tr>
+<td>Input payload:</td>
+<td><: $payload :></td>
+</tr>
+
+<tr>
+<td>Page template:</td>
+<td align="left"><input type="file" name="name" /></td>
+</tr>
+
+<tr>
+<td><input type="reset" value="Reset" /></td>
+<td><input type="submit" name="submit" id="submit" value="Submit" /></td>
+</tr>
+
+</table>
+
+</form>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Util time-system related functions.
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+# pretend it is "2005-04-18 17:53:20 GMT" now
+*Arch::Util::time = sub () { return 1113836000; };
+*Arch::Util::time = *Arch::Util::time;
+
+use Test::More tests => 21;
+use_ok("Arch::Util", "date2daysago", "date2age");
+
+sub daysago ($) { scalar date2daysago(shift() . " GMT") }
+sub listago ($) { date2daysago(shift() . " GMT") }
+sub age     ($) { date2age(shift() . " GMT") }
+
+is(daysago("2005-04-18 00:00:00"),  0, "date2daysago today 00:00");
+is(daysago("2005-04-18 23:59:59"),  0, "date2daysago today 23:59");
+is(daysago("2005-04-19 00:00:00"),  0, "date2daysago tomorrow 00:00");
+is(daysago("2005-04-19 23:59:59"), -1, "date2daysago tomorrow 23:59");
+is(daysago("2005-04-17 00:00:00"),  1, "date2daysago yesterday 00:00");
+is(daysago("2005-04-17 23:59:59"),  0, "date2daysago yesterday 23:59");
+
+my ($days, $time, $tz) = listago("2005-01-01 12:00:00");
+is($days, 107,        "date2daysago days 2005-01-01 12:00:00");
+is($time, 1104580800, "date2daysago time 2005-01-01 12:00:00");
+is($tz,   "GMT",      "date2daysago tz 2005-01-01 12:00:00");
+
+is(age("2006-01-01 12:00:00"), "-8 months", "date2age 2006-01-01 12:00:00");
+is(age("2005-01-01 12:00:00"),  "4 months", "date2age 2005-01-01 12:00:00");
+is(age("2004-01-01 12:00:00"), "16 months", "date2age 2004-01-01 12:00:00");
+is(age("2003-01-01 12:00:00"),   "2 years", "date2age 2003-01-01 12:00:00");
+is(age("2002-01-01 12:00:00"),   "3 years", "date2age 2002-01-01 12:00:00");
+is(age("2005-05-01 12:00:00"),  "-12 days", "date2age 2005-05-01 12:00:00");
+is(age("2005-04-01 12:00:00"),   "17 days", "date2age 2005-04-01 12:00:00");
+is(age("2005-04-19 12:00:00"),    "0 days", "date2age 2005-04-19 12:00:00");
+is(age("2005-04-18 12:00:00"),    "0 days", "date2age 2005-04-18 12:00:00");
+is(age("2005-04-17 12:00:00"),     "1 day", "date2age 2005-04-17 12:00:00");
+is(age("2005-04-10 12:00:00"),    "8 days", "date2age 2005-04-10 12:00:00");

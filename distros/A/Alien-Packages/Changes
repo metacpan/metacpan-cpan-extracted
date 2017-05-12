@@ -1,0 +1,12 @@
+Revision history for Alien-Packages
+
+0.003 2013-09-14
+ - split on , for debian packages to handle multiple packages owning the
+   same file/dir (thanks to Graham Ollis <perl@wdlabs.com>)
+
+0.002 2013-09-12
+ - move to github
+ - move author tests to xt/
+
+0.000_001 - 2010-08-14
+ - First version, released on an unsuspecting world.

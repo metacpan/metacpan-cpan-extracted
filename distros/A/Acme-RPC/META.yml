@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Acme-RPC
+version:            0.01
+abstract:           Easy remote function and method call and more
+author:
+    - Scott Walters <scott@slowass.net>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Continuity:     0
+    Devel::Caller:  0
+    IO::Handle:     0
+    JSON:           0
+    PadWalker:      0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

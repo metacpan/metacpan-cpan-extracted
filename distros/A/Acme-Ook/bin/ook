@@ -1,0 +1,25 @@
+#!/usr/bin/perl -ws
+
+use strict;
+use vars qw($S $l $O);
+
+use Acme::Ook;
+my $Ook = Acme::Ook->new;
+my $OOK = $Ook->compile(@ARGV);
+
+if ($O) {
+    $OOK = $Ook->optimise($OOK);
+}
+
+if ($S) {
+    print $OOK;
+} else {
+    eval $OOK;
+}
+
+print "\n" if $l;
+
+exit(0);
+
+
+

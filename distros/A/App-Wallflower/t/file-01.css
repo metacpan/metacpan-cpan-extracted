@@ -1,0 +1,17 @@
+@import "foo.css";
+@import "bar.css";
+h1 {
+    background: url(/img.png);
+}
+
+h2 {
+    background: url("img_qq.png");
+}
+
+h3 {
+    background: url('../img_q.png');
+}
+
+h4 {
+    background: url(http://example.com/ex.png);
+}

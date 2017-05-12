@@ -1,0 +1,24 @@
+---
+name: Apache2-DirBasedHandler-TT
+version: 0.03
+author:
+  - Adam Prime (adam.prime@utoronto.ca)
+abstract: TT hooked into DirBasedHandler
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Apache2::DirBasedHandler: 0.03
+  Apache2::Request: 2.07
+  Template: 2.18
+  mod_perl2: 2
+build_requires:
+  Apache::Test: 1.12
+provides:
+  Apache2::DirBasedHandler::TT:
+    file: lib/Apache2/DirBasedHandler/TT.pm
+    version: 0.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,60 @@
+Usage: for-example ACTION
+
+Where ACTION can be
+
+(Note: Every option below is, well, optional. If not specified, a fun default will be chosen/guessed for you)
+
+    catalyst/fastcgi ...
+
+        Generate a Catalyst FastCGI configuration (for monit, start-stop, or the specified http daemon and fastcgi method)
+
+        --package           The Catalyst package for your application (e.g. Project::Xyzzy or My::Application)
+        --home              The path to your Catalyst home directory, default: . (The current directory)
+        --log-home          The directory to log into, default: <home>/log (Below the directory given by --home)
+        --base              The base for your application, default: / (At the root)
+        --hostname          The hostname from which your application is served (e.g. example.com)
+
+        --bare              Do not output anything BUT the configuration (no monit, no start-stop)
+        --output -          Print output to stdout
+        --output <path>     Write output to <path> (which can be either a directory or file)
+                            This will split output appropiately (e.g. <file>.apache2, <file>.start-stop, <file>.monit)
+
+        --fastcgi-script                The <path> to the Catalyst fastcgi script (e.g. script/xyzzy_fastcgi.pl)
+        --fastcgi-socket <path>         Have fastcgi use <path> for the file socket
+        --fastcgi-socket <host:port>    Have fastcgi use <host:port> for the socket
+        --fastcgi-pid-file <path>       Store the pid for the process in <path>
+
+        apache2 standalone  Apache2 with standalone FastCGI (mod_fastcgi)
+        apache2 static      Apache2 with static FastCGI (mod_fastcgi)
+        apache2 dynamic     Apache2 with dynamic FastCGI (mod_fastcgi)
+
+        lighttpd standalone lighttpd with dynamic FastCGI
+        lighttpd static     lighttpd with static FastCGI
+
+        nginx               nginx with standalone FastCGI (the only kind supported)
+
+        monit               A monit configuration for a standalone FastCGI setup
+        start-stop          A start-stop script for a standalone FastCGI setup
+        
+    catalyst/mod_perl
+
+        Generate a mod_perl2 (for Apache2) Catalyst configuration
+
+        --package           The Catalyst package for your application (e.g. Project::Xyzzy or My::Application)
+        --home              The path to your Catalyst home directory, default: . (The current directory)
+        --log-home          The directory to log into, default: <home>/log (Below the directory given by --home)
+        --base              The base for your application, default: / (At the root)
+        --hostname          The hostname from which your application is served (e.g. example.com)
+
+    monit
+
+        Generate a basic, stripped-down monit configuration suitable for a non-root user
+
+        --home              The directory designated monit home (containing the pid file, log, rc, ...)
+
+For example:
+
+    for-example catalyst/fastcgi apache2 standalone --package My::Application --hostname example.com
+    for-example monit --home $HOME/my-monit
+    for-example catalyst/mod_perl --package Project::Xyzzy --hostname xyzzy.com --home Project-Xyzzy
+

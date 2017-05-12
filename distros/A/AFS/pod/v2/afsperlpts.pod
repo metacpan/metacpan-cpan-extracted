@@ -1,0 +1,505 @@
+#------------------------------------------------------------------------------
+# RCS-Id: "@(#)$RCS-Id: pod/v2/afsperlpts.pod 2e2ca60 Tue Apr 15 13:04:20 2014 +0200 Norbert E Gruener$"
+#
+# © 2001-2014 Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<AFS::PTS> - Class to communicate with the B<AFS Protection Server>
+
+=head1 SYNOPSIS
+
+  use AFS::PTS;
+
+  my $num_flg = AFS::PTS->convert_numeric_names;
+  my $bits  = AFS::PTS->ascii2ptsaccess("S----");
+  my $flags = AFS::PTS->ptsaccess2ascii($bits);
+
+  my $pts = AFS::PTS->new;
+
+  my $id    = $pts->createuser('guest');
+  my $entry = $pts->listentry('guest');
+  foreach my $key ( sort keys %$entry) {
+      printf("%20s =>  %s\n", $key, $$entry{$key});
+  }
+  $ok = $pts->delete('guest');
+  undef $pts;   # destroy server connection
+
+  $pts   = AFS::PTS->new;
+  $entry = $pts->dumpentry(67136, 1, 1);
+  foreach my $key ( sort keys %$entry) {
+      printf("%20s =>  %s\n", $key, $$entry{$key});
+  }
+
+  my $over  = 1;
+  my @names = $pts->getcps('nog', 1, $over);
+  print "OVER = $over \n";
+  print "cps for NOG\n";
+  foreach my $mem (sort @names) {
+      print "  $mem\n";
+  }
+
+  AFS::PTS->convert_numeric_names(1);
+  my @ids = (28053, 1, 105, 32000, 32766);
+  @names  = $pts->PR_IDToName(\@ids);
+  foreach my $name (@names) {
+      print "name = $name\n";
+  }
+
+  print "Convert(nog): ", $pts->id('nog'), "\n";
+
+=head1 DESCRIPTION
+
+This class is used to communicate with the B<AFS Protection Server> in
+order to maintain and to administer the Protection Database maintained
+by the Protection Server.  The Protection Database stores information
+about AFS users, client machines, and groups which the File Server
+process uses to determine whether clients are authorized to access AFS
+data.
+
+This class provides methods to map back and forth between user account
+names and their internal numerical AFS identifiers. It also manages
+the creation, manipulation, and update of user-defined groups suitable
+for use on ACLs.  It has methods to query the information held for any
+given AFS user or group and to create, modify, and delete the records
+in the PDB where the above information is held.
+
+Before you can access any PDB records you must establish a connection
+to the Protection Server.  This is done by the constructor method
+C<new> which returns a PTS object.  A PTS object is essentially a
+handle to talk to the Protection Server in a given cell.  Such a PTS
+object is required before any of the other PTS instance methods can be
+called.
+
+All PR_* methods are essentially the same as the low-level AFS PTS
+APIs and are considered as I<low-level> methods.  The other methods
+(considered as high-level) are more I<user friendly> and perl-like.
+Whereas the low-level (PR_*) methods only accept numerical values for
+names or groups the high-level methods accept either numeric IDs or
+names.
+
+=head1 COMPATIBILITY
+
+B<This release does NOT support any features and interfaces
+from version 1.>
+
+=head1 METHODS
+
+=over 4
+
+=item B<CONSTRUCTOR>
+
+=item S< >
+
+=item B<$pts = AFS::PTS-E<gt>new(([SEC [, CELL]]);>
+
+Creates a new object of the class AFS::PTS.  An AFS::PTS object is
+essentially a handle to talk to the Protection Server in a given
+CELL.  Internally an AFS::PTS object is a pointer to a ubik_client
+structure, although this may change and the value returned from
+AFS::PTS::new should always be treaded as an opaque handle.
+
+CELL defaults to NULL.  The security level SEC (default 1) is a number
+from 0 to 2:
+
+   0    un-authenticated connection should be made
+   1    try authenticated first, fall back to un-authenticated
+   2    fail if an authenticated connection can't be made
+
+=item B<DESTRUCTOR>
+
+=item S< >
+
+=item B<$pts-E<gt>DESTROY;>
+
+Destroys the ubik connection to the Protection Server and frees the ubik
+connection structure.
+
+=item B<CLASS METHODS>
+
+=item S< >
+
+=item B<$bits = AFS::PTS-E<gt>ascii2ptsaccess(FLAGS);>
+
+Converts the privacy flags FLAGS (a string of five characters) into
+its corresponding five privacy bits. The privacy flags indicate who
+can display or administer certain aspects of a PTS entry.
+
+=item B<$flags = AFS::PTS-E<gt>ptsaccess2ascii(BITS);>
+
+Converts the five PTS privacy bits BITS into its corresponding privacy
+flags (a string of five characters).  The privacy flags indicate who
+can display or administer certain aspects of a PTS entry.
+
+=item B<$value = AFS::PTS-E<gt>convert_numeric_names;>
+
+=item B<AFS::PTS-E<gt>convert_numeric_names(NEWVAL);>
+
+Gets or sets the global flag for converting names into numeric AFS ids.
+If conversion is 'on' (default) all names NOT looking like a numeric
+value are converted into its AFS id. If you set NEWVAL to 0 (conversion
+is 'off'), B<NO> conversion is done.  You'll probably want to leave
+conversion 'on' unless you create PTS names that look exactly like
+numbers. (not a good idea to begin with :-)
+
+=item S< >
+
+=item B<INSTANCE METHODS> (high-level)
+
+All high-level methods will accept either numeric AFS ids or AFS user
+names.
+
+=item S< >
+
+=item B<$ok = $pts-E<gt>adduser(NAME, GROUP);>
+
+Adds the given user NAME to the specified GROUP.  It calls the AFS
+system library function 'PR_AddToGroup'.
+
+=item B<$ok = $pts-E<gt>chid(NAME, NEWID);>
+
+Changes the id for the given entry NAME to NEWID.  It calls the AFS
+system library function 'PR_ChangeEntry'.
+
+=item B<$ok = $pts-E<gt>chown(NAME, OWNER);>
+
+Changes the owner of the given entry NAME to OWNER.  It calls the AFS
+system library function 'PR_ChangeEntry'.
+
+=item B<$id = $pts-E<gt>creategroup(NAME [, OWNER [, GID]]);>
+
+Creates the new group NAME. You can optionally specify the OWNER and
+the id GID of the new group.  If successful, the group ID allocated
+for this new entry is returned. It calls the AFS system library
+function 'PR_INewEntry' or 'PR_NewEntry'.
+
+=item B<$id = $pts-E<gt>createuser(NAME [, UID]);>
+
+Creates the new user NAME. You can optionally specify the id UID of
+the new user.  If successful, the user ID allocated for this new entry
+is returned. It calls the AFS system library function 'PR_INewEntry'
+or 'PR_NewEntry'.
+
+=item B<$ok = $pts-E<gt>delete(NAME);>
+
+Deletes the entry NAME.  It calls the AFS system library function
+'PR_Delete'.
+
+=item B<$entry = $pts-E<gt>dumpentry(POS [, LOOKUP_ID [, CONV]]);>
+
+Returns a reference to a hash table containing the values from the C
+structure C<prdebugentry>. If LOOKUP_ID is 1 (default) then the AFS ids
+in the hash table will be converted to names. If CONV is 1 (default)
+then flags will be converted to its ASCII representation.  It calls
+the AFS system library function 'PR_DumpEntry'.
+
+=item B<@members = $pts-E<gt>getcps(NAME [, LOOKUP_ID [, OVER]]);>
+
+Returns the I<Current Protection Subdomain> (CPS) for the given PTS
+id. The CPS is the closure of all identities that the given NAME can
+use. This list includes all the groups NAME belongs to, the special
+AFS ids (system:anyuser and system:authuser), as well as the id
+itself. If LOOKUP_ID is 1 (default) then names will be returned.  If
+the size of the list is greater then &AFS::PR_MAXGROUPS then OVER will
+be set to a non-zero value and only &AFS::PR_MAXGROUPS items will be
+returned.  It calls the AFS system library function 'PR_GetCPS'.
+
+=item B<$id = $pts-E<gt>id($NAME [, ANON]]);>
+
+=item B<@id = $pts-E<gt>id(\@NAME [, ANON]]);>
+
+=item B<$idref = $pts-E<gt>id(\%NAME [, ANON]]);>
+
+Converts the NAME into a AFS id. The first method returns a single
+id. The second method takes a reference to an array of names and
+returns an array of ids. The third method takes a reference to a hash
+table, the keys of which are names, and returns a reference to the
+B<same hash>, with the ids as the value of each key.
+
+If ANON is 1 (default) and a given name does not map into an id then
+the value &AFS::ANONYMOUSID will be returned. If ANON is 0 then the id
+will be set to undef.  It calls the AFS system library function
+'PR_NameToID'.
+
+=item B<$ok = $pts-E<gt>ismember(NAME, GROUP);>
+
+Returns a non-zero value if NAME is a member of GROUP.  It calls the
+AFS system library function 'PR_IsAMemberOf'.
+
+=item B<$entry = $pts-E<gt>listentry(NAME [, LOOKUP_ID [, CONV]]);>
+
+Returns a reference to a hash table containing the values from the C
+structure C<prcheckentry>.  If LOOKUP_ID is 1 (default) then the PTS
+ids in the hash table will be converted to names. If CONV is 1
+(default) then flags will be converted to its ASCII representation.
+It calls the AFS system library function 'PR_ListEntry'.
+
+=item B<($uid, $gid) = $pts-E<gt>listmax;>
+
+Returns the largest allocated user ID and group ID.  It calls the AFS
+system library function 'PR_ListMax'.
+
+=item B<@members = $pts-E<gt>members(NAME [, LOOKUP_ID [, OVER]]);>
+
+Returns the list of groups in which the user NAME is a member. If NAME
+is a group, this method returns a list of users which are in that
+group. If LOOKUP_ID is 1 (default) then names will be returned.  If
+the size of the list is greater then &AFS::PR_MAXGROUPS then OVER will
+be set to a non-zero value and only &AFS::PR_MAXGROUPS items will be
+returned.  It calls the AFS system library function 'PR_ListElements'.
+
+=item B<$name = $pts-E<gt>name(ID [, ANON]]);>
+
+=item B<@name = $pts-E<gt>name(ID [, ANON]]);>
+
+=item B<$nameref = $pts-E<gt>name(ID [, ANON]]);>
+
+Converts AFS ID into a name. The first method returns a single
+name. The second method takes a reference to an array of ids and
+returns an array of names. The third method takes a reference to a
+hash table, the keys of which are ids, and returns a reference to the
+B<same hash>, with the names as the value of each key.  If ANON is 1
+(default) and a given id does not map into a name then the id value
+will be converted to a string (i.e, 11234 => "11234").
+
+If ANON is 0 then the name will be set to undef.  It calls the AFS
+system library function 'PR_IDToName'.
+
+=item B<@members = $pts-E<gt>owned(NAME [, LOOKUP_ID [, OVER]]);>
+
+Returns a list of AFS ids owned by the given user or group NAME.  If
+NAME is 0, then the PDB orphan list is returned. There is also a
+global orphan list, which contains entries for all orphans, namely
+groups belonging to users that have been deleted from the PDB. If
+LOOKUP_ID is 1 (default) then names will be returned.  If the size of
+the list is greater then &AFS::PR_MAXGROUPS then OVER will be set to a
+non-zero value and only &AFS::PR_MAXGROUPS items will be returned.  It
+calls the AFS system library function 'PR_ListOwned'.
+
+=item B<$ok = $pts-E<gt>rename(NAME, NEWNAME);>
+
+Renames NAME into NEWNAME.  It calls the AFS system library function
+'PR_ChangeEntry'.
+
+=item B<$ok = $pts-E<gt>removeuser(NAME, GROUP);>
+
+Removes the user NAME from GROUP.  It calls the AFS system library
+function 'PR_RemoveFromGroup'.
+
+=item B<$ok = $pts-E<gt>setaccess(NAME, NEWFLAG);>
+
+Sets the privacy flags for the given entry NAME to NEWFLAG.  It calls
+the AFS system library function 'PR_SetFieldsEntry'.
+
+=item B<$ok = $pts-E<gt>setgroupquota(NAME, NGROUPS);>
+
+Sets the group creation quota for NAME to NGROUPS.  It calls the AFS
+system library function 'PR_SetFieldsEntry'.
+
+=item B<$max = $pts-E<gt>setmax(ID [, ISGROUP]);>
+
+If ISGROUP is 0 (default) then the maximum id number for user is set
+to ID. Otherwise the maximum id number of groups is set to ID.  It
+calls the AFS system library function 'PR_SetMax'.
+
+=item B<$pos = $pts-E<gt>whereisit(NAME);>
+
+Returns the PDB byte offset of NAME. This method is used in
+conjunction with the method 'dumpentry'.  It calls the AFS system
+library function 'PR_WhereIsIt'.
+
+=item S< >
+
+=item B<INSTANCE METHODS> (low-level)
+
+The following low-level methods deal only with numeric AFS ids.
+
+=item S< >
+
+=item B<$ok = $pts-E<gt>PR_AddToGroup(UID, GID);>
+
+Adds the given AFS UID to the group whose numerical identifier is
+GID.
+
+=item B<$ok = $pts-E<gt>PR_ChangeEntry(ID, NAME, OID, NEWID);>
+
+Allows the caller to change one or more aspects of the user or group
+entry in the PDB whose numerical id is ID. An attempt to change the
+entry for any of the reserved AFS ids (ANYUSERID, AUTHUSERID,
+ANONYMOUSID, or SYSADMINID) will be rejected. The new name, if any, to
+assign to the entry is held in NAME. If no name change is to be made,
+then the name argument may be set to NULL.  Similarly, the numerical
+ID of the entry's (possibly new) owner is listed in the OID
+parameter. If no owner change is desired, OID is set to zero. Finally,
+a new numerical ID may be specified for the given entry in NEWID. If
+this is set to zero, then the entry's ID will not be altered.
+
+=item B<$ok = $pts-E<gt>PR_Delete(ID);>
+
+Deletes the PDB entry for the user or group whose id is ID.
+
+=item B<$entry = $pts-E<gt>PR_DumpEntry(POS);>
+
+Returns the contents of the PDB entry located at byte offset POS
+within the database, and is intended to be used only for debugging.
+
+=item B<@ids = $pts-E<gt>PR_GetCPS(ID, OVER);>
+
+Generate the Current Protection Subdomain, or CPS, for the AFS user with
+the given numerical ID. Basically, the CPS is the closure of all
+identities that the given ID can use.  This list of groups and special
+AFS ids (e.g. ANYUSERID and AUTHUSERID) to which the specified user
+belongs is returned.  The user's own ID also appears on this list. If
+the size of the list has overflowed the maximum list size, PR_MAXGROUPS
+(5,000), then the OVER argument is set to a non­zero value.
+
+=item B<@names = $pts-E<gt>PR_IDToName(\@IDS);>
+
+Converts the array of numerical AFS user IDS into the appropriate
+printable AFS user names. Entries in the given list IDS for which the
+Protection Server does not have an ID­to­name mapping are translated
+to the string representation of the numerical ID, in base 10.
+
+=item B<$id = $pts-E<gt>PR_INewEntry(NAME, ID, OID);>
+
+Creates an entry in the PDB for a user or group with the given NAME,
+and whose owner's id is OID.  The numerical AFS id must be set to the
+given value ID.  If successful, the given ID allocated for this new
+entry is returned.
+
+=item B<$ok = $pts-E<gt>PR_IsAMemberOf(UID, GID);>
+
+Returns a non-zero value if user UID is a member of group GID.
+
+=item B<@ids = $pts-E<gt>PR_ListElements(ID, OVER);>
+
+For the user ID, this method returns the list of groups in which the
+user is a member. For the group ID, this method returns a list of
+users which are in that group. Note that this function returns
+numerical ids, not names.  If the size of the generated list has
+overflowed the maximum list size, PR_MAXGROUPS (5,000), then the OVER
+argument is set to a non­zero value.
+
+=item B<$entry = $pts-E<gt>PR_ListEntry(ID);>
+
+Returns a reference to a hash table containing the values from the C
+structure C<prcheckentry> for the PDB entry ID. No conversion is done
+on ids or flags.
+
+=item B<($uid, $gid) = $pts-E<gt>PR_ListMax;>
+
+Returns the largest allocated user id and group id.
+
+=item B<@members = $pts-E<gt>PR_ListOwned(ID, OVER);>
+
+Returns a list of AFS ids owned by the given user or group ID.  If the
+ID parameter is set to zero, then the PDB orphan list is returned. If
+the size of the generated list has overflowed the maximum list size,
+PR_MAXGROUPS (5,000), then the OVER argument is set to a non­zero
+value.
+
+=item B<@ids = $pts-E<gt>PR_NameToID(\@NAMES);>
+
+Converts the array of AFS NAMES into the appropriate AFS ids.  Entries
+in the given list NAMES for which the Protection Server does not have
+an ID­to­name mapping are set to &AFS::ANONYMOUS.
+
+
+=item B<$id = $pts-E<gt>PR_NewEntry(NAME, FLAG, OID);>
+
+Creates an entry in the PDB for a user or group with the given NAME,
+and whose owner's ID is OID.  If successful, the user or group ID
+allocated for this new entry is returned.  The FLAG argument is used
+to communicate whether the entry is for a user or group. Legal values
+are
+
+    &AFS::PRGRP   create a group
+    &AFS::PRUSER  create a user
+
+=item B<$ok = $pts-E<gt>PR_RemoveFromGroup(UID, GID);>
+
+Removes the given AFS id UID from the group identified by GID.
+
+=item B<$ok = $pts-E<gt>PR_SetFieldsEntry(ID, MASK, FLAGS, NGROUPS, NUSERS, S1, S2);>
+
+This method allows a caller to change one or more fields within the
+PDB entry matching the given user ID. The MASK argument is used to
+select which fields are to be changed. Depending on what has been
+selected, the values placed in the argument fLAGS (setting the flag
+bits), NGROUPS (setting the group creation limit), and/or NUSERS
+(setting the foreign user limit) are inserted into the PDB entry. The
+remaining two arguments, S1 and S2, are not referenced, and are
+reserved for future expansion.
+
+=item B<$ok = $pts-E<gt>PR_SetMax(ID, GFLAG);>
+
+Sets the value of either the highest­allocated AFS user or group to
+ID. The GFLAG argument is set to a non­zero value if the given ID is
+for a group, and to zero for an individual user.
+
+=item B<$pos = $pts-E<gt>PR_WhereIsIt(ID);>
+
+Returns the PDB byte offset for ID. This method is used in conjunction
+with the method 'PR_DumpEntry'.
+
+=back
+
+=head1 CURRENT AUTHOR
+
+Norbert E. Gruener E<lt>nog@MPA-Garching.MPG.deE<gt>
+
+=head1 AUTHOR EMERITUS
+
+Roland Schemers E<lt>schemers@slapshot.stanford.eduE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (c) 2001-2010 Norbert E. Gruener <nog@MPA-Garching.MPG.de>.
+ All rights reserved.
+
+ Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University.
+ All rights reserved.
+
+Most of the explanations in this document are taken from the original
+AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ Protection Server Interface
+ Edward R. Zayas
+ Copyright (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ Copyright (c) IBM Corporation 2000.
+ All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=over 6
+
+=item The original module is covered by the following copyright:
+
+Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation,
+advertising materials, and other materials related to such
+distribution and use acknowledge that the software was developed
+by Stanford University.  The name of the University may not be used
+to endorse or promote products derived from this software without
+specific prior written permission.
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=back
+
+=head1 DOCUMENT VERSION
+
+Revision $Rev: 1059 $

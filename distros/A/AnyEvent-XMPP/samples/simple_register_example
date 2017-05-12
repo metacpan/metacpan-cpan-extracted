@@ -1,0 +1,109 @@
+#!/opt/perl/bin/perl
+use strict;
+use utf8;
+use AnyEvent;
+use AnyEvent::XMPP::Client;
+use AnyEvent::XMPP::Ext::Registration;
+use AnyEvent::XMPP::Util qw/split_jid/;
+
+sub result {
+   my ($reg, $ok, $error, $form, $comment) = @_;
+   $comment ||= 'REGISTERED!';
+   if ($ok) {
+      print "$comment\n";
+   } else {
+      print "ERROR: " . $error->string . " [form: $form]\n";
+   }
+}
+
+my ($user, $pw, $act) = @ARGV;
+my ($username, $server) = split_jid ($user);
+
+unless ($user && $pw) {
+print <<USAGE;
+usage:
+  register account:
+     ./simple_register_example <jid> <password>
+
+  unregister account:
+     ./simple_register_example <jid> <password> unregister
+
+  change password:
+     ./simple_register_example <jid> <password> chpw:<newpassword>
+
+USAGE
+die "\n";
+}
+
+my $j = AnyEvent->condvar;
+my $cl = AnyEvent::XMPP::Client->new (debug => 1);
+$cl->add_account ($user, $pw);
+$cl->reg_cb (
+   stream_pre_authentication => sub {
+      my ($cl, $acc) = @_;
+
+      my $reg = AnyEvent::XMPP::Ext::Registration->new (connection => $acc->connection);
+
+      if ($act eq '') {
+         $reg->send_registration_request (sub {
+            my ($reg, $form, $error) = @_;
+
+            if ($error) {
+               print "ERROR: " . $error->string . "\n";
+
+            } else {
+               my $df = $form->get_data_form;
+               my $lf = $form->get_legacy_form_fields;
+               my $oo = $form->get_oob;
+
+               if ($df) {
+                  print "GOT FORM! ".($df ? $df->as_debug_string : "")."\n";
+               }
+               if ($lf) {
+                  require Data::Dumper;
+                  print "LEGACY: " . Data::Dumper->Dump ([$lf]) . "\n";
+               }
+               if ($oo) {
+                  print "OOB: $oo->{url} / $oo->{desc}\n";
+               }
+
+               my $af = $form->try_fillout_registration ($username, $pw);
+               $reg->submit_form ($af, \&result);
+            }
+         });
+         return 0
+      }
+      1
+   },
+   session_ready => sub {
+      my ($cl, $acc) = @_;
+
+      my $reg = AnyEvent::XMPP::Ext::Registration->new (connection => $acc->connection);
+
+      if ($act eq 'unregister') {
+         $reg->send_unregistration_request (
+            sub { result ($_[0], $_[1], $_[2], $_[3], 'UNREGISTERED!') }
+         );
+
+      } elsif ($act =~ /chpw:(\S+)/) {
+         $reg->send_password_change_request ($username, $1,
+            sub { result ($_[0], $_[1], $_[2], $_[3], 'CHANGED PW!') }
+         );
+      }
+   },
+   disconnect => sub {
+      my ($cl, $acc, $h, $p, $reas) = @_;
+      print "disconnect ($h:$p): $reas\n";
+   },
+   error => sub {
+      my ($cl, $acc, $err) = @_;
+      print "ERROR: " . $err->string . "\n";
+   },
+   message => sub {
+      my ($cl, $acc, $msg) = @_;
+      print "message from: " . $msg->from . ": " . $msg->any_body . "\n";
+   }
+);
+
+$cl->start;
+$j->wait;

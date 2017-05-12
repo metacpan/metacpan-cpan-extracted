@@ -1,0 +1,8 @@
+TYPEMAP
+my_cpu_t *								 T_PACKED
+my_disk_t *								 T_PACKED
+my_netinterface_t *					 T_PACKED
+perfstat_cpu_total_t *				 T_PACKED
+perfstat_disk_total_t *				 T_PACKED
+perfstat_memory_total_t *			 T_PACKED
+perfstat_netinterface_total_t *	 T_PACKED

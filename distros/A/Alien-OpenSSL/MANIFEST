@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Alien/OpenSSL.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/00-use.t
+t/01-signature.t
+t/author-pod.t
+SIGNATURE    Added here by Module::Build

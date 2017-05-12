@@ -1,0 +1,211 @@
+Copyright 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+
+This file is part of Chart.
+
+Chart is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3, or (at your option) any later
+version.
+
+Chart is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with Chart.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Version 260, April 2017
+    - Yahoo exchanges moved
+
+Version 259, April 2017
+    - Emacs chart-ses-refresh fix waiting for quotes to download
+    - Emacs chart-latest fields quote-date quote-time last-date last-time
+
+Version 258, July 2016
+    - new CHART_DIRECTORY environment variable
+
+Version 257, May 2016
+    - Fix for quotes from symbols not otherwise in database
+
+Version 256, May 2016
+    - Trading Room gone
+
+Version 255, February 2016
+    - RBA CSV download
+
+Version 254, January 2016
+    - TSP web page moved
+    - Emacs watchlist bookmarking
+
+Version 253, June 2015
+    - Barchart, Yahoo updates, new Trading Room
+
+Version 252, June 2015
+    - TSP download update
+
+Version 251, December 2014
+    - chartprog.el various fixes
+
+Version 250, October 2014
+    - use I18::Langinfo only if available
+    - use Encode::Locale for console encoding
+
+Version 249, June 2014
+    - misc fixes
+
+Version 248, September 2012
+    - updates for RBA historical data
+
+Version 247, March 2012
+    - NZ weblink to Google finance
+
+Version 246, October 2011
+    - fix --ticker of multiple lists
+
+Version 245, October 2011
+    - fix for ta-lib segvs on symbols with no data
+
+Version 244, July 2011
+    - NZX dividends page moved
+
+Version 243, July 2011
+    - fix indicators initial scale
+
+Version 242, June 2011
+    - fix watchlist drag re-ordering
+
+Version 241, June 2011
+    - some code split outs
+
+Version 240, June 2011
+    - some warnings
+
+Version 239, February 2011
+    - show latest under divs/splits adjust
+
+Version 238, February 2011
+    - fix for dividend adjust on the ex-div day
+
+Version 237, January 2011
+    - some PixbufBits split out
+
+Version 236, December 2010
+    - fix weekly/monthly initial range
+    - initial range/page include latest quote
+
+Version 235, November 2010
+    - fix for initial View/Weblink menu, and use ConnectProperties not
+      the history's private ModelSensitive
+
+Version 234, October 2010
+    - fix for new shares from open dialog
+
+Version 233, October 2010
+    - intraday print and save
+
+Version 232, August 2010
+    - fix graph initial scale (when latest fetch slow)
+    - NumAxis split out
+
+Version 231, August 2010
+    - more module split outs
+
+Version 230, August 2010
+    - History and DynamicContext split out
+
+Version 229, August 2010
+    - fix for Adjustment configure with Perl-Gtk 1.230
+
+Version 228, July 2010
+    - some split outs and renaming
+
+Version 227, July 2010
+    - TSP web page update
+
+Version 226, July 2010
+    - misc stuff
+
+Version 225, June 2010
+    - misc stuff
+
+Version 224, May 2010
+    - some splits display fixes
+
+Version 223, May 2010
+    - barchart page updates
+
+Version 222, May 2010
+    - TextBufferBits split out to Gtk2-Ex-WidgetBits
+
+Version 221, April 2010
+    - misc stuff
+
+Version 220, April 2010
+    - misc stuff
+
+Version 219, March 2010
+    - misc fixes and stuff, including open dialog row clicking
+
+Version 218, March 2010
+    - File/Delete remove from Alerts list too
+    - Symlist radio menu fix
+
+Version 217, February 2010
+    - RBA url fix
+
+Version 216, January 2010
+    - RBA web page updates
+
+Version 215, December 2009
+    - Gtk2::Ex::Units split out
+
+Version 214, November 2009
+    - misc renaming, in particular to App::Chart
+
+Version 213, October 2009
+    - TSP download fixes (and other POSTs)
+
+Version 212, September 2009
+    - split out constant::defer
+
+Version 211, September 2009
+    - more Barchart
+
+Version 210, September 2009
+    - Barchart pass through initial advert page
+
+Version 209, July 2009
+    - Yahoo zap high!=low when no trades
+    - NZX dividends page moved
+
+Version 208, July 2009
+    - Yahoo historical high/low crossed on suspended shares.
+    - Yahoo fix last trade date at end of month.
+
+Version 207, June 2009
+    - More stuff
+
+Version 206, June 2009
+    - Fix for "Add Favourite"
+
+Version 205, May 2009
+    - Various stuff
+
+Version 204, April 2009
+    - Yahoo unchanged actually
+
+Version 203, April 2009
+    - Mucho various stuff.
+    - Yahoo date update.
+
+Version 202, March 2009
+    - New indicators.
+    - ASX weblink new location
+
+Version 201, March 2009
+    - More stuff.
+
+Version 200, March 2009
+    - Upgrade to Perl.

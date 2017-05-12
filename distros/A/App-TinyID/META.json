@@ -1,0 +1,47 @@
+{
+   "abstract" : "Command line tool to encrypt and encrypt integer using Integer::Tiny",
+   "author" : [
+      "faraco <skelic3@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-TinyID",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "v2.49.1",
+            "Integer::Tiny" : "0.3",
+            "Scalar::Util" : "1.47",
+            "Test::More" : "1.302075",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/faraco/App-TinyID/issues"
+      },
+      "homepage" : "https://github.com/faraco/App-TinyID",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/faraco/App-TinyID.git",
+         "web" : "https://github.com/faraco/App-TinyID"
+      }
+   },
+   "version" : "0.1.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

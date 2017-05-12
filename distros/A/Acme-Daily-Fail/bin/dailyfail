@@ -1,0 +1,36 @@
+#!perl
+#ABSTRACT: generate random newspaper headlines
+package
+  dailyfail;
+use strict;
+use warnings;
+use Acme::Daily::Fail qw(get_headline);
+$|=1;
+print get_headline(), "\n";
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dailyfail - generate random newspaper headlines
+
+=head1 VERSION
+
+version 1.14
+
+=head1 AUTHOR
+
+Chris Williams <chris@bingosnet.co.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Chris Applegate and Chris Williams.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

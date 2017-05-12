@@ -1,0 +1,26 @@
+Revision history for Acme-CPANAuthors-Israeli
+
+0.0310  2015-06-19
+        - Actual release number due to a misrelease.
+
+0.0300  2015-06-19
+        - Convert to dzil and update some old URLs/addresses.
+
+0.0201  2015-05-30
+        - Add LICENSE file.
+        - Update the repository link to point to GitHub.
+        - Convert "Changes" to CPAN::Changes.
+        - Add a test for trailing space and removed it.
+
+0.0200  2009-07-01
+        - Added keywords and resources to the META.yml (via Build.PL).
+
+0.0102  2008-09-14
+        - Removed an author who did not want to be included.
+
+0.0101  2008-09-14
+        Added dependencies to the Build.PL.
+
+0.01    2008-09-14
+        First version, released on an unsuspecting world.
+

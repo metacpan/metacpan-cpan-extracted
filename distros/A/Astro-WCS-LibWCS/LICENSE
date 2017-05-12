@@ -1,0 +1,12 @@
+LICENSE INFORMATION
+-------------------
+
+The Astro::WCS::LibWCS Perl module is released under the same terms as
+Perl itself.  Please see the "README" file in the Perl distribution
+for more details.
+
+WCSTools is a package of programs and a library of utility subroutines
+for setting and using the world coordinate systems (WCS) in the
+headers of the most common astronomical image formats - FITS and IRAF -
+to relate image pixels to sky coordinates. More information on WCSTools
+can be found at http://tdc-www.harvard.edu/software/wcstools/

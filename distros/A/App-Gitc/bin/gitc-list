@@ -1,0 +1,225 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-list
+# ABSTRACT: Get a list of active changesets
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw( project_name unmerged_changesets );
+use Getopt::Long;
+
+my $format = 'basic';
+my $summary = 0;
+my $yaml    = 0;
+GetOptions(
+    'format=s'  => \$format,
+    's|summary' => \$summary,
+    'yaml'      => \$yaml,
+);
+$format = 'summary' if $summary;
+$format = 'yaml'    if $yaml;
+
+# find changesets that haven't been merged yet
+my $project_name = shift || eval { project_name() };
+die "You must specify a project on the command line or with you pwd\n"
+    if not $project_name;
+my $unmerged = unmerged_changesets($project_name);
+
+# display the results
+my $class = 'App::Gitc::ListFormat::' . ucfirst( lc $format );
+my $formatter = $class->new;
+$formatter->print_header;
+for my $changeset ( sort keys %$unmerged ) {
+    my $history = $unmerged->{$changeset};
+    $formatter->print_row( $changeset, $history );
+}
+$formatter->print_footer;
+
+#######################################################################
+# various list format implementations
+
+package App::Gitc::ListFormat::Base;
+use strict;
+use warnings;
+sub new {
+    bless {}, shift;
+}
+sub print_header {}
+sub print_row {}
+sub print_footer {}
+
+package App::Gitc::ListFormat::Basic;
+use strict;
+use warnings;
+use base qw( App::Gitc::ListFormat::Base );
+use App::Gitc::Util qw( history_owner history_reviewer history_status );
+
+sub print_header {
+    print "owner    id              status    timestamp             user     reviewer\n";
+    print "==========================================================================\n";
+}
+
+sub print_row {
+    my ( $self, $changeset, $history) = @_;
+    my $action = $history->[-1];  # the most recent
+    my $status = history_status($history);
+    printf
+        "%-8s %-15s %-9s %s %-8s %-8s\n",
+        history_owner($history),
+        $changeset,
+        $status,
+        $action->{stamp},
+        $action->{user} || q{},
+        $status eq 'submitted' ? history_reviewer($history) : q{},
+    ;
+}
+
+package App::Gitc::ListFormat::Summary;
+use strict;
+use warnings;
+use base qw( App::Gitc::ListFormat::Base );
+use App::Gitc::Util qw( history_status history_reviewer );
+
+sub print_header {
+    my ($self) = @_;
+    # we don't need a header, we'll take a chance to set up some state
+    $self->{summary} = {};
+}
+
+sub print_row {
+    my ( $self, $changeset, $history ) = @_;
+    my $summary = $self->{summary};
+    my $action  = $history->[-1];
+    my $status  = history_status($history);
+    $summary->{$status}{ $action->{user} }++;
+    if ( $status eq 'submitted' ) {
+        $summary->{submitted_to}{ history_reviewer($history) }++;
+    }
+}
+
+# actually, print everything
+sub print_footer {
+    my ($self) = @_;
+    my $summary = $self->{summary};
+    my %pretty = (
+        open         => 'opened by',
+        submitted    => 'submitted by',
+        submitted_to => 'submitted to',
+        reviewing    => 'under review by',
+        failed       => 'failed by',
+        merged       => 'merged by',
+    );
+
+    STATUS:
+    for my $status (qw( open submitted submitted_to reviewing failed merged )) {
+        my $users = $summary->{$status};
+        next STATUS if !(keys %$users);
+
+        print $pretty{$status} . ":\n";
+        for my $user ( sort keys %$users ) {
+            my $count = $users->{$user};
+            printf "    %-8s: %2d %s\n", $user, $count, '='x$count;
+        }
+        print "\n";
+    }
+}
+
+package App::Gitc::ListFormat::Yaml;
+use strict;
+use warnings;
+use base qw( App::Gitc::ListFormat::Base );
+use App::Gitc::Util qw(
+    history_owner history_status history_reviewer
+    its_for_changeset
+);
+
+sub print_row {
+    my ($self, $changeset, $history) = @_;
+    my $action = $history->[-1];
+
+    my $status = history_status($history);
+    my $data = {
+        owner  => history_owner($history),
+        id     => $changeset,
+        status => $status,
+        date   => $action->{stamp},
+        user   => $action->{user},
+    };
+    $data->{reviewer} = history_reviewer($history) if $status eq 'submitted';
+
+    my $its = its_for_changeset($changeset);
+    if ($its) {
+        my $its_name = $its->label_service;
+        eval {
+            if ( my $issue = $its->get_issue($changeset) ) {
+                    $data->{eventum} = {
+                        summary => $its->issue_summary($issue),
+                        status  => $its->issue_state($issue),
+                        number  => $its->issue_number($issue),
+                    };
+            }
+        };
+        warn "Problem with $its_name for $changeset: $@" if $@;
+    }
+
+    require YAML::Syck;
+    print YAML::Syck::Dump($data);
+}
+
+package App::Gitc::ListFormat::Dump;
+use strict;
+use warnings;
+use base qw( App::Gitc::ListFormat::Base );
+
+sub print_row {
+    my ($self, $changeset, $history) = @_;
+
+    require YAML::Syck;
+    print YAML::Syck::Dump({
+        changeset => $changeset,
+        history   => $history,
+    });
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-list - Get a list of active changesets
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

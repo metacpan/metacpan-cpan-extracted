@@ -1,0 +1,75 @@
+{
+   "abstract" : "Random data generator for Memcached",
+   "author" : [
+      "YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Memcached-Roaster",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cache::Memcached::Fast" : "0.23",
+            "Class::Accessor::Lite" : "0.08",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::Memcached::Roaster" : {
+         "file" : "lib/App/Memcached/Roaster.pm",
+         "version" : "v0.2.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/key-amb/perl5-App-Memcached-Roaster/issues"
+      },
+      "homepage" : "https://github.com/key-amb/perl5-App-Memcached-Roaster",
+      "repository" : {
+         "url" : "git://github.com/key-amb/perl5-App-Memcached-Roaster.git",
+         "web" : "https://github.com/key-amb/perl5-App-Memcached-Roaster"
+      }
+   },
+   "version" : "v0.2.2",
+   "x_authority" : "cpan:KEYAMB"
+}

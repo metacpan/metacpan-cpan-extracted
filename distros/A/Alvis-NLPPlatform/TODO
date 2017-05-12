@@ -1,0 +1,42 @@
+- remove any use of xmlfoot and xmlhead
+
+- managing several document in the client/server mode
+
+- integrate features defined in XML_INPUT and XML_OUTPUT
+
+- complete the modification of the xml loader (above all managing
+  terms like EN)
+
+- modify the spit_to_docrecfunction in NLPPlatform to take into
+  account
+
+ - integrate properly the semantic tagging
+
+ - checking and cleaning the bioLG wrapper
+
+- testing if the programs and resources given in the config file,
+  exist (if not well exiting by dumping the annotated file with the
+  annotation).
+
+- checking if the file given in argument (ogmios standalone at least)
+  exists
+
+- Wrapper for BioLG : some strange things with terms ...
+
+- Add additional programs to the documentation of bioLG
+
+- Enabling processing several docs in once (in the C/S mode)
+
+- Using time schedule for processing 
+
+- add a client for submitting and getting document(s)
+
+- use Time::HiRes qw(gettimeofday tv_interval)
+
+- constituents -> phrases in bioLG wrapper
+
+- a annotated document already exists renamed it
+
+- put the dependency between NLP parts in the config file
+
+- Add a full time processing in the display

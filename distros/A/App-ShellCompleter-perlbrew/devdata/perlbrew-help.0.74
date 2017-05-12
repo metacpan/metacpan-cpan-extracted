@@ -1,0 +1,560 @@
+NAME
+    perlbrew - Perl environment manager.
+
+SYNOPSIS
+    perlbrew command syntax:
+
+        perlbrew <command> [options] [arguments]
+
+    Commands:
+
+        init           Initialize perlbrew environment.
+        info           Show useful information about the perlbrew installation
+
+        install        Install perl
+        uninstall      Uninstall the given installation
+        available      List perls available to install
+        lib            Manage local::lib directories.
+        alias          Give perl installations a new name
+        upgrade-perl   Upgrade the current perl
+
+        list           List perl installations
+        use            Use the specified perl in current shell
+        off            Turn off perlbrew in current shell
+        switch         Permanently use the specified perl as default
+        switch-off     Permanently turn off perlbrew (revert to system perl)
+        exec           exec programs with specified perl enviroments.
+
+        self-install       Install perlbrew itself under PERLBREW_ROOT/bin
+        self-upgrade       Upgrade perlbrew itself.
+
+        install-patchperl  Install patchperl
+        install-cpanm      Install cpanm, a friendly companion.
+        install-multiple   Install multiple versions and flavors of perl
+
+        download       Download the specified perl distribution tarball.
+        clean          Purge tarballs and build directories
+        version        Display version
+        help           Read more detailed instructions
+
+    Generic command options:
+
+        -q --quiet     Be quiet on informative output message.
+        -v --verbose   Tell me more about it.
+
+    See `perlbrew help` for the full documentation of perlbrew, or
+
+    See `perlbrew help <command>` for detail description of the command.
+
+CONFIGURATION
+    PERLBREW_ROOT
+        By default, perlbrew builds and installs perls into
+        "$ENV{HOME}/perl5/perlbrew" directory. To use a different directory,
+        set this environment variable in your "bashrc" to the directory in
+        your shell RC before sourcing perlbrew's RC.
+
+        It is possible to share one perlbrew root with multiple user account
+        on the same machine. Therefore people do not have to install the
+        same version of perl over an over. Let's say "/opt/perl5" is the
+        directory we want to share. All users should be able append this
+        snippet to their bashrc to make it effective:
+
+            export PERLBREW_ROOT=/opt/perl5
+            source ${PERLBREW_ROOT}/etc/bashrc
+
+        After doing so, everyone's PATH should include "/opt/perl5/bin" and
+        "/opt/perl5/perls/${PERLBREW_PERL}/bin". Each user can invoke
+        "perlbrew switch" and "perlbrew use" to independently switch to
+        different perl environment of their choice. However, only the user
+        with write permission to $PERLBREW_ROOT may install CPAN modules.
+        This is both good and bad depending on the working convention of
+        your team.
+
+        If you wish to install CPAN modules only for yourself, you should
+        use the "lib" command to construct a personal local::lib
+        environment. local::lib environments are personal, and are not
+        shared between different users. For more detail, read "perlbrew help
+        lib" and the documentation of local::lib.
+
+        If you want even a cooler module isolation and wish to install CPAN
+        modules used for just one project, you should use carton for this
+        purpose.
+
+        It is also possible to set this variable before installing perlbrew
+        to make perlbrew install itself under the given PERLBREW_ROOT:
+
+            export PERLBREW_ROOT=/opt/perl5
+            curl -kL http://install.perlbrew.pl | bash
+
+        After doing this, the perlbrew executable is installed as
+        "/opt/perl5/bin/perlbrew"
+
+    PERLBREW_HOME
+        By default, perlbrew stores per-user setting to
+        "$ENV{HOME}/.perlbrew" directory. To use a different directory, set
+        this environment variable in your shell RC before sourcing
+        perlbrew's RC.
+
+        In some cases, say, your home directory is on NFS and shared across
+        multiple machines, you may wish to have several different perlbrew
+        setting per-machine. To do so, you can use the "PERLBREW_HOME"
+        environment variable to tell perlbrew where to look for the
+        initialization file. Here's a brief bash snippet for the given
+        scenario.
+
+            if [ "$(hostname)" == "machine-a" ]; then
+                export PERLBREW_HOME=~/.perlbrew-a
+            elif [ "$(hostname)" == "machine-b" ]; then
+                export PERLBREW_HOME=~/.perlbrew-b
+            fi
+
+            source ~/perl5/perlbrew/etc/bashrc
+
+    PERLBREW_CONFIGURE_FLAGS
+        This environment variable specify the list of command like flags to
+        pass through to 'sh Configure'. By default it is '-de'.
+
+    PERLBREW_CPAN_MIRROR
+        The CPAN mirror url of your choice.
+
+COMMAND: INIT
+    Usage: perlbrew init
+
+    The "init" command should be manually invoked whenever you (the perlbrew
+    user) upgrade or reinstall perlbrew.
+
+    If the upgrade is done with "self-upgrade" command, or by running the
+    one-line installer manually, this command is invoked automatically.
+
+COMMAND: INFO
+    info [module]
+        Usage: perlbrew info [ <module> ]
+
+        Display useful information about the perlbrew installation.
+
+        If a module is given the version and location of the module is
+        displayed.
+
+COMMAND: INSTALL
+    install [options] perl-<version>
+    install [options] <version>
+        Build and install the given version of perl.
+
+        Version numbers usually look like "5.x.xx", or "perl-5.xx.x-RCx" for
+        release candidates.
+
+        The specified perl is downloaded from the official CPAN website or
+        from the mirror site configured before.
+
+        Add '--mirror $URL' to specify the URL of mirror site.
+
+    install [options] perl-stable
+    install [options] stable
+        A convenient way to install the most recent stable version of Perl,
+        of those that are available.
+
+    install [options] perl-blead
+    install [options] blead
+        A special way to install the blead version of perl, which is
+        downloaded from this specific URL regardless of mirror settings:
+
+            http://perl5.git.perl.org/perl.git/snapshot/blead.tar.gz
+
+    install [options] /path/to/perl/git/checkout/dir
+        Build and install from the given git checkout dir.
+
+    install [options] /path/to/perl-5.14.0.tar.gz
+        Build and install from the given archive file.
+
+    install [options] http://example.com/mirror/perl-5.12.3.tar.gz
+        Build and install from the given URL. Supported URL schemes are
+        "http://", "https://", "ftp://" and "file://".
+
+    Options for "install" command:
+
+        -f --force     Force installation
+        -j $n          Parallel building and testing. ex. C<perlbrew install -j 5 perl-5.14.2>
+        -n --notest    Skip testing
+
+           --switch    Automatically switch to this Perl once successfully
+                       installed, as if with `perlbrew switch <version>`
+
+           --as        Install the given version of perl by a name.
+                       ex. C<perlbrew install perl-5.6.2 --as legacy-perl>
+
+           --noman     Skip installation of manpages
+
+           --thread    Build perl with usethreads enabled
+           --multi     Build perl with usemultiplicity enabled
+           --64int     Build perl with use64bitint enabled
+           --64all     Build perl with use64bitall enabled
+           --ld        Build perl with uselongdouble enabled
+           --debug     Build perl with DEBUGGING enabled
+           --clang     Build perl using the clang compiler
+
+        -D,-U,-A       Switches passed to perl Configure script.
+                       ex. C<perlbrew install perl-5.10.1 -D usemymalloc -U uselargefiles>
+
+        --sitecustomize $filename
+                       Specify a file to be installed as sitecustomize.pl
+
+    By default, all installations are configured after their name like this:
+
+        sh Configure -de -Dprefix=$PERLBREW_ROOT/perls/<name>
+
+COMMAND: INSTALL-MULTIPLE
+    Usage: perlbrew install-multiple [options] <perl-version-1>
+    <perl-version-2> ...
+
+    Build and install the given versions of perl.
+
+    "install-multiple" accepts the same set of options as the command
+    "install" plus the following ones:
+
+        --both $flavor       Where $flavor is one of C<thread>, C<multi>, C<ld>,
+                             C<64int>, C<64all>, C<debug> and C<clang>.
+
+                             For every given perl version, install two
+                             flavors, one with the flag C<--$flavor> set
+                             and the other with out. C<--both> can be
+                             passed multiple times with different values
+                             and in that case, all the possible
+                             combinations are generated.
+
+        --common-variations  equivalent to C<--both thread --both ld --both 64int>
+
+        --all-variations     generates all the possible flavor combinations
+
+        --append $string     Appends the given string to the generated names
+
+    For instance:
+
+        perlbrew install-multiple 5.18.0 blead --both thread --both debug
+
+    Installs the following perls:
+
+        perl-blead
+        perl-blead-debug
+        perl-blead-thread-multi
+        perl-blead-thread-multi-debug
+        perl-5.18.0
+        perl-5.18.0-debug
+        perl-5.18.0-thread-multi
+        perl-5.18.0-thread-multi-debug
+
+    (note that the "multi" flavor is selected automatically because "thread"
+    requires it)
+
+    Another example using custom compilation flags:
+
+        perlbrew install-multiple 5.18.0 --both thread -Doptimize='-O3' --append='-O3'
+
+COMMAND: UNINSTALL
+    Usage: perlbrew uninstall <name>
+
+    Uninstalls the given perl installation. The name is the installation
+    name as in the output of `perlbrew list`
+
+COMMAND: USE
+    Usage: perlbrew use [perl-<version> | <version> | <name>]
+
+    Use the given version perl in current shell. This will not effect newly
+    opened shells.
+
+    Without a parameter, shows the version of perl currently in use.
+
+COMMAND: SWITCH
+    Usage: perlbrew switch [ <name> ]
+
+    Switch to the given version, and makes it the default for this and all
+    future terminal sessions.
+
+    Without a parameter, shows the version of perl currently selected.
+
+COMMAND: LIST
+    Usage: perlbrew list
+
+    List all perl installations inside perlbrew root specified by
+    $PERLBREW_ROOT environment variable. By default, the value is
+    "~/perl5/perlbrew".
+
+    If there are libs associated to some perl installations, they will be
+    included as part of the name. The output items in this list can be the
+    argument in various other commands.
+
+COMMAND: AVAILABLE
+    Usage: perlbrew available [--all]
+
+    List the recently available versions of perl on CPAN.
+
+    The list is retrieved from the web page
+    <http://www.cpan.org/src/README.html>, and is not the list of *all* perl
+    versions ever released in the past.
+
+    To get a list of all perls ever released, use the "--all" option.
+
+    NOTICE: This command might be gone in the future and becomes an option
+    of 'list' command.
+
+COMMAND: OFF
+    Usage: perlbrew off
+
+    Temporarily disable perlbrew in the current shell. Effectively
+    re-enables the default system Perl, whatever that is.
+
+    This command works only if you add the statement of `source
+    $PERLBREW_ROOT/etc/bashrc` in your shell initialization (bashrc /
+    zshrc).
+
+COMMAND: SWITCH-OFF
+    Usage: perlbrew switch-off
+
+    Permananently disable perlbrew. Use "switch" command to re-enable it.
+    Invoke "use" command to enable it only in the current shell.
+
+    Re-enables the default system Perl, whatever that is.
+
+COMMAND: ALIAS
+    Usage: perlbrew alias [-f] create <name> <alias>
+
+        Create an alias for the installation named <name>.
+
+    Usage: perlbrew alias [-f] rename <old_alias> <new_alias>
+
+        Rename the alias to a new name.
+
+    Usage: perlbrew alias delete <alias>
+
+        Delete the given alias.
+
+COMMAND: EXEC
+    Usage: perlbrew exec [--with perl-name[,perl-name...]] <command>
+    <args...>
+
+    Execute command for each perl installations, one by one.
+
+    For example, run a Hello program:
+
+        perlbrew exec perl -e 'print "Hello from $]\n"'
+
+    The output looks like this:
+
+        perl-5.12.2
+        ==========
+        Hello word from perl-5.012002
+
+        perl-5.13.10
+        ==========
+        Hello word from perl-5.013010
+
+        perl-5.14.0
+        ==========
+        Hello word from perl-5.014000
+
+    Notice that the command is not executed in parallel.
+
+    When "--with" argument is provided, the command will be only executed
+    with the specified perl installations. The following command install
+    Moose module into perl-5.12, regardless the current perl:
+
+        perlbrew exec --with perl-5.12 cpanm Moose
+
+    Multiple installation names can be provided:
+
+        perlbrew exec --with perl-5.12,perl-5.12-debug,perl-5.14.2 cpanm Moo
+
+    They are split by either spaces or commas. When spaces are used, it is
+    required to quote the whole specification as one argument, but then
+    commas can be used in the installation names:
+
+        perlbrew exec --with '5.12 5.12,debug 5.14.2@nobita @shizuka' cpanm Moo
+
+    As demonstrated above, "perl-" prefix can be omitted, and lib names can
+    be specified too. Lib names can appear without a perl installation name,
+    in such cases it is assumed to be "current perl".
+
+    At the moment, any specified names that fails to be resolved as a real
+    installation names are silently ignored in the output. Also, the command
+    exit status are not populated back.
+
+COMMAND: ENV
+    Usage: perlbrew env [ <name> ]
+
+    Low-level command. Invoke this command to see the list of environment
+    variables that are set by "perlbrew" itself for shell integration.
+
+    The output is something similar to this (if your shell is bash/zsh):
+
+        export PERLBREW_ROOT=/Users/gugod/perl5/perlbrew
+        export PERLBREW_VERSION=0.31
+        export PERLBREW_PATH=/Users/gugod/perl5/perlbrew/bin:/Users/gugod/perl5/perlbrew/perls/current/bin
+        export PERLBREW_PERL=perl-5.14.1
+
+    tcsh / csh users should see 'setenv' statements instead of `export`.
+
+COMMAND: SYMLINK-EXECUTABLES
+    Usage: perlbrew symlink-executables [ <name> ]
+
+    Low-level command. This command is used to create the "perl" executable
+    symbolic link to, say, "perl5.13.6". This is only required for
+    development version of perls.
+
+    You don't need to do this unless you have been using old perlbrew to
+    install perls, and you find yourself confused because the perl that you
+    just installed appears to be missing after invoking `use` or `switch`.
+    perlbrew changes its installation layout since version 0.11, which
+    generates symlinks to executables in a better way.
+
+    If you just upgraded perlbrew (from 0.11 or earlier versions) and
+    "perlbrew switch" failed to work after you switch to a development
+    release of perl, say, perl-5.13.6, run this command:
+
+        perlbrew symlink-executables perl-5.13.6
+
+    This essentially creates this symlink:
+
+       ${PERLBREW_ROOT}/perls/perl-5.13.6/bin/perl
+       -> ${PERLBREW_ROOT}/perls/perl-5.13.6/bin/perl5.13.6
+
+    Newly installed perls, whether they are development versions or not,
+    does not need manually treatment with this command.
+
+COMMAND: INSTALL-CPANM
+    Usage: perlbrew install-cpanm
+
+    Install the "cpanm" standalone executable in "$PERLBREW_ROOT/bin".
+
+    For more rationale about the existence of this command, read
+    <http://www.perlbrew.pl/Perlbrew-and-Friends.html>
+
+COMMAND: INSTALL-PATCHPERL
+    Usage: perlbrew install-patchperl
+
+    Install the "patchperl" standalone executable in "$PERLBREW_ROOT/bin".
+    This is automatically invoked if your perlbrew installation is done with
+    the installer, but not with cpan.
+
+    For more rationale about the existence of this command, read
+    <http://www.perlbrew.pl/Perlbrew-and-Friends.html>
+
+COMMAND: SELF-UPGRADE
+    Usage: perlbrew self-upgrade
+
+    This command upgrades Perlbrew to its latest version.
+
+COMMAND: SELF-INSTALL
+    Usage: perlbrew self-install
+
+    NOTICE: You should not need to run this command in your daily routine.
+
+    This command install perlbrew itself to "$PERLBREW_ROOT/bin". It is
+    intended to be used by the perlbrew installer. However, you could
+    manually do the following to re-install only the "perlbrew" executable:
+
+        curl -kL http://get.perlbrew.pl -o perlbrew
+        perl ./perlbrew self-install
+
+    It is slightly different from running the perlbrew installer because
+    "patchperl" is not installed in this case.
+
+COMMAND: CLEAN
+    Usage: perlbrew clean
+
+    Removes all previously downloaded Perl tarballs and build directories.
+
+COMMAND: VERSION
+    Usage: perlbrew version
+
+    Show the version of perlbrew.
+
+COMMAND: LIB
+    Usage: perlbrew lib <action> <lib-name>
+
+        perlbrew lib list
+        perlbrew lib create <lib-name>
+        perlbrew lib delete <lib-name>
+
+    The `lib` command is used to manipulate local::lib roots inside perl
+    installations. Effectively it is similar to `perl
+    -Mlocal::lib=/path/to/lib-name`, but a little bit more than just that.
+
+    A lib name can be a short name, containing alphanumeric, like 'awesome',
+    or a full name, prefixed by a perl installation name and a '@' sign, for
+    example, 'perl-5.14.2@awesome'.
+
+    Here are some a brief examples to invoke the `lib` command:
+
+        # Create lib perl-5.12.3@shizuka
+        perlbrew lib create perl-5.12.3@shizuka
+
+        # Create lib perl-5.14.2@nobita and perl-5.14.2@shizuka
+        perlbrew use perl-5.14.2
+        perlbrew lib create nobita
+        perlbrew lib create shizuka
+
+        # See the list of use/switch targets
+        perlbrew list
+
+        # Activate a lib in current shell
+        perlbrew use perl-5.12.3@shizuka
+        perlbrew use perl-5.14.2@nobita
+        perlbrew use perl-5.14.2@shizuka
+
+        # Activate a lib as default
+        perlbrew switch perl-5.12.3@shizuka
+        perlbrew switch perl-5.14.2@nobita
+        perlbrew switch perl-5.14.2@shizuka
+
+        # Delete lib perl-5.14.2@nobita and perl-5.14.2@shizuka
+        perlbrew use perl-5.14.2
+        perlbrew lib delete nobita
+        perlbrew lib delete shizuka
+
+        # Delete lib perl-5.12.3@shizuka
+        perlbrew lib delete perl-5.12.3@shizuka
+
+    Short lib names are local to current perl. A lib name 'nobita' can refer
+    to 'perl-5.12.3@nobita' or 'perl-5.14.2@nobita', depending on your
+    current perl.
+
+    When "use"ing or "switch"ing to a lib, always provide the long name. A
+    simple rule: the argument to "use" or "switch" command should appear in
+    the output of "perlbrew list".
+
+COMMAND: UPGRADE-PERL
+    Usage: perlbrew upgrade-perl
+
+    Minor Perl releases (ex. 5.x.*) are binary compatible with one another,
+    so this command offers you the ability to upgrade older perlbrew
+    environments in place.
+
+    It upgrades the currently activated perl to its latest released
+    brothers. If you have a shell with 5.14.0 activated, it upgrades it to
+    5.14.2.
+
+COMMAND: DOWNLOAD
+    Usage:
+
+        perlbrew download perl-5.14.2
+        perlbrew download perl-5.16.1
+        perlbrew download perl-5.17.3
+
+    Download the specified version of perl distribution tarball under
+    "$PERLBREW_ROOT/dists/" directory.
+
+COMMAND: LIST-MODULES
+    List all installed cpan modules for the current perl.
+
+    This command can be used in conjunction with `perlbrew exec` to migrate
+    your module installation to different perl. The following command
+    re-installs all modules under perl-5.16.0:
+
+        perlbrew list-modules | perlbrew exec --with perl-5.16.0 cpanm
+
+    Note that this installs the latest versions of the Perl modules on the
+    new perl, which are not necessarily the same module versions you had
+    installed previously.
+
+SEE ALSO
+    App::perlbrew, App::cpanminus, Devel::PatchPerl
+

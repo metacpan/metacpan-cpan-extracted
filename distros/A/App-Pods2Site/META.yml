@@ -1,0 +1,45 @@
+---
+abstract: 'converting pods to HTML site'
+author:
+  - 'Kenneth Olwing <knth@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.12'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Pods2Site
+no_index:
+  directory:
+    - t
+    - inc
+    - author
+requires:
+  Config: '0'
+  Cwd: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  Grep::Query: '1.004'
+  HTML::Entities: '0'
+  JSON: '0'
+  List::MoreUtils: '0'
+  Pod::Find: '0'
+  Pod::Html: '0'
+  Pod::Simple::Search: '0'
+  Pod::Usage: '0'
+  perl: '5.010001'
+resources:
+  repository: https://github.com/kenneth-olwing/App-Pods2Site.git
+version: '0.010'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

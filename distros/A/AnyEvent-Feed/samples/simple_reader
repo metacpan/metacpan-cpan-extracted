@@ -1,0 +1,30 @@
+#!/opt/perl/bin/perl
+use strict;
+use Encode;
+use AnyEvent::Feed;
+use AnyEvent;
+
+$XML::Atom::ForceUnicode = 1;
+
+my $cv = AnyEvent->condvar;
+
+my $f = AnyEvent::Feed->new (
+      url => $ARGV[0],
+      interval => 300,
+      on_fetch => sub {
+         my ($fee, $ent, $feed, $er) = @_;
+
+         if (defined $er) {
+            warn "ERROR: $er\n";
+            $cv->send;
+            return;
+         }
+
+         for (@$ent) {
+            printf "New story found:\n   %s\n   => %s\n",
+                   encode ('utf-8', $_->[1]->title),
+                   $_->[1]->link;
+         }
+      });
+
+$cv->recv;

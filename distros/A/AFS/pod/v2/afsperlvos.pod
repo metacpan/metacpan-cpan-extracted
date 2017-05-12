@@ -1,0 +1,439 @@
+#------------------------------------------------------------------------------
+# RCS-Id: "@(#)$RCS-Id: pod/v2/afsperlvos.pod 2e2ca60 Tue Apr 15 13:04:20 2014 +0200 Norbert E Gruener$"
+#
+# © 2005-2014 Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+# © 2003-2004 Alf Wachsmann <alfw@slac.stanford.edu>
+#             Venkata Phani Kiran Achanta <neo_phani@hotmail.com>, and
+#             Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<AFS::VOS> - Class to communicate with the B<AFS Volume Server>
+
+=head1 SYNOPSIS
+
+  use AFS::VOS;
+
+  my $vos = AFS::VOS->new(1, 120, 1);
+
+  my $ok = $vos->backup('volume');
+  $vos->DESTROY;
+
+  $vos = AFS::VOS->new;
+
+  $ok = $vos->dump('volume', 0, 'dump.vol', '', '', 1, 1);
+  $ok = $vos->dump('volume', 0, 'dump.vol');
+  $ok = $vos->restore('serv1', '/vicepa', 'volume', 'dump.vol', 0, 1);
+
+  my $volid = $vos->create('serv1', '/vicepa', 'volume');
+  $volid = $vos->move('volume', 'serv1', 'vicepa', 'serv2', 'vicepb');
+  $volid = $vos->remove('serv1', '/vicepa', 'volume');
+
+  $ok = $vos->offline('serv1', '/vicepa', 'volume');
+  $ok = $vos->online('serv1', '/vicepa', 'volume');
+
+  $ok = $vos->release('volume');
+  my $stat = $vos->status('serv1', '/vicepa');
+  print "Status is: $stat\n";
+
+  $ok = $vos->rename('oldvol', 'newvol');
+
+  $ok = $vos->setquota('volume', 6500, 1);
+
+  $volid = $vos->zap('serv1', '/vicepa', 'volume');
+
+  my ($tBack, $tFail) = $vos->backupsys('home', 'serv', '/vicepc');
+  ($tBack, $tFail) = $vos->backupsys(['home', 'data'], 'serv', '/vicepc');
+
+  my @parts = $vos->listpart('serv1');
+
+  my $vols = $vos->listvol('serv1', '/vicepa');
+
+  my $partinfo = $vos->partinfo('volume');
+
+=head1 DESCRIPTION
+
+This class is used to communicate with the B<AFS Volume Server>, which
+runs on every AFS server machine.  The Volume Server allows
+administrative tasks and probes to be performed on the set of AFS
+volumes residing on the machine on which it is running.  This class
+provides methods to create, move, delete, replicate, back up and
+examine AFS volumes.  It has also methods to provide information about
+AFS partitions.
+
+Before you can submit any tasks to a Volume Server you must establish
+a connection to it.  This is done by the constructor method I<new>
+which returns a VOS object.  A VOS object is essentially a handle to
+talk to the Volume Server in a given cell.  Such a VOS object is
+required before any of the other VOS instance methods can be called.
+
+=head1 COMPATIBILITY
+
+There was no version 1 implementation and hence there are no version
+conflicts :-)
+
+=head1 METHODS
+
+=over 4
+
+=item B<CONSTRUCTOR>
+
+=item S< >
+
+=item B<$vos = AFS::VOS-E<gt>new([VERBOSE [, TIMEOUT [, NOAUTH [, LOCALAUTH [, CELL [, ENCRYPT]]]]]);>
+
+Creates a new object of the class AFS::VOS.  An AFS::VOS object is
+essentially a handle to talk to the Volume Server.  Internally an
+AFS::VOS object is a pointer to a ubik_client structure, although this
+may change and the value returned from AFS::VOS::new should always be
+treaded as an opaque handle.
+
+Set VERBOSE (default 0) to 1 to produce on the standard output stream
+a detailed trace of the method's execution.  TIMEOUT is the time of
+inactivity in seconds before the connection to the VOS server is
+declared dead (default 90 seconds).  Set LOCALAUTH (default 0) to 1
+only when issuing a command on a server machine.  If NOAUTH is 1
+(default 0) it establishes an unauthenticated connection to the
+server, in which the servers treat the issuer as an unprivileged user.
+CELL (default NULL) specifies the cell in which to run the
+command. Set ENCRYPT to 1 (default 0) to encrypt the connection to the
+VOS server.
+
+=item B<DESTRUCTOR>
+
+=item S< >
+
+=item B<$vos-E<gt>DESTROY;>
+
+Destroys the ubik connection to the Volume Server and frees the
+ubik_client structure.
+
+
+=item B<INSTANCE METHODS>
+
+=item S< >
+
+=item B<$ok = $vos-E<gt>backup(VOLUME);>
+
+Clones the indicated read/write volume to create a backup version,
+placing it at the same site as the read/write version. VOLUME
+specifies either the complete name or volume ID number of the
+read/write source volume.
+It calls the AFS system library function I<UV_BackupVolume>.
+
+=item B<($SUCCESS, $FAILED) = $vos-E<gt>backupsys([PREFIX [, SERVER [, PARTITION [, EXCLUDE [, XPREFIX [, DRYRUN]]]]]]);>
+
+=item B<($SUCCESS, $FAILED) = $vos-E<gt>backupsys([\@PREFIX [, SERVER [, PARTITION [, EXCLUDE [, \@XPREFIX [, DRYRUN]]]]]]);>
+
+Clones each indicated read/write volume to create a backup version,
+placing each clone at the same site as its read/write source version.
+To clone a various numbers of volumes, combine the arguments as indicated:
+
+ * For every volume listed in the VLDB, omit all of the arguments.
+
+ * To clone only volumes that reside on one file server machine,
+   specify the SERVER argument,
+
+ * To clone only volumes that reside on one partition, combine the
+   SERVER and the PARTITION arguments. The PARTITION argument can
+   also be used alone to clone volumes that reside on the indicated
+   partition on every file server machine.
+
+ * In PREFIX a character string or regular expression is specified.
+   A volume whose name includes the string is placed on the set of
+   volumes to be cloned.
+
+ * In XPREFIX a character string or regular expression is specified.
+   A volume whose name includes the string is removed from the set of
+   volumes to be cloned.
+
+If EXCLUDE (default 0) is set to 1 it reverses the meaning of the
+PREFIX or XPREFIX argument.  It returns two array references
+containing a list of SUCCESSfully backed up site name and a list of
+site name which are FAILED to backup. If DRYRUN (default 0) is set to
+1 then SUCCESS contains a list of the volumes to be cloned, without
+actually cloning them.
+
+It calls the AFS system library function I<UV_BackupVolume>.
+
+=item B<$volid = $vos-E<gt>create(SERVER, PARTITION, VOLUME [, MAXQUOTA [, VOLID, ROVOLID]]);>
+
+Creates a read/write VOLUME at the site specified by the SERVER and
+PARTITION arguments.  The volume's space quota is set to 5000 kilobyte
+blocks by default. Use the MAXQUOTA argument to specify a different
+quota.
+
+VOLID specifies the volume ID for the read/write volume. If this
+argument is not specified, or the given volume ID is 0, a volume ID
+will be allocated for the volume automatically. The volume IDs
+allocated should be fine for almost all cases, so you should almost
+never need to specify this argument.
+
+ROVOLID specifies the volume ID for the readonly volume corresponding
+to the read/write volume that is being created. The readonly volume
+will not be created; this merely specifies what volume ID the readonly
+volume will use when it is created. If a volume ID of 0 is specified
+here, no readonly volume ID will be assigned to the created volume
+immediately. A readonly volume ID can still be assigned later when
+B<vldb->addsite> is run; if a volume does not have a readonly volume
+ID associated with it by the time B<vos->:release> is run, a volume ID
+will be allocated for it.  If this argument is not specified, the
+default readonly volume ID is one number higher than the read-write
+volume ID, whether or not that ID was manually specified.  As with the
+B<VOLID> argument, the default allocated volume IDs should be sufficient
+for almost all cases, so you should almost never need to specify this
+argument.
+
+These two arguments (VOLID, ROVOLID) are supported when the AFS Perl
+modules are linked with the OpenAFS system libraries v1.4.12 or later.
+
+It returns the volume id number of the new volume.  It calls the AFS
+system library function I<UV_CreateVolume2> or I<UV_CreateVolume3>
+(OpenAFS v.1.4.12 or later).
+
+=item B<$ok = $vos-E<gt>dump(VOLUME [, TIME [, FILE [, SERVER, PARTITION, CLONE_FLG, OMIT_FLG]]]);>
+
+Converts the contents of the indicated volume, which can be
+read/write, read-only or backup, into ASCII format.  VOLUME specifies
+either the complete name or volume ID number of the volume.  The
+Volume Server writes the converted contents to the FILE or to the
+standard output stream (default).  To dump the complete contents of a
+volume (create a full dump), set TIME to 0 (default). To create an
+incremental dump, which includes only the files and directories in the
+volume that have modification timestamps later than a certain time,
+specify a date and time as the value for the TIME argument.  By
+default, the VL server consults the Volume Location Database (VLDB) to
+learn the volume's location.  To dump the read-only volume from a
+particular site, use the SERVER and PARTITION arguments to specify the
+site.
+
+If CLONE_FLG is set to 1 (default 0), it will clone the volume first
+and then dumps the clone.  This can significantly decrease the amount
+of time the volume is kept locked for dumps of large volumes.  By
+default, it includes all directory objects in an incremental dump
+whether they’ve been changed or not.
+
+If the OMIT_FLG is set to 1 (default 0), unchanged directories will be
+omitted.  This will reduce the size of the dump and not cause problems
+if the incremental is restored, as expected, on top of a volume
+containing the correct directory structure (such as one created by
+restoring previous full and incremental dumps).
+
+B<These two flags are supported with OpenAFS system libraries 1.4.5 or
+later.>
+
+It calls the AFS system library function I<UV_DumpVolume>.
+
+=item B<@part = $vos-E<gt>listpart(SERVER);>
+
+Returns a list of the valid AFS partitions on the indicated file
+SERVER machine.
+It calls the AFS system library function I<UV_ListPartitions>.
+
+=item B<$vollist = $vos-E<gt>listvol(SERVER [, PARTITION [, FAST [, EXTENDED]]]);>
+
+Returns information about volume headers.  The actual information
+returned depends on the combination of arguments supplied when the
+method is applied. To get volume header information for various
+numbers of volumes, combine the arguments as indicated:
+
+ * For every volume on a file server machine, specify the SERVER
+   argument.
+
+ * For every volume at a particular site, combine the SERVER argument
+   with the PARTITION argument.
+
+If you set EXTENDED (default 0) to 1, it returns extensive statistics
+about access patterns for each volume.  If you set FAST (default 0) to
+1, it returns only the volume IDs and the numbers of volumes.
+
+The return value is a reference to a hash table containing the values
+from the C structure C<volintinfo>.  The hash table has the following
+keys
+
+       backupID    cloneID     creationDate
+       dayUse      inUse       maxquota
+       parentID    server      size
+       status      type        updateDate
+       copyDate    backupDate  accessDate
+       volid
+
+It calls the AFS system library function I<UV_ListPartitions>.
+
+You can find an example how to print the entire content of the
+returned hash reference in the C<examples/v2/vos> directory.
+
+=item B<$vollist = $vos-E<gt>listvolume(VOLUME);>
+
+Returns information about the volume header of the indicated volume.
+VOLUME specifies either the complete name or volume ID number of the
+volume. The return value is a reference to a hash table containing the
+values from the C structure C<volintinfo>.  For a list of the hash
+keys see above.
+
+It calls the AFS system library function I<UV_ListOneVolume>.
+
+You can find an example how to print the entire content of the
+returned hash reference in the C<examples/v2/vos> directory.
+
+=item B<$volid = $vos-E<gt>move(VOLUME, FSERVER, FPARTITION, TSERVER, TPARTITION);>
+
+Moves the indicated read/write volume from its current site FSERVER,
+FPARTITION to the destination site TSERVER, TPARTITION.  VOLUME
+specifies either the complete name or volume ID number of the volume.
+It returns the volume id number of the moved volume.  It calls the AFS
+system library function I<UV_MoveVolume>.
+
+=item B<$ok = $vos-E<gt>offline(SERVER, PARTITION, VOLUME [, BUSY, SLEEP]);>
+
+Takes the specified volume offline.  VOLUME specifies either the
+complete name or volume ID number of the volume.  If you set BUSY
+(default 0) to 1 the volume will be marked as I<busy> for the
+specified SLEEP seconds.  It calls the AFS system library function
+I<UV_SetVolume>.
+
+=item B<$ok = $vos-E<gt>online(SERVER, PARTITION, VOLUME);>
+
+Brings the specified volume online.  VOLUME specifies either the
+complete name or volume ID number of the volume.  It calls the AFS
+system library function I<UV_SetVolume>.
+
+=item B<$partinfo = $vos-E<gt>partinfo( SERVER [, PARTITION]);>
+
+Returns an hash reference containing the amount of space available and
+total size on either all of the partitions on the indicated file
+SERVER machine (if the PARTITION argument is omitted) or the specified
+PARTITION on that file server machine.
+
+It calls the AFS system library function I<UV_ListPartitions>.
+
+You can find an example how to print the entire content of the
+returned hash reference in the C<examples/v2/vos> directory.
+
+=item B<$ok = $vos-E<gt>release(VOLUME [, FORCE]);>
+
+Copies the contents of the indicated read/write source volume to each
+read-only site.  VOLUME specifies either the complete name or volume
+ID number of the volume.  If FORCE (default 0) is set to 1, a complete
+release is enforced.  It calls the AFS system library function
+I<UV_ReleaseVolume>.
+
+=item B<$volid = $vos-E<gt>remove(VOLUME [, SERVER, PARTITION]);>
+
+Removes the indicated volume.  VOLUME specifies either the complete
+name or volume ID number of the volume.  To remove the read-only
+volume from a particular site, specify the SERVER and PARTITION
+arguments. It returns the volume id number of the removed volume.  It
+calls the AFS system library function I<UV_DeleteVolume>.
+
+=item B<$ok = $vos-E<gt>rename(ONAME, NNAME);>
+
+Changes the name of the read/write volume from ONAME to NNAME.
+It calls the AFS system library function I<UV_RenameVolume>.
+
+=item B<$ok = $vos-E<gt>restore(SERVER, PARTITION, VOLUME [, DUMPFILE [, ID [, INTER [, OVERWRITE [, OFFLINE [, READONLY]]]]]] );>
+
+Converts the ASCII file DUMPFILE or the standard input stream
+(default) and restores it as a read/write VOLUME to the PARTITION on
+the SERVER.  ID specifies the volume ID number to assign to the
+restored volume.  OVERWRITE must be specified when overwriting an
+existing volume.  The following values are possible:
+
+=over 4
+
+=item B<a> to abort the restore operation.
+
+=item B<f> if restoring a full dump file.
+
+=item B<i> if restoring an incremental dump file.
+
+=back
+
+Set OFFLINE (default 0) to 1 to leave restored volume offline.  Set
+READONLY (default 0) to 1 to make the restored volume read-only.
+
+If the VOLUME already exists, the OVERWRITE argument is omitted, and
+the INTER argument (default 0) is set to 1 the method is interactively
+prompting for the type of restore (exactly like the I<vos restore>
+command).
+
+It calls the AFS system library function I<UV_RestoreVolume>.
+
+=item B<$ok = $vos-E<gt>setquota(VOLUME, QUOTA [, CLEAR]);>
+
+Sets the QUOTA for the specified volume.  Specify the number of
+one-kilobyte blocks as a positive integer (1024 is one megabyte).
+VOLUME specifies either the complete name or volume ID number of the
+volume.  Set CLEAR (default 0) to 1 to clear the access counter on the
+VOLUME, shown on the B<examine> method.  It calls the AFS system
+library function I<UV_SetVolumeInfo>.
+
+=item B<$stat = $vos-E<gt>status(SERVER);>
+
+Reports on what the Volume Server on a certain file SERVER machine is
+doing at the moment the method is performed.
+It calls the AFS system library function I<UV_VolserStatus>.
+
+=item B<$volid = $vos-E<gt>zap(SERVER, PARTITION, ID [, FORCE [, BACKUP]]);>
+
+Removes the specified volume ID number of the volume from the site
+defined by the SERVER and PARTITION arguments, without attempting to
+change the corresponding Volume Location Database (VLDB) entry.  Set
+FORCE (default 0) to 1 to remove the volume even though it cannot be
+attached (brought online). Use this flag only after the failure of
+previous attempts to remove the volume. Set BACKUP (default 0) to 1 to
+remove the backup version of the read/write volume.  It returns the
+volume id number of the removed volume.
+It calls the AFS system library function I<UV_VolumeZap>.
+
+=back
+
+=head1 AUTHORS
+
+The code and documentation for this class were contributed by Stanford
+Linear Accelerator Center, a department of Stanford University.  This
+documentation were written by
+
+=over
+
+=item Alf Wachsmann E<lt>alfw@slac.stanford.eduE<gt>,
+
+=item Venkata Phani Kiran Achanta E<lt>neo_phani@hotmail.comE<gt>, and
+
+=item Norbert E. Gruener E<lt>nog@MPA-Garching.MPG.deE<gt>
+
+=item S< >
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (c) 2005-2011 Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+ Copyright (c) 2003-2004 Alf Wachsmann <alfw@slac.stanford.edu>,
+                         Venkata Phani Kiran Achanta <neo_phani@hotmail.com>, and
+                         Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+ All rights reserved.
+
+Most of the explanations in this document are taken from the original
+AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ Volume Server/Volume Location Server Interface
+ Edward R. Zayas
+ Copyright (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ Copyright (c) IBM Corporation 2000.
+ All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DOCUMENT VERSION
+
+Revision $Rev: 1082 $

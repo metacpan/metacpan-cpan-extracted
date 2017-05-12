@@ -1,0 +1,43 @@
+{
+   "abstract" : "Query a PostgreSQL database asynchronously",
+   "author" : [
+      "Salvador Fandino <sfandino@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-Pg",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "5.34",
+            "Method::WeakCallback" : "0.01",
+            "Pg::PQ" : "0.14"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 0.15
+}

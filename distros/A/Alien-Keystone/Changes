@@ -1,0 +1,8 @@
+- 0.03
+    - Removing Test::Alien and using Test::More
+
+- 0.02
+    - fixing minor issue in tests
+
+- 0.01
+     - Initial commit with a working version

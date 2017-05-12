@@ -1,0 +1,31 @@
+NAME
+
+    Acme::MetaSyntactic::legostarwarstheforceawakens - LEGO Star Wars The
+    Force Awakens theme
+
+VERSION
+
+    version 0.02
+
+DESCRIPTION
+
+    Characters from the LEGO Star Wars The Force Awakens game as gleaned
+    from Brickpedia http://lego.wikia.com.
+
+    It's a trap!!
+
+SEE ALSO
+
+    Acme::MetaSyntactic, Acme::MetaSyntactic::List.
+
+AUTHOR
+
+    Chris Williams
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

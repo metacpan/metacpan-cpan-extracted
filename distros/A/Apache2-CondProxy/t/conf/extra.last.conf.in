@@ -1,0 +1,34 @@
+# XXX figure out how to do this a non-ridiculous way
+LoadModule dir_module @src_dir@/mod_dir.so
+LoadModule negotiation_module @src_dir@/mod_negotiation.so
+LoadModule proxy_module @src_dir@/mod_proxy.so
+LoadModule proxy_http_module @src_dir@/mod_proxy_http.so
+LoadModule proxy_connect_module @src_dir@/mod_proxy_connect.so
+
+
+<IfModule !mod_fcgid.c>
+LoadModule fcgid_module @src_dir@/mod_fcgid.so
+#ScriptSock @t_logs@/cgisock
+#FcgidIPCDir @t_logs@/fcgidsock
+FcgidIPCDir /tmp/apache-test-fcgid
+FcgidProcessTableFile @t_logs@/fcgid_shm
+</IfModule>
+
+<IfModule !mod_cgi.c>
+LoadModule cgi_module @src_dir@/mod_cgi.so
+#ScriptSock @t_logs@/cgisock
+</IfModule>
+
+PerlLoadModule Apache2::CondProxy
+PerlFixupHandler Apache2::CondProxy
+PerlSetVar ProxyTarget http://iainstitute.org
+PerlSetVar RequestBodyCache @ServerRoot@/tmp
+#PerlSetVar RemoteFirst on
+
+<Directory "@DocumentRoot@">
+AllowOverride all
+AddHandler cgi-script .cgi
+AddHandler fcgid-script .fcgi
+Options Indexes ExecCGI MultiViews
+#DirectoryIndex index
+</Directory>

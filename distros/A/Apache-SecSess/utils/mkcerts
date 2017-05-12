@@ -1,0 +1,323 @@
+#!/usr/bin/perl
+# mkcerts - (the anti-CA script) make x509 certificates with openssl
+#
+# $Id: mkcerts,v 1.3 2002/05/08 02:14:59 pliam Exp $
+#
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# mkcerts
+# Copyright (c) 2001, 2002 John Pliam (pliam@atbash.com)
+# This is open-source software.
+# See file 'COPYING' in original distribution for complete details.
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+use Getopt::Std;
+
+system("openssl version");
+
+#
+# cmd line args
+#
+$usage = "usage: $0 [-d] [-e] [-n]";
+getopts('den') || die $usage;
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+#
+# you must edit all the config info below
+#
+
+# # # # # # # # # # # # # # Begin Configuration # # # # # # # # # # # # # # #
+
+# security
+$rsabits = 2048;  # number of RSA modulus bits
+$digest = 'sha1'; # or 'md5'
+$cadays  = 4*365; # days of validity for root CA
+$days	 = 2*365; # days of validity for signed certs
+
+# cert files
+$cacert	= 'acme-ca.crt';
+$cakey	 = 'acme-ca.key';
+$capasswd = 'certd@ddy'; # password for root CA (really do change me)
+$spasswd	= 'serverpw'; # server passwords (not used, unless -e opt)
+$cpasswd	= 'certb@by'; # PKCS12 client passwords (always used)
+
+# DN info
+$dnc = 'US';							 # country
+$dnst = 'NJ';							# state, province, canton etc
+$dnl = 'Basispoint Springs';		# city
+$company = 'Acme Industries Inc'; # company name
+$dns = 'acme.com';					 # DNS domain
+
+#
+# things to do when creating new CA (-n option)
+# 
+if ($opt_n) {
+	# server certs to create and sign (dns prefixes to $dns)
+	@servers = (						
+		'adam.', 'lysander.', 'tom.',			# .acme.com domain
+		'john.sec.', 'milt.sec.', 				# .sec.acme.com
+		'stu.transacme.com', 'noam.acme.org'	# outside signing domain
+	); 
+
+	# pkcs12 client certs to create and sign
+	@clients = (
+		{'email' => 'bob', 'full' => 'Col. Robert Bobtight'},
+		{'email' => 'admin', 'full' => 'Acme Security Administrator'}
+	);
+}
+
+#
+# things to do in append mode (no -n option)
+#
+if (!$opt_n) { @servers = ('www'); }
+
+# # # # # # # # # # # # # # End Configuration # # # # # # # # # # # # # # # #
+
+#
+# configuration info which should be OK to LEAVE ALONE
+#
+$confile = './request.cnf';  # config file for requests
+
+#
+# create CA cert, if necessary
+#
+if ($opt_n) { &newca; }
+
+#
+# make basic ssl server certs under CA's domain
+#
+for $s (@servers) { &mksslserv($s); }
+
+#
+# make pkcs12 client cert/key's
+#
+for $c (@clients) { &mkpkcs12($c); }
+
+#
+# subroutine to create new CA
+#
+sub newca {
+	my($configinfo);
+
+	printf(":\n: Creating CA Cert ...\n:\n");
+
+	#
+	# create root request config file
+	#
+	$configinfo = <<"END_CONFILE";
+[ req ]
+default_bits			  = $rsabits
+default_md				 = $digest
+default_keyfile		  = $cakey
+distinguished_name	  = req_distinguished_name
+prompt					  = no
+output_password		  = $capasswd
+
+[ req_distinguished_name ]
+C							 = $dnc
+ST							= $dnst
+L							 = $dnl
+O							 = $company
+OU							= www.$dns
+CN							= $company Root CA
+emailAddress			  = trustmaster\@$dns
+END_CONFILE
+
+	open(CONFILE, ">$confile") || die "cannot create config file: $confile";
+	printf CONFILE "%s\n", $configinfo;
+	close(CONFILE);
+	
+	#
+	# create self-signed root cert for CA, and display
+	#
+	
+	# create/sign
+	system(
+		"openssl req -config $confile -x509 -new -days $cadays -out $cacert"
+	) == 0 or die "problem creating root CA certificate";
+	
+	# clean up
+	unlink($confile) || die "cannot remove $confile";
+	
+	# display
+	if ($opt_d) {
+		printf(":\n: Newly Created Root CA Certificate\n:\n");
+		system(
+			"openssl x509 -in $cacert -noout -text"
+		) == 0 or die "problem printing root CA certificate: $cacert";
+	}
+	printf(":\n: CA's MD5 fingerprint\n:\n");
+	system(
+		"openssl x509 -in $cacert -noout -fingerprint"
+	) == 0 or die "fingerprint problem with root CA certificate: $cacert";
+}
+
+#
+# general subroutine to create and sign x509 certs
+#
+sub mknsign {
+	my ($opt_e, $hr) = @_; # global $opt_e doesn't apply to pkcs12
+	my($name, $req, $key, $cert);
+	my($enccmd, $dtag, $configinfo);
+	my(@x500tags) = ('C', 'ST', 'L', 'O', 'OU', 'CN');
+
+	$name = $hr->{'name'};					  # short name for files
+	$req = sprintf("%s-req.pem", $name);	# request file
+	$key = sprintf("%s-key.pem", $name);	# private key file
+	$cert = sprintf("%s-cert.pem", $name); # cert file
+
+	printf("\n:\n: Creating and Signing Cert for '%s' ...\n:\n", $name);
+	if ($opt_d) {
+		printf("%s: creating request/key (%s,%s)\n", $name, $req, $key);
+	}
+
+	#
+	# make configuation file for openssl req
+	#
+	$enccmd = ($opt_e) ?
+		"output_password		  = $spasswd" :
+		"encrypt_key				= no";
+
+	$configinfo = <<"END_CONFILE";
+[ req ]
+default_bits			  = $rsabits
+default_md				 = $digest
+default_keyfile		  = $key
+distinguished_name	  = req_distinguished_name
+prompt					  = no
+$enccmd
+
+[ req_distinguished_name ]
+END_CONFILE
+
+	for $dtag (@x500tags) {
+		if (defined($hr->{$dtag})) {
+			$configinfo .= sprintf("%s\t\t= %s\n", $dtag, $hr->{$dtag});	
+		}
+	}
+	if (defined($hr->{'email'})) {
+		$configinfo .= sprintf("emailAddress\t\t= %s\n", $hr->{'email'});	
+	}
+	open(CONFILE, ">$confile") || die "cannot create config file: $confile";
+	printf CONFILE "%s\n", $configinfo;
+	close(CONFILE);
+
+	#
+	# create cert request
+	#
+	system(
+		"openssl req -config $confile -new -out $req"
+	) == 0 or die "problem creating certificate request for: $name";
+
+	#
+	# sign the request
+	#
+
+	# sign
+	open(SIGNREQ, "| openssl x509 -req -in $req -passin stdin -$digest " .
+		"-CA $cacert -CAkey $cakey -CAcreateserial -days $days -out $cert"
+	) or die "problem signing certificate request for: $name";
+	printf SIGNREQ  "%s\n", $capasswd;
+	close(SIGNREQ);
+
+	# clean up
+	unlink($confile, $req) || die "cannot clean up";
+
+	# display
+	if ($opt_d) {
+		printf(":\n: Newly Signed Certificate for '%s'\n:\n", $name);
+		system(
+			"openssl x509 -in $cert -noout -text"
+		) == 0 or die "problem printing certificate: $cert";
+		printf(":\n: Verifying '%s' ...\n:\n", $name);
+		system(
+			"openssl x509 -in $cert -noout -fingerprint"
+		) == 0 or die "certificate fingerprint problem: $name";
+		printf("verifying signature ...\n");
+		system(
+			"openssl verify -verbose -CAfile $cacert $cert"
+		) == 0 or die "certificate fingerprint problem: $name";
+	}
+}
+
+#
+# create the SSL server certs under CA's domain
+#
+sub mksslserv {
+	my $s = shift;
+	my($servdns, $name);
+
+	if ($s =~ /\.$/) { # host within signing domain
+		$name = $`;
+		$servdns = sprintf("%s%s", $s, $dns);
+	}
+	else { # hosts outside signing domain
+		$name = $s;
+		$servdns = $s;
+	}
+	
+	#
+	# copy most X.500 tags from CA's cert
+	#
+	&mknsign($opt_e, {
+		'name'  => $name,
+		'C'	  => $dnc,
+		'ST'	 => $dnst,
+		'L'	  => $dnl,
+		'O'	  => $company,
+		'CN'	 => $servdns,
+		'email' => "trustmaster\@$dns"
+	});
+}
+
+#
+# make PKCS12 client certificate for browser import
+#
+sub mkpkcs12 {
+	my $c = shift;
+	my($email,$nick,$full,$cert,$key,$pemfile,$p12file,);
+
+	#
+	# parse nick name, email and full name
+	#
+	$email = $c->{'email'};
+	if ($email =~ /^([^@]+)@/) { # full email passed
+		$nick = $1;
+	}
+	else { # short email passed
+		$nick = $email;
+		$email = sprintf('%s@%s', $nick, $dns);
+	}
+	$full = $c->{'full'};
+
+	#
+	# make *-cert.pem & *-key.pem, copying tags from CA's if nec.
+	#
+	&mknsign(0, {
+		'name'  => $nick,
+		'C'	  => defined($c->{'C'}) ? $c->{'C'} : $dnc,
+		'ST'	 => defined($c->{'ST'}) ? $c->{'ST'} : $dnst,
+		'L'	  => defined($c->{'L'}) ? $c->{'L'} : $dnl,
+		'O'	  => defined($c->{'O'}) ? $c->{'O'} : "Personal Certificate",
+		'CN'	 => $full,
+		'email' => $email
+	});
+
+	#
+	# create .p12 file
+	#
+	$cert = sprintf("%s-cert.pem", $nick);
+	$key = sprintf("%s-key.pem", $nick);
+	$pemfile = sprintf("%s.pem", $nick);
+	$p12file = sprintf("%s.p12", $nick);
+	system("cat $cert $key > $pemfile") == 0 
+		or die "cannot create concatenated file: $pemfile";
+	open(PKCSCMD,
+		"| openssl pkcs12 -export -in $pemfile -out $p12file " .
+			"-name \"$full\" -passout stdin"
+	) or die "problem creating PKCS file: $p12file";
+	printf PKCSCMD  "%s\n", $cpasswd;
+	close(PKCSCMD);
+	unlink($cert, $key, $pemfile) || die "cannot clean up";
+}

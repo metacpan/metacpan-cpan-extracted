@@ -1,0 +1,9 @@
+Changes
+Holy.pm
+Holy.xs
+Makefile.PL
+MANIFEST
+README
+t/1compile.t
+t/2holy.t
+t/3aliases.t

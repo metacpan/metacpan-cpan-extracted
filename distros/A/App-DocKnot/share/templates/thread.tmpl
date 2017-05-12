@@ -1,0 +1,189 @@
+\==[doc]      [2] [\bullet(packed)[\link[\1][\2]]]
+\==[program]  [3]
+    [\tablerow[\1 \version[\2]] [\release[\2]]
+        [\link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+        (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+              [PGP signature])]
+        [\link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+        (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+              [PGP signature])]]
+\==[download] [3]
+    [\1 \version[\2]\break
+     \link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+     (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+           [signature])\break
+     \link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+     (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+           [signature])\break
+    Released \release[\2]]
+
+\heading[[% name %]][software]
+
+\h1[[% name %]]
+[% IF quote %]
+\quote[% IF quote.text.length < 80 %](short)[% END %][
+
+[% indent(quote.text, 4) %]
+
+][[% quote.author %]][[% quote.work %]]
+[% END %]
+\div(sidebar)[
+    \h2[Download]
+
+    \download[[% name %]][[% distribution.version %]]
+        [[% distribution.section %]/[% distribution.tarname %]-\version[[% distribution.version %]]]
+[% IF packaging.debian %]
+    \link[https://packages.debian.org/source/sid/[% packaging.debian %]]
+         [Debian packages] \break[% END %]
+    \link[https://archives.eyrie.org/software/ARCHIVE/[% distribution.tarname %]/]
+         [Archive]
+
+    \h2[Documentation]
+
+    \link[readme.html][General overview] \break
+    \link[news.html][Change summary][% FOREACH doc IN docs.user %] \break
+    \link[[% doc.name %].html][[% doc.title %]][% END %]
+
+    \h2[Development]
+
+    \link[todo.html][To-do list][% IF vcs.github %] \break
+    \link[https://github.com/[% vcs.github %]]
+         [GitHub][% END %][% IF support.github %] \break
+    \link[https://github.com/[% support.github %]/issues]
+         [Bug tracker][% ELSIF support.cpan %] \break
+    \link[https://rt.cpan.org/Dist/Display.html?Name=[% support.cpan %]]
+         [Bug tracker][% END %][% IF vcs.type == 'Git' %] \break
+    \link[[% vcs.browse %]]
+         [Git repository][% END %][% IF vcs.openhub %] \break
+    \link[[% vcs.openhub %]]
+         [Open HUB code analysis][% END %][% IF packaging.debian %] \break
+    \link[https://tracker.debian.org/pkg/[% packaging.debian %]]
+         [Debian package tracker][% END %]
+]
+[% IF orphaned %]
+\h2[Warning]
+
+\class(alert)[This package is orphaned.]
+[% orphaned %]
+[% END %]
+\h2[Blurb]
+
+[% to_thread(blurb) %]
+
+\h2[Description]
+
+[% to_thread(description) %]
+
+\h2[Requirements]
+
+[% to_thread(requirements) %]
+[% IF build.autotools %]
+To bootstrap from a Git checkout, or if you change the Automake files and
+need to regenerate Makefile.in, you will need Automake
+[% build.automake %] or later.  For bootstrap or if you change
+configure.ac or any of the m4 files it includes and need to regenerate
+configure or config.h.in, you will need Autoconf [% build.autoconf %] or
+later.[% IF build.manpages %]  Perl is also required to generate manual
+pages from a fresh Git checkout.[% END %][% IF bootstrap %]
+[% to_thread(bootstrap) %][% END %]
+[% END %]
+\h2[Download]
+
+The distribution:
+
+\table[][
+    \program[[% name %]][[% distribution.version %]]
+        [[% distribution.section %]/[% distribution.tarname %]-\version[[% distribution.version %]]]
+]
+
+An \link[https://archives.eyrie.org/software/ARCHIVE/[% distribution.tarname %]/]
+[archive of older releases] is also available.
+[% IF debian.summary %]
+[% to_thread(debian.summary) | trim %]  See the
+\link[https://tracker.debian.org/pkg/[% packaging.debian %]][Debian
+package tracker] for more information.
+[% ELSIF debian.personal %]
+A Debian package is available from my \link[../debian.html][personal
+repository].
+[% END %]
+[% name %] is maintained using the [% vcs.type %] version control system.
+To check out the current development tree, [% IF vcs.github %]see
+\link[https://github.com/[% vcs.github %]][GitHub] or [% END %]clone:
+
+\pre[    [% vcs.url %]]
+
+[% IF vcs.github %]Pull requests on GitHub are welcome.  [% END %]You can
+also \link[[% vcs.browse %]][browse the current development source].
+
+\h2[Documentation]
+[% IF docs.api %]
+\div(left)[
+    \class(first)[User documentation:]
+
+    \doc[readme.html][README]
+    \doc[news.html][Change summary][% FOREACH doc IN docs.user %]
+    \doc[[% doc.name %].html][[% doc.title %]][% END %]
+    \doc[license.html][License and copyright]
+
+    Developer documentation:
+
+    \doc[todo.html][To-do list][% IF vcs.github %]
+    \doc[https://github.com/[% vcs.github %]]
+        [GitHub][% END %][% IF support.github %]
+    \doc[https://github.com/[% support.github %]/issues]
+        [Bug tracker][% END %][% IF vcs.openhub %]
+    \doc[[% vcs.openhub %]]
+        [Open HUB code analysis][% END %]
+]
+
+\div(right)[
+    \class(first)[API documentation:]
+[% FOREACH doc IN docs.api %]
+    \doc[[% doc.name %].html][[% doc.title %]][% END %][% IF docs.extra %]
+[% FOREACH section IN docs.extra %]
+    [% section.title %]:
+[% FOREACH doc IN section.links %]
+    \doc[[% doc.name %].html][[% doc.title %]][% END %][% END %][% END %]
+]
+
+\h2(after)[License]
+[% ELSE %]
+User documentation:
+
+\doc[readme.html][README]
+\doc[news.html][Change summary][% FOREACH doc IN docs.user %]
+\doc[[% doc.name %].html][[% doc.title %]][% END %]
+\doc[license.html][License and copyright]
+
+Developer documentation:
+
+\doc[todo.html][To-do list][% IF vcs.github %]
+\doc[https://github.com/[% vcs.github %]]
+    [GitHub][% END %][% IF support.github %]
+\doc[https://github.com/[% support.github %]/issues]
+    [Bug tracker][% END %][% IF vcs.openhub %]
+\doc[[% vcs.openhub %]]
+    [Open HUB code analysis][% END %]
+
+\h2[License]
+[% END %]
+The [% name %] package as a whole is covered by the following copyright
+and license:
+
+\block[
+[% FOREACH copr IN copyrights %]
+    Copyright [% copr.years %]
+        [% copr.holder %]
+[% END %]
+
+[% indent(license.full, 4) %]
+[% IF license.notices %]
+[% indent(to_thread(license.notices), 4) %]
+[% END %]
+]
+
+Some individual source files are covered by other, compatible licenses.
+For complete copyright and license information, see the file
+\link[license.html][LICENSE] in the [% name %] source distribution.
+
+\signature

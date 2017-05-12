@@ -1,0 +1,64 @@
+#!perl
+
+# DATE
+# VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Benchmark::Command;
+use FindBin '$Bin';
+
+my $node_chalk;
+{
+    require File::Slurper;
+    require File::Which;
+    for (File::Which::which('chalk')) {
+        my $content = File::Slurper::read_text($_);
+        if ($content =~ /process\.stdin/) {
+            $node_chalk = $_;
+            last;
+        }
+    }
+    die "Can't find node's chalk" unless $node_chalk;
+}
+
+Benchmark::Command::run(
+    undef,
+    {
+        'perl (--help)' => [$^X, "$Bin/../bin/chalk", "--help"],
+        'node (--help)' => [$node_chalk, "--help"],
+
+        'perl (red bold str)' => [$^X, "$Bin/../bin/chalk", "red","bold","str"],
+        'node (red bold str)' => [$node_chalk, "red", "bold", "str"],
+
+        'perl (100_000 lines)' => sub {
+            open my($fh), "| $^X $Bin/../bin/chalk red bold" or die $!;
+            for (1..100_000) {
+                print $fh "foo\n";
+            }
+            close $fh or die $!;
+        },
+
+        'node (100_000 lines)' => sub {
+            open my($fh), "| $node_chalk red bold" or die $!;
+            for (1..100_000) {
+                print $fh "foo\n";
+            }
+            close $fh or die $!;
+        },
+    },
+    {
+        quiet => 1,
+    },
+);
+
+# ABSTRACT: Benchmark node.js's chalk vs perl's
+# PODNAME:
+
+=head1 DESCRIPTION
+
+node's chalk is still faster for processing stdin (6.5ms for 100ki lines vs
+16.5ms for perl's chalk). This is probably because in perl's chalk we print ANSI
+code and reset per line.

@@ -1,0 +1,80 @@
+
+.clear { clear: both; }
+
+div.jGrowl div.error {
+    background: red;
+    color: black;
+}
+
+#langlist { margin: 10px 10%; margin-bottom: 20px; }
+#langlist li { display: inline; margin: 5px; background: #36D986; color: #007439;  padding: 6px; }
+#langlist li:hover { text-decoration: underline; background: #eee; }
+
+#current-lang { color: #999; margin: 10px; }
+
+#current-message { margin: 10px 13%; margin-top: 20px; }
+.navbar input { font-size: 16px; padding: 6px; margin-right: 10px; border: 1px solid #ddd; background: #fff; }
+.navbar input:hover { background: #eee; }
+
+#current-msgstr,
+#current-msgid { 
+	margin: 10px; padding: 8px; 
+	width: 70%;
+	border-top: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+	border-left: 0px;
+	border-right: 0px;
+	color: #333;
+	font-family: Serif;
+	font-size: 18px;
+}
+
+#google-translation { 
+	margin-left: 30px; margin-bottom: 30px; 
+	color: #666;
+	background: #eee;
+	border: #ddd;
+	width: 65%;
+	padding: 10px;
+}
+
+
+.apply { color: blue; margin-left: 10px; font-size: 12px; }
+
+/*
+body {
+    font-size: 22px;
+}
+
+h1,h2,h3 { color: #3F92D2; }
+
+textarea,input { 
+    font-size: 22px;
+    padding: 3px;
+    background: #ded;
+    color: #666;
+}
+
+textarea:focus,
+input:focus {  background: #99CCD2;color: #333; font-weight: bold; }
+
+.msgid { width: 300px; float: left; padding:6px; }
+.msgstr { width: 400px; float: left; padding:6px; }
+
+.msgid textarea,
+.msgid input { width: 300px; }
+
+.msgstr textarea,
+.msgstr input { width: 400px; }
+
+.savethis { float: left; padding: 6px; }
+
+.column-header { color: #66A3D2; }
+.column-header { color: #66A3D2; }
+
+.msgitem { clear: both; }
+
+
+
+*/
+

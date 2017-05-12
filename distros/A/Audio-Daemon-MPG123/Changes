@@ -1,0 +1,6 @@
+Revision history for Perl extension Audio::Daemon::MPG123.
+
+1.0  Fri Aug  9 23:17:03 2002
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Audio::Daemon::MPG123 -v 1.0
+

@@ -1,0 +1,49 @@
+.progressmeter {
+    font-family: Arial;
+    font-size: 10pt;
+    text-align: center;
+}
+
+.progressmeter table {
+}
+
+.progressmeter th {
+    font-weight: bold;
+    text-align: right;
+}
+
+.progressmeter td {
+    text-align: left;
+}
+
+.finished {
+    color: #667799;
+}
+
+.progressmeter .meter {
+    position: relative;
+    background: url('data:image/gif;base64,R0lGODlhEwAYAIACAM7O+v///ywAAAAAEwAYAAACLoyPqcsID6N0skJqK85x8+d9ITdmpXVqxzet7OW+QNoaMhi/dJezO2y7NYbEYQEAOw==') repeat-x;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    width: 285px;
+    height: 24px
+}
+
+.progressmeter .meter .amount {
+    background: url('data:image/gif;base64,R0lGODlhEwAYAIACAJeX/////ywAAAAAEwAYAAACLoyPqcsID6N0skJqK85x8+d9ITdmpXVqxzet7OW+QNoaMhi/dJezO2y7NYbEYQEAOw==') repeat-x;
+    width: 0px;
+    height: 24px
+}
+
+.progressmeter .meter .percent {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 1000;
+    height: 24px;
+    text-align: center;
+    font-family: Arial;
+    font-size: 20px;
+    font-weight: bold;
+}
+

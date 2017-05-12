@@ -1,0 +1,31 @@
+---
+abstract: 'Add a prepare-commit-msg to your git repository that uses whatthecommit.com to generate random commit messages'
+author:
+  - 'mudler <mudler@dark-lab.net>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build::Tiny: 0.035
+  perl: 5.008005
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-whatthecommit
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  perl: 5.008_005
+resources:
+  bugtracker: https://github.com/mudler/App-whatthecommit/issues
+  homepage: https://github.com/mudler/App-whatthecommit
+  repository: https://github.com/mudler/App-whatthecommit.git
+version: 0.02

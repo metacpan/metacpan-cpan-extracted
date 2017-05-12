@@ -1,0 +1,25 @@
+Revision history for Algorithm-Kuhn-Munkres
+
+0.0.3 Sat Nov  6 23:20:40 EDT 2010
+    Initial release.
+
+1.0.0 Sun Nov  7 21:07:19 EST 2010
+    Documentation update
+
+1.0.1 Mon Nov  8 10:12:35 EST 2010
+    README update
+
+1.0.3 Mon Nov  8 15:42:12 EST 2010
+    assertion updates
+
+1.0.4 Mon Nov  8 21:51:20 EST 2010
+    add testing dependencies
+
+1.0.5 Tue Nov  9 09:25:13 EST 2010
+    correcting testing dependencies
+
+1.0.6 Tue Nov  9 10:37:01 EST 2010
+    documentation bug fix
+
+1.0.7 Wed Nov 10 17:02:06 EST 2010
+    minor documentation bug fix

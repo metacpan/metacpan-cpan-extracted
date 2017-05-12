@@ -1,0 +1,19 @@
+#!/usr/bin/perl -w
+
+use File::Spec::Functions;
+my $bin_dir = catdir qw(t scripts);
+$bin_dir    = catdir(qw(t bin)) unless -d $bin_dir;
+
+if ($ARGV[0] eq '--version') {
+    print "OSSP uuid 1.3.0 (02-Sep-2005)\n";
+} elsif ($ARGV[0] eq '--bindir') {
+    print "$bin_dir\n";
+} elsif ($ARGV[0] eq '--includedir') {
+    print "t/testinc\n";
+} elsif ($ARGV[0] eq '--libdir') {
+    print "t/testlib\n";
+} elsif ($ARGV[0] eq '--cflags') {
+    print "-I/usr/local/include\n";
+} elsif ($ARGV[0] eq '--ldflags') {
+    print "-L/usr/local/lib\n";
+}

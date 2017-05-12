@@ -1,0 +1,70 @@
+Astro::FITS::HdrTrans module
+----------------------------
+
+What is it?
+-----------
+Astro::FITS::HdrTrans and associated sub-classes are tools for translating
+instrument-specific FITS headers into generically named headers.
+
+Requirements
+------------
+The Astro::FITS::HdrTrans module has minimal requirements on other
+modules; only Carp and Time::Piece are required. Instrument-specific
+sub-classes of Astro::FITS::HdrTrans may require other modules to be
+installed, depending on the transformations those sub-classes make.
+As an example, the translation sub-class for IRIS2 (an imaging
+spectrometer used at the Anglo-Australian Telescope) requires
+Math::Trig in order to do zenith distance to airmass translations.
+
+Adding Subclasses
+-----------------
+Adding subclasses to do translations for other instruments should
+be fairly straight-forward. Detailed documentation can be found
+in the Astro::FITS::HdrTrans::Base class.
+
+Where can I get it?
+-------------------
+The package is available from CPAN <http://www.cpan.org/>.
+
+Installation
+------------
+Installation is automated using the Module::Build library
+
+    % perl Build.PL
+    % ./Build
+    % ./Build test
+    % ./Build install
+
+Authors
+-------
+
+The module was written by Brad Cavanagh <b.cavanagh@jach.hawaii.edu> and
+Tim Jenness <t.jenness@jach.hawaii.edu> of the Joint Astronomy Centre
+(JAC) in Hawaii, and Malcolm J. Currie <mjc@star.rl.ac.uk> of the Rutherford
+Appleton Laboratory (RAL) and the JAC.
+
+Copyright (C) 2016 East Asian Observatory.
+Copyright (C) 2007-2013 Science and Technology Facilities Council.
+Copyright (C) 2003-2007 Particle Physics and Astronomy Research Council.
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+Maintainer
+----------
+The package is currently maintained by Tim Jenness <tjenness@cpan.org>.
+Please use CPAN RT for bug reports and github pull requests for patches.
+The source code repository is at
+
+  git://github.com/Starlink/perl-Astro-FITS-HdrTrans.git

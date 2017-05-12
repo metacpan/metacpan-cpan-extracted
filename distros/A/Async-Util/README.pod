@@ -1,0 +1,171 @@
+=pod
+
+=head1 NAME
+
+Async::Util - Utilities for common asynchronous programming tasks
+
+=head1 SYNOPSIS
+
+    use Async::Util qw(amap azipmap achain);
+
+    # async map
+    amap(
+        inputs => [ 'foo', 'bar' ],
+        action => \&something_asynchronous,
+        cb     => \&do_this_at_the_end,
+    );
+
+    # invoke action on the corresponding input
+    azipmap(
+        inputs  => [ 1, 1, 1 ],
+        actions => [
+            ... # asynchronous subs
+        ],
+        cb     => \&do_this_at_the_end,
+    );
+
+    # execute steps in order
+    achain(
+        input => 2,
+        steps => [
+            ... # asynchronous subs
+        ],
+        cb    => \&do_this_at_the_end,
+    );
+
+Examples using AnyEvent:
+
+    use AnyEvent;
+    use Async::Util qw(amap);
+
+    my @timers;
+    my $delayed_double = sub {
+        my ($input, $cb) = @_;
+
+        push @timers, AnyEvent->timer(after => 2, cb => sub {
+            $cb->($input*2);
+        });
+    };
+
+    my $cv = AE::cv;
+
+    amap(
+        inputs    => [ 1 .. 20 ],
+        action    => $delayed_double,
+        cb        => sub { $cv->send(@_) },
+        at_a_time => 5,
+    );
+
+    my ($res, $err) = $cv->recv;
+
+    # achain
+    my $cv = AE::cv;
+
+    achain(
+        input => 2,
+        steps => [
+            sub {
+                my ($input, $cb) = @_;
+                push @timers, AnyEvent->timer(
+                    after => 0,
+                    cb    => sub { $cb->($input+1) },
+                );
+            },
+            sub {
+                my ($input, $cb) = @_;
+                push @timers, AnyEvent->timer(
+                    after => 0,
+                    cb    => sub { $cb->($input * 2) },
+                );
+            },
+        ],
+        cb => sub { $cv->send(@_) },
+    );
+
+    my ($res, $err) = $cv->recv; # $res is 6
+
+=head1 DESCRIPTION
+
+C<Async::Util> provides functionality for common tasks that come up when doing
+asynchronous programming. This module's functions often take code refs. These
+code refs are invoked with two arguments: the input and a callback to be
+invoked on completion. When the provided callback is invoked it should be
+passed an output argument and an optional error.
+
+=head1 FUNCTIONS
+
+=head2 amap
+
+C<amap> is an asynchronous version of map:
+
+    amap(
+        inputs    => <ARRAY_REF>,
+        action    => <CODE_REF>,
+        cb        => <CODE_REF>,
+        at_a_time => <INTEGER>, # defaults to 100
+        output    => <BOOL>,    # defaults to true
+    );
+
+The action coderef is executed for every provided input. The first argument to
+the action coderef is an input from the list and the second is a callback.
+When the action is done it should invoke the callback passing the result as
+the first argument and optionally an error message as the second.
+
+If the action will produce no output then it can pass C<undef> as the first
+argument to the callback and an optional error as the second argument in the
+usual way. In this case, the C<amap> argument C<output> can be set to 0,
+allowing certain performance optimizations to occur.
+
+The C<at_a_time> argument sets the maximum number of inputs that will be
+processed simultaneously. This defaults to 100.
+
+When the action has been applied to each input then the C<cb> coderef is
+invoked and passed an arrayref containing one result for every input. If
+action ever passes an error to its callback then the cb coderef is immediately
+invoked and passed the error. No more inputs are processed.
+
+=head2 azipmap
+
+C<azipmap> executes a list of callbacks on a list of corresponding inputs.
+Every provided action is executed and passed the input found in the same
+position in the list of provided inputs. In other words, the list of actions
+and the list of inputs are zipped in to action/input pairs, then each action
+is executed on its input.
+
+    azipmap(
+        inputs    => <ARRAY_REF>,
+        actions   => <CODE_REF>,
+        cb        => <CODE_REF>,
+        at_a_time => <INTEGER>, # defaults to 100
+        output    => <BOOL>,    # defaults to true
+    );
+
+Just as with C<amap>, actions should pass a result to the passed in callback
+as well as an optional error. Also, as with C<amap>, the C<cb> coderef is
+invoked once all the inputs have been processed or immediately if any action
+passes an error to its callback.
+
+=head2 achain
+
+C<achain> executes the provided steps in order. Each step's coderef is passed
+an input and a callback. When the step is complete is should invoke the
+coderef and pass a result and an optional error. The result from each step
+becomes the input to the next step. The first step's input is the value passed
+to C<achain> as the C<input> argument. When all steps are complete the C<cb>
+coderef is executed and passed the result from the last step. If any step
+returns an error then the C<cb> coderef is immediately invoked and passed the
+error.
+
+    achain(
+        input => <SCALAR>,
+        steps => <ARRAY_REF>,
+        cb    => <CODE_REF>,
+    );
+
+=head1 REPOSITORY
+
+L<http://github.com/wjackson/async-util>
+
+=head1 AUTHORS
+
+Whitney Jackson

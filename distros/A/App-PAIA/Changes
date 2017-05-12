@@ -1,0 +1,45 @@
+Revision history for Perl module App::PAIA
+
+0.30  2015-04-28 14:31:56 CEST
+  - improved App::PAIA::Tester
+
+0.29  2015-04-28 11:55:37 CEST
+  - take base URL from session if available (issue #10)
+
+0.28  2015-04-27 21:30:19 CEST
+  - migrate to Dist::Milla
+
+0.25    2014-01-06
+  - fix test failure with Pod::Simple 3.28 on Perl >= 5.18
+
+0.24    2013-12-18
+  - ignore existing session on login/logout
+
+0.23    2013-11-22
+  - print items in JSON
+
+0.22    2013-11-20
+  - improved unit tests
+  - show document errors
+  - support explicit patron identifier at command line
+  - renamed option --full to --debug and imply --verbose
+
+0.21    2013-11-07
+  - fixed scopes read_items & write_items
+  - improved error handling
+  - added dependency on module URI
+  - internal changes (logging etc.)
+
+0.20    2013-10-31
+  - better support --version and --help
+  - new command 'config'
+  - implement PAIA method 'change'
+  - changed session file from .paia_session to paia-session.json
+  - support Perl >= 5.10
+  - facilitate writing unit tests
+
+0.11    2013-10-23
+  - implemented all PAIA method but 'change'
+
+0.01    2013-10-22
+  - First version released to CPAN

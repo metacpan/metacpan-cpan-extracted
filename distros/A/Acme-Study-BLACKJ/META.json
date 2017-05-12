@@ -1,0 +1,41 @@
+{
+   "abstract" : "Use the cpantesters cloud for testing bugs and features.",
+   "author" : [
+      "Jeff Black <blackj@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Study-BLACKJ",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Study::BLACKJ" : {
+         "file" : "lib/Acme/Study/BLACKJ.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ]
+   },
+   "version" : "0.01"
+}

@@ -1,0 +1,40 @@
+Changelog for App-Pastebin-sprunge
+
+0.012     2014-08-29
+  - Require sprunge libraries that detect errors properly
+
+0.011     2013-02-21
+  - Die instead of exit on failure to create/fetch a paste
+
+0.010     2012-09-01
+  - Test for network connectivity in the test suite
+
+0.009     2012-06-25
+  - Update test suite [GH #3]
+
+0.008     2012-05-12
+  - Don't use perl5i - too slow
+
+0.007     2011-04-29
+  - Looser test validation to catch more erroneously-failing smokers
+
+0.006     2011-04-26
+  - Fix incorrect test string so tests pass
+
+0.005     2011-04-21
+  - Packaging updates
+  - Internal refactoring
+  - Expanded test suite
+
+0.004     2010-11-28
+  - Use Perl_5 license: dual-licensed under GPL and Artistic
+
+0.003     2010-10-31
+  - Fixed documentation formatting
+
+0.002     2010-10-21
+  - Tweaked documentation
+  - Require minimum version of Test::More to resolve test failures
+
+0.001     2010-10-18
+  - Initial version

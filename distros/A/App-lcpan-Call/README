@@ -1,0 +1,6 @@
+ENVIRONMENT
+
+ LCPAN_MAX_AGE => int
+
+    Set the default of max_age.
+

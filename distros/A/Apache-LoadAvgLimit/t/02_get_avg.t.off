@@ -1,0 +1,23 @@
+# some linux system don't have getloadavg() ..
+print "1..1\n";
+
+use Apache::LoadAvgLimit::GetAvg;
+
+my @avg;
+eval {
+    @avg = Apache::LoadAvgLimit::GetAvg::get_loadavg()
+        or die q/Cannot get load averages./;
+};
+
+if( $@ =~ /undefined symbol/ ){
+    warn "your system don't support getloadavg(), so you cannot use this module..";
+}
+
+my $flag = 0;
+for my $i(1..3){
+#    warn $avg[($i-1)], "\n";
+    $flag++ if $avg[($i-1)] !~ /^[\d\.]{4,}$/ 
+}
+
+print "not " if $flag;
+print "ok 1\n";

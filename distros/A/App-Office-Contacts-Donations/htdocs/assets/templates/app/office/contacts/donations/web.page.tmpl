@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+
+<title>Donations</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="stylesheet" type="text/css" href="<tmpl_var name=css_url>/table.even.odd.css">
+<link rel="stylesheet" type="text/css" href="<tmpl_var name=css_url>/web.page.css">
+
+<link rel="stylesheet" type="text/css" href="<tmpl_var name=yui_url>/build/autocomplete/assets/skins/sam/autocomplete.css">
+<link rel="stylesheet" type="text/css" href="<tmpl_var name=yui_url>/build/calendar/assets/skins/sam/calendar.css">
+<link rel="stylesheet" type="text/css" href="<tmpl_var name=yui_url>/build/container/assets/skins/sam/container.css">
+<link rel="stylesheet" type="text/css" href="<tmpl_var name=yui_url>/build/datatable/assets/skins/sam/datatable.css">
+<link rel="stylesheet" type="text/css" href="<tmpl_var name=yui_url>/build/tabview/assets/skins/sam/tabview.css">
+
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/yahoo/yahoo-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/dom/dom-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/event/event-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/calendar/calendar-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/connection/connection-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/element/element-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/datasource/datasource-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/json/json-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/datatable/datatable-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/tabview/tabview-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/autocomplete/autocomplete-min.js"></script>
+<script type="text/javascript">
+<tmpl_var name=head_js>
+
+function init()
+{
+<tmpl_var name=head_init>
+}
+YAHOO.util.Event.onDOMReady(init);
+</script>
+</head>
+
+<body class="yui-skin-sam">
+
+<h3 class="blue_center">Donations</h3>
+
+<table align="center">
+<tr><td><div id="container"></div></td></tr>
+</table>
+
+</body>
+</html>

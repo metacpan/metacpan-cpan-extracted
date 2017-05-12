@@ -1,0 +1,47 @@
+Acme-Stardate
+
+A silly module for generating a "stardate" string based
+on the local clock. Stardates are simple numerically and lexically
+comparable strings that might be useful as version numbers.
+http://en.wikipedia.org/wiki/Stardate documents a bit about the usage of
+the term on Star Trek.  This module just generates sortable gmt date plus
+a decimal fraction of a day precise enough to catch one second changes
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Acme::Stardate
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-Stardate
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Acme-Stardate
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Acme-Stardate
+
+    Search CPAN
+        http://search.cpan.org/dist/Acme-Stardate
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Chris Fedde
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

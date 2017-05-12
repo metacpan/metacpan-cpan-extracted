@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Array-DeepUtils.t
+lib/Array/DeepUtils.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+bin/mpg123
+dist.ini
+lib/Alien/mpg123.pm
+t/load.t
+t/release-pod-syntax.t

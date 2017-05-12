@@ -1,0 +1,6 @@
+%%release production
+%%server_production alpha
+%%server_beta  beta
+%%server_staging  gamma
+%%url http://<server_<release>>.mysite.com/
+<url> /okay/ Y proper output

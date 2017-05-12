@@ -1,0 +1,8 @@
+Revision history for Perl extension Authen::Simple::CDBI
+
+0.2 2006-01-15 00:00
+    - Verify class and columns at construction time.
+    - Fixed spelling errors.
+
+0.1 2006-01-13 00:00
+    - First release

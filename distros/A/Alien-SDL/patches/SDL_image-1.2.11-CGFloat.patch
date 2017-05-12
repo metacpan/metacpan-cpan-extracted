@@ -1,0 +1,13 @@
+--- SDL_image-1.2.11/IMG_ImageIO.m	2012-01-15 22:28:46.000000000 +0100
++++ SDL_image-1.2.11/IMG_ImageIO.m	2012-07-25 23:57:31.000000000 +0200
+@@ -30,6 +30,10 @@
+ #include <ApplicationServices/ApplicationServices.h>
+ #endif
+ 
++#ifndef CGFLOAT_DEFINED
++#include <CoreGraphics/CoreGraphics.h>
++#endif
++
+ /**************************************************************
+  ***** Begin Callback functions for block reading *************
+  **************************************************************/

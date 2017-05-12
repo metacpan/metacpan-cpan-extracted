@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Acme/Partitioner.pm
+t/00basic.t
+t/01simple.t
+t/02simple.t
+t/98podsyn.t
+t/99podcov.t
+eg/simple.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

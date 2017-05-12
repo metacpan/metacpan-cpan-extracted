@@ -1,0 +1,13 @@
+.shipit
+ignore.txt
+lib/AnyMQ/Topic/Trait/ZeroMQ.pm
+lib/AnyMQ/Trait/ZeroMQ.pm
+lib/AnyMQ/ZeroMQ.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/10-pubsub.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use App::pathed;
+exit(App::pathed->run);
+
+=pod
+
+=head1 NAME
+
+pathed - munge the Bash PATH environment variable
+
+=head1 DESCRIPTION
+
+See L<App::pathed>.
+
+=cut

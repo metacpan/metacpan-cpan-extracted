@@ -1,0 +1,55 @@
+{
+   "abstract" : "Perl extension for comparing arrays.",
+   "author" : [
+      "Dave Cross <dave@mag-sol.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Array-Compare",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::NoWarnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Moo" : "0",
+            "Types::Standard" : "0",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Array::Compare" : {
+         "file" : "lib/Array/Compare.pm",
+         "version" : "v3.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davorg/array-compare.git",
+         "web" : "https://github.com/davorg/array-compare"
+      }
+   },
+   "version" : "v3.0.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

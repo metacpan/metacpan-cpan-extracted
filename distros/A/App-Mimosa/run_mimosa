@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use autodie;
+use Getopt::Long;
+
+my $port   = 8080;
+my $suffix = '';
+my $log    = 'mimosa.log';
+
+# TODO: debug mode + autorestart
+
+my $result = GetOptions(
+                "port=s",   \$port,
+                "suffix=s", \$suffix,
+                "log=s",    \$log,
+            );
+
+my $cmd = <<CMD;
+CATALYST_CONFIG_LOCAL_SUFFIX=$suffix perl script/mimosa_server.pl -rd -p $port &> $log &
+CMD
+
+system $cmd;

@@ -1,0 +1,30 @@
+---
+abstract: 'We are Icelandic CPAN authors'
+author:
+  - 'Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>'
+build_requires:
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-CPANAuthors-Icelandic
+no_index:
+  directory:
+    - t
+    - xt
+    - utils
+requires:
+  Acme::CPANAuthors: 0
+  Acme::CPANAuthors::Register: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANAuthors-Icelandic
+  homepage: http://search.cpan.org/dist/Acme-CPANAuthors-Icelandic/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hinrik/acme-cpanauthors-icelandic.git
+version: 0.04
+x_authority: cpan:HINRIK

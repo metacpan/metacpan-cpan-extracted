@@ -1,0 +1,111 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+=head1 NAME
+
+logging/file - Logging plugin to send logging to a file
+
+=head1 SYNOPSIS
+
+  Plugin   logging/file
+  LogFile  log.out
+  LogLevel LOGWARN
+
+=head1 DESCRIPTION
+
+This plugin simply sends all error logging to the file specified.
+
+=head1 CONFIG
+
+=head2 LogLevel STRING | NUMBER
+
+Specify the level of logging. One of:
+
+        LOGDEBUG   or 7
+        LOGINFO    or 6
+        LOGNOTICE  or 5
+        LOGWARN    or 4
+        LOGERROR   or 3
+        LOGCRIT    or 2
+        LOGALERT   or 1
+        LOGEMERG   or 0
+
+=head2 LogFile STRING
+
+A file to use for logging.
+
+=cut
+
+sub init {
+    my $self = shift;
+    
+    $self->register_config('LogLevel', sub { $self->loglevel(@_) });
+    $self->register_config('LogFile',  sub { $self->logfile(@_) });
+}
+
+sub dor {
+    my $val = shift;
+    defined($val) ? $val : $_[0];
+}
+
+sub loglevel {
+    my ($self, $conf) = (shift, shift);
+    
+    my $key = $self->plugin_name . '::loglevel';
+    
+    if (@_) {
+        my $value = shift;
+        if ($value !~ /^\d+$/) {
+            $value = AxKit2::Constants::log_level($value)
+                || die "Invalid log level: $value";
+        }
+        $conf->notes($key, $value);
+    }
+    
+    dor($conf->notes($key), 4);
+}
+
+sub logfile {
+    my $self = shift;
+    my $conf = shift;
+    
+    my $key = $self->plugin_name . '::logfile';
+    
+    if (@_) {
+        my $filename = shift;
+        open(my $fh, ">>$filename") || die "open($filename): $!";
+        $conf->notes($key, $fh);
+    }
+    
+    $conf->notes($key) || die "No log file specified";
+}
+
+sub hook_logging {
+    my ($self, $level, @args) = @_;
+    
+    if ($level <= $self->loglevel($self->config)) {
+        my $fh = $self->logfile($self->config);
+        if ($self->client->can('peer_addr_string')) {
+            print $fh ($self->client->peer_addr_string, " L$level ", @args, "\n");
+        }
+        else {
+            print $fh ("L$level ", @args, "\n");
+        }
+    }
+    
+    return DECLINED;
+}

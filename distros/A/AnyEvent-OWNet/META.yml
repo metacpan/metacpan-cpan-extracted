@@ -1,0 +1,36 @@
+---
+abstract: 'Client for 1-wire File System server'
+author:
+  - 'Mark Hindess <soft-cpan@temporalanomaly.com>'
+build_requires:
+  AnyEvent::MockTCPServer: '0'
+  Exporter: '0'
+  File::Temp: '0'
+  Test::More: '0'
+  base: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-OWNet
+requires:
+  AnyEvent: '0'
+  AnyEvent::Handle: '0'
+  AnyEvent::Socket: '0'
+  Carp: '0'
+  Sub::Name: '0'
+  Try::Tiny: '0'
+  constant: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/beanz/anyevent-ownet-perl/issues
+  homepage: http://search.cpan.org/dist/AnyEvent-OWNet/
+  repository: git://github.com/beanz/anyevent-ownet-perl.git
+version: '1.163170'
+x_serialization_backend: 'YAML::Tiny version 1.69'

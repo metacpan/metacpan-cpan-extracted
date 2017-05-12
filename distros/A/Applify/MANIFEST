@@ -1,0 +1,24 @@
+.perltidyrc
+.ship.conf
+Changes
+cpanfile
+example/fatpack.sh
+example/moo.pl
+example/test1.pl
+lib/Applify.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/alias.t
+t/autoload.t
+t/constant.t
+t/example-test1.t
+t/extends.t
+t/help.t
+t/Helper.pm
+t/moose.t
+t/options.t
+t/version.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

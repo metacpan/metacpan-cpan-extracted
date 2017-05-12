@@ -1,0 +1,208 @@
+{
+   "abstract" : "We are German CPAN authors",
+   "author" : [
+      "Florian Ragwitz <rafl@debian.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102340, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-CPANAuthors-German",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::CPANAuthors::Register" : 0,
+            "utf8" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Acme::CPANAuthors" : 0,
+            "Acme::CPANAuthors::Austrian" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Acme-CPANAuthors-German@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANAuthors-German"
+      },
+      "homepage" : "http://search.cpan.org/dist/Acme-CPANAuthors-German",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rbo/acme-cpanauthors-german.git",
+         "web" : "http://github.com/rbo/acme-cpanauthors-german"
+      }
+   },
+   "version" : "0.04",
+   "x_Dist_Zilla" : {
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@FLORA/@Basic/GatherDir",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@FLORA/@Basic/PruneCruft",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@FLORA/@Basic/ManifestSkip",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@FLORA/@Basic/MetaYAML",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@FLORA/@Basic/License",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@FLORA/@Basic/Readme",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@FLORA/@Basic/ExtraTests",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@FLORA/@Basic/ExecDir",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@FLORA/@Basic/ShareDir",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "name" : "@FLORA/@Basic/MakeMaker",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@FLORA/@Basic/Manifest",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@FLORA/@Basic/TestRelease",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@FLORA/@Basic/ConfirmRelease",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@FLORA/@Basic/UploadToCPAN",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@FLORA/MetaConfig",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@FLORA/MetaJSON",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@FLORA/PkgVersion",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@FLORA/PodSyntaxTests",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NoTabsTests",
+            "name" : "@FLORA/NoTabsTests",
+            "version" : "0.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
+            "name" : "@FLORA/PodCoverageTests",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@FLORA/MetaResources",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Authority",
+            "name" : "@FLORA/Authority",
+            "version" : "1.000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::EOLTests",
+            "name" : "@FLORA/EOLTests",
+            "version" : "0.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "name" : "@FLORA/PodWeaver",
+            "version" : "3.101640"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereq",
+            "name" : "@FLORA/AutoPrereq",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "4.102340"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "4.102340"
+      }
+   },
+   "x_authority" : "cpan:FLORA"
+}
+

@@ -1,0 +1,12 @@
+TYPEMAP
+Instance *		WRAPPED_C_OBJECT
+
+
+INPUT
+WRAPPED_C_OBJECT
+	$var = (($type)SvIV(SvRV($arg)))
+
+OUTPUT
+WRAPPED_C_OBJECT
+	/* 'class' must be an argument to any function that returns this datatype */
+	sv_setref_pv($arg, class, (void*)$var);

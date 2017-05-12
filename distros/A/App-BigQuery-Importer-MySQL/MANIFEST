@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+cpanfile.snapshot
+lib/App/BigQuery/Importer/MySQL.pm
+minil.toml
+script/mysqlbq
+t/00_compile.t
+t/01_new.t
+t/02__check_columns.t
+t/Util.pm
+META.yml
+MANIFEST

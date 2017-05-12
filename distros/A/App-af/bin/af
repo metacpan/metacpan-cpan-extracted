@@ -1,0 +1,913 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.014;
+use App::af;
+use File::chdir;
+
+# PODNAME: af
+# ABSTRACT: Command line tool for alienfile
+# VERSION
+
+
+package App::af::download 0.09 {
+  use Moose;
+  use namespace::autoclean;
+  use MooseX::Types::Path::Tiny qw( AbsPath );
+  use Path::Tiny qw( path );
+
+  with 'App::af';
+  with 'App::af::role::alienfile';
+
+
+  has local => (
+    is       => 'ro',
+    isa      => AbsPath,
+    traits   => ['App::af::opt'],
+    short    => 'l',
+    coerce   => 1,
+    opt_type => 's',
+    default  => '.',
+  );
+
+  sub main
+  {
+    my($self) = @_;
+    
+    unless(-d $self->local)
+    {
+      say STDERR "no such directory: @{[ $self->local ]}";
+      return 2;
+    }
+
+    local $ENV{ALIEN_INSTALL_TYPE} = 'share';    
+    my $build = $self->build;
+    $build->load_requires('configure');
+    $build->load_requires('share');
+    eval { $build->download };
+    warn $@ if $@;
+
+    unless(defined $build->install_prop->{download} &&
+           length $build->install_prop->{download})
+    {
+      say STDERR "Recipe did not seem to download a file or directory";
+      return 2;
+    }
+    
+    my $download = path($build->install_prop->{download});
+    
+    if(-f $download)
+    {
+      my $to = $self->local->child($download->basename);
+      $download->copy($to) || die "unable to copy $download => $to $!";
+      say "Wrote archive to $to";
+    }
+    elsif(-d $download)
+    {
+      require File::Copy::Recursive;
+      my $to = $self->local->child($download->basename);
+      File::Copy::Recursive::dircopy("$download", "$to") || die "unable to copy $download => $to $!";
+      say "Wrote directory to $to";
+    }
+    else
+    {
+      say STDERR "Recipe did not seem to download a file or directory";
+      return 2;
+    }
+    
+    0;
+  }
+
+  __PACKAGE__->meta->make_immutable;
+}
+
+package App::af::install {
+  use Moose;
+  use namespace::autoclean;
+  use File::Temp qw( tempdir );
+  use MooseX::Types::Path::Tiny qw( AbsPath );
+  use YAML qw( Dump );
+  use Path::Tiny qw( path );
+  
+  with 'App::af';
+  with 'App::af::role::alienfile';
+  
+  
+  has stage => (
+    is       => 'ro',
+    isa      => AbsPath,
+    traits   => ['App::af::opt'],
+    coerce   => 1,
+    lazy     => 1,
+    opt_type => 's',
+    default  => sub {
+      tempdir( CLEANUP => 1);
+    },
+  );
+  
+  has prefix => (
+    is     => 'rw',
+    isa    => AbsPath,
+    traits => ['App::af::opt'],
+    opt_type => 's',
+    coerce => 1,
+  );
+  
+  has type => (
+    is       => 'ro',
+    isa      => 'Str',
+    traits   => ['App::af::opt'],
+    opt_type => 's',
+  );
+  
+  has dry_run => (
+    is     => 'ro',
+    isa    => 'Int',
+    traits => ['App::af::opt'],
+  );
+  
+  has root => (
+    is       => 'ro',
+    isa      => AbsPath,
+    traits   => ['App::af::opt'],
+    opt_type => 's',
+    coerce   => 1,
+    lazy     => 1,
+    default  => sub {
+      tempdir( CLEANUP => 1);
+    },
+  );
+  
+  has before => (
+    is       => 'ro',
+    isa      => 'ArrayRef[Str]',
+    traits   => ['App::af::opt'],
+    opt_type => 's{2}',
+  );
+
+  has after => (
+    is       => 'ro',
+    isa      => 'ArrayRef[Str]',
+    traits   => ['App::af::opt'],
+    opt_type => 's{2}',
+  );
+  
+  has I => (
+    is       => 'ro',
+    isa      => 'ArrayRef[Str]',
+    traits   => ['App::af::opt'],
+    opt_type => 's',
+    is_array => 1,
+  );
+  
+  has blib => (
+    is       => 'ro',
+    isa      => 'Int',
+    traits   => ['App::af::opt'],
+  );
+  
+  sub main
+  {
+    my($self) = @_;
+  
+    local $ENV{ALIEN_INSTALL_TYPE} = $ENV{ALIEN_INSTALL_TYPE};
+    
+    foreach my $inc (reverse @{ $self->I })
+    {
+      require lib;
+      lib->import($inc);
+    }
+    
+    if($self->blib)
+    {
+      require blib;
+      blib->import;
+    }
+
+    # make sure @INC entries are absolute, since $build
+    # may do a lot of directory changes    
+    @INC = map { ref $_ ? $_ : path($_)->absolute->stringify } @INC;
+    
+    if(defined $self->type)
+    {
+      unless($self->type =~ /^(share|system)$/)
+      {
+        say STDERR "unknown install type: @{[ $self->type ]}";
+        return 2;
+      }
+      $ENV{ALIEN_INSTALL_TYPE} = $self->type;
+    }
+    
+    if(-d $self->stage && $self->stage->children)
+    {
+      say "stage directory is not empty";
+      exit 2;
+    }
+    
+    my($build, $prefix) = $self->build( root => $self->root->stringify );
+    $self->prefix($prefix) if defined($prefix) && ! $self->prefix;
+    
+    my @all_hooks = qw(
+      probe download fetch decode prefer extract patch
+      build stage gather_share gather_system
+    );
+    
+    my $repl = sub {
+      no warnings 'once';
+      require Shell::Perl;
+      my $pirl = Shell::Perl->new(on_quit => 'return');
+      $pirl->set_package("App::af::pirl");
+      $App::af::pirl::build = $build;
+      $App::af::pirl::meta  = $build->meta;
+      eval { $pirl->run };
+      warn $@ if $@;
+    };
+    
+    while(@{ $self->before })
+    {
+      my $hook    = shift @{ $self->before };
+      my $command = shift @{ $self->before };
+      
+      my @hook = $hook =~ /^(\%|\*)$/ 
+        ? @all_hooks
+        : ($hook);
+      
+      $build->meta->before_hook(
+        $_ => sub {
+          my($build) = @_;
+          $build->log(" [ before @{[ $build->hook_prop->{name} ]} ] + $command");
+          $build->checkpoint;
+          $command eq ':repl'
+            ? $repl->()
+            : $build->system($command);
+        }
+      ) for @hook;
+    }
+    
+    while(@{ $self->after })
+    {
+      my $hook    = shift @{ $self->after };
+      my $command = shift @{ $self->after };
+
+      my @hook = $hook =~ /^(\%|\*)$/ 
+        ? @all_hooks
+        : ($hook);
+      
+      $build->meta->around_hook(
+        $_ => sub {
+          my $orig = shift;
+          my $ret = eval { $orig->(@_) };
+          my $error = $@;
+          $build->log(" [ after @{[ $build->hook_prop->{name} ]} ] + $command");
+          $build->checkpoint;
+          $command eq ':repl'
+            ? $repl->()
+            : $build->system($command);
+          die $error if $error;
+          $ret;
+        },
+      ) for @hook
+    }
+    
+    
+    if($self->dry_run && ! defined $self->prefix)
+    {
+      $self->prefix(tempdir( CLEANUP => 1 ));
+    }
+    
+    unless(defined $self->prefix)
+    {
+      say STDERR "You must specify a prefix with --prefix or use --dry-run";
+      return 2;
+    }
+    
+    if(-d $self->prefix->child('_alien'))
+    {
+      my $test = $self->prefix->child('_alien/test');
+      eval { $test->touch };
+      if($@)
+      {
+        say STDERR "prefix is not writable.  You may need to use su or sudo";
+        return 2;
+      }
+      $test->remove;
+    }
+    
+    $build->set_stage($self->stage->stringify);
+    $build->set_prefix($self->prefix->stringify);
+    $build->load_requires('configure');
+    $build->load_requires($build->install_type);
+    $build->download;
+    $build->build;
+    
+    unless($self->dry_run)
+    {
+      require File::Copy::Recursive;
+    
+      if(-d $self->prefix)
+      {
+        # this is slightly dangerous.
+        foreach my $child ($self->prefix->children)
+        {
+          say "rm -rf $child";
+          $_->remove_tree({ safe => 0 }) for $self->prefix->children;
+        }
+      }
+    
+      File::Copy::Recursive::dircopy($self->stage, $self->prefix) || die "unable to copy @{[ $self->stage ]} => @{[ $self->prefix ]} $!";
+      say "copied staged install into @{[ $self->prefix ]}";
+    };
+    
+    print Dump($build->runtime_prop);
+    
+    0;
+  }
+  __PACKAGE__->meta->make_immutable;
+}
+
+package App::af::requires {
+  use Moose;
+  use namespace::autoclean;
+  use YAML qw( Dump );
+
+
+  with 'App::af';
+  with 'App::af::role::alienfile';
+  with 'App::af::role::phase';
+  
+  sub main
+  {
+    my($self) = @_;
+    
+    $self->check_phase;
+    
+    my $build = $self->build;
+    
+    if($self->phase eq 'all')
+    {
+      print Dump({
+        map { $_ => $build->requires($_) } qw( configure any share system )
+      });
+    }
+    else
+    {
+      print Dump($build->requires($self->phase));
+    }
+    
+    0;
+  }
+  
+  __PACKAGE__->meta->make_immutable;
+}
+
+package App::af::missing {
+  use Moose;
+  use namespace::autoclean;
+  use Capture::Tiny qw( capture );
+  
+  with 'App::af';
+  with 'App::af::role::alienfile';
+  with 'App::af::role::phase';
+  
+  
+  sub main
+  {
+    my($self) = @_;
+    
+    $self->check_phase;
+    
+    my $build = $self->build;
+    
+    my @reqs;
+    my %need;
+    
+    if($self->phase eq 'all')
+    {
+      $build->load_requires('configure');
+      capture { $build->probe };
+      @reqs = map { $build->requires($_) } qw( configure any share system );
+      @reqs = (
+        $build->requires('configure'),
+        $build->requires($build->install_type),
+      );
+    }
+    else
+    {
+      @reqs = ( $build->requires($self->phase) );
+    }
+        
+    foreach my $reqs (@reqs)
+    {
+      foreach my $module (sort keys %$reqs)
+      {
+        my $version = $reqs->{$module};
+        eval {
+          my $pm = $module . '.pm';
+          $pm =~ s/::/\//g;
+          require $pm;
+          !$version || $module->VERSION($version);
+        };
+        $need{$module} = 1 if $@
+      }
+    }
+    
+    say $_ for sort keys %need;
+  
+    0;
+  }
+  
+  __PACKAGE__->meta->make_immutable;
+}
+
+package App::af::prop {
+  use Moose;
+  use namespace::autoclean;
+
+  
+  with 'App::af';
+
+  has class => (
+    is       => 'ro',
+    isa      => 'Str',
+    traits   => ['App::af::opt'],
+    short    => 'c',
+    opt_type => 's',
+  );
+  
+  has $_ => (
+    is       => 'ro',
+    isa      => 'Int',
+    traits   => ['App::af::opt'],
+  ) for qw( static cflags libs modversion bin_dir );
+
+  sub main {
+    my($self) = @_;
+    
+    unless($self->class)
+    {
+      say STDERR "You must specify a class.\n";
+      return 2;
+    }
+    
+    my $class = $self->class =~ /::/ ? $self->class : 'Alien::' . $self->class;
+
+    {
+      my $pm = $class . '.pm';
+      $pm =~ s/::/\//g;
+      require $pm;
+    }
+    unless($class->can('runtime_prop'))
+    {
+      say STDERR "$class was not installed with Alien::Build";
+      return 2;
+    }
+    
+    my $prop = $class->runtime_prop;
+    
+    unless($prop)
+    {
+      say STDERR "$class was not installed with Alien::Build";
+      return 2;
+    }
+    
+    my $found = 0;
+    
+    if($self->cflags)
+    {
+      if($self->static)
+      {
+        say $class->cflags_static;
+      }
+      else
+      {
+        say $class->cflags;
+      }
+      $found = 1;
+    }
+    
+    if($self->libs)
+    {
+      if($self->static)
+      {
+        say $class->libs_static;
+      }
+      else
+      {
+        say $class->libs;
+      }
+      $found = 1;
+    }
+    
+    if($self->bin_dir)
+    {
+      say $_ for $class->bin_dir;
+      $found = 1;
+    }
+    
+    if($self->modversion)
+    {
+      say $class->version // 'undef';
+      $found = 1;
+    }
+    
+    unless($found)
+    {
+      require YAML;
+      print YAML::Dump($prop);
+    }
+    
+    0;
+  }
+  __PACKAGE__->meta->make_immutable;
+}
+
+package App::af::list {
+  use Moose;
+  use namespace::autoclean;
+  use Path::Tiny qw( path );
+  use Text::Table;
+  
+  
+  with 'App::af';
+
+  has long => (
+    is       => 'ro',
+    isa      => 'Int',
+    traits   => ['App::af::opt'],
+    short    => 'l',
+  );
+  
+  sub main
+  {
+    my($self) = @_;
+    
+    my $table;
+    $table = Text::Table->new('name', 'alien version', 'package version')
+      if $self->long;
+    
+    foreach my $inc (map { path($_)->absolute } @INC)
+    {
+      my $dist_root = $inc->child('auto/share/dist');
+      next unless -d $dist_root;
+      
+      foreach my $dist_dir ($dist_root->children)
+      {
+        next unless -f $dist_dir->child('_alien/alien.json');
+        my $dist = $dist_dir->basename;
+        my $class = $dist;
+        $class =~ s/-/::/g;
+        
+        unless($table)
+        {
+          say $class;
+          next;
+        }
+        
+        eval {
+          my $pm = $class . '.pm';
+          $pm =~ s/::/\//g;
+          require $pm;
+        };
+        if($@)
+        {
+          $table->add($class, '---', '---');
+        }
+        else
+        {
+          my $perl_version = eval { $class->VERSION } // '---';
+          my $pkg_version   = eval { $class->version } // '---';
+          $table->add($class, $perl_version, $pkg_version);
+        }
+      }
+
+    }
+    
+    print $table if defined $table;
+    0;
+  }
+  
+  __PACKAGE__->meta->make_immutable;
+}
+
+# for testing, allow us to do this file
+# without running.
+unless(caller)
+{
+  my $class = App::af->compute_class;
+  unless(eval { $class->does('App::af') })
+  {
+    say STDERR "unknown subcommand";
+    exit 2;
+  }
+  my $app = $class->new(@ARGV);
+  exit($app->main // 0);
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+af - Command line tool for alienfile
+
+=head1 VERSION
+
+version 0.09
+
+=head1 SYNOPSIS
+
+ af download   --help
+ af install    --help
+ af requires   --help
+ af missing    --help
+ af prop       --help
+ af list       --help
+
+=head1 DESCRIPTION
+
+The C<af> command is a command line interface to L<alienfile> and
+L<Alien::Build>.
+
+=head3 options
+
+These options are available for all subcommands.
+
+=head4 --help
+
+Print the help for either C<af> as a whole, or the specific subcommand.
+
+=head4 --version
+
+Print the version of C<af> and exit.
+
+=head1 SUBCOMMANDS
+
+=head2 download
+
+=head3 Usage
+
+ af download
+   [ ( -f | --file )  alienfile | ( -c | --class ) class ]
+   [ ( -l | --local ) directory ]
+
+=head3 description
+
+Download the external resource using the usual L<alienfile> logic.  File
+will be deposited in the directory indicated by the C<--local> (or C<-l>)
+option, or the current working directory if not specified.
+
+=head3 options
+
+=head4 -f | --file
+
+The L<alienfile>.  If neither this option, nor C<-c> is specified, then 
+C<alienfile> in the current directory will be assumed.
+
+=head4 -c | --class
+
+Get the L<alienfile> from the already installed Alien module.    You may
+omit the C<Alien::> prefix, so for example L<Alien::curl> may be specified
+as simply C<curl>.  
+
+=head4 -l | --local
+
+The location to store the downloaded resource.  The current directory
+if not specified.
+
+=head2 install
+
+=head3 Usage
+
+ af install
+   [ ( -f | --file )  alienfile |  ( -c | --class ) class ]
+   [ --prefix directory | --dry-run ] [ --stage directory ]
+   [ --type ( share | system ) ] [ --root directory ] 
+   [ --before hook command ] [ --after hook command ]
+   [ -I lib ] [ --blib ]
+
+=head3 description
+
+Install or reinstall using the given L<alienfile> or already installed
+L<Alien>.
+
+=head3 options
+
+=head4 -f | --file
+
+The L<alienfile>.  If neither this option, nor C<-c> is specified, then 
+C<alienfile> in the current directory will be assumed.
+
+=head4 -c | --class
+
+Get the L<alienfile> from the already installed Alien module.    You may
+omit the C<Alien::> prefix, so for example L<Alien::curl> may be specified
+as simply C<curl>.  If you do not specify the C<--prefix> option, the
+package will replace the already installed one.
+
+=head4 --stage
+
+The stage directory.  By default this is a temporary directory that will
+automatically be removed.
+
+=head4 --prefix
+
+The final install location to use.  Required when using the C<-f> option,
+but optional when using the C<-c> option.
+
+=head4 --type
+
+Override the install type.  May be either C<share> or C<system>.
+
+=head4 --dry-run
+
+Do not install into the final location.
+
+=head4 --root
+
+Build in root
+
+=head4 --before
+
+Execute the given command before the given hook.  Note that the same 
+hook my execute several times for a given recipe.  Example, to open up 
+an interactive shell before the build has started, right after the 
+extraction:
+
+ % af install --before build bash
+
+The build configuration is check pointed, so you can read the install 
+and runtime properties in the C<state.json> file in the build root.
+Use * or % as the hook to run the command before all hooks.  You can
+use C<:repl> as the command to open up a Perl REPL (Read-Eval-Print-Loop)
+to inspect the C<$build> and C<$meta> objects.
+
+=head4 --after
+
+Execute the given command after the given hook.  Note that the same hook 
+my execute several times for a given recipe.  Example, to open up an 
+interactive shell after the build has completed:
+
+ % af install --after build bash
+
+The build configuration is check pointed, so you can read the install 
+and runtime properties in the C<state.json> file in the build root.
+Use * or % as the hook to run the command before all hooks.  You can
+use C<:repl> as the command to open up a Perl REPL (Read-Eval-Print-Loop)
+to inspect the C<$build> and C<$meta> objects.
+
+=head4 -I
+
+Add directory to the Perl search lib (like -I on L<perl>).
+
+=head4 --blib
+
+Use the blib from the current directory.
+
+=head2 requires
+
+=head3 Usage
+
+ af requires
+   [ ( -f | --file )  alienfile |  ( -c | --class ) class ]
+   [ ( -p | --phase ) ( configure | any | share | system ) ]
+
+=head3 description
+
+Print the requirements for the given phase in L<YAML> format.  If the phase
+is not provided, then requirements for all phases will be printed separately
+in L<YAML> format.
+
+=head3 options
+
+=head4 -f | --file
+
+The L<alienfile>.  If neither this option, nor C<-c> is specified, then 
+C<alienfile> in the current directory will be assumed.
+
+=head4 -c | --class
+
+Get the L<alienfile> from the already installed Alien module.    You may
+omit the C<Alien::> prefix, so for example L<Alien::curl> may be specified
+as simply C<curl>.
+
+=head4 -p | --phase
+
+The phase of the requirement.  Please refer to the L<Alien::Build> documentation
+for the meaning of the various phases.
+
+=head2 missing
+
+=head3 Usage
+
+ af missing
+   [ ( -f | --file )  alienfile |  ( -c | --class ) class ]
+   [ ( -p | --phase ) ( configure | any | share | system ) ]
+
+=head3 description
+
+Print the requirements for the given phase in list format that are not
+currently fulfilled.  This output can be piped into L<cpanm> in order
+to install any missing requirements:
+
+ % af missing -p configure | cpanm
+ % af missing              | cpanm
+
+If no phase is specified, then missing prereqs for configure, and either 
+share or system will be printed depending on what type of install is 
+detected (for this to work you may need to install the configure 
+prereqs, since the probe may use configure required modules).
+
+=head3 options
+
+=head4 -f | --file
+
+The L<alienfile>.  If neither this option, nor C<-c> is specified, then 
+C<alienfile> in the current directory will be assumed.
+
+=head4 -c | --class
+
+Get the L<alienfile> from the already installed Alien module.    You may
+omit the C<Alien::> prefix, so for example L<Alien::curl> may be specified
+as simply C<curl>.
+
+=head4 -p | --phase
+
+The phase of the requirement.  Please refer to the L<Alien::Build> 
+documentation for the meaning of the various phases.
+
+=head2 prop
+
+=head3 Usage
+
+ af prop 
+   ( -c | --class ) class [ --cflags ] [ --libs ] [ --static ] 
+   [ --modversion ] [ --bin-dir ]
+
+=head3 prop
+
+Print the runtime properties for the given L<Alien> class.  You may
+omit the C<Alien::> prefix, so for example L<Alien::curl> may be queried
+as simply C<curl>.  If no specific properties are requested then the
+entire runtime property hash will be printed in L<YAML> format.
+
+=head3 options
+
+=head4 -c | --class
+
+The class to query for runtime properties.  This option is required.
+
+=head4 --cflags
+
+Print the compiler flags
+
+=head4 --libs
+
+Print the linker flags
+
+=head4 --static
+
+For either the C<--cflags> or C<--libs> option print the static versions.
+
+=head4 --modversion
+
+Print the version of the Alienized package.  This is not the version of
+the L<Alien> module itself.
+
+=head4 --bin-dir
+
+Print the list of directories bundled with a C<share> install.
+
+=head2 list
+
+=head3 Usage
+
+ af list [ -l | --long ]
+
+=head3 prop
+
+Print list of L<Alien> modules already installed that used L<Alien::Build>
+as their installer.
+
+=head3 options
+
+=head4 -l | --long
+
+Also print the version number of the L<Alien> module, and the version of the
+alienized package.
+
+=head1 AUTHOR
+
+Graham Ollis <plicease@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Graham Ollis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

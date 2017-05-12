@@ -1,0 +1,92 @@
+Revision history for App-Bootstrap-Perl
+
+0.12      2015-10-03
+        - install essential modules conditionally
+
+0.11      2015-04-17
+        - force ExtUtils::Config
+        - POD in generated CPAN::Config to find with perldoc -l
+
+0.10      2015-04-17
+        - Changed default target directory and naming schema.
+          Instead of /opt it now uses /$HOME/.bootstrapperl/$HOSTNAME in
+          order to simplify permissions, multi-machine usage, and backups.
+        - fine-tune build fixes for Perl <= 5.12.3
+        - some more notest/force cpan dependencies on Perl 5.8
+        - reworked meta info injection into %Config
+
+0.09      2015-04-05
+        - cleaner log handling [Vyacheslav Pechenin]
+        - fix building perl <5.14 [Vyacheslav Pechenin]
+        - better testing support [Vyacheslav Pechenin]
+        - control CPAN.pm via its command interface [Vyacheslav Pechenin]
+        - metainfo now in built Perl's %Config [Steffen Schwigon]
+
+0.08      2015-03-28
+        - now --blead allows every commit contained in blead
+        - easier benchmarking of local (non-upstream) changesets
+          --giturl|-g .
+            # use CWD as Perl's git repo
+          --version|-c .
+            # use local CWD's current HEAD as version
+          --perlformance-local
+            # similar to --perlformance but with
+              --giturl .
+              and
+              --plugins=<all without extra deps>
+        - default dependencies finetuned
+
+0.07      2012-09-14
+        - simplify path prefix back
+
+0.06      2012-09-14
+        - allow to override defaults from --perlformance
+        - do not throw away versions built with --blead
+
+0.05      2012-09-04
+        - use Pinto-based mirror for --perlformance(-report)
+
+0.04      2012-08-29
+        - use Task::PerlFormance now instead of Bundle::PerlFormance
+        - with --blead skip build of same existing version
+          (but still benchmark again with --perlformance)
+
+0.03      2012-08-24
+        - Dist::Zilla roundhouse kick
+        - fix unsafe git clean
+        - faster CPAN index expiration
+        - force Benchmark::Perl::Formance
+        - try hard on some essential modules
+        - drop dysfunctional way of CPAN configuring
+        - disable SQLite for CPAN.pm
+        - don't insist on Safe
+        - work around the work-around with symlinks
+        - rework filename scheme
+        - rework git version details
+        - more 5.9.x handling but without success on lots of CPAN deps
+        - rebuild on missing metainfo utils
+        - executable names always 2 minor digits
+        - add libssl-dev to Debian deps
+        - new options
+          --(no)forcecpancfg
+            # force cpan (re)config
+          --(no)cpan
+            # force cpan install
+          --perlformance
+            # shortcut for Perl::Formance
+          --perlformance-report
+            # +report results
+          --blead
+            # for easier micro-tracking
+          --run
+            # run scripts at end
+          --runargs=...
+            # args to run scripts
+          --installprefs=debian
+            # apt-get install known Debian deps
+
+0.02      2012-01-06
+        - distro maintenance
+
+0.01      2011-12-05
+        - initial public version

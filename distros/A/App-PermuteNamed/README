@@ -1,0 +1,7 @@
+SEE ALSO
+
+    Permute::Named, Permute::Named::Iter, PERLANCAR::Permute::Named.
+
+    Set::Product, Set::CrossProduct (see more similar modules in the POD of
+    Set::Product) and CLI scripts <cross>, cross-pericmd.
+

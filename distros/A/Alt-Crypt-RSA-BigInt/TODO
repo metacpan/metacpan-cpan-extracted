@@ -1,0 +1,22 @@
+
+ - Should we be concerned about deserialize doing a string eval on the input,
+   especially if that input came from some disk file they gave us in read()?
+
+ - The only remaining issue with supporting 5.6 is on 64-bit Perls, where
+   Math::Prime::Util's random prime generator doesn't work.  5.6.2 can't
+   represent integers in the range 2^50 to 2^64.  This version of Perl is
+   just fundamentally broken and a _huge_ pain to work around.
+
+ - The test suites do almost no failure testing.  Use Devel::Cover to see all
+   the failure cases that aren't covered.
+
+ - Look into allowing other SHA hashes for PSS and OAEP.
+
+ - Decide if RIPEMD160 should be non-optional.  Module version 0.05 looks like
+   it has an excellent test pass rate.
+
+ - t/16-serialize.t is just verifying we don't die horribly.  We should verify
+   that it's actually working.
+
+ - t/90-release-perlcritic.t
+   t/92-release-pod-coverage.t

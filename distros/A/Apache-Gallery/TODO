@@ -1,0 +1,24 @@
+$Author: mil $ $Rev: 255 $
+$Date: 2004-04-12 19:49:02 +0200 (Mon, 12 Apr 2004) $
+
+- Write a gallery-cleancache.pl script for removing entries in
+  the cache where the original picture has been removed.
+
+- /admin page to edit comments and .rotate file. (Cleanup in
+  .cache when changing rotation)
+
+- Write perlscript to make static html galleries.
+
+- Sort by the DateTimeOriginal part of the EXIF header
+  if possible
+
+- Make the template and imagesystem pluggable
+
+- Make scaling quality configurable
+
+- Thumbnails are to be generated in tmp files first,
+  then moved to the correct location.
+
+- Use imlib_create_cropped_scaled_image in resizepicture
+
+- Try to avoid running too many resize processes 

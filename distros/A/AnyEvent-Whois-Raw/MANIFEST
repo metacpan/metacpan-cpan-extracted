@@ -1,0 +1,9 @@
+Changes
+lib/AnyEvent/Whois/Raw.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/1_load.t
+t/2_blocking.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

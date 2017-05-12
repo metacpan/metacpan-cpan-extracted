@@ -1,0 +1,4 @@
+#!/usr/bin/env perl
+
+open my $fh, '>', shift;
+print {$fh} '["frew","bar","baz"]'

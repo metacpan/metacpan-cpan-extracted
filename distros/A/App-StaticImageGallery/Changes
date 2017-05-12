@@ -1,0 +1,14 @@
+# Revision history for App-SIG
+# date +"%F %T %z
+
+0.002   2011-01-03 16:11:15 +0100
+        Changes cli behaviour old: sig --dir /tmp new: sig build /tmp
+            sig [options] [commands] [work dir]
+        Added commands: clean and rebuild (read POD for more informations)
+        Fixed infix value, copy&paste mistake
+        Check if file must be created or not, by timestamp
+        Change recursive mode behaviour, default: recursive mode is on
+
+0.001   2010-12-21 01:14:56 +0100
+        Initial Version
+

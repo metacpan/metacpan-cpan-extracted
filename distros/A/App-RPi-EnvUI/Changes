@@ -1,0 +1,175 @@
+Changes history for App::RPi::EnvUI
+
+0.28    2016-11-30
+        - all updates other than a Makefile.PL file were 0.27. This release is
+          just a small correction
+        - correct issue where the minute portion of the time was displaying
+          only a single digit if minutes were less than 10 (fixes #23)
+        - clean up of all sample test files and random test code snips
+        - consolodated the JS graph routines into a single function
+        - all SQL prepare statements are now only created once, where possible
+          (queries where structure elements can be hardcoded)
+        - /logout route now redirects back to the home page
+        - removed everything related to the water auxs; aux 4 and 5 are now just
+          generic, unused auxs now
+        - all auxs are now listed in the HTML template (hidden if pin == -1)
+        - completely changed the way we track light times. Added
+          set_light_times(). It's called once on webapp start, then at the end
+          of each light-off event. It's all done with epoch now instead of
+          DateTime objects
+        - the set_aux route has been broken out into two separate routes:
+          set_aux_state and set_aux_override. (closes #30)
+        - we now save draggable widget locations if changed from default with
+          HTML5's `localStorage`
+        - new menu header "System", with sub menu "Reset Layout", resets layout
+          to defaults
+        - template layout changes
+        - JS code restructured entirely; all functions have been moved out of
+          $(document).ready
+        - all auxs will now be hidden if the pin is set to -1 in the config/db
+
+0.26    2016-10-25
+        - functionality adddition and bug fix beta release
+        - DB::auth() now returns a hashref of the username sent in with a blank
+          password field if the user doesn't exist (added tests)
+        - added light_on() and light_off(), each return a DateTime object with
+          with the respective times for each operation
+        - action_light() now uses proper DateTime objects for on/off checking
+        - _config_light('on_hours') will die if hours is not an integer, is less
+          than 0 or more than 24
+        - added numerous new tests for new internal functionality and existing
+        - cleanup after profiling, shaved startup from 10.7 seconds to ~700ms
+          (closes #20)
+        - added new drop-down menu system
+        - added time to top-right of UI, beside menu, with the same style as the
+          menu
+        - UI now has a basic, alpha set of "draggable" widgets
+        - reworked light_off(), it now uses the set 'on_since' flag as it's base
+          time, which we simply add 'on_hours' to it
+        - added _reset_light() called by _parse_config() after _reset(), resets
+          the light 'on_since' flag. If the Pi crashed, the light would be
+          deemed already on no matter what, and if it was lights-on time, the
+          light would not be re-enabled (fixes #21)
+        - extensive work on the authentication mechanisms (the set route
+          requires a user to be logged in, or on localhost. Also, jquery
+          disables buttons if not logged in)
+        - major work on UI enhancements; objects are drag/droppable, and graph
+          functionality is well on its way (fixes #24)(new graph_data() methods
+          in DB and API, and new /graph_data route)
+        - made a feeble attempt at bettering explanations in POD
+
+0.25    2016-10-16
+        - separated out API::new() initialization code into _init(), which loads
+          _test_mode() or _prod_mode() to make things cleaner (closes #18)
+        - the t/15-api.t file was split apart into numerous files, each one now
+          tests a specific part of the API (closes #17)
+        - due to Event tests needing to mock out certain subs within the test
+          file itself (as opposed to API handling this), created a new
+          flag/getter & setter "test_mock", which is sent into the API::new()
+          when we're testing Event routines
+        - test files (other than one that tests Event code) no longer need to
+          mock out hardware-based subs themselves. The API now does this in
+          _test_mode()
+        - added debug_sensor, log_level and log_file core config directives to
+          the Configuration POD
+        - aux overrides for temp/humidity now have tests
+        - if 'stats' table is empty on first API::env() call, we now return an
+          href where the temp and hum are both -1 (added tests as well)
+        - fixed an issue where the DB::new() connect() call wasn't able to be
+          tested thoroughly (thanks 'NetWallah' from Perlmonks:
+          http://perlmonks.org/?node_id=1173884
+        - added a check to ensure we found the config file ok in API
+        - added initial user authentication implementation (outside of normal
+          run modes for now)
+        - added session support (JSON files at this time)
+
+0.24    2016-10-11
+        - all modules now have initial draft POD
+        - separated out setting/fetching API variables from $self->{} to
+          $self->method()
+        - migrated the API initialization tasks out of new() and into a new
+          _init() method
+        - all subs in API now alphabetical in public/private sections
+        - logging is now configurable via method calls
+        - new db() method, sets/gets the db object
+        - new testing() method, sets/gets testing
+        - replaced all die() calls in API to confess(), makes it much easier to
+          track things down
+
+0.23    2016-10-11
+        - this update contains changes for 0.22 which wasn't released properly
+        - fixed critical bug where each process (events) were sharing a copy of
+          the same DB handle (via the DB object stored within the API object),
+          which was breaking periodically due to contention. (See
+          http://perlmonks.org/?node_id=1173608)
+        - added initial logging configuration with Logging::Simple
+        - re-wrote light timing logic, and performed basic 12 hour tests for
+          proper functionality
+        - added several more tests
+        - added more error check code
+        - events are now started within the API, instead of the Dancer2 app lib
+        - reset() now resets override, state and aux_on_time for all auxs on
+          app load
+        - API::env() now returns a properly structured hashref with values set
+          to zero for temp/humidity if the DB doesn't have any statistics data
+          yet
+        - in API, created a $sensor class variable to make it easier to set up
+          whether we're in tests or not
+        - more work on cleaning up in-module testing functionality, next round
+          of changes will focus specifically on this and other code refactoring,
+          along with initial draft of documentation for all modules
+
+0.21    2016-10-04
+        - had to change version numbers because of a typo in 0.2, which should
+          have been 0.02
+        - added sensor_pin to core config section in json and db
+        - fix issue where wiringPi was being loaded multiple times, breaking
+          things. First, set up a check in %INC to see if they've already
+          been required, then instead of passing a new API object to each
+          event, we now pass in $self instead, so we don't call new() which
+          tries to load the wiringPi libraries again
+        - the 'envui' app dir now gets placed in the user's home directory, and
+          works
+
+0.03    2016-10-04
+        - broke out the main components (route-handler, API, DB) into distinct
+          abstraction layers making it easy to test specific sections, and use
+          the various pieces external from the web app
+        - significant amount of test coverage written, particularly for API
+          and DB
+        - many small bugs corrected, and error checking added while in the
+          process of test writing
+        - separated testing from prod in API and DB (needs more work)
+        - initial work done on using memory-backed databases. For now, they are
+          fully implemented in testing
+        - temp and humidity limits are now grabbed by jquery from the API, so
+          there's no risk of conflict (closes #1)
+        - set reasonable real defaults in the default config file (closes #2)
+        - we now get the control aux values from the API instead of having them
+          specified all over the place manually (closes #3)
+        - the "next on" UI display is now updated on each fetch of the aux
+          states 9closes #8)
+        - in the Makefile.PL in a postamble, we now create a new app dir
+          (envui), and copy in the relevant pieces into it on 'make install'
+          (closes #10). More work will be needed here
+        - default config now has all aux pins set to -1. This is because GPIO 0
+          is a valid pin
+        - added core config section "testing" directive. This allows unit
+          testing on non-Pi boards, and on machines that don't have the wiringPi
+          C libraries installed
+        - next release will be doc and test focused
+
+0.02    2016-10-01
+        - all auxillaries working
+        - temp/humidity on/off limits working
+        - aux override working
+        - min on time working (temp/humidity)
+        - light infrastructure added
+        - feeding infrastructure added
+        - initial pod for configuration
+        - dist default config/db
+        - graphs added, but don't use live data yet
+        - added App::FatPacker build structure
+
+0.01    2016-09-15
+        - initial import

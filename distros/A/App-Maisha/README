@@ -1,0 +1,68 @@
+App-Maisha
+==========
+
+Maisha - A command line social micro-blog networking tool.
+
+DEPENDENCIES
+
+The distribution requires the following modules:
+
+  Class::Accessor::Fast
+  Config::Any
+  Module::Pluggable
+  Net::Identica
+  Net::Twitter
+  Term::Shell
+  Test::More
+  Text::Wrap
+
+  File::HomeDir         # used by maisha script
+  FindBin               # used by maisha script
+  Getopt::Long          # used by maisha script
+  Pod::Usage            # used by maisha script
+
+INSTALLATION
+
+To install this module, untar the tarball into the directory of choice then
+type the following on the command line (substitute make with nmake or dmake
+if appropriate):
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Alternatively you may wish to use the CPAN.pm shell or CPANPLUS shell as your
+installer, which will automatically detect uninstalled prerequisities and 
+install those too for you.
+
+BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties that are not explained within the POD
+documentation, please submit a bug to the RT system (see link below). However,
+it would help greatly if you are able to pinpoint problems or even supply a 
+patch. 
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me by sending an email
+to barbie@cpan.org .
+
+RT: http://rt.cpan.org/Public/Dist/Display.html?Name=App-Maisha
+
+WEBSITES
+
+Main Site: http://maisha.grango.org
+Git Repo:  http://github.com/barbie/maisha/tree/master
+
+AUTHOR
+
+  Barbie, <barbie@cpan.org>
+  for Miss Barbell Productions <http://www.missbarbell.co.uk>.
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2009-2014 by Barbie
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic License v2.

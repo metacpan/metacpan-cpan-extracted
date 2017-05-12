@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>AnnoCPAN - [% title | html %]</title>
+    <meta name="description" content='AnnoCPAN is an "Annotated CPAN"; a site
+    where users can add notes next to the POD documentation for Perl modules'>
+    <meta name="keywords" content="cpan, perl, module, modules, documentation, annocpan">
+    <link rel="stylesheet" type="text/css" href="[% root_uri_rel %]/annocpan.css">
+    [% IF prefs('style') == 'side' %]
+    <link rel="stylesheet" title="margin notes" type="text/css" href="[% root_uri_rel %]/layout-side.css">
+    <link rel="alternate stylesheet" title="inline notes" type="text/css" href="[% root_uri_rel %]/layout-inline.css">
+    [% ELSE %]
+    <link rel="stylesheet" title="inline notes" type="text/css" href="[% root_uri_rel %]/layout-inline.css">
+    <link rel="alternate stylesheet" title="margin notes" type="text/css" href="[% root_uri_rel %]/layout-side.css">
+    [% END %]
+    [% IF prefs('js') %]
+        [% FOR script = scripts %]
+        <script src="[% root_uri_rel %]/[% script %].js" type="text/javascript"></script>
+        [% END %]
+    [% END %]
+    <link rel="alternate" title="New CPAN Distributions" href="[% root_uri_abs %]/recent_dists.rss" type="application/rss+xml">
+    [% IF rss == 'global' %]
+        <link rel="alternate" title="AnnoCPAN Recent Notes" href="[% root_uri_abs %]/recent.rss" type="application/rss+xml">
+    [% ELSIF rss == 'author' %]
+        <link rel="alternate" title="AnnoCPAN Notes for [% author %]" href="[% root_uri_abs %]/~[% author %]/recent.rss" type="application/rss+xml">
+    [% END %]
+
+    [% IF user %]
+    <style type="text/css">
+        #pod2html .cb { display: inline; }
+        .u_[% user.id %] { display: inline; }
+        [% IF user.privs > 1 %]
+        .button { display: inline; }
+        [% END %]
+        [% FOR val = [50,60,70,80,90,100] -%]
+            [% IF val < prefs('tol') %].sim_[% val %] { display: none; }[% END %]
+        [%- END %]
+
+    </style>
+    [% END %]
+</head>
+
+<body>
+
+<h1><a href="[% root_uri_rel %]/"><img src="[% img_root %]/annocpan.png" alt="Annotated CPAN" height="50" width="280"></a></h1>
+
+<ul id="nav">
+<li><a href="[% root_uri_rel %]/">Home</a>
+<li><a href="[% root_uri_rel %]/about">About</a>
+<li><a href="[% root_uri_rel %]/faq">FAQ</a>
+<li><a href="[% root_uri_rel %]/news">News</a>
+[% IF user %]
+    <li class="right"><a href="[% root_uri_rel %]/prefs">Prefs</a>
+    <li class="right"><a href="[% root_uri_rel %]/?mode=logout;from=[% request_uri | myuri %]">Logout</a>
+[% ELSE %]
+    <li class="right"><a href="[% root_uri_rel %]/new_user">New user</a>
+[% END %]
+</ul>
+
+
+<div id="content">
+
+[% IF error %]
+<p class="error">[% error %]</p>
+[% END %]
+
+[% IF message %]
+<p class="message">[% message %]</p>
+[% END %]
+
+[% IF log.size > 0 %]
+<ul class="message">
+[% FOR m = log %]
+<li>[% m %]</li>
+[% END %]
+</ul>
+[% END %]
+

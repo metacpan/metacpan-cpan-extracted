@@ -1,0 +1,23 @@
+bin/scm-digest
+Changes
+lib/App/SCM/Digest.pm
+lib/App/SCM/Digest/SCM.pm
+lib/App/SCM/Digest/SCM/Factory.pm
+lib/App/SCM/Digest/SCM/Git.pm
+lib/App/SCM/Digest/SCM/Hg.pm
+lib/App/SCM/Digest/Utils.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/10-scm.t
+t/11-git.t
+t/12-hg.t
+t/20-digest.t
+t/21-is-usable.t
+t/22-ignore-errors.t
+t/lib/TestFunctions.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

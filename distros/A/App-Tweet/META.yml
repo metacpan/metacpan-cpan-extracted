@@ -1,0 +1,27 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         App-Tweet
+version:      1.02
+version_from: lib/App/Tweet.pm
+installdirs:  site
+requires:
+    Config::YAML:                  0
+    Crypt::Blowfish:               0
+    Crypt::CBC:                    0
+    File::HomeDir:                 0
+    File::Slurp:                   0
+    File::Spec:                    0
+    File::Touch:                   0
+    FindBin:                       0
+    Getopt::Long:                  0
+    IO::Interactive:               0
+    Log::Log4perl:                 0
+    Net::Twitter:                  0
+    Pod::Usage:                    0
+    String::Random:                0
+    Term::Prompt:                  0
+    Test::MockObject:              0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

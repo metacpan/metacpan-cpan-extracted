@@ -1,0 +1,76 @@
+{
+   "abstract" : "Merge multiple cpanfile into one",
+   "author" : [
+      "aereal <aereal@aereal.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-merge_cpanfile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::CPANfile" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::merge_cpanfile" : {
+         "file" : "lib/App/merge_cpanfile.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aereal/App-merge_cpanfile/issues"
+      },
+      "homepage" : "https://github.com/aereal/App-merge_cpanfile",
+      "repository" : {
+         "url" : "git://github.com/aereal/App-merge_cpanfile.git",
+         "web" : "https://github.com/aereal/App-merge_cpanfile"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:AEREAL",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,59 @@
+{
+   "abstract" : "A Fuzzy Engine, PDL aware",
+   "author" : [
+      "Juergen Mueck <jmueck@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AI-FuzzyEngine",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Carp" : 0,
+            "List::MoreUtils" : 0,
+            "List::Util" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : 0,
+            "Test::Most" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008009"
+         }
+      }
+   },
+   "provides" : {
+      "AI::FuzzyEngine" : {
+         "file" : "lib/AI/FuzzyEngine.pm",
+         "version" : "v0.2.2"
+      },
+      "AI::FuzzyEngine::Set" : {
+         "file" : "lib/AI/FuzzyEngine/Set.pm",
+         "version" : "v0.2.2"
+      },
+      "AI::FuzzyEngine::Variable" : {
+         "file" : "lib/AI/FuzzyEngine/Variable.pm",
+         "version" : "v0.2.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.2.2"
+}

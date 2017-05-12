@@ -1,0 +1,39 @@
+                            Astro::FITS::CFITSIO
+
+What is it?
+-----------
+   Astro::FITS::CFITSIO is a Perl interface to William Pence's cfitsio
+   subroutine library. For more information on cfitsio, see
+   http://heasarc.gsfc.nasa.gov/fitsio
+
+Where can (did) I get it?
+-------------------------
+   http://hea-www.harvard.edu/~rpete/cfitsio
+   http://www.perl.com/CPAN/authors/id/P/PR/PRATZLAFF
+
+What version of cfitsio does this module require?
+----------------------------------------------
+  Astro::FITS::CFITSIO version 1.11 requires at least cfitsio version 3.39
+
+Installation
+------------
+   For installation instructions, see the 'INSTALL' file in the base
+   distribution directory. Essentially, it just tells you to set the
+   CFITSIO environment variable, and then do
+
+     $ perl Makefile.PL OPTIMIZE=-O0
+     $ make
+     $ make test
+     $ make install
+
+Copyright and License
+---------------------
+   Copyright (C) 2002,2004,2006,2011,2012,2013,2016 by the Smithsonian
+   Astrophysical Observatory.
+
+   This software is released under the same terms as Perl. A copy of
+   the Perl license may be obtained at http://dev.perl.org/licenses/
+
+   The demonstration image m51.fits.gz is derived from the Hubble
+   Heritage project archival images; its creation was funded in part
+   by a grant from NASA. The image is in the public domain.

@@ -1,0 +1,58 @@
+
+############################################################################## 
+Audio::Audiere
+
+2004-03-15 v0.01 Tels - 21 tests (first version)
+  * first working draft - all functions should be supported, except error
+    handling
+2004-03-17 v0.02 Tels - 27 tests (not released)
+  * win32 fixes (thanx to PODMASTER)
+    + added typemap entries for float and char* for Perl v5.6.x
+    + relocated XS code to Audiere_perl.xs and made the lib into
+      Audiere_perl.so respectively Audiere_perl.dll
+    + GetVersion() needs to be audiere::GetVersion()
+    + Makefile.PL fixups (that is stil suboptimal on win32)
+  * added for Streams: getPosition(), setPosition(), isSeekable()
+  * added Audio/Audiere/Error.pm for when creation of streams fail
+  * test errors with non-existing sound files
+2004-03-18 v0.03 Tels - 43 tests
+  * added to Audio::Audiere:
+    + createTone(), createSquareWave(), createWhiteNoise(), createPinkNoise()
+  * added examples/psp
+  * added $parameters to Audio::Audiere->new()
+  * pass $devicename and $parameters to _open_device()
+  * added error() to Audio::Audiere(), and make it return an
+    Audio::Audiere::Error object upon device creation errors
+  * added error.t to test device creation erorrs
+2004-03-26 v0.04 Tels - 59 tests
+  * theoretically you could open more than one audio device (by calling
+    Audio::Audiere->new() with different device names), but a global variable
+    still prevented this in v0.03. Done, works now.
+  * added constants for the different supported fileformats, stream formats,
+    and doc and tests
+  * fixed the segfault with the tones/noise - the refactoring of the code to
+    use the RefPtr objects (in combination with new() and delete()) now also
+    makes the sound output on my system work - Yeah!
+  * moved the doc about the methods callable on streams to Streams.pm
+
+2004-03-28 v0.05 Tels - 97 tests
+  * reorder tests in stream.t due to getPosition() varying while stream is
+    already playing (thanx PODMASTER)
+  * setVolume() and setPitchShift in Stream.pm default to 0, not 1 (prevented
+    setting them to 0)
+  * added for streams: setMute(), isMuted() - streams can now be muted (and
+    remember their volume while muted!)
+  * added Audio::Audiere::Stream::3D: streams with position, dampening etc.
+  * added in Audio::Audiere:
+    + add3DStream()
+    + setListenerPosition()/getListenerPosition()
+    + setListenerRotation()/getListenerRotation()
+    + setMasterVolume()/getMasterVolume()
+    + set3DMasterVolume()/get3DMasterVolume()
+  * upon update_3D_sound(), call update on all 3D streams
+  * added examples/3d.pl
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

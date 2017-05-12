@@ -1,0 +1,154 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use AnyEvent::CouchDB;
+use Getopt::Long;
+use File::Basename;
+use IO::All;
+use JSON;
+use URI::Escape;
+use MIME::Base64;
+
+my $__help     = undef;
+my $__verbose  = undef;
+my $__force    = undef;
+my $__user     = undef;
+my $__password = undef;
+
+GetOptions(
+  "help|h"       => \$__help,
+  "verbose|v"    => \$__verbose,
+  "force|f"      => \$__force,
+  "user|u=s"     => \$__user,
+  "password|p=s" => \$__password,
+);
+
+my $json = JSON->new;
+
+if ($__help || @ARGV == 0) {
+my $executable = basename $0;
+print qq{couchdb-push - push documents from the filesystem to CouchDB
+
+Usage:
+
+  $executable [OPTION]... <FILE>... <COUCHDB_DATABASE>
+
+Options:
+
+  -h, --help            This help message
+  -v, --verbose         Verbose output
+  -u, --user            user
+  -p, --password        password
+  -f, --force           Overwrite documents that already exist
+
+};
+exit 0;
+}
+
+my $name = pop;
+my $db   = couchdb($name);
+
+print "db: " . $db->uri . "\n" if ($__verbose);
+
+my $options;
+if ($__user && $__password) {
+  $options->{headers}->{Authentication} = "Basic ".encode_base64($__user.':'.$__password,'');
+}
+
+for (@ARGV) {
+  my $file;
+  my $doc;
+  eval {
+    $file = io($_);
+    $doc  = $json->decode(scalar $file->all);
+  };
+  if ($@) {
+    die "$_ : $@";
+  }
+
+  my $id = uri_unescape($_);
+  $doc->{_id} = $id;
+
+  eval {
+    $db->save_doc($doc,$options)->recv;
+  };
+  if ($@) {
+    warn "first save attempt failed: $@" if ($__verbose);
+    if ($__force) {
+      my $old_doc  = $db->open_doc($id,$options)->recv;
+      $doc->{_id}  = $old_doc->{_id};
+      $doc->{_rev} = $old_doc->{_rev};
+      eval {
+        $db->save_doc($doc,$options)->recv;
+      };
+      if ($@) {
+        warn $@;
+      } else {
+        print "  $id { _id: $doc->{_id}, _rev: $doc->{_rev} }\n" if ($__verbose);
+      }
+    } else {
+      warn $@;
+    }
+  } else {
+    print "  $id\n" if ($__verbose);
+  }
+}
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+couchdb-push - Push documents from the filesystem to CouchDB
+
+=head1 SYNOPSIS
+
+Usage:
+
+  couchdb-push [OPTION]... <FILE>... <COUCHDB_DATABASE>
+
+Pushing a directory of JSON documents to http://localhost:5984/mydb :
+
+  couchdb-push * http://localhost:5984/mydb
+  couchdb-push * mydb                         # same as above
+
+  # Note that the filenames will be used as document ids
+
+Pushing one design document to mydb:
+
+  # The file "_design/comments" must exist in the filesystem.
+  couchdb-push _design/comments mydb
+
+Overwrite existing documents when pushing to mydb:
+
+  couchdb-push --force * mydb
+
+=head1 DESCRIPTION
+
+This script will take a list of JSON-encoded files and publish them to a
+CouchDB database.  The paths of the filenames will be used as document ids in
+CouchDB, and slashes in the path will be escaped properly.  This will let you
+upload documents that have ids with '/'s in them (like '_design/docs').
+
+=head1 SEE ALSO
+
+L<AnyEvent::CouchDB>, L<AnyEvent::CouchDB::Database>
+
+=head1 AUTHOR
+
+John Beppu E<lt>john.beppu@gmail.comE<gt>
+
+=cut
+
+# Local Variables: ***
+# mode: cperl ***
+# indent-tabs-mode: nil ***
+# cperl-close-paren-offset: -2 ***
+# cperl-continued-statement-offset: 2 ***
+# cperl-indent-level: 2 ***
+# cperl-indent-parens-as-block: t ***
+# cperl-tab-always-indent: nil ***
+# End: ***
+# vim:tabstop=2 softtabstop=2 shiftwidth=2 shiftround expandtab

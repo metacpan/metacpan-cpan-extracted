@@ -1,0 +1,11 @@
+drwxr-xr-x marca/admin       0 2012-01-15 08:33 test_tar_archive/
+brw-r--r-- root/admin     14,0 2012-01-14 09:11 test_tar_archive/block_device
+crw-r--r-- root/admin      0,0 2012-01-14 09:10 test_tar_archive/char_device
+drwxr-xr-x marca/admin       0 2012-01-14 08:57 test_tar_archive/directory/
+-rwxr-xr-x marca/CHEGG\domain users 0 2012-01-14 08:59 test_tar_archive/executable
+prw-r--r-- marca/admin              0 2012-01-14 09:01 test_tar_archive/fifo
+-rw-r--r-- marca/CHEGG\domain users 0 2012-01-14 08:57 test_tar_archive/normal_file
+-rw-r-Sr-- marca/admin              0 2012-01-14 09:48 test_tar_archive/setgid_file
+-rwSr--r-- marca/admin              0 2012-01-14 09:47 test_tar_archive/setuid_file
+-rw-r--r-T marca/admin              0 2012-01-14 09:17 test_tar_archive/sticky_file
+lrwxr-xr-x marca/admin              0 2012-01-15 08:33 test_tar_archive/symlink -> normal_file

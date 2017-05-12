@@ -1,0 +1,48 @@
+ChangeLog for Acme::Colour
+
+1.06 Tue Jun 10 14:51:37 BST 2008
+    - remove the Perl::Critic test from the distribution
+
+1.05 Sun Jun  8 10:00:05 BST 2008
+    - update the test suite to handle both "dark red" and "darkred"
+
+1.04 Sat Apr 28 16:19:00 CEST 2007
+    - perltidy
+    - add LICENSE, META.yml, examples/acme_colour.pl
+    - add perlcritic test
+
+1.03 Fri Sep  8 17:34:37 BST 2006
+        - added pod test and pod coverage test
+        - perltidy
+
+1.02 Tue Sep 21 14:03:22 BST 2004
+        - renamed private methods to start with _
+        - documented the default method
+        - increased test coverage to 100%
+
+1.01 Fri May 14 16:21:26 BST 2004
+	- regenerated with new Module::Build, which means the
+	  Makefile.PL now contains Test::Exception
+
+1.00 Sun Sep 28 17:50:26 BST 2003
+	- moved to Module::Build
+	- throw exceptions using Error when given unknown colours
+
+0.20 Tue Aug 20 19:35:23 BST 2002
+	- require 5.6.1 as it runs out of memory for some
+          reason on 5.005_003 (spotted by Daniel)
+
+0.19 Tue Jul  2 11:31:32 BST 2002
+	- Fix minor warning
+
+0.18 Mon Jun 17 15:33:38 GMT 2002
+	- Minor doc patch and support for colour constants
+	  by James Duncan
+
+0.17 ?
+
+0.16 Thu Apr 11 16:02:43 GMT 2002
+	- Fixed minor typo (thanks to Leo Lapworth)
+
+0.15 ?
+	- First released version

@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Redis;
+use LWP::UserAgent::CHICaching;
+use Attean;
+use RDF::Trine;
+use CHI;
+use AtteanX::Query::Cache::Analyzer;
+use AtteanX::Store::SPARQL;
+use AtteanX::Store::LDF;
+
+use AtteanX::Query::Cache::Analyzer::Model;
+use Log::Any::Adapter;
+Log::Any::Adapter->set( 'Stdout' );
+
+my $sparqlurl = 'http://dbpedia.org/sparql';
+my $ldfurl = 'http://fragments.dbpedia.org/2015/en';
+my $redisserver = 'robin.kjernsmo.net:6379';
+
+my $cache = CHI->new(
+							driver => 'Redis',
+							namespace => 'cache',
+							server => $redisserver,
+							debug => 0
+						  );
+
+
+RDF::Trine::default_useragent(LWP::UserAgent::CHICaching->new(cache => $cache));
+
+my $sparqlstore = Attean->get_store('SPARQL')->new(endpoint_url => $sparqlurl);
+my $ldfstore    = Attean->get_store('LDF')->new(start_url => $ldfurl);
+
+
+my $redissub = Redis->new(server => $redisserver, name => 'subscriber');
+my $redisstore = Redis->new(server => $redisserver, name => 'store');
+
+my $model = AtteanX::Query::Cache::Analyzer::Model->new(store => $sparqlstore,
+																		  ldf_store => $ldfstore,
+																		  cache => $cache);
+
+
+
+$redissub->subscribe('analyze.fullquery', 
+							sub {
+								my $string = shift;
+								print "Query:\n$string\n";
+								my $analyzer = AtteanX::Query::Cache::Analyzer->new(model => $model,
+																									 query => $string,
+																									 store => $redisstore);
+								print 'Prefetching ' . $analyzer->analyze_and_cache('all') . " patterns.\n";
+							});
+
+$redissub->wait_for_messages(0) while 1;

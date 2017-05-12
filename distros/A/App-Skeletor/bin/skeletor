@@ -1,0 +1,41 @@
+#! /usr/bin/env perl
+
+use warnings;
+use strict;
+use App::Skeletor;
+
+App::Skeletor->run(@ARGV);
+
+__END__
+
+=head1 NAME 
+
+skeletor - Build a new project from a prepared template
+
+=head1 SYNOSIS
+
+    skeletor --template Example \
+      --as Local::MyApp \
+      --directory ~/new_projects \
+      --author 'John Napiorkowski <jjnapiork@cpan.org>' \
+      --year 2015
+
+=head1 DESCRIPTION
+
+Script runner for L<App::Skeletor>.  See that file for more detailed
+docs and how to build custom skeleton project templates.
+
+=head1 SEE ALSO
+ 
+L<App::Skeltor>
+ 
+=head1 COPYRIGHT
+ 
+Copyright 2015 - John Napiorkowski
+ 
+=head1 AUTHOR
+ 
+John Napiorkowski
+
+=cut
+

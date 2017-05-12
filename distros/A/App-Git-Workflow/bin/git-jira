@@ -1,0 +1,93 @@
+#!/usr/bin/perl
+
+# Created on: 2014-03-11 21:06:01
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use App::Git::Workflow::Command::Jira;
+
+App::Git::Workflow::Command::Jira->run();
+
+__DATA__
+
+=head1 NAME
+
+git-jira - Checkout any branch mentioning the passed Jira
+
+=head1 VERSION
+
+This documentation refers to git-jira version 1.0.1
+
+=head1 SYNOPSIS
+
+   git-jira [option] JIRAID
+
+ OPTIONS:
+  JIRAID            A Jira format id
+  -r --remote       Look in remote branches for the Jira branch
+  -a --all          Look everywhere?
+  -u --url[=]URL    Use URL as the JIRA instance for looking up summaries.
+
+  -v --verbose      Show more detailed option
+     --version      Prints the version information
+     --help         Prints this help information
+     --man          Prints the full documentation for git-Jira
+
+=head1 DESCRIPTION
+
+Finds any branch containing the passed Jira issue id and switches to that
+branch. If none is found then it suggests creating the branch using
+L<git-feature>. If L<JIRA::REST> is installed the suggestion will use the
+JIRA summary as part of the name.
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+Defaults for this script can be set through C<git config>
+
+ jira.url       Specifies the URL for the JIRA instance being used.
+
+You can set these values either by editing the repository local C<.git/config>
+file or C<~/.gitconfig> or use the C<git config> command
+
+ # eg Setting the local value (ie only the current repository)
+    git config jira.url https://jira.example.com/
+
+ # eg Setting the global value
+    git config --global jira.url https://jira.example.com/
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2014 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

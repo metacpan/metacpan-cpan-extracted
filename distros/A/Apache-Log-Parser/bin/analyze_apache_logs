@@ -1,0 +1,175 @@
+#!/usr/bin/env perl
+
+### cat logs | analyze_apache_logs
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Apache::Log::Parser;
+
+use Getopt::Long qw(:config posix_default no_ignore_case gnu_compat);
+my ($detail, $sort, $verbose);
+GetOptions(
+    "detail|d" => \$detail,
+    "sort|s=s" => \$sort,
+    "verbose|v" => \$verbose,
+);
+
+$sort = 'duration' if not defined($sort);
+die "'sort' option value: 'path', 'num' or 'duration'" if defined($sort) and ($sort ne 'path' and $sort ne 'num' and $sort ne 'duration');
+
+sub avg_subzero2 {
+    my ($sum, $num) = @_;
+    sprintf("%.2f", $sum / $num);
+}
+
+sub parse_stdin {
+    my $parser = Apache::Log::Parser->new( fast => [ 'debug', 'combined', 'common' ] );
+
+    my $logs = 0;
+    my $summary = {};
+    # $summary->{method_str}->{path} = {... };
+    # path => {
+    #     num => 0,
+    #     status => {},
+    #     bytes => {min => undef, max => undef, sum => 0},
+    #     duration => {min => undef, max => undef, sum => 0},
+    #     queries => {},
+    #     referer => {},
+    # };
+
+    while (my $line = <STDIN>) {
+        chomp $line;
+        my $log = $parser->parse($line);
+
+        next unless $log;
+
+        $logs += 1;
+
+        my ($path, $query_string);
+
+        if ($detail) {
+            $path = $log->{path};
+        }
+        else {
+            ($path, $query_string) = split(/\?/, $log->{path}, 2);
+            unless ($query_string) {
+                $query_string = '(blank)';
+            }
+        }
+
+        my $method = $log->{method};
+
+        $summary->{$method} ||= {};
+        unless ($summary->{$method}->{$path}) {
+            $summary->{$method}->{$path} = {
+                path => undef,
+                num => 0,
+                status => {},
+                bytes => {min => undef, max => undef, sum => 0},
+                duration => {min => undef, max => undef, sum => 0},
+                queries => {},
+                referer => {},
+            };
+        }
+        my $s = $summary->{$method}->{$path};
+
+        $s->{path} = $path;
+        $s->{method} = $method;
+        $s->{num} += 1;
+
+        $s->{status}->{$log->{status}} ||= 0;
+        $s->{status}->{$log->{status}} += 1;
+
+        $s->{bytes}->{min} = $log->{bytes} if not defined($s->{bytes}->{min}) or $s->{bytes}->{min} > $log->{bytes};
+        $s->{bytes}->{max} = $log->{bytes} if not defined($s->{bytes}->{max}) or $s->{bytes}->{max} < $log->{bytes};
+        $s->{bytes}->{sum} += $log->{bytes};
+
+        if (defined $log->{duration}) {
+            $s->{duration_flag} = 1;
+            $s->{duration}->{min} = $log->{duration} if not defined($s->{duration}->{min}) or $s->{duration}->{min} > $log->{duration};
+            $s->{duration}->{max} = $log->{duration} if not defined($s->{duration}->{max}) or $s->{duration}->{max} < $log->{duration};
+            $s->{duration}->{sum} += $log->{duration};
+        }
+
+        unless ($detail) {
+            $s->{queries}->{$query_string} ||= 0;
+            $s->{queries}->{$query_string} += 1;
+        }
+
+        if (defined $log->{referer}) {
+            $s->{referer_flag} = 1;
+            $s->{referer}->{$log->{referer}} ||= 0;
+            $s->{referer}->{$log->{referer}} += 1;
+        }
+    }
+
+    return ($logs, $summary);
+}
+
+my ($logs_count, $logs_summary) = parse_stdin();
+
+print "TOTAL: $logs_count\n";
+
+my $have_duration = 0;
+my @summaries = ();
+foreach my $m (keys(%$logs_summary)) {
+    foreach my $s (values(%{$logs_summary->{$m}})) {
+        my $num = $s->{num};
+        if ($s->{duration_flag}) {
+            $have_duration = 1;
+            $s->{duration}->{avg} = avg_subzero2( $s->{duration}->{sum}, $num );
+        }
+        $s->{bytes}->{avg} = avg_subzero2( $s->{bytes}->{sum}, $num );
+        push @summaries, $s;
+    }
+}
+
+if ($sort eq 'duration' and $have_duration == 0) {
+    warn "This input logs does not have durations.";
+    $sort = 'path';
+}
+
+my @sorted = ();
+if ($sort eq 'path') {
+    @sorted = sort { $a->{path} cmp $b->{path} or $a->{method} cmp $b->{method} } @summaries;
+} elsif ($sort eq 'num') {
+    @sorted = sort { $a->{num} <=> $b->{num} } @summaries;
+} else { # duration avg
+    @sorted = sort { $a->{duration}->{avg} <=> $b->{duration}->{avg} } @summaries;
+}
+
+foreach my $s (@sorted) {
+    print $s->{method}, ' ', $s->{path}, "\t";
+
+    if ($s->{duration_flag}) {
+        print "duration ",
+            "avg:", $s->{duration}->{avg}, ", ",
+            "min:", $s->{duration}->{min}, ", ",
+            "max:", $s->{duration}->{max}, "\t";
+    }
+    print "status ", join(",", map { $_ . ":" . $s->{status}->{$_} } sort(keys %{$s->{status}})), "\n";
+
+    next unless $verbose;
+
+    print "\t\tbytes",
+        "avg:", $s->{bytes}->{avg}, ", ",
+        "min:", $s->{bytes}->{min}, ", ",
+        "max:", $s->{bytes}->{max}, "\n";
+
+    unless ($detail) {
+        print "\n";
+        print "\tQUERY STRING\n";
+        foreach my $q (sort(keys %{$s->{queries}})) {
+            print "\t\t", ($q eq '' ? "(none)" : $q), "\t", $s->{queries}->{$q}, "\n";
+        }
+    }
+
+    if ($s->{referer_flag}) {
+        print "\n";
+        print "\tREFERER\n";
+        foreach my $r (sort(keys %{$s->{referer}})) {
+            print "\t\t", $r, "\t", $s->{referer}->{$r}, "\n";
+        }
+    }
+}

@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Algorithm/VectorClocks.pm
+t/00.load.t
+t/01.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+META.yml

@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use AnyEvent::Graphite;
+
+use Getopt::Long;
+
+my $opt = {};
+GetOptions($opt, 'host=s', 'port=i', 'value=i', 'key=s', 'oid=s', 'interval=i', 'snmphost=s');
+
+if(defined($opt->{snmphost})) {
+    
+    # toy to interact with the SNMPAgent module
+    use AnyEvent::Graphite::SNMPAgent;
+
+    if(!(defined($opt->{oid}) && defined($opt->{key}))) {
+        print "usage: --key some.graphite.key --oid .1.3.6.1.2.1.6.11.0\n";
+        exit;
+    }
+    my $agent = AnyEvent::Graphite::SNMPAgent->new(host => $opt->{'host'}, port => $opt->{'port'}, interval => $opt->{interval});
+    $agent->add_snmp(host => $opt->{snmphost}, oid => $opt->{oid}, graphite_key => $opt->{key});
+    $agent->add_snmp(host => $opt->{snmphost}, oid => $opt->{oid}, graphite_key => "$opt->{key}_tenth", filter => sub { return int($_[0]/10) });
+    print "Running forever. CTRL-C to interrupt\n";
+    AnyEvent->condvar->recv;
+
+} else {
+    
+    # just run a one-shot with the Graphite module itself
+    unless (defined($opt->{key}) && defined($opt->{value})) {
+        print "usage: [--host <host>] [--port <port>] --key a.b.c.d --value <value>\n"; 
+        exit;
+    }
+    my $ag = AnyEvent::Graphite->new(host => $opt->{host}, port => $opt->{port});
+    $ag->send($opt->{key}, $opt->{value});
+    $ag->finish;
+}
+
+
+

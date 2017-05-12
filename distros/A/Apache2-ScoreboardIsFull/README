@@ -1,0 +1,32 @@
+NAME
+    Apache2::ScoreboardIsFull - set $r->pnotes('scoreboard_is_full' => 1) if
+    no servers left
+
+SYNOPSIS
+      use Apache2::ScoreboardIsFull;
+
+      PerlInitHandler Apache2::ScoreboardIsFull
+
+    Meanwhile, in a mod_perl handler elsewhere:
+
+      if ($r->pnotes('scoreboard_is_full') {
+          $r->log->emerg("No httpd children left. Call out the winged monkeys");
+      }
+
+DESCRIPTION
+    Sets scoreboard_is_full pnotes when there are no available httpd
+    children.
+
+SEE ALSO
+    Apache::Scoreboard, mod_perl
+
+AUTHOR
+    Fred Moyer, <fred@redhotpenguin.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014 by Fred Moyer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.16.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

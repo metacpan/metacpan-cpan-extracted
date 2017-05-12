@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# $1 may be -v.
+
+echo Creating App::Office::Contacts tables
+
+cd ~/perl.modules/App-Office-Contacts
+
+perl -Ilib scripts/create.tables.pl $1
+
+echo Creating App::Office::Contacts::Donations tables
+
+cd ~/perl.modules/App-Office-Contacts-Donations
+
+perl -Ilib -I../App-Office-Contacts scripts/create.tables.pl $1
+
+echo Done

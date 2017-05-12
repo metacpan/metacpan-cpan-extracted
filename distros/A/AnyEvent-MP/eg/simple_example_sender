@@ -1,0 +1,18 @@
+#!/opt/bin/perl
+
+use AnyEvent;
+use AnyEvent::MP;
+use AnyEvent::MP::Global;
+
+configure;
+
+my $find_timer =
+   AnyEvent->timer (after => 0, interval => 1, cb => sub {
+      my $ports = grp_get "eg_receivers"
+         or return;
+
+      snd $_, test => time
+         for @$ports;
+   });
+
+AnyEvent->condvar->recv;

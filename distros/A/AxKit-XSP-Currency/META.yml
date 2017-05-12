@@ -1,0 +1,23 @@
+--- 
+abstract: Currency formatting and conversion taglib
+author: 
+  - Christopher H. Laco
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: artistic
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: AxKit-XSP-Currency
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  AxKit: 1.62
+  Finance::Currency::Convert::WebserviceX: 0
+  Locale::Currency::Format: 0
+  mod_perl: 0
+  perl: 5.8.0
+tests: t/*.t
+version: 0.13000

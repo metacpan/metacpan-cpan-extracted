@@ -1,0 +1,14 @@
+Revision history for Perl extension Algorithm-HITS.
+
+0.01  Sat, 21 Aug 2004 07:22:53 +0800
+	- original version
+
+
+0.02  Sat, 21 Aug 2004 11:52:52 +0800
+	- corrected my previous moronic computation error
+
+0.03  Sun, 22 Aug 2004 17:29:40 +0800
+	- update in test
+
+0.04  Sun, 14 Aug 2005 13:10:10 +0800
+	- fixed normalization bug (Thanks to Hugo Zanghi)

@@ -1,0 +1,63 @@
+{
+   "abstract" : "Creates a catalyst app, a TT view, a model and a HTML5 wrapper template from initalizr.com.",
+   "author" : [
+      "TorbjÃ¸rn Lindahl <torbjorn.lindahl@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-CatalystStarter-Bloated",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "1.30",
+            "Capture::Tiny" : "0.23",
+            "Catalyst::View::JSON" : "0.30",
+            "Catalyst::View::TT" : "0.41",
+            "DBI" : "1.63",
+            "File::ShareDir" : "1.03",
+            "File::Which" : "1.09",
+            "HTML::TreeBuilder" : "5.03",
+            "IO::All" : "0.53",
+            "List::MoreUtils" : "0.33",
+            "Log::Log4perl" : "1.42",
+            "Moose" : "2.1005",
+            "Path::Tiny" : "0.051",
+            "Test::FailWarnings" : "0.008",
+            "Test::File::ShareDir" : "v0.3.1",
+            "Test::Most" : "0.31",
+            "Test::Output" : "1.02",
+            "Test::Perl::Critic" : "1.02",
+            "Test::Pod" : "1.48",
+            "Test::Pod::Coverage" : "1.08",
+            "namespace::autoclean" : "0.13",
+            "utf8::all" : "0.011"
+         }
+      }
+   },
+   "provides" : {
+      "App::CatalystStarter::Bloated" : {
+         "file" : "lib/App/CatalystStarter/Bloated.pm",
+         "version" : "v0.9.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_1_0"
+      ]
+   },
+   "version" : "v0.9.3",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

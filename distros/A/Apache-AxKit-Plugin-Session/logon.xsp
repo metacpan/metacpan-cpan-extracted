@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xsp:page language="Perl"
+ xmlns:xsp="http://www.apache.org/1999/XSP/Core"
+ xmlns:session="http://www.apache.org/1999/XSP/Session"
+ xmlns:auth="http://www.creITve.de/2002/XSP/Auth"
+ xmlns:rsddl="http://www.creITve.de/2002/RSDDL"
+ xmlns:esql="http://apache.org/xsp/SQL/v2"
+ xmlns:xi="http://www.w3.org/2001/XInclude"
+ xmlns="http://www.w3.org/1999/xhtml"
+>
+<html>
+<xsp:logic>
+<!-- fill in your favourite form checking code here -->
+my $form_complete = ($cgi->param('username') and $cgi->param('password'));
+my $form_username = $cgi->param('username');
+my $form_password = $cgi->param('password');
+
+my $correct_username = 'test';
+my $crypted_password = '$1$abcdefgh$irWbblnpmw.5z7wgBnprh0'; # == test
+my $level = 42;
+my @groups = ('test','foo','bar');
+<!-- - - - - - - - - - - - - - - - - - - - - - - - -->
+</xsp:logic>
+<head>
+<title>Login</title>
+</head>
+<body>
+<xsp:logic>
+if (<auth:is-logged-in/>) {
+  <h1>Welcome!</h1>
+  <p>You are logged on as: <auth:get-access type="user"/></p>
+} else {
+  <h1>Logon</h1>
+  if ($form_complete) {
+
+    if ($form_username eq $correct_username and <auth:password-matches>
+      <auth:clear><xsp:expr>$form_password</xsp:expr></auth:clear>
+      <auth:encrypted><xsp:expr>$crypted_password</xsp:expr></auth:encrypted>
+        </auth:password-matches>) {
+       <auth:login>
+        <auth:access type="user"><xsp:expr>$form_username</xsp:expr></auth:access>
+        <auth:access type="level"><xsp:expr>$level</xsp:expr></auth:access>
+        <xsp:logic>
+        foreach my $group (@groups) {
+          <auth:access type="group"><xsp:expr>$group</xsp:expr></auth:access>
+        }
+        </xsp:logic>
+      </auth:login>
+     }
+  }
+  <p>User unknown or wrong password.</p>
+}
+my $reason = <auth:get-reason/>;
+my $dest = Apache::Request->instance($r)->{'destination'} || <auth:get-location/>;
+<auth:clear-reason/>
+if ($reason) {
+  if ($reason ne 'bad_session_provided') {
+    <p>This area is only available to registered users.</p>
+  } else {
+    <p>Your session data has expired. If you are inactive for a certain amount, you are automatically logged out.</p>
+  }
+}
+</xsp:logic>
+<p>Please log on.</p>
+<form method="POST">
+<input type="hidden" name="destination">
+  <xsp:attribute name="value"><xsp:expr>$dest</xsp:expr></xsp:attribute>
+</input>
+Username: <input type="text" name="username"/><br/>
+Password: <input type="password" name="password"/><br/>
+</form>
+</body>
+</html>
+</xsp:page>

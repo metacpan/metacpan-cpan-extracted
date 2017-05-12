@@ -1,0 +1,39 @@
+#!perl
+
+use strict;
+use warnings;
+use App::envfile;
+
+main(@ARGV);
+exit;
+
+sub main {
+    my ($envfile, @commands) = @_;
+    usage() unless defined $envfile;
+    die "$envfile: $!\n" unless -r $envfile;
+
+    my $envf = App::envfile->new;
+    my $env = $envf->parse_envfile($envfile);
+    $envf->run_with_env($env, \@commands);
+}
+
+sub usage {
+    my $self = shift;
+print << 'USAGE';
+Usage: evnfile file commands
+
+USAGE
+    exit 1;
+}
+
+__END__
+
+=head1 NAME
+
+  envfile - runs another program with environment modified according to envfile
+
+=head1 SYNOPSIS
+
+  envfile file commands
+
+=cut

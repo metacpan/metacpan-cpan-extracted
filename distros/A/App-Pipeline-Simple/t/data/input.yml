@@ -1,0 +1,14 @@
+---
+description: "Demonstrate input from command line and printing to STDOUT"
+name: input demo
+version: '0.1'
+steps:
+  s1:
+    name: echo
+    args:
+      in:
+        type: unnamed
+        value:
+      out:
+        type: redir
+        value: s1_string.txt

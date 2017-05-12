@@ -1,0 +1,37 @@
+Authen::TypeKey::Sign is a TypeKey authentication signature generation
+module. Also included in the package is a command-line utility for 
+generating the necessary DSA keys for working with this module.
+
+INSTALLATION
+
+To install this module type the following:
+
+ perl Makefile.PL 
+ make 
+ make test 
+ make install
+ 
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Crypt::DSA
+Crypt::DSA::Key
+Crypt::DSA::Signature
+MIME::Base64
+Getopt::Long 2.33+
+Pod::Usage
+
+COPYRIGHT AND LICENCE
+
+The software is released under the Artistic License. The terms of
+the Artistic License are described at
+http://www.perl.com/language/misc/Artistic.html.
+
+TypeKey is a trademark of Six Apart Ltd. TypeKey Authentication Protocol 
+is Copyright 2004 Six Apart Ltd, cpan@sixapart.com. All rights reserved.
+
+Except where otherwise noted, L<Authen::TypeKey::Sign> is 
+Copyright 2004-2007, Timothy Appnel, cpan@timaoutloud.org. All rights 
+reserved.
+

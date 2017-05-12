@@ -1,0 +1,93 @@
+Revision history for Perl extension AI::Genetic::Pro.
+
+0.341 Mon, 23 Mar 2009 17:21:52 +0100
+	- Fixed bug in a documentation. Thanks to Randal L. Schwartz :-)
+
+0.34  Tue, 17 Mar 2009 20:39:16 +0100 
+	- Fixed bug in PMX strategy. Thanks to Maciej Misiak :-)
+
+0.335 Sat, 07 Feb 2009 20:04:52 +0100
+	- Little changes in a Makefile.PL (especially for Sun Solaris)
+
+0.334 Fri, 23 Jan 2009 00:03:26 +0100
+	- Module 'Digest::MD5' is loaded by default,
+
+0.333 Fri, 22 Jan 2009 15:30:06 +0100
+	- Some improvments in 'getFittest' function,
+	- Added 'getFittest_as_arrayref' function,
+
+0.332 Wed, 21 Jan 2009 00:31:01 +0100
+	- Some changes in tests.
+
+0.331 Tue, 20 Jan 2009 23:55:20 +0100
+	- Added tests.
+	- Some improvments in the 'inject' function.
+
+0.33 Mon, 19 Jan 2009 00:38:06 +0100
+	- Added 'strict' mode.
+	- Added 'inject' function.
+
+0.32 Sun, 18 Jan 2009 01:16:37 +0100
+	- Fixes in rangevectors.
+
+0.31 Sat, 17 Jan 2009 20:32:27 +0100
+	- Fixes in mutation. Added changing of fitness for mutated chromosomes.
+
+0.30 Fri, 16 Jan 2009 00:06:29 +0100
+	- Fixes in as_string method.
+
+0.29 Thu, 15 Jan 2009 21:13:15 +0100
+	- Added full support for variable-length chromosomes.
+
+0.28
+	- Little fixes. Again :-)
+	
+0.27
+	- Little fixes.
+
+0.26 Sun, 11 Jan 2009 22:04:26 +0100
+	- Little modifications in crossover.
+	- Added supprot for variable-length chromosomes. Thanks to Leonid Zamdborg :-)
+
+0.25 Mon, 24 Nov 2008 18:57:27 +0100
+	- Little fix in a counter of generations.
+
+0.24 Mon, 10 Nov 2008 11:34:12 +0100
+	- Little speed up in main loop.
+
+0.23 Mon, 10 Nov 2008 10:14:32 +0100
+	- Little modification in main loop. Infinity loop available.
+
+0.22 Wed, 05 Nov 2008 00:49:18 +0100
+	- Added "-preserve" parameter.
+	- Little speed up (Class::Accessor::Fast => Class::Accessor::Fast::XS).
+
+0.21 Fri, 10 Oct 2008 03:41:39 +0200
+	- Fixed mutation in rangevectors. Thanks to Christoph Meissner :-)
+
+0.20 Sat, 04 Oct 2008 02:39:28 +0200
+	- Again... Little bug in mutation (inversion; listvectors only) - fixed. Thanks to Alec Chen :-)
+
+0.19 Wed, 24 Sep 2008 19:52:33 +0200
+	- Little bug in mutation - fixed. Thanks to Alec Chen :-) 
+
+0.18 Fri, 19 Sep 2008 21:41:46 +0200
+	- Little fixes in documentation.
+
+0.17 Fri, 19 Sep 2008 03:52:21 +0200
+	- Added documentation :-)
+
+0.16 Mon, 15 Sep 2008 12:12:44 +0200
+	- Increased speed during chart generation.
+	- More documentation.
+	- Feature 'say' removed for compatibility.
+
+0.15	Sun, 14 Sep 2008 02:14:02 +0200
+	- Increased speed :-)
+	- Changes way of mutation is made.
+	- Added charts.
+	- Added possibility to save/load GA.
+	- More documentation.
+
+0.1		Sat, 13 Sep 2008 02:04:25 +0200
+	- First release.

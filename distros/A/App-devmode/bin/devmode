@@ -1,0 +1,908 @@
+#!/usr/bin/env perl
+
+# Created on: 2008-01-26 16:49:28
+# Create by:  freman
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use version;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use List::MoreUtils qw/uniq/;
+use Path::Class;
+use Term::ANSIColor qw/colored/;
+use YAML qw/LoadFile DumpFile/;
+
+our $VERSION   = version->new('0.0.8');
+my ($PROGNAME) = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+my $HOME       = $ENV{HOME};
+my $SCREEN     = '/usr/bin/screen';
+
+my %option = (
+    task        => '',
+    force_title => 1,
+    verbose     => 0,
+    man         => 0,
+    help        => 0,
+    VERSION     => 0,
+);
+my %ERROR = (
+    COULD_NOT_LAUNCH_SCREEN => {
+        message => "Unable to launch screen %s\n",
+        code    => 10,
+    },
+    COULD_NOT_LAUNCH_SCREEN_PROTECTION => {
+        message => "Unable to run protection screen '%s': %s\n",
+        code    => 12,
+    },
+    COULD_NOT_WIPE_SESSION => {
+        message => "Unable to launch screen to wipe '%s': %s\n",
+        code    => 14,
+    },
+    COULD_NOT_REATTACH => {
+        message => "Unable to launch screen to re-attach to '%s': %s\n",
+        code    => 16,
+    },
+    COULD_NOT_FIND_SESSION => {
+        message => "Could not find the screen session '%s'\n",
+        code    => 18,
+    },
+    COULD_NOT_FIND_CONFIG => {
+        message => "No config exists for %s\nTo create from template Use:\n \$ %s %s --create\n",
+        code    => 20,
+    },
+    COULD_NOT_LAUNCH_SCREEN_TASK => {
+        message => "Unable to launch screen for '%s': %s\n",
+        code    => 30,
+    },
+    COULD_NOT_CREATE_CONFIG => {
+        message => "Could not create '%s' config from template: %s\n",
+        code    => 40,
+    },
+);
+my %COLOURS = (
+    'ATTACHED'    => 'green',
+    'DETACHED'    => 'blue',
+    'Not Started' => 'white',
+    ''            => 'red',
+);
+my %SUFFIXES = (
+    'ATTACHED'    => '*',
+    'DETACHED'    => '/',
+    'Not Started' => '',
+    ''            => '',
+);
+
+if (!@ARGV) {
+    pod2usage(-verbose => 1);
+}
+
+main();
+exit 0;
+
+sub error {
+    my ( $name, @args ) = @_;
+    print {*STDERR} sprintf $ERROR{$name}{message}, @args;
+    exit $ERROR{$name}{code};
+}
+
+sub main {
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'task|t=s',
+        'kill|k',
+        'list|ls|l',
+        'bw',
+        'all|a',
+        'exists|e!',
+        'multiconnect|x',
+        'create|c+',
+        'chdir|d',
+        'reconnect|r!',
+        'force_title|force-title|f',
+        'title_bar|title-bar|b=s',
+        'protect|p',
+        'short|S!',
+        'server|s=s',
+        'auto|A=s',
+        'current|C=s',
+        'remote_opt|remote-opt|o=s',
+        'pre_cmd|pre-cmd|pre=s',
+        'post_cmd|post-cmd|post=s',
+        'test|T',
+        'verbose|v+',
+        'man',
+        'help',
+        'VERSION!',
+    ) or pod2usage(2);
+    my $task = $option{task} || $ARGV[0] || '';
+
+    if ($option{VERSION}) {
+        print "$PROGNAME Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ($option{man}) {
+        pod2usage(-verbose => 2);
+    }
+    elsif ($option{help}) {
+        pod2usage(-verbose => 1);
+    }
+    elsif ( $option{auto} ) {
+        auto($option{auto}) ;
+    }
+
+    my %session = get_sessions();
+
+    # Make upper and lower case versions of the task name
+    # All filenames are lower case
+    # All session names are upper case
+    my $uc_task = uc $task;
+    my $lc_task = lc $task;
+
+    # task defaults
+    my $config = config($lc_task);
+
+    if ($option{'server'}) {
+        my $mode  = shift @ARGV;
+        my $reset = 'reset;';
+        my $ssh   = 'ssh -t';
+        if ( $option{list} ) {
+            $mode  = '--list';
+            $reset = '';
+            $ssh   = 'ssh';
+        }
+        push @ARGV, $config->{remote_opt} if $config->{remote_opt};
+
+        return print "$ssh @ARGV $option{server} '$reset devmode $mode'\n" if $option{test};
+        return exec  "$ssh @ARGV $option{server} '$reset devmode $mode'";
+    }
+    elsif ($option{'list'}) {
+        my $count = 0;
+
+        if ( $option{verbose} || $option{all} ) {
+            my @modes = grep { -f $_ && $_->basename !~ /^[.#]|[.]rc$/xms } dir("$ENV{HOME}", ".devmode")->children;
+            for my $mode (@modes) {
+                my $base = $mode->basename;
+                $session{uc $base} ||= { state => 'Not Started' };
+            }
+        }
+
+        SESSION:
+        for my $session ( sort keys %session ) {
+            # remove any sessions that look like they are named after their pid
+            next SESSION if $session{$session}{pid} && $session =~ /^\d+$/ && $session == $session{$session}{pid};
+
+            print ucfirst lc $session{$session}{state},
+                ' ' x (14 - length $session{$session}{state}),
+                $option{bw}
+                ? lc $session
+                : colored( lc $session, $COLOURS{ $session{$session}{state} || '' } ),
+                "\n";
+            $count++;
+        }
+
+        exit $count;
+    }
+
+    if ( $option{create} && !-f "$HOME/.devmode/$lc_task" ) {
+        my $task = create_task( $task, $option{template} || 'rc', "$ENV{HOME}/.devmode/" );
+
+        exec 'vim', $task;
+    }
+
+    if ($config) {
+        for my $key ( keys %{ $config } ) {
+            if ( !exists $option{$key} ) {
+                $option{$key} = $config->{$key};
+            }
+        }
+    }
+
+    if ($option{'force_title'}) {
+        force_title( $option{title_bar} || $task);
+    }
+    else {
+        $option{short} = length $task > 8 if !exists $option{short};
+
+        require Term::Title;
+        Term::Title::set_titlebar(
+            ( $option{short} ? '' : "Devmode " )
+            . ( $option{title_bar} || $task )
+        );
+    }
+
+    if ( $option{verbose} ) {
+        print Dumper \%session;
+    }
+
+    if ( exists $session{$uc_task} ) {
+        if ( $option{kill} ) {
+            if ( $option{post_cmd} ) {
+                system $option{post_cmd};
+            }
+            system "kill $session{$uc_task}{pid}";
+            exit;
+        }
+        elsif ( $session{$uc_task}{state} eq 'DEAD' ) {
+            warn "A previous session for '$task' was detected as dead, wiping and starting a new session\n";
+            system "$SCREEN -wipe $uc_task > /dev/null 2>&1" or error( COULD_NOT_WIPE_SESSION => $task, $OS_ERROR );
+        }
+        else {
+            my $task = "$session{$uc_task}{pid}.$uc_task";
+            my $conn = $option{multiconnect} ? '-x' : '-d -R';
+            warn "$SCREEN $conn $task" if $option{verbose} || $option{test};
+            return if $option{test};
+            exec "$SCREEN $conn $task" or error( COULD_NOT_REATTACH => $task, $OS_ERROR );
+        }
+    }
+    elsif ( $option{reconnect} || $option{kill} ) {
+        error( COULD_NOT_FIND_SESSION => $task );
+    }
+
+    system $option{pre_cmds} if $option{pre_cmds};
+
+    my @screen_opts = (
+        "-S $uc_task",
+    );
+
+    # Per session config?
+    if (-e "$HOME/.devmode/$lc_task") {
+        push @screen_opts, "-c $HOME/.devmode/$lc_task";
+
+        if ($option{chdir}) {
+            my $rc    = file("$HOME/.devmode/$lc_task")->slurp;
+            my ($dir) = $rc =~ m{ ^ chdir \s+ (\S+?) $ }xms;
+
+            if ( -d $dir ) {
+                chdir $dir;
+            }
+        }
+    }
+    elsif ( $option{exits} ) {
+        error( COULD_NOT_FIND_CONFIG => $task, $0, $task );
+        die "No config exists for $task\nTo create from template Use:\n \$ $0 $task --create\n";
+    }
+
+    if ( $option{protect} ) {
+        protect($lc_task);
+    }
+
+    if ( $option{pre_cmd} ) {
+        system $option{pre_cmd};
+    }
+
+    my $cmd = "$SCREEN " . join (' ', @screen_opts);
+    if ($option{test}) {
+        warn $cmd;
+        exit 0;
+    }
+    exec $cmd or error( COULD_NOT_LAUNCH_SCREEN_TASK => $task, $OS_ERROR );
+}
+
+sub get_sessions {
+    my %session;
+
+    # run screen to read in all the sessions
+    open my $screen, "-|", "$SCREEN -ls" or error( COULD_NOT_LAUNCH_SCREEN => $OS_ERROR);
+
+    # read each running session
+    while ( my $session = <$screen> ) {
+        if ( $session =~ /^\s+ (\d+) [.] ([\w-]+) \s+ (?: \( .*? \) \s+ )? \( (Attached|Dead|Detached) /xms ) {
+            $session{$2} = {
+                pid   => $1,
+                name  => $2,
+                state => uc($3),
+            };
+            $session{$1} = $session{$2}
+        }
+    }
+    close $screen;
+
+    return map { $_ => $session{$_} } grep { $_ ne $session{$_}{pid} } keys %session;
+
+}
+
+# runs a ssh-agent protecting screen session
+sub protect {
+    my ($task) = @_;
+    my $protect_dir = "$ENV{HOME}/.devmode_prot";
+    if ( !-d $protect_dir ) {
+        mkdir $protect_dir;
+    }
+
+    my $protect_rc = file $protect_dir, $task;
+    if ( !-f $protect_rc ) {
+        create_task( $task, 'rcprot', $protect_dir );
+    }
+
+    for my $env ( keys %ENV ) {
+        delete $ENV{$env} if $env =~ /ssh/i;
+    }
+    my $cmd = "$SCREEN -S PROT_$task -c $protect_rc";
+    if ($option{test}) {
+        warn $cmd;
+        exit 0;
+    }
+    exec $cmd or error( COULD_NOT_LAUNCH_SCREEN_PROTECTION => $cmd, $OS_ERROR );
+}
+
+sub force_title {
+    my ($task) = @_;
+
+    require Term::Title;
+    Term::Title::set_titlebar(
+        ( $option{short} ? '' : "Devmode " )
+        . ( $option{title_bar} || $task )
+    );
+
+    return;
+}
+
+sub create_task {
+    my ( $task, $template, $out_dir ) = @_;
+
+    require Template;
+    require Template::Provider::FromDATA;
+
+    # Create the provider
+    my $provider = Template::Provider::FromDATA->new({
+        CLASSES => __PACKAGE__,
+    });
+
+    # Add the provider to the config
+    my $tt = Template->new({
+        LOAD_TEMPLATES => [ $provider ],
+        OUTPUT_PATH    => $out_dir,
+    });
+
+    my %data = (
+        cwd     => file('.')->absolute->resolve,
+        devmode => file($0)->absolute->resolve,
+        task    => $task,
+    );
+
+    $tt->process( $template, \%data, lc $task ) or error( COULD_NOT_CREATE_CONFIG => $tt->error() );
+
+    return "$out_dir/$task";
+}
+
+sub auto {
+    my ($type) = @_;
+
+    if ( $type eq 'ssh' ) {
+        my @hosts
+            = map {
+                /(.*?)(?:#.*)?$/;
+                my ($addr, @a) = split /\s+/, $1;
+                @a;
+            }
+            grep {
+                !/^\s*$/ && !/^\s*#/
+            }
+            map {
+                /(.*)\n/;
+                $1 || $_
+            }
+            file('/etc/hosts')->slurp;
+        push @hosts,
+            map {
+                /(?:Host\s*)?(.*)/;
+                $1;
+            }
+            grep {
+                /^Host /
+            }
+            map {
+                /(.*)\n/;
+                $1 || $_
+            }
+            file("$ENV{HOME}/.ssh/config")->slurp;
+        print join ' ', uniq sort @hosts;
+        exit 0;
+    }
+    elsif ( $type eq 'full' ) {
+        my @names;
+        my @running;
+        if ( $option{server} ) {
+            @names = remote_cache($option{server});
+        }
+        else {
+            @names
+                = sort {
+                    my $A = $a;
+                    $A =~ s/(\d+)/sprintf "%05d", $1/egxms;
+                    my $B = $b;
+                    $B =~ s/(\d+)/sprintf "%05d", $1/egxms;
+                    $A cmp $B;
+                }
+                map {
+                    $_->basename
+                }
+                grep {
+                    !/[.]rc$/ && !/^#/
+                }
+                dir($ENV{HOME}, '.devmode')->children;
+            @running = `devmode --list --bw`;
+        }
+
+        if ( @running && !$option{bw} ) {
+            my %running
+                = map {
+                    chomp;
+                    my ($state, $mode) = split /\s+/, $_, 2;
+                    ( $mode => $state );
+                }
+                @running;
+            @names
+                = map {
+                    $running{$_} ? $_ . ( $SUFFIXES{ $running{$_} || '' } || '' ) : $_;
+                }
+                @names;
+        }
+
+        shift @ARGV;
+        my $search = pop @ARGV;
+        if ($search) {
+            @names = grep { /$search/ } @names;
+        }
+
+        print join ' ', @names;
+        exit 0;
+    }
+
+    exit 1;
+}
+
+sub remote_cache {
+    my ($server)   = @_;
+    my $cache      = {};
+    my $cache_file = file('/tmp/devmode_remoter_cache');
+
+    if ( -f $cache_file ) {
+        $cache = LoadFile($cache_file);
+    }
+
+    # check the cache is fresh (1 day)
+    if ( $cache->{$server} && $cache->{$server}{last} > time - 1 * 24 * 60 * 60 ) {
+        return @{ $cache->{$server}{modes} };
+    }
+
+    $cache->{$server}{last} = time;
+    $cache->{$server}{modes}
+        = [
+            grep {
+                !/[.]rc$/ && !/^#/
+            }
+            map {
+                m{^(?:.*/)(.*)};
+                $1
+            }
+            split /\n/,
+            '' . `ssh $option{server} '/bin/ls -1 ~/.devmode/[^.#]*'`
+        ];
+
+    DumpFile($cache_file, $cache);
+
+    return @{ $cache->{$server}{modes} };
+}
+
+sub config {
+    my ($base) = @_;
+    my $base_config = "$HOME/.devmode/$base.rc";
+    my $devmode     = "$HOME/.devmode.rc";
+    my $config      = {};
+
+    if ( -e $base_config ) {
+        $config = eval { LoadFile($base_config) };
+
+        # if no config found and we have an error assume that the file is old
+        # format and try to require it and convert to YAML.
+        if ( !$config && $@ ) {
+            $config = require $base_config;
+            DumpFile($base_config, $config);
+        }
+    }
+
+    if ( -e $devmode ) {
+        $config = { %{ LoadFile($devmode) }, %$config };
+    }
+
+    return $config
+}
+
+=head1 NAME
+
+devmode - Wrapper for GNU screen to manage multiple screenrc files
+
+=head1 VERSION
+
+This documentation refers to devmode version 0.0.8.
+
+=head1 SYNOPSIS
+
+   devmode <task>
+
+ OPTIONS:
+  <task>       The name of a screen config found in the ~/.devmode/ directory
+  -k --kill    Kill the task
+  -l --list    List all running devmode tasks
+  -a --all     Makes --list show even non-running sessions
+  -e --exists  Only run screen if a devmode file exists by that name
+  -x --multiconnect
+               Connect to session with out disconnecting existing session
+  -c --create  Creates a missing devmode task
+  -d --chdir   Parse the config and change directory to the last chdir command
+               found in there.
+  -f --force-title
+               Try harder to set the terminal title
+  -t --template=name
+               Uses this template name for creating the missing task. The
+               default template is rc other templates can be stored in the
+               $HOME/.devmode/templates/ directory
+  -p --protect Run a surrounding screen session to protect the intended
+               session from ssh-agent being lost when logging out of the
+               of box. (experimental 256 colours doesn't work is sub screen)
+  -s --server=str
+               Use a remote server to connect to and run devmode. The server
+               may include username@ to login with a particular user.
+  -S --short   Don't show "Devmode" in the title bar
+
+  -A --auto=str
+               Allows a BASH command line completion mode helper mode to run
+  -T --test    Don't run any external commands
+     --VERSION Prints the version information
+     --help    Prints this help information
+     --man     Prints the full documentation for devmode
+
+=head1 DESCRIPTION
+
+C<devmode> makes managing screen sessions simpler by managing session names
+and configuration files.
+
+C<devmode> configuration files are stored in the $HOME/.devmode/ directory.
+Templates for creating new configuration files can be placed in the directory
+$HOME/.devmode/template/, the default template creates a session that always
+opens to the directory that devmode was run from, it is aimed at working with
+perl packages.
+
+=head2 BASH auto-completion
+
+ _devmode() {
+     local cur prev opts
+     COMPREPLY=()
+     cur="${COMP_WORDS[COMP_CWORD]}"
+     prev="${COMP_WORDS[COMP_CWORD-1]}"
+     opts="--task -t --kill -k --list --ls -l --all -a --exists -e --multiconnect -x --create -c --chdir -d --reconnect -r --force_title -force-title -f --title_bar -title-bar -b --protect -p --short -S --server -s --auto -A --current -C --pre_cmd -pre-cmd --pre --post_cmd -post-cmd --post --test -T --verbose -v --man --help --VERSION"
+     if [[ ${cur} == -* && ${COMP_CWORD} -eq 1 ]]; then
+         COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+     elif [[ ${prev} == -s* ]]; then
+         local hosts=$(devmode --auto ssh)
+         COMPREPLY=($(compgen -W "${hosts}" -- ${cur}))
+     else
+         local sonames=$(devmode --auto full --current ${COMP_CWORD} ${COMP_WORDS[@]})
+         COMPREPLY=($(compgen -W "${sonames}" -- ${cur}))
+     fi
+ }
+ complete -F _devmode devmode
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+The <Cdevmode> program uses 3 different types of configuration files:
+
+=over 4
+
+=item Screen
+
+Stored in C<~/.devmode/[name]> are standard GNU Screen files.
+
+=item mode
+
+Each mode file can have a C,~/.devmode[mode].rc> to change default configuration.
+It is stored in YAML format.
+
+=item global
+
+Stored inC<`/.devmode.rc> sets global defaults.
+It is stored in YAML format.
+
+=back
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com)
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Shannon Wynter - (http://fremnet.net/contact) (original)
+Ivan Wills  - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2007 Shannon Wynter, 2007-2013 Ivan Wills.
+All rights reserved.
+
+=cut
+
+__DATA__
+
+__rc__
+[% TAGS <+ +> -%]
+#
+# Example of a user's .screenrc file
+#
+
+# This is how one can set a reattach password:
+# password ODSJQf.4IJN7E    # "1234"
+
+# no annoying audible bell, please
+vbell off
+
+# detach on hangup
+autodetach on
+
+# don't display the copyright page
+startup_message off
+
+# emulate .logout message
+pow_detach_msg "Screen session of \$LOGNAME \$:cr:\$:nl:ended."
+
+# advertise hardstatus support to $TERMCAP
+# termcapinfo  * '' 'hs:ts=\E_:fs=\E\\:ds=\E_\E\\'
+
+# make the shell in every window a login shell
+#shell -$SHELL
+
+# autoaka testing
+# shellaka '> |tcsh'
+# shellaka '$ |sh'
+
+# set every new windows hardstatus line to somenthing descriptive
+# defhstatus "screen: ^En (^Et)"
+
+defscrollback 5000
+
+# don't kill window after the process died
+# zombie "^["
+zombie kr
+
+
+################
+#
+# xterm tweaks
+#
+
+#xterm understands both im/ic and doesn't have a status line.
+#Note: Do not specify im and ic in the real termcap/info file as
+#some programs (e.g. vi) will not work anymore.
+termcap  xterm hs@:cs=\E[%i%d;%dr:im=\E[4h:ei=\E[4l
+terminfo xterm hs@:cs=\E[%i%p1%d;%p2%dr:im=\E[4h:ei=\E[4l
+
+#80/132 column switching must be enabled for ^AW to work
+#change init sequence to not switch width
+termcapinfo  xterm Z0=\E[?3h:Z1=\E[?3l:is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l
+
+# Make the output buffer large for (fast) xterms.
+termcapinfo xterm* OL=10000
+
+# tell screen that xterm can switch to dark background and has function
+# keys.
+termcapinfo xterm 'VR=\E[?5h:VN=\E[?5l'
+termcapinfo xterm 'k1=\E[11~:k2=\E[12~:k3=\E[13~:k4=\E[14~'
+termcapinfo xterm 'kh=\E[1~:kI=\E[2~:kD=\E[3~:kH=\E[4~:kP=\E[H:kN=\E[6~'
+
+# special xterm hardstatus: use the window title.
+#termcapinfo xterm 'hs:ts=\E]2;:fs=\007:ds=\E]2;screen\007'
+
+#terminfo xterm 'vb=\E[?5h$<200/>\E[?5l'
+termcapinfo xterm 'vi=\E[?25l:ve=\E[34h\E[?25h:vs=\E[34l'
+
+# emulate part of the 'K' charset
+termcapinfo   xterm 'XC=K%,%\E(B,[\304,\\\\\326,]\334,{\344,|\366,}\374,~\337'
+
+# xterm-52 tweaks:
+# - uses background color for delete operations
+termcapinfo xterm ut
+
+################
+#
+# wyse terminals
+#
+
+#wyse-75-42 must have flow control (xo = "terminal uses xon/xoff")
+#essential to have it here, as this is a slow terminal.
+termcapinfo wy75-42 xo:hs@
+
+# New termcap sequences for cursor application mode.
+termcapinfo wy* CS=\E[?1h:CE=\E[?1l:vi=\E[?25l:ve=\E[?25h:VR=\E[?5h:VN=\E[?5l:cb=\E[1K:CD=\E[1J
+
+################
+#
+# other terminals
+#
+
+#make hp700 termcap/info better
+termcapinfo  hp700 'Z0=\E[?3h:Z1=\E[?3l:hs:ts=\E[62"p\E[0$~\E[2$~\E[1$}:fs=\E[0}\E[61"p:ds=\E[62"p\E[1$~\E[61"p:ic@'
+
+# Extend the vt100 desciption by some sequences.
+termcap  vt100* ms:AL=\E[%dL:DL=\E[%dM:UP=\E[%dA:DO=\E[%dB:LE=\E[%dD:RI=\E[%dC
+terminfo vt100* ms:AL=\E[%p1%dL:DL=\E[%p1%dM:UP=\E[%p1%dA:DO=\E[%p1%dB:LE=\E[%p1%dD:RI=\E[%p1%dC
+
+# 256 colour stuff
+# terminfo and termcap for nice 256 color terminal
+# allow bold colors - necessary for some reason
+attrcolor b ".I"
+# tell screen how to set colors. AB = background, AF=foreground
+termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+# erase background with current bg color
+#defbce "on"
+
+
+################
+#
+# keybindings
+#
+
+#remove some stupid / dangerous key bindings
+bind k
+bind ^k
+bind .
+bind ^\
+bind \\
+bind ^h
+bind h
+#make them better
+bind 'K' kill
+bind 'I' login on
+bind 'O' login off
+bind '}' history
+
+# Yet another hack:
+# Prepend/append register [/] to the paste if ^a^] is pressed.
+# This lets me have autoindent mode in vi.
+register [ "\033:se noai\015a"
+register ] "\033:se ai\015a"
+bind ^] paste [.]
+
+################
+#
+# default windows
+#
+
+# screen -t local 0
+# screen -t mail 1 elm
+# screen -t 40 2 rlogin faui40
+
+# caption always "%3 %t%? @%u%?%? [%h]%?"
+# hardstatus alwaysignore
+# hardstatus alwayslastline "%w"
+
+# run any cmds before starting the screen session
+# eg cd via chdir
+# choose a program to run automaticall in that window by appending to the end of the command
+#
+# eg:
+# chdir /var/log/apache
+# screen -t 'logs' 1 tail -f error_log
+#
+chdir <+ cwd +>
+screen -t '> cmds'	1
+screen -t '> cmds'	2
+screen -t '> code'	3
+screen -t '> code'	4 #deep -N10 -fbd data=1 /tmp/<+ task +>_\*.log
+screen -t '> code'	5 itail /www/logs/error.log /www/logs/access.log
+chdir <+ cwd +>/db
+screen -t '> psql'	6
+chdir <+ cwd +>
+screen -t '> root'	7 sudo -s
+#screen -t '> tail'	8
+#screen -t '> code'	9
+#screen -t '> code'	10
+#screen -t '> code'	11
+#screen -t '> code'	12
+#screen -t '> code'	13
+#screen -t '> code'	14
+#screen -t '> code'	15
+#screen -t '> code'	16
+#screen -t '> code'	17
+#screen -t '> code'	18
+#screen -t '> code'	19
+#screen -t '> code'	20
+#screen -t '> code'	21
+#screen -t '> code'	22
+
+# see 'Input Translation' section for key names
+bindkey 0   select 0
+bindkey OP  select 1
+bindkey OQ  select 2
+bindkey OR  select 3
+bindkey OS  select 4
+bindkey -k k5 select 5
+bindkey -k k6 select 6
+bindkey -k k7 select 7
+bindkey -k k8 select 8
+bindkey -k k9 select 9
+bindkey -k k; select 10
+bindkey -k F1 select 11
+bindkey -k F2 select 12
+bindkey 3   select 13
+bindkey 4   select 14
+bindkey 5   select 15
+bindkey 6   select 16
+bindkey 7   select 17
+bindkey 8   select 18
+bindkey 9   select 19
+bindkey 0   select 20
+bindkey 1   select 21
+bindkey 2   select 22
+
+hardstatus on
+hardstatus alwayslastline
+#hardstatus string "%{..k}%-t%{.rK}%n %t%{-}%+w %=%{..K} %H %{..K} %Y-%m-%d %c "
+#hardstatus alwayslastline "%-Lw%{= BW}%50>%n%f* %t%{-}%+Lw%< %=[%c, %D, %d/%m/%y]"
+#hardstatus alwayslastline "%-w%?%F%{.R.}%?%n %t%+w [%H %l] [%0c] [%Y-%m-%d]"
+hardstatus alwayslastline "%{+b}%{.kw}[<+ task +>] %-w%{.kc}%n %t%{-}%+w %=%{b}%H%{d} - %{y}%l%{d} - %{r}%Y-%m-%d %0c"
+#caption always "%{=}%?%{r}%H %L=%{+b}%?%{b}%-Lw%47L>%?%{w}%n*%f %t %?%{b}%+Lw%?%{g}%-31=%c %l %Y-%m-%d"
+
+escape ^Aa
+
+__rcprot__
+[% TAGS <+ +> -%]
+vbell off
+autodetach on
+startup_message off
+pow_detach_msg "Screen session of \$LOGNAME \$:cr:\$:nl:ended."
+defscrollback 0
+termcap  xterm hs@:cs=\E[%i%d;%dr:im=\E[4h:ei=\E[4l
+terminfo xterm hs@:cs=\E[%i%p1%d;%p2%dr:im=\E[4h:ei=\E[4l
+termcapinfo  xterm Z0=\E[?3h:Z1=\E[?3l:is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l
+termcapinfo xterm* OL=10000
+termcapinfo xterm 'VR=\E[?5h:VN=\E[?5l'
+termcapinfo xterm 'k1=\E[11~:k2=\E[12~:k3=\E[13~:k4=\E[14~'
+termcapinfo xterm 'kh=\E[1~:kI=\E[2~:kD=\E[3~:kH=\E[4~:kP=\E[H:kN=\E[6~'
+termcapinfo xterm 'vi=\E[?25l:ve=\E[34h\E[?25h:vs=\E[34l'
+termcapinfo   xterm 'XC=K%,%\E(B,[\304,\\\\\326,]\334,{\344,|\366,}\374,~\337'
+termcapinfo xterm ut
+termcapinfo wy75-42 xo:hs@
+termcapinfo wy* CS=\E[?1h:CE=\E[?1l:vi=\E[?25l:ve=\E[?25h:VR=\E[?5h:VN=\E[?5l:cb=\E[1K:CD=\E[1J
+termcapinfo  hp700 'Z0=\E[?3h:Z1=\E[?3l:hs:ts=\E[62"p\E[0$~\E[2$~\E[1$}:fs=\E[0}\E[61"p:ds=\E[62"p\E[1$~\E[61"p:ic@'
+termcap  vt100* ms:AL=\E[%dL:DL=\E[%dM:UP=\E[%dA:DO=\E[%dB:LE=\E[%dD:RI=\E[%dC
+terminfo vt100* ms:AL=\E[%p1%dL:DL=\E[%p1%dM:UP=\E[%p1%dA:DO=\E[%p1%dB:LE=\E[%p1%dD:RI=\E[%p1%dC
+attrcolor b ".I"
+termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+bind k
+bind ^k
+bind .
+bind ^\
+bind \\
+bind ^h
+bind h
+#make them better
+bind 'K' kill
+bind 'I' login on
+bind 'O' login off
+bind '}' history
+register [ "\033:se noai\015a"
+register ] "\033:se ai\015a"
+bind ^] paste [.]
+escape ^Qq
+
+screen 0 bash -c 'ssh-agent; <+ devmode +> <+ task +>'
+

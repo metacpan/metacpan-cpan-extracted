@@ -1,0 +1,42 @@
+---
+abstract: 'Simple cache for AnyEvent::DNS'
+author:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.4.6, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-DNS-Cache-Simple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  AnyEvent::DNS::Cache::Simple:
+    file: lib/AnyEvent/DNS/Cache/Simple.pm
+    version: 0.01
+requires:
+  AnyEvent: 7.04
+  Cache::Memory::Simple: 1.02
+  List::Util: 0
+  Time::HiRes: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/kazeburo/AnyEvent-DNS-Cache-Simple/issues
+  homepage: https://github.com/kazeburo/AnyEvent-DNS-Cache-Simple
+  repository: git://github.com/kazeburo/AnyEvent-DNS-Cache-Simple.git
+version: 0.01

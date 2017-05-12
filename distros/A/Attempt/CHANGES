@@ -1,0 +1,5 @@
+1.01   Bugfix release to fix bug with the 'method' option due
+       to limitations of Perl's package and SUPER system.  Not
+       caught by 1.00 test suite as problem masked by Test::Exception
+
+1.00   Initial release

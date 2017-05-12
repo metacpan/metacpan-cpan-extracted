@@ -1,0 +1,55 @@
+Revision history for Perl extension Acme::Text::Rhombus.
+
+0.19  2010-05-02  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.18_01  2010-04-29  <schubiger@cpan.org>
+
+ - Validate options and resort to defaults when needed.
+
+ - List options defaults in the documentation.
+
+ - Describe rhombus() with more detail.
+
+ - Document the function as exportable.
+
+ - Reword the abstract.
+
+ - Improve the synopsis.
+
+ - Update broken license link.
+
+ - Remove the testing diagnostic.
+
+ - Minor code enhancements.
+
+ - Adjust some file permissions.
+
+0.18 Tue Jan 15 16:44:21 CET 2008
+
+ - Added basic output test.
+
+ - Beautified documentation.
+
+0.16 Sun Oct 23 17:00:22 CEST 2005
+
+ - Relocated the package to the Acme:: namespace.
+
+ - Made INSTALL a part of the distribution.
+
+0.15 2005/02/23
+
+ - Example output has been added to the docs.
+
+0.1 2004/02/01
+
+ - Minor additions and indentations changes.
+
+0.03 2004/01/15
+
+ - Added example.
+
+0.01 2004/01/15
+
+ - Initial version.

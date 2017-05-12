@@ -1,0 +1,6 @@
+name = "Amazon-CloudFront-SignedURL"
+badges = ["travis"]
+authority="cpan:ZONCOEN"
+
+module_maker="ModuleBuildTiny"
+

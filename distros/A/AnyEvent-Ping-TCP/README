@@ -1,0 +1,52 @@
+AnyEvent-Ping-TCP version 1.01
+==============================
+
+NAME
+
+AnyEvent::Ping::TCP - Asynchronous and Synchronous TCP ping functions.
+
+SYNOPSIS
+
+   use AnyEvent::Ping::TCP;
+
+   # Synchronous TCP Ping
+   my $latency = tcp_ping 'www.google.co.nz', 80;
+
+   # Asynchronous TCP Ping
+   tcp_ping_syn 'www.google.co.nz', 80;
+
+   # Sometime later
+   my $latency = tcp_ping_ack 'www.google.co.nz', 80;
+
+DESCRIPTION
+
+This module provides a very simple implementation of TCP Ping, with both 
+an asynchronous and synchronous interface.
+
+Latency is always returned in milliseconds, and is provided by Time::HiRes
+Socket functionality is provided by AnyEvent::Socket
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+   AnyEvent
+   AnyEvent::Socket
+   Time::HiRes
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Phillip O'Donnell <podonnell@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,44 @@
+[% USE Number.Format %]
+<table id="data-table" class="table table-bordered table-condensed table-hover" width="100%" cellspacing="0">
+  <thead>
+    <tr>
+      <th class="nd_center-cell">Bldg</th>
+      <th class="nd_center-cell">Building</th>
+      <th class="nd_center-cell">Room</th>
+      <th class="nd_center-cell">Jack</th>
+      <th class="nd_center-cell">Port</th>
+      <th class="nd_center-cell">Device</th>
+      <th class="nd_center-cell">Email</th>
+      <th class="nd_center-cell">Remarks</th>
+    </tr>
+  </thead>
+  </tbody>
+    [% FOREACH row IN results %]
+    <tr>
+      <td class="nd_center-cell">[% row.0 %]</td>
+      <td class="nd_center-cell">[% row.1 %]</td>
+      <td class="nd_center-cell">[% row.2 %]</td>
+      <td class="nd_center-cell">[% row.3 %]</td>
+      <td class="nd_center-cell"><a href="[% uri_for('/device') %]?tab=ports&q=[% row.5 %]&f=[% row.4 %]&c_port=on&jacklink=on&c_name=on&c_pvid=on&c_vmember=on&c_neighbors=on&n_ip=on&n_netbios=on&n_ssid=on">[% row.4 %]</a></td>
+      <td class="nd_center-cell"><a href="[% uri_for('/device') %]?tab=ports&q=[% row.5 %]&c_port=on&jacklink=on&c_name=on&c_pvid=on&c_vmember=on&c_neighbors=on&n_ip=on&n_netbios=on&n_ssid=on">[% row.5 %]</a></td>
+      <td class="nd_center-cell">[% row.6 %]</td>
+      <td class="nd_center-cell">[% row.7 %]</td>
+    </tr>
+    [% END %]
+  </tbody>
+</table>
+
+<script>
+$(document).ready(function() {
+  $('#data-table').dataTable({
+    "processing": true,
+    "stateSave": false,
+    "pageLength": [% settings.table_pagesize %],
+    "language": {
+      "search": 'Filter records: '
+    },
+    "order": [[ 2, 'asc' ]],
+  } );
+} );
+</script>
+

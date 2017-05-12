@@ -1,0 +1,98 @@
+{
+   "abstract" : "An AnyEvent compatible module to monitor files/directories for changes",
+   "author" : [
+      "Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-Filesys-Notify",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::Dump" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.87",
+            "Test::Without::Module" : "0",
+            "autodie" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "7.05",
+            "Carp" : "1.20",
+            "Cwd" : "3.40",
+            "Mac::FSEvents" : "0.10",
+            "Moo" : "1.003001",
+            "MooX::Types::MooseLike::Base" : "0.25",
+            "MooX::late" : "0.014",
+            "Path::Iterator::Rule" : "1.005",
+            "Try::Tiny" : "0.18",
+            "namespace::autoclean" : "0.24",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "AnyEvent::Filesys::Notify" : {
+         "file" : "lib/AnyEvent/Filesys/Notify.pm",
+         "version" : "1.21"
+      },
+      "AnyEvent::Filesys::Notify::Event" : {
+         "file" : "lib/AnyEvent/Filesys/Notify/Event.pm",
+         "version" : "1.21"
+      },
+      "AnyEvent::Filesys::Notify::Role::FSEvents" : {
+         "file" : "lib/AnyEvent/Filesys/Notify/Role/FSEvents.pm",
+         "version" : "1.21"
+      },
+      "AnyEvent::Filesys::Notify::Role::Fallback" : {
+         "file" : "lib/AnyEvent/Filesys/Notify/Role/Fallback.pm",
+         "version" : "1.21"
+      },
+      "AnyEvent::Filesys::Notify::Role::Inotify2" : {
+         "file" : "lib/AnyEvent/Filesys/Notify/Role/Inotify2.pm",
+         "version" : "1.21"
+      },
+      "AnyEvent::Filesys::Notify::Role::KQueue" : {
+         "file" : "lib/AnyEvent/Filesys/Notify/Role/KQueue.pm",
+         "version" : "1.21"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/mvgrimes/AnyEvent-Filesys-Notify/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/mvgrimes/AnyEvent-Filesys-Notify"
+      }
+   },
+   "version" : "1.21",
+   "x_contributors" : [
+      "Gasol Wu E<lt>gasol.wu@gmail.comE<gt> who contributed the BSD support for IO::KQueue",
+      "Dave Hayes E<lt>dave@jetcafe.orgE<gt>",
+      "Carsten Wolff E<lt>carsten@wolffcarsten.deE<gt>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

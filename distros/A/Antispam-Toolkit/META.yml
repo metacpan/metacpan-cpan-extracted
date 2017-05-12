@@ -1,0 +1,37 @@
+---
+abstract: 'Classes, roles, and types for use by other Antispam modules'
+author:
+  - 'Dave Rolsky <autarch@urth.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Dist::CheckConflicts: 0.01
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Antispam-Toolkit
+requires:
+  Archive::Zip: 0
+  BerkeleyDB: 0
+  DateTime: 0
+  File::Temp: 0
+  List::AllUtils: 0
+  Moose: 0
+  MooseX::Params::Validate: 0
+  MooseX::StrictConstructor: 0
+  MooseX::Types: 0
+  MooseX::Types::Common: 0
+  MooseX::Types::Path::Class: 0
+  Path::Class: 0
+  autodie: 0
+  namespace::autoclean: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Antispam-Toolkit
+  repository: http://hg.urth.org/hg/Antispam-Toolkit
+version: 0.08
+x_conflicts:
+  Antispam::httpBL: 0.01

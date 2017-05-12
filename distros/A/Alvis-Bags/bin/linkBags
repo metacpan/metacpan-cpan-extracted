@@ -1,0 +1,331 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use POSIX;
+use Encode;
+use Alvis::URLs;
+use IO::Handle; 
+
+###################### CONFIGURATION #####################
+
+#  ensure sort handles UTF8 order
+my $SORTCODE = "LC_ALL=en_US.UTF-8; export LC_ALL;" ;
+
+############ END CONFIGURATION ######################
+
+#  autoflush
+select((select(STDERR), $| = 1)[0]);
+
+# encoding pragmas follow any includes like "use"
+use encoding 'utf8';
+use open ':utf8';
+binmode STDIN, ":utf8";
+binmode STDERR, ":utf8";
+
+#  command line inputs 
+my $gzip = 0;
+my $stem = "";
+my $file = "";
+my $linktext = 0;
+my $titletext = 0;
+my $update = 0;
+
+# shared vars
+my $doccount = 0;
+my $featcount = 0;
+my %featmap = ();        #  maps feature hash to feature index
+my %docfeat = ();        #  true if its a doc/internal link
+
+
+#################################################################
+#
+#  Build routines
+#
+#################################################################
+
+#   discards feature if it doesn't hash to something known
+sub table() {
+  my $tp = $_[0];
+  my $tk = $_[1];
+  my $ft = $_[2];
+  my $code = "$tp $tk";
+  my $h = &Alvis::URLs::easyhash64char($code);
+  if ( $docfeat{$h} ) {
+    if ( $tp eq "link" ) {
+      $ft->{$h} ++;
+    }
+  } elsif ( $featmap{$h} ) { 
+    $ft->{$h} ++;
+  }
+}
+
+#  copied from linkTables.pl, with changes
+sub tabletext() {
+  my $tw = $_[0];
+  my $ft = $_[1];
+  #  strip punctuation
+  $tw =~ s/[!-\/:-@\{\}\|~\[-_\`]+/ /g;
+  #  break at spaces
+  $tw =~ s/\s+/ /g; 
+  $tw =~ s/^\s//; 
+  $tw =~ s/\s$//; 
+  foreach my $k ( split(/\s/,$tw) ) {
+    #  lower case by default
+    $k = lc($k);
+    &table("text",$k,$ft);
+  }
+}
+
+#  Processors the file of links got through filehandle IN.
+#  Output bag to filehandle OUT.
+#  Output a bagged version to make it shorter, but its pretty
+#  complex.
+sub MakeBags() {
+  while (($_=<IN>) ) {
+    chomp();
+    if ( /^D ([^ ]*) ([^ ]*) (.*)$/ ) {
+      my $titles = $3;
+      my %feats = ();
+      if ( $titletext ) {
+	&tabletext($titles);
+      }
+      #   now process links
+      for ( $_=<IN>,chomp(); $_ ne "EOD" && $_ ne "EOL";
+	    $_=<IN>,chomp() ) {
+	my $link = $_;
+	$link =~ s/ .*//;
+	# print STDERR "LINK: $link $_\n";
+	$link = &Alvis::URLs::StandardURL($link);
+	&table("link",$link,\%feats);
+	if ( $linktext && /^([^ ]+) (.*)$/ ) {
+	  &tabletext($2,\%feats);
+	}
+      }
+      if ( $_ eq "EOL" ) {
+	#   now process tokens
+	for ( $_=<IN>,chomp(); $_ ne "EOD";
+	      $_=<IN>,chomp() ) {
+	  if ( /^([^ ]+) (.*)$/ ) {
+	    if ( $1 eq "text" ) {
+	      &tabletext($2,\%feats);
+	    } else {
+	      &table($1,$2,\%feats);
+	    }
+	  }
+	}
+      }
+      #   now print the constructed record
+      my $entries = 0;
+      foreach my $k ( keys(%feats) ) {
+	$entries++;
+      }
+      print OUT "$entries";
+      foreach my $k ( keys(%feats) ) {
+	print OUT " $featmap{$k} $feats{$k}";
+      }
+      print OUT "\n";
+    }
+  }
+}
+
+
+#################################################################
+#
+#  Load routines
+#
+#################################################################
+
+
+#  Load up symbol table info.
+#      $doccount, $featcount
+#      %featmap  (hashcode to feature number map)
+sub LoadTables() {
+  open(FEATS,"<$stem.words");
+  #  load up the mappings, precomputed
+  %featmap = ();
+  $featcount = 0;
+  while ( ($_=<FEATS>) ) {
+    chomp();
+    my @a = split();
+    $featmap{$a[2]} = $a[0];
+    if ( $a[1] eq "doc" ) {
+      $docfeat{$a[2]} = 1;
+    }
+    $featcount ++;
+  }
+  close(FEATS);
+
+  print STDERR "Loading feature map, size = " . %featmap . ".\n";
+  print STDERR "Loading document map, size = " . %docfeat . ".\n";
+  
+  open(PAR,"grep '^maxdoc=' $stem.srcpar |");
+  my $par = <PAR>;
+  chomp($par);
+  close(PAR);
+  $par =~ s/.*=//;
+  $doccount = int($par);
+  print STDERR "Loaded $stem with $doccount docs and $featcount features\n";
+}
+
+
+#################################################################
+#
+#  Run
+#
+#################################################################
+
+GetOptions(
+     'man'       => sub {pod2usage(-exitstatus => 0, -verbose => 2)},
+      'update' => \$update,
+      'linktext' => \$linktext,
+      'titletext' => \$titletext,
+      'noclean' => \$Alvis::URLs::noclean,
+      'nocase' => \$Alvis::URLs::nocase,
+      'gzip'      => \$gzip,
+      'h|help'       => sub {pod2usage(1)}
+);
+
+pod2usage(-message => "ERROR: need input file and stem")
+      if ( $#ARGV != 1 );
+
+$file = shift();
+$stem = shift();
+
+print STDERR "\nNow build the document text bag file\n";
+print STDERR "======================================\n";
+&LoadTables();
+
+my $tfile = "$stem.txtbag";
+if ( -f "$stem.txtbag" ) {
+  open(OUT,">>$tfile");
+} else {
+  open(OUT,">$tfile");
+  #  first time write header, correct it later
+  printf OUT "%8d\n%8d\n", $doccount, $featcount;
+}
+#  bags generated with the document number to assist sorting;
+#  sorts the bags prior to saving, and cut out the document number
+open(IN,"<$file");
+&MakeBags(); 
+close(IN); 
+close(OUT); 
+#  we want to write to the front of the file,
+#  without destroying rest of contents, this open does it
+sysopen(OUT, $tfile, O_RDWR) or die "Cannot reopen $tfile: $!";
+my $oldfh = select(OUT); $| = 1; select($oldfh);
+#  now, rewrite header
+print OUT sprintf("%8d\n%8d\n", $doccount, $featcount);
+close(OUT); 
+
+print STDERR "\nNow build the document bags with mpdata\n";
+print STDERR "=========================================\n";
+open(OUT,">$stem.cnf");
+print OUT "#\nindexdensity=10\ninput=\"$stem.txtbag\"\nbaggedinput\n";
+if ( $update ) {
+  print OUT "update\n";
+}
+close(OUT);
+system("mpdata $stem");
+if ( ( $? >> 8) == 1 ) {
+  print STDERR "mpdata error, status: " . ( $? >> 8) . "\n";
+  exit(1);
+}
+if ( $gzip ) {
+	system("gzip $stem.txtbag");
+}	
+
+exit 0;
+
+__END__
+
+=head1 NAME
+    
+linkBags - input file of links and tokens for document set, 
+plus tables generated with 
+I<linkTables>, to produce forward bags.
+
+=head1 SYNOPSIS
+    
+linkBags [--linktext|--nocase|--noclean|--titletext|--update] LINK-FILE STEM
+
+Options:
+
+    LINK-FILE           Filename for input link file usually created by XSL.
+    STEM                Stem for output file, severl extensions read and made.
+    --linktext          add link text to the bag
+    --nocase            set nocase flag in Alvis::URLs
+    --noclean           set noclean flag in Alvis::URLs
+    --titletext         add title text to the bag
+    --update            indicate to the output config file that this is an update
+    -h, --help          display help message and exit.
+     --man              print man page and exit.
+
+=head1 DESCRIPTION
+
+This package works in conjunction with an XSL script which is used to
+generate a text file giving URL+title+link+tag information for the input XML
+files.  Use name '-' to input stdin.  The final output files are created
+when the MPCA 
+I<mpdata>(1) utility is called.
+
+Input file of links and tags is assumed to be in UTF-8 encoding
+in the format given in 
+I<linkTables>(1).
+Separate
+tables (
+F<STEM.words>, 
+F<STEM.docs>, 
+F<STEM.docmap>) have previously been
+made by running
+I<linkTables>(1).  The linktext, nocase, noclean and titletext flags should
+be the same as those used.
+
+If redirects exist in the links file, process them out first using
+the 
+I<linkRedir>(1) script.  Code assumes that collection is small enough so
+that all required hash tables fit into memory. 
+
+Output files in form STEM.EXT, for EXT one of:
+    .txtbag[.gz] : constructed input text bag for mpdata
+    .bag, .cnf, .iinx, .par : usual output of mpdata
+
+See 
+I<mpdata>(1) for detail of these formats.
+
+=head1 SEE ALSO
+
+I<Alvis::URLs>(3), 
+I<linkMpca>(1), 
+I<linkRedir>(1), 
+I<linkTables>(1), 
+I<mpdata>(1).
+
+MPCA website is 
+F<http://www.componentanalysis.org>
+
+=head1 AUTHOR
+
+Wray Buntine
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2006 Wray Buntine
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+=cut

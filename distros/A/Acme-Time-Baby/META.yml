@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               Acme-Time-Baby
+version:            2010090301
+abstract:           Tell time little children can understand
+author:
+    - Abigail <acme-time-baby@abigail.be>
+license:            mit
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    perl:      5.006
+    strict:    0
+    vars:      0
+    warnings:  0
+resources:
+    repository:  git://github.com/Abigail/acme--time--baby.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+keywords:
+    - Time
+    - Clock
+test_requires:
+    Test:        0
+    Test::More:  0

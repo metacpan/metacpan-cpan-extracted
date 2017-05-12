@@ -1,0 +1,215 @@
+NAME
+    Audio::Ofa::Util - Retrieve audio fingerprints and metadata for unknown
+    audio files
+
+SYNOPSIS
+    This module tries to make retrieving audio fingerprints and metadata for
+    unknown audio files as easy as possible. It interfaces with the modules
+    Audio::Ofa and WebService::MusicBrainz, provides a simple LWP based
+    interface to the MusicDNS library, and can make use of
+    Audio::Extract::PCM to read some popular music formats.
+
+    The most comprehensive way to use this is to start with a (possibly
+    untagged) file name and get full metadata:
+
+        my $util = Audio::Ofa::Util->new(filename => 'song.ogg');
+        my @tracks = $util->musicbrainz_lookup or die $util->error;
+        for (@tracks) {
+            print 'Artist: ', $_->artist, "\n";
+            print 'Title:  ', $_->title, "\n";
+            print 'Track:  ', $_->track, "\n";
+            print 'Album:  ', $_->album, "\n\n";
+        }
+
+    To create an audio fingerprint:
+
+        my $util = Audio::Ofa::Util->new(filename => 'song.ogg');
+        $util->analyze_file or die $util->error;
+        print $util->fingerprint, "\n";
+
+    To create a fingerprint and look it up at MusicDNS:
+
+        my $util = Audio::Ofa::Util->new(filename => 'song.ogg');
+        $util->musicdns_lookup or die $util->error; # calls analyze_file implicitly
+        print $util->artist, ' - ', $util->title, "\n";
+
+    To look up a known fingerprint at MusicDNS (you need the length of the
+    song, too):
+
+        my $util = Audio::Ofa::Util->new(fingerprint => $fp, duration => $millisecs);
+
+    The overall process goes like this:
+
+    *       We create an audio fingerprint, which stores some
+            characteristics of a recording in a rather small amount of data.
+            This is what libofa (and the Perl binding in Audio::Ofa) does.
+            This module (Audio::Ofa::Util) faciliates this with
+            "analyze_file" by allowing to fingerprint some widely used music
+            formats and storing the results so they can be used for the next
+            steps:
+
+    *       The audio fingerprint is submitted to the MusicDNS web service.
+            Using a proprietary fuzzy algorithm and their database, they
+            determine which song we have at hand. MusicDNS returns some
+            metadeta: The artist, the song title, and a PUID. This "portable
+            unique identifier" is an arbitrary index into their database and
+            is unique for every recording of a given song.
+
+            Note that while libofa's audio fingerprints may change after
+            transformations of a recording (such as lossy audio compression
+            or radio transmission), the fuzzy algorithm will (ideally) still
+            find the same PUID.
+
+    *       Because we usually want to know more than the artist and title,
+            we look up the PUID in a second Web Database called MusicBrainz.
+            It provides us with all desired metadata such as all the albums
+            the song has appeared on in this particular version, and the
+            respective track numbers.
+
+            This module provides a basic MusicBrainz PUID lookup through
+            "musicbrainz_lookup". If you want to know even more (such as
+            members of the band and the previous bands of those members),
+            you can use WebService::MusicBrainz, to which this module
+            provides an easy frontend.
+
+ACCESSORS
+  filename
+    See "analyze_file".
+
+  fingerprint, duration
+    See "analyze_file" and "musicdns_lookup".
+
+  client_id, client_version, metadata, bitrate, extension, artist, title,
+album, track, genre, year, puids
+    See "musicdns_lookup".
+
+    Note that puids accesses an array reference. If it is not defined or not
+    set, it means that no PUID has been looked up yet. If it is an empty
+    array, it means that no PUIDs were found.
+
+  error
+    Description of the last error that happened.
+
+METHODS
+  new
+    Constructor. Accepts key-value pairs as initializers for all of the
+    fields, c.f. "ACCESSORS", but currently only the following calls make
+    sense:
+
+        Audio::Ofa::Util->new(filename => $filename);
+        Audio::Ofa::Util->new(fingerprint => $fp, duration => $dur);
+        Audio::Ofa::Util->new(puid => $puid);
+
+  analyze_file
+    This creates an Audio Fingerprint of a sound file. The audio file is
+    read using Audio::Extract::PCM, which currently uses the extarnal "sox"
+    program and supports encodings such as MP3, Ogg/Vorbis and many others.
+
+    You must set "filename" before calling this method.
+
+    The fingerprint is calculated by "ofa_create_print" in Audio::Ofa, and
+    the "fingerprint" field of the object will be set. Additionally, the
+    "duration" (in milliseconds) and the "extension" will be set to the
+    values provided by the file name.
+
+    In case of an error, an empty list is returned and the error message can
+    be retrieved via "error". Otherwise, a true value will be returned.
+
+  musicdns_lookup
+    This looks up a track at the MusicDNS web service.
+
+    To do a fingerprint lookup, the keys "fingerprint" and "duration" must
+    be present, where duration is the length of the song in milli seconds.
+    Additionally, the following fields (defaults in parentheses) will be
+    sent to the MusicDNS service:
+
+    client_id (hardcoded client id), client_version (module name and
+    version), fingerprint, metadata (1), bitrate (0), extension ("unknown"),
+    duration, artist ("unknown"), title ("unknown"), album ("unknown"),
+    track (0), genre ("unknown"), year (0).
+
+    To do a fingerprint lookup, "fingerprint" and "duration" must have been
+    set (can be given to "new"), where "duration" is the song length in
+    milli seconds.
+
+    If "fingerprint" hasn't been set, "analyze_file" is called implicitly.
+
+    client_id defaults to a hard-coded Client ID. You can get your own from
+    http://www.musicip.com.
+
+    You should set as much of the above-mentioned metadata (like artist,
+    etc.) as you have available, because the MusicDNS terms of service
+    require this in order to help clean errors in their database.
+
+    In the case of an error, "musicdns_lookup" returns an empty list and the
+    error message can be retrieved with the "error" method.
+
+    In the case of success, "musicdns_lookup" sets the fields "puids" to the
+    found PUIDs, and sets the fields "artist" and "title" to the first of
+    the found values, and returns a true value. In list context, it returns
+    a list of objects which have "artist", "title" and "puid" methods.
+
+  musicbrainz_lookup
+    This looks up a PUID at MusicBrainz. The PUID can come from a call to
+    "musicdns_lookup". In fact this is implicitly done if there is no PUID
+    stored in the object (cf. "SYNOPSIS").
+
+    This returns a list of WebService::MusicBrainz::Response::Track objects
+    on success, or the first of them in scalar context. Otherwise it returns
+    an empty list and the error message can be retrieved via the "error"
+    method.
+
+    This method returns a list of tracks or the first track in scalar
+    context. The tracks are represented as objects that are guaranteed to
+    have the methods "artist", "title", "album", "track" and "wsres", where
+    the latter is an WebService::MusicBrainz::Response::Track object, and
+    the four former return values that have been retrieved from that object
+    for your convenience.
+
+    In the case of an error, an empty list is returned and the error can be
+    returned via the "error" method.
+
+SEE ALSO
+    *       MusicBrainz::Client - A client for the old MusicBrainz web
+            service
+
+    *       MusicBrainz::TRM - Obsolete TRM-based audio fingerprinting
+            library
+
+    *       tunepimp - C library which does pretty much everything that this
+            module does. It even includes Perl bindings, but as of this
+            writing, they don't compile in the current tunepimp version and
+            only support the old TRM fingerprints.
+
+    *       <http://www.musicdns.org> - Web site of the MusicDNS web service
+            as provided by MusicIP
+
+    *       <http://www.musicbrainz.org> - Web site of MusicBrainz
+
+    *       <http://wiki.musicbrainz.org/HowPUIDsWork> - How PUIDs work
+
+LICENSE
+    This module is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License (GPL) as published by
+    the Free Software Foundation (http://www.fsf.org/); either version 2 of
+    the License, or (at your option) any later version.
+
+    The GPL, which is quite restrictive (when compared to LGPL or Artistic),
+    seems to be necessary because of libofa's licenses, but IANAL and if you
+    need a license change please contact me.
+
+    Please note that in addition to the license which allows you to use this
+    software, the MusicDNS web service has its own terms of service. The
+    most important fact is that you can use it for free unless you use it
+    commercially. See <http://www.musicdns.org> for more information. You
+    are encouraged to register your own client id (for free) if you build a
+    client on top of this module.
+
+AUTHOR
+    Christoph Bussenius (pepe at cpan.org)
+
+    Please mention the module's name in the subject of your mails so that
+    they will not be lost in the spam.
+
+    If you find this module useful I'll be glad if you drop me a note.
+

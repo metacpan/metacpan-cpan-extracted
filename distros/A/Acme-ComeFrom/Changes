@@ -1,0 +1,18 @@
+[Changes for 0.11 - 2007-10-15]
+
+* Correct test counts for Perl versions earlier than 5.7.
+
+[Changes for 0.10 - 2007-10-14]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the permissive "MIT" license.
+
+* Line numbers are now preserved after filtering.
+
+* The unit test no longer breaks under recent versions of Filter::Simple.
+
+* Tidied up source code, test files, and this changelog.
+
+[Changes for 0.07 - 2003-11-08]
+
+* Switch build infrastructure to Module::Install.

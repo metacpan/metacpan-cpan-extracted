@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+# Tests cmd_new()'s get_mirrors() subroutine that uses Term::UI to ask the user
+# questions. This "test script" is called by t/bin-fetchware-new.t's using
+# Test::Expect, if its optionally installed. And Test::Expect answer's the
+# questsions that this script asks thereby testing get_mirrors() Q&A interface.
+
+use Test::More;
+use Test::Builder;
+use Term::ReadLine;
+
+use App::Fetchware 'get_mirrors';
+
+my $current_file_list =
+[
+    [ 'CURRENT-IS-2.2.21', '999910051831' ],
+    [ 'httpd-2.2.21-win32-src.zip', '999909121702' ],
+    [ 'httpd-2.2.21-win32-src.zip.asc', '999909121702' ],
+    [ 'httpd-2.2.21.tar.bz2', '999909121702' ],
+    [ 'httpd-2.2.21.tar.bz2.asc', '999909121702' ],
+    [ 'httpd-2.2.21.tar.gz', '999909121702' ],
+    [ 'httpd-2.2.21.tar.gz.asc', '999909121702' ],
+];
+
+my $term = Term::ReadLine->new('testing fetchware new');
+
+my $mirrors_hashref = get_mirrors($term, $current_file_list);
+
+# Ensure all keys are 'mirror'.
+ok(exists $mirrors_hashref->{mirror}, 'checked get_mirrors() key success.');
+
+# And all values are URLs.
+# Support checking a arrayref of values if the user or Test::Expect provides
+# one.
+if (ref $mirrors_hashref->{mirror} eq 'ARRAY') {
+    for my $mirror (@{$mirrors_hashref->{mirror}}) {
+        like($mirror, qr!(ftp|http|file)://!ms,
+            "checked get_mirrors($mirror) success.");
+    }
+} else {
+    like($mirrors_hashref->{mirror}, qr!(ftp|http|file)://!ms,
+        'checked get_mirrors($mirror) success.');
+}
+
+# Spit out # of tests run.
+done_testing();
+
+# Print a bogus "prompt" to keep Expect from freaking out, because it presumes
+# the prompt works like it does in a shell, but fetchware new is not a shell.
+print "Bogus shell: \n";
+
+# Because we're in a child process not the same one that is running the main
+# test suite, if any tests fail this failure will not be reported back to our
+# caller. So, we use Test::Builder to check if our tests have passed, and if
+# they have we do nothing and return succes, but if not we throw an exception.
+my $test = Test::Builder->new();
+unless ($test->is_passing()) {
+    diag explain \[$test->details()];
+    die <<EOD;
+get_mirrors test file for testing get_mirrors() using Test::Expect has failed!
+The details() method of this process's Test::Builder object should have been
+printed above to help you figure out what went wrong.
+EOD
+}

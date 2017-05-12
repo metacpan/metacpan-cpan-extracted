@@ -1,0 +1,72 @@
+Revision history for Perl extension Apache2::AuthEnv
+
+1.3.8 April 2011
+        - Use Memoize to cache the database file lookup, to speed access
+          on subsequence requests.
+
+1.3.7 March 2011
+        - Set verion number to v1.3.7 as this allows CPAN to update the
+          module correctly.
+	- Incorporate Apache2::ServerRec::warn for logging.
+        - Add AuthEnvLogDebug directive for debugging.
+        - Restrict AuthEnvUser and AuthEnvVar to directory, location and
+          .htaccess files only.
+	- Deal with taint checks.
+	- No longer need "PerlOptions +GlobalRequest" in perl.conf
+
+1.3.6 March 2011
+        - Fix bug that disallowed directives to be specified in
+          httpd.conf files. Reported by John Ostuni, Giovanni Torres,
+          NIH/NINDS)
+
+	- Allow fixed user names but still issue warning.
+
+1.3.5 January 2011
+	- Expand %{} in the regular expressions for AuthEnv.*Match
+
+1.3.4 December 2010
+        - Change undefined ENV variable to empty strings. This will stop
+          authorization denials due to undefined var. To disallow empty
+          variables should be done explicitly.
+        - Added AuthEnvLogInfo directive to reduce logging.
+        - Added the config file and line number for allowed and
+          denied messages.
+
+1.3.3 April 2009
+        Added support for loading extra ENV data from database via the
+        AuthEnvDbImport directive.
+
+1.3.2 June 2009
+        Extra errors to help pinpoint auth failure issues with
+        .htaccess rules.
+
+1.3.1 June 2009
+        Fixed a bug in the environment expansion whereby a final
+        empty default is ignored and mangles the last environment
+        variable name.
+
+1.3 April 2009
+	- Re-engineered the expansion to allow for
+		%{VAR1|VAR2|VAR3:default}
+	  and to use common code.
+        - Added AuthEnvAllowAll, AuthEnvDenyAll, AuthEnvAllowFile and
+          AuthEnvDenyFile directives.
+
+1.2 Jan 2009
+	- Documentation changes.
+
+1.1 June 2008
+	- Changed AuthEnvVar to AuthEnvUser.
+	- Added AuthEnvChange directive.
+        - Changes internals to respect order of AuthEnvSet and
+          AuthEnvChange directives.
+
+1.0 May 2008
+	- Added config merging and AuthEnv*Split* directives.
+
+0.9 April 2008
+	- Put into production use with slight modification.
+
+0.8 March 2008
+	- Initial module built and tested
+

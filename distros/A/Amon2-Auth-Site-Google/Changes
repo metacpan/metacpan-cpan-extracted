@@ -1,0 +1,16 @@
+Revision history for Perl extension Amon2-Auth-Site-Google
+
+0.04 2014-11-26T09:48:47Z
+    - fix pod
+
+0.03 2013-06-17T01:59:34Z
+
+    - change Mouse from Moose
+
+0.02 2013-06-16T06:52:45Z
+    - fix pod
+
+0.01 2013-06-16T06:42:26Z
+
+    - original version
+

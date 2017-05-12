@@ -1,0 +1,10 @@
+Revision history for Perl extension Anansi::Library.
+
+0.01  Sat Apr 20 03:10:24 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Anansi::Library
+0.02  Wed May 15 00:36:49 2013
+	- Added "abstractClosure" subroutine.
+	- Added "abstractObject" subroutine.
+0.03  Wed May 15 00:36:49 2013
+	- modified the POD to reflect more concise examples and include method parameter.

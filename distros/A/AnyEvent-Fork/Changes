@@ -1,0 +1,82 @@
+
+TODO: keeping fork objects around after run - problems?
+TODO: many forks in a row fail to fork all
+TODO: $AnyEvent::Fork::Template vs. $TEMPLATE
+TODO: $AnyEvent::Fork::Serve::OWNER expose somehow?
+
+1.31 Thu Nov 10 17:30:45 CET 2016
+	- new child API function, AnyEvent::Fork::Serve::run_args.
+	- put pid first in child names.
+
+1.3  Thu May 12 18:53:37 CEST 2016
+	- the full path to the perl binary is now being passed as argv[0].
+	- talk a bit about using AnyEvent::Fork itself after a fork.
+	- work around perl 5.19 again breaking backwards compatibility.
+        - pod fixes.
+
+1.2  Wed Sep 25 13:05:09 CEST 2013
+	- ->fork would not clone, but erase the arguments in the parent
+          (analyzed by Christopher Paulicka).
+	- mention AnyEvent::Fork::Remote, and how to be compatible to it
+          in the description of the run method.
+        - AnyEvent::Fork now sets a child watcher for direct children.
+        - clarify that one might need to set a child watcher.
+        - explicitly call exit on eof in children, to hide(!) win32 perl
+          bugs. at least the test suite doesn't complain anymore, but
+          the bug is doubtlessly still there.
+
+1.1  Sun Apr 28 15:47:38 CEST 2013
+	- (hopefully) remove dependency on common::sense in child code.
+        - make dependency on IO::FDPass dynamic in child code.
+        - actually open "communications socket" for reading AND writing
+          in the child (this does not normally bother syswrite).
+	- allow perl path overriding in new_exec.
+
+1.0  Sun Apr 21 14:05:33 CEST 2013
+	- implement new_from_fh and to_fh, for easy passing of
+          fork objects among processes (EXPERIMENTAL!).
+        - sabotage the fork object on run or to_fh.
+        - expliticly call exit in child server - not elegant, but
+          doesn't disturb any sane perl, and helps broken win32 perls
+          to clean up.
+        - the write watcher wasn't disabled on write errors.
+
+0.7  Thu Apr 18 22:16:26 CEST 2013
+	- only set SIGCHLD to IGNORE while serving requests, reset
+          it to the previous value after ->run.
+        - minor docpatches.
+        - mention AnyEvent::Fork::RPC, but not yte AnyEvent::Fork::Pool.
+
+0.6  Sun Apr  7 00:41:30 CEST 2013
+	- this release mostly updates the documentation.
+	- add fork+exec replacement example to SYNOPSIS.
+        - clarify some eval and run documentation.
+        - defuse the documentation a bit - split synopsis into
+          an example section, and rewor the problem statement.
+
+0.5   Sat Apr  6 05:30:03 CEST 2013
+	- set $SIG{CHLD} to IGNORE in processes forked to avoid
+          accumulating zombies.
+        - added "typical problems" section.
+        - add some unscientific benchmark numbers to indicate relative
+          performance.
+        - post-benchmark socket writing optimisations :) (fewer syscalls,
+          do more than one write per event loop iteration).
+
+0.2   Fri Apr  5 21:07:59 CEST 2013
+	- INCOMPATIBLE CHANGE: AnyEvent::Fork::Template no longer exports
+          anything and has renamed the variable.
+	- do not leak the internal watcher as return value from run.
+        - set $0 to run function name, tune existing $0 names as well.
+        - work around a bug in openbsd file descriptor passing on at least
+          4.5 and 4.8. might introduce a security problem on that platform.
+        - switch to the new IO::FDPass module, which also fixes a bug
+          with setting non-blocking mode and gives other improvements.
+        - no longer an XS module.
+
+0.01  Thu Apr  4 09:23:33 CEST 2013
+	- "technology preview".
+
+0.00  Fri Mar 29 02:15:20 CET 2013
+	- post planning, pre writing.
+

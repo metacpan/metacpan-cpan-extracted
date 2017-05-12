@@ -1,0 +1,53 @@
+<%args>
+$schema
+$table
+$unique => 0
+$fulltext => 0
+$function => ''
+@columns
+@prefixes => ()
+</%args>
+
+<%init>
+my ($s, $t);
+eval
+{
+    $s = Alzabo::Create::Schema->load_from_file( name => $schema );
+
+    $t = $s->table($table);
+
+    my @cols = ( map { { column => $t->column( $columns[$_] ),
+		         $prefixes[$_] ? ( prefix => $prefixes[$_] ) : () } }
+		 0..$#columns );
+
+    @cols = sort { $ARGS{ $a->{column}->name . '_order' } <=> $ARGS{ $b->{column}->name . '_order' } } @cols;
+
+    undef $function unless length $function;
+
+    $t->make_index( columns => \@cols,
+		    unique => $unique,
+		    fulltext => $fulltext,
+                    Alzabo::Index->can('function') ? ( function => $function ) : (),
+		  );
+
+    $s->save_to_file;
+};
+
+my $e = $@;
+
+$m->comp( 'handle_rules_exception', e => $e, comp => 'add_index_1', %ARGS );
+
+$m->comp( 'exception', $e ) if $e;
+
+$m->redirect( uri( path => 'view_table_other' . Alzabo::GUI::Mason::Config::mason_extension(),
+                   query => { schema => $s->name,
+                              table  => $t->name,
+                            },
+                 ),
+            );
+
+</%init>
+
+<%flags>
+inherit => 'syshandler'
+</%flags>

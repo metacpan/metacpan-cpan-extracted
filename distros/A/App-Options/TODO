@@ -1,0 +1,39 @@
+x######################################################################
+## File: $Id: TODO 14348 2010-08-28 21:37:13Z spadkins $
+######################################################################
+
+TODO
+
+ o Implement {security_policy_level} variable
+ o "secure" attribute (to ensure that passwords are only stored in files not
+   readable by "world", and never in %ENV)
+
+ o Support "-f <file>" format of options (single-letter includes an arg
+ o enforce other option parsing rules (single letter + arg, single/double dash)
+ o option aliases/synonyms/alternates (i.e. -s = --silent)
+
+ o "strict" option:
+       0 = no strictness
+       1 = unknown cmd line options cause error (file can define options),
+       2 = [1] + silently don't include env+file options not defined by program
+       3 = [1+2] + unknown cmd line options cause error (program only can define options)
+       4 = [1+2+3] + file options not defined by program cause errors
+
+These items are what will be required to go to the next release to CPAN
+ o Get the documentation to match the new organization of the code
+ o [no more critical items]
+
+These are other interesting things which I might do
+ o Create a sample subclassing distribution (i.e. App::Options::YAML)
+ o make --debug_options=9 even more readable
+ o improve ease-of-use (enhanced help display) for more advanced features (i.e. debug_options=9)
+ o clean up use of --version_modules (when to show all)
+ o incorporate LWP::UserAgent->get() as a standard way to get a conf
+ o VERSION option in program sets the $main::VERSION
+ o make lots more tests (starting with the examples in the documentation)
+ o make example scripts (starting with the examples in the documentation)
+ o consider ISO std datetimes: T instead of space, Z suffix, timezone suffix
+ o write "prefix.pod"
+ o try use lib "dir"; instead of unshift(@INC,"dir") (interaction with "arch")
+ o consider checking the PERL5LIB variable under -T
+

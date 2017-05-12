@@ -1,0 +1,1906 @@
+We will perhaps eventually be writing only small modules which are identified
+by name as they are used to build larger ones, so that devices like
+indentation, rather than delimiters, might become feasible for expressing local
+structure in the source language.
+      -- Donald E. Knuth, "Structured Programming with goto Statements",
+         Computing Surveys, Vol 6 No 4, Dec. 1974
+
+Python's syntax succeeds in combining the mistakes of Lisp and Fortran. I do
+not construe that as progress.
+      -- Larry Wall, May 12 2004
+
+    Some rejected alternate names for "Monty Python's Flying Circus":
+    1 2 3 / It's Them! / Arthur Megapode's Flying Circus / The Horrible Earnest
+Megapode / The Panic Show / The Plastic Mac Show / Ow! It's Colin Plint! /
+Vaseline Review / Vaseline Parade / The Keen Show / Brian's Flying Circus / The
+Year of the Stoat / Cynthia Fellatio's Flying Circus / Owl Stretching Time /
+The Whizzo Easishow! (Guaranteed to last 1/2 hour! Money back if not!)
+      -- From Kim "Howard" Johnson's _Life Before and After Monty Python_.
+         It's interesting to contemplate what Python would have been called
+         if one of these names had been chosen.
+
+Anybody else on the list got an opinion? Should I change the language or not?
+      -- Guido van Rossum, 28 Dec 1991
+
+in-any-case-the-best-christmas-present-i-got-today!-ly y'rs - tim
+      -- Tim Peters, 29 Dec 1991 [First occurrence of Tim Peters's long-
+         phrase-ly idiom.]
+
+but-i'm-not-even-motivated-enough-to-finish-this-sig-
+      -- Tim Peters, 20 Dec 2000
+
+Ha -- you have done me the favor of underestimating my ignorance <smile>.
+      -- Tim Peters, 30 Dec 1991
+
+I prefer (all things being equal) regularity/orthogonality and logical
+syntax/semantics in a language because there is less to have to remember. (Of
+course I *know* all things are NEVER really equal!)
+      -- Guido van Rossum, 6 Dec 1991
+
+The details of that silly code are irrelevant.
+      -- Tim Peters, 4 Mar 1992
+
+Frankly, I'd rather not try to compete with Perl in the areas where Perl is
+best -- it's a battle that's impossible to win, and I don't think it is a good
+idea to strive for the number of obscure options and shortcuts that Perl has
+acquired through the years.
+      -- Guido van Rossum, 7 Jul 1992
+
+Python is a truly wonderful language. When somebody comes up with a good idea
+it takes about 1 minute and five lines to program something that almost does
+what you want. Then it takes only an hour to extend the script to 300 lines,
+after which it still does almost what you want.
+      -- Jack Jansen, 8 Jul 1992
+
+If you have a browser from CERN's WWW project (World-Wide Web, a distributed
+hypertext system) you can browse a WWW hypertext version of the manual...
+      -- Guido van Rossum, 19 Nov 1992 [First mention of the Web on python-
+         list.]
+
+Just a success note for Guido and the list: Python 0.9.9, stdwin, readline,
+gmp, and md5 all go up on linux 0.99 pl11 without much problems.
+      -- Allan Bailey, 2 Aug 1993 [First mention of Linux on python-list.]
+
+Rule: "You shouldn't have to open up a black box and take it apart to find out
+you've been pushing the wrong buttons!" Corollary: "Every black box should have
+at least TWO blinking lights: "Paper Jam" and "Service Required" (or
+equivalent)."
+      -- Steven D. Majewski, 9 Sep 1993
+
+We've been through a couple of syntax changes, but I have sort of assumed that
+by the time we get to version 1.0 release, the language, (if not the
+implementation) will essentially be stable.
+      -- Steven D. Majewski, 14 Sep 1993
+
+"Python tricks" is a tough one, cuz the language is so clean. E.g., C makes an
+art of confusing pointers with arrays and strings, which leads to lotsa neat
+pointer tricks; APL mistakes everything for an array, leading to neat
+one-liners; and Perl confuses everything period, making each line a joyous
+adventure <wink>.
+      -- Tim Peters, 16 Sep 1993
+
+I've seen Python criticized as "ugly" precisely because it *doesn't* have a
+trick-based view of the world. In many ways, it's a dull language, borrowing
+solid old concepts from many other languages & styles: boring syntax,
+unsurprising semantics, few automatic coercions, etc etc. But that's one of the
+things I like about it.
+      -- Tim Peters, 16 Sep 1993
+
+One of the things that makes it interesting, is exactly how much Guido has
+managed to exploit that *one* implementation trick of 'namespaces'.
+      -- Steven D. Majewski, 17 Sep 1993
+
+Anyone familiar with Modula-3 should appreciate the difference between a
+layered approach, with generic Rd/Wr types, and the Python 'C with foam
+padding' approach.
+      -- John Redford, 24 Nov 1993
+
+People simply will not agree on what should and shouldn't be "an error", and
+once exception-handling mechanisms are introduced to give people a choice, they
+will far less agree on what to do with them.
+      -- Tim Peters, 17 Dec 1993
+
+Note that because of its semantics, 'del' *can't* be a function: "del a"
+deletes 'a' from the current namespace. A function can't delete something from
+the calling namespace (except when written by Steve Majewski :-).
+      -- Guido van Rossum, 1 Aug 1994
+
+    I don't know a lot about this artificial life stuff -- but I'm suspicious
+of anything Newsweek gets goofy about -- and I suspect its primary use is as
+another money extraction tool to be applied by ai labs to the department of
+defense (and more power to 'em).
+    Nevertheless in wondering why free software is so good these days it
+occurred to me that the propagation of free software is one gigantic artificial
+life evolution experiment, but the metaphor isn't perfect.
+    Programs are thrown out into the harsh environment, and the bad ones die.
+The good ones adapt rapidly and become very robust in short order.
+    The only problem with the metaphor is that the process isn't random at all.
+Python *chooses* to include Tk's genes; Linux decides to make itself more
+suitable for symbiosis with X, etcetera.
+    Free software is artificial life, but better.
+      -- Aaron Watters, 29 Sep 1994
+
+I claim complete innocence and ignorance! It must have been Tim. I wouldn't
+know a Trondheim Hammer if it fell on my foot!
+      -- Steve Majewski, 10 Jan 1995
+
+(Aieee! Yet another thing on my TODO pile!)
+      -- A.M. Kuchling, 10 Jan 1995
+
+[After someone wrote "...assignment capability, a la djikstra"] Ehh, the poor
+old man's name is Dijkstra. I should know, "ij" is a well known digraph in the
+Dutch language. And before someone asks the obvious: his famous "P and V" names
+for semaphores are derived for the Dutch words "Passeer" and "Verlaat", or
+"Pass" and "Leave". And no, I haven't met him (although he did work at CWI back
+in the fifties when it was called, as it should still be today, Mathematical
+Centre). he currently lives in Austin, Texas I believe. (While we're at it...
+does anybody remember the Dijkstra font for Macintoshes? It was a scanned
+version of his handwriting. I believe Luca Cardelli scanned it -- the author of
+Obliq, a somewhat Python-like distributed language built on Modula-3. I could
+go on forever... :-)
+      -- Guido van Rossum, 19 Jan 1995
+
+As always, I'll leave it to a volunteer to experiment with this.
+      -- Guido van Rossum, 20 Jan 1995
+
+Non-masochists, please delete this article NOW.
+      -- Aaron Watters, 20 Jan 1995
+
+If Perl weren't around, I'd probably be using Python right now.
+      -- Tom Christiansen in comp.lang.perl, 2 Jun 1995
+
+GUI stuff is *supposed* to be hard. It builds character.
+      -- Jim Ahlstrom, at one of the early Python workshops
+
+    >VERY cool mod, Peter. I'll be curious to see GvR's reaction to your
+syntax.
+    Hm.
+      -- Nick Seidenman and Guido van Rossum, 1 Aug 1996
+
+Python is an experiment in how much freedom programmers need. Too much freedom
+and nobody can read another's code; too little and expressiveness is
+endangered.
+      -- Guido van Rossum, 13 Aug 1996
+
+[On regression testing] Another approach is to renounce all worldly goods and
+retreat to a primitive cabin in Montana, where you can live a life of purity,
+unpolluted by technological change. But now and then you can send out little
+packages....
+      -- Aaron Watters
+
+Ah, you're a recent victim of forceful evangelization. Write your own assert
+module, use it, and come back in a few months to tell me whether it really
+caught 90% of your bugs.
+      -- Guido van Rossum, 7 Feb 1997
+
+The larger scientific computing centers generally have a "theory" division and
+a "actually uses the computer" <wink> division. The theory division generally
+boasts some excellent theoreticians and designers, while the other division
+generally boasts some excellent physical scientists who simply want to get
+their work done. In most labs I've seen, the two divisions hate each others'
+guts (or, rarely, blissfully ignore each other), & the politics is so thick you
+float on it even after they embed your feet in cement blocks (hence even the
+simple relief of death is denied you <wink>).
+      -- Tim Peters, 25 Mar 1997
+
+In one particular way the conflict is fundamental & eternal: the "working
+scientists" generally understand the hardware du jour perfectly, and
+passionately resent any attempt to prevent them from fiddling with it directly
+-- while the theory folks are forever inventing new ways to hide the hardware
+du jour. That two groups can both be so right and so wrong at the same time is
+my seventh proof for the existence of God ...
+      -- Tim Peters, 25 Mar 1997
+
+You're going to be in a minority - you're coming to Python programming from a
+language which offers you a lot more in the way of comfortable operations than
+Python, instead of coming from medieval torture chambers like C or Fortran,
+which offer so much less.
+      -- Andrew Mullhaupt, 26 Jun 1997
+
+...although Python uses an obsolete approach to memory management, it is a
+*good* implementation of that approach, as opposed to S, which uses a
+combination of bad implementation and demented design decisions to arrive at
+what may very well be the worst memory behavior of any actually useful program.
+      -- Andrew Mullhaupt, 26 Jun 1997
+
+I suggested holding a "Python Object Oriented Programming Seminar", but the
+acronym was unpopular.
+      -- Joseph Strout, 28 Feb 1997
+
+Strangely enough I saw just such a beast at the grocery store last night.
+Starbucks sells Javachip. (It's ice cream, but that shouldn't be an obstacle
+for the Java marketing people.)
+      -- Jeremy Hylton, 29 Apr 1997
+
+    A little girl goes into a pet show and asks for a wabbit. The shop keeper
+looks down at her, smiles and says:
+    "Would you like a lovely fluffy little white rabbit, or a cutesy wootesly
+little brown rabbit?"
+    "Actually", says the little girl, "I don't think my python would notice."
+      -- Told by Nick Leaton, 4 Dec 1996
+
+When I originally designed Perl 5's OO, I thought about a lot of this stuff,
+and chose the explicit object model of Python as being the least confusing. So
+far I haven't seen a good reason to change my mind on that.
+      -- Larry Wall, 27 Feb 1997 on perl5-porters
+
+PSA 1996 Budget
+---------------
+Income:
+$1,093,276.54  'Guido for President' 
+                 Campaign Contributions(1)
+$        3.12  Milk Money Extortion Program
+$    2,934.07  PSA Memberships
+-------------
+$1,096,213.73  Total Income
+
+Expenses:
+$  652,362.55  Monty Python Licencing Fees (2)
+$   10,876.45  Pre-Release 2 Week Vacations (3)
+$  369,841.59  Post-Release 2 Week Vacations (3)
+$       15.01  Alien Abduction Insurance
+$   62,541.72  Python Web Site Maintenance
+$      554.65  Great Comfort Cream
+-------------
+$1,096,191.97  Total Expenses
+$      (21.76) Total Profit (Loss)
+    Notes:
+    (1) Many of you many not be aware of the fabulously successful 'Guido for
+President' Campaign. While Guido has no interest in being the president, the
+PSA thought it would be a cool way to collect money. The centerpiece of the
+campaign featured an attractive offer to spend the night in Guido's spare
+bedroom in exchange for a $50,000.00 contribution. (Mark Lutz stayed TWICE!)
+    (2) Since the proliferation of Monty Python related names (Python, Monty,
+Grail, Eric-the-Half-a-Compiler, et al.) has increased over the past year, the
+PSA felt it would be wise to licencing the Python name to forestall any
+lawsuits. An added benefit is that John Cleese is teaching Guido how to walk
+funny.
+    (3) Pre-Release vacations are spent in the Catskills. Post-Release
+vacations are spent in the Bahamas. Guido is currently working on a system
+which will allow him to make more releases of Python; thus octupling the number
+of vacations he takes in a year.
+      -- Matthew Lewis Carroll Smith, 4 Apr 1997
+
+I mean, just take a look at Joe Strout's brilliant little "python for
+beginners" page. Replace all print-statements with sys.stdout.write(
+string.join(map(str, args)) + "\n") and you surely won't get any new beginners.
+And That Would Be A Very Bad Thing.
+      -- Fredrik Lundh, 27 Aug 1996
+
+Ya, ya, ya, except ... if I were built out of KSR chips, I'd be running at 25
+or 50 MHz, and would be wrong about ALMOST EVERYTHING almost ALL THE TIME just
+due to being a computer! Think about it -- when's the last time you spent 20
+hours straight debugging your son/wife/friend/neighbor/dog/ferret/snake? And
+they *still* fell over anyway? Except in a direction you've never seen before
+each time you try it? The easiest way to tell you're dealing with a computer is
+when the other side keeps making the same moronic misteakes over and misteakes
+over and misteakes over and misteakes over and misteakes over and misteakes
+CTRL-C again.
+      -- Tim Peters, 30 Apr 1997
+
+BTW, a member of the ANSI C committee once told me that the only thing rand is
+used for in C code is to decide whether to pick up the axe or throw the dwarf,
+and if that's true I guess "the typical libc rand" is adequate for all but the
+most fanatic of gamers <wink>.
+      -- Tim Peters, 21 June 1997.
+
+Things in Python are very clear, but are harder to find than the secrets of
+wizards. Things in Perl are easy to find, but look like arcane spells to invoke
+magic.
+      -- Mike Meyer, 6 Nov 1997
+
+    Indeed, as Palin has come to understand, being part of Python means never
+really knowing what may lurk around the corner.
+    "We've never really followed any rules at all with Python," he said. "We're
+a spontaneous lot. It's more fun that way."
+      -- Michael Palin, quoted from a Reuters/Variety news item titled
+         "Rare Python Reunion", Jan 15 1998.
+
+Python is an excellent language for learning object orientation. (It also
+happens to be my favorite OO scripting language.)
+      -- Sriram Srinivasan, _Advanced Perl Programming_
+
+The point is that newbies almost always read more into the semantics of release
+than are specified, so it's worthwile to be explicit about how little is being
+said <wink>.
+      -- Tim Peters, 12 Feb 1998
+
+Ah! "Never mind" to a bunch of what I said before (this editor can't move
+backwards <wink>).
+      -- Tim Peters, 12 Feb 1998
+
+After 1.5 years of Python, I'm still discovering richness (and still unable to
+understand what the hell Jim Fulton is talking about).
+      -- Gordon McMillan, 13 Mar 1998
+
+Tabs are good, spaces are bad and mixing the two just means that your motives
+are confused and that you don't use enough functions.
+      -- John J. Lehmann, 19 Mar 1998
+
+... but whenever optimization comes up, people get sucked into debates about
+exciting but elaborate schemes not a one of which ever gets implemented; better
+to get an easy 2% today than dream about 100% forever.
+      -- Tim Peters, 22 Mar 1998
+
+I've been playing spoilsport in an attempt to get tabnanny.py working, but now
+that there's absolutely no reason to continue with this, the amount of my life
+I'm willing to devote to it is unbounded <0.9 wink>.
+      -- Tim Peters, 30 Mar 1998
+
+Python is a little weak in forcing encapsulation. It isn't made for bondage and
+domination environments.
+      -- Paul Prescod, 30 Mar 1998
+
+One of my first big programming assignments as a student of computer science
+was a source formatter for Pascal. The assignment was designed to show us the
+real-life difficulties of group programming projects. It succeeded perhaps too
+well. For a long time, I was convinced that source code formatters were a total
+waste of time, and decided to write beautiful code that no automatic formatter
+could improve upon. In fact, I would intentionally write code that formatters
+could only make worse.
+      -- Guido van Rossum, 31 Mar 1998
+
+You need to build a system that is futureproof; it's no good just making a
+modular system. You need to realize that your system is just going to be a
+module in some bigger system to come, and so you have to be part of something
+else, and it's a bit of a way of life.
+      -- Tim Berners-Lee, at the WWW7 conference
+
+From gotos to the evolution of life in 10 posts; that's comp.lang.python for
+you!
+      -- A.M. Kuchling, 4 Apr 1998
+
+This is *Python*! If we didn't care what code looked like, most of us would
+probably be hacking in some version of Lisp -- which already covered most of
+Python's abstract *semantics* way back when Guido was just a wee snakelet
+frolicking in the lush Amsterdam jungle.
+      -- Tim Peters, 24 Apr 1998
+
+The infinities aren't contagious except in that they often appear that way due
+to their large size.
+      -- Tim Peters on the IEEE 754 floating point standard, 27 Apr 1998
+
+The "of course, while *I* have no problem with this at all, it's surely too
+much for a lesser being" flavor of argument always rings hollow to me. Are you
+personally confused by the meanings for "+" that exist today? *Objecting* to
+the variations is a different story; I'm wondering whether you personally
+stumble over them in practice. I don't; Steven doesn't; I doubt that you do
+either. I'm betting that almost *nobody* ever does, in which case those "less
+nimble colleagues and students" must be supernaturally feeble to merit such
+concern.
+      -- Tim Peters, 29 Apr 1998
+
+    "Ideally, IMO, two messages with the same name should have the same meaning
+but possibly different implementations. Of course, "meaning" is somewhat
+relative, but the notion that two messages with the same name should have the
+same 'meaning' is very useful."
+    "Like clothes.launder() vs money.launder(), or shape.draw() vs
+blood.draw(), or matrix.norm() vs hi.norm() <wink>? I'm afraid English thrives
+on puns, and the same word routinely means radically different things across
+application areas. Therefore, to insist that a word have "one true meaning" in
+a programming language is insisting that the language cater to one true
+application domain."
+      -- Jim Fulton and Tim Peters, in a discussion of rich comparisons, 29
+         Apr 1998
+
+Indeed, when I design *my* killer language, the identifiers "foo" and "bar"
+will be reserved words, never used, and not even mentioned in the reference
+manual. Any program using one will simply dump core without comment. Multitudes
+will rejoice.
+      -- Tim Peters, 29 Apr 1998
+
+Too little freedom makes life confusingly clumsy; too much, clumsily confusing.
+Luckily, the tension between freedom and restraint eventually gets severed by
+Guido's Razor.
+      -- Tim Peters, 29 Apr 1998
+
+In other words, I'm willing to see dark corners added to the language, as long
+as I don't have to go into them myself.
+      -- A.M. Kuchling, 29 Apr 1998
+
+This argument is specious. What on earth would it mean to compare an object you
+created with another object from someone else's code unless you knew exactly
+what each object's semantics were? Do you really want to ask if my abstract
+syntax tree is less then your HTTP connection object?
+      -- Jeremy Hylton, in a discussion of rich comparisons, 29 Apr 1998
+
+Two things I learned for sure during a particularly intense acid trip in my own
+lost youth: (1) everything is a trivial special case of something else; and,
+(2) death is a bunch of blue spheres.
+      -- Tim Peters, 1 May 1998
+
+Well, they will be: "<" will mean what everyone thinks it means when applied to
+builtin types, and will mean whatever __lt__ makes it mean otherwise, except
+when __lt__ isn't defined but __cmp__ is in which case it will mean whatever
+__cmp__ makes it mean, except when neither __lt__ or __cmp__ are defined in
+which case it's still unsettled. I think. Or isn't that what you meant by
+"clearly defined"?
+      -- Tim Peters, 6 May 1998
+
+You write a great program, regardless of language, by redoing it over & over &
+over & over, until your fingers bleed and your soul is drained. But if you tell
+newbies *that*, they might decide to go off and do something sensible, like
+bomb defusing<wink>.
+      -- Tim Peters, 5 Jun 1998
+
+OO styles help in part because they make it easier to redo large parts over,
+or, when the moon is shining just right, to steal large parts from someone
+else. Python helps in many additional ways regardless of style, not least of
+which in that it hurts less to throw away 50 lines of code than 5,000 <0.5
+wink>. The pains, and joys, of programming are *qualitatively* the same under
+Python. There's less pain less often, and joy comes quicker. And that's worth a
+whole lot.
+      -- Tim Peters, 5 Jun 1998
+
+I've had a DBA tell me that what I wanted to do "could not" be done because his
+silly $5000 tool couldn't model it. Proving him wrong simply increased his
+conviction that what I was doing was immoral and perverse. Which, come to think
+of it, it probably was. Hee hee.
+      -- Gordon McMillan, 8 Jun 1998
+
+The majority of programmers aren't really looking for flexibility. Most
+languages that enjoy huge success seem to do so not because they're flexible,
+but because they do one particular thing *extremely* well. Like Fortran for
+fast number-crunching in its day, or Perl for regexps, or C++ for compatibility
+with C, or C for ... well, C's the exception that proves the rule.
+      -- Tim Peters, 11 Jun 1998
+
+It has also been referred to as the "Don Beaudry *hack*," but that's a
+misnomer. There's nothing hackish about it -- in fact, it is rather elegant and
+deep, even though there's something dark to it.
+      -- Guido van Rossum, _Metaclass Programming in Python 1.5_
+
+Just point your web browser at http://www.python.org/search/ and look for
+"program", "doesn't", "work", or "my". Whenever you find someone else whose
+program didn't work, don't do what they did. Repeat as needed.
+      -- Tim Peters, on python-help, 16 Jun 1998
+
+Now some people see unchecked raw power and flee from perceived danger, while
+others rush toward perceived opportunity. That's up to them. But I think it's
+enormously *clarifying* in either case to see just *how* raw this particular
+gimmick can get.
+      -- Tim Peters, 16 Jun 1998
+
+Every language has its partisans, usually among folks deeply immersed in their
+particular theology, triumphant in having divined the inner meaning of some
+esoteric operations, like a medieval Jesuit hot on the trail of the final
+ontological proof, whose conciseness in solving a single problem makes them
+almost swoon with ecstacy at the expected savings of many keystrokes, as if
+those very keystrokes represented a lot of heavy lifting and hauling on their
+part.
+      -- John Holmgren, 18 Jun 1998
+
+    > In general, the situation sucks.
+    mind-if-i-use-that-as-my-epitaph<wink>?-ly y'rs - tim
+      -- Timothy J. Grant and Tim Peters, 22 Jun 1998
+
+    > Just for the record, on AIX, the following C program:
+    Oh no you don't! I followed AIX threads for the first year it came out, but
+eventually decided there was no future in investing time in baffling
+discussions that usually ended with "oh, never mind -- turns out it's a bug"
+<0.9 wink>.
+      -- Vladimir Marangozov and Tim Peters, 23 Jun 1998
+
+Python - why settle for snake oil when you can have the *whole* snake?
+      -- Mark Jackson, 26 Jun 1998
+
+The problem I have with "SETL sets" in Python is the same I have with every
+other language's "killer core" in Python: SETL is much more than just "a set
+type", Eiffel is much more than just fancy pre- and post- conditions, Perl's
+approach to regexps is much more than just its isolated regexp syntax, Scheme
+is much more than just first-class functions & lexical closures, and so on.
+Good languages aren't random collections of interchangeable features: they have
+a philosophy and internal coherence that's never profitably confused with their
+surface features.
+      -- Tim Peters, 10 Jul 1998
+
+    "Since I'm so close to the pickle module, I just look at the pickles
+directly, as I'm pretty good at reading pickles."
+    "As you all can imagine, this trick goes over really well at parties."
+      -- Jim Fulton and Paul Everitt on the Bobo list, 17 Jul 1998
+
+My theory is that the churning of old threads and reminiscences (Continuations,
+Icon influences, old-T-shirts, the pre news-group mailing list archive,
+whitespace, closures, .... ) has brought some old messages to the surface, via
+some mechanism similar to the way plankton and other nutrients are cycled in
+the ocean.
+      -- Steven D. Majewski, 23 Jul 1998
+
+In general, Our Guido flees from schemes that merely change *which* foot gets
+blown off <0.45 caliber wink>. Schemes that remove the firing pin entirely have
+a much better, um, shot <wink>.
+      -- Tim Peters, 25 Jul 1998
+
+I don't know what "invert the control structure" means -- but if it's anything
+like turning a hamster inside-out, I would *expect* it to be messy <wink>.
+      -- Tim Peters, 25 Jul 1998
+
+This makes it possible to pass complex object hierarchies to a C coder who
+thinks computer science has made no worthwhile advancements since the invention
+of the pointer.
+      -- Gordon McMillan, 30 Jul 1998
+
+The nice thing about list comprehensions is that their most useful forms could
+be implemented directly as light sugar for ordinary Python loops, leaving
+lambdas out of it entirely. You end up with a subtly different beast, but so
+far it appears to be a beast that's compatible with cuddly pythons.
+      -- Tim Peters, 6 Aug 1998
+
+I wonder what Guido thinks he might do in Python2 (assuming, of course, that he
+doesn't hire a bus to run over him before then <wink>).
+      -- Tim Peters, 26 Aug 1998
+
+After writing CGI scripts the traditional way for a few years, it is taking
+awhile to reshape my thinking. No sledgehammer to the head yet, but lots of
+small sculpting hammers...
+      -- John Eikenberry on the Bobo list, 27 Aug 1998
+
+I believe sometimes numbers creep into my programs as strings, so '4'/2 needs
+to also be 2. Other languages do this. Since this is due in part to user input,
+I guess 'four'/2, 'quattro/2', 'iv/2' etc. need to be 2 as well; don't know any
+other language that does so, but Python could take the lead here in software
+reliability. Any white space should be ignored, including between my ears. I
+don't have time to write any useful software, so I've decided to devote myself
+to proposing various changes to the Python interpreter.
+      -- Donn Cave uses sarcasm with devastating effect, 28 Aug 1998
+
+then-again-if-history-were-important-god-wouldn't-have-hid- it-in-the- past-ly
+y'rs
+      -- Tim Peters, 28 Aug 1998
+
+> >( float ( / 1 3 ))
+> 0.33333333333333331
+ Now *that* one is impressive: it's the best possible 17-digit decimal
+representation of the best possible 53-bit fp binary representation of 1/3, and
+17 is the minimum number of decimal digits you need in general so that a 53-bit
+binary fp value can be exactly reconstructed by a best-possible atof.
+      -- Tim Peters, 2 Sep 1998
+
+This is not a technical issue so much as a human issue; we are limited and so
+is our time. (Is this a bug or a feature of time? Careful; trick question!)
+      -- Fred Drake on the Documentation SIG, 9 Sep 1998
+
+There are also some surprises [in the late Miocene Australia] some small
+mammals totally unknown and not obviously related to any known marsupial
+(appropriately awarded names such as _Thingodonta_ and _Weirdodonta_) and a
+giant python immortalized as _Montypythonoides_.
+      -- _The Book of Life_, found by Aaron Watters
+
+    Can the denizens of this group enlighten me about what the advantages of
+Python are, versus Perl ?
+    "python" is more likely to pass unharmed through your spelling checker than
+"perl".
+      -- An unknown poster and Fredrik Lundh, 11 Sep 1998
+
+I have to say that the Dragon book is good when you consider the alternatives,
+but compared with the Platonic ideal it leaves much to be desired. In
+particular the algorithm descriptions are described at such a low level it's
+difficult to understand how they work -- and at a higher conceptual level
+involving graph theoretical transforms of automata (which I got thanks to Jean
+Gallier by word of mouth and effort of chalk) is nearly invisible for the
+trees.
+      -- Aaron Watters, 17 Sep 1998
+
+... and at a higher conceptual level involving graph theoretical transforms of
+automata (which I got thanks to Jean Gallier by word of mouth and effort of
+chalk) ...
+      -- Aaron Watters, 17 Sep 1998
+
+Every clarity vanished? :-)
+      -- Christian Tismer after answering a poster's question, 17 Sep 1998
+
+    Take the "public" modifier off Joseph's interface, or leave it there but
+nest the interface inside class "closure", or even move the interface to its
+own printer.java file, and it compiles and runs without incident. Most of the
+big boys I hang with aren't paralyzed by self-explanatory compiler msgs <wink>.
+    not-to-mention-the-girls-ly y'rs
+      -- Tim Peters, 24 Sep 1998
+
+<shakes head ruefully> You kids today, with your piercings and your big pants
+and your purple-and-green hair and your X-Files and your Paula Cole and your
+espresso coffee and your Seattle grunge rock and your virtual machines and your
+acid-washed jeans and your Ernest Hemingway and your object-oriented languages
+and your fax machines and your hula hoops and your zoot suits and your strange
+slang phrases like "That's so bogus" or "What a shocking bad hat" and those
+atonal composers like Arnold Schoenberg and Milton Babbit that you kids seem to
+like these days and your cubist painters and your Ally McBeal and that guy in
+Titanic and your TCP/IP protocol and your heads filled with all that Cartesian
+dualism these days and ... well, I just don't get you kids. <shakes head
+ruefully again>
+      -- A.M. Kuchling, 1 Oct 1998
+
+    E.g., at the REBOL prompt I typed
+send tim@email.msn.com "Did this work?"
+     and in response it dialed my modem, connected to my ISP, and then REBOL
+crashed after provoking an invalid page fault in kernel32.dll. Then my
+connection broke, and the modem dialed and connected again. Then it just sat
+there until it timed out.
+    now-*that's*-user-friendly<wink>-ly y'rs
+      -- Tim Peters, 24 Sep 1998
+
+I've reinvented the idea of variables and types as in a programming language,
+something I do on every project.
+      -- Greg Ward, September 1998
+
+    "The event/tree dualism reminds me why I always wanted to be able to do
+pattern matching on trees."
+    "'Honey, what is this guy doing up there?' 'Oh, I suppose it's Christian,
+trying to match some patterns.' "
+      -- Christian Tismer and Dirk Heise, 12 Oct 1998
+
+Perl is worse than Python because people wanted it worse.
+      -- Larry Wall, 14 Oct 1998
+
+    "What's the opinion of the (wink) Python luminaries?"
+    "The last time I saw a position paper from them, they came out strongly
+against the suggestion that old people be put on ice floes and left to drift
+out to sea to die.
+    they-never-like-*any*-of-my-ideas-ly y'rs"
+      -- Stuart Hungerford and Tim Peters, 14 Oct 1998
+
+Rather than borrowing from our beauty-impaired ugly sibling, why not look at
+Java, the beautiful, conceited sister? We could have something more like
+JavaDoc.
+      -- Paul Prescod, 18 Oct 1998
+
+    It won't work. This is far too concrete a problem to interest Tim. I see 3
+possible approaches:
+    1) Claim that Python can't do a <some random combination of 'L', 'R', 'A'>
+grammar. This will yield an irate response from Aaron which will draw Tim into
+it and you'll get a solution in 3 months after lots of entertaining posts.
+    2) Turn it into an optimization problem and get a solution from Marc- Andre
+using mxTextTools next week.
+    3) Turn it into an obfuscation problem and get competing solutions from
+Greg Stein and Fredrik tomorrow morning.
+    if-anybody's-found-don-beaudry's-sucker-button-let-me-know ly 'yrs
+      -- Gordon McMillan, 16 Oct 1998
+
+To my battle-scarred mind, documentation is never more than a hint. Read it
+once with disbelief suspended, and then again with full throttle skepticism.
+      -- Gordon McMillan, 19 Oct 1998
+
+    Then let the record show that I hereby formally lobby for such an
+optimization! I'd lay out some arguments, except that it's already implemented
+<wink>.
+    well-*that*-one-went-easy-ly y'rs - tim
+      -- Tim Peters, 20 Oct 1998
+
+We did requirements and task analysis, iterative design, and user testing.
+You'd almost think programming languages were an interface between people and
+computers.
+      -- Steven Pemberton, one of the designers of Python's direct ancestor
+         ABC
+
+Not at all, although I agree here too <wink>. It's like saying a fork is broken
+just because it's not that handy for jacking up a car. That is, Guido
+implemented the syntax to support default arguments, and it works great for
+that purpose! Using it to fake closures is a hack, and the "hey, this is cool!"
+/ "hey, this really sucks!" mixed reaction thus follows, much as pain follows a
+car falling on your skull. Stick to stabbing peas, or even teensy pea-sized
+closures, and a fork serves very well.
+      -- Tim Peters, 31 Oct 1998
+
+My customers consider it a marketable skill that I a) think for myself b) share
+my thoughts with them.
+      -- Paul Prescod, 2 Nov 1998
+
+    Anyone else know what a Stanley #45 plane is? ... it's not what you use if
+you aren't looking to produce intricate moldings. If you want to make a
+tabletop flat, and bring out the natural beauty of the wood, you use a big,
+long and flat bench plane. The beauty is in the wood, not the tool, the tool is
+just the right one to let you see that and to let others see it too.
+    And that's a very impressive kind of beauty in itself, isn't it? The kind
+of beauty some say is homely--an uninteresting face, boring angles, few if any
+parts, no curly flowers. It's just a tool, and not beautiful at all. But look,
+that tool makes beauty. It makes it *easy* to make beautiful things, to see
+deep into the the grain of whatever material you're working.
+    Maybe it gets us a little closer to art.
+      -- Ivan Van Laningham, 3 Nov 1998
+
+You might think "That's illegal." That's not illegal; that's *cool*.
+      -- Paul Dubois at IPC7, on recursive template definitions in C++
+
+This supports reflection, which is the 90s way of writing self- modifying code.
+      -- John Aycock at IPC7, during his parsing talk
+
+It turns out that docstrings are the only way to associate information with
+functions, which is what led you to abuse them in such a fascinating and
+stomach-churning way.
+      -- Jim Hugunin at IPC7, on embedding BNF parsing rules in docstrings
+
+    "The Mayans looked on the integers as gods."
+    "What did the Mayans think of integer division?"
+      -- Ivan Van Laningham and an unknown audience member at IPC7
+
+Y2K problem? The Mayans didn't have a *millennium*-2K problem!
+      -- Eric S. Raymond at IPC7, on learning that the Mayan calendar takes
+         28 octillion years to wrap around
+
+"Generic identifier" -- think about it too much and your head explodes.
+      -- Sean McGrath at IPC7, discussing SGML terminology
+
+Nothing I've ever written has reached 1.0.
+      -- Greg Ward at IPC7, on using small version numbers
+
+Well, that's a little thing -- the specification.
+      -- Guido van Rossum at IPC7
+
+    "We've got a name (Module Distribution Utilities) that gives us a good
+3-letter acronym to group things under: MDU."
+    "<thpftbt>"
+      -- Greg Ward and Jeremy Hylton at IPC7
+
+Mailman is designed to be extensible *and* comprehensible. Without
+comprehensibility, enhancement is self-limiting -- functionality may be
+improved, but further enhancement gets increasingly difficult.
+      -- Ken Manheimer at IPC7
+
+"Generating Usable Installations" -- OK, you've got the GUI SIG.
+      -- Barry Warsaw at IPC7, on the choice of name for a SIG to discuss
+         extension building
+
+Performance is a lot like drugs -- it doesn't do much for you, but it occupies
+a lot of your time.
+      -- Jeremy Hylton at IPC7, on the need for a Performance SIG
+
+I made some slides, but they suck, so I won't bother with them.
+      -- Andrew Kuchling at IPC7
+
+    "What's Python?"
+    "It's a computer programming language."
+    "You mean, like DOS?"
+      -- Some guy in a bar and Eric S. Raymond (who was wearing a
+         conference T-shirt) at IPC7
+
+Excellent plan! Devious minds are attracted to Python, like mimes to
+unappreciative crowds.
+      -- Tim Peters, 13 Nov 1998
+
+Ha! If we had only started numbering dimensions with one, we'd already be
+living in a 4-D world, and Mental Organons would be *all over the place*!
+      -- Tim Peters, 13 Nov 1998
+
+Well, during those periods when I was me, there was most assuredly only one of
+me. But during some of the more intense discussions, I was not me, and while
+all the rest of the attendees were also not me, it is difficult to say whether
+they were the same not me that I was or wasn't at the time.
+      -- Gordon McMillan, 18 Nov 1998
+
+    If Python strays into trying to be something completely new it will fail,
+like Scheme, K and Smalltalk. There are both technical and sociological reasons
+for this. If you stray too far technically, you make mistakes: either you make
+modelling mistakes because you don't have an underlying logical model (i.e. C++
+inheritance) or you make interface mistakes because you don't understand how
+your new paradigm will be used by real programmers.
+    Let research languages innovate. Python integrates.
+      -- Paul Prescod, 21 Nov 1998
+
+    "I got a little mad at the way python polynomials were written -- the code
+looked like its author knew neither polynomials nor Python."
+    "That would be me :-)."
+      -- Moshe Zadka and Guido van Rossum, 22 Nov 1998
+
+I would recommend not wasting any more time on the naming issue. (This is a
+recurring theme in my posts -- remember, I spent about 0.3 microseconds
+thinking about whether "Python" would be a good name for a programming
+language, and I've never regretted it.)
+      -- Guido van Rossum, 25 Nov 1998
+
+    "My course members are almost all coming from Math, and the first question
+was 'why isn't it complete?' Just a matter of elegance."
+    "Oh, don't worry. My background is math. This is actually good for them --
+like discovering that Santa Claus doesn't really exist."
+      -- Christian Tismer and Guido van Rossum, 2 Dec 1998
+
+One of my cheap entertainments is axiomatizing characterizations of [Tim
+Peters]. I think I've come up with a minimal one: the only c.l.p poster more
+concerned with working non-legal code than non-working legal code.
+      -- Cameron Laird, 2 Dec 1998
+
+PYTHON = (P)rogrammers (Y)earning (T)o (H)omestead (O)ur (N)oosphere.
+      -- Seen in Sean McGrath's .sig, 3 Dec 1998
+
+I never realized it before, but having looked that over I'm certain I'd rather
+have my eyes burned out by zombies with flaming dung sticks than work on a
+conscientious Unicode regex engine.
+      -- Tim Peters, 3 Dec 1998
+
+"Python? Oh, I've heard of that. I have a friend at the NSA who uses it."
+      -- Overhead at a meeting, quoted in c.l.p on 3 Dec 1998
+
+I think Gordon has priority on this one, since it's clearly a consequence of
+his observation that tim_one despises and deplores anything useful. Which has
+greater explanatory power, since I've often noted that tim_one complains about
+legal working code too! Anything that works may be useful, right? Brrrrr. Must
+destroy.
+      -- Tim Peters in the third person, 3 Dec 1998
+
+"Eric has a way of explaining what we're doing and why we're doing it," says
+Guido van Rossum, the inventor of a programming language called Python and a
+prominent figure among open-source proponents. Van Rossum, a gawky Dutchman who
+now lives in Reston, invited Raymond to address a group of Python software
+developers in Houston...
+      -- From the _Washington Post_, 3 Dec 1998
+
+Subclassing with a mixin doesn't let you, for example, interfere with how an
+existing attribute is accessed. The general idea here is to kidnap the object,
+skin it, then waltz around in public impersonating it. All without letting the
+programmer / user know he's been bamboozled.
+      -- Gordon McMillan, 3 Dec 1998
+
+    Hey, while they're all eating dinner, let's sneak in a keyword!
+    emancipate variable: declare absolute freedom for one variable. It can be
+whatever it wants whenever it wants in whatever form it wants in whatever
+language it wants on whatever computer it wants. In the ensuing chaos it will
+get nothing done, but it will give programmers stories to tell for years to
+come...
+      -- Mike Fletcher, 25 Dec 1998
+
+    "Can we kill this thread? The only thing it does as far as I'm concerned is
+increase the posting statistics. :-)"
+    "don't-open-cans-of-worms-unless-you're-looking-for-a-new-diet-ly y'rs"
+      -- Guido van Rossum and Tim Peters, 6 Jan 1999
+
+    Hey, that was the first truly portable laptop! Of course I'm nostalgic.
+Came with a mighty 24Kb RAM standard, & I popped the extra $80 to max it out at
+32Kb. Much of Cray's register assigner was developed on that beast: unlike the
+prototype Crays of the time, the M100 was always available and never crashed.
+Even better, I could interrupt it any time, poke around, and resume right where
+it left off <wink>.
+    m100-basic-reminded-me-a-lot-of-python-except-that-it-sucked-ly y'rs
+      -- Tim Peters remembering the Model 100, 10 Jan 1999
+
+    "Heh -- all it really broke so far was my resistance to installing Tk. I
+suppose wizardry is inevitable after one installs something, though <wink>."
+    "Spoken like a truly obsessive-compulsive wizard! It-takes-one-to-know
+-one..."
+      -- Tim Peters and Guido van Rossum, 6 Jan 1999
+
+Note, however, that architectural forms are completely declarative and can be
+implemented in a highly optimized fashion. The sorts of extensions that
+Microsoft has proposed for XSL (<xsl:eval>...</>) would completely destroy
+those features. Architectural mapping would, in general, be as reliable and
+high performance as ordinary software -- (not at all).
+      -- Paul Prescod, 6 Jan 1999
+
+Darned confusing, unless you have that magic ingredient *coffee*, of which I
+can pay you Tuesday for a couple pounds of extra-special grind today.
+      -- John Mitchell, 11 Jan 1999
+
+That's so obvious that someone has already got a patent on it.
+      -- Guido van Rossum, 12 Jan 1999
+
+I have to stop now. I've already told you more than I know.
+      -- Wolf Logan, 14 Jan 1999
+
+I really don't have any incisive insights about the economic mechanisms or
+viability of free software and open source, but I do have a strong, clear sense
+that such things make it possible for me to do my job, as a programmer and a
+facilitator of/participant in online communities, better and more easily than I
+otherwise could do.
+      -- Ken Manheimer, 24 Jan 1999
+
+    Every standard applies to a certain problem domain and a certain level. A
+standard can work perfectly and save the world economy billions of dollars and
+there will still be software and hardware compatibility problems. In fact,
+solving one level of compatibility just gives rise to the next level of
+incompatibility. For example, connecting computers together through standard
+protocols gives rise to the problem of byte endianness issues. Solving byte
+endianness gives rise to the problem of character sets. Solving character sets
+gives rise to the problem of end-of-line and end-of-file conventions. Solving
+that gets us to the problem of interpreting the low-level syntax (thus XML).
+Then we need to interpet that syntax in terms of objects and properties (thus
+RDF, WDDX, etc.). And so forth.
+    We could judge a standard's success by its ability to reveal another level
+of standardization that is necessary.
+      -- Paul Prescod, 24 Jan 1999
+
+I just want to go on the record as being completely opposed to computer
+languages. Let them have their own language and soon they'll be off in the
+corner plotting with each other!
+      -- Steven D. Majewski, 25 Jan 1999
+
+Constraints often boost creativity.
+      -- Jim Hugunin, 11 Feb 1999
+
+Programming is no different - it's only by going outside what you know, and
+looking from another direction (working, if you like, your brain, so that it
+can be more powerful :-) that you can improve further.
+      -- Andrew Cooke, 12 Feb 1999
+
+any-technology-indistinguishable-from-magic-is-too-mysterious- to- trust-ly
+y'rs
+      -- Tim Peters, 16 Feb 1999
+
+    "I don't think we've thought of this, and it's actually a good idea."
+    "I'd better go patent it!"
+      -- Uche Ogbuji and Paul Prescod, 16 Feb 1999
+
+Contrary to advertising, no parsing system is "easy to learn", in or out of the
+Python world -- parsing is a hard problem. Most are easy enough to use after
+practice, though. Ironically, the trickiest system of all to master (regexps)
+is also the feeblest and the most widely used.
+      -- Tim Peters, 17 Feb 1999
+
+So Python's only cross-platform choices were to mimic the C/POSIX API or invent
+its own new x-platform API; only one of those is realistic (as Java proves
+every day <wink>).
+      -- Tim Peters, 21 Feb 1999
+
+Yes: the code in ntpath.split is too clever to have any hope of working
+correctly <wink>.
+      -- Tim Peters, 19 Mar 1999
+
+Thanks. The sooner I get discouraged and quit, the more time I'll save overall.
+      -- Frank Sergeant, 28 Mar 1999
+
+But it's a general way to debug: tell someone what right things your program is
+doing. Chances are that you will see the wrong thing(s) before the other person
+has said anything... I just stick a picture of a face on my monitor and talk to
+it to find bugs.
+      -- Richard van de Stadt, 9 Apr 1999
+
+Might just be nostalgia, but I think I would give an arm or two to get that
+(not necessarily my own, though).
+      -- Fredrik Lundh, 13 May 1999
+
+    1. Beautiful is better than ugly.
+    2. Explicit is better than implicit.
+    3. Simple is better than complex.
+    4. Complex is better than complicated.
+    5. Flat is better than nested.
+    6. Sparse is better than dense.
+    7. Readability counts.
+    8. Special cases aren't special enough to break the rules.
+    9. Although practicality beats purity.
+    10. Errors should never pass silently.
+    11. Unless explicitly silenced.
+    12. In the face of ambiguity, refuse the temptation to guess.
+    13. There should be one -- and preferably only one -- obvious way to do it.
+    14. Although that way may not be obvious at first unless you're Dutch.
+    15. Now is better than never.
+    16. Although never is often better than *right* now.
+    17. If the implementation is hard to explain, it's a bad idea.
+    18. If the implementation is easy to explain, it may be a good idea.
+    19. Namespaces are one honking great idea -- let's do more of those!
+      -- Tim Peters' 19 Pythonic Theses, 4 Jun 1999
+
+    "However, I've heard that after about 10K items in a dict, it starts having
+problems."
+    "11,523 to be exact. After that, dicts drink to excess and show up for work
+late the morning after. We don't like to talk about it, though."
+      -- Aahz Maruch and Tim Peters, 8 Jun 1999
+
+Stackless Python 0.2, a plug-in replacement for the Python core that does not
+use the C stack, has been announced by Christian Tismer as the best way to
+prove that it was possible without a major rewrite to the core. Neel
+Krishnaswami commented to Christian, "This is very neat, and you are completely
+deranged".
+      -- From Linux Weekly News, 17 Jul 1999
+
+... we need more people like him, who are willing to explore without being
+driven to argue with people about it.
+      -- William Tanksley on Chuck Moore, inventor of Forth, 2 Jul 1999
+
+Sorry for the term, I picked it up from Jim Fulton back when it was an
+about-to-be-added feature for Principia/Aqueduct. As with so many Fultonisms,
+it's vivid and tends to stick in one's (non-pluggable) brain.
+      -- Paul Everitt on the term "pluggable brains", 5 Jul 1999
+
+I picture a lump of inanimate flesh (a result from a relational database query)
+being infused with the spark of life (object behavior, aka class).
+      -- Jim Fulton on the term "pluggable brains", 5 Jul 1999
+
+This is good. It means that while Ionesco is dead, his spirit lives on.
+      -- Gordon McMillan on how Windows attaches meaning to 3-character
+         file extensions, 30 Jul 1999
+
+(On the statement print "42 monkeys"+"1 snake") BTW, both Perl and Python get
+this wrong. Perl gives 43 and Python gives "42 monkeys1 snake", when the answer
+is clearly "41 monkeys and 1 fat snake".
+      -- Jim Fulton, 10 Aug 1999
+
+I expect that what you really object to is the absence of control structures
+other than goto, and the LT/GE/etc spelling of comparison operators. That was
+common enough in its day, and even by the time Pascal came around the keypunch
+I used still didn't have a semicolon key. It looks ugly in retrospect only
+because it is <wink>.
+      -- Tim Peters on SNOBOL4, 17 Aug 1999
+
+Theory and reality rarely are kissing cousins.
+      -- Christopher Petrilli, 1 Sep 1999
+
+Features generally don't exist in isolation, and you have to look at all the
+consequences, not just the one that attracts you at first sight.
+      -- Tim Peters, 3 Sep 1999
+
+The danger in this line of thinking is not realizing that the computational
+effort involved in big NP complete problems is *so* huge that even in optimized
+micro-code, the algorithm might take a million years to run. Tweezers or shovel
+-- it makes little difference when you are trying to move a universe...
+      -- Sean McGrath, 4 Sep 1999
+
+On a scale of one to ten I'd give it a tim.
+      -- William Tanksley, 13 Sep 1999
+
+Statistical analysis shows that the junk looks like human text, which clearly
+shows that it is actually used in some yet unknown way. (docstrings?)
+      -- Fredrik Lundh, writing about junk DNA, 5 Oct 1999
+
+If I engineer code that I expect to be in use for N years, I make damn sure
+that every internal limit is at least 10x larger than the largest I can
+conceive of a user making reasonable use of at the end of those N years. The
+invariable result is that the N years pass, and fewer than half of the users
+have bumped into the limit <0.5 wink>.
+      -- Tim Peters, 11 Nov 1999
+
+I don't think the bytecodehacks, while sufficiently dark and useless to be a
+tim-ism, qualify me in any way for a Pythonic Wizard Hat...
+      -- Michael Hudson, 16 Nov 1999
+
+The bottom tier is what a certain class of wanker would call "business
+objects"...
+      -- Greg Ward, 9 Dec 1999
+
+Since I've done fewer than my normal quota of futile things this week, I
+thought I'd post to remind people that ...
+      -- Phil Austin, 9 Dec 1999
+
+There are useful diagrams in UML, (eg, the state and transition diagrams).
+Unfortunately, the one most tools use to generate code (and draw from reverse
+engineering) has everything to do with language structure, and nothing to do
+with what actually happens at runtime. To put it bluntly: people spend most of
+their time designing the wrong thing. Worse, they get it wrong, but it's carved
+in stone now; so the final system is either needlessly complex and marginally
+functional, or bears no resemblance to the "design".
+      -- Gordon McMillan, 15 Dec 1999
+
+The secret to good performance is to prototype and prototype, then code the
+bottlenecks in a faster language. The secret to large systems is to prototype
+and prototype, until you've got clean separation of the system into managable
+pieces, then code in whatever language most suits the need of each piece.
+      -- Gordon McMillan, 15 Dec 1999
+
+When Jim [Fulton] says "tricky" it means your brain could explode.
+      -- Michel Pelletier, 15 Dec 1999
+
+You have start-tags, attributes, end-tags and character data. We have all seen
+"XML applications" and "XML parsers" which handle this gang- of-four concepts.
+... Now we can peer over the parapet and shout "your parser smells of
+elderberries" or "I wave my mixed content at your ankles", as long as we like
+but the simple gang-of-four base apps will not go away.
+      -- Sean McGrath, 19 Dec 1999
+
+Abstraction is one of those notions that Python tosses out the window, yet
+expresses very well.
+      -- Gordon McMillan, 6 Jan 2000
+
+The set of naming conventions has a cardinality equal to the number of Python
+users.
+      -- Gordon McMillan, 6 Jan 2000
+
+The way to build large Python applications is to componentize and
+loosely-couple the hell out of everything.
+      -- Aahz Maruch, 6 Jan 2000
+
+It's not the mail volume that bothers me -- I can ignore 100s of messages a day
+very quickly. It's the time it takes to respond to all of them.
+      -- Guido van Rossum, 20 Jan 2000
+
+This is the way of Haskell or Design by Contract of Eiffel. This one is like
+wearing a XV century armor, you walk very safely but in a very tiring way.
+      -- Manuel Gutierrez Algaba, 26 Jan 2000
+
+Life's better without braces.
+      -- Unofficial motto of IPC8, coined by Bruce Eckel
+
+"Aggressive" means "sometimes wrong".
+      -- John Aycock at IPC8, during his "Agressive Type Inferencing" talk
+
+Do I do everything in C++ and teach a course in advanced swearing?
+      -- David Beazley at IPC8, on choosing a language for teaching
+
+Alice is 3D Logo on steroids.
+      -- Randy Pausch at IPC8
+
+I was willing to grant this one at once, but, now that I look back at it all --
+the loyalty oaths, the relentless self-criticism sessions, the midnight visits
+from the Ministry of Love -- I'm afraid what we really have here is unspeakably
+more sinister.
+      -- Tim Peters after a reference to "Python's cult-like following", 2
+         Feb 2000
+
+Guido (like us!) is a bit schizophrenic here: he wants to be a benevolent
+dictator, but also wants to treat people like grownups. This probably worked
+better before Python got a large American audience <0.9 wink>.
+      -- Tim Peters, 10 Feb 2000
+
+I have formal proofs that any change of the indentation rules results in 35%
+increase of the page faults for only 63.7% of the cache misses. The net effect
+is an overall slowdown of 10%.
+      -- Vladimir Marangozov after Yet Another indentation flamewar, 16 Feb
+         2000
+
+... let me just say that my least-favourite Python error message is
+"SyntaxError: invalid syntax", which somehow manages to be both overly terse
+and redundant at the same time.
+      -- Greg Ward, 15 Feb 2000
+
+    See, functional programmers are an insular lot. You rarely see them in
+public, except at parades when they all have antler- hats and silly shoes on.
+So they completely missed the infamous "goto considered harmful" thread and
+didn't even realize they were doing anything wrong.
+    Now, let's pretend you're writing a 'bot that can pass as a functional
+programmer. There's a complex protocol here. When two functional programmers
+see each other on the street, they recognize each other by the antler hats. But
+in certain parts of the Midwest, regular people wear antler hats, too. So
+there's a protocol. First a <wink wink>. Then the secret handshake. Then you
+sniff each other's armpits and stamp your foot 3 times.
+    OK, so you've written a bot, and it works fine on the street. Now you send
+it to a cocktail party. It sees a potential functional programmer and gives the
+<wink wink>. Now it tries to move into position to do the secret handshake, but
+discovers that it's antler-hat is entangled with someone else's. Oops. <wink
+wink> at the new guy. Handshake. But before it can sniff, the first one has
+moved up for his handshake. Ay yi yi. Your bot crashes and is exposed.
+    So now you rewrite your bot to use a finite state machine so it can handle
+multiple sessions. That means throwing out all the code that worked on the
+street. But if you'd used continuations, it would be a relatively minor
+adjustment of that code. 'Course you wouldn't have had to write the bot to
+begin with.
+      -- Gordon McMillan, 18 Feb 2000
+
+IIRC, Guido went to CNRI to work on bots and agents or something similar. Could
+the timbot and the effbot be an offshoot of that? Next, he's going to start a
+company with timbot and effbot as the main products. Van Rossum's Universal
+Robots?
+      -- Bernhard Herzog, 21 Feb 2000
+
+So those are the extremes: Boehm-Demers-Weiser avoids blame by refusing to do
+anything. Java avoids blame by exposing an impossibly baroque
+implementation-driven finalization model. Scheme avoids blame by refusing to do
+anything "by magic", but helps you to shoot yourself with the weapon of your
+choice. The bad news is that I don't know of a scheme *not* at an extreme!
+      -- Tim Peters on the knotty problem of finalizers and cycles, 3 Mar
+         2000
+
+It's extremely un-Pythonic to let things leak (despite that it has let things
+leak for a decade <wink>), but also extremely un-Pythonic to make some wild-ass
+guess.
+      -- Tim Peters on garbage collection, 3 Mar 2000
+
+IOW, the only people who lose under this scheme are the ones begging to lose,
+and their "loss" consists of taking responsibility.
+      -- Tim Peters, 3 Mar 2000
+
+An axiom is accepted without proof: we have plenty of proof that there's no
+thoroughly good answer (i.e., every language that has ever addressed this issue
+-- along with every language that ever will <wink>).
+      -- Tim Peters on garbage collection, 3 Mar 2000
+
+    I can see the FAQ now...
+    Q1.1.2.3: Why can't I divide integers?
+    A: You drooling moron! You need a 10-page owners manual and instructional
+video to handle the notational complexity of Tic-Tacs, don't you? As every
+schoolboy knows, the integers are a *ring*, not a field, you simpering
+simpleton. Oh wait! Let me guess! I have to spell it out for you, you festering
+wombat boil. You can't divide integers by integers and get integers. Understand
+now? Now go out there and don't do it. And read Herstein, while you're at it.
+      -- Johann Hibschman, 4 Mar 2000
+
+Actually, I believe you understand me fine, you'd just rather not believe it:
+floating point sucks, rationals suck, refusing to allow int division sucks, the
+constructive reals suck, symbolic manipulation sucks, ..., but all in different
+ways for different reasons. Every one bristles with its own brands of both
+shallow and deep "surprises". So it goes -- seeking to represent the infinite
+by the finite is an inherently unreachable goal. This is also why people die
+<wink>.
+      -- Tim Peters, 4 Mar 2000
+
+    The reason I'm right is that I said there won't be any *single* "survivor"
+of the evolutionary struggle, and that the efforts to crown one's favorite as
+such are just so much noise. The software ecosystem of the foreseeable future
+will always have its own form of "diversity": there will be lions *and*
+elephants *and* fish *and* seals *and* birds, because there will be many
+diverse "habitats" where the particular adaptations of each will be
+needed/advantageous.
+    The reasoned debates (as opposed to religious wars) may lead to lions with
+opposable thumbs, or elephants that can see in the infrared, but there will
+never be a 2000-pound fish with a mane and wings. Well, not outside the lab,
+anyway.
+      -- Ran, 5 Mar 2000
+
+"Complexity" seems to be a lot like "energy": you can *transfer* it from the
+end user to one/some of the other players, but the total amount seems to remain
+pretty much constant for a given task.
+      -- Ran, 5 Mar 2000
+
+LaTeX2HTML is pain.
+      -- Fred Drake in a documentation checkin message, 14 Mar 2000
+
+Here, have some cycles of reversed kielbasa. And ten (10 (0xa (101010b)))
+Usenet Points, redeemable in comp.lang.python for increased local prestige.
+Some prestige may depend upon your own actions. Local Prestige may or may not
+have any effect on your actual life (or lack thereof).
+      -- William Tanksley, 21 Mar 2000
+
+Mucking with builtins is fun the way huffing dry erase markers is fun. Things
+are very pretty at first, but eventually the brain cell lossage will more than
+outweigh that cheap thrill.
+      -- Barry Warsaw, 23 Mar 2000
+
+    >Have you ever looked at the output of a bib | tbl | eqn pipeline?
+    Are you kids still using that as a pick-up line?
+      -- Roy Smith and Cameron Laird, 4 Apr 2000
+
+This is like getting lost in a dictionary. What does quincuncial mean anyhow?
+      -- Dennis Hamilton, 4 Apr 2000
+
+UTF-8 has a certain purity in that it equally annoys every nation, and is
+nobody's default encoding.
+      -- Andy Robinson, 10 Apr 2000
+
+    "Now if we could figure out where python programmers are from, someone
+could write a book and get rich."
+    "Yorkshire."
+      -- Quinn Dunkan and Warren Postma, 11 Apr 2000
+
+If I didn't have my part-time performance art income to help pay the bills, I
+could never afford to support my programming lifestyle.
+      -- Jeff Bauer, 21 Apr 2000
+
+Of course, this brought me face to face once again with Python's _pons
+asinorum_, the significance of whitespace.
+      -- Eric S. Raymond, in the _Linux Journal_'s Python supplement
+
+Surprisingly enough, Python has taught me more about Lisp than Lisp ever did
+;-).
+      -- Glyph Lefkowitz, 3 May 2000
+
+How about we notate the hungarian notation with the type of hungarian notation,
+you know, hungarian meta notation: HWND
+aWin32ApiHandleDefinedInWindowsDotH_hwndWindowHandle;
+      -- Warren Postma, 4 May 2000
+
+Note that Python's licence is in fact the MIT X11 licence, with MIT filed off
+and CNRI written in its place in crayon.
+      -- A.M. Kuchling, 5 May 2000
+
+Once you've read and understood _The Art of the Metaobject Protocol_ you are
+one quarter of the way to provisional wizard status. (The other three-fourths
+are b) understanding Haskell's monads, c) grokking Prolog, and d) becoming
+handy with a combinator- based language by implementing a Forth.)
+      -- Neel Krishnaswami, 9 May 2000
+
+"The future" has arrived but they forgot to update the docs.
+      -- R. David Murray, 9 May 2000
+
+/* This algorithm is from a book written before the invention of structured
+programming... */
+      -- Comment in parser/pgen.c, noted by Michael Hudson
+
+For more information please see my unpublished manuscript on steam driven
+turing machines. [2000pp in crayon donated to the harvard library -- they never
+told me whether they filed it under mathematics, philosophy, logic, mechanical
+engineering, or computational science]
+      -- Aaron Watters, 12 May 2000
+
+    Me? I hate the whole lambda calculus, not because of what it is, but
+because of what many people think it is. They think that it's the whole of
+computer science, the ultimate way to express and reason about programs, when
+in reality it's merely a shabby and incomplete model of how Fortran fails to
+work. The first thing SICP has to do is teach everyone how bad the lambda
+calculus model is -- as part of teaching them about a language allegedly based
+on lambda calculus.
+    I'm sorry, was my bias showing again? :-)
+      -- William Tanksley, 13 May 2000
+
+I never got beyond starting the data-structures in C++, I never got beyond
+seeing how it would work in Scheme. I finished it in one Python -filled
+afternoon, and discovered the idea sucked big time. I was glad I did it in
+Python, because it only cost me one afternoon to discover the idea sucks.
+      -- Moshe Zadka, 13 May 2000
+
+In truth, we use 'j' to represent sqrt(-1) for exactly the same reason we use a
+convention for the direction of current which is exactly the opposite of the
+direction the electrons actually travel: because it drives physicists crazy.
+(And if we pick up a few mathematicians or whatever along the way, well, that's
+just gravy. ;-)
+      -- Grant R. Griffin, 14 May 2000
+
+Unicode: everyone wants it, until they get it.
+      -- Barry Warsaw, 16 May 2000
+
+I saw a hack you sent me a few months ago and approved of its intent and was
+saddened by its necessity.
+      -- Jim Fulton, 16 May 2000
+
+Suspicions are most easily dispelled/confirmed via evidence, and taking the
+trouble to do this has the pleasant side-effect that you can either cease
+expending effort worrying, or move directly to taking positive action to
+correct the problem.
+      -- Neel Krishnaswami, 21 May 2000
+
+Thanks to the overnight turnaround and the early interpreter's habit of
+returning nothing at all useful if faced with a shortage of )s, one could
+easily detect the LISP users: they tended to walk around with cards full of
+)))))))... in their shirt pockets, to be slapped onto the end of submitted card
+decks: one at least got something back if there were too many )s.
+      -- John W. Baxter, 21 May 2000
+
+Python: embodies a harmony of chocolate kisses with hints of jasmine and rose.
+Trussardi's wild new fragrance.
+      -- From _Marie Claire_, Australian edition, May 2000; noted by Fiona
+         Czuczman
+
+In arts, compromises yield mediocre results. The personality and vision of the
+artist has to go through. I like to see Python as a piece of art. I just hope
+the artist will not get too tainted by usability studies.
+      -- François Pinard, 22 May 2000
+
+In fact, I've never seen an argument about which I cared less. I'm completely
+case insensitivity insensitive.
+      -- William Tanksley, 23 May 2000
+
+They boo-ed when Dylan went electric. But for me its about the instincts of a
+designer, and the faith of a fan. Not science. So much the better.
+      -- Arthur Siegel, 23 May 2000
+
+Burroughs did something very odd with COBOL at one point (and no, it wasn't The
+Naked Lunch).
+      -- Will Rose, 27 May 2000
+
+Code generators are hacks. Sometimes necessary hacks, but hacks nevertheless.
+      -- Paul Prescod, 7 Jun 2000
+
+Very rough; like estimating the productivity of a welder by the amount of
+acetylene used.
+      -- Paul Svensson, on measuring programmer productivity by lines of
+         code, 19 Jun 2000
+
+I vote for backward compatibility for now, and not only because that will
+irritate /F the most.
+      -- Tim Peters, 30 Jun 2000
+
+A comment is in order then. If the code is smarter than it looks, most people
+aren't going to think it looks very smart.
+      -- Jeremy Hylton, 6 Jul 2000
+
+You and I think too much alike ?!ng. And if that doesn't scare you now, you
+should have a talk with Gordon.
+      -- Barry Warsaw, 12 Jul 2000
+
+Isn't it somewhat of a political statement to allow marriages of three or more
+items? I always presumed that this function was n-ary, like map().
+      -- Paul Prescod, on the proposed name marry() for a function to
+         combine sequences, 12 Jul 2000
+
+Since my finger was slowest reaching my nose, I got elected Editor. On the
+positive side of that, I get to make the early decisions that will be cursed
+for generations of Python hackers to come.
+      -- Barry Warsaw, 12 Jul 2000
+
+Hey, you know, we can work this in. Sailor Moon + Giant Robots + Tentacle
+Demons + Python Conference == Bizarre hilarity ensues!
+      -- Alexander Williams, 4 Aug 2000
+
+The rapid establishment of social ties, even of a fleeting nature, advance not
+only that goal but its standing in the uberconscious mesh of communal psychic,
+subjective, and algorithmic interbeing. But I fear I'm restating the obvious.
+      -- Will Ware, 28 Aug 2000
+
+The comp.lang.python newsgroup erupted last week with a flurry of posts that
+accused the Python development team of creeping featurism, selling out the
+language to corporate interests, moving too fast, and turning a deaf ear to the
+Python community. What triggered this lava flow of accusations? The development
+team accepted a proposal to change the syntax of the print statement.
+      -- Stephen Figgins, 30 Aug 2000
+
+    INTERVIEWER: Tell us how you came to be drawn into the world of pragmas.
+    COMPILER WRITER: Well, it started off with little things. Just a few
+boolean flags, a way to turn asserts on and off, debug output, that sort of
+thing. I thought, what harm can it do? It's not like I'm doing anything you
+couldn't do with command line switches, right? Then it got a little bit
+heavier, integer values for optimisation levels, even the odd string or two.
+Before I knew it I was doing the real hard stuff, constant expressions,
+conditionals, the whole shooting box. Then one day when I put in a hook for
+making arbitrary calls into the interpreter, that was when I finally realised I
+had a problem...
+      -- Greg Ewing, 31 Aug 2000
+
+The modules people have built for Python are like the roads the Romans built
+through Europe. On this solid ground, you can move fast as you work on aspects
+of program design that aren't so analytical -- user interface, multi-threaded
+event dispatching models, all kinds of things that can be done a lot of
+different ways and are hard to get right the first time through.
+      -- Donn Cave, 3 Sep 2000
+
+Python 2.0 beta 1 is now available from BeOpen PythonLabs. There is a long list
+of new features since Python 1.6, released earlier today. We don't plan on any
+new releases in the next 24 hours.
+      -- Jeremy Hylton, in the 2.0b1 announcement, 5 Sep 2000
+
+Fortunately, you've left that madness behind, and entered the clean, happy, and
+safe Python world of transvestite lumberjacks and singing Vikings.
+      -- Quinn Dunkan, 17 Sep 2000
+
+Regular expressions are among my most valued tools, along with goto, eval,
+multiple inheritance, preemptive multithreading, floating point, run-time type
+identification, a big knife, a bottle of bleach, and 120VAC electricity. All of
+these things suck sometimes.
+      -- Kragen Sitaker, 27 Sep 2000
+
+    IIRC, he didn't much care for regexps before, but actually writing a regexp
+engine drives most people who do it to intense hatred.
+    Just more of the magic of Python! Transmuting a few peoples' intense agony
+into the subject of others' idle amusement <wink>.
+      -- Tim Peters, 27 Sep 2000
+
+"I do not love thee, lambda; let me count the ways..."
+      -- Aahz Maruch, 27 Sep 2000
+
+They are called "Exceptions" because to any policy for handling them, imposed
+in advance upon all programmers by the computer system, some programmers will
+have good reason to take exception.
+      -- William Kahan, quoted by Tim Peters, 13 Oct 2000
+
+"Interim steps" have a tendency to become permanent in our industry, where
+"Compatibility" is the way the sins of the fathers are inflicted upon the third
+and fourth generations ...
+      -- William Kahan, quoted by Huaiyu Zhu, 16 Oct 2000
+
+The most successful projects I've seen and been on *did* rewrite all the code
+routinely, but one subsystem at a time. This happens when you're tempted to add
+a hack, realize it wouldn't be needed if an entire area were reworked, and mgmt
+is bright enough to realize that hacks compound in fatal ways over time. The
+"ain't broke, don't fix" philosophy is a good guide here, provided you've got a
+very low threshold for insisting "it's broke".
+      -- Tim Peters, 25 Oct 2000
+
+Humour is a tricky thing. Some people can't even get the spelling right.
+      -- Richard Brodie, 30 Oct 2000
+
+    The same way as you get the name of that cat you found on your porch: the
+cat (object) itself cannot tell you its name, and it doesn't really care -- so
+the only way to find out what it's called is to ask all your neighbours
+(namespaces) if it's their cat (object)...
+    ....and don't be surprised if you'll find that it's known by many names, or
+no name at all!
+      -- Fredrik Lundh, 3 Nov 2000, in answer to the question "How can I
+         get the name of a variable from C++ when I have the PyObject*?"
+
+These are mostly nice features, to be sure, but they're also just that:
+features. C++ has features. Python doesn't have a stellar score on my
+elegance-o-meter, but for me its major win is the lack of features, and lack of
+ambiguities. It fits in my brain.
+      -- Quinn Dunkan, 18 Nov 2000
+
+When explaining programming I sometimes compare programmers to photographers:
+amateur photographers talk about cameras and lenses and gadgets. They know how
+to make their camera do almost anything, and they are keen to argue the merits
+of their favorite tools. Professional photographers talk about contrast and
+lighting and composition. The camera is almost irrelevant. Ansel Adams used
+cameras that were less sophisticated than a supermarket disposable, back when
+photography was slow and tedious (like batch-oriented programming). Because the
+technology was so primitive, he carefully planned his photographs and developed
+discipline so he could reliably make excellent photographs over and over.
+      -- Greg Jorgensen, 26 Nov 2000
+
+As you might have guessed, I didn't do this just for fun. It is the old game of
+explaining what is there, convincing everybody that you at least know what you
+are talking about, and then three days later coming up with an improved
+application of the theory.
+      -- Christian Tismer, 11 Dec 2000
+
+Have they sprouted a new timbot, more geared towards newbies, more polite and
+friendly maybe, with a touch of human fallibility (hence the occasional slip of
+the keyboard) and named it Alex?
+      -- Carel Fellinger, 12 Dec 2000
+
+I'm spending most of my waking hours understanding this patch -- it is a true
+piece of wizardry.
+      -- GvR, discussing a patch from Neil Schemenauer, 13 Dec 2000
+
+    Maybe they took solidity *for granted*, because, in their (Renaissance)
+times and in their (Architecture) calling, compromises regarding solidity were
+simply unthinkable. Well, we're not so lucky, in the software field, today; the
+Firmitas of *by far* most software around is imperfect.
+    We *must* live by "do the simplest thing that can possibly work" -- give
+solidity its proper, foremost place. One of the debilitating factors for much
+current software is a misplaced emphasis on assumed 'convenience' (funky GUIs,
+quirky shortcuts, special cases aplenty) to the detriment of solidity. A small
+but crucial step to reverse this trend, is to start by putting the order right
+once more... the way Vitruvius had it!
+      -- Alex Martelli, 13 Dec 2000
+
+The Martellibot Mark 1 has a completely European flavour to it, and adds a
+cosmopolitan touch of linguistics to its output, sprinkling foreign language
+references in. It is similar to the timbot in its overall erudition, but can be
+distinguished from it by its tendency to indulge in flamewars (which, I
+believe, it does mostly to convince us it is human).
+      -- Steve Holden, 13 Dec 2000
+
+    In keeping with the religious nature of the battle-- and religion offers
+precise terms for degrees of damnation! --I suggest:
+    struggling -- a supported feature; the initial state of all features; may
+transition to Anathematized
+    anathematized -- this feature is now cursed, but is supported; may
+transition to Condemned or Struggling; intimacy with Anathematized features is
+perilous
+    condemned -- a feature scheduled for crucifixion; may transition to
+Crucified, Anathematized (this transition is called "a pardon"), or Struggling
+(this transition is called "a miracle"); intimacy with Condemned features is
+suicidal
+    crucified -- a feature that is no longer supported; may transition to
+Resurrected
+    resurrected -- a once-Crucified feature that is again supported; may
+transition to Condemned, Anathematized or Struggling; although since
+Resurrection is a state of grace, there may be no point in human time at which
+a feature is identifiably Resurrected (i.e., it may *appear*, to the
+unenlightened, that a feature moved directly from Crucified to Anathematized or
+Struggling or Condemned -- although saying so out loud is heresy).
+      -- Tim Peters, 18 Dec 2000
+
+my-python-code-runs-5x-faster-this-month-thanks-to-dumping-$2K- on-a-
+new-machine-ly y'rs
+      -- Tim Peters, 26 Dec 2000
+
+Really, I should pronounce on that PEP (I don't like it very much but haven't
+found the right argument to reject it :-) ) so this patch can either go in or
+be rejected.
+      -- GvR, 04 Jan 2001, in a comment on patch #101264
+
+The rest is history: the glory, the fame, the riches, the groupies, the
+adulation of my peers. We won't mention the financial scandal and subsequent
+bankruptcy lest it discourage you for no good reason <wink>.
+      -- Tim Peters, 14 Jan 2001
+
+If you're using anything besides US-ASCII, I *stringly* suggest Python 2.0.
+      -- Uche Ogbuji (A fortuitous typo?), 29 Jan 2001
+
+    "There goes Tim, browsing the Playboy site just for the JavaScript.
+Honest."
+    "Well, it's not like they had many floating-point numbers to ogle! I like
+'em best when the high-order mantissa bits are all perky and regular, standing
+straight up, then go monster insane in the low-order bits, so you can't guess
+*what* bit might come next! Man, that's hot. Top it off with an exponent field
+with lots of ones, and you don't even need any oil. Can't say I've got a
+preference for sign bits, though -- zero and one can both be saucy treats. Zero
+is more of a tease, so I guess it depends on the mood."
+      -- Barry Warsaw and Tim Peters, 3 Feb 2001
+
+We were sincerely hoping that the Python core team would teach their employers
+how to code Python, instead of the other way around...
+      -- Pieter Nagel, 5 Feb 2001
+
+This bug fix brought to you by the letters b, c, d, g, h, ... and the reporter
+Ping.
+      -- Jeremy Hylton in a checkin message for Python/compile.c, 12 Feb
+         2001
+
+    "It's in ClassModules.py you dumb f**k - can't you tell by the name?"
+    "Furthermore, RTFM is much more effective if you do it gently and make them
+feel nicely embarrassed, rather than having them just say 'well, fuck you too'
+when reading the first insult, and not learn a thing."
+    "Thanks. I'll try to keep that in mind the next time I flame myself."
+      -- Phlip, following up to a query he'd posted earlier, and Thomas
+         Wouters, 18 Feb 2001
+
+    "Also, does the simple algorithm you used in Cyclops have a name?"
+    "Not officially, but it answers to "hey, dumb-ass!"
+      -- Neil Schemenauer, interested in finding strongly connected
+         components in graphs, and Tim Peters, 23 Feb 2001
+
+Make this IDLE version 0.8. (We have to skip 0.7 because that was a CNRI
+release in a corner of the basement of a government building on a planet
+circling Aldebaran.)
+      -- GvR, in a CVS commit message, 22 Mar 2001
+
+Python: programming the way Guido indented it.
+      -- Digital Creations T-shirt slogan at IPC9
+
+Stackless Python: programming the way Guido prevented it.
+      -- Christian Tismer's title slide, at IPC9
+
+I don't think we should use rational numbers for money because money isn't
+rational.
+      -- Moshe Zadka, at IPC9
+
+We can't stop people from complaining but we can influence what they complain
+about.
+      -- Tim Peters, at IPC9
+
+Perl is like vise grips. You can do anything with it but it is the wrong tool
+for every job.
+      -- Bruce Eckel, at IPC9
+
+Given the choice between a good text editor and a good source control system,
+i'll take the source control, and use "cat" to write my code.
+      -- Greg Wilson, at IPC9
+
+here's the eff-bot's favourite lambda refactoring rule:
+1) write a lambda function
+2) write a comment explaining what the heck that lambda does
+3) study the comment for a while, and think of a name that captures
+   the essence of the comment
+4) convert the lambda to a def statement, using that name
+5) remove the comment
+      -- Fredrik Lundh, 01 Apr 2001
+
+The GPL tried to protect the freedom of end-users to modify and redistribute
+their code. Most people do not believe that this is a legitimate freedom like
+freedom of speech or assembly but Richard Stallman does. I don't think that
+there is an argument that that will persuade a person one way or another. If
+freedoms could be proven, that famous document would probably start: "Not
+everyone holds these truths to be self-evident, so we've worked up a proof of
+them as Appendix A."
+      -- Paul Prescod, 11 Apr 2001
+
+That is one of the first goals. Also, we want to handle a C++ SAX stream with
+Python, and vice versa (feed a Python SAX stream into Xalan). Bi-SAXuality, in
+a sense. :)
+      -- Jürgen Hermann, 11 Apr 2001
+
+As you seem totally unwilling or unable to understand that _Weltanschauung_ to
+any extent, I don't see how you could bring Python any constructive enhancement
+(except perhaps by some random mechanism akin to monkeys banging away on
+typewriters until 'Hamlet' comes out, I guess).
+      -- Alex Martelli, 17 Apr 2001
+
+    "Are we more likely to add different concrete subclasses of Consumable in
+the future, or different concrete subclasses of Consumer? I suspect the former
+is more likely."
+    "With genetic engineering being the latest growth industry, I'm not sure
+that's true. Although I expect that any new models of cow, etc. will have a
+backwards compatible food-consumption protocol."
+      -- Alex Martelli and Greg Ewing, 19 Apr 2001
+
+This property is called confluence, and the proof is called the Church -Rosser
+theorem. I'm sure you know this, of course, but somewhere out there there's a
+college student who is being shocked that CS is actually turning out to be
+relevant, for sufficiently small values of relevance.
+      -- Neelakantan Krishnaswami, 20 Apr 2001
+
+if the style mafia finds out, you may find a badly severed list comprehension
+in your bed one morning, but I'd say the risk is very low.
+      -- Fredrik Lundh, 10 May 2001
+
+1495 is a *deservedly* unpopular number. After all, Lorenzo de' Medici ("il
+Magnifico") died in 1492, and Giovanni de' Medici ("dalle Bande Nere") wasn't
+born until 1498, so 1495 fell right in the middle of a very boring and unusual
+lull where no really outstanding member of the Medici family (either branch)
+was around.
+      -- Alex Martelli, 24 May 2001
+
+    "What do you call the thing that pops up and says `Searching' or something
+to reassure the user that his computer hasn't crashed and the application is
+still running?"
+    "On Windows, that's called 'a miracle'."
+      -- Laura Creighton and Tim Peters, 28 May 2001
+
+In general, my conclusion after doing numerical work for a while is that the
+desire to look at algorithms crucial to your research as black boxes is futile.
+In the end, I always had to dig into the details of the algorithms because they
+were either never black-boxable or the black-box versions didn't do a good
+enough job.
+      -- David Ascher, 28 May 2001
+
+    "Oh, read *all* Kahan has written, and if you emerge still thinking you
+*know* what you're doing when floating point is involved, you're either Tim
+Peters, or the world champ of hubris."
+    "I find it's possible to be both <wink>."
+      -- Alex Martelli and Tim Peters, 20 May 2001
+
+Wow, this almost looks like a real flamefest. ("Flame" being defined as the
+presence of metacomments.)
+      -- GvR, 13 Jun 2001
+
+    "Maybe we also have a smaller brain than the typical Lisper -- I would say,
+that would make us more normal, and if Python caters to people with a
+closer-to-average brain size, that would mean more people will be able to
+program in Python. History will decide..."
+    "I thought it already has, pretty much."
+      -- GvR and A.M. Kuchling, 14 Jun 2001
+
+Did Guido use the time machine to get a copy of the GoF book before he started
+working on the first version of Python, or are Patterns just a transparent
+attempt to cover for chronically inexpressive languages like C++ and Java which
+can't generally implement these mind-numbingly simple constructs in code?
+      -- Glyph Lefkowitz, 7 Jun 2001
+
+Google confuses me; if you search for "michael hudson" my page is the third hit
+-- but my name doesn't actually appear anywhere on the linked page! The "did
+you mean to search for..." feature is also downright uncanny. They've clearly
+sold their souls to the devil -- there's no other explanation.
+      -- Michael Hudson, 28 Jun 2001
+
+You didn't say what you want to accomplish. If the idea of "provably correct"
+programs appeals to you, Eiffel will give you more help than any other
+practical language I know of. But since your post didn't lay out your
+assumptions, your goals, or how you view language characteristics as fitting in
+with either, you're not a *natural* candidate for embracing Design by Contract
+<0.6 wink>.
+      -- Tim Peters, 3 Jun 2001
+
+    The static people talk about rigorously enforced interfaces, correctness
+proofs, contracts, etc. The dynamic people talk about rigorously enforced
+testing and say that types only catch a small portion of possible errors. The
+static people retort that they don't trust tests to cover everything or not
+have bugs and why write tests for stuff the compiler should test for you, so
+you shouldn't rely on *only* tests, and besides static types don't catch a
+small portion, but a large portion of errors. The dynamic people say no program
+or test is perfect and static typing is not worth the cost in language
+complexity and design difficulty for the gain in eliminating a few tests that
+would have been easy to write anyway, since static types catch a small portion
+of errors, not a large portion. The static people say static types don't add
+that much language complexity, and it's not design "difficulty" but an
+essential part of the process, and they catch a large portion, not a small
+portion. The dynamic people say they add enormous complexity, and they catch a
+small portion, and point out that the static people have bad breath. The static
+people assert that the dynamic people must be too stupid to cope with a real
+language and rigorous requirements, and are ugly besides.
+    This is when both sides start throwing rocks.
+      -- Quinn Dunkan, 13 Jul 2001
+
+I am becoming convinced that Unicode is a multi-national plot to take over the
+minds of our most gifted (and/or most obsessive) programmers, in pursuit of an
+elusive, unresolvable, and ultimately, undefinable goal.
+      -- Ken Manheimer, 19 Jul 2001
+
+Unicode is the first technology I have to deal with which makes me hope I die
+before I really really *really* need to understand it fully.
+      -- David Ascher, 19 Jul 2001
+
+Moore's law is slowly making type declarations irrelevant...
+      -- Paul Prescod, 29 Jul 2001
+
+The mark of a mature programmer is willingness to throw out code you spent time
+on when you realize it's pointless.
+      -- Bram Cohen, 20 Sep 2001
+
+Generators and iterators are among the most loving features ever introduced.
+They will give and give, without ever asking anything from you save the
+privilege of gracing your code, waiting with eager anticipation for you to
+resume them at your pleasure, or even to discard them if you tire of their
+charms. In fact, they're almost pathologically yielding.
+      -- Tim Peters, 18 Oct 2001
+
+IMO a bunch of the frustration I sometimes feel with Python comes from its
+originally being intended as a "glue" language. It's too good for that, and
+finds itself used as a work horse or even a race horse. Neither type of horse
+belongs in the glue factory ;-).
+      -- Paul Rubin, 30 Oct 2001
+
+    "Which inevitably has the followup rhyme 'There was a young man from
+Verdun'."
+    "But somehow no one ever seems to be able to remember what it was about the
+man from Abdero."
+      -- Simon Callan and Gareth McCaughan, 04 Nov 2001, after someone
+         quoted the limerick "There was a young man from Wooloomooloo /
+         Whose limericks always finished on line two."
+
+Sometimes I feel like I'm reinventing Zope, but at least it's a Zope I
+understand.
+      -- Quinn Dunkan, 05 Nov 2001 on the quixote-users list
+
+Homological algebra beckons -- brain relief in this context!
+      -- Michael Hudson, 07 Nov 2001, in a discussion of Stackless Python
+
+If you're talking "useful", I'm not your bot.
+      -- Tim Peters, 08 Nov 2001
+
+    "How do you do a range of floats?"
+    "Bring flowers, and buy them all nice dinners. Try not to be *too* obvious
+that you're out to do them, though."
+      -- Thomas Wouters and Tim Peters, 09 Nov 2001
+
+Changing diapers reminded Guido that he wanted to allow for some measure of
+multiple inheritance from a mix of new- and classic-style classes.
+      -- Tim Peters in a checkin message, 14 Nov 2001
+
+My late father-in-law, Ray Pigozzi, was an extremely talented architect (he was
+made a fellow of the AIA in the late 70's or early 80's), and although he was
+by all accounts an excellent mentor to younger architects in the firm he
+cofounded, he also had the well- deserved reputation of being quite laconic
+(this I know from personal experience ;-). Early in his career, he received an
+award from some masonry organization for his use of brick in building OWP (now
+OWP&P) had designed. This necessitated the usual awards ceremony with dinner
+and speeches. The recipients who preceeded Ray to the podium all spoke at
+length about their work. Ray's entire acceptance speech was, "The building
+speaks for itself."
+      -- Skip Montanaro, 4 Jan 2002
+
+The Lisp community is like a ghost town, with the occasional banshee howl
+echoing darkly around the chamber in lament of what might have been.
+      -- Courageous, 19 Jan 2002
+
+I'll lend you _Calendrical Calculations_. Even *skimming* the chapters on some
+of the world's other calendrical delights makes our date gimmicks blind via the
+intensity of their clarity.
+      -- Tim Peters, 05 Mar 2002
+
+The joy of coding Python should be in seeing short, concise, readable classes
+that express a lot of action in a small amount of clear code -- not in reams of
+trivial code that bores the reader to death.
+      -- GvR, 20 Mar 2002
+
+A bot may injure a human being, or, preferably, through inaction, allow a human
+being to come to harm, although laughing about either in the hearing of humans
+is MACNAM-017B3^H.
+      -- Tim Peters, 26 Mar 2002
+
+"It works in Scheme" doesn't give me the warm fuzzy feeling that it's been
+tried in real life.
+      -- GvR, 02 Oct 2002
+
+Most recipes are short enough for the attention span of the average Python
+programmer.
+      -- GvR, in the introduction to the _Python Cookbook_
+
+We read Knuth so you don't have to.
+      -- Tim Peters, _Python Cookbook_
+
+Here's another technique that is faster and more obvious but that is often
+avoided by those who mistakenly believe that writing two lines of code where
+one might do is somehow sinful.
+      -- Tim Peters, _Python Cookbook_
+
+A fruitful approach to problem solving is known as "divide and conquer", or
+making problems easier by splitting their different aspects apart. Making
+problems harder by joining several aspects together must be an example of an
+approach known as "unite and suffer!"
+      -- Alex Martelli, _Python Cookbook_
+
+compromise-is-the-art-of-spreading-misery-ly y'rs
+      -- Tim Peters, 11 Dec 2002
+
+As for Grail, it was certainly a "hot product" in the Python community in 1995
+because of the restricted execution environment which I evaluated for a project
+involving mobile software agents. How priorities and trends have changed since
+then! Who would have thought that Microsoft Outlook would be the premier
+platform for mobile code?
+      -- Paul Boddie, 16 Jan 2004
+
+    I mean, if I think about my open-source contributions, nobody wants to see
+talks with these titles:
+    * The Zope API Reference: Ouch
+    * A Random Handful Of Bugs I've Fixed In Other Peoples' Code
+    * An Old Crufty Project I Inherited That Has Zero Relevance To You
+    * The Joy of Preemptive Abandonware: Release Late, If Ever (or, Software
+Design as a Nihilistic Abstract Art Form) (or, Sourceforge as a Medium for
+Cryptic Time Capsules)
+      -- Paul Winkler, 14 Mar 2005
+
+Syntax should not look like grit on my monitor.
+      -- Anthony Baxter, 02 Jun 2005
+
+Can this not be resolved by carefully adjusting the order of finalization? If
+code can be bootstrapped it can be strootbapped.
+      -- Kristján Jónsson, 30 Jun 2006
+
+Python resembles Lisp like an octopus eye resembles a mammalian eye: they have
+lots in common because they're both pretty good solutions to similar problems.
+Deciding whether it's Python or Lisp that has the retina fitted back-to-front
+is left as an exercise for the reader.
+      -- Gareth McCaughan, 11 Jul 2006
+
+As Neal said, we are not perfect; bugs happen. If we all gave up on a piece of
+software after two bugs we would not be able to turn our computers.
+      -- Brett Cannon, 13 Jul 2006
+
+... I've come to believe that some people have the personality traits that let
+them tolerate redoing the same work over and over again for no reason other
+than management "furniture rearranging", whereas others start to resent having
+their (working) life repeatedly flashed before their eyes, but in slightly
+different colours, over a longer period of time.
+      -- Paul Boddie, 29 Aug 2006
+
+    I am the very model of a modern major database,
+     For gigabytes of information gathered out in userspace.
+     For banking applications to a website crackers will deface,
+     You access me from console or spiffy user interface.
+    My multi-threaded architecture offers you concurrency,
+     And loads of RAM for caching things reduces query latency.
+     The data is correctly typed, a fact that I will guarantee,
+     Each datum has a data type, it's specified explicitly.
+      -- Tim Chase, 12 Sep 2006
+

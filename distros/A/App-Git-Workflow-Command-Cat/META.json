@@ -1,0 +1,55 @@
+{
+   "abstract" : "Show the content of a git file.",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Git-Workflow-Command-Cat",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0.016"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Git::Workflow" : "0.96011",
+            "App::Git::Workflow::Command" : "0.96011",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "App::Git::Workflow::Command::Cat" : {
+         "file" : "lib/App/Git/Workflow/Command/Cat.pm",
+         "version" : "0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::Git::Workflow::Command::Cat"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/ivanwills/App-Git-Workflow-Command-Cat.git"
+      }
+   },
+   "version" : "0.2"
+}

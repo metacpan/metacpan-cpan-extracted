@@ -1,0 +1,84 @@
+{
+   "abstract" : "Generate Plant UML's class diagraom from Perl packages.",
+   "author" : [
+      "This library is free software; you can redistribute it and/or modify"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-PerlPackage2PlantUMLClassDiagram",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PPI" : "0",
+            "Text::MicroTemplate::DataSection" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::PerlPackage2PlantUMLClassDiagram" : {
+         "file" : "lib/App/PerlPackage2PlantUMLClassDiagram.pm",
+         "version" : "0.02"
+      },
+      "App::PerlPackage2PlantUMLClassDiagram::Package" : {
+         "file" : "lib/App/PerlPackage2PlantUMLClassDiagram/Package.pm"
+      },
+      "App::PerlPackage2PlantUMLClassDiagram::Repository" : {
+         "file" : "lib/App/PerlPackage2PlantUMLClassDiagram/Repository.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hitode909/App-PerlPackage2PlantUMLClassDiagram/issues"
+      },
+      "homepage" : "https://github.com/hitode909/App-PerlPackage2PlantUMLClassDiagram",
+      "repository" : {
+         "url" : "git://github.com/hitode909/App-PerlPackage2PlantUMLClassDiagram.git",
+         "web" : "https://github.com/hitode909/App-PerlPackage2PlantUMLClassDiagram"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:HITODE",
+   "x_contributors" : [
+      "hitode909 <hitode909@gmail.com>"
+   ]
+}

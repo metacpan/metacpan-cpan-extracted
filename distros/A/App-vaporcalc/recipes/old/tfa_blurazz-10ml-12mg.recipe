@@ -1,0 +1,29 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "Blueberry",
+            "percentage" : "4"
+         },
+         {
+            "type" : "PG",
+            "tag" : "Raspberry (sweet)",
+            "percentage" : "8"
+         }
+      ],
+      "target_pg" : "50",
+      "base_nic_per_ml" : "100",
+      "base_nic_type" : "PG",
+      "target_quantity" : "10",
+      "target_nic_per_ml" : "12",
+      "target_vg" : "50",
+      "notes" : [
+         "Tried 7% raspberry (sweet), 3% blueberry",
+         "This one needs some adjustment. 55 PG might be better.",
+         "Maybe just a little higher on the rasp.",
+         " ..maybe a little EM to add some pop.",
+         "(Jon)"
+      ]
+   }
+}

@@ -1,0 +1,21 @@
+Revision history for Acme-Lingua-EN-Inflect-Modern
+
+0.006     2014-02-04 22:31:38-05:00 America/New_York
+        - fix metadata links
+
+0.005     2013-10-27 22:19:55 America/New_York
+        - update packaging again, add repo, bugtracker
+        - replace use base with use parent
+
+0.004   2009-01-16
+        update packaging
+
+0.003   2007-03-22
+        fix stupid kwalitee indicator's
+
+0.002   2007-02-26
+        fix prerequisite's
+
+0.001   2007-02-25
+        First version, released on unsuspecting user's.
+

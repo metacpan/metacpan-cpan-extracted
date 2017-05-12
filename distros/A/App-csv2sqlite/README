@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution App-csv2sqlite,
+version 0.004:
+
+  Import CSV files into a SQLite database
+
+This software is copyright (c) 2012 by Randy Stauner.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,58 @@
+#!/usr/bin/perl /usr/bin/asp-perl
+
+<% $Response->Include('header.inc', bgcolor => $Request->Form('color') || 'white'); %>
+<h3> Demonstration of dynamic includes. </h3>
+<table border=0>
+<tr>
+	<td>
+		<form name=color method=post>
+		<input type=text name=color value="<%=$Request->Form('color') || 'white' %>">
+		</form>
+	</td>
+	<td>
+	This first example demonstrates dynamic includes SSI style.
+	First try entering a color in the box to be passed as a runtime argument to the
+	included header for this file.  Just hit enter after typing in the color.
+	</td>
+</tr>
+</table>
+
+<table border=0>
+<tr>
+	<td>
+		<form method=post>
+		<input type=text name=size value="<%=$Request->Form('size')%>">
+		</form>
+	</td>
+	<td>
+	Now to show you how to access dynamic includes through the API
+	extension $Response->Include($filename, @args)... please
+	enter a number of columns less than 10 in the text box, and a grid will
+	be produce below of that size.
+	</td>
+</tr>
+<tr>
+	<td colspan=2>
+	<%
+	my $size = $Request->Form('size');
+	if($size > 0 and $size <= 10) {		
+	    # Response->Include() and Server->Execute do the same things
+	    # but the former is the native solution, and the latter comes
+	    # from the recent IIS/ASP 3.0 API extension.  Formally, Execute()
+	    # doesn't take arguments, but we allow this functionality.
+	    if($size % 2) {
+		$Response->Include('table.inc', $size);
+	    } else {
+	        $Server->Execute('table.inc', $size);
+	    }
+	} else {
+		print "Please enter a valid number from 1 to 10 in the form.\n";
+	}    
+	%>
+	</td>
+</tr>
+</table>
+
+<!--#include file=footer.inc-->
+
+

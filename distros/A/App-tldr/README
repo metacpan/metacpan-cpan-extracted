@@ -1,0 +1,23 @@
+NAME
+
+    App::tldr - a perl client for http://tldr-pages.github.io/
+
+SYNOPSIS
+
+      $ tldr tar
+
+DESCRIPTION
+
+    App::tldr is a client for http://tldr-pages.github.io/.
+
+SEE ALSO
+
+    https://github.com/tldr-pages/tldr
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2016 Shoichi Kaji <skaji@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

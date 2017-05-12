@@ -1,0 +1,11 @@
+TYPEMAP
+Apache  T_APACHEOBJ
+
+OUTPUT
+T_APACHEOBJ
+  sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+
+INPUT
+T_APACHEOBJ
+  r = sv2request_rec($arg, \"$ntype\", cv)
+

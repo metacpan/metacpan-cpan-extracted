@@ -1,0 +1,113 @@
+---
+abstract: 'Aspose.Storage Cloud SDK for Perl'
+author:
+  - 'Farooq Sheikh <farooq.sheikh@aspose.com>'
+build_requires:
+  Test::More: '0.10'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AsposeStorageCloud-StorageApi
+provides:
+  AsposeStorageCloud::ApiClient:
+    file: lib/AsposeStorageCloud/ApiClient.pm
+  AsposeStorageCloud::Configuration:
+    file: lib/AsposeStorageCloud/Configuration.pm
+  AsposeStorageCloud::Object::BaseObject:
+    file: lib/AsposeStorageCloud/Object/BaseObject.pm
+  AsposeStorageCloud::Object::DateTime:
+    file: lib/AsposeStorageCloud/Object/DateTime.pm
+  AsposeStorageCloud::Object::DateTimeKind:
+    file: lib/AsposeStorageCloud/Object/DateTimeKind.pm
+  AsposeStorageCloud::Object::DayOfWeek:
+    file: lib/AsposeStorageCloud/Object/DayOfWeek.pm
+  AsposeStorageCloud::Object::DiscUsage:
+    file: lib/AsposeStorageCloud/Object/DiscUsage.pm
+  AsposeStorageCloud::Object::DiscUsageResponse:
+    file: lib/AsposeStorageCloud/Object/DiscUsageResponse.pm
+  AsposeStorageCloud::Object::FileExist:
+    file: lib/AsposeStorageCloud/Object/FileExist.pm
+  AsposeStorageCloud::Object::FileExistResponse:
+    file: lib/AsposeStorageCloud/Object/FileExistResponse.pm
+  AsposeStorageCloud::Object::FileVersion:
+    file: lib/AsposeStorageCloud/Object/FileVersion.pm
+  AsposeStorageCloud::Object::FileVersionsResponse:
+    file: lib/AsposeStorageCloud/Object/FileVersionsResponse.pm
+  AsposeStorageCloud::Object::HttpResponseMessage:
+    file: lib/AsposeStorageCloud/Object/HttpResponseMessage.pm
+  AsposeStorageCloud::Object::HttpStatusCode:
+    file: lib/AsposeStorageCloud/Object/HttpStatusCode.pm
+  AsposeStorageCloud::Object::LineNumberRestartMode:
+    file: lib/AsposeStorageCloud/Object/LineNumberRestartMode.pm
+  AsposeStorageCloud::Object::MoveFileResponse:
+    file: lib/AsposeStorageCloud/Object/MoveFileResponse.pm
+  AsposeStorageCloud::Object::MoveFolderResponse:
+    file: lib/AsposeStorageCloud/Object/MoveFolderResponse.pm
+  AsposeStorageCloud::Object::NumberStyle:
+    file: lib/AsposeStorageCloud/Object/NumberStyle.pm
+  AsposeStorageCloud::Object::Orientation:
+    file: lib/AsposeStorageCloud/Object/Orientation.pm
+  AsposeStorageCloud::Object::PageBorderAppliesTo:
+    file: lib/AsposeStorageCloud/Object/PageBorderAppliesTo.pm
+  AsposeStorageCloud::Object::PageBorderDistanceFrom:
+    file: lib/AsposeStorageCloud/Object/PageBorderDistanceFrom.pm
+  AsposeStorageCloud::Object::PageVerticalAlignment:
+    file: lib/AsposeStorageCloud/Object/PageVerticalAlignment.pm
+  AsposeStorageCloud::Object::PaperSize:
+    file: lib/AsposeStorageCloud/Object/PaperSize.pm
+  AsposeStorageCloud::Object::RemoveFileResponse:
+    file: lib/AsposeStorageCloud/Object/RemoveFileResponse.pm
+  AsposeStorageCloud::Object::RemoveFolderResponse:
+    file: lib/AsposeStorageCloud/Object/RemoveFolderResponse.pm
+  AsposeStorageCloud::Object::ReportType:
+    file: lib/AsposeStorageCloud/Object/ReportType.pm
+  AsposeStorageCloud::Object::ResponseMessage:
+    file: lib/AsposeStorageCloud/Object/ResponseMessage.pm
+  AsposeStorageCloud::Object::SectionStart:
+    file: lib/AsposeStorageCloud/Object/SectionStart.pm
+  AsposeStorageCloud::Object::StorageExistResponse:
+    file: lib/AsposeStorageCloud/Object/StorageExistResponse.pm
+  AsposeStorageCloud::Object::StyleIdentifier:
+    file: lib/AsposeStorageCloud/Object/StyleIdentifier.pm
+  AsposeStorageCloud::Object::TextEffect:
+    file: lib/AsposeStorageCloud/Object/TextEffect.pm
+  AsposeStorageCloud::Object::TimeSpan:
+    file: lib/AsposeStorageCloud/Object/TimeSpan.pm
+  AsposeStorageCloud::Object::Underline:
+    file: lib/AsposeStorageCloud/Object/Underline.pm
+  AsposeStorageCloud::StorageApi:
+    file: lib/AsposeStorageCloud/StorageApi.pm
+    version: '1.01'
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Date::Parse: '0'
+  DateTime: '0'
+  Digest::HMAC_SHA1: '0'
+  Exporter: '0'
+  File::Slurp: '0'
+  HTTP::Headers: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Response: '0'
+  HTTP::Status: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Log::Any: '0'
+  MIME::Base64: '0'
+  Module::Runtime: '0'
+  Scalar::Util: '0'
+  Test::Exception: '0'
+  URI::Escape: '0'
+  URI::Query: '0'
+  perl: v5.6.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: '1.01'

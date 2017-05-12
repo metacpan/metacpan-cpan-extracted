@@ -1,0 +1,10 @@
+0.033
+        * Fix shareroot bug
+        * Update command help.
+        * Fix server command.
+
+0.032
+        * Just update.
+
+0.007   
+        * Add --prompt option to `po auto` command.

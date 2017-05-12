@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Apache/AutoIndex.dic
+AutoIndex.pm
+t/icon.t
+t/test.t

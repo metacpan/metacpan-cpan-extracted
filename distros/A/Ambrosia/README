@@ -1,0 +1,33 @@
+                             Ambrosia framework.
+              Copyright (c) 2012 by Kuritsyn Nikolay <knm@cpan.org>
+
+Project version: 0.10
+Project state: Experimental / Unde construction
+Licension: see LICENSE
+
+This archive contains the distribution Ambrosia,
+a powerful web application framework that can be used
+to create general applications too.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Tests that need access to the database use the username "root" with empty password to authorize.
+
+And in the database you must have the schema "test".
+The database used for tests must be MySql.
+
+You can change username and password. This user must have permission to create tables in the schema "test".
+    perl Makefile.PL -U USER_NAME -P PASSWORD
+
+Run
+    perl Makefile.PL --help
+for see other parameters.
+

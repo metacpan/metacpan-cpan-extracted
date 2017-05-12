@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/AnyEvent/Handle/Throttle.pm
+MANIFEST			This list of files
+META.json
+README
+t/http.t
+t/http_default.t
+t/http_global.t
+t/loopback.t

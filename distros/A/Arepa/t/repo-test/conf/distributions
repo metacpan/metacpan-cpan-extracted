@@ -1,0 +1,10 @@
+Codename: lenny-opera
+Components: main
+Architectures: source i386 amd64
+Suite: Lenny
+Version: 5.0
+
+Codename: etch-opera
+Components: main
+Architectures: i386
+Origin: Opera

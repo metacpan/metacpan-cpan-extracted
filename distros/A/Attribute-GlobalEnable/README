@@ -1,0 +1,32 @@
+Attribute-GlobalEnable version 0.01
+===================================
+
+See the perldoc for package specific info.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Attribute::Handlers
+  Test::More (for running the tests)
+  Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Craig L. Monson
+
+I suppose I (Craig Monson) own it.  All Rights Reserved.  This module is 100%
+free software, and may be used, reused, redistributed, messed with,
+subclassed, deleted, printed, compiled, and pooped on, just so long as you
+follow the terms described by Perl itself.
+
+

@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache::Session::Generate::AutoIncrement.
+
+0.01  Wed Jan  2 20:22:58 2002
+	- original version; created by h2xs 1.20 with options
+		-AX Apache::Session::Generate::AutoIncrement
+

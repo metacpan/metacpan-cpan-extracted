@@ -1,0 +1,28 @@
+---
+abstract: 'nopaste service for L<Dancebin>'
+author:
+  - 'William Wolf <throughnothing@gmail.com>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120630'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Nopaste-Service-Dancebin
+requires:
+  App::Nopaste::Service: 0
+  Encode: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/throughnothing/App-Nopaste-Service-Dancebin/issues
+  homepage: http://metacpan.org/release/App-Nopaste-Service-Dancebin/
+  repository: git://github.com/throughnothing/App-Nopaste-Service-Dancebin.git
+version: 0.004

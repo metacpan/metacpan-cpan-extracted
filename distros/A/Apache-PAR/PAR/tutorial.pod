@@ -1,0 +1,351 @@
+=head1 NAME
+
+Apache::PAR::tutorial - Information on getting Apache::PAR up and running.
+
+=head1 INTRODUCTION
+
+Apache::PAR is a framework for including Perl ARchive files in a mod_perl (1.x or 2.x) 
+environment.  It allows an author to package up a web application, including configuration, 
+static files, Perl modules, and Registry and PerlRun scripts to include in a single file.  
+This archive can then be moved to other locations on the same system or distributed and loaded 
+with a single set of configuration options in the Apache configuration.
+
+These modules are based on PAR.pm by Autrijus Tang and Archive::Zip by Ned Konz as well as the 
+mod_perl modules.  They extend the concept of PAR files to mod_perl, similar to how WAR 
+archives work for Java. An archive (which is really a zip file), contains one or more elements 
+which can be served to clients making requests to an Apache web server.  Scripts, modules, and 
+static content should then be able to be served from within the .par archive without 
+modifications.
+
+=head2 For the package developer
+
+For the package developer, Apache::PAR allows for easy package management, which frees the 
+author from the task of creating a full Perl package.  Apache::PAR allows the package 
+developer to set the required Apache configuration directly in a package which greatly 
+simplifies the install process for the end user and gives the the developer the ability to 
+assign URL's which remain the same on all systems that the package is installed on.  It is 
+possible to decompress the contents of the PAR file during startup, which allows the use of 
+code which relies on outside content (templating systems, etc)
+
+=head2 For the package user
+
+Once Apache::PAR is installed, it can be configured in an Apache configuration file with as 
+little as two lines.  Once setup, to add a new .par package to the system a user only has to 
+place the package in the directory specified in the Apache configuration and restart Apache.  
+All other configuration needs are provided by the module itself.
+
+=head1 INSTALLATION
+
+Apache::PAR is installed in a manner similar to other CPAN modules.  Either use CPAN to 
+install, or download the package and install by hand.
+
+=head2 Installation from CPAN
+
+To install from CPAN, simply start the CPAN shell and execute an install command.  
+For instance:
+
+	perl -MCPAN -eshell;
+	install Apache::PAR
+
+Select [y]es to install any required dependencies.
+
+B<NOTE:> If you are installing Apache::PAR using CPAN as root you may need to force the 
+install (force install Apache::PAR.)  This is because the tests rely on loading .par files 
+from a test directory, which may fail due to permission problems.  Unless compiled to do so, 
+Apache will not run as the root user, however, the modules are tested from the .cpan directory 
+under root's home directory.  This will hopefully be addressed in a future version of 
+Apache::PAR.  Also, you may want to add your Apache bin/ directory to your path if it isn't 
+already set.  This allows Apache::Test to choose which Apache to use when testing.
+
+
+=head2 Manual installation
+
+Download the latest version of Apache::PAR from CPAN, as well as any dependencies which you do 
+not already have installed.  Below is a list of modules which are required by Apache::PAR.  
+For some of these modules, a compiler may be required if building from source (although, 
+Apache::PAR itself is written in pure perl.)  NOTE: It is possible to install all of these on 
+Win32 systems without a compiler.  Most of these modules are avalable through ppm, and PAR 
+itself has it's own system for downloading binary code for platforms which do not have a 
+compiler (as of this writing, PAR .74 is not available on ppm, but a normal install should
+work)
+
+=over 4
+
+=item * PAR.pm       >= .74
+
+=item * Archive::Zip >= 1.05
+
+=item * MIME::Types  >= 1.004
+
+=item * mod_perl     >= 1.26 (or > 1.99)
+
+=item * Apache::Test >= 1.03
+
+=item * Digest::MD5  >= 2.20
+
+=item * File::Spec   >= .83
+
+=item * File::Path   >= 1.05
+
+=back 
+
+To install a Perl module manually, use the following steps: unpack, create the makefile, make 
+the package, optionally test the package, and install the package:
+
+=over 4
+
+=item 1. tar -xvzf Apache-PAR-<version>.tar.gz
+
+=item 2. cd Apache-PAR-<version>
+
+=item 3. perl Makefile.PL
+
+=item 4. make
+
+=item 5. make test
+
+=item 6. make install
+
+=back
+
+If you want to install Apache::PAR in a directory other than the default, use the PREFIX 
+option to step 3. above:
+	perl Makefile.PL PREFIX=/path/to/install
+
+This is useful if you are installing Apache::PAR as a non-root user.  If you do this, however, 
+you may need to add the path to find Apache::PAR to a <PERL> section in your Apache 
+configuration.  See the mod_perl documentation for more information.
+
+B<NOTE:> Similarly to the CPAN install instructions above, if you are installing this package 
+as root, or using mod_perl 2.x, you may run into some problems with permissions when running 
+step 5. above (make test.)  In order to run the tests as root, you will have to build 
+Apache::PAR from a directory that is readable by the Apache user, normally the "nobody" user, 
+that you wish to test with.
+
+B<NOTE:> If you have both mod_perl 1.x and 2.x installed, you may have to setup which one to 
+test against before installing.  See L<Apache::Test> for more information.
+
+If you have installation problems which you cannot resolve, see the L<CONTACT> section to 
+notify the module author of the problem.
+
+=head1 CONFIGURATION
+
+Once Apache::PAR has been installed, it needs to be configured in order to tell it which 
+packages should be included when starting Apache.  A short example follows:
+
+    PerlSetVar PARInclude /path/to/dir
+    PerlAddVar PARInclude /path/to/another/dir
+    ...
+    PerlAddVar PARInclude /path/to/a/file.par
+    PerlAddVar PARInclude /path/to/another/file.par
+    ...
+    PerlAddVar PARTempDir /path/to/temp/dir
+    ...
+    PerlModule Apache::PAR
+    PerlInitHandler Apache::PAR
+
+B<PLATFORM NOTE:> On Win32 platforms, the line reading PerlModule::Apache::PAR should be:
+    <PERL>
+    use Apache::PAR;
+    </PERL>
+
+B<IMPORTANT:> PerlSetVar lines related to the configuration of the Apache::PAR module 
+B<*must*> appear above the PerlModule line for Apache::PAR.  This is due to the order in which 
+Apache parses the configuration file and what information is available to Apache::PAR when it 
+is loaded.
+
+B<IMPORTANT:> When using mod_perl 2.x, if you are using both mod_perl 1.x and 2.x on the same 
+machine, you may need to add a line similar to:
+
+  PerlModule Apache2
+
+This line should be added before any Apache::PAR lines in the configuration.
+
+B<NOTE:> Alternatively, Apache::PAR can be configured completely in a startup.pl or PERL 
+section by using a configuration like the following:
+
+  use Apache::PAR qw(
+    /path/to/dir
+    /path/to/another/dir
+    /path/to/a/par/file.par
+    /path/to/another/par/file.par
+  );
+
+The files and directories listed in the import list for Apache::PAR will be included in the 
+same fashion as PAR archives added with PARInclude.  However, not mix PerlModule Apache::PAR 
+with use Apache::PAR, only one of these should exist in a given configuration.  If you need to 
+do something like this, you can use
+
+  import Apache::PAR qw(...);
+
+after a PerlModule Apache::PAR entry (or after a previous use Apache::PAR line).
+
+Each configuration option is described below in more detail:
+
+B<PARInclude:> PARInclude options are used to specify either PAR archives to be loaded, or 
+directories to be scanned for PAR archives.  For either directories or files, the option can 
+include either a full or relative path (without a leading /).
+
+If a relative path is specified, Apache::PAR will attempt to find files based on Apache's 
+server_root (normally the base directory in which Apache is installed.)  For instance, if 
+Apache is installed in /usr/local/apache, then including "PerlSetVar PARInclude par/" in your 
+configuration would attempt to load .par files from C</usr/local/apache/par>
+
+B<PARDir *DEPRECATED*:> The PARDir directive has been depracated and for now works the same 
+way as PARInclude.  This directive may be removed in a future version of Apache::PAR.
+
+B<PARFile *DEPRECATED*:> The PARFile directive has been depracated and for now works the same 
+way as PARInclude.  This directive may be removed in a future version of Apache::PAR.
+
+A PAR archive will be rejected if it is not readable by the user which Apache is started as 
+or if the file is not in zip file format.  Otherwise, Apache::PAR will then open each .par 
+archive found and attempt to load any configuration found within.  Look in your Apache 
+error_log for errors related to loading .par archives.
+
+B<PerlInitHandler Apache::PAR:> This directive tells Apache that Apache::PAR should be 
+checked during requests to see if any content has been changed inside PAR archives.  If any 
+content has changed, the modules and content will be reloaded automatically.  This is 
+probably a good setting to use in development, but you may want to consider skipping this in 
+a production environment due to the overhead of checking the modified times of packages.
+
+B<PARTempDir:> This directive is used to specifiy the location of the directory which will 
+be used when unpacking any PAR content (for archives which require this functionality.)  If 
+PARTempDir is set to NONE, archives which require unpacking will not load during startup, and 
+a warning will be generated.  PARTempDir defaults to the platform specific temp directory if 
+available.
+
+=head1 CREATING PACKAGES
+
+At a minimum, creating .par packages is as simple as making a web.conf file which has 
+information about how to access the contents of your package and creating a zip file with this 
+file as well as the content and programs.
+
+=head2 web.conf
+
+The web.conf file contains the Apache configuration instructions necessary to use the content 
+included in your package.  This file should be placed in the main directory of the .par file 
+and is in Apache configuration file format.  The only addition to this format by Apache::PAR 
+is the ##PARFILE## meta directive, which is used to specify the location of the current .par 
+file (since this information is not known at package creation time.)  Below is a sample 
+web.conf file:
+
+    Alias /myapp/cgi-perl/ ##PARFILE##/
+    PerlModule Apache::PAR::Registry
+    <Location /myapp/cgi-perl>
+      Options +ExecCGI
+      SetHandler perl-script
+      PerlHandler Apache::PAR::Registry
+    </Location>
+
+This web.conf file creates a /myapp/cgi-perl location on the web server to serve Registry 
+scripts from inside your .par archive.  Similar sections can be added for other types of 
+content including static content, Registry scripts, PerlRun scripts, or mod_perl modules.  
+Another section below shows the configuration necessary to load a sample mod_perl module:
+
+    PerlModule MyApp::TestMod
+    Alias /myapp/mod/ ##PARFILE##/
+    <Location /myapp/mod>
+      SetHandler perl-script
+      PerlHandler TestMod
+    </Location>
+
+This configuration section would load a mod_perl module named MyApp::TestMod and make it 
+available under the url /myapp/mod.  For other types of configuration, see the documentation 
+for the particular content type you wish to add.
+
+Another special variable, ##UNPACKDIR## allows the managing of uncompressing content during 
+Apache startup.  If ##UNPACKDIR## is specified, it does two things. 1) Tells Apache::PAR 
+that it is expected to decompress the content and 2) defines the location to directives in 
+the web.conf where this content was unpacked to.  For instance, to set a template directory 
+to be unpacked, and create a environment variable pointing to this location for content, 
+you could use something like the following:
+
+    PerlSetEnv TestModTemplateDir ##UNPACKDIR##/templates
+
+With this directive, a PAR archive can also be treated as any other Apache content, by 
+using ##UNPACKDIR## in place of ##PARFILE##, and using the normal Apache or mod_perl modules 
+for handling content.  For instance:
+
+    Alias /myapp/cgi-perl/ ##UNPACKDIR##/cgi-perl/
+    PerlModule Apache::Registry
+    <Location /myapp/cgi-perl>
+      Options +ExecCGI
+      SetHandler perl-script
+      PerlHandler Apache::Registry
+    </Location>
+
+=head2 Content
+
+To add content to a package simply create your scripts, modules and static content in the 
+appropriate directory.  Below are the default directories for each content type.  It is 
+probably a good idea to use the directories listed below, as the selection of the directory 
+each type of content will be read from is configured by the end user of the package.
+
+=over 4
+
+=item * Static content -> static/
+
+=item * Registry scripts -> script/
+
+=item * PerlRun scripts -> script/
+
+=item * Modules -> /, lib/, arch/, i386-freebsd/ (i.e. $Config{archname}), 5.8.0/ 
+(i.e. $Config{version}), 5.8.0/586-freebsd/ (see previous)
+
+=back
+
+There are a couple items of note in the list above.  Both Registry and PerlRun scripts are 
+loaded from a scripts/ directory by default.  Normally, a package would not contain both 
+Registry and PerlRun scripts.  If a package does need both, using PerlRun should work for both 
+Registry and PerlRun.  Also, which directory a module is installed into should be based on the 
+same criteria as for a normal package (i.e. it should go into / or lib/ unless it contains XS 
+code, in which case it should be installed in the appropriate directory.)
+
+B<NOTE: > If you wish your package to work under both mod_perl 1.x and 2.x environments, 
+please see L<http://perl.apache.org/docs/2.0/devel/porting/porting.html> for more information 
+on porting modules to mod_perl 2.x.
+
+=head2 Packaging
+
+Once the web.conf file has been created and content has been created and moved to the 
+appropriate directory, the final package can be created.  As noted previously, .par archives 
+use the zip file format so that any program which creates zip files should be sufficient for 
+creating .par archives.  PAR archives do not currently support encrypted zip files, however.
+
+On a un*x system, a command similar to the following should be sufficient to create a par 
+archive:
+
+	zip -r myapp.par *
+
+After packaging (or during installing), the .par archive must be made executable if script 
+files (Registry or PerlRun) files will be used out of the archive.
+
+=head1 CONTACT
+
+For questions regarding the installation or use of Apache::PAR, either post a message on the 
+PAR list E<lt>par@perl.orgE<gt>, on the sourceforge project page at 
+L<http://www.sourceforge.net/projects/apache-par> or send an email to the author directly 
+at E<lt>nathan@byrd.netE<gt>.
+
+=head1 AUTHOR
+
+Nathan Byrd, E<lt>nathan@byrd.netE<gt>
+
+=head1 SEE ALSO
+
+L<perl>.
+
+L<PAR>.
+
+L<Apache::PAR::Registry>, L<Apache::PAR::PerlRun>, and L<Apache::PAR::Static>.
+
+=head1 COPYRIGHT
+
+Copyright 2002 by Nathan Byrd, E<lt>nathan@byrd.netE<gt>.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

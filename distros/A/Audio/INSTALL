@@ -1,0 +1,21 @@
+This package follows standard MakeMaker procedure 
+
+That is if all goes well : 
+
+Unpack the distribution:
+  zcat Audio-0.00?.tar.gz | tar xf - 
+
+  cd Audio-0.00?
+  perl Makefile.PL
+  make
+  make test 
+
+If you have recent perl or Tk installed you can then say : 
+
+  perl -Mblib morse perl5
+
+Then install:
+
+  make install
+  morse perl5
+

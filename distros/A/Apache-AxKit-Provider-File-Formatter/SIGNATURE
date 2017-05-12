@@ -1,0 +1,33 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.38.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8e00ac633efdd5c6050a7d7959f3f2ad12e75f3f Changes
+SHA1 84c0737755365c2c836f2b811d10996e7b0b3abd MANIFEST
+SHA1 e394bbf37b03397a373f2c14574f6958870ddfe6 MANIFEST.SKIP
+SHA1 5d04f8dbd5197c951dd27d5124088c0115fa0994 META.yml
+SHA1 95d776353e700a37930d6576fe4774e3176c2f19 Makefile.PL
+SHA1 38b5b20d8e2d094d6baf71aa007d939ecf615476 README
+SHA1 83ca681b7edf5e562c8eb346ce530644f954e9f0 lib/Apache/AxKit/Provider/File/Formatter.pm
+SHA1 a1ffd971f92971d79448c465130948f4560ac609 t/Apache-AxKit-Provider-File-Formatter.t
+SHA1 49cf551ed0f4c5ac3afc3b4ae4227474fddf06c1 transforms/do-nothing.xsl
+SHA1 aebda90e569fefad0edea08af8b1bd366d266a9b transforms/xhtml2html.xsl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (GNU/Linux)
+
+iD8DBQFCL5XplE/Gp2pqC7wRAiBPAJ9uRM25GpOIlC86SbAWzCNfCKfLQwCaA3CH
+MaaKCQ+5DRP8AMoUIu080Pg=
+=Ff9W
+-----END PGP SIGNATURE-----

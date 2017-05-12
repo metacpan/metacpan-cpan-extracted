@@ -1,0 +1,16 @@
+Revision history for Perl extension Alien::OTR.
+
+4.1.1.0 2016-03-10 23:37:45
+    Provide libotr v4.1.1
+
+4.1.0.0 2014-11-19 00:29:45
+    Provide libotr 4.1.0.
+    Compile using Alien::GPG::Error and Alien::GCrypt (so it works on Raspi).
+
+4.0.0.1 2014-06-16 01:27:50
+    Use latest devel branch of libotr.
+    Add patch to free memory of context->context_priv.
+
+4.0.0.0 2014-02-04 00:24:20
+	Initial version.
+

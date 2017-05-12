@@ -1,0 +1,32 @@
+
+=head1 Friendship between modules
+
+Such relationship between modules, compared to parent-child relationship, is 
+more social. These two modules can be many-to-many mapping, e.g. An A can have
+many Bs while a B can have many A's.
+
+=head2 API examples
+
+    my ($group1, $group)=map{Group->new(-name=>$_)} qw(group1 group2);
+    
+    my $person=Person->new(
+        -groups => [$group1, $group2]
+    );
+
+    my $person=Person->new(
+        -groups=>[
+            [$group1, {-rank=>1}],
+            [$group2, {-rank=>10}]
+        ]
+    );
+
+    my $person=Person->new(
+        -groups=>{
+            $group1 => {-rank=>1},
+            $group2 => {-rank=>10}
+        }
+    );
+
+    
+
+=cut

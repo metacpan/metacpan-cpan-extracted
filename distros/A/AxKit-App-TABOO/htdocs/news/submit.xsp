@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="NULL" type="application/x-xsp"?>
+<?xml-stylesheet href="/transforms/news/insert-values-edit.xsl" type="text/xsl"?>
+<?xml-stylesheet href="/transforms/news/xhtml/submit.xsl" type="text/xsl"?>
+<xsp:page
+  xmlns:xsp="http://www.apache.org/1999/XSP/Core"
+  xmlns:ct="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Control"
+  xmlns:cust="http://www.kjetil.kjernsmo.net/software/TABOO/NS/CustomGrammar"
+  xmlns:user="http://www.kjetil.kjernsmo.net/software/TABOO/NS/User"
+  xmlns:story="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Story"
+  xmlns:cat="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Category"
+  xmlns:i18n="http://www.kjetil.kjernsmo.net/software/TABOO/NS/I18N"
+  xmlns:val="http://www.kjetil.kjernsmo.net/software/TABOO/NS/FormValues"
+  xmlns:param="http://www.axkit.org/2002/XSP/QueryParam">
+  <cust:submit>
+    <cust:title><i18n:insert>submit-story</i18n:insert></cust:title>
+    <param:if-exists name="submitted">
+      <story:store/>
+    </param:if-exists>
+    <param:if-exists name="previewed">
+      <story:this-story/>
+    </param:if-exists>    
+    <param:if-exists name="edit">
+      <story:get-story>
+	<story:sectionid><param:get name="sectionid"/></story:sectionid>
+	<story:storyname><param:get name="storyname"/></story:storyname>
+      </story:get-story>
+      <cat:get-category>
+	<cat:catname><param:get name="sectionid"/></cat:catname>
+      </cat:get-category>
+    </param:if-exists>    
+    <param:unless-exists name="submitted">
+      <ct:control name="title" type="text" element="input" size="40" maxlength="40">
+	<ct:title><i18n:insert>article-title</i18n:insert></ct:title>
+	<ct:descr><i18n:insert>article-descr</i18n:insert></ct:descr>
+	<ct:value><val:insert name="title"/></ct:value>
+      </ct:control>
+      <ct:control name="minicontent" element="textarea" rows="10" cols="60">
+	<ct:title><i18n:insert>minicontent</i18n:insert></ct:title>
+	<ct:descr>
+	  <i18n:insert>minicontent-descr</i18n:insert>	  
+	</ct:descr>
+	<ct:value><val:insert name="minicontent"/></ct:value>
+      </ct:control>
+      <ct:control name="content" element="textarea" rows="20" cols="60">
+	<ct:title><i18n:insert>content</i18n:insert></ct:title>
+	<ct:descr>
+	  <i18n:insert>content-descr</i18n:insert>
+	</ct:descr>
+	<ct:value><val:insert name="content"/></ct:value>
+      </ct:control>
+      <!-- user:is-authorized authlevel="3">
+	<user:true>
+	  <ct:control element="input" type="text" name="image" size="40" maxlength="100">
+	    <ct:title><i18n:insert>descriptive-image</i18n:insert></ct:title>
+	    <ct:descr><i18n:insert>descriptive-image-descr</i18n:insert></ct:descr>
+	    <ct:value><val:insert name="image"/></ct:value>
+	  </ct:control>
+	</user:true>
+      </user:is-authorized -->
+      <ct:control name="linktext" type="text" element="input" size="15" maxlength="30">
+	<ct:title><i18n:insert>linktext</i18n:insert></ct:title>
+	<ct:descr><i18n:insert>linktext-descr</i18n:insert></ct:descr>
+	<ct:value><val:insert name="linktext"/></ct:value>
+      </ct:control>
+      <ct:control name="primcat">
+	<ct:title><i18n:insert>primcat</i18n:insert></ct:title>
+	<ct:descr><i18n:insert>primcat-descr</i18n:insert></ct:descr>
+	<cat:get-categories type="categ"/>
+	<ct:value><val:insert name="primcat"/></ct:value>
+      </ct:control>
+      
+      <!-- Arrays are not yet supported well by the underlying
+      database driver, so these fields with multiples are problematic.
+      <ct:control name="seccat" type="multiple">
+      <ct:title>Seccat</ct:title>
+      <cat:get-categories type="categ"/>
+      <param:enumerate name="seccat"/>
+    </ct:control>
+      <user:is-authorized authlevel="2">
+      <user:true>
+      <ct:control name="freesubject" type="multiple">
+      <ct:title>Free subject</ct:title>
+      <cat:get-categories type="frees"/>
+      <param:enumerate name="freesubject"/>
+    </ct:control>
+    </user:true>
+    </user:is-authorized -->
+      <user:is-authorized authlevel="5">
+	<user:true>
+	  <ct:control name="sectionid">
+	    <ct:title><i18n:insert>article-sectionid</i18n:insert></ct:title>
+	    <ct:descr>
+	      <i18n:insert>article-sectionid-descr</i18n:insert>
+	      <param:if name="sectionid" value="subqueue">
+		<i18n:insert>article-sectionid-descr-editorhelp</i18n:insert>
+	      </param:if>
+	    </ct:descr>
+	    <cat:get-categories type="stsec"/>
+	    <ct:value><val:insert name="sectionid"/></ct:value>
+	  </ct:control>
+	  <ct:control element="input" type="checkbox" name="editorok">
+	    <ct:title><i18n:insert>editorok</i18n:insert></ct:title>
+	    <ct:descr><i18n:insert>editorok-descr</i18n:insert></ct:descr>
+	    <ct:value><val:insert name="editorok"/></ct:value>
+	  </ct:control>
+	  <ct:control element="input" type="text" name="submitterid" size="8" maxlength="8">
+	    <ct:title><i18n:insert>submitterid</i18n:insert></ct:title>
+	    <ct:descr><i18n:insert>submitterid-descr</i18n:insert></ct:descr>
+	    <ct:value><val:insert name="submitterid"/></ct:value>
+	  </ct:control>
+	  <ct:control element="input" type="hidden" name="storyname"> 
+	    <ct:value><param:get name="storyname"/></ct:value>
+	  </ct:control>
+	</user:true>
+	<user:false>
+	  <ct:control element="input" type="hidden" name="sectionid"> 
+	    <ct:value>subqueue</ct:value>
+	  </ct:control>
+	</user:false>
+      </user:is-authorized>
+      <ct:control element="input" type="submit" name="submitted"> 
+	<ct:value><i18n:insert>send</i18n:insert></ct:value>
+      </ct:control>
+      <ct:control element="input" type="submit" name="previewed"> 
+	<ct:value><i18n:insert>preview</i18n:insert></ct:value>
+      </ct:control>
+      
+    </param:unless-exists>
+  </cust:submit>
+</xsp:page>
+

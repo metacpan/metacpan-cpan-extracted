@@ -1,0 +1,9 @@
+This is the "sharedir", where App::CELL stores its own internal
+configuration information. It can serve as a model for populating the
+application's site configuration directory.
+
+For more information, do:
+
+$ perldoc App::CELL::Guide
+
+or point your browser at https://metacpan.org/pod/App::CELL::Guide

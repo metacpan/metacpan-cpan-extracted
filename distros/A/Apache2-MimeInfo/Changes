@@ -1,0 +1,8 @@
+Revision history for Apache2-MimeInfo
+
+0.05    Wed, Dec 10 2014 19:22:58 -0800
+        Added recursive type checking and brought the filter up to spec
+
+0.03    Sun, 22 Dec 2013 16:54:58 -0800
+        Added overrides for gzip, compress and bzip2
+

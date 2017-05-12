@@ -1,0 +1,21 @@
+NAME
+    Acme::Hello - Print a greeting message
+
+VERSION
+    This document describes version 0.04 of Acme::Hello.
+
+SYNOPSIS
+        use Acme::Hello;    # exports hello() by default
+        hello();            # procedure call interface
+
+        my $obj = Acme::Hello->new;
+        $obj->hello;        # object-oriented interface
+
+CC0 1.0 Universal
+    To the extent possible under law, 唐鳳 has waived all copyright and
+    related or neighboring rights to Acme-Hello.
+
+    This work is published from Taiwan.
+
+    <http://creativecommons.org/publicdomain/zero/1.0>
+

@@ -1,0 +1,30 @@
+Changes
+lib/ActiveRecord/Simple.pm
+lib/ActiveRecord/Simple/Connect.pm
+lib/ActiveRecord/Simple/Find.pm
+lib/ActiveRecord/Simple/Migration.pm
+lib/ActiveRecord/Simple/Utils.pm
+lib/ActiveRecord/Simple/Validate.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+README
+script/mars
+t/00-load.t
+t/01-boilerplate.t
+t/02-pod.t
+t/03-pod-coverage.t
+t/04-manifest.t
+t/05-basic.t
+t/06-accessors.t
+t/07-find.t
+t/08-relations.t
+t/09-crud-methods.t
+t/10-sql-translator.t
+t/11-connect.t
+t/12-init.t
+t/13-migration.t
+t/14-smart-accessors.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

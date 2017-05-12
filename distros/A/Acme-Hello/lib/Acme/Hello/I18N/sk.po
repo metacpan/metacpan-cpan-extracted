@@ -1,0 +1,23 @@
+# hello sk.po
+# Copyright (C) 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+# Marcel Telka <marcel@telka.sk>, 2002.
+# Stanislav Meduna <stano@meduna.org>, 2000, 2001.
+# Miroslav Vasko <vasko@debian.cz>, 1999.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: hello 2.0.60\n"
+"POT-Creation-Date: 2002-05-22 19:23+0200\n"
+"PO-Revision-Date: 2002-05-29 14:26+0200\n"
+"Last-Translator: Marcel Telka <marcel@telka.sk>\n"
+"Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Transfer-Encoding: 8-bit\n"
+
+msgid "hello, world\n"
+msgstr "ahoj, svet\n"
+
+msgid "Hello, world!"
+msgstr "Ahoj, svet!"
+

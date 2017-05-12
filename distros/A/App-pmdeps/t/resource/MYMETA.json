@@ -1,0 +1,59 @@
+{
+   "abstract" : "It's new $module",
+   "author" : [
+      "moznion C<< moznion@gmail.com >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.3, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-pmdeps",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Furl" : "2.16",
+            "JSON" : "2.59",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "App::pmdeps" : {
+         "file" : "lib/App/pmdeps.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/moznion/pm-deps/issues"
+      },
+      "homepage" : "https://github.com/moznion/pm-deps",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/moznion/pm-deps.git",
+         "web" : "https://github.com/moznion/pm-deps"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "moznion <moznion@gmail.com>"
+   ]
+}

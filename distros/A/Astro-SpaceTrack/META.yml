@@ -1,0 +1,55 @@
+---
+abstract: 'Download satellite orbital elements from Space Track'
+author:
+  - 'Tom Wyant (wyant at cpan dot org)'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0.96'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Astro-SpaceTrack
+no_index:
+  directory:
+    - inc
+    - t
+    - tools
+    - xt
+provides:
+  Astro::SpaceTrack:
+    file: lib/Astro/SpaceTrack.pm
+    version: '0.098'
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  Getopt::Long: '2.39'
+  HTTP::Date: '0'
+  HTTP::Request: '0'
+  HTTP::Response: '0'
+  HTTP::Status: '6.03'
+  IO::File: '0'
+  IO::Uncompress::Unzip: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  List::Util: '0'
+  Mozilla::CA: '20141217'
+  POSIX: '0'
+  Scalar::Util: '1.07'
+  Text::ParseWords: '0'
+  Time::Local: '0'
+  URI: '0'
+  constant: '0'
+  perl: '5.006002'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trwyant/perl-Astro-SpaceTrack.git
+version: '0.098'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

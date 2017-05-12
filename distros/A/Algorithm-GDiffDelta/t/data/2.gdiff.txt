@@ -1,0 +1,38 @@
+# Operands for reading fixed-size bits of data.  Test the first 16 of them,
+# and then the last one.
+data_1 "\n"
+data_2 "-\n"
+data_3 "[]\n"
+data_4 "[-]\n"
+data_5 "[--]\n"
+data_6 "[---]\n"
+data_7 "[----]\n"
+data_8 "[-----]\n"
+data_9 "[------]\n"
+data_10 "[-------]\n"
+data_11 "[--------]\n"
+data_12 "[---------]\n"
+data_13 "[----------]\n"
+data_14 "[-----------]\n"
+data_15 "[------------]\n"
+data_16 "[-------------]\n"
+data_246 "<***************************************************************************************************************************************************************************************************************************************************>\n"
+
+# Data commands that have an operand for the length.
+data_ushort 9 "peekaboo\n"
+data_int 10 "peekafoo\n\n"
+
+# Copy commands.
+copy_ushort_ubyte 18 59
+copy_ushort_ushort 78 3
+data_1 "\n"
+copy_ushort_int 81 3
+data_1 "\n"
+copy_int_ubyte 84 3
+data_1 "\n"
+copy_int_ushort 87 4
+data_1 "\n"
+copy_int_int 175 255
+
+# This one isn't implemented yet, either in the XS or the GDIFF compiler.
+#copy_long_int

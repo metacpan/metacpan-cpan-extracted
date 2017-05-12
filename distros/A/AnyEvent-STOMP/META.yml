@@ -1,0 +1,26 @@
+---
+abstract: 'A lightweight event-driven STOMP client'
+author:
+  - 'Fulko Hew <fulko.hew@gmail.com'
+  - 'Michael S. Fischer <michael+cpan@dynamine.net>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-STOMP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: 5
+  Object::Event: 1.21
+  Test::More: 0
+  common::sense: 1
+version: 0.7

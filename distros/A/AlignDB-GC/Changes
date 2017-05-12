@@ -1,0 +1,13 @@
+Revision history for AlignDB-GC
+
+1.1.0 2017-01-10T23:39:15Z
+    - Release to CPAN
+    - Improve test coverage
+    - Travis CI
+
+1.0.1 2016-12-16T00:26:50Z
+    - Switch to Minilla
+
+1.0.0  2016-01-15 16:41:31 CST
+    - Switch to Dist::Milla
+    - Move subs here from AlignDB::Util

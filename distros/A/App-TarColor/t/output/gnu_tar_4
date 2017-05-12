@@ -1,0 +1,4 @@
+drwxr-xr-x marc/marc         0 2011-01-27 09:01 [01;34mtest_archive/[0m
+drwxr-xr-x marc/marc         0 2011-01-27 09:00 [01;34mtest_archive/dir/[0m
+-rwxr-xr-x marc/marc         0 2011-01-27 09:00 [01;33mtest_archive/executable[0m
+lrwxr-xr-x marc/marc         0 2011-01-27 09:01 [01;36mtest_archive/link[0m -> executable

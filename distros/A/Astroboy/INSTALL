@@ -1,0 +1,18 @@
+# 
+# Astroboy
+# INSTALL
+#
+# make sure you have id3 tools installed (id3tag, id3info, etc)
+yum -y install libid3tag
+
+# make sure you have cpan deps
+cpan Carp Cwd Exporter File::PathMP3::Tag  Test::Simple
+cpan File::PathInfo Getopt::Std::Strict LEOCHARRE::CLI LEOCHARRE::Class2 LEOCHARRE::DEBUG LEOCHARRE::Dir
+cpan Smart::Comments
+
+# install the perl part
+perl Makefile.PL
+make test
+make install
+
+# If you have any problems, contact Leo Charre leocharre at cpan dot org

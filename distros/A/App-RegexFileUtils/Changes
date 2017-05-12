@@ -1,0 +1,42 @@
+Revision history for App-RegexFileUtils
+
+0.07      2016-05-06 05:38:55 -0400
+  - Support for MSYS2
+
+0.06      2013-09-16 09:08:27 -0400
+  - promote to production
+
+0.05_05   2013-09-14 21:27:53 -0400
+  - fix logic in t/retouch.t for when MSWin32 DOES have touch.exe
+
+0.05_04   2013-09-12 12:14:39 -0400
+  - Prefer .exe in path over ppt version on MSWin32
+
+0.05_03   2013-09-12 06:29:54 -0400
+  - experimental: include my own mv verson for MSWin32 along
+    with the ppt programs
+
+0.05_01   2013-09-11 21:49:56 -0400
+  - experimental: package ppt versions of ln, cp, rm, touch
+    for use on MSWin32 where GNU File/Coreutils (or equivalent)
+    are not usually installed.  (mv is missing so I will have
+    to write that one myself)
+
+0.05      2013-05-31 07:03:59 America/New_York
+  - promote to production
+
+0.04_01   2013-05-29 21:11:34 America/New_York
+  - rm dist build dep on [Dist::Zilla::Plugin::MakeMaker::Custom]
+
+0.04      2012-11-26 11:34:01 America/New_York
+  - Makefile.PL to fail when cannot find cp mv rm
+  - skip ln test if cannot find ln
+
+0.03      2012-11-02 13:54:06 America/New_York
+  - Add support for MSWin32 (still need to install GNU FileUtils first)
+
+0.02      2012-10-25 15:25:42 America/New_York
+  - Add tests fix bugs.
+
+0.01      2012-10-25 10:55:07 America/New_York
+  - initial version

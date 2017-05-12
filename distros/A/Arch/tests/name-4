@@ -1,0 +1,112 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Name parsing.
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More tests => 83;
+use_ok("Arch::Name");
+
+sub check_name ($;$) {
+	my $string = shift;
+	my $level = shift;
+	my $label = defined $level? $level: "valid";
+
+	my $name = Arch::Name->new($string);
+	#print "[expected $label] [ got ", $name->level, "]\n";
+	ok($name->is_valid($level), "'$string' is $label");
+}
+
+check_name('migo@homemail.com--Perl-GPL');
+check_name('migo@homemail.com--Perl-GPL/arch-perl');
+check_name('migo@homemail.com--Perl-GPL/arch-perl--devel');
+check_name('migo@homemail.com--Perl-GPL/arch-perl--devel--0');
+check_name('migo@homemail.com--Perl-GPL/arch-perl--devel--0--patch-73');
+
+check_name('some@project');
+check_name('some@project/c');
+check_name('some@project/c--');
+check_name('some@project/c----00');
+check_name('some@project/c----00--versionfix-22');
+
+check_name('some@project/c--b--FIRST', 4);
+check_name('some@project/c--b--LATEST', 4);
+check_name('some@project/c--b--FIRST--versionfix-2', 5);
+check_name('some@project/c--b--LATEST--version-0', 5);
+check_name('some@project/c--b--FIRST--LATEST', 5);
+check_name('some@project/c--b--LATEST--FIRST', 5);
+check_name('some@project/c--b--1--FIRST', 5);
+check_name('some@project/c--b--1--LATEST', 5);
+
+check_name('some-project', 0);
+check_name('some@project/@', 0);
+check_name('some@project/c--@', 0);
+check_name('some@project/c--b--v', 0);
+check_name('some@project/c--b--0--base-2', 0);
+
+check_name('@aaa', 0);
+check_name('aaa@@ddd', 0);
+check_name('aaa@ddd/', 0);
+check_name('aaa@ddd//', 0);
+check_name('aaa@ddd/c@', 0);
+check_name('aaa@ddd/@c', 0);
+check_name('aaa@ddd/c@c', 0);
+check_name('aaa@ddd/_', 0);
+check_name('aaa@ddd/_b', 0);
+check_name('aaa@ddd/-', 0);
+check_name('aaa@ddd/--', 0);
+check_name('aaa@ddd/---', 0);
+check_name('aaa@ddd/c/', 0);
+check_name('aaa@ddd/-c', 0);
+check_name('aaa@ddd/c-', 0);
+check_name('aaa@ddd/c---', 0);
+check_name('aaa@ddd/c--_', 0);
+check_name('aaa@ddd/c--_b', 0);
+check_name('aaa@ddd/c--b-', 0);
+check_name('aaa@ddd/c--b--', 0);
+check_name('aaa@ddd/c--b---', 0);
+check_name('aaa@ddd/c--b--.0', 0);
+check_name('aaa@ddd/c--b--0.', 0);
+check_name('aaa@ddd/c--b--1.1.', 0);
+check_name('aaa@ddd/c--b--11a', 0);
+check_name('aaa@ddd/c--b--1.a', 0);
+check_name('aaa@ddd/c--b--1-', 0);
+check_name('aaa@ddd/c--b--1--', 0);
+check_name('aaa@ddd/c--b--1---', 0);
+check_name('aaa@ddd/c--b--1--patch-a', 0);
+
+check_name(' ', 0);
+check_name('a @d', 0);
+check_name('a@d/ ', 0);
+check_name('a@d/c ', 0);
+check_name('a@d/c-- ', 0);
+check_name('a@d/c-- b', 0);
+check_name('a@d/c--b-- ', 0);
+check_name('a@d/c--b-- 1', 0);
+check_name('a@d/c--b--1-- ', 0);
+check_name('a@d/c--b--1-- base-0', 0);
+check_name('a@d/c--b--1--base-0 ', 0);
+
+check_name('', 0);
+check_name('a@', 1);
+check_name('a@/c', 2);
+check_name('a@/c--', 3);
+check_name('a@/c----0', 4);
+check_name('a@/c----0--version-0', 5);
+
+check_name('', 'none');
+check_name('a1@d2', 'archive');
+check_name('a1@d2/c3', 'category');
+check_name('a1@d2/c3--b4', 'branch');
+check_name('a1@d2/c3--b4--56', 'version');
+check_name('a1@d2/c3--b4--00.11.22--patch-11111111', 'revision');
+
+check_name('a1@d2/c3--b4--5.6--patch-7', 'none+');
+check_name('a1@d2/c3--b4--5.6--patch-7', 'archive+');
+check_name('a1@d2/c3--b4--5.6--patch-7', 'category+');
+check_name('a1@d2/c3--b4--5.6--patch-7', 'branch+');
+check_name('a1@d2/c3--b4--5.6--patch-7', 'version+');
+check_name('a1@d2/c3--b4--5.6--patch-7', 'revision+');

@@ -1,0 +1,15 @@
+Changes
+Changes.old
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/demo_race.pl
+examples/demo_simple.pl
+lib/Acme/POE/Knee.pm
+t/00-compile.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

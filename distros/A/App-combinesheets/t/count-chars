@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+my $count = 0;
+while (my $line = <>) {
+    chomp $line;
+    my ($header, $value) = split (m{\t}, $line);
+    $count += length ($value);
+}
+print STDOUT $count;
+
+__END__

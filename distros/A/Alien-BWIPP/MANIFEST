@@ -1,0 +1,13 @@
+AUTHORS
+Build.PL
+Changes
+examples/example.pl
+lib/Alien/BWIPP.pm
+MANIFEST			This list of files
+README
+share/barcode.ps
+t/00-load.t
+t/10-generated-class.t
+t/10-interface.t
+META.yml
+META.json

@@ -1,0 +1,36 @@
+---
+abstract: 'Utility synchronization of the mirror distribution-sites'
+author:
+  - 'Serz Minus (Lepenkov Sergey) http://www.serzik.com <minus@mail333.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.6'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.143240'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-DistSync
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Basename: '0'
+  File::Copy: '2'
+  File::Find: '1'
+  File::Path: '2'
+  File::Spec: '3'
+  HTTP::Message: '6.06'
+  LWP: '6.08'
+  URI: '1.64'
+  YAML::Tiny: '1'
+  perl: '5.008001'
+resources:
+  homepage: http://app-distsync.sourceforge.net
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: https://svn.code.sf.net/p/app-distsync/code/trunk
+version: '1.04'

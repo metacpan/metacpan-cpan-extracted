@@ -1,0 +1,45 @@
+{
+   "abstract" : "Asyncronious multiserver requests to Postgresql with AnyEvent::Pg",
+   "author" : [
+      "Andrey Kuzmin <kak-tus@mail.ru>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-Pg-Pool-Multiserver",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "7.07",
+            "AnyEvent::Pg::Pool" : "0.14",
+            "Class::XSAccessor" : "1.19",
+            "Future" : "0.27",
+            "Params::Validate" : "1.10"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.4"
+}

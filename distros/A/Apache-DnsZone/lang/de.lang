@@ -1,0 +1,86 @@
+#!/usr/bin/perl -w
+
+# created by thomas@stderr.net (2001/03/23)
+# $Id: de.lang,v 1.4 2001/05/05 16:23:38 thomas Exp $
+
+use strict;
+
+sub lang () {
+    my %text = (
+		'SUBMIT'            => 'Abschicken',
+		'CANCEL'            => 'Abbrechen',
+		'HELP'              => 'Hilfe',
+		'EDIT'              => 'Bearbeiten',
+		'ADD'               => 'Hinzuf&uuml;gen',
+		'REMOVE'            => 'Entfernen',
+		'LOCKED'            => 'Gesperrt',
+		'SETTINGS'          => 'Einstellungen',
+		'LIST_DOMAIN'       => 'Liste der Domain',
+		'LOGOUT'            => 'Abmelden',
+		'LANGUAGE'          => 'Sprache',
+		'EMAIL'             => 'E-mail',
+		'NEW_PASSWORD'      => 'Neues Passwort',
+		'CONFIRM_PASSWORD'  => 'Passwort Best&auml;tigen',
+		'AUTH_NS'           => 'Authoritative Nameserver',
+		'SERIAL'            => 'Seriennummer',
+		'ADMIN_EMAIL'       => 'Verwaltungs- E-Mail',
+		'REFRESH'           => 'Aktualisierungszeit',
+		'RETRY'             => 'Wiederholungszeit',
+		'EXPIRE'            => 'Ablaufzeit',
+		'TTL'               => 'Time to Live',
+		'HOST'              => 'Host',
+		'IP_ADDRESS'        => 'IP Adresse',
+		'CNAME'             => 'Canonical Name',
+		'MX'                => 'Mail Exchanger',
+		'PREFERENCE'        => 'Pr&auml;ferenz',
+		'ZONE'              => 'Zone',
+		'NS'                => 'Nameserver',
+		'TXT'               => 'Text',
+		'DNS'               => 'Domain Name System',
+		'SOA'               => 'Beginn der Befugnis',
+		'PAGE_LIST_DOMAIN'  => 'Mit DnsZone verwaltete Domains',
+		'PAGE_VIEW_DOMAIN'  => 'Domain $domain wird angezeigt',
+		'PAGE_HELP'         => 'Hilfe',
+		'PAGE_SETTINGS'     => 'Pers&ouml;nliche Einstellungen werden verändert',
+		'PAGE_EDIT'         => 'Eintrag $record unter $domain wird bearbeitet',
+		'PAGE_ADD'          => 'Eintrag $record wird zu $domain hinzugef&uuml;gt',
+		'PAGE_DEL'          => 'Eintrag $record unter $domain wird gel&ouml;scht',
+		'ERROR_CORRECT'     => 'Bitte korrigieren Sie die/den folgenden Fehler:',
+		'ERROR_DUPLICATE'   => 'Es gibt einen doppelten Eintrag',
+		'ERROR_IP'          => 'Ung&uuml;ltiger Wert f&uuml;r IP Adresse',
+		'ERROR_HOST'        => 'Ung&uuml;ltiger Wert f&uuml;r Host',
+		'ERROR_TTL'         => 'Ung&uuml;ltiger Wert f&uuml;r TTL',
+		'ERROR_CNAME'       => 'Ung&uuml;ltiger Wert f&uuml;r Canonical Name',
+		'ERROR_MX'          => 'Ung&uuml;ltiger Wert f&uuml;r Mail Exchanger',
+		'ERROR_PREFERENCE'  => 'Ung&uuml;ltiger Wert f&uuml;r Präferenz',
+		'ERROR_ZONE'        => 'Ung&uuml;ltiger Wert f&uuml;r Zone',
+		'ERROR_NS'          => 'Ung&uuml;ltiger Wert f&uuml;r Nameserver',
+		'ERROR_TXT'         => 'Ung&uuml;ltiger Wert f&uuml;r Text',
+		'ERROR_EMAIL'       => 'Ung&uuml;ltiger Wert f&uuml;r E-Mail',
+		'ERROR_PASSWORD'    => 'Passw&ouml;rter stimmen nicht &uuml;berein',
+		'ERROR_ADMIN_EMAIL' => 'Ung&uuml;ltiger Wert f&uuml;r Verwaltungs- E-Mail',
+		'ERROR_REFRESH'     => 'Ung&uuml;ltiger Wert f&uuml;r Aktualisierungszeit',
+		'ERROR_RETRY'       => 'Ung&uuml;ltiger Wert f&uuml;r Wiederholungszeit',
+		'ERROR_EXPIRE'      => 'Ung&uuml;ltiger Wert f&uuml;r Ablaufzeit',
+		'FILLOUT_FIELDS'    => 'Bitte f&uuml;llen sie die folgenden Felder aus:',
+		'EDIT_FIELDS'       => 'Bitte bearbeiten sie diese Felder:',
+		'DELETE_RECORD'     => 'Sie sind dabei folgenden Eintrag zu l&ouml;schen:',
+		'USERNAME'          => 'Benutzername',
+		'PASSWORD'          => 'Passwort',
+		'LOGIN_BUTTON'      => 'Anmelden',
+		'PAGE_LOGIN'        => 'Anmeldeseite',
+		'LOGIN_NOTE'        => 'Anmerkung: Cookies m&uuml;ssen bei Ihrem Browser aktiviert sein, um sich anmelden zu k&ouml;nnen. Nach einiger Zeit werden Sie aufgefordert sicher erneut anzumelden.',
+		'IDLE_TIMEOUT'      => 'Abmeldegrund: Zeitablauf nach Unt&auml;tigkeit',
+		'MALFORMED_TICKET'  => 'Abmeldegrund: Ticket besch&auml;digt',
+		'INVALID_HASH'      => 'Abmeldegrund: Unbekanntes Ticket',
+		'EXPIRED_TICKET'    => 'Abmeldegrund: Ticket ist abgelaufen',
+		'MISSING_SECRET'    => 'Abmeldegrund: Server Secret konnte nicht geladen werden',
+		'TAMPERED_HASH'     => 'Abmeldegrund: Ticket Daten wurden manipuliert',
+		'PASSWORD_CHANGE'   => 'Das Passwort wird nur ver&auml;ndert wenn Sie die untenstehenden Felder ausf&uuml;llen.'
+		);
+    
+    return %text;
+}
+
+1;
+

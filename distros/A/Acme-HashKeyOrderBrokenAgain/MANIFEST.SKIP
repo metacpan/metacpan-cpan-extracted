@@ -1,0 +1,8 @@
+blib
+^Makefile$
+^Makefile.old$
+MANIFEST.bak
+adm/release
+MYMETA.json
+MYMETA.yml
+.git

@@ -1,0 +1,30 @@
+AtteanX-Store-SPARQL
+====================
+
+Created:      2015-06-23
+Home page:    <https://metacpan.org/release/AtteanX-Store-SPARQL>
+Bug tracker:  <https://github.com/kjetilk/p5-atteanx-store-sparql/issues>
+Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
+
+0.010	2016-05-15	Quality improvements.
+
+ - Added: Set version in all perl modules.
+ - Added: Test model for costplanner support.
+ - Removed: Remove the CostPlanner from the store.
+
+0.008	2016-04-11	Add single-BGP access plan. Some fixes
+
+ - Accept only JSON SPARQL results.
+ - Added: Add single-BGP access plan.
+ - Do the SPARQL serialization in the impl method.
+ - Use the content method on the response object.
+
+0.006	2016-03-07	API change for plan
+
+ - Rename AtteanX::Store::SPARQL::Plan::BGP to AtteanX::Plan::SPARQLBGP.
+
+0.004	2016-02-09	A few smaller changes
+
+0.002	2016-01-11	Simplify cost modelling
+
+0.001	2015-12-24	Initial release

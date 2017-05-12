@@ -1,0 +1,136 @@
+ TestPrj.chm:
+
+ spc    start   length   name
+ ===    =====   ======   ====
+   0        0        0   /
+   1   752560     4096   /#IDXHDR
+   0        0        0   /#ITBITS
+   1   757702      872   /#STRINGS
+   0      366     4302   /#SYSTEM
+   1   756656      224   /#TOPICS
+   1   757048      654   /#URLSTR
+   1   756880      168   /#URLTBL
+   1        0        0   /$FIftiMain
+   1   749809     2751   /$OBJINST
+   0        0        0   /$WWAssociativeLinks/
+   1   749805        4   /$WWAssociativeLinks/Property
+   0        0        0   /$WWKeywordLinks/
+   1   747587     2124   /$WWKeywordLinks/BTree
+   1   749711       52   /$WWKeywordLinks/Data
+   1   749763       10   /$WWKeywordLinks/Map
+   1   749773       32   /$WWKeywordLinks/Property
+   1   363819    15583   /____ Advanced Computing Systems & Architectures - Teaching _.htm
+   1     4493    80948   /Cyber-Sex (haha!).html
+   1    85441     8709   /Facultatea AC din UTCN.htm
+   0        0        0   /Facultatea AC din UTCN_files/
+   1   416623    23108   /Facultatea AC din UTCN_files/ccd.jpg
+   1   384562    31228   /Facultatea AC din UTCN_files/head_automatica.jpg
+   1   439731      440   /Facultatea AC din UTCN_files/pl.png
+   1   415790      833   /Facultatea AC din UTCN_files/prezentare.gif
+   1   381924     2638   /Facultatea AC din UTCN_files/sigla.gif
+   1   732125     1872   /Facultatea AC din UTCN_files/trafic.js
+   1   724475     7650   /Facultatea AC din UTCN_files/utcluj.css
+   1   379402      315   /Facultatea AC din UTCN_files/utcluj.htm
+   1     3262     1231   /Index.hhk
+   1    94150    30113   /PlanetUnreal - UT 2003.htm
+   0        0        0   /PlanetUnreal - UT 2003_files/
+   1   733997      283   /PlanetUnreal - UT 2003_files/ad.aspx
+   1   440500      807   /PlanetUnreal - UT 2003_files/dot_clear.gif
+   1   441307      780   /PlanetUnreal - UT 2003_files/icon.gif
+   1   734280      871   /PlanetUnreal - UT 2003_files/imprint.js
+   1   448048     1417   /PlanetUnreal - UT 2003_files/left.gif
+   1   449581      159   /PlanetUnreal - UT 2003_files/left_bottom.gif
+   1   449847      173   /PlanetUnreal - UT 2003_files/main_left_bottom.gif
+   1   450020      121   /PlanetUnreal - UT 2003_files/main_right_bottom.gif
+   1   449740      107   /PlanetUnreal - UT 2003_files/mid_bottom.gif
+   1   440424       76   /PlanetUnreal - UT 2003_files/mid_mid.gif
+   1   449465      116   /PlanetUnreal - UT 2003_files/right.gif
+   1   440171      253   /PlanetUnreal - UT 2003_files/top_back_sm.gif
+   1   442087     5961   /PlanetUnreal - UT 2003_files/wholejumpsm.jpg
+   1   124263    17035   /Secret Of Monkey Island Solution.html
+   0        0        0   /Secret Of Monkey Island Solution_files/
+   1   379717     2207   /Secret Of Monkey Island Solution_files/parch7.htm
+   1   141298    34326   /Symantec Security Response - Backdoor_Trojan.htm
+   1   175624    20638   /Symantec Security Response - W32_Sasser Removal Tool.htm
+   1   196262    31358   /Symantec Security Response - W32_Sasser_B_Worm.htm
+   1   227620    19865   /Tabel de Derivate.htm
+   0        0        0   /Tabel de Derivate_files/
+   1   454986     6145   /Tabel de Derivate_files/basicderivs.gif
+   1   450141     2018   /Tabel de Derivate_files/CCC_Math_Background.gif
+   1   461281     3779   /Tabel de Derivate_files/CCC_Wheat_Logo.gif
+   1   461131       89   /Tabel de Derivate_files/d-dx.gif
+   1   452159     2827   /Tabel de Derivate_files/Math_Title.gif
+   1   465060     5400   /Tabel de Derivate_files/MathFolder.gif
+   1   461220       61   /Tabel de Derivate_files/sqrt.gif
+   1   247485    19623   /Tabel de Integrale.htm
+   0        0        0   /Tabel de Integrale_files/
+   1   470460     2018   /Tabel de Integrale_files/CCC_Math_Background.gif
+   1   472756     3779   /Tabel de Integrale_files/CCC_Wheat_Logo.gif
+   1   472478       93   /Tabel de Integrale_files/integral.gif
+   1   476535     5400   /Tabel de Integrale_files/MathFolder.gif
+   1   472571       58   /Tabel de Integrale_files/not-equ.gif
+   1   472690       66   /Tabel de Integrale_files/pi-s.gif
+   1   472629       61   /Tabel de Integrale_files/sqrt.gif
+   1        0     3262   /Table of Contents.hhc
+   1   267108    79635   /The Arreat Summit - Items Rune Words.htm
+   0        0        0   /The Arreat Summit - Items Rune Words_files/
+   1   481935    18906   /The Arreat Summit - Items Rune Words_files/bg2.jpg
+   1   609949      799   /The Arreat Summit - Items Rune Words_files/blackbg.gif
+   1   595655       42   /The Arreat Summit - Items Rune Words_files/blank.gif
+   1   563478     5181   /The Arreat Summit - Items Rune Words_files/blizz-logo.gif
+   1   710760     2805   /The Arreat Summit - Items Rune Words_files/botmenu-close-off.gif
+   1   716409     2830   /The Arreat Summit - Items Rune Words_files/botmenu-next-off.gif
+   1   713565     2844   /The Arreat Summit - Items Rune Words_files/botmenu-prev-off.gif
+   1   500841     6568   /The Arreat Summit - Items Rune Words_files/d2-logo-off.gif
+   1   735151     2049   /The Arreat Summit - Items Rune Words_files/d2-strat.css
+   1   737200     5532   /The Arreat Summit - Items Rune Words_files/d2.js
+   1   629471    25038   /The Arreat Summit - Items Rune Words_files/delirium01.gif
+   1   654509    29504   /The Arreat Summit - Items Rune Words_files/delirium02.gif
+   1   610748     7041   /The Arreat Summit - Items Rune Words_files/header-back.gif
+   1   617789     3019   /The Arreat Summit - Items Rune Words_files/header-left.gif
+   1   626428     3043   /The Arreat Summit - Items Rune Words_files/header-right.gif
+   1   620808     5620   /The Arreat Summit - Items Rune Words_files/items-runewords.gif
+   1   512268     4843   /The Arreat Summit - Items Rune Words_files/menu-basics-off.gif
+   1   559517     3961   /The Arreat Summit - Items Rune Words_files/menu-bottom.gif
+   1   517111     3731   /The Arreat Summit - Items Rune Words_files/menu-classes-off.gif
+   1   551020     3747   /The Arreat Summit - Items Rune Words_files/menu-faq-off.gif
+   1   554767     4750   /The Arreat Summit - Items Rune Words_files/menu-files-off.gif
+   1   525685     3259   /The Arreat Summit - Items Rune Words_files/menu-items-act.gif
+   1   546183     4837   /The Arreat Summit - Items Rune Words_files/menu-maps-off.gif
+   1   528944     3870   /The Arreat Summit - Items Rune Words_files/menu-monsters-off.gif
+   1   507409     4859   /The Arreat Summit - Items Rune Words_files/menu-news-off.gif
+   1   532814     3567   /The Arreat Summit - Items Rune Words_files/menu-npcs-off.gif
+   1   536381     4904   /The Arreat Summit - Items Rune Words_files/menu-quests-off.gif
+   1   541285     4898   /The Arreat Summit - Items Rune Words_files/menu-shrines-off.gif
+   1   520842     4843   /The Arreat Summit - Items Rune Words_files/menu-skills-off.gif
+   1   575992     8585   /The Arreat Summit - Items Rune Words_files/mid-linkbar-back.gif
+   1   574444     1548   /The Arreat Summit - Items Rune Words_files/mid-linkbar-left.gif
+   1   584577     1591   /The Arreat Summit - Items Rune Words_files/mid-linkbar-right.gif
+   1   586168     2955   /The Arreat Summit - Items Rune Words_files/mid-linkbarbot-back.gif
+   1   589123      642   /The Arreat Summit - Items Rune Words_files/mid-linkbarbot-left.gif
+   1   589765      678   /The Arreat Summit - Items Rune Words_files/mid-linkbarbot-right.gif
+   1   590443     5212   /The Arreat Summit - Items Rune Words_files/mid-mid-back.gif
+   1   689748     8540   /The Arreat Summit - Items Rune Words_files/mid-textboxbot-back.gif
+   1   698288     6559   /The Arreat Summit - Items Rune Words_files/mid-textboxbot-left.gif
+   1   704847     5913   /The Arreat Summit - Items Rune Words_files/mid-textboxbot-right.gif
+   1   607136     2813   /The Arreat Summit - Items Rune Words_files/mid-textboxleft.gif
+   1   687024     2724   /The Arreat Summit - Items Rune Words_files/mid-textboxright.gif
+   1   595697     8309   /The Arreat Summit - Items Rune Words_files/mid-textboxtop-back.gif
+   1   604006     1570   /The Arreat Summit - Items Rune Words_files/mid-textboxtop-left.gif
+   1   605576     1560   /The Arreat Summit - Items Rune Words_files/mid-textboxtop-right.gif
+   1   568659     2190   /The Arreat Summit - Items Rune Words_files/mid-top-back.gif
+   1   570849     1731   /The Arreat Summit - Items Rune Words_files/mid-top-left.gif
+   1   572580     1864   /The Arreat Summit - Items Rune Words_files/mid-top-right.gif
+   1   684013     3011   /The Arreat Summit - Items Rune Words_files/privacy3.jpg
+   1   346743    17076   /XML-Validator-Schema.pm.htm
+   0        0        0   /XML-Validator-Schema.pm_files/
+   1   719239     5160   /XML-Validator-Schema.pm_files/cpan_banner.png
+   1   742732     4855   /XML-Validator-Schema.pm_files/style.css
+   1   724399       76   /XML-Validator-Schema.pm_files/up.gif
+   0        0       60   ::DataSpace/NameList
+   0     4668   405594   ::DataSpace/Storage/MSCompressed/Content
+   0      106       28   ::DataSpace/Storage/MSCompressed/ControlData
+   0       98        8   ::DataSpace/Storage/MSCompressed/SpanInfo
+   0       60       38   ::DataSpace/Storage/MSCompressed/Transform/List
+   0        0        0   ::DataSpace/Storage/MSCompressed/Transform/{7FC28940-9D31-11D0-9B27-00A0C91E9C7C}/InstanceData/
+   0      134      232   ::DataSpace/Storage/MSCompressed/Transform/{7FC28940-9D31-11D0-9B27-00A0C91E9C7C}/InstanceData/ResetTable

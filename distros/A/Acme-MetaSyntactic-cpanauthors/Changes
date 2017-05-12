@@ -1,0 +1,8 @@
+Revision history for Acme-MetaSyntactic-cpanauthors
+
+1.001 Tue Jun 3 2014
+        - Fixed the categories to be all lowercase, and the names to be
+          in uppercase (as in PAUSE)
+
+1.000 Mon May 26 2014
+        - First version of the Acme::MetaSyntactic::cpanauthors theme

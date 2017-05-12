@@ -1,0 +1,17 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::PTS;
+
+print "name: "; chop(my $name=<STDIN>);
+print "maxgroups: "; chop(my $ngroup=<STDIN>);
+
+my $pts = AFS::PTS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+my $ok = $pts->setgroupquota($name, $ngroup);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "success  = $ok\n"; }

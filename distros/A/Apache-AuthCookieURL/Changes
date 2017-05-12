@@ -1,0 +1,7 @@
+Revision history for Perl extension Apache::AuthCookieURL.
+
+0.01  July 14, 2000 
+      -- Modified Apache::AuthCookie to work with munged URLs
+
+0.02  Mon Sep 11 09:01:37 2000
+      -- Packaged up

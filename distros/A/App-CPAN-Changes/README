@@ -1,0 +1,10 @@
+SYNOPSIS
+
+    See included script cpan-changes.
+
+SEE ALSO
+
+    CPAN::Changes
+
+    parse-cpan-changes (from App::ParseCPANChanges)
+

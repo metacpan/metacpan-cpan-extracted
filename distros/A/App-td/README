@@ -1,0 +1,12 @@
+SEE ALSO
+
+    Rinci::function for a more detailed explanation on enveloped result.
+
+    TableDef for more detailed explanation of table data definition, which
+    can be specified in enveloped result's `meta` hash in the `table` key
+    (see Perinci::Sub::Property::result::table).
+
+    TableData::Object
+
+    Perinci::CmdLine
+

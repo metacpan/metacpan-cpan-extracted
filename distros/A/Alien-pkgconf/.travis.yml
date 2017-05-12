@@ -1,0 +1,34 @@
+language: perl
+
+addons:
+  apt:
+    packages:
+      - liblzma-dev
+
+before_install:
+  - export PATH=/tmp/pkgconf/bin:$PATH
+  - export ALIEN_PKGCONF_TARBALL=/tmp/pkgconf/src/pkgconf.tar.gz
+
+install:
+  - ./maint/travis
+  - cpanm --installdeps -n -v .
+
+perl:
+  - "5.8"
+  - "5.10"
+  - "5.12"
+  - "5.14"
+  - "5.16"
+  - "5.18"
+  - "5.20"
+  - "5.22"
+  - "5.24"
+  
+script:
+  - perl Makefile.PL
+  - make
+  - make test TEST_VERBOSE=1
+
+env:
+  - ALIEN_INSTALL_TYPE=system
+  - ALIEN_INSTALL_TYPE=share

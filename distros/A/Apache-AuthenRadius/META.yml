@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache-AuthenRadius
+version:      0.9
+version_from: AuthenRadius.pm
+installdirs:  site
+requires:
+    Authen::Radius:                0.06
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

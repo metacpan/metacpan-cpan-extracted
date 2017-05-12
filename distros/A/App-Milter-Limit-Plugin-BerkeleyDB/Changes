@@ -1,0 +1,8 @@
+Revision history for App::Milter::Limit::Plugin::BerkeleyDB
+
+0.51  2010-03-30
+    - dzil: use my @MSCHOUT plugin bundle
+    - add signature test
+
+0.50      2010-03-29 13:26:50 America/Chicago
+    - initial release

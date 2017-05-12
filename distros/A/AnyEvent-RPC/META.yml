@@ -1,0 +1,48 @@
+---
+abstract: 'Abstract framework for Asyncronous RPC clients'
+author:
+  - 'Mons Anderson <mons@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  Test::NoWarnings: 0
+  lib::abs: 0.90
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-RPC
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  AnyEvent::RPC:
+    file: lib/AnyEvent/RPC.pm
+    version: 0.05
+  AnyEvent::RPC::Enc::REST:
+    file: lib/AnyEvent/RPC/Enc/REST.pm
+    version: 0.04
+  AnyEvent::RPC::Enc::YAML:
+    file: lib/AnyEvent/RPC/Enc/YAML.pm
+    version: 0.04
+recommends:
+  YAML::Syck: 0
+requires:
+  AnyEvent: 5
+  AnyEvent::HTTP: 1.43
+  HTTP::Headers: 0
+  HTTP::Response: 0
+  URI: 0
+  XML::Hash::LX: 0.05
+  common::sense: 2
+  parent: 0
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

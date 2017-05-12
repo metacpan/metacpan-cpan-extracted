@@ -1,0 +1,179 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Config::General;
+use Getopt::Long;
+use Log::Dispatch;
+use Pod::Usage;
+
+use App::Nrepo;
+use App::Nrepo::Logger;
+
+our $VERSION = '0.1'; # VERSION
+
+my $config_file = '/etc/nrepo.conf';
+my $log_level;
+my $help;
+my $app_options = {};
+
+GetOptions(
+
+  # App Options
+  'action=s'  => \$app_options->{'action'},
+  'file=s@'   => \$app_options->{'file'},
+  'arch=s'    => \$app_options->{'arch'},
+  'checksums' => \$app_options->{'checksums'},
+  'force'     => \$app_options->{'force'},
+  'repo=s'    => \$app_options->{'repo'},
+  'tag=s'     => \$app_options->{'tag'},
+  'src-tag=s' => \$app_options->{'src-tag'},
+  'symlink'   => \$app_options->{'symlink'},
+
+  # Script options
+  'config-file=s' => \$config_file,
+  'log-level=s'   => \$log_level,
+  'h|help'        => \$help,
+) or pod2usage( -verbose => 2, -output => \*STDERR );
+
+pod2usage( -verbose => 2, -output => \*STDERR ) if $help;
+
+my $conf_o = Config::General->new(
+  -ConfigFile         => $config_file,
+  -UseApacheInclude   => 1,
+  -IncludeDirectories => 1,
+  -IncludeGlob        => 1,
+  -IncludeRelative    => 1,
+  -IncludeAgain       => 1,
+  -AllowMultiOptions  => 1,
+);
+my $config = { $conf_o->getall };
+
+# Setup Default Config
+$config->{tag_style}      ||= 'bottomdir';
+$config->{log_file_level} ||= 'info';
+$config->{screen_level}   ||= 'notice';
+
+# We allow the cli to override the config for ScreenLevel
+$config->{screen_level} = $log_level if $log_level;
+
+# Setup Logging
+my $log_outputs = [
+  [
+    'Screen',
+    'min_level' => $config->{screen_level},
+    stderr      => 0,
+    newline     => 1,
+  ],
+];
+push @{$log_outputs},
+  [
+  'File',
+  'min_level' => $config->{log_file_level},
+  'filename'  => $config->{log_file},
+  'newline'   => 1,
+  'mode'      => '>>',
+  ]
+  if $config->{log_file};
+my $logger = Log::Dispatch->new( outputs => $log_outputs );
+App::Nrepo::Logger->load($logger);
+$logger->debug('logging initialized.');
+
+my $a = App::Nrepo->new( config => $config, logger => $logger );
+my $action = delete $app_options->{'action'};
+
+# Params::Validate does not like undef which GetOptions will fill with options
+for my $param ( keys %{$app_options} ) {
+  delete $app_options->{$param} unless defined $app_options->{$param};
+}
+$a->go( $action, $app_options );
+
+__END__
+
+=head1 NAME
+
+nrepo - Repository Management
+
+=head1 DESCRIPTION
+
+Nrepo is designed to be an extensible repository management system
+Currently it provides a basic framework and support for Yum based repositories.
+Stay tuned for more!
+
+=head1 SYNOPSIS
+
+nrepo --action X [options]
+
+ See perldoc App::Nrepo for all valid actions and their in depth descriptions
+
+ Actions:
+   list      List all configured repositories
+   mirror    Mirror a repository
+     requires:
+       --repo (all|$repository_name)
+     optional:
+       --checksums
+   tag       Tag a repository
+     requires:
+       --repo $repository_name
+       --tag  $destination_tag
+     optional:
+       --src-tag $src_tag (defaults to 'head')
+       --symlink (default false)
+   clean     Cleans a repository of unreferenced files
+     requires:
+       --repo (all|$repository_name)
+   init      Initialise a custom repository
+     requires:
+       --repo $repository_name
+   add-file  Add files to a custom repository
+     requires:
+       --repo $repository_name
+       --arch $arch
+       --file $path_to_file (--file can be supplied multiple times)
+   del-file  Remove files from a custom repository
+     requires:
+       --repo $repository_name
+       --arch $arch
+       --file $path_to_file (--file can be supplied multiple times)
+
+ Script Options:
+   --config-file    Path to config-file, defaults to ./conf/nrepo.conf
+   --log-level      Change the stdout log level (overrides config)
+   --help           This helpful message
+
+=head1 Examples:
+
+  nrepo --action mirror --repo centos-6-epel
+  nrepo --action tag --repo centos-6-epel --tag release_20150827
+  nrepo --action tag --repo centos-6-epel --src-tag release_20150827 --symlink --tag production
+
+  This will:
+   1. update centos-6-epel to the current upstream version
+   2. create a hardlink copy of head to release_20150827
+   3. create a symlink of release_20150827 to production
+
+=head1 nrepo.conf Configuration:
+
+# Global options:
+
+# data_dir - path to location where repositories files are stored
+data_dir = /path/to/repo_data
+
+# include - you can use this to include other conf files or directories
+include repos.d
+
+# tag_style - (Defaults to bottomdir) This determines if repositories are tagged at a parent or child level
+# eg.
+# topdir would have tags like: $data_dir/$tag/$repo_name
+# bottomdir would have tags like: $data_dir/$repo_name/$tag
+
+#hard_tag_regex - When someone creates a hard tag of a repository the destination tag must match this regex (No default)
+# This can be per repo and/or global. it will use the per repo value first
+# ie I want them as: release_YYYYMMDD
+#hard_tag_regex = ^release_\d{8}$
+
+# log_file - Path to log output to (No default)
+# log_file_level - At what level you want the log file logged at (defaults to info)
+# screen_level - At what level you want the screen to output at (defaults to notice) this can be overwritten on the cli using --log-level

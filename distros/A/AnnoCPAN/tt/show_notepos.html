@@ -1,0 +1,44 @@
+[% PROCESS header.html title="Version bindings for note " _ note.id %]
+[% PROCESS login_form.html %]
+[% PROCESS form.html %]
+
+<h2>Version bindings for note [% note.id %]</h2>
+
+<div class="noteblock_inline">
+<div class="note_header">
+    <div class="note_data">
+    [% link_user(note.user) %]
+    ([% YMD_HMS.format(note.time) %])
+    </div>
+</div>
+<div class="note_body">
+    [% note.html %]
+</div>
+</div>
+
+[% can  = user.can_hide(note) ? '' : 'disabled="disabled"' %]
+
+<form method="post" action="[% root_uri_rel %]/">
+<input type="hidden" name="mode" value="update_notepos">
+<input type="hidden" name="note" value="[% note.id %]">
+
+<table>
+<tr><th>Version</th><th>Section</th><th>Score</th><th>Hidden</th><th>Ref</th></tr>
+[% FOR notepos = note.notepos.sort('distver_mtime').reverse %]
+<tr class="[% loop.count % 2 ? 'even' : 'odd' %]">
+    <td><a href="[% podver_uri(notepos.podver) %]#[% notepos.section.pos %]">[% notepos.podver.distver.distver %]</a></td>
+    <td>[% notepos.section.content | truncate(100) | html %]</td>
+    <td>[% notepos.score %]</td>
+    <td><input type="checkbox" name="hide" value="[% notepos.id %]" 
+        [% 'checked="checked"' IF notepos.status < 0 %] [% can %]></td>
+    <td><input type="radio" name="ref" value="[% notepos.id %]" 
+        [% 'checked="checked"' IF notepos.section.id == note.section.id %] [% can %]></td>
+</tr>
+[% END %]
+</table>
+
+<input type="submit" [% can %]>
+</form>
+
+[% PROCESS footer.html %]
+

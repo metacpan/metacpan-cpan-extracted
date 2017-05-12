@@ -1,0 +1,9 @@
+Revision history for Perl extension Acme::Ref.
+
+0.03  Thu Jun 19 22:06:59 2003
+    - dereferencing null pointers is now safe
+
+0.01  Thu Jun 19 18:50:59 2003
+	- original version; created by h2xs 1.22 with options
+		-A -n Acme::Ref
+

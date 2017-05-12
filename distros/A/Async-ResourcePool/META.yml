@@ -1,0 +1,21 @@
+---
+abstract: 'Resource pooling for asynchronous programs.'
+author:
+  - unknown
+build_requires:
+  Test::More: 0
+  common::sense: 0
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.112150'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Async-ResourcePool
+provides:
+  Async::ResourcePool:
+    file: lib/Async/ResourcePool.pm
+    version: v0.1.3
+version: v0.1.3

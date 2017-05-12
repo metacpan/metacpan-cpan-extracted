@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               App-MrShell
+version:            2.0207
+abstract:           ~
+author:
+    - Paul Miller <jettero@cpan.org>
+license:            GPL
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Config::Tiny:     0
+    perl:             5.006001
+    POE:              0
+    Term::ANSIColor:  0
+    Text::Balanced:   0
+resources:
+    repository:  http://github.com/jettero/mrsh
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+keywords:
+    - ssh

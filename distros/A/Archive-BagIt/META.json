@@ -1,0 +1,99 @@
+{
+   "abstract" : "An interface to make and verify bags according to the BagIt standard",
+   "author" : [
+      "Rob Schmidt <rjeschmi@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.022, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Archive-BagIt",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "inc",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "IO::AIO" : "0"
+         },
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Data::Printer" : "0",
+            "Digest::MD5" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "IO::AIO" : "0",
+            "Moo" : "0",
+            "Moose" : "0",
+            "POSIX" : "0",
+            "String::CRC32" : "0",
+            "Sub::Quote" : "0",
+            "Time::HiRes" : "0",
+            "parent" : "0",
+            "perl" : "5.014",
+            "strict" : "0",
+            "warnings" : "0"
+         },
+         "suggests" : {
+            "Archive::BagIt::App" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rjeschmi/Archive-BagIt/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rjeschmi/Archive-BagIt.git",
+         "web" : "https://github.com/rjeschmi/Archive-BagIt"
+      }
+   },
+   "version" : "0.052"
+}
+

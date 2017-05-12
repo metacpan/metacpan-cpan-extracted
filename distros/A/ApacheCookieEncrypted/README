@@ -1,0 +1,41 @@
+Apache/Cookie/Encrypted version 0.02
+====================================
+
+Apache::Cookie::Encrypted is a subclass of Apache::Cookie.
+It takes the value you put in to the cookie and automaticaly
+encrypts it. It automaticaly decrypts it when the value is
+retrieved. Other than that it behaves just like Apache::Cookie.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Apache()
+  Apache::Cookie
+  Crypt::CBC
+  Crypt::Blowfish
+
+Apache::Cookie is bundled with Apache::Request.
+This module is meant to be used with mod_perl.
+
+Suggested Modules
+
+Crypt::Random
+Math::Pari - needed by Crypt::Random
+
+makes creating 448 bit keys much easier.
+
+COPYRIGHT AND LICENCE
+
+This is under the same license as Apache::Cookie or perl.
+
+Copyright (C) 2001 Jamie Krasnoo
+

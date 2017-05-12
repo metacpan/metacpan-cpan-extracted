@@ -1,0 +1,94 @@
+div.voodooDebug {
+	font-family: monospace;
+	font-size: 11px;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	z-index: 10000;
+	border: 1px solid black;
+}
+
+.voodooDebug,
+.voodooDebug pre {
+	font-family: monospace;
+	color: #000000;
+	font-size: 11px;
+	background-color: #f0f0f0;
+}
+
+.voodooDebug pre {
+	margin: 0px;
+	padding: 0px;
+}
+
+div.voodooDebug div.vdOpen,
+div.voodooDebug div.vdClosed {
+	border: 1px solid black;
+}
+
+div.voodooDebug div.vdOpen   div.vdContent { display: block; }
+div.voodooDebug div.vdClosed div.vdContent { display: none;  }
+
+div.voodooDebug dd.vdOpen   { display: block; }
+div.voodooDebug dd.vdClosed { display: none;  }
+
+div.voodooDebug li.vdOpen   ul { display: block; }
+div.voodooDebug li.vdClosed ul { display: none;  }
+
+div.voodooDebug span.vdVisible   { display: block; }
+div.voodooDebug span.vdInvisible { display: none;  }
+
+div.voodooDebug div.vdOpen div.vdOpen div.vdContent {
+	max-width: 1024px;
+	max-height: 768px;
+	overflow: -moz-scrollbars-vertical;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+div.voodooDebug ul {
+	cursor: default;
+}
+
+div.voodooDebug .vdClick {
+	cursor: pointer;
+}
+
+div.voodooDebug table {
+	padding: 5px 0px 5px 0px;
+	border-collapse: collapse;
+}
+
+div.voodooDebug th {
+	background: #ccc;
+}
+
+div.voodooDebug th,
+div.voodooDebug td {
+	padding-left: 2px;
+	padding-right: 2px;
+	border: 1px solid black;
+	color: #000000;
+}
+
+div.voodooDebug .vdTableRowOdd {
+	background-color: #e0ffe0;
+}
+
+div.voodooDebug dt {
+	margin-left: 2em;
+}
+
+div.voodooDebug ul {
+	list-style: none;
+	margin-left: 0px;
+	padding-left: 2em;
+}
+
+div.voodooDebug ul pre {
+	padding-left: 2em;
+}
+
+
+div.voodooDebug div.vdOpen div.vdOpen div.vdContent span { white-space: pre; }
+div.voodooDebug dd { white-space: pre; }

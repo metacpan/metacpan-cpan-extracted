@@ -1,0 +1,41 @@
+NAME
+    App::BCVI::AutoInstall - Automatically install bcvi on a new host
+
+DESCRIPTION
+    This module is a plugin for "bcvi" (see: App::BCVI). If you are
+    connecting to a server for the first time it will install the required
+    files for you.
+
+    It requires App::BCVI::InstallManager for tracking which servers you've
+    already installed the bcvi files on.
+
+SUPPORT
+    You can look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-BCVI-AutoInstall>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/App-BCVI-AutoInstall>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/App-BCVI-AutoInstall>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/App-BCVI-AutoInstall>
+
+    *   Git Repository
+
+        <http://git.etc.gen.nz/cgi-bin/gitweb.cgi?p=app-bcvi-autoinstall.git
+        >
+
+COPYRIGHT & LICENSE
+    Copyright 2010 Andrew Ruthven <andrew@etc.gen.nz>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

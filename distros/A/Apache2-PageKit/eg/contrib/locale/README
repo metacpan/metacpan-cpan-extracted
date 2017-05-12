@@ -1,0 +1,153 @@
+
+lets perl do the work!
+
+cd to_the_example_site;
+./contrib/bin/build_locale.pl `pwd`
+
+this creates all possible message catalogs from the dir .../locale/templates/po/
+and install them in the right place.
+
+How to build a compiled message file (.mo) manual?
+
+first cd into the po_templates directory and copy the file
+empty.po to your_lang.po i.e. cp empty.po de.po
+the translate it. for all your messages add a
+
+msgid "Hello World" and a
+msgstr "Hallo Welt" line with the translation
+
+if done call msgfmt to build the .mo file.
+
+msgfmt -o de.mo de.po
+
+then copy the file de.mo into the pkit_root/locale/de/LC_MESSAGES directory.
+
+thats all.
+
+with this patch pkit have locale info. This is very usefull for
+languages != en for obvious reason but also for en. with this you
+can have some sites with different messages four the same thing.
+
+like: "You logged in succsesfully." on one site and
+"You are welcome." on the other.
+
+also all messages form the pkit_validate_input are translated.
+
+use_locale = 'yes' in the global config part of the Config.xml file activates
+the use of the locale info you provide. You need the module Locale::gettext
+1.01. if reload = 'yes' (from the server config part) then the .mo files
+are reread on every request. else only on serverstartup or first usage.
+
+the API:
+
+pkit_gettext($text);
+	translate the text $text and return the translated text.
+	if the text cant be translated, the original text is returned.
+
+and pkit_gettext_message($text,...);
+	this is a shortcut for
+$model->pkit_message($model->pkit_gettext($text),...);
+
+
+what to do?
+copy your locale files into the directory
+pkit_root/locale/*YOUR_LANG*/LC_MESSAGES/MyPageKit.mo where *YOUR_LANG*
+should be replaced with your language shortcut from the ISO 639 standard.
+
+here some i know of.
+
+en English
+de German
+fr French
+es Spanish
+ga Irish
+it Italian
+zu Zulu
+
+and MyPageKit should be replaced with the name of your pkit application.
+
+so for my internal site pkit.brain.de with the dispatch class MyPageKit::MyModel
+
+../htdocs/pkit.brain.de/locale/de/LC_MESSAGES/PageKit.mo
+../htdocs/pkit.brain.de/locale/en/LC_MESSAGES/PageKit.mo
+
+the .mo files are created with the msgfmt commandline tool form your PageKit.po
+file.
+A simple one is here:
+
+######## start of file
+
+domain "PageKit.mo"
+
+#
+# Apache2::PageKit
+#
+
+msgid "You have successfully logged in."
+msgstr "Erfolgreich eingeloggt."
+
+msgid "You have successfully logged out."
+msgstr "Erfolgreich ausgeloggt."
+
+msgid "Cookies must be enabled in your browser."
+msgstr "Im Browser müssen Cookies eingeschaltet sein."
+
+msgid "This page requires a login."
+msgstr "Für diese Seite ist ein Login erforderlich."
+
+msgid "Please try again."
+msgstr "Bitte nocheinmal versuchen."
+
+msgid "You did not fill out all the required fields. Please fill the <font
+color=\"<PKIT_ERRORSTR>\">red</font> fields."
+msgstr "Es wurden nicht alle erforderlichen Felder ausgefüllt. Bitte alle
+<font color=\"<PKIT_ERRORSTR>\">roten</font> Felder ausfüllen."
+
+#
+# MyPageKit::Common
+#
+
+msgid "Your login/password is invalid. Please try again."
+msgstr "Das Passwort oder der Login ist ungültig. Bitte nocheinmal versuchen"
+
+msgid "You did not fill all of the fields. Please try again."
+msgstr "Es wurden nicht all Felder ausgefüllt, bitte nocheinmal versuchen"
+
+#
+# MyPageKit::MyModel
+#
+
+msgid "Your changes have been made."
+msgstr "Die Änderungen wurden vorgenommen."
+
+msgid "The E-mail address, <b>%%VALUE%%</b>, is invalid."
+msgstr "Die Emailadresse <b>%%VALUE%%</b> ist ungültig."
+
+msgid "The phone number, <b>%%VALUE%%</b>, is invalid."
+msgstr "Die Telefonnummer <b>%%VALUE%%</b> ist ungültig."
+
+msgid "[Session not set]"
+msgstr "[Session nicht gesetzt]"
+
+msgid "The login, <b>%%VALUE%%</b>, has already been used."
+msgstr "Der Login <b>%%VALUE%%</b>, wird bereits verwendet."
+
+msgid "The E-mail address, <b>%%VALUE%%</b>, is invalid."
+msgstr "Die Emailadresse <b>%%VALUE%%</b> ist ungültig."
+
+msgid "The phone number you entered is invalid."
+msgstr "Die eingegebene Telefonnummer ist ungültig."
+
+msgid "The passwords you entered do not match."
+msgstr "Das eingegebene Passwort ist nicht richtig."
+
+msgid "This message was passed throught pkit_redirect"
+msgstr "Diese Nachricht wurde weitergeleitet durch pkit_redirect"
+
+msgid "Another message passed throught pkit_redirect"
+msgstr "Eine andere Nachricht weitergeleitet durch pkit_redirect"
+
+msgid "This ERROR message was passed throught pkit_redirect"
+msgstr "Diese Fehlermeldung wurde weitergeleitet durch pkit_redirect"
+
+#### end of file.

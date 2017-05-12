@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin;
+use File::Spec::Functions qw(catdir updir catfile);
+use Cwd qw(abs_path);
+_set_env();
+
+# Start command line interface for application
+require Mojolicious::Commands;
+Mojolicious::Commands->start_app('Ado');
+
+sub _set_env {
+    $ENV{MOJO_MODE} ||= 'development';
+
+    #$ENV{MOJO_MODE}='production';
+    $ENV{MOJO_HOME} ||= abs_path(catdir($FindBin::Bin, updir));
+    $ENV{MOJO_CONFIG} ||= catfile($ENV{MOJO_HOME}, 'etc', 'ado.conf');
+
+    # Try to find a local lib
+    my @libs = (
+        catdir($ENV{MOJO_HOME}, 'lib',  'perl5'),
+        catdir($ENV{MOJO_HOME}, 'site', 'lib'),
+        catdir($ENV{MOJO_HOME}, 'lib')
+    );
+    for my $d (@libs) {
+        unshift @INC, $d if -d $d;
+    }
+    return;
+}

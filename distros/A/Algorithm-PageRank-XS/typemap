@@ -1,0 +1,11 @@
+TYPEMAP
+pagerank            T_PTROBJ_PAGERANK
+TableRef *       T_PTROBJ
+
+INPUT
+T_PTROBJ_PAGERANK
+        $var = C_PAGERANK($arg, \"$var\");
+
+OUTPUT
+T_PTROBJ_PAGERANK
+        sv_setref_pv($arg, \"Algorithm::PageRank::XS\", (void*)$var);

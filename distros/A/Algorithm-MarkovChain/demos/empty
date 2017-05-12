@@ -1,0 +1,11 @@
+#!/usr/bin/perl -w
+use strict;
+
+use lib qw(../blib/lib ./blib/lib);
+
+use Algorithm::MarkovChain;
+use Data::Dumper qw/DumperX/;
+
+my $a = Algorithm::MarkovChain::->new();
+
+print join("\n", $a->spew(), '');

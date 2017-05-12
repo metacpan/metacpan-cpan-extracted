@@ -1,0 +1,17 @@
+<html>
+<title>Login</title>
+<body>
+[% IF logout %]
+<p>
+[% logout %], you've been logged out successfully.
+</p>
+[% END %]
+<h2>Please login</h2>
+<form action="u" method="post">
+Username: [% username %] <br />
+Password: [% password %] <br />
+[% redirect %]
+<input type="submit" value="Login" />
+</form>
+</body>
+</html>

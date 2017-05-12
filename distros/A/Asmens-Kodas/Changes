@@ -1,0 +1,9 @@
+Revision history for Perl extension Asmens::Kodas.
+
+0.02  Tue Jan  6 11:58:31 2004 
+	- Allow module to be used by Perls older than v5.8.1
+
+0.01  Mon Dec 29 10:16:17 2003
+	- original version; created by h2xs 1.23 with options
+		-X Asmuo::Kodas
+

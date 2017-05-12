@@ -1,0 +1,11 @@
+<div class="login">
+<form method="POST" action="[% s.uri %]">
+<h1>Forgot Password</h1>
+[% IF s.error.login %]
+<div class="alert">[% s.error.login %]</div>
+[% END %]
+<b>Your Email</b><br>
+<input name="forgot_email" value="[% s.in.forgot_email %]"><br>
+<input type="submit" value="Next">
+</form>
+</div>

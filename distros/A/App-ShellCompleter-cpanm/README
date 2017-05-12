@@ -1,0 +1,10 @@
+SYNOPSIS
+
+    See _cpanm included in this distribution.
+
+SEE ALSO
+
+    Bash::Completion::Plugins::cpanm, which focuses on completing module
+    name remotely using MetaCPAN API. This module, on the other hand,
+    focuses on completing cpanm command-line options.
+

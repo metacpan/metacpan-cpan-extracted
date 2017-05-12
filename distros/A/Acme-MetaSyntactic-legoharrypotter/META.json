@@ -1,0 +1,46 @@
+{
+   "abstract" : "LEGO Harry Potter theme",
+   "author" : [
+      "Chris Williams"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-MetaSyntactic-legoharrypotter",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::MetaSyntactic" : "0",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::MetaSyntactic::List" : "1.001",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/acme-metasyntactic-legoharrypotter",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/acme-metasyntactic-legoharrypotter.git",
+         "web" : "https://github.com/bingos/acme-metasyntactic-legoharrypotter"
+      }
+   },
+   "version" : "0.02"
+}
+

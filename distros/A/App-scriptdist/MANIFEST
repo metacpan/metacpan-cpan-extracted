@@ -1,0 +1,20 @@
+Changes
+INSTALL.SKIP
+lib/App/scriptdist.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+scriptdist
+t/compile.t
+t/pod.t
+t/run.t
+t/test_home_dir/.scriptdist/INSTALL
+t/test_home_dir/.scriptdist/Makefile.PL
+t/test_home_dir/.scriptdistrc
+t/test_home_dir/test_script
+t/test_manifest
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

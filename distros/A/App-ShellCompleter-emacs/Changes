@@ -1,0 +1,21 @@
+Revision history for App-ShellCompleter-emacs
+
+0.04    2016-10-21 (PERLANCAR)
+
+        - Allow script to be dumped by Getopt::Long::Dump.
+
+
+0.03    2015-09-17 (PERLANCAR)
+
+	- Adjust to Complete::Util 0.36 (complete_file() split to
+	  Complete-File).
+
+
+0.02    2015-02-15 (PERLANCAR)
+
+	- Fixes.
+
+
+0.01    2015-02-15 (PERLANCAR)
+
+        - First release.

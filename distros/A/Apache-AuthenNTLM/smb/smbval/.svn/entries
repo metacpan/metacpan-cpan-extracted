@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="9"
+   name=""
+   committed-date="2004-09-21T10:22:21.291102Z"
+   url="file:///home/speeves/svn/modperl/authenntlm/trunk/smb/smbval"
+   last-author="root"
+   kind="dir"
+   uuid="55723fa2-1fe4-0310-95fb-f6aa04edc561"
+   revision="15"/>
+<entry
+   committed-rev="9"
+   name="rfcnb-io.c"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="9567e9d6a4b214639fe55171bc81e6da"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   committed-rev="9"
+   name="rfcnb.h"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="0400faee761716749d3ae81af71259f3"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   committed-rev="9"
+   name="valid.c"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="a06b9a4cc0419e84cce01187df3d83cc"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   committed-rev="9"
+   name="std-includes.h"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="2ba619839e80afb20e99f4c7b1ec331c"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   committed-rev="9"
+   name="smblib-common.h"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="7c9950290d394a2ce5a5085859c2d834"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   committed-rev="9"
+   name="valid.h"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="7569275ed9f486a65d03abdb9de6bfa4"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   committed-rev="9"
+   name="rfcnb-io.h"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="535f532179a9021fa4c0b917dfcc9bd3"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   committed-rev="9"
+   name="byteorder.h"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="f95b40f540b392b085c315118b3f76ec"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   name="hints"
+   kind="dir"/>
+<entry
+   committed-rev="9"
+   name="rfcnb-util.c"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="35574b765d3070702ee14e5a8685dd3f"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   committed-rev="9"
+   name="Makefile.PL"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="6ea6b479c6aa1905565fa57e949d8edc"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   committed-rev="9"
+   name="smblib.c"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="3622f53d9b93294fe606050457944c36"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   committed-rev="9"
+   name="rfcnb-util.h"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="ff388640c912ad03b3b38e5d50387d2f"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   committed-rev="9"
+   name="std-defines.h"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="cca1531d3a9fd68b92c844b1947187b1"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   committed-rev="9"
+   name="smbdes.c"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="fcd9bd77587ef53baa59a115caef2359"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   committed-rev="9"
+   name="smblib.h"
+   text-time="2004-11-22T13:01:45.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="9de770314a8886082ac3dc1a0f96819d"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   committed-rev="9"
+   name="rfcnb-priv.h"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="61b2b9687e6af8ca24092b7ba99131f9"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:45.000000Z"/>
+<entry
+   committed-rev="9"
+   name="session.c"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="5c431343e24b5288f49daed247311e44"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:46.000000Z"/>
+<entry
+   committed-rev="9"
+   name="smblib-util.c"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="f97db48de4c3bf2fae1c3e1bf51558ff"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:46.000000Z"/>
+<entry
+   committed-rev="9"
+   name="md4.c"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="90a3a5a2023a9b36faaa0a5912827891"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:46.000000Z"/>
+<entry
+   committed-rev="9"
+   name="rfcnb-common.h"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="deddc80369a7b4c719276eb39340527a"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:46.000000Z"/>
+<entry
+   committed-rev="9"
+   name="rfcnb-error.h"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="b636efd1f535fc5276d44ed17dd75d47"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:46.000000Z"/>
+<entry
+   committed-rev="9"
+   name="smbencrypt.c"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="79d177ac87d9a1dda06f9cfa10a10667"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:46.000000Z"/>
+<entry
+   committed-rev="9"
+   name="smblib-priv.h"
+   text-time="2004-11-22T13:01:46.000000Z"
+   committed-date="2004-09-21T10:22:21.291102Z"
+   checksum="c15ad838b99659b0212278545eb68d99"
+   last-author="root"
+   kind="file"
+   prop-time="2004-11-22T13:01:46.000000Z"/>
+</wc-entries>

@@ -1,0 +1,13 @@
+xmpp:
+    username: your.name
+    password: 'pa55word'
+    google_talk: true
+
+whitelist:
+    - 'your.name@gmail.com'
+
+tracks:
+    url: 'http://example.com/tracks'
+    username: 'test'
+    password: 'pa55word'
+    default_context: Inbox

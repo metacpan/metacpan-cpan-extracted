@@ -1,0 +1,12 @@
+This module provides flexible quota tracking under mod_perl.  See the
+module documentation for details.
+
+INSTALLATION
+
+To install this module type the following in the distribution
+directory:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install

@@ -1,0 +1,40 @@
+Revision history for Perl extension Apache2::Filter::Minifier::JavaScript.
+
+1.05    Fri Apr 23 22:25 PDT 2010
+    - Switch to Git
+
+1.04    Mon May  5 15:17 PDT 2008
+    - no changes since 1.04_02, but is a non-devel release
+
+1.04_02 Wed Oct 17 16:01 PDT 2007
+    - decline processing if unable to determine Content-Type of document
+    - lower Perl requirement to 5.6.0
+
+1.04_01 Tue Oct 16 00:59 PDT 2007
+    - added timing info to the debug logs
+    - use JavaScript::Minifier::XS if available; its -MUCH- faster
+    - new "JsMinifier" PerlVar, to let you specify which minifier package or
+      function to use (otherwise we try J:M:XS first, falling back to J:M)
+
+1.03    Fri Sep 28 11:09 PDT 2007
+    - release; verified that changes in 1.03_01 for configuration requirements
+      worked as intended when doing CPANPLUS test runs
+
+1.03_01 Thu Sep 27 13:27 PDT 2007
+    - rewrote Build.PL/Makefile.PL so they now check if you've got Apache::Test
+      installed -at-configuration-time-.  If not, the build is aborted.  One
+      day, CPAN(PLUS) et al. will support "configure_requires", but until then
+      we've got to check for this ourselves.
+    - fixed Content-Type filtering so that it now properly handles HTTP headers
+      that have additional attributes (e.g. "charset=...")
+
+1.02    Wed Sep 26  1:25 PDT 2007
+    - added Makefile.PL, so CPANPLUS testers stop failing tests because they
+      don't have Module::Build installed
+
+1.01    Fri Sep 21 13:31 PDT 2007
+    - added explicit dependency on MP2
+    - updated test requirements to "need_*" instead of "have_*"
+
+1.00    Thu Sep 20 12:45 PDT 2007
+    - initial version

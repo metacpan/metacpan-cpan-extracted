@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentCollection>
+  <documentRecord id="A40C00BE1D17086E4AE59ABB355FFF3C">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1141065636598</modifiedDate>
+        <httpServer>Apache/1.3.34 (Unix) DAV/1.0.3 mod_auth_passthrough/1.8 mod_log_bytes/1.2 mod_bwlimited/1.4 PHP/4.4.1 FrontPage/5.0.2.2635 mod_ssl/2.8.25 OpenSSL/0.9.7a</httpServer>
+        <urls>
+          <url>http://battellemedia.com/archives/2005_01.php</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>Many of you may have noticed that last night Searchblog was hacked, apparently by someone in Albania (!). For a brief period of time my site redirected to a very odd page, and it appeared I had entirely lost my mind. All is well now, though we have some backend housekeeping to do. Thanks to the many readers who alerted me.</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">John Battelle's Searchblog: January 2005 Archives</meta>
+        <meta name="dc.date">2005-01-15</meta>
+        <meta name="dc.type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+        </outlinks>
+      </links>
+    </acquisition>
+  </documentRecord>
+</documentCollection>

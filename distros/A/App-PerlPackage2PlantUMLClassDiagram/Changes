@@ -1,0 +1,9 @@
+Revision history for Perl extension App-PerlPackage2PlantUMLClassDiagram
+
+0.02 2015-12-09T01:40:52Z
+    - Experimental push on scalar is now forbidden
+
+0.01 2015-12-08T08:24:05Z
+
+    - original version
+

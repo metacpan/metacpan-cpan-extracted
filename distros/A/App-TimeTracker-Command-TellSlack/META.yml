@@ -1,0 +1,19 @@
+---
+abstract: 'App::TimeTracker plugin for posting to slack.com'
+author:
+  - 'Thomas Klausner <domm@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-TimeTracker-Command-TellSlack
+resources:
+  homepage: http://timetracker.plix.at
+  repository: git://github.com/domm/App-TimeTracker-TellSlack.git
+version: '1.001'

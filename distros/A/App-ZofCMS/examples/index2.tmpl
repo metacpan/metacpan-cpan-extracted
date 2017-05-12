@@ -1,0 +1,31 @@
+use strict;
+use warnings;
+
+{
+    body => \'index.tmpl',
+    title => '',
+
+    plugins => [
+        { DBI => 2000 },
+        { DBIPPT => 3000 },
+    ],
+    
+    dbi => {
+        dsn     => 'DBI:mysql:database=ds2;host=localhost',
+        user    => 'test',
+        pass    => 'test',
+        opt     => { RaiseError => 1, AutoCommit => 1 },
+        dbi_get => {
+            name    => 'comments',
+            sql     => [
+                'SELECT `comment`, `time` FROM `forum_comments`',
+                { Slice => {} },
+            ],
+        },
+    },
+
+    plug_dbippt => {
+        key => [ 'forum', 'comments', ],
+        n   => 'comment',
+    }
+}

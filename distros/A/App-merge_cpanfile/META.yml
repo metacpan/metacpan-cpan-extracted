@@ -1,0 +1,40 @@
+---
+abstract: 'Merge multiple cpanfile into one'
+author:
+  - 'aereal <aereal@aereal.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-merge_cpanfile
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::merge_cpanfile:
+    file: lib/App/merge_cpanfile.pm
+    version: '0.01'
+requires:
+  CPAN::Meta::Prereqs: '0'
+  Module::CPANfile: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/aereal/App-merge_cpanfile/issues
+  homepage: https://github.com/aereal/App-merge_cpanfile
+  repository: git://github.com/aereal/App-merge_cpanfile.git
+version: '0.01'
+x_authority: cpan:AEREAL
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

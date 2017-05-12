@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Audio::Metadata::TextProcessor;
+use File::Temp;
+use Pod::Usage;
+
+my $command = $ARGV[0]
+    or do {
+       Pod::Usage::pod2usage(-verbose => 2, -noperldoc => 1);
+       exit 1;
+    };
+
+if ($command eq 'edit') {
+    # Edit metadata interactively.
+
+    # No way to edit without editor.
+    unless ($ENV{EDITOR}) {
+        die "EDITOR environment variable must be set\n";
+    }
+
+    # Read metadata and write it as text to temporary file.
+    my ($tmp_fh, $tmp_file_name) = File::Temp::tempfile();
+    print $tmp_fh Audio::Metadata->file_to_text($_), "\n" foreach @ARGV[1..$#ARGV];
+    close $tmp_fh;
+
+    # Run editor to edit the text.
+    system $ENV{EDITOR}, $tmp_file_name;
+
+    # Apply edited temporary file and delete it.
+    my $text_processor = Audio::Metadata::TextProcessor->new({
+        input => $tmp_file_name,
+    });
+    $text_processor->update;
+    unlink $tmp_file_name;
+}
+elsif ($command eq 'read') {
+    print Audio::Metadata->file_to_text($_), "\n" foreach @ARGV[1..$#ARGV];
+}
+else {
+    # Run arbitary method of the text processor.
+    Audio::Metadata::TextProcessor->can($command)
+        or die "Unknown command: $command\n";
+
+    my $text_processor = Audio::Metadata::TextProcessor->new({
+        input_fh  => *STDIN,
+        output_fh => *STDOUT,
+    });
+    $text_processor->$command;
+}
+
+__END__
+
+=head1 USAGE
+
+ ametadata <command> [file2 file3 file4...]
+
+=head2 The following commands are available:
+
+=over
+
+=item read
+
+Read metadata and write it to standard output.
+
+=item update
+
+Read metadata combined with file names from standard input and save it.
+Run "read" command and see the output for an example.
+
+=item edit
+
+Read metadata into temporary file, run default editor (configured with EDITOR environment
+variable) and save the changes to audio files.
+
+=item update_from_cue
+
+Read metadata from .cue file on standard input and write it to files in current directory.
+Files are looked for in current directory, track number is identified by leading digits in
+file name. Number of files must exactly match number of audio tracks in the cue file.
+
+=back
+
+=cut
+
+=head1 EXAMPLES
+
+=head2 Print metadata for all .flac files:
+
+ ametadata read *.flac
+
+=head2 Replace artist in each .flac file:
+
+ ametadata read *.flac | sed 's/^artist .*/artist Pat Metheny/' | ametadata update
+
+=head2 Edit metadata using default editor:
+
+ ametadata edit *.flac
+
+=head2 Write metadata from .cue file to audio files:
+
+ ametadata update_from_cue < album.cue
+
+=cut

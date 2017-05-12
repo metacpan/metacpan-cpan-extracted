@@ -1,0 +1,173 @@
+=head1 NAME
+
+App::Rad::Plugin::TT - Template Toolkit extension for the App::Rad framework
+
+=head1 SYNOPSIS
+
+  use App::Rad qw(TT);
+  App::Rad->run();
+
+  sub mycommand {
+      my $c = shift;
+
+      # ...
+      $c->stash->{template} = 'mytemplate.tt2';
+      return $c->process();
+  }
+
+You can also customize your template configurations during setup:
+
+  sub setup {
+      my $c = shift;
+      $c->register_commands();  # or whatever
+
+      $c->tt_config({
+              # any TT configuration items go here
+              INCLUDE_PATH    => '/some/template/path',
+              PRE_PROCESS     => 'myapp/main',
+              WRAPPER         => 'some/wrapper',
+
+              # plus some additional goodness :)
+              CONTROLLER_VAR     => 'c',
+              TEMPLATE_EXTENSION => '.tt2',
+      });
+  }
+
+
+=head1 DESCRIPTION
+
+This module extends C<< App::Rad >>'s functionality by letting you use Template Toolkit to render your output (or anything you like).
+
+
+=head2 Rendering Output
+
+When you call C<< $c->process() >> from inside your C<< App::Rad >> commands, it will try to render whatever template file is specified in the 'template' stash variable. If the stash item isn't defined, it will instead look for a template file with the same name as the command (appended, by default, with the '.tt2' extension).
+
+While processing, all the items defined in the stash are passed to the Template Toolkit for use as template variables. This means that, if you have:
+
+  $c->stash->{foo} = 1;
+  $c->stash->{bar} = 2;
+  $c->stash->{baz} = 3;
+
+they can be directly accessed as:
+
+  [% foo %]
+  [% bar %]
+  [% baz %]
+
+The C<< $c >> context object is also passed to the template as the 'c' variable, should you need to use any other values:
+
+  [% c.config.someconfig %]
+  [% c.argv %]
+
+Also, please note that, if you happen to have a stash variable named 'c', it will only be accessible through C<< [% c.stash.c %] >>.
+
+
+=head2 Capturing Template Output
+
+Keep in mind that, although you will probably just want to C<< return() >> the processed template from your command, you don't actually have to. You can just as easily use the output of the template for some purpose other than displaying in the response, such as sending an email, or writing to a file.
+
+
+=head2 Post-processing Output
+
+C<< App::Rad >> has a special function called post_process() that actually prints whatever is returned from your commands. While using templates, you have usually two different approaches:
+
+=over 8
+
+=item * Render the template from inside your commands, and return that rendered value. This will store the output inside C<< $c->output >> for the post_process() function to handle. By default, it just prints that output appended with a newline, and this is most likely what you want for simple usage.
+
+=item * Set the template inside your commands, don't render it, and return nothing. This way you can render any received template from inside your custom post_process() function, in a way that will let you normalize data before rendering or whatever, providing much more flexibility.
+
+=back
+
+Either way, it's just fine :)
+
+
+=head1 METHODS
+
+
+=head2 process()
+
+Returns the rendered template specified in C<< $c->stash->{template} >>, or a C<< Template::Exception >> object upon error. If there is no template variable set, it will look for a template with the same name as the command in which the method call resides. For example:
+
+  sub something {
+      my $c = shift;
+      return $c->process();
+  }
+
+Since no 'template' variable was set in the stash, it will automatically render a template called 'something', inside the template directories set via the INCLUDE_PATH configuration variable. Please refer to the TEMPLATE_EXTENSION variable below for more information on how to add a default file suffix for your templates.
+
+=head2 process_array()
+
+=head2 use_tt_post_process()
+
+=head2 no_tt_post_process()
+
+=head2 tt_config()
+
+This method lets you setup Template Tookit as you see fit for your application. It receives a hash reference where you can put *any* TT configuration items. Please refer to L<Template::Config> for more information on accepted options. Although you can call this method anywhere in your code, developers are advised to do it inside C<< App::Rad >>'s setup() special function.
+
+Note that you don't have to actually call this method at all for the plugin to work. If you don't, C<< App::Rad::Plugin::TT >> will fall to the default configuration values. This is simply a helper method for people with more complex templating needs.
+
+Besides the standard TT configuration explained above, you can also setup the following plugin variables:
+
+
+=head3 CONTROLLER_VAR
+
+Allows you to change the name of App::Rad's context object, as seen from inside the template. For example:
+
+  $c->tt_config({
+          CONTROLLER_VAR => 'Rad',  # default value is 'c', just like in App::Rad
+  });
+
+Then, later on your command:
+
+  $c->stash->{template} = 'message.tt2';
+  $c->stash->{message}  = 'Hello, World!';
+  return $c->process();
+
+Then your C<message.tt2> template could be something like this:
+
+  The message is [% message %]
+  
+  [% FOREACH arg IN Rad.argv %]
+     Argument [% arg %] was typed!
+  [% DONE %]
+
+
+=head3 TEMPLATE_EXTENSION
+
+A filename suffix to add when looking for templates, either while trying to match them to your command name or if you ommit it from the 'template' stash variable. For example, if you set C<TEMPLATE_EXTENSION> to '.tt2', then:
+
+  $c->stash->{template} = 'whatever';
+
+will search for the file 'whatever' and 'whatever.tt2'. However, if you do:
+
+  $c->stash->{template} = 'whatever.tt2';
+
+then it will only search for 'whatever.tt2'.
+
+Also, if you don't specify a template variable on your stash, then something like:
+
+    sub mycmd {
+        my $c = shift;
+        return $c->process();
+    }
+
+would by default look for something called C<< <rootdir>/mycmd >>. If you set C<TEMPLATE_EXTENSION> to '.tt2', it will look for C<< <rootdir>/mycmd.tt2 >>.
+
+
+=head1 SEE ALSO
+
+L<App::Rad>, L<Template>
+
+
+=head1 AUTHORS
+
+Fernando Correa de Oliveira, <fco at cpan.org>
+Breno G. de Oliveira, <garu at cpan.org>
+
+
+=head1 COPYRIGHT
+
+This program is free software, you can redistribute it and/or modify it under the same terms as Perl 5 itself.

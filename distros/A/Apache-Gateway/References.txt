@@ -1,0 +1,18 @@
+			      REFERENCES
+
+Roy T. Fielding, Jim Gettys, Jeffrey C. Mogul, Henrik Frystyk Nielsen,
+and Tim Berners-Lee.  _Hypertext Transfer Protocol--HTTP/1.1_.
+RFC2616
+
+Y. Y. Goland, E. J. Whitehead, Jr., A. Faizi, S. R. Carter, and
+D. Jensen.  _Extensions for Distributed Authoring on the World Wide
+Web -- WEBDAV_.  RFC2518
+
+Jeffrey Mogul and Arthur van Hoff.  _Duplicate Suppression in HTTP_.
+Internet-Draft draft-mogul-http-dupsup-00, HTTP Working Group,
+April, 1998.
+
+Arthur van Hoff, John Giannandrea, Mark Hapner, Steve Carter, and Milo
+Medin.  _The HTTP Distribution and Replication Protocol_.  Technical
+Report NOTE-DRP, World Wide Web Consortium, August, 1997.
+<URL:http://www.w3.org/TR/NOTE-drp-19970825.html>.

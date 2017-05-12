@@ -1,0 +1,14 @@
+Revision history for App-Goto2
+
+0.04  2014-10-02 10:01:47 BST
+        - More dependencies added
+
+0.03  2014-10-01 15:33:03 BST
+        - Minor documentation & dependency updates
+
+0.02  2014-09-26 10:22:55 BST
+        - Increased verbose output
+        - List option to accept a string to filter results by
+
+0.01  2014-09-25 17:17:05 BST
+        - Initial release

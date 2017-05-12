@@ -1,0 +1,5 @@
+ChangeLog for Apache::GD::Thumbnail
+
+0.01 - Jan 21, 2002 - Started
+0.02 - JAn 22, 2002 - Removed some debug code that shouldn't have been there
+0.03 - Mar  1, 2002 - Send cache control response BEFORE generating the thumbnail...

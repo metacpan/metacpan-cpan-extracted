@@ -1,0 +1,4 @@
+001	1.00	Certain file names cause a parse error at the top parse line.
+		This is due to them upsetting the RE used to check the top line
+		when they are interpolated.
+	1.01    Fixed by replacing RE with eq check

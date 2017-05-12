@@ -1,0 +1,23 @@
+name: Algorithm-Accounting
+version: 0.08
+abstract: Generate accounting statistic for general logs
+author: Kang-min Liu <gugod@gugod.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+requires:
+  Spiffy: 0
+  Perl6::Form: 0
+  Array::Compare: 0
+  List::Util: 0
+  Array::Iterator::Reusable: 0
+  FreezeThaw: 0
+  Clone: 0
+  YAML: 0
+  Imager::Graph::Pie: 0
+  GD::Graph: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

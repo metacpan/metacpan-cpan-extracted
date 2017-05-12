@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+use Applify;
+use App::git::ship;
+
+documentation 'App::git::ship';
+version 'App::git::ship';
+
+app {
+  my $self   = shift;
+  my $action = shift || 'ship';
+  my $ship   = App::git::ship->new;
+
+  $action =~ s/-/_/g;
+
+  if ($action eq 'start') {
+    $ship->start(@_);
+  }
+  else {
+    $ship = $ship->detect->new;
+    $ship->config;
+    $ship->abort("Unknown action: $action") if $action !~ /^[a-z_]+$/ or !$ship->can($action);
+    $ship->$action(@_);
+  }
+
+  return 0;
+};

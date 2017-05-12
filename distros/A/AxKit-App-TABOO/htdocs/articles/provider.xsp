@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="NULL" type="application/x-xsp"?>
+<?xml-stylesheet href="/transforms/articles/xhtml/article-provider.xsl" type="text/xsl"?>
+<xsp:page
+  xmlns:xsp="http://www.apache.org/1999/XSP/Core"  
+  xmlns:art="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Article" 
+  xmlns:param="http://www.axkit.org/2002/XSP/QueryParam">
+  <taboo>
+    <art:get-article>
+      <art:filename><param:get name="filename"/></art:filename>
+      <art:primcat><param:get name="primcat"/></art:primcat>
+    </art:get-article>
+  </taboo>
+</xsp:page>

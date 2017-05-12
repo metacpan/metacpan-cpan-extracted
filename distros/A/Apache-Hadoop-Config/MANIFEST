@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Apache-Hadoop-Config.t
+lib/Apache/Hadoop/Config.pm

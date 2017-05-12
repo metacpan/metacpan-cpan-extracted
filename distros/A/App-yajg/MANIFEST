@@ -1,0 +1,24 @@
+bin/yajg
+Changes
+lib/App/yajg.pm
+lib/App/yajg/Hooks.pm
+lib/App/yajg/Output.pm
+lib/App/yajg/Output/DDP.pm
+lib/App/yajg/Output/Json.pm
+lib/App/yajg/Output/Perl.pm
+lib/App/yajg/Output/Yaml.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/00-simple-use.t
+t/01-size.t
+t/02-parse_select.t
+t/03-select_by_path.t
+t/04-filter.t
+t/05-modify_data.t
+t/06-hooks.t
+t/07-values_ref.t
+t/08-output.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

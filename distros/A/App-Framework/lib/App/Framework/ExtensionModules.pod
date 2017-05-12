@@ -1,0 +1,24 @@
+=head1 NAME
+
+App::Framework::ExtensionModules - Module list for installed Extension modules 
+
+=head1 DESCRIPTION
+
+The following list shows the available Extension:
+
+=over 4
+
+=item * L<App::Framework::Extension::Filter>  v1.000
+
+Script filter application object
+
+
+
+=back
+
+=head1 AUTHOR
+
+Steve Price, C<< <sdprice at cpan.org> >>
+
+=cut
+

@@ -1,0 +1,156 @@
+Put changes under the appropriate header. Headers can include API CHANGES,
+DIFFERENT BEHAVIOR, BUG FIXES, DEPENDENCIES, ENHANCEMENTS, NEW FEATURES, and
+OTHER. Entries should be in chronological order, i.e. oldest at the top
+
+0.12  Mon, Nov 28, 2016
+
+  [DEPENDENCIES]
+  
+  * Updated to latest tccx work, fixing struct alignment issues and
+    enum handling..
+
+0.11  Mon, Aug 8, 2016
+
+  [DIFFERENT BEHAVIOR]
+  
+  * The binary, library, and include file locations are reported based on
+    the results of an actual subdirectory search, rather than by sheer
+    guesswork, as used to be the case.
+  
+  [BUG FIXES]
+  
+  * BSDs were switched to use cc, but that is clang (at least on some
+    BSDs) so we need to add the heinous-gnu-extensions flag.
+  
+  * Add patch for Mac OSX to #define _VA_LIST_T. Macs were hitting trouble
+    with incompatible preprocessor definitions. If the macros and internal
+    definitions had all been expanded, the definitions for variadic function
+    lists would have been the same, but tcc doesn't know that.
+  
+  [OTHER]
+  
+  * The test suite has been made robust against compiler warnings. It now
+    searches for expected printouts as substrings of the obtained printouts.
+
+0.10  Thu, June 2, 2016
+
+  [BUG FIXES]
+  
+  * Fix 64-bit cpu specification for call to configure on Macs.
+
+0.09  Mon, May 30, 2016
+
+  [DEPENDENCIES]
+  
+  * Recently, extended symbol table work was brought back up-to-date with
+    the latest mob branch of tcc. The github branch with this work is
+    called 'mobx'. This Alien package now uses mobx as its subrepo.
+
+0.08  Sun, Apr 24, 2016
+
+  [ENHANCEMENTS]
+  
+  * Include new exsymtab inline test files.
+  
+  [BUG FIXES]
+  
+  * Use "cc" instead of "gcc" on BSDs
+  
+  * MANIFEST now includes all necessary mingw header files in the git
+    repo. Somehow I forgot to include these after I figured out which
+    ones needed to be added.
+
+0.07  Wed, Dec 2, 2015
+
+  * Updated to latest work including inline support for inline functions.
+  
+  [ENHANCEMENTS]
+  
+  * New and improved patching for Mac and NetBSD
+  
+  * Added tentative support for Solaris
+  
+  * Remove stack protection on Linuxes; this was causing trouble on
+    recent vintages of Ubuntu.
+
+0.06  Sat, Aug 1, 2015
+
+  * Forked from v0.05 of Alien::TinyCC; the source repository is now my local
+    fork so that I can distribute the extended symbol table API.
+  
+  [ENHANCEMENTS]
+  
+  * Include functions to generate ExtUtils::MakeMaker arguments, ported from
+    Alien::TinyCC.
+
+0.05  Mon, Sep 2, 2013
+
+  [BUG FIXES]
+  
+  * The patch function in the build system now sets execution bit on all new
+    files. This fixes the build issues for BSD boxes, which patch configure,
+    rendering it non-executable.
+  
+  [OTHER]
+  
+  * Added Travis CI integration.
+
+0.04  Thu, Aug 29, 2013
+
+  [ENHANCEMENTS]
+  
+  * Created a general patching function, used now by Windows and BSD build
+    systems, and used to patch the test files for all systems.
+  
+  [BUG FIXES]
+  
+  * Patched MidnightBSD detection.
+  
+  * Added -fPIC flag for systems whose Perl was compiled with it.
+  
+  * Fixed stdarg.h issues for older gcc header collections.
+  
+  * Added method to detect, and patch if necessary, the proper path for
+    ucontext.h (either #include <ucontext.h> or #include <sys/ucontext.h>).
+  
+  [OTHER]
+  
+  * Added a commit hook (and instructions in the README for activation) which
+    should help keep this file up-to-date. :-)
+  
+  * Updated the dist Build command to reset the files under src/ before
+    building the dist.
+  
+  * Added various dev Build commands to make it easier to get a clean setup.
+
+0.03  Sun, Aug 25, 2013
+
+  [ENHANCEMENTS]
+  
+  * Added work-around for Mac smoke tester's erroneous configuration.
+  
+  * Included tcc's test suite.
+  
+  [BUG FIXES]
+  
+  * Tweaked BSD make invocation.
+  
+  * Fixed Windows compiler detection code.
+
+0.02  Wed, Aug 21, 2013
+
+  [BUG FIXES]
+  
+  * Fixed incorrect MANIFEST issues and other build system problems.
+
+0.01  Wed, Aug 21, 2013
+
+  Initial release!
+  
+  * Compiles and installs tcc on Windows, Linux, and Mac OSX.
+  
+  * Installs to a sharedir location, and is Perl-specific.
+  
+  * Provides simple mechanisms for use in Build.PL files.
+  
+  * "use Alien::TinyCC" modifies PATH so tcc can be found.

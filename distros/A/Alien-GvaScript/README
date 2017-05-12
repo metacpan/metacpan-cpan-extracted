@@ -1,0 +1,63 @@
+Alien-GvaScript
+===============
+Geneva extension to the prototype javascript framework
+
+This distribution contains three core components :
+
+  * protoExtensions> : some extensions to the prototype javascript 
+    framework (mainly walking the DOM searching for collections of 
+    classnames).
+
+  * event : registering and firing application-specific events 
+    (in addition to the standard W3C event model)
+
+  * keyMap : managing maps of handlers for key events (similar
+    in spirit to Emacs keymaps)
+
+and three widgets:
+
+  * choiceList : dropdown list of choices with navigation 
+
+  * autoCompleter : autocompletion on form input fields
+
+  * treeNavigator : navigation in a tree structure, opening and 
+    closing nodes
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Alien::GvaScript
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Alien-GvaScript
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-GvaScript
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Alien-GvaScript
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Alien-GvaScript
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Laurent Dami
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

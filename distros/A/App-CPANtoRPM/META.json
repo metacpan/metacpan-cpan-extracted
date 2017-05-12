@@ -1,0 +1,67 @@
+{
+   "abstract" : "An RPM packager for perl modules",
+   "author" : [
+      "Sullivan Beck (sbeck@cpan.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-CPANtoRPM",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config" : "0",
+            "IO::File" : "0",
+            "POSIX" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::CPANtoRPM" : {
+         "file" : "CPANtoRPM.pm",
+         "version" : "1.06"
+      },
+      "cpantorpm" : {
+         "file" : "cpantorpm",
+         "version" : "1.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/SBECK-github/App-CPANtoRPM.git",
+         "web" : "https://github.com/SBECK-github/App-CPANtoRPM"
+      }
+   },
+   "version" : "1.06",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

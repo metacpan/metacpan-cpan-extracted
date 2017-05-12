@@ -1,0 +1,56 @@
+[
+    { name => 'Two events', method => 'POST',
+      password => 'Usual, please',
+      cgi_url => 'http://localhost/cgi-bin/poll1.cgi',
+      plack_url => 'http://localhost:8529/events',
+      plack_input => [ poll_path => '/events', debug => 1, ],
+      input_content => undef,
+      http_status => 200, content_type => qr|^application/json\b|,
+      expected_content => 
+                q|[{"data":["foo"],|.
+                q|  "name":"foo_event",|.
+                q|  "type":"event"},|.
+                q| {"data":{"foo":"bar"},|.
+                q|  "name":"bar_event",|.
+                q|  "type":"event"}]|,
+    },
+    { name => 'One event', method => 'POST',
+      password => 'Ein kaffe bitte',
+      cgi_url  => 'http://localhost/cgi-bin/poll2.cgi',
+      plack_url => 'http://localhost:8529/events',
+      plack_input => [ poll_path => '/events', debug => 1, ],
+      input_content => undef,
+      http_status => 200, content_type => qr|^application/json\b|,
+      expected_content =>
+                q|{"data":"Uno cappuccino, presto!",|.
+                q| "name":"coffee",|.
+                q| "type":"event"}|,
+    },
+    { name => 'Failed method', method => 'POST',
+      password => 'Whiskey, straight away!',
+      cgi_url  => 'http://localhost/cgi-bin/poll3.cgi',
+      plack_url => 'http://localhost:8529/events',
+      plack_input => [ poll_path => '/events', debug => 1, ],
+      input_content => undef,
+      http_status => 200, content_type => qr|^application/json\b|,
+      expected_content => q|{"data":"","name":"__NONE__","type":"event"}|,
+    },
+    { name => 'No events at all', method => 'POST',
+      password => "Sorry sir, but that's not on the menu?",
+      cgi_url  => 'http://localhost/cgi-bin/poll4.cgi',
+      plack_url => 'http://localhost:8529/events',
+      plack_input => [ poll_path => '/events', debug => 1, ],
+      input_content => undef,
+      http_status => 200, content_type => qr|^application/json\b|,
+      expected_content => q|{"data":"","name":"__NONE__","type":"event"}|,
+    },
+    { name => 'Invalid Event provider output', method => 'POST',
+      password => "Hey man! There's a roach in my soup!",
+      cgi_url  => 'http://localhost/cgi-bin/poll5.cgi',
+      plack_url => 'http://localhost:8529/events',
+      plack_input => [ poll_path => '/events', debug => 1, ],
+      input_content => undef,
+      http_status => 200, content_type => qr|^application/json\b|,
+      expected_content => q|{"data":"","name":"__NONE__","type":"event"}|,
+    },
+]

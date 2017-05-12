@@ -1,0 +1,11 @@
+#defaults
+^Makefile$
+^blib/
+^pm_to_blib
+^blibdirs
+^.git
+^.travis.yml$
+^MANIFEST.bak
+^MYMETA.json
+^MYMETA.yml
+~$

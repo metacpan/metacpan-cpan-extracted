@@ -1,0 +1,129 @@
+[-
+
+
+use Apache::DAV::Resource ;
+
+
+my $r = shift ;
+
+
+foreach (keys %fdat)
+    {
+    next if (/^\*/) ;
+    if (/^-(.*?)$/)
+        {
+        $remove{$1} = $fdat{$_} ;
+        }
+    else
+        {
+        $set{$_} = $fdat{$_} ;
+        }
+    }
+
+eval
+    {
+    my $subr ;
+    my $resource ;
+
+    if ($fdat{'*uri'})
+        {
+        # get sub request actual document
+        $subr = $req_rec->lookup_uri($fdat{'*uri'});
+        die 'ERROR in lookup_uri. Cannot create subrequest' if (!$subr) ;
+
+        my $err ;
+        ($err, $resource) =  $subr->get_resource;
+        die 'ERROR in get_resource(' . $err->status . '): ' . $err->desc if ($err) ;
+        }
+
+    if ($resource)
+        {
+        if ($fdat{'*add'})
+            {
+            %set    = ($fdat{addname} => $fdat{addvalue}) ;
+            %remove = () ;
+            $fdat{'*patch'} = 1 ;
+            }
+        elsif ($fdat{'*remove'})
+            {
+            %remove = ($fdat{rmname} => 1) ;
+            %set    = () ;
+            $fdat{'*patch'} = 1 ;
+            }
+
+
+        if ($fdat{'*patch'})
+            {
+            ($status, $patchtext) = $resource -> proppatch ($subr, \%set, \%remove) ;
+            $fdat{'*find'} = 1 if (!$status) ;
+            }
+        elsif ($fdat{'*info'})
+            {
+            $resource -> info ($subr) ;
+            }
+        if ($fdat{'*find'})
+            {
+            ($status, $props) = $resource -> propfind_hash ($subr) ;
+            }
+        }
+
+    } ;
+
+if ($@)
+    {
+    print OUT $@ ;
+    }
+-]
+<html>
+<head>
+<style type="text/css">
+   .cBody       {font-family: Geneva,Arial,Helvetica;  font-size: 12px; }
+   .cInputTable {font-family: Geneva,Arial,Helvetica;  font-size: 12px; margin: 4px 4px 4px 4px;}
+</style>
+</head>
+<body>
+
+[$if $patchtext $]
+    <h2>PROPPATCH status</h2>
+    <pre>
+    [+ $patchtext +]
+    </pre>
+[$endif$]
+
+<form>
+
+Enter path of URI for which you want to show/change properties: <input type=text name="*uri" size=50><br>
+
+<table class="cInputTable">
+
+[$ if $props $]
+    [- @props = sort keys %$props -]
+    [$ foreach $prop (@props) $]
+        <tr>
+            <td>[+ $prop +]</td>
+            <td><input type=text name="[+ $prop +]" value="[+ $props -> {$prop} +]" size=70></td>
+        </tr>
+    [$endforeach$]
+[$endif$]
+
+</table>
+
+<input type="submit" name="*find" value="Show">
+
+<input type="submit" name="*patch" value="Update">
+
+<br>
+Name <input type=text name="addname">
+Value <input type=text name="addvalue">
+<input type="submit" name="*add" value="Add">
+
+<br>
+Name <select name="rmname">
+    <option value="[+ $props[$row] +]">[+ $props[$row] +]</option>
+</select>
+
+<input type="submit" name="*remove" value="Remove">
+
+</form>
+
+</body>

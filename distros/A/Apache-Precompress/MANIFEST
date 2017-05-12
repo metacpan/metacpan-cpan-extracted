@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+Precompress.pm
+README
+t/00-decompress.t
+t/01-gzip.t
+t/baseline.html
+t/decompress.html.gz

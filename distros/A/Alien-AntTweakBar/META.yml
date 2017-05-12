@@ -1,0 +1,44 @@
+---
+abstract: 'perl5 alien library for AntTweakBar'
+author:
+  - 'DMOL, dmol@cpan.org'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Archive::Extract: '0'
+  Devel::CheckLib: '1.01'
+  Digest::SHA: '0'
+  ExtUtils::CBuilder: '0'
+  ExtUtils::Command: '0'
+  ExtUtils::Liblist: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Fetch: '0'
+  File::Path: '0'
+  File::ShareDir: '0'
+  File::chdir: '0.1008'
+  Module::Build: '0'
+  Text::Patch: '0'
+  perl: '5.008'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4206, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-AntTweakBar
+provides:
+  Alien::AntTweakBar:
+    file: lib/Alien/AntTweakBar.pm
+    version: '0.03'
+requires:
+  Carp: '0'
+  File::ShareDir: '1.00'
+  File::Spec: '0'
+  Text::ParseWords: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/PerlGameDev/Alien-AntTweakBar/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/PerlGameDev/Alien-AntTweakBar
+version: '0.03'

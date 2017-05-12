@@ -1,0 +1,32 @@
+TYPEMAP
+float *			T_VECTOR
+short *			T_VECTOR
+float			T_NV
+Audio *			T_AUDIO
+play_audio_t *		T_AUDIO
+NV			T_NV
+
+INPUT
+T_AUDIO
+	if (sv_isobject($arg)) {
+	    STRLEN size;
+	    $var = ($type) SvPV((SV*)SvRV($arg),size);
+	    if (size < sizeof(*$var))
+	      croak(\"$var is not large enough\");
+	}
+	else
+	    croak(\"$var is not an object\")
+
+T_VECTOR
+	if (sv_isobject($arg)) {
+	    $var = ($type) SvPV((SV*)SvRV($arg),na);
+	}
+	else
+	    croak(\"$var is not an object\")
+
+OUTPUT
+T_AUDIO
+	sv_setref_pvn($arg, (class) ? class : \"${Package}\", (char *) $var, sizeof(*$var));
+
+
+

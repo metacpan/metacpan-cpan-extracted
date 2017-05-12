@@ -1,0 +1,104 @@
+Revision history for Perl module Acme::Alien::DontPanic.
+
+0.032  Feb 9, 2016
+  - Require Alien::Base 0.032
+
+0.031  Jan 31, 2016
+  - Require Alien::Base 0.031
+
+0.030  Nov 2, 2016
+  - Require Alien::Base 0.030
+  - No longer bundle dontpanic with this dist, instead download
+    it from the official release site:
+      https://perl5-alien.github.io/page/dontpanic.html
+
+0.029  Jun 22, 2016
+  - Require Alien:Base 0.029
+
+0.028  Mar 14, 2016
+  - Require Alien::Base 0.028
+
+0.027  Jan 20, 2016
+  - Require Alien::Base 0.025
+
+0.026  Jan 10, 2016
+  - Require Alien::Base 0.024
+  - Added t/xs.t and t/ffi.t tests that use Test::Alien
+
+0.025  Jul 20, 2015
+  - Require Alien::Base 0.022
+
+0.024  Jul 13, 2015
+  - Require Alien::Base 0.020
+
+0.023  Apr 27, 2015
+  - Bumped version to match new version of Acme::Ford::Prefect
+
+0.022  Apr 24, 2015
+  - Require Alien::Base 0.017
+
+0.021  Apr 22, 2015
+  - Require Alien::Base 0.016
+  - use alien_stage_install
+
+0.020  Mar 17, 2015
+  - Require Alien::Base 0.015
+  - Fix for static test on MSWin32 and FreeBSD
+  - Remove extranious -Wall flag from AM_CFLAGS that was causing trouble
+    on Solaris (and probably other Perls not built by gcc)
+
+0.019  Feb 26, 2015
+  - Additional diagnostics during testing
+  - Add -I${prefix} to dontpanic .pc file for bib install
+
+0.018  Feb 25, 2015
+  - Require Alien::Base 0.014
+
+0.017  Feb 24, 2015
+  - Release identical to 0.016
+  - Intended for use with Acme::Ford::Prefect 0.017
+
+0.016  Feb 22, 2015
+  - Require Alien::Base 0.012
+
+0.015  Feb 22, 2015
+  - Require Alien::Base 0.011
+
+0.014  Feb 17, 2015
+  - Require Alien::Base 0.010
+
+0.012  Feb 6, 2015
+  - Require Alien::Base 0.009
+
+0.011  Jan 8, 2015
+  - Require Alien::Base 0.007
+
+0.010  Jan 8, 2015
+  - add test to make sure that we produce a static lib that can be used to create a dynamic lib
+
+0.009  Oct 14, 2014
+  - Require Alien::Base 0.006
+
+0.008  Oct 9, 2014
+  - bundle a dontpanic that includes a dll on windows
+
+0.007  Sep 22, 2014
+  - use alien_inline_auto_include for Inline integration
+
+0.006  Sep 11, 2014
+  - Require Alien::Base 0.005
+  - Support for building system provided dontpanic (plicease gh#2)
+
+0.005  Mar 4, 2013
+	- Depend on Alien::Base 0.003
+
+0.003  Nov 4, 2012
+	- Move more tests from here to Acme::Ford::Prefect
+	- Depend on Alien::Base 0.001_001
+
+0.002  Oct 8, 2012
+	- Fixes related to Alien::Base 0.000_022 dev release (major refactoring)
+
+0.001  Jul 30, 2012
+	- Initial release
+

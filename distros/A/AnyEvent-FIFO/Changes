@@ -1,0 +1,16 @@
+Changes
+=======
+
+0.00003 2013-04-18T01:41:12Z
+    * Apply changes from Nikolay Martynov
+        - Add ->active/->waiting to examine number of tasks active and waiting
+        - Add ability to pass provide an external condvar.
+        - (Internal) change idle to postpone
+        - Other minor fixes, mainly because the main maintainer was being
+          a bit of a slob (Thank you, Nikolay!)
+
+0.00002 - 28 Apr 2010
+    * Fix a problem where the slot counter wasn't properly incremented (tkimuranet)
+
+0.00001 - 19 Feb 2010
+    * Initial release

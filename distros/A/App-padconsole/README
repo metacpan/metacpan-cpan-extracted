@@ -1,0 +1,143 @@
+NAME
+    padconsole - manage your etherpad from the console
+
+SYNOPSIS
+    padconsole [OPTION]
+
+DESCRIPTION
+    Provides a console to manage an etherpad instance. Get infos about pads,
+    delete them, etc.
+
+           --help                      prints a help message and exit
+
+           --version                   prints version and exit
+
+           -e http://pad.example.com   URL of the etherpad instance
+
+           -k secretPadApiKey          API key for the etherpad instance
+
+           -u padUserLogin             username for the etherpad instance, if needed
+
+           -p padUserPassword          password for the etherpad instance
+
+           -c /path/to/config/file     use a different config file than \$XDG_HOME_DIR/padconsolerc or ~/.config/padconsolerc
+
+           -b x-www-browser            use this browser to open pads or etherpad instance home page
+
+COMMANDS
+    Once the padconsole is launched, you can use this commands:
+
+           help                 : print this message
+
+           exit                 : exit program
+
+           count                : print the number of existing pads
+
+           list                 : list all the existing pads (20 items per page)
+
+           search <PATTERN>     : print the list of the pads which name matches the pattern (Perl regex) (20 items per page)
+
+           delete <pad1> <pad2> : delete the pads pad1 pad2 (have to be separated by space)
+
+           text <pad> [rev]     : print the pad content, at the revision [rev] if defined
+
+           html <pad> [rev]     : print the pad HTML export, at the revision [rev] if defined
+
+           revcount <pad>       : print the number of revisions of a pad
+
+           authors <pad>        : print the name of the differents authors who wrote on the pad
+
+           infos <pad>          : print multiple informations about the pad
+
+           writeconf            : write the configuration to $config_file
+
+           use <alias>          : change connection to the etherpad instance which alias is <alias>
+
+           alist                : print all the configured etherpads aliases
+
+           current              : print configuration informations about the current etherpad instance
+
+           open <pad>           : open pad in browser. If no pad is given, open the etherpad instance home page
+
+           create <pad>         : create pad <pad>. If it already exists, print a warning
+
+CONFIGURATION FILE
+    You can write it (that a simple YAML file), or launch padconsole with
+    valid etherpad informations (options *-e*, *-k* and possibly *-u* and
+    *-p*) and then use the *writeconf* command.
+
+    If you want to add instances, you can write them in the configuration
+    file or launch padconsole with the informations and use *writeconf*, it
+    will push the new instance in the configuration file.
+
+        ---
+        browser: x-www-browser
+        instances:
+          beta:
+            url: http://pad1.example.com
+            key: KLJfdskldJKLjkfds634lnfdsqxdsnjk5
+            passwd: ~
+            user: ~
+          lite:
+            url: http://pad2.example.com
+            key: qSDHlfknsuIH290oitjepz6fqd3jeuzi
+            passwd: myuser
+            user: mypasswd
+
+INSTALLATION
+    The better way to install it is by CPAN:
+
+        cpan App::padconsole
+
+    You can install it manually:
+
+        wget https://github.com/ldidry/padconsole/archive/master.zip -O padconsole.zip
+        unzip padconsole.zip
+        cd padconsole-master
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+BUGS and SUPPORT
+           You can find documentation for this module with the perldoc command.
+
+               perldoc padconsole
+
+           Bugs and feature requests will be tracked at github:
+
+               https://github.com/ldidry/padconsole/issues/
+
+           The latest source code can be browsed and fetched at:
+
+               https://github.com/ldidry/padconsole
+               git clone git://github.com/ldidry/padconsole.git
+
+           You can also look for information at:
+
+               RT: CPAN's request tracker
+               http://rt.cpan.org/NoAuth/Bugs.html?Dist=padconsole
+
+               AnnoCPAN: Annotated CPAN documentation
+               http://annocpan.org/dist/padconsole
+
+               CPAN Ratings
+               http://cpanratings.perl.org/d/padconsole
+
+               Search CPAN
+               http://search.cpan.org/dist/padconsole
+
+AUTHOR
+               Luc DIDRY
+               CPAN ID: LDIDRY
+               ldidry@cpan.org
+               http://www.fiat-tux.fr/
+
+COPYRIGHT
+           This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+           The full text of the license can be found in the LICENSE file included with this module.
+
+SEE ALSO
+           L<Etherpad::API>, L<https://github.com/ldidry/etherpad-admin>
+

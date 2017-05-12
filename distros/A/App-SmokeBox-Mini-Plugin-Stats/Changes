@@ -1,0 +1,43 @@
+==============================
+2011-07-27 12:27:01 +0100 0.10
+==============================
+
+  commit bb5fbb5268f684351539887e07f02f3a92688673
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Wed Jul 27 12:27:01 2011 +0100
+  
+    Add an 'enable' configuration option so we can disable plugin use 
+
+==============================
+2010-11-03 23:28:39 +0000 0.08
+==============================
+
+  commit 88f941555c39ca1ac62ce4cc087a3dd9bf85bf15
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Wed Nov 3 23:28:39 2010 +0000
+  
+    Update for missing prereqs 
+
+==============================
+2010-11-02 21:13:29 +0000 0.06
+==============================
+
+  commit e82d5e6c4336adf8ffc1f30cc016929d9a1a9b1c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue Nov 2 21:13:29 2010 +0000
+  
+    Forgot to update the number of placeholders for the jobs table insert 
+
+==============================
+2010-11-02 19:22:37 +0000 0.04
+==============================
+
+  commit 9cec8937f23bf901a210df08ee0eda3ad950b11a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue Nov 2 19:22:37 2010 +0000
+  
+    Add timestamps to the database tables 
+
+====================================
+End of changes in the last 1825 days
+====================================

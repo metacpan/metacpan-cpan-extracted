@@ -1,0 +1,5969 @@
+#!/usr/local/bin/perl
+
+package Astro::satpass;
+
+use strict;
+use warnings;
+
+use Astro::Coord::ECI;
+use Astro::Coord::ECI::Moon;
+use Astro::Coord::ECI::Sun;
+use Astro::Coord::ECI::Star;
+use Astro::Coord::ECI::TLE qw{:constants};
+use Astro::Coord::ECI::TLE::Iridium;
+use Astro::Coord::ECI::TLE::Set;
+use Astro::Coord::ECI::Utils qw{:all};
+
+use Carp qw{confess};
+use Config;
+use Data::Dumper;
+use File::Basename;
+use FileHandle;
+use Getopt::Long;
+use Pod::Usage;
+use POSIX qw{floor strftime};
+use Text::Abbrev;
+use Text::ParseWords;
+
+my (
+	$clipboard_unavailable,
+	$io_string_unavailable,
+    );
+$clipboard_unavailable = $IO::Clipboard::clipboard_unavailable;
+
+
+########################################################################
+#
+#	Initialization
+#
+
+our $VERSION = '0.079';
+
+use constant LINFMT => <<eod;
+%s %s %8.4f %9.4f %7.1f %-4s %s
+eod
+
+use constant LINFMT_MAG => <<eod;
+%s %s %8.4f %9.4f %7.1f %4s %-4s %-4s
+eod
+
+use constant BGFMT => <<eod;
+%s %s %8.4f %9.4f              %s
+eod
+
+my @bodies;
+my @sky = (
+    Astro::Coord::ECI::Sun->new (),
+    Astro::Coord::ECI::Moon->new (),
+    );
+
+my %opt;	# Options passed when we were invoked.
+my %cmdconfig;	# How option parsing is to be comfigured for command.
+my %cmdopt;	# Options for individual satpass commands.
+my %cmdlgl;	# Legal options for a given command.
+my %cmdquote;	# 1 if we keep quotes when parsing the command.
+
+my %exported;	# True if the parameter is exported.
+my %parm = (
+##    almanac_horizon	=> 0, set below
+    appulse => 0,
+    autoheight => 1,
+    background => 1,
+    backdate => 1,
+    country => 'us',
+    date_format => '%a %d-%b-%Y',
+    debug => 0,
+    desired_equinox_dynamical => 0,
+    echo => 0,
+    edge_of_earths_shadow => 1,
+    ellipsoid => Astro::Coord::ECI->get ('ellipsoid'),
+    error_out => 0,
+    exact_event => 1,
+    explicit_macro_delete => 0,
+    extinction => 1,
+    flare_mag_day => -6,
+    flare_mag_night => 0,
+    geometric => 1,
+    gmt => 0,
+##    horizon => 20, set below
+    local_coord => 'azel_rng',
+    model => 'model',
+    pass_threshold => undef,
+    prompt => 'satpass>',
+##    simbad_url => 'simbad.harvard.edu',
+##    simbad_version => 3,
+    refraction => 1,
+    simbad_url => 'simbad.u-strasbg.fr',
+    simbad_version => 4,
+    singleton => 0,
+    time_format => '%H:%M:%S',
+##    timing => 0,
+##    twilignt => 'civil', set below
+    verbose => 0,
+    visible => 1,
+    webcmd => ''
+    );
+$parm{tz} = $ENV{TZ} if $ENV{TZ};
+
+my %macro;
+
+my %mutator = (
+    almanac_horizon => \&_set_almanac_horizon,
+    appulse => \&_set_angle,
+    autoheight => \&_set_unmodified,
+    backdate => \&_set_unmodified,
+    background => \&_set_unmodified,
+    country => \&_set_unmodified,
+    date_format => \&_set_unmodified,
+    desired_equinox_dynamical => \&_set_time,
+    debug => \&_set_unmodified,
+    echo => \&_set_unmodified,
+    edge_of_earths_shadow => \&_set_unmodified,
+    ellipsoid => \&_set_ellipsoid,
+    error_out => \&_set_unmodified,
+    exact_event => \&_set_unmodified,
+    explicit_macro_delete => \&_set_unmodified,
+    extinction => \&_set_unmodified,
+    flare_mag_day => \&_set_unmodified,
+    flare_mag_night => \&_set_unmodified,
+    geometric => \&_set_unmodified,
+    gmt => \&_set_unmodified,
+    height => \&_set_unmodified,
+    horizon => \&_set_angle,
+    latitude => \&_set_angle,
+    local_coord => \&_set_local_coord,
+    location => \&_set_unmodified,
+    longitude => \&_set_angle,
+    model => \&_set_unmodified,
+    perltime => \&_set_perltime,
+    prompt => \&_set_unmodified,
+    refraction => \&_set_unmodified,
+    simbad_url => \&_set_unmodified,
+    simbad_version => \&_set_simbad_version,
+    singleton => \&_set_unmodified,
+    pass_threshold => \&_set_angle_or_undef,
+    time_format => \&_set_unmodified,
+##    timing => \&_set_unmodified,
+    twilight => \&_set_twilight,  # 'civil', 'nautical', 'astronomical'
+				# (or a unique abbreviation thereof),
+				# or degrees below the geometric
+				# horizon.
+    tz => \&_set_tz,
+    verbose => \&_set_unmodified, # 0 = events only
+				# 1 = whenever above horizon
+				# 2 = anytime
+    visible => \&_set_unmodified, # 1 = only if sun down & sat illuminated
+    webcmd => \&_set_webcmd,	# Command to spawn for web pages
+    );
+
+my %accessor = (
+    desired_equinox_dynamical => \&_get_time,
+);
+foreach (keys %mutator) {$accessor{$_} ||= \&_show_unmodified};
+
+my @bearing = qw{N NE E SE S SW W NW};
+
+my %twilight_def = (
+    civil => deg2rad (-6),
+    nautical => deg2rad (-12),
+    astronomical => deg2rad (-18),
+    );
+my %twilight_abbr = abbrev (keys %twilight_def);
+
+set( twilight	=> 'civil' );
+set( horizon	=> 20 );
+set( almanac_horizon => 0 );
+
+my $inifn = $^O eq 'MSWin32' || $^O eq 'VMS' || $^O eq 'MacOS' ?
+    'satpass.ini' : '.satpass';
+
+my $inifil = $ENV{SATPASSINI} ? $ENV{SATPASSINI} :
+    $^O eq 'VMS' ? "SYS\$LOGIN:$inifn" :
+    $^O eq 'MacOS' ? $inifn :
+    $ENV{HOME} ? "$ENV{HOME}/$inifn" :
+    $ENV{LOGDIR} ? "$ENV{LOGDIR}/$inifn" :
+    $ENV{USERPROFILE} ? "$ENV{USERPROFILE}/$inifn" : undef;
+
+sub _format_location;	# Predeclare, so I do not need explicit STDOUT.
+sub _time ();		# Predeclare, since I intend to redefine.
+
+my $reader = eval {
+    -t STDIN
+	or return;
+    require Term::ReadLine;
+    my $rl = Term::ReadLine->new( 'Predict satellite passes' )
+	or return;
+    return sub {
+	my ( $fh, @arg ) = @_;
+	return -t $fh ?  $rl->readline( @arg ) : $fh->getline();
+    };
+} || sub {
+    my ( $fh, @arg ) = @_;
+    -t $fh and print "\n@arg";
+    return $fh->getline();
+};
+
+my $fh = *STDIN;
+my @frame;
+my %alias = (
+    '!' => 'system',
+    '.' => 'source',
+    bye => 'exit',
+    quit => 'exit',
+    );
+
+GetOptions (\%opt, qw{clipboard filter initialization_file=s
+    version}) or die <<eod;
+
+Predict satellite visibility.
+
+usage: perl @{[basename $0]} [options] [command ...]
+
+where the legal options are
+
+  -clipboard
+    Asserting this option causes all output to stdout to be captured
+    and placed on the system clipboard. Command-line output redirection
+    is ignored.
+
+  -filter
+    Asserting this option suppresses extraneous output, making satpass
+    behave more like a Unix filter.
+
+  -initialization_file filename
+    Initializes satpass from the named file. The default is
+    $inifil.
+
+  -version
+    Display the version and exit. Overrides -filter if both are
+    specified.
+
+Option names can be abbreviated, as long as the abbreviation is unique.
+
+$clipboard_unavailable
+eod
+
+$inifil || $opt{initialization_file} or warn <<eod;
+
+Warning - Can not find home directory, and no explicit initialization
+        file specified.
+eod
+if ($opt{initialization_file}) {
+    if (-e $opt{initialization_file}) {
+	$inifil = $opt{initialization_file};
+	}
+      else {
+	warn <<eod;
+
+Warning - File $opt{initialization_file} does not exist.
+        Initializing with $inifil
+eod
+	}
+    }
+
+$ENV{SATPASSINI} = $inifil;
+
+my $interrupted = 'Interrupted by user.';
+
+$opt{clipboard} and select (IO::Clipboard->new ());
+
+ref $Astro::satpass::Test::Hook eq 'CODE' and do {
+    $fh = Astro::satpass::Test->new () or die <<eod;
+Error - Failed to instantiate Astro::satpass::Test object.
+eod
+    select ($fh);
+    no warnings qw{once};
+    $SIG{__WARN__} = sub {$Astro::satpass::Test::Exception = $_[0]};
+    use warnings qw{once};
+    };
+
+Getopt::Long::Configure (qw{pass_through});	# Need because of relative time format.
+
+push @frame, {
+	args => [],
+	cntind => '',
+	lines => [],
+	parm => {},
+	stdin => $fh,
+	stdout => select (),
+	};
+
+$opt{version} and delete $opt{filter};
+
+$opt{filter} or print <<eod;
+
+satpass $VERSION - Satellite pass predictor
+based on Astro::Coord::ECI @{[Astro::Coord::ECI->VERSION]}
+Perl $Config{version} on $Config{osname}
+
+Copyright 2005-2017 by Thomas R. Wyant, III.
+
+Enter 'help' for help. See the help for terms of use.
+
+As of release 0.057 this script is deprecated. See 'NOTES' in the help
+for details.
+
+eod
+$opt{version} and exit;
+
+
+########################################################################
+#
+#	Main program loop.
+#
+
+@ARGV and source (_memio ('<', \(join "\n", @ARGV)));
+
+{	# Local symbol block
+    my %inodes;
+##    foreach my $fn ($inifn, $inifil) {	# Reverse of intended order
+    foreach my $fn ($inifil) {	# Reverse of intended order
+	next unless $fn && -e $fn;
+	my $inode = (stat (_))[1];
+	next if $inodes{$inode};
+	$inodes{$inode} = $fn;
+	source ($fn);
+	}
+    }	# End local symbol block
+
+while (1) {
+
+
+#	Select the default output
+
+    select ($frame[$#frame]{stdout});
+
+
+#	Get the next command, wherever it comes from.
+
+    my $cntind = $frame[$#frame]{cntind} || '';
+    my $buffer = @frame > 1 ? $fh->getline () :
+	$reader->( $fh, "$cntind$parm{prompt} " );
+
+#	If it was end-of-file, pop one level off the stack of input
+#	files. If it's empty, we exit the execution loop. Otherwise
+#	we select the proper STDOUT and redo the loop.
+
+    defined $buffer or do {
+	defined ($fh = _frame_pop ()) or last;
+	redo;
+	};
+
+#	Canonicalize the input buffer.
+
+    chomp $buffer;
+    $buffer =~ s/^\s+//;
+    $buffer =~ s/\s+$//;
+
+#	If the input is empty or a comment, redo the loop.
+
+    next unless $buffer;
+    next if $buffer =~ m/^#/;
+
+#	If we're a continuation line, save it in the line
+#	buffer and redo the loop.
+
+    $buffer =~ s/\\$// and do {
+	push @{$frame[$#frame]{lines}}, $buffer;
+	$frame[$#frame]{cntind} = '_';
+	next
+    };
+
+#	Prepend all saved continuations (if any) to the line.
+
+    @{$frame[$#frame]{lines}} and do {
+	$buffer = join ' ', @{$frame[$#frame]{lines}}, $buffer;
+	@{$frame[$#frame]{lines}} = ();
+	$frame[$#frame]{cntind} = '';
+	};
+
+#	Interpolate positional parameters. This is not done if we
+#	have the 'macro' command, because in that case we want to
+#	defer the expansion until the macro is expanded. Note that
+#	the way to pass a dollar sign is to double it.
+
+    eval {$buffer =~ s/\$(?:(\w+)|\{(\w+)(?:\:(.*?))\}|(.))/
+	    defined $4 ? $4 : _sub_arg ($1 || $2, $3 || '',
+	    $frame[$#frame]->{args} || [])/mgex
+	    unless $buffer =~ m/^\s*macro\b/};
+    $@ and do {
+	warn $@;
+	defined ($fh = _frame_pop ()) or last;
+	redo;
+	};
+
+#	Help the parser deal with things like '.' and '!'
+
+    $buffer =~ s/^(\W)\s*/$1 /;
+    $buffer =~ s/\s+$//;
+
+#	Echo the line, if this is selected.
+
+    $parm{echo} && (@frame > 1 || !-t $fh) and
+	print "$cntind$parm{prompt} $buffer\n";
+
+#	Pull the verb off by brute force, because we need to know what
+#	it is before we know how to parse the rest of the line.
+
+    my ($cmdspec, $rest) = split '\s+', $buffer, 2;
+    $cmdspec = $alias{$cmdspec} if $alias{$cmdspec};
+
+#	Pull the namespace off the command spec. We make use
+#	of the $cmdspec argument later as a macro name, since
+#	with the 'core.' on the front it will be invalid, and
+#	force the use of the built-in.
+
+    (my $verb = $cmdspec) =~ s/^core\.//;
+    $verb = $alias{$verb} if $alias{$verb};
+
+#	Parse the line, pulling off output redirection as we go.
+
+    my $redout = '';
+    my @args = parse_line ('\s+', $cmdquote{$verb} || 0, $rest);
+    $rest && !@args and do {
+	warn <<eod;
+Error - Malformed command failed to parse:
+        $rest
+eod
+	next;
+    };
+    {	# Local symbol block for hacking pipe off commands
+	my @pipe;
+	@args = map {
+	    (@pipe && !$redout) ? do {push @pipe, $_; ()} :
+	    m/^([>|])/ ?
+		$1 eq '|' ? do {push @pipe, $_; ()} :
+		    do {$redout = $_; ()} :
+	    $redout =~ m/^>+$/ ? do {$redout .= $_; ()} :
+	    $_} @args;
+	@pipe and $redout = join ' ', @pipe;
+    }	# End local symbol block.
+
+#	Do pseudo tilde expansion.
+
+    eval {
+	$redout =~ s/^(>+)(~.*)/ $1 . _tilde_expand ($2) /e;
+	1;
+    } or do {
+	warn $@;
+	next;
+    };
+
+#	Special-case 'exit' to drop out of the input loop.
+
+    $verb eq 'exit' and last;
+
+#	Arbitrarily disallow syntactically invalid commands.
+
+    $verb =~ m/^_/ || $verb =~ m/\W/ and do {
+	warn <<eod;
+Error - Verb '$verb' not recognized.
+eod
+	next;
+	};
+
+#	Parse any command options present. Note that GetOptions is
+#	configured to pass any unrecognized options because otherwise
+#	our relative time format would confuse it.
+
+    %cmdopt = ();
+    {	# Begin local symbol block.
+	local @ARGV = @args;
+        Getopt::Long::Configure (@{$cmdconfig{$verb} ||= ['permute']});
+	GetOptions (\%cmdopt, qw{clipboard debug time}, @{$cmdlgl{$verb} ||= []});
+	@args = @ARGV;
+	}
+    $cmdopt{_redirection} = $cmdopt{clipboard} ? '-clipboard' : $redout;
+
+#	Preserve our current output, and redirect as and if specified.
+
+    if ($cmdopt{clipboard}) {
+	$redout = '';
+	my $fh = eval {IO::Clipboard->new ()};
+	$@ and do {warn $@; next;};
+	select ($fh) or die <<eod;
+Error - Failed to redirect output to clipboard.
+        $!
+eod
+	}
+      elsif ($redout) {
+	open (my $fh, $redout) or do {warn <<eod; next};
+Error - Failed to open '$redout'
+        $!
+eod
+	select ($fh) or die <<eod;
+Error - Failed to redirect output to $redout.
+        $!
+eod
+	}
+
+#	Record start time if required.
+
+    $frame[$#frame]{timing} = {
+	command => $buffer,
+	start => _time (),
+    } if $cmdopt{time};
+
+#	If our command is a macro, build an input stream from it, and
+#	pass the results to the source() command. We use $cmdspec
+#	because it contains the namespace 'core.' if it was specified,
+#	and therefore cannot match any macro name.
+
+    my $error;	# Status from command execution.
+    if ($macro{$cmdspec}) {
+	my $cmd = join "\n", @{$macro{$cmdspec}};
+	source (_memio  ('<', \$cmd), @args);
+	$frame[$#frame]{macro}{$cmdspec} = $macro{$verb};
+	delete $macro{$cmdspec};
+	}
+
+#	Else, if there exists a subroutine named after the command,
+#	call it, fielding any exceptions thrown and turning them into
+#	warnings.
+
+      elsif (my $code = __PACKAGE__->can($verb)) {
+	_parse_time_reset ();	# Reset relative time base to last explicit
+	local $SIG{INT} = sub {die "\n$interrupted\n"};
+	eval {$code->(@args)};
+	$error = $@;
+	}
+
+#	Else, complain about the unrecognized verb.
+
+      else {
+	$error = <<eod;
+Error - Verb '$verb' not recognized.
+eod
+	}
+	warn $error if $error;
+
+
+#	Display timing information if desired.
+
+    _display_timing ();
+
+
+#	Unwind frame stack if needed.
+
+    if ($error && $parm{error_out}) {
+	$fh = _frame_pop () while @frame > 1;
+	last unless -t $fh;
+    }
+
+
+#	End of command dispatching.
+
+    }
+
+#	End of the input loop. Print a newline just in case we
+#	terminated on eof.
+
+print "\n";
+
+
+########################################################################
+#
+#	alias () - manipulate class aliases
+#
+
+sub alias {
+    if (@_) {
+	Astro::Coord::ECI::TLE->alias (@_);
+    } else {
+	my %rslt = Astro::Coord::ECI::TLE->alias ();
+	foreach my $key (sort keys %rslt) {
+	    print "$key => $rslt{$key}\n";
+	}
+    }
+}
+
+########################################################################
+#
+#	almanac () - display almanac data for all bodies in @sky for
+#		the specified day(s)
+#
+
+BEGIN {
+$cmdlgl{almanac} = [qw{dump flatten horizon|rise|set
+    transit twilight quarter}];
+}
+
+sub almanac {
+
+my $almanac_start = _parse_time (shift || 'today midnight');
+my $almanac_end = _parse_time (shift || '+1');
+
+$almanac_start >= $almanac_end and die <<eod;
+Error - End time must be after start time.
+eod
+
+my $all;
+$all = 1 unless grep{$cmdopt{$_}} qw{horizon transit twilight quarter};
+
+#	Build an object representing our ground location.
+
+my $sta = _get_station ();
+
+my $id = $parm{twilight} =~ m/^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/ ?
+    "twilight ($parm{twilight} degrees)" :
+    "$parm{twilight} twilight (@{[rad2deg $parm{_twilight}]} degrees)";
+
+my @almanac;
+
+
+#	Display our location.
+
+print _format_location ();
+
+#	Iterate through the background bodies, accumulating data or
+#	complaining about the lack of an almanac() method as
+#	appropriate.
+
+foreach my $body (@sky) {
+    $body->can ('almanac') or do {
+	warn <<eod;
+Warning - @{[ref $body]} does not support the almanac method.
+eod
+	next;
+	};
+    $body->set (
+	station	=> $sta,
+	twilight => $parm{_twilight},
+    );
+    push @almanac, $body->almanac( $almanac_start, $almanac_end );
+    }
+
+#	Sort the almanac data by date, and display the results.
+
+my $last = '';
+foreach (sort {$a->[0] <=> $b->[0]} @almanac) {
+    my ($time, $event, $detail, $descr) = @$_;
+    next unless $all || $cmdopt{$event};
+    if ($cmdopt{dump}) {
+	if ($cmdopt{flatten}) {
+	    local $Data::Dumper::Terse = 1;
+	    print Dumper (_flatten ($_));
+	} else {
+	    print Dumper $_;
+	}
+    } else {
+	$descr = ('End ', 'Begin ')[$detail] . $id if $event eq 'twilight';
+	my $day = strftime $parm{date_format}, _mytime($time);
+	print "$day\n" if $day ne $last;
+	$last = $day;
+	print strftime ($parm{time_format}, _mytime($time)), ' ',
+	    ucfirst $descr, "\n";
+	}
+    }
+
+}
+
+
+########################################################################
+#
+#	cd ()  - Change Directory.
+#
+
+sub cd {
+my $expand;
+$expand = _tilde_expand ($_[0]) if $_[0];
+$expand ? chdir ($expand) || die <<eod : chdir () || die <<eod;
+Error - Can not cd to $expand
+        $!
+eod
+Error - Can not cd to home
+        $!
+eod
+}
+
+
+########################################################################
+#
+#	check_version () - See if we're up to date.
+#
+
+sub check_version {
+    _load_module ('LWP::UserAgent', 'check_version');
+    my $lwp = LWP::UserAgent->new ();
+    my $url = 'http://search.cpan.org/dist/Astro-satpass/';
+    my $rslt = $lwp->get ($url);
+    if (!$rslt->is_success) {
+	die <<eod;
+Error - Version check failed. Can not fetch $url
+    @{[$rslt->status_line]}
+eod
+    } else {
+	my $re = __PACKAGE__;
+	$re =~ s/::/-/g;
+	$re .= '-(\d+\.\d+(_\d+)?)';
+	if ($rslt->content =~ m/$re/m) {
+	    my $curver = $1;
+	    print <<eod;
+Current version: $curver. Your version: $VERSION.
+eod
+	    $curver =~ s/_//g;
+	    (my $myver = $VERSION) =~ s/_//g;
+	    if ($curver == $myver) {
+		print <<eod;
+    You are running the latest version.
+eod
+	    } elsif ($curver > $myver) {
+		print <<eod;
+    You are running an obsolete version.
+eod
+	    } else {
+		print <<eod;
+    You are running a pre-release version.
+eod
+	    }
+	} else {
+	    die <<eod;
+Error - Can not find version number in $url.
+eod
+	}
+    }
+}
+
+########################################################################
+#
+#	choose () - throw out the observing list except for the
+#		    specified bodies
+#
+
+BEGIN {
+$cmdlgl{choose} = [qw{epoch=s}];
+}
+
+sub choose {
+$cmdopt{choose} = [@_];
+@bodies = _select_observing_list ();
+}
+
+
+########################################################################
+#
+#	clear ()  - Clear the observing list.
+#
+
+sub clear {
+@bodies = ();
+}
+
+
+########################################################################
+#
+#	drop ()  - remove the given bodies from the observing list.
+#
+
+sub drop {
+my @check = map {m/\D/ ? qr{@{[quotemeta $_]}}i : $_} @_;
+my @keep;
+DROP_LOOP:
+foreach my $tle (@bodies) {
+    my ($id, $name) = ($tle->get ('id'), $tle->get ('name') || '');
+    foreach my $test (@check) {
+	next DROP_LOOP if ref $test ? $name =~ m/$test/ : $id == $test;
+	}
+    push @keep, $tle;
+    }
+@bodies = @keep;
+}
+
+
+########################################################################
+#
+#	dump ()  - ***UNDOCUMENTED*** Dump all known objects.
+#
+
+sub dump {
+use Data::Dumper;
+local $Data::Dumper::Terse = 1;
+foreach my $body (@bodies, @sky) {
+    print "\n", $body->get ('name') || $body->get ('id'), ' = ' , Dumper ($body);
+    }
+}
+
+########################################################################
+#
+#	echo () - send arguments to standard out
+#
+
+sub echo {
+    print join (' ', @_), "\n";
+}
+
+########################################################################
+#
+#	export () - Create environment vars from params or data.
+#
+
+sub export {
+my $name = shift;
+if ($mutator{$name}) {
+    @_ and set ($name, shift);
+    $ENV{$name} = $parm{$name};
+    $exported{$name} = 1;
+    }
+  else {
+    @_ or die <<eod;
+You must specify a value since you are not exporting a parameter.
+eod
+    $ENV{$name} = shift;
+    }
+}
+
+
+########################################################################
+#
+#	flare () - Predict satellite flares.
+
+BEGIN {
+$cmdlgl{flare} = [qw{algorithm=s am choose=s@ day dump flatten pm
+    questionable|spare quiet}];
+}
+
+sub flare {
+my $pass_start = _parse_time (shift || 'today noon');
+my $pass_end = _parse_time (shift || '+7');
+$pass_start >= $pass_end and die <<eod;
+Error - End time must be after start time.
+eod
+my $sta = _get_station ();
+
+my $horizon = deg2rad ($parm{horizon});
+my $twilight = $parm{_twilight};
+my @flare_mag = ($parm{flare_mag_night}, $parm{flare_mag_day});
+my $lcfmt = \&{"_format_local_$parm{local_coord}"};
+
+#	Decide which model to use.
+
+my $model = $parm{model};
+
+#	Tell aggregate() how to work.
+
+local $Astro::Coord::ECI::TLE::Set::Singleton = $parm{singleton};
+
+#	Select only the bodies capable of flaring. We use
+#	_select_observing_list () to eliminate duplicates,
+#	though it might be better if we could make use of
+#	any element sets relevant to the period under
+#	consideration.
+
+my @active;
+my $zone = $parm{gmt} ? 0 : $parm{tz} ? $parm{tz} : undef;
+foreach my $tle (_select_observing_list ($pass_start)) {
+    $tle->can_flare ($cmdopt{questionable}) or next;
+    $tle->set (
+	algorithm => $cmdopt{algorithm} || 'fixed',
+	backdate => $parm{backdate},
+	debug => $cmdopt{debug},
+	edge_of_earths_shadow => $parm{edge_of_earths_shadow},
+	horizon => $horizon,
+	twilight => $twilight,
+	model => $model,
+	am => !$cmdopt{am},
+	day => !$cmdopt{day},
+	pm => !$cmdopt{pm},
+	station	=> $sta,
+	extinction => $parm{extinction},
+	zone	=> $zone,
+    );
+    push @active, $tle;
+    }
+@active or die <<eod;
+Error - Can not calculate satellite flares without loading at least one
+        flaring body.
+eod
+my $timlen = max (
+    length (strftime ($parm{time_format}, 59, 59, 23, 31, 11, 2000)),
+    length (strftime ($parm{time_format}, 59, 59, 11, 31, 11, 2000)),
+    );
+
+if ($cmdopt{debug}) {
+    foreach my $tle (@active) {
+	print join ("\t", $tle->get ('id'), $tle->get ('name'), ref $tle), "\n";
+	}
+    }
+
+my @flares;
+foreach my $tle (@active) {
+    eval {
+	push @flares, $tle->flare( $sta, $pass_start, $pass_end );
+	1;
+    } or do {
+	$@ =~ m/$interrupted/o and die $@;
+	!$cmdopt{quiet} and warn $@;
+    };
+}
+
+my $last_day = '';
+my $fmt = <<eod;
+%${timlen}s %-11s  %s %4.1f %s %s
+eod
+{	# local symbol block
+    my $lchd = $lcfmt->();
+    my $lcln = length ($lchd);
+    my $cthd = _format_local_az_rng ();
+    my $ctln = length ($cthd);
+    printf <<eod, '', '    flare', '    center', 'time', $lchd, $cthd
+%-${timlen}s              %-${lcln}s       from %-${ctln}s
+%-${timlen}s name         %s  mag  Sun  %s
+eod
+	unless $cmdopt{dump}
+##printf <<eod, 'time', $lcfmt->(), _format_local_az_rng ();
+##%-${timlen}s name        MMA angle %s  mag frmSun %s
+##eod
+    }	# end local symbol block
+foreach my $fd (sort {$a->{time} <=> $b->{time}} @flares) {
+
+    next if $cmdopt{$fd->{type}};
+    next if $fd->{magnitude} > $flare_mag[$fd->{type} eq 'day'];
+
+    my $time = $fd->{time};
+
+    my $tle = $fd->{body}->universal ($time);
+
+    my $displaytime = floor($time + .5);
+    my $day = strftime ($parm{date_format}, _mytime($displaytime));
+    print "$day\n" if $day ne $last_day && !$cmdopt{dump};
+    $last_day = $day;
+    $time = strftime ($parm{time_format}, _mytime($displaytime));
+    my $name = ucfirst lc ($tle->get ('name') || $tle->get ('id'));
+    if ($cmdopt{dump}) {
+	if ($cmdopt{flatten}) {
+	    local $Data::Dumper::Terse = 1;
+	    print Dumper (_flatten ($fd));
+	} else {
+	    print Dumper $fd;
+	}
+    } else {
+	printf $fmt, $time, $name,
+	    $lcfmt->( $tle ),
+	    $fd->{magnitude},
+	    $fd->{type} eq 'day' ?
+		sprintf '%5.0f', rad2deg ($fd->{appulse}{angle}) : 'night',
+	    _format_local_az_rng( $fd->{center}{body} ),
+	    ;
+	}
+    }
+
+}
+
+
+########################################################################
+#
+#	geocode () - Get latitude and longitude.
+#
+#	The arguments are the location, and an optional country code,
+#	which defaults to the 'country' parameter. All this does is
+#	dispatch geocode_$country if it exists, or fails if it does not.
+
+#	Yes, it would be nice to be able to parse the country code off
+#	the end of the address, but conflicts between U.S. Postal state
+#	codes and ISO 3166 country codes abound, running from
+#	    AL = Alabama (U.S.) or Albania (ISO) through
+#	    VA = Virginia (U.S.) or Vatican City (ISO).
+
+#	In addition to the global options, the geocode verb takes -all
+#	(for the benefit of height() if called) and -height (to negate
+#	the autoheight setting)
+
+BEGIN {
+$cmdlgl{geocode} = [qw{all height retry_on_zero=i source_layer=s}];
+$cmdlgl{geocode_as} = $cmdlgl{geocode};
+$cmdlgl{geocode_ca} = $cmdlgl{geocode};
+$cmdlgl{geocode_fm} = $cmdlgl{geocode};
+$cmdlgl{geocode_gu} = $cmdlgl{geocode};
+$cmdlgl{geocode_mh} = $cmdlgl{geocode};
+$cmdlgl{geocode_mp} = $cmdlgl{geocode};
+$cmdlgl{geocode_pr} = $cmdlgl{geocode};
+$cmdlgl{geocode_pw} = $cmdlgl{geocode};
+$cmdlgl{geocode_us} = $cmdlgl{geocode};
+$cmdlgl{geocode_vi} = $cmdlgl{geocode};
+}
+
+#	Here is the subroutine proper.
+
+sub geocode {
+my $cc = lc ($_[1] || $parm{country});
+my $handler = "geocode_$cc";
+die <<eod unless __PACKAGE__->can ($handler);
+Error - I have no idea how to geocode a location in country code
+        '$cc'. The only known country codes at the moment are
+	@{[join ', ', _find_suffixes ('geocode_')]}
+eod
+goto \&{$handler};
+}
+
+########################################################################
+#
+#	geocode_ca () get lat/long from geocoder.ca
+#
+
+sub geocode_ca {
+_load_module ('LWP::UserAgent', 'geocode_ca');
+_load_module ('XML::Parser', 'geocode_ca');
+
+warn <<eod;
+
+Warning - Geocoding Canadian addresses is now unsupported, and probably
+        will not work anyway, because geocoder.ca has started requiring
+        registration to use its free port. My apologies for the
+        inconvenience.
+
+eod
+
+my $set_loc = @_;
+my $loc = shift @_ || $parm{location};
+
+#	Manufacture an LWP::UserAgent object.
+
+my $ua = LWP::UserAgent->new ();
+foreach my $url (qw{http://geocoder.ca/ http://backup-geocoder.ca/}) {
+    my $rslt = $ua->post  ($url,
+	{locate => $loc, geoit => 'XML'});
+    next unless $rslt->is_success ();
+    $cmdopt{debug} and warn "Debug - Parsing ", $rslt->content;
+
+    my @xml = _parse_xml ($rslt->content, 'geocode_ca');
+    @xml = @{_find_first_tag (\@xml, 'geodata')};
+    my @rslt;
+    my $point = {};
+    foreach (@xml) {
+	next unless ref $_ eq 'ARRAY';
+	next unless $_->[0] eq 'latt' || $_->[0] eq 'longt';
+	$point->{$_->[0]} = $_->[2];
+	if (exists $point->{latt} && exists $point->{longt}) {
+	    push @rslt, [$point->{latt}, $point->{longt}];
+	    $point = {};
+	}
+    }
+
+
+    if (@rslt == 1) {
+	$parm{location} = $loc if $set_loc;
+	@parm{qw{latitude longitude}} = @{$rslt[0]};
+	print "\n";
+	show (($set_loc ? 'location' : ()), qw{latitude longitude});
+	_geocode_height ();
+	last;
+	}
+      elsif (@rslt) {
+	die <<eod;
+Error - Too many results.
+eod
+	}
+      else {
+	die <<eod;
+Error - No results.
+eod
+	}
+    }
+}
+
+
+########################################################################
+#
+#	geocode_us () get lat/long from Open Street Maps
+#
+
+#	The options are those documented with geocode().
+
+sub geocode_us {
+    my ( $loc ) = @_;
+    my $set_loc;
+    if ( defined $loc ) {
+	$set_loc = 1;
+    } else {
+	$loc = $parm{location};
+    }
+    my $class = _load_module( [ 'Geo::Coder::OSM' ], 'geocode_us' );
+    my $gc = $class->new();
+    if ( my @rslt = sort { $b->{importance} <=> $a->{importance} }
+	$gc->geocode( location => $loc ) ) {
+	splice @rslt, 1;	# I give up.
+	if ( @rslt == 1 ) {
+	    $set_loc
+		and $parm{location} = $loc;
+	    @parm{ qw{latitude longitude } } =
+		map { sprintf '%.6f', $_ }
+		@{ $rslt[0] }{ qw{ lat lon } };
+	    show( ( $set_loc ? 'location' : () ), qw{ latitude longitude } );
+	    _geocode_height();
+	} else {
+	    foreach my $addr ( @rslt ) {
+		( my $desc = $addr->{display_name} ) =~ s/ [^,]+ , \s* //smx;
+		$desc =~ s/ \A ( \d+ ) , /$1/smx;	# Oh, for 5.10 and \K
+		print join( "\t", $addr->{lat}, $addr->{lon}, $desc ), "\n";
+	    }
+	}
+    } elsif ( my $resp = $gc->response() ) {
+	if ( $resp->is_success() ) {
+	    die "No match found for location\n";
+	} else {
+	    die $resp->status_line(), "\n";
+	}
+    } else {
+	die "No HTTP response found\n";
+    }
+}
+
+#	We have the following synonyms, based on the fact that ISO 3166
+#	defines as separate countries territories of the U.S. that may
+#	be covered by the census database.
+
+no warnings qw{once};
+BEGIN {
+*geocode_as = \&geocode_us;	# American Samoa
+*geocode_fm = \&geocode_us;	# Federated States of Micronesia
+*geocode_gu = \&geocode_us;	# Guam
+*geocode_mh = \&geocode_us;	# Marshall Islands
+*geocode_mp = \&geocode_us;	# Northern Mariana Islands
+*geocode_pr = \&geocode_us;	# Puerto Rico
+*geocode_pw = \&geocode_us;	# Palau
+*geocode_vi = \&geocode_us;	# Virgin Islands
+}
+use warnings qw{once};
+
+#	_geocode_height () is a helper subroutine to get the caller
+#	from one of the geocode_* routines to the proper height_*
+#	routine.
+
+sub _geocode_height {
+    if ( $cmdopt{height} ? !$parm{autoheight} : $parm{autoheight} ) {
+	$cmdopt{geocoding} = 1;
+	height( _get_suffix( 'geocode_', 2 ) );
+    }
+    return;
+}
+
+
+########################################################################
+#
+#	height () - Fetch the height above sea level.
+#
+
+#	In addition to the usual command qualifiers, height takes the
+#	following additional ones:
+
+#	The -all option asks the USGS to return data from all data sets,
+#	rather than the 'best.' The first valid non-zero result is
+#	accepted. If all results are 0, that is accepted also.
+
+#	The -retry_on_zero option is for dealing with a flakiness of the
+#	USGS server, which will sometimes return 0 rather than the
+#	actual height. The argument is the number of retries.
+
+#	The -source_layer option is for specifying a specific data
+#	source rather than the USGS' idea of 'best.' Its argument is the
+#	name of the data source (see the USGS for more data, or look at
+#	the data returned by -all). This will have no effect of -all is
+#	specified.
+
+BEGIN {
+$cmdlgl{height} = [ qw{ all retry_on_zero=i source_layer=s }];
+$cmdlgl{height_af} = $cmdlgl{height};
+$cmdlgl{height_as} = $cmdlgl{height};
+$cmdlgl{height_ca} = $cmdlgl{height};
+$cmdlgl{height_fm} = $cmdlgl{height};
+$cmdlgl{height_gu} = $cmdlgl{height};
+$cmdlgl{height_mh} = $cmdlgl{height};
+$cmdlgl{height_mp} = $cmdlgl{height};
+$cmdlgl{height_pr} = $cmdlgl{height};
+$cmdlgl{height_pw} = $cmdlgl{height};
+$cmdlgl{height_us} = $cmdlgl{height};
+$cmdlgl{height_vi} = $cmdlgl{height};
+}
+
+#	Here is the height() subroutine itself.
+
+sub height {
+my $cc;
+@_ % 2 and $cc = pop @_;
+$cc ||= $parm{country};
+$cc = lc $cc;
+my $handler = "height_$cc";
+die <<eod unless __PACKAGE__->can ($handler);
+Error - I have no idea how to get the height of a location in country
+        code '$cc'. The only known country codes at the moment are
+	@{[join ', ', _find_suffixes ('height_')]}
+eod
+goto \&{$handler};
+}
+
+#	Note for the future: http://gnswww.nga.mil/geonames/GNS/index.jsp
+#	(the GEOnet Names Server)
+#	is a worldwide search for city names. This may include height if
+#	you hold your tongue right.
+
+########################################################################
+#
+#	height_ca () - Fetch the height above sea level in Canada.
+#
+#	We default the source layer to 'SRTM.C_1TO19_3' and
+#	retry_on_zero to 3, and redispatch to height_us ().
+
+sub height_ca {
+$cmdopt{debug} and warn "Debug - Calling height_ca()\n";
+$cmdopt{source_layer} ||= 'SRTM.C_1TO19_3';
+$cmdopt{retry_on_zero} = 3 unless defined $cmdopt{retry_on_zero};
+goto \&height_us;
+}
+
+########################################################################
+#
+#	height_us () - Fetch the height above sea level in the United
+#	States.
+#
+#	The USGS has data for locations other than the USA, so other
+#	countries will be handled here as well.
+
+sub height_us {
+    _load_module ('Geo::WebService::Elevation::USGS', 'height_us');
+
+    my $set_pos = @_;
+    my $lat = @_ ? shift @_ : $parm{latitude};
+    my $lon = @_ ? shift @_ : $parm{longitude};
+
+    $cmdopt{source_layer} ||= -1;
+    $cmdopt{retry_on_zero} ||= 0;
+
+    my $eq = Geo::WebService::Elevation::USGS->new (
+#	source => $cmdopt{source_layer},
+	trace => $cmdopt{debug},
+	units => 'METERS',
+	croak => 0,	# Handle own errors
+    );
+    my $tries = ($cmdopt{retry_on_zero} || 0) + 1;
+    my $rslt;
+    while (--$tries >= 0) {
+	eval {
+	    ($rslt) = $eq->elevation($lat, $lon);
+	    1;
+	} and $eq->is_valid($rslt)
+	    or do {
+	    $tries > 0 and next;
+	    my $msg = $eq->get( 'error' ) || 'No valid result found.';
+	    $cmdopt{geocoding} or die "$msg\n";
+	    print "# Could not determine height. Setting to zero.\n";
+	    $rslt = { Elevation => 0 };
+	};
+	$rslt->{Elevation} != 0 and last;
+    }
+
+    if ($set_pos) {
+	$parm{latitude} = $lat;
+	$parm{longitude} = $lon;
+	show (qw{latitude longitude});
+	}
+    $parm{height} = sprintf '%.2f', $rslt->{Elevation};
+    show (qw{height});
+
+}
+
+no warnings qw{once};
+BEGIN {
+*height_af = \&height_us;	# Afghanistan (believe it or not).
+*height_as = \&height_us;	# American Samoa
+*height_fm = \&height_us;	# Federated States of Micronesia
+*height_gu = \&height_us;	# Guam
+*height_mh = \&height_us;	# Marshall Islands
+*height_mp = \&height_us;	# Northern Mariana Islands
+*height_pr = \&height_us;	# Puerto Rico
+*height_pw = \&height_us;	# Palau
+*height_vi = \&height_us;	# Virgin Islands
+}
+use warnings qw{once};
+
+
+########################################################################
+#
+#	help () - Display help to user
+#
+
+my %help_module;
+BEGIN {
+%help_module = (
+    eci => 'Astro::Coord::ECI',
+    iridium => 'Astro::Coord::ECI::TLE::Iridium',
+    moon => 'Astro::Coord::ECI::Moon',
+    set => 'Astro::Coord::ECI::TLE::Set',
+    sun => 'Astro::Coord::ECI::Sun',
+    st => 'Astro::SpaceTrack',
+    star => 'Astro::Coord::ECI::Star',
+    tle => 'Astro::Coord::ECI::TLE',
+    utils => 'Astro::Coord::ECI::TLE::Utils',
+    );
+}
+sub help {
+if ($parm{webcmd}) {
+    CORE::system (join ' ', $parm{webcmd},
+	"http://search.cpan.org/~wyant/Astro-satpass-$VERSION/");
+    }
+  else {
+    my $arg = defined $_[0] ? lc $_[0] : '';
+    my @ha;
+    if (my $fn = $help_module{$arg}) {
+	$fn =~ s|::|/|g;
+	$fn .= '.pm';
+	$INC{$fn} or do {
+	    eval "use $help_module{$arg}";
+	    $@ and die <<eod;
+Error - No help available on $help_module{$arg}.
+        Module can not be loaded.
+eod
+	    };
+	@ha = (-input => $INC{$fn});
+	}
+
+    my $os_specific = "_help_$^O";
+    if (__PACKAGE__->can ($os_specific)) {
+	__PACKAGE__->$os_specific ();
+	}
+      else {
+	pod2usage (-verbose => 2, -exitval => 'NOEXIT', @ha);
+	}
+    }
+}
+
+# Called by __PACKAGE__->$os_specific(), above
+sub _help_MacOS {	## no critic (ProhibitUnusedPrivateSubroutines)
+print <<eod;
+
+Normally, we would display the documentation for the satpass
+script here. But unfortunately this depends on the ability to
+spawn the perldoc command, and we do not have this ability under
+Mac OS 9 and earlier. You can find the same thing online at
+http://search.cpan.org/dist/Astro-satpass/
+
+eod
+}
+
+
+########################################################################
+#
+#	list () - Display the observing list
+#
+
+BEGIN {
+    $cmdlgl{list} = [qw{choose=s@}];
+}
+
+sub list {
+if (@bodies) {
+    my $dtfmt = "$parm{date_format} $parm{time_format} " . ($parm{gmt}
+	? "(GMT)" : "(local)");
+    print "\n";
+    foreach my $tle (_select_observing_list ()) {
+	my $id = $tle->get ('id');
+	my $name = $tle->get ('name');
+	my $epoch = strftime $dtfmt, _mytime($tle->get ('epoch'));
+	$name = $name ? " - $name" : '';
+	my $secs = floor ($tle->period + .5);
+	my $mins = floor ($secs / 60);
+	$secs %= 60;
+	my $hrs = floor ($mins / 60);
+	$mins %= 60;
+	printf "$id$name: epoch $epoch; period %2d:%02d:%02d\n", $hrs, $mins, $secs;
+	}
+    print "\n";
+    }
+  else {
+    print "\nThe observing list is empty.\n\n";
+    }
+}
+
+
+########################################################################
+#
+#	load () - Load a file of two- or three- line elements into the
+#		  observing list
+#
+
+sub load {
+foreach my $fn (@_) {
+    my $expand = _tilde_expand ($fn);
+    my $fh = FileHandle->new ("<$expand") or die <<eod;
+Error - Cannot open $expand.
+        $!
+eod
+    local $/ = undef;
+    push @bodies, Astro::Coord::ECI::TLE->parse (<$fh>);
+    }
+}
+
+
+########################################################################
+#
+#	localize () - Localize parameter settings.
+#
+
+sub localize {
+foreach my $key (@_) {
+    $key =~ m/\W/ || $key =~ m/^_/ || !exists ($parm{$key}) and
+	die <<eod;
+Error - Parameter $key does not exist.
+eod
+    $frame[$#frame]{local_parm}{$key} = $parm{$key}
+	unless exists $frame[$#frame]{local_parm}{$key};
+    }
+}
+
+########################################################################
+#
+#	macro () - Define a macro. With no name, lists all macros.
+#
+
+BEGIN {
+$cmdlgl{macro} = [qw{brief delete list}];
+}
+
+sub macro {
+$io_string_unavailable and die <<eod;
+Error - You can not use the macro facility unless you are running at
+        at least Perl 5.8, or IO::String is available.
+eod
+
+unless (@_ != 1 || $cmdopt{brief} || $cmdopt{delete} || $cmdopt{list}) {
+    $cmdopt{$parm{explicit_macro_delete} ? 'list' : 'delete'} = 1;
+    }
+
+if ($cmdopt{brief}) {
+    foreach my $name (sort @_ ? @_ : keys %macro) {
+	print $name . "\n" if $macro{$name};
+	}
+    }
+  elsif ($cmdopt{list} || !@_) {
+    foreach my $name (sort @_ ? @_ : keys %macro) {
+	print "macro $name ", join (" \\\n    ", map {
+		_quoter ($_)} @{$macro{$name}}), "\n"
+		if $macro{$name};
+	}
+    }
+  elsif ($cmdopt{delete}) {
+    foreach my $name (@_ ? @_ : keys %macro) {
+	delete $macro{$name};
+	}
+    }
+  else {
+    my $name = shift;
+    $name !~ m/\W/ && $name !~ m/^_/ or die <<eod;
+Error - Invalid macro name '$name'. All characters must be alphanumeric
+        or underscores, and the name must not start with an underscore.
+eod
+    $macro{$name} = [map {s/\\(.)/$1/g; $_} @_];
+    }
+
+}
+
+########################################################################
+#
+#	magnitude_table() - Maintain magnitude table
+#
+
+sub magnitude_table {
+    my @arg = @_;
+    @arg
+	or @arg = 'show';
+    my $cmd = shift @arg;
+
+    if ( $cmd eq 'show' ) {
+	foreach my $item ( Astro::Coord::ECI::TLE->magnitude_table(
+		$cmd	=> @arg ) ) {
+	    print join( ' ', qw{ magnitude_table add }, @{ $item } ), "\n";
+	}
+    } elsif ( $cmd eq 'adjust' && ! defined $arg[0] ) {
+	print join( ' ', qw{ magnitude_table adjust },
+	    Astro::Coord::ECI::TLE->magnitude_table( 'adjust' ) ), "\n";
+    } else {
+	Astro::Coord::ECI::TLE->magnitude_table( $cmd, @arg );
+    }
+    return;
+}
+
+########################################################################
+#
+#	pass () - Predict passes over the observer's location, using
+#		the Astro::Coord::ECI::TLE->pass() method.
+#
+
+
+{	# Begin local symbol block
+
+    my @event_name;
+    BEGIN {
+	foreach my $code (PASS_EVENT_NONE, PASS_EVENT_SHADOWED,
+	    PASS_EVENT_LIT, PASS_EVENT_DAY, PASS_EVENT_RISE,
+	    PASS_EVENT_MAX, PASS_EVENT_SET, PASS_EVENT_START,
+	    PASS_EVENT_END, PASS_EVENT_BRIGHTEST ) {
+	    my $val = ucfirst $code;
+	    $event_name[$code] = sub {$val};
+	}
+	$event_name[PASS_EVENT_APPULSE] =
+	    sub {sprintf '%.1f from %s', rad2deg ($_[0]{appulse}{angle}),
+		$_[0]{appulse}{body}->get ('name') ||
+		$_[0]{appulse}{body}->get ('id')};
+
+	$cmdlgl{pass} = [ qw{ choose=s@ dump flatten
+	    magnitude|brightest quiet truncate! } ];
+    }
+
+    sub pass {
+
+#	Initialize.
+
+    my $lcfmt = \&{"_format_local_$parm{local_coord}"};
+
+    my $pass_start = _parse_time (shift || 'today noon');
+    my $pass_end = _parse_time (shift || '+7');
+    $pass_start >= $pass_end and die <<eod;
+Error - End time must be after start time.
+eod
+    my $sta = _get_station ();
+    @bodies or die <<eod;
+Error - Can not calculate satellite pass without loading at least one
+        body.
+eod
+    my $pass_step = shift || 60;
+    my $timlen = max (
+	length (strftime ($parm{time_format}, 59, 59, 23, 31, 11, 2000)),
+	length (strftime ($parm{time_format}, 59, 59, 11, 31, 11, 2000)),
+	);
+    my $header = <<eod;
+
+%s%s
+
+time@{[' ' x ($timlen - 4)]} @{[$lcfmt->()]} latitude longitude altitude
+
+eod
+
+
+#	Decide which model to use.
+
+    my $model = $parm{model};
+
+#	Pick up horizon, appulse distance, etc.
+
+    my $horizon = deg2rad ($parm{horizon});
+    my $appulse = deg2rad ($parm{appulse});
+    my $pass_threshold = deg2rad( $parm{pass_threshold} );
+    my $pass_variant = $cmdopt{magnitude} ? PASS_VARIANT_BRIGHTEST :
+	PASS_VARIANT_NONE;
+    $cmdopt{truncate}
+	and $pass_variant |= PASS_VARIANT_TRUNCATE;
+    my $line_format = $cmdopt{magnitude} ? LINFMT_MAG : LINFMT;
+
+#	Print the header
+
+    print _format_location () unless $cmdopt{dump};
+
+#	Tell aggregate() how to work.
+
+    local $Astro::Coord::ECI::TLE::Set::Singleton = $parm{singleton};
+    if ($cmdopt{debug}) {
+	foreach my $tle (_aggregate ()) {
+	    print join ("\t", $tle->get ('id'), $tle->get ('name'),
+		ref $tle), "\n";
+	    }
+	}
+
+#	Set the station for all the bodies in the sky
+
+    foreach my $body ( @sky ) {
+	$body->set( station => $sta );
+    }
+
+#	Foreach body to be modelled
+
+    foreach my $tle (_select_observing_list ($pass_start)) {
+
+	$tle->set (
+	    appulse => $appulse,
+	    backdate => $parm{backdate},
+	    debug => $parm{debug},
+	    edge_of_earths_shadow => $parm{edge_of_earths_shadow},
+	    geometric => $parm{geometric},
+	    horizon => $horizon,
+	    interval => $parm{verbose} ? $pass_step : 0,
+	    lazy_pass_position => 1,
+	    model => $model,
+	    pass_threshold => $pass_threshold,
+	    pass_variant => $pass_variant,
+	    station	=> $sta,
+	    twilight => $parm{_twilight},
+	    visible => $parm{visible},
+	);
+
+	my @passes;
+	eval {
+	    @passes = $tle->pass ( $pass_start, $pass_end, \@sky);
+	    1;
+	} or do {
+	    $@ =~ m/$interrupted/o and die $@;
+	    $cmdopt{quiet} or warn $@;
+	    next;
+	};
+       	@passes or next;
+
+	my $id = $tle->get ('id');
+	my $name = $tle->get ('name') || '';
+	$name = " - $name" if $name;
+	my $hdrdone;
+	my $last_date = '';
+	foreach my $pass (@passes) {
+	    unless ($cmdopt{dump}) {
+		if ($hdrdone++) {
+		    print "\n"
+		} else {
+		    printf $header, $id, $name
+		};
+	    }
+	    foreach my $event (@{$pass->{events}}) {
+		my $time = $event->{time};
+		my $displaytime = floor($time + .5);
+		my $date = strftime ($parm{date_format},
+		    _mytime($displaytime));
+		if ($date ne $last_date) {
+		    print "$date\n" unless $cmdopt{dump};
+		    $last_date = $date;
+		}
+		$tle->universal ($time);
+		my ($lat, $long, $alt) = $tle->geodetic ();
+		if ($cmdopt{dump}) {
+		    if ($cmdopt{flatten}) {
+			$event->{body} ||= $tle;
+			$event->{station} ||= $sta;
+			local $Data::Dumper::Terse = 1;
+			print Dumper (_flatten ($event));
+		    } else {
+			print Dumper ($event);
+		    }
+		} else {
+		    my @data = (
+			strftime( $parm{time_format}, _mytime(
+				$displaytime ) ),
+			$lcfmt->( $tle ),
+			rad2deg ($lat), rad2deg ($long), $alt,
+			$event_name[$event->{illumination}]->($event),
+			$event_name[$event->{event}]->($event),
+		    );
+		    if ( $cmdopt{magnitude} ) {
+			my $mag = exists $event->{magnitude} ?
+			    $event->{magnitude} :
+			    $tle->magnitude( $sta );
+			splice @data, -2, 0, defined $mag ?
+			    sprintf '%4.1f', $mag :
+			    '';
+		    }
+		    printf $line_format, @data;
+		    if ($event->{appulse} && $parm{background}) {
+			my $body = $event->{appulse}{body}
+			    ->universal ($time);
+			my ($lat, $long) = $body->geodetic;
+			printf BGFMT, strftime (
+				$parm{time_format}, _mytime (
+				    $displaytime)),
+			    $lcfmt->( $body ),
+			    rad2deg ($lat), rad2deg ($long),
+			    $body->get ('name') || $body->get ('id') || '';
+			}
+		    }
+		}
+	    }
+	}
+    }
+}	# End local symbol block
+
+
+########################################################################
+#
+#	phase () - Compute the phase of any relevant bodies in @sky at
+#		the given time.
+#
+
+BEGIN {	# Localize and initialize phase table.
+my @table = (
+    [6.1 => 'new'], [83.9 => 'waxing crescent'],
+    [96.1 => 'first quarter'], [173.9 => 'waxing gibbous'],
+    [186.1 => 'full'], [263.9 => 'waning gibbous'],
+    [276.1 => 'last quarter'], [353.9 => 'waning crescent'],
+    [360 => 'new'],
+    );
+
+sub phase {
+my $time = _parse_time (shift);
+my $dtfmt = "$parm{date_format} $parm{time_format}";
+
+foreach my $body (@sky) {
+    $body->can ('phase') or next;
+    my ($phase, $illum) = $body->phase ($time);
+    $phase = rad2deg ($phase);
+    my $name;
+    foreach (@table) {$_->[0] > $phase or next; $name = $_->[1]; last}
+    printf "%s @{[$body->get ('name')]} phase %.0f deg, %s, %.0f%% illum.\n",
+	strftime ($dtfmt, _mytime($time)), $phase, $name, $illum * 100;
+    }
+}
+}	# end of BEGIN block
+
+########################################################################
+#
+#	position () - Compute position of all bodies in observing list
+#		and sky at the given time.
+#
+
+BEGIN {
+$cmdlgl{position} = [qw{choose=s@ magnitude|brightest! questionable|spare quiet realtime}];
+}
+
+sub position {
+my $time = _parse_time (shift || '+0');
+my $endtm = _parse_time (shift ||
+	($cmdopt{realtime} ? '+10' : '+0'));
+my $interval = shift || ($cmdopt{realtime} ? 10 : 60);
+my $dtfmt = "$parm{date_format} $parm{time_format}";
+my $lcfmt = \&{"_format_local_$parm{local_coord}"};
+my @lighting = qw{Shdw Lit Day};	# Duped from pass()
+my $twilight = $parm{_twilight};
+
+
+#	Define the observing station.
+
+my $sta = _get_station ();
+
+my $sun = Astro::Coord::ECI::Sun->new ();
+
+#	Print a header.
+
+if ( $cmdopt{magnitude} ) {
+    printf <<"EOD", _format_location (),
+%s            name @{[$lcfmt->()]} %-*s illum mag
+EOD
+	length (strftime $dtfmt, _mytime(time)), 'epoch of data';
+} else {
+    printf <<"EOD", _format_location (),
+%s            name @{[$lcfmt->()]} %-*s illum
+EOD
+	length (strftime $dtfmt, _mytime(time)), 'epoch of data';
+}
+
+#	Tell aggregate() how to work.
+
+local $Astro::Coord::ECI::TLE::Set::Singleton = $parm{singleton};
+
+my $when = time ();
+my $indent;
+while ($time <= $endtm) {
+    print strftime ($dtfmt, _mytime($time)), "\n";
+    foreach my $body (_select_observing_list ($time), @sky) {
+	$body->set(
+	    debug	=> $cmdopt{debug},
+	    station	=> $sta,
+	);
+	eval {$body->universal ($time); 1;}
+	    or do {
+	    $@ =~ m/$interrupted/o and die $@;
+	    $cmdopt{quiet} or warn $@;
+	    next;
+	};
+	my $name = $body->get ('name') || $body->get ('id') || 'body';
+	$name = substr $name, 0, 16;
+	if ($body->represents ('Astro::Coord::ECI::TLE')) {
+	    my $illum = $body->illuminated() ? 1 : 0;
+	    $illum
+		and ( $sta->azel( $body ) )[1] >= 0
+		and ( $sta->azel($sun->universal( $time ) ) )[1] > $twilight
+		and $illum = 2;
+	    my $line;
+	    if ( $cmdopt{magnitude} ) {
+		my $mag = $body->magnitude( $sta );
+		$mag = defined $mag ? sprintf( '%4.1f', $mag ) : '';
+		$line = sprintf '%16s %s %s %5s %4s', $name, $lcfmt->( $body ),
+		    strftime ($dtfmt, _mytime($body->get ('epoch'))),
+		    $lighting[$illum] || '', $mag;
+	    } else {
+		$line = sprintf '%16s %s %s %5s', $name, $lcfmt->( $body ),
+		    strftime ($dtfmt, _mytime($body->get ('epoch'))),
+		    $lighting[$illum] || '';
+	    }
+	    $line =~ s/ \s+ \z //smx;
+	    print $line, "\n";
+
+	    if ($body->can_flare ($cmdopt{questionable})) {
+##		$indent ||= length (sprintf '%16s %s', $name,
+##		    $lcfmt=>( $body ) );
+		$indent ||= 32;
+		$body->set (horizon => 0);
+		foreach my $info ($body->reflection ($sta, $time)) {
+		    if (!exists $info->{mma}) {
+			printf "%*s %s\n", $indent, '', $info->{status};
+			last;
+			}
+		      elsif ($info->{status}) {
+			printf "%*s MMA %d %s\n", $indent, '',
+			    $info->{mma}, $info->{status};
+			}
+		      else {
+			printf
+			    "%*s MMA %d mirror angle %6.1f magnitude %4.1f\n",
+			    $indent, '', $info->{mma},
+			    rad2deg ($info->{angle}), $info->{magnitude};
+			}
+		    }
+		}
+
+	    }
+	  else {
+	    printf "%16s %s\n", $name, $lcfmt->( $body );
+	    }
+	}
+    $when += $interval;
+    $time += $interval;
+    my $sleep = $when - time ();
+    sleep ($sleep) if $cmdopt{realtime} && $sleep > 0;
+    }
+
+}
+
+
+########################################################################
+#
+#	quarters () - Compute the quarters of any relevant bodies in
+#		@sky in the given time range.
+#
+
+BEGIN {
+    $cmdlgl{quarters} = [qw{dump flatten}];
+}
+
+sub quarters {
+    my $start = _parse_time ($_[0] || 'today midnight');
+    my $end = _parse_time ($_[1] || '+30');
+
+    my $dtfmt = "$parm{date_format} $parm{time_format}";
+
+    my @data;
+
+#	Iterate over any background objects, accumulating all
+#	quarter-phases of each until we get one after the
+#	end time. We silently ignore bodies that do not support
+#	the next_quarter() method.
+
+    foreach my $body (@sky) {
+	next unless $body->can ('next_quarter');
+	$body->universal ($start);
+
+	while (1) {
+	    my ($time, undef, $quarter) = $body->next_quarter;
+	    last if $time > $end;
+	    push @data, [$time, $quarter];
+	    }
+    }
+
+#	Sort and display the quarter-phase information.
+
+    foreach (sort {$a->[0] <=> $b->[0]} @data) {
+	if ($cmdopt{dump}) {
+	    if ($cmdopt{flatten}) {
+		local $Data::Dumper::Terse = 1;
+		print Dumper (_flatten ($_));
+	    } else {
+		print Dumper $_;
+	    }
+	} else {
+	    my ($time, $quarter) = @$_;
+	    print strftime ($dtfmt, _mytime($time)), " $quarter\n";
+	}
+    }
+
+}
+
+
+########################################################################
+#
+#	retrieve () - Reload the observing list using Storable::retrieve.
+#
+
+sub retrieve {
+@bodies = @{Storable::retrieve (_storable (@_))};
+}
+
+
+########################################################################
+#
+#	set () - set the values of parameters
+#
+
+sub set {
+while (@_) {
+    my $name = shift;
+    my $value = shift;
+    if ($mutator{$name}) {
+	$mutator{$name}->($name, $value);
+	$exported{$name} and $ENV{$name} = $parm{$name};
+	}
+      else {
+	die <<eod;
+Warning - Unknown parameter '$name'.
+eod
+	}
+    }    
+}
+
+sub _set_almanac_horizon {
+    my ( $name, $value ) = @_;
+    $value = _parse_angle( $value );
+    Astro::Coord::ECI->new( almanac_horizon => $value );
+    $parm{$name} = $value;
+    $parm{"_$name"} = looks_like_number( $value ) ?
+	deg2rad( $value ) :
+	$value;
+    return;
+}
+
+sub _set_angle {
+    my ( $name, $value ) = @_;
+    $parm{$name} = _parse_angle( $value );
+    $parm{"_$name"} = deg2rad( $value );
+    return;
+}
+
+sub _set_angle_or_undef {
+    defined $_[1]
+	and $_[1] ne 'undef'
+	and goto &_set_angle;
+    $parm{$_[0]} = $parm{"_$_[0]"} = undef;
+    return;
+}
+
+sub _set_ellipsoid {
+Astro::Coord::ECI->set (ellipsoid => $_[1]);
+$parm{$_[0]} = $_[1];
+}
+
+
+sub _set_local_coord {
+my $method = "_format_local_$_[1]";
+die <<eod unless __PACKAGE__->can ($method);
+Error - Illegal local coordinate specification. The only legal values
+        are @{[join ', ', _find_suffixes ('_format_local_')]}
+eod
+$parm{$_[0]} = $_[1];
+}
+
+sub _set_perltime {
+    $parm{$_[0]} = $_[1];
+    if ( _parse_time_absolute_use_perltime() ) {
+	if ( $_[1] ) {
+	    _parse_time_absolute_init_perltime();
+	} else {
+	    _parse_time_absolute_init( $parm{tz} );
+	}
+    }
+}
+
+sub _set_simbad_version {
+    if (__PACKAGE__->can ("_simbad$_[1]")) {
+	$parm{$_[0]} = $_[1];
+    } else {
+	my @lglver;
+	no strict qw{refs};
+	foreach (keys %{*{__PACKAGE__ . '::'}}) {
+	    m/^_simbad(\d+)/ && __PACKAGE__->can ($_)
+		and push @lglver, $1;
+	}
+	@lglver = sort {$a <=> $b} @lglver;
+	my $lastver = pop @lglver;
+	if (@lglver) {
+	    die <<eod;
+Error - Invalid SIMBAD version number $_[1]. Must be @{[
+    join ', ', @lglver]} or $lastver.
+eod
+	} else {
+	    die <<eod;
+Error - Invalid SIMBAD version number $_[1]. Must be $lastver.
+eod
+	}
+    }
+}
+
+sub _set_time {
+    my ($name, $val) = @_;
+    if ($val) {
+	$parm{$name} = _parse_time ($val);
+    } else {
+	$parm{$name} = 0;
+    }
+}
+
+sub _set_twilight {
+if (my $key = $twilight_abbr{lc $_[1]}) {
+    $parm{$_[0]} = $key;
+    $parm{_twilight} = $twilight_def{$key};
+    }
+  else {
+    my $angle = _parse_angle ($_[1]);
+    $angle =~ m/^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/ or
+	die <<eod;
+Error - The twilight setting must be 'civil', 'nautical', or
+        'astronomical', or a unique abbreviation thereof, or a number
+        of degrees the geometric center of the sun is below the
+        horizon.
+eod
+    $parm{$_[0]} = $_[1];
+    $parm{_twilight} = - deg2rad (abs ($angle));
+    }
+}
+
+sub _set_tz {
+    if ($_[1] || looks_like_number ($_[1])) {
+	$ENV{TZ} = $parm{$_[0]} = $_[1];
+	$parm{perltime} and _parse_time_absolute_use_perltime()
+	    or _parse_time_absolute_init( $_[1] );
+    } else {
+	$parm{$_[0]} = undef;
+	delete $ENV{TZ};
+	$parm{perltime} and _parse_time_absolute_use_perltime()
+	    or _parse_time_absolute_init();
+    }
+}
+
+sub _set_unmodified {$parm{$_[0]} = $_[1]}
+
+sub _set_webcmd {
+$parm{$_[0]} = $_[1];
+my $st = _get_spacetrack (1);	# Get only if already instantiated.
+$st and $st->set (webcmd => $_[1]);
+}
+
+
+########################################################################
+#
+#	show () - display the values of parameters
+#
+
+sub show {
+    my @arg = @_;
+    @arg
+	or @arg = grep { m/ \A [[:alpha:]] /smx } sort keys %parm;
+    foreach my $name ( @arg ) {
+	exists $accessor{$name} or die <<"EOD";
+Error - '$name' is not a valid setting.
+EOD
+	exists $parm{$name} or next;
+	my $val = _quoter ($accessor{$name}->($name));
+	print "set $name $val\n";
+    }
+}
+
+sub _show_unmodified {
+defined $parm{$_[0]} ? $parm{$_[0]} : 'undef'
+}
+
+
+########################################################################
+#
+#	sky () - handle manipulation of the sky. What happens is based
+#		on the arguments as follows:
+#		none - list
+#		'add body' - add the named body, if it is not already
+#			there. If the body is not 'sun' or 'moon' it
+#			is assumed to be a star of the given name,
+#			and coordinates must be given.
+#		'clear' - clear
+#		'drop name ...' - drop the named bodies; the name match
+#			is by case-insensitive regular expression.
+#		'lookup name' - Look up the star name in the SIMBAD
+#			catalog, and add it as a background body if
+#			found.
+#
+
+# For proper motion, we need to convert arc seconds per year to degrees
+# per second.
+
+use constant SPY2DPS => 3600 * 365.24219 * SECSPERDAY;
+
+sub sky {
+my $verb = lc (shift @_ || '');
+
+#	If no subcommand given, display the background bodies.
+
+if (!$verb) {
+    foreach my $body (@sky) {
+	if ( __instance( $body, 'Astro::Coord::ECI::Star' ) ) {
+	    my ($ra, $dec, $rng, $pmra, $pmdec, $vr)  = $body->position ();
+	    $rng /= PARSEC;
+	    $pmra = rad2deg ($pmra / 24 * 360 * cos ($ra)) * SPY2DPS;
+	    $pmdec = rad2deg ($pmdec) * SPY2DPS;
+	    printf "sky add %s %s %7.3f %.2f %.4f %.5f %s\n",
+		_quoter ($body->get ('name')), _rad2hms ($ra),
+		rad2deg ($dec), $rng, $pmra, $pmdec, $vr;
+	    }
+	  else {
+	    print "sky add ", _quoter ($body->get ('name')), "\n";
+	    }
+	}
+    @sky or print "The sky is empty.\n";
+    }
+
+#	If the subcommand is 'add', add the given body. Stars are a
+#	special case, since we can have more than one, and we need to
+#	specify position. No matter what we're adding we check for
+#	duplicates first and silently no-op the request if one is
+#	found.
+
+  elsif ($verb eq 'add') {
+    my $name = shift or die <<eod;
+Error - You did not specify what to add.
+eod
+    my $lcn = lc $name;
+    my $special = $lcn eq 'sun' || $lcn eq 'moon';
+    my $class = 'Astro::Coord::ECI::' .
+	($special ? ucfirst ($lcn) : 'Star');
+    foreach my $body (@sky) {
+	return if __instance($body, $class) &&
+		($special || $lcn eq lc $body->get ('name'));
+	}
+    my $body = $class->new (debug => $parm{debug});
+    unless ($special) {
+	$body->set (name => $name);
+	@_ >= 2 or die <<eod;
+Error - You must specify a name, a right ascension (in either
+        hours:minutes:seconds or degrees) and a declination
+        (in either degreesDminutesMseconds or degrees, with
+        south declination negative). The distance in parsecs
+        is optional.
+eod
+	my $ra = deg2rad (_parse_angle (shift));
+	my $dec = deg2rad (_parse_angle (shift));
+	my $rng = @_ ? _parse_distance (shift @_, '1pc') : 10000 * PARSEC;
+	my $pmra = @_ ? do {
+	    my $angle = shift;
+	    $angle =~ s/s$//i or $angle *= 24 / 360 / cos ($ra);
+	    deg2rad ($angle / SPY2DPS);
+	    } : 0;
+	my $pmdec = @_ ? deg2rad (shift (@_) / SPY2DPS) : 0;
+	my $pmrec = @_ ? shift : 0;
+	$body->position ($ra, $dec, $rng, $pmra, $pmdec, $pmrec);
+	}
+    push @sky, $body;
+    }
+
+#	If the subcommand is 'clear', we empty the background.
+
+  elsif ($verb eq 'clear') {
+    @sky = ();
+    }
+
+#	If the subcommand is 'drop', we iterate over the background,
+#	dropping any bodies whose name matches any of the given
+#	names.
+
+  elsif ($verb eq 'drop') {
+    @_ or die <<eod;
+Error - You must specify at least one name to drop.
+eod
+    my $match = qr{@{[join '|', map {quotemeta $_} @_]}}i;
+    @sky = grep {$_->get ('name') !~ m/$match/} @sky;
+    }
+
+#	If the subcommand is 'lookup', we take the next argument to
+#	be the name of the star to look up, and try to look it up
+#	on line. If we find it, we add it to the background.
+
+  elsif ($verb eq 'lookup') {
+    my $name = $_[0];
+    my $lcn = lc $_[0];
+    foreach my $body (@sky) {
+	next unless __instance($body, 'Astro::Coord::ECI::Star') &&
+		$lcn eq lc $body->get ('name');
+	die <<eod;
+Error - The sky already contains $_[0]. If you want to
+        replace it you must first drop it.
+eod
+	return;
+	}
+    my ($ra, $dec, $rng, $pmra, $pmdec, $pmrec) = _simbad ($name);
+    $rng = sprintf '%.2f', $rng;
+    print "sky add ", _quoter ($name),
+	" $ra $dec $rng $pmra $pmdec $pmrec\n";
+    $ra = deg2rad (_parse_angle ($ra));
+    my $body = Astro::Coord::ECI::Star->new (name => $name);
+    $body->position ($ra, deg2rad (_parse_angle ($dec)),
+	$rng * PARSEC, deg2rad ($pmra * 24 / 360 / cos ($ra) / SPY2DPS),
+	deg2rad ($pmdec / SPY2DPS), $pmrec);
+    push @sky, $body;
+    }
+  else {
+    die <<eod;
+Error - 'sky' subcommand '$verb' not known. See 'help'.
+eod
+    }
+}
+
+########################################################################
+#
+#	source () - take commands from the specified file
+#
+
+BEGIN {
+$cmdlgl{source} = [qw{optional}];
+}
+
+sub source {
+my $fn = shift;
+my $hdl = ref $fn ? $fn : FileHandle->new ("<@{[_tilde_expand ($fn)]}") ||
+    ($cmdopt{optional} ? return : die <<eod);
+Error - Can not open $fn for input.
+        $!
+eod
+push @frame, {
+	args => [@_],
+	cntind => '',
+	lines => [],
+	stdin => $fh,
+	stdout => select (),
+	};
+$fh = $hdl;
+}
+
+
+########################################################################
+#
+#	st () - pass commands to Astro::SpaceTrack
+#
+
+#	In addition to the usual command qualifiers, st takes -verbose,
+#	which means to display all data fetched.
+
+my %st_suppress_output;
+
+BEGIN {
+    $cmdlgl{st} = [qw{end=s start=s verbose}];
+    %st_suppress_output = map { $_ => 1 } '', 'set';
+}
+
+sub st {
+my $st = _get_spacetrack (0, 'st');
+my $func = lc shift or die <<eod;
+Error - No Astro::SpaceTrack method specified.
+eod
+$func = 'get' if $func eq 'show';	# Special-case 'show' into 'get'.
+
+#	$st->get() is special-cased to: allow multiple arguments, allow
+#	no argument to get all defined, and format output as st set.
+
+if ($func eq 'get') {
+    @_ = _get_spacetrack_attrib_names () unless @_;
+    foreach my $name (@_) {
+	my $rslt = $st->get ($name);
+	die $rslt->status_line unless $rslt->is_success;
+	print "st set $name ", _quoter ($rslt->content), "\n";
+	}
+    return;
+    }
+
+#	$st->localize does not exist, but we special-case it to
+#	$st->get all the arguments and save them in the stack frame.
+
+  elsif ($func eq 'localize') {
+    foreach my $key (@_) {
+	$frame[$#frame]{local_st}{$key} = $st->get ($key)->content
+	    unless exists $frame[$#frame]{local_st}{$key};
+	}
+    return;
+    }
+
+#	Otherwise we just execute the function and dispatch on the
+#	result.
+
+$func !~ m/^_/ && $st->can ($func) or die <<eod;
+Error - Unknown Astro::SpaceTrack method $func.
+eod
+unshift @_, -start => _parse_time ($cmdopt{start}) if $cmdopt{start};
+unshift @_, -end =>  _parse_time ($cmdopt{end}) if $cmdopt{end};
+
+my ($rslt, @rest) = $st->$func (@_);
+my $content = $st->content_type || '';
+if (!$rslt->is_success) {
+    die $rslt->status_line;
+    }
+  elsif ($content eq 'orbit') {
+    push @bodies, Astro::Coord::ECI::TLE->parse ($rslt->content);
+    $cmdopt{verbose} and print $rslt->content, "\n";
+    }
+  elsif ($content eq 'iridium-status') {
+    __PACKAGE__->_iridium_status (@rest);
+    $cmdopt{verbose} and print $rslt->content, "\n";
+    }
+  elsif ( $content eq 'molczan' || $content eq 'quicksat' ) {
+    magnitude_table( $content, \( $rslt->content() ) );
+    }
+  elsif ( ! $st_suppress_output{$content} || $cmdopt{verbose}) {
+    print $rslt->content, "\n";
+    }
+}
+
+########################################################################
+#
+#	status () - Show satellite status, fetching if necessary.
+#
+
+my @status_code_map;
+
+BEGIN {
+$cmdlgl{status} = [qw{name reload}];
+@status_code_map = qw{+ S -};
+}
+
+sub status {
+@_ or @_ = qw{show};
+
+my $verb = lc (shift (@_) || 'show');
+
+if ($verb eq 'add' || $verb eq 'drop') {
+    Astro::Coord::ECI::TLE->status ($verb, @_);
+    foreach my $tle (@bodies) {
+	$tle->get ('id') == $_[0] and $tle->rebless ();
+	}
+    }
+  elsif ($verb eq 'clear') {
+    Astro::Coord::ECI::TLE->status ($verb, @_);
+    foreach my $tle (@bodies) {
+	$tle->rebless ();
+	}
+    }
+  elsif ( $verb eq 'iridium' ) {
+    die "The 'iridium' subcommand is removed; use 'show' instead\n";
+    }
+  elsif ( $verb eq 'show' ) {
+    my @data = Astro::Coord::ECI::TLE->status( 'show', @_ );
+    @data = sort {$a->[3] cmp $b->[3]} @data if $cmdopt{name};
+    foreach my $tle (@data) {
+	print <<eod;
+status add $tle->[0] $tle->[1] $status_code_map[$tle->[2]] '$tle->[3]' '$tle->[4]'
+eod
+	}
+    }
+  else {
+    Astro::Coord::ECI::TLE->status ($verb, @_);
+    }
+
+}
+
+
+########################################################################
+#
+#	store () - Save the observing list using Storable nstore().
+#
+
+sub store {
+Storable::nstore (\@bodies, _storable (@_));
+}
+
+########################################################################
+#
+#	system () - Execute a system command.
+#
+
+BEGIN {
+##$cmdlgl{system} = undef;	# No option parsing.
+$cmdconfig{system} = [qw{require_order}];	# Options must come first.
+$cmdquote{system} = 1;	# Keep quotes when parsing.
+}
+
+sub system {
+my $cmd = @_ ? "@_" : $ENV{SHELL} || ($^O eq 'MSWin32' ? 'cmd' :
+    die <<eod);
+Error - No command passed, the SHELL environment variable was not
+        defined, and no system-specific default was available.
+eod
+$^O eq 'MSWin32' || $^O eq 'VMS' and $cmd =~ tr/'"/"'/;
+-t select() ? CORE::system ($cmd) : print `$cmd`;
+}
+
+########################################################################
+#
+#	times () - display time in a number of formats
+#
+
+sub times {
+    my $time = _parse_time (shift || '+0');
+    my $dtfmt = "$parm{date_format} $parm{time_format}";
+    my $sta = _get_station ()->universal ($time);
+    print strftime ($dtfmt, gmtime ($time)), " universal =\n";
+    print '    ', strftime ($dtfmt, gmtime ($sta->dynamical ())),
+	" dynamical\n";
+    print '    ', strftime ($dtfmt, localtime ($time)),
+	" local standard time\n";
+    print '    ', strftime ($dtfmt, gmtime (
+	    floor ($sta->local_mean_time () + .5))),
+	" local mean time\n";
+    print '    ', strftime ($dtfmt, gmtime (
+	    floor ($sta->local_time () + .5))),
+	" local time\n";
+}
+
+########################################################################
+#
+#	tle () - display original TLE data from list.
+#
+
+# TODO the Celestia functionality. Currently, it gives a file that is
+# syntactically valid, but does not give the correct position. What is
+# really needed is for Celestia to implement the right model, but it
+# would also be nice to KNOW we're generating the correct Keplerian
+# ellipse. Until we do, this functionality is UNSUPPORTED and
+# undocumented.
+
+my %tle_formatter;
+
+BEGIN {
+    %tle_formatter = (
+	celestia	=> sub {
+	    my ( $bodies ) = @_;
+	    my $dtfmt = "$parm{date_format} $parm{time_format}";
+	    foreach my $tle ( @{ $bodies } ) {
+		my $name = $tle->get('name') || $tle->get('id') || 'unspecified';
+		my $incl = rad2deg($tle->get('inclination'));
+		my $ascnod = rad2deg($tle->get('ascendingnode'));
+		print <<"EOD";
+
+# Keplerian elements for $name
+# Generated by satpass $VERSION
+# Epoch: @{[strftime $dtfmt, gmtime $tle->get('epoch')]} UT
+
+Modify "$name" "Sol/Earth" {
+    EllipticalOrbit {
+	Epoch  @{[julianday($tle->get('epoch'))]}
+	Period  @{[$tle->period/SECSPERDAY]}
+	SemiMajorAxis  @{[$tle->semimajor]}
+	Eccentricity  @{[$tle->get('eccentricity')]}
+	Inclination  $incl
+	AscendingNode  $ascnod
+	ArgOfPericenter  @{[rad2deg($tle->get('argumentofperigee'))]}
+	MeanAnomaly  @{[rad2deg($tle->get('meananomaly'))]}
+    }
+    UniformRotation {
+	Inclination  $incl
+	MeridianAngle  90
+	AscendingNode  $ascnod
+    }
+}
+EOD
+	    }
+	    return;
+	},
+#	json	=> sub {
+#	    my ( $bodies ) = @_;
+#	    _load_module( 'JSON' );
+#	    my $json = JSON->new()->pretty()->canonical()->utf8()
+#		->convert_blessed();
+#	    print $json->encode( $bodies );
+#	    return;
+#	},
+	verbose	=> sub {
+	    my ( $bodies ) = @_;
+	    my $dtfmt = "$parm{date_format} $parm{time_format}";
+	    foreach my $tle ( @{ $bodies } ) {
+		print "\n", $tle->tle_verbose(date_format => $dtfmt);
+	    }
+	    return;
+	},
+    );
+    $cmdlgl{tle} = [ 'choose=s@', keys %tle_formatter ];
+}
+
+
+sub tle {
+    my @specified = grep { $cmdopt{$_} } keys %tle_formatter;
+    @specified > 1
+	and die 'You may not specify more than one of ',
+	    join( ', ', map { "-$_" } @specified ), "\n";
+    my $bodies = $cmdopt{choose} ? [ _select_observing_list() ] : \@bodies;
+    if ( @specified ) {
+	my $code = $tle_formatter{$specified[0]}
+	    or confess 'Programming error - ',
+		"No TLE formatter for -$specified[0]";
+	$code->( $bodies );
+    } else {
+	foreach my $tle ( @{ $bodies } ) {
+	    print $tle->get( 'tle' );
+	}
+    }
+    return;
+}
+
+
+########################################################################
+#
+#	validate() - remove invalid data
+
+BEGIN {
+    $cmdlgl{validate} = [qw{quiet}];
+}
+
+sub validate {
+    my $pass_start = _parse_time (shift || 'today noon');
+    my $pass_end = _parse_time (shift || '+7');
+    $pass_start >= $pass_end and die <<eod;
+Error - End time must be after start time.
+eod
+
+#	Tell aggregate() how to work.
+
+    local $Astro::Coord::ECI::TLE::Set::Singleton = $parm{singleton};
+
+    my @valid;
+    foreach my $tle (_select_observing_list ($pass_start)) {
+	$tle->validate(\%cmdopt, $pass_start, $pass_end) or next;
+	push @valid, $tle->members();
+    }
+    @bodies = @valid;
+    return;
+
+}
+
+
+########################################################################
+
+#	Internally-used subroutines.
+
+#	Accessors and mutators are with show() and set() respectively.
+
+#	_aggregate ();
+
+#	This is just a wrapper for
+#	Astro::Coord::ECI::TLE::Set->aggregate. You can pass a single
+#	hash ref for the options hash.
+
+sub _aggregate {
+    Astro::Coord::ECI::TLE::Set->aggregate (@_, @bodies);
+}
+
+#	_display_timing ()
+
+#	Displays command timing information from the current frame
+#	if present, and clears it afterwards.
+
+sub _display_timing {
+if (@frame && $frame[$#frame]{timing}) {
+    my $end = _time ();
+    my $delta = _time_trim ($end - $frame[$#frame]{timing}{start});
+    print <<eod;
+Information - $frame[$#frame]{timing}{command}
+        elapsed time is $delta seconds.
+eod
+    delete $frame[$#frame]{timing};
+    }
+}
+
+
+#	$subtree = _find_first_tag (\@tree, $tag, ...)
+#
+#	descends through the given parse tree, recursively finding the
+#	given tags, and returning the subtree thus identified. It dies
+#	if a tag cannot be found.
+
+sub _find_first_tag {
+    my $tree = shift;
+    TAG_LOOP:
+    foreach my $tag (@_) {
+	foreach my $branch (@$tree) {
+	    next unless ref $branch eq 'ARRAY' && $branch->[0] eq $tag;
+	    $tree = $branch;
+	    next TAG_LOOP;
+	}
+	die "Error - Tag <$tag> not found.\n";
+    }
+    $tree;
+}
+
+#	@suff = _find_suffixes ($prefix, $package)
+
+#	This subroutine traverses the symbol table of the given
+#	package, looking for subroutine names that start with the given
+#	prefix, and returns all suffixes (i.e. the part of the name
+#	that is not the prefix). Its intent is to find out, for the
+#	purpose of producing helpful error messages, what 'geocode_*'
+#	and 'height_*' subroutines are currently implemented. The
+#	package name defaults to the current package.
+
+# Perl::Critic can't find code interpolated into strings
+sub _find_suffixes {	## no critic (ProhibitUnusedPrivateSubroutines)
+my $prefix = shift;
+my $package = shift || __PACKAGE__;
+my $symtab = $package . '::';
+my $re = qr{^$prefix};
+my $len = length ($prefix);
+my @rslt;
+no strict qw{refs};
+foreach my $symbol (keys %$symtab) {
+use strict qw{refs};
+    next unless $symbol =~ m/$re/ && $package->can ($symbol);
+    push @rslt, substr ($symbol, $len);
+    }
+sort @rslt;
+}
+
+
+#	$hashref = _flatten ($hashref)
+#
+#	This subroutine implements 'event flattening'; the conversion
+#	of all Astro::Coord::ECI subclasses in the hash into the base
+#	class.
+
+sub _flatten {
+    my $hash = shift;
+    foreach my $key (keys %$hash) {
+	if (eval {$hash->{$key}->represents ('Astro::Coord::ECI::TLE')}) {
+	    my $old = $hash->{$key};
+	    $hash->{$key} = Astro::Coord::ECI->new ()->
+		universal ($old->universal ())->
+		eci ($old->eci ());
+	    $hash->{$key}->set (
+		name => $old->get ('name'),
+		id => $old->get ('id'),
+	    );
+	} elsif (eval {$hash->{$key}->represents ('Astro::Coord::ECI')}) {
+	    my $old = $hash->{$key};
+	    my $meth = $old->get ('inertial') ? 'eci' : 'ecef';
+	    $hash->{$key} = Astro::Coord::ECI->new ()->
+		universal ($old->universal ())->
+		$meth ($old->$meth ());
+	    $hash->{$key}->set (
+		name => $old->get ('name'),
+		id => $old->get ('id'),
+	    );
+	} elsif (ref $hash->{$key} eq 'HASH') {
+	    _flatten ($hash->{$key});
+	}
+    }
+    $hash;
+}
+
+
+#	$string = _format_local_az_rng ($station, $body)
+
+#	This subroutine formats the azimuth and range of the body
+#	as seen from the station. If called with no arguments, it
+#	returns a suitable heading for this information.
+
+# Some calls are by code ref obtained by $self->can()
+sub _format_local_az_rng {
+    my ( $body ) = @_
+	or return ' azim     range    ';
+    my ( $az, undef, $rng ) = $body->azel();
+    return sprintf "%5.1f %-2s @{[$rng > 1e6 ? '%10.3e' : '%10.1f']}",
+	rad2deg ($az),
+	$bearing[floor ($az/TWOPI * @bearing + .5) % @bearing],
+	$rng;
+}
+
+
+#	$string = _format_local_azel ($station, $body)
+
+#	This subroutine formats the elevation and azimuth of the body
+#	as seen from the station. If called with no arguments, it
+#	returns a suitable heading for this information.
+
+# Called by code ref obtained by $self->can()
+sub _format_local_azel {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $body ) = @_
+	or return ' elev  azim   ';
+    my ( $az, $el ) = $body->azel();
+    return sprintf "%5.1f %5.1f %-2s",
+	rad2deg ($el), rad2deg ($az),
+	$bearing[floor ($az/TWOPI * @bearing + .5) % @bearing];
+}
+
+
+#	$string = _format_local_azel_rng ($station, $body)
+
+#	This subroutine formats the elevation, azimuth, and range of
+#	the body as seen from the station. If called with no arguments,
+#	it returns a suitable heading for this information.
+
+# Called by code ref obtained by $self->can()
+sub _format_local_azel_rng {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $body ) = @_
+	or return ' elev  azim     range    ';
+    my ( $az, $el, $rng ) = $body->azel();
+    return sprintf "%5.1f %5.1f %-2s @{[$rng > 1e6 ? '%10.3e' : '%10.1f']}",
+	rad2deg ($el), rad2deg ($az),
+	$bearing[floor ($az/TWOPI * @bearing + .5) % @bearing],
+	$rng;
+}
+
+#	$string = _format_local_equatorial ($station, $body)
+
+#	This subroutine formats the right ascension and declination of
+#	the body as seen from the station. If called with no arguments,
+#	it returns a suitable heading for this information.
+
+# Called by code ref obtained by $self->can()
+sub _format_local_equatorial {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $body ) = @_
+	or return 'right asc decl';
+    my ( $ra, $dec ) = _get_equatorial_coordinates( $body );
+    return sprintf "%s %5.1f",
+	_rad2hms ($ra), rad2deg ($dec);
+}
+
+#	$string = _format_local_equatorial_rng ($station, $body)
+
+#	This subroutine formats the right ascension, declination, and
+#	range of the body as seen from the station. If called with no
+#	arguments, it returns a suitable heading for this information.
+
+# Called by code ref obtained by $self->can()
+sub _format_local_equatorial_rng {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $body ) = @_
+	or return 'right asc decl  range    ';
+    my ( $ra, $dec, $rng ) = _get_equatorial_coordinates( $body );
+    return sprintf "%s %5.1f @{[$rng > 1e6 ? '%10.3e' : '%10.1f']}",
+	_rad2hms ($ra), rad2deg ($dec), $rng;
+}
+
+
+#	$location = _format_location ()
+
+#	Formats the location data for printing.
+
+sub _format_location {
+$parm {location} ?
+    sprintf (
+	<<eod, map {$parm{$_}} qw{location latitude longitude height}) :
+Location: %s
+          Latitude %.4f, longitude %.4f, height %.0f m
+eod
+    sprintf (
+	<<eod, map {$parm{$_}} qw{latitude longitude height});
+Location: Latitude %.4f, longitude %.4f, height %.0f m
+eod
+}
+
+#	$input_handle = _frame_pop ();
+
+#	Pops a stack frame. Returns the desired input handle, or
+#	undef if there are no frames left on the stack.
+
+sub _frame_pop {
+my $info = pop @frame;
+@{$info->{lines}} and warn <<eod;
+Warning - Continued line not completed at end-of-file or abort.
+eod
+select ($info->{stdout});
+set (%{$info->{local_parm}}) if exists $info->{local_parm};
+_get_spacetrack ()->set (%{$info->{local_st}})
+    if exists $info->{local_st};
+if (exists $info->{macro}) {
+    foreach my $name (keys %{$info->{macro}}) {
+	if (defined $info->{macro}{$name}) {
+	    $macro{$name} = $info->{macro}{$name};
+	    }
+	  else {
+	    delete $macro{$name};
+	    }
+	}
+    }
+_display_timing ();
+@frame ? $info->{stdin} : undef;
+}
+
+#	my ($ra, $dec, $rng) = _get_equatorial_coordinates ($body);
+
+#	Get the required equatorial coordinates, precessed to
+#	desired_equinox_dynamical if that is set.
+
+sub _get_equatorial_coordinates {
+    my ( $body ) = @_;
+    if ( my $equinox = $parm{desired_equinox_dynamical} ) {
+	my $sta;
+	$sta = $body->get( 'station' )
+	    and $sta->universal( $body->universal() );
+	$body = $body->clone()->precess_dynamical( $equinox );
+    }
+    return $body->equatorial();
+}
+
+
+#	$st = _get_spacetrack ($conditional)
+
+#	Gets the Astro::SpaceTrack object, instantiating it if
+#	necesary. If the $conditional argument is true, the object
+#	is returned if it has already been instantiated, otherwise
+#	undef is returned.
+
+{	# Local symbol block.
+
+    my $st;
+
+    sub _get_spacetrack {
+	shift and return $st;
+	_load_module ('Astro::SpaceTrack', @_);
+	$st ||= 
+	    Astro::SpaceTrack->new (
+		webcmd => $parm{webcmd},
+		filter => 1,
+		iridium_status_format => 'kelso',
+	    );
+    }
+}	# End local symbol block.
+
+#	@names = _get_spacetrack_attrib_names ();
+
+#	Get the names of all the Spacetrack attributes.
+
+{	# local symbol block.
+my @names;
+
+sub _get_spacetrack_attrib_names {
+unless (@names) {
+    my $st = _get_spacetrack ();
+    if ($st->can ('attribute_names')) {
+	@names = $st->attribute_names ();
+	}
+      else {
+	eval {$st->get ('##')};
+	(my $data = $@) =~ s/.*?Legal attributes are\s+//;
+	$data =~ s/\..*//s;
+	@names = split ',\s*', $data;
+	}
+    }
+@names;
+}
+}	# end local symbol block;
+
+
+#	_get_station ();
+
+#	This subroutine manufactures and returns a station object
+#	appropriate to the current parameter settings. It throws an
+#	exception if the height, latitude, and longitude are not
+#	defined.
+
+sub _get_station {
+defined $parm{height} && defined $parm{latitude} &&
+    defined $parm{longitude} or die <<eod;
+Error - You must set height, latitude, and longitude to use this
+        function.
+eod
+    Astro::Coord::ECI->new (
+	    almanac_horizon	=> $parm{_almanac_horizon},
+	    horizon		=> $parm{_horizon},
+	    refraction		=> $parm{refraction},
+	    name		=> $parm{location} || 'Station',
+	    id			=> 'station',
+	    )
+	->geodetic (
+	    deg2rad ($parm{latitude}), deg2rad ($parm{longitude}),
+	    $parm{height} / 1000);
+}
+
+
+#	$suf = _get_suffix ($prefix, $backoff);
+
+#	Gets the suffix of the caller's name. All that this really does
+#	is to get the caller's name and use the length of the prefix
+#	argument to determine the number of characters to strip off the
+#	front. The optional $backoff argument says how many levels of
+#	call to back off; the default is 1, meaning to get the suffix
+#	of the caller.
+
+sub _get_suffix {
+    my ( $prefix, $backoff ) = @_;
+    my $rtn = ( caller( $backoff || 1 ) )[3];
+    $rtn =~ s/ .* :: //smx;
+    $rtn =~ s/ \A _+ //smx;
+    $rtn = substr $rtn, length $prefix;
+    $rtn =~ s/ __ .* //smx;
+    $rtn;
+}
+
+#	$string = _get_time ($name);
+
+#	Accessor for a time attribute. Returns '0' if the attribute is
+#	not set, or a string representing the attribute in GMT if it is
+#	set.
+
+sub _get_time {
+    my ($name) = @_;
+    if ($parm{$name}) {
+	return strftime '%d-%b-%Y %H:%M:%S UT', gmtime $parm{$name};
+    } else {
+	return 0;
+    }
+}
+
+#	__PACKAGE__->_iridium_status ($text)
+
+#	Parses the given text and updates the status of all Iridium
+#	satellites. If no argument specified, the status is retrieved
+#	using Astro::SpaceTrack->iridium_status ().
+
+#	We use the OO calling convention for convenience in dispatch.
+
+sub _iridium_status {
+shift;
+unless (@_) {
+    my $st = _get_spacetrack ();
+    my ($rslt, @rest) = $st->iridium_status;
+    $rslt->is_success or die $rslt->status_line;
+    push @_, @rest;
+    }
+
+if (@_ && ref $_[0] eq 'ARRAY') {
+    Astro::Coord::ECI::TLE->status (clear => 'iridium');
+    foreach (@{$_[0]}) {
+	Astro::Coord::ECI::TLE->status (add => $_->[0], iridium =>
+	    $_->[4], $_->[1], $_->[5]);
+    }
+} else {
+    confess <<eod;
+Program error - Portable status not passed, and unavailable from
+        Astro::SpaceTrack->iridium_status.
+eod
+}
+
+foreach my $tle (@bodies) {
+    $tle->rebless ();
+    }
+
+}
+
+#	$handle = _memio ($access, \$memory)
+
+#	Generates a handle to do I/O to the $memory string. The $access
+#	parameter specifies the access (typically ">" or "<").
+
+BEGIN {
+
+*_memio = $] >= 5.008 ?
+    sub {my $hdl; open ($hdl, $_[0], $_[1]) || die <<eod; $hdl} :
+Failed to open @_
+    $!
+eod
+    do {
+	eval "use IO::String";
+	$io_string_unavailable = "Error - IO::String unavailable.\n" if @_;
+	$@ ? sub {die $io_string_unavailable} :
+	    sub {IO::String->new ($_[1])}
+	}
+}
+
+#	_load_module ($module_name)
+
+#	Loads the module if it has not yet been loaded. Dies if it
+#	can not be loaded.
+
+BEGIN {	# Begin local symbol block
+
+    my %version = (
+	'Astro::SpaceTrack' => 0.052,
+    );
+
+    sub _load_module {
+	my @module = ref $_[0] eq 'ARRAY' ? @{shift ()} : shift ||
+	    die "Programming error - No module specified";
+	my @probs;
+	foreach my $module (@module) {
+	    eval {load_module ($module); 1} or do {
+		push @probs, "$module must be installed";
+		next;
+	    };
+	    my $modver;
+	    $version{$module} && ($modver = $module->VERSION) and do {
+		$modver =~ s/_//g;
+		$modver < $version{$module} and do {
+		    push @probs,
+		    "$module version must be at least $version{$module}";
+		    next;
+		};
+	    };
+	    return $module;
+	}
+	push @probs, "if you wish to use command @_" if @_;
+	my $pfx = 'Error -';
+	die map {my $x = "$pfx $_\n"; $pfx = ' ' x 7; $x} @probs;
+    }
+
+}	# end local symbol block.
+
+#	@times = _mytime($time);
+
+#	Returns seconds, minutes, hours, and so on. It is localtime if
+#	the gmt parameter is false, or GMT if it is true.
+
+sub _mytime {
+    return $parm{gmt} ? gmtime($_[0]) : localtime($_[0]);
+}
+
+#	$angle = _parse_angle ($string)
+
+#	Parses an angle in degrees, hours:minutes:seconds, or
+#	degreesDminutesMsecondsS and returns the angle in degrees.
+#
+#	NOTE that the almanac_horizon code relies on this returning
+#	whatever it is given unless it is recognized as
+#	hours:minutes:seconds or degreesDminutesMsecondsS.
+
+sub _parse_angle {
+my $angle = shift;
+defined $angle or return;
+if ($angle =~ m/:/) {
+    my ($h, $m, $s) = split ':', $angle;
+    $s ||= 0;
+    $m ||= 0;
+    $h ||= 0;
+    $m += $s / 60;
+    $h += $m / 60;
+    $angle = $h * 360 / 24;
+    }
+  elsif ($angle =~ m/^([+\-])?(\d*)d(\d*(?:\.\d*)?)(?:m(\d*(?:\.\d*)?)s?)?$/i) {
+    $angle = ((($4 || 0) / 60) + ($3 || 0)) / 60 + ($2 || 0);
+    $angle = -$angle if $1 && $1 eq '-';
+    }
+$angle;
+}
+
+#	$distance = _parse_distance ($string, $units)
+
+#	Strips 'm', 'km', 'au', 'ly', or 'pc' from the end of $string,
+#	the default being $units. Converts to km.
+
+BEGIN {
+my %units = (
+    m => .001,
+    km => 1,
+    au => AU,
+    ly => LIGHTYEAR,
+    pc => PARSEC,
+    );
+
+sub _parse_distance {
+my ($string, $dfdist) = @_;
+my $dfunits = $dfdist =~ s/([[:alpha:]]+)$// ? $1 : 'km';
+my $units = lc ($string =~ s/([[:alpha:]]+)$// ? $1 : $dfunits);
+$units{$units} or die <<eod;
+Error - Units of '$units' are unknown.
+eod
+looks_like_number ($string) or die <<eod;
+Error - '$string' is not a number.
+eod
+$string * $units{$units};
+}
+}	# end of BEGIN block
+
+#	$time = _parse_time ($string, $default)
+
+#	Parses a time string in any known format. Strings with a
+#	leading "+" or "-" are assumed to be relative to the last
+#	explicit setting. Otherwise the time is assumed to be explicit,
+#	and passed to Date::Manip. The parsed time is returned. If the
+#	time to be parsed is false (in the Perl sense) we return the
+#	default (if specified) or the current time. We die on an
+#	invalid time.
+
+BEGIN {	# Begin local symbol block.
+
+    my $last_time_set = time ();
+    my $initial_time_set = $last_time_set;
+
+    sub _parse_time {
+    my $time = $_[0] or return $_[1] || time ();
+    if ($time =~ m/^([\+\-])\s*(\d+)(?:\s+(\d+)(?::(\d+)(?::(\d+))?)?)?/) {
+	my $delta = ((($2 || 0) * 24 + ($3 || 0)) * 60 +
+	    ($4 || 0)) * 60 + ($5 || 0);
+	$last_time_set = $1 eq '+' ?
+	    $last_time_set + $delta :
+	    $last_time_set - $delta;
+	}
+      else {
+	defined( my $parsed_time =
+	    _parse_time_absolute( $time ) )
+	    or die <<eod;
+Error - Invalid time '$time'
+eod
+	$last_time_set = $parsed_time;
+	$parm{perltime}
+	    and _parse_time_absolute_use_perltime()
+	    and $last_time_set = _apply_perltime( $last_time_set );
+	$initial_time_set = $last_time_set;
+	}
+    }
+
+    sub _apply_perltime {
+	my ( $time ) = @_;
+	my @t = gmtime $time;
+	$t[5] += 1900;
+	return time_local( @t );
+    }
+
+
+#	Reset the last time set.
+
+    sub _parse_time_reset {$last_time_set = $initial_time_set}
+
+}	# End local symbol block.
+
+
+#	$seconds_since_epoch = _parse_time_absolute( $string )
+
+#	Parse the given time using the first of the following mechanisms
+#	which is available:
+#	    Date::Manip::UnixDate
+#	    an internal quasi-ISO-8601 parser.
+
+BEGIN {
+    eval {
+
+	# Workaround for bug (well, _I_ think it's a bug) introduced
+	# into Date::Manip with 6.34, while fixing RT #78566. My bug
+	# report is RT #80435.
+	my $path = $ENV{PATH};
+	local $ENV{PATH} = $path;
+
+	require Date::Manip;
+
+	my $dm_ver = Date::Manip->VERSION();
+	$dm_ver =~ s/ _ //smxg;
+
+	# At version 6.49, the TZ configuration variable was deprecated
+	# in favor of the SetDate or ForceTime variables. So we need to
+	# check the Date::Manip version and Do The Right Thing depending
+	# on what it is.
+	if ( $dm_ver >= 6.49 ) {
+	    my $tz_init = grep { m/ \A SetDate= /smx } Date::Manip::Date_Init();
+
+	    *_parse_time_absolute_init = sub {
+		my ( $tz ) = @_;
+		if ( defined $tz ) {
+		    $tz =~ s/ \A (?: gmt | ut ) \z /UT/smxi;
+		    Date::Manip::Date_Init( "SetDate=zone,$tz" );
+		} else {
+		    Date::Manip::Date_Init( $tz_init );
+		}
+		return;
+	    };
+
+	    *_parse_time_absolute_init_perltime = sub {
+		Date::Manip::Date_Init( 'SetDate=zone,UT' );
+		return;
+	    };
+	} else {
+
+	    my $tz_init = grep { m/ \A TZ= /smx } Date::Manip::Date_Init();
+
+	    *_parse_time_absolute_init = sub {
+		my ( $tz ) = @_;
+		Date::Manip::Date_Init( defined $tz ? "TZ=$tz" : $tz_init );
+		return;
+	    };
+
+	    *_parse_time_absolute_init_perltime = sub {
+		Date::Manip::Date_Init( 'TZ=GMT' );
+		return;
+	    };
+
+	}
+
+    #	The problem we're solving with the following is that
+    #	Date::Manip assumes an epoch of midnight January 1 1970, but
+    #	MacPerl takes the Mac OS 9 epoch of January 1 1904, local.
+    #	Rather than get Date::Manip patched, we just fudge the
+    #	results where needed.
+
+	my $date_manip_fudge = 
+	    $^O eq 'MacOS' ? time_gm( 0, 0, 0, 1, 0, 1970 ) : 0;
+
+	*_parse_time_absolute = sub {
+	    my ( $string ) = @_;
+	    defined( my $time = Date::Manip::UnixDate( $string, '%s' ) )
+		or return;
+	    return $time + $date_manip_fudge;
+	};
+
+	*_parse_time_absolute_use_perltime = $dm_ver < 6 ? sub { 1 } : sub { 0 };
+
+    } || do {
+
+	*_parse_time_absolute_init = sub {};
+	*_parse_time_absolute_init_perl = sub {};
+	*_parse_time_absolute =
+	    \&Astro::Coord::ECI::Utils::__parse_time_iso_8601;
+	*_parse_time_absolute_use_perltime = sub { 0 };
+    };
+}
+
+#	@tree = _parse_xml ($data, $command_name)
+
+#	Parses the given $data as XML, using either XML::Parser or
+#	XML::Parser::Lite, whichever is the first one that can be
+#	loaded. The $command_name argument is optional, and is used
+#	only for _load_module's error reporting.
+
+sub _parse_xml {
+    my $data = shift;
+
+    my $xml_parser = _load_module (
+	['XML::Parser', 'XML::Parser::Lite'], @_);
+
+    my $root;
+    my @tree;
+
+    my $psr = $xml_parser->new (
+	Handlers => {
+	    Init => sub {
+		$root = [];
+		@tree = ($root);
+	    },
+	    Start => sub {
+		shift;
+		my $tag = shift;
+		my $item = [$tag, {@_}];
+		push @{$tree[$#tree]}, $item;
+		push @tree, $item;
+	    },
+	    Char => sub {
+		push @{$tree[$#tree]}, $_[1];
+	    },
+	    End => sub {
+		my $tag = $_[1];
+		die <<eod unless @tree > 1;
+Error - Unmatched end tag </$tag>
+eod
+		die <<eod unless $tag eq $tree[$#tree][0];
+Error - End tag </$tag> does not match start tag <$tree[$#tree][0]>
+eod
+		pop @tree;
+	    },
+	    Final => sub {
+		_strip_empty_xml ($root);
+		@$root;
+	    },
+	});
+
+    $psr->parse ($data);
+}
+
+
+#	$quoted = _quoter ($string)
+
+#	Quotes and escapes the input string if and as necessary for parser.
+
+sub _quoter {
+my $string = shift;
+return $string if looks_like_number ($string);
+return "''" unless $string;
+return $string unless $string =~ m/[\s'"]/;
+$string =~ s/([\\'])/\\$1/g;
+return "'$string'";
+}
+
+#	$string = _rad2hms ($angle)
+
+#	Converts the given angle in radians to hours, minutes, and
+#	seconds (of right ascension, presumably)
+
+sub _rad2hms {
+my $sec = shift (@_) / PI * 12;
+my $hr = floor ($sec);
+$sec = ($sec - $hr) * 60;
+my $min = floor ($sec);
+$sec = ($sec - $min) * 60;
+my $rslt = sprintf '%2d:%02d:%02d', $hr, $min, floor ($sec + .5);
+$rslt;
+}
+
+#	@data = _select_matching_bodies (\@data, \@choose);
+#	takes as input a reference to a list of data and a reference
+#	to a list of names or numbers to choose.
+#	The data list is composed of Astro::Coord::ECI objects.
+#	The choice list is numbers or names, the latter being rendered
+#	as case-insensitive regular expressions.
+#
+#	All this really does is to delegate to _select_matching_data,
+#	after manufacturing the correct first argument.
+
+sub _select_matching_bodies {
+    ($_[1] && @{$_[1]}) ?
+	_select_matching_data (
+	    [map {[$_->get ('id'), $_->get ('name') || '', $_]} @{$_[0]}],
+	    $_[1]) : @{$_[0]}
+}
+
+#	@data = _select_matching_data (\@data, \@choose);
+#	takes as input a reference to a list of data and a reference
+#	to a list of names or numbers to choose.
+#	The data list is composed of three-element list references:
+#	item 0 is the ID number, item 1 is the name, and item 2 is
+#	the object having that number and name.
+#	The choice list is numbers or names, the latter being rendered
+#	as case-insensitive regular expressions.
+
+sub _select_matching_data {
+    my ($data, $choose) = @_;
+    my @keep;
+    if ($choose && @$choose) {
+	my %want;
+	my @check = map {
+	    m/\D/ || length $_ < 4 || $want{$_}++;
+	    qr{$_}i}
+	    map {split '\s*,\s*', $_} @$choose;
+	foreach my $tle (@$data) {
+	    $want{$tle->[0]} and do {push @keep, $tle->[2]; last};
+	    foreach my $test (@check) {
+		$tle->[1] =~ m/$test/ or next;
+		push @keep, $tle->[2];
+		last;
+	    }
+	}
+    } else {
+	@keep = map {$_->[2]} @$data;
+    }
+    return wantarray ? @keep : \@keep;
+}
+
+#	@list = _select_observing_list ($time)
+
+#	This subroutine selects and returns the correct TLEs to use
+#	for calculations relevant to the given time. The algorithm
+#	is:
+#	    * If there is only one tle for a given NORAD ID, it is
+#		returned; otherwise
+#	    * If there is any tle for the given NORAD ID having an
+#		epoch less than the given time, the most recent
+#		such tle is returned; otherwise
+#	    * The earliest such tle (whose epoch is necessarily
+#		AFTER the given time) is returned.
+#	The returned list contains each NORAD ID in the observing
+#	list exactly once, in ascending order by NORAD ID.
+#
+# >>>>	Note that in the current implementation the presence of the
+# >>>>	time argument is used as a flag to determine whether we want
+# >>>>	aggregation into sets or not.
+
+sub _select_observing_list {
+my $time = shift;
+my $choose = $cmdopt{choose} || [];
+my $data;
+if ($time) {
+    $data = [_aggregate ()];
+    }
+  elsif ($cmdopt{epoch}) {
+    my $time = _parse_time ($cmdopt{epoch});
+    $data = [_aggregate({select => $time})];
+    }
+  else {
+    $data = \@bodies;
+    }
+if (@$choose) {
+    $data = _select_matching_bodies ($data, $choose);
+    }
+@$data
+}
+
+#	@coordinates = _simbad ($query);
+
+#	Looks up the given star in the SIMBAD catalog. We are actually
+#	a dispatcher based on the setting of the simbad_version
+#	parameter.
+
+sub _simbad {
+    if (my $code = __PACKAGE__->can ("_simbad$parm{simbad_version}")) {
+	$code->(@_);
+    } else {
+	die <<eod;
+Programming Error - Parameter simbad_version set to '$parm{simbad_version}',
+        but subroutine _simbad$parm{simbad_version} does not exist.
+eod
+    }
+}
+
+
+#	@coordinates = _simbad4 ($query)
+
+#	Look up the given star in the SIMBAD catalog. This assumes
+#	SIMBAD 4.
+
+#	We die on any error.
+
+# Called from _simbad() above by code reference
+sub _simbad4 {	## no critic (ProhibitUnusedPrivateSubroutines)
+_load_module ('Astro::SIMBAD::Client');
+my $query = shift;
+my $simbad = Astro::SIMBAD::Client->new (
+    format => {txt => 'FORMAT_TXT_SIMPLE_BASIC'},
+    parser => {
+	script	=> 'Parse_TXT_Simple',
+	txt	=> 'Parse_TXT_Simple',
+    },
+    server => $parm{simbad_url},
+    type => 'txt',
+);
+# I prefer script() to query() these days because the former does
+# not require SOAP::Lite, which seems to be getting flakier as time
+# goes on.
+# TODO get rid of $fmt =~ s/// once I massage
+# FORMAT_TXT_SIMPLE_BASIC in Astro::SIMBAD::Client
+#   my @rslt = $simbad->query (id => $query)
+## my @rslt = $simbad->query (id => $query) or die <<eod;
+my $fmt = Astro::SIMBAD::Client->FORMAT_TXT_SIMPLE_BASIC();
+$fmt =~ s/ \n //smxg;
+my @rslt = $simbad->script( <<"EOD" )
+format obj "$fmt"
+query id $query
+EOD
+    or die <<"EOD";
+Error - No entry found for $query.
+EOD
+@rslt > 1 and die <<eod;
+Error - More than one entry found for $query.
+eod
+@rslt = map {$rslt[0]{$_} eq '~' ? 0 : $rslt[0]{$_} || 0} qw{
+    ra dec plx pmra pmdec radial};
+$rslt[0] && $rslt[1] or die <<eod;
+Error - No position returned by $query.
+eod
+$rslt[2] = $rslt[2] ? 1000 / $rslt[2] : 10000;
+$rslt[3] and $rslt[3] /= 1000;
+$rslt[4] and $rslt[4] /= 1000;
+wantarray ? @rslt : join ' ', @rslt;
+}
+
+=begin comment
+
+Not used, as far as I can tell.
+
+#	@list = _sort_observing_list ()
+
+#	This subroutine sorts the observing list into ascending order
+#	by NORAD ID, and within NORAD ID by ascending epoch, using the
+#	Schwartzian transform. The sorted list is returned, and the
+#	original list is unmodified.
+
+sub _sort_observing_list {
+map {$_->[2]}
+    sort {$a->[0] <=> $b->[0] || $a->[1] <=> $b->[1]}
+    map {[$_->get ('id'), $_->get ('epoch'), $_]} @bodies;
+}
+
+=end comment
+
+=cut
+
+#	$fn = _storable ($file)
+
+#	Initialize and check arguments for use of the Storable module.
+#	The return is the tilde-expanded filename.
+
+sub _storable {
+eval {require Storable} or die <<eod;
+Error - Storable module not available.
+eod
+my $fn = shift or die <<eod;
+Error - No file name specified.
+eod
+_tilde_expand ($fn);
+}
+
+#	_strip_empty_xml (\@tree)
+#
+#	splices out anything in the tree that is not a reference and
+#	does not match m/\S/. It would be more natural to do this in
+#	the Char handler, but I can't figure out how to preserve the
+#	regular expression context XML::Parser::Lite needs.
+
+sub _strip_empty_xml {
+    my $ref = shift;
+    my $inx = @$ref;
+    while (--$inx >= 0) {
+	my $val = $ref->[$inx];
+	my $typ = ref $val;
+	if ($typ eq 'ARRAY') {
+	    _strip_empty_xml ($val);
+	} elsif (!$typ) {
+	    splice @$ref, $inx, 1 unless $val =~ m/\S/ms;
+	}
+    }
+}
+
+
+#	$value = _sub_arg ($spec, $default, \@args)
+
+#	This subroutine figures out what to substitute into a
+#	macro being expanded, given the thing being substituted,
+#	the default, and a list of the arguments provided.
+#
+#	If $spec is an unsigned integer, it returns the corresponding
+#	element of the @args list (numbered FROM 1) if that argument
+#	is defined, otherwise you get the default.
+#
+#	If $spec is the name of a parameter, you get that parameter's
+#	value.
+#
+#	If $spec is the name of an environment variable, you get that
+#	environment variable's value.
+#
+#	If all else fails, you get the default.
+
+sub _sub_arg {
+my ($name, $dflt, $args) = @_;
+$dflt = '' unless defined $dflt;
+my $ctrl = $dflt =~ s/^(\W)// ? $1 : '-';
+my $val = $name !~ m/\D/ ? $args->[$name - 1] :
+    exists $mutator{$name} ? $parm{$name} : $ENV{$name};
+my $rslt;
+if ($ctrl eq '+') {
+    $rslt = defined $val ? $dflt : '';
+    }
+  elsif ($val || looks_like_number $val) {
+    $rslt = $val;
+    }
+  elsif ($ctrl eq '-') {
+    $rslt = $dflt;
+    }
+  elsif ($ctrl eq '=') {
+    if ($name !~ m/\D/) {
+	$args->[$name - 1] = $dflt;
+	$rslt = $dflt;
+	}
+      elsif (exists $mutator{$name}) {
+	set ($name, $dflt);
+	$rslt = $parm{$name};
+	}
+      else {
+	$ENV{$name} = $dflt;
+	$rslt = $dflt;
+	}
+    }
+  elsif ($ctrl eq '?') {
+    die "$dflt\n";
+    }
+  else {
+    die "Unrecognized substitution control character '$ctrl'\n";
+    }
+$rslt;
+}
+
+#	$expand = _tilde_expand ($filename)
+
+#	Perform tilde expansion on the given filename if needed.
+
+sub _tilde_expand {
+    (my $rslt = $_[0] || '') =~ s%^~(\w*)%
+	$1 ? do {
+	    my @info = eval {getpwnam ($1)} or die $@ ?
+		"Error - '~user' does not work under $^O.\n" :
+		"Error - No such user as '$1'.\n";
+	    $info[7]
+	} :
+	$^O eq 'VMS' ? '/sys$login' : ($ENV{HOME} || $ENV{LOGDIR} ||
+	    $ENV{USERPROFILE})%e;
+    $rslt
+}
+
+#	$time = _time ()
+
+#	The first time this is called, it attempts to load Time::HiRes.
+#	If it succeeds it redefines itself to Time::HiRes::time if that
+#	exists. Otherwise it redefines itself to CORE::time. Either
+#	way it then transfers control to its redefined self.
+
+sub _time () {
+    eval "use Time::HiRes";
+    no warnings qw{redefine};
+    if (my $code = Time::HiRes->can ('time')) {
+	*_time = $code;
+	*_time_trim = sub {sprintf '%.3f', $_[0]};
+    } else {
+	*_time = \&CORE::time;
+	*_time_trim = sub {$_[0]};
+    }
+    goto &_time;
+}
+
+########################################################################
+
+package IO::Clipboard;
+
+use Carp;
+use Config;
+use Symbol;
+
+my ($clip, $clipout, $memio);
+our @ISA;
+
+BEGIN {
+
+$IO::Clipboard::clipboard_unavailable = '';
+
+eval "use Scalar::Util qw{weaken}; 1"
+    or $IO::Clipboard::clipboard_unavailable = <<eod;
+Error - Clipboard unavailable. Unable to load Scalar::Util weaken.
+eod
+
+sub _win32 {
+eval "use Win32::Clipboard" ?
+    sub {(my $s = $_[0]) =~ s/\n/\r\n/mg;
+	Win32::Clipboard->new ()->Set ($s)} : undef
+}
+
+sub _xclip {
+no warnings;
+`xclip -o`;
+use warnings;
+$? ? undef : sub {
+    my $hdl;
+    open ($hdl, '|xclip') or croak <<eod;
+Error - Failed to open handle to xclip.
+        $!
+eod
+    print $hdl $_[0];
+    };
+}
+
+sub _pb {
+    my $code;
+    $code = eval {
+	require Mac::Pasteboard;
+	sub {Mac::Pasteboard::pbcopy($_[0])};
+    } and return $code;
+### no warnings;
+system('pbcopy -help >/dev/null 2>&1');
+### use warnings;
+$? ? undef : sub {
+    my $hdl;
+    open ($hdl, '|pbcopy') or croak <<eod;
+Error - Failed to open handle to pbcopy.
+        $!
+eod
+    print $hdl $_[0];
+    };
+}
+
+sub _flunk {
+$IO::Clipboard::clipboard_unavailable = shift;
+}
+
+my $err = "Can not open handle to clipboard.";
+
+$clipout = eval {$^O eq 'MSWin32' ? _win32 || _flunk (<<eod) :
+Error - Clipboard unavailable. Can not load Win32::Clipboard.
+eod
+    $^O eq 'cygwin' ? _win32 || _xclip || _flunk (<<eod) :
+Error - Clipboard unavailable. Can not load Win32::Clipboard
+        and xclip has not been installed. For xclip, see
+        http://freshmeat.net/projects/xclip
+eod
+    $^O eq 'darwin' ? _pb || _flunk (<<eod) :
+Error - Clipboard unavailable. Can not load Mac::Pasteboard, and
+        can not find pbcopy. The latter is supposed to come with
+        Mac OS X.
+eod
+    $^O eq 'MacOS' ? _flunk (<<eod) :
+Error - Clipboard unavailable. Mac OS 9 and below not supported.
+eod
+    _xclip || _flunk (<<eod)};
+Error - Clipboard unavailable. Can not find xclip. For xclip,
+        see http://freshmeat.net/projects/xclip
+eod
+
+$memio = $] >= 5.008 && $Config{useperlio} ?
+    sub {my $fh = gensym; open ($fh, $_[0], $_[1]); $fh} :
+    do {
+	eval "use IO::String";
+	$@ or push @ISA, 'IO::String';
+        $@ ? sub {croak "$err IO::String not available"} :
+	    sub {new IO::String ($_[1])};
+	};
+
+*_memio = \&$memio;
+}
+
+sub new {
+return $clip if $clip;
+croak $IO::Clipboard::clipboard_unavailable
+    if $IO::Clipboard::clipboard_unavailable;
+my $class = shift;
+my $data = '';
+my $clip = _memio ('>', \$data);
+*$clip->{__PACKAGE__}{data} = \$data;
+bless $clip, $class;
+my $self = $clip;
+weaken ($clip);	# So we destroy the held copy when we need to.
+$self;
+}
+
+sub DESTROY {
+my $self = shift;
+my $data = *$self->{__PACKAGE__}{data};
+$clipout->($$data);
+}
+
+########################################################################
+
+#	Test hook.
+
+package Astro::satpass::Test;
+
+use Carp;
+use Config;
+
+our @ISA;
+
+our $noios;
+
+unless ($] >= 5.008 && $Config{useperlio}) {
+    eval "use IO::String";
+    if ($@) {
+	$noios = $@;
+	}
+    else {
+	push @ISA, 'IO::String';
+	}
+    }
+
+
+our $Hook;	# Code reference that we use to get data from.
+our $Handle;	# First argument to pass to hook when called.
+our $Exception;
+
+sub new {
+my $class = shift;
+confess <<eod if $noios;
+Programming error - You are trying to use the test hook under
+        a version of Perl prior to v5.8 and you do not have
+	the IO::String package available.
+eod
+confess <<eod unless ref $Hook eq 'CODE';
+Programming error - Should not instantiate a @{[__PACKAGE__]} object
+        unless \$@{[__PACKAGE__]}::Hook has been set to a code
+	reference.
+eod
+my $data = '';
+my $hook = IO::Clipboard::_memio ('+<', \$data);
+*$hook->{__PACKAGE__} = {
+	data => \$data,
+	loc => 0,
+	last_line => undef,
+	};
+bless $hook, $class;
+$hook;
+}
+
+sub getline {
+my $self = shift;
+my $attr = *$self->{__PACKAGE__};
+my $oldout = select (*STDOUT);
+$attr->{last_line} =
+    $Hook->($Handle, $attr->{last_line},
+	substr (${$attr->{data}}, $attr->{loc}), $Exception);
+$Exception = undef;
+select ($oldout);
+$attr->{loc} = length ${$attr->{data}};
+$attr->{last_line};
+}
+
+__END__
+
+=head1 NAME
+
+satpass - Predict satellite passes over an observer.
+
+=head1 SYNOPSIS
+
+The intent is to be 'one stop shopping' for satellite passes. Almost
+all necessary data can be acquired from within the satpass script,
+an initialization file can be used to make your normal settings, and
+macros can be defined to issue frequently-used commands.
+
+ $ satpass
+ 
+ [various front matter displayed]
+ 
+ satpass> # Get observer's latitude, longitude and height.
+ satpass> geocode '1600 Pennsylvania Ave Washington DC'
+ satpass> # Don't use SpaceTrack when a redistributor has the data.
+ satpass> # If you don't set direct, you must have a SpaceTrack login.
+ satpass> st set direct 1
+ satpass> # Get the top 100 (or so) visible satellites from CelesTrak.
+ satpass> st celestrak visual
+ satpass> # Keep only the HST and the ISS by NORAD ID number
+ satpass> choose 20580 25544
+ satpass> # Predict for a week, with output to visual.txt
+ satpass pass 'today noon' +7 >visual.txt
+ satpass> # Get Iridium satellites.
+ satpass> st celestrak iridium
+ satpass> # Predict flares and scroll thru output if you have 'less'.
+ satpass> flare |less
+ satpass> # We're done
+ satpass> exit
+
+=head1 NOTICE
+
+As of release 0.057 this script is deprecated. See below for details. In
+the first release of the year 2014 I intend to remove the question in
+the installer that allows this script to be installed, and to rename the
+entire distribution from the current C<Astro-satpass> to
+C<Astro-Coord-ECI>.
+
+This release supports the new C<pass_threshold> attribute of
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>, which provides a way
+to decouple how high a pass need to be to be reported from how high the
+horizon is.
+
+The C<status iridium> command is now fatal. It has been deprecated in
+favor of C<status show> for some time now, and has warned on every use
+since version 0.044 (October 19 2011).
+
+A production version of the C<Asto-App-Satpass2> package, which is the
+planned successor to this script, was released February 5 2012.
+
+Once I consider this production-quality (six months to a year after I go
+to a production version number) the F<satpass> script will become
+deprecated, and eventually will be removed (or moved to the F<eg/>
+directory). When this happens, the C<Astro-satpass> distribution will be
+replaced by the C<Astro-Coord-ECI> distribution.
+
+Most of the functionality of the F<Astro-App-Satpass2> distribution will
+be in the Astro::App::Satpass2 class. A minimal F<satpass2> script will
+be provided to manufacture an Astro::App::Satpass2 object and invoke its
+run method. I will try to keep the core functionality the same, and to
+document in Astro::App::Satpass2 any incompatibilities introduced.
+
+Since Perl's dependency mechanism is based on module names, not package
+names, I assume that there will be no problems with packages that depend
+on the Astro::Coord::ECI modules. But I will try to give the authors of
+such packages a month's notice before releasing the first
+Astro-Coord-ECI package.
+
+One incentive for doing this is to restructure the F<satpass>
+functionality to be more easily testable. Placing the F<satpass>
+functionality in its own object achieves this; indeed the work flushed
+out a couple subtle bugs in the F<satpass> script, whose fixes have been
+back-ported into this script.
+
+A second incentive is that the natural dependencies for the application
+are quite different than those of the Astro::Coord::ECI classes. It
+seems desirable not to force those who only want the latter to download
+and install all the stuff required by the former.
+
+=head1 DETAILS
+
+The B<satpass> script provides satellite visibility predictions, given
+the position of the observer and the NORAD element sets for the desired
+satellites. It also provides the following bells and whistles:
+
+* The ability to acquire the NORAD element sets directly from
+L<http://www.space-track.org/>, L<http://spaceflight.nasa.gov/>,
+or L<http://celestrak.com/> (or, indeed, any source supported by
+Astro::SpaceTrack), provided the user has an Internet connection
+and the relevant site is functional. The Space Track site also
+requires registration. You will need to install B<Astro::SpaceTrack>
+to get this functionality.
+
+* The ability to acquire the observer's latitude and longitude from
+Open Street Maps, given a street address or intersection name,
+and provided the user has an Internet connection and the relevant site
+is functional and has the data required. This function may not be used
+for commercial purposes because of restrictions Geocoder.us places on
+the use of their data. You will need to install
+B<Geo::Coder::OSM> to get this functionality.
+
+* The ability to acquire the observer's height above sea level from
+L<http://gisdata.usgs.gov/>, given the latitude and longitude
+of the observer, and provided the user has an internet connection
+and the relevant site is functional and has the data required. You will
+need to install B<Geo::WebService::Elevation::USGS> to get this
+functionality.
+
+* The ability to look up star positions in the SIMBAD catalog. You will
+need to install B<Astro::SIMBAD> (if using SIMBAD 3) or
+B<Astro::SIMBAD::Client> (if using SIMBAD 4) to get this functionality.
+The SIMBAD version is selected using the
+L<simbad_version|/simbad_version> parameter.
+
+* The ability to produce solar and lunar almanac data (rise and set,
+meridian transit, and so forth).
+
+* The ability to define macros to perform frequently-used operations.
+These macros may take arguments, and make use of any L</PARAMETERS> or
+environment variables. You will need to install B<IO::String> to get
+this functionality unless you are running Perl 5.8 or above.
+
+* An initialization file in the user's home directory. The file is
+named satpass.ini under MacOS (meaning OS 9 - OS X is Darwin to Perl),
+MSWin32 and VMS, and .satpass under any other operating system. Any
+command may be placed in the initialization file. It is a good place to
+set the observer's location and define any macros you want. The default
+initialization file can be overridden using the SATPASSINI environment
+variable or the -initialization_file command option. Internally to
+satpass and any commands it spawns, environment variable SATPASSINI will
+be set to the name of the initialization file actually used. See
+L</ENVIRONMENT VARIABLES> for how to find out the actual initialization
+file used.
+
+=head1 COMMANDS
+
+A number of commands are available to set operational parameters,
+manage the observing list, acquire orbital elements for the observing
+list, and predict satellite passes.
+
+The command execution loop supports command continuation, which is
+specified by placing a trailing '\' on the line to be continued.
+
+It also supports a pseudo output redirection, by placing '>filename'
+(for a new file) or '>>filename' (to append to an existing file)
+somewhere on the command line. It is also possible to redirect the data
+into a spawned command using the pipe character ('|'). Additional pipe
+characters may be specified on the same command line if your operating
+system supports this. Note that the redirection character B<must> be the
+first character of the token; that is, 'pass >file.txt' or 'pass |less',
+but not 'pass>file.txt' or 'pass|less'. See the L</SYNOPSIS> for
+examples.
+
+In addition, all commands support the following options:
+
+-clipboard places the output of the command on the clipboard. This
+will be discussed more below.
+
+-debug is accepted but not supported - that is, the author makes
+no claims of what will happen if you assert it, and reserves the
+right to change this behavior without warning. It is really a
+development aid.
+
+-time causes the elapsed time of the command in seconds to be
+displayed. This is another development aid.
+
+Individual commands may have options specific to them. Option names
+may be abbreviated, provided the abbreviation is unique among all
+options valid for that command. They may appear anywhere in the
+command line unless otherwise documented with the specific command
+('system' being the only exception at the moment).
+
+If the -clipboard option is asserted, output to standard out will
+be placed on the clipboard. This output will not appear on the
+clipboard until the command completes.
+
+The clipboard functionality requires the availability of the
+Win32::Clipboard module under MSWin32 (standard with ActivePerl), the
+Mac::Pasteboard module or the pbcopy command under darwin (and any Mac
+OS X I know of comes with pbcopy and pbpaste), or the xclip command
+(available from L<http://freshmeat.net/projects/xclip>) under any other
+operating system.
+
+The clipboard functionality is implemented as a singleton object,
+so that if you redirect output away from the clipboard and then
+back to it, both sets of clipboard data are considered to be the
+same data stream, and both end up on the clipboard, without the
+intervening data.
+
+The command loop also supports rudimentary interpolation of arguments
+and other values into commands. The "magic" character is a dollar sign,
+which may be followed by the name of what is to be substituted. A
+number represents the corresponding macro or source argument (numbered
+from 1), and anything else represents the value of the named parameter
+(if it exists) or environment variable (if not). The name may be
+optionally enclosed in curly brackets.
+
+If the name of the thing substituted is enclosed in curly brackets, it
+may be optionally followed by other specifications, as follows:
+
+${arg:-default} substitutes in the default if the argument is undef or
+the empty string. If the argument is 0, the default will B<not> be
+substituted in.
+
+${arg:=default} not only supplies the default, but sets the value of
+the argument to the specified default. Unlike bash, this works for
+B<any> argument.
+
+${arg:?message} causes the given message to be displayed if the
+argument was not supplied, and the command not to be processed. If this
+happens when expanding a macro or executing a source file, the entire
+macro or file is abandoned.
+
+${arg:+substitute} causes the substitute value to be used provided the
+argument is defined. If the argument is not defined, you get an empty
+string.
+
+${arg:default} is the same as ${arg:-default}, but the first character
+of the default B<must> be alphanumeric.
+
+Interpolation is not affected by quotes. If you want a literal dollar
+sign in the expansion of your macro, double the dollar signs in the
+definition. It is probably a good idea to put quotes around
+an interpolation in case the interpolated value contains spaces.
+
+For example:
+
+ macro ephemeris 'almanac "$1"'
+
+sets up "ephemeris" as a synonym for the 'almanac' command. The
+forward-looking user might want to set up
+
+ macro ephemeris 'almanac "${1:tomorrow midnight}"'
+
+which is like the previous example except it defaults to
+'tomorrow midnight', where the 'almanac' command defaults to
+'today midnight'.
+
+As a slightly less trivial example,
+
+ macro ephemeris 'almanac "${1:=tomorrow midnight}"' 'quarters "$1"'
+
+which causes the quarters command to see 'tomorrow midnight' if no
+arguments were given when the macro is expanded.
+
+The following commands are available:
+
+=for html <a name="almanac"></a>
+
+=over
+
+=item almanac start_time end_time
+
+This command displays almanac data for the current background bodies
+(see L<sky|/sky>). You will get at least rise, meridian
+transit, and set. For the Sun you also get beginning and end of
+twilight, and local midnight. You also get equinoxes, and solstices,
+but they are only good to within about 15 minutes. For the Moon you get
+quarter-phases. This is all done based on the current parameter
+settings (see L</PARAMETERS> below).
+
+The output is in chronological order.
+
+This command supports the following options:
+
+-horizon specifies that rise and set times are reported. -rise and -set
+are both synonyms for this; -rise also reports when the bodies set, and
+vice versa.
+
+-quarter specifies that quarters are reported.
+
+-transit specifies that transits are reported. This includes transits
+below the observer (e.g. local midnight), if these are generated.
+
+-twilight specifies that the beginning and end of twilight are
+reported.
+
+By default, all events are reported.
+
+The start_time defaults to 'today midnight', and the end_time to one
+day after the start time.
+
+See L</SPECIFYING TIMES> below for how to specify times.
+
+
+=for html <a name="cd"></a>
+
+=item cd directory
+
+This command changes to the named directory, or to the user's home if
+no directory is specified and the user's home directory can be
+determined. This change affects this script, and any processes invoked
+by it, but B<not> the invoking process. In plainer English, it does not
+affect the directory in which you find yourself after exiting satpass.
+
+=for html <a name="check_version"></a>
+
+=item check_version
+
+This command downloads L<http://search.cpan.org/dist/Astro-satpass/>,
+parses out the version, and compares it to the version of this script,
+displaying both versions and the result of the comparison. The intent
+is to provide a mechanism for checking the currency of this script in
+the event it becomes a separate distribution from Astro::Coord::ECI.
+
+=for html <a name="choose"></a>
+
+=item choose name_or_id ...
+
+This command retains only the objects named on the command in the
+observing list, eliminating all others. It is intended for reducing
+a downloaded catalog to manageable size. Either names, NORAD ID numbers,
+or a mixture may be given. Numeric items are matched against the NORAD
+IDs of the items in the observing list; non-numeric items are made into
+case-insensitive regular expressions and matched against the names of
+the items if any.
+
+For example:
+
+ satpass> # Get the CelesTrak "top 100" list.
+ satpass> st celestrak visual
+ satpass> # Keep only the HST and the ISS
+ satpass> choose hst iss
+
+The one command-specific option is -epoch. It takes as an argument any
+valid time, and retains the most recent set of elements for each object
+which are before the given time. If there are none before the given
+time for a given object, the earliest set of elements is retained.
+
+For example:
+
+ satpass> # Get some historical data
+ satpass> st search_name zarya -start 2006/04/01 \
+ _satpass> -end 2006/04/07
+ satpass> # Keep the set relevant to noon the 6th
+ satpass> choose -epoch 'Apr 7 2006 noon'
+
+Most commands that operate on the observing list choose the correct
+elements based on the time (or the start time) specified on the
+command. So barring bugs, you may not need this option unless you are
+trying to assemble and save a set of elements relevant to a given time
+in the past.
+
+=for html <a name="clear"></a>
+
+=item clear
+
+This command clears the observing list. It is not an error to issue it
+with the list already clear.
+
+=for html <a name="drop"></a>
+
+=item drop name_or_id ...
+
+This command removes the objects named in the command from the
+observing list, retaining all others. Either names, NORAD ID numbers,
+or a mixture may be given. Numeric items are matched against the NORAD
+IDs of the items in the observing list; non-numeric items are made into
+case-insensitive regular expressions and matched against the names of
+the items if any.
+
+=for html <a name="echo"></a>
+
+=item echo ...
+
+This command just prints its arguments to standard output. Environment
+variable substitution and pseudo-redirection is done. You may not get
+out exactly what you put in, because the output is reconstructed from
+the tokens left after substitution and redirection.
+
+This was added on a whim, to prevent having to shell out to get some
+random text in the output.
+
+=for html <a name="exit"></a>
+
+=item exit
+
+This command causes this script to terminate immediately. If issued
+from a 'source' file, this is done without giving control back to the
+user.
+
+'bye' and 'quit' are synonyms. End-of-file at the command prompt will
+also cause this script to terminate.
+
+=for html <a name="export"></a>
+
+=item export name value
+
+This command exports the given value to an environment variable. This
+value will be available to spawned commands, but will not persist after
+we exit.
+
+If the name is the name of a parameter, the value is optional, but if
+supplied will be used to set the parameter. The environment variable
+is set from the value of the parameter, and will track changes in it.
+
+=for html <a name="flare"></a>
+
+=item flare start_time end_time
+
+This command predicts flares for any bodies in the observing list
+capable of generating them. Currently, this means Iridium satellites.
+The start_time defaults to 'today noon', and the end_time to +7.
+
+In addition to the global options, the following options are legal
+for the flare command:
+
+-am ignores morning flares -- that is, those after midnight but before
+morning twilight.
+
+-choose chooses bodies from the observing list. It works the same way
+as the L<choose|/choose> command, but does not alter the observing
+list. You can specify multiple bodies by specifying -choose multiple
+times, or by separating your choices with commas. If -choose is not
+specified, the whole observing list is used.
+
+-day ignores daytime flares -- that is, those between morning twilight
+and evening twilight.
+
+-pm ignores evening flares -- that is, those between evening twilight
+and midnight.
+
+-questionable requests that satellites whose status is questionable
+(i.e. 'S') be included. Typically these are spares, or moving
+between planes. You may use -spare as a synonym for this.
+
+-quiet suppresses any errors generated by running the orbital model.
+These are typically from obsolete data, and/or decayed satellites.
+Bodies that produce errors will not be included in the output.
+
+See the L</SPECIFYING TIMES> topic below for how to specify times.
+
+For example, assuming the observers' location has already been set, you
+can predict flares for the next two days as follows:
+
+ satpass> # Get data for Iridium satellites
+ satpass> st celestrak iridium
+ satpass> # Use shorter twilight for Iridium flares
+ satpass> set twilight 3
+ satpass> # We are not interested in range to flare
+ satpass> set local_coord azel
+ satpass> # Supress date line in output, include in time
+ satpass> set date_format "" time_format "%d-%b %H:%M:%S"
+ satpass> # Not interested in night flares dimmer than -1
+ satpass> set flare_mag_night -1
+ satpass> # Finally, predict the flares. Include spares.
+ satpass> flare -spare now +2
+
+=for html <a name="geocode"></a>
+
+=item geocode location country_code
+
+This command attempts to look up the latitude and longitude of the
+given location in the given country. The country is an ISO 3166
+two-character country code, and defaults to the contents of the
+L<country|/country> parameter.
+
+This command actually works by dispatching to one of the following
+geocode_* commands, which may also be invoked explicitly. In fact,
+it is the existence of such a command that makes a given country
+code work.
+
+If a single location is found, the latitude and longitude parameters
+will be set. The location parameter will also be set if it was not
+defaulted. In addition, if the L<autoheight|/autoheight> parameter is
+asserted the L<height|/height> command will be issued with the latitude
+and longitude defaulted, and the effective country code used for the
+geocode lookup.
+
+Yes, it would be nice to simply parse the country code off the end
+of the location, but unfortunately there are many conflicts between
+the ISO 3166 country codes and the U.S. Postal Service state codes
+and Canadian province codes, ranging from AL (either Albania or
+Alabama) through PE (either Peru or Prince Edward Island) to VA
+(either Vatican City or Virginia).
+
+In addition to the global options, the following additional options
+are available:
+
+-height causes the command to behave as though the
+L<autoheight|/autoheight> parameter were complemented. That is, it
+causes the height command to be issued if autoheight is false, and
+vice versa.
+
+Also, any options legal for the height command are legal, and will be
+passed through to it.
+
+The above options are also available on all of the 'geocode_*' commands.
+
+=for html <a name="geocode_as"></a>
+
+=item geocode_as location
+
+American Samoa is handled by L<geocode_us|/geocode_us>.
+
+=for html <a name="geocode_ca"></a>
+
+=item geocode_ca location
+
+B<Notice:> This command is unsupported as of satpass 0.021, and
+probably will not work anyway, since geocoder.ca has started
+requiring registration to use its free port.
+
+This command attempts to look up the given location (either street
+address or street intersection) at L<http://geocoder.ca/>. The results
+of the lookup are displayed. If no location is specified, it looks up
+the value of the L<location|/location> parameter.
+
+If exactly one valid result is returned, the latitude and longitude
+of the observer are set to the returned values, and the name of
+the location of the observer is set to the location passed to the
+command.
+
+If the location contains whitespace, it must be quoted. Example:
+
+ satpass> geocode_ca '80 wellington st ottawa on'
+
+Because of restrictions on the use of the Geocoder.ca site, you may not
+use this command for commercial purposes.
+
+=for html <a name="geocode_fm"></a>
+
+=item geocode_fm location
+
+The Federated States of Micronesia are handled by
+L<geocode_us|/geocode_us>.
+
+=for html <a name="geocode_gu"></a>
+
+=item geocode_gu location
+
+Guam is handled by L<geocode_us|/geocode_us>.
+
+=for html <a name="geocode_mh"></a>
+
+=item geocode_mh location
+
+The Marshall Islands are handled by L<geocode_us|/geocode_us>.
+
+=for html <a name="geocode_mp"></a>
+
+=item geocode_mp location
+
+The Northern Mariana Islands are handled by L<geocode_us|/geocode_us>.
+
+=for html <a name="geocode_pr"></a>
+
+=item geocode_pr location
+
+Puerto Rico is handled by L<geocode_us|/geocode_us>.
+
+=for html <a name="geocode_pw"></a>
+
+=item geocode_pw location
+
+Palau is handled by L<geocode_us|/geocode_us>.
+
+=for html <a name="geocode_us"></a>
+
+=item geocode_us location
+
+This command attempts to look up the given location (either street
+address or street intersection) in Open Street Maps. The results
+of the lookup are displayed. If no location is specified, it looks up
+the value of the L<location|/location> parameter.
+
+If exactly one valid result is returned, the latitude and longitude
+of the observer are set to the returned values, and the name of
+the location of the observer is set to the canonical name of the
+location as returned by Open Street Maps. Also, the height command is
+implicitly invoked to attempt to acquire the height above sea level
+provided the L<autoheight|/autoheight> parameter is true.
+
+In addition to the usual qualifiers, this command supports the -height
+qualifier, which reverses the action of the L<autoheight|/autoheight>
+parameter for the command on which it is specified.
+
+If the location contains whitespace, it must be quoted. Example:
+
+ satpass> geocode_us '1600 pennsylvania ave washington dc'
+
+Because of restrictions on the use of the Geocoder.us site, you may not
+use this command for commercial purposes.
+
+If you wish to use this command, you must install the
+B<Geo::Coder::OSM> module.
+
+=for html <a name="geocode_vi"></a>
+
+=item geocode_vi location
+
+The U.S. Virgin Islands are handled by L<geocode_us|/geocode_us>.
+
+=for html <a name="height"></a>
+
+=item height latitude longitude country
+
+This command attempts to look up the height above sea level at the
+given latitude and longitude in the given country. The country is an
+ISO 3166 two-character country code, and defaults to the contents of the
+L<country|/country> parameter.
+
+Yes, technically country is redundant given latitude and longitude, but
+I lacked a means to take advantage of this in practice.
+
+This command actually works by dispatching to one of the following
+height_* commands, which may also be invoked explicitly. In fact,
+it is the existence of such a command that makes a given country
+code work.
+
+The latitude and longitude can be omitted, in which case the current
+L<latitude|/latitude> and L<longitude|/longitude> parameters are
+used.
+
+In addition to the global options, the following options are available
+for this command:
+
+-all causes all results to be fetched, rather than just the 'best' one.
+This probably makes no difference in the value you get, since the
+results are assumed to be in descending order of goodness, and we
+return the first one.
+
+-retry_on_zero specifies the number of times to retry the query if the
+result is zero. The default is 0, but you can specify more.
+
+-source_layer specifies the data set to retrieve the height from. The
+default is '-1', which specifies the 'best' dataset. This is ignored
+unless -all is asserted, and you can probably ignore it too.
+
+These options are also available on all of the 'height_*' commands.
+
+=for html <a name="height_af"></a>
+
+=item height_af latitude longitude
+
+Afghanistan is handled by L<height_us|/height_us>, since this is
+(supposedly) covered by the U.S. Geological Survey's Afghanistan
+Digital Elevation Model.
+
+=for html <a name="height_as"></a>
+
+=item height_as latitude longitude
+
+American Samoa is handled by L<height_us|/height_us>.
+
+=for html <a name="height_ca"></a>
+
+=item height_ca latitude longitude
+
+This command is equivalent to L<height_us|/height_us> and in fact is
+handled by it since the U.S. Geological Survey dataset includes all of
+North America. But in order to cover some observed weirdness in the
+data returned, -source_layer is defaulted to 'SRTM.C_1TO19_3' and
+-retry_on_zero is defaulted to 3.
+
+=for html <a name="height_fm"></a>
+
+=item height_fm latitude longitude
+
+The Federated States of Micronesia are handled by L<height_us|/height_us>.
+
+=for html <a name="height_gu"></a>
+
+=item height_gu latitude longitude
+
+Guam is handled by L<height_us|/height_us>.
+
+=for html <a name="height_mh"></a>
+
+=item height_mh latitude longitude
+
+The Marshall Islands are handled by L<height_us|/height_us>.
+
+=for html <a name="height_mp"></a>
+
+=item height_mp latitude longitude
+
+The Northern Mariana Islands are handled by L<height_us|/height_us>.
+
+=for html <a name="height_pr"></a>
+
+=item height_pr latitude longitude
+
+Puerto Rico is handled by L<height_us|/height_us>.
+
+=for html <a name="height_pw"></a>
+
+=item height_pw latitude longitude
+
+Palau is handled by L<height_us|/height_us>.
+
+=for html <a name="height_us"></a>
+
+=item height_us latitude longitude
+
+This command attempts to look up the height above sea level at the
+given latitude and longitude in the U.S. Geological Survey's EROS
+Web Services (L<http://gisdata.usgs.gov/>). If the lookup succeeds,
+the latitude and longitude parameters are set to the arguments and
+the height parameter is set to the result.
+
+The latitude and longitude default to the current
+L<latitude|/latitude> and L<longitude|/longitude> parameters.
+
+If you wish to use this command, you must install the
+B<Geo::Webservice::Elevation::USGS> module.
+
+B<Caveat:> It is the author's experience that this resource is not
+always available. You should probably geocode your usual location
+and put its latitude, longitude and height in the initialization
+file. You can use macros to define alternate locations if you
+want.
+
+=for html <a name="height_vi"></a>
+
+=item height_vi latitude longitude
+
+The U.S. Virgin Islands are handled by L<height_us|/height_us>.
+
+=for html <a name="help"></a>
+
+=item help
+
+This command can be used to get usage help. Without arguments, it
+displays the documentation for this script (hint: you are reading this
+now). You can get documentation for related Perl modules by specifying
+the appropriate arguments, as follows:
+
+ eci ------ Astro::Coord::ECI
+ iridium -- Astro::Coord::ECI::TLE::Iridium
+ moon ----- Astro::Coord::ECI::Moon
+ sun ------ Astro::Coord::ECI::Sun
+ st ------- Astro::SpaceTrack
+ star ----- Astro::Coord::ECI::Star
+ tle ------ Astro::Coord::ECI::TLE
+ utils ---- Astro::Coord::ECI::Utils
+
+The viewer is whatever is the default for your system.
+
+If you set the L<webcmd|/webcmd> parameter properly, this
+command will launch the L<http://search.cpan.org/> page for this
+package, and any arguments will be ignored.
+
+=for html <a name="list"></a>
+
+=item list
+
+This command displays the observing list. Each body's NORAD ID, name
+(if available), dataset epoch, and orbital period are displayed. If
+the observing list is empty, you get a message to that effect.
+
+In addition to the global options, the following options are legal for
+the list command:
+
+-choose chooses bodies from the observing list. It works the same way
+as the L<choose|/choose> command, but does not alter the observing
+list. You can specify multiple bodies by specifying -choose multiple
+times, or by separating your choices with commas. If -choose is not
+specified, the whole observing list is displayed.
+
+=for html <a name="load"></a>
+
+=item load file ...
+
+This command loads the contents of one or more files into the
+observing list. The files must contain NORAD two- or three- line
+element sets.
+
+=for html <a name="localize"></a>
+
+=item localize parameter_name ...
+
+This command localizes the values of the given parameters. If done in a
+macro or source file, this causes the old parameter values to be
+restored when the macro or source file exits.
+
+If you localize a parameter more than once in a given macro or source
+file, the duplicate localizations are ignored.
+
+=for html <a name="macro"></a>
+
+=item macro name command ...
+
+This command bundles one or more commands under the given name,
+effectively creating a new command. If any of the component commands
+contain whitespace, they must be quoted. This may require playing
+games if the component command also requires quotes. For example:
+
+ satpass> macro foo list 'pass \'today noon\' +7'
+
+or equivalently (since single and double quotes mean the same thing
+to the parser)
+
+ satpass> macro foo list "pass 'today noon' +7"
+
+Macro names must be composed entirely of alphanumerics and underscores
+(characters that match \w, to be specific) and may not begin with an
+underscore. As of version 0.008_03, B<macros may redefine built-in
+commands.> A macro is undefined inside itself, so use of the name
+inside the macro invokes the built-in. The macro becomes redefined
+again when it exits. The built_in can still be accessed by prefixing
+the string 'core.' to its name, e.g. 'core.quarters', whether or
+not you have overridden the built_in with a macro.
+
+If you specify a macro name with no definition, it deletes the current
+definition of that macro, if any. You can change this behavior by
+setting the L<explicit_macro_delete|/explicit_macro_delete> parameter
+true; this will cause 'macro name' to list the named macro, and require
+an explicit -delete to delete it. Macros can also be redefined, simply
+by issuing the 'macro' command, naming the macro, and giving its
+definition.
+
+The macro command takes the following options in addition to the
+global ones:
+
+-brief lists the names of macros. If names are given, they are listed
+provided they are currently defined. If no names are given, the names
+of all defined macros are given.
+
+-delete deletes the named macros. If no macro names are given, all
+macros are deleted. A macro may also be deleted by giving its name
+but no definition, but as of 0.009_01, B<this mechanism is deprecated
+in favor of use of the -delete option.> The
+L<explicit_macro_delete|/explicit_macro_delete> parameter may be used
+to require an explicit -delete to delete macros.
+
+-list lists the names and definitions of macros. If names are given,
+they are listed if they are defined. If no names are given, all
+defined macros are listed.
+
+Macros may be nested - that is, a macro may be defined in terms of
+other macros. A macro temporarily becomes undefined when it is called
+to prevent endless recursion. It becomes defined again when it exits.
+
+Be aware that there is no syntax checking done when the macro is
+defined. You only find out if your macro definition is good by
+trying to execute it.
+
+=for html <a name="magnitude_table"></a>
+
+=item magnitude_table ...
+
+This command displays or maintains the satellite magnitude table. This
+table is used to initialize satellite magnitudes.
+
+See the L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> documentation
+for information on how this table is populated initially. If you have
+installed Astro::SpaceTrack, you can update the status using one of the
+commands that fetches magnitude data, such as C<'st mccants vsnames'>,
+or you can update it using the 'add', 'clear', and 'drop' subcommands,
+which are discussed in more detail below.
+
+C<add> adds the given body to the magnitude table. The arguments are OID
+and magnitude.
+
+C<clear> clears the magnitude table.
+
+C<drop> drops the given body from the magnitude table. The argument is
+the OID to be dropped.
+
+C<molczan> reloads the magnitude table with the contents of the named
+Molczan-format file. An optional second argument is a magnitude offset
+to be added to the magnitudes read.
+
+C<quicksat> reloads the magnitude table with the contents of the named
+Quicksat-format file. An optional second argument is a magnitude offset
+to be added to the magnitudes read.
+
+C<show> displays the contents of the magnitude table, as a series of
+C<'magnitude_table add'> commands. If arguments are passed, only those
+OIDs specified in the arguments are displayed.
+
+=for html <a name="pass"></a>
+
+=item pass start_time end_time increment
+
+This command predicts visibility of the contents of the observing
+list, in accordance with the various L</PARAMETERS>, between the given
+start_time and end_time, using the given increment. See the
+L</SPECIFYING TIMES> topic below for how to specify times. The increment
+is in seconds, and does nothing useful unless the L<verbose|/verbose>
+setting is true.
+
+The position of the visible body is given in either elevation, azimuth,
+and range or right ascension, declination, and range as seen from the
+location of the observer, as determined by the value of the
+L<local_coord|/local_coord> parameter. The geodetic latitude, longitude,
+and altitude are also given.
+
+The defaults are 'today noon', seven days after the start time, and 60
+(seconds) respectively.
+
+Example:
+
+ satpass> pass 'today noon' 'tomorrow noon'
+
+In addition to the global options, the following options are legal for
+the pass command:
+
+C<-brightest> is a synonym for C<-magnitude>.
+
+C<-choose> chooses bodies from the observing list. It works the same way
+as the L<choose|/choose> command, but does not alter the observing list.
+You can specify multiple bodies by specifying -choose multiple times, or
+by separating your choices with commas. If -choose is not specified, the
+whole observing list is used.
+
+C<-magnitude> includes magnitude data in the output, and adds the
+moment the satellite is brightest to the pass events.
+
+C<-quiet> suppresses any errors generated by running the orbital model.
+These are typically from obsolete data, and/or decayed satellites.
+Bodies that produce errors will not be included in the output.
+
+=for html <a name="phase"></a>
+
+=item phase time
+
+This command gives the phase of the relevant background bodies (see
+L<sky|/sky>) at the given time. At the moment, the only
+body that supports this is the Moon.
+
+The display shows the time, the phase angle in degrees (0 being new, 90
+being first quarter, and so on), and a description of the phase ('new',
+'waxing crescent', 'first quarter', 'waxing gibbous', 'full',
+'waning gibbous', 'last quarter', or 'waning crescent'). The body is
+considered to be at quarter-phase if it is within 6.1 degrees (about 12
+hours for the Moon) of 0, 90, 180, or 270 degrees. Otherwise you get
+waxing|waning crescent|gibbous.
+
+The default time is the time the command was issued.
+
+=for html <a name="position"></a>
+
+=item position start_time end_time interval
+
+This command gives the positions of all objects in the observing list
+and in the sky between the given start_time and end_time, at the given
+interval. The default for both start_time and end_time is the current
+time, and the default interval is 60 (seconds).
+
+The position is given as seen by the observer, either as elevation,
+azimuth, and range, or as right ascension, declination, and range,
+depending on the setting of the L<local_coord|/local_coord> parameter.
+
+If the satellite is capable of producing flares, the status of each
+potential flare is given also.
+
+In addition to the global options, the following options are legal for
+the position command:
+
+C<-choose> chooses bodies from the observing list. It works the same way
+as the L<choose|/choose> command, but does not alter the observing list.
+You can specify multiple bodies by specifying -choose multiple times, or
+by separating your choices with commas. If -choose is not specified, the
+whole observing list is used.
+
+C<-magnitude> adds the object's magnitude to the output. To be
+consistent with the C<'pass'> command you can use C<-brightest> as a
+synonym for this.
+
+C<-questionable> causes the code to consider spares (status 'S') to be
+capable of flaring. You may use C<-spare> as a synonym for this.
+
+C<-quiet> suppresses any errors generated by running the orbital model.
+These are typically from obsolete data, and/or decayed satellites.
+Bodies that produce errors will not be included in the output.
+
+C<-realtime> causes a running display in near-real-time. The default
+end_time changes to '+10' (i.e. 10 days), and the default interval to 10
+(seconds). Also, the script sleeps between outputs, so the output is
+more or less as it happens, at least to the nearest second. You can
+break out of this by sending the script a SIGINT signal (typically by
+typing control/C).
+
+The default start_time is the current time.
+
+The default end_time is the start time unless -realtime is specified,
+in which case the default end_time is ten days after the start time.
+
+The default interval is 60 (seconds) unless -realtime is specified, in
+which case the default interval is 10 (seconds).
+
+=for html <a name="quarters"></a>
+
+=item quarters start_time end_time
+
+This command gives the quarters of such current background bodies (see
+L<sky|/sky>) as support this function. This means
+quarter-phases for the Moon, and equinoxes and solstices for the Sun.
+The Solar data may be off by as much as 15 minutes, because we are only
+calculating the position of the Sun to the nearest 0.01 degree.
+
+See the L</SPECIFYING TIMES> topic below for how to specify times.
+
+The defaults are 'today noon' and 30 days after the start time.
+
+=for html <a name="retrieve"></a>
+
+=item retrieve filename
+
+This command is one half of the interface to the Storable module.
+It uses the retrieve() subroutine to read the observing list from
+the given file.
+
+=for html <a name="set"></a>
+
+=item set name value ...
+
+This command sets operating parameters. See L</PARAMETERS> below for
+the list, and what they are used for.
+
+You can specify more than one name-value pair on the same command.
+
+=for html <a name="show"></a>
+
+=item show ...
+
+This command shows the named operating parameters. See L</PARAMETERS>
+below for the list, and what they are used for. If no names are
+given, it displays the complete list.
+
+The display format is in terms of the 'set' commands used to set
+the given values.
+
+=for html <a name="sky"></a>
+
+=item sky ...
+
+This command manipulates the background objects (Sun, Moon, stars ...)
+that are used in the various calculations. If specified by itself
+it lists the current background objects. B<Note that, beginning with
+version 0.002, this list is formatted as 'sky add' commands.>
+
+The 'sky' command also takes the following subcommands:
+
+add - adds the named background object, provided it is not already in
+the list. You must specify the name of the object (Sun, Moon, or star
+name). 'Sun' and 'Moon' are not case-sensitive.
+
+If you specify a star name, you must also specify its right ascension
+and declination in J2000.0 coordinates. See L</SPECIFYING ANGLES> for
+more on specifying angles. You can also specify:
+
+* Distance, followed by units 'm', 'km', 'au', 'ly', or 'pc', the
+default being 'pc' (parsecs). For example, '4.2ly' represents 4.2
+light-years. B<Beginning with version 0.002, the default distance is
+10000 parsecs.> This is probably too big, but we are not correcting
+for stellar parallax anyway.
+
+* Proper motion in right ascension, in seconds of arc per year, or
+seconds of right ascension per year if 's' is appended. The default is
+0.
+
+* Proper motion in declination, in seconds of arc per year. The default
+is 0.
+
+* Proper motion in recession, in kilometers per second. The default is
+0.
+
+clear - clears the list of background objects.
+
+drop name ... - removes the objects with the given names from the
+background object list. The name matching is done using
+case-insensitive regular expressions.
+
+For example,
+
+ satpass> sky
+        Sun
+       Moon
+ satpass> sky drop moon
+ satpass> sky add Spica 13:25.193 -11d9.683m
+ satpass> sky
+ sky add Sun
+ sky add Spica 13:25:11.58 -11.161 10000.00 0.0000 0.00000 0
+ satpass>
+
+lookup - Looks up the given object in the SIMBAD catalog, using the
+L<simbad_url|/simbad_url> parameter to determine which copy of the
+catalog is used, and the L<simbad_version|/simbad_version> parameter to
+determine which version of SIMBAD is used. If the named object is found,
+it is added to the list of background objects. Range defaults to 10000
+parsecs, and the proper motions to 0.
+
+For example,
+
+ satpass> sky lookup 'Theta Orionis'
+ sky add 'Theta Orionis' 05:35.3 -05d24 10000.00 0 0 0
+
+If L<simbad_version|/simbad_version> is set to 3, you need to have
+Astro::SIMBAD installed. If it is 4, you need to have
+Astro::SIMBAD::Client installed. The latter uses the SOAP interface,
+which appears to be a work in progress, so I am not sure how stable it
+will be. Since SIMBAD 3 is being phased out, B<The 'lookup' function
+should be considered experimental.>
+
+=for html <a name="source"></a>
+
+=item source file_name
+
+This command takes commands from the given file, reading it until it is
+exhausted. This file may also contain source commands, with the nesting
+limit determined by how many files your system allows you to have open
+at one time.
+
+To be consistent with the bash shell, you can use '.' as a synonym for
+source. If you do, there need not be a space between the '.' and the
+file name.
+
+The file name must be quoted if it contains whitespace.
+
+The one legal option is -optional, which means that no error is reported
+if the file cannot be opened.
+
+=for html <a name="st"></a>
+
+=item st ...
+
+This command uses the B<Astro::SpaceTrack> package to acquire orbital
+data directly from the Space Track web site (assuming it is available).
+It can also retrieve them from the CelesTrak web site for as long as
+Dr. Kelso retains his authorization to redistribute the orbital
+elements, or any other location supported by Astro::SpaceTrack.
+
+What comes after the 'st' is the name of an B<Astro::SpaceTrack> method,
+followed by any arguments to that method. If the method returns orbital
+elements, those elements will be added to the observing list. You can
+use 'st help' to get brief help, or see
+L<Astro::SpaceTrack|Astro::SpaceTrack>.
+
+In addition to the legal B<Astro::SpaceTrack> methods, 'show' has been
+made a synonym to 'get', for consistency. Also, as of satpass 0.006_13,
+multiple attributes may be shown, 'show' or 'get' without an argument
+shows all B<Astro::SpaceTrack> arguments, and the output is formatted
+as 'st set' commands.
+
+You can also use the 'st localize' command to localize
+B<Astro::SpaceTrack> attribute values in exactly the same way that the
+L<localize|/localize> command localizes satpass parameters.
+
+In addition to the usual options, the following options specific to
+this command are supported:
+
+-start and -end specify the start and end of the date range to be
+retrieved. The date may be specified in any legal format. See
+L<SPECIFYING TIMES|/SPECIFYING TIMES> for the details. If you
+specify relative times, be aware that the -start value is parsed
+before the -end value, regardless of their positions on the command
+line. Yes, Astro::SpaceTrack already supports this, but by pre-parsing
+them we get more flexibility on how to specify the date and time.
+
+-verbose causes the content of the response to be displayed in cases
+where it normally would not be (e.g. cases where the content is "OK",
+or where it  would normally simply be digested by this application
+(e.g. orbital elements)).
+
+You must install B<Astro::SpaceTrack> version 0.017 or higher to use
+this command.
+
+Example of retrieving data on the International Space Station and the
+Hubble Space Telescope from Space Track:
+
+ satpass> # Specify your Space Track access info
+ satpass> st set username your_username password your_password
+ satpass> # Ask for data with the common name
+ satpass> st set with_name 1
+ satpass> # Get the data by NORAD ID number
+ satpass> st retrieve 20580 25544
+
+Example of retrieving the data from CelesTrak without using a Space
+Track login:
+
+ satpass> # Specify direct retrieval.
+ satpass> st set direct 1
+ satpass> # Get the "top 100" or so.
+ satpass> st celestrak visual
+ satpass> # Only keep the ones we want.
+ satpass> choose 20580 25544
+
+Example of retrieving predicted Space Shuttle elements from the Human
+Space Flight web site. You need -all because the elements change as the
+Shuttle maneuvers. Position (etc.) predictions will be made using
+whatever element set is current at the time. If no shuttle flight is
+impending (or in progress) you will get an error.
+
+ satpass> # Specify direct retrieval.
+ satpass> st set direct 1
+ satpass> # Get the data
+ satpass> st spaceflight shuttle -all
+
+=for html <a name="status"></a>
+
+=item status ...
+
+This command displays or maintains the satellite status list. This list
+is used by the L<flare|/flare> command to predict Iridium flares. If
+given without a subcommand, it lists the known statuses.
+
+Beginning with version 0.007, this list is formatted as C<status add>
+commands, and the syntax C<status iridium> is deprecated.
+
+Beginning with version 0.035_02, C<status iridium> generates a warning
+on the first use. Beginning with version 0.044 it will generate a
+warning on every use, and six months after that release it will become
+fatal.
+
+See the L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> documentation
+for information on how this list is populated initially.  If you have
+installed Astro::SpaceTrack, you can update the status using the 'st
+iridium_status' command, or you can update it using the 'add', 'clear',
+and 'drop' subcommands, which are discussed in more detail below.
+
+The 'status' command also takes the following subcommands:
+
+add - adds the given body to the status list. The arguments are NORAD
+ID, satellite type ('iridium' is the only valid type at the moment),
+status ('+' for in-service, 'S' for spare, '-' for tumbling or otherwise
+unable to flare), name (e.g.  'Iridium 12'), and a comment, with the
+status defaulting to '+', and name and comment to ''. For example:
+
+ satpass> status add 12345 iridium S 'Bogus body' TRW
+
+The 'add' command can also be used to change the status of an existing
+body, with the new entry replacing the old.
+
+drop - removes the given body from the status list. You will get a
+message if the body does not exist. For example, to remove the
+previously-added bogus body,
+
+ satpass> status drop 12345
+
+show - is equivalent to a bare status command, and displays all known
+statuses. However, you can also specify the bodies to display as either
+NORAD IDs or names or a mixture of both. Names will be taken as regular
+expressions. For example:
+
+ satpass> status show 36 97
+
+to display the status of Iridium 36 and 97.
+
+=for html <a name="store"></a>
+
+=item store filename
+
+This command is one half of the interface to the Storable module.
+It uses the nstore() subroutine to write the observing list to
+the given file.
+
+=for html <a name="system"></a>
+
+=item system command
+
+This command passes its arguments to the system as a command. The
+results are displayed unless redirected.
+
+Technically, what happens is that if the current output is a tty,
+the command is executed using the core system command; otherwise
+its output is captured with backticks and printed.
+
+If the command is omitted, the value of environment variable SHELL
+is used as the command, with the intent of dropping you into the
+given shell. If environment variable SHELL is not defined and you
+are running under MSWin32, value 'cmd' is used as the command.
+
+The -clipboard qualifier B<must> come immediately after the verb
+'system', and before the name of the command you are actually
+issuing if any. This restriction is to prevent legal qualifiers
+from being stripped from the command. For example:
+
+ satpass> system -c ls
+
+Issues the 'ls' command, and captures the output on the clipboard.
+That is to say the satpass script handles the -c. But
+
+ satpass> system ls -c
+
+displays the status change time of the file, with output going to
+standard out. That is to say the ls command handles the -c.
+
+=for html <a name="times"></a>
+
+=item times time
+
+This command displays the universal, dynamical, local standard,
+local mean, and local time for the given input time.
+
+The time defaults to the current time.
+
+=for html <a name="tle"></a>
+
+=item tle
+
+This command displays the original two- or three- line element data
+which was used to build the observation list.
+
+In addition to the global options, the following options are legal for
+the tle command:
+
+-choose chooses bodies from the observing list. It works the same way
+as the L<choose|/choose> command, but does not alter the observing
+list. You can specify multiple bodies by specifying -choose multiple
+times, or by separating your choices with commas. If -choose is not
+specified, the whole observing list is used.
+
+The C<-verbose> qualifier causes the data to be displayed verbosely,
+one item per line, labeled and with units if applicable.
+
+=item validate start_time end_time
+
+This command validates the observing list over the given time range,
+dropping any TLEs that do not validate.  See the L</SPECIFYING TIMES>
+topic below for how to specify times.
+
+In addition to the global options, the following options are legal for
+the validate command:
+
+-quiet suppresses any errors generated by running the orbital model.
+These are typically from obsolete data, and/or decayed satellites.
+
+The defaults are 'today noon' and seven days after the start time
+respectively.
+
+=back
+
+=head1 PARAMETERS
+
+This script has a number of parameters to configure its operation. In
+general:
+
+Strings must be quoted if they contain blanks. Either kind of quotes
+will work, but back ticks will not.
+
+Angles may be specified in a number of formats. See
+L</SPECIFYING ANGLES> for more detail.
+
+Boolean (i.e. true/false) parameters are set by convention to 1 for
+true, or 0 for false. The evaluation rules are those of Perl itself:
+0, '', and the undefined value are false, and everything else is true.
+
+The parameters are:
+
+=for html <a name="almanac_horizon"></a>
+
+=over
+
+=item almanac_horizon (numeric or string)
+
+This parameter specifies the horizon used for almanac calculations, in
+degrees above or below the plane of the observer. The following strings
+are also accepted:
+
+* C<height> causes the horizon to be adjusted for the height of the
+observer above sea level. This adjustment assumes a spherical Earth and
+an unobstructed horizon.
+
+* C<horizon> causes the value of the C<horizon> setting to be used for
+almanac calculations also.
+
+The default is C<0>.
+
+=for html <a name="appulse"></a>
+
+=item appulse (numeric)
+
+This parameter specifies the maximum reportable angle between the
+orbiting body and any of the background objects. If the body passes
+closer than this, the closest point will appear as an event in the
+pass. The intent is to capture transits or near approaches.
+
+If this parameter is set to 0, no check for close approaches to
+background objects will be made.
+
+See L</SPECIFYING ANGLES> for ways to specify an angle. This parameter
+is displayed in decimal degrees.
+
+The initial setting is 0.
+
+=for html <a name="autoheight"></a>
+
+=item autoheight (boolean)
+
+This parameter determines whether the L<geocode|/geocode>
+command attempts to acquire the height of the location above sea level.
+It does this only if the parameter is true. You may wish to turn this
+off (i.e. set it to 0) if the USGS elevation service is being balky.
+
+The default is 1 (i.e. true).
+
+=for html <a name="backdate"></a>
+
+=item backdate (boolean)
+
+This parameter determines whether the 'pass' command will attempt to use
+orbital elements before their epoch. It is actually simply propagated to
+the 'backdate' attribute of the individual TLE objects, and so takes
+effect on a per-object basis.  If it is false, the pass () method will
+silently move the start of the pass prediction to the epoch of the data
+if the specified pass start is earlier than the epoch.
+
+You may wish to set this to 0 (i.e. false) if you are dealing with
+future launches -- i.e. the predicted Space Shuttle data from
+L<http://spaceflight.nasa.gov/>.
+
+The default is 1 (i.e. true), which is consistent with the behavior of
+the code before this parameter was added.
+
+=for html <a name="background"></a>
+
+=item background (boolean)
+
+This parameter determines whether the location of the background body
+is displayed when the L<appulse|/appulse> logic detects an
+appulse.
+
+The default is 1 (i.e. true).
+
+=for html <a name="country"></a>
+
+=item country (string)
+
+This parameter determines the default country for the L<geocode|/geocode>
+functionality. The intent is that it be an ISO 3166 two-character
+country code, but at the moment only 'CA' (Canada) and 'US' (United
+States of America) do anything useful.
+
+See L<http://www.iso.org/iso/en/prods-services/iso3166ma/index.html>
+for the current list of country codes. Note that these are B<not>
+always the same as the corresponding top-level geographic domain names
+(e.g. Great Britain is 'GB' in ISO 3166 but for historical reasons has
+both 'gb' and 'uk' as top-level geographic domain name).
+
+The country codes are case-insensitive, since they will be converted to
+lower case for use.
+
+The default is 'us'.
+
+=for html <a name="date_format"></a>
+
+=item date_format (string)
+
+This parameter specifies the strftime(3) format used to display dates.
+You will need to quote the format if it contains spaces. Documentation
+on the strftime(3) subroutine may be found at
+L<http://www.openbsd.org/cgi-bin/man.cgi?query=strftime&apropos=0&sektion=0&manpath=OpenBSD+Current&arch=i386&format=html>.
+
+The above is a long URL, and may be split across multiple lines. More
+than that, the formatter may have inserted a hyphen at the break, which
+needs to be taken out to make the URL good. I<Caveat user.>
+
+The default is '%a %d-%b-%Y', which produces (e.g.)
+'Mon 01-Jan-2001' for the first day of the current millennium. 
+
+=for html <a name="debug"></a>
+
+=item debug (numeric)
+
+This parameter turns on debugging output. The only supported value
+is 0, which is the default. The author makes no representation of
+what will happen if a non-zero value is set, not does he promise
+that the behavior for a given non-zero value will not change from
+release to release.
+
+The default is 0.
+
+=for html <a name="desired_equinox_dynamical"></a>
+
+=item desired_equinox_dynamical (time)
+
+This parameter specifies the desired equinox for equatorial and ecliptic
+coordinates. It is specified as a dynamical time, or as 0, '', or undef
+if you want whatever the various models give (generally the current
+equinox, or something reasonably close to this).
+
+This parameter is used to precess equatorial coordinates to the correct
+equinox for display. Any legal satpass time specification will parse,
+but you probably want to specify an absolute time in the UT zone, e.g.
+'1-Jan-2000 12:00 UT' for J2000.0. Yes, technically UT is universal, but
+values specified for this setting are handled as dynamical. See
+L<SPECIFYING TIMES|/SPECIFYING TIMES> for the full story on how to
+specify times.
+
+The only reason I can think of to set this is if you are displaying
+equatorial coordinates for the 'flare', 'pass', or 'position' commands,
+and want the coordinates for a given epoch.
+
+The default is 0.
+
+=for html <a name="echo"></a>
+
+=item echo (boolean)
+
+This parameter causes commands that did not come from the keyboard to
+be echoed. Set it to a non-zero value to watch your scripts run, or to
+debug your macros, since the echo takes place B<after> parameter
+substitution has occurred.
+
+The default is 0.
+
+=for html <a name="edge_of_earths_shadow"></a>
+
+=item edge_of_earths_shadow (numeric)
+
+This parameter specifies the offset in elevation of the edge of the
+Earth's shadow from the center of the illuminating body (typically the
+Sun) as seen from a body in space. The offset is in units of the
+apparent radius of the illuminating body, so that setting it to C<1>
+specifies the edge of the umbra, <-1> specifies the edge of the
+penumbra, and C<0> specifies the middle of the penumbra. This parameter
+corresponds to the same-named L<Astro::Coord::ECI|Astro::Coord::ECI>
+parameter.
+
+The default is 1 (i.e. edge of umbra).
+
+=for html <a name="ellipsoid"></a>
+
+=item ellipsoid (string)
+
+This parameter specifies the name of the reference ellipsoid to be used
+to model the shape of the earth. Any reference ellipsoid supported by
+Astro::Coord::ECI may be used. For details,
+see L<Astro::Coord::ECI|Astro::Coord::ECI>.
+
+The default is 'WGS84'.
+
+=for html <a name="error_out"></a>
+
+=item error_out (boolean)
+
+This parameter specifies the behavior on encountering an error. If
+true, all macros, source files, etc are aborted and control is returned
+to the command prompt. If standard in is not a terminal, we exit. If
+false, we ignore the error.
+
+The default is 0 (i.e. false).
+
+=for html <a name="exact_event"></a>
+
+=item exact_event (boolean)
+
+This parameter specifies whether visibility events (rise, set, max, 
+into or out of shadow, beginning or end of twilight) should be computed
+to the nearest second. If false, such events are reported to the step
+size specified when the 'pass' command was issued.
+
+The default is 1 (i.e. true).
+
+=for html <a name="explicit_macro_delete"></a>
+
+=item explicit_macro_delete (boolean)
+
+This parameter specifies whether an explicit -delete qualifier is needed
+to delete a macro. If false, 'macro foo' deletes macro foo. If true,
+'macro foo' lists macro foo.
+
+The default is 0 (i.e. false). B<This will change>, as deletion without
+an explicit -delete is deprecated.
+
+=for html <a name="extinction"></a>
+
+=item extinction (boolean)
+
+This parameter specifies whether magnitude estimates take atmospheric
+extinction into account. It should be set true if you are interested
+in measured brightness, and false if you are interested in estimating
+magnitudes versus nearby stars.
+
+The default is 1 (i.e. true).
+
+=for html <a name="flare_mag_day"></a>
+
+=item flare_mag_day (numeric)
+
+This parameter specifies the limiting magnitude for the flare
+calculation for flares that occur during the day. For this
+purpose, it is considered to be day if the elevation of the
+Sun is above the L<twilight|/twilight> parameter.
+
+The default is -6.
+
+=for html <a name="flare_mag_day"></a>
+
+=item flare_mag_night (numeric)
+
+This parameter specifies the limiting magnitude for the flare
+calculation for flares that occur during the night. For this
+purpose, it is considered to be night if the elevation of the
+Sun is below the L<twilight|/twilight> parameter.
+
+The default is 0.
+
+=for html <a name="geometric"></a>
+
+=item geometric (boolean)
+
+This parameter specifies whether satellite rise and set should be
+computed versus the geometric horizon or the effective horizon
+specified by the 'horizon' parameter. If true, the computation is
+versus the geometric horizon (elevation 0 degrees). If false, it
+is versus whatever the 'horizon' parameter specifies.
+
+The default is 1 (i.e. true).
+
+=for html <a name="gmt"></a>
+
+=item gmt (boolean)
+
+This parameter specifies whether output times are local (if false) or
+GMT (if true).
+
+The default is 0 (i.e. false).
+
+=for html <a name="height"></a>
+
+=item height (numeric)
+
+This parameter specifies the height of the observer above mean sea
+level, in meters.
+
+There is no default; you must specify a value.
+
+=for html <a name="horizon"></a>
+
+=item horizon (numeric)
+
+This parameter specifies the minimum elevation a body must attain to be
+considered visible, in degrees. If the 'geometric' parameter is 0,
+the rise and set of the satellite are computed versus this setting
+also.
+
+See L</SPECIFYING ANGLES> for ways to specify an angle. This parameter
+is displayed in decimal degrees.
+
+The default is 20 degrees.
+
+=for html <a name="latitude"></a>
+
+=item latitude (numeric)
+
+This parameter specifies the latitude of the observer in degrees north.
+If your observing location is south of the Equator, specify a negative
+number.
+
+See L</SPECIFYING ANGLES> for ways to specify an angle. This parameter
+is displayed in decimal degrees.
+
+There is no default; you must specify a value.
+
+=for html <a name="local_coord"></a>
+
+=item local_coord (string)
+
+This parameter determines what local coordinates of the object are
+displayed by the L<pass|/pass> and L<position|/position> commands.
+The only legal values are:
+
+az_rng - displays azimuth and range;
+
+azel - displays elevation and azimuth;
+
+azel_rng - displays elevation, azimuth, and range;
+
+equatorial - displays right ascension and declination.
+
+equatorial_rng - displays right ascension, declination, and range.
+
+The default is 'azel_rng'.
+
+B<Note that prior to version 0.005_04, the 'azel' and 'equatorial'
+formats included range.>
+
+=for html <a name="location"></a>
+
+=item location (string)
+
+This parameter contains a text description of the observer's location.
+This is not used internally, but if it is not empty it will be
+displayed wherever the observer's latitude, longitude, and height are.
+
+There is no default; the parameter is undefined unless you supply a
+value.
+
+=for html <a name="longitude"></a>
+
+=item longitude (numeric)
+
+This parameter specifies the longitude of the observer in degrees east.
+If your observing location is west of the Standard Meridian (as it
+would be if you live in North or South America), specify a negative
+number.
+
+See L</SPECIFYING ANGLES> for ways to specify an angle. This parameter
+is displayed in decimal degrees.
+
+There is no default; you must specify a value.
+
+=for html <a name="model"></a>
+
+=item model (string)
+
+This parameter specifies the model to be used to predict the satellite.
+There are different models for 'near-Earth' and 'deep-space' objects.
+The models define a near-Earth object as one whose orbit has a period
+less than 225 minutes. Objects with periods of 225 minutes or more are
+considered to be deep-space objects. A couple 'meta-models' have been
+provided, consisting of a near-Earth model and the corresponding
+deep-space model, the computation being done using whichever one is
+appropriate to the object in question.
+
+The models implemented are:
+
+sgp - A simple model for near-earth objects.
+
+sgp4 - A somewhat more sophisticated model for near-Earth objects. This
+is currently the model normally used for near-Earth objects.
+
+sdp4 - A deep-space model corresponding to sgp4, but including resonance
+terms. This is currently the model normally used for deep-space objects.
+
+sgp4r - The model from "Revisiting Spacetrack Report #3", which corrects
+and combines sgp4 and sdp4.
+
+sgp8 - A proposed model for near-Earth objects.
+
+sdp8 - A proposed deep-space model corresponding to sgp8.
+
+null - A non-model, which causes no position computation to be done.
+Useful for testing, maybe.
+
+The 'meta-models' implemented are:
+
+model - Use the normal model appropriate to the object. Currently this
+means sgp4r, but this will change if the preferred model changes (at
+least, if I become aware of the fact).
+
+model4 - Use either sgp4 or sdp4 as appropriate. Right now this is the
+same as 'model', but 'model4' will still run sgp4 and sdp4, even if
+they are no longer the preferred models.
+
+model4r - Synonym for sgp4r, implemented to keep the 'meta-models'
+consistent.
+
+model8 - Use either sgp8 or sdp8 as appropriate.
+
+The default is 'model'.
+
+=for html <a name="perltime"></a>
+
+=item perltime (boolean)
+
+This parameter is a wart occasioned by the failure of
+L<Date::Manip|Date::Manip> to understand summer time prior to version 6.
+It is ignored if you are using L<Date::Manip|Date::Manip> 6.0 or
+greater, or if you are using the internal ISO-8601 parser, since neither
+needs this mechanism.
+
+If you are using a L<Date::Manip|Date::Manip> prior to 6.0, you should
+read on. This includes anyone not using Perl 5.010 or later, since Perl
+5.010 is required for L<Date::Manip|Date::Manip> 6.0 and above.
+
+This parameter specifies the time zone mechanism for date input. If
+false (i.e. 0 or an empty string), L<Date::Manip|Date::Manip> does the
+conversion.  If true (typically 1), L<Date::Manip|Date::Manip> is told
+that the time zone is GMT, and the time zone conversion is done by
+C<gmtime( timelocal( $time ) )>.
+
+The problem this attempts to fix is that, in jurisdictions that do
+summer time, Date::Manip gives the wrong time if the current time is not
+summer time but the time converted is.  That is to say, with a time zone
+of EST5EDT, in January, 'jan 1 noon' converts to 5:00 PM GMT. But 'jul 1
+noon' does also, but should convert to 4:00 PM GMT.
+
+If you turn this setting on, 'jul 1 noon' comes out 4:00 PM GMT even
+if done in January. If you plan to parse times B<with zones> (e.g.
+'jul 1 noon edt'), you should turn this setting off.
+
+Note that at at some point this setting will be no-oped and its use
+deprecated, though given the state of things this may well not happen
+until this script itself starts requiring Perl 5.010.
+
+The default is 0 (i.e. false).
+
+=for html <a name="prompt"></a>
+
+=item prompt (string)
+
+This parameter specifies the string used to prompt for commands.
+
+The default is 'satpass>'.
+
+=for html <a name="refraction"></a>
+
+=item refraction (boolean)
+
+This parameter specifies whether atmospheric refraction should be taken
+into account in the azel() calculation.
+
+The default is 1 (i.e. true).
+
+=for html <a name="simbad_url"></a>
+
+=item simbad_url (string)
+
+This parameter does not, strictly speaking, specify a URL, but does
+specify the server to use to perform SIMBAD lookups (see the 'lookup'
+subcommand of the L<sky|/sky> command). Currently-legal values are
+'simbad.u-strasbg.fr' (the original site) and 'simbad.harvard.edu'
+(Harvard University's mirror).
+
+B<As of satpass 0.013_09,> the default is 'simbad.u-strasbg.fr', since
+Harvard seems to be redirected to Strasbourg these days.
+
+B<Please note that the command this parameter supports is
+experimental,> and see the warnings on that command. Changes in the
+command may result in this parameter becoming deprecated and/or
+no-oped.
+
+Also note that the version of SIMBAD used to access the site is
+controlled by the L<simbad_version|/simbad_version> parameter.
+
+=for html <a name="simbad_version"></a>
+
+=item simbad_version (integer)
+
+This parameter specifies the version of the SIMBAD application being
+used, the valid values being 3 or 4. If you set it to 3, the
+Astro::SIMBAD package will be used for SIMBAD lookups. If you set it to
+4, Astro::SIMBAD::Client will be used. As of early January 2007,
+'simbad.u-strasbg.fr' supports both versions, though 3 is being phased
+out. 'Simbad.harvard.edu' appears to me to be phasing out, and
+redirected to simbad.u-strasbg.fr.
+
+B<As of satpass 0.013_09,> the default is 4.
+
+=for html <a name="singleton"></a>
+
+=item singleton (boolean)
+
+If this parameter is true, the script uses Astro::Coord::ECI::TLE::Set
+objects to represent all bodies. If false, the set object is used only
+if the observing list contains more than one instance of a given
+NORAD ID. This is really only useful for testing purposes.
+
+Use of the Astro::Coord::ECI::TLE::Set object causes calculations to
+take about 15% longer.
+
+The default is 0 (i.e. false).
+
+=for html <a name="pass_threshold"></a>
+
+=item pass_threshold (angle or undef)
+
+This parameter corresponds to the
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> C<pass_threshold>
+attribute.  It is set in degrees. It can also be set to the C<undef>
+value by specifying the string C<'undef'> (unquoted) as its value.
+
+=for html <a name="time_format"></a>
+
+=item time_format (string)
+
+This parameter specifies the strftime(3) format used to display times.
+You will need to quote the format if it contains spaces. The default is
+'%H:%M:%S', which produces (e.g.) '15:30:00' at 3:30 PM. If you would
+prefer AM and PM, use something like '%I:%M:%S %p'. Documentation on
+the strftime(3) subroutine may be found at
+L<http://www.openbsd.org/cgi-bin/man.cgi?query=strftime&apropos=0&sektion=0&manpath=OpenBSD+Current&arch=i386&format=html>.
+
+The above is a long URL, and may be split across multiple lines. More
+than that, the formatter may have inserted a hyphen at the break, which
+needs to be taken out to make the URL good. I<Caveat user.>
+
+=for html <a name="twilight"></a>
+
+=item twilight (string or numeric)
+
+This parameter specifies the number of degrees the sun must be below
+the horizon before it is considered dark. The words 'civil',
+'nautical', or 'astronomical' are also acceptable, as is any unique
+abbreviation of these words. They specify 6, 12, and 18 degrees
+respectively.
+
+See L</SPECIFYING ANGLES> for ways to specify an angle. This parameter
+is displayed in decimal degrees, unless 'civil', 'nautical', or
+'astronomical' was specified.
+
+The default is 'civil'.
+
+=for html <a name="tz"></a>
+
+=item tz (string)
+
+This parameter specifies the time zone for Date::Manip. You probably
+will not need it, unless running under MacOS (OS 9 is meant, not OS X)
+or VMS. You will know you need to set it if commands that take times
+as parameters complain mightily about not knowing what time zone they
+are in. Otherwise, don't bother.
+
+If you find you need to bother, see the TIMEZONES section of
+L<Date::Manip|Date::Manip> for more information.
+
+This parameter is not set at all by default, and will not appear
+in the 'show' output until it has been set.
+
+=for html <a name="verbose"></a>
+
+=item verbose (boolean)
+
+This parameter specifies whether the 'pass' command should give the
+position of the satellite every step that it is above the horizon.
+If false, only rise, set, max, into or out of shadow, and the
+beginning or end of twilight are displayed.
+
+The default is 0 (i.e. false).
+
+=for html <a name="visible"></a>
+
+=item visible (boolean)
+
+This parameter specifies whether the 'pass' command should report
+only visible passes (if true) or all passes (if false). A pass is
+considered to have occurred if the satellite, at some point in its
+path, had an elevation above the horizon greater than the 'horizon'
+parameter. A pass is considered visible if it is after the end of
+evening twilight or before the beginning of morning twilight for the
+observer (i.e. "it's dark"), but the satellite is illuminated by the
+sun.
+
+The default is 1 (i.e. true).
+
+=for html <a name="webcmd"></a>
+
+=item webcmd (string)
+
+This parameter specifies the system command to spawn to display a
+web page. If not the empty string, the L<help|/help> command
+uses it to display the help for this package on
+L<http://search.cpan.org/>. Mac OS X users will find 'open' a useful
+setting, and Windows users will find 'start' useful.
+
+This functionality was added on speculation, since there is no good
+way to test it in the initial release of the package.
+
+The default is '' (i.e. the empty string), which leaves the
+functionality disabled.
+
+=back
+
+=head1 SPECIFYING ANGLES
+
+This script accepts angle input in the following formats:
+
+* Decimal degrees.
+
+* Hours, minutes, and seconds, specified as hours:minutes:seconds. You
+would typically only use this for right ascension. You may specify
+fractional seconds, or fractional minutes for that matter.
+
+* Degrees, minutes, and seconds, specified as degreesDminutesMsecondsS.
+The letters may be specified in either case, and trailing letters may
+be omitted. You may specify fractional seconds, or fractional minutes
+for that matter.
+
+Examples:
+
+ 23.4 specifies 23.4 degrees.
+ 1:22.3 specifies an hour and 22.3 minutes
+ 12d33m5 specifies 12 degrees 33 minutes 5 seconds
+
+Right ascension is always positive. Declination and latitude are
+positive for north, negative for south. Longitude is positive for
+east, negative for west.
+
+=head1 SPECIFYING TIMES
+
+This script (or, more properly, the modules it is based on) does not,
+at this point, do anything fancy with times. It simply handles them as
+Perl scalars, with the limitations that that implies.
+
+Times may be specified absolutely, or relative to the previous absolute
+time, or to the time the script was invoked if no absolute time has
+been specified.
+
+Both absolute and relative times may contain whitespace. If they do,
+they need to be quoted. For example,
+
+ satpass> pass today +1
+
+needs no quotes, but
+
+ satpass> pass 'today midnight' '+1 12'
+
+needs quotes.
+
+=head2 Absolute time
+
+Any time string not beginning with '+' or '-' is assumed to be an
+absolute time. If L<Date::Manip|Date::Manip> is available, the string is
+fed to that for parsing. See the documentation for that module for all
+the possibilities. Some of them are:
+
+ today        'today noon'        'next monday'
+ tomorrow     'yesterday 10:00'   'nov 10 2:00 pm'
+
+L<Date::Manip|Date::Manip> has at least some support for locales, so
+check L<Date::Manip|Date::Manip> before you assume you must enter dates
+in English.
+
+If C<Date::Manip> is not available, this script will do the best it can
+with an internal parsing routine. This routine accepts ISO-8601 dates,
+but not ordinal day specifications (e.g. 2009365 for December 31 2009)
+or week specifications (e.g. 2009W0101 for January 4 2009 (if that is in
+fact the correct interpretation of the spec)).
+
+The internal routine is rather permissive about punctuation: any
+non-digit character is accepted, and multiple whitespace characters are
+accepted between date and time, and between time and zone. Years can be
+two- or four-digit, with two-digit years representing years between 1970
+and 2069, inclusive. Any other date or time field can be shortened if it
+has trailing punctuation or is the last field specified before the zone.
+
+In addition, the internal routine accepts the strings 'yesterday',
+'today', and 'tomorrow' in lieu of a date. If time is not specified,
+these represent midnight.
+
+So, using the internal parser the following are valid:
+
+ today     'today 12:00'  '2009/2/1 6:00Z' (i.e. February 1)
+ tomorrow  yesterday6:00
+
+As a refresher, ISO-8601 dates are numeric and specified as year, month,
+and day. If all fields are full-width (4 digits for years, 2 for
+everything else) no punctuation at all is needed, other than in an
+optional zone specification.
+
+=head2 Relative time
+
+A relative time is specified by '+' or '-' and an integer number of
+days. The number of days must immediately follow the sign. Optionally,
+a number of hours, minutes, and seconds may be specified by placing
+whitespace after the day number, followed by hours:minutes:seconds. If
+you choose not to specify seconds, omit the trailing colon as well. The
+same applies if you choose not to specify minutes. For example:
+
++7 specifies 7 days after the last-specified time.
+
+'+7 12' specifies 7 days and 12 hours after the last-specified time.
+
+If a relative time is specified as the first time argument of a command,
+it is relative to the most-recently-specified absolute time, even if
+that absolute time was specified by default. Relative times in subsequent
+arguments to the same command are relative to the previously-specified
+time, whether absolute or relative. For example:
+
+ almanac '' +5
+
+establishes the most-recently-specified time as 'today midnight', and does
+an almanac for 5 days from that time. If the next command is
+
+ almanac +5 +3
+
+this produces almanac output for three days, starting 5 days after
+'today midnight'.
+
+=head1 INVOCATION
+
+Assuming this script is installed as an executable, you should be able
+to run it just by specifying its name. Under VMS, the DCL$PATH logical
+name must include the directory into which the script was installed.
+
+The only command qualifiers are
+
+=over
+
+=item -clipboard
+
+which causes all output to go to the clipboard. Use of this qualifier
+requires module Win32::Clipboard under MSWin32 (standard with
+ActivePerl), the Mac::Pasteboard module or the 'pbcopy' command under
+Darwin (the latter standard with Mac OS X), or the xclip command
+(available from L<http://freshmeat.net/projects/xclip>) under any other
+operating system. This script will warn and abort the command using this
+option if the requisites are not available.
+
+=item -filter
+
+which suppresses extraneous output to make satpass behave more like a
+Unix filter. The only thing suppressed at the moment is the banner text.
+
+=item -initialization_file filename
+
+which specifies an initialization file to use in place of the default.
+
+=item -version
+
+which causes the banner text to be displayed and the script to exit.
+This option overrides -filter if both are specified.
+
+=back
+
+These qualifiers can be abbreviated, as long as the abbreviation is
+unique.
+
+It is also possible to pass commands on the command line, or to pipe or
+redirect them in. The execution order is
+
+ 1. The initialization file;
+ 2. Commands on the command line;
+ 3. Commands from standard input.
+
+For example, assuming the initialization file defines a macro named
+'usual' to load the usual observing list, you could do:
+
+ $ satpass usual 'pass "today noon" +1' exit
+
+to display passes for the next day. Obviously you may need to play
+games with your shell's quoting rules. In the above example,
+MSWin32 and VMS users would be advised to interchange the single
+and double quotes.
+
+Should you wish to execute the above from a file, each command needs
+to go on its own line, thus:
+
+  usual
+  pass "today noon" +1
+  exit
+
+and the file is then invoked using either
+
+  $ satpass <commands
+
+(assuming 'commands' is the name of the file), or, under the same
+naming assumption,
+
+  $ satpass 'source commands'
+
+or (under some flavor of Unix)
+
+  $ cat commands | satpass
+
+or even
+
+  $ satpass `cat commands`
+
+=head1 ENVIRONMENT VARIABLES
+
+SATPASSINI can be used to specify an initialization file to use in lieu
+of the default. This can still be overridden by the
+-initialization_file command option. To see the current setting,
+
+ satpass> echo $SATPASSINI
+
+which reports the name of the file actually used to initialize.
+
+=head1 ACKNOWLEDGMENTS
+
+L<Astro::Coord::ECI|Astro::Coord::ECI> acknowledges those without whom
+this code would not exist. But the script has its own issues, and I
+would like to acknowledge here those who made this script better:
+
+Imacat of Tavern IMACAT in Taiwan, for helping me to work out a satpass
+script testing problem.
+
+=head1 BUGS
+
+Bugs can be reported to the author by mail, or through
+L<http://rt.cpan.org/>.
+
+The VMS- and MSWin32-specific code to find the initialization file and
+do tilde expansion is untested, since I do not currently have access to
+those systems.
+
+As of 0.003, clipboard functionality is provided by this code, not by
+the Clipboard module, making clipboard bugs mine also.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III (F<wyant at cpan dot org>)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+TIGER/LineE<reg> is a registered trademark of the U.S. Census Bureau.
+
+=cut
+
+# ex: set textwidth=72 :

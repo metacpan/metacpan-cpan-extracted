@@ -1,0 +1,52 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE omf PUBLIC "-//OMF//DTD Scrollkeeper OMF Variant V1.0//EN" "http://scrollkeeper.sourceforge.net/dtds/scrollkeeper-omf-1.0/scrollkeeper-omf.dtd">
+
+<!-- Copyright 2005, 2006, 2007, 2009, 2010, 2011, 2016 Kevin Ryde
+
+     This file is part of Chart.
+
+     Chart is free software; you can redistribute it and/or modify it
+     under the terms of the GNU General Public License as published by
+     the Free Software Foundation; either version 3, or (at your
+     option) any later version.
+
+     Chart is distributed in the hope that it will be useful, but
+     WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+     General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with Chart.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Crib notes: The OMF file spec is at
+     http://www.ibiblio.org/osrt/omf/
+and in the Debian scrollkeeper package
+     /usr/share/scrollkeeper/doc/writing_scrollkeeper_omf_files/C/writing_scrollkeeper_omf_files.xml
+
+-->
+
+<omf>
+  <resource>
+    <creator>Kevin Ryde</creator>
+    <title>Chart Manual</title>
+    <date>2017-04-07</date>
+    <version identifier="259"
+             date="2017-04-07"/>
+    <subject category="Applications|Office|Financial"/>
+    <description>
+      Chart is a program for stock and commodity charting, featuring
+      data downloading from several sources, and various display
+      options and technical analysis indicators and averages.
+    </description>
+    <type>user's guide</type>
+    <format mime="text/html"/>
+    <identifier url="file://@gnomehelppkgCdir@/chart.html"/>
+    <language code="C"/>
+    <relation seriesid="c323d922-86de-11d9-9b26-94efc0676788"/>
+    <rights type="GNU GPL"
+            license="http://www.gnu.org/licenses/gpl.txt"
+            license.version="2"
+            holder="Kevin Ryde"/>
+  </resource>
+</omf>

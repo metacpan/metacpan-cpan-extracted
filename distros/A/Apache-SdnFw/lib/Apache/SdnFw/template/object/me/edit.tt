@@ -1,0 +1,22 @@
+<form method="POST" action="[% s.ubase %]/[% s.object %]/save">
+<div class="floatleft">
+<table>
+	<caption>Your Information</caption>
+	<tbody>
+		<tr>
+			<th>Login</th>
+			<td><input name="login" value="[% hash.login %]"></td>
+		</tr>
+		<tr>
+			<th>Name</th>
+			<td><input name="name" value="[% hash.name %]"></td>
+		</tr>
+		<tr>
+			<th>Email</th>
+			<td><input name="email" value="[% hash.email %]"></td>
+		</tr>
+	</tbody>
+</table>
+<input type="submit" value="Save">
+</div>
+</form>

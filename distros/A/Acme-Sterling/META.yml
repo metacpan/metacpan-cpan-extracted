@@ -1,0 +1,23 @@
+---
+abstract: 'playing with Dist::Zilla'
+author:
+  - 'Ted Katseres'
+build_requires:
+  Module::Build: '0.28'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Sterling
+requires:
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/tedkat/Acme-Sterling
+  repository: https://github.com/tedkat/Acme-Sterling.git
+version: '0.001'

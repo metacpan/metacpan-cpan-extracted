@@ -1,0 +1,107 @@
+=begin html
+
+<a href="https://travis-ci.org/dod38fr/cme-perl">
+   <img src="https://travis-ci.org/dod38fr/cme-perl.svg?branch=master">
+</a>
+
+=end html
+
+=head1 cme - Check or edit configuration data
+
+L<cme> provides a command to check or edit configuration data with
+L<config-model|https://github.com/dod38fr/config-model/wiki>.
+
+L<cme> and L<Config::Model> are quite modular: the configuration data
+that you can edit depend on the other C<Config::Model> distributions
+installed on your system.
+
+For instance, to configure L<ssh client|http://man.cx/ssh_config> or
+L<sshd server|http://man.cx/sshd_config>, you need to
+install L<Config::Model::OpenSsh>.
+
+Then you can check your ssh configuration with this command:
+
+ $ cme check ssh
+
+and you can modify it with:
+
+ $ cme edit ssh
+
+The L<wiki|https://github.com/dod38fr/config-model/wiki> contains a
+L<list of available models|https://github.com/dod38fr/config-model/wiki/Available-models-and-backends>
+
+L<cme> provides several commands. The most important are :
+
+=over
+
+=item check
+
+To check the content of the configuration file of an application.
+
+=item fix
+
+To fix the warnings of the configuration file.
+
+=item edit
+
+To launch cme interactive editor. This editor contains documentation
+and sanity checks to help user configure correctly their application.
+
+=back
+
+L<cme> user interface can be:
+
+=over
+
+=item *
+
+Graphical if L<Config::Model::TkUI> is installed.
+
+=item *
+
+a shell-like interface (plain or based on L<Term::ReadLine>).
+
+=item *
+
+based on curses if L<Config::Model::CursesUI> is installed.
+
+=back
+
+By default, C<cme edit> will try to launch a GUI.
+
+=head2 Installation
+
+See L<Readme.install|https://github.com/dod38fr/cme-perl/blob/master/README.install.pod>.
+
+Perl developers can also L<build App::Cme from git|build-from-git.md>
+
+
+=head2 What does "cme" means ?
+
+Nothing fancy: "Config Model Editor". The idea was to
+L<choose a short, easy to remember and available name|http://ddumont.wordpress.com/2011/12/12/what-name-for-configmodels-new-command-line-cfg-or-something-else/>.
+
+=head2 More information
+
+See
+
+=over
+
+=item *
+
+L<cme> man page
+
+=item *
+
+L<config-model wiki|https://github.com/dod38fr/config-model/wiki> (i.e. the wiki tab above)
+
+=item *
+
+L<http://ddumont.wordpress.com/>
+
+=item *
+
+The list of available models, interfaces and known configuration syntaxes: https://github.com/dod38fr/config-model/wiki/Available-models-and-backends
+
+=back
+

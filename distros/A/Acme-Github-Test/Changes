@@ -1,0 +1,11 @@
+Revision history for Acme-Github-Test
+
+0.03    2013-01-07
+        Fix broken link in POD and README (thanks Smylers)
+
+0.02    2013-01-04
+        Silence CPAN test failures
+
+0.01    2012-07-17
+        Initial release
+

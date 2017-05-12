@@ -1,0 +1,97 @@
+NAME
+    Attribute::Tie - Tie via Attribute
+
+SYNOPSIS
+      use Attribute::Tie;
+      my %hash   : Tie('Hash::Yours', args ...);
+      my @array  : Tie('Array::Yours', args ...);
+      my $scalar : Tie('Scalar::Yours', args ...);
+
+DESCRIPTION
+    Attribute::Tie allows you to tie variables via attribute. This is more
+    intuitive than
+
+      tie my %hash, "Tie::Hash::Yours", args ... or die "$!";
+
+    The first argument to "Tie()" is the name of the module to which you
+    want to tie the variable. You can omit 'Tie' therein.
+
+      my %db  : Tie('DB_File', ....); # ties to DB_File;
+      my @fie : Tie('File', ...);     # ties to Tie::File;
+
+    You do not have to "use Tie::Whatever"; Attribute::Tie does it for you.
+
+  Attribute::Tie vs Attribute::Handlers' autotie
+    I wrote this module for two reasons:
+
+    semantics
+      Attribute::Handlers offers an alternate approach via autotie. That
+      looks like this.
+
+        use Attribute::Handlers autotie => { File => 'Tie::File' };
+        my @array : File('array.txt');
+
+      Which is handy but it hides the fact that the variable is actually
+      tied. I want the attribute name to reflect what is really done to the
+      variable.
+
+    error handling
+      unlike most attributes, "tie"-ing variable may fail. This is
+      especially true for modules that tie variables to external files. But
+      autotie does not trap the error; it just leaves the variable untied.
+      Consider this.
+
+        use Attribute::Handlers autotie => { File => 'Tie::File' };
+        my @array : File('/nonexistent/nowhere.txt');
+
+      Of course you can check the error like this.
+
+        tied(@array) or die $!
+
+      or this:
+
+        my @array : File('/nonexistent/nowhere.txt') or die $!;
+
+      First one is error-prone and the second one is unnatural because
+      setting attribute is not assignment. When the error happens, it should
+      croak before the attribute is 'set', or fails to be set.
+
+      On the other hand, Attribute::Tie dies on failure by default.
+
+        my @array : Tie('File', '/nonexistent/nowhere.txt');
+        # you die here!
+
+  CUSTOM ERROR HANDLER
+    By default, Attribute::Tie dies on failure as follows.
+
+      tie(%HASH, 'SDBM_File', ./_none_/db, 514, 438) failed : 
+      No such file or directory at t/04-error.t line 12
+
+    You can change this behavior via "Attribute::Tie->seterror()".
+
+      # sets the error handler
+      Attribute::Tie->seterror(sub{ die @_ });
+
+      # disables error handling like Attribute::Handler's autotie
+      Attribute::Tie->seterror(sub{});
+
+       Attribute::Tie->seterror(0);
+      # restores default handler
+      Attribute::Tie->seterror(1);
+
+  EXPORT
+    None by default.
+
+SEE ALSO
+    perltie, Attribute::Handlers
+
+AUTHOR
+    Dan Kogai, <dankogai@dan.co.jp>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Dan Kogai
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

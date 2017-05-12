@@ -1,0 +1,40 @@
+=head1 CHANGES (Apache::Watchdog::RunAway)
+
+=over
+
+=item 1.00 - Mon Mar 21 13:49:25 EST 2005
+
+ported to mod_perl2
+
+open the safehang.log file only when it's used for the first time, so
+if someone loads the module before setting
+$Apache::Watchdog::RunAway::LOG_FILE the user value will take an
+effect
+
+added a basic test suite
+
+untaint proc id used in stop_monitor (now runs under -T)
+
+
+
+=item 0.3 - Wed Feb 20 14:09:32 SGT 2002
+
+rewrite debug and error handling code, so one can actually benefit
+from debug levels
+
+
+
+=item 0.2 - Tue May 15 09:46:43 SGT 2001
+
+now printing the request info for the hanging process that gets killed
+(a patch by Philippe M. Chiasson <gozer@ectoplasm.org>)
+
+
+
+=item 0.1 - Tue Feb 22 11:34:14 IST 2000
+
+First version released
+
+=back
+
+=cut

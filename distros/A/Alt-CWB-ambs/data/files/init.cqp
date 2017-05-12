@@ -1,0 +1,4 @@
+## CQP init file for test scripts
+set DataDirectory "tmp";
+define macro number_of_NPs ('$0=Num_NP') '<s> (<np> []+ </np>){$0} [!np]';
+set Context 1 s;

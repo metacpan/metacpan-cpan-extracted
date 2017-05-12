@@ -1,0 +1,30 @@
+clear
+power on
+regs
+
+op a9 55
+
+# Should be: SP=FF, ACC=55
+test sp = ff
+test acc = 55
+
+op 48
+
+# Should be: SP=FE, ACC=55, mem[$01FF]=55
+test sp = fe
+test acc = 55
+test m:01ff = 55
+
+# Set the ACC to something else
+op a9 01
+
+# Should be: ACC=01
+test acc = 01
+
+op 68
+
+# Should be: SP=FF, ACC=55
+test sp = ff
+test acc = 55
+
+save verify_68.txt

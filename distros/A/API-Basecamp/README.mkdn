@@ -1,0 +1,345 @@
+# NAME
+
+API::Basecamp - Basecamp.com API Client
+
+# VERSION
+
+version 0.06
+
+# SYNOPSIS
+
+    use API::Basecamp;
+
+    my $basecamp = API::Basecamp->new(
+        username   => 'USERNAME',
+        password   => 'PASSWORD',
+        identifier => 'APPLICATION NAME',
+        account    => 'ACCOUNT NUMBER',
+    );
+
+    $basecamp->debug(1);
+    $basecamp->fatal(1);
+
+    my $project = $basecamp->projects('605816632');
+    my $results = $project->fetch;
+
+    # after some introspection
+
+    $project->update( ... );
+
+# DESCRIPTION
+
+This distribution provides an object-oriented thin-client library for
+interacting with the Basecamp ([http://basecamp.com](http://basecamp.com)) API. For usage and
+documentation information visit [https://github.com/basecamp/bcx-api](https://github.com/basecamp/bcx-api).
+API::Basecamp is derived from [API::Client](https://metacpan.org/pod/API::Client) and inherits all of it's
+functionality. Please read the documentation for API::Client for more usage
+information.
+
+# ATTRIBUTES
+
+## account
+
+    $basecamp->account;
+    $basecamp->account('ACCOUNT');
+
+The account attribute should be set to the account holder's account ID number.
+
+## identifier
+
+    $basecamp->identifier;
+    $basecamp->identifier('IDENTIFIER');
+
+The identifier attribute should be set to a string that identifies your application.
+
+## password
+
+    $basecamp->password;
+    $basecamp->password('PASSWORD');
+
+The password attribute should be set to the account holder's password.
+
+## username
+
+    $basecamp->username;
+    $basecamp->username('USERNAME');
+
+The username attribute should be set to the account holder's username.
+
+## debug
+
+    $basecamp->debug;
+    $basecamp->debug(1);
+
+The debug attribute if true prints HTTP requests and responses to standard out.
+
+## fatal
+
+    $basecamp->fatal;
+    $basecamp->fatal(1);
+
+The fatal attribute if true promotes 4xx and 5xx server response codes to
+exceptions, a [API::Client::Exception](https://metacpan.org/pod/API::Client::Exception) object.
+
+## retries
+
+    $basecamp->retries;
+    $basecamp->retries(10);
+
+The retries attribute determines how many times an HTTP request should be
+retried if a 4xx or 5xx response is received. This attribute defaults to 0.
+
+## timeout
+
+    $basecamp->timeout;
+    $basecamp->timeout(5);
+
+The timeout attribute determines how long an HTTP connection should be kept
+alive. This attribute defaults to 10.
+
+## url
+
+    $basecamp->url;
+    $basecamp->url(Mojo::URL->new('https://basecamp.com'));
+
+The url attribute set the base/pre-configured URL object that will be used in
+all HTTP requests. This attribute expects a [Mojo::URL](https://metacpan.org/pod/Mojo::URL) object.
+
+## user\_agent
+
+    $basecamp->user_agent;
+    $basecamp->user_agent(Mojo::UserAgent->new);
+
+The user\_agent attribute set the pre-configured UserAgent object that will be
+used in all HTTP requests. This attribute expects a [Mojo::UserAgent](https://metacpan.org/pod/Mojo::UserAgent) object.
+
+# METHODS
+
+## action
+
+    my $result = $basecamp->action($verb, %args);
+
+    # e.g.
+
+    $basecamp->action('head', %args);    # HEAD request
+    $basecamp->action('options', %args); # OPTIONS request
+    $basecamp->action('patch', %args);   # PATCH request
+
+The action method issues a request to the API resource represented by the
+object. The first parameter will be used as the HTTP request method. The
+arguments, expected to be a list of key/value pairs, will be included in the
+request if the key is either `data` or `query`.
+
+## create
+
+    my $results = $basecamp->create(%args);
+
+    # or
+
+    $basecamp->POST(%args);
+
+The create method issues a `POST` request to the API resource represented by
+the object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+## delete
+
+    my $results = $basecamp->delete(%args);
+
+    # or
+
+    $basecamp->DELETE(%args);
+
+The delete method issues a `DELETE` request to the API resource represented by
+the object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+## fetch
+
+    my $results = $basecamp->fetch(%args);
+
+    # or
+
+    $basecamp->GET(%args);
+
+The fetch method issues a `GET` request to the API resource represented by the
+object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+## update
+
+    my $results = $basecamp->update(%args);
+
+    # or
+
+    $basecamp->PUT(%args);
+
+The update method issues a `PUT` request to the API resource represented by
+the object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+# RESOURCES
+
+## accesses
+
+    $basecamp->projects('605816632')->accesses;
+
+The accesses method returns a new instance representative of the API
+_Accesses_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/accesses.md](https://github.com/basecamp/bcx-api/blob/master/sections/accesses.md).
+
+## attachments
+
+    $basecamp->attachments;
+
+The attachments method returns a new instance representative of the API
+_Attachments_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/attachments.md](https://github.com/basecamp/bcx-api/blob/master/sections/attachments.md).
+
+## calendar\_events
+
+    $basecamp->calendar_events;
+
+The calendar\_events method returns a new instance representative of the API
+_Calendar Events_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/calendar\_events.md](https://github.com/basecamp/bcx-api/blob/master/sections/calendar_events.md).
+
+## calendars
+
+    $basecamp->calendars;
+
+The calendars method returns a new instance representative of the API
+_Calendars_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/calendars.md](https://github.com/basecamp/bcx-api/blob/master/sections/calendars.md).
+
+## comments
+
+    $basecamp->projects('605816632')->comments;
+
+The comments method returns a new instance representative of the API
+_Comments_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/comments.md](https://github.com/basecamp/bcx-api/blob/master/sections/comments.md).
+
+## documents
+
+    $basecamp->documents;
+
+The documents method returns a new instance representative of the API
+_Documents_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/documents.md](https://github.com/basecamp/bcx-api/blob/master/sections/documents.md).
+
+## events
+
+    $basecamp->events;
+
+The events method returns a new instance representative of the API
+_Events_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/events.md](https://github.com/basecamp/bcx-api/blob/master/sections/events.md).
+
+## groups
+
+    $basecamp->groups;
+
+The groups method returns a new instance representative of the API
+_Groups_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/groups.md](https://github.com/basecamp/bcx-api/blob/master/sections/groups.md).
+
+## messages
+
+    $basecamp->projects('605816632')->messages;
+
+The messages method returns a new instance representative of the API
+_Messages_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/messages.md](https://github.com/basecamp/bcx-api/blob/master/sections/messages.md).
+
+## people
+
+    $basecamp->people;
+
+The people method returns a new instance representative of the API
+_People_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/people.md](https://github.com/basecamp/bcx-api/blob/master/sections/people.md).
+
+## project\_templates
+
+    $basecamp->project_templates;
+
+The project\_templates method returns a new instance representative of the API
+_Project Templates_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/project\_templates.md](https://github.com/basecamp/bcx-api/blob/master/sections/project_templates.md).
+
+## projects
+
+    $basecamp->projects;
+
+The projects method returns a new instance representative of the API
+_Projects_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/projects.md](https://github.com/basecamp/bcx-api/blob/master/sections/projects.md).
+
+## stars
+
+    $basecamp->stars;
+
+The stars method returns a new instance representative of the API
+_Stars_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/stars.md](https://github.com/basecamp/bcx-api/blob/master/sections/stars.md).
+
+## todo\_lists
+
+    $basecamp->todo_lists;
+
+The todo\_lists method returns a new instance representative of the API
+_Todo Lists_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/todolists.md](https://github.com/basecamp/bcx-api/blob/master/sections/todolists.md).
+
+## todos
+
+    $basecamp->projects('605816632')->todos;
+
+The todos method returns a new instance representative of the API
+_Todos_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/todos.md](https://github.com/basecamp/bcx-api/blob/master/sections/todos.md).
+
+## topics
+
+    $basecamp->topics;
+
+The topics method returns a new instance representative of the API
+_Topics_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/topics.md](https://github.com/basecamp/bcx-api/blob/master/sections/topics.md).
+
+## uploads
+
+    $basecamp->projects('605816632')->uploads;
+
+The uploads method returns a new instance representative of the API
+_Uploads_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://github.com/basecamp/bcx-api/blob/master/sections/uploads.md](https://github.com/basecamp/bcx-api/blob/master/sections/uploads.md).
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

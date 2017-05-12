@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Acme/Laugh.pm
+t/00.load.t
+t/01.laugh.t
+t/pod-coverage.t
+t/pod.t
+eg/xchat-laugh.pl
+META.json

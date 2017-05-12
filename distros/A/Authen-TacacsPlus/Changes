@@ -1,0 +1,67 @@
+Revision history for Perl extension Authen::TacacsPlus.
+
+0.01  Mon Dec  8 16:05:51 1997
+	- original version; created by h2xs 1.18
+
+0.16  Mon Apr 26 10:22:22 1999
+	- Now does PAP and CHAP authentication, as well
+	as the original ASCII. PAP and CHAP use TACACS+ version 1
+	- Added flag to make_auth to specify the
+	authentication type, plus string lengths (because
+	in some auth types, the password string may contain NULs.
+	- Added optional flag to ->authen() to specify the
+	authentication type. Defaults to ASCII
+	- Some reformatting to make it easier to read.
+	- Cleaned up Makefiles so it builds cleaner
+	- Mike McCauley (mikem@open.com.au)
+
+0.17 Sat Sep 22 2007, Mike McCauley
+     - Mike McCauley (mikem@open.com.au) is now co-maintainer.
+     - DISTNAME changed to Authen-TacacsPlus to be consistent with file
+     naming of other Authen modules.
+     - readme changed to README.
+     - Added licensing statement to README, with the approval and consent of
+     Mike Shoyher.
+     - Fixed a typedef in md5.h that breaks md5 on 64 bit machines. Patch
+     provided by Ernst Oudhof.
+     - Removed bogus broken constant TACACS_CLIENT.
+     - Fixed a number of compiler warnings, but still does not compile on
+     Windows.
+
+0.18 Sat Mar 15 2008, Mike McCauley
+     - Disabled default setting of -symbolic in Makefile.PL
+     on Solaris since it seems to be
+     no longer required on most platforms.
+     - Improved errmsg() so it works as advertised
+     - test suite now uses Test.
+     - test suite now skips if there is no Tacacs server to test against
+
+0.19 Sun Mar 16 2008, Mike McCauley
+     - Fixed 'make test' failure in taclibplus due to missing pure_all target
+
+0.20 Fri July 10, 2009 Mike McCauley
+     - Fixed incorect spelling of 'Authentication' in tac_client.c
+     - implements a 
+     timeout for the connect() operation. It uses the timeout value which is
+     passed to the init_tac_session() function. Contributed by Robert Leibl
+
+0.21 Sat Aug 13, 2011 Mike McCauley
+     - Changes to TacacsPlus.pm to permit multiple servers to be specified in
+     new(). Patches provided by Paulo A Ferreira.
+     
+0.22 Wed Jan 18, 2012 Mike McCauley
+     - Fixed warning under perl 5.14g
+
+0.23 Wed Aug 23, 2012 Mike McCauley
+     - Fixed problems in low level read_data() function triggered when an
+     incorrect key is used with some Tacacs+ servers, resulting in a 0-length
+     read(), causing a seg
+     fault on some platforms, and a very slow exit on others. This problem
+     appears to have been in tac_client ever since I inherited this library.
+
+0.24 Fri Mar 22, 2013 Mike McCauley
+     - Updated author and distribution location details to airspayce.com
+
+0.26 2015-12-08 Mike McCauley
+     - pass CFLAGS and CPPFLAGS explicitly in the subdirectory to get all
+     hardening flags, Patch from Florian Schlichting.

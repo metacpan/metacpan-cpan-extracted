@@ -1,0 +1,10 @@
+Revision history for App-TextTableUtils
+
+0.002   2016-09-03 (PERLANCAR)
+
+	- [Bugfix] Forgot to implement rendering to ansitable.
+
+
+0.001   2016-09-03 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,7 @@
+Revision history for Perl extension AnyEvent::Gmail::Feed
+
+0.02  Fri Jul 24 15:00:34 PDT 2009
+        - use AnyEvent->timer rather than sleep(2)
+
+0.01  Thu Jul 23 23:40:07 2009
+        - original version

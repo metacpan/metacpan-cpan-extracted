@@ -1,0 +1,42 @@
+AI-Logic-AnswerSet version 0.01
+===============================
+
+Answer Set Programming (ASP) is a very powerful formalism tool for knowledge representation and reasoning, 
+which is lately getting quite popular, also thanks to the availability of a number of modern 
+and solid systems supporting it, such as DLV. 
+The main goal of this module is to “embed” DLV into Perl programs in such a way that a programmer 
+can easily ask DLV for some jobs and then easily exploit its output. 
+So, how does it work? The user can write down (or compose!) his/her declarative solutions; 
+AI::Logic::AnswerSet takes care of interacting with DLV and makes results available into Perl, 
+where they can be easily managed by the  user.
+
+NOTE: the use of this framework requires at least some basics of declarative programming, ASP in particular;
+in addition, the DLV system is needed. 
+The user might refer to www.dlvsystem.com for  downloading DLV and getting some info on its language.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Ferdinando Primerano, Francesco Calimeri.
+
+This work started within the bachelor degree thesis program of the
+Computer Science course at Department of Mathematics of the University
+of Calabria.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

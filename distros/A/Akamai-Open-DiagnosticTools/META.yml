@@ -1,0 +1,30 @@
+---
+abstract: 'The Akamai Open DiagnosticTools API Perl client'
+author:
+  - 'Martin Probst <internet+cpan@megamaddin.org>'
+build_requires:
+  Akamai::Open::Client: 0
+  Test::More: 0
+  Test::Pod: 1.41
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Akamai-Open-DiagnosticTools
+requires:
+  Akamai::Open::Client: 0
+  Akamai::Open::Request::EdgeGridV1: 0
+  JSON: 0
+  Moose: 0
+  constant: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://github.com/MegaMaddin/akamai-open-diagnostictools-perl
+version: 0.02
+x_authority: cpan:PROBST

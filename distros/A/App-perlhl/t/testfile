@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+my $scalar = 'hello';
+my $newline = "\n";
+my @array = qw(one two three);
+my $string = q{Hello, world!};
+if ($scalar) {
+    my $ver  = $File::Basename::VERSION;
+    my $ver2 = File::Basename->VERSION();
+    print ($ver == $ver2 ? 'ok' : 'notok');
+}
+my %hash = @ARGV if @ARGV % 2 == 0;
+while (<>) {
+    print if m/\Q$scalar\E|hi/i;
+}
+close *STDOUT;

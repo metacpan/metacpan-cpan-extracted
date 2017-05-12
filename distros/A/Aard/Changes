@@ -1,0 +1,9 @@
+Revision history for Perl extension Aard.
+
+0.001 2014-11-14T23:16+02:00
+ - Improve POD
+ - Replace JSON with JSON::MaybeXS
+ - Mark as stable
+
+0.000_001 2014-05-01T02:06+03:00
+ - Initial release

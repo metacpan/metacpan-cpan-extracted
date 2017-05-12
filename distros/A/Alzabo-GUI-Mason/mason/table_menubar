@@ -1,0 +1,34 @@
+% if (@c) {
+ <tr><td colspan="5">&nbsp;</td></tr>
+ <tr>
+  <td colspan="5" align="center"><span class="green16bold">Columns</span></td>
+ </tr>
+%   for (my $x = 0; $x <= int ($#c / 5); $x++) {
+ <tr>
+%     for (my $y = $x * 5; $y < ($x * 5) + 5; $y++) {
+  <td align="center">
+   <span class="black12">
+%       if ( my $c = $c[$y] ) {
+%         if ( $y > 0 ) {
+   <& 'href', text => '<', path => 'move_column' . Alzabo::GUI::Mason::Config::mason_extension(), query => { schema => $t->schema->name, table => $t->name, before => $c[ $y - 1 ]->name, column => $c->name } &>
+%         }
+   <& 'href', text => $c->name, path => 'view_column' . Alzabo::GUI::Mason::Config::mason_extension(), query => { schema => $t->schema->name, table => $t->name, column => $c->name } &>
+%         if ($c->is_primary_key) {
+   : <b>pk</b>
+%         }
+%         if ( $c[ $y + 1 ] ) {
+   <& 'href', text => '>', path => 'move_column' . Alzabo::GUI::Mason::Config::mason_extension(), query => { schema => $t->schema->name, table => $t->name, after => $c[ $y + 1 ]->name, column => $c->name } &>
+%         }
+%       }
+   </span>
+  </td>
+%     }
+ </tr>
+%   }
+% }
+
+<%init>
+my $t = shift;
+
+my @c = $t->columns;
+</%init>

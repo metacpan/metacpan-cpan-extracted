@@ -1,0 +1,9 @@
+BEGIN { -e 'Distar' or system("git clone git://git.shadowcat.co.uk/p5sagit/Distar.git") }
+use lib 'Distar/lib';
+use Distar;
+
+author 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>';
+
+manifest_include 'bin' => qr/.*/;
+manifest_include 't/mod' => qr/.*/;
+manifest_include 't/line' => qr/.*\.p[ml]/;

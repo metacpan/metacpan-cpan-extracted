@@ -1,0 +1,28 @@
+<%args>
+$schema
+$instantiated
+</%args>
+<%init>
+my $s;
+eval
+{
+    $s = Alzabo::Create::Schema->load_from_file( name => $schema );
+
+    $s->set_instantiated($instantiated);
+    $s->save_to_file;
+};
+
+my $e = $@;
+
+$m->comp( 'exception', $e ) if $e;
+
+$m->redirect( uri( path => 'view_schema' . Alzabo::GUI::Mason::Config::mason_extension(),
+                   query => { schema => $s->name,
+                            },
+                 ),
+            );
+
+</%init>
+<%flags>
+inherit => 'syshandler'
+</%flags>

@@ -1,0 +1,88 @@
+#!/usr/bin/perl
+
+# ABSTRACT: example script to write to an RFXCOM transmitter
+# PODNAME: rfxcom-anyevent-tx
+
+
+use warnings;
+use strict;
+use AnyEvent::RFXCOM::TX;
+
+$|=1; # don't buffer output
+
+my $device = shift or die "Usage: $0 [device] [key=value] ...\n";
+
+my $tx =
+  AnyEvent::RFXCOM::TX->new(device => $device,
+                            map { split /=/ } @ARGV);
+
+my $w;
+$w = AnyEvent->io(fh => \*STDIN, poll => 'r',
+                  cb => sub {
+                    my $line = <STDIN>;
+                    exit unless (defined $line); # eof
+                    chomp $line;
+                    my $cv = $tx->transmit(split /[\t =]/, $line);
+                    $cv->cb(sub { print "sent $line\n" });
+                  });
+
+AnyEvent->condvar->recv;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rfxcom-anyevent-tx - example script to write to an RFXCOM transmitter
+
+=head1 VERSION
+
+version 1.142240
+
+=head1 SYNOPSIS
+
+  # read from USB tty device
+  rfxcom-anyevent-tx /dev/ttyUSB0
+
+  # read from USB device with nicer name see Device::RFXCOM::TX(3)
+  rfxcom-anyevent-tx /dev/rfxcom-tx
+
+  # read from network/wireless device
+  rfxcom-anyevent-tx 10.0.0.1:10001
+
+=head1 DESCRIPTION
+
+This script is an example of the usage of the L<AnyEvent::RFXCOM::TX>
+API.  It simply initializes the transmitter and reads message
+specifications from stdin.  The keys and values given on the command
+line become the parameter hash for the L<AnyEvent::RFXCOM::TX>
+constructor and are documented in that module.
+
+=head1 THANKS
+
+Special thanks to RFXCOM, L<http://www.rfxcom.com/>, for their
+excellent documentation and for giving me permission to use it to help
+me write this code.  I own a number of their products and highly
+recommend them.
+
+=head1 SEE ALSO
+
+L<AnyEvent::RFXCOM::TX>
+
+RFXCOM website: http://www.rfxcom.com/
+
+=head1 AUTHOR
+
+Mark Hindess <soft-cpan@temporalanomaly.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Mark Hindess.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

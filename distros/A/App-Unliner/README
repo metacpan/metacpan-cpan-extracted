@@ -1,0 +1,410 @@
+Introduction to Unliner
+  A day in the life
+    ... of a unix plumber.
+
+    Let's say you have a huge access log file in a typical Apache-like
+    format like this:
+
+        10.9.2.1 - - [10/Oct/2012:03:53:11 -0700] "GET /report.cgi HTTP/1.0" 200 724083
+
+    However, you notice that report.cgi is chewing up lots of system
+    resources. Who is responsible? Let's find out the IP addresses that are
+    hitting this URL the most so we can track them down.
+
+    The first step is to extract out the requests for report.cgi so we'd
+    probably do something like this:
+
+        $ grep "GET /report.cgi" access.log
+
+    Now we'll extract the IP address:
+
+        $ grep "GET /report.cgi" access.log | awk '{print $1}'
+
+    Next we add the standard "sort | uniq -c | sort -rn" tallying pipeline:
+
+        $ grep "GET /report.cgi" access.log | awk '{print $1}' | sort | uniq -c | sort -rn
+
+    Oops, the important bit scrolled off the screen. Let's add a "head"
+    process to limit the output:
+
+        $ grep "GET /report.cgi" access.log | awk '{print $1}' | sort | uniq -c | sort -rn | head -n 5
+
+    And we finally get our nice report:
+
+        3271039 10.3.0.29
+            912 10.9.2.7
+            897 10.9.2.1
+            292 10.9.2.3
+            101 10.9.2.4
+
+    Looks like we've found our culprit.
+
+  Installing unliner
+    If you want to follow along with this tutorial, or start coding right
+    away, the easiest way to install unliner is with cpanminus:
+
+        curl -sL https://raw.github.com/miyagawa/cpanminus/master/cpanm | sudo perl - App::Unliner
+
+  You want it to do *what*?
+    Usually one-liners entered in your shell are thrown away after they are
+    used because it's so easy to re-create them as necessary. That's one
+    reason why unix pipes are so cool.
+
+    Besides, as soon as your pipelines reach a full line or two of text they
+    start to become very hard to work with (though I confess I've gotten a
+    lot of use out of crazy long pipelines before). At this point, usually
+    the one-liner is re-written as a "real" program.
+
+    The point of unliner is to provide an intermediate stage between a
+    one-liner and a real program. And you might even find that there is no
+    need to make it a real program after all.
+
+    To turn your one-liner into an unliner just wrap a "def main { }" around
+    it like this:
+
+        def main {
+          grep "GET /report.cgi" access.log | awk '{print $1}' | sort | uniq -c | sort -rn | head -n 5
+        }
+
+    If you save this in the file "log-report" then your unliner program can
+    be invoked with this command:
+
+        $ unliner log-report < input.txt
+
+    You could also put a shebang line
+    <https://en.wikipedia.org/wiki/Shebang_(Unix)> at the top of your
+    script:
+
+        #!/usr/bin/env unliner
+
+    Now if you "chmod +x log-report" you can run it directly:
+
+        $ ./log-report < input.txt
+
+  Defs
+    The "def main { }" isn't a special type of def except that it happens to
+    be what is called when your program is invoked. You can create other
+    defs and they can be invoked by your main def and other defs, kind of
+    like subroutines.
+
+    For example, we could move the "awk" command into a "ip-extractor" def,
+    and the tallying logic into a "tally" def:
+
+        def main {
+          grep "GET /report.cgi" access.log | ip-extractor | tally | head -n 5
+        }
+
+        def ip-extractor {
+          awk '{print $1}'
+        }
+
+        def tally {
+          sort | uniq -c | sort -rn
+        }
+
+    The same sequences of processes will be created with this program as
+    with the previous. However, defs let you organize and re-use pipeline
+    components better.
+
+  Arguments
+    The unliner program shown so far is not very flexible. For instance, the
+    "access.log" filename is hard-coded.
+
+    To fix this the arguments passed in to our log-report program are
+    available in the variable $@, just like in a shell script:
+
+        def main {
+          grep "GET /report.cgi" $@ | ip-extractor | tally | head -n 5
+        }
+
+    Now we can pass in a log file argument to our program (otherwise it will
+    read input from standard input):
+
+        $ unliner log-report access.log
+
+    Note that $@ escapes whitespace like bourne shell's "$@". Actually it
+    just passes the argument array untouched through to the process (grep in
+    this case) so the arguments can contain any characters. The bourne
+    equivalent of unquoted $@ and $* are not supported because they cause
+    way too many bugs (use templates if you need to do this).
+
+    We can parameterise other aspects of the unliner program too. For
+    example, suppose you wanted to control the number of lines that are
+    included in the report. To do this add a "prototype":
+
+        def main(head|h=i, junkarg=s) {
+          grep "GET /report.cgi" $@ | ip-extractor | tally | head -n $head
+        }
+
+    The prototype indicates that the main def requires arguments. Since the
+    main def is the entry-point, these arguments must come from the command
+    line:
+
+        $ unliner log-report access.log --head 5
+
+    "head|h=i" is a Getopt::Long argument definition. It means that the
+    official name of this argument is "head", that there is a single-dash
+    alias "h", and that the argument's "type" is required to be an integer.
+    Because "h" is an alias we could also use that as the argument:
+
+        $ unliner log-report access.log -h 5
+
+    However, if you forget to add one of these arguments, the head process
+    will die with an error like "head: : invalid number of lines".
+
+    Other common GetOpt::Long argument types are string (ie "hostname|h=s")
+    and boolean on/off switches that require no argument (ie "flag|f").
+
+    In order to have a default value for a parameter, you put parentheses
+    around the argument definition followed by the default value (just like
+    lisp):
+
+        def main((head|h=i 5)) {
+          grep "GET /report.cgi" $@ | ip-extractor | tally | head -n $head
+        }
+
+    None of these variables need to be quoted. They are always passed
+    verbatim to the underlying command. If you do quote them, be aware that
+    string interpolation is not implemented (use templates for that).
+
+    Defs internal to your program accept arguments in exactly the same way.
+    You can think of internal defs as being their own mini command-line
+    programs:
+
+        def main {
+          grep "GET /report.cgi" $@ | ip-extractor | tally | my-head -n 5
+        }
+
+        def my-head((n=i 10)) {
+          head -n $n
+        }
+
+  Argument pass-through and environment variables
+    Normally if you pass an argument into a def (from the command line or
+    from another def) that isn't listed in the prototype, an "Unknown
+    option" error will be thrown. This is the default Getopt::Long
+    behaviour. If you wish to suppress this error and leave unknown options
+    in the argument list, you can use the "pass-through" def modifier like
+    so:
+
+        def main : pass-through {
+          my-head $@
+        }
+
+        def my-head(count=i) {
+          head -n $count
+        }
+
+    "pass-through" simply sets the "pass_through" option of Getopt::Long.
+
+    Environment variables that were given to the unliner process are present
+    in your scripts as variables too. For example, this does what you'd
+    expect:
+
+        def main {
+          echo $PATH
+        }
+
+    But note that interpolating variables isn't (yet?) supported so "echo
+    "$PATH:/opt/bin"" won't work (use templates for that -- see below).
+
+    There is a def modifier called "env" that allows you to install
+    arguments into environment variables while invoking the def. This is
+    useful for languages like "perl" where access to environment variables
+    is easier than parsing an argument list:
+
+        def main((name=s 'Anonymous')) : perl : env {
+          print "Hello, $ENV{name}\n";
+        }
+
+  Def Modifiers
+    The contents of all the defs we've seen so far are in a custom unliner
+    language called Shell. You can add it if you want, but the ": sh" def
+    modifier is redundant because Shell is the default language.
+
+    Shell is mostly like bourne shell/bash but a little bit different. The
+    differences are described in the distribution's TODO file. Some
+    differences are deliberate and some are just features that haven't been
+    implemented yet. One difference is that unliner uses perl-style
+    backslashed single quotes in single quoted string literals, not bourne
+    shell-style. If you don't know what the bourne shell-style is, consider
+    yourself lucky.
+
+    Def modifiers can be used to change how the def body is interpreted by
+    changing the language to something other than Shell. Modifiers go in
+    between the def name/prototype and the body. One language modifier that
+    can be used is "perl". It causes the def body to be interpreted as perl
+    code. For example:
+
+        def body-size-extractor : perl {
+          while (<STDIN>) {
+            ## body size is the last field in the log
+            print "$1\n" if /(\d+)$/;
+          }
+        }
+
+    This def could also have been written in sh, but dealing with shell
+    escapes is sometimes annoying:
+
+        def body-size-extractor {
+          perl -e 'while(<STDIN>) { ... }'
+        }
+
+    Def modifiers themselves sometimes take arguments. For example, perl
+    defs can take the "-n" switch which implicitly adds a loop (just like
+    the perl binary):
+
+        def body-size-extractor : perl -n {
+          print "$1\n" if /(\d+)$/;
+        }
+
+    Another supported language is python:
+
+        def wrap-in-square-brackets : python {
+          import sys
+
+          for line in sys.stdin:
+            line = line[:-1] # chop newline
+            print "[" + line + "]"
+        }
+
+    Note that python is very noisy when it receives a SIGPIPE so polite
+    pipeline components should manually catch it and then exit silently.
+
+    A general-purpose "language" is exec. It is useful for running any
+    command on your system, even when there are no such custom languages. As
+    an example of exec usage, the following defs are equivalent:
+
+        def second-column {
+          awk -F, '{ print $2 }'
+        }
+
+        def second-column : exec awk -F, -f {
+          { print $2 }
+        }
+
+    Note that the "-f" is required because awk doesn't follow the common
+    scripting language convention where a program path is the first
+    argument.
+
+    Github pull requests for new languages appreciated.
+
+  Templates
+    Another def modifier is "template". This modifier processes your def
+    body with Template Toolkit <http://template-toolkit.org/> before it
+    passes it on to whatever language type is specified. Because the
+    template has access to the def's arguments, this lets you conditionally
+    include pipeline components.
+
+    Let's say we wanted to add a "filter-localhost" switch to our log-report
+    unliner that will exclude requests from localhost (127.0.0.1) from the
+    tally. This can be accomplished with templates:
+
+        def main((head|h=i 5), filter-localhost) : template {
+          grep "GET /report.cgi" $@ |
+          ip-extractor |
+
+          [% IF filter_localhost %]  ## Note: - changes to _
+            grep -v '^127\.0\.0\.1$' |
+          [% END %]
+
+          tally |
+          head -n $head
+        }
+
+        def ip-extractor {
+          awk '{print $1}'
+        }
+ 
+        def tally {
+          sort | uniq -c | sort -rn
+        }
+
+    We can now enable this option from the command line:
+
+        $ unliner log-report access.log --filter-localhost
+
+    A grep process will only be created if the "--filter-localhost" option
+    is passed in.
+
+    Remember that templates are processed as strings before the language
+    even sees them. For example, here is how you could take advantage of the
+    head "negative number" trick:
+
+        def my-head((n=i 5)) : template {
+          head -[% n %]
+        }
+
+    When using templates always be careful about escaping or sanitising
+    values.
+
+    The above example is OK because "n" is guaranteed to be an integer.
+
+  Debugging
+    In order to see the actual pipeline being run, you can set the
+    environment variable "UNLINER_DEBUG" and it will print some information
+    to standard error:
+
+        $ UNLINER_DEBUG=2 unliner log-report access.log --filter-localhost
+        unliner: TMP: Not cleaning up temp directory /tmp/GPtXapOfib because UNLINER_DEBUG >= 2
+        unliner: CMD: grep 'GET /report.cgi' access.log | perl /tmp/GPtXapOfib/56ba8ad7a6431cbe6b64835c97e248d27a4234a0 | sort | uniq -c | sort -rn | head -n 5
+
+    Note that when you write defs in languages like perl and python, scripts
+    will be created in a temporary directory and executed from there.
+
+  Optimisation
+    Unliner does pipeline optimisation by default. Currently only spurious
+    cat processes are optimised away.
+
+    *   Leading cats
+
+        If a pipeline begins with a cat of no arguments, that cat is removed
+        and no cat process is created. If a pipeline begins with a cat of
+        exactly one argument, then that file is opened and dup2()ed to
+        STDIN.
+
+    *   Trailing cats
+
+        If a pipeline ends with a trailing cat, that cat is removed unless
+        STDOUT is a terminal. Trailing cats are useful to prevent a program
+        from doing special terminal formatting things like adding ANSI
+        colours.
+
+    *   Internal cats
+
+        All internal cats with no arguments are removed. Such cats aren't as
+        silly as they sound. Sometimes pipeline components have leading or
+        trailing cats for some reason. When these components are used in
+        pipelines, internal cats result. This optimisation will stop any
+        unnecessary cat processes from being created.
+
+    Consider the following unliner script:
+
+        def main {
+          cat $@ | cat | cat | cat | wc -l | cat | cat
+        }
+
+    Because of the spurious cat optimisations, running it like so won't
+    start a single cat process:
+
+        unliner lots-of-cats.unliner file.txt > output.txt
+
+    It will be optimised to this equivalent command:
+
+        wc -l < file.txt > output.txt
+
+SEE ALSO
+    App::Unliner
+
+    unliner
+
+    Unliner github repo <https://github.com/hoytech/unliner>
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2012-2014 Doug Hoyte.
+
+    This module is licensed under the same terms as perl itself.
+

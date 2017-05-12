@@ -1,0 +1,74 @@
+{
+   "abstract" : "Build and make available CMake library - L<http://cmake.org/>",
+   "author" : [
+      "KMX <kmx@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-CMake",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Archive::Extract" : "0",
+            "Archive::Tar" : "0",
+            "Digest::SHA" : "0",
+            "File::Copy" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::Fetch" : "0",
+            "File::Find" : "0",
+            "File::Path" : "2.07",
+            "File::ShareDir" : "0",
+            "File::Spec" : "0",
+            "File::Which" : "0",
+            "Module::Build" : "0.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Archive::Extract" : "0",
+            "Digest::SHA" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::Fetch" : "0",
+            "File::Find" : "0",
+            "File::Path" : "2.07",
+            "File::Spec" : "0",
+            "File::Which" : "0",
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.00",
+            "File::Spec" : "0",
+            "File::Which" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::CMake" : {
+         "file" : "lib/Alien/CMake.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-CMake"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/PerlGameDev/Alien-CMake"
+      }
+   },
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

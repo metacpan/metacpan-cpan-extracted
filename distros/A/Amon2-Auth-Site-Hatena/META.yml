@@ -1,0 +1,43 @@
+---
+abstract: 'Hatena authentication integration for Amon2'
+author:
+  - 'Kentaro Kuribayashi <kentarok@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.1, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amon2-Auth-Site-Hatena
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Amon2::Auth::Site::Hatena:
+    file: lib/Amon2/Auth/Site/Hatena.pm
+    version: '0.04'
+requires:
+  JSON: '0'
+  Mouse: '0'
+  OAuth::Lite: '0'
+  Woothee: '0'
+resources:
+  bugtracker: https://github.com/kentaro/Amon2-Auth-Site-Hatena/issues
+  homepage: https://github.com/kentaro/Amon2-Auth-Site-Hatena
+  repository: git://github.com/kentaro/Amon2-Auth-Site-Hatena.git
+version: '0.04'
+x_authority: cpan:SONGMU
+x_contributors:
+  - 'Songmu <y.songmu@gmail.com>'

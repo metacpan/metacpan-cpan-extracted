@@ -1,0 +1,28 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "TFA Strawberry (Ripe)",
+            "percentage" : "6"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Double Kiwi",
+            "percentage" : "4"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Blueberry (Extra)",
+            "percentage" : "5"
+         }
+      ],
+      "target_pg" : 18,
+      "base_nic_per_ml" : 100,
+      "base_nic_type" : "PG",
+      "target_quantity" : "55",
+      "target_nic_per_ml" : "3",
+      "target_vg" : "82",
+      "notes" : []
+   }
+}

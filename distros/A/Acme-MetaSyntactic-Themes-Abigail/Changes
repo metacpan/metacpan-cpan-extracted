@@ -1,0 +1,59 @@
+Version 2013073101 Wed Jul 31 00:06:59 CEST 2013
++ No zen.
+
+Version 2013072902 Mon Jul 29 22:57:06 CEST 2013
++ New theme: zen
+
+Version 2013072901 Mon Jul 29 16:38:10 CEST 2013
++ New theme: primes
+
+Version 2013072602 Fri Jul 26 23:25:23 CEST 2013
++ New themes: moonwalkers, cyclists, peter_and_the_wolf
+
+Version 2013072601 Fri Jul 26 00:59:09 CEST 2013
++ New theme: playing_cards
+
+Version 2012060702 Thu Jun  7 19:28:51 CEST 2012
++ New theme: stratego
+
+Version 2012060701 Thu Jun  7 00:59:53 CEST 2012
++ New themes: all_in_the_family, candyland, southpark.
+
+Version 2012060201 Sat Jun  2 01:49:14 CEST 2012
++ New theme: kodokan
+
+Version 2012060103 Fri Jun  1 22:47:55 CEST 2012
++ New theme: willy_wonka
+
+Version 2012060102 Fri Jun  1 21:10:42 CEST 2012
++ New themes: noughts_and_crosses, shou_dou_qi, famous_five
+
+Version 2012060101 Fri Jun  1 02:34:11 CEST 2012
++ New theme: cluedo
+
+Version 2012053102 Thu May 31 22:15:58 CEST 2012
++ Add author tests
++ New theme: jelly_belly
+
+Version 2012053101 Thu May 31 13:29:07 CEST 2012
++ Theme: nehi
+
+Version 2012053001 Wed May 30 23:23:06 CEST 2012
++ Theme: evangelist
+
+Version 2012052202 Tue May 22 23:56:41 CEST 2012
++ Theme: compass
+
+Version 2012052201 Tue May 22 00:20:51 CEST 2012
++ List prereq 'Acme::MetaSyntactic::MultiList'
+
+Version 2012052102 Mon May 21 23:55:12 CEST 2012
++ Theme: bee_gees
+
+Version 2012052101 Mon May 21 01:29:06 CEST 2012
++ List requirements in Makefile.PL
++ Theme: charlies_angels
+
+Version 2012051701 Thu May 17 23:34:39 CEST 2012
++ First release
++ Themes: beatles, michelin, sodor.

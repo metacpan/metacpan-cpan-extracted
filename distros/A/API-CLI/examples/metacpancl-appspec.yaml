@@ -1,0 +1,212 @@
+---
+apppec:
+  version: '0.001'
+class: API::CLI
+name: metacpancl
+openapi:
+  basePath: /v0
+  host: api.metacpan.org
+  info:
+    description: Unofficial MetaCPAN API specification
+    title: MetaCPAN API
+    version: 3
+  paths:
+    /author/:author:
+      get:
+        description: Author information
+        parameters:
+        - description: CPAN handle
+          in: path
+          name: author
+          required: true
+          type: string
+    /distribution/:distribution:
+      get:
+        description: Distribution information not specific to a version
+        parameters:
+        - description: distribution name
+          in: path
+          name: distribution
+          required: true
+          type: string
+    /file:
+      post:
+        description: file
+        parameters:
+        - description: query
+          in: body
+          name: body
+          required: true
+          type: object
+    /module/:module:
+      get:
+        description: Module information
+        parameters:
+        - description: Module name
+          in: path
+          name: module
+          required: true
+          type: string
+    /pod/:module:
+      get:
+        description: Module POD
+        parameters:
+        - description: Module name
+          in: path
+          name: module
+          required: true
+          type: string
+        - description: Default is text/html
+          enum: &1
+          - text/html
+          - text/plain
+          - text/x-pod
+          - text/x-markdown
+          in: query
+          name: content-type
+          type: string
+    /release/:author/:release:
+      get:
+        description: Release information
+        parameters:
+        - description: CPAN handle
+          in: path
+          name: author
+          required: true
+          type: string
+        - description: release, e.g. Moose-123
+          in: path
+          name: release
+          required: true
+          type: string
+    /release/:distribution:
+      get:
+        description: Release information
+        parameters:
+        - description: distribution name
+          in: path
+          name: distribution
+          required: true
+          type: string
+    /release/_search:
+      get:
+        description: Search releases
+        parameters:
+        - description: query ("author:ANDK AND status:latest")
+          in: query
+          name: q
+          required: true
+          type: string
+        - description: resultset fields
+          in: query
+          name: fields
+          type: string
+        - description: how many results
+          in: query
+          name: size
+          type: integer
+  schemes:
+  - https
+  swagger: 2.0
+options:
+- name: data-file
+  summary: File with data for POST/PUT/PATCH/DELETE requests
+  type: file
+- aliases:
+  - d
+  name: debug
+  summary: debug
+  type: flag
+- aliases:
+  - v
+  name: verbose
+  summary: verbose
+  type: flag
+subcommands:
+  GET:
+    op: apicall
+    subcommands:
+      /author/:author:
+        options: []
+        parameters:
+        - name: author
+          required: 1
+          summary: CPAN handle
+          type: string
+        summary: Author information
+      /distribution/:distribution:
+        options: []
+        parameters:
+        - name: distribution
+          required: 1
+          summary: distribution name
+          type: string
+        summary: Distribution information not specific to a version...
+      /module/:module:
+        options: []
+        parameters:
+        - name: module
+          required: 1
+          summary: Module name
+          type: string
+        summary: Module information
+      /pod/:module:
+        options:
+        - enum: *1
+          name: q-content-type
+          required: ~
+          summary: Default is text/html
+          type: string
+        parameters:
+        - name: module
+          required: 1
+          summary: Module name
+          type: string
+        summary: Module POD
+      /release/:author/:release:
+        options: []
+        parameters:
+        - name: author
+          required: 1
+          summary: CPAN handle
+          type: string
+        - name: release
+          required: 1
+          summary: release, e.g. Moose-123
+          type: string
+        summary: Release information
+      /release/:distribution:
+        options: []
+        parameters:
+        - name: distribution
+          required: 1
+          summary: distribution name
+          type: string
+        summary: Release information
+      /release/_search:
+        options:
+        - name: q-q
+          required: 1
+          summary: query ("author:ANDK AND status:latest")
+          type: string
+        - name: q-fields
+          required: ~
+          summary: resultset fields
+          type: string
+        - name: q-size
+          required: ~
+          summary: how many results
+          type: integer
+        parameters: []
+        summary: Search releases
+    summary: GET call
+  POST:
+    op: apicall
+    subcommands:
+      /file:
+        options: []
+        parameters: []
+        summary: file
+    summary: POST call
+summary: Unofficial MetaCPAN API specification
+title: MetaCPAN API

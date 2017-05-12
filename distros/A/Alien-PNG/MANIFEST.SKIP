@@ -1,0 +1,16 @@
+.git
+_build
+stage
+blib
+deps
+^Build$
+^Build.bat$
+^MYMETA.yml$
+^tmp
+^build_
+^download
+^share
+\.tmp$
+\.bak$
+\.zip$
+\.gz$

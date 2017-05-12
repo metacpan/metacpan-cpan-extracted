@@ -1,0 +1,36 @@
+Revision history for Perl extension Astro::Funtools::Parse.
+
+0.08  Thu Mar  6 11:53:23 EST 2008
+        - minor mods to the test harness 
+
+0.07
+        - first public release as part of the raytrace suite
+	- parse_funcnts returns ARRAY or ARRAYREF depending context
+
+0.06
+	- fix to correct {tables} for bkgd_sb
+
+0.05  Fre Feb 17 22:30:00 EST 2006
+	- funcnts output changed; modify to parse the new region
+	  information
+
+0.04  Sat Apr 20 13:58:33 EDT 2002
+	- renamed to Astro::Funtools::Parse
+	- test suite was modernized
+	- region section parsing was confused if there was
+	  a globally excluded region (i.e., with a preceding `-')
+
+0.03  Fri Aug 17 14:18:07 EDT 2001
+	- added parse_funhist and parse_funhist_file
+	- now outputs "width" of column (really just width of 
+	  separators)
+
+0.02  Tue Jun 26 14:41:48 EDT 2001
+	- new version of funcnts put blank line between header and
+          data. work around that.
+	
+
+0.01  Wed Feb 28 11:44:44 2001
+	- original version; created by h2xs 1.20 with options
+		-n Funtools -X
+

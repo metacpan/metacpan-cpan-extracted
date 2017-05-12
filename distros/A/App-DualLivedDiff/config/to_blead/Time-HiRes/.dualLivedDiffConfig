@@ -1,0 +1,10 @@
+---
+dirs-recursive:
+  .: ext/Time-HiRes
+exclude-regexes:
+  - '^(?:\.?/)?META.yml$'
+  - '^(?:\.?/)?MANIFEST$'
+  - '^(?:\.?/)?SIGNATURE$'
+  - '^(?:\.?/)?ppport\.h$'
+  - '^(?:\.?/)?TODO$'
+  - '^(?:\.?/)?README$'

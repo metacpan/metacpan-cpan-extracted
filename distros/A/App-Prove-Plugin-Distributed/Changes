@@ -1,0 +1,6 @@
+Revision history for Perl extension App::Prove::Plugin::Distributed.
+
+0.01  Tue Apr 24 22:52:47 2012
+	- original version; created by h2xs 1.23 with options
+		-AX App::Prove::Plugin::Distributed
+

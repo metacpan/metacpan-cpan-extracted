@@ -1,0 +1,26 @@
+Changes
+MANIFEST
+Makefile.PL
+INSTALL
+README
+RELEASE
+ToDo
+test.pl
+set_pureperl.PL
+lib/Apache/Dispatch.pm
+lib/Apache/Dispatch/Util.pm
+lib/Apache2/Dispatch.pm
+t/lib/Apache/Bar.pm
+t/lib/Apache/Foo.pm
+t/lib/Apache/Foo/Bar.pm
+t/lib/Apache/Foo/Foo.pm
+t/lib/Apache/Foo/Filter.pm
+t/lib/Apache2/Foo.pm
+t/lib/Apache2/Foo/Bar.pm
+t/all.t
+t/01plain.t
+t/02extras.t
+t/03filter.t
+t/04oo.t
+t/conf/extra.last.conf.in
+META.yml                                 Module meta-data (added by MakeMaker)

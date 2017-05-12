@@ -1,0 +1,49 @@
+---
+abstract: 'A publishing tool for static websites.'
+author:
+  - 'Mark Benson <markbenson@vanilladraft.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  Getopt::Mixed: 1.11
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.88, CPAN::Meta::Converter version 2.120921'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Dapper
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI: 0
+  Data::Dumper: 0
+  DateTime: 0
+  DateTime::Format::XSD: 0
+  Exporter: 0
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Monitor: 0
+  File::Path: 0
+  File::Spec::Functions: 0
+  FindBin: 0
+  Getopt::Mixed: 0
+  HTTP::Server::Brick: 0
+  IO::Dir: 0
+  JSON: 0
+  POSIX: 0
+  Pod::Usage: 0
+  Template::Alloy: 0
+  Template::Constants: 0
+  Test: 0
+  Test::More: 0
+  Text::Markdown: 0
+  Text::MultiMarkdown: 0
+  Unicode::Normalize: 0
+  YAML::Tiny: 0
+  perl: 5.008000
+resources:
+  repository: https://github.com/markdbenson/dapper
+version: 0.18

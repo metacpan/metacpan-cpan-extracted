@@ -1,0 +1,28 @@
+
+- exported names are no good
+
+    - apply - it's really map
+
+        proposal: amap
+
+    - each  - reserved word
+
+        f[x,y] where x is a list of inputs and y is a list of funcs
+
+            f_n = y_n[x_n]
+
+        proposol: aapply aeach azip
+            employ
+            engage
+            compose
+            concoct
+            send
+            turn
+            dispatch
+            delegate
+
+            azipmap
+
+    - chain - fine
+
+        proposal: achain

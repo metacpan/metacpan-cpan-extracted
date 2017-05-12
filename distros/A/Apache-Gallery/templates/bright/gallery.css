@@ -1,0 +1,145 @@
+body {
+	background-color: #eee;
+	font-family: tahoma, verdana, sans-serif;
+	color: #555;
+	text-align: center;
+	font-size: 11px;
+	margin: 10px;
+}
+td {
+	font-size: 11px;
+}
+a {
+	color: #506677;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+table {
+	margin: auto;
+}
+.gallery-info {
+	text-align:	left;
+	margin-bottom: 30px;
+}
+/*
+.img-white {
+	margin: 0px auto;
+	float: left;
+ 	background: url(/eeeBorder.gif) no-repeat top left;
+}
+.img-shadow {
+	float: left;
+	background: url(/eeeshadow.gif) no-repeat bottom right;
+}
+*/
+.img-border {
+	background-color: #fff;
+	border: 1px solid #555;
+	padding: 8px;
+	font-size: 11px;
+	margin: 6px;
+	text-align: right;
+}
+.img-shadow img {
+	border: 2px solid #ddd;
+	border-left: 2px solid #999;
+	border-top: 2px solid #999;
+}
+.img-border div {
+	margin-top: 4px;
+}
+.clr {
+	clear: both;
+}
+div.gallery-nav {
+	float: right;
+	text-align: right;
+}
+div.gallery-info {
+	float: left;
+	text-align: left;
+}
+div.gallery-info a {
+}
+div.gallery-info:hover {
+	color: #000;
+}
+div.gallery-info:hover a {
+	color: #5b8db2;
+}
+.img-info {
+	margin-bottom: 5px;
+}
+.img-info:hover {
+	color: #000;
+}
+.comment {
+	margin-bottom: 5px;
+	font-size: 18px;
+}
+.comment:hover {
+	color: #000;
+	font-size: 18px;
+}
+.img-options {
+	margin-top: 10px;
+	margin-bottom: 100px;
+}
+.img-options:hover {
+	color: #000;
+}
+.img-options:hover a {
+	color: #5b8db2;
+}
+.aginfo:hover {
+	color: #000;
+}
+.aginfo:hover a {
+	color: #0066b2;
+}
+#directory {
+    background-color: #fff;
+    border: 4px solid #ddd;
+    padding: 20px;
+    text-align: left;
+    top: 0px;
+	width: 620px;
+}
+.directory-preview {
+    background-color: #fff;
+    border: 4px solid #ddd;
+    padding: 20px;
+    text-align: left;
+    top: 0px;
+    width: 200px;
+    height: 50px;
+}
+.thumb {
+	float: left;
+	text-align: center;
+	width: 150px;
+	height: 150px;
+	margin: 2px;
+}
+.thumb img {
+	border-color: #506677;
+	vertical-align: middle;
+}
+.folder {
+    float: left;
+    height: 100px;
+    padding: 2px;
+    text-align: center;
+    width: 120px;
+}
+.folder img {
+    border: 0px;
+}
+.folder a:hover img {
+    border: 0px;
+}
+.folder a:hover {
+	text-decoration: none;
+}

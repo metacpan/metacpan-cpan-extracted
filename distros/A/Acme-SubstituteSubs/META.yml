@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Acme-SubstituteSubs
+version:            0.02
+abstract:           Replace subroutines at run-time
+author:
+    - Scott Walters <knoppix@lightandslowass.net>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Acme::Test:     0
+    Devel::Caller:  0
+    PPI:            0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

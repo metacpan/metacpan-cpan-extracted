@@ -1,0 +1,44 @@
+{
+   "abstract" : "Build and install GEOS",
+   "author" : [
+      "Alessandro Ranellucci <aar@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-GEOS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "File::ShareDir" : "1.00",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::GEOS" : {
+         "file" : "lib/Alien/GEOS.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

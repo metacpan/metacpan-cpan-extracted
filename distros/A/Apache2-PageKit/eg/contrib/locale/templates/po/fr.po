@@ -1,0 +1,67 @@
+domain "PageKit.mo"
+
+#
+# Apache2::PageKit
+#
+
+msgid "You have successfully logged in."
+msgstr "Vous êtes connecté"
+
+msgid "You have successfully logged out."
+msgstr "Vous êtes déconnecté"
+
+msgid "Cookies must be enabled in your browser."
+msgstr "Votre browser doit accepter les cookies"
+
+msgid "This page requires a login."
+msgstr "Vous devez être connecté pour accèder à cette page"
+
+msgid "Please try again."
+msgstr "Essayer encore, s'il vous plait"
+
+msgid "You did not fill out all the required fields. Please fill the <font color=\"<PKIT_ERRORSTR>\">red</font> fields."
+msgstr "Vous n'avez pas rempli tous les champs obligatoires. S'il vous plaît veuillez remplir tous les champs en <font color=\"<PKIT_ERRORSTR>\">rouge</font>"
+
+#
+# MyPageKit::Common
+#
+
+msgid "Your login/password is invalid. Please try again."
+msgstr "Login et Mot de passe incorrect. S'il vous plait, réessayé"
+
+msgid "You did not fill all of the fields. Please try again."
+msgstr "Vous n'avez pas remplis tous les champs. S'il vous plait, réessayé"
+
+#
+# MyPageKit::MyModel
+#
+
+msgid "Your changes have been made."
+msgstr "Vos changements ont été pris en compte"
+
+msgid "The E-mail address, <b>%%VALUE%%</b>, is invalid."
+msgstr "L'adresses email, <b>%%VALUE%%</b>, n'est pas valide"
+
+msgid "The phone number, <b>%%VALUE%%</b>, is invalid."
+msgstr "Le numéro de téléphone, <b>%%VALUE%%</b>, n'est pas valide"
+
+msgid "[Session not set]"
+msgstr "[Session inactive]"
+
+msgid "The login, <b>%%VALUE%%</b>, has already been used."
+msgstr "Ce login est déja utilisé"
+
+msgid "The phone number you entered is invalid."
+msgstr "Le numéro de téléphone saisi n'est pas valide"
+
+msgid "The passwords you entered do not match."
+msgstr "Mot de passe incorrect"
+
+msgid "This message was passed throught pkit_redirect"
+msgstr "Ce message est passé à travers pkit_redirect"
+
+msgid "Another message passed throught pkit_redirect"
+msgstr "Un autre message passé à travers pkit_redirect"
+
+msgid "This ERROR message was passed throught pkit_redirect"
+msgstr "Ce message d'erreur est passé à travers pkit_redirect"

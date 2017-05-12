@@ -1,0 +1,24 @@
+fix-up window when font cycling:
+       resize && mvwin w/ pre-calc'd vals
+       alternate through a set of dup'd wins
+
+Multiple style "delays"?
+	cond > 0 ? every(seconds=>cond) : offset = 0
+
+selectively recompile subroutines?
+modify $RE{balanced}{-begin=>'sub\s+$NAME.*?{'}{-end=>'}'}
+
+Text::FIGlet features
+	Unicode/control files
+
+	smush mode?
+
+vscroll
+	clobber scroll, and use a wrapping figify.
+	pause when full line-height is shown
+
+
+
+color_set
+wa_blink
+_maxLen

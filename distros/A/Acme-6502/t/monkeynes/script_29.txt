@@ -1,0 +1,32 @@
+clear
+power on
+regs
+
+# Base test --------------------
+op a9 55
+op 29 72
+
+# Should be:  ACC=50
+test acc = 50
+
+# Zero test --------------------
+power on
+
+op a9 55
+op 29 aa
+
+# Should be:  ACC=0, Z=1
+test acc = 0
+test z = 1
+
+# Negative test ----------------
+power on
+
+op a9 84
+op 29 aa
+
+# Should be:  ACC=80, S=1
+test acc = 80
+test s = 1
+
+save verify_29.txt

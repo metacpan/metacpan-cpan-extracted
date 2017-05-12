@@ -1,0 +1,45 @@
+Revision history for Perl extension Apache::Language.
+0.14  Fri Jul 21 16:49:35 EDT 2000
+	- stupid debugging message left behind
+
+0.13  Fri Jul 21 13:28:48 EDT 2000
+
+	- added new configuration options for debugging
+	  Prefix
+	  Postfix
+	  NotFoundPrefix
+	  NotFoundPostfix
+	
+
+0.12  Mon Feb 28 16:31:27 EST 2000
+
+	- added a new DBfunc PerlVar to give the full name of a function that
+	  returns a database handle in Language::DBI
+
+0.10  Thu Dec  2 13:44:04 EST 1999
+
+	- mostly bug fixes in the exist codes
+	- added a new argument to give a function name to get the DB Handle
+
+0.07  Sat Oct 23 17:32:06 EDT 1999
+
+	- cpan chocked on 0.06 so this is the same thing
+
+0.06  Thu Oct 21 17:01:34 EDT 1999
+	- modified Language::DBI to allow configurable fields in the DataBase
+
+0.05  Thu Sep  9 14:34:14 EDT 1999
+	- was to fast at releasing 0.04.  Fixed a few other things just me will 	know
+
+0.04  Thu Sep  9 11:37:36 EDT 1999
+	- added the AUTOLOAD sub to give Handlers pollibility to define their own calls
+	- removed the $r arg to new and replaced it with args passed to the Handler
+	- added the Language::SW handler for SmartWorker support
+	- corrected a few little things not worth mentionnng
+
+0.02  Mon Feb 15 11:11:10 1999
+	- added TIEHASH interface and kept the old methods
+
+0.01  Sun Jan 31 22:29:47 1999
+	- original version; created by Philippe M. Chiasson <gozer@ectoplasm.dyndns.com>
+

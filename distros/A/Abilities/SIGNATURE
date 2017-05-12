@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 aa8bf064d99162daea4f9dc31a369690bd04687f Changes
+SHA1 8a4e7bc3043c5a9175c585c46dfd21c2628b1d3d INSTALL
+SHA1 4dceae0eaef7a9ac83dea9d378c954bfce55223a LICENSE
+SHA1 46ab1593a505f878bde34803643bc7ba710e97f8 MANIFEST
+SHA1 beff4a17e62d38f89f42f7d4bd8eea65bd3eed43 MANIFEST.SKIP
+SHA1 79363be94119dee40e43d2b7b32962e9bd3efc25 META.json
+SHA1 9674a80d81366885a992c06f608b0964d77923c6 META.yml
+SHA1 548e1b4c55b9ebc755adeab12b43235409201209 Makefile.PL
+SHA1 584c885eaa73ec7b92fd17db4891fd099569fd80 README
+SHA1 92f96a5defd798a8643ad925dd3b86f10e2836c2 dist.ini
+SHA1 ac56180c952cdc52935ea53ce590f5d384431447 lib/Abilities.pm
+SHA1 6d3acce2f84f4360a4768d93c82663a884279145 lib/Abilities/Features.pm
+SHA1 b968ed1c0d3c90f8bc8d8ad970aa3e6de5fbc150 t/00-load.t
+SHA1 913156ea716a1551101e218ba6e663fd37c89f18 t/01-abilities.t
+SHA1 52a99df8d7dcf5e2b599fbeba6c011a99f23f820 t/02-features.t
+SHA1 6a7b6c44a92ac5b4c07cad3d1addab03d01e72d8 t/lib/TestCustomer.pm
+SHA1 a735c6657aeb8677e6fc8adf8b982090d5685442 t/lib/TestManager.pm
+SHA1 ec23fe5e511b42f09053e897fe7006c4a5772702 t/lib/TestPlan.pm
+SHA1 168a46d7f5c5a4376f6c46e90ae926e69a343c79 t/lib/TestRole.pm
+SHA1 b2b28919aa35e8ef5bdc061d5f8774e8b33e06d6 t/lib/TestUser.pm
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.19 (GNU/Linux)
+
+iF4EAREIAAYFAlGD+nsACgkQa4OHQAFM10dF1gD7BfmZneDfUYd2e4kUCzD/n/Cu
+xNR4hCTHL9DxaZc70PgA/A37Fftl8En07WImobZ1UuQHl/ym24YTZttOv6ss9ket
+=ocDd
+-----END PGP SIGNATURE-----

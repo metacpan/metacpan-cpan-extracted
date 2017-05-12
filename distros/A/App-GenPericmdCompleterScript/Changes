@@ -1,0 +1,67 @@
+0.10    2017-01-12 (PERLANCAR)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Rename function gen_perinci_cmdline_completer_script to
+          gen_pericmd_completer_script (standardize on the shorter name).
+
+        - Change 'subcommand' argument (array) to 'subcommands' (hash).
+
+
+0.09    2016-12-02 (PERLANCAR)
+
+	- Set Getopt::Long configuration gnu_compat to allow setting empty
+	  value '--name=' and no_getopt_compat to disallow '+name'.
+
+	- Tweak metadata: replace x.schema.entity with schema.
+
+	- Convert command-line arguments from octets to Unicode strings, to
+	  be able to complete e.g. Unicode filenames properly.
+
+
+0.08    2016-02-06 (PERLANCAR)
+
+	- Update to Complete::Bash 0.27.
+
+
+0.07    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+
+0.06    2016-01-14 (PERLANCAR)
+
+	- [Bugfix] Typo causing load_module option to not take effect.
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.05    2015-09-27 (PERLANCAR)
+
+	- Replace Data::Dumper with Data::Dmp 0.13 for more compatible
+	  dumping of coderefs.
+
+
+0.04    2015-08-19 (PERLANCAR)
+
+	- Remove temporary code, set defaults for stripping to make it work
+	  because defaults aren't yet called if we call via function.
+
+
+0.03    2015-08-19 (PERLANCAR)
+
+	- Add arguments: read_config, read_env.
+
+	- Set default output_file when called as function.
+
+
+0.02    2015-08-19 (PERLANCAR)
+
+	- Pack the completer script so it only depends on core modules.
+
+
+0.01    2015-08-19 (PERLANCAR)
+
+        - First release.

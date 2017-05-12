@@ -1,0 +1,101 @@
+0.93  2011-06-06
+    fixed logout set Location header (broken in 0.92)
+    added ticket object to _ticket_idle_timeout() args
+
+0.92  2011-06-03
+*** Ticket Format Has Changed ***
+    Tickets are now opaque, and are strings that include the signature hash,
+        and the ticket data in MIME::Base64 encoding. This ensures that fields
+        that may have been added to the ticket by a subclass are included in
+        the signature.
+
+0.91  2011-05-13
+    added SIGNATURE support to make dist
+    added signature test
+    added META_MERGE bugtracker, repository to Makefile.PL
+    cleanup Makefile.PL a bit
+    fixed uninitialized warning in _unpack_ticket() [51138]
+    fixed Odd number of elements warning in _unpack_ticket() [51136]
+    POD: explain difference between "TicketExpires" and inherited AuthCookie
+        "Expire" directive.
+    MP1: synchronize with MP2 version.
+    abstract common MP1/MP2 code into ::Base package.
+    Move ::Util code into ::Base
+    use Class::Accessor::Fast to generate accessors
+    combine user/pass lookup into single SQL query (one less query per request)
+    added get_config() for fetching config values
+    added user_table(), ticket_table(), secret_table() methods to simplify
+        table lookups
+    eliminate need for _get_max_secret_version() - consolidated into
+        fetch_secret()
+    changed make_ticket() no longer takes $r parameter - use object attr
+        instead
+    added secret_version() to fetch current max secret version
+    abstract new ticket fields generation into new_ticket_for()
+
+Release 0.90
+    changed LICENSE information in README removed "same terms as perl" and be
+        more explicit.
+    moved password check routines out into Util::compare_password()
+    removed last of the hard coded SQL in Apache2::AuthTicket
+    removed cruft in Apache2::AuthTicket left over from MP1 migration
+    changed $this => $self
+    added tests for tampered cookie, CheckIP=0, CheckBrowser=1
+    changed config parsing so that boolean values can be specified as any of:
+        TRUE : 1, yes, on, true
+        FALSE: 0, no, off, false
+    added Apache::AuthTicket::Util and moved some internal into it
+    added configuration parameter TicketCheckBrowser which enables checking of
+        the client User-Agent string.
+    added configuration parameter TicketCheckIP so client ip address checks can
+        be disabled.
+    added test cases to check that cookie fields secure, path, and domain work
+    moved source management to github.com:
+        http://github.com/mschout/apache-authticket/
+    updated documentation for MP2
+    addedd a real test suite using DBD::SQLite backing, Apache::Test and
+        Test::More
+
+Release 0.40
+   o update to use new Apache::Filter API (you need at least 1.012 now)
+   o Create Apache2::AuthTicket from copy of Apache::AuthTicket and ported to
+     mod_perl 2.0 API.  This is the first release that supports mod_perl2
+   o MP2 - use SQL::Abstract to generate queries
+
+Release 0.31
+   o Removed an email address from Changes file via owners request.
+
+Release 0.30
+   o Changed calls from to Digest::MD5->md5_hex to just Digest::MD5::md5_hex()
+     This causes md5 passwords generated with other md5() routines (PHP for 
+     example to fail).  Thanks to Steve Chadsey for spotting this.
+
+     ** NOTE ** MD5 passwords that worked with previous versions will not work
+     with this version due to the fact that md5_hex() was used incorrectly.  
+     Upgrading from previous versions will also invalidate any current tickets
+     because the ticket generation routines also were using md5_hex
+     incorrectly.
+
+Release 0.20
+   o Renamed module from Apache::TicketAccess to Apache::AuthTicket after
+     discovering that Apache::TicketAccess is distributed with the mod_perl
+     book examples.
+   o Adapted module to Apache::AuthCookie v2.011.  This module now
+     subclasses Apache::AuthCookie and relies on AuthCookie for all of the 
+     cookie login logic.  This was basically a complete rewrite.
+   o Split up query to fetch the server secret so that the LIMIT clause is
+     not needed (for Sybase ASE backends, thanks to Eivind Trondsen)
+   o Made DBI commit() only be called if AutoCommit is off. 
+     (silences a warn() for MySQL)
+   o Added support for md5 style passwords.
+   o Added support for crypt() style passwords.
+   o Added way to retrieve reason for login using
+     $r->subprocess_env("AuthTicketReason").
+   o Added support for Idle Timeout logouts via TicketIdleTimeout
+     configuration.
+   o Added "sample" directory with sql examples for setting up pgsql and mysql
+     backends, as well as httpd.conf samples.
+   o Removed libapreq dependency (AuthCookie does this stuff now)
+
+Relaese 0.10
+   o Initial public release: Apache::TicketAccess 0.10

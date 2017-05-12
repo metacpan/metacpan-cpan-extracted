@@ -1,0 +1,84 @@
+# NAME
+
+API::Assembla - Access to Assembla API via Perl.
+
+# VERSION
+
+version 0.03
+
+# UNDER CONSTRUCTION
+
+API::Assembla is not feature-complete.  It's a starting point.  The Assembla
+API has LOTS of stuff that this module does not yet contain.  These features
+will be added as needed by the author or as gifted by thoughtful folks who
+write patches! ;)
+
+# SYNOPSIS
+
+    use API::Assembla;
+
+    my $api = API::Asembla->new(
+        username => $username,
+        password => $password
+    );
+
+    my $href_of_spaces = $api->get_spaces;
+    # Got an href of API::Assembla::Space objects keyed by space id
+    my $space = $api->get_space($space_id);
+    # Got an API::Assembla::Space object
+
+    my $href_of_tickets = $api->get_tickets;
+    # Got an href of API::Assembla::Space objects keyed by ticket id
+    my $ticket = $api->get_ticket($space_id, $ticket_number);
+    # Got an API::Assembla::Ticket object
+
+# DESCRIPTION
+
+API::Assembla is a Perl interface to [Assembla](http://www.assembla.com/), a
+ticketing, code hosting collaboration tool.
+
+# ATTRIBUTES
+
+## password
+
+The password to use when logging in.
+
+## url
+
+The URL to use when working with the api.  Defaults to
+
+  http://www.assembla.com
+
+## username
+
+The username to use when logging in.
+
+# METHODS
+
+## get_space ($id)
+
+Get Space information.
+
+## get_spaces
+
+Get Space information.  Returns a hashref of [API::Assembla::Space](http://search.cpan.org/perldoc?API::Assembla::Space) objects
+keyed by the space's name.
+
+## get_tickets ($space_id, $number)
+
+Get Tickets for a space information.
+
+## get_tickets ($space_id)
+
+Get Tickets for a space information.
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Infinity Interactive, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

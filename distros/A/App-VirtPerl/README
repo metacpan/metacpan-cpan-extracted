@@ -1,0 +1,123 @@
+NAME
+
+    virtperl - Virtual perl environments
+
+VERSION
+
+    version 0.1
+
+SYNOPSIS
+
+    virtperl command syntax:
+
+        virtperl <command> options [arguments]
+        
+
+    Commands:
+
+        create      Create a new environment.
+        new         Synonym for create.
+        
+        use         Change to the given environment in current shell.
+        
+        list        List the available environments.
+        
+        remove      Remove an environment.
+        rm          Synonym for remove.
+        
+        mkcpanfile  Print a cpanfile of the dist installed in the current env.
+        
+
+    Example:
+
+        virtperl create moose-based-project
+        virtperl use moose-based-project
+        cpanm install Moose
+        ... hack hack hack...
+        
+
+SETUP
+
+    Run the setup-virtperl script to initialize virtperl. It will output a
+    shell command for sourcing virtperl's shell glue. It is recommended
+    that you put that in your .profile or similar.
+
+COMMANDS
+
+ create
+
+    Creates a new virtual perl environment. Takes a name as its only
+    argument:
+
+        virtperl create my-new-project
+        
+
+ use
+
+    Switches the current shell to use the given environment:
+
+        virtperl use my-other-project
+        
+
+ list
+
+    List the environments that are currently setup.
+
+        virtperl list
+            my-new-project
+          * my-other-project
+
+ remove
+
+    Removes an environment from disk.
+
+        virtperl remove my-new-project
+
+ mkcpanfile
+
+    Outputs to STDOUT a cpanfile of all the distributions installed in the
+    current environment. This feature only works if you are using cpanm to
+    install modules - but you've been using cpanm to install your
+    modules.... right?
+
+        virtperl mkcpanfile
+
+INTERNALS
+
+    A base directory is created to store your environments in
+    $HOME/.virtperl. When a environement is created, a basic directory tree
+    for that environement is created with in the base dir.
+
+    When an environment is active, then the PERL_VIRTPERL_CURRENT_ENV env
+    variable is set to that name, anad PERL5OPT is set to include
+    -MApp::VirtPerl::Setup. App::VirtPerl::Setup removes all the entries
+    from @INC except for the core paths and the paths for the current
+    environment.
+
+    Because of this, perl -MDBI will not fail in a new virtual environment
+    if DBI is installed in the global environment. However, perl -e 'use
+    DBI;' will not pull in DBI from the global env.
+
+    PERL_CPANM_OPT is also changed to when a virutual environment is active
+    to make sure that modules are installed into the virtual env. This
+    means you can just run cpanm whatever and it will DTRT. cpanm should be
+    used for this, as it also installs metadata to allow the mkcpanfile
+    feature to work.
+
+AUTHORS
+
+        Chris Reinhardt
+        crein@cpan.org
+
+COPYRIGHT
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+
+    App::perlbrew, App::cpanminus, virtualenv, perl(1)
+

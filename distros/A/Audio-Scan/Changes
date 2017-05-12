@@ -1,0 +1,494 @@
+Revision history for Audio::Scan
+
+Note: Bug numbers refer to bugs at http://bugs.slimdevices.com
+
+0.98    2017-04-28
+        - RT #119101, stop including MYMETA files in the tarball.
+
+0.97    2017-04-27
+        - WAV: GH #2, fixed an integer overflow error that could result in an incorrect song_length_ms
+          for >16-bit files.
+
+0.96    2016-11-21
+        - Ogg: RT #118888, fixed crash when trying to read Vorbis comments in an
+          incorrectly framed file with a bad terminal header page.
+        - Removed hints/darwin.pl, don't try to be smarter than Perl about how to build things.
+        - Fixed various minor compiler warnings output by the latest clang on macOS.
+
+0.95    Unreleased community build
+        - Improved DFF parsing for files which end with corrupted chunk. (Adrian Smith)
+        - Improved ID3 support for DFF files. (Adrian Smith)
+
+0.94    Unreleased community build
+        - DSF/DFF: Support dsd file scanning for dsd and dsdiff files. (Kimmo Taskinen)
+        - AIFF: Fixed scanning of 24 bit files. (Adrian Smith)
+
+0.93    2011-09-14
+        - ASF: Support seeking in a file without an ASF_Index object.
+        - Don't use MAX_PATH because this limits path names to only 260 chars on Win32.
+
+0.92    2011-09-09
+        - Added $info->{jenkins_hash} which is a 32-bit hash value of the
+          filename + mtime + file size.
+        - MP4: Get correct HE-AAC samplerate values from esds.
+        - ADTS AAC: Add support for .adts file extension.
+
+0.91    2011-09-06
+        - MP3, MP4, WMA, WAV, AIFF, ADTS AAC: Added DLNA audio profile detection as
+          $info->{dlna_profile}.
+
+0.90    2011-08-03
+        - ID3: Bug 17392, fixed APIC offset calculation for non-MP3 files such as AIFF
+          and WAV where the tag does not live at the front of the file.
+
+0.89    2011-08-03
+        - APE: Bug 15895, better handling if we have a broken APE tag and run out of
+          tag data. (Adrian Smith)
+        - WMA: Bug 17355, fixed WM/Picture offset calculation when artwork is stored in the
+          Header Extension/Metadata Library block.
+        - WMA: Added output warning when trying to seek in a file without ASF_Index.
+        - Switched aac.t to Test::Warn instead of manual STDERR redirection.
+
+0.88    2011-07-20
+        - ADTS AAC: Check first 2-3 frames to avoid false syncs.
+        - OSX: Xcode 4 doesn't include the 10.5 SDK, so check for this before using it.
+        - Win32: Display better error messages when unable to read from files.
+        - MP3, AAC, MPC: Bug 17173: Cleaned up several places where invalid memory reads could occur.
+
+0.87    2011-03-21
+        - AAC: Bug 16874, Fixed infinite loop that could occur when reading a truncated
+          ADTS stream.
+        - Win32: Fixed MSVC compilation error in mp3.c.
+
+0.86    2011-03-18
+        - MP3: Require first 3 frames to have matching samplerate and channel values.
+        - MP3: Fixed bug where info->{vbr} would not be set if a file had a Xing frame
+          but no LAME data.
+        - MP3: Handle case where ID3 tag indicates an extended header is present but no
+          actual header exists.
+
+0.85    2010-09-08 23:40:00
+        - Changed audio_md5 to use bytes from middle of file instead of the start,
+          to reduce chance of false matches due to padding or silence.  Added new
+          md5_offset option to override the default location used for MD5.
+        - MP4: Fixed incorrect COVR_offset calculation.
+        - FLAC: Fixed a bug where artwork could be seen as invalid if the picture header
+          wasn't fully buffered.
+        - FLAC: Use existing MD5 value if available for audio_md5.
+        - FLAC, INCOMPATIBLE CHANGE: info 'md5' value changed to 'audio_md5'.
+
+0.84    2010-08-27 19:10:00
+        - Added an optional audio_md5 info value, this is the MD5 checksum of the
+          first N audio bytes of the file.  This is useful in determining if a file
+          is the same even when tags have been changed.  See the documentation for details.
+        - Added audio_size info value to all formats.
+        - Added image offset values in AUDIO_SCAN_NO_ARTWORK mode for some formats, so
+          image data may be extracted directly from the file if needed.  See the
+          documentation for specific details.
+        - AAC: Fixed samplerate values for AACplus files. The samplerate in the header
+          needs to be doubled to obtain the actual playback samplerate.
+        - ID3: Bug 16452, Don't add null strings as array entries for T* frames.
+
+0.83    2010-06-10 14:15:00
+        - APE: Tag could be ignored when ID3v1 tag is present.
+        - Fixed error handling for invalid RVAD tags.
+        - Win32: Added binmode for all open files and filehandles.
+
+0.82    2010-05-24 13:15:00
+        - RT 57664: ID3: Add checks to avoid reading too much inside an invalid frame.
+        - FLAC: Seeking bug fixes.
+
+0.81    2010-05-15 10:40:00
+        - Fixed broken boolean values.
+
+0.80    2010-05-14 23:15:00
+        - ID3: Fixed unsynchronisation of v2.2/v2.3 tags.
+        - FLAC: Fixed several seeking bugs and improved seeking algorithm.
+        - MP3: Subtract LAME encoder delay/padding from total samples to obtain more
+          accurate song duration value.
+
+0.79    2010-04-27 14:30:00
+        - ID3: Bug 16079, fixed crash when reading empty TCON tag.
+        - Bug 16095, workaround Win32+filehandle bug where file pos could sometimes
+          be off-by-one after a PerlIO_read.
+
+0.78    2010-04-16 15:45:00
+        - ASF: Fixed various issues when seeking, now uses the ASF_Index object correctly.
+        - ASF: Refactored to clean up the code and make it more efficient.
+        - ID3: Bug 16073, properly handle illegal zero-byte frames.
+
+0.77    2010-04-14 11:30:00
+        - PerlIO_seek with SEEK_END sometimes does not work correctly, changed all seeks
+          to use SEEK_SET instead.
+
+0.76    2010-04-14 10:30:00
+        - APE: Bug 15992, fixed reading of APE tags when file also has a Lyricsv2 tag.
+        - APE: Bug 16056, fixed reading of APE tags with certain kinds of invalid tags.
+
+0.75    2010-04-02 15:50:00
+        - ID3: Really fixed empty text field bug this time.
+
+0.74    2010-04-02 12:15:00
+        - ID3: Fixed bug where an empty text field could contain the text from the
+          previous frame.
+
+0.73    2010-03-31 12:30:00
+        - Added find_frame_fh_return_info method for MP4 seeking from a filehandle.
+
+0.72    2010-03-31 10:50:00
+        - Fixed bug in reading unsynchronized APIC frames, the APIC data returned was not
+          the correct size.
+        - Fixed Mac hints file to work properly on OSX Server 10.6.
+
+0.71    2010-03-30 00:00:00
+        - Added find_frame_return_info method for MP4 that returns the seek offset as well
+          as a rewritten header that can be placed before the seeked audio to construct a
+          valid bitstream.
+
+0.70    2010-03-23 19:00:00
+        - Replaced libid3tag with a custom ID3 tag parser. libid3tag would read an entire
+          tag into memory, so in files with large embedded artwork this was a huge waste
+          of memory.  The new parser will generally never buffer more than about 4K of the
+          file if AUDIO_SCAN_NO_ARTWORK is set.  It is also around twice as fast.
+        - INCOMPATIBLE CHANGE: ID3 tag elements returned in array form no longer include
+          the encoding type as the first value in the array.  Common frames this affects
+          include COMM, APIC, USLT, and others.
+        - INCOMPATIBLE CHANGE: find_frame for both MP3 and Ogg Vorbis now take a
+          timestamp in milliseconds.  Seeking using a file offset is too ambiguous
+          because of non-audio tag data.
+        - Fixed minor bug in Ogg Vorbis bitrate calculation, it was not ignoring the
+          size of the leading tag data when calculating average bitrate.
+        - Improved Ogg Vorbis bitrate/duration calculation when file contains multiple
+          logical bitstreams.
+        - Added support for old WavPack versions < 4.
+        - Changed ASF file_size value to be the actual file size, not the value from within
+          the file metadata which may or may not be correct.
+        - Bundled a win32 build of zlib to make compiling on Windows a bit easier.
+
+0.62    2010-03-02 12:00:00
+        - INCOMPATIBLE CHANGE: Ogg Vorbis COVERART tags are now translated to an
+          ALLPICTURES block and are base64-decoded.
+        - Added support for new Ogg Vorbis cover art tag, METADATA_BLOCK_PICTURE. Data
+          is returned in the same ALLPICTURES array as for FLAC.
+
+0.61    2010-02-23 22:50:00
+        - RT 53118: Fixed crash under Perl 5.11.
+        - Updated Mac hints file to be more compatible with non-Apple Perl builds.
+
+0.60    2010-02-22 17:45:00
+        - WavPack 4.x support.
+        - ID3: Bug 3998, Fixed parsing of multiple TCON genre values in older tag
+          versions.
+        - ID3: Parse RGAD frame (replay gain adjustment).
+        - APE: Fixed bug where a trailing null could be read from tags.
+        - FLAC: Calculate correct duration/bitrate for files with bad header
+          information.
+        - WAV: Ignore chunks SAUR, PAD, and otom.
+
+0.59    2010-02-08 15:30:00
+        - MP4: Bug 15656, read channels and bits_per_sample for ALAC files.
+        - APE: Bug 15324, read APEv2 tags that don't contain a header.
+        - APE: Fixed reading of binary tag data.
+        - APE: Support for reading special "Cover Art (Front)" tag.
+
+0.58    2010-01-28 12:30:00
+        - MP4: Bug 15262, Don't overwrite song_length_ms from individual tracks if it was
+          found in the mvhd box.
+
+0.57    2010-01-12 21:40:00
+        - Vorbis: Fixed parsing of files with large comment headers containing >128
+          page segments.
+        - Removed leading numbers from most tests, Schwern is right. :)
+          http://use.perl.org/~schwern/journal/40054
+
+0.56    2009-12-21 08:15:00
+        - MP3: Bug 15197, fixed bitrate/duration calculation of MPEG-2 Layer 3 files.
+        - MP3: RT 52932, fixed crash if seek fails while looking for APE tag.
+
+0.55    2009-11-26 17:00:00
+        - ID3: Bug 15196, fixed reading multiple TCON genre values.
+
+0.54    2009-11-25 15:30:00
+        - FLAC: Fixed bug when seeking in a file containing artwork.
+        - FLAC: Save memory by not buffering padding data.
+
+0.53    2009-11-22 17:20:00
+        - FLAC: Avoid wasting memory when reading picture block when
+          AUDIO_SCAN_NO_ARTWORK is set.
+        - Fixed Win32 compile issue.
+
+0.52    2009-11-20 23:30:00
+        - Bug 15115, ignore ID3 LINK frame data in latin1 list type.
+        - libid3tag: Avoid wasting memory when AUDIO_SCAN_NO_ARTWORK is set and we're
+          reading an APIC frame.
+        - MP4: Refactored tag parser to avoid wasting memory on COVR tags when not
+          reading artwork.
+        - Various minor buffer optimizations to slightly reduce memory usage.
+
+0.51    2009-11-16 15:10:00
+        - Fixed compilation error under Windows.
+
+0.50    2009-11-12 22:00:00
+        - MP4: API change, avg_bitrate is now returned in the top-level info hash, not
+          on a per-track basis.  This fixes some issues where tracks do not have an
+          average bitrate value.
+        - MP4: Read correct bits_per_sample value for secondary SLS track.
+
+0.49    2009-11-09 09:00:00
+        - Bug 15074, Fixed ASF GUID struct issues on some platforms.
+
+0.48    2009-11-02 15:40:00
+        - Fixed bug where AUDIO_SCAN_NO_ARTWORK didn't work properly when set to 0.
+
+0.47    2009-11-02 14:00:00
+        - If the AUDIO_SCAN_NO_ARTWORK environment variable is set, binary artwork tag
+          data is instead replaced by the length of the artwork data.  This can save
+          memory when scanning a lot of files with potentially large artwork.
+        - Changed method on non-Windows platforms for determining file size to use
+          stat instead of seek/tell.
+
+0.46    2009-10-29 14:00:00
+        - ID3: Change format of id3_version info field to list all versions of
+          tags found in a file.
+        - FLAC: Don't parse ID3 tags when using find_frame, in filehandle mode this
+          caused a crash.
+        - FLAC: Bug 14913, fixed error when calculating bitrate for large files.
+        - WAV: Bug 14946, strip nulls from the end of LIST INFO tags.
+        - MP4: Fixed error in avg_bitrate calculation for ALAC files.
+
+0.45    2009-10-26 15:00:00
+        - Bug 8380, Read multiple ID3 tags when more than one is found
+          in a file, such as ID3v1 + ID3v2.
+        - Fixed MP3 find_frame when looking for audio_offset + 1 and
+          a Xing TOC is present.  Xing TOC is ignored for this special
+          case.
+        - Fixed FLAC find_frame when file has ID3v2 tags.
+        - Bug 14883, added audio_size info to WAV and AIFF.
+        - Fixed crash on invalid FLAC picture block.
+        - Fixed bug in Ogg bitrate calculation.
+        - Fixed tests to work on old Perls without Encode.
+        - Max buffer size got accidentally reset to 10M in 0.44.
+        - Added utility methods: get_types, extensions_for, type_for (Frank Terbeck)
+
+0.44    2009-10-16 22:00:00
+        - Bug 14788, ASF: Fixed crasher when reading multiple integer tags.
+        - Changed Newx/Newxz calls to use older New/Newz API to support older Perls.
+
+0.43    2009-10-16 15:00:00
+        - Increase max buffer size yet again (to 20MB), this time someone had 16MB
+          of artwork!
+        - libid3tag: Don't re-generate frametype.c, compat.c, and genre.dat as this
+          can fail if gperf is not available.
+
+0.42    2009-10-13 10:45:00
+        - Bug 14728, fixed issue in libid3tag where default ID3v2.3 UTF-16 byte
+          order was set to big-endian instead of little-endian when no BOM
+          was present.  Several other tag readers also default to little-endian
+          so this appears to be the de-facto standard, even though the v2.3 spec
+          says all Unicode text must have a BOM.
+        - Bug 14705, Fixed libid3tag to return frames parsed so far when it runs into
+          an invalid frame.
+        - Bug 14658, MP4: fixed signed char issue on some PPC platforms.
+
+0.41    2009-10-12 10:30:00
+        - FLAC: Re-factored FLAC code to remove libFLAC dependency.
+        - FLAC: API change: more accurate seeking via find_frame, which
+          now takes an offset in milliseconds instead of bytes and seeks
+          to the correct audio frame containing the desired sample.
+        - FLAC: Added support for reading ID3v2 tags.
+        - AIFF: Fixed error when reading ID3 chunks with a bad chunk size.
+        - MP4: Fixed parsing of files with short TRKN fields.
+        - MP4: Parse audio object type from esds box.
+        - Vorbis: Added file_size to info.
+
+0.40    2009-10-03 16:00:00
+        - Bug 14462, fixed reading of WAV files with 18-byte fmt chunks.
+        - WAV: Fixed reading of files with data chunks having the wrong size.
+        - MP4: Fixed parsing of tags with duplicate keys containing integer
+          values.
+
+0.39    2009-10-01 16:00:00
+        - Bug 14241, fixed Win32 crash when using find_frame on FLAC files.
+        - Bug 14476, fixed crash when very large artwork is present (now supports
+          tags up to 10M).
+        - MP4: Fixed handling of cover art when multiple covers are present. Currently
+          only the first cover image is returned.
+        - Added is_supported($path) method. Can be used to determine if a given
+          file can be scanned. (Frank Terbeck)
+
+0.38    2009-09-22 13:00:00
+        - Fixed crasher bug in average bitrate calculation logic.
+
+0.37    2009-09-18 23:40:00
+        - Minor fix to avoid an error being printed during bitrate calculation.
+
+0.36    2009-09-18 23:30:00
+        - Bug 13449, changed the way MP3 average bitrate calculation works. Read
+          bitrate of all frames starting from the beginning of the file, bail out
+          early if the file appears to be CBR.
+        - Fixed a few bugs in the buffering code.
+
+0.35    2009-09-17 15:00:00
+        - WAV: added support for tags in an "ID3 " chunk.
+
+0.34    2009-09-12 00:15:00
+        - Bug 13995, fixed divide by zero error when trying to detect MP3 average
+          bitrate on a file with no valid frames.
+
+0.33    2009-09-11 22:15:00
+        - Fixed Xing bitrate calculation for MPEG 2.0 files.
+
+0.32    2009-09-09 14:00:00
+        - Bug 13921, added support for ID3v2.3 experimental XSOP frame.
+        - PPC is dead, changed Snow Leopard hint to only compile 32/64-bit x86.
+
+0.31    2009-08-29 13:30:00
+        - Allow static linking to a libFLAC that was built without
+          Ogg support.
+        - Change Snow Leopard hint to use 10.5 SDK and minimum version.
+
+0.30    2009-08-27 00:15:00
+        - Bug 8563, fixed parsing of MP4 sample rate.
+        - Bug 13486, fixed parsing of MP4 files with multiple values for
+          a single key.
+        - Added Snow Leopard 64-bit universal binary support.
+
+0.29    2009-08-07 16:00:00
+        - Bug 13198, really fixed bad FLAC bitrate calculation on some
+          files under Windows.
+
+0.28    2009-08-06 19:00:00
+        - Bug 13198, Changed the method for determining FLAC bitrate.
+
+0.27    2009-07-26 23:00:00
+        - Added support for Musepack SV8 files.
+        - Refactored Musepack code to use buffer API, fixes
+          crashes on big-endian platforms.
+        - Added support for reading Musepack track gain and album gain.
+
+0.26    2009-07-25 17:00:00
+        - Added support for ID3v2.4 RVA2 peak values.
+        - Fixed build on Solaris again.
+
+0.25    2009-07-10 22:00:00
+        - Bug 9942, fixed APE check when file does not have an ID3v1 tag, and
+          fixed parsing of APE tags with multiple items separated by a null byte.
+        - Bug 12615, improved Ogg Vorbis parser to do a better job finding the
+          audio offset.
+        - Bug 12668, fixed build on OpenSolaris (Sun's CC doesn't support -Wall).
+
+0.24    2009-07-09 22:45:00
+        - Bug 12691, some people have *really* large embedded artwork, allow buffer
+          to allocate up to 5M at a time (was 1M).
+
+0.23    2009-06-26 10:00:00
+        - Added support for ADTS files with leading junk before first audio frame.
+
+0.22    2009-06-18 12:00:00
+        - Improved accuracy of MP3 find_frame when Xing TOC is present.
+        - Fixed MP3 bug where Xing parser was not reading enough data.
+
+0.21    2009-06-17 17:30:00
+        - Refactored MP3 code to use more robust buffer API.
+        - Bug 12409, fixed crash when scanning MP3 file with null bytes before
+          initial audio frame.
+
+0.20    2009-06-16 15:00:00
+        - Bug 12168, fixed Vorbis calculation of bitrate and duration in certain
+          files.
+        - Bug 12326, fixed bug in scanning MP4 meta box.
+        - Bug 12152, added support for APEv1 tags.
+        - Fixed some APE test failures that happened on some platforms.
+
+0.19    2009-06-15 15:35:00
+        - MP4: find_frame support.
+        - MP4: Added leading_mdat flag for MP4 files where mdat precedes
+          moov.
+        - MP4: Handle invalid data sizes in ilst box.
+        - Changed FLAC parser to return CUESHEET_BLOCK for cuesheet metadata
+          block so it doesn't conflict with user-added CUESHEET tag.
+
+0.18    2009-06-05 11:45:00
+        - Added support for reading ID3v2 tags from ADTS files.
+
+0.17    2009-06-05 09:45:00
+        - MPEG-4 ADTS support.
+        - Fixed Makefile.PL to set local include dirs before FLAC include
+          dirs. (Philippe Kehl)
+
+0.16    2009-06-04 15:45:00
+        - Fixed parsing of MPEG-4 files where mdat occurs before moov.
+        - Bug 12250, Added handling for invalid field lengths in WAV LIST INFO
+          chunks.
+        - Bug 12242, (libid3tag) Fixed broken parsing of ID3v2.2 PIC frames.
+
+0.15    2009-06-02 16:30:00
+        - Bug 12224, (libid3tag) Added support for broken iTunes v2.4 lengths that
+          are not sync-safe.
+        - Bug 12212, Fixed infinite loop during MP3 bitrate calculation if tag size
+          is very large compared to the audio size.
+
+0.14    2009-05-21 14:45:00
+        - MPEG-4 support.
+        - Bug 12082: Fixed reading of APE files with header version <= 3.97.
+        - Fixed test failure on some Linux platforms due to rounding error.
+
+0.13    2009-04-24 16:00:00
+        - Musepack support.
+        - Monkey's Audio Codec (APE) support.
+        - AIFF support.
+
+0.12    2009-04-23 12:10:00
+        - Fixed bug in WAV duration calculation.
+        - Fixed seek-related bug caused by passing a PerlIO to libid3tag.
+
+0.11    2009-04-22 16:20:00
+        - Renamed FLAC CRC function to fix --with-flac-static build.
+
+0.10    2009-04-22 16:10:00
+        - WAV support.
+        - FLAC: Support for find_frame().
+
+0.09    2009-04-19 18:00:00
+        - ASF: Disabled index parsing.  This data isn't useful and just adds
+          overhead.  Also, it does not compile on Windows.
+        - Fixed Win32 compile issues.
+
+0.08    2009-04-18 16:35:00
+        - MP3: Support for find_frame().
+        - MP3: Added support for RVA/RVAD frame.
+
+0.07    2009-04-17 12:35:00
+        - Added find_frame_fh( $type => $fh, $offset ) method.
+          See docs for details.
+        - Added $info->{lossless} for WMA Lossless.
+
+0.06    2009-04-15 23:15:00
+        - Added scan_fh( $type => $fh ) method to scan a filehandle.
+        - Don't build FLAC support with < libFLAC 1.1.3.
+        - --with-flac-static flag for statically-linking libFLAC.
+
+0.05    2009-04-13 11:20:00
+        - ASF: Fixed bug with empty script command names.
+        - ASF: Support Extended Content Encryption.
+
+0.04    2009-04-12 16:10:00
+        - ASF: Support for Content Encryption, Extended Content
+          Encryption, Script Command, and Digital Signature objects.
+        - ASF: Fixed handling of multiple WM/Picture tags.
+
+0.03    2009-04-11 14:30:00
+        - Fixed big-endian GUID issues with ASF.
+        - (libid3tag) Updated to latest config.guess.
+
+0.02    2009-04-10 17:15:00
+        - ASF (WMA/WMV) parsing support.
+        - Improved directory structure.
+        - Added build instructions for Win32.
+        - Skip FLAC tests if FLAC support was not built.
+        - Don't try and build Universal Binary on PPC Macs.
+        - Fixed #define MIN for platforms that don't have it.
+
+0.01    2009-04-03 11:00:00
+        - Initial release.
+

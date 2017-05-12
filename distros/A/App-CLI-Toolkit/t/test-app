@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use App::CLI::Toolkit;
+
+my $DESCRIPTION = 'A test app for App::CLI::Toolkit';
+my $SEP         = '|';
+my $SUBSEP      = ',';
+my $DEFAULT     = '-';
+
+my $app = new App::CLI::Toolkit(
+    description => $DESCRIPTION,
+    params      => [ qw( foo bar+ wibble ) ],
+    options     => {
+                       'verbose|v+' => 'More verbose output',
+                       'names|n=s@' => 'Sample option that takes multiple arguments',
+                       'foo-bar=i'  => 'Sample option with hyphen in the key',
+                       'ages=i%'    => 'Sample option that takes a hash of ints',
+                   },
+    noautohelp  => 1,
+);
+
+print $app->foo . $SEP;
+print join($SUBSEP, $app->bar) . $SEP;
+print $app->wibble . $SEP;
+
+print(($app->verbose || $DEFAULT) . $SEP);
+print($app->names ? join($SUBSEP, $app->names) . $SEP : "$DEFAULT$SEP");
+
+print(($app->foo_bar || $DEFAULT) . $SEP);
+print(($app->get('foo-bar') || $DEFAULT) . $SEP);
+
+print($app->ages ? join($SUBSEP, keys %{$app->ages}) . $SEP : "$DEFAULT$SEP");
+

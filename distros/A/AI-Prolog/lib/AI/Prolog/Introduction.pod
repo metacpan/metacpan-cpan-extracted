@@ -1,0 +1,144 @@
+=head1 NAME
+
+AI::Prolog::Introduction - The what and the why of logic programming.
+
+=head1 REVISION
+
+ $Id: Introduction.pod,v 1.2 2005/02/20 18:27:55 ovid Exp $
+
+=head1 RATIONALE
+
+You can skip this if you already know logic programming.
+
+Note that most of this was pulled from my write-up about logic programming in
+Perl at L<http://www.perlmonks.org/?node_id=424075>.
+
+In Perl, generally you can append one list to another with this:
+
+ my @Z = (@X, @Y);
+
+However, that's telling the language what to do.  As sentient beings, we can
+look at that and infer more information.  Given C<@Z> and C<@X>, we could infer
+C<@Y>.  Given just C<@Z>, we could infer all combinations of C<@X> and C<@Y>
+that can be combined to form C<@Z>.
+
+Perl cannot do that.  In logic programming, however, by defining what
+C<append()> looks like, we get all of that other information.
+
+In Prolog, it looks like this:
+
+ append([], X, X).
+ append([W|X],Y,[W|Z]) :- append(X,Y,Z).
+
+(There's actually often something called a "cut" after the first definition,
+but we'll keep this simple.)
+
+What the above code says is "appending an empty list to a non-empty list yields
+the non-empty list." This is a boundary condition. Logic programs frequently
+require a careful analysis of boundary conditions to avoid infinite loops
+(similar to how recursive functions in Perl generally should have a terminating
+condition defined in them.)
+
+The second line is where the bulk of the work gets done. In Prolog, to identify
+the head (first element) of a list and its tail (all elements except the
+first), we use the syntax [head|tail]. Since ":-" is read as "if" in Prolog,
+what this says if we want to concatenate (a,b,c) and (d,e,f):
+
+=over 4
+
+=item * Given a list with a head of W and a tail of X:
+
+ @list1 = qw/a b c/; (qw/a/ is W, the head, and qw/b c/ is X, the tail)
+
+=item * If it's appended to list Y:
+
+ @Y = qw/d e f/;
+
+=item * We get a list with a head of W and a tail of Z:
+
+ @list2 = qw/a b c d e f/;
+
+=item * Only if X appended to Y forms Z:
+
+ X is qw/b c/. Y is qw/d e f/. Z is qw/b c d e f/.
+
+=back
+
+But how do we know if X appended to Y forms Z? Well, it's recursive. You see,
+the head of X is 'b' and it's tail is 'c'. Let's follow the transformations:
+
+ append([a,b,c],[d,e,f],[a,b,c,d,e,f])
+  if append([b,c],[d,e,f],[b,c,d,e,f])
+  if append([c],[d,e,f],[c,d,e,f])
+  if append([],[d,e,f],[d,e,f])
+
+As you can see, the last line matches our boundary condition, so the program
+can determine what the concatenation is.
+
+Now that may seem confusing at first, but so was the Schwartzian transform when
+many of us encountered it. After a while, it becomes natural. Sit down and work
+it out and you'll see what's going one.
+
+So what does this give us? Well, we can now append lists X and Y to form Z:
+
+ append([a], [b,c,d], Z).
+
+Given Y and Z, we can infer X.
+
+ append(X, [b,c,d], [a,b,c,d]).
+
+And finally, given Z, we can infer all X and Y that combine to form Z.
+
+ append(X,Y,[a,b,c,d]).
+
+Note that you get all of that from one definition of how to append two lists.
+You also don't have to tell the program how to do it. It just figures it out
+for you.
+
+Translating all of this into C<AI::Prolog> looks like this:
+
+ use AI::Prolog;
+ use Data::Dumper;
+
+ my $prolog = AI::Prolog->new(append_prog());
+ $prolog->raw_results(0) # Disable raw results
+ $prolog->query("append(X,Y,[a,b,c,d])");
+ while (my $result = $prolog->results) {
+     print Dumper($result->X); # array references
+     print Dumper($result->Y);
+ }
+
+ sub append_prog {
+     return <<'    END_PROLOG';
+     append([], X, X).
+     append([W|X],Y,[W|Z]) :- append(X,Y,Z).
+     END_PROLOG
+ }
+
+=head1 SEE ALSO
+
+W-Prolog:  L<http://goanna.cs.rmit.edu.au/~winikoff/wp/>
+
+X-Prolog:  L<http://www.iro.umontreal.ca/~vaucher/XProlog/>
+
+Roman BartE<225>k's online guide to programming Prolog:
+L<http://kti.ms.mff.cuni.cz/~bartak/prolog/index.html>
+
+=head1 AUTHOR
+
+Curtis "Ovid" Poe, E<lt>moc tod oohay ta eop_divo_sitrucE<gt>
+
+Reverse the name to email me.
+
+This work is based on W-Prolog, http://goanna.cs.rmit.edu.au/~winikoff/wp/,
+by Dr. Michael Winikoff.  Many thanks to Dr. Winikoff for granting me
+permission to port this.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005 by Curtis "Ovid" Poe
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

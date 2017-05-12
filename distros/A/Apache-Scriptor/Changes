@@ -1,0 +1,11 @@
+Revision history for Perl extension Apache::Scriptor.
+
+1.00  Mon Nov  5 19:25:11 2001
+      - original version; created by h2xs 1.21 with options
+         -A -X -n Apache::Scriptor -v 1.00
+
+1.10  Wed 22 Oct 21:14:26 2003
+      - fixed some bugs when used with -T switch.
+	
+1.20  Thu 1 Jan	18:30:00 2004
+    - Published to CPAN.

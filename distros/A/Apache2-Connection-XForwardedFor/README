@@ -1,0 +1,44 @@
+Apache2::Connection::XFUosrewrarCdoendtFroirb(u3t)ed PerAlpaDcohceu2m:e:nCtoantnieocntion::XForwardedFor(3)
+
+
+
+NNAAMMEE
+       Apache2::Connection::XForwardedFor - Sets the connection remote_ip to
+       X-Forwarded-For header
+
+SSYYNNOOPPSSIISS
+        PerlPostReadRequestHandler Apache2::Connection::XForwardedFor
+
+       Meanwhile in another mod_perl handler...
+
+        $client_ip = $r->connection->remote_ip;
+
+DDEESSCCRRIIPPTTIIOONN
+       This simple module takes the X-Forwarded-For header value and sets the
+       remote_ip attribute of the connection object with that ip.  This module
+       is meant to be used with reverse proxies where the proxy sets the
+       header to the ip of the http client.
+
+       This module doesn't have any fancy features like similar modules, it is
+       meant to be short and to the point, and have some test coverage.
+
+SSEEEE AALLSSOO
+       Apache2::Connection
+
+       Apache2::XForwardedFor
+
+       Apache::ForwardedFor
+
+AAUUTTHHOORR
+       Fred Moyer, <fred@redhotpenguin.com>
+
+CCOOPPYYRRIIGGHHTT AANNDD LLIICCEENNSSEE
+       Copyright (C) 2010 by Fred Moyer
+
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself, either Perl version 5.12.0 or, at
+       your option, any later version of Perl 5 you may have available.
+
+
+
+perl v5.12.0                      2010-05-A1p0ache2::Connection::XForwardedFor(3)

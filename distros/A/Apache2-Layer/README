@@ -1,0 +1,154 @@
+NAME
+    Apache2::Layer - Layers for DocumentRoot
+
+VERSION
+    version 1.103360
+
+SYNOPSIS
+        # in httpd.conf
+        DocumentRoot "/usr/local/htdocs"
+
+        # load module
+        PerlLoadModule Apache2::Layer
+
+        # enable layers for whole server
+        EnableDocumentRootLayers On
+
+        # disable location strip
+        DocumentRootLayersStripLocation Off
+
+        # paths are relative to DocumentRoot
+        DocumentRootLayers layered/christmas layered/promotions
+
+        <VirtualHost *:80>
+            ...
+            # layers enabled for this vhost
+        </VirtualHost>
+
+        <VirtualHost *:80>
+            ...
+            DocumentRoot "/usr/local/vhost2"
+
+            # disabled by default
+            EnableDocumentRootLayers Off
+
+            <LocationMatch "\.png$">
+                # layer images only
+                EnableDocumentRootLayers On
+                DocumentRootLayers images_v3 images_v2
+            </LocationMatch>
+
+
+            <Location "/images">
+                DocumentRootLayersStripLocation On
+            </Location>
+
+            <Location "/images/company1">
+                DocumentRootLayers company1/images default/images
+            </Location>
+
+            <Location "/images/company2">
+                DocumentRootLayers company2/images default/images
+            </Location>
+
+        </VirtualHost>
+
+        <VirtualHost *:80>
+            ...
+            PerlOptions +MergeHandlers
+            PerlTransHandler My::Other::Handler
+        </VirtualHost>
+
+DESCRIPTION
+    Create multiple layers to allow incremental content modifications.
+
+    If file was found in layered directory it will be used instead of one
+    from "DocumentRoot".
+
+    Loaded module adds itself as "PerlTransHandler" and
+    "PerlMapToStorageHandler", so please remember to use
+
+        PerlOptions +MergeHandlers
+
+    if you want to define your own handlers for those phases.
+
+DIRECTIVES
+    Apache2::Layer needs to be loaded via "PerlLoadModule" due to use of
+    following directives:
+
+  EnableDocumentRootLayers
+        Syntax:   EnableDocumentRootLayers On|Off
+        Default:  EnableDocumentRootLayers Off
+        Context:  server config, virtual host, <Location*
+
+    Enable use of "DocumentRootLayers".
+
+  DocumentRootLayersStripLocation
+        Syntax:   DocumentRootLayersStripLocation On|Off
+        Default:  DocumentRootLayersStripLocation On
+        Context:  server config, virtual host, <Location*
+
+    Remove the path specified in <Location>, <LocationMatch> from the URI
+    before searching for layered file.
+
+    That allows to simplify the file hieratchy tree, eg.
+
+        <Location "/images">
+            DocumentRootLayersStripLocation On
+        </Location>
+
+        <Location "/images/company1">
+            DocumentRootLayers company1/images default/images
+        </Location>
+
+        <Location "/images/company2">
+            DocumentRootLayers company2/images default/images
+        </Location>
+
+    for following requests:
+
+        /images/company1/headers/top.png 
+
+        /images/company2/headers/top.png
+
+    those paths would be searched:
+
+       company1/images/headers/top.png default/images/headers/top.png 
+
+       company2/images/headers/top.png default/images/headers/top.png
+
+    but with "DocumentRootLayersStripLocation Off":
+
+       company1/images/images/company1/headers/top.png default/images/images/company1/headers/top.png
+
+       company2/images/images/company2/headers/top.png default/images/images/company2/headers/top.png
+
+  DocumentRootLayers
+        Syntax:   DocumentRootLayers dir-path1 [dir-path2 ... dir-pathN]
+        Context:  server config, virtual host, <Location*
+
+    Specify content layers to be used on top of "DocumentRoot".
+
+    If the *dir-path** is not absolute it is assumed to be relative to
+    "DocumentRoot".
+
+    Directories are searched in order specified and first one containing the
+    file is used.
+
+    If file does not exists in any of them module falls back to
+    "DocumentRoot".
+
+SEE ALSO
+    Module was created as a result of upgrade existing application from
+    mod_perl1 to mod_perl2 and is a replacement for Apache::Layer.
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,28 @@
+---
+abstract: 'Extract embedded jpegs from RAW files'
+author:
+  - 'Paul Fenwick <pjf@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Exifpic
+requires:
+  File::Slurp: 0
+  Image::ExifTool: 0
+  Imager: 0
+  Thread::Queue: 0
+  autodie: 0
+  constant: 0
+  perl: 5.010
+  strict: 0
+  threads: 0
+  warnings: 0
+resources:
+  repository: git://github.com/pfenwick/app-exifpic.git
+version: 0.02

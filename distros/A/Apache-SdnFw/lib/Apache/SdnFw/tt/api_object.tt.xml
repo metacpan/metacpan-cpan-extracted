@@ -1,0 +1,5 @@
+<object name="[% name %]" id="[% o.id %]">
+[% FOREACH l IN o.functions.keys %]
+	<function name="[% l %]" />
+[% END %]
+</object>

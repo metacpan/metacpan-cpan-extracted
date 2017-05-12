@@ -1,0 +1,290 @@
+=head1 APACHE 2.4 PORTING NOTES
+
+=head2 VERY IMPORTANT!!!
+
+Apache 2.4 has a B<VERY> different authentication API from previous versions.
+You will not be able to simply ugrade apache and upgrade AuthCookie in order to
+migrate to Apache 2.4.  You will also need to port your AuthCookie subclass
+over to the Apache 2.4 API, and update your Apache configuration for Apache
+2.4.
+
+This document attempts to help you understand the changes required and
+how to port your module over to Apache 2.4.  If your subclass stopped working
+when you migrated to Apache 2.4, please make sure you have read and understand
+everything in this document before filing a bug report.
+
+=head2 Changes Required to Run Under Apache 2.4
+
+=over 4
+
+=item Mod Perl
+
+You need at least C<mod_perl> version 2.0.9, which is the first official
+release to support Apache 2.4.
+
+=item Apache::Test
+
+You need Apache::Test version 1.39 or later.  Previous versions do not define
+the constant C<APACHE2_4> which is needed for the test suite.
+
+=item Your AuthCookie Subclass
+
+=over 4
+
+=item *
+
+Your module must inherit from C<Apache2_4::AuthCookie> instead of C<Apache2::AuthCookie>
+
+=item *
+
+You must change every method that was called as a C<PerlAuthzHandler> under
+previous versions to return one of the following values:
+
+=over 4
+
+=item Apache2::Const::AUTHZ_DENIED_NO_USER
+
+return this constant if C<< $r->user >> is empty/undefined and you do not wish
+to allow anonymous access.
+
+=item Apache2::Const::AUTHZ_DENIED
+
+return this constant if C<< $r->user >> is not authorized for the current request.
+
+=item Apache2::Const::AUTHZ_GRANTED
+
+return this constant if C<< $r->user >> is authorized for the current request
+
+=item Apache2::Const::AUTHZ_GENERAL_ERROR
+
+return this constant to indicate an error processing authz requirements.
+
+=item Apache2::Const::AUTHZ_NEUTRAL
+
+return this constant to indicate a neutral response.  It is assumed that
+another authz provider will be checked in a parent/sibling scope that will
+return granted or denied.
+
+=back
+
+=back
+
+=item httpd.conf
+
+=over 4
+
+=item *
+
+Remove all C<PerlAuthzHandler> entries.  C<PerlAuthzHandler> does not exist in Apache 2.4.
+
+=item *
+
+Depending on what your C<Require> directives say, you may need to add one or
+more top level C<PerlAddAuthzProvider> entires and implement a handler for each
+one.
+
+If your C<Require> directives are simply C<valid-user> or C<user ...> then you
+do not need to do this.  Apache already provides an authz provider that handles
+C<user> and C<valid-user> requirements for you in C<mod_authz_user>.
+
+C<AuthCookie> does provide a C<authz_handler> for these requirements for
+backwards compatibility with previous versions, but the one provided by Apache
+is preferred.
+
+=item *
+
+If you are C<Require>'ing anything other than C<valid-user> or C<user ...> then
+you will need to write your own Authz Provider method and register it with Apache.
+
+Authz Providers are the Apache 2.4 equivalent of a C<PerlAuthzHandler> method.
+Each one implements a specific requirement. E.g.:
+
+ PerlAddAuthzProvider species My::AuthCookieHandler->authz_species
+
+Will be called to handle a 
+
+ Require species klingon
+
+Directive.
+
+It is important to know that Authz Providers are called B<twice> for
+a request.  First, the authz provider is called before authentication has been
+processed to check for anonymous access.  In this method call, C<< $r->user >>
+is not set.  You are expected to return one of:
+
+=over 4
+
+=item AUTHZ_GRANTED
+
+Access is granted and no further authn/authz processing will occur for this
+request.
+
+=item AUTHZ_DENIED
+
+=item AUTHZ_NEUTRAL
+
+The response is C<HTTP_FORBIDDEN> (unless neutral is overridden by another
+provider)
+
+=item AUTHZ_DENIED_NO_USER
+
+Authentication is processed, C<< $r->user >> will be set with the current
+username and your authz provider will be called again.
+
+=back
+
+The second time the authz provider is called, C<< $r->user >> is set and you
+are expected to return one of:
+
+=over 4
+
+=item AUTHZ_GRANTED
+
+The request is allowed
+
+=item AUTHZ_DENIED
+
+The request is forbidden
+
+=item AUTHZ_NEUTRAL
+
+The request is forbidden, unless another authz provider returns
+C<AUTHZ_GRANTED>.  Consult the apache documentation about authorization merging
+for more info.
+
+=back
+
+You could also return C<AUTHZ_GENERAL_ERROR> from any of these to indicate an
+error processing authz directives and halt processing immediately.
+
+One way to think about these response codes what kind of Require satisfies is
+in effect:
+
+=over 4
+
+=item RequireAll/RequireNone
+
+In this case the priority of responses is:
+
+=over 4
+
+=item AUTHZ_GENERAL_ERROR
+
+Processing stops immediately
+
+=item AUTHZ_DENIED
+
+Processing stops immediately, no siblings are processed. Request is denied.
+
+=item AUTHZ_DENIED_NO_USER
+
+Process Authentication and try again
+
+=item AUTHZ_GRANTED
+
+Continue processing siblings.
+
+=item AUTZ_NEUTRAL
+
+Continue processing siblings.
+
+=back
+
+=item RequireAny
+
+In this case the priority of responses is:
+
+=over 4
+
+=item AUTHZ_GENERAL_ERROR
+
+Processing stops immediately
+
+=item AUTHZ_GRANTED
+
+Processing stops immediately, no siblings are processed.  Request is allowed.
+
+=item AUTHZ_DENIED_NO_USER
+
+Process Authentication and try again
+
+=item AUTHZ_DENIED
+
+Continue processing siblings.
+
+=item AUTZ_NEUTRAL
+
+Continue processing siblings.
+
+=back
+
+=back
+
+=back
+
+=back
+
+=head2 Important Internal API Changes for Apache 2.4
+
+=over 4
+
+=item authorize() has been removed
+
+You need to use a C<PerlAddAuthzProvider> and write an appropriate handler as
+described above instead.  Note that you do not need a C<PerlAddAuthzProvider>
+for C<user> or C<valid-user> requirements.  Apache already handles those
+internally.
+
+=item ${auth_name}Satisfy
+
+Satisfy support is removed as it is no longer needed with Apache 2.4.
+
+You are expected to use C<RequireAll> or C<RequireAny> instead.
+
+e.g.:
+
+    PerlAddAuthzProvider species Your::AuthCookieHandler->authz_species_handler
+
+    <RequireAll>
+      Require valid-user
+      Require species klingon
+    </RequireAll>
+
+see: L<https://httpd.apache.org/docs/2.4/howto/auth.html#reqaccessctrl>
+
+=item Unauthorized User HTTP Response Code
+
+In Apache 2.4, in C<mod_authz_core>, if no authz handlers return C<AUTHZ_GRANTED>,
+then C<HTTP_UNAUTHORIZED> is returned.  In previous versions of Apache,
+C<HTTP_FORBIDDEN> was returned.  You can get the old behaviour if you want it
+with:
+
+    AuthzSendForbiddenOnFailure On
+
+=back
+
+=head1 FREQUENTLY ASKED QUESTIONS
+
+=over 4
+
+=item *
+
+Why is my authz method called twice per request?
+
+This is normal behaviour under Apache 2.4.  This is to accomodate for
+authorization of anonymous access. You are expected to return
+C<Apache2::Const::AUTHZ_DENIED_NO_USER> IF C<< $r->user >> has not yet been set
+if you want authentication to proceed.  Your authz handler will be called a
+second time after the user has been authenticated.
+
+=item *
+
+My log shows an entry like:
+
+ authorization result of Require ...: denied (no + # authenticated user yet)
+
+These are normal.  This happens because the authz provider returned
+C<AUTHZ_DENIED_NO_USER> and the authz provider will be called again after
+authentication happens.
+
+=back

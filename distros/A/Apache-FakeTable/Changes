@@ -1,0 +1,45 @@
+Revision history for Perl extension Apache::FakeTable.
+
+0.06  2013-10-16T20:53:33Z
+        - Hid the internal Apache::FakeTableHash module from the CPAN
+          indexer.
+        - Fixed a warning "Modification of a read-only value" on Perl 5.19.4.
+          Thanks to Zefram for the fix.
+
+0.05  2011-06-19T05:15:24
+        - Fixed a test failure on Perl 5.5 (I think). Reported by Slaven Rezic
+          via cpan-testers.
+        - Moved to GitHub.
+        - Includes a "traditional, rather than "passthrough", `Makefile.PL`.
+
+0.04  2008-05-15T03:33:49
+        - Fixed a pasto in the Support section.
+        - Added Module::Build to the "build_requires" parameter in Build.PL to
+          eliminate a warning during `make dist`.
+        - Fixed a bug to allow this module to work on Perl 5.5. Reported by
+          Slaven Rezic.
+
+0.03  2008-04-02T00:14:25
+        - Updated pod.t to use newer version of Test::Pod.
+        - Added the "configure_requires", "build_requires", and "recommends"
+          parameters to Build.PL.
+        - Fixed syntax error under Perl 5.10. Reported by IMACAT via
+          cpan-testers.
+
+0.02  Thu Sep  4 05:32:22 2003
+        - Fixed behavior of each to match that of Apache::Table. It will now
+          return multiple key/value pairs for a single key that has multiple
+          values.
+        - Changed behavior of new() to require an Apache object as its first
+          object to bring it more in line with the behavior of
+          Apache::Table::new.
+        - Assigning a value of undef no longer deletes the key from the table,
+          but goes ahead and assigns it. When warnings are enabled, this will
+          cause Apache::FakeTable to issue a "Use of uninitialized value in
+          null operation" warning.
+        - The merge() method will now only merge the new value with the first
+          value when a key has multiple existing values. It also now uses a
+          comma and a space to separate the values, instead of just a comma.
+
+0.01  Sun Aug 31 22:58:05 2003
+        - Original version, poached from a patch for HTML::Mason.

@@ -1,0 +1,14 @@
+Build.PL
+LICENSE
+Changes
+lib/Apache/Session/DBMS.pm
+lib/Apache/Session/Store/DBMS.pm
+lib/Apache/Session/Generate/DBMS.pm
+lib/Apache/Session/Serialize/DBMS/YAML.pm
+lib/Apache/Session/Serialize/DBMS/Storable.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00_simple.t
+t/01_object_per_key.t

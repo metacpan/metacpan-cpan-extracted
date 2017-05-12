@@ -1,0 +1,27 @@
+This is Perl module App::CLI::Plugin::Parallel::ForkManager.
+
+INSTALLATION
+
+App::CLI::Plugin::Parallel::ForkManager installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan App::CLI::Plugin::Parallel::ForkManager
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+App::CLI::Plugin::Parallel::ForkManager documentation is available as in POD. So you can do:
+
+    % perldoc App::CLI::Plugin::Parallel::ForkManager
+
+to read the documentation online with your favorite pager.
+
+Akira Horimoto

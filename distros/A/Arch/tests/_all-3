@@ -1,0 +1,16 @@
+#!/usr/bin/perl -w
+
+# The script verifies pod coverage in all classes.
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More;
+
+my $test_pod_class = "Test::Pod::Coverage 1.00";
+eval "use $test_pod_class";
+plan skip_all => "$test_pod_class required for testing POD" if $@;
+my $trustme = [ '^new$', '' ];  # currently assume all methods are covered
+all_pod_coverage_ok({ trustme => $trustme });

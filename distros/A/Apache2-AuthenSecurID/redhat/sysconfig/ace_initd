@@ -1,0 +1,2 @@
+OPTIONS="--listen=127.0.0.1 --pidfile=/var/run/ace_initd --daemon"
+ACE_INITD="/usr/local/bin/ace_initd"

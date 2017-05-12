@@ -1,0 +1,21 @@
+app:
+  # global settings for the application
+  # maybe application name, stuff for the homepage, etc.
+  name: Demo
+  title: AutoCRUD demo application
+  readonly: 0
+  default:
+      page_size : 50
+
+datasources :
+  Sakila :
+    dbh:
+      connect:
+        - "dbi:SQLite:dbname=sakila.sqlite"
+        - ""
+        - ""
+        - RaiseError: 1
+          sqlite_unicode: 1
+          sqlite_open_flags: 2 # SQLITE_OPEN_READWRITE
+
+# no custom Sakila config yet

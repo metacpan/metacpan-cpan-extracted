@@ -1,0 +1,37 @@
+clear
+power on
+regs
+
+memset befa 55
+op a2 0b
+op de efbe
+
+# Should be: mem[$BEFA]=54, IX=0B
+test ix = 0b
+test m:befa = 54
+
+# Wrap and Negative case -------------
+power on
+
+memset befa 00
+op a2 0b
+op de efbe
+
+# Should be: memory[$BEFA]=FF, S=1
+test m:befa = ff
+test ix = 0b
+test s = 1
+
+# Zero case -------------------
+power on
+
+memset befa 01
+op a2 0b
+op de efbe
+
+# Should be: memory[$BEFA]=00, Z=1
+test m:befa = 00
+test ix = 0b
+test z = 1
+
+save verify_DE.txt

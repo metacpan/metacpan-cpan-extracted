@@ -1,0 +1,642 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# ABSTRACT: shows `git log` with a more readable graph
+# PODNAME: git-fancy
+
+use autodie;
+use Getopt::Long;
+use Pod::Usage;
+
+##### configuration variables #####
+#{{{
+my $COMPACT = 1;
+my $GAP = 2;
+my $SPLIT_MERGE = 1;
+my $VERBOSE = 0;
+my $COLOR = 1;
+
+my %opt = (
+        'compact'  => \$COMPACT,
+        'gap'     => \$GAP,
+        'split-merge'  => \$SPLIT_MERGE,
+        'verbose'   => \$VERBOSE,
+        'color' => \$COLOR,
+        );
+
+foreach my $k ( qw/compact split-merge color/ ) {
+    my $v = `git config fancygraph.$k`;
+    chomp $v;
+    if ( $v ne '' ) {
+        if ( $v =~ /^yes$/i ) {
+            ${$opt{$k}} = 1;
+        }
+        elsif ( $v =~ /^no$/i ) {
+            ${$opt{$k}} = 0;
+        }
+        else {
+            print "Invalid option fancygraph.$k = [$v]\n";
+            exit 1;
+        }
+    }
+}
+
+GetOptions(
+    \%opt,
+    'help|?'=> sub { pod2usage(-verbose => 1); },
+    'man'   => sub { pod2usage(-verbose => 2, -noperldoc => 1); },
+    'compact!',
+    'gap=i',
+    'split-merge!',
+    'verbose',
+    'color!',
+    'no-msg|nomsg|no-message|nomessage',
+) or pod2usage(2);
+
+local $| = 1 if $VERBOSE;
+#}}}
+
+
+
+
+##### global variables #####
+#{{{
+my $git_option = '--all';
+if ( @ARGV ) {
+    $git_option = join ' ', @ARGV;
+}
+
+# %commit = (
+#              sha-id => {
+#                            idx => num   # order in timeline
+#                            sha_id_p => ID(for output),
+#                            msg => 'commit msg',
+#                            src => 'source refs'
+#                            src_p => 'source refs'(for output),
+#                            parents = [ sha, sha, ... ];
+#                            head => 1   # most recent commit in each branch
+#                            merge => 1  # merge commit
+#                        }
+#           )
+my %commit = ();
+
+# timeline = ( sha_id, sha_id, ... )
+my @timeline = ();
+
+my $pat_color  = qr/(?:\e\[[;\d]*?m)/;
+my $pat_sha_id = qr/$pat_color?[0-9a-fA-F]{7}$pat_color?/;
+my $pat_gitlog_line = qr/^
+                        ((?:\s*?$pat_sha_id)+)         # sha-id's
+                        \s+
+                        ($pat_color?.+?$pat_color?)    # source
+                        \s
+                        (.+)                    # commit message
+                        $
+                        /x;
+
+# @merge_commits = ( commit, commit, ... )
+my @merge_commits = ();
+
+# %print = (
+#              refs-name => {
+#                              column => num,
+#                              color  => num,
+#                           }
+#           )
+my %print = ();
+
+# the right-most column
+my $usedcolumn = 0;
+# @returnedcolumn = ( [num, idx], [num, idx]... );
+my @returnedcolumn = ();
+
+#}}}
+
+
+
+
+
+##### subroutines #####
+
+# return a color code to assign to new branch
+{
+my $color = 0;
+sub next_color { #{{{
+    $color = (($color+1)%6);
+    $color++ if $color == 2;    # avoid yellow
+    return 1 + $color;
+} #}}}
+} 
+
+# assign a new column to a branch $src at $idx
+sub assign_col { #{{{
+    my ( $src, $idx ) = @_;
+
+	# return a 'returned column' if there is any.
+    if ( $COMPACT and @returnedcolumn ) {
+        for (my $i=0; $i<@returnedcolumn; $i++) {
+            if ( $returnedcolumn[$i][1] > $idx+1 ) {
+                my $ret = $returnedcolumn[$i][0];
+                splice @returnedcolumn, $i, 1;
+
+                verbose("    we can use col [$ret]\n");
+                return $ret;
+            }
+        }
+    }
+
+    # new right-most column
+    verbose("    new column number [$usedcolumn]\n");
+    return $usedcolumn++;
+} #}}}
+
+# returned maximum column number
+sub max_col { #{{{
+    return $usedcolumn - 1;
+} #}}}
+
+# free a column $col that will be not used by current branch any more
+# $idx - the last index until which the column is used.
+sub free_col { #{{{
+    my ($col, $idx) = @_;
+
+    push @returnedcolumn, [ $col, $idx ];
+
+    return;
+} #}}}
+
+# return a symbol $sym, decorated with $color
+sub colored_symbol { #{{{
+    my ( $sym, $color ) = @_;
+
+    return "\e[${color}m$sym\e[m" if $COLOR;
+    return $sym;
+} #}}}
+
+# change 'src' value of commits from $old to $new
+# begin at $root commit, finish at $ca commit
+sub rename_src { #{{{
+    my ( $root, $old, $new, $ca ) = @_;
+
+    return unless exists $commit{$root};
+
+    my @stack = ( $root );
+    while ( @stack ) {
+        my $id = shift @stack;
+
+        if ( exists $commit{$id} and $commit{$id}{'src'} eq $old ) {
+            verbose("  rename [$id] to [$new]\n");
+            $commit{$id}{'src'} = $new;
+        }
+        else {
+            next;
+        }
+
+        foreach my $p ( @{$commit{$id}{'parents'}} ) {
+            next if ( $p eq $ca );
+
+            push @stack, $p;
+        }
+    }
+
+} #}}}
+
+# print verbose message
+sub verbose { #{{{
+    my $str = shift;
+    return unless $VERBOSE;
+    $str =~ s/$pat_color//g unless $COLOR;
+    print $str;
+} #}}}
+
+
+
+
+
+##### main #####
+
+
+# read git log and gather basic information of commits
+verbose("PHASE 1 : read git log with '--parents'...\n");
+{ #{{{
+    my $idx = 0;
+    open my $git, "-|", "git log --oneline --decorate --color=always --source --parents --date-order $git_option";
+    while (my $line = <$git>) {
+        chomp $line;
+
+        if ( $line =~ /$pat_gitlog_line/ ) {
+            my ( $sha_block_p, $src_p, $msg ) = ( $1, $2, $3, $4 );
+
+            $sha_block_p =~ s/^\s+//;
+            my @sha_block_p = split /\s+/, $sha_block_p;
+            (my $sha_block = $sha_block_p) =~ s/$pat_color//g;
+            my @sha_block = split /\s+/, $sha_block;
+
+            my $sha_id   = shift @sha_block;
+            my $sha_id_p = shift @sha_block_p;
+
+            $src_p =~ s{^($pat_color?)refs/}{$1}g;
+            (my  $src = $src_p) =~ s/$pat_color//g;
+
+            # construct a commit structure
+            @{$commit{$sha_id}}{ qw/idx sha_id_p msg src src_p parents/ } =
+                ( ++$idx, $sha_id_p, $msg, $src, $src_p, [ @sha_block ] );
+            if ( not exists $commit{$sha_id}{'children'} ) {
+                $commit{$sha_id}{'children'} = [ ];
+            }
+
+            push @timeline, $sha_id;
+            verbose("  add commit [$idx][$sha_id][$src][$msg]\n");
+
+            foreach my $id ( @sha_block ) {
+                push @{$commit{$id}{'children'}}, $sha_id;
+            }
+
+            # check merge commit
+            if (2 <= @{$commit{$sha_id}{'parents'}}) {
+                $commit{$sha_id}{'merge'} = 1;
+
+                push @merge_commits, $commit{$sha_id};
+            }
+        }
+    }
+    close $git;
+} #}}}
+verbose("PHASE 1 : done.\n\n\n");
+
+
+
+# remove commits that have only 'children' field.
+foreach my $id ( keys %commit ) { #{{{
+    unless ( exists $commit{$id}{'idx'} ) {
+        delete $commit{$id};
+    }
+} #}}}
+
+# assign a new 'src' value to a branch that was merged.
+if ( $SPLIT_MERGE ) { #{{{
+    verbose("PHASE 2 : rename merged commits...\n");
+
+    my %lastnum = ();   # last number that was assigned to each src name
+    foreach my $cmt ( @merge_commits ) {
+
+        if ( $VERBOSE ) {
+            (my $cmtid = $cmt->{'sha_id_p'} ) =~ s/$pat_color//g;
+            print "Check merge commit [$cmtid].....\n";
+        }
+
+        my $src = $cmt->{'src'};
+        my @parents = @{$cmt->{'parents'}};
+        my $first_id = shift @parents;
+        my $basename;
+
+        if ( $src =~ /^(.+?)(?:'(\d+))?$/ ) {
+            $basename = $1;
+
+            if ( not exists $lastnum{$basename} ) {
+                $lastnum{$basename} = 2;
+            }
+        }
+        else {
+            die "Assertion failed: branch name [$src]";
+        }
+
+        foreach my $p_id ( @parents ) {
+            next unless exists $commit{$p_id};
+            if ( $src eq $commit{$p_id}{'src'} ) {
+                my $common_ancestor = `git merge-base $first_id $p_id`;
+                $common_ancestor = substr($common_ancestor, 0, 7);
+
+                my $newsrc = $basename."'".$lastnum{$basename};
+                $lastnum{$basename}++;
+
+                verbose("rename commits from [$p_id] before [$common_ancestor] as [$newsrc]\n");
+                rename_src( $p_id, $src, $newsrc, $common_ancestor );
+            }
+        }
+    }
+    verbose("PHASE 2 : done.\n\n\n");
+} #}}}
+
+
+
+# assign columns to each commit
+verbose("PHASE 3 : assign column and color to each branch...\n");
+# pre-define using git.config 
+{
+    my $conf = `git config fancygraph.fixcolumn`;
+    chomp $conf;
+    foreach my $src ( split /\s+/, $conf ) {
+        $print{"heads/$src"}{'column'} = assign_col($src, 0);
+        $print{"heads/$src"}{'color' } = next_color();
+    }
+}
+my $last_color = -1;
+foreach my $id ( reverse @timeline ) { #{{{
+    my $cmt = $commit{$id};
+    my $src = $cmt->{'src'};
+
+    # new branch
+    if ( not defined $print{$src} ) {
+        my $bottom = $cmt->{'idx'};
+        foreach my $id ( @{$cmt->{'parents'}} ) {
+            next unless exists $commit{$id};
+            if ( $cmt->{'idx'} == @timeline ) { next; }
+            if ( $bottom < $commit{$id}{'idx'} ) {
+                $bottom = $commit{$id}{'idx'};
+            }
+        }
+        my $new_col = assign_col($src, $bottom);
+        $print{$src}{'column'} = $new_col;
+        verbose("  assign column [$new_col] to [$id][$cmt->{msg}] / [$src]\n");
+
+        # new color
+        $print{$src}{'color'}  = next_color();
+        while ( $print{$src}{'color'} == $last_color ) {
+            $print{$src}{'color'} = next_color();
+        }
+    }
+
+    # most recent commit of each branch
+    if (not grep { exists $commit{$_} and $src eq $commit{$_}{'src'} } @{$cmt->{'children'}}) {
+        $cmt->{'head'} = 1;
+
+        my $top = $cmt->{'idx'};
+        foreach my $id ( @{$cmt->{'children'}} ) {
+            next unless exists $commit{$id};
+            if ( $commit{$id}{'merge'} and $top > $commit{$id}{'idx'} ) {
+                $top = $commit{$id}{'idx'};
+            }
+        }
+
+        # free the column assigned
+        verbose("  free column [$print{$src}{column}] at index [$top]\n");
+        free_col( $print{$src}{'column'}, $top );
+    }
+
+    $last_color = $print{$src}{'color'};
+} #}}}
+verbose("PHASE 3 : done.\n\n\n");
+
+
+
+# output
+{ #{{{
+    my $HEAD_id = `git rev-list -1 HEAD`;
+    $HEAD_id = substr($HEAD_id, 0, 7);
+
+    my $idx = 0;
+    open my $less, '|-', 'less -RFfX';
+    my $maxc = 1 + max_col();
+    my @nextline = (' ')x($GAP*$maxc);
+
+    foreach my $id ( @timeline ) {
+        my @currentline = @nextline;
+        $idx++;
+
+        my $cmt = $commit{$id};
+        my $prt = $print{$cmt->{'src'}};
+        my $color = '3'.$prt->{'color'};
+
+        # symbol of commit
+        my $symbol;
+        if ( $cmt->{merge} ) {
+            $symbol = 'M';
+        }
+        else {
+            $symbol = 'O';
+        }
+
+        if ( $cmt->{head} ) {
+            $symbol = colored_symbol($symbol, 103);
+        }
+        # column
+        my $indent = $GAP * $prt->{'column'};
+
+        # assign the symbol to the column of current line
+        $currentline[$indent] = colored_symbol($symbol, $color);
+
+        # decide the symbol at the same column of next line
+        if ( @{$cmt->{parents}} ) {
+            if ( grep { exists $commit{$_} } @{$cmt->{parents}} ) {
+                $nextline[$indent] = colored_symbol('|', $color);
+            }
+            else {
+                # parent commit doesn't exist
+                $nextline[$indent] = colored_symbol('^', $color);
+            }
+        }
+        else {
+            $nextline[$indent] = ' ';
+        }
+
+        # diverging branch
+        foreach my $s ( @{$cmt->{children}} ) {
+            next if ( not exists $commit{$s} );
+            my $c = $commit{$s};
+            my $b = $c->{'src'};
+
+            next if ( $cmt->{'src'} eq $b );
+            next if ( $c->{'merge'} );
+
+            my $col = $GAP*$print{$b}{'column'};
+            $currentline[$col] = colored_symbol('^', '3'.$print{$b}{'color'});
+
+			# print '-'s to that branch
+            foreach my $i ( $indent < $col ? ( $indent+1 .. $col-1 ) : ( $col+1 .. $indent-1 ) ) {
+                if ( $currentline[$i] =~ /[ |]/ ) {
+                    $nextline[$i] = $currentline[$i];
+                    $currentline[$i] = colored_symbol('-', $color);
+                }
+            }
+        }
+
+        # " " under "^"
+        # "|" under "|"
+        for ( my $i=0; $i<@currentline; $i++ ) {
+            $nextline[$i] = ' ' if $currentline[$i] =~ /\^/;
+            $nextline[$i] = $currentline[$i] if $currentline[$i] =~ /\|/;
+        }
+
+        # print
+        printf{$less} "%5d. ", $idx if $VERBOSE;
+        print {$less} join('', @currentline);
+
+        (my $tmp_src = $cmt->{'src'}) =~ s{^(.).*?/}{($1) };    # abbreviate "heads/", "tags/" to (h),(t)
+        (my $tmp_msg = $cmt->{'msg'}) =~ s{\(($pat_color)}{colored_symbol('(', 33).$1}e;
+
+        my $line = '';
+        if ( $id eq $HEAD_id ) {
+            $line .= colored_symbol('*'.$cmt->{'sha_id_p'}, 103);
+        }
+        else {
+            $line .= ' '. $cmt->{'sha_id_p'};
+        }
+        $line .= " " . colored_symbol($tmp_src, $color);
+        $line .= " " . $tmp_msg unless $opt{'no-msg'};
+        $line =~ s/$pat_color//g unless $COLOR;
+
+        print {$less} $line;
+        print {$less} "\n";
+
+        # additional line beneath a merge commit
+        if ( $cmt->{'merge'} and $cmt->{'idx'} != @timeline ) {
+            my @templine = (' ')x($GAP*$maxc);
+            for (my $i=0; $i<@currentline; $i++) {
+                $templine[$i] = $nextline[$i] if $nextline[$i] =~ /[|]/;
+            }
+
+            $templine[$indent] = colored_symbol('+', $color);
+
+			# when there is no parent of same branch
+            if ( not grep { exists $commit{$_} and $cmt->{'src'} eq $commit{$_}{'src'} } @{$cmt->{parents}} ) {
+                $nextline[$indent] = ' ';
+            }
+
+            # print '-'s
+            my $col_diff = sub {
+                                 my $id = shift;
+                                 return abs( $indent - $print{$commit{$id}{'src'}}{'column'} );
+                               };
+
+            foreach my $s ( sort { $col_diff->($b) <=> $col_diff->($a) }
+                            grep { exists $commit{$_} } @{$cmt->{'parents'}} ) {
+                my $c = $commit{$s};
+                my $b = $c->{'src'};
+                next if ( $cmt->{'src'} eq $b );
+
+                my $temp_color = '3'.$print{$b}{'color'};
+                my $bcol = $GAP*$print{$b}{'column'};
+
+                $templine[$bcol] = colored_symbol('.', $temp_color);
+                $nextline[$bcol] = colored_symbol('|', $temp_color);
+
+                foreach my $i ( $indent < $bcol ? ( $indent+1 .. $bcol-1 ) : ( $bcol+1 .. $indent-1 ) ) {
+                    $templine[$i] = colored_symbol('-', $temp_color);
+                }
+
+            }
+            printf {$less} "%7s", '' if $VERBOSE;
+            print  {$less} join('', @templine), "\n";
+        }
+    }
+    close $less;
+} #}}}
+
+
+#pod
+#{{{
+
+
+#}}}
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+git-fancy - shows `git log` with a more readable graph
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+	git-fancy [options] [-- arguments for git-log]
+
+	In your git repository,
+	
+	# show logs of all commits
+	% git fancy
+
+	# some options are supported
+	% git fancy --no-compact
+
+	# show logs of commits that are reachable from some branches or tags
+	# (All arguments after -- are passed to git-log)
+	% git fancy -- master release devel
+
+	# show logs of commits that are relevant to 'README' file
+	# (Note that the second -- is passed to git-log as is)
+	% git fancy -- -- README
+
+=head1 DESCRIPTION
+
+B<git-fancy> shows almost same output as what B<git-log> shows,
+except that it tries its best to draw each branch as "straight line".
+
+When called without any option or argument, it calls:
+
+	git log --oneline --decorate --color=always --source --parents --date-order
+
+B<git-fancy> uses L<less(1)> as pager. B<git> and B<less> should be in your PATH.
+
+=head1 OPTIONS
+
+=over
+
+=item C<< --compact >>
+
+draw entire graph using as few columns as possible (default)
+
+=item C<< --no-compact >>
+
+draw every new branch lines at new column
+
+=item C<< --gap <positive num> >>
+
+gap between lines (default is 2)
+
+=item C<< --spilt-merge >>
+
+draw merged commits without any reference as different branch (default)
+
+(If you feel the scripts is too slow, turn this off)
+
+=item C<< --no-split-merge >>
+
+draw merged commits without any reference as if they are of same branch.
+
+=item C<< --no-color >>
+
+print without ANSI terminal color
+
+=item C<< --no-msg >>, C<< --no-message >>
+
+suppress commit messages
+
+=item C<< --verbose >>
+
+be verbose
+
+=item C<< -? >>, C<< --help >>
+
+show brief help message
+
+=item C<< --man >>
+
+show full documentation
+
+=back
+
+=head1 SEE ALSO
+
+L<git|http://www.git-scm.com>
+
+=head1 AUTHOR
+
+Geunyoung Park <gypark@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Geunyoung Park.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

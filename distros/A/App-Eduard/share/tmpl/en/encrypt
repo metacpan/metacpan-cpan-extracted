@@ -1,0 +1,7 @@
+Message decrypted successfully.
+
+You said:
+[% plaintext %]
+
+GnuPG said:
+[% message %]

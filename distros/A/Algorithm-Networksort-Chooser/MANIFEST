@@ -1,0 +1,9 @@
+bin/algorithm-networksort-chooser
+Changes
+lib/Algorithm/Networksort/Chooser.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+t/runs.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

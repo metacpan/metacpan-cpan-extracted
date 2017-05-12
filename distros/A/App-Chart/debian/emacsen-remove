@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# Emacs remove: /usr/lib/emacsen-common/packages/remove/chart
+
+# Copyright 2005, 2007, 2008, 2016 Kevin Ryde
+# Copyright 1998 Robert Browning
+#
+# This file is part of Chart.  It was derived from the example code in
+# /usr/share/doc/emacsen-common/debian-emacs-policy.gz of emacsen-common
+# version 1.4.16.  That code is by Rob Browning and covered by the GPL, as
+# described in /usr/share/doc/emacsen-common/copyright.
+#
+#
+# Chart is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# Chart is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Chart.  If not, see <http://www.gnu.org/licenses/>.
+
+set -e
+
+FLAVOR=$1
+elc_dir=/usr/share/${FLAVOR}/site-lisp/chart
+
+echo remove/chart: Handling removal of emacsen flavor ${FLAVOR}
+
+if [ ${FLAVOR} != emacs ]
+then
+  echo chart: purging byte-compiled files for ${FLAVOR}
+
+  # prior to chart 36 only had .elc files, no .el file links, so use "rm -f"
+  # to tolerate no .el's
+  # allow for $elc_dir not existing at all on failed postinst
+  rm -f $elc_dir/*.el $elc_dir/*.elc
+  rmdir $elc_dir || true
+fi
+exit 0

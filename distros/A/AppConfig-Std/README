@@ -1,0 +1,28 @@
+
+			AppConfig::Std
+
+AppConfig::Std is a subclass of Andy Wardley's AppConfig module,
+to provide standard command-line arguments for tool scripts.
+
+AppConfig is a Perl5 module to handle global configuration variables
+for perl programs. AppConfig::Std provides the following switches:
+
+	-help           display a short help statement
+	-doc            display the full documentation (formatted pod)
+	-version        display the version of the script
+	-verbose	turn on verbose status/progress output
+	-debug          turn on debugging output
+
+The module is a subclass of AppConfig, and uses Brad Appleton's
+Pod::Usage module to implement the -help and -doc switches.
+
+To install this module, you should just have to run the following:
+
+	% perl Makefile.PL
+	% make
+	% make test
+	% make install
+
+I'd be happy to hear of any suggestions for improving this module.
+
+Neil Bowers <neil@bowers.com>

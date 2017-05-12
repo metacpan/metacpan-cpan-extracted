@@ -1,0 +1,81 @@
+{
+   "abstract" : "Clone module source codes with ghq",
+   "author" : [
+      "Songmu <y.songmu@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-CPANGhq",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Devel::CheckBin" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::CPANRepo" : "0",
+            "Class::Accessor::Lite::Lazy" : "0.03",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::CPANGhq" : {
+         "file" : "lib/App/CPANGhq.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Songmu/p5-App-CPANGhq/issues"
+      },
+      "homepage" : "https://github.com/Songmu/p5-App-CPANGhq",
+      "repository" : {
+         "url" : "git://github.com/Songmu/p5-App-CPANGhq.git",
+         "web" : "https://github.com/Songmu/p5-App-CPANGhq"
+      }
+   },
+   "version" : "0.10",
+   "x_authority" : "cpan:SONGMU",
+   "x_contributors" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ]
+}

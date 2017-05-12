@@ -1,0 +1,6 @@
+=head1 NAME
+
+Some documentation
+
+=cut
+

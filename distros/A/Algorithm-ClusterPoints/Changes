@@ -1,0 +1,19 @@
+Revision history for Perl extension Algorithm::ClusterPoints.
+
+0.08  Jul 10, 2008
+        - bug in hypercylinder calculation corrected.
+
+0.07  Jul 8, 2008
+        - bug corrected on scales method
+        - better error messages for scales and add_point
+
+0.06  Jul 7, 2008
+        - add support for hypercylindrical distances
+
+0.04  Jul 7, 2008
+        - first version released to CPAN
+
+0.01  Wed Jul  2 12:06:45 2008
+	- original version; created by h2xs 1.23 with options
+		-AXn Algorithm::ClusterPoints
+

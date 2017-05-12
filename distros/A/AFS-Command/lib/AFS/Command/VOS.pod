@@ -1,0 +1,1968 @@
+#
+# $Id: VOS.pod,v 7.2 2004/05/11 15:55:17 wpm Exp $
+#
+# (c) 2003-2004 Morgan Stanley and Co.
+# See ..../src/LICENSE for terms of distribution.
+#
+
+=head1 NAME
+
+AFS::Command::VOS - OO API to the AFS vos command
+
+=head1 SYNOPSIS
+
+    use AFS::Command::VOS;
+
+    my $vos = AFS::Command::VOS->new();
+
+    my $vos = AFS::Command::VOS->new
+      (
+       command			=> $path_to_your_vos_binary,
+      );
+
+    my $vos = AFS::Command::VOS->new
+      (
+       localauth			=> 1,
+       encrypt			=> 1,
+      );
+
+=head1 DESCRIPTION
+
+This module implements an OO API wrapper around the AFS 'vos' command.
+The supported methods depend on the version of the vos binary used,
+and are determined automagically.
+
+=head1 METHODS -- Inherited
+
+All of the following methods are inherited from the AFS::Command::Base
+class.  See that documentation for details.
+
+=over
+
+=item new
+
+=item errors
+
+=item supportsOperation
+
+=item supportsArgument
+
+=back
+
+=head1 METHODS (dump, restore)
+
+Both the 'dump' and 'restore' methods are special, since this API
+supports compression to and from the filesystem when dumping or
+restoring the volume.  Normally, "vos dump -file" will just wrote the
+uncompressed volume dump to the file, but this API can compress it.
+This is a huge cost savings in disk space, assuming you can afford the
+CPU time to perform the compression (this is the 21st century -- you
+probably can).
+
+Both of these commands return simply boolean true/false values, but
+they have some special case handling for the -file argument, and
+support several special arguments that are extensions implemented in
+this API only.
+
+=head2 dump
+
+The vos help string is:
+
+    vos dump: dump a volume
+    Usage: vos dump -id <volume name or ID> [-time <dump from time>] [-file <dump file>]
+		    [-server <server>] [-partition <partition>] [-cell <cell name>]
+		    [-noauth] [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->dump
+      (
+       # Required arguments
+       id			=> $id,
+       file			=> $file, # SPECIAL CASE!!! (see below)
+       # Optional arguments
+       time			=> $time,
+       server			=> $server,
+       partition		=> $partition,
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+       # Enhanced arguments
+       gzip			=> $gzip,
+       bzip2			=> $bzip2,
+       filterout		=> [ @command ], # OR [ [ @cmd1 ], [ @cmd2 ], ... ]
+      );
+
+The first thing to notice is that 'file' is optional to the vos dump
+command itself, but required in this API.  The second thing to notice
+is the addition of three new arguments: gzip, bzip2 and filterout.
+
+=over
+
+=item file
+
+This argument specifies the file to which the vos dump output should
+be written.  If this file ends in '.gz' or '.bz2', then gzip or bzip2
+will be used to compress the output before it is written to the
+filesystem.  This is accomplished using a pipe, so there is no
+intermediate file written to disk first.
+
+By default, 'vos dump' will write the volume dump to stdout, which is
+not what you want in most applications.  If you really want the volume
+to be written to stdout, then you have to explicitly say so:
+
+   my $result = $vos->dump
+     (
+      ...
+      file			=> 'stdout',
+      ...
+     );
+
+=item gzip, bzip2
+
+Both of these arguments will turn on compression explicitly, and if
+the file specified doesn't end in the appropriate extension already
+('.gz' for gzip, and '.bz2' for bzip2), then the extension is appended
+to the filename.
+
+The value of these arguments specifies the degree of compression used,
+an should be a single numeric digit, from 0 to 9.  See the gzip and
+bzip2 man pages for more information.
+
+These arguments are also mutually exclusive.
+
+=item filterout
+
+This is an advanced feature, and one that allows the volume dump to be
+filtered through any arbitrary number of commands before it is
+compressed (optionally) and written to the filesystem.  The value of
+this argument is either an ARRAY reference to a list of command line
+arguments, suitable for passing to exec(), or an ARRAY or such ARRAYS,
+when more than one filter command is being used.
+
+For example, the author has a requirement to pass all volume dumps
+through a simple filter called 'newversion', which reads a volume
+dump, changes the directory version numbers to the current utime
+value, and writes the volume dump to stdout.  Trust me, you really
+don't want to know why.
+
+    my $result = $vos->dump
+      (
+       ...
+       filterout		=> [ 'newversion' ],
+       ...
+      );
+
+If there were command line arguments for this command, then they must
+be given as follows:
+
+    my $result = $vos->dump
+      (
+       ...
+       filterout		=> [ 'newversion', '-arg1', '-value1' ],
+       ...
+      );
+
+These args are passed directly to exec, with no shell involved.  When
+more than one command is given, then an ARRAY or ARRAYs must be
+specified as follows:
+
+    my $result = $vos->dump
+      (
+       ...
+       filterout		=> [
+                                    [ 'command1', '-arg1', '-value1' ],
+                                    [ 'command2', '-arg2', '-value2' ],
+                                    [ 'command3', '-arg3', '-value3' ],
+                                   ],
+       ...
+      );
+
+If B<ANY> of the filterout commands exits with a non-zero status, then
+the entire dump method invocation is considered to fail.  You may or
+may not get a valid volume dump file, compressed or otherwise,
+depending on the behavior of the commands you specify.
+
+=back
+
+=head2 restore
+
+The vos help string is:
+
+    vos restore: restore a volume
+    Usage: vos restore -server <machine name> -partition <partition name>
+		       -name <name of volume to be restored> [-file <dump file>]
+		       [-id <volume ID>] [-overwrite <abort | full | incremental>]
+		       [-offline] [-readonly]
+                       [-creation <dump | keep | new>] [-lastupdate <dump | keep | new>]
+                       [-cell <cell name>] [-noauth]
+		       [-localauth] [-verbose] [-encrypt]
+    Where: -offline    leave restored volume offline
+	   -readonly   make restored volume read-only
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->restore
+      (
+       # Required arguments
+       server			=> $server,
+       partition		=> $partition,
+       name			=> $name,
+       file			=> $file, # SPECIAL CASE!!! (see below)
+       # Optional arguments
+       id			=> $id,
+       overwrite		=> 'abort' | 'full' | 'incremental',
+       offline			=> 1,
+       readonly			=> 1,
+       creation			=> 'dump' | 'keep' | 'new',
+       lastupdate		=> 'dump' | 'keep' | 'new',
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+       # Enhanced arguments
+       gunzip			=> 1,
+       bunzip2			=> 1,
+       filterin			=> [ @command ], # OR [ [ @cmd1 ], [ @cmd2 ], ... ]
+      );
+
+NOTE: The 'creation' and 'lastupdate' options are available only in a
+very recent patch to the vos command, which should be available in the
+OpenAFS 1.2.11 or 1.2.12 releases.  These options control how the
+Creation and LastUpdate timestamps are set on the restored volume.
+
+The 3 values these options can take, and their meanings, are:
+
+=over
+
+=item dump
+
+Use the timestamp from the volume dump file being restored to the
+volume.  This is the default behavior for the LastUpdate timestamp.
+
+=item keep
+
+Preserve the existing timestamp on the volume.
+
+=item new
+
+Set the timestamp to the current time.  This is the default behavior
+for the Creation timestamp.
+
+=back
+
+Note that the default behavior creates the condition where the
+Creation time is newer than the LastUpdate time, and when this is
+true, "vos examine" (or any command that display the timestamps in the
+volume header, really) will show the Creation time as the LastUpdate
+time, presumably because it would be confusing to show the volume as
+having been updated before it was created.
+
+Similar to 'vos dump', the 'file' argument is optional to 'vos
+restore', but required in this API.  There are also three new
+arguments: gunzip, bunzip2, and filterin.  The analogy with 'vos dump'
+is by design entirely symmetrical.
+
+=over
+
+=item file
+
+This argument specifies the file from which the vos restore input
+should be read.  If the file ends in '.gz' or '.bz2', then gunzip or
+bunzip2 will be used to uncompress the input before it is read by vos
+restore.  This is accomplished using a pipe, so there is no
+intermediate file written to disk first.
+
+By default, 'vos restore' will read the volume dump from stdin, which
+is not what you want in most applications.  If you really want the
+volume to be read from stdin, then you have to explicitly say so:
+
+   my $result = $vos->restore
+     (
+      ...
+      file			=> 'stdin',
+      ...
+     );
+
+=item gunzip, bunzip2
+
+Both of these arguments will turn on uncompression explicitly,
+although they only need to be specified if the need for uncompression
+can not be determined dynamically from the filename.  If the files are
+compressed, but lack the proper extension ('.gz' or '.bz2'), or if the
+compressed input is being read from stdin, then uncompression must be
+specified explicitly.
+
+These arguments have boolean values, since uncompression is either on
+or off.  They are mutually exclusive as well.
+
+=item filterin
+
+This is an advanced feature, and one that allows the volume dump to be
+filtered through any arbitrary number of commands after it is
+uncompressed (optionally) and read by vos restore.  The value of this
+argument is either an ARRAY reference to a list of command line
+arguments, suitable for passing to exec(), or an ARRAY or such ARRAYS,
+when more than one filter command is being used.
+
+Lacking a better example, let's assume the author's 'newversion'
+utility is being applied to the restore process, rather than the dump.
+
+    my $result = $vos->restore
+      (
+       ...
+       filterin			=> [ 'newversion' ],
+       ...
+      );
+
+If there were command line arguments for this command, then they must
+be given as follows:
+
+    my $result = $vos->restore
+      (
+       ...
+       filterin			=> [ 'newversion', '-arg1', '-value1' ],
+       ...
+      );
+
+These args are passed directly to exec, with no shell involved.  When
+more than one command is given, then an ARRAY or ARRAYs must be
+specified as follows:
+
+    my $result = $vos->restore
+      (
+       ...
+       filterin			=> [
+                                    [ 'command1', '-arg1', '-value1' ],
+                                    [ 'command2', '-arg2', '-value2' ],
+                                    [ 'command3', '-arg3', '-value3' ],
+                                   ],
+       ...
+      );
+
+If B<ANY> of the filterin commands exits with a non-zero status, then
+the entire restore method invocation is considered to fail.  You may
+or may not get a valid volume restored to your fileserver, depending
+on the behavior of the commands you specify.
+
+=back
+
+=head1 METHODS (with complex return values)
+
+=head2 examine
+
+=over
+
+=item Arguments
+
+The vos help string is:
+
+    vos examine: everything about the volume
+    Usage: vos examine -id <volume name or ID> [-extended] [-cell <cell name>]
+                       [-noauth] [-localauth] [-verbose] [-encrypt]
+    Where: -extended   list extended volume fields
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->examine
+      (
+       # Required arguments
+       id			=> $id,
+       # Optional arguments
+       cell			=> $cell,
+       extended			=> 1,
+       noauth			=> 1,
+       localauth		=> 1,
+       verbose			=> 1,
+       encrypt			=> 1,
+      );
+
+=item Return Values
+
+This method returns an AFS::Object::Volume object, which in
+turn contains one or more AFS::Object::VolumeHeader objects,
+as well as an AFS::Object::VLDBEntry, which contains one or
+more AFS::Object::VLDBSite objects.
+
+    my $result = $vos->examine
+      (
+       id			=> $volname,
+       cell			=> $cell,
+      ) || die $vos->errors();
+
+    foreach my $header ( $result->getVolumeHeaders() ) {
+	my ($server,$partition) = ($header->server(),$header->partition());
+	print "[header] server = $server, partition = $partition\n";
+    }
+
+    my $vldbentry = $result->getVLDBEntry();
+
+    foreach my $vldbsite ( $vldbentry->getVLDBSites() ) {
+	my ($server,$partition) = ($vldbsite->server(),$vldbsite->partition());
+	print "[vldbsite] server = $server, partition = $partition\n";
+    }
+
+Each of these objects has the following attributes and methods:
+
+B<AFS::Object::Volume>
+
+This object is nothing more than a container for the VolumeHeader and
+VLDBEntry objects, and has no attributes of its own.  It has two
+methods for extracting the objects it contains.
+
+    Methods			Returns
+    -------			-------
+    getVLDBEntry()		a single AFS::Object::VLDBEntry object
+    getVolumeHeaders()		list of AFS:Command::Result::VolumeHeader objects
+
+B<AFS::Object::VLDBEntry>
+
+This object is created by parsing this stanza of output:
+
+    root.afs
+	RWrite: 536918445     ROnly: 536918450
+	number of sites -> 6
+	   server pasafq3 partition /vicepc RW Site
+	   server pasafq3 partition /vicepc RO Site
+	   server pasafq1 partition /viceph RO Site
+	   server pasafq2 partition /vicepg RO Site
+	   server pasafq4 partition /vicepc RO Site
+	   server pasafq5 partition /vicepg RO Site
+
+The object attributes are taken from the first two lines of output:
+
+    root.afs
+	RWrite: 536918445     ROnly: 536918450
+
+The following attributes should always be present:
+
+    Attributes			Values
+    ----------			------
+    name			Volume name
+    rwrite			Numeric Volume ID for the RW volume
+    locked			Boolean value, indicating the VLDB entry is locked or not
+
+The following attributes may be present, if there are volumes of the
+associated type in the VLDB entry:
+
+    Attributes			Values
+    ----------			------
+    ronly			Numeric Volume ID for the RO volume
+    backup			Numeric Volume ID for the BK volume
+    rclone			Numeric Volume ID for the RClone volume, if present
+
+Note that the 'rclone' attribute is only present if the volume was
+actively being cloned while being examined.  This is true when a 'vos
+release' command is actively updating the RO volumes.
+
+The following methods are available:
+
+    Methods			Returns
+    -------			-------
+    getVLDBSites()		list of AFS::Object::VLDBSite objects
+
+B<AFS::Object::VLDBSite>
+
+This object is created by parsing the individual VLDB sites in the
+VLDB entry, namely the lines such as:
+
+	   server pasafq5 partition /vicepg RO Site
+
+The following attributes are always available:
+
+    Attributes			Values
+    ----------			------
+    server			Fileserver hostname
+    partition			Fileserver /vice partition name
+    type			"RO" | "RW" | "BK"
+    status			Site status.
+
+Note that the status is the field indicating the state of the volume
+during a 'vos release' command, and this will be an empty string for
+VLDB entries which are completely in sync.
+
+B<AFS::Object::VolumeHeader>
+
+This object is created by parsing the volume header stanza, such as:
+
+    root.afs                          536908042 RW         23 K  Off-line
+        npiafa3 /viceph
+        RWrite  536908042 ROnly  536908046 Backup          0
+        MaxQuota          0 K
+        Creation    Sat Sep 23 03:41:50 2006
+        Copy        Fri Aug 31 01:12:21 2007
+        Backup      Fri Oct 17 20:59:02 2003
+        Last Update Sat Nov  7 15:12:40 1998
+        0 accesses in the past day (i.e., vnode references)
+
+Note that there may very well be more than one of these, if a
+.readonly is examined, since the volume headers for all of the RO
+volumes will be queried.
+
+The attributes available in this object depend on the method
+arguments, as well as the state of the volume (less information can be
+obtained when a volume is busy, for example).
+
+The following attributes should always be present.
+
+    Attributes			Values
+    ----------			------
+    id				Numeric Volume ID
+    status			online | offline | busy
+    attached			Boolean
+
+The 'attached' attribute is a Boolean that indicates whether or not
+the volume is attached by the volserver.  A volume which can not be
+brought online due to volume header problems will be offline, and
+unattached (attached == 0), but a volume can be offline for other
+reasons, (eg. vos offline, or more than one volume with the same ID on
+the same server), and still be attached (attached == 1).
+
+The following attributes are present only if the volume's status is
+'online':
+
+    Attributes			Values
+    ----------			------
+    name			Volume Name
+    type			"RO" | "RW" | "BK"
+    size			Numeric size in KB
+    server			Fileserver hostname
+    partition			Fileserver /vice partition
+    maxquota			Volume quota in KB
+    creation			Volume creation date (ctime format, eg: Sat Oct  6 04:39:50 2001)
+    copyTime			Volume copy date   (also in ctime format)
+    backupTime			Volume backup date (also in ctime format)
+    access      Volume Last Access date (also in ctime format)
+    update			Volume update date (also in ctime format)
+    accesses			Number of volume accesses since the last reset
+    rwrite			Numeric Volume ID for the RW volume
+    ronly			Numeric Volume ID for the RO volume
+    backup			Numeric Volume ID for the BK volume
+    rclone			Numeric Volume ID for the RClone volume, if present
+
+Note that the 'rclone' attribute is only present if the volume was
+actively being cloned while being examined.  This is true when a 'vos
+release' command is actively updating the RO volumes.
+
+The following attributes are only present if the 'extended' argument
+was specified (see below for details on access the raw and author
+stats):
+
+    Attributes			Values
+    ----------			------
+    files			Number of files in the volume
+    raw				Generic AFS::Object object
+    author			Generic AFS::Object object
+
+The 'raw' and 'author' stats are implemented as a hierarchy of simple,
+generic AFS::Object objects, which have nothing but a couple
+of attributes, and no special methods associated with them.
+
+The 'raw' object has the following attributes:
+
+    Attributes			Values
+    ----------			------
+    reads			Generic AFS::Object object
+    writes			Generic AFS::Object object
+
+Both of the 'reads' and 'writes' objects have the following
+attributes:
+
+    Attributes			Values
+    ----------			------
+    same			Generic AFS::Object object
+    diff			Generic AFS::Object object
+
+Both of the 'same' and 'diff' objects have the following attributes:
+
+    Attributes			Values
+    ----------			------
+    total			Numeric value
+    auth			Numeric value
+
+The 'author' object has the following attributes:
+
+    Attributes			Values
+    ----------			------
+    0sec			Generic AFS::Object object
+    1min			Generic AFS::Object object
+    10min			Generic AFS::Object object
+    1hr				Generic AFS::Object object
+    1day			Generic AFS::Object object
+    1wk				Generic AFS::Object object
+
+Each of the above interval value objects has the following attributes:
+
+    Attributes			Values
+    ----------			------
+    file			Generic AFS::Object object
+    dir				Generic AFS::Object object
+
+Both the 'file' and 'dir' objects have the following attributes:
+
+    Attributes			Values
+    ----------			------
+    same			Numeric value
+    diff			Numeric value
+
+At this point, any sane individual is probably hopelessly confused how
+to make sense of the statistics, so let's make this clear with an
+example.
+
+First of all, the 'raw' and 'author' statistics are parsed from this
+noise, generated when -extended is given:
+
+			  Raw Read/Write Stats
+	      |-------------------------------------------|
+	      |    Same Network     |    Diff Network     |
+	      |----------|----------|----------|----------|
+	      |  Total   |   Auth   |   Total  |   Auth   |
+	      |----------|----------|----------|----------|
+    Reads     |      162 |      162 |        6 |        6 |
+    Writes    |     1815 |     1815 |        0 |        0 |
+	      |-------------------------------------------|
+		       Writes Affecting Authorship
+	      |-------------------------------------------|
+	      |   File Authorship   | Directory Authorship|
+	      |----------|----------|----------|----------|
+	      |   Same   |   Diff   |    Same  |   Diff   |
+	      |----------|----------|----------|----------|
+    0-60 sec  |      226 |        0 |      621 |        0 |
+    1-10 min  |       87 |        0 |      105 |        0 |
+    10min-1hr |       42 |        0 |       44 |        0 |
+    1hr-1day  |       18 |        0 |        6 |        0 |
+    1day-1wk  |        0 |        0 |        0 |        0 |
+    > 1wk     |        1 |        0 |        0 |        0 |
+	      |-------------------------------------------|
+
+Since attributes can most easily be accessed by calling the method of
+the same name, one can easily dig into the hierarchy as follows:
+
+    my $result = $vos->examine
+      (
+       id			=> 'user.wpm',
+       cell			=> 'q.ny.ms.com',
+       extended			=> 1,
+      );
+
+    print $result->raw()->reads()->same()->total();  # 162, in the above output.
+    print $result->author()->10min()->dir()->same(); # 44, in the above output.
+
+See?  It's not as ugly as the pedantic description above implies.
+
+=back
+
+=head2 listaddrs
+
+=over
+
+=item Arguments
+
+The vos help string is:
+
+    vos listaddrs: list the IP address of all file servers registered in the VLDB
+    Usage: vos listaddrs [-uuid <uuid of server>] [-host <address of host>]
+			 [-noresolve] [-printuuid] [-cell <cell name>] [-noauth]
+			 [-localauth] [-verbose] [-encrypt] 
+    Where: -noresolve  don't resolve addresses
+	   -printuuid  print uuid of hosts
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->listaddrs
+      (
+       # Optional arguments
+       uuid			=> $uuid,
+       host			=> $host,
+       noresolve		=> 1,
+       printuuid		=> 1,
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+       verbose			=> 1,
+       encrypt			=> 1,
+      );
+
+=item Return Values
+
+This method returns a list of AFS::Object::FileServer
+objects, each of which has attributes that vary depending on the
+arguments to the method call.
+
+In particular, vos will try to map IP addresses into hostnames, and
+this may or may not succeed, depending on the stability and
+correctness of the hostname resolution mechanism (usually DNS, of
+course, but that is outside of vos' control).
+
+    my @result = $vos->listaddrs
+      (
+       cell				=> $cell,
+      );
+
+    foreach my $result ( @result ) {
+	if ( $result->hasAttribute('hostname') {
+	    print "Hostname: " . $result-hostname() . "\n";
+	} elsif ( $result->hasAttribute('addresses') {
+	    my $addresses = $result->addresses();
+	    foreach my $address ( @addresses ) {
+		print "IP Address: $address\n";
+	    }
+	}
+    }
+
+If a specific 'host' or 'uuid' is specified, then only one object will
+be returned (assuming the specified host or uuid is valid, of course,
+otherwise, you get nothing).
+
+B<AFS::Object::FileServer>
+
+This object will have one or more of the following attributes,
+depending on the choice of arguments to the method, as well as the
+ability of vos to map the IP addresses back into hostnames.
+
+    Attributes			Values
+    ----------			------
+    hostname			Server's hostname (duh)
+    addresses			ARRAY reference of IP addresses
+    uuid			Servers's UUID (duh)
+
+The 'uuid' will be present if the 'printuuid' or 'uuid' arguments were
+passed to the method call.  The 'addresses' will be present either
+'noresolve' was specified, or vos has problems with hostname
+resolution.
+
+=back
+
+=head2 listpart
+
+=over
+
+=item Arguments
+
+The vos help string is:
+
+    vos listpart: list partitions
+    Usage: vos listpart -server <machine name> [-cell <cell name>] [-noauth]
+			[-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->listpart
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       cell			=> $cell,
+       noauth			=> 1,
+       localauth		=> 1,
+       verbose			=> 1,
+       encrypt			=> 1,
+      );
+
+=item Return Values
+
+This method returns an AFS::Object::FileServer object, which
+contains one or more AFS::Object::Partition objects.  Because
+'listpart' returns nothing other than the partition names, the
+underlying Partition objects have only one attribute ('partition'), so
+the API for access this data is trivial:
+
+    my $result = $vos->listpart
+      (
+       server			=> 'fs1.ms.com',
+      ) || die $vos->errors();
+
+    foreach my $partition ( $result->getPartitionNames() ) {
+	print "Server '$server' has partition '$partition'\n";
+    }
+
+The FileServer object has no attributes at all, it merely contains the
+Partition objects.  Since the Partition objects are indexed by name,
+there's no need to extract the partition objects and query their
+attributes, since once you have the names, you have all the information
+already.
+
+Compare this with 'vos partinfo', which provides a lot more
+information.  For pedantic completeness (the author is kinda
+anal-retentive in that way), here's the description of the complete
+interface.
+
+B<AFS::Object::FileServer>
+
+This object has no attributes, and is merely a container for the
+AFS::Object::Partition objects.  It has the following methods
+for extracting the objects is contains.
+
+    Methods			Returns
+    -------			-------
+    getPartitionNames()		list of strings (partition names)
+    getPartitions()		list of AFS::Object::Partition objects
+    getPartition($partname)	a single AFS::Object::Partition object,
+				for the partition named $partname
+
+B<AFS::Object::Partition>
+
+This object has one boring attribute:
+
+    Attributes			Values
+    ----------			------
+    partition			Fileserver /vice partition name
+
+When used to encapsulate 'vos listpart' output, this object has no
+relevant methods.  Note, however, that this version of the API reuses
+this object to represent other partition-related data (see 'vos
+listvol' method documentation, for example), but they are not relevant
+in this usage of the object.  This multiple personality of the objects
+may be changed in a future release, so don't get too attached to the
+specific class names.
+
+See the AFS::Object documentation for a discussion of the
+planned evolution of the API.
+
+=back
+
+=head2 listvldb
+
+=over
+
+=item Arguments
+
+The vos help string is:
+
+    vos listvldb: list volumes in the VLDB
+    Usage: vos listvldb [-name <volume name or ID>] [-server <machine name>]
+			[-partition <partition name>] [-locked] [-quiet] [-nosort]
+			[-cell <cell name>] [-noauth] [-localauth] [-verbose] [-encrypt] 
+    Where: -locked     locked volumes only
+	   -quiet      generate minimal information
+	   -nosort     do not alphabetically sort the volume names
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->listvldb
+      (
+       # Optional arguments
+       name			=> $name,
+       server			=> $server,
+       partition		=> $partition,
+       locked			=> 1,
+       quiet			=> 1,
+       nosort			=> 1,
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=item Return Values
+
+This method returns an AFS::Object::VLDB object, which has a
+few attributes, and contains one or more
+AFS::Object::VLDBEntry objects, which in turn contain
+AFS::Object::VLDBSite objects, as well as their own
+attributes.
+
+NOTE: the VLDBEntry and VLDBSite objects are the same as those used by
+the 'examine' method, since that command also queries the VLDB for
+part of its return values.  See that discussion above for some
+relevant details on the parsing of those objects, which will no be
+repeated here.
+
+    my $result = $vos->listvldb
+      (
+       cell				=> $cell,
+      ) || die $vos->errors();
+
+    print("VLDB contains " . $result->total() " volumes, " .
+	  $result->locked() . " of which are locked\n");
+
+    foreach my $entry ( $result->getVLDBEntries() ) {
+	my $name = $entry->name();
+	foreach my $attr ( $entry->listAttributes() ) {
+	    print "Volume $name has attribute $attr => " . $entry->$attr() . "\n";
+	}
+	foreach my $site ( $entry->getVLDBSites() ) {
+	    my %attrs = $site->getAttributes();
+	    while ( my($attr,$value) = each %attrs ) {
+		print "Site has attribute $attr => $value\n";
+	    }
+	}
+    }
+
+Another way to slice and dice this data:
+
+    foreach my $name ( $result->getVolumeNames() ) {
+	my $entry = $result->getVLDBEntry( name => $name );
+	....
+    }
+
+Each of these objects has the following attributes and methods:
+
+B<AFS::Object::VLDB>
+
+This object has two attributes, and several methods:
+
+    Attributes			Values
+    ----------			------
+    total			Number of VLDBEntries in the results
+    locked			Number of locked volumes in the results
+
+    Methods			Returns
+    -------			-------
+    getVolumeNames()		list of volume names in the results
+    getVolumeIds()		list of numeric volume IDs
+    getVLDBEntry(name => $name)	the AFS::Object::VLDBEntry for name $name
+    getVLDBEntry(id => $id)	the AFS::Object::VLDBEntry for id $id
+    getVLDBEntries()		list of AFS::Object::VLDBEntry objects
+    getVLDBEntryByName($name)   the AFS::Object::VLDBEntry for $name
+    getVLDBEntryById($id)   	the AFS::Object::VLDBEntry for $id
+
+NOTE: name to volume mappings are one to one, but id to volume
+mappings are many to one, since a single logical VLDB entry can have
+several IDs associated with it (RW, RO, BK, and/or RC).
+
+B<AFS::Object::VLDBEntry>
+
+This object also has a few attributes, and a few methods.  The 'name'
+attribute is always present, but the others vary, depending on the
+volume (again, see the 'examine' documentation for more verbosity).
+
+    Attributes			Values
+    ----------			------
+    name			Volume name
+    rwrite			Numeric Volume ID for the RW volume
+    ronly			Numeric Volume ID for the RO volume
+    backup			Numeric Volume ID for the BK volume
+    rclone			Numeric Volume ID for the RClone volume, if present
+    locked			Boolean, indicating whether or not the VLDB entry is locked
+
+    Methods			Returns
+    -------			-------
+    getVLDBSites()		list of AFS::Object::VLDBSite objects
+
+B<AFS::Object::VLDBSite>
+
+The following attributes are always available:
+
+    Attributes			Values
+    ----------			------
+    server			Fileserver hostname
+    partition			Fileserver /vice partition name
+    type			"RO" | "RW" | "BK"
+    status			Site status.
+
+This object has no special methods.
+
+=back
+
+=head2 listvol
+
+=over
+
+=item Arguments
+
+The vos help string is:
+
+    vos listvol: list volumes on server (bypass VLDB)
+    Usage: vos listvol -server <machine name> [-partition <partition name>]
+		       [-fast] [-long] [-quiet] [-extended] [-cell <cell name>]
+		       [-noauth] [-localauth] [-verbose] [-encrypt] 
+    Where: -fast       minimal listing
+	   -long       list all normal volume fields
+	   -quiet      generate minimal information
+	   -extended   list extended volume fields
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->listvol
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       partition		=> $partition,
+       fast			=> 1,
+       long			=> 1,
+       quiet			=> 1,
+       extended			=> 1, # Not really... see below
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+NOTE: 'extended' is not supported in this version of the API, and
+specifying it will result in a warning, but not an error.  However,
+'vos examine' does parse the extended output, so if you really want
+that data you can get it on a volume by volume basis.  Adding support
+for 'extended' to 'vos listvol' is on the todo list.
+
+=item Return Values
+
+This method returns an AFS::Object::VolServer object, which
+merely contains one or more AFS::Object::Partition objects,
+which in turn have a few attributes and contain one or more
+AFS::Object::VolumeHeader objects.
+
+    my $result = $vos->listvol
+      (
+       server			=> $server,,
+       cell				=> $cell,
+      ) || die $vos->errors();
+    foreach my $partition ( $result->getPartitions() ) {
+	my $partname 		= $partition->partition();
+	my $total			= $partition->total();
+	my $online			= $partition->online();
+	my $offline			= $partition->offline();
+	my $busy			= $partition->busy();
+	print("Partition $partname has $total total volumes, of which " .
+	      "$online are online, $offline are offline, and $busy are busy.\n");
+	foreach my $header ( $partition->getVolumeHeaders() ) {
+	    # Do something interesting with $header.
+	}
+    }
+
+There are several other ways to get at the headers, of course.
+
+	foreach my $name ( $partition->getVolumeNames() ) {
+	    my $header = $partition->getVolumeHeaderByName($name)
+	    # Do something interesting with $header.
+	}
+
+	foreach my $id ( $partition->getVolumeIds() ) {
+	    my $header = $partition->getVolumeHeaderById($id);
+	    # Do something interesting with $header.
+	}
+
+And there is yet one more method to extract the headers (don't say the
+author doesn't pander to lots of different programming styles,
+provided of course they are one of his own).
+
+
+	foreach my $name ( $partition->getVolumeNames() ) {
+	    my $header = $partition->getVolumeHeader( name => $name );
+	    # Do something interesting with $header.
+	}
+
+	foreach my $id ( $partition->getVolumeIds() ) {
+	    my $header = $partition->getVolumeHeader( id => $id );
+	    # Do something interesting with $header.
+	}
+
+Each of these objects has the following attributes and methods:
+
+B<AFS::Object::VolServer>
+
+This object has no attributes, and has several methods for extracting
+the partition objects.
+
+    Methods			Returns
+    -------			-------
+    getPartitionNames()		list of partition names
+    getPartitions()		list of AFS::Object::Partition objects
+    getPartition($name)		the AFS::Object::Partition for partition $name
+
+B<AFS::Object::Partition>
+
+This objects has several attributes, and several methods for
+extracting the VolumeHeader objects.
+
+    Attributes				Values
+    ----------				------
+    partition				Partition name
+    total				Total number of volumes on the partition
+    online				Total number of online volumes
+    offline				Total number of offline volumes
+    busy				Total number of busy volumes
+
+    Methods				Returns
+    -------				-------
+    getVolumeIds()			List of volume ids
+    getVolumeNames()			List of volume names
+    getVolumeHeaderById($id)		the AFS::Object::VolumeHeader object for $id
+    getVolumeHeaderByName($name)	the AFS::Object::VolumeHeader object for $name
+    getVolumeHeaders()			list of AFS::Object::VolumeHeader objects
+    getVolumeHeader( id => $id )	the AFS::Object::VolumeHeader object for $id
+    getVolumeHeader( name => $name )	the AFS::Object::VolumeHeader object for $name
+
+Note that both of the following are equivalent, but merely differ in style:
+
+    getVolumeHeaderById($id)
+    getVolumeHeader( id => $id )
+
+And it should be obvious, but these are also equivalent we well:
+
+    getVolumeHeaderByName($name)
+    getVolumeHeader( name => $name )
+
+B<AFS::Object::VolumeHeader>
+
+The following attributes should always be present.
+
+    Attributes			Values
+    ----------			------
+    id				Numeric Volume ID
+    status			online | offline | busy
+    attached			Boolean
+
+The 'attached' attribute is a Boolean that indicates whether or not
+the volume is attached by the volserver.  A volume which can not be
+brought online due to volume header problems will be offline, and
+unattached (attached == 0), but a volume can be offline for other
+reasons, (eg. vos offline, or more than one volume with the same ID on
+the same server), and still be attached (attached == 1).
+
+If the 'fast' argument was specified, then none of the other
+attributes will be present.
+
+The following attributes are present only if the volume's status is
+'online':
+
+    Attributes			Values
+    ----------			------
+    name			Volume Name
+    type			"RO" | "RW" | "BK"
+    size			Numeric size in KB
+
+The following attributes are present only if the 'long' argument was
+specified:
+
+    Attributes			Values
+    ----------			------
+    server			Fileserver hostname
+    partition			Fileserver /vice partition
+    maxquota			Volume quota in KB
+    creation			Volume creation date (ctime format, eg: Sat Oct  6 04:39:50 2001)
+    copyTime			Volume copy date   (also in ctime format)
+    backupTime			Volume backup date (also in ctime format)
+    access			Volume Last Access date (also in ctime format)
+    update			Volume update date (also in ctime format)
+    accesses			Number of volume accesses since the last reset
+    rwrite			Numeric Volume ID for the RW volume
+    ronly			Numeric Volume ID for the RO volume
+    backup			Numeric Volume ID for the BK volume
+    rclone			Numeric Volume ID for the RClone volume, if present
+
+=back
+
+=head2 partinfo
+
+=over
+
+=item Arguments
+
+The vos help string is:
+
+    vos partinfo: list partition information
+    Usage: vos partinfo -server <machine name> [-partition <partition name>]
+			[-cell <cell name>] [-noauth] [-localauth]
+			[-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->partinfo
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       partition		=> $partition,
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=item Return Values
+
+This method returns an AFS::Object::FileServer object, which
+contains one or more AFS::Object::Partition objects, which
+have more interesting attributes than those returned by 'vos
+partinfo'.
+
+    my $result = $vos->partinfo
+      (
+       server			=> $server,
+       cell			=> $cell,
+      ) || die $vos->errors();
+    foreach my $partition ( $result->getPartitions() ) {
+	my $partname		= $partition->partition();
+	my $available		= $partition->available();
+	my $total		= $partition->total();
+	print("Partition $partname has $available KB of " .
+              "space available out of $total KB total\n");
+    }
+
+B<AFS::Object::FileServer>
+
+This object has no attributes, and is merely a container for the
+AFS::Object::Partition objects.  It has the following methods
+for extracting the objects is contains.
+
+    Methods			Returns
+    -------			-------
+    getPartitionNames()		list of strings (partition names)
+    getPartitions()		list of AFS::Object::Partition objects
+    getPartition($partname)	a single AFS::Object::Partition object,
+				for the partition named $partname
+
+B<AFS::Object::Partition>
+
+This object has three attributes:
+
+    Attributes			Values
+    ----------			------
+    partition			Fileserver /vice partition name
+    available			Space available, in KB
+    total			Total space, in KB
+
+=back
+
+=head2 status
+
+=over
+
+=item Arguments
+
+The vos help string is:
+
+    vos status: report on volser status
+    Usage: vos status -server <machine name> [-cell <cell name>] [-noauth]
+		      [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->status
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=item Return Values
+
+This method returns an AFS::Object::VolServer object with one
+attribute, which also may or may not contain one or more
+AFS::Object::Transaction objects.
+
+    my $result = $vos->status
+      (
+       server			=> $server,
+      ) || die $vos->errors();
+    print "Server has " . $result->transactions() . "active transactions\n";
+
+    foreach my $transaction ( $result->getTransactions() ) {
+	print("There are active transactions for volume ID " .
+	      $transaction->volume() . "\n");
+    }
+
+B<AFS::Object::VolServer>
+
+This object has exactly one attribute, and several methods:
+
+    Attributes				Values
+    ----------				------
+    transactions			Number of active transactions on the volserver
+
+    Methods				Returns
+    -------				-------
+    getTransactions			list of AFS::Object::Transaction objects
+    getVolumes				list of volume IDs for which there are transactions
+    getTransactionByVolume($volume)	a single AFS::Object::Transaction object for the volume $volume
+
+B<AFS::Object::Transaction>
+
+This object has several attributes:
+
+    Attributes				Values
+    ----------				------
+    transaction				Numeric transaction ID
+    created				Creation date (in ctime format)
+    attachFlags				String (exact meaning unclear)
+    volume				Numeric volume ID
+    partition				Vice partition on whcih the volume resides
+    procedure				What is being done to the volume
+    packetRead				Numeric value
+    lastReceiveTime			Time value (utime format)
+    packetSend				Numeric value
+    lastSendTime			Time value (utime format)
+
+NOTE: These attributes just come from a straight parsing of output like this:
+
+    --------------------------------------
+    transaction: 170423  created: Wed Oct  8 15:59:12 2003
+    attachFlags:  offline
+    volume: 536963097  partition: /vicepf  procedure: Restore
+    packetRead: 222  lastReceiveTime: 1065643165  packetSend: 1  lastSendTime: 1065643165
+    --------------------------------------
+
+To understand the meaning of these various fields (which to the
+author's knowledge are not documented anywhere), see the OpenAFS
+source code.  Some of these values are obvious, or intuitive, but
+others are not.
+
+=back
+
+=head1 METHODS (with simple return values)
+
+All of the following commands return a simple Boolean (true/false)
+value, if they succeed or fail.
+
+=head2 addsite
+
+The vos help string is:
+
+    vos addsite: add a replication site
+    Usage: vos addsite -server <machine name for new site> -partition <partition name for new site>
+		       -id <volume name or ID> [-cell <cell name>]
+		       [-noauth] [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->addsite
+      (
+       # Required arguments
+       server			=> $server,
+       partition		=> $partition,
+       id			=> $id,
+       # Optional arguments
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 backup
+
+The vos help string is:
+
+    vos backup: make backup of a volume
+    Usage: vos backup -id <volume name or ID> [-cell <cell name>]
+		      [-noauth] [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->backup
+      (
+       # Required arguments
+       id			=> $id,
+       # Optional arguments
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 backupsys
+
+The vos help string is:
+
+    vos backupsys: en masse backups
+    Usage: vos backupsys [-prefix <common prefix on volume(s)>+] [-server <machine name>]
+			 [-partition <partition name>] [-exclude]
+			 [-xprefix <negative prefix on volume(s)>+] [-dryrun]
+			 [-cell <cell name>] [-noauth] [-localauth] [-verbose] [-encrypt]
+    Where: -exclude    exclude common prefix volumes
+	   -dryrun     no action
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->backupsys
+      (
+       # Optional arguments
+       prefix			=> $prefix, # OR [ $prefix1, $prefix2, ... ]
+       server			=> $server,
+       partition		=> $partition,
+       exclude			=> 1,
+       prefix			=> $xprefix, # OR [ $xprefix1, $xprefix2, ... ]
+       dryrun			=> 1,
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 changeaddr
+
+The vos help string is:
+
+    vos changeaddr: change the IP address of a file server
+    Usage: vos changeaddr -oldaddr <original IP address> [-newaddr <new IP address>]
+			  [-remove] [-cell <cell name>] [-noauth]
+			  [-localauth] [-verbose] [-encrypt]
+    Where: -remove     remove the IP address from the VLDB
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->changeaddr
+      (
+       # Required arguments
+       oldaddr			=> $oldaddr,
+       # Optional arguments
+       newaddr			=> $newaddr,
+       remove			=> 1,
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 changeloc
+
+The vos help string is:
+
+    vos changeloc: change an RW volume's location in the VLDB
+    Usage: vos changeloc -server <machine name for new location>
+			 -partition <partition name for new location>
+			 -id <volume name or ID> [-cell <cell name>] [-noauth]
+			 [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->changeloc
+      (
+       # Required arguments
+       server			=> $server,
+       partition		=> $partition,
+       id			=> $id,
+       # Optional arguments
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 clone
+
+The vos help string is:
+
+    vos clone: make clone of a volume
+    Usage: vos clone -id <volume name or ID> 
+      [-server <server>] [-partition <partition>] 
+      [-toname <volume name on destination>] [-toid <volume ID on destination>] 
+      [-offline] [-readonly] [-cell <cell name>] [-noauth] 
+      [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->clone
+      (
+       # Required arguments
+       id           => $id,
+       # Optional arguments
+       server       => $server,
+       partition    => $partition,
+       toname       => $newname,
+       toid         => $newid,
+       cell         => $cell,
+       noauth       => 1,
+       localauth    => 1,
+       verbose      => 1,
+       encrypt      => 1,
+      );
+
+=head2 convertROtoRW
+
+The vos help string is:
+
+    vos convertROtoRW: convert a RO volume into a RW volume (after loss of old RW volume)
+    Usage: vos convertROtoRW -server <machine name> -partition <partition name> 
+       -id <volume name or ID> [-force] [-cell <cell name>] [-noauth]
+       [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->convertROtoRW
+      (
+       # Required arguments
+       server     => $server,
+       partition  => $partition,
+       id             => $id,
+       # Optional arguments
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 copy
+
+The vos help string is:
+
+    vos copy: copy a volume
+    Usage: vos copy -id <volume name or ID on source> -fromserver <machine name on source> 
+       -frompartition <partition name on source> -toname <volume name on destination> 
+       -toserver <machine name on destination> -topartition <partition name on destination> 
+       [-offline] [-readonly] [-live] [-cell <cell name>] [-noauth] 
+       [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->copy
+      (
+       # Required arguments
+       id             => $id,
+       fromserver     => $server,
+       frompartition  => $partition,
+       toname         => $name
+       toserver       => $newserver,
+       topartition    => $newpartition,
+       # Optional arguments
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+
+=head2 create
+
+The vos help string is:
+
+    vos create: create a new volume
+    Usage: vos create -server <machine name> -partition <partition name>
+		      -name <volume name> [-maxquota <initial quota (KB)>]
+		      [-cell <cell name>] [-noauth] [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->create
+      (
+       # Required arguments
+       server			=> $server,
+       partition		=> $partition,
+       name			=> $name,
+       # Optional arguments
+       maxquota			=> $maxquota,
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 delentry
+
+The vos help string is:
+
+    vos delentry: delete VLDB entry for a volume
+    Usage: vos delentry [-id <volume name or ID>+]
+			[-prefix <prefix of the volume whose VLDB entry is to be deleted>]
+			[-server <machine name>] [-partition <partition name>]
+			[-cell <cell name>] [-noauth] [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->delentry
+      (
+       # Optional arguments
+       id			=> $id, # OR [ $id1, $id2, ... ]
+       prefix			=> $prefix,
+       server			=> $server,
+       partition		=> $partition,
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 lock
+
+The vos help string is:
+
+    vos lock: lock VLDB entry for a volume
+    Usage: vos lock -id <volume name or ID> [-cell <cell name>]
+		    [-noauth] [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->lock
+      (
+       # Required arguments
+       id			=> $id,
+       # Optional arguments
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 move
+
+The vos help string is:
+
+    vos move: move a volume
+    Usage: vos move -id <volume name or ID> -fromserver <machine name on source>
+		    -frompartition <partition name on source>
+		    -toserver <machine name on destination>
+		    -topartition <partition name on destination> [-cell <cell name>]
+		    [-noauth] [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->move
+      (
+       # Required arguments
+       id			=> $id,
+       fromserver		=> $fromserver,
+       frompartition		=> $frompartition,
+       toserver			=> $toserver,
+       topartition		=> $topartition,
+       # Optional arguments
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 offline
+
+The vos help string is:
+
+    Usage: vos offline -server <server name> -partition <partition name>
+ 		       -id <volume name or ID> [-sleep <seconds to sleep>]
+                       [-busy] [-cell <cell name>]
+ 		       [-noauth] [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->offline
+      (
+       # Required arguments
+       id			=> $id,
+       server			=> $server,
+       partition		=> $partition,
+       # Optional arguments
+       sleep			=> $sleep,
+       busy			=> 1,
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 online
+
+The vos help string is:
+
+    Usage: vos online -server <server name> -partition <partition name>
+		      -id <volume name or ID> [-cell <cell name>]
+		      [-noauth] [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->online
+      (
+       # Required arguments
+       id			=> $id,
+       server			=> $server,
+       partition		=> $partition,
+       # Optional arguments
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 release
+
+The vos help string is:
+
+    vos release: release a volume
+    Usage: vos release -id <volume name or ID> [-force] [-cell <cell name>]
+		       [-noauth] [-localauth] [-verbose] [-encrypt]
+    Where: -force      force a complete release
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->release
+      (
+       # Required arguments
+       id			=> $id,
+       # Optional arguments
+       force			=> 1,
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 remove
+
+The vos help string is:
+
+    vos remove: delete a volume
+    Usage: vos remove [-server <machine name>] [-partition <partition name>]
+		      -id <volume name or ID> [-cell <cell name>] [-noauth]
+		      [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->remove
+      (
+       # Required arguments
+       id			=> $id,
+       # Optional arguments
+       server			=> $server,
+       partition		=> $partition,
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 remsite
+
+The vos help string is:
+
+    vos remsite: remove a replication site
+    Usage: vos remsite -server <machine name> -partition <partition name>
+		       -id <volume name or ID> [-cell <cell name>] [-noauth]
+		       [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->remsite
+      (
+       # Required arguments
+       id			=> $id,
+       server			=> $server,
+       partition		=> $partition,
+       # Optional arguments
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 rename
+
+The vos help string is:
+
+    vos rename: rename a volume
+    Usage: vos rename -oldname <old volume name > -newname <new volume name >
+		      [-cell <cell name>] [-noauth] [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->rename
+      (
+       # Required arguments
+       oldname			=> $oldname,
+       newname			=> $newname,
+       # Optional arguments
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 setfields
+
+The vos help string is:
+
+    vos setfields: change volume info fields
+    Usage: vos setfields -id <volume name or ID> [-maxquota <quota (KB)>]
+			 [-clearuse] [-cell <cell name>] [-noauth]
+			 [-localauth] [-verbose] [-encrypt]
+    Where: -clearuse   clear dayUse
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->setfields
+      (
+       # Required arguments
+       id			=> $id,
+       # Optional arguments
+       maxquota			=> $maxquota,
+       clearuse			=> 1,
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 shadow
+
+The vos help string is:
+
+    vos shadow: make or update a shadow volume
+    Usage: vos shadow -id <volume name or ID on source> -fromserver <machine name on source> 
+       -frompartition <partition name on source> -toserver <machine name on destination> 
+       -topartition <partition name on destination> [-toname <volume name on destination>] 
+       [-toid <volume ID on destination>] [-offline] [-readonly] [-live] [-incremental] 
+       [-cell <cell name>] [-noauth] [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->shadow
+      (
+       # Required arguments
+       id             => $id,
+       fromserver     => $server,
+       frompartition  => $partition,
+       toserver       => $newserver,
+       topartition    => $newpartition,
+       # Optional arguments
+       toname                   => $newname
+       toid                     => $newid
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+
+=head2 syncserv
+
+The vos help string is:
+
+    vos syncserv: synchronize server with VLDB
+    Usage: vos syncserv -server <machine name> [-partition <partition name>]
+			[-cell <cell name>] [-noauth] [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->syncserv
+      (
+       # Required arguments
+       server			=> $server,
+       # Optional arguments
+       partition		=> $partition,
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 syncvldb
+
+The vos help string is:
+
+    vos syncvldb: synchronize VLDB with server
+    Usage: vos syncvldb [-server <machine name>] [-partition <partition name>]
+			[-volume <volume name or ID>] [-cell <cell name>]
+			[-noauth] [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->syncvldb
+      (
+       # Optional arguments
+       server			=> $server,
+       partition		=> $partition,
+       volume			=> $volume,
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 unlock
+
+The vos help string is:
+
+    vos unlock: release lock on VLDB entry for a volume
+    Usage: vos unlock -id <volume name or ID> [-cell <cell name>] [-noauth]
+		      [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->unlock
+      (
+       # Required arguments
+       id			=> $id,
+       # Optional arguments
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 unlockvldb
+
+The vos help string is:
+
+    vos unlockvldb: unlock all the locked entries in the VLDB
+    Usage: vos unlockvldb [-server <machine name>] [-partition <partition name>]
+			  [-cell <cell name>] [-noauth] [-localauth] [-verbose] [-encrypt]
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->unlockvldb
+      (
+       # Optional arguments
+       server			=> $server,
+       partition		=> $partition,
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head2 zap
+
+The vos help string is:
+
+    vos zap: delete the volume, don't bother with VLDB
+    Usage: vos zap -server <machine name> -partition <partition name> -id <volume ID>
+		   [-force] [-backup] [-cell <cell name>] [-noauth]
+		   [-localauth] [-verbose] [-encrypt]
+    Where: -force      force deletion of bad volumes
+	   -backup     also delete backup volume if one is found
+
+The corresponding method invocation looks like:
+
+    my $result = $vos->zap
+      (
+       # Required arguments
+       server			=> $server,
+       partition		=> $partition,
+       id			=> $id,
+       # Optional arguments
+       force			=> 1,
+       backup			=> 1,
+       cell                     => $cell,
+       noauth                   => 1,
+       localauth                => 1,
+       verbose                  => 1,
+       encrypt                  => 1,
+      );
+
+=head1 SEE ALSO
+
+AFS::Command(1), AFS::Object(1)
+
+=cut
+

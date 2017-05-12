@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>U2F Demo</title>
+</head>
+<body>
+[% IF username %]
+  <p>G'day [% username %]</p>
+  [% IF registered_keys.keys %]
+  <p>registered key handles:</p>
+  <ul>
+    [% FOR handle IN registered_keys.keys %]
+    <li>[% handle %]</li>
+    [% END %]
+  </ul>
+  [% END %]
+  <a href='/register'>Register U2F device</a>
+  <a href='/logout'>Logout</a>
+[% ELSE %]
+  <a href='/signup'>Signup</a>
+  <a href='/login'>Login</a>
+[% END %]
+</body>
+</html>

@@ -1,0 +1,116 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-review
+# ABSTRACT: Review a submitted changeset
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    get_user_name
+    get_user_email
+    git
+    git_fetch_and_clean_up
+    history
+    history_status
+    meta_data_add
+    project_name
+    unmerged_changesets
+    history_status
+    history_reviewer
+);
+use App::Gitc::Reversible;
+
+# make sure we can really review this changeset
+our $changeset = shift or die "You must specify a changeset\n";
+my $project_name = project_name();
+if ($changeset eq 'next') {
+    my $unmerged = unmerged_changesets($project_name);
+    my @to_review = grep {
+        my $history = $unmerged->{$_};
+        my $status = history_status($history);
+        $status eq 'submitted' and history_reviewer($history) eq get_user_name();
+    } keys %$unmerged;
+    die "No changesets submitted for review.\n" unless @to_review;
+    @to_review = sort {
+        $unmerged->{$a}[-1]{stamp} cmp $unmerged->{$b}[-1]{stamp}
+    } @to_review;
+    $changeset = $to_review[0];
+}
+
+my $history = history($project_name, $changeset);
+die "No such changeset $changeset\n" if not @$history;
+is_it_ok_to_review($history);
+
+git_fetch_and_clean_up();
+reversibly {
+    failure_warning "\nCanceling gitc review\n";
+
+    # make a note about reviewing the changeset
+    my $id = meta_data_add({
+        action    => 'review',
+        changeset => $changeset,
+    });
+    to_undo { meta_data_rm(id => $id, changeset => $changeset) };
+
+    # create a new local branch
+    git "checkout --no-track -b $changeset origin/pu/$changeset";
+};
+
+#################### helper subs ####################
+
+sub is_it_ok_to_review {
+    my ($history) = @_;
+    our $changeset;
+
+    # is the changeset currently submitted for code review?
+    my $status = history_status($history);
+    return if $status eq 'submitted' or $status eq 'reviewing';
+
+    # ... nope, so warn the user
+    die   "The changeset $changeset has status '$status' and can only be\n"
+        . "reviewed if the status is 'submitted' or 'reviewing'.\n"
+        ;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-review - Review a submitted changeset
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

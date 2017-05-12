@@ -1,0 +1,34 @@
+---
+abstract: 'Require branch names to match a given pattern before they can be pushed to the origin.'
+author:
+  - 'Guillaume Aubert <aubertg@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Test::Exception: '0'
+  Test::FailWarnings: '0'
+  Test::Git: '0'
+  Test::More: '0.94'
+  Test::Requires::Git: '1.005'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-GitHooks-Plugin-ForceBranchNamePattern
+provides:
+  App::GitHooks::Plugin::ForceBranchNamePattern:
+    file: lib/App/GitHooks/Plugin/ForceBranchNamePattern.pm
+    version: v1.1.3
+requires:
+  App::GitHooks: '0'
+  Log::Any: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/guillaumeaubert/App-GitHooks-Plugin-ForceBranchNamePattern/issues
+  homepage: https://metacpan.org/release/App-GitHooks-Plugin-ForceBranchNamePattern
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/guillaumeaubert/App-GitHooks-Plugin-ForceBranchNamePattern
+version: v1.1.3

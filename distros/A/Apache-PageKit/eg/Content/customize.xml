@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<content>
+<pkit_nav_title>Customize</pkit_nav_title>
+<html_title>PageKit.org | Customize</html_title>
+
+      <demo_desc>
+	<feature>Session Management</feature>
+	<description>Four colors, link_color, text_color, bgcolor, and mod_color
+	  are set and stored in $pk-&gt;{session}.  MyPageKit.pm retrives the values from the session
+	  and sets the corresponding view parameters.</description>
+      </demo_desc>
+    
+</content>

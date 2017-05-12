@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name: Apache2::WebApp::Plugin::Validate
+abstract: Common methods used for validating user input
+version: 0.08
+author:
+  - Marc S. Brooks <mbrooks@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  Apache2::WebApp: 0.38
+  Date::Calc: 5.4
+  Data::Validate::URI: 0.05
+  Email::Valid: 0.181
+  HTTP::BrowserDetect: 0.98
+  MIME::Types: 1.20
+  Net::DNS::Check: 0.45
+  Params::Validate: 0
+build_requires:
+  Apache::Test: 0
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html

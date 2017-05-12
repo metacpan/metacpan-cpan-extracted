@@ -1,0 +1,17 @@
+Upgrade from 0.08 or earlier instructions:
+
+Some changes in API have been made since 0.08. If you have an older version
+than 0.10, you _have_ to upgrade you code before installing this version.
+
+Major changes are in ""directive()"" and ""section()"" methods. They no longer
+return an array ref where called in scalar context, but the latest item of
+the list.
+
+You are encouraged to modify your code, but, I know this can take a lot of
+time so you can activate the compatibility mode by call the contructor method 
+""new()"" with the argument ""-oldapi"" like this :
+
+    my $obj = new Apache::Admin::Config ('/path/to/file', -oldapi=>1);
+
+Others changes in the new API shouldn't disturb your programs, so if you
+find any problem, please contact me at <rs@rhapsodyk.net>.

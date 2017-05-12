@@ -1,0 +1,349 @@
+#!/usr/bin/perl -w
+#----------------------------------------------------------------------------
+#   App::Modular::Module::Events - perl program modularization framewok
+#                                 event handler class
+#
+#   Copyright (c) 2003-2004 Baltasar Cevc
+#
+#   This code is released under the L<perlartistic> Perl Artistic
+#   License, which can should be accessible via the C<perldoc
+#   perlartistic> command and the file COPYING provided with this
+#
+#   DISCLAIMER: THIS SOFTWARE AND DOCUMENTATION IS PROVIDED "AS IS," AND
+#   COPYRIGHT HOLDERS MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+#   IMPLIED, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY
+#   OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE
+#   OR DOCUMENTATION WILL NOT INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS,
+#   TRADEMARKS OR OTHER RIGHTS.
+#   IF YOU USE THIS SOFTWARE, YOU DO SO AT YOUR OWN RISK.
+#
+#   See this internet site for more details: http://technik.juz-kirchheim.de/
+#
+#   Creation:       30.07.04    bc
+#   Last Update:    17.02.05    bc
+#   Version:         0. 1. 1  
+# ----------------------------------------------------------------------------
+
+###################
+###             ###
+###    INIT     ###
+###             ###
+################### 
+package App::Modular::Module::Events;
+use base qw(App::Modular::Module);
+
+###################
+###    Pragma   ###
+###################
+use strict;
+use warnings;
+
+###################
+### Dependencies###
+###################
+use 5.006_001;
+
+###################
+###  Version    ###
+###################
+our ($VERSION);
+$VERSION = 0.001_001;
+
+###################
+### Constructor ###
+###################
+sub module_init {
+   my ($type) = @_;
+
+   my $self = $type->SUPER::module_init($type);
+
+   $self->{'events'} = {};
+
+   return $self;
+};
+
+###################
+###Register Event##
+###################
+# register a module as event listener/"handler"
+sub register {
+   my ($self, $module, $event) = @_;
+   my (@listeners) = ();
+   if (ref $module) {
+      $module = ref $module;
+      $module =~ s/^App::Modular::Module:://;
+   }
+
+   $self->modularizer()->mlog (95, 
+       "adding event $event listener for module $module");
+   ${$self->{'events'}}{$event} =
+      \@listeners unless (${$self->{'events'}}{$event});
+   # we'll only save module names as listeners for easier handling
+   push @{${$self->{'events'}}{$event}}, $module;
+
+   # return an array of all listening modules for this event
+   return @{${$self->{'events'}}{$event}};
+};
+
+sub deregister {
+   my ($self, $module, $event) = @_;
+   my $offset;
+
+   $self->modularizer->mlog (99, "deregistering event $event listener for module $module"); 
+   for ($offset = 0; $offset <= $#{${$self->{'events'}}{$event}}; $offset ++) {
+      splice @{${$self->{'events'}}{$event}}, $offset, 1
+         if (${${$self->{'events'}}{$event}}[$offset] eq $module);
+   };
+};
+
+# trigger an event (call the handlers of all registered listeners)
+sub trigger {
+   my ($self, $event, @parameters) = @_;
+   my (@listeners, %listeners);
+   my $module;
+
+   # return unless the event is known
+   unless ($event) {
+      $self->modualrizer->mlog(2, "Event handler: trigger: need ".
+         "event as argument");
+         return undef;
+   }
+   unless (${$self->{'events'}}{$event}) {
+      $self->modularizer->mlog(2, "Event handler: '$event' unknown");
+      return undef;
+   }
+
+   # we know this event: juppie, let's start
+   $self -> modularizer -> mlog (95,
+      "Sending event '$event' signal to modules:");
+
+   # get all listening modules
+   foreach $module ($self->listeners($event)) {
+      if ($self->modularizer()->module($module)) {
+         # found module, everything ok
+         $self->modularizer->mlog (99, " -> $module");
+         $self->modularizer->module($module)->
+            event_handler($event, @parameters);
+      } else {
+         # modularizer does not know that module -> remove its listeners
+         $self->modularizer()->
+            mlog (95, "module $module not ok, removing its events");
+         $self->deregister_bymodule($module);
+      }; # end if "module ok"
+   }; # end foreach module
+   return 1;
+};
+
+# return all modules listening on a specified event
+sub listeners {
+   my ($self,$event) = @_;
+   my ($module, @listeners);
+
+   return undef unless ($event && ${$self->{'events'}}{$event});
+
+   $self->modularizer()->mlog(99, "Module::Events::listeners for $event");
+   foreach $module (@{${$self->{'events'}}{$event}}) {
+      $self->modularizer()->mlog(99,
+          " -> $module");
+      push @listeners, $module;
+   };
+
+   return @listeners;
+};
+
+# deregister all listeners for a given module
+sub deregister_bymodule {
+   my ($self, $module) = @_;
+   my ($event);
+
+   $self->mlog (60, "deregistering all events for module '$module'");
+
+   foreach $event (keys %{$self->{'events'}}) {
+      $self->event_deregister ($module, $event);
+   }
+};
+
+# deregister all listeners for a given event
+sub deregister_byevent {
+   my ($self, $event) = @_;
+
+   $self->mlog (60, "deregistering all listeners for event '$event'");
+
+   delete $self->{'events'}->{$event};
+};
+
+1;
+
+
+###################
+###             ###
+###DOCUMENTATION###
+###             ###
+###################
+=pod
+
+=head1 NAME
+
+B<App::Modular::Module::Events> - event handling for App::Modular compatible
+applications
+
+=head1 SYNOPSIS
+
+	####################################################################
+	package App::Modular::Module::Me;
+
+	use base qw(App::Modular::Module);
+
+	sub depends { return 'Events'; }
+
+	sub start_listen {
+	   my $self = shift;
+
+	   $self->{'modularizer'}->module('Events')->
+	      register('Listener', 'TelephoneRings');
+	};
+
+	sub event_handler {
+	   my $self = shift;
+	   my $event = shift;
+	   print 'Yeah! Somebody thought about me!'
+	      if ($event eq 'TelephoneRings');
+	};
+
+	####################################################################
+	package App::Modular::Module::You;
+
+	use base qw(App::Modular::Module);
+
+	sub depends { return 'Events'; }
+
+	sub call_me { 
+	   $self->{'modularizer'}->module('Events')->
+	      trigger('TelephoneRings');
+	};
+
+	####################################################################
+	package main;
+
+	use App::Modular;
+
+	my $modul = instance App::Modular;
+
+	$modul->module('Me')->start_listen();
+	$modul->module('You')->callme();
+
+	exit;
+
+=head1 DESCRIPTION
+
+App::Modular aims to provide a framework which should it make very
+easy to programmes to create any kind of modular program.
+
+This module provides basic event handling as a contribution to that toolkit.
+Modules may register themselves as listeners for events, if an event is
+triggered, all the modules are notified by calling 
+C<$module-\>event_handler('event', @params)>.
+
+The events are speciefied as simple strings.
+
+=head1 REFERENCE
+
+In this man page, you will only find the method descriptions fror hte App::Modular 
+object; the standard functions of the application modules can be found in 
+L<App::Modular::Module>.
+
+=head2 Methods
+
+=over 4
+
+=item listeners (string event_name)
+
+Return an array of all modules that listen for an given event.
+
+Return value: (array of strings) module_name(s)
+
+=item module_init (void)
+
+Init the module -> nothing you have to worry about, App::Modular will take
+care of everything needed.
+
+Return value: (blessed hash reference) object 
+
+=item deregister (string module_name, string event_name)
+
+Stop listening to an event (deregister a module as listener).
+
+Return value: (none)
+
+=item deregister_byevent (string event_name)
+
+Deregister all listeners for an event, effectively removing that event.
+
+Return value: (void)
+
+=item deregister_bymodule (string module_name)
+
+Make a module stop listening to all events. Useful before unloading modules.
+
+Return value: (none)
+
+=item register (string module_name, string event_name)
+
+Register a listener for a given event. (A module calls this function in
+order to start listening to an event).
+
+Return value: (array) module_name(s) of all listeners
+
+=item trigger (string event_name, [argument1, [argument2, [...]]])
+
+Trigger an event (call the funtion event_handler of all modules registered
+as listeners).
+E.g. if Listerner1 and Listener2 are registered for MyEvent, calling C<
+trigger('MyEvent', 'Hello, World!')> will result in 
+C<Listener1-\>event_handler('MyEvent', 'Hello, World!')> and
+C<Listener2-\>event_handler('MyEvent', 'Hello, World!')>.
+
+Return value: (bool) undef on error, 1 on success
+
+=item Methods inherited from L<App::Modular::Module>
+
+Additionaly, L<App::Modular::Module::Events> inherits all methods from
+L<App::Modular::Module>. Because of that it provides the standard 
+interfac of App::Modular modules.
+
+=back
+
+=head2 Internal data
+
+The internal data space has been kept as simple as possible. The events
+are stored in an hash, $self->{'events'}, with the hash keys being the
+event names.
+Standard variables, as defined by L<App::Modular::Modular> are also available.
+
+=head1 BUGS
+
+None known at the moment. However, the module could certainly be more 
+flexible than it is.
+If you find any bugs, please notify me: baltasar -A-T- cevc-topp -D-O-T de.
+
+=head1 AUTOR
+
+(c) 2003-2005 Baltasar Cevc (baltasar A.T. cevc-topp .D.O.T. de)
+
+Permission to use this software is granted under the terms of the
+L<perlartistic> Perl Artistic License, which can should be accessible 
+via the C<perldoc perlartistic> command and the file COPYING provided 
+with this package.
+
+B<DISCLAIMER>: THIS SOFTWARE AND DOCUMENTATION IS PROVIDED "AS IS," AND
+COPYRIGHT HOLDERS MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE
+OR DOCUMENTATION WILL NOT INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS,
+TRADEMARKS OR OTHER RIGHTS.
+IF YOU USE THIS SOFTWARE, YOU DO SO AT YOUR OWN RISK.
+
+=head1 SEE ALSO
+
+L<App::Modular::Module(3pm)>, L<App::Modular::Module::Events(3pm)>
+
+=cut

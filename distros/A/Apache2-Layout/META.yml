@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Apache2-Layout
+version:             0.6
+abstract:            mod_perl 2.0 html layout engine
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    mod_perl2:                     0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Philippe M. Chiasson <gozer@ectoplasm.org>
+resources:
+    license: http://dev.perl.org/licenses/
+    Repository: http://svn.ectoplasm.org/projects/perl/Apache2-Layout/trunk/

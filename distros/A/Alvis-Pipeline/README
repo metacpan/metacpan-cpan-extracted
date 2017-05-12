@@ -1,0 +1,36 @@
+$Id: README,v 1.8 2005/09/19 12:07:52 mike Exp $
+
+The Alvis::Pipeline module
+==========================
+
+This Perl module implements the Alvis pipeline.  Not the _stages_ of
+the pipeline -- harvesting, semantic analysis, etc. -- those things
+are done elsewhere by other partners.  This is the glue that makes up
+the actual pipeline itself.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+You need the following modules installed:
+
+IO::File
+
+
+COPYRIGHT
+
+The Alvis::Pipeline module is copyright (C) 2005 by Index Data ApS.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+For more information, see the embedded documentation in
+Alvis::Pipeline.pm (e.g. use "man Alvis::Pipeline" after installing.)
+

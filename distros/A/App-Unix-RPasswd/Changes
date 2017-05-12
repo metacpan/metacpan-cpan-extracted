@@ -1,0 +1,33 @@
+Revision history for App-Unix-RPasswd
+
+0.3    	20110316
+		- First CPAN release on an unsuspecting world.
+0.31   	20110318
+		- POD fixes.
+		- Migration to Module::Install for easier building.
+0.32	20110320
+		- Removal of namespace::autoclean dependency for easier building.
+		- Removal of DateTime dependency for easier building.
+		- Migration to Mouse for easier building and size.
+0.33	20110321
+		- Fix cornercase base == 0.
+		- Fix cornercase servername eq ''.
+0.34	20110322
+		- Fix esthetics end repport.
+		- Moose->Mouse refactoring (no fast cli response workarounds needed).
+		- New tests
+0.35	20110401
+		- Fix parameter sessions bug.
+0.40	20120112
+		- Comply to Solaris 11 minalpha default
+0.41	20121022
+		- Bump Module::Install
+0.5	20130111
+		- Migration to Moo
+		- Pretty print
+0.51	20130111
+		- Typo
+0.52	20130530
+		- Pass Perl 5.18.0 tests
+0.53	20140523
+		- Removal of Solaris specific "passwd -r files" syntax

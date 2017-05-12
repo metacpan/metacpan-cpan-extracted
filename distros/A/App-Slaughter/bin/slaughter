@@ -1,0 +1,1330 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+slaughter - Perl Automation Tool
+
+=cut
+
+=head1 SYNOPSIS
+
+  General Options:
+
+   --delay         Delay for up to N seconds prior to launching.   Useful if you have a lot of clients.
+   --mail          Email the output of any LogMessages to the given address.
+   --role          Specify a role for this host, useful for policy writers.
+   --transports    Dump the names of all available transports.
+   --include       Include the specified file in our wrapper content.
+
+  File/Policy Fetching:
+
+   --prefix         The prefix for the transport we're using.
+   --transport      The transport to use for policy/file-fetching
+   --username       The username for the policy-fetch, if appropriate (http-only).
+   --password       The password for the policy-fetch, if appropriate (http-only).
+   --transport-args Any arguments to pass to the transport (used for rsync/hg/git/svn).
+
+  Developing and debugging policies. Note that none of these settings should be
+        used on the target hosts.
+
+   --dump          Dump details of the local environment, and immediately exit.
+   --no-delete     Don't delete the compiled perl post-execution.
+   --no-execute    Don't actually execute the downloaded policy.
+   --skip-cfgfile  Don't read the config file.
+   --allow-nonroot Allow non-root users (also sets --no-execute).
+   --outfile       Write the generated script to this file (also sets --no-delete).
+   --lockfile      Specify the lockfile to use (useful with --allow-nonroot).
+   --fqdn          Spoof the fqdn.
+   --hostname      Spoof the hostname.
+
+  Help Options:
+
+   --help        Show the help information for this script.
+   --manual      Read the manual for this script.
+   --verbose     Show useful debugging information.
+   --version     Show the version number of the slaughter client.
+
+=cut
+
+
+=head1 ABOUT
+
+slaughter is a simple system administration and server automation tool,
+which is designed to download policy files from a central server and
+execute them locally.
+
+The policy files which are downloaded are perl scripts which are executed
+with the help of a simple wrapper module - this module provides several new
+language functions (or primitives) which can be useful to manage systems.
+
+=cut
+
+
+=head1 TRANSPORTS
+
+When this tool is invoked it will attempt to fetch a file called
+"policies/default.policy".  This policy may include others, which
+are fetched in turn and inserted.
+
+The policies, and any associated files, may be fetched via one of
+several mechanisms:
+
+=over 8
+
+=item git
+
+=item http
+
+=item local
+
+=item mercurial
+
+=item rsync
+
+=item subversion
+
+=back
+
+The simplest mechanism is HTTP, which can be configured by specifying the
+prefix-URL of the server from which to download the files, and the transport of
+'http'.
+
+Given the configuration:
+
+=for example begin
+
+   --transport=http --prefix=http://server.example.org/slaughter/
+
+=for example end
+
+The client will download the file:
+
+=for example begin
+
+   http://server.example.org/slaughter/policies/default.policy
+
+=for example end
+
+The path "/policies/" is automatically appended to the first fetch,
+and to all subsequent policies.  Similarly all files will be assumed
+to be beneath the common URL-prefix of:
+
+=for example begin
+
+   http://server.example.org/slaughter/files/
+
+=for example end
+
+There are examples of other transports, including server-setup, in the
+included file TRANSPORTS.
+
+=cut
+
+
+=head1 PRIMITIVES
+
+There are several primitives and variables available to your code which are
+made available by the various Slaughter modules.
+
+These primitives and variables are described online:
+
+=for example begin
+
+  http://www.steve.org.uk/Software/slaughter/primitives/
+
+  http://www.steve.org.uk/Software/slaughter/variables/
+
+=for example end
+
+=cut
+
+
+=head1 DEBUGGING
+
+The simplest way to debug a potential problem is to execute slaughter
+with both the C<--no-delete> and C<--verbose> options.  This will ensure that
+once the policy/policies are downloaded and compiled they will be kept.
+
+The result should be that you'll be shown the name of a file - this file
+may be executed interactively to see what is going on.
+
+You may also invoke slaughter with the C<--dump> flag which will cause
+it to display the environmental details it has discovered, and which will
+be compiled into the policy prior to execution.
+
+The C<--allow-nonroot> flag permits unprivileged users to run
+C<slaughter> and generate the update script. It doesn't allow them to run the
+generated script. This flag also sets the C<--no-execute> flag.
+
+You can use C<--role>, C<--hostname> and C<--fqdn> options to spoof particular
+environments and check the generated update script before deploying.
+
+You can set C<--outfile> to capture the generated script, instead of sending it
+to a randomly named tmpfile. This will also set the C<--no-delete> flag for you.
+
+For example:
+
+    slaughter --verbose --skip-cfgfile --allow-nonroot --lockfile=/tmp/slaug.lck \
+        --transport=local --prefix=/path/to/my/slaughter-policies \
+        --role=mailserver --hostname=smtp --fqdn=smtp.example.com \
+        --outfile=GENERATED.pl
+
+
+=cut
+
+
+=head1 CONFIGURATION
+
+The configuration of this tool may be carried out via the command line,
+however some options may be more naturally supplied in the system-wide
+configuration file.
+
+For Unix platforms the global configuration file is located at
+C</etc/slaughter/slaughter.conf>, and it may be found at C<C:/slaughter.conf>
+for Microsoft Windows systems.
+
+A fully-featured file might look something like this:
+
+=for example begin
+
+  #
+  #  Comments start with "#"
+  #
+
+  #
+  #  Be quiet
+  ##
+  verbose = 0
+
+  #
+  #  Sleep for up to 60 seconds prior to working.
+  #
+  #  This is useful if you have many clients all hitting the same
+  # central server at the same time (due to NTP and hourly cron
+  # scheduling for example).
+  #
+  delay = 60
+
+  #
+  # Fetch the default policy from http://example.com/slaughter/policies/default.policy
+  #
+  # NOTE: "policies/default.policy" is automatically appended.
+  ##
+  transport = http
+  prefix    = http://example.com/slaughter/
+
+=for example end
+
+
+=head1 AUTHOR
+
+ Steve
+ --
+ http://www.steve.org.uk/
+
+=cut
+
+
+=head1 LICENSE
+
+Copyright (c) 2010-2015 by Steve Kemp.  All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.
+The LICENSE file contains the full text of the license.
+
+=cut
+
+
+use strict;
+use warnings;
+
+use English;
+use Fcntl qw(:flock);
+use File::Basename qw! basename !;
+use File::Path qw! mkpath !;
+use File::Spec;
+use File::Temp qw! tempfile tempdir !;
+use Getopt::Long;
+use POSIX;
+use Pod::Usage;
+
+
+
+#
+# The version of our release.
+#
+my $VERSION = '__UNRELEASED__';
+
+
+#
+#  Setup default options - include meta-data about the current host.
+#
+our %CONFIG = defaultOptions();
+
+
+#
+#  Parse configuration file.
+#
+parseConfigurationFile();
+
+
+#
+#  Parse command line, this takes precedence over the configuration file.
+#
+parseCommandLine();
+
+#
+#  If we're dumping, do that.
+#
+if ( $CONFIG{ 'dump' } )
+{
+    foreach my $var ( sort keys %CONFIG )
+    {
+        my $val = $CONFIG{ $var };
+        $val = "undefined" if ( !defined($val) );
+
+        print sprintf( "%-20s => %s", $var, $val ) . "\n";
+    }
+    exit;
+}
+
+
+#
+#  At this point we should lock ourselves - we've parsed the command-line
+# and we might have an updated lockfile - because this is the start of
+# "real" work.
+#
+createLock();
+
+
+#
+#  Create a temporary directory, some transports need such a thing.
+#
+createTransportDir();
+
+
+#
+#  Ensure we're root, and ensure that we have the options setup that we need.
+#
+testEnvironment();
+
+#
+# Splay-time, if set.  The default is -1 == no delay.
+#
+if ( $CONFIG{ 'delay' } > 0 )
+{
+    my $rand = int( rand( $CONFIG{ 'delay' } ) );
+    $CONFIG{ 'verbose' } &&
+      print "Sleeping for $rand seconds - from max delay of $CONFIG{'delay'}\n";
+    sleep($rand);
+}
+
+
+#
+#  Attempt to load the policy from the remote source.
+#
+#
+my ( $policy, $modules ) = loadPolicy();
+if ( !$policy )
+{
+    print "Failed to fetch policy from server.\n";
+    exit 0;
+}
+
+
+
+#
+#  Write it out to disk, with the appropriate wrapper, such that it
+#  becomes executable as valid perl.
+#
+my $file = writeoutPolicy( $policy, $modules );
+$CONFIG{ 'verbose' } && print "Policy written to: $file\n";
+
+
+#
+#  Run the script locally, unless we're told not to.
+#
+if ( $CONFIG{ 'noexecute' } )
+{
+    $CONFIG{ 'verbose' } &&
+      print "Not launching script due to --no-execute.\n";
+}
+else
+{
+    $CONFIG{ 'verbose' } &&
+      print "Script starting : " . scalar localtime() . "\n";
+
+    #
+    #  Execute the compiled code explicitly via the Perl interpreter
+    # this is redundant for operating systems that honour the shebang
+    # line, but useful for Microsoft Windows.
+    #
+    my $return = system( "perl " . $file );
+
+    #
+    #  Show the result?
+    #
+    $CONFIG{ 'verbose' } &&
+      print "Script completed: (return = $return) " . scalar localtime() . "\n";
+
+}
+
+
+
+#
+#  Cleanup.
+#
+unlink($file) unless ( $CONFIG{ 'nodelete' } );
+
+
+#
+#  We're all done
+#
+exit 0;
+
+
+
+
+=begin doc
+
+Configure the default options, and return these as a hash.
+
+These default options are augmented by one of the modules in the
+Slaughter::Info namespace.
+
+=end doc
+
+=cut
+
+sub defaultOptions
+{
+    my %defs = ( version       => 0,
+                 verbose       => 0,
+                 transportargs => '',
+                 nodelete      => 0,
+                 noexecute     => 0,
+                 allownonroot  => 0,
+                 skipcfgfile   => 0,
+                 delay         => -1,
+               );
+
+
+    #
+    #  The lockfile will be located in a predictable location.
+    #
+    foreach my $tmpdir (qw! /var/tmp /tmp C:/Temp C:/ !)
+    {
+        if ( ( -d $tmpdir ) &&
+             ( !$defs{ 'lockfile' } ) )
+        {
+            $defs{ 'lockfile' } = "$tmpdir/slaug.lck";
+        }
+    }
+
+    #
+    # The platform/OS.
+    #
+    $defs{ 'os' } = $^O;
+
+    #
+    # Setup the day of the week we're currently on.
+    #
+    foreach
+      my $day (qw! monday tuesday wednesday thursday friday saturday sunday !)
+    {
+        $defs{ $day } = 0;
+    }
+    my $dow = strftime "%A", localtime;
+    $defs{ lc $dow } = 1;
+
+
+    #
+    #  Setup the hours
+    #
+    my $h = 0;
+    while ( $h <= 24 )
+    {
+        my $hr = sprintf "Hr%02d", $h;
+        $defs{ $hr } = 0;
+        $h += 1;
+    }
+    my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
+      localtime(time);
+    $defs{ sprintf "Hr%02d", $hour } = 1;
+
+
+    #
+    #  Attempt to load the environment-specific module, and return the
+    # information from it.
+    #
+    my $data = loadInfo("Slaughter::Info::$^O");
+
+    #
+    #  If that worked we'll augment our data further with any locally
+    # supplied data.
+    #
+    if ($data)
+    {
+
+        #
+        #  This will probably fail, but allows overrides/changes.
+        #
+        my $local = loadInfo("Slaughter::Info::Local::$^O");
+
+        #
+        #  Convert both sets of data from hash-references to hashes.
+        #
+        my %data;
+        %data = %$data if ($data);
+
+        my %local;
+        %local = %$local if ($local);
+
+        #
+        #  Return the sum-total of all three references:
+        #
+        #  1.  The stub data we setup above.
+        #
+        #  2.  The OS-dependant data, found by ourselves.
+        #
+        #  3.  The OS-dependant data, found by the local module.
+        #
+        return ( %defs, %data, %local );
+    }
+
+    #
+    #  If we're here we're using the generic module
+    #
+    $data = loadInfo("Slaughter::Info::generic");
+    if ($data)
+    {
+        my %data = %$data;
+
+        return ( %defs, %data );
+    }
+    else
+    {
+
+        #
+        #  This means the generic module failed to load/return data.
+        #
+        print "Failed to use a module from the Slaughter::Info:: namespace\n";
+        exit(1);
+    }
+}
+
+
+
+=begin doc
+
+Load a given module from beneath the Slaughter::Info:: namespace, and return
+the result of calling "getInformation" on it.
+
+This is abstracted into a routine so that we can be conditional.
+
+Return value is undef on failure, or the populated hash-reference of system
+information on success.
+
+=end doc
+
+=cut
+
+sub loadInfo
+{
+    my ($module) = (@_);
+
+    my $data;
+
+    ## no critic (Eval)
+    eval("use $module");
+    ## use critic
+
+    if ($@)
+    {
+        warn "Error loading info module $module: $@";
+    }
+    else
+    {
+
+        #
+        #  Fetch the system-information from the module.
+        #
+        my $obj = $module->new();
+        $data = $obj->getInformation();
+    }
+
+    return ($data);
+}
+
+
+=begin doc
+
+Parse the configuration file, which is one of:
+
+=over 8
+
+=item /etc/slaughter/slaughter.conf
+
+=item C:/slaughter.conf
+
+=back
+
+The configuration file comprises of "key = value" lines, and lines which are
+ignored as they start with a comment character.  "#".
+
+=end doc
+
+=cut
+
+sub parseConfigurationFile
+{
+    my $config = undef;
+
+    return if $CONFIG{ 'skipcfgfile' };
+
+    #
+    #  Try each of the configuration files in turn.
+    #
+    foreach my $conf (qw! /etc/slaughter/slaughter.conf C:/slaughter.conf !)
+    {
+        $config = $conf if ( -e $conf );
+    }
+
+    #
+    #  Failed to find a configuration file.
+    #
+    return if ( !defined($config) );
+
+    #
+    #  Show what we used.
+    #
+    $CONFIG{ 'verbose' } && print "Reading configuration file: $config\n";
+
+    #
+    #  Failed to open?  Return
+    #
+    open my $handle, "<", $config or
+      return;
+
+    while ( my $line = <$handle> )
+    {
+        chomp $line;
+        if ( $line =~ s/\\$// )
+        {
+            $line .= <$handle>;
+            redo unless eof($handle);
+        }
+
+        # Skip lines beginning with comments
+        next if ( $line =~ /^([ \t]*)\#/ );
+
+        # Skip blank lines
+        next if ( length($line) < 1 );
+
+        # Strip trailing comments.
+        if ( $line =~ /(.*)\#(.*)/ )
+        {
+            $line = $1;
+        }
+
+        # Find variable settings
+        if ( $line =~ /([^=]+)=([^\n]+)/ )
+        {
+            my $key = $1;
+            my $val = $2;
+
+            # Strip leading and trailing whitespace.
+            $key =~ s/^\s+//;
+            $key =~ s/\s+$//;
+            $val =~ s/^\s+//;
+            $val =~ s/\s+$//;
+
+            # strip dashes in variable name
+            $key =~ s/-//g;
+
+            # Store value.
+            $CONFIG{ $key } = $val;
+        }
+    }
+    close($handle);
+}
+
+
+=begin doc
+
+Parse the command-line for options.
+
+=end doc
+
+=cut
+
+sub parseCommandLine
+{
+    my $SHOW_HELP    = 0;
+    my $SHOW_MANUAL  = 0;
+    my $SHOW_VERSION = 0;
+
+    if (
+        !GetOptions(
+
+            # Help options
+            "help",    \$SHOW_HELP,
+            "manual",  \$SHOW_MANUAL,
+            "version", \$SHOW_VERSION,
+
+            # For fetching policies.
+            "transport=s",    \$CONFIG{ 'transport' },
+            "prefix=s",       \$CONFIG{ 'prefix' },
+            "transport-args", \$CONFIG{ 'transportargs' },
+
+            # Some policies might require a username/password.
+            "username=s", \$CONFIG{ 'username' },
+            "password=s", \$CONFIG{ 'password' },
+
+            # wrapper flags
+            "include=s", \$CONFIG{ 'include' },
+
+            # Flags
+            "mail",          \$CONFIG{ 'mail' },
+            "dump",          \$CONFIG{ 'dump' },
+            "delay=i",       \$CONFIG{ 'delay' },
+            "lockfile=s",    \$CONFIG{ 'lockfile' },
+            "role=s",        \$CONFIG{ 'role' },
+            "fqdn=s",        \$CONFIG{ 'fqdn' },
+            "hostname=s",    \$CONFIG{ 'hostname' },
+            "outfile=s",     \$CONFIG{ 'outfile' },
+            "transports",    \$CONFIG{ 'transports' },
+            "no-delete",     \$CONFIG{ 'nodelete' },
+            "no-execute",    \$CONFIG{ 'noexecute' },
+            "verbose",       \$CONFIG{ 'verbose' },
+            "skip-cfgfile",  \$CONFIG{ 'skipcfgfile' },
+            "allow-nonroot", \$CONFIG{ 'allownonroot' },
+        ) )
+    {
+        exit 1;
+    }
+
+    pod2usage(1) if $SHOW_HELP;
+    pod2usage( -verbose => 2 ) if $SHOW_MANUAL;
+
+    #
+    #  Don't bother trying to execute the generated script if we're allowing non-root
+    #
+    if ( $CONFIG{ 'allownonroot' } )
+    {
+        $CONFIG{ 'noexecute' } ||= 1;
+    }
+
+    #
+    # Don't delete the output file if it was specified on the command line
+    #
+    if ( $CONFIG{ 'outfile' } )
+    {
+        $CONFIG{ 'nodelete' } ||= 1;
+    }
+
+    #
+    #  Showing the version number only?
+    #
+    if ($SHOW_VERSION)
+    {
+        print $VERSION . "\n";
+        exit;
+    }
+
+
+    #
+    #  Dump transport modules
+    #
+    if ( $CONFIG{ 'transports' } )
+    {
+
+        #
+        #  Look beneath each directory on the perl include path.
+        #
+        foreach my $dir (@INC)
+        {
+
+            #
+            #  Portable filename construction
+            #
+            my $guess = File::Spec->catfile( $dir, "Slaughter", "Transport" );
+
+            #
+            #  Found the module directory?
+            #
+            if ( -d $guess )
+            {
+                foreach my $pm ( sort( glob( $guess . "/*.pm" ) ) )
+                {
+
+                    # skip the base-class
+                    next if ( $pm =~ /revisionControl\.pm/ );
+
+                    # strip the directory name + suffix
+                    my $name = basename($pm);
+                    $name =~ s/\.pm$//gi;
+
+                    print $name . "\n";
+                }
+            }
+        }
+        exit;
+    }
+
+}
+
+
+=begin doc
+
+Create a lockfile, which will be removed on process-termination.
+
+=end doc
+
+=cut
+
+sub createLock
+{
+
+    #
+    #  Get the lockfile - if we failed to define one then abort.
+    #
+    my $lockfile = $CONFIG{ 'lockfile' };
+    return unless ($lockfile);
+
+
+    #
+    # Open the lock-file exclusively.
+    #
+    open( LOCK, ">>", $lockfile ) or
+      die "Failed to open lockfile at $lockfile - $!";
+
+    #
+    # Lock the file.
+    #
+    flock( LOCK, LOCK_EX | LOCK_NB ) or
+      die "$0 already running - Lock file $lockfile is locked";
+
+
+    #
+    # The file will be closed when slaughter terminates so although it
+    # looks like we're leaking a handle here this is intentional.
+    #
+
+}
+
+=begin doc
+
+Create a temporary directory for holding files, some transports need this.
+
+B<NOTE>:  This directory will be removed when this process terminates unless
+slaughter was invoked with --no-delete.
+
+=end doc
+
+=cut
+
+sub createTransportDir
+{
+
+    #
+    #  Temporary directory for transports to use
+    #
+    $CONFIG{ 'transportDir' } = tempdir( CLEANUP => !$CONFIG{ 'nodelete' } );
+
+    #  The temporary directory should not be world-readable
+    chmod 0700, $CONFIG{ 'transportDir' };
+}
+
+
+
+=begin doc
+
+Test the environment - which is a combination of the command line flags, and
+configuration file settings, and the local user.
+
+=end doc
+
+=cut
+
+sub testEnvironment
+{
+    if ( $UID != 0 and !$CONFIG{ 'allownonroot' } )
+    {
+        print <<EOF;
+You must launch this command as root.
+EOF
+        exit 1;
+    }
+
+    #
+    #  If we have no transport type, but we do have a prefix, we can attempt
+    # to infer what to use.
+    #
+    if ( $CONFIG{ 'prefix' } && !$CONFIG{ 'transport' } )
+    {
+
+        # show what is going on
+        $CONFIG{ 'verbose' } &&
+          print "Attempting to guesss transport for $CONFIG{'prefix'}\n";
+
+        # git://.... or   http://.../foo.git
+        $CONFIG{ 'transport' } = "git"
+          if ( $CONFIG{ 'prefix' } =~ /(^git|\.git$)/i );
+
+        # http://.../foo.hg
+        $CONFIG{ 'transport' } = "hg" if ( $CONFIG{ 'prefix' } =~ /\.hg$/i );
+
+        # rsync://.../
+        $CONFIG{ 'transport' } = "rsync"
+          if ( $CONFIG{ 'prefix' } =~ /^rsync/i );
+
+        # Local policies will start with /
+        $CONFIG{ 'transport' } = "local"
+          if ( $CONFIG{ 'prefix' } =~ /^\// );
+
+        # fall-back to HTTP.
+        $CONFIG{ 'transport' } = "http" if ( !$CONFIG{ 'transport' } );
+
+        $CONFIG{ 'verbose' } &&
+          print "Guessed transport: $CONFIG{'transport'}\n";
+    }
+
+    #
+    # Abort if we don't have both transport & prefix set now.
+    #
+    if ( !$CONFIG{ 'transport' } || !$CONFIG{ 'prefix' } )
+    {
+        print
+          "Unless you specify both --transport and --prefix slaughter will be unable to fetch policies\n";
+        print
+          "(You can use the configuration file /etc/slaughter/slaughter.conf if you prefer.)\n";
+        exit 0;
+    }
+
+
+    #
+    #  If an include file is specified it must exist.
+    #
+    if ( ( $CONFIG{ 'include' } ) && ( !-e $CONFIG{ 'include' } ) )
+    {
+        print "Ignoring the include file - doesn't exist: $CONFIG{'include'}\n";
+        $CONFIG{ 'include' } = undef;
+    }
+
+}
+
+
+
+=begin doc
+
+Load and return the transport the user wants, taking care to cover the
+case when either:
+
+=over 8
+
+=item  The transport named doesn't exist.
+
+=item  The transport named isn't available.
+
+=back
+
+=end doc
+
+=cut
+
+sub loadTransport
+{
+    my $module    = "Slaughter::Transport::$CONFIG{'transport'}";
+    my $transport = "use $module;";
+
+    ## no critic (Eval)
+    eval($transport);
+    ## use critic
+
+    if ($@)
+    {
+        print "The transport module you've chosen doesn't seem to exist.\n";
+        print "To see possible transports please run: slaughter --transports\n";
+        exit(0);
+    }
+
+    #
+    #  Create the helper, and test that the dependencies for the transport module are present.
+    #
+    my $object = $module->new(%CONFIG);
+    if ( !$object || !$object->isAvailable() )
+    {
+        print
+          "The transport module you've chosen doesn't seem to be available.\n\n";
+
+        print "$module:\n\t" . $object->error() . "\n\n" if ($object);
+
+        print "To see possible transports please run: slaughter --transports\n";
+        exit(0);
+    }
+
+    #
+    #  Some transports need an init-method to be called.  If the module
+    # supports it then call it.
+    #
+    if ( $object && ( UNIVERSAL::can( $object, "setup" ) ) )
+    {
+        $object->setup();
+
+    }
+
+
+    return ($object);
+}
+
+
+
+
+=begin doc
+
+Load the default policy "/policies/default.policy", via the transport
+and then expand that for any policy inclusions.
+
+=end doc
+
+=cut
+
+sub loadPolicy
+{
+
+    #
+    #  Load the transport the user has chosen.
+    #
+    my $object = loadTransport();
+
+    #
+    #  Now fetch the policies, expanding and recursing, where appropriate.
+    #
+    my $contents =
+      $object->fetchContents( prefix => "/policies/",
+                              file   => "default.policy" );
+
+
+    return ( $contents, undef ) if ( !$contents );
+
+    #
+    #  The expanded policy.
+    #
+    my $policy;
+
+    #
+    #  The modules the user might fetch.
+    #
+    my $modules = "";
+
+
+    #
+    #  Expand inclusions here.
+    #
+    foreach my $line ( split /[\r\n]/, $contents )
+    {
+        next unless ($line);
+        chomp($line);
+
+        # Skip lines beginning with comments
+        next if ( $line =~ /^([ \t]*)\#/ );
+
+        # Skip blank lines
+        next if ( length($line) < 1 );
+
+        # Strip comments on end of line
+        $line =~ s/#.*$//;
+
+        if ( $line =~ /^([ \t]*)FetchPolicy(.*);\s*/ )
+        {
+            $::CONFIG{ 'verbose' } && print "Policy inclusion: $line\n";
+
+            #  Get the initial value.
+            my $include = $2;
+
+            #  Strip the trailing ";".
+            $include =~ s/;$//g;
+
+            # Strip leading/trailing stuff.
+            $include =~ s/^([("' \t]+)|(['" \t)]+)$//g;
+
+            # does it refer to a variable?
+            if ( $include =~ /\$/ )
+            {
+                $::CONFIG{ 'verbose' } && print "Expanding from: $include\n";
+
+                foreach my $key ( sort keys %::CONFIG )
+                {
+                    while ( $include =~ /(.*)\$\Q$key\E(.*)/ )
+                    {
+                        $include = $1 . $::CONFIG{ $key } . $2;
+                    }
+                }
+
+                $::CONFIG{ 'verbose' } && print "Expanded into: $include\n";
+
+            }
+
+            #
+            #  Fetch the included policy
+            #
+            my $txt =
+              $object->fetchContents( prefix => "/policies/",
+                                      file   => $include );
+            if ($txt)
+            {
+                $line = "{\n" . "# Policy inclusion - $include\n";
+                $line .=
+                  "print '>>>>> Running policy: ---------------------- $include\n';\n"
+                  if $::CONFIG{ verbose };
+                $line .= $txt;
+                $line .=
+                  "print '<<<<< Completed policy: -------------------- $include\n';\n"
+                  if $::CONFIG{ verbose };
+                $line .= "}\n";
+            }
+            else
+            {
+                $line = "# Policy inclusion failed - $include\n";
+            }
+        }
+        if ( $line =~ /^([ \t]*)FetchModule(.*);\s*/ )
+        {
+            $::CONFIG{ 'verbose' } && print "Module inclusion: $line\n";
+
+            #  Get the initial value.
+            my $include = $2;
+
+            #  Strip the trailing ";".
+            $include =~ s/;$//g;
+
+            # Strip leading/trailing stuff.
+            $include =~ s/^([("' \t]+)|(['" \t)]+)$//g;
+
+            my $tmp =
+              $object->fetchContents( prefix => "/modules/",
+                                      file   => $include );
+            if ($tmp)
+            {
+                $modules .= "\n{\n" . "\n# Module inclusion - $include\n";
+                $modules .= $tmp . "}\n";
+                $line = "";
+            }
+            else
+            {
+                $modules .= "\n# Module inclusion failed - $include\n";
+                $line = "";
+            }
+        }
+
+        $policy .= $line;
+        $policy .= "\n";
+    }
+
+    return ( $policy, $modules );
+}
+
+
+
+
+=begin doc
+
+Write out specified policy content into a form which can be executed,
+and return the name of the file to which it was written.
+
+Once complete this is the script which will be executed on the client
+system - so it will be valid perl.
+
+=end doc
+
+=cut
+
+sub writeoutPolicy
+{
+    my ( $policy, $modules ) = (@_);
+
+
+    #
+    # Create the temporary file, and set the permissions on
+    # it to something restrictive.
+    #
+    my ( undef, $name ) = File::Temp::tempfile();
+    $name = $CONFIG{ 'outfile' } if $CONFIG{ 'outfile' };
+    if ( $^O ne "MSWin32" )
+    {
+        chmod( 0700, $name );
+    }
+
+    #
+    #  The user might have specified an include-file to be added
+    # to the wrapper.  Here we load that, if present.
+    #
+    my $include = "";
+    if ( $CONFIG{ 'include' } && ( -e $CONFIG{ 'include' } ) )
+    {
+        open( my $inc, "<", $CONFIG{ 'include' } );
+        while ( my $line = <$inc> )
+        {
+            $include .= $line;
+        }
+        close($inc);
+    }
+
+    #
+    #  Two lines we output into the generated script.
+    #
+    my $line = "our \%template = (";
+    my $keys = "";
+
+    #
+    #  Generate the fixed sections we output,
+    # which are based upon our global config.
+    #
+    foreach my $key ( sort keys %CONFIG )
+    {
+        my $val = $CONFIG{ $key };
+
+        if ( defined($val) )
+        {
+            $keys .= "our \$$key = '$val';\n";
+            $line .= "\n\t$key => '$val',";
+        }
+        else
+        {
+            $keys .= "our \$$key = undef;\n";
+            $line .= "\n\t$key => undef,";
+        }
+
+    }
+
+    $line =~ s/, $//g;
+    $line .= "\t);\n";
+
+    #
+    #  Open the file for writing.
+    #
+    open my $handle, ">", $name or
+      die "Failed to write to file : $!";
+
+
+    #
+    #  Write the script.
+    #
+    print $handle <<EOF;
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use English;
+use Slaughter;
+
+#
+#  1/7:
+#
+# Generated output of the form:
+#   our \$var = 'value';
+#
+$keys
+
+#
+#  2/7:
+#
+# Generated output in the form of a hash:
+#
+$line
+
+#
+#  3/7:
+#
+# Setup of the transport, for fetching files and policies.
+#
+use Slaughter::Transport::$CONFIG{'transport'};
+our \$TRANSPORT = Slaughter::Transport::$CONFIG{'transport'}->new( \%template );
+die "Transport unavailable: \$TRANSPORT->error()" unless( \$TRANSPORT->isAvailable() );
+
+#
+#  4/7:
+#
+# Setup a hash to store the messages created in LogMessages
+#
+our \%LOG;
+
+#
+#  4/7:
+#
+# Sanity check prior to execution
+#
+if ( \$UID != 0 )
+{
+    print <<EOFF;
+You must launch this command as root.
+EOFF
+    exit 1;
+}
+
+#
+#  5/7:
+#
+#  User-supplied policies.
+#
+$policy
+
+
+#
+#  6/7:
+#
+#  Post-Execution log-output
+#
+my \$logOutput = "";
+
+foreach my \$level ( keys \%LOG )
+{
+    my \$msg = \$LOG{\$level};
+
+    \$logOutput .= "\$level\\n";
+    foreach my \$txt ( \@\$msg )
+    {
+        \$logOutput .= "\\t" . \$txt . "\\n";
+    }
+}
+
+if ( length( \$logOutput ) )
+{
+   if ( \$template{'mail'} )
+   {
+        Alert( Email => \$template{'mail'},
+               Message => \$logOutput,
+               Subject => "Output from slaughter on \$fqdn\\n" );
+   }
+   else
+   {
+      print "Output from slaughter on \$fqdn\\n";
+      print \$logOutput;
+   }
+}
+
+#
+#  7/7 - User-include file
+#
+
+$include
+
+
+#
+#  Modules:
+#
+$modules
+EOF
+
+    #
+    #  All done.
+    #
+    close($handle);
+
+    return ($name);
+
+}

@@ -1,0 +1,83 @@
+#!/bin/bash
+# init script for ace_initd from Apache2::AuthenSecurID
+#
+# chkconfig: - 50 50
+# description: ACE proxy daemon for Apache authentication
+#
+# processname: ace_initd
+# pidfile: /var/run/ace_initd
+
+# source function library
+. /etc/init.d/functions
+
+if [ -e /etc/sysconfig/ace_initd ]; then
+  . /etc/sysconfig/ace_initd
+else
+   OPTIONS="--listen=127.0.0.1 --pidfile=/var/run/ace_initd --daemon"
+   ACE_INITD="/usr/local/bin/ace_initd"
+fi
+
+RETVAL=0
+prog="ace_initd"
+
+start() {
+        echo -n $"Starting $prog: "
+        if [ $UID -ne 0 ]; then
+                RETVAL=1
+                failure
+        else
+                daemon $ACE_INITD $OPTIONS
+                RETVAL=$?
+                [ $RETVAL -eq 0 ] && touch /var/lock/subsys/ace_initd
+        fi;
+        echo 
+        return $RETVAL
+}
+
+stop() {
+        echo -n $"Stopping $prog: "
+        if [ $UID -ne 0 ]; then
+                RETVAL=1
+                failure
+        else
+                killproc $ACE_INITD
+                RETVAL=$?
+                [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/ace_initd
+        fi;
+        echo
+        return $RETVAL
+}
+
+restart(){
+	stop
+	start
+}
+
+condrestart(){
+    [ -e /var/lock/subsys/ace_initd ] && restart
+    return 0
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart)
+	restart
+        ;;
+  condrestart)
+	condrestart
+	;;
+  status)
+        status ace_initd
+	RETVAL=$?
+        ;;
+  *)
+	echo $"Usage: $0 {start|stop|status|restart|condrestart}"
+	RETVAL=1
+esac
+
+exit $RETVAL

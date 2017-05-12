@@ -1,0 +1,33 @@
+Revision history for App-spaceless
+
+0.07      2015-12-29 15:50:09 -0500
+  - skip directories that do not exist on cygwin.
+    as they cannot be made spaceless.
+
+0.06      2014-12-20 05:39:56 -0500
+  - internal cleanup
+  - now requires Perl 5.10.1
+
+0.05      2014-05-31 12:42:32 -0400
+  - capture warning from running shell during test
+    to avoid failure
+
+0.04      2014-05-31 06:37:09 -0400
+  - bump version requirement for Shell::Guess to 0.04
+    to avoid infrequent test failure
+
+0.03      2014-05-29 07:43:32 -0400
+  - first CPAN release
+  - added --login option
+  - added --list option
+  - added --squeeze option
+  - added --sep* options
+
+0.02      2014-05-28 08:53:13 -0400
+  - added --expand | -x option
+  - added --no-cygwin option
+  - added t/basic.t
+  - avoid warnings
+
+0.01      2014-05-27 20:33:28 -0400
+  - initial version

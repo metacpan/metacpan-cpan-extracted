@@ -1,0 +1,128 @@
+{
+   "abstract" : "Synchronise text notes with simplenoteapp.com",
+   "author" : [
+      "Ioan Rogers <ioanr@cpan.org>",
+      "Fletcher T. Penney <owner@fletcherpenney.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300018, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-SimplenoteSync",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::INI::Reader" : "0",
+            "DateTime" : "0",
+            "File::BaseDir" : "0",
+            "File::Basename" : "0",
+            "File::ExtAttr" : "0",
+            "Getopt::Long" : "0",
+            "Log::Any" : "0",
+            "Log::Any::Adapter" : "0",
+            "Log::Any::Adapter::Dispatch" : "0",
+            "Log::Dispatch" : "0",
+            "Log::Dispatch::File" : "0",
+            "Log::Dispatch::Screen::Color" : "0",
+            "Method::Signatures" : "0",
+            "Moose" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "Pod::Usage" : "0",
+            "Proc::InvokeEditor" : "0",
+            "Try::Tiny" : "0",
+            "WebService::Simplenote" : "v0.2.0",
+            "WebService::Simplenote::Note" : "0",
+            "namespace::autoclean" : "0",
+            "open" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "JSON" : "0",
+            "Path::Class" : "0",
+            "Test::More" : "0",
+            "Test::utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ioanrogers/App-SimplenoteSync/issues"
+      },
+      "homepage" : "http://metacpan.org/release/App-SimplenoteSync/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ioanrogers/App-SimplenoteSync.git",
+         "web" : "https://github.com/ioanrogers/App-SimplenoteSync"
+      }
+   },
+   "version" : "0.2.0",
+   "x_BuiltWith" : {
+      "modules" : {
+         "Config::INI::Reader" : "0.019",
+         "DateTime" : "0.75",
+         "File::BaseDir" : "0.03",
+         "File::Basename" : "2.84",
+         "File::ExtAttr" : "1.09",
+         "File::Find" : "1.20",
+         "File::Temp" : "0.22",
+         "Getopt::Long" : "2.38",
+         "JSON" : "2.53",
+         "Log::Any" : "0.14",
+         "Log::Any::Adapter" : "0.07",
+         "Log::Any::Adapter::Dispatch" : "0.06",
+         "Log::Dispatch" : "2.32",
+         "Log::Dispatch::File" : "2.32",
+         "Log::Dispatch::Screen::Color" : "0.04",
+         "Method::Signatures" : "20120523",
+         "Module::Build" : "0.4",
+         "Moose" : "2.0602",
+         "MooseX::Types::Path::Class" : "0.06",
+         "Path::Class" : "0.26",
+         "Pod::Usage" : "1.51",
+         "Proc::InvokeEditor" : "1.06",
+         "Test::More" : "0.98",
+         "Test::utf8" : "1.00",
+         "Try::Tiny" : "0.11",
+         "WebService::Simplenote" : "0.2.0",
+         "WebService::Simplenote::Note" : "0.2.0",
+         "namespace::autoclean" : "0.13",
+         "open" : "1.10",
+         "perl" : "NA(skipped: perl)",
+         "strict" : "1.07",
+         "warnings" : "1.13"
+      },
+      "perl" : {
+         "original" : "v5.16.0",
+         "qv" : 1,
+         "version" : [
+            5,
+            16,
+            0
+         ]
+      },
+      "platform" : "linux"
+   }
+}
+

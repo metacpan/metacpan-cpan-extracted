@@ -1,0 +1,15 @@
+Changes
+lib/App/calendr.pm
+lib/App/calendr/Option.pm
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/app-calendr.t
+t/manifest.t
+t/pod.t
+script/calendr
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

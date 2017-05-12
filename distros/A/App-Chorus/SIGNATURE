@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 65db7cc7f2932b904efdfb5efef4e36fd3c6fba8 AUTHOR_PLEDGE
+SHA1 3e30877d031bc355a765b2a36a4dcd472115949c Build.PL
+SHA1 04a7c0a31441926da0fc9be940e14a40a61bc9ef CONTRIBUTORS
+SHA1 eb6b909880ff00638aeaf950d1a0060eae2ce8a2 Changes
+SHA1 c5925e168e12904f3bc4936904c5dbd78f0d7192 INSTALL
+SHA1 769557ae7e699664d9c0bba4a6e3e7f7ac31c0ae LICENSE
+SHA1 55b15d12f01d17b47a55fe08ac31c1620462edaf MANIFEST
+SHA1 134c30c98d5643ee4f06389762bf50a29fa85945 MANIFEST.SKIP
+SHA1 f1d3fe097b0908c982503e66b77846c51f5af617 META.json
+SHA1 e0ba8a6cdff443274ae038dfedd614299735db8c META.yml
+SHA1 bfd6de3b6641318e825fe076fc18b87e7ef5c3e7 README
+SHA1 d7281f67bc376141a21b8f66eca758d0d67ca191 README.mkdn
+SHA1 09604772d0cacb6954a7f93952cabb97aae9800d bin/chorus
+SHA1 66108013059b1a8e8cbe68a51afc6ed065ceaf3b cpanfile
+SHA1 85578d4847a9cffd488aa1c54059bb1513325f8a doap.xml
+SHA1 6eaade6fad76ca005638d1ce8ba0600b2e068ecc examples/ex1.pl
+SHA1 f52bb6de3387d04c7383280eea5199ede664a81d examples/reveal-default.mkd
+SHA1 f2cb44a6015eeb3d755a6aa729086d1c4f1484ea examples/root/hello.mason
+SHA1 3c672d66ee4ef6f9351b91df190d4dd071f50977 lib/App/Chorus.pm
+SHA1 93ab384b27f30ae561c27d30176b5d3c928fcf3f lib/App/Chorus/Slidedeck.pm
+SHA1 23c3e6bd6a7548e3aa0423f28ac6ad5d567057b1 share/shared-files.tar.gz
+SHA1 ca796a21001bac20fa2a4cd0f6d88fe68ed9e2bc t/000-report-versions-tiny.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlS1hK8ACgkQ34Hwf+GwC4y/bACgo/J/GUweyTLhGc4ydbkgM4+B
+X3oAoIa69+xXNETyzt+y6WGWNaAMDr5x
+=rwqt
+-----END PGP SIGNATURE-----

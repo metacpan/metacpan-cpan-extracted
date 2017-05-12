@@ -1,0 +1,71 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8cc00da89087d9b6350e0b252e7924665377c382 Changes
+SHA1 349e3c3f8e1bb1bd4d3335b2ffe8e5e3539b020b LICENSE
+SHA1 639d1bf158729cf8c19abafba6a71c6db0edb60f MANIFEST
+SHA1 557ec4a9b847c7c5a442778581cdb8a0842f914d META.yml
+SHA1 0bb2f1c4dff8a13bd41a162763cf8bf19f2d9f3f Makefile.PL
+SHA1 60630918f4f3f6cc3bd47312143b833bbf0208ff README.md
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 470809a1dbe03e197e74dde79c6af40b5f7f9b26 inc/Module/Install/DOAPChangeSets.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 42de62df31eaf796d8bfd49a11fdc9cff1b50b74 inc/Module/Install/Share.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 fc25cf8aaa0ff8b37bce8431b0784c9d9e8802ee lib/AtteanX/Endpoint.pm
+SHA1 09e3dc51f37f2682eed524790e8442810ef527b7 meta/changes.ttl
+SHA1 6c15105d58a15ce7c102b845e50799a0e4abbbf6 scripts/endpoint.psgi
+SHA1 19ac766464ef05698ac985e2a42e87dbb7912f3f share/endpoint/index.html
+SHA1 6dd0cf355b49dcb0fdfe9203c68917d5320584f8 share/endpoint/results.html
+SHA1 c40ebad09f7e1d92ad0228a0625d730ba2f57b84 share/endpoint/www/css/docs.css
+SHA1 398bae2ae66a19ab8976036b50a2d20041b67fe5 share/endpoint/www/css/sparqlcolors.css
+SHA1 aa6874f2bad5f0b75b0ff52760f5e6b48ec933ae share/endpoint/www/favicon.ico
+SHA1 13fece7654a01193013d3d96528c851bfc79a300 share/endpoint/www/js/codemirror.js
+SHA1 d372c911fcc2bd030da800fdeedfbcd6b0100c83 share/endpoint/www/js/editor.js
+SHA1 551ff99056361eebfba2a32ea7445502a6eb4f21 share/endpoint/www/js/highlight.js
+SHA1 5bff996ab2564db1a998de30cb9e1ae07cbe62b5 share/endpoint/www/js/mirrorframe.js
+SHA1 d7540f8390913afc0d58484bf5161cf9b9aad9f8 share/endpoint/www/js/parsecss.js
+SHA1 a0028275114eaedf7ddcf57976c99c32ecb2c1d3 share/endpoint/www/js/parsedummy.js
+SHA1 39383cdfc93568cc5673e2b71f681e2811fb5463 share/endpoint/www/js/parsehtmlmixed.js
+SHA1 d5319247a4b26cafccfd4f26621918f0f4d22ef4 share/endpoint/www/js/parsejavascript.js
+SHA1 c6597fb9a5c7969237f7f039f2d0bc6968ef7ce7 share/endpoint/www/js/parsesparql.js
+SHA1 ae75f537ad61277a21a8ec423f5deffed8454e22 share/endpoint/www/js/parsexml.js
+SHA1 85cdbc16cd1581f441480d91fa5c0a50f234ff0b share/endpoint/www/js/select.js
+SHA1 d3261a5ddb7e5835c7abed5d5c343f0ef98637a5 share/endpoint/www/js/sparql_form.js
+SHA1 19cc324cce7165c868a60d523b2462c648f20887 share/endpoint/www/js/stringstream.js
+SHA1 5fdb14f3db575d0ce6a7113f96ea5a530f4f1941 share/endpoint/www/js/tokenize.js
+SHA1 7f581a2b4647f1214d1bc3160eb4e166a1261e4f share/endpoint/www/js/tokenizejavascript.js
+SHA1 9bba7456d4a25b23e805bc2d1d5bde61371c4e82 share/endpoint/www/js/undo.js
+SHA1 26ff15a8f6c196e8bd9f5d7e7b628a6ee9b0dfaa share/endpoint/www/js/unittests.js
+SHA1 201409b1d00a8df0b65b00a1b92ab62d9e0bbd7a share/endpoint/www/js/util.js
+SHA1 ba3972579f5adab59fefb48dee2f8d59247e37e6 t/00.load.t
+SHA1 6c81693f964d4569f641101787e648b6a8a16272 t/simple.t
+SHA1 61bf86179ce63f1148d1fb8c7a4c57bee395f7fc xt/pod-coverage.t
+SHA1 6387af7a5fde0747be5bc9ad2ec15ca9759bd95a xt/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAlb1Ik8ACgkQhPK6VMqoyC2osACgjhTzyR73prgoPR3BkPKNB7kF
+XHEAoKMfgTEW73WOXGk4CgjMCly2dBeb
+=wWPz
+-----END PGP SIGNATURE-----

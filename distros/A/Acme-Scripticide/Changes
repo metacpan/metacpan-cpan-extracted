@@ -1,0 +1,13 @@
+Revision history for Perl extension Acme::Scripticide.
+
+0.0.1  Sun Nov 13 10:28:35 2005
+	- original version; created by h2xs 1.22 with options
+		-AXc -n Acme::Scripticide
+0.0.2  Sun Nov 13 17:12:55 2005
+        - forgot a POD person
+
+0.0.3  Sun Nov 13 17:22:29 2005
+        -fixed POD and README version
+
+0.0.4  Sun Nov 13 20:02:51 2005
+	- sheesh more POD people...

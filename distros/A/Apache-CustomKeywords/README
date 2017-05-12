@@ -1,0 +1,74 @@
+NAME
+    Apache::CustomKeywords - Customizable toolbar for MSIE
+
+SYNOPSIS
+      # 1. As an Apache proxy
+      Listen 8888
+      <VirtualHost *:8888>
+      PerlTransHandler +Apache::CustomKeywords
+      CustomKeyword cpan http://search.cpan.org/search?mode=module&query=%s
+      CustomKeyword perldoc http://perldoc.com/cgi-bin/htsearch?words=%s&restrict=perl5.8.0
+      CustomKeyword google http://www.google.com/search?q=%s
+      </VirtualHost>
+
+      # 2. As a pseudo-MSN
+      <Location /response.asp>
+      SetHandler perl-script
+      PerlHandler +Apache::CustomKeywords
+      CustomKeyword cpan http://search.cpan.org/search?mode=module&query=%s
+      # ...
+      </Location>
+
+DESCRIPTION
+    Apache::CustomKeywords is a customizable proxy/webapp to change your
+    MSIE's Location box to your favourite toolbar!
+
+    See http://www.mozilla.org/docs/end-user/keywords.html for what Custom
+    Keywords means in Mozilla. This module enables Custom Keywords in MSIE.
+
+    With "CustomKeyword" settings shown in the section on "SYNOPSIS", you
+    type "cpan CustomKeywords" or "google blah blah" in your browser's
+    Location: box, then you will be redirected to the page you wanna go to!
+
+    Here's the way this handler works:
+
+    *   Type "foo bar" in Location: box
+
+    *   MSIE sends request to "auto.search.msn.com"
+
+    *   Apache::CustomKeywords detects it and redirects browser to your
+        favourite search engine.
+
+CONFIGURATION
+    There're two ways to let your browser use this module:
+
+    As a proxy server
+        configure "httpd.conf" with a proxy version and set up your
+        browser's proxy setting.
+
+    As a pseudo MSN
+        configure "httpd.conf" with psuedo MSN version and set up your Hosts
+        file ("/etc/hosts" in Un*x, "Windows/Hosts" or
+        "windows/system/drivers/etc/Hosts" in Win32) or local DNS so that
+        "auto.search.msn.com" points to the server where this module is
+        installed.
+
+NOTE
+    If you put ":" or "@" as a query in Location: box, MSIE recognizes it as
+    protocol or authentication password stuff, hence this module might not
+    work.
+
+TODO
+    *   User-definable conversion of query paramers, including encoding
+        conversions. Currenty only %s interpolates to URI-Escaped string
+        encoded in UTF8.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the mod_perl manpage, http://www.mozilla.org/docs/end-user/keywords.html
+

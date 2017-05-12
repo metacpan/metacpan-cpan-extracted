@@ -1,0 +1,106 @@
+#!/usr/bin/perl -w
+use strict;
+use Archive::SelfExtract;
+use Getopt::Long;
+
+(my $prog = $0) =~ s{.*/}{};
+my $Usage = 
+  qq{$prog [options] source.pl archive.zip
+options:
+     --help:
+         Display this summary.
+     --output=FN, -o FN:
+         Create selfextracting script FN (default is to output to stdout).
+     --perlbin=PATH, -p PATH:
+         Use PATH for the #! line in output script (default is /usr/bin/perl).
+};
+
+my $OutputFile = undef;
+my $PerlBin = undef;
+my $ShowHelp = 0;
+
+die $Usage 
+  unless GetOptions( "help" => \$ShowHelp,
+		     "perlbin=s" => \$PerlBin,
+		     "output=s" => \$OutputFile,
+		     );
+die $Usage if $ShowHelp;
+
+my $script = shift;
+my $archive = shift;
+
+die $Usage unless ( defined($script) && defined($archive) );
+
+my %opts = ();
+if ( defined($OutputFile) ) {
+  open( my $out, "> $OutputFile" ) ||
+    die "Can't open specified output file '$OutputFile' ($!)\n";
+  $opts{output_fh} = $out;
+}
+if ( defined($PerlBin) ) {
+  $opts{perlbin} = $PerlBin;
+}
+
+Archive::SelfExtract::createExtractor( $script, $archive, %opts );
+
+close( $opts{output_fh} ) if defined($OutputFile);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+mkselfextract - Creates a self-extracting perl script.
+
+=head1 SYNOPSIS
+
+    mkselfextract source.pl archive.zip > output.pl
+
+    mkselfextract --output=output.pl source.pl archive.zip
+
+=head1 DESCRIPTION
+
+C<mkselfextract> combines a file containing Perl code and a compressed
+zip archive into a single file.  This file can be run as a Perl
+program, which as its first action will extract the data in the zip
+file into a temporary directory.
+
+To create such a self-extracting script, you can do something like the
+following:
+
+    % zip -r9 distrib.zip src/ doc/ lib/ bin/
+    % mkselfextract setup-script.pl distrib.zip > setup.pl
+
+=head2 Options
+
+C<mkselfextract> supports the following options:
+
+=over 4
+
+=item C<--output>, C<-o>
+
+By default, C<mkselfextract> emits the created script on stdout.  The
+C<--output> option tells it to write the script to the given file
+instead.
+
+=item C<--perlbin>, C<-p>
+
+If you need to specify the location of the C<perl> binary, you can
+override the default C</usr/bin/perl> with this option.  This value is
+used only for the initial C<#!> line in the created script.
+
+=back
+
+=head1 SEE ALSO
+
+L<Archive::SelfExtract>, L<perl>.
+
+=head1 COPYRIGHT
+
+Copyright 2004 Greg Fast (gdf@speakeasy.net)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+ 
+=cut

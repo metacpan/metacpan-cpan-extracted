@@ -1,0 +1,38 @@
+/**
+ * Audit::DBI::TT2 v2.3.0
+ * https://metacpan.org/release/Audit-DBI
+ *
+ * Copyright 2010-2017 Guillaume Aubert
+ */
+
+html {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+}
+
+/* Customize code columns */
+.code {
+	min-width: 400px;
+}
+.code div {
+	font-family: monospace;
+	border: 1px solid #257025;
+	margin-top: 3px;
+	display: none;
+}
+
+/* Format the table of results */
+#results {
+	border: 1px solid black;
+}
+#results td {
+	border-right: 1px solid lightgrey;
+	vertical-align: top;
+}
+#results th {
+	border-bottom: 1px solid black;
+}
+#results tr.even {
+	background-color: #F0F0F0;
+}
+

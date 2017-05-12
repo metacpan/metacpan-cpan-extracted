@@ -1,0 +1,23 @@
+#!/usr/bin/perl -w
+#
+# Copyright © 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+#                  Elizabeth Cassell <e_a_c@mailsnare.net>
+#
+# $Revision: 1.1 $ $Date: 2004/08/05 20:52:03 $ $Author: alfw $
+#
+
+print "*** Handler Script called for an overflow!   ***\n";
+print "*** Host name: ", shift, " type: ", shift, "  ***\n";
+print "*** Overflow in field ", shift,
+                " (threshold ", shift, ",
+                      actual ", shift, ") ***\n";
+
+my $otherargs = shift;
+
+if ($otherargs) {
+  print "*** Other arguments: ", $otherargs;
+  while ($otherargs = shift) {
+    print " ", $otherargs;
+  }
+  print " ***\n";
+}

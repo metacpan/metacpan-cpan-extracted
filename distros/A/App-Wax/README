@@ -1,0 +1,96 @@
+wax
+===
+
+NAME
+----
+
+wax - webify your CLI
+
+SYNOPSIS
+--------
+
+    wax [OPTIONS] program [OPTIONS] ...
+
+DESCRIPTION
+-----------
+
+wax is a command-line program which runs other command-line programs and
+converts their URL arguments to local file paths. By default, the files are
+removed after the command has exited.
+
+As well as adding transparent support for remote resources to commands
+that don't support them natively, wax can be used to:
+
+-   add support for HTTPS (and any other protocols supported by LWP) to
+    programs that only support HTTP
+-   add a mirroring layer to network requests (remote resources are only
+    fetched if they've been updated)
+-   add a caching layer to network requests (remote resources are only
+    fetched once)
+
+For more details, see the wax man page.
+
+INSTALLATION
+------------
+
+INSTALL
+
+Install cpanminus if it's not already installed, then:
+
+    cpanm App::Wax
+
+UPDATE
+
+    cpanm App::Wax
+
+UNINSTALL
+
+    cpanm --uninstall App::Wax
+
+EXAMPLES
+--------
+
+grep:
+
+    $ wax grep -B1 demons http://www.mplayerhq.hu/DOCS/man/en/mplayer.1.txt
+
+espeak:
+
+    $ alias espeak="wax espeak"
+    $ espeak -f http://www.setec.org/mel.txt
+
+nman:
+
+Node.js man-page viewer
+
+    #!/bin/sh
+
+    node_version=${NODE_VERSION:-`node --version`}
+    docroot="https://cdn.rawgit.com/nodejs/node/$node_version/doc/api"
+    wax -D --cache pandoc --standalone --from markdown --to man "$docroot/$1.md" | man -l -
+
+VERSION
+-------
+
+1.1.0
+
+SEE ALSO
+--------
+
+-   rlwrap
+-   sshfs
+-   zsh completion script
+
+AUTHOR
+------
+
+chocolateboy (chocolate@cpan.org)
+
+COPYRIGHT AND LICENSE
+---------------------
+
+Copyright (C) 2010-2016 by chocolateboy
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself, either Perl version 5.10.1 or, at
+your option, any later version of Perl 5 you may have available.

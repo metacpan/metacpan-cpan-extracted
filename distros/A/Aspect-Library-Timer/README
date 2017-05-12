@@ -1,0 +1,41 @@
+NAME
+    Aspect::Library::Timer - Predefined timer pointcut
+
+SYNOPSIS
+      use Aspect;
+      
+  aspect Timer => call qr/^Foo::/;
+
+      Foo::bar();
+      
+  package Foo;
+      
+  sub bar {
+          sleep 1;
+      }
+
+DESCRIPTION
+    "Aspect::Library::Timer" provides support for simple timers aspects.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Aspect-Library-Timer>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    Aspect, Aspect::Library::ZoneTimer
+
+COPYRIGHT
+    Copyright 2009 - 2012 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,10 @@
+# multipart/form-data MIME-decoding
+POST /latin1 HTTP/1.0
+Content-Type: multipart/form-data; boundary="FOO FOO"
+
+--FOO FOO
+Content-Disposition: form-data; name="=?ISO-8859-1?Q?Fr=E9d=E9ric?="
+
+Brière
+--FOO FOO--
+

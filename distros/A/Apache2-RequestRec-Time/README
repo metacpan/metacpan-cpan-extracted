@@ -1,0 +1,35 @@
+
+		-----------------------------------------
+			Apache2::RequestRec::Time
+		-----------------------------------------
+
+This is the README file for the Apache2::RequestRec::Time module.
+
+As of mod_perl 2.0.4, it is possible to get request duration
+information by substracting current time from $r->request_time().
+However, that information is in seconds, so it's not possible to get
+the equivalent of Custom Log Format %D -- the time taken to serve
+the request, in microseconds.
+
+This module adds $r->request_duration_microseconds() method,
+and a couple of utility methods.
+
+Available from http://www.adelton.com/perl/Apache2-RequestRec-Time/
+and from your favorite CPAN site in the authors/id/JANPAZ/ directory.
+
+Contact the author at jpx dash perl at adelton dot com.
+
+Copyright 2009--2011 Jan Pazdziora.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this software except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+

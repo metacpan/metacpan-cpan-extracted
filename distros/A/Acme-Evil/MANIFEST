@@ -1,0 +1,40 @@
+Changes
+lib/evil.pm
+Makefile.PL
+MANIFEST
+README
+t/confused.t
+t/disable-die.t
+t/disable-safe.t
+t/intermediate-direct.t
+t/intermediate-indirect.t
+t/intermediate-unrelated.t
+t/lax-direct.t
+t/lax-indirect.t
+t/lax-unrelated.t
+t/strict-die.t
+t/strict-safe.t
+t/t1/Direct.pm
+t/t1/Evil.pm
+t/t1/Indirect.pm
+t/t1/Unrelated.pm
+t/t2/Dies.pm
+t/t2/Evil.pm
+t/t2/Survives.pm
+t/t3/Evil.pm
+t/t3/IntermediateDirect.pm
+t/t3/IntermediateIndirect.pm
+t/t3/LaxDirect.pm
+t/t3/LaxIndirect.pm
+t/t3/UnrelatedIntermediate.pm
+t/t3/UnrelatedLax.pm
+t/t3/UsesEvil.pm
+t/t4/ConfusedIntermediate1.pm
+t/t4/ConfusedIntermediate2.pm
+t/t4/ConfusedLax1.pm
+t/t4/ConfusedLax2.pm
+t/t4/ConfusedStrict1.pm
+t/t4/ConfusedStrict2.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

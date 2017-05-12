@@ -1,0 +1,19 @@
+---
+abstract: 'Parse a line from an Apache logfile into a hash'
+author:
+  - 'Andrew Kirkpatrick <ubermonk@gmail.com>'
+  - 'Peter Hickman <peterhi@ntlworld.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache-LogRegex
+resources:
+  homepage: https://github.com/spacebat/perl-apache-logregex
+  repository: https://github.com/spacebat/perl-apache-logregex.git
+version: '1.71'

@@ -1,0 +1,58 @@
+Revision history for Alien-nasm
+
+0.18      2017-03-01 19:10:26 +1100
+  - Remove dep on Alien::Base2.  Use Alien::Base directly.
+
+0.17      2017-02-08 16:49:10 -0500
+  - Properly handle the hierarchical directory strcture
+    used by nasm official mirror (gh#3 plicease)
+  - Fix bug where version wasn't guessed correctly
+    under a share install (gh#2 plicease)
+
+0.16      2017-02-08 08:02:46 -0500
+  - Require Alien::Build 0.11 for bugfixes
+
+0.15      2017-02-04 11:42:57 -0500
+  - Fixed configure requires bug
+  - Require Alien::Build 0.08
+
+0.14      2017-01-31 16:51:38 -0500
+  - Require Alien::Build 0.02
+
+0.12      2017-01-30 22:36:03 -0500
+  - migrate from Alien::Base::ModuleBuild to Alien::Build
+
+0.11      2017-01-12 22:40:51 -0500
+  - implicit modification of PATH is now deprecated
+    (see https://metacpan.org/pod/Alien::nasm#CAVEATS for details)
+
+0.10      2016-01-29 10:44:39 -0500
+  - Use Alien::Base::ModuleBuild as configure_requires
+    instead of Alien::Base
+
+0.09      2016-01-20 22:06:57 -0500
+  - Compatability for recent changes in Alien::Base
+
+0.08      2015-04-22 11:45:18 -0400
+  - Require Alien::Base 0.016 at configure time (needed for alien_stage_install)
+
+0.07      2015-04-22 11:30:09 -0400
+  - use alien_stage_install
+
+0.06      2015-02-26 10:00:54 -0500
+  - When building from source use version 2.11.08 (was 2.11.05)
+
+0.05      2015-02-18 17:24:25 -0500
+  - Require Alien::Base 0.010
+
+0.04      2014-10-14 08:05:46 -0400
+  - use Alien::Base 0.006
+
+0.03      2014-09-24 13:42:09 -0400
+  - use Alien::gmake to more reliably find GNU Make
+
+0.02      2014-09-24 11:09:32 -0400
+  - use gmake if it is available when building
+
+0.01      2014-09-24 09:27:30 -0400
+  - initial version

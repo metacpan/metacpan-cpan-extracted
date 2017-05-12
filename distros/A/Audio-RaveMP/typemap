@@ -1,0 +1,8 @@
+Audio::RaveMP	T_PTROBJ
+Audio::RaveMPSlot	T_PTROBJ
+AV *			T_AVREF
+
+OUTPUT
+
+T_AVREF
+	$arg = newRV_noinc((SV*)$var);

@@ -1,0 +1,56 @@
+NAME
+    AxKit::XSP::Minisession - Yet Another Session Handling Library
+
+SYNOPSIS
+    In your config file:
+
+        PerlSetVar MinisessionDir /tmp/sessions
+        PerlSetVar MinisessionLockDir /tmp/sessionlock
+        AxAddXSPTaglib +AxKit::XSP::Minisession
+
+    In your XSP code:
+
+        <xsp:page
+            xmlns:session="http://squash.oucs.ox.ac.uk/XSP/Minisession"
+        >
+
+        <session:set-value username="simon"/>
+        <session:get-value>username</s:get-value>
+
+    In your Perl code:
+
+        die "Already logged in" if
+            AxKit::XSP::Minisession::Backend::get_value($r, "username");
+        AxKit::XSP::Minisession::Backend::set_value($r, "username", $username);
+
+DESCRIPTION
+    This is a very simple session library which sets state via a cookie and
+    uses "Apache::Session::File" to store sessions in files on the file
+    system. If you need anything more complex than that, this module isn't
+    for you.
+
+    The guts of the module are the two functions "get_value" and "set_value"
+    in the "::Backend" module. The first parameter to these should be an
+    "Apache::Request" object, and the second a hash key.
+
+    These functions are wrapped by the "set-value" and "get-value" tags from
+    XSP.
+
+    And that's it. I said it was very simple.
+
+TAG REFERENCE
+  set-value
+    Assigns the given name/value pair to the currenct session.
+
+  get-value
+    Returns the currennt session value for the itemd requested.
+
+AUTHOR
+        Christopher H. Laco
+        CPAN ID: CLACO
+        claco@chrislaco.com
+        http://today.icantfocus.com/blog/
+
+AUTHOR EMERITUS
+    The original version was created by Simon Cozens.
+

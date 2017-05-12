@@ -1,0 +1,17 @@
+README
+README.fec
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+FEC.pm
+FEC.xs
+fec.3
+fec.h
+fec_imp.h
+fec8.c
+fec16.c
+typemap
+t/00_load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

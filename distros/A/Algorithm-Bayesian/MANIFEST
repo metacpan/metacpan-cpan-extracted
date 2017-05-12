@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+SIGNATURE
+lib/Algorithm/Bayesian.pm
+t/00.simple.t
+t/01.clean-state.t
+t/02.prec.t

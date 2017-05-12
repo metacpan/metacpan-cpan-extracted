@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+srand($$);
+my $start = time;
+my $lifespan = 5+int(rand(10));
+
+# Keep the CPU busy until it's time to exit
+while (time - $start < $lifespan) {
+    my $a = time;
+    my $b = $a^time/3;
+}
+
+exit 0;

@@ -1,0 +1,65 @@
+#!/usr/bin/env perl
+use common::sense;
+use AnyEvent::Impl::Perl;
+use AnyEvent;
+use AnyEvent::IRC::Connection;
+
+my $c = AnyEvent->condvar;
+
+my $con = AnyEvent::IRC::Connection->new;
+
+
+my ($nick, $user, $real) = qw/BinDepp BinDepp depp/;
+
+$con->reg_cb (irc_001 => sub {
+   my ($con) = @_;
+   $con->event ('welcome'); # emit a self defined event
+});
+
+# display all irc messages for debugging
+$con->reg_cb ('irc_*' => sub {
+   my @p = @{delete $_[1]->{params} || []};
+   warn "DEBUG: " . join ('|', %{$_[1]}, @p) . "\n";
+});
+$con->reg_cb ('sent'  => sub {
+   shift; warn "DEBUG SENT: " . join ('|', @_) . "\n";
+});
+
+# we register now a callback on our self defined event
+$con->reg_cb (welcome => sub {
+   my ($con) = @_;
+   $con->send_msg ("PRIVMSG", "elmex", "Hi!!!");
+});
+
+# Disconnect after 10 seconds:
+my $t;
+$t = AnyEvent->timer (after => 10, cb => sub {
+   $con->disconnect ("Timeout exceeded");
+   undef $t;
+});
+
+# lets register connect and disconnect handlers.
+$con->reg_cb (
+   connect => sub {
+      my ($con, $err) = @_;
+
+      if (defined $err) {
+         warn "Connect ERROR! => $err\n";
+         $c->broadcast;
+      } else {
+         warn "Connected! Yay!\n";
+      }
+
+      # send IRC registration
+      $con->send_msg ("NICK", $nick);
+      $con->send_msg ("USER", $user || $nick, "*", "0", $real || $nick);
+   },
+   disconnect => sub {
+      warn "Oh, got a disconnect: $_[1], exiting...\n";
+      $c->broadcast;
+   }
+);
+
+$con->connect ("localhost", 6667);
+
+$c->wait;

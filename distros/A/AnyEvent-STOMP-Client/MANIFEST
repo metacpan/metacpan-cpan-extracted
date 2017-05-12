@@ -1,0 +1,13 @@
+Changes
+examples/basic.pl
+examples/connection_handling.pl
+examples/sample-consumer.pl
+examples/sample-producer.pl
+lib/AnyEvent/STOMP/Client.pm
+lib/AnyEvent/STOMP/Client/All.pm
+lib/AnyEvent/STOMP/Client/Any.pm
+Makefile.PL
+MANIFEST
+README.pod
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

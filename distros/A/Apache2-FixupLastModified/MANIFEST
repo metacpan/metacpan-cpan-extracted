@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Apache2/FixupLastModified.pm
+t/pod-coverage.t
+t/pod.t
+t/00-load.t
+t/conf/extra.last.conf.in
+t/response/Does_It_Work.pm
+t/TEST.PL
+META.yml                                 Module meta-data (added by MakeMaker)

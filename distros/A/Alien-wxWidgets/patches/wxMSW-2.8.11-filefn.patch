@@ -1,0 +1,31 @@
+--- include/wx/filefn.h	2010-04-15 10:02:45.000000000 +0100
++++ include/wx/filefn.h	2010-04-24 06:33:37.318000000 +0100
+@@ -180,10 +180,19 @@
+     #endif
+ 
+     // detect compilers which have support for huge stdio files
++
+     #if defined __VISUALC__ && __VISUALC__ >= 1400
++      #if defined __WIN64__
++        #if __VISUALC__ >= 1500
+         #define wxHAS_HUGE_STDIO_FILES
+         #define wxFseek _fseeki64
+         #define wxFtell _ftelli64
++        #endif
++      #else
++        #define wxHAS_HUGE_STDIO_FILES
++        #define wxFseek _fseeki64
++        #define wxFtell _ftelli64
++      #endif
+     #elif wxCHECK_MINGW32_VERSION(3, 5) // mingw-runtime version (not gcc)
+         #define wxHAS_HUGE_STDIO_FILES
+         #define wxFseek fseeko64
+@@ -210,7 +219,7 @@
+     // to avoid using them as they're not present in earlier versions and
+     // always using the native functions spelling is easier than testing for
+     // the versions
+-    #if defined(__BORLANDC__) || defined(__DMC__) || defined(__WATCOMC__) || defined(__MINGW64__)
++    #if defined(__BORLANDC__) || defined(__DMC__) || defined(__WATCOMC__)
+         #define wxPOSIX_IDENT(func)    ::func
+     #else // by default assume MSVC-compatible names
+         #define wxPOSIX_IDENT(func)    _ ## func

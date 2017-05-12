@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Audio/Radio/Sirius.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/checksum.t
+t/song_updates.t
+Makefile.PL

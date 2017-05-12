@@ -1,0 +1,77 @@
+[% s.add_js('check') %]
+<form method="POST" action="[% s.uo %]/save" name="form">
+[% s.html_hidden(s.o.id,hash.${s.o.id}) %]
+<div class="floatleft">
+<table>
+	<caption>[% s.object %]</caption>
+	<tbody>
+	<tr>
+		<th>ID</th>
+		<td>[% s.html_display_link(s.object,hash.${s.o.id},hash.${s.o.id}) %]</td>
+	</tr>
+[% FOREACH f IN s.o.fields -%]
+	<tr>
+		<th>[% f.t %]</th>
+		<td>
+	[% IF f.noedit %]
+		[% hash.${f.k} %]
+	[% ELSIF f.r -%]
+		[% IF f.notnull %]
+			[% s.html_select(hash.menu.${f.r},f.i,'id','name',hash.${f.i}) %]
+		[% ELSE %]
+			[% s.html_select(hash.menu.${f.r},f.i,'id','name',hash.${f.i},1) %]
+		[% END %]
+	[% ELSIF f.boolean %]
+		[% s.html_checkbox(f.k,1,hash.${f.k}) %]
+	[% ELSIF f.textarea %]
+		[% s.html_textarea(f.k,hash.${f.k},40,10) %]
+	[% ELSIF f.v %]
+		[% IF f.notnull %]
+			[% s.html_select_basic(f.v,f.k,hash.${f.k}) %]
+		[% ELSE %]
+			[% s.html_select_basic(f.v,f.k,hash.${f.k},1) %]
+		[% END %]
+	[% ELSIF f.calendar %]
+		[% s.html_input_calendar(f.k,hash.${f.k}) %]
+	[% ELSE %]
+		[% IF f.verify == 'phone' %]
+			[% s.html_input(f.k,s.format_phone(hash.${f.k}),f.input_size) %]
+		[% ELSE %]
+			[% s.html_input(f.k,hash.${f.k},f.input_size) %]
+		[% END %]
+	[% END %]
+		</td>
+	</tr>
+	</tbody>
+[% END -%]
+</table>
+</div>
+[% FOREACH r IN s.o.relations -%]
+<div class="floatleft">
+<table>
+	<caption>[% r.title || r.t %]</caption>
+	<thead>
+	<tr>
+		<th>[% r.n %]</th>
+	</tr>
+	<tr>
+		<th class='shead'>
+		<a href="#" onClick="javascript: check('[% r.t %]',true); return false;" class="action">Check All</a>
+		<a href="#" onClick="javascript: check('[% r.t %]',false); return false;" class="action">UnCheck All</a>
+		</th>
+	</tr>
+	</thead>
+	<tbody>
+	[% FOREACH d IN hash.relation.${r.t} -%]
+		<tr>
+			<td>
+				<input type="checkbox" value="1" name="[% r.t %]:[% d.${r.k} %]"[% IF d.checked %] checked[% END %]>[% d.${r.n} %]
+			</td>
+		</tr>
+	[% END -%]
+	</tbody>
+</table>
+</div>
+[% END -%]
+<input type="submit" value="Save" style="clear: both;">
+</form>

@@ -1,0 +1,35 @@
+Apache-AuthLDAPBind
+
+This is an authentication module for Apache 1.3 (and mod_perl) that
+authenticates a user to an LDAP server by binding as that user (with
+his supplied password).  If the bind succeeds, the user is
+authenticated.  If not, authentication fails.
+
+This is much more secure than the usual method of checking the
+password against a hash, since there's no possibility that the hash
+will be viewed while in transit (or worse, simply pulled out of the
+LDAP database by an attacker), or that the client somehow miscomputes
+the hash (since there are a variety of algorithms for password
+hashes).  
+
+Since passwords are being sent to the LDAP server over the network,
+the server is required to support SSL.  Authentications will fail if
+the server doesn't support StartTLS.  Cutting corners is not an option
+when dealing with passwords!
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Jonathan T. Rockway
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

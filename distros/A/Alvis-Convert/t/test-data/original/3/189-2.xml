@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentCollection  xmlns="http://alvis.info/enriched/" version="1.1">
+<documentRecord id="706D87D704893B9A3B40C28AC3620991" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1141065628996</modifiedDate>
+        <httpServer>Apache</httpServer>
+        <urls>
+          <url>http://blog.searchenginewatch.com/blog/0505</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>If you've been wanting an option to keyword search your Gmail using Google's desktop search tool, your wait is over. A 105K plug-in was made available late last week on the GDS site called, "Larry's Gmail Indexer" (beta). It uses GMail's POP access feature to make your Gmail indexable. It's developer, Larry Gadea has more info and links to other GDS plug-ins on his site.</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Search Your Gmail with Google Desktop Search</meta>
+        <meta name="dc:date">2005-05-01</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>desktop search</anchorText>
+            <location>http://desktop.google.com</location>
+          </link>
+          <link type="a">
+            <anchorText>"Larry's Gmail Indexer"</anchorText>
+            <location>http://desktop.google.com/plugins/gmail.html</location>
+          </link>
+          <link type="a">
+            <anchorText>on his site</anchorText>
+            <location>http://www.trivex.net/</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  </documentRecord>
+</documentCollection>

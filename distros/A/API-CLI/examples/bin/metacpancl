@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.010;
+use Data::Dumper;
+use FindBin '$Bin';
+use lib "$Bin/../../lib";
+
+use API::CLI::App::Spec;
+
+package API::CLI::MetaCPAN;
+use base 'API::CLI';
+
+sub add_auth {
+}
+
+package main;
+
+my $appspec_file = "$Bin/../metacpancl-appspec.yaml";
+my $spec = API::CLI::App::Spec->read($appspec_file);
+my $runner = App::Spec::Run->new(
+    spec => $spec,
+    cmd => API::CLI::MetaCPAN->new(
+        dir => "$ENV{HOME}/.githubcl",
+    ),
+);
+$runner->run;

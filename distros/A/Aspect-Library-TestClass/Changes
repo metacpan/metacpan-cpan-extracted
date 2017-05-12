@@ -1,0 +1,19 @@
+Changes for Perl extensions Aspect-Library-TestClass
+
+1.00 Thu 26 May 2011
+	- Updating to 1.00 to indicate a stable release synced to Aspect 1.00
+
+0.98 Tue 24 May 2011 - Adam Kennedy
+	- Updated to Module::Install 1.01
+	- Updated to match syntax changes in Aspect 0.98
+
+0.37 Wed 18 May 2011 - Adam Kennedy
+	- Removed use of deprecated append_param method
+
+0.36 Wed 13 Jan 2010 - Adam Kennedy
+	- Updated to match API changes in Aspect 0.36
+
+0.32 Thu  7 Jan 2010 - Adam Kennedy
+	- Extracted from the main Aspect distribution to allow the removal
+	  of the Test::Class dependency, now we are no longer using Test::Class
+	  for testing in the main Aspect distribution

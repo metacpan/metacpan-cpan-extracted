@@ -1,0 +1,25 @@
+---
+abstract: 'Command wrapper around L<FileDedup> using MooseX::App::Simple'
+author:
+  - 'Hunter McMillen <mcmillhj@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-FileDedup
+requires:
+  File::Dedup: '0'
+  MooseX::App::Simple: '0'
+  MooseX::Types::Moose: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/mcmillhj/%{dist}/issues
+  homepage: https://metacpan.org/release/%{dist}
+  repository: git://github.com/mcmillhj/%{dist}.git
+version: '0.001'

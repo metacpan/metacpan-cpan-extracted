@@ -1,0 +1,5 @@
+Revision history for Perl extension Acme::MorseComments.
+
+1.00  Mon Jul 17 14:54:35 2006
+	- original version; created by h2xs 1.23 with options
+		-X -b 5.0.0 -n Acme::MorseComments

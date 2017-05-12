@@ -1,0 +1,132 @@
+NAME
+     Apache::Authen::Generic - A generic authentication handler for
+       the Apache webserver (under mod_perl)
+
+SYNOPSIS
+        # httpd.conf
+        PerlModule Apache::Authen::Generic
+        <Location /cgi-bin/secure>
+                AuthType Basic
+                AuthName "Test Login"
+                PerlAuthenHandler Apache::Authen::Generic->authenticate
+                require valid-user
+                PerlSetVar generic_auth_cipher_key abcdefghijklmnopqrstuvwxyz012345
+                PerlSetVar generic_auth_failed_url "/cgi-bin/login/login_form.cgi"
+                PerlSetVar generic_auth_allow_url "^/cgi-bin/login"
+                PerlSetVar generic_auth_cookie_name test_cookie
+                PerlSetVar generic_auth_ref_url_var ref_url
+                PerlSetVar generic_auth_set_cookie_env 1
+        </Location>
+
+        # cgi script
+        use Apache::Authen::Generic;
+        my $auth_obj = Apache::Authen::Generic->new;
+        if (&check_login($user, $pwd)) {
+            my $cookie = $auth_obj->($data, $key);
+            print "Set-Cookie: $cookie\n";
+            print "Location: $redirect_url\n";
+            print "\n";
+        } else {
+            &handle_invalid_password()
+        }
+
+     # Efforts have been made to make this module work under Apache
+     # 1.3.* and mod_perl 1.0, but it has only been tested under
+     # Apache 2.0.* and mod_perl 2.0.
+
+DESCRIPTION
+  Variables to set in the Apache configuration file
+     The following are variables to be set in the Apache
+     configuration file with the PerlSetVar directive.
+
+   generic_auth_cipher_key
+     This is the encryption key used for encrypting the cookies used
+     to verify authentication.  It must be 32 bytes (256-bit).  The
+     encryption used is AES-256 and uses an SHA1 digest to verify
+     data integrity.
+
+   generic_auth_failed_url
+     This is the url users are be redirected to if they have not been
+     authenticated (typically a login page).  This url can be
+     relative.
+
+   generic_auth_allow_url
+     This is a regular expression that will be run against the URI
+     the user is trying to access.  If a match occurs, the user will
+     be allowed through, as if the user had been authenticated.  This
+     is useful for allowing the user to access the login page and to
+     allow access to other public pages.
+
+   generic_auth_cookie_name
+     This is the name of the cookie that will be used to verify
+     authentication.  This must match the name passed to the
+     generateAuthCookie() method when using a CGI script for the
+     login process.
+
+   generic_auth_ref_url_var
+     This is the name of the field the handler will use to pass the
+     current URI to the authentication failed page.  This is useful
+     for redirecting the user to the page the user was originally
+     trying to access when prompted with the login page.
+
+   generic_auth_set_cookie_env
+     If this is set to a true value, and the first argument passed to
+     the generateAuthCookie() method is a hash, those values will be
+     available to your CGI scripts as environment variables whose
+     names are the keys of the hash prefixed with the cookie name (as
+     set by generic_auth_cookie_name) and an underscore.
+
+METHODS
+  generateAuthCookie($data, $key, $cookie_params, $cookie_name)
+     This method is used to generate the authentication cookie from a
+     CGI script.  The return value is the value to set for the header
+     Set-Cookie without the end of line sequence, e.g.,
+
+         my $cookie = $auth_obj->($data, $key);
+         print "Set-Cookie: $cookie\n";
+         print "Location: $redirect_url\n";
+         print "\n";
+
+     The value for $key must be the same value assigned to
+     generic_auth_cipher_key in the webserver configuration.
+
+     if $data is a reference to a hash and the
+     generic_auth_set_cookie_env variable is set to a true value in
+     the Apache configuration, the values from the hash will be
+     available to your CGI scripts as environment variables whose
+     names are the keys of the hash prefixed with the cookie name (as
+     set by generic_auth_cookie_name) and an underscore.
+
+  authenticate($request_obj)
+     The main interface to this module.  This is the method to be
+     called as the authentication handler.  If you wish to subclass
+     this module, the following information may be useful.
+
+     The steps in authenticate() are as follows:
+
+       1) Instantiates an Apache::Authen::Generic object by calling
+          the new() method.
+       2) Check if the user is already authenticated
+          Calls $self->checkAlreadyAuthenticated($request_obj)
+          Returns OK if return value is true
+       3) Check if the current URI is always allowed through
+          Calls $self->checkGloballyAllowedUrls($req)
+          Returns OK if return value is true
+       4) Redirect to login page if the above steps fail
+          Calls $self->redirectToAuthFailedPage($req)
+          Sets a Location header and returns OK
+
+EXAMPLES
+AUTHOR
+     Don Owens <don@owensnet.com>
+
+COPYRIGHT
+     Copyright (c) 2003 Don Owens
+
+     All rights reserved. This program is free software; you can
+     redistribute it and/or modify it under the same terms as Perl
+     itself.
+
+VERSION
+     0.01
+

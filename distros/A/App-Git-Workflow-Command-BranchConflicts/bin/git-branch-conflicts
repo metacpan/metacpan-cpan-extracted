@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+# Created on: 2015-04-12 06:56:45
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use App::Git::Workflow::Command::BranchConflicts;
+
+App::Git::Workflow::Command::BranchConflicts->run();
+
+__DATA__
+

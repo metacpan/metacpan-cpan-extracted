@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+# vim: set sw=4 sts=4 ai:
+
+use strict;
+use warnings;
+use App::HTTP_Proxy_IMP;
+App::HTTP_Proxy_IMP->start(@ARGV);

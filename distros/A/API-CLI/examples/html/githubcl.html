@@ -1,0 +1,3151 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#ABSTRACT">ABSTRACT</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#GLOBAL-OPTIONS">GLOBAL OPTIONS</a></li>
+      <li><a href="#SUBCOMMANDS">SUBCOMMANDS</a>
+        <ul>
+          <li><a href="#DELETE">DELETE</a></li>
+          <li><a href="#DELETE-gists-:id">DELETE /gists/:id</a></li>
+          <li><a href="#DELETE-gists-:id-comments-:commentId">DELETE /gists/:id/comments/:commentId</a></li>
+          <li><a href="#DELETE-gists-:id-star">DELETE /gists/:id/star</a></li>
+          <li><a href="#DELETE-notifications-threads-:id-subscription">DELETE /notifications/threads/:id/subscription</a></li>
+          <li><a href="#DELETE-orgs-:org-members-:username">DELETE /orgs/:org/members/:username</a></li>
+          <li><a href="#DELETE-orgs-:org-public_members-:username">DELETE /orgs/:org/public_members/:username</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo">DELETE /repos/:owner/:repo</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-collaborators-:user">DELETE /repos/:owner/:repo/collaborators/:user</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-comments-:commentId">DELETE /repos/:owner/:repo/comments/:commentId</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-contents-:path">DELETE /repos/:owner/:repo/contents/:path</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-downloads-:downloadId">DELETE /repos/:owner/:repo/downloads/:downloadId</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-git-refs-:ref">DELETE /repos/:owner/:repo/git/refs/:ref</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-hooks-:hookId">DELETE /repos/:owner/:repo/hooks/:hookId</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-issues-:number-labels">DELETE /repos/:owner/:repo/issues/:number/labels</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-issues-:number-labels-:name">DELETE /repos/:owner/:repo/issues/:number/labels/:name</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-issues-comments-:commentId">DELETE /repos/:owner/:repo/issues/comments/:commentId</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-keys-:keyId">DELETE /repos/:owner/:repo/keys/:keyId</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-labels-:name">DELETE /repos/:owner/:repo/labels/:name</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-milestones-:number">DELETE /repos/:owner/:repo/milestones/:number</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-pulls-comments-:commentId">DELETE /repos/:owner/:repo/pulls/comments/:commentId</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-releases-:id">DELETE /repos/:owner/:repo/releases/:id</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-releases-assets-:id">DELETE /repos/:owner/:repo/releases/assets/:id</a></li>
+          <li><a href="#DELETE-repos-:owner-:repo-subscription">DELETE /repos/:owner/:repo/subscription</a></li>
+          <li><a href="#DELETE-teams-:teamId">DELETE /teams/:teamId</a></li>
+          <li><a href="#DELETE-teams-:teamId-members-:username">DELETE /teams/:teamId/members/:username</a></li>
+          <li><a href="#DELETE-teams-:teamId-memberships-:username">DELETE /teams/:teamId/memberships/:username</a></li>
+          <li><a href="#DELETE-teams-:teamId-repos-:owner-:repo">DELETE /teams/:teamId/repos/:owner/:repo</a></li>
+          <li><a href="#DELETE-user-emails">DELETE /user/emails</a></li>
+          <li><a href="#DELETE-user-following-:username">DELETE /user/following/:username</a></li>
+          <li><a href="#DELETE-user-keys-:keyId">DELETE /user/keys/:keyId</a></li>
+          <li><a href="#DELETE-user-starred-:owner-:repo">DELETE /user/starred/:owner/:repo</a></li>
+          <li><a href="#DELETE-user-subscriptions-:owner-:repo">DELETE /user/subscriptions/:owner/:repo</a></li>
+          <li><a href="#GET">GET</a></li>
+          <li><a href="#GET-emojis">GET /emojis</a></li>
+          <li><a href="#GET-events">GET /events</a></li>
+          <li><a href="#GET-feeds">GET /feeds</a></li>
+          <li><a href="#GET-gists">GET /gists</a></li>
+          <li><a href="#GET-gists-:id">GET /gists/:id</a></li>
+          <li><a href="#GET-gists-:id-comments">GET /gists/:id/comments</a></li>
+          <li><a href="#GET-gists-:id-comments-:commentId">GET /gists/:id/comments/:commentId</a></li>
+          <li><a href="#GET-gists-:id-star">GET /gists/:id/star</a></li>
+          <li><a href="#GET-gists-public">GET /gists/public</a></li>
+          <li><a href="#GET-gists-starred">GET /gists/starred</a></li>
+          <li><a href="#GET-gitignore-templates">GET /gitignore/templates</a></li>
+          <li><a href="#GET-gitignore-templates-:language">GET /gitignore/templates/:language</a></li>
+          <li><a href="#GET-issues">GET /issues</a></li>
+          <li><a href="#GET-legacy-issues-search-:owner-:repository-:state-:keyword">GET /legacy/issues/search/:owner/:repository/:state/:keyword</a></li>
+          <li><a href="#GET-legacy-repos-search-:keyword">GET /legacy/repos/search/:keyword</a></li>
+          <li><a href="#GET-legacy-user-email-:email">GET /legacy/user/email/:email</a></li>
+          <li><a href="#GET-legacy-user-search-:keyword">GET /legacy/user/search/:keyword</a></li>
+          <li><a href="#GET-meta">GET /meta</a></li>
+          <li><a href="#GET-networks-:owner-:repo-events">GET /networks/:owner/:repo/events</a></li>
+          <li><a href="#GET-notifications">GET /notifications</a></li>
+          <li><a href="#GET-notifications-threads-:id">GET /notifications/threads/:id</a></li>
+          <li><a href="#GET-notifications-threads-:id-subscription">GET /notifications/threads/:id/subscription</a></li>
+          <li><a href="#GET-orgs-:org">GET /orgs/:org</a></li>
+          <li><a href="#GET-orgs-:org-events">GET /orgs/:org/events</a></li>
+          <li><a href="#GET-orgs-:org-issues">GET /orgs/:org/issues</a></li>
+          <li><a href="#GET-orgs-:org-members">GET /orgs/:org/members</a></li>
+          <li><a href="#GET-orgs-:org-members-:username">GET /orgs/:org/members/:username</a></li>
+          <li><a href="#GET-orgs-:org-public_members">GET /orgs/:org/public_members</a></li>
+          <li><a href="#GET-orgs-:org-public_members-:username">GET /orgs/:org/public_members/:username</a></li>
+          <li><a href="#GET-orgs-:org-repos">GET /orgs/:org/repos</a></li>
+          <li><a href="#GET-orgs-:org-teams">GET /orgs/:org/teams</a></li>
+          <li><a href="#GET-rate_limit">GET /rate_limit</a></li>
+          <li><a href="#GET-repos-:owner-:repo">GET /repos/:owner/:repo</a></li>
+          <li><a href="#GET-repos-:owner-:repo-:archive_format-:path">GET /repos/:owner/:repo/:archive_format/:path</a></li>
+          <li><a href="#GET-repos-:owner-:repo-assignees">GET /repos/:owner/:repo/assignees</a></li>
+          <li><a href="#GET-repos-:owner-:repo-assignees-:assignee">GET /repos/:owner/:repo/assignees/:assignee</a></li>
+          <li><a href="#GET-repos-:owner-:repo-branches">GET /repos/:owner/:repo/branches</a></li>
+          <li><a href="#GET-repos-:owner-:repo-branches-:branch">GET /repos/:owner/:repo/branches/:branch</a></li>
+          <li><a href="#GET-repos-:owner-:repo-collaborators">GET /repos/:owner/:repo/collaborators</a></li>
+          <li><a href="#GET-repos-:owner-:repo-collaborators-:user">GET /repos/:owner/:repo/collaborators/:user</a></li>
+          <li><a href="#GET-repos-:owner-:repo-comments">GET /repos/:owner/:repo/comments</a></li>
+          <li><a href="#GET-repos-:owner-:repo-comments-:commentId">GET /repos/:owner/:repo/comments/:commentId</a></li>
+          <li><a href="#GET-repos-:owner-:repo-commits">GET /repos/:owner/:repo/commits</a></li>
+          <li><a href="#GET-repos-:owner-:repo-commits-:ref-status">GET /repos/:owner/:repo/commits/:ref/status</a></li>
+          <li><a href="#GET-repos-:owner-:repo-commits-:shaCode">GET /repos/:owner/:repo/commits/:shaCode</a></li>
+          <li><a href="#GET-repos-:owner-:repo-commits-:shaCode-comments">GET /repos/:owner/:repo/commits/:shaCode/comments</a></li>
+          <li><a href="#GET-repos-:owner-:repo-compare-:baseId...:headId">GET /repos/:owner/:repo/compare/:baseId...:headId</a></li>
+          <li><a href="#GET-repos-:owner-:repo-contents-:path">GET /repos/:owner/:repo/contents/:path</a></li>
+          <li><a href="#GET-repos-:owner-:repo-contributors">GET /repos/:owner/:repo/contributors</a></li>
+          <li><a href="#GET-repos-:owner-:repo-deployments">GET /repos/:owner/:repo/deployments</a></li>
+          <li><a href="#GET-repos-:owner-:repo-deployments-:id-statuses">GET /repos/:owner/:repo/deployments/:id/statuses</a></li>
+          <li><a href="#GET-repos-:owner-:repo-downloads">GET /repos/:owner/:repo/downloads</a></li>
+          <li><a href="#GET-repos-:owner-:repo-downloads-:downloadId">GET /repos/:owner/:repo/downloads/:downloadId</a></li>
+          <li><a href="#GET-repos-:owner-:repo-events">GET /repos/:owner/:repo/events</a></li>
+          <li><a href="#GET-repos-:owner-:repo-forks">GET /repos/:owner/:repo/forks</a></li>
+          <li><a href="#GET-repos-:owner-:repo-git-blobs-:shaCode">GET /repos/:owner/:repo/git/blobs/:shaCode</a></li>
+          <li><a href="#GET-repos-:owner-:repo-git-commits-:shaCode">GET /repos/:owner/:repo/git/commits/:shaCode</a></li>
+          <li><a href="#GET-repos-:owner-:repo-git-refs">GET /repos/:owner/:repo/git/refs</a></li>
+          <li><a href="#GET-repos-:owner-:repo-git-refs-:ref">GET /repos/:owner/:repo/git/refs/:ref</a></li>
+          <li><a href="#GET-repos-:owner-:repo-git-tags-:shaCode">GET /repos/:owner/:repo/git/tags/:shaCode</a></li>
+          <li><a href="#GET-repos-:owner-:repo-git-trees-:shaCode">GET /repos/:owner/:repo/git/trees/:shaCode</a></li>
+          <li><a href="#GET-repos-:owner-:repo-hooks">GET /repos/:owner/:repo/hooks</a></li>
+          <li><a href="#GET-repos-:owner-:repo-hooks-:hookId">GET /repos/:owner/:repo/hooks/:hookId</a></li>
+          <li><a href="#GET-repos-:owner-:repo-issues">GET /repos/:owner/:repo/issues</a></li>
+          <li><a href="#GET-repos-:owner-:repo-issues-:number">GET /repos/:owner/:repo/issues/:number</a></li>
+          <li><a href="#GET-repos-:owner-:repo-issues-:number-comments">GET /repos/:owner/:repo/issues/:number/comments</a></li>
+          <li><a href="#GET-repos-:owner-:repo-issues-:number-events">GET /repos/:owner/:repo/issues/:number/events</a></li>
+          <li><a href="#GET-repos-:owner-:repo-issues-:number-labels">GET /repos/:owner/:repo/issues/:number/labels</a></li>
+          <li><a href="#GET-repos-:owner-:repo-issues-comments">GET /repos/:owner/:repo/issues/comments</a></li>
+          <li><a href="#GET-repos-:owner-:repo-issues-comments-:commentId">GET /repos/:owner/:repo/issues/comments/:commentId</a></li>
+          <li><a href="#GET-repos-:owner-:repo-issues-events">GET /repos/:owner/:repo/issues/events</a></li>
+          <li><a href="#GET-repos-:owner-:repo-issues-events-:eventId">GET /repos/:owner/:repo/issues/events/:eventId</a></li>
+          <li><a href="#GET-repos-:owner-:repo-keys">GET /repos/:owner/:repo/keys</a></li>
+          <li><a href="#GET-repos-:owner-:repo-keys-:keyId">GET /repos/:owner/:repo/keys/:keyId</a></li>
+          <li><a href="#GET-repos-:owner-:repo-labels">GET /repos/:owner/:repo/labels</a></li>
+          <li><a href="#GET-repos-:owner-:repo-labels-:name">GET /repos/:owner/:repo/labels/:name</a></li>
+          <li><a href="#GET-repos-:owner-:repo-languages">GET /repos/:owner/:repo/languages</a></li>
+          <li><a href="#GET-repos-:owner-:repo-milestones">GET /repos/:owner/:repo/milestones</a></li>
+          <li><a href="#GET-repos-:owner-:repo-milestones-:number">GET /repos/:owner/:repo/milestones/:number</a></li>
+          <li><a href="#GET-repos-:owner-:repo-milestones-:number-labels">GET /repos/:owner/:repo/milestones/:number/labels</a></li>
+          <li><a href="#GET-repos-:owner-:repo-notifications">GET /repos/:owner/:repo/notifications</a></li>
+          <li><a href="#GET-repos-:owner-:repo-pulls">GET /repos/:owner/:repo/pulls</a></li>
+          <li><a href="#GET-repos-:owner-:repo-pulls-:number">GET /repos/:owner/:repo/pulls/:number</a></li>
+          <li><a href="#GET-repos-:owner-:repo-pulls-:number-comments">GET /repos/:owner/:repo/pulls/:number/comments</a></li>
+          <li><a href="#GET-repos-:owner-:repo-pulls-:number-commits">GET /repos/:owner/:repo/pulls/:number/commits</a></li>
+          <li><a href="#GET-repos-:owner-:repo-pulls-:number-files">GET /repos/:owner/:repo/pulls/:number/files</a></li>
+          <li><a href="#GET-repos-:owner-:repo-pulls-:number-merge">GET /repos/:owner/:repo/pulls/:number/merge</a></li>
+          <li><a href="#GET-repos-:owner-:repo-pulls-comments">GET /repos/:owner/:repo/pulls/comments</a></li>
+          <li><a href="#GET-repos-:owner-:repo-pulls-comments-:commentId">GET /repos/:owner/:repo/pulls/comments/:commentId</a></li>
+          <li><a href="#GET-repos-:owner-:repo-readme">GET /repos/:owner/:repo/readme</a></li>
+          <li><a href="#GET-repos-:owner-:repo-releases">GET /repos/:owner/:repo/releases</a></li>
+          <li><a href="#GET-repos-:owner-:repo-releases-:id">GET /repos/:owner/:repo/releases/:id</a></li>
+          <li><a href="#GET-repos-:owner-:repo-releases-:id-assets">GET /repos/:owner/:repo/releases/:id/assets</a></li>
+          <li><a href="#GET-repos-:owner-:repo-releases-assets-:id">GET /repos/:owner/:repo/releases/assets/:id</a></li>
+          <li><a href="#GET-repos-:owner-:repo-stargazers">GET /repos/:owner/:repo/stargazers</a></li>
+          <li><a href="#GET-repos-:owner-:repo-stats-code_frequency">GET /repos/:owner/:repo/stats/code_frequency</a></li>
+          <li><a href="#GET-repos-:owner-:repo-stats-commit_activity">GET /repos/:owner/:repo/stats/commit_activity</a></li>
+          <li><a href="#GET-repos-:owner-:repo-stats-contributors">GET /repos/:owner/:repo/stats/contributors</a></li>
+          <li><a href="#GET-repos-:owner-:repo-stats-participation">GET /repos/:owner/:repo/stats/participation</a></li>
+          <li><a href="#GET-repos-:owner-:repo-stats-punch_card">GET /repos/:owner/:repo/stats/punch_card</a></li>
+          <li><a href="#GET-repos-:owner-:repo-statuses-:ref">GET /repos/:owner/:repo/statuses/:ref</a></li>
+          <li><a href="#GET-repos-:owner-:repo-subscribers">GET /repos/:owner/:repo/subscribers</a></li>
+          <li><a href="#GET-repos-:owner-:repo-subscription">GET /repos/:owner/:repo/subscription</a></li>
+          <li><a href="#GET-repos-:owner-:repo-tags">GET /repos/:owner/:repo/tags</a></li>
+          <li><a href="#GET-repos-:owner-:repo-teams">GET /repos/:owner/:repo/teams</a></li>
+          <li><a href="#GET-repos-:owner-:repo-watchers">GET /repos/:owner/:repo/watchers</a></li>
+          <li><a href="#GET-repositories">GET /repositories</a></li>
+          <li><a href="#GET-search-code">GET /search/code</a></li>
+          <li><a href="#GET-search-issues">GET /search/issues</a></li>
+          <li><a href="#GET-search-repositories">GET /search/repositories</a></li>
+          <li><a href="#GET-search-users">GET /search/users</a></li>
+          <li><a href="#GET-teams-:teamId">GET /teams/:teamId</a></li>
+          <li><a href="#GET-teams-:teamId-members">GET /teams/:teamId/members</a></li>
+          <li><a href="#GET-teams-:teamId-members-:username">GET /teams/:teamId/members/:username</a></li>
+          <li><a href="#GET-teams-:teamId-memberships-:username">GET /teams/:teamId/memberships/:username</a></li>
+          <li><a href="#GET-teams-:teamId-repos">GET /teams/:teamId/repos</a></li>
+          <li><a href="#GET-teams-:teamId-repos-:owner-:repo">GET /teams/:teamId/repos/:owner/:repo</a></li>
+          <li><a href="#GET-user">GET /user</a></li>
+          <li><a href="#GET-user-emails">GET /user/emails</a></li>
+          <li><a href="#GET-user-followers">GET /user/followers</a></li>
+          <li><a href="#GET-user-following">GET /user/following</a></li>
+          <li><a href="#GET-user-following-:username">GET /user/following/:username</a></li>
+          <li><a href="#GET-user-issues">GET /user/issues</a></li>
+          <li><a href="#GET-user-keys">GET /user/keys</a></li>
+          <li><a href="#GET-user-keys-:keyId">GET /user/keys/:keyId</a></li>
+          <li><a href="#GET-user-orgs">GET /user/orgs</a></li>
+          <li><a href="#GET-user-repos">GET /user/repos</a></li>
+          <li><a href="#GET-user-starred">GET /user/starred</a></li>
+          <li><a href="#GET-user-starred-:owner-:repo">GET /user/starred/:owner/:repo</a></li>
+          <li><a href="#GET-user-subscriptions">GET /user/subscriptions</a></li>
+          <li><a href="#GET-user-subscriptions-:owner-:repo">GET /user/subscriptions/:owner/:repo</a></li>
+          <li><a href="#GET-user-teams">GET /user/teams</a></li>
+          <li><a href="#GET-users">GET /users</a></li>
+          <li><a href="#GET-users-:username">GET /users/:username</a></li>
+          <li><a href="#GET-users-:username-events">GET /users/:username/events</a></li>
+          <li><a href="#GET-users-:username-events-orgs-:org">GET /users/:username/events/orgs/:org</a></li>
+          <li><a href="#GET-users-:username-followers">GET /users/:username/followers</a></li>
+          <li><a href="#GET-users-:username-following-:targetUser">GET /users/:username/following/:targetUser</a></li>
+          <li><a href="#GET-users-:username-gists">GET /users/:username/gists</a></li>
+          <li><a href="#GET-users-:username-keys">GET /users/:username/keys</a></li>
+          <li><a href="#GET-users-:username-orgs">GET /users/:username/orgs</a></li>
+          <li><a href="#GET-users-:username-received_events">GET /users/:username/received_events</a></li>
+          <li><a href="#GET-users-:username-received_events-public">GET /users/:username/received_events/public</a></li>
+          <li><a href="#GET-users-:username-repos">GET /users/:username/repos</a></li>
+          <li><a href="#GET-users-:username-starred">GET /users/:username/starred</a></li>
+          <li><a href="#GET-users-:username-subscriptions">GET /users/:username/subscriptions</a></li>
+          <li><a href="#PATCH">PATCH</a></li>
+          <li><a href="#PATCH-gists-:id">PATCH /gists/:id</a></li>
+          <li><a href="#PATCH-gists-:id-comments-:commentId">PATCH /gists/:id/comments/:commentId</a></li>
+          <li><a href="#PATCH-notifications-threads-:id">PATCH /notifications/threads/:id</a></li>
+          <li><a href="#PATCH-orgs-:org">PATCH /orgs/:org</a></li>
+          <li><a href="#PATCH-repos-:owner-:repo">PATCH /repos/:owner/:repo</a></li>
+          <li><a href="#PATCH-repos-:owner-:repo-comments-:commentId">PATCH /repos/:owner/:repo/comments/:commentId</a></li>
+          <li><a href="#PATCH-repos-:owner-:repo-git-refs-:ref">PATCH /repos/:owner/:repo/git/refs/:ref</a></li>
+          <li><a href="#PATCH-repos-:owner-:repo-hooks-:hookId">PATCH /repos/:owner/:repo/hooks/:hookId</a></li>
+          <li><a href="#PATCH-repos-:owner-:repo-issues-:number">PATCH /repos/:owner/:repo/issues/:number</a></li>
+          <li><a href="#PATCH-repos-:owner-:repo-issues-comments-:commentId">PATCH /repos/:owner/:repo/issues/comments/:commentId</a></li>
+          <li><a href="#PATCH-repos-:owner-:repo-labels-:name">PATCH /repos/:owner/:repo/labels/:name</a></li>
+          <li><a href="#PATCH-repos-:owner-:repo-milestones-:number">PATCH /repos/:owner/:repo/milestones/:number</a></li>
+          <li><a href="#PATCH-repos-:owner-:repo-pulls-:number">PATCH /repos/:owner/:repo/pulls/:number</a></li>
+          <li><a href="#PATCH-repos-:owner-:repo-pulls-comments-:commentId">PATCH /repos/:owner/:repo/pulls/comments/:commentId</a></li>
+          <li><a href="#PATCH-repos-:owner-:repo-releases-:id">PATCH /repos/:owner/:repo/releases/:id</a></li>
+          <li><a href="#PATCH-repos-:owner-:repo-releases-assets-:id">PATCH /repos/:owner/:repo/releases/assets/:id</a></li>
+          <li><a href="#PATCH-teams-:teamId">PATCH /teams/:teamId</a></li>
+          <li><a href="#PATCH-user">PATCH /user</a></li>
+          <li><a href="#POST">POST</a></li>
+          <li><a href="#POST-gists">POST /gists</a></li>
+          <li><a href="#POST-gists-:id-comments">POST /gists/:id/comments</a></li>
+          <li><a href="#POST-gists-:id-forks">POST /gists/:id/forks</a></li>
+          <li><a href="#POST-markdown">POST /markdown</a></li>
+          <li><a href="#POST-markdown-raw">POST /markdown/raw</a></li>
+          <li><a href="#POST-orgs-:org-repos">POST /orgs/:org/repos</a></li>
+          <li><a href="#POST-orgs-:org-teams">POST /orgs/:org/teams</a></li>
+          <li><a href="#POST-repos-:owner-:repo-commits-:shaCode-comments">POST /repos/:owner/:repo/commits/:shaCode/comments</a></li>
+          <li><a href="#POST-repos-:owner-:repo-deployments">POST /repos/:owner/:repo/deployments</a></li>
+          <li><a href="#POST-repos-:owner-:repo-deployments-:id-statuses">POST /repos/:owner/:repo/deployments/:id/statuses</a></li>
+          <li><a href="#POST-repos-:owner-:repo-forks">POST /repos/:owner/:repo/forks</a></li>
+          <li><a href="#POST-repos-:owner-:repo-git-blobs">POST /repos/:owner/:repo/git/blobs</a></li>
+          <li><a href="#POST-repos-:owner-:repo-git-commits">POST /repos/:owner/:repo/git/commits</a></li>
+          <li><a href="#POST-repos-:owner-:repo-git-refs">POST /repos/:owner/:repo/git/refs</a></li>
+          <li><a href="#POST-repos-:owner-:repo-git-tags">POST /repos/:owner/:repo/git/tags</a></li>
+          <li><a href="#POST-repos-:owner-:repo-git-trees">POST /repos/:owner/:repo/git/trees</a></li>
+          <li><a href="#POST-repos-:owner-:repo-hooks">POST /repos/:owner/:repo/hooks</a></li>
+          <li><a href="#POST-repos-:owner-:repo-hooks-:hookId-tests">POST /repos/:owner/:repo/hooks/:hookId/tests</a></li>
+          <li><a href="#POST-repos-:owner-:repo-issues">POST /repos/:owner/:repo/issues</a></li>
+          <li><a href="#POST-repos-:owner-:repo-issues-:number-comments">POST /repos/:owner/:repo/issues/:number/comments</a></li>
+          <li><a href="#POST-repos-:owner-:repo-issues-:number-labels">POST /repos/:owner/:repo/issues/:number/labels</a></li>
+          <li><a href="#POST-repos-:owner-:repo-keys">POST /repos/:owner/:repo/keys</a></li>
+          <li><a href="#POST-repos-:owner-:repo-labels">POST /repos/:owner/:repo/labels</a></li>
+          <li><a href="#POST-repos-:owner-:repo-merges">POST /repos/:owner/:repo/merges</a></li>
+          <li><a href="#POST-repos-:owner-:repo-milestones">POST /repos/:owner/:repo/milestones</a></li>
+          <li><a href="#POST-repos-:owner-:repo-pulls">POST /repos/:owner/:repo/pulls</a></li>
+          <li><a href="#POST-repos-:owner-:repo-pulls-:number-comments">POST /repos/:owner/:repo/pulls/:number/comments</a></li>
+          <li><a href="#POST-repos-:owner-:repo-releases">POST /repos/:owner/:repo/releases</a></li>
+          <li><a href="#POST-repos-:owner-:repo-statuses-:ref">POST /repos/:owner/:repo/statuses/:ref</a></li>
+          <li><a href="#POST-user-emails">POST /user/emails</a></li>
+          <li><a href="#POST-user-keys">POST /user/keys</a></li>
+          <li><a href="#POST-user-repos">POST /user/repos</a></li>
+          <li><a href="#PUT">PUT</a></li>
+          <li><a href="#PUT-gists-:id-star">PUT /gists/:id/star</a></li>
+          <li><a href="#PUT-notifications">PUT /notifications</a></li>
+          <li><a href="#PUT-notifications-threads-:id-subscription">PUT /notifications/threads/:id/subscription</a></li>
+          <li><a href="#PUT-orgs-:org-public_members-:username">PUT /orgs/:org/public_members/:username</a></li>
+          <li><a href="#PUT-repos-:owner-:repo-collaborators-:user">PUT /repos/:owner/:repo/collaborators/:user</a></li>
+          <li><a href="#PUT-repos-:owner-:repo-contents-:path">PUT /repos/:owner/:repo/contents/:path</a></li>
+          <li><a href="#PUT-repos-:owner-:repo-issues-:number-labels">PUT /repos/:owner/:repo/issues/:number/labels</a></li>
+          <li><a href="#PUT-repos-:owner-:repo-notifications">PUT /repos/:owner/:repo/notifications</a></li>
+          <li><a href="#PUT-repos-:owner-:repo-pulls-:number-merge">PUT /repos/:owner/:repo/pulls/:number/merge</a></li>
+          <li><a href="#PUT-repos-:owner-:repo-subscription">PUT /repos/:owner/:repo/subscription</a></li>
+          <li><a href="#PUT-teams-:teamId-members-:username">PUT /teams/:teamId/members/:username</a></li>
+          <li><a href="#PUT-teams-:teamId-memberships-:username">PUT /teams/:teamId/memberships/:username</a></li>
+          <li><a href="#PUT-teams-:teamId-repos-:org-:repo">PUT /teams/:teamId/repos/:org/:repo</a></li>
+          <li><a href="#PUT-user-following-:username">PUT /user/following/:username</a></li>
+          <li><a href="#PUT-user-starred-:owner-:repo">PUT /user/starred/:owner/:repo</a></li>
+          <li><a href="#PUT-user-subscriptions-:owner-:repo">PUT /user/subscriptions/:owner/:repo</a></li>
+          <li><a href="#help">help</a></li>
+          <li><a href="#meta">_meta</a></li>
+          <li><a href="#meta-completion">_meta completion</a></li>
+          <li><a href="#meta-completion-generate">_meta completion generate</a></li>
+          <li><a href="#meta-pod">_meta pod</a></li>
+          <li><a href="#meta-pod-generate">_meta pod generate</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>githubcl - GitHub</p>
+
+<h1 id="ABSTRACT">ABSTRACT</h1>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<h2 id="GLOBAL-OPTIONS">GLOBAL OPTIONS</h2>
+
+<pre><code>    --data-file     File with data for POST/PUT/PATCH/DELETE requests
+    --debug -d      debug (flag)                                     
+    --verbose -v    verbose (flag)                                   
+    --help -h       Show command help (flag)                         </code></pre>
+
+<h2 id="SUBCOMMANDS">SUBCOMMANDS</h2>
+
+<h3 id="DELETE">DELETE</h3>
+
+<pre><code>    githubcl  DELETE &lt;subcommands&gt;</code></pre>
+
+<p>DELETE call</p>
+
+<h3 id="DELETE-gists-:id">DELETE /gists/:id</h3>
+
+<pre><code>    githubcl DELETE /gists/:id &lt;id&gt;</code></pre>
+
+<p>Delete a gist.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id  *  Id of gist.</code></pre>
+
+<h3 id="DELETE-gists-:id-comments-:commentId">DELETE /gists/:id/comments/:commentId</h3>
+
+<pre><code>    githubcl DELETE /gists/:id/comments/:commentId &lt;id&gt; &lt;commentId&gt;</code></pre>
+
+<p>Delete a comment.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id         *  Id of gist.   
+    commentId  *  Id of comment.</code></pre>
+
+<h3 id="DELETE-gists-:id-star">DELETE /gists/:id/star</h3>
+
+<pre><code>    githubcl DELETE /gists/:id/star &lt;id&gt;</code></pre>
+
+<p>Unstar a gist.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id  *  Id of gist.</code></pre>
+
+<h3 id="DELETE-notifications-threads-:id-subscription">DELETE /notifications/threads/:id/subscription</h3>
+
+<pre><code>    githubcl DELETE /notifications/threads/:id/subscription &lt;id&gt;</code></pre>
+
+<p>Delete a Thread Subscription.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id  *  Id of thread.</code></pre>
+
+<h3 id="DELETE-orgs-:org-members-:username">DELETE /orgs/:org/members/:username</h3>
+
+<pre><code>    githubcl DELETE /orgs/:org/members/:username &lt;org&gt; &lt;username&gt;</code></pre>
+
+<p>Remove a member.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    org       *  Name of organisation.
+    username  *  Name of the user.    </code></pre>
+
+<h3 id="DELETE-orgs-:org-public_members-:username">DELETE /orgs/:org/public_members/:username</h3>
+
+<pre><code>    githubcl DELETE /orgs/:org/public_members/:username &lt;org&gt; &lt;username&gt;</code></pre>
+
+<p>Conceal a user&#39;s membership.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    org       *  Name of organisation.
+    username  *  Name of the user.    </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo">DELETE /repos/:owner/:repo</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Delete a Repository.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-collaborators-:user">DELETE /repos/:owner/:repo/collaborators/:user</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/collaborators/:user &lt;owner&gt; &lt;repo&gt; &lt;user&gt;</code></pre>
+
+<p>Remove collaborator.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    user   *  Login of the user.       </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-comments-:commentId">DELETE /repos/:owner/:repo/comments/:commentId</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/comments/:commentId &lt;owner&gt; &lt;repo&gt; &lt;commentId&gt;</code></pre>
+
+<p>Delete a commit comment</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  Id of comment.           </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-contents-:path">DELETE /repos/:owner/:repo/contents/:path</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/contents/:path &lt;owner&gt; &lt;repo&gt; &lt;path&gt;</code></pre>
+
+<p>Delete a file.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    path   *                           </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-downloads-:downloadId">DELETE /repos/:owner/:repo/downloads/:downloadId</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/downloads/:downloadId &lt;owner&gt; &lt;repo&gt; &lt;downloadId&gt;</code></pre>
+
+<p>Deprecated. Delete a download.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner       *  Name of repository owner.
+    repo        *  Name of repository.      
+    downloadId  *  Id of download.          </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-git-refs-:ref">DELETE /repos/:owner/:repo/git/refs/:ref</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/git/refs/:ref &lt;owner&gt; &lt;repo&gt; &lt;ref&gt;</code></pre>
+
+<p>Delete a Reference</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    ref    *                           </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-hooks-:hookId">DELETE /repos/:owner/:repo/hooks/:hookId</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/hooks/:hookId &lt;owner&gt; &lt;repo&gt; &lt;hookId&gt;</code></pre>
+
+<p>Delete a hook.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    hookId  *  Id of hook.              </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-issues-:number-labels">DELETE /repos/:owner/:repo/issues/:number/labels</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/issues/:number/labels &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>Remove all labels from an issue....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-issues-:number-labels-:name">DELETE /repos/:owner/:repo/issues/:number/labels/:name</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/issues/:number/labels/:name &lt;owner&gt; &lt;repo&gt; &lt;number&gt; &lt;name&gt;</code></pre>
+
+<p>Remove a label from an issue.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         
+    name    *  Name of the label.       </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-issues-comments-:commentId">DELETE /repos/:owner/:repo/issues/comments/:commentId</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/issues/comments/:commentId &lt;owner&gt; &lt;repo&gt; &lt;commentId&gt;</code></pre>
+
+<p>Delete a comment.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  ID of comment.           </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-keys-:keyId">DELETE /repos/:owner/:repo/keys/:keyId</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/keys/:keyId &lt;owner&gt; &lt;repo&gt; &lt;keyId&gt;</code></pre>
+
+<p>Delete a key.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    keyId  *  Id of key.               </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-labels-:name">DELETE /repos/:owner/:repo/labels/:name</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/labels/:name &lt;owner&gt; &lt;repo&gt; &lt;name&gt;</code></pre>
+
+<p>Delete a label.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    name   *  Name of the label.       </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-milestones-:number">DELETE /repos/:owner/:repo/milestones/:number</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/milestones/:number &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>Delete a milestone.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of milestone.     </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-pulls-comments-:commentId">DELETE /repos/:owner/:repo/pulls/comments/:commentId</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/pulls/comments/:commentId &lt;owner&gt; &lt;repo&gt; &lt;commentId&gt;</code></pre>
+
+<p>Delete a comment.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  Id of comment.           </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-releases-:id">DELETE /repos/:owner/:repo/releases/:id</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/releases/:id &lt;owner&gt; &lt;repo&gt; &lt;id&gt;</code></pre>
+
+<p>Users with push access to the repository can delet...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    id     *                           </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-releases-assets-:id">DELETE /repos/:owner/:repo/releases/assets/:id</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/releases/assets/:id &lt;owner&gt; &lt;repo&gt; &lt;id&gt;</code></pre>
+
+<p>Delete a release asset</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    id     *                           </code></pre>
+
+<h3 id="DELETE-repos-:owner-:repo-subscription">DELETE /repos/:owner/:repo/subscription</h3>
+
+<pre><code>    githubcl DELETE /repos/:owner/:repo/subscription &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Delete a Repository Subscription....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="DELETE-teams-:teamId">DELETE /teams/:teamId</h3>
+
+<pre><code>    githubcl DELETE /teams/:teamId &lt;teamId&gt;</code></pre>
+
+<p>Delete team.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    teamId  *  Id of team.</code></pre>
+
+<h3 id="DELETE-teams-:teamId-members-:username">DELETE /teams/:teamId/members/:username</h3>
+
+<pre><code>    githubcl DELETE /teams/:teamId/members/:username &lt;teamId&gt; &lt;username&gt;</code></pre>
+
+<p>The &quot;Remove team member&quot; API is deprecated and is ...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    teamId    *  Id of team.      
+    username  *  Name of a member.</code></pre>
+
+<h3 id="DELETE-teams-:teamId-memberships-:username">DELETE /teams/:teamId/memberships/:username</h3>
+
+<pre><code>    githubcl DELETE /teams/:teamId/memberships/:username &lt;teamId&gt; &lt;username&gt;</code></pre>
+
+<p>Remove team membership.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    teamId    *  Id of team.      
+    username  *  Name of a member.</code></pre>
+
+<h3 id="DELETE-teams-:teamId-repos-:owner-:repo">DELETE /teams/:teamId/repos/:owner/:repo</h3>
+
+<pre><code>    githubcl DELETE /teams/:teamId/repos/:owner/:repo &lt;teamId&gt; &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>In order to remove a repository from a team, the a...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    teamId  *  Id of team.                
+    owner   *  Name of a repository owner.
+    repo    *  Name of a repository.      </code></pre>
+
+<h3 id="DELETE-user-emails">DELETE /user/emails</h3>
+
+<pre><code>    githubcl DELETE /user/emails</code></pre>
+
+<p>Delete email address(es).</p>
+
+<h3 id="DELETE-user-following-:username">DELETE /user/following/:username</h3>
+
+<pre><code>    githubcl DELETE /user/following/:username &lt;username&gt;</code></pre>
+
+<p>Unfollow a user.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    username  *  Name of user.</code></pre>
+
+<h3 id="DELETE-user-keys-:keyId">DELETE /user/keys/:keyId</h3>
+
+<pre><code>    githubcl DELETE /user/keys/:keyId &lt;keyId&gt;</code></pre>
+
+<p>Delete a public key. Removes a public key. Require...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    keyId  *  ID of key.</code></pre>
+
+<h3 id="DELETE-user-starred-:owner-:repo">DELETE /user/starred/:owner/:repo</h3>
+
+<pre><code>    githubcl DELETE /user/starred/:owner/:repo &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Unstar a repository</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of a repository owner.
+    repo   *  Name of a repository.      </code></pre>
+
+<h3 id="DELETE-user-subscriptions-:owner-:repo">DELETE /user/subscriptions/:owner/:repo</h3>
+
+<pre><code>    githubcl DELETE /user/subscriptions/:owner/:repo &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Stop watching a repository</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of the owner. 
+    repo   *  Name of repository.</code></pre>
+
+<h3 id="GET">GET</h3>
+
+<pre><code>    githubcl  GET &lt;subcommands&gt;</code></pre>
+
+<p>GET call</p>
+
+<h3 id="GET-emojis">GET /emojis</h3>
+
+<pre><code>    githubcl GET /emojis</code></pre>
+
+<p>Lists all the emojis available to use on GitHub....</p>
+
+<h3 id="GET-events">GET /events</h3>
+
+<pre><code>    githubcl GET /events</code></pre>
+
+<p>List public events.</p>
+
+<h3 id="GET-feeds">GET /feeds</h3>
+
+<pre><code>    githubcl GET /feeds</code></pre>
+
+<p>List Feeds.</p>
+
+<h3 id="GET-gists">GET /gists</h3>
+
+<pre><code>    githubcl GET /gists [options]</code></pre>
+
+<p>List the authenticated user&#39;s gists or if called a...</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-since    Timestamp in ISO 8601 format YYYY-MM-DDTHH:MM:SSZ.    
+                 Only gists updated at or after this time are returned.</code></pre>
+
+<h3 id="GET-gists-:id">GET /gists/:id</h3>
+
+<pre><code>    githubcl GET /gists/:id &lt;id&gt;</code></pre>
+
+<p>Get a single gist.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id  *  Id of gist.</code></pre>
+
+<h3 id="GET-gists-:id-comments">GET /gists/:id/comments</h3>
+
+<pre><code>    githubcl GET /gists/:id/comments &lt;id&gt;</code></pre>
+
+<p>List comments on a gist.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id  *  Id of gist.</code></pre>
+
+<h3 id="GET-gists-:id-comments-:commentId">GET /gists/:id/comments/:commentId</h3>
+
+<pre><code>    githubcl GET /gists/:id/comments/:commentId &lt;id&gt; &lt;commentId&gt;</code></pre>
+
+<p>Get a single comment.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id         *  Id of gist.   
+    commentId  *  Id of comment.</code></pre>
+
+<h3 id="GET-gists-:id-star">GET /gists/:id/star</h3>
+
+<pre><code>    githubcl GET /gists/:id/star &lt;id&gt;</code></pre>
+
+<p>Check if a gist is starred.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id  *  Id of gist.</code></pre>
+
+<h3 id="GET-gists-public">GET /gists/public</h3>
+
+<pre><code>    githubcl GET /gists/public [options]</code></pre>
+
+<p>List all public gists.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-since    Timestamp in ISO 8601 format YYYY-MM-DDTHH:MM:SSZ.    
+                 Only gists updated at or after this time are returned.</code></pre>
+
+<h3 id="GET-gists-starred">GET /gists/starred</h3>
+
+<pre><code>    githubcl GET /gists/starred [options]</code></pre>
+
+<p>List the authenticated user&#39;s starred gists....</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-since    Timestamp in ISO 8601 format YYYY-MM-DDTHH:MM:SSZ.    
+                 Only gists updated at or after this time are returned.</code></pre>
+
+<h3 id="GET-gitignore-templates">GET /gitignore/templates</h3>
+
+<pre><code>    githubcl GET /gitignore/templates</code></pre>
+
+<p>Listing available templates.</p>
+
+<h3 id="GET-gitignore-templates-:language">GET /gitignore/templates/:language</h3>
+
+<pre><code>    githubcl GET /gitignore/templates/:language &lt;language&gt;</code></pre>
+
+<p>Get a single template.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    language  *  </code></pre>
+
+<h3 id="GET-issues">GET /issues</h3>
+
+<pre><code>    githubcl GET /issues [options]</code></pre>
+
+<p>List issues.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-filter     *  Issues assigned to you / created by you / mentioning you / you&#39;re       
+                      subscribed to updates for / All issues the authenticated user can see   
+    --q-state      *                                                                          
+    --q-labels     *  String list of comma separated Label names. Example - bug,ui,@high.     
+    --q-sort       *                                                                          
+    --q-direction  *                                                                          
+    --q-since         Optional string of a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                      Only issues updated at or after this time are returned.                 </code></pre>
+
+<h3 id="GET-legacy-issues-search-:owner-:repository-:state-:keyword">GET /legacy/issues/search/:owner/:repository/:state/:keyword</h3>
+
+<pre><code>    githubcl GET /legacy/issues/search/:owner/:repository/:state/:keyword &lt;keyword&gt; &lt;state&gt; &lt;owner&gt; &lt;repository&gt;</code></pre>
+
+<p>Find issues by state and keyword....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    keyword     *  The search term.                                                          
+    state       *  Indicates the state of the issues to return. Can be either open or closed.
+    owner       *                                                                            
+    repository  *                                                                            </code></pre>
+
+<h3 id="GET-legacy-repos-search-:keyword">GET /legacy/repos/search/:keyword</h3>
+
+<pre><code>    githubcl GET /legacy/repos/search/:keyword [options] &lt;keyword&gt;</code></pre>
+
+<p>Find repositories by keyword. Note, this legacy me...</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-order         The sort field. if sort param is provided. Can be either asc or desc.                      
+    --q-language      Filter results by language                                                                 
+    --q-start_page    The page number to fetch                                                                   
+    --q-sort          The sort field. One of stars, forks, or updated. Default: results are sorted by best match.</code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    keyword  *  The search term</code></pre>
+
+<h3 id="GET-legacy-user-email-:email">GET /legacy/user/email/:email</h3>
+
+<pre><code>    githubcl GET /legacy/user/email/:email &lt;email&gt;</code></pre>
+
+<p>This API call is added for compatibility reasons o...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    email  *  The email address</code></pre>
+
+<h3 id="GET-legacy-user-search-:keyword">GET /legacy/user/search/:keyword</h3>
+
+<pre><code>    githubcl GET /legacy/user/search/:keyword [options] &lt;keyword&gt;</code></pre>
+
+<p>Find users by keyword.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-order         The sort field. if sort param is provided. Can be either asc or desc.                      
+    --q-start_page    The page number to fetch                                                                   
+    --q-sort          The sort field. One of stars, forks, or updated. Default: results are sorted by best match.</code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    keyword  *  The search term</code></pre>
+
+<h3 id="GET-meta">GET /meta</h3>
+
+<pre><code>    githubcl GET /meta</code></pre>
+
+<p>This gives some information about GitHub.com, the ...</p>
+
+<h3 id="GET-networks-:owner-:repo-events">GET /networks/:owner/:repo/events</h3>
+
+<pre><code>    githubcl GET /networks/:owner/:repo/events &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List public events for a network of repositories....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of the owner. 
+    repo   *  Name of repository.</code></pre>
+
+<h3 id="GET-notifications">GET /notifications</h3>
+
+<pre><code>    githubcl GET /notifications [options]</code></pre>
+
+<p>List your notifications.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-all              True to show notifications marked as read.                                       
+    --q-participating    True to show only notifications in which the user is directly participating      
+                         or mentioned.                                                                    
+    --q-since            The time should be passed in as UTC in the ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                         Example: &quot;2012-10-09T23:39:01Z&quot;.                                                 </code></pre>
+
+<h3 id="GET-notifications-threads-:id">GET /notifications/threads/:id</h3>
+
+<pre><code>    githubcl GET /notifications/threads/:id &lt;id&gt;</code></pre>
+
+<p>View a single thread.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id  *  Id of thread.</code></pre>
+
+<h3 id="GET-notifications-threads-:id-subscription">GET /notifications/threads/:id/subscription</h3>
+
+<pre><code>    githubcl GET /notifications/threads/:id/subscription &lt;id&gt;</code></pre>
+
+<p>Get a Thread Subscription.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id  *  Id of thread.</code></pre>
+
+<h3 id="GET-orgs-:org">GET /orgs/:org</h3>
+
+<pre><code>    githubcl GET /orgs/:org &lt;org&gt;</code></pre>
+
+<p>Get an Organization.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    org  *  Name of organisation.</code></pre>
+
+<h3 id="GET-orgs-:org-events">GET /orgs/:org/events</h3>
+
+<pre><code>    githubcl GET /orgs/:org/events &lt;org&gt;</code></pre>
+
+<p>List public events for an organization....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    org  *  Name of organisation.</code></pre>
+
+<h3 id="GET-orgs-:org-issues">GET /orgs/:org/issues</h3>
+
+<pre><code>    githubcl GET /orgs/:org/issues [options] &lt;org&gt;</code></pre>
+
+<p>List issues.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-filter     *  Issues assigned to you / created by you / mentioning you / you&#39;re       
+                      subscribed to updates for / All issues the authenticated user can see   
+    --q-state      *                                                                          
+    --q-labels     *  String list of comma separated Label names. Example - bug,ui,@high.     
+    --q-sort       *                                                                          
+    --q-direction  *                                                                          
+    --q-since         Optional string of a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                      Only issues updated at or after this time are returned.                 </code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    org  *  Name of organisation.</code></pre>
+
+<h3 id="GET-orgs-:org-members">GET /orgs/:org/members</h3>
+
+<pre><code>    githubcl GET /orgs/:org/members &lt;org&gt;</code></pre>
+
+<p>Members list.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    org  *  Name of organisation.</code></pre>
+
+<h3 id="GET-orgs-:org-members-:username">GET /orgs/:org/members/:username</h3>
+
+<pre><code>    githubcl GET /orgs/:org/members/:username &lt;org&gt; &lt;username&gt;</code></pre>
+
+<p>Check if a user is, publicly or privately, a membe...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    org       *  Name of organisation.
+    username  *  Name of the user.    </code></pre>
+
+<h3 id="GET-orgs-:org-public_members">GET /orgs/:org/public_members</h3>
+
+<pre><code>    githubcl GET /orgs/:org/public_members &lt;org&gt;</code></pre>
+
+<p>Public members list.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    org  *  Name of organisation.</code></pre>
+
+<h3 id="GET-orgs-:org-public_members-:username">GET /orgs/:org/public_members/:username</h3>
+
+<pre><code>    githubcl GET /orgs/:org/public_members/:username &lt;org&gt; &lt;username&gt;</code></pre>
+
+<p>Check public membership.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    org       *  Name of organisation.
+    username  *  Name of the user.    </code></pre>
+
+<h3 id="GET-orgs-:org-repos">GET /orgs/:org/repos</h3>
+
+<pre><code>    githubcl GET /orgs/:org/repos [options] &lt;org&gt;</code></pre>
+
+<p>List repositories for the specified org....</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-type    </code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    org  *  Name of organisation.</code></pre>
+
+<h3 id="GET-orgs-:org-teams">GET /orgs/:org/teams</h3>
+
+<pre><code>    githubcl GET /orgs/:org/teams &lt;org&gt;</code></pre>
+
+<p>List teams.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    org  *  Name of organisation.</code></pre>
+
+<h3 id="GET-rate_limit">GET /rate_limit</h3>
+
+<pre><code>    githubcl GET /rate_limit</code></pre>
+
+<p>Get your current rate limit status...</p>
+
+<h3 id="GET-repos-:owner-:repo">GET /repos/:owner/:repo</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get repository.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-:archive_format-:path">GET /repos/:owner/:repo/:archive_format/:path</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/:archive_format/:path &lt;owner&gt; &lt;repo&gt; &lt;archive_format&gt; &lt;path&gt;</code></pre>
+
+<p>Get archive link.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner           *  Name of repository owner.                 
+    repo            *  Name of repository.                       
+    archive_format  *                                            
+    path            *  Valid Git reference, defaults to &#39;master&#39;.</code></pre>
+
+<h3 id="GET-repos-:owner-:repo-assignees">GET /repos/:owner/:repo/assignees</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/assignees &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List assignees.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-assignees-:assignee">GET /repos/:owner/:repo/assignees/:assignee</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/assignees/:assignee &lt;owner&gt; &lt;repo&gt; &lt;assignee&gt;</code></pre>
+
+<p>Check assignee.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner     *  Name of repository owner.
+    repo      *  Name of repository.      
+    assignee  *  Login of the assignee.   </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-branches">GET /repos/:owner/:repo/branches</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/branches &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get list of branches</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-branches-:branch">GET /repos/:owner/:repo/branches/:branch</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/branches/:branch &lt;owner&gt; &lt;repo&gt; &lt;branch&gt;</code></pre>
+
+<p>Get Branch</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    branch  *  Name of the branch.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-collaborators">GET /repos/:owner/:repo/collaborators</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/collaborators &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-collaborators-:user">GET /repos/:owner/:repo/collaborators/:user</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/collaborators/:user &lt;owner&gt; &lt;repo&gt; &lt;user&gt;</code></pre>
+
+<p>Check if user is a collaborator...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    user   *  Login of the user.       </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-comments">GET /repos/:owner/:repo/comments</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/comments &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List commit comments for a repository....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-comments-:commentId">GET /repos/:owner/:repo/comments/:commentId</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/comments/:commentId &lt;owner&gt; &lt;repo&gt; &lt;commentId&gt;</code></pre>
+
+<p>Get a single commit comment.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  Id of comment.           </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-commits">GET /repos/:owner/:repo/commits</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/commits [options] &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List commits on a repository.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-since     The time should be passed in as UTC in the ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                  Example: &quot;2012-10-09T23:39:01Z&quot;.                                                 
+    --q-sha       Sha or branch to start listing commits from.                                     
+    --q-path      Only commits containing this file path will be returned.                         
+    --q-author    GitHub login, name, or email by which to filter by commit author.                
+    --q-until     ISO 8601 Date - Only commits before this date will be returned.                  </code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-commits-:ref-status">GET /repos/:owner/:repo/commits/:ref/status</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/commits/:ref/status &lt;owner&gt; &lt;repo&gt; &lt;ref&gt;</code></pre>
+
+<p>Get the combined Status for a specific Ref...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    ref    *                           </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-commits-:shaCode">GET /repos/:owner/:repo/commits/:shaCode</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/commits/:shaCode &lt;owner&gt; &lt;repo&gt; &lt;shaCode&gt;</code></pre>
+
+<p>Get a single commit.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    shaCode  *  SHA-1 code of the commit.</code></pre>
+
+<h3 id="GET-repos-:owner-:repo-commits-:shaCode-comments">GET /repos/:owner/:repo/commits/:shaCode/comments</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/commits/:shaCode/comments &lt;owner&gt; &lt;repo&gt; &lt;shaCode&gt;</code></pre>
+
+<p>List comments for a single commitList comments for...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    shaCode  *  SHA-1 code of the commit.</code></pre>
+
+<h3 id="GET-repos-:owner-:repo-compare-:baseId...:headId">GET /repos/:owner/:repo/compare/:baseId...:headId</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/compare/:baseId...:headId &lt;owner&gt; &lt;repo&gt; &lt;baseId&gt; &lt;headId&gt;</code></pre>
+
+<p>Compare two commits</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    baseId  *                           
+    headId  *                           </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-contents-:path">GET /repos/:owner/:repo/contents/:path</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/contents/:path [options] &lt;owner&gt; &lt;repo&gt; &lt;path&gt;</code></pre>
+
+<p>Get contents.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-path    The content path.                                              
+    --q-ref     The String name of the Commit/Branch/Tag. Defaults to &#39;master&#39;.</code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    path   *                           </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-contributors">GET /repos/:owner/:repo/contributors</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/contributors [options] &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get list of contributors.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-anon  *  Set to 1 or true to include anonymous contributors in results.</code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-deployments">GET /repos/:owner/:repo/deployments</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/deployments &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Users with pull access can view deployments for a ...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-deployments-:id-statuses">GET /repos/:owner/:repo/deployments/:id/statuses</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/deployments/:id/statuses &lt;owner&gt; &lt;repo&gt; &lt;id&gt;</code></pre>
+
+<p>Users with pull access can view deployment statuse...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.                   
+    repo   *  Name of repository.                         
+    id     *  The Deployment ID to list the statuses from.</code></pre>
+
+<h3 id="GET-repos-:owner-:repo-downloads">GET /repos/:owner/:repo/downloads</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/downloads &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Deprecated. List downloads for a repository....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-downloads-:downloadId">GET /repos/:owner/:repo/downloads/:downloadId</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/downloads/:downloadId &lt;owner&gt; &lt;repo&gt; &lt;downloadId&gt;</code></pre>
+
+<p>Deprecated. Get a single download....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner       *  Name of repository owner.
+    repo        *  Name of repository.      
+    downloadId  *  Id of download.          </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-events">GET /repos/:owner/:repo/events</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/events &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get list of repository events.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-forks">GET /repos/:owner/:repo/forks</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/forks [options] &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List forks.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-sort    </code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-git-blobs-:shaCode">GET /repos/:owner/:repo/git/blobs/:shaCode</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/git/blobs/:shaCode &lt;owner&gt; &lt;repo&gt; &lt;shaCode&gt;</code></pre>
+
+<p>Get a Blob.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    shaCode  *  SHA-1 code.              </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-git-commits-:shaCode">GET /repos/:owner/:repo/git/commits/:shaCode</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/git/commits/:shaCode &lt;owner&gt; &lt;repo&gt; &lt;shaCode&gt;</code></pre>
+
+<p>Get a Commit.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    shaCode  *  SHA-1 code.              </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-git-refs">GET /repos/:owner/:repo/git/refs</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/git/refs &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get all References</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-git-refs-:ref">GET /repos/:owner/:repo/git/refs/:ref</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/git/refs/:ref &lt;owner&gt; &lt;repo&gt; &lt;ref&gt;</code></pre>
+
+<p>Get a Reference</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    ref    *                           </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-git-tags-:shaCode">GET /repos/:owner/:repo/git/tags/:shaCode</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/git/tags/:shaCode &lt;owner&gt; &lt;repo&gt; &lt;shaCode&gt;</code></pre>
+
+<p>Get a Tag.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    shaCode  *                           </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-git-trees-:shaCode">GET /repos/:owner/:repo/git/trees/:shaCode</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/git/trees/:shaCode [options] &lt;owner&gt; &lt;repo&gt; &lt;shaCode&gt;</code></pre>
+
+<p>Get a Tree.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-recursive    Get a Tree Recursively. (0 or 1)</code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    shaCode  *  Tree SHA.                </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-hooks">GET /repos/:owner/:repo/hooks</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/hooks &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get list of hooks.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-hooks-:hookId">GET /repos/:owner/:repo/hooks/:hookId</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/hooks/:hookId &lt;owner&gt; &lt;repo&gt; &lt;hookId&gt;</code></pre>
+
+<p>Get single hook.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    hookId  *  Id of hook.              </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-issues">GET /repos/:owner/:repo/issues</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/issues [options] &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List issues for a repository.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-filter     *  Issues assigned to you / created by you / mentioning you / you&#39;re       
+                      subscribed to updates for / All issues the authenticated user can see   
+    --q-state      *                                                                          
+    --q-labels     *  String list of comma separated Label names. Example - bug,ui,@high.     
+    --q-sort       *                                                                          
+    --q-direction  *                                                                          
+    --q-since         Optional string of a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                      Only issues updated at or after this time are returned.                 </code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-issues-:number">GET /repos/:owner/:repo/issues/:number</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/issues/:number &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>Get a single issue</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-issues-:number-comments">GET /repos/:owner/:repo/issues/:number/comments</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/issues/:number/comments &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>List comments on an issue.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-issues-:number-events">GET /repos/:owner/:repo/issues/:number/events</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/issues/:number/events &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>List events for an issue.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-issues-:number-labels">GET /repos/:owner/:repo/issues/:number/labels</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/issues/:number/labels &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>List labels on an issue.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-issues-comments">GET /repos/:owner/:repo/issues/comments</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/issues/comments [options] &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List comments in a repository.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-direction    Ignored without &#39;sort&#39; parameter.                                                
+    --q-sort                                                                                          
+    --q-since        The time should be passed in as UTC in the ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                     Example: &quot;2012-10-09T23:39:01Z&quot;.                                                 </code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-issues-comments-:commentId">GET /repos/:owner/:repo/issues/comments/:commentId</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/issues/comments/:commentId &lt;owner&gt; &lt;repo&gt; &lt;commentId&gt;</code></pre>
+
+<p>Get a single comment.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  ID of comment.           </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-issues-events">GET /repos/:owner/:repo/issues/events</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/issues/events &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List issue events for a repository....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-issues-events-:eventId">GET /repos/:owner/:repo/issues/events/:eventId</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/issues/events/:eventId &lt;owner&gt; &lt;repo&gt; &lt;eventId&gt;</code></pre>
+
+<p>Get a single event.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    eventId  *  Id of the event.         </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-keys">GET /repos/:owner/:repo/keys</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/keys &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get list of keys.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-keys-:keyId">GET /repos/:owner/:repo/keys/:keyId</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/keys/:keyId &lt;owner&gt; &lt;repo&gt; &lt;keyId&gt;</code></pre>
+
+<p>Get a key</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    keyId  *  Id of key.               </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-labels">GET /repos/:owner/:repo/labels</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/labels &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List all labels for this repository....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-labels-:name">GET /repos/:owner/:repo/labels/:name</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/labels/:name &lt;owner&gt; &lt;repo&gt; &lt;name&gt;</code></pre>
+
+<p>Get a single label.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    name   *  Name of the label.       </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-languages">GET /repos/:owner/:repo/languages</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/languages &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List languages.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-milestones">GET /repos/:owner/:repo/milestones</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/milestones [options] &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List milestones for a repository....</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-state        String to filter by state.       
+    --q-direction    Ignored without &#39;sort&#39; parameter.
+    --q-sort                                          </code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-milestones-:number">GET /repos/:owner/:repo/milestones/:number</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/milestones/:number &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>Get a single milestone.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of milestone.     </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-milestones-:number-labels">GET /repos/:owner/:repo/milestones/:number/labels</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/milestones/:number/labels &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>Get labels for every issue in a milestone....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of milestone.     </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-notifications">GET /repos/:owner/:repo/notifications</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/notifications [options] &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List your notifications in a repository...</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-all              True to show notifications marked as read.                                       
+    --q-participating    True to show only notifications in which the user is directly participating      
+                         or mentioned.                                                                    
+    --q-since            The time should be passed in as UTC in the ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                         Example: &quot;2012-10-09T23:39:01Z&quot;.                                                 </code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-pulls">GET /repos/:owner/:repo/pulls</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/pulls [options] &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List pull requests.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-state    String to filter by state.                                                 
+    --q-head     Filter pulls by head user and branch name in the format of &#39;user:ref-name&#39;.
+                 Example: github:new-script-format.                                         
+    --q-base     Filter pulls by base branch name. Example - gh-pages.                      </code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-pulls-:number">GET /repos/:owner/:repo/pulls/:number</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/pulls/:number &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>Get a single pull request.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-pulls-:number-comments">GET /repos/:owner/:repo/pulls/:number/comments</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/pulls/:number/comments &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>List comments on a pull request....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-pulls-:number-commits">GET /repos/:owner/:repo/pulls/:number/commits</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/pulls/:number/commits &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>List commits on a pull request....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-pulls-:number-files">GET /repos/:owner/:repo/pulls/:number/files</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/pulls/:number/files &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>List pull requests files.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-pulls-:number-merge">GET /repos/:owner/:repo/pulls/:number/merge</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/pulls/:number/merge &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>Get if a pull request has been merged....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-pulls-comments">GET /repos/:owner/:repo/pulls/comments</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/pulls/comments [options] &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List comments in a repository.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-direction    Ignored without &#39;sort&#39; parameter.                                                
+    --q-sort                                                                                          
+    --q-since        The time should be passed in as UTC in the ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                     Example: &quot;2012-10-09T23:39:01Z&quot;.                                                 </code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-pulls-comments-:commentId">GET /repos/:owner/:repo/pulls/comments/:commentId</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/pulls/comments/:commentId &lt;owner&gt; &lt;repo&gt; &lt;commentId&gt;</code></pre>
+
+<p>Get a single comment.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  Id of comment.           </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-readme">GET /repos/:owner/:repo/readme</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/readme [options] &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get the README.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-ref    The String name of the Commit/Branch/Tag. Defaults to master.</code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-releases">GET /repos/:owner/:repo/releases</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/releases &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Users with push access to the repository will rece...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-releases-:id">GET /repos/:owner/:repo/releases/:id</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/releases/:id &lt;owner&gt; &lt;repo&gt; &lt;id&gt;</code></pre>
+
+<p>Get a single release</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    id     *                           </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-releases-:id-assets">GET /repos/:owner/:repo/releases/:id/assets</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/releases/:id/assets &lt;owner&gt; &lt;repo&gt; &lt;id&gt;</code></pre>
+
+<p>List assets for a release</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    id     *                           </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-releases-assets-:id">GET /repos/:owner/:repo/releases/assets/:id</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/releases/assets/:id &lt;owner&gt; &lt;repo&gt; &lt;id&gt;</code></pre>
+
+<p>Get a single release asset</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    id     *                           </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-stargazers">GET /repos/:owner/:repo/stargazers</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/stargazers &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List Stargazers.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-stats-code_frequency">GET /repos/:owner/:repo/stats/code_frequency</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/stats/code_frequency &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get the number of additions and deletions per week...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-stats-commit_activity">GET /repos/:owner/:repo/stats/commit_activity</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/stats/commit_activity &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get the last year of commit activity data....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-stats-contributors">GET /repos/:owner/:repo/stats/contributors</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/stats/contributors &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get contributors list with additions, deletions, a...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-stats-participation">GET /repos/:owner/:repo/stats/participation</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/stats/participation &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get the weekly commit count for the repo owner and...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-stats-punch_card">GET /repos/:owner/:repo/stats/punch_card</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/stats/punch_card &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get the number of commits per hour in each day....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-statuses-:ref">GET /repos/:owner/:repo/statuses/:ref</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/statuses/:ref &lt;owner&gt; &lt;repo&gt; &lt;ref&gt;</code></pre>
+
+<p>List Statuses for a specific Ref....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.                                                    
+    repo   *  Name of repository.                                                          
+    ref    *  Ref to list the statuses from. It can be a SHA, a branch name, or a tag name.</code></pre>
+
+<h3 id="GET-repos-:owner-:repo-subscribers">GET /repos/:owner/:repo/subscribers</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/subscribers &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List watchers.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-subscription">GET /repos/:owner/:repo/subscription</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/subscription &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get a Repository Subscription.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-tags">GET /repos/:owner/:repo/tags</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/tags &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get list of tags.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-teams">GET /repos/:owner/:repo/teams</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/teams &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Get list of teams</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repos-:owner-:repo-watchers">GET /repos/:owner/:repo/watchers</h3>
+
+<pre><code>    githubcl GET /repos/:owner/:repo/watchers &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>List Stargazers. New implementation....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="GET-repositories">GET /repositories</h3>
+
+<pre><code>    githubcl GET /repositories [options]</code></pre>
+
+<p>List all public repositories.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-since    The time should be passed in as UTC in the ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                 Example: &quot;2012-10-09T23:39:01Z&quot;.                                                 </code></pre>
+
+<h3 id="GET-search-code">GET /search/code</h3>
+
+<pre><code>    githubcl GET /search/code [options]</code></pre>
+
+<p>Search code.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-order     The sort field. if sort param is provided. Can be either asc or desc.      
+    --q-q      *  The search terms. This can be any combination of the supported code        
+                  search parameters:                                                         
+                  &#39;Search In&#39; Qualifies which fields are searched. With this qualifier       
+                  you can restrict the search to just the file contents, the file path,      
+                  or both.                                                                   
+                  &#39;Languages&#39; Searches code based on the language it&#39;s written in.           
+                  &#39;Forks&#39; Filters repositories based on the number of forks, and/or          
+                  whether code from forked repositories should be included in the results    
+                  at all.                                                                    
+                  &#39;Size&#39; Finds files that match a certain size (in bytes).                   
+                  &#39;Path&#39; Specifies the path that the resulting file must be at.              
+                  &#39;Extension&#39; Matches files with a certain extension.                        
+                  &#39;Users&#39; or &#39;Repositories&#39; Limits searches to a specific user or repository.
+    --q-sort      Can only be &#39;indexed&#39;, which indicates how recently a file has been indexed
+                  by the GitHub search infrastructure. If not provided, results are sorted   
+                  by best match.                                                             </code></pre>
+
+<h3 id="GET-search-issues">GET /search/issues</h3>
+
+<pre><code>    githubcl GET /search/issues [options]</code></pre>
+
+<p>Find issues by state and keyword. (This method ret...</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-order     The sort field. if sort param is provided. Can be either asc or desc.                           
+    --q-q      *  The q search term can also contain any combination of the supported issue search qualifiers:    
+    --q-sort      The sort field. Can be comments, created, or updated. Default: results are sorted by best match.</code></pre>
+
+<h3 id="GET-search-repositories">GET /search/repositories</h3>
+
+<pre><code>    githubcl GET /search/repositories [options]</code></pre>
+
+<p>Search repositories.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-order     The sort field. if sort param is provided. Can be either asc or desc.       
+    --q-q      *  The search terms. This can be any combination of the supported repository   
+                  search parameters:                                                          
+                  &#39;Search In&#39; Qualifies which fields are searched. With this qualifier you    
+                  can restrict the search to just the repository name, description, readme,   
+                  or any combination of these.                                                
+                  &#39;Size&#39; Finds repositories that match a certain size (in kilobytes).         
+                  &#39;Forks&#39; Filters repositories based on the number of forks, and/or whether   
+                  forked repositories should be included in the results at all.               
+                  &#39;Created&#39; and &#39;Last Updated&#39; Filters repositories based on times of         
+                  creation, or when they were last updated.                                   
+                  &#39;Users or Repositories&#39; Limits searches to a specific user or repository.   
+                  &#39;Languages&#39; Searches repositories based on the language they are written in.
+                  &#39;Stars&#39; Searches repositories based on the number of stars.                 
+    --q-sort      If not provided, results are sorted by best match.                          </code></pre>
+
+<h3 id="GET-search-users">GET /search/users</h3>
+
+<pre><code>    githubcl GET /search/users [options]</code></pre>
+
+<p>Search users.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-order     The sort field. if sort param is provided. Can be either asc or desc.    
+    --q-q      *  The search terms. This can be any combination of the supported user      
+                  search parameters:                                                       
+                  &#39;Search In&#39; Qualifies which fields are searched. With this qualifier you 
+                  can restrict the search to just the username, public email, full name,   
+                  location, or any combination of these.                                   
+                  &#39;Repository count&#39; Filters users based on the number of repositories they
+                  have.                                                                    
+                  &#39;Location&#39; Filter users by the location indicated in their profile.      
+                  &#39;Language&#39; Search for users that have repositories that match a certain  
+                  language.                                                                
+                  &#39;Created&#39; Filter users based on when they joined.                        
+                  &#39;Followers&#39; Filter users based on the number of followers they have.     
+    --q-sort      If not provided, results are sorted by best match.                       </code></pre>
+
+<h3 id="GET-teams-:teamId">GET /teams/:teamId</h3>
+
+<pre><code>    githubcl GET /teams/:teamId &lt;teamId&gt;</code></pre>
+
+<p>Get team.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    teamId  *  Id of team.</code></pre>
+
+<h3 id="GET-teams-:teamId-members">GET /teams/:teamId/members</h3>
+
+<pre><code>    githubcl GET /teams/:teamId/members &lt;teamId&gt;</code></pre>
+
+<p>List team members.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    teamId  *  Id of team.</code></pre>
+
+<h3 id="GET-teams-:teamId-members-:username">GET /teams/:teamId/members/:username</h3>
+
+<pre><code>    githubcl GET /teams/:teamId/members/:username &lt;teamId&gt; &lt;username&gt;</code></pre>
+
+<p>The &quot;Get team member&quot; API is deprecated and is sch...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    teamId    *  Id of team.      
+    username  *  Name of a member.</code></pre>
+
+<h3 id="GET-teams-:teamId-memberships-:username">GET /teams/:teamId/memberships/:username</h3>
+
+<pre><code>    githubcl GET /teams/:teamId/memberships/:username &lt;teamId&gt; &lt;username&gt;</code></pre>
+
+<p>Get team membership.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    teamId    *  Id of team.      
+    username  *  Name of a member.</code></pre>
+
+<h3 id="GET-teams-:teamId-repos">GET /teams/:teamId/repos</h3>
+
+<pre><code>    githubcl GET /teams/:teamId/repos &lt;teamId&gt;</code></pre>
+
+<p>List team repos</p>
+
+<p>Parameters:</p>
+
+<pre><code>    teamId  *  Id of team.</code></pre>
+
+<h3 id="GET-teams-:teamId-repos-:owner-:repo">GET /teams/:teamId/repos/:owner/:repo</h3>
+
+<pre><code>    githubcl GET /teams/:teamId/repos/:owner/:repo &lt;teamId&gt; &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Check if a team manages a repository...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    teamId  *  Id of team.                
+    owner   *  Name of a repository owner.
+    repo    *  Name of a repository.      </code></pre>
+
+<h3 id="GET-user">GET /user</h3>
+
+<pre><code>    githubcl GET /user</code></pre>
+
+<p>Get the authenticated user.</p>
+
+<h3 id="GET-user-emails">GET /user/emails</h3>
+
+<pre><code>    githubcl GET /user/emails</code></pre>
+
+<p>List email addresses for a user....</p>
+
+<h3 id="GET-user-followers">GET /user/followers</h3>
+
+<pre><code>    githubcl GET /user/followers</code></pre>
+
+<p>List the authenticated user&#39;s followers...</p>
+
+<h3 id="GET-user-following">GET /user/following</h3>
+
+<pre><code>    githubcl GET /user/following</code></pre>
+
+<p>List who the authenticated user is following....</p>
+
+<h3 id="GET-user-following-:username">GET /user/following/:username</h3>
+
+<pre><code>    githubcl GET /user/following/:username &lt;username&gt;</code></pre>
+
+<p>Check if you are following a user....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    username  *  Name of user.</code></pre>
+
+<h3 id="GET-user-issues">GET /user/issues</h3>
+
+<pre><code>    githubcl GET /user/issues [options]</code></pre>
+
+<p>List issues.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-filter     *  Issues assigned to you / created by you / mentioning you / you&#39;re       
+                      subscribed to updates for / All issues the authenticated user can see   
+    --q-state      *                                                                          
+    --q-labels     *  String list of comma separated Label names. Example - bug,ui,@high.     
+    --q-sort       *                                                                          
+    --q-direction  *                                                                          
+    --q-since         Optional string of a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                      Only issues updated at or after this time are returned.                 </code></pre>
+
+<h3 id="GET-user-keys">GET /user/keys</h3>
+
+<pre><code>    githubcl GET /user/keys</code></pre>
+
+<p>List your public keys.</p>
+
+<h3 id="GET-user-keys-:keyId">GET /user/keys/:keyId</h3>
+
+<pre><code>    githubcl GET /user/keys/:keyId &lt;keyId&gt;</code></pre>
+
+<p>Get a single public key.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    keyId  *  ID of key.</code></pre>
+
+<h3 id="GET-user-orgs">GET /user/orgs</h3>
+
+<pre><code>    githubcl GET /user/orgs</code></pre>
+
+<p>List public and private organizations for the auth...</p>
+
+<h3 id="GET-user-repos">GET /user/repos</h3>
+
+<pre><code>    githubcl GET /user/repos [options]</code></pre>
+
+<p>List repositories for the authenticated user. Note...</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-type    </code></pre>
+
+<h3 id="GET-user-starred">GET /user/starred</h3>
+
+<pre><code>    githubcl GET /user/starred [options]</code></pre>
+
+<p>List repositories being starred by the authenticat...</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-direction    Ignored without &#39;sort&#39; parameter.
+    --q-sort                                          </code></pre>
+
+<h3 id="GET-user-starred-:owner-:repo">GET /user/starred/:owner/:repo</h3>
+
+<pre><code>    githubcl GET /user/starred/:owner/:repo &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Check if you are starring a repository....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of a repository owner.
+    repo   *  Name of a repository.      </code></pre>
+
+<h3 id="GET-user-subscriptions">GET /user/subscriptions</h3>
+
+<pre><code>    githubcl GET /user/subscriptions</code></pre>
+
+<p>List repositories being watched by the authenticat...</p>
+
+<h3 id="GET-user-subscriptions-:owner-:repo">GET /user/subscriptions/:owner/:repo</h3>
+
+<pre><code>    githubcl GET /user/subscriptions/:owner/:repo &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Check if you are watching a repository....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of the owner. 
+    repo   *  Name of repository.</code></pre>
+
+<h3 id="GET-user-teams">GET /user/teams</h3>
+
+<pre><code>    githubcl GET /user/teams</code></pre>
+
+<p>List all of the teams across all of the organizati...</p>
+
+<h3 id="GET-users">GET /users</h3>
+
+<pre><code>    githubcl GET /users [options]</code></pre>
+
+<p>Get all users.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-since    The integer ID of the last User that you&#39;ve seen.</code></pre>
+
+<h3 id="GET-users-:username">GET /users/:username</h3>
+
+<pre><code>    githubcl GET /users/:username &lt;username&gt;</code></pre>
+
+<p>Get a single user.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    username  *  Name of user.</code></pre>
+
+<h3 id="GET-users-:username-events">GET /users/:username/events</h3>
+
+<pre><code>    githubcl GET /users/:username/events &lt;username&gt;</code></pre>
+
+<p>If you are authenticated as the given user, you wi...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    username  *  Name of user.</code></pre>
+
+<h3 id="GET-users-:username-events-orgs-:org">GET /users/:username/events/orgs/:org</h3>
+
+<pre><code>    githubcl GET /users/:username/events/orgs/:org &lt;username&gt; &lt;org&gt;</code></pre>
+
+<p>This is the user&#39;s organization dashboard. You mus...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    username  *  Name of user.
+    org       *               </code></pre>
+
+<h3 id="GET-users-:username-followers">GET /users/:username/followers</h3>
+
+<pre><code>    githubcl GET /users/:username/followers &lt;username&gt;</code></pre>
+
+<p>List a user&#39;s followers</p>
+
+<p>Parameters:</p>
+
+<pre><code>    username  *  Name of user.</code></pre>
+
+<h3 id="GET-users-:username-following-:targetUser">GET /users/:username/following/:targetUser</h3>
+
+<pre><code>    githubcl GET /users/:username/following/:targetUser &lt;username&gt; &lt;targetUser&gt;</code></pre>
+
+<p>Check if one user follows another....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    username    *  Name of user.
+    targetUser  *  Name of user.</code></pre>
+
+<h3 id="GET-users-:username-gists">GET /users/:username/gists</h3>
+
+<pre><code>    githubcl GET /users/:username/gists [options] &lt;username&gt;</code></pre>
+
+<p>List a users gists.</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-since    The time should be passed in as UTC in the ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+                 Example: &quot;2012-10-09T23:39:01Z&quot;.                                                 </code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    username  *  Name of user.</code></pre>
+
+<h3 id="GET-users-:username-keys">GET /users/:username/keys</h3>
+
+<pre><code>    githubcl GET /users/:username/keys &lt;username&gt;</code></pre>
+
+<p>List public keys for a user.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    username  *  Name of user.</code></pre>
+
+<h3 id="GET-users-:username-orgs">GET /users/:username/orgs</h3>
+
+<pre><code>    githubcl GET /users/:username/orgs &lt;username&gt;</code></pre>
+
+<p>List all public organizations for a user....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    username  *  Name of user.</code></pre>
+
+<h3 id="GET-users-:username-received_events">GET /users/:username/received_events</h3>
+
+<pre><code>    githubcl GET /users/:username/received_events &lt;username&gt;</code></pre>
+
+<p>These are events that you&#39;ll only see public event...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    username  *  Name of user.</code></pre>
+
+<h3 id="GET-users-:username-received_events-public">GET /users/:username/received_events/public</h3>
+
+<pre><code>    githubcl GET /users/:username/received_events/public &lt;username&gt;</code></pre>
+
+<p>List public events that a user has received...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    username  *  Name of user.</code></pre>
+
+<h3 id="GET-users-:username-repos">GET /users/:username/repos</h3>
+
+<pre><code>    githubcl GET /users/:username/repos [options] &lt;username&gt;</code></pre>
+
+<p>List public repositories for the specified user....</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-type    </code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    username  *  Name of user.</code></pre>
+
+<h3 id="GET-users-:username-starred">GET /users/:username/starred</h3>
+
+<pre><code>    githubcl GET /users/:username/starred &lt;username&gt;</code></pre>
+
+<p>List repositories being starred by a user....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    username  *  Name of user.</code></pre>
+
+<h3 id="GET-users-:username-subscriptions">GET /users/:username/subscriptions</h3>
+
+<pre><code>    githubcl GET /users/:username/subscriptions &lt;username&gt;</code></pre>
+
+<p>List repositories being watched by a user....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    username  *  Name of user.</code></pre>
+
+<h3 id="PATCH">PATCH</h3>
+
+<pre><code>    githubcl  PATCH &lt;subcommands&gt;</code></pre>
+
+<p>PATCH call</p>
+
+<h3 id="PATCH-gists-:id">PATCH /gists/:id</h3>
+
+<pre><code>    githubcl PATCH /gists/:id &lt;id&gt;</code></pre>
+
+<p>Edit a gist.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id  *  Id of gist.</code></pre>
+
+<h3 id="PATCH-gists-:id-comments-:commentId">PATCH /gists/:id/comments/:commentId</h3>
+
+<pre><code>    githubcl PATCH /gists/:id/comments/:commentId &lt;id&gt; &lt;commentId&gt;</code></pre>
+
+<p>Edit a comment.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id         *  Id of gist.   
+    commentId  *  Id of comment.</code></pre>
+
+<h3 id="PATCH-notifications-threads-:id">PATCH /notifications/threads/:id</h3>
+
+<pre><code>    githubcl PATCH /notifications/threads/:id &lt;id&gt;</code></pre>
+
+<p>Mark a thread as read</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id  *  Id of thread.</code></pre>
+
+<h3 id="PATCH-orgs-:org">PATCH /orgs/:org</h3>
+
+<pre><code>    githubcl PATCH /orgs/:org &lt;org&gt;</code></pre>
+
+<p>Edit an Organization.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    org  *  Name of organisation.</code></pre>
+
+<h3 id="PATCH-repos-:owner-:repo">PATCH /repos/:owner/:repo</h3>
+
+<pre><code>    githubcl PATCH /repos/:owner/:repo &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Edit repository.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="PATCH-repos-:owner-:repo-comments-:commentId">PATCH /repos/:owner/:repo/comments/:commentId</h3>
+
+<pre><code>    githubcl PATCH /repos/:owner/:repo/comments/:commentId &lt;owner&gt; &lt;repo&gt; &lt;commentId&gt;</code></pre>
+
+<p>Update a commit comment.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  Id of comment.           </code></pre>
+
+<h3 id="PATCH-repos-:owner-:repo-git-refs-:ref">PATCH /repos/:owner/:repo/git/refs/:ref</h3>
+
+<pre><code>    githubcl PATCH /repos/:owner/:repo/git/refs/:ref &lt;owner&gt; &lt;repo&gt; &lt;ref&gt;</code></pre>
+
+<p>Update a Reference</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    ref    *                           </code></pre>
+
+<h3 id="PATCH-repos-:owner-:repo-hooks-:hookId">PATCH /repos/:owner/:repo/hooks/:hookId</h3>
+
+<pre><code>    githubcl PATCH /repos/:owner/:repo/hooks/:hookId &lt;owner&gt; &lt;repo&gt; &lt;hookId&gt;</code></pre>
+
+<p>Edit a hook.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    hookId  *  Id of hook.              </code></pre>
+
+<h3 id="PATCH-repos-:owner-:repo-issues-:number">PATCH /repos/:owner/:repo/issues/:number</h3>
+
+<pre><code>    githubcl PATCH /repos/:owner/:repo/issues/:number &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>Edit an issue.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         </code></pre>
+
+<h3 id="PATCH-repos-:owner-:repo-issues-comments-:commentId">PATCH /repos/:owner/:repo/issues/comments/:commentId</h3>
+
+<pre><code>    githubcl PATCH /repos/:owner/:repo/issues/comments/:commentId &lt;owner&gt; &lt;repo&gt; &lt;commentId&gt;</code></pre>
+
+<p>Edit a comment.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  ID of comment.           </code></pre>
+
+<h3 id="PATCH-repos-:owner-:repo-labels-:name">PATCH /repos/:owner/:repo/labels/:name</h3>
+
+<pre><code>    githubcl PATCH /repos/:owner/:repo/labels/:name &lt;owner&gt; &lt;repo&gt; &lt;name&gt;</code></pre>
+
+<p>Update a label.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    name   *  Name of the label.       </code></pre>
+
+<h3 id="PATCH-repos-:owner-:repo-milestones-:number">PATCH /repos/:owner/:repo/milestones/:number</h3>
+
+<pre><code>    githubcl PATCH /repos/:owner/:repo/milestones/:number &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>Update a milestone.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of milestone.     </code></pre>
+
+<h3 id="PATCH-repos-:owner-:repo-pulls-:number">PATCH /repos/:owner/:repo/pulls/:number</h3>
+
+<pre><code>    githubcl PATCH /repos/:owner/:repo/pulls/:number &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>Update a pull request.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              </code></pre>
+
+<h3 id="PATCH-repos-:owner-:repo-pulls-comments-:commentId">PATCH /repos/:owner/:repo/pulls/comments/:commentId</h3>
+
+<pre><code>    githubcl PATCH /repos/:owner/:repo/pulls/comments/:commentId &lt;owner&gt; &lt;repo&gt; &lt;commentId&gt;</code></pre>
+
+<p>Edit a comment.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner      *  Name of repository owner.
+    repo       *  Name of repository.      
+    commentId  *  Id of comment.           </code></pre>
+
+<h3 id="PATCH-repos-:owner-:repo-releases-:id">PATCH /repos/:owner/:repo/releases/:id</h3>
+
+<pre><code>    githubcl PATCH /repos/:owner/:repo/releases/:id &lt;owner&gt; &lt;repo&gt; &lt;id&gt;</code></pre>
+
+<p>Users with push access to the repository can edit ...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    id     *                           </code></pre>
+
+<h3 id="PATCH-repos-:owner-:repo-releases-assets-:id">PATCH /repos/:owner/:repo/releases/assets/:id</h3>
+
+<pre><code>    githubcl PATCH /repos/:owner/:repo/releases/assets/:id &lt;owner&gt; &lt;repo&gt; &lt;id&gt;</code></pre>
+
+<p>Edit a release asset</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    id     *                           </code></pre>
+
+<h3 id="PATCH-teams-:teamId">PATCH /teams/:teamId</h3>
+
+<pre><code>    githubcl PATCH /teams/:teamId &lt;teamId&gt;</code></pre>
+
+<p>Edit team.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    teamId  *  Id of team.</code></pre>
+
+<h3 id="PATCH-user">PATCH /user</h3>
+
+<pre><code>    githubcl PATCH /user</code></pre>
+
+<p>Update the authenticated user.</p>
+
+<h3 id="POST">POST</h3>
+
+<pre><code>    githubcl  POST &lt;subcommands&gt;</code></pre>
+
+<p>POST call</p>
+
+<h3 id="POST-gists">POST /gists</h3>
+
+<pre><code>    githubcl POST /gists</code></pre>
+
+<p>Create a gist.</p>
+
+<h3 id="POST-gists-:id-comments">POST /gists/:id/comments</h3>
+
+<pre><code>    githubcl POST /gists/:id/comments &lt;id&gt;</code></pre>
+
+<p>Create a commen</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id  *  Id of gist.</code></pre>
+
+<h3 id="POST-gists-:id-forks">POST /gists/:id/forks</h3>
+
+<pre><code>    githubcl POST /gists/:id/forks &lt;id&gt;</code></pre>
+
+<p>Fork a gist.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id  *  Id of gist.</code></pre>
+
+<h3 id="POST-markdown">POST /markdown</h3>
+
+<pre><code>    githubcl POST /markdown</code></pre>
+
+<p>Render an arbitrary Markdown document...</p>
+
+<h3 id="POST-markdown-raw">POST /markdown/raw</h3>
+
+<pre><code>    githubcl POST /markdown/raw</code></pre>
+
+<p>Render a Markdown document in raw mode...</p>
+
+<h3 id="POST-orgs-:org-repos">POST /orgs/:org/repos</h3>
+
+<pre><code>    githubcl POST /orgs/:org/repos &lt;org&gt;</code></pre>
+
+<p>Create a new repository for the authenticated user...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    org  *  Name of organisation.</code></pre>
+
+<h3 id="POST-orgs-:org-teams">POST /orgs/:org/teams</h3>
+
+<pre><code>    githubcl POST /orgs/:org/teams &lt;org&gt;</code></pre>
+
+<p>Create team.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    org  *  Name of organisation.</code></pre>
+
+<h3 id="POST-repos-:owner-:repo-commits-:shaCode-comments">POST /repos/:owner/:repo/commits/:shaCode/comments</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/commits/:shaCode/comments &lt;owner&gt; &lt;repo&gt; &lt;shaCode&gt;</code></pre>
+
+<p>Create a commit comment.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner    *  Name of repository owner.
+    repo     *  Name of repository.      
+    shaCode  *  SHA-1 code of the commit.</code></pre>
+
+<h3 id="POST-repos-:owner-:repo-deployments">POST /repos/:owner/:repo/deployments</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/deployments &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Users with push access can create a deployment for...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-deployments-:id-statuses">POST /repos/:owner/:repo/deployments/:id/statuses</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/deployments/:id/statuses &lt;owner&gt; &lt;repo&gt; &lt;id&gt;</code></pre>
+
+<p>Create a Deployment Status</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.                   
+    repo   *  Name of repository.                         
+    id     *  The Deployment ID to list the statuses from.</code></pre>
+
+<h3 id="POST-repos-:owner-:repo-forks">POST /repos/:owner/:repo/forks</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/forks &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Create a fork.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-git-blobs">POST /repos/:owner/:repo/git/blobs</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/git/blobs &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Create a Blob.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-git-commits">POST /repos/:owner/:repo/git/commits</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/git/commits &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Create a Commit.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-git-refs">POST /repos/:owner/:repo/git/refs</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/git/refs &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Create a Reference</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-git-tags">POST /repos/:owner/:repo/git/tags</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/git/tags &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Create a Tag Object.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-git-trees">POST /repos/:owner/:repo/git/trees</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/git/trees &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Create a Tree.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-hooks">POST /repos/:owner/:repo/hooks</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/hooks &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Create a hook.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-hooks-:hookId-tests">POST /repos/:owner/:repo/hooks/:hookId/tests</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/hooks/:hookId/tests &lt;owner&gt; &lt;repo&gt; &lt;hookId&gt;</code></pre>
+
+<p>Test a push hook.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    hookId  *  Id of hook.              </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-issues">POST /repos/:owner/:repo/issues</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/issues &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Create an issue.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-issues-:number-comments">POST /repos/:owner/:repo/issues/:number/comments</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/issues/:number/comments &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>Create a comment.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-issues-:number-labels">POST /repos/:owner/:repo/issues/:number/labels</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/issues/:number/labels &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>Add labels to an issue.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-keys">POST /repos/:owner/:repo/keys</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/keys &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Create a key.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-labels">POST /repos/:owner/:repo/labels</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/labels &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Create a label.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-merges">POST /repos/:owner/:repo/merges</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/merges &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Perform a merge.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-milestones">POST /repos/:owner/:repo/milestones</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/milestones &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Create a milestone.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-pulls">POST /repos/:owner/:repo/pulls</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/pulls &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Create a pull request.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-pulls-:number-comments">POST /repos/:owner/:repo/pulls/:number/comments</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/pulls/:number/comments &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>Create a comment.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-releases">POST /repos/:owner/:repo/releases</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/releases &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Create a release</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="POST-repos-:owner-:repo-statuses-:ref">POST /repos/:owner/:repo/statuses/:ref</h3>
+
+<pre><code>    githubcl POST /repos/:owner/:repo/statuses/:ref &lt;owner&gt; &lt;repo&gt; &lt;ref&gt;</code></pre>
+
+<p>Create a Status.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.                                                    
+    repo   *  Name of repository.                                                          
+    ref    *  Ref to list the statuses from. It can be a SHA, a branch name, or a tag name.</code></pre>
+
+<h3 id="POST-user-emails">POST /user/emails</h3>
+
+<pre><code>    githubcl POST /user/emails</code></pre>
+
+<p>Add email address(es).</p>
+
+<h3 id="POST-user-keys">POST /user/keys</h3>
+
+<pre><code>    githubcl POST /user/keys</code></pre>
+
+<p>Create a public key.</p>
+
+<h3 id="POST-user-repos">POST /user/repos</h3>
+
+<pre><code>    githubcl POST /user/repos</code></pre>
+
+<p>Create a new repository for the authenticated user...</p>
+
+<h3 id="PUT">PUT</h3>
+
+<pre><code>    githubcl  PUT &lt;subcommands&gt;</code></pre>
+
+<p>PUT call</p>
+
+<h3 id="PUT-gists-:id-star">PUT /gists/:id/star</h3>
+
+<pre><code>    githubcl PUT /gists/:id/star &lt;id&gt;</code></pre>
+
+<p>Star a gist.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id  *  Id of gist.</code></pre>
+
+<h3 id="PUT-notifications">PUT /notifications</h3>
+
+<pre><code>    githubcl PUT /notifications</code></pre>
+
+<p>Mark as read.</p>
+
+<h3 id="PUT-notifications-threads-:id-subscription">PUT /notifications/threads/:id/subscription</h3>
+
+<pre><code>    githubcl PUT /notifications/threads/:id/subscription &lt;id&gt;</code></pre>
+
+<p>Set a Thread Subscription.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    id  *  Id of thread.</code></pre>
+
+<h3 id="PUT-orgs-:org-public_members-:username">PUT /orgs/:org/public_members/:username</h3>
+
+<pre><code>    githubcl PUT /orgs/:org/public_members/:username &lt;org&gt; &lt;username&gt;</code></pre>
+
+<p>Publicize a user&#39;s membership.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    org       *  Name of organisation.
+    username  *  Name of the user.    </code></pre>
+
+<h3 id="PUT-repos-:owner-:repo-collaborators-:user">PUT /repos/:owner/:repo/collaborators/:user</h3>
+
+<pre><code>    githubcl PUT /repos/:owner/:repo/collaborators/:user &lt;owner&gt; &lt;repo&gt; &lt;user&gt;</code></pre>
+
+<p>Add collaborator.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    user   *  Login of the user.       </code></pre>
+
+<h3 id="PUT-repos-:owner-:repo-contents-:path">PUT /repos/:owner/:repo/contents/:path</h3>
+
+<pre><code>    githubcl PUT /repos/:owner/:repo/contents/:path &lt;owner&gt; &lt;repo&gt; &lt;path&gt;</code></pre>
+
+<p>Create a file.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      
+    path   *                           </code></pre>
+
+<h3 id="PUT-repos-:owner-:repo-issues-:number-labels">PUT /repos/:owner/:repo/issues/:number/labels</h3>
+
+<pre><code>    githubcl PUT /repos/:owner/:repo/issues/:number/labels &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>Replace all labels for an issue....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Number of issue.         </code></pre>
+
+<h3 id="PUT-repos-:owner-:repo-notifications">PUT /repos/:owner/:repo/notifications</h3>
+
+<pre><code>    githubcl PUT /repos/:owner/:repo/notifications &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Mark notifications as read in a repository....</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="PUT-repos-:owner-:repo-pulls-:number-merge">PUT /repos/:owner/:repo/pulls/:number/merge</h3>
+
+<pre><code>    githubcl PUT /repos/:owner/:repo/pulls/:number/merge &lt;owner&gt; &lt;repo&gt; &lt;number&gt;</code></pre>
+
+<p>Merge a pull request (Merge Button&#39;s)...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner   *  Name of repository owner.
+    repo    *  Name of repository.      
+    number  *  Id of pull.              </code></pre>
+
+<h3 id="PUT-repos-:owner-:repo-subscription">PUT /repos/:owner/:repo/subscription</h3>
+
+<pre><code>    githubcl PUT /repos/:owner/:repo/subscription &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Set a Repository Subscription</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of repository owner.
+    repo   *  Name of repository.      </code></pre>
+
+<h3 id="PUT-teams-:teamId-members-:username">PUT /teams/:teamId/members/:username</h3>
+
+<pre><code>    githubcl PUT /teams/:teamId/members/:username &lt;teamId&gt; &lt;username&gt;</code></pre>
+
+<p>The API (described below) is deprecated and is sch...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    teamId    *  Id of team.      
+    username  *  Name of a member.</code></pre>
+
+<h3 id="PUT-teams-:teamId-memberships-:username">PUT /teams/:teamId/memberships/:username</h3>
+
+<pre><code>    githubcl PUT /teams/:teamId/memberships/:username &lt;teamId&gt; &lt;username&gt;</code></pre>
+
+<p>Add team membership.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    teamId    *  Id of team.      
+    username  *  Name of a member.</code></pre>
+
+<h3 id="PUT-teams-:teamId-repos-:org-:repo">PUT /teams/:teamId/repos/:org/:repo</h3>
+
+<pre><code>    githubcl PUT /teams/:teamId/repos/:org/:repo &lt;teamId&gt; &lt;org&gt; &lt;repo&gt;</code></pre>
+
+<p>In order to add a repository to a team, the authen...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    teamId  *  Id of team.            
+    org     *  Name of a organization.
+    repo    *  Name of a repository.  </code></pre>
+
+<h3 id="PUT-user-following-:username">PUT /user/following/:username</h3>
+
+<pre><code>    githubcl PUT /user/following/:username &lt;username&gt;</code></pre>
+
+<p>Follow a user.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    username  *  Name of user.</code></pre>
+
+<h3 id="PUT-user-starred-:owner-:repo">PUT /user/starred/:owner/:repo</h3>
+
+<pre><code>    githubcl PUT /user/starred/:owner/:repo &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Star a repository.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of a repository owner.
+    repo   *  Name of a repository.      </code></pre>
+
+<h3 id="PUT-user-subscriptions-:owner-:repo">PUT /user/subscriptions/:owner/:repo</h3>
+
+<pre><code>    githubcl PUT /user/subscriptions/:owner/:repo &lt;owner&gt; &lt;repo&gt;</code></pre>
+
+<p>Watch a repository.</p>
+
+<p>Parameters:</p>
+
+<pre><code>    owner  *  Name of the owner. 
+    repo   *  Name of repository.</code></pre>
+
+<h3 id="help">help</h3>
+
+<pre><code>    githubcl  help &lt;subcommands&gt; [options]</code></pre>
+
+<p>Show command help</p>
+
+<p>Options:</p>
+
+<pre><code>    --all     (flag)</code></pre>
+
+<h3 id="meta">_meta</h3>
+
+<pre><code>    githubcl  _meta &lt;subcommands&gt;</code></pre>
+
+<p>Information and utilities for this app</p>
+
+<h3 id="meta-completion">_meta completion</h3>
+
+<pre><code>    githubcl _meta completion &lt;subcommands&gt;</code></pre>
+
+<p>Shell completion functions</p>
+
+<h3 id="meta-completion-generate">_meta completion generate</h3>
+
+<pre><code>    githubcl _meta completion generate [options]</code></pre>
+
+<p>Generate self completion</p>
+
+<p>Options:</p>
+
+<pre><code>    --name    name of the program (optional, override name in spec)
+    --zsh     for zsh (flag)                                       
+    --bash    for bash (flag)                                      </code></pre>
+
+<h3 id="meta-pod">_meta pod</h3>
+
+<pre><code>    githubcl _meta pod &lt;subcommands&gt;</code></pre>
+
+<p>Pod documentation</p>
+
+<h3 id="meta-pod-generate">_meta pod generate</h3>
+
+<pre><code>    githubcl _meta pod generate</code></pre>
+
+<p>Generate self pod</p>
+
+
+</body>
+
+</html>
+
+

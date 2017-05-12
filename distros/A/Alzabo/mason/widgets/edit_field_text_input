@@ -1,0 +1,85 @@
+<%doc>
+=pod
+
+=head1 NAME
+
+edit_field_text_input
+
+=head1 SYNOPSIS
+
+  <& edit_field_text_input, column => $column, row => $row &>
+
+=head1 DESCRIPTION
+
+Given a column and an optional row, this component produces a text
+input form element for that column.
+
+If a row is given, then its value will be used as the default value
+for the form element.
+
+=head1 PARAMETERS
+
+=over 4
+
+=item * column (required)
+
+An C<Alzabo::Column> object.
+
+=item * row (optional)
+
+An Alzabo row object.
+
+=item * class (optional)
+
+This defaults to C<<
+$m->base_comp->attr_if_exists('text_input_class_default') >>, which
+makes it easy to set up default styles for this form element.
+
+=item * size (optional)
+
+If this is not given, it default to C<<
+$m->base_comp->attr_if_exists('text_input_size_default') >> if
+available, otherwise 30.
+
+=item * maxlength (optional)
+
+If this is not given, the component tries to come up with some reasonable
+value based on the column's type and length.
+
+=back
+
+=cut
+</%doc>
+<input type="text" name="<% $col_name %>" value="<% $val | h %>" size="<% $size %>" maxlength="<% $maxlength %>" class="<% $class %>">\
+<%args>
+$row => undef
+$column
+$class => $m->base_comp->attr_if_exists('text_input_class_default')
+$size => $m->base_comp->attr_if_exists('text_input_size_default') || 30
+$maxlength => $size
+</%args>
+<%init>
+my $val;
+
+my $col_name = ref $column ? $column->name : $column;
+
+if (defined $row)
+{
+    $val = $row->select( $col_name );
+}
+
+$val = '' unless defined $val;
+
+$maxlength =
+    $column->length && $column->length < $maxlength ? $column->length :
+    ( ! $column->is_character ? 10 : $maxlength );
+
+if ( $maxlength > $size && exists $ARGS{size} )
+{
+    $maxlength = $size;
+}
+elsif ( $maxlength < $size )
+{
+    $size = $maxlength;
+}
+</%init>

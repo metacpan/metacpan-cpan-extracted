@@ -1,0 +1,75 @@
+#!/usr/bin/env perl
+
+use 5.006;
+use strict;
+use warnings;
+
+use App::todoist;
+
+my $todoist = App::todoist->new;
+
+$todoist->run({ argv => \@ARGV });
+
+exit 0;
+
+=head1 NAME
+
+todoist - command-line tool for managing your todoist.com todo list
+
+=head1 SYNOPSIS
+
+ todoist -project perl -token XXX -i taskfile.txt [ -priority 1|2|3|4 ]
+         [ -add-project projectname ]
+
+=head1 DESCRIPTION
+
+This script gives you a command-line interface to the API for todoist,
+which is an online todo list service, with interfaces on most mobile
+devices and desktop operating systems.
+
+At the moment this just supports two operations:
+
+=over 4
+
+=item * importing a list of tasks from a text file, with one task per line.
+
+=item * adding a new project
+
+=back
+
+It will evolve over time - I'll be adding more features as I need them.
+I've released this in a separate dist so as not to add a bunch of
+non-core dependencies to L<Net::Todoist>.
+
+You can create a C<.todoist> file in your home directory,
+with default values for the various parameters.
+This is probably where you want to provide your API token:
+
+ token    = XXXXXX
+ priority = 4
+ project  = work
+
+Note that this file must only be readable by you.
+
+
+=head1 SEE ALSO
+
+L<Net::Todoist>
+
+=head1 REPOSITORY
+
+L<https://github.com/neilbowers/App-todoist>
+
+=head1 AUTHOR
+
+Neil Bowers E<lt>neilb@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Neil Bowers <neilb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

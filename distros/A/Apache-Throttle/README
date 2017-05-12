@@ -1,0 +1,36 @@
+Apache::Throttle - Apache/Perl module for speed-based content negotiation
+
+Apache::Throttle is a package designed to allow Apache webservers to
+negotiate content based on the speed of the connection.
+
+It's primary purpose is to transparently send smaller (lower
+resolution/quality) images to users with slow internet connections,
+but it can also be used for many other purposes.
+
+Prerequisites:
+  * Apache w/ mod_perl
+  * IPC::Shareable
+  * Time::HiRes and Image::Magick are also recommended.
+
+Quick Start:
+  1) "perl Makefile.PL"
+  2) "make"
+  3) "make install"
+  4) add the following lines to one of your Apache config files:
+         PerlTransHandler   Apache::Throttle
+         PerlFixUpHandler   Apache::Throttle::Log
+  5) "apachectl restart" (or send the main httpd process a -HUP signal)
+  6) "throttleimg <a gif or jpeg in your Apache htdocs root>"
+  7) Browse around your site with a web browser for a while from a remote
+     machine, making sure that it loads at least one file larger than 64k.
+  8) Request the file that you ran throttleimg on earlier.  It should load
+     in approximately 5 seconds, regardless of your connection speed.
+  9) See the manpages for Apache::Throttle, Apache::Throttle::Log, and 
+     throttleimg for information on changing the defaults.
+ 10) Good luck. :-)
+
+Copyright (c) 1998 Don Schwarz. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms
+as Perl itself.
+
+$Id: README,v 1.2 1998/09/11 20:45:39 don Exp $

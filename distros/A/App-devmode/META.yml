@@ -1,0 +1,35 @@
+---
+abstract: 'Simple wrapper for screen that permits running of multiple screen configs for different tasks.'
+author:
+  - 'Ivan Wills <ivan.wills@gmail.com>'
+build_requires:
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4204, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-devmode
+provides:
+  App::devmode:
+    file: lib/App/devmode.pm
+    version: v0.0.8
+requires:
+  List::MoreUtils: 0
+  Path::Class: 0
+  Template: 0
+  Template::Provider::FromDATA: 0
+  Term::Title: 0
+  Test::NoWarnings: 0
+  YAML: 0
+  perl: 5.008
+  version: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::devmode
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ivanwills/App-devmode.git
+version: v0.0.8

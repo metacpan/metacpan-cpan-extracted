@@ -1,0 +1,316 @@
+#------------------------------------------------------------------------------
+# Z80 assembly table
+# The order is important: an instruction is only loaded if not yet defined
+#
+# $Id$
+
+#------------------------------------------------------------------------------
+# 8 bit load group
+
+ld	<b.c.d.e.h.l..a>,<b.c.d.e.h.l..a>			=>      0x40+<1:3>+<2>
+
+ld	<b.c.d.e.ixh.ixl..a>,<....ixh.ixl..>		=> 0xDD 0x40+<1:3>+<2>
+ld	<....ixh.ixl..>,<b.c.d.e.ixh.ixl..a>		=> 0xDD 0x40+<1:3>+<2>
+
+ld	<b.c.d.e.iyh.iyl..a>,<....iyh.iyl..>		=> 0xFD 0x40+<1:3>+<2>
+ld	<....iyh.iyl..>,<b.c.d.e.iyh.iyl..a>		=> 0xFD 0x40+<1:3>+<2>
+
+ld	<b.c.d.e.h.l..a>,N							=>      0x06+<1:3> N
+ld	<....ixh.ixl..>,N							=> 0xDD 0x06+<1:3> N
+ld	<....iyh.iyl..>,N							=> 0xFD 0x06+<1:3> N
+
+ld	<b.c.d.e.h.l..a>,(hl)						=>      0x46+<1:3>
+ldi	<b.c.d.e.h.l..a>,(hl)						=>      0x46+<1:3> 0x23
+ldd	<b.c.d.e.h.l..a>,(hl)						=>      0x46+<1:3> 0x2B
+
+ld	<b.c.d.e.h.l..a>,(ix+DIS)					=> 0xDD 0x46+<1:3> DIS
+ldi	<b.c.d.e.h.l..a>,(ix+DIS)					=> 0xDD 0x46+<1:3> DIS 0xDD 0x23
+ldd	<b.c.d.e.h.l..a>,(ix+DIS)					=> 0xDD 0x46+<1:3> DIS 0xDD 0x2B
+
+ld	<b.c.d.e.h.l..a>,(iy+DIS)					=> 0xFD 0x46+<1:3> DIS
+ldi	<b.c.d.e.h.l..a>,(iy+DIS)					=> 0xFD 0x46+<1:3> DIS 0xFD 0x23
+ldd	<b.c.d.e.h.l..a>,(iy+DIS)					=> 0xFD 0x46+<1:3> DIS 0xFD 0x2B
+
+ld	(hl),<b.c.d.e.h.l..a>						=>      0x70+<2>
+ldi	(hl),<b.c.d.e.h.l..a>						=>      0x70+<2> 0x23
+ldd	(hl),<b.c.d.e.h.l..a>						=>      0x70+<2> 0x2B
+
+ld	(ix+DIS),<b.c.d.e.h.l..a>					=> 0xDD 0x70+<2> DIS
+ldi	(ix+DIS),<b.c.d.e.h.l..a>					=> 0xDD 0x70+<2> DIS 0xDD 0x23
+ldd	(ix+DIS),<b.c.d.e.h.l..a>					=> 0xDD 0x70+<2> DIS 0xDD 0x2B
+
+ld	(iy+DIS),<b.c.d.e.h.l..a>					=> 0xFD 0x70+<2> DIS
+ldi	(iy+DIS),<b.c.d.e.h.l..a>					=> 0xFD 0x70+<2> DIS 0xFD 0x23
+ldd	(iy+DIS),<b.c.d.e.h.l..a>					=> 0xFD 0x70+<2> DIS 0xFD 0x2B
+
+ld	(hl),N										=>      0x36 N
+ldi	(hl),N										=>      0x36 N 0x23
+ldd	(hl),N										=>      0x36 N 0x2B
+
+ld	(ix+DIS),N									=> 0xDD 0x36 DIS N
+ldi	(ix+DIS),N									=> 0xDD 0x36 DIS N 0xDD	0x23
+ldd	(ix+DIS),N									=> 0xDD 0x36 DIS N 0xDD	0x2B
+
+ld	(iy+DIS),N									=> 0xFD 0x36 DIS N
+ldi	(iy+DIS),N									=> 0xFD 0x36 DIS N 0xFD	0x23
+ldd	(iy+DIS),N									=> 0xFD 0x36 DIS N 0xFD	0x2B
+
+ld	a,<(bc).(de)>								=> 0x0A+<2:4>
+ldi	a,<(bc).(de)>								=> 0x0A+<2:4> 0x03+<2:4>
+ldd	a,<(bc).(de)>								=> 0x0A+<2:4> 0x0B+<2:4>
+
+ld	<(bc).(de)>,a								=> 0x02+<1:4>
+ldi	<(bc).(de)>,a								=> 0x02+<1:4> 0x03+<1:4>
+ldd	<(bc).(de)>,a								=> 0x02+<1:4> 0x0B+<1:4>
+
+ld	a,(NN) 										=> 0x3A NNl NNh
+ld	(NN),a 										=> 0x32 NNl NNh
+
+ld	a,<i.r>										=> 0xED 0x57+<2:3>
+ld	<i.r>,a										=> 0xED 0x47+<1:3>
+
+# load 16 bits
+
+ld	<bc..de..hl>,<bc..de..hl>	=>      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+ld	<bc..de..>,ix				=> 0xDD 0x44+<1:3>     0xDD 0x4D+<1:3>
+ld	<bc..de..>,iy				=> 0xFD 0x44+<1:3>     0xFD 0x4D+<1:3>
+
+ld	<bc..de..>,(hl)				=>      0x4E+<1:3> 0x23     0x46+<1:3> 0x2B
+ldi	<bc..de..>,(hl)				=>      0x4E+<1:3> 0x23     0x46+<1:3> 0x23
+
+ld	<bc..de..hl>,(ix+DIS)		=> 0xDD 0x4E+<1:3> DIS           0xDD 0x46+<1:3> DIS+1
+ldi	<bc..de..hl>,(ix+DIS)		=> 0xDD 0x4E+<1:3> DIS 0xDD 0x23 0xDD 0x46+<1:3> DIS 0xDD 0x23 
+
+ld	<bc..de..hl>,(iy+DIS)		=> 0xFD 0x4E+<1:3> DIS           0xFD 0x46+<1:3> DIS+1
+ldi	<bc..de..hl>,(iy+DIS)		=> 0xFD 0x4E+<1:3> DIS 0xFD 0x23 0xFD 0x46+<1:3> DIS 0xFD 0x23
+
+ld 	(hl),<bc..de>				=>      0x71+<2> 0x23     0x70+<2> 0x2B
+ldi	(hl),<bc..de>				=>      0x71+<2> 0x23     0x70+<2> 0x23
+
+ld 	(ix+DIS),<bc..de..hl>		=> 0xDD 0x71+<2> DIS           0xDD 0x70+<2> DIS+1
+ldi	(ix+DIS),<bc..de..hl>		=> 0xDD 0x71+<2> DIS 0xDD 0x23 0xDD 0x70+<2> DIS 0xDD 0x23
+
+ld 	(iy+DIS),<bc..de..hl>		=> 0xFD 0x71+<2> DIS 0xFD 0x70+<2> DIS+1
+ldi	(iy+DIS),<bc..de..hl>		=> 0xFD 0x71+<2> DIS 0xFD 0x23 0xFD 0x70+<2> DIS 0xFD 0x23
+
+ld 	hl,ix						=> 0xDD 0xE5 0xE1
+ld 	hl,iy						=> 0xFD 0xE5 0xE1
+
+ld	ix,<bc..de..>				=> 0xDD 0x69+<2>       0xDD 0x60+<2>
+ld	iy,<bc..de..>				=> 0xFD 0x69+<2>       0xFD 0x60+<2>
+
+ld ix,hl						=> 0xE5 0xDD 0xE1
+ld iy,hl						=> 0xE5 0xFD 0xE1
+
+ld ix,ix						=> 0xDD 0x6D 0xDD 0x64
+ld ix,iy						=> 0xFD 0xE5 0xDD 0xE1
+
+ld iy,iy						=> 0xFD 0x6D 0xFD 0x64
+ld iy,ix						=> 0xDD 0xE5 0xFD 0xE1
+
+#------------------------------------------------------------------------------
+# 16 bit load group
+
+ld	<bc.de.hl.sp>,NN					 		=>      0x01+<1:4> NNl NNh
+ld	ix,NN								 		=> 0xDD 0x21 NNl NNh
+ld	iy,NN								 		=> 0xFD 0x21 NNl NNh
+
+ld	hl,(NN)										=>      0x2A NNl NNh
+ld	ix,(NN)										=> 0xDD 0x2A NNl NNh
+ld	iy,(NN)										=> 0xFD 0x2A NNl NNh
+
+ld	<bc.de.hl.sp>,(NN)							=> 0xED 0x4B+<1:4> NNl NNh
+
+ld	(NN),hl										=>      0x22 NNl NNh
+ld	(NN),ix										=> 0xDD 0x22 NNl NNh
+ld	(NN),iy										=> 0xFD 0x22 NNl NNh
+
+ld	(NN),<bc.de.hl.sp>							=> 0xED 0x43+<2:4> NNl NNh
+
+ld	sp,hl										=>      0xF9
+ld	sp,ix										=> 0xDD 0xF9
+ld	sp,iy										=> 0xFD 0xF9
+
+push <bc.de.hl.af>								=>      0xC5+<1:4>
+push ix											=> 0xDD 0xE5
+push iy											=> 0xFD 0xE5
+
+pop <bc.de.hl.af>								=>      0xC1+<1:4>
+pop ix											=> 0xDD 0xE1
+pop iy											=> 0xFD 0xE1
+
+#------------------------------------------------------------------------------
+# Exchange, block transfer, search group
+
+ex	de,hl										=>      0xEB
+ex	af,af'										=>		0x08	# '
+exx												=> 		0xD9
+
+ex	(sp),hl										=>		0xE3
+ex	(sp),ix										=> 0xDD 0xE3
+ex	(sp),iy										=> 0xFD 0xE3
+
+ldi												=> 0xED 0xA0
+ldir											=> 0xED 0xB0
+ldd												=> 0xED 0xA8
+lddr											=> 0xED 0xB8
+
+cpi												=> 0xED 0xA1
+cpir											=> 0xED 0xB1
+cpd												=> 0xED 0xA9
+cpdr											=> 0xED 0xB9
+
+#------------------------------------------------------------------------------
+# 8 bit arithmetic and logical group
+
+<add.adc..sbc> a,<b.c.d.e.h.l..a>				=>      0x80+<0:3>+<2>
+<add.adc..sbc> a,<....ixh.ixl..>				=> 0xDD 0x80+<0:3>+<2>
+<add.adc..sbc> a,<....iyh.iyl..>				=> 0xFD 0x80+<0:3>+<2>
+<add.adc..sbc> a,N								=>		0xC6+<0:3> N
+<add.adc..sbc> a,(hl)							=>      0x86+<0:3>
+<add.adc..sbc> a,(ix+DIS)						=> 0xDD 0x86+<0:3> DIS
+<add.adc..sbc> a,(iy+DIS)						=> 0xFD 0x86+<0:3> DIS
+
+<..sub..and.xor.or.cp>   <b.c.d.e.h.l..a>		=>      0x80+<0:3>+<1>
+<..sub..and.xor.or.cp>   <....ixh.ixl..>		=> 0xDD 0x80+<0:3>+<1>
+<..sub..and.xor.or.cp>   <....iyh.iyl..>		=> 0xFD 0x80+<0:3>+<1>
+<..sub..and.xor.or.cp>   N						=>		0xC6+<0:3> N
+<..sub..and.xor.or.cp>   (hl)					=>      0x86+<0:3>
+<..sub..and.xor.or.cp>   (ix+DIS)				=> 0xDD 0x86+<0:3> DIS
+<..sub..and.xor.or.cp>   (iy+DIS)				=> 0xFD 0x86+<0:3> DIS
+
+<....inc.dec> <b.c.d.e.h.l..a>					=>      0x00+<0>+<1:3>
+<....inc.dec> <....ixh.ixl..>					=> 0xDD 0x00+<0>+<1:3>
+<....inc.dec> <....iyh.iyl..>					=> 0xFD 0x00+<0>+<1:3>
+
+<....inc.dec> (hl)								=>      0x30+<0>
+<....inc.dec> (ix+DIS)							=> 0xDD 0x30+<0> DIS
+<....inc.dec> (iy+DIS)							=> 0xFD 0x30+<0> DIS
+
+#------------------------------------------------------------------------------
+# General purpose arithmetic and CPU control group
+
+daa 											=> 0x27
+cpl 											=> 0x2F
+neg 											=> 0xED 0x44
+ccf 											=> 0x3F
+scf 											=> 0x37
+nop 											=> 0x00
+halt											=> 0x76
+di 												=> 0xF3
+ei	 											=> 0xFB
+im	0 											=> 0xED 0x46
+im	1 											=> 0xED 0x56
+im	2 											=> 0xED 0x5E
+
+#------------------------------------------------------------------------------
+# 8 bit arithmetic and logical group
+
+add hl,<bc.de.hl.sp>							=>		0x09+<2:4>
+add ix,<bc.de.ix.sp>							=> 0xDD 0x09+<2:4>
+add iy,<bc.de.iy.sp>							=> 0xFD 0x09+<2:4>
+
+<sbc.adc> hl,<bc.de.hl.sp>						=>      0xED 0x42+<0:3>+<2:4>
+sub hl,<bc.de.hl.sp>							=> 0xB7 0xED 0x42+<2:4>
+
+<inc.dec> <bc.de.hl.sp>							=>		0x03+<0:3>+<1:4>
+<inc.dec> <..ix.>								=> 0xDD 0x03+<0:3>+<1:4>
+<inc.dec> <..iy.>								=> 0xFD 0x03+<0:3>+<1:4>
+
+#------------------------------------------------------------------------------
+# rotate and shift group
+
+<rlca.rrca.rla.rra>											=>		0x07+<0:3>
+
+<rlc.rrc.rl.rr.sla.sra.sll.srl> <b.c.d.e.h.l..a>			=> 		0xCB     0x00+<0:3>+<1>
+<rlc.rrc.rl.rr.sla.sra.sll.srl> (hl)						=>      0xCB     0x06+<0:3>
+<rlc.rrc.rl.rr.sla.sra.sll.srl> (ix+DIS)					=> 0xDD 0xCB DIS 0x06+<0:3>
+<rlc.rrc.rl.rr.sla.sra.sll.srl> (iy+DIS)					=> 0xFD 0xCB DIS 0x06+<0:3>
+<rlc.rrc.rl.rr.sla.sra.sll.srl> (ix+DIS),<b.c.d.e.h.l..a>	=> 0xDD 0xCB DIS 0x00+<0:3>+<2>
+<rlc.rrc.rl.rr.sla.sra.sll.srl> (iy+DIS),<b.c.d.e.h.l..a>	=> 0xFD 0xCB DIS 0x00+<0:3>+<2>
+
+<rlc.rrc.rl.rr.sla.sra.sli.srl> <b.c.d.e.h.l..a>			=> 		0xCB     0x00+<0:3>+<1>
+<rlc.rrc.rl.rr.sla.sra.sli.srl> (hl)						=>      0xCB     0x06+<0:3>
+<rlc.rrc.rl.rr.sla.sra.sli.srl> (ix+DIS)					=> 0xDD 0xCB DIS 0x06+<0:3>
+<rlc.rrc.rl.rr.sla.sra.sli.srl> (iy+DIS)					=> 0xFD 0xCB DIS 0x06+<0:3>
+<rlc.rrc.rl.rr.sla.sra.sli.srl> (ix+DIS),<b.c.d.e.h.l..a>	=> 0xDD 0xCB DIS 0x00+<0:3>+<2>
+<rlc.rrc.rl.rr.sla.sra.sli.srl> (iy+DIS),<b.c.d.e.h.l..a>	=> 0xFD 0xCB DIS 0x00+<0:3>+<2>
+
+rld															=> 0xED 0x6F
+rrd															=> 0xED 0x67
+
+# rotate 16 bits
+
+rl <bc..de..hl>					=> 0xCB 0x11+<1> 0xCB 0x10+<1>
+rr <bc..de..hl>					=> 0xCB 0x18+<1> 0xCB 0x19+<1>
+
+sla hl							=> 0x29			# special case: add hl,hl
+sla <bc..de..hl>				=> 0xCB 0x21+<1> 0xCB 0x10+<1>
+sll <bc..de..hl>				=> 0xCB 0x31+<1> 0xCB 0x10+<1>
+sli <bc..de..hl>				=> 0xCB 0x31+<1> 0xCB 0x10+<1>
+
+sra <bc..de..hl>				=> 0xCB 0x28+<1> 0xCB 0x19+<1>
+srl <bc..de..hl>				=> 0xCB 0x38+<1> 0xCB 0x19+<1>
+
+#------------------------------------------------------------------------------
+# Bit Set, Reset and Test Group
+
+<.bit.res.set> <0.1.2.3.4.5.6.7>,<b.c.d.e.h.l..a>			=>      0xCB     <0:6>+<1:3>+<2>
+<.bit.res.set> <0.1.2.3.4.5.6.7>,(hl)						=>      0xCB     <0:6>+<1:3>+6
+<.bit.res.set> <0.1.2.3.4.5.6.7>,(ix+DIS)					=> 0xDD 0xCB DIS <0:6>+<1:3>+6
+<.bit.res.set> <0.1.2.3.4.5.6.7>,(iy+DIS)					=> 0xFD 0xCB DIS <0:6>+<1:3>+6
+<..res.set>    <0.1.2.3.4.5.6.7>,(ix+DIS),<b.c.d.e.h.l..a>	=> 0xDD 0xCB DIS <0:6>+<1:3>+<3>
+<..res.set>    <0.1.2.3.4.5.6.7>,(iy+DIS),<b.c.d.e.h.l..a>	=> 0xFD 0xCB DIS <0:6>+<1:3>+<3>
+
+#------------------------------------------------------------------------------
+# Jump Group
+
+jp NN											=> 		0xC3       NNl NNh
+jp <nz.z.nc.c.po.pe.p.m>,NN						=> 		0xC2+<1:3> NNl NNh
+
+jr NN											=> 		0x18       NNo
+jr <nz.z.nc.c>,NN								=> 		0x20+<1:3> NNo
+jr <....po.pe.p.m>,NN							=> 		0xC2+<1:3> NNl NNh
+djnz NN											=>		0x10       NNo
+
+jp (hl)											=> 		0xE9
+jp (ix)											=> 0xDD	0xE9
+jp (iy)											=> 0xFD	0xE9
+
+#------------------------------------------------------------------------------
+# Call and Return Group
+
+call NN											=> 		0xCD       NNl NNh
+call <nz.z.nc.c.po.pe.p.m>,NN					=> 		0xC4+<1:3> NNl NNh
+ret												=> 		0xC9
+ret <nz.z.nc.c.po.pe.p.m>						=> 		0xC0+<1:3>
+reti											=> 0xED 0x4D
+retn											=> 0xED 0x45
+rst <0.8.16.24.32.40.48.56>						=> 		0xC7+(<1:3>&0b00111000)
+rst <0.1.2.3.4.5.6.7>							=> 		0xC7+(<1:3>&0b00111000)
+
+#------------------------------------------------------------------------------
+# Input and Output Group
+
+in a,(N)										=>		0xDB N
+in <b.c.d.e.h.l..a>,(c)							=> 0xED 0x40+<1:3>
+in f,(c)										=> 0xED 0x70
+
+ini												=> 0xED 0xA2
+inir											=> 0xED 0xB2
+ind												=> 0xED 0xAA
+indr											=> 0xED 0xBA
+
+out (N),a										=>		0xD3 N
+out (c),<b.c.d.e.h.l..a>						=> 0xED 0x41+<2:3>
+out (c),0										=> 0xED 0x71
+
+outi											=> 0xED 0xA3
+otir											=> 0xED 0xB3
+outd											=> 0xED 0xAB
+otdr											=> 0xED 0xBB
+
+#------------------------------------------------------------------------------
+# Special instruction for CPU::Emulator::Z80
+
+stop											=> 0xDD 0xDD 0x00

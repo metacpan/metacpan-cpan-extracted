@@ -1,0 +1,11 @@
+---
+dirs-recursive:
+  .: ext/threads-shared
+exclude-regexes:
+  - '^(?:\.?/)?META.yml$'
+  - '^(?:\.?/)?README$'
+  - '^(?:\.?/)?MANIFEST$'
+  - '^(?:\.?/)?ppport\.h$'
+  - '^(?:\.?/)?examples/'
+  - '^(?:\.?/)?t/pod\.t$'
+  - '^(?:\.?/)?Changes$'

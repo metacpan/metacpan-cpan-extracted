@@ -1,0 +1,130 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+#ABSTRACT: Command line client to simply deploy PSGI applications
+#PODNAME: padadoy
+
+use 5.010;
+use App::Padadoy;
+
+use Getopt::Long;
+use File::Spec::Functions;
+use File::Basename;
+use Pod::Usage;
+use YAML::Any qw(LoadFile);
+use Cwd;
+
+my ($help,$version,$config,$quiet);
+GetOptions(
+    'help|?'   => \$help,
+    'version'  => \$version,
+    'config:s' => \$config,
+    'quiet'    => \$quiet,
+) or pod2usage(2);
+pod2usage(1) if $help;
+
+$ARGV[0] = 'version' if $version;
+
+pod2usage('Please specify a command!') unless @ARGV; 
+
+my $cmd = shift @ARGV;
+pod2usage(1) if $cmd eq 'help';
+
+# TODO: There should be a CPAN module to do this:
+sub find_config {
+    my $path = cwd;
+    while ($path) {
+        my $file = catfile($path,'padadoy.yml');
+        return $file if -e $file;
+        last if $path eq dirname($path);
+        $path = dirname($path);
+    }
+    my ($login) = getpwuid($<);
+    my $file = catdir('/home',$login,'padadoy.yml');
+    return -e $file ? $file : '';
+}
+
+$config //= find_config;
+
+# Parse config file and values
+my $values = $config ne '' ? LoadFile( $config ) : { };
+my $regexp = qr{^([a-z]+)=(.*)$};
+foreach (@ARGV) {
+    next unless $_ =~ $regexp;
+    $values->{$1} = $2;
+}
+
+foreach my $key (keys %$values) {
+    pod2usage("Unknown config value $_") unless 
+        grep { $key eq $_ } @App::Padadoy::configs;
+}
+
+my $padadoy = App::Padadoy->new($config,%$values);
+$padadoy->{quiet} = 1 if $quiet;
+
+pod2usage("Unknown command '$cmd'!")
+    unless grep { $_ eq $cmd } @App::Padadoy::commands;
+
+$padadoy->$cmd( grep { $_ !~ $regexp } @ARGV );
+
+
+
+__END__
+=pod
+
+=head1 NAME
+
+padadoy - Command line client to simply deploy PSGI applications
+
+=head1 VERSION
+
+version 0.125
+
+=head1 SYNOPSIS
+
+ padadoy [options] <command> [config=value]
+
+   Commands:
+     start           start the application
+     stop            stop the application
+     restart         start or gracefully restart the application if running
+     config          show configuration values
+     status          show some status information
+     create          create a boilerplate application
+     deplist         list applications package dependencies
+     checkout [R]    check out the application to a new directory (R=revision)
+     cartontest      update dependencies (with carton) and run tests
+     version         show version number of padadoy and exit
+     logs            consult logfiles
+     remote CMD      run padadoy with some command on the remote machine
+
+     init            initialize environment on deployment machine
+     update          check out a new revision and test it
+     enable          enable prepared application and (re)start
+
+   Options:
+     -c|--config F   specify some configuration file F. By default padadoy.yml
+                     is looked for in ./, ../, ../../ etc. and in ~/.
+                     ./padadoy.yml and then ~/padadoy.yml is used.
+     -q|--quiet      suppress status messages
+     -h|--help       show this help message and exit
+     -v|--version    show version number of padadoy and exit
+
+   Configuration:
+     Configuration values are read from padadoy.yml. In addition you can
+     set config values as key=value pairs on the command line. See the
+     command `config` for a list of config values.
+
+=head1 AUTHOR
+
+Jakob Voss
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Jakob Voss.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

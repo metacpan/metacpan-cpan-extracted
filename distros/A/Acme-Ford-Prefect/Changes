@@ -1,0 +1,100 @@
+Revision history for Perl module Alien::Base.
+
+0.038  Mar 6, 2017
+  - Require Acme::Alien::DontPanic 0.038 (Alien::Base 0.038)
+
+0.032  Feb 9, 2017
+  - Require Acme::Alien::DontPanic 0.032 (Alien::Base 0.032)
+
+0.031  Jan 31, 2017
+  - Require Acme::Alien::DontPanic 0.031 (Alien::Base 0.031)
+
+0.030  Nov 2, 2016
+  - Require Acme::Alien::DontPanic 0.030 (Alien::Base 0.030)
+
+0.029  Jun 22, 2016
+  - Require Acme::Alien::DontPanic 0.029 (Alien::Base 0.029)
+
+0.028  Mar 14, 2016
+  - Require Acme::Alien::DontPanic 0.028 (Alien::Base 0.028)
+
+0.027  Jan 20, 2016
+  - Require Acme::Alien::DontPanic 0.027 (Alien::Base 0.025)
+
+0.026  Jan 10, 2016
+  - Require Acme::Alien::DontPanic 0.026 (Alien::Base 0.024)
+
+0.025  Jul 20, 2015
+  - Require Acme::Alien::DontPanic 0.025 (Alien::Base 0.022)
+
+0.024  Jul 13, 2015
+  - Require Acme::Alien::DontPanic 0.024 (Alien::Base 0.020)
+
+0.023  Apr 27, 2015
+  - Re-release of 0.022 without the .o and .c files erroneously included
+
+0.022  Apr 24, 2015
+  - Require Acme::Alien::DontPanic 0.022 (Alien::Base 0.017)
+
+0.021  Apr 22, 2015
+  - Require Acme::Alien::DontPanic 0.021 (Alien::Base 0.016)
+
+0.020  Mar 17, 2015
+  - Require Acme::Alien::DontPanic 0.020 (Alien::Base 0.015)
+
+0.019  Feb 26, 2015
+  - Require Acme::Alien::DontPanic 0.019 (Alien::Base 0.014)
+
+0.018  Feb 25, 2015
+  - Require Acme::Alien::DontPanic 0.018 (Alien::Base 0.014)
+  - skip packlist test on blib installs.  This should
+    improve usefulness of cpantesters matrix
+
+0.017  Feb 24, 2015
+  - Require Acme::Alien::DontPanic 0.017 (Alien::Base 0.012)
+  - skip packlist test if the Acme::Alien::DontPanic share dir
+    appears to have moved
+
+0.016  Feb 22, 2015
+  - Require Acme::Alien::DontPanic 0.016 (Alien::Base 0.012)
+
+0.015  Feb 22, 2015
+  - Require Acme::Alien::DontPanic 0.015 (Alien::Base 0.011)
+
+0.014  Jan 17, 2015
+  - Require Acme::Alien::DontPanic 0.014 (Alien::Base 0.010)
+
+0.010  Jan 8, 2015
+  - Require Acme::Alien::DontPanic 0.011 (Alien::Base 0.007)
+
+0.010  Jan 8, 2015
+  - Require Acme::Alien::DontPanic 0.010 (Alien::Base 0.006)
+
+0.009  Oct 14, 2014
+  - Require Acme::Alien::DontPanic 0.009 (Alien::Base 0.006)
+
+0.008  Oct 9, 2014
+  - Require Acme::Alien::DontPanic 0.008 (Alien::Base 0.005)
+
+0.007  Sep 22, 2014
+  - Request Acme::Alien::DontPanic 0.007 (Alien::Base 0.005)
+
+0.006  Sep 11, 2014
+  - Require Acme::Alien::DontPanic 0.006 (Alien::Base 0.005)
+
+0.005  Mar 4, 2013
+	- Depend on Acme::Alien::DontPanic 0.005 (Alien::Base 0.003)
+
+0.004  Nov 28, 2012
+	- Prevent test failure on CPANtesters that don't fully install modules
+
+0.003  Nov 4, 2012
+	- Number 0.003 to correspond with Acme::Alien::DontPanic
+	- Depend on Acme::Alien::DontPanic 0.003 (A::B 0.001_001)
+	- More tests
+		- Packlist
+		- AlienLoaded hash
+
+0.001  Oct 8, 2012
+	- Initial release
+		- related to Alien::Base 0.000_022 dev release (major refactoring)

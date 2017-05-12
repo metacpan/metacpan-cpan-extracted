@@ -1,0 +1,32 @@
+This is Perl module AnyEvent::Twitter.
+
+INSTALLATION
+
+AnyEvent::Twitter installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan AnyEvent::Twitter
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+AnyEvent::Twitter documentation is available as in POD. So you can do:
+
+    % perldoc AnyEvent::Twitter
+
+to read the documentation online with your favorite pager.
+
+NOTE
+
+The API of this module is different from older version.
+Be careful to upgrade if you are using older version.
+
+punytan

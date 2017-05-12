@@ -1,0 +1,15 @@
+Revision history for Perl extension Ananke::SqlLink.
+
+1.1.2 Mon Jan 27 16:54:29 BRST 2003
+	- Fix prerequisete (DBI, DBD::mysql)
+	- Add: function rows
+
+1.1.1 Fri May 31 16:06:17 BRT 2002
+   - Fix do()
+
+1.1 Wed May 15 08:49:50 BRT 2002
+   - Change print to die when ocurred error
+
+1.0  Wed Mar  6 17:57:41 2002
+	- First stable version
+

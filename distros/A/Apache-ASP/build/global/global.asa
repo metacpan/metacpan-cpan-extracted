@@ -1,0 +1,254 @@
+
+use Data::Dumper;
+use vars qw(%FILES %ALIASES %LINKS $ASP $DOCINIT $DUMP $Ads $LINKS_MATCH $VAR1);
+use MD5;
+use Time::HiRes;
+use Data::Dumper;
+use Digest::MD5 qw( md5_hex );
+use SiteTags;
+use strict;
+
+$DUMP = "/tmp/aspbuilddumpdata";
+%FILES = ('index' => 'INTRO',
+	  'install' => 'INSTALL',
+	  'changes' => 'CHANGES',
+	  'config' => 'CONFIG',
+	  'sessions' => 'SESSIONS',
+	  'syntax' => 'SYNTAX',
+          'style' => 'STYLE GUIDE',
+	  'events' => 'EVENTS',
+	  'objects' => 'OBJECTS',
+	  'resources' => 'RESOURCES',
+	  'ssi' => 'SSI',
+	  'cgi' => 'CGI',
+	  'perlscript' => 'PERLSCRIPT',
+	  'faq' => 'FAQ',
+	  'tuning' => 'TUNING',
+	  'kudos' => 'CREDITS',
+	  'support' => 'SUPPORT',
+	  'sites' => 'SITES USING',
+	  'todo' => 'TODO',
+	  'xml' => 'XML/XSLT',
+	  'license' => 'LICENSE',
+	  'testimonials' => 'TESTIMONIALS',
+	 );
+
+%ALIASES = (
+	    'DESCRIPTION' => 'INTRO',
+#	    'INSTALL' => 'DOWNLOAD',
+	    'NOTES' => 'CREDITS',
+	   );
+
+# auto link these key words, includes %FILES inverted
+%LINKS = (
+	  'Apache Web Server' => 'http://www.apache.org',
+	  'mod_perl' => 'http://perl.apache.org',
+	  'CGI.pm' => 'http://stein.cshl.org/WWW/software/CGI/cgi_docs.html',
+	  'PerlScript' => 'http://www.activestate.com/ActivePerl/',
+	  'NT/IIS' => 'http://www.microsoft.com/iis/',
+	  'XML::XSLT' => 'http://xmlxslt.sourceforge.net/',
+	  'LRN' => 'http://www.lrn.com',
+	 );
+
+# purify files and add as links
+for(keys %FILES) {
+    delete($FILES{$_}) unless -e "$_.html";
+    $LINKS{$FILES{$_}} = "$_.html";
+}
+
+$LINKS_MATCH = join('|', keys %LINKS);
+
+#exit;
+
+sub Script_OnStart {
+    unless ($DOCINIT++) {
+	doc_init();
+    }
+    if($Request->QueryString('ads')) {
+	$Ads = 1;
+    }
+}
+
+sub Script_OnEnd {
+    $Response->Write("\n");
+}
+
+sub dmp {
+    Data::Dumper->Dump([@_]);
+}
+
+sub dbg {
+    $Response->Debug(@_);
+}
+
+sub doc_init {
+    local $/ = undef;
+    open(DUMP, $DUMP);
+    my $dump = <DUMP>;
+    close DUMP;
+    my $dump_data;
+    if ($dump) {
+	$Response->Debug("evaling compiled ASP data");
+	$dump_data = eval $dump;
+    }
+    $dump_data ||= {};
+    $Response->Debug("past eval");
+    
+    open(ASP, "../ASP.pm") || die("can't open ASP.pm: $!");
+    my $data = <ASP>;
+    close ASP;
+    
+    my $self_data;
+    open(ASP, $0);
+    $self_data = <ASP>;
+    close ASP;
+
+    $data =~ s/^.*\n__END__//s;
+    my $new_checksum = MD5->hexhash($data.$self_data.(join('', %ALIASES)));
+    if ($new_checksum eq $dump_data->{checksum}) {
+	$Response->Debug("matched old compiled ASP doc $dump_data->{checksum}");
+	$ASP = $dump_data->{ASP};
+	return;
+    }
+    
+    $ASP = { name => 'ASP', stack => [], level => 0};
+    my @levels;
+    unshift(@levels, $ASP);
+    
+    my $count = 0;
+    my $level = 0;
+    my $time = Time::HiRes::time;
+    $data =~ s/\n=(over|back|begin|end)[^\n]*\n/\n/sg;
+    while($data =~ s/^.*?\n=(head\d|item) ([^\n]*)\n(.*?)(\n\=|$)/$4/is) {
+	my($type, $name, $body) = ($1,$2,$3);
+	$body =~ s/\s+$//s;
+
+	$name = $ALIASES{$name} || $name;
+	# warn time." ----------- $type :: $name :: $body ----------- \n\n";
+	#    warn substr($data, 0, 200)."\n";
+	#    $body =~ s/\n=over\s*$//s;
+	my $item = { 
+		    name => $name,
+		    unique => substr($name, 0, 12).(length($name) > 12 ? substr(md5_hex($name.$body),0,8) : ''),
+		    body => $body,
+		    stack => [],
+		    level => ($level + 1),
+		   };
+	
+	if($type =~ /^head(\d)/) {
+	    my $current = $1;		
+	    $item->{level} = $current;
+#	    dbg("$current current level $name");
+	    while($current <= $levels[0]->{level}) {
+#		dbg("shifting $levels[0]->{name}");
+		shift(@levels);
+	    }
+	    push(@{$levels[0]->{stack}}, $item);
+#	    dbg("$level unshifting $item->{name}");
+	    unshift(@levels, $item);
+	    $level = $item->{level};
+	} else {
+	    push(@{$levels[0]->{stack}}, $item);	
+	}
+
+#	last if $count++ > 20;
+    }
+
+#    warn(Time::HiRes::time - $time);
+    open(DUMP, ">$DUMP");
+    print DUMP Data::Dumper->Dump([{ checksum => $new_checksum, ASP => $ASP}]);
+    close DUMP;
+    
+    dbg(dmp($ASP));
+}
+
+sub pod2html {
+    my($body, $title, $depth) = @_;
+
+    if($title) {
+	$depth ||= 1;
+	my $size = 2 - $depth;
+	$size = ($size > -1) ? "+$size" : $size;
+	
+	$title = "<font class=title size=$size color=#555555><b>$title</b></font>\n";
+    }
+
+    if (($body =~ /^(.*?)(<(a|table)[^\<\>]*>.*?<\/(\3)>)(.*)$/is)) {
+	my($pre,$html,$post) = ($1, $2, $5);
+#	$html =~ s/\s+/ /isg;
+	$body = $Server->HTMLEncode($pre).$html.$Server->HTMLEncode($post);
+    } else {
+	$body = $Server->HTMLEncode($body);
+    }
+    $body =~ s/(\<\%|\%\>)/$Server->HTMLEncode($1);/esg;
+
+    my @lines = split(/\n/, $body);
+    my $pre = 0;
+    my @newlines;
+    for(@lines) {
+	my $pre_tag = '';
+	if(/^\s+[^\s]/ || /^\s*$/) {
+	    if(! $pre) {
+		#			$_ = "<pre>$_";
+		$pre_tag = "<font face=\"courier new\" size=3><pre>";
+		$pre = 1;
+	    }
+	} else {
+	    if($pre) {
+		#			$_ = "</pre>$_";	
+		$pre_tag = "</pre></font>";
+		$pre = 0;
+	    }
+	}
+#	if($pre) {
+#	$_ =~ s/\s*$//;
+#	    $_ = $Server->HTMLEncode($_);	    
+#	}
+
+#	} 
+
+	$_ = $pre_tag . $_;
+	push(@newlines, $_);
+    }
+    $body = join("\n", @newlines);
+    $pre and $body .= "\n</pre>";
+
+    $body =~ s,\n\s+(([^:\n\s]{5}|[A-Z])[^\n]*?)\s*\n\s+(http://[^\n\s]+)\s*?\n,\n  <a href="$3">$1</a>\n,sg;
+#print STDERR $body;
+
+    #$body =~ s/\n\s*\n+/<p>/isg;
+    $body =~ s/([^\=\"])((http|ftp):\/\/[\w\.\/\-]+\.[\w\.\/\-\#\,\%]+[^\.\s\)])/$1<a href=$2>$2<\/a>/sg;
+#    $1 && warn "link: $1\n";
+    $body =~ s|(http://localhost[\S]*[^\.\s\,]?)|<tt>$1</tt>|sg;
+    $body =~ s|([\w\-]+\@[\w\.\,\@\-]+)(\?[\w\=\:]+)?|'<b>'.&html_encode_hide($1).'</b>'|esg;
+    $body =~ s|(\./site/)(eg/[\w\.]+[^\.\s])|<a href=$2>$1$2</a>|sg;
+
+    $body =~ s|\n\n</pre>|\n</pre>|isg;
+#    my $match_links = join('|', keys %LINKS);
+
+    my %matched;
+    $body =~ s:([^\n]*?)\b($LINKS_MATCH)(?=[^<])\b:
+    {
+	my($head, $match) = ($1, $2);
+
+#print STDERR "***** $head $match\n";
+	if(! $matched{$match}++ and $head !~ /\>$/ and $head !~ /^\s+/ and $LINKS{$match}) {
+	    "$head<a href=$LINKS{$match}><font size=-1 face=verdana><b>$match<\/b><\/font><\/a>";
+	} else	 {
+	    $head.$match;
+	}
+    }
+    :sgex;
+
+    '<font face=verdana>'.$title.$body.'</font>';
+}
+
+# we use this to mask email addresses in the documentation
+sub html_encode_hide {
+    my $word = shift;
+    join('',
+	 map{
+	     sprintf(qq(&#%03d;),ord($_))
+	 } split(//, $word)
+	);
+}

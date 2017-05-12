@@ -1,0 +1,55 @@
+Revision history for Perl extension Audio::Play::MPG123
+
+0.63 Thu Mar  3 18:00:52 CET 2005
+	- updated to mpg123 2001-05-18.
+        - added new frame accessor method, patch by Steven Elling.
+        - change of contact address.
+
+0.62 Sun Feb  4 13:39:04 CET 2001
+	- implemented SHuffle command for mpg123sh.
+	- forgot to include playlist.h. However, mpg123
+          is being used by somebody so this kind of bug gets found ;)
+	- mpg123's stderr is now redirected to /dev/null.
+        - mpg123sh no longer depends on File::Glob.
+        - mpg123 no longer destroys your terminal settings.
+
+0.61 Thu Jan 18 19:46:45 CET 2001
+	- load now returns even whent he song couldn't be started :)
+        - mpg123 is now started without the "-y" flag, since this
+          also disables id3-tag-detection.
+
+0.6  Wed Jan 17 10:49:33 CET 2001
+	- updated to version 2001-01-17 of mpg123. Left out a lot
+          of my patches (e.g. IRIX6). tell me if you need them.
+        - mpg123sh now stops on SIGPWR (send it from your
+          /etc/apmd_proxy) (requires recompile of mpg123!).
+        - new parameter "mpg123args" which expects an arrayref with
+          additinal arguments for mpg123.
+
+0.051 Fri Jul 21 04:13:35 CEST 2000
+	- fork()s no longer destroy the mpg123 process.
+        - mpg123sh accounts non-existant files to other
+          files with the same basename.
+
+0.05  Sat Jul 15 23:28:41 CEST 2000
+	- more small improvements & fixes in mpg123sh.
+        - new method 'paused'.
+        - fixed a bug that made broke http-url support.
+
+0.04  Fri Jun 23 08:03:01 CEST 2000
+	- fixed tpf, required a change in mpg123.
+        - small improvements to mpg123sh, fixing the completion problem
+          with perl's readlines in a very ugly way.
+
+0.03  Fri Jun 25 01:20:42 CEST 1999
+	- bug fixes, many of them to mpg123.
+        - removed opts method, implemented statfreq method instead.
+        - added tpf method.
+        - implemented "d" and "j" commands, many small improvements.
+
+0.02  Wed Jun 23 21:14:29 CEST 1999
+	- first release.
+
+0.01  Tue Jun 22 13:18:03 CEST 1999
+	- original version; created by cp -r ;)
+

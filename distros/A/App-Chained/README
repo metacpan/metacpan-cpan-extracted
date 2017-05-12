@@ -1,0 +1,17 @@
+Chained
+=======
+
+'Front end to sub applications in a Svn/Git fashion'
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

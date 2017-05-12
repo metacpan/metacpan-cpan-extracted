@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Acme-NewMath.t
+lib/Acme/NewMath.pm
+META.yml                                 Module meta-data (added by MakeMaker)

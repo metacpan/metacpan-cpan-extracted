@@ -1,0 +1,140 @@
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+Plugin    logging/warn
+LogLevel  LOGDEBUG
+
+Plugin request_log
+RequestLog access_log
+
+# setup console
+ConsolePort 18000
+Plugin stats
+
+Plugin       cachecache
+CacheModule  Memory
+# ten megabytes (ish)
+CacheSize    10000000
+
+Plugin  error_xml
+ErrorStylesheet demo/error.xsl
+StackTrace On
+
+Plugin fast_mime_map
+
+<Server>
+    
+    Port   8000
+    DocumentRoot   demo/disabled
+    
+    Plugin uri_to_file
+    Plugin serve_cgi
+    Plugin serve_file
+    
+    CGI_Match  .*\.(pl|cgi)$
+    
+    DirectoryIndex index.html
+    
+    <Location /stylesheets>
+        # CSS
+        DocumentRoot demo/stylesheets
+    </Location>
+    
+    <Location /icons>
+        DocumentRoot demo/icons
+    </Location>
+    
+# The demo directories that follow are disabled by default simply so that
+# the example config loads a minimal AxKit (as some of these have deep CPAN
+# dependencies that we don't want you to be forced to load).
+# 
+# To enable each demo uncomment the <Location> section and restart AxKit.
+
+# XSLT DEMO    
+#     <Location /xslt>
+#         Plugin demo/serve_xslt
+#         DirectoryIndex 01.xml
+#         DocumentRoot demo/xslt
+#         XSLT_Match .*\.xml$
+#         XSLT_Style demo/xslt/stylesheets/01.xsl
+#     </Location>
+    
+# XSP DEMO
+#     <Location /xsp>
+#         DocumentRoot demo/xsp
+#         DirectoryIndex test.xsp
+#         Plugin demo/serve_xsp
+#         XSP_Match .*\.xsp$
+#     </Location>
+
+# TAL DEMO
+#     <Location /tal>
+#         DocumentRoot demo/tal
+#         DirectoryIndex index.xml
+#         Plugin demo/serve_tal
+#     </Location>
+    
+# XPathScript DEMO
+#     <Location /xpathscript>
+#         DocumentRoot demo/xpathscript
+#         DirectoryIndex index.xml
+#         Plugin demo/serve_xpathscript
+#         XPathScript_Stylesheet demo/xpathscript/demo.xps
+#         XPathScript_OutputType text/html
+#      </Location>
+
+# generic DEMO, needs XSLT, XPathScript and TAL
+#     <Location /generic>
+#         DocumentRoot demo/generic
+#         DirectoryIndex index.xml
+#         Plugin generic_transform
+#         Transformation             XSLT(demo/generic/stylesheet.xsl)  \
+#                                    XPathScript(demo/generic/stylesheet.xps)  \
+#                                    TAL(demo/generic/stylesheet.tal)
+#      </Location>
+
+# Gallery DEMO
+#      <Location /gallery>
+#         DocumentRoot demo/gallery
+#         Plugin dir_to_xml
+#         Plugin demo/gallery
+#         ProofSheetColumns    3
+#         ImagesPerProofSheet  15
+#         GallerySizes         "205 800 640 1024 full"
+#         GalleryThumbQuality  preview
+#     </Location>
+    
+# Docs DEMO
+#     <Location /docs>
+#         Plugin demo/doc_viewer
+#     </Location>
+
+# Spod5 DEMO
+#     <Location /spod5>
+#         DirectoryIndex index.pod
+#         DocumentRoot demo/spod5
+#         Plugin spod5
+#     </Location>
+
+# MoeWiki DEMO
+#     <Location /moewiki>
+#        DocumentRoot demo/moewiki
+#        DirectoryIndex index.xml
+#        Plugin demo/moewiki
+#        Plugin generic_transform
+#        Transformation XSLT(demo/moewiki/global.xsl)
+#     </Location>
+
+</Server>

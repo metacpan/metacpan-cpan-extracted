@@ -1,0 +1,326 @@
+---
+abstract: 'Use L<AnyEvent> with L<Tickit> user interface.'
+author:
+  - 'Alex J. G. Burzyński <ajgb@cpan.org>'
+build_requires:
+  AnyEvent::Util: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.3601'
+  Test::HexString: '0'
+  Test::More: '0'
+  Test::Refcount: '0'
+  Time::HiRes: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Tickit
+requires:
+  AnyEvent: '0'
+  AnyEvent::Handle: '0'
+  Tickit: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=AnyEvent-Tickit
+  homepage: http://search.cpan.org/dist/AnyEvent-Tickit
+  repository: git://github.com/ajgb/anyevent-tickit.git
+version: '0.01'
+x_Dist_Zilla:
+  perl:
+    version: '5.018002'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Filter/ExecDir'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Filter/ShareDir'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Filter/GatherDir'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Filter/MetaYAML'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Filter/MetaJSON'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Filter/License'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Filter/Manifest'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@Filter/Test::Compile'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Filter/PodSyntaxTests'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@Filter/EOLTests'
+      version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@Filter/NoTabsTests'
+      version: '0.06'
+    -
+      class: Dist::Zilla::Plugin::KwaliteeTests
+      name: '@Filter/KwaliteeTests'
+      version: '1.101420'
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      name: '@Filter/Test::Portability'
+      version: '2.000005'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Filter/PruneCruft'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Filter/ManifestSkip'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@Filter/PkgVersion'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@Filter/Authority'
+      version: '1.006'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          config_plugins:
+            - '@AJGB'
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Plugin::Encoding
+              name: '@AJGB/Encoding'
+              version: '0.02'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@AJGB/Name'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@AJGB/Version'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@AJGB/Prelude'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@AJGB/Synopsis'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@AJGB/Description'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@AJGB/Overview'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: FUNCTIONS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: TYPES
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@AJGB/Leftovers'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@AJGB/Postlude'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@AJGB/Authors'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@AJGB/Legal'
+              version: '4.006'
+      name: '@Filter/PodWeaver'
+      version: '4.005'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Filter/MetaConfig'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::AutoMetaResources
+      name: '@Filter/AutoMetaResources'
+      version: '1.20'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@Filter/AutoPrereqs'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Filter/MakeMaker'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Filter/ModuleBuild'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::ReadmeFromPod
+      name: '@Filter/ReadmeFromPod'
+      version: '0.21'
+    -
+      class: Dist::Zilla::Plugin::InstallGuide
+      name: '@Filter/InstallGuide'
+      version: '1.200002'
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@Filter/Git::NextVersion'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::CopyFilesFromBuild
+      name: '@Filter/CopyFilesFromBuild'
+      version: '0.103510'
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@Filter/Git::Check'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@Filter/CheckChangesHasContent'
+      version: '0.006'
+    -
+      class: Dist::Zilla::Plugin::CheckExtraTests
+      name: '@Filter/CheckExtraTests'
+      version: '0.021'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Filter/TestRelease'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Filter/ConfirmRelease'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Filter/UploadToCPAN'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@Filter/NextRelease'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Filter/Git::Tag'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@Filter/Git::Commit'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@Filter/Git::Push'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '5.014'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '5.014'
+x_authority: cpan:AJGB

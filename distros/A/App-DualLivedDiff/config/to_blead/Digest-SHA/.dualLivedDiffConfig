@@ -1,0 +1,11 @@
+---
+exclude-regexes:
+  - ^(?:\./)?examples/
+  - ^(?:\./)?shasum$
+  - ^(?:\./)?MANIFEST$
+  - ^(?:\./)?META\.yml$
+  - ^(?:\./)?t/podcover\.t$
+  - ^(?:\./)?t/pod\.t$
+dirs-recursive:
+  .: ext/Digest-SHA
+

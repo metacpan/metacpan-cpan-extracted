@@ -1,0 +1,6 @@
+email_address_type_id, address, upper_address
+1, ron@savage.net.au, RON@SAVAGE.NET.AU
+2, zoe@savage.net.au, ZOE@SAVAGE.NET.AU
+2, ronnie@savage.net.au, RONNIE@SAVAGE.NET.AU
+1, andromeda@savage.net.au, ANDROMEDA@SAVAGE.NET.AU
+2, whirlpool@savage.net.au, WHIRLPOOL@SAVAGE.NET.AU

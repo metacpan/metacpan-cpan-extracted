@@ -1,0 +1,55 @@
+{
+  "system": {
+    "post_processors": [
+    ],
+    "libs": [
+      "@ServerRoot@/lib"
+    ],
+    "load_modules": [
+    ],
+    "env_vars": {
+    },
+    "settings": {
+    }
+  },
+  "errors": {
+    "error_handler":    "ASP4::ErrorHandler",
+    "mail_errors_to":   "you@your-server.com",
+    "mail_errors_from": "root@localhost",
+    "smtp_server":      "localhost"
+  },
+  "web": {
+    "application_name": "ASP4xLinker",
+    "application_root": "@ServerRoot@",
+    "www_root":         "@ServerRoot@/htdocs",
+    "handler_root":     "@ServerRoot@/handlers",
+    "page_cache_root":  "/tmp/PAGE_CACHE",
+    "handler_resolver": "ASP4::HandlerResolver",
+    "handler_runner":   "ASP4::HandlerRunner",
+    "filter_resolver":  "ASP4::FilterResolver",
+    "request_filters": [
+    ],
+    "disable_persistence": [
+      {
+        "uri_match": "/.*",
+        "disable_session": true
+      }
+    ]
+  },
+  "data_connections": {
+    "session": {
+      "manager":          "ASP4::SessionStateManager::NonPersisted",
+      "cookie_name":      "session-id",
+      "cookie_domain":    "*",
+      "session_timeout":  "*",
+      "dsn":              "",
+      "username":         "",
+      "password":         ""
+    },
+    "main": {
+      "dsn":      "",
+      "username": "",
+      "password": ""
+    }
+  }
+}

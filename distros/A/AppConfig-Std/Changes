@@ -1,0 +1,58 @@
+Revision history for perl module AppConfig::Std
+
+1.10 2015-10-26 NEILB
+    - Switched to Dist::Zilla
+    - Got rid of tab characters
+    - Updated github repo URL after changing my github username
+    - Made the SEE ALSO entries linked, and simplified the formatting
+
+1.09 2014-01-30
+    - Added "use warnings"
+    - min Perl version 5.6.0
+
+1.08 2013-07-20
+    - ChangeLog renamed to Changes and reformatted as per CPAN::Changes::Spec
+    - Added repository details to metadata (Makefile.PL) and pod
+    - Added license type to metadata (in Makefile.PL)
+
+1.07 2002-07-03
+    - We now over-ride the getopt() method, and handle the
+      standard options if getopt() is used rather than args().
+      Change based on a patch from Martin Bloecker.
+    - Added a set of tests which exercise the getopt() method.
+    - Renamed the show_version() function to _show_version(),
+      to signify its private status.
+
+
+1.06 2002-03-09
+    - The testsuite was try to invoke perl on the test script,
+      which fails if you install the binary as something other
+      than "perl". Changed "perl" to "$^X". Also invoked perl
+      with -Iblib/lib when running the test, so that it actually
+      pulls in the version you think you're testing :-)
+      Thanks to Ed Santiago for both of these.
+
+
+1.05 2002-01-19
+    - Added a basic test-suite. Tests all switches apart
+      from -help. The test-suite works by comparing the
+      output of a test script with expected output.
+      The output of -help will be formatted slightly
+      differently on different systems (pod2usage() uses
+      perldoc to format the output), so the comparison
+      is likely to fail.
+
+
+1.04 2002-01-15
+    - Updated call to pod2usage() - the API has changed.
+    - Minor improvements to documentation.
+
+
+1.03 2001-02-26
+    - Tied up the documentation; eg updated references to CPAN.
+    - Added a -verbose switch - found I was adding one of these
+      to just about all of my scripts.
+
+1.02 1998-12-09
+    - First version of module. Created from previous module App::StdConfig.
+

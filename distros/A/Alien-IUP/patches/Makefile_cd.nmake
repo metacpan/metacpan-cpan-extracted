@@ -1,0 +1,303 @@
+
+!IF "$(CFG)" == "Win64"
+BUILDBITS= 64
+!ELSE
+BUILDBITS= 32
+!ENDIF
+
+PERL   = perl 
+CP     = $(PERL) -MExtUtils::Command -e cp --
+RM_F   = $(PERL) -MExtUtils::Command -e rm_f --
+MKPATH = $(PERL) -MExtUtils::Command -e mkpath --
+
+### GLOBAL PART ###
+
+BUILDNICK= msvc
+
+PREFIX   = ../../_output_
+INCDIR   = $(PREFIX)/include
+LIBDIR   = $(PREFIX)/lib
+
+CF_ALL   = -DTEC_UNAME=vc9 -DTEC_SYSNAME=Win32 -DTEC_LITTLEENDIAN -DTEC_32 -DWIN32 -DNDEBUG -I"$(INCDIR)"
+LF_ALL   = -L../lib/$(BUILDNICK) -L"$(LIBDIR)"
+
+VER_OBJ      = version.o
+VER_RC       = version.rc
+
+BUILD_DIRS   = ../obj/$(BUILDNICK)/cd ../obj/$(BUILDNICK)/cd_pdflib ../obj/$(BUILDNICK)/cdpdf ../obj/$(BUILDNICK)/cdgl ../obj/$(BUILDNICK)/cdcontextplus ../lib/$(BUILDNICK)
+
+ALL_OBJS     = $(OBJS_cd) $(OBJS_cd_pdflib) $(OBJS_cdpdf) $(OBJS_cdgl) $(OBJS_cdcontextplus)
+
+STATIC_LIBS  = $(SLIB_cd) $(SLIB_cd_pdflib) $(SLIB_cdpdf) $(SLIB_cdgl) $(SLIB_cdcontextplus)
+
+DYNAMIC_LIBS = $(DLIB_cd) $(ILIB_cd) $(DLIB_cd_pdflib) $(ILIB_cd_pdflib) $(DLIB_cdpdf) $(ILIB_cdpdf) $(DLIB_cdgl) $(ILIB_cdgl) $(DLIB_cdcontextplus) $(ILIB_cdcontextplus)
+
+ALL_LIBS     = $(STATIC_LIBS) $(DYNAMIC_LIBS)
+
+all: all-static all-dynamic
+
+
+### START OF cd ###
+CF_cd   = -c   -O2 -I. -Idrv -Ix11 -Iwin32 -Iintcgm -Isim -Icairo -Isvg -I../include -I../../freetype/include -I../../zlib/include   -DUNICODE -DWIN32 $(CF_cd_EXTRA)
+LF_cd   = -lfreetype6 -lzlib1 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_cd_EXTRA)
+SLIB_cd = ../lib/$(BUILDNICK)/cd.lib
+DLIB_cd = ../lib/$(BUILDNICK)/libcd.dll.a
+ILIB_cd = ../lib/$(BUILDNICK)/cd_alien_.dll
+OBJS_cd = ../obj/$(BUILDNICK)/cd/cd.obj ../obj/$(BUILDNICK)/cd/wd.obj ../obj/$(BUILDNICK)/cd/wdhdcpy.obj ../obj/$(BUILDNICK)/cd/rgb2map.obj ../obj/$(BUILDNICK)/cd/cd_vectortext.obj ../obj/$(BUILDNICK)/cd/cd_active.obj ../obj/$(BUILDNICK)/cd/cd_attributes.obj ../obj/$(BUILDNICK)/cd/cd_bitmap.obj ../obj/$(BUILDNICK)/cd/cd_image.obj ../obj/$(BUILDNICK)/cd/cd_primitives.obj ../obj/$(BUILDNICK)/cd/cd_text.obj ../obj/$(BUILDNICK)/cd/cd_util.obj ../obj/$(BUILDNICK)/cd/base64.obj ../obj/$(BUILDNICK)/cd/lodepng.obj ../obj/$(BUILDNICK)/cd/cdsvg.obj ../obj/$(BUILDNICK)/cd/cd_intcgm.obj ../obj/$(BUILDNICK)/cd/cgm_bin_get.obj ../obj/$(BUILDNICK)/cd/cgm_bin_parse.obj ../obj/$(BUILDNICK)/cd/cgm_list.obj ../obj/$(BUILDNICK)/cd/cgm_play.obj ../obj/$(BUILDNICK)/cd/cgm_sism.obj ../obj/$(BUILDNICK)/cd/cgm_txt_get.obj ../obj/$(BUILDNICK)/cd/cgm_txt_parse.obj ../obj/$(BUILDNICK)/cd/cddgn.obj ../obj/$(BUILDNICK)/cd/cdcgm.obj ../obj/$(BUILDNICK)/cd/cgm.obj ../obj/$(BUILDNICK)/cd/cddxf.obj ../obj/$(BUILDNICK)/cd/cdirgb.obj ../obj/$(BUILDNICK)/cd/cdmf.obj ../obj/$(BUILDNICK)/cd/cdps.obj ../obj/$(BUILDNICK)/cd/cdpicture.obj ../obj/$(BUILDNICK)/cd/cddebug.obj ../obj/$(BUILDNICK)/cd/cdpptx.obj ../obj/$(BUILDNICK)/cd/pptx.obj ../obj/$(BUILDNICK)/cd/ioapi.obj ../obj/$(BUILDNICK)/cd/minizip.obj ../obj/$(BUILDNICK)/cd/zip.obj ../obj/$(BUILDNICK)/cd/cdfontex.obj ../obj/$(BUILDNICK)/cd/sim.obj ../obj/$(BUILDNICK)/cd/cd_truetype.obj ../obj/$(BUILDNICK)/cd/sim_primitives.obj ../obj/$(BUILDNICK)/cd/sim_text.obj ../obj/$(BUILDNICK)/cd/sim_linepolyfill.obj ../obj/$(BUILDNICK)/cd/cdwclp.obj ../obj/$(BUILDNICK)/cd/cdwemf.obj ../obj/$(BUILDNICK)/cd/cdwimg.obj ../obj/$(BUILDNICK)/cd/cdwin.obj ../obj/$(BUILDNICK)/cd/cdwnative.obj ../obj/$(BUILDNICK)/cd/cdwprn.obj ../obj/$(BUILDNICK)/cd/cdwwmf.obj ../obj/$(BUILDNICK)/cd/wmf_emf.obj ../obj/$(BUILDNICK)/cd/cdwdbuf.obj ../obj/$(BUILDNICK)/cd/cdwdib.obj
+
+../obj/$(BUILDNICK)/cd/cd.obj : ./cd.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/wd.obj : ./wd.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/wdhdcpy.obj : ./wdhdcpy.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/rgb2map.obj : ./rgb2map.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cd_vectortext.obj : ./cd_vectortext.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cd_active.obj : ./cd_active.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cd_attributes.obj : ./cd_attributes.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cd_bitmap.obj : ./cd_bitmap.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cd_image.obj : ./cd_image.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cd_primitives.obj : ./cd_primitives.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cd_text.obj : ./cd_text.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cd_util.obj : ./cd_util.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/base64.obj : ./svg/base64.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/lodepng.obj : ./svg/lodepng.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdsvg.obj : ./svg/cdsvg.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cd_intcgm.obj : ./intcgm/cd_intcgm.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cgm_bin_get.obj : ./intcgm/cgm_bin_get.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cgm_bin_parse.obj : ./intcgm/cgm_bin_parse.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cgm_list.obj : ./intcgm/cgm_list.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cgm_play.obj : ./intcgm/cgm_play.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cgm_sism.obj : ./intcgm/cgm_sism.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cgm_txt_get.obj : ./intcgm/cgm_txt_get.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cgm_txt_parse.obj : ./intcgm/cgm_txt_parse.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cddgn.obj : ./drv/cddgn.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdcgm.obj : ./drv/cdcgm.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cgm.obj : ./drv/cgm.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cddxf.obj : ./drv/cddxf.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdirgb.obj : ./drv/cdirgb.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdmf.obj : ./drv/cdmf.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdps.obj : ./drv/cdps.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdpicture.obj : ./drv/cdpicture.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cddebug.obj : ./drv/cddebug.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdpptx.obj : ./drv/cdpptx.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/pptx.obj : ./drv/pptx.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/ioapi.obj : ./minizip/ioapi.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/minizip.obj : ./minizip/minizip.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/zip.obj : ./minizip/zip.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdfontex.obj : ./sim/cdfontex.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/sim.obj : ./sim/sim.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cd_truetype.obj : ./sim/cd_truetype.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/sim_primitives.obj : ./sim/sim_primitives.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/sim_text.obj : ./sim/sim_text.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/sim_linepolyfill.obj : ./sim/sim_linepolyfill.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdwclp.obj : ./win32/cdwclp.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdwemf.obj : ./win32/cdwemf.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdwimg.obj : ./win32/cdwimg.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdwin.obj : ./win32/cdwin.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdwnative.obj : ./win32/cdwnative.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdwprn.obj : ./win32/cdwprn.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdwwmf.obj : ./win32/cdwwmf.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/wmf_emf.obj : ./win32/wmf_emf.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdwdbuf.obj : ./win32/cdwdbuf.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+../obj/$(BUILDNICK)/cd/cdwdib.obj : ./win32/cdwdib.c ; cl $(CF_ALL) $(CF_cd) /Fo$@ $**
+
+$(SLIB_cd): $(OBJS_cd)
+	lib /OUT:$@ $**
+
+$(ILIB_cd) $(DLIB_cd) : $(OBJS_cd)
+	xxxg++ -s -shared -o $(ILIB_cd) $** -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_cd) $(LF_cd) $(LF_ALL)
+
+cd-static: build-dirs $(SLIB_cd)
+cd-dynamic: build-dirs $(ILIB_cd) $(DLIB_cd) 
+
+### START OF cd_pdflib ###
+CF_cd_pdflib   = -c   -O2 -Ipdflib/font -Ipdflib/pdcore -Ipdflib/pdflib -I../../zlib/include    -DWIN32 $(CF_cd_pdflib_EXTRA)
+LF_cd_pdflib   = -lzlib1 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_cd_pdflib_EXTRA)
+SLIB_cd_pdflib = ../lib/$(BUILDNICK)/pdflib.lib
+DLIB_cd_pdflib = ../lib/$(BUILDNICK)/libpdflib.dll.a
+ILIB_cd_pdflib = ../lib/$(BUILDNICK)/pdflib_alien_.dll
+OBJS_cd_pdflib = ../obj/$(BUILDNICK)/cd_pdflib/pdflib.obj ../obj/$(BUILDNICK)/cd_pdflib/p_3d.obj ../obj/$(BUILDNICK)/cd_pdflib/p_actions.obj ../obj/$(BUILDNICK)/cd_pdflib/p_afm.obj ../obj/$(BUILDNICK)/cd_pdflib/p_annots.obj ../obj/$(BUILDNICK)/cd_pdflib/p_block.obj ../obj/$(BUILDNICK)/cd_pdflib/p_bmp.obj ../obj/$(BUILDNICK)/cd_pdflib/p_ccitt.obj ../obj/$(BUILDNICK)/cd_pdflib/p_cid.obj ../obj/$(BUILDNICK)/cd_pdflib/p_color.obj ../obj/$(BUILDNICK)/cd_pdflib/p_document.obj ../obj/$(BUILDNICK)/cd_pdflib/p_draw.obj ../obj/$(BUILDNICK)/cd_pdflib/p_encoding.obj ../obj/$(BUILDNICK)/cd_pdflib/p_fields.obj ../obj/$(BUILDNICK)/cd_pdflib/p_filter.obj ../obj/$(BUILDNICK)/cd_pdflib/p_font.obj ../obj/$(BUILDNICK)/cd_pdflib/p_gif.obj ../obj/$(BUILDNICK)/cd_pdflib/p_gstate.obj ../obj/$(BUILDNICK)/cd_pdflib/p_hyper.obj ../obj/$(BUILDNICK)/cd_pdflib/p_icc.obj ../obj/$(BUILDNICK)/cd_pdflib/p_icclib.obj ../obj/$(BUILDNICK)/cd_pdflib/p_image.obj ../obj/$(BUILDNICK)/cd_pdflib/p_jpeg.obj ../obj/$(BUILDNICK)/cd_pdflib/p_jpx.obj ../obj/$(BUILDNICK)/cd_pdflib/p_kerning.obj ../obj/$(BUILDNICK)/cd_pdflib/p_layer.obj ../obj/$(BUILDNICK)/cd_pdflib/p_mbox.obj ../obj/$(BUILDNICK)/cd_pdflib/p_object.obj ../obj/$(BUILDNICK)/cd_pdflib/p_opi.obj ../obj/$(BUILDNICK)/cd_pdflib/p_page.obj ../obj/$(BUILDNICK)/cd_pdflib/p_params.obj ../obj/$(BUILDNICK)/cd_pdflib/p_pattern.obj ../obj/$(BUILDNICK)/cd_pdflib/p_pdi.obj ../obj/$(BUILDNICK)/cd_pdflib/p_pfm.obj ../obj/$(BUILDNICK)/cd_pdflib/p_photoshp.obj ../obj/$(BUILDNICK)/cd_pdflib/p_png.obj ../obj/$(BUILDNICK)/cd_pdflib/p_shading.obj ../obj/$(BUILDNICK)/cd_pdflib/p_subsett.obj ../obj/$(BUILDNICK)/cd_pdflib/p_table.obj ../obj/$(BUILDNICK)/cd_pdflib/p_tagged.obj ../obj/$(BUILDNICK)/cd_pdflib/p_template.obj ../obj/$(BUILDNICK)/cd_pdflib/p_text.obj ../obj/$(BUILDNICK)/cd_pdflib/p_textflow.obj ../obj/$(BUILDNICK)/cd_pdflib/p_tiff.obj ../obj/$(BUILDNICK)/cd_pdflib/p_truetype.obj ../obj/$(BUILDNICK)/cd_pdflib/p_type1.obj ../obj/$(BUILDNICK)/cd_pdflib/p_type3.obj ../obj/$(BUILDNICK)/cd_pdflib/p_util.obj ../obj/$(BUILDNICK)/cd_pdflib/p_xgstate.obj ../obj/$(BUILDNICK)/cd_pdflib/p_xmp.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_aes.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_aescbc.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_arc4.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_chartabs.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_contain.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_core.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_crypt.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_ctype.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_digsig.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_ebcdic.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_encoding.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_file.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_geom.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_md5.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_optparse.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_output.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_resource.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_scan.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_scope.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_string.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_unicode.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_util.obj ../obj/$(BUILDNICK)/cd_pdflib/pc_xmp.obj ../obj/$(BUILDNICK)/cd_pdflib/ft_cid.obj ../obj/$(BUILDNICK)/cd_pdflib/ft_corefont.obj ../obj/$(BUILDNICK)/cd_pdflib/ft_font.obj ../obj/$(BUILDNICK)/cd_pdflib/ft_hostfont.obj ../obj/$(BUILDNICK)/cd_pdflib/ft_pdffont.obj ../obj/$(BUILDNICK)/cd_pdflib/ft_truetype.obj ../obj/$(BUILDNICK)/cd_pdflib/ft_type1.obj
+
+../obj/$(BUILDNICK)/cd_pdflib/pdflib.obj : ./pdflib/pdflib/pdflib.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_3d.obj : ./pdflib/pdflib/p_3d.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_actions.obj : ./pdflib/pdflib/p_actions.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_afm.obj : ./pdflib/pdflib/p_afm.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_annots.obj : ./pdflib/pdflib/p_annots.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_block.obj : ./pdflib/pdflib/p_block.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_bmp.obj : ./pdflib/pdflib/p_bmp.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_ccitt.obj : ./pdflib/pdflib/p_ccitt.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_cid.obj : ./pdflib/pdflib/p_cid.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_color.obj : ./pdflib/pdflib/p_color.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_document.obj : ./pdflib/pdflib/p_document.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_draw.obj : ./pdflib/pdflib/p_draw.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_encoding.obj : ./pdflib/pdflib/p_encoding.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_fields.obj : ./pdflib/pdflib/p_fields.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_filter.obj : ./pdflib/pdflib/p_filter.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_font.obj : ./pdflib/pdflib/p_font.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_gif.obj : ./pdflib/pdflib/p_gif.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_gstate.obj : ./pdflib/pdflib/p_gstate.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_hyper.obj : ./pdflib/pdflib/p_hyper.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_icc.obj : ./pdflib/pdflib/p_icc.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_icclib.obj : ./pdflib/pdflib/p_icclib.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_image.obj : ./pdflib/pdflib/p_image.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_jpeg.obj : ./pdflib/pdflib/p_jpeg.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_jpx.obj : ./pdflib/pdflib/p_jpx.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_kerning.obj : ./pdflib/pdflib/p_kerning.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_layer.obj : ./pdflib/pdflib/p_layer.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_mbox.obj : ./pdflib/pdflib/p_mbox.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_object.obj : ./pdflib/pdflib/p_object.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_opi.obj : ./pdflib/pdflib/p_opi.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_page.obj : ./pdflib/pdflib/p_page.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_params.obj : ./pdflib/pdflib/p_params.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_pattern.obj : ./pdflib/pdflib/p_pattern.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_pdi.obj : ./pdflib/pdflib/p_pdi.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_pfm.obj : ./pdflib/pdflib/p_pfm.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_photoshp.obj : ./pdflib/pdflib/p_photoshp.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_png.obj : ./pdflib/pdflib/p_png.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_shading.obj : ./pdflib/pdflib/p_shading.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_subsett.obj : ./pdflib/pdflib/p_subsett.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_table.obj : ./pdflib/pdflib/p_table.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_tagged.obj : ./pdflib/pdflib/p_tagged.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_template.obj : ./pdflib/pdflib/p_template.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_text.obj : ./pdflib/pdflib/p_text.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_textflow.obj : ./pdflib/pdflib/p_textflow.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_tiff.obj : ./pdflib/pdflib/p_tiff.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_truetype.obj : ./pdflib/pdflib/p_truetype.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_type1.obj : ./pdflib/pdflib/p_type1.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_type3.obj : ./pdflib/pdflib/p_type3.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_util.obj : ./pdflib/pdflib/p_util.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_xgstate.obj : ./pdflib/pdflib/p_xgstate.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/p_xmp.obj : ./pdflib/pdflib/p_xmp.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_aes.obj : ./pdflib/pdcore/pc_aes.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_aescbc.obj : ./pdflib/pdcore/pc_aescbc.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_arc4.obj : ./pdflib/pdcore/pc_arc4.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_chartabs.obj : ./pdflib/pdcore/pc_chartabs.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_contain.obj : ./pdflib/pdcore/pc_contain.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_core.obj : ./pdflib/pdcore/pc_core.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_crypt.obj : ./pdflib/pdcore/pc_crypt.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_ctype.obj : ./pdflib/pdcore/pc_ctype.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_digsig.obj : ./pdflib/pdcore/pc_digsig.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_ebcdic.obj : ./pdflib/pdcore/pc_ebcdic.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_encoding.obj : ./pdflib/pdcore/pc_encoding.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_file.obj : ./pdflib/pdcore/pc_file.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_geom.obj : ./pdflib/pdcore/pc_geom.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_md5.obj : ./pdflib/pdcore/pc_md5.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_optparse.obj : ./pdflib/pdcore/pc_optparse.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_output.obj : ./pdflib/pdcore/pc_output.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_resource.obj : ./pdflib/pdcore/pc_resource.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_scan.obj : ./pdflib/pdcore/pc_scan.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_scope.obj : ./pdflib/pdcore/pc_scope.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_string.obj : ./pdflib/pdcore/pc_string.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_unicode.obj : ./pdflib/pdcore/pc_unicode.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_util.obj : ./pdflib/pdcore/pc_util.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/pc_xmp.obj : ./pdflib/pdcore/pc_xmp.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/ft_cid.obj : ./pdflib/font/ft_cid.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/ft_corefont.obj : ./pdflib/font/ft_corefont.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/ft_font.obj : ./pdflib/font/ft_font.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/ft_hostfont.obj : ./pdflib/font/ft_hostfont.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/ft_pdffont.obj : ./pdflib/font/ft_pdffont.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/ft_truetype.obj : ./pdflib/font/ft_truetype.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+../obj/$(BUILDNICK)/cd_pdflib/ft_type1.obj : ./pdflib/font/ft_type1.c ; cl $(CF_ALL) $(CF_cd_pdflib) /Fo$@ $**
+
+$(SLIB_cd_pdflib): $(OBJS_cd_pdflib)
+	lib /OUT:$@ $**
+
+$(ILIB_cd_pdflib) $(DLIB_cd_pdflib) : $(OBJS_cd_pdflib)
+	xxxg++ -s -shared -o $(ILIB_cd_pdflib) $** -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_cd_pdflib) $(LF_cd_pdflib) $(LF_ALL)
+
+cd_pdflib-static: build-dirs $(SLIB_cd_pdflib)
+cd_pdflib-dynamic: build-dirs $(ILIB_cd_pdflib) $(DLIB_cd_pdflib) 
+
+### START OF cdpdf ###
+CF_cdpdf   = -c   -O2 -I. -Isim -Ipdflib/pdflib -I../include    -DWIN32 $(CF_cdpdf_EXTRA)
+LF_cdpdf   = -lpdflib -lcd -lfreetype6 -lzlib1 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_cdpdf_EXTRA)
+SLIB_cdpdf = ../lib/$(BUILDNICK)/cdpdf.lib
+DLIB_cdpdf = ../lib/$(BUILDNICK)/libcdpdf.dll.a
+ILIB_cdpdf = ../lib/$(BUILDNICK)/cdpdf_alien_.dll
+OBJS_cdpdf = ../obj/$(BUILDNICK)/cdpdf/cdpdf.obj
+
+../obj/$(BUILDNICK)/cdpdf/cdpdf.obj : ./drv/cdpdf.c ; cl $(CF_ALL) $(CF_cdpdf) /Fo$@ $**
+
+$(SLIB_cdpdf): $(OBJS_cdpdf)
+	lib /OUT:$@ $**
+
+$(ILIB_cdpdf) $(DLIB_cdpdf) : $(OBJS_cdpdf)
+	xxxg++ -s -shared -o $(ILIB_cdpdf) $** -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_cdpdf) $(LF_cdpdf) $(LF_ALL)
+
+cdpdf-static: build-dirs $(SLIB_cdpdf)
+cdpdf-dynamic: build-dirs $(ILIB_cdpdf) $(DLIB_cdpdf) 
+
+### START OF cdgl ###
+CF_cdgl   = -c   -O2 -I. -Isim -I../include -I../../ftgl/include -I../../freetype/include    -DWIN32 $(CF_cdgl_EXTRA)
+LF_cdgl   = -lcd -lftgl -lfreetype6 -lzlib1 -lglaux -lglu32 -lopengl32 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_cdgl_EXTRA)
+SLIB_cdgl = ../lib/$(BUILDNICK)/cdgl.lib
+DLIB_cdgl = ../lib/$(BUILDNICK)/libcdgl.dll.a
+ILIB_cdgl = ../lib/$(BUILDNICK)/cdgl_alien_.dll
+OBJS_cdgl = ../obj/$(BUILDNICK)/cdgl/cdgl.obj
+
+../obj/$(BUILDNICK)/cdgl/cdgl.obj : ./drv/cdgl.c ; cl $(CF_ALL) $(CF_cdgl) /Fo$@ $**
+
+$(SLIB_cdgl): $(OBJS_cdgl)
+	lib /OUT:$@ $**
+
+$(ILIB_cdgl) $(DLIB_cdgl) : $(OBJS_cdgl)
+	xxxg++ -s -shared -o $(ILIB_cdgl) $** -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_cdgl) $(LF_cdgl) $(LF_ALL)
+
+cdgl-static: build-dirs $(SLIB_cdgl)
+cdgl-dynamic: build-dirs $(ILIB_cdgl) $(DLIB_cdgl) 
+
+### START OF cdcontextplus ###
+CF_cdcontextplus   = -c   -O2 -I. -Igdiplus -I../include    -DWIN32 $(CF_cdcontextplus_EXTRA)
+LF_cdcontextplus   = -lgdiplus -lcd -lfreetype6 -lzlib1 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_cdcontextplus_EXTRA)
+SLIB_cdcontextplus = ../lib/$(BUILDNICK)/cdcontextplus.lib
+DLIB_cdcontextplus = ../lib/$(BUILDNICK)/libcdcontextplus.dll.a
+ILIB_cdcontextplus = ../lib/$(BUILDNICK)/cdcontextplus_alien_.dll
+OBJS_cdcontextplus = ../obj/$(BUILDNICK)/cdcontextplus/cdwemfp.obj ../obj/$(BUILDNICK)/cdcontextplus/cdwimgp.obj ../obj/$(BUILDNICK)/cdcontextplus/cdwinp.obj ../obj/$(BUILDNICK)/cdcontextplus/cdwnativep.obj ../obj/$(BUILDNICK)/cdcontextplus/cdwprnp.obj ../obj/$(BUILDNICK)/cdcontextplus/cdwdbufp.obj ../obj/$(BUILDNICK)/cdcontextplus/cdwclpp.obj ../obj/$(BUILDNICK)/cdcontextplus/cdwgdiplus.obj
+
+../obj/$(BUILDNICK)/cdcontextplus/cdwemfp.obj : ./gdiplus/cdwemfp.cpp ; cl $(CF_ALL) $(CF_cdcontextplus) /Fo$@ $**
+../obj/$(BUILDNICK)/cdcontextplus/cdwimgp.obj : ./gdiplus/cdwimgp.cpp ; cl $(CF_ALL) $(CF_cdcontextplus) /Fo$@ $**
+../obj/$(BUILDNICK)/cdcontextplus/cdwinp.obj : ./gdiplus/cdwinp.cpp ; cl $(CF_ALL) $(CF_cdcontextplus) /Fo$@ $**
+../obj/$(BUILDNICK)/cdcontextplus/cdwnativep.obj : ./gdiplus/cdwnativep.cpp ; cl $(CF_ALL) $(CF_cdcontextplus) /Fo$@ $**
+../obj/$(BUILDNICK)/cdcontextplus/cdwprnp.obj : ./gdiplus/cdwprnp.cpp ; cl $(CF_ALL) $(CF_cdcontextplus) /Fo$@ $**
+../obj/$(BUILDNICK)/cdcontextplus/cdwdbufp.obj : ./gdiplus/cdwdbufp.cpp ; cl $(CF_ALL) $(CF_cdcontextplus) /Fo$@ $**
+../obj/$(BUILDNICK)/cdcontextplus/cdwclpp.obj : ./gdiplus/cdwclpp.cpp ; cl $(CF_ALL) $(CF_cdcontextplus) /Fo$@ $**
+../obj/$(BUILDNICK)/cdcontextplus/cdwgdiplus.obj : ./gdiplus/cdwgdiplus.c ; cl $(CF_ALL) $(CF_cdcontextplus) /Fo$@ $**
+
+$(SLIB_cdcontextplus): $(OBJS_cdcontextplus)
+	lib /OUT:$@ $**
+
+$(ILIB_cdcontextplus) $(DLIB_cdcontextplus) : $(OBJS_cdcontextplus)
+	xxxg++ -s -shared -o $(ILIB_cdcontextplus) $** -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_cdcontextplus) $(LF_cdcontextplus) $(LF_ALL)
+
+cdcontextplus-static: build-dirs $(SLIB_cdcontextplus)
+cdcontextplus-dynamic: build-dirs $(ILIB_cdcontextplus) $(DLIB_cdcontextplus) 
+
+### compile RC
+
+$(VER_OBJ) : $(VER_RC) ; windres --define GCC_WINDRES $** -o $@
+
+all-static: build-dirs $(STATIC_LIBS)
+
+all-dynamic: build-dirs $(DYNAMIC_LIBS)
+
+install-all:
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) ../lib/$(BUILDNICK)/*.lib "$(LIBDIR)"
+	$(CP) ../include/*.h "$(INCDIR)"
+
+install-static: all-static
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) $(STATIC_LIBS) "$(LIBDIR)"
+	$(CP) ../include/*.h "$(INCDIR)"
+
+install-dynamic: all-dynamic
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) $(DYNAMIC_LIBS) "$(LIBDIR)"
+	$(CP) ../include/*.h "$(INCDIR)"
+
+build-dirs:
+	$(MKPATH) $(BUILD_DIRS)
+
+clean:
+	$(RM_F) $(ALL_OBJS) $(ALL_LIBS) $(VER_OBJ)

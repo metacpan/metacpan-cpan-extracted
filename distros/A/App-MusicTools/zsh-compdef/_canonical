@@ -1,0 +1,82 @@
+#compdef canonical
+#
+# ZSH completion for canonical. Install to a $fpath directory. Consult
+# the perl distribution of the App::MusicTools module for the related
+# CLI program. This completion is from the zsh-compdef/ subdirectory of
+# that perl distribution.
+#
+# XXX lots more that could be improved but only so much time...
+
+if [[ ${#notes} -eq 0 ]]; then
+  notes=(c d e f g a b des ees ges aes bes cis dis fis gis ais)
+fi
+
+if [[ ${#pitches} -eq 0 ]]; then
+  pitches=(c d e f g a b des ees ges aes bes cis dis fis gis ais 0 1 2 3 4 5 6 7 8 9 10 11)
+fi
+
+_canonical() {
+  _arguments \
+    '(--nocontrary)'{--contrary,-c}'[use contrary motion]' \
+    '--duration=[default duration]:value:(1 2 4 8 16 32)' \
+    '(--raw --noflats)--flats[print notes as flats]' \
+    '(- *)--help[emit help and exit]' \
+    '(--noraw)--raw[emit pitch numbers not note names]' \
+    {--relative=,--rel=}'[input relative to]:note:_values "note" $notes' \
+    '(--noretrograde)'{--retrograde,-r}'[reverse output phrase]' \
+    {--transpose=,-t=}'[transpose by or to]:pitch:_values "pitch" $pitches' \
+    '*::canonical command:_canonical_modes'
+}
+
+_canonical_modes() {
+  _canonical_modes=(
+    'exact:exact interval canon computation' \
+    'modal:modal interval canon computation'
+  )
+
+  if (( CURRENT == 1 )); then
+    _describe -t commands 'canonical command' _canonical_modes
+  else
+    local curcontext="$curcontext"
+
+    cmd="${_canonical_modes[(r)$words[1]:*]%%:*}"
+    if (( $#cmd )); then
+      curcontext="${curcontext%:*:*}:canonical-${cmd}:"
+      _call_function ret _canonical_$cmd || _message 'no more arguments'
+    else
+      _message "unknown canonical command: $words[1]"
+    fi
+    return ret
+  fi
+}
+
+_canonical_exact() {
+  _arguments -s \
+    '(--nocontrary)'{--contrary,-c}'[use contrary motion]' \
+    '--duration=[default duration]:value:(1 2 4 8 16 32)' \
+    '(--raw --noflats)--flats[print notes as flats]' \
+    '(- *)--help[emit help and exit]' \
+    '(--noraw)--raw[emit pitch numbers not note names]' \
+    {--relative=,--rel=}'[input relative to]:note:_values "note" $notes' \
+    '(--noretrograde)'{--retrograde,-r}'[reverse output phrase]' \
+    {--transpose=,-t=}'[transpose by or to]:pitch:_values "pitch" $pitches'
+}
+
+_canonical_modal() {
+  _arguments -s \
+    '(--nocontrary)'{--contrary,-c}'[use contrary motion]' \
+    '--duration=[default duration]:value:(1 2 4 8 16 32)' \
+    '(--raw --noflats)--flats[print notes as flats]' \
+    '(- *)--help[emit help and exit]' \
+    '(--noraw)--raw[emit pitch numbers not note names]' \
+    {--relative=,--rel=}'[input relative to]:note:_values "note" $notes' \
+    '(--noretrograde)'{--retrograde,-r}'[reverse output phrase]' \
+    {--transpose=,-t=}'[transpose by or to]:pitch:_values "pitch" $pitches' \
+    '--chrome=[chromatic weighting]:weight:(-1 0 1)' \
+    '--ep=[output linking pitch]:pitch:_values "pitch" $pitches' \
+    '--input=[input mode]:mode:' \
+    '--output=[output mode]:mode:' \
+    '(--nonos)--nos[enable non-octave scales]' \
+    '--sp=[input linking pitch]:pitch:_values "pitch" $pitches' \
+    '--undef=[undefined conversion marker]:string:'
+}

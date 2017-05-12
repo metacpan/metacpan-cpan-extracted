@@ -1,0 +1,17 @@
+#!/opt/bin/perl
+
+use AnyEvent;
+use AnyEvent::MP;
+
+my $end_cv = AnyEvent->condvar;
+
+my $port = port;
+
+rcv $port, test => sub {
+   my ($data) = @_;
+   $end_cv->send ($data);
+};
+
+snd $port, test => 123;
+
+print "Ending with: " . $end_cv->recv . "\n";

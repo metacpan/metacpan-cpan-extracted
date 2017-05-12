@@ -1,0 +1,9 @@
+# This directory contains telescope position data
+# and is combined with module code contained in
+# Build.PL.
+
+# when the module is built a perl module file will
+# be generated automatically from these files by the
+# build system.
+
+# See the ../README file for more details

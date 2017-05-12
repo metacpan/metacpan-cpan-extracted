@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7a0e270ee6bdc2585c9f7ce47425b1947516448e Admin.pm
+SHA1 29bef427f045932a7ba5ffeaeebbb336134c5f5c Admin.xs
+SHA1 9d411294eeb4412a3d3941ba44c2e3d6b6e6e0a9 COPYING
+SHA1 15840a4e691f1c631569823fbe1e5fcaed32f80e ChangeLog
+SHA1 6e839f9ddfb5c6342e88a701910c934de7d11da6 MANIFEST
+SHA1 d409618d9db5bb2842492de2e357658d39e0d333 MANIFEST.SKIP
+SHA1 f48eae8793331cbaf18e0e186d8f15287136a111 META.yml
+SHA1 3aa2f15c0eafb8c7dd124489685638169cc15ea7 Makefile.PL
+SHA1 c42f202e3b8cbe0c74cb146df786349ec71f530f README
+SHA1 4feef6e2e5c4a19c39b8452a98b02491e375e4ce admin.h
+SHA1 d6494c57318da08bb30b26e443332bfd23635b8a ppport.h
+SHA1 3daef757c45f7b8ca1f146ec01ecb05a55d08014 t/00-0-signature.t
+SHA1 ab84455cec3e006b25700ad4074e6dd28a186f9a t/00-loadme.t
+SHA1 11d571b28db47c1fff44784af72f1e093a2dee04 t/01-config.t
+SHA1 dc71364d6e7f665721a2e28e64e9412d3fc5e113 t/02-policy.t
+SHA1 8916d3cff9212b764beb178c68d2b592129b8f4f t/03-principal.t
+SHA1 25aea0e8ed15db6cfd2d63ae1aeb949ab9b4b8c7 t/04-key.t
+SHA1 892d1f6e8d348be06bb8f8accc1eb88f71bb5eb9 t/10-getprivs.t
+SHA1 7a02fa43de3029a3f49bd6b9db494d4d4506fd45 t/20-addpol.t
+SHA1 0e6437797831e3d40675d11d3128b482976eae8d t/21-getpol.t
+SHA1 4b3b9ed18c02b7f7fa7b8b81c956952250ecb0b5 t/22-getpols.t
+SHA1 ac3c6edbe0a6cf5391e6f23084cd16b1852e063c t/23-modpol.t
+SHA1 bd69d05765ac6e78e04992d8197ea26bf3db56d3 t/30-addprinc.t
+SHA1 77078c4c38a034053bf4f866fbf76bb25e95f2ab t/31-getprinc.t
+SHA1 f9bba152894e34e369934b3db570889b7c4de5bb t/32-getprincs.t
+SHA1 ea7a90a375cc49e0288d1ec1e57b2387b2125468 t/33-modprinc.t
+SHA1 04b3de86bee25271c8fe4ada723665ae5c214f85 t/34-cpw.t
+SHA1 f652f0fbea15ed23c84a3fbcaa16333334a4993a t/35-randkey.t
+SHA1 4651b8ee4d089987147cdbf5e1366f1493cc6c90 t/36-rename.t
+SHA1 db154392578265f079b7db1246d080b1de830bc7 t/91-delprinc.t
+SHA1 0aa209a31f5553d281e91673a2099200afe03401 t/92-delpol.t
+SHA1 ffd57b95abe76c918cc0452755bb8957afa4e449 typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.7 (GNU/Linux)
+
+iD8DBQFHwsbi8gM8+Mr5peERAq8XAKDruVshGHZTUv3fWzrOSwCF4E/flQCdHjnK
+hd+kEIXwOuqc5fUB4uuQ2Ss=
+=a9Ch
+-----END PGP SIGNATURE-----

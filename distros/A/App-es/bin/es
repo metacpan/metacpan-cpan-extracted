@@ -1,0 +1,448 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::es;
+
+use encoding 'utf8';
+use Term::ANSIColor;
+use List::MoreUtils qw{ uniq };
+use File::Slurp     qw{ read_file };
+use JSON            qw{ decode_json to_json };
+
+use ElasticSearch;
+
+my @cmds = (qw/
+    alias
+    create
+    delete
+    get
+    ls
+    ls-types
+    put
+    search
+    unalias
+/);
+
+# get args
+my $cmd = shift or do {
+    print "es - version $App::es::VERSION\n\n";
+    require Pod::Usage;
+    Pod::Usage::pod2usage();
+};
+
+die "illegal command\n" unless grep {/^$cmd$/} @cmds;
+
+my @params = @ARGV;
+
+# create ES object
+my $es = ElasticSearch->new( servers => $ENV{ELASTIC_SEARCH_SERVERS} );
+
+my @aliases = @{ _get_elastic_search_aliases($es) };
+
+_validate_params();
+
+( $cmd eq 'ls'       ) and index_ls       ( @params );
+( $cmd eq 'ls-types' ) and index_ls_types ( @params );
+( $cmd eq 'create'   ) and index_create   ( @params );
+( $cmd eq 'delete'   ) and index_delete   ( @params );
+( $cmd eq 'put'      ) and index_put_doc  ( @params );
+( $cmd eq 'search'   ) and index_search   ( @params );
+( $cmd eq 'get'      ) and index_get      ( @params );
+( $cmd eq 'alias'    ) and index_alias    ( @params );
+( $cmd eq 'unalias'  ) and index_unalias  ( @params );
+
+exit 0;
+
+
+sub index_create {
+    my ( $index ) = @_;
+
+    my $result;
+    eval {
+        $result = $es->create_index( index => $index );
+        1;
+    };
+
+    warn "[ERROR] failed to create index: $index\n"
+        unless ref($result) eq 'HASH' and $result->{ok};
+}
+
+sub index_delete {
+    my ( $index ) = @_;
+
+    my $result = $es->delete_index(
+        index => $index,
+        ignore_missing => 1,
+    );
+    warn "[ERROR] failed to delete index: $index\n" unless $result->{ok};
+}
+
+sub index_ls {
+    my ( $str ) = @_;
+
+    my $aliases = $es->get_aliases;
+
+    my @indices =$ElasticSearch::VERSION < 0.52
+        ? keys %{ $aliases->{indices} }
+        : keys %{ $aliases };
+
+    my $stats;
+    eval {
+        $stats = $es->index_stats(
+            index => \@indices,
+            docs  => 1,
+            store => 1,
+        );
+        1;
+    } or do {
+        die "[ERROR] failed to obtain stats for index: $str\n";
+    };
+
+
+  INDEX: for my $i ( keys %{ $stats->{_all}{indices} } ) {
+        next INDEX if $str and $i !~ /$str/;
+
+        my $size  = $stats->{_all}{indices}{$i}{primaries}{store}{size};
+        my $count = $stats->{_all}{indices}{$i}{primaries}{docs}{count};
+
+        printf "%s %s %s\n", $i, $size, $count;
+    }
+}
+
+sub index_ls_types {
+    my ( $index ) = @_;
+
+    my @indices = ( $index );
+
+    if ( grep { $index eq $_ } @aliases ) {
+        my $x = _get_elastic_search_index_alias_mapping($es);
+        @indices = @{ $x->{$index} };
+    }
+
+    for my $n (@indices) {
+        my $mapping = $es->mapping( index => $n );
+
+    TYPE: for my $type ( keys %{ $mapping->{$n} } ) {
+            my $search = $es->count(
+                index => $n,
+                type  => $type,
+            );
+
+            printf "%s: %s\n", $type, $search->{count};
+        }
+    }
+}
+
+sub index_put_doc {
+    my ( $index, $type, $doc ) = @_;
+
+    my $json;
+    eval {
+        $json = decode_json( read_file($doc) );
+        1;
+    } or do {
+        die "[ERROR] invlid json data in $doc\n";
+    };
+
+    $es->index(
+        index => $index,
+        type  => $type,
+        data  => $json,
+        create => 1
+    );
+}
+
+sub index_search {
+    my ( $index, $type, $string, $size ) = @_;
+
+    my ( $field, $text ) = split q{:} => $string;
+    my $query = {
+        query_string => {
+            default_field => $field,
+            query         => $text,
+        }
+    };
+
+    my $result = $es->search(
+        index => $index,
+        type  => $type,
+        size  => $size || 24,
+        query => $query,
+        highlight => { fields => { $field => {} },
+                       pre_tags  => [ '__STARTCOLOR__' ],
+                       post_tags => [ '__ENDCOLOR__' ],
+                     },
+    );
+
+    my @output =
+        map { { id => $_->{_id},
+                lines => $_->{highlight}{$field},
+              }
+            }
+        @{ $result->{hits}{hits} };
+
+    for my $o ( @output ) {
+        for my $line ( @{ $o->{lines} } ) {
+            $line =~ s/\n/ /g;
+            $line =~ s/__STARTCOLOR__/color 'bold red'/eg;
+            $line =~ s/__ENDCOLOR__/color 'reset'/eg;
+            printf "%s: %s\n", colored ($o->{id}, 'cyan'), $line;
+        }
+    }
+}
+
+sub index_get {
+    my ( $index, $type, $doc_id ) = @_;
+
+    my $get = $es->get(
+        index => $index,
+        type  => $type,
+        id    => $doc_id,
+    );
+
+    print to_json($get->{_source}, { pretty => 1 }), "\n";
+}
+
+sub index_alias {
+    my ( $index, $alias ) = @_;
+
+    my $result = $es->aliases( actions => [
+        { add => { index => $index, alias => $alias } }
+    ] );
+    warn "[ERROR] failed to create alias $alias for index $index\n" unless $result->{ok};
+}
+
+sub index_unalias {
+    my ( $index, $alias ) = @_;
+
+    my $result = $es->aliases( actions => [
+        { remove => { index => $index, alias => $alias } }
+    ] );
+    warn "[ERROR] failed to remove alias $alias for index $index\n" unless $result->{ok};
+}
+
+sub _get_elastic_search_aliases {
+    my ($es) = @_;
+    my @aliases;
+    my $aliases = $es->get_aliases;
+
+    if ($ElasticSearch::VERSION < 0.52) {
+        @aliases = keys %{$aliases->{aliases}};
+    }
+    else {
+        for my $i (keys %$aliases) {
+            push @aliases, keys %{$aliases->{$i}{aliases}};
+        }
+        @aliases = uniq @aliases;
+    }
+
+    return \@aliases;
+}
+
+sub _get_elastic_search_index_alias_mapping {
+    my ($es) = @_;
+    my $aliases = $es->get_aliases;
+    my %mapping;
+
+    if ($ElasticSearch::VERSION < 0.52) {
+        for (keys %{$aliases->{indices}}) {
+            push @{ $mapping{$_} ||=[] }, @{ $aliases->{indices}{$_} };
+        }
+        for (keys %{$aliases->{aliases}}) {
+            push @{ $mapping{$_} ||=[] }, @{ $aliases->{aliases}{$_} };
+        }
+    }
+    else {
+        for my $i (keys %$aliases) {
+            for my $a (@{ $mapping{$i} = [keys %{$aliases->{$i}{aliases}}] }) {
+                push @{$mapping{$a} ||=[]}, $i;
+            }
+        }
+    }
+    return \%mapping;
+}
+
+sub _validate_params {
+    # index_ls
+    if ( $cmd eq 'ls' ) {
+        die "[ERROR] illegal index name sub-string: " . $params[0] . "\n"
+            if $params[0] and $params[0] !~ /^[a-zA-Z0-9_-]+$/;
+
+        return;
+    }
+
+    my $index = $params[0];
+
+    # check common params
+    unless ( $cmd =~ /^(?:ls)$/ ) {
+        die "[ERROR] illegal index name: $index\n"
+            unless $index and $index =~ /^[a-zA-Z0-9_-]+$/;
+    }
+
+    if ( $cmd =~ /^(?:put|search|get)$/ ) {
+        my $type = $params[1];
+        die "[ERROR] must provide a valid type\n"
+            unless $type and $type =~ /^[a-zA-Z0-9_-]+$/;
+    }
+
+    # check existance of an index if applicable
+    if ( $cmd =~ /^(?:ls-types|delete|put|search|get|alias|unalias)$/ ) {
+        my $check_index = $es->index_exists( index => $index );
+        die "[ERROR] index $index does not exists\n" unless $check_index->{ok};
+
+    } elsif ( $cmd eq 'create' ) {
+        my $check_index = $es->index_exists( index => $index );
+        die "[ERROR] index $index already exists\n" if $check_index->{ok};
+    }
+
+    # check document file where applicable
+    if ( $cmd eq 'put' ) {
+        die "[ERROR] must provide a valid json file\n"
+            unless $params[2] and -f $params[2];
+    }
+
+    # check document id where applicable
+    if ( $cmd eq 'get' ) {
+        my $doc_id = $params[2];
+        die "[ERROR] must provide a valid doc_id\n"
+            unless $doc_id and $doc_id =~ /^[a-zA-Z0-9\/_-]+$/;
+    }
+
+    # check alias name where applicable
+    if ( $cmd =~ /alias/ ) {
+        my $alias = $params[1];
+        die "[ERROR] must provide a valid alias name\n"
+            unless $alias and $alias =~ /^[a-zA-Z0-9_-]+$/;
+
+        die "[ERROR] $index is an alias\n" if grep { /^$index$/ } @aliases;
+
+        my $check_alias = $es->index_exists( index => $alias );
+        if ( $cmd eq 'alias' ) {
+            die "[ERROR] alias $alias already exists" if $check_alias->{ok};
+
+        } else {
+            die "[ERROR] alias doesn't exist" unless $check_alias->{ok};
+        }
+    }
+
+    # check search params
+    if ( $cmd eq 'search' ) {
+        my $string = $params[2];
+        my $size   = $params[3];
+
+        utf8::decode($string);
+        die "[ERROR] must provide a query string\n"
+            unless $string and $string =~ /^[a-zA-Z0-9_-]+ : [\w\d_\s-]+$/x;
+
+        die "[ERROR] invalid size\n"
+            if $size and $size !~ /^[0-9]+$/;
+    }
+}
+
+__END__
+
+=head1 NAME
+
+es -- The command line client of ElasticSearch.
+
+=head1 SYNOPSIS
+
+    # List document count / size per index / type
+    es ls
+    es ls-types <index>
+
+    # Create / delete an index
+    es create <index>
+    es delete <index>
+
+    # Indexing / getting a document
+    es put <index> <doc> # doc needs to be a JSON file
+    es get <name> <type> <doc_id>
+
+    # Search by a field
+    es search <name> <type> <field>:<search string> [<size>]
+
+    # Aliasing
+    es alias   <index-name> <alias>
+    es unalias <index-name> <alias>
+
+See `perldoc es` for more info.
+
+=head1 DESCRIPTION
+
+This program can be used to basic manipulation for day-to-day development need
+with ElasticSearch server. The default server is C<localhost:9200>, to use
+different server, you can change it with C<ELASTIC_SEARCH_SERVERS> environment variable.
+
+    ESASTIC_SEARCH_SERVERS=search-server.company.com:9200
+
+You may supply a list of servers seperate by comma
+
+    ESASTIC_SEARCH_SERVERS=search-server-1.company.com:9200,search-server-2.company.com:9200
+
+The list of servers are used in a round-robin manner, which is the default
+behaviour of the underlying L<ElasticSearch> perl module.
+
+=head1 COMMANDS
+
+=head2 ls [<index sub-string>]
+
+List all indices. Or if a sub-string is provided, list only matching ones.
+
+=head2 ls-types <index>
+
+List all document type of the given index.
+
+=head2 create <index>
+
+Create the index.
+
+=head2 delete <index>
+
+Delete the index
+
+=head2 alias <index> <alias>
+
+Add an alias for the index.
+
+=head2 unalias <index> <alias>
+
+Remove an alias to the index.
+
+=head2 put <index> <type> <doc>
+
+Put the content of doc into the index.  <type> is the the documentation type.
+<doc> must be a valid JSON file.
+
+=head2 get <index> <type> <doc_id>
+
+Print the specic document as JSON.
+
+=head2 search <index> <type> <field>:<query_string>
+
+Perform a simple text query. Need to provide field name and a query string.
+
+=head1 AUTHORS
+
+Mickey Nasriachi E<lt>mickey75@gmail.comE<gt>
+
+Kang-min Liu E<lt>gugod@gugod.orgE<gt>
+
+
+=head1 ACKNOWLEDGMENT
+
+This module was originally developed for Booking.com. With approval from
+Booking.com, this module was generalized and published on CPAN, for which the
+authors would like to express their gratitude.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by Mickey Nasriachi
+
+Copyright (C) 2013 by Kang-min Liu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

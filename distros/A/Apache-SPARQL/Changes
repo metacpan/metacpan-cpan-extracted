@@ -1,0 +1,16 @@
+0.22	Wed Apr 13 18:13:38 CEST 2005 (Monte San Savino, Tuscany)
+
+	- made _param() method more general
+
+0.21	Wed Apr 13 10:14:50 CEST 2005 (Monte San Savino, Tuscany)
+	
+	- added output-type to specify the mime-type output of XSLT
+
+0.2	Wed Apr 13 10:14:50 CEST 2005 (Monte San Savino, Tuscany)
+
+	- added more HTTP parameters to query and getGraph methods
+	  see http://lists.w2.org/Archives/Public/public-rdf-dawg/2005AprJun/0054.html
+
+0.1	Tue Mar  1 12:13:43 CET 2005 (Lunde, Norway)	
+
+	- initial release

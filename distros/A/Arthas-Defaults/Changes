@@ -1,0 +1,26 @@
+Revision history for Perl extension Arthas::Defaults.
+
+3.0.0 - Feb 23rd, 2012
+    - All warning are now fatal
+
+2.0.5 - Feb 9th, 2012
+    - fix bug for which strictures were not imported
+
+2.0.4 - Feb 5th, 2012
+    - fix errors in deps leading to failed tests
+
+2.0.3
+    - minor fixes
+
+2.0.2
+    - fix POD error
+
+2.0.1
+    - little bugfixes
+    - fix email address
+    - fix dependencies
+    
+2.0.0
+    - added Carp and Try::Tiny
+    - wrote documentation
+    - wrote some tests

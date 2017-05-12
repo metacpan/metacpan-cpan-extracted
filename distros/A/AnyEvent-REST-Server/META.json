@@ -1,0 +1,42 @@
+{
+   "abstract" : "An AnyEvent-based TCP server providing a RESTful interface.",
+   "author" : [
+      "Raphael Seebacher <raphael@seebachers.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-REST-Server",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "7.04",
+            "Object::Event" : "1.23"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.05"
+}

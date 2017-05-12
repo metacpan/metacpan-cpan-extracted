@@ -1,0 +1,70 @@
+CONVERTERS = pod2html
+
+POD2HTML = $(P2H) \
+	    --htmlroot=./ \
+	    --podpath=AFS \
+	    --verbose \
+	    --noindex \
+	    --libpods=ACL:BOS:Base:CM:Cell:FS:KAS:KTC_EKEY:KTC_PRINCIPAL:KTC_TOKEN:PTS:Utils:VLDB:VOS
+all: $(CONVERTERS)
+
+converters: $(CONVERTERS)
+
+P2H = ./zpod2html
+
+POD = \
+	AFS.pod	\
+	AFS/ACL.pod	\
+	AFS/Base.pod	\
+	AFS/BOS.pod	\
+	AFS/Cell.pod	\
+	AFS/CM.pod	\
+	AFS/FS.pod	\
+	AFS/KAS.pod	\
+	AFS/KTC_EKEY.pod	\
+	AFS/KTC_PRINCIPAL.pod	\
+	AFS/KTC_TOKEN.pod	\
+	AFS/PTS.pod	\
+	AFS/Utils.pod \
+	AFS/VLDB.pod	\
+	AFS/VOS.pod
+
+HTML = \
+	AFS.html	\
+	AFS/ACL.html	\
+	AFS/Base.html	\
+	AFS/BOS.html	\
+	AFS/Cell.html	\
+	AFS/CM.html	\
+	AFS/FS.html	\
+	AFS/KAS.html	\
+	AFS/KTC_EKEY.html	\
+	AFS/KTC_PRINCIPAL.html	\
+	AFS/KTC_TOKEN.html	\
+	AFS/PTS.html	\
+	AFS/Utils.html \
+	AFS/VLDB.html \
+	AFS/VOS.html
+# not perltoc.html
+
+html:	$(P2H) $(HTML)
+
+.SUFFIXES: .pm .pod
+
+.SUFFIXES: .html
+
+.pod.html:
+	$(POD2HTML) --infile=$*.pod --outfile=$*.html
+	perl -p -i -e "s/utf-8/latin-1/" $*.html
+
+clean:
+	rm -f $(HTML)
+	rm -f pod2html-*cache
+	rm -f pod2htmi.x* pod2htmd.x*
+	rm -f pod2htmi.tmp* pod2htmd.tmp*
+
+realclean:	clean
+	rm -f $(CONVERTERS)
+
+distclean:	realclean
+

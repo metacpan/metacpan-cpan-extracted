@@ -1,0 +1,39 @@
+Revision history for AnyEvent-HTTP-LWP-UserAgent
+
+0.10    Mon Dec 10, 2012
+        Add guard for length(undef) to avoid warnings in older perl.
+        t/invalid_host.t checks if not-died instead of not-success.
+
+0.09    Sat Dec 08, 2012
+        Add minimum support for request content by code reference,
+        response content by filename or code reference
+
+0.08    Fri Oct 05, 2012
+        Fair support of pure AnyEvent without Coro.
+        Thanks to Yasutaka Atarashi.
+
+0.07    Mon Mar 14, 2011
+        Use new version of AnyEvent::HTTP with persistent
+        connections. Initial support of LWP's conn_cache
+        for it.
+
+0.06    Wed Mar 09, 2011
+        Don't overload Coro stack when we have
+        a really big url.
+
+0.05    Thu Mar 03, 2011
+        Increase version.
+
+0.04    Thu Mar 03, 2011
+        More compatible with LWP::UserAgent using handlers.
+        Thanks motetem (Masatoshi Fujimura) for patch.
+
+0.03    Thu Dec 09, 2010
+        Support cookies.
+        Fix headers that exists many times in response.
+
+0.02    Tue Dec 07, 2010
+        Fix SYNOPSIS in POD, thanks to Ryan Perry.
+
+0.01    Fri Nov 26, 2010
+        First prototype

@@ -1,0 +1,16 @@
+
+-- get rid of the wank in installing a temporary distribution
+   maybe use this as an example:
+   
+   https://raw.githubusercontent.com/jjn1056/bootstrap-locallib.pl/0.03/bootstrap_locallib.pl
+
+-- allow a git repository to be the source for project
+   template
+
+-- allow hooks and configuration presets in the template
+   distribution.
+  -- pre build hook
+  -- post build hook
+
+-- swith to Getopt::Long before its too late....
+

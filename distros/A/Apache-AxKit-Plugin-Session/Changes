@@ -1,0 +1,43 @@
+Revision history for Perl extension Session.pm.
+
+1.00
+	- bug fixes as usual
+	- a new globals storage mechanism
+	- non-exclusive logins
+	- some more AxKit::XSP::Auth tags
+	- allow cookies to be deleted when browser is closed
+
+0.98
+	- first release after various internal versions
+	- numerous bugfixes
+	- better docs
+	- less dependencies
+	- better interoperability
+	- a few new features
+
+0.94
+        - fix /redirect
+        - fix login/logout sequence
+        - added sample login/logout XSP pages
+        - don't parse input if not neccessary (so a later module can
+          pass own options, like Apache::AxKit::Plugin::Upload)
+        - removed dependency on Apache::RequestNotes (no longer
+          provides $r->pnotes('INPUT'))
+
+0.93
+        - several bug fixes
+        - added sample script for cleaning session dirs
+        - updated for AxKit 1.6.1 (you definitely need it!)
+
+0.92
+        - fixed timeout bug (sessions didn't time out)
+        - fixed AxAddPlugin bug (plugin usage didn't work)
+
+0.91
+        - fixed bug where inifinite redirection occurred when
+          URL sessions were deactivated
+        - changed configuration, made even easier to use
+        - fixed wrong package declarations
+
+0.9
+        - initial release

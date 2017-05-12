@@ -1,0 +1,48 @@
+Alien-WiX version 1.305419001
+
+Alien::WiX is provided in order to be able to specify a dependency on Windows
+Installer XML (otherwise known as WiX), which is used to create Windows 
+Installer (.msi) installation packages.
+
+This module also provides utility subroutines that will be useful to programs
+and modules that use WiX.
+
+INSTALLATION
+
+When installing this module manually or with old versions of the CPAN/CPANPLUS
+toolchains, (CPAN 1.91_53 or below or CPANPLUS 0.85_04 or below), 
+Win32API::Registry is required to be installed in order to install
+this module.
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+This method of installation will install a current version of Module::Build 
+if it is not already installed.
+    
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+Dependencies for installation include perl 5.8.0, Win32API::Registry 0.30, 
+Module::Build 0.2808_01, and LWP::UserAgent 5.819.
+
+Non-core perl modules required to run this module are Win32::TieRegistry 0.25, 
+version.pm 0.76, and Readonly 1.03.  Readonly::XS 1.05 is recommended.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Curtis Jewell.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,20 @@
+<& /header.comp, sitename => $sitename, title => $title &>
+
+<tr><td><table width="100%" border="0">
+<tr>
+  <td width="75%" valign="top">
+	<% $content %>
+  </td>
+  <td align=left valign="top">
+	<& /menu.comp &>
+  </td>
+</tr>
+</table></td></tr>
+
+<& /footer.comp, sitename => $sitename &>
+
+<%args>
+$sitename => 'Acme Industries, Inc.'
+$title => 'What are you looking at?'
+$content => 'At what are you looking?'
+</%args>

@@ -1,0 +1,35 @@
+Apache2-AuthzCaps version 0.002
+===============================
+
+Apache2::AuthzCaps is a perl module which provides simple Apache2
+capability-based authorization. It contains a mod_perl2 handler and
+some utility functions.
+
+For more information, please read the POD of Apache2::AuthzCaps (for
+Apache 2.2) or Apache2_4::AuthzCaps (for Apache 2.4)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+- YAML::Any
+
+If you want to use anything more than the utility functions, you will
+also need mod_perl2.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013-2015 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.

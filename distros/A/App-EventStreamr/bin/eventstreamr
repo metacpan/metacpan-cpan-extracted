@@ -1,0 +1,234 @@
+#!/usr/bin/env perl
+use v5.10.0;
+use strict;
+use warnings;
+use experimental 'say';
+use App::EventStreamr;
+use Getopt::Long;
+use File::Spec;
+use POSIX;
+use Proc::Daemon; # libproc-daemon-perl
+
+# PODNAME: eventstreamr 
+
+# ABSTRACT: eventstreamr - Daemon that runs the Orchestrator
+
+our $VERSION = '0.5'; # VERSION
+
+
+# $progname is just a nicer-formatted version of $0 (our command name)
+my $PROGNAME = (File::Spec->splitpath($0))[2];
+$PROGNAME ||= 'eventstreamr';
+
+my $DEBUG  = 0;
+my $DAEMON = 1;
+
+my $getopts_rc = GetOptions(
+  "configure"     => \&configure,
+  "version"       => \&version,
+  "devices"       => \&devices,
+  "debug!"        => \$DEBUG,
+  "daemon!"       => \$DAEMON,
+
+  "help|?"        => \&print_usage,
+);
+
+# daemonize
+# TODO: Fix File Descripter issue when initialising logs before daemonizing
+my $daemon = Proc::Daemon->new(
+  work_dir => "$ENV{HOME}/.eventstreamr/",
+);
+
+if ( $DAEMON ) {
+  $daemon->Init();
+}
+
+my $eventstreamr = App::EventStreamr->new(
+  debug => $DEBUG,
+);
+
+# setup signal handlers and daemon stuff
+# POSIX unmasks the sigprocmask properly
+$SIG{CHLD} = 'IGNORE';
+my $sigset = POSIX::SigSet->new();
+my $update = POSIX::SigAction->new( 'self_update',
+                                    $sigset,
+                                    &POSIX::SA_NODEFER);
+my $exit = POSIX::SigAction->new(   'sig_exit',
+                                    $sigset,
+                                    &POSIX::SA_NODEFER);
+my $pipe = POSIX::SigAction->new(   'sig_pipe',
+                                    $sigset,
+                                    &POSIX::SA_NODEFER);
+my $get = POSIX::SigAction->new(   'get_config',
+                                    $sigset,
+                                    &POSIX::SA_NODEFER);
+my $post = POSIX::SigAction->new(   'post_config',
+                                    $sigset,
+                                    &POSIX::SA_NODEFER);
+# Handle INT/Term
+POSIX::sigaction(&POSIX::SIGTERM, $exit);
+POSIX::sigaction(&POSIX::SIGINT, $exit);
+
+# SIGHUP updates and execs
+POSIX::sigaction(&POSIX::SIGHUP, $update);
+POSIX::sigaction(&POSIX::SIGPIPE, $pipe);
+
+# USR1/2 for get/post config
+POSIX::sigaction(&POSIX::SIGUSR1, $get);
+POSIX::sigaction(&POSIX::SIGUSR2, $post);
+
+
+sub print_usage {
+  say q{
+  Usage:
+
+  evenstreamr --configure     : Run through station configuration
+
+  Debugging commands:
+    
+  eventstreamr --version      : Show version information
+  eventstreamr --debug        : Run with debugging enabled.
+  eventstreamr --nodaemon     : Run in the foreground, log to console
+  eventstreamr --devices      : Print available devices
+
+  For more documentation, use `perldoc eventstreamr`.
+  };
+
+  exit 1;
+}
+
+sub devices {
+  my $eventstreamr = App::EventStreamr->new();
+  $eventstreamr->config->update_devices();
+
+  say "ID (Type) - Name";
+  foreach my $device (@{$eventstreamr->config->available_devices->{array}}) {
+    say "$device->{id} ($device->{type}) - $device->{name}";
+  }
+  exit 1;
+}
+
+sub version {
+  $::VERSION ||= "Unreleased";
+  say "eventstreamr version          : $::VERSION";
+  say "App::EventStreamr version     : ", $eventstreamr->VERSION;
+  exit 1;
+}
+
+sub configure {
+  my $eventstreamr = App::EventStreamr->new();
+  $eventstreamr->config->configure;
+
+  exit 1;
+}
+
+# Signal Handler Subs
+sub self_update {
+  # TODO: Implement
+}
+
+sub sig_exit {
+  $eventstreamr->stop();
+}
+
+sub get_config {
+  $eventstreamr->config->get_config();
+}
+
+sub post_config {
+  $eventstreamr->config->post_config();
+}
+
+sub sig_pipe {
+  print "Caught Pipe\n";
+}
+
+# set umask
+umask 0027;
+
+chdir($eventstreamr->config->config_path) or $eventstreamr->error("Couldn't change working dir to ".$eventstreamr->config->config_path);
+
+$eventstreamr->run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+eventstreamr  - eventstreamr - Daemon that runs the Orchestrator
+
+=head1 VERSION
+
+version 0.5
+
+=head1 SYNOPSIS
+
+Usage:
+
+  evenstreamr --configure     : Run through station configuration
+
+  Debugging commands:
+    
+  eventstreamr --version      : Show version information
+  eventstreamr --devices      : Print a list of devices
+  eventstreamr --debug        : Run with debugging enabled.
+  eventstreamr --nodaemon     : Run in the foreground, log to console
+
+=head1 DESCRIPTION
+
+This is the primary controlling daemon for EventStreamr.
+
+=head1 SETUP
+
+=head2 Installation
+
+If you have not already installed this software, the easiest way
+is to use L<cpanm> and L<local::lib>. If you don't have them installed,
+it's easy with:
+
+    curl -L http://cpanmin.us/ | perl - --self-upgrade
+    ~/perl5/bin/cpanm -L ~/perl5 App::local::lib::helper
+    source ~/perl5/bin/localenv-bashrc
+
+You might want to put that last line in your F<~/.bashrc> file.
+
+You can then install C<eventstreamr> and related utilities with:
+
+    cpanm App::EventStreamr
+
+=head1 BUGS/Features Requests
+
+Please submit any bugs, feature requests to
+L<https://github.com/plugorgau/eventstreamr-station/issues> .
+
+Contributions are more than welcome!
+
+=head1 Known Issues
+
+Daemon dies when alsa device isn't present on start - L<https://github.com/plugorgau/eventstreamr-station/issues/54>
+Workaround: Ensure all configured ALSA devices are plugged in on boot
+
+Correctly Restart on Date Change - L<https://github.com/plugorgau/eventstreamr-station/issues/18>
+Workaround: Reboot or Restart the EventStreamr Daemon (pressing update from the controller will restart it)
+
+=head1 SEE ALSO
+
+L<App::EventStreamr>
+
+=head1 AUTHOR
+
+Leon Wright < techman@cpan.org >
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by Leon Wright.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

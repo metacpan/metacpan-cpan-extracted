@@ -1,0 +1,29 @@
+Array/Lock version 0.02
+=======================
+
+This is Array::Lock.
+
+Array::Lock is a set of subroutines to lock either the indexes value
+pairs of an array, or its indexes (size.)  It can lock both to create
+an only readable array.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+DEPENDENCIES
+
+Array::Lock requires perl version 5.7.3 to be useful, because of the
+Internals::SvREADONLY function.
+
+COPYRIGHT AND LICENCE
+
+Copyright 2003 by Gyan Kapur
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

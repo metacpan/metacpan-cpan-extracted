@@ -1,0 +1,88 @@
+#!/usr/bin/perl -CA
+
+package App::tmblr;
+
+use strict;
+use utf8;
+
+use App::tmblr;
+use Getopt::Std;
+use App::tmblr;
+
+our ($skellington, $tokens, $blog);
+
+our ($opt_h, $opt_b, $opt_f);
+getopts('hb:f:');
+
+my $usage = "$0 [-h] [-b blog] [-f config] ID";
+
+my $tumblr = init($opt_f, $opt_b);
+
+if($opt_h) {
+  print("$usage\n");
+  exit(0);
+}
+
+if($ARGV[0]) {
+  my ($id) = $ARGV[0] =~ /([0-9]+)$/;
+  my $ok = $tumblr->post_delete(id => $id);
+  if($ok) {
+    print("$id deleted\n");
+  } else {
+    print("that doesn't work\n");
+  }
+} else {
+  print("$usage\n");
+  exit(1);
+}
+__END__
+
+=head1 NAME
+
+tmblr-rm - delete tmblr posts
+
+=head1 SYNOPSIS
+
+B<tmblr> [-h] [-b blog] [-f config] ID
+
+=head1 DESCRIPTION
+
+Delete posts from tumblr.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-h>
+
+Display usage information and exit.
+
+=item B<-b> I<blog>
+
+Post to I<blog>.
+
+=item B<-f> I<config>
+
+Read the blog name and oauth tokens from the file -I<config>.
+Defaults to ~/.tmblr.
+
+=back
+
+=head1 EXAMPLES
+
+  $ tmblr-rm 92831985892
+
+=head1 AUTHOR
+
+bie E<lt>bie@kyber.ioE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2015 by bie
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.22.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+

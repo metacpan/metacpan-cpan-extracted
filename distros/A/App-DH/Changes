@@ -1,0 +1,84 @@
+Release history for App-DH
+
+0.004001 2017-03-06T13:58:28Z af0e8c1
+ [Bugfix]
+ - Fix tests failing with -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.004000, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+ - test: ↓1
+
+0.004000 2016-10-08T05:23:17Z d3631d1
+ [Commands]
+ - New commands "database_version" and "schema_version" for inspecting relevant version fields.
+ - Thanks to Daniel Böhmer for PR #2
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003000, see misc/*.deps* for details
+ - configure: (suggests: +1)
+ - develop: +4 ↑1 (suggests: ↑1)
+
+0.003000 2015-06-27T04:31:29Z 3f38f2a
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see misc/*.deps* for details
+ - develop: +1 -1 (suggests: ↑2)
+ - runtime: +1
+ - test: +6 (recommends: +1)
+
+ [Features]
+ - Can now specify a target version with --target
+ - Thanks to Yanick Champoux #1
+
+0.002000 2015-03-08T09:13:15Z 2350202
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001002, see misc/*.deps* for details
+ - build: -1
+ - configure: +2 -1 (recommends: +1)
+ - develop: +52 -2 (recommends: +1 -1, suggests: +1 ↑1)
+ - runtime: +2 -1 (recommends: +1)
+ - test: +3 ↓1 -2 (recommends: +3)
+
+ [Internals]
+ - A few dependencies that were no longer needed have been shaved from runtime.
+
+ [Meta]
+ - Move repository to kentnl org
+ - Updated git URLs
+
+ [Packaging]
+ - Switched to EUMM: https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+ - Dependencies on toolkit softened.
+
+0.001002 2013-04-07T22:12:52Z
+ [Bugfix]
+ - Depend on MooseX::Getopt 0.48 because we wrap one of the methods added at that version.
+
+ [Dependencies::Changed / build requires]
+ - Module::Build 0.4003 → 0.4004
+
+ [Dependencies::Changed / configure requires]
+ - Module::Build 0.4003 → 0.4004
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.7.0 → v1.7.2
+
+ [Dependencies::Changed / runtime requires]
+ - MooseX::Getopt 0 → 0.48
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: (suggests: ↑1)
+ - runtime: ↑1
+
+ [Packaging]
+ - Utilise Module::Build 0.4004 test_requires
+
+0.001001 2013-02-15T16:09:39Z
+ - default databases are now chosen by introspecting your --connection_name. But you can still override the default on
+   the commandline.
+
+0.001000 2013-02-15T03:56:31Z
+ - First version.

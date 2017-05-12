@@ -1,0 +1,9 @@
+Revision history for Perl extension Acme::landmine.
+
+0.01  Wed Nov 13 00:19:05 2002
+	- original version; created by h2xs 1.22 with options
+		-X -A -b 5.0.0 --skip-autoloader Acme::landmine
+
+
+1.00 Mon Feb 27 Ten Past Eight 2006
+        - rewrote the documentation for no particular reason

@@ -1,0 +1,31 @@
+---
+abstract: 'Build and install the Chipmunk Physics library'
+author:
+  - 'Jeffrey T. Palmer <jtpalmer@cpan.org>'
+build_requires:
+  Alien::CMake: '0.03'
+  Test::More: '0'
+configure_requires:
+  Alien::Base::ModuleBuild: '0'
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Chipmunk
+provides:
+  Alien::Chipmunk:
+    file: lib/Alien/Chipmunk.pm
+    version: '0.001002'
+requires:
+  Alien::Base: '0.020'
+  File::ShareDir: '1.00'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/jtpalmer/Alien-Chipmunk/issues
+  homepage: https://github.com/jtpalmer/Alien-Chipmunk
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://github.com/jtpalmer/Alien-Chipmunk.git
+version: '0.001002'

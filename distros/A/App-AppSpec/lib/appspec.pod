@@ -1,0 +1,138 @@
+=head1 NAME
+
+appspec - Utilities for spec files for App::Spec cli apps
+
+=head1 ABSTRACT
+
+
+
+=head1 DESCRIPTION
+
+This script is a collection of tools for authors of L<App::Spec> command line scripts.
+
+    # generate completion
+    % appspec completion --bash path/to/spec.yaml
+    # generate pod
+    % appspec pod --bash path/to/spec.yaml
+    # validate your spec file
+    % appspec validate --bash path/to/spec.yaml
+    # generate a new App::Spec app skeleton
+    % appspec new --class App::foo --name foo --with-subcommands
+
+
+=head2 GLOBAL OPTIONS
+
+    --help -h    Show command help (flag)
+
+
+=head2 SUBCOMMANDS
+
+=head3  completion
+
+    appspec  completion [options] <spec_file>
+
+Generate completion for a specified spec file
+
+
+This command takes a spec file and outputs the corresponding shell script for tab completion.
+
+
+Options:
+
+    --name    name of the program
+    --zsh     for zsh (flag)     
+    --bash    for bash (flag)    
+
+Parameters:
+
+    spec_file  *  Path to the spec file (use '-' for standard input)
+
+=head3  new
+
+    appspec  new [options] [<path>]
+
+Create new app
+
+
+This command creates a skeleton for a new app. It will create a directory for your app and write a skeleton spec file.
+
+
+Options:
+
+    --name -n              *  The (file) name of the app                     
+    --class -c             *  The main class name for your app implementation
+    --overwrite -o            Overwrite existing dist directory (flag)       
+    --with-subcommands -s     Create an app with subcommands (flag)          
+
+Parameters:
+
+    path    Path to the distribution directory (default is 'Dist-Name' in current directory)
+
+=head3  pod
+
+    appspec  pod <spec_file>
+
+Generate pod
+
+
+This command takes a spec file and outputs the generated pod documentation.
+
+
+Parameters:
+
+    spec_file  *  Path to the spec file (use '-' for standard input)
+
+=head3  validate
+
+    appspec  validate [options] <spec_file>
+
+Validate spec file
+
+
+This command takes a spec file and validates it against the current L<App::Spec> schema.
+
+
+Options:
+
+    --color -C    output colorized (flag)
+
+Parameters:
+
+    spec_file  *  Path to the spec file (use '-' for standard input)
+
+=head3  help
+
+    appspec  help <subcommands> [options]
+
+Show command help
+
+
+Options:
+
+    --all     (flag)
+
+
+=head3  _complete
+
+    appspec  _complete [options]
+
+Generate self completion
+
+
+Options:
+
+    --name    name of the program
+    --zsh     for zsh (flag)     
+    --bash    for bash (flag)    
+
+
+=head3  _pod
+
+    appspec  _pod
+
+Generate self pod
+
+
+
+
+

@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name: Acme-Scurvy-Whoreson-BilgeRat-Backend-insultserver
+version: 1.0
+author:
+  - Simon Wistow <simon@thegestalt.org>
+  - based on code by
+  - James Garnett <garnett@colorado.edu>
+abstract: |-
+  generate insults in the style of the old colarado.edu Insult Server
+license: perl
+requires:
+  Acme::Scurvy::Whoreson::BilgeRat: 0
+  Test::More: 0
+provides:
+  ? |-
+    Acme::Scurvy::Whoreson::BilgeRat::Backend::insultserver
+:
+    file: |-
+      lib/Acme/Scurvy/Whoreson/BilgeRat/Backend/insultserver.pm
+    version: 1.0
+  Acme::Scurvy::Whoreson::BilgeRat::Backend::lala:
+    file: lib/Acme/Scurvy/Whoreson/BilgeRat/Backend/lala.pm
+    version: 1.0
+generated_by: Module::Build version 0.25

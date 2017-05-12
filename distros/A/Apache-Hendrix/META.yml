@@ -1,0 +1,45 @@
+---
+abstract: 'Provides a route-to-sub based web framework'
+author:
+  - 'Zack Allison <zedoriah@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Apache-Hendrix
+provides:
+  Apache::Hendrix:
+    file: lib/Apache/Hendrix.pm
+    version: v0.3.0
+  Apache::Hendrix::Route:
+    file: lib/Apache/Hendrix/Route.pm
+    version: v0.1.0
+  Apache::Hendrix::Session:
+    file: lib/Apache/Hendrix/Session.pm
+    version: v0.1.0
+requires:
+  Apache2::Const: 0
+  Apache2::Request: 0
+  Apache2::RequestIO: 0
+  Apache2::RequestRec: 0
+  Carp: 0
+  JSON::XS: 0
+  Module::Load: 0
+  Moose: 0
+  Moose::Exporter: 0
+  MooseX::ClassAttribute: 0
+  MooseX::FollowPBP: 0
+  MooseX::Singleton: 0
+  Template: 0
+  Test::More: 0
+  Tie::Cache: 0
+  TryCatch: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.3.0

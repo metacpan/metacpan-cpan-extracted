@@ -1,0 +1,41 @@
+Array-Tour version 0.03
+=======================
+
+Array::Tour is a module that returns cell coordinates to allow an application
+to visit cells in a specialized order.  Currently there are four of these
+modules bundled in the package; Array::Tour itself, Array::Tour::Spiral,
+Array::Tour::Serpentine, Array::Tour::RandomWalk.
+
+THESE MODULES ARE STILL EXPERIMENTAL.
+
+SOME CLASS METHODS MAY CHANGE, ALTHOUGH THE CONSTANTS PROBABLY WILL NOT.
+------------------------------------------------------------------------
+
+INSTALLATION
+
+To install this module type the following:
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+Or the old method:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None yet, however the module and its descendents are meant to be used in
+conjunction with other (as yet unwritten) modules.
+
+COPYRIGHT AND LICENCE
+
+Copyright 2006, John M. Gamble.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+

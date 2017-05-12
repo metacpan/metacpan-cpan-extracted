@@ -1,0 +1,706 @@
+==================================================
+Changes from 2011-10-23 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.9.1 at 2012-10-22 06:00:27 +0000
+------------------------------------------
+
+  Change: 8c702e337ae9f7c02e114644d9623cb1af21cede
+  Author: Heikki Lehvaslaiho <heikki.lehvaslaiho@gmail.com>
+  Date : 2012-10-22 08:57:31 +0000
+
+    documentation on use of quotes in YAML on perl one-liners 
+
+  Change: a343dfe3ed5891e43ee234d6e0c945a831cbb050
+  Author: Heikki Lehvaslaiho <heikki.lehvaslaiho@gmail.com>
+  Date : 2012-10-16 09:34:41 +0000
+
+    more documentation 
+
+  Change: 9c6ec874ed14655ca024e7c79cc2ba49926a5a75
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-07-01 16:50:53 +0000
+
+    Documentation: reciprocal links between script and module; to-do 
+
+  Change: c96a35c8045955da24fbb4f25fa245801d6d8488
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-07-01 11:35:02 +0000
+
+    small documentation fixes 
+
+  Change: a8670578cb59ecc6b6c52f1ae4d7bce6d237547d
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-07-01 10:50:08 +0000
+
+    reorganize documentation: all run time information into spipe 
+
+  Change: 240b48ea0a676b1bd3f10e8782534d534f6bfe48
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-30 12:07:27 +0000
+
+    use FindBin to find the binary 
+
+  Change: 95378878b6d39b0108af9f07efd2daada9739506
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-26 10:55:37 +0000
+
+    Merge branch 'master' of github.com:heikkil/app-pipeline-simple 
+
+  Change: a6933d56544d1cd988c707b7e3cddb0d1feafae0
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-26 10:54:45 +0000
+
+    standard file name 'Changes' used 
+
+  Change: 77060492790938fb89e80d59dbca9a923805a48d
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-26 10:54:45 +0000
+
+    cleaner graphviz output 
+
+  Change: 3b42601dac727191f44559a79b08bc4ef7658e1e
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-26 10:54:45 +0000
+
+    better documentation on IO types 
+
+  Change: e4e198d8b434051399fc563b2204371dcbe70cad
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-26 10:54:19 +0000
+
+    add a bioinformatics example pipeline 
+
+  Change: 921a3ab82a18b26d5fabbd79b05eba09e4d0a77e
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-26 10:26:22 +0000
+
+    cleaner graphviz output 
+
+  Change: fb362e91a90e5424c2a554d718cced3d35764847
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-26 10:23:17 +0000
+
+    better documentation on IO types 
+
+  Change: 2d3a283dd4f325ef956134594be7f5d998b811e5
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-25 12:57:47 +0000
+
+    add a bioinformatics excample pipeline 
+
+  Change: 125c6db00d8d1878ab7844107e143182198fd580
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-25 12:55:55 +0000
+
+    Do not require Data::Printer 
+
+  Change: 6c6db057d0d5b8ff176c3b5971047c1e04c023ef
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-25 12:52:51 +0000
+
+    ignore cover_db; use only one change log 
+
+  Change: f1899d500288e78258ec782e07d816bb5d96ccf6
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-24 09:07:52 +0000
+
+    rewrite of config rendering; use single dash/space output format,
+    only 
+
+  Change: 8bc1ca2725c8910092ac3bf612a1470dbb7651b6
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-24 08:49:03 +0000
+
+    simplify the YAML; add an option with a value 
+
+  Change: 7468335d29d5bc16c14399295cbebc0331722b75
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-23 10:37:46 +0000
+
+    keep CPAN happy by having the Changes file 
+
+  Change: 9d37227e1a74863b6f56574a66f654bc9d29d668
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-23 10:37:06 +0000
+
+    module name change 
+
+  Change: da33065c2c69e8026c110fbad5ac7710ca791b30
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-23 10:36:05 +0000
+
+    module name change refleced here 
+
+  Change: 6e2d022dee10c72fa7fda77068526fe4b3d1639e
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-23 10:34:47 +0000
+
+    Rename to App::Pipeline::Simple 
+
+  Change: 6ca5f6648361a0fee8f116a2a8f8948cfb3754c5
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-23 10:23:05 +0000
+
+    allow upload to CPAN 
+
+  Change: 7aa7338b9ba0e257a1620407bc9249465121c997
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-23 10:12:16 +0000
+
+    rename Pipeline::Simple to App::Pipeline::Simple 
+
+  Change: b3e2d96821a90065167b8f087f925319de0cf757
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-23 08:39:14 +0000
+
+    explain filled in config file 
+
+  Change: a4a8fb763367cc7caf45666514c511df8112b145
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-23 08:32:23 +0000
+
+    clean POD for PodWeaver duplicates 
+
+  Change: 734c8ba04fd274272f67f5c9dd678abb8c48ec43
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-23 08:02:14 +0000
+
+    reminder about PODNAME 
+
+  Change: 0b36c14c54fdf9061028ad9b16ec31588733d000
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-20 17:23:43 +0000
+
+    remove spurious file 
+
+  Change: f8653b0232d9f84af29d72e5545e9ba688e55e53
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-20 17:20:37 +0000
+
+    update dzil plugins 
+
+  Change: 81ceb6fd3122e40b5f72be5ac41d0aaa7946645a
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-18 14:55:27 +0000
+
+    fix warning from unitialized variable 
+
+  Change: e5d987bd4c7f7a0f45853b1f1a6a36ae39365548
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-18 14:54:40 +0000
+
+    spurious ';' character 
+
+  Change: 9a43c1acfbc68cadffefac62316bc850f5e970ae
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-18 14:44:25 +0000
+
+    link to t/data/ configuration files 
+
+  Change: 22d071b522d60bd68cc429bc4c05ffab263d205f
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-18 14:24:36 +0000
+
+    DTD not needed since not using XML any more 
+
+  Change: 0769cd691edcdb95ae5f67d35089bcbb283e830c
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-18 14:22:34 +0000
+
+    Merge branch 'master' of github.com:heikkil/pipeline-simple 
+
+  Change: caeae4875399d1e93156e69756cd533d802e0c0d
+  Author: Heikki Lehvaslaiho <heikki.lehvaslaiho@gmail.com>
+  Date : 2012-06-18 04:18:07 +0000
+
+    Initial commit 
+
+----------------------------------------
+version 0.8 at 2012-06-18 11:19:43 +0000
+----------------------------------------
+
+  Change: 21b5891f6c8810dcec21ccf4d4f836998b808d78
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-18 14:19:43 +0000
+
+    doc fixes 
+
+  Change: 7d95a4d11b4ee17c8d65af8715f5302bad2bcd8b
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-18 13:54:45 +0000
+
+    injection of command line parameters 
+
+  Change: b32d83b2a4487f306674429e30cb4c51f0e074ad
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-18 08:46:58 +0000
+
+    remove trailing spaces 
+
+  Change: 89ee449e39dcbd65b86d05566870820b49cf2e1d
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-17 16:19:21 +0000
+
+    documentation fixes 
+
+  Change: 67e14825c7bd93b72d67c909870309d7b7207ef5
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-17 16:18:42 +0000
+
+    move code to top, POD to bottom 
+
+----------------------------------------
+version 0.7 at 2012-06-17 12:23:38 +0000
+----------------------------------------
+
+  Change: 23883f2f531f20728499e15b1daa020efe78f5c4
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-17 15:23:38 +0000
+
+    raneme pipeline.pl to spipe 
+
+----------------------------------------
+version 0.6 at 2012-06-17 09:04:56 +0000
+----------------------------------------
+
+  Change: 02d01e15ed32efa46e75346d8c3ca0b6cb247612
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-17 12:04:56 +0000
+
+    bump the version to 0.6 
+
+  Change: ce3712376578023a562ec78f95767f64a909600e
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-17 12:03:15 +0000
+
+    increased logging; test the cmd line programme 
+
+  Change: eb39bcb04e92bb02645eb25956b7944f7042c3a6
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-17 10:18:09 +0000
+
+    documentation and code cleaning 
+
+  Change: f5cf3f80449990ac7d82806b9a1a23e777fa2433
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-16 15:56:05 +0000
+
+    better loggin info; no Data::Dump'ing 
+
+  Change: dd6348979369ae8bed97af0a84b9761453ce3bca
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-16 15:52:16 +0000
+
+    re-enable log analysis; more logging 
+
+  Change: cdd5ad3cd25af1f7ceaad0fc30a47e8f9821913a
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-16 15:26:49 +0000
+
+    log the log name 
+
+  Change: af554e9820048bf955bf8fa9d9b370d07123a8ed
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-16 15:25:09 +0000
+
+    log how starting point is determined 
+
+  Change: a93384d56765d168ba8f552ef344368f9de5e833
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-16 15:24:45 +0000
+
+    clean after running tests 
+
+  Change: b1bcc7cd81cead159f0049a44aa92f4dbafc719f
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-16 15:13:48 +0000
+
+    replace xml with yml 
+
+  Change: 7afa03709300d96252ff1d76f1872188d34a0f6e
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-16 15:08:24 +0000
+
+    test for log file before parsing it 
+
+  Change: 9f2b45bb4c87fcf490a93a4f2bb49bf628480011
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-16 15:06:49 +0000
+
+    keep CritickTests 
+
+  Change: 8d83e5cb6e32dc6b23bb220499066342432e46fb
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-16 14:56:34 +0000
+
+    it is year 2012 
+
+  Change: 048ee8e24c6ca8a5695a883fa58938b771c37c55
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-16 14:36:25 +0000
+
+    rename test files 
+
+  Change: 7f58b6afe3d59a9d8b2847e405bd414fc4cd5753
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-06-11 15:40:26 +0000
+
+    use now YAML config files 
+
+  Change: ed237ac28af3212188827a4a122f26186c55268a
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-02-06 13:41:21 +0000
+
+    notes about philosophy of the pipeline 
+
+  Change: ea80d7d838926f7203e7df01dea65676ac9276f0
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2012-02-06 13:40:22 +0000
+
+    update dzil git version plugin 
+
+  Change: 21f96ca6cb8be11d1309e523752edaf3145c31fa
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2011-08-10 16:31:35 +0000
+
+    tag the test files as perl for emacs 
+
+  Change: 32680218d78721866d9bc48a3abf55fb3c37c7cd
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2011-08-10 15:02:06 +0000
+
+    bump copyright year, add explicit depencies 
+
+  Change: 6e2bd62fcfdd51d3650261563fbf873897082e88
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2011-08-10 15:00:30 +0000
+
+    remove test help docs 
+
+  Change: 32afb18658a0214b590b29aec80355d55e5de8d6
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2011-07-11 12:07:40 +0000
+
+    run time tests 
+
+  Change: e9db57bba24aa8304b3e92002967d7519e5bcb69
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2011-07-11 12:06:48 +0000
+
+    more tests, running works, logging is more complete, stopping works 
+
+  Change: e51df5f4c8caeae48f6f426d75e05f6d5fae1a0c
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-17 21:41:55 +0000
+
+    v0.5.2 Change time to Changes 
+
+  Change: 85632bc36136e435bae561aafb32984d57165e8e
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-17 21:39:40 +0000
+
+    v0.5.2
+
+    Log::Log4perl use exclusively, no more log.xml 
+
+  Change: fca5ac795af7377935e5a311ded56e28ae6a8531
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-17 21:30:03 +0000
+
+    Documentation fixes 
+
+  Change: 82961a5dcae83ab09f5a34107e24a89c5d7222e9
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-17 12:49:11 +0000
+
+    log.xml no longer used, pipeline.log read in stead. Added verbose()
+    to control logging, esp. to silence it when running tests 
+
+  Change: b28b030a7973edab84dd81397c8e7259a60b8a1a
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-16 08:29:44 +0000
+
+    add version to module 
+
+  Change: 71570779577965dcf835f728a7d87e48f6136bf1
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-16 08:17:36 +0000
+
+    add MANIFEST.SKIP into MANIFEST.SKIP 
+
+  Change: a91d3ce201df5fcd7f7a24c807ccecf69e5d8d48
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-16 08:14:54 +0000
+
+    allow for release confirmation 
+
+  Change: 962caea87ae6d755247073ff8113ed27599b66a5
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-15 21:53:02 +0000
+
+    0.5.1 release notes 
+
+  Change: e09a21540400e975e61fb32c2047b05b063a2a98
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-15 21:48:34 +0000
+
+    v0.5.1 
+
+  Change: 5ba6e7df31c0c029be0ab901ddedc6010a33ca14
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-15 21:42:24 +0000
+
+    fix pod coverage 
+
+  Change: e84fdab09da5dd3cfb02ff5a1c2d4ce6c6b03bd2
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-15 21:35:24 +0000
+
+    manual merge on notes.org 
+
+  Change: fa28eb8b8042bd9e000a310d8369352abdc7a961
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-15 21:31:20 +0000
+
+    Logging can be now done using Log::Log4perl 
+
+  Change: 7e1120862c29a2645a46bacda3587fa1b546219d
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-15 10:38:27 +0000
+
+    all get-setters written out and short pod docs added 
+
+  Change: 4786ff17208d38f5b587fd72786341c8bb3cc47e
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-14 12:37:53 +0000
+
+    dzil tweeking 
+
+  Change: c6b602f19b2244a88fb91372c4eb47f44190badc
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-13 09:21:18 +0000
+
+    v0.5.0 
+
+  Change: 62384e05ad2d7204613191876e6e9def395776d2
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-12 22:21:58 +0000
+
+    clean timestamps 
+
+  Change: 24d40afee571401e8a5af0dae51cd2ae4841d5f5
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-12 22:21:18 +0000
+
+    change log written from git log 
+
+  Change: f65456bbafad5aea851150b62e636eac432d8265
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-12 22:04:13 +0000
+
+    motes on dzil command 
+
+  Change: 515684a027512b778ee0d53f2be9e2d5bc216ebc
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-12 22:02:56 +0000
+
+    pod for methods to keep Pod::Coverage happy 
+
+  Change: 8991526ebafc168b8665d775276afb325ca09882
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-12 14:11:13 +0000
+
+    trying to maintain a private notes.org file 
+
+  Change: 59c2e73028fb90a219e4c14b1324496e1b0b526e
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-12 14:03:55 +0000
+
+    pod in the module 
+
+  Change: d6c835e2379909d8a03c209d1d373d561b60ec44
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-12 14:02:59 +0000
+
+    remove more old files, build README from POD 
+
+  Change: 6b8da3500283b7afc67148f218a1c53b07ca8c78
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-12 13:32:17 +0000
+
+    moved to using Dist::Zilla 
+
+  Change: 0ee175649b4f318b2534ae6f2efaa3ca358e4b2a
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-12 11:09:00 +0000
+
+    halfway getting shipit and Makefile to work 
+
+  Change: 8f0b92e1d335b9aa33f6a1783f9e84c4756b94b4
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-12 08:51:21 +0000
+
+    very loose DTD for the config file XML 
+
+  Change: 4823aff0937cd619e8e61f9032309323acb7b327
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-12 08:40:27 +0000
+
+    add dependency to GraphViz 
+
+  Change: 21f59173ecac52507d8175db4d8cd59a979f1bcf
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-12 08:37:50 +0000
+
+    add dependency to GraphViz 
+
+  Change: 6b460151bbc0b6955626e3834ad589754643b899
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-11 19:17:38 +0000
+
+    path() is now an allowed method 
+
+  Change: 791342b87a469788353d11508af9d3bdb2905dc9
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-11 19:16:46 +0000
+
+    version 0.5 
+
+  Change: 7e473259ff334bc8b4e033d38f68c7223ed54355
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-11 19:13:36 +0000
+
+    module documentation 
+
+  Change: a06009bc0b64d621c8b026f20a87bab2c2cb360a
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-11 18:05:47 +0000
+
+    add parsing of <step>/<path> tag 
+
+  Change: 29ce7b1172db4d4091c6b9d5f77fdc6312fdc069
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-08 08:51:42 +0000
+
+    fix: code never reached 
+
+  Change: a89b62e23ea77d480efe5fddd4f160712d301e33
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-08 08:49:27 +0000
+
+    pod documentation 
+
+  Change: 93900799a194605255312fdebf20a40638040ce9
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-08 08:47:16 +0000
+
+    simpler time function using localtime in scalar context 
+
+  Change: f832f8f41c3786981062673dfa224dadea9e9662
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-07 15:13:21 +0000
+
+    update to modern version, v0.4 
+
+  Change: ed229d80b67a64f52afcebc6051a115afbd76594
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-07 15:12:32 +0000
+
+    had trouble with outdata example sample config XML file, fix typos 
+
+  Change: ae8239d77eed940564109172379cc23774078211
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-07 14:45:24 +0000
+
+    unix pipeline example fixed to do what this pipeline does 
+
+  Change: eab2b71fe13d05a656b1a124ec5c286cb3e2aee8
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-12-07 14:43:20 +0000
+
+    fix typos, migrate to Pipeline::Simple 
+
+  Change: ae8f57ec8d2b8bdae5a185ea994a09d6d12c2d09
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-05-05 14:06:07 +0000
+
+    move the module into Pipeline::Simple; keep the old Pipeline manually
+    for now 
+
+  Change: e2467af36b56750a056f6718f77c512bc8d55d17
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-05-03 12:03:53 +0000
+
+    Starting to write documentation using name "Pipeline::Simple" 
+
+  Change: b69074f1c738cd224ac90972305f9acf6a04d761
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-05-02 20:38:07 +0000
+
+    small functionality tweeks, version 0.4 
+
+  Change: 18692c7aba2eb08cc973fe5812a52dd25d497903
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-04-27 09:30:17 +0000
+
+    v0.3: start and stop at any step 
+
+  Change: 3bc9f0a67c73d0e37f571a616a12376b53e66c6e
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-04-26 14:56:08 +0000
+
+    end nodes to graphviz output; unnamed input argument 
+
+  Change: e83b6b87c7f1102f174a17e9d9cca7d59f617fb1
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-04-26 13:16:45 +0000
+
+    ignore emacs desktop files 
+
+  Change: 7057ad744c2b14bae714c2060c9c301609685044
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-04-26 13:15:44 +0000
+
+    first functional version 
+
+  Change: 6a23748b318e92cd46695085d1eed28b50e0c3de
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-04-24 15:55:04 +0000
+
+    better stringfy() that debugs pipelines 
+
+  Change: 8d08cc340e40fa5b8b2a875d49a41572578b2255
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-04-23 15:52:18 +0000
+
+    basic loging 
+
+  Change: 715133985a2a5f92905a8d883964c723ef6f9c04
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-04-23 12:38:37 +0000
+
+    graphviz output, running works 
+
+  Change: 19f86f0af204748cd1bcdc60fb31981d0b61b0c3
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-04-23 10:37:07 +0000
+
+    internal objectification done 
+
+  Change: 6e051f09bb3f07af47f20d78080b37b9938bdca9
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-04-22 12:08:56 +0000
+
+    config parsing works 
+
+  Change: 9ce24a9a0d70f488e9f9150be438b75a2492f6d6
+  Author: Heikki Lehvaslaiho <Heikki.Lehvaslaiho@kaust.edu.sa>
+  Date : 2010-04-22 09:30:18 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

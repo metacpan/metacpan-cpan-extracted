@@ -1,0 +1,9 @@
+Revision history for Perl extension Authen-OATH-KeyURI
+
+0.02 2014-10-05T08:53:41Z
+    - add support base32 encoded secret
+
+0.01 2014-09-09T16:11:43Z
+
+    - original version
+

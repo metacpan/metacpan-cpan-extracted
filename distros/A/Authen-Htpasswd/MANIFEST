@@ -1,0 +1,15 @@
+Changes
+lib/Authen/Htpasswd.pm
+lib/Authen/Htpasswd/User.pm
+lib/Authen/Htpasswd/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01use.t
+t/02pod.t
+t/03podcoverage.t
+t/04core.t
+t/05edit.t
+t/data/passwd.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

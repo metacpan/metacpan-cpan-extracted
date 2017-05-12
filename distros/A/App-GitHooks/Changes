@@ -1,0 +1,123 @@
+Revision history for App-GitHooks
+
+v1.9.0  2017-03-19
+        - Added min_app_githooks_version config option to allow enforcing a
+          minimum version of App::GitHooks against a repository (GH-28). Thank
+          you, Lisa Hare!
+        - Added GITHOOKS_SKIP and GITHOOKS_DISABLE environment variables to
+          hard-skip specific hooks (GH-6). Thank you, E. Choroba!
+
+v1.8.0  2016-05-21
+        - Switched to Test::Requires::Git instead of the now obsolete
+          Test::Git::has_git(). Thank you, Philippe Bruhat!
+        - Added App::GitHooks->get_remote_name() to get the name of the
+          repository.
+        - Fixed typo in documentation. Thank you, Yanick Champoux!
+        - Relicensed under Perl 5 terms.
+
+v1.7.3  2015-06-22
+        - Removed relative path include in ./bin/githooks (GH-25).
+        - Minor code and documentation cleanup.
+
+v1.7.2  2015-04-08
+        - Retrieve stdin at the hook level for pre-push.
+        - Catch plugin exceptions.
+
+v1.7.1  2015-04-07
+        - Added pre-push hook file to the hooks directory (GH-22).
+
+v1.7.0  2015-04-06
+        - Implemented support for pre-push hook (GH-22).
+
+v1.6.1  2015-03-31
+        - Fixed test that prevented upgrading App::GitHooks in situations where
+          plugins were already installed and returned a different value than
+          expected in the test.
+
+v1.6.0  2015-03-30
+        - Added App::GitHooks::Test::ok_reset_githooksrc() to ensure that tests
+          can run without interference.
+        - Refactored tests to use ok_reset_githooksrc().
+        - Added .githooksrc to manage App::GitHooks' commits with App::GitHooks
+          (GH-21).
+        - Implement support for warnings in the pre-commit hook (GH-13).
+
+v1.5.1  2015-03-29
+        - Account for git-commit trimming whitespace in commit messages
+          (GH-20).
+
+v1.5.0  2015-03-29
+        - Rename App::GitHooks::Utils::get_ticket_id() to
+          App::GitHooks::Utils::get_ticket_id_from_commit_regex() and fix the
+          function to match its documentation (GH-19).
+
+v1.4.0  2015-03-27
+        - Implement "force_plugins" configuration option (GH-18).
+
+v1.3.0  2015-03-25
+        - Add "list" command to "githooks" to display available plugins for
+          each git hook (GH-8).
+
+v1.2.1  2015-03-23
+        - Replace File::Slurp with Path::Tiny (GH-17).
+        - Improve and clean up tests.
+        - Improve and clean up documentation.
+        - Make constants read-only.
+
+v1.2.0  2015-01-21
+        - Fix running git actions with an underscore in their name and that are
+          using the default App::GitHooks::Hook->run() (GH-15). Thank you,
+          Jacob Maurer!
+
+v1.1.5  2014-09-06
+        - Fix documentation typos.
+
+v1.1.4  2014-08-22
+        - Added missing "autodie" pre-requisite.
+
+v1.1.3  2014-08-16
+        - Documented the new "githooks" command and simplified the synopsis.
+
+v1.1.2  2014-08-13
+        - Require Test::Compile v1.1.0 to use its object-oriented interface.
+
+v1.1.1  2014-08-11
+        - Amended tests to use the current Perl to instantiate "githooks".
+
+v1.1.0  2014-08-10
+        - Added "githooks" command line utility to set up in git repositories
+          all the hooks supported by App::GitHooks.
+
+v1.0.8  2014-06-11
+        - Forced encoding only when utf8 characters are to be printed (part 2).
+
+v1.0.7  2014-06-07
+        - Forced encoding only when utf8 characters are to be printed.
+        - Added screenshots of App::GitHooks in action.
+        - Improved information in readme file.
+        - Fixed interpreter line in examples and hooks/.
+        - Noted the git version in tests to help troubleshooting.
+
+v1.0.6  2014-06-03
+        - Bumped git requirement to v1.7.4.1.
+        - Documented git requirement.
+
+v1.0.5  2014-06-02
+        - Synced manifest.
+
+v1.0.4  2014-06-02
+        - Added git v1.5.0 as a requirement for the tests.
+
+v1.0.3  2014-06-01
+        - Fixed test coverage when using 'cover' instead of 'prove'.
+
+v1.0.2  2014-05-31
+        - Fixed prerequisites.
+
+v1.0.1  2014-05-31
+        - Tweaked POD formatting.
+        - Instantiated a new Git::Repository object on demand only to help with
+          unit testing.
+
+v1.0.0  2014-05-30
+        - Public release.

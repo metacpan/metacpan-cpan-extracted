@@ -1,0 +1,109 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Query-Cache/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	dc:identifier        "AtteanX::Query::Cache"^^doap-deps:CpanId;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [ doap-deps:on "Redis"^^doap-deps:CpanId ], [ doap-deps:on "Attean 0.015"^^doap-deps:CpanId ], [ doap-deps:on "IRI 0.005"^^doap-deps:CpanId ], [ doap-deps:on "AtteanX::Endpoint"^^doap-deps:CpanId ], [ doap-deps:on "Digest::MD4"^^doap-deps:CpanId ], [
+		doap-deps:on "Class::Method::Modifiers"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "LWP::UserAgent::CHICaching 0.04"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Types::Standard 0.008"^^doap-deps:CpanId;
+	], [ doap-deps:on "MooX::Log::Any"^^doap-deps:CpanId ], [ doap-deps:on "List::MoreUtils"^^doap-deps:CpanId ], [
+		doap-deps:on "AtteanX::Store::SPARQL 0.008"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "AtteanX::Store::LDF 0.02"^^doap-deps:CpanId;
+	], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.014"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::Modern"^^doap-deps:CpanId ], [ doap-deps:on "Carp::Always"^^doap-deps:CpanId ], [ doap-deps:on "Test::RedisServer"^^doap-deps:CpanId ], [ doap-deps:on "autodie"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Endpoint"^^doap-deps:CpanId ], [ doap-deps:on "RDF::LinkedData"^^doap-deps:CpanId ], [
+		doap-deps:on "Test::LWP::UserAgent 0.027"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "LWP::Protocol::PSGI"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "HTTP::Message::PSGI"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "RDF::Generator::Void 0.04"^^doap-deps:CpanId;
+	];
+	doap:bug-database    <https://github.com/kjetilk/p5-atteanx-query-cache/issues>;
+	doap:category        <http://dbpedia.org/resource/Category:Database_caching>, <http://dbpedia.org/resource/Category:Semantic_Web>;
+	doap:created         "2015-06-11"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:download-page   <https://metacpan.org/release/AtteanX-Query-Cache>;
+	doap:helper          <http://kasei.us/about/foaf.xrdf#greg>;
+	doap:homepage        <https://metacpan.org/release/AtteanX-Query-Cache>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:name            "AtteanX-Query-Cache";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/AtteanX-Query-Cache/v_0-001_01>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Query-Cache/v_0-001_02>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Query-Cache/v_0-001_03>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Query-Cache/v_0-001_04>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Query-Cache/v_0-002>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/kjetilk/p5-atteanx-query-cache>;
+		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-atteanx-store-sparql/&serialization=PROV-O#>;
+	];
+	doap:shortdesc       "Experimental prefetching SPARQL query cacher".
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Query-Cache/v_0-001_01>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Initial alpha release";
+	dc:identifier        "AtteanX-Query-Cache-0.001_01"^^xsd:string;
+	dc:issued            "2016-02-17"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Query-Cache-0.001_01.tar.gz>;
+	doap:revision        "0.001_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Query-Cache/v_0-001_02>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Current test suite passes alpha release";
+	dc:identifier        "AtteanX-Query-Cache-0.001_02"^^xsd:string;
+	dc:issued            "2016-02-20"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Query-Cache-0.001_02.tar.gz>;
+	doap:revision        "0.001_02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Query-Cache/v_0-001_03>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Smaller fixes";
+	dc:identifier        "AtteanX-Query-Cache-0.001_03"^^xsd:string;
+	dc:issued            "2016-03-07"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Query-Cache-0.001_03.tar.gz>;
+	doap:revision        "0.001_03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Query-Cache/v_0-001_04>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "First release of complete system";
+	dc:identifier        "AtteanX-Query-Cache-0.001_04"^^xsd:string;
+	dc:issued            "2016-04-13"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Query-Cache-0.001_04.tar.gz>;
+	doap:revision        "0.001_04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Query-Cache/v_0-002>
+	a                    doap:Version;
+	rdfs:label           "Code quality improvements";
+	dc:identifier        "AtteanX-Query-Cache-0.002"^^xsd:string;
+	dc:issued            "2016-05-15"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Query-Cache-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/kjetilk>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	foaf:nick            "KJETILK";
+	foaf:page            <https://metacpan.org/author/KJETILK>.
+

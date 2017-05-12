@@ -1,0 +1,364 @@
+Revision history for App-LintPrereqs
+
+0.52    2017-01-01 (PERLANCAR)
+
+	- Grok x_alt_for prereq relationship.
+
+
+0.51    2016-12-28 (PERLANCAR)
+
+	- Remove extra relationship prefix stuffs, replace it with groking
+	  -phase and -relationship/-type in Prereqs sections.
+
+	- [dist] Fix expressing follow-spec prereq relationship with
+	  x_spec.
+
+
+0.50    2016-12-27 (PERLANCAR)
+
+	- [Bugfix] Properly handle extra relationship prefix (_EMBED::,
+	  ...).
+
+	- [dist] Moving spec prereq from DevelopRecommends to
+	  DevelopSuggests with _SPEC:: prefix.
+
+
+0.49    2016-12-27 (PERLANCAR)
+
+	- Aside from _EMBED, disregard the other extra relationships.
+
+
+0.48    2016-12-27 (PERLANCAR)
+
+	- Grok extra relationship information encoded in module name prefix
+	  in DevelopSuggests dependency, e.g. _SPEC::Rinci, _EMBED::*.
+
+
+0.47    2016-11-25 (PERLANCAR)
+
+	- No functional changes.
+
+	- [ux] When fixing, put DONE/FAILED messages at the beginning of
+	  the remedy to make them stand out more.
+
+
+0.46    2016-09-17 (PERLANCAR)
+
+        - No functional changes.
+
+        - Release to test Markdown->POD formatting.
+
+
+0.45    2016-08-04 (PERLANCAR)
+
+        - Add support for Perl::PrereqScanner::NotQuiteLite. To select this
+          scanner, use --scanner=nqlite. Currently, both 'suggests' and
+          'requires' from the scanning result are added as 'requires'.
+
+        - Deprecate --lite option and replace it with --scanner. The default is
+          still Perl::PrereqScanner ('regular'). Other possible values are
+          'lite' (Perl::PrereqScanner::Lite) and 'nqlite' mentioned in the
+          previous point.
+
+        - Perl::PrereqScanner::Lite is downgraded as RuntimeRecommends prereq,
+          as is Perl::PrereqScanner::NotQuiteLite.
+
+
+0.44    2016-08-03 (PERLANCAR)
+
+        - Add options --extra-runtime-dirs, --extra-test-dirs.
+
+        - Add "." (curdir) into config_dirs, so we can easily customize on a
+          per-distro basis.
+
+
+0.43    2016-06-09 (PERLANCAR)
+
+	- When adding missing prereq, check minimum version in [versions]
+	  and use it.
+
+
+0.42    2016-06-03 (PERLANCAR)
+
+        - Allow specifying minimum version of modules in [versions] of
+          lint-prereqs.conf.
+
+
+0.41    2016-03-17 (PERLANCAR)
+
+	- Change backup dist.ini from dist.ini.bak to dist.ini~.
+
+
+0.40    2016-03-13 (PERLANCAR)
+
+	- Recognize test modules from same dist (in t/lib/).
+
+
+0.39    2016-03-04 (PERLANCAR)
+
+	- Add --fix option.
+
+
+0.38    2016-03-01 (PERLANCAR)
+
+	- [Bugfix] Checking for duplicate prereq shouldn't be done using
+	  Config::IOD's allow_duplicate_key=0 because that will disallow
+	  duplicate key in all sections, not just prereq sections.
+
+
+0.37    2016-03-01 (PERLANCAR)
+
+	- [Enhancement] Check some misplaced phase cases: 1) prereqs used only
+          in tests (t/, xt/) must be put in Test prereqs in dist.ini and not in
+          [Prereqs / Runtime*]; 2) prereqs used in test as well as runtime must
+          be put in Runtime prereqs and not in [Prereqs / Test*].
+
+          This will be useful when CPAN clients want to skip installing
+          test-only prerequisites (e.g. because user runs "cpanm -n" instead of
+          "cpanm").
+
+        - [Removed] Remove 'allow-core' feature to simplify stuffs. You either
+          need to specify core prereqs (if `core_prereqs` option is enabled, the
+          default) or are not allowed to specify core prereqs (if `core_prereqs`
+          option is disabled).
+
+        - [Incompatible change] For safety, switch back default scanner to
+          Perl::PrereqScanner (::Lite still misses/misdetects sometimes).
+
+
+0.36    2016-02-27 (PERLANCAR)
+
+	- [Internal] Switch from using Config::IniFiles to Config::IOD.
+
+        - Disallow duplicate prereq.
+
+
+0.35    2016-02-27 (PERLANCAR)
+
+	- [ux] Sort result by module name (a la PERLANCAR: perl, then
+	  pragmas, then modules).
+
+
+0.34    2016-02-04 (PERLANCAR)
+
+	- [Incompatible change] Set default --core-prereqs to 1.
+
+
+0.33    2016-01-29 (PERLANCAR)
+
+	- Show requested version (req_v) and is_core fields in result.
+
+	- Add option: --core-prereqs to require core modules to be listed
+	  just like non-core modules.
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.32    2015-10-18 (PERLANCAR)
+
+	- Add directive argument: allow-core.
+
+
+0.31    2015-08-31 (PERLANCAR)
+
+	- [Bugfix] Don't explode when there is no t/.
+
+
+0.30    2015-08-18 (PERLANCAR)
+
+	- Re-tweak: also check *.pl & *.pm files in t/ and xt/.
+
+
+0.29    2015-08-18 (PERLANCAR)
+
+	- Only include *.t for files in t/ and xt/.
+
+
+0.28    2015-08-18 (PERLANCAR)
+
+	- Tweak regex to allow ;!(no-)?lint-prereqs as well as
+	  ;!(no_)?lint_prereqs.
+
+
+0.27    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.26    2015-05-15 (PERLANCAR)
+
+        - Support lumped modules (see Dist::Zilla::Plugin::Lump for more
+          details).
+
+        - Observe ';!no-lint-prereqs' directive.
+
+        - Replace detecting core module from using 'corelist -v' to using
+          Module::CoreList::More->is_still_core to handle modules that were once
+          in core but removed later.
+
+
+0.25    2015-04-11 (PERLANCAR)
+
+	- Replace detecting core module from using 'corelist -v' to using
+	  Module::CoreList::More->is_still_core to handle modules that were
+	  once in core but removed later.
+
+
+0.24    2015-03-10 (PERLANCAR)
+
+	- Change result metadata 'result_format_options' ->
+	  'cmdline.format_options'.
+
+
+0.23    2015-02-24 (PERLANCAR)
+
+        - [Bugfix] Rebuild to use Perinci::CmdLine::Lite backend by default.
+
+        - [Bugfix] Allow --nolite since --lite is now on by default.
+
+        - [Bugfix] [dzil] Make Perl::PrereqScanner::Lite a requires prereq and
+          not recommends.
+
+
+0.22    2015-02-24 (PERLANCAR)
+
+	- Try once again using --lite by default.
+
+	- Add extra scanner Moose & Version for Lite (ref:
+	  https://github.com/moznion/Perl-PrereqScanner-Lite/issues/8).
+
+
+0.21    2015-01-04 (PERLANCAR)
+
+	- Revert back to using Perl::PrereqScanner by default (due to
+	  ::Lite still misses detecting some modules), but offer --lite to
+	  switch to ::Lite.
+
+
+0.20    2015-01-04 (PERLANCAR)
+
+	- Skip scanning backup files.
+
+
+0.19    2015-01-04 (PERLANCAR)
+
+	- Replace Perl::PrereqScanner with Perl::PrereqScanner::Lite for
+	  performance.
+
+
+0.18    2014-12-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Regression: section regex didn't match 'Prereqs /
+	  Something' while it used to.
+
+
+0.17    2014-12-18 (PERLANCAR)
+
+	- Also look at OSPrereqs (and OSPrereqs::*) for prereqs.
+
+
+0.16     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.15     2014-07-22 (SHARYANTO)
+
+         - No functional changes.
+
+         - Switch CLI scripts from using Perinci::CmdLine to
+           Perinci::CmdLine::Any to reduce size of dependencies.
+
+
+0.14    2014-03-08 (SHARYANTO)
+
+	- No functional changes. Rebuild with Rinci::Wrap to test embedding
+          wrapper code.
+
+
+0.13    2013-11-12 (SHARYANTO)
+
+	- No functional changes. Rebuild to fix t/00-compile.t generated by
+	  older DZP::Test::Compile (2.019 < x < 2.033).
+
+
+0.12    2013-09-26 (SHARYANTO)
+
+        - For core modules, compare version from scanned vs version in core
+          modules (e.g. Test::More is 0.92 in perl 5.10.1, if test script says
+          'use Test::More 0.98' we should fail).
+
+        - Tweak outputs and error messages.
+
+
+0.11    2013-03-11 (SHARYANTO)
+
+        - Allow version mismatch if dist.ini specifies a version but
+          scan_prereqs specifies 0 (e.g. 'require Foo' in code, because require
+          doesn't allow specifying minimum version).
+
+
+0.10    2013-03-10 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Replace 'default_perl_version' argument with 'perl_version', takes
+          precedence over perl version from dist.ini or scan_prereqs.
+
+        - Force versions in dist.ini and scan_prereqs to match.
+
+
+0.09    2012-10-17 (SHARYANTO)
+
+        - Fix handling of single-word package name (e.g. Gepok).
+
+
+0.08    2012-10-04 (SHARYANTO)
+
+        - No functional changes. Check perl version and the success status of
+          corelist. Tweak error message.
+
+
+0.07    2012-08-29 (SHARYANTO)
+
+        - Show version information in result.
+
+
+0.06    2012-08-28 (SHARYANTO)
+
+        - No functional changes. Tweak exit code and error message.
+
+
+0.05    2012-08-28 (SHARYANTO)
+
+        - Return detailed result, for scriptability.
+
+
+0.04    2012-08-09 (SHARYANTO)
+
+        - Fix regex again. D'oh.
+
+
+0.03    2012-08-09 (SHARYANTO)
+
+        - Fix regex.
+
+
+0.02    2012-08-09 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Read '!lint-prereqs assume-used' directive in comment, to avoid having
+          to listing modules again in [Extras / lint-prereqs / assume-used]
+          section.
+
+
+0.01    2012-08-08 (SHARYANTO)
+
+        - First release.

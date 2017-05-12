@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual - ars_CreateEscalation</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_CreateEscalation(ctrl, escalationHash)</CODE></H2>
+
+      This function creates a new escalation. You must first
+      populate the <CODE>escalationHash</CODE> before calling this routine.
+      <P><CODE>escalationHash</CODE> is an 
+      <A HREF="ds_getescalation_hash.html">Escalation Attributes</a> hash. 
+
+      <P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns 1
+          <DT><B>On failure</B><DD>
+              Returns 0
+      </DL>
+
+      <P>Example:
+
+      <P><BLOCKQUOTE>
+      <I> This example copies an existing escalation to a new 
+          escalation. I.e. it simply re-saves the escalation under
+          a new name. </I></BLOCKQUOTE>
+
+      <PRE>
+      ($e = ars_GetEscalation($c, "E-foobar")) ||
+	    die $ars_errstr;
+      $e->{name} = "Copy of ".$e->{name};
+      ars_CreateEscalation($c, $e) || die $ars_errstr;
+      </PRE>
+
+<B>Notes</B>: Hash keys <CODE>helpText, owner</CODE> and 
+<CODE>changeDiary</CODE> are optional when calling this routine.
+<P>
+<I>This function was introduced in version 1.90 of ARSperl</I>
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

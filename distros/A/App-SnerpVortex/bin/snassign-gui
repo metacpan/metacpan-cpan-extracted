@@ -1,0 +1,392 @@
+#!/usr/bin/env perl
+
+# Given a snaalyze sqlite database, allow a user to page through a
+# repository's significant revisions.  Display a Gtk2 TreeView of the
+# directory structure at each revision.
+#
+# TODO - Eventually allow the user to select which directories are
+# branches and tags at each revision, so that Snerp Vortex can do the
+# right thing when replaying the repository into another system.
+#
+# TODO - Given sufficient motivation, the intermediate sqlite database
+# could be made generic enough to represent repositories from version
+# control systems other than Subversion.  Snerp Vortex could become an
+# any-to-any tool, rather than a Subversion-to-any tool.
+#
+# Wouldn't that be nice?
+#
+# TODO - Remember state of paths between revisions.  Probably by
+# pushing the state into the SVN::Analysis object.  That way the state
+# may be saved and loaded with the analysis.  The replay phase can
+# then use the tags & branches to do the right things.
+
+use warnings;
+use strict;
+use lib qw(./lib);
+
+use Getopt::Long;
+use SVN::Analysis;
+
+use Glib qw(TRUE FALSE);
+use Gtk2 '-init';
+
+my ($help, $analysis_db);
+my $getopt_okay = GetOptions(
+	"help"        => \$help,
+	"analysis=s"  => \$analysis_db,
+);
+
+if ($help or !$getopt_okay) {
+	die(
+		"$0 usage:\n",
+		"  --analysis=FILENAME  location of snanalyze sqlite database\n",
+		"  --help               you're soaking in it.\n",
+	);
+}
+
+die "$0: --analysis=FILENAME required\n" unless (
+	defined $analysis_db and length $analysis_db
+);
+die "$0: --analysis path ($analysis_db) doesn't exist\n" unless (
+	-e $analysis_db
+);
+die "$0: --analysis path ($analysis_db) must be a file\n" unless (
+	-f $analysis_db
+);
+
+### Load the Subversion analysis.
+
+warn time(), " attaching to database...\n";
+my $analysis = SVN::Analysis->new(db_file_name => $analysis_db);
+warn time(), " analyzing...\n";
+$analysis->analyze();
+warn time(), " done.\n";
+
+### Window.
+
+my $window = Gtk2::Window->new('toplevel');
+$window->signal_connect('delete_event' => sub { Gtk2->main_quit; });
+$window->set_border_width(5);
+
+### Vertical layout box.
+
+my $v_box = Gtk2::VBox->new(FALSE, 0);
+$window->add($v_box);
+
+### Revisions and the revision labels.
+
+my @revisions = $analysis->get_significant_revisions();
+my ($revision_index, $current_revision);
+
+my $revision_box = Gtk2::VBox->new(FALSE, 0);
+
+my $revision_label = Gtk2::Label->new("#");
+$revision_box->pack_start($revision_label, FALSE, FALSE, 0);
+
+my $progress_label = Gtk2::Label->new("%");
+$revision_box->pack_start($progress_label, FALSE, FALSE, 0);
+
+sub next_revision   { set_revision($revision_index + 1) }
+sub prev_revision   { set_revision($revision_index - 1) }
+sub first_revision  { set_revision(0) }
+sub last_revision   { set_revision($#revisions) }
+
+sub set_revision {
+	my $i = shift;
+
+	$i = 0            if $i < 0;
+	$i = $#revisions  if $i > $#revisions;
+
+	$revision_index   = $i;
+	$current_revision = $revisions[$i];
+
+	$revision_label->set_text("Revision $current_revision");
+
+	$progress_label->set_text(
+		sprintf("%.2f%%", 100 * ($current_revision / ($revisions[-1] || 1)))
+	);
+}
+
+first_revision();
+
+### Navigation buttons.
+
+my $nav_box = Gtk2::HBox->new(FALSE, 0);
+$v_box->pack_start($nav_box, FALSE, FALSE, 0);
+
+my $first_button = Gtk2::Button->new("<<");
+$first_button->signal_connect(
+	clicked => sub {
+		first_revision();
+		populate_tree($current_revision);
+	}
+);
+
+$nav_box->pack_start($first_button, FALSE, FALSE, 0);
+
+my $prev_button = Gtk2::Button->new("<");
+$prev_button->signal_connect(
+	clicked => sub {
+		prev_revision();
+		populate_tree($current_revision);
+	}
+);
+
+$nav_box->pack_start($prev_button, FALSE, FALSE, 0);
+
+my $refresh_button = Gtk2::Button->new("=");
+$prev_button->signal_connect(
+	clicked => sub {
+		populate_tree($current_revision);
+	}
+);
+
+$nav_box->pack_start($refresh_button, FALSE, FALSE, 0);
+
+my $next_button = Gtk2::Button->new(">");
+$next_button->signal_connect(
+	clicked => sub {
+		next_revision();
+		populate_tree($current_revision);
+	}
+);
+
+my $last_button = Gtk2::Button->new(">>");
+$last_button->signal_connect(
+	clicked => sub {
+		last_revision();
+		populate_tree($current_revision);
+	}
+);
+
+$nav_box->pack_start($next_button, FALSE, FALSE, 0);
+
+$nav_box->pack_start($last_button, FALSE, FALSE, 0);
+
+$nav_box->pack_start($revision_box, TRUE, TRUE, 0);
+
+### Scrolled window to hold the tree view.
+
+# Exists in a scrolled window, with a minimum size.
+my $scrolled_window = Gtk2::ScrolledWindow->new(undef, undef);
+$scrolled_window->set_shadow_type("etched-out");
+$scrolled_window->set_policy("automatic", "automatic");
+$scrolled_window->set_size_request(750, 550);
+$scrolled_window->set_border_width(5);
+
+$v_box->pack_start($scrolled_window, TRUE, TRUE, 0);
+
+### Tree view.
+
+# Column 0 is a Glib::String.
+my $tree_store = Gtk2::TreeStore->new(
+	'Glib::String',
+	'Glib::String',
+	'Glib::String',
+	'Glib::String',
+	'Glib::String',
+	'Glib::String',
+	'Glib::String',
+);
+
+# Create a TreeView for the TreeStore.
+my $tree_view = Gtk2::TreeView->new($tree_store);
+
+# 0: Path names column.
+{
+	my $tree_column = Gtk2::TreeViewColumn->new();
+	$tree_column->set_title("Path");
+
+	# Paths will be rendered as text.
+	my $renderer = Gtk2::CellRendererText->new();
+	$tree_column->pack_start($renderer, FALSE);
+
+	# The tree column's text will be read from column 0 of the TreeStore.
+	$tree_column->add_attribute($renderer, text => 0);
+
+	# Append the column to the tree view, and set some attributes.
+	$tree_view->append_column($tree_column);
+}
+
+# 1: Creation operation.
+{
+	my $tree_column = Gtk2::TreeViewColumn->new();
+	$tree_column->set_title("Op");
+
+	my $renderer = Gtk2::CellRendererText->new();
+	$tree_column->pack_start($renderer, FALSE);
+	$tree_column->add_attribute($renderer, text => 1);
+
+	$tree_view->append_column($tree_column);
+}
+
+# 2: Branch type column.
+{
+	my $tree_column = Gtk2::TreeViewColumn->new();
+	$tree_column->set_title("Type");
+
+	my $renderer = Gtk2::CellRendererText->new();
+	$tree_column->pack_start($renderer, FALSE);
+	$tree_column->add_attribute($renderer, text => 2);
+
+	$tree_view->append_column($tree_column);
+}
+
+# 3: Branch name column.
+{
+	my $tree_column = Gtk2::TreeViewColumn->new();
+	$tree_column->set_title("Name");
+
+	my $renderer = Gtk2::CellRendererText->new();
+	$tree_column->pack_start($renderer, FALSE);
+	$tree_column->add_attribute($renderer, text => 3);
+
+	$tree_view->append_column($tree_column);
+}
+
+# 4: Prefix to remove.
+{
+	my $tree_column = Gtk2::TreeViewColumn->new();
+	$tree_column->set_title("Remove");
+
+	my $renderer = Gtk2::CellRendererText->new();
+	$tree_column->pack_start($renderer, FALSE);
+	$tree_column->add_attribute($renderer, text => 4);
+
+	$tree_view->append_column($tree_column);
+}
+
+# 4: Prefix to add.
+{
+	my $tree_column = Gtk2::TreeViewColumn->new();
+	$tree_column->set_title("Prefix");
+
+	my $renderer = Gtk2::CellRendererText->new();
+	$tree_column->pack_start($renderer, FALSE);
+	$tree_column->add_attribute($renderer, text => 5);
+
+	$tree_view->append_column($tree_column);
+}
+
+# 5: Relocated path column.
+{
+	my $tree_column = Gtk2::TreeViewColumn->new();
+	$tree_column->set_title("Relocated");
+
+	my $renderer = Gtk2::CellRendererText->new();
+	$tree_column->pack_start($renderer, FALSE);
+	$tree_column->add_attribute($renderer, text => 6);
+
+	$tree_view->append_column($tree_column);
+}
+
+# Column 0 is searchable and sortable by clicking the header.
+$tree_view->set_search_column(0);
+
+$scrolled_window->add($tree_view);
+
+sub _populate_tree_recursive {
+	my ($revision, $parent_iter, $tree_node) = @_;
+
+	my $iter = $tree_store->append($parent_iter);
+
+	$tree_store->set(
+		$iter,
+		0 => $tree_node->name(),
+		1 => (
+			($revision == $tree_node->revision())
+			? (
+				$tree_node->is_copy()
+				? "copy"
+				: (
+					$tree_node->is_add()
+					? "add"
+					: "--"
+				)
+			)
+			: "--"
+		),
+		2 => $tree_node->ent_type() || "",
+		3 => $tree_node->ent_name() || "",
+		4 => $tree_node->path_lop() || "",
+		5 => $tree_node->path_prepend() || "",
+		6 => $tree_node->rel_path() || "",
+	);
+
+	_populate_tree_recursive($revision, $iter, $_) foreach (
+		map { $tree_node->children()->{$_} }
+		sort keys %{$tree_node->children()}
+	);
+}
+
+sub populate_tree {
+	my $revision = shift;
+
+	my $tree = $analysis->get_tree($revision);
+
+	$tree_store->clear();
+	_populate_tree_recursive($revision, undef, $tree);
+
+	# TODO - Expand only branches and tags, not directories.
+	$tree_view->expand_all();
+}
+
+populate_tree($current_revision);
+
+$window->show_all();
+
+Gtk2->main();
+exit;
+
+__END__
+
+=head1 NAME
+
+snassign-gui - Graphical snanalyze index browser.
+
+=head1 SYNOPSIS
+
+	snassign-gui --analysis index.sqlite3
+
+=head1 DESCRIPTION
+
+snassign-gui is a Gtk-based graphical browser for Snerp Vortex index
+databases.  It presents the directory structure of the repository at
+each revision where tags and branches may be created.  Users may page
+through these key revisions to see how the repository evolves over
+time.
+
+A future revision may allow users to manually assign branch and tag
+status to directories.  This may depend upon contributions, however.
+
+=head1 USAGE
+
+=head2 --analysis DB_FILENAME
+
+The location of the SQLite database to hold the index.  Required.
+
+=head1 SEE ALSO
+
+L<App::SnerpVortex> - Main documentation for Snerp Vortex.
+
+L<SVN::Dump> - Subversion dumps are parsed by SVN::Dump.
+
+snanalyze - Analyze a Subversion dump, and produce an index database
+for other tools to process.
+
+snassign-auto - Automatically assign tags and branches to a snanalyze
+index.
+
+snauthors - Extract a basic authors.txt file from a Subversion dump.
+
+snerp - Convert a Subversion repository to a flat filesystem or Git.
+Uses the snanalyze index, with help from the snassign tools, to
+intelligently branch and tag as it goes.
+
+=head1 AUTHORS AND LICENSE
+
+Snerp Vortex is Copyright 2010 by Rocco Caputo and contributors.
+
+It is released under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,27 @@
+---
+'Activator::Registry':
+  list_of_5_letters: 
+    - a
+    - b
+    - c
+    - d
+    - e
+  list_of_3_numbers:
+    - 1
+    - 1.1
+    - 42
+  deep_hash:
+    level_1:
+      level_2:
+        level_3: 'this is level 3'
+  deep_hash_with_list:
+    level_1:
+      level_2:
+        - a
+        - b
+       
+
+
+
+
+

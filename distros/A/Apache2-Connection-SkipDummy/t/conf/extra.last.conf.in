@@ -1,0 +1,15 @@
+<IfModule mod_perl.c>
+
+        <Perl>
+           use Apache2::Const -compile => qw(OK);
+        </Perl>
+
+        PerlLoadModule Apache2::Connection::SkipDummy
+
+        PerlPostReadRequestHandler Apache2::Connection::SkipDummy Apache2::Const::OK
+
+        <Location />
+                SetHandler modperl
+                PerlResponseHandler Apache2::Const::OK
+        </Location>
+</IfModule>

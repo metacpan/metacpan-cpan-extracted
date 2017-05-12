@@ -1,0 +1,11 @@
+The tools/ directory contains tools used to manage the Astro-SpaceTrack
+distribution. Its contents are:
+
+README - This file.
+
+capture - A script to execute Space Track queries, censor the results
+	heavily, and write the results to the directory and file that
+	Mock::LWP::UserAgent (in the inc/ directory of this
+	distribution) will read them from. Because the names of the
+	files are completely cryptic, it will also list the files with
+	their contents. Use tools/capture --help for the documentation.

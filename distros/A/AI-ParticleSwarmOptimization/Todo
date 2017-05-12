@@ -1,0 +1,6 @@
+TODO list for Perl module AI::ParticleSwarmOptimization
+
+Add more tests
+Document optimization engine methods to allow customisation through derivation
+Reinit particles using best position and random velocities as option
+No search size limit by default

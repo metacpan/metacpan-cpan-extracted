@@ -1,0 +1,50 @@
+NAME
+    Acme::Pony::Pink - make your script look like a pink pony
+
+SYNOPSIS
+     my $converter = Acme::Pony::Pink->new;
+     $converter->ponify('myscript.pl' => 'myscript.gif');
+
+    myscript.gif is now a small picture of a pink pony, and you can run the
+    original script using:
+
+     perl -x myscript.gif
+
+DESCRIPTION
+    This module turns a Perl script into a picture of a pink pony.
+
+    The picture is executable via `perl -x`.
+
+  Unconstrutive Constructor
+    `new`
+        Returns the invocant.
+
+  Method
+    `ponify($input, $output)`
+        The input is a Perl script; the output is a GIF file. (No, the "F" in
+        "GIF" does not stand for "file".)
+
+        Input and output may be filehandles, file names, or scalar references
+        if you just want to play with strings. The input source is required;
+        the default output destination is STDOUT.
+
+BUGS
+    Please report any bugs to someone who cares.
+
+SEE ALSO
+    Acme::Pony, Unicornify::URL.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

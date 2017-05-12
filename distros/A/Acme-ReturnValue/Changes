@@ -1,0 +1,60 @@
+Changes Acme::ReturnValue
+
+1.001	2013-03-30T10:39:27+0100
+    - manually removed lots of files (json dumps, website)
+      /me hates dist::zilla right now...
+
+
+1.000   2013-03-30T10:30:36+0100
+    - added disqus comments (Thomas Klausner)
+    - sort packages (Thomas Klausner)
+    - more compact cool values list (Thomas Klausner)
+    - dist::zilla (Thomas Klausner)
+    - whitespace/docs (Thomas Klausner)
+    - keep track of files/dists analysed, only one json output file (Thomas Klausner)
+    - ignore __PACKAGE__ and make_immutable (Thomas Klausner)
+    - encode now happens in code, so remove it from t (Thomas Klausner)
+    - switched to JSON, more Path::Class (Thomas Klausner)
+    - use ->spew to write data (Thomas Klausner)
+    - proper utf8 fix (RT83963_UTF8_broken) (Thomas Klausner)
+    - added utf8 test case (spotted by saper)
+
+
+0.70.0 2009-05-13 09:20:18
+    - switched to Moose & MooseX::Getopt
+    - use YAML for serialization
+    - much better detection of false positves
+    - generate a sort-of-nice website
+
+
+0.05   Tue Mar  4 21:02:14 CET 2008
+    - changed last-statement-finding implementation to the one from
+      Perl::Critic::Policy::Modules::RequireEndWithOne
+      Thanks to Chris Dolan for suggestion this here:
+      http://use.perl.org/comments.pl?sid=38799
+    - added generate_report_from_dump to generate a nice HTML page
+    - do not check .pm in t/
+
+
+0.04   Sat Mar  1 00:28:16 CET 2008
+    - live from the Dutch Perl Workshop 2008!
+    - in_CPAN now forks a new acme_returnvalue.pl to fight memory
+      leaks
+
+
+0.03  Fri Feb 29 14:15:47 CET 2008
+    - live from the Dutch Perl Workshop 2008!
+    - added tests
+    - added in_CPAN
+
+
+0.02   Fri Feb 29 09:22:23 CET 2008
+    - live from the Dutch Perl Workshop 2008!
+    - added docs
+    - added lot of helper methods
+    - switched to PPI
+
+
+0.01    2005-05-27
+    - first draft at Linuxwochen Wien
+

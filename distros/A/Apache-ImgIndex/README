@@ -1,0 +1,63 @@
+Copyright (C) 1999-2007 James Pavlick  All Rights Reserved
+
+   You may distribute under the terms of either the GNU General Public
+   License or the Artistic License, as specified in the Perl README file.
+
+
+NAME
+
+  Apache::ImgIndex
+
+
+DESCRIPTION
+
+Apache::ImgIndex is a simple mod_perl application for displaying photos. 
+Apache::ImgIndex will automatically build thumbnails of the images. You 
+can also rotate and scale the images from the web interface.
+
+REQUIREMENTS
+
+  Digest::SHA1
+  Error
+  File::Spec
+  File::Path
+  Storable
+
+
+INSTALLATION
+
+  perl Makefile.PL
+  make
+  make install
+
+
+USAGE
+
+Add the following to your httpd.conf and restart. Then point your browser to
+http://yoursite.com/photos
+
+
+  <Location /photos>
+    AllowOverride None
+    #Options -Indexes -Includes -FollowSymLinks
+    Order allow,deny
+    Allow from all
+
+    SetHandler perl-script
+    PerlHandler Apache::ImgIndex
+    PerlSetVar Rows 10
+    PerlSetVar Cols 5
+    PerlSetVar Thumb-size 50x20
+    PerlSetVar Show-names 1
+    PerlSetVar Hide-dirs 1
+  </Location>
+
+Make sure /photos contains the full size images that you want to display.
+
+
+AUTHOR
+
+  Original author: James Pavlick <jpavlick@mymule.com>
+
+  Copyright (C) 2000-2007 James Pavlick
+

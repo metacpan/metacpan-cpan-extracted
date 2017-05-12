@@ -1,0 +1,41 @@
+Revision history for App-IsGitSynced
+
+0.01    2012-03-05
+        * First public release
+
+0.02    2012-03-06
+        * Information about script in Makefile.PL
+
+0.03    2012-06-20
+        * Removed warnings if not on any branch
+        * Added --show_ok parameter
+        * Other small changes
+
+0.04    2012-07-13
+        * Added --ignore_missing parameter
+        * Other small changes
+
+0.05    2013-05-01
+        * Module is now released with Dist::Zilla
+        * Other small changes
+
+1.0.0   2013-09-01
+        [Major]
+        * Using SemVer for version numbers
+
+        [Patch]
+        * Added Perl 5.8 to be checked by Travis CI
+        * Fixing travis
+        * Added Perl 5.16 to .travis.yml
+
+1.0.1   2014-09-13
+        [Patch]
+        * Fixing warnings when checking git repo in detached stage
+
+1.0.2   2014-11-01
+        [Patch]
+        * Now script works with perl 5.18
+
+1.0.3   2015-03-23
+        [Patch]
+        * Added App::GitWorkspaceScanner to SEE ALSO section

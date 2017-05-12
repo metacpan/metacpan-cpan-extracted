@@ -1,0 +1,26 @@
+#!/usr/local/bin/perl
+# 
+# foca-server
+# 
+# Author(s): Pablo Fischer (pablo@pablo.com.mx)
+# Created: 08/01/2012 12:43:34 AM UTC 12:43:34 AM
+
+use strict;
+use warnings;
+use Data::Dumper;
+use FindBin;
+use lib "$FindBin::RealBin/../lib/";
+use App::Foca::Server;
+
+my $port            = 6666;
+my $timeout         = 60;
+my $commands        = "$FindBin::RealBin/example_commands.yaml";
+my $debug           = 1;
+
+my $server = App::Foca::Server->new(
+        port                => $port,
+        commands_file       => $commands,
+        commands_timeout    => $timeout,
+        debug               => $debug);
+$server->run_server();
+

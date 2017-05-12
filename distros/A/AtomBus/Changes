@@ -1,0 +1,82 @@
+Revision history for AtomBus
+
+1.0405  2012-04-17
+        Fixed tests to set config options at compile time before AtomBus module
+        is loaded.
+        Removed unnecessary before hook. Initializing now happens when AtomBus
+            is loaded.
+        Fixed the structure of the config options in config.yml.
+
+1.0404  2010-12-29
+        Making configuration more friendly. All AtomBus specific settings
+            should now be under the 'atombus' config setting.
+
+1.0403  2010-12-29
+        Renaming AtomMQ to AtomBus.
+
+1.0402  2010-12-29
+        The example config in the POD was incorrectly setting password instead
+            of pass.
+
+1.0401  2010-12-28
+        Just some POD fixes.
+
+1.0400  2010-12-28
+        Added support for ETags. Behaves as recommended by pubsubhubbub:
+            http://code.google.com/p/pubsubhubbub/wiki/PublisherEfficiency
+        No longer require user to set schema_class config value.
+
+1.0301  2010-12-11
+        Fixed a bug that breaks app in FCGI environment if Capture::Tiny
+        is used inside the before filter to silence deploying the schema.
+
+1.0300  2010-12-10
+        AtomMQ is now a Dancer app, hooray!
+        A bunch of junk went away now that we are using Dancer.
+        Added support for paging via the page_size setting.
+
+1.0200  2010-12-03
+        Added support for max_msgs_per_request parameter and corresponding
+            tests and documentation.
+
+1.0100  2010-11-25
+        Generted feed now validates against http://validator.w3.org/feed
+        Added atommq_feed table.  Now there are 2 tables total.
+        Entry and feed id's are now urn's
+
+1.0000  2010-11-20
+        One AtomMQ server can serve multiple feeds.
+        Posting to a feed that doesn't exist will automatically create the feed
+            for you.
+        The feed name is no longer a param of the constructor.  It is passed
+            in through the uri, e.g., /atommq/feed=widgets
+        Added a FastCGI section to the docs.
+        Made the PSGI example simpler in the docs.
+
+0.0301  2010-11-19
+        Set AutoCommit and RaiseError DBI options to true.
+
+0.0300  2010-11-19
+        Replaced dsn/user/password constructor params with db_info.
+        Added exception handling test for missing db_info param.
+        Updated default schema to use TEXT columns instead of VARCHAR.
+
+0.0200  2010-11-14
+        Added auto_create_db option.
+        Added example sql for creating db table.
+        Fixed PSGI example.
+
+0.0102  2010-11-14
+        Added directions for running AtomMQ in a PSGI environment.
+        Catch exception if db table creation fails.
+
+0.0101  2010-11-14
+        Added more documentation.
+
+0.0100  2010-11-13
+        Now using dbic instead of dbi.
+        Auto creating of db table should work for all db's supported by dbic.
+
+0.0001  2010-11-12
+        First version, released on an unsuspecting world.
+

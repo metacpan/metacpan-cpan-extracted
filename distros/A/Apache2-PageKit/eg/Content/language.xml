@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<content>
+<pkit_nav_title>Language Localization</pkit_nav_title>
+<html_title>PageKit.org | Language Localization</html_title>
+
+      <demo_desc>
+	<feature>Language Localization</feature>
+	<description>The language displayed is based
+	on the
+         user's preference, defaulting to the browser settings.</description>
+      </demo_desc>
+
+<title xml:lang="de">Titel auf Deutsch</title>
+<title xml:lang="en">Title in English</title>
+<title xml:lang="es">Titulo en Espa&#xF1;ol</title>
+<title xml:lang="fr">Titre en Fran&#xE7;ais</title>
+<de xml:lang="en">German</de>
+<en xml:lang="en">English</en>
+<es xml:lang="en">Spanish</es>
+<fr xml:lang="en">French</fr>
+
+<de xml:lang="de">Deutsch</de>
+<en xml:lang="de">Englisch</en>
+<es xml:lang="de">Spanisch</es>
+<fr xml:lang="de">Franzoesisch</fr>
+
+<de xml:lang="es">Alem&#xE1;n</de>
+<en xml:lang="es">Ingl&#xE9;s</en>
+<es xml:lang="es">Espa&#xF1;ol</es>
+<fr xml:lang="es">Franc&#xE9;s</fr>
+
+<de xml:lang="fr">Allemand</de>
+<en xml:lang="fr">Anglais</en>
+<es xml:lang="fr">Espa&#xF1;ol</es>
+<fr xml:lang="fr">Fran&#xE7;ais</fr>
+</content>

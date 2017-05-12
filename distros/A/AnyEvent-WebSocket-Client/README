@@ -1,0 +1,227 @@
+NAME
+
+    AnyEvent::WebSocket::Client - WebSocket client for AnyEvent
+
+VERSION
+
+    version 0.38
+
+SYNOPSIS
+
+     use AnyEvent::WebSocket::Client 0.12;
+     
+     my $client = AnyEvent::WebSocket::Client->new;
+     
+     $client->connect("ws://localhost:1234/service")->cb(sub {
+     
+       # make $connection an our variable rather than
+       # my so that it will stick around.  Once the
+       # connection falls out of scope any callbacks
+       # tied to it will be destroyed.
+       our $connection = eval { shift->recv };
+       if($@) {
+         # handle error...
+         warn $@;
+         return;
+       }
+       
+       # send a message through the websocket...
+       $connection->send('a message');
+       
+       # recieve message from the websocket...
+       $connection->on(each_message => sub {
+         # $connection is the same connection object
+         # $message isa AnyEvent::WebSocket::Message
+         my($connection, $message) = @_;
+         ...
+       });
+       
+       # handle a closed connection...
+       $connection->on(finish => sub {
+         # $connection is the same connection object
+         my($connection) = @_;
+         ...
+       });
+    
+       # close the connection (either inside or
+       # outside another callback)
+       $connection->close;
+     
+     });
+    
+     ## uncomment to enter the event loop before exiting.
+     ## Note that calling recv on a condition variable before
+     ## it has been triggered does not work on all event loops
+     #AnyEvent->condvar->recv;
+
+DESCRIPTION
+
+    This class provides an interface to interact with a web server that
+    provides services via the WebSocket protocol in an AnyEvent context. It
+    uses Protocol::WebSocket rather than reinventing the wheel. You could
+    use AnyEvent and Protocol::WebSocket directly if you wanted finer grain
+    control, but if that is not necessary then this class may save you some
+    time.
+
+    The recommended API was added to the AnyEvent::WebSocket::Connection
+    class with version 0.12, so it is recommended that you include that
+    version when using this module. The older version of the API has since
+    been deprecated and removed.
+
+ATTRIBUTES
+
+ timeout
+
+    Timeout for the initial connection to the web server. The default is
+    30.
+
+ ssl_no_verify
+
+    If set to true, then secure WebSockets (those that use SSL/TLS) will
+    not be verified. The default is false.
+
+ ssl_ca_file
+
+    Provide your own CA certificates file instead of using the system
+    default for SSL/TLS verification.
+
+ protocol_version
+
+    The protocol version. See Protocol::WebSocket for the list of supported
+    WebSocket protocol versions.
+
+ subprotocol
+
+    List of subprotocols to request from the server. This class will throw
+    an exception if none of the protocols are supported by the server.
+
+ http_headers
+
+    Extra headers to include in the initial request. May be either
+    specified as a hash reference, or an array reference. For example:
+
+     AnyEvent::WebSocket::Client->new(
+       http_headers => {
+         'X-Foo' => 'bar',
+         'X-Baz' => [ 'abc', 'def' ],
+       },
+     );
+     
+     AnyEvent::WebSocket::Client->new(
+       http_headers => [
+         'X-Foo' => 'bar',
+         'X-Baz' => 'abc',
+         'X-Baz' => 'def',
+       ],
+     );
+
+    Will generate:
+
+     X-Foo: bar
+     X-Baz: abc
+     X-Baz: def
+
+    Although, the order cannot be guaranteed when using the hash style.
+
+ max_payload_size
+
+    The maximum payload size for received frames. Currently defaults to
+    whatever Protocol::WebSocket defaults to.
+
+METHODS
+
+ connect
+
+     my $cv = $client->connect($uri)
+
+    Open a connection to the web server and open a WebSocket to the
+    resource defined by the given URL. The URL may be either an instance of
+    URI::ws, URI::wss, or a string that represents a legal WebSocket URL.
+
+    This method will return an AnyEvent condition variable which you can
+    attach a callback to. The value sent through the condition variable
+    will be either an instance of AnyEvent::WebSocket::Connection or a
+    croak message indicating a failure. The synopsis above shows how to
+    catch such errors using eval.
+
+FAQ
+
+ My program exits before doing anything, what is up with that?
+
+    See this FAQ from AnyEvent:
+    AnyEvent::FAQ#My-program-exits-before-doing-anything-whats-going-on.
+
+    It is probably also a good idea to review the AnyEvent documentation if
+    you are new to AnyEvent or event-based programming.
+
+ My callbacks aren't being called!
+
+    Make sure that the connection object is still in scope. This often
+    happens if you use a my $connection variable and don't save it
+    somewhere. For example:
+
+     $client->connect("ws://foo/service")->cb(sub {
+     
+       my $connection = eval { shift->recv };
+       
+       if($@)
+       {
+         warn $@;
+         return;
+       }
+       
+       ...
+     });
+
+    Unless $connection is saved somewhere it will get deallocated along
+    with any associated message callbacks will also get deallocated once
+    the connect callback is executed. One way to make sure that the
+    connection doesn't get deallocated is to make it a our variable (as in
+    the synopsis above) instead.
+
+CAVEATS
+
+    This is pretty simple minded and there are probably WebSocket features
+    that you might like to use that aren't supported by this distribution.
+    Patches are encouraged to improve it.
+
+SEE ALSO
+
+      * AnyEvent::WebSocket::Connection
+
+      * AnyEvent::WebSocket::Message
+
+      * AnyEvent::WebSocket::Server
+
+      * AnyEvent
+
+      * URI::ws
+
+      * URI::wss
+
+      * Protocol::WebSocket
+
+      * Net::WebSocket::Server
+
+      * Net::Async::WebSocket
+
+      * RFC 6455 The WebSocket Protocol
+      <http://tools.ietf.org/html/rfc6455>
+
+AUTHOR
+
+    Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Toshio Ito
+
+    José Joaquín Atria
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2013 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

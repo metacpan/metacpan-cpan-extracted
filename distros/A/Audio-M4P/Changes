@@ -1,0 +1,196 @@
+Revision history for Perl modules under Audio::M4P
+
+0.57 Thu Oct 22 2014
+	- added ownr atom to list of Apple iTMS user ID atoms 
+
+0.55 Fri 21 Feb 2014
+	- fix to get multiple album covers from a single covr atom if needed
+	- pod fixes
+
+0.54 Wed 19 Feb 2014
+	- added AddCoverArt and DeleteAllCoverArt methods, thanks to F.J. Rueda for helping test
+
+0.53 Thu 03 Jan 2014
+    - pod doc fix
+
+0.51 Fri 11 Jul 2008
+    -remove unneeded dependencies in Makefile.PL
+
+0.50 Mon 30 June 2008
+    - some revision to the decrypt functions
+
+0.48 Thu 19 Jun 2008
+    - some bug fixes for copyright and genre metadata, thanks to Brian L.
+
+0.47 Thu 12 Jun 2008
+    - fix for @gen versus genre atom text, thanks to Alex K. for finding 
+      the issue
+
+0.45 Thu 29 May 2008
+    - fix for requiem 1.5 modified mp4 files, thanks Uwe R.
+
+0.44 Sun 20 April 2008
+    - pod revisions, added tests for pod
+
+0.43 Tue 8 Jan 2008
+    - revised track count setting function-- thanks to Eli A.
+
+0.42 Sun 6 Jan 2008
+    - another memory leak patch for Perl 5.10, and a test for this
+
+0.41 Sat 8 Dec 2007
+    - corrected a skip in a test file (replaced use with require)
+    - utf8::encode requires perl 5.8, so unfortunately that's what we will need
+
+0.40 Fri 7 Dec 2007
+    - improved circular reference handling with the 'use_weak_ref' option
+      in Tree::Simple and some weakening of the Atom's internal circular refs
+
+0.39 Thu 6 Dec 2007
+    - more memory leak fix work, and
+    - add some utf8 data fixes, thanks to Christopher K. for the patches
+
+0.38 Thu 27 Sep 2007
+    - fixed a circular reference memory leak in the parse tree, 
+      thanks to Paul S. for finding the bug
+
+0.37  Thu 5 July 2007
+   - POD revision and miscellaneous minor code tweaks
+
+0.36  Wed 13 June 2007
+    - added code to parse the new iTunes Plus mp4a atom with its 'pinf' atom
+    - polished the CleanAppleM4aPersonalData method to reflect the mp4a parsing
+
+0.351 Mon 11 June 2007
+    - POD fix
+
+0.35  Sun 10 June 2007
+    -added the Audi::M4P::QuickTime::CleanAppleM4aPersonalData method, which
+      now strips personal ID information from Apple .m4a files (ALPHA)
+      NOTE: this function was largely suggested and contributed by 
+        Stefano Santoro--thanks!
+      
+0.341 Sat 9 June 2007
+    - POD fixes
+
+0.34  Mon 4 June 2007
+    - changed Audio::M4P::Atom::data method to allow stripping of ID data from
+      'unprotected' iTMS files (this was contributed by Stefano Santoro--thanks)
+
+0.33  Sun 9 July 2006
+    - added a 0.32 distro missing (from MANIFEST) 3gp video test file
+
+0.32  Tue 20 June 2006
+    - added some preliminary support for 3GP type files (cell phone video)
+    - ARTIST tag was not always being capitalized properly, fixed
+
+0.31  Mon May 15 2006
+    - another bizarre MP4 variant (moof atoms) file fix, 
+      thanks to pucklock for the test case
+
+0.30  Tue May 2 2006
+    - fixed caps typo in Audio::M4P::QuickTime::track method 
+    --   thanks to ? contax//\\phrenetic.org 
+
+0.28  Wed Mar 8 2006
+    - added to pod docs for some less used options
+    - pod formatting fixes
+    - removed a 270K video test file (cable TV sample, content questionably protected)
+
+0.27 Sat 4 Mar 2006
+    - more bizarre variant MP4 file meta data fixes 
+      (Sorry, we will probably never support missing moov atoms.)
+    - setting meta info as text was always replacing old meta data: fixed.
+
+0.26 Thu 2 Mar 2006
+    - some more code to allow for a few especially twisted mp4 video formats,
+      such as multiple mdat atoms at beginning and end of the file
+    - changed code for location of adding new meta data in atypical video--thanks to pucklock
+
+0.25 Tue 28 Feb 2006
+    - fix of a test file left out of manifest in version 0.24, needed for testing
+
+0.24 Wed 15 Feb 2006
+    - pod fixes
+    - changed to perl 5.8 syntax conventions for our $VERSION;
+    - another atypical 64-bit video file fix for a test case from pucklock
+
+0.23 Tue 8 Feb 2005
+    - some fixes to potential stco table alterations in unusual (non-M4P) Quicktime video files
+     (thanks to pucklock for test cases)
+    - added support for changing tags in MP4 files over 4.2 gigabytes in size 
+      (not that we expect to test one that large anytime soon)
+
+0.22 Sun 5 Feb 2006
+    - changed adding tag meta data to be compatible with mp4 video (non-iTunes QuickTime) formats
+
+0.21 Sun 5 Feb 2006
+    - changed pod doc formatting
+    - added support to adding tag meta data to video files without meta data atom
+
+0.20 Sat 4 Feb 2006
+    - bug fixes for handling video files with chapters or variant data sections
+    - more tests
+
+0.19 Sat Jan 28 2006
+    - additions to hashes for  MP4::Info compatibility
+    - additional functions for MP3::Tag compatibility
+    
+0.18 Mon Jan 23 2006
+    - fixed genre setting logic
+    
+0.16 Thu Sep 1 2005
+    - some code syntax and spacing cleanup
+
+0.15 Thu July 28 2005
+    - changed cover artwork meta data additions to follow iTunes usage
+    
+0.14 Tue July 19 2005
+    - class internal method changes in Atom.pm to support covr atom handling
+
+0.13 Sat June 18 2005
+    - revised meta data get/set functions to accept text arguments for data
+      and convert to and from binary form
+    - added some more meta container data types to list of containers
+    
+0.12 Mon May 30 2005
+    - added resize support for atoms > 4 gigs in size
+    - changed GetMetaInfo method to support return of text info
+
+0.11 Wed May 25 2005
+    - corrected meta info atom types bug where '©alb' and '@alb' were exchanged
+    - added meta info compatibility function for iTMS XML data sent with 
+      itms:// url's (the iTMS_MetaInfo method)
+
+0.10 Mon May 9 2005
+    - further pod revision
+    
+0.09 Fri April 29 2005
+    - fractional seconds in metadata SS field calculation bugfix
+    
+0.08 Tue April 26 2006
+    - Further pod revision
+    
+0.07 Mon April 25 2005
+    - Revision to pod docs
+    
+0.06 Mon April 18 2005
+    - First revision since iTunes 4.7+ version incompatibility began
+    - changed name from Audio::M4pDecrypt to Audio::M4P::Decrypt
+    - Added analysis and meta data editing
+    - refactored original code into four .pm files, with additional functionality
+    
+0.05 Mon July 12 2004
+    - removed some OS specific code in new() to allow Solaris to use
+    
+0.04 Tue June 15 2004
+    - upgraded to ITunes 4.6, added fix
+    
+0.03 Sat May 8 2004
+    - some loop optimization and minor tweaks
+    
+0.02 Fri April 30 2004
+    - portability changes 
+
+0.01 Wed April 28 2004
+    - original version (alphas were called Crypt::MP4Stream)

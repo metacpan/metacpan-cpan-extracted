@@ -1,0 +1,88 @@
+# NAME
+
+Auth::YubiKey::Client::Web - Authenticate using the Yubico Web API
+
+# VERSION
+
+version 0.0.2
+
+# SYNOPSIS
+
+    use Auth::YubiKey::Client::Web;
+
+    my $yubiauth = Auth::YubiKey::Client::Web->new(
+        id      => $id,
+        api_key => $apikey,
+    );
+
+    my $result = $yubiauth->verify_otp($input);
+
+    if ($result->is_success) {
+        say 'Good to go';
+        say 'user-id: ' . $result->public_id;
+    }
+    else {
+        say 'Oh dear: ' . $result->status;
+    }
+
+# CLASS ATTRIBUTES
+
+## id
+
+## api\_key
+
+## verify\_url
+
+## ua
+
+# METHODS
+
+## nonce()
+
+This function returns a
+[nonce](http://en.wikipedia.org/wiki/Cryptographic_nonce) for use in the
+validation step,
+
+    my $nonce = nonce();
+
+## verify\_otp($self, $otp)
+
+Given an OTP make a call to the remote service and validate the value
+provided.
+
+This method returns an [Auth::YubiKey::Client::Web::Response](https://metacpan.org/pod/Auth::YubiKey::Client::Web::Response) object which
+can be queried for the validity of the request.
+
+    my $response = $self->verify_otp( $otp );
+    if ($response->is_success) {
+        # yay!
+    }
+    else {
+        # boo!
+    }
+
+# API KEY
+
+To use this module you will require an API key from Yubico. You can
+get a key by visiting the following page and entering the required
+information:
+
+- [https://upgrade.yubico.com/getapikey/](https://upgrade.yubico.com/getapikey/)
+
+# FURTHER READING
+
+Here are some related, useful or interesting links:
+
+- [How do I get an API-Key for YubiKey development?](https://www.yubico.com/faq/api-key-yubikey-development/)
+- [Validation Protocol Version 2.0](https://github.com/Yubico/yubikey-val/wiki/ValidationProtocolV20)
+
+# AUTHOR
+
+Chisel <chisel@chizography.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Chisel Wright.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

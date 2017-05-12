@@ -1,0 +1,120 @@
+
+=head1 PLab Apps manual
+
+=head2 Introduction
+
+The PLabApps stands for the "Protein Laboratory Applications", which means computer software
+applications, developed for the needs of the laboratory. These applications are covering some
+image-processing routine tasks, that computer accomplishes much faster that human. <p>
+An image-centric idea of every application here starts from the main application window,
+where image could be loaded, viewed and processed. 
+The common view of an application is like that:
+
+=for podview <img src="bigview.gif">
+
+=head2 Menu commands
+
+The image, once loaded, is displayed in the working area of the window. To load an image, the "Open file"
+command must be issued. All of commands are gathered in the menu, under menu bars. Some of them have 
+the keyboard shortuts, for example, the "Open file" function has shortcut "F3" key. Some also
+has been assigned to the icons on the toolbar, to provide fast access for frequently used commands.
+The "Open file" command corresponds here to an image of an open folder. The tooltip window pop us
+with brief explanation of the icon, once the mouse pointer is driven above it.
+
+=over
+
+=item File
+
+The "File" menu usually contains set of commands related to the files onto the disk.
+The conception of the applications is that you open images, but you never save them,
+contrary to the data-centric conception of many Windows applications. Instead, the application
+itself saves the corresponded data, usually points and lines drwan, when closing file 
+and/or opening the another. In this aspect, "Save" command saves not the image but correspondent data.
+This data file has always same name but another extension, specific to the application. For example,
+application "ManCen" ( on the picture above) keeps points into nact0000.cen file for the nact0000.gif image, and so on.
+
+As the applications deals mostly to the experiment results, that are grabbed by series, the conception
+of file grouping is introduced through all of PLab applications. When experiment is written, that consists, for example,
+of 15 files, it's given the part of unique name, which appended the with series number. So, if the given above
+nact0000.gif is the first file in the series, that imaginary 15 files will be correspondingly nact0001.gif, nact0002.gif etc.
+
+To browse groups and not files, command "Open series" is provided, that behaves as same as
+"Open file" command but browses groups rether than ordinary files. The applications are automatically 
+recognize whether the file loaded represents a part of a series or not, and if it is in the start or in the end or in the middle of a series.
+
+Thus, the "Next", "Previous", "Next 5", "Prev 5", "Start" and "End" commands are used, to simplify the navigation inside a series. "Next" and "Prev" usually
+have keyboard shortucts "Left" and "Right", and have also toolbar icons "arrow left" and "arrow right" correspondingly.
+
+Command "Close" saves the supplementary data and closes the image, leaving the working area empty.
+(Warning! The application may not write down supplementary data if it was not modified. This 
+behavior is application-dependant).
+All the commands and actions, that load an image, call "Close" command implicitly. Thus, when processing series of
+images, one by one, all data are written automatically without irrelevant saving prompt messages.
+
+"File" menu may contain some application-specific commands also.
+Note:applications usually work with only grayscale 8-bit images, and fail to work with other types.
+Also, they know not a big extent of image file formats, usually bmp,pcx,gif,tiff and jpeg.
+Use other programs like Corel or Photoshop to convert images to appropriate format.
+
+=item Edit
+
+Under "Edit" bar, only application-specific commands usually grouped. Consult the application manual
+for more meaningful description. The only exception, command "Properties" is contained here for almost all applications.
+
+=item View
+
+The "View" commands are more or less standartized and not vary from application to application.
+The purpose of this group is to change the zooming factor of image viewed. When image loads first time,
+the default zoom factor if 100%. If the image is too small or too large, or the details on the image are small,
+the zooming factor could be changed to the appropriate value. Notation of most of these command is quite instuitive,
+and require no explanation - for example command "200%".
+
+Command "Best fit" tries to zoom image so it fits the woking area
+best way. In correspondence, "Auto best fit" command turns on ( and off) special mode, when changing of
+the working area leads to the automatic change of the zoom factor.
+
+Commands "Zoom +" and "Zoom -" increase and decrease current zoom factor to 10% each time called.
+
+When image is bigger than working area, scroll bars are activated, and dragging with right mouse button scrolls 
+the image.
+
+=back
+
+=head2 Properties dialog
+
+This command brings the set-up dialog that governs the application behavior and look. Settings are grouped
+under different bookmarks, and covers different aspects of the application. Applications may include any bookmarks and 
+controls into the "Properties" dialog, so the look of it may vary. Here only generic ( or often used) bookmarks and
+control groups are given.
+
+=over
+
+=item Series type
+
+Applications are currently incapable of determining the extension of the series type. The name of the file may
+look ambiguous for the application, and it cannot tell whether name nact0000.gif stands for series of 1000 files,
+from nact0000 to nact0999 or 100 files from nact0000 to nact0099, and what is the unique series name, nact0 or nact00.
+To resolve the problem, explicit series type switch is provided under the "General" tab, that tells, whether series is
+"short" ( up to 100 images) or long ( up to 1000 images), taking correspondingly 2 or 3 digits in the end of file name away.
+
+=item Save path
+
+Applications save supplementary data in the same directory where images are located, that is a default behavior, and it's used
+when "use default save path" box is checked. But sometimes it's needed to tell program to save data in the different location,
+for example, when processing files from the CD-ROM. It's reached by pressing "..." button that brings up "change directory" dialog
+and turns the checkbox above off.
+
+=item Appearance
+
+These controls set up the view of the application. The "color setup" combo selector contains topics of the colors
+that application uses.
+The "show hints" box prohibits tooltip windows from popping up if off.
+
+=item Calibrations
+
+The experiment recording may use not pixel-to-pixel mapping, and the vertical and
+horizontal resolutions of the digital camera may differ. To unify image extensions when calculating 
+image parameters some calibrations are often provided. Applications mostly care about calibration matching when processing a series,
+and warn uses if image supplementary data containts different calibrations from current.
+
+=back

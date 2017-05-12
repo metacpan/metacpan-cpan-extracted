@@ -1,0 +1,10 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+cpanfile
+lib/Acme/Holy/Shit/Here/Come/s/An/S.pm
+t/verify.t

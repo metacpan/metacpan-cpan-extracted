@@ -1,0 +1,9 @@
+Version 2.10, Mar 17 2005, Florian Forster <octo@verplant.org>
+- Changed to work with Apache2/mod_perl2
+- Added E-Tag and Last-Modified HTTP-headers for caches.
+
+Version 2.00, Feb 06 2004, Florian Forster <octopus@verplant.org>
+- Rewrite of pretty much everything but the documentation.
+
+Version 1.03, May 24 2000, Roman Kosenko <ra@amk.lg.ua>
+- First official reliase

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding= "UTF-8"?>
+<svg width="800" height="200" xmlns:drawswf="http://drawswf.sf.net/2002/drawswf" xmlns="http://www.w3.org/2000/svg">
+  <title>Made with DrawSWF 1.2 (http://drawswf.sf.net)</title>
+    <text x="85.78616352201257" y="116.80503144654084" font-size="64" font-family="Utopia"  fill="#009900" fill-opacity="1.0" drawswf:effect="1">Hello DrawSWF Users!</text>
+    <rect x="47.0" y="37.0" width="705.0" height="112.0"  fill="#ffffff" fill-opacity="0.4980392156862745" stroke="#000099" stroke-width="5.0" stroke-opacity="0.0" stroke-linecap="round"/>
+    <rect x="51.0" y="34.0" width="701.0" height="111.0"  fill="#ffffff" fill-opacity="0.4980392156862745" stroke="#000099" stroke-width="5.0" stroke-opacity="0.0" stroke-linecap="round"/>
+    <rect x="59.0" y="40.0" width="697.0" height="121.0"  fill="#ffffff" fill-opacity="0.4980392156862745" stroke="#000099" stroke-width="5.0" stroke-opacity="0.0" stroke-linecap="round"/>
+    <rect x="47.0" y="27.0" width="707.0" height="142.0"  fill="#ffffff" fill-opacity="0.4980392156862745" stroke="#000099" stroke-width="5.0" stroke-opacity="0.0" stroke-linecap="round"/>
+    <rect x="39.0" y="30.0" width="737.0" height="122.0"  fill="#ffffff" fill-opacity="1.0" stroke="#000099" stroke-width="5.0" stroke-opacity="0.0" stroke-linecap="round"/>
+    <text x="120.31446540880502" y="129.50943396226413" font-size="96" font-family="Bitstream Charter"  fill="#0000ff" fill-opacity="1.0" drawswf:effect="2">How are you?</text>
+</svg>

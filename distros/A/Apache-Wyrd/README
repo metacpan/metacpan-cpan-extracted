@@ -1,0 +1,176 @@
+============
+Apache::Wyrd
+============
+
+This is a set of interoperating modules which provide an object-oriented
+method of developing applications on Apache under mod_perl.  The system
+is comprised of a handler (Apache::Wyrd::Handler) and a family of
+modules that the handler is able to call based on the HTML content of
+the files it processes.
+
+The modules are configurable via tag-like strings in the HTML code
+itself, and are meant to produce output on HTML pages where the strings
+are placed.  The strings are meant to be intuitive for an HTML coder to
+use while also giving a perl programmer a ready library of tools to draw
+on to make these HTML-friendly strings.  For convenience, these strings
+are referred to as "Wyrds" and are comprised of (X)HTML tags named after
+the perl modules they represent.
+
+The Apache::Wyrd modules are meant to be abstract classes, so that a
+functional namespace can be derived from the Apache::Wyrd family of
+modules for each web site supported on a server.  The new namespace will
+then have its own set of object names for each individual Wyrd.
+
+To illustrate, assume a namespace of "FOOBAR"--For the derived classes,
+the subclassing of certain modules (FOOBAR::Wyrd, FOOBAR::Handler, and
+FOOBAR::DBL) will automatically give access on pages of the site handled
+by FOOBAR::Handler to all the derived classes of Apache::Wyrd in the
+Apache::Wyrd namespace.  These objects are inserted onto pages by
+FOOBAR::Handler when it encounters a string with the proper syntax, for
+example:
+
+  There are <FOOBAR::Lookup query="select count(*) from items" /> items
+  available in this online database.
+
+Automatically instantiates Apache::Wyrd::Lookup and uses it to make an
+SQL query, inserting the result onto the location of the page where the
+string is found.
+
+In addition to deriveable classes, the Apache::Wyrd family includes some
+service modules and handlers (Apache::Wyrd::Services::*) which provide
+authentication, indexing, data structure management, and other services
+useful for Apache mod_perl development.  There is also a small, but
+robust collection of objects designed to make the creation of complex
+forms and database interfaces more rapid.  Also included is a set of
+interface classes to equip objects derived from Apache::Wyrd with
+frequently-required functionality.
+
+Apache::Wyrd is not meant to be a complete set of applications or a
+competitor to other pre-parser software packages such as Mason, PHP, or
+ColdFusion.  It is designed, rather, to give an experienced perl
+programmer a set of ready tools to rapidly convert a largely "static"
+website to a dynamic one within tight monetary or time constraints
+without sacrificing future development options or compromising code
+reuse.
+
+It has been made available by Wyrdwright, Inc. under the GPL, and
+consequently comes with the GPL's rights and caveats.  Please see the
+file "LICENSE". It was developed with NGO partners and is meant to be
+always be available to the public free of charge and with no vendor
+lock-in.
+
+We hope you find it useful.
+
+=============
+DOCUMENTATION
+=============
+
+All the Wyrds have their own documentation in POD form.
+
+The first three give the basics:
+
+Apache::Wyrd::Handler   The Handler Module
+Apache::Wyrd            The abstract self-parsing embeddable object
+Apache::Wyrd::DBL       The "switchboard" of Apache and DBI connnections
+
+Then the support classes provide much-used functionality:
+
+Apache::Wyrd::Cookie
+Apache::Wyrd::Request
+Apache::Wyrd::Template
+Apache::Wyrd::Attribute
+Apache::Wyrd::Lib
+Apache::Wyrd::Query
+Apache::Wyrd::Lookup
+Apache::Wyrd::CGICond
+Apache::Wyrd::CGISetter
+
+There are "form-handling" modules:
+
+Apache::Wyrd::Form
+Apache::Wyrd::Form::Template
+Apache::Wyrd::Input
+Apache::Wyrd::Datum
+Apache::Wyrd::Input::Set
+Apache::Wyrd::Input::Opt
+Apache::Wyrd::Input::Complex
+Apache::Wyrd::Input::Condenser
+Apache::Wyrd::MySQLForm
+Apache::Wyrd::Form::Preload
+Apache::Wyrd::Form::View
+Apache::Wyrd::ErrTag
+Apache::Wyrd::ErrFlield
+Apache::Wyrd::Interfaces::SmartInput
+Apache::Wyrd::SQLForm
+Apache::Wyrd::Var
+
+The interface classes:
+
+Apache::Wyrd::Interfaces::Mother
+Apache::Wyrd::Interfaces::Setter
+Apache::Wyrd::Interfaces::Stealth
+
+The service classes:
+
+Apache::Wyrd::Services::CodeRing
+Apache::Wyrd::Services::FileCache
+Apache::Wyrd::Services::Key
+Apache::Wyrd::Services::SAK
+Apache::Wyrd::Services::Tree
+
+The search engine components:
+
+Apache::Wyrd::Services::Index
+Apache::Wyrd::Interfaces::Indexable
+Apache::Wyrd::Services::MySQLIndex
+Apache::Wyrd::Services::SearchParser
+
+Database-driven objects:
+
+Apache::Wyrd::Chart
+Apache::Wyrd::Lookup
+Apache::Wyrd::Query
+Apache::Wyrd::Defaults
+
+A cookie-authentication system:
+
+Apache::Wyrd::Services::Auth
+Apache::Wyrd::Services::LoginServer
+Apache::Wyrd::Services::TicketPad
+Apache::Wyrd::User
+Apache::Wyrd::Interfaces::GetUser
+
+The debugging tools:
+
+Apache::Wyrd::CSSGene
+Apache::Wyrd::Debug
+Apache::Wyrd::LogDump
+Apache::Wyrd::ShowParams
+
+And the formatting/convenience classes:
+
+Apache::Wyrd::FileSize
+Apache::Wyrd::Number
+Apache::Wyrd::Redirect
+
+Lastly, A set for constructing whole WWW Sites:
+
+Apache::Wyrd::Site::EditablePage
+Apache::Wyrd::Site::GDButton
+Apache::Wyrd::Site::Index
+Apache::Wyrd::Site::IndexBot
+Apache::Wyrd::Site::IndexBrowser
+Apache::Wyrd::Site::Login
+Apache::Wyrd::Site::MySQLIndex
+Apache::Wyrd::Site::MySQLIndexBot
+Apache::Wyrd::Site::NavPull
+Apache::Wyrd::Site::Page
+Apache::Wyrd::Site::Pull
+Apache::Wyrd::Site::SearchResults
+Apache::Wyrd::Site::TagPull
+Apache::Wyrd::Site::Widget
+Apache::Wyrd::Site::WidgetControl
+Apache::Wyrd::Site::WidgetIndex
+
+--------
+NB: "Wyrd" is pronounced "word" or "weird"--use whichever one you like.

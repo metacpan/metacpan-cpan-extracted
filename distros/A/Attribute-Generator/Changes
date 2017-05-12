@@ -1,0 +1,8 @@
+Revision history for Perl extension Attribute::Generator
+
+0.02    Tue Mar 24 04:25:23 2009
+        - Release on CPAN
+        - Requires Coro 4.91
+
+0.01    Tue Nov  4 04:16:32 2008
+        - original version ( not released on CPAN )

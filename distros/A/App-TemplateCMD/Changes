@@ -1,0 +1,202 @@
+Revision history for App-TemplateCMD
+
+0.6.7   2017-04-23
+        Updating for release of version 0.6.7
+        Update date (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+        New template for creating gulp plugins (Ivan Wills)
+
+0.6.6   2016-03-14
+        Updating for release of version 0.6.6
+        Updated date (Ivan Wills)
+        VTide and editor configs (Ivan Wills)
+        Dancer2 based templates (Ivan Wills)
+        Added more things todo (Ivan Wills)
+        Removed generation/use of Makefile.PL (Ivan Wills)
+
+0.6.5   2015-08-17
+        Updating for release of version 0.6.5
+        Removed creation of makefile (Ivan Wills)
+
+0.6.4   2015-07-07
+        Updating for release of version 0.6.4
+        Fixed typo in Path::Tiny (Ivan Wills)
+
+0.6.3   2015-07-07
+        Updating for release of version 0.6.3
+        Fixed test template (Ivan Wills)
+        Moved more to Path::Tiny (Ivan Wills)
+
+0.6.2   2015-07-04
+        Updating for release of version 0.6.2
+        Fixed POD (Ivan Wills)
+
+0.6.1   2015-06-06
+        Updating for release of version 0.6.1
+        Removed accedentally left in debugging code (Ivan Wills)
+
+0.6.0   2015-06-04
+        Updating for release of version 0.6.0 (Ivan Wills)
+        Added missing dependencies (Ivan Wills)
+        Added adding bin file for boilerplate tests if specified (Ivan Wills)
+        Fixed changed variable name (Ivan Wills)
+        Removed unused tag (Ivan Wills)
+        Made base module name possible to specify (Ivan Wills)
+        Fixed template config in README and added Source Code reference (Ivan Wills)
+        Added ability to pass JSON values and changed the combining of those keys in print (Ivan Wills)
+        Removed unused dependency (Ivan Wills)
+
+0.5.9   2015-04-01
+        Updating for release of version 0.5.9
+        Fixed readme in manifest (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Fixed POD for READMEs (Ivan Wills)
+        Changed POD test to skip templates (Ivan Wills)
+        Converted README to POD (Ivan Wills)
+        Added default build and coverage badges for markdown template (Ivan Wills)
+        Added markdown version of README (Ivan Wills)
+        POD version of README (Ivan Wills)
+        Added ability to switch README formats, Added documentation about use (Ivan Wills)
+        Fixed NoWarnings tests (Ivan Wills)
+        Fixed boilerplate test (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+        Removed Test::NoWarnings to be replaced by Test::Warnings (Ivan Wills)
+        Added sending the module file to boilerplate.t template (Ivan Wills)
+        Updated LICENSE (Ivan Wills)
+        Removed redundant author example (Ivan Wills)
+        Added hiding recoverable error (Ivan Wills)
+        Added missing files to manifest template and sorted (Ivan Wills)
+        Cleaned up manifest files (Ivan Wills)
+        Added new template files (Ivan Wills)
+        Added more things todo (Ivan Wills)
+
+0.5.8   2015-03-01
+        Updating for release of version 0.5.8
+        Added travis config as an option (Ivan Wills)
+        Added supporting setting --path to choose the default template path (Ivan Wills)
+        Some cleanup of whitespace (Ivan Wills)
+        HTML5 doc (Ivan Wills)
+        Added accedentally conjoined file (Ivan Wills)
+        Cleaned up templates with better formatting etc (Ivan Wills)
+
+0.5.7   2015-02-22
+        Updating for release of version 0.5.7
+        More complete gulp option (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/App-TemplateCMD (Ivan Wills)
+        Added Moo option (Ivan Wills)
+        Added TODO file (Ivan Wills)
+        New file to produce a template for a POD document (Ivan Wills)
+
+0.5.6   2015-01-19
+        Updating for release of version 0.5.6
+        Added more items to the package.json file (Ivan Wills)
+        New builder for gulp module (Ivan Wills)
+        Licence updated (Ivan Wills)
+        Updated skipped files (Ivan Wills)
+
+0.5.5   2014-12-28
+        Updating for release of version 0.5.5
+        Updated licence (Ivan Wills)
+        Changed double quotes to single quotes (Ivan Wills)
+        Cleaned up generated whitespace (Ivan Wills)
+        Added default columns (Ivan Wills)
+        DBIx::Class helpers (Ivan Wills)
+
+0.5.4   2014-11-16
+        Upated manifest (Ivan Wills)
+        Added explicit modules to prevent confusion (Ivan Wills)
+        Fixed version setting (Ivan Wills)
+        Updating for release of version 0.5.3 (Ivan Wills)
+
+0.5.3   2014-10-09
+        New template to building module based scripts (Ivan Wills)
+        Updated boilerplate test (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/App-TemplateCMD (Ivan Wills)
+        Updated boilerplate tests to check for more boilerplate text (Ivan Wills)
+        Fixed travis-ci config (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/App-TemplateCMD (Ivan Wills)
+        Added travis config (Ivan Wills)
+        Updating for next release (Ivan Wills)
+        Updated dependancies (Ivan Wills)
+
+0.5.2   2014-08-15
+        Updated dependancies (Ivan Wills)
+        Added more files to skip (Ivan Wills)
+        New templates for Test::Class::Moose (Ivan Wills)
+        Fixed abstracts to match spec per http://neilb.org/2014/02/19/compliant-abstract.html (Ivan Wills)
+        Adding tag files (Ivan Wills)
+        Improved default Moose style (Ivan Wills)
+        Added configure_requires section (Ivan Wills)
+        Added default ignore file (Ivan Wills)
+        Changed default load test to require files (fixes Windows issues) (Ivan Wills)
+        Fixed YAML syntax (Ivan Wills)
+        LICENCE updated (Ivan Wills)
+
+0.5.1   2013-05-09
+        Changed default load test to one that finds all modules and tries to use them
+        Added manifest test to default module builds
+        Fixed file generation
+        Fixed version numbers
+        Fixed warning
+        Changed build/module to make other standard files
+        Added blank template
+        Changed to using google jquery
+        Added better documentation
+        Removed dia test as it's not really a standard test
+        Fixed reverted build code
+        Updated version for next release, added changes to change file
+        Removed DATA templates
+        Removed DATA templates
+        Updated licence code
+        Changed to using share_dir to distribute templates
+        Added templates
+
+0.5.0   2012-05-13
+        Removed DATA templates
+        Changed to using share_dir to distribute templates
+        Added templates (moved from DATA section)
+        Changed the build to command to be keyed on file name rather than template name
+        Added manifest testing
+        Updated test to improve catching thrown errors
+        Added version of manifest.t from module-starter
+        Fixed bad template name
+
+0.1.1   2011-07-23
+        Fixed missing Class::Path dependency
+
+0.1.0   2011-06-26
+        Fixed problem with test when Test::Kwalitee isn't installed
+        Added extracting module name form output file name
+        Added tidy option to try to tidy up outputted templates baised on the users preferences
+        More ignore sorting
+        Updated the templates
+        Updated POD
+        Implemented updating a modules data section
+        Added missing files
+        Changed the indentation from tabs to spaces
+        Added default ignores
+        Cleaned Build.PL
+        added repo and bug tracker
+        Changed path handling to remove trailing slashes
+        Fixed up the build command so that can now build a directory of templates
+        Added helper scripts for handling conversion of templates between DATA and files
+
+0.0.4   2010-02-16
+        Added missing required modules
+        Fixed not correctly finding templates
+        Removed unused module
+        Fixed missing requirements of Readonly and List::MoreUtils
+        Fixed spelling mistake
+        Updated templates to include my more up to date best practices
+
+0.0.3   2009-07-13
+        Minor changes to the default templates for tests and changed the
+        packages' tests to match
+
+0.0.2   2009-06-02
+        Minor fixes to print's matching incomplete template names
+        Some documentation cleanup
+
+0.0.1   2009-05-26
+        First version, released on an unsuspecting world.
+

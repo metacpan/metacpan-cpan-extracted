@@ -1,0 +1,117 @@
+Apache/Gallery version 1.0
+===========================
+
+INSTALLATION
+
+Before you start installing Apache::Gallery you need to check
+that you have the following installed:
+
+- Perl 5 (http://www.cpan.org/src/README.html)
+- Apache (http://httpd.apache.org/) - 1.3.x or 2.x
+- mod_perl (http://perl.apache.org/) - 1.x or 2.x (2.0.0 or newer)
+- X11 libraries (ie, XFree86)
+- Imlib2 (http://prdownloads.sourceforge.net/enlightenment/imlib2-1.0.3.tar.gz)
+
+Perl Modules: (Use http://search.cpan.org/ to find them)
+
+- URI::Escape
+- Image::Info version 1.11. (NB NB NB: Version 1.12 is known to give problems)
+- Image::Size 
+- Text::Template
+- CGI (3.08)
+- Image::Imlib2 (1.02)
+
+When installing Imlib2 from rpm, deb or other packages formats, remember
+that you need the imlib2-dev package too. On Debian this can be installed
+by running:
+
+apt-get install libimlib2-dev
+
+Then, to install Apache::Gallery run the following commands:
+
+   perl Makefile.PL
+   make
+   export MOD_PERL_API_VERSION=2 # Only if you run mod_perl 2.0
+   make test (optional)
+   make install
+
+If you use Apache 1.3 and mod_perl 1, you need to configure
+your virtualhostblock to look like:
+
+<VirtualHost *>
+	ServerName   gallery.yourdomain.org
+	DocumentRoot /data/pictures/
+	ErrorLog     logs/gallery-error_log
+	TransferLog  logs/gallery-access_log
+	PerlSetVar   GalleryTemplateDir '/usr/local/apache/gallery/templates/default/'
+	PerlSetVar   GalleryInfo 'Picture Taken => DateTimeOriginal, Flash => Flash' 
+	PerlSetVar   GallerySizes '640 1024 1600 2272'
+	PerlSetVar   GalleryThumbnailSize '100x75'
+	PerlSetVar   GalleryCopyrightImage 'htdocs/c.png'
+	<Location />
+		SetHandler        perl-script
+		PerlHandler       Apache::Gallery
+	</Location>
+</VirtualHost>
+
+In case you run apache 2 and modperl 2 (or 1.99), it needs to look
+like:
+
+<VirtualHost *>
+	ServerName   gallery.yourdomain.org
+	DocumentRoot /data/pictures/
+	ErrorLog     logs/gallery-error_log
+	TransferLog  logs/gallery-access_log
+	PerlSetVar   GalleryTemplateDir '/usr/local/apache/gallery/templates/default/'
+	PerlSetVar   GalleryInfo 'Picture Taken => DateTimeOriginal, Flash => Flash' 
+	PerlSetVar   GallerySizes '640 1024 1600 2272'
+	PerlSetVar   GalleryThumbnailSize '100x75'
+	PerlSetVar   GalleryCopyrightImage 'htdocs/c.png'
+	PerlOptions +GlobalRequest
+	<Location />
+		SetHandler        modperl
+		PerlResponseHandler       Apache::Gallery
+	</Location>
+</VirtualHost>
+
+Warning: Apache::Gallery does not work properly if mod_autoindex 
+is loaded by Apache. Indeed, mod_autoindex overrides Apache::Gallery 
+and does not let it display directory content. 
+
+To check if your apache loads mod_autoindex, just look for this line 
+in httpd.conf:
+
+LoadModule autoindex_module /usr/lib/apache/1.3/mod_autoindex.so
+
+If this line is not commented, Apache::Gallery will only work when an
+image is loaded directly. Whenever a directory listing is requested,
+Apache will respond with the classic (and ugly) directory listing performed 
+by mod_autoindex.
+
+Copy the files from templates/ to where you pointed GalleryTemplateDir to.
+
+Create a directory called gallery in your Apache icons directory and
+copy the png files in htdocs to this directory. 
+
+The gallery.css file from the template directory you choose must be 
+copied to the DocumentRoot of your gallery.
+
+It is possible to include a graphical copyright notice on each picture now.
+By setting the GalleryCopyrightImage PerlSetVar you can define the path
+to a picture that you want include in the bottom right of each picture.
+
+Feel free to contact me with questions if you have problems setting up
+Apache::Gallery. You can write to michael@legart.dk
+
+Make sure you try the latest version of the gallery from 
+<http://apachegallery.dk/> before reporting bugs. 
+
+If you are brave you can also download the latest snapshot
+from http://svn.apachegallery.dk/snapshots/
+
+If you have problems installing Apache::Gallery, please make 
+sure to run "make test" to see, what may be the problem.
+
+When reporting bugs please use this page and include the output from make test
+in your bugreport:
+<http://bugs.cpan.org/NoAuth/ReportBug.html?Queue=Apache%3A%3AGallery>

@@ -1,0 +1,6 @@
+.gitconfig
+.git/
+blib/
+Makefile
+MYMETA.yml
+pm_to_blib

@@ -1,0 +1,89 @@
+#
+# $Id: ToDo,v 7.1 2004/01/13 19:01:11 wpm Exp $
+#
+# (c) 2003-2004 Morgan Stanley and Co.
+# See ..../src/LICENSE for terms of distribution.
+#
+
+=head1 NAME
+
+AFS::Command ToDo List
+
+=head1 Enhancements
+
+=head2 Accept AFS::Object objects as arguments
+
+Methods like $fs->listacl() return these handy little AFS::Object::ACL
+objects.  It would be nice if we could manipulate them via OO method
+calls, and then pass them right back to $fs->setacl(), wouldn't it?
+
+And how about passing the AFS::Object::Path objects returned from
+$fs->whichcell directly to an $fs->listquota call, so that the final
+AFS::Object::Path objects have all of the attributes returned by both
+calls, but in one set of objects?
+
+Look for this in version 1.1
+
+=head2 stderr handling
+
+stderr processing needs to be handled in the _exec_cmds() method, and
+for that matter, _reap_cmds() needs to be folded into _exec_cmds().
+
+The problem is that each API method calls _save_stderr(), and then
+later calls _restore_stderr(), and we leave stderr redirected for
+longer than necessary.  The contents of the redirected output should
+be *only* the output from the commands we run, and right now, some of
+our own carping can creep in there.
+
+Worse, its possible that a failure in the API can leave stderr
+redirected, resulting in a lot of confusion.
+
+Its possible we should just suck in *ALL* of the output, both
+stdout/stderr, and drop that data into a couple of arrays.  Then,
+method calls on the command object get gets individual rows of
+stdout/stderr output.
+
+  return unless $self->_exec_cmds();
+
+  #
+  # Process stdout
+  #
+  while ( defined($_ = $self->_stdout() ) ) {
+
+  }
+
+  #
+  # Process stderr (in some cases, there's interesting data in here.
+  # see the fs examine/diskfree and similar api calls)
+  #
+  while ( defined($_ = $self->_stderr() ) ) {
+
+  }
+
+Maybe something like that.  By the time _exec_cmds returns, we have
+reaped the commands, and collected *ALL* of the output into arrays in
+the object.
+
+=head2 Test Suite: fs lsmount using multiple dirs
+
+We should create several mount points and then query then all with one
+lsmount method call, to verify we can parse output for multiple dirs.
+We should pass in some bogus paths, too, to verify the error handling
+is correct as well (that code feels dubious to me).
+
+=head1 Bugs
+
+=head2 stdout/stderr buffering will break the fs examine/diskfree commands
+
+Actually, all of the commands that parse per-path output, really.
+Currently the code assumes the stderr output will appear first, which
+is a side effect of the buffering.  Some attempts to turn of buffering
+didn't change this, and in any case, we don't want to be sensitive to
+this (we currently are).
+
+We need to process stderr first, to determine which paths had errors,
+and then parse stdout.  This will require the change descibred above
+for how we handle stderr.
+
+=cut
+

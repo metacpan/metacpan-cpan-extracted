@@ -1,0 +1,26 @@
+---
+abstract: 'Authenticating the Yubikey against the Yubico Web API'
+author:
+  - 'Phil Massyn <massyn@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Auth-Yubikey_WebClient
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::HMAC_SHA1: '1'
+  LWP::UserAgent: '1'
+  MIME::Base64: '1'
+  Test::More: '0'
+  URI::Escape: '1'
+version: '4.01'

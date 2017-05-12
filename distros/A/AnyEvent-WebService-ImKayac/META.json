@@ -1,0 +1,81 @@
+{
+   "abstract" : "connection wrapper for im.kayac.com",
+   "author" : [
+      "taiyoh <sun.basix@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.3",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-WebService-ImKayac",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::More" : "0",
+            "Test::Requires" : "0",
+            "Test::TCP" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::HTTP" : "0",
+            "Digest::SHA" : "0",
+            "Filter::Util::Call" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "AnyEvent::WebService::ImKayac" : {
+         "file" : "lib/AnyEvent/WebService/ImKayac.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/soh335/AnyEvent-WebService-ImKayac/issues"
+      },
+      "homepage" : "https://github.com/soh335/AnyEvent-WebService-ImKayac",
+      "repository" : {
+         "url" : "git://github.com/soh335/AnyEvent-WebService-ImKayac.git",
+         "web" : "https://github.com/soh335/AnyEvent-WebService-ImKayac"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "sugyan <sugi1982@gmail.com>",
+      "soh335 <sugarbabe335@gmail.com>"
+   ]
+}

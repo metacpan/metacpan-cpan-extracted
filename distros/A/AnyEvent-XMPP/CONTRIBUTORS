@@ -1,0 +1,10 @@
+These people have helped to work on AnyEvent::XMPP:
+
+   * melo             - minor fixes on AnyEvent::XMPP::Connection.
+   * Chris Miceli     - additional work on the pubsub extension.
+   * Johansson Olle E - pointing out documentation errors and typos all 
+                        over the module and missing from attribute for messages.
+   * Ky6uk            - adding MUC history support.
+   * J. Cameijo Cerdeira - Pointing out bugs and making suggestions.
+   * Carlo von Loesch (aka lynX) - Pointing out typos.
+   * mons@cpan.org    - some maintenance patches.

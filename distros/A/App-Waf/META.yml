@@ -1,0 +1,25 @@
+---
+abstract: 'A sample  Web Application Firewall, analysis the web logs for illegal attempt in real time。 summary the source IP and other tpyes infomations ,using this infomations for ban whith iptables. '
+author:
+  - 'ORANGE <bollwarm@ijz.me>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ReadBackwards: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Waf
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006'
+resources:
+  repository: https://github.com/bollwarm/app-waf.git
+version: '0.06'

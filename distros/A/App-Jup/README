@@ -1,0 +1,5 @@
+DESCRIPTION
+
+    Processes a Jupfile for performing build and deployment tasks of your
+    application in a Juju enabled environment.
+

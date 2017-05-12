@@ -1,0 +1,203 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+our $home;
+
+BEGIN {
+  use FindBin;
+  FindBin::again();
+
+  my $me = File::Spec->catfile($FindBin::RealBin, $FindBin::RealScript);
+  my $uid = (stat($me))[4] || 0;
+
+  $home = ($ENV{NETDISCO_HOME} || (getpwuid($uid))[7] || $ENV{HOME});
+
+  # try to find a localenv if one isn't already in place.
+  if (!exists $ENV{PERL_LOCAL_LIB_ROOT}) {
+      use File::Spec;
+      my $localenv = File::Spec->catfile($FindBin::Bin, 'localenv');
+      exec($localenv, $0, @ARGV) if -f $localenv;
+      $localenv = File::Spec->catfile($home, 'perl5', 'bin', 'localenv');
+      exec($localenv, $0, @ARGV) if -f $localenv;
+
+      die "Sorry, can't find libs required for App::Netdisco.\n"
+        if !exists $ENV{PERLBREW_PERL};
+  }
+}
+
+BEGIN {
+  use Path::Class;
+
+  # stuff useful locations into @INC and $PATH
+  unshift @INC,
+    dir($FindBin::RealBin)->parent->subdir('lib')->stringify,
+    dir($FindBin::RealBin, 'lib')->stringify;
+
+  use Config;
+  $ENV{PATH} = $FindBin::RealBin . $Config{path_sep} . $ENV{PATH};
+}
+
+use Daemon::Control;
+use Filesys::Notify::Simple;
+use IO::File;
+use File::Copy;
+
+use App::Netdisco::Environment;
+my $config = ($ENV{PLACK_ENV} || $ENV{DANCER_ENVIRONMENT}) .'.yml';
+
+my $netdisco = file($FindBin::RealBin, 'netdisco-web-fg');
+my @args = (scalar @ARGV > 1 ? @ARGV[1 .. $#ARGV] : ());
+
+my $uid = (stat($netdisco->stringify))[4] || 0;
+my $gid = (stat($netdisco->stringify))[5] || 0;
+
+my $log_dir = dir($home, 'logs');
+mkdir $log_dir if ! -d $log_dir;
+chown $uid, $gid, $log_dir;
+
+my $pid_file = file($home, 'netdisco-web.pid');
+my $log_file = file($log_dir, 'netdisco-web.log');
+
+# change ownership of key files to be netdisco user
+foreach my $file ($pid_file, $log_file) {
+    unless (-e $file) {
+        sysopen my $fh, $file, O_WRONLY|O_CREAT|O_NONBLOCK|O_NOCTTY;
+        print $fh '0' if $file eq $pid_file;
+        close $fh;
+    }
+    chown $uid, $gid, $file;
+}
+
+# clean old web sessions
+my $sdir = dir($home, 'netdisco-web-sessions')->stringify;
+unlink glob file($sdir, '*');
+
+Daemon::Control->new({
+  name => 'Netdisco Web',
+  program  => \&restarter,
+  program_args => [
+    '--disable-keepalive',
+    '--user', $uid, '--group', $gid,
+    @args, $netdisco->stringify
+  ],
+  pid_file => $pid_file,
+  stderr_file => $log_file,
+  stdout_file => $log_file,
+  redirect_before_fork => 0,
+  ((scalar grep { $_ =~ m/port/ } @args) ? ()
+                                         : (uid => $uid, gid => $gid)),
+})->run;
+
+# the guts of this are borrowed from Plack::Loader::Restarter - many thanks!!
+
+sub restarter {
+  my ($daemon, @program_args) = @_;
+
+  my $child = fork_and_start($daemon, @program_args);
+  exit(1) unless $child;
+
+  my $watcher = Filesys::Notify::Simple->new([$ENV{DANCER_ENVDIR}, $log_dir]);
+  warn "config watcher: watching $ENV{DANCER_ENVDIR} for updates.\n";
+
+  # TODO: starman also supports TTIN,TTOU,INT,QUIT
+  local $SIG{HUP}  = sub { signal_child('HUP',  $child); };
+  local $SIG{TERM} = sub { signal_child('TERM', $child); exit(0); };
+
+  while (1) {
+      my @restart;
+
+      # this is blocking
+      $watcher->wait(sub {
+          my @events = @_;
+          @events = grep {$_->{path} eq $log_file or
+                          file($_->{path})->basename eq $config} @events;
+          return unless @events;
+          @restart = @events;
+      });
+
+      my ($hupit, $rotate) = (0, 0);
+      next unless @restart;
+
+      foreach my $f (@restart) {
+          if ($f->{path} eq $log_file) {
+              ++$rotate;
+          }
+          else {
+              warn "-- $f->{path} updated.\n";
+              ++$hupit;
+          }
+      }
+
+      rotate_logs($child) if $rotate;
+      signal_child('HUP', $child) if $hupit;
+  }
+}
+
+sub fork_and_start {
+  my ($daemon, @starman_args) = @_;
+  my $pid = fork;
+  die "Can't fork: $!" unless defined $pid;
+
+  if ($pid == 0) { # child
+      $daemon->redirect_filehandles;
+      exec( 'starman', @starman_args );
+  }
+  else {
+      return $pid;
+  }
+}
+
+sub signal_child {
+  my ($signal, $pid) = @_;
+  return unless $signal and $pid;
+  warn "config watcher: sending $signal to the server (pid:$pid)...\n";
+  kill $signal => $pid;
+  waitpid($pid, 0);
+}
+
+sub rotate_logs {
+  my $child = shift;
+
+  return unless (-f $log_file) and
+    ((-s $log_file) > (10 * 1024768));
+
+  my @files = glob file($log_dir, '*');
+  foreach my $f (reverse sort @files) {
+      next unless $f =~ m/$log_file\.(\d)$/;
+      my $pos = $1;
+      unlink $f if $pos == 7;
+      my $next = $pos + 1;
+      (my $newf = $f) =~ s/\.$pos$/.$next/;
+      rename $f, $newf;
+  }
+
+  # if the log file's about 10M then the race condition in copy/truncate
+  # has a low risk of data loss. if the file's larger, then we rename and
+  # kill.
+  if ((-s $log_file) > (12 * 1024768)) {
+      rename $log_file, $log_file .'.1';
+      signal_child('HUP', $child);
+  }
+  else {
+      copy $log_file, $log_file .'.1';
+      truncate $log_file, 0;
+  }
+}
+
+=head1 NAME
+
+netdisco-web - Web Application Server for Netdisco
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<App::Netdisco>
+
+=back
+
+=cut

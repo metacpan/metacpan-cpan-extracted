@@ -1,0 +1,29 @@
+---
+abstract: 'A Simple Perl interface to OLE Automation framework of Amibroker Software.'
+author:
+  - 'Babu Prasad HP <bprasad@cpan.org>'
+build_requires:
+  FindBin: '0'
+  Test::More: '1.001014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amibroker-OLE-Interface
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  File::Slurp: '9999.19'
+  IO::File: '1.14'
+  Path::Tiny: '0.061'
+  Win32: '0.51'
+  Win32::OLE: '0.1712'
+  perl: '5.006'
+version: '0.03'

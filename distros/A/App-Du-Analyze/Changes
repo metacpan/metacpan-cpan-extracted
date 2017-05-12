@@ -1,0 +1,35 @@
+Revision history for App-Du-Analyze
+
+v0.2.1      2015-04-28
+    - Specify minimal version of perl to 5.8.x.
+        - CPANTS / Kwalitee
+    - Add provides to META.yml.
+        - CPANTS / Kwalitee
+
+v0.2.0      2015-03-09
+    - Remove dependency on Moo/MooX/MooX::late.
+        - Seemed like an overkill for such a small and simple app.
+    - Remove dependency on List::MoreUtils.
+        - To avoid unnecessary deps.
+
+v0.0.5      2015-01-25
+    - Add inc/ to the git repo, so minting a new release.
+
+v0.0.4      2014-05-04
+    - Add minimal prereq on Getopt::Long 2.36 for GetOptionsFromArray.
+        - There were test failures with older Getopt::Long-s.
+
+v0.0.3      2014-05-02
+    - Convert t/app.t from IPC::System::Simple to Test::Trap hoping to
+    fix test failures on MS Windows.
+        - we also don't use a separate process now but rather capture
+        STDOUT.
+
+v0.0.2      2014-05-01
+    - Change the meta resources/links to point to the actual repository at
+    GitHub.
+        - Thanks to pyon from Freenode for noticing it.
+    - Add DESCRIPTION and correct some typos.
+
+v0.0.1      2014-04-30
+    - First version, released on an unsuspecting world

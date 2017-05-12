@@ -1,0 +1,251 @@
+package Authen::Krb5::KDB;
+
+# $Id: KDB.in,v 1.10 2002/10/09 20:40:14 steiner Exp $
+
+use Carp;
+use strict;
+use vars qw($VERSION);
+
+$VERSION = do{my@r=q$Revision: 1.10 $=~/\d+/g;sprintf '%d.'.'%02d'x$#r,@r};
+
+my $Version;
+
+#%%[This line will be removed in the .pm] will be patched in the .pm file
+my $KDB5_UTIL = "%%K_SBIN_PATH%%/kdb5_util";
+
+my $LineNo = 1;
+
+my %old_dump_version = (
+    name => "Kerberos version 5 old format",
+    header => "kdb5_edit load_dump version 2.0\n",
+);
+
+my %beta6_dump_version = (
+    name => "Kerberos version 5 beta 6 format",
+    header => "kdb5_edit load_dump version 3.0\n",
+);
+
+my %beta7_dump_version = (
+    name => "Kerberos version 5",  # beta7 version
+    header => "kdb5_util load_dump version 4\n",
+);
+
+my %r1_3_version = (
+    name => "Kerberos version 5 release 1.3",
+    header => "kdb5_util load_dump version 5\n",
+);
+
+sub new {
+    my $proto = shift;
+    my $class = ref($proto) || $proto;
+    my %args = @_;
+        #  realm => realm_name
+	#  checks => level (0..2) [def=1]
+	#  save => 1 [otherwise no]
+	#  file => filename [def="kdb5_util dump |"]
+    my $self = {};
+
+    if (defined($args{'realm'})) {
+	$self->{'realm'} = $args{'realm'};
+    } else {
+	if (not defined($args{'file'})) { # need realm if dumping via kdb5_util
+	    croak "Realm not defined";
+	}
+    }
+    $self->{'checks'} = $args{'checks'} ? $args{'checks'} : 1;
+    $self->{'save'} = $args{'save'} ? $args{'save'} : 0;
+    $self->{'file'} = $args{'file'} ? $args{'file'} :
+	"$KDB5_UTIL -r $self->{'realm'} dump |";
+    $self->{'principals'} = [];
+    $self->{'policies'} = [];
+
+    open(KDB, $self->{'file'}) or croak "Can't open $self->{'file'}: $!";
+    $self->{'_FH'} = *KDB{IO};
+    $self->{'header'} = <KDB>;
+
+    if ($self->{'header'} eq $r1_3_version{'header'}) {
+	$self->{'dump_name'} = $r1_3_version{'name'};
+	require Authen::Krb5::KDB::V5;
+	$Version = "Authen::Krb5::KDB::V5";
+
+    } elsif ($self->{'header'} eq $beta7_dump_version{'header'}) {
+	$self->{'dump_name'} = $beta7_dump_version{'name'};
+	require Authen::Krb5::KDB::V4;
+	$Version = "Authen::Krb5::KDB::V4";
+
+    } elsif ($self->{'header'} eq $beta6_dump_version{'header'}) {
+	$self->{'dump_name'} = $beta6_dump_version{'name'};
+	require Authen::Krb5::KDB::V3;
+	$Version = "Authen::Krb5::KDB::V3";
+
+    } elsif ($self->{'header'} eq $old_dump_version{'header'}) {
+	$self->{'dump_name'} = $old_dump_version{'name'};
+	croak "$old_dump_version{'name'} not yet supported";
+	require Authen::Krb5::KDB::V2;
+	$Version = "Authen::Krb5::KDB::V2";
+
+    } else {
+	croak "Unknown dump header: '$self->{'header'}'";
+    }
+
+    bless($self, $class);
+    return $self;
+}
+
+sub next {
+    my $self = shift;
+    my $entry_type;
+    my $fh = $self->{'_FH'};
+    my $line = <$fh>;
+    return undef if (not $line);
+    chomp($line);
+    $LineNo++;
+
+    my $p = $Version->new ( checks => $self->{'checks'}, lineno => $LineNo,
+			    data => $line );
+
+    if (not $p) {
+	carp "Unknown entry type at line $LineNo";
+	return undef;
+    }
+
+    if ($p->type eq 'princ') { 
+	if ($self->{'save'}) {
+	    push @{$self->{'principals'}}, $p;
+	}
+    } elsif ($p->type eq 'policy') {
+	push @{$self->{'policies'}}, $p;
+    }
+    return $p;
+
+}
+
+sub read {
+    my $self = shift;
+    $self->{'save'} = 1;
+    my $entry;
+    do { $entry = $self->next(); } until (not $entry);
+}
+
+sub principals {
+    my $self = shift;
+    return $self->{'principals'};
+}
+
+sub policies {
+    my $self = shift;
+    return $self->{'policies'};
+}
+
+sub close {
+    my $self = shift;
+    close $self->{'_FH'} or croak "Can't close $self->{'file'}: $!/$?";
+    return 1;
+}
+
+1;
+__END__
+
+=head1 NAME
+
+Authen::Krb5::KDB - Parse Kerberos V5 database dumps
+
+=head1 SYNOPSIS
+
+    use Authen::Krb5::KDB;
+    $db = Authen::Krb5::KDB->new( file => 'slave_datatrans' );
+    while ($p = $db->next) {
+       print "Found" if ($p->name eq 'foo@TEST.ORG');
+    }
+    $db->close;
+
+    use Authen::Krb5::KDB;
+    $db = Authen::Krb5::KDB->new( realm => 'TEST.ORG' );
+    $db->read;
+    $db->close;
+    $policies = $db->policies;
+    foreach my $p (@{$policies}) {
+        $p->print_policy;
+    }
+
+
+=head1 DESCRIPTION
+
+Constructor and methods to parse Kerberos V5 database files, either
+directly from kerberos (via B<kdb5_util>) or from already dumped files
+(e.g. F<slave_datatrans>).
+
+=over 4
+
+=item  new()
+
+Open the database file and return a new database object.  You can either
+read from a file or read directly from Kerberos (done via "B<kdb5_util> B<-r>
+E<lt>B<realm>E<gt> B<dump |>"; this is the default).
+
+Arguments are:
+
+realm => E<lt>realm_nameE<gt>
+
+The realm which should be extracted via B<kdb5_util>.  This is ignored
+if you use the file argument.
+
+file => E<lt>filenameE<gt>
+
+Read from a file instead of Kerberos directly.
+
+checks => E<lt>levelE<gt>
+
+Data checking level.  Level 0 means no checks; level 1 (the default)
+does basic checks like checking that the lengths in the records are
+correct; level 2 does much further consistency checks on the data.
+
+save => 1
+
+Save the principal objects in the database object.  Normally the
+objects are not saved for space considerations.  Note that policy
+objects are always kept.
+
+=item  next()
+
+Returns the next principal or policy object.
+
+=item  read()
+
+Reads all principals and policies. The objects are saved in the
+database object.
+
+=item  principals()
+
+Returns a reference to array of principal objects
+
+=item  policies()
+
+Returns a reference to array of policy objects
+
+=item  close()
+
+Closes FH to database.  It's especially important to call C<close>
+when reading directly via B<kdb5_util> to make sure there are no
+errors from the pipe.
+
+=back
+
+=head1 AUTHOR
+
+Dave Steiner, E<lt>steiner@bakerst.rutgers.eduE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2002 David K. Steiner.  All rights reserved.  
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=head1 SEE ALSO
+
+perl(1), kerberos(1), Authen::Krb5::KDB::V5, Authen::Krb5::KDB::V4,
+Authen::Krb5::KDB::V3, Authen::Krb5::KDB::V2, Authen::Krb5::KDB_H.
+
+=cut

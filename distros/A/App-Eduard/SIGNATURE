@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 45915ba532c7f81771032b751fd32eac27b5a0ba Changes
+SHA1 162afc97705dcf27a3477c659bfd61e3b69f7c62 MANIFEST
+SHA1 b8ba8dccb4a575f4031840cf8214b741a48d482f META.json
+SHA1 b23826ffca94e4ff737460b510939aaf2172c709 META.yml
+SHA1 e96f4b603012c74862d91f4e3121cd3de2b6f618 Makefile.PL
+SHA1 932829924326608b446bd0fd6104aa510b30d510 README
+SHA1 82b3196d0d2a3fd9dc25343b6d6a149192a4c01e eduard
+SHA1 6661c89bddebd999a6d7cfa9550c57cf8c0a0ada lib/App/Eduard.pm
+SHA1 f031bdcc3ca9bf8c756aa846651ef7464eecbf5a share/tmpl/en/encrypt
+SHA1 4c00b6359055d666e6823c49cf22459a292516b4 share/tmpl/en/encrypt_error
+SHA1 cacd1191c080579f99ed8b020f3b05b25f501ee7 share/tmpl/en/error
+SHA1 23a4ec8cc29b77207a23003bb98465b5e3511e9c share/tmpl/en/keys
+SHA1 b047bd59d571fbc8c7c6a07fa1f40ffba56ebda6 share/tmpl/en/plain
+SHA1 27a22e64fae9d17ae416a66c9ee0b164d94a8aa3 share/tmpl/en/sign
+SHA1 8106294187213a46a014708600313bb1ddfccf32 share/tmpl/en/sign_error
+SHA1 a6ee3bf537e48c465a50662daf50e7ee8d5b8207 share/tmpl/en/signencrypt
+SHA1 016e4f0429e73f85dbfec2d98672d5db3b1a98bb t/App-Eduard.t
+SHA1 d80a6379a9fad261587caa3aa631d26f5c552ff3 t/data/contains-pubkey
+SHA1 052a9473becfebcf8ae4dedde64c9c839600c0d6 t/data/inline-encrypted
+SHA1 2ebeff7efdf1dcd6c48af9078639f492f733a282 t/data/inline-encrypted-attachment
+SHA1 7a3473b4be8d31ea46eaf34b28788201472a3846 t/data/inline-signed
+SHA1 1c7904ccac2a4fbf6ea9565e91cccc5e5967396d t/data/inline-signed-attachment
+SHA1 2bac2e28ed9b53c5496b754d1c3525326f2450c8 t/data/inline-signed-encrypted
+SHA1 57bd261514d397946d2dc997fbe3d278dd1a8a0c t/data/mime-encrypted
+SHA1 3cfff105472b47414f272be06e0649e60f6f1b0a t/data/mime-signed
+SHA1 9c67bed693e85e821047d2dfa5282a1ba28e61c2 t/data/mime-signed-encrypted
+SHA1 59c25e0d4a8a1b400d75e8892723b84d88db7954 t/keydir/pubring.gpg
+SHA1 d071b8efe7c2d59b6260bb07c194708054e8630b t/keydir/secring.gpg
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJUQs+2AAoJEMoENb5ewbNi6xkQAJaJOxPfbNfQamzcvaHyZ2KF
+0oVLJr9X+CKvQx65otlFbGRR2jKWq03+Y8YYDyHFYDvGqekfFptx83ZUwpQkP+3P
+O1fjN6ehjts1cANY1/KCYNlLJ9NzK/k8x7fRw7Htm+8G7BbNnaV2SedwlDCuos7I
+VvZRRnlDznGE0J6GG4lD31cv5z10gHQyJ08S5qeko8pj1kDd8MK6NMk6gyk82Z5V
+HkrKqmroLtF2XtQ28Y8yNF/35JQyhKMWhrLhUaEsgrZMgwF1y0zOjYYVdWFQEBr9
+WHtO4PU2su/7p9iC9zcS62SPC+tefhj7qMnYVM0NIooiVrt1KrdSVm9O894KWRuL
+qF60v6ltE5djESzt1mNCt+2iOuXp6MddC/6LjFj/erh8Hoa9qGNMgwx9fXvH+xre
+x0gx2IeyzDC6AtsDrhdTpQKe4nfAMUxDTPx9K/xQv32vkkHsiBwY6RQ2M/9w6AAz
+WeJIWfaUro3tdhj0ocEcjbJg99lcKRrTHFhy2WLMko/X5e7v2Wm0UgP7JLQEQGU7
+s8iWQ4HhOeRi/uidI2k1Glw2guXtVJGXRPZbMBL+omgZu+yRft8UPGajCOO2dTdF
+P87mKy01jP9qAiii1OWdFlsYaqXxZx2PfHY8uOQMtVhkIsmK4GML+2Xw4bVB/0AO
+a6xVe2xQwnRXTs/qfYXR
+=gp7n
+-----END PGP SIGNATURE-----

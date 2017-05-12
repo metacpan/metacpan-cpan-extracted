@@ -1,0 +1,10 @@
+0.003
+  - Allow the specification of the exchange type and durability, allowing
+    you to tail in a wider range of situations.
+
+0.002
+  - Deal correctly with (and require) Net::RabbitFoot 1.03
+
+0.001
+  - Initial version.
+

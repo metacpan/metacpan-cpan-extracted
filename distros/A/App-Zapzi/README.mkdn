@@ -1,0 +1,367 @@
+# zapzi
+
+### A tool to store articles and publish them as eBooks to read later
+
+# Synopsis
+
+    $ zapzi init
+    Created Zapzi directory ~/.zapzi
+
+    Select configuration options. Press enter to accept defaults.
+    Format to publish eBooks in. (EPUB, MOBI or HTML) [default MOBI] : MOBI
+
+    $ zapzi add ~/src/foo/README.txt
+    Added article 2 to folder Inbox
+
+    $ zapzi add http://perldoc.perl.org/perlintro.html
+    Added article 3 to folder Inbox
+
+    $ zapzi ls
+    Inbox    1 05-Jul-2013 Welcome to Zapzi
+    Inbox    2 05-Jul-2013 README for project foo
+    Inbox    3 05-Jul-2013 perlintro - perldoc.perl.org
+
+    $ zapzi publish
+    Published ~/.zapzi/ebooks/Zapzi - Inbox - 05-Jul-2013.mobi
+
+    # See Usage below for more details on command line options.
+
+# Installation
+
+You will need Perl 5.10.1 or later. Use your favourite CPAN client to
+get the package and its dependencies, eg:
+
+    cpan App::Zapzi
+
+Zapzi depends on a large number of Perl modules so this may take some
+time to download and install.
+
+# Description
+
+Zapzi is a command line tool to take articles - from files or from the
+web - and create eBooks for reading later.
+
+## Features
+
+- Can read articles from local files or via HTTP.
+- Understands plain text, POD, HTML and Markdown format articles.
+- HTML is converted to a more readable form (eg no menus or
+footers) to make the article easier to view on an eReader.
+- Articles can be stored in different folders to organise your reading.
+- eBooks can be created in MOBI, EPUB or HTML format.
+- eBooks can be automatically copied to a directory or emailed
+when published.
+- Once you publish a folder of articles to an eBook file, the
+articles are archived so you can retrieve them later if needed.
+
+## Setup
+
+To get started, type:
+
+    $ zapzi init
+
+and it will create a directory (by default ~/.zapzi) to store its
+database and files. You can override this directory by setting the
+environment variable `ZAPZI_DIR`.
+
+Zapzi will then prompt for configuration options such as preferred
+format for publishing eBooks. If you run this command
+non-interactively it will use defaults.
+
+To view or change these options see Configuration below for further
+details.
+
+## Adding Articles
+
+To add an article, use `zapzi add` with a filename on your computer,
+the name of a module containing POD (eg File::Basename) or an HTTP
+URL. Remember to quote URLs if they include space or shell special
+characters, eg
+
+    $ zapzi add 'http://example.com/article?id=4'
+
+Use `zapzi add -` to add a list of articles read from standard input.
+
+Zapzi will download a copy of each and store it in its database. Note
+that if you need to log into a site this will not work - save a copy
+of the page locally using your browser and then point Zapzi at the
+file.
+
+## Transformers
+
+By default, Zapzi will detect the file type and if it is HTML it will
+use [HTML::ExtractMain](http://search.cpan.org/perldoc?HTML::ExtractMain)
+to strip out non-essential parts of the page such as menus. Other
+formats are treated as plain text with Markdown.
+
+You can override this by setting the `-t` option to `add`. For
+example, if HTMLExtractMain does not correctly determine which parts
+of the article are readable you can get the complete HTML text
+instead:
+
+    $ zapzi add -t HTML 'http://example.com/article?id=4'
+
+## Folders
+
+By default, Zapzi will store articles in the 'Inbox' folder. This can
+be changed by using the `-f` option, eg
+
+    $ zapzi add -f Foo project.txt
+
+In order to use other folders you will need to create them first using
+the `make-folder` or `mkf` command, eg
+
+    $ zapzi make-folder Foo
+
+Folders can be deleted with the `delete-folder` or `rd` command.
+Note that this will also delete all articles in the folder.
+
+To see a summary of your folders and how many articles are in them use
+the `list-folders` or `lsf` command.
+
+    $ zapzi lsf
+
+    Inbox        2
+    Archive      4
+    Foo          1
+
+To see a summary of a particular folder, use `list` or `ls`:
+
+    $ zapzi ls -f Foo
+    Foo      1 05-Jul-2013 Project readme
+
+Use the `l` option to `ls` to get a more detailed listing.
+
+You can delete articles with `zapzi rm` and move articles between
+folders with `zapzi mv`, for example:
+
+    $ zapzi rm 10                 # remove article 10 from the database
+    $ zapzi mv 12 13 Foo          # move articles 12 and 13 to folder Foo
+
+## Publishing
+
+To create an eBook, run `zapzi publish` or `zapzi pub`. By default
+this will publish articles from the Inbox folder; use the `-f` option
+to select another folder.
+
+You can specify the format of the eBook with the `--format` switch.
+Options are:
+
+- MOBI (the default)
+- EPUB
+- HTML (a single HTML file containing all the articles)
+
+You can also set the encoding with `--encoding` but Zapzi will
+normally set this correctly based on the content and publication
+format.
+
+If everything worked OK, Zapzi will create a new eBook in the ebooks
+sub-directory of your Zapzi directory, eg `~/.zapzi/ebooks`.
+
+If you have set distribution options, it will also run these at this
+time. See the next section for more information.
+
+When you publish a folder, the articles are moved to the Archive
+folder unless you set the `--noarchive` option.
+
+## Distribution
+
+When an eBook is published, Zapzi can run an action on the completed
+file by setting distribution options. The following distribution
+methods are available:
+
+- Copy - will copy the file to another directory or file
+- Email - will email the file to a recipient
+- Script - will run a script with the eBook as a parameter
+- Nothing - will do no distribution (the default)
+
+To use this at publication time, set the `--distribute` or `-d`
+option to the publish command. Some examples:
+
+    $ zapzi publish -d copy /path/to/directory
+    $ zapzi publish -d email me@my.address.com
+    $ zapzi publish -d script /home/user/bin/myscript.sh
+
+To set this up so distribution happens every time you publish without
+needing to provide the `-d` command line option, set the
+`distribution_method` and `distribution_destination` config
+parameters. See the Configuration section below for more details.
+
+For email distribution, the From address used will be the same as the
+To address. You can override this by setting the
+`EMAIL_SENDER_TRANSPORT_from` environment variable. By default, email
+will be sent via the local sendmail service on your machine; if you
+want to send by SMTP set the `EMAIL_SENDER_TRANSPORT` environment
+variable to SMTP and configure the below environment variables as
+appropriate. You can also set any other options documented by
+`Email::Sender`.
+
+- EMAIL_SENDER_TRANSPORT_host: the name of the host to connect to;
+defaults to localhost
+
+- EMAIL_SENDER_TRANSPORT_ssl: if set, connect via SSL; defaults to
+false
+
+- EMAIL_SENDER_TRANSPORT_port: port to connect to; defaults to 25
+for non-SSL, 465 for SSL
+
+- EMAIL_SENDER_TRANSPORT_timeout: maximum time in secs to wait for
+server; default is 120
+
+- EMAIL_SENDER_TRANSPORT_sasl_username: the username to use for
+auth; optional
+
+- EMAIL_SENDER_TRANSPORT_sasl_password: the password to use for
+auth; required if username is provided
+
+## Showing and Exporting
+
+Instead of publishing, if you want to see a copy of an article use
+`zapzi show` to view the article in a browser or `zapzi export` to
+send a copy of the readable article to the standard output. Both these
+commands will not archive the article.
+
+You can chain together adding and showing, eg
+
+    $ zapzi add show README.md
+
+will add a copy of README.md to the database and then open a browser
+to show how it looks in readable format.
+
+# Configuration
+
+To view or change configuration variables use the `config get` or
+`config set` commands, eg:
+
+    $ zapzi config get                      # to see all set variables
+    $ zapzi config get publish_format       # to see one variable
+    $ zapzi config set publish_format EPUB  # to set a variable
+
+The following configuration variables are available:
+
+- publish\_format
+
+    The eBook format Zapzi will use when running the `publish` command.
+    Default is MOBI; can be set to EPUB or HTML.
+
+- publish\_encoding
+
+    The encoding used to create an eBook when running the `publish`
+    command. Default is unset, which means Zapzi will choose the best
+    encoding for the publication format. Can be set to UTF-8 or
+    ISO-8859-1.
+
+- distribution\_method
+
+    The method used to automatically distribute published eBook files.
+    Can be either 'Copy', 'Script' or 'Nothing'. Default is 'Nothing'.
+
+- distribution\_destination
+
+    Where to distribute published eBook files. If `distribute_method`
+    is set to 'Copy' then this should be a directory name. If the
+    method is 'Script' this should the the full path to an executable
+    script. If the method is 'Email' then this should be the
+    recipient's email address.
+
+- deactivate\_links
+
+    If set to Y, will replace links with text when using the
+    HTMLExtractMain transformer. Motivation for this is eReaders with
+    touch screens where tapping the screen will turn the page, unless
+    you happen to touch a link in which case it will try to follow the
+    link in a web browser. This can be annoying if you are offline as
+    it will load the browser then ask if you want to go online.
+
+# Usage
+
+    $ zapzi help | h
+      Shows this help text.
+
+    $ zapzi version | v
+      Shows version information.
+
+    $ zapzi init [--force]
+      Initialises new zapzi database. Will not create a new database
+      if one exists already unless you set --force.
+
+    $ zapzi config get [KEYS]
+      Prints configuration variables specified by KEYS, or all config
+      variables if KEYS not provided.
+
+    $ zapzi config set KEY VALUE
+      Set configuration variable KEY to VALUE.
+
+    $ zapzi add [-t TRANSFORMER] FILE | URL | POD | -
+      Adds article to database. Accepts multiple file names or URLs,
+      or read articles names from standard input with -
+      TRANSFORMER determines how to extract the text from the article
+      and can be HTML, HTMLExtractMain, POD or TextMarkdown
+      If not specified, Zapzi will choose the best option based on the
+      content type of the article.
+
+    $ zapzi list | ls [-f FOLDER] [-l | --long]
+      Lists articles in FOLDER, one line per article. The -l option shows
+      a more detailed listing.
+
+    $ zapzi list-folders | lsf
+      Lists a summary of all folders.
+
+    $ zapzi make-folder | mkf | md FOLDER
+      Makes a new folder.
+
+    $ zapzi delete-folder | rmf | rd FOLDER
+      Remove a folder and all articles in it.
+
+    $ zapzi delete-article | delete | rm ID
+      Removes article ID.
+
+    $ zapzi move | mv ARTICLES FOLDER
+      Move one or more articles to the given folder.
+
+    $ zapzi export | cat ID
+      Prints content of readable article to STDOUT.
+
+    $ zapzi show | view ID
+      Opens a browser to view the readable text of article ID.
+
+    $ zapzi publish | pub [-f FOLDER] [--format FORMAT]
+                          [--encoding ENC] [--noarchive]
+                          [--distribute METHOD DESTINATION]
+      Publishes articles in FOLDER to an eBook.
+      Format can be specified as MOBI, EPUB or HTML.
+      Will archive articles unless --noarchive is set.
+      Optionally distribute using METHOD to DESTINATION.
+
+# Support and Development
+
+Bugs and requested issues can be reported at Github. Pull requests are
+also very welcome; please try to follow the existing style and
+organisation of the module.
+
+    https://github.com/rupertl/app-zapzi/
+
+# Future Plans
+
+- Improve text extraction and formatting - complex pages may not
+render correctly or may miss sections at present
+- Support other ways to fetch articles, eg FTP or IMAP for email.
+- Support other article formats, eg mbox/maildir.
+- Add the ability to read sources with state, eg RSS feeds.
+- Publish to other eBook formats such as PDF.
+
+# Name
+
+Zapzi comes from the Chinese word 雜誌, meaning magazine. It is
+pronounced ZAAP-zi in Cantonese.
+
+# Author
+
+Rupert Lane <rupert@rupert-lane.org>
+
+# Copyright and License
+
+This software is copyright (c) 2015 by Rupert Lane.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,76 @@
+{
+   "abstract" : "Evaluate arbitrary code in a safe environment",
+   "author" : [
+      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-EvalServer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "utils"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Inline::Lua" : 0,
+            "Inline::Python" : 0,
+            "Jplugin" : 0,
+            "PHP::Interpreter" : 0,
+            "Ruby" : 0
+         },
+         "requires" : {
+            "BSD::Resource" : 0,
+            "File::Temp" : "0.22",
+            "POE" : "1.291",
+            "POE::Filter::JSON" : 0,
+            "POE::Filter::Reference" : 0,
+            "POE::Filter::Stream" : 0,
+            "POE::Session" : 0,
+            "POE::Wheel::ReadWrite" : 0,
+            "POE::Wheel::Run" : 0,
+            "POE::Wheel::SocketFactory" : 0,
+            "Proc::Daemon" : 0,
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-App-EvalServer@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-EvalServer"
+      },
+      "homepage" : "http://search.cpan.org/dist/App-EvalServer/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hinrik/app-evalserver.git",
+         "web" : "http://github.com/hinrik/app-evalserver"
+      }
+   },
+   "version" : "0.08",
+   "x_authority" : "cpan:HINRIK"
+}
+

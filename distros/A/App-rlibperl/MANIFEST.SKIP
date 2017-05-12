@@ -1,0 +1,10 @@
+
+\B\.git\b
+\B\.gitignore$
+^[\._]build
+^blib/
+^(Build|Makefile)$
+\bpm_to_blib$
+^MYMETA\.
+
+

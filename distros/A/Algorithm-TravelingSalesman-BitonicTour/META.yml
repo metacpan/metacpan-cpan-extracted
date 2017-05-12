@@ -1,0 +1,32 @@
+---
+name: Algorithm-TravelingSalesman-BitonicTour
+version: 0.05
+author:
+  - 'John Trammell <johntrammell -at- gmail (dot) com>'
+abstract: solve the euclidean traveling-salesman problem with bitonic tours
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Class::Accessor::Fast: 0
+  List::Util: 0
+  Params::Validate: 0
+  Regexp::Common: 0
+  perl: 5.006
+build_requires:
+  Data::Dumper: 0
+  Pod::Coverage: 0
+  Readonly: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Algorithm::TravelingSalesman::BitonicTour:
+    file: lib/Algorithm/TravelingSalesman/BitonicTour.pm
+    version: 0.05
+generated_by: Module::Build version 0.280802
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

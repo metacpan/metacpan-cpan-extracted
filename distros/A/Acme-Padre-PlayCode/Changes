@@ -1,0 +1,46 @@
+Revision history for Acme::Padre::PlayCode
+
+0.13    2010.01.15
+        Missing share/locale/ (RT 53690)
+
+0.12    2009.08.28
+     actually install translations (RSN)
+     Renamed to the new Padre 0.43 PO naming scheme (azawawi)
+     Renamed it to Acme::Padre::PlayCode (azawawi)
+
+0.11    2009.05.31
+    removed taint mode for tests, leading to build failures (jquelin)
+
+0.10    2009.05.26
+    Add Chinese (Traditional) translation (BLUET).
+	Added Arabic Translation (AZAWAWI).
+	Added Spanish Translation (BRUNOV)
+
+0.09    2009.05.18
+    Added translations:
+	    - Brazilian Portuguese (garu)
+        - French (jquelin)
+	    - Polish (therek)
+	    - Chinese Simpified (fayland)
+
+0.08    2009.02.03
+        fix http://www.nntp.perl.org/group/perl.cpan.testers/2009/02/msg3185057.html
+
+0.07    2009.1.23
+        for Padre 0.26
+
+0.06    2009.1.5
+        for Padre 0.23
+
+0.05	2008.11.24
+		for 'Padre::Plugin' => '0.18'
+
+0.04	2008.11.20
+		from use Acme::PlayCode to require
+
+0.02	2008.11.3
+		requires 'Padre' => '0.15'
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

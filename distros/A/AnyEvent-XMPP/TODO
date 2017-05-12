@@ -1,0 +1,144 @@
+'x' means: is done!
+
+- keep an eye on disco_feature stuff.
+- fix MUC documentation!
+X make the MUC extension not be tied to a specific connection.
+  Let it discover new connections itself.
+  => for this the join_room function might need a connection argument
+     to discover the right connection. => maybe use the %args hash for this,
+     as the default should be 'the first' connection we can grab.
+  => think about get_room and the implications in general that 'multiple'
+     connections are handled by one extension.
+- vcard retrieve sends out presence, but the 'last sent presence' info
+  isn't available in the connection or to the vcard extension.
+  => introduce storing the 'last sent presence' and offer a 'send_presence_update'
+  method (at least internally), to repeat the last sent presence (be careful
+  not to repeat directed presences!).
+   - think more about $dont_retrieve_vcard.
+- make exponential falloff in Client.pm when an account couldn't be connected.
+- remove XML::Twig dependency from debug => ...
+- map the domain part correctly w.r.t. IDNA
+- rename 'domain' parameter to 'host',
+  and rename the internal host/port to peer_host and
+  peer_port.
+- add nick_change to documentation
+- Implement XEP-0045: Multi-User Chat
+   x store full jid info on entering room
+   x implement delayed delivery for messages
+      x WRITE TEST!
+      - to mark history of room
+   x 7.8 Sending a Private Message
+   x 7.9 Sending a Message to All Occupants
+     - visitor error (when room not allow without voice to chat)
+   - improve room info handler class to retrieve interesting information eaasier
+      - room occupant query
+   - implement status code mappings
+      - that room logged
+      - non anonymous
+   x look over error reporting (more conclusive errors!)
+      x change presenceerror to something more clear
+      x entering members only
+      x banned
+      x nickname conflict
+         - with resolution
+      x max users
+      x locked
+      x 11. Error and Status Codes
+         x 11.1 Error Codes
+         - 11.2 Status Codes
+   - managing of discussion history when entering
+      - maxchars, maxstanzas, seconds, since
+   x nickname changes
+      x make own possible
+      x log changes of other people nicknames
+      - according errors
+   - test changing of presence of a user
+   - invitations
+   - 7.10 Registering with a Room
+   - 7.11 Discovering Reserved Room Nickname
+   - 7.12 Requesting Voice
+   - 8. Moderator Use Cases
+      x 8.1 Modifying the Room Subject
+        - test error handling of subject_change_error
+      - 8.2 Kicking an Occupant
+      - 8.3 Granting Voice to a Visitor
+      - 8.4 Revoking Voice from a Participant
+      - 8.5 Modifying the Voice List
+      - 8.6 Approving Voice Requests
+   - 9. Admin Use Cases
+      - 9.1 Banning a User
+      - 9.2 Modifying the Ban List
+      - 9.3 Granting Membership
+      - 9.4 Revoking Membership
+      - 9.5 Modifying the Member List
+      - 9.6 Granting Moderator Privileges
+      - 9.7 Revoking Moderator Privileges
+      - 9.8 Modifying the Moderator List
+      - 9.9 Approving Registration Requests
+   - 10. Owner Use Cases
+      x 10.1.1 General Considerations
+      x 10.1.2 Creating an Instant Room
+      x 10.1.3 Creating a Reserved Room
+         x entering password protected rooms
+         - 7.7 Occupant Modification of the Room Subject
+      - 10.1.4 Requesting a Unique Room Name
+      - 10.2 Subsequent Room Configuration
+      - 10.2.1 Notification of Configuration Changes
+      - 10.3 Granting Ownership Privileges
+      - 10.4 Revoking Ownership Privileges
+      - 10.5 Modifying the Owner List
+      - 10.6 Granting Administrative Privileges
+      - 10.7 Revoking Administrative Privileges
+      - 10.8 Modifying the Admin List
+      - 10.9 Destroying a Room
+   - 7.6 Converting a One-to-One Chat Into a Conference
+
+- write a tutorial for simxml
+- improve the SSL/TLS handling
+- make more tests
+   - oob
+   - data forms
+   - jabber component
+- fix the inaviodable memoryleaks with the callbacks
+  the circular object structs.
+- put some serious stuff in the synopsises
+- look at attribute namespace preservation! (if they got
+  prefixes, how to parse this with expat?
+  see also http://www.w3.org/TR/REC-xml-names/#scoping-defaulting )
+- fix problem that xml::writer writes after <stream/> ahs been written
+  - reproduce by conflicting resources!
+- test the xml parse error object somehow!
+- add context field to IQ error for all the places origin from IQ errors
+  (bind_error, session_error, ...)
+- AnyEvent::XMPP::Client
+  - find a way to distinguish presences from JIDs that
+    are in multiple account's roster.
+- AnyEvent::XMPP missing functionality to be RFC 3920 conform:
+   - improve error handling for SASL to
+     support retries as specified in RFC 3920.
+     (eg. by supporting a method sasl_retry() which takes
+      the changed credentials)
+   x SRV record lookup
+      - weight handling!
+- AnyEvent::XMPP::IM missing functionality to be RFC 3921 conform:
+   - 7.2.  Business Rules
+- Implement XEP-0115: Entity Capabilities
+- Implement XEP-0190: Best Practice for Closing Idle Streams
+x Implement XEP-0030: Service Discovery
+   - see also: XEP-0128: Service Discovery Extensions
+   - missing feature: building up a item tree for discovery
+- see also: grep 'XXX\|FIXME\|TODO' * -r
+  - lib/AnyEvent/XMPP/Writer.pm: # XXX: removed authname, because it
+                                    ensures maximum connectivitiy
+long term?
+==========
+
+x Implement XEP-0082: XMPP Date and Time Profiles
+   - provide maybe _to functions for the old format,
+     it's still in use out there
+- make dns resolution async!
+- Maybe implement XEP-0146: Remote Controlling Clients
+x keep an eye on:
+   - TLS: implemented, just do some extensive testing WRT blocking,
+          i don't trust the current way the watchers are handled,
+          i'm in fear of deadlocks...

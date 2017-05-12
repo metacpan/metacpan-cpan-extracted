@@ -1,0 +1,26 @@
+script/update_template.sh and related .pl files
+(or update_template.cmd if you're running Windoze)
+take the three capital letter xs (template) files:
+
+    1. xs/TITERATOR.xs
+    2. xs/TLIST.xs
+    3. xs/TMAP.xs
+
+and create the following XS files:
+
+     1. stringiterator.xs
+     2. apeitemlistmap.xs
+     3. id3v2tagframelistmap.xs
+     4. id3v2tagframelistiterator.xs
+     5. apeitemlistmapiterator.xs
+     6. id3v2tagframelist.xs
+     7. oggfieldlistmapiterator.xs
+     8. id3v2tagframelistmapiterator.xs
+     9. bytevectoriterator.xs
+    10. oggfieldlistmap.xs
+
+So changes done to any of the 10 files should be done in the corresponding
+CAPITOL.xs (template) file, then run script/update_template.sh to recreate the xs files.
+
+Of course, the files can be updated individually by running the appropriate .pl files from
+script/update_template

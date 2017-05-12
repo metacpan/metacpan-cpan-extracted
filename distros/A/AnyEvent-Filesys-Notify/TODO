@@ -1,0 +1,14 @@
+Wishlist of things to add to this module:
+
+o Add flag to avoid recursing on fs scan (RT#104714)
+o Make Linux::Inotify2 flags an attribute that can be changed by user
+o Monitor individual files
+o Filter/exclued files in a dir
+o Change abs_path stuff
+o What happens if there is a change b/w ->new and loop()
+x Kqueue on BSD
+x Use Linux::Inotify2 on linux
+x Monitor multiple dirs
+x Rename Linux to Inotify2
+x Rename Mac to FSEvents
+x Rename FreeBSD to KQueue

@@ -1,0 +1,13 @@
+---
+files:
+  t/errno.t: ext/Errno/t/Errno.t
+dirs-recursive:
+  .: ext/Errno
+exclude-regexes:
+  - '^(?:\.?/)?META.yml$'
+  - '^(?:\.?/)?MANIFEST$'
+  - '^(?:\.?/)?SIGNATURE$'
+  - '^(?:\.?/)?README$'
+  - '^(?:\.?/)?d/'
+  - '^(?:\.?/)?t/errno\.t$'
+

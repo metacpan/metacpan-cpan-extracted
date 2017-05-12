@@ -1,0 +1,68 @@
+diff -ru Aiup/srcmglplot/mgl2/define.h Biup/srcmglplot/mgl2/define.h
+--- Aiup/srcmglplot/mgl2/define.h	2016-06-21 21:28:43.000000000 +0200
++++ Biup/srcmglplot/mgl2/define.h	2016-07-09 16:16:30.103964200 +0200
+@@ -155,7 +155,7 @@
+ #define M_PI	3.14159265358979323846  /* pi */
+ #endif
+ //-----------------------------------------------------------------------------
+-#ifdef WIN32
++#if defined(WIN32) && !defined(__CYGWIN__)
+ #define mglprintf    _snwprintf
+ #else
+ #define mglprintf    swprintf
+diff -ru Aiup/srcmglplot/src/addon.cpp Biup/srcmglplot/src/addon.cpp
+--- Aiup/srcmglplot/src/addon.cpp	2016-06-19 19:01:20.000000000 +0200
++++ Biup/srcmglplot/src/addon.cpp	2016-07-09 16:19:41.899141800 +0200
+@@ -19,7 +19,11 @@
+  ***************************************************************************/
+ #include <stdarg.h>
+ #ifdef WIN32
++#ifdef __CYGWIN__
++#include <unistd.h>
++#else
+ #include <direct.h>
++#endif
+ #else
+ #include <unistd.h>
+ #endif
+diff -ru Aiup/srcmglplot/src/exec.cpp Biup/srcmglplot/src/exec.cpp
+--- Aiup/srcmglplot/src/exec.cpp	2016-06-19 19:01:20.000000000 +0200
++++ Biup/srcmglplot/src/exec.cpp	2016-07-09 16:18:37.975750100 +0200
+@@ -19,7 +19,11 @@
+  ***************************************************************************/
+ #ifdef WIN32
+ #include <io.h>
++#ifdef __CYGWIN__
++#include <unistd.h>
++#else
+ #include <direct.h>
++#endif
+ #else
+ #include <unistd.h>
+ #endif
+diff -ru Aiup/srcmglplot/src/export.cpp Biup/srcmglplot/src/export.cpp
+--- Aiup/srcmglplot/src/export.cpp	2016-06-19 19:01:24.000000000 +0200
++++ Biup/srcmglplot/src/export.cpp	2016-07-09 16:02:33.829345100 +0200
+@@ -612,8 +612,10 @@
+ //-----------------------------------------------------------------------------
+ #ifdef WIN32
+ #include <io.h>
++#ifndef __CYGWIN__
+ #include <direct.h>
+ #endif
++#endif
+ void MGL_EXPORT mgl_show_image(HMGL gr, const char *viewer, int keep)
+ {
+ 	char fname[128], *cmd = new char [128];
+diff -ru Aiup/srcscintilla/win32/HanjaDic.cxx Biup/srcscintilla/win32/HanjaDic.cxx
+--- Aiup/srcscintilla/win32/HanjaDic.cxx	2016-05-24 14:56:28.000000000 +0200
++++ Biup/srcscintilla/win32/HanjaDic.cxx	2016-07-09 16:09:11.468105000 +0200
+@@ -7,7 +7,7 @@
+ // The License.txt file describes the conditions under which this software may be distributed.
+ 
+ #include <windows.h>
+-
++#include <wchar.h>
+ #include "UniConversion.h"
+ #include "HanjaDic.h"
+ 

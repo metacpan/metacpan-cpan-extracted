@@ -1,0 +1,6 @@
+name = "App-Sv"
+authors = ['Gelu Lupaş <gvl@cpan.org>']
+authority = "cpan:GVL"
+license = "artistic_2"
+readme_from = "lib/App/Sv.pm"
+abstract_from = "lib/App/Sv.pm"

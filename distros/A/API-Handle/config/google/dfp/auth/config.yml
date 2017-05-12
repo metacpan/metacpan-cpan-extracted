@@ -1,0 +1,6 @@
+---
+scope: https://www.google.com/apis/ads/publisher
+uri:
+    auth: https://accounts.google.com/o/oauth2/auth
+    token: https://accounts.google.com/o/oauth2/token
+    redirect: urn:ietf:wg:oauth:2.0:oob

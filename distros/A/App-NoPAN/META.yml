@@ -1,0 +1,35 @@
+---
+abstract: ~
+author:
+  - 'Kazuho Oku'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Slurp: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-NoPAN
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Archive::Tar: 0
+  CPAN::Inject: 0
+  HTML::LinkExtor: 0
+  LWP::Simple: 0
+  Path::Class: 0
+  Pod::Usage: 0
+  Scope::Guard: 0
+  URI::Escape: 0
+  perl: 5.8.0
+resources:
+  license: http://opensource.org/licenses/bsd-license.php
+version: 0.01

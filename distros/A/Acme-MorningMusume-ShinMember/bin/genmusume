@@ -1,0 +1,24 @@
+#!perl
+# genmusume - generate a morning musume!
+# Copyright (c) 2006 Jonathan Rockway <jrockway@cpan.org>
+
+use strict;
+use Acme::MorningMusume::ShinMember;
+use YAML;
+use encoding ':locale';
+
+
+my $musume = Acme::MorningMusume::ShinMember->new;
+
+print $musume->name_ja. " (". $musume->name_en. ")\n";
+print "Nickname: ". $musume->nick->[0]. "\n";
+print "Blood type: ". $musume->blood_type. "\n";
+print "Birthday: ". $musume->birthday. " (". $musume->age. ")\n";
+print "Hometown: ". $musume->hometown. "\n";
+print "Generation: ". $musume->class. "\n";
+print "Icons: \n";
+foreach my $icon (@{$musume->emoticon||()}){
+    print "    $icon\n";
+}
+
+

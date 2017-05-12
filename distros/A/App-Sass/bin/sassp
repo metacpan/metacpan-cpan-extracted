@@ -1,0 +1,77 @@
+#!/usr/bin/env perl
+use v5.10;
+use File::Slurp qw( read_file write_file );
+use Filesys::Notify::Simple;
+use Getopt::Long;
+use Path::Class qw( file );
+use Pod::Usage qw( pod2usage );
+use Text::Sass;
+
+# ABSTRACT: sass command-line tool
+
+my ($sass, %opts) = ( Text::Sass->new );
+GetOptions(\%opts, "--watch=s", "--update=s", "--help");
+die pod2usage if $opts{help} || !(keys %opts || @ARGV);
+
+if( $opts{watch} ) { watch( $opts{watch} ) }
+elsif( $opts{update} ) { update( $opts{update} ) }
+else { single( $ARGV[0], $ARGV[1] ) };
+
+sub single {
+    my ( $input, $output ) = @_;
+    my $output = $output // $input =~ s/\.scss$/\.css/r;
+    write_file $output, $sass->scss2css( scalar read_file $input );
+}
+
+sub watch {
+    my ($in, $out) = @_;
+    ($in, $out) = _split_dir( $in ) unless $out;
+    my $w = Filesys::Notify::Simple->new([ $in ]);
+    use Data::Dump;
+    while(1){
+        $w->wait( sub {
+            # Make sure it was a scss file that was modified
+            my $valid = 0;
+            $valid = $valid || $_->{path} ~~ /\.scss$/ for @_;
+
+            if( $valid ) {
+                print "Building css files...";
+                update( "$in:$out" );
+                print "done.\n";
+            }
+        });
+    }
+}
+
+sub update {
+    my ($in, $out) = @_;
+    ($in, $out) = _split_dir( $in ) unless $out;
+    for( glob "$in*.scss" ) {
+        single( $_, ($out . file( $_ )->basename) =~ s/\.scss$/\.css/r );
+    }
+}
+
+sub _split_dir {
+    my ($dir) = @_;
+    my @parts = split /:/, $dir;
+    push @parts, $dir if @parts < 2;
+    $_ =~ s{([^/])$}{$1/} for @parts; # make sure they end with /
+    return @parts;
+}
+
+# PODNAME: sassp
+
+__END__
+
+=head1 NAME
+
+sassp - command-line tool to compile scss files
+
+=head1 SYNOPSIS
+
+    sassp style.scss
+    sassp style.scss style-output.css
+    sassp --watch dir
+    sassp --watch dir:outputdir
+    sassp --update dir
+    sassp --update dir:outputdir

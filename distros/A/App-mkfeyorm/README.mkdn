@@ -1,0 +1,158 @@
+# NAME
+
+App::mkfeyorm - Make skeleton code with Fey::ORM
+
+# VERSION
+
+version 0.010
+
+# SYNOPSIS
+
+    use App::mkfeyorm;
+    
+
+    my $app = App::mkfeyorm->new(
+        output_path      => 'somewhere/lib',
+        schema           => 'Schema',
+        tables           => [qw(
+            MC::User
+            MC::Role
+            MC::UserRole
+            AE::Source
+            AE::Task
+            CM::Source
+            CM::Task
+        )],
+        namespace        => 'MedicalCoding',
+        table_namespace  => 'Model',
+    );
+    
+
+    $app->process;
+
+# DESCRIPTION
+
+This module generates [Fey::ORM](http://search.cpan.org/perldoc?Fey::ORM) based module on the fly.
+At least `schema` and `tables` attributes are needed.
+
+# ATTRIBUTES
+
+## schema
+
+Schema module name (required)
+
+    my $schema_module_name = $self->schema;
+    $self->set_schema($schema_module_name);
+
+## tables
+
+Table module name list (required)
+
+    my $table_module_names_ref = $self->tables;
+    $self->set_tables(\@table_module_names);
+    $self->set_tables(\%table_module_names);
+
+## output_path
+
+Output path for generated modules.
+Default output directory is `lib`.
+
+    my $output_path = $self->output_path;
+    $self->set_output_path($output_path);
+
+## namespace
+
+Namespace for schema and table module
+
+## table_namespace
+
+Namespace for table module
+
+## schema_namespace
+
+Namespace for schema module
+
+## schema_template
+
+Schema template string.
+If you want to use your own template file then use this attribute.
+
+## table_template
+
+Table template string.
+If you want to use your own template file then use this attribute.
+
+## cache
+
+Use cache feature or not. Default is false.
+It uses [Storable](http://search.cpan.org/perldoc?Storable) to save and load cache file.
+
+## template_params
+
+Hash reference for templating.
+Set this attribute if you want to use additional parameters
+in your own templates.
+
+# METHODS
+
+## process
+
+Generate the schema module & table module
+
+    my $app = App::mkfeyorm->new(
+        schema          => 'Schema',
+        tables          => {
+            User     => 'user',
+            Role     => 'role',
+            UserRole => 'user_role',
+        },
+        namespace       => 'Web::Blog',
+        table_namespace => 'Model',
+    );
+    $app->process;
+
+## process_schema
+
+Generate the schema module.
+
+    $app->process_schema;
+
+## process_table
+
+Generate the talbe module.
+
+    $app->process_table;
+
+## process_tables
+
+Generate the table module.
+
+    $app->process_tables;                  # generates all tables
+    $app->process_tables(qw/ User Role /); # generates User and Role tables
+
+## schema_module
+
+Get full name of schema module
+
+## table_modules
+
+Get full names of table modules
+
+## module_path
+
+Get module path from module names
+
+# SEE ALSO
+
+[Fey::ORM](http://search.cpan.org/perldoc?Fey::ORM)
+
+# AUTHOR
+
+Keedi Kim - 김도형 <keedi@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Keedi Kim.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

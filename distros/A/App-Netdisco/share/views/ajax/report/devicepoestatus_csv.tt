@@ -1,0 +1,19 @@
+[% USE CSV -%]
+[% CSV.dump([ 'Device' 'Model' 'Device Location' 'PoE Module' 'Power (W)'
+              'Supply' 'Capable Ports' 'Powered Ports' 'Disabled Ports'
+              'Errored Ports' 'Committed (W)' 'Delivering (W)' ]) %]
+
+[% FOREACH row IN results %]
+  [% mydlist = [] %]
+  [% mydevice = row.dns || row.name || row.ip %]
+  [% mydlist.push(mydevice) %]
+  [% FOREACH col IN [ row.model row.location row.module row.power row.status
+                      row.poe_capable_ports row.poe_powered_ports
+                      row.poe_disabled_ports row.poe_errored_ports
+                      row.poe_power_committed row.poe_power_delivering
+                      ] %]
+    [% mydlist.push(col) %]
+  [% END %]
+  [% CSV.dump(mydlist) %]
+
+[%END%]

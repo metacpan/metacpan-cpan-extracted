@@ -1,0 +1,156 @@
+NAME
+    Algorithm::FEC - Forward Error Correction using Vandermonde Matrices
+
+SYNOPSIS
+     use Algorithm::FEC;
+
+DESCRIPTION
+    This module is an interface to the fec library by Luigi Rizzo et al.,
+    see the file README.fec in the distribution for more details.
+
+    This library implements a simple ("encoded_blocks","data_blocks")
+    erasure code based on Vandermonde matrices. The encoder takes
+    "data_blocks" blocks of size "block_size" each, and is able to produce
+    up to "encoded_blocks" different encoded blocks, numbered from 0 to
+    "encoded_blocks-1", such that any subset of "data_blocks" members
+    permits reconstruction of the original data.
+
+    Allowed values for "data_blocks" and "encoded_blocks" must obey the
+    following equation:
+
+       data_blocks <= encoded_blocks <= MAXBLOCKS
+
+    Where "MAXBLOCKS=256" for the fast implementation and "MAXBLOCKS=65536"
+    for the slow implementation (the implementation is chosen
+    automatically).
+
+    $fec = new Algorithm::FEC $data_blocks, $encoded_blocks, $blocksize
+        Creates a new Algorithm::FEC object with the given parameters.
+
+    $fec->set_encode_blocks ([array_of_blocks])
+        Sets the data blocks used for the encoding. Each member of the array
+        can either be:
+
+        *   a string of size "blocksize" "exactly".
+
+            This is useful for small files (encoding entirely in memory).
+
+        *   a filehandle of a file of size "blocksize" "exactly".
+
+            This is useful when the amount of data is large and resides in
+            single files.
+
+        *   a reference to an array containing a filehandle and, optionally,
+            an offset into that file.
+
+            This is useful if the amount of data is large and resides in a
+            single file. Needless to say, all parts must not overlap and
+            must fit into the file.
+
+        If your data is not of the required size (i.e. a multiple of
+        "blocksize" bytes), then you must pad it (e.g. with zero bytes) on
+        encoding (and you should truncate it after decoding). Otherwise,
+        this library croaks.
+
+        Future versions might instead load the short segment into memory or
+        extend your scalar (this might enable nice tricks, like "$fec-"copy
+        (..., my $x)> :). Mail me if you want this to happen.
+
+        If called without arguments, the internal storage associated with
+        the blocks is freed again.
+
+    $block = $fec->encode ($block_index)
+        Creates a single encoded block of index "block_index", which must be
+        between 0 and "encoded_blocks-1" (inclusive). The blocks from 0 to
+        "data_blocks-1" are simply copies of the original data blocks.
+
+        The encoded block is returned as a perl scalar (so the blocks should
+        fit into memory. If this is a problem for you mail me and I'll make
+        it a file.
+
+    $fec->set_decode_blocks ([array_of_blocks], [array_of_indices])
+        Prepares to decode "data_blocks" of blocks (see "set_encode_blocks"
+        for the "array_of_blocks" parameter).
+
+        Since these are not usually the original data blocks, an array of
+        indices (ranging from 0 to "encoded_blocks-1") must be supplied as
+        the second arrayref.
+
+        Both arrays must have exactly "data_blocks" entries.
+
+        This method also reorders the blocks and index array in place (if
+        necessary) to reflect the order the blocks will have in the decoded
+        result.
+
+        The index array represents the decoded ordering, in that the n-th
+        entry in the indices array corresponds to the n-th data block of the
+        decoded result. The value stored in the n-th place in the array will
+        contain the index of the encoded data block.
+
+        Input blocks with indices less than "data_blocks" will be moved to
+        their final position (block k to position k), while the gaps between
+        them will be filled with check blocks. The decoding process will not
+        modify the already decoded data blocks, but will modify the check
+        blocks.
+
+        That is, if you call this function with "indices = [4,3,1]", with
+        "data_blocks = 3", then this array will be returned: "[0,2,1]". This
+        means that input block 0 corresponds to file block 0, input block 1
+        to file block 2 and input block 2 to data block 1.
+
+        You can just iterate over this array and write out the corresponding
+        data block (although this is inefficient):
+
+           for my $i (0 .. $#idx)
+              if ($idx[$i] != $i) # need we move this block?
+                 copy encoded block $idx[$i] to position $i
+              }
+           }
+
+        The "copy" method can be helpful here.
+
+        This method destroys the block array as set up by
+        "set_encode_blocks".
+
+    $fec->shuffle ([array_of_blocks], [array_of_indices])
+        The same same as "set_decode_blocks", with the exception that the
+        blocks are not actually set for decoding.
+
+        This method is not normally used, but if you want to move blocks
+        around after reordering and before decoding, then calling "shuffle"
+        followed by "set_decode_blocks" incurs lower overhead than calling
+        "set_decode_blocks" twice, as files are not mmapped etc.
+
+    $fec->decode
+        Decode the blocks set by a prior call to "set_decode_blocks".
+
+        This method destroys the block array as set up by
+        "set_decode_blocks".
+
+    $fec->copy ($srcblock, $dstblock)
+        Utility function that simply copies one block (specified like in
+        "set_encode_blocks") into another. This, btw., destroys the blocks
+        set by "set_*_blocks".
+
+COMPATIBILITY
+    The way this module works is compatible with the way freenet
+    (<http://freenet.sf.net>) encodes files. Comaptibility to other file
+    formats or networks is not known, please tell me if you find more
+    examples.
+
+SEE ALSO
+    Net::FCP. And the author, who might be happy to receive mail from any
+    user, just to see that this rather rarely-used module is actually being
+    used (except for freenet ;)
+
+BUGS
+     * too complicated.
+     * largely untested, please change this.
+     * file descriptors are not supported, but should be.
+     * utility functions for files should be provided.
+     * 16 bit version not tested
+
+AUTHOR
+     Marc Lehmann <schmorp@schmorp.de>
+     http://home.schmorp.de
+

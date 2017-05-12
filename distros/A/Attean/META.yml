@@ -1,0 +1,65 @@
+---
+abstract: 'A Semantic Web Framework'
+author:
+  - 'Gregory Todd Williams  C<< <gwilliams@cpan.org> >>'
+  - 'Gregory Todd Williams <gwilliams@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  HTTP::Message::PSGI: 0
+  Regexp::Common: 0
+  Test::Exception: 0
+  Test::LWP::UserAgent: 0
+  Test::More: 0.88
+  XML::Simple: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Attean
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Algorithm::Combinatorics: 0
+  Data::UUID: 0
+  DateTime::Format::W3CDTF: 0
+  File::Slurp: 0
+  HTTP::Negotiate: 0
+  IRI: 0.005
+  JSON: 0
+  LWP::UserAgent: 0
+  List::MoreUtils: 0
+  Math::Cartesian::Product: 1.008
+  Module::Pluggable: 0
+  Moo: 2.000002
+  MooX::Log::Any: 0
+  Role::Tiny: 2.000003
+  Set::Scalar: 0
+  Sub::Install: 0
+  Sub::Util: 1.4
+  Test::Modern: 0.012
+  Test::Moose: 0
+  Test::Roo: 0
+  Text::CSV: 0
+  Try::Tiny: 0
+  Type::Tiny: 0
+  URI::Escape: 1.36
+  URI::NamespaceMap: 0.12
+  XML::SAX: 0
+  namespace::clean: 0
+  perl: 5.14.0
+resources:
+  IRC: irc://irc.perl.org/#perlrdf
+  bugtracker: https://github.com/kasei/attean/issues
+  homepage: http://search.cpan.org/dist/Attean/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/kasei/attean/
+version: '0.017'

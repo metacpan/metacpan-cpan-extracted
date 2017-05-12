@@ -1,0 +1,171 @@
+#!perl
+
+our $DATE = '2016-10-21'; # DATE
+our $VERSION = '0.04'; # VERSION
+
+# FRAGMENT id=shcompgen-hint completer=1 for=emacs
+
+use 5.010001;
+use strict;
+use warnings;
+#use Log::Any::IfLOG '$log';
+
+use Complete::File qw(complete_file);
+use Complete::Unix qw(complete_user);
+use Complete::Util qw(complete_array_elem combine_answers);
+use Getopt::Long::Complete qw(GetOptionsWithCompletion);
+
+die "This script is for shell completion only\n"
+    unless $ENV{GETOPT_LONG_DUMP} || $ENV{COMP_LINE} || $ENV{COMMAND_LINE};
+
+my $noop = sub {};
+
+$Getopt::Long::Complete::opt_bundling = 0;
+
+# this is gathered from emacs manpage and should be updated from time to time.
+GetOptionsWithCompletion(
+    sub {
+        my %args  = @_;
+        my $type      = $args{type};
+        my $word      = $args{word};
+        if ($type eq 'arg') {
+            #$log->tracef("Completing arg");
+            return complete_file(word => $word);
+            # XXX +number
+            # XXX +line:column
+        } elsif ($type eq 'optval') {
+            my $ospec = $args{ospec};
+            my $opt   = $args{opt};
+            #$log->tracef("Completing optval (opt=$opt)");
+            if ($opt eq '--file' || $opt eq '--find-file' || $opt eq '--visit') {
+                return complete_file(word => $word);
+            } elsif ($opt eq '--user' || $opt eq '-u') {
+                return complete_user(word => $word);
+            } elsif ($opt eq '--terminal' || $opt eq '-t') {
+                return complete_file(word => $word);
+            } elsif ($opt eq '--load' || $opt eq '-l') {
+                return complete_file(word => $word);
+            } elsif ($opt eq '--script') {
+                return complete_file(word => $word);
+            } elsif ($opt eq '--insert') {
+                return complete_file(word => $word);
+            } elsif ($opt eq '--directory' || $opt eq '-L') {
+                return complete_user(word => $word, filter=>'d');
+            } elsif ($opt eq '--color') {
+                return complete_array_elem(word => $word, array=>[qw/auto never always ansi8/]);
+            }
+            # XXX funcall/f -> list of Lisp functions
+            # XXX name -> list of window names
+            # XXX font/fn -> list of font names
+            # XXX fg/bg/bd/... -> list of colors
+            # XXX display/d -> list of X display names (:0.0 only as default?)
+        }
+        return [];
+    },
+    'file|find-file|visit=s' => $noop,
+    'no-init-file|q' => $noop,
+    'no-site-file' => $noop,
+    'no-desktop' => $noop,
+    'quick|Q' => $noop,
+    'no-splash' => $noop,
+    'debug-init' => $noop,
+    'user|u=s' => $noop,
+    'terminal|t=s' => $noop,
+    'daemon' => $noop,
+    'version' => $noop,
+    'help' => $noop,
+
+    'funcall|f=s' => $noop,
+    'load|l=s' => $noop,
+    'eval|execute=s' => $noop,
+
+    'batch' => $noop,
+    'script=s' => $noop,
+    'insert=s' => $noop,
+    'kill' => $noop,
+    'directory|L=s' => $noop,
+
+    'name=s' => $noop,
+    'title|T=s' => $noop,
+    'reverse-video|r' => $noop, '-rv' => $noop,
+    'font=s' => $noop, '-fn=s' => $noop,
+    'xrm=s' => $noop,
+    'color=s' => $noop,
+    'border-width=i' => $noop, '-bw=i' => $noop,
+    'internal-border=i' => $noop, '-ib=i' => $noop,
+    'geometry|g=s' => $noop,
+    'line-spacing=i' => $noop, '-lsp=i' => $noop,
+    'vertical-scroll-bars' => $noop, '-vsb' => $noop,
+    'fullheight' => $noop, '-fh' => $noop,
+    'fullwidth' => $noop, '-fw' => $noop,
+    'maximized' => $noop, '-mm' => $noop,
+    'foreground-color=s' => $noop, '-fg' => $noop,
+    'background-color=s' => $noop, '-bg' => $noop,
+    'border-color=s' => $noop, '-bd' => $noop,
+    'cursor-color=s' => $noop, '-cs' => $noop,
+    'mouse-color=s' => $noop, '-ms' => $noop,
+    'no-bitmap-icon' => $noop, '-nbi' => $noop,
+    'iconic' => $noop,
+    'no-blinking-cursor' => $noop, '-nbc' => $noop,
+    'no-window-system' => $noop, '-nw' => $noop,
+    'basic-display|D' => $noop,
+);
+
+# ABSTRACT: Shell completer for emacs
+# PODNAME: _emacs
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+_emacs - Shell completer for emacs
+
+=head1 VERSION
+
+This document describes version 0.04 of _emacs (from Perl distribution App-ShellCompleter-emacs), released on 2016-10-21.
+
+=head1 SYNOPSIS
+
+To install, install this module and then in your bash (and/or bash startup
+file):
+
+ complete -C _emacs emacs
+
+or, you can use L<shcompgen> to do that for you automatically.
+
+Now L<emacs> has bash completion:
+
+ % emacs -n<tab>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ShellCompleter-emacs>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ShellCompleter-emacs>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ShellCompleter-emacs>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

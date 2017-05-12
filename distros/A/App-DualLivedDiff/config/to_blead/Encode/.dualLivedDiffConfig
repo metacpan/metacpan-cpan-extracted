@@ -1,0 +1,6 @@
+---
+dirs-recursive:
+  .: ext/Encode
+exclude-regexes:
+  - '^(?:\.?/)?META.yml$'
+  - '^(?:\.?/)?MANIFEST$'

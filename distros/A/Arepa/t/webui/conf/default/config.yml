@@ -1,0 +1,19 @@
+---
+repository:
+  path: t/webui/tmp/repository/
+  # remote_path: machine:/var/www/virtual/aptrepo/html/debian/
+  signature: unsigned   # Special value meaning the repo shouldn't be signed
+  # id: 12345678
+upload_queue:
+  path: t/webui/tmp/upload-queue
+package_db: t/webui/tmp/package.db
+web_ui:
+  public_url: http://localhost/cgi-bin/arepa/arepa.cgi
+  base_url: /
+  template_dir: /usr/share/arepa/templates
+  user_file: t/webui/conf/users.yml
+  gpg_homedir: ./t/webui/conf/gnupg-web
+  check_remote_repo: 1
+  session_db: t/webui/tmp/sessions.db
+dir:
+  build_logs: t/webui/tmp/build-logs

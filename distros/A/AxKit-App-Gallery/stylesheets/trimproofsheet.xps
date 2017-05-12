@@ -1,0 +1,83 @@
+<%
+
+# Copyright (c) 2003 Nik Clayton
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+# 
+# $Id: trimproofsheet.xps,v 1.1.1.1 2003/03/29 17:11:49 nik Exp $
+ 
+use Data::Page;
+
+my $cgi = Apache::Request->new($r);
+
+my $per_page = $r->dir_config('ImagesPerProofsheet');
+
+my $cur_page = $cgi->param('cur_page');
+$cur_page = 1 if ! defined $cur_page;
+$cur_page = 1 if $cur_page !~ /\d+/;
+
+my @images = findnodes('/proofsheet/images/image');
+
+my $page = Data::Page->new(scalar(@images), $per_page, $cur_page);
+
+# Remove all the images from @images that should not be on the current page
+@images = @images[$page->first() - 1 .. $page->last() - 1];
+
+my %included_images = ();
+
+foreach my $image (@images) {
+	next if ! defined $image;
+	$included_images{$image->string_value()}++;
+}
+
+# Only list the images we're allowed to process
+$t->{'image'}{testcode} = sub {
+	my $node = shift;
+	my $t = shift;
+
+	return 0 if ! exists $included_images{$node->string_value()};
+	
+	$t->{showtag} = 1;
+	return 1;
+};
+
+# Included information about the number of pages, and the current page
+$t->{'proofsheet'}{testcode} = sub {
+	my $node = shift;
+	my $t = shift;
+
+	$t->{postchildren} = '<pages>';
+	foreach ($page->first_page() .. $page->last_page()) {
+		$t->{postchildren} .= "<page number='$_'";
+		$t->{postchildren} .= ' current=\'yes\'' if $_ == $cur_page;
+		$t->{postchildren} .= '/>';
+	}
+	$t->{postchildren} .= '</pages>';
+
+	$t->{showtag} = 1;
+	return 1;
+};
+
+print apply_templates();
+
+%>

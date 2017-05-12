@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Audio-Ardour-Irc.t
+lib/Audio/Ardour/Irc.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,89 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - ars_perl_qualifier</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_perl_qualifier($ctrl, $qual)</CODE></H2>
+
+      This function returns a Hash that contains a processed
+      version of the qualifier structer (i.e. what is retured
+      by ars_LoadQualifier or what is encoded in the qualifier structure
+      that appears when you examine Filters and Active links via
+      the Perl extension). You can then walk the various
+      segments of the Hash and interpret the Qualifier.  <P>
+      Note that this is a fairly complex Hash and if all you want
+      to do is <I>see</I> the qualifier in a readable form (and
+      not interpret it) you might just want to call 
+      <A HREF="ars_Export.html">ars_Export</A> and extract the
+      readable qualifier from the return value of that routine.
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns a Hash
+          <DT><B>On failure</B><DD>
+              Returns <CODE>undef</CODE>.
+      </DL>
+
+      <P>Example:
+
+      <PRE>
+      ($parsed_qual = ars_perl_qualifier($c, $q)) || 
+            die $ars_errstr;
+      </PRE>
+
+      <P>Hash:
+
+the hash returned by ars_perl_qualifier has these members:<P>
+<CENTER><B>Note this is an incomplete description. We will complete the doc
+on this Hash in the future</B></CENTER>
+<PRE>
+ oper   = "and", "or", "not", "rel_op"
+ left   = qualifier             (only for and, or)
+ right  = qualifier             (only for and, or)
+ not    = qualifier             (only for not)
+ rel_op = rel_op                (only for rel_op)
+
+a rel_op is:
+ oper   = "==", "&gt;", "&gt;=", "&lt;", "&lt;=", "!=", "like", "in"
+ left   = FieldValueOrArithStruct 
+ right  = FieldValueOrArithStruct
+
+FieldValueOrArithStruct is:
+ fieldId        = integer 
+ value          = scalar value (integer, string, float, etc.) 
+ arith          = ArithOpStruct 
+ statHistory    = StatHistoryValue
+ valueSet       = list of scalar values 
+ variable       = integer       /* I think this is for passing
+                                   macro arguments */ 
+ queryValue     = QueryValueStruct 
+ queryCurrent   = integer
+
+StatHistoryValue is:
+ userOrTime     = integer (1 = user, 2 = time)
+ enumVal        = integer
+
+ArithOpStruct is (a binary tree basically):
+
+ arith          = operation ("+", "-", etc)
+ left           = ArithOpStruct
+ right          = ArithOpStruct
+ value          = scalar value
+ field          = 
+ process        = scalar value
+ function       = function
+ dde            = not supported
+</PRE>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 26th June 1997 by d.j.adams@soton.ac.uk<br>
+&#169; J.C.Murphy, J.W.Murphy 1997 arsperl@arsperl.org
+</address>
+</BODY>
+</HTML>

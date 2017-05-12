@@ -1,0 +1,12 @@
+SYNOPSIS
+
+     % ls | extract-date
+    
+     % ls | extract-date -m ID   ;# use Date::Extract::ID
+
+ENVIRONMENT
+
+ PERL_DATE_EXTRACT_MODULE => str
+
+    Set default for module.
+

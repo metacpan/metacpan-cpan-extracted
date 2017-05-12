@@ -1,0 +1,190 @@
+#!perl
+use strict;
+use warnings;
+use App::Wallflower;
+
+App::Wallflower->new_with_options( \@ARGV )->run;
+
+__END__
+
+=head1 NAME
+
+wallflower - Sorry I can't dance, I'm hanging on to my friend's purse
+
+=head1 SYNOPSIS
+
+ wallflower [options] [arguments]
+
+=head1 OPTIONS AND ARGUMENTS
+
+In typical L<Getopt::Long> fashion, all options can be abbreviated
+as long as the shorter version is unambiguous.
+
+=head2 Required options
+
+ --application <app>        Pathname of the .psgi Plack application file
+
+=head2 Other options
+
+ --destination <path>       Directory for saving generated files
+ --directory   <path>       (default: current dir), must exist
+
+ --environment <name>       Plack environment for running the application,
+                            usually development, deployment, or test
+                            (default: deployment)
+
+ --index       <filename>   Name of index file for URLs ending in /
+                            (default: index.html)
+
+ --follow                   Do/don't follow links in (X)HTML and CSS pages
+ --no-follow                (default = follow)
+
+ --filter                   Arguments are files containing lists of URLs
+ --files
+ -F
+
+ --url         <url>        URL of the production site. If the URL has
+                            a path component, the application will be
+                            "mounted" there.
+
+ --host        <hostname> * Process URLs with one of these hostnames in
+                            addition to hostame-less ones and ones using
+                            localhost (default is only hostame-less and
+                            localhost ones), can include * as a wildcard,
+                            like *.example.com. The hostname used in the
+                            --url option is automatically added to the list,
+
+ --errors                   Show URLs that returned a non-200 status code
+ --verbose                  Show URLs that returned a 200 status code
+ --quiet                    Disable both --errors and --verbose
+                            (which are enabled by default)
+
+ --include     <path>     * Library paths to add to @INC, delimited with your
+ --INC         <path>     * OS' path separator ($Config::Config{path_sep})
+
+ --help                     Print a short help summary and exit
+ --manual                   Print the full manual page and exit
+ --tutorial                 Print the tutorial and exit
+
+Options marked with * can be repeated as necessary.
+
+=head2 Arguments
+
+Arguments are either URLs or (if I<--filter> is specified) files containing
+URLs (one per line) or lines containing only spaces or where the first
+non-space is a #. If no arguments are present, / (or standard input if
+I<--filter> is specified) is used instead.
+
+=head1 DESCRIPTION
+
+B<wallflower> turns your L<Plack> application into a static (read-only)
+web site.
+
+While this isn't suitable for all applications, it makes sense for many
+uses. Most web sites are largely static. With no
+way for the site's users to update its content (via forms, comments, etc)
+the only changes to the web site come from sources that you control
+(including the database) and that are accessible in your development
+environment.
+
+Using a web framework like L<Dancer> (or any other) for a static web
+site is very useful, because it lets you use all the features of the
+framework on that site. Think of it as I<extreme caching>.
+
+A possible dataflow would be processing forms on your development server
+(maybe to update a local database), then I<publish> as static pages
+a I<subset> of all the URLs the application supports.
+
+Turning that application into a real static site (a set of pages
+to upload to a static web server) is just a matter of generating all
+possible URLs for the static site and saving the corresponding pages to files.
+
+B<wallflower> does just that. It reads a list of URLs, strips off
+any query strings, issues HTTP C<GET> requests for each in turn and
+saves the response body to a file with a name derived from the request
+pathinfo, under the directory specified by the B<--destination> option.
+
+Note that B<wallflower> is not meant for use as an offline browsing tool:
+among other things, it doesn't rewrite link URLs to match the pathnames of
+the saved pages.
+
+=head1 EXAMPLE
+
+The web site created by C<dancer -a mywebapp> is the perfect example.
+
+The complete list of URLs needed to view the site is:
+
+    /
+    /404.html
+    /500.html
+    /css/error.css
+    /css/style.css
+    /favicon.ico
+    /images/perldancer-bg.jpg
+    /images/perldancer.jpg
+    /javascripts/jquery.js
+
+Passing this list to B<wallflower> gives the following result:
+
+    $ wallflower -a bin/app.pl -d /tmp -F urls.txt
+    200 / => /tmp/output/index.html [5367]
+    200 /404.html => /tmp/output/404.html [499]
+    200 /500.html => /tmp/output/500.html [510]
+    200 /css/error.css => /tmp/output/css/error.css [1210]
+    200 /css/style.css => /tmp/output/css/style.css [2850]
+    404 /favicon.ico
+    404 /images/perldancer-bg.jpg
+    404 /images/perldancer.jpg
+    200 /javascripts/jquery.js => /tmp/output/javascripts/jquery.js [248235]
+
+Note that URLs with a path ending in a C</> are considered directories
+and have the default I<index> filename appended, and that wallflower will
+behave unpredictably if the site contains pages accessible through URLs
+ending both in F<foo> and F<foo/>. This is arguably a bug, but it's
+unclear where to fix it, or if it can be fixed at all. See
+L<Wallflower::Tutorial/URI SEMANTICS COMPARED TO DIRECTORY SEMANTICS> for
+background on this.
+
+Any URL returning a status other than C<200> will be logged,
+but not saved. URLs returning a C<301> status (moved) are followed.
+
+Only the path component is used to fetch the response, so URLs
+pointing to other sites will likely return a C<404> (or fetch the
+I<local> page if it exists in the application).
+
+=head1 ACKNOWLEDGEMENTS
+
+L<wallflower> started as a neat idea in a discussion between Marc
+Chantreux, Alexis Sukrieh, Franck Cuny and myself in the hallway of
+OSDC.fr (L<http://osdc.fr/>) 2010, after Alexis' talk about L<Dancer>.
+
+Because a good pun should never be wasted, a first version of the
+program has been included in L<Dancer> since version 1.3000_01.
+Since it wasn't maintained, it has been removed in version 1.3110,
+after the first release of L<App::Wallflower>.
+
+The idea for L<App::Wallflower> owes a lot to Vincent Pit who, while
+I was talking about L<wallflower> and L<Dancer> with Marc on IRC in
+January 2011, noted that this file generation scheme had
+nothing to do with L<Dancer> and much more with L<Plack>.
+
+L<wallflower> treats all L<Plack> applications equally, even if the
+first version of the program was targetting L<Dancer> only.
+
+=head1 SEE ALSO
+
+L<Wallflower::Tutorial>
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2010-2015 by Philippe Bruhat (BooK).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

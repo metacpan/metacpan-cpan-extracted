@@ -1,0 +1,27 @@
+---
+abstract: 'class for obtaining telescope information'
+author:
+  - 'Tim Jenness <tjenness@cpan.org>'
+  - 'Brad Cavanagh <bradc@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.3
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Astro-Telescope
+provides:
+  Astro::Telescope:
+    file: lib/Astro/Telescope.pm
+    version: 0.71
+requires:
+  Astro::PAL: 0.99
+resources:
+  homepage: http://github.com/timj/perl-Astro-Telescope/tree/master
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/timj/perl-Astro-Telescope.git
+version: 0.71

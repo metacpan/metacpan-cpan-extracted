@@ -1,0 +1,13 @@
+Changes
+lib/Acme/IEnumerable.pm
+Makefile.PL
+MANIFEST
+README
+t/00basic.t
+t/01simple.t
+t/02reverse.t
+t/98podsyn.t
+t/99podcov.t
+eg/example.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

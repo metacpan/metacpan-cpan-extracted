@@ -1,0 +1,14 @@
+Document: chart
+Title: Chart Manual
+Author: Kevin Ryde
+Abstract: This manual describes how to install and use Chart
+ stock and commodity charting.
+Section: Office
+
+Format: HTML
+Index: /usr/share/perl5/App/Chart/doc/chart.html
+Files: /usr/share/perl5/App/Chart/doc/chart.html
+
+Format: Info
+Index: /usr/share/info/chart.info.gz
+Files: /usr/share/info/chart.info*.gz /usr/share/info/chart-*.png

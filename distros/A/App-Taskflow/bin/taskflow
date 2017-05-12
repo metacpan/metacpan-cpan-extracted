@@ -1,0 +1,228 @@
+#! /usr/bin/env perl
+use Getopt::Lucid qw( :all );
+use File::Basename;
+use App::Taskflow;
+my $myname = basename($0);
+
+my @specs = (
+  Switch("help|h"),
+  Switch("version|v"),
+
+  Switch("sleep|s")->default(1),
+  Param("clear|c"),
+  Param("name|n")->default('$0'),
+  Param("folder|f")->default("./"),
+  Switch("daemonize|d"),
+  Param("config|x")->default("$myname.config"),
+  Param("cache|y")->default("$myname.cache"),
+  Param("logfile|l")->default("/var/tmp/$myname.log"),
+);
+my $opt = Getopt::Lucid->getopt( \@specs );
+usage()    if $opt->get_help;
+version()  if $opt->get_version;
+daemonize() if $opt->get_daemonize;
+
+if ($opt->get_clear){
+    open my $fh, '>', sprintf(".$myname.%s.clear", $opt->get_clear);
+    print $fh scalar localtime;
+    exit 0;
+}
+
+taskflow(
+        $opt->get_folder,
+        $opt->get_logfile,
+        $opt->get_config,
+        $opt->get_cache,
+        $opt->get_name,
+        $opt->get_sleep,
+        );
+1;
+__END__
+=head1 NAME
+
+taskflow - a light weight file based taskflow engine
+
+=head1 VERSION
+
+Version 1.0
+
+=cut
+
+=head1 SYNOPSIS
+
+=over 4
+
+=item * create a configuration file, synatx defined below - default
+name will be `taskflow.config`
+
+=item * run `taskflow` 
+
+=back
+
+=head1 DESCRIPTION
+
+`taskflow` is a tiny workflow engine. It could be run as a normal
+process, as a background process or as a daemon.
+
+It automates many routine tasks such as moving and deleting files,
+sending emails if some new files created or other tasks.
+
+Files will be chosen by patterns and these patterns can be written in a
+configuration file. For each file which is mached by a pattern, a new
+process will be started.
+
+If the process produces any output, it will be saved in a file with
+`out` ending. Additionaly there is a file with ending `err` for error
+message of started process.
+
+The information about each processed file will be stored in a binary file
+named `taskflow.cach`. Such a file will not be processed again, only if
+
+=over 4
+
+=item * the modified-time of the file changes (you edit or touch the file)
+
+=item * the rule is cleaned up
+
+=back    
+
+A rule can be cleaned up with:
+
+     taskflow -c rulename
+
+     or
+
+     taskflow --cache rulename
+
+This command creates a file named `.taskflow.rulename.clear`. The next
+running `taskflow` will clear corresponding entries in `taskflow.cache`.
+It causes that the rule will be run again.
+
+If you delete the `taskflow.cache` file, all rules will be run again.
+
+If `taskflow` crashes, you find the name of rule and file which causes
+such crashes in `<filename>.<rulename>.pid`. These pid files will be
+deleted, if you restart `taskflow`.
+
+If a rule results in an error and a `<filename>.<rulename>.err` is
+created, the file is not processed again according to the rule, unless
+the error file is deleted.
+
+If a file is edited or touched and the rule runs again, the
+`<filename>.<rulename>.out` will be overwritten.
+
+Unless otherwise specified each file is processed 1s after it is last
+modified. It is possible that a different process is still writing the
+file but it is pausing more than 1s between writes (for example the file
+is being downloaded via a slow connection). In this case it is best to
+download the file with a different name than the name used for the
+patterm and rename the file to its proper name after the write of the
+file is completed. This must be handled outside of taskflow. taskflow
+has no way of knowing when a file is completed or not.
+
+Any change to `taskflow.config` file causes that it is realaoded
+automatically by running `taskflow`.
+
+=head1 taskflow options
+
+    -f, --folder    <path>       processing and monitoring directory
+    -s, --sleep     <seconds>    the time interval between checks for new files
+    -n, --name      <name>       the current filename, defaults to `$0`
+    -x, --config    <path>       name of config file ( default:  taskflow.config)
+    -y, --cache     <path>       name of cache file to use (default: taskflow.cache)
+    -l, --logfile   <path>       name of logfile (default: /var/tmp/taskflow.log)
+    -d, --daemonize              daemonizes `taskflow`
+    -c, --clear     <rulename>   clears a rule without starting the `taskflow`
+
+    -h, --help                   display this documentation
+    -v, --version                display current version
+
+=head1 `taskflow.config` syntax
+
+`taskflow.config` consists of a series of rules with the following syntax
+
+    rulename: pattern [dt]: command
+
+here:
+
+=over 4
+
+=item * `rulename`: name of the rule (no space)
+
+=item * `pattern`: pattern of monitoring files
+
+=item * `dt`: time interval (default:1 sec). Only files newer than `dt`
+seconds will be considered, time units are as expected (see also
+examples):
+
+    s = seconds, m = minutes, h = hours, d = days, w = weeks
+
+=item * `command`: command to execute matching files (see `pattern`),
+that are created more than `dt` seconds ago and not processed already.
+
+`&` executes command in background.In case of missing `&`,  it blocks the process
+until its completion. 
+
+`$0` refers to name of matching file.
+
+`\` used for command continuation for more than one line
+
+`#` at the start of a line marks that line as comment and ignored
+
+=back      
+
+
+=head2 Examples of rules
+
+=over 4
+
+=item * Delete all `*.log` files older than one day
+
+    delete_old_logs: *.log [1d]: rm $0
+
+=item * Move all `*.txt` files older than one hour to other directory
+
+    move_old_txt: *.txt [1h]: mv $0 otherfolder/$0
+
+=item * Email me when when a new `*.doc` file is created
+
+    email_me_on_new_doc: *.doc: mail -s 'new file: $0' me@example.com < /dev/null
+
+=item * Process new `*.dat` files using a Perl script
+
+    process_dat: *.dat: perl process.pl $0
+
+=item * Crate a finite state machine for each `*.src` file
+
+    rule1: *.src [1s]: echo > $0.state.1
+    rule2: *.state.1 [1s]: mv $0 `expr "$0" : '\(.*\).1'`.2
+    rule3: *.state.2 [1s]: mv $0 `expr "$0" : '\(.*\).2'`.3
+    rule4: *.state.3 [1s]: rm $0
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+ 
+Ideas for this script are borrowed from a Python script written by
+'Massimo Di Pierro'.
+
+=head1 SEE ALSO
+
+There are similar solutions in CPAN for managing tasks or workflows. But
+most of them are heavy and need more sophisticated configuration.
+
+Some of the other modules:
+
+L<Workflow>,  L<Helios>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 Farhad Fouladi.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

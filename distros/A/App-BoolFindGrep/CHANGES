@@ -1,0 +1,245 @@
+==================================================
+Changes from 2014-07-02 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.06 at 2015-07-02 03:10:30 +0000
+-----------------------------------------
+
+  Change: 93cc9715b1a272c3c1f3e522e9b75ce05253e1c4
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-07-02 00:10:14 +0000
+
+    * v0.06 
+
+  Change: a9aaa945d6cf35af56d764f379a5d912625b8bd0
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-07-02 00:09:55 +0000
+
+    * app-boolfindgrep.t: fixing glob test 
+
+  Change: 65eaa30a2ad6ffa71d9bb20eaef6b9040386fd3f
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-07-01 23:35:15 +0000
+
+    * add new feature: --files-with-matches 
+
+  Change: 1375ec04834f18350dcf08cdc6629297fffceee4
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-07-01 23:04:50 +0000
+
+    * Find.pm: fixing glob regexps 
+
+  Change: 598b03a210e6d87b38724ac565f6b88790cce3b3
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-07-01 22:06:42 +0000
+
+    * bin/bfg: input now respect locale 
+
+  Change: 85cc0928de45f5169b9e37fba93e672b5c3575fc
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-07-01 22:01:39 +0000
+
+    * bin/bfg: output now respect locale 
+
+  Change: 07313c80eecda89daaaebe5de9e29d2f605db00d
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-05-26 17:25:28 +0000
+
+    Merge tag 'v0.04'
+
+    v0.04 
+
+-----------------------------------------
+version 0.04 at 2015-05-26 19:12:16 +0000
+-----------------------------------------
+
+  Change: 50d7a4ec6dc2defec2b7cc497da196f5a5f562f6
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-05-26 16:12:16 +0000
+
+    v0.04 
+
+  Change: 36148144f1c8f6abc78b3d5cd37d3ee1272e8adf
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-05-26 16:11:49 +0000
+
+    * README 
+
+  Change: a7772218918efbf2469b9d149ab9f4f2140eab29
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-05-26 15:43:16 +0000
+
+    * app-boolfindgrep.t: fix IO::File declaration 
+
+  Change: f7983ca9ee6c7bfb797b6ce49f9d1627149a7ab4
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-05-26 10:09:14 +0000
+
+    * v0.04 
+
+  Change: ffa2dbcb6a5af791333b783db69addb62a2d0555
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-05-26 10:06:14 +0000
+
+    * improving output 
+
+  Change: 8fb050563ba6ce86a0b8f52e6149bff6e4ac4995
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-05-26 00:56:52 +0000
+
+    * improving commanline argument parser 
+
+  Change: 048510f05fd74b876e85153bf1b4ca3988095442
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-05-26 00:17:51 +0000
+
+    * add option: --glob-regexp 
+
+  Change: 1e8a5daf35a711ceb8e0232df2b44ede0e560533
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-05-25 23:06:06 +0000
+
+    * add t/app-boolfindgrep.t 
+
+  Change: 3eabd2aa86d49a7ccca37ffbeba18850f4c1ddb8
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-05-25 17:31:17 +0000
+
+    * Find.pm: fix glob find_type 
+
+  Change: 7c7a89a0281557aa2282ea6a185d90f8bdecb744
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-05-17 23:31:12 +0000
+
+    * bin/bfg: autodie --:all 
+
+  Change: ba40f50731912dc7f21153bebc4c6402748d6fcf
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-05-17 23:14:47 +0000
+
+    * bin/bfg: change --slash-as-delim short option 
+
+  Change: 1f523ba4fdfcf1edc8be31a35f1d0bfe8b580de5
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-05-17 23:08:45 +0000
+
+    * bin/bfg: fix pod shell sample 
+
+-----------------------------------------
+version 0.03 at 2015-01-28 13:06:35 +0000
+-----------------------------------------
+
+  Change: ca72276d524f952703485c6cd2a59419833878c4
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-28 11:06:35 +0000
+
+    v0.03 
+
+  Change: 8101b8464e1d114617ffcd38684d6a87c8db8179
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-28 11:04:21 +0000
+
+    * README: update 
+
+  Change: 07d5907c231c0b136ee7ec450c7daf1d91219fa1
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-28 10:34:21 +0000
+
+    * OPERATORS now are case insensitive 
+
+  Change: f88cb8cfbb7c92e121c11d57133ae26ff9a76efb
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-28 09:51:22 +0000
+
+    * add --slash-as-delim; improve documentation 
+
+-----------------------------------------
+version 0.02 at 2015-01-18 14:55:20 +0000
+-----------------------------------------
+
+  Change: a94a97db522934b3c65ac20d974910baccc63b9c
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-18 12:55:20 +0000
+
+    v0.02 
+
+  Change: 178ab4b740bb9c1f19b7a90f1ec90b9ff264097b
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-18 12:54:21 +0000
+
+    * v0.02 
+
+  Change: 7603b6dafcd78633c353ae86e0bc7ca668932ceb
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-18 12:51:20 +0000
+
+    * dist.ini: v0.02 
+
+  Change: 6da84b347eb450805e93e187437f2674a7a5b625
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-18 11:52:12 +0000
+
+    * add glob support to '--find-type,-t' 
+
+  Change: f2a7f0231354674ef24a6720731d637ef358ab76
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-18 10:44:27 +0000
+
+    * Bool.pm: fix 'local $EVAL_ERROR' 
+
+  Change: bd1a73573d83ff655a61f8fdf4f83fedbb4c9e53
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-17 23:34:20 +0000
+
+    * add explicit 'use IO::File;' 
+
+  Change: e94fd87921fbf0dafc74b04e498cd46d2d39b50c
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-17 21:09:22 +0000
+
+    * add new option '--directory, -D' 
+
+  Change: a3ab674c9545cb85ab06eefdbcfc84758bf4decb
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-17 20:10:34 +0000
+
+    * CLI.pm: fix --files-from bug 
+
+  Change: f808bb3b0fc0df36595d4722d8df6c3fea12946b
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-17 18:14:18 +0000
+
+    * bin/bfg: add examples 
+
+  Change: 0e685929f2e3a98af368439147b781f0c1f0112c
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-15 15:25:03 +0000
+
+    * bin/bfg: add --version 
+
+  Change: ce03dc6e2fe5c67ad902634c0641ff9397988962
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-15 15:10:35 +0000
+
+    * bin/bfg: '--find-ignore-case,-I' now is a flag 
+
+-----------------------------------------
+version 0.01 at 2015-01-15 03:49:01 +0000
+-----------------------------------------
+
+  Change: 6056cb612f8a83afe12d72d3e65a18d016e39ea9
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-15 01:49:01 +0000
+
+    v0.01 
+
+  Change: 6cf437e35c663fb9bd7df2f68536c872ce5581a4
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2015-01-15 01:47:52 +0000
+
+    * Initial commit 
+
+================
+End of releases.
+================

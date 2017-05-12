@@ -1,0 +1,34 @@
+Arepa
+=====
+
+Arepa (Apt REPository Assistant) is a suite of tools to manage a Debian
+package repository. It consists of command-line tools and a web interface.
+
+Dependencies
+------------
+
+You need reprepro (3.9 or higher), sudo and sbuild installed for Arepa to
+work.
+
+You must create a user "arepa-master" in a group "arepa" and give the user
+permissions to run sbuild (typically, run "sudo adduser arepa-admin sbuild").
+
+Configuration
+-------------
+
+The main configuration file is /etc/arepa/config.yml. There is a configuration
+sample for it in config.yml-sample. Similarly, you have to create the user file
+/etc/arepa/users.yml from the example users.yml-sample.
+
+Once you have a proper configuration in /etc/arepa/config.yml, you must also
+create several files and directories (typically under /var/arepa). You can
+execute the given script "install_arepa.pl" as root and it will create them for
+you.
+
+When that's ready, read the POD documentation for the Arepa module
+(lib/Arepa.pm) and follow the steps.
+
+To configure the web interface, you'll have to make web/cgi/arepa.cgi
+available somewhere (as well as the CSS) and configure /etc/arepa/config.yml
+appropriately (there's a sample config file named config.yml-sample). Make sure
+you make www-data, or whatever Apache runs as, member of the group "arepa".

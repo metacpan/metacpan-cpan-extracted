@@ -1,0 +1,10 @@
+0.9.5 Mon May  8 2017 Pavel Shaydo <zwon@cpan.org>
+    - Upgrade to librdkafka v0.9.5
+
+0.9.3 Fri Feb  3 2017 Pavel Shaydo <zwon@cpan.org>
+    - Add dependency on IO::Socket::SSL
+    - Upgrade to librdkafka v0.9.3
+
+0.9.1 Fri Oct 14 2016 Pavel Shaydo <zwon@cpan.org>
+    - First version, released on an unsuspecting world.
+

@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual - ars_SetActiveLink</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_SetActiveLink(ctrl, name, activeLinkHash)</CODE></H2>
+
+      This function modifies an existing active link. You must first
+      populate the <CODE>activeLinkHash</CODE> before calling this routine.
+      <P><CODE>name</CODE> is the name of the active link.
+      <P><CODE>activeLinkHash</CODE> is a partially assigned
+      <A HREF="ds_al.html">Active Link Attributes</a> hash. 
+
+      <P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns 1
+          <DT><B>On failure</B><DD>
+              Returns 0
+      </DL>
+
+      <P>Example:
+
+      <P><BLOCKQUOTE>
+      <I> This example changes the name and execution mask of an existing 
+      active link. </I></BLOCKQUOTE>
+
+      <PRE>
+      ($al = ars_GetActiveLink($c, "TEST:ActiveLink")) ||
+	    die $ars_errstr;
+
+      ars_SetActiveLink( $c, $al->{name}, {
+        name        => $al->{name} . "(renamed)",
+        executeMask => 1 + 16,    # button, display
+      } ) || die $ars_errstr;
+      </PRE>
+
+<P>
+<I>This function was introduced in version 1.90 of ARSperl</I>
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

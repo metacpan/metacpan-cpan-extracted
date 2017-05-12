@@ -1,0 +1,16 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/AnyEvent/WebService/Notifo.pm
+t/00-compile.t
+t/release-distmeta.t
+t/release-no-tabs.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+weaver.ini

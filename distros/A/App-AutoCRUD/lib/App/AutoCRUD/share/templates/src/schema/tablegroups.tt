@@ -1,0 +1,57 @@
+[% WRAPPER head %]
+<style>
+  .groupname  { width: 27%; font-weight: bold; color: navy; font-size: 120%;
+                vertical-align: top }
+  .descr      { width: 60%; font-style: italic; font-size: 90%;
+                vertical-align: top }
+  .link_descr { float: right }
+</style>
+
+<script>
+  function setup() {  
+      new GvaScript.TreeNavigator(
+         'TN_tree', 
+         {selectFirstNode: true,
+          tabIndex: 0}
+      );
+  }
+  window.onload = setup;
+  function followLink(event) {
+    var label = event.controller.label(event.target);
+    if (label && label.tagName == "A") {
+      label.focus();
+      return Event.stopNone;
+    }
+  }
+</script>
+
+
+[% END; # WRAPPER head %]
+
+[%# ---------- start body ---------- %]
+
+<a href="perl_code" class="link_descr">Perl source code</a>
+<h1>List of tables</h1>
+
+<div id="TN_tree" onPing="followLink">
+
+[% FOREACH group IN data;
+   SET node_status = group.node or (loop.first ? "open" : "closed") %]
+<div class="TN_node[% " TN_closed" IF node_status == "closed" %]">
+  <span class="TN_label groupname">[% group.name %]</span>
+  <span class="descr">[% group.descr %]</span>
+  <div class="TN_content">
+    [% FOREACH table IN group.tables %]
+      [% SET table_name = table.TABLE_NAME %]
+      <div class="TN_leaf">
+        <a href="../table/[% table_name %]/descr" class="link_descr">descr</a>
+        <a href="../table/[% table_name %]/search"  class="TN_label"
+           title="search this table">
+          [%~ table_name ~%]
+        </a>
+        <span class="after_label">[% table.descr %]</span>
+      </div>
+    [% END; # FOREACH table  %]
+  </div>
+</div>
+[% END; # FOREACH group  %]

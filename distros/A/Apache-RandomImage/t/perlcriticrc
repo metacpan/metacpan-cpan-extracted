@@ -1,0 +1,17 @@
+#------------------------------------------------------------------------------
+
+severity = 3
+
+#------------------------------------------------------------------------------
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|DESCRIPTION|SYNOPSIS|AUTHOR|COPYRIGHT
+script_sections = NAME|DESCRIPTION|SYNOPSIS|AUTHOR|COPYRIGHT
+
+[-Miscellanea::RequireRcsKeywords]
+
+[ControlStructures::ProhibitPostfixControls]
+allow = if unless
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = t/perltidy.conf

@@ -1,0 +1,6 @@
+#!perl
+
+use strict; use warnings;
+use App::calendr;
+
+App::calendr->new_with_options->run;

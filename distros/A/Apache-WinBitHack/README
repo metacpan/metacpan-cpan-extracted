@@ -1,0 +1,102 @@
+NAME
+    Apache::WinBitHack - An Apache module to emulate XBitHack on Win32
+
+SYNOPSIS
+    In Apache's httpd.conf:
+
+       PerlModule Apache::WinBitHack
+
+       <Directory "/Apache/htdocs/some_dir">
+          SetHandler perl-script
+          PerlFixupHandler Apache::WinBitHack
+          XBitHack Full
+          Options MultiViews Indexes Includes
+       </Directory>
+
+DESCRIPTION
+    Apache contains a very useful directive 'XBitHack', whereby a file that
+    has the user-execute bit set will be treated as a server-parsed html
+    document. As well, the group-execute bit can be used to set the
+    Last-modified time of the returned file to be the last modified time of
+    the file, which is useful in determining if a document is to be cached
+    or not. On Win32 the directive works in principle, but in an
+    inconvenient fashion - the execute bit is set on Win32 by the file
+    extension, which means that documents that are to take advantage of
+    'XBitHack' must have an extension like 'exe' or 'bat'.
+
+    This module emulates 'XBitHack' on Win32 by, rather than using the user
+    and group execute bits, using instead the attributes of the file to
+    determine if the file is to be server-parsed by mod_include. Attributes
+    of a file on Win32, which you can see by running
+
+        C:\> attrib file_name
+
+    include 'archive', 'hidden', 'read-only', and 'system'. Normal user
+    files have just the 'archive' attribute set, which some back-up programs
+    use to determine if the file should be included in the next incremental
+    backup (most backup programs now instead use the last-modified-time of
+    the file for this purpose). By setting certain attributes of the file
+    and specifying directives as in the SYNOPSIS, particularly the
+    'Includes' option, 'XBitHack' can be emulated in the following ways.
+
+  XBitHack Off
+
+    With this directive, no server-side parsing of the file will be
+    performed.
+
+  XBitHack On
+
+    This directive emulates setting the user-execute bit. With this
+    directive, a file will parsed by mod_include if the 'archive' attribute
+    is unset, which you can do by
+
+       C:\> attrib -a file_name
+
+    Note that when a user's file is first created or when it is edited the
+    'archive' attribute will normally be set (and all others unset), so you
+    must intentionally unset the 'archive' attribute to enable
+    server-parsing of the file.
+
+  XBitHack Full
+
+    This directive emulates the action of also setting the group-execute
+    bit. With this directive, as with 'XBitHack On', a file will be parsed
+    by mod_include if the 'archive' attribute is unset. As well, a
+    Last-modified header will be sent, equal to the last-modified time of
+    the file, *unless* the 'read-only' attribute of the file is set, which
+    you can do by
+
+       C:\> attrib +r file_name
+
+SEE ALSO
+    the mod_perl manpage
+
+    The description of the 'XBitHack' directive in the Apache manual
+    (http://httpd.apache.org/docs/mod/directives.html).
+
+AUTHORS
+    Randy Kobes <randy@modperlcookbook.org>
+
+    Geoffrey Young <geoff@modperlcookbook.org>
+
+    Paul Lindner <paul@modperlcookbook.org>
+
+COPYRIGHT
+    Copyright (c) 2001, Geoffrey Young, Paul Lindner, Randy Kobes. All
+    rights reserved.
+
+    This module is free software. It may be used, redistributed and/or
+    modified under the same terms as Perl itself.
+
+PPM
+    A Win32 ppm package of this module, suitable for use with
+    ActivePerl (build 6xx), is available for install via
+
+    ppm install http://www.modperlcookbook.org/download/Apache-WinBitHack.ppd
+
+HISTORY
+    This code is derived from the *Cookbook::WinBitHack* module, available
+    as part of "The mod_perl Developer's Cookbook".
+
+    For more information, visit http://www.modperlcookbook.org/
+

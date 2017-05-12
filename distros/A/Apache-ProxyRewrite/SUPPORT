@@ -1,0 +1,12 @@
+$Id: SUPPORT,v 1.1 2001/01/02 23:10:47 cgilmore Exp $
+
+=head1 SUPPORT
+
+=over 3
+
+=item MAIL LIST
+
+For comments, questions, bug-reports, announcements, etc., send
+mail to the I<modperl@apache.org> mailing list.
+
+=back

@@ -1,0 +1,38 @@
+Revision history for App-a2p
+
+1.009     2015-07-08 23:05:11+02:00 Europe/Amsterdam
+          Generate path to a2p more portably
+
+1.008     2015-07-05 23:13:34+02:00 Europe/Amsterdam
+          Generate path to a2p portably
+          Use size_t instead of int for string lengths
+
+1.007     2014-05-29 16:35:56+02:00 Europe/Amsterdam
+          Pointers set but then (immediately or very shortly) overwritten [Jarko Hietaniemi]
+
+1.006     2014-03-13 17:13:34CET+0100 Europe/Amsterdam
+          Use tempfiles instead of pipes for portability in tests
+          Add a makefile snipplet for MSVC
+
+1.005     2013-12-15 22:34:51 Europe/Amsterdam
+          Fix prereqs
+
+1.004     2013-12-15 22:28:29 Europe/Amsterdam
+          Run generated perl code and compare with expected
+          Fix double definition of coeff
+
+1.003     2013-12-13 12:25:56 Europe/Amsterdam
+          Fix type in 5.12 compatibility code
+
+1.002     2013-12-13 00:59:38 Europe/Amsterdam
+          Support isWORDCHAR on <5.14
+          Give clearer errors on open2 failure
+
+1.001     2013-12-05 13:53:53 Europe/Amsterdam
+          Make a2p compile on 5.16 and lower again
+          Manify to section 1
+          Add one sanity test
+
+1.000     2013-12-04 00:39:41 Europe/Amsterdam
+          Released a2p as in blead circa 5.19.6
+          

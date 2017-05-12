@@ -1,0 +1,67 @@
+{
+   "abstract" : "A pluggable Perl web service to preprocess web requests. Plugins can add geo, timezone and browser metadata, and throttle request rate.",
+   "author" : [
+      "Clinton Gormley <drtech@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Cerberus",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cache::Memcached::Fast" : "0",
+            "Carp" : "0",
+            "DateTime" : "0",
+            "DateTime::TimeZone::Tzfile" : "0",
+            "File::Spec::Functions" : "0",
+            "FindBin" : "0",
+            "Geo::IP" : "0",
+            "HTTP::BrowserDetect" : "0",
+            "JSON" : "0",
+            "List::Util" : "0",
+            "Net::IP::Match::Regexp" : "0",
+            "Plack::Request" : "0",
+            "Plack::Runner" : "0",
+            "Pod::Usage" : "0",
+            "Time::OlsonTZ::Data" : "0",
+            "YAML" : "0",
+            "lib" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/clintongormley/App-Cerberus/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/clintongormley/App-Cerberus.git",
+         "web" : "https://github.com/clintongormley/App-Cerberus"
+      }
+   },
+   "version" : "0.11"
+}
+

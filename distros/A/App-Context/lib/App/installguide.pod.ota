@@ -1,0 +1,143 @@
+#!perl -w
+# run this document through perl to check its syntax
+use Pod::Checker;
+podchecker(\*DATA);
+__END__
+
+=head1 NAME
+
+Business::Travel::OTA::installguide - Installation Guide for the Business-Travel-OTA Distribution
+
+=head1 INTRODUCTION
+
+This is the Installation Guide to the Business-Travel-OTA distribution
+the Microsoft Windows platform.
+You can find out more background to the project on the web.
+
+  http://search.cpan.org/~spadkins/Business-Travel-OTA/lib/Business/Travel/OTA.pm
+  http://search.cpan.org/~spadkins/Business-Travel-OTA
+  http://sourceforge.net/projects/ota-tools
+  http://www.opentravel.org 
+
+This will describe how to get
+up and running (for demonstration or development purposes) on a Unix/Linux system.
+
+These instructions assume that your system is connected to the Internet.
+
+=head1 SET UP THE ENVIRONMENT
+
+You could just install all of the software into "/usr/local", or "/usr", or
+wherever your Perl is installed.  In that case, skip this section.
+
+If however, you are setting up a development environment, or
+if you wish to install multiple versions of the App software,
+it is advisable you choose an approach as follows.
+
+=head2 Set Up a Development Environment
+
+Choose a directory that will be the base of all App
+environments (i.e. /usr/mycompany, any base directory will do).
+
+  /usr/mycompany
+
+Create a subdirectory for each separate developer/tester.
+You may wish to choose groups rather than users (i.e. "devel", "qagroup").
+(In this case, you would have several developers working in
+one directory tree.  This may cause more conflicts between
+developers during development, but the
+conflicts get worked out more quickly than when developers
+work in separate directories.)
+
+  /usr/mycompany/spadkins
+  /usr/mycompany/joe
+  /usr/mycompany/marysue
+  /usr/mycompany/devel
+  /usr/mycompany/qagroup
+
+These are independent development "sandboxes".
+Later, when we start making releases of the software (which includes the App
+framework), we will create other environment directories like this.
+
+  /usr/mycompany/0.5.0
+  /usr/mycompany/0.5.1
+  /usr/mycompany/1.0.0
+  /usr/mycompany/2.17.10
+
+All of these directories will have their own self-contained installation
+of software.  Named versions (i.e. "test", "qa", "prod") are simply
+symbolic links to the particular version to which they currently apply.
+
+In your chosen development directory, you should set the permissions
+to allow access to be granted by group.
+
+  chgrp -R spadkins /usr/mycompany/spadkins  # all files and dirs owned by group
+  chmod 775 `find /usr/mycompany/spadkins -type d -print` # dirs writable by the group
+  chmod g+s `find /usr/mycompany/spadkins -type d -print` # setgid bit keeps files in the group
+
+Within each directory, you should create a default set of subdirectories.
+
+  cd /usr/mycompany/spadkins
+  mkdir src lib bin man etc include src/tar
+
+You should set up in your ".profile" some appropriate variables.
+
+  PREFIX=/usr/mycompany/spadkins; export PREFIX
+  PATH=$PREFIX/bin:$PATH; export PATH
+  LD_LIBRARY_PATH=$PREFIX/lib:$LD_LIBRARY_PATH; export LD_LIBRARY_PATH
+  LIBPATH=$PREFIX/lib:$LIBPATH; export LIBPATH  # for AIX? (instead of LD_LIBRARY_PATH)
+  MANPATH=$PREFIX/man:$MANPATH; export MANPATH
+
+Note: If no initial MANPATH was set, setting the MANPATH this way
+could inhibit the "man" command
+from finding all of the standard "man" pages.  You may need to create
+an initial MANPATH something like this and then add the $PREFIX/man
+directory to it.
+
+  MANPATH=`find /usr /opt /man -type d -name man -print 2> /dev/null`
+  MANPATH=`echo $MANPATH | sed 's/ /:/g'`
+  export MANPATH
+
+Note: It may be similar for LD_LIBRARY_PATH, and you may need to set an
+initial LD_LIBRARY_PATH something like this.
+
+  LD_LIBRARY_PATH=`find /usr /opt /lib -type d -name lib -print 2> /dev/null`
+  LD_LIBRARY_PATH=`echo $LD_LIBRARY_PATH | sed 's/ /:/g'`
+  export LD_LIBRARY_PATH
+
+Now log out and log in again so that your ".profile" variables
+are in your environment.
+
+=head1 INSTALLATION
+
+Presumably you have Perl installed. If not, go here.
+
+   http://www.perl.org/get.html
+   http://www.cpan.org/src/README.html
+
+Install it as appropriate.  Then become root ("su - root") and use the CPAN
+shell to install a bunch of distributions that Business-Travel-OTA depends on.
+Then install the Business-Travel-OTA distribution itself.
+
+   perl -MCPAN -e shell
+   cpan> install Module::Build
+   cpan> install App::Build
+   cpan> install App::Options
+   cpan> install XML::Simple
+   cpan> install Data::Dumper
+   cpan> install LWP::UserAgent
+   cpan> install SOAP::Lite
+   cpan> install MIME::Entity
+   cpan> install XML::XPath
+   cpan> install Crypt::SSLeay
+   cpan> install Business::Travel::OTA
+   cpan> exit
+
+Presumably you have Apache running on your machine.  If not, start it up or
+install it.  You cannot run the OTA demo server without a web server.
+
+=head1 AND MORE
+
+I need to write more on this, but this is how far I got thus far.
+
+=cut
+

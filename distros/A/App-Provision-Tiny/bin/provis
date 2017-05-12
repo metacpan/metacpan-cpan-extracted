@@ -1,0 +1,81 @@
+#!/usr/bin/env perl
+# PODNAME: provis
+use strict;
+use warnings;
+
+use lib '/Users/gene/sandbox/github/ology/App-Provision-Tiny/lib';
+use Getopt::Simple qw($switch);
+use Module::Runtime qw(use_module);
+
+my $usage = "Usage: perl $0 program [--options]";
+
+my $program = shift || die "$usage\n";
+
+my $options = {
+    help => {
+        type    => '',
+        env     => '-',
+        default => '',
+    },
+    force => {
+        type    => '',
+        default => 0,
+    },
+    keytype => {
+        type    => '=s',
+        default => 'rsa',
+        verbose => 'ssh key type [rsa]',
+    },
+    keyname => {
+        type    => '=s',
+        default => '',
+        verbose => 'ssh key name e.g. github',
+    },
+    repo => {
+        type    => '=s',
+        default => 'repo',
+        verbose => 'Personal repository root [repo]',
+    },
+    site => {
+        type    => '=s',
+        default => 'localhost',
+        verbose => 'Webserver root []',
+    },
+    release => {
+        type    => '=s',
+        verbose => 'The latest version number of the program',
+    },
+};
+my $option = Getopt::Simple->new;
+exit -1 unless $option->getOptions($options, $usage);
+
+$program = lc $program;
+my $app = use_module('App::Provision::' . ucfirst($program))->new(%$switch);
+$app->meet();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+provis
+
+=head1 VERSION
+
+version 0.0402
+
+=head1 AUTHOR
+
+Gene Boggs <gene@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Gene Boggs.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

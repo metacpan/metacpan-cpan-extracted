@@ -1,0 +1,102 @@
+While there is an install target, it's present only because Automake
+provides it automatically.  Its use is not recommended.  Instead, the code
+in this package is intended to be copied into your package and refreshed
+from the latest release of rra-c-util for each release.
+
+You can obviously copy the code and integrate it however works best for
+your package and your build system.  Here's how I do it for my packages as
+an example:
+
+* Create a portable directory and copy `macros.h`, `system.h`,
+  `stdbool.h`, and `dummy.c` along with whatever additional functions that
+  your package uses that may not be present on all systems.  If you use
+  much of the `util` directory (see below), you'll need `asprintf.c`,
+  `reallocarray.c`, and `snprintf.c` at least.  If you use
+  `util/network.c`, you'll also need `getaddrinfo.c`, `getaddrinfo.h`,
+  `getnameinfo.c`, `getnameinfo.h`, `inet_*.c`, and `socket.h`.  You'll
+  need `winsock.c` for networking portability to Windows.
+
+* Copy the necessary portions of `configure.ac` from this package into
+  your package.  `configure.ac` is commented to try to give you a guide
+  for what you need to copy over.  You will also need to make an `m4`
+  subdirectory, add the code to `configure.ac` to load Autoconf macros
+  from `m4`, and copy over `m4/snprintf.m4` and possibly `m4/socket.m4`
+  and `m4/inet-ntoa.m4`.
+
+* Copy the code from `Makefile.am` for building `libportable.a` into your
+  package and be sure to link your package binaries with `libportable.a`.
+  If you include this code in a shared library, you'll need to build
+  `libportable.la` instead; see the Automake manual for the differences.
+  You'll need to change `LIBRARIES` to `LTLIBRARIES` and `LIBOBJS` to
+  `LTLIBOBJS` in addition to renaming the targets.
+
+* Create a `util` directory and copy over the portions of the utility
+  library that you want.  You will probably need `messages.[ch]` and
+  `xmalloc.[ch]` if you copy anything over at all, since most of the rest
+  of the library uses those.  You will also need `m4/vamacros.m4` if you
+  use `messages.[ch]`.
+
+* Copy the code from `Makefile.am` for building `libutil.a` into your
+  package and be sure to link your package binaries with `libutil.a`.  As
+  with `libportable.a`, if you want to use the utility functions in a
+  shared library, you'll need to instead build `libutil.la` and change
+  some of the Automake variables.
+
+* If your package uses a TAP-based test suite written in C, consider using
+  the additional TAP utility functions in `tests/tap` (specifically
+  `messages.*`, `process.*`, and `string.*`).
+
+* If you're using the Kerberos portability code, copy over
+  `portable/krb5.h`, `portable/krb5-extra.c`, `m4/krb5.m4`,
+  `m4/lib-depends.m4`, `m4/lib-pathname.m4`, and optionally
+  `util/messages-krb5.[ch]`.  You'll also need the relevant fragments of
+  `configure.ac`.  You may want to remove some things from `krb5.h` and
+  `krb5-extra.c` the corresponding configure checks if your code doesn't
+  need all of those functions.  If you need `krb5_get_renewed_creds`, also
+  copy over `krb5-renew.c`.  Don't forget to add `$(KRB5_CPPFLAGS)` to
+  `CPPFLAGS` for `libportable` and possibly `libutil`, and if you're
+  building a shared library, also add `$(KRB5_LDFLAGS)` to `LDFLAGS` and
+  `$(KRB5_LIBS)` to `LIBADD` for those libraries.
+
+  For a Kerberos-enabled test suite, also consider copying the
+  `kerberos.*` libraries in `tests/tap` for a Kerberos-enabled test suite.
+  If you want to use `kerberos_generate_conf` from `tests/tap/kerberos.c`,
+  also copy over `tests/data/generate-krb5-conf`.
+
+* For testing that requires making Kerberos administrative changes,
+  consider copying over the `kadmin.*` libraries in `tests/tap`.
+
+* For testing packages that use remctl, see the `tests/tap/remctl.c` and
+  `tests/tap/remctl.h` files for C tests and `tests/tap/remctl.sh` for
+  shell scripts.
+
+* If you're using the kafs portability code, copy over the `kafs`
+  directory, `m4/kafs.m4`, `m4/lib-pathname.m4`, `portable/k_haspag.c`,
+  the code to build kafs from `Makefile.am`, and the relevant fragments of
+  `configure.ac`.
+
+* If you're using the PAM portability code, copy over `pam-util/*`,
+  `portable/pam*`, `m4/pam-const.m4`, and the relevant fragments of
+  `configure.ac`.
+
+* Copy over any other Autoconf macros that you want to use in your
+  package from the m4 directory.
+
+* Copy over any generic tests from `tests/docs` and `tests/perl` that are
+  appropriate for your package.  If you use any of these, also copy over
+  the `tests/tap/perl` directory and `tests/data/perl.conf` (and customize
+  the latter for your package).
+
+* If the package embeds a Perl module, copy over any tests from the
+  `perl/t` directory that are applicable.  This can provide generic
+  testing of the embedded Perl module using Perl's own test
+  infrastructure.  If you use any of these, also copy over the
+  `perl/t/data/perl.conf` file and customize it for your package.  You
+  will need to arrange for `perl/t/data` to contain copies of the
+  `perlcriticrc` and `perltidyrc` files, either by making copies of the
+  files from `tests/data` or by using make to copy them.
+
+I also copy over all the relevant tests from the `tests` directory and the
+build machinery for them from `Makefile.am` so that the portability and
+utility layer are tested along with the rest of the package.  The test
+driver should come from C TAP Harness.

@@ -1,0 +1,61 @@
+Apache::Mmap Version 0.05
+-------------------------
+
+Updated: 11/24/97
+
+This is a Perl5 extension interface to the mmap(2) system call.  A
+file can be mapped into memory and then read from (or written to)
+via a scalar.  More complete documentation is in Mmap.pm (You can
+read it with 'perldoc Mmap.pm').
+ 
+To build the extension, unpack this distribution, create the Makefile
+using 'perl Makefile.PL' and do a 'make'.  As this is alpha software,
+you should probably also do a 'make test' before trying to 'make
+install'.  A message about not being able to bootstrap Apache::Constants
+outside httpd is normal.
+
+This version of the module was developed with perl 5.004_04, and the
+example Apache::Mmap::handler was tested with:
+
+Server version Apache/1.2.4 mod_perl/1.06.
+
+The "t" directory contains three test scripts: 'tie.t' which tests
+just the XSUB TIESCALAR methods, 'mmap.t' which checks the mmap/munmap
+methods, and 'handle.t' which checks the Apache::Mmap::Handle
+TIEHANDLE routines.  The "eg" directory contains three sample
+benchmark scripts: 'bench.pl' which uses LWP::UserAgent to retrieve
+files from a mod_perl'd apache; 'bench2.pl' which compares reading
+from a mapped scalar vs. reading a file with open|while(<FILE>); and
+'bench3.pl' which compares doing a copy of a file with open|while
+vs. using a Apache::Mmap::Handle tie'd handle.  Also in the "eg"
+directory is a (_very_) simple PerlHandler 'MmapHandler.pm' which
+shows how to use mmap to cache and return image files.
+
+A prelimiary version of a package implementing the TIEHANDLE methods
+using a mmap'd file (Apache::Mmap::Handle) is also included.  It's
+currently written entirely in perl and does a lot of copying of data
+around memory.  On my Linux box it's about an order of magnitude
+slower than using the tied scalar.  It currently works read-only
+(e.g. you can't tie a handle for writing).
+
+The module is known to work (or seems to work :) on at least:
+
+* Linux 2.0.30 
+* Solaris 2.5.1
+
+It should work on other UNIXish platforms which support the mmap(2)
+system call.  If you get it to work on another version, please let
+me know.
+
+Please send any bug reports, queries, large wads of unmarked bills,
+etc. to the author.  The latest version should be available from
+my web page URL<http://www.mindspring.com/~lemur1/> or from a CPAN
+mirror near you.
+
+$Id: README,v 1.3 1997/11/25 04:15:39 fletch Exp $
+
+--
+Fletch                |                                            __`'/|
+lemur1@mindspring.com |       "I drank what?" -- Socrates          \ o.O'
+770 209-8037(w)       |                                            =(___)=
+                      |                                               U

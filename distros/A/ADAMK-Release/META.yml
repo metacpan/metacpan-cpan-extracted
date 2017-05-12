@@ -1,0 +1,50 @@
+---
+abstract: ''
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.42
+  Test::Script: 1.07
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: ADAMK::Release
+name: ADAMK-Release
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  CPAN::Uploader: 0.103003
+  Devel::PPPort: 3.21
+  File::Find::Rule: 0.32
+  File::Flat: 1.04
+  File::LocalizeNewlines: 1.12
+  File::ShareDir: 1.03
+  File::Slurp: 9999.19
+  File::Spec::Functions: 0.80
+  Getopt::Long: 2.33
+  GitHub::Extract: 0.02
+  IO::Prompt::Tiny: 0.002
+  Module::Extract::VERSION: 1.01
+  Object::Tiny: 1.01
+  Params::Util: 1.00
+  Perl::MinimumVersion: 1.27
+  Term::ReadKey: 2.14
+  Test::MinimumVersion: 0.101080
+  Test::Pod: 1.44
+  YAML::Tiny: 1.51
+  perl: 5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/adamkennedyADAMK-Release.git
+version: 0.02

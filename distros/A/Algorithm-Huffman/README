@@ -1,0 +1,57 @@
+Algorithm/Huffman version 0.09
+==============================
+
+SYNOPSIS
+
+  use Algorithm::Huffman;
+
+  my %char_counting = map {$_ => int rand(100)} ('a' .. 'z', 'A' .. 'Z');
+  # or better the real counting for your characters
+  # as the huffman algorithm doesn't work good with random data :-)) 
+
+  my $huff = Algorithm::Huffman->new(\%char_counting);
+  my $encode_hash = $huff->encode_hash;
+  my $decode_hash = $huff->decode_hash;
+
+  my $encode_of_hello = $huff->encode_bitstring("Hello");
+
+  print "Look at the encoding bitstring of 'Hello': $encode_of_hello\n";
+  print "The decoding of $encode_of_hello is '", $huff->decode_bitstring($encode_of_hello), "'";
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+         Heap             
+         Heap::Fibonacci  
+         Heap::Elem       
+         Tree::DAG_Node   
+         List::Util
+         Carp
+
+         # Modules only for the test script
+         Test::More       
+         Test::ManyParams 
+         Test::Exception  
+         Data::Dumper     
+         String::Random
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2002 Janek Schleicher
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

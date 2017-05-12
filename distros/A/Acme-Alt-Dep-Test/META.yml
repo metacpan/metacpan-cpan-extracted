@@ -1,0 +1,28 @@
+---
+abstract: 'Test Module for Depping on Alted Modules'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Alt-Dep-Test
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - example
+requires:
+  Acme::Math::XS: '0'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/acme-alt-dep-test-pm/issues
+  homepage: https://github.com/ingydotnet/acme-alt-dep-test-pm
+  repository: https://github.com/ingydotnet/acme-alt-dep-test-pm.git
+version: 0.0.1

@@ -1,0 +1,79 @@
+Revision history for Perl extension AnyEvent::FastPing
+
+TODO: range interleaving
+TODO: rcvbuf/sndbuf, arp cache size
+TODO: /proc/sys/net/ipv4/neigh/default/gc_thresh1
+
+2.1   Sat Nov 12 02:20:25 CET 2016
+	- improve fork support - only initialise the module on
+          first call to ->new.
+
+2.03  Fri Nov 11 02:17:47 CET 2016
+	- do not initialise AnyEvent by merely loading this module.
+
+2.02  Mon Oct 13 13:14:40 CEST 2014
+	- fix a bug in the checksumming algorithm.
+
+2.01  Sun Feb  6 01:23:25 CET 2011
+	- add_hosts now allows mixed ipv4 and ipv6 addresses.
+	- netbsd and solaris lack PTHREAD_STACK_MIN. sigh.
+
+2.0   Wed Feb  2 21:20:11 CET 2011
+	- use completely different object-oriented API. more complex, but
+          also much more flexible.
+        - support host lists in addition to ranges.
+        - support per-pinger receive callbacks, no more global callback stuff.
+	- no longer embed floating point values in packet, to avoid relying
+          on isnormal.
+        - use slightly faster ipv4 checksumming function.
+        - better cope with high overload conditions by using exponential backoff.
+        - add missing - sigh - common::sense dependency.
+
+1.15  Sun Jan 30 00:55:10 CET 2011
+	- famous last words: final 1.x API release.
+        - bin/fastping didn't support ipv4 anymore, due to a thinko :/.
+
+1.14  Sun Jan 30 00:36:19 CET 2011
+	- likely last 1.x release.
+	- use common sense.
+        - convert to AE API.
+        - convert bin/fastping to AnyEvent::Socket, so Socket6 is
+          no longer required.
+        - enable ipv6 on freebsd, netbsd, openbsd, as it seems they
+          got thier header file horrors sorted out.
+        - enable on cygwin, which lacks netinet/icmp6.h, but otherwise
+          might work (untested).
+
+1.13  Wed Apr  7 16:12:38 CEST 2010
+	- fix prototype of register_cb to match documentation.
+
+1.12  Tue Nov 17 22:37:48 CET 2009
+	- enhance portability slightly.
+        - convert to c89.
+
+1.11  Sun May 18 22:09:13 CEST 2008
+	- fix #ifdef APPLE logic. why does apple actively hurt
+          free sofwtare development so much?
+        - restore ipv6 support on non-broken==non-darwin platforms.
+
+1.1   Sat May 17 23:47:05 CEST 2008
+	- try to improve portability here and there.
+
+1.0   Sun Apr 27 17:43:24 CEST 2008
+	- rename from Net::FPing to AnyEvent::FastPing.
+
+0.9   Tue May 15 21:24:22 CEST 2007
+	- document net-fping output format.
+        - count iterations from 1 in net-fping.
+        - clarified license.
+
+0.02  Sun May  6 01:16:52 CEST 2007
+        - randomise the magic number used a bit so multiple net-fpings
+          running on the same host do not see each others' replies.
+        - net-fping did not accept its floating-point arguments.
+        - add -h and usage to net-fping.
+        - skip ping tests when !root.
+
+0.01  Fri May  4 02:02:04 CEST 2007
+	- cloned from Convert-Scalar.
+

@@ -1,0 +1,22 @@
+0.07
+ * hidden actions
+ * LIST action
+
+0.06
+ * some refactoring and documentation
+
+0.05
+ * show description pod section in help
+
+0.04
+ - 'use' instead of 'use base'
+
+0.03
+ - unknown action in help
+
+0.02
+ * action aliases
+ * POD usage
+
+0.01
+ Initial release, factored out from cocaine-manager

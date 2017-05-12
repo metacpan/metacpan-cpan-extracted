@@ -1,0 +1,15 @@
+[% META title = 'SSL Certificate Revocation' -%]
+    
+    <form method="post" action="/ca/template/ssl/revoke">
+    <table>
+      <tr><td>Type :</td>
+      <td>
+      	<select name="type">
+      		<option value="role">Role</option>
+	      	<option value="dns">Dns</option>
+    	</select>
+      </td></tr>
+       <tr><td>Datas (e.g. role or dns string) :</td><td><input type="text" name="data"></td></tr>
+       <tr><td colspan=2><input type="submit" name="Submit" value="Revoke"></td></tr>
+    </table>
+    </form>

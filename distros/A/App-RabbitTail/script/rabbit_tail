@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use App::RabbitTail;
+App::RabbitTail->new_with_options->run;
+

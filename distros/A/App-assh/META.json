@@ -1,0 +1,74 @@
+{
+   "abstract" : "A wrapper around autossh.",
+   "author" : [
+      "DBR <dbr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-assh",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Moo" : "0",
+            "MooX::Options" : "0",
+            "MooX::Types::MooseLike::Base" : "0",
+            "lib" : "0",
+            "methods" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "true" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "List::Util" : "0",
+            "Scalar::Util" : "0",
+            "Test::CheckDeps" : "0.006",
+            "Test::More" : "0.94",
+            "Test::UseAllModules" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::assh" : {
+         "file" : "lib/App/assh.pm",
+         "version" : "v1.1.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {},
+   "version" : "1.1.2",
+   "x_authority" : "cpan:DBR"
+}
+

@@ -1,0 +1,16 @@
+<div class="login">
+<form method="POST" action="[% s.uri %]">
+[% s.html_hidden('ori_args',s.in.ori_args) %]
+<h1>Login</h1>
+[% IF s.error.login %]
+<div class="alert">[% s.error.login %]</div>
+[% END %]
+<b>Username</b><br>
+[% s.html_input('login',s.in.login) %]<br>
+<b>Password</b><br>
+[% s.html_password('passwd','') %]<br>
+<input type="submit" value="Login">
+<br><br>
+<a href="[% s.uri %]?forgot=1">forgot password?</a>
+</form>
+</div>

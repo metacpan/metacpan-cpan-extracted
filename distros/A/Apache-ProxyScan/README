@@ -1,0 +1,137 @@
+Installation
+============
+
+Install this Apache::ProxyScan
+------------------------------
+like every other perl module do
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Prepare Apache for use of Apache::ProxyScan
+-------------------------------------------
+You need an Apache 2.0 webserver with mod_perl 1.99_12 or higher
+(If you want to use Apache 1.3 use Apache-ProxyScan-0.31)  
+
+Add the following lines to your httpd.conf
+Use the proper wrapper for your av-tool from Apache-ProxyScan-X.XX/eg/ 
+
+  PerlTransHandler  Apache::ProxyScan
+  PerlSetVar        ProxyScanScanner "/usr/local/bin/clamav.pl"
+  PerlSetVar        ProxyScanTempDir /var/cache/virus/dl/
+  PerlSetVar        ProxyScanPredeliverSize     102400
+  PerlSetEnv 	    SCAN_TMP 	   /var/cache/virus/av/
+
+If you want to handle https requests as well, activate mod_proxy and allow
+the handling of CONNECT requests:
+
+  ProxyRequests On
+
+  <Directory proxy:*>
+    <Limit CONNECT GET POST>
+      Order allow,deny
+      Allow from all
+    </Limit>
+    <LimitExcept CONNECT GET POST>
+      Order deny,allow
+      Deny from all
+    </LimitExcept>
+  </Directory>
+
+Install your av wrapper
+-----------------------
+Install the wrapper for your av tool from Apache-ProxyScan-X.XX/eg/ into
+your favorit directory and fix the PerlSetVar ProxyScanScanner in your
+httpd.conf
+
+Network design
+--------------
+Apache::ProxyScan only supports scanning files but not caching. 
+Chain Apache::ProxyScan with a caching proxy, for example define the Apache
+as a parent for a squid cache. (And if you are paranoid, scan or purge the 
+squid cache directory after every pattern update for your av tool)
+
+Customize existing av wrappers
+------------------------------
+If you want to add for example a contact email address in the "infected"
+return page, add this line in the wrapper.
+
+Write a new wrapper for an unsupported av tool
+----------------------------------------------
+Don't write a new wrapper, take one of the existing wrappers and put in your
+av tool command. ;-)
+
+There are basically two kinds of wrappers:
+The wrapper for clamav, sophos and mcafee call the av command via perl 
+open call and read stdout of the av command and decide on the return code 
+if the file was infected, suspicious or clean.
+The RAV wrapper is built with expect, because RAV tries a TCGETS ioctl and
+segfaults if no pty is present, but decisions are made on the same codes.
+In general the open version should be enough.
+
+The wrapper is called with one parameter: a temporary filename, where
+the download was saved.
+
+The result of the scan should be reported back to Apache::ProxyScan via
+return codes.
+
+The executable must return 0 if the file is clean and tested und the file
+must not be deleted.
+If the return code ist not 0 and the file still exists, we assume that the
+call of the scanner wrapper failed. The file is not deliverd and a hardcoded
+error message from Apache::ProxyScan is delivered.
+If the return code ist not 0 and the file is deleted, then the Handler
+returns the standard output of the wrapper script.
+
+If you wrote a wrapper for an unsupported av tool, send it to
+cpan at sourcentral dot org. Maybe I will put it into the next package
+of Apache::ProxyScan.
+
+The Power of Apache::ProxyScan
+------------------------------
+I started to write Apache::ProxyScan because we needed a virus scanning 
+proxy on Linux for zSeries. 
+The solutions provided for the integration of commercial av scanners into
+open source proxy servers were rather ugly.
+SQUID+SQIRM+ApacheCGI+WGET is the worst I can remember. Other projects 
+provided patches for old and outdated squid caches and/or need a daemon
+to scan the files.
+I decided for a solution in mod_perl and Apache at the point I found 
+the ProxyPass Example in "Writing Apache Mopdules with Perl and C" from O'Reily and the easy way to move the request and response headers between Apache and 
+LWP::UserAgent.
+
+Timeouts
+--------
+*fix this for ProxyScanPredeliverSize*
+OK, and here the special sections about timeouts:
+Users are used to get a growing download bar when the start a download.
+We don't deliver a byte of the downloaded file until we know if it is clean
+or not. If we deliver the beginning of the file and then need to report
+that the file is infected, we only can interrupt the transmission but there
+is no possibility to send a message why the transmission was interrupted.
+The other possibility would be sending a "prepage" with a redirect in it but
+then you need to disable your save-as button and a filter which files
+should be delivered directly or with prepage.
+Any ideas? Write an email to me and point out why your solution is the 
+ultimate solution for this problem and why this solution is conform
+to all the HTTP RFCs. ;-)
+
+If you use Apache::ProxyScan as parent for a squid-cache use 
+"read_timeout 90 minutes" in squid.conf to allow large downloads.
+
+Feedback
+--------
+I am generally interested in wrappers for other av tools.
+But I am also interested in "scanners", which remove ActiveX or JavaScript 
+from HTML Pages for. Then the Proxy is no longer a Proxy conforming to the RFCs,
+but your users are no longer vulnerable.
+
+And I am interested in performance data.
+Send me information about your box (CPUs, RAM, Disks), your av tool, 
+the number of users, your daily throughput, your peak throughput per hour 
+or minute and so on.
+
+any comments? write to cpan at sourcentral dot org.
+

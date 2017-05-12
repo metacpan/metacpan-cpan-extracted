@@ -1,0 +1,122 @@
+# This is the main configuration file of your Dancer app
+# env-related settings should go to environments/$env.yml
+# all the settings in this file will be loaded at Dancer's startup.
+
+# Your application's name
+appname: "PlainSpeaking"
+
+# The default layout to use for your application (located in
+# views/layouts/main.tt)
+layout: "main"
+
+# when the charset is set to UTF-8 Dancer will handle for you
+# all the magic of encoding and decoding. You should not care
+# about unicode within your app when this setting is set (recommended).
+charset: "UTF-8"
+
+plugins:
+  Articulate:
+    routes:
+      - PlainSpeaking::Routes::BlogContent
+      - Articulate::Routes::Login
+    components:
+      construction:
+        Articulate::Construction:
+          constructors:
+            - class: Articulate::Construction::LocationBased
+              args:
+                types:
+                  article: Articulate::Item::Article
+      service:
+        Articulate::Service:
+          providers:
+            - Articulate::Service::Error
+            - Articulate::Service::Simple
+            - Articulate::Service::List
+            - Articulate::Service::SimpleForms
+            - Articulate::Service::SimplePreviews
+            - Articulate::Service::Login
+            - Articulate::Service::LoginForm
+      authentication:
+        Articulate::Authentication:
+          providers:
+            - class: Articulate::Authentication::Preconfigured
+              args:
+                passwords:
+                  admin: admin
+      authorisation:
+        Articulate::Authorisation:
+          rules:
+            - class: Articulate::Authorisation::Preconfigured
+              args:
+                rules:
+                  "zone/*":
+                    admin: 1
+                    "[guest]":
+                      read: 1
+                  "assets/*":
+                    admin: 1
+                    "[guest]":
+                      read: 1
+      enrichment:
+        Articulate::Enrichment:
+          enrichments:
+            - Articulate::Enrichment::DateCreated
+            - Articulate::Enrichment::DateUpdated
+      navigation:
+        Articulate::Navigation:
+          locations:
+            - assets
+            - assets/images
+            - assets/images/image
+            - assets/images/image/*
+            - zone
+            - zone/*
+            - zone/*/article/
+            - zone/*/article/*
+            - user/*
+#      storage: Articulate::Storage::Local
+      storage: Articulate::Storage::DBIC::Simple
+      augmentation:
+        Articulate::Augmentation:
+          augmentations:
+            - class: Articulate::Flow::ContentType
+              args:
+                where:
+                  "text/markdown":
+                    - Articulate::Augmentation::Interpreter::Markdown
+      validation:
+        Articulate::Validation:
+          validators: []
+      #      - Articulate::Validation::NoScript
+      serialisation:
+        Articulate::Serialisation:
+          serialisers:
+            - class: Articulate::Serialisation::SiteConfig
+              args:
+                site_data:
+                  title: Plain Speaking
+                  subtitle: An Articulate Blog
+                  css:
+                    - //maxcdn.bootstrapcdn.com/bootswatch/3.3.1/journal/bootstrap.min.css
+                    - blog
+                  js:
+                    - https://code.jquery.com/jquery-1.11.2.min.js
+                    - plain-speaking-forms
+                  nav_links:
+                    - href: /
+                      text: Home
+                    - href: http://github.com/pdl/Articulate
+                      text: About Articulate
+                    - href: /login
+                      text: Log In
+                    - href: /create
+                      text: New Post
+                    - href: /upload
+                      text: New File
+            - Articulate::Serialisation::StatusSetter
+            - Articulate::Serialisation::Asset
+            - Articulate::Serialisation::TemplateToolkit
+      framework: Articulate::FrameworkAdapter::Dancer1
+      caching: Articulate::Caching::Native
+

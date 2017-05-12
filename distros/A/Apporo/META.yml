@@ -1,0 +1,30 @@
+---
+abstract: 'Perl binding for Apporo(Approximate String Matching Engine)'
+author:
+  - 'Toshinori Satou <overlasting {at} gmail.com>'
+build_requires:
+  Devel::CheckLib: 0
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.36
+  ExtUtils::ParseXS: 2.21
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Apporo
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  XSLoader: 0.02
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: origin
+version: 0.000001

@@ -1,0 +1,8 @@
+# -*- perl -*-
+
+#!perl
+
+use lib qw( @ServerRoot@/app );
+use Basic::Test;
+
+1;

@@ -1,0 +1,37 @@
+Revision history for Apache-Bootstrap
+
+0.07 Mon Jul 13 12:09:00 PST 2009
+    - fix syntax error in params validation in new (mp2 param unchecked)
+    - warn instead of dying in new if a module is not present, and then
+      decide if any modules are present to create a new bootstrap object
+
+0.06 Sat Apr 25 14:07:04 PST 2009
+    - replace confusing instances of mod_perl1 and mp1 with simply mod_perl
+
+0.05 Mon Mar 30 10:25:54 PST 2009
+    - change apache test check for wrong version instead of valid a:t config
+
+0.05-rc1 Mon Jan 21 14:34:83 PST 2009
+    - code imported to ASF repository, thanks to pgollucci
+
+0.04_02  Sat Nov 08 17:07:56 PST 2008
+    - skip more tests if no versions of mod_perl are present
+    - clean up a bit more of the convoluted logic
+
+0.04_01  Fri Jun 27 20:58:58 PST 2008
+    - more tests, coverage for success conditions
+    - now we actually fail at compile time if base mod_perl is not present
+
+0.03  Sun Jun 22 01:28:13 PST 2008
+    - fail at compile time if mod_perl dependencies are not present
+    - put the constructor back now that it has a use case
+    - add a few helper methods, and WriteMakefile which uses the appropriate
+        build subsystem
+
+0.02  Fri Jun 20 15:28:27 PST 2008
+    - change interface call methods as class methods
+    - default to finding mp2 before finding mp1
+
+0.01  Thu May 10 00:13:05 PST 2008
+    - First version, released on an unsuspecting world.
+

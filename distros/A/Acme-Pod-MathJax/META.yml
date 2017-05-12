@@ -1,0 +1,28 @@
+---
+abstract: 'All your math are belong to us!'
+author:
+  - 'Joel Berger'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Pod-MathJax
+no_index:
+  file:
+    - README.pod
+provides:
+  Acme::Pod::MathJax:
+    file: lib/Acme/Pod/MathJax.pm
+    version: 0.03
+requires:
+  perl: v5.8.0
+resources:
+  bugtracker: http://github.com/jberger/Acme-Pod-MathJax/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/Acme-Pod-MathJax
+version: 0.03

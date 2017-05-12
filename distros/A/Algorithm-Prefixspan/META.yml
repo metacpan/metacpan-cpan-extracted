@@ -1,0 +1,38 @@
+---
+abstract: 'Perl implementation for the algorithm PrefixSpan (Prefix-projected Sequential Pattern mining).'
+author:
+  - 'Yukio HORI <horiyuki@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-Prefixspan
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Algorithm::Prefixspan:
+    file: lib/Algorithm/Prefixspan.pm
+    version: '0.04'
+requires:
+  Carp: '0.36'
+  Moo: '2.000001'
+  MooX::Types::MooseLike::Base: '0.28'
+  namespace::clean: '0.25'
+  perl: '5.008001'
+version: '0.04'
+x_contributors:
+  - 'Yukio HORI <horiyuki@whitebase.org>'

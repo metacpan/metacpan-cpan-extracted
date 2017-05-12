@@ -1,0 +1,27 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::FS qw(lsmount);
+
+my ($path, $vol);
+
+die "Usage: $0 path\n" if ($#ARGV != 0);
+
+$path = shift;
+
+$vol = lsmount($path);
+$AFS::CODE and print "Error Code: $AFS::CODE\n";
+
+if (defined $vol) {
+    print "\'$path\' is a mount point for volume \'$vol\' \n";
+}
+elsif ($path =~ /\.$/) {
+    print "you may not use '.' or '..' as the last component of the path name \n";
+}
+else {
+    print "\'$path\' is not a mount point \n";
+}
+

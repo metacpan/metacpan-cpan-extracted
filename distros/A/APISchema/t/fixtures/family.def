@@ -1,0 +1,99 @@
+title 'Family API';
+description 'The API to define or exaplain a family';
+
+resource person => {
+    type => 'object',
+    description => 'A person',
+    properties => {
+        name => {
+            type => 'string',
+            description => 'The name of the person',
+            example => 'Alice',
+        },
+        age => {
+            type => 'integer',
+            description => 'The age of the person',
+            example => 16,
+        },
+    },
+    required => ['name', 'age'],
+};
+
+resource target => {
+    type => 'object',
+    description => 'Target of retrieving information',
+    properties => {
+        name => { '$ref' => '#/resource/person/properties/name' },
+    },
+};
+
+resource parent => {
+    '$ref' => '#/resource/target',
+    description => 'Target of retrieving/defining children',
+    example => { name => 'Bob' },
+};
+
+resource people => {
+    type => 'array',
+    description => 'Some people',
+    items => {
+        '$ref' => '#/resource/person',
+    },
+    example => [ {
+        name => 'Alice',
+        age  => 16,
+    }, {
+        name => 'Charlie',
+        age  => 14,
+    } ],
+};
+
+resource result => {
+    type => 'object',
+    description => 'Result of an operation',
+    properties => {
+        status => {
+            enum => [ 'success', 'failure' ],
+            example => 'success',
+        },
+        message => {
+            type => 'string',
+            example => 'OK',
+        },
+    },
+};
+
+PUT '/person' => {
+    title => 'Person PUT API',
+    description => 'Define a new person',
+    destination => {},
+    request => 'person',
+    response => 'result',
+};
+
+GET '/person' => {
+    title => 'Person GET API',
+    description => 'Retrieve a person',
+    destination => {},
+    request => { parameter => 'target' },
+    response => 'person',
+};
+
+PUT '/child' => {
+    title => 'Child PUT API',
+    description => 'Add a child to a person',
+    destination => {},
+    request => {
+        parameter => 'parent',
+        body => 'person',
+    },
+    response => 'result',
+};
+
+GET '/children' => {
+    title => 'Children GET API',
+    description => 'Retrieve children of a person',
+    destination => {},
+    request => { parameter => 'parent' },
+    response => 'people',
+};

@@ -1,0 +1,41 @@
+NAME
+    Acme::Pinoko - Acchonburike!
+
+SYNOPSIS
+      use Acme::Pinoko;
+      use utf8;
+
+      my $pinoko = Acme::Pinoko->new(%config);
+      print $pinoko->say('ピノコ１８のレディなのよ');
+      # -> ピノコ１８のレレイなのよさ
+
+DESCRIPTION
+    Acme::Pinoko converts standard Japanese text to Pinoko-ish Japanese
+    text.
+
+    Pinoko is a Japanese manga character. She speaks with a lisp and
+    therefore her spoken Japanese is slightly different from standard
+    Japanese.
+
+METHODS
+  $pinoko = Acme::Pinoko->new(%config)
+    Creates a new Acme::Pinoko instance.
+
+      my $pinoko = Acme::Pinoko->new(
+          parser        => 'Text::MeCab' or 'Text::KyTea',  # default is 'Text::MeCab'
+          parser_config => \%parser_config,                 # default is undef
+      );
+
+  $pinoko_ish_text = $pinoko->say($text)
+    Pinoko says $text.
+
+AUTHOR
+    pawa <pawapawa@cpan.org>
+
+SEE ALSO
+    <https://en.wikipedia.org/wiki/Black_Jack_%28manga%29#Characters>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

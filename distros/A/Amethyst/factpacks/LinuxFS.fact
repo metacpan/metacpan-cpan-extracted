@@ -1,0 +1,32 @@
+# Linux File System
+# Created 12-30-99
+# Creator: Sean Hollen
+
+directory /bin => /bin is short for "binaries," or executables, where many essential system programs reside. Use ls -F /bin to list the files here. If you look down the list you may see a few commands that you recognize, such as cp, ls and mv. These are the actual programs for these commands. When you use the cp command, for example, you're running the program /bin/cp.
+directory /dev => The "files," in /dev are device drivers - they access system devices and resources like disk drives, modems, and memory. Just as your system can read data from a file, it can also read imput from the mouse by accessing /dev/mouse.
+directory /dev/console => refers to the system's console - this is the monitor connected directly to your system.
+directory /dev/cua => The directory for devices that are used to access serial ports.
+directory /dev/ttyS => The directory for different com ports. Example: ttyS1 is com 2, ttyS2 is com three, etc.
+directory /dev/hda => The directory that refers to the whole first hard disk, while /dev/hda1 refers to the first partition on /dev/hda.
+directory /dev/null => The directory that is concidered the balck-hole. Data sent to this device is gone forever. Why is this useful you ask? Well, if you wanted to suppress the output of a command appearing on your screen, you could send that output to /dev/null.
+directory /ect => The directory /etc contains a number of miscellaneous system configuration files. These include, /etc/passwd (the user database), /etc/rc (the system initialization script), and so on.
+directory /sbin => The directory that contains essential system binaries that are used for system administration.
+directory /home => The directory that contains user's home directories. For Exapmle: /home/larry is the home directory for the user "larry." On a newly installed system, there may not be any users in this directory.
+directory /lib => The directory that contains shared library images, which are files that contain code whic many programs share in common. Rather than each program using its own copy of these shared routines, they are all stored in on common place, in /lib. This makes executable files smaller, and saves space.
+directory /proc => The directory that supports a "virtual file system," where the files are stored in memory, not on disk. These "files" refer to the various processes running on the system, and let you get information about the programs and processes that are running at any given time.
+directory /tmp => The directory that programs store temporary information in when the program has finished executing. 
+directory /usr => The directory /usr is a very important directory whic contains subdirectories that contain some of the most important and useful programs and configuration files used on the system. The various directories are essential for the system to operate, but most of the items found in /usr are optional.
+directory /usr/X11r6 => The directory that contains the X Windows System, if you installed it. The X Window System is a large, powerful graphical environment that provides a large number of graphical utilities and programs. If you're at all familiar with the MS Windows, X will look familiar. The /usr/X11R6 directory contains all of the X executables.
+directory /usr/bin => The directory that is a real warehouse for sofware on any UNIX system, containing most of the executables for programs not found in other places, like /bin.
+directory /usr/etc => The directory that contains miscellaneous utilities and files, that in general, are not essential to the system.
+directory /usr/include => The directory that contains include files for the C compiler. These files (most of which end in .h, for "header") declare data structure names, subroutines, and constants used when writing programs in C. Files in /usr/include/sys are generally used when programming on the UNIX system level.
+directory /usr/g++-include => The directory that contains include files for the C++ compiler (much like /usr/include.)
+directory /usr/lib => The directory that contains the "stub" and "static" library equivalents for the files found in /lib. When compliling a program, the program is "linked" with the libraries found in /usr/lib, which then directs the program to look in /lib when it needs the actual code in the library.
+directory /usr/local => The directory that is much like /usr it contains various programs and files not essential to the system, but which make the system fun and exciting. In general, programs in /usr/local are specialized for you system consequently, /usr/local differs greatly between UNIX systems.
+directory /usr/man => The directory that contains manual pages. There are two subdirectories in it for every manual page "section" (use the command "man man" for details). For Example: /usr/man/man1 contains the source (that is, the unformatted original) for manal pages in section 1.
+directory /usr/src => The directory that contains the source code (the uncompiled instructions) for various programs on your system. The most important directory here is /usr/src/linux, which contains the source code for the Linux kernel.
+directory /var => The directory that holds directories that often change in size or tend to grow. Many of those directories used to reside in /usr, but since those who support Linux are trying to keep it relatively unchangeable, the directories that change often have been moved to /var.
+directory /var/adm => The directory that contains various files of interest to the system administrator, specifically system logs, which record errors or problems with the system. Other files record logins to the system as well as failed login attempts. These on some systems can be found in /var/log also.
+directory /var/spool => The directory that contains files which are "spooled" to another program. For Example: If your machine is connected to a network, incomming mail is stored in /var/spool/mail until you read or delete it. Incomming or outgoing news is stored in /var/spool/news.
+
+

@@ -1,0 +1,101 @@
+Revision history for Perl extension App::pmuninstall
+
+0.30 2013-06-03T14:42:38Z
+        - minil migrate
+
+0.29    Wed Feb  8 17:23:05 2012
+        - Copy and wording fixes (finn++)
+
+0.28    Wed Dec  7 01:11:32 2011
+        - fixed issue: https://github.com/xaicron/pm-uninstall/issues/2 (finn++)
+
+0.27    Wed Nov 30 12:55:13 2011
+        - changed cpanmetadb URL
+
+0.26    Wed Nov 30 02:45:19 2011
+        - fixed not CPAN module problem (reported by gfx++)
+        - if did not fetch vname then skip check desp.
+
+0.25    Thu Oct 13 16:03:48 2011
+        - maybe support install.json (from cpanm 1.5000 / miyagawa++)
+
+0.24    Tue Oct  4 15:10:39 2011
+        - fix is_local_lib() (But, it's called after the setup_local_lib(), no problem)
+
+0.23    Tue Oct  4 01:57:32 2011
+        - fix broken -l and -L option (rt:71417)
+        - fix doc
+
+0.22    Sat Sep 17 17:10:26 2011
+        - shorten startup time
+        - fix checking core module logic
+        - fix was gone version option
+        - coloring for Success or Failed message.
+
+0.21    Sun Aug 28 03:01:03 2011
+        - maybe fixed: cannot be find a XS path problem. (reported by Ben Bullock++)
+        - added --quiet option
+
+0.20    Wed Aug 24 02:19:56 2011
+        - is_core_module was broken (win32)
+
+0.19    Thu Aug  4 02:52:38 2011
+        - removed dependency on local::lib
+            (did not work, because latest local::lib had been changed interface.)
+
+0.18    Sun Jun 26 13:20:05 2011
+        - modularization
+
+0.17    Sat Jun 25 15:06:12 2011
+        - fixed the dependencies check problem
+
+0.16    Wed Feb 23 01:19:12 2011
+        - fixe couldn't remove core-modules installed from 'local::lib' or etc... issue (suggested by masartz)
+
+0.15    Fri Dec  3 00:16:50 2010
+        - suppress warnings for no CPAN module
+
+0.14    Tue Nov 23 01:06:22 2010
+        - workaround for Windows
+
+0.13    Mon Nov 22 19:25:16 2010
+        - fixed `-L` option problem (suggested by tokuhirom++)
+        - fixed wrong show dependencies issue (previous version was not corrected)
+
+0.12    Sun Nov 21 16:00:27 2010
+        - fixed wrong show dependencies issue (report by tokuhirom++)
+        - fixed `-L` option was not working
+        - fixed core-module check issue
+
+0.11    Sun Nov 14 22:39:02 2010
+        - fixed wrong message issue. (report by punytan++)
+
+0.10    Mon Oct 25 22:10:28 2010
+        - wrote `-n` about the document
+
+0.09    Mon Oct 25 02:19:36 2010
+        - fixed syntax error for pod
+
+0.08    Mon Oct 25 00:25:53 2010
+        - small changes to the document.
+
+0.07    Sun Oct 24 17:56:47 2010
+        - suppressed uninstall for core-module
+        - show mandb message
+
+0.06    Sun Oct 17 23:16:31 2010
+        - --checkdeps option default
+        - check core module
+
+0.05    Fri Oct  8 00:36:10 2010
+        - supported local::lib
+        - rmdir for empty dir
+
+0.04    Fri Aug  6 14:19:52 2010
+        - wrote document
+
+0.03    Tue Aug  3 01:01:22 2010
+        - thanks miyagawa-san!
+
+0.01    Wed Mar 10 23:26:16 2010
+        - original version

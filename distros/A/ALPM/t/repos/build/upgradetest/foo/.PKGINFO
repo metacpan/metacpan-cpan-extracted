@@ -1,0 +1,6 @@
+pkgdesc = Foo Version Two!
+pkgver = 2.0-1
+arch = any
+pkgname = foo
+license = GPL
+url = http://www.foo.com

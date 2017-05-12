@@ -1,0 +1,38 @@
+Revision history for Perl extension App-BigQuery-Importer-MySQL
+
+0.024 2016-07-19T08:02:31Z
+
+    - add allow_text_type option (https://github.com/myfinder/app-bigquery-importer-mysql/pull/4)
+
+0.023 2016-06-17T01:46:08Z
+
+    - Fixed: automatically removed a tempfile when the program exits (https://github.com/myfinder/app-bigquery-importer-mysql/pull/3)
+
+0.022 2016-06-17T01:39:54Z
+
+    - Fixed: readme
+
+0.021 2014-11-17T08:45:04Z
+
+    - check arguments and add test case
+
+0.02 2014-11-17T07:14:47Z
+
+    - Alpha Release
+
+0.01_4 2014-11-16T14:10:53Z
+
+    - remove dependency 'Time::Piece'
+
+0.01_3 2014-11-14T07:33:41Z
+
+    - developer release
+
+0.01_2 2014-11-14T07:20:42Z
+
+    - detached cli and refactoring
+
+0.01_1 2014-11-14T04:59:38Z
+
+    - original version
+

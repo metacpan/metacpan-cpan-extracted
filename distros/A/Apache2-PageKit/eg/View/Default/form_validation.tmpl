@@ -1,0 +1,29 @@
+<PKIT_COMPONENT NAME="/top">
+<h1>Form Validation/Sticky HTML Form</h1>
+<form method="get" action="form_validation_done">
+<PKIT_ERRORSPAN NAME="email">Email:</PKIT_ERRORSPAN><br>
+<input type="text" name="email">
+<p>
+<PKIT_ERRORSPAN NAME="phone">Phone:</PKIT_ERRORSPAN><br>
+<input type="text" name="phone">
+<br>
+<PKIT_ERRORSPAN NAME="likes">Which of the following things do you like?</PKIT_ERRORSPAN><br>
+<select name="likes" multiple size="6">
+<option>Pizza</option>
+<option>Ice Cream</option>
+<option>Perl</option>
+<option>Goodfellas</option>
+<option>Simpsons</option>
+<option>Sopranos</option>
+</select>
+<p>
+<PKIT_ERRORSPAN NAME="toppings">If you selected Pizza, which toppings do you
+  like?</PKIT_ERRORSPAN><br>
+<input type="checkbox" name="toppings" value="Extra Cheese"> Extra Cheese<br>
+<input type="checkbox" name="toppings" value="Green Peppers"> Green Peppers<br>
+<input type="checkbox" name="toppings" value="Italian Sausage"> Italian Sausage<br>
+<input type="checkbox" name="toppings" value="Pepperoni"> Pepperoni<br>
+<p>
+<input type="submit" name="submit" value="Submit">
+</form>
+<PKIT_COMPONENT NAME="/bottom">

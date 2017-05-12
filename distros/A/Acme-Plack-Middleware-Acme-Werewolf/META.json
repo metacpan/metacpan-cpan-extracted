@@ -1,0 +1,48 @@
+{
+   "abstract" : "Plack middleware of Acme::Apache::Werewolf",
+   "author" : [
+      "Makamaka Hannyaharamitu, E<lt>makamaka[at]cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Plack-Middleware-Acme-Werewolf",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Astro::MoonPhase" : "0.60",
+            "Plack" : "0.99",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/makamaka/plack-middleware-acme-werewolf/"
+      }
+   },
+   "version" : "0.02"
+}

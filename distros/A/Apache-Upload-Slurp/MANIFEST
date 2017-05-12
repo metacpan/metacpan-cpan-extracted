@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+Slurp.pm
+t/010_base.t
+META.yml                                 Module meta-data (added by MakeMaker)

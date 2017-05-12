@@ -1,0 +1,29 @@
+---
+name: APR-HTTP-Headers-Compat
+version: 0.02
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+abstract: Make an APR::Table look like an HTTP::Headers
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=APR-HTTP-Headers-Compat
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/AndyA/APR--HTTP--Headers--Compat.git
+requires:
+  APR::Pool: 0
+  APR::Table: 0
+  HTTP::Headers: 0
+  Storable: 0
+  Test::More: 0
+provides:
+  APR::HTTP::Headers::Compat:
+    file: lib/APR/HTTP/Headers/Compat.pm
+    version: 0.02
+  APR::HTTP::Headers::Compat::MagicArray:
+    file: lib/APR/HTTP/Headers/Compat/MagicArray.pm
+  APR::HTTP::Headers::Compat::MagicHash:
+    file: lib/APR/HTTP/Headers/Compat/MagicHash.pm
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

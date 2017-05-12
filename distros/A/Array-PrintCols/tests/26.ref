@@ -1,0 +1,40 @@
+Test 26: Complex words, indent 5, total width 25
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+     3D                    
+     FSPEC_complete        
+     FSPEC_long            
+     FSPEC_short           
+     ISPEC_complete        
+     ISPEC_long            
+     ISPEC_short           
+     LargeApps             
+     MMx_complete          
+     MMx_long              
+     MMx_short             
+     Multimedia_complete   
+     NTDesktop_complete    
+     NTDesktop_long        
+     NTDesktop_short       
+     NT_other_complete     
+     NT_other_long         
+     NT_other_short        
+     SysNT_complete        
+     SysNT_long            
+     SysNT_short           
+     Win95Desktop_complete 
+     Win95Desktop_long     
+     Win95Desktop_short    
+     front_end             
+     games                 
+     memory                
+     photoshop             
+     sys32_win95_complete  
+     sys32_win95_long      
+     sys32_win95_short     
+     ubench                
+     vox                   
+     wmt_ubench            
+     xmark96_complete      
+     xmark96_long          
+     xmark96_short         
+12345678901234567890123456789012345678901234567890123456789012345678901234567890

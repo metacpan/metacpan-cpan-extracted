@@ -1,0 +1,12 @@
+AdaGradPtr T_PTROBJ_ADAGRAD
+
+INPUT
+
+T_PTROBJ_ADAGRAD
+	$var = GET_ADAGRAD_PTR($arg);
+
+OUTPUT
+
+T_PTROBJ_ADAGRAD
+	sv_setref_pv($arg, klass, (void*)$var);
+

@@ -1,0 +1,11 @@
+# This is the README file for Acme::PIA::Export
+#
+# VERSION: 0.001
+
+For intructions on how to install Acme::PIA::Export, please
+see the file INSTALL included in this release.
+
+After having installed the package successfully, you can have a look
+at the included documentation by issuing
+perldoc Acme::PIA::Export
+on the command line.

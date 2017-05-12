@@ -1,0 +1,57 @@
+NAME
+    App::Env::Login - An App::Env application module which returns the login
+    environment
+
+SYNOPSIS
+        use App::Env 'Login';
+
+DESCRIPTION
+    The is an App::Env application module which returns the user's login
+    environment by starting the user's login shell in login mode.
+
+    App::Env::Login should not be used directly. It must be used via
+    App::Env.
+
+INTERFACE
+    The following options may be passed via App::Env's "AppOpts" facility:
+
+    "Shell"
+        The user's login shell. If not specified, this is derived from the
+        SHELL environment variable. Any shell supported by the Shell::GetEnv
+        module is accepted.
+
+DEPENDENCIES
+    Shell::GetEnv
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-app-env-login@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=App-Env-Login>.
+
+SEE ALSO
+    App::Env
+
+VERSION
+    Version 0.01
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2016 The Smithsonian Astrophysical Observatory
+
+    App::Env::Login is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program. If not, see <http://www.gnu.org/licenses/>.
+
+AUTHOR
+    Diab Jerius <djerius@cpan.org>
+

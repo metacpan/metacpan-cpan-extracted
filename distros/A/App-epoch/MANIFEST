@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/epoch
+dist.ini
+lib/App/epoch.pm
+t/skel.t

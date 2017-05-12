@@ -1,0 +1,41 @@
+NAME
+    hl7dump - Script to dump hl7 file message.
+
+SYNOPSIS
+     hl7dump [-c] [-h] [--version] hl7_file
+
+ARGUMENTS
+    *       "-c"
+
+             Color mode.
+
+    *       "-h"
+
+             Print help.
+
+    *       "--version"
+
+             Print version of script.
+
+    *       "hl7_file"
+
+             File with HL7 messages.
+
+EXAMPLE
+     hl7dump -h
+
+REPOSITORY
+    <https://github.com/tupinek/App-HL7-Dump>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2016 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.02
+

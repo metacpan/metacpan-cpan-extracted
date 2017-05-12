@@ -1,0 +1,155 @@
+#------------------------------------------------------------------------------
+# xstat_fs_test.pod
+#
+# Copyright © 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+#                  Elizabeth Cassell <e_a_c@mailsnare.net>
+#
+# This library is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<xstat_fs_test> - Gathers data collections from the File Server process.
+
+=head1 SYNOPSIS
+
+  use AFS::Monitor qw(xstat_fs_test);
+
+  my $result = xstat_fs_test(
+                             fsname => ["hostName1", "hostName2"],
+                             collID => [0, 1, 2],
+                            );
+
+  foreach my $probe (@$result) {
+    print "For host: $probe->{hostName}, ";
+    print "Collection $probe->{collectionNumber}\n";
+    if ($probe->{probeOK}) {
+      print "probe successful\n";
+    } else {
+      print "probe failed\n";
+    }
+  }
+
+=head1 DESCRIPTION
+
+The B<xstat_fs_test> function tests the routines in the B<libxstat_fs.a>
+library and returns the data collections associated with the File Server (the
+fs process).
+
+=head1 OPTIONS
+
+=over
+
+=item B<fsname>
+
+String with one name or reference to an array with names of one or
+more machines from which to monitor the File Server process.
+
+=item B<collID>
+
+Integer or reference to an array where each entry specifies each data collection
+to return, which defines the type and amount of data the command interpreter
+gathers about the File Server. Data is returned in a predefined data structure.
+
+There are three acceptable values:
+
+=over
+
+=item B<0>
+
+Provides profiling information about the numbers of times different internal
+File Server routines were called since the File Server started. This value is
+not currently implemented; it returns no data.
+
+=item B<1>
+
+Reports various internal performance statistics related to the File Server
+(for example, vnode cache entries and Rx protocol activity).
+
+=item B<2>
+
+Reports all of the internal performance statistics provided by the 1 setting,
+plus some additional, detailed performance figures about the File Server (for
+example, minimum, maximum, and cumulative statistics regarding File Server
+RPCs, how long they take to complete, and how many succeed).
+
+=item B<3>
+
+Only when compiled with OpenAFS-1.4.1 or newer.
+Reports various internal CallBack statistics related to the File Server.
+
+=back
+
+=back
+
+=head1 OUTPUT
+
+The returned value is a reference to an array. There is an entry in the array
+for each collection gathered for each file server. Each entry in the array is
+a reference to a hash, containing the following keys:
+
+=over
+
+=item B<hostName>
+
+The name of the file server this data collection represents
+
+=item B<collectionNumber>
+
+The data collection number
+
+=item B<probeTime>
+
+The time the probe was initiated, measured in seconds since the Epoch
+(00:00:00 UTC, January 1, 1970).
+
+=item B<probeOK>
+
+1 if the probe was successful, 0 if the probe failed.
+
+=item B<data>
+
+If the probe was not successful, this key will not exist. Otherwise, this
+entry will contain a reference to a hash containing all of the data collected.
+For details on the contents of this hash, and an example of printing it in a
+readable format, refer to the B<xstat_fs_test> script in the B<examples>
+directory.
+
+=back
+
+=head1 AUTHORS
+
+The code and documentation for this class were contributed by Stanford
+Linear Accelerator Center, a department of Stanford University.  This
+documentation was written by
+
+=over
+
+=item Elizabeth Cassell <e_a_c@mailsnare.net> and
+
+=item Alf Wachsmann <alfw@slac.stanford.edu>
+
+=back
+
+=head1 COPYRIGHT AND DISCLAIMER
+
+ Copyright 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+                Elizabeth Cassell <e_a_c@mailsnare.net>
+ All rights reserved.
+
+ Most of the explanations in this document are taken from the original
+ AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ Volume Server/Volume Location Server Interface
+ Edward R. Zayas
+ (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ (c) IBM Corporation 2000.
+ All rights reserved.
+
+ This library is free software; you can redistribute it and/or modify it
+ under the same terms as Perl itself.

@@ -1,0 +1,88 @@
+Revision history for Perl extension Amon2::Lite
+
+0.13 2014-08-28T09:41:58Z
+
+    - Fixed deps.
+      (Reported by andk)
+
+0.12 2014-03-25T01:06:43Z
+
+    - Fix default DB name to expand environment name
+      (moznion)
+    - Fixed testing issues
+      (Kosuke Asami)
+
+0.11 2013-10-08T23:29:10Z
+
+    - Amon2::Lite with Text::Xslate 2.0010- gets Perl 5.18+ issue.
+      Just updated deps.
+      ref. http://blog.64p.org/entry/2013/10/08/093236
+      (tokuhirom)
+    - Tiny fix for Amon2 5.00 compatibility.
+      (tokuhirom)
+
+0.10 2013-08-14T01:14:41Z
+
+    - minil migrate
+      (tokuhirom)
+
+0.09
+
+    - Allows "get '/'" and "post '/'" in same router.
+      (Reported by mattn++)
+
+0.08
+
+    [bug fix]
+    commit 60372b2ac2af6d6a2b0683626e1bf7650e7b5b60
+    Author: Syohei YOSHIDA <syohex@gmail.com>
+    Date:   Thu Jul 12 00:27:23 2012 +0900
+
+    fix typo
+
+    lib/Amon2/Setup/Flavor/Lite.pm |    2 +-
+    1 file changed, 1 insertion(+), 1 deletion(-)
+
+0.07
+
+    [BUG FIX]
+    - 'any' was broken at 0.06
+
+0.06
+
+    * e26e2d3 better coding style
+    * 936a1e4 better static file handling
+    * cbe3fca puts x-nantoka headers by default
+    * b857d56 simplified code
+    * 8e20caa added enable_session method
+    * added enable_middleware method
+    * Return 405 Method Not Allowed if it's not allowed(Old impl returns 404)
+    * 52a9094 docs about session
+
+0.05
+
+    [SETUP FLAVOR]
+    * c4b5db2 ignore .gitignore files
+    * d6e0163 better html skelton
+    * eac6045 setup bootstrap and jquery by default.
+
+    [DOC ENHANCEMENTS]
+    * a27cd94 link to example code
+
+0.04
+
+    - added 'handle_static' option.
+    - remove some deps. 
+
+0.03
+
+    - added 'template_options' method.
+      (suggested by gfx)
+
+0.02
+
+    - fixed incompatibility with latest Amon2::Lite.
+      Amon2::Lite should not be use Bridge::Star.
+
+0.01    Mon Nov 14 09:24:15 2011
+    - original version

@@ -1,0 +1,38 @@
+Install this package from source:
+
+  $ perl MakeFile.PL PREFIX=~/path/to/custom/dir LIB=~/path/to/custom/lib
+  $ make
+  $ make install
+
+
+Perl one liner using CPAN.pm:
+
+  $ perl -MCPAN -e 'install Apache2::WebApp::Extra::Admin'
+
+
+Use of CPAN.pm in interactive mode:
+
+  $ perl -MCPAN -e shell
+  cpan> install Apache2::WebApp::Extra::Admin
+  cpan> quit
+
+Just like the manual installation of perl modules, the user may need root access
+during this process to insure write permission is allowed within the intstallation
+directory.
+
+
+Install/Runtime issues (non-root)
+
+Q. When running a script, I get the message "Can't locate loadable object for mod.."
+
+A. Since you are an unpriviledged user, you aren't allowed to install modules into
+   system directories.  In order to remedy this situation, you can install CPAN
+   into your home directory.  Not only is this good practice (sandboxing), it
+   will make it easier when installing other 3rd party CPAN modules in the future.
+
+  $ perl -MCPAN -e shell
+
+  cpan shell -- CPAN exploration and modules installation (v1.X)
+  ReadLine support enabled
+
+  cpan> o conf commit

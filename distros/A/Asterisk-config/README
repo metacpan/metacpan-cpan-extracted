@@ -1,0 +1,33 @@
+This is the README file for Asterisk::config, a module to
+read/write Asterisk config.
+
+Asterisk is most popular Opensource PBX in PBX World!
+
+Access www.asterisk.org for more details.
+
+* Installation
+
+Asterisk::config uses the standard perl module install process:
+
+perl Makefile.PL
+make
+make install
+
+* Copyright
+
+See COPYRIGHT section in pod text below for usage and 
+distribution rights.
+
+by Sun bing <hoowa.sun@gmail.com>
+
+* Introduction
+
+Asterisk::config can parse and saving data with Asterisk config
+files. this module support asterisk 1.0 1.2 1.4 1.6, and it also
+support Zaptel config files.
+
+The Asterisk::config be Part of FreeIris opensource Telephony Project
+Access http://www.freeiris.org for more details.
+
+Please refer to the POD text for synopsis and usage details.
+

@@ -1,0 +1,9 @@
+<chapter>
+    <title>XML::XPathScript</title>
+      <para>
+	 XPathScript is a stylesheet language similar in many ways to XSLT
+	 (in concept, not in appearance), for transforming XML from one
+	 format to another (possibly HTML, but XPathScript also <emph>shines </emph>for
+	 non-XML-like output).
+      </para>
+  </chapter> 

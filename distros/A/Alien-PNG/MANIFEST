@@ -1,0 +1,17 @@
+Build.PL
+CHANGELOG
+inc/My/Builder.pm
+inc/My/Builder/Unix.pm
+inc/My/Builder/Windows.pm
+inc/My/Utility.pm
+lib/Alien/PNG.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001_load.t
+t/002_config.t
+t/003_check_header.t
+t/004_get_header_version.t
+TODO
+META.yml

@@ -1,0 +1,76 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Registry with local archives.
+
+use Data::Dumper;
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More;
+use Arch::Util qw(is_tla_functional);
+
+plan skip_all => "No functional arch backend" unless is_tla_functional;
+plan tests => 20;
+
+use_ok("Arch::Registry");
+use_ok("Arch::Util", "run_tla");
+use_ok("Arch::Backend", "is_baz");
+use_ok("Arch::TempFiles");
+
+my $tmp = Arch::TempFiles->new;
+my $dir = $tmp->dir;
+die "Internal: Arch::TempFiles::dir didn't create dir\n" unless $dir && -d $dir;
+
+chdir($dir) or die "Internal: can't chdir $dir\n";
+$ENV{HOME} = $dir;
+
+my $registry = Arch::Registry->new;
+ok(ref($registry) && $registry->isa('Arch::Registry'), "create registry object");
+
+my $archives = $registry->registered_archives;
+ok(ref($archives) eq 'HASH' && !%$archives, "no registered test archives");
+
+my $archive1 = 'person@domain.com--test';
+my $archive2 = 'something@unreal--test';
+my $archive3 = 'un@existing--test';
+
+#mkdir("$dir/$archive1", 0777) or die "Can't mkdir $dir/$archive1: $!";
+run_tla("make-archive $archive1 $dir/$archive1");
+is($?, 0, "make-archive $archive1");
+my $success = $registry->register_archive("$dir/$archive1", $archive1);
+ok($success, "register-archive $archive1");
+$success = $registry->register_archive("$dir/$archive1");
+ok($success, "register-archive $archive1 with location only");
+
+my $is_baz = is_baz();
+my $num_archives = $is_baz? 1: 2;
+
+open OLDERR, ">&STDERR";
+close STDERR; *OLDERR = *OLDERR;
+$success = $registry->register_archive($dir, $archive2);
+ok($success ^ $is_baz, "register-archive $archive2");
+
+$success = $registry->register_archive("$dir/$archive3");
+open STDERR, ">&OLDERR";
+ok(!$success, "register-archive with unexisting location");
+
+my %archives = $registry->registered_archives;
+is(%archives && keys %archives, $num_archives, "check the number of archives");
+ok($archives{$archive1},                   "- including $archive1");
+is($archives{$archive1}, "$dir/$archive1", "- - and its location");
+SKIP: {
+skip("baz has changed register-archive", 2) if $is_baz;
+ok($archives{$archive2},                   "- including $archive2");
+is($archives{$archive2}, "$dir",           "- - and its location");
+}
+
+$success = $registry->unregister_archive($archive1);
+ok($success, "unregister-archive $archive1");
+$success = $registry->unregister_archive($archive2);
+ok($success, "unregister-archive $archive2");
+$success = $registry->unregister_archive($archive3);
+ok($success, "unregister-archive $archive3");
+
+%archives = $registry->registered_archives;
+ok(!%archives, "no registered test archives again");
+

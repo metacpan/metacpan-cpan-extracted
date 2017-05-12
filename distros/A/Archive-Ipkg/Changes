@@ -1,0 +1,15 @@
+Revision history for Perl extension Archive::Ipkg.
+
+0.03  2005/06/05
+    - Updated POD, included new links for iPKG format
+    - Updated tests to reflect new Archive::Tar behaviour
+    - Added POD tests
+
+0.02  Mon Apr  7 14:09:00 2003
+	- Bugfix: Setting mode 0100644 on all files that are added via 
+          Tar->add_data. Now busybox tar doesn't complain anymore.
+
+0.01  Fri Apr  4 17:15:14 2003
+	- original version
+
+

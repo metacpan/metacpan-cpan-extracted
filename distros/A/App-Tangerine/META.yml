@@ -1,0 +1,35 @@
+---
+abstract: 'Perl dependency metadata tool'
+author:
+  - 'Petr Šabata <contyk@redhat.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Tangerine
+requires:
+  Archive::Extract: '0'
+  Cwd: '0'
+  File::Find::Rule: '0'
+  File::Find::Rule::Perl: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  List::Compare: '0'
+  MCE::Map: '0'
+  Pod::Usage: '0'
+  Tangerine: '0.15'
+  overload: '1'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/contyk/tangerine
+  repository: https://github.com/contyk/tangerine.git
+version: '0.22'

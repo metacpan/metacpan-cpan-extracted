@@ -1,0 +1,8 @@
+---
+files:
+  lib/Pod/Escapes.pm: lib/Pod/Escapes.pm
+  ChangeLog: lib/Pod/Escapes/ChangeLog
+  README: lib/Pod/Escapes/README
+dirs-recursive:
+  t/: lib/Pod/Escapes/t/
+

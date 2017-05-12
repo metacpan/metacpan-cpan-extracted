@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE ServiceReports SYSTEM "dtd/nagios-1.0.dtd">
+
+<ServiceReports>
+  <Schema Value="1.0"/>
+  <ServiceReport Host="server.citap.be" Service="ServiceName 2" Environment="LOCAL" Date="2005/11/04" Time="17:27:30" Epochtime="1131121650" Status="2" StatusMessage="StatusMessage 2" PerfData="PerfData=99ms;0;;;">
+    <![CDATA[ErrorDetails 2]]>
+  </ServiceReport>
+</ServiceReports>

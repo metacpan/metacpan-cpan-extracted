@@ -1,0 +1,134 @@
+NAME
+    Alien::PNG - building, finding and using PNG binaries
+
+VERSION
+    Version 0.1
+
+SYNOPSIS
+    Alien::PNG tries (in given order) during its installation:
+
+    *   Locate an already installed PNG via 'libpng-config' script.
+
+    *   Check for PNG libs in directory specified by PNG_INST_DIR variable.
+        In this case the module performs PNG library detection via
+        '$PNG_INST_DIR/bin/libpng-config' script.
+
+    *   Download prebuilt PNG binaries (if available for your platform).
+
+    *   Build PNG binaries from source codes (if possible on your system).
+
+    Later you can use Alien::PNG in your module that needs to link agains
+    PNG and/or related libraries like this:
+
+        # Sample Makefile.pl
+        use ExtUtils::MakeMaker;
+        use Alien::PNG;
+
+        WriteMakefile(
+          NAME         => 'Any::PNG::Module',
+          VERSION_FROM => 'lib/Any/PNG/Module.pm',
+          LIBS         => Alien::PNG->config('libs', [-lAdd_Lib]),
+          INC          => Alien::PNG->config('cflags'),
+          # + additional params
+        );
+
+DESCRIPTION
+    Please see Alien for the manifest of the Alien namespace.
+
+    In short "Alien::PNG" can be used to detect and get configuration
+    settings from an installed PNG and related libraries. Based on your
+    platform it offers the possibility to download and install prebuilt
+    binaries or to build PNG & co. from source codes.
+
+    The important facts:
+
+    *   The module does not modify in any way the already existing PNG
+        installation on your system.
+
+    *   If you reinstall PNG libs on your system you do not need to
+        reinstall Alien::PNG (providing that you use the same directory for
+        the new installation).
+
+    *   The prebuild binaries and/or binaries built from sources are always
+        installed into perl module's 'share' directory.
+
+    *   If you use prebuild binaries and/or binaries built from sources it
+        happens that some of the dynamic libraries (*.so, *.dll) will not
+        automaticly loadable as they will be stored somewhere under perl
+        module's 'share' directory. To handle this scenario Alien::PNG
+        offers some special functionality (see below).
+
+METHODS
+  config()
+    This function is the main public interface to this module. Basic
+    functionality works in a very similar maner to 'libpng-config' script:
+
+        Alien::PNG->config('prefix');   # gives the same string as 'libpng-config --prefix'
+        Alien::PNG->config('version');  # gives the same string as 'libpng-config --version'
+        Alien::PNG->config('libs');     # gives the same string as 'libpng-config --libs'
+        Alien::PNG->config('cflags');   # gives the same string as 'libpng-config --cflags'
+
+    On top of that this function supports special parameters:
+
+        Alien::PNG->config('ld_shared_libs');
+
+    Returns a list of full paths to shared libraries (*.so, *.dll) that will
+    be required for running the resulting binaries you have linked with PNG
+    libs.
+
+        Alien::PNG->config('ld_paths');
+
+    Returns a list of full paths to directories with shared libraries (*.so,
+    *.dll) that will be required for running the resulting binaries you have
+    linked with PNG libs.
+
+        Alien::PNG->config('ld_shlib_map');
+
+    Returns a reference to hash of value pairs '<libnick>' =>
+    '<full_path_to_shlib'>, where '<libnick>' is shortname for PNG related
+    library like: PNG.
+
+    NOTE: config('ld_<something>') return an empty list/hash if you have
+    decided to use PNG libraries already installed on your system. This
+    concerns 'libpng-config' detection and detection via
+    '$PNG_INST_DIR/bin/libpng-config'.
+
+  check_header()
+    This function checks the availability of given header(s) when using
+    compiler options provided by "Alien::PNG->config('cflags')".
+
+        Alien::PNG->check_header('png.h');
+        Alien::PNG->check_header('png.h', 'pngconf.h');
+
+    Returns 1 if all given headers are available, 0 otherwise.
+
+  get_header_version()
+    Tries to find a header file specified as a param in PNG prefix direcotry
+    and based on "#define" macros inside this header file tries to get a
+    version triplet.
+
+        Alien::PNG->get_header_version('png.h');
+
+    Returns string like '1.2.3' or undef if not able to find and parse
+    version info.
+
+BUGS
+    Please post issues and bugs at
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-PNG>
+
+AUTHOR
+        Tobias Leich
+        CPAN ID: FROGGS
+        FROGGS@cpan.org
+
+ACKNOWLEDGEMENTS
+        This module is based on Alien::SDL, so in fact the credits has to be given to these guys.
+        kmx - complete redesign between versions 0.7.x and 0.8.x
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

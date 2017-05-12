@@ -1,0 +1,57 @@
+{
+   "abstract" : "GnuPG email sign/encrypt testing bot",
+   "author" : [
+      "Marius Gavrilescu <marius@ceata.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Eduard",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Email::Sender::Simple" : "0",
+            "File::Share" : "0",
+            "File::Slurp" : "0",
+            "Getopt::Long" : "0",
+            "MIME::Entity" : "5.419",
+            "MIME::Parser" : "5.419",
+            "Mail::GnuPG" : "0",
+            "PerlX::Maybe" : "0",
+            "Template" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.014000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "git://gitorious.org/ceata/ceata-eduard.git"
+      }
+   },
+   "version" : "0.001002"
+}

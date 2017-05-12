@@ -1,0 +1,208 @@
+#!/usr/local/bin/perl -w
+
+use Date::Format;
+
+use App::Options (
+    options => [ qw(dbhost dbname dbuser dbpass repository table params columns headings compact decimals subtotal_columns totals
+                    cache_skip cache_refresh verbose) ],
+    option => {
+        repository => {
+            default => "default",
+            description => "Name of the repository to get the rows from",
+        },
+        table => {
+            required => 1,
+            description => "Table name (i.e. --table=customer)",
+        },
+        params => {
+            required => 1,
+            description => "List of params (var=value pairs) (i.e. --params=\"last_name=Jones|first_name=Mike\")",
+        },
+        columns => {
+            description => "List of columns (comma-separated list) (i.e. --columns=first_name,last_name)",
+        },
+        headings => {
+            description => "List of heading abbreviations (comma-separated) (i.e. --headings=first,last)",
+        },
+        compact => {
+            description => "Trim titles to make compact table",
+        },
+        decimals => {
+            description => "Number of decimal places to print on floats",
+            default => "2",
+        },
+        subtotal_columns => {
+            description => "Print sub-totals at the end",
+        },
+        totals => {
+            description => "Print totals at the end",
+        },
+        cache_skip => {
+            description => "Skip any cached values for the table",
+        },
+        cache_refresh => {
+            description => "Skip any cached values for the table but save the results in the cache",
+        },
+        verbose => {
+            default => 1,
+            description => "Verbose level",
+        },
+    },
+);
+
+use App;
+use strict;
+
+$| = 1;  # autoflush stdout
+
+{
+    my $context  = App->context();
+    my $db       = $context->repository($App::options{repository});
+    my $table    = $App::options{table};
+    my ($columns);
+    if ($App::options{columns}) {
+        $columns  = [ split(/,/, $App::options{columns}) ];
+    }
+    else {
+        $columns  = $db->_get_default_columns($table);
+    }
+    my $params   = { split(/[=>\|]+/, $App::options{params}) };
+    my $headings = $App::options{headings} ? [ split(/,/, $App::options{headings}) ] : [];
+    my $verbose  = $App::options{verbose};
+    my $get_options = { extend_columns => 1 };
+    $get_options->{cache_skip} = 1 if ($App::options{cache_skip});
+    $get_options->{cache_refresh} = 1 if ($App::options{cache_refresh});
+    my $rows     = $db->get_rows($table, $params, $columns, $get_options);
+    my ($subtotal_rows, $total_rows);
+    if ($App::options{subtotal_columns}) {
+        my $subtotal_columns = [ split(/,/, $App::options{subtotal_columns}) ];
+        $subtotal_rows = $db->summarize_rows($table, $rows, $columns, $subtotal_columns);
+    }
+    if ($App::options{totals}) {
+        $total_rows = $db->summarize_rows($table, $rows, $columns);
+    }
+    if ($subtotal_rows) {
+        push(@$rows, @$subtotal_rows);
+    }
+    if ($total_rows) {
+        push(@$rows, @$total_rows);
+    }
+    my $formats  = [];
+    &print_table($rows, $columns, $formats, { compact => $App::options{compact}, headings => $headings });
+}
+
+sub print_table {
+    &App::sub_entry if ($App::trace);
+    my ($rows, $columns, $formats, $options) = @_;
+    my ($row, $r, $c, $elem, $format, $len, $f, $heading);
+    my (@autoformat);
+    my $headings = $options->{headings};
+
+    # compute the number of columns as the max columns of any row
+    my $max_columns = 0;
+    for ($r = 0; $r <= $#$rows; $r++) {
+        $row = $rows->[$r];
+        if ($max_columns < $#$row + 1) {
+            $max_columns = $#$row + 1;
+        }
+    }
+
+    # compute automatic sprintf formats
+    for ($c = 0; $c < $max_columns; $c++) {
+
+        if (! defined $autoformat[$c]) {
+            $autoformat[$c] = {
+                max_length => 0,
+                type => 2,        # 0=string, 1=float, 2=integer
+                min => undef,
+                max => undef,
+            };
+        }
+        $f = $autoformat[$c];
+
+        # set the length of the column by the length of its heading
+        $heading = ($headings && $headings->[$c]) ? $headings->[$c] : "";
+        if ($heading) { 
+            $len = length($heading);
+            if ($len > $f->{max_length}) {
+                $f->{max_length} = $len;
+            }
+        }
+        elsif (! $options->{compact}) { 
+            $len = length($columns->[$c]);
+            if ($len > $f->{max_length}) {
+                $f->{max_length} = $len;
+            }
+        }
+
+        for ($r = 0; $r <= $#$rows; $r++) {
+            $row = $rows->[$r];
+            if ($c <= $#$row && defined $row->[$c]) {
+                $elem = $row->[$c];
+                $len = length($elem);
+                if ($elem =~ /^-?[0-9]*\.[0-9]+$/) {  # float
+                    $len = length(sprintf("%.$App::options{decimals}f",$elem));
+                    $f->{type} = 1 if ($f->{type} > 1);
+                    if (!defined $f->{min} || $elem < $f->{min}) {
+                        $f->{min} = $elem;
+                    }
+                    if (!defined $f->{max} || $elem < $f->{max}) {
+                        $f->{max} = $elem;
+                    }
+                }
+                elsif ($elem =~ /^-?[0-9]+$/) { # integer
+                    if (!defined $f->{min} || $elem < $f->{min}) {
+                        $f->{min} = $elem;
+                    }
+                    if (!defined $f->{max} || $elem < $f->{max}) {
+                        $f->{max} = $elem;
+                    }
+                }
+                else {
+                    $f->{type} = 0;
+                }
+                $f->{max_length} = $len if ($len > $f->{max_length});
+            }
+        }
+        &determine_sprintf_fmt($f);
+    }
+    for ($c = 0; $c <= $#$columns; $c++) {
+        $format = $autoformat[$c]->{title_fmt} || "%s";
+        print " " if ($c > 0);
+        $heading = ($headings && $headings->[$c]) ? $headings->[$c] : $columns->[$c];
+        printf($format, $heading);
+    }
+    print "\n";
+    for ($r = 0; $r <= $#$rows; $r++) {
+        $row = $rows->[$r];
+        for ($c = 0; $c <= $#$row; $c++) {
+            $format = $autoformat[$c]->{fmt} || "%s";
+            print " " if ($c > 0);
+            printf($format, $row->[$c]);
+        }
+        print "\n";
+    }
+    &App::sub_exit() if ($App::trace);
+}
+
+sub determine_sprintf_fmt {
+    &App::sub_entry if ($App::trace);
+    my ($f) = @_;
+    my ($width, $int_len, $fract_len);
+    if ($f->{type} == 1) {     # float
+        $f->{title_fmt} = "%$f->{max_length}.$f->{max_length}s";
+        $f->{fmt} = "%$f->{max_length}.$App::options{decimals}f";
+    }
+    elsif ($f->{type} == 2) {  # integer
+        $f->{title_fmt} = "%$f->{max_length}.$f->{max_length}s";
+        $f->{fmt} = "%$f->{max_length}d";
+    }
+    else {                     # string
+        $f->{title_fmt} = "%-$f->{max_length}.$f->{max_length}s";
+        $f->{fmt} = "%-$f->{max_length}s";
+    }
+    &App::sub_exit($f->{fmt}) if ($App::trace);
+}
+
+exit (0);
+

@@ -1,0 +1,18 @@
+Changes
+Makefile.PL
+MANIFEST
+ModLogConfig.xs
+ppport.h
+README
+mk_README.sh
+typemap
+lib/Apache2/ModLogConfig.pm
+t/conf/extra.last.conf.in
+t/TEST.PL
+t/response/TestLogConfig/custom_logs.pm
+t/logconfig/custom_logs2.t
+t/print.t
+t/redir.t
+t/TestLib/print.pm
+t/TestLib/redir.pm
+META.yml                                 Module meta-data (added by MakeMaker)

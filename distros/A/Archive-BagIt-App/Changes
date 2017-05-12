@@ -1,0 +1,18 @@
+Revision history for Archive-BagIt-App
+
+0.049     2014-11-01
+  - Actual release with full testing and signed
+:
+0.048     2014-11-01
+  - Signing this release
+
+0.047     2014-11-01
+  - Bumping version to a version newer than Archive-BagIt (from which this is decended)
+
+0.002     2014-11-01
+  - Create a test arch
+  - fixing against MooseX-App-Cmd
+
+0.001   2014-10-20
+    - First release
+

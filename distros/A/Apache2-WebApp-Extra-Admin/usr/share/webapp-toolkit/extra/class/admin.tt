@@ -1,0 +1,395 @@
+package [% project_title %]::Admin;
+
+use strict;
+use warnings;
+use base '[% project_title %]::Base';
+use Params::Validate qw( :all );
+
+our $VERSION = 0.19;
+
+#----------------------------------------------------------------------------+
+# _default(\%controller)
+#
+# View the page.
+
+sub _default {
+    my ($self, $c) = @_;
+
+    my $load = $c->request->param('load') || 'main';
+
+    my $frame = {
+        main    => 'extras/admin/frame_main.tt',
+        side    => 'extras/admin/frame_side.tt',
+        top     => 'extras/admin/frame_top.tt',
+        default => 'extras/admin/default.tt',
+      };
+
+    $c->request->content_type('text/html');
+
+    $c->template->process(
+        $frame->{$load},
+        {
+            %{ $c->config },
+            username   => $c->request->user,
+            ip_address => $c->request->connection->remote_ip,
+        }
+      )
+      or $self->_error($c, 'Template process failed', $c->template->error() );
+
+    exit;
+}
+
+#----------------------------------------------------------------------------+
+# _error(\%controller,$title, $value)
+#
+# Print errors/exceptions and exit.
+
+sub _error {
+    my ($self, $c, $title, $value)
+      = validate_pos(@_,
+          { type => OBJECT },
+          { type => OBJECT },
+          { type => SCALAR },
+          { type => SCALAR }
+      );
+
+    $c->request->content_type('text/html');
+
+    $c->template->process(
+        'extras/admin/error.tt',
+        {
+            %{ $c->config },
+            title  => $title,
+            output => ($c->config->{debug} == 1) ? $value : undef,
+        }
+      )
+      or die $c->template->error();
+
+    exit;
+}
+
+#----------------------------------------------------------------------------+
+# _log_action(\%controller, $value)
+#
+# Logs the action including HTTP request parameters.
+
+sub _log_action {
+    my ($self, $c, $action)
+      = validate_pos(@_,
+          { type => OBJECT },
+          { type => OBJECT },
+          { type => SCALAR }
+      );
+
+    my $user    = $c->request->user || 'Unknown';
+    my $ip_addr = $c->request->connection->remote_ip;
+    my $uri     = $c->request->uri;
+
+    my $param = $c->request->param();
+
+    # convert the key/values into a query string format
+    my $session_val =
+      join('', map { $_ . '=' . $param->{$_} . '&' } keys %$param);
+
+    # log the URI and GET/POST parameters
+    my $string = ($c->config->{debug} == 1) ? "$uri/?$session_val" : '';
+
+    my $dbh = $c->stash('DBH');
+    my $sth;
+
+    if ($dbh) {
+
+        # create table if it doesn't exist
+        eval {
+            $dbh->do(qq{
+                CREATE TABLE IF NOT EXISTS admin_log (
+                    admin_log_id int(3) NOT NULL auto_increment,
+                    admin_log_username varchar(15) default NULL,
+                    admin_log_action varchar(55) default NULL,
+                    admin_log_query_string text,
+                    admin_log_user_ip_addr varchar(15) default NULL,
+                    admin_log_created datetime default NULL,
+                    PRIMARY KEY (admin_log_id)
+                )
+              });
+          };
+
+        if ($@) {
+            $self->_error($c, 'Database CREATE failed', $dbh->errstr);
+        } 
+
+       # write the information to a database
+        eval {
+            $sth = $dbh->prepare(qq{
+                REPLACE INTO admin_log SET
+                    admin_log_username     = ?,
+                    admin_log_action       = ?,
+                    admin_log_query_string = ?,
+                    admin_log_user_ip_addr = ?,
+                    admin_log_created      = NOW()
+              });
+
+            $sth->execute($user, $action, $string, $ip_addr);
+
+            $dbh->commit
+              if ($c->config->{database_auto_commit} == 0);
+          };
+
+        if ($@) {
+            $dbh->rollback
+              if ($c->config->{database_auto_commit} == 0);
+
+            $self->_error($c, 'Database INSERT failed', $sth->errstr);
+        }
+    }
+    else {
+
+        my $logfile = $c->config->{apache_doc_root} . '/logs/admin_log';
+
+        # write the information to a file
+        open (FILE, ">>$logfile") or die $self->_error($c, "Cannot open $logfile: $!");
+        print FILE "$user\t$action\t$string\t$ip_addr\t" . time() . "\n";
+        close(FILE);
+    }
+
+    return;
+}
+
+#----------------------------------------------------------------------------+
+# _gen_results($total, $start, $limit, \%ary_ref)
+#
+# Generate per-page results.
+
+sub _gen_results {
+    my ($self, $total, $start, $limit, $ary_ref)
+      = validate_pos(@_,
+          { type => OBJECT   },
+          { type => SCALAR   },
+          { type => SCALAR   },
+          { type => SCALAR   },
+          { type => ARRAYREF }
+      );
+
+    # calculate the total pages
+    my $pages = int($total / $limit);
+
+    if ( ($pages * $limit) != $total) { $pages++ }
+
+    my $first_result = $start + 1;
+    my $last_result  = ($first_result + $limit) - 1;
+
+    $last_result = ($last_result <= $total) ? $last_result : $total;
+
+    # calculate page links totals
+    my $first_page = int( ($first_result - 1) / $limit) - 6;
+    my $last_page  = int( ($last_result  - 1) / $limit) + 6;
+
+    my $curr_page = 0;
+    my $links     = "";
+
+    for my $count (0 .. ($pages - 1) ) {
+        next if ($first_page > $count);
+        next if ($last_page  < $count);
+
+        if ($count == 0) {
+            if ($start != 0) {
+                $links .= "<a href=\"javascript:startWith('0')\">";
+                $links .= ($count + 1);
+                $links .= '</a>';
+            }
+            else {
+                $links .= '<span>' . ($count + 1) . '</span>';
+                $curr_page = ($count + 1);
+            }
+
+            $links .= ' ';
+        }
+
+        if ($count > 0) {
+            if ($start != ($count * $limit)) {
+                $links .= "<a href=\"javascript:startWith('" . ($count * $limit) . "')\">";
+                $links .= $count + 1;
+                $links .= '</a>';
+            }
+            else {
+                $links .= '<span>' . ($count + 1) . '</span>';
+                $curr_page = ($count + 1);
+            }
+
+            $links .= ' ';
+        }
+    }
+
+    # add page navigation buttons
+    if ($curr_page > 1) {
+        $links .= " &#124; <a href=\"javascript:startWith('" . (($curr_page * $limit) - ($limit * 2)) . "')\">";
+        $links .= 'Last';
+        $links .= '</a>';
+    }
+
+    if (($pages > 1) && ($total > ($curr_page * $limit))) {
+        $links .= " &#045; <a href=\"javascript:startWith('" . ($curr_page * $limit) . "')\">";
+        $links .= 'Next';
+        $links .= '</a>';
+    }
+
+    return {
+        results => {
+            first => $first_result,
+            last  => $last_result,
+            total => $total,
+            loop  => \@$ary_ref,
+        },
+        pages => {
+            current => $curr_page,
+            total   => $pages,
+            links   => $links,
+        },
+      };
+}
+
+#----------------------------------------------------------------------------+
+# merge_hashref(\%hash1, \%hash2)
+#
+# Return a single reference to a hash, merge key/value pairs.
+
+sub _merge_hashref {
+    my $self = shift;
+    # second argument overrides the first
+    return { map %$_, grep ref $_ eq 'HASH', @_ };
+}
+
+#----------------------------------------------------------------------------+
+# _sort_data($key, $order, \%ary_ref)
+#
+# Return a sorted multi-dimensional array.
+
+sub _sort_data {
+    my ($self, $key, $order, $ary_ref)
+      = validate_pos(@_,
+          { type => OBJECT   },
+          { type => SCALAR   },
+          { type => SCALAR   },
+          { type => ARRAYREF }
+      );
+
+    my $alpha = 0;
+
+    for (@$ary_ref) {
+        return unless defined $_->{$key};
+        $alpha = 1, last  if ($_->{$key} =~ /[^0-9 ]/);
+    }
+
+    my @sorted;
+    my $dir = ($order eq 'asc') ? +1 : -1;
+
+    if ($alpha) {
+        @sorted =
+          sort { $dir * ($a->{$key} cmp $b->{$key}) } @$ary_ref;
+    }
+    else {
+        @sorted =
+          sort { $dir * ($a->{$key} <=> $b->{$key}) } @$ary_ref;
+    }
+    return \@sorted;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+[% project_title %]::Admin - Web based admin control panel
+
+=head1 SYNOPSIS
+
+  use [% project_title %]::Admin;
+
+=head1 DESCRIPTION
+
+Base class module that is used to load the admin control panel.  Also provides 
+shared functionality for installed admin extras.
+
+=head1 OBJECT METHODS
+
+=head2 _default
+
+Create the Control Panel interface.  Load the selected window into an HTML frame.
+
+=head2 _error
+
+Print errors/exceptions and exit.
+
+  $self->_error(\%controller, $title, $value);
+
+=head2 _log_action
+
+Logs the action including HTTP request parameters.
+
+  $self->_log_action(\%controller, $value);
+
+=head2 _gen_results
+
+Generate per-page results.
+
+  $self->_gen_results($total, $start, $limit, \%ary_ref);
+
+=head2 _merge_hashref
+
+Return a single reference to a hash, merge key/value pairs.
+
+  $self->_merge_hashref(\%hash1, \%hash2);
+
+=head2 _sort_data
+
+Return a sorted multi-dimensional array.
+
+  $self->_sort_data($column, $order, \%ary_ref);
+
+=head1 OPTIONAL
+
+If database support is available, you can log control panel user actions 
+to a database.  The database table to store logging information is 
+auto-generated.  Since this is the case, the SQL user must have CREATE 
+privileges.
+
+In case you want to manually create this table, you can run the following
+SQL statement on the database command-line:
+
+  CREATE TABLE IF NOT EXISTS admin_log (
+      admin_log_id int(3) NOT NULL AUTO_INCREMENT,
+      admin_log_username varchar(15) DEFAULT NULL,
+      admin_log_action varchar(55) DEFAULT NULL,
+      admin_log_query_string text,
+      admin_log_user_ip_addr varchar(15) DEFAULT NULL,
+      admin_log_created datetime DEFAULT NULL,
+      PRIMARY KEY (admin_log_id)
+    );
+
+If a database is not available at the time data is collected, this 
+information will be written to a file that can be located in your project 
+C<logs> directory.
+
+=head1 DEBUG MODE
+
+If debugging is enabled, the URI and query string are logged.  This can 
+pose as a security risk when running in a production environment since
+personal information (including passwords) may be exposed.
+
+=head1 SEE ALSO
+
+L<Apache2::WebApp>, L<Apache2::WebApp::Plugin::DBI>
+
+=head1 AUTHOR
+
+Marc S. Brooks, E<lt>mbrooks@cpan.orgE<gt> L<http://mbrooks.info>
+
+=head1 COPYRIGHT
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

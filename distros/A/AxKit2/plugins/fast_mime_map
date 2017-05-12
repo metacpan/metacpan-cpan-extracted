@@ -1,0 +1,110 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+=head1 NAME
+
+fast_mime_map - File extension to MIME type mapping
+
+=head1 SYNOPSIS
+
+    Plugin fast_mime_map
+    
+    # Optionally:
+    MimeMap   .foo   application/foo
+
+=head1 DESCRIPTION
+
+This module attempts to map filenames to MIME types without doing any I/O. It
+is purely based on file extensions. If you need to introspect the contents of
+the file to get the MIME type then use the magic_mime_map plugin.
+
+There is a default mapping. Best to view the source to find out what it is.
+Anything specified in the C<MimeMap> config directives overrides the default
+mappings.
+
+The default MIME type is B<text/html> (in case an extension cannot be found in
+your custom mappings nor the default mappings). To override the default mapping:
+
+    MimeMap   #default   application/octet-stream
+
+(Or whatever default you would prefer).
+
+=cut
+
+my %default_types = (
+        'html'     => 'text/html',
+        'htm'      => 'text/html',
+        'txt'      => 'text/plain',
+        'gif'      => 'image/gif',
+        'jpeg'     => 'image/jpeg',
+        'jpg'      => 'image/jpeg',
+        'png'      => 'image/png',
+        'tiff'     => 'image/tiff',
+        'ico'      => 'image/x-icon',
+        'css'      => 'text/css',
+        'csv'      => 'text/csv',
+        'rtf'      => 'text/rtf',
+        'xml'      => 'text/xml',
+        'mpg'      => 'video/mpeg',
+        'avi'      => 'application/octet-stream',
+        'eml'      => 'message/rfc822',
+        'mp2'      => 'audio/mpeg',
+        'mp3'      => 'audio/mpeg',
+        'mp4'      => 'audio/mp4',
+        'js'       => 'application/ecmascript',
+        'doc'      => 'application/msword',
+        'gz'       => 'application/octet-stream',
+        'xhtml'    => 'application/xhtml+xml',
+        'dtd'      => 'application/xml-dtd',
+        'xls'      => 'application/ms-excel',
+        'ppt'      => 'application/ms-powerpoint',
+        'pps'      => 'application/ms-powerpoint',
+        'rpm'      => 'application/octet-stream',
+        'pdf'      => 'application/pdf',
+        'ps'       => 'application/postscript',
+        'rdf'      => 'application/rdf+xml',
+        'smil'     => 'application/smil+xml',
+        '#default'  => 'text/html',
+    );
+
+sub conf_MimeMap {
+    my ($self,$ext,$type) = @_;
+    $self->config('MimeMap',{%default_types}) unless $self->config('MimeMap');
+	$ext =~ s/^\.//;
+    $self->config('MimeMap')->{$ext} = $type;
+    return ();
+}
+
+sub hook_mime_map {
+    my ($self, $hd, $filename) = @_;
+    
+    my $map = $self->config('MimeMap') || \%default_types;
+    
+    $filename =~ s/.*\///;
+    my @parts = split(/\./, $filename);
+    my $uno = 0;
+    while (@parts) {
+        my $name = join('.', @parts);
+        if (exists($map->{$name})) {
+            $hd->mime_type($map->{$name});
+            return OK;
+        }
+        shift @parts;
+    }
+    $hd->mime_type($map->{'#default'});
+    return DECLINED;
+}

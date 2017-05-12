@@ -1,0 +1,320 @@
+#!/usr/bin/env perl
+
+# PODNAME: simplenotesync
+
+use v5.10;
+use strict;
+use warnings;
+use App::SimplenoteSync;
+use File::BaseDir;
+use Getopt::Long qw/:config no_ignore_case bundling/;
+use Pod::Usage;
+use Config::INI::Reader;
+use Log::Dispatch;
+use Log::Any::Adapter;
+use Try::Tiny;
+
+my $logger;
+
+our $PROGNAME = 'simplenotesync';
+
+my $opt = {action => 'sync'};
+
+sub get_opts {
+    my $getopt = GetOptions(
+        $opt,                'help|h',
+        'man',               'debug|d!',
+        'version|v',         'no_server_updates!',
+        'no_local_updates!', 'email=s',
+        'password=s',        'quiet|q!',
+        'edit|e=s',          'editor=s'
+    );
+
+    if ($getopt == 0 or defined $opt->{help}) {
+        pod2usage;
+    }
+
+    if (defined $opt->{version}) {
+        printf "%s version %s [using WebService::Simplenote %s]\n", $PROGNAME,
+          $App::SimplenoteSync::VERSION, $WebService::Simplenote::VERSION;
+        exit;
+    }
+
+    if (defined $opt->{man}) {
+        pod2usage(-verbose => 2);
+    }
+
+    if (defined $opt->{edit}) {
+        $opt->{action} = 'edit';
+    }
+
+    # is there a path on the command line?
+    if (defined $ARGV[0]) {
+        $opt->{notes_dir} = $ARGV[0];
+    }
+
+    return 1;
+}
+
+sub get_logger {
+
+    my $log_level = 'info';
+    if ($opt->{debug}) {
+        $log_level = 'debug';
+    }
+
+    # TODO interactive/background
+    $logger = Log::Dispatch->new(
+        outputs => [
+
+            [
+                'Syslog',
+                min_level => $log_level,
+                ident     => $PROGNAME,
+            ],
+        ],
+    );
+
+    if (!$opt->{quiet}) {
+        require Log::Dispatch::Screen::Color;
+        $logger->add(
+            Log::Dispatch::Screen::Color->new(
+                min_level => 'info',
+                newline   => 1,
+            ));
+    }
+
+    if ($opt->{debug}) {
+        require Log::Dispatch::File;
+        require DateTime;
+        my $sub = sub {
+            my %p   = @_;
+            my $dt  = DateTime->now;
+            my $str = sprintf '%s::%s::%s', $dt->iso8601, uc $p{level},
+              $p{message};
+            return $str;
+        };
+
+        $logger->add(
+            Log::Dispatch::File->new(
+                name      => 'debug_file',
+                min_level => 'debug',
+                filename  => $PROGNAME . '_debug.log',
+                newline   => 1,
+                callbacks => $sub,
+            ));
+    }
+
+    Log::Any::Adapter->set('Dispatch', dispatcher => $logger);
+}
+
+sub get_config {
+    my $conf_dir  = Path::Class::Dir->new(File::BaseDir->config_home);
+    my $conf_file = $conf_dir->file("$PROGNAME.ini");
+    $logger->debug("Trying to read config from $conf_file");
+
+    my $config;
+    try {
+        $config = Config::INI::Reader->read_file($conf_file);
+    }
+    catch {
+        if (!exists $opt->{email} || !exists $opt->{password}) {
+            die
+              "--email and/or --password missing from command line, and failed to read config file: $_";
+        }
+    };
+
+    # merge config opts - cli opts take precedence
+    foreach my $key (keys %{$config->{_}}) {
+        if (!exists $opt->{$key}) {
+            $opt->{$key} = $config->{_}->{$key};
+        }
+    }
+
+    if (!$opt->{debug}) {
+        return;
+    }
+
+    $logger->debug('======= Options ========');
+    foreach my $key (keys %$opt) {
+        my $value = $opt->{$key};
+        if ($key eq 'password') {
+            $value = '******';
+        }
+        $logger->debug("$key: [$value]");
+    }
+    $logger->debug('===== End Options ======');
+    return;
+}
+
+get_opts;
+get_logger;
+get_config;
+
+my $app = App::SimplenoteSync->new($opt);
+
+given ($opt->{action}) {
+    when ('edit') {
+        $app->edit($opt->{edit});
+    }
+    default {
+        my $notes = $app->sync_notes;
+        $app->sync_report;
+    }
+}
+
+
+__END__
+=pod
+
+=for :stopwords Ioan Rogers Fletcher T. Penney github
+
+=head1 NAME
+
+simplenotesync
+
+=head1 VERSION
+
+version 0.2.0
+
+=head1 SYNOPSIS
+
+simplenotesync [options] [pathname]
+
+ Options:
+   --help     -h           brief help message
+   --man                   full documentation
+   --version -v            display program and library version
+   --debug   -d            write debug output to a logfile in current dir
+   --quiet   -q            log nothing
+   --email                 email used for simplenote account
+   --password              password used for simplenote account
+   --no_server_updates     don't modify notes on server
+   --no_local_updates      don't modify notes locally
+   --edit                  edit a note, preserving xattrs
+   --editor                override $ENV{EDITOR}
+
+  [pathname] is the local notes folder to syncronise with. Defaults to $HOME/Notes.
+  
+  Everything is optional and can be specified in the config file. See manual.
+
+=head1 DESCRIPTION
+
+C<simplenotesync> provides bidirectional synchronization between the L<http://simplenoteapp.com/>/ website
+and a local directory of text files on your computer
+
+=head1 WARNING
+
+Please note that this software is still in development stages --- I STRONGLY
+urge you to backup all of your data before running to ensure nothing is lost.
+If you run C<simplenotesync> on an empty local folder without the net result will 
+be to copy the remote notes to the local folder, effectively performing a backup.
+
+=head1 CONFIGURATION
+
+TODO x-platform!
+
+C<simplenotesync> can optionally use a config file. Create a file called 
+F<simplenotesync.ini> in your config dir, usually ~/.config.
+
+It is an ini file, supporting the following keys:
+
+  email, password, notes_dir, no_server_updates, no_local_updates, editor
+
+=head1 KNOWN ISSUES
+
+=over
+
+=item
+
+No merging when both local and remote file are changed between syncs - this might be enabled in the future
+
+=item
+
+Renaming a note filename, then changing the contents remotely, will result in two 
+copies of the same note. Also, chaging the notes title remotely will cause it to be
+downloaded with again with the new name.
+
+For now, you'll have to manually delete the old copy
+
+=item
+
+Certain characters are prohibited in filenames (:,\,/) - if present in the
+title, they are stripped out.
+
+=item
+
+Simplenote supports multiple notes with the same title, but two files cannot
+share the same filename. If you have two notes with the same title, only one
+will be downloaded. I suggest changing the title of the other note.
+
+=back
+
+=head1 FAQ
+
+=over
+
+=item B<Why can I download notes from Simplenote, but local notes aren't being uploaded?>
+
+Do the text files end in F<.txt> or F<.mkdn>? These are currently the only two
+extensions considered.
+
+Text files can't be located in subdirectories - this script does not (by
+design) recurse folders looking for files (since they shouldn't be anywhere
+but the specified directory).
+
+=back
+
+=head1 TROUBLESHOOTING
+
+Running with C<--debug> will put a log in the current directory with lots of useful
+information. If your filing a bug report, I'd like to see that log!
+
+You can disable writing changes to either the local directory or to the 
+Simplenote web server with "C<--no_local_updates> and C<--no_remote_updates> to
+protect your data.
+
+=head1 SEE ALSO
+
+Designed for use with Simplenote:
+
+<http://www.simplenoteapp.com/>
+
+Based on SimplenoteSync:
+
+<http://fletcherpenney.net/other_projects/simplenotesync/>
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Ioan Rogers <ioanr@cpan.org>
+
+=item *
+
+Fletcher T. Penney <owner@fletcherpenney.net>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Ioan Rogers.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://github.com/ioanrogers/App-SimplenoteSync/issues>.
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/ioanrogers/App-SimplenoteSync>
+and may be cloned from L<git://github.com/ioanrogers/App-SimplenoteSync.git>
+
+=cut
+

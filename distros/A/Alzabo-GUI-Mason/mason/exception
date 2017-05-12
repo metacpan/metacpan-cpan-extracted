@@ -1,0 +1,87 @@
+<html>
+<head>
+<title>Alzabo: Error</title>
+</head>
+
+<body>
+
+<table width="100%">
+ <tr valign="top">
+  <td bgcolor="#ffeeee">
+   Error message:
+  </td>
+  <td bgcolor="#eeffff">
+   <% UNIVERSAL::isa($exc, 'Exception::Class::Base') ? $exc->error : $exc %>
+  </td>
+ </tr>
+% if ( UNIVERSAL::isa($exc, 'Exception::Class::Base') ) {
+ <tr valign="top">
+  <td bgcolor="#ffeeee">
+   Error class:
+  </td>
+  <td bgcolor="#eeffff">
+   <% ref $exc %>
+  </td>
+ </tr>
+%   if ($exc->trace) {
+ <tr valign="top">
+  <td bgcolor="#ffeeee">
+   Trace:
+  </td>
+  <td bgcolor="#eeffff">
+   <pre>
+   <% join "\n\n", split /\n+/, $exc->trace->as_string %>
+   </pre>
+  </td>
+ </tr>
+%   }
+<tr valign="top">
+ <td bgcolor="#ffeeee">
+  Process id:
+ </td>
+ <td bgcolor="#eeffff">
+  <% $exc->pid %>
+ </td>
+</tr>
+%   if ( $exc->isa('Alzabo::Exception::Driver') ) {
+ <tr valign="top">
+  <td bgcolor="#ffeeee">
+   SQL:
+  </td>
+  <td bgcolor="#eeffff">
+   <% $exc->sql %>
+  </td>
+ </tr>
+ <tr valign="top">
+  <td bgcolor="#ffeeee">
+   Bind values:
+  </td>
+  <td bgcolor="#eeffff">
+%     if (my @b = @{ $exc->bind || [] }) {
+   <ul>
+%       foreach my $b (@b) {
+    <li><% $b %>
+%       }
+   </ul>
+%     }
+  </td>
+ </tr>
+%   }
+% }
+</table>
+
+</body>
+</html>
+
+<%init>
+my $exc = shift;
+$m->clear_buffer;
+</%init>
+
+<%cleanup>
+$m->abort;
+</%cleanup>
+
+<%flags>
+inherit => undef
+</%flags>

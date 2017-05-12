@@ -1,0 +1,72 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 cdc49805a5ff8e3d2959152d3a386ee50fea6d0b Changes
+SHA1 ef8aafc5cddcb66c942f87619bc4aac9f5db4c7b MANIFEST
+SHA1 dcc2c1237f70901c7e97c801593039b59a1f556c META.json
+SHA1 b522919a70b6902c54839bb1c3bf7f5d4a218ebc META.yml
+SHA1 7fee9ef3ab5bbd5a053ea206164bd5561437e5de Makefile.PL
+SHA1 8a4bead1b54d90e036ce4c4665bc1398475e1a5f README
+SHA1 e38684d259b0c61be99110a847fe78f03f9379eb lib/evil.pm
+SHA1 0ba4f8e53cfb2ae2d5d4409f9b65f0223492f560 t/confused.t
+SHA1 a7dc0705587c4e1b18b3694b0df92ab04caca51e t/disable-die.t
+SHA1 853435fcaa614e83f65a73fc56522c72234bb484 t/disable-safe.t
+SHA1 063d061175d51ba40017935d31e924cb66db1433 t/intermediate-direct.t
+SHA1 348d91f8f0390349f5e6824065cffb2ca3717912 t/intermediate-indirect.t
+SHA1 a8ec8041f0f8dc172ae55b7ce903c5c4c1b0e8dc t/intermediate-unrelated.t
+SHA1 28e07e88175302c7e42c19760526e89e6db1cd96 t/lax-direct.t
+SHA1 4428689d2e43a7c7bcdd5a1507177904fc821090 t/lax-indirect.t
+SHA1 261ab966528f2901504644e8cfc8605f808c08db t/lax-unrelated.t
+SHA1 3d7261afc13cdb8cc511d48a51ec4beb63a3c6bc t/strict-die.t
+SHA1 bc5cd4e14a9c4f271752c654f64f3b3cbfb08184 t/strict-safe.t
+SHA1 e385561ed6e18a1b78c1feb46221c68bcf0ab3bb t/t1/Direct.pm
+SHA1 9cb78b67d98c1242bbf5f7f0e718dbdfcea613c9 t/t1/Evil.pm
+SHA1 64b847d279c6ceef34485bee83f080566321e618 t/t1/Indirect.pm
+SHA1 5ac14a311278d71128c412629f97e3bc7222fb5d t/t1/Unrelated.pm
+SHA1 a1ac67a4be833550451e8dbafc76049028e88589 t/t2/Dies.pm
+SHA1 6027a35e34ff2b49ee7dd6cf2cce67c02ec6d7b4 t/t2/Evil.pm
+SHA1 a0129b0809aba86e9f23beb3fb02b65ed3f8bf71 t/t2/Survives.pm
+SHA1 e9c95bcbde288e8026c40c4601bd178192e4db31 t/t3/Evil.pm
+SHA1 1b68d4b23069525748305a363c6664de4d9be577 t/t3/IntermediateDirect.pm
+SHA1 ba1f8f4daae124bc7d21637ffa80c15203461804 t/t3/IntermediateIndirect.pm
+SHA1 04fb577e72f2cb9d4d93c932ecb0ce1bc3baa341 t/t3/LaxDirect.pm
+SHA1 151ce50f6a9b22054a9569cd8572e60917eedb7b t/t3/LaxIndirect.pm
+SHA1 ce07cecc9327697cf6630343cd053ed589e8a503 t/t3/UnrelatedIntermediate.pm
+SHA1 6de1c7bde2e0cd6ea1bd4d3e0f590aa885c2fac3 t/t3/UnrelatedLax.pm
+SHA1 5000d8df4a96b1fb7e3c9e712c684c3dee624bd0 t/t3/UsesEvil.pm
+SHA1 e7ebc04c86835b6c1421e4e62d5618e073d46337 t/t4/ConfusedIntermediate1.pm
+SHA1 68afcd69df5c74604f4c1f0beae8ff20d87354cd t/t4/ConfusedIntermediate2.pm
+SHA1 5942092d813eed2d4a5027a6c1a5211b57aa592c t/t4/ConfusedLax1.pm
+SHA1 c5dd7c29fea8b51c9d29005d89a29bdacc676129 t/t4/ConfusedLax2.pm
+SHA1 b3d1edef58e85f0ea7efddb453c67f34f777c177 t/t4/ConfusedStrict1.pm
+SHA1 aefdbc0739c90477e123627029c03e4deddb8de3 t/t4/ConfusedStrict2.pm
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAljxO/EQHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYqR1D/9dYYftb+Nl5Re5Zy3t2oLVh+oVQF9FucYX
+axZX8Jn34P03rIxYdHVezUoTEJI6dcnkb91a4XwJfoAV8HGqy9zv3tjdqUDkv2fV
+rDmuzablglm9GVBdSl5cIOY9C+u+EXXLwY9Gf2ziBI2yS1d/4zhC8+iBobbHyElY
+JnrnjB8ExXs6hkhoYo7nEHWfzBs9qB40V8iNAso8XmfNa7hDDC5U97GDe2W92WkQ
+byZzalaX99z00nKyLm1auwjD7g42F/xVWL2qjYR6twjVF9LF9jTRdFGn5pMJCQnv
+YoavaFwpyEra3GiSk6k7S4vIvP/Au6vZm2cZwEQrNHrs46dI/eqBJrh1pismgmoL
+BfEykzvMW8ZKx+iFSStUxAeDbwK6ZiUwqAKNaxg8dgbY6LglR6A1B7q9qSqX6H9C
+KkluH7042fTj8lDSAOgLH54XB15n1T7U1w4YScinoO3bgJWwpo7uOztk3yKMN88Q
+beIX6aYEzTcZ9vWJpqs6cOqXTK61Ka65j4j507vC9INBwUUI7OEm2FkRPJiqe1Bu
+S1k/Kx8wFNlE70zOcOvkHfiwTs8KiNLmX1FY/uf/dYWKBXzN0n8Ffh8rutvIgcHn
+8nRPXE/4pBAR4X1QCe9al7DlW6/P6nU/ieSkjz+v943p2aRw5s1JPqEtKBEUFoCF
+RRmxBW138A==
+=2god
+-----END PGP SIGNATURE-----

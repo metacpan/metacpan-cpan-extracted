@@ -1,0 +1,20 @@
+List of stuff I want this module to have
+
+  * allow to set aliases to --no-* bool options
+  * on request, ignore unrecognized options in App::Getopt->options() method
+  * on request, 1) ignore or 2) treat as non-option args unrecognized options
+    in App::Getopt->cmdline() ((2) should make multi-level option sets
+    possible)
+  * on request, treat options without help message as unrecognized in
+    App::Getopt->cmdline()
+  * set other options when setting current one (opt { set => sub { ... } })
+  * print --help message as table (`rsync --help' like, at least in options
+    section)
+  * add priority-based option lookup
+  * add environment variables handling (those options will also get their prio)
+  * set/change options later, at run time, using copy-on-write strategy
+    (multithreading anyone?)
+
+List of ideas to settle
+  * how about whole subtree aliases? (for subsystem to have its own view on
+    config options without arduous copying all the options)

@@ -1,0 +1,76 @@
+Revision history for Perl extension AnyEvent::Pg.
+
+0.15  Oct 28, 2014
+        - add AnyEvent::Pg method last_query_start_time (feature
+          request by Yoran Heling)
+        - use Test::PostgreSQL instead of Test::postgresql for testing
+        - set Test::PostgreSQL as required when
+          $ENV{AUTOMATED_TESTING} is set
+
+0.14  May 6, 2014
+       - remove usage of given/when construction that is experimental
+         now
+
+0.13  Aug 28, 2013
+       - on_error callbacks were not being called on fatal errors
+         breaking the connection (bug report and patch by Pavel
+         Shaydo)
+
+0.12  Jul 16, 2013
+       - in some cases, on_connect_error callback was being called
+         from the constructor
+       - use weak callbacks for all the AE::postpone() invocations
+       - better debugging
+
+0.11  Jul 2, 2013
+       - add support for priorizing queries
+       - add initialization queries
+
+0.10  Mar 25, 2013
+       - add support for set method that allows to change pool
+         parameters after creation
+       - resolve some problems with Test::postgresql
+
+0.09  Mar 21, 2013
+       - add support for global_timeout feature
+
+0.08  Feb 27, 2013
+        - AnyEvent::Pg objects were not calling on_empty_queue after
+          stablishing the connection
+        - more tests added
+
+0.07  Feb 25, 2013
+        - remove dependency on unused Devel::FindRef 
+
+0.06  Feb 20, 2013
+        - use Method::WeakCallback to create callbacks to itself in
+          order to remove some memory leaks
+        - add tests based on Test::postgresql
+        - empty_query callback could be called too many times due to
+          stacked calls from AE::postpone
+
+0.05  Jan 18, 2013
+        - add experimental support for listeners
+
+0.04  Oct 22, 2012
+        - add support for the on_transient_error feature
+
+0.03  May 22, 2012
+        - add banner about alpha status of this module in the
+          documentation
+        - add support for AnyEvent::Pg::Pool
+        - add support for notifications
+        - return watcher objects from push_queue and related methods
+          ** THIS CHANGE IS BACKWARD INCOMPATIBLE!!! **
+
+0.02  Jul 18, 2011
+        - push_query was not triggering database dialog
+        - add debugging support
+        - add cancel_query method
+        - add queue_size method
+        - rename fail method to abort_all
+
+0.01  Wed Jun  1 13:02:52 2011
+	- original version; created by h2xs 1.23 with options
+		-AXn AnyEvent::Pg
+

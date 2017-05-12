@@ -1,0 +1,93 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use IPC::Run qw(run timeout);
+
+use constant TIMEOUT => 5*60;
+use constant DEBUG   => 0;
+
+$SIG{INT} = sub { report(); exit; };
+
+my %report = (ok => 0, nok => 0, failed => {});
+my $test = 0;
+while (<DATA>) {
+    next if /^\s*(#.*|$)/;
+    chomp;
+    run_test($_);
+}
+
+report();
+
+sub run_test {
+    my $command = shift;
+    my @cmds = split /\s*&&\s*/, $command;
+    $test++;
+    my $cnt = 0;
+    my $failed = 0;
+    for my $cmd (@cmds) {
+        next unless $cmd =~ /\S/;
+        $cnt++;
+        print "[$test.$cnt] $cmd\n";
+        my @cmd = split /\s+/, $cmd;
+        my($in, $out, $err);
+        my $ok = 0;
+        eval {
+            $ok = run \@cmd, \$in, \$out, \$err,
+                debug => DEBUG, timeout(TIMEOUT);
+        };
+        warn "$@\n" if $@;
+        $ok = 1 if $cmd =~ /make clean/; # ignore 'make clean' errors
+        unless ($ok) {
+            print "\n\tFAILURE!\n\n";
+            print "STDOUT:\n$out\n" if $out;
+            print "STDERR:\n$err\n" if $err;
+            push @{ $report{failed}{$command} }, "($cnt) $cmd";
+            $failed++;
+            last;
+        }
+        if (@cmd == 2 && $cmd[0] eq 'make' && $cmd[1] eq 'test') {
+            my $result = $out =~ /All tests successful/ ? "OK" : "NOT OK";
+            print "\n\t$result\n\n";
+        }
+    }
+
+    $failed ? $report{nok}++ : $report{ok}++;
+    print "\n", "-" x 40, "\n\n";
+}
+
+sub report {
+    my $format = "%-7s: %3d\n";
+    printf $format, "Success", $report{ok};
+    printf $format, "Failure", $report{nok};
+    print "-" x 16, "\n";
+    printf $format, "Total", $report{ok}+$report{nok};
+
+    my @failed = keys %{ $report{failed} };
+    if (@failed) {
+        print join "\n", '',
+            "Failed commands:", "-" x 16,
+            map { join("\n\t", $_, @{ $report{failed}{$_}||[] }),"\n"} @failed;
+    }
+}
+
+__DATA__
+# need to test all these combinations
+
+### mp2 DSO ###
+
+make clean && perl-5.6.1 Makefile.PL -httpd /home/$USER/httpd/prefork/bin/httpd -libmodperl /home/$USER/httpd/prefork/modules/mod_perl-5.6.1.so -port select MOD_PERL=2 && make && make test
+
+make clean && perl-5.8.0 Makefile.PL -httpd /home/$USER/httpd/prefork/bin/httpd -libmodperl mod_perl-5.8.0.so -port select MOD_PERL=2 && make && make test
+
+make clean && perl-5.8.0-ithread Makefile.PL -httpd /home/$USER/httpd/prefork/bin/httpd -libmodperl mod_perl-5.8.0-ithread.so -port select MOD_PERL=2 && make && make test
+
+make clean && perl-5.8.1 Makefile.PL -httpd /home/$USER/httpd/prefork/bin/httpd -libmodperl mod_perl-5.8.1.so -port select MOD_PERL=2 && make && make test
+
+make clean && perl-5.8.1-ithread Makefile.PL -httpd /home/$USER/httpd/prefork/bin/httpd -libmodperl mod_perl-5.8.1-ithread.so -port select MOD_PERL=2 && make && make test
+
+make clean && perl-blead Makefile.PL -httpd /home/$USER/httpd/prefork/bin/httpd -libmodperl mod_perl-blead.so -port select MOD_PERL=2 && make && make test
+
+make clean && perl-blead-ithread Makefile.PL -httpd /home/$USER/httpd/prefork/bin/httpd -libmodperl mod_perl-blead-ithread.so -port select MOD_PERL=2 && make && make test
+

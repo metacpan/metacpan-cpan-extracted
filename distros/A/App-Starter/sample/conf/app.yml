@@ -1,0 +1,8 @@
+# put this file into ~/.app-starter/conf/app.yml
+tag_style : star
+ignore  :
+    - \.svn
+    - \.cvs
+replace :
+    foo : bar
+    bar : hoge

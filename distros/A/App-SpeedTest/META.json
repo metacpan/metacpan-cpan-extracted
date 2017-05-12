@@ -1,0 +1,71 @@
+{
+   "name" : "App-SpeedTest",
+   "abstract" : "Command line interface to speedtest.net",
+   "release_status" : "stable",
+   "meta-spec" : {
+      "version" : "2",
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+   },
+   "license" : [
+      "perl_5"
+   ],
+   "version" : "0.19",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/Tux/speedtest",
+         "url" : "https://github.com/Tux/speedtest"
+      },
+      "homepage" : "https://metacpan.org/pod/App::SpeedTest",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "x_IRC" : "irc://irc.perl.org/#csv"
+   },
+   "generated_by" : "Author",
+   "provides" : {
+      "App::SpeedTest" : {
+         "version" : "0.19",
+         "file" : "speedtest"
+      }
+   },
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+   ],
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Socket" : "0",
+            "LWP::UserAgent" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.010000",
+            "Getopt::Long" : "0",
+            "Data::Peek" : "0",
+            "Data::Dumper" : "0",
+            "HTML::TreeBuilder" : "0",
+            "Math::Trig" : "0",
+            "XML::Simple" : "0"
+         },
+         "recommends" : {
+            "Time::HiRes" : "1.9728",
+            "XML::Simple" : "2.20",
+            "Getopt::Long" : "2.48",
+            "Data::Peek" : "0.44",
+            "HTML::TreeBuilder" : "5.03",
+            "Socket" : "2.021",
+            "LWP::UserAgent" : "6.13"
+         }
+      }
+   },
+   "dynamic_config" : 1
+}

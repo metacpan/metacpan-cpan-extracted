@@ -1,0 +1,51 @@
+Revision history for module
+
+0.3   2015-08-13
+        Updating for release of version 0.3
+        Removed creation of makefile (Ivan Wills)
+        Removed Path::Class Dependency (Ivan Wills)
+
+0.2     2015-05-28
+        Updating for release of version 0.2
+        Fixed abstract (Ivan Wills)
+        Have both versions (Ivan Wills)
+        Moved absract to meta merge section to try to fix output (Ivan Wills)
+        Alignment fix (Ivan Wills)
+        Updated changes with commits (Ivan Wills)
+
+0.1     2015-05-24
+        Reset version (Ivan Wills)
+        Added dist_abstract and fixed dependencies (Ivan Wills)
+        Updated tests (Ivan Wills)
+        Added META.json (Ivan Wills)
+        Fixed documentation (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+        Updated manifest skip files (Ivan Wills)
+        Fixed the tests (Ivan Wills)
+        Converted to new mock format (Ivan Wills)
+        Tidied up module references (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+        Added tags (Ivan Wills)
+        Split into own repository (Ivan Wills)
+        Removed unused module (Ivan Wills)
+        Fixed executable bits (Ivan Wills)
+        New file on things I wish to do (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Added more tests to increase coverage (Ivan Wills)
+        Added method description (Ivan Wills)
+        Got test working (Ivan Wills)
+        Fixed dependencies (Ivan Wills)
+        Starting to fix tests (Ivan Wills)
+        Stop reporting if no tags found and --quiet (Ivan Wills)
+        Fixed changes (Ivan Wills)
+        Updated boilerplait test (Ivan Wills)
+        Cleaned up some documentation (Ivan Wills)
+        Got basic code working (Ivan Wills)
+        Updated documentation (Ivan Wills)
+        Renamed to POD (Ivan Wills)
+        Fixed version from (Ivan Wills)
+        Implemented getting newest tag (Ivan Wills)
+        added test (Ivan Wills)
+        Thinking of what to do (Ivan Wills)
+        Starting to work on the files (Ivan Wills)
+        Initial commit (Ivan Wills)

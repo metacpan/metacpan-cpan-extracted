@@ -1,0 +1,131 @@
+# This file must be used with "source bin/activate" *from bash*
+# you cannot run it directly
+
+deactivate () {
+    if [ ! "${1-}" ] ; then
+        unset PERL_VIRTUAL_ENV
+        unset PATH
+        unset PERL5LIB
+        unset PERL_LOCAL_LIB_ROOT
+        unset PERL_MB_OPT
+        unset PERL_MM_OPT
+        unset PS1
+    fi
+
+    # reset old environment variables
+    # ! [ -z ${VAR+_} ] returns true if VAR is declared at all
+    if ! [ -z "${_OLD_PERL_VIRTUAL_ENV+_}" ] ; then
+        PERL_VIRTUAL_ENV="$_OLD_PERL_VIRTUAL_ENV"
+        export PERL_VIRTUAL_ENV
+        unset _OLD_PERL_VIRTUAL_ENV
+    fi
+
+    if ! [ -z "${_OLD_PERL_VIRTUAL_PATH+_}" ] ; then
+        PATH="$_OLD_PERL_VIRTUAL_PATH"
+        export PATH
+        unset _OLD_PERL_VIRTUAL_PATH
+    fi
+
+    if ! [ -z "${_OLD_PERL_VIRTUAL_PERL5LIB+_}" ] ; then
+        PERL5LIB="$_OLD_PERL_VIRTUAL_PERL5LIB"
+        export PERL5LIB
+        unset _OLD_PERL_VIRTUAL_PERL5LIB
+    fi
+
+    if ! [ -z "${_OLD_PERL_VIRTUAL_PERL_LOCAL_LIB_ROOT+_}" ] ; then
+        PERL_LOCAL_LIB_ROOT="$_OLD_PERL_VIRTUAL_PERL_LOCAL_LIB_ROOT"
+        export PERL_LOCAL_LIB_ROOT
+        unset _OLD_PERL_VIRTUAL_PERL_LOCAL_LIB_ROOT
+    fi
+
+    if ! [ -z "${_OLD_PERL_VIRTUAL_PERL_MB_OPT+_}" ] ; then
+        PERL_MB_OPT="$_OLD_PERL_VIRTUAL_PERL_MB_OPT"
+        export PERL_MB_OPT
+        unset _OLD_PERL_VIRTUAL_PERL_MB_OPT
+    fi
+
+    if ! [ -z "${_OLD_PERL_VIRTUAL_PERL_MM_OPT+_}" ] ; then
+        PERL_MM_OPT="$_OLD_PERL_VIRTUAL_PERL_MM_OPT"
+        export PERL_MM_OPT
+        unset _OLD_PERL_VIRTUAL_PERL_MM_OPT
+    fi
+
+    if ! [ -z "${_OLD_PERL_VIRTUAL_PS1+_}" ] ; then
+        PS1="$_OLD_PERL_VIRTUAL_PS1"
+        export PS1
+        unset _OLD_PERL_VIRTUAL_PS1
+    fi
+
+    # This should detect bash and zsh, which have a hash command that must
+    # be called to get it to forget past commands.  Without forgetting
+    # past commands the $PATH changes we made may not be respected
+    if [ -n "${BASH-}" ] || [ -n "${ZSH_VERSION-}" ] ; then
+        hash -r 2>/dev/null
+    fi
+
+    if [ ! "${1-}" ] ; then
+        # Self destruct!
+        unset -f deactivate
+    fi
+}
+
+# unset irrelevant variables
+deactivate 1
+
+SOURCE=${BASH_SOURCE:-$0}
+
+if ! [ -z "${PERL_VIRTUAL_ENV+_}" ] ; then
+    _OLD_PERL_VIRTUAL_ENV="$PERL_VIRTUAL_ENV"
+    export _OLD_PERL_VIRTUAL_ENV
+fi
+PERL_VIRTUAL_ENV=$(cd `dirname $SOURCE`/.. && pwd)
+export PERL_VIRTUAL_ENV
+
+if ! [ -z "${PATH+_}" ] ; then
+    _OLD_PERL_VIRTUAL_PATH="$PATH"
+    export _OLD_PERL_VIRTUAL_PATH
+fi
+PATH="$PERL_VIRTUAL_ENV/bin${PATH:+:${PATH}}"
+export PATH
+
+if ! [ -z "${PERL5LIB+_}" ] ; then
+    _OLD_PERL_VIRTUAL_PERL5LIB="$PERL5LIB"
+    export _OLD_PERL_VIRTUAL_PERL5LIB
+fi
+PERL5LIB="$PERL_VIRTUAL_ENV/lib/perl5${PERL5LIB:+:${PERL5LIB}}"
+export PERL5LIB
+
+if ! [ -z "${PERL_LOCAL_LIB_ROOT+_}" ] ; then
+    _OLD_PERL_VIRTUAL_PERL_LOCAL_LIB_ROOT="$PERL_LOCAL_LIB_ROOT"
+    export _OLD_PERL_VIRTUAL_PERL_LOCAL_LIB_ROOT
+fi
+PERL_LOCAL_LIB_ROOT="$PERL_VIRTUAL_ENV"
+export PERL_LOCAL_LIB_ROOT
+
+if ! [ -z "${PERL_MB_OPT+_}" ] ; then
+    _OLD_PERL_VIRTUAL_PERL_MB_OPT="$PERL_MB_OPT"
+    export _OLD_PERL_VIRTUAL_PERL_MB_OPT
+fi
+PERL_MB_OPT="--install_base \"$PERL_VIRTUAL_ENV\""
+export PERL_MB_OPT
+
+if ! [ -z "${PERL_MM_OPT+_}" ] ; then
+    _OLD_PERL_VIRTUAL_PERL_MM_OPT="$PERL_MM_OPT"
+    export _OLD_PERL_VIRTUAL_PERL_MM_OPT
+fi
+PERL_MM_OPT="INSTALL_BASE=$PERL_VIRTUAL_ENV"
+export PERL_MM_OPT
+
+if ! [ -z "${PS1+_}" ] ; then
+    _OLD_PERL_VIRTUAL_PS1="$PS1"
+    export _OLD_PERL_VIRTUAL_PS1
+fi
+PS1="(`basename \"$PERL_VIRTUAL_ENV\"`) $PS1"
+export PS1
+
+# This should detect bash and zsh, which have a hash command that must
+# be called to get it to forget past commands.  Without forgetting
+# past commands the $PATH changes we made may not be respected
+if [ -n "${BASH-}" ] || [ -n "${ZSH_VERSION-}" ] ; then
+    hash -r 2>/dev/null
+fi

@@ -1,0 +1,33 @@
+Revision history for Perl extension Attribute-Overload
+
+1.100710  2010-03-12 14:36:47 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.06  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+
+0.05  Thu, 29 May 2008 12:00:16 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Converted Changes file to YAML style
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - lib/*: converted to template
+     - updated MANIFEST
+     - updated t/perlcriticrc
+     - .shipit: fixed svk.tagpattern
+     - tags: NEWFEATURE
+
+0.04  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - fixed version requirement of Test::More
+
+0.03  Sat, 08 Sep 2007 23:28:30 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - converted to new-style distro (ShipIt, Module::Install)
+     - fixed documentation
+     - moved files to where they should be
+
+0.02  Wed, 30 May 2001 23:03:14 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - added documentation, tests
+
+0.01  Wed, 30 May 2001 22:55:26 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

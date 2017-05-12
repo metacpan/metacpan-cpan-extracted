@@ -1,0 +1,245 @@
+#!/usr/bin/env perl
+BEGIN {
+  @Screenorama::ARGV = do {
+    my $i = 0;
+    for my $arg (@ARGV) {
+      last if $arg eq '--';
+      $i++;
+    }
+    splice @ARGV, $i, @ARGV, ();
+  };
+  shift @Screenorama::ARGV;
+}
+use Mojolicious::Lite;
+use Mojo::IOLoop::ReadWriteFork;
+
+my $config = $ENV{MOJO_CONFIG} ? plugin 'Config' : app->config;
+my ($program, @program_args) = @Screenorama::ARGV ? @Screenorama::ARGV : split /\s/, ($ENV{SCREENORAMA_COMMAND} || '');
+
+$config->{conduit}     ||= $ENV{SCREENORAMA_CONDUIT}     || 'pty';
+$config->{kill_signal} ||= $ENV{SCREENORAMA_KILL_SIGNAL} || 15;
+$config->{program_args} ||= \@program_args;
+$config->{program} ||= $program or die "Usage: $0 -- <program> [args]\n";
+$config->{single} //= $ENV{SCREENORAMA_SINGLE} || 0;
+$config->{stdin}  //= $ENV{SCREENORAMA_STDIN}  || 0;
+
+get '/' => sub {
+  my $c   = shift;
+  my $url = $c->req->url->to_abs;
+
+  $c->render('index', stream_base => $url->clone->base->scheme($url->scheme =~ /https/ ? 'wss' : 'ws'));
+};
+
+if ($config->{single}) {
+  my $plugins = app->plugins;
+  my ($fork, $last);
+
+  websocket '/stream' => sub {
+    my $c = shift;
+    my $cb = sub { $c->send({json => $_[1]}) };
+
+    unless ($fork) {
+      $fork = _start_application($c);
+      $fork->on(close => sub { $plugins->emit(output => $last = {exit_value => $_[1], signal => $_[2]}) });
+      $fork->on(error => sub { $plugins->emit(output => $last = {error => $_[1]}) });
+      $fork->on(read => sub { $plugins->emit(output => {output => $_[1]}) });
+    }
+
+    $plugins->on(output => $cb);
+    $c->on(finish => sub { $plugins->unsubscribe(output => $cb); });
+    $c->send({json => $last}) if $last;
+  };
+}
+else {
+  websocket '/stream' => sub {
+    my $c    = shift;
+    my $fork = _start_application($c);
+
+    Scalar::Util::weaken($c);
+    $c->on(finish => sub { $fork->kill($config->{kill_signal}); undef $fork; });
+    $fork->on(close => sub { $c->send({json => {exit_value => $_[1], signal => $_[2]}})->finish });
+    $fork->on(error => sub { $c->send({json => {error      => $_[1]}})->finish });
+    $fork->on(read  => sub { $c->send({json => {output     => $_[1]}}) });
+  };
+}
+
+app->start;
+
+#=============================================================================
+
+sub _start_application {
+  my $c    = shift;
+  my $fork = Mojo::IOLoop::ReadWriteFork->new;
+
+  Mojo::IOLoop->stream($c->tx->connection)->timeout(60);
+  $fork->start(conduit => $config->{conduit}, program => $config->{program}, program_args => $config->{program_args});
+  $c->on(json => sub { $fork->write(chr $_[1]->{key}) if $_[1]->{key} }) if $c->app->config->{stdin};
+  $c->send({json => {program => $program, program_args => \@program_args}});
+  $fork;
+}
+__DATA__
+@@ index.html.ep
+<!DOCTYPE html>
+<html>
+<head>
+  <title>screenorama - <%= app->config->{program} %> <%= join ' ', @{app->config->{program_args}} %></title>
+  %= stylesheet begin
+body { background: #111; padding: 8px; }
+body, .shell { font-size: 13px; font-family: monospace; color: #eee; margin: 0; padding: 0; }
+pre { margin: 0; padding: 0; }
+.status { border-top: 1px solid #333; margin-top: 20px; }
+input { position: absolute; left: -600px; }
+  % end
+  %= javascript begin
+var termColors = { // from http://flatuicolors.com/
+  '30': '#000000',
+  '31': '#c0392b',
+  '32': '#2ecc71',
+  '33': '#f1c40f',
+  '34': '#48a2df',
+  '35': '#9b59b6',
+  '36': '#1abc9c',
+  '37': '#ecf0f1',
+};
+
+var screenorama = function() {
+  var cursor = document.querySelector('.cursor');
+  var input = document.querySelector('input');
+
+  var attach = function(elem, events, cb) {
+    events = events.split(' ');
+    for (var i = 0; i < events.length; i++) elem.addEventListener(events[i], cb, false);
+  };
+
+  screenorama.buf = '';
+  screenorama.ws = new WebSocket('<%= $stream_base %>/stream');
+
+% if (app->config->{stdin}) {
+  cursor.visible = true;
+  cursor.style.display = 'inline';
+
+  setInterval(
+    function() {
+      cursor.style.opacity = cursor.visible ? 0.02 : 1.0;
+      cursor.visible = !cursor.visible;
+    },
+    700
+  );
+
+  var tDown;
+  attach(document, 'mousedown touchstart', function(e) { tDown = new Date().getTime(); });
+  attach(document, 'mouseup touchstop', function(e) { if (new Date().getTime() - tDown < 250) input.focus(); });
+
+  screenorama.ws.onopen = function() {
+    input.focus();
+    attach(input, 'keydown', screenorama.keydown);
+    attach(input, 'keypress', screenorama.keypress);
+    attach(input, 'paste', screenorama.paste);
+    setInterval(function() { screenorama.send('{}'); }, 5000);
+  };
+% }
+
+  screenorama.ws.onmessage = function(e) {
+    if (window.console) console.log(e.data);
+    var data = JSON.parse(e.data);
+    if (typeof data.output !== 'undefined') screenorama.printToScreen(data.output.replace(/</g, '&lt;'));
+    if (typeof data.exit_value !== 'undefined') screenorama.exitStatus(data);
+    window.scrollTo(0, document.body.scrollHeight);
+  };
+};
+
+screenorama.exitStatus = function(data) {
+  var cursor = document.querySelector('.cursor');
+  var shell = document.querySelector('.shell');
+  var status = document.createElement('div');
+  cursor.style.display = 'none';
+  status.className = 'status';
+  status.innerHTML = '$?=' + data.exit_value;
+  shell.appendChild(status);
+};
+
+screenorama.keydown = function(e) {
+  var k = e.keyCode || e.which;
+  if (window.console) console.log('keydown: ' + k);
+  switch (k) {
+    case 8: // backspace
+      return screenorama.send('{"key":' + 0x7f + '}', e);
+    case 9: // tab
+      return screenorama.send('{"key":9}', e);
+  }
+};
+
+screenorama.keypress = function(e) {
+  e.preventDefault();
+  screenorama.send('{"key":' + (e.keyCode || e.which) + '}');
+};
+
+screenorama.paste = function(e) {
+  var keys = e.clipboardData.getData('text/plain');
+  e.preventDefault();
+  for (var i = 0; i < keys.length; i++) screenorama.send('{"key":' + keys.charCodeAt(i) + '}');
+};
+
+screenorama.printToScreen = function(str) {
+  var output = document.querySelector('.output');
+  var clear;
+
+  str = str
+    .replace(/\u001B\[(?:0?(\d?);(\d\d)|(\d*)(X?))m/g, screenorama.replaceColors)
+    .replace(/(\u001B\[K|\x08\s\x08)/g, function() { screenorama.buf = screenorama.buf.replace(/[\x00-\x1f]*.[\x00-\x1f]*$/, ''); return ''; })
+    .replace(/\u001B\(B/g, function() { return ''; })
+    .replace(/\u001B\[3;J\u001B\[H\u001B\[2J(.*)/, function(a, c) { clear = c; })
+
+  screenorama.buf += str;
+
+  if (typeof clear != 'undefined') {
+    var shell = output.parentNode;
+    var lines = shell.querySelectorAll('.line') || [];
+    for (i = 0; i < lines.length; i++) shell.removeChild(lines[i]);
+    screenorama.buf = clear;
+  }
+
+  screenorama.buf = screenorama.buf.replace(/(.*?)\r?\n/g, function(a, c) {
+    var line = document.createElement('pre');
+    line.className = 'line';
+    line.innerHTML = c;
+    output.parentNode.insertBefore(line, output);
+    return '';
+  });
+
+  output.innerHTML = screenorama.buf;
+};
+
+screenorama.replaceColors = function(match, x, a, b) {
+  var closing = screenorama.replaceColors.span ? '</span>' : '';
+  var style = [];
+
+  console.log('replaceColors("' + [match, x, a, b].join('", "') +  '") == ' + (termColors[b || a] || closing));
+  screenorama.replaceColors.span = false;
+
+  if (!a && typeof b == 'undefined') { return closing; } // regular
+
+  if (termColors[b]) style.push('color: ' + termColors[b]);
+  else if (termColors[a]) style.push('background-color: ' + termColors[a]);
+
+  if (a == 1) { style.push('font-weight: bold'); }
+  else if (a == 4) { style.push('text-decoration: underline'); }
+
+  screenorama.replaceColors.span = true;
+  return closing + '<span style="' + style.join(';') + '">';
+};
+
+screenorama.send = function(msg, e) {
+  if (e) e.preventDefault();
+  console.log(msg);
+  screenorama.ws.send(msg);
+};
+
+window.onload = screenorama;
+  % end
+</head>
+<body>
+<div class="shell"><span class="output"></span><span class="cursor" style="display:none">&#9602;</span></div>
+<input style="position:absolute;top:-100px">
+</body>
+</html>

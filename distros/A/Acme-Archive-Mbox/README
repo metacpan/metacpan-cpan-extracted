@@ -1,0 +1,47 @@
+Acme-Archive-Mbox
+
+Store and retrieve files to/from an mbox (suitable for viewing with a 
+mail client, eg mutt).
+
+Mbox format is one message per file, with metadata in the headers and
+file contents in an attachment.  Included script[s] create and extract
+mbox archives, like tar.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Acme::Archive::Mbox
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-Archive-Mbox
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Acme-Archive-Mbox
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Acme-Archive-Mbox
+
+    Search CPAN
+        http://search.cpan.org/dist/Acme-Archive-Mbox/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Ian Kilgore
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

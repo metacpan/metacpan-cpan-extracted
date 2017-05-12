@@ -1,0 +1,24 @@
+[% USE date ( format = '%l o\'clock %p on %A, %e %B, %Y' locale = 'en_GB') %]
+<a
+  [%- SET slug = article.location _ '' -%]
+  [%- slug = slug.replace('.*/', '') -%]
+  href  = "/article/[% slug %]"
+  class = "block-item list-group-item"
+>
+  <p
+    class="article-title h3"
+    itemprop="name"
+  >
+      [% article.schema.core.title | html %]
+  </p>
+<div class="small text-muted">
+  <div class="article-meta-created">
+    Written at about <time itemprop="dateModified">[% date.format(article.schema.core.dateCreated) | html %]</time>
+  </div>
+  [%- IF article.schema.core.dateCreated != article.schema.core.dateUpdated  -%]
+  <div class="article-meta-updated">
+    Revised at approximately <time itemprop="dateModified">[% date.format(article.schema.core.dateUpdated, '%a %d %b %y', 'en_GB') | html %]</time>
+  </div>
+  [%- END -%]
+</div>
+</a>

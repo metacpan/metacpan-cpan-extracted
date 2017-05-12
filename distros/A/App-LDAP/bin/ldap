@@ -1,0 +1,5 @@
+#!/usr/bin/env perl
+use lib 'lib';
+use Modern::Perl;
+use App::LDAP;
+App::LDAP->new()->run();

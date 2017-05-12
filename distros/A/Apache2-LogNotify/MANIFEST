@@ -1,0 +1,9 @@
+lib/Apache2/LogNotify.pm
+lib/Apache2/LogNotify/Parameters.pm
+Makefile.PL
+MANIFEST
+t/TEST
+t/01compile.t
+t/conf/extra.last.conf.in
+
+META.yml                                 Module meta-data (added by MakeMaker)

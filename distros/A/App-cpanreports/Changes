@@ -1,0 +1,38 @@
+Revision history for App-cpan-reports
+
+0.004   2015-08-07
+        Updating for release of version 0.004
+        Removed creation of makefile (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.003   2015-06-10
+        Updating for release of version 0.003
+        Fixed abstract and changed file name (Ivan Wills)
+
+0.002   2015-05-25
+        Updating for release of version 0.002
+        Fixed incorrect ignore (Ivan Wills)
+        Added TODO to manifest (Ivan Wills)
+        Added todo file (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+        Fixed module name (Ivan Wills)
+        Updated changes (Ivan Wills)
+
+0.001   2015-03-01
+        Finally got this working (Ivan Wills)
+        Fixed typo (Ivan Wills)
+        Added lib as I can't see how to make Module::Build happy any other way (Ivan Wills)
+        Made the description a little clearer (Ivan Wills)
+        Got tests working (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Updated License (Ivan Wills)
+        Working on documentation (Ivan Wills)
+        Fixed boilerplate tests (Ivan Wills)
+        Set dependencies (Ivan Wills)
+        Removed lib file (Ivan Wills)
+        Tag files (Ivan Wills)
+        Added implementation (Ivan Wills)
+        Renamed file (Ivan Wills)
+        Initial commit (Ivan Wills)

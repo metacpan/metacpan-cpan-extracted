@@ -1,0 +1,53 @@
+<h3 align="center">Edit pages for site <: $site_name :>, design <: $design_name :></h3>
+<form name="<: $context :>_page_form" id="<: $context :>_page_form" action="" method="post" onSubmit="return <: $context :>_page_onsubmit()">
+
+<table align="center">
+<tr>
+<td align="center" colspan="3"><div id="<: $context :>_page_message_div"></div></td>
+</tr>
+<tr>
+<td>Current page:</td>
+<td align="left" colspan="2"><div id="current_page_div"><: $current_page_name :></div></td>
+</tr>
+<tr>
+<td>Page name:</td>
+<td align="left" colspan="2"><input type="text" name="name" id="name" size="50" maxlength="255" value="<: $name :>" class="required" title="Page name is required" /></td>
+</tr>
+<td>Homepage?</td>
+<td align="left" colspan="2"><input type="checkbox" name="homepage" id="homepage" value="Yes" <: $homepage :> /></td>
+</tr>
+<tr>
+<td>Add sibling above:</td>
+<td align="left" colspan="2"><input type="submit" name="submit_sibling_above" id="submit_sibling_above" value="Add page as a sibling above the current page" onClick="document.<: $context :>_page_form.action.value=1" /></td>
+</tr>
+<tr>
+<td>Add sibling below:</td>
+<td align="left" colspan="2"><input type="submit" name="submit_sibling_below" id="submit_sibling_below" value="Add page as a sibling below the current page" onClick="document.<: $context :>_page_form.action.value=2" /></td>
+</tr>
+<tr>
+<td>Add child:</td>
+<td align="left" colspan="2"><input type="submit" name="submit_child" id="submit_child" value="Add page as a child of the current page" onClick="document.<: $context :>_page_form.action.value=3" /></td>
+</tr>
+<tr>
+<td>Delete page:</td>
+<td align="left" colspan="2"><input type="submit" name="submit_delete_page" id="submit_delete_page" value="Delete current page" onClick="document.<: $context :>_page_form.action.value=4" /></td>
+</tr>
+<tr>
+<td>Template name:</td>
+<td align="left" colspan="2"><: $template_name :></td>
+</tr>
+<tr>
+<td><input type="submit" name="submit_edit_content" id="submit_edit_content" value="Edit content" onClick="document.<: $context :>_page_form.action.value=5" /></td>
+<td><input type="reset" value="Reset" /></td>
+<td><input type="submit" name="submit_<: $context :>_page" id="submit_<: $context :>_page" value="<: $submit_text :>" onClick="document.<: $context :>_page_form.action.value=6" /></td>
+</tr>
+<tr><td colspan="3"><hr /></td></tr>
+<tr><td>Site map (clickable)</td></tr>
+<tr>
+<td colspan="3"><div id="page_tree_div"></div></td>
+</tr>
+</table>
+
+<input type="hidden" name="action" id="action" value="0" />
+<input type="hidden" name="sid" id="sid" value="<: $sid :>" />
+</form>

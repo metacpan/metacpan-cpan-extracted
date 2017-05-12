@@ -1,0 +1,9 @@
+SYNOPSIS
+
+     # See cal-id script provided in this distribution
+
+DESCRIPTION
+
+    This module provides the cal-id command to display Indonesian calendar
+    on the command-line.
+

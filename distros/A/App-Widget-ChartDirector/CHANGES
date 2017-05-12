@@ -1,0 +1,17 @@
+#########################################
+# CHANGE LOG
+#########################################
+
+VERSION 0.966
+ x Fixed: The x-axis does not show -1
+ x Fixed: the graph in the report section overlaps the legend since the max value is zero
+
+VERSION 0.60
+ x Now have the ability to use themes, get_theme_value()
+ x use Makefile.PL instead of Build.PL
+ x added step graph
+ x per-module VERSION (svn)
+
+VERSION 0.50
+ x Initial release
+

@@ -1,0 +1,37 @@
+---
+abstract: 'Abstract API to create archives (tar.gz and zip)'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  Test::More: 0.90
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Archive-Any-Create
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Archive::Tar: 0
+  Archive::Zip: 0
+  Exception::Class: 0
+  IO::Zlib: 0
+  UNIVERSAL::require: 0
+resources:
+  bugtracker: https://github.com/miyagawa/Archive-Any-Create/issues
+  homepage: https://github.com/miyagawa/Archive-Any-Create
+  repository: https://github.com/miyagawa/Archive-Any-Create.git
+version: 0.03
+x_contributors:
+  - 'Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>'
+  - 'miyagawa <miyagawa@65690182-5df0-0310-9871-95da5a3706e7>'

@@ -1,0 +1,70 @@
+---
+abstract: 'Write a human-readable resume in Perl'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Iller version 0.1204, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Resume
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Acme::Resume:
+    file: lib/Acme/Resume.pm
+    version: '0.0102'
+  Acme::Resume::Internal:
+    file: lib/Acme/Resume/Internal.pm
+    version: '0.0102'
+  Acme::Resume::MoopsParserTrait:
+    file: lib/Acme/Resume/MoopsParserTrait.pm
+    version: '0.0102'
+  Acme::Resume::Moose:
+    file: lib/Acme/Resume/Moose.pm
+    version: '0.0102'
+  Acme::Resume::Output::ToPlain:
+    file: lib/Acme/Resume/Output/ToPlain.pm
+    version: '0.0102'
+  Acme::Resume::Types::Education:
+    file: lib/Acme/Resume/Types/Education.pm
+    version: '0.0102'
+  Acme::Resume::Types::Job:
+    file: lib/Acme/Resume/Types/Job.pm
+    version: '0.0102'
+requires:
+  Module::Runtime: '0'
+  Moo::Role: '0'
+  Moops: '0.034'
+  MoopsX::UsingMoose: '0'
+  Moose: '2.000'
+  Moose::Exporter: '0'
+  String::Nudge: '0'
+  Syntax::Feature::Qs: '0'
+  Time::Moment: '0'
+  Types::Standard: '0'
+  Types::URI: '0'
+  perl: '5.014000'
+  syntax: '0'
+resources:
+  bugtracker: https://github.com/Csson/p5-Acme-Resume/issues
+  homepage: https://metacpan.org/release/Acme-Resume
+  repository: https://github.com/Csson/p5-Acme-Resume.git
+version: '0.0102'
+x_contributors:
+  - 'Karen Etheridge <ether@cpan.org>'

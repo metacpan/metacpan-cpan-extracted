@@ -1,0 +1,6 @@
+# d2
+# The "AuthType" directive causes environment variables to be passed.
+# The authentication and authorization phases are skipped because
+# there is no "Require" directive
+
+AuthType auth-any

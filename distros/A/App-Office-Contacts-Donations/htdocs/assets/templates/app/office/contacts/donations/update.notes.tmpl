@@ -1,0 +1,31 @@
+<table align="center">
+<tr><td><div id="<tmpl_var name=context>_notes_result"><tmpl_var name=result></div></td></tr>
+</table>
+<form name="<tmpl_var name=context>_update_notes_form" id="<tmpl_var name=context>_update_notes_form" action="" method="post" onSubmit="return <tmpl_var name=context>_update_notes_onsubmit()">
+<table align="center">
+<tr><td colspan="3"><textarea name="note" id="note" cols="100" rows="4"></textarea></td></tr>
+<tr>
+<td align="center"><input type="button" id="close_notes_form" name="close_notes_form" onClick="tab_set.removeTab(<tmpl_var name=context>_notes_tab); <tmpl_var name=context>_notes_tab=null; tab_set.set('activeTab', search_tab)" value="Close tab"/></td>
+<td align="center"><input type="reset" name="reset" value="Reset" /></td>
+<td align="center"><input type="submit" name="submit_notes_add" id="submit_notes_add" value="Save" onClick="document.<tmpl_var name=context>_update_notes_form.action.value=1" /></td>
+</tr>
+</table>
+<input type="hidden" name="action" id="action" value="0" />
+<input type="hidden" name="target_id" id="target_id" value="<tmpl_var name=target_id>" />
+<input type="hidden" name="sid" id="sid" value="<tmpl_var name=sid>" />
+</form>
+<tmpl_if name=notes_loop>
+<form name="<tmpl_var name=context>_update_notes_list_form" id="<tmpl_var name=context>_update_notes_list_form" action="" method="post" onSubmit="return <tmpl_var name=context>_update_notes_list_onsubmit()">
+<table align="center">
+<tr><td colspan="2"><hr /></td></tr>
+<tmpl_loop name=notes_loop>
+<tr><td><tmpl_var name=timestamp></td><input type="checkbox" name="notes_id_<tmpl_var name=notes_id>" id="notes_id_<tmpl_var name=notes_id>" value="<tmpl_var name=notes_id>" /></td></tr>
+<tr><td align="center" colspan="2"><div class="notes_text"><tmpl_var name=note escape=html></div></td></tr>
+</tmpl_loop>
+<tr>
+<td align="center" colspan="2"><input type="submit" name="submit_notes_delete" id="submit_notes_delete" value="Delete note(s)" onClick="document.<tmpl_var name=context>_update_notes_list_form.action.value=2" /></td>
+</tr>
+</table>
+<input type="hidden" name="action" id="action" value="0" />
+</form
+</tmpl_if>

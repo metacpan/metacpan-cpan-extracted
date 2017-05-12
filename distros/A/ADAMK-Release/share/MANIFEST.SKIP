@@ -1,0 +1,68 @@
+# Standard MANIFEST.SKIP file
+# Copied from http://svn.ali.as/cpan/tools/shared/MANIFEST.SKIP
+
+# Distribution build and packaging files
+^MYMETA.yml$
+^MYMETA.json$
+^Makefile$
+^Makefile\.[a-z]+$
+^blib/
+^blibdirs$
+^blibdirs\.ts$
+^pm_to_blib\.ts$
+^pm_to_blib$
+^_build/
+^Build$
+^Build.bat$
+^MANIFEST\.
+\.o$
+\.xsi$
+
+# Some packaging files are allowed to exist in the t directory
+^(?!t\b).+\.tar$
+^(?!t\b).+\.tgz$
+^(?!t\b).+\.tar\.gz$
+
+# OS and third-party tool detritus
+^smoke
+^debian/
+\bDebian_CPANTS\.txt\b
+\bcover_db\b
+\btmon\.out\b
+\bThumbs\.db$
+^embedded/
+sqlnet.log
+
+# Third-party tool repository-only config files
+\breleaserc$
+^BUILD.SKIP
+^COVER.SKIP
+^CPAN.SKIP
+.shipit
+
+# Version control data files
+\bRCS/
+\bCVS/
+\bSCCS/
+\b_darcs\b
+\B\.bzr\b
+\B\.svn\b
+\B\.git\b
+\B\.gitignore\b
+\.mine$
+\.\d+$
+,v$
+
+# Temporary, swap and backup files
+^tmp/
+^scratch/
+\~$
+\.bs$
+\.old$
+\.bak$
+\.swp$
+\.tmp$
+\.sw[a-z]$
+^\..*\.sw.$
+\#
+\._t$

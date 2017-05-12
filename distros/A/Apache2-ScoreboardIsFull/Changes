@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache2::ScoreboardIsFull.
+
+0.01  Thu Feb 20 10:12:21 2014
+	- original version; created by h2xs 1.23 with options
+		-X Apache2::ScoreboardIsFull
+

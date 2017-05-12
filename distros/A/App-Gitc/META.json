@@ -1,0 +1,132 @@
+{
+   "abstract" : "Git Changesets, tools for managing your git changes",
+   "author" : [
+      "Grant Street Group <developers@grantstreet.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131490",
+   "license" : [
+      "agpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Gitc",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "sql"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "JIRA::Client" : "0",
+            "JIRA::Client::REST" : "0",
+            "Pithub::Issues" : "0"
+         },
+         "requires" : {
+            "Algorithm::Dependency::Ordered" : "0",
+            "Algorithm::Dependency::Source::HoA" : "0",
+            "Carp" : "0",
+            "Class::MOP" : "0",
+            "Cwd" : "0",
+            "Date::Format" : "0",
+            "Date::Parse" : "0",
+            "Date::PeriodParser" : "0",
+            "Email::Simple" : "0",
+            "Exporter" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "Hash::Merge::Simple" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "POSIX" : "0",
+            "Term::ReadLine" : "0",
+            "Test::More" : "0",
+            "Text::Levenshtein" : "0",
+            "Time::Local" : "0",
+            "Try::Tiny" : "0",
+            "YAML" : "0",
+            "YAML::Syck" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "Test::CheckDeps" : "0.006",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "App::Gitc::Its::Eventum" : {
+         "file" : "lib/App/Gitc/Its/Eventum.pm",
+         "version" : "0.60"
+      },
+      "App::Gitc::Its::Github" : {
+         "file" : "lib/App/Gitc/Its/Github.pm",
+         "version" : "0.60"
+      },
+      "App::Gitc::Its::Jira" : {
+         "file" : "lib/App/Gitc/Its/Jira.pm",
+         "version" : "0.60"
+      },
+      "App::Gitc::Its::RT" : {
+         "file" : "lib/App/Gitc/Its/RT.pm",
+         "version" : "0.60"
+      },
+      "App::Gitc::Reversible" : {
+         "file" : "lib/App/Gitc/Reversible.pm",
+         "version" : "0.60"
+      },
+      "App::Gitc::Test" : {
+         "file" : "lib/App/Gitc/Test.pm",
+         "version" : "0.60"
+      },
+      "App::Gitc::UserLookup" : {
+         "file" : "lib/App/Gitc/UserLookup/GitTag.pm",
+         "version" : "0.60"
+      },
+      "App::Gitc::UserLookup::LocalGroup" : {
+         "file" : "lib/App/Gitc/UserLookup/LocalGroup.pm",
+         "version" : "0.60"
+      },
+      "App::Gitc::Util" : {
+         "file" : "lib/App/Gitc/Util.pm",
+         "version" : "0.60"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/GrantStreetGroup/gitc/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/GrantStreetGroup/gitc.git",
+         "web" : "https://github.com/GrantStreetGroup/gitc"
+      }
+   },
+   "version" : "0.60"
+}
+

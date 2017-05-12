@@ -1,0 +1,43 @@
+NAME
+    AnyEvent::DBI::Abstract - AnyEvent::DBI + SQL::Abstract
+
+SYNOPSIS
+      use AnyEvent::DBI::Abstract;
+
+      my $dbh = AnyEvent::DBI::Abstract->new($dsn, $user, $pass);
+
+      $dbh->select($table, \@fields, \%where, \@order, sub {
+          my($dbh, $rows, $rv) = @_;
+          # ...
+      });
+
+      $dbh->insert($table, \%fieldvals, sub {
+          my($dbh, undef, $rv) = @_;
+          # ...
+      });
+
+      $dbh->update($table, \%fieldvals, \%where, sub {
+          my($dbh, undef, $rv) = @_;
+          # ...
+      });
+
+      $dbh->delete($table, \%where, sub {
+          my($dbh, undef, $rv) = @_;
+          # ...
+      });
+
+DESCRIPTION
+    AnyEvent::DBI::Abstract is a subclass of AnyEvent::DBI that has methods
+    to wrap SQL::Abstract methods into "exec". See SQL::Abstract for the
+    parameters to the methods and AnyEvent::DBI for the callback interface.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    AnyEvent::DBI SQL::Abstract
+

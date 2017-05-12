@@ -1,0 +1,198 @@
+#!perl
+
+our $DATE = '2016-12-16'; # DATE
+our $VERSION = '0.03'; # VERSION
+
+use 5.010001;
+use strict 'subs', 'vars';
+use warnings;
+
+use Getopt::Long::More;
+use Sort::Sub ();
+
+my %opts = (
+    ignore_case => 0,
+    reverse => 0,
+);
+my $routine;
+my @files;
+my $res = GetOptions(
+    'ignore_case|f' => sub { $opts{ignore_case} = 1 },
+    'reverse|r'     => sub { $opts{reverse} = 1 },
+    'help|h'        => sub {
+        print <<'_';
+sortsub - Sort lines of text using Sort::Sub routines
+
+Usage:
+  % subsort [OPTIONS] <ROUTINE> [FILE]...
+  % subsort --help (or -h)
+  % subsort --list (or -l)
+  % subsort --version (or -v)
+
+Options:
+  --help, -h         Show this help message and exit.
+  --version, -v      Show version and exit.
+  --list, -l         List available Sort::Sub routines.
+  --ignore-case, -f  Do a case-insensitive sort.
+  --reverse, -r      Do a reverse sort.
+_
+        exit 0;
+    },
+    'version|v'     => sub {
+        no warnings 'once';
+        say "subsort version ", ($main::VERSION // 'dev'),
+            " (", ($main::DATE // 'no date'), ")";
+        exit 0;
+    },
+    'list|l'        => sub {
+        require PERLANCAR::Module::List;
+        my $mods = PERLANCAR::Module::List::list_modules(
+            "Sort::Sub::", {list_modules=>1});
+        for (sort keys %$mods) {
+            s/.+:://;
+            say $_;
+        }
+        exit 0;
+    },
+    '<>' => optspec(
+        handler => sub {
+            my $val = shift;
+            if (!defined $routine) {
+                $routine = $val;
+            } else {
+                push @files, $val;
+            }
+        },
+        completion => sub {
+            require Complete::Module;
+            my %args = @_;
+            Complete::Module::complete_module(
+                word => $args{word},
+                ns_prefix => "Sort::Sub",
+            );
+        },
+    ),
+);
+exit 1 unless $res;
+
+die "Please specify routine to use\n" unless defined $routine;
+
+Sort::Sub->import("$routine<".
+                      ($opts{ignore_case} ? "i":"").
+                      ($opts{reverse} ? "r":"").
+                      ">");
+@ARGV = @files;
+for (sort {&{$routine}} map {chomp;$_} <>) {
+    say $_;
+}
+
+# ABSTRACT: Sort lines of text using Sort::Sub routines
+# PODNAME: sortsub
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+sortsub - Sort lines of text using Sort::Sub routines
+
+=head1 VERSION
+
+This document describes version 0.03 of sortsub (from Perl distribution App-subsort), released on 2016-12-16.
+
+=head1 SYNOPSIS
+
+ % subsort [OPTIONS] <ROUTINE> [FILE]...
+
+To list all available routines:
+
+ % subsort -l
+
+=head1 DESCRIPTION
+
+This program is like the Unix command B<sort>, but it uses routines from
+L<Sort::Sub>.
+
+=head1 OPTIONS
+
+  --help, -h         Show this help message and exit.
+  --version, -v      Show version and exit.
+  --list, -l         List available Sort::Sub routines.
+  --ignore-case, -f  Do a case-insensitive sort.
+  --reverse, -r      Do a reverse sort.
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C sortsub sortsub
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete sortsub 'p/*/`sortsub`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-subsort>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-subsort>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-subsort>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+The B<sort> Unix command.
+
+L<App::psort>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

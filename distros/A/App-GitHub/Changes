@@ -1,0 +1,54 @@
+Revision history for Perl extension App-GitHub
+
+1.0.1	2012.08.22
+		fixed typo that would prevent proper error handling on repo creation
+
+1.0		2012.05.01
+		1.0 release
+		non-interactive command-line options
+
+0.13	2012.04.12
+		updated for api v3
+
+0.12	2012.03.27
+		doesn't drop into a pager for short output
+		runs loadcfg at startup
+		doesn't require choosing a repository for certain actions
+		changed repo in synopsis
+
+0.11    2010.11.06
+        use LoadTests instead of CompileTests (because CompileTests returns 'skipped: no tests to run')
+
+0.10    2010.11.04
+        typo fix
+        Less is more (datamuc)
+
+0.09    2009.04.21
+        bug fix for o.raw
+
+0.08    2009.04.21
+        object/network related command
+        all API are done now
+
+0.07    2009.04.21
+        commits related commad
+        '| more' command
+
+0.06    2009.04.21
+        User related command
+
+0.05    2009.04.20
+        more and more commands
+        i.search, i.comment
+
+0.04    2009.04.20
+        more
+
+0.03    2009.04.20
+        add more
+
+0.02    2009.04.19
+        add issue
+
+0.01    2009.04.19
+        a start

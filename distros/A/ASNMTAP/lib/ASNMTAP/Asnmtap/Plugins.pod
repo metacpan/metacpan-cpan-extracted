@@ -1,0 +1,1195 @@
+=head1 NAME
+
+ASNMTAP::Asnmtap::Plugins provides a nice object oriented interface for building ASNMTAP (http://asnmtap.citap.be) compatible plugins.
+
+ASNMTAP::Asnmtap::Plugins Subclass of ASNMTAP::Asnmtap
+
+=head1 SYNOPSIS
+
+use ASNMTAP::Asnmtap::Plugins;
+
+my $objectPlugin = ASNMTAP::Asnmtap::Plugins->new ();
+
+=head1 Description
+
+This module that provides a nice object oriented interface for building ASNMTAP (http://asnmtap.citap.be) compatible plugins.
+
+=head1 EXAMPLE
+
+ use ASNMTAP::Asnmtap::Plugins qw(:PLUGINS);
+
+ my $objectPlugins = ASNMTAP::Asnmtap::Plugins->new (
+   _programName        => 'check_template.pl',
+   _programDescription => "General plugin template for the '$APPLICATION'",
+   _programVersion     => '3.002.003',
+   _programUsagePrefix => '-H <host> -w <warning> -c <critical>',
+   _programHelpPrefix  => "-H, --hostname=HOST
+    Name or IP address of host to check
+ -w, --warning=INTEGER
+    Percentage strength below which a WARNING status will result
+ -c, --critical=INTEGER
+    Percentage strength below which a CRITICAL status will result",
+   _programGetOptions  => ['hostname|H=s', 'warning|w=i', 'critical|c=i'],
+   _timeout            => 30,
+   _debug              => 0);
+
+ $objectPlugins->dumpData ();
+
+ $objectPlugins->exit (7);
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item _programGetOptions
+
+=over 4
+
+=item default command line options
+
+ -S, --status=N
+    N(agios)      : Nagios custom plugin output (default)
+ -A, --asnmtapEnv=[F|T]|[F|T][F|T]
+    F(alse)       : all screendebugging off (default)
+    T(true)       : all screendebugging on
+    |
+    F(alse)       : all file debugging off (default)
+    T(true)       : all file debugging on
+    |
+    F(alse)       : nok file debugging off (default)
+    T(true)       : nok file debugging on
+ -O, --onDemand=F|T|N|Y
+    F(alse)/N(o)  : normal plugin execution (default)
+    T(true)/Y(es) : plugin launched on demand
+ -L, --logging=<LOGGING>
+    write logging to file <LOGGING>
+ -D, --debugfile=<DEBUGFILE>
+    write debug to file <DEBUGFILE>
+ -d, --debug=F|T|L|M|A|S
+    F(alse)       : screendebugging off (default)
+    T(true)       : normal screendebugging on
+    L(ong)        : long screendebugging on
+    M(oderator)   : long screendebugging on for Moderators
+    A(dmin)       : long screendebugging on for Admins
+    S(erver Admin): long screendebugging on for Server Admins
+
+=item reserved command line options (autoinsertions)
+
+ -t, --timeout=<TIMEOUT>
+
+    timeout threshold (seconds) from which an UNKNOWN status will result when timing out slow plugins
+
+    add: new ... (_programGetOptions => ['timeout|t:i' or 'timeout|t=i'])
+
+    autoadd [-t|--timeout <TIMEOUT>] to _programUsageSuffix
+
+    autoadd -t, --timeout=<TIMEOUT> ... to _programHelpSuffix
+
+ -T, --trendline=<TRENDLINE>
+
+    trendline threshold (seconds) from which a TRENDLINE status will result for the plugin response time
+
+    add: new ... (_programGetOptions => ['trendline|T:i' or trendline|T=i'])
+
+    autoadd [-T|--trendline <TRENDLINE>] to _programUsageSuffix
+
+    autoadd -T, --trendline=<TRENDLINE> ..0 to _programHelpSuffix
+
+ -e, --environment=<ENVIRONMENT>
+
+    P(roduction)  and set the _getOptionsValues to 'Production'
+    S(imulation)  and set the _getOptionsValues to 'Simulation'
+    A(cceptation) and set the _getOptionsValues to 'Acceptation'
+    T(est)        and set the _getOptionsValues to 'Test'
+    D(evelopment) and set the _getOptionsValues to 'Development'
+    L(ocal)       and set the _getOptionsValues to 'Local'
+
+    add: new ... (_programGetOptions => ['environment|e:s' or 'environment|e=s'])
+
+    autoadd [--environment <ENVIRONMENT>] to _programUsageSuffix
+
+    autoadd --environment=<ENVIRONMENT>
+               P(roduction)
+               S(imulation)
+               A(cceptation)
+               T(est)
+               D(evelopment)
+               L(ocal) to _programHelpSuffix
+
+ --proxy=<username:password@proxy:port&domain[,domain]>
+
+    add: new ... (_programGetOptions => ['proxy:s' or 'proxy=s'])
+
+    autoadd [--proxy <username:password@proxy:port&domain[,domain]>] to _programUsageSuffix
+
+    autoadd --proxy=<username:password@proxy:port&domain[,domain]> to _programHelpSuffix
+
+ -H, --host=<HOST>
+
+    hostname or ip address
+
+    add: new ... (_programGetOptions => ['host|H:s' or 'host|H=s'])
+
+    autoadd [-H|--host <HOST>] to _programUsageSuffix
+
+    autoadd -H,--host=<HOST> to _programHelpSuffix
+
+ -U, --url=<URL>
+
+    add: new ... (_programGetOptions => ['url|U:s' or 'url|U=s'])
+
+    autoadd [-U|--url <URL>] to _programUsageSuffix
+
+    autoadd -U, --url=<URL> to _programHelpSuffix
+
+ -P, --port=<PORT>
+
+    add: new ... (_programGetOptions => ['port|P:i' or 'port|P=i'])
+
+    autoadd [-P|--port <PORT>] to _programUsageSuffix
+
+    autoadd -P, --port=<PORT> to _programHelpSuffix
+
+ -C, --community=<SNMP COMMUNITY>
+
+   _programUsagePrefix: [-C|--community <SNMP COMMUNITY>]
+
+    add: new ... (_programGetOptions => ['community|C:s' or 'community|C=s'])
+
+    autoadd [-C|--community <SNMP COMMUNITY>] to _programUsageSuffix
+
+    autoadd -C, --community=<SNMP COMMUNITY> to _programHelpSuffix
+
+ -u, --username/--loginname=<USERNAME>
+
+    add: new ... (_programGetOptions => ['username|u|loginname:s' or 'username|u|loginname=s'])
+
+    autoadd [-u|--username|--loginname <USERNAME>] to _programUsageSuffix
+
+    autoadd -u, --username/--loginname=<USERNAME> to _programHelpSuffix
+
+ -p, --password/--passwd=<PASSWORD>
+
+    add: new ... (_programGetOptions => ['password|p|passwd:s' or 'password|p|passwd=s'])
+
+    autoadd [-p|--password|--passwd <PASSWORD>] to _programUsageSuffix
+
+    autoadd -p, --password/--passwd=<PASSWORD> to _programHelpSuffix
+
+ -F, --filename=<FILENAME>
+
+    XML filename with the ASNMTAP/Nagios compatible test results
+
+    add: new ... (_programGetOptions => ['filename|F:s' or 'filename|F=s'])
+
+    autoadd [-F|--filename <FILENAME>] to _programUsageSuffix
+
+    autoadd -F, --filename=<FILENAME> ... to _programHelpSuffix
+
+ -i, --interval=<SECONDS>
+
+    interval threshold (seconds) from which a CRITICAL (2x) or WARNING (1x) status will result when XML fingerprint out of time
+
+    add: new ... (_programGetOptions => ['interval|i:i' or 'interval|i=i'])
+
+    autoadd [-i|--interval <SECONDS>] to _programUsageSuffix
+
+    autoadd -i, --interval=<SECONDS> ... to _programHelpSuffix
+
+-l, --loglevel=<LOGLEVEL>
+
+    loglevel, one of (order of decrescent verbosity): debug, verbose, notice, info, warning, err, crit, alert, emerg
+
+    add: new ... (_programGetOptions => ['loglevel|l:s' or 'loglevel|l=s'])
+
+    autoadd [-l|--loglevel <LOGLEVEL>] to _programUsageSuffix
+
+    autoadd -l, --loglevel=<LOGLEVEL> ... to _programHelpSuffix
+
+-Y, --year=<YEAR>
+
+    year, format: [19|20|21]yy
+
+    add: new ... (_programGetOptions => ['year|i:i' or 'year|i=i'])
+
+    autoadd [-Y|--year <YEAR>] to _programUsageSuffix
+
+    autoadd -Y, --year=<YEAR> ... to _programHelpSuffix
+
+-Q, --quarter=<QUARTER>
+
+    quarter, where value 1..4
+
+    add: new ... (_programGetOptions => ['quarter|Q:i' or 'quarter|Q:i'])
+
+    autoadd [-Q|--quarter <QUARTER>] to _programUsageSuffix
+
+    autoadd -Q, --quarter=<QUARTER> ... to _programHelpSuffix
+
+-M, --month=<MONTH>
+
+    month, where value 1..12
+
+    add: new ... (_programGetOptions => ['month|M:i' or 'month|M=i'])
+
+    autoadd [-M|--month <MONTH>] to _programUsageSuffix
+
+    autoadd -M, --month=<MONTH> ... to _programHelpSuffix
+
+=item reserved command line options (without autoinsertion)
+
+ -w, --warning=<WARNING>
+
+    warning threshold with more than one type of threshold
+
+    add: new ... (_programGetOptions => ['warning|w:s' 'warning|w=s'],
+                  _programUsagePrefix => '[-w|--warning <WARNING>]',
+                  _programHelpPrefix  => '-w, --warning=<WARNING>]')
+
+ -c, --critical=<CRITICAL>
+
+    critical threshold with more than one type of threshold'
+
+   _programUsagePrefix: [-c|--critical <CRITICAL>]
+
+    add: new ... (_programGetOptions  => ['critical|c:s' or 'critical|c=s'],
+                  _programUsagePrefix => '[-c|--critical <CRITICAL>]',
+                  _programHelpPrefix  => '-c, --critical=<CRITICAL>]')
+
+=item Threshold lists
+
+Lists are expressed with commas, '-c x1,x2,xn' where x1, x2 ... x2 are integers
+
+If possible when writing lists, use tokens to make the list easy to remember and non-order dependent as in '-c 10000,10%' so that it is clear which is the precentage and which is the KB values
+
+=item Threshold ranges
+
+Ranges are expressed with colons as in -w 1:20 -c 1:30 which will warn above 20 instances, and critical at 0 and above 30
+
+=back
+
+=item _getOptionsArgs
+
+scalar, the program command line entered options returned values (the equivalent of the assignment)
+
+=item _getOptionsValues
+
+=over 4
+
+=item asnmtapEnv
+
+--asnmtapEnv=[F|T]|[F|T][F|T]
+
+[boolean_screenDebug]|[boolean_debug_all]|[boolean_debug_NOK]
+
+=over 4
+
+=item boolean_screenDebug
+
+equals 0 when F(alse) and 1 when T(true)
+
+=item boolean_debug_all
+
+equals 0 when F(alse) and 1 when T(true)
+
+=item boolean_debug_NOK
+
+equals 0 when F(alse) and 1 when T(true)
+
+=back
+
+=item onDemand
+
+equals 0 when F(alse)/N(o) and 1 when T(true)/Y(es)
+
+=item debug
+
+equals 0 when F(alse)
+
+equals 1 when T(true)
+
+equals 2 when L(ong)
+
+equals 3 when M(oderator)
+
+equals 4 when A(dmin)
+
+equals 6 when S(erver Admin)
+
+=back
+
+=item _pluginValues: the following keys are possible
+
+=over 4
+
+=item stateValue
+
+ 0: OK
+ 1: WARNING
+ 2: CRITICAL
+ 3: UNKNOWN
+ 4: DEPENDENT
+ 5: OFFLINE
+ 6: NO TEST
+ 7: NO DATA
+ 8: IN PROGRESS
+ 9: TRENDLINE
+
+=item stateError
+
+ OK         : 0
+ WARNING    : 1
+ CRITICAL   : 2
+ UNKNOWN    : 3
+ DEPENDENT  : 4
+ OFFLINE    : 5
+ NO TEST    : 6
+ NO DATA    : 7
+ IN PROGRESS: 8
+ TRENDLINE  : 9
+
+=item message
+
+name from the application.
+
+=item alert
+
+<fixed 1>[ - <fixed 2>[ - <fixed n>]]
+
+|
+
+<var 1>[ - <var 2>[ - <var n>]], <fixed 1>[ - <fixed 2>[ - <fixed n>]]
+
+=over 4
+
+=item fixed (text)
+
++<name subtest>:<status>[+<name subtest>:<status>]+
+
+vb +DUMMY-T1+DUMMY-T2+
+
+=item var (variable text)
+
++<name subtest>:<status> time[+<name subtest>:<status> time]+
+
+vb +DUMMY-T1:C 2.077+DUMMY-T2:W 1.913+
+
+=back
+
+=item error
+
+error description
+
+=item result
+
+returned results from the test
+
+=item performanceData
+
+look at section 'Performance data'
+
+=item startTime
+
+time set the when the class object initialization is finished
+
+=item endTime
+
+time of the last run of the function setEndTime_and_getResponsTime()
+
+=back
+
+=over 4
+
+=item Structure from the status message
+
+statusMessage = 'state - message'
+
+when alert !~ /(?:OK|..|TRENDLINE)/
+  statusMessage .= ': alert'
+
+when error exists
+  returnMessage .= ':: error';
+
+when performanceData defined
+  statusMessage .= '|performanceData' 
+
+=back
+
+=item _browseragent
+
+specifies the name that your application should use when it presents itself on the network.
+
+scalar, default 'Mozilla/5.0 (compatible; ASNMTAP; U; ASNMTAP 3.002.003 postfix; nl-BE; rv:3.002.003) Gecko/yyyymmdd libwww-perl/5.813'
+
+=item _SSLversion
+
+the value of the SSL version, 2, 3 or 23, default 3
+
+  Crypt::SSLeay tries very hard to connect to ANY SSL web server trying to accomodate servers that are buggy, old or simply not standards compliant.
+
+  To this effect, this module will try SSL connections in this order:
+  - SSL v23 - should allow v2 & v3 servers to pick their best type
+  - SSL v3  - best connection type
+  - SSL v2  - old connection type
+
+=item _clientCertificate: the following keys are possible
+
+=over 4
+
+=item certFile
+
+CLIENT CERT SUPPORT, PEM encoded certificate file.
+
+=item keyFile
+
+CLIENT CERT SUPPORT, PEM encoded private key file.
+
+=item caFile
+
+CA CERT PEER VERIFICATION
+
+=item caDir
+
+Additionally, if you would like to tell the client where the CA file is.
+
+=item pkcs12File
+
+CLIENT PKCS12 CERT SUPPORT, Use of this type of certificate will take precedence over previous certificate settings described.
+
+=item pkcs12Password
+
+PKCS12 PASSWORD
+
+=back
+
+=item _proxy: the following keys are possible
+
+=over 4
+
+=item server
+
+the name of the server and optional port number
+
+=item username
+
+the username
+
+=item password
+
+the password
+
+=item no
+
+do not proxy requests to the given domains. Calling no_proxy without any domains clears the list of domains.
+
+=back
+
+=item _timeout
+
+specifies how much time we give remote servers to respond before the library disconnects and creates an internal timeout response.
+
+scalar, default 10
+
+=back
+
+=head1 INHERITS from ASNMTAP::Asnmtap
+
+=head2 Attributes
+
+_programName
+_programDescription
+_programVersion
+_programUsagePrefix
+_programHelpPrefix
+_programGetOptions
+_debug
+
+=head2 Object accessor methods
+
+programName()
+programDescription()
+programVersion()
+
+getOptionsArgv()
+getOptionsValue()
+
+debug()
+
+=head2 Class accessor methods
+
+dumpData()
+
+=head2 Utility methods
+
+printRevision()
+printUsage()
+printHelp()
+
+get_yyyymmddhhmmsswday()
+
+get_datetimeSignal()
+get_datetime()
+
+get_logfiledate()
+get_csvfiledate()
+get_csvfiletime()
+
+get_epoch()
+get_week()
+get_wday()
+get_hour()
+get_min()
+get_seconds()
+get_day()
+get_month()
+get_year()
+get_yearMonthDay()
+
+get_timeslot()
+
+=head1 METHODS
+
+=head2 Object accessor methods
+
+=over 4
+
+=item appendPerformanceData()
+
+=over 4
+
+=item Arguments
+
+value: scalar, the performanceData to append
+
+=item Function
+
+Append the value to the PerformanceData
+
+=back
+
+=item browseragent()
+
+=over 4
+
+=item Arguments (optional)
+
+scalar, browseragent string
+
+=item Function
+
+Set and/or get the browseragent string
+
+=back
+
+=item SSLversion()
+
+=over 4
+
+=item Arguments (optional)
+
+scalar, SSL version
+
+=item Function
+
+Set and/or get the SSL version
+
+  $objectPlugins->SSLversion(23);     # set SSL version
+  $objectPlugins->_init_proxy_and_client_certificate ();
+  $objectPlugins->SSLversion();       # get SSL version
+
+=back
+
+=item clientCertificate()
+
+=over 4
+
+=item Arguments (optional)
+
+scalar, client certificate key values
+
+keys: certFile, keyFile, caFile, caDir, pkcs12File, pkcs12Password
+
+=item Function
+
+Set and/or get the client certificate key values
+
+=back
+
+=item pluginValue()
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item item
+
+scalar, set and/or get a plugin value
+
+item is equal to one of the possible items:
+
+=over 4
+
+=item stateValue
+
+$ERROR{OK..UNKNOWN}
+
+=item stateError
+
+$STATE{0..3}
+
+=item message
+
+..., when '-e|--environment' specified (<selected envoronment>) added after the message
+
+=item alert
+
+scalar, the message description for the alert
+
+=item error
+
+scalar, the message description for the error
+
+=item result
+
+scalar, the returned result from the last test
+
+=item performanceData
+
+look at section 'Performance data'
+
+=item startTime
+
+the time set after the compilation and initialisation off the plugin.
+
+scalar, format: 'seconds.microseconds'
+
+=item endTime
+
+is the time set by the last call off the function setEndTime_and_getResponsTime()
+
+scalar, format: 'seconds.microseconds', default: equals to 'startTime'
+
+=back
+
+=item value (optional)
+
+scalar, the value to set
+
+=back
+
+=item Function
+
+Set and/or get the plugin value for item
+
+=back
+
+=item pluginValues()
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item parameters
+
+hash with item is equal to one of the possible items:
+
+=over 4
+
+=item stateValue
+
+set the return status value, 'stateError' is automatically set
+
+optional, $ERROR{OK..UNKNOWN}
+
+=item stateError
+
+set the return status error, 'stateValue' is automatically set
+
+optional, $STATE{0..3}
+
+=item alert
+
+set the error message
+
+optional, scalar
+
+=item error
+
+set the error message
+
+optional, scalar
+
+=item result
+
+set the result to the object
+
+optional, scalar
+
+=back
+
+=item replace/append
+
+  0: replace alert and/or error
+  1: append to alert and/or error
+  2: insert to alert and/or error
+  3: add comma and replace alert and/or error
+  4: add comma and append to alert and/or error
+  5: add comma and insert to alert and/or error
+ 
+  %TYPE = ( REPLACE => 0, APPEND => 1, INSERT => 2, COMMA_REPLACE => 3, COMMA_APPEND => 4, COMMA_INSERT => 5 )
+
+=back
+
+=item Function
+
+Set and/or get the plugin values for the required arguments
+
+=back
+
+=item proxy()
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item item
+
+scalar, set and/or get a proxy value
+
+item is equal to one of the possible items:
+
+=over 4
+
+=item server
+
+  $objectPlugins->proxy( 'server' => 'proxy.citap.com' );
+  $objectPlugins->_init_proxy_and_client_certificate ();
+
+=item username
+
+  $objectPlugins->proxy( 'username' => 'username' );
+  $objectPlugins->_init_proxy_and_client_certificate ();
+
+=item password
+
+  $objectPlugins->proxy( 'password' => 'password' );
+  $objectPlugins->_init_proxy_and_client_certificate ();
+
+=item no
+
+  $objectPlugins->proxy( 'no' => ['localhost', '127.0.0.1'] );
+  $objectPlugins->_init_proxy_and_client_certificate ();
+
+=back
+
+=item value (optional)
+
+scalar, the value to set
+
+=back
+
+=item Function
+
+Set and/or get the plugin value for item
+
+=back
+
+=item timeout()
+
+=over 4
+
+=item Arguments (optional)
+
+scalar, timeout value
+
+=item Function
+
+Set and/or get the timeout value
+
+=back
+
+=item write_debugfile()
+
+=over 4
+
+=item Arguments
+
+parameter 1: scalar reference, debug
+parameter 2: scalar, open debugfile as 'Writes, Appends, and Creates' mode when 1, otherwise open debugfile in 'Creates, Writes, and Truncates' mode.
+
+=item Function
+
+Write debug to file DEBUGFILE, specified with the command line options '-D, --debugfile=DEBUGFILE'
+
+=back
+
+=back
+
+=head2 Class accessor methods
+
+=over 4
+
+=item setEndTime_and_getResponsTime()
+
+=over 4
+
+=item Arguments
+
+time: scalar, hhmmss.mmmnnn
+
+=item Function
+
+Set endTime and get responstime (-1 when argument time fails)
+
+=back
+
+=back
+
+=head2 Utility methods
+
+=over 4
+
+=item call_system()
+
+=over 4
+
+=item Arguments
+
+command, scalar
+
+=item Function
+
+system call for command
+
+=item Return
+
+returns stateValue => $ERRORS{OK..UNKNOWN}, alert => stdout and error => stderr
+
+=back
+
+=item exit()
+
+=over 4
+
+=item Arguments (optional)
+
+=over 4
+
+=item exit
+
+scalar, exit value
+
+=over 4
+
+=item exit value equals
+
+0 = abnormal exit,
+
+1 = abnormal exit with Performance Data for 'Status'
+
+2 = abnormal exit with Performance Data for 'Compilation', 'Duration/Trendline' and 'Execution'
+
+3 = abnormal exit with Performance Data for 'Status', 'Compilation', 'Duration/Trendline' and 'Execution'
+
+4 = normal exit,
+
+5 = normal exit with Performance Data for 'Status'
+
+6 = normal exit with Performance Data for 'Compilation', 'Duration/Trendline' and 'Execution'
+
+7 = normal exit with Performance Data for 'Status', 'Compilation', 'Duration/Trendline' and 'Execution'
+
+=back
+
+'Trendline' used instead of 'Duration' when command line option '--trendline' is specified.
+
+=back
+
+=item Function
+
+exit plugin function
+
+=item Return
+
+exit Plugin Return Code and Performance Data when exit argument exists
+
+=back
+
+=over 4
+
+=item Plugin Return Codes
+
+The return codes below are based on the POSIX spec of returning a  positive value. ASNMTAP supports POSIX return codes by default.
+
+Note: Some plugins will on occasion print on STDOUT that an error occurred and error code is 138 or 255 or some such number. These are usually caused by plugins using system commands and having not enough checks to catch unexpected output. Developers should include a default catch-all for system command output that returns an UNKNOWN return code.
+
+Numeric Value, Service Status & Status Description:
+
+=over 4
+
+=item 0 OK
+
+The plugin was able to check the service and it appeared to be functioning properly
+
+=item 1 Warning
+
+The plugin was able to check the service, but it appeared to be above some "warning" threshold or did not appear to be working properly
+
+=item 2 Critical
+
+The plugin detected that either the service was not running or it was above some "critical" threshold
+
+=item 3 Unknown
+
+Invalid command line arguments were supplied to the plugin or low-level failures internal to the plugin (such as unable to fork, or open a tcp socket) that prevent it from performing the specified operation. Higher-level errors (such as name resolution errors, socket timeouts, etc) are outside of the control of plugins and should generally NOT be reported as UNKNOWN states. 
+
+=back
+
+=item Threshold range format
+
+Thresholds ranges define the warning and critical levels for plugins to alert on. The theory is that the plugin will do some sort of check which returns back a numerical value, or metric, which is then compared to the warning and critical thresholds.
+
+This is the generalised format for threshold ranges:
+
+[@]start:end
+
+=over 4
+
+=item Notes
+
+=over 4
+
+=item 1
+
+start > end
+
+=item 2
+
+start and ":" is not required if start=0
+
+=item 3
+
+if range is of format "start:" and end is not specified, assume end is infinity
+
+=item 4
+
+to specify negative infinity, use "~"
+
+=item 5
+
+alert is raised if metric is outside start and end range (inclusive of endpoints)
+
+=item 6
+
+if range starts with "@", then alert if inside this range (inclusive of endpoints)
+
+=back
+
+=item Note
+
+Not all plugins are coded to expect ranges in this format. It is planned for a future release to provide standard libraries to parse and compare metrics against ranges. There will also be some work in providing multiple metrics.
+
+=back
+
+=item Performance data
+
+Performance data is defined by Nagios as 'everything after the | of the plugin output', please refer to Nagios documentation for information on capturing this data to logfiles. However, it is the responsibility of the plugin writer to ensure the performance data is in a 'Nagios plugins' format.
+
+=over 4
+
+=item This is the expected format
+
+'label'=value[UOM];[warn];[crit];[min];[max]
+
+=item Notes
+
+=over 4
+
+=item 1.
+
+space separated list of label/value pairs
+
+=item 2.
+
+label can contain any characters
+
+=item 3.
+
+the single quotes for the label are optional. Required if spaces, = or ' are in the label
+
+=item 4.
+
+label length is arbitrary, but ideally the first 19 characters are unique (due to a limitation in RRD). Be aware of a limitation in the amount of data that NRPE returns to Nagios
+
+=item 5.
+
+to specify a quote character, use two single quotes
+
+=item 6.
+
+warn, crit, min or max may be null (for example, if the threshold is not defined or min and max do not apply). Trailing unfilled semicolons can be dropped
+
+=item 7.
+
+min and max are not required if UOM=%
+
+=item 8.
+
+value, min and max in class [-0-9.]. Must all be the same UOM
+
+=item 9.
+
+warn and crit are in the range format (see the Section called Threshold range format). Must be the same UOM
+
+=item 10.
+
+UOM (unit of measurement) is one of:
+
+=over 4
+
+=item a.
+
+no unit specified - assume a number (int or float) of things (eg, users, processes, load averages)
+
+=item b.
+
+s - seconds (also us, ms)
+
+=item c.
+
+% - percentage
+
+=item d.
+
+B - bytes (also KB, MB, TB)
+
+=item e.
+
+c - a continous counter (such as bytes transmitted on an interface)
+
+=back
+
+=back
+
+=back
+
+=back
+
+=back
+
+=head1 EXPORT
+
+=head2 TAGS
+
+=over 4
+
+=item *
+
+ALL
+
+  $APPLICATION $BUSINESS $DEPARTMENT $COPYRIGHT $SENDEMAILTO
+  $CAPTUREOUTPUT
+  $PREFIXPATH $PLUGINPATH $LOGPATH $PIDPATH $PERL5LIB $MANPATH $LD_LIBRARY_PATH
+  $CHATCOMMAND $DIFFCOMMAND $KILLALLCOMMAND $PERLCOMMAND $PPPDCOMMAND $ROUTECOMMAND $RSYNCCOMMAND $SCPCOMMAND $SSHCOMMAND
+  %ERRORS %STATE %TYPE
+
+=item *
+
+PLUGINS
+
+  $APPLICATION $BUSINESS $DEPARTMENT $COPYRIGHT $SENDEMAILTO
+  $CAPTUREOUTPUT
+  $PREFIXPATH $PLUGINPATH $LOGPATH $PIDPATH $PERL5LIB $MANPATH $LD_LIBRARY_PATH
+  %ERRORS %STATE %TYPE
+
+=item *
+
+COMMANDS
+
+  $CHATCOMMAND $DIFFCOMMAND $KILLALLCOMMAND $PERLCOMMAND $PPPDCOMMAND $ROUTECOMMAND $RSYNCCOMMAND $SCPCOMMAND $SSHCOMMAND
+
+=item *
+
+PLUGINS
+
+  $PLUGINPATH
+
+=back
+
+=head1 AUTHOR
+
+Alex Peeters [alex.peeters@citap.be]
+
+=head1 SEE ALSO
+
+ASNMTAP::Asnmtap, ASNMTAP::Asnmtap::Plugins
+
+jUnit
+
+  check_jUnit.pl
+
+  create_ASNMTAP_jUnit_configuration_for_jUnit.pl
+
+SNMPTT
+
+  check_SNMPTT_oracle.pl
+  check_SNMPTT_probe.pl
+
+Weblogic
+
+  check_SNMPTT_weblogic.pl
+
+  create_ASNMTAP_weblogic_configuration_for_SNMP.pl
+  create_weblogic_configuration_for_SNMPTT.pl
+  snmptt_traps_remove_pending_and_duplicated.pl
+  create_NCPL_weblogic_configuration_for_SNMP.pl
+  create_weblogic_configuration_database_with_SNMP.pl
+
+ASNMTAP::Asnmtap, ASNMTAP::Asnmtap::Plugins::Nagios
+
+  check_file-counter.pl
+  check_sendAndReceiveMail.pl
+
+  check_template.pl
+  check_template-cluster.pl
+
+=head1 DEPENDENCIES
+
+  ASNMTAP::Asnmtap
+  Time::HiRes
+
+=head1 COPYRIGHT NOTICE
+
+(c) Copyright 2000-2011 by Alex Peeters [alex.peeters@citap.be],
+                        All Rights Reserved.
+
+ASNMTAP is based on 'Process System daemons v1.60.17-01', Alex Peeters [alex.peeters@citap.be]
+
+ Purpose: CronTab (CT, sysdCT),
+          Disk Filesystem monitoring (DF, sysdDF),
+          Intrusion Detection for FW-1 (ID, sysdID)
+          Process System daemons (PS, sysdPS),
+          Reachability of Remote Hosts on a network (RH, sysdRH),
+          Rotate Logfiles (system activity files) (RL),
+          Remote Socket monitoring (RS, sysdRS),
+          System Activity monitoring (SA, sysdSA).
+
+'Process System daemons' is based on 'sysdaemon 1.60' written by Trans-Euro I.T Ltd
+
+=head1 LICENSE
+
+This ASNMTAP CPAN library and Plugin templates are free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+The other parts of ASNMTAP may be used and modified free of charge by anyone so long as this copyright notice and the comments above remain intact. By using this code you agree to indemnify Alex Peeters from any liability that might arise from it's use.
+
+Selling the code for this program without prior written consent is expressly forbidden. In other words, please ask first before you try and make money off of my program.
+
+Obtain permission before redistributing this software over the Internet or in any other medium. In all cases copyright and header must remain intact.
+
+=cut

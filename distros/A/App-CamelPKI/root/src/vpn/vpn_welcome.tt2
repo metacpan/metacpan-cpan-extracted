@@ -1,0 +1,8 @@
+[% META title = 'VPN Certificates' %]
+<p> VPN certificates are generally used beetwen a computers.
+They are used to crypt the transmission and to be sure the client is really
+who he prentends to be.
+</p>
+<p> From this page, you can either revoke or issue a certificate :</p>
+<p> - <a href="/ca/template/vpn/certifyForm">Issuance</a></p>
+<p> - <a href="/ca/template/vpn/revokeForm">Revocation</a></p>

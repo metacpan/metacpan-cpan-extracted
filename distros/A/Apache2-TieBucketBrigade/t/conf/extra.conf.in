@@ -1,0 +1,10 @@
+#file:t/conf/extra.conf.in
+#-------------------------
+# this file will be Include-d by @ServerRoot@/httpd.conf
+
+PerlSwitches -I@ServerRoot@/../lib
+
+<VirtualHost Apache::TestTieBucketBrigade>
+      PerlModule                   Apache::TestTieBucketBrigade
+      PerlProcessConnectionHandler Apache::TestTieBucketBrigade
+</VirtualHost>

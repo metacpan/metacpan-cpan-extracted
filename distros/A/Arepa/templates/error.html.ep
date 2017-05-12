@@ -1,0 +1,9 @@
+<h1>Error</h1>
+
+<p>Some error(s) occurred:</p>
+
+<ul>
+<% foreach my $error (@$errors) { %>
+    <li><%= $error->{error} %><% if ($error->{output}) { %> Command output was:<pre><%= $error->{output} %></pre><% } %></li>
+<% } %>
+</ul>

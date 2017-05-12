@@ -1,0 +1,104 @@
+  <td>
+
+<div class="right">
+
+<form action="add_index_2<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="hidden" name="table" value="<% $t->name %>">
+<table width="70%" cellspacing="5">
+ <tr valign="top">
+  <td>
+   <h4>Column</h4>
+  </td>
+  <td>
+% if ( $s->rules->feature('index_prefix') ) {
+   <h4>Prefix (optional)</h4>
+% } else {
+   &nbsp;
+% }
+  </td>
+  <td>
+% if (@columns > 1) {
+   <h4>Column order</h4>
+% } else {
+  &nbsp;
+% }
+ </tr>
+% my $x = 1;
+% foreach my $c ( @columns ) {
+ <tr valign="top">
+  <td>
+   <span class="text"><% $c %></span>
+   <input type="hidden" name="columns" value="<% $c %>">
+  </td>
+  <td>
+%   if ( $s->rules->feature('index_prefix') ) {
+   <input type="text" size="5" name="prefixes">
+%   } else {
+   &nbsp;
+%   }
+  </td>
+  <td>
+%   if (@columns > 1) {
+   <input type="text" size="2" maxlength="2" name="<% "${c}_order" %>" value="<% $x++ %>">
+%   } else {
+  &nbsp;
+% }
+  </td>
+ </tr>
+% }
+ <tr>
+  <td colspan="2">
+   <span class="text">Unique?</span> <input type="checkbox" name="unique">
+  </td>
+ </tr>
+% if ( $s->rules->feature('fulltext_index') ) {
+ <tr>
+  <td colspan="2">
+   <span class="text">Fulltext?</span> <input type="checkbox" name="fulltext">
+  </td>
+ </tr>
+% }
+% if ( $s->rules->feature('functional_indexes') ) {
+ <tr>
+  <td colspan="2">
+   <p>
+   If you want to make a function index, simply type the function
+   below, with the proper column name arguments.  You should only use
+   the columns you selected on the previous page.
+   </p>
+  </td>
+ <tr>
+ <tr>
+  <td colspan="2">
+   <input type="text" name="function">
+  </td>
+ </tr>
+% }
+ <tr>
+  <td colspan="2">
+   <input type="submit" value="Submit">
+  </td>
+ </tr>
+</table>
+</form>
+
+</div>
+
+  </td>
+
+<%args>
+$s
+$t
+@columns => ()
+</%args>
+
+<%init>
+$m->redirect( uri( path => 'view_table_other' . Alzabo::GUI::Mason::Config::mason_extension(),
+                   query => { schema => $s->name,
+                              table  => $t->name,
+                            },
+                 ),
+            )
+     unless @columns;
+</%init>

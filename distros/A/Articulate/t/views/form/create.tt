@@ -1,0 +1,21 @@
+<form method="post">
+
+  <div>
+    <label for="article_id">Article ID</label>
+    <input name="article_id" pattern="^[a-z0-9-]+$"></input>
+  </div>
+
+  <div>
+    <label for=content">Content</label>
+    <textarea name="content"></textarea>
+  </div>
+
+  <div>
+    <button class="submit-form-preview">Preview</button>
+  </div>
+
+  <div>
+    <button type="submit" class="submit-form">Create</button>
+  </div>
+
+</form>

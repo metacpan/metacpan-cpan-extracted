@@ -1,0 +1,253 @@
+NAME
+    Apache::Album - Simple mod_perl Photo Album
+
+SYNOPSIS
+    Add to httpd.conf
+
+     <Location /albums>
+       SetHandler perl-script
+       PerlHandler Apache::Album
+    #   PerlSetVar  AlbumDir            /albums_loc
+    #   PerlSetVar  ThumbNailUse        Width  
+    #   PerlSetVar  ThumbNailWidth      100
+    #   PerlSetVar  ThumbNailAspect     2/11
+    #   PerlSetVar  ThumbSubDir         thumbs
+    #   PerlSetVar  DefaultBrowserWidth 640
+    #   PerlSetVar  NumberOfColumns     0
+    #   PerlSetVar  OutsideTableBorder  0
+    #   PerlSetVar  InsideTablesBorder  0
+    #   PerlSetVar  BodyArgs            BGCOLOR=white
+    #   PerlSetVar  Footer              "<EM>Optional Footer Here</EM>"
+    #   PerlSetVar  EditMode            0
+    #   PerlSetVar  AllowFinalResize    0
+    #   PerlSetVar  FinalResizeDir      thumbs
+    #   PerlSetVar  ReverseDirs         0
+    #   PerlSetVar  ReversePics         0
+     </Location>
+
+ABSTRACT
+    This is a simple photo album. You simply copy some gif's/jpeg's
+    to a directory, create an optional text block (in a file called
+    caption.txt) to go at the top, and the module does the rest. It
+    does however require that PerlMagick be installed.
+
+    Default settings in the httpd.conf file may be overriden by
+    using .htaccess files.
+
+INSTALLATION
+      perl Makefile.PL
+      make
+      make install
+
+    (no test necessary)
+
+CONFIGURATION
+    The configuration can be a little tricky, so here is a little
+    more information. It's important to realize that there are two
+    separate, but related directories. One is where the physical
+    pictures reside, the other is where the "virtual" albums reside.
+
+    Consider a filesystem called /albums exists and it is this
+    filesystem that will house the images. Also consider that
+    multiple people will have albums there, so you would create a
+    directory for each user:
+
+      /albums/jdw/albums_loc
+      /albums/travis/albums_loc
+
+    Then in your httpd.conf file you would have the following entry
+    to allow pictures in those directories to be viewed:
+
+      Alias /jdw /albums/jdw/
+
+    At this point you could view a full sized picture under the
+    directory /albums/jdw/albums_loc as the url /jdw/albums_loc.
+
+    To have an album that creates thumbnails/captions of those
+    pictures you would need an entry like:
+
+     <Location /jdw/albums>
+      SetHandler perl-script
+      AllowOverride None
+      Options None
+      PerlHandler Apache::Album
+      PerlSetVar  AlbumDir /jdw/albums_loc
+      PerlSetVar  Footer   "<a href=\"mailto:woody@bga.com\">Jim Woodgate</a>"
+     </Location>
+
+    Note how AlbumDir points to the url where the files exist, and
+    the url you use to access the album will be just like that url,
+    only substituting albums for albums_loc.
+
+    If anyone knows of a way to accomplish this same thing, but
+    using a DirectoryIndex instead, please let me know. I tried and
+    could not get it to work!
+
+DESCRIPTION
+    This module sets up a virtual set of photo albums starting at
+    the `Location' definition. This virtual directory is mapped to a
+    physical directory under `AlbumDir'. Under `AlbumDir' create a
+    sub-directory for each photo album, and copy image files into
+    each subdirectory. You must also make the permissions for each
+    subdirectory so that the id which runs Apache can write to the
+    directory.
+
+    At this point, if you have PerlMagick installed, you can go to
+    *http://your.site/albums/album_name* Apache::Album will create
+    thumbnails for each of the images, and send the caption.txt file
+    along with the thumbnails to the client's browser. The
+    thumbnails are links to the full sized images.
+
+    The caption.txt file
+      The caption.txt file consists of two parts. The first part is
+      text/html that will be placed at the top of the html document.
+      The second part is a mapping of filenames to captions. The
+      module will do some simple mangling of the image file names to
+      create the caption. But if it finds a mapping in the
+      caption.txt file, that value is used instead. The value
+      __END__ signifies the end of the first section and the
+      beginning of the second.
+
+        For example:
+
+        Image   -> Bob_and_Jenny.jpg
+        Caption -> Bob and Jenny       (the auto-generated caption)
+
+        override in caption.txt
+        Bob_and_Jenny.jpg: This is me with my sister <EM>Jenny</EM>.
+
+      Here is a sample caption.txt file:
+
+        <H1>My Birthday Party</H1>
+
+        <center>This is me at my Birthday Party!.</center>
+
+        __END__
+        pieinface.gif: Here's me getting hit the face with a pie.
+        john5.jpg: This is <A HREF="mailto:johndoe@nowhere.com">John</A>
+
+    ThumbNail Types
+      `ThumbNailUse' can either be set to "width" or "aspect". If
+      `ThumbNailUse' is set to "width", thumbnails that need to be
+      created will be `ThumbNailWidth' wide, and the height will be
+      modified to keep the same aspect as the original image.
+
+      If `ThumbNailUse' is set to "aspect", thumbnails that need to
+      be created will be transformed by the value of
+      `ThumbNailAspect'. `ThumbNailAspect' can be either a floating
+      point number like 0.25 or it can be a ratio like 2 / 11.
+
+      If an image file is updated, the corresponding thumbnail file
+      will be updated the next time the page is accessed. In
+      practice I have found that Netscape will used the cached
+      images even if they are updated. I normally have to flush the
+      cache and reload to see the new images.
+
+      At any time you can `rm -f tn__*' in the
+      `AlbumDir'/album_name/ directory, the next time the page is
+      loaded all the thumbnails will be regenerated. (Naturally
+      image names that start with tn__ should be renamed before
+      placing them in the album directory.)
+
+    ThumbSubDir
+      If you want your thumbnails to be in a different directory
+      than the original pictures, set `ThumbSubDir' which is the
+      subdirectory the thumbnails will be created in and viewed
+      from. (This could also be used to allow multiple sets of
+      thumbnails).
+
+    DefaultBrowserWidth
+      A general number of how wide you want the final table to be,
+      not an absolute number. If the next image would take it past
+      this "invisible line", a new row is started.
+
+    NumberOfColumns
+      Instead of using DefaultBrowserWidth and a guess at the number
+      of pixels, NumberOfColumns can be set to the maximum number of
+      columns in a table. The default is 0 (which causes
+      DefaultBrowserWidth to be used instead).
+
+    BodyArgs
+      This entire string is passed in the <BODY> tag. Useful for
+      setting background images, background color, link colors, etc.
+      If set in the httpd.conf file, you must put quotes around the
+      value, and escape any quotes in the value. If this value is
+      set in the .htaccess file, this is not necessary:
+
+        In httpd.conf: PerlSetVar BodyArgs "BACKGROUND=gray.gif text=\"#FFFFFF\""
+        In .htaccess : PerlSetVar BodyArgs BACKGROUND=gray.gif text="#FFFFFF"
+
+    OutsideTableBorder
+      This variable's value is passed to the outer table's BORDER
+      attribute.
+
+    InsideTablesBorder
+      This variables's value is passed to all the inner table's
+      BORDER attributes. Note that the name of the
+      `InnerTablesBorder' has an 's' in it, as it modifes all the
+      inner tables.
+
+    Footer
+      This text/html will placed at the bottom of the page after all
+      the thumbnails, but before the end of the page. Useful for
+      links back to a home page, mailto: tag, etc.
+
+    EditMode
+      Allows the user to create new albums and upload pictures.
+      Obviously there are security implications here, so if EditMode
+      is turned on that location should probably have some kind of
+      security. Albums can share the same AlbumDir, so you can have
+      something like:
+
+      /albums - ReadOnly version, no security /albums_edit - Allow
+      new album creation and picture uploads, require authentication
+
+      both using the same AlbumDir.
+
+    AllowFinalResize
+      If this is set to true, the user will have 3 additional
+      options when viewing the full sized picture. The thumbnail can
+      still be selected to view the full picture, or Sm (Small), Med
+      (Medium), or Lg(Large) can be selected to bring the picture
+      down to fit better in a 640x480, 800x600, or 1024x758 screen.
+
+    ReverseDirs
+      When viewing albums, they will be sorted by name. If this is
+      set to true the order will be reversed. (Useful if you want to
+      use things like dates/months as the directory names, this will
+      put the most recent albums first.
+
+    ReversePics
+      When viewing pictures, they will be sorted by name. If this is
+      set to true, the order of the pictures will be reversed.
+
+OTHER FEATURES
+    For people with lots of bandwidth and memory, Apache::Album can
+    generate a single page with all the full sized pictures (or all
+    the Small(sm), Medium(med) or Large(lg) pictures if
+    AllowFinalResize is turned on). This is enabled by passing
+    ?all_full_images=sm|med|lg|full to the url of an album, for
+    example:
+
+      `http://your.web.server/albums/specific_album/?all_full_images
+      =sm'
+
+    Will create a page with all the picutres in an album, but none
+    will be larger than 640x480. The pictures will have captions as
+    if the pictures were being viewed one at a time.
+
+LIMITATIONS
+    PerlMagick is a limiting factor. If PerlMagick can't load the
+    image, no thumbnail will be created.
+
+COPYRIGHT
+    Copyright (c) 1998-2000 Jim Woodgate. All rights reserved. This
+    program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.
+
+AUTHOR
+    Jim Woodgate woody@bga.com
+
+SEE ALSO
+    perl(1), the Image::Magick manpage(3).
+

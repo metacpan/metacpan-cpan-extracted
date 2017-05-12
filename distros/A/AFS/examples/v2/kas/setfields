@@ -1,0 +1,72 @@
+#!/usr/local/bin/perl
+
+use blib;
+use AFS::KAS;
+use AFS::KTC_PRINCIPAL;
+use AFS::KTC_TOKEN;
+use AFS::KTC_EKEY;
+use AFS qw(checkafs raise_exception);
+
+die "Usage: admin user \n" if ($#ARGV != 1);
+
+raise_exception(1);
+
+my $admin = AFS::KTC_PRINCIPAL->new(shift);
+my $user  = AFS::KTC_PRINCIPAL->new(shift);
+my $key   = AFS::KTC_EKEY->ReadPassword($admin->principal . "'s Password:");
+
+my $reason = '';
+my $token = AFS::KTC_TOKEN->GetAdminToken($admin, $key, 300, 1, $reason);
+if ($reason) { print "reason = $reason\n"; }
+checkafs('AdminToken');
+
+my $kas = AFS::KAS->AuthServerConn($token, &AFS::KA_MAINTENANCE_SERVICE);
+checkafs('AuthServerConn');
+
+my $entry = $kas->getentry($user->name, $user->instance);
+print "\n\nUser data for ", $user->name, $user->instance, ": \n";
+foreach my $tp_key (sort keys %$entry) {
+    printf("%20s  %s\n",$tp_key, $$entry{$tp_key});
+}
+
+my $flags    = 1;        # (1 = normal, 4 = admin)
+my $expire   = 925715000;# 03 May 1999 07:03
+my $maxassoc = 0;
+my $lifetime = 48*60*60; # unit is secs; => 48 hrs
+my $pwexpire = 10;       # number of days
+my $pw_reuse = 2;        # pwreuse allowed: [1 = yes], [2 = no], [0 = not changed]
+my $nfail    = 4;        # (nfail - 1) tries are allowed; => 3 tries
+my $locktime = 3;        # unit is 8.5 min => 3 * (8.5)
+
+$pwexpire++;
+$nfail++;
+$locktime++;
+
+my $packed= (($pwexpire << 24) | ($pw_reuse  << 16) | ($nfail << 8) | $locktime );
+#my $ok = $kas->setfields($user->name, $user->instance, $flags, $expire, $lifetime, $maxassoc, $packed);
+my $ok = $kas->KAM_SetFields($user->name, $user->instance, $flags, $expire, $lifetime, $maxassoc, $packed);
+printf("KAS setfields: %s \n", $ok ? 'yes' : 'no');
+checkafs('SetFields');
+
+$entry = $kas->getentry($user->name, $user->instance);
+print "\n\nUser data for ", $user->name, $user->instance, ": \n";
+foreach my $tp_key (sort keys %$entry) {
+    printf("%20s  %s\n",$tp_key, $$entry{$tp_key});
+    if ($tp_key =~ 'misc_auth_bytes') {
+        if ($$entry{$tp_key}) {
+            my $packed    = $$entry{$tp_key};
+            my $pwexpire  = (($packed >> 24) & 0xff);
+            my $is_locked = (($packed >> 16) & 0xff);
+            my $nfail     = (($packed >>  8) & 0xff);
+            my $locktime  = (($packed >>  0) & 0xff);
+            print "\t\t pwexpire  $pwexpire\n";
+            print "\t\t nfail     $nfail\n";
+            print "\t\t locktime  $locktime\n";
+            print "\t\t is_locked $is_locked\n";
+        }
+    }
+    if ($tp_key =~ 'passwd_reuse') {
+        my $reused = $$entry{'passwd_reuse'} - 0x12340000;
+        print "\t\t permit password reuse $reused \n";
+    }
+}

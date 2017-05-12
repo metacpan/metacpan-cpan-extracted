@@ -1,0 +1,17 @@
+Changes
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+script/opan
+t/fix/AAAAAAAAA-1.00.tar.gz
+t/fix/AAAAAAAAA-1.01.tar.gz
+t/fix/empty.index
+t/fix/M-1.000001.tar.gz
+t/fix/M-1.tar.gz
+t/fix/upstream.fragment
+t/pan.t
+xt/ext.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)
+lib/App/opan.pm                          lib/App/opan.pm file (added by Distar)

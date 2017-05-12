@@ -1,0 +1,219 @@
+#!/usr/bin/env perl
+
+use 5.006002;
+
+use strict;
+use warnings;
+
+use Astro::SpaceTrack;
+use Data::Dumper;
+use Getopt::Long 2.33 qw{ :config auto_version };
+use HTTP::Date;
+use LWP::UserAgent;
+use Pod::Usage;
+
+our $VERSION = '0.079';
+
+my %opt;
+
+GetOptions( \%opt,
+    qw{ merge! },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+
+my $ast = Astro::SpaceTrack->new();
+my $ua = LWP::UserAgent->new();
+my $mask = 1;
+my $all = 0;
+my @sources;
+my %found;
+my $date = 0;
+my %vsnames;
+
+foreach my $code (
+    sub {
+	return (
+	    'Celestrak visual',
+	    $ua->get( 'http://celestrak.com/SpaceTrack/query/visual.txt'),
+	);
+    },
+    sub {
+	return (
+	    'McCants vsnames',
+	    $ast->mccants( 'vsnames' ),
+	);
+    }
+) {
+    my ( $source, $rslt ) = $code->();
+    process( $source, $rslt, sub {
+	    my ( $oid, $line ) = @_;
+	    $found{$oid} |= $mask;
+	    my $mag;
+	    defined( $mag = unpack_mag( $line ) )
+		and $vsnames{$oid} = $mag;
+	} );
+    $sources[$mask] = $source;
+    $all |= $mask;
+    $mask <<= 1;
+}
+
+my %mcnames;
+
+if ( $opt{merge} ) {
+    my $rslt = $ast->mccants( 'mcnames' );
+    process( 'McCants mcnames', $rslt, sub {
+	    my ( $oid, $line ) = @_;
+	    my $mag;
+	    defined( $mag = unpack_mag( $line ) )
+		and $mcnames{$oid} = $mag;
+	} );
+    foreach my $oid ( keys %found ) {
+	defined( $found{$oid} = dor( $vsnames{$oid}, $mcnames{$oid} ) )
+	    or delete $found{$oid};
+    }
+    # Unless we have a number for Tiangong 2, make it the same as
+    # Tiangong 1.
+    my $tiangong2;
+    unless ( defined $found{41765} ) {
+	if ( defined $found{37820} ) {
+	    $found{41765} = $found{37820};
+	    $tiangong2 = ' # Assumed same as Tiangong 1';
+	} else {
+	    $found{41765} = 4.0;
+	    $tiangong2 = ' # Assumed 4.0 (old Tiangong 1 value)';
+	}
+    }
+    local $Data::Dumper::Terse = 1;
+    local $Data::Dumper::Sortkeys = 1;
+    my $output = Dumper ( \%found );
+    $output =~ s/ \A \s* [{] /%magnitude_table = (/smx;
+    $output =~ s/ [}] \s* \z /);\n/smx;
+    $output =~ s/ ' ( -? \d+ [.] \d+ ) ' /$1/smxg;
+    $output =~ s/ (?<= \d ) (?: (?= \n ) | \z ) /,/smxg;
+    defined $tiangong2
+	and $output =~ s/ \b ( 41765 \b [^\n]* ) /$1$tiangong2/smx;
+    print <<"EOD";
+# Last-Modified: @{[ time2str( $date ) ]}
+
+EOD
+
+    print $output;
+} else {
+    foreach my $oid ( sort { $a <=> $b } keys %found ) {
+	$found{$oid} == $all
+	    and next;
+	print "$oid $sources[$found{$oid}]\n";
+    }
+    print 'Last-Modified: ', time2str( $date ), "\n";
+}
+
+sub dor {
+    my @arg = @_;
+    foreach my $val ( @arg ) {
+	defined $val
+	    and return $val;
+    }
+    return $arg[0];
+}
+
+sub last_modified {
+    my ( $resp ) = @_;
+    my ( $last_modified ) = $resp->header( 'Last-Modified' );
+    defined $last_modified
+	or return;
+    return str2time( $last_modified );
+}
+
+sub process {
+    my ( $source, $rslt, $process ) = @_;
+    $rslt->is_success()
+	or die "Failed to get $source data: ", $rslt->status_line();
+    my $last_mod = last_modified( $rslt );
+    defined $last_mod
+	and $last_mod > $date
+	and $date = $last_mod;
+    foreach my $line ( split qr{ \n }smx, $rslt->content() ) {
+	$line =~ m/ \A ( [0-9]{5} ) /smx
+	    or next;
+	chomp $line;
+	$process->( "$1", $line );
+    }
+    return;
+}
+
+sub unpack_mag {
+    my ( $line ) = @_;
+    49 > length $line
+	and $line = sprintf '%-49s', $line;
+    my ( undef, $mag ) = unpack 'a5x32a5', $line;
+    $mag =~ s/ \s+ //smxg;
+    '' eq $mag
+	and return;
+    return $mag;
+}
+__END__
+
+=head1 TITLE
+
+visual - Compare Celestrak visual to McCants vsnames
+
+=head1 SYNOPSIS
+
+ visual
+ visual -help
+ visual -version
+
+=head1 OPTIONS
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -merge
+
+If asserted, this option causes Mike McCants' mcnames.mag file to be
+fetched also, and a magnitude hash to be produced that defines
+magnitudes for any body that appears on either the Celestrak visual list
+or the McCants vsnames list, and has a magnitude in either the McCants
+vsnames list or the McCants mcnames list. The output is Data::Dumper
+format.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script downloads the list of visual bodies from the Celestrak
+web site and the vsnames.mag file from Mike McCants' web site and
+compares the two, reporting OIDs that are not on both sites and what
+site they B<are> on.
+
+Note, though, that you get different output if you assert C<-merge>.
+
+In either case, though, the last thing you get is a C<Last-Modified:>
+date, which is the most-recent of any of the data sources examined.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014-2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the Artistic
+License 1.0 at
+L<http://www.perlfoundation.org/artistic_license_1_0>, and/or the Gnu
+GPL at L<http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt>.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

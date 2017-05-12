@@ -1,0 +1,10 @@
+MANIFEST
+Makefile.PL
+TODO
+README
+CHANGES
+lib/Attribute/Signature.pm
+t/signature.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

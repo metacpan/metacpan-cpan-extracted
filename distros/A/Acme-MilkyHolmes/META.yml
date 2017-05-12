@@ -1,0 +1,75 @@
+---
+abstract: "There's more than one way to do it!(SEIKAI HA HITOTSU! JANAI!!)"
+author:
+  - 'Takuya Tsuchida <tsucchi@cpan.org>'
+build_requires:
+  Test::MockTime: '0'
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-MilkyHolmes
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::MilkyHolmes:
+    file: lib/Acme/MilkyHolmes.pm
+    version: '0.07'
+  Acme::MilkyHolmes::Character:
+    file: lib/Acme/MilkyHolmes/Character.pm
+  Acme::MilkyHolmes::Character::AliceMyojingawa:
+    file: lib/Acme/MilkyHolmes/Character/AliceMyojingawa.pm
+  Acme::MilkyHolmes::Character::CordeliaGlauca:
+    file: lib/Acme/MilkyHolmes/Character/CordeliaGlauca.pm
+  Acme::MilkyHolmes::Character::HerculeBarton:
+    file: lib/Acme/MilkyHolmes/Character/HerculeBarton.pm
+  Acme::MilkyHolmes::Character::KazumiTokiwa:
+    file: lib/Acme/MilkyHolmes/Character/KazumiTokiwa.pm
+  Acme::MilkyHolmes::Character::NeroYuzurizaki:
+    file: lib/Acme/MilkyHolmes/Character/NeroYuzurizaki.pm
+  Acme::MilkyHolmes::Character::SherlockShellingford:
+    file: lib/Acme/MilkyHolmes/Character/SherlockShellingford.pm
+  Acme::MilkyHolmes::Group::Detective:
+    file: lib/Acme/MilkyHolmes/Group/Detective.pm
+  Acme::MilkyHolmes::Group::MilkyHolmes:
+    file: lib/Acme/MilkyHolmes/Group/MilkyHolmes.pm
+  Acme::MilkyHolmes::Role::HasPersonalColor:
+    file: lib/Acme/MilkyHolmes/Role/HasPersonalColor.pm
+  Acme::MilkyHolmes::Role::ToysOwner:
+    file: lib/Acme/MilkyHolmes/Role/ToysOwner.pm
+requires:
+  Data::Section::Simple: '0'
+  Encode: '0'
+  Localizer::Resource: '0'
+  Localizer::Style::Gettext: '0'
+  Mouse: '0'
+  Mouse::Role: '0'
+  Readonly: '0'
+  YAML::Tiny: '0'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tsucchi/p5-Acme-MilkyHolmes/issues
+  homepage: https://github.com/tsucchi/p5-Acme-MilkyHolmes
+  repository: git://github.com/tsucchi/p5-Acme-MilkyHolmes.git
+version: '0.07'
+x_authority: cpan:TSUCCHI
+x_contributors:
+  - 'htk291 <htk0129@gmail.com>'
+  - 'htk291 <htk291@gmail.com>'

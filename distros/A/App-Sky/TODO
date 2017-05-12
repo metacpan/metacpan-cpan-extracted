@@ -1,0 +1,9 @@
+* Add a --verbose flag to display the rsync/etc. command that is being
+used.
+
+DONE:
+-----
+
+* Merge the duplicate code between up and up-r in lib/App/Sky/Manager.pm .
+
+* Merge the duplicate code between up and up-r in lib/App/Sky/CmdLine.pm .

@@ -1,0 +1,21 @@
+[%#
+   Apache2::WebApp::Toolkit - Admin Control Panel (panel.tt)
+   Copyright (C) 2010 Marc S. Brooks <mbrooks@cpan.org>
+
+   Licensed under the terms of the BSD License
+   http://www.opensource.org/licenses/bsd-license.php
+-%]
+
+<h3 class="title">
+	About
+</h3>
+
+<div class="list">
+	<ul>
+		<li>
+			<a href="/app/admin/about/system" onClick="loadMenu('menu_[% number %]')">
+				System Info
+			</a>
+		</li>
+	</ul>
+</div>

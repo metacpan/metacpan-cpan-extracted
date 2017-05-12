@@ -1,0 +1,288 @@
+NAME
+    AnyEvent::GDB - asynchronous GDB machine interface interface
+
+SYNOPSIS
+       use AnyEvent::GDB;
+
+DESCRIPTION
+    This module is an AnyEvent user, you need to make sure that you use and
+    run a supported event loop.
+
+    It implements the GDB MI protocol, which can be used to talk to GDB
+    without having to parse the ever changing command syntax aimed at
+    humans.
+
+    It properly quotes your commands and parses the data structures returned
+    by GDB.
+
+    At the moment, it's in an early stage of development, so expect changes,
+    and, over time, further features (such as breakpoint-specific callbacks
+    and so on).
+
+EXAMPLE PROGRAM
+    To get you started, here is an example program that runs /bin/ls,
+    displaying the stopped information when hitting a breakpoint on "_exit":
+
+       use Data::Dump;
+       use AnyEvent::GDB;
+
+       our $gdb = new AnyEvent::GDB
+          trace => 1,
+          on_exec_stopped => sub {
+             ddx $_[0];
+          },
+       ;
+
+       my $done
+
+       ddx $gdb->cmd_sync (file_exec_and_symbols => "/bin/ls");
+       ddx $gdb->cmd_sync (break_insert => "_exit");
+       ddx $gdb->cmd_sync ("exec_run");
+
+       AE::cv->recv;
+
+  PROTOCOL QUIRKS
+   Minus vs. underscores
+    The MI protocol uses "-" to separate name components, while in Perl, you
+    use "_" for this purpose.
+
+    This module usually accepts either form as input, and always converts
+    names with "-" to names with "_", so the "library-loaded" notify might
+    become "notify_library_loaded", and the "host-name" result in that event
+    is stored in the "host_name" hash element in Perl.
+
+   Output redirection
+    Unfortunately, GDB has no (portable) provision to separate GDB
+    input/output from program input/output. Obviously, without a distinction
+    between program I/O and GDB I/O it becomes impossible to safely control
+    GDB.
+
+    There are two ways for you around it: redirect stdin/stdout yourself, or
+    set a tty (eg. with the "inferior_set_tty" command).
+
+    Unfortunately, the MI interface does not seem to support any kind of I/O
+    redirection, so this module helps you a bit, by setting the
+    "exec-wrapper" variable with a console "set" commmand. That is, this
+    module does soeQmthing like the following for you, providing proper file
+    descriptors for your actual stdin and stdout:
+
+       set exec-wrapper <&5 >&6
+
+    The actual I/O redirection operators are also stored in "$gdb->{stdio}",
+    so you can even do it yourself, e.g. when providing your own wrapper:
+
+       $self->cmd_raw ("set exec-wrapper $self->{stdio}", sub { });
+
+    (You need to use a raw command, as the "correct" "gdb_set" MI command
+    silently ignores any "exec-wrapper" setting).
+
+  METHODS
+    $gdb = new AnyEvent::GDB key => value...
+        Create a new GDB object using the given named parameters.
+
+        For initial experiments, it is highly recommended to run with
+        tracing or at least "verbose" enabled. And don't forget to provide
+        an "on_eof" callback.
+
+           my $gdb = new AnyEvent::GDB
+              on_eof => sub {
+                 print "We are done.\n";
+              },
+              trace => 1; # or verbose => 1, for less output
+
+        exec => $path (default: "gdb")
+            The path of the GDB executable.
+
+        args => [$string...] (default: ["-n"])
+            An optional array of parameters to pass to GDB. This should not
+            be used to load a program executable, use the
+            "file_exec_and_symbols", "target_attach" or similar MI commands
+            instead.
+
+        trace => $boolean (default: 0)
+            If true, then all commands sent to GDB are printed to STDOUT
+            prefixed with "> ", and all replies received from GDB are
+            printed to STDOUT prefixed with "< ".
+
+        verbose => $boolean (default: true if trace is enabled, false
+        otherwise)
+            If true, then log output and possibly other information is
+            printed to STDOUT.
+
+        on_xxxx => $callback->(...)
+            This specifies a callback for a specific event - see the EVENTS
+            section later in this document.
+
+    $gdb->cmd_raw ($command, $cb->($class, $results, $console))
+        Execute a raw command: $command is sent unchanged to GDB. See "cmd_"
+        for a description of the callback arguments.
+
+        Example: execute a CLI command and print its output.
+
+           $gdb->cmd_raw ("info sh", sub {
+              print "$_[3]\n";
+           });
+
+    $gdb->cmd ($command => [$option...], $parameter..., $cb->($class,
+    $results, $console))
+        Execute a MI command and invoke the callback with the results.
+
+        $command is a MI command name. The leading minus sign can be
+        omitted, and instead of minus signs, you can use underscores, i.e.
+        all the following command names are equivalent:
+
+           "-break-insert"   # as documented in the GDB manual
+           -break_insert     # using underscores and _ to avoid having to quote
+           break_insert      # ditto, when e.g. used to the left of a =>
+           "break-insert"    # no leading minus
+
+        The second argument is an optional array reference with options
+        (i.e. it can simply be missing). Each $option is either an option
+        name (similar rules as with command names, i.e. no initial "--") or
+        an array reference with the first element being the option name, and
+        the remaining elements being parameters: [$option, $parameter...].
+
+        The remaining arguments, excluding the last one, are simply the
+        parameters passed to GDB.
+
+        All options and parameters will be properly quoted.
+
+        When the command is done, the callback $cb will be invoked with
+        $class being one of "done", "connected", "error" or "exit" (note:
+        not "running"), $results being a has reference with all the
+        "variable=value" pairs from the result list.
+
+        $console is an array reference with all the GDB console messages
+        written while command executes (for MI commands, this should always
+        be "undef" and can be ignored).
+
+        Example: #todo#
+
+    ($results, $console) = $gdb->cmd_sync ($command => [$option...],
+    $parameter...]) =item $results = $gdb->cmd_sync ($command =>
+    [$option...], $parameter...])
+        Like "cmd", but blocks execution until the command has been
+        executed, and returns the results if sucessful. Croaks when GDB
+        returns with an error.
+
+        This is purely a convenience method for small scripts: since it
+        blocks execution using a condvar, it is not suitable to be used
+        inside callbacks or modules.
+
+        That is, unless Coro is used - with Coro, you can run multiple
+        "cmd_sync" methods concurrently form multiple threads, with no
+        issues.
+
+  EVENTS
+    AnyEvent::GDB is asynchronous in nature, as the goal of the MI interface
+    is to be fully asynchronous. Due to this, a user of this interface must
+    be prepared to handle various events.
+
+    When an event is produced, the GDB object will look for the following
+    four handlers and, if found, will call each one in order with the GDB
+    object and event name (without "on_") as the first two arguments,
+    followed by any event-specific arguments:
+
+    on_event method on the GDB object
+        Useful when subclassing.
+
+    on_event constructor parameter/object member
+        The callback specified as "on_event" parameter to the constructor.
+
+    on_EVENTNAME method on the GDB object
+        Again, mainly useful when subclassing.
+
+    on_EVENTNAME constructor parameter/object member
+        Any callback specified as "on_EVENTNAME" parameter to the
+        constructor.
+
+    You can change callbacks dynamically by simply replacing the
+    corresponding "on_XXX" member in the $gdb object:
+
+       $gdb->{on_event} = sub {
+          # new event handler
+       };
+
+    Here's the list of events with a description of their arguments.
+
+    on_eof => $cb->($gdb, "eof")
+        Called whenever GDB closes the connection. After this event, the
+        object is partially destroyed and must not be accessed again.
+
+    on_target => $cb->($gdb, "target", $string)
+        Output received from the target. Normally, this is sent directly to
+        STDOUT by GDB, but remote targets use this hook.
+
+    on_log => $cb->($gdb, "log", $string)
+        Log output from GDB. Best printed to STDOUT in interactive sessions.
+
+    on_TYPE => $cb->($gdb, "TYPE", $class, $results)
+        Called for GDB "exec", "status" and "notify" event (TYPE is one of
+        these three strings). $class is the class of the event, with "-"
+        replaced by "_" everywhere.
+
+        For each of these, the GDB object will create *two* events: one for
+        TYPE, and one for TYPE_CLASS. Usuaully you should provide the more
+        specific event (TYPE_CLASS).
+
+    on_TYPE_CLASS => $cb->($gdb, "TYPE_CLASS", $results)
+        Called for GDB "exec", "status" and "notify" event: TYPE is one of
+        these three strings, the class of the event (with "-" replaced b
+        "_"s) is appended to it to form the TYPE_CLASS (e.g. "exec_stopped"
+        or "notify_library_loaded").
+
+  STATUS STORAGE
+    The default implementations of the event method store the thread,
+    thread_group, recording, library and running status insid ethe $gdb
+    object.
+
+    You can access these at any time. Specifically, the following
+    information is available:
+
+    "$gdb->{thread_group}{*id*}"
+        The "thread_group" member stores a hash for each existing thread
+        group. The hash always contains the "id" member, but might also
+        contain other members.
+
+    "$gdb->{thread_group}{*id*}{pid}"
+        The "pid" member only exists while the thread group is running a
+        program, and contaisn the PID of the program.
+
+    "$gdb->{thread_group}{*id*}{exit_code}"
+        The "exit_code" member only exists after a program has finished
+        executing, and before it is started again, and contains the exit
+        code of the program.
+
+    "$gdb->{thread_group}{*id*}{recording}"
+        The "recording" member only exists if recording has been previously
+        started, and is 1 if recoridng is currently active, and 0 if it has
+        been stopped again.
+
+    "$gdb->{thread}{*id*}"
+        The "thread" member stores a hash for each existing thread. The hash
+        always contains the "id" member with the thread id, and the
+        "group_id" member with the corresponding thread group id.
+
+    "$gdb->{thread}{*id*}{running}"
+        The "running" member is 1 while the thread is, well, running, and is
+        missing otherwise.
+
+    "$gdb->{thread}{*id*}{stopped}"
+        The "stopped" member contains the result list from the
+        "on_exec_stopped" notification that caused the thread to stop, and
+        only exists when the thread is topped.
+
+    "$gdb->{library}{*id*}"
+        The "library" member contains all results from the
+        "on_library_loaded" event (such as "id", "target_name", "host_name"
+        and potentially a "thread_group".
+
+SEE ALSO
+    AnyEvent,
+    <http://sourceware.org/gdb/current/onlinedocs/gdb/GDB_002fMI.html#GDB_00
+    2fMI>.
+
+AUTHOR
+       Marc Lehmann <schmorp@schmorp.de>
+       http://home.schmorp.de/
+

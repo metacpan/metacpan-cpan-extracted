@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+# Created on: 2015-06-18 16:41:14
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use App::Git::Workflow::Command::Cat;
+
+App::Git::Workflow::Command::Cat->run();
+
+__DATA__
+

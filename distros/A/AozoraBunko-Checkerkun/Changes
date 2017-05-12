@@ -1,0 +1,55 @@
+Revision history for Perl extension AozoraBunko-Checkerkun
+
+0.12 2015-12-31T16:08:54Z
+
+    - Added JIS X 0208 tests
+
+0.11 2015-12-31T14:05:13Z
+
+    - Improved the performance of _is_gaiji method (about 3.8 times faster)
+    - Added zentilde option
+    - Improved documentation
+
+0.10 2015-12-23T20:24:31Z
+
+    - No code changes
+
+0.09 2015-12-23T14:48:43Z
+
+    - Improved documentation
+
+0.08 2015-12-23T14:42:25Z
+
+    - Improved documentation
+
+0.07 2015-12-13T08:56:06Z
+
+    - Changed namespace from AozoraBunko::Tools::Checkerkun to AozoraBunko::Checkerkun
+    - Added kouetsukun option
+    - Added tests
+    - Improved documentation
+
+0.06 2015-12-05T17:13:08Z
+
+    - Improved documentation
+
+0.05 2015-12-05T16:59:07Z
+
+    - Improved documentation
+    - Improved html output
+    - Renamed j78 78
+    - Fixed simplesp option
+
+0.03 2015-12-05T11:58:37Z
+
+    - Improved documentation
+
+0.02 2015-12-05T11:40:37Z
+
+    - Added output_format option
+    - Improved documentation
+
+0.01 2015-11-23T15:21:17Z
+
+    - original version
+

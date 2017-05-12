@@ -1,0 +1,10 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+README.pod
+dist.ini
+lib/App/Nopaste/Service/Dancebin.pm
+t/00-compile.t

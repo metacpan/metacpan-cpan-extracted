@@ -1,0 +1,6 @@
+/--/etc/motd ----------------------------------------------------------------\
+|                                                                            |
+|  This is the machine http://debian-administration.org/                     |
+|                                                                            |
+\-------------------------------------------------< deployed via slaughter >-/
+

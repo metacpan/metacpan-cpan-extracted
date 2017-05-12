@@ -1,0 +1,22 @@
+---
+abstract: 'full set of array and set operations'
+author:
+  - 'Sullivan Beck <sbeck@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Array-AsObject
+provides:
+  Array::AsObject:
+    file: lib/Array/AsObject.pm
+    version: 1.02
+requires:
+  Sort::DataTypes: 0
+  perl: 5.004
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.02

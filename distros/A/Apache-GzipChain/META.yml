@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Apache-GzipChain
+version:             1.20
+abstract:            ~
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.36_01
+distribution_type:   module
+requires:     
+    Apache::Constants:             0
+    Apache::OutputChain:           0.04
+    Compress::Zlib:                1
+    FileHandle:                    0
+    strict:                        0
+    vars:                          0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

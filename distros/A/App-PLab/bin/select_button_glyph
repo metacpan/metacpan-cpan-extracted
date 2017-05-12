@@ -1,0 +1,135 @@
+#!perl -w
+
+use strict;
+
+my $pkgname = 'App::PLab::ButtonGlyphs';
+my $gifname = 'App::PLab::ButtonGlyphs.gif';
+my $conname = 'bg';
+my $gifnameused = 0;
+my $zoom = 1;
+
+my $i;
+for ( $i = 0; $i < @ARGV; $i++) {
+   $_ = lc $ARGV[$i];
+   next unless /^-/;
+   s/^-//;
+   die <<SD if ( $_ eq 'h' || $_ eq '?' || $_ eq 'help' || $_ eq '-h' || $_ eq '-help');
+format: select_glyph options
+
+options:
+   -p package name          - default is App::PLab::ButtonGlyphs
+   -l image library name    - default is package_name.gif
+   -c constant package name - default is 'bg'
+   -z zoom                  - default is 1
+SD
+
+   if ( $_ eq 'p') {
+      $pkgname = $ARGV[++$i];
+      $gifname = "$pkgname.gif" unless $gifnameused;
+      next;
+   }
+   if ( $_ eq 'l') {
+      $gifname = $ARGV[++$i];
+      $gifnameused = 1;
+      next;
+   }
+   if ( $_ eq 'c') {
+      $conname = $ARGV[++$i];
+      next;
+   }
+   if ( $_ eq 'z') {
+      $zoom = $ARGV[++$i];
+      next;
+   }
+}
+
+eval " use $pkgname; ";
+die "$@" if $@;
+
+use Prima;
+use Prima::Application;
+use Prima::Lists;
+
+my $bmImageFile = Prima::Utils::find_image( '', $gifname);
+die "No $gifname found\n" unless $bmImageFile;
+
+my @images = Prima::Icon-> load( $bmImageFile, loadAll => 1);
+
+my $maxH  = 0;
+my $maxW  = 0;
+my $maxIW = 0;
+my @isz = ();
+
+my %grep_out = (
+   'BEGIN' => 1,
+   'END' => 1,
+   'AUTOLOAD' => 1,
+   'constant' => 1
+);
+
+
+my $x = <<SD;
+sub {
+   sort { \$conname::{\$a} <=> \$conname::{\$b}} 
+   grep { !exists \$grep_out{\$_}} 
+   keys \%conname::;
+}
+SD
+$x =~ s/conname/$conname/mge;
+my $grepsub = eval $x;
+
+my @inames = $grepsub->();
+
+for ( @images) {
+   my @size = $_-> size;
+   my $h = abs( $size[1] * $zoom);
+   $maxH = $h if $h > $maxH;
+   push ( @isz, [ abs($size[0] * $zoom), abs($size[1] * $zoom)]);
+   $maxIW = abs($size[0] * $zoom) if $maxIW < abs($size[0] * $zoom);
+}
+
+
+$i = 0;
+my $a = $::application;
+$a-> begin_paint_info;
+my $fh = $a-> font-> height;
+for ( @isz) {
+   my $tw = $a-> get_text_width( $inames[$i]);
+   $maxW = $tw if $maxW < $tw;
+   $i++;
+}
+$maxW += $maxIW + 4;
+$maxH = $fh if $maxH < $fh;
+$a-> end_paint_info;
+
+
+my $w = Prima::Window-> create(
+    text => 'Button glyphs',
+    onDestroy => sub { $::application-> close },
+);
+
+
+$w-> insert( ListViewer =>
+   rect => [0,0,$w->size],
+   itemWidth => $maxW,
+   itemHeight => $maxH,
+   growMode => gm::Client,
+   autoWidth => 0,
+   hScroll => 1,
+   multiColumn => 1,
+   onDrawItem => sub {
+      my ($self, $canvas, $index, $left, $bottom, $right, $top, $hilite, $focusedItem) = @_;
+      my $clrSave = $self-> color;
+      my $backColor = $hilite ? $self-> hiliteBackColor : $self-> backColor;
+      $canvas-> color( $backColor);
+      $canvas-> bar( $left, $bottom, $right, $top);
+      $canvas-> stretch_image( $left + ( $maxIW - $isz[$index][0]) / 2 + 1, $bottom + ( $maxH - $isz[$index][1]) / 2,
+             @{$isz[$index]}, $images[$index]);
+      $canvas-> color( $hilite ? $self-> hiliteColor : $clrSave);
+      $canvas-> text_out( $inames[$index], $left + $maxIW + 4, $bottom + ( $maxH - $fh) / 2);
+      $canvas-> color( $clrSave);
+   },
+)-> set_count( scalar @images);
+
+run Prima;
+

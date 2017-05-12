@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_use.t
+t/02_configuration.t
+t/04_definition.t
+t/03_loader.t
+lib/Aspect/Loader.pm
+lib/Aspect/Loader/Configuration.pm
+lib/Aspect/Loader/Configuration/YAML.pm
+lib/Aspect/Loader/TestMock/Object.pm
+lib/Aspect/Loader/Definition.pm
+

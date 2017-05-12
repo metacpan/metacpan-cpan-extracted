@@ -1,0 +1,106 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Session methods.
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More;
+use Arch::Util qw(is_tla_functional);
+
+plan skip_all => "No functional arch backend" unless is_tla_functional;
+plan tests => 37;
+
+use_ok("Arch::Session");
+use_ok("Arch::Util", "run_tla", "save_file");
+use_ok("Arch::Backend", "has_archive_setup_cmd");
+use_ok("Arch::TempFiles");
+
+my $tmp = Arch::TempFiles->new;
+my $dir = $tmp->dir;
+die "Internal: Arch::TempFiles::dir didn't create dir\n" unless $dir && -d $dir;
+
+$ENV{HOME} = $dir;
+
+sub run_tla0 (@) {
+	my $cmd = "'tla " . join(" ", @_) . "'";
+	run_tla(@_);
+	fail($cmd), die "$cmd failed: $?\n" if $?;
+	pass($cmd);
+}
+
+my $archive = 'arch-perl@example.com--test';
+my $userid = 'Arch Perl <arch-perl@example.com>';
+
+my $dont_setup = !has_archive_setup_cmd();
+my $status;
+
+run_tla0("my-id", $userid);
+run_tla0("make-archive $archive $dir/$archive");
+SKIP: {
+skip("this arch backend has no archive-setup", 2) if $dont_setup;
+run_tla0("archive-setup $archive/cat--brn--0");
+run_tla0("archive-setup $archive/cat--brn--1");
+}
+
+my $dir2 = "$dir/tree_a";
+mkdir($dir2, 0777) or die "Can't mkdir $dir2: $!";
+chdir($dir2) or die "Can't chdir $dir2: $!";
+
+my $session = new Arch::Session;
+isa_ok($session, 'Arch::Session', "create Arch::Session instanse");
+is($session->my_id, $userid,      "read my-id");
+is($session->my_id("bad_id"), 0,  "set bad my-id");
+is($session->my_id, $userid,      "read my-id again");
+is($session->my_id('<my@email>'), 1, "set good my-id");
+is($session->my_id, '<my@email>', "read my-id one more time");
+
+my $tree = $session->init_tree("$archive/cat--dog--0.1");
+ok($tree && ref($tree) eq 'Arch::Tree', "create Arch::Tree instanse");
+
+mkdir("foo", 0777) or die "Can't mkdir foo: $!";
+save_file("foo/bar", "Just foo bar");
+$status = $tree->add("foo", "foo/bar");
+is($status, 0, "add 2 files");
+$status = $tree->import;
+is($status, 0, "import");
+
+$session->working_names($archive);
+is($session->working_name, $archive, "working_name");
+my $categories = $session->categories;
+is(ref($categories), 'ARRAY',     "  categories");
+is(@$categories, 1,               "  check number");
+is($categories->[0], 'cat',       "  check first element");
+
+SKIP: {
+skip("this arch backend removed empty branches", 8) if $dont_setup;
+$session->working_names($archive, 'cat');
+is($session->working_name, "$archive/cat", "working_name");
+my $branches = $session->branches;
+is(ref($branches), 'ARRAY',       "  branches");
+is(@$branches, 2,                 "  check number");
+is($branches->[1], 'cat--dog',    "  check second element");
+
+$session->working_names($archive, 'cat', 'brn');
+is($session->working_name, "$archive/cat--brn", "working_name");
+my $versions = $session->versions;
+is(ref($versions), 'ARRAY',       "  versions");
+is(@$versions, 2,                 "  check number");
+is($versions->[1], "cat--brn--1", "  check second element");
+}
+
+$session->working_names($archive, 'cat', 'dog', '0.1');
+is($session->working_name, "$archive/cat--dog--0.1", "working_name");
+my $revisions = $session->revisions;
+is(ref($revisions), 'ARRAY',      "  revisions");
+is(@$revisions, 1,                "  check number");
+is($revisions->[0], "base-0",     "  check first element");
+
+ok($session->is_archive_registered($archive), "is_archive_registered");
+ok(!$session->is_archive_registered('some@thing--test'), "!is_archive_registered");
+
+is_deeply($session->expanded_revisions, [ "$archive/cat--dog--0.1--base-0" ], "expanded_revisions");
+is_deeply($session->expanded_versions, [ "$archive/cat--dog--0.1" ], "expanded_versions");
+
+# TODO in tests/session-2:
+#   get_revision_descs, expanded_archive_info, get_log, get_changeset

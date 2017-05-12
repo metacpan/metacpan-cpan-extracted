@@ -1,0 +1,222 @@
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+#define ASF_BLOCK_SIZE 8192
+
+#define IS_VALID_WMA_BASE       (1)
+#define IS_VALID_WMA_FULL       (1 << 1)
+#define IS_VALID_WMA_PRO        (1 << 2)
+#define IS_VALID_WMA_LSL        (1 << 3)
+#define IS_VALID_WMA_LSL_MULT5  (1 << 4)
+
+#undef DEFINE_GUID
+
+#define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
+  GUID name = {l, w1, w2, {b1, b2, b3, b4, b5, b6, b7, b8}}
+  
+#define IsEqualGUID(rguid1, rguid2) (!memcmp(rguid1, rguid2, sizeof(GUID)))
+
+#define GETLEN2b(bits) (((bits) == 0x03) ? 4 : bits)
+
+DEFINE_GUID(ASF_Header_Object, 0x75b22630, 0x668e, 0x11cf,
+      0xa6, 0xd9, 0x00, 0xaa, 0x00, 0x62, 0xce, 0x6c);
+
+DEFINE_GUID(ASF_Content_Description, 0x75b22633, 0x668e, 0x11cf,
+	    0xa6, 0xd9, 0x00, 0xaa, 0x00, 0x62, 0xce, 0x6c);
+
+DEFINE_GUID(ASF_File_Properties, 0x8cabdca1, 0xa947, 0x11cf,
+	    0x8e, 0xe4, 0x00, 0xc0, 0x0c, 0x20, 0x53, 0x65);
+
+DEFINE_GUID(ASF_Stream_Properties, 0xb7dc0791, 0xa9b7, 0x11cf,
+	    0x8e, 0xe6, 0x00, 0xc0, 0x0c, 0x20, 0x53, 0x65);
+
+DEFINE_GUID(ASF_Header_Extension, 0x5fbf03b5, 0xa92e, 0x11cf,
+	    0x8e, 0xe3, 0x00, 0xc0, 0x0c, 0x20, 0x53, 0x65);
+
+DEFINE_GUID(ASF_Compatibility, 0x26f18b5d, 0x4584, 0x47ec,
+	    0x9f, 0x5f, 0x0e, 0x65, 0x1f, 0x04, 0x52, 0xc9);
+
+DEFINE_GUID(ASF_Metadata, 0xc5f8cbea, 0x5baf, 0x4877,
+	    0x84, 0x67, 0xaa, 0x8c, 0x44, 0xfa, 0x4c, 0xca);
+
+DEFINE_GUID(ASF_Padding, 0x1806d474, 0xcadf, 0x4509,
+	    0xa4, 0xba, 0x9a, 0xab, 0xcb, 0x96, 0xaa, 0xe8);
+
+DEFINE_GUID(ASF_Extended_Stream_Properties, 0x14E6A5CB, 0xC672, 0x4332,
+	    0x83, 0x99, 0xA9, 0x69, 0x52, 0x06, 0x5B, 0x5A);
+
+DEFINE_GUID(ASF_Extended_Content_Description, 0xd2d0a440, 0xe307, 0x11d2,
+	    0x97, 0xf0, 0x00, 0xa0, 0xc9, 0x5e, 0xa8, 0x50);
+	    
+DEFINE_GUID(ASF_Language_List, 0x7c4346a9, 0xefe0, 0x4bfc,
+	    0xb2, 0x29, 0x39, 0x3e, 0xde, 0x41, 0x5c, 0x85);
+
+DEFINE_GUID(ASF_Advanced_Mutual_Exclusion, 0xa08649cf, 0x4775, 0x4670,
+	    0x8a, 0x16, 0x6e, 0x35, 0x35, 0x75, 0x66, 0xcd);
+
+DEFINE_GUID(ASF_Index_Parameters, 0xd6e229df, 0x35da, 0x11d1,
+	    0x90, 0x34, 0x00, 0xa0, 0xc9, 0x03, 0x49, 0xbe);
+
+DEFINE_GUID(ASF_Codec_List, 0x86d15240, 0x311d, 0x11d0,
+      0xa3, 0xa4, 0x00, 0xa0, 0xc9, 0x03, 0x48, 0xf6);
+
+DEFINE_GUID(ASF_Stream_Bitrate_Properties, 0x7bf875ce, 0x468d, 0x11d1,
+	    0x8d, 0x82, 0x00, 0x60, 0x97, 0xc9, 0xa2, 0xb2);
+
+DEFINE_GUID(ASF_Metadata_Library, 0x44231c94, 0x9498, 0x49d1,
+	    0xa1, 0x41, 0x1d, 0x13, 0x4e, 0x45, 0x70, 0x54);
+
+DEFINE_GUID(ASF_Content_Encryption, 0x2211b3fb, 0xbd23, 0x11d2,
+	    0xb4, 0xb7, 0x00, 0xa0, 0xc9, 0x55, 0xfc, 0x6e);
+
+DEFINE_GUID(ASF_Extended_Content_Encryption, 0x298ae614, 0x2622, 0x4c17,
+	    0xb9, 0x35, 0xda, 0xe0, 0x7e, 0xe9, 0x28, 0x9c);
+
+DEFINE_GUID(ASF_Script_Command, 0x1efb1a30, 0x0b62, 0x11d0,
+	    0xa3, 0x9b, 0x00, 0xa0, 0xc9, 0x03, 0x48, 0xf6);
+
+DEFINE_GUID(ASF_Digital_Signature, 0x2211b3fc, 0xbd23, 0x11d2,
+	    0xb4, 0xb7, 0x00, 0xa0, 0xc9, 0x55, 0xfc, 0x6e);
+
+// XXX: Can't find any documentation on this object, we will just ignore it
+DEFINE_GUID(ASF_Index_Placeholder, 0xd9aade20, 0x7c17, 0x4f9c,
+	    0xbc, 0x28, 0x85, 0x55, 0xdd, 0x98, 0xe2, 0xa2);
+
+DEFINE_GUID(ASF_Error_Correction, 0x75b22635, 0x668e, 0x11cf,
+	    0xa6, 0xd9, 0x00, 0xaa, 0x00, 0x62, 0xce, 0x6c);
+
+DEFINE_GUID(ASF_Data, 0x75b22636, 0x668e, 0x11cf,
+	    0xa6, 0xd9, 0x00, 0xaa, 0x00, 0x62, 0xce, 0x6c);
+
+DEFINE_GUID(ASF_Index, 0xd6e229d3, 0x35da, 0x11d1,
+	    0x90, 0x34, 0x00, 0xa0, 0xc9, 0x03, 0x49, 0xbe);
+
+DEFINE_GUID(ASF_Simple_Index, 0x33000890, 0xe5b1, 0x11cf,
+	    0x89, 0xf4, 0x00, 0xa0, 0xc9, 0x03, 0x49, 0xcb);
+	    
+// Stream types found in Stream Properties
+DEFINE_GUID(ASF_Audio_Media, 0xf8699e40, 0x5b4d, 0x11cf,
+	    0xa8, 0xfd, 0x00, 0x80, 0x5f, 0x5c, 0x44, 0x2b);
+
+DEFINE_GUID(ASF_Video_Media, 0xbc19efc0, 0x5b4d, 0x11cf,
+	    0xa8, 0xfd, 0x00, 0x80, 0x5f, 0x5c, 0x44, 0x2b);
+
+DEFINE_GUID(ASF_Command_Media, 0x59dacfc0, 0x59e6, 0x11d0,
+	    0xa3, 0xac, 0x00, 0xa0, 0xc9, 0x03, 0x48, 0xf6);
+
+DEFINE_GUID(ASF_JFIF_Media, 0xb61be100, 0x5b4e, 0x11cf,
+	    0xa8, 0xfd, 0x00, 0x80, 0x5f, 0x5c, 0x44, 0x2b);
+
+DEFINE_GUID(ASF_Degradable_JPEG_Media, 0x35907de0, 0xe415, 0x11cf,
+      0xa9, 0x17, 0x00, 0x80, 0x5f, 0x5c, 0x44, 0x2b);
+
+DEFINE_GUID(ASF_File_Transfer_Media, 0x91bd222c, 0xf21c, 0x497a,
+      0x8b, 0x6d, 0x5a, 0xa8, 0x6b, 0xfc, 0x01, 0x85);
+
+DEFINE_GUID(ASF_Binary_Media, 0x3afb65e2, 0x47ef, 0x40f2,
+      0xac, 0x2c, 0x70, 0xa9, 0x0d, 0x71, 0xd3, 0x43);
+
+// Error correction types found in Stream Properties
+DEFINE_GUID(ASF_No_Error_Correction, 0x20fb5700, 0x5b55, 0x11cf,
+      0xa8, 0xfd, 0x00, 0x80, 0x5f, 0x5c, 0x44, 0x2b);
+
+DEFINE_GUID(ASF_Audio_Spread, 0xbfc3cd50, 0x618f, 0x11cf,
+      0x8b, 0xb2, 0x00, 0xaa, 0x00, 0xb4, 0xe2, 0x20);
+
+// Mutual Exclusion types
+DEFINE_GUID(ASF_Mutex_Language, 0xd6e22a00, 0x35da, 0x11d1,
+      0x90, 0x34, 0x00, 0xa0, 0xc9, 0x03, 0x49, 0xbe);
+
+DEFINE_GUID(ASF_Mutex_Bitrate, 0xd6e22a01, 0x35da, 0x11d1,
+      0x90, 0x34, 0x00, 0xa0, 0xc9, 0x03, 0x49, 0xbe);
+
+DEFINE_GUID(ASF_Mutex_Unknown, 0xd6e22a02, 0x35da, 0x11d1,
+      0x90, 0x34, 0x00, 0xa0, 0xc9, 0x03, 0x49, 0xbe);
+      
+typedef struct _asf_object_t {
+  GUID     ID;
+  uint64_t size;
+  uint32_t num_objects;
+  uint8_t  reserved1;
+  uint8_t  reserved2;
+} _PACKED ASF_Object;
+
+typedef struct asf_index_specs {
+  uint16_t stream_number;
+  uint16_t index_type;
+  uint32_t time_interval;
+  uint64_t block_pos;
+  uint32_t entry_count;
+  uint32_t *offsets;
+} asf_index_specs;
+
+typedef struct asfinfo {
+  PerlIO *infile;
+  char *file;
+  Buffer *buf;
+  Buffer *scratch;
+  uint64_t file_size;
+  uint64_t audio_offset;
+  uint64_t audio_size;
+  uint32_t object_offset;
+  HV *info;
+  HV *tags;
+  
+  uint8_t seeking;      // flag if we're seeking
+  
+  // DLNA profile detection bitfield
+  uint8_t valid_profiles;
+  uint32_t max_bitrate;
+  
+  uint16_t spec_count;
+  struct asf_index_specs *specs;
+} asfinfo;
+
+enum types {
+  TYPE_UNICODE,
+  TYPE_BYTE,
+  TYPE_BOOL,
+  TYPE_DWORD,
+  TYPE_QWORD,
+  TYPE_WORD,
+  TYPE_GUID
+};
+
+int get_asf_metadata(PerlIO *infile, char *file, HV *info, HV *tags);
+asfinfo * _asf_parse(PerlIO *infile, char *file, HV *info, HV *tags, uint8_t seeking);
+void _parse_content_description(asfinfo *asf);
+void _parse_extended_content_description(asfinfo *asf);
+void _parse_file_properties(asfinfo *asf);
+void _parse_stream_properties(asfinfo *asf);
+void _store_stream_info(int stream_number, HV *info, SV *key, SV *value);
+void _store_tag(HV *tags, SV *key, SV *value);
+int _parse_header_extension(asfinfo *asf, uint64_t len);
+void _parse_metadata(asfinfo *asf);
+void _parse_extended_stream_properties(asfinfo *asf, uint64_t len);
+void _parse_language_list(asfinfo *asf);
+void _parse_advanced_mutual_exclusion(asfinfo *asf);
+void _parse_codec_list(asfinfo *asf);
+void _parse_stream_bitrate_properties(asfinfo *asf);
+void _parse_metadata_library(asfinfo *asf);
+void _parse_index_parameters(asfinfo *asf);
+int _parse_index_objects(asfinfo *asf, int index_size);
+void _parse_index(asfinfo *asf, uint64_t size);
+void _parse_content_encryption(asfinfo *asf);
+void _parse_extended_content_encryption(asfinfo *asf);
+void _parse_script_command(asfinfo *asf);
+SV *_parse_picture(asfinfo *asf, uint32_t picture_offset);
+int asf_find_frame(PerlIO *infile, char *file, int offset);
+int _timestamp(asfinfo *asf, int offset, int *duration);

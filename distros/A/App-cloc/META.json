@@ -1,0 +1,63 @@
+{
+   "abstract" : "Count Lines of Code",
+   "author" : [
+      "G. Casati <fibo@cpan.org>",
+      "Al Danial <al.danial@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-cloc",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "Test::Compile" : "v1.2.1",
+            "Test::More" : "1.001009",
+            "Test::Pod" : "1.48"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::Diff" : "1.1903",
+            "Digest::MD5" : "2.54",
+            "Regexp::Common" : "201331301",
+            "Test::Compile" : "v1.2.1",
+            "Test::More" : "1.001009",
+            "Test::Pod" : "1.48",
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/AlDanial/cloc/issues"
+      },
+      "homepage" : "http://cloc.sourceforge.net",
+      "license" : [
+         "https://github.com/AlDanial/cloc/blob/master/LICENSE"
+      ],
+      "repository" : {
+         "url" : "https://github.com/AlDanial/cloc"
+      }
+   },
+   "version" : "1.68"
+}

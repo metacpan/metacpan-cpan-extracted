@@ -1,0 +1,175 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use App::VW;
+use POSIX 'setsid';
+# TODO  - Ask Marc Lehman about excessive CPU usage.
+#       - EV and AnyEvent::Impl::Perl eat up a lot of CPU when idle.
+#       - Event is fine, though.
+use Event;
+use AnyEvent;
+use Time::HiRes;
+use Sys::Syslog qw(:standard :macros);
+
+
+# PROCESS STRUCTURE
+# 
+#   leader_daemon (handles sigint,sighup,(sigchld?))
+#   `- continuity_daemon
+#   |  `- continuity_server
+#   `- continuity_daemon
+#   |  `- continuity_server
+#   `- continuity_daemon
+#   |  `- continuity_server
+#   `- continuity_daemon
+#      `- continuity_server
+#      etc...
+#
+# * Any function with "daemon" in its name has its own OS process.
+# * The leader_daemon watches over the continuity_daemons.
+# * Each continuity_daemon runs one continuity_server.
+# * The continuity_servers load a script called vw_harness.pl
+#   that should be located in the document root of the
+#   Squatting+Continuity app.
+
+
+# AnyEvent->loop    vs.   AnyEvent->condvar->recv
+{
+  package AnyEvent;
+  sub loop { $_[0]->condvar->recv }
+}
+
+# TODO - become aware of $ENV{VW_CONFIG}
+my $config = App::VW->config;
+
+# a pid_file 
+sub pid_file {
+  my ($pid_file, $pid) = @_;
+  open(PID, "> $pid_file") || die($!);
+  print PID "$pid\n";
+  close(PID);
+  return [$pid_file, $pid];
+}
+
+# a continuity-based http server
+sub continuity_server {
+  my ($app) = @_;
+  chdir($app->{dir});
+  my $harness = "$app->{dir}/vw_harness.pl";
+  if (-e $harness) {
+    local @ARGV = %$app;
+    eval { do $harness; };
+    # ...and never return.
+    # But if it fails for some reason...
+    my $error = $@ || "$harness could not be started.";
+    syslog(LOG_ERR, "$app->{app}: $error");
+  } else {
+    syslog(LOG_ERR, "$app->{app}: $harness was not found.");
+  }
+  exit 1;
+}
+
+# a process for continuity to run in
+sub continuity_daemon {
+  my ($app) = @_;
+  defined(my $pid = fork) or die "Can't fork: $!";
+  unless ($pid) {
+    continuity_server($app);
+  } else {
+    my $app_name     = lc $app->{app}; $app_name =~ s/::/_/g;
+    my $pid_file     = "$app->{dir}/$app_name-$app->{port}.pid";
+    $app->{pid}      = $pid;
+    $app->{pid_file} = $pid_file;
+    syslog(LOG_INFO, "$pid => $app->{pid_file}");
+    pid_file($app->{pid_file}, $pid);
+    return $app;
+  }
+}
+
+# a process for watching over continuity_daemons
+sub leader_daemon {
+  my ($config) = @_;
+  defined(my $pid = fork)     or die "Can't fork: $!";
+  unless ($pid) {
+    openlog('vw', 'ndelay,pid', LOG_USER);
+    chdir '/'                 or die "Can't chdir to /: $!";
+    open STDIN,  '/dev/null'  or die "Can't read /dev/null: $!";
+    open STDOUT, '>/dev/null' or die "Can't write to /dev/null: $!";
+    setsid                    or die "Can't start a new session: $!";
+    open STDERR, '>&STDOUT'   or die "Can't dup stdout: $!";
+
+    # list of continuity_daemons
+    my @continuities;
+
+    # /etc/init.d/vw stop
+    my $stop = AnyEvent->signal(signal => 'INT', cb => sub {
+      syslog(LOG_INFO, 'Stopping Daemons');
+      my @pids = map { $_->{pid} } @continuities;
+      syslog(LOG_INFO, $_) for (@pids);
+      kill 15 => @pids;
+      sleep 0.25;
+      kill 9 => @pids;
+      sleep 0.25;
+      unlink map { $_->{pid_file} } @continuities;
+      unlink($config->{pid_file});
+      closelog();
+      exit 0;
+    });
+
+    # /etc/init.d/vw reload
+    my $reload = AnyEvent->signal(signal => 'HUP', cb => sub {
+      # What should it mean to "reload" vw?
+      syslog(LOG_INFO, 'Received SIGHUP -- Now what?');
+    });
+
+    # start a bunch of continuity_daemons
+    syslog(LOG_INFO, 'Starting Daemons');
+    my @apps = @{ $config->{apps} };
+    @continuities = 
+      # ^daemonize
+      map { continuity_daemon($_) } 
+      # ^cluster
+      map { 
+        my $app = $_;
+        map { +{ %$app, port => $app->{port} + ($_ - 1) } } 
+          (1 .. $app->{cluster_size});
+      } 
+      # ^apps
+      @apps;
+
+    # loop forever
+    AnyEvent->loop;
+
+  } else {
+    select(undef, undef, undef, 0.25);
+    pid_file($config->{pid_file}, $pid);
+    return $config;
+  }
+}
+
+# main
+#_____________________________________________________________________________
+leader_daemon($config);
+
+__END__
+
+=head1 NAME
+
+vw-bus - the daemon for the vw system
+
+=head1 SYNOPSIS
+
+Usage:
+
+  vw-bus
+
+=head1 DESCRIPTION
+
+This is the daemon that F</etc/init.d/vw> starts.  It starts one leader process
+that watches over many child processes.  The child processes that are started
+are defined by the configuration files in F</etc/vw/*.yml>.
+
+To shutdown the leader process and all its children, send the process a SIGINT.
+
+=cut

@@ -1,0 +1,76 @@
+NAME
+    Apache::AntiSpam - AntiSpam filter for web pages
+
+SYNOPSIS
+      # You can't use this class directry
+      # see Apache::AntiSpam::* 
+
+      # or ... if you want your own AntiSpam Filter,
+      package Your::AntiSpamFilter;
+      use base qw(Apache::AntiSpam);
+
+      sub antispamize {
+          my($class, $email, $orig) = @_;
+          # do some filtering with $orig, and
+          return $orig;
+      }
+
+      # in httpd.conf
+      <Location /antispam>
+      SetHandler perl-script
+      PerlHandler Your::AntiSpamFilter
+      </Location>
+
+      # filter aware
+      PerlModule Apache::Filter
+      SetHandler perl-script
+      PerlSetVar Filter On
+      PerlHandler Apache::RegistryFilter Your::AntiSpamFilter Apache::Compress
+
+DESCRIPTION
+    Apache::AntiSpam is a filter module to prevent e-mail addresses exposed
+    as is on web pages. The way to hide addresses from spammers are
+    implemented in each of Apache::Antispam::* subclasses.
+
+    This module is Filter aware, meaning that it can work within
+    Apache::Filter framework without modification.
+
+SUBCLASSING
+    Here is how to make your own filter.
+
+    Declare your class
+    Inherit from Apache::AntiSpam
+    define antispamize() method
+    That's all. Template of antispamize() method will be like this:
+
+      sub antispamize {
+          my($class, $email, $orig) = @_;
+          # do some stuff..
+          return $orig;
+      }
+
+    where "$class" is your class, "$email" is an instance of Mail::Address,
+    and "$orig" is an original e-mail address string. See the Email::Find
+    manpage for details.
+
+TODO
+    *   remove mailto: tags using HTML::Parser.
+
+ACKNOWLEDGEMENTS
+    The idea of this module is stolen from Apache::AddrMunge by Mark J
+    Dominus. See http://perl.plover.com/AddrMunge/ for details.
+
+    Many thanks to Michael G. Schwern for kindly improving the matching
+    speed of Email::Find.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Email::Find manpage, the Apache::Filter manpage, the
+    Apache::AntiSpam::NoSpam manpage, the Apache::AntiSpam::Heuristic
+    manpage, the Apache::AntiSpam::HTMLEncode manpage.
+

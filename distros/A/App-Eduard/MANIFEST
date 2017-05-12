@@ -1,0 +1,29 @@
+Changes
+eduard
+lib/App/Eduard.pm
+Makefile.PL
+MANIFEST
+README
+t/App-Eduard.t
+t/data/contains-pubkey
+t/data/inline-encrypted
+t/data/inline-encrypted-attachment
+t/data/inline-signed
+t/data/inline-signed-attachment
+t/data/inline-signed-encrypted
+t/data/mime-encrypted
+t/data/mime-signed
+t/data/mime-signed-encrypted
+t/keydir/pubring.gpg
+t/keydir/secring.gpg
+share/tmpl/en/encrypt
+share/tmpl/en/encrypt_error
+share/tmpl/en/error
+share/tmpl/en/keys
+share/tmpl/en/plain
+share/tmpl/en/sign
+share/tmpl/en/sign_error
+share/tmpl/en/signencrypt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

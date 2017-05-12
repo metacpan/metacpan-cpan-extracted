@@ -1,0 +1,43 @@
+---
+abstract: 'Nothing to be done'
+author:
+  - 'Salve J. Nilsen <sjn@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  perl: '5.006'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Godot
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Acme::Godot:
+    file: lib/Acme/Godot.pm
+    version: '0.001010'
+requires:
+  perl: '5.006'
+  strict: '0'
+  version: '0'
+resources:
+  bugtracker: https://github.com/sjn/Acme-Godot/issues
+  homepage: https://github.com/sjn/Acme-Godot
+  repository: https://github.com/sjn/Acme-Godot.git
+version: '0.001010'
+x_authority: cpan:SJN

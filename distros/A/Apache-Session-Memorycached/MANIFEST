@@ -1,0 +1,22 @@
+Changes
+lib/Apache/Session/Lock/Memorycached.pm
+lib/Apache/Session/Memorycached.pm
+lib/Apache/Session/MemcachedClient.pm
+lib/Apache/Session/MemcachedReplicator.pm
+lib/Apache/Session/Store/Memorycached.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+scripts/memd.pl
+scripts/client_memcached.pl
+scripts/slurp_memcached.pl
+scripts/MemcachedSOAPClass.pm
+scripts/MemcachedSOAP.cgi
+scripts/statTest.pl
+scripts/getTest.pl
+scripts/setTest.pl
+
+
+t/1.t
+t/test-apache-session.t

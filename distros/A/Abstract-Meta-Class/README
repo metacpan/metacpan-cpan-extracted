@@ -1,0 +1,27 @@
+Abstract/Meta/Class version 0.11
+===========================
+ Simple meta object protocol implementation.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+
+COPYRIGHT AND LICENCE
+
+    (c) 2004 by Adrian Witas.
+    
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

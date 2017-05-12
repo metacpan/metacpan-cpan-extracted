@@ -1,0 +1,16 @@
+<inventory format="5">
+<file file_id="bzrignore-20070516172210-at7cyyh1jpgks1og-1" name=".bzrignore" />
+<file file_id="changes-20070516172058-q2wm0b0x6onbev2u-1" name="Changes" />
+<file file_id="manifest-20070516172058-q2wm0b0x6onbev2u-2" name="MANIFEST" />
+<file file_id="makefile.pl-20070516172058-q2wm0b0x6onbev2u-3" name="Makefile.PL" />
+<file file_id="readme-20070516172058-q2wm0b0x6onbev2u-4" name="README" />
+<file file_id="todo-20070516182456-1w8g41kh12wxw6ru-1" name="TODO" />
+<directory file_id="lib-20070516172058-q2wm0b0x6onbev2u-5" name="lib" />
+<directory file_id="asterisk-20070516172058-q2wm0b0x6onbev2u-7" name="Asterisk" parent_id="lib-20070516172058-q2wm0b0x6onbev2u-5" />
+<directory file_id="store-20070516172058-q2wm0b0x6onbev2u-9" name="Store" parent_id="asterisk-20070516172058-q2wm0b0x6onbev2u-7" />
+<file file_id="queue.pm-20070516172058-q2wm0b0x6onbev2u-10" name="Queue.pm" parent_id="store-20070516172058-q2wm0b0x6onbev2u-9" />
+<directory file_id="log-20070516172151-la93ifxh65govfi2-1" name="log" />
+<file file_id="exists-20070516172151-la93ifxh65govfi2-2" name=".exists" parent_id="log-20070516172151-la93ifxh65govfi2-1" />
+<directory file_id="t-20070516172058-q2wm0b0x6onbev2u-6" name="t" />
+<file file_id="asteriskstorequeue.t-20070516172058-q2wm0b0x6onbev2u-8" name="Asterisk-Store-Queue.t" parent_id="t-20070516172058-q2wm0b0x6onbev2u-6" />
+</inventory>

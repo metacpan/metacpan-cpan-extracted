@@ -1,0 +1,23 @@
+examples/cleanup_directory.pl
+examples/cluster_after_data_normalization.pl
+examples/cluster_and_visualize.pl
+examples/cluster_and_visualize_with_data_visualization.pl
+examples/data_generator.pl
+examples/which_cluster_for_new_data.pl
+examples/find_best_K_and_cluster.pl
+examples/find_best_K_in_range_and_cluster.pl
+examples/sphericaldata.csv
+examples/mydatafile1.dat
+examples/mydatafile2.dat
+examples/mydatafile3.dat
+examples/param.txt
+examples/param2.txt
+examples/param3.txt
+examples/README
+lib/Algorithm/KMeans.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/test.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

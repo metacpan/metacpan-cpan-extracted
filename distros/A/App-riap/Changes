@@ -1,0 +1,292 @@
+Revision history for App-Riap
+
+0.36    2016-08-18 (PERLANCAR)
+
+	- [ux] More convenient completion for 'cd' command.
+
+	- [doc] Mention peri-access script.
+
+
+0.35    2016-03-10 (PERLANCAR)
+
+	- Replace JSON with JSON::MaybeXS.
+
+
+0.34    2016-02-03 (PERLANCAR)
+
+	- Adjust to Complete::Bash 0.27.
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.33    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.32    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.31    2015-03-13 (PERLANCAR)
+
+	- Use IOD format for .riaprc.
+
+	- Change result metadata 'result_format_options' ->
+	  'cmdline.format_options'.
+
+
+0.30    2015-03-04 (PERLANCAR)
+
+	- Follow Complete 0.12 (escmode renamed to esc_mode).
+
+
+0.29    2015-02-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use Data::Sah::Normalize instead of Data::Sah when just for
+	  normalizing schemas.
+
+
+0.28    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.27    2014-12-23 (PERLANCAR)
+
+	- Replace Perinci::CmdLine with Perinci::CmdLine::Help to generate
+	  help message, this reduces dependency significantly.
+
+
+0.26    2014-12-22 (PERLANCAR)
+
+	- [Bugfix] exclude non-functions in Rinci metadata from being
+	  entered as commands.
+
+
+0.25    2014-12-20 (PERLANCAR)
+
+        - No functional changes.
+
+        - Adjust to Perinci::Sub::Complete 0.68.
+
+
+0.24    2014-11-28 (PERLANCAR)
+
+	- Adjust to Complete::Bash 0.12 (in hash form, words are now put in
+	  'words' instead of 'completion').
+
+	- Typo: unimplemented status is 501, not 502.
+
+
+0.23     2014-09-04 (PERLANCAR)
+
+         - Tweak help message.
+
+
+0.22     2014-09-04 (PERLANCAR)
+
+         - Fix bug in displaying help.
+
+
+0.21     2014-08-24 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Perinci::CmdLine 1.19.
+
+
+0.20     2014-08-06 (SHARYANTO)
+
+         - [Bugfix] Forgot to require module.
+
+
+0.19     2014-08-06 (SHARYANTO)
+
+         - [Bugfix] Fix completion by updating prereqs versions.
+
+
+0.18     2014-08-06 (SHARYANTO)
+
+         - Also cache 'child_metas' Riap response.
+
+         - [Bugfix] HTTP auth options (-u, -p) were not passed to Riap client.
+
+
+0.17     2014-07-29 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Perinci::Sub::Complete 0.60.
+
+
+0.16     2014-07-23 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Perinci::Sub::GetArgs::Argv 0.46.
+
+
+0.15     2014-07-19 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Complete::Bash 0.06.
+
+
+0.14     2014-07-18 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Perinci::Sub::Complete 0.55+, Perinci::Sub::GetArgs::Argv
+           0.37+.
+
+
+0.13     2014-07-02 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Perinci::Sub::Complete 0.53.
+
+
+0.12     2014-07-02 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Complete::Util 0.12.
+
+
+0.11     2014-06-29 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Complete::Util 0.10 (changed interface of
+           mimic_shell_dir_completion).
+
+
+0.10     2014-06-27 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to newer completion modules.
+
+
+0.09     2014-06-25 (SHARYANTO)
+
+         - No functional changes.
+
+         - Use Complete::Util which replaces SHARYANTO::Complete::Util.
+
+
+0.08     2014-06-20 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Fix path handling for ls ('ls .' or 'ls ..' didn't work before).
+
+
+0.07     2014-06-20 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - More complete ls -l output by performing 'child_metas' Riap request
+           instead of 'list'.
+
+         - Add common option: --json.
+
+         - Add command: history.
+
+         [BUG FIXES]
+
+         - Fix path handling so that things like 'meta .' or 'req child_metas
+           ..' work.
+
+         - A couple of other fixes.
+
+         [REMOVED FEATURES]
+
+         - Remove per-command --version (unneeded).
+
+
+0.06     2014-06-18 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - [ux] Add --all (-a) dummy option to ls just so I can type 'ls -la' or
+           'ls -al' without error.
+
+         - Add new setting: debug_time_command.
+
+         - Improve/fix completion by using Perinci::Sub::Complete 0.39.
+
+
+0.05     2014-06-17 (SHARYANTO)
+
+         - Add --version (-v) for each command/function. --verbose loses the -v
+           alias.
+
+
+0.04     2014-04-16 (SHARYANTO)
+
+         - Pass 'argv' to the server if parsing it on the client side returns
+           501. This can happen when coderefs in cmdline_aliases in metadata got
+           converted into string 'CODE' due to having to be transported via JSON
+           from the server side (Riap::HTTP/Riap::Simple). This also requires a
+           recent version of Perinci::Access::Perl (0.64) on the server side,
+           which supports accepting 'argv' request key for the 'call' action.
+
+         - Add -v (version).
+
+
+0.03     2014-01-01 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Cache some Riap results like meta/info/list to speed up tab
+           completion, help, ls.
+
+         - Alias -u for --user, -p for --password; document about
+           PERINCI_HTTP_{USER,PASSWORD}
+
+         [BUG FIXES]
+
+         - if 'ls' command mentions path, error 404 if there are no matches.
+
+
+0.02     2013-11-27 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Fix Riap requesting so it works with Riap::HTTP, etc.
+
+         - Fix tab completion on path so it mimics shell better (no space
+           automatically added after a match on dir).
+
+         [ENHANCEMENTS]
+
+         - Add commands: show, req, meta, info, call.
+
+         - Save command history even though we are interrupted.
+
+         - Add setting: debug_completion to show Riap requests for completion as
+           well as completion alternatives.
+
+         [INCOMPATIBLE CHANGES]
+
+         - Change setting debug_show_{request,response} to debug_riap.
+
+
+0.01     2013-11-06 (SHARYANTO)
+
+         - First release.

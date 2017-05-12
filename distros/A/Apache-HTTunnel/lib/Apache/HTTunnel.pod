@@ -1,0 +1,156 @@
+=head1 NAME
+
+Apache::HTTunnel - Universal HTTP tunnel using Apache + mod_perl
+
+
+=head1 SYNOPSIS
+
+  # on the server: in /etc/httpd/conf.d/perl_httunnel.conf
+    PerlSetVar              HTTunnelFifo          /var/lib/httunnel/httunnel.sock
+    PerlPostConfigRequire   Apache/HTTunnel.pm
+    <Location "/httunnel">
+      SetHandler      perl-script
+      PerlResponseHandler   Apache::HTTunnel
+    </Location>
+
+  # on the client: in /etc/httunnel.d/server_ssh.cfg
+    [server ssh]
+    local_port = 9876
+    url = http://server/httunnel
+    remote_host = localhost
+    remote_port = 22
+
+  # on the client
+    % /usr/bin/httunnel -f /etc/httunnel.d/ssh.cfg &
+    % ssh localhost -p 9876 
+
+    # You will now have a ssh connection to server where the packets
+    # are actually being transported over many HTTP requests.
+       
+ 
+=head1 DESCRIPTION
+
+C<Apache::HTTunnel> allows the creation of HTTP tunnels using Apache and 
+mod_perl. The C<HTTunnel::Client> class (or the C<httunnel> daemon) can be
+used to configure the tunnels.
+
+
+=head1 CONFIGURATION
+
+The following configuration directives can be used inside httpd.conf (or
+some other file in the conf.d directory) to control the behaviour of 
+C<Apache::HTTunnel>. 
+
+Please note that HTTunnelFifo and HTTunnelConnectionTimeout must be used
+before the PerlPostConfigRequire directive since they are used at startup 
+time. The other directives can be specified at the Location level.
+
+=over 4
+
+=item HTTunnelFifo
+
+Specifies the path to be used for the fifo that allows communication
+between the keeper process and the Apache workers.
+
+  Ex: HTTunnelFifo              /var/lib/httunnel/httunnel.sock
+
+There is no default value. This directive is mandatory.
+
+=item HTTunnelConnectionTimeout
+
+Specifies the number of seconds after which inactive connections
+will be closed. The connection table is checked at least every 15 
+seconds.
+
+  Ex: HTTunnelConectionTimeout  900
+
+The default value is 900, meaning connections idle for more than
+15 minutes will be closed.
+
+=item HTTunnelAllowedTunnels
+
+Specifies towards which host/port combinations this server allows tunnels
+to be established. The format is as such:
+
+  Ex: HTTunnelAllowedTunnels    "\
+        *              => 22, \
+        myhost         => 3389 | 5800, \
+        host1 | host2  => * "
+
+You can specify many sections by separating them by commas (,). Within each 
+section, multiple hosts/ports may be specified by separating them with pipes 
+(|). The asterisk (*) can be used as a wildcard, allowing any host/port.
+There is no default value. This directive is mandatory.
+
+=item HTTunnelMaxConnectTimeout
+
+When a client sends a connection request, it may specify a timeout
+value for the connection. In order to prevent blocking in the Apache child
+in cases when the connection blocks, this directive limits the 
+connection timeout that may be specified by the client.
+
+  Ex: HTTunnelMaxConnectTimeout 10
+
+The default value is 15 seconds. It is best to keep the value relatively
+low to prevent blocking in the Apache child.
+
+=item HTTunnelMaxReadTimeout
+
+C<HTTunnel::Client> needs to poll to check if there is some data to be 
+read from the remote socket. In order to not be troubled by proxies or 
+other intermediaries that may terminate long lasting connections 
+prematurely, C<Apache::HTTunnel> will purposely time-out read requests 
+that take longer than HTTunnelReadTimeout seconds. A special response 
+is sent to the client telling it to retry the read request.
+
+  Ex: HTTunnelMaxReadTimeout    10
+
+The default value is 15 seconds. It is best to keep the value relatively
+low to prevent blocking in the Apache child.
+
+=item HTTunnelMaxReadLength
+
+The maximum number of bytes that a client may request for a read.
+
+  Ex: HTTunnelMaxReadLength     16384
+
+The default value is 131072 bytes.
+
+
+=head1 SECURITY
+
+Please keep in mind that HTTP is not, by default, encrypted. Further more, 
+you will most certainly want to control which users are permitted to use 
+the /httunnel URL since it can provide an entry point into your network. 
+
+For these reasons, the use of SSL and Basic Authentication is strongly 
+recommended. See the Apache documentation (mod_ssl, mod_allow, mod_auth) 
+for more information on how to configure these features.
+
+Also, be sure to keep a tight HTTunnelAllowedTunnels that allows only access
+to the hosts/ports that are necessary.
+
+
+=head1 BUGS
+
+I'm sure there are some in there :)
+
+
+=head1 SEE ALSO
+
+L<File::FDkeeper>, L<File::FDpasser>, L<LWP>
+
+
+=head1 AUTHOR
+
+Patrick LeBoutillier, E<lt>patl@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005 by Patrick LeBoutillier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

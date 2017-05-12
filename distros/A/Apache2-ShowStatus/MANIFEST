@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+mk_README.sh
+t/conf/extra.conf.in
+t/stat/1pid.t
+t/response/TestStat/1pid.pm
+t/TEST.PL
+lib/Apache2/ShowStatus.pm
+META.yml                                 Module meta-data (added by MakeMaker)

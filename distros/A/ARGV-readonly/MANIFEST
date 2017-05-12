@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/ARGV-readonly.t
+lib/ARGV/readonly.pm
+META.yml                                 Module meta-data (added by MakeMaker)

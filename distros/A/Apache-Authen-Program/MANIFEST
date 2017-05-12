@@ -1,0 +1,9 @@
+Changes
+examples/filelogon
+examples/oralogon
+examples/smblogon
+MANIFEST
+Makefile.PL
+Program.pm
+README
+test.pl

@@ -1,0 +1,10 @@
+gz$
+^\.git
+^MANIFEST\.bak$
+^Makefile$
+\..*\.swp$
+pm_to_blib
+etc_to_auto
+~$
+\bblib\b
+\b\.xvpics\b

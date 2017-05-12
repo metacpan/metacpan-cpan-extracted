@@ -1,0 +1,22 @@
+Build.PL
+Changes
+lib/Acme/AllThePerlIsAStage.pm
+lib/Acme/AllThePerlIsAStage/AndAllTheMenAndWomenJAPH.pm
+share/they_have_their_exits_and_their_entrances.pl
+share/and_one_man_in_his_time_plays_many_parts.pl
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00.load.t
+t/lib
+t/perlcritic.t
+t/perltidy.t
+t/pkg-changes.t
+t/pkg-readme.t
+t/pod-coverage.t
+t/pod-encoding.t
+t/pod-spelling.t
+t/pod-version.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

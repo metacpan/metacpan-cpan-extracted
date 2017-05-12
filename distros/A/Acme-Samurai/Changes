@@ -1,0 +1,11 @@
+Revision history for Perl extension Acme::Samurai
+
+0.04 2016-09-11T09:21:39Z
+        - rewrite with Text::Mecabist
+        - fixed about numbers started by zero
+
+0.02  Thu Sep  4 07:57:31 JST 2008
+        - first CPAN release
+
+0.01  Sun Mar 23 23:58:44 JST 2008
+        - original version

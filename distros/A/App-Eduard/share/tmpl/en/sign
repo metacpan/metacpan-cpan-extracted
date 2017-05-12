@@ -1,0 +1,4 @@
+This message is correctly signed with key [% keyid %] from [% email %].
+
+GnuPG said:
+[% message %]

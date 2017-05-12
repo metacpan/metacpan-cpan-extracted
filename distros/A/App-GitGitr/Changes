@@ -1,0 +1,64 @@
+Changes file for App-GitGitr
+
+0.906     2017-03-20 15:14:59-07:00 America/Los_Angeles
+
+  Switch the _other_ LWP::Simple function call to HTTP::Tiny too...
+
+0.905     2017-03-20 15:03:15-07:00 America/Los_Angeles
+
+  Switch from LWP::Simple to HTTP::Tiny
+
+0.904     2017-03-20 15:01:45-07:00 America/Los_Angeles
+
+  Update copyright notice
+
+0.903     2016-02-15 09:59:11-08:00 America/Los_Angeles
+
+  Don't use OpenSSL on MacOS X
+
+0.902     2015-06-27 13:53:01-07:00 America/Los_Angeles
+
+  Move App::GitGitr::Cmd to App::GitGitr. Should make PAUSE happier.
+
+0.901     2015-06-27 13:23:07-07:00 America/Los_Angeles
+
+        Doc tweak
+        Extra error checking
+        Remove FindBin stuff
+
+0.900     2015-04-14 21:14:43-07:00 America/Los_Angeles
+
+        No changes since last dev release.
+
+0.8       2015-03-29 23:54:53-04:00 America/New_York (TRIAL RELEASE)
+
+        Add compilation tests
+
+0.7       2015-03-28 21:02:10-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+0.6       2014-08-16 11:21:34-07:00 America/Los_Angeles
+
+        CPAN DAY RELEASE!
+
+0.5       2014-05-31 11:41:30-07:00 America/Los_Angeles
+
+        Doc tweaks
+        Switch homepage to pretty version
+        Use a real HTML parser to extract version
+        Switch back to kernel.org for downloads
+
+0.4       2014-04-06 12:20:14-07:00 America/Los_Angeles
+
+        Added 'no_symlink' option
+        General cleanup & stuff
+        Documentation (thanks to Tom Metro for the asskick)
+        Update dist.ini to generate Makefile.PL in repo
+        Update dist.ini to generate README.md in build & repo
+
+0.3       2014-04-05 23:41:32-07:00 America/Los_Angeles
+
+        Dummy App::GitGitr package
+
+0.2       2014-04-05 23:33:07-07:00 America/Los_Angeles
+
+        Created Changes file

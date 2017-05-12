@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+
+#######################################################################
+#
+# Last Update: 12/10/2007 (mm/dd/yyyy date format)
+# 
+# Copyright (C) 2007 Thierry Hamon
+#
+# Written by thierry.hamon@lipn.univ-paris13.fr
+#
+# Author : Thierry Hamon
+# Email : thierry.hamon@lipn.univ-paris13.fr
+# URL : http://www-lipn.univ-paris13.fr/~hamon
+# Version : 1
+########################################################################
+
+
+use strict;
+
+use Getopt::Long;
+use Config::General;
+use Pod::Usage;
+use Data::Dumper;
+use File::Basename;
+use Sys::Hostname;
+
+use Alvis::Convert;
+
+use Alvis::NLPPlatform;
+use Alvis::NLPPlatform::Convert;
+
+use Encode;
+
+my $man = 0;
+my $help = 0;
+my $rcfile = "./nlpplatform-test.rc";
+
+GetOptions('help|?' => \$help, man => \$man, "rcfile=s" => \$rcfile) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+
+if (($rcfile ne "") && (-f $rcfile)) {
+  my %config = &Alvis::NLPPlatform::load_config($rcfile);
+
+  &Alvis::NLPPlatform::print_config(\%config);
+
+} else {
+  warn "No such config file or config file is not set ($rcfile)\n";
+} 

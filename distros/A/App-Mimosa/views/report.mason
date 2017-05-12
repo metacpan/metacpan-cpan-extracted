@@ -1,0 +1,19 @@
+<%args>
+    $report => 'No hits found! Please try changing some of the advanced options, such as the e-value'
+    $job_id
+    $sequence_data_dir
+</%args>
+<div id="tabs1">
+    <div id="t1_content">
+    <div id="report">
+    <a href="/show_grid">Align a different sequence</a>
+    <div id="raw_download">
+
+    Bookmarkable URLs: Mimosa Report #<% $job_id %> <a href="/api/report/raw/<% $job_id %>">Raw</a>
+    <a href="/api/report/html/<% $job_id %>">HTML</a>
+    </div>
+    <% $report %>
+    </div>
+    </div> <!-- t1_content -->
+    <& tabs.mason, admin => 0, sequence_data_dir => $sequence_data_dir &>
+</div> <!-- tabs1 -->

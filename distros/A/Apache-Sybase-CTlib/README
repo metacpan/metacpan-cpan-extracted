@@ -1,0 +1,15 @@
+
+
+This is the Apache::Sybase::CTlib2 module. It allow persistant connections
+between Sybase and Apache. 
+
+Requirements:
+	Apache 2.0.48+
+	ModPerl 1.99+
+	Perl 5.8+
+	SybPerl 2.15+
+	Sybase 11.0.3.3+
+
+
+This module is intended to be used with Apache2 and ModPerl2. For Apache1
+and ModPerl1, use the Apache::Sybase::CTlib module.

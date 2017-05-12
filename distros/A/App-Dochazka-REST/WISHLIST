@@ -1,0 +1,45 @@
+============================
+App::Dochazka::REST Wishlist
+============================
+
+This file is for feature requests, cleanup tasks, and other issues that 
+are worth pursuing, but not right now.
+
+
+------------------------------------------------------------------------
+SQL: use jsonb instead of text in schedules table
+https://github.com/smithfarm/dochazka-rest/issues/55
+
+    In the "schedules" table, intervals are stored as a JSON structure
+    in a column called "schedule". However, the SQL type of this column
+    is text:
+
+        schedule   text UNIQUE NOT NULL
+
+    This is because, at the time the SQL was written, the jsonb feature
+    of PostgreSQL was still a WIP.
+
+    As of PostgreSQL 9.4 the jsonb feature is in production and we can
+    migrate to it.
+
+
+------------------------------------------------------------------------
+Implement site policy table
+https://github.com/smithfarm/dochazka-rest/issues/25
+
+    The use case for a policy table is as follows: we have a site
+    configuration mechanism, but the SQL code cannot access it.
+
+    SQL-relevant configuration values, such as what constitutes "too far in
+    the future" for the not_too_future() stored procedure, could be stored
+    in a "policy" table and accessed via a Policy class.
+
+    The idea is that each policy would define a scalar value used in a
+    function or trigger. This would give site admins some degree of control
+    over the functions/triggers.
+
+    So, site admins would not be able to add or delete policies, but they
+    could update them. Each policy object would contain a validation
+    attribute defining the range of permissible values.
+
+

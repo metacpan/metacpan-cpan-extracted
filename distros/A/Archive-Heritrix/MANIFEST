@@ -1,0 +1,9 @@
+Changes
+lib/Archive/Heritrix.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/Archive-Heritrix.t
+eg/a.arc.gz
+eg/b.arc.gz

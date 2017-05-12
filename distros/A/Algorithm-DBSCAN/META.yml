@@ -1,0 +1,24 @@
+---
+abstract: '(ALFA code) Perl implementation of the DBSCAN (Density-Based Spatial Clustering of Applications with Noise) algorithm'
+author:
+  - 'Michal TOMA <mtoma@cpan.org>'
+build_requires:
+  File::Slurp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-DBSCAN
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006'
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

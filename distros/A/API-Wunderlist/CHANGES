@@ -1,0 +1,30 @@
+Changelog for API-Wunderlist
+
+0.06 2015-10-11T08:09:32
+ - Updated build.
+ - Modified the implementation style and dependencies.
+
+0.05 2015-09-28T13:17:54
+ - v0.05
+ - Updated build.
+ - Updated inconsistency in documentation.
+ - Updated dist.ini to generate META files.
+
+0.04 2015-09-28T04:06:10
+ - v0.04
+ - Updated build.
+ - Refactored to derive from API::Client.
+ - Updated dist.ini.
+
+0.03 2015-07-01T15:55:14
+ - v0.03
+ - Refactored dependencies.
+ - Initial commit.
+
+0.02 2015-05-22T12:57:54
+ - v0.02
+ - Initial commit.
+
+0.01 2015-05-17T03:26:20
+ - v0.01
+ - Initial commit.

@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache2::ModLogConfig.
+
+0.01  Sun Feb 27 12:58:18 2011
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.8.8 -n Apache2::ModLogConfig
+

@@ -1,0 +1,8 @@
+
+2.01 15. Nov. 2005 
+
+- fixes security problem in session_id validation, which allows createtion of
+  session with invalid id's.
+
+
+       

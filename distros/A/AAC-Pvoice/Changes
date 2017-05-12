@@ -1,0 +1,64 @@
+Revision history for Perl module AAC::Pvoice
+
+0.1 First version
+
+0.2 0.1 didn't arrive on PAUSE correctly
+
+0.3 minor documentation update in AAC::Pvoice::Bitmap
+
+0.4 correction in AAC::Pvoice::Input to read individual bits
+    instead of the whole statusbyte from the parallel port
+
+0.5 AAC::Pvoice::Input now no longer uses Win32::API. Now it uses
+    Device::ParallelPort, so it should be able to run on Linux now too.
+
+0.6 AAC::Pvoice::Bitmap now returns a wxNullBitmap if the resize-factor
+    is 0 to prevent 'illegal division by zero'
+    AAC::Pvoice::EditableRow now has some sensible defaults to prevent
+    'Use of uninitialized value' warnings
+    AAC::Pvoice::Input can now handle one button input
+
+0.7 AAC::Pvoice::Input
+        * now allows keyboard input
+        * now allows direct mouseclicks on the buttons
+    AAC::Pvoice::Panel
+        * now uses a round cornered background and
+        * no longer simply sets the background for the normal and
+          selected state, but draws a round cornered border around
+          the rows and buttons that are selected
+        * finally got the screensizing correctly...no more weird
+          calculating stuff...
+    AAC::Pvoice::Bitmap
+        * now produces round cornered bitmaps
+    AAC::Pvoice::Row
+        * no longer uses too large images (screensizing update)
+    AAC::Pvoice::EditableRow
+        * no longer uses too large images (screensizing update)
+
+0.8 AAC::Pvoice::Input
+        * when keystrokes are used, alpha keys are now case-insensitive
+    Several bugfixes and therefore needed new methods (for most of you
+    probably not that important)
+
+0.9 AAC::Pvoice::Bitmap
+        * We now use Image::Magick to create the bitmaps. It's a change to
+          the internals, so the methods and their parameters stay the same.
+        * Returned images are cached first (using File::Cache). If an image
+          has been processed before, it will be retrieved from the cache.
+          The cache never expires, but every combination of parameters
+          results in a new cached image (and of course the file modificationtime
+          of the image is also taken into account.
+    AAC::Pvoice::Dialog
+        * This is a newly added class. It's a subclass of Wx::Dialog and
+          allows you to create dialog boxes, using an AAC::Pvoice::Panel
+    AAC::Pvoice
+        * This module now provides the AAC::Pvoice::MessageBox function,
+          similar to Wx::MessageBox.
+0.91 AAC::Pvoice
+        * Made a little more space between the text and the buttons in the MessageBox
+          function
+     AAC::Pvoice::Bitmap
+        * Minor changes
+     AAC::Pvoice::Panel
+        * ability to return the array of added texts from RetrieveText and SpeechRetrieveText
+        and made accompanying changes in other methods.

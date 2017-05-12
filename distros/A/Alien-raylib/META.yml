@@ -1,0 +1,30 @@
+---
+abstract: 'Alien distribution for Raylib'
+author:
+  - 'Ahmad Fatoum <athreef@cpan.org>'
+build_requires:
+  Test2::Bundle::More: '0'
+  Test::Alien: '0.05'
+configure_requires:
+  Alien::Base::ModuleBuild: '0.002'
+  File::ShareDir: '1.03'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-raylib
+requires:
+  Alien::Base: '0.002'
+  File::ShareDir: '1.03'
+  parent: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/athreef/Alien-raylib/issues
+  homepage: https://github.com/athreef/Alien-raylib
+  repository: https://github.com/athreef/Alien-raylib.git
+version: '0.002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

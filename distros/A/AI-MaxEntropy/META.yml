@@ -1,0 +1,19 @@
+--- 
+abstract: Perl extension for learning Maximum Entropy Models
+author: 
+  - Laye Suen, <laye@cpan.org>
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: MIT
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: AI-MaxEntropy
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Algorithm::LBFGS: 0.16
+  YAML::Syck: 0.87
+version: 0.20

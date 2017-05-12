@@ -1,0 +1,33 @@
+Changes
+examples/eigenvector_initialization.pl
+examples/load_save.pl
+examples/README
+FastSOM.h
+FastSOM.xs
+lib/AI/NeuralNet/FastSOM.pm
+lib/AI/NeuralNet/FastSOM/Hexa.pm
+lib/AI/NeuralNet/FastSOM/Rect.pm
+lib/AI/NeuralNet/FastSOM/Torus.pm
+lib/AI/NeuralNet/FastSOM/Utils.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+proto.h
+README
+t/hexa.t
+t/hexa_retrieve.t
+t/orig/hexa.t
+t/orig/pods.t
+t/orig/rect.t
+t/orig/som.t
+t/orig/torus.t
+t/pods.t
+t/rect.t
+t/rect_retrieve.t
+t/som.t
+t/torus.t
+t/torus_retrieve.t
+TODO
+typemap.v1
+typemap.v2
+META.json                                Module JSON meta-data (added by MakeMaker)

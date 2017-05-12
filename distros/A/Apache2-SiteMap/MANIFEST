@@ -1,0 +1,16 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+README
+lib/Apache2/SiteMap.pm
+t/00-load.t
+t/10-status_ok.t
+t/data/one/archives.html
+t/data/one/index.html
+t/data/one/tags.html
+t/data/two/elton_john.mp3
+t/data/two/spice_girls.mp3
+t/data/two/the_cure.mp3
+t/pod-coverage.t
+t/pod.t

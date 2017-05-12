@@ -1,0 +1,35 @@
+NAME
+    App::derived - run command periodically and calculate rate and check
+    from network
+
+SYNOPSIS
+      $ cat CmdsFile
+      slowqueries: mysql -NB -e 'show global status like "Slow_queries%"'
+      $ derived -MMemcahced,port=11211,host=127.0.0.1 CmdsFile
+
+      $ telnet localhost port
+      get slowqueris
+      VALUE slowqueris 0 3
+      0.2  # slow queries/sec
+
+DESCRIPTION
+    derived runs commands periodically and capture integer value. And
+    calculate per-second rate. You can retrieve these values from integrated
+    memcached-protocol server or pluggable workers.
+
+    You can monitoring the variation of metrics through this daemon.
+
+    See detail for perldoc "derived"
+
+AUTHOR
+    Masahiro Nagano <kazeburo@gmail.com>
+
+SEE ALSO
+    <derived>
+
+LICENSE
+    Copyright (C) Masahiro Nagano
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

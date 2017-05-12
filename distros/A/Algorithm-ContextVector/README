@@ -1,0 +1,44 @@
+NAME
+    Algorithm::ContextVector - Simple implementation based on
+    Data::CosineSimilarity
+
+SYNOPSIS
+     my $cv = Algorithm::ContextVector->new( top => 300 );
+
+     $cs->add_instance( label => 'label1', attributes => { feature1 => 3, feature2 => 1, feature3 => 10 } );
+     $cs->add_instance( label => [ 'label2', 'label3' ], attributes => { ... } );
+     $cs->add_instance( label => ..., attributes => ... );
+     ...
+
+     $cv->train;
+
+     my $results = $cv->predict( attributes => { ... } );
+
+DESCRIPTION
+    Simple implementation based on Data::CosineSimilarity
+
+  $class->new( top => ... )
+    During the training, keeps the $top most heavy weighted features. Keeps
+    the complete feature set if omitted.
+
+  $class->new_from_file( $filename )
+    Returns the instance of Algorithm::ContextVector stored in $filename.
+
+  $self->save_to_file( $filename )
+    Save the $self to $filename using Storable.
+
+  $self->add_instance( label => [ ... ], attributes => { ... } )
+  $self->train
+    Keeps the best features (top N) and norms the vectors.
+
+  $self->predict( attributes => { ... } )
+    Returns a hashref with the labels as the keys and the cosines as the
+    values.
+
+AUTHOR
+    Antoine Imbert, "<antoine.imbert at gmail.com>"
+
+LICENSE AND COPYRIGHT
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

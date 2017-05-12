@@ -1,0 +1,7 @@
+Message encrypted and signed with key [% keyid %] from [% email %].
+
+You said;
+[% plaintext %]
+
+GnuPG said:
+[% message %]

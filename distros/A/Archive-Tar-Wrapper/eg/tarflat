@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+###########################################
+# tarflat 
+# 2005, Mike Schilli <cpan@perlmeister.com>
+###########################################
+use strict;
+use warnings;
+use Getopt::Std;
+use Pod::Usage;
+use Archive::Tar::Wrapper;
+use Sysadm::Install qw(:all);
+
+use vars qw($CVSVERSION);
+
+$CVSVERSION = '$Revision: 1.1 $';
+
+getopts("hv", \my %opts);
+
+pod2usage() if $opts{h};
+
+if($opts{v}) {
+    my ($version) = $CVSVERSION =~ /(\d\S+)/;
+    die "$0 $version\n";
+}
+
+my($target_dir, @tarfiles) = @ARGV;
+
+if(!defined $target_dir or
+   !@tarfiles) {        
+    pod2usage("Wrong number of arguments");
+}
+
+if(! -d $target_dir) {
+    my $create = ask "$target_dir doesn't exist. Create it [y]", "y";
+    mkd $target_dir if $create =~ /[yY]/;
+}
+
+my $arch = Archive::Tar::Wrapper->new();
+
+for my $tarfile (@tarfiles) {
+    $arch->read($tarfile);
+}
+
+$arch->list_reset();
+
+while(my $entry = $arch->list_next()) {
+    my($tar_path, $phys_path) = @$entry;
+    if(-f $phys_path) {
+        cp $phys_path, $target_dir;
+    }
+}
+
+__END__
+
+=head1 NAME
+
+    tarflat - Unpack tarfiles and put their content flat in a single directory
+
+=head1 SYNOPSIS
+
+    tarflat target_dir tarfile ...
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-h>
+
+Prints this manual page in text format.
+
+=item B<-v>
+
+Prints the script version.
+
+=back
+
+=head1 DESCRIPTION
+
+C<tarflat> 
+
+=head1 EXAMPLES
+
+      # Unpack foo.tgz and bar.tgz and store all of their files
+      # (anywhere in the directory hierarchy) in the directory
+      # /tmp/junk.
+  $ mkdir /tmp/junk
+  $ tarflat /tmp/junk foo.tgz bar.tgz
+
+=head1 LEGALESE
+
+Copyright 2005 by Mike Schilli, 
+all rights reserved. This program is free 
+software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2005, Mike Schilli <cpan@perlmeister.com>

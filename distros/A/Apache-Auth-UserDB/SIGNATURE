@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 50db20c33851483bcf2f3be3801b5f93fe68f4aa Build.PL
+SHA1 3ad4b6c520e74537a430d5bc48fffcb09c3bad8c CHANGES
+SHA1 344da11a6feb2297b52dc0d15d4cf440da8a1c4a MANIFEST
+SHA1 7575bc0ace7cc888484b8840ebc85cffb5caae39 META.yml
+SHA1 cd14ada78fb37a0d926edd86eddcdf7f939de582 Makefile.PL
+SHA1 dfa030b168afb1d5e9261c6aafebbb66c7cbd276 README
+SHA1 d5883ce207304767dae018bcd388bc9590c6237d TODO
+SHA1 1b677c1b29fae597616c8cff6c21522d050438e7 debian/changelog
+SHA1 5d9474c0309b7ca09a182d888f73b37a8fe1362c debian/compat
+SHA1 f9b7e307ce49426f84d99f3ccf4903bffed42446 debian/control
+SHA1 1d56e19fdb0eb5cae1dfa8b7e48238920d7b12b8 debian/copyright
+SHA1 e7ef40e521b2c50f9f696d2d26a8b11167ec4119 debian/rules
+SHA1 dd0c636583831e0f477d585d15e494de36d73073 lib/Apache/Auth/User.pm
+SHA1 ff8abe300319807b4b42f3066786981a82aa8a9b lib/Apache/Auth/User/Basic.pm
+SHA1 466602e9a8618aa02a000248cf874afba6d338f3 lib/Apache/Auth/User/Digest.pm
+SHA1 d546cd506aac8daf25f781d81e97004e14661dae lib/Apache/Auth/UserDB.pm
+SHA1 1e3dee18e7e07aab0028f40957b5f0677bdeaaf3 lib/Apache/Auth/UserDB/File.pm
+SHA1 3b09b49a220fa73ed173bb4c16da0c4266cab30c lib/Apache/Auth/UserDB/File/Basic.pm
+SHA1 db27f869f3208cd1940c1dda74094e2b7fd1a886 lib/Apache/Auth/UserDB/File/Digest.pm
+SHA1 5e43e380f493a5cd3c08db823bb0d60d451a8e08 t/00-user-basic.t
+SHA1 021618dd1694d4bf80256a4e797c3b455dce7542 t/01-user-digest.t
+SHA1 981b678cd62a31d63f758b76fbc96010b96d3545 t/02-userdb-file-basic.t
+SHA1 987a6fbfa6669622bc0244517542f59f97c98e26 t/03-userdb-file-digest.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFG7y+3wL7PKlBZWjsRAnNXAKCGVo0IsxBcVh8JzBl6iduvIVKoPgCg8kn3
+i3lDYsa0rqFvB97coCgUixY=
+=QX0g
+-----END PGP SIGNATURE-----

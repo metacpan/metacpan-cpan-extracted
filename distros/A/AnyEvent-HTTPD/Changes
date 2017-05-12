@@ -1,0 +1,102 @@
+Revision history for AnyEvent-HTTPD
+
+0.93    Thu Aug  4 10:38:09 CEST 2011
+        - made it possible to remove default headers
+          completely, thanks go to Chris Kastorff for providing a patch.
+        - applied also a fix for case handling of the headers,
+          thanks go to the patch from Chris Kastorff.
+        - fixed some tests. I hate it when all bugs that
+          are found via CPAN Testers are bugs in the tests.
+        - fixed that the URL returned by Request::url method will
+          now also contain the query string (thanks to art sackett for
+          spotting this).
+
+0.92    Tue Mar  1 11:46:14 CET 2011
+        - added simple SSL/TLS support.
+        - removed from tests from the distribution.
+        - replaced 01_basic_request.t with a non-wget variant for CPAN.
+
+0.91    Wed Feb  2 15:21:02 CET 2011
+        - set the Date header correctly.
+        - append a newline to error messages.
+        - hopefully improved connection closing mechanism.
+        - don't send body when responding to a HEAD request.
+
+0.90    Mon Jan 31 13:04:45 CET 2011
+        - fixed a small thing with response on dead connections.
+        - added small example of 'request' event usage.
+        - make Content-Length: not be empty.
+        - hand HEAD requests down to the event handlers.
+        - added allowed_methods support from nrh.
+        - don't force cache policy anymore.
+
+0.84    Mon Nov  9 17:18:07 CET 2009
+        - added client_connected and client_disconnected events.
+        - returning 501 instead of 405 on unimplemented method.
+        - optimized regexes (contributed by Mons Anderson).
+        - added backlog option to AE::HTTPD (contributed by Mons Anderson).
+
+0.83    Tue Sep 29 16:29:57 CEST 2009
+        - added client host and port to the request.
+
+0.82    Tue Aug 11 08:33:05 CEST 2009
+        - added common::sense to prereq.
+        - made tests using 127.0.0.1.
+
+0.81    Mon Aug 10 09:59:16 CEST 2009
+        - cleaned up dependencies in Makefile.PL.
+        - using common::sense in all modules & scripts.
+
+0.8     Sun Aug  9 18:10:23 CEST 2009
+        - made tests run with AnyEvent::Impl::Perl.
+        - removed HTTP::Date (LWP) dependency.
+
+0.71    Sat Aug  8 00:43:58 CEST 2009
+        - fixed the published tests. they used Coro.
+
+0.7     Fri Aug  7 15:37:27 CEST 2009
+        - fixed documentation in AE::HTTP::Request.
+        - added asynchronous response functionality,
+          for sending large files via AnyEvent::AIO for instance.
+        - added tests to distribution (instead of maintainer only tests).
+        - fixed a bug with reception of requests without headers.
+
+0.6     Tue Jul 14 11:16:44 CEST 2009
+        - fixed leaking AE::HTTPD::HTTPConnection.
+
+0.5     Thu Jul  2 04:30:14 CEST 2009
+        - applied patch from mathieu at closetwork.org to add a
+          host parameter for binding.
+        - removed bogus API stuff like ::Appgets or the weird
+          form and response handling. AnyEvent::HTTPD should be and
+          stay a simple HTTP server for simple purposes.
+          If you need further sugar, please write your own modules for
+          it. If you need anything ask me or look in the git repository
+          at http://git.ta-sa.org/AnyEvent-HTTPD.git
+        - added responded method to ::Request.
+        - stop_request now also stops further handling of the request
+          after the 'request' event.
+        - added 'request_timeout's
+        - added keep-alive support (for HTTP 1.0) (thanks to Andrey Smirnov).
+
+0.04    Sun Dec 28 15:48:28 CET 2008
+        - removed TCP* classes and using AnyEvent::Handle instead.
+        - added size and maxlength args to the C<entry> function in Appgets
+        - changed the API to actually call the events for all path segments
+          of an URL. also removed the ugly '/' => '_' mapping for the path
+          seperators. Sorry for any breakage in your code ;-/
+        - removed Perl 5.10 dependency.
+
+0.03    Tue Apr 15 12:57:10 CEST 2008
+        - added submit() function to Appgets.
+        - fixed a bug in the url() method of AnyEvent::HTTPD::Request where
+          the url wasn't get correctly. resulting in bad form behaviour.
+
+0.02    Sat Mar 22 16:09:55 CET 2008
+        - rewrote the module API to be more "async".
+        - made it possible to respond to requests asynchronously
+          in C<AnyEvent::HTTPD>.
+        - added lots of example scripts.
+
+0.01    Thu Mar 20 19:53:31 CET 2008
+        - first release.

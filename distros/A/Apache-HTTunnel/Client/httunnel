@@ -1,0 +1,482 @@
+#!/usr/bin/perl
+
+use strict ;
+use FindBin ;
+use lib "$FindBin::Bin" ;
+use Getopt::Long qw(:config no_ignore_case) ;
+use IO::Socket::INET ;
+use IO::Select ;
+use IO::Pipe ;
+use IO::Handle ;
+BEGIN { eval { require Sys::Syslog } }
+use HTTunnel::Client ;
+use Data::Dumper ;
+use POSIX qw(setsid) ;
+
+
+$SIG{CHLD} = 'IGNORE' ;
+
+
+my %opts = () ;
+GetOptions(\%opts,
+	"h",		# help
+	"v",		# version
+	"V",		# verbose
+	"VV",		# very verbose (may include binary data)
+	"d",		# daemon
+) ;
+
+if ($opts{v}){
+	print "httunnel version $HTTunnel::Client::VERSION\n" ;
+	exit() ;
+}
+
+sub usage {
+	print STDERR <<USAGE;
+Usage: httunnel path [-V] [-VV] [-d] | -v | -h
+
+    path   Configuration file or directory. Please the httunnel(1) 
+           manual page for details on the configuration file format.
+     -V    Verbose output.
+     -VV   Very verbose output, which may include binary output.
+     -d    Runs in daemon mode with logging to syslog if 
+           available.
+     -v    Prints version and exits.
+     -h    Prints this usage information.
+USAGE
+	exit(1) ;
+}
+usage() if (($opts{h})||(! @ARGV[0])) ;
+$opts{V} = 2 if $opts{VV} ;
+my $DEBUG = $opts{V} || 0 ;
+my $SYSLOG = 0 ;
+
+if (($opts{d})&&(Sys::Syslog->can('openlog'))){
+    Sys::Syslog::setlogsock('unix') ;
+    Sys::Syslog::openlog('httunnel', 'pid', 'user') or die("Can't open syslog: $!") ;
+	$SYSLOG = 1 ;
+}
+
+my $config = get_conf(@ARGV[0]) ;
+my ($select, $listeners) = start_listeners($config) ;
+
+if ($opts{d}){
+    chdir('/') or sdie("Can't chdir to /: $!") ;
+    open(STDIN, '</dev/null') or sdie("Can't open /dev/null for reading: $!") ;
+    open(STDOUT, '>>/dev/null') or sdie("Can't open /dev/null for appending: $!") ;
+    open(STDERR, '>>/dev/null') or sdie("Can't open /dev/null for appending: $!") ;
+    setsid() or sdie("Can't start a new session: $!") ;
+    umask(0) ;
+
+	my $pid = fork() ;
+	sdie("Can't fork: $!") unless defined($pid) ;
+	exit(0) if ($pid != 0) ;
+}
+
+
+while (1){
+	my @ready = $select->can_read() ;
+	foreach my $fh (@ready){
+		my $cfg = $config->{$listeners->{$fh}} ;
+		$DEBUG = $cfg->{verbose} ;
+
+		my $client = undef ;
+		if ($cfg->{protocol} eq 'udp'){
+			$client = $fh ;
+			$select->remove($fh) ;
+		}
+		else {
+			$client = $fh->accept() ;
+		}
+		next if ! defined($client) ;
+
+		slog('notice', "Accepted connection on " . $fh->sockhost() . ':' . $fh->sockport()) ;
+
+		my $pid = fork() ;
+		sdie("Can't fork: $!") unless defined($pid) ;
+		next if ($pid) ;
+
+		# child
+		undef $listeners ;
+		undef $select ;
+
+		$pid = undef ;
+		my $reader = undef ;
+		my $hc = new My::HTTunnel::Client($cfg, keep_alive => $cfg->{http_keep_alive}) ;
+		eval {
+			local $SIG{TERM} = 'IGNORE' if $cfg->{protocol} ne 'udp' ;
+
+			$hc->proxy(['http'], $cfg->{http_proxy}) if $cfg->{http_proxy} ;
+			$hc->connect($cfg->{protocol}, $cfg->{remote_host}, $cfg->{remote_port}) ;
+			sdebug("Remote connection to $cfg->{remote_host}:$cfg->{remote_port} established") ;
+		
+			my $lifeline = new IO::Pipe() ;
+			($reader, $pid) = start_reader($hc, $cfg, $lifeline) ;
+			if (! $reader){
+				$hc->close() ;
+				die("Can't fork: $!") ;
+			}
+		
+			my $sel = new IO::Select($client, $reader) ;
+			while (1){
+				my @ready = $sel->can_read() ;
+				foreach my $fh (@ready){
+					my $buf = undef ;
+					if (($fh eq $client)&&($cfg->{protocol} eq 'udp')){
+						$buf = recv_from($fh, $cfg->{read_length}) ;
+					}
+					else {
+						$buf = read_from($fh, $cfg->{read_length}) ;	
+					}
+					if (! defined($buf)){
+						kill 9, $pid ;
+						$hc->close() ;
+						exit() ;
+					}
+					if ($fh eq $reader){
+						if ($cfg->{protocol} eq 'udp'){
+							send_to($client, $buf) ;
+						}
+						else {
+							write_to($client, $buf) ;
+						}
+					}
+					else {
+						$hc->print($buf) ;
+					}
+				}
+			}
+		} ;
+		if ($@){
+			my $e = $@ ;
+			kill 9, $pid if defined($pid) ;
+			eval { $hc->close() ; } ;
+			slog('err', "$@\n") if $@ ;
+			sdie("$e\n") ;
+		}
+	}
+}
+
+
+###############################################################################
+
+
+sub get_conf {
+	my $path = shift ;
+
+	my @files = () ;
+	if (-d $path){
+		$path =~ s/\/+$// ;
+		# open dir and get all .conf files.
+		opendir(CONFD, $path) or die("Can't open configuration directory '$path': $!\n") ;
+		push @files, map {{name => "$path/$_", lines => []}} grep {$_ =~ /\.conf$/} readdir CONFD ;
+		die("No configuration files (*.conf) found in '$path'") unless scalar(@files) ;
+	}
+	else{
+		push @files, {name => $path, lines => []} ;
+	}
+
+	foreach my $f (@files){
+		slog('notice', "Processing configuration file '$f->{name}'") ;
+		open(CONF, "<$f->{name}") or die("Can't open configuration file '$f->{name}': $!\n") ;
+		push @{$f->{lines}}, <CONF> ;
+		close(CONF) ;
+	}
+
+	# Process configuration
+	my %defaults = (
+		local_addr => 'localhost',
+		local_port => undef,
+		protocol => 'tcp',
+		remote_port => undef,
+		remote_host => undef,
+
+		url => undef,
+		http_protocol => 'HTTP/1.1',
+		http_keep_alive => 1,
+		http_username => '',
+		http_password => '',
+		http_proxy => '',
+		http_proxy_username => '',
+		http_proxy_password => '',
+		read_length => 131072,
+		read_timeout => 15,
+		verbose => $DEBUG,
+	) ;
+	
+	foreach my $f (@files){
+		my $cnt = 0 ;
+		my $section = $f->{name} ;
+		my $config = {$section => {%defaults}} ;
+		foreach my $l (@{$f->{lines}}){
+			chomp($l) ;
+			$l =~ s/^\s+// ;
+			$l =~ s/\s+$// ;
+			$cnt++ ;
+
+			if (($l eq '')||($l =~ /^[;#]/)){
+				next ;
+			}
+			elsif ($l =~ /^\[(.+?)\]$/){
+				$section = "$f->{name}:[$1]" ;
+				$config->{$section} = {%{$config->{$f->{name}}}} ;
+			}
+			elsif (($l =~ /^(\w+)\s*=\s*(.*?)$/)&&(exists $config->{$section}->{$1})){
+				$config->{$section}->{$1} = $2 ;
+			}
+			else{
+				die("Invalid configuration directive at '$f->{name}' line $cnt") ;
+			}
+		}
+		$f->{config} = $config ;
+	}
+
+	# Validation
+	my $config = {} ;
+	foreach my $f (@files){
+		my $nb_sections = 0 ;
+		foreach my $s (keys %{$f->{config}}){
+			if ($s ne $f->{name}){
+				$nb_sections++ ;
+				foreach my $k (keys %{$f->{config}->{$s}}){
+					die("Configuration parameter '$k' is required in section '$s'\n") 
+						unless defined($f->{config}->{$s}->{$k}) ;
+				}
+				$config->{$s} = $f->{config}->{$s} ;
+				$config->{$s}->{__file__} = $f->{name} ;
+				$config->{$s}->{__section__} = $s ;
+			}
+		}
+		die("No sections declared in configuration file '$f->{name}'\n") unless $nb_sections ;
+	}
+
+	sdebug(Dumper($config)) ;
+
+	return $config ;
+}
+
+
+sub start_listeners {
+	my $config = shift ;
+
+	my $select = new IO::Select() ;
+	my $listeners = {} ;
+
+	foreach my $s (values %{$config}){
+		my $server = new IO::Socket::INET(
+			Proto => $s->{protocol},
+			LocalAddr => $s->{local_addr} || undef,
+			LocalPort => $s->{local_port},
+			($s->{protocol} eq 'tcp' ? (Reuse => 1, Listen => SOMAXCONN) : ()),
+		) ;
+		die("Can't create server socket $s->{local_addr}:$s->{local_port}: $!") unless $server ;
+		$select->add($server) ;
+		$listeners->{$server} = $s->{__section__} ;
+		slog('notice', "Listening for $s->{protocol} connections on $s->{local_addr}:$s->{local_port}") ;
+	}
+
+	return ($select, $listeners) ;
+}
+
+
+sub start_reader {
+	my $hc = shift ;
+	my $cfg = shift ;
+	my $lifeline = shift ;
+
+	sdebug("Starting reader process...") ;
+	my ($reader, $writer) = () ;
+	socketpair($reader, $writer, AF_UNIX, ($cfg->{protocol} eq 'udp' ? SOCK_DGRAM : SOCK_STREAM), PF_UNSPEC) ;
+	shutdown($reader, 1) ;
+	shutdown($writer, 0) ;
+
+	my $pid = fork() ;
+	if (! defined($pid)){
+		return undef ;
+	}
+	elsif (! $pid){
+		# child
+		$writer->autoflush(1) ;
+		$lifeline->reader() ;
+
+		while (1){
+			my $data = $hc->read(
+				$cfg->{read_length},
+				$cfg->{read_timeout},
+				$lifeline, 
+				sub {exit()}) ;
+
+			if (! defined($data)){
+				sdebug("Reader process ended ($pid)") ;
+				exit() ;
+			}
+			write_to($writer, $data) ;
+		}
+	}
+	else {
+		$lifeline->writer() ;
+		sdebug("Reader process started ($pid)") ;
+	}
+
+	return ($reader, $pid) ;
+}
+
+
+sub read_from {
+	my $h = shift ;
+	my $bufsize = shift || 0 ;
+
+	my $buf = '' ;
+	my $res = $h->sysread($buf, $bufsize) ;
+	if ($res < 0){
+		die("sysread error: $!") ;
+	}
+	elsif ($res == 0){
+		return undef ;
+	}
+	else {
+		return $buf ;
+	}
+}
+
+
+sub recv_from {
+	my $h = shift ;
+	my $bufsize = shift || 0 ;
+
+	my $buf = '' ;
+	my $res = $h->recv($buf, $bufsize) ;
+	if (! defined($res)){
+		die("sysread error: $!") ;
+	}
+	else {
+		return ($res, $buf) ;
+	}
+}
+
+
+sub write_to {
+	my $h = shift ;
+	my $buf = shift ;
+
+	my $res = print $h $buf ;
+	if (! $res){
+		die("print error: $!") ;
+	}
+}
+
+
+sub send_to {
+	my $h = shift ;
+	my $buf = shift ;
+
+	my $res = $h->send($buf) ;
+	if (! defined($res)){
+		die("send error: $!") ;
+	}
+}
+
+
+sub sdebug ($;$$){
+	my $msg = shift ;
+	my $indent = shift ;
+	my $maybe_binary = shift ;
+
+	if ($DEBUG){
+		slog('debug', $msg, $indent, $maybe_binary) ;
+	}
+}
+
+
+sub slog ($$;$$){
+    my $level = shift ;
+    my $msg = shift ;
+	my $indent = shift || '' ;
+	my $maybe_binary = shift ;
+
+	if (($DEBUG)||($SYSLOG)){
+		my @lines = split(/\n/, $msg) ;
+		foreach my $l (@lines){
+			if ($SYSLOG){
+				# We do not send possible binary debug info to syslog since it may screw up syslog.
+				Sys::Syslog::syslog($level, "$indent$l") unless $maybe_binary ;
+			}
+			elsif ($DEBUG){
+				if ((! $maybe_binary)||($DEBUG > 1)){
+					print STDERR "[$$][$level] $indent$l\n" ;
+				}
+			}
+		}
+	}
+}
+
+
+sub sdie ($){
+	my $msg = shift ;
+
+	$DEBUG = 1 ;
+	slog('err', $msg) ;
+	exit(1) ;
+}
+
+
+
+###############################################################################
+
+
+
+package My::HTTunnel::Client ;
+BEGIN { @My::HTTunnel::Client::ISA = qw(HTTunnel::Client) ; }
+
+
+use strict ;
+
+
+sub new {
+	my $class = shift ;
+	my $cfg = shift ;
+
+	my $this = $class->SUPER::new($cfg->{url}, @_) ;
+	$this->{__PACKAGE__}->{cfg} = $cfg ;
+	bless($this, $class) ;
+
+	return $this ;
+}
+
+
+sub get_basic_credentials {
+	my $this = shift ;
+	my $realm = shift ;
+	my $uri = shift ;
+	my $proxy = shift ;
+
+	my $cfg = $this->{__PACKAGE__}->{cfg} ;
+	if ($proxy){
+		return ($cfg->{http_proxy_username}, $cfg->{http_proxy_password}) ;
+	}
+
+	return ($cfg->{http_username}, $cfg->{http_password}) ;
+}
+
+
+sub request_callback {
+	my $this = shift ;
+	my $req = shift ;
+
+	$req->protocol($this->{__PACKAGE__}->{cfg}->{http_protocol}) ;
+	main::sdebug("HTTP Request:") ;
+	main::sdebug(join(' ', $req->method(), $req->uri(), $req->protocol()), '  ') ;
+	main::sdebug($req->headers()->as_string(), '  ') ;
+	main::sdebug($req->content(), '  ', 1) ;
+}
+
+
+sub response_callback {
+	my $this = shift ;
+	my $resp = shift ;
+
+	main::sdebug("HTTP Response:") ;
+	main::sdebug(join(' ', $resp->protocol(), $resp->code(), $resp->message()), '  ') ;
+	main::sdebug($resp->headers()->as_string(), '  ') ;
+	main::sdebug($resp->content(), '  ', 1) ;
+}

@@ -1,0 +1,13 @@
+
+                    Profiler Example
+                    ================
+
+An example of profiling using the profiler aspect. Requires
+Benchmark::Timer. We profile all calls on SlowObject, which were made
+from its method run(). Here is what a sample run should look like:
+
+  Done with SlowObject::run
+  2 trials of SlowObject::fast (0s total), 0s/trial
+  1 trial of SlowObject::slow (1.021s total)
+  1 trial of SlowObject::very_slow (2s total)
+

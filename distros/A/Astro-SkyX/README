@@ -1,0 +1,44 @@
+Astro::SkyX version 0.03
+=================
+
+  The SkyX perl module allows a programmer to interact with the
+SkyX scripting engine. Syntax is very close to the Java script
+syntax documented in the Software Bisque Script TheSkyX Documentation.
+
+  Read the perldoc for more information.
+  
+  There is an included test script (SkyX_Test.pl) that demonstrates
+many of the SkyX functions.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ IO::Socket;
+ Scalar::Util;
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2013 by Robert Woodard
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+There are restrictions on commercial use of the SkyX scripting engine.
+Please see the Software Bisque End User License Agreement prior to
+using this module in a commercial setting.
+
+
+

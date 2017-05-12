@@ -1,0 +1,18 @@
+exclude  = Miscellanea::RequireRcsKeywords
+severity = 1
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | METHODS | DEPENDENCIES | BUGS AND LIMITATIONS | AUTHOR | LICENSE AND COPYRIGHT
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print
+
+[TestingAndDebugging::RequireUseStrict]
+severity = 5
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 5
+
+[Documentation::PodSpelling]
+stop_words = CAS login CPAN AnnoCPAN username ServiceTicket TicketGrantingCookie HASHREF perldoc CPAN's UserAgent redirectable

@@ -1,0 +1,88 @@
+# init autoconf (and check for presence of libnova.h)
+AC_INIT(src/libnova/libnova.h)
+
+# Save this value here, since automake will set cflags later
+cflags_set=${CFLAGS+set}
+
+# libtool versioning
+LIBNOVA_MAJOR_VERSION=0
+LIBNOVA_MINOR_VERSION=15
+LIBNOVA_MICRO_VERSION=0
+LIBNOVA_VERSION=$LIBNOVA_MAJOR_VERSION.$LIBNOVA_MINOR_VERSION.$LIBNOVA_MICRO_VERSION
+AC_SUBST(LIBNOVA_MAJOR_VERSION)
+AC_SUBST(LIBNOVA_MINOR_VERSION)
+AC_SUBST(LIBNOVA_MICRO_VERSION)
+AC_SUBST(LIBNOVA_VERSION)
+
+LT_VERSION=$LIBNOVA_MICRO_VERSION
+LT_RELEASE=$LIBNOVA_MAJOR_VERSION.$LIBNOVA_MINOR_VERSION
+AC_SUBST(LT_VERSION)
+AC_SUBST(LT_RELEASE)
+
+VERSION=$LIBNOVA_VERSION
+PACKAGE=libnova
+
+AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
+
+# Specify a configuration file
+AM_CONFIG_HEADER(config.h)
+
+dnl Initialize libtool
+AM_PROG_LIBTOOL
+
+dnl Initialize maintainer mode
+AM_MAINTAINER_MODE
+
+# Checks for programs.
+AC_PROG_CC
+AM_PROG_CC_STDC
+AC_PROG_INSTALL
+AC_CHECK_FUNCS([gettimeofday])
+AC_CHECK_FUNCS([modf])
+AC_CHECK_FUNCS([pow])
+AC_CHECK_FUNCS([sqrt])
+AC_CHECK_FUNCS([strchr])
+AC_CHECK_FUNCS([strpbrk])
+AC_CHECK_FUNCS([strtol])
+AC_CHECK_FUNCS([tzset])
+AC_CHECK_HEADERS([malloc.h])
+AC_CHECK_HEADERS([sys/time.h])
+AC_C_CONST
+AC_FUNC_ALLOCA
+AC_FUNC_STRTOD
+AC_HEADER_TIME
+AC_STRUCT_TM
+
+AC_CHECK_LIB(m,pow)
+AC_CHECK_LIB(sunmath,acosl)
+
+AC_CHECK_FUNCS([round])
+AC_CHECK_FUNCS([cosl])
+AC_CHECK_FUNCS([sinl])
+AC_CHECK_FUNCS([acosl])
+AC_CHECK_FUNCS([asinl])
+AC_CHECK_FUNCS([atan2l])
+
+CFLAGS=-Wall
+
+# Checks for header files.
+AC_HEADER_STDC
+
+# Set LIBNOVA_MACRO_DIR
+if test "x${prefix}" = "xNONE"; then
+  LIBNOVA_MACRO_DIR=${ac_default_prefix}/share/aclocal
+  AC_SUBST(LIBNOVA_MACRO_DIR)
+else
+  LIBNOVA_MACRO_DIR=\${prefix}/share/aclocal
+  AC_SUBST(LIBNOVA_MACRO_DIR)
+fi
+
+AC_OUTPUT([
+Makefile
+src/Makefile
+src/libnova/Makefile
+lntest/Makefile
+doc/Makefile
+doc/doxyfile
+examples/Makefile
+])

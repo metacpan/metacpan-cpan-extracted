@@ -1,0 +1,107 @@
+NAME
+    App::GitHub::FixRepositoryName - Fix your .git/config after a
+    repository-name case change
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+        github-fix-repository-name .git/config
+
+        github-fix-repository-name My-Repository/ # ...should contain a .git directory
+
+        cd .git; github-fix-repository
+
+        # All of the above do the same thing, basically
+
+DESCRIPTION
+    App::GitHub::FixRepositoryName will automatically find and update the
+    github repository URLs in .git/config (so that they have the right
+    casing). It will first make a backup of your .git/config AND it will
+    prompt you before writing out the new config (and show it to you first)
+
+INSTALL
+    You can install App::GitHub::FixRepositoryName by using CPAN:
+
+        cpan -i App::GitHub::FixRepositoryName
+
+    If that doesn't work properly, you can find help at:
+
+        http://sial.org/howto/perl/life-with-cpan/
+        http://sial.org/howto/perl/life-with-cpan/macosx/ # Help on Mac OS X
+        http://sial.org/howto/perl/life-with-cpan/non-root/ # Help with a non-root account
+
+CONTRIBUTE
+    You can contribute or fork this project via GitHub:
+
+    <http://github.com/robertkrimen/App-GitHub-FixRepositoryName/tree/master
+    >
+
+        git clone git://github.com/robertkrimen/App-GitHub-FixRepositoryName.git
+
+USAGE
+  github-fix-repository-name
+    A commandline application that will fix a given .git/config to have the
+    right repository name(s)
+
+        Usage: github-fix-repository-name [...] <path1> <path2> ... 
+
+            --backup-to <directory>     Backup 'config' to <directory> (default is the same directory)
+
+            --no-backup                 Do not make a backup first
+
+            --always-yes                Assume yes when asking to write out the new config
+
+            --help, -h, -?              This help
+
+        For example:
+
+            github-fix-repository-name .git/config
+
+            github-fix-repository-name My-Project1 xyzzy/My-Project2 # Fix many at once
+
+SEE ALSO
+    App::GitHub::FindRepository
+
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-app-github-fixrepositoryname at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-GitHub-FixRepository
+    Name>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc App::GitHub::FixRepositoryName
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-GitHub-FixRepositoryNa
+        me>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/App-GitHub-FixRepositoryName>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/App-GitHub-FixRepositoryName>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/App-GitHub-FixRepositoryName/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

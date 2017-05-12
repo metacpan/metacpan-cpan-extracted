@@ -1,0 +1,213 @@
+
+                                 Identification:
+TELESCOP= 'UKIRT             ' / Telescope name
+INSTRUME= 'WFCAM             ' / Instrument
+CAMNUM  =                    1 / Number of WFCAM camera (1, 2, 3 or 4)
+DHSVER  = 'UKDHS 2002 Oct 31 ' / Data handling version
+HDTFILE = 'wfcam.hdt         ' / Name of global hdt file
+HDTFILE2= 'wfcam2.hdt        ' / Name of camera-specific hdt file
+OBSERVER                       / Observers names
+USERID                         / Userid logged in as
+OBSREF                         / PATT or other reference
+PROJECT = 'U/EC/10 '           / Time-allocation code
+SURVEY                         / Survey name
+SURVEY_I                       / Pointing ID within survey
+MSBID   = 'none    '           / Id min.-schedulable block
+
+                                 eStar headers:
+RMTAGENT= 'none    '           / Name of remote agent
+AGENTID = 'none    '           / Unique identifier for remote agent
+
+OBJECT  = 'CMC307958'          / Object name from telescope
+
+                                 Data Reduction:
+RECIPE  = 'FOCUS_REDUCE'       / Data reduction recipe to be used
+OBSTYPE = 'OBJECT  '           / BIAS|DARK|SKYFLAT|DOMEFLAT|OBJECT|SKY|FOCUS
+OBSNUM  =                  349 / Observation number
+GRPNUM  =                  339 / Group number applied to all members
+GRPMEM  =                    F / Group membership
+TILENUM =                    0 / Tile number applied to all members
+STANDARD=                    F / Is the target a standard star observation?
+NJITTER =                    1 / Number of positions in tel jitter pattern
+JITTER_I=                    1 / Serial number in this tel jitter pattern
+JITTER_X=                 0.00 / [arcsec] X (RA) offset in tel jitter pattern
+JITTER_Y=                 0.00 / [arcsec] Y (Dec) offset in tel jitter pattern
+NUSTEP  =                    1 / Number of positions in microstep pattern
+USTEP_I =                    1 / Serial number in this microstep pattern
+USTEP_X =                 0.00 / [arcsec] X (RA) offset in microstep pattern
+USTEP_Y =                 0.00 / [arcsec] Y (Dec) offset in microstep pattern
+NFOC    =                    0 / Number of positions in focus scan
+NFOCSCAN=                    0 / Number of focus scans in focus test
+
+                                 Astrometric and time information:
+UTDATE  = '20050404'           / UT date as integer in yyyymmdd format
+DATE-OBS= '2005-04-04T10:31:11.267' / Date time (UTC) of start of observation
+DATE-END= '2005-04-04T10:31:23.588' / Date time (UTC) of end of observation
+MJD-OBS =          53464.43832 / DATE-OBS as Modified Julian Date
+WCSAXES =                    2 / Number of axes in world co-ordinate system
+RADESYS = 'FK5     '           / Mean IAU 1984 equatorial co-ordinates
+EQUINOX =             2000.000 / [yr] Equinox of object position
+TRACKSYS= 'J2000   '           / Telescope tracking coordinate system
+CTYPE1  = 'RA---ZPN'           / Algorithm type for axis 1
+CTYPE2  = 'DEC--ZPN'           / Algorithm type for axis 2
+
+CRPIX1  =               3003.6 / [pixel] Reference pixel along axis 1 (RA)
+CRPIX2  =               -959.2 / [pixel] Reference pixel along axis 2 (Rec)
+CRVAL1  =          165.4878096 / [deg] Right ascension at the reference pixel
+CRVAL2  =           19.5088855 / [deg] Declination at the reference pixel
+CRUNIT1 = 'deg     '           / Unit of right ascension co-ordinates
+CRUNIT2 = 'deg     '           / Unit of declination co-ordinates
+
+CD1_1   =        -1.105000E-07 / Transformation matrix element
+CD1_2   =        -1.113000E-04 / Transformation matrix element
+CD2_1   =         1.112000E-04 / Transformation matrix element
+CD2_2   =        -1.627000E-07 / Transformation matrix element
+
+PV2_1   =         1.000000E+00 / Pol.coeff. for pixel -> celestial coord
+PV2_2   =         0.000000E+00 / Pol.coeff. for pixel -> celestial coord
+PV2_3   =        -5.000000E+01 / Pol.coeff. for pixel -> celestial coord
+
+RABASE  =           11.0323949 / [h] Right ascension of base position
+DECBASE =           19.5093799 / [deg] Declination of base position
+TELRA   =           11.0325206 / [h] Current telescope right ascension
+TELDEC  =           19.5088855 / [deg] Current telescope declination
+GSRA    =           11.0323949 / [h] Right ascension of guide star
+GSDEC   =           19.5093799 / [deg] Declination of guide star
+HABASE  =           29.5649638 / [deg] Hour angle
+TRAOFF  =                6.400 / [arcsec] Telescope offset in RA
+TDECOFF =               -1.780 / [arcsec] Telescope offset in Dec
+AMSTART =                1.131 / Airmass at start of observation
+AMEND   =                1.131 / Airmass at end of observation
+
+                                 Instrument aperture:
+APER_X  =                0.000 / [arcsec] Aperture X axis coordinate
+APER_Y  =                0.000 / [arcsec] Aperture Y axis coordinate
+
+                                 ISU2 parameters
+ISU2PORT= 'East    '           / ISU2 port name
+ISU2POFF=                    0 / ISU2 port offset
+ISU2TOFF=                    0 / ISU2 tilt offset
+
+                                 Guider:
+GUIDING = 'OFF     '           / Guider status: OFF|ON|PAUSED
+AGFREQ  =               50.000 / Autoguider: Frequency
+FGMODE  = 'Fast Guider'        / Fast guider mode
+
+
+                                 Instrument detector configuration:
+DETECTOR= 'RSC Hawaii 2'       / Type of detector array used
+DETECTID= 'RSC:H2:60'          / Serial number of detector array
+NINT    =                    1 / Number of integrations in observation
+DROWS   =                 2048 / [pixel] Number of detector rows
+DCOLUMNS=                 2048 / [pixel] Number of detector columns
+RDOUT_X1=                    1 / Start column of array readout
+RDOUT_X2=                 2048 / Start column of array readout
+RDOUT_Y1=                    1 / Start row    of array readout
+RDOUT_Y2=                 2048 / Start row    of array readout
+PIXLSIZE=               0.4000 / [arcsec] Pixel size
+
+                                 Detector controller:
+PCSYSID = 'wfacq1  '           / PC system identifier
+SDSUID  = '1e1d1c17'           / Serial number of SDSU controller
+READMODE= 'CDS     '           / Name of camera readmode
+CAPPLICN= 'do_mean_wfcam_cds'  / Name of camera readout application
+CAMROLE = 'master  '           / Camera role (master|slave|unsync)
+CAMPOWER= 'On      '           / Camera power (On|Off)
+RUNID   = '/home/wfcam/ucam/data/run00000350' / Name of raw data file
+READOUT = 'CDS     '           / Camera readout (CDS|NDR|SAR|RRR)
+EXP_TIME=             5.000000 / [s] Integration time per exposure
+NEXP    =                    2 / Number of exposures in integration
+READINT =             0.000000 / [s] Interval between reads
+NREADS  =                    2 / Number of reads per exposure
+GAIN    =                4.500 / [electrons/ADU] Detector gain
+
+                                 Environment:
+AIRTEMP =              -65.546 / [degC] Air temperature
+BARPRESS=              614.335 / [mbar] Ambient pressure
+DEWPOINT=              -75.584 / [degC] Dewpoint
+DOMETEMP=                0.056 / [degC] Dome temperature
+HUMIDITY=               23.001 / Relative Humidity
+MIRR_NE =                1.502 / [degC] Mirror temperature NE
+MIRR_NW =                1.175 / [degC] Mirror temperature NW
+MIRR_SE =                0.196 / [degC] Mirror temperature SE
+MIRR_SW =                0.203 / [degC] Mirror temperature SW
+MIRRBTNW=                3.966 / [degC] Mirror bottom temp. SW
+MIRRTPNW=                2.294 / [degC] Mirror top temp. SW
+SECONDAR=               -1.583 / [degC] Temperature of secondary
+TOPAIRNW=                0.110 / [degC] Top air NW
+TRUSSENE=                1.234 / [degC] Truss leg ENE
+TRUSSWSW=               -1.030 / [degC] Truss leg WSW
+WIND_DIR=              245.069 / [deg] Wind direction, azimuth
+WIND_SPD=               18.446 / [km/s] Wind speed
+CSOTAU  =                0.050 / Tau at 225 GHz from CSO
+TAUDATE = '2005-04-04T10:22'   / Time and date of Tau reading
+TAUSRC  = 'CSO225GHZ'          / Source of opacity data
+
+
+                                      Image quality related parameters:
+IZ5     =              895.000 / Astigmatism: IZ5
+HZ5SH   =             -890.000 / Astigmatism: HZ5SH
+HZ5CH   =              235.000 / Astigmatism: HZ5CH
+HZ5SD   =            -1470.000 / Astigmatism: HZ5SD
+HZ5CD   =              370.000 / Astigmatism: HZ5CD
+IZ6     =            -1662.000 / Astigmatism: IZ6
+HZ6SH   =             -846.000 / Astigmatism: HZ6SH
+HZ6CH   =              200.000 / Astigmatism: HZ6CH
+HZ6SD   =              205.000 / Astigmatism: HZ6SD
+HZ6CD   =             1190.000 / Astigmatism: HZ6CD
+Z7      =             -405.000 / Coma: Z7
+Z8      =             1450.000 / Coma: Z8
+WEBEAM  =             -405.000 / Topend: W-E beam
+NSBEAM  =               45.000 / Topend: N-S beam
+IZ9     =             -358.000 / Trefoil: IZ9
+HZ9SH   =              125.000 / Trefoil: HZ9SH
+HZ9CH   =              240.000 / Trefoil: HZ9CH
+HZ9SD   =              295.000 / Trefoil: HZ9SD
+HZ9CD   =             -160.000 / Trefoil: HZ9CD
+IZ10    =              535.000 / Trefoil: IZ10
+HZ10SH  =              114.000 / Trefoil: HZ10SH
+HZ10CH  =                0.000 / Trefoil: HZ10CH
+HZ10SD  =              -25.000 / Trefoil: HZ10SD
+HZ10CD  =             -270.000 / Trefoil: HZ10CD
+Z11     =              300.000 / Spherical: Z11
+AAMP    =              882.934 / Astigmatism: amplitude
+APHI    =              -26.797 / Astigmatism: angle
+TAMP    =              356.475 / Trefoil: Amplitude
+TPHI    =               37.711 / Trefoil: angle
+
+
+                                 M2 raw positions
+M2_X    =               -0.800 / [mm]   M2 X (E-W) raw position
+M2_Y    =                0.200 / [mm]   M2 Y (N-S) raw position
+M2_Z    =                1.804 / [mm]   M2 Z (focus) raw position
+M2_U    =                2.100 / [mrad] M2 U (N-S tilt) raw position
+M2_V    =                1.400 / [mrad] M2 V (E-W tilt) raw position
+M2_W    =                0.000 / [mrad] M2 W (axial rotation) raw position
+TCS_FOC =               -3.620 / telescope (TCS) focus
+TEL_FOFF=                0.000 / focus offset for inst. filter
+
+                                 Instrument optical configuration:
+FOC_POSN=                0.660 / [mm] Internal focus position
+FOC_ZERO=                3.500 / [mm] Focus zero-point position
+FOC_OFFS=                0.500 / [mm] Focus offset
+FOC_FOFF=                0.160 / [mm] Focus filter offset
+FILTER  = 'K       '           / Filter name
+
+                                 Engineering:
+DET_TEMP=                 74.6 / [K] Detector array temperature
+DETTEMPB=                 74.7 / [K] DET_TEMP alternate sensor
+DETTEMPS=                 75.0 / [K] Det temperature setpoint
+DET_HTP =                 53.5 / [percent] Det heater level
+CCD_TEMP=                160.3 / [K] AG CCD temperature
+CCDTEMPS=                160.0 / [K] AG CCD temperature setpoint
+CCD_HTP =                 11.5 / [percent] AG CCD heater level
+FS_TEMP =                 75.1 / [K] CCC 1st stage temperature
+LNC_TEMP=                106.6 / [K] LN can temperature
+SS_TEMP =                 18.9 / [K] CCC 2nd stage temperature
+M3_TEMP =                128.0 / [K] M3 temperature
+TR_TEMP =                134.4 / [K] Top ring temperature
+RS_TEMP =                148.1 / [K] Rad shield temperature
+CP_TEMP =                197.4 / [K] Cor plate temperature
+SC_TEMP =                273.7 / [K] SCSU cab temperature
+CC_PRES =          6.49900e-06 / [mbar] Cryostat Pressure
+CNFINDEX=             22537434 / Configuration index

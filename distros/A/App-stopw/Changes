@@ -1,0 +1,20 @@
+Revision history for App-stopw
+
+0.03    2016-07-30 (PERLANCAR)
+
+	- Add option to show banner ASCII art of mm:ss instead
+	  (--banner-size).
+
+
+0.02    2014-09-11 (PERLANCAR)
+
+        - Add Enter as alias for S (start/stop).
+
+        - Change default refresh rate from 0.01s to 0.02s.
+
+        - Add whitespace at the end so cursor is less distracting.
+
+
+0.01    2014-09-09 (PERLANCAR)
+
+        - First release.

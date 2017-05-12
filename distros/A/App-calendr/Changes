@@ -1,0 +1,53 @@
+Revision history for App::calendr
+
+0.15  Sat Apr 08 18:50:00 2017
+      - Updated copyright year information in the pod document.
+
+0.14  Mon Feb 20 11:25:00 2017
+      - Fixed inconsistent version issues.
+      - Updated dependency on MooX::Options v4.023.
+
+0.13  Fri Jan 13 10:35:00 2017
+      - Made command line parameter --name, optional. Default is Gregorian.
+
+0.12  Thu Jun 16 12:30:00 2016
+      - Added command line parameter "--list_month_names".
+
+0.11  Sat Jun 11 01:30:00 2016
+      - Updated "SYNOPSIS" with respect to the changes to the parameter --month.
+
+0.10  Wed Jun 08 10:25:00 2016
+      - Added support for month name in addition to month number. Now --month flag can be set as month name.
+
+0.09  Sun May 08 02:30:00 2016
+      - Added ability to generate calendar in SVG format.
+
+0.08  Sat Mar 19 06:10:00 2016
+      - Added support for Gregorian Calendar.
+      - Updated copyright year information in the pod document.
+
+0.07  Wed Jan 06 10:10:00 2016
+      - Fixed 'provides' list in the Makefile.PL script.
+      - Added $AUTHORITY to the distribution.
+
+0.06  Sun Nov 22 10:15:00 2015
+      - Added key 'provides' to the Makefile.PL script.
+
+0.05  Sun Jul 12 05:40:00 2015
+      - Added two new command line optional flags "--gregorian" and "--julian".
+      - Added unit test for the new command line flags.
+
+0.04  Sun Jun 07 09:15:00 2015
+      - Made the Calendar::Bahai 0.23 as pre-requisite for test 01-app-calendr.t script.
+
+0.03  Sat Jun 06 10:20:00 2015
+      - Extracted out options and added as Moo Role (App::calendr::Option).
+      - Added unit test script t/01-app-calendr.t
+
+0.02  Sat Apr 25 09:30:00 2015
+      - Updated Makefile.PL script regarding the version of pre-requisites.
+      - Fixed the typo in the section "SYNOPSIS".
+      - Restructured the section "SUPPORTED CALENDARS" to make it easy to understand.
+
+0.01  Wed Apr 22 13:00:00 2015
+      - Module Created.

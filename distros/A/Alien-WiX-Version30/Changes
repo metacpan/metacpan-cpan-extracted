@@ -1,0 +1,35 @@
+Revision history for Alien-WiX-Version30
+
+1.305419001  Sat May 15 2010
+       Updated to handle x64 perl correctly.
+
+1.305419  Sat Jul 11 2009
+       Updated to download WiX 3.0.5419.
+       Will allow installation of future 3.5 versions.
+	   Added tests to match my other modules.
+
+0.305405  Sat Jun 08 2009
+       Updated to download WiX 3.0.5405.
+       Corrected downloading of .NET Framework.
+
+0.305301  Sat May 02 2009
+       Updated to download WiX 3.0.5301.
+
+0.305224  Mon Apr 27 2009
+       Updated to download WiX 3.0.5224.
+
+0.305217  Sat Apr 18 2009
+       Updated to download WiX 3.0.5217.
+
+0.305210  Sat Apr 11 2009
+       Updated to download WiX 3.0.5210.
+
+0.305207  Tue Apr 07 2009
+       Updated to download WiX 3.0.5207.
+
+0.305121  Fri Apr 03 2009
+       Changing way version is calculated.
+
+0.305120  Wed Mar 21 2009
+       Initial release (WiX 3.0.5120).
+

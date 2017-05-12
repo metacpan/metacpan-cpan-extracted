@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<content>
+<pkit_nav_title>Resticted page</pkit_nav_title>
+<html_title>PageKit.org | Restricted page</html_title>
+
+      <demo_desc>
+	<feature>Restricted pages</feature>
+
+	<description>This page is only visible if you login recently.</description>
+
+      </demo_desc>
+
+
+</content>

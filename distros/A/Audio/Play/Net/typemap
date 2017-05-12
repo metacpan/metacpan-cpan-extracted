@@ -1,0 +1,16 @@
+TYPEMAP
+AuServer *	T_SERVER
+
+INPUT
+T_SERVER
+	if (sv_isobject($arg)) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = ($type) tmp; 
+	}
+	else
+	    croak(\"$var is not an object\")
+
+OUTPUT
+T_SERVER
+	sv_setref_pv($arg, \"${Package}\", (void *) $var);
+

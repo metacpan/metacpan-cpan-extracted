@@ -1,0 +1,309 @@
+2011-08-20 Mark Whittington <markwhi@cpan.org>
+
+  * Release 0.95
+
+	* Fixed bug 40155 (https://rt.cpan.org/Ticket/Display.html?id=40155)
+	  - t/value.t now passes all tests
+
+	* Updated version in README from 0.93 to 0.95
+
+2006-04-11 Daniel Muey <dmuey@cpan.org>
+
+	* Release 0.93
+
+	* Fixed bug 18792 (http://rt.cpan.org/Public/Bug/Display.html?id=18792)
+
+	* Updated version in README from 0.91 to 0.93
+
+2004-12-08  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.92
+
+	* Fix CPAN case #8782: destroy() method doesn't a true value on
+          succesfully deleting empty sections
+
+2003-01-25  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.91
+
+	* Change the name() accessor behavior. Instead of returning the
+	directive and section's name in lowercase, it no longer alter the
+	case. Be careful, this change may broke your programs
+
+	* Add some notice in the doc about the misunderstanding of the
+	use of file handle with this module.
+
+2002-11-15  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.90
+
+	* Feed documentation
+
+	* Add dump_reformat() method
+
+	* Rewrite write_<type>() methods to allow to change theirs
+	contents via set_write_<type>() methods.
+
+	* Replace the "top" property by a dynamic top-level discovery
+	engine.
+
+	* Change add() method to accept an already formed item in argument
+	instead of its description (type, name, value).
+
+	* Implement clone(), copy() and move() methods
+
+	* Rewrite of delete(), remove() and destroy() methods
+
+	* Add internal _add_child() method and implement it in
+	_insert_*(), add() and clone() methods
+
+	* Fix select() method, now allow to search items of different
+	types with (for example) same names
+
+	* Add -create option to constructor
+
+	* Add -reformat option to save() method
+
+	* Add write_blank() method
+
+	* Add some example scripts into the eg/ folder
+
+	* Add comment grouping feature which allow consecutive comment
+	lines to be grouped in a single comment item
+
+	* Add blank lines grouping, same as comment grouping for blank
+	lines
+
+	* Fix first_line and last_line methods
+
+	* Add count_lines method
+
+        * Rename remove method to unlink()
+
+	* Turn this project in pre-stable state
+
+2002-08-26  Olivier Poitrey  <rs@rhapsodyk.net>
+	
+	* Release 0.56
+
+	* Fix major bug in _get_index() method. Impact delete() method.
+	Thanks to Scott Beck
+          
+2002-08-11  Olivier Poitrey  <rs@rhapsodyk.net>
+	
+	* Release 0.55
+
+	* Rewrite line continuation mechanism
+
+2002-08-15  Olivier Poitrey  <rs@rhapsodyk.net>
+	
+	* Release O.54
+
+	* Fix a major bug in save method (thanks to Szilveszter Farkas)
+	
+	* Rename some internal variables
+
+2002-07-15  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.53
+
+	* Fix saveas() method
+
+2002-06-07  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.52
+	
+	* Fix big memory leak problem (thanks to Scott Beck)
+
+	* Fix miscellaneous bugs
+
+2002-06-07  Olivier Poitrey  <rs@rhapsodyk.net>
+	
+	* Release 0.51
+
+	* Fix select() method
+
+2002-06-07  Olivier Poitrey  <rs@rhapsodyk.net>
+	
+	* Release 0.50
+
+	* Fix many major bugs
+
+	* Rewrite entire module with a new algorithm
+
+	* Homogenization of API (may distrub you old applications !)
+
+	* Change no longer support old API (-oldapi option)
+
+	* Change all methods are overloaded to return its value. Using
+	overloading feature *is now really deprecated*
+
+	* New support for indentation
+	
+	* New handle comment and blank lines
+
+	* New methods : add, select, add_comment, comment, add_blank and
+	blank
+			
+	* Upgrade documentation
+
+	* Optimizations it's now very fast ! =)
+
+2002-06-03  Olivier Poitrey  <rs@rhapsodyk.net>
+	
+	* Release 0.21 Mon Jun 3 16:39:41 2002
+	
+	* Fix major bugs. Correction of '-ontop', '-onbottom', '-after'
+	and '-before' parameters behavior in 'add_directive' and
+	'add_section' methods.
+
+2002-06-03  Olivier Poitrey  <rs@rhapsodyk.net>
+	
+	* Release 0.20
+	
+	* Fix major bugs
+	
+	* Rethink completely the algorithm, it's 65 times faster !
+
+2002-04-11  Olivier Poitrey  <rs@rhapsodyk.net>
+	
+	* Release 0.16
+	
+	* Fix major bug, no longer merging namespace of identical (same
+	name/value) sections
+
+2001-12-11  Olivier Poitrey  <rs@rhapsodyk.net>
+	
+	* Release 0.15
+	
+	* Fix minor bug, add_(section|directive) with option -onbottom
+	weren't work properly
+	
+	* Add dump_raw() method 
+
+2001-12-08  Olivier Poitrey  <rs@rhapsodyk.net>
+	
+	* Release 0.14 Sat Dec  8 14:14:50 2001
+	
+	* Fix major bug that cause an endless loop in the constructor with
+	perl 5.005 and maybe 5.6
+	
+	* Fix error messages
+
+2001-12-06  Olivier Poitrey  <rs@rhapsodyk.net>
+	
+	* Release 0.13
+	
+	* Fix compatibility problem with perl 5.005, thinks to Anton
+	Berezin
+
+	* Fix error when add_(directive|section) on an empty file
+
+2001-11-11  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.12
+	
+	* New feature, constructor and save() method now accept file
+	handle instead of file path. Thanks Peter Suschlik for his patch.
+
+2001-10-25  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.11
+
+	* Fix bug in add_section method. add_section will add entries
+	before the last context's section line.
+
+2001-10-12  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.10
+	
+	* Fix bug in test scripts, that makes test fail randomly
+
+	* Change directive() now returns full list of directives, sorted
+	as it comes in the file. Each element of this list is an object
+	that points to the directive entry.
+
+	* Change directive(Foo) also returns a full list of value of all
+	"Foo" directive in current context, also sorted as it comes in the
+	file. Each list's element is also an object that points to the
+	directive entry.
+
+	* Change directive(Foo, Bar) returns an object that points to the last
+	directive (if more than one) wich has the same directive's
+	name/value. In list context, it returns the full list of same
+	directive's name/value.
+
+	* Change directive() can now takes the -which=>N parameter to
+	select the entry's number to return (if exists).
+
+	* Change directive() can now takes 4 new type of parameters:
+	-before, -after, -ontop and -onbottom.
+
+	* Modification of parser to allow sections to have same name than
+	directive in the same context without clash.
+	
+	* New methods (see documentation for more details) first_line,
+	last_line, lines, dump_line, isin, type and name.
+	
+	* Change API, so contructor can take the -oldapi=>1 argument for a
+	backward compatibility
+
+2001-09-20  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.07
+
+	* Change, section and directive methods no any longer return an
+	arrayref in list context but a simple list. Documentation
+	corrected (thanx to Nathan Wiger for this suggestion).
+
+2001-09-18  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.6
+
+	* Add a quick and dirty documentation
+	
+	* Change value() method, returns the context value if no arguments
+	given
+
+	* Change new() method, can be called without argument, save()
+	need an argument in this case
+
+2001-08-18  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.05
+	
+	* Fix major bug, if config file wasn't exists, module won't work !
+	
+	* Fix bug, value() method wasn't took the appropriate value to
+	change it, resulting to an unchanged value
+
+	* Fix bug, $master and $root value was undefined in value method,
+	so value wasn't work at all
+
+2001-08-17  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.4
+	
+	* Fix a minor bug in directive method.
+
+2001-08-17  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.03
+
+	* Fix a major bug in directive method.
+
+2001-08-16  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.02
+
+	* Put module on CPAN
+	
+	* Fix a very major bug that cause "syntax error" from parser on
+	directives with no value like "clearmodulelist", thanx A2 for this
+	report.
+
+2001-08-12  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.01
+
+	* Original version

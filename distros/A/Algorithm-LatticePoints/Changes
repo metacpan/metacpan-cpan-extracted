@@ -1,0 +1,11 @@
+#
+# $Id: Changes,v 0.1 2007/02/04 05:45:16 dankogai Exp dankogai $
+#
+# Revision history for Perl extension Algorithm::LatticePoints.
+
+$Revision: 0.1 $ $Date: 2007/02/04 05:45:16 $
+
+0.01  Sun Feb  4 13:58:05 2007
+	- original version; created by h2xs 1.23 with options
+		-XA -n Algorithm::LatticePoints
+

@@ -1,0 +1,15 @@
+MANIFEST.bak
+Makefile.old
+Makefile$
+README.pod
+.gitignore
+.git/
+blib/
+pm_to_blib
+MYMETA.*
+META.*
+Alien-OpenVcdiff.*tar[.]gz$
+Build$
+_build/
+_alien/
+_share/

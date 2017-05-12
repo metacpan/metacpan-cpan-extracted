@@ -1,0 +1,49 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::BOS;
+use POSIX qw(strftime);
+
+my ($server, $cellname, $bos, $lastmod, $keylist, $show);
+
+die "Usage: $0 server [show [cell]]\n" if $#ARGV < 0;
+
+$server   = shift;
+$show     = shift;
+$cellname = shift;
+
+if ($cellname) { $bos = AFS::BOS->new($server, 0, 0, $cellname); }
+else           { $bos = AFS::BOS->new($server); }
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+if ($show) { ($lastmod, $keylist) = $bos->listkeys($show); }
+else       { ($lastmod, $keylist) = $bos->listkeys; }
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+if ($keylist) {
+    foreach my $key (keys %{$keylist}) {
+        print "Key with kvno $key:\n";
+        foreach (keys %{$keylist->{$key}}) {
+            if ($_ eq 'key') { print_key($keylist->{$key}->{$_}); }
+            else { print "\tkey: $_, Value: '$keylist->{$key}->{$_}'\n"; }
+        }
+    }
+}
+
+chomp($lastmod = strftime('%d %b %R %Y', localtime($lastmod)));
+print "Keys last changed on $lastmod\n";
+print "All done.\n";
+
+$bos->DESTROY;
+
+sub print_key {
+    my $key = shift;
+
+    print "key is: ";
+    my (@val) = unpack("C*", $key);
+    foreach (@val) { printf("\\%o", $_); }
+    print "\n";
+}

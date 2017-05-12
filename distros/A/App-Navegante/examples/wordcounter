@@ -1,0 +1,131 @@
+filename(./wordcounter)
+formtitle(Word Counting Tool)
+proc(wcFunction)
+desc(wcDesc)
+init(wcInit)
+livefeedback(wcLive)
+quit(wcQuit)
+
+##
+
+=head1 NAME
+
+wordcounter - an application built using Navegante
+
+=head1 SYNOPSIS
+
+Build the application:
+
+  $ navegante examples/wordcounter
+
+Use the newly created file I<wordcounter> as a CGI.
+
+=head1 DESCRIPTION
+
+This application behaves as a CGI and it counts the words being in the 
+content being browsed. On every request we are using the live feedback
+option of our application banner to print the number of browsed words.
+Also, we are keeping track of the total of words being counted, we print
+this information when the user quits the application. The specific DSL 
+section is:
+
+  cginame(./wordcounter)
+  formtitle(Word Counting Tool)
+  proc(wcFunction)
+  desc(wcDesc)
+  init(wcInit)
+  livefeedback(wcLive)
+  quit(wcQuit)
+
+=head1 VARIABLES
+
+=head2 C<$current>
+
+This variable is used to keep count of words in every request.
+
+=cut 
+
+$current;
+
+=head1 FUNCTIONS
+
+=head2 C<wcDesc>
+
+This function prints the description of the application. This
+is defined in the DSL by the C<desc> statement.
+
+=cut
+
+sub wcDesc {
+    return "Word counting utility.";
+}
+
+=head2 C<wcFunction>
+
+This is the function that actually counts the number of words. This
+is defined in the DSL by the C<proc> statement.
+
+XXX - _loadit
+
+=cut
+
+sub wcFunction {
+    my $item = shift;
+    if ($item =~ m/__MARCA__/) {
+        $item = _loadit($item);
+    }
+    else {
+        @words = split(/\s+/, $item);
+        $current += @words;
+print STDERR "ERR in @words i have $current\n";
+        $estado{'count'} += @words;
+    }
+    return $item;
+}
+
+=head2 C<wcLive>
+
+This is the function that prints the HTML that feeds the banner section
+for reporting information. This is defined in the DSL by the 
+C<livefeedback> statement.
+
+=cut
+
+sub wcLive {
+    "Found $current words in this page.";
+}
+
+=head2 C<wcInit>
+
+This function runs on the beginig of every request and it's used here
+to reset the word counter. This is defined in the DSL by the C<init>
+statement.
+
+=cut
+
+sub wcInit {
+    $current = 0;
+}
+
+=head2 C<wcQuit>
+
+The function that is called when the user follows the link to
+leave the application. This is defined in the DSL by the
+C<quit> statement.
+
+=cut
+
+sub wcQuit {
+    return "I found a total of $estado{'count'} words, wordcount quitting.";
+}
+
+=head1 AUTHOR
+
+Nuno Carvalho, smash@cpan.org
+
+=head1 SEE ALSO
+
+TODO
+
+=cut
+

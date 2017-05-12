@@ -1,0 +1,149 @@
+Revision history for Acme-CPANLists-PERLANCAR
+
+0.19    2016-12-28 (PERLANCAR)
+
+	- fmt: Use <pm:...> links in Markdown text to link the modules.
+
+	- [dist] Fix expressing follow-spec prereq relationship with
+	  x_spec.
+
+	- Add module list: PERLANCAR::MyGetoptLongExperiment.
+
+	- Add module list:
+	  PERLANCAR::Task::CheckingModuleInstalledLoadable.
+
+
+0.18    2016-07-26 (PERLANCAR)
+
+	- CustomCPAN: mention WorePAN and CPAN::Mirror::Tiny.
+
+
+0.17    2016-07-24 (PERLANCAR)
+
+        - Add module lists: CustomCPAN & LocalCPANMirror.
+
+        - Add module to Retired list: Module::List::WithPath.
+
+        - Undeprecate Tree::Create::Size for now.
+
+        - Rename module Tree::Create to Tree::Create::Callback.
+
+
+0.16    2016-03-29 (PERLANCAR)
+
+	- Add module list: Task::WorkingWithTree.
+
+	- Remove mention of Class::Build::Array::Glob (the use of
+	  Hook::AfterRuntime makes it problematic to load in some cases),
+	  mention Class::Accessor::Array and Class::Accessor::Array::Glob.
+
+
+0.15    2016-03-26 (PERLANCAR)
+
+        - Add module lists: MooseStyleClassBuilder, NonMooseStyleClassBuilder,
+          ArrayClassBuilder.
+
+
+0.14    2016-03-16 (PERLANCAR)
+
+	- Retired: Mention Carp::Always to boost its 'lcpan related-mods
+          Carp::Always' ranking.
+
+	- Avoided: Add more note about Exporter::Lite.
+
+	- Add module lists: MagicVariableTechniques, Unbless, Weird.
+
+
+0.13    2016-03-09 (PERLANCAR)
+
+	- Wording/grammar.
+
+	- [Bugfix] Fix wrong file name for
+	  ::Task::PickingRandomLinesFromFile.
+
+
+0.12    2016-03-09 (PERLANCAR)
+
+	- Add JSON and JSON::XS to list of modules to avoid.
+
+
+0.11    2016-02-25 (PERLANCAR)
+
+	- Add Exporter::Lite to list of modules to avoid.
+
+
+0.10    2016-02-20 (PERLANCAR)
+
+        - Split each list into a separate module (POD) to help 'lcpan
+          related-mods' result.
+
+          When a POD document mentions unrelated modules together (which is when
+          several unrelated lists are put together in a single POD), it gives a
+          false positive for the 'lcpan related-mods' result which thinks that
+          such modules are related. To help 'lcpan related-mods', I now put each
+          list into a separate POD.
+
+        - Add module list: Getting system-wide temporary directory in a portable
+          way.
+
+        - Add module list: Assertion.
+
+        - Mention about BackPAN or GitHub on how to get retired modules.
+
+        [REMOVED]
+
+        - Remove test lists.
+
+
+0.09    2016-01-23 (PERLANCAR)
+
+	- Add module list: Retired modules.
+
+
+0.08    2015-11-24 (PERLANCAR)
+
+	- Add module list: Picking random lines from a file.
+
+
+0.07    2015-10-29 (PERLANCAR)
+
+	- Add module list: Ensuring only a single instance of program is
+	  running.
+
+
+0.06    2015-10-23 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Update prereq version to Acme::CPANLists 0.9.0 -> 0.90.1.
+
+
+0.05    2015-10-23 (PERLANCAR)
+
+	- Adjust to Acme::CPANLists specification v0.9.0.
+
+
+0.04    2015-10-22 (PERLANCAR)
+
+	- Add module lists: Modules I'm avoiding & Test list.
+
+
+0.03    2015-06-30 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated
+          Pod::Weaver::Plugin::PERLANCAR::CPANLists.
+
+
+0.02    2015-06-30 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated
+          Pod::Weaver::Plugin::PERLANCAR::CPANLists.
+
+
+0.01    2015-06-30 (PERLANCAR)
+
+        - First release.

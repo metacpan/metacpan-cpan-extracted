@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use Config::Apachish::Reader;
+use File::Slurper qw(write_text);
+use JSON;
+
+my $json = JSON->new->allow_nonref->pretty->canonical;
+
+my $reader = Config::Apachish::Reader->new();
+for (glob "share/examples/*.conf") {
+    next if /TODO-|invalid-/;
+    say "$_ ...";
+    write_text("$_.json", $json->encode($reader->read_file($_)));
+}

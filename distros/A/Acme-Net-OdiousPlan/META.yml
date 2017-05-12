@@ -1,0 +1,12 @@
+name: Acme-Net-OdiousPlan
+version: 0.001
+abstract: Your odio.us Gateway to Web 2.0 Riches
+author: Jesse Vincent <jesse@bestpractical.com>
+license: perl
+distribution_type: module
+requires:
+  Test::More: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

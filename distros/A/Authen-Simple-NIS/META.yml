@@ -1,0 +1,15 @@
+---
+name: Authen-Simple-NIS
+version: 0.3
+author:
+  - 'Christian Hansen C<ch@ngmedia.com>'
+abstract: Simple NIS authentication
+license: perl
+requires:
+  Authen::Simple: 0.3
+  Net::NIS: 0
+provides:
+  Authen::Simple::NIS:
+    file: lib/Authen/Simple/NIS.pm
+    version: 0.3
+generated_by: Module::Build version 0.2611

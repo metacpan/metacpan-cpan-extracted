@@ -1,0 +1,22 @@
+---
+abstract: 'Hex to color name converter'
+author:
+  - 'Zoffix Znet <cpan@zoffix.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-ColorNamer
+requires:
+  Class::Accessor::Grouped: 0.10010
+  Convert::Color: 0.07
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/zoffixznet/App-ColorNamer/issues
+  repository: git://github.com/zoffixznet/App-ColorNamer.git
+version: 0.0104

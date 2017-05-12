@@ -1,0 +1,22 @@
+---
+abstract: 'The great new ACME::THEDANIEL::Utils!'
+author:
+  - 'Daniel jones <dtj@someplace.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ACME-THEDANIEL-Utils
+provides:
+  ACME::THEDANIEL::Utils:
+    file: lib/ACME/THEDANIEL/Utils.pm
+    version: '0.01'
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: '0.01'

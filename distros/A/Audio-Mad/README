@@ -1,0 +1,48 @@
+Audio::Mad - Perl interface to the mad mpeg decoder library.
+
+Version 0.6
+
+Description
+
+	Audio::Mad is a perl module designed to provide an abstract 
+	interface to the low level mad mpeg decoder library.  Interfaces for 
+	mad_stream, mad_frame, mad_synth, and mad_timer_t are provided.  
+	Two addon interfaces Audio::Mad::Resample and Audio::Mad::Dither 
+	provide methods for manipulating raw mad_fixed_t data into usable 
+	strings.
+
+Requirements
+
+	In order to use Audio::Mad, you will have to install the MAD
+	decoder library version 0.14.2b or greater.  This can be
+	retrieved at http://mad.sf.net/
+	
+Installation
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Author
+
+	Mark McConnell
+	mischke@cpan.org
+	
+Copyright
+
+	Copyright (C) 2002 by Mark McConnell. This program is free software,  
+	you may redistribue or modify it under the terms of the GNU General 
+	Public License Version 2.
+	
+	Some of the code in this distribution is directly borrowed from 
+	the mad-0.14.2b distribution itself;  which is copyright (C) 2000-
+	2001 Robert Leslie.
+	
+See Also
+
+	The mad mpeg library homepage:
+		http://mad.sf.net/
+		

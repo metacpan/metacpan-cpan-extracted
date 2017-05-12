@@ -1,0 +1,57 @@
+Release history for Perl module AtExit
+
+2.03 2015-10-25 NEILB
+    - Trimmed down the README and moved some of the history into Changes
+    - Updated github repo URL after changing my github username
+
+2.02 2014-04-06
+    - Added a whole load of modules to SEE ALSO.
+
+2.01_01 2014-04-03
+    - Created testsuite based on old test script
+    - Switched to Dist::Zilla
+    - Moved AtExit.pm to lib/AtExit.pm
+    - Added COPYRIGHT AND LICENSE section to pod
+    - Added this Changes file
+    - Added "use warnings"
+
+2.01 1999-01-20 BRADAPP
+    - rmexit may now be called (as a function or a method) with *no* arguments.
+      When this happens, *all* exit-handlers are removed!
+
+2.00 1998-10-20 @bradapp
+    - Made the following changes based on patches contributed by Michael Chase
+    - AtExit may now be used as a class to create objects which invoke callbacks
+      whenever the AtExit object is destroyed (or goes out of scope with no
+      other references to it).
+    - atexit() amd rmexit() may now be invoked as functions, or as methods.
+      When invoked as methods, they operate on an object for destruction-time
+      callbacks. Otherwise they operate on the program for program-exit-time
+      callbacks.
+    - Added the exit_subs(), is_exiting() and ignore_when_exiting() subroutines
+      to replace the use of @AtExit::EXIT_SUBS, $AtExit::EXITING, and
+      $AtExit::IGNORE_WHEN_EXITING. Use of these three variables is now
+      deprecated in favor of these new subroutines.
+      Although atexit & rmexit are still exported (for backward compatibility),
+      exit_subs(), is_exiting() and ignore_when_exiting() are NOT exported
+      by default.
+    - $AtExit::EXITING, $AtExit::IGNORE_WHEN_EXITING, and @AtExit::EXIT_SUBS
+      are now merely aliases to a class hash/object.
+
+1.02 1996-09-05 @bradapp
+    - First release to CPAN
+
+1.01 1996-09-02 @bradapp
+    - Some minor changes to documentation and variable names at the request
+      of some comp.lang.perl.modules readers.
+
+1.00 1996-08-27 @bradapp
+    - Initial version was created by Andrew Langmead, then worked on
+      by Brad Appleton for release to CPAN.
+    - posted to comp.lang.perl.modules to garner feedback, and
+      to see if the module was too trivial to merit placing on CPAN.
+    - Added sections to the manpage as recommended by Andrew Langmead.
+    - Convert "soft-refs" to subs into "hard-refs" at Andrew's recommendation.
+    - Added exit-handler arguments to atexit() at Andrew's recommendation.
+    - Changed atexit() to return a sub-ref (instead of nothing).
+

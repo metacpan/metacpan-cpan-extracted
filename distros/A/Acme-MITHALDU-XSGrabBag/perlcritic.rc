@@ -1,0 +1,6 @@
+# THIS IS AN AUTOMATICALLY GENERATED FILE.
+# CHANGES TO IT WILL BE DESTROYED BY Dist::Zilla.
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = strictures
+

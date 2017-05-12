@@ -1,0 +1,24 @@
+=head1 Name
+
+sqitch-add-usage - Sqitch add usage statement
+
+=head1 Usage
+
+  sqitch [options] add [change options] [<template options>] <change> [<target>]
+
+=head1 Options
+
+    -c --change               name of the change to add
+    -r --requires             require change
+    -x --conflicts            declare conflicting change
+    -a --all                  add change to all project plans
+    -s --set                  set a template variable
+    -n --note                 a note describing the change
+
+    -t --template             name of the templates to use
+       --template-directory   path to directory containing templates
+       --use [template=path]  path to named template
+
+       --with    [script]     create named script
+       --without [script]     do not create named script
+    -e --edit, --open-editor  open change scripts in an editor

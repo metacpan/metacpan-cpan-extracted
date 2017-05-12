@@ -1,0 +1,40 @@
+# $Id: .htaccess 47 2012-03-29 19:26:10Z jo $
+
+AddOutputFilter node .xml
+AddOutputFilter node .osm
+AddOutputFilter node .html
+
+<Files *.html>
+XML2Parse html
+</Files>
+
+<Perl>
+use lib '/home/jo/www/wwwroot/xml2';
+</Perl>
+
+<Files *.xml>
+    SetHandler modperl
+    PerlOutputFilterHandler TestXML2 
+</Files>
+
+<Files *.osm>
+    SetHandler modperl
+    PerlOutputFilterHandler TestXML2::handler_osm
+</Files>
+
+<Files *.html>
+    SetHandler modperl
+    PerlModule TestXML2
+
+#    PerlOutputFilterHandler TestXML2::handler_html 
+</Files>
+
+<Files test4.html>
+    # we need to control the order of processing
+    RemoveOutputFilter html 
+    SetOutputFilter INCLUDES;node
+    SetHandler modperl
+    PerlOutputFilterHandler TestXML2::handler_html  
+</Files>
+
+

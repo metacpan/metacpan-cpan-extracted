@@ -1,0 +1,37 @@
+NAME
+    App::Pod2Epub - Convert Pod to an ePub eBook.
+
+DESCRIPTION
+    This module is used for converting Pod documents to ePub eBooks. The
+    output eBook can be read on a variety of hardware and software eBook
+    readers.
+
+    Pod is Perl's "Plain Old Documentation" format, see
+    http://perldoc.perl.org/perlpod.html. EPub is an eBook format, see
+    http://en.wikipedia.org/wiki/Epub.
+
+    This module comes with a pod2epub utility that will convert Pod to an
+    ePub eBook. For example:
+
+        pod2epub some_module.pm -o some_module.epub
+
+    See pod2epub --man for full documentation.
+
+INSTALLATION
+    To install this module, run the following commands:
+
+    	perl Makefile.PL
+    	make
+    	make test
+    	make install (as root or with sudo)
+    
+AUTHOR
+    John McNamara, jmcnamara@cpan.org
+
+COPYRIGHT & LICENSE
+    Copyright 2010-2012 John McNamara.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License. See
+    http://dev.perl.org/licenses/ for more information.

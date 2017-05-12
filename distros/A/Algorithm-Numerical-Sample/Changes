@@ -1,0 +1,22 @@
+Version 2010011201 Tue Jan 12 15:49:54 CET 2010
++ Disable Kwalitee tests
+
+Version 2009112001
++ POD and Kwalitee tests.
++ Even moderner Makefile.PL.
++ Test::NoWarnings.
+
+Version 2009102701
++ Modernized Makefile.PL.
+
+Version 2009040301
++ Moved to git and github.
+
+Revision 1.3  1999/08/09 08:01:05  abigail
++ Changed *all* occurences of Algorithms to Algorithm.
+
+Revision 1.2  1999/03/01 21:06:07  abigail
++ Changed package to Algorithm::*
+
+Revision 1.1  1998/04/29 03:05:57  abigail
++ Initial revision

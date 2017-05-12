@@ -1,0 +1,16 @@
+$Id: README,v 1.1 2004/09/08 00:25:41 comdog Exp $
+
+App::Module::Lister is really just a single-file program stuck in a
+fancy Perl distribution. To use it, copy the lib/Lister.pm file to
+whatever CGI script name that you like and upload it to your no-shell
+web hoster. Run the CGI script and see all of the installed modules
+with their versions.
+
+This module is also in SVN on SourceForge
+
+	http://sourceforge.net/projects/brian-d-foy/
+
+
+Enjoy, 
+
+brian d foy, bdfoy@cpan.org

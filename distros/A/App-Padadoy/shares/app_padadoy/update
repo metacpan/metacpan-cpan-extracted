@@ -1,0 +1,13 @@
+#!/bin/bash
+
+refname="$1" 
+oldrev="$2" 
+newrev="$3" 
+ 
+if [ -z "$refname" -o -z "$oldrev" -o -z "$newrev" ]; then 
+    echo "Usage: $0 <ref> <oldrev> <newrev>" >&2 
+    echo "  where <newrev> is relevant only" >&2
+    exit 1 
+fi 
+
+padadoy update $newrev

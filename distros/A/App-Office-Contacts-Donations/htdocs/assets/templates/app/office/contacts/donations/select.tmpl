@@ -1,0 +1,3 @@
+<select name="<tmpl_var name=name>" id="<tmpl_var name=name>" <tmpl_var name=on_change>>
+<tmpl_loop name=loop><option value="<tmpl_var name=value escape=html>"<tmpl_if name=default> selected</tmpl_if>><tmpl_var name=name escape=html></option>
+</tmpl_loop></select>

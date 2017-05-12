@@ -1,0 +1,61 @@
+{
+   "abstract" : "Barcode Writer in Pure PostScript",
+   "author" : [
+      "Lars DÉªá´á´á´á´á´¡ C<< <daxim@cpan.org> >>",
+      "Matthew Newton C<< <mcnewton@cpan.org> >>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-BWIPP",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.35_14",
+            "perl" : "5.010"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "English" : "1.04",
+            "File::ShareDir" : "1.01",
+            "IO::File" : "1.14",
+            "Moose" : "0.93",
+            "Moose::Meta::Class" : "0.93",
+            "MooseX::ClassAttribute" : "0.10",
+            "Storable" : "2.21",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::BWIPP" : {
+         "file" : "lib/Alien/BWIPP.pm",
+         "version" : "0.007"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/daxim/Alien-BWIPP/issues"
+      },
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "http://github.com/daxim/Alien-BWIPP"
+      }
+   },
+   "version" : "0.007"
+}

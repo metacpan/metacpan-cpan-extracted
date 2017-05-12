@@ -1,0 +1,13 @@
+system:
+  description: "Various parameters determining core application functionality"
+  isa: section
+  contains:
+    email:
+      description: "Dummy email address"
+      isa: Str
+      default: "dummy@email.com"
+      global: 1
+    admins:
+      description: "Admin list"
+      isa: ArrayRef
+      default: []

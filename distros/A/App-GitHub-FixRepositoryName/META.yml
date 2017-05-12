@@ -1,0 +1,35 @@
+---
+abstract: 'Fix your .git/config after a repository-name case change'
+author:
+  - 'Robert Krimen <rkrimen@cpan.org>'
+build_requires:
+  Directory::Scratch: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.87'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-GitHub-FixRepositoryName
+no_index:
+  directory:
+    - inc
+    - t
+    - test
+requires:
+  App::GitHub::FindRepository: 0
+  Carp::Clan: 0
+  Digest::SHA1: 0
+  File::AtomicWrite: 0
+  File::Temp: 0
+  Getopt::Long: 0
+  Path::Class: 0
+  Term::Prompt: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/robertkrimen/App-GitHub-FixRepositoryName/tree/master
+version: 0.02

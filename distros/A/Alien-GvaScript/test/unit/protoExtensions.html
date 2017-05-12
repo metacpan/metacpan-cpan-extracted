@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <meta http-equiv="Content-Type" content='text/html; charset=iso-8859-1' />
+    <link rel="stylesheet" href="../test.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="../images/GvaScript.css" type="text/css" media="screen" charset="utf-8" />
+
+    <script src="../../lib/Alien/GvaScript/lib/prototype.js" type="text/javascript"></script>
+    <script src="../unittest.js" type="text/javascript"></script>
+    <script src="../../lib/Alien/GvaScript/lib/GvaScript.js" type="text/javascript"></script>
+    <title>GvaScript Unit Tests</title>
+  </head>
+  <body>
+    <h1>Unit Tests :: GvaScript/protoExtensions.js </h1>
+    <p>Tests for methods included in ProtoExtensions</p>
+
+    <!-- Test Log output -->
+    <div id="testlog">...</div>
+    
+    <span id="test_flash"></span>
+
+    <textarea id="chomp_this">mickey mouse
+</textarea>
+
+    <script type="text/javascript" language="javascript" charset="iso-8859-1">
+
+    // <![CDATA[
+    new Test.Unit.Runner({
+        testCSSPREFIX: function() {
+            this.assertEqual('gva', CSSPREFIX(), 'CSSPREFIX has not been correctly defaulted to "gva"');
+            CSS_PREFIX = 'tst';
+            this.assertEqual('tst', CSSPREFIX(), 'CSSPREFIX has not been correctly overloaded to "tst"');
+        },
+
+        // tests method flash
+        testFlash: function() { with(this) {
+            assertInstanceOf(Function, $('test_flash').flash, '<span> elt should support method flash');
+            assertEqual('undefined', typeof $$('p')[0].flash, '<p> elt should not support method flash');
+            assertNull($('test_flash').flash());
+
+            wait(101, function() { with(this) {
+                assertEqual(false, $('test_flash').hasClassName('flash'));         
+            }});
+
+            $('test_flash').flash({duration: 200});
+            assertEqual(true, $('test_flash').hasClassName('flash'), "flash classname has not been set!");
+            wait(200, function() { with(this) {
+                assertEqual(false, $('test_flash').hasClassName('flash'), "flash classname has not been removed after duration timeout");
+            }});
+        }},
+        
+        testChomp: function() {
+            this.assertInstanceOf(Function, 'dummy'.chomp);
+            this.assert("mickey mouse" != $('chomp_this').value);
+            this.assert("mickey mouse" == $('chomp_this').value.chomp(), "Carriage return has not been chomped!");
+        }
+    });
+
+    // ]]>
+    </script>
+    </body>
+</html>

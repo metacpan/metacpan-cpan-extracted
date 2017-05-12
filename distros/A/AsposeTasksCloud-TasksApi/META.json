@@ -1,0 +1,409 @@
+{
+   "abstract" : "Aspose.Tasks Cloud SDK for Perl",
+   "author" : [
+      "Farooq Sheikh <support@aspose.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AsposeTasksCloud-TasksApi",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.10"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AsposeStorageCloud::StorageApi" : "0",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Date::Parse" : "0",
+            "DateTime" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "Exporter" : "0",
+            "File::Slurp" : "0",
+            "HTTP::Headers" : "0",
+            "HTTP::Request::Common" : "0",
+            "HTTP::Response" : "0",
+            "HTTP::Status" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Log::Any" : "0",
+            "MIME::Base64" : "0",
+            "Module::Runtime" : "0",
+            "Scalar::Util" : "0",
+            "Test::Exception" : "0",
+            "URI::Escape" : "0",
+            "URI::Query" : "0",
+            "perl" : "v5.6.0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "AsposeTasksCloud::ApiClient" : {
+         "file" : "lib/AsposeTasksCloud/ApiClient.pm"
+      },
+      "AsposeTasksCloud::Configuration" : {
+         "file" : "lib/AsposeTasksCloud/Configuration.pm"
+      },
+      "AsposeTasksCloud::Object::AssignmentItem" : {
+         "file" : "lib/AsposeTasksCloud/Object/AssignmentItem.pm"
+      },
+      "AsposeTasksCloud::Object::AssignmentItemResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/AssignmentItemResponse.pm"
+      },
+      "AsposeTasksCloud::Object::AssignmentItems" : {
+         "file" : "lib/AsposeTasksCloud/Object/AssignmentItems.pm"
+      },
+      "AsposeTasksCloud::Object::AssignmentItemsResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/AssignmentItemsResponse.pm"
+      },
+      "AsposeTasksCloud::Object::AssignmentResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/AssignmentResponse.pm"
+      },
+      "AsposeTasksCloud::Object::AssignmentsResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/AssignmentsResponse.pm"
+      },
+      "AsposeTasksCloud::Object::BaseObject" : {
+         "file" : "lib/AsposeTasksCloud/Object/BaseObject.pm"
+      },
+      "AsposeTasksCloud::Object::BookingType" : {
+         "file" : "lib/AsposeTasksCloud/Object/BookingType.pm"
+      },
+      "AsposeTasksCloud::Object::CalculationMode" : {
+         "file" : "lib/AsposeTasksCloud/Object/CalculationMode.pm"
+      },
+      "AsposeTasksCloud::Object::CalculationType" : {
+         "file" : "lib/AsposeTasksCloud/Object/CalculationType.pm"
+      },
+      "AsposeTasksCloud::Object::Calendar" : {
+         "file" : "lib/AsposeTasksCloud/Object/Calendar.pm"
+      },
+      "AsposeTasksCloud::Object::CalendarException" : {
+         "file" : "lib/AsposeTasksCloud/Object/CalendarException.pm"
+      },
+      "AsposeTasksCloud::Object::CalendarExceptionType" : {
+         "file" : "lib/AsposeTasksCloud/Object/CalendarExceptionType.pm"
+      },
+      "AsposeTasksCloud::Object::CalendarExceptionsResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/CalendarExceptionsResponse.pm"
+      },
+      "AsposeTasksCloud::Object::CalendarItem" : {
+         "file" : "lib/AsposeTasksCloud/Object/CalendarItem.pm"
+      },
+      "AsposeTasksCloud::Object::CalendarItemResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/CalendarItemResponse.pm"
+      },
+      "AsposeTasksCloud::Object::CalendarItems" : {
+         "file" : "lib/AsposeTasksCloud/Object/CalendarItems.pm"
+      },
+      "AsposeTasksCloud::Object::CalendarItemsResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/CalendarItemsResponse.pm"
+      },
+      "AsposeTasksCloud::Object::CalendarResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/CalendarResponse.pm"
+      },
+      "AsposeTasksCloud::Object::ConfidenceLevel" : {
+         "file" : "lib/AsposeTasksCloud/Object/ConfidenceLevel.pm"
+      },
+      "AsposeTasksCloud::Object::ConstraintType" : {
+         "file" : "lib/AsposeTasksCloud/Object/ConstraintType.pm"
+      },
+      "AsposeTasksCloud::Object::CostAccrualType" : {
+         "file" : "lib/AsposeTasksCloud/Object/CostAccrualType.pm"
+      },
+      "AsposeTasksCloud::Object::CustomFieldType" : {
+         "file" : "lib/AsposeTasksCloud/Object/CustomFieldType.pm"
+      },
+      "AsposeTasksCloud::Object::DateTime" : {
+         "file" : "lib/AsposeTasksCloud/Object/DateTime.pm"
+      },
+      "AsposeTasksCloud::Object::DateTimeKind" : {
+         "file" : "lib/AsposeTasksCloud/Object/DateTimeKind.pm"
+      },
+      "AsposeTasksCloud::Object::DayOfWeek" : {
+         "file" : "lib/AsposeTasksCloud/Object/DayOfWeek.pm"
+      },
+      "AsposeTasksCloud::Object::DayType" : {
+         "file" : "lib/AsposeTasksCloud/Object/DayType.pm"
+      },
+      "AsposeTasksCloud::Object::Document" : {
+         "file" : "lib/AsposeTasksCloud/Object/Document.pm"
+      },
+      "AsposeTasksCloud::Object::DocumentProperties" : {
+         "file" : "lib/AsposeTasksCloud/Object/DocumentProperties.pm"
+      },
+      "AsposeTasksCloud::Object::DocumentPropertiesResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/DocumentPropertiesResponse.pm"
+      },
+      "AsposeTasksCloud::Object::DocumentProperty" : {
+         "file" : "lib/AsposeTasksCloud/Object/DocumentProperty.pm"
+      },
+      "AsposeTasksCloud::Object::DocumentPropertyResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/DocumentPropertyResponse.pm"
+      },
+      "AsposeTasksCloud::Object::DocumentResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/DocumentResponse.pm"
+      },
+      "AsposeTasksCloud::Object::ElementType" : {
+         "file" : "lib/AsposeTasksCloud/Object/ElementType.pm"
+      },
+      "AsposeTasksCloud::Object::ExtendedAttribute" : {
+         "file" : "lib/AsposeTasksCloud/Object/ExtendedAttribute.pm"
+      },
+      "AsposeTasksCloud::Object::ExtendedAttributeDefinition" : {
+         "file" : "lib/AsposeTasksCloud/Object/ExtendedAttributeDefinition.pm"
+      },
+      "AsposeTasksCloud::Object::ExtendedAttributeItem" : {
+         "file" : "lib/AsposeTasksCloud/Object/ExtendedAttributeItem.pm"
+      },
+      "AsposeTasksCloud::Object::ExtendedAttributeItems" : {
+         "file" : "lib/AsposeTasksCloud/Object/ExtendedAttributeItems.pm"
+      },
+      "AsposeTasksCloud::Object::ExtendedAttributeItemsResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/ExtendedAttributeItemsResponse.pm"
+      },
+      "AsposeTasksCloud::Object::ExtendedAttributeResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/ExtendedAttributeResponse.pm"
+      },
+      "AsposeTasksCloud::Object::HttpResponseMessage" : {
+         "file" : "lib/AsposeTasksCloud/Object/HttpResponseMessage.pm"
+      },
+      "AsposeTasksCloud::Object::HttpStatusCode" : {
+         "file" : "lib/AsposeTasksCloud/Object/HttpStatusCode.pm"
+      },
+      "AsposeTasksCloud::Object::Int32" : {
+         "file" : "lib/AsposeTasksCloud/Object/Int32.pm"
+      },
+      "AsposeTasksCloud::Object::LineNumberRestartMode" : {
+         "file" : "lib/AsposeTasksCloud/Object/LineNumberRestartMode.pm"
+      },
+      "AsposeTasksCloud::Object::Link" : {
+         "file" : "lib/AsposeTasksCloud/Object/Link.pm"
+      },
+      "AsposeTasksCloud::Object::MaskType" : {
+         "file" : "lib/AsposeTasksCloud/Object/MaskType.pm"
+      },
+      "AsposeTasksCloud::Object::Month" : {
+         "file" : "lib/AsposeTasksCloud/Object/Month.pm"
+      },
+      "AsposeTasksCloud::Object::MonthItemType" : {
+         "file" : "lib/AsposeTasksCloud/Object/MonthItemType.pm"
+      },
+      "AsposeTasksCloud::Object::MonthPosition" : {
+         "file" : "lib/AsposeTasksCloud/Object/MonthPosition.pm"
+      },
+      "AsposeTasksCloud::Object::NumberStyle" : {
+         "file" : "lib/AsposeTasksCloud/Object/NumberStyle.pm"
+      },
+      "AsposeTasksCloud::Object::OrdinalNumber" : {
+         "file" : "lib/AsposeTasksCloud/Object/OrdinalNumber.pm"
+      },
+      "AsposeTasksCloud::Object::Orientation" : {
+         "file" : "lib/AsposeTasksCloud/Object/Orientation.pm"
+      },
+      "AsposeTasksCloud::Object::OutlineCode" : {
+         "file" : "lib/AsposeTasksCloud/Object/OutlineCode.pm"
+      },
+      "AsposeTasksCloud::Object::OutlineCodeDefinition" : {
+         "file" : "lib/AsposeTasksCloud/Object/OutlineCodeDefinition.pm"
+      },
+      "AsposeTasksCloud::Object::OutlineCodeItem" : {
+         "file" : "lib/AsposeTasksCloud/Object/OutlineCodeItem.pm"
+      },
+      "AsposeTasksCloud::Object::OutlineCodeItems" : {
+         "file" : "lib/AsposeTasksCloud/Object/OutlineCodeItems.pm"
+      },
+      "AsposeTasksCloud::Object::OutlineCodeItemsResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/OutlineCodeItemsResponse.pm"
+      },
+      "AsposeTasksCloud::Object::OutlineCodeResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/OutlineCodeResponse.pm"
+      },
+      "AsposeTasksCloud::Object::OutlineMask" : {
+         "file" : "lib/AsposeTasksCloud/Object/OutlineMask.pm"
+      },
+      "AsposeTasksCloud::Object::OutlineValue" : {
+         "file" : "lib/AsposeTasksCloud/Object/OutlineValue.pm"
+      },
+      "AsposeTasksCloud::Object::OutlineValueType" : {
+         "file" : "lib/AsposeTasksCloud/Object/OutlineValueType.pm"
+      },
+      "AsposeTasksCloud::Object::PageBorderAppliesTo" : {
+         "file" : "lib/AsposeTasksCloud/Object/PageBorderAppliesTo.pm"
+      },
+      "AsposeTasksCloud::Object::PageBorderDistanceFrom" : {
+         "file" : "lib/AsposeTasksCloud/Object/PageBorderDistanceFrom.pm"
+      },
+      "AsposeTasksCloud::Object::PageVerticalAlignment" : {
+         "file" : "lib/AsposeTasksCloud/Object/PageVerticalAlignment.pm"
+      },
+      "AsposeTasksCloud::Object::PaperSize" : {
+         "file" : "lib/AsposeTasksCloud/Object/PaperSize.pm"
+      },
+      "AsposeTasksCloud::Object::ProbabilityDistributionType" : {
+         "file" : "lib/AsposeTasksCloud/Object/ProbabilityDistributionType.pm"
+      },
+      "AsposeTasksCloud::Object::RateFormatType" : {
+         "file" : "lib/AsposeTasksCloud/Object/RateFormatType.pm"
+      },
+      "AsposeTasksCloud::Object::RateType" : {
+         "file" : "lib/AsposeTasksCloud/Object/RateType.pm"
+      },
+      "AsposeTasksCloud::Object::RecurrencePattern" : {
+         "file" : "lib/AsposeTasksCloud/Object/RecurrencePattern.pm"
+      },
+      "AsposeTasksCloud::Object::RecurringInfo" : {
+         "file" : "lib/AsposeTasksCloud/Object/RecurringInfo.pm"
+      },
+      "AsposeTasksCloud::Object::RecurringInfoResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/RecurringInfoResponse.pm"
+      },
+      "AsposeTasksCloud::Object::ReportType" : {
+         "file" : "lib/AsposeTasksCloud/Object/ReportType.pm"
+      },
+      "AsposeTasksCloud::Object::Resource" : {
+         "file" : "lib/AsposeTasksCloud/Object/Resource.pm"
+      },
+      "AsposeTasksCloud::Object::ResourceAssignment" : {
+         "file" : "lib/AsposeTasksCloud/Object/ResourceAssignment.pm"
+      },
+      "AsposeTasksCloud::Object::ResourceAssignments" : {
+         "file" : "lib/AsposeTasksCloud/Object/ResourceAssignments.pm"
+      },
+      "AsposeTasksCloud::Object::ResourceItem" : {
+         "file" : "lib/AsposeTasksCloud/Object/ResourceItem.pm"
+      },
+      "AsposeTasksCloud::Object::ResourceItemResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/ResourceItemResponse.pm"
+      },
+      "AsposeTasksCloud::Object::ResourceItems" : {
+         "file" : "lib/AsposeTasksCloud/Object/ResourceItems.pm"
+      },
+      "AsposeTasksCloud::Object::ResourceItemsResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/ResourceItemsResponse.pm"
+      },
+      "AsposeTasksCloud::Object::ResourceResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/ResourceResponse.pm"
+      },
+      "AsposeTasksCloud::Object::ResourceType" : {
+         "file" : "lib/AsposeTasksCloud/Object/ResourceType.pm"
+      },
+      "AsposeTasksCloud::Object::ResourceUri" : {
+         "file" : "lib/AsposeTasksCloud/Object/ResourceUri.pm"
+      },
+      "AsposeTasksCloud::Object::ResponseMessage" : {
+         "file" : "lib/AsposeTasksCloud/Object/ResponseMessage.pm"
+      },
+      "AsposeTasksCloud::Object::RollupType" : {
+         "file" : "lib/AsposeTasksCloud/Object/RollupType.pm"
+      },
+      "AsposeTasksCloud::Object::SaaSposeResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/SaaSposeResponse.pm"
+      },
+      "AsposeTasksCloud::Object::SectionStart" : {
+         "file" : "lib/AsposeTasksCloud/Object/SectionStart.pm"
+      },
+      "AsposeTasksCloud::Object::StyleIdentifier" : {
+         "file" : "lib/AsposeTasksCloud/Object/StyleIdentifier.pm"
+      },
+      "AsposeTasksCloud::Object::Task" : {
+         "file" : "lib/AsposeTasksCloud/Object/Task.pm"
+      },
+      "AsposeTasksCloud::Object::TaskItem" : {
+         "file" : "lib/AsposeTasksCloud/Object/TaskItem.pm"
+      },
+      "AsposeTasksCloud::Object::TaskItemResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/TaskItemResponse.pm"
+      },
+      "AsposeTasksCloud::Object::TaskItems" : {
+         "file" : "lib/AsposeTasksCloud/Object/TaskItems.pm"
+      },
+      "AsposeTasksCloud::Object::TaskItemsResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/TaskItemsResponse.pm"
+      },
+      "AsposeTasksCloud::Object::TaskLink" : {
+         "file" : "lib/AsposeTasksCloud/Object/TaskLink.pm"
+      },
+      "AsposeTasksCloud::Object::TaskLinkResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/TaskLinkResponse.pm"
+      },
+      "AsposeTasksCloud::Object::TaskLinkType" : {
+         "file" : "lib/AsposeTasksCloud/Object/TaskLinkType.pm"
+      },
+      "AsposeTasksCloud::Object::TaskLinksResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/TaskLinksResponse.pm"
+      },
+      "AsposeTasksCloud::Object::TaskResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/TaskResponse.pm"
+      },
+      "AsposeTasksCloud::Object::TaskType" : {
+         "file" : "lib/AsposeTasksCloud/Object/TaskType.pm"
+      },
+      "AsposeTasksCloud::Object::TextEffect" : {
+         "file" : "lib/AsposeTasksCloud/Object/TextEffect.pm"
+      },
+      "AsposeTasksCloud::Object::TimeSpan" : {
+         "file" : "lib/AsposeTasksCloud/Object/TimeSpan.pm"
+      },
+      "AsposeTasksCloud::Object::TimeUnitType" : {
+         "file" : "lib/AsposeTasksCloud/Object/TimeUnitType.pm"
+      },
+      "AsposeTasksCloud::Object::Underline" : {
+         "file" : "lib/AsposeTasksCloud/Object/Underline.pm"
+      },
+      "AsposeTasksCloud::Object::Value" : {
+         "file" : "lib/AsposeTasksCloud/Object/Value.pm"
+      },
+      "AsposeTasksCloud::Object::WBSCodeMask" : {
+         "file" : "lib/AsposeTasksCloud/Object/WBSCodeMask.pm"
+      },
+      "AsposeTasksCloud::Object::WBSDefinition" : {
+         "file" : "lib/AsposeTasksCloud/Object/WBSDefinition.pm"
+      },
+      "AsposeTasksCloud::Object::WBSDefinitionResponse" : {
+         "file" : "lib/AsposeTasksCloud/Object/WBSDefinitionResponse.pm"
+      },
+      "AsposeTasksCloud::Object::WBSSequence" : {
+         "file" : "lib/AsposeTasksCloud/Object/WBSSequence.pm"
+      },
+      "AsposeTasksCloud::Object::WeekDay" : {
+         "file" : "lib/AsposeTasksCloud/Object/WeekDay.pm"
+      },
+      "AsposeTasksCloud::Object::WeekDayType" : {
+         "file" : "lib/AsposeTasksCloud/Object/WeekDayType.pm"
+      },
+      "AsposeTasksCloud::Object::WorkContourType" : {
+         "file" : "lib/AsposeTasksCloud/Object/WorkContourType.pm"
+      },
+      "AsposeTasksCloud::Object::WorkingTime" : {
+         "file" : "lib/AsposeTasksCloud/Object/WorkingTime.pm"
+      },
+      "AsposeTasksCloud::TasksApi" : {
+         "file" : "lib/AsposeTasksCloud/TasksApi.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "1.01"
+}

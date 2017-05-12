@@ -1,0 +1,40 @@
+Apache-SMTP version 0.01
+========================
+
+This is a simple SMTP server/proxy written for Apache and mod_perl 2.  It 
+might be a little bit dangerous, so you should probably read the pod before
+you go about installing it.  Also, there is no test suite yet.  Sorry about 
+that, I haven't figured out how to use Apache::Test to test 
+ProcessConnectionHandler bits yet.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Apache::TieBucketBrigade
+   Net::Server::Mail::SMTP
+   Net::SMTP
+   Apache 2
+   mod_perl 2
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 by Will Whittaker and Ken Simpson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

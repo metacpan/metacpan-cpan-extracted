@@ -1,0 +1,34 @@
+Model:
+category | P(category)       
+---+---
+Spam=Y   | 0.469656992084 
+Spam=N   | 0.530343007915 
+---+---
+
+category | Caps | P( Caps | category ) 
+---+---+---
+Spam=Y   | N    | 0.365168539325    
+Spam=Y   | Y    | 0.634831460674    
+---+---+---
+Spam=N   | N    | 0.636815920398     
+Spam=N   | Y    | 0.363184079601     
+---+---+---
+
+category | Free | P( Free | category ) 
+---+---+---
+Spam=Y   | N    | 0.359550561797    
+Spam=Y   | Y    | 0.640449438202    
+---+---+---
+Spam=N   | N    | 0.646766169154    
+Spam=N   | Y    | 0.353233830845    
+---+---+---
+
+category | Html | P( Html | category ) 
+---+---+---
+Spam=Y   | N    | 0.376404494382    
+Spam=Y   | Y    | 0.623595505617    
+---+---+---
+Spam=N   | N    | 0.666666666666    
+Spam=N   | Y    | 0.333333333333    
+---+---+---
+

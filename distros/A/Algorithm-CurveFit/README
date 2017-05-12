@@ -1,0 +1,189 @@
+NAME
+    Algorithm::CurveFit - Nonlinear Least Squares Fitting
+
+SYNOPSIS
+    use Algorithm::CurveFit;
+
+      # Known form of the formula
+      my $formula = 'c + a * x^2';
+      my $variable = 'x';
+      my @xdata = read_file('xdata'); # The data corresponsing to $variable
+      my @ydata = read_file('ydata'); # The data on the other axis
+      my @parameters = (
+          # Name    Guess   Accuracy
+          ['a',     0.9,    0.00001],  # If an iteration introduces smaller
+          ['c',     20,     0.00005],  # changes that the accuracy, end.
+      );
+      my $max_iter = 100; # maximum iterations
+
+      my $square_residual = Algorithm::CurveFit->curve_fit(
+          formula            => $formula, # may be a Math::Symbolic tree instead
+          params             => \@parameters,
+          variable           => $variable,
+          xdata              => \@xdata,
+          ydata              => \@ydata,
+          maximum_iterations => $max_iter,
+      );
+
+      use Data::Dumper;
+      print Dumper \@parameters;
+      # Prints
+      # $VAR1 = [
+      #          [
+      #            'a',
+      #            '0.201366784209602',
+      #            '1e-05'
+      #          ],
+      #          [
+      #            'c',
+      #            '1.94690440147554',
+      #            '5e-05'
+      #          ]
+      #        ];
+      #
+      # Real values of the parameters (as demonstrated by noisy input data):
+      # a = 0.2
+      # c = 2
+
+DESCRIPTION
+    "Algorithm::CurveFit" implements a nonlinear least squares curve fitting
+    algorithm. That means, it fits a curve of known form (sine-like,
+    exponential, polynomial of degree n, etc.) to a given set of data
+    points.
+
+    For details about the algorithm and its capabilities and flaws, you're
+    encouraged to read the MathWorld page referenced below. Note, however,
+    that it is an iterative algorithm that improves the fit with each
+    iteration until it converges. The following rule of thumb usually holds
+    true:
+
+    * A good guess improves the probability of convergence and the quality
+      of the fit.
+
+    * Increasing the number of free parameters decreases the quality and
+      convergence speed.
+
+    * Make sure that there are no correlated parameters such as in 'a + b *
+      e^(c+x)'. (The example can be rewritten as 'a + b * e^c * e^x' in
+      which 'c' and 'b' are basically equivalent parameters.
+
+    The curve fitting algorithm is accessed via the 'curve_fit' subroutine.
+    It requires the following parameters as 'key => value' pairs:
+
+    formula
+      The formula should be a string that can be parsed by Math::Symbolic.
+      Alternatively, it can be an existing Math::Symbolic tree. Please refer
+      to the documentation of that module for the syntax.
+
+      Evaluation of the formula for a specific value of the variable
+      (X-Data) and the parameters (see below) should yield the associated
+      Y-Data value in case of perfect fit.
+
+    variable
+      The 'variable' is the variable in the formula that will be replaced
+      with the X-Data points for evaluation. If omitted in the call to
+      "curve_fit", the name 'x' is default. (Hence 'xdata'.)
+
+    params
+      The parameters are the symbols in the formula whose value is varied by
+      the algorithm to find the best fit of the curve to the data. There may
+      be one or more parameters, but please keep in mind that the number of
+      parameters not only increases processing time, but also decreases the
+      quality of the fit.
+
+      The value of this options should be an anonymous array. This array
+      should hold one anonymous array for each parameter. That array should
+      hold (in order) a parameter name, an initial guess, and optionally an
+      accuracy measure.
+
+      Example:
+
+        $params = [
+          ['parameter1', 5,  0.00001],
+          ['parameter2', 12, 0.0001 ],
+          ...
+        ];
+
+        Then later:
+        curve_fit(
+        ...
+          params => $params,
+        ...
+        );
+
+      The accuracy measure means that if the change of parameters from one
+      iteration to the next is below each accuracy measure for each
+      parameter, convergence is assumed and the algorithm stops iterating.
+
+      In order to prevent looping forever, you are strongly encouraged to
+      make use of the accuracy measure (see also: maximum_iterations).
+
+      The final set of parameters is not returned from the subroutine but
+      the parameters are modified in-place. That means the original data
+      structure will hold the best estimate of the parameters.
+
+    xdata
+      This should be an array reference to an array holding the data for the
+      variable of the function. (Which defaults to 'x'.)
+
+    ydata
+      This should be an array reference to an array holding the function
+      values corresponding to the x-values in 'xdata'.
+
+    maximum_iterations
+      Optional parameter to make the process stop after a given number of
+      iterations. Using the accuracy measure and this option together is
+      encouraged to prevent the algorithm from going into an endless loop in
+      some cases.
+
+    The subroutine returns the sum of square residuals after the final
+    iteration as a measure for the quality of the fit.
+
+  EXPORT
+    None by default, but you may choose to export "curve_fit" using the
+    standard Exporter semantics.
+
+  SUBROUTINES
+    This is a list of public subroutines
+
+    curve_fit
+      This subroutine implements the curve fitting as explained in
+      DESCRIPTION above.
+
+NOTES AND CAVEATS
+    * When computing the derivative symbolically using "Math::Symbolic", the
+      formula simplification algorithm can sometimes fail to find the
+      equivalent of "(x-x_0)/(x-x_0)". Typically, these would be hidden in a
+      more complex product. The effect is that for "x -> x_0", the
+      evaluation of the derivative becomes undefined.
+
+      Since version 1.05, we fall back to numeric differentiation using
+      five-point stencil in such cases. This should help with one of the
+      primary complaints about the reliability of the module.
+
+    * This module is NOT fast. For slightly better performance, the formulas
+      are compiled to Perl code if possible.
+
+SEE ALSO
+    The algorithm implemented in this module was taken from:
+
+    Eric W. Weisstein. "Nonlinear Least Squares Fitting." From MathWorld--A
+    Wolfram Web Resource.
+    http://mathworld.wolfram.com/NonlinearLeastSquaresFitting.html
+
+    New versions of this module can be found on http://steffen-mueller.net
+    or CPAN.
+
+    This module uses the following modules. It might be a good idea to be
+    familiar with them. Math::Symbolic, Math::MatrixReal, Test::More
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org<gt>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005-2010 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6 or, at your
+    option, any later version of Perl 5 you may have available.
+

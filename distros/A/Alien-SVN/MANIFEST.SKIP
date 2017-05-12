@@ -1,0 +1,73 @@
+
+#!start included /Users/schwern/perl5/perlbrew/perls/perl-5.14.1/lib/5.14.1/ExtUtils/MANIFEST.SKIP
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\B\.git\b
+\B\.gitignore\b
+\b_darcs\b
+\B\.cvsignore$
+
+# Avoid VMS specific MakeMaker generated files
+\bDescrip.MMS$
+\bDESCRIP.MMS$
+\bdescrip.mms$
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+\bBuild.bat$
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.tmp$
+\.#
+\.rej$
+
+# Avoid OS-specific files/dirs
+# Mac OSX metadata
+\B\.DS_Store
+# Mac OSX SMB mount metadata files
+\B\._
+
+# Avoid Devel::Cover and Devel::CoverX::Covered files.
+\bcover_db\b
+\bcovered\b
+
+# Avoid MYMETA files
+^MYMETA\.
+#!end included /Users/schwern/perl5/perlbrew/perls/perl-5.14.1/lib/5.14.1/ExtUtils/MANIFEST.SKIP
+
+
+# Avoid archives of this distribution
+\bAlien-SVN-[\d\.\_]+
+
+# Avoid SVN configure stuff
+src/subversion/config.log$
+src/subversion/config.nice$
+src/subversion/config.status$
+src/subversion/libtool$
+src/subversion/mkmf.log$
+src/subversion/subversion/bindings/swig/perl/native/Makefile.PL$
+src/subversion/subversion/svn_private_config.h$
+src/subversion/tools/backup/hot-backup.py$
+src/subversion/tools/hook-scripts/commit-access-control.pl$

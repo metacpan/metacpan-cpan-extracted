@@ -1,0 +1,36 @@
+---
+abstract: 'A lightweight DNS ad filter'
+author:
+  - 'David Watson <dwatson@cpan.org>'
+build_requires:
+  Net::DNS::Resolver: 0
+  Test::More: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-DNS-Adblock
+requires:
+  Capture::Tiny: 0
+  Carp: 0
+  Data::Dumper: 0
+  LWP::Simple: 0
+  Mozilla::CA: 0
+  Net::DNS: 0.74
+  Net::DNS::Nameserver: 0
+  POSIX: 0
+  Storable: 0
+  Sys::HostIP: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/terminalfool/App-DNS-Adblock/issues
+  homepage: http://search.cpan.org/~dwatson/App-DNS-Adblock/
+  repository: git://github.com/terminalfool/App-DNS-Adblock.git
+version: 0.015

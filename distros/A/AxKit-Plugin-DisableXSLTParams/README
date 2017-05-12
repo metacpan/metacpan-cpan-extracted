@@ -1,0 +1,21 @@
+
+AxKit::Plugin::DisableXSLTParams - Disable XSLT Params
+
+
+    Under normal circumstances, CGI params are passed on top the XSLT
+    processor. While this can be wanted, it can also have undesirable
+    effects. Some of those may match variable or other param names that
+    you use in your XSLT stylesheet, and having them forced upon you
+    by CGI params can lead to hard to locate bugs.
+
+    All you need to do to make them go away is to add this module to
+    your conf.
+
+    The patch that allows this module to work should have been in
+    AxKit 1.5 but unfortunately it somehow slipped. Currently you'll
+    need the CVS version of AxKit (see http://axkit.org/ for details on
+    how to get it) or wait until 1.5.1 or 1.6.
+
+
+-- Robin Berjon, robin@knowscape.com
+

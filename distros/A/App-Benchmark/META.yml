@@ -1,0 +1,34 @@
+---
+abstract: 'Output your benchmarks as test diagnostics'
+author:
+  - 'The following person is the author of all the files provided in'
+build_requires:
+  Benchmark: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Benchmark
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Benchmark: '0'
+  Capture::Tiny: '0'
+  Test::More: '0'
+resources:
+  bugtracker: https://github.com/marcelgruenauer/App-Benchmark/issues
+  homepage: https://github.com/marcelgruenauer/App-Benchmark
+  repository: https://github.com/marcelgruenauer/App-Benchmark.git
+version: '2.00'
+x_contributors:
+  - 'Marcel Gruenauer <hanekomu@gmail.com>'

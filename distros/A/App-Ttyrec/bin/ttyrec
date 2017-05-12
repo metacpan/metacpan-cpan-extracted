@@ -1,0 +1,104 @@
+#!perl
+use strict;
+use warnings;
+# ABSTRACT: record interactive terminal sessions
+# PODNAME: ttyrec
+
+use App::Ttyrec;
+use Getopt::Long;
+
+
+my $cmd = $ENV{SHELL} || '/bin/sh';
+my $append;
+
+sub usage {
+    my ($exit) = @_;
+
+    my $out = $exit ? \*STDERR : \*STDOUT;
+
+    print { $out }
+          "$0 [-a] [-e <cmd>] [output_file]\n";
+
+    exit($exit);
+}
+
+GetOptions(
+    'execute=s' => \$cmd,
+    'append'    => \$append,
+    'uudecode'  => sub { die "uudecode mode not supported. "
+                           . "Why are you not just using scp?\n" },
+    'help'      => sub { usage(0) },
+) || usage(1);
+
+App::Ttyrec->new(
+    ttyrec_file => ($ARGV[0] || 'ttyrecord'),
+    append      => $append,
+)->run($cmd);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ttyrec - record interactive terminal sessions
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+  ttyrec foo.ttyrec
+  ttyrec -e 'nethack' nethack.ttyrec
+  ttyrec -a
+
+=head1 DESCRIPTION
+
+This is an implementation of the C<ttyrec> program for recording terminal
+sessions. All data that the program running in the terminal produces is
+recorded, along with timing information, so that it can be replayed later (via
+a ttyrec player such as the C<ttyplay> script distributed with
+C<Term::TtyRec::Plus>).
+
+This program is intended to be mostly a drop-in replacement for the C<ttyrec>
+program distributed L<here|http://0xcc.net/ttyrec/index.html.en>.
+
+=head1 OPTIONS
+
+  ttyrec [-a] [-e <cmd>] [output_file]
+
+=over 4
+
+=item -a
+
+Append to the ttyrec file, rather than overwriting it.
+
+=item -e <cmd>
+
+Execute <cmd>, rather than a shell. Defaults to C<$SHELL> or C</bin/sh>.
+
+=item output_file
+
+The file to write the ttyrec data to. This can be a named pipe. Defaults to
+C<ttyrecord>.
+
+=back
+
+=head1 SEE ALSO
+
+L<http://0xcc.net/ttyrec/index.html.en>
+
+=head1 AUTHOR
+
+Jesse Luehrs <doy@tozt.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by Jesse Luehrs.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

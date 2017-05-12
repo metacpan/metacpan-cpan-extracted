@@ -1,0 +1,11 @@
+#defaults
+^Makefile$
+^blib/
+^pm_to_blib
+^blibdirs
+t/conf/httpd.conf
+t/conf/extra.conf
+t/conf/apache_test_config.pm
+t/logs
+t/htdocs
+t/TEST

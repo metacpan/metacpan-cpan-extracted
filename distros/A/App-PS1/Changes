@@ -1,0 +1,138 @@
+Revision history for App-PS1
+
+0.04   2017-03-15
+        Updating for release of version 0.04
+        Fixed POD and spelling (Ivan Wills)
+        Added missing tests (Ivan Wills)
+        Updated licence (Ivan Wills)
+        Code tidy (Ivan Wills)
+        Adding eval to protect against errors (Ivan Wills)
+        Adding generic environment reporter (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+
+0.03   2016-09-11
+        Updating for release of version 0.03
+        Fixed spelling (Ivan Wills)
+        Added documentation about status (Ivan Wills)
+        Changed status to be shorter if nothing to report (Ivan Wills)
+        Fixed missing 11 (Ivan Wills)
+        Adding git status details to prompt (Ivan Wills)
+        Added some description to A::P::P::Face (Ivan Wills)
+        Added vtide files (Ivan Wills)
+
+0.02   2016-01-01
+        Updating for release of version 0.02
+        Updating license (Ivan Wills)
+        Made directory length configurable (and set to 30) (Ivan Wills)
+
+0.01   2015-08-16
+        Updating for release of version 0.01
+        Removed creation of makefile (Ivan Wills)
+
+0.009   2015-08-03
+        Updating for release of version 0.009
+        Fixed sizes (Ivan Wills)
+        Fixing display (Ivan Wills)
+
+0.008   2015-08-02
+        Updating for release of version 0.008
+        Fixed display of elements (Ivan Wills)
+
+0.007   2015-08-01
+        Updating for release of version 0.007
+        Added documentation about new settings (Ivan Wills)
+        Added logic to turn on and off file, dir and size (Ivan Wills)
+
+0.006   2015-07-31
+        Updating for release of version 0.006
+        Added missing documentation (Ivan Wills)
+        Updated dependencies (Ivan Wills)
+        Converted options to using JSON (as documented) (Ivan Wills)
+        Added getting options for future use (Ivan Wills)
+
+0.005   2015-07-30
+        Updating for release of version 0.005
+        Added abreviation option for directories (Ivan Wills)
+        Update TODO (Ivan Wills)
+
+0.004   2015-07-01
+        Updating for release of version 0.004
+        Added env variable documentation into more places (Ivan Wills)
+
+0.003   2015-06-16
+        Updating for release of version 0.003
+        Added documentation about environment variables (Ivan Wills)
+        Added more to the description (Ivan Wills)
+        Added image examples (Ivan Wills)
+        Fixed param name (Ivan Wills)
+        Better documentation for command (Ivan Wills)
+
+0.002   2015-06-08
+        Updating for release of version 0.002
+        Added limiting dir name length (Ivan Wills)
+        Set max branch name length to 60 characters (Ivan Wills)
+
+0.001   2014-08-29
+        Removed unused modules and cleaned up version number (Ivan Wills)
+        Updated build (Ivan Wills)
+        Updated tests to my current standards (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Added support for nvm's version of node switching (Ivan Wills)
+        Fixed variable error (Ivan Wills)
+        Converted to use subtests rather than just diag the sub-test results (Ivan Wills)
+        Added config for travis-ci (Ivan Wills)
+        Cleaned up POD to pass tests (Ivan Wills)
+        Updated to latest version (Ivan Wills)
+        Fixed readme (Ivan Wills)
+        Added referenced commands to be ignored (Ivan Wills)
+        Updating README description and changing to POD (Ivan Wills)
+        Added extra logic to try to work out the original branch when in detached head state (Ivan Wills)
+        Added blue style (Ivan Wills)
+        Stopped warnings (Ivan Wills)
+        Fixed version environment config (Ivan Wills)
+        Made check more specific to stop error when there is a .git directory which isn't a git repository (Ivan Wills)
+        Added eval to protect against plugins erroring (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Fixed not updating variable name (Ivan Wills)
+        New plugin to display ruby version (Ivan Wills)
+        Fixed abstracts to match spec per http://neilb.org/2014/02/19/compliant-abstract.html (Ivan Wills)
+        Fixed dependency (Ivan Wills)
+        Fixed colouring (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/App-PS1 (Ivan Wills)
+        Fixed up documentation (Ivan Wills)
+        Added showing perlbrew and nave node versions (Ivan Wills)
+        Adding tag files (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+        Added method documentation (Ivan Wills)
+        Cleaned up boiler plate text (Ivan Wills)
+        Started documenting methods (Ivan Wills)
+        Removed non-existant files (Ivan Wills)
+        Updated package files (Ivan Wills)
+        Added setting the theme from the environment (Ivan Wills)
+        Added green theme (Ivan Wills)
+        Removed warn (Ivan Wills)
+        Converted colours to use themes (Ivan Wills)
+        Passing more things on (Ivan Wills)
+        Some rationalisation of plugins and cleanup (Ivan Wills)
+        Changed it so that the background colour can be configured by an environment variable (Ivan Wills)
+        Removed colon (Ivan Wills)
+        Added space (Ivan Wills)
+        Added all recommended modules (Ivan Wills)
+        Added configure_requires section (Ivan Wills)
+        Merge branch 'master' of https://github.com/ivanwills/App-PS1 (Ivan Wills)
+        Updated generated files (Ivan Wills)
+        Stopped Perl::Critic complaining about stuff (Ivan Wills)
+        Updated stopwords (Ivan Wills)
+        Corrected copyright (Ivan Wills)
+        Updated license text (Ivan Wills)
+        Fixed copyright (Ivan Wills)
+        Added ignoring generated files (Ivan Wills)
+        Added ignoring generated files (Ivan Wills)
+        Fixed copyright (Ivan Wills)
+        Added missing dependencies (Ivan Wills)
+        Started working out how to write a deamon for the prompt (Ivan Wills)
+        Updated MANIFEST files (Ivan Wills)
+        Automated update (Ivan Wills)
+        Added place name words to be ignored by spelling (Ivan Wills)
+        Fixed incorrect mobule name (Ivan Wills)
+        initial commit (Ivan Wills)

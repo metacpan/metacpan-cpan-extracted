@@ -1,0 +1,139 @@
+[%#
+   Apache2::WebApp::Toolkit - Admin Control Panel (users_form.tt)
+   Copyright (C) 2010 Marc S. Brooks <mbrooks@cpan.org>
+
+   Licensed under the terms of the BSD License
+   http://www.opensource.org/licenses/bsd-license.php
+-%]
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Users</title>
+
+	<meta http-equiv="pragma" content="no-cache" />
+
+	<script type="text/javascript" src="/extras/admin/js/disable.js"></script>
+	<script type="text/javascript" src="/extras/admin/js/form.js"></script>
+
+	<style type="text/css">
+		@import url( /extras/admin/css/base.css );
+		@import url( /extras/admin/css/content.css );
+		@import url( /extras/admin/css/form.css );
+	</style>
+</head>
+<body onLoad="requireFields([% UNLESS param.username && !error.username %]'username',[% END %]'password'); focusFirstField()">
+
+<noscript>
+	<h2>
+		To use this admin you must have a JavaScript-enabled browser
+	</h2>
+</noscript>
+
+
+<!-- page begin -->
+
+<div id="page">
+	<div class="back">
+		<a onClick="window.history.go(-1)" title="Back">
+			Back
+		</a>
+	</div>
+
+	<h2 class="title">
+		[% IF edit %]Edit User[% ELSE %]Add User[% END %]
+	</h2>
+</div>
+
+<!-- page end -->
+
+
+<div id="split">
+	<hr></hr>
+</div>
+
+
+<!-- info begin -->
+
+<div id="info">
+	<p class="text_center">
+		Fill out the form info below.  Fields marked with a (&bull;) are required.
+	</p>
+</div>
+
+<!-- info end -->
+
+[% IF error.alert %]
+<!-- alert begin -->
+
+<p id="alert">
+	<strong>
+		[% error.alert %]
+	</strong>
+</p>
+
+<!-- alert end -->
+[% END %]
+
+
+<!-- form begin -->
+
+<form method="post" action="/app/admin/users/[% IF edit %]edit[% ELSE %]add[% END %]/submit">
+
+<div id="form">
+	<fieldset>
+		<legend>
+			Login Info
+		</legend>
+
+	[% UNLESS edit %]
+		<label>
+			<strong>
+				&bull; User Name
+			</strong>
+		</label>
+
+		<div>
+			<input class="field0 [% IF error.username %]error[% END %]" type="text" name="username" value="[% param.username %]" maxlength="15" [% IF error.username %]title="[% error.username %]"[% END %] />
+		</div>
+	[% ELSE %]
+		<label>
+			<strong>
+				&bull; User Name
+			</strong>
+		</label>
+
+		<div>
+			<input class="field0" type="text" name="username" value="[% param.username %]" maxlength="30" readonly />
+		</div>
+	[% END %]
+
+		<label>
+			<strong>
+				&bull; [% IF edit %]New [% END %]Password
+			</strong>
+		</label>
+
+		<div>
+			<input class="field0 [% IF error.password %]error[% END %]" type="text" name="password" value="[% param.password %]" maxlength="15" [% IF error.password %]title="[% error.password %]"[% END %] />
+		</div>
+
+		<p class="notes">
+			Your password must be a minimum of 8 characters and is case-sensitive
+		</p>
+	</fieldset>
+
+	<div>
+		<input id="allow" class="button0" type="submit" value="[% IF edit %]Save Changes[% ELSE %]Submit[% END %]" />
+	</div>
+</div>
+
+</form>
+
+<!-- form end -->
+
+
+</body>
+</html>

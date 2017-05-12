@@ -1,0 +1,33 @@
+---
+abstract: 'Perl virtual environment'
+author:
+  - 'Orkun Karaduman <orkunkaraduman@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Virtualenv
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CPAN: '2.00'
+  Cwd: '3.47'
+  ExtUtils::Installed: '2.02'
+  Lazy::Utils: '1.13'
+  local::lib: '2.000004'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/orkunkaraduman/perl5-virtualenv/issues
+  homepage: https://metacpan.org/release/App-Virtualenv
+  license: https://www.gnu.org/licenses/gpl-3.0.html
+  repository: git://git@github.com:orkunkaraduman/perl5-virtualenv.git
+version: '2.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

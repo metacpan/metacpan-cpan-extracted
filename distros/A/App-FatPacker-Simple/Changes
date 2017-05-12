@@ -1,0 +1,33 @@
+Revision history for App::FatPacker::Simple
+
+0.07  2016-02-27 20:23:06 JST
+
+    - Introduce --exclude-strip option (#5, #7 by glensc)
+
+0.06  2015-10-04 00:50:34 JST
+
+    - rename bin/ to script/ in order to install fatpack-simple script
+
+0.05  2015-10-04 00:37:51 JST
+
+    - Update mentioned module App::fatten (has been renamed to App::depak) (#6 by perlancar)
+
+0.04 2015-04-28T12:38:04Z
+
+    - introduce --shebang SHEBANG option
+
+0.03 2015-04-19T07:13:27Z
+
+    - handle lib/ directories more correctly
+    - recognize multi-line shebang,
+      as described in `perldoc perlrun` (#3 by kazuho)
+
+0.02 2015-02-23T16:13:47Z
+
+    - document that this module is an alternative
+      for ONLY fatpack file command
+    - stop localizing PERL5LIB and PERL5OPT in test
+
+0.01 2015-02-22T08:18:14Z
+
+    - initial version

@@ -1,0 +1,28 @@
+# $Id: SGI_4_IRIX5_DEF,v 1.1 2002/11/14 20:00:06 lstein Exp $
+
+#################################################################
+############### acedb: R.Durbin and J.Thierry-Mieg ##############
+#################################################################
+
+#################################################################
+########## Machine dependant compiler modification ##############
+########### for the SGI Silicon Graphics Irix5.2 ################
+#################################################################
+########### This file is included by wmake/truemake #############
+######  Edit this file to adapt the ACeDB to a new machine ######
+#####   following the explanations given in wmake/truemake  #####
+#################################################################
+
+NAME = SGI 
+COMPILER = cc -g -DNO_LEFT_CASTING -DACEDB4
+LINKER = cc -g
+
+LIBS = -lm
+RANLIB_NEEDED = false
+
+.c.o:
+	$(CC) $*.c
+
+#################################################################
+#################################################################
+ 

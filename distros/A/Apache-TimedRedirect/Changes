@@ -1,0 +1,12 @@
+Revision history for Perl extension Apache::TimedRedirect.
+
+0.01  Tue Sep  1 17:36:49 1998
+	- original version; created by h2xs 1.18
+0.12  Thu Sep 17 23:56:20 EDT 1998
+        - added exclude and logging
+0.13  Sun Nov 10 01:53:35 EST 2002
+        - added PRE PREREQ_PM   => {'Time::Period'  => '1.20'} to Makefile.PL
+        - added Author to Makefile.PL
+        - as requested by the cpan testers group may the gods bless them 
+          and keep them
+                                

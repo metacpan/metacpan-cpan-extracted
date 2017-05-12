@@ -1,0 +1,10 @@
+---
+pod_spelling_system:
+  stopwords:
+    - url
+    - PlugAuth
+
+pod_coverage:
+  private:
+    - Authen::Simple::PlugAuth#check
+    - Authen::Simple::PlugAuth#init

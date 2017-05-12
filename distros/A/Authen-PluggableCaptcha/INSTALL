@@ -1,0 +1,4 @@
+ perl Makefile.PL
+ make install
+
+This comes bundled with the Imager routines, but as they're not fully functional yet, the Imager library is not included.

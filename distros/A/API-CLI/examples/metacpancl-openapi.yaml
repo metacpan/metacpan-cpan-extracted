@@ -1,0 +1,122 @@
+---
+swagger: 2.0
+info:
+  title: MetaCPAN API
+  description: Unofficial MetaCPAN API specification
+  version: 3
+host: api.metacpan.org
+schemes: [https]
+basePath: /v0
+
+paths:
+  /author/:author:
+    get:
+      description: Author information
+      parameters:
+        -
+          name: author
+          in: path
+          type: string
+          required: true
+          description: CPAN handle
+
+  /distribution/:distribution:
+    get:
+      description: Distribution information not specific to a version
+      parameters:
+        -
+          name: distribution
+          in: path
+          type: string
+          required: true
+          description: distribution name
+
+  /release/:distribution:
+    get:
+      description: Release information
+      parameters:
+        -
+          name: distribution
+          in: path
+          type: string
+          required: true
+          description: distribution name
+
+  /release/:author/:release:
+    get:
+      description: Release information
+      parameters:
+        -
+          name: author
+          in: path
+          type: string
+          required: true
+          description: CPAN handle
+        -
+          name: release
+          in: path
+          type: string
+          required: true
+          description: release, e.g. Moose-123
+
+  /module/:module:
+    get:
+      description: Module information
+      parameters:
+        -
+          name: module
+          in: path
+          type: string
+          required: true
+          description: Module name
+
+  /pod/:module:
+    get:
+      description: Module POD
+      parameters:
+        -
+          name: module
+          in: path
+          type: string
+          required: true
+          description: Module name
+        -
+          name: content-type
+          in: query
+          type: string
+          enum: [text/html, text/plain, text/x-pod, text/x-markdown]
+          description: Default is text/html
+
+  /release/_search:
+    get:
+      description: Search releases
+      parameters:
+        -
+          name: q
+          in: query
+          type: string
+          required: true
+          description: query ("author:ANDK AND status:latest")
+        -
+          name: fields
+          in: query
+          type: string
+          description: resultset fields
+        -
+          name: size
+          in: query
+          type: integer
+          description: how many results
+
+  /file:
+    post:
+      description: file
+      parameters:
+        -
+          name: body
+          in: body
+          type: object
+          required: true
+          description: query
+
+# vim:et:sts=2:sws=2:sw=2:foldmethod=indent

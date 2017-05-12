@@ -1,0 +1,8 @@
+language: perl
+install: cpanm --installdeps --notest --verbose .
+before_install:
+  - perlbrew install-cpanm -f
+  - cpanm Module::Build
+perl:
+  - "5.10"
+  - "5.18"

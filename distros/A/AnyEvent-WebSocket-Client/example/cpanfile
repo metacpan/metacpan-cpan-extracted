@@ -1,0 +1,12 @@
+requires 'AnyEvent';
+requires 'AnyEvent::Open3::Simple';
+requires 'AnyEvent::WebSocket::Client', '0.12';
+requires 'JSON';
+requires 'LWP::UserAgent';
+requires 'Mojo::JSON';
+requires 'Mojo::Redis';
+requires 'Mojolicious::Lite';
+requires 'Text::Table';
+requires 'URI';
+requires 'autodie';
+requires 'perl', 'v5.8.0';

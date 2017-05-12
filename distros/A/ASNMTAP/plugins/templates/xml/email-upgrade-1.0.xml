@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE BaseServiceReport SYSTEM "dtd/email-upgrade-1.0.dtd">
+
+<BaseServiceReport>
+  <Ressource>
+    <Server>Server ...</Server>
+    <Name>Name Service to Report</Name>
+    <Date>yyyy/mm/dd</Date>
+    <Time>hh:mm:ss</Time>
+    <Environment>PROD</Environment>
+	<ErrorStack><![CDATA[ErrorStack .1.]]></ErrorStack>
+    <ErrorDetail><![CDATA[ErrorDetail .1.]]></ErrorDetail>
+  </Ressource>
+</BaseServiceReport>

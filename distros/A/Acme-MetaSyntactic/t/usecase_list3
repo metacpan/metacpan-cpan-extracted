@@ -1,0 +1,4 @@
+use Acme::MetaSyntactic::test_ams_list;
+my $b = Acme::MetaSyntactic::test_ams_list->new;
+print $b->name;
+

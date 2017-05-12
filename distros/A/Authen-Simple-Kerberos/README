@@ -1,0 +1,60 @@
+NAME
+    Authen::Simple::Kerberos - Simple Kerberos authentication
+
+SYNOPSIS
+        use Authen::Simple::Kerberos;
+    
+        my $kerberos = Authen::Simple::Kerberos->new(
+            realm => 'REALM.COMPANY.COM'
+        );
+    
+        if ( $kerberos->authenticate( $username, $password ) ) {
+            # successfull authentication
+        }
+    
+        # or as a mod_perl Authen handler
+    
+        PerlModule Authen::Simple::Apache
+        PerlModule Authen::Simple::Kerberos
+
+        PerlSetVar AuthenSimpleKerberos_realm "REALM.COMPANY.COM"
+
+        <Location /protected>
+          PerlAuthenHandler Authen::Simple::Kerberos
+          AuthType          Basic
+          AuthName          "Protected Area"
+          Require           valid-user
+        </Location>    
+    
+DESCRIPTION
+    Kerberos authentication.
+
+METHODS
+    * new
+        This method takes a hash of parameters. The following options are
+        valid:
+
+        * realm Kerberos realm.
+
+                    realm => 'REALM.COMPANY.COM'
+
+        * log   Any object that supports "debug", "info", "error" and
+                "warn".
+
+                    log => Log::Log4perl->get_logger('Authen::Simple::Kerberos')
+
+    * authenticate( $username, $password )
+        Returns true on success and false on failure.
+
+SEE ALSO
+    Authen::Simple.
+
+    Authen::Krb5::Simple.
+
+AUTHOR
+    Christian Hansen "ch@ngmedia.com"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

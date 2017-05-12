@@ -1,0 +1,52 @@
+This is the README file for Authen::ACE, the Perl interface to the
+Security Dynamics' SecurID ACE client API.
+
+This is version 0.90 of Authen::ACE. This version is still considered
+alpha software. It has only been built on Solaris 2.5.1 with Perl
+5.004_03 and gcc 2.7.2.1. It has only been tested against version
+3.0.1 of ACE/Server.
+
+AVAILABILITY
+
+The latest version of Authen::ACE is available from the Comprehensive
+Perl Archive Network (CPAN) or via anonymous FTP at 
+
+  ftp://ftp.iplenergy.com/pub/perl 
+
+INSTALLATION
+
+See the accompanying INSTALL file for detailed installation
+directions.
+
+EXAMPLES
+
+The eg directory contains a few example scripts. Some of them require
+entering PINs and tokens. If you have the Term::ReadKey module
+(available from CPAN), then the example scripts will generally use it
+to avoid echoing PINs to the screen. If you don't have the module, ALL
+ENTERED PINS WILL WILL BE DISPLAYED IN PLAIN TEXT.
+
+SUPPORT
+
+You can send bug reports and suggestions for improvements on this
+module to me at <mailto:Dave.Carrigan@iplenergy.com>. However, I can't
+promise to offer any other support for this module (the lawyers made
+me say that).
+
+FUTURE WORK
+
+Support for the functions sdi_auth_create_certificate() and
+sdi_auth_validate_certificate() is not yet implemented.
+
+COPYRIGHT
+
+This module is Copyright © 1997 Dave Carrigan, Interprovincial Pipe
+Line Inc. All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. This module is distributed in the
+hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. The copyright holder of this module can not be held liable
+for any general, special, incidental or consequential damages arising
+out of the use of the module.

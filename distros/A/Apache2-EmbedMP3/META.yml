@@ -1,0 +1,21 @@
+---
+abstract: 'Embed MP3 audio files into a templated web interface'
+author:
+  - 'David Moreno <david@axiombox.com>, L<http://damog.net/>.'
+distribution_type: module
+generated_by: 'Module::Install version 0.78'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Apache2-EmbedMP3
+no_index:
+  directory:
+    - examples
+    - inc
+requires:
+  Music::Tag::Lyrics: 0.29
+  Music::Tag::MP3: 0.29
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.1

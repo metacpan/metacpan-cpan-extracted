@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 a8c5218aab6f19676a0488735584121a8cdebb52 Changes
+SHA1 6f239f0e6b763c2308047e63337a4d45c0996713 MANIFEST
+SHA1 29fa63bc3a00f121c2b36fbb7f75256a8b3de770 META.json
+SHA1 3edef11778db82f28e1dbb2ff13b34615585c1e0 META.yml
+SHA1 5a2f676d86fcfb4aa62f53db6a1b3bea592618e5 Makefile.PL
+SHA1 cb60b913cb40b392718d32e8ced0f4f4fce23f80 README
+SHA1 48b6d901065fb8a0863ae5fa1f6027aae7d04d7f lib/Aard.pm
+SHA1 459959189c38ed5095d4bd0e8f21ad1fa3f28fca t/Aard.t
+SHA1 38e312abd39e6c202cd5dcd843de4f7fa68be4b7 t/jargon-4.4.7-1.aar
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJUZnD6AAoJEMoENb5ewbNiDaEP/1bK3hZEwQUJVlcXyE+IvHTl
+JPaeWIzDWFXHh9bAg965Ks7FdQk3Pc223GZdwH/qu1cCkxr5dI5H1xbI2kJhGpWS
+pz7Til4cvsjHetaOPQclUvksnjvV96jTJ5VY+isHsdyCw4K76gype0i7WlmbYuGS
+0BirhVkKcWWl5/eeqvFngiC0frQhXq005MX6ypOv9OKjLarmr4ty/MqLym7cdLcl
+3X3nUNKY2eGNvSk1ZMG7PsZdaIt2dzfIC2O8zbfXTlHGEPUrwZ+SDjf+LPNsHrab
+nVwrOdSiuhoxAZDyp6llNV6IuDFjTibN5vnNQ/dhkLJppCCOc9DHfToDQTVRAHXd
+Kfhm/74MFO40sreX1X7bUIZb1pz158g5Uw0jdPMq2pgZWi3H4Fom+EI4xYp6AsFx
+csehAPjmah7QS1ebL53T7RIh2w8e7JsEW6aHnsIch8ffx7hjbP4jWHRtcoYdMCBy
+AVXUZ4Ytk1c3ns3qLnH+1MOiUZaXO9VVA7ZEdZEMFxxeJv54KClQgSDdlvnhShuv
+waBuPXegmC5dRzMjJ5hf3pB6Wau2NlpVhKzxuMMSaaFBBGc6Lc8gcmuyhUvEU64H
+e6hShurtUze91SpyLsPSK2EYTIe8n8BD9KyRNQptwZ3u2MaaiJyzxLOHU26CT6D1
+OezZLG6muDT1brZKQ+1I
+=q99Z
+-----END PGP SIGNATURE-----

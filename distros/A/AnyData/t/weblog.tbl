@@ -1,0 +1,1 @@
+12.34.56.78 - - [13/Mar/2008:07:38:53 +0100] "GET /creeper/image HTTP/1.1" 200 252 "http://www.example.com/" "Mozilla/5.0 (Windows; U; Windows NT 6.0; sv-SE; rv:1.8.1.12) Gecko/20080201 Firefox/2.0.0.12"

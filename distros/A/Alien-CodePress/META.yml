@@ -1,0 +1,28 @@
+---
+name: Alien-CodePress
+version: 1.03
+author:
+  - 'Ask Solem <asksh@cpan.org>'
+abstract: Installing and finding CodePress.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Archive::Extract: 0
+  Module::Build: 0
+  perl: 5.6.1
+build_requires:
+  Test::Exception: 0
+dynamic_config: 1
+provides:
+  Alien::CodePress:
+    file: lib/Alien/CodePress.pm
+    version: 1.03
+  Alien::CodePress::Archive:
+    file: lib/Alien/CodePress/Archive.pm
+    version: 1.03
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+distribution_type: Module

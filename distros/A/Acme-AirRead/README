@@ -1,0 +1,27 @@
+This is Perl module Acme::AirRead.
+
+INSTALLATION
+
+Acme::AirRead installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Acme::AirRead
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Acme::AirRead documentation is available as in POD. So you can do:
+
+    % perldoc Acme::AirRead
+
+to read the documentation online with your favorite pager.
+
+Koji Takiguchi

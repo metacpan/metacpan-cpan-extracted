@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Apache/Session/Wrapper.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01-basic.t
+t/02-register.t
+t/99-pod.t
+t/apache/basic.t
+t/conf/extra.conf.in
+t/response/TestApache/basic.pm
+t/TEST.PL
+SIGNATURE    Added here by Module::Build

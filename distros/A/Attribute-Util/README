@@ -1,0 +1,60 @@
+NAME
+    Attribute::Util - Assorted general utility attributes
+
+SYNOPSIS
+      # makes all attributes available
+      use  Attribute::Util;
+
+      # or you can load individual attributes 
+      use Attribute::Util qw(Memoize SigHandler);
+
+DESCRIPTION
+    When used without argument, this module provides four universally
+    accessible attributes of general interest as follows:
+
+    Abstract
+        See Attribute::Abstract.
+
+    Alias
+        See Attribute::Alias.
+
+    Memoize
+        See Attribute::Memoize.
+
+    Method
+        See Attribute::Method.
+
+    SigHandler
+        See Attribute::SigHandler.
+
+    When used with arguments, this module acts as an attributes loader.
+
+      use Attribute::Util qw/Memoize SigHandler/;
+
+    Is exactly the same as
+
+      use Attribute::Memoize; use Attribute::SigHandler;
+
+    Theoretically, you can load any other attribute handlers so long as it
+    is named *Attribute::AnyThing*.
+
+BUGS
+    None known so far. If you find any bugs or oddities, please do inform
+    the author.
+
+AUTHOR
+    Marcel Grunauer, <marcel@codewerk.com>
+
+    Dan Kogai, <dankogai@dan.co.jp>
+
+COPYRIGHT
+    Copyright 2001 Marcel Grunauer. All rights reserved.
+
+    Copyright 2006 Dan Kogai. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    perl(1), Attribute::Handlers
+

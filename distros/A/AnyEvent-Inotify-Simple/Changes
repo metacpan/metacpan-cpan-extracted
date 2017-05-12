@@ -1,0 +1,14 @@
+Change history for AnyEvent-Inotify-Simple
+
+0.03      2014-06-09 20:56:31+10:00 Australia/Melbourne
+  - handle new file disappearing quickly while we're checking to see if its a
+    directory and needs to be watched
+  - silenced occasional warnings at destruction
+  - fixed tests
+  - converted to dzil
+
+0.02 Wed Sep 15 05:15:13 CDT 2010
+  - fix prereqs; no code changes
+
+0.01 Sun Sep 12 04:10:45 CDT 2010
+  - initial release

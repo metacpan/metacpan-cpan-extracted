@@ -1,0 +1,17 @@
+name
+-
+Client
+Contact
+Contractor
+Customer
+Donor
+Family
+Friend
+Guest
+Manager
+Other
+Patient
+Staff
+Supervisor
+Supplier
+Visitor

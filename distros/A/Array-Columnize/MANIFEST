@@ -1,0 +1,20 @@
+Build.PL			Run this first. Creates Build program
+ChangeLog
+Changes				What's changed? 
+GNUmakefile			Compatibilty for non-Perl users. Try: remake --tasks
+eg/example.pl
+lib/Array/Columnize.pm
+lib/Array/Columnize/columnize.pm
+lib/Array/Columnize/options.pm
+Makefile.PL			Compatibility with MakeMaker
+MANIFEST			This list of files
+META.json
+META.yml
+README.md			Read this. It is formatted with mark-down
+t/00.test-pod.t
+t/01.version.t
+t/02.options.t
+t/03.cell_size.t
+t/04.columnize.t
+t/05.longcol.t
+SIGNATURE    Added here by Module::Build

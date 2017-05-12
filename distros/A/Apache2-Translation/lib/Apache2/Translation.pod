@@ -1,0 +1,903 @@
+=head1 NAME
+
+Apache2::Translation - Configuring Apache dynamically
+
+=head1 SYNOPSIS
+
+  LoadModule perl_module /path/to/mod_perl.so
+  PerlLoadModule Apache2::Translation
+  PerlTransHandler Apache2::Translation
+  PerlMapToStorageHandler Apache2::Translation
+  TranslationEvalCache 1000
+  TranslationKey MyKey
+  <TranslationProvider DB>
+      Database  dbi:mysql:dbname:host
+      User      username
+      Password  password
+      Singleton 1
+      Table     tablename
+      Key       keycolumn
+      Uri       uricolumn
+      Block     blockcolumn
+      Order     ordercolumn
+      Action    actioncolumn
+      Cachetbl  cachetablename
+      Cachecol  cachecolumn
+      Cachesize 1000
+  </TranslationProvider>
+
+  # another provider
+  <TranslationProvider File>
+      Configfile /path/to/config
+  </TranslationProvider>
+
+  # export our provider parameters
+  <Location /config>
+    SetHandler modperl
+    PerlResponseHandler Apache2::Translation::Config
+  </Location>
+
+  # configuring the WEB interface
+  PerlModule Apache2::Translation::Admin
+  <Location /-/transadm/>
+    SetHandler modperl
+    PerlResponseHandler Apache2::Translation::Admin
+  </Location>
+
+=head1 DESCRIPTION
+
+As the name implies C<Apache2::Translation> lives mostly in the URI Translation
+Phase. It is somehow similar to C<mod_rewrite> but configuration
+statements are read at runtime, thus, allowing to reconfigure
+a server without restarting it.
+
+The actual configuration statements are read by means of a
+I<Translation Provider>, a Perl class offering
+a particular interface, see below. Currently there are 3 providers
+implemented, L<Apache2::Translation::DB>, L<Apache2::Translation::BDB>,
+and L<Apache2::Translation::File>.
+
+There is also a WEB interface (L<Apache2::Translation::Admin>).
+
+=head2 B<An Example>
+
+Let's begin with an example. Given some database table:
+
+ id  key    uri      blk ord action
+  1  front  :PRE:    0   0   Cond: $HOSTNAME !~ /^(?:www\.)xyz\.(?:com|de)$/
+  2  front  :PRE:    0   1   Redirect: 'http://xyz.com'.$URI, 301
+  3  front  :PRE:    1   0   Do: $CTX{lang}='en'
+  4  front  :PRE:    1   1   Cond: $HOSTNAME =~ /de$/
+  5  front  :PRE:    1   2   Do: $CTX{lang}='de'
+  6  front  /static  0   0   File: $DOCROOT.'/'.$CTX{lang}.$MATCHED_PATH_INFO
+  7  front  /appl1   0   0   Proxy: 'http://backend/'.$CTX{lang}.$URI
+  8  front  /appl2   0   0   Proxy: 'http://backend/'.$URI.'?l='.$CTX{lang}
+  9  front  /        0   0   Config: ['AuthName "secret"'], ['AuthType Basic']
+ 10  back   :PRE:    0   0   Cond: $r->connection->remote_ip ne '127.0.0.1'
+ 11  back   :PRE:    0   1   Error: 403, 'Forbidden by Apache2::Translation(11)'
+ 12  back   /appl1   0   0   PerlHandler: 'My::Application1'
+ 13  back   /appl2   0   0   PerlHandler: 'My::Application2'
+
+The C<id> column in this table is not really necessary for
+C<Apache2::Translation>. But if you want to deploy
+L<Apache2::Translation::Admin> you need it.
+
+Well, here we have a frontend/backend configuration. The frontend records
+are labeled with the key C<front>, the backend records with C<back>.
+
+When a request comes in first the records with C<:PRE:> in the C<uri>-field are
+examined. Suppose, a request for C<http://abc.com/static/img.png>
+comes in. Record 1 (id=1) checks the C<Host> header. The expression
+after C<Cond:> is evaluated as Perl code. It obviously returns true.
+C<Cond> stands for I<condition>. But how does it affect the further
+workflow? Here C<blk> and C<ord> come in. All records with the same
+C<key>, C<uri> and C<blk> form a B<block>. C<ord> gives an order within
+this block. Within a block all actions are executed up to the first
+condition that is false.
+
+Now, because our condition in record 1 is true the action in record 2
+(within the same block) is executed. It redirects the browser with a
+HTTP code of 301 (MOVED PERMANENTLY) to C<http://xyz.com/static/img.png>.
+
+When the redirected request comes back the condition in record 1 is
+false. Hence, the next block (key=front, uri=:PRE:, blk=1) is evaluated.
+First a C<lang> member of a context hash is set to C<en>. A C<Do> action
+is similar to a condition, only its value is ignored. Record 4 then
+checks if the C<Host> header matches C</de$/>. If so, then record 5 sets
+the I<language> to C<de>.
+
+Now, the records labeled with C<:PRE:> are finished. The handler starts
+looking for blocks labeled with the request uri. That is, it looks
+for a block with key=front, uri=/static/img.png. None is found.
+
+Then it cuts off the last part of the uri (/img.png), repeats the
+lookup and finds record 6. The C<File> action sets C<$r-E<gt>filename> to
+C<$DOCROOT/en/img.png>. C<Apache2::Translation> provides some convenience
+variables. They are tied to members of the request record.
+C<$MATCHED_PATH_INFO> contains the uri part cut off
+(C</img.png>). More on them below.
+
+Now another round is started and the next uri part is cut off. Record 9
+matches. We see a C<Config> action that sets C<AuthName> and C<AuthType>.
+
+At the end the translation handler checks if C<$r-E<gt>filename> was set and
+returns C<Apache2::Const::OK> or C<Apache2::Const::DECLINED> respectively.
+
+I think that example gives a general idea, what C<Apache2::Translation>
+does.
+
+=head2 B<Processing States>
+
+Internally C<Apache2::Translation> is implemented as a state machine. It
+starts in the I<START> state, where some variables are initialized. From
+there it shifts immediately to the I<PREPOC> state. Here all C<:PRE:>
+rules are evaluated. From I<PREPROC> it shifts to I<PROC>. Now the rules
+with real uris are examined. When the I<DONE> state is reached processing is
+finished.
+
+There is a special state named I<LOOKUPFILE>. It is only used for subrequests
+that don't have an URI. For such requests the URI translation phase of the
+request cycle is skipped. Hence a I<PerlTransHandler> would never be called.
+Such requests are results of calling C<$r-E<gt>lookup_file> for example.
+
+To catch also such requests install C<Apache2::Translation> both as
+I<PerlTransHandler> as well as I<PerlMapToStorageHandler>. Then if such a
+subrequest occures the handler enters the I<LOOKLUPFILE> state instead of
+I<PREPROC>. From I<LOOKLUPFILE> it normally shifts to I<PROC> unless it
+executes a C<Restart> action. In that case it shifts to I<PREPROC>.
+
+You have to set C<$MATCHED_URI> to some initial value if you want to hop
+through the I<PROC> phase. A still empty C<$MATCHED_URI> shifts from I<PROC>
+immediately to I<DONE>.
+
+B<Note>: The I<LOOKUPFILE> stuff is still somewhat experimental.
+
+You can control the current state by means of the C<State>, C<Done> and
+C<Restart> actions.
+
+=head2 B<Blocks and Lists of Blocks>
+
+Above, we have defined a B<block> as all records with the same
+C<key>, C<uri> and C<block>. The actions within a block are ordered by
+the C<order> field.
+
+A B<list of blocks> is then an ordered list of all blocks with the same
+C<key> and C<uri>. The order is given by the C<block> number.
+
+=head2 B<Actions>
+
+An action starts with a key word optionally followed by a colon and
+some arguments. The key words are case insensitive.
+
+C<Apache2::Translation> provides some environment for code snippets in
+actions. They are compiled into perl functions. The compiled result is
+cached. 2 variables, C<$r> and C<%CTX>, are provided plus a few
+convenience variables. C<$r> is the current C<Apache2::RequestRec>.
+C<%CTX> is a hash that can be used to store arbitrary data. This hash
+is not used by Apache2::Translation itself. It can be used to pass data
+between actions. But note, the hash is localized to the translation handler.
+So, it cannot be used to pass data between different phases of the
+apache request cycle. Use C<$r-E<gt>notes> or C<$r-E<gt>pnotes> for that.
+
+
+=over 4
+
+=item B<Do: perl_code>
+
+=item B<Fixup: perl_code>
+
+C<Do> is the simplest action. The Perl code is evaluated in scalar context.
+The return value is ignored. C<Fixup> is just the same save it is run in the
+I<Fixup> phase
+
+=item B<Cond: perl_code>
+
+This is almost the same as C<Do>. The return value is taken as boolean.
+If it is false, the current block is finished. Processing continues
+with the next block.
+
+=item B<Done>
+
+C<Done> finishes the current block list and transfers control to the next state.
+That means if encountered in I<PREPROC> state it switches to I<PROC>. If the
+current state is I<PROC> then the translation handler ends here.
+
+This action is a combination of C<State: next_state> and C<Last>, see below.
+
+Don't try to use C<Done> to return from a subroutine. Use C<Last> instead.
+
+=item B<File: string>
+
+This action sets C<$r-E<gt>filename> to string. It is equivalent to
+
+ Do: $FILENAME=do{ string }
+
+=item B<Doc: ?content_type?, string>
+
+C<string> is evaluated as well as C<content_type> if given. Then a special
+C<moperl> handler is installed that simply sets the given content type and
+prints out the string to the client. C<content_type> is C<text/plain> if
+omitted.
+
+=item B<Proxy: ?url?>
+
+This tells Apache to forward the request to C<url> as a proxy. C<url> is
+optional. If ommitted C<$r-E<gt>unparsed_uri> is used. That means Apache
+must be used as a proxy by the browser.
+
+=item B<CgiScript: ?string?>
+
+is equivalent to
+
+ Do: $r->handler( 'cgi-script' );
+ FixupConfig: ['Options ExecCGI']
+
+If C<string> is given it is evaluated and the result is assigned to
+C<$r-E<gt>filename>.
+
+=item B<PerlScript: ?string?>
+
+is equivalent to
+
+ Do: $r->handler( 'perl-script' );
+ FixupConfig: ['Options ExecCGI'], ['PerlOptions +ParseHeaders']
+
+If C<string> is given it is evaluated and the result is assigned to
+C<$r-E<gt>filename>.
+
+=item B<PerlHandler: string>
+
+In short this action tries to figure out what C<string> means and calls it
+as C<modperl> handler.
+
+In detail it installs a C<Apache2::Translation::response> as
+C<PerlResponseHandler>. When called the handler evaluates C<string> which
+results either in a subroutine name, a package name, a subroutine reference
+or an object or class that implements the C<handler> method. If a package
+name is given it must implement a C<handler> subroutine.
+
+If the given package is not yet loaded it is C<require>ed.
+
+Then the resulting subroutine or method is called and C<$r> is passed.
+
+Further, a C<PerlMapToStorageHandler> is installed that skips the handling
+of C<Directory> containers and C<.htaccess> files. If not set, this
+handler also sets C<path_info>. Assumed,
+
+ #uri        blk ord action
+ /some/path  0   0   PerlHandler: ...
+
+and a request comes in for C</some/path/foo/bar>. Then C<path_info> is set
+to C</foo/bar>.
+
+=item B<Config: list_of_strings_or_arrays>
+
+=item B<FixupConfig: list_of_strings_or_arrays>
+
+Surprisingly, these are the most complex actions of all.
+
+C<Config> adds Apache configuration directives to the request in the
+I<Map To Storage> phase B<before> the default C<MapToStorage> handler. Think of
+it as a kind of C<.htaccess>. C<FixupConfig> does the same in the I<Fixup>
+phase. While C<Config> is used quite often C<FixupConfig> is seldom required.
+It is used mainly to mend configurations that are spoiled by the default
+C<MapToStorage> handler.
+
+Arguments to both actions are strings or arrays of one or two elements:
+
+ Config: 'AuthName "secret"',
+         ['AuthType Basic'],
+         ['ProxyPassReverse http://...', '/path']
+
+To understand the different meaning, you have to know about how Apache
+applies its configuration to a request. Hence, let's digress a little.
+
+Each Apache directive is used in certain contexts. Some for example
+can occur only in server config context, that means outside  any C<Directory>,
+C<Location> or even C<VirtualHost> container. C<Listen> or C<PidFile> are
+examples. Other directives insist on being placed in a container.
+
+Also, the point in time when a directive takes effect differs for different
+directives. C<PidFile> is clearly applied during server startup before
+any request is processed. Hence, our C<Config> action cannot apply C<PidFile>.
+It's simply too late. C<AllowOverride> is applied to single requests.
+But since it affects the processing of C<.htaccess> files it must be applied
+before that processing takes place. To make things even more confusing some
+directives take effect at several points in time. Consider
+
+ Options FollowSymLinks ExecCGI
+
+C<FollowSymLinks> is applied when Apache looks up a file in the file system,
+while C<ExecCGI> influences the way the response is generated ages later.
+
+Apache solves this complexity by computing a configuration for each single
+request. As a starting point it uses the server default configuration. That
+is the configuration outside any C<Location> or C<Directory> for a
+virtual host. This basic configuration is assigned to the request just
+between the I<Uri Translation Phase> and I<Map to Storage>. At the very
+end of I<Map to Storage> Apache's core I<Map to Storage> handler incorporates
+matching C<Directory> containers and C<.htaccess> files into the request's
+current configuration. C<Location> containers are merged after
+I<Map to Storage> is finished.
+
+Our C<Config> action is applied early in I<Map to Storage>. That means it
+affects the way Apache maps the request file name computed to the file
+system, because that comes later. But it also means, your
+static configuration (config file based) overrides our C<Config> actions.
+This limitation can be partly overcome using C<FixupConfig> instead of
+C<Config>.
+
+Now, what does the various syntaxes mean? The simplest one:
+
+ #uri      blk ord action
+ /uri      0   0   Config: 'ProxyPassReverse http://my.backend.org'
+
+is very close to
+
+ <Location /uri>
+   ProxyPassReverse http://my.backend.org
+ </Location>
+
+Only, it is applied before any C<Directory> container takes effect.
+Note, the uri-argument to the C<Location> container is the value of
+C<$MATCHED_URI>, see below. This is also valid if the C<Config> action
+is used from a C<Call>ed block.
+
+The location uri is sometimes important. C<ProxyPassReverse>, for
+example, uses the path given to the location container for its own purpose.
+
+All other forms of C<Config> are not influenced by C<$MATCHED_URI>.
+
+These two:
+
+ Config: ['ProxyPassReverse http://my.backend.org']
+ Config: ['ProxyPassReverse /path http://my.backend.org', '']
+
+are equivalent to
+
+ <Location />
+   ProxyPassReverse http://my.backend.org
+ </Location>
+
+Note, the location container uri differs.
+
+The first one of them is also the only form of C<Config> available with
+mod_perl before 2.0.3.
+
+The next one:
+
+ Config: ['ProxyPassReverse http://my.backend.org', '/path']
+
+is equivalent to
+
+ <Location /path>
+   ProxyPassReverse http://my.backend.org
+ </Location>
+
+I have chosen C<ProxyPassReverse> for this example because the C<Location>
+container uri matters for this directive, see httpd docs. The following
+form of applying C<ProxyPassReverse> outside of any container is not
+possible with C<Apache2::Translation>:
+
+ ProxyPassReverse /path http://my.backend.org
+
+Now let's look at another example to see how C<Directory> containers and
+C<.htaccess> files are applied. C<AllowOverride> controls which directives
+are allowed in C<.htaccess> files. As said before Apache applies C<Directory>
+containers and C<.htaccess> files after our C<Config> directives.
+Unfortunately, they are both applied in the same step. That means we can
+say:
+
+ Config: 'AllowOverride Options'
+
+But if at least one C<Directory> container from our C<httpd.conf> is applied
+that says for example C<AllowOverride AuthConfig> it will override our
+C<Config> statement. So, if you want to control which directives are allowed
+in C<.htaccess> files with C<Apache2::Translation> then avoid C<AllowOverride>
+in your C<httpd.conf>, especially the often seen:
+
+ <Directory />
+   AllowOverride None
+ </Directory>
+
+Put it instead in a I<PREPROC> rule:
+
+ #uri     blk ord action
+ :PRE:    0   0   Config: 'AllowOverride None'
+
+So subsequent rules can override it.
+
+A similar problem exists with C<Options FollowSymlinks>. This option affects
+directly the phase when C<Directory> containers are applied. Hence, any
+such option from the C<httpd.conf> cannot be overridden by a C<Config> rule.
+
+In Apache 2.2 at least up to 2.2.4 there is a bug that prevents
+C<Config: AllowOverride Options> from working properly. The reason is an
+uninitialized variable that is by cause 0, see
+L<http://www.gossamer-threads.com/lists/apache/dev/327770#327770>
+
+=item B<Call: string, ?@params?>
+
+Well, the name suggests it is calling a subroutine. Assume you have several
+WEB applications running on the same server, say one application for each
+department. Each department needs of course some kind of authorization:
+
+ #uri      blk ord action
+ AUTH      0   0   Config: "AuthName \"$ARGV[0]\""
+ AUTH      0   1   Config: 'AuthType Basic'
+ AUTH      0   2   Config: 'AuthUserFile /etc/htaccess/user/'.$ARGV[1]
+ /dep1     0   0   Call: qw/AUTH Department_1 dep1/
+ /dep2     0   0   Call: qw/AUTH Department_2 dep2/
+
+The C<AUTH> in the C<Call> actions refer to the C<AUTH> block list in the
+C<uri> column. An optional parameter list is passed via C<@ARGV>.
+
+C<Call> fetches the block list for a given uri and processes it. If a
+C<Last> action is executed the processing of that block list is finished.
+
+=item B<Redirect: url, ?http_code?>
+
+The C<Redirect> action sends a HTTP redirect response to the client and
+abort the current request. The optional C<http_code> specifies the
+HTTP response code. Default is 302 (MOVED TEMPORARILY).
+
+C<Redirect> tries to make the outgoing C<Location> header RFC2616 conform.
+That means if the schema part is ommitted it figures out if it has to be
+C<http> or C<https>. If a relative url is given an appropriate url is
+computed based on the current value of C<$URI>.
+
+If the current request is the result of an internal redirect the
+redirecting request's status is changed to C<http_code>. Thus,
+C<Redirect> works also for C<ErrorDocument>s.
+
+=item B<Error: ?http_code?, ?message?>
+
+C<Error> aborts the entire request. A HTTP response is sent to the client.
+The optional C<http_code> specifies the HTTP response code. The optional
+C<message> is logged as reason to the C<error_log>.
+
+C<http_code> defaults to 500 (INTERNAL SERVER ERROR), C<message> to
+C<unspecified error>.
+
+=item B<Uri: string>
+
+This action sets C<$r-E<gt>uri> to string. It is equivalent to
+
+ Do: $URI=do{ string }
+
+=item B<Key: string>
+
+C<string> is evaluated in scalar context. The result is assigned to the
+current key. The new key takes effect if the list of blocks matching the
+current uri is finished.
+
+For example:
+
+ id  key    uri      blk ord action
+  1  dflt   :PRE:    0   0   Cond: $CLIENTIP eq '192.168.0.1'
+  2  dflt   :PRE:    0   1   Key: 'spec'
+  3  dflt   :PRE:    0   2   Do: $DEBUG=3
+  4  dflt   :PRE:    1   0   Config: 'Options None'
+  5  dflt   /        0   0   File: $DOCROOT.$URI
+  6  spec   /        0   0   File: '/very/special'.$URI
+
+Here an entirely different directory tree is shown to a client with the IP
+address C<192.168.0.1>. In record 2 the current key is set to C<spec> if the
+condition in record 1 matches. Also, C<$DEBUG> is set in this case (record 3).
+
+The next block in record 4 is executed for all clients, because the key
+change is not in effect, yet.
+
+Records 5 and 6 are new lists of blocks. Hence, record 6 is executed only
+for C<192.168.0.1> and record 5 for the rest.
+
+The action C<Key: 'string'> is equivalent to C<Do: $KEY='string'>.
+
+=item B<Restart: ?newuri?, ?newkey?, ?newpathinfo?>
+
+C<Restart> restarts the processing from the I<PREPROC> phase. The optional
+arguments ar evaluated and assumed to result in strings. C<newuri> is then
+assigned to C<$r-E<gt>uri> and C<$MATCHED_URI>. C<newkey> is assigned to
+C<$KEY> and C<newpathinfo> to C<$MATCHED_PATH_INFO>.
+
+=item B<State: string>
+
+If you look for a premature exit from the current block list take the
+C<Done> action.
+
+This action affects the current state directly. Thus, you can loop back to
+the I<PREPROC> state from I<PROC>. It is mostly used the prematurely finish
+the translation handler from the I<PREPROC> state. As the C<Key> action
+it takes effect, when the current list of blocks is finished.
+
+C<string> is evaluated as perl code. It is expected to result in one of
+the following strings. If not, a warning is printed in the C<error_log>.
+State names are case insensitive:
+
+    start
+    preproc
+    proc
+    done
+
+The C<State> action is similar to setting the convenience variable C<$STATE>.
+Only in the latter case you must use the state constants, e.g.
+C<$STATE=DONE>.
+
+=item B<Last>
+
+If you look for a premature exit from the current block list take the
+C<Done> action.
+
+This action finishes the current list of blocks (just like a false
+condition finishes the current block). It is used together with
+C<State> to finish the translation handler from a conditional block in
+the I<PREPROC> state:
+
+ :PRE:  0 0 Cond: $finish
+ :PRE:  0 1 State: 'done'
+ :PRE:  0 2 Last
+
+Another application of C<Last> is to return from a C<Call> action.
+
+=back
+
+=head2 B<Convenience Variables and Data Structures>
+
+=over 4
+
+=item B<$URI>
+
+tied to C<$r-E<gt>uri>
+
+=item B<$REAL_URI>
+
+tied to C<$r-E<gt>unparsed_uri>
+
+=item B<$METHOD>
+
+tied to C<$r-E<gt>method>
+
+=item B<$QUERY_STRING>
+
+tied to C<$r-E<gt>args>
+
+=item B<$FILENAME>
+
+tied to C<$r-E<gt>filename>
+
+=item B<$DOCROOT>
+
+tied to C<$r-E<gt>document_root>
+
+=item B<$HOSTNAME>
+
+tied to C<$r-E<gt>hostname>
+
+=item B<$PATH_INFO>
+
+tied to C<$r-E<gt>path_info>
+
+=item B<$REQUEST>
+
+tied to C<$r-E<gt>the_request>
+
+=item B<$HEADERS>
+
+tied to C<$r-E<gt>headers_in>
+
+=item B<$C>
+
+tied to C<$r-E<gt>connection>
+
+=item B<$CLIENTIP>
+
+tied to C<$r-E<gt>connection-E<gt>remote_ip>
+
+=item B<$KEEPALIVE>
+
+tied to C<$r-E<gt>connection-E<gt>keepalive>
+
+For more information see L<Apache2::RequestRec>.
+
+=item B<$MATCHED_URI>
+
+tied to C<$r-E<gt>notes('Apache2::Translation::n::uri')>
+
+=item B<$MATCHED_PATH_INFO>
+
+tied to C<$r-E<gt>notes('Apache2::Translation::n::pathinfo')>
+
+While in C<PROC> state the incoming uri is split in 2 parts. The first part
+is matching the C<uri> field of a database record. The second part is the
+rest. They can be accessed as C<$MATCHED_URI> and C<$MATCHED_PATH_INFO>.
+
+=item B<$KEY>
+
+the current key.
+
+Tied to C<$r-E<gt>notes('Apache2::Translation::n::key')>
+
+=item B<$STATE>
+
+the current processing state.
+
+=item B<$RC>
+
+Normally, C<Apache2::Translation> checks at the end if C<$r-E<gt>filename> is
+set. If so, it returns C<Apache2::Const::OK> to its caller. If not,
+C<Apache2::Const::DECLINED> is returned. The first alternative signals that
+the I<Uri Translation Phase> is done and no further handlers are to be called
+in this phase. The second alternative says that subsequent handlers are
+to be called. Thus, C<mod_alias> or the core translation handler
+see the request.
+
+Setting C<$RC> your action decide what is returned.
+
+C<$RC> is also set by the C<PerlHandler> action. Modperl generated responses
+are normally not associated with a single file on disk.
+
+=item B<$DEBUG>
+
+tied to C<$r-E<gt>notes('Apache2::Translation::n::debug')>
+
+If set to C<1> or C<2> debugging output is sent to the C<error_log>.
+
+=item B<%CTX>
+
+a hash to store arbitrary data. It can be used to pass data between action
+blocks. But note, it is localized to the translation handler. So, it cannot
+be used to pass data between different phases of the apache request cycle.
+Use C<$r-E<gt>notes> or C<$r-E<gt>pnotes> for that.
+
+=back
+
+=head1 APACHE CONFIGURATION DIRECTIVES
+
+After installed and loaded by
+
+  PerlLoadModule Apache2::Translation
+
+in your C<httpd.conf> C<Apache2::Translation> is configured with
+the following directives:
+
+=over 4
+
+=item B<E<lt>TranslationProvider classE<gt> ... E<lt>/TranslationProviderE<gt>>
+
+Currently there are 3 provider classes implemented,
+L<Apache2::Translation::DB>, L<Apache2::Translation::File> and
+L<Apache2::Translation::BDB>.
+
+The ellipsis represents configuration lines formatted as
+
+ NAME   VALUE
+
+These lines are passed as parameters to the provider. C<NAME> is case
+insensitive and is converted to lowercase before passed to the provider
+object. Spaces round C<VALUE> are stripped off. If C<VALUE> begins and
+ends with the same quotation character (double quote or single quote)
+they are also stripped off.
+
+If C<VALUE> is not quoted or is quoted with double quote characters then
+it is subject to environment variable expansion. All substrings that match
+C<${VAR}> are replaced by the environment variable C<VAR>.
+
+The provider object is then created by:
+
+ $Apache2::Translation::class->new( NAME1=>VALUE1, NAME2=>VALUE2, ... );
+
+where C<class> is exchanged by the actual provider name.
+
+=item B<TranslationProvider class param1 param2 ...>
+
+This is an alternative way to specify translation provider parameters.
+
+Each parameter is expected to be a string formatted as
+
+ NAME=VALUE
+
+There must be no spaces around the equal sign. The
+list is passed to the constructor of the provider class as named
+parameters:
+
+ $Apache2::Translation::class->new( NAME1=>VALUE1, NAME2=>VALUE2, ... );
+
+If C<class> is literally C<inherit> the provider of the base server is used.
+This is obviously valid only in a VHost configuration.
+
+=item B<TranslationKey initial-key>
+
+This sets the initial value for the key. Default is the string C<default>.
+
+=item B<TranslationEvalCache number>
+
+C<Apache2::Translation> compiles all code snippets into functions and caches
+these functions. Normally, an ordinary hash is used for this. Strictly
+speaking this is a memory hole if your translation table changes. I think
+that can be ignored, if the number of requests per worker is limited,
+see C<MaxRequestsPerChild>. If you think this is too lax, put a number here.
+
+If set the cache is tied to L<Tie::Cache::LRU>. The number of cached code
+snippets will then be limited by C<number>.
+
+=back
+
+=head2 VHost merging
+
+If in a VHost configuration any of the above directives is ommitted it is
+inherited from the base server.
+
+=head1 WHICH PROVIDER TO CHOOSE
+
+Unless you want to implement your own provider you can choose from these 3:
+
+=over 4
+
+=item * B<DB>
+
+This is the provider implemented first. It uses a cache to store lookup
+results but at least one read (to fetch the version) is made for each request.
+Use it if you already have a DB engine at your site and if you don't mind the
+additional lookups.
+
+=item * B<File>
+
+This provider is very fast. It reads the complete config file into memory and
+refreshes it when modified. Hence come the greatest drawback. Each perl
+interpreter reads the file and needs all the memory to hold every rule. So
+with many rules and a high C<MaxClients> directive it eats up much memory.
+
+=item * B<BDB>
+
+Choose this provider if you have many rules and a high C<MaxClients> directive.
+Since most of the database is stored in shared memory by BerkeleyDB it is
+almost as fast as the C<File> provider but its resource hunger is limited.
+
+=back
+
+=head1 EXPORTING OUR PROVIDER PARAMETERS
+
+A WEB server can export its provider parameters by means of the
+L<Apache2::Translation::Config> module. That can then be used by the
+admin interface to connect to that provider.
+
+=head1 THE WEB ADMINISTRATION INTERFACE
+
+The simplest way to configure the WEB interface is this:
+
+  PerlModule Apache2::Translation::Admin
+  <Location /-/transadm/>
+    SetHandler modperl
+    PerlResponseHandler Apache2::Translation::Admin
+  </Location>
+
+Note, here an extra PerlModule statement is necessary. If nothing else
+specified the provider that has handled the current request is used.
+
+Note, there is a slash at the end of the location statement. It is necessary
+to be specified. Also, the URL given to the browser to reach the WEB interface
+must end with a slash or with C</index.html>.
+
+Another provider is given by creating an C<Apache2::Translation::Admin>
+object:
+
+  <Perl>
+    $My::Transadmin=Apache2::Translation::Admin->new
+         (provider_spec=>[File,
+                          ConfigFile=>'/path/to/config']);
+  </Perl>
+
+  <Location /-/transadm/>
+    SetHandler modperl
+    PerlResponseHandler $My::Transadmin->handler
+  </Location>
+
+Here the provider is specified in a way similar to the C<TranslationProvider>
+statement above.
+
+Also, an URL can be given that links to an exported parameter set:
+
+  <Perl>
+    $My::Transadmin=Apache2::Translation::Admin->new
+         (provider_url=>'http://host/config');
+  </Perl>
+
+In this case C<LWP::UserAgent> is used to fetch the parameters.
+
+Or you can create the provider object by yourself and pass it:
+
+  <Perl>
+    use Apache2::Translation::File;
+    $My::Transadmin=Apache2::Translation::Admin->new
+	(provider=>Apache2::Translation::File->new
+                      (configfile=>'/path/to/config'));
+  </Perl>
+
+
+=head1 IMPLEMENTING A NEW PROVIDER
+
+A provider implements a certain interface that is documented in
+L<Apache2::Translation::_base>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Apache2::Translation::DB>
+
+=item L<Apache2::Translation::BDB>
+
+=item L<Apache2::Translation::File>
+
+=item L<Apache2::Translation::Admin>
+
+=item L<Apache2::Translation::_base>
+
+=item L<Apache2::Translation::Config>
+
+=item mod_perl: http://perl.apache.org
+
+=back
+
+=head1 TODO / WHISHLIST
+
+=over 4
+
+=item * B<UI improvements>
+
+Help system that provides a short explanation to the actions and perhaps
+convenience variables.
+
+Action selection box.
+
+More and better keyboard control.
+
+=item * B<cleaning up the javascript code>
+
+my.js could use redesign.
+
+=item * B<auto-Done mode>
+
+In this mode the the translation handler finishes the current state after
+processing the first block list. Most of my block lists have a C<Done>
+action at the end. This would also require an C<Continue> action that to
+go to the next block list thus overruling the auto-Done.
+
+=item * B<user identities + access rights>
+
+=item * B<domain specific mode>
+
+to delegate responsibility for certain domains to different user groups.
+
+=item * B<some kind of I<run-once> actions>
+
+To initialize things.
+
+=item * B<error_log hook>
+
+Apache implements an C<error_log> hook. If there were a perl interface to it
+one could direct error messages to separate files with C<Apache2::Translation>.
+
+=back
+
+=head1 AUTHOR
+
+Torsten Foertsch, E<lt>torsten.foertsch@gmx.netE<gt>
+
+=head1 SPONSORING
+
+Sincere thanks to Arvato Direct Services (http://www.arvato.com/) for
+sponsoring the initial version of this module.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2008 by Torsten Foertsch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+# Local Variables:
+# mode: perl
+# End:

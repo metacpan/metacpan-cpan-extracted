@@ -1,0 +1,22 @@
+Revision history for App-filewatch
+
+0.004   2016-10-23
+        Updating for release of version 0.004
+        Updated License file (Ivan Wills)
+        Fixed manifest test (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+        Added more configs (Ivan Wills)
+        Fixed checking if files changed (Ivan Wills)
+
+0.0.3   2015-08-09
+        Updating for release of version 0.0.3
+        Removed creation of makefile (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.0.2   2015-07-03
+        Updating for release of version 0.0.2
+        Removed unneeded tag (Ivan Wills)
+
+0.0.1   2015-03-08
+        First version, released on an unsuspecting world.
+

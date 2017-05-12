@@ -1,0 +1,28 @@
+Revision history for App-Addex-AddressBook-AppleScript
+
+0.008     2014-10-02 10:41:50-04:00 America/New_York
+        - allow "--" as line leader for comments in notes section
+
+0.007     2013-11-19 23:16:54 America/New_York
+          fix repository link
+
+0.006     2013-06-19 19:17:07 America/New_York
+          update bugtracker
+
+0.005     2013-04-18 21:10:49 America/New_York
+          for "company" cards, use the organization field rather than the name
+          fields
+
+0.004     2012-11-06 14:16:20 America/New_York
+          port the default_email feature from the Apple address book plugin
+
+0.003     2012-02-27 13:19:20 America/New_York
+          change how notes fields are processed
+
+          add a "use middle" field; if set and false, the person's middle name
+          is not used
+
+0.002     2010-12-07 09:08:02 America/New_York
+          explicitly state perl 5.10 requirement
+
+0.001     2010-12-06 22:07:36 America/New_York

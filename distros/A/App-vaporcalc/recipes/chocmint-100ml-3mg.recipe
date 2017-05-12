@@ -1,0 +1,28 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "TFA Double Chocolate",
+            "percentage" : "8"
+         },
+         {
+            "type" : "PG",
+            "tag" : "E.M.",
+            "percentage" : "1"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Peppermint",
+            "percentage" : "0.5"
+         }
+      ],
+      "target_pg" : 45,
+      "base_nic_per_ml" : 100,
+      "base_nic_type" : "PG",
+      "target_quantity" : "100",
+      "target_nic_per_ml" : "3",
+      "target_vg" : 55,
+      "notes" : []
+   }
+}

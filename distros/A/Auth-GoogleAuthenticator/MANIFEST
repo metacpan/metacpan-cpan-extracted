@@ -1,0 +1,37 @@
+.gitignore
+bin/app.pl
+bin/test.pl
+Changes
+config.yml
+environments/development.yml
+environments/production.yml
+lib/Auth/GoogleAuthenticator.pm
+lib/Dancer/Auth/GoogleAuthenticator.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+public/404.html
+public/500.html
+public/css/error.css
+public/css/style.css
+public/dispatch.cgi
+public/dispatch.fcgi
+public/favicon.ico
+public/images/perldancer-bg.jpg
+public/images/perldancer.jpg
+public/javascripts/jquery.js
+t/001_base.t
+t/002_index_route.t
+t/99-changes.t
+t/99-examples.t
+t/99-manifest.t
+t/99-pod.t
+t/99-todo.t
+t/99-unix-text.t
+t/99-versions.t
+views/index.tt
+views/layouts/main.tt
+views/login.tt
+views/setup_twofactor.tt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

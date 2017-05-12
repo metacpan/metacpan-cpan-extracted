@@ -1,0 +1,24 @@
+Build.PL
+CHANGES
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+lib/Apache/Auth/User.pm
+lib/Apache/Auth/User/Basic.pm
+lib/Apache/Auth/User/Digest.pm
+lib/Apache/Auth/UserDB.pm
+lib/Apache/Auth/UserDB/File.pm
+lib/Apache/Auth/UserDB/File/Basic.pm
+lib/Apache/Auth/UserDB/File/Digest.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-user-basic.t
+t/01-user-digest.t
+t/02-userdb-file-basic.t
+t/03-userdb-file-digest.t
+TODO
+SIGNATURE    Added here by Module::Build

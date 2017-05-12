@@ -1,0 +1,15 @@
+=head1 Name
+
+sqitch-status-usage - Sqitch status usage statement
+
+=head1 Usage
+
+  sqitch [db-options] status [status options] [<database>]
+
+=head1 Options
+
+    -t --target <target>       database to which to connect
+          --project <project>  project for which to retrieve the status
+       --show-changes          include a list of deployed changes
+       --show-tags             include a list of applied tags
+       --date-format <format>  display dates using the specified format

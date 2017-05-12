@@ -1,0 +1,49 @@
+Revision history for Perl extension Apache::ParseFormData.
+
+0.09  Thu Oct 23 14:10:44 WEST 2003
+        - in "delete" description method where if reads "$apr->param" must
+	  read "$apr->delete".
+	  Thanks to Finn Hakansson <finn@df.lth.se>
+
+0.08  Tue Oct 21 11:51:04 WEST 2003
+	- another bug in documentation was fixed (the constant APACHE::OK
+	  was changed to Apache::OK).
+	  Thanks to Finn Hakansson <finn@df.lth.se>
+
+0.07  Wed Jul 30 11:29:29 WEST 2003
+	- fixed documentation where it saids "Apache::Request" starts to
+	  say "Apache::ParseFormData"
+	  Thanks to Stas Bekman <stas@stason.org>
+
+0.06  Fri Jul 25 15:39:30 WEST 2003
+	- a small bug in "parse_content" was fixed
+	- the documetation has been updated
+
+0.05  Thu Jul 24 14:00:22 WEST 2003
+	- the cookies are implemented
+	- the "_parse_query" method has changed
+	- a bug where upload multiple files has been fixed
+	- a major bug where set values in param method has been fixed
+	- fixed a bug in "DESTROY" method before clean temporary files
+	- updated documentation
+
+0.04  Tue Jul 22 18:44:04 WEST 2003
+	- added "disable_uploads" and "post_max" keywords to the
+	  constructor
+	- new method "parse_result" was also added
+	- a bug in documentation has been fixed
+
+0.03  Mon Jul 21 17:52:07 WEST 2003
+	- set the "PREREQ_PM" keyword in Makefile.PL file
+	- the return value of method "upload" was changed
+	- the documetation has been updated
+
+0.02  Mon Jul 21 11:14:51 WEST 2003
+	- "delete" and "delete_all" methods have been added
+	- now, is possible set multiple values in param method like CGI.pm
+	- the documetation was also updated
+
+0.01  Fri Jul 18 18:09:51 WEST 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n Apache::ParseFormData
+

@@ -1,0 +1,13 @@
+Revision history for Perl extension App::Web::VPKBuilder.
+
+0.001 2015-11-21T19:39+00:00
+ - Stable release
+ - Add perlcritic test and make code comply
+ - Fix experimental warnings
+
+0.000_002 2014-08-24T00:54+03:00
+ - Now works without a vpk program (by shipping the folder as-is)
+ - Use POST for submit (to avoid long URLs)
+
+0.000_001 2014-08-10T00:16+03:00
+ - Initial Release

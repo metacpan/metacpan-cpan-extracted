@@ -1,0 +1,65 @@
+Revision history for App-Cronjob
+
+1.200006  2016-07-25 16:39:18-04:00 America/New_York
+        - when writing a lock file, put cronjob's pid in it
+
+1.200005  2015-06-01 13:37:07-04:00 America/New_York
+        - when flock fails, include $! in the error
+
+1.200004  2014-11-18 17:58:57-05:00 America/New_York
+        - --temp-ignore-lock-errors=3600 now lets you ignore lock errors
+          iff the lock is 1h old or less
+
+1.200003  2014-01-06 19:08:15 America/New_York
+        - Process::Status is now used to interpret $?, making reports
+          more human-oriented and less computer-oriented
+
+1.200002  2013-12-07 08:52:23 America/New_York
+        - do not log the pid to syslog; it should already be there
+        - if a jobname was given, use it as logging prefix
+
+1.200001  2013-06-19 21:56:28 America/New_York
+          update bugtracker
+
+1.200000  2013-04-28 19:43:58 America/New_York
+          locking is now done with flock, not O_CREAT|O_EXCL (much of this
+          work by Mark Jason Dominus)
+
+          there are now two error types: lockfile (can't create the file) and
+          lock (can't get a lock on it)
+
+1.102311  2010-11-02 17:09:23 America/New_York
+          lockfile now includes cronjob's pid
+          "can't locked, already locked" message now includes lockfile name
+
+1.102310  2010-08-19 12:40:51 America/New_York
+          add an Auto-Submitted: auto-generated header (RFC 3834)
+          documentation typos fixed (thanks, chromatic)
+
+1.101660  2010-06-15 17:01:46 America/New_York
+          added some more documentation to cronjob
+
+1.101230  2010-05-03 17:32:03 America/New_York
+          allow A-Z and _ in jobname (requested by AVAR
+
+1.100080  2010-01-08 08:30:52 America/New_York
+          syslog when job completes (requested by Bryan Allen)
+
+1.100070  2010-01-07 14:30:09 America/New_York
+          switch to Email::Sender::Simple
+          improve locking: do not delete lockfile if we didn't lock
+          (thanks to sungo and chargrill)
+
+1.093480  2009-12-14 22:15:18 America/New_York
+          add prereq for IPC::Run3
+          include a pointer, in the App::Cronjob docs, to the bin/cronjob app
+
+1.003     2009-04-21
+          fix a moronic bug whereby -> closed a q< string
+
+1.002     2009-04-21
+          moved logic to App::Cronjob (not reusable yet; awful)
+          fix bug where output caused "FAIL" label instead of just mail
+
+1.000     2009-03-08
+          first release with Pobox-specific guts replaced with free guts

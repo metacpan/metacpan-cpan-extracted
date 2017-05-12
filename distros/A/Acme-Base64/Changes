@@ -1,0 +1,9 @@
+Revision history for Acme-Base64
+
+0.0.2  Wednesday, 10 March 2010
+       - Fixed bug relating to test failure when Test::Perl::Critic is unavailable
+       - Skip author tests
+       - Updated README
+
+0.0.1  Tuesday, 09 March 2010
+       - Initial release.

@@ -1,0 +1,30 @@
+Acme-MorseComments version 1.00
+===============================
+
+This module is very simple to install and use.  See the manpage for usage.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+PPI.  This module makes use of the PPI module to distinguish what is a
+comment and what is not.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2006 Justin Wheeler <morsecomments@datademons.com.  All
+rights reserved.  This program is free software; you can redistribute
+or modify it under the same terms as Perl itself.
+
+This software also comes without any warranty to the extent allowed by
+law.  Don't blame me should this software somehow lose all of your
+data and code.

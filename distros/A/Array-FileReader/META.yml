@@ -1,0 +1,16 @@
+---
+name: Array-FileReader
+version: 0.03
+author:
+  - Curtis "Ovid" Poe <moc.oohay@eop_divo_sitruc>
+abstract: Lazily tie files to arrays for reading
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0.6
+provides:
+  Array::FileReader:
+    file: lib/Array/FileReader.pm
+    version: 0.03
+generated_by: Module::Build version 0.2702

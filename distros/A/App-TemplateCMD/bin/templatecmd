@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+
+# Created on: 2008-03-26 13:49:34
+# Create by:  ivanw
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use App::TemplateCMD;
+
+our $VERSION = '0.1.0';
+
+my $itempl = App::TemplateCMD->new();
+$itempl->process(@ARGV);
+
+exit 0;
+
+__DATA__
+
+=head1 NAME
+
+templatecmd - Templating system for command line or editor use (like vim)
+
+=head1 VERSION
+
+This documentation refers to templatecmd version 0.1.0.
+
+=head1 SYNOPSIS
+
+   templatecmd cmd [option] template
+
+ COMMANDS:
+  print
+  cat
+  describe
+  list
+  help         Display help on other commands
+
+ OPTIONS:
+  -o --other   other option
+
+  -v --verbose Show more detailed option
+     --version Prints the version information
+     --help    Prints this help information
+     --man     Prints the full documentation for templatecmd
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2008 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077)
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

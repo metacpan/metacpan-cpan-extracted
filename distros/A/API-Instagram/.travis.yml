@@ -1,0 +1,15 @@
+language: perl
+perl:
+  - "5.18"
+  - "5.16"
+  - "5.14"
+  - "5.12"
+  - "5.10"
+
+branches:
+  only:
+    - /^build/
+
+after_success:
+  - cpanm --quiet --notest Devel::Cover::Report::Coveralls
+  - cover -test -report coveralls

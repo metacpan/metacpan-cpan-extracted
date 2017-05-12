@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+# PODNAME: sispmctl
+# ABSTRACT: Command sispmctl of Alien-sispmctl
+
+$|=1;
+
+use strict;
+use warnings;
+use File::ShareDir ':ALL';
+use Path::Class;
+
+my $abs = file(dist_dir('Alien-sispmctl'),'bin','sispmctl')->cleanup->absolute;
+
+exec($abs, @ARGV) or print STDERR "couldn't exec sispmctl: $!";
+
+__END__
+
+=pod
+
+=head1 NAME
+
+sispmctl - Command sispmctl of Alien-sispmctl
+
+=head1 VERSION
+
+version 0.001
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudss.us>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

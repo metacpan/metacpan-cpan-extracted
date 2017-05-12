@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Apache2/Tail.pm
+t/00-signature.t
+t/01compile.t
+t/02simple.t
+t/03pod.t
+t/03pod-cover.t
+t/conf/extra.last.conf.in
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

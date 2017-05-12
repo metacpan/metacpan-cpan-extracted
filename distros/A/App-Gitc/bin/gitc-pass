@@ -1,0 +1,274 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-pass
+# ABSTRACT: Pass a changeset review
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    confirm
+    current_branch
+    full_changeset_name
+    get_user_name
+    get_user_email
+    git
+    git_tag
+    guarantee_a_clean_working_directory
+    history
+    history_status
+    history_submitter
+    is_merge_commit
+    is_suspendable
+    its_for_changeset
+    meta_data_add
+    meta_data_rm
+    project_name
+    sendmail
+    sort_changesets_by_name
+    unpromoted
+);
+use App::Gitc::Reversible;
+use Getopt::Long;
+
+my $skip_email = 0;
+my $self_review = 0;
+GetOptions(
+    'skip-email' => \$skip_email,
+    'from-self-review' => sub {
+        $self_review = 1;
+        $skip_email  = 1;
+    },
+);
+is_suspendable();
+my $changeset = current_branch();
+die "You can't pass the master branch\n" if $changeset eq 'master';
+
+# validate the current status
+my $history = history($changeset);
+my $status = history_status($history);
+die   "This changeset has status '$status' but it must be 'reviewing' for\n"
+    . "you to pass it.\n"
+    if $status ne 'reviewing';
+
+my $stash;
+my $send_email;
+reversibly {
+    failure_warning "\nAborting gitc pass\n";
+
+    $stash = guarantee_a_clean_working_directory();
+    to_undo { git "stash apply $stash" if $stash; $stash = undef };
+
+    # tag the head of our changeset branch
+    git_tag( "cs/$changeset/head", 'HEAD' );
+    to_undo { git_tag( '-d', "cs/$changeset/head" ) };
+
+    # make sure that our repository and master branch are up to date
+    git "fetch origin" if not $self_review;  # self-review just fetched
+    git "checkout master";
+    git "reset --hard origin/master";
+    to_undo { git "checkout -f $changeset" };
+
+    my $full = full_changeset_name($changeset);
+    my @unmerged = grep {
+        $_ ne $changeset
+    } unpromoted( $full, 'origin/master' );
+    if (@unmerged) {
+        sort_changesets_by_name(\@unmerged);
+        warn "This changeset depends on $_, which is not yet merged.\n"
+            for @unmerged;
+        die   "This changeset cannot be merged until its dependencies "
+            . "are merged.\n";
+    }
+
+    # merge the changeset to master and tag the merge point
+    eval {
+        my $output = git "merge --no-ff $changeset";
+        to_undo { git "reset --hard origin/master" };
+        die "Merge conflicts\n" if $output =~ m/Automatic merge failed/;
+    };
+    let_user_resolve_conflict($changeset) if $@;
+    git_tag( "cs/$changeset/to-master", 'HEAD' );
+    to_undo { git_tag( '-d', "cs/$changeset/to-master" ) };
+
+    # delete branches we don't need anymore
+    failure_warning "\nAborting gitc pass\n";
+    git "branch -d $changeset";
+    to_undo { git "branch $changeset cs/$changeset/head" };
+    if ( not $self_review ) {
+        git "branch -D -r origin/pu/$changeset";
+        to_undo { git "fetch origin" };
+    }
+
+    # send a pass email
+    if ( not $skip_email ) {
+        my $history = history($changeset);
+        my $to_master = "cs/$changeset/to-master";
+        my $patch = git "diff --no-prefix --no-color --stat -p $to_master~1 $to_master";
+        my $has_schema_change = $patch =~ m[
+            \+\+\+\s+schema/changes/
+            (.(?!=======================================))+
+        ]six;
+        $send_email = sendmail({
+            lazy      => 1,
+            to        => get_user_email(scalar history_submitter($history)),
+            subject   => 'Merged',
+            changeset => $changeset,
+            content   => "-- \n$patch",
+            has_schema_change => $has_schema_change,
+        });
+    }
+
+    # make a note about passing the changeset
+    my $id = meta_data_add({
+        action    => 'pass',
+        changeset => $changeset,
+    });
+    to_undo { meta_data_rm(id => $id, changeset => $changeset) };
+
+    # publish the new master branch to the world
+    failure_warning "\nGitc failed when publishing the changeset. "
+        . "It was probably a push collision.\n"
+        . "Try 'gitc pass' again.\n";
+    git "push origin master:master";
+    return;  # to make sure the push happens in void context
+};
+
+# published successfully, now we can send the email
+$send_email->() if $send_email;
+
+my $its = its_for_changeset($changeset);
+if ($its) {
+    # update the ITS status
+    my $its_name = $its->label_service;
+    eval {
+        if ( my $issue = $its->get_issue($changeset, reload => 1) ) {
+            my $project = project_name();
+            my $what_happened = $its->transition_state({
+                command   => 'pass',
+                issue     => $issue,
+                message   => "$project#$changeset passed code review",
+                changeset => $changeset,
+            });
+        }
+    };
+    warn "$its_name Error: ".$@ if $@;
+}
+
+# if this fails, don't rollback, tell the user to do it manually
+my $base = "refs/tags/cs/$changeset";
+my $push_command
+    = "push origin"
+    . " $base/head:$base/head"
+    . " $base/to-master:$base/to-master"
+    . ($self_review ? '' : " :pu/$changeset")
+    ;
+eval { git $push_command };
+if ($@) {
+    warn "Failed while cleaning up after a successful 'pass'.  I\n"
+        . "tried to execute the following command:\n"
+        . "\n"
+        . "  git $push_command\n"
+        . "\n"
+        . "but got this message: $@\n"
+        . "Please help out by doing the above command manually. Thanks.\n"
+        ;
+}
+
+# reinstate any changes present when we started
+git "stash apply $stash" if $stash;
+
+############################### helper subroutines #######################
+# tells the user to resolve any merge conflicts, suspends this process
+# and waits to be resumed.  Once resumed, verify that the conflict
+# was resolved and committed.  If not, let the user try again or
+# die.
+#
+# This code is very similar to code in gitc-promote.  Unfortunately, there
+# were enough differences that a common framework couldn't be factored out
+# cleanly.
+sub let_user_resolve_conflict {
+    my ($changeset, $again) = @_;
+    if ( not $again ) {
+        warn "There were conflicts merging '$changeset' to master.\n";
+
+        # let the reviewer resolve the conflicts
+        warn  "This process will suspend so that you can manually resolve\n"
+            . "the conflict and commit.  Once you've done that, 'fg' this\n"
+            . "process and the merge will continue.\n"
+            ;
+    }
+
+    my $suspended = 1;
+    local $SIG{CONT} = sub { $suspended = 0 };
+    kill STOP => $$;
+    while ($suspended) { } # spin while signals propagate (necessary?)
+
+    my $confirm_note = q{NOTE: Saying 'no' will abort the pass and put you back into the review branch.};
+    my $confirm_text = q{Do you want to try resolving conflicts again?};
+
+    # we're back, verify the state of the tree
+    if( git('diff') or git('diff --cached') ) {
+        warn "You shall not pass! You have a dirty tree.\n";
+        warn "$confirm_note\n";
+        if ( confirm($confirm_text) ) {
+            return let_user_resolve_conflict($changeset, 'again');
+        }
+        die "You didn't resolve a merge conflict\n";
+    }
+
+    # verify that the previous commit is a merge
+    if ( not is_merge_commit('HEAD') ) {
+        warn "The most recent commit is not a merge.\n";
+        warn "$confirm_note\n";
+        if ( confirm($confirm_text) ) {
+            return let_user_resolve_conflict($changeset, 'again');
+        }
+        die   "You were supposed to resolve merge conflicts for '$changeset' but\n"
+            . "the most recent commit does not look like a merge commit.\n";
+    }
+
+    return;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-pass - Pass a changeset review
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

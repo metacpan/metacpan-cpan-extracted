@@ -1,0 +1,22 @@
+!T Rhythm Schema
+
+Volgorde (meestal): A A B A
+
+= A
+| bes gm | cm f7 | bes gm | cm f7 |
+| bes bes7 | es as7 | cm f7 | bes . |
+
+=B
+| d7 . | d7 . | g7 . | g7 . |
+| c7 . | c7 . | f7 . | f7 . |
+
+=
+= Idem, in F
+!x -5
+= A
+| bes gm | cm f7 | bes gm | cm f7 |
+| bes bes7 | es as7 | cm f7 | bes . |
+
+=B
+| d7 . | d7 . | g7 . | g7 . |
+| c7 . | c7 . | f7 . | f7 . |

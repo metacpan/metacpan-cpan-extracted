@@ -1,0 +1,11 @@
+Revision history for Module-Starter-Plugin-App-Cmd
+
+0.02    Fri 29 August 2014
+        - Merged pull request from Colin Newell, fixing installation of
+          appcmd-starter script, adding repository details, and bugfixes
+          to the generated script.
+        - Documentation update
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,50 @@
+{
+   "abstract" : "Simple but non-blocking HTTP client for ClickHouse Database",
+   "author" : [
+      "Maxim Motylkov <mmv@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-ClickHouse",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "7.13",
+            "AnyEvent::HTTP" : "2.23",
+            "Data::Dumper" : "2.161",
+            "Scalar::Util" : "1.46",
+            "Test::HTTP::AnyEvent::Server" : "0.013",
+            "URI" : "1.71",
+            "URI::QueryParam" : "1.71",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.031"
+}

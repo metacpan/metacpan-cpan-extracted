@@ -1,0 +1,89 @@
+#!perl
+use strict;
+use warnings;
+use 5.008001;
+use App::Tacochan;
+use Getopt::Long ();
+use LWP::UserAgent;
+use HTTP::Request::Common;
+
+my $parser = Getopt::Long::Parser->new(
+    config => ['no_ignore_case', 'pass_through'],
+);
+
+my $tacochan_server = 'http://127.0.0.1:4969/';
+$parser->getoptions(
+    's|server=s' => \$tacochan_server,
+);
+
+sub usage {
+    print "tacochan_client
+$0 [-s tacochan_server] leave #chat
+$0 [-s tacochan_server] send #chat|user[, user, ...] message
+$0 [-s tacochan_server] chat_id user[, user, ...]
+";
+}
+
+my $command = shift @ARGV;
+my $chat = shift @ARGV;
+unless ($chat) {
+    usage();
+    exit;
+}
+
+my $req;
+if ($command =~ /^leave|part$/) {
+    $req = POST "${tacochan_server}leave",
+        +{
+            chat => $chat,
+        };
+} elsif ($command =~ /^send|notice|privmsg$/) {
+    my $message = shift @ARGV;
+    unless ($message) {
+        usage();
+        exit;
+    }
+    $req = POST "${tacochan_server}send",
+        +{
+            chat => $chat,
+            message => $message,
+        };
+} elsif ($command eq 'chat_id') {
+    $req = GET "${tacochan_server}chat_id",
+        +{
+            chat => $chat,
+        };
+} else {
+    usage();
+    exit;
+}
+
+my $ua = LWP::UserAgent->new(
+    agent => "TacochanClient/$App::Tacochan::VERSION",
+);
+my $res = $ua->request($req);
+print $res->content . "\n";
+
+__END__
+
+=head1 NAME
+
+tacochan_client - tacochan client
+
+=head1 SYNOPSIS
+
+  # leave chat
+  tacochan -s http://127.0.0.1:4969/ leave \#chat
+
+  # sent message
+  tacochan -s http://127.0.0.1:4969/ send \#chat|user[, user, ...] message
+
+=head1 OPTIONS
+
+=over 4
+
+=item -s, --server
+
+tacochan server url.
+
+=cut

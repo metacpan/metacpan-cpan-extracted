@@ -1,0 +1,44 @@
+---
+abstract: 'Update a Puppet environment in a Git branch'
+author:
+  - 'Manfred Stock <mstock@cpan.org>'
+build_requires:
+  Directory::Scratch: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::Class: 0
+  Test::Exception: 0
+  Test::More: 0.88
+  parent: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Puppet-Environment-Updater
+no_index:
+  file:
+    - perlcritic.rc
+requires:
+  Carp: 0
+  File::pushd: 0
+  Git::Wrapper: 0
+  List::MoreUtils: 0
+  Log::Dispatchouli: 0
+  Moose: 0
+  MooseX::FollowPBP: 0
+  MooseX::Getopt: 0
+  MooseX::Types::Path::Class: 0
+  Path::Class::Dir: 0
+  Term::ANSIColor: 0
+  Try::Tiny: 0
+  namespace::autoclean: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/mstock/App-Puppet-Environment-Updater.git
+version: 0.001001

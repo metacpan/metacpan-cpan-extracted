@@ -1,0 +1,8 @@
+Revision history for Perl extension Amazon::SendToKindle.
+
+0.01  Wed Aug  7 20:50:40 2013
+	- original version; created by h2xs 1.23 with options
+		-XAn Amazon::SendToKindle
+
+0.2 Thu Aug  8 08:03:21 2013
+	- Fixed a link in the module description

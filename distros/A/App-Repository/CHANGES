@@ -1,0 +1,127 @@
+#########################################
+# CHANGE LOG
+#########################################
+
+0.966
+ x App::Repository::mk_select_joined_sql(): enable param substitutions in dbexpr's
+ x App::Repository::get_rows()/get_row(): use query caching if turned on for the table ({cache_name} => "name_of_shared_datastore")
+ x App::Repository::create_temporary_object_set(): can create a temporary object set with data, not bound to the database
+ x App::Repository::create_temporary_object_domain(): can create a temporary object domain with data, not bound to the database
+ x App::Repository::evaluate_expression(): can now supply defaults for null columns
+ x App::Repository::evaluate_expression(): added column defaults
+ x App::Repository::evaluate_expression(): fixed to be more efficient and to handle defaults on columns which are expressions themselves
+ x App::Repository::evaluate_expression(): fixed a bug when evaluating expressions of columns that end in digits
+ x App::Repository::evaluate_expression(): fixed a bug where using a hashref instead of arrayref
+ x App::Repository::evaluate_constant_expression(): can also do simple functions (abs(x), min(x,y), max(x,y), if(x,y,z), ifnull(x,y), case(x,y,a,z,b,c))
+ x App::Repository::evaluate_constant_expression(): can also do boolean operators (=, !=, <, <=, >, >=)
+ x App::Repository::evaluate_constant_expression(): fix for div 0 and sci notation
+ x App::Repository::summarize_rows(): can now summarize columns which have alternate aggregate levels
+ x App::Repository::summarize_rows(): produce an undef if all values that are summed are undef
+ x App::Repository::last_inserted_id($table): new method (without underscore) now takes $table param, works on redirects
+ x App::Repository - changed begin_work(), commit(), rollback() to consult an {in_transaction} attribute
+   This does something sensible if begin_work() is called within a transaction or a commit()/rollback() is outside a transaction
+ x App::Repository - get_table_def(): enable the 'table_def' option in get_rows() to override or supplement table_def entries already in the config
+ x App::Repository::* - change debug_sql and all other debug-style output to obey the debug_file option
+ x App::Repository::DBI - get_phys_column_names(): new method
+ x App::Repository::ValueDomain - use App::Repository::DBI::_do instead of DBI methods
+ x App::Repository::_insert_row(): handle update on duplicate
+ x App::Repository::* - improved logging of database errors when they occur (includes the SQL statement that failed)
+
+0.965
+ x can now configure multiple databases (App::Repository::DBI) from app.conf (xyz.dbhost, xyz.dbname, ... for rep "xyz")
+ x full redirection to other tables or other tables in other repositories is done
+ x added dbsocket as a parameter which App::Repository::DBI automatically picks up from app.conf
+ x added dbioptions to the list of things App::Repository::MySQL takes into account in building its dsn
+ x use $dbh->quote() to quote values instead of doing it half-way correctly
+ x add App::Repository::summarize_rows() (with extended summaries, ros->get_summary(), ros->get_ext_summary())
+ x add bin/dbget --totals and --subtotal_columns options
+ x fix App::RepositoryObjectSet->set_params() to not clear cache if %$params are identical
+ x fix App::RepositoryObjectDomain->get_object_set() to call $object_set->set_params() 
+   instead of update_params() if a %$params subset has not been explicitly defined.
+ x added an implementation of insert_rows() for App::Repository::MySQL which uses multiple-row inserts
+ x worked on import_rows() to use insert_rows() if ($options->{import_method} eq "insert")
+ x enhance summarize_rows() to do extended summaries (count, distinct, min, max, average, mode, median, stddev)
+ x add call_procedure() method
+ x finalized transaction support with begin_work(), commit(), rollback() (added t/DBI-transaction.t test case)
+
+0.964
+ x add bin/dbget
+ x add default params and params that don't relate to column names
+ x fix index hints.
+ x clean up MySQL explain
+ x change author email to spadkins@gmail.com
+
+0.963
+ x add support for qualified classes on a single table (i.e. get_object("person",...)
+   may return an App::RepositoryObject::Man or an App::RepositoryObject::Woman depending
+   on the value in the "gender" field)
+ x add not_in, not_contains, and not_matches operators
+ x add better implied operations to value-side of params (=, !, !=, >, >=, <=, ~, =~)
+ x _shutdown_unshareable_resources()
+ x substitute() on joincriteria
+ x added automatic timings on all debug_sql
+ x added explain_sql
+ x added support for dbsocket option in App::Repository::MySQL
+
+0.962
+ ???
+
+0.96
+ x test suites are driven by app.conf (App::Options) (dbdriver/dbhost/dbname/dbuser/dbpass)
+   (and they succeed trivially when no app.conf is set up)
+ x App::Repository::DBI - change the meaning of param.eq, .eq means =, not infer IN
+ x App::Repository::DBI - return 0 rather than 0E0 from update()
+ x App::SessionObject::RepositoryObjectSet - add max_age feature to serve as default if not provided in get_objects({max_age => 0})
+ x App::Repository::DBI - dbexpr_update option sprintf()s using more than one $value (5 actually) for 'if(%s=5,%s,3)' expressions
+ x App::Repository::DBI - add support for literal aggregation functions
+ x App::Repository::DBI - rename summarykeys to group_by
+ x App::Repository::DBI - enhanced debug_sql output on _do()
+ x App::Repository::DBI - protect against undef params
+ x App::Repository::DBI - retry when _connect() gets a Lost connection
+ x App::Repository::DBI - _get_default_columns() use configured columns for get_hashes() etc. when no columns specified
+ x App::Repository::DBI - table-level hints now work (main table only) (MySQL-compatible)
+ x App::Repository/::DBI - _get_default_columns($table) returns {default_columns}, {phys_columns}, or {columns}
+ x App::ValueDomain::RepositoryTables - a list of tables from a repository
+ x App::ValueDomain::RepositoryTableColumns - a list of column from a table in a repository
+ x App::ValueDomain::Repository - added EACH as a special kind of {extra_values}
+ x App::ValueDomain::Repository - added {extra_values} and {extra_labels} attribs
+ x App::Repository - (logical to physical) table redirection
+ x App::Repository::evaluate_expressions() - can now evaluate expressions for column definitions
+ x App::Repository::sort() - can now sort arrays of hashrefs as well as arrays of arrayrefs
+ x App::Repository::DBI - add _do($sql) method - same as $db->{dbh}->do($sql) with added debugging features
+   The "_" reminds you this is not really a portable method in the spirit of the App::Repository abstraction.
+   It is provided so that you won't be tempted to use the work-around described above.
+   Any need to use this method is an indication that the API still needs work. Please send feedback to me.
+   NOTE: _do() works for select as well as insert/update/delete statements, returning the array of rows
+ x App::ValueDomain::Repository - add extra_values, extra_labels, and order_by
+ x App::SessionObject::RepositoryObjectSet - enable relevant "columns" to be configured (limits them)
+ x App::SessionObject::RepositoryObjectDomain - can configure mappings of domain params to individual object set params
+ x $rep->new_object() calls class-specific (RepositoryObject) _init() method to set up object values
+ x $rep->new_object() now adds configured "default" values
+ x $rep->new_object() now throws an exception for NULL values in "not_null" and alternate key columns
+ x $rep->new_object() has option { temp => 1 } that doesn't create the RepositoryObject in the repository
+
+0.95
+ x add "config_from_options" as a default behavior for App::Repository::DBI
+ x add $rep->new_object($table, {@initializers}); (and tests)
+ x add $repobj->delete(); (and tests)
+ x add $rep->import_rows(...)  (import from file) (handles CSV by default)
+ x add $rep->export_rows(...)  (export to file)   (handles CSV by default)
+
+0.94
+ x add "distinct => 1" to options hash for get_rows()/get_row()
+ x recognize the following special cases in inferred-op params: '' (same as as 'ALL' in non-quoted/numeric params)
+ x recognize the following special cases in inferred-op params: 'ALL','NULL','NULL,value','@[db expr]'
+ x support set() with hash values. i.e. set($table,\@cols,\%values)
+ x fix set_rows() to work (also with create option)
+ x support compressed columns (through dbexpr/dbexpr_update)
+ x changed test scripts to be driven by App::Options
+
+0.93
+ x MySQL - auto_reconnect flag set
+ x DBI   - Reconnect on disconnect in _get_rows()/_get_row() (MySQL-specific?)
+ x MySQL - load primary key, alternate keys, indexes
+ x all   - Multiple (delegated) repositories
+
+0.90 First functional/supportable release
+

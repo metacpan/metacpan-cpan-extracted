@@ -1,0 +1,82 @@
+Authen::Krb5Password
+
+NAME
+     Authen::Krb5Password - Perl extension for Kerberos 5
+     password verification
+
+SYNOPSIS
+       use Authen::Krb5Password;
+       $success = kpass("username", "password", "service", "host", "FILE:/path/t
+o/keytab");
+
+DESCRIPTION
+     This module provides a Perl function to perform password
+     verification using Kerberos 5. It is intended for use by
+     applications that cannot use the Kerberos protocol directly.
+     If it must be run on a system that receives a username and
+     password over the network, steps should be taken to ensure
+     that these are passed to the server in a cryptographically
+     secure manner.
+
+     kpass() attempts to validate a given users Kerberos username and
+     password. It does this in the following manner: it first obtains a 
+     Kerberos ticket for the specified service for the given username and 
+     password from the Kerberos AS. And then attempts to decrypt the ticket 
+     using the key stored in the specified keytable file to verify the 
+     authenticity of the AS response. An empty string can be passed 
+     as the 4th (host) argument to use the fully canonicalized primary 
+     hostname of the system that the function is executed on. The fifth 
+     argument can also be an empty string to use the system's default 
+     keytab file (usually "FILE:/etc/krb5.keytab").
+
+     Note that previous versions of this module obtained a TGT from the
+     AS and then subsequently used that to obtain the service ticket from
+     the TGS. Directly obtaining the service ticket from the AS saves a
+     round trip with the KDC and the associated cryptographic computations.
+
+     kpass() returns -1 if an error occurs, 0 if the username or
+     password is incorrect, or 1 if password verification is
+     successful. Errors and authentication failures are recorded
+     via syslog(3). Because of deficiencies in Perl's syslog
+     implementation in Sys::Syslog(3), there's no clean way to
+     log output to any facility other than the default LOG_USER.
+     One possible way around this problem is to use the
+     Unix::Syslog module available on CPAN, which correctly uses
+     your platform's native syslog library routines to perform
+     the functions.
+
+Prerequisites:
+
+	- perl 5
+	- MIT Kerberos V5 Release 1.3.x or better (this module
+	  also appears to work with Heimdal Kerberos, although
+	  I have not extensively tested it)
+	- Creation of an application service principal on the Kerberos
+	  server in order to verify the KDC's response. And access to
+	  a local keytab file containing the key for that principal.
+
+To build and install:
+
+1. Edit "Makefile.PL" to reflect the proper locations of the MIT 
+   Kerberos 5 libraries and include directories for your system.
+
+   Note: if you're using Heimdal, uncomment the line:
+            'DEFINE'   => '',
+
+2. perl Makefile.PL
+3. make
+4. make test
+5. (as root) make install
+6. make distclean
+
+Note that it may be necessary to create a keytab file specifically 
+for use with this module since the default system keytab file is 
+usually readable only by root.
+
+Shumon Huque
+E-mail: <shuque -at- isc.upenn.edu>
+University of Pennsylvania.
+
+Copyright (c) 2005, 2006, 2007 Shumon Huque. All rights reserved.  
+This program is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself.

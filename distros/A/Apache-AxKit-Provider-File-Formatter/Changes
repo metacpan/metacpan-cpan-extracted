@@ -1,0 +1,17 @@
+Revision history for Perl extension Apache::AxKit::Provider::File::Formatter.
+
+0.96 2005-03-10 01:30
+	- Added two very simple stylesheets, that may be added to the
+	  pipeline to get XML or HTML.
+
+0.95 2005-03-09 22:00
+	- Now implements get_dom and parses as HTML with XML::LibXML.
+	- Added SIGNATURE
+
+0.93 2005-01-27 21:45
+	- Upgraded to Formatter API v0.93
+
+0.01 2005-01-14 15:35
+	- original version; created by h2xs 1.23 with options
+		-AX -n Apache::AxKit::Provider::File::Formatter
+

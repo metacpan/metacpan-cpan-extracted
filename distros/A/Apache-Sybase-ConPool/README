@@ -1,0 +1,33 @@
+$Id: README,v 1.2 2001/10/31 22:17:38 mpeppler Exp $
+
+This is Apache::Sybase::ConPool, a connection pooling module for
+mod_perl and Sybase database servers.
+
+Copyright (c) 2001 by Michael Peppler.
+
+
+This module uses the fact that Sybase client connections can be shared
+between processes to create a pool of database connections that can
+be shared between all of the httpd processes using mod_perl. The 
+connections are created during the Apache initialization by
+including this module in a startup.pl or pre-load.pl script
+loaded with a PerlRequire directive in httpd.conf.
+
+I have been using a version of this module for about a year now on a 
+site with a farm of 40 web servers, and it has worked well. The
+caveat is that connections can't be re-initialized while the 
+web server is running, so you have to stop/start Apache to
+reconnect to the database if the database is rebooted, or if the
+connections become unusable for any other reason.
+
+The eg/ directory has a sample conpool.cfg file, as well as
+a simple pool.cgi script that illustrates usage.
+
+Credit where credit is due department: I initially got this 
+technique from Kenny MacLeod, who suggested it when I was
+inquiring about connection pooling in the Sybase newsgroups
+about a year ago.
+
+Comments are as usual welcome!
+
+Michael Peppler, mpeppler@peppler.org

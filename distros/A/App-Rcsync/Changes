@@ -1,0 +1,11 @@
+Revision history for App-Rcsync
+
+0.003   19/04/2012
+    * Add --which option to print path to profile template
+    * Add --help option
+
+0.002   07/12/2011
+    * Add --init option to creat sample configuration file
+
+0.001   29/12/2010
+    * Initial upload to CPAN

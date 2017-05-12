@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Temp qw/tempdir/;
+
+my @cmd = ("/bin/sh");
+
+# running as root to chroot
+if ($> != 0) {
+    die "This must be run as root\n";
+}
+
+if (@ARGV) {
+    @cmd = @ARGV;
+}
+
+my $jaildir = tempdir(DIR => "/");
+(my $jaildir_rel_root = $jaildir) =~ s/.//;
+
+chmod 0755, $jaildir or die "chmod failed: $!";
+chdir "/" or die "chdir to / failed: $!";
+chroot $jaildir or die "chroot to jail failed: $!";
+rmdir $jaildir_rel_root or warn "failed to clean $jaildir: $!";
+
+my $ino = 0;
+while (1) {
+    my @st = stat ".";
+    if (!@st) {
+        die "stat failed: $!";
+    }
+    my $cur_ino = $st[1];
+    if ($cur_ino == $ino) {
+        last;
+    }
+    $ino = $cur_ino;
+    chdir ".." or die "chdir to .. failed: $!";
+}
+
+chroot "." or die "chroot to . failed: $!";
+
+exec { $cmd[0] } @cmd or die "exec failure: $!";
+
+__END__
+

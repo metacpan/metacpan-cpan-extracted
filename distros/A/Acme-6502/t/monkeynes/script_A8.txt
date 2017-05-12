@@ -1,0 +1,58 @@
+clear
+power on
+regs
+
+op a9 55
+
+# ACC should now show $55
+test acc = 55
+
+op a8 
+
+# ACC and IY should now show $55
+test acc = 55
+test iy = 55
+
+# Now for the Z flag case --------------------
+power on
+
+op a9 00
+op a0 55
+
+# Use the IX register to reset Z
+op a2 01
+
+# Should be: ACC=0, IY=55, Z=0
+test acc = 0
+test iy = 55
+test z = 0
+
+op a8 
+
+# Should be: ACC=0, IY=0, Z=1
+test acc = 0
+test iy = 0
+test z = 1
+
+# Now for the S flag case --------------------
+power on
+
+op a9 f2
+op a0 55
+
+# Use the IX register to reset S
+op a2 01
+
+# Should be: ACC=F2, IY=55, S=0
+test acc = f2
+test iy = 55
+test s = 0
+
+op a8 
+
+# Should be: ACC=F2, IY=F2, S=1
+test acc = f2
+test iy = f2
+test s = 1
+
+save verify_A8.txt

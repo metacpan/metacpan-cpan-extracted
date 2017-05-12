@@ -1,0 +1,44 @@
+Apache/AxKit/Provider/CGI version 0.01
+======================================
+
+AxKit has a very powerful Taglib architecture that allows you to
+separate you content from your presentation.
+
+This module provides an alternative to taglibs. The general philosphy
+here is to respond to http requests with perl cgi scripts. Such scripts
+perform two duties. First, they generate content. Second, they determine
+the stylesheet for presenting the content. The cgi scripts do not
+generate the stylesheets. They simply determine which stylesheet should
+be used for presentation.
+
+CGI scripts must contain a "content()" subroutine that returns a hashref
+containing the generated content, and optionally, the name of a stylesheet.
+
+The hashref is converted to XML and wrapped in a <response> tag using
+XML::Simple. If the cgi script specifies a stylesheet, an appropriate
+processing instruction is prepended to the xml document.
+
+This xml document is then provided to AxKit for further processing.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 root
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

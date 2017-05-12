@@ -1,0 +1,189 @@
+=head1 NAME
+
+httunnel - Client daemon for Apache::HTTunnel
+
+
+=head1 SYNOPSIS
+
+  httunnel path [-V] [-VV] [-d]
+  httunnel -v
+  httunnel -h
+
+=head1 DESCRIPTION
+
+L<httunnel> is a stand-alone daemon that can be used to easily
+set up HTTP tunnels with L<Apache::HTTunnel>.
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item path
+
+Path to a configuration file or directory. If C<path> is a directory,
+all .conf files found are loaded.
+
+=item -V
+
+Verbose output.
+
+=item -VV
+
+Very verbose output. May contain binary data.
+
+=item -d
+
+Daemon mode. L<httunnel> will detach from the console and log information
+to syslog if available.
+
+=item -v
+
+Prints version and exits.
+
+=item -h
+
+Prints a short usage message and exits.
+
+=back
+
+
+=head1 CONFIGURATION FILE FORMAT
+
+The configuration file format is similar to .ini files and to that of
+C<stunnel>. It is built up of sections and directives. Here is an
+example:
+
+  global_key_1 = value1
+  global_key_2 = value2
+
+  [section 1]
+  section1_key_1 = value1
+  section1_key_2 = value2
+
+  [section 2]
+  section2_key_1 = value1
+  section2_key_2 = value2
+
+Keys can be declared globally and/or locally inside a section. Sections
+not specifying a value locally will inherit the global value. If there is
+no global value, the default value is used.
+
+Each section corresponds to a tunnel to be established. Below is the
+description of all the valid configuration directives.
+
+
+=head1 CONFIGURATION FILE DIRECTIVES
+
+=over 4
+
+=item local_addr = <hostname or ip address>
+
+Local address to bind to. Default is 'localhost'.
+
+=item local_port = <port nb.>
+
+Local port number to bind to. This directive is mandatory.
+
+=item protocol = <proto>
+
+Protocol for the tunnelled connection. Default is 'tcp', possible values
+are 'tcp and 'udp'.
+
+=item remote_port = <port nb.>
+
+Remote port number. This directive is mandatory.
+
+=item remote_host = <hostname or ip address>
+
+Remote host. This directive if mandatory.
+
+=item url = <url>
+
+The URL to reach the L<Apache::HTTunnel> server. This directive
+is mandatory.
+
+=item http_protocol = <http proto>
+
+The HTTP protocol to use. The default is 'HTTP/1.1'.
+
+=item http_keep_alive = <0 or 1>
+
+Whether to use persistent HTTP connections. Although not required, this
+increases performance quite a bit. The default is '1'.
+
+=item http_username = <username>
+
+Basic authentication username for the L<Apache::HTTunnel> server.
+The default is ''.
+
+=item http_password = <password>
+
+Basic authentication password for the L<Apache::HTTunnel> server.
+The default is ''.
+
+=item http_proxy = <url>
+
+URL of your HTTP proxy. This is passed directly to L<LWP::UserAgent>.
+
+=item http_proxy_username = <username>
+
+Basic authentication username for your HTTP proxy. The default is ''.
+
+=item http_proxy_password = <password>
+
+Basic authentication password for your HTTP proxy. The default is ''.
+
+=item read_length = <nb. bytes>
+
+The numbers of bytes the L<httunnel> tries to read when a read is
+attempted. The default is 131072 bytes.
+
+=item read_timeout = <nb. seconds>
+
+All HTTP read request are interrupted after C<read_timeout> by
+L<Apache::HTTunnel>. However, L<HTTunnel::Client> will keep on
+sending HTTP read requests until data is received. You can lower
+this value if your proxy is interrupting the HTTP requests abruptly,
+causing L<HTTunnel::Client> to not function correctly. The default
+is 15 seconds.
+
+=item verbose = <0 or 1 or 2>
+
+Controls debug output. The default is as such: '2' if the -VV option
+is used, '1' if the -V option is used, '0' otherwise.
+
+=back
+
+
+=head1 L<httunnel> SERVICE
+
+On supported platforms (Linux only for now), a service script
+(/etc/init.d/httunnel) is installed. When invoked using this
+script, L<httunnel> will use /etc/httunnel.d as its configuration
+directory and subsequently load all .conf files found there.
+
+
+=head1 BUGS
+
+I'm sure there are some in there :)
+
+
+=head1 SEE ALSO
+
+L<HTTunnel::Client>, L<LWP::UserAgent>
+
+
+=head1 AUTHOR
+
+Patrick LeBoutillier, E<lt>patl@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005 by Patrick LeBoutillier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

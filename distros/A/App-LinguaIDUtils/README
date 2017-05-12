@@ -1,0 +1,14 @@
+SYNOPSIS
+
+    This distribution provides the following command-line utilities:
+
+    #INSERT_EXECS_LIST
+
+DESCRIPTION
+
+    This distribution will become a collection of CLI utilities related to
+    Indonesian language. Currently it contains very little and the
+    collection will be expanded in subsequent releases.
+
+SEE ALSO
+

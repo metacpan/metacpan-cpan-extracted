@@ -1,0 +1,62 @@
+{
+   "abstract" : "Command Line Interface interface to Google Calendar.",
+   "author" : [
+      "Andrew Jones <andrew@arjones.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-gcal",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::ReturnValue" : 0,
+            "Data::ICal" : 0,
+            "DateTime::Format::ICal" : 0,
+            "DateTime::TimeZone" : 0,
+            "File::Basename" : 0,
+            "Getopt::Long" : 0,
+            "ICal::Format::Natural" : 0,
+            "Net::Google::Calendar" : 0,
+            "Net::Google::Calendar::Entry" : 0,
+            "Net::Netrc" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "FindBin" : 0,
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/andrewrjones/gcal/issues"
+      },
+      "homepage" : "https://github.com/andrewrjones/gcal",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/andrewrjones/gcal.git",
+         "web" : "https://github.com/andrewrjones/gcal"
+      }
+   },
+   "version" : "1.121460"
+}
+

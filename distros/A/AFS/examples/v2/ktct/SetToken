@@ -1,0 +1,36 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::KTC_TOKEN;
+use AFS::KTC_PRINCIPAL;
+use AFS::Cell qw(localcell);
+
+print "tokens-1:";
+system "tokens";
+
+my (@Tokens, @Services, @Clients);
+my $index = 0;
+while (my $service = AFS::KTC_PRINCIPAL->ListTokens($index)) {
+    if(my ($token, my $client) = AFS::KTC_TOKEN->GetToken($service)) {
+        $Tokens[$index]   = $token;
+        $Services[$index] = $service;
+        $Clients[$index]  = $client;
+    }
+}
+
+AFS::KTC_TOKEN->ForgetAllTokens();
+
+print "\n\ntokens-2:";
+system "tokens";
+
+foreach my $i (1 .. $#Tokens) {
+    my $ok = AFS::KTC_TOKEN->SetToken($Services[$i], $Tokens[$i], $Clients[$i], 0);
+    print "AFS::CODE = $AFS::CODE\n" if ! $ok;
+}
+
+print "\n\ntokens-3:";
+system "tokens";
+

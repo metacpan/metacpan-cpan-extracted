@@ -1,0 +1,72 @@
+==================================================
+Changes from 1741-02-22 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.005 at 2014-12-07 18:34:59 +0000
+------------------------------------------
+
+  Change: 10018cc2b7f2fc2f7709f2c795b8162cf8492c51
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-07 19:34:55 +0000
+
+    Fixed rights 
+
+  Change: 2514cecc6a442f44bf93616be4dcdf25c0b248c1
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-07 19:34:41 +0000
+
+    Switching to Data::Colour 
+
+  Change: 1967473c779ef32bf365fb71b2ddf6496f870086
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-05 02:21:26 +0000
+
+    Meh, example a bit longer as needed for understandment 
+
+  Change: 4b4e6ad115d2e88a6f8357471348b7b4bc96a4e0
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-05 02:18:30 +0000
+
+    Fixed a stupid typo in the ascii table mapping of the control
+    sequences 
+
+  Change: 88915e44ef15a0d21d1402ee9b7e55c6285d4775
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-05 02:09:58 +0000
+
+    Adapted also the sample output from the doc 
+
+  Change: 23d4904c37d7beff4d38f4ff5841b11bee356c1f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-05 02:04:21 +0000
+
+    Cosmetical change on output to be also readable if blackwhite 
+
+  Change: d444a9c383d2c2d3904687049102a68db53b1d76
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-05 01:57:50 +0000
+
+    Fixed rights 
+
+  Change: e5b23ab962e744f58ffa0b1d86bc7913711af2bf
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-05 01:57:36 +0000
+
+    Hups! A bit too much copy&paste 
+
+  Change: cbb29661f335657b615032c22adb33c52f08401a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-05 01:55:34 +0000
+
+    First working version, no tests, all in script... yeah shame on me 
+
+  Change: 6a950f38fd0f6a2385519accda0e1d6b90ae15cb
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-05 01:36:55 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,15 @@
+Authen::PhoneChallenge
+
+This module is a very simple challenge/response system that uses strictly
+numeric data ([0-9]).  The original intent was for use in a automated phone
+system.
+
+User dials extension that requires authentication for some reason.
+User asked for their identification number.
+User given a challenge number.
+User looks up the proper response to the challenge on previously issued card and enters it.
+Call continues as normal.
+
+The idea was inspired by OPIE, but is in no way to be considered as secure.
+Additional logic such as maximum failure counts, etc are left as an exercise to
+the calling code.

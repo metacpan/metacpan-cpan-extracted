@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+use v5.14;
+use warnings;
+
+use App::RemoteGnokii;
+use File::Slurp qw/slurp/;
+
+App::RemoteGnokii::action(@ARGV[0 .. 1], slurp \*STDIN);
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+rg-action - gnokii-smsd action that forwards messages
+
+=head1 SYNOPSIS
+
+  smsd -m file -u /path/to/rg-action ...
+
+=head1 DESCRIPTION
+
+This script is a gnokii-smsd action that forwards each received mesage to a given number.
+
+=head1 MESSAGE FORMAT
+
+  $password
+  $originating_number
+  $date_received
+  $message_text
+
+The first line is the password (from the configuration file), the second is the phone number of the sender, the third is the date when the message was received, and the fourth (and later) lines are the message text.
+
+=head1 ENVIRONMENT
+
+=over
+
+=item RGCONF
+
+The basename of the configuration file. For example, if the configuration file is '/srv/rg/config.yml', RGCONF should be set to '/srv/rg/config'. Defaults to '/etc/rg'.
+
+=back
+
+=head1 SEE ALSO
+
+L<App::RemoteGnokii>
+
+=head1 AUTHOR
+
+Marius Gavrilescu E<lt>marius@ieval.roE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Marius Gavrilescu
+
+This library is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+
+=cut

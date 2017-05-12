@@ -1,0 +1,52 @@
+---
+abstract: "a bunch of XS math functions i'm not sure where to shove yet"
+author:
+  - 'Christian Walde <walde.christian@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::InDistDir: '0'
+  Test::More: '0'
+  Test::Number::Delta: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-MITHALDU-XSGrabBag
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Acme::MITHALDU::XSGrabBag:
+    file: lib/Acme/MITHALDU/XSGrabBag.pm
+    version: '1.161310'
+  Acme::MITHALDU::XSGrabBag::Inline:
+    file: lib/Acme/MITHALDU/XSGrabBag/Inline.pm
+    version: '1.161310'
+requires:
+  Exporter: '0'
+  Inline::C: '0.74'
+  Inline::Module: '0'
+  perl: '5.006'
+  strict: '0'
+  strictures: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Acme-MITHALDU-XSGrabBag
+  homepage: https://github.com/wchristian/Acme-MITHALDU-XSGrabBag
+  repository: https://github.com/wchristian/Acme-MITHALDU-XSGrabBag.git
+version: '1.161310'

@@ -1,0 +1,8 @@
+Revision history for Perl extension Acme::PerlML
+
+1.00 Tue  6 Jun 2006
+	- Moved from old CVS to new SVN repository
+	- Upgraded to Module::Install 0.62
+
+0.01 Sat 17 Aug 2005
+	- original version (the evil begins)

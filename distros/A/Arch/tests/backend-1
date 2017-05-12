@@ -1,0 +1,51 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Backend functions.
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More tests => 17;
+BEGIN {
+	$ENV{ARCH_BACKEND} = $ENV{TLA} = $ENV{BAZ} = "";
+	use_ok("Arch::Backend", qw(
+		arch_backend arch_backend_name arch_backend_version
+		is_tla is_baz
+		has_archive_setup_cmd
+		has_file_diffs_cmd
+		has_register_archive_name_arg
+		has_tree_version_dir_opt
+		has_tree_id_cmd
+		has_set_tree_version_cmd
+		has_cache_feature
+		get_cache_config
+		has_commit_version_arg
+		has_commit_files_separator
+	));
+}
+
+is(arch_backend(), "tla",                "check default arch_backend");
+my $exe = -x "/usr/bin/true"? "/usr/bin/true": "/bin/true";
+is(arch_backend($exe), $exe,             "set arch_backend to $exe");
+
+$ENV{ARCH_PERL_QUIET} = 1;
+is(arch_backend_name(), "tla",           "check arch_backend_name");
+like(arch_backend_version(), qr/^\d+\./, "check arch_backend_version");
+ok(is_tla(),                             "check is_tla");
+ok(!is_baz(),                            "check is_baz");
+
+ok(has_archive_setup_cmd(),              "check has_archive_setup_cmd");
+ok(!has_file_diffs_cmd(),                "check has_file_diffs_cmd");
+ok(has_register_archive_name_arg(),      "check has_register_archive_name_arg");
+
+ok(!has_tree_version_dir_opt(),          "check has_tree_version_dir_opt");
+ok(!has_tree_id_cmd(),                   "check has_tree_id_cmd");
+ok(has_set_tree_version_cmd(),           "check has_set_tree_version_cmd");
+
+ok(!has_cache_feature(),                 "check has_cache_feature");
+is_deeply(get_cache_config(), { dir => undef }, "check get_cache_config");
+
+ok(has_commit_version_arg(),             "check has_commit_version_arg");
+ok(has_commit_files_separator(),         "check has_commit_files_separator");

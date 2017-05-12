@@ -1,0 +1,36 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::KTC_TOKEN;
+use AFS::KTC_PRINCIPAL;
+use AFS::Cell qw(localcell);
+
+my $service = AFS::KTC_PRINCIPAL->new("afs","",localcell);
+my ($token, $user) = AFS::KTC_TOKEN->GetToken($service);
+
+print "Old Token\n";
+print "  StartTime  = ", $token->startTime, "\n";
+print "  EndTime    = ", $token->endTime, "\n";
+print "  SessionKey = ", $token->sessionKey, "\n";
+print "  Kvno       = ", $token->kvno, "\n";
+print "  TicketLen  = ", $token->ticketLen, "\n";
+#print "  Ticket     = ", $token->ticket, "\n";
+#print "  String     = ", $token->string, "\n";
+
+my $string = $token->string();
+
+my $newtoken = AFS::KTC_TOKEN->FromString($string) or
+    die "AFS::KTC_TOKEN->FromString failed!\n";
+
+print "New Token (from String)\n";
+print "  StartTime  = ", $newtoken->startTime, "\n";
+print "  EndTime    = ", $newtoken->endTime, "\n";
+print "  SessionKey = ", $newtoken->sessionKey, "\n";
+print "  Kvno       = ", $newtoken->kvno, "\n";
+print "  TicketLen  = ", $newtoken->ticketLen, "\n";
+#print "  Ticket     = ", $newtoken->ticket, "\n";
+#print "  String     = ", $newtoken->string, "\n";
+

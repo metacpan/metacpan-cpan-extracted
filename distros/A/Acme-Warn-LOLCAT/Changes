@@ -1,0 +1,9 @@
+Revision history for Perl extension Acme::Warn::LOLCAT.
+
+0.02  Sun Aug  5 13:08:15 2012
+    - filter core warnings through the lolcat
+    - fixed undeclared dependency
+
+0.01  Fri Aug  3 18:52:55 2012
+	- original version
+

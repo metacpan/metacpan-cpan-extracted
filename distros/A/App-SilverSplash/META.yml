@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               App-SilverSplash
+version:            0.02
+abstract:           SilverSplash Captive Portal
+author:
+    - Fred Moyer <fred@slwifi.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Apache2::Connection::XForwardedFor:  0.01
+    Business::PayPal:     0.04
+    Config::SL:           0.01
+    Template:             2.18
+    URI::Escape:          3.3
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

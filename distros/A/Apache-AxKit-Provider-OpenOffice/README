@@ -1,0 +1,9 @@
+AxKit OpenOffice Plugin
+=======================
+
+This plugin allows your AxKit application server to directly read
+and transform OpenOffice documents to the output format of your
+choice, generally HTML, PDF, or raw.
+
+Please see the INSTALL file for installation instructions.
+

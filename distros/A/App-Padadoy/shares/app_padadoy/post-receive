@@ -1,0 +1,4 @@
+#!/bin/bash
+# .git/hooks/post-receive
+
+padadoy enable

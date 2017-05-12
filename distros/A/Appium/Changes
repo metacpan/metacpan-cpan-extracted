@@ -1,0 +1,38 @@
+Revision history for perl module Appium
+
+0.0803 2015-01-25
+ - Inherit all webdriver finder strategies
+ - Improve documentation in Appium & Appium::Element
+
+0.0801 2015-01-08
+ - Use 'caps' for alias of desired_capabilities in init args
+ - Remove inaccurate coercion on desired caps
+
+0.0702 2014-12-05
+ - Add `page` command like arc's
+ - Add precise tap subroutine that maps does 'mobile: tap'
+
+0.06 2014-11-27
+ - Fix error message for invalid finder strategies via dep upgrade
+
+0.05 2014-11-13
+ - Restore restrictions about caps vs desired; this is just 0.03 again.
+
+0.04 2014-11-12
+ - Loosen restrictions about caps vs desired_capabilities in
+  constructor
+
+0.03 2014-11-11
+ - Use hard dependency on S-R-D v0.22 to allow us to use our own
+   Finders constant and ErrorHandler class.
+ - Add a slew of appium endpoints: notifs, network connections, lock,
+   shake, app management, file/folder managing, set_text, and others.
+
+0.02 2014-08-08
+ - Add context management endpoints
+ - Use snake case for internal endpoints: hide_keyboard replaces
+   hideKeyboard
+
+0.01 2014-08-07
+ - Initial release: only additional Appium-specific sub is
+   hide_keyboard

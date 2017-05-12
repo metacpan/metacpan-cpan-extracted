@@ -1,0 +1,43 @@
+NAME
+    Acme::NoTalentAssClown - Get some Bolton Lyrics!
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+        use Acme::NoTalentAssClown;
+
+        #Defaults to use Lyrics::Fetcher::Google, but any Lyrics::Fetcher
+        #plugin will work as specified by agent=>'bar'
+        my $nta = Acme::NoTalentAssClown->new(gid=>'yourGoogleApi_ID'); 
+        print $nta->grammys(); #finds a greatest hit
+        print $nta->grammys('When a Man Loves a Woman'); #For my money, it doesn't get any better
+        ...
+
+METHODS
+    new Initializes Acme::NoTalentAssClown and loads lyric loader depending
+        on agent
+
+    grammys
+        Returns the result of a search for a random greatest hit, or a hit
+        you specify
+
+AUTHOR
+    John Lifsey, "<nebulous@crashed.net>"
+
+BUGS
+    I'm sure there are plenty of bugs. But why should I change it? He's the
+    one who sucks.
+
+    Please report any bugs or feature requests to
+    "bug-acme-notalentassclown@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Acme-NoTalentAssClown>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2005 John Lifsey, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

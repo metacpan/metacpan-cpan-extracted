@@ -1,0 +1,68 @@
+NAME
+    App::prove4air - Test ActionScript (.as) with prove, Adobe Air, and
+    tap4air
+
+VERSION
+    version 0.0013
+
+SYNOPSIS
+        $ git clone git://github.com/robertkrimen/tap4air.git tap4air
+        $ export BUILD_AIR="$AIR_SDK/bin/mxmlc -incremental +configname=air -compiler.source-path=tap4air/src/ -debug"
+        $ export RUN_AIR="$AIR_SDK/bin/adl"
+
+        # Run against every .t.as in t/
+        $ prove4air t/
+
+DESCRIPTION
+    App::prove4air integrates with App::Prove and tap4air to provide
+    prove-like TAP-testing in Adobe Air
+
+An example test file
+        // !prove4air
+        // ---
+        $.ok( 1, 'ok' );
+        $.equal( 1, 1, 'equal' );
+        $.unequal( 1, 2, 'unequal' );
+        $.like( 'Xyzzy', /yzzy/, 'like' );
+        $.unlike( 'Xyzzy', /Y/, 'unlike' );
+
+An example test with an import
+        // !prove4air
+        import com.example.Example;
+        // ---
+        $.ok( 1, 'ok' );
+        $.equal( 1, 1, 'equal' );
+
+A test example in another (more traditional) style
+        package {
+            import yzzy.tap4air.Test;
+            import mx.core.UIComponent;
+            import flash.desktop.NativeApplication;
+
+            public class test extends UIComponent {
+
+                public function test() {
+                    Test.ok( 1, 'ok' );
+                    Test.equal( 1, 1, 'equal' );
+                    Test.unequal( 1, 2, 'unequal' );
+                    Test.like( 'Xyzzy', /yzzy/, 'like' );
+                    Test.unlike( 'Xyzzy', /Y/, 'unlike' );
+                    Test.exit();
+                }
+            }
+        }
+
+SEE ALSO
+    <http://github.com/robertkrimen/tap4air>
+
+    App::Prove
+
+AUTHOR
+    Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

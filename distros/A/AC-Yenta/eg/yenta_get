@@ -1,0 +1,35 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+
+# Copyright (c) 2009 AdCopy
+# Author: Jeff Weisberg
+# Created: 2009-Apr-03 13:43 (EDT)
+# Function: get value example
+#
+# $Id$
+
+use AC::Yenta::Client;
+use AC::Dumper;
+use strict;
+
+my $map = shift @ARGV;
+my $key = shift @ARGV;
+die "usage: get [-h host] map key\n" unless $map && $key;
+
+my $y   = AC::Yenta::Client->new(
+    # server_file, servers[], or host + port
+    server_file	=> '/var/tmp/yenta.status',
+    debug 	=> \&debug,
+   );
+
+my $res = $y->get($map, $key);
+
+print dumper($res), "\n";
+
+
+exit;
+
+sub debug {
+    print STDERR @_, "\n";
+}
+

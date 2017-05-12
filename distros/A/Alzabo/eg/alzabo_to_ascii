@@ -1,0 +1,228 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use Alzabo::Create;
+use Text::Autoformat qw(autoformat form);
+
+my $name;
+unless ( $name = $ARGV[0] )
+{
+    print "Usage: alzabo_to_ascii  schema\n";
+    exit;
+}
+
+my $schema = Alzabo::Create::Schema->load_from_file( name => $name );
+
+my @out;
+
+# 60 chars wide
+###############################################################################
+my $schema_title = <<'EOF';
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------------------------------------------
+
+EOF
+
+###############################################################################
+my $table_title  = <<'EOF';
+  [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[
+  -----------------------------------------------------------------------------
+  \|  Name                    \|  Type                  \| Null? \| Default  \|    \|
+  -----------------------------------------------------------------------------
+EOF
+
+my $column = <<'EOF';
+  \| [[[[[[[[[[[[[[[[[[[[[[[[ \| [[[[[[[[[[[[[[[[[[[[[[ \| [[[[[ \| [[[[[[[[ \| [[ \|
+EOF
+
+my $column_comment = <<'EOF';
+  \| - [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ \|
+EOF
+
+my $fk_comment = <<'EOF';
+  \| - [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ \|
+EOF
+
+my $lj_table_line = <<'EOF';
+  \| [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ \|
+EOF
+
+render_schema($schema);
+
+print join '', @out;
+
+sub render_schema
+{
+    my $schema = shift;
+
+    push @out, form $schema_title,
+	'Schema: ' . $schema->name . ' (' . $schema->rules->rules_id . ')';
+
+    foreach my $t ($schema->tables)
+    {
+	render_table($t);
+    }
+}
+
+sub render_table
+{
+    my $t = shift;
+
+    # indent 2 spaces
+    push @out, form $table_title, $t->name;
+
+    foreach my $c ($t->columns)
+    {
+	render_column($c);
+    }
+
+    push @out, '  ' . '-' x 77;
+    push @out, "\n";
+
+    if ( $t->all_foreign_keys )
+    {
+	push @out, form $lj_table_line, 'Foreign keys';
+	push @out, '  ' . '-' x 77;
+	push @out, "\n";
+
+	foreach my $fk ($t->all_foreign_keys)
+	{
+	    render_foreign_key($fk);
+	    push @out, '  ' . '-' x 77;
+	    push @out, "\n";
+	}
+    }
+
+    if ( $t->indexes )
+    {
+	push @out, form $lj_table_line, 'Indexes';
+	push @out, '  ' . '-' x 77;
+	push @out, "\n";
+
+	foreach my $i ($t->indexes)
+	{
+	    render_index($i);
+	    push @out, '  ' . '-' x 77;
+	    push @out, "\n";
+	}
+    }
+
+    push @out, "\n";
+
+    my $comment = $t->comment;
+    if ( defined $comment && length $comment )
+    {
+	$comment =~ s/\r\n?/\n/g;
+	$comment =~ s/\n$//;
+
+	push @out, autoformat( $comment, { all => 1 } );
+	push @out, "\n\n";
+    }
+}
+
+sub render_column
+{
+    my $c = shift;
+
+    my $type = $c->type;
+    if ( $c->length )
+    {
+	$type .= '(';
+	$type .= $c->length;
+	$type .= ', ' . $c->precision if $c->precision;
+	$type .= ')';
+    }
+
+    if ($c->attributes)
+    {
+	$type .= '  ';
+	$type .= join ' ', sort $c->attributes;
+    }
+
+    push @out, form $column,
+	( $c->name,
+	  $type,
+	  ( $c->nullable ? 'Y' : '' ),
+	  ( defined $c->default ? $c->default : ''),
+	  ( $c->is_primary_key ? 'PK' : '' )
+	);
+
+    my $comment = $c->comment;
+    if ( defined $comment && length $comment )
+    {
+	push @out, form $column_comment, $comment;
+    }
+}
+
+sub render_foreign_key
+{
+    my $fk = shift;
+
+    foreach my $p ( $fk->column_pairs )
+    {
+	push @out, form $lj_table_line, $p->[0]->name . ' => ' . $p->[1]->table->name . '.' . $p->[1]->name;
+    }
+
+    my $to = $fk->table_to->name;
+
+    my ($amount, $verb);
+    my $plural = '';
+    if ( $fk->from_is_dependent )
+    {
+	$verb = 'must be';
+
+	if ( $fk->is_one_to_many )
+	{
+	    $amount = 'one or more';
+	    $plural = 's';
+	}
+	else
+	{
+	    $amount = 'one and only one';
+	}
+    }
+    else
+    {
+	$verb = 'can be';
+
+	if ( $fk->is_one_to_many )
+	{
+	    $amount = 'zero or more';
+	    $plural = 's';
+	}
+	else
+	{
+	    $amount = 'zero or one';
+	}
+    }
+
+    push @out, form $lj_table_line, "There $verb $amount corresponding row$plural in the foreign table";
+
+    my $comment = $fk->comment;
+    if ( length $comment )
+    {
+	push @out, form $fk_comment, $comment;
+    }
+}
+
+sub render_index
+{
+    my $i = shift;
+
+    my @i;
+    foreach my $c ( $i->columns )
+    {
+	my $spec = $c->name;
+	$spec .= '(' . $i->prefix($c) . ')' if $i->prefix($c);
+
+	push @i, $spec;
+    }
+
+    my $out = join ', ', @i;
+    $out .= ' -- unique' if $i->unique;
+    $out .= ' -- fulltext' if $i->fulltext;
+
+    push @out, form $lj_table_line, $out;
+}

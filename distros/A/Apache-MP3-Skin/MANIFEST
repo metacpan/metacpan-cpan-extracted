@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Skin.pm
+Makefile.PL
+README
+apache_mp3/apache_mp3_skin.js
+apache_mp3/default.tmpl
+apache_mp3/default/cart.gif
+apache_mp3/default/delete.gif
+apache_mp3/default/down_and_right_arrow.gif
+apache_mp3/default/folder.gif
+apache_mp3/default/minus.gif
+apache_mp3/default/pixel.gif
+apache_mp3/default/play.gif
+apache_mp3/default/plus.gif
+apache_mp3/default/save.gif

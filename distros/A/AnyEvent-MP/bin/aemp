@@ -1,0 +1,989 @@
+#!/opt/bin/perl
+
+=head1 NAME
+
+   aemp - AnyEvent:MP utility
+
+=head1 SYNOPSIS
+
+   aemp command args...
+
+   # protocol commands
+   aemp snd <port> <arg...>      # send a message
+   aemp mon <port>               # wait till port is killed
+   aemp cal <port> <arg...>      # send message, append reply
+   aemp eval <node> <expr...>    # evaluate expression
+   aemp shell [<node>]           # run an interactive shell
+   aemp trace <node>             # trace the network topology
+
+   # run a node
+   aemp run configure_args...    # run a node
+   aemp restart <node>           # restart a node if running under watchdog
+
+   # node configuration: node ID
+   aemp setnodeid <nodeid>       # configure the real node id
+   aemp delnodeid                # reset node id to default (= inherit)
+
+   # node configuration: authentication
+   aemp gensecret                # generate a random shared secret
+   aemp setsecret <secret>       # set the shared secret
+   aemp delsecret                # remove the secret (= inherit)
+   aemp gencert                  # generate a random certificate
+   aemp setcert <file>           # set a certificate (key.pem + certificate.pem)
+   aemp delcert                  # remove certificate (= inherit)
+
+   # node configuration: seed addresses for bootstrapping
+   aemp setseeds <host:port>,... # set seeds
+   aemp delseeds                 # clear all seeds (= inherit)
+   aemp addseed <host:port>      # add a seed
+   aemp delseed <host:port>      # remove seed
+
+   # node configuration: bind addresses
+   aemp setbinds <host:port>,... # set binds
+   aemp delbinds                 # clear all binds (= inherit)
+   aemp addbind <host:port>      # add a bind address
+   aemp delbind <host:port>      # remove a bind address
+
+   # node configuration: services
+   aemp setservices initfunc,... # set service functions
+   aemp delservices              # clear all services (= inherit)
+   aemp addservice <initfunc>    # add an instance of a service
+   aemp delservice <initfunc>    # delete one instance of a service
+
+   # profile management
+   aemp profile <name> <command>... # apply command to profile only
+   aemp setparent <name>         # specify a parent profile
+   aemp delparent                # clear parent again
+   aemp delprofile <name>        # eradicate the named profile
+   aemp showprofile <name>       # display given profile
+   aemp showconfig <name> ...    # display effective config
+
+   # node configuration: low-level protocol
+   aemp [set|del]monitor_timeout <seconds>
+   aemp [set|del]connect_interval <seconds>
+   aemp [set|del]framing_format [array]
+   aemp [set|del]auth_offer [array]
+   aemp [set|del]auth_accept [array]
+   aemp [set|del]autocork <boolean>
+   aemp [set|del]nodelay <boolean>
+
+=head1 DESCRIPTION
+
+With aemp you can configure various aspects of AnyEvent::MP and its
+protocol, send various messages and even run a node.
+
+The F<aemp> utility works like F<cvs>, F<svn> or other commands: the first
+argument defines which operation (subcommand) is requested, after which
+arguments for this operation are expected. When a subcommand does not eat
+all remaining arguments, the remaining arguments will again be interpreted
+as subcommand and so on.
+
+This means you can chain multiple commands, which is handy for profile
+configuration, e.g.:
+
+   aemp gensecret profile xyzzy binds 4040,4041 nodeid anon/
+
+Please note that all C<setxxx> subcommands have an alias without the
+C<set> prefix.
+
+All configuration data is stored in a human-readable (JSON) config file
+stored in F<~/.perl-anyevent-mp> (or F<%appdata%/perl-anyevent-mp> on
+loser systems, or wherever C<$ENV{PERL_ANYEVENT_MP_RC}> points to). Feel
+free to look at it or edit it, the format is relatively simple.
+
+=head2 SPECIFYING ARGUMENTS
+
+Arguments can be specified just as with any other shell command, with a
+few special cases:
+
+If the I<first> argument starts with a literal C<[>-character, then it is
+interpreted as a UTF-8 encoded JSON text. The resulting array replaces all
+arguments.
+
+Otherwise, if I<any> argument starts with one of C<[>, C<{> or C<">, then
+it is interpreted as UTF-8 encoded JSON text (or a single value in case of
+C<">), and the resulting reference or scalar replaces the argument.
+
+This allows you, for example, to specify binds in F<aemp run> (using POSIX
+shell syntax):
+
+   aemp run binds '["*:4040"]'
+
+=head2 RUNNING A NODE
+
+This can be used to run a node - together with some services, this makes
+it unnecessary to write any wrapper programs.
+
+=over 4
+
+=item run <configure_args>...
+
+Runs a node by calling C<AnyEvent::MP::Kernel::configure> with the given
+arguments. The node runs under L<AnyEvent::Watchdog>, can be restarted
+(and autorestarted, see the L<AnyEvent::Watchdog> manual). A very common
+invocation is to just specify a profile using the profile name
+
+   aemp run database-backend
+
+... but you can use most arguments that C<configure> understands:
+
+   aemp run nodeid mynode2 profile someprofile
+
+Care has been taken to load (almost) no modules other than
+L<AnyEvent::Watchdog> and the modules it loads, so everything (including
+the L<AnyEvent::MP> modules themselves) will be freshly loaded on restart,
+which makes upgrading everything except the perl binary easy.
+
+=item restart <node>
+
+Restarts the node using C<AnyEvent::Watchdog::Util::restart>. This works
+for nodes started by C<aemp run>, but also for any other node that uses
+L<AnyEvent::Watchdog>.
+
+=back
+
+=head2 PROTOCOL COMMANDS
+
+These commands actually communicate with other nodes. They all use a node
+profile name of C<aemp> (specifying a default node ID of C<anon/> and a
+binds list containing C<*:*> only).
+
+They all use a timeout of five seconds, after which they give up.
+
+=over 4
+
+=item snd <port> <arguments...>
+
+Simply send a message to the given port - where you get the port ID from
+is your problem.
+
+Exits after ensuring that the message has been delivered to its node.
+
+Most useful to take advantage of some undocumented functionality inside
+nodes, such as node ports being able to call any method:
+
+   aemp snd doomed AnyEvent::Watchdog::restart 1
+
+=item cal <port> <arg...>
+
+Like F<aemp cal>: appends a local reply port to the message and waits for
+a message to it.
+
+Any return values will be JSON-encoded and printed separated by commas
+(kind of like a JSON array without []-brackets).
+
+Example: ask the (undocumented) time service of a node for its current
+time.
+
+   aemp cal mynode time
+
+=item mon <port>
+
+Monitors the port and exits when it's monitorign callback is called. Most
+useful to monitor node ports.
+
+Example: monitor some node.
+
+   aemp mon doomed
+
+=item eval <node> <expr...>
+
+Joins all remaining arguments into a string and evaluates it on the given
+node. Return values are handled as with F<aemp cal>.
+
+Example: find the unix process ID of the node called posicks.
+
+   aemp eval posicks '$$'
+
+=item trace <node>
+
+Asks the given node for all currently connected nodes, then asks those
+nodes for the same, thus tracing all node connections.
+
+=back
+
+=head2 CONFIGURATION/NODE ID/SECRET/CERTIFICATE
+
+These commands deal with rather basic settings, the node ID, the shared
+secret and the TLS certificate.
+
+=over 4
+
+=item setnodeid <nodeid>
+
+Set the node ID to the given string.
+
+=item delnodeid
+
+Removes the node ID again, which means it is inherited again from it's
+parent profile, or stays unset.
+
+=item gensecret
+
+Generates a random shared secret and sets it. The shared secret is used to
+authenticate nodes to each other when TLS is not required.
+
+=item setsecret <secret>
+
+Sets the shared secret tot he given string, which can be anything.
+
+=item delsecret
+
+Removes the shared secret again, which means it is inherited again from
+it's parent profile, or stays unset.
+
+=item gencert
+
+Generates a self-signed certificate and key, and sets it. This works
+similarly to a shared secret: when all nodes have it, TLS will be used to
+authenticate and encrypt all traffic.
+
+=item setcert <file>
+
+Set a node certificate (and optionally any CA certificates) from the given
+file. The file must contain the key, followed by the certificate, followed
+by any CA certificates you want to trust, all in PEM format.
+
+See L<AnyEvent::TLS> for some more details - this sets the C<cert> and
+C<ca_cert> options.
+
+=item delcert
+
+Removes the certificate(s) again, which means it is inherited again from
+it's parent profile, or stays unset.
+
+=back
+
+=head2 CONFIGURATION/SEEDS
+
+To discover the network you have to specify some seed addresses, which are
+basically C<host:port> pairs where you expect some long-running nodes. It
+does no harm to have a node as its own seed (they will eventually be
+ignored).
+
+=over 4
+
+=item setseeds <host:port>,...
+
+Sets or replaces the list of seeds, which must be specified as a
+comma-separated list of C<host:port> pairs. The C<host> can be a hostname,
+an IP address, or C<*> to signify all local host addresses (which makes
+little sense for seeds, outside some examples, but a lot of sense for
+binds).
+
+An empty list is allowed.
+
+Example: use C<doomed> with default port as only seednode.
+
+   aemp setseeds doomed
+
+=item delseeds
+
+Removes the seed list again, which means it is inherited again from it's
+parent profile, or stays unset.
+
+=item addseed <host:port>
+
+Adds a single seed address.
+
+=item delseed <host:port>
+
+Deletes the given seed address, if it exists.
+
+=back
+
+=head2 CONFIGURATION/BINDS
+
+To be able to be reached from other nodes, a node must I<bind> itself
+to some listening socket(s). The list of these can either bs specified
+manually, or AnyEvent::MP can guess them. Nodes without any binds are
+possible to some extent.
+
+=over 4
+
+=item setbinds <host:port>,...
+
+Sets the list of bind addresses explicitly - see the F<aemp setseeds>
+command for the exact syntax. In addition, a value of C<*> for the port,
+or not specifying a port, means to use a dynamically-assigned port.
+
+Note that the C<*>, C<*:*> or C<*:port> patterns are very useful here.
+
+Example: bind on a ephemeral port on all local interfaces.
+
+   aemp setbinds "*"
+
+Example: bind on a random port on all local interfaces.
+
+   aemp setbinds "*:*"
+
+Example: resolve "doomed.mydomain" and try to bind on port C<4040> of all
+IP addressess returned.
+
+   aep setbinds doomed.mydomain:4040
+
+=item delbinds
+
+Removes the bind list again, which means it is inherited again from it's
+parent profile, or stays unset.
+
+=item addbind <host:port>
+
+Adds a single bind address.
+
+=item delbind <host:port>
+
+Deletes the given bind address, if it exists.
+
+=back
+
+=head2 CONFIGURATION/SERVICES
+
+Services are modules (or functions) that are automatically loaded (or
+executed) when a node starts. They are especially useful when used in
+conjunction with F<aemp run>, to configure which services a node should
+run.
+
+Despite the daunting name, services really I<are> nothing more than a
+module name or a function name with arguments. The "service" aspect comes
+only from the behaviour of the module or function, which is supposed to
+implement, well, some kind of service for the node, network etc.
+
+Instead of writing a standalone program for each different node type in
+your network, you can simply put your code into a module, and then let the
+configuration decide which node runs which "services". This also makes it
+easy to combine multiple different services within the same node.
+
+=over 4
+
+=item setservices <initfunc>...
+
+Sets or replaces the list of services, which must be specified as a
+comma-separated list or a JSON array.
+
+Each string entry in the list is interpreted as either a module name to
+load (when it ends with C<::>) or a function to call (all other cases).
+
+Each entry which is an array itself (you need to use JSON format to
+specify those) is interpreted as a function name and the arguments to
+pass.
+
+The algorithm to find the function is the same as used for C<<
+L<AnyEvent::MP>::spawn >>.
+
+Example: run the globa service (which runs anyway, but this doesn't hurt).
+
+   aemp setservices AnyEvent::MP::Global::
+
+Example: call the mymod::myfun function with arguments 1, 2 and 3.
+
+   aemp setservices '[["mymod::myfun", 1,2,3]]'
+
+=item delservices
+
+Removes the service list again, which means it is inherited again from
+it's parent profile, or stays unset.
+
+=item addservice <initfunc>
+
+Adds a single service.
+
+=item delservice <initfunc>
+
+Deletes the given service, if it exists.
+
+=back
+
+=head2 CONFIGURATION/PROFILE MANAGEMENT
+
+All the above configuration functions by default affect the I<global
+default configuration>, which is basically used to augment every profile
+and node configuration.
+
+=over 4
+
+=item profile <name> ...
+
+This subcommand makes the following subcommands act only on a specific
+named profile, instead of on the global default. The profile is created if
+necessary.
+
+Example: create a C<server> profile, give it a random node name, some seed
+nodes and bind it on an unspecified port on all local interfaces. You
+should add some services then and run the node...
+
+   aemp profile server nodeid anon/ seeds doomed,10.0.0.2:5000 binds "*:*"
+
+=item delprofile <name>
+
+Deletes the profile of the given name.
+
+=item setparent <name>
+
+Sets the parent profile to use - values not specified in a profile will be
+taken from the parent profile (even recursively, with the global default
+config being the default parent). This is useful to configure profile
+I<classes> and then to inherit from them for individual nodes.
+
+Note that you can specify circular parent chains and even a parent for the
+global configuration. Neither will do you any good, however.
+
+Example: inherit all values not specified in the C<doomed> profile from
+the C<server> profile.
+
+   aemp profile doomed setparent server
+
+=item delparent
+
+Removes the parent again from the profile, if any was set, so the profile
+inherits directly from the global default config again.
+
+=item showprofile <name>
+
+Shows the values of the given profile, and only those, no inherited
+values.
+
+=item showconfig <name> <key value...>
+
+Shows the I<effective> config, i.e. the values as used by a node started
+with the given profile name. Any additional key-value pairs specified
+augment the configuration, just as with C<configure>.
+
+If all arguments are omitted, show the global default config.
+
+=back
+
+=head2 LOW-LEVEL TRANSPORT PROTOCOL
+
+The low-level transport protocol betwene two nodes also has a number of
+configurable options, most of which should not be touched unless you know
+what you are doing.
+
+=over 4
+
+=item [set|del]monitor_timeout <seconds>
+
+Sets the default monitor timeout, that is, when a connection to a node
+cannot be established within this many seconds, the node is declared
+unreachable and all monitors will fire.
+
+C<30> seconds are usually a good time span for this.
+
+=item [set|del]connect_interval <seconds>
+
+When a connection cannot be established successfully within this many
+seconds, try the next transport address (e.g. the next IP address). If
+your nodes have a lot of transports, you might have to set this to a low
+value so that they will actually all be tried within the monitor timeout
+interval.
+
+C<2> is usually a good value, unless you live in new zealand.
+
+=item [set|del]framing_format [array]
+
+Configures the list of framing formats offered to the other side. This is
+simply a list of formatted read/write types used with L<AnyEvent::Handle>,
+in order of decreasing preference.
+
+Nodes support both C<json> and C<storable> framing formats for data
+packets out of the box, and usually choose C<json> because it is first in
+the list.
+
+Example: prefer the C<My::Personal::Format> framing format over JSON over
+Storable.
+
+   aemp setframing_format '["My::Personal::Format", "json", "storable"]'
+
+=item [set|del]auth_offer [array]
+
+Configures the list of authentication types that the node offers to the
+other side as acceptable, in order of decreasing preference. Only auth
+methods that the node can actually support will be offered.
+
+The default is '["tls_md6_64_256", "hmac_md6_64_256"]' and is usually good
+enough.
+
+=item [set|del]auth_accept [array]
+
+Configures the list of authentication types that remote nodes can use to
+authenticate, in order of decreasing preference.
+
+The default is '["tls_md6_64_256", "hmac_md6_64_256", "tls_anon",
+"cleartext"]' and is usually good enough.
+
+=item [set|del]autocork <boolean>
+
+Sets the default C<autocork> option value for the L<AnyEvent::Handle>
+object used by transports. By default, autocorking is off.
+
+=item [set|del]nodelay <boolean>
+
+Sets the default C<nodelay> option value for the L<AnyEvent::Handle>
+object used by transports. By default, nodelay is on.
+
+=back
+
+=cut
+
+use common::sense;
+
+# should come before anything else, so all modules
+# will be loaded on each restart
+BEGIN {
+   if (@ARGV == 1 && $ARGV[0] =~ /^\[/) {
+      require JSON::XS;
+      @ARGV = @{ JSON::XS->new->utf8->decode (shift) };
+   } else {
+      for (@ARGV) {
+         if (/^[\[\{\"]/) {
+            require JSON::XS;
+            $_ = JSON::XS->new->utf8->allow_nonref->decode ($_);
+         }
+      }
+   }
+
+   if ($ARGV[0] eq "run") {
+      shift;
+
+      # d'oh
+      require AnyEvent::Watchdog;
+      # only now can we load additional modules
+
+      require AnyEvent;
+
+      require AnyEvent::Watchdog::Util;
+      AnyEvent::Watchdog::Util::autorestart (1);
+      AnyEvent::Watchdog::Util::heartbeat (300);
+
+      require AnyEvent::MP::Kernel;
+      AnyEvent::MP::Kernel::configure (@ARGV);
+
+      AnyEvent::detect () eq "AnyEvent::Impl::EV"
+         ? EV::loop ()
+         : AE::cv ()->recv;
+   }
+}
+
+use Carp ();
+
+use JSON::XS;
+
+use AnyEvent;
+use AnyEvent::Util;
+
+use AnyEvent::MP;
+use AnyEvent::MP::Config;
+
+sub my_run_cmd {
+   my ($cmd) = @_;
+
+   my $cv = &run_cmd;
+   my $status = $cv->recv;
+
+   $status
+      and die "@$cmd: command failed with exit status $status.";
+}
+
+sub gen_cert {
+   my_run_cmd [qw(openssl req 
+                     -new -nodes -x509 -days 3650
+                     -newkey rsa:2048 -keyout /dev/fd/3
+                     -batch -subj /CN=AnyEvent::MP
+              )],
+      "<", "/dev/null",
+      ">" , \my $cert,
+      "3>", \my $key,
+      "2>", "/dev/null";
+
+   "$cert$key"
+}
+
+sub init {
+   configure profile => "aemp", nodeid => "anon/";
+}
+
+our $cfg     = AnyEvent::MP::Config::config;
+our $profile = $cfg;
+
+sub trace {
+   my ($node) = @_;
+   my $cv = AE::cv;
+   my %seen;
+
+   my $to = AE::timer 15, 0, sub { exit 1 };
+
+   init;
+
+   my $reply = port {
+      my ($node, @neigh) = @_;
+
+      @neigh = grep $_ ne $NODE, @neigh;
+
+      print +(join " ", $node, @neigh), "\n";
+
+      for (@neigh) {
+         unless ($seen{$_}++) {
+            $cv->begin;
+            snd $_, up_nodes => $SELF => $_;
+         }
+      }
+
+      $cv->end;
+   };
+
+   $cv->begin;
+   snd $reply, seed => $node;
+
+   $cv->recv;
+}
+
+sub shell {
+   init;
+
+   my $node = shift @ARGV || $NODE;
+   $| = 1;
+
+   print <<EOF;
+Entering interactive shell - no commandline editing of course (use rlfe etc.).
+
+\=           display a list of nodes
+\=name       switch to another node
+
+EOF
+   print "$node> ";
+   my $cv = AE::cv;
+   my $t = AE::io *STDIN, 0, sub {
+      chomp (my $line = <STDIN>);
+
+      if ($line =~ s/^=//) {
+         if (length $line) {
+            $node = $line;
+         } else {
+            print +(join " ", AnyEvent::MP::Kernel::up_nodes), "\n";
+         }
+      } else {
+         my $time = AE::time;
+         AnyEvent::MP::Kernel::eval_on $node, $line, port {
+            my ($err, @res) = @_;
+
+            $time = AE::time - $time;
+
+            print "\n  $node: $line\n";
+            if (length $err) {
+               print "  $err @res";
+            } else {
+               print "  ", JSON::XS::encode_json \@_;
+            }
+            printf "\n  %0.3fs\n", $time;
+            print "$node> ";
+         };
+      }
+
+      print "$node> ";
+   };
+   $cv->recv;
+}
+
+sub node_eval {
+   my ($node, $expr) = @_;
+
+   init;
+
+   my $cv = AE::cv;
+   my $to = AE::timer 5, 0, sub { exit 1 };
+   AnyEvent::MP::Kernel::eval_on $node, $expr, port { &$cv };
+   mon $node, $cv;
+
+   my ($err, @res) = $cv->recv;
+
+   die "$err @res" if length $err;
+
+   print +(substr JSON::XS->new->encode (\@res), 1, -1), "\n";
+}
+
+sub docmd;
+
+our %CMD = (
+   snd => sub {
+      my $port = shift @ARGV;
+      init;
+
+      snd $port, @ARGV; @ARGV = ();
+
+      my $cv = AE::cv;
+      my $to = AE::timer 5, 0, sub { exit 1 };
+      mon $port, $cv;
+      my $reply = port sub { &$cv };
+      snd node_of $port, snd => $reply, "message sent successfully";
+
+      print join " ", $cv->recv, "\n";
+   },
+
+   cal => sub {
+      my $port = shift @ARGV;
+      init;
+
+      my $cv = AE::cv;
+      cal $port, @ARGV, sub { &$cv }; @ARGV = ();
+
+      print +(substr JSON::XS->new->encode ([$cv->recv]), 1, -1), "\n";
+   },
+
+   mon => sub {
+      my $port = shift @ARGV;
+      init;
+
+      mon $port, my $cv = AE::cv;
+      print join " ", $cv->recv, "\n";
+   },
+
+   eval => sub {
+      my $node = node_of shift @ARGV;
+      my $expr = join " ", @ARGV; @ARGV = ();
+      node_eval $node, $expr;
+   },
+
+   shell => \&shell,
+
+   trace => sub {
+      @ARGV >= 1
+         or die "node id missing\n";
+
+      trace shift @ARGV;
+   },
+   restart => sub {
+      my $node = node_of shift @ARGV;
+      node_eval $node, 'my $w; $w = AE::idle sub { '
+                       . 'undef $w; '
+                       . 'use AnyEvent::Watchdog::Util ();'
+                       . 'AnyEvent::Watchdog::Util::restart'
+                       . '}; ()';
+   },
+
+   setnodeid => sub {
+      @ARGV >= 1
+         or die "shared secret missing\n";
+
+      $profile->{nodeid} = shift @ARGV;
+      ++$cfg->{dirty};
+   },
+   delnodeid => sub {
+      delete $profile->{nodeid};
+      ++$cfg->{dirty};
+   },
+
+   setsecret => sub {
+      @ARGV >= 1
+         or die "shared secret missing\n";
+
+      $profile->{secret} = shift @ARGV;
+      ++$cfg->{dirty};
+   },
+   gensecret => sub {
+      $profile->{secret} = AnyEvent::MP::Kernel::alnumbits AnyEvent::MP::Kernel::nonce 64;
+      ++$cfg->{dirty};
+   },
+   delsecret => sub {
+      delete $profile->{secret};
+      ++$cfg->{dirty};
+   },
+
+   setcert => sub {
+      @ARGV >= 1
+         or die "key+certificate pem filename missing\n";
+
+      my $certfile = shift @ARGV;
+
+      open my $fh, "<", $certfile
+         or die "$certfile: $!";
+
+      local $/;
+      $profile->{cert} = <$fh>;
+      ++$cfg->{dirty};
+   },
+   gencert => sub {
+      $profile->{cert} = gen_cert;
+      ++$cfg->{dirty};
+   },
+   delcert => sub {
+      delete $profile->{cert};
+      ++$cfg->{dirty};
+   },
+
+   setbinds => sub {
+      @ARGV >= 1
+         or die "bind addresses missing\n";
+      my $list = shift @ARGV;
+      $profile->{binds} = ref $list ? $list : [split /,/, $list];
+      ++$cfg->{dirty};
+   },
+   delbinds => sub {
+      delete $profile->{binds};
+      ++$cfg->{dirty};
+   },
+   addbind => sub {
+      @ARGV >= 1
+         or die "bind address missing\n";
+      my $bind = shift @ARGV;
+
+      @{ $profile->{binds} } = grep $_ ne $bind, @{ $profile->{binds} };
+      push @{ $profile->{binds} }, $bind;
+      ++$cfg->{dirty};
+   },
+   delbind => sub {
+      @ARGV >= 1
+         or die "bind address missing\n";
+      my $bind = shift @ARGV;
+
+      @{ $profile->{binds} } = grep $_ ne $bind, @{ $profile->{binds} };
+      ++$cfg->{dirty};
+   },
+
+   setseeds => sub {
+      @ARGV >= 1
+         or die "seed addresses missing\n";
+      my $list = shift @ARGV;
+      $profile->{seeds} = ref $list ? $list : [split /,/, $list];
+      ++$cfg->{dirty};
+   },
+   delseeds => sub {
+      delete $profile->{seeds};
+      ++$cfg->{dirty};
+   },
+   addseed => sub {
+      @ARGV >= 1
+         or die "seed address missing\n";
+      my $seed = shift @ARGV;
+
+      @{ $profile->{seeds} } = grep $_ ne $seed, @{ $profile->{seeds} };
+      push @{ $profile->{seeds} }, $seed;
+      ++$cfg->{dirty};
+   },
+   delseed => sub {
+      @ARGV >= 1
+         or die "seed address missing\n";
+      my $seed = shift @ARGV;
+
+      @{ $profile->{seeds} } = grep $_ ne $seed, @{ $profile->{seeds} };
+      ++$cfg->{dirty};
+   },
+
+   setservices => sub {
+      @ARGV >= 1
+         or die "service specifications missing\n";
+      my $list = shift @ARGV;
+      $profile->{services} = ref $list ? $list : [split /,/, $list];
+      ++$cfg->{dirty};
+   },
+   delservices => sub {
+      delete $profile->{services};
+      ++$cfg->{dirty};
+   },
+   addservice => sub {
+      @ARGV >= 1
+         or die "service specification missing\n";
+      my $service = shift @ARGV;
+      push @{ $profile->{services} }, $service;
+      ++$cfg->{dirty};
+   },
+   delservice => sub {
+      @ARGV >= 1
+         or die "service specification missing\n";
+      my $service = shift @ARGV;
+      for (0 .. $#{ $profile->{services} }) {
+         next unless $profile->{services}[$_] eq $service;
+         splice @{ $profile->{services} }, $_, 1;
+         last;
+      }
+      ++$cfg->{dirty};
+   },
+
+   profile => sub {
+      @ARGV >= 1
+         or die "profile name is missing\n";
+      my $name = shift @ARGV;
+
+      $profile = $cfg->{profile}{$name} ||= {};
+      ++$cfg->{dirty};
+   },
+   delprofile => sub {
+      @ARGV >= 1
+         or die "profile name is missing\n";
+      my $name = shift @ARGV;
+
+      delete $cfg->{profile}{$name};
+      ++$cfg->{dirty};
+   },
+   setparent => sub {
+      @ARGV >= 1
+         or die "profile name is missing\n";
+
+      $profile->{parent} = shift @ARGV;
+      ++$cfg->{dirty};
+   },
+   delparent => sub {
+      delete $profile->{parent};
+      ++$cfg->{dirty};
+   },
+   showprofile => sub {
+      @ARGV >= 1
+         or die "profile name is missing\n";
+      my $name = shift @ARGV;
+
+      print JSON::XS->new->pretty->encode ($cfg->{profile}{$name} || {});
+   },
+   showconfig => sub {
+      my $name = @ARGV ? shift @ARGV : AnyEvent::MP::Kernel::_nodename;
+
+      my $profile = AnyEvent::MP::Config::find_profile $name, @ARGV;
+      @ARGV = ();
+
+      # make it look nicer:
+      delete $profile->{profile};
+      delete $profile->{parent};
+
+      print JSON::XS->new->pretty->encode ($profile);
+   },
+
+   # undocumented
+   _resolve => sub {
+      print +(join ",", (AnyEvent::MP::Kernel::_resolve shift @ARGV)->recv), "\n";
+   },
+);
+
+for my $attr (qw(
+   monitor_timeout connect_interval framing_format auth_offer
+   auth_accept autocork nodelay
+)) {
+   $CMD{"set$attr"} = sub {
+      @ARGV >= 1
+         or die "$attr value is missing\n";
+
+      $profile->{$attr} = shift @ARGV;
+      ++$cfg->{dirty};
+   };
+   $CMD{"del$attr"} = sub {
+      delete $profile->{$attr};
+      ++$cfg->{dirty};
+   };
+}
+
+for (keys %CMD) {
+   $CMD{$1} = $CMD{$_} if /^set(.*)$/;
+}
+
+sub docmd {
+   my $cmd = shift @ARGV;
+
+   $CMD{$cmd}
+      or die "$cmd: no such aemp command (try perldoc aemp, or man aemp)";
+
+   $CMD{$cmd}();
+}
+
+@ARGV
+   or die "Usage: aemp subcommand ... (try perldoc aemp, or man aemp)\n";
+
+docmd while @ARGV;
+
+

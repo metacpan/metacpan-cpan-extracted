@@ -1,0 +1,60 @@
+#!/usr/bin/perl -w
+
+if ($ARGV[0] eq '-v') {
+    print "Server version: Apache/1.3.31 (Darwin)\nServer built:   Oct 23 2004 12:16:31\n";
+} elsif ($ARGV[0] eq '-V') {
+    print <<'EOF';
+Server version: Apache/1.3.31 (Darwin)
+Server built:   Oct 23 2004 12:16:31
+Server's Module Magic Number: 19990320:16
+Server compiled with....
+ -D EAPI
+ -D EAPI_MM
+ -D EAPI_MM_CORE_PATH="logs/httpd.mm"
+ -D HAVE_MMAP
+ -D USE_MMAP_SCOREBOARD
+ -D USE_MMAP_FILES
+ -D HAVE_FCNTL_SERIALIZED_ACCEPT
+ -D HAVE_FLOCK_SERIALIZED_ACCEPT
+ -D SINGLE_LISTEN_UNSERIALIZED_ACCEPT
+ -D DYNAMIC_MODULE_LIMIT=64
+ -D HARD_SERVER_LIMIT=256
+ -D HTTPD_ROOT="t"
+ -D SUEXEC_BIN="t/bin"
+ -D DEFAULT_PIDLOG="logs/httpd.pid"
+ -D DEFAULT_SCOREBOARD="logs/httpd.scoreboard"
+ -D DEFAULT_LOCKFILE="logs/httpd.lock"
+ -D DEFAULT_ERRORLOG="logs/error_log"
+ -D TYPES_CONFIG_FILE="conf/mime.types"
+ -D SERVER_CONFIG_FILE="t/testlib/httpd.conf"
+ -D ACCESS_CONFIG_FILE="conf/access.conf"
+ -D RESOURCE_CONFIG_FILE="conf/srm.conf"
+EOF
+} elsif ($ARGV[0] eq '-l') {
+    print <<'EOF';
+Compiled-in modules:
+  http_core.c
+  mod_env.c
+  mod_log_config.c
+  mod_mime.c
+  mod_negotiation.c
+  mod_status.c
+  mod_include.c
+  mod_autoindex.c
+  mod_dir.c
+  mod_cgi.c
+  mod_asis.c
+  mod_imap.c
+  mod_actions.c
+  mod_userdir.c
+  mod_alias.c
+  mod_rewrite.c
+  mod_access.c
+  mod_auth.c
+  mod_so.c
+  mod_setenvif.c
+  mod_ssl.c
+  mod_perl.c
+suexec: disabled; invalid wrapper t/bin
+EOF
+}

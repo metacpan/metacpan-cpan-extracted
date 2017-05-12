@@ -1,0 +1,43 @@
+.. |A-RB| replace:: `App-RoboBot`_
+
+.. _App-RoboBot: https://metacpan.org/pod/App::RoboBot
+
+.. |RB| replace:: RoboBot
+
+.. |GH| replace:: `Github`_
+
+.. _Github: https://github.com/jsime/robobot
+
+.. |REPO| replace:: https://github.com/jsime/robobot
+
+.. |CPANM| replace:: `cpanminus`_
+
+.. _cpanminus: https://metacpan.org/pod/App::cpanminus
+
+.. |DZIL| replace:: `Dist-Zilla`_
+
+.. _Dist-Zilla: https://metacpan.org/pod/Dist::Zilla
+
+.. |Perlbrew| replace:: `Perlbrew`_
+
+.. _Perlbrew: https://perlbrew.pl/
+
+.. |PG| replace:: `PostgreSQL`_
+
+.. _PostgreSQL: https://postgresql.org/
+
+.. |Slack| replace:: `Slack`_
+
+.. _Slack: https://slack.com/
+
+.. |Mattermost| replace:: `Mattermost`_
+
+.. _Mattermost: https://about.mattermost.com/
+
+.. |Sqitch| replace:: `Sqitch`_
+
+.. _Sqitch: http://sqitch.org/
+
+.. |Vagrant| replace:: `Vagrant`_
+
+.. _Vagrant: https://www.vagrantup.com/

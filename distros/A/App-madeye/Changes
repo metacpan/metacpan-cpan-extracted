@@ -1,0 +1,104 @@
+Revision history for Perl extension App::MadEye
+
+0.13 2013-09-29T01:40:28Z
+
+    - Remove nakanobu plugin from core.
+      Please use Ikachan instead.
+      (tokuhirom)
+
+0.12 2013-08-14T03:16:18Z
+
+    - Packaging again
+
+0.10 2013-03-22T17:59:44
+
+    - Convert to minil
+
+0.09 2013-03-11T09:38:14
+
+    - Added Notify::Ikachan
+    - Switch to Furl
+
+0.08
+
+    (FEATURES)
+    - added Agent::TheSchwartz::Error, Agent::TheSchwartz::Job.
+
+    (MAINENANCE)
+    - modernize package
+
+0.07
+
+    (FEATURES)
+    - added P::Notify::IMKayac
+    - added Agent::Memcached(walf443).
+    - various fixes(hirose31)
+    - added P::Agent::WriteDisk
+
+    (MAINTENANCE)
+    - modernize package
+    - move t/9*.t to xt/
+
+0.06
+
+    (BUGS)
+
+    - oops. notifier doesn't works.
+      (broken at 0.05)
+
+0.05
+
+    (FEATURE)
+
+    - rule for Plugin::Notify.
+    - added Plugin::Notify::XMPP
+    - added Plugin::Notify::Nakanobu.
+    - added Plugin::Agent::FileSync.
+    - added Plugin::Agent::SNMP::IPAddress.
+    - Plugin::Agent::SNMP::Disk: you can set retry
+
+    (BUGS)
+
+    - fixed Worker::Simple autoload feature.
+
+0.04
+
+    (FEATURE)
+
+    - timeout is now normal error.
+    - added new plugins
+        - Agent::Sleep (debugging module)
+        - Agent::SSLExpireDate
+
+    (MISC)
+
+    - fixed some pod bug.
+
+0.03
+
+    WARNINGS: this release has some drastic changes..
+
+    (FEATURE)
+    - validate schema with Kwalify
+    - added new plugins
+        - Notify::IRC
+        - Check::Flock
+        - Agent::MySQLSlave
+        - Agent::SNMP::Disk
+        - Agent::SNMP::Process
+        - use Log::Dispatch, a pluggable logger.
+
+    (BUG FIX)
+    - Worker::Gearman: kill zombie.
+
+    (MISC)
+    - added documents.
+    - some variables are now configurable
+
+0.02
+
+    - oops. 0.01 is broken... version 0.01 does not contains madeye.pl...(REPORTED BY hirose31++)
+    - added more document.
+
+0.01    Wed Mar  5 16:39:07 2008
+        - original version

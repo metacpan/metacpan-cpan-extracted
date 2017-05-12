@@ -1,0 +1,11 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+README.pod
+bin/sassp
+dist.ini
+lib/App/Sass.pm
+t/00-compile.t

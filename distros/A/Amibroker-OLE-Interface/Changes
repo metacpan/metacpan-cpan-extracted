@@ -1,0 +1,10 @@
+Revision history for Amibroker-OLE-Interface
+
+0.01    2015-09-16
+      * First version, an OLE interface to Amibroker released for windows
+
+0.02    2015-09-16
+      * Fixed POD issues
+
+0.03    2015-09-20
+      * Added new module APXCreator - which creates (.apx extension) file for amibroker

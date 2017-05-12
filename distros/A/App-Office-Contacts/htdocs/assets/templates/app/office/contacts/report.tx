@@ -1,0 +1,38 @@
+<form id="report_form">
+
+<table align="center">
+	<tr>
+		<td>Report type:</td><td><: $reports :></td><td></td>
+	</tr>
+	<tr>
+		<td>Entity type:</td><td><: $report_entities :></td><td></td>
+	</tr>
+	<tr>
+		<td>Contact via:</td><td><: $communication_types :></td><td><input type="checkbox" id="ignore_communication_type" value="1" checked="checked">Ignore</td>
+	</tr>
+	<tr>
+		<td>Gender:</td><td><: $genders :></td><td><input type="checkbox" id="ignore_gender" value="1" checked="checked">Ignore</td>
+	</tr>
+	<tr>
+		<td>Role:</td><td><: $roles :></td><td><input type="checkbox" id="ignore_role" value="1" checked="checked">Ignore</td>
+	</tr>
+	<tr>
+		<td>Visibility:</td><td><: $visibilities :></td><td><input type="checkbox" id="ignore_visibility" value="1" checked="checked">Ignore</td>
+	</tr>
+</table>
+
+<table align="center">
+	<tr>
+		<td align="center" colspan="3"><span id="generate_report_button">Generate report</span></td>
+	</tr>
+	<tr>
+		<td align="center" colspan="3"><hr></td>
+	</tr>
+	<tr>
+		<td align="center" colspan="3"><div id="report_result"></div></td>
+	</tr>
+</table>
+
+<input type="hidden" id="report_id" value="1">
+<input type="hidden" id="report_sid" value="<: $sid :>">
+</form>

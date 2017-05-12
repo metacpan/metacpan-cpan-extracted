@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+use strict;
+use lib "lib";
+use Acme::MetaSyntactic::daleks;
+
+my $mod_path = $INC{"Acme/MetaSyntactic/daleks.pm"};
+open(MODULE, $mod_path) or die "can't read '$mod_path': $!";
+my @file = grep { /^package/ .. /^__DATA__/ } <MODULE>;
+close(MODULE);
+
+push @file, map { "$_\n" } "# names", Acme::MetaSyntactic::daleks->remote_list();
+
+open(MODULE, ">$mod_path") or die "can't write '$mod_path': $!";
+print MODULE @file;
+close(MODULE);

@@ -1,0 +1,65 @@
+Revision history for Archive-Har
+
+0.21   Mon Apr 17 10:15:00 2015
+        Correct validation for on_content_load as per RT #121188
+
+0.20   Mon Nov 23 07:33:00 2015
+        Do not warn for DESTROY in AUTOLOAD methods        
+
+0.19   Sat Oct 24 20:33:00 2015
+        Updated dependencies.
+
+0.18   Sat Oct 24 18:22:00 2015
+        Updated dependencies.  Swapped gzip dependencies.  Maximum gzip compression is now specified during a gzip call
+
+0.17   Tue Sep 08 05:58:00 2015
+        Added return value for hashref method, improved BOM handling
+
+0.16   Mon Sep 07 17:41:00 2015
+        Canonical sorting for json output
+
+0.15   Sat Sep 05 21:19:00 2015
+        Added parsing gzipped archives
+
+0.14   Sat Sep 05 18:49:00 2015
+        Remove BOMs from the start of strings when importing.
+
+0.13   Sat Sep 05 10:09:00 2015
+        Added hashref method.  Small changes to default handling.  perlcritic fixes
+
+0.12   Fri Sep 04 06:25:00 2015
+        Documentation fixes, removing postData if bodySize is 0
+
+0.11   Wed Aug 25 21:12:00 2015
+        Small improvements
+
+0.10   Sun Aug 16 21:01:00 2015
+        Added gzip method, improved test coverage
+
+0.09   Sat Aug 15 21:57:00 2015
+        Added preliminary xml support for Internet Explorer's Network Inspector
+
+0.08   Sat Aug 15 16:18:00 2015
+        Removed unused error method, improved test coverage, private methods
+
+0.07   Fri Aug 14 21:00:00 2015
+        Changing internals to only use AUTOLOAD methods for private methods.  Lowercase all methods
+
+0.06   Mon Aug 10 21:22:00 2015
+        Improved defaults to cope with mandatory HAR fields.  Changed behaviour of Boolean fields
+
+0.05   Sun Apr 21 21:31:00 2013
+        Included changelog for 0.04
+
+0.04   Thu Apr 11 17:42:00 2013
+        Documentation fix pointed out by Mark Stacey
+
+0.03   Fri Apr 06 08:41:00 2012
+        More documentation fixes
+
+0.02   Thu Apr 05 21:01:00 2012
+        Documentation fixes, removal of pod-coverage test
+
+0.01   Wed Mar 28 10:00:00 2012
+        Initial release.
+

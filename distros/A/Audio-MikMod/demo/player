@@ -1,0 +1,56 @@
+#!/usr/bin/perl -w
+
+# $Id: player,v 1.1 1999/07/29 18:43:42 daniel Exp $
+use strict;
+use ExtUtils::testlib;
+use Audio::MikMod qw(:MikMod :Player);
+use Time::HiRes qw(usleep);
+
+$|++;
+my $chr8   = chr 8;
+my @rotate = qw( | / - \ );
+
+if (!defined $ARGV[0]) {
+	print "Usage: $0 <filename>\n";
+	exit;
+}
+
+# YMMV
+sub pause { Player_TogglePause() }
+$SIG{'TSTP'} = \&pause;
+$SIG{'CONT'} = \&pause;
+
+MikMod_RegisterAllDrivers();
+MikMod_RegisterAllLoaders();
+
+if (MikMod_Init()) {
+	printf STDERR "Could not initialize sound, reason: %s\n", MikMod_strerror();
+	exit 1;
+}
+
+my $title  = Player_LoadTitle($ARGV[0]);
+print "Playing: $title - ";
+
+my $module = Player_Load($ARGV[0] ,64,0);
+
+if (!defined $module) {
+	printf STDERR "Could not load module, reason: %s\n", MikMod_strerror();
+	MikMod_DisableOutput;
+	MikMod_Exit;
+	exit;
+}
+
+Player_Start($module);
+while(Player_Active()) {
+	usleep(10000);
+	MikMod_Update();
+	print STDERR "$rotate[0]$chr8";
+	push @rotate, shift @rotate;
+}
+
+print "Done!\n";
+Player_Stop();
+Player_Free($module);
+
+MikMod_DisableOutput;
+MikMod_Exit();

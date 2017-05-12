@@ -1,0 +1,276 @@
+Revision history for Perl extension Asterisk::AMI.
+0.2.8	- Fix Github#6 Update loop() method to create a loop via an AnyEvent conditional variable instead of the loop() method.
+
+	- Added break() method to exit the loop entered by the loop() method.
+
+	- Fixed documentation of the destroy() method.
+
+0.2.7	- Fix version declaration to conform to examples in documentation.
+
+0.2.6	- Fix RT#71704 Populate empty values in db_show with undef instead of ignoring the entry completely.
+
+0.2.5   - Fix RT#65782 Consume all memory on dropped connection.
+
+0.2.4	- Due to a bug introduced in 0.2.3 get_event would return a reference to the current Asterisk::AMI object instead of the event. 
+
+0.2.3	- The Carp module is now required.
+
+        - Switched certain warnings to now use carp where appropriate.
+
+        - We now honor the 'use warnings' pragma and only present warnings when it is enabled. To disable all warnings
+        specific to this module you can use 'no warnings qw(Asterisk::AMI)'.
+
+	- Deprecated the use of the CALLBACK and TIMEOUT keys for setting timeouts and callbacks for actions sent with
+	send_action. A warning is emitted if they are used. Please use the new syntax introduced in version version 0.2.0.
+        This was done to minimize potential hash key collisions with actual manager command options.
+
+	- Allow passing of a perl variable to an action callback via a new argument for the send_action() method.
+	This can be used to pass along additional information to the callback. See the documentation for more details.
+
+	- Internal changes to how the constructor works, mostly pertaining to better option validation and making it
+	more flexible. Obvious errors should now be caught earlier (e.g. not using a subroutine refernce for an error
+	or event handler).
+
+	- Constructor options are now case-insensitive.
+
+        - db_show() was not honoring timeouts passed to it.
+
+	- Merged Asterisk::AMI::Common::Dev into Asterisk::AMI::Common. This was done because Asterisk 1.8 is now released.
+
+	- Notes have been added to Asterisk::AMI::Common methods that require Asterisk 1.8+.
+
+	- Fixed a typo in the get_var() method in Asterisk::AMI::Common that broke the method.
+
+	- We were not always calling the on_connect_err callback when we should have.
+
+	- Added db_deltree() method to Asterisk::AMI::Common for deleting an entire tree in the astdb.
+
+	- Added db_del() method to Asterisk::AMI::Common for deleting an entry in astdb.
+
+	- Added mute_chan() and unmute_chan() methods to Asterisk::AMI::Common for muting/unmuting inbound/outbound/all
+	audio on a channel.
+
+	- Added mixmonitor_mute() and mixmonitor_unmute() methods to Asterisk::AMI::Common for muting inbound and/or outbound audio
+	for a MixMonitor recording.
+
+	- Added sip_notify() method to Asterisk::AMI::Common for sending a SIP Notify on a channel.
+
+	- Added module_check() method to Asterisk::AMI::Common for checking if an asterisk module is currently loaded.
+
+	- Added module_load(), module_reload() and module_unload() methods to Asterisk::AMI::Common for loading/reloading/unloading an asterisk module.
+
+	- Added originate() and orignate_async() methods to Asterisk::AMI::Common for creating a call from asterisk.
+
+	- Added compatibility to some Asterisk::AMI::Common methods so that they can be used with Asterisk 1.4.
+	Compatibility for 1.4 often requires invokation of cli commands and/or multiple manager actions to gather
+	the required information. Check method documentation for more information.
+
+        - Made general changes to become more compliant with PBP. No warnings with perlcritic -4, very few with -3.
+
+        - General refactoring for a some internal methods for the sake of maintainability
+
+        - Updated cmd_server.pl to use new syntax and variable passing
+
+0.2.2	- Added a call to AE::now_update in blocking methods to force the time for the event loop to update. Fixes an
+	issue where if sleep was called for a period before a blocking call after connecting that the resulting 
+	blocking call would return a timeout (rt #61148).
+
+0.2.1	- Fixed some errors in the documentation
+
+	- Fixed a bug where we would leave an empty value in callbacks on a get_response if the response was already in the
+	buffer. Only error message for this happend once the Asterisk::AMI object went away and attempted to flush all
+	pending callbacks.
+	
+	- Require AnyEvent 5.2 or newer, as a feature we rely on was introduced in that release. Note, I have only tested
+	as far back as version 5.26.
+
+0.2.0	- Added new syntax for using callbacks with the send_action method. Old syntax still works.
+	Check documentation for this method for more details.
+
+	- Changed method of parsing from a regex to a simple split. This was possible due to previous
+	changes in the order that we parsed input. Results are more accurate parsing and better performance.
+	
+	- Removed the need for the 'DATA' key due to above parsing improvements. All input now creates a key
+	in the appropriate hash.
+
+	- Manager lines with empty values ( e.g. 'Account: ' in an event) are no longer placed
+	in 'DATA' and are instead parsed properly and contain the null string as a value ( test for '' ).
+
+	- Added documentation examples for the Originate Action
+
+	- Update documenation
+
+	- Switch to the Artistic License 2
+
+	- Improved Package for CPAN, META.yml now included
+
+0.1.10	- Added exception for the 'Originate' command while using the 'Async' option.
+
+	- Added option 'OriginateHack', which makes changes to allow using the 'Originate' action with the 'Async'
+	option.
+	
+	- Added new subroutine 'loop', calls an event loop via AnyEvent.
+
+0.1.9	- Fixed a bug when the cli command 'database show' was used with a small asterisk database (single entry)
+	that would cause the response to not be parsed correctly, causing it to never complete. Also affected
+	AMI::Common::db_show();
+
+	- Fixing some of our OO implementation to make it more correct and to properly isolate seperate 
+	instances of our object from each other
+
+	- Now after calling destroy() any further calls to methods on that object will simple fail
+
+	- Optimized the regex and method used for splitting 'Action: Command' output
+
+	- Cleaned up some logic in a few subroutines
+
+	- Fixed some more typos in the documentation
+
+0.1.8	- Added support for 'MD5' challenge authenticaiton
+
+	- Added SSL support
+
+	- Internal changes to how we keep track of active actions
+
+	- Fixed some bad grammar/spelling/typos in documentation,
+	most likely added a few more as well
+
+0.1.7	- Removed Asterisk::AMI::completed(). Seemed pointless with callbacks.
+
+	- Added TCP_Keepalive option, enables socket level TCP keepalive for detecting dead connections.
+
+	- Fixed possible undefined value for timeout when sending a keepalive.
+
+	- We were being a bit overzealous when we encounted an error on the socket (during connect or otherwise).
+	We now callback any outstanding actions (as if they had timed out) before we issue the on_error callbacks
+	and do internal cleanup. This bug was causing the hang during login if a socket connection could not
+	be made.
+
+	- Fixed a bug with older version of ExtUtils::MakeMaker
+
+	- Fix to properly us \v when perl >=5.10, we were only doing it when perl >5.10. This only affects performance.
+
+	- 'Keepalive' was not being set if Blocking was set to 1. Now 'Keepalive' is always set if configured,
+	it just may not be helpful if you are not running an event loop.
+
+	- Updated Dependancy to AnyEvent version 5.0 or greater
+
+	- Switch to AE interface for AnyEvent for timers and condvars. Lowers overhead when using alot of timers.
+
+	- Some general code cleanups
+
+0.1.6 	- Fixes calling wrong modules (leftover from name change)
+
+	- Adds backwards compatability for perl 5.8
+
+0.1.5	- Bad test, which broken installing from cpan
+
+0.1.4	- Changed namespace from AMI to Asterisk::AMI
+
+	- Massive Internal changes. Entire core re-written to use AnyEvent. This module is still usuable without an event loop, but now can integrate
+	easily into any event loop supported by AnyEvent.
+
+	- Out put from cli commands (from issueing Action: Command) is now placed in $response->{'CMD'}.
+	As a bonus from rewriting how we parse packets (to work with anyevent) we can now very easily identify all lines
+	associated with command output.
+
+	- Object is no longer also a filehandle. No longer required because of the use of AnyEvent
+
+	- Event handling from AMI::Event merged into Core.
+	
+	- Add more advance options for error handling, check the documentation for the constructor.
+
+	- Removed number of 'useless' functions. You should check the documentation.
+	
+	- Fixed a memory 'leak' (total consumtion was still capped by our ring buffer) that could happen when many responses were timeing out.
+	Essentially we were still buffering the subsequent packets even if they action had already timed out. Now we properly discard them. 
+
+	- AMI::get_action is now AMI::get_response. Behavior is the same, only the name has changed.
+
+	- Re-wrote event_proxy.pl example to utilize the new integration with AnyEvent.
+
+	- New example server called 'cmd_server.pl' which allows for a few basic commands. It demonstrates the use of callbacks.
+
+0.1.3	- Changed version requirements from 5.10 to 5.8. Those running 5.8 may need to install the 'version' and 'parent'
+	pragmas. (install version and install parent in cpan).
+
+	- Now using "\015\012" as the end of line delimiter, more portable and better practice than "\r\n"
+
+	- AMI::Common::channels() was not accepting timeouts
+
+	- Changed AMI::Common::channels() to use the status command, which has changed the information it returns (more is better).
+
+	- New key {'GOOD'} added to the Response Obj. It is 1 when an object is complete and had no errors and 0 if it
+	had an error or never finished. Should make it very easy to check if a response is usuable.
+
+	- AMI::check_response() now also removes the action from the buffer
+
+	- We were not properly returning undef on error for several AMI::Common functions. These should now properly
+	return undef if the action failed.
+
+	- Added Callbacks on for Actions to core AMI, read the documentation for more information.
+
+	- New code example 'cmd_server.pl', a simple server, gives examples on how to use callbacks.
+
+	- New Module AMI::Common:Dev contains additional functions for working with Asterisk 1.6+
+
+0.1.2	- All AMI Objects can now also be used a normal IO Handles. It is not recommended
+	that you read and write directly to them. This was added so you can add the AMI
+	object to something like IO::Select for single threaded server applications
+
+	- New module AMI::Common::Dev, which is currently empty. This will be where new functions
+	specific to Asterisk 1.6+ will go. When the next LTS of Asterisk is released these will then
+	be merged back into AMI::Common and new functions will be added here.
+
+	- Cleaned up option handling
+
+	- Fixed a bug in reading packets that could lead to 100% cpu usage when
+	a remote end disconnected.
+
+	- action() and get_action now return the response so long as the action completed
+	and undef if an error happened or if it timed out.
+
+	- check_response() and simple_action now return 0 on a failure, 1 on success, and
+	undef on error or timeout.
+
+	- get_event() now returns undef on error or timeout.
+
+	- send_action now returns undef on error.
+
+	- The above changes filter through to many AMI::Common functions as well.
+
+	(If you get undef you should check the connection.)
+
+	- check_connection changed to connected()
+
+	- New Method process_packet(). Tells AMI to process input from asterisk.
+
+	- 'EventPreempt' changed to 'FastEvents', behavior changed to immeditly proccess any events
+	after processing a packet.
+
+	- Added 'Timeout' option to constructor. Allows setting a default timeout on function calls.
+
+	- Removed AutoAge and AutoClear settings and added 'BufferSize', which is the max number of Actions to hold 
+	in memory. We basically use a ring buffer now for actions. Default is 30000.
+
+	- Fixed a bug in AMI::Common where we were accidnetly using the channel name for positions for Queue Entries
+
+	- Added AMI::Common::play_digits() which plays a series of DTMF tones on a channel.
+	
+	- Restructued the logic for sorting events and responses
+
+	- Added key 'Handlers' to AMI::Events constructor which accepts a hash containing event handlers
+
+	- Removed AMI::Events::event_mask() and AMI::Events::handlers(), instead use the constructor.
+
+	- Events are now discarded if they are not enabled at object creation. (If you don't set 'Events' to something
+	other than 'off' then we will discard any events not associated with an action that we get in for that object)
+
+	- Useing AMI::Common or AMI::Common::Dev before AMI::Events will allow the AMI::Events object to use the methods
+	in AMI::Common or AMI::Common:Dev
+
+	- Various other code cleanups
+
+0.1.1  Thu Jan 27 2010
+	- Initial Release
+

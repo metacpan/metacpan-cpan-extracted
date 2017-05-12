@@ -1,0 +1,61 @@
+Revision history for Perl extension AnyEvent::Twitter
+
+0.64    Fri Jan 11 22:16:43 2013
+        - add deps (Time::Piece) 
+          Time::Piece was first released with perl v5.9.5
+
+0.63    Sun Jan  6 21:30:43 2013
+        - add parse_timestamp method
+        - support REST API Version 1.1
+        - support media uploading
+
+0.62    Thu Jul 21 20:00:39 JST 2011
+        - documentation fix
+        - clean code up
+
+0.61    Wed Jul 20 06:12:29 JST 2011
+        - remove deps: Net::Twitter::Lite
+        - document get_access_token() and get_request_token()
+
+0.60    Wed Jul 20 04:30:23 JST 2011
+        - refactoring
+        - add get_request_token() *undocumented
+        - add get_access_token() *undocumented
+
+0.53    Mon Jun 20 21:30:32 2011
+        - fix documentation
+
+0.52    Mon Nov 22 06:28:11 JST 2010
+        - new arguments for new().
+        - added get() and post() method.
+
+0.51    Sat Jun 12 16:11:59 JST 2010
+        - Cleaned up, added some tests and modified POD.
+
+0.5     Thu May 27 23:15:33 JST 2010
+        - With the removal of basic authentication,
+          the API of this module is different from older version.
+
+0.3     Thu Nov  5 00:09:11 CET 2009
+        - requiring new Object::Event API.
+        - fixed bug with 400 status, thanks to some weird Japanese forum.
+
+0.26    Fri Sep 11 23:08:36 CEST 2009
+        - removed 'count' parameter, it was defunct anyways.
+          Now as many status updates as possible are fetched when
+          no state exists yet.
+        - added unix timestamp decoding.
+
+0.25    Thu Sep  3 14:29:12 CEST 2009
+        - implemented mentions.  Thanks go to Nuno Nunes
+          (nfmnunes @ CPAN) for the initial patch.
+
+0.21    Tue Aug 11 08:37:27 CEST 2009
+        - added common::sense to prereq.
+
+0.2     Mon Aug 10 10:07:28 CEST 2009
+        - fixed some missing documentation.
+        - using common::sense for all scripts and modules.
+
+0.1     Mon Jul 13 09:13:53 CEST 2009
+        - initial release

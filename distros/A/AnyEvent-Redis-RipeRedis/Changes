@@ -1,0 +1,379 @@
+Revision history for AnyEvent::Redis::RipeRedis.
+
+1.62 Mon Jul 26 19:22:05 MSK 2016
+  - Bugfix in unit tests.
+
+1.60 Mon Jul 26 15:03:25 MSK 2016
+  - Module is deprecated. Use AnyEvent::RipeRedis instead. Made related changes
+    in POD.
+  - Slight refactoring and cosmetic changes.
+
+1.52 Mon Jun 27 11:25:35 MSK 2016
+  - BUGFIX Added error code mapping for new error prefixes.
+
+1.50 Mon Jun 20 15:20:45 MSK 2016
+  - FEATURE Improved syntax of calling of multiple word commands.
+  - FEATURE Added new constructor parameter "min_reconnect_interval" and
+    corresponding accessor.
+  - FEATURE Added new error codes.
+  - Slight refactoring of unit tests.
+
+1.48 Sat Jun 27 15:31:24 MSK 2015
+  - FEATURE Improved subscription mechanism. Now if connection was lost when
+    client has active subscriptions, the 'on_error' or 'on_reply' callback,
+    specified in appropriate '(p)subscribe' method, is called.
+  - Slight refactoring.
+  - Minor changes in POD.
+
+1.46 Sat Mar 7 15:37:54 MSK 2015
+  - FEATURE: Added new error code E_BUSY_KEY.
+  - Module Test::RedisServer was copied to testing environment and was refactored.
+    Now it has name Test::RedisRunner and doesn't require Any::Moose.
+  - Slight refactoring.
+  - Minor changes in POD.
+
+1.44 Sat Nov 1 19:35:00 MSK 2014
+  - FEATURE: Method info() now parsing information and statistics about the
+    server. The result is passed to 'on_done' or 'on_reply' callback as a hash
+    reference.
+  - Minor internal changes.
+  - Improved unit tests.
+
+1.42 Tue Sep 9 18:30:00 MSK 2014
+  - FEATURE: added constructor parameter 'handle_params'.
+  - Constructor parameters 'autocork' and 'linger' now are deprecated.
+  - Changed parsing logic of replies from redis-server.
+  - Large refactoring.
+  - Improved POD.
+  - Improved unit tests.
+
+1.40 Mon May 19 10:45:00 MSK 2014
+  - FEATURE: added constructor parameter 'linger'. Thanks to Ivan Kruglov.
+  - Slight internal changes.
+
+1.38 Sun Jan 26 19:15:00 MSK 2014
+  - FEATURE: added 'autocork' behavior, which can be enabled or disabled.
+  - BUGFIX: fixed conversion to lower case of command keyword.
+  - Minor internal changes.
+  - Minor changes in POD.
+
+1.36 Mon Jan 20 19:15:00 MSK 2014
+  - Accepted new versioning convention.
+  - Unit tests improved.
+  - Minor internal changes.
+  - Minor changes in POD.
+
+1.346 Wed Jan 15 01:45:00 MSK 2014
+  - Copyright updated.
+
+1.345 Wed Jan 15 01:25:00 MSK 2014
+  - Command keyword is converted to lowercase.
+
+1.344 Wed Jan 15 00:45:00 MSK 2014
+  - Minor changes.
+
+1.343 Wed Jan 15 00:40:00 MSK 2014
+  - Several changes in unit tests.
+
+1.342 Wed Jan 15 00:30:00 MSK 2014
+  - Fix in unit tests.
+
+1.341 Tue Jan 14 22:15:00 MSK 2014
+  - BUGFIX: Now, selected_database() method returns '0' if 'database' parameter
+    was not specified in constructor.
+
+1.340 Tue Jan 14 21:00:00 MSK 2014
+  - FEATURE: Added selected_database() method.
+  - BUGFIX: Now, client remembers last selected database after reconnection.
+  - Minor changes in POD.
+  - Required version of ExtUtils::MakeMaker decremented back to 6.64.
+  - Several internal changes.
+
+1.321 Sun Jan 12 14:30:00 MSK 2014
+  - Required version of Test::More decremented to 0.98.
+
+1.320 Sat Jan 11 23:40:00 MSK 2014
+  - On premature connection close, the client additionally calls the common
+    'on_error' callback.
+  - The premature connection close or the premature destroy of the client object
+    produce different warnings.
+  - Internal API improved.
+  - Unit tests improved.
+  - Minor changes in POD.
+
+1.314 Tue Dec 24 19:10:00 MSK 2013
+  - Minor fix in unit tests.
+
+1.312 Tue Dec 24 18:00:00 MSK 2013
+  - Several changes in POD.
+  - Several changes in tests.
+
+1.311 Fri Dec 20 00:30:00 MSK 2013
+  - Several fixes in POD.
+  - Cosmetic changes.
+
+1.310 Wed Dec 18 19:10:00 MSK 2013
+  - FEATURE: Added error codes based on error prefixes.
+  - Improved parsing of error prefixes.
+  - Minor changes in POD.
+  - Cosmetic changes in example scripts.
+
+1.303 Tue Dec 17 23:00:00 MSK 2013
+  - Added version numbers to dependencies in BUILD_REQUIRES section in Makefile.PL.
+  - Increased several timeouts in unit tests.
+
+1.302 Tue Dec 17 01:20:00 MSK 2013
+  - Fixed typo in POD.
+
+1.301 Tue Dec 17 01:07:00 MSK 2013
+  - Some fixes in POD.
+
+1.300 Mon Dec 16 19:50:00 MSK 2013
+  - FEATURE: Now, in command methods can be specified single callback, which
+    is called in both cases: when operation was completed successfully and when
+    some error occurred.
+  - Improved POD.
+  - Improved unit tests.
+  - Another wave of refactoring.
+
+1.254 Mon Jun 9 17:44:55 MSK 2013
+  - Minor changes in POD.
+
+1.253 Wed May 31 14:38:35 MSK 2013
+  - BUGFIX: Fixed premature triggering of the 'rtimeout' timer in some cases.
+
+1.252 Wed May 29 11:00:45 MSK 2013
+  - BUGFIX: Fixed reading from the uninitialized read buffer in some cases.
+  - Now, in tests empty TCP port is taken using module Net::EmptyPort.
+
+1.251 Fri Apr 26 11:29:05 MSK 2013
+  - Slight modification of examples in POD
+
+1.250 Thu Apr 25 22:00:30 MSK 2013
+  - Improved error handling for EXEC command and for Lua scripts, which returns
+    errors in multi-bulk reply.
+  - Word 'command' replaced on 'operation' in error messages.
+  - Added test for memory leaks.
+  - Improved other tests.
+  - POD has been complemented.
+
+1.244 Sat Apr 13 00:41:25 MSK 2013
+  - Added CONFIGURE_REQUIRES section in Makefile.PL.
+  - TEST_REQUIRES section renamed back to BUILD_REQUIRES.
+
+1.243 Sat Apr 13 00:41:25 MSK 2013
+  - Minor fixes in POD.
+
+1.242 Fri Apr 12 16:54:10 MSK 2013
+  - Increased minimal required version of Perl up to v5.8.0
+  - Test 10-exceptions.t rewritten with using Test::Fatal
+  - Edited POD.
+  - Minor changes in examples.
+  - Fixed dates in Changes file
+  - Fixed year in copyright in README file
+
+1.241 Wed Apr 10 07:35:25 MSK 2013
+  - Removed Test::MockObject from dependencies.
+  - Minor fix in POD.
+
+1.240 Tue Apr 9 19:40:55 MSK 2013
+  - FEATURE: Now, destroying of object can produce warnings if some commands
+    were not completed.
+  - BUGFIX: Fixed parsing of empty bulk reply.
+  - Error codes E_INVALID_PASS and E_OPRN_NOT_PERMITTED were joined with code
+    E_OPRN_ERROR.
+  - unit tests completely rewritten with using module Test::RedisServer.
+
+1.239 Sat Mar 2 15:28:50 MSK 2013
+  - Minor changes in POD
+
+1.238 Fri Mar 1 18:00:00 MSK 2013
+  - Slight refactoring of input parameters validation.
+  - Added list of error codes in POD.
+
+1.237 Sat Feb 16 12:36:55 MSK 2013
+  - Module Digest::SHA1 replaced on Digest::SHA in unit tests too.
+
+1.236 Thu Feb 14 15:20:25 MSK 2013
+  - Module Digest::SHA1 replaced on Digest::SHA.
+
+1.235 Mon Feb 11 16:41:30 MSK 2013
+  - BUGFIX: Empty strings in command arguments now processed correctly
+    (bug discovered by Andrey Kuzmin).
+  - Minor changes in unit tests.
+
+1.234 Mon Jan 14 18:10::40 MSK 2013
+  - Fixes in POD.
+
+1.233 Fri Jan 11 10:40::10 MSK 2013
+  - Slight improvements.
+
+1.232 Fri Jan 11 00:40::50 MSK 2013
+  - Minor fixes in POD.
+
+1.231 Wed Jan 9 14:06:35 MSK 2013
+  - Slight improvements.
+
+1.230 Wed Jan 9 11:12:12 MSK 2013
+  - BUGFIX: Fixed the bug, which was a cause of crashes of the client in some
+    cases of lost connection.
+  - Slight refactoring and optimization.
+
+1.220 Mon Jan 7 17:47:47 MSK 2013
+  - FEATURE: Added following accessors:
+    - connection_timeout,
+    - read_timeout,
+    - reconnect,
+    - encoding,
+    - on_connect,
+    - on_disconnect,
+    - on_connect_error,
+    - on_error.
+  - Added section BUILD_REQUIRES in Makefile.PL
+  - POD improved.
+
+1.212 Wed Dec 26 09:43:35 MSK 2012
+  - Specified minimum version of AnyEvent in Makefile.PL.
+
+1.211 Mon Dec 24 01:05:35 MSK 2012
+  - Fixes in POD.
+
+1.210 Mon Dec 24 00:10:00 MSK 2012
+  - FEATURE: Implemented parameter 'read_timeout' in constructor.
+  - FEATURE: Added error code constant E_READ_TIMEDOUT.
+  - Now, if client received unexpected data, it abort all commands and close
+    connection.
+  - Validation of input parameters became less strict.
+  - Slight optimization.
+  - Added section TRANSACTIONS in POD.
+  - Refactoring.
+  - POD improved.
+  - unit tests improved.
+
+1.204 Tue Nov 27 22:28:15 MSK 2012
+  - Fixed typo in the name of internal method _process_response() (typo discovered
+    by Natalya Filippova).
+
+1.203 Fri Nov 23 11:17:00 MSK 2012
+  - Internal method _async_call() replaced by AE::postpone() function.
+
+1.202 Fri Nov 23 11:17:00 MSK 2012
+  - BUGFIX: Now, lazy connection works correctly if the parameter 'reconnect'
+    is false.
+  - unit tests improved.
+  - Minor internal changes
+
+1.201 Mon Nov 19 11:05:55 MSK 2012
+  - Fixes in POD
+
+1.200 Sat Nov 17 21:10:10 MSK 2012
+  - Implemented new method eval_cached()
+  - Added new error code NO_SCRIPT.
+  - Many internal changes.
+  - unit tests improved.
+  - Fixes in POD.
+  - Added new example script eval.pl
+
+1.115 Wed Oct 31 18:51:50 MSK 2012
+  - Minor fixes in POD.
+
+1.114 Wed Oct 31 14:37:55 MSK 2012
+  - Added protection from deep recursion in case of some errors.
+  - Renamed constants (hope no one used them yet):
+    - E_AUTH_REQUIRED renamed to E_OPRN_NOT_PERMITTED.
+    - E_COMMAND_EXEC renamed to E_OPRN_ERROR.
+    - E_CLIENT renamed to E_UNEXPECTED_DATA,
+  - Changes in POD.
+
+1.112 Fri Oct 27 15:30:25 MSK 2012
+  - POD edited.
+
+1.111 Fri Oct 27 15:30:25 MSK 2012
+  - Minor changes in POD.
+  - Slight improvement in unit test.
+  - Minor internal changes.
+
+1.110 Fri Oct 26 18:08:20 MSK 2012
+  - FEATURE: Added constructor parameter 'database'.
+  - FEATURE: Added constructor parameter 'lazy'.
+  - BUGFIX: Fixed reconnect error, which has been occurred if password was not
+    been required.
+  - Changes in POD.
+
+1.109 Fri Oct 20 01:54:40 MSK 2012
+  - Changes in POD.
+
+1.108 Fri Oct 20 01:28:40 MSK 2012
+  - Changes in POD.
+
+1.107 Fri Oct 19 18:31:40 MSK 2012
+  - Added POD coverage test.
+  - Changes in POD.
+  - Added minimal Perl version in Makefile.PL.
+
+1.106 Fri Oct 19 16:44:00 MSK 2012
+  - BUGFIX: In some cases method disconnect() has not been closing the connection.
+
+1.105 Tue Oct 10 18:31:40 MSK 2012
+  - Slight optimization.
+  - Added section 'resources' in Makefile.PL for META.yml.
+  - Some changes in POD.
+
+1.104 Sat Sep 1 03:14:45 MSK 2012
+  - E_IO_OPERATION renamed to E_IO.
+  - E_CONN_CLOSED_ON_DEMAND renamed to E_CONN_CLOSED_BY_CLIENT.
+  - E_UNEXPECTED renamed to E_CLIENT.
+
+1.103 Fri Aug 31 14:24:45 MSK 2012
+  - POD has been complemented.
+  - Cosmetic changes.
+
+1.102 Fri Aug 31 00:19:15 MSK 2012
+  - FEATURE: Added error codes in 'on_error' callbacks.
+  - FEATURE: Added constants for error codes.
+  - unit tests improved.
+  - Many internal changes.
+
+1.000 Wed Aug 15 23:24:05 MSK 2012
+  - BUGFIX: Now, connection to server closed automatically after destroying
+    last reference on AnyEvent::Redis::RipeRedis object.
+  - BUGFIX: Fixed cyclic references.
+
+0.807301 Wed Aug 15 00:52:45 MSK 2012
+  - Changes in POD
+
+0.807300 Tue Aug 14 19:02:20 MSK 2012
+  - Many internal changes
+  - Changed format of error messages.
+
+0.807200 Fri Jun 29 22:12:40 MSK 2012
+  - BUGFIX: "on_done" callback now calls at the end of processing of response,
+    to avoid unexpected behavior.
+
+0.807100 Wed Jun 20 10:38:50 MSK 2012
+  - BUGFIX: If some error ocurred or if connection was closed, then uncompleted
+    commands will be aborted before calling 'on_error', 'on_connect_error'
+    or 'on_disconnect' callbacks, to avoid unexpected behavior.
+
+0.807000 Mon Jun 18 14:55:50 MSK 2012
+  - FEATURE: Added 'on_connect_error' callback in constructor
+
+0.806000 Thu Jun 14 15:47:10 MSK 2012
+  - FEATURE: Added public method disconnect()
+
+0.805201 Wed Jun 13 10:14:00 MSK 2012
+  - Minor fix in POD.
+
+0.805200 Tue May 29 11:02:30 MSK 2012
+  - BUGFIX: Fixed probable race condition in auto-authentication.
+
+0.805103 Thu May 17 12:27:05 MSK 2012
+  - BUGFIX: Prevented an infinite loop in method _abort_commands() in case, when
+    commands was executed in 'on_error' callback wihtout delay.
+
+0.805000 Wed May 16 21:20:15 MSK 2012
+  - BUGFIX: Automatic authentication now works correctly in case, when Redis
+    server needs some time to load data file in memory.
+
+0.804106 Sat Apr 14 15:48:46 MSK 2012
+  - First release.

@@ -1,0 +1,387 @@
+2000-03-31  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* Tag: INCOM_0_09
+
+	* MANIFEST: Added NEWS file.
+
+	* lib/Apache/iNcom.pm: 
+	(return_error) s/log_warn/warn.
+
+2000-03-30  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/Apache/iNcom.pm:
+	($VERSION) Upgraded to 0.09.
+
+	* lib/HTML/FormValidator.pm: 
+	(filter_quotemeta) Wrapper around quotemeta.
+	(filter_uc) Wrapper around uc.
+	(filter_lc) Wrapper around lc.
+	(filter_ucfirst) Wrapper around ucfirst.
+	(filter_sql_wildcard) Transform * into %.
+
+	* lib/Apache/iNcom/Session.pm: 
+	(get_lock_manager): Use Apache::iNcom::SessionLocker has lock manager.
+
+	* lib/Apache/iNcom/Request.pm: 
+	(cleanup_aliases) Undef the symbol of %Session and %UserSession, 
+	since a %hash = undef call CLEAR in tied implementation.
+
+	* lib/Apache/iNcom/SessionLocker.pm: LockManager to serialize
+	access to session. It will be used only if 
+	INCOM_SESSION_SERIALIZE_ACCESS is set to true.
+
+	* lib/Apache/iNcom.pm: 
+	(session_init): Make sure the cookies' value looks like a 
+	session id. Added Serialize parameter.
+	(new_session_handler) Added Serialize parameter.
+	(pod) Documented INCOM_SESSION_SERIALIZE_ACCESS directive.
+	
+2000-03-29  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/HTML/FormValidator.pm: 
+	(filter_phone) Strip blank space.
+
+	* lib/Apache/iNcom/Request.pm: 
+	(cleanup_aliases) New method which undoes
+	what setup_aliases does.
+	(setup_aliases) New %UserSession hash.
+	(BEGIN) Added possibility to import the global variables.
+
+	* lib/Apache/iNcom.pm: 
+	(offset_calc) Method grabbed from CGI.pm.
+	(request_handler) Call cleanup_aliases.
+	(error_handler) Call cleanup_aliases.
+	(request_cleanup) Delete expired sessions.	
+
+2000-03-17  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/HTML/FormValidator.pm: 
+	(validate) Fixed field_filters processing. 
+	(filters) Added integer, pos_integer, neg_integer, 
+	decimal, pos_decimal, neg_decimal,
+	dollars and phone filters. 
+	(filter_trim) Fixed return value.
+	(valid_american_phone) True if more than 7 digits.
+	(valid_phone) True if more than 6 digits.
+
+
+2000-02-25  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* TAG: INCOM_0_08
+
+	* Documentation fixes for first public release.
+	
+2000-02-23  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* TAG: INCOM_0_07
+	
+	* lib/Apache/iNcom.pm:
+	(i18n_init) Do not add default language to languages list. That is
+	done by Localizer. Sets default to en.
+	(error_handler) Honors EMBPERL_OPTIONS and EMBPERL_DEBUG 
+	settings. (From the environment or the apache configuration)
+	(default_handler) Honors EMBPERL_OPTIONS and EMBPERL_DEBUG
+	settings. (From the environment or the apache configuration)
+
+	* lib/Apache/iNcom/Request.pm: (Include) Honors EMBPERL_OPTIONS
+	and EMBPERL_DEBUG settings. (From the environment or the apache
+	configuration)
+
+	* lib/Apache/iNcom/Localizer.pm: (preffered_lang) returns 
+	defaults language if none is set. (new) Set en as default language
+	if it's not a valid language tag.
+
+2000-02-16  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* TAG: INCOM_0_06
+
+	* lib/Apache/iNcom/CartManager.pm: Fixed bug with quantity = 0.
+
+2000-02-15  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/Apache/iNcom/Request.pm: Added TextInclude function.
+
+	* lib/Apache/iNcom/Localizer.pm: Add default language to the list
+	  of package to try.
+
+	* lib/Apache/iNcom/CartManager.pm: When using quantity = 0, remove
+	  the item.
+
+	* lib/Apache/iNcom.pm: Added default language to LANGUAGE env
+	  variable. Changed version to 0.06.
+
+1999-12-03  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* TAG: INCOM_0_05
+	
+	* lib/Apache/iNcom/OrderManager.pm (order_report): Use the new
+	semantics of Apache::iNcom::Request::Include for report
+	generation, which gives us automatic localization of report and 
+	template path search.
+	
+	* lib/Apache/iNcom/Request.pm (Include): Allows an HTML::Embperl
+	hash parameter as argument.
+
+	* lib/DBIx/SearchProfiles.pm
+	(record_search,template_search,do_bounded_search): Reimplemented
+	limit and max to be more robust. Previous implementation used
+	LIMIT / OFFSET and count(*) to retrieive slice and total. It was
+	prone to failure on complex query. New implementation run the
+	query, count the number of rows returned and returns only the
+	requested slice. LIMIT is only to enforce the new max parameter.
+
+	* lib/Apache/iNcom.pm: Small typos fixes. Documented requirements
+	for MIME::Base64.
+	(bake_session_cookie,new_session_handler,session_init): Resubmit
+	cookie to user if there is an explicit expiration date on the cookie.
+	
+
+	* lib/Apache/Session/DBIBase64Store.pm: Use instead a Base64 encoding
+	since this will requires less quoting. (uuencoding use ' as a
+	valid character).
+
+	* lib/Apache/Session/DBIUUStore.pm: Removed in favor of
+	DBIBase64Store.pm. 
+	
+	* lib/Apache/iNcom/Session.pm (get_store): Use
+	Apache::Session::DBIBase64Store instead of Apache::Session::DBIUUStore.
+
+1999-11-26  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* Tag: INCOMP_SNAP_19991129
+
+	* lib/Apache/iNcom/Request.pm (QueryArgs): Tested the value of %odat
+	and %idat instead of the existence of the key.
+
+	* lib/DBIx/SearchProfiles.pm (record_search,template_search):
+	Removed dbix_sp_prev and dbix_sp_next.
+	(template_search): Use count(*) to determines the total number of
+	records that will be returned. (This is broken in regards to distinct).
+
+1999-11-24  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* Tag: INCOM_0_04.
+	
+	* lib/Apache/iNcom/Request.pm (logout): Fix erroneous UserDB
+	not-set error.
+
+	* lib/Apache/iNcom.pm (default_handler): Only set non-empty values
+	in %fdat. 
+
+1999-11-20  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/DBIx/SearchProfiles.pm (record_update): Throw exception if
+	there is no fields to update.
+	(record_insert): Throw exception if there is no fields to insert.
+
+1999-11-15  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/Apache/iNcom/UserDBAuthen.pm (pod): Added documentation.
+	(handler): Variable can be set to true by using yes or on or true.
+	
+	* lib/Apache/iNcom/UserDBAuthz.pm (pod): Added documentation.
+
+	* Tag: INCOM_SNAP_19991115
+
+	* lib/Apache/iNcom/Request.pm (new): Added possibility to disable
+	unneeded features by setting the appropriate directives.
+	(logged_in,login,user,logout): Throw exception if the UserDB was
+	turn off.
+	(setup_aliases): Only setup variable for which the feature was
+	configured.
+	
+
+	* lib/Apache/iNcom.pm (pod): Added documentation about how to 
+	disable features by setting directives to NONE.
+
+1999-11-14  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/Apache/iNcom.pm (error_handler,default_handler,pod):
+	HTML::Embperl errors are available through the @param in 500 error
+	pages.
+	
+	* lib/DBIx/SearchProfiles.pm (pod): Corrected rollback
+	documentation. 
+
+1999-11-09  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/Apache/iNcom/Request.pm (new): Implemented
+	INCOM_SCRAMBLE_PASSWORD configuration directive.
+	
+	* lib/Apache/iNcom.pm (pod): Documented the INCOM_SCRAMBLE_PASSWORD
+	configuration directive to change password scrambling option.
+	
+	* lib/DBIx/UserDB.pm: Made password's scrambling optional.
+
+1999-11-08  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* demo/incom.sql: Fix errors in group_acl index definitions.
+
+	* lib/Apache/iNcom.pm (new_session_handler): Forgot to pass
+	request object in call to return_error.
+	(dispatch_handler): Added Pragma and Cache-control headers for
+	browser that ignores the Expires header.
+
+1999-11-01  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/DBIx/UserDB.pm (group_get): $gid renamed to $gidorname.
+
+	* lib/Apache/iNcom/OrderManager.pm (checkout): Variable $profile
+	is really variable $order. items is an array ref. Remove
+	Data::Dumper reference.
+	(order_report): %fdat of calling page was overwritten. Order data
+	is now passed into the %order global hash.
+
+	* lib/Apache/iNcom/CartManager.pm (apply_charges): Didn't
+	deference array.
+	(apply_discount): Ditto.
+	
+
+1999-10-29  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* MANIFEST: Rename of UserDBAuthz and UserDBAuthen.
+
+1999-10-28  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/Apache/iNcom.pm (pod): Added module documentation.
+
+	* lib/Apache/UserDBAuthz.pm: Renamed to Apache::iNcom::UserDBAuthz
+
+	* lib/Apache/UserDBAuthen.pm: Renamed to Apache::iNcom::UserDBAuthen
+
+1999-10-27  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/Apache/iNcom/Request.pm (pod): Added module documentation.
+	
+	* lib/Apache/iNcom/OrderManager.pm (pod): Added module
+	documentation. 
+	(build_order_fields): Fixed typo "shippin".
+	(checkout): Report generation is in its own method now. Added
+	item_discount_fields parameter to profile. Method now returns 
+	the created order's data.
+	(order_report): New method.
+
+	* lib/Apache/iNcom/CartManager.pm (pod): Added module documentation.
+	
+	* lib/Apache/iNcom/Localizer.pm (pod): Added module documentation.
+
+	* lib/Apache/iNcom/Session.pm (pod): Added module documentation.
+
+	* lib/DBIx/UserDB.pm (license): Changed license to perl terms.
+	(user_search): Pass all arguments to underlying record_search.
+	(user_get): Accept either a uid or username.
+	(user_update): Removed unused $data variable.
+	(group_search): Pass all arguments to underlying record_search.
+	(group_get): Accept either a gid or groupname.
+	(group_update): New method.
+	(pod): Added module documentation.
+	
+	
+	* lib/DBIx/SearchProfiles.pm (pod): Completed documentation.
+
+1999-10-21  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/DBIx/SearchProfiles.pm (new): Possibility to specify
+	DBI parameters to open a connection. Possibility to give the
+	search profiles as an hash reference to the constructor.
+	(DESTROY): Disconnect from the database if we opened the connection
+	in the constructor.
+	(sql_do): Query isn't checked for INSERT|UPDATE|DELETE.
+	(record_search,template_search): Renamed incom_* parameters to
+	dbix_sp_*.
+	(pod): Started module documentation.
+
+	* lib/HTML/FormValidator.pm (new): The input profiles
+	specification can be passed directly to the constructor instead of
+	a file name.
+	(validate): If the constraints string looks like a regexp compile an
+	anonymous subroutines which match that regexp.
+	(postcode): Allow space or dash inside the postal code.
+	(filter_trim,filter_strip): Moved white space stripping code in
+	its own filter.
+	(pod): Added module documentation.
+
+	* lib/Apache/Session/DBIUUStore.pm (new): Renamed parameters to 
+	DataSource, UserName, Password for DBIStore compatibility.
+	(DESTROY): If the database handle was opened by the module,
+	disconnect the connection on DESTROY to prevent spurious warnings.
+	Spotted by Craig Sanders <cas@taz.net.au>.
+	(pod): Added module documentation.
+
+1999-10-18  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/Apache/iNcom/CartManager.pm (compute): Enable use of
+	mutiple discounts for an item.
+	(apply_discount): Added function to handle the single/multiple
+	cases for discount.
+	(apply_charges): Added function to handle the single/multiple
+	cases for taxes,shipping charges, etc.
+	(item_price): Added functions to query the CartManager about the
+	pricing informations of an not yet ordered item.
+	(item_pricing): See previous.
+	(item_discount): See previous.
+
+	* lib/Apache/iNcom/Localizer.pm (find_localized_file): quote
+	filename in regard to regexp.
+
+	* lib/Apache/iNcom/Request.pm	(new): INCOM_ROOT may be relative
+	to the server root.
+
+1999-10-15  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/Apache/Session/DBIUUStore.pm: Removed requirements on
+				    MIME::Base64, used perl internal 
+				    pack and unpack.
+
+				    Added possibility to specify DSN, 
+				    username and password rather than 
+				    an open DBI connection.
+	
+	* Many files:		    Name space reorganization.
+
+	TAG: INCOM_0_03
+
+	* iNcom.spec:		     Set BuildArchitectures to noarch.
+
+	* lib/iNcom/UserDBAuthen.pm: Added.
+
+	* lib/iNcom/UserDBAuthz.pm:  Added.
+	
+
+1999-10-14  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/iNcom/UserDB.pm:	    (allowed)
+				    Fixed named of sql_search method. 
+				    Fixed group members checking. 
+				    Fixed privilege attribute name.
+
+	* MANIFEST:		    Added Localizer.pm, UserDBAuthen.pm
+				    and UserDBAuthz.pm
+	
+
+	TAG: INCOM_0_02
+
+	* lib/iNcom/Localizer.pm:   Added get_handle method which finds
+				    a Locale::Maketext object appropriate
+				    for the preferred languages.
+
+	* lib/iNcom/Request.pm:	    Added $Localizer to namespace of the
+				    page. 
+				    Set a $Locale object if the variable
+				    INCOM_LOCALE is set.
+				    Added convenience Currency() and
+				    Localize() methods.
+				    
+
+1999-10-13  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* lib/iNcom.pm:		    INCOM_ROOT is relative to server root.
+				    Files are language negotiated.
+				    Added error maps.
+
+	* lib/iNcom/Request.pm:	    Added template path search.
+				    Search for localized version of the 
+				    templates.
+
+	* lib/iNcom/Localizer.pm:   Added.
+

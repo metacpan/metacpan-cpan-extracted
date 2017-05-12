@@ -1,0 +1,30 @@
+---
+abstract: 'RPC::ExtDirect gateway for AnyEvent::HTTPD'
+author:
+  - 'Alex Tokarev <tokarev@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.82'
+  URI: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-HTTPD-ExtDirect
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent::HTTPD: '0.93'
+  HTTP::Request: '0'
+  RPC::ExtDirect: '3.20'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/nohuhu/AnyEvent-HTTPD-ExtDirect/issues
+  repository: https://github.com/nohuhu/AnyEvent-HTTPD-ExtDirect
+version: '3.20'

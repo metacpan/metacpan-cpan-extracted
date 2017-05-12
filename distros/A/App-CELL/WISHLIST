@@ -1,0 +1,24 @@
+MIGHT IMPLEMENT SOMEDAY
+20140526 release.sh process multiple arguments (ATM it takes only one)
+20140529 Status.pm: 'ok' and 'not_ok' methods are almost identical - use a
+         "subroutine factory" to generate them
+20140529 Guide.pm: write verbiage about how statuses are for handling
+         expected errors. It's still OK to croak if something unexpected
+         happens.
+20140609 If sitedir is passed to load routine by argument or environment
+         variable, return an error status if sitedir not loaded
+20140610 Clarify that messages cannot be overwritten
+20140610 Implement Status.pm->dump (currently just a stub)
+20140610 Change debug_mode to log_level (for finer granularity of control)
+20140613 Log.pm: add a check for (caller)[0] -- if being called from
+         App::CELL itself, check a flag that toggles _all_ App::CELL log 
+         messages so the application developer can suppress them if needed
+
+
+WILL PROBABLY NEVER IMPLEMENT
+20140516 put meta, core, and site params directly in the module's symbol
+         table like RT does it
+20140516 get App::CELL to build on Perl 5.10.0 (SLE_11_SP3)
+20140524 add 'testing' mode to Load->init (prefix all paths, e.g., with 
+         '/tmp')
+20140610 get App::CELL to run in taint mode

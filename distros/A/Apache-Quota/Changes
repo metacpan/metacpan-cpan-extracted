@@ -1,0 +1,18 @@
+0.04  2007-03-30
+
+- Some small doc tweaks.
+
+- Made the open_db method private.
+
+- Added POD coverage tests.
+
+
+0.03  2004-02-20
+
+- Wow, a version without syntax errors!  What a fantastic idea.
+Reported by me!
+
+
+0.02  2004-02-20
+
+- First version released on CPAN

@@ -1,0 +1,28 @@
+Format: 1.8
+Date: Tue, 09 Mar 2010 16:43:31 +0100
+Source: qux
+Binary: qux
+Architecture: source i386
+Version: 1.0-1
+Distribution: unstable
+Urgency: low
+Maintainer: Esteban Manchado Velázquez <estebanm@estebanm-desktop>
+Changed-By: Esteban Manchado Velázquez <estebanm@estebanm-desktop>
+Description: 
+ qux        - <short description; defaults to some wise words>
+Changes: 
+ qux (1.0-1) unstable; urgency=low
+ .
+   * First version
+Checksums-Sha1: 
+ 1d847bb021ade9dec03be35356dbd8d7529a4182 446 qux_1.0-1.dsc
+ 498f5076145ae29c07148ab8d92f5653b816d0b9 1782 qux_1.0-1.tar.gz
+ 9f76ac9aaa5ee3daed4e1161fe6c5329f04701ad 2072 qux_1.0-1_i386.deb
+Checksums-Sha256: 
+ 25a0191017a79dedfc5fe975f69911f0b9cfa837a2d004b2ce0ceaa0ff576173 446 qux_1.0-1.dsc
+ 6308ff99f8453fe2cd88632f752bda0c556250d6974a158ad0ac15fe25d0c187 1782 qux_1.0-1.tar.gz
+ ce714c3a7b2d746b4465d2731dea451ecc1611d605f536c8c19a4be4f9807696 2072 qux_1.0-1_i386.deb
+Files: 
+ 0a2ec77c6cdb3adf44f4b8d1c649669b 446 misc optional qux_1.0-1.dsc
+ 8a51205b1447768fd42480995ea6db5c 1782 misc optional qux_1.0-1.tar.gz
+ 9dfffdacac5cd1abf79e11d02e2d1fd6 2072 misc optional qux_1.0-1_i386.deb

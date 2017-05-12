@@ -1,0 +1,48 @@
+{
+   "abstract" : "access to Wietse Venema's TCP Wrappers library",
+   "author" : [
+      "James FitzGibbon, E<lt>jfitz@CPAN.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4206",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Authen-Libwrap",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Authen::Libwrap" : {
+         "file" : "lib/Authen/Libwrap.pm",
+         "version" : "0.23"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.23"
+}

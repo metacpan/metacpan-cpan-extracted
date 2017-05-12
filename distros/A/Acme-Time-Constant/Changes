@@ -1,0 +1,64 @@
+Release history for Acme-Time-Constant
+
+0.001006 2017-03-07T08:12:13Z 805d720
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001005, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+ - test: ↓1
+
+0.001005 2016-04-27T14:50:17Z adc5064
+ - Requiring the newest Time::Warp, which appears to have avoided the nvsize bug reported in issue #1
+ - Alternatively: I blame CERN
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001004, see misc/*.deps* for details
+ - develop: +4 ↑1 (suggests: ↑1)
+ - runtime: ↑1
+
+0.001004 2015-06-23T04:50:45Z f351e75
+ [00 Minor]
+ - Attempt 5.6 support
+ - This will come in handy when this module supports time travel and has to be used back before 5.8 exists without
+   breaking timespace.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001003, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +9 ↑3 -3 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 -1
+ - test: +1 (recommends: ↑1 ↓1)
+
+0.001003 2014-08-30T07:49:40Z
+ [00 Trivial]
+ - Improve test coverage.
+ - Pull timespace and subspace closer together.
+
+0.001002 2014-08-30T00:35:43Z
+ [00 Trivial]
+ - no code changes
+ - metadata
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+
+ [Metadata]
+ - Fixup author
+
+0.001001 2014-08-15T21:11:15Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - whitespace adjustment.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+
+ [Misc]
+ - Whitespace moved down by improving pre-build source.
+
+0.001000 2014-08-04T04:27:24Z
+ - First version.

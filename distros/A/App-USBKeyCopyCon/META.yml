@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                App-USBKeyCopyCon
+version:             1.02
+abstract:            GUI console for bulk copying of USB keys
+license:             ~
+author:              
+    - Grant McLean <grantm@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Gtk2:                          0
+    Moose:                         0
+    Net::DBus:                     0
+    Net::DBus::GLib:               0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

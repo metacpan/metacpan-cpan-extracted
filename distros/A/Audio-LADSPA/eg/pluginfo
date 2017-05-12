@@ -1,0 +1,256 @@
+#!/usr/bin/perl -w
+# Audio::LADSPA perl modules for interfacing with LADSPA plugins
+# Copyright (C) 2003  Joost Diepenmaat.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# See the COPYING file for more information.
+
+use strict;
+use Audio::LADSPA;
+use Getopt::Long;
+use Pod::Usage;
+use Config;
+
+my $so = $Config{'so'};
+
+my $verbose = 0;
+my @label;
+my @id;
+my @libs;
+my $help;
+my $short;
+my $list_ports;
+my @package;
+
+GetOptions(
+    'verbose!' => \$verbose,
+    'library=s' => \@libs,
+    'id=i' => \@id,
+    'label=s' => \@label,
+    'help|?' => \$help,
+    'short!' => \$short,
+    'ports!' => \$list_ports,
+    'package=s' => \@package,
+) && @ARGV == 0 or pod2usage(-verbose=>0,-exitval => 1);
+pod2usage( -verbose => 2, -exitval => 0) if $help;
+
+sub verbose {
+    print STDERR @_ if $verbose;
+}
+
+
+my @plugins;
+my @libraries;
+
+if (@libs) {
+    for my $lib (@libs) {
+	my $lib_class;
+	verbose("searching for library $lib...\n");
+	if ($lib =~ m#^/#) {
+	    $lib .= ".$so" unless $lib =~ /\.$so$"/;
+	    ($lib_class) = grep { $_->library_file() eq $lib } Audio::LADSPA->libraries;
+	    unless ($lib_class) {
+		verbose("not already loaded, trying to load library directly\n");
+		if (-f $lib) {
+		    $lib_class = Audio::LADSPA->load($lib);
+		}
+		else {
+		    die "no library file $lib found.\n";
+		}
+	    }
+	}
+	else {
+	    ($lib_class) = grep { $_->library_file() =~ /(^|\/)\Q$lib\E(\.$so)?$/ } Audio::LADSPA->libraries;
+	    verbose("cannot find library in LADSPA_PATH, try specfiying the full path to the library (.$so) file\n") unless $lib_class;
+	}
+	die "cannot find library $lib anywhere.\n" unless $lib_class;
+	push @libraries,$lib_class;
+	push @plugins, $lib_class->plugins;
+    }
+}
+else {
+    verbose("all libraries in LADSPA_PATH should be examined\n");
+    @libraries = Audio::LADSPA->libraries;
+    @plugins = Audio::LADSPA->plugins;
+}
+
+
+if (@label) {
+    my @filt;
+    for my $label (@label) {
+	push @filt, grep { $_->label eq $label } @plugins;
+    }
+    @plugins = @filt;
+}
+if (@id) {
+    my @filt;
+    for my $id (@id) {
+	push @filt, grep { $_->id == $id } @plugins;
+    }
+    @plugins = @filt;
+}
+if (@package) {
+    @plugins = @package;
+    for (@package) {
+	unless ($_->isa('Audio::LADSPA::Plugin')) {
+	    verbose("trying to load $_ as a perl module\n");
+	    eval "use $_;";
+	}
+    }
+}
+die "no matching plugins found\n" unless @plugins;
+
+
+verbose(scalar @plugins," plugins found in ",scalar @libraries," libraries\n");
+
+@plugins = sort @plugins;
+
+my @plug_fields = qw(label id);
+push @plug_fields, qw(name maker copyright port_count is_realtime 
+		    is_hard_rt_capable is_inplace_broken has_run 
+		    has_run_adding has_activate has_deactivate) unless $short;
+
+for my $lib ( sort @libraries ) {
+    verbose("library $lib\n");
+    my $seen_lib = 0;
+    for my $plug (@plugins) {
+        if (grep { $_ eq $plug } $lib->plugins) {
+	    print "$lib (",$lib->library_file,")\n" unless $seen_lib++;
+	    print "    $plug\n";
+	    
+	    for (@plug_fields) {
+		if (! /^(is|has)/ and defined $plug->$_) {
+		    print "\t$_:\t",$plug->$_,"\n";
+		}
+		if (/^(is|has)/) {
+		    print "\t$_:\t",$plug->$_ ? "yes" : "no","\n";
+		}
+	    }
+
+	    next unless $list_ports;
+
+	    for my $port ($plug->ports) {
+		print "\t$port\n";
+		for (qw(is_input is_control lower_bound 
+		    upper_bound is_toggled is_integer is_sample_rate 
+		    is_logarithmic default)) {
+		    if (/^is/) {
+		      	print "\t    $_:\t",$plug->$_($port) ? "yes" : "no" ,"\n";
+			next;
+		    }
+		    next unless defined $plug->$_($port);
+		    if (/_bound$/ && $plug->is_integer($port)) {
+			printf "\t    $_\t%1.0f",$plug->$_($port);
+		    }
+		    elsif(/_bound$/) {
+			printf "\t    $_\t%1f",$plug->$_($port);
+		    }
+		    else {
+			print "\t    $_:\t\"",$plug->$_($port),'"';
+		    }
+		    if (/_bound$/ && $plug->is_sample_rate($port)) {
+			print " x sample_rate";
+		    }
+		    print "\n";
+		}
+	    }	
+	}
+    }
+}
+
+
+
+
+
+=pod
+
+=head1 NAME
+
+pluginfo - Describe ladspa plugins
+
+=head1 SYNOPSIS
+
+  pluginfo [options]
+
+  Options:
+    --verbose              processing info
+    --library              library file name
+    --id                   plugin id
+    --label                plugin label
+    --package		   perl package name of the plugin
+    --short                only short info
+    --ports		   full port listing
+    --help                 more help
+
+  Example:
+    pluginfo --library cmt --short  # list plugins in the cmt library
+    pluginfo --id 1043 --ports      # describe the 'delay_5s' plugin
+    pluginfo --ports		    # list everything about everything
+
+=head1 OPTIONS
+
+Options are of the form --option-name or -option-name and may be abbreviated
+untill unambiguous, for instance: C<--id> to C<-i> and C<--library> to C<-li>.
+
+=over 4
+
+=item B<--verbose>
+
+Describe what the program is doing.
+This is mostly helpful when debugging.
+
+=item B<--library>
+
+The library file where the plugin should be searched. Multiple library options may be given.
+
+Without this option, all libraries in LADSPA_PATH will be searched.
+
+=item B<--label>
+
+The label of the plugin you want described. Multiple label options may be given.
+
+=item B<--id>
+
+The ID of the plugin you want described. Multiple id options may be given.
+
+I<Note: although in the LADSPA plugin API this ID is called UniqueID,
+there are some libraries that have multiple versions of a plugin, all
+with the same ID. To select one of these plugins unambiguously, you
+should use both the B<--label> and B<--id> options.>
+
+=item B<--short>
+
+Only list file, library & plugin class, label and id of found plugins.
+
+=item B<--help>
+
+Describe the program and its options.
+
+=head1 SEE ALSO
+
+L<Audio::LADSPA>, L<perl>.
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Joost Diepenmaat <jdiepen@cpan.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+See the COPYING file for more information
+

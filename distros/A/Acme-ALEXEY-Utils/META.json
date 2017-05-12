@@ -1,0 +1,46 @@
+{
+   "abstract" : "The great new Acme::ALEXEY::Utils!",
+   "author" : [
+      "Alexey Morar  <alexeymorar0@gmail.com >"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-ALEXEY-Utils",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::ALEXEY::Utils" : {
+         "file" : "lib/Acme/ALEXEY/Utils.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ]
+   },
+   "version" : "0.01"
+}

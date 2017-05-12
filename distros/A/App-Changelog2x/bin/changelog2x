@@ -1,0 +1,836 @@
+#!/usr/bin/perl
+
+###############################################################################
+#
+# This file copyright (c) 2008-2009 by Randy J. Ray, all rights reserved
+#
+# Copying and distribution are permitted under the terms of the Artistic
+# License 2.0 (http://www.opensource.org/licenses/artistic-license-2.0.php) or
+# the GNU LGPL (http://www.opensource.org/licenses/lgpl-license.php).
+#
+###############################################################################
+#
+#   Description:    A simple Perl script that uses XML::LibXSLT and other CPAN
+#                   modules to format a ChangeLogML file into some form of
+#                   human-readable output.
+#
+#   Functions:      formats_list
+#
+#   Libraries:      App::Changelog2x
+#                   File::Spec
+#                   Getopt::Long
+#                   XML::LibXML
+#                   XML::LibXSLT
+#                   DateTime
+#                   DateTime::Format::ISO8601
+#
+#   Globals:        $VERSION
+#                   $revision
+#                   $cmd
+#
+###############################################################################
+
+use 5.008;
+use strict;
+use warnings;
+use vars qw($dir $cmd $USAGE $VERSION %opts $app);
+use subs qw(formats_list);
+use constant STYLESHEET_OPTS => qw(notoc versions order css color javascript
+                                   headcontent bodycontent class);
+
+use File::Spec;
+use Getopt::Long;
+
+use XML::LibXML;
+use XML::LibXSLT;
+use DateTime;
+use DateTime::Format::ISO8601;
+
+use App::Changelog2x;
+
+$VERSION = '0.11';
+($dir, $cmd) = (File::Spec->splitpath($0))[1, 2];
+$USAGE = "$cmd [ --input file ] [ --output file ] [ --format date-format ]
+\t[ --template template ] [ --templateroot dir ]
+\t[ --headcontentfile file ] [ --bodycontentfile file ]
+\t[ stylesheet opts ... ]
+
+Where:
+
+--input                    Name of ChangeLogML file to process, STDIN used
+                             if this option not passed
+--output                   Name of file to write transformed content to, STDOUT
+                             used if this option not passed
+--format (-f)              Alternate format to use for formatting the dates
+                             in release blocks, may be abbreviated to '-f'
+--template (-t)            The name of the template to use, option may be
+                             abbreviated to '-t'
+--templateroot (-tr)       A directory to look for templates in, option may
+                             be abbreviated to '-tr', may be repeated
+--headcontentfile (-head)  A file to read content from to use as the
+                             stylesheet's 'headcontent' parameter, option may
+                             be abbreviated to '-head'
+--bodycontentfile (-body)  A file to read content from to use as the
+                             stylesheet's 'bodycontent' parameter, option may
+                             be abbreviated to '-body'
+";
+
+GetOptions(\%opts, qw(help|h
+                      input=s
+                      output=s
+                      format|f=s
+                      template|t=s
+                      templateroot|tr=s@
+                      headcontentfile|head=s
+                      bodycontentfile|body=s
+
+                      notoc
+                      versions=s
+                      order=s
+                      class=s
+                      css=s
+                      color=s
+                      javascript=s
+                      headcontent=s
+                      bodycontent=s
+                      xsltparam=s%))
+    or die $USAGE;
+
+# Get a App::Changelog2x instance to work with
+$app = App::Changelog2x->new();
+
+# Add ourself to the "credits" list:
+$app->application_tokens("$cmd/$VERSION");
+
+# The default root for the templates is in a changelog2x directory that sits
+# below the installation of App::Changelog2x.pm. We get it through a pseudo-
+# accessor in that package. We actually only need it to generate the list of
+# available formats for the --help option. Actual resolving of template names
+# that aren't absolute paths is handled within App::Changelog2x.
+$app->xslt_path(@{$opts{templateroot}}) if $opts{templateroot};
+
+# We actually needed that option *before* handling the "help" option, so that
+# we can scan the template-root directory for available formats:
+if ($opts{help})
+{
+    my @paths = $app->xslt_path;
+    my $paths = join("\n\t", @paths);
+    my @formats = formats_list @paths;
+    my $plural = (1 < @paths) ? 's' : '';
+
+    print "$USAGE
+Type 'man $cmd' for full manual page and stylesheet options.
+
+Template search path$plural:
+\t$paths
+
+Available values for the --template option:
+\t@formats\n";
+
+    exit 0;
+}
+
+# The default template is "html".
+$opts{template} ||= 'html';
+
+# If either of headcontentfile or bodycontentfile have been specified, they
+# override the simpler options (if they were even set at all).
+for my $part (qw(head body))
+{
+    if ($opts{"${part}contentfile"})
+    {
+        open(my $fh, "< $opts{'${part}contentfile'}") or
+            die "Error opening $opts{'${part}contentfile'} for reading: $!";
+        $opts{"${part}content"} = join('', <$fh>);
+    }
+}
+
+# If the user specified a date format to use, set it
+$app->date_format($opts{format}) if $opts{format};
+
+# Set up the input/output sinks, allowing for '-' or no specification to
+# default to STDIN/STDOUT
+our ($ifh, $ofh);
+if ($opts{input} && ($opts{input} ne '-'))
+{
+    open($ifh, "< $opts{input}") or
+        die "Error opening $opts{output} for writing: $!";
+    binmode $ifh; # In case someone tried to sneak a PerlIO layer in
+}
+else
+{
+    $ifh = \*STDIN;
+}
+if ($opts{output} && ($opts{output} ne '-'))
+{
+    open($ofh, "> $opts{output}") or
+        die "Error opening $opts{output} for writing: $!";
+}
+else
+{
+    $ofh = \*STDOUT;
+}
+
+# Though the stylesheet processor will quietly ignore unknown parameters, I
+# prefer to only pass through those params that are for the stylesheet. Drop
+# the application parameters:
+my %params = map { $opts{$_} ? ($_ => $opts{$_}) : () } (STYLESHEET_OPTS);
+# And copy over any user-specified "extra" XSLT parameters:
+if ($opts{xsltparam} and ref($opts{xsltparam}))
+{
+    for (keys %{$opts{xsltparam}})
+    {
+        $params{$_} = $opts{xsltparam}->{$_};
+    }
+}
+$app->transform_changelog($ifh, $ofh, $opts{template}, \%params);
+
+exit 0;
+
+###############################################################################
+#
+#   Sub Name:       formats_list
+#
+#   Description:    List the available formats/stylesheets in the default
+#                   directory of XSLT files.
+#
+#   Arguments:      NAME      IN/OUT  TYPE      DESCRIPTION
+#                   @dirs     in      list      Directories to scan for files
+#
+#   Globals:        None.
+#
+#   Environment:    None.
+#
+#   Returns:        Success:    1
+#                   Failure:    0
+#
+###############################################################################
+sub formats_list
+{
+    my @dirs = @_;
+
+    my (%seen, @list);
+
+    foreach my $dir (@dirs)
+    {
+        opendir(my $dh, $dir) or die "Error opening $dir for reading: $!";
+
+        @list = grep(/^changelog2.*\.xslt$/, readdir($dh));
+        for (@list)
+        {
+            s/changelog2(.*)\.xslt/$1/;
+            $seen{$_}++;
+        }
+
+        closedir($dh);
+    }
+
+    sort keys %seen;
+}
+
+__END__
+
+=head1 NAME
+
+changelog2x - Transform ChangeLogML files using XSLT stylesheets
+
+=head1 SYNOPSIS
+
+    changelog2x --format html --css /styles/changelog.css < Changes.xml
+
+=head1 DESCRIPTION
+
+This script is a simple example of transforming B<ChangeLogML> mark-up into
+user-friendly formats. The application itself does very little work; it's
+purpose is mainly to process and handle the command-line options, then
+delegate the actual work to the B<App::Changelog2x> (L<App::Changelog2x>)
+module.
+
+B<changelog2x> installs with a set of sample XSLT stylesheets, as well as the
+XML Schema definition of B<ChangeLogML>. These stylesheets allow conversion
+to valid XHTML (with comprehensive use of CSS classes for styling), a
+plain-text format based on typical C<ChangeLog> files in use, and a variety
+of snippets useful for inclusion or embedding within other documents.
+
+=head1 OPTIONS
+
+There are two distinct groups of options: application options that are used by
+B<changelog2x>, and stylesheet options that are passed through to the XSLT
+processor for use/recognition by the processor itself. The latter group of
+options control such things as URLs for CSS, sorting order, etc.
+
+=head2 Application Options
+
+These options control the behavior of the application itself, and are not
+passed to the actual stylesheet processing:
+
+=over 4
+
+=item --input FILE
+
+If this option is passed, it specifies the ChangeLogML XML file to process. If
+the value of this string is C<->, or if the option is not passed at all, then
+the STDIN file-handle is used.
+
+=item --output FILE
+
+If this option is passed, it specifies the file to write the transformed
+content out to. If the value of this string is C<->, or if the option is not
+passed at all, then the STDOUT file-handle is used.
+
+=item --format STRING
+
+=item -f STRING
+
+This option specifies an alternate format pattern for the B<DateTime>
+C<strftime> method to use when formatting the dates in the C<< <release> >>
+tags. Note that B<< DateTime->strftime >> formatting is sensitive to your
+locale setting. The format is also used for those output templates that
+include "generated on" comments.
+
+This option may be abbreviated as C<-f> for convenience.
+
+=item --template NAME
+
+=item -t NAME
+
+Specifies the XSLT template to use. This may be a filename path or a string.
+A "string" is defined as a value consisting of only alphanumeric characters
+(those matching the Perl C<\w> regular expression character class).
+
+If the value of this parameter matches the pattern C<^\w+$>, then the string
+is used to construct a path to a XSLT file. The file is assumed to be named
+C<changelog2I<string>.xslt>, and is looked for in the directory declared as
+the root for templates (see the C<templateroot> option, next).
+
+If the parameter does not match the pattern, it is assumed to be a file name.
+If it is not an absolute path, it is looked for under the template root
+directory. As a special case, if the path starts with a C<.> character, it
+is not converted to absolute.
+
+Once the full path and name of the file has been determined, if it cannot be
+opened or read an error is reported.
+
+This option may be abbreviated as C<-t> for convenience. The default value of
+this option is C<html>. See L</"Template Option Values"> for the list of
+templates/stylesheets provided with the application, and what they produce.
+
+=item --templateroot DIR
+
+=item -tr DIR
+
+Specifies an alternative root directory for locating the XSLT templates
+(stylesheets). By default, the root directory is a sub-directory called
+C<changelog2x> in the same directory that the B<App::Changelog2x> class-file
+is installed into. A directory specified with this option is added to the
+list of paths that get searched, so you can specify a directory that (for
+example) only provides a template for C<text>, while still having the rest
+of templates be findable in the default directory.
+
+If you do add a path, you can also take advantage of the expansion of
+"string" arguments to the C<template> option (see above) into full file
+names, if you have files that fit that pattern in your chosen template
+directory.
+
+This option may be abbreviated as C<-tr> for convenience. It may be specified
+multiple times, with the search-order of the directories being the same order
+they're given on the command-line.
+
+=item --headcontentfile FILE
+
+=item --head FILE
+
+This option allows the user to specify additional C<< <head> >>-block content
+as the contents of a file, in lieu of the C<headcontent> option below, under
+L</"Stylesheet Options">. See the documentation of that option for more detail
+of its role. This option makes it easier to specify large and/or complex
+values that would otherwise be difficult or impossible to pass on a
+command-line.
+
+If both this and C<headcontent> are passed, this option takes precedence. If
+the file name specified cannot be opened or read, an error is reported.
+
+This option may be abbreviated as C<--head> for convenience.
+
+=item --bodycontentfile FILE
+
+=item --body FILE
+
+This option allows the user to specify additional C<< <body> >>-block content
+as the contents of a file, in lieu of the C<bodycontent> option below, under
+L</"Stylesheet Options">. See the documentation of that option for more detail
+of its role. This option makes it easier to specify large and/or complex
+values that would otherwise be difficult or impossible to pass on a
+command-line.
+
+If both this and C<bodycontent> are passed, this option takes precedence. If
+the file name specified cannot be opened or read, an error is reported.
+
+This option may be abbreviated as C<--body> for convenience.
+
+=back
+
+=head2 Stylesheet Options
+
+The following set of options are actually used by the XSLT processor
+(B<XML::LibXSLT> in this case), and are not directly used by B<changelog2x>
+at all. They are passed in to the transformation phase of the processing
+after being converted to XPath-style strings.
+
+Some of the options only apply to certain of the stylesheets. This is denoted
+by listing the templates that the option affects in square brackets after the
+option-type.
+
+=over 4
+
+=item --notoc (boolean) [ html ]
+
+This is a boolean option. If given, it disables the generation of the
+shortcut-links at the top of the full-page XHTML rendition of the ChangeLogML
+file.
+
+=item --versions STRING [ div, dl, html, text, ul ]
+
+A string that specifies which release-versions should be processed. By default,
+all C<< <release> >> blocks are processed. If this parameter is given, it
+acts as a sort of filter to limit the set of releases. The acceptable values
+for the string are:
+
+=over 8
+
+=item all
+
+This is the default value; all release blocks are processed in the sorted
+order.
+
+=item first
+
+If this value is given, then the first release block (based on sorting order)
+is processed and all others are ignored.
+
+=item verStr[,verStr[,verStr]...]
+
+Generally, the value is assumed to be a comma-separated list of versions as
+defined by the C<version> attribute of the C<< <release> >> tag. As each
+release block is considered, if the version is present in the user-provided
+list then the release block is processed. There is (currently) no sort of
+wildcarding or regular-expression matching provided for the list.
+
+=back
+
+Any string that is I<not> C<first> or C<all> is assumed to be a list of
+versions. If it badly-formed, it will likely not match any of the release
+blocks, and none will be processed.
+
+=item --order STRING [ div, dl, html, text, ul ]
+
+This parameter should be a string whose value is one of C<ascending> or
+C<descending>. It controls the order in which the release blocks are sorted
+by their C<date> attributes. The default is C<descending>, which places the
+newest version at the top of the resulting document.
+
+Date-sorting is used as proper sorting of version strings is usually
+problematic. Dates expressed in ISO 8601 will sort correctly when sorted as
+text. The only caveat is that two releases close to each other in different
+timezone-offsets could sort incorrectly, since the sorting would key off of
+the hours portion before taking the offsets into consideration. This is a
+limitation of XSL's sorting capabilities.
+
+=item --class STRING [ htmlnewest, htmlversion ]
+
+For the C<htmlnewest> and C<htmlversion> output templates, the overall XHTML
+content is much smaller than the other XHTML-oriented stylesheets. To this
+end, this option allows the user to specify an explicit CSS style-name to give
+to the containing elements that are generated. In the case of the
+C<htmlnewest> stylesheet, this is a C<< <div> >>. In the case of
+C<htmlversion>, it is a C<< <span> >>. See the documentation below
+(L</"Template Option Values">) for the default class names for each of the
+templates.
+
+=item --css URL [ html ]
+
+Specifies a URL to be used as the basic CSS stylesheet when rendering a
+complete XHTML document. If given, a C<< <link> >> element is created in the
+document's C<< <head> >> section with the C<rel> attribute set to
+C<stylesheet>, the C<type> attribute set to C<text/css> and the C<href>
+attribute set to the value of this parameter. No checking is done on the URL,
+and no constraints are applied. The URL may be absolute, relative, etc.
+
+The only distinction between this parameter and the next one, is that this one
+will occur first in the C<< <head> >> block, and thus be first in the CSS
+cascade model.
+
+=item --color URL [ html ]
+
+As above, but this parameter is used to allow a second URL to be specified,
+one that will follow the previous one in the CSS cascade order. This allows
+the user to have a "main" stylesheet with font, spacing, etc. declarations
+while also using this option to select between color schemes for text,
+backgrounds, etc. (hence the choice of C<color> as the option name).
+
+=item --javascript URL [ html ]
+
+Like the two CSS-related options above, this allows the specification of a URL
+to be included in the document head-section. Unlike the previous, this URL is
+assumed to refer to a Javascript resource. As such, it triggers the generation
+of a C<< <script> >> element with a C<type> attribute set to C<text/javascript>
+and a C<href> attribute set to the value of this parameter.
+
+This element occurs I<after> any content specified in the C<headcontent> (or
+appliction option C<headcontentfile>) is included in the output. Thus, it can
+safely refer to any functions, etc. defined in that content.
+
+=item --headcontent STRING [ html ]
+
+=item --bodycontent STRING [ html ]
+
+These options allow for the user to provide arbitrary content for the C<<
+<head> >> and/or C<< <body> >> sections of the XHTML document, when rendering
+a full document with the C<html> template.
+
+Realizing that the generalized stylesheets provided by this package won't fit
+every user's needs, these options are a sort of "wildcard" pass to include
+anything that can't be achieved by the existing stylesheet-targeted
+parameters. Note that as command-line arguments, they are limited as to how
+complex the values can be. Hence the C<headcontentfile> and C<bodycontentfile>
+options, which are handled by the application before processing is handed off
+to B<XML::LibXSLT>. Also note that the file-oriented options to the
+application will override any values passed in via either of these options.
+
+=item --xsltparam NAME=VALUE
+
+Allow for the user to pass additional parameters to the XSLT processing phase
+beyond those defined here. If you have written your own XSLT stylesheets to
+use with the C<template> and/or C<templateroot> options, you may also have
+need for your own XSLT parameters. You may provide as many of these as you
+wish with this option. Each occurrence should have a value of the form,
+C<name=value>, where C<name> is the name the parameter will have when passed
+to the XSLT processor, and C<value> will be the content of the parameter.
+
+=back
+
+=head2 Template Option Values
+
+This application installs with (at present) nine pre-defined stylesheets
+available for use. These are the potential values of the C<template> option
+to the application (the default being C<html>). The stylesheets fall into
+two groups: XHTML and plain-text.
+
+=head3 XHTML templates
+
+These templates produce content that is either complete, valid XHTML, or
+snippets that are conformant and should be easily included in larger
+documents:
+
+=over 4
+
+=item html
+
+This is the default stylesheet, which generates a complete XHTML document.
+The C<< <body> >> tag and all its children will have a CSS classes associated
+with them that indicate the hierarchy to some extent, and allow for
+comprehensive styling via CSS.
+
+The structure of the document is basically:
+
+    HEAD
+      headcontent parameter
+      <title>
+      CSS parameters
+      javascript parameter
+    BODY
+      bodycontent parameter
+      <h1> containing same text as <title>
+      <div> containing abstract (top-most <description> block)
+      ToC-style links
+      <hr>
+      <div> containing one or more release blocks:
+        <div> wrapping one release:
+          <span> containing subproject name (if release is from a subproject)
+          <span> containing version number
+          <span> containing release date
+          <p> containing release-level <description>, if present
+          <div> containing one or more change blocks:
+            <div> wrapping one change:
+              <span> containing transaction revision, if any
+              <ul> containing one or more files:
+                <li> containing one file, possibly with revision
+                     and/or action information
+              <p> containing the change-level <description>
+      <hr>
+      <div> containing diagnostics/credits data
+
+This doesn't include most of the viewer-visible content that doesn't come
+directly from the input file (things like labels, etc.), except for the two
+horizontal-rule elements, which contribute to the overall visual structure.
+Every element referred to above (and some that are implied, but not explicitly
+listed) is given a CSS class name. See L</"CSS Class Hierarchy"> for details
+on the class names and where they are used.
+
+=item div
+
+This stylesheet renders a structure similar to the above, except that it only
+produces the C<< <div >> element that contains the release blocks. Referring
+to the structure above, this is the C<< <div> >> that immediately follows the
+first C<< <hr> >>. An XML comment is included with some information on the
+version of the stylesheet used, as well as tools. However, no visible content
+is included (i.e., no "footer" as follows the second C<< <hr> >> in the layout
+above).
+
+=item ul
+
+Like the previous stylesheet, this produces an XHTML fragment suitable for
+inclusion in a larger document. However, it differs in that the outermost
+container is not a C<< <div> >>, but instead a C<< <ul> >>. The containing
+C<< <ul> >> is assigned a different CSS class than the C<< <ul> >> containers
+used for change-blocks. Each release-block is rendered within one C<< <li> >>
+child-element (which is also assigned a distinct class from the similar
+elements used within the change-blocks). This stylesheet also includes some
+diagnostic information as an XML/XHTML comment, but does not include it in
+any visible elements.
+
+=item dl
+
+As with the previous two stylesheets, this produces an XHTML fragment for
+inclusion in other documents. In this case, the outermost container element is
+a C<< <dl> >>. The structure of this template's output is also somewhat
+different: where the previous two rendered each release-block in the same
+manner as the whole-document stylesheet, this stylesheet moves the
+pseudo-heading line that contains the word "Version" followed by the release's
+version number into the C<< <dt> >> element, and renders the remainder of the
+release block in the C<< <dd> >> element. As with the others, the stylesheet
+also includes some diagnostic information as an XML/XHTML comment, but does
+not include it in any visible elements.
+
+=item htmlnewest
+
+This is a special variation of the C<div> stylesheet, that contains exactly
+one release-block, that of the most-recent release (as sorted by date). The
+outermost container is a C<< <div> >> element whose CSS class dfaults to the
+same class used for the top-most container in the other templates.  However,
+the user may specify a different CSS class with the C<class> stylesheet
+parameter (see L</"Stylesheet Options">), if they wish to have this XHTML
+fragment adhere to styles defined in a different CSS stylesheet. Diagnostic
+information is included within a comment.
+
+=item htmlversion
+
+This is similar to the previous stylesheet, but only renders a single
+C<< <span> >> tag containing the version-string of the newest release (as
+sorted by date). The element is assigned a CSS class whose name fits within
+the general naming scheme of other CSS classes used in these templates. As
+with the previous, the class can be specified by the user via the C<class>
+parameter.
+
+=back
+
+For all varieties of XHTML output, any elements in C<< <description> >> blocks
+that belong to the namespace set aside by the W3C for XHTML
+(C<http://www.w3.org/1999/xhtml>) are copied into the output verbatim, except
+that a C<class> attribute is added to allow the user to include CSS style
+information with the rest of the changelog-related CSS declarations. If the
+element already has a C<class> attribute, it is copied over and the new class
+name added at the end of the existing content.  The new class name is created
+by appending the tag name to the string C<changelog-html->. Thus, an element
+C<p> gets the class C<changelog-html-p>.  For example (assuming that the
+C<xhtml> prefix has been declared to reference the XHTML namespace), the
+following content:
+
+    <xhtml:a href="http://perl.org">perl.org</xhtml:a>
+
+yields this output:
+
+    <a href="http://perl.org" class="changelog-html-a">perl.org</a>
+
+The following content (which already has a C<class> attribute):
+
+    <xhtml:span class="bold">Bold Span</xhtml:span>
+
+yields:
+
+    <span class="bold changelog-html-span">Bold Span</span>
+
+No other foreign XML tags are copied over, at present. Allowance has been
+made for future extension with information such as version-control system
+specification, hosting information, Dublin Core metadata, etc.
+
+=head3 Text templates
+
+These templates produce plain-text output:
+
+=over 4
+
+=item text
+
+This template produces output that comes very close to the de-facto standard
+plain-text "Changelog" so familiar to open-source projects. After the project
+name and in-set description (formatted like a document abstract, left-justified
+and centered with regards to an 80-column page), the releases are presented
+in the sorted order (possibly filtered by the C<versions> parameter).
+
+Each release starts with a line like this:
+
+    0.19    Monday October 20, 2008, 02:00:00 AM -0700
+
+The version string is left-justified, followed by a single tab-stop character
+and the formatted date (see the C<format> application option to control the
+formatting of the dates).
+
+Following the "header" for a release, each C<< <change> >> element is presented
+(in order) in a format roughly like this:
+
+            [ <transaction-revision number> ]
+            * FILE-1 [ <revision number> [, <action label> ] ]
+            ...
+            Change <description> text
+
+If the change-block contains a C<< <fileset> >> that itself has a C<revision>
+attribute, the first line in the example above is produced, identifying this
+as the revision identifier for the transaction as a whole (similar to how
+systems like Subversion group commits of multiple files at once into a
+"transaction"). Then, all the files listed in the change are enumerated as
+a bulleted-list. For each file, if there is a C<revision> attribute on the
+C<< <file> >> element, it is displayed after the path. If the file has an
+C<action> attribute, a parenthetical action-label is further appended. Once
+all files have been listed, the contents of the C<< <description> >> element
+are displayed, indented 8 spaces and word-wrapped to a width of 70 columns.
+
+At the end of the output, several lines are added with C<# > in the first
+two columns (pseudo-comment notation) that identify the revision of the
+XSLT stylesheet used, the date/time when it was processed, and the tools used
+to do the processing.
+
+=item textnewest
+
+This template is similar to the C<htmlnewest> listed earlier, except that it
+generates plain-text. It outputs the newest revision as a single block, using
+the same format and layout as described above for C<text>. However, it does
+not output the pseudo-comments at the end.
+
+=item textversion
+
+This template is the plain-text counterpart to C<htmlversion>. It outputs just
+the version-string of the most-recent release. It does I<not> output a newline
+character, so that the result of this can be saved to a file that can be later
+inserted into other files without bringing in a potentially-unwanted
+line-break. (As opposed to the output of the C<textnewest> stylesheet, above,
+which ends in a fully-formatted paragraph for which an ending newline makes
+sense.)
+
+=back
+
+All stylesheets that generate plain-text will strip XHTML elements out of
+the output while retaining the text content they have. Thus, a construct like
+the example used above:
+
+    <xhtml:a href="http://www.perl.org">perl.org</xhtml:a>
+
+will output as plain text simply:
+
+    perl.org
+
+Null elements such as C<< <br /> >> or C<< <p></p> >> will not add anything
+to the output.
+
+As with the XHTML templates, XML tags that are not part of ChangeLogML or
+XHTML are removed completely. Their present is tolerated, however, to allow
+for future integration of additional metadata.
+
+=head2 CSS Class Hierarchy
+
+To illustrate the hierarchy of classes used to allow CSS styling, the diagram
+from earlier is revisited and revised:
+
+    <body class="changelog">
+      <h1 class="changelog-title" />
+      <div class="changelog-abstract" />
+      <div class="changelog-toc-div"> [*]
+        <a class="changelog-toc-link" />
+      </div>
+      <hr class="changelog-divider" />
+      <div class="changelog-container-div">
+        <div class="changelog-release-div">
+          <span class="changelog-subproject-heading"> [*]
+          <span class="changelog-release-heading">
+          <a class="changelog-toc-link" /> (link back to top) [*]
+          <span class="changelog-release-date">
+            <span class="changelog-date" />
+          </span>
+          <p class="changelog-release-para" /> [*]
+          <div class="changelog-release-changes-container">
+            <div class="changelog-release-change">
+              <span class="changelog-transaction-revision" /> [*]
+              <ul class="changelog-release-change-ul">
+                <li class="changelog-release-change-li">
+                  <tt class="changelog-filename" />
+                  <span class="changelog-file-revision" /> [*]
+                  <span class="changelog-release-file-action" /> [*]
+                </li>
+              <p class="changelog-release-change-para" />
+            </div>
+          </div>
+        </div>
+      <hr class="changelog-divider" />
+      <div class="changelog-footer">
+        <p class="changelog-credits">
+          <span class="changelog-credits-revinfo" />
+          <span class="changelog-credits-date" />
+          <span class="changelog-credits-toolchain" />
+        </p>
+      </div>
+    </body>
+
+Those elements marked with an asterisk (C<*>) to their right side might not
+be present. In some cases (the table-of-contents), they may be opted-out by
+the user. In other cases they are only present if there is data to be
+contained (that is, empty container-tags are not rendered).
+
+The file C<changelogml.css> that comes with this distribution implements
+almost all of these classes, and can serve as a reference.
+
+=head1 SEE ALSO
+
+L<App::Changelog2x>, L<XML::LibXSLT>,
+L<https://sourceforge.net/projects/changelogml>
+
+=head1 AUTHOR
+
+Randy J. Ray C<< <rjray@blackperl.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-app-changelog2x at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Changelog2x>. I will be
+notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Changelog2x>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/App-Changelog2x>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/App-Changelog2x>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/App-Changelog2x>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+This file and the code within are copyright (c) 2008 by Randy J. Ray.
+
+Copying and distribution are permitted under the terms of the Artistic
+License 2.0 (L<http://www.opensource.org/licenses/artistic-license-2.0.php>) or
+the GNU LGPL 2.1 (L<http://www.opensource.org/licenses/lgpl-2.1.php>).

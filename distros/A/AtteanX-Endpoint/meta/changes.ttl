@@ -1,0 +1,42 @@
+# -*-n3-*-
+
+@prefix :			<http://usefulinc.com/ns/doap#> .
+@prefix dc:			<http://purl.org/dc/terms/> .
+@prefix dcs:		<http://ontologi.es/doap-changeset#> .
+@prefix foaf:		<http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:		<http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms:	<http://purl.org/dc/terms/> .
+@prefix doap:		<http://usefulinc.com/ns/doap#> .
+@prefix my:			<http://purl.org/NET/cpan-uri/dist/AtteanX-Endpoint/> .
+
+<>
+	dc:title			"Changes for AtteanX::Endpoint" ;
+	dc:subject			my:project ;
+	dc:creator			my:developer ;
+	dc:description		"Changes for AtteanX::Endpoint" ;
+	.
+
+my:project
+	a 						:Project ;
+	:name					"AtteanX::Endpoint" ;
+	:shortdesc				"An Attean SPARQL 1.1 Endpoint implementation." ;
+	:programming-language	"Perl" ;
+	:created				"2016-03-25"^^xsd:date ;
+	:maintainer				my:developer ;
+	:homepage				<http://search.cpan.org/dist/AtteanX::Endpoint/> ;
+	:bug-database			<https://github.com/kasei/atteanx-endpoint/issues> ;
+	doap:download-page		<http://search.cpan.org/dist/AtteanX-Endpoint/> ;
+	doap:download-mirror	<http://kasei.us/code/files/> ;
+	:release				my:v_0-001 ;
+	.
+
+my:v_0-001
+	a					:Version ;
+	dc:issued			"2016-03-25"^^xsd:date ;
+	:revision			"0.001" ;
+	dcs:changeset [
+		dcs:item
+			[ a dcs:Addition ; rdfs:label "Initial release." ]
+	]
+	.

@@ -1,0 +1,37 @@
+<article
+  itemscope="itemscope"
+  itemtype="http://schema.org/Article"
+>
+<header>
+  <h1
+    class="article-title"
+    itemprop="name"
+  >
+    [% article.schema.core.title | html %]
+  </h1>
+</header>
+<section
+  class="article-summary"
+  itemprop="description"
+>
+  [% article.content %]
+</section>
+[%- FOREACH section in article.components.sections -%]
+<section>
+  [% section.content %]
+</section>
+[%- END -%]
+<footer>
+  <div class="article-id">
+    This is  [% article.article_id | html %]
+  </div>
+  <div class="article-meta-created">
+    Created <time itemprop="dateModified">[% article.schema.core.dateCreated | html %]</time>
+  </div>
+  [%- IF article.schema.core.dateCreated != article.schema.core.dateUpdated  -%]
+  <div class="article-meta-updated">
+    Updated <time itemprop="dateModified">[% article.schema.core.dateUpdated | html %]</time>
+  </div>
+  [%- END -%]
+</footer>
+</article>

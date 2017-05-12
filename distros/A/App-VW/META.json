@@ -1,0 +1,49 @@
+{
+   "abstract" : "a deployment system for Squatting+Continuity web apps",
+   "author" : [
+      "John BEPPU <beppu@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-VW",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "App::CLI" : "0",
+            "Event" : "0",
+            "File::Copy" : "0",
+            "File::ShareDir" : "0",
+            "Sys::Syslog" : "0.13",
+            "Test::More" : "0",
+            "Time::HiRes" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}

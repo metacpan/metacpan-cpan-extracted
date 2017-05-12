@@ -1,0 +1,15 @@
+Revision history for App-MysqlUtils
+
+0.003   2016-12-23 (PERLANCAR)
+
+	- Add utility: mysql-query.
+
+
+0.002   2016-12-15 (PERLANCAR)
+
+	- Add utility: mysql-drop-tables.
+
+
+0.001   2016-12-15 (PERLANCAR)
+
+        - First release.

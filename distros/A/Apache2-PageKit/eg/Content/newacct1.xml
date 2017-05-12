@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<content>
+<pkit_nav_title>New Account</pkit_nav_title>
+<html_title>PageKit.org | New Account</html_title>
+
+      <demo_desc>
+	<feature>Form Validation</feature>
+
+	<description>Validates fields to make sure that they are filled in correctly.  If there is an error, highlights field in red.</description>
+
+      </demo_desc>
+
+    
+</content>

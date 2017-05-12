@@ -1,0 +1,125 @@
+ To install the OpenGL module, please follow these instructions:
+
+ 1. Update your development environment with the latest OpenGL header
+    and lib files.  If you are using a GPU, get the latest drivers
+    from your vendor.
+
+    Install FreeGLUT (or compatible) - you can find this at
+    http://freeglut.sourceforge.net/.  NOTE: Strawberry Perl
+    includes the FreeGLUT library and the binary distributions
+    at http://www.sisyphusion.tk provide the needed FreeGLUT
+    as well.
+
+    On 32-bit MS Windows, a binary FreeGLUT library is installed
+    automatically by this module if needed.
+    
+    On Mac OS X (Leopard and newer), GLUT is available in the default
+    OpenGL programming environment with sufficient extensions (added
+    by Apple) to support full functionality.
+    
+    On most Linux distributions FreeGLUT is available via their
+    package installers.
+
+    The 'include' subfolder provided with this module contains
+    headers that this module has been tested with.
+
+    This module looks for libGL.so, libGLU.so and libglut.so
+    (opengl32.dll, glu32.dll and freeglut.dll on Windows) in the normal
+    places for your OS installation.  You may need to symlink libraries
+    from various vendors to the proper place/names.
+
+    Note:  If you will be installing OpenGL::Image, it is recommended,
+    but not required, that you install PerlMagick (6.3.5 or newer) first,
+    as this will dramatically simplify and enhance your ability/performance
+    in loading/saving images/textures via OpenGL::Image - see INSTALL note
+    in the OpenGL::Image module.
+
+ 
+ 2. Run 'perl Makefile.PL'
+
+    Makefile.PL attempts to detemine your OS and available libs.
+
+    You can override these defaults by specifying addiional
+    options, shown in square brackets []:
+
+        perl Makefile.PL [verbose] [interface=<XFACE>] [dist=<EXCLUSION SETTING>]
+
+    The "verbose" option provides additional diagnostic output messages
+    which can be helpful for troubleshooting and bug reports.
+
+    For the "interface" option, <XFACE> is one of the following strings:
+			      
+        FREEGLUT		Default window interface
+        GLUT			Fallback if FreeGLUT is not available
+        AGL			GLUT framework on Mac OS X
+        GLX			Legacy X11+GLX, use FreeGLUT instead
+	W32API                  FreeGLUT and W32API OpenGL on CYGWIN
+	WGL                     Same as W32API
+
+    Specifying the interface directly should not be needed except
+    where there is some ambiguity in the available interfaces (i.e.
+    you have FreeGLUT, GLUT, and GLX on your system).  If you have
+    FreeGLUT and OpenGL installed, it should just work with the defaults.
+
+    *Please* let us know if it doesn't.
+
+    Makefile.PL will attempt to build and run a glversion utility to
+    determine what version and extensions your OpenGL installation
+    supports, and will create an gl_exclude.h header file to exclude
+    APIs your libraries do not support.  You can manually edit this
+    file to override excluded extensions.
+
+
+    Note: glversion assumes libGL.so and libglut.so
+    (opengl32.dll and freeglut.dll on Windows) - and that it will
+    be run via a GUI window (eg. X11 on Unix).  This may impact
+    automated build systems.
+
+
+    For building POGL without extension exclusions, use:
+
+        perl Makefile.PL dist=NO_EXCLUSIONS
+
+    Note: NO_EXCLUSIONS is the default for Windows; this can be
+    overridden by using the EXCLUSIONS option.
+
+
+    To install in non-standard locations, use the INSTALL_BASE option
+    when generating the Makefiles:
+
+       perl Makefile.PL INSTALL_BASE=BASEPATH
+
+    where BASEPATH is the path of the directory where you wish
+    the module to be installed (e.g. binary executables in BASEPATH/bin,
+    manual pages in BASEPATH/man, library files in BASEPATH/lib/perl5).
+
+    Then either set the PERL5LIB environment variable before you run
+    scripts that use the modules/libraries (see perlrun) or in your
+    programs say:
+ 
+      use lib 'BASEPATH/lib/perl5';
+
+
+ 3. Run 'make' ('nmake' on Windows, 'dmake' on MinGW) to build OpenGL.
+
+ 
+ 4. Run 'make test' ('nmake test' on Windows, 'dmake test' on MinGW) to
+    test your installation.  You must have GLUT installed in order to run
+    this test.  You should see a spinning cube with textured surfaces.
+    Press 'q' to quit/complete the test (the test window must have focus).
+
+    Note: Automated builds will normally fail this test, as it requires
+    the ability to open a GL context (window) and provide user input.
+
+ 
+ 5. If all is well, run 'sudo make install' ('nmake install on Windows',
+    and 'dmake install' with MinGW) to intall the OpenGL module onto
+    your system.
+
+
+ 6. It is recommended (though not required) that you also install the
+    OpenGL::Image and OpenGL::Shader modules to enhance POGL's features.
+
+
+Read the included README files for additional notes on your particular
+platform.

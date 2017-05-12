@@ -1,0 +1,45 @@
+ dpkg-buildpackage -rfakeroot -D -us -uc
+dpkg-buildpackage: set CFLAGS to default value: -g -O2
+dpkg-buildpackage: set CPPFLAGS to default value: 
+dpkg-buildpackage: set LDFLAGS to default value: -Wl,-Bsymbolic-functions
+dpkg-buildpackage: set FFLAGS to default value: -g -O2
+dpkg-buildpackage: set CXXFLAGS to default value: -g -O2
+dpkg-buildpackage: source package experimental-package
+dpkg-buildpackage: source version 1.0
+dpkg-buildpackage: source changed by Esteban Manchado Velázquez <estebanm@estebanm-desktop>
+dpkg-buildpackage: host architecture i386
+ fakeroot debian/rules clean
+dh_testdir
+dh_testroot
+dh_clean
+ dpkg-source -b equivs.wbwzSY
+dpkg-source: warning: source directory 'equivs.wbwzSY' is not <sourcepackage>-<upstreamversion> 'experimental-package-1.0'
+dpkg-source: info: using source format `1.0'
+dpkg-source: info: building experimental-package in experimental-package_1.0.tar.gz
+dpkg-source: info: building experimental-package in experimental-package_1.0.dsc
+ debian/rules build
+make: Nothing to be done for `build'.
+ fakeroot debian/rules binary
+dh_testdir
+dh_testroot
+dh_clean -k
+dh_testdir
+dh_testroot
+dh_install
+dh_installdocs
+dh_installchangelogs
+dh_compress
+dh_fixperms
+dh_installdeb
+dh_gencontrol
+dh_md5sums
+dh_builddeb
+dpkg-deb: building package `experimental-package' in `../experimental-package_1.0_i386.deb'.
+ dpkg-genchanges  >../experimental-package_1.0_i386.changes
+dpkg-genchanges: including full source code in upload
+dpkg-buildpackage: full upload; Debian-native package (full source is included)
+Now signing changes and any dsc files...
+ signfile experimental-package_1.0.dsc Esteban Manchado Velázquez <estebanm@estebanm-desktop>
+gpg: skipped "Esteban Manchado Velázquez <estebanm@estebanm-desktop>": secret key not available
+gpg: /tmp/debsign.mML97X6p/experimental-package_1.0.dsc: clearsign failed: secret key not available
+debsign: gpg error occurred!  Aborting....

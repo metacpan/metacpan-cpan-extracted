@@ -1,0 +1,47 @@
+Revision history for App-Reg
+
+1.2.5  Fri Nov 30 07:40:12 2012
+     - Fixed test failures on Windows/Cygwin platforms
+     - Fixed test failures on Perl 5.8
+     - Fixed test failures on Perl 5.17
+
+1.2.4  Sat Nov 24 09:25:55 2012
+     - Fixed --version option
+     - Added serious unit tests
+
+1.2.3  Sat Nov 24 08:16:11 2012
+     - Perl v5.8 is now required as Perl v5.6 didn't worked correctly
+
+1.2.2  Fri Nov 17 13:57:30 2012
+     - dynamic_config is parsed correctly with YAML module
+
+1.2.1  Fri Nov 17 13:40:23 2012
+     - Make META.yml parsable for YAML module
+
+1.2.0  Wed Nov 15 17:57:44 2012
+     - Makefile.PL isn't executable anymore
+     - Bug tracker URL in README leads to GitHub
+     - Changed repository URL
+     - Added --no-colors option to help pasting output of this utility
+     - Added --ascii option when 7 bits are enough
+     - App::Reg contains new reg() function
+     - Added unit test to make people happy
+
+1.1.0  Mon Nov 13 15:50:23 2012
+     - Added --version option for receiving current reg version.
+     - Added --global option that matches RegExpes with list /g modifier.
+     - App::Reg has the page that redirects to reg utility page.
+
+1.0.3  Sun Nov 11 20:24:13 2012
+     - Add META.yml to the distribution
+     - Removed tab characters in README
+
+1.0.2  Sun Nov 11 14:18:42 2012
+     - Add changelog entry for 1.0.1
+     - Remove version information from reg manpage
+
+1.0.1  Sun Nov 11 12:31:45 2012
+     - Make first line in documentation synopsis actual code.
+
+1.0.0  Sun Nov 11 09:00:45 2012
+     - First public release of App::Reg, the re 'debug' wrapper.

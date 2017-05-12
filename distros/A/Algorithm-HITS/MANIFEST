@@ -1,0 +1,7 @@
+Changes
+lib/Algorithm/HITS.pm
+Makefile.PL
+MANIFEST
+README
+t/Algorithm-HITS.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,20 @@
+Build.PL
+Changes
+lib/Acme/Padre/PlayCode.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+share/locale/Acme__Padre__PlayCode-ar.po
+share/locale/Acme__Padre__PlayCode-de.po
+share/locale/Acme__Padre__PlayCode-es-es.po
+share/locale/Acme__Padre__PlayCode-fr-fr.po
+share/locale/Acme__Padre__PlayCode-ja.po
+share/locale/Acme__Padre__PlayCode-nl-nl.po
+share/locale/Acme__Padre__PlayCode-pl.po
+share/locale/Acme__Padre__PlayCode-pt-br.po
+share/locale/Acme__Padre__PlayCode-ru.po
+share/locale/Acme__Padre__PlayCode-zh-cn.po
+share/locale/Acme__Padre__PlayCode-zh-tw.po
+t/00-load.t
+t/pod.t

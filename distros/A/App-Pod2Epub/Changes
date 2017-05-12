@@ -1,0 +1,32 @@
+Revision history for App-Pod2Epub
+
+0.05 September 2 2012
+
+    ! Removed overridden Pod::Simple::XHTML start_L() function.
+      This method is now handled correctly in Pod::Simple::XHTML
+      for versions >= 3.15. RT #69413.
+
+
+0.04 August 24 2010
+
+    ! Increased Pod::Simple dependency to 3.06 to ensure access to
+      Pod::Simple::XHTML.
+
+
+0.03 August 20 2010
+
+    + Added option for adding an eBook cover image.
+
+    ! The -c|-css option has changed to -s|--stylesheet.
+      The -c option is now used for cover.
+
+
+0.02 August 19 2010
+
+    + Converted to EBook::EPUB 0.5 API.
+
+
+0.01 August 18 2010
+
+    + Initial CPAN release.
+

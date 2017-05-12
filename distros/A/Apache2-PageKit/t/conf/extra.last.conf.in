@@ -1,0 +1,37 @@
+
+# Apache::Reload is very very helpfull during development,
+# but it is not required. So install it and uncomment 
+# the following lines 
+#
+# PerlModule Apache::Reload
+# PerlInitHandler Apache::Reload
+# PerlSetVar ReloadAll On
+
+<Perl>
+ use mod_perl2;
+
+# It is not necasary to preload this modules, but it helps
+# to find errors in your instalation.
+
+use Apache2::URI ();
+use Apache2::Cookie ();
+use Apache2::Request ();
+use Apache::SessionX ();
+use Apache2::Util ();
+use Compress::Zlib ();
+use File::Find ();
+use HTML::FillInForm ();
+use HTML::Parser ();
+use HTML::Template ();
+use XML::LibXML ();
+
+use Apache2::PageKit();
+Apache2::PageKit->startup('@DocumentRoot@','staging');
+ </Perl>
+
+<Location />
+SetHandler perl-script
+PerlSetVar PKIT_ROOT  @DocumentRoot@
+PerlSetVar PKIT_SERVER staging
+PerlHandler +Apache2::PageKit
+</Location>

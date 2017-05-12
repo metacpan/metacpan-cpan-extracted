@@ -1,0 +1,6 @@
+hide-password
+noauth
+noipdefault
+remotename ASNMTAP
+ipparam ASNMTAP
+usepeerdns

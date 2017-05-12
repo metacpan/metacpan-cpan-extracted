@@ -1,0 +1,70 @@
+Revision history for Perl extension Audio::FindChunks.
+
+0.01  Fri Feb 20 16:03:06 2004
+	- original version; created by h2xs 1.23 with options
+		-b 5.5.3 -Afn Audio::FindChunks -x wavestats
+
+0.02	The lame reader was faulty; add --silent and an extra '-'.
+	Reading from a pipe would fail (such as for MP3) due to sysread vs read
+	Detection of a short read was wrong too...
+	Allow caseless match of file types...
+	Test that output_blocks(), output_levels() do not die too...
+	Add mp3 split via MP3::Splitter.
+
+0.03	End silence was erroneously subject to min_actual_silence_sec filter.
+		Introduce new entries min_start_silence_sec,
+		min_end_silence_sec, min_boundary_silence_sec.
+	Examples of split_file().
+	In documentation: change dependencies *_sec => *_chunks.
+	(!!!) Uncompatible change to optional arguments of split_file().
+	New parameter to output_blocks(); make output more machine-readable.
+	Make set(), output_level(), output_blocks() return $self, thus
+ 		making them chainable: $self->set(...)->output_*()->....
+
+0.04	Run test extraction twice (without/with tmp.rms).
+	make `make clean' to clean test temporaries.
+	Allow for shortsize > 2 and longsize > 4 starting with v5.6.0.
+	Correct capitalization of dB in output_levels().
+	Improve docs for output_levels(), output_blocks().
+	Test could loop indefinitely due to while (--$c) done on an FP value.
+	Set AUDIO_FH_TEST_UNLINK=0 in environment to keep the .wav file.
+
+0.05	Use sysread() instead of <> to read RMS (gives better alignment).
+
+1.00	Remove a spurious ";" in .xs.
+	More 5.005-compatibility fixes (# in pack, => on separate line).
+	More output_levels() examples.
+	Protect output_levels(), output_blocks() against $\.
+	New functions for sanity check of sizeof().
+	Decrease the size of subchunk to 7KB.
+	Add low-level debugging code.
+	Correct off-by-one error in le_short_sample_stats().
+1.01	Protect against broken Data::Flow v1.00.
+1.02	Enable remote machine-code debugging of crashes (looks like it crashes
+	on big-endian 64-bit machines...).
+1.03	Upgrade remote machine-code debugging to v0.01.
+1.04	Upgrade remote machine-code debugging to v0.02.
+2.00	For pointer-conversion, append ! on pack specifier for long if supported.
+	Should fix the crash on 64-bit machines.
+2.01	Add a test to check double_median3().
+	Fix a misprint in C code of double_median3().
+		Thanks to Arvind Srivaths who spotted this in C code!  (The extra
+			smoothing steps were so robust that they completely hid
+			this error.)
+	Workaround for a Perl bug (Copy-on-Write not enabled on T_PV typemap, introduced in 5.19)
+			See http://www.nntp.perl.org/group/perl.perl5.porters/2014/06/msg216164.html
+		Breaks compatibility with older Perls.
+	Attempt a workaround (in FindChunks.xs) for the compatibility breakage above.
+	In typemap, change T_UV to T_PTR for pointers-as-int (avoid warning on conversion to pointer with wider-than-pointer IV).
+		T_PTR is already present in the oldest version (5.003_07, 1996-10-10) browsable on CPAN.
+		We `use 5.00503' anyway...
+2.02	Update ppport.h to one of v5.22.
+	Test suite tests 5,19 fail on ARM.  Make the output of test easier-to-debug.
+	Since we use newer pppport, remove the (now unneeded) compatibility hack introduced in 2.01.
+	Add an intermediate cast to (void*) to quiet the warning about a change of alignment (on ARM):
+		 cast from 'char *' to 'int *' increases required alignment from 1 to 4 [-Wcast-align]
+	Quiet warnings (on ARM) in wavestat.[hc].
+
+2.03:	Edit ppport.h to quiet warning on MUTABLE_PTR() on v5.10.
+	Add more tests to help pinpoint problems on ARM and on Darwin.
+	Generation of sine wave was putting one cample more than expected.

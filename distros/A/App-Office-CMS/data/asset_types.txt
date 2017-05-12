@@ -1,0 +1,3 @@
+# File name, Name.
+home.page.tx, Home page template
+generic.page.tx, Generic page template

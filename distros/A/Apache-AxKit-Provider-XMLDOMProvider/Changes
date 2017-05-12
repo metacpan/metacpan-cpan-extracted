@@ -1,0 +1,8 @@
+Revision history for Perl extension Apache::AxKit::Provider::XMLDOMProvider.
+
+0.02  Thu Jul 12 10:28:54 2007
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.4 -AX Apache::AxKit::Provider::XMLDOMProvider
+
+0.03  09/03/2007
+        - correct dependencies in Makefile

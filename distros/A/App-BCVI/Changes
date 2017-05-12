@@ -1,0 +1,52 @@
+Revision history for App-BCVI
+
+3.09      2014-03-24 21:46:22 Pacific/Auckland
+        - fixes #3: allow remote installation without local plugins
+          (pull request from Will Crawford)
+
+3.08      2012-10-06 12:02:29 Pacific/Auckland
+        - changed install_to_host() method to no longer die on error
+
+3.07      2012-09-21 21:40:47 Pacific/Auckland
+        - fixed server version reported by --version
+        - moved docs from .pod to .pm
+        - fix a couple of warnings from debug code
+
+3.06      2012-07-06 06:50:38 Pacific/Auckland
+        - added a --debug option
+        - fix dumb typo in $PATH setting
+
+3.05      2011-05-23 22:44:09 Pacific/Auckland
+        - add $HOME/bin to $PATH if not there already
+        - switch packaging to use Dist::Zilla
+
+3.04    2010-11-27
+        - add -r option so that bcp can copy directories too
+
+3.03    2010-09-07
+        - make the wrap_ssh() method more overridable (feature request from
+          Andrew Ruthven)
+
+3.02    2010-06-05
+        - allow optional arguments on 'dispatch_to' options
+        - list installed plugins in --help
+        - add --plugin-help option
+
+3.01    2010-06-05
+        - Fix bug where remote username was not being propagated to $BCVI_CONF
+          (bug report from Douglas Wilson)
+
+3.00    2010-06-03
+        First version, uploaded to CPAN
+        Complete rewrite to support plugin API
+
+2.xx    ????-??-??
+        Numerous unreleased versions added support for:
+        * authentication via shared secrets
+        * additional backchannel commands
+        * automated installation
+        * improved reliability
+
+1.00    2007-04-23
+        First version published on PerlMonks
+

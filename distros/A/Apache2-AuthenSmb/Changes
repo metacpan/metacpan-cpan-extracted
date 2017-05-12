@@ -1,0 +1,46 @@
+Revision history for Perl extension Apache2::AuthenSmb.
+
+0.01  Thu Jun 09 14:50:00 2005
+        - Moving module into Apache2 namespace.
+        - loading Apache2::* instead of Apache::
+        - Modified Apache::Htgroup to Apache2::Htgroup (Contacted rbowen about porting)
+        - Documentation is updated.
+
+Revision history for Perl extension Apache::AuthenSmb.
+
+0.72  Fri Mar 26 14:50:00 2004
+	- split domain\username so that one can manipulate
+	  one or all members of the array
+	- added htgroup check for require group capabilities
+	  (All thanks to Carlos Ramirez.  Thanks!!)
+	- Added documentation to include PerlSetVar items
+	- Cleaned up code a bit
+	- Added Apache::Htgroup as a prereq for this module
+	  in the Makefile.PL
+
+0.71  Wed Mar 17 14:50:00 2004
+	- fixed $r->log_reason, $r->log_error error on line 99
+	  (Thanks to Jason Lehman)
+
+0.70  Mon Jul  28 14:50:00 2003
+	- Ported to work with both versions of mod_perl
+	- Changed Michaels email :) 
+	- Changed Makefile.PL to use ExtUtils::AutoInstall
+	- Added a test suite to the distribution
+
+0.60  Mon Jun  7 14:50:00 1999
+        - Fixed Smb->Authen::Smb deal in Makefile.PL
+        - Require Authen::Smb 0.9 or greater due to buffer overflow problem
+
+0.50  Wed Mar 24 15:26:00 1999
+	- Change Smb to Authen::Smb and updated the documentation
+
+0.20  Wed Jul  1 13:24:00 1998
+	- Fixed bug where blank username would give you access.
+
+0.10  Fri Apr 17 10:10:10 1998
+	- First Beta Release
+
+0.01  Wed Mar 11 13:40:16 1998
+	- original version; created by h2xs 1.18
+

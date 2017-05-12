@@ -1,0 +1,26 @@
+#file:t/conf/extra.conf.in -*-httpd-config-*-
+#-------------------------
+# this file will be Include-d by @ServerRoot@/conf/httpd.conf
+# where Apache::Amazing can be found
+
+# preload the module
+#PerlModule Apache::Constants
+
+AddLanguage en    .en
+AddLanguage fr    .fr
+AddLanguage de    .de
+AddLanguage it    .it
+AddLanguage es    .es
+
+LanguagePriority en de it fr es
+
+<Location />
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    DirectoryIndex index.html index.htm index.xml
+    PerlInitHandler Apache::LangPrefCookie
+</Location>
+
+<Location /langprefcookie/foo>
+    PerlSetVar LangPrefCookieName "foo-pref"
+</Location>

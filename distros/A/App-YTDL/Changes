@@ -1,0 +1,401 @@
+Revision history for App-YTDL
+
+
+0.254   2016-11-30
+        - Fix "duration".
+
+0.253   2016-10-14
+        - Update regexps for arguments.
+
+0.252   2016-08-30
+        - Fixes
+        - From "Term::ReadLine::Simple" to "Term::Form".
+
+0.251   2016-03-29
+        - Update url regexp.
+
+0.250   2016-02-21
+        - Requires "Term::Choose::LineFold".
+        - "Term::Choose" minimum version is "1.500".
+        - "Term::Choose-Util" minimum version is "0.050".
+        - Code refactoring.
+        - Update year copyright.
+
+0.226   2015-12-08
+        - Modified regexp in GetData::_parse_yt_list_html.
+        - Marked the hidden menu entry in the uploader menu.
+
+0.225   2015-10-06
+        - Bugfix: handle undefined date in "timestamp_to_upload_date".
+
+0.224   2015-09-17
+        - Allow to reset preferred qualities.
+        - Added hidden menu entry.
+
+0.223   2015-08-15
+        - Update css selectors.
+
+0.222   2015-07-25
+        - Update regexps for arguments.
+        - Don't show the status code if the status code is 206.
+        - Removed option "kb_sec_len".
+        - Removed the temporary checking of history files for invalid entries.
+        - Skip merge if the video id is in the download archive.
+
+0.221   2015-07-10
+        - Uploader-menu: remove chosen items from the list of available items.
+
+0.220   2015-06-06
+        - Bugfix in a download "sprintf".
+
+0.219   2015-06-05
+        - Fixed bug in previous bugfix.
+
+0.218   2015-06-05
+        - Bugfix: check if the "uploader_id" is an user-id or a channel-id.
+
+0.217   2015-06-02
+        - Filename: remove leading dots.
+        - Bugfix in "_generic".
+        - Removed: check for deprecated "log_info".
+
+0.216   2015-05-18
+        - Code refactoring.
+
+0.215   2015-05-15
+        - Bugfix: filter negated regexp.
+        - Removed old history format support.
+
+0.214   2015-05-14
+        - Removed option "Logging".
+        - Bugfix visibility cursor.
+        - Update documentation.
+
+0.213   2015-05-13
+        - New option "download archive".
+        - New option "Skip archived videos".
+        - Deprecated option "Logging".
+        - Bugfix: handle undefined preferred qualities.
+        - Code refactoring.
+        - Update documentation.
+
+0.212   2015-05-09
+        - Bugfix: default fmt.
+        - Bugfix: remove channel-urls from "fast list-menu"-support.
+        - Bugfix: check return values of the "Mojo::DOM" methods "at" and "find".
+
+0.211   2015-05-09
+        - Reenabled "fast list-menu" for youtube.
+        - Update documentation.
+
+0.210   2015-05-07
+        - Removed option "sleep interval".
+        - Update documentation.
+
+0.209   2015-05-07
+        - Bugfix: undefined values if single yt ids.
+        - New option "sleep interval".
+        - Update documentation.
+
+0.208   2015-05-06
+        - Bugfix "view count".
+        - New function to fetch uploader videos.
+        - Update documentation (youtube: fast list-menu is not supported any more).
+
+0.207   2015-05-05
+        - "getvideo" requires now less time to get ready:
+          use "which('youtube-dl')" instead of "youtube-dl --version" to check if "youtube-dl" is available.
+        - Code refactoring.
+
+0.206   2015-04-29
+        - New option "Encode filename".
+        - Bug fixes.
+        - Code refactoring.
+        - Update documentation.
+
+0.205   2015-04-24
+        - Modified option "Sanitize filename".
+        - Bugfix encoding.
+        - Bugfix "get_new_video_url".
+        - Bugfix: pass webpage_url instead of video_id to "youtube-dl".
+        - Code refactoring.
+        - Update documentation.
+
+0.204   2015-04-22
+        - Bugfix: raised minimum version of "Term::Readline::Simple" to "0.301".
+        - Raised minimum version of "Term::Choose" and "Term::Choose::Util".
+        - Encoding bugfixes.
+        - Modified options.
+        - Update documentation.
+
+0.203_01   2015-04-18
+        - New options "fast list-menu" and "use netrc".
+        - New dependency "Mojo::DOM";
+        - Bugfixes;
+        - Code refactoring.
+        - Update documentation.
+
+0.203   2015-04-14
+        - "view count" and "upload date": adapt behavior if they are not available.
+        - Bugfix video count.
+        - Update documentation.
+
+0.202   2015-04-13
+        - Update list-menu layout.
+        - Set default timeout to 60s.
+        - Bugfix: set "video_id" explicitly.
+
+0.201   2015-04-11
+        - New options "Replace spaces" and "Sanitize filename" and "Unmappable characters".
+        - New dependency "Text::Unidecode".
+        - Bugfix in "_yt_list_info" and other fixes.
+        - Update documentation.
+
+0.200   2015-04-08
+        - Stable release.
+
+0.109_08   2015-04-08
+        - Use "Win32::ShellQuote" to quote Win32 file names for system/capture.
+        - Bug fixes.
+        - Code refactoring.
+
+0.109_07   2015-04-06
+        - Update MENU behavior.
+        - "Extractor directory" disabled by default.
+        - Code refactoring.
+        - Update documentation.
+
+0.109_06   2015-04-05
+        - Bugfix "requested format not available".
+        - Bugfix in "preferred qualities".
+
+0.109_05   2015-04-05
+        - New dependency "File::Path".
+        - Get config dir with "File::HomeDir".
+        - Removed dependency "File::BaseDir".
+        - If "xdg-user-dir" config dir is "$HOME/.config".
+        - Renamed configuration files.
+        - Bugfix sort.
+        - Code refactoring.
+        - Update documentation.
+
+0.109_04   2015-04-03
+        - New dependency "File::BaseDir".
+        - Get config dir from "File::BaseDir::config_home" instead from "File::HomeDir::my_data".
+        - Bug fixes.
+        - Code refactoring.
+        - Update documentation.
+
+0.109_03   2015-04-02
+        - "Timestamp to uploaddate" enabled by default.
+        - No "ucfirst" for extractor directory name.
+        - Invert filter: now space required between "!~" and pattern.
+        - Code refactoring.
+        - Update documentation.
+
+0.109_02   2015-04-01
+        - New option:  "Slots 'preferred qualities'".
+        - Update option menu.
+        - Bug fix.
+        - Code refactoring.
+        - Update documentation.
+
+0.109_01   2015-03-31
+        - Code refactoring.
+        - New: auto-merge.
+        - Bug fixes.
+        - Update documentation.
+
+0.109   2015-03-27
+        - Code refactoring.
+        - Update documentation.
+
+0.108   2015-03-17
+        - Removed yt-download.pl.
+        - Use also hours, minutes and seconds for the file timestamp if they are available.
+        - Win32: modify the 'youtube-dl' pathname with "Win32::GetShortPathName".
+        - Update documentation.
+
+0.107   2015-03-02
+        - eval decode_json if json is not from youtube-dl.
+
+0.106   2015-02-24
+        - New sort option.
+        - New option to add the video view count to the list items.
+        - Bugfix (like_coun => like_count).
+        - Update documentation.
+
+0.105   2015-02-12
+        - Added the option "Extractors" to list the supported extractors.
+        - Update documentation.
+
+0.104   2015-02-09
+        - Possibility to select more than one video quality.
+        - Channel/Playlist: option to fetch the video info for the latest 50 videos.
+        - Update documentation.
+
+0.103   2015-01-29
+        - Code refactoring.
+        - Changed shebang line.
+        - Channel history: mark the channel that will be removed next.
+
+0.102   2015-01-22
+        - Fix and refactoring "FILTER".
+
+0.101   2015-01-18
+        - Option to change the file timestamp to the upload date.
+        - New dependencies: "File::Touch", "Time::Local".
+        - "Term::Choose-Util" minimum version is "0.022".
+        - Code refactoring.
+        - Update help menu.
+        - Update documentation.
+
+0.100   2015-01-17
+        - Changed the format of different files.
+        - "preferred qualities" can be set for all extractors.
+        - New option "channel sort".
+        - Code refactoring.
+        - Update documentation.
+
+0.031   2015-01-14
+        - "youtube-dl": added the option "--youtube-skip-dash-manifest".
+        - Code refactoring.
+
+0.030   2015-01-09
+        - Code refactoring.
+        - Update copyright year.
+
+0.029   2015-01-03
+        - Removed option "auto_width" (now always on).
+        - Added new option "Extractor directory".
+        - Option "Logging" disabled by default.
+        - Changed the default video directory.
+        - Code refactoring.
+        - Update documentation.
+
+0.028   2014-12-30
+        - Bugfix status message in "download_video".
+
+0.027   2014-12-30
+        - "Delete","Redo","Append": fixed video count.
+        - Modified status messages.
+
+0.026   2014-12-30
+        - Bugfix: "sticky".
+        - Bugfix: entries history file.
+        - Code refactoring.
+
+0.025   2014-12-29
+        - Bugfix: ad channel to history only if youtube.
+        - Code refactoring.
+
+0.024   2014-12-27
+        - New option "Channel directory".
+        - Bug fixes.
+        - Code refactoring.
+        - Update documentation.
+
+0.023   2014-12-25
+        - Channels in the history file can be made sticky.
+        - Update documentation.
+
+0.022   2014-12-04
+        - Bugfix: use "List::MoreUtils" for any and none.
+
+0.021   2014-11-26
+        - New option "Channel history".
+        - New option "Sort order".
+        - Code refactoring.
+        - "Term::Choose" minimum version is "1.117".
+        - Update documentation.
+
+0.020_01   2014-11-01
+        - Don't reset the previous selected videos if "FILTER" is called.
+        - "Term::Choose" minimum version is "1.116_01".
+        - Update documentation.
+
+0.020   2014-09-27
+        - New option "timeout".
+        - Ask user what to do if error while fetching download info.
+
+0.019   2014-09-14
+        - Added "Term::Choose::Util" minimum version.
+
+0.018   2014-09-10
+        - Bugfixes.
+        - Code refactoring.
+        - Made "Term::Twiddle" a prerequisite if OS is not Win32.
+        - Update documentation:
+
+0.017   2014-08-23
+        - Bugfix lists.
+        - Perl minimum version from "5.10.1" to "5.10.0".
+
+0.016   2014-08-07
+        - Check if "youtube-dl" is available.
+        - Added a filter for lists.
+        - Output fixes and updates.
+
+0.015   2014-07-21
+        - Bugfixes and updates.
+
+0.014   2014-07-21
+        - "Set auto quality": added an "always default (best)" option.
+        - Update documentation.
+
+0.013   2014-07-21
+        - "App::YTDL" uses now "youtube-dl" the get the data required for the video download.
+        - Code refactoring.
+        - Update Makefile.PL.
+        - Update documentation.
+
+0.012   2014-04-22
+        - Code refactoring.
+        - Out of order.
+
+0.011   2014-03-10
+        - "Term::Choose" version 1.100 or higher is required.
+        - MSWin32 OS: it is required "Term::Choose" instead of "Term::Choose::Win32".
+        - Experimental option "Video directory".
+        - Update documentation.
+
+0.010   2014-02-22
+        - Bugfix: if OS is "MSWin32" -> term-width - 1 (windows console behaves differently).
+
+0.009   2014-02-13
+        - Update exit messages.
+        - Update documentation.
+
+0.008   2014-02-02
+        - Fixed bug: moved "decode_argv()" to the beginning of the BEGIN block.
+        - Code refactoring.
+
+0.007   2014-02-01
+        - Handle empty entrynodes.
+
+0.006   2014-02-01
+        - Added LICENSE file.
+        - Detect encodings.
+        - Handle not mappable characters.
+        - Code refactoring.
+        - Update documentation.
+
+0.005   2014-01-26
+        - Fixed precedence bug.
+
+0.004   2014-01-24
+        - Removed "channel" regexp.
+        - Update "Auto width".
+        - Update license.
+
+0.003   2014-01-18
+        - Added option "Auto width".
+        - Update documentation.
+
+0.002   2014-01-15
+        - Fixed "channel" regexp.
+        - Added option "UserAgent".
+        - Updated documentation.
+
+0.001   2014-01-12
+        - First relase on CPAN.

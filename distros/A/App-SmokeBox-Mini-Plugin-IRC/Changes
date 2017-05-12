@@ -1,0 +1,99 @@
+==================================================
+Changes from 2008-09-30 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.12 at 2013-09-29 18:10:49 +0000
+-----------------------------------------
+
+  Change: f9106323ac06400af31b13befd77e19f083d8e80
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-29 19:10:49 +0000
+
+    Updated to report osvers as well 
+
+-----------------------------------------
+version 0.10 at 2011-06-12 07:02:01 +0000
+-----------------------------------------
+
+  Change: 939ea86881bbef47e2ac38b83540f59efc23edd0
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-06-12 08:02:01 +0000
+
+    Converted distribution to Dist::Zilla 
+
+-----------------------------------------
+version 0.08 at 2011-04-18 10:32:07 +0000
+-----------------------------------------
+
+  Change: 6f70ea128351560404e5cc51ab09cff360d32e55
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-04-18 11:32:07 +0000
+
+    Respond to CTCP requests for VERSION and USERINFO with the perl
+    version/architecture that is being smoked 
+
+  Change: 6f84767f660bdc88e2085b320747f205868b7af7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-04-18 11:15:49 +0000
+
+    Make sure that the perl version + architecture always gets announced
+    in channels 
+
+  Change: 70a357fecc372cb1457658749dd490b6c2573efa
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-04-18 10:29:30 +0000
+
+    Remove Changes file from source control 
+
+-----------------------------------------
+version 0.06 at 2010-09-27 10:54:15 +0000
+-----------------------------------------
+
+  Change: 11255186c0dbe424f2790354f6456f82a504f324
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-27 11:54:15 +0000
+
+    Bump version to 0.06 
+
+  Change: 6f9afd29b5054b95224b2c624497afdbe083a743
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-27 11:53:35 +0000
+
+    Updates for new minismokebox event sbox_perl_info 
+
+-----------------------------------------
+version 0.04 at 2010-02-19 07:59:42 +0000
+-----------------------------------------
+
+  Change: aa53eaa73ce8b6f933f7fa41e72e1a67a7ac65e8
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2010-02-19 07:59:42 +0000
+
+    Added 'password' configuration variable. 
+
+-----------------------------------------
+version 0.02 at 2010-02-18 12:04:51 +0000
+-----------------------------------------
+
+  Change: f9b19c205e209f79e06763a2601bb6cfef8b2fe3
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2010-02-18 12:04:51 +0000
+
+    Ready for initial CPAN release 
+
+  Change: fca430a0898bb72e5ee7f83d98c466c1a4c48ebb
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2010-02-18 12:03:47 +0000
+
+    Added the Changelog generation gubbings 
+
+  Change: ea9d1a03b1d0637104d309d88c93b146ca478bc8
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2010-02-18 11:55:56 +0000
+
+    In the beginning ... 
+
+================
+End of releases.
+================

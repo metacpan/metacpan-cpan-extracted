@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 57f8f6fe2e70e0cd6bbd5beeb9291d94da93aaf7 Changes
+SHA1 6f4e663edc9dbf49af0add43a8d41d24292bc61b Generator.pm
+SHA1 fda23a0b314432c4a81e8d7beb5290e9f0219c73 LICENSE
+SHA1 42b6d07317986867dc1dd6a91e57308dd5edfabf MANIFEST
+SHA1 03f66adb0183fdfe90a7760a84d12fb9ca8452ff META.yml
+SHA1 9357b1e0c619deecc16a9804be3439776a18b003 Makefile.PL
+SHA1 b1e1f3fdd9375116bb31134785fb8a00ed67bac0 README
+SHA1 4d7d88c1ff8be072315b0726964738a179f7f35f bin/video-generator
+SHA1 5b4315bd0c48b53a07f196ddc74778bf296c678e examples/ex1.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 01978a56e76a58399af3bd4d022aa990b9669bee inc/Module/Install/Scripts.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 bb438527ea2ec6f80d6ec63c201c4a953c66b77f t/App-Video-Generator/01-use.t
+SHA1 ca188b9265b6ac412d17845061e69ea53822370a t/App-Video-Generator/02-version.t
+SHA1 ed1eb88d3bb48fcbb9747ff58e8550591bd9c780 t/App-Video-Generator/03-new.t
+SHA1 79ee218773d1e0a9619bd4838bb29b64daf65428 xt/App-Video-Generator/01-pod_coverage.t
+SHA1 82efecc33032f9d49c450c4d97c1dd7cfc188bbb xt/App-Video-Generator/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWPJaIAAoJEJe+XXKaIuTlcRkH/0lNrmx8pcdDdR/8JrKOTnwJ
+cMlpXXoLeKO+9Wlw8ssNBdzFL540+dbqrFJQK00PXsRbTOjIn/LuH9V1AUQCjGqV
+8cYKsyAvN7INN2X5rhWe+MnqyKRuqDjftZpCujJEdUnSjHSDbG5kiK5KVaLyivwP
+Y8GVPgPhSYdbr7z1ek/+D18i7p0fV0LpeztC+UGbkBIlcahc6q23B8YyOnbEFizm
+3yTHRmJT1fXxnHrFVQiRPSVk4pCzb3PZmEk0daUaaOIdp6Ll2EAoONav0fd/OENB
+RQBPXxbDyYn8ljX8chLCtsghzm1ASdBXlYxiuxp6lqe7rzdNjeRKyRILjro0gqs=
+=obLN
+-----END PGP SIGNATURE-----

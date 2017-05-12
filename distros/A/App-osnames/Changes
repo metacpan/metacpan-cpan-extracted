@@ -1,0 +1,70 @@
+Revision history for App-osnames
+
+0.10    2015-09-15 (PERLANCAR)
+
+	- [ux] Allow displaying result as text table under
+	  Perinci::CmdLine::Lite, by converting tags to comma-separated
+	  string.
+
+	- [ux] Change -V to -l (mnemonic: ls -l).
+
+
+0.09    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.08    2015-07-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- Adjust to Perinci::Sub::Gen::AccessTable 0.46.
+
+
+0.07    2014-12-18 (PERLANCAR)
+
+	- Split data to Perl-osnames.
+
+
+0.06    2014-12-18 (PERLANCAR)
+
+	- Add tag: posix, document the tags.
+
+
+0.05     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.04     2014-07-22 (SHARYANTO)
+
+         - No functional changes.
+
+         - Switch CLI scripts from using Perinci::CmdLine to
+           Perinci::CmdLine::Any to reduce size of dependencies.
+
+
+0.03    2013-10-26 (SHARYANTO)
+
+        - Allow specifying query in first argument.
+
+        - Add examples.
+
+
+0.02    2013-09-12 (SHARYANTO)
+
+        - Add -V alias for --detail for convenience.
+
+        - Force use of Perinci::Sub::Gen::AccessTable 0.23 which hints correct
+          column order.
+
+
+0.01    2013-09-11 (SHARYANTO)
+
+        - First release.

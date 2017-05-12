@@ -1,0 +1,24 @@
+---
+abstract: 'Nous sommes des auteurs CPAN francophones'
+author:
+  - 'Sébastien Aperghis-Tramoni <sebastien@aperghis.net>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-CPANAuthors-French
+provides:
+  Acme::CPANAuthors::French:
+    file: lib/Acme/CPANAuthors/French.pm
+    version: 0.09
+requires:
+  Acme::CPANAuthors: 0.04
+  perl: 5.008
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.09

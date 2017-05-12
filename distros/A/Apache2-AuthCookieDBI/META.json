@@ -1,0 +1,63 @@
+{
+   "abstract" : "An AuthCookie module backed by a DBI database.",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Apache2-AuthCookieDBI",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Digest::SHA" : "5.47",
+            "Test::More" : "0.4"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Digest::SHA" : "5.47"
+         },
+         "requires" : {
+            "Apache2::AuthCookie" : "3.08",
+            "Apache2::Const" : 0,
+            "Apache2::RequestRec" : 0,
+            "Apache2::ServerUtil" : 0,
+            "Carp" : 0,
+            "Crypt::CBC" : "2.13",
+            "DBI" : "1.4",
+            "Date::Calc" : 0,
+            "Digest::MD5" : 0,
+            "FindBin" : 0,
+            "mod_perl2" : "1.999022"
+         }
+      }
+   },
+   "provides" : {
+      "Apache2::AuthCookieDBI" : {
+         "file" : "lib/Apache2/AuthCookieDBI.pm",
+         "version" : "2.17"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/lgpl-license.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/matisse/Apache-AuthCookieDBI"
+      }
+   },
+   "version" : "2.17"
+}

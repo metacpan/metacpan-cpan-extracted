@@ -1,0 +1,39 @@
+Apache-AxKit-Plugin-NotFoundIfPathInfo version 1.01
+===================================================
+
+This module is a very simple plugin for AxKit that returns NOT_FOUND if
+PATH_INFO has length. It is (obviously) incompatible with modules that
+depend on PATH_INFO. (i.E. Apache::AxKit::StyleChooser::PathInfo)
+
+Given you have /this/is/myfile.html on your server and someone requests
+GET /this/is/myfile.html/bla/bla, AxKit will happily serve myfile.html
+and put /bla/bla in the PATH_INFO. This behaviour can get anoying under
+circumstances: Someone creates a loop with broken relative links
+and a stupid webspider starts to crawl through these...
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+AxKit 1.60
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007 by Hansjoerg Pehofer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

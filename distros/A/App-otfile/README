@@ -1,0 +1,20 @@
+NAME
+    App::otfile - Serve a single file, once, via HTTP over the local
+    network.
+
+DESCRIPTION
+    See otfile. The module App::otfile is just a placeholder for CPAN.
+
+AUTHOR
+    Mike Greb <michael@thegrebs.com>
+
+COPYRIGHT
+    Copyright 2013- Mike Greb
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    otfile.
+

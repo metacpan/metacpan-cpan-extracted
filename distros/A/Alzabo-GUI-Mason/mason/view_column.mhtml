@@ -1,0 +1,143 @@
+  <td>
+
+<div class="right">
+<h2>Delete</h2>
+
+<form action="delete_column<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="hidden" name="table" value="<% $t->name %>">
+ <input type="hidden" name="column" value="<% $c->name %>">
+ <input type="submit" value="Delete column">
+</form>
+</div>
+
+
+<div class="right">
+<h2>Name</h2>
+
+<form action="change_column_name<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="hidden" name="table" value="<% $t->name %>">
+ <input type="hidden" name="column" value="<% $c->name %>">
+ <input type="text" name="name" value="<% $c->name %>">
+ <input type="submit" value="Change name">
+</form>
+
+</div>
+
+<div class="right">
+<h2>Edit</h2>
+
+<form action="change_column<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="hidden" name="table" value="<% $t->name %>">
+ <input type="hidden" name="column" value="<% $c->name %>">
+
+ <h4>Change comment:</h4>
+
+ <textarea rows="5" cols="40" name="comment"><% $c->comment | h %></textarea>
+
+ <h4>Change type:</h4>
+
+ <select name="type">
+% my $selected;
+% foreach ( ( $is_extended_type ? ('') : () ), $s->rules->column_types ) {
+  <option value="<% $_ %>" <% $c->type eq $_ && 'selected' %>><% $_ %></option>
+% }
+ </select>
+% if ( $s->rules->feature('extended_column_types') ) {
+ <br />
+
+ Enter your type if it is not on the list: <br />
+
+ <input type="textfield" name="extended_type" value="<% $is_extended_type && $c->type %>">
+% }
+
+ <h4>Change length/precision:</h4>
+
+ <input type="textfield" name="length" value="<% defined $c->length ? $c->length : '' %>" size="5">,
+ <input type="textfield" name="precision" value="<% defined $c->precision ? $c->precision : '' %>" size="5">
+
+ <h4>Change default:</h4>
+
+ <input type="textfield" name="default" value="<% Alzabo::GUI::Mason::default_for_web( $c->default ) | h %>" size="20">
+
+ <h4>Change/add attributes/constraints:<br>
+     (to delete an attribute simply erase it)</h4>
+
+% foreach my $a (sort $c->attributes) {
+ <input type="textfield" name="attributes" value="<% $a | h %>" size="40"><br />
+% }
+ <input type="textfield" name="attributes" size="40"><br />
+ <input type="textfield" name="attributes" size="40"><br />
+
+ <table>
+  <tr valign="top">
+   <td>
+    <h4>Primary key:</h4>
+   </td>
+   <td>
+    <input type="checkbox" name="primary_key" value="1" <% $c->is_primary_key ? 'checked' : '' %>>
+   </td>
+  </tr>
+  <tr valign="top">
+   <td>
+    <h4>Sequenced:</h4>
+   </td>
+   <td>
+    <input type="checkbox" name="sequenced" value="1" <% $c->sequenced ? 'checked' : '' %>>
+   </td>
+  </tr>
+  <tr valign="top">
+   <td>
+    <h4>Allow nulls:</h4>
+   </td>
+   <td>
+    <input type="checkbox" name="nullable" value="1" <% $c->nullable ? 'checked' : '' %>>
+   </td>
+  </tr>
+ </table>
+
+ <input type="submit" value="Submit">
+
+</form>
+</div>
+
+% if ( (my @cols = $t->columns) > 2 ) {
+<div class="right">
+<h2>Move</h2>
+
+<form action="move_column<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="hidden" name="table" value="<% $t->name %>">
+ <input type="hidden" name="column" value="<% $c->name %>">
+ <h4>Move column</h4>
+
+ After column:
+ <select name="after">
+%   foreach my $c (@cols) {
+  <option value="<% $c->name %>"><% $c->name %></option>
+%   }
+ </select>
+
+ <input type="submit" value="Submit">
+
+</form>
+</div>
+% }
+
+  </td>
+
+<%args>
+$s
+$t
+$c
+</%args>
+<%init>
+use Alzabo::GUI::Mason;
+
+my $is_extended_type =
+      ( $s->rules->feature('extended_column_types')
+	&& ! grep { $c->type eq $_ } $s->rules->column_types
+      );
+</%init>

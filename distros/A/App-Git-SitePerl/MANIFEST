@@ -1,0 +1,9 @@
+lib/App/Git/SitePerl.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.mkdn
+script/git-site-perl-commit
+script/git-site-perl-init
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

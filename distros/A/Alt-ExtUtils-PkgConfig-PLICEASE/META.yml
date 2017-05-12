@@ -1,0 +1,34 @@
+---
+abstract: 'Simplistic interface to pkgconf (like pkg-config)'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  English: '0'
+  PkgConfig::LibPkgConf: '0'
+  Test::More: '0.94'
+  perl: '5.021008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alt-ExtUtils-PkgConfig-PLICEASE
+no_index:
+  file:
+    - lib/ExtUtils/PkgConfig.pm
+requires:
+  Carp: '0'
+  PkgConfig::LibPkgConf::Client: '0'
+  PkgConfig::LibPkgConf::Util: '0'
+  perl: '5.021008'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/plicease/Alt-ExtUtils-PkgConfig-PLICEASE/issues
+  homepage: https://metacpan.org/pod/Alt::ExtUtils::PkgConfig::PLICEASE
+  repository: git://github.com/plicease/Alt-ExtUtils-PkgConfig-PLICEASE.git
+version: '1.15'
+x_serialization_backend: 'YAML::Tiny version 1.69'

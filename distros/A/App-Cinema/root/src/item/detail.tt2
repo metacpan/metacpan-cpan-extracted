@@ -1,0 +1,44 @@
+[% META title = "ACCOUNT" %]
+<p>
+<table class="detail">
+	<tr>
+		<td><img src="[% item.img %]"/>
+		</td>
+	</tr>
+	<tr align=left>
+		<th>Title:</td>
+		<td>[% item.title %]</td>
+	</tr>
+	<tr align=left>
+		<th>Year:</td>
+		<td>[% item.year %]</td>
+	</tr>
+	<tr align=left>
+		<th>Genre:</td>
+		<td>
+			[% FOR row = item.genres %]
+				[% row.name %] 
+			[% END %]
+		</td>
+	</tr>
+	<tr align=left>
+		<th width='150px'>Release Date:</td>
+		<td>[% item.release_date %]</td>
+	</tr>
+	<tr align=left>
+		<th valign=top>Plot:</td>
+		<td>[% item.plot %]</td>
+	</tr>
+	<tr align=left>
+		<th>Creator:</td>
+		<td>[% item.uid %]</td>
+	</tr>
+	[% IF Catalyst.user_exists %]
+	<tr align=left>
+		<th>Action:</td>		
+		<td><a href="[% Catalyst.uri_for('checkout_do/') _ item.id _ '/' _ item.title %]">CHECKOUT</a> | 
+		<a href="[% Catalyst.uri_for('delete_do/') _ item.id _ '/' _ item.title %]">DELETE</a></td>
+	</tr>
+	[% END %]
+</table>
+</p>

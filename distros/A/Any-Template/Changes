@@ -1,0 +1,13 @@
+Mon May  8 13:29:32 2006 - 1.015
+    CPAN release 1.015.
+
+Wed Apr 19 13:09:10 2006 - 1.015
+    Modified Text::MicroMason unit test to pass loop_global_vars rather than global_vars
+
+Mon Aug  1 11:42:57 2005 - 1.013
+	- Remove orphaned IO::Scalar dependencies which weren't listed as prereqs
+	Added some other non-core (as of 5.004) prereqs
+
+Sun May  8 16:12:47 2005 - 1.012
+	- Added missing prereqs for unit tests
+

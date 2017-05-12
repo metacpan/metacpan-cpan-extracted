@@ -1,0 +1,16 @@
+Revision history for App-Base64
+
+v0.1.0    2011-10-24 14:28:20 Australia/Sydney
+    Fixed the decode command module needs to return 1 when loaded.
+
+v0.0.4    2011-08-21 13:59:33 Australia/Sydney
+    Added simple tests.
+
+v0.0.3    2011-08-16 14:50:36 Australia/Sydney
+    Metadata only - still trying to fix the git autotag
+
+v0.0.2    2011-08-15 20:55:18 Australia/Sydney
+    Metadata only - just trying to fix the git autotag
+
+v0.0.1    2011-08-15 20:32:04 Australia/Sydney
+    Decode from STDIN to STDOUT

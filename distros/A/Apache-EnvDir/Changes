@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache::EnvDir.
+
+0.01  Thu Nov  6 11:50:45 2003
+	- original version; created by h2xs 1.21 with options
+		-Af -n Apache::EnvDir
+

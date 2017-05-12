@@ -1,0 +1,94 @@
+{
+   "abstract" : "Design by contract via Perl attributes",
+   "author" : [
+      "Viacheslav Tykhanovskyi, C<vti@cpan.org>."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.5",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Attribute-Contract",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Scalar::Util" : "0",
+            "Type::Tiny" : "0.006",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Attribute::Contract" : {
+         "file" : "lib/Attribute/Contract.pm",
+         "version" : "0.05"
+      },
+      "Attribute::Contract::Modifier::Ensures" : {
+         "file" : "lib/Attribute/Contract/Modifier/Ensures.pm"
+      },
+      "Attribute::Contract::Modifier::Requires" : {
+         "file" : "lib/Attribute/Contract/Modifier/Requires.pm"
+      },
+      "Attribute::Contract::Modifier::Throws" : {
+         "file" : "lib/Attribute/Contract/Modifier/Throws.pm"
+      },
+      "Attribute::Contract::Utils" : {
+         "file" : "lib/Attribute/Contract/Utils.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vti/attribute-contract/issues"
+      },
+      "homepage" : "https://github.com/vti/attribute-contract",
+      "repository" : {
+         "url" : "git://github.com/vti/attribute-contract.git",
+         "web" : "https://github.com/vti/attribute-contract"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Viktor Turskyi <koorchik@gmail.com>",
+      "vti <viacheslav.t@gmail.com>"
+   ]
+}

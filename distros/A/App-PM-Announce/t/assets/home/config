@@ -1,0 +1,28 @@
+# vim: set filetype=configgeneral:
+
+xyzzy 1
+
+<feed meetup>
+    username robert...krimen@gmail.com
+    password test8378
+    uri http://www.meetup.com/The-San-Francisco-Beta-Tester-Meetup-Group/calendar/?action=new
+    venue 920502
+</feed>
+
+<feed linkedin>
+    username robertkrimen+alice8378@gmail.com
+    password test8378
+    uri http://www.linkedin.com/groupAnswers?start=&gid=1873425
+</feed>
+
+<feed greymatter>
+    username alice8378
+    password test8378
+    uri http://72.14.179.195/cgi-bin/greymatter/gm.cgi
+</feed>
+
+<feed useperl>
+    username alice8378
+    password test8378
+    promote post
+</feed>

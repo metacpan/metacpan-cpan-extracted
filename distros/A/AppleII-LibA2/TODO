@@ -1,0 +1,30 @@
+$$ $Id$
+===============================================================================
+LibA2                            Things to Do                       $%    11d%$
+===============================================================================
+
+This is a list of features that could be added to LibA2.  They are
+organized by file, and ranked on a scale of 1 to 10, where 10 means
+"I'm planning to do this right away", and 1 means "I may get around to
+this, if there's a blizzard and I'm stuck in the house for a month".
+
+If you'd like to attempt one of these projects, contact me at
+<perl AT cjmweb.net>.  Many of them aren't very difficult; I just have
+other things to do.
+
+AppleII::Disk.pm
+    1	Allow read/write by track & sector on ProDOS-order disk images
+
+AppleII::DOS33.pm
+AppleII::Pascal.pm
+    1	Write these modules to access DOS 3.3 and Apple Pascal disk images
+
+AppleII::ProDOS.pm
+    7	Allow for deleting files
+
+var_display.pl
+    1	Add support for integer and floating point variables
+
+$$ Local Variables:
+$$   tmtrack-file-task: "LibA2: TODO"
+$$ End:

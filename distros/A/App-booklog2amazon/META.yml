@@ -1,0 +1,20 @@
+---
+abstract: 'Update amazon recommended according to booklog status'
+author:
+  - 'Yasutaka ATARASHI <yakex@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-booklog2amazon
+requires:
+  Net::Amazon::Recommended: 0
+  WebService::Booklog: 0
+  YAML::Any: 0
+  perl: 5.008
+version: v0.0.1

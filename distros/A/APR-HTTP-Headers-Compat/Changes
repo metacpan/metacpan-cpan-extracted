@@ -1,0 +1,9 @@
+Revision history for APR-HTTP-Headers-Compat
+
+0.01    2009-06-11
+        - Initial release.
+
+0.02    2009-06-12
+        - Expanded on documentation
+        - Removed a couple of errant $DB::single = 1 statements. Mad
+          debugging skilz.

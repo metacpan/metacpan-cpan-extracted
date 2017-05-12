@@ -1,0 +1,48 @@
+Apache-AxKit-Provider-XMLDOMProvider version 0.01
+=================================================
+
+Apache::AxKit::Provider::XMLDOMProvider allows for local transformation of
+remote XML-Files available via HTTP. The remote XML-file for local processing
+can be specified in the Apache::AxKit configuration. Additionally, an element
+holding adequate modification time information can be provided via the
+Apache::AxKit configuration. This Apache::AxKit-Provider is very useful for
+local processing of dynamically generated XML-DOMs available via a Web-server,
+especially if one needs to pass specific query parameters to it. 
+
+The URI of the remote XML-file is specified with the RemoteXML variable.
+RemoteXMLmTimeElement should hold the name of the XML-Element which contains
+date information when the remote XML-file was last modified (format "YYYY-MM-DD
+hh:mm"; e.g. "2007-07-15 16:20"). Is the element specifying the modification
+time not present, the remote XML-file will not be cached and hence fetched for
+each request. This module uses LWP::UserAgent to get remote XML-files. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Apache;
+   Apache::Log;
+   Apache::AxKit::Exception;
+   Apache::AxKit::Provider::File;
+   XML::LibXML;
+   LWP::UserAgent;
+   Time::Piece;
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007 by Severin Gehwolf (Severin.Gehwolf@uibk.ac.at)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

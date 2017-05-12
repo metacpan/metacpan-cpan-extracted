@@ -1,0 +1,48 @@
+clear
+power on
+regs
+
+op a0 55
+
+# IY should now be set to 55
+test iy = 55
+
+op c8
+
+# IY should now be set to 56
+test iy = 56
+
+# Wrap and Zero case --------------
+power on
+
+op a0 ff
+
+# IY should now be set to ff
+test iy = ff
+
+op c8
+
+# Should be: IY=0, Z=1
+test iy = 0
+test z = 1
+
+# Negative case --------------------
+power on
+
+op a0 ef
+
+# Clear S with ACC
+op a9 01
+
+# Should be: IY=EF, S=0
+test iy = ef
+test s = 0
+
+op c8
+
+# Should be: IY=F0, S=1
+test iy = F0
+test s = 1
+
+
+save verify_C8.txt

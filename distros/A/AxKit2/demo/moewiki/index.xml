@@ -1,0 +1,11 @@
+<html><body>&#xD;
+<h1>MoeWiki - nothing is smaller</h1>&#xD;
+<p>This is the start page of MoeWiki, a minimal Wiki implemented in&#xD;
+AxKit2 with just 30 lines of perl code. It is totally bare-bones&#xD;
+but shows how easy you can get started.</p>&#xD;
+&#xD;
+<p>To create a new page, use the address bar to input a nonexisting page&#xD;
+and append "?edit" to the URL</p>&#xD;
+&#xD;
+<p>By the way: This wiki works with HTML code.</p>&#xD;
+</body></html>

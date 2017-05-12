@@ -1,0 +1,62 @@
+{
+   "abstract" : "Perl virtual environment",
+   "author" : [
+      "Orkun Karaduman <orkunkaraduman@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Virtualenv",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN" : "2.00",
+            "Cwd" : "3.47",
+            "ExtUtils::Installed" : "2.02",
+            "Lazy::Utils" : "1.13",
+            "local::lib" : "2.000004",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-App-Virtualenv@rt.cpan.org",
+         "web" : "https://github.com/orkunkaraduman/perl5-virtualenv/issues"
+      },
+      "homepage" : "https://metacpan.org/release/App-Virtualenv",
+      "license" : [
+         "https://www.gnu.org/licenses/gpl-3.0.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git@github.com:orkunkaraduman/perl5-virtualenv.git",
+         "web" : "https://github.com/orkunkaraduman/perl5-virtualenv"
+      }
+   },
+   "version" : "2.06",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

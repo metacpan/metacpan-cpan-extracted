@@ -1,0 +1,468 @@
+#!/usr/bin/perl
+
+# Author          : Johan Vromans
+# Created On      : Sun Jun 30 21:15:32 2013
+# Last Modified By: Johan Vromans
+# Last Modified On: Wed Jul  3 18:25:41 2013
+# Update Count    : 56
+# Status          : Unknown, Use with caution!
+
+################ Common stuff ################
+
+use strict;
+use warnings;
+use App::Module::Setup;
+
+################ Setup  ################
+
+# Process command line options, config files, and such.
+my $options = app_setup( "module-setup", $App::Module::Setup::VERSION );
+
+################ Presets ################
+
+$options->{trace} = 1 if $options->{debug} || $options->{test};
+
+################ Activate ################
+
+App::Module::Setup->main($options);
+
+################ Options and Configuration ################
+
+use Getopt::Long 2.13;
+
+# Package name.
+my $my_package;
+# Program name and version.
+my ($my_name, $my_version);
+
+sub app_setup {
+    my $help = 0;		# handled locally
+    my $ident = 0;		# handled locally
+
+    # Package name.
+    $my_package = 'Sciurix';
+    # Program name and version.
+    ($my_name, $my_version) = @_;
+
+    my @configs = ( $ENV{HOME} . "/.config/module-setup/",
+		    $ENV{HOME} . "/.module-setup/",
+		  );
+
+    my $options =
+      {
+       verbose		=> 0,		# verbose processing
+       postcmd		=> [],
+       template 	=> "default",
+
+       # Development options (not shown with -help).
+       debug		=> 0,		# debugging
+       trace		=> 0,		# trace (show process)
+       test		=> 0,		# test mode
+
+       # Service.
+       _configs		=> \@configs,
+       _package		=> $my_package,
+       _name		=> $my_name,
+       _version		=> $my_version,
+       _stdin		=> \*STDIN,
+       _stdout		=> \*STDOUT,
+       _stderr		=> \*STDERR,
+       _argv		=> [ @ARGV ],
+      };
+
+    # Process standard config, if present.
+    for my $cfg ( @configs ) {
+	if ( -f "$cfg/config" ) {
+	    app_config($options, "<default>", "$cfg/config" );
+	    last;
+	}
+    }
+
+    # Sorry, layout is a bit ugly...
+    if ( !GetOptions
+	 ($options,
+
+	  'author=s',
+	  'email=s',
+	  'cpanid=s',
+	  'module=s',
+	  'template=s',
+	  'postcmd=s@',
+	  'install-templates',
+
+	  'git' => sub { push( @{ $options->{postcmd} }, "git init" ) },
+
+	  # Configuration handling.
+	  'config=s'		=> sub { app_config($options, $_[0], $_[1]) },
+
+	  # Standard options.
+	  'ident'		=> \$ident,
+	  'help|?'		=> \$help,
+	  'verbose',
+	  'trace',
+	  'debug',
+	 ) )
+    {
+	app_usage(2);
+    }
+
+    app_usage(0) if $help;
+
+    unless ( $options->{'install-templates'} ) {
+	# Take module name from command line if not specified with --module.
+	$options->{module} ||= shift(@ARGV);
+	# Bail out if none.
+	app_usage(3) unless $options->{module};
+    }
+
+    # Bail out if command line arguments remain.
+    app_usage(2) if @ARGV;
+
+    app_ident() if $ident;
+
+    $options;
+}
+
+sub app_ident {
+    print ("This is $my_package [$my_name $my_version]\n");
+}
+
+sub app_usage {
+    my ($exit) = @_;
+
+    # GNU convention: message to STDOUT upon request, STDERR if error.
+    $exit ? select(STDERR) : select(STDOUT);
+
+    app_ident();
+
+    print <<EndOfUsage;
+Usage: $0 [options] [ module ]
+    --author=NAME	full name of author*
+    --email=EMAIL	email address of author*
+    --module=MMM	the new module
+    --cpanid=XXX	author's CPAN Id*
+    --template=XXX	select a set of templates*
+    --postcmd=XXX	command(s) to execute after creating*
+    --git		set up a git repo after creating
+    --install-templates	install the default templates
+    --config=CFG	load options from config file
+    --help		this message
+    --ident		show identification
+    --verbose		verbose information
+
+The module name must be specified either with --module option, or as
+the single remaining argument on the command line.
+
+Options marked with * can be preset in an optional configuration file.
+First tried is \$HOME/.config/module-setup/config, if this is missing,
+\$HOME/.module-setup/config .
+
+EndOfUsage
+    exit $exit if defined $exit;
+}
+
+sub app_config {
+    my ($options, $optname, $config) = @_;
+    die( "$config: $!\n" ) unless -e $config;
+    push(@{$options->{_config}}, $config);
+
+    open( my $fd, '<', $config )
+      or die( "Error opening $config: $!" );
+
+    while ( <$fd> ) {
+	chomp;
+	next unless /\S/;
+	next if /^\s*[;#]/;
+
+	if ( /^(.*?)\s*[:=]\s*(.*)/ ) {
+	    if ( ref($options->{$1}) eq 'ARRAY' ) {
+		push( @{ $options->{$1} }, $2 );
+	    }
+	    else {
+		$options->{$1} = $2;
+	    }
+	}
+	else {
+	    warn( "Invalid content in $config, line $.\n" );
+	}
+    }
+
+    close($fd);
+}
+
+=head1 NAME
+
+module-setup - Generate boilerplate files for a new module
+
+=head1 SYNOPSIS
+
+    module-setup --author="A.U.Thor" --email=a.u.thor@example.com Foo::Bar
+
+=head1 DESCRIPTION
+
+B<module-setup> is a boilerplate generator for new Perl modules.
+
+Why, yet another one?
+
+All existing boilerplate generators suit many users, but abhor others.
+They can do too much, or too little, or use conventions that not
+everyone agrees with.
+
+B<module-setup> uses a set of customisable templates so everyone can
+tailor it to whatever needs may arise. Its design goal is to be
+extremely simple for unexperienced users, while still being useful for
+more advanced module writing.
+
+=head1 COMMAND LINE OPTIONS
+
+=over 4
+
+=item B<--author=>I<name>
+
+Specifies the name of the author of the module.
+
+If this option is not given, the name will be taken from the system
+account information.
+
+This option can be preset in an optional configuration file.
+
+=item B<--email=>I<mailaddr>
+
+Specifies the email address of the author of the module.
+
+This option can be preset in an optional configuration file.
+
+=item B<--cpanid=>I<id>
+
+Specifies the CPAN id of the author of the module.
+
+If this option is not given, the id will be inferred from the email
+address if possible.
+
+This option can be preset in an optional configuration file.
+
+=item B<--template=>I<set>
+
+Specifies the set of templates to use for this module.
+See L</"TEMPLATES">. Default set is C<default>.
+
+This option can be preset in an optional configuration file.
+
+=item B<--postcmd=>I<cmd>
+
+Specifies a command to execute after creating the boilerplate files.
+The command will be executed in the distribution directory using the
+system shell. This can be used to postprocess the created files, set
+up a git repository, and so on.
+
+This option can occur multiple times, all commands will be executed.
+This option can be preset in an optional configuration file.
+
+=item B<--git>
+
+Initialises an empty git repository after creating the boilerplate
+files.
+
+This is a shortcut for B<--postcmd="git init">.
+
+=item B<--module=>I<name>
+
+Specifies the name of the new module to be created.
+
+Alternatively, the module name can also be specified as a command line
+argument, e.g.
+
+    module-setup Foo::Bar
+
+=item B<--config=>I<config>
+
+Specifies the name of an alternate config file to be loaded.
+See L</"CONFIG FILES">.
+
+Note that the config file is processed at the point it appears on the
+command line, possibly overwriting values already specified.
+
+=item B<--install-templates>
+
+Installs the default set of templates to the local disk, suitable for
+tailoring to one's needs. No further processing is done.
+
+The templates are installed in subdirectory C<templates/default> under
+the current directory, and will be used instead of the built-in
+templates for subsequent runs of B<module-setup> in the same
+directory.
+
+You can move the templates to the config location if you want to use
+them for other module projects.
+
+=item B<--help>
+
+Shows a help message, and exits.
+
+=item B<--verbose>
+
+Shows verbose information during the process.
+
+=back
+
+=head1 CONFIG FILES
+
+Some information can be preset in a config file. This is particulary
+useful for global information that is not likely to change, like the
+author's name and email address.
+
+B<module-setup> tries to find a config file in two locations.
+First it tries C<$HOME/.config/module-setup/config>, if this is missing,
+it tries C<$HOME/.module-setup/config>.
+
+The config file should contain settings like:
+
+    name = A.U. Thor
+    email: a.u.thor@example.com
+    cpanid = thorax
+    template = default
+    postcmd = git init
+
+Empty lines and lines starting with C<;> or C<#> are ignored.
+
+=head1 TEMPLATES
+
+B<module-setup> creates the distribution directory and populates it with
+boilerplate files. The name of the distribution directory is the same
+as the name of the module, with all C<::> replaced with C<->. E.g.,
+the directory name for module C<Foo::Bar> would be C<Foo-Bar>.
+
+After creating this directory, B<module-setup> copies all files from the
+templates directory into the distribution directory.
+
+The source directory for the templates can be selected with a
+B<--template> option or B<template> setting in the config file. For
+example, if the selected template set is C<modstart>, then the
+following locations are tried:
+
+    ./templates/modstart/
+    $HOME/.config/module-setup/templates/modstart/
+    $HOME/.module-setup/templates/modstart/
+
+The default template set is named C<default>. If no suitable templates
+can be found in any of the locations, a default set is provided by
+B<module-setup>.
+
+=head2 Variable substitution
+
+While copying the templates, variable substitution is performed on the
+contents. Variables can be specified in the templates in Template
+Toolkit notation, e.g.,
+
+    ... in some text the occurrence of [% foobar %] will be replaced ...
+
+In the above example, C<[% foobar %]> will be replaced with the value
+of the variable C<foobar>. If there is no value available, a warning
+will be given and the substitution is not done.
+
+The following variables are currently supported:
+
+=over 12
+
+=item author.name
+
+The name of the author, e.g., C<A.U. Thor>.
+
+=item author.email
+
+The author's email address, e.g., C<a.u.thor@example.com>,
+
+=item author.cpanid
+
+The author's CPAN id, e.g., C<THORAX>.
+
+=item module.name
+
+The name of the module to be created, e.g., C<Foo::Bar>.
+
+=item module.version
+
+The initial version of the module, e.g., C<0.01>.
+
+=item module.distname
+
+The distribution name for the module, e.g., C<Foo-Bar>.
+
+=item module.distnamelc
+
+Same, but all lowercase. E.g., C<foo-bar>.
+
+=item module.filename
+
+The file name for the module, e.g., C<Foo/Bar.pm>.
+
+=item current.year
+
+The current year, for copyrights and such. E.g., C<2013>.
+
+=back
+
+=head2 Default templates
+
+The default set of templates consists of the following files:
+
+    Changes
+    lib/_Module.pm
+    Makefile.PL
+    MANIFEST
+    README
+    t/00-load.t
+
+Note that the filename C<_Module.pm> is magic, this template will be
+copied under the filename of the new module.
+
+=head1 AUTHOR
+
+Johan Vromans, C<< <jv at cpan.org> >>
+
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-app-module-setup at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Module-Setup>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc module-setup
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Module-Setup>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/App-Module-Setup>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+David Golden, for giving me the final incentive to write this module.
+
+Sawyer X, for writing Module::Starter where I borrowed many ideas from.
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2013 Johan Vromans, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+=cut
+

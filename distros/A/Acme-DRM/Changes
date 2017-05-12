@@ -1,0 +1,10 @@
+Revision history for Acme-DRM
+
+0.01    12-Sep-2005
+        First version, released on an unsuspecting world.
+
+0.02	04-Nov-2005
+	First bugfix -- made functions exportable! (Thanks KANE, rt ticket #15434)
+
+0.03	01-Mar-2007
+	Converted to Module::Build to make the distribution more modern and easier for me to maintain.

@@ -1,0 +1,28 @@
+---
+abstract: 'install the ddc-concordance C++ libraries on your system'
+author:
+  - 'Bryan Jurish <moocow@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Text::ParseWords: '0'
+configure_requires:
+  Alien::Base::ModuleBuild: '0.027'
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-DDC-Concordance
+provides:
+  Alien::DDC::Concordance:
+    file: lib/Alien/DDC/Concordance.pm
+    version: '0.002'
+requires:
+  Alien::Base: '0.005'
+  File::ShareDir: '1.00'
+  perl: v5.8.9
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.002'

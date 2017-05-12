@@ -1,0 +1,11 @@
+Algorithm::ChooseSubsets
+Brian Duggan <bduggan@matatu.org>
+
+This module is for iterating through the subsets of a list.
+
+Thanks to Alexa Sorant for finding the off-by-one typo.
+
+Copyright (c) 2002 Brian Duggan.  All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,85 @@
+=head1 NAME
+
+Alzabo::FAQ - Frequently Asked Questions
+
+=head2 How can I generate the SQL to turn one schema into another?
+
+Assuming you have schema objects representing these already created
+(through reverse engineering for example) B<and> both schemas are for
+the same RDBMS, you can simply do this:
+
+ my @sql = $schema1->rules->schema_diff( old => $schema1, new => $schema2 );
+
+The C<@sql> array will contain all the SQL statements necessary to
+transform the schema in C<$schema1> into the schema in C<$schema2>.
+
+If you want to sync a schema object to the current state of the RDBMS
+backend's schema, check out the L<C<<
+Alzabo::Create::Schema->sync_backend
+>>|Alzabo::Create::Schema/sync_backend> method.
+
+=head2 How can I make a local copy of the documentation as HTML?
+
+Alzabo comes with a script called C<make_html_docs.pl>.  It takes
+three arguments.  The first is the source file directory root.  The
+second is the target directory.  The last is the absolute URL path
+that this target directory represents.  If you have perl 5.6.0 or
+greated installed, it is recommended that you use it to run this
+script as the Pod::Html module included with more recent Perls does a
+much better job of making HTML.
+
+If you were in the root of the source directory you might run this as:
+
+ perl ./make_html_docs.pl ./lib /usr/local/apache/htdocs/Alzabo_docs /Alzabo_docs
+
+The script will create an index.html file as well as turning the
+documentation into HTML.
+
+=head2 How can I optimize memory usage under mod_perl?
+
+You should simply preload the Alzabo::Runtime module (which loads all
+the other modules it needs).
+
+In addition, if you are using Alzabo::MethodMaker, make sure it runs
+in the parent.  This module can create a lot of methods on the fly and
+each method eats up some memory.
+
+Finally, you can preload one or more schema objects.  The easiest way
+to do this is to simply pass its name to Alzabo::Runtime when you use
+it, like this:
+
+  use Alzabo::Runtime qw( schema1 schema2 );
+
+=head2 How can I get objects for tables linked via the Mason GUI?
+
+=over 4
+
+For example, if I have a websites2categories table which maps a list
+of categories that a given web site should display -- and uses
+website_id and category_id in a 1..n relationship -- what is the
+proper way to set that up in the GUI and then in my code?
+
+=back
+
+In the GUI, you can simply create a relationship from websites to
+categories, and declare it n..n.  Alzabo will automatically create a
+table called websites_categories, and you're free to change the name
+to whatever you want.
+
+Then if you use C<Alzabo::MethodMaker>, Alzabo will see that you have
+a table with 2 cols, both of which are part of the PK, and that it has
+1..n relationships with 2 other tables, and it will create the
+appropriate methods.
+
+You can see what methods are being created by setting the
+C<ALZABO_DEBUG> environment variable to "METHODMAKER" before loading
+Alzabo::MethodMaker.  It'll spit everything out to STDERR.  There's
+also the generated documentation, which is available via the C<<
+docs_as_pod() >> schema method after MethodMaker does its thing.
+
+=head1 AUTHOR
+
+Dave Rolsky, <autarch@urth.org>
+
+=cut
+

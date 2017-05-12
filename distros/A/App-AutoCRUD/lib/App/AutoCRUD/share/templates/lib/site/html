@@ -1,0 +1,22 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+ <head>
+  <title>[% c.title OR template.title OR site.title %]</title>
+
+  [% FOREACH style IN page.linked_styles.unique;
+       "<link href=\"$style\" rel=\"stylesheet\" type=\"text/css\" />\n";
+     END; # FOREACH 
+
+     FOREACH script IN page.linked_scripts.unique;
+        "<script src=\"$script\"></script>\n";
+     END; # FOREACH 
+
+     page.head_fragments.join("\n");
+
+   %]
+
+ </head>
+ <body>
+[% content %]
+ </body>
+</html>

@@ -1,0 +1,28 @@
+my $VERSION = '2.9.0';
+   $URL   ||= "http://prdownloads.sourceforge.net/wxwindows";
+my $BASE    = 'wxWidgets';
+# $TYPE from Build.PL
+
+my @common = qw(wxWidgets-2.9.0-magic.patch
+                wxWidgets-2.9.0-msgdlg.patch);
+
+{ msw     => { unicode => [ qw(
+wxMSW-2.9.0-setup.patch
+wxMSW-2.9.0-config.patch
+wxMSW-2.9.0-makefiles.patch
+wxMSW-2.9.0-version.patch
+wxMSW-2.8.10-w64-mslu.patch
+wxMSW-2.9.0-w64-filefn.patch
+                               ), @common ],
+               },
+  mac     => { unicode => [ qw(wxMac-2.9.0-textctrl.patch
+                               ), @common ],
+               },
+  unix    => { unicode => [ @common ],
+               },
+  data    => { url  => ( sprintf '%s/%s-%s.%s', $URL, $BASE, $VERSION, $TYPE ),
+               directory => ( sprintf '%s-%s', $BASE, $VERSION ),
+               archive   => ( sprintf '%s-%s.%s', $BASE, $VERSION, $TYPE ),
+               version   => $VERSION,
+               },
+  };

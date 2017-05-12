@@ -1,0 +1,25 @@
+0.004   2017-02-27 (PERLANCAR)
+
+	- You can now use -lc to list all themes with their categories
+	  (e.g. theme1/cat1, theme1/cat2, and so on).
+
+
+0.003   2017-02-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak Rinci function metadata: give maximum result lines for
+	  example outputs.
+
+
+0.002   2017-02-17 (PERLANCAR)
+
+	- [ux] When a multilist theme is requested without category, list
+	  all names from all categories instead of returning no names.
+
+	- Use Perinci::CmdLine::Inline for less dependency.
+
+
+0.001   2017-02-17 (PERLANCAR)
+
+        - First release.

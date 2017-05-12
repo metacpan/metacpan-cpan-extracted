@@ -1,0 +1,29 @@
+==================================================
+Changes from 1739-05-19 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2013-03-02 19:17:09 +0000
+------------------------------------------
+
+  Change: e128bb53eb675a0c2342a2a5d7accd43aba9148b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-03-02 16:17:35 +0000
+
+    Ok no Alien::Base bug, just a bad organized download dir 
+
+  Change: 5dea746bd865c28a647b2755ae3a6c097465fe8c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-03-02 04:53:37 +0000
+
+    Working version directly, but bug in Alien::Base 
+
+  Change: 0c00b2c041ae60a6b861b0f0af57f8392770ec8d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-03-02 04:46:37 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

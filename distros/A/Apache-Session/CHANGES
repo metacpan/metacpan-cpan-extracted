@@ -1,0 +1,220 @@
+In near future Apache::Session may require perl 5.6.
+If you use perl older than 5.6 - write to alexchorny[AT]gmail.com
+and tell me what version do you use, why and will you need newer versions
+of Apache::Session.
+
+1.93  2014-04-12
+  - even more test fixes
+
+1.92  2014-03-08
+  - more test fixes
+
+1.91  2014-01-07 by Alexandr Ciornii, Perl 26th birthday version
+  - Add a test for RT#50896
+  - 99mysql.t will work more correctly in some corner cases
+
+1.90   2013-01-27 by Alexandr Ciornii, Perl 25th birthday version
+  - Allow specifying table for Oracle
+  - Use Test::Database for tests
+
+1.89   2010-09-22  by Alexandr Ciornii
+  - require Digest::MD5
+  - all semaphore tests were removed
+  - Apache::Session::Store::File::materialize should not append to $session->{serialized}
+  - Apache::Session::Store::File will flush after writing to file
+
+1.88   2008-12-20  by Alexandr Ciornii
+  - Apache::Session::Generate::MD5::validate will untaint data
+  - MIN_PERL_VERSION in Makefile.PL
+
+1.87=1.86_03   2008-08-08
+1.86_03   2008-08-03 by Alexandr Ciornii
+  - disabled 99semaphore.t. Help needed.
+
+1.86_02   2008-06-27 by Alexandr Ciornii
+  - correct number of tests in 99semaphore.t
+
+1.86_01   2008-06-20 by Alexandr Ciornii
+  - use Carp::confess in Apache::Session::Lock::Semaphore
+  - more info in die message in Apache::Session::Generate::MD5 (RT#36412, by Knut Arne Bjorndal)
+  - semaphore tests check for semctl availability
+  - Makefile.PL prints message if perl version < 5.006
+
+1.86   2008-02-01 by Alexandr Ciornii
+  - Default number of semaphores for *BSD is 8 in Apache::Session::Lock::Semaphore
+
+1.85_01   2008-01-24 by Alexandr Ciornii
+  - typos corrected (catched by Gerald Fox)
+  - more tests and diag in 99semaphore.t
+  - no warning "disconnect invalidates 2 active statement" in
+    Apache::Session::Lock::MySQL by Tony Cook (RT#32148)
+
+1.85   2007-12-20 by Alexandr Ciornii, Perl 20th birthday version
+  - mention Catalyst::Plugin::Session, Session
+
+1.84_01   2007-11-26 by Alexandr Ciornii (alexchorny AT gmail.com)
+  - Added Apache::Session::Lock::Semaphore::remove to remove semaphore
+  - 99flex.t will remove semaphore (RT#30440)
+  - 99flex.t should work on 5.6.1 again (no chdir now)
+  - 99flex.t will clean all temporary files (RT#30209)
+  - pod.t included in MANIFEST
+  - cleaner tests
+
+1.84   2007-10-02 by Alexandr Ciornii (alexchorny AT gmail.com)
+  - Added constant.pm to the list of prerequisites
+  - Jeffrey W. Baker, Casey West, Alexandr Ciornii, Oliver Maul agreed to
+    change license of all files to Perl license
+    Alexandr Ciornii agrees to relicense to Artistic 2.0 in future if needed.
+  - 99flex.t will be skipped on *bsd and Solaris
+
+1.83_01   2007-08-03 by Alexandr Ciornii
+  - better handling of Storable errors by Rick Delaney (RT#27476)
+
+1.83=1.82_05  2007-05-25
+1.82_05   2007-05-14 by Alexandr Ciornii
+  - skipping part of 99flex.t on NetBSD
+
+1.82_04   2007-04-27 by Alexandr Ciornii
+  - More diagnostics in Apache::Session::Lock::Semaphore::acquire_write_lock,
+    acquire_read_lock
+  - Did not increment modules versions in previous versions of distribution
+  - Apache::Session::Lock::Semaphore can work with private semaphore
+  - 99flex.t will use private semaphore
+  - 99dbfile.t, 99dbfilestore.t - added undef (for RT#6216)
+
+1.82_03   2007-03-12 by Alexandr Ciornii
+  - Apache::Session::Lock::File checks flock success (RT#6936)
+  - Apache::Session::Lock::File will not change to shared lock if write
+    lock is in effect and read lock is requested (RT#7072)
+  - 99dbfile.t, 99dbfilestore.t - added untie (for RT#6216)
+  - Apache::Session::Lock::Semaphore will check for $Config{d_semget} and
+    cygserver
+
+1.82_02   2007-03-11 by Alexandr Ciornii
+  - 99semaphore.t, 99flex.t will be skipped if $Config{d_semget}==undef,
+    patch by Slaven Rezic
+  - Removed redundant code in 99filelock.t
+  - Removed unnecessary skip in 99nulllock.t
+  - Added file 'Contributing.txt'
+  - Apache::Session - mention CGI::Session
+  - Request in Makefile.PL
+
+1.82_01   2007-03-10 by Alexandr Ciornii
+  - Applied part of patch of SREZIC (Slaven Rezic), RT#3670,
+    more diagnostics on failing file operations (Apache::Session::Lock::File,
+    Apache::Session::Store::DB_File, Apache::Session::Store::File)
+  - RT#1251, ModUniqueId.pm, ModUsertrack.pm - small error in Carp usage,
+    by Slaven Rezic
+  - 99flex.t will be skipped on perls earlier than 5.8 (RT#16539)
+  - Requires Storable (core from 5.7.3), as it is almost useless without it
+
+1.82   2007-02-21 by Alexandr Ciornii
+  - Slightly faster test skip
+  - 99semaphore.t and 99flex.t check for cygserver on Cygwin
+  - 99flex.t skips less tests in some cases
+  - 99flex.t checks for Digest::MD5, MIME::Base64
+  - Warning in doc of Apache::Session::Lock::Semaphore about cygserver
+  - Requires File::Temp (core from 5.6.1), needed for tests and work
+  - Changed order of use/chdir in tests (RT#16539, from Andrew Benham)
+
+1.81_01   2007-02-12 by Alexandr Ciornii
+  - My patch for Win32 and Cygwin (RT#18795)
+  - More information in Makefile.PL
+  - 99flex.t checks for Storable (RT#101)
+  - 99semaphore.t does not die if IPC:: modules are not present
+
+1.81   2006-05-23
+
+  - Don't unconditionally try to require packages in Apache::Session::Flex
+    (Dave Rolsky).
+
+1.8    2005-10-06
+
+  - Bug fix to stop death in Apache::Session::Lock::Semaphore.
+
+1.70_01   2004-09-01
+
+  - Casey West takes the pumpkin.
+  - Complete rewrite of test suite to use Test::* modules.
+  - Minor documentation tweaks.
+
+---
+
+Changes in 1.6 (2004-02-24):
+
+Fixed file age test for clean().  The previous test was never true.
+
+Applied patch to add TableName option to the DBI/MySQL store.  
+From Corris Randall <corris AT line6.net>.  Tests added by jwb.
+
+Applied patch from Oliver Maul <oliver.maul AT ixos.de> for better Sybase support,
+without tests.
+
+Informix support from Mike Langen <mike.langen AT tamedia.ch>.  Unfortunately no
+tests were included.
+
+Changes in 1.54 (2001-10-11):
+
+Added mod_uniqueid and mod_usertrack generators from 
+Tatsuhiko Miyagawa <miyagawa AT bulknews.net>
+
+Fixed validate function in Flex.
+
+Move to Digest::MD5 instead of MD5.
+
+Changes in 1.53 (2000-09-01):
+
+?
+
+Changes in 1.52 (2000-07-23):
+
+Chris Winters <cwinters AT intes.net> added the Sybase backing store and 
+related modules.  
+
+Michael Schout <mschout AT gkg.net> fixed a commit policy bug in 1.51.
+
+Edward Lopez <zed AT apricot.com> fixed a thinko in the POD.
+
+Peter Baker <Peter AT eBluegrass.com> fixed a typo in the POD.
+
+Andrew Wild <andrew AT eservers.com.au> fixed a typo in the POD.
+
+Alan Sparks <asparks AT cpd.harris.com> fixed a type in the POD.
+
+Jay Lawrence <jlawrenc AT infonium.com> changed the interface so that an undefined
+or false variable indicates a fresh session.  Previously, only undefined was
+considered new.
+
+Lupe Christoph <lupe AT lupe-christoph.de> noticed that there was a buffer
+race condition in the file store, which is now fixed.
+
+
+
+Changes in 1.51:
+
+Added the Oracle backing store.
+
+
+
+Changes in 1.50:
+
+If you are upgrading from a previous version of Apache::Session, please note
+these changes:
+
+The Apache::Session::DBI module is gone.  It has been obsoleted by MySQL
+and Postgres.  Please read the documentation for the module that corresponds
+with your database.
+
+The semaphore locker is no longer used anywhere by default.  If you want
+to turn it on, you need to hack the modules themselves, or us
+Apache::Session::Flex.
+
+By default, all IDs are now 32-characters long.  You can truncate them
+to the previous default of 16 characters by providing the IDLength argument
+when tieing your sessions.  Note that you might also need to extend the 
+datatype of the ID column in your database schema.
+
+All of the modules have been refreshed.  I suggest reading the documentation
+for the ones that you plan to use.
+
+Jeffrey

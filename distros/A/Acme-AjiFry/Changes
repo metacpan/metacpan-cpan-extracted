@@ -1,0 +1,32 @@
+Revision history for Acme-AjiFry
+
+0.09 2013-05-26T13:48:03Z
+       - Replace "smart-match" to "if-else" (for perl-5.18).
+
+0.08  Mon Jan 14 01:48:06 JST 2013
+       - Fixed a problem of failing some tests.
+       - Changed builder module, to Module::Build from ExtUtils::MakeMaker.
+
+0.07  Sat Dec 22 20:00:54 JST 2012
+       Fixed some misprints in document.
+
+0.06  Fri Nov  2 02:26:00 JST 2012
+       Improved Acme::AjiFry::Perl by using Filter::Simple.
+       Thanks a lot, @__papix__!
+
+0.05  Wed Oct 31 15:45:22 JST 2012
+       Fixed misprints at the SYNOPSIS.
+
+0.04  Thu Oct 18 12:02:07 JST 2012
+       Implemented function of rewrite own perl script which use "Acme::AjiFry::Perl".
+       And fixed minor bugs.
+
+0.03  Sun Oct 14 02:18:47 JST 2012
+       I'm really sorry. Ver 0.02 is something wrong.
+       So fixed it.
+
+0.02  Sun Oct 14 01:00:22 JST 2012
+       Changed License.
+
+0.01  Sat Sep 22 13:39:23 JST 2012
+       Initial release.

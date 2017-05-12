@@ -1,0 +1,192 @@
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# LOGFILE appender log anything at level TRACE, DEBUG, INFO, WARN, ERROR or FATAL
+log4perl.logger                                = FATAL, LOGFILE, LOGSCREEN
+
+log4perl.logger.archive                        = ERROR, LOGARCHIVE
+
+log4perl.logger.collector                      = ERROR, LOGCOLLECTOR
+log4perl.logger.collector.CollectorCT-test     = TRACE, LOGCOLLECTORTEST
+
+log4perl.logger.import.data.through.catalog    = ERROR, LOGIMPORTDATA
+
+log4perl.logger.generate.reports               = ERROR, LOGGENERATEREPORTS
+
+log4perl.logger.holiday.bundle.set.downtimes   = ERROR, LOGHOLIDAYBUNDLE
+
+# The oneMessagePerAppender flag will suppress duplicate messages to the same appender
+log4perl.oneMessagePerAppender = 1
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+log4perl.appender.LOGFILE           = Log::Log4perl::Appender::File
+log4perl.appender.LOGFILE.filename  = /opt/monitoring/asnmtap/log/root.log
+log4perl.appender.LOGFILE.mode      = append
+log4perl.appender.LOGFILE.Threshold = FATAL
+log4perl.appender.LOGFILE.layout    = PatternLayout
+log4perl.appender.LOGFILE.layout.ConversionPattern = [%d] %H | %p | %P | %C | %c | %l - %m%n  %T%n
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+log4perl.appender.LOGARCHIVE           = Log::Log4perl::Appender::File
+log4perl.appender.LOGARCHIVE.filename  = /opt/monitoring/asnmtap/log/archive.log
+log4perl.appender.LOGARCHIVE.mode      = append
+log4perl.appender.LOGARCHIVE.Threshold = OFF
+log4perl.appender.LOGARCHIVE.layout    = PatternLayout
+log4perl.appender.LOGARCHIVE.layout.ConversionPattern = [%d] %H | %p | %P | %C | %c | %l - %m%n
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+log4perl.appender.LOGCOLLECTOR           = Log::Log4perl::Appender::File
+log4perl.appender.LOGCOLLECTOR.filename  = /opt/monitoring/asnmtap/log/collector.log
+log4perl.appender.LOGCOLLECTOR.mode      = append
+log4perl.appender.LOGCOLLECTOR.Threshold = ERROR
+log4perl.appender.LOGCOLLECTOR.layout    = PatternLayout
+log4perl.appender.LOGCOLLECTOR.layout.ConversionPattern = [%d] %H | %p | %P | %C | %c | %l - %m%n
+
+log4perl.appender.LOGCOLLECTORTEST           = Log::Log4perl::Appender::File
+log4perl.appender.LOGCOLLECTORTEST.filename  = /opt/monitoring/asnmtap/log/collector-CollectorCT-test.log
+log4perl.appender.LOGCOLLECTORTEST.mode      = append
+log4perl.appender.LOGCOLLECTORTEST.Threshold = OFF
+log4perl.appender.LOGCOLLECTORTEST.layout    = PatternLayout
+log4perl.appender.LOGCOLLECTORTEST.layout.ConversionPattern = [%d] %H | %p | %P | %C | %c | %l - %m%n
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+log4perl.appender.LOGIMPORTDATA           = Log::Log4perl::Appender::File
+log4perl.appender.LOGIMPORTDATA.filename  = /opt/monitoring/asnmtap/log/import-data-through-catalog.log
+log4perl.appender.LOGIMPORTDATA.mode      = append
+log4perl.appender.LOGIMPORTDATA.Threshold = OFF
+log4perl.appender.LOGIMPORTDATA.layout    = PatternLayout
+log4perl.appender.LOGIMPORTDATA.layout.ConversionPattern = [%d] %H | %p | %P | %C | %c | %l - %m%n
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+log4perl.appender.LOGGENERATEREPORTS           = Log::Log4perl::Appender::File
+log4perl.appender.LOGGENERATEREPORTS.filename  = /opt/monitoring/asnmtap/log/generate-reports.log
+log4perl.appender.LOGGENERATEREPORTS.mode      = append
+log4perl.appender.LOGGENERATEREPORTS.Threshold = OFF
+log4perl.appender.LOGGENERATEREPORTS.layout    = PatternLayout
+log4perl.appender.LOGGENERATEREPORTS.layout.ConversionPattern = [%d] %H | %p | %P | %C | %c | %l - %m%n
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+log4perl.appender.LOGHOLIDAYBUNDLE           = Log::Log4perl::Appender::File
+log4perl.appender.LOGHOLIDAYBUNDLE.filename  = /opt/monitoring/asnmtap/log/holiday-bundle-set-downtimes.log
+log4perl.appender.LOGHOLIDAYBUNDLE.mode      = append
+log4perl.appender.LOGHOLIDAYBUNDLE.Threshold = OFF
+log4perl.appender.LOGHOLIDAYBUNDLE.layout    = PatternLayout
+log4perl.appender.LOGHOLIDAYBUNDLE.layout.ConversionPattern = [%d] %H | %p | %P | %C | %c | %l - %m%n
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+log4perl.appender.LOGSCREEN        = Log::Log4perl::Appender::Screen
+log4perl.appender.LOGSCREEN.stderr = 0
+log4perl.appender.LOGSCREEN.layout = PatternLayout
+log4perl.appender.LOGSCREEN.layout.ConversionPattern = [%d] %H | %p | %P | %C | %c | %l - %m%n
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Define DBIx::Log4perl to output DEBUG and above msgs to /opt/asnmtap/log/MySQL.log using the simple layout
+log4perl.logger.DBIx.Log4perl     = DEBUG, MySQL
+log4perl.appender.MySQL           = Log::Log4perl::Appender::File
+log4perl.appender.MySQL.filename  = /opt/monitoring/asnmtap/log/MySQL.log
+log4perl.appender.MySQL.mode      = append
+log4perl.appender.MySQL.Threshold = OFF
+log4perl.appender.MySQL.layout    = PatternLayout
+log4perl.appender.MySQL.layout.ConversionPattern = [%d] %H | %p | %P | %C | %c | %l - %m%n
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# If you don't define any appenders, nothing will happen. Appenders will be 
+# triggered whenever the configured logging level requires a message to be 
+# logged and not suppressed. To log to the screen, to files and to databases:
+#   Log::Log4perl::Appender::Screen
+#   Log::Log4perl::Appender::ScreenColoredLevels
+#   Log::Log4perl::Appender::File
+#   Log::Log4perl::Appender::Socket
+#   Log::Log4perl::Appender::DBI
+#   Log::Log4perl::Appender::Synchronized
+#   Log::Log4perl::Appender::RRDs
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Additional Appenders via Log::Dispatch. Here's the list of appender modules:
+#   Log::Dispatch::ApacheLog
+#   Log::Dispatch::DBI (by Tatsuhiko Miyagawa)
+#   Log::Dispatch::Email,
+#   Log::Dispatch::Email::MailSend,
+#   Log::Dispatch::Email::MailSendmail,
+#   Log::Dispatch::Email::MIMELite
+#   Log::Dispatch::File
+#   Log::Dispatch::FileRotate (by Mark Pfeiffer)
+#   Log::Dispatch::Handle
+#   Log::Dispatch::Screen
+#   Log::Dispatch::Syslog
+#   Log::Dispatch::Tk (by Dominique Dumont)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# log4perl.appender.<category>.layout.ConversionPattern
+#   %c Category of the logging event.
+#   %C Fully qualified package (or class) name of the caller
+#   %d Current date in yyyy/MM/dd hh:mm:ss format
+#   %F File where the logging event occurred
+#   %H Hostname (if Sys::Hostname is available)
+#   %l Fully qualified name of the calling method followed by the callers source 
+#      the file name and line number between parentheses.
+#   %L Line number within the file where the log statement was issued
+#   %m The message to be logged
+#   %m{chomp} The message to be logged, stripped off a trailing newline
+#   %M Method or function where the logging request was issued
+#   %n Newline (OS-independent)
+#   %p Priority of the logging event
+#   %P pid of the current process
+#   %r Number of milliseconds elapsed from program start to logging event
+#   %R Number of milliseconds elapsed from last logging event to current logging 
+#      event 
+#   %T A stack trace of functions called
+#   %x The topmost NDC (see below)
+#   %X{key} The entry 'key' of the MDC (see below)
+#   %% A literal percent (%) sign
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# log4perl.appender.<category>.layout = PatternLayout
+# log4perl.appender.<category>.layout.ConversionPattern = [%d] %H | %p | %P | %C | %c | %l - %m%n  %T%n
+#
+# [%r   ] %H              | %p    | %P    | %C                             | %c            | %l                                                                                                           - %m
+#  %T%n
+# [11723] crinaeatst01-sz | DEBUG | 19472 | ASNMTAP::Asnmtap::Applications | DBIx.Log4perl | ASNMTAP::Asnmtap::Applications::DBI_execute /opt/monitoring/lib/perl5/ASNMTAP/Asnmtap/Applications.pm (1951) - DBI_EXECUTE_ALARM_OFF: sth->execute timed out
+#   ASNMTAP::Asnmtap::Applications::DBI_execute(1, 'REF(0x9fdff8)', 5, 'CODE(0xa0cd64)', 'ARRAY(0xb1521c)', 'REF(0x8fb6bc)', 'F') called at ./collector.pl line 1115, main::graphEntryDBI('SML', 'DUMMY-T5', 'Condenced View test', 'T', '/opt/monitoring/asnmtap/results/test-05/check_dummy_timemout-...', 2, 121, 6, 1, ...) called at ./collector.pl line 973, main::insertEntryDBI(1265797992, 'SML_DUMMY-T5', 'SML', 'DUMMY-T5', 'Condenced View test', '/opt/monitoring/asnmtap/results/test-05/check_dummy_timemout-...', 'check_dummy_timemout.pl --environment=T --trendline=2 -r 0', 2, 'OK', ...) called at ./collector.pl line 837, main::call_system('F|T|F', 1265797992, 'SML_DUMMY-T5', 'SML', 'DUMMY-T5', 'test-05', 'Condenced View test', 'check_dummy_timemout.pl --environment=T --trendline=2 -r 0', 'N', ...) called at ./collector.pl line 430, main::do_crontab() called at ./collector.pl line 222
+# [11729] crinaeatst01-sz | INFO  | 19472 | ASNMTAP::Asnmtap::Applications | DBIx.Log4perl | ASNMTAP::Asnmtap::Applications::DBI_execute /opt/monitoring/lib/perl5/ASNMTAP/Asnmtap/Applications.pm (1956) - OUT: DBI_execute
+#   ASNMTAP::Asnmtap::Applications::DBI_execute(1, 'REF(0x9fdff8)', 5, 'CODE(0xa0cd64)', 'ARRAY(0xb1521c)', 'REF(0x8fb6bc)', 'F') called at ./collector.pl line 1115, main::graphEntryDBI('SML', 'DUMMY-T5', 'Condenced View test', 'T', '/opt/monitoring/asnmtap/results/test-05/check_dummy_timemout-...', 2, 121, 6, 1, ...) called at ./collector.pl line 973, main::insertEntryDBI(1265797992, 'SML_DUMMY-T5', 'SML', 'DUMMY-T5', 'Condenced View test', '/opt/monitoring/asnmtap/results/test-05/check_dummy_timemout-...', 'check_dummy_timemout.pl --environment=T --trendline=2 -r 0', 2, 'OK', ...) called at ./collector.pl line 837, main::call_system('F|T|F', 1265797992, 'SML_DUMMY-T5', 'SML', 'DUMMY-T5', 'test-05', 'Condenced View test', 'check_dummy_timemout.pl --environment=T --trendline=2 -r 0', 'N', ...) called at ./collector.pl line 430, main::do_crontab() called at ./collector.pl line 222
+# [11734] crinaeatst01-sz | DEBUG | 19472 | main                           | DBIx.Log4perl | main::call_system ./collector.pl (837)                                                                       - disconnect(2)
+#   DBIx::Log4perl::_dbix_l4p_debug('DBIx::Log4perl::db=HASH(0xb15774)', 'HASH(0xaa61f0)', 2, 'disconnect(2)') called at /opt/monitoring/lib/perl5/DBIx/Log4perl/db.pm line 349, DBIx::Log4perl::db::disconnect('DBIx::Log4perl::db=HASH(0xb15774)') called at ./collector.pl line 1159, main::graphEntryDBI('SML', 'DUMMY-T5', 'Condenced View test', 'T', '/opt/monitoring/asnmtap/results/test-05/check_dummy_timemout-...', 2, 121, 6, 1, ...) called at ./collector.pl line 973, main::insertEntryDBI(1265797992, 'SML_DUMMY-T5', 'SML', 'DUMMY-T5', 'Condenced View test', '/opt/monitoring/asnmtap/results/test-05/check_dummy_timemout-...', 'check_dummy_timemout.pl --environment=T --trendline=2 -r 0', 2, 'OK', ...) called at ./collector.pl line 837, main::call_system('F|T|F', 1265797992, 'SML_DUMMY-T5', 'SML', 'DUMMY-T5', 'test-05', 'Condenced View test', 'check_dummy_timemout.pl --environment=T --trendline=2 -r 0', 'N', ...) called at ./collector.pl line 430, main::do_crontab() called at ./collector.pl line 222
+#
+# or
+#
+# log4perl.appender.<category>.layout = Log::Log4perl::Layout::SimpleLayout
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# How you can log ERROR and WARN messages to different files
+# log4perl.logger = WARN, AppWarn, AppError
+# 
+# Filter to match level ERROR
+#   log4perl.filter.MatchError = Log::Log4perl::Filter::LevelMatch
+#   log4perl.filter.MatchError.LevelToMatch  = ERROR
+#   log4perl.filter.MatchError.AcceptOnMatch = true
+#
+# Filter to match level WARN
+#   log4perl.filter.MatchWarn  = Log::Log4perl::Filter::LevelMatch
+#   log4perl.filter.MatchWarn.LevelToMatch  = WARN
+#   log4perl.filter.MatchWarn.AcceptOnMatch = true
+#
+# Error appender
+#   log4perl.appender.AppError = Log::Log4perl::Appender::File
+#   log4perl.appender.AppError.filename = /tmp/app.err
+#   log4perl.appender.AppError.layout   = SimpleLayout
+#   log4perl.appender.AppError.Filter   = MatchError
+#
+# Warning appender
+#   log4perl.appender.AppWarn = Log::Log4perl::Appender::File
+#   log4perl.appender.AppWarn.filename = /tmp/app.warn
+#   log4perl.appender.AppWarn.layout   = SimpleLayout
+#   log4perl.appender.AppWarn.Filter   = MatchWarn
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

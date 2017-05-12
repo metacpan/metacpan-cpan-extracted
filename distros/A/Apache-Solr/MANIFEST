@@ -1,0 +1,26 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+TODO
+lib/Apache/Solr.pm
+lib/Apache/Solr.pod
+lib/Apache/Solr/Document.pm
+lib/Apache/Solr/Document.pod
+lib/Apache/Solr/JSON.pm
+lib/Apache/Solr/JSON.pod
+lib/Apache/Solr/Result.pm
+lib/Apache/Solr/Result.pod
+lib/Apache/Solr/Tables.pm
+lib/Apache/Solr/XML.pm
+lib/Apache/Solr/XML.pod
+t/01use.t
+t/10endpoint.t
+t/11expand.t
+t/12facet.t
+t/20xml.t
+t/21json.t
+t/30result.t
+t/a.pdf
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,6 @@
+Revision history for Perl extension Acme::Test::Pr0n.
+
+0.01  Thu Sep 19 10:05:02 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Acme::Test::Pr0n
+

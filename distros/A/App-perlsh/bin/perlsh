@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+
+# These two will remain in effect during the eval
+use strict;
+use warnings;
+
+use Getopt::Long;
+use App::perlsh;
+
+GetOptions(
+   'blib|b' => sub { require blib; blib->import; },
+) or exit 1;
+
+App::perlsh->run;
+
+__END__
+
+=head1 NAME
+
+F<perlsh> - a simple F<perl> REPL based on C<Lexical::Persistence>
+
+=head1 SYNOPSIS
+
+ $ perlsh
+ eval: 1 + 2
+ '3'
+
+ eval:
+
+=head1 DESCRIPTION
+
+This script runs an instance of L<App::perlsh>, which provides a simple perl
+REPL ("read-execute-print loop").
+
+=head1 OPTIONS
+
+=head2 -b, --blib
+
+Imports the L<blib> module at startup, which prefers build code in the
+F<blib/> directory if such exists. This is useful for commandline testing or
+experimenting with newly-built perl modules before they are installed.
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>

@@ -1,0 +1,72 @@
+--- #YAML:1.0
+name:                   App-Maisha
+version:                0.21
+abstract:               A command line social micro-blog networking tool
+author:
+  - Barbie <barbie@cpan.org>
+
+license:                artistic_2
+distribution_type:      module
+installdirs:            site
+
+requires:
+  perl:                     5.006
+  Carp:                     0
+  Class::Accessor::Fast:    0
+  Config::Any:              0
+  File::Basename:           0
+  File::HomeDir:            0
+  File::Path:               0
+  FindBin:                  0
+  Getopt::Long:             0
+  IO::File:                 0
+  Module::Pluggable:        2.7
+  Net::Twitter:             3.18003
+  Pod::Usage:               0
+  Storable:                 0
+  Term::Shell:              0
+  Text::Wrap:               0
+recommends:
+  Test::CPAN::Meta:         0
+  Test::CPAN::Meta::JSON:   0
+  Test::Distribution:       2.00
+  Test::Effects:            0
+  Test::Pod:                1.00
+  Test::Pod::Coverage:      0.08
+build_requires:
+  Test::More:               0.70
+
+provides:
+  App::Maisha:
+    file: lib/App/Maisha.pm
+    version: 0.21
+  App::Maisha::Shell:
+    file: lib/App/Maisha/Shell.pm
+    version: 0.21
+  App::Maisha::Plugin::Base:
+    file: lib/App/Maisha/Plugin/Base.pm
+    version: 0.21
+  App::Maisha::Plugin::Identica:
+    file: lib/App/Maisha/Plugin/Identica.pm
+    version: 0.21
+  App::Maisha::Plugin::Test:
+    file: lib/App/Maisha/Plugin/Test.pm
+    version: 0.21
+  App::Maisha::Plugin::Twitter:
+    file: lib/App/Maisha/Plugin/Twitter.pm
+    version: 0.21
+
+no_index:
+  directory:
+    - t
+    - examples
+
+resources:
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-Maisha
+  repository: http://github.com/barbie/maisha
+
+meta-spec:
+   version: 1.4
+   url: http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

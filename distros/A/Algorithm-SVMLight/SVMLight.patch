@@ -1,0 +1,492 @@
+diff -urb svm_light/Makefile svm_light-new/Makefile
+--- svm_light/Makefile	2008-10-08 14:38:53.000000000 -0500
++++ svm_light-new/Makefile	2008-11-18 14:06:33.000000000 -0600
+@@ -16,17 +16,25 @@
+ #CFLAGS= $(SFLAGS) -pg -Wall -pedantic      # debugging C-Compiler flags
+ #LFLAGS= $(SFLAGS) -pg                      # debugging linker flags
+ LIBS=-L. -lm                               # used libraries
++RANLIB=ranlib
+ 
+-all: svm_learn_hideo svm_classify
++OPTIM=hideo
++
++all: svm_learn svm_classify libsvmlight.a libsvmlight.so
++
++libsvmlight.a: svm_learn.o svm_common.o svm_$(OPTIM).o
++	$(AR) r $@ $^
++	$(RANLIB) $@
+ 
+ tidy: 
+-	rm -f *.o 
+-	rm -f pr_loqo/*.o
++	$(RM) *.o 
++	$(RM) pr_loqo/*.o
+ 
+ clean:	tidy
+-	rm -f svm_learn
+-	rm -f svm_classify
+-	rm -f libsvmlight.so
++	$(RM) svm_learn
++	$(RM) svm_classify
++	$(RM) libsvmlight.so
++	$(RM) libsvmlight.a
+ 
+ help:   info
+ 
+@@ -34,72 +42,63 @@
+ 	@echo
+ 	@echo "make for SVM-light               Thorsten Joachims, 1998"
+ 	@echo
+-	@echo "Thanks to Ralf Herbrich for the initial version."
++	@echo "Thanks to Ralf Herbrich for the initial version of the Makefile."
+ 	@echo 
+-	@echo "USAGE: make [svm_learn | svm_learn_loqo | svm_learn_hideo | "
+-	@echo "             libsvmlight_hideo | libsvmlight_loqo | "
+-	@echo "             svm_classify | all | clean | tidy]"
+-	@echo 
+-	@echo "    svm_learn           builds the learning module (prefers HIDEO)"
+-	@echo "    svm_learn_hideo     builds the learning module using HIDEO optimizer"
+-	@echo "    svm_learn_loqo      builds the learning module using PR_LOQO optimizer"
++	@echo "USAGE: make [svm_learn | svm_classify | libsvmlight.so | libsvmlight.a "
++	@echo "             all | clean | tidy] [OPTIM=loqo]"
++	@echo 
++	@echo "    svm_learn           builds the learning module"
+ 	@echo "    svm_classify        builds the classfication module"
+-	@echo "    libsvmlight_hideo   builds shared object library that can be linked into"
+-	@echo "                        other code using HIDEO"
+-	@echo "    libsvmlight_loqo    builds shared object library that can be linked into"
+-	@echo "                        other code using PR_LOQO"
++	@echo "    libsvmlight.so      builds shared object library that can be linked into"
++	@echo "                        other code"
++	@echo "    libsvmlight.a       builds object library that can be linked into"
++	@echo "                        other code"
+ 	@echo "    all (default)       builds svm_learn + svm_classify"
+ 	@echo "    clean               removes .o and target files"
+ 	@echo "    tidy                removes .o files"
+ 	@echo
++	@echo "    OPTIM=loqo          use the PR_LOQO optimizer (default is HIDEO)"
++	@echo
+ 
+ # Create executables svm_learn and svm_classify
+ 
+-svm_learn_hideo: svm_learn_main.o svm_learn.o svm_common.o svm_hideo.o 
+-	$(LD) $(LFLAGS) svm_learn_main.o svm_learn.o svm_common.o svm_hideo.o -o svm_learn $(LIBS)
++ifeq ($(OPTIM),loqo)
++  loqoobj=pr_loqo/pr_loqo.o
++endif
+ 
+-#svm_learn_loqo: svm_learn_main.o svm_learn.o svm_common.o svm_loqo.o loqo
+-#	$(LD) $(LFLAGS) svm_learn_main.o svm_learn.o svm_common.o svm_loqo.o pr_loqo/pr_loqo.o -o svm_learn $(LIBS)
++svm_learn: svm_learn_main.o svm_learn.o svm_common.o svm_$(OPTIM).o $(loqoobj)
++	$(LD) $(LFLAGS) $^ -o $@ $(LIBS)
+ 
+ svm_classify: svm_classify.o svm_common.o 
+-	$(LD) $(LFLAGS) svm_classify.o svm_common.o -o svm_classify $(LIBS)
++	$(LD) $(LFLAGS) $^ -o $@ $(LIBS)
+ 
+ 
+ # Create library libsvmlight.so, so that external code can get access to the
+ # learning and classification functions of svm-light by linking this library.
+ 
+-svm_learn_hideo_noexe: svm_learn_main.o svm_learn.o svm_common.o svm_hideo.o 
++svm_learn_noexe: svm_learn_main.o svm_learn.o svm_common.o svm_$(OPTIM).o $(loqoobj)
+ 
+-libsvmlight_hideo: svm_learn_main.o svm_learn.o svm_common.o svm_hideo.o 
+-	$(LD) -shared svm_learn.o svm_common.o svm_hideo.o -o libsvmlight.so
++libsvmlight.so: svm_learn_main.o svm_learn.o svm_common.o svm_$(OPTIM).o $(loqoobj)
++	$(LD) -shared $^ -o $@
+ 
+-#svm_learn_loqo_noexe: svm_learn_main.o svm_learn.o svm_common.o svm_loqo.o loqo
+-
+-#libsvmlight_loqo: svm_learn_main.o svm_learn.o svm_common.o svm_loqo.o 
+-#	$(LD) -shared svm_learn.o svm_common.o svm_loqo.o  pr_loqo/pr_loqo.o -o libsvmlight.so
+ 
+ # Compile components
+ 
+-svm_hideo.o: svm_hideo.c
+-	$(CC) -c $(CFLAGS) svm_hideo.c -o svm_hideo.o 
+-
+-#svm_loqo.o: svm_loqo.c 
+-#	$(CC) -c $(CFLAGS) svm_loqo.c -o svm_loqo.o 
++svm_$(OPTIM).o: svm_$(OPTIM).c
++	$(CC) -c $(CFLAGS) $< -o $@
+ 
+ svm_common.o: svm_common.c svm_common.h kernel.h
+-	$(CC) -c $(CFLAGS) svm_common.c -o svm_common.o 
++	$(CC) -c $(CFLAGS) $< -o $@
+ 
+ svm_learn.o: svm_learn.c svm_common.h
+-	$(CC) -c $(CFLAGS) svm_learn.c -o svm_learn.o 
++	$(CC) -c $(CFLAGS) $< -o $@
+ 
+ svm_learn_main.o: svm_learn_main.c svm_learn.h svm_common.h
+-	$(CC) -c $(CFLAGS) svm_learn_main.c -o svm_learn_main.o 
++	$(CC) -c $(CFLAGS) $< -o $@
+ 
+ svm_classify.o: svm_classify.c svm_common.h kernel.h
+-	$(CC) -c $(CFLAGS) svm_classify.c -o svm_classify.o
+-
+-#loqo: pr_loqo/pr_loqo.o
++	$(CC) -c $(CFLAGS) $< -o $@
+ 
+-#pr_loqo/pr_loqo.o: pr_loqo/pr_loqo.c
+-#	$(CC) -c $(CFLAGS) pr_loqo/pr_loqo.c -o pr_loqo/pr_loqo.o
++pr_loqo/pr_loqo.o: pr_loqo/pr_loqo.c
++	$(CC) -c $(CFLAGS) $< -o $@
+ 
+diff -urb svm_light/svm_classify.c svm_light-new/svm_classify.c
+--- svm_light/svm_classify.c	2008-10-08 14:05:54.000000000 -0500
++++ svm_light-new/svm_classify.c	2008-11-18 14:06:33.000000000 -0600
+@@ -78,19 +78,20 @@
+ 	if((words[j]).wnum>model->totwords) /* are not larger than in     */
+ 	  (words[j]).wnum=0;               /* model. Remove feature if   */
+       }                                        /* necessary.                 */
++    }
+       doc = create_example(-1,0,0,0.0,create_svector(words,comment,1.0));
+       t1=get_runtime();
++
++    if(model->kernel_parm.kernel_type == 0) {   /* linear kernel */
+       dist=classify_example_linear(model,doc);
+-      runtime+=(get_runtime()-t1);
+-      free_example(doc,1);
+     }
+     else {                             /* non-linear kernel */
+-      doc = create_example(-1,0,0,0.0,create_svector(words,comment,1.0));
+-      t1=get_runtime();
+       dist=classify_example(model,doc);
++    }
++
+       runtime+=(get_runtime()-t1);
+       free_example(doc,1);
+-    }
++    
+     if(dist>0) {
+       if(pred_format==0) { /* old weired output format */
+ 	fprintf(predfl,"%.8g:+1 %.8g:-1\n",dist,-dist);
+@@ -183,7 +184,7 @@
+ 
+ void print_help(void)
+ {
+-  printf("\nSVM-light %s: Support Vector Machine, classification module     %s\n",VERSION,VERSION_DATE);
++  printf("\nSVM-light %s: Support Vector Machine, classification module     %s\n",SVMLIGHT_VERSION,SVMLIGHT_VERSION_DATE);
+   copyright_notice();
+   printf("   usage: svm_classify [options] example_file model_file output_file\n\n");
+   printf("options: -h         -> this help\n");
+diff -urb svm_light/svm_common.c svm_light-new/svm_common.c
+--- svm_light/svm_common.c	2008-10-08 16:00:35.000000000 -0500
++++ svm_light-new/svm_common.c	2008-11-18 14:06:33.000000000 -0600
+@@ -527,7 +527,7 @@
+   }
+   if ((modelfl = fopen (modelfile, "w")) == NULL)
+   { perror (modelfile); exit (1); }
+-  fprintf(modelfl,"SVM-light Version %s\n",VERSION);
++  fprintf(modelfl,"SVM-light Version %s\n",SVMLIGHT_VERSION);
+   fprintf(modelfl,"%ld # kernel type\n",
+ 	  model->kernel_parm.kernel_type);
+   fprintf(modelfl,"%ld # kernel parameter -d \n",
+@@ -598,7 +598,7 @@
+   { perror (modelfile); exit (1); }
+ 
+   fscanf(modelfl,"SVM-light Version %s\n",version_buffer);
+-  if(strcmp(version_buffer,VERSION)) {
++  if(strcmp(version_buffer,SVMLIGHT_VERSION)) {
+     perror ("Version of model-file does not match version of svm_classify!"); 
+     exit (1); 
+   }
+@@ -887,6 +887,103 @@
+   return(alpha);
+ }
+ 
++double costfunc(DOC **docs, double *rankvalue, long i, long j, LEARN_PARM *custom) {
++  return (docs[i]->costfactor+docs[j]->costfactor)/2.0;
++}
++
++void set_learning_defaults(LEARN_PARM *learn_parm, KERNEL_PARM *kernel_parm)
++{
++  learn_parm->type=CLASSIFICATION;
++  strcpy (learn_parm->predfile, "trans_predictions");
++  strcpy (learn_parm->alphafile, "");
++  learn_parm->biased_hyperplane=1;
++  learn_parm->sharedslack=0;
++  learn_parm->remove_inconsistent=0;
++  learn_parm->skip_final_opt_check=0;
++  learn_parm->svm_maxqpsize=10;
++  learn_parm->svm_newvarsinqp=0;
++  learn_parm->svm_iter_to_shrink=2;
++  learn_parm->maxiter=100000;
++  learn_parm->kernel_cache_size=40;
++  learn_parm->svm_c=0.0;
++  learn_parm->eps=0.1;
++  learn_parm->transduction_posratio=-1.0;
++  learn_parm->svm_costratio=1.0;
++  learn_parm->svm_costratio_unlab=1.0;
++  learn_parm->svm_unlabbound=1E-5;
++  learn_parm->epsilon_crit=0.001;
++  learn_parm->epsilon_a=1E-15;
++  learn_parm->compute_loo=0;
++  learn_parm->rho=1.0;
++  learn_parm->xa_depth=0;
++  learn_parm->costfunc=&costfunc;
++  learn_parm->costfunccustom=NULL;
++
++  kernel_parm->kernel_type=LINEAR;
++  kernel_parm->poly_degree=3;
++  kernel_parm->rbf_gamma=1.0;
++  kernel_parm->coef_lin=1;
++  kernel_parm->coef_const=1;
++  strcpy(kernel_parm->custom,"empty");
++}
++
++int check_learning_parms(LEARN_PARM *learn_parm, KERNEL_PARM *kernel_parm)
++{
++  if((learn_parm->skip_final_opt_check) 
++     && (kernel_parm->kernel_type == LINEAR)) {
++    printf("\nIt does not make sense to skip the final optimality check for linear kernels.\n\n");
++    learn_parm->skip_final_opt_check=0;
++  }    
++  if((learn_parm->skip_final_opt_check) 
++     && (learn_parm->remove_inconsistent)) {
++    printf("\nIt is necessary to do the final optimality check when removing inconsistent \nexamples.\n");
++    return 0;
++  }    
++  if((learn_parm->svm_maxqpsize<2)) {
++    printf("\nMaximum size of QP-subproblems not in valid range: %ld [2..]\n",learn_parm->svm_maxqpsize); 
++    return 0;
++  }
++  if((learn_parm->svm_maxqpsize<learn_parm->svm_newvarsinqp)) {
++    printf("\nMaximum size of QP-subproblems [%ld] must be larger than the number of\n",learn_parm->svm_maxqpsize); 
++    printf("new variables [%ld] entering the working set in each iteration.\n",learn_parm->svm_newvarsinqp); 
++    return 0;
++  }
++  if(learn_parm->svm_iter_to_shrink<1) {
++    printf("\nMaximum number of iterations for shrinking not in valid range: %ld [1,..]\n",learn_parm->svm_iter_to_shrink);
++    return 0;
++  }
++  if(learn_parm->svm_c<0) {
++    printf("\nThe C parameter must be greater than zero!\n\n");
++    return 0;
++  }
++  if(learn_parm->transduction_posratio>1) {
++    printf("\nThe fraction of unlabeled examples to classify as positives must\n");
++    printf("be less than 1.0 !!!\n\n");
++    return 0;
++  }
++  if(learn_parm->svm_costratio<=0) {
++    printf("\nThe COSTRATIO parameter must be greater than zero!\n\n");
++    return 0;
++  }
++  if(learn_parm->epsilon_crit<=0) {
++    printf("\nThe epsilon parameter must be greater than zero!\n\n");
++    return 0;
++  }
++  if(learn_parm->rho<0) {
++    printf("\nThe parameter rho for xi/alpha-estimates and leave-one-out pruning must\n");
++    printf("be greater than zero (typically 1.0 or 2.0, see T. Joachims, Estimating the\n");
++    printf("Generalization Performance of an SVM Efficiently, ICML, 2000.)!\n\n");
++    return 0;
++  }
++  if((learn_parm->xa_depth<0) || (learn_parm->xa_depth>100)) {
++    printf("\nThe parameter depth for ext. xi/alpha-estimates must be in [0..100] (zero\n");
++    printf("for switching to the conventional xa/estimates described in T. Joachims,\n");
++    printf("Estimating the Generalization Performance of an SVM Efficiently, ICML, 2000.)\n");
++    return 0;
++  }
++  return 1;
++}
++
+ void nol_ll(char *file, long int *nol, long int *wol, long int *ll) 
+      /* Grep through file and count number of lines, maximum number of
+         spaces per line, and longest line. */
+diff -urb svm_light/svm_common.h svm_light-new/svm_common.h
+--- svm_light/svm_common.h	2008-10-08 15:34:58.000000000 -0500
++++ svm_light-new/svm_common.h	2008-11-18 14:06:33.000000000 -0600
+@@ -27,8 +27,8 @@
+ # include <time.h> 
+ # include <float.h>
+ 
+-# define VERSION       "V6.02"
+-# define VERSION_DATE  "14.08.08"
++# define SVMLIGHT_VERSION       "V6.02"
++# define SVMLIGHT_VERSION_DATE  "14.08.08"
+ 
+ # define CFLOAT  float       /* the type of float to use for caching */
+                              /* kernel evaluations. Using float saves */
+@@ -179,6 +179,8 @@
+   double svm_unlabbound;
+   double *svm_cost;            /* individual upper bounds for each var */
+   long   totwords;             /* number of features */
++  double (*costfunc)(DOC **, double *, long, long, struct learn_parm *);
++  void   *costfunccustom;
+ } LEARN_PARM;
+ 
+ typedef struct kernel_parm {
+@@ -284,6 +286,8 @@
+ void   read_documents(char *, DOC ***, double **, long *, long *);
+ int    parse_document(char *, WORD *, double *, long *, long *, double *, long *, long, char **);
+ double *read_alphas(char *,long);
++void   set_learning_defaults(LEARN_PARM *learn_parm, KERNEL_PARM *kernel_parm);
++int    check_learning_parms(LEARN_PARM *learn_parm, KERNEL_PARM *kernel_parm);
+ void   nol_ll(char *, long *, long *, long *);
+ long   minl(long, long);
+ long   maxl(long, long);
+diff -urb svm_light/svm_learn.c svm_light-new/svm_learn.c
+--- svm_light/svm_learn.c	2004-08-27 16:56:21.000000000 -0500
++++ svm_light-new/svm_learn.c	2008-11-18 14:06:33.000000000 -0600
+@@ -741,7 +741,8 @@
+   for(i=0;i<totdoc;i++) {
+     for(j=i+1;j<totdoc;j++) {
+       if(docs[i]->queryid == docs[j]->queryid) {
+-	cost=(docs[i]->costfactor+docs[j]->costfactor)/2.0;
++	cost=learn_parm->costfunc(docs, rankvalue, i, j, learn_parm);
++
+ 	if(rankvalue[i] > rankvalue[j]) {
+ 	  if(kernel_parm->kernel_type == LINEAR)
+ 	    docdiff[k]=create_example(k,0,0,cost,
+@@ -2193,7 +2194,7 @@
+       qp->opt_g0[i]-=(kernel_temp*a[kj]*(double)label[kj]);
+       qp->opt_g0[j]-=(kernel_temp*a[ki]*(double)label[ki]); 
+       /* compute quadratic part of objective function */
+-      qp->opt_g[varnum*i+j]=(double)label[ki]*(double)label[kj]*kernel_temp;
++      qp->opt_g[varnum*i+j]=
+       qp->opt_g[varnum*j+i]=(double)label[ki]*(double)label[kj]*kernel_temp;
+     }
+ 
+diff -urb svm_light/svm_learn_main.c svm_light-new/svm_learn_main.c
+--- svm_light/svm_learn_main.c	2008-10-08 15:51:38.000000000 -0500
++++ svm_light-new/svm_learn_main.c	2008-11-18 14:06:33.000000000 -0600
+@@ -115,38 +115,12 @@
+   
+   /* set default */
+   strcpy (modelfile, "svm_model");
+-  strcpy (learn_parm->predfile, "trans_predictions");
+-  strcpy (learn_parm->alphafile, "");
+   strcpy (restartfile, "");
+   (*verbosity)=1;
+-  learn_parm->biased_hyperplane=1;
+-  learn_parm->sharedslack=0;
+-  learn_parm->remove_inconsistent=0;
+-  learn_parm->skip_final_opt_check=0;
+-  learn_parm->svm_maxqpsize=10;
+-  learn_parm->svm_newvarsinqp=0;
+-  learn_parm->svm_iter_to_shrink=-9999;
+-  learn_parm->maxiter=100000;
+-  learn_parm->kernel_cache_size=40;
+-  learn_parm->svm_c=0.0;
+-  learn_parm->eps=0.1;
+-  learn_parm->transduction_posratio=-1.0;
+-  learn_parm->svm_costratio=1.0;
+-  learn_parm->svm_costratio_unlab=1.0;
+-  learn_parm->svm_unlabbound=1E-5;
+-  learn_parm->epsilon_crit=0.001;
+-  learn_parm->epsilon_a=1E-15;
+-  learn_parm->compute_loo=0;
+-  learn_parm->rho=1.0;
+-  learn_parm->xa_depth=0;
+-  kernel_parm->kernel_type=0;
+-  kernel_parm->poly_degree=3;
+-  kernel_parm->rbf_gamma=1.0;
+-  kernel_parm->coef_lin=1;
+-  kernel_parm->coef_const=1;
+-  strcpy(kernel_parm->custom,"empty");
+   strcpy(type,"c");
+ 
++  set_learning_defaults(learn_parm, kernel_parm);
++
+   for(i=1;(i<argc) && ((argv[i])[0] == '-');i++) {
+     switch ((argv[i])[1]) 
+       { 
+@@ -221,74 +195,8 @@
+     print_help();
+     exit(0);
+   }    
+-  if((learn_parm->skip_final_opt_check) 
+-     && (kernel_parm->kernel_type == LINEAR)) {
+-    printf("\nIt does not make sense to skip the final optimality check for linear kernels.\n\n");
+-    learn_parm->skip_final_opt_check=0;
+-  }    
+-  if((learn_parm->skip_final_opt_check) 
+-     && (learn_parm->remove_inconsistent)) {
+-    printf("\nIt is necessary to do the final optimality check when removing inconsistent \nexamples.\n");
+-    wait_any_key();
+-    print_help();
+-    exit(0);
+-  }    
+-  if((learn_parm->svm_maxqpsize<2)) {
+-    printf("\nMaximum size of QP-subproblems not in valid range: %ld [2..]\n",learn_parm->svm_maxqpsize); 
+-    wait_any_key();
+-    print_help();
+-    exit(0);
+-  }
+-  if((learn_parm->svm_maxqpsize<learn_parm->svm_newvarsinqp)) {
+-    printf("\nMaximum size of QP-subproblems [%ld] must be larger than the number of\n",learn_parm->svm_maxqpsize); 
+-    printf("new variables [%ld] entering the working set in each iteration.\n",learn_parm->svm_newvarsinqp); 
+-    wait_any_key();
+-    print_help();
+-    exit(0);
+-  }
+-  if(learn_parm->svm_iter_to_shrink<1) {
+-    printf("\nMaximum number of iterations for shrinking not in valid range: %ld [1,..]\n",learn_parm->svm_iter_to_shrink);
+-    wait_any_key();
+-    print_help();
+-    exit(0);
+-  }
+-  if(learn_parm->svm_c<0) {
+-    printf("\nThe C parameter must be greater than zero!\n\n");
+-    wait_any_key();
+-    print_help();
+-    exit(0);
+-  }
+-  if(learn_parm->transduction_posratio>1) {
+-    printf("\nThe fraction of unlabeled examples to classify as positives must\n");
+-    printf("be less than 1.0 !!!\n\n");
+-    wait_any_key();
+-    print_help();
+-    exit(0);
+-  }
+-  if(learn_parm->svm_costratio<=0) {
+-    printf("\nThe COSTRATIO parameter must be greater than zero!\n\n");
+-    wait_any_key();
+-    print_help();
+-    exit(0);
+-  }
+-  if(learn_parm->epsilon_crit<=0) {
+-    printf("\nThe epsilon parameter must be greater than zero!\n\n");
+-    wait_any_key();
+-    print_help();
+-    exit(0);
+-  }
+-  if(learn_parm->rho<0) {
+-    printf("\nThe parameter rho for xi/alpha-estimates and leave-one-out pruning must\n");
+-    printf("be greater than zero (typically 1.0 or 2.0, see T. Joachims, Estimating the\n");
+-    printf("Generalization Performance of an SVM Efficiently, ICML, 2000.)!\n\n");
+-    wait_any_key();
+-    print_help();
+-    exit(0);
+-  }
+-  if((learn_parm->xa_depth<0) || (learn_parm->xa_depth>100)) {
+-    printf("\nThe parameter depth for ext. xi/alpha-estimates must be in [0..100] (zero\n");
+-    printf("for switching to the conventional xa/estimates described in T. Joachims,\n");
+-    printf("Estimating the Generalization Performance of an SVM Efficiently, ICML, 2000.)\n");
++
++  if (!check_learning_parms(learn_parm, kernel_parm)) {
+     wait_any_key();
+     print_help();
+     exit(0);
+@@ -303,7 +211,7 @@
+ 
+ void print_help()
+ {
+-  printf("\nSVM-light %s: Support Vector Machine, learning module     %s\n",VERSION,VERSION_DATE);
++  printf("\nSVM-light %s: Support Vector Machine, learning module     %s\n",SVMLIGHT_VERSION,SVMLIGHT_VERSION_DATE);
+   copyright_notice();
+   printf("   usage: svm_learn [options] example_file model_file\n\n");
+   printf("Arguments:\n");
+@@ -379,7 +287,7 @@
+   wait_any_key();
+   printf("\nMore details in:\n");
+   printf("[1] T. Joachims, Making Large-Scale SVM Learning Practical. Advances in\n");
+-  printf("    Kernel Methods - Support Vector Learning, B. Schölkopf and C. Burges and\n");
++  printf("    Kernel Methods - Support Vector Learning, B. Schlkopf and C. Burges and\n");
+   printf("    A. Smola (ed.), MIT Press, 1999.\n");
+   printf("[2] T. Joachims, Estimating the Generalization performance of an SVM\n");
+   printf("    Efficiently. International Conference on Machine Learning (ICML), 2000.\n");

@@ -1,0 +1,289 @@
+README for Array::Suffix 
+=========================
+
+Array::Suffix is a perl module to determine variable length ngrams
+from large corpora using the data structure suffix arrays. 
+
+The module:
+   
+   1. Provides an easy to use interface to determine ngrams from a 
+      corpus. Some of the basic functionality include:
+
+   *  returns variable length ngrams
+   *  allow for a stop list 
+   *  allows for a frequency cutoff
+   *  allows for a remove cutoff
+
+REQUIREMENTS
+===================================
+
+This module REQUIRES that the following software be download
+and installed.
+
+--Programming Languages
+Perl (version 5.8.5 or better)
+
+INSTALLATION
+=========================
+
+There are multiple ways to install this package.
+
+1. You can use CPAN.pm to install Array::Suffix.
+
+   To install type the following:
+   
+	perl -MCPAN -e 'install Array-Suffix'
+
+2. Or you can install this yourself.
+
+   To install this module type the following:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+PROGRAM :  
+=========================
+
+array-suffix-driver.pl
+
+  This program takes as input a flat ASCII text file and outputs all
+  Ngrams, or token sequences of length 'n', where the value of 'n' 
+  can be decided by the user, and the frequency of the ngram.
+
+  Using array-suffix-driver.pl
+  
+  	The most basic way of running this program is the following: 
+
+	    % array-suffix-driver.pl output.txt input.txt 
+
+	    where input.txt is the input text file in which to find 
+	    the Ngrams and output.txt is the output file into which 
+	    count.pl will put all the Ngrams with their frequencies. 
+
+  Changing the Length of Ngrams 
+	    
+	The default ngram size is 2. This can be changed by using
+	the parameter option --ngram N, where N is the number of
+	tokens in each ngram. For example, to find all the trigrams
+	in the file input.txt, you would running program:    
+	 
+	     %count.pl --ngram 3 output.txt input.txt
+
+  Using User-Provided Token Definitions:
+	 
+	The default token definitions are:
+
+	\w+	    -> this matches a contiguous sequence of 
+		       alpha-numeric characters
+
+	[\.,;:\?!]  -> this matches a single punctuation mark
+
+	The default token definitions can be over-ridden by using 
+	the option:
+	
+	     --token FILE 
+	
+	where FILE is the name of the file containing the regular 
+	expressions on which the token definitions will be based. 
+
+	Each regular expression in this FILE should be:
+	      1. on a line of its own
+	      2. should be delimited by the forward slash '/'. 
+	      3. should be valid Perl regular expressions
+
+  Removing character strings 
+
+	This option 
+
+	     --nontoken FILE
+	
+	allows a user to define regular expressions that 
+	will match strings that should not be considered as tokens. 
+	These strings will be removed from the data and not counted 
+	or included in Ngrams. 
+
+	The --nontoken option is recommended when there are predictable 
+	sequences of characters that you know should not be included as 
+	tokens for purposes of counting Ngrams, finding collocations, etc. 
+
+	For example, if mark-up symbols like <s>, <p>, [item], [/ptr] 
+	exist in text being processed, you may want to include those 
+	in your list of nontoken items so they are discarded. If not, 
+	a simple regex such as /\w+/ will match with 's', 'p', 'item',	
+	'ptr' from these tags, leading to confusing results. 
+
+	The FILE following the nontoken option file should contain Perl 
+	regular expressions delimited by forward slashes '/' that define 
+	non-tokens. Multiple expressions may be placed on separate lines 
+	or be separated via the '|'  (Perl 'or') as in /regex1|regex2|../ 
+
+	The following are some of the examples of valid non-token 
+	definitions:
+
+		/<\/?s|p>/ : will remove xml tags like <s>, <p>, </s>, </p>. 
+
+		/\[\w+\]/  : will remove all words which appear in square 
+			     brackets like [p], [item], [123] and so on. 
+
+	The program will first remove any string from the input data that 
+	matches the non-token regular expression, and only then will match 
+	the remaining data against the token definitions. 
+
+  The Output Format
+
+        Assume that the following are the contents of the input text file to
+	array-suffix-driver.pl; let us call the file test.txt: 
+
+		first line of text
+		second line
+		and a third line of text
+
+	 Assume that array-suffix-driver.pl is run in its most general
+	 mode:
+
+		 % array-suffix-driver.pl test.out test.txt 
+
+	 The output will contain all the bigrams found in the file test.txt
+	 using the default tokens as specified above. The contents of the 
+	 output file test.out would be:
+	
+		11
+		line<>of<>2
+		of<>text<>2
+		second<>line<>1 
+		line<>and<>1 
+		and<>a<>1 
+		a<>third<>1 
+		first<>line<>1 
+		third<>line<>1 
+		text<>second<>1 
+
+	 The number on the first line, 11, indicates that there were 
+	 11 bigrams in test.txt
+
+	 Following are the bigrams that were found in the test.txt file
+	 delimited by the diamond sign, "<>". Therefore the first bigram
+	 is line<>of<>, make up of the tokens "line" and "of" in that
+	 order. After the diamond following the last token there is a 
+	 number, this number denotes how many times this bigram occurred
+	 in the text. 
+
+  The Marginals Option
+
+         To obtain the a partial set of marginal counts for the bigram
+	 the option:
+
+	     --marginals
+
+	 must be set. This option outputs the individual frequency counts
+	 of each token in the ngram. Let us use our example from above
+	 but run the array-suffix-driver.pl program as follows:
+
+		 % array-suffix-driver.pl --marginals test.out test.txt
+
+	 The output will contain all the bigrams found i the file test.txt
+	 using the default tokens as specified above, their frequency
+	 counts and the number of times each of the tokens in the bigram
+	 occurred in their respective positions. The contents of the 
+	 output file test.out would be:
+		11
+		line<>of<>2 3 2 
+		of<>text<>2 2 2 
+		second<>line<>1 1 3 
+		line<>and<>1 3 1 
+		and<>a<>1 1 1 
+		a<>third<>1 1 1 
+		first<>line<>1 1 3 
+		third<>line<>1 1 3 
+		text<>second<>1 1 1 
+ 
+	  The first number after the bigram is the frequency of the bigram
+	  seen in test.out. The second number after the bigram is the
+	  number of times the first token was seen in the first position 
+	  of all the bigrams and the second number is the number of times
+	  the second token was seen in the second position of all the
+	  bigrams.
+
+
+  Stoplists
+
+	  The user may "stop" the Ngrams formed by array-suffix-driver.pl 
+	  by providing a list of stop-tokens through the option:
+
+	      --stop FILE. 
+	   
+	  Each stop token in FILE should be a Perl regular expression that 
+	  occurs on a line by itself. This expression should be delimited 
+	  by forward slashes, as in /REGEX/. All regular expression 
+	  capabilities in Perl are supported except for regular expression 
+	  modifiers (like the "i" /REGEX/i). 
+
+	  The following are a few examples of valid entries in the stop list.
+
+		/^\d+$/
+		/\bthe\b/
+		/\b[Tt][Hh][Ee]\b/
+		/^and$/
+		/\bor\b/
+		/^be(ing)?$/
+
+		There are two modes in which a stop list can be used, 
+		AND and OR. The default mode is AND, which means that
+		an Ngram must be made up entirely of words from the
+		stoplist before it is eliminated. The OR mode eliminates 
+		an Ngram if any of the words that make up the Ngram
+		are found in the stoplist.
+
+
+
+  Removing Low Frequency Ngrams:
+
+	   We allow the user to either remove or to not display low 
+	   frequency Ngrams. The user can remove low frequency Ngrams
+	   by using the option :
+
+		--remove N
+ 
+           by which all Ngrams that occur less than n times are
+	   removed. The Ngram and the individual frequency counts are
+	   adjusted accordingly upon the removal of these Ngrams. 
+	   
+	   The user can choose not to display low frequency Ngrams by
+	   using the option :
+	
+		--frequency N, 
+	
+	   by which Ngrams that occur less than n times are not
+	   displayed in the output. Note that this differs from the
+	   remove option above in that the frequency counts are not
+	   changed. 
+
+
+COPYRIGHT AND LICENCE
+=========================
+
+Copyright (C) 2004-2007, Bridget T. McInnes
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+
+Note: a copy of the GNU Free Documentation License is available
+on the web at L<http://www.gnu.org/copyleft/fdl.html> and is
+included in this distribution as FDL.txt.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

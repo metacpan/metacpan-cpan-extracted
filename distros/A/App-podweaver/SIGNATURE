@@ -1,0 +1,66 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 598d6e0fdad11ac3c052d41f954d3b4edf6947db Build.PL
+SHA1 cee134d7fbc66dcaf7fbcd4b15e1f9f9b89d1c0d Changes
+SHA1 081c1d33c1c65ac7c56a9cd1283b3f64fa685f7c MANIFEST
+SHA1 28f58b1134afdb9d1410a5394d136498cb5aa90d META.json
+SHA1 2ea6a763c55dfb4e75215f11f35224d371c3c1e9 META.yml
+SHA1 93b04df9c7fbfa88f6e747fc1043e123e438fa30 README
+SHA1 7124c720c7e8da3c6975d0372ee68ea0d20c333c ignore.txt
+SHA1 00ba2883ec74736dcd56b6ea37a94a1dda71dd3c lib/App/podweaver.pm
+SHA1 65569da9724cf90f4ee4e1067cca7642489d359a script/podweaver
+SHA1 996b75c4fbec5e1b37f76d5c56eb9f491cf92631 t/00-load.t
+SHA1 73a3731ec27e217464a4d716872930973ca01c19 t/30-weave-file.t
+SHA1 c93aac15d01101e56a28f35f1d069d8d63aa2985 t/40-dist-info.t
+SHA1 d323a0b14346e330109a19c435f3735f309ab108 t/50-files-to-weave.t
+SHA1 7083a26fad0a40e6ece1ee939a1b1a2f6451977c t/80-script.t
+SHA1 57db22b18a2045d4776a6434e6b106922ef3a319 t/90-check-changes.t
+SHA1 dcf6c7fef5befbc5b8f754de3da707c0fbc22ae9 t/91-fixme.t
+SHA1 98cdccf1120f3c9b445d6bcfaa10339a9c821d54 t/92-hasversion.t
+SHA1 e6efcfd6a7173a136748ef560e913465fe03a854 t/93-meta.t
+SHA1 9f074af0f75805df778e06a6b2c0221aa9ae6a1f t/94-minimumversion.t
+SHA1 bae7f6978d6b9099f6f5b3321598871503e78781 t/95-manifest.t
+SHA1 8c57f2b89f12c54fd975c39ded1c100796ab5f17 t/98-pod.t
+SHA1 49835efe20e87aef3f67d9fdd75a6593acf811d2 t/99-pod-coverage.t
+SHA1 9f9df9a34a194e4c4ab8ca3c0cdc73f8955e1171 t/test_files/30-weave-file/block-after-pod-with-end-no-data.in.txt
+SHA1 9f9df9a34a194e4c4ab8ca3c0cdc73f8955e1171 t/test_files/30-weave-file/block-after-pod-with-end-no-data.out.txt
+SHA1 277e109a12a1c6b44a81541d3407320ac9b7f480 t/test_files/30-weave-file/block-before-pod-with-end-no-data.in.txt
+SHA1 277e109a12a1c6b44a81541d3407320ac9b7f480 t/test_files/30-weave-file/block-before-pod-with-end-no-data.out.txt
+SHA1 480ae43908279bd8efd56c34ec767fa0e2fc8200 t/test_files/30-weave-file/block-pod-no-end-no-data.in.txt
+SHA1 9f9df9a34a194e4c4ab8ca3c0cdc73f8955e1171 t/test_files/30-weave-file/block-pod-no-end-no-data.out.txt
+SHA1 29467813cd403cab881955a07516016f142722eb t/test_files/30-weave-file/block-pod-no-end-with-data.in.txt
+SHA1 29467813cd403cab881955a07516016f142722eb t/test_files/30-weave-file/block-pod-no-end-with-data.out.txt
+SHA1 1372bc7bbc7e5070b2528a0872202042da2689be t/test_files/30-weave-file/interlaced-pod-no-end-no-data.in.txt
+SHA1 6890953a5c628f575580e70d991e7431a29a11a7 t/test_files/30-weave-file/interlaced-pod-no-end-no-data.out.txt
+SHA1 1941c7b4c8112e9692f096ee34d7a8f0c0a94538 t/test_files/30-weave-file/interlaced-pod-no-end-with-data.in.txt
+SHA1 64e5ea8c09140862fc65d30527844838e5aa843c t/test_files/30-weave-file/interlaced-pod-no-end-with-data.out.txt
+SHA1 441405cc9ee083d6c1facb251534857ad5db8c27 t/test_files/30-weave-file/interlaced-pod-with-end-no-data.in.txt
+SHA1 c2c0fcd2b66b9f10f42ffc59553b40f425e6ca9e t/test_files/30-weave-file/interlaced-pod-with-end-no-data.out.txt
+SHA1 57ff993ae7b3f131274b05e5f8789bcc6ef0a3da t/test_files/30-weave-file/no-pod-no-end-no-data.in.txt
+SHA1 17786855c59695fc55afd352c7a8a27d6ef56f44 t/test_files/30-weave-file/no-pod-no-end-no-data.out.txt
+SHA1 074478d651ffe96003315e31ce7990d01f7ff201 t/test_files/30-weave-file/no-pod-no-end-with-data.in.txt
+SHA1 6ccd9b13e2daa6ed99c043c30e6141de18dac59c t/test_files/30-weave-file/no-pod-no-end-with-data.out.txt
+SHA1 fde3860152e51102be54239c17e73524e648ee47 t/test_files/30-weave-file/no-pod-with-end-no-data.in.txt
+SHA1 ed78445b0fa6f0c3f5582c61805180f0ea9d123d t/test_files/30-weave-file/no-pod-with-end-no-data.out.txt
+SHA1 752680b3e564bb817342e7fc66cef2ca10d892cd weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk6SCSUACgkQk0asf7iG0tSFuwCgmySyadIPMxqcV444+g8B6NAY
+WOcAn11DY/sTIm/bx0V0RLwLEYjw5GxG
+=BA57
+-----END PGP SIGNATURE-----

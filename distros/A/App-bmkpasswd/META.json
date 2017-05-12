@@ -1,0 +1,80 @@
+{
+   "abstract" : "bcrypt-capable mkpasswd(1) and exported bcrypt interface",
+   "author" : [
+      "Jon Portnoy <avenj@cobaltirc.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-bmkpasswd",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Test::Without::Module" : "0"
+         },
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Crypt::Passwd::XS" : "0",
+            "Crypt::Random::Seed" : "0",
+            "Math::Random::ISAAC" : "0",
+            "Math::Random::ISAAC::XS" : "0"
+         },
+         "requires" : {
+            "Bytes::Random::Secure::Tiny" : "0",
+            "Carp" : "0",
+            "Crypt::Eksblowfish" : "0.003",
+            "Exporter::Tiny" : "0",
+            "Getopt::Long" : "2.24",
+            "IO::Handle" : "0",
+            "POSIX" : "0",
+            "Pod::Usage" : "1.51",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0.12",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::Cmd" : "1.09",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/avenj/app-bmkpasswd.git",
+         "web" : "https://github.com/avenj/app-bmkpasswd"
+      }
+   },
+   "version" : "2.012002",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

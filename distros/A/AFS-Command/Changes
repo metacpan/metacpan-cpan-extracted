@@ -1,0 +1,330 @@
+#-*-cperl-*-
+#
+# $Id: Changes,v 11.1 2004/11/18 17:24:53 wpm Exp $
+#
+# (c) 2003-2004 Morgan Stanley and Co.
+# See ..../src/LICENSE for terms of distribution.
+#
+
+=head1 CHanges in 1.9
+
+=head1 Enhancements
+
+A new argument is supported by AFS::Command::Base->new():
+
+    my $vos = AFS::Command::VOS->new( timestamps => 1 );
+
+This will result in ISO timestamps being prepended to each line of
+output when it is collected into the $vos->errors().  This is useful
+for profiling the performance of operations such as vos release:
+
+    my $result = $vos->release
+      (
+       id		=> 'somevol',
+       cell		=> 'somecell',
+      ) || die $vos->errors();
+
+When this works, the $vos->errors() will have the verbose output,
+which can be logged even in the successful case, for diagnostics.
+Here's an example for a failure:
+
+    [2004-11-18 17:20:36] Could not lock the VLDB entry for the volume 536998569.
+    [2004-11-18 17:20:36] VLDB: no permission access for call
+    [2004-11-18 17:20:36] Error in vos release command.
+    [2004-11-18 17:20:36] VLDB: no permission access for call
+
+=head1 Changes in 1.8
+
+=head1 Bug Fixes
+
+=head2 vos examine did not pick up the LOCKED flag
+
+The code to parse the VLDB header was missing the LOCKED flag, if it
+was present, so this attribute was not being set properly.  It is now.
+
+=head2 pts membership error checking was bogus
+
+Well, it still is bogus, actually, since the code has to deal with the
+fact that pts has never produced meaningful return codes, so a failed
+pts membership command can still exit 0, and we have to figure out if
+it failed by other means.  This is done by looking for the known error
+messages that pts prints out, which is a good example of why parsing
+the ASCII test output of commands like this is a weak architecture.
+
+=head1 Changes in 1.7
+
+=head1 Enhancements
+
+=head2 Boolean flags can be turned off, as well as on
+
+If an argument to a method (and its corresponding command line
+argument) doesn't take a value, it is treated like a Boolean flag.
+However, the code used to assume that the existence of a Boolean key
+in the argument list implied the Boolean argument was always true.
+
+Now, the truth of the arguments I<value> is tested to determine if the
+flag should be set on or off.  This makes it easy to have subroutines
+that just blindly pass certain arguments along, without haing to test
+them, and allows for much cleaner code.
+
+For example:
+
+    my $result = $vos->release
+      (
+       name		=> $name,
+       force		=> $force,
+      );
+
+Will work as you probably expected it to, namely if $force is zero, it
+will NOT be passed to the "vos release" command.  In previous
+releases, regardless of the value of $force, the mere existence of the
+force key in the argument hash would have caused the -force option to
+be used.
+
+=head1 Bugs
+
+=head2 vos examine by numeric ID did not parse Volume Headers
+
+The code to parse the volume headers in the output from "vos examine"
+was looking for a pattern match based on the "id" argument.  However,
+the headers always print the name first, and we were assuming that the
+id argument was the volume name, when it can also be the volume ID.
+
+The parsing is less strict now, and works for both a volume name od a
+numeric ID.
+
+=head1 Changes in 1.6
+
+=head1 Enhancements
+
+=head1 AFS::Object::VolumeHeader: new attribute 'attached'
+
+When a volume's status is "offline", there is really more than one
+status the volume can be in.  A volume might be unattached, and
+offline, or it might be attached, but adminitratively offline.  For
+example, "vos offline" put a vlume in the latter state, and if for
+some reason there are two volumes with the same ID on the same
+fileserver, they will both be attached (if possible), but only the
+first one encountered will be brought online.
+
+Changing the value of status would been a non-backwards compatible
+change, and caused some subtle problems for some applications.  Rather
+than introduce such a change, I have chosen to represent this state
+with an additional attribute "attached", which is just a Boolean,
+indicating whether or not the volume is attached.
+
+=head1 Bugs
+
+=head1 Changes in 1.5
+
+=head1 Enhancements
+
+=head2 Principal names, as user supplied arguments, are lowercased
+
+As a convenience, when PTS names are passed to methods like
+getUserByName(), they will be lower-cased before looking up the user,
+or group.  Since PTS is a case-insensitive database, this will avoid
+the need for applications to lc() some strings, although not in all
+cases.
+
+For example, you can pass a mixed case string to pts->creategroup(),
+and then use the same string to query the resulting AFS::Object::Group
+object using getGroupByName().
+
+The object's "group" attribute, however, will be in lower case, since
+that will be the value returned by the pts command itself.
+
+=head2 AFS::Command::VOS->restore arguments added
+
+Documentation for two important new vos restore arguments was added to
+the documentation (-creation and -lastupdate).  These options are only
+available in a patch to vos, which should be in one the next two major
+OpenAFS 1.2.X releases.
+
+=head1 Bugs
+
+=head2 AFS::Object::VolumeHeader 'accesses' attribute was incorrect
+
+The actual attribute on the objects was named "access".  Oops.  The
+attribute was changed to "accesses" to match the documentation, and
+the string that is parsed in vos output.
+
+=head1 Changes in 1.4
+
+=head1 Enhancements
+
+=head2 Test suite is disabled by default.
+
+There is a well intentioned effort to automatically test all new
+submissions to CPAN (see http://testers.cpan.org).  Unfortunately, the
+AFS-Command package can't be tested automatically, since it requires a
+fair amount of configuration.  You have to specify a cell name, some
+fileserver names and partitions, etc.
+
+By default, the tests will all be skipped if the configured cell name
+in the CONFIG file has not been modified, thus allowing the automated
+CPAN testing to continue, automatically, without the author getting a
+bunch of bogus emails.
+
+=head1 Bugs
+
+=head2 Volume status value inconsistency
+
+!!!!!!!! WARNING !!!!!!!!
+
+This change is NOT backwards compatible with previous releases, so
+verify that your code handles the new, consistent values correctly.
+
+The "status" field returned from either vos->examine() or
+vos->listvol(), in previous releases, had inconsistent values. When a
+volume is online, the status would be one of:
+
+    online
+    On-line
+
+Likewise, when offline, one of:
+
+    offline
+    Off-line
+
+These values have all been normalized to: online, offline
+
+=head2 AFS::Command::VOS->examine parses busy and offline messages
+
+When a volume is busy or can not be attached, "vos examine" will be
+unable to display the volume headers.  Instead, a one line message is
+printed, such as one of the following:
+
+    **** Volume 123456789 is busy ****
+    **** Could not attach volume 123456789 ****
+
+The examine method now parses these, and the AFS::Object::VolumeHeader
+object will have only the 'id' and 'status' attributes.  Previously,
+those lines were incorrectly parsed and the 'name' attribute set to
+'****', which is pretty obviously wrong.
+
+
+
+
+=head1 Changes in 1.3
+
+=head1 Enhancements
+
+=head2 AFS::Command::VOS->release support both -f and -force
+
+Someone at some point changed vos release's force argument from -f to
+-force.  API calls written with one of those will not work with a vos
+binary that doesn't agree on the choice of force option.  This would
+have require developers to write code like this:
+
+   $vos->release
+     (
+      id		=> $id,
+      cell		=> $cell,
+      ( $vos->supportsArgument('release','force') ?
+        ( force		=> 1 ) :
+        ( f		=> 1 )
+      ),
+     );
+
+OK, that's the authors twisted way of doing it, and it seems like
+needless complexity.  Both f and force are now supported as options,
+using a simply alias mechanism to translate from one to the other,
+based on what is supported by the vos binary.
+
+The documentation hasn't been changed, since you can use 'force' in
+all cases, and since that is the newer of the two, the docs will stay
+as they are.  The fact that your vos binary really wants 'f' is hidden
+from you, and will stay that way.
+
+=head1 Bugs
+
+=head2 AFS::Command::BOS->listhosts
+
+The returned object has a cell attribute, as well as the hosts
+attribute, but the docs forgot to mention this.
+
+
+
+
+=head1 Changes in 1.2
+
+=head1 Enhancements
+
+=head2 AFS::Command::VOS->offline() and ->online()
+
+Both of these "hidden" vos commands are now supported by the API.
+These commands are part of the vos command suite, but they do not show
+up in the output of "vos help".
+
+=head1 Bugs
+
+
+
+=head1 Changes in 1.1
+
+=head1 Enhancements
+
+=head2 AFS::Command::VOS->status()
+
+This method now parses the individual transaction stanzas, and the API
+provides access to objects that encapsulate each of them.  So, instead
+of just finding out how many transactions are active, you can analyze
+each of them in detail.
+
+=head2 AFS::Object::VLDB data is now keyed on volume ID, as well as name
+
+This changes the way the AFS::Object::VLDB data can be extracted.  In
+1.0, the API allowed AFS::Object::VLDBEntry object to be queried only
+by name, but 3 new methods calls allow this data to be queried by
+numeric ID as well as name:
+
+    getVLDBEntryById($id)
+    getVLDBEntryByName($name)
+    getVolumeIds()
+
+The API for getVLDBEntry has changed, and the single argument usage:
+
+    getVLDBEntry($name)		# DEPRECATED!!!!
+
+has been deprecated.  If warnings are enabled (perl -w), then the API
+will carp at you.  In the next release (1.2), that usage will no
+longer be supported.  Upgrade your code, or pay the price.
+
+The new usage of getVLDBEntry is one of:
+
+    getVLDBEntry( name => $name )
+    getVLDBEntry( id => $id )
+
+The internal method _addEntry() now manages the data by id as well as
+name, but you're not supposed to know that anyway...
+
+=head1 Bugs
+
+=head2 AFS::Command::BOS->status
+
+When querying a specific instance, if it wasn't there, the API would
+try to add an undefined instance object to the result, and croak.
+Now, you just get a result object with no instances.
+
+=head2 AFS::Command::FS->(several methods)
+
+If you pass a list of paths to methods such as whichcell(), then the
+error handling was a bit intrusive.  The way it used to work, in 1.0,
+was to return an error if we didn't see output for one or more of the
+paths.  Now, the code is more forgiving, and if have no idea what
+happened for one of the given paths, we'll return a Path object for
+that path which has a generic error.
+
+=head2 AFS::Command::FS->lsmount
+
+The "File 'foo' doesn't exist" error message wasn't trapped as a
+recognized error.  It is now.
+
+=head2 AFS::Command::FS->sysname
+
+The pattern matching was a bit greedy and the trailing single quote
+was showing up in the returned sysname value.
+
+=cut
+

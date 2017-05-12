@@ -1,0 +1,96 @@
+---
+type: object
+additionalProperties: false
+required: [name, appspec]
+properties:
+  name: { type: string }
+  appspec:
+    type: object
+    required: [version]
+    additionalProperties: false
+    properties:
+      version: { type: number }
+  title: { type: string }
+  abstract: { type: string }
+  description: { type: string }
+  markup: { type: string }
+  class: { type: string }
+  options: { '$ref': '#/definitions/options' }
+  parameters: { '$ref': '#/definitions/options' }
+  subcommands:
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^[a-zA-Z0-9_]+$":
+        '$ref': '#/definitions/command'
+
+definitions:
+
+  optionTypeSimple:
+    enum: [flag, string, integer, file]
+
+  options:
+    type: array
+    items:
+      '$ref': '#/definitions/option'
+
+  option:
+    type: object
+    additionalProperties: false
+    anyOf:
+    - required: [name]
+    - required: [spec]
+    properties:
+      name: { type: string }
+      spec: { type: string }
+      summary: { type: string }
+      description: { type: string }
+      multiple: { '$ref': '#/definitions/bool' }
+      mapping: { '$ref': '#/definitions/bool' }
+      unique: { '$ref': '#/definitions/bool' }
+      type:
+        oneOf:
+          - '$ref': '#/definitions/optionTypeSimple'
+      enum:
+        type: array
+        items: { type: string }
+      aliases:
+        type: array
+        items: { type: string }
+      required: { '$ref': '#/definitions/bool' }
+      values:
+        type: object
+        additionalProperties: false
+        properties:
+          op: { type: string }
+          mapping:
+            type: object
+          enum:
+            type: array
+            items: { type: string }
+      completion:
+        oneOf:
+          - { type: object }
+          - { '$ref': '#/definitions/bool' }
+
+  command:
+    type: object
+    additionalProperties: false
+    properties:
+      summary: { type: string }
+      description: { type: string }
+      op: { type: string }
+      options: { '$ref': '#/definitions/options' }
+      parameters: { '$ref': '#/definitions/options' }
+      subcommands:
+        type: object
+        additionalProperties: false
+        patternProperties:
+          "^[a-zA-Z0-9_]+$":
+            '$ref': '#/definitions/command'
+
+  bool:
+    anyOf:
+      - { type: boolean }
+      - { type: integer }
+      - { type: string, maxLength: 0 }

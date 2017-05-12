@@ -1,0 +1,9 @@
+lib/Acme/CPANAuthors/CPANTS/FiveOrMore.pm
+Makefile.PL
+MANIFEST
+t/000_basic.t
+t/950_pod.t
+t/960_pod_coverage.t
+Changes
+README
+META.yml                                 Module meta-data (added by MakeMaker)

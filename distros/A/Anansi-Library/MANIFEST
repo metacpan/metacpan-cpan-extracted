@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Anansi-Library.t
+lib/Anansi/Library.pm

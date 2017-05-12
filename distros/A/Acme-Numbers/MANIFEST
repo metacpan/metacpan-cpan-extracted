@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Acme/Numbers.pm
+MANIFEST			This list of files
+t/00use.t
+t/01basic.t
+t/02point.t
+t/03american_billion.t
+t/04currency.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

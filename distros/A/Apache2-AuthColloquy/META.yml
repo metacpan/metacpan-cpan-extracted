@@ -1,0 +1,27 @@
+---
+name: Apache2-AuthColloquy
+version: 1.13
+author:
+  - Nicola Worthington <nicolaw@cpan.org>
+abstract: mod_perl authentication against the Colloquy users.lua file
+license: open_source
+requires:
+  Apache2::Access: 0
+  Apache2::Connection: 0
+  Apache2::Const: 0
+  Apache2::Log: 0
+  Apache2::RequestRec: 0
+  Apache2::RequestUtil: 0
+  Colloquy::Data: 1.02
+  MD5: 0
+  mod_perl2: 0
+build_requires:
+  Test: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Apache2::AuthColloquy:
+    file: lib/Apache2/AuthColloquy.pm
+    version: 1.13
+generated_by: Module::Build version 0.2611

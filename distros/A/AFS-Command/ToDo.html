@@ -1,0 +1,185 @@
+    <HTML> 
+	<HEAD> 
+	    <TITLE>distro/ToDo</TITLE> 
+	</HEAD>
+
+	<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#Enhancements">Enhancements</A>
+	<UL>
+
+		<LI><A HREF="#Accept_AFS_Object_objects_as_ar">Accept AFS::Object objects as arguments</A>
+		<LI><A HREF="#stderr_handling">stderr handling</A>
+		<LI><A HREF="#Test_Suite_fs_lsmount_using_mul">Test Suite: fs lsmount using multiple dirs</A>
+	</UL>
+
+	<LI><A HREF="#Bugs">Bugs</A>
+	<UL>
+
+		<LI><A HREF="#stdout_stderr_buffering_will_bre">stdout/stderr buffering will break the fs examine/diskfree commands</A>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME
+
+</A></H1>
+AFS::Command ToDo List
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Enhancements">Enhancements
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Accept_AFS_Object_objects_as_ar">Accept AFS::Object objects as arguments
+
+</A></H2>
+Methods like $fs-&gt;listacl() return these handy little AFS::Object::ACL
+objects. It would be nice if we could manipulate them via OO method calls,
+and then pass them right back to $fs-&gt;setacl(), wouldn't it?
+
+
+<P>
+
+And how about passing the AFS::Object::Path objects returned from
+$fs-&gt;whichcell directly to an $fs-&gt;listquota call, so that the final
+AFS::Object::Path objects have all of the attributes returned by both
+calls, but in one set of objects?
+
+
+<P>
+
+Look for this in version 1.1
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="stderr_handling">stderr handling
+
+</A></H2>
+stderr processing needs to be handled in the <CODE>_exec_cmds()</CODE>
+method, and for that matter, <CODE>_reap_cmds()</CODE> needs to be folded
+into <CODE>_exec_cmds().</CODE>
+
+
+<P>
+
+The problem is that each API method calls <CODE>_save_stderr(),</CODE> and
+then later calls <CODE>_restore_stderr(),</CODE> and we leave stderr
+redirected for longer than necessary. The contents of the redirected output
+should be *only* the output from the commands we run, and right now, some
+of our own carping can creep in there.
+
+
+<P>
+
+Worse, its possible that a failure in the API can leave stderr redirected,
+resulting in a lot of confusion.
+
+
+<P>
+
+Its possible we should just suck in *ALL* of the output, both
+stdout/stderr, and drop that data into a couple of arrays. Then, method
+calls on the command object get gets individual rows of stdout/stderr
+output.
+
+
+<P>
+
+<PRE>  return unless $self-&gt;_exec_cmds();
+</PRE>
+
+<P>
+
+<PRE>  #
+  # Process stdout
+  #
+  while ( defined($_ = $self-&gt;_stdout() ) ) {
+</PRE>
+
+<P>
+
+<PRE>  }
+</PRE>
+
+<P>
+
+<PRE>  #
+  # Process stderr (in some cases, there's interesting data in here.
+  # see the fs examine/diskfree and similar api calls)
+  #
+  while ( defined($_ = $self-&gt;_stderr() ) ) {
+</PRE>
+
+<P>
+
+<PRE>  }
+</PRE>
+
+<P>
+
+Maybe something like that. By the time _exec_cmds returns, we have reaped
+the commands, and collected *ALL* of the output into arrays in the object.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Test_Suite_fs_lsmount_using_mul">Test Suite: fs lsmount using multiple dirs
+
+</A></H2>
+We should create several mount points and then query then all with one
+lsmount method call, to verify we can parse output for multiple dirs. We
+should pass in some bogus paths, too, to verify the error handling is
+correct as well (that code feels dubious to me).
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Bugs">Bugs
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="stdout_stderr_buffering_will_bre">stdout/stderr buffering will break the fs examine/diskfree commands
+
+</A></H2>
+Actually, all of the commands that parse per-path output, really. Currently
+the code assumes the stderr output will appear first, which is a side
+effect of the buffering. Some attempts to turn of buffering didn't change
+this, and in any case, we don't want to be sensitive to this (we currently
+are).
+
+
+<P>
+
+We need to process stderr first, to determine which paths had errors, and
+then parse stdout. This will require the change descibred above for how we
+handle stderr.
+
+
+<P>
+
+</DL>
+    </BODY>
+
+    </HTML>

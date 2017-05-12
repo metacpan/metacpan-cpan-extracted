@@ -1,0 +1,337 @@
+Apache::PageKit
+===============
+
+Status
+------
+	Version: 1.17
+
+Description
+-----------
+	PageKit is a web applications framework that is based on mod_perl.
+	This framework is distinguished from others such as Embperl and Mason
+	by providing a clear separation of programming, content and
+	presentation.
+
+	It does this by implementing a Model/View/Content/Controller (MVCC)
+	design paradigm:
+		- Model is user supplied Perl Classes
+		- View is set of PageKit Templates and/or XSLT files
+		- Content is set of XML Files
+		- Controller is PageKit
+
+	This allows your programmers, designers and content editors to work
+	independently with clean well-defined interfaces.
+
+	PageKit provides the following features:
+		- Component-based architecture
+		- Language Localization and charset translation
+		- Session Management
+		- Input Validation
+		- Sticky HTML Forms
+		- Authentication
+		- Co-branding and XML,WML, and PDF output
+		- Automatic Dispatching of URIs
+		- Easy Error Handling
+		- Online Editing Tools
+		- Page based sessions
+		- Localized error/messages
+
+
+Requirements
+------------
+	- perl 5.005 or greater
+	- mod_perl 1.24_01 (lastest version requir'd for make test only)
+	- Apache 1.3.x (at best compiled _without_ expat (1.3.21 or higher recommended))
+	- Apache::libapreq
+
+	- Apache::SessionX
+	- Compress::Zlib
+	- Data::FormValidator
+	- Digest::MD5
+	- HTML::FillInForm 0.12
+	- HTML::Template 2.2
+	- HTML::Template::XPath
+	- HTML::Clean
+	- Text::Iconv
+        - libxml2 library - download from http://www.xmlsoft.org
+	- XML::LibXML 1.31
+
+Required for example web site located in eg/ directory
+----------------------
+	- DBD::SQLite
+	- HTTP::Headers
+	- Apache::Reload
+
+Recommended
+-----------
+	- Mail::Mailer (needed if you use Apache::ErrorReport)
+	- Apache::DBI (*strongly* recommended if you use DBI)
+	- MIME::Types (needed if you want to serve static files from
+		View/Default directory)
+	- XML::LibXSLT 1.31 (needed if you want to use XSLT tranformations)
+	- Apache XML FOP - need for generating PDF
+        - Locale::gettext 1.01 (needed if you want to localize pkit messages)
+
+Installation
+------------
+PageKit >= 1.08
+	You must have a mod_perl enabled apache server. That's all.
+
+        PageKit avoids the expat conflict by not using XML::Parser anymore.
+        If your application relies on XML::Parser, follow the instructions
+        for installation PageKit <= 1.07.
+
+PageKit <= 1.07
+        First you must have a mod_perl enabled apache server _without_
+	expat compiled in.  Apache 1.3.21 and above do not include
+	expat if you already have expat installed.
+
+	However, if you are using a version below 1.3.21, then
+	you should supply the option
+	--disable-rule=EXPAT to ./configure when you build Apache.  Alternatively
+	if you build Apache with mod_perl, it will supply this option
+	automatically for you.  For more information on the expat conflict,
+	read http://www.axkit.org/faq.xml under "I install AxKit and Apache
+	segfaults when it starts".  For an excellent reference on installing
+	a mod_perl server from source, see http://perl.apache.org/guide/
+
+	It is recommended that you compile mod_perl with the EVERYTHING switch.
+	In any case, you should make sure that you allow the httpd.conf <Perl>
+	directive.
+
+	By the way, you may download the expat library from sourceforge
+		http://sourceforge.net/projects/expat/
+	(Required for XML::Parser)
+
+	After installing the requirements, you can use the standard
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Setting up Included Example PageKit Site
+----------------------------------------
+
+	An example web site is included in the eg/ directory.  This is an
+	good starting point for building your own website.  See eg/README
+	for more details.
+
+	Make sure httpd is found in your PATH. 
+	To setup and configure, run
+		
+	./t/TEST -start-httpd
+
+	This will be used to configure and start a PageKit enabled 
+	web server on port 8529.
+
+	and killed by
+
+	./t/TEST -stop-httpd
+
+	To view the site, point your browser to http://localhost:8529/
+	(Replace localhost with the name of the server, if necessary)
+
+	If this page fails to load, you may find the error in t/logs/error_log.
+	
+	Note that to test the PDF generation, you will have to download the
+	Apache XML FOP Processor from http://xml.apache.org/fop/ and 
+	configure the path to the processor using fop_command configuration
+	directive in Config.xml.
+
+	Please note that the above is only for a quick test. 
+	If you like to start on a new application take a look into 
+	./t/conf/httpd.conf.
+	
+	To start a new application read Setup and Configuration in this
+	README
+	
+Upgrading
+---------
+	To upgrade from an earlier version of PageKit, follow the
+	installation instructions above.  You may have to change your
+	Model, View, Content, or Config files.  For more information,
+	see migration/README.
+
+Setup
+-----
+	You should use the directories and files contained in the eg/
+	directory of the distribution as a starting point for your own
+	application.
+
+	Note that the example application uses DBD::SQLite to store the
+	login data.  This is choosen because it will work on any platform
+	and support a resonable part of SQL.
+	However, when building your own application you can change to 
+	whartever database you like.
+
+        Just provide a database with the tables 'pkit_user' and 'session'
+
+        CREATE 
+          TABLE pkit_user (
+             user_id CHAR(8), login CHAR(255), email CHAR(255), passwd CHAR(255)
+        );
+        
+        CREATE 
+          TABLE sessions (
+            id char(32) not null primary key, a_session text
+        );
+
+	You can adjust or remove database fields from these tables as you like,
+        just supply the fields you use. My pkit_user table is typical larger and I
+        like to use VARCHAR on some fields.
+	
+	Note for Win32 user: 
+	  On Win32 you should use a session_lock_class => 'Null'
+	  in the eg site if you encount any problems. At least for me
+	  session_lock_class => 'File' is not working.
+
+	For the example application to work on a real database you must
+	create the above table on it as well.
+
+	For sessions to work, you will have
+	to manually create a database 'sessions', and include a table (this
+	example is for MySQL/PostgreSQL/SQLite, adjust as needed for your
+        target database)
+
+		CREATE TABLE sessions (
+			id char(32) not null primary key,
+			a_session text
+		);
+
+        A MySQL configuration inside Common.pm might look like:
+		sub pkit_session_setup {
+		  my $model = shift;
+		  my $dbh = $model->dbh;
+
+		  my %session_setup = (
+			session_store_class => 'MySQL',
+			session_lock_class => 'MySQL',
+			session_args => {
+					 Handle => $dbh,
+					 LockHandle => $dbh,
+                                        }
+		  );
+		  return \%session_setup;
+		}
+
+
+	A PostgreSQL configuration inside Common.pm might look like:
+		sub pkit_session_setup {
+		  my $model = shift;
+		  my $dbh = $model->dbh;
+
+		  my %session_setup = (
+			session_store_class => 'Postgres',
+			session_lock_class => 'Null',
+			session_serialize_class => 'Base64',
+			session_args => {
+					 Handle => $dbh,
+                                         IDLength => 32,
+                                         Commit => 0,
+                                        }
+		  );
+		  return \%session_setup;
+		}
+
+	Postgres user MUST use the Commit parameter in the session_args no
+        matter if it is on or off.
+        Look in Apache::Session::Postgres and Apache::Session.
+
+
+        A SQLite configuration inside Common.pm might look like:
+                sub pkit_session_setup {
+                  my $model = shift;
+                  my $dbh = $model->dbh;
+                
+                  my %session_setup = (
+                        session_store_class     => 'MySQL',
+                        session_lock_class      => 'Null',
+                        session_serialize_class => 'Base64',
+                        session_args => {
+                                         Handle => $dbh,
+                        },
+                  );
+                  return \%session_setup;
+                }
+        For more information look in Apache::Session::SQLite,
+        Apache::Session::Flex and Apache::Session.
+
+Configuration
+-------------
+
+PageKit >= 1.09 with mod_perl >= 1.26
+	If you use PageKit >= 1.09 and mod_perl < 1.26, the follow the instructions
+	for PageKit < 1.09.
+
+	Configuring PageKit is as easy as adding the following
+	to your httpd.conf
+
+		SetHandler perl-script
+		PerlSetVar PKIT_ROOT /path/to/pagekit/files
+		PerlSetVar PKIT_SERVER staging
+		PerlHandler +Apache::PageKit
+		<Perl>
+			Apache::PageKit->startup;
+		</Perl>
+
+		# Optional
+		PerlRequire /path/to/startup.pl
+		PerlModule Apache::ErrorReport
+		PerlSetVar ErrorReportHandler display
+
+	and changing the settings in
+
+		/path/to/pagekit/files/Config/Config.xml
+
+PageKit < 1.09
+
+	Configuring PageKit is as easy as adding the following
+	to your httpd.conf
+
+		SetHandler perl-script
+		PerlSetVar PKIT_ROOT /path/to/pagekit/files
+		PerlSetVar PKIT_SERVER staging
+		PerlHandler +Apache::PageKit
+		<Perl>
+			Apache::PageKit->startup("/path/to/pagekit/files","staging");
+		</Perl>
+
+		# Optional
+		PerlRequire /path/to/startup.pl
+		PerlModule Apache::ErrorReport
+		PerlSetVar ErrorReportHandler display
+
+	and changing the settings in
+
+		/path/to/pagekit/files/Config/Config.xml
+
+Bugs
+----
+
+There is a bug in Perl 5.6.1 that causes weirdness with the templates
+are encoded in UTF-8.
+
+Please submit any bug reports, comments, or suggestions to the Apache::PageKit
+mailing list at http://lists.sourceforge.net/mailman/listinfo/pagekit-users
+
+Copyright
+---------
+
+Copyright (c) 2000, 2001, 2002, 2003, 2004, 2005 AnIdea Corporation.  All rights Reserved.
+PageKit is a trademark of AnIdea Corporation.
+
+License
+-------
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+Ricoh Source Code Public License for more details.
+
+You can redistribute this module and/or modify it only under the
+terms of the Ricoh Source Code Public License.
+
+You should have received a copy of the Ricoh Source Code Public
+License along with this program; if not, obtain one at
+http://www.pagekit.org/license.html

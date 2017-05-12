@@ -1,0 +1,93 @@
+---
+name: appspec
+appspec: { version: 0.001 }
+title: Utilities for spec files for App::Spec cli apps
+class: App::AppSpec
+markup: swim
+description: |
+  This script is a collection of tools for authors of [App::Spec] command line
+  scripts.
+    # generate completion
+    % appspec completion --bash path/to/spec.yaml
+    # generate pod
+    % appspec pod --bash path/to/spec.yaml
+    # validate your spec file
+    % appspec validate --bash path/to/spec.yaml
+    # generate a new App::Spec app skeleton
+    % appspec new --class App::foo --name foo --with-subcommands
+options: []
+
+subcommands:
+  completion:
+    summary: Generate completion for a specified spec file
+    description: |
+      This command takes a spec file and outputs the corresponding
+      shell script for tab completion.
+    op: cmd_completion
+    options:
+    - name: name
+      description: name of the program
+    - name: zsh
+      description: for zsh
+      type: flag
+    - name: bash
+      description: for bash
+      type: flag
+    parameters:
+    - &param_spec_file
+      name: spec_file
+      type: file
+      required: true
+      summary: Path to the spec file (use '-' for standard input)
+
+  new:
+    summary: Create new app
+    op: cmd_new
+    description: |
+      This command creates a skeleton for a new app.
+      It will create a directory for your app and write a skeleton
+      spec file.
+    parameters:
+      - name: path
+        summary: Path to the distribution directory (default is 'Dist-Name' in current directory)
+    options:
+    - name: name
+      summary: The (file) name of the app
+      aliases: [n]
+      required: true
+    - name: class
+      summary: The main class name for your app implementation
+      aliases: [c]
+      required: true
+    - name: overwrite
+      summary: Overwrite existing dist directory
+      type: flag
+      aliases: [o]
+    - name: with-subcommands
+      summary: Create an app with subcommands
+      type: flag
+      aliases: [s]
+
+  pod:
+    summary: Generate pod
+    description: |
+      This command takes a spec file and outputs the generated pod
+      documentation.
+    op: generate_pod
+    parameters:
+    - *param_spec_file
+
+  validate:
+    summary: Validate spec file
+    description: |
+      This command takes a spec file and validates it against the current
+      [App::Spec] schema.
+    op: cmd_validate
+    parameters:
+    - *param_spec_file
+    options:
+    - name: color
+      summary: output colorized
+      type: flag
+      aliases: [C]
+# vim:et:sts=2:sws=2:sw=2:foldmethod=indent

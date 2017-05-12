@@ -1,0 +1,31 @@
+###############################################################################
+# HISTORY
+###############################################################################
+
+Set::ArrayAlt
+=============
+
+Version 1.00  2009-04-14
+   Originally, all functionality was in Template::Plugins::ListOps.
+      Moved it here and made that module a wrapper around this one
+      so the list operations can be used outside of templates.
+
+Version 1.01  2010-02-05
+   When a new object is created, it starts as an empty list instead
+      of an undefined value.
+   Any type of element (scalar, reference, undef) can be stored in
+      the list.
+   Added is_subset/not_subset methods.
+
+Version 1.02
+   Renamed the module to Array::AsObject . 1.02 is the final version
+      of Set::ArrayAlt .
+
+Array::AsObject
+===============
+
+Version 1.02
+   Renamed the module Set::ArrayAlt to Array::AsObject . 1.02 is the
+      final version of Set::ArrayAlt and the first version of
+      Array::AsObject .
+

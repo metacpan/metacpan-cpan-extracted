@@ -1,0 +1,8 @@
+MANIFEST
+LICENSE
+README
+Changes
+Todo
+lib/Acme/Apache/Werewolf.pm
+t/001_load.t
+Makefile.PL

@@ -1,0 +1,142 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-fail
+# ABSTRACT: Fail a changeset review
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    current_branch
+    get_user_name
+    get_user_email
+    git
+    guarantee_a_clean_working_directory
+    history
+    history_status
+    history_submitter
+    its_for_changeset
+    meta_data_add
+    meta_data_rm
+    project_name
+    sendmail
+);
+use App::Gitc::Reversible;
+use Getopt::Long;
+
+my $with_changes = 0;
+my $skip_email   = 0;
+GetOptions(
+    'with-changes' => \$with_changes,
+    'skip_email'   => \$skip_email,
+    'skip-email'   => \$skip_email,
+);
+
+# verify the changeset
+my $changeset = current_branch();
+die "You can't fail the master branch\n" if $changeset eq 'master';
+my $history = history($changeset);
+my $status = history_status($history);
+die   "This changeset has status '$status' but it must be 'reviewing' for\n"
+    . "you to fail it.\n"
+    if $status ne 'reviewing';
+
+my $stash;
+reversibly {
+    failure_warning "\nCanceling fail command\n";
+
+    $stash = guarantee_a_clean_working_directory();
+    to_undo { git "stash apply $stash" if $stash; $stash = undef };
+
+    # if --with-changes, publish local changes
+    if ($with_changes) {
+        git "fetch origin";
+        my $original = git "rev-parse origin/pu/$changeset";
+        git "push --force origin $changeset:pu/$changeset";
+        to_undo { git "push --force origin $original:pu/$changeset" };
+    }
+
+    # append failure to meta data
+    my $id = meta_data_add({
+        action    => 'fail',
+        changeset => $changeset,
+    });
+    to_undo { meta_data_rm(id => $id, changeset => $changeset) };
+
+    # delete the local branch
+    my $sha1 = git "rev-parse $changeset";
+    git "checkout master";
+    to_undo { git "checkout $changeset" };
+    git "branch -D $changeset";
+    to_undo { git "branch $changeset $sha1" };
+
+    # let the user edit the failure email
+    sendmail({
+        to        => get_user_email(scalar history_submitter($history)),
+        subject   => 'Failed Review',
+        changeset => $changeset,
+    }) if not $skip_email;
+};
+
+my $its = its_for_changeset($changeset);
+if ($its) {
+    # update Eventum status (fail with warning)
+    my $its_label = $its->label_issue;
+    eval {
+        print STDERR "Updating $its_label...";
+        my $project = project_name();
+        my $what_happened = $its->transition_state({
+            command   => 'fail',
+            issue     => $its->get_issue($changeset, reload => 1),
+            message   => "$project#$changeset failed code review",
+            changeset => $changeset,
+        });
+        print STDERR "done\n";
+    };
+    warn "Updating $its_label failed! $@" if $@;
+}
+
+# reinstate any changes present when we started
+git "stash apply $stash" if $stash;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-fail - Fail a changeset review
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

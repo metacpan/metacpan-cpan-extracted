@@ -1,0 +1,19 @@
+# $Id: .htaccess 15 2011-09-13 06:58:46Z jo $
+
+AddOutputFilter node .xml
+
+PerlModule TestXML2
+
+<Files test1.xml>
+    SetHandler modperl
+    PerlOutputFilterHandler TestXML2::test1 
+</Files>
+
+<Files test2.xml>
+    # we need to control the order of processing
+    RemoveOutputFilter xml 
+    SetOutputFilter INCLUDES;node
+    SetHandler modperl
+    PerlOutputFilterHandler TestXML2::test2 
+</Files>
+

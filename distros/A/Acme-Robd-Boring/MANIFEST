@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Acme/Robd/Boring.pm
+t/1.t
+weaver.ini

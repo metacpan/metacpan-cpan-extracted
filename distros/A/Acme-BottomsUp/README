@@ -1,0 +1,54 @@
+Acme-BottomsUp
+
+Write individual statements backwards
+
+        use Acme::BottomsUp;
+        @arr                  # first, start w/ numbers
+          grep { $_ % 2 }     # then get the odd ones
+          map { $_**3 }       # then cube each one
+          join ":",           # and glue together
+          print               # lastly, display result
+        ;
+        print "ok";
+        no Acme::BottomsUp;
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+PREREQUISITES
+
+    Filter::Simple
+    PPI
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Acme::BottomsUp
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Acme-BottomsUp
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-BottomsUp
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Acme-BottomsUp
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Acme-BottomsUp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 David Westbrook
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

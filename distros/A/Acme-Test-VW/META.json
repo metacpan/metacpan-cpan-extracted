@@ -1,0 +1,59 @@
+{
+   "abstract" : "Makes your tests always pass under CI",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Acme-Test-VW",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "perl" : "5.008005"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/miyagawa/Acme-Test-VW/issues"
+      },
+      "homepage" : "https://github.com/miyagawa/Acme-Test-VW",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/miyagawa/Acme-Test-VW.git",
+         "web" : "https://github.com/miyagawa/Acme-Test-VW"
+      }
+   },
+   "version" : "0.01"
+}
+

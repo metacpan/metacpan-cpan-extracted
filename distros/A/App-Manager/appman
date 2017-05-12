@@ -1,0 +1,193 @@
+#!/usr/bin/perl
+
+use Getopt::Long;
+use Cwd;
+use File::Spec 0.7;
+use App::Manager qw(slog trace_program);
+use POSIX 'strftime';
+
+$quiet=0;
+$verbose=1;
+$cwd=".";
+
+Getopt::Long::Configure qw/bundling/;
+
+sub usage {
+   print <<EOF;
+Usage: appman [-qbhdC] command ...
+       
+       appman [-qbhdC] install <database> <program> [arguments...]
+       appman [-qbhdC] info <database>
+       appman [-qbhdC] swap <database>
+       appman [-qbhdC] delete <database>
+
+   -q --quiet          be real quiet
+   -v --verbose        increase verbosity
+   -h -? --help        this listing
+   -d --db <database>  use specified database to store diffs
+   -C <path>           change to directory <path> before runnning
+
+Please enter 'perldoc appman' for more information.
+
+EOF
+   exit 1;
+}
+
+GetOptions(
+      "q|quiet"		=> \$quiet,
+      "v|verbose+"	=> \$verbose,
+      "help|h|?"	=> \&usage,
+      "C=s"		=> \$cwd,
+   ) or usage;
+
+$verbose = 0 if $quiet;
+$App::Manager::verbose = $verbose;
+
+chdir $cwd or die "Unable to change directory to $cwd: $!\n";
+
+sub cmd_install {
+   my %cache;
+   my %excl;
+
+   die "no database specified\n" unless @ARGV; my $db = creat App::Manager::DB shift @ARGV;
+   die "no install command specified\n" unless @ARGV; my @cmd = @ARGV;
+
+   my $excl_dir = sub {
+      my $dir = Cwd::abs_path shift;
+      return unless $dir =~ /^\//;
+      slog 1,"adding '$dir' to the ignorelist" unless $excl{$dir};
+      $excl{$dir}++;
+   };
+
+   $excl_dir->(getcwd);
+   eval { $excl_dir->(File::Spec->tmpdir) };
+   $excl_dir->('/tmp');
+   $excl_dir->('/usr/tmp');
+   $excl_dir->('/var/tmp');
+
+   my $excl = '^'.join('|^',keys %excl);
+
+   eval {
+      App::Manager::trace_program(sub {
+         my $path = shift;
+         unless ($path =~ $excl || exists $cache{$path}) {
+            lstat $path;
+            if (!-e _ || -l _ || -d _ || -f _) {
+               slog 2,"possible change detected: $path";
+               $cache{$path} = $db->ci($path);
+            }
+         }
+      }, @cmd)
+   };
+   $db->optimize(0);
+   if ($@) {
+      $db->rollback;
+      die $@;
+   }
+}
+
+sub ltime($) {
+   strftime "%Y-%m-%d %H:%M:%S",localtime shift;
+}
+
+sub cmd_info {
+   die "no database specified\n" unless @ARGV; my $db = App::Manager::DB->open(shift @ARGV);
+
+   print "database path: $db->{path}\n";
+   print "creation time: ".(ltime $db->{ctime})."\n";
+   print "modification time: ".(ltime $db->{mtime})."\n";
+   while (my ($id,$stat) = each %{$db->storage}) {
+      printf "%5s %5s %9s %s %s\n",$stat->{uid},$stat->{gid},$stat->{size},ltime $stat->{mtime},$stat->{path};
+   }
+}
+
+sub cmd_swap {
+   die "no database specified\n" unless @ARGV; my $db = App::Manager::DB->open(shift @ARGV);
+   $db->swap;
+}
+
+die "no command specified\n" unless @ARGV; $cmd = shift;
+
+$cmd eq "install"	and cmd_install;
+$cmd eq "info"		and cmd_info;
+$cmd eq "swap"		and cmd_swap;
+
+=head1 NAME
+
+appman - install/manage/uninstall software packages.
+
+WARNING: This is pre-alpha and might destroy wyour wholesystem. You have
+been warned!
+
+=head1 SYNOPSIS
+
+ appman [-qbhdC] command ...
+
+ appman [-qbhdC] install <database> <program> [arguments...]
+ appman [-qbhdC] info <database>
+ appman [-qbhdC] swap <database>
+
+=head1 DESCRIPTION
+
+This program traces any dynamically linked program for
+filesystem-modifying calls such as rename, open64, unlink, remove etc. It
+will save all the files before they were modified. It can than undo and redo the changes.
+
+=head2 COMMANDS
+
+Well, this is an alpha release, so there are not yet many commands.
+
+=over 4
+
+=item install <database> <program> [arguments...]
+
+Run the specified program with the specified arguments and trace all
+changes. Then check for differences in files and only save files that have
+changed.
+
+
+=item info <database>
+
+Print some info about the files stored in the database.
+
+=item swap <database>
+
+Check out all the files in the database, and store the former files in
+it. If you do this twice no real change should be done (thats why its
+called "swap").
+
+=back
+
+=head1 EXAMPLES
+
+A trivial one, just install a single file with cp:
+
+ appman install test cp testfile /bin/appmantest
+
+Print info about the files that were overwritten:
+
+ appman info test
+
+Which prints:
+
+   APPMAN: opening db /var/appman/test
+   database path: /var/appman/test
+   creation time: 1999-06-14 14:14:05
+   modification time: 1999-06-14 14:14:05
+                         1970-01-01 01:00:00 /bin/appmantest
+
+This means that /bin/appmantest was overwritten. Since no such file
+existed before, the filetime and uid/gid information is not valid.
+
+If you want to restore the file again (in this case just delete it), all you have to do is to enter:
+
+ appman swap test
+
+=head1 AUTHOR
+
+Marc Lehmann <pcg@goof.com>.
+
+
+
+
+

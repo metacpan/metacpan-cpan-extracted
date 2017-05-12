@@ -1,0 +1,392 @@
+Change 3304 on 2004/06/02 by nick@llama
+
+	Audio-1.029 Release Preparation
+
+Change 3303 on 2004/06/02 by nick@llama
+
+	Audio-1.028 Release Preparation
+
+Change 3302 on 2004/06/02 by nick@llama
+
+	ktext again
+
+Change 3301 on 2004/06/02 by nick@llama
+
+	Audio-1.028 Release Preparation
+
+Change 3300 on 2004/06/02 by nick@llama
+
+	Update version via $Revision$?
+
+Change 3299 on 2004/06/02 by nick@llama
+
+	Audio-1.028 Release Preparation
+
+Change 3298 on 2004/06/02 by nick@llama
+
+	Change version
+
+Change 3116 on 2004/01/06 by nick@llama
+
+	More tidy up of ALSA rate setting debug
+
+Change 3115 on 2004/01/05 by nick@camel
+
+	Fix l2u.c to have prototypes so float is 
+	passed as such.
+
+Change 3114 on 2004/01/05 by nick@camel
+
+	l2u has debug
+
+Change 3113 on 2004/01/05 by nick@camel
+
+	Audio::Data::create had scope issues with temp Audio
+
+Change 3111 on 2004/01/04 by nick@llama
+
+	Automate mkdist more like Tk
+
+Change 3107 on 2004/01/04 by nick@llama
+
+	Audio-1.028 Release Preparation
+
+Change 3106 on 2004/01/04 by nick@llama
+
+	Add Change.log
+
+Change 3105 on 2004/01/04 by nick@llama
+
+	mkdist changes
+
+Change 3100 on 2004/01/04 by nick@dromedary
+
+	Fix rate-setting scheme for ALSA driver.
+	 - defer setting device till last possible point
+	 - close/reopen if rate is committed but changed
+
+Change 3097 on 2004/01/02 by nick@llama
+
+	Update MANIFEST
+
+Change 3093 on 2003/12/31 by nick@llama
+
+	Simple ALSA driver added
+
+Change 3092 on 2003/12/31 by nick@llama
+
+	Rename linux* to oss*
+
+Change 3022 on 2003/12/07 by nick@llama
+
+	Manifest tidy up
+
+Change 3021 on 2003/12/07 by nick@llama
+
+	Use perl's Configure detected Drand01()
+
+Change 3020 on 2003/12/07 by nick@llama
+
+	After Win32 changes caused linux to stop working
+	Back out those and do gcc with strict options.
+	Still get segfault-after-exit.
+	Running under gdb says process has gone.
+	valgrind complains device in use (after abortive gdb).
+
+Change 3018 on 2003/12/06 by nick@camel
+
+	Win32 fixups
+
+Change 3001 on 2003/11/27 by nick@llama
+
+	Import /home/nick/.cpan/build/Parse-Yapp-1.05
+
+Change 2930 on 2003/10/09 by nick@llama
+
+	Handle non-writable .t and .m
+
+Change 2639 on 2003/01/10 by nick@dromedary
+
+	Remove dependance on -lgsl via Math::GSL (or Math::Gsl)
+	 - add all-perl solve_polynomial()
+
+Change 2638 on 2003/01/10 by nick@dromedary
+
+	Flatten out into one routine.
+
+Change 2636 on 2003/01/08 by nick@nickwork
+
+	Some tidy up on RedHat 7.1
+
+Change 2634 on 2003/01/07 by nick@dromedary
+
+	Tinker with *= etc.
+
+Change 2633 on 2003/01/07 by nick@bactrian
+
+	Perl version of netlib root finder
+
+Change 2631 on 2003/01/05 by nick@dromedary
+
+	Add some docs and tidy for release 
+	(Released to CPAN as Audio-1.000)
+
+Change 2628 on 2003/01/05 by nick@dromedary
+
+	Perl bindings for librsynth.a
+
+Change 2599 on 2002/12/31 by nick@dromedary
+
+	Measure f0 in voice window, spectogram tracks window width.
+
+Change 2592 on 2002/12/28 by nick@dromedary
+
+	Display roots as poles and as freq/bw
+
+Change 2583 on 2002/12/27 by nick@dromedary
+
+	Finaly sort the maths out for roots of LPC derived H(z)
+
+Change 2582 on 2002/12/27 by nick@dromedary
+
+	Load/Save 
+
+Change 2578 on 2002/12/23 by nick@dromedary
+
+	Add display of inverse-filtered source as view of 
+	voicing source
+
+Change 2577 on 2002/12/23 by nick@dromedary
+
+	Print binding
+	Calculate yscale in more cases
+
+Change 2572 on 2002/12/23 by nick@dromedary
+
+	More robust Linux audio initialization
+
+Change 2571 on 2002/12/22 by nick@dromedary
+
+	Report duration on play
+	 - generate dial tones from table (as an exercise)
+	 - Save checks SvOK of comment
+
+Change 2568 on 2002/12/22 by nick@dromedary
+
+	Compute impluse response and roots of LPC polynomial
+
+Change 2565 on 2002/12/20 by nick@dromedary
+
+	Saving was just broken on LE machines.
+
+Change 2562 on 2002/12/19 by nick@dromedary
+
+	Typos, install Tk bits, prep for root finder, force start 
+	       of spectrum in case of zoom accidents.
+
+Change 2561 on 2002/12/19 by nick@dromedary
+
+	Generalize to handle freq display better
+
+Change 2560 on 2002/12/19 by nick@dromedary
+
+	Use Festival-derived LPC rather than Durbin of suspect origin
+	GUI control of poles and FFT order and on/off of FFT/LPC plots
+
+Change 2559 on 2002/12/18 by nick@dromedary
+
+	Track spectrum on Button-2 drag
+
+Change 2558 on 2002/12/18 by nick@dromedary
+
+	Fast C level bounds determination
+
+Change 2557 on 2002/12/18 by nick@dromedary
+
+	Spectrum (inc. LPC) 
+
+Change 2556 on 2002/12/18 by nick@dromedary
+
+	Add spectogram (as background to scope!)
+
+Change 2555 on 2002/12/18 by nick@dromedary
+
+	Try open a few times to better co-exist with other drivers.
+
+Change 2554 on 2002/12/18 by nick@dromedary
+
+	Play of subranges
+
+Change 2553 on 2002/12/17 by nick@dromedary
+
+	Overview and range callbacks
+
+Change 2552 on 2002/12/17 by nick@dromedary
+
+	Basic scope
+
+Change 2551 on 2002/12/17 by nick@dromedary
+
+	Quick fix for multi-channel files (average them)
+
+Change 2536 on 2002/11/24 by nick@dromedary
+
+	end-of-weekend checkin
+
+Change 2534 on 2002/11/23 by nick@dromedary
+
+	Remove debug prints
+
+Change 2533 on 2002/11/23 by nick@dromedary
+
+	Fix various things used for LPC analysis
+	Cleanup XS code.
+
+Change 2532 on 2002/11/20 by nick@dromedary
+
+	Various hackery trying to get LPC spectrum right
+
+Change 2531 on 2002/11/19 by nick@dromedary
+
+	Try some 3d plotting
+
+Change 2529 on 2002/11/19 by nick@dromedary
+
+	Add things for computing LPC spectrum
+
+Change 2520 on 2002/11/09 by nick@dromedary
+
+	Updates for PerlIO 
+
+Change 2298 on 2001/10/29 by nick@bactrian
+
+	Make relative path to config file explicit
+
+Change 2243 on 2001/07/17 by nick@bactrian
+
+	Split package statement:
+	package
+		Audio::Play::#OSNAME#;
+	To avoid CPAN indexing the file.
+
+Change 2203 on 2001/04/18 by nick@pluto
+
+	Model voicing sources in rsynth.
+
+Change 2196 on 2001/04/16 by nick@dromedary
+
+	Spectogram support
+
+Change 2192 on 2001/04/16 by nick@dromedary
+
+	dB method had domain problems with zero & -ve values
+
+Change 2189 on 2001/04/14 by nick@dromedary
+
+	Filter efficency and use new features in tkanal.
+
+Change 2188 on 2001/04/14 by nick@dromedary
+
+	+ - * / . overloads working in simple cases
+
+Change 2187 on 2001/04/14 by nick@dromedary
+
+	Overload for '.' on audio data
+
+Change 2186 on 2001/04/13 by nick@dromedary
+
+	More features for analysing rsynth element tables.
+
+Change 2185 on 2001/04/13 by nick@dromedary
+
+	Update MANIFST
+
+Change 2184 on 2001/04/13 by nick@dromedary
+
+	Add FIR and AllPole filters.
+
+Change 2183 on 2001/04/12 by nick@dromedary
+
+	Update MANIFEST
+
+Change 2182 on 2001/04/12 by nick@dromedary
+
+	New Linux audio driver
+
+Change 2181 on 2001/04/12 by nick@pluto
+
+	Resonators.
+
+Change 2180 on 2001/04/12 by nick@pluto
+
+	Basic plotting via Tk and GD::Graph
+
+Change 2179 on 2001/04/12 by nick@pluto
+
+	Add FFT routines.
+
+Change 2178 on 2001/04/11 by nick@dromedary
+
+	Start of digital signal processing support
+
+Change 1739 on 2000/03/11 by nick@bactrian
+
+	Cleanup MANIFEST.SKIP for linux
+
+Change 1738 on 2000/03/11 by nick@bactrian
+
+	Backward compatibility fixes to 5.00404
+
+Change 1737 on 2000/03/10 by nick@bactrian
+
+	Add dTHX
+
+Change 1479 on 1999/09/26 by nick@bactrian
+
+	Remove debug
+
+Change 1477 on 1999/09/25 by nick@bactrian
+
+	Use /dev/dspW (16 bit) and /dev/audio (uLaw) before using
+	/dev/dsp - to keep as much dynamic range as possible.
+
+Change 1118 on 1998/10/18 by nick@ni-s
+
+	VERSION update
+
+Change 1114 on 1998/10/16 by nick@ni-s
+
+	Slaven Rezic's Linux FreeBSD patches
+
+Change 1092 on 1998/09/13 by nick@ni-s
+
+	Prepare for 0.004
+
+Change 1091 on 1998/09/13 by nick@gobstopper
+
+	Builds and tests on Win32
+
+Change 1090 on 1998/09/13 by nick@gobstopper
+
+	Update MANIFEST 
+
+Change 1089 on 1998/09/13 by nick@gobstopper
+
+	Compiles under Win32
+
+Change 1088 on 1998/09/13 by nick@ni-s
+
+	Tidy up C code
+
+Change 1086 on 1998/09/13 by nick@gobstopper
+
+	Nearly-there Win32 port
+
+Change 979 on 1998/07/15 by nick@ni-s
+
+	SGI/Irix Makefile.PL driver selection fix.
+
+Change 202 on 1997/04/18 by nick@ni-s
+
+	Import ../Audio.save
+

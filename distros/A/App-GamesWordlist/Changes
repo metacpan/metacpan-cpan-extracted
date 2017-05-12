@@ -1,0 +1,112 @@
+Revision history for App-GamesWordlist
+
+0.16    2016-02-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- Adjust to App::lcpan::Call 0.07.
+
+
+0.15    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+
+0.14    2016-01-07 (PERLANCAR)
+
+	- No functional changes.
+
+	- No need to show examples' result (which are large).
+
+
+0.13    2016-01-07 (PERLANCAR)
+
+        - Rename module/script from App::wordlist/wordlist to
+          App::GamesWordlist/games-wordlist. This is to make way for the new
+          App::wordlist which will be based on WordList::*.
+
+
+0.12    2016-01-04 (PERLANCAR)
+
+	- Implement -L (list_cpan action).
+
+
+0.11    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.10    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.09    2014-12-18 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with newer DZP::GenShellCompletion (0.07) (fixes).
+
+
+0.08    2014-12-18 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with newer DZP::GenShellCompletion (0.06) that skips
+          running shcompgen on non-POSIX systems.
+
+
+0.07    2014-12-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Let's try again adding Complete::Util as prereq on
+	  Windows.
+
+
+0.06    2014-12-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dzil] Make Complete::Util prereq for unix only for now,
+	  Complete::Util doesn't pass test on Windows, ref:
+	  http://blog.nu42.com/2014/12/when-bits-dont-stick.html.
+
+
+0.05    2014-12-16 (PERLANCAR)
+
+	- [Incompatible change] Rename --{min,max}len to --{min,max}-len to
+	  be consistent with my other namings.
+
+
+0.04    2014-12-11 (PERLANCAR)
+
+	- Add options: --len, --minlen, --maxlen.
+
+	- [ux] Don't show border for list action without detail.
+
+
+0.03    2014-12-05 (PERLANCAR)
+
+	- [ux] Don't show border when grepping, but still show border as
+	  usual when listing modules.
+
+
+0.02    2014-12-04 (PERLANCAR)
+
+        - No functional changes.
+
+        - Re-upload.
+
+
+0.01    2014-12-04 (PERLANCAR)
+
+        - First release.

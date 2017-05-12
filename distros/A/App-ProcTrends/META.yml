@@ -1,0 +1,40 @@
+---
+abstract: 'The great new App::ProcTrends::Cron!'
+author:
+  - 'Satoshi Yagi <satoshi.yagi@yahoo.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-ProcTrends
+provides:
+  App::ProcTrends::Commandline:
+    file: lib/App/ProcTrends/Commandline.pm
+    version: 0.03
+  App::ProcTrends::Config:
+    file: lib/App/ProcTrends/Config.pm
+    version: 0.03
+  App::ProcTrends::Cron:
+    file: lib/App/ProcTrends/Cron.pm
+    version: 0.03
+  App::ProcTrends::RRD:
+    file: lib/App/ProcTrends/RRD.pm
+    version: 0.03
+requires:
+  CGI: 0
+  File::Slurp: 0
+  Log::Log4perl: 0
+  Mojolicious::Lite: 0
+  RRD::Simple: 0
+  RRDTool::OO: 0
+  RRDs: 0
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

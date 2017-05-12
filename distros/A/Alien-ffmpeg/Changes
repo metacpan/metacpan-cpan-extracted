@@ -1,0 +1,116 @@
+==================================================
+Changes from 1740-12-08 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.103 at 2014-09-22 22:33:18 +0000
+------------------------------------------
+
+  Change: 6ca672821b40547b288b3967dc7866cd125affdc
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-09-22 20:18:18 +0000
+
+    Added travis, added cpanfile for new structure, updated load file 
+
+  Change: 93e47e2a42975712658bf5e00d181e7fc1870874
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2014-09-22 20:13:16 +0000
+
+    Merge pull request #1 from plicease/alien_0.005
+
+    make this work with Alien::Base 0.005 
+
+  Change: b09b3e1e6ebbb9ff6133794cda25584ee0a35c46
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2014-09-10 13:01:17 +0000
+
+    make this work with Alien::Base 0.005 
+
+  Change: 0d7845722f7e0ad76ce8f2d187e7c988f186b013
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-03-02 21:20:14 +0000
+
+    Switched to author bundle alien handling 
+
+  Change: 1f88621f465ddaa280d9d92e4c1b14209716a9a4
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 23:34:36 +0000
+
+    Ok there is no trick to avoid the problem 
+
+  Change: eb63b098b72d9144ada6100925d0c71a27580288
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 22:10:25 +0000
+
+    One day... one day it will work 
+
+  Change: c47141d7d3e80c7d8f5d96208e4d7c7b0a6ed778
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 21:56:28 +0000
+
+    Dont ask... just dont ask... 
+
+  Change: 701c01483d62d96ad1c4421cb026201b2e40763f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 21:55:32 +0000
+
+    Ok, right, i use Build not make 
+
+  Change: 3a95d82229ae3153da9a7b3d37753362f2db821a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 21:54:36 +0000
+
+    Lets try it different 
+
+  Change: bd2b90fdc7c77aae963fa474703a7af4fb1b96ca
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 21:46:29 +0000
+
+    Hups, thats better 
+
+  Change: dfbfd39f9f33c06b2fdf86f48ee520f5dc90798a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 21:43:31 +0000
+
+    Lets see if the faster installation way works... 
+
+  Change: a5cbe7e544facbe7b4f8e6d4503defccbb91e461
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 03:27:53 +0000
+
+    Switched to Dist::Zilla 
+
+  Change: bdfbe989592cf70d9d660e2af835b648e5e7728e
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 00:15:46 +0000
+
+    Yeah whatever, released 0.001 with that... tagging... damn i miss
+    dzil... 
+
+  Change: 9786d6a5ded99ec6a66eaa198d8e935a0a80baaa
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 00:14:53 +0000
+
+    Better version concept 
+
+  Change: e09342bc912c7c316d565f70b9184a4f731c7b35
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-25 23:35:28 +0000
+
+    Cause bitches love tests 
+
+  Change: 2c24f7ad5ea8e1a0a597019a95c447ed246ef62c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-25 23:34:01 +0000
+
+    Ok, thats all ;) 
+
+  Change: ed6854245340aa3f4e045653b66669c2035cffd9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-25 22:19:26 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

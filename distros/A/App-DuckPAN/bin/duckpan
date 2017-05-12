@@ -1,0 +1,252 @@
+#!/usr/bin/env perl
+# PODNAME: duckpan
+# ABSTRACT: Command line tool for using the DuckPAN of DuckDuckGo
+
+use strict; use warnings;
+
+my @libs;
+
+BEGIN {
+	use Getopt::Long qw/:config bundling pass_through/;
+	use Path::Tiny;
+	use Try::Tiny;
+	GetOptions 'include|I=s' => \@libs;
+	@libs = split ',', join ',', @libs;
+	if (my @missing = grep { !$_->exists } map { path($_) } @libs) {
+		my $plural = (scalar @missing == 1) ? '' : 's';
+		print STDERR '[FATAL ERROR] Missing include path' . $plural . ': ' . join(', ',
+			map { try { $_->realpath } || $_->absolute } @missing) . "\n";
+		exit 1;
+	}
+
+	# For other commands, bundling is desirable but pass_through leads to
+	# incomplete validation of command line arguments
+	Getopt::Long::Configure('no_pass_through');
+}
+use lib @libs;
+
+$|=1;
+
+use App::DuckPAN;
+App::DuckPAN->new_with_cmd;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+duckpan - Command line tool for using the DuckPAN of DuckDuckGo
+
+=head1 VERSION
+
+version 1018
+
+=head1 SYNOPSIS
+
+duckpan [-I=<path>] [-v|--verbose] <command> [<args>]
+
+Commands include:
+
+	check           Check if you fulfill all requirements for the development environment
+	env             Add, remove or retrieve values from DuckPAN's Env.ini
+	help            View more detailed help information
+	installdeps     Install all Perl dependencies
+	new             Generate new Instant Answer skeleton
+	publisher       Start local web server for DuckDuckGo-Publisher static websites
+	query           Test Instant Answer triggers on command line
+	reinstall       Reinstalls installed, pinned, or most recent DuckPAN and DDG Perl modules
+	latest          Like reintall but ignores installed versions
+	roadrunner      Same as installdeps, but skips tests (dangerous!)
+	server          Start local web server to test Instant Answer display
+	update          Installs newest DuckPAN packages
+	upgrade         Installs newest DuckPAN and DDG packages
+
+Use 'duckpan help' or 'man duckpan' for more details.
+
+=head1 DESCRIPTION
+
+DuckPAN is an application built to aid DuckDuckHack contributors with Instant Answer development. It is mainly used by contributors to test Instant Answer triggers and preview their visual design and output.
+
+=head1 NAME
+
+DuckPAN - The DuckDuckHack Developer Tool
+
+=head1 INSTALLATION
+
+Please see L<https://github.com/duckduckgo/p5-app-duckpan#installing-duckpan> for DuckPAN installation instructions
+
+=head1 COMMANDS
+
+=head2 Help
+
+=over 4
+
+=item C<duckpan> OR C<duckpan help> OR C<man duckpan>
+
+Shows you the DuckPAN help page which briefly describes DuckPAN and its features.
+
+=back
+
+=head2 FOR INSTANT ANSWER DEVELOPERS
+
+=over 4
+
+=item C<duckpan check>
+
+Checks if you fulfill all requirements for the development environment. This will run automatically during a B<duckpan release>.
+
+=item C<duckpan query> [package_name ...]
+
+Test Goodie and Spice triggers interactively on the command line. For each query, the Instant Answers triggered will be displayed. This tool should be used to ensure your Instant Answer triggers correctly.
+
+[package_name ...]:
+Loads only the specified Spice or Goodie Instant Answers.
+
+Examples:
+duckpan query Npm
+duckpan query Twitter IsItUp
+
+=item C<duckpan server> [--port <number>] [package_name ...]
+
+Starts a local web server, which emulates the DuckDuckGo production environment. Allows for live testing of Goodie and Spice Instant Answers. This tool should be used to ensure your Instant Answer displays correctly. For Spice Instant Answers, this is especially important to verify API calls are successful and no JavaScript errors exist.
+
+-p, --port <number>:
+Forces DuckPAN server to run on the specified port (default port is 5000)
+
+[package_name ...]:
+Loads only the specified Spice or Goodie Instant Answers.
+
+Examples:
+duckpan server Movie
+duckpan server IDN Sort Morse
+
+=item C<duckpan new> [package name]
+
+Generates all necessary files for a new Spice or Goodie Instant Answer (depending on the current repo). DuckPAN will prompt you for a package name and generate the required files. If the name is already in use, DuckPAN will let you know and no files will be created.
+
+=item C<duckpan test>
+
+Tests your release, by running the tests in the B<t/> directory using Dzil (if a dist.ini exists) or prove. This will run automatically during a B<duckpan release>.
+
+=item C<duckpan installdeps>
+
+Attempt to install dependencies for the distribution in your current directory using cpanm.
+
+=item C<duckpan roadrunner>
+
+Same as installdeps, but without testing them. Meep meep!
+
+=item C<duckpan publisher>
+
+Starts a local web server which displays static websites created with L<DuckDuckGo-Publisher|https://github.com/duckduckgo/duckduckgo-publisher>.
+
+=item C<duckpan update>
+
+Update DuckPAN to the latest version.
+
+=item C<duckpan upgrade>
+
+Upgrade DuckPAN and DDG to the latest versions.
+
+=back
+
+=head2 FOR DUCKPAN DEVELOPERS
+
+=over 4
+
+=item C<duckpan reinstall>
+
+Force installation of DuckPAN and DDG modules using the installed, pinned, or latest versions, in that order.
+
+=item C<duckpan latest>
+
+Like L<reinstall> except it ignores any installed version.
+
+=item C<duckpan -I [filepath ...]>
+
+Loads the specified external library. This should be used to test changes made to L<App::DuckPAN> and L<DDG>. Example: loading modified DuckPAN modules C<duckpan -I../p5-app-duckpan/lib server>.
+
+=back
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item C<duckpan env>
+
+View env commands and shows command usage.
+
+=item C<duckpan env help>
+
+View env commands and shows command usage.
+
+=item C<duckpan env set> <name> <value>
+
+Add an environment variable that DuckPAN will remember. This is specifically useful for Spice API keys. Variables are stored in ~/.duckpan/config/env.ini
+
+=item C<duckpan env get> <name>
+
+Retrieve the matching key for a given env variable.
+
+=item C<duckpan env rm> <name>
+
+Remove an environment variable from DuckPAN.
+
+=item C<duckpan env list>
+
+Lists all the env variables currently stored in ~/.duckpan/config/env.ini.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<https://github.com/duckduckgo/p5-app-duckpan>
+
+=item L<https://github.com/duckduckgo>
+
+=item L<https://duckduckgo.com>
+
+=item L<https://duck.co>
+
+=item L<http://duckpan.org>
+
+=back
+
+=head1 CONTRIBUTION
+
+To contribute to DuckPAN, please visit L<https://github.com/duckduckgo/p5-app-duckpan>. We also welcome and encourage contributions from our community. Please visit L<http://duckduckhack.com/> to contribute new Instant Answers, or visit L<https://duck.co/ideas> to share your ideas and Instant Answer source suggestions.
+
+=head1 SUPPORT
+
+=over 4
+
+=item B<Slack>
+
+We invite you to join us on L<Slack|https://quackslack.herokuapp.com/> for any queries and lively discussion.
+
+=item B<Repository>
+
+L<https://github.com/duckduckgo/p5-app-duckpan>
+
+=item B<Issue Tracker>
+
+L<https://github.com/duckduckgo/p5-app-duckpan/issues>
+
+=back
+
+=head1 AUTHOR
+
+DuckDuckGo <open@duckduckgo.com>, Zach Thompson <zach@duckduckgo.com>, Zaahir Moolla <moollaza@duckduckgo.com>, Torsten Raudssus <torsten@raudss.us> L<https://raudss.us/>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by DuckDuckGo, Inc. L<https://duckduckgo.com/>.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

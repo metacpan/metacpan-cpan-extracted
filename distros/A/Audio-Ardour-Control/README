@@ -1,0 +1,32 @@
+Audio::Ardour::Control version 0.2
+==================================
+
+Audio::Ardour::Control provides a facility to control the Ardour DAW
+using the Open Sound Control protocol.
+
+Please see the documentation in the module for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::LibLO
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Jonathan Stowe
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

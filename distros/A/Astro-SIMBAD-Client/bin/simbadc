@@ -1,0 +1,429 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use Astro::SIMBAD::Client;
+use Data::Dumper;
+use Term::ReadLine;
+use Text::ParseWords;
+
+local $Data::Dumper::Terse = 1;
+local $Data::Dumper::Sortkeys = 1;
+
+my $VERSION = '0.018';
+
+my $class = 'Astro::SIMBAD::Client';
+my $simbad = $class->new ();
+my $object;
+
+my $rl;
+-t STDIN
+    and $rl = Term::ReadLine->new ('Fetch data from SIMBAD 4');
+my $fh = *STDIN;
+
+print <<eod if $rl;
+
+simbadc version $VERSION
+based on $class version @{[$class->VERSION]}
+
+Query the SIMBAD 4 database.
+
+For copyright and terms of use, see the 'help' command. If this does
+not work on your installation, read the POD.
+
+eod
+
+#	Main program loop
+
+while (defined (my $buffer = _readline ())) {
+
+    # Conway's objection to this is relevant to autoflushing. Perl::
+    # critic extends this, but offers no alternative when changing
+    # stdout.
+    select STDOUT;	## no critic (ProhibitOneArgSelect)
+
+    chomp $buffer;
+    $buffer =~ s/^\s+//;
+    $buffer =~ s/\s+$//;
+
+    next unless $buffer;
+    next if $buffer =~ m/^#/;
+
+    my @args = eval {map {m/^<</ ? _heredoc ($_) :
+	m/^<(.*)/ ? do {
+	    open (my $fh, '<', $1) or die "Failed to open $1: $!\n";
+	    local $/ = undef;
+	    scalar <$fh>;
+	    close $fh;
+	} :
+	m/^(>{1,2})(.+)/ ? do {
+	    # We intend to use this handle as standard out, so it needs
+	    # to hang around for a while.
+	    open (my $fh, $1, $2) or die <<eod;	## no critic (RequireBriefOpen)
+Error - Failed to open $2
+        $!
+eod
+	    # Conway's book discourages this for setting autoflush.
+	    # Perl::Critic extends this to all uses of the single
+	    # argument select. But I'm using it to designate the
+	    # handle for standard output, which Perl::Critic's docs
+	    # ignore.
+	    select $fh;	## no critic (ProhibitOneArgSelect)
+	    ()
+	} : $_ }
+	parse_line ('\s+', 0, $buffer)
+    };
+    $@ and do {warn $@; next};
+    my $verb = shift @args;
+    if ($verb eq 'static') {
+	$object = $class;
+	next unless @args;
+	$verb = shift @args;
+    } else {
+	$object = $simbad;
+    }
+
+    my $rslt = eval {
+	if ($verb =~ m/\W/ || $verb =~ m/^_/) {
+	    die "Error - Syntactically invalid verb '$verb'\n";
+	} elsif (my $code = __PACKAGE__->can ('_cmd_' . $verb)) {
+	    $code->(@args);
+	} elsif ($simbad->can ($verb)) {
+	    $object->$verb (@args);
+	} else {
+	    die "Error - Unrecognized verb '$verb'\n";
+	}
+    };
+    if ($@) {
+	warn $@
+    } elsif (defined $rslt &&
+	    !eval {$rslt->isa('Astro::SIMBAD::Client')}) {
+	print ref $rslt ? Dumper ($rslt) : "$rslt\n";
+    }
+}
+
+=head1 NAME
+
+simbadc - Access the SIMBAD 4 astronomical database.
+
+=head1 SYNOPSIS
+
+ $ simbadc
+ simbadc> # Queries should default to returning text data.
+ simbadc> set type txt
+ simbadc> # Get the standard data on Arcturus, capturing
+ simbadc> # the output in arcturus.data
+ simbadc> queryObjectById Arcturus >arcturus.data
+ simbadc> # Queries should default to returning VO data.
+ simbadc> set type vo
+ simbadc> # Do a url query, capturing its results.
+ simbadc> url_query id Ident 3c273 >3c273.data
+ simbadc> # Execute a script file, capturing its results.
+ simbadc> script_file m31.simbad4 >m31.data
+ simbadc> # We are done.
+ simbadc> exit
+
+The intent here is to be able to collect data from the SIMBAD database
+on an ad-hoc basis. Most commands map directly to
+L<Astro::SIMBAD::Client> methods.
+
+=head1 DETAILS
+
+This script uses L<Term::ReadLine> for user interaction, though it can
+also be used as a traditional Unix filter. Command parsing is fairly
+simple. L<Text::ParseWords> is used to split the line into tokens, with
+the first token being the command/method name.
+
+If a token begins with '>' or '>>', the rest of the token represents
+the name of a file to which the output of that command is redirected.
+The '>' overwrites an existing file, while '>>' appends to it. There
+can be no space between the '>' or '>>' and the file name.
+
+A token beginning with '<<' introduces a 'here document', which appears
+on subsequent lines of input. The rest of the token represents the text
+which marks the end of the 'here document'. If the script is being run
+interactively, the end text will also be used as the prompt. For
+example:
+
+ simbadc> set format <<eod
+ eod>txt=---\n
+ eod>name: %idlist(NAME|1)\n
+ eod>ra: %coord(d;A)\n
+ eod>dec: %coord(d;D)\n
+ eod>eod
+ simbadc>
+
+specifies a format to be used for a 'txt' mode query. Note that
+
+ simbadc> set format txt=<<eod
+
+is B<not> equivalent; the '<<eod' must be a token all by itself.
+
+If a token begins with '<', the rest of the token is taken as a file
+name, and the contents of the file are substituted for the token. Note
+that this does B<not> give a mechanism for feeding commands from a file,
+since the contents of the input file are not parsed. It does, however,
+give a less painful way to test tweaks of complex formats.
+
+The following commands are implemented by this script, in addition to
+(or in lieu of) the commands documented in L<Astro::SIMBAD::Client>:
+
+=over
+
+=item default (attribute_name ...)
+
+This command resets the values of the named attributes to their static
+values.
+
+=cut
+
+# Called by reference obtained by __PACKAGE__->can( '_cmd_' . $verb )
+sub _cmd_default {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my @args = @_;
+    @args or @args = $simbad->attributes();
+    foreach my $name (@args) {
+	my $val = $class->get ($name);
+	$val->{clear} = 1 if ref $val eq 'HASH';
+	$simbad->set ($name, $val);
+    }
+    return $simbad;
+}
+
+# Called by reference obtained by __PACKAGE__->can( '_cmd_' . $verb )
+###sub _cmd_dump {	## no critic (ProhibitUnusedPrivateSubroutines)
+###    Dumper ($simbad);
+###}
+
+=item exit
+
+This command terminates the script. It is simply a wrapper for
+CORE::exit. End-of-file also works.
+
+=cut
+
+# Called by reference obtained by __PACKAGE__->can( '_cmd_' . $verb )
+sub _cmd_exit {	## no critic (ProhibitUnusedPrivateSubroutines)
+    CORE::exit;
+    return;	# Should never get here.
+}
+
+=item help
+
+This command displays the documentation for this script. If you use
+
+ simbadc> help client
+
+You get L<Astro::SIMBAD::Client>.
+
+=cut
+
+{	# Begin local symbol block.
+
+    my $problem;
+
+    BEGIN {
+	if ($^O eq 'MacOS') {
+	    $problem = <<eod
+The help command is not available under MacPerl (Mac OS 9 and below)
+because of the way Perl executable scripts are constructed.
+eod
+	} else {
+	    eval {
+		require Pod::Usage;
+		Pod::Usage->import();
+		1;
+	    } or $problem = <<eod;
+The help command is not available because Pod::Usage could not be
+loaded.
+eod
+	}
+    }
+
+    my $client_file;
+
+    # Called by reference obtained by __PACKAGE__->can( '_cmd_' . $verb )
+    sub _cmd_help {	## no critic (ProhibitUnusedPrivateSubroutines)
+	my ($what) = @_;
+	if ($problem) {
+	    print $problem
+	} else {
+	    my @args = (-verbose => 2, -exitval => 'NOEXIT');
+	    if (defined $what && $what eq 'client') {
+		push @args, -input => ($client_file ||=
+		    do {(my $x = 'Astro::SIMBAD::Client') =~ s|::|/|g;
+			$x .= '.pm';
+			$INC{$x};
+		    });
+	    }
+	    Pod::Usage::pod2usage (@args);
+	}
+
+	return;
+    }
+
+}	# End of local symbol block.
+
+=begin comment
+
+#	The following routines were useful in development:
+
+#	'loaded' lists the modules that have been loaded.
+
+sub loaded {
+    foreach (sort keys %INC) {
+	print "$_ => $INC{$_}\n";
+    }
+}
+
+#	'parse' submits a file to Parse_VO_Table, displaying the
+#	results.
+
+sub parse {
+    my $fn = shift;
+    -e $fn or die "Error - File $fn does not exist.\n";
+    open (my $fh, '<', $fn) or die <<eod;
+Error - Failed to open $fn
+        $!
+eod
+    local $/ = undef;
+    my $data = <$fh>;
+    [Astro::SIMBAD::Client::Parse_VO_Table ($data)];
+}
+
+=end comment
+
+=cut
+
+
+=item show (attribute ...)
+
+This command is a slightly more command-friendly wrapper for the
+get() method. If given no arguments, all are displayed. The output
+is formatted as 'set' commands.
+
+=cut
+
+# Called by reference obtained by __PACKAGE__->can( '_cmd_' . $verb )
+sub _cmd_show {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my @args = @_;
+    @args or @args = $object->attributes();
+    my @verb = ('set');
+    unshift @verb, 'static' unless ref $object;
+    my @rslt;
+    foreach my $name (@args) {
+	my $val = $object->get ($name);
+	if (ref $val eq 'HASH') {
+	    foreach my $key (sort keys %$val) {
+		push @rslt, _quote (@verb, $name,
+		    defined $val->{$key} ? "$key=$val->{$key}" : "$key=");
+	    }
+	} else {
+	    push @rslt, _quote (@verb, $name, defined $val ? $val : ());
+	}
+    }
+    my $rslt = join '', @rslt;
+    chomp $rslt;
+    return $rslt;
+}
+
+=item static
+
+This is not really a command, but when prefixed to a method name causes
+that method to be called as a static method. For example,
+
+ simbadc> static set type vo
+
+Causes the default query type to be 'vo'.
+
+=cut
+
+########################################################################
+#
+#	Utility subroutines
+#
+
+#	$doc = _heredoc ($label)
+#
+#	This subroutine reads input until it hits the given label, and
+#	returns the input. If input is interactive, the $label is also
+#	used as the prompt.
+
+sub _heredoc {
+    my $lbl = shift;
+    $lbl =~ s/^<+//;
+    my @inf;
+    while (defined (my $buffer = _readline ($lbl))) {
+	chomp $buffer;
+	last if $buffer eq $lbl;
+	push @inf, $buffer . "\n";
+    }
+    return join '', @inf;
+}
+
+#	$output = _quote (@input)
+#
+#	This subroutine applies token quoting rules to the input, and
+#	concatenates the result into a string. The rules are that any
+#	token containing a newline becomes a here document, and any
+#	token containing space or quote becomes quoted, with the quote
+#	escaped. Anything else is left alone.
+
+sub _quote {
+    my @args = @_;
+    my @rslt;
+    my @append;
+    foreach (@args) {
+	if (m/\n/m) {
+	    chomp;
+	    push @append, "$_\neod\n";
+	    $_ = '<<eod';
+	} elsif (m/['\s]/m) {
+	    s/'/\\'/g;
+	    $_ = "'" . $_ . "'";
+	}
+	push @rslt, $_;
+    }
+    return "@rslt\n@append";
+}
+
+#	$input = _readline ($prompt)
+
+#	This subroutine Does the Right Thing depending on whether input
+#	is from the keyboard. The $prompt defaults to 'Simbadc', and
+#	'> ' is appended to the prompt before use.
+
+sub _readline {
+    my $prompt = (shift || 'Simbadc') . '> ';
+    return $rl ? $rl->readline ($prompt) : <$fh>
+}
+
+__END__
+
+=back
+
+Any command not named above is assumed to be an Astro::SIMBAD::Client
+method, and called. Whatever the method returns is displayed,
+unless the return is an Astro::SIMBAD::Client object.
+
+See L<Astro::SIMBAD::Client> for the details.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III (F<wyant at cpan dot org>)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2016 Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

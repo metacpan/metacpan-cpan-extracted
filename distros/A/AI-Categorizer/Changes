@@ -1,0 +1,190 @@
+Revision history for Perl extension AI::Categorizer.
+
+ - The t/01-naive_bayes.t test was failing (instead of skipping) when
+   Algorithm::NaiveBayes wasn't installed.  Now it skips.
+
+0.08 - Tue Mar 20 19:39:41 2007
+
+ - Added a ChiSquared feature selection class. [Francois Paradis]
+
+ - Changed the web locations of the reuters-21578 corpus that
+   eg/demo.pl uses, since the location it referenced previously has
+   gone away.
+
+ - The building & installing process now uses Module::Build rather
+   than ExtUtils::MakeMaker.
+
+ - When the features_kept mechanism was used to explicitly state the
+   features to use, and the scan_first parameter was left as its
+   default value, the features_kept mechanism would silently fail to
+   do anything.  This has now been fixed. [Spotted by Arnaud Gaudinat]
+
+ - Recent versions of Weka have changed the name of the SVM class, so
+   I've updated it in our test (t/03-weka.t) of the Weka wrapper
+   too. [Sebastien Aperghis-Tramoni]
+
+0.07  Tue May  6 16:15:04 CDT 2003
+
+ - Oops - eg/demo.pl and t/15-knowledge_set.t didn't make it into the
+   MANIFEST, so they weren't included in the 0.06 distribution.
+   [Spotted by Zoltan Barta]
+
+0.06 Tue Apr 22 10:27:26 CDT 2003
+
+ - Added a relatively simple example script at the request of several
+   people, at eg/demo.pl
+
+ - Forgot to note a dependency on Algorithm::NaiveBayes in version
+   0.05.  Fixed.
+
+ - AI::Categorizer class wasn't loading AI::Categorizer::KnowledgeSet
+   class.  Fixed.
+
+ - Fixed a bug in which the 'documents' and 'categories' parameters to
+   the KnowledgeSet objects were never accepted, claiming that it
+   failed the "All are Document objects" or "All are Category objects"
+   callbacks. [Spotted by rob@phraud.org]
+
+ - Moved the 'stopword_file' parameter from Categorizer.pm to the
+   Collection class.
+
+0.05  Sat Mar 29 00:38:21 CST 2003
+
+ - Feature selection is now handled by an abstract FeatureSelector
+   framework class.  Currently the only concrete subclass implemented
+   is FeatureSelector::DocFrequency.  The 'feature_selection'
+   parameter has been replaced with a 'feature_selector_class'
+   parameter.
+
+ - Added a k-Nearest-Neighbor machine learner. [First revision
+   implemented by David Bell]
+
+ - Added a Rocchio machine learner. [Partially implemented by Xiaobo
+   Li]
+
+ - Added a "Guesser" machine learner which simply uses overall class
+   probabilities to make categorization decisions.  Sometimes useful
+   for providing a set of baseline scores against which to evaluate
+   other machine learners.
+
+ - The NaiveBayes learner is now a wrapper around my new
+   Algorithm::NaiveBayes module, which is just the old NaiveBayes code
+   from here, turned into its own standalone module.
+
+ - Much more extensive regression testing of the code.
+
+ - Added a Document subclass for XML documents. [Implemented by
+   Jae-Moon Lee] Its interface is still unstable, it may change in
+   later releases.
+
+ - Added a 'Build.PL' file for an alternate installation method using
+   Module::Build.
+
+ - Fixed a problem in the Hypothesis' best_category() method that
+   would often result in the wrong category being reported.  Added a
+   regression test to exercise the Hypothesis class.  [Spotted by
+   Xiaobo Li]
+
+ - The 'categorizer' script now records more useful benchmarking
+   information about time & memory in its outfile.
+
+ - The AI::Categorizer->dump_parameters() method now tries to avoid
+   showing you its entire list of stopwords.
+
+ - Document objects now use a default 'name' if none is supplied.
+
+ - For some Learner classes, the generated Hypothesis objects had
+   non-functioning all_categories() methods.  Fixed.
+
+ - The Collection::Files class now uses File::Spec internally to
+   manage cross-platform filenames.
+
+ - Added the 'stopword_behavior' parameter for controlling how
+   stopword lists and stemming interact.  Previously, if stopwords &
+   stemming were both used, stopwords were assumed to be pre-stemmed,
+   which often isn't the case.
+
+ - parse() is now an instance method of the Document class, not a
+   class method.  This means it can operate directly on an object, it
+   doesn't have to return a hash of content.  This allows more
+   flexible document parsing.  This may cause some backward
+   compatibility problems if people were overriding the parse()
+   method.
+
+ - Added a parse_handle() method, which can parse a document directly
+   from a filehandle.
+
+ - Fixed documentation for add_hypothesis() [spotted by Thierry
+   Guillotin]
+
+ - Added documentation for the AI::Categorizer::Collection::Files
+   class.
+
+0.04  Thu Nov  7 19:27:15 AEST 2002
+
+ - Added learners for SVMs, Decision Trees, and a pass-through to
+   Weka.
+
+ - Added a virtual class for binary classifiers.
+
+ - Wrote documentation for lots of the undocumented classes.
+
+ - Added a PNG file giving an overview diagram of the classes.
+
+ - Added a script 'categorizer' to provide a simple command-line
+   interface to AI::Categorizer
+
+ - save_state() and restore_state() now save to a directory, not a
+   file.
+
+ - Removed F1(), precision(), recall(), etc. from Util package since
+   they're in Statistics::Contingency.  Added random_elements() to
+   Util.
+
+ - Collection::Files now warns when no category information is known
+   about a document in the collection (knowing it's in zero categories
+   is okay).
+
+ - Added the Collection::InMemory class
+
+ - Much more thorough testing with 'make test'.
+
+ - Added add_hypothesis() method to Experiment.
+
+ - Added dot() and value() methods to FeatureVector.
+
+ - Added 'feature_selection' parameter to KnowledgeSet.
+
+ - Added document($name) accessor method to KnowledgeSet.
+
+ - In KnowledgeSet, load(), read(), and scan_*() can now accept a
+   Collection object.
+
+ - Added document_frequency(), finish(), and weigh_features() methods
+   to KnowledgeSet.
+
+ - Added save_features() and restore_features() to KnowledgeSet.
+
+ - Added default categories() and categorize() methods to Learner base
+   class.  get_scores() is now abstract.
+
+ - Extended interface of ObjectSet class with retrieve(), includes(),
+   and includes_name().
+
+ - Moved 'term_weighting' parameter from Document to KnowledgeSet,
+   since the normalized version needs to know the maximum
+   term-frequency.  Also changed its values to 'n', 'l', 'b', and 't',
+   with 'x' a synonym for 't'.
+
+ - Implemented full range of TF/IDF term weighting methods (see Salton
+   & Buckley, "Term Weighting Approaches in Automatic Text Retrieval",
+   in journal "Information Processing & Management", 1988 #5)
+
+0.03  Wed Jul 24 01:57:00 AEST 2002
+
+ - First version released to CPAN
+
+0.01  Wed Apr 17 10:47:21 2002
+ - original version; created by h2xs 1.21 with options
+   -XA -n AI::Categorizer
+

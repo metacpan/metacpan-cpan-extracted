@@ -1,0 +1,50 @@
+Revision history for App-used
+
+0.0.7   2016-03-20
+        Updating for release of version 0.0.7
+        Updated date (Ivan Wills)
+        Fixed typo (Ivan Wills)
+        Added logic to skip dot files (Ivan Wills)
+        Added config files (Ivan Wills)
+        Improved base module finding (Ivan Wills)
+        Added .cpanm to directories/files to ignore (Ivan Wills)
+
+0.0.6   2015-09-19
+        Updating for release of version 0.0.6
+        Added missing documentation of options (Ivan Wills)
+        Only warn the directory in verbose mode if the directory is read (Ivan Wills)
+        Fixed issue with dieing on broken symlinks (Ivan Wills)
+
+0.0.5   2015-09-12
+        Updating for release of version 0.0.5
+        Added debian directory to list of directories to be ignored (Ivan Wills)
+        Added showing the declared version (Ivan Wills)
+
+0.0.4   2015-08-18
+        Updating for release of version 0.0.4
+        Removed creation of makefile (Ivan Wills)
+
+0.0.3   2015-07-15
+        Updating for release of version 0.0.3
+        Improved documentation (Ivan Wills)
+        Started checking configure_requires as well (Ivan Wills)
+
+0.0.2   2015-07-13
+        Updating for release of version 0.0.2
+        Converted to Path::Tiny (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+        Added skipping tags file (Ivan Wills)
+
+0.0.1   2015-03-07
+        Removed unneeded tag (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Made it easier to get minimum versions of files cleaned up what is checked (Ivan Wills)
+        Added missing case of "base" module dependency (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+        Added stop words (Ivan Wills)
+        Fixed manifest files (Ivan Wills)
+        Updated dependencies (Ivan Wills)
+        Fixed boiler plate test (Ivan Wills)
+        Moved file to POD format (Ivan Wills)
+        Moved file from App-Useful (Ivan Wills)
+        Fixed manifest (Ivan Wills)

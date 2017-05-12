@@ -1,0 +1,83 @@
+{
+   "abstract" : "Speak like a Samurai",
+   "author" : [
+      "Naoki Tomita <tomita@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Samurai",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "File::ShareDir" : "0",
+            "Lingua::JA::Alphabet::Yomi" : "0",
+            "Lingua::JA::Numbers" : "0",
+            "Text::Mecabist" : "0.02",
+            "Unicode::Japanese" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Encode" : "0",
+            "Test::Base" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Samurai" : {
+         "file" : "lib/Acme/Samurai.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tomill/Acme-Samurai/issues"
+      },
+      "homepage" : "https://github.com/tomill/Acme-Samurai",
+      "repository" : {
+         "url" : "git://github.com/tomill/Acme-Samurai.git",
+         "web" : "https://github.com/tomill/Acme-Samurai"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "tomi-ru <tomi-ru@d0d07461-0603-4401-acd4-de1884942a52>"
+   ]
+}

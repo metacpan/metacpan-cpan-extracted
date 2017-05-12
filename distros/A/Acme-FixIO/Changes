@@ -1,0 +1,17 @@
+Revision history for Acme-FixIO
+
+0.02 - 2014-12-28T09:24:30+01:00
+
+  [DOCUMENTATION]
+
+  - Migrate to Dist::Zilla
+
+  [ENHANCEMENTS]
+
+  - Apply the functionality also to STDERR
+
+0.01 2014-08-30T22:06:12+01:00
+
+  [ENHANCEMENTS]
+
+  - first version released on an unsupecting population

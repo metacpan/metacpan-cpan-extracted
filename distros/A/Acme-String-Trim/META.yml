@@ -1,0 +1,25 @@
+---
+abstract: "Acme::String::Trim - Module to experiment with 'dist-zilla', github and cpan"
+author:
+  - 'Abhishek Shende <abhishekisnot@gmail.com>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-String-Trim
+requires:
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/abhishekisnot/Acme-String-Trim/issues
+  homepage: http://search.cpan.org/dist/Acme-String-Trim/
+  repository: git://github.com/abhishekisnot/Acme-String-Trim.git
+version: 0.003

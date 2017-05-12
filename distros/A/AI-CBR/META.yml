@@ -1,0 +1,27 @@
+---
+name: AI-CBR
+version: 0.02
+author:
+  - 'Darko Obradovic <dobradovic@gmx.de>'
+abstract: Framework for Case-Based Reasoning
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+provides:
+  AI::CBR:
+    file: lib/AI/CBR.pm
+    version: 0.02
+  AI::CBR::Case:
+    file: lib/AI/CBR/Case.pm
+  AI::CBR::Case::Compound:
+    file: lib/AI/CBR/Case/Compound.pm
+  AI::CBR::Retrieval:
+    file: lib/AI/CBR/Retrieval.pm
+  AI::CBR::Sim:
+    file: lib/AI/CBR/Sim.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

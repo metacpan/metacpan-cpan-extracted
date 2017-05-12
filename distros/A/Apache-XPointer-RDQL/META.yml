@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name: Apache-XPointer-RDQL
+version: 1.1
+author:
+  - Aaron Straup Cope E<lt>ascope@cpan.orgE<gt>
+abstract: ! >-
+  mod_perl handler for addressing XML fragments using the RDF Data Query
+  Language.
+license: perl
+requires:
+  Apache::XPointer: '>= 1.1'
+  RDFStore: '>= 0.50'
+build_requires:
+  Test::Simple: '>= 0.47'
+provides:
+  Apache::XPointer::RDQL:
+    file: lib/Apache/XPointer/RDQL.pm
+    version: 1.1
+  Apache::XPointer::RDQL::Parser:
+    file: lib/Apache/XPointer/RDQL/Parser.pm
+    version: 1.1
+  Apache::XPointer::RDQL::RDFStore:
+    file: lib/Apache/XPointer/RDQL/RDFStore.pm
+    version: 1.1
+generated_by: Module::Build version 0.25_02

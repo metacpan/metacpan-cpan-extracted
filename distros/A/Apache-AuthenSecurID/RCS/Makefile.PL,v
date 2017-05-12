@@ -1,0 +1,60 @@
+head	1.2;
+access;
+symbols;
+locks;
+comment	@# @;
+
+
+1.2
+date	2002.07.30.20.15.39;	author Administrator;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2001.06.22.19.08.42;	author root;	state Exp;
+branches;
+next	;
+
+
+desc
+@Created
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@# $Id: Makefile.PL,v 1.1 2001/06/22 19:08:42 root Exp $
+
+use ExtUtils::MakeMaker;
+
+sub MY::libscan {
+	my($self,$path) = @@_;
+	return '' if $path =~ /RCS/;
+	$path;
+}
+
+WriteMakefile(
+	'NAME'		=> 'Apache::AuthenSecurID',
+	'VERSION_FROM'	=> 'AuthenSecurID.pm', 
+	'PREREQ_PM'	=> { 	Authen::ACE => 0.90,
+				Crypt::CBC => 1.25,
+				Config::General => 1.20,
+				Crypt::Blowfish => 2.06 },
+	'dist'		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+);
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 1
+# $Id: Makefile.PL,v 1.1 2001/01/18 20:50:27 root Exp $
+d16 1
+@

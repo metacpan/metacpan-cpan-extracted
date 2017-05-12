@@ -1,0 +1,14 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+cpanfile
+cpanfile.snapshot
+dist.ini
+lib/AMQP.pm
+lib/AMQP/Publisher.pm
+lib/AMQP/Subscriber.pm
+t/publisher.t
+t/subscriber.t

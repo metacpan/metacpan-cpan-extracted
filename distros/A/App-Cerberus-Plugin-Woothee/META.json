@@ -1,0 +1,50 @@
+{
+   "abstract" : "Add user-agent information to App::Cerberus",
+   "author" : [
+      "Dominik Schulz <tex@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Cerberus-Plugin-Woothee",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cerberus::Plugin" : "0",
+            "Woothee" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gittex/App-Cerberus-Plugin-Woothee/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gittex/App-Cerberus-Plugin-Woothee.git",
+         "web" : "https://github.com/gittex/App-Cerberus-Plugin-Woothee"
+      }
+   },
+   "version" : "0.01"
+}
+

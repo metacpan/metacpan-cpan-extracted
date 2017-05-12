@@ -1,0 +1,19 @@
+[% META title = 'Certificates issued and not revoked' -%]
+
+<p>Here is a list of certificates wich are currently valid :</p>
+<table>
+<tr>
+	<th>Serial</th>
+	<th>Subject</th>
+	<th>Not Before</th>
+	<th>Not After</th>
+</tr>
+[% FOREACH cert IN certs -%]
+<tr>
+	<td><a href="/certificate/show_by_serial/[% cert.serial %]">[% cert.serial %]</a></td>
+	<td>[% cert.subject %]</td>
+	<td>[% cert.notBefore %]</td>
+	<td>[% cert.notAfter %]</td>
+</tr>
+[% END -%]
+</table>

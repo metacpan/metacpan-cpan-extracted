@@ -1,0 +1,558 @@
+Revision history for Perl extension Aspect
+
+1.04 Mon 8 Apr 2013
+	- fix failures on 5.17.6 (RT#81400)
+
+1.03 Fri 19 Oct 2012
+	- Updating to Module::Install 1.06
+	- Removed warnings except in the test suite to prevent log spamming
+
+1.02 Wed 1 Feb 2012
+	- Updating to Module::Install 1.04
+	- Adding B:: to the recursively excluded classes to avoid hooking
+
+1.01 Thu 9 Jun 2011
+	- Added experimental function interface for the join point context.
+	- Move the library tests into the numeric order
+
+1.00 Thu 26 May 2011
+	- First production release of the second-generation Aspect.pm!
+	- Support passing an explicit function list to import as per Exporter
+	- Final POD spelling tweaks
+
+0.983 Thu 26 May 2011
+	- Added a convenience wrapper over Sub::Install
+	- Rewrote the initial introduction by drawing language from Wikipedia.
+	- Moved all legacy code into a dedicated legacy module
+	- Split out tests for deprecated features into their own test scripts
+
+0.982 Wed 25 May 2011
+	- Refactored away the ->{proceed} flag on before join point objects.
+	- Unified return_value across all advice types, and optimised further.
+	- Completing the POD documentation for the Aspect::Point:: modules
+	- Folded down Aspect::Point::Before/After/Around into a single class
+
+0.981 Wed 25 May 2011
+	- Removed the proceed method from the begin advice, you now only signal
+	  to not continue with either exception or return_value.
+	- Remove some leftover references to after_throwing and after_returning
+	- Moved all advice code method documentation into Aspect::Point
+	- Added a reduced volume copy of the Aspect::Point method documentation
+	  to the main Aspect documentation.
+	- Ensure $_ is passed through intact during around advice using proceed
+	- Aspect::Library::Single no longer incorrectly checks for exceptions,
+	  as the around advice doesn't catch them during proceed (that will be
+	  fixed some time after 1.00)
+	- Expanded the testing of various edge cases
+	- Localise $_ in a more contained manner so that don't copy/backup $_
+	  for hooked around pointcuts that don't match the runtime part of the
+	  join point. Using a global for this instead of overloading $_ also
+	  makes pointcut marginally slightly faster.
+
+0.98 Tue 24 May 2011
+	- Production release, no change from 0.97_06
+	- Major refactoring, documentation and and 1.00 preparation release
+	- The API has now moved closed to the AspectJ API where sensible
+
+0.97_06 Tue 24 May 2011
+	- Generalised and moved Aspec::Pointcut::Highest::Clean to Aspect::Guard
+	- Removed dedicated Aspect::Advice::AfterReturning advice type
+	- Removed dedicated Aspect::Advice::AfterThrowing advice type
+	- Collapsing of nested and/or pointcuts is now done at constructor time
+	- Expanded testing for corner case pointcut currying scenarios
+	- Deprecated after_returning and after_throwing
+
+0.97_05 Mon 23 May 2011
+	- Advice code is now always run consistently in void context, the
+	  ->wantarray method is now the only way to check the calling context
+	  of the active joint point. This is not only more consistent in having
+	  all context come from methods, is also prevents inconsistent
+	  behaviour when calling methods directly with $_->self->method and it
+	  allows context-senstive behaviour to be added to the advice methods.
+	- Replaced params and params_ref with args, with a different behaviour
+	  based on the wantarray context it is called in. This is semantically
+	  much closer to the AspectJ version, and more importantly it has no
+	  "convenience" features which will prevent weird complexity later on.
+	- Rewrote return_value to act on context in the same manner as args.
+	  This is theoretically not backwards compatible, but the entire test
+	  suite continued to pass after change, which shows that the only things
+	  backcompatible would be things using methods in a strange manner.
+	- Added POD documentation for most of the methods in Aspect::Point.
+	- Added basic POD skeletons for the different Aspect::Advice:: classes.
+	- Minor optimisation in generated code to check for exceptions
+	  directly, rather than via the slower accessor method.
+	- Clarified that only after and after_throwing support exception
+	  handling and throwing.
+	- Aspect::Advice::AfterReturning now inherits from ::After
+	- Aspect::Advice::AfterThrowing  now inherits from ::After
+	- Added the returning pointcut for use with after advice
+	- Added a second curry method for use prior to weave-time compilation
+	- Added support for naked throwing() without a specific exception value
+
+0.97_04 Sat 21 May 2011
+	- Added more POD to the main page, this is closer to the final form
+
+0.97_03 Fri 20 May 2011
+	- Simplified if_true to true and ::If to ::True
+	- Expanded XS acceleration to more classes and methods
+	- Completed reasonable thorough main documentation for Aspect.pm
+	- Prohibit usage of the highest pointcut to one per advice declaration
+	  due to implementation complexity and unclear semantics.
+	- Added Advice::Point::Static for the cflow point details in line with
+	  AspectJ's idea of "static parts" of join points.
+	- Removed deprecated Aspect::AdviceContext now it is no longer needed
+	  by the cflow pointcut.
+	- Pointcut logic operations & | ! now validate their children
+	- The cflow declarator is now documented everywhere as single param,
+	  defaulting to an "enclosing" accessor, which is accelerated.
+	- Added specific accelerated Aspect::Point::pointcut method
+	- Move Aspect::Pointcut::Highest::Cleanup into its own module file
+
+0.97_02 Wed 18 May 2011
+	- Removed the barely document, untested and rarely used append_param(s)
+	- Added an improved SYNOPSIS and generally improving main POD
+	- Added limited XS acceleration if Class::XSAccessor 1.08 installed.
+	- Remove the use of test recursion in preparation for XS vs PP copying
+
+0.97_01 Thu 24 Mar 2011
+	- Now all standard keys have their own methods, remove the weird
+	  automagic from the AUTOLOAD method.
+	- Some more minor performance tweaks
+	- Removed excessive exception method from begin advice
+	- Moved proceed to the specific method it is used
+	- Renamed run_original to proceed, keeping the original as an alias
+
+0.96 Thu 24 Mar 2011
+	- Updating copyright year
+	- Moved exception method away from a slow generic implementation
+	- Moved original method away from slow generic implementation
+	- Moved type method away from slow generic implementation
+	- Rewrote return_value method into a much faster version
+	- Removed get_value method, AUTOLOAD now reads the value directly
+
+0.95 Mon 13 Dec 2010
+	- Fixed #57528 ([PATCH] Fix spelling error
+	- Fixed #57417 Bad return value in list context
+
+0.94 Fri 10 Dec 2010
+	- CPAN Testers is happy, moving to production release
+
+0.93_02 Fri 10 Dec 2010
+	- Applied the fix from 0.93_01 to an additional place it was
+	  occuring in Aspect::Pointcut::Throwing.
+	- Corrected the Aspect::Advice::Around documentation to refer to
+	  $_->run_original instead of $_->proceed until the proceed method
+	  actually works like that.
+
+0.93_01 Thu 9 Dec 2010
+	- This contains a potential fix for the 5.13.6 breakage to be
+	  confirmed by CPAN Testers.
+
+0.92 Wed 21 Jul 2010
+	- Correcting bad link to search.cpan
+
+0.91 Tue 20 Jul 2010
+	- Updating to Module::Install::DSL 1.00
+	- The bundled libraries now use the new $_ mechanism to use the
+	  point context object.
+	- Expanding the documentation and modernising it to match the API
+	  changes in the last few releases.
+
+0.90 Thu 27 May 2010
+	- Updating to Module::Install::DSL 0.97
+	- Upgraded the old method-based match_run run-time context testing
+	  interface to a newer compiled_runtime context testing interface.
+	  The new interface cooks the run-time tests down to a single
+	  compiled perl condition where possible, and a set of nested
+	  function calls where strings cannot be used. The function calls
+	  alone are faster than methods, and the functions have no 
+	  parameters, making them faster still. Tests that can be compiled
+	  all the way down to a string are even faster, because they avoid
+	  Perl's expensive function calls, and get even faster because
+	  Perl's opcode optimisations get a much better shot at improving
+	  the generated code.
+	- Upgraded the weave-time mechanism to work using compiled code in
+	  the same fashion as the run-time code. This should make the weave
+	  costs (the time to scan the entire namespace) much lower as well.
+	- Expanded out the POD documentation to cover the entire namespace
+	  tree.
+
+0.45 Mon 10 May 2010
+	- Updating to Module::Install::DSL 0.96
+	- More performance tuning of the namespace scanner in match_all.
+	- A wide range of cleanups, improvements and expansions to the
+	  previously existing documentation. This includes full
+	  documentation for the entire Aspect::Pointcut tree.
+	- Renamed the new API for join point contexts from Aspect::Context
+	  to Aspect::Point.
+	- Aspect libraries in namespaces other than Aspect::Library:: can
+	  now be used as long as the module inherits from the (empty)
+	  identifying base class Aspect::Library. All libraries that
+	  currently inherit from Aspect::Modular automatically inherit from
+	  the new Aspect::Library as well.
+	- Started work on third-generation optimiser for Aspect::Pointcut.
+	  This functionality will be hidden until it is complete enough
+	  to use.
+
+0.44 Mon 15 Feb 2010 - Adam Kennedy
+	- Inlined and reimplemented a stripped down and faster replacement
+	  for the functionality provided by Devel::Symdump to make match_all
+	  significantly faster and remove potential issues with Devel::Symdump
+	  on Mac OS 5.10.0
+
+0.43 Thu 28 Jan 2010 - Adam Kennedy
+	- Fixed a pointcut optimisation problem where we were currying away
+	  call checking in complex nested pointcuts where runtime pointcuts
+	  needed to retain the call checking to limit the run-time checks
+	  to an appropriate subset of the total number of functions hooked.
+	- More elements of what will ultimately become the pointcut context
+	  are passed through to the curried pointcut tests (in preparation
+	  for moving to a File::Find::Rule-like string-eval-compiled form
+	  of the pointcut.
+
+0.42 Wed 20 Jan 2010 - Adam Kennedy
+	- Began the implementation of the new Aspect::Context tree
+	- Generated advice hook code now cheats for speed and blesses
+	  context objects directly into the advice-specific Aspect::Context
+	  class, which should be safe now the contexts have a dumb
+	  constructor.
+	- Pointcut matching now correctly ignores exported Aspect functions.
+	- Added in initial stub for Aspect::Library (the renaming of
+	  Aspect::Modular).
+	- Moved Aspect::Advice::Hook to Aspect::Hook to provide Advice/Hook
+	  class symmetry, and make it no longer an Advice subclass.
+	- Removed temporary debugging code in Aspect::Library::Breakpoint
+	  that slipped through into production
+
+0.41 Wed 20 Jan 2010 - Adam Kennedy
+	- So few pointcuts care about the sub name at run-time that
+	  it doesn't make sense to pass it as a separate parameter
+	  to match_run. Include it in the run-time HASH instead.
+	- Normalise changes to return_value inside the advice code,
+	  rather than after it by using the ->{wantarray} context attribute
+	  to know when that normalisation is needed. This allows us to cheat
+	  in the hook code and use ->{return_value} directly, which is
+	  significantly faster than calling ->return_value.
+
+0.40 Tue 19 Jan 2010 - Adam Kennedy
+	- Added experimental Aspect::Library::Throwing pointcut
+	- Only nested pointcuts containing only call() would curry away.
+	  Now nested mixed pointcuts curry out as well.
+	- Nested And|Or pointcuts curry to faster flat 3+ element And|Or
+
+0.39 Tue 19 Jan 2010 - Adam Kennedy
+	- All hook code is now generated in a single namespace
+	- Added the Aspect::Library::Wantarray pointcut
+
+0.38 Tue 19 Jan 2010 - Adam Kennedy
+	- Added experimental support for the "highest" pointcut.
+	- Added experimental support for the Breakpoint reusable library.
+
+0.37 Wed 13 Jan 2010 - Adam Kennedy
+	- Added support for "Aspect ':legacy'", which will cause the Aspect
+	  module to export functions with their original behaviours.
+	  Only the original aspect/before/after/call/cflow functions are
+	  exported and after() advice applies the same behaviour as the
+	  equivalent new-API advice function after_returning().
+	- To prevent hassles with Exporter (and since we need Sub::Install
+	  anyway to implement :legacy) replace all uses of Exporter with
+	  a trivial hand-rolled equivalent using Sub::Install.
+	- Added the Aspect::Pointcut::If pointcut to match Java's equivalent
+	  if PointCut primitive. Unfortunately, since it's going to be a bit
+	  to hard to actually use "if" in a function, we will use "if_true"
+	  instead.
+	- Added Sub::Uplevel to the list of untouchables to prevent infinite
+	  circular loops.
+
+0.36 Wed 13 Jan 2010 - Adam Kennedy
+	- WARNING: THIS RELEASE CONTAINS API CHANGES.
+	  To retain compatibility with previous releases, you should change
+	  all of your after() calls to after_returning() calls.
+	- The after () advice now traps BOTH orginary return values and
+	  exceptions, as per the AspectJ implementation.
+	- To provide a more consistent naming of pointcuts (in preparation
+	  for adding more of them) renamed the logical pointcut classes
+	  to remove the "Op" part of the class name.
+	- Bumped Test::Exception dependency to 0.29, since it has some
+	  Sub::Uplevel fixes, and we use that heavily.
+
+0.35 Mon 11 Jan 2010 - Adam Kennedy
+	- Adding initial support for exceptions, with after_throwing
+
+0.34 Sun 10 Jan 2010 - Adam Kennedy
+	- Adding Aspect::Advice::AfterReturning before we implement exception
+	  support in the main ::After advice.
+
+0.33 Fri  8 Jan 2010 - Adam Kennedy
+	- Added Test::NoWarnings to all of the tests
+	- Refactoring advice testing into one test per advice type
+	- Testing now covers more combinations of cases, including for around()
+	- Fixed bug in return values for listwise before () calls
+	- Calls to run_original for advice called in void context now
+	  correctly runs the underlying hooked method in void context as well.
+	- When called in after() or around() advice, proceed will throw an
+	  exception.
+	- Removed some of the author tests I don't care about as much.
+
+0.32 Thu  7 Jan 2010 - Adam Kennedy
+	- The actual term "forever" is meaningless. Reversed the flag to
+	  be used as "lexical" instead.
+
+0.31 Thu  7 Jan 2010 - Adam Kennedy
+	- Removed the loading of Aspect::Library::Memoize and
+	  Aspect::Library::TestClass in 01_compile.t which was causing
+	  installation failure.
+
+0.30 Thu  7 Jan 2010 - Adam Kennedy
+	- Extended the forever currying support to the overall Aspect itself,
+	  and upgraded the regular Library classes to implement it properly.
+	- Renamed the term "forever" to a more simple "global" name.
+	- Moved Aspect::Library::Memoize into a seperate distribution to
+	  remove the Memoize dependency, which isn't 100% reliable.
+
+0.29 Wed  6 Jan 2010 - Adam Kennedy
+	- Added "forever currying" support. If advice is created in
+	  void context we never add the $out_of_scope hook, and as a
+	  result we don't need to save the advice object at all (and just
+	  let it immediately destroy). As well as removing the need for a
+	  bunch of the nasty curried objects, we remove an unnecessary if ()
+	  test for every single call (to non-lexical hooks).
+
+0.28 Wed  6 Jan 2010 - Adam Kennedy
+	- Implemented Pointcut currying. The pointcut objects will
+	  optimise themselves down to just the section that should run
+	  if we assume the function was hooked correctly.
+	  This not only makes the hooks much more efficient in working
+	  out if they need to fire, but it also fixes a major bug with
+	  negative call pointcuts always causing all functions to not fire.
+	- Resolved RT #36527 - Minor doc bug s/Profiled/Profiler/
+	- Moved Aspect::Library::Listenable into it's own distribution
+	- Migrated all the tests from Test::Class to normal Test::More
+	- Various code clean up and simplification, with less exporting
+	- Added missing Task::Weaken dependency
+	- Fixed, hopefully, the "variables will not remain shared" but
+	  by moving from using pure named hook functions to assigning
+	  anonymous subroutines to the typeglob instead.
+	- Pointcuts now boolify (quickly) to true, and don't stringify to
+	  a Data::Dumper debugging spew any more.
+	- Implemted the internals needed to support AndOp and OrOp pointcuts
+	  with more than 2 elements, so that in future long chained
+	  collections of & or | pointcuts will collapse down into a single
+	  object, instead of building as giant nested trees of boolean pairs.
+
+0.27 Sun  3 Jan 2010 - Adam Kennedy
+	- Various micro-optimisation of Aspect::AdviceContext which would
+	  normally be somewhat pointless, but is useful in this case when
+	  an Aspect hook is applied to something which is in the hot loop
+	  for some program.
+	- Added a test script to specifically hunt down the problems with
+	  variable sharing in string-eval'ed closures.
+
+0.26 Thu 31 Dec 2009 - Adam Kennedy
+	- With the primary internals refactoring completely, we now start
+	  a series of commits to remove excessive abstractions, and to alter
+	  others to more appropriate abstractions (still without changing
+	  any of the APIs)
+	- Cleaning up and refactoring the Aspect/Advice constructor code in
+	  Aspect.pm
+	- Removed the weird Aspect::Advice->new( type, code, pointcut ) for
+	  a more conventional ->new setup.
+	- Attempt to load Sub::Uplevel earlier (before we load Exporter) so
+	  there is an increased likelyhood that we don't have to reload
+	  Exporter later.
+	- Removed redundant references to Hook::LexWrap from the POD, and
+	  removed the "Convert to Sub::Uplevel" item from the TO DO list.
+	- Rewrote the Pointcut family of classes to have a simpler structure
+	  which should be faster. Some now use blessed ARRAYs as a
+	  preparatory step for allowing the AndOp/OrOp pointcuts to have
+	  more than just two elements (and to allow enable certain
+	  optimisation strategies down the line).
+	- Removed the faulty Aspect::Pointcut::BinOp abstraction entirely.
+	  It was causing boolean and/or operations to always run both sides,
+	  so unlike the overloaded expression they were created from, they
+	  would never shortcut. This is now resolved, and the an/or pointcut
+	  elements now shortcut properly.
+
+0.25 Thu 31 Dec 2009 - Adam Kennedy
+	- Debundled various out-of-date testing libraries, and reverted
+	  to more conventional build_requires dependencies now that our
+	  downstream packaging systems have the ability to consume them.
+	- Since the code documents the Aspect::Advice->install method as
+	  private (and it is undocumented) rename to ->_install as a
+	  precursor to changing it's behaviour at an API level.
+	- Now that the descope execution of the closure hook is able to be
+	  trusted, we no longer need the Aspect::Cleanup DESTROY-time
+	  self-execution magick.
+	- Added the ->wantarray property to the AdviceContext object.
+	  This is provided as a convenience to the user (since the wantarray)
+	  function works properly inside the advice code. It's main use is
+	  for some AspectContext internals.
+	- Added wantarray context test, which uncovered a bug where
+	  void-context calls were incorrectly running the advice in scalar
+	  context.
+
+0.24 Wed 30 Dec 2009 - Adam Kennedy
+	- Changes file now uses tabs (to make it less annoying for me) :)
+	- Moved the inline Aspect::Hook::LexWrap::Cleanup class into it's
+	  own dedicated Aspect::Cleanup class.
+	- Merged Advice-specific hooks from Aspect::Hook::Lexwrap into the
+	  advice classes.
+	- Removed the now-redundant Aspect::Hook::Lexwrap entirely
+	- Simplified the Aspect::AdviceContext constructor to make it faster
+	- Logically merged the code-generated functionality from ->install
+	  and the Hook::LexWrap-inspired ->hook methods for each Advice
+	  class. This removes a lot of guess work and double handling from
+	  the main execution path, and should be significantly faster.
+	- With the code merged, pushed the scope exit flag outside the
+	  symbol table iteration in the installer. Instead of a large array
+	  of separate exit-tracking objects, we can instead use one single
+	  shared lexical hook that works via mixed depth closure Magick.
+	- Only call wantarray once per hook execution and share the result
+	  therafter as a variable. Saves two function calls per hook.
+
+0.23 Thu 24 Dec 2009 - Adam Kennedy
+	- Removed the concept of a standalone Aspect::Weaver class
+	- Each Aspect::Advice:: subclass now does most of the setup for the weaving
+	  individually, with similar but slightly different implementations.
+	  This adds some duplication of code, but removes a lot of architectural
+	  complexity. It should make the creation of new types of Advice simpler.
+	- Corrected the versions of the test libs (which went out of sync)
+	- The Hook::LexWrap wrap function is now split into Advice-specific hooks
+	  before and after, duplicating some code but making each type simpler and
+	  faster.
+
+0.22 Mon 21 Dec 2009 - Adam Kennedy
+	- Part one of an upcoming series of major upgrades
+	- Migrating to Sub::Uplevel to remove our custom CORE::GLOBAL::caller
+
+0.21 Tue 21 Jul 2009 - Adam Kennedy
+	- Bumped the version to 0.21 so the Hook::LexWrap module indexes
+
+0.16 Tue 19 May 2009 - Adam Kennedy
+	- Moved out Aspect::Library::Profiler into a standalone distribution
+
+0.15 Thu Jul 24 23:02:11 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+	- fixed version in all modules. *sigh*
+
+0.14 Thu Jul 24 22:46:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+	- fixed dist style
+
+0.13 Thu Jul 24 18:22:15 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+	- Made sure every module has a $VERSION
+	- updated MANIFEST and MANIFEST.SKIP
+	- removed META.yml as it is being generated by Module::Install
+	- added requirements to Makefile.PL
+	- converted Makefile.PL to use Module::Install
+	- Aspect::Hook::LexWrap now uses warnings and strict; some changes were
+	  necessary for those to go through
+	- fixed POD error in Aspect::Modular
+	- added spaces where necessary to avoid having the template's start_tag in
+	  the code
+	- renamed t/all_tests.t to t/01_all.t
+	- added t/perlcriticrc
+	- added .shipit
+	- set version to 0.13
+	- updated MANIFEST
+	- updated t/perlcriticrc
+
+0.12 Sat, 24 Mar 2007 00:00:00 +0100 (Ran Eilam <ran.eilam@gmail.com>)
+	- You can now attach advice to subs in main:: package, see Advice tests
+	- Made everything easier to install by including dependencies required for
+	  testing
+	- Added __always_fire option to Listenable
+	- Listenable: You can now let listeners receive any parameters, not just
+	  the event, see the test object_listener
+	- Modified our hack on Hook::LexWrap so it does not ignore prototypes, see
+	  Advice tests
+	- Removed old warning from Makefile.PL
+
+0.11 Tue, 03 Aug 2004 00:00:00 +0100 (Ran Eilam <ran.eilam@gmail.com>)
+	- Fixed problem in upgrading from 0.08, CPAN.pm was getting confused on
+	  Advice and Modular, because they had no version numbers, and undef is
+	  smaller than 0.08. (merlyn)
+	- Lowered dependency on Test::Class to 0.03
+
+0.10 Fri, 30 Jul 2004 00:00:00 +0100 (Ran Eilam <ran.eilam@gmail.com>)
+	- No longer a developer release
+	- Added Listenable reusable aspect
+	- Added subject_params() support for TestClass library aspect
+
+0.09_03 Tue, 06 Jul 2004 00:00:00 +0100 (Ran Eilam <ran.eilam@gmail.com>)
+	- Added Carp::Heavy to list of untouchables in Weaver.pm, to avoid Carp
+	  dumping core
+	- Test::Class aspect allows for customizing IUT through init_subject_state
+
+0.09_02 Sat, 06 Mar 2004 00:00:00 +0100 (Ran Eilam <ran.eilam@gmail.com>)
+	- AdviceContext now has the original code, so you can do AspectJ-style
+	  around advice. You can call the original code from before or after
+	  advice. Added AdviceContext::run_original.
+	- Memoize can memoize in any context, not just scalar, again
+	- Added Test::Class helper aspect
+	- Started using Devel::Symdump
+
+0.09_01 Sat, 06 Mar 2004 00:00:00 +0100 (Ran Eilam <ran.eilam@gmail.com>)
+	- Released for review by participants in YAPC::Israel 2004
+	- New syntax is incompatible with old
+	- New maintainer, Ran Eilam
+	- Control flow pointcut: cflow(), done according to Marcel's design
+	- Advice context trapping for control flow pointcuts
+	- Use Test::Class for unit tests
+	- Wormhole reusable aspect
+	- Added prototypes so you can dispense with parentheses
+	- Removed return/around pointcuts, added after advice
+	- Removed attribute interface
+	- Added a mutated version of Hook::LexWrap with support for
+	  appending/removing arguments
+	- Moved reusable aspects to Aspect::Library
+	- regression: Aspect exported subs generate join points again
+
+0.07 Wed, 31 Jul 2002 22:42:27 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+	- The distribution has been adapted for use with perl5.8.0.
+	  C<Hook::LexWrap> is now a core module, but there was a problem with
+	  context (wantarray) handling with Aspect::Memoize. Sorry about the perl
+	  5.6.x users, but this is bleeding-edge stuff, so you're expected to use
+	  the very latest gear. Anyway, you can still get an earlier version (up
+	  to 0.07) from CPAN, which will work with perl 5.6.x.
+	- Aspect::Memoize is now intended for subroutines returning scalars only.
+	  That is, if the sub is called in list context, it will still only
+	  memoize, and return, a memoized scalar. Void context obviously doesn't
+	  matter when it comes to memoization; subroutines returning lists are
+	  something I have to think about.
+	- Tests now use Test::More
+
+0.07 Fri, 15 Mar 2002 09:04:51 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+	- symbols exported from Aspect.pm now don't generate join points. So I
+	  added Aspect::import() and modified Aspect::JoinPoint::enum() to check
+	  for %Aspect::exp_syms.
+
+0.06 Fri, 26 Oct 2001 16:42:51 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+	- added around() function to Aspect.pm
+	- added Aspect::Profiled
+	- added Aspect::Attribute interface to creating advice
+	- made Aspect::Advice's enable() and disable() return $self
+	- added cookbook example program callflow_attr.pl
+	- added cookbook recipes for bounds checking and change tracking, plus
+	  sample programs
+
+0.05 Thu, 11 Oct 2001 09:44:50 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+	- removed dependency on Data::Denter
+
+0.04 Mon, 01 Oct 2001 18:33:00 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+	- removed the patched Hook::LexWrap now that 0.20 is out which fixes all
+	  the problems of 0.10
+	- added documentation (a recurring theme, never finishes)
+
+0.03 Sun, 30 Sep 2001 19:43:56 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+	- added documentation
+	- Included a patched Hook::LexWrap that fixes a bug with wantarray
+	  preservation in subroutine wrappers. Will be removed if and when Damian
+	  approves of the patch or otherwise fixes the bug.
+
+0.02 Fri, 28 Sep 2001 12:59:06 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+	- added documentation
+	- added '$::thisjp' global variable
+	- added modular memoization aspect: Aspect::Memoize
+	- added modular tracing aspect: Aspect::Trace
+
+0.01 Fri, 28 Sep 2001 10:36:08 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+	- original version

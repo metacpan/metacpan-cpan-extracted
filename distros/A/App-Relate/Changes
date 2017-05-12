@@ -1,0 +1,19 @@
+Revision history for App-Relate
+
+0.01-0.03  See App::Relate::Complex
+
+0.04    Tue Mar 16 18:15:28 2010
+        A greatly simplified code base: twice as fast, with fewer
+        non-core dependencies.  The older codebase is now named
+        App::Relate::Complex.
+
+0.10    Sun Mar 21 15:05:01 2010
+        Jumped all versions of library, script and package up to 0.10
+        so that they all match.
+        (Previously the script version was left at 0.01, in error).
+
+        Added "locatedb" as synonym for "database" option.
+
+        Shut-off some debug messages.  Added internal DEBUG options
+        turned on by the existing -D script option.
+

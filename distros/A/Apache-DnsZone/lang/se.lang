@@ -1,0 +1,88 @@
+#!/usr/bin/perl -w
+
+# created by castrox@stderr.net (2001/04/25) # urghh, hmm, err :)
+# $Id: se.lang,v 1.2 2001/04/24 22:13:29 thomas Exp $
+
+use strict;
+
+sub lang () {
+    my %text = (
+		'SUBMIT'            => 'Skicka',
+		'CANCEL'            => 'Avbryt',
+		'HELP'              => 'Hj&auml;lp',
+		'EDIT'              => 'Redigera',
+		'ADD'               => 'L&auml;gg till',
+		'REMOVE'            => 'Ta bort',
+		'LOCKED'            => 'L&aring;st',
+		'SETTINGS'          => 'Inst&auml;llningar',
+		'LIST_DOMAIN'       => 'Dom&auml;nlista',
+		'LOGOUT'            => 'Logga ut',
+		'LANGUAGE'          => 'Spr&aring;k',
+		'EMAIL'             => 'E-post',
+		'NEW_PASSWORD'      => 'Nytt l&ouml;senord',
+		'CONFIRM_PASSWORD'  => 'Bekr&auml;fta l&ouml;senord',
+		'AUTH_NS'           => 'Befogad namnserver',
+		'SERIAL'            => 'Serialnummer',
+		'ADMIN_EMAIL'       => 'Administrativ e-post',
+		'REFRESH'           => 'Uppdateringstid',
+		'RETRY'             => 'Upprepningstid',
+		'EXPIRE'            => 'Utg&aring;ngstid',
+		'TTL'               => 'Time to Live',
+		'HOST'              => 'Host',
+		'IP_ADDRESS'        => 'IP adress',
+		'CNAME'             => 'Canonicalt namn',
+		'MX'                => 'Mail exchanger',
+		'PREFERENCE'        => 'Preference',
+		'ZONE'              => 'Zon',
+		'NS'                => 'Namnserver',
+		'TXT'               => 'Text',
+		'DNS'               => 'Dom&auml;n Namn System',
+		'SOA'               => 'Start av befogenhet',
+		'PAGE_LIST_DOMAIN'  => 'Dom&auml;ner sk&ouml;tta med DnsZone',
+		'PAGE_VIEW_DOMAIN'  => 'Betraktar dom&auml;n $domain',
+		'PAGE_HELP'         => 'Hj&auml;p',
+		'PAGE_SETTINGS'     => '&Auml;ndrar personliga inst&auml;llningar',
+		'PAGE_EDIT'         => 'Redigerar $record record under $domain',
+		'PAGE_ADD'          => 'Adderar $record record till $domain',
+		'PAGE_DEL'          => 'Tar bort $record record under $domain',
+		'ERROR_CORRECT'     => 'V&auml;nligen r&auml;tta f&ouml;ljande fel:',
+		'ERROR_DUPLICATE'   => 'Dubbla record finns',
+		'ERROR_IP'          => 'Inkorrekt v&auml;rde f&ouml;r IP adress',
+		'ERROR_HOST'        => 'Inkorrekt v&auml;rde f&ouml;r Host',
+		'ERROR_TTL'         => 'Inkorrekt v&auml;rde f&ouml;r TTL',
+		'ERROR_CNAME'       => 'Inkorrekt v&auml;rde f&ouml;r Canonicalt namn',
+		'ERROR_MX'          => 'Inkorrekt v&auml;rde f&ouml;r Mail exchanger',
+		'ERROR_PREFERENCE'  => 'Inkorrekt v&auml;rde f&ouml;r Preference',
+		'ERROR_ZONE'        => 'Inkorrekt v&auml;rde f&ouml;r Zon',
+		'ERROR_NS'          => 'Inkorrekt v&auml;rde f&ouml;r Namnserver',
+		'ERROR_TXT'         => 'Inkorrekt v&auml;rde f&ouml;r Text',
+		'ERROR_EMAIL'       => 'Inkorrekt v&auml;rde f&ouml;r E-post',
+		'ERROR_PASSWORD'    => 'Icke-matchande l&ouml;senord',
+		'ERROR_ADMIN_EMAIL' => 'Inkorrekt v&auml;rde f&ouml;r Administrativ e-post',
+		'ERROR_REFRESH'     => 'Inkorrekt v&auml;rde f&ouml;r Uppdateringstid',
+		'ERROR_RETRY'       => 'Inkorrekt v&auml;rde f&ouml;r Upprepningstid',
+		'ERROR_EXPIRE'      => 'Inkorrekt v&auml;rde f&ouml;r Utg&aring;ngstid',
+		'FILLOUT_FIELDS'    => 'V&auml;nligen fyll i f&ouml;ljande f&auml;lt:',
+		'EDIT_FIELDS'       => 'V&auml;nligen redigera f&auml;lt:',
+		'DELETE_RECORD'     => 'Du kommer att ta bort f&auml;ljande record:',
+		'USERNAME'          => 'Anv&auml;ndarnamn',
+		'PASSWORD'          => 'L&ouml;senord',
+		'LOGIN_BUTTON'      => 'Logga In',
+		'PAGE_LOGIN'        => 'Inloggningsida',
+		'LOGIN_NOTE'        => 'Notera: St&auml;ll in din webbl&auml;sare att acceptera cookies f&ouml;r att kunna logga in. Du kommer att bli h&auml;nvisad att logga in igen efter en viss tid.',
+		'IDLE_TIMEOUT'      => 'Logout reason: Idle timeout',
+		'MALFORMED_TICKET'  => 'Logout reason: Ticket malformed',
+		'INVALID_HASH'      => 'Logout reason: Unknown ticket',
+		'EXPIRED_TICKET'    => 'Logout reason: Ticket has expired',
+		'MISSING_SECRET'    => 'Logout reason: Server secret could not be loaded',
+		'TAMPERED_HASH'     => 'Logout reason: Ticket data tampered with',
+		'PASSWORD_CHANGE'   => 'L&ouml;senordet kommer endast att &auml;ndras om du skriver n&aring;got i f&auml;lten nedan.'
+		);
+    
+    return %text;
+}
+
+1;
+
+
+

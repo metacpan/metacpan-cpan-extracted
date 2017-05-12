@@ -1,0 +1,16 @@
+#!perl
+use 5.10.0;
+use strict;
+use warnings;
+
+use App::test::travis;
+
+exit(App::test::travis->run(@ARGV));
+
+__END__
+
+=head1 NAME
+
+test-travis - The test-travis(1) command
+
+=cut

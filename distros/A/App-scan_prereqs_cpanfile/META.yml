@@ -1,0 +1,53 @@
+---
+abstract: 'Scan prerequisite modules and generate CPANfile'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-scan_prereqs_cpanfile
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::scan_prereqs_cpanfile:
+    file: lib/App/scan_prereqs_cpanfile.pm
+    version: '1.03'
+recommends:
+  Test::Requires::Scanner: '0'
+requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Requirements: '0'
+  Getopt::Long: '0'
+  Module::CPANfile: '0.9020'
+  Module::CoreList: '0'
+  Module::Metadata: '0'
+  Perl::PrereqScanner::Lite: '0.21'
+  perl: '5.008005'
+  version: '0'
+resources:
+  bugtracker: https://github.com/tokuhirom/App-scan_prereqs_cpanfile/issues
+  homepage: https://github.com/tokuhirom/App-scan_prereqs_cpanfile
+  repository: git://github.com/tokuhirom/App-scan_prereqs_cpanfile.git
+version: '1.03'
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Kan Fushihara <kan.fushihara@gmail.com>'
+  - 'HIROSE Masaaki <hirose31@gmail.com>'
+  - 'Songmu <y.songmu@gmail.com>'
+  - 'moznion <moznion@gmail.com>'
+  - 'Alex Efros <powerman@powerman.name>'

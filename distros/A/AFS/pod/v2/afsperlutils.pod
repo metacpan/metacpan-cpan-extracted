@@ -1,0 +1,146 @@
+#------------------------------------------------------------------------------
+# RCS-Id: "@(#)$RCS-Id: pod/v2/afsperlutils.pod 2e2ca60 Tue Apr 15 13:04:20 2014 +0200 Norbert E Gruener$"
+#
+# © 2001-2014 Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<AFS::Utils> - Shared utility functions for the B<AFS module bundle>
+
+=head1 SYNOPSIS
+
+  use AFS::Utils qw (
+                    XSVERSION get_server_version get_syslib_version
+                    setpag sysname unlog
+                    );
+
+  my $ok = setpag();
+  print "Return Code = $ok\n";
+
+  print 'XS-Version = ', XSVERSION, "\n";
+  print 'Syslib Version = ', get_syslib_version, "\n";
+  print 'Server Version = ', get_server_version('pts', 'ibm-1'), "\n";
+
+  my $sysname = sysname;
+
+  unlog;
+
+=head1 DESCRIPTION
+
+This module provides several utility functions for the B<AFS module
+bundle>.  You can retrieve the version number for the underlying AFS
+system libraries, for the XS module, and for the AFS server processes.
+And it contains several commands that do not belong to any AFS command
+suites like creating a new PAG or retrieving and setting the
+CPU/operating system type. Any function required must by explicitly
+listed by the C<use> statement to be exported into the calling package.
+
+=head1 COMPATIBILITY
+
+B<This release does NOT support any features and interfaces
+from version 1.>
+
+=head1 EXPORTS
+
+=head2 Standard Exports
+
+none
+
+=head2 Optional Exports
+
+The following functions will be exported into your namespace if you
+specifically ask that they be imported.
+
+=over 4
+
+=item B<$version = XSVERSION;>
+
+Reports the version number of the underlying XS file.
+
+=item B<$version = get_server_version(SERVER [, HOST [, VERBOSE]]);>
+
+Reports the version number of the SERVER process running at HOST
+(default localhost). If VERBOSE (default 0) is set to 1 some program
+trace is printed.
+
+=item B<$version = get_syslib_version;>
+
+Reports the version number of the underlying AFS system library.
+
+=item B<$ok = setpag;>
+
+Creates a new command shell (owned by the issuer of the command) and
+associates a new process authentication group (PAG) with the shell and
+the user. A PAG is a number guaranteed to identify the issuer of
+commands in the new shell uniquely to the local Cache Manager.
+
+=item B<$sysname = sysname([NEWSYSNAME]);>
+
+Reports the CPU/operating system type or sets the CPU/operating system
+type to NEWSYSNAME.
+
+=item B<unlog;>
+
+Discards all of the issuer's tokens.
+
+=back
+
+=head1 CURRENT AUTHOR
+
+Norbert E. Gruener E<lt>nog@MPA-Garching.MPG.deE<gt>
+
+=head1 AUTHOR EMERITUS
+
+Roland Schemers E<lt>schemers@slapshot.stanford.eduE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (c) 2001-2010 Norbert E. Gruener <nog@MPA-Garching.MPG.de>.
+ All rights reserved.
+
+ Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University.
+ All rights reserved.
+
+Most of the explanations in this document are taken from the original
+AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ File Server/Cache Manager Interface
+ Edward R. Zayas
+ Copyright (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ Copyright (c) IBM Corporation 2000.
+ All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=over 6
+
+=item The original module is covered by the following copyright:
+
+Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation,
+advertising materials, and other materials related to such
+distribution and use acknowledge that the software was developed
+by Stanford University.  The name of the University may not be used
+to endorse or promote products derived from this software without
+specific prior written permission.
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=back
+
+=head1 DOCUMENT VERSION
+
+Revision $Rev: 1059 $

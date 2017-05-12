@@ -1,0 +1,24 @@
+---
+abstract: 'use L<Future> with L<AnyEvent>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::More: '0.88'
+  Test::Timer: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Future
+provides:
+  AnyEvent::Future:
+    file: lib/AnyEvent/Future.pm
+    version: '0.03'
+requires:
+  AnyEvent: '0'
+  Future: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.03'

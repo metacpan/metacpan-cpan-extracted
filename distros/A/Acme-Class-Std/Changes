@@ -1,0 +1,6 @@
+Revision history for Perl extension Acme::Class::Std.
+
+0.01  Thu Feb  9 20:17:52 2006
+	- original version; created by h2xs 1.23 with options
+		-b 5.0.0 -X -n Acme::Class::Std
+

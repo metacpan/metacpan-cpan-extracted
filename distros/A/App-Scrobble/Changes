@@ -1,0 +1,16 @@
+0.03      2013-10-10 22:32:50 Europe/London
+
+- Add namespace::autoclean and __PACKAGE__->meta->make_immutable
+- Add support for scrobbling BBC Radio programmes via WWW::BBC::TrackListings
+
+0.02      2013-01-21 22:48:00 Europe/London
+
+- Add debug option
+- Handle errors better (exit)
+- Add support for configfile-based config options
+
+0.01      2012-03-25 13:59:58 Europe/London
+
+- Initial release of a command line scrobbling client
+- Only supports options passed over the command line
+- Only has support for one "service" - Mixcloud

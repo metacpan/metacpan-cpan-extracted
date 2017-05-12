@@ -1,0 +1,226 @@
+=head1 NAME
+
+App::RPi::EnvUI::Configuration - Configuration options for L<App::RPi::EnvUI>
+
+=head1 CONFIGURATION FILE
+
+A default distribution configuration file is housed in the C<src/> directory
+named C<envui-dist.json>. This file gets copied into C<config/envui.json> for
+normal usage during the C<perl Makefile.PL> stage. Edit this file to modify the
+web application before runtime.
+
+This is a C<JSON> file, so both the key and value must be double-quoted.
+
+=head1 CONFIGURATIIION OPTIONS
+
+Configure options are separated into separate sections based on their purpose.
+
+=head2 CORE CONFIGURATION SECTION
+
+The C<core> configuration section contains the following configuration
+directives, which pertain to the core operation of the system.
+
+=head3 event_fetch_timer
+
+Value: Integer, the number of seconds we'll poll the environment sensors and
+update the database with the new information.
+
+Default: C<15>
+
+Default: C<5>
+
+=head3 event_action_timer
+
+Value: Integer, representing the interval (seconds) that the server will read
+the current state of the system, and will enable/disable any functional GPIO
+pins.
+
+Default: C<3>
+
+=head3 event_display_timer
+
+Value: Integer, representing the interval (seconds) that the client UI will
+automatically refresh the page (asynchronously).
+
+Default: C<4>
+
+=head3 time_zone
+
+Value: A time zone as accepted by L<DateTime>'s C<new()> method's C<time_zone>
+parameter.
+
+Default: C<America/Edmonton> (MST)
+
+=head3 testing
+
+Value: Bool. True (C<1>) to enable testing. We will mock out all portions that
+are non-Perl in order to allow for unit test runs on non-Pi boards. Set to False
+(C<0>) to disable this and run in normal mode.
+
+Default: C<0>
+
+=head3 debug_sensor
+
+Value: Bool. True to have the L<RPi::DHT11> hygrometer sensor print out debug
+information.
+
+Default: C<0>
+
+=head3 log_level
+
+Value: Integer, C<-1> through C<7>. Sets the logging level.
+
+Default: C<-1> (off)
+
+=head3 log_file
+
+Value: String, a filename to use to log to. By default, if logging is enabled,
+we log to C<STDOUT>.
+
+Default: C<""> (empty string, ie. no file)
+
+=head2 CONTROL CONFIGURATION SECTION
+
+The C<control> configuration section specifies parameters for specific actions
+within the system.
+
+=head3 temp_limit
+
+Value: Integer. A limit (in Farenheit), that when the temperature goes above,
+the colour of the temperature in the UI will change from green to
+red, and we'll enable the assoiated GPIO pin, if set.
+
+Default: C<80>
+
+=head3 humidity_limit
+
+Value: Integer. A limit, that when the humidity goes below, the colour of the
+humidity in the UI will change from green to red, and we'll enable the assoiated
+GPIO pin, if set.
+
+Default: C<20>
+
+=head3 temp_aux_on_time
+
+Value: Integer (seconds). This is the minimum length of time that the auxillary
+associated with the temperature limit reached event will remain on once turned
+on. Setting this to a reasonable number will prevent repeated on/off events
+if the temperature fluctuates right around the limit.
+
+Default: C<1800> (30 minutes)
+
+=head3 humidity_aux_on_time
+
+Value: Integer (seconds). This is the minimum length of time that the auxillary
+associated with the humidity limit reached event will remain on once turned
+on. Setting this to a reasonable number will prevent repeated on/off events
+if the humidity fluctuates right around the limit.
+
+Default: C<1800> (30 minutes)
+
+=head3 temp_aux
+
+Value: String, in the form C<auxN>, where C<N> is a value from 1-8. This
+specifies that we'll associate that auxillary (an auxillary represents a GPIO
+pin) to the temperature button in the UI, and the temperature limit reached
+event.
+
+Default: C<aux1>
+
+=head3 humidity_aux
+
+Value: String, in the form C<auxN>, where C<N> is a value from 1-8. This
+specifies that we'll associate that auxillary (an auxillary represents a GPIO
+pin) to the humidity button in the UI, and the humidity limit reached event.
+
+Default: C<aux2>
+
+=head3 light_aux
+
+Value: String, in the form C<auxN>, where C<N> is a value from 1-8. This
+specifies that we'll associate that auxillary with the light on/off event.
+
+Default: C<aux3>
+
+=head2 LIGHT CONFIGURATION SECTION
+
+This section manages the light control functionality.
+
+=head3 enable
+
+Value: Bool. Set to C<1> (true) to enable the light management functionality,
+and C<0> (false) to disable it. If this is false, we won't show the light
+management table in the UI, and we will not perform any light on/off events.
+
+Default: C<0>
+
+=head3 toggle
+
+Value: Bool. Set to C<1> to allow the light's on/off button to be toggled in the
+UI, and C<0> to have it disabled, preventing manual overrides of the schedule.
+The C<enable> directive must be set for this to have any effect.
+
+Default: C<0>
+
+=head3 on_at
+
+Value: A time, in C<HH:MM> format, in 24 hour clock (eg: C<18:30>). This is the
+time that the light will be enabled (turned on).
+
+Default: C<18:00>
+
+=head3 on_hours
+
+Value: Integer, the number of hours the light shall remain on, before being
+turned back off.
+
+Note: C<12> hours is typical for a flowering cycle, and either C<18> or C<24>
+hours are typical for a vegitative plant cycle.
+
+Default: C<12>
+
+=head2 AUXILLARY CONFIGURATION SECTION
+
+An auxillary (ie. aux) is the representation of a Raspberry Pi GPIO pin. There
+are eight auxillaries built into the system, all are disabled by default.
+
+Each auxillary has its own little configuration section, and each contains the
+following directives.
+
+=head3 pin
+
+Value: Integer. The GPIO pin number (in Broadcom BCM GPIO numbering scheme).
+
+Disable an aux by setting this value to C<-1> (by default all of them are).
+
+Default: C<-1>
+
+=head3 desc
+
+Value: String. A one-word description of what the pin is used for. This value
+is operationally irrelevant.
+
+Default:
+
+    aux1: temp
+    aux2: humidity
+    aux3: light
+    aux4: none
+    aux5: none
+    aux6: none
+    aux7: none
+    aux8: none
+
+=head1 AUTHOR
+
+Steve Bertrand, E<lt>steveb@cpan.org<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016 Steve Bertrand.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.

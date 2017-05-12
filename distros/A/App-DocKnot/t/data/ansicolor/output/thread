@@ -1,0 +1,194 @@
+\==[doc]      [2] [\bullet(packed)[\link[\1][\2]]]
+\==[program]  [3]
+    [\tablerow[\1 \version[\2]] [\release[\2]]
+        [\link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+        (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+              [PGP signature])]
+        [\link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+        (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+              [PGP signature])]]
+\==[download] [3]
+    [\1 \version[\2]\break
+     \link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+     (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+           [signature])\break
+     \link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+     (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+           [signature])\break
+    Released \release[\2]]
+
+\heading[Term::ANSIColor][software]
+
+\h1[Term::ANSIColor]
+
+\quote(short)[
+
+    Ah, September, when the sysadmins turn colors and fall off the
+    trees....
+
+][Dave van Domelen][]
+
+\div(sidebar)[
+    \h2[Download]
+
+    \download[Term::ANSIColor][term-ansicolor]
+        [devel/Term-ANSIColor-\version[term-ansicolor]]
+
+    \link[https://archives.eyrie.org/software/ARCHIVE/Term-ANSIColor/]
+         [Archive]
+
+    \h2[Documentation]
+
+    \link[readme.html][General overview] \break
+    \link[news.html][Change summary] \break
+    \link[docs.html][Module documentation] \break
+    \link[thanks.html][Thanks and credits]
+
+    \h2[Development]
+
+    \link[todo.html][To-do list] \break
+    \link[https://github.com/rra/ansicolor]
+         [GitHub] \break
+    \link[https://rt.cpan.org/Dist/Display.html?Name=Term-ANSIColor]
+         [Bug tracker] \break
+    \link[https://git.eyrie.org/?p=perl/ansicolor.git]
+         [Git repository]
+]
+
+\h2[Blurb]
+
+Term::ANSIColor provides constants and simple functions for setting ANSI
+text attributes, most notably colors.  It can be used to set the current
+text attributes or to apply a set of attributes to a string and reset the
+current text attributes at the end of that string.  Eight-color,
+sixteen-color, and 256-color escape sequences are all supported.
+
+\h2[Description]
+
+This Perl module is a simple and convenient interface to the ANSI terminal
+escape sequences for color (from ECMA-48, also included in ISO 6429).  The
+color sequences are provided in two forms, either as constants for each
+color or via a function that takes the names of colors and returns the
+appropriate escape codes or wraps them around the provided text.  The
+non-color text style codes from ANSI X3.64 (bold, dark, underline, and
+reverse, for example), which were also included in ECMA-48 and ISO 6429,
+are also supported.  Also supported are the extended colors used for
+sixteen-color and 256-color emulators.
+
+This module is very stable, and I've used it in a wide variety of
+applications.  It has been included in the core Perl distribution starting
+with version 5.6.0, so you don't need to download and install it yourself
+unless you have an old version of Perl or need a newer version of the
+module than comes with your version of Perl.  I continue to maintain it as
+a separate module, and the version included in Perl is resynced with mine
+before each release.
+
+The original module came out of a discussion in comp.lang.perl.misc and is
+a combination of two approaches, one with constants by Zenin and one with
+functions that I wrote.  I offered to maintain a combined module that
+included both approaches.
+
+\h2[Requirements]
+
+Term::ANSIColor is written in pure Perl and has no module dependencies
+that aren't found in Perl core.  It should work with any version of Perl
+after 5.6, although it hasn't been tested with old versions in some time.
+
+In order to actually see color, you will need to use a terminal window
+that supports the ANSI escape sequences for color.  Any recent version of
+xterm, most xterm derivatives and replacements, and most telnet and ssh
+clients for Windows and Macintosh should work, as will the MacOS X
+Terminal application (although Terminal.app reportedly doesn't support 256
+colors).  The console windows for Windows NT and Windows 2000 will not
+work, as they do not even attempt to support ANSI X3.64.
+
+For a complete (to my current knowledge) compatibility list, see the
+Term::ANSIColor module documentation.  If you have any additions to the
+table in the documentation, please send them to me.
+
+The test suite requires Test::More (part of Perl since 5.6.2).  The
+following additional Perl modules will be used by the test suite if
+present:
+
+\bullet(packed)[Devel::Cover]
+\bullet(packed)[Test::MinimumVersion]
+\bullet(packed)[Test::Perl::Critic]
+\bullet(packed)[Test::Pod]
+\bullet(packed)[Test::Pod::Coverage]
+\bullet(packed)[Test::Spelling]
+\bullet(packed)[Test::Strict]
+\bullet(packed)[Test::Synopsis]
+\bullet(packed)[Test::Warn]
+
+All are available on CPAN.  Those tests will be skipped if the modules are
+not available.
+
+\h2[Download]
+
+The distribution:
+
+\table[][
+    \program[Term::ANSIColor][term-ansicolor]
+        [devel/Term-ANSIColor-\version[term-ansicolor]]
+]
+
+An \link[https://archives.eyrie.org/software/ARCHIVE/Term-ANSIColor/]
+[archive of older releases] is also available.
+
+Term::ANSIColor is maintained using the Git version control system.  To
+check out the current development tree, see
+\link[https://github.com/rra/ansicolor][GitHub] or clone:
+
+\pre[    https://git.eyrie.org/git/perl/ansicolor.git]
+
+Pull requests on GitHub are welcome.  You can also
+\link[https://git.eyrie.org/?p=perl/ansicolor.git][browse the current
+development source].
+
+\h2[Documentation]
+
+User documentation:
+
+\doc[readme.html][README]
+\doc[news.html][Change summary]
+\doc[docs.html][Module documentation]
+\doc[thanks.html][Thanks and credits]
+\doc[license.html][License and copyright]
+
+Developer documentation:
+
+\doc[todo.html][To-do list]
+\doc[https://github.com/rra/ansicolor]
+    [GitHub]
+
+\h2[License]
+
+The Term::ANSIColor package as a whole is covered by the following
+copyright and license:
+
+\block[
+
+    Copyright 1996-1998, 2000-2002, 2005-2006, 2008-2016
+        Russ Allbery <rra@cpan.org>
+
+    Copyright 1996
+        Zenin
+
+    Copyright 2012
+        Kurt Starsinic <kstarsinic@gmail.com>
+
+    This program is free software; you may redistribute it and/or modify
+    it under the same terms as Perl itself.  This means that you may
+    choose between the two licenses that Perl is released under: the GNU
+    GPL and the Artistic License.  Please see your Perl distribution for
+    the details and copies of the licenses.
+
+    PUSH/POP support submitted 2007 by openmethods.com voice solutions
+
+]
+
+Some individual source files are covered by other, compatible licenses.
+For complete copyright and license information, see the file
+\link[license.html][LICENSE] in the Term::ANSIColor source distribution.
+
+\signature

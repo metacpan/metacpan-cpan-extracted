@@ -1,0 +1,130 @@
+Revision history for Audit-DBI
+
+v1.9.0  2017-03-20
+        - Relicensed under Perl 5 terms.
+        - Cleaned up dependencies.
+        - Improved test coverage.
+
+v1.8.2  2014-04-20
+        - Added automatic conversion of IP addresses.
+        - Added many test to improve code coverage.
+        - Refactored tests.
+        - Fixed "package version matches dist version" for CPANTS.
+        - Fixed license declared in meta files.
+
+v1.8.1  2013-05-13
+        - Fixed meta information.
+
+v1.8.0  2013-05-12
+        - IMPORTANT: Audit::DBI::TT2 is now in an independent distribution
+          instead of being bundled inside Audit-DBI. Removed module and
+          prerequisites accordingly.
+        - Fixed missing use.
+
+v1.7.3  2013-05-08
+        - Updated readme to use markdown.
+        - Replaced Test::NoWarnings with Test::FailWarnings.
+
+v1.7.2  2013-04-27
+        - (GitHub #5) Fixed retrieving events with the 'values' argument in
+          Audit::DBI->review(). Thanks Jacob Rose!
+        - Added tests for the 'values' argument of Audit::DBI->review().
+
+v1.7.1  2013-03-24
+        - Updated example to use JQuery v1.9.1 and JQueryUI.
+        - Moved release tests to xt/.
+        - Added tests for Kwalitee.
+        - Added Test::NoWarnings to all tests.
+        - Updated links to point to MetaCPAN.
+        - Updated links to point to GitHub's issue tracker.
+        - Fixed tests that depend on String::Diff.
+
+v1.7.0  2013-03-16
+        - Added optional sort argument to Audit::DBI->review().
+        - Moved request tracker from RT to GitHub.
+        - Added get_string_bytes() and get_diff_string_bytes() in
+          Audit::DBI::Utils to support calculating the size of diffs.
+        - Added Audit::DBI::Event->get_diff_string_bytes() to retrieve the size
+          of string differences in the diff stored for the audit event.
+
+v1.6.0  2012-10-07
+        - Fixed expiration time issue with Cache::Memcached::Fast.
+        - Added full support for PostGreSQL.
+        - Refactored tests to centralize database connections and allow testing
+          with different database types.
+        - Added config file for Travis-CI.
+        - Added comments in JS and CSS files.
+
+v1.5.3  2012-10-01
+        - Added tests for Audit::DBI::Utils::ipv4_to_integer() and
+          Audit::DBI::Utils::integer_to_ipv4().
+        - Simplified Audit::DBI::Utils::ipv4_to_integer() to fix a persistent
+          error report on OS X Tiger.
+        - Relicensed as GPLv3.
+        - Fixed POD.
+
+v1.5.2  2012-09-21
+        - (RT #79696) Updated default comparison function when determining the
+          difference between two data structures to handle equal numbers with
+          a different formatting.
+        - (RT #79695) Added support in Audit::DBI->record() for specifying a
+          custom comparison function for the diff.
+
+v1.5.1  2012-09-19
+        - POD corrections.
+        - (RT #79749) Fixed index name. Thanks Jamie!
+        - Moved repository to GitHub.
+
+v1.5.0  2012-09-12
+        - Implemented option to convert objects into strings when calling,
+          record(), to improve the readability of the diff and information
+          when calling review(). Thanks Kate Kirby for pair-programming this
+          feature with me!
+
+v1.4.3  2012-09-11
+        - Fixed warning.
+        - Fixed call to Storable::freeze() when there is no diff structure.
+
+v1.4.2  2012-09-11
+        - Fixed how field names are quoted when inserting events.
+
+v1.4.1  2012-09-10
+        - Added optional database_handle argument to Audit::DBI->review().
+        - Tightened up checking for invalid parameters.
+
+v1.4.0  2012-09-07
+        - Repackaged and generalized code.
+        - Added fully working example.
+        - Added standalone tests.
+        - Public release.
+
+v1.3.0  2012-02-13
+        - Nathan Gray (KOLIBRIE) implemented rate-limiting in Audit::DBI->record().
+
+v1.2.5  2012-02-12
+        - Added verification of mandatory parameters for record().
+        - Added Audit::DBI::Event->get_ip_address().
+
+v1.2.4  2011-05-18
+        - Upgraded JQuery from 1.3.2 to 1.5.
+
+v1.2.3  2011-01-21
+        - Cleaned up imports.
+
+v1.2.2  2010-12-20
+        - Changed arguments of review() use a singular form.
+        - Changed to use hashrefs instead of hashes to pass data.
+        - Cleaned up Audit::DBI::Event.
+
+v1.2.1  2010-08-18
+        - Fixed typo.
+
+v1.2.0  2010-08-04
+        - Added support for searching on events.
+
+v1.1.0  2010-01-25
+        - Implemented search data.
+        - Fixed review() when searching with key/values.
+
+v1.0.0  2010-01-07
+        - First version.

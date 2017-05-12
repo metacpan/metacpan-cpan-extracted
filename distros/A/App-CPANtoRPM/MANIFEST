@@ -1,0 +1,28 @@
+.travis.yml
+bin/cpantorpm
+bin/cpantorpm-depreq
+bin/cpantorpm.pod
+Changes
+examples/modopts.yaml
+examples/test_prov.exp
+examples/test_prov.pl
+examples/test_vers.exp
+examples/test_vers.pl
+INSTALL
+internal/_no_tests
+internal/build.yaml
+internal/perl.prov
+internal/perl.req
+internal/TODO
+lib/App/CPANtoRPM.pm
+lib/App/CPANtoRPM.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/pod.dirs
+t/pod.t
+t/pod_coverage.t
+t/runtests
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

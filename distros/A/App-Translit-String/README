@@ -1,0 +1,80 @@
+NAME
+    translit-string - Script to transliterate string.
+
+SYNOPSIS
+     translit-string [-h] [-r] [-t table] [--version] string
+
+DESCRIPTION
+     translit-string script uses Lingua::Translit class to transliterate strings.
+
+ARGUMENTS
+    *       "-h"
+
+             Print help.
+
+    *       "-r"
+
+             Reverse transliteration.
+
+    *       "-t table"
+
+             Transliteration table.
+             For list of transliteration tables see L<Lingua::Translit>.
+
+    *       "--version"
+
+             Print version of script.
+
+    *       "string"
+
+             String to transliterate.
+
+EXAMPLE1
+     translit-string
+
+     # Output:
+     # Usage: translit-string [-h] [-r] [-t table] [--version]
+     #         string
+     # 
+     #         -h              Print help.
+     #         -r              Reverse transliteration.
+     #         -t table        Transliteration table (default value is 'ISO/R 9').
+     #         --version       Print version.
+
+EXAMPLE2
+     translit-string 'Российская Федерация'
+
+     # Output:
+     # Rossijskaja Federacija
+
+EXAMPLE3
+     translit-string -r 'Rossijskaja Federacija'
+
+     # Output:
+     # Российскайа Федерацийа
+
+DEPENDENCIES
+    App::Translit::String.
+
+SEE ALSO
+    translit
+        transliterate text between various writing systems
+
+    Lingua::Translit
+        transliterates text between writing systems
+
+REPOSITORY
+    <https://github.com/tupinek/App-Translit-String>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2015-2016 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.04
+

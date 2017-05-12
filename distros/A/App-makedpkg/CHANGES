@@ -1,0 +1,33 @@
+Changelog for App-makedpkg
+
+0.05 2014-04-16T11:16:23
+ - don't depend on newline handling for tests [Jakob Voss]
+ - skip tests on Windows [Jakob Voss]
+
+0.04 2014-03-20T07:17:06
+ - depend on File::ShareDir [Jakob Voss]
+ - include source/format file [Jakob Voss]
+ - include compat file for V9 [Jakob Voss]
+
+0.03 2014-03-14T08:34:33
+ - removed dependency [Jakob Voss]
+
+0.02 2014-03-13T09:48:11
+ - fixed creation of install file [Jakob Voss]
+ - config value build.command instead of build.options [Jakob Voss]
+
+0.01 2014-03-13T08:01:31
+ - fixed test [Jakob Voss]
+ - fixed directory structure [Jakob Voss]
+ - don't fail on different newlines [Jakob Voss]
+ - sort files for predictable output [Jakob Voss]
+ - automatically create install file [Jakob Voss]
+ - show build directory in verbose mode [Jakob Voss]
+ - allow failure for perl 5.10 [Jakob Voss]
+ - don't show YAML parsing error [Jakob Voss]
+ - more safe YAML writing [Jakob Voss]
+ - facilitated testing [Jakob Voss]
+ - YAMl files must end with newline [Jakob Voss]
+ - forgot option --prepare [Jakob Voss]
+ - initial version [Jakob Voss]
+

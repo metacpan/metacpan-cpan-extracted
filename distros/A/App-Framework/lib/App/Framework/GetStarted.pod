@@ -1,0 +1,508 @@
+=head1 NAME
+
+App::Framework::GetStarted - Getting Started
+
+=head1 DESCRIPTION
+
+A minimal script consists of setting up allowed options, expected arguments, and writing the application body. An example of this would be:
+
+    #!/usr/bin/perl
+    #
+    use strict ;
+    use App::Framework ;
+    
+    # VERSION
+    our $VERSION = '1.000' ;
+    
+        # Create application and run it
+        App::Framework->new()->go() ;
+    
+    #----------------------------------------------------------------------
+    # Main execution
+    #
+    sub app
+    {
+        my ($app, $opts_href, $args_href) = @_ ;
+    
+        print "Hello world\n" ;
+    
+        # do something more useful...
+    }
+    
+    #=================================================================================
+    # SETUP
+    #=================================================================================
+    __DATA__
+    
+    [SUMMARY]
+    
+    An example of using the application framework
+    
+    [ARGS]
+    
+    * infile=f        Input file
+    
+    Should be set to the input file
+    
+    * indir=d        Input dir
+    
+    Should be set to the input dir
+    
+    [OPTIONS]
+    
+    -table=s        Table [default=listings2]
+    
+    Sql table name
+    
+    -database=s        Database [default=tvguide]
+    
+    Sql database name
+    
+    
+    [DESCRIPTION]
+    
+    B<$name> is an example script.
+
+=head2 Object Creation
+
+The first few lines of the script import the App::Framework and then create an App::Framework object (using App::Framework->new()) followed by
+immediately using it (the ->go() part). Alternatively, you can do this in 2 stages:
+
+    # Create application ...
+    my $app = App::Framework->new() ;
+    
+    # ... and run it
+    $app->go() ;
+
+Or, if like me you are *really* lazy, then you can just call:
+
+    # Create application and run it
+    go() ;
+
+It's usually a "good thing" to define a version number (and better still, keep it updated as the script changes!). If you do define a $VERSION
+at the start of the script, App::Framework will use it when displaying script manual pages.    
+
+=head2 Set-up
+
+The command-line arguments and options are defined in a text section at the end of the program. In fact it's actually part of a 
+__DATA__ definition. All program settings are grouped under sections which are introduced by '[section]' style headings. There are many 
+different settings that can be set using this mechanism, but since the framework sets most of them to useful defaults, then the most common 
+settings are:
+
+=over 4
+
+=item * 
+
+SUMMARY
+
+=item * 
+
+ARGS
+
+=item * 
+
+OPTIONS
+
+=item * 
+
+DESCRIPTION
+
+=back
+
+The following sections describe these items in more detail.
+
+
+
+=head3 Summary
+
+This should be a single line, concise summary of what the script does. It's used in the terse man page created by pod2man.
+
+=head3 Description
+
+As you'd expect, this should be a full description, user-guide etc. on what the script does and how to do it. Notice that this example
+has used one (of many) of the variables available: $name (which expands to the script name, without any path or extension).
+
+=head3 Options
+
+Command line options are defined in general as:
+
+    -<name>=<specification>    <Summary>    <optional default setting>
+    
+    <Description> 
+
+The specification is in the format:
+
+   <type> [ <desttype> ]
+
+Allowed specifications are:
+
+   (s|i|o|f) [ @|% ]  
+
+where the I<type> may be s (string), i (integer), o (extended integer), f (float); the optional I<desttype> can be @ (array), % (hash).
+
+Note, if a specification is not defined then the option is treated as a boolean flag that is by default unset, but set if the option is 
+used at the command line, for example:
+
+    -ok        Flag for validity
+
+Defaults, where specified, are in the format:
+
+    [default=<value>]
+
+The name (or names) of the option are specified as a list separated by '|'. One name is used as the option variable name, and the others
+are used as aliases that the script user can specify at the command line. Normally, the first name specified in a list is used as the variable
+name, but this may be over-ridden by surrounding the required name in quotes. For example, we could have said:
+
+    -table|tbl|sql_table=s        Table [default=listings2]
+
+or
+
+    -tbl|'table'|sql_table=s        Table [default=listings2]
+
+so that the command line could use -tbl, -table, or -sql_table and the option value be retrieved using 'table' as the option name.
+
+The option spec (which in the example is set to 's') is a subset of the set supported by L<Getpt::Long>. For full details of the supported
+set please see L<App::Framework::Feature::Options>
+
+If a default is specified, that the option will be given the default value if it is not specified at the command line. Also, the default
+can contains variables which will be expanded once the script starts. These variables can include the values of other options. For example, 
+we could have specified the 'database' option as:
+
+    -database=s        Database [default=${table}_db]
+
+Then the database option would be set to 'listings2_db' if no options were specified by the user at the command line.
+
+By default, the application is called with the options HASH as the 2nd parameter. Using the option values is discussed 
+in L<Application body>
+
+
+=head3 Arguments
+
+The command line arguments specification is (not) suprisingly similar to the options specification! In this case we use '*' to signify the
+start of a new argument definition (rather than the '-' for options). Note, however, that you can actually use '-' if you want to (for example,
+you might want to move something that starts as an option but then you decide it would be better as an argument).
+
+The main differences between options and arguments are the specification and the defaults.
+
+Arguments are defined in general as:
+
+    * <name>=<specification>    <Summary>    <optional default setting>
+    
+    <Description> 
+
+
+For arguments, the specification is in the format:
+
+   [ <direction> ] [ <binary> ] <type> [ <multiple> ]
+
+allowed specifications are:
+
+   [ (<|>|>>) ] [b] (f|d|s) [@|*]  
+
+The optional I<direction> can be one of: <, >, or >> signifying input, output, or appended output.
+
+The I<type> can be: s, f, or d for string, file, or directory. 
+
+An optional 'b' after the direction specifies that the file is binary mode (only used when the type is file).
+
+Additionally, an optional multiple can be specified as: @ or *. If used, this can only be specified on the last argument. When it is used, this tells the
+application framework to use the last argument as an ARRAY, pushing all subsequent specified arguments onto this (don't worry, an example should make this clear).
+
+The difference between @ and * is that @ specifies that there must be at least one argument specified, whereas * expects 0 or more arguments.
+
+There is also a special case (the real reason for *) where the argument specification is of the form '<f*' (input file multiple). Here, if the script user does not
+specify any arguments on the command line for this argument then the framework opens STDIN and provides it as a file handle.  
+
+Defaults, where specified, are in the format:
+
+    [default=<value>]
+
+If a default is specifed, this makes this argument optional. It also makes all subsequent arguments optional. Optional arguments are not checked for by the application (and if
+they are not specified will take the default value).
+
+The main reason for specifying arguments is to get the framework to do all the work of checking for you. All (non optional) values are checked to ensure that the user specified
+something on the command line. This is all the checking string arguments are given. However, input file and directory arguments are also checked for presence, causing an error
+message if they are not present. 
+
+For the lazy, you'll appreciate the fact that the framework does even more for you. By default, any arguments specified as input files will be opened for reading; output files will be opened for writing; output directories will be created. In addition, any output files 
+specified with >> will be appended to (rather than truncated). All of these opened files are passed in as file handles in the arguments HASH named with the argument name suffixed
+by '_fh' (you can turn this off by declaring the Args feature with 'open' settings - see L<App::Framework::Feature::Args>).
+
+For example, with the following specifications
+
+    * infile=<f
+    * outfile=>f 
+
+the command line arguments (and opened files) can be accessed with the argument HASH keys:
+
+    infile        = infile filename
+    infile_fh    = infile file handle opened for reading
+    outfile        = outfile filename
+    outfile_fh    = outfile file handle opened for writing
+
+An example of using the * multiple is as follows:
+
+    [ARGS]
+    * file=<f*    Input files
+
+And it's use as:
+
+    sub app
+    {
+        my ($app, $opts_href, $args_href) = @_ ;
+        
+        foreach my $fh (@{$args_href->{files_fh}})
+        {
+            while (my $data = <$fh>)
+            {
+                # do something ... 
+            }
+        }
+    }    
+
+This script can then be called with one or more filenames, or can be called with no filenames and STDIN will be used.
+
+
+By default, the application is called with the arguments HASH as the 3rd parameter. Using the argument values is discussed 
+in L</Application body>. 
+
+
+=head2 Application body
+
+    sub app
+    {
+        my ($app, $opts_href, $args_href) = @_ ;
+        
+        ....    
+    }
+
+The application framework calls the subroutine B<app> with 3 parameters:
+
+=over 4
+
+=item * 
+
+$app - The application object
+
+=item * 
+
+$opts_href - An HASH ref of the options
+
+=item * 
+
+$args_href - An HASH ref of the arguments
+
+=back
+
+This means that you immediately have access to all of the application object methods, the options, and the command line arguments.
+
+Alternatively, you can access the options and arguments using either the feature accessor, or by accessing the feature object.
+
+=head3 Feature accessor
+
+Every registered feature has an B<access> method that is aliased on to the application object with the name of the feature. For example,
+the feature 'Args' has an 'access' method aliased onto the application as 'args' so that you could do:
+
+    $app->args() ;
+    
+    # same as:
+    $args_obj->access() ; 
+
+=head3 Feature object
+
+To get the feature object, call the application's 'feature' method with the name of the feature (case insensitive):
+
+    my $args_obj = $app->feature('Args') ;
+    
+This allows you to directly call any of the advertised feature methods.
+
+=head3 Options feature
+
+The options access method returns the options HASH, which is passed into the app subroutine by reference. So, the following are equivalent:
+
+    sub app
+    {
+        my ($app, $opts_href, $args_href) = @_ ;
+        
+        # use parameter
+        my $log = $opts_href->{log}
+        
+        # access alias
+        my %options = $app->options() ;
+        $log = $options{log} ;
+        
+        # feature object
+        %options = $app->feature('Options')->access() ;
+        $log = $options{log} ;
+    }
+
+
+=head3 Args feature
+
+The args access method returns the argument values in a list. You may also specify one or more argument names to only return their values in 
+the list. 
+
+For example, with the following specifications
+
+    * infile=<f
+    * outfile=>f 
+
+then the arguments can be accessed as:
+
+    sub app
+    {
+        my ($app, $opts_href, $args_href) = @_ ;
+        
+        # use parameter
+        my $infile = $args_href->{infile}
+        
+        # access alias
+        my @args = $app->args() ;
+        $infile = $args[0] ;
+        
+        ($infile) = $app->args('infile') ;
+        
+        # feature object
+        @args = $app->feature('Args')->access() ;
+        $infile = $args[0] ;
+    }
+
+
+=head2 Advanced
+
+In addition to the straightforward cases described above, additional features may be optionally included into the script as described below.
+
+=head3 Data sections
+
+The framework installs the 'Data' feature automatically in order to process the script settings. The user may then add additional data sections
+below the setup. These data sections can be named, and the data contents accessed via this name. Also, the contents (text) of the data sections
+may contain variables the are expanded from the current settings of options, application setup, or the environment variables.
+
+For example, the following data definition:
+
+    __DATA__
+    
+    [SUMMARY]
+    Tests the application object with SQL
+    
+    [DESCRIPTION]
+    
+    B<$name> will ensure that table 'listings2' is created in the specified database. It will then
+    add some rows, show them, and then delete them.
+    
+    
+    [OPTIONS]
+    
+    -database=s    Database name
+    
+    Specify the database name to use
+    
+    -table=s       Table name
+    
+    Specify a different table
+    
+    
+    __#=============================================================================================================================
+    __DATA__ sql
+    
+    -- --------------------------------------------------------
+    -- 
+    -- Table structure for table `$table`
+    -- 
+    DROP TABLE IF EXISTS `$table`;
+    CREATE TABLE IF NOT EXISTS `$table` (
+      `pid` varchar(128) NOT NULL,
+      `title` varchar(128) NOT NULL,
+      `date` date NOT NULL,
+      `start` time NOT NULL,
+      KEY `pid` (`pid`),
+    ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
+and script command arguments:
+
+  -table listings2
+
+result in the data section 'sql' being expanded to:
+
+    -- --------------------------------------------------------
+    -- 
+    -- Table structure for table `listings2`
+    -- 
+    DROP TABLE IF EXISTS `listings2`;
+    CREATE TABLE IF NOT EXISTS `listings2` (
+      `pid` varchar(128) NOT NULL,
+      `title` varchar(128) NOT NULL,
+      `date` date NOT NULL,
+      `start` time NOT NULL,
+      KEY `pid` (`pid`),
+    ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+For further details see L<App::Framework::Feature::Data>
+
+=head3 Configurations
+
+A configuration file may be used to provide all of the application's option settings, rather than supplying them at the command line. The default setup of the Config feature
+is to attempt to read the configuration file named ${name}.conf (where ${name} is the script name). The framework, by default, will search for this file in three directories depending
+on operating system. For example, a script 'test_script' will look for it's configuration file on Linux in:
+
+    $HOME/.test_script
+    /etc/test_script
+    /usr/local/bin/config 
+
+The configuration file contents, at simplest, are just variable=value pairs with optional descriptive comments. For example:
+
+    # Server port number
+    port = 32023
+    
+    # stay alive tick interval
+    tick = 5
+    
+    # log
+    logfile = /tmp/ate_snmp.log
+
+For further details, and more advanced configurations, see L<App::Framework::Feature::Config>
+
+
+=head3 Running external programs
+
+You use the B<Run> feature to execute external programs. First, you should specify which programs you want to run in the script. This
+step is not necessary, but it checks up front that all the programs you want to use are actually installed:
+
+   use App::Framework '+Run'
+   
+   ...
+   
+   my $run = $app->run ;
+
+   # get the framework to abort if some programs are not installed
+   $run->on_error('fatal') ;
+   
+   # check your programs
+   $run->required(
+      {
+          'lsvob'      => 1,
+          'ffmpeg'     => 1,
+          'transcode'  => 1,
+          'vlc'        => 1,	
+      },
+   ) ;
+
+Once you know you can use the programs, you call them as (for example):
+
+   my $status = $app->run("ffmpeg", "-i move.avi movie.mpeg") ;
+
+where the returned value is 0 for success; non-zero for program error code.
+
+You can also get the program output by:
+
+  my $results_aref = $app->run->results ;
+
+which returns an ARRAY ref of lines of text output. 
+
+For further details see L<App::Framework::Feature::Run>
+
+
+=cut
+
+

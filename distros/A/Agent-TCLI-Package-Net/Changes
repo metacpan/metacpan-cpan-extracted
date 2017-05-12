@@ -1,0 +1,22 @@
+Revision history for Agent::TCLI::Package::Net
+
+0.031	Thu Jun  7 20:40:10 EST 2007
+	- Fixed up more POD errors
+	- Fixed bug in SMTP when failing to send, created dev test
+	- Turned off some debugging in SMTP that was left on.
+	- Added SMTP sendmsg command
+
+0.03	Thu Jun  7 06:42:00 EST 2007
+	- Added SMTP client package
+	- Cleaned up some PODs
+
+0.02	Thu May  3 14:04:37 EST 2007
+	- updated tests for TCLI-Core 0.03
+	- Fixed POD documentation
+	- Added pod.t test
+	- Added HTTPD package
+	- Added ex/target.t example script for inter Agent testing
+
+0.01	Mon Apr  2 18:48:44 EST 2007
+		Initial release.
+

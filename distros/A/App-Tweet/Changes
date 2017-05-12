@@ -1,0 +1,13 @@
+Revision history for App::Tweet
+
+1.00    2008-01-20 21:00:00 -06:00
+        First version, released on an unsuspecting world.
+
+1.01    2008-01-21 10:00:00 -06:00
+        Added Crypt::Blowfish as an prereq module.  Thanks John SJ Anderson for
+        reporting the issue.
+
+1.02    2008-01-21 10:05:00 -06:00
+        Added Test::MockObject as an prereq module.  Thanks Bob Walker for
+        reporting the issue.  That's two prereq problems in the first day,
+        man I released this too late last night.

@@ -1,0 +1,42 @@
+NAME
+    Apache2::ShowStatus - if you want to know what your Apache processes are
+    doing
+
+SYNOPSIS
+     LoadModule perl_module ".../mod_perl.so"
+     PerlModule Apache2::ShowStatus
+     PerlInitHandler Apache2::ShowStatus
+
+DESCRIPTION
+    This module provides a "PerlInitHandler" that sets the apache's process
+    title to
+
+     "httpd: ".$r->the_request
+
+    The process title is automagically reset when the request is over.
+
+    Thus, "top" & Co shows what requests are currently active.
+
+SEE ALSO
+    Sys::Proctitle
+
+AUTHOR
+    Torsten Foertsch, <torsten.foertsch@gmx.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Torsten Foertsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+INSTALLATION
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DEPENDENCIES
+    *   Sys::Proctitle
+
+    *   perl 5.8.0
+

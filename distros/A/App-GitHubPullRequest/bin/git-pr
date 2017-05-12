@@ -1,0 +1,106 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: Command-line tool to query GitHub pull requests
+# PODNAME: git-pr
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use App::GitHubPullRequest;
+
+my $pr = App::GitHubPullRequest->new;
+my $rc = $pr->run(@ARGV);
+exit $rc;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+git-pr - Command-line tool to query GitHub pull requests
+
+=head1 VERSION
+
+version 0.4.0
+
+=head1 SYNOPSIS
+
+    $ git pr
+    $ git pr list closed # not shown by default
+    $ git pr show 7      # also includes comments
+    $ git pr patch 7     # can be piped to colordiff if you like colors
+    $ git pr checkout 7  # create upstream tracking branch pr/7
+    $ git pr help
+
+    $ git pr login       # Get access token for commands below
+    $ git pr close 7
+    $ git pr open 7
+    $ git pr comment 7 'This is good stuff!'
+
+=head1 INSTALLATION
+
+Install it by just typing in these few lines in your shell:
+
+    $ curl -L http://cpanmin.us | perl - --self-upgrade
+    $ cpanm App::GitHubPullRequest
+
+The following external programs are required:
+
+=over 4
+
+=item *
+
+L<git(1)>
+
+=item *
+
+L<curl(1)>
+
+=item *
+
+L<stty(1)>
+
+=back
+
+=head1 CAVEATS
+
+If you don't authenticate with GitHub using the login command, it will use
+unauthenticated API requests where possible, which has a rate-limit of 60
+requests.  If you login first it should allow 5000 requests before you hit
+the limit.
+
+You must be standing in a directory that is a git dir and that directory must
+have a remote that points to github.com for the tool to work.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<App::GitHubPullRequest>
+
+=back
+
+=head1 SEMANTIC VERSIONING
+
+This module uses semantic versioning concepts from L<http://semver.org/>.
+
+=head1 AUTHOR
+
+Robin Smidsrød <robin@smidsrod.no>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Robin Smidsrød.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,33 @@
+[% PROCESS header.html scripts=['show'] title=podver.name %]
+
+[% PROCESS login_form.html %]
+[% PROCESS form.html %]
+
+<h2>
+<a href="[% root_uri_rel %]/~[% podver.distver.pause_id %]">[% podver.distver.pause_id %]</a>
+&gt;
+[% link_distver(podver.distver) %]
+&gt; 
+[% link_pod(podver.pod) %]
+</h2>
+
+<p class="sisters">[[% link_podver_search_cpan_org(podver) %] |
+[% link_podver_kobes(podver) %] ]
+</p>
+
+[% my_html(podver) %]
+
+<script type="text/javascript">
+<!--
+var el = document.createElement('div');
+el.innerHTML = '[% PROCESS note_form.html note_form_class="hidden" | remove("\n") %]';
+document.getElementById('nav').appendChild(el);
+
+var el2 = document.createElement('div');
+el2.id = 'plswait';
+el2.style.display = 'none';
+el2.innerHTML = 'Saving note... please wait';
+document.getElementById('nav').appendChild(el2);
+// -->
+</script>
+[% PROCESS footer.html %]

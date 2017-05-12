@@ -1,0 +1,24 @@
+.travis.yml
+Build.PL
+Changes
+inc/My/Builder.pm
+inc/My/Builder/Unix.pm
+inc/My/Builder/Windows.pm
+inc/My/Utility.pm
+lib/Alien/SDL2.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+patches/libpng-1.6.3-hack.patch
+patches/libtiff.4.0.3.tiffio.h.patch
+patches/libvorbis-1.3.3-configure.patch
+README
+t/001_load.t
+t/002_config.t
+t/003_check_header.t
+t/004_get_header_version.t
+t/005_havelib.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+TODO

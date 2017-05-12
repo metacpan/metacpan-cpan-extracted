@@ -1,0 +1,12 @@
+Changes
+Release
+Makefile.PL
+MANIFEST
+NCA.pm
+README
+e/timing.pl
+e/execution.log
+t/preprocess.t
+t/basic.t
+t/random.t
+META.yml                                 Module meta-data (added by MakeMaker)

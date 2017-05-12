@@ -1,0 +1,8 @@
+Revision history for Perl extension Acme::Collector64
+
+0.02
+    - add test case
+    - refactoring
+
+0.01
+    - original version

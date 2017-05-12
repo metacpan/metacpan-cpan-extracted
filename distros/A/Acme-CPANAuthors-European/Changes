@@ -1,0 +1,18 @@
+Version 2014051201 Mon May 12 12:03:05 CEST 2014
++ Removed Italian authors, as Italian.pm has disappeared from CPAN (book)
+
+Version 2010081901 Wed Aug 18 17:59:26 CEST 2010
++ Added British authors
+
+Version 2010081701 Tue Aug 17 02:14:02 CEST 2010
++ Added SREZIC (Slaven Rezic)
+
+Version 2009110201
++ List requirements in Makefile.PL
+
+Version 2009102802
++ Mention prereqs in Makefile.PL
++ POD tests
+
+Version 2009102801
+First release

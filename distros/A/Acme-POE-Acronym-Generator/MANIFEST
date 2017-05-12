@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/synopsis.pl
+lib/Acme/POE/Acronym/Generator.pm
+t/00-compile.t
+t/01_acronym.t
+t/02_fakedict.t
+t/03_wordlist.t
+t/04_cfedde_key.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

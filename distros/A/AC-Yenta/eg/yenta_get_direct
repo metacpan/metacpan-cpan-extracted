@@ -1,0 +1,22 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+
+# Copyright (c) 2009 AdCopy
+# Author: Jeff Weisberg
+# Created: 2009-Sep-16 12:00 (EDT)
+# Function: get - using bdb file directly
+#
+# $Id$
+
+use AC::Dumper;
+use AC::Yenta::Direct;
+use strict;
+
+my $map  = shift @ARGV;
+my $file = shift @ARGV;
+my $key  = shift @ARGV;
+
+my $y = AC::Yenta::Direct->new( $map, $file );
+my $v = $y->get($key);
+print  dumper($v), "\n";
+

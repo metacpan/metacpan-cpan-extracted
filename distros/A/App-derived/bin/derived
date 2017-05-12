@@ -1,0 +1,162 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use App::derived;
+use Getopt::Long qw/:config posix_default no_ignore_case bundling/;
+use Pod::Usage qw/pod2usage/;
+ use Module::Load;
+
+GetOptions(
+    'h|help' => \my $help,
+    'i=i'    => \my $interval,
+    'M=s@'   => \my @plugins,
+    'port=i' => \my $port,
+    'host=i' => \my $host,
+) or pod2usage(1);
+
+pod2usage(-verbose=>2,-exitval=>0) if $help;
+my ($derivedfile) = @ARGV;
+pod2usage(-verbose=>1,-exitval=>1) unless $derivedfile;
+
+$interval = 10 unless $interval;
+$port = 12306 unless $port;
+$host = '0' unless defined $host;
+
+push @plugins, 'Memcached' if @plugins == 0;
+
+my $derived = App::derived->new(
+    interval => $interval,
+);
+my $services = load_derviedfile($derivedfile);
+
+for my $service ( keys %$services ) {
+    $derived->add_service($service, $services->{$service});
+}
+
+foreach my $plugin ( @plugins ) {
+    my ($plugin, @args) = split /,/, $plugin;
+    my %args = map { split /=/, $_ } @args;
+    
+    $plugin = "App::derived::Plugin::" . $plugin if $plugin !~ m!^\+!;
+    load($plugin);
+    $derived->add_plugin( $plugin, {
+        host => $host,
+        port => $port,
+        %args
+    });
+}
+
+$derived->run;
+
+sub load_derviedfile {
+    my $file = shift;
+    my %services;
+    open(my $fh, '<:utf8', $file) or die "cannot load file $file: $!";
+    while (my $line = <$fh>) {
+        if (my ($name, $command) = ($line =~ /^([^:]+)\s*:\s*(.+)/)) {
+            $services{$name} = $command;
+        }
+    }
+    return \%services;
+}
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+derived - run command periodically, calculate rate and check from network
+
+=head1 SYNOPSIS
+
+  $ cat CmdsFile
+  slowqueries: mysql -NB -e 'show global status like "Slow_queries%"'
+
+  $ derived --port=12306 CmdsFile
+
+  or
+
+  $ derived -MMemcahced,port=12306 CmdsFile
+
+  $ telnet localhost 12306
+  get slowqueris
+  VALUE slowqueris 0 3
+  0.2  # slow queries/sec
+
+=head1 DESCRIPTION
+
+derived runs command periodically and capture integer value. And calculate per-second rate. 
+You can retrieve these values from integrated memcached-protocol server or pluggable workers.
+
+You can monitoring the variation of metrics through this daemon.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item -h, --help
+
+Display help message
+
+=item -i 
+
+Interval seconds for running commands. Default 10.
+
+=item -M
+
+Plugin. 
+
+for example
+
+  -MMemcahced,port=11211,host=127.0.0.1
+
+loading plugin with port and host arguments.
+
+If no plugin are loaded, Memcached plugin will be loaded by default
+
+=item --port
+
+port number to bind. Memcached plugin uses this. default port number is 12306
+
+=item --host
+
+hostname or ipaddress to bind. Memcached plugin uses this.
+
+=item CmdsFile
+
+a file that list commands. required
+
+=back
+
+=head1 COMMAND FILE
+
+A command file should contain both a name for the process and the command used to run it.
+
+  slowquery: mysql -NB -e 'show global status like "Slow_queries%"'
+  lines: wc -l /path/to/file
+
+=head1 NOTICE
+
+IF there is no previous data to calculate rate, the server returns "0E0"
+
+=head1 SEE ALSO
+
+<App::derived::Plugin::Memcached>, <App::derived::Plugin> for writing plugins
+
+=head1 AUTHOR
+
+Masahiro Nagano E<lt>kazeburo@gmail.comE<gt>
+
+=head1 LICENSE
+
+Copyright (C) Masahiro Nagano
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,19 @@
+Mon May 17 2013 18:11 - v1.3 Features
+
+   Allow passing own answers
+   Allow making answers consistent (thanks Mark A. Smith)
+
+Wed Oct 15 2008 23:30 - v1.2 @ rather than $#
+
+   Fix bug http://rt.cpan.org/Ticket/Display.html?id=40080
+   from Zoffix Znet - not choosing from all the answers
+
+Thu Jan 13 2005 13:58 - v1.1 Silly bug
+
+   Must reset DATA handle
+
+Thu Jan 13 2005 13:23 - v1.0 Initial release
+
+   Even though it's very silly
+
+

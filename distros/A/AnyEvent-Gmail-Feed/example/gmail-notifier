@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+package GmailNotifier;
+use Moose;
+use AnyEvent;
+use AnyEvent::Gmail::Feed;
+use Mac::Growl ':all';
+
+with 'MooseX::Getopt';
+
+has 'username' => (is => 'rw', isa => 'Str', required => 1);
+has 'password' => (is => 'rw', isa => 'Str', required => 1);
+has 'interval' => (is => 'rw', isa => 'Int', default  => 60);
+
+sub run {
+    my ($self, %args) = @_;
+
+    my %seen;
+    RegisterNotifications('GmailNotifier',  ['email.arrived'], ['email.arrived']);
+    AnyEvent::Gmail::Feed->new(
+        username => $self->username,
+        password => $self->password,
+        interval => $self->interval,
+        on_new_entry => sub {
+            my $entry = shift;
+            warn "send notify: " . $entry->summary;
+            PostNotification('GmailNotifier',  'email.arrived', $entry->title, $entry->summary);
+        },
+    );
+    AnyEvent->condvar->recv;
+}
+
+package main;
+GmailNotifier->new_with_options->run;

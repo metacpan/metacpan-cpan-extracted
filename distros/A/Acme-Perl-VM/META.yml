@@ -1,0 +1,31 @@
+---
+abstract: 'A Perl5 Virtual Machine in Pure Perl (APVM)'
+author:
+  - 'Goro Fuji (gfx) <gfuji(at)cpan.org>.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.62
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Perl-VM
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  B: 0
+  Exporter: 5.57
+  Mouse: 0.21
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/gfx/Perl-APVM.git
+version: 0.006

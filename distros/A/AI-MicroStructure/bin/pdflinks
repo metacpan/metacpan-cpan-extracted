@@ -1,0 +1,30 @@
+IFS=$'\n';
+pat="Category"
+
+url="http://en.wikipedia.org/wiki/$1"
+
+if [[ $1 =~ $pat ]]; then
+  url="http://en.wikipedia.org/wiki/$1";
+else
+  url="http://en.wikipedia.org/wiki/Category:$1";
+fi
+
+echo $url;
+
+
+for i in $(mojo get "$url" a attr href | sort -u | egrep "^\/wiki\/[A-Z]" | egrep -v "Portal|Wikipedia|Special:|Help:|Main_Page" | sed -s "s/\/wiki\///");
+do
+
+if [[ $i =~ $pat ]]; then
+  echo -e "\t\t\t./$0 $i"
+  
+  #./pdflinks $i
+  
+else
+  echo $i;
+fi
+done
+
+#url=$(echo "http://en.wikipedia.org/wiki/"$i); 
+#for ii in `mojo get $url a attr href | egrep pdf$ | sort -R`; do
+#  echo echo wget -rc "$ii"; done done

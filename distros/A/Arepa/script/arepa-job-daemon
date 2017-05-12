@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use English qw(-no_match_vars);
+use Cwd;
+use Getopt::Std;
+use Proc::Daemon;
+use TheSchwartz;
+
+use Arepa::Job::CompilePackage;
+use Arepa::Config;
+use Arepa::PackageDb;
+
+our $VERSION = $Arepa::VERSION;
+
+sub HELP_MESSAGE {
+    print STDERR "Syntax: arepa-job-daemon [options]\n";
+    print STDERR "Options:\n";
+    print STDERR "-p pid_file         where to store the PID (only when daemonizing)\n";
+    print STDERR "-c config_file      path to the config file (default: /etc/arepa/config.yml)\n";
+    exit 1;
+}
+
+sub VERSION_MESSAGE {
+    print STDERR "arepa-job-daemon version $VERSION\n";
+}
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+my %opts;
+getopts('p:c:', \%opts) || HELP_MESSAGE;
+my $pid_file    = Cwd::abs_path($opts{p} || 'arepa-job-daemon.pid');
+my $config_file = Cwd::abs_path($opts{c} || '/etc/arepa/config.yml');
+
+scalar @ARGV != 0 && do { HELP_MESSAGE; };
+
+my $config = Arepa::Config->new($config_file);
+my $db_path = $config->get_key('package_db');
+# We don't need the object, this is just to make sure that the
+# database exists and it has all the latest DB structure changes
+# applied
+Arepa::PackageDb->new($db_path);
+my $client = TheSchwartz->new(databases => [
+        { dsn  => "dbi:SQLite:dbname=" . $db_path }
+    ]);
+$client->can_do('Arepa::Job::CompilePackage');
+
+open PIDFILE, ">$pid_file" or do {
+    print STDERR "Can't write the PID file to $pid_file\n";
+    exit 1;
+};
+close PIDFILE;
+
+my $daemon = Proc::Daemon->new;
+unless ($daemon->Init) {
+    open PIDFILE, ">$pid_file" or
+      die "Can't write to PID file $pid_file\n";
+    print PIDFILE $PID, "\n";
+    close PIDFILE;
+
+    $SIG{TERM} = \&signal_handler_TERM;
+    sub signal_handler_TERM {
+        open PIDFILE, $pid_file and do {
+            my $pid_in_file = <PIDFILE>;
+            close PIDFILE;
+            if ($pid_in_file == $PID) {
+                unlink $pid_file;
+            }
+        };
+
+        exit 1;
+    }
+
+    $client->work();
+}

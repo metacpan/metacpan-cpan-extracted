@@ -1,0 +1,18 @@
+DirectoryIndex index.asp
+<Files ~ \.asp$>
+	SetHandler perl-script
+	PerlHandler Apache::ASP
+	PerlSetVar Global .
+	PerlSetVar GlobalPackage My::Search
+	PerlSetVar StateDir /tmp/asp_search
+	PerlSetVar Debug -3
+	PerlSetVar IncludesDir ../../eg
+	PerlSetVar UseStrict 1
+	PerlSetVar SessionSerialize 1
+
+	PerlSetVar SearchDB /tmp/asp_search/search
+	PerlSetVar SearchFileRoot ../..
+	PerlSetVar SearchSiteRoot ../..
+	PerlSetVar SearchRefreshPeriod 86400
+	PerlSetVar SearchFileMatch (\.asp|\.html?)$
+</Files>

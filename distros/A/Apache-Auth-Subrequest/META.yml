@@ -1,0 +1,25 @@
+---
+name: Apache-Auth-Subrequest
+version: v0.0.1
+author:
+  - 'Scott Penrose <scottp@dd.com.au>'
+abstract: Allow only if a Subrequest !
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Test::More: 0
+  version: 0
+provides:
+  Apache::Auth::Subrequest:
+    file: lib/Apache/Auth/Subrequest.pm
+    version: !perl/version
+      qv: 1
+      version:
+        - 0
+        - 0
+        - 1
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

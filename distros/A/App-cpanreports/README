@@ -1,0 +1,48 @@
+App-cpan-reports
+
+Installs cpan-reports script for downloading a distributions CPAN Testers
+test reports.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::cpan-reports
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-cpan-reports
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-cpan-reports
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-cpan-reports
+
+    Search CPAN
+        http://search.cpan.org/dist/App-cpan-reports/
+
+    Source Code
+        git://github.com/ivanwills/App-cpan-reports.git
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

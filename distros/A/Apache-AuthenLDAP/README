@@ -1,0 +1,11 @@
+Apache::AuthenLDAP is designed to work with mod_perl and
+Net::LDAP. This module authenticates a user against an LDAP
+backend. It can be combined with Apache::AuthzLDAP to provide
+LDAP authorization as well.
+
+This module also handles password aging and expiration, allowing for
+enforcement of local password policy.
+
+See AuthenLDAP.pm pod for detailed documentation.
+
+$Id: README,v 1.2 2002/03/07 22:03:23 cgilmore Exp $

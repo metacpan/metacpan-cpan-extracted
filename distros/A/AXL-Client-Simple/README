@@ -1,0 +1,113 @@
+NAME
+    AXL::Client::Simple - Cisco Unified Communications XML API
+
+VERSION
+    This document refers to version 0.01 of AXL::Client::Simple
+
+SYNOPSIS
+    Set up your CUCM AXL client:
+
+     use AXL::Client::Simple;
+     
+ my $cucm = AXL::Client::Simple->new({
+         server      => 'call-manager-server.example.com',
+         username    => 'oliver',
+         password    => 's3krit', # or set in $ENV{AXL_PASS}
+     });
+
+    Then perform simple queries on the Unified Communications server:
+
+     my $device = $cucm->get_phone('SEP001122334455');
+     
+ my $lines = $device->lines;
+     printf "this device has %s lines.\n", $lines->count;
+     
+ while ($lines->has_next) {
+         my $l = $lines->next;
+         print $l->alertingName, "\n";
+         print $l->extn, "\n";
+     }
+     
+ if ($device->has_active_em) {
+         # extension mobility is active, so the lines are different
+     
+     my $profile = $device->currentProfile;
+     
+     my $profile_lines = $profile->lines;
+         printf "this profile has %s lines.\n", $profile_lines->count;
+     
+     while ($profile_lines->has_next) {
+             my $l = $profile_lines->next;
+             print $l->alertingName, "\n";
+             print $l->extn, "\n";
+         }
+     }
+
+DESCRIPTION
+    This module acts as a client to the Cisco Unified Communications
+    Administrative XML interface (AXL). From here you can perform simple
+    queries to retrieve phone device details and in particular the lines
+    active on a device.
+
+    Although the API is presently very limited, it should be possible to add
+    access to additional device and line properties, although performing
+    other AXL calls is probably out of scope (hence the module being named
+    Simple).
+
+    If the device is running Extension Mobility and a user is logged in, you
+    can also retrieve the line details from the current mobility profile
+    active on the handset.
+
+METHODS
+  AXL::Client::Simple->new( \%arguments )
+    Instantiates a new AXL client. There won't be any connection to the
+    server until you call the device retrieval method "get_phone". Arguments
+    are:
+
+    "server =>" Fully Qualified Domain Name (required)
+        The host name of the CUCM server to which the module should connect.
+        Note that the port number 8443 and the path "/axl/" are
+        automatically appended so you need only provide the FQDN or IP
+        address.
+
+    "username =>" String (required)
+        The account username under which the module will connect to CUCM.
+        This value will be URI encoded by the module.
+
+    "password =>" String OR via $ENV{AXL_PASS} (required)
+        The password of the account under which the module will connect to
+        CUCM. This value will be URI encoded by the module. You can also
+        provide the password via the "AXL_PASS" environment variable.
+
+    "schema_path =>" String (optional)
+        A folder on your file system which contains the WSDL and Schema file
+        which describe the Administrative XML (AXL) interface. They are
+        shipped with this module so your providing this is optional.
+
+  "$cucm->get_phone( <device-name> )"
+    Retrieves the AXL::Client::Simple::Phone object which reveals a limited
+    number of phone properties and details on the active extensions on the
+    handset. See that linked manual page for more details.
+
+REQUIREMENTS
+    *   Moose
+
+    *   MooseX::Iterator
+
+    *   XML::Compile::SOAP
+
+    *   XML::Compile::WSDL11
+
+    *   URI::Escape
+
+    *   File::ShareDir
+
+AUTHOR
+    Oliver Gorwits "<oliver.gorwits@oucs.ox.ac.uk>"
+
+COPYRIGHT & LICENSE
+    Copyright (c) University of Oxford 2010.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

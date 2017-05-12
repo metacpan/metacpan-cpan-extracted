@@ -1,0 +1,244 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+B<zonewalk> - recursive DNS zone walk
+
+=head1 SYNOPSIS
+
+B<zonewalk> [-d] [-4] [-6] [-l] [-s server] B<zone> 
+
+=head1 DESCRIPTION
+
+This script walks the given zone recursively and prints all the DWIM resource records.
+
+As a convenience, if you specify an ip address as startzone the reverse zone is fetched, e.g.
+
+  134.60         does the zonewalk for 60.134.in-addr.arpa
+  2001:07c0:0900 does the zonewalk for 0.0.9.0.0.c.7.0.1.0.0.2.ip6.arpa
+
+The server option is optional. If you don't specify the server, default servers are used, as defined by the resolver config file.
+
+Keep in mind that the server must be authoritative for the zones and the client must be allowed to fetch the zones from the authoritative server via AXFR.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-d>
+
+  Enable debug messages
+
+=item B<-4>
+
+  Print A records, no AAAA records
+
+=item B<-6>
+
+  Print AAAA records, no A records
+
+=item B<-l>
+
+  Long zone listing, print all resource records instead of DWIM
+
+=item B<-s server>
+
+  DNS server for zone transfers, must be authoritative or authorized
+
+=back
+
+=head1 ARGUMENTS
+
+Define the DNS start zone.
+
+=head1 LIMITATIONS
+
+If IPv6 addresses are given, abbreviated forms are not allowed, .e.g.
+
+  2001:07c0:0900     allowed
+  2001:7c0:900   not allowed
+
+=cut
+
+use strict;
+use warnings;
+use feature qw(switch);
+
+use App::DNS::Zonewalk qw();
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+
+our $VERSION = '0.05';
+
+our $debug;
+our $v4;
+our $v6;
+our $long_listing;
+our $server;
+our $start_zone;
+
+handle_options();
+my $rec_zone_listing = run_raxfr($start_zone);
+print_rec_zone($rec_zone_listing);
+exit;
+
+###############################################################
+#                         end of main
+###############################################################
+
+#
+# check cmdline flags and args
+#
+sub handle_options {
+
+    GetOptions(
+        'debug|d'    => \$debug,
+        '4'          => \$v4,
+        '6'          => \$v6,
+        'long|l'     => \$long_listing,
+        'server|s=s' => \$server,
+      )
+      or pod2usage(
+        -exitval => 2,
+        -verbose => 1,
+      );
+
+    # get the start zone from cmdline
+    $start_zone = lc shift @ARGV
+      or pod2usage(
+        -exitval => 2,
+        -verbose => 1,
+        -message => 'missing zone',
+      );
+
+    # #####################
+    # convenience function
+    # #####################
+    #
+    # check for IPv4 address as start zone, build reverse zone
+    if ( Net::DNS::Resolver::Base::_ip_is_ipv4($start_zone) ) {
+        my @octets = split( /\./, $start_zone );
+        $start_zone = join( '.', reverse @octets );
+        $start_zone .= '.in-addr.arpa';
+    }
+    # check for IPv6 address as start zone, build reverse zone
+    elsif ( Net::DNS::Resolver::Base::_ip_is_ipv6($start_zone) ) {
+
+        # this simple algo works only for fully expanded IPv6 addresses
+        $start_zone =~ s/://g;
+        my @octets = split( //, $start_zone );
+        $start_zone = join( '.', reverse @octets );
+        $start_zone .= '.ip6.arpa';
+    }
+
+    return 1;
+}
+
+#
+# create a Net::DNS::Resolver object and do a raxfr() fro start zone
+# return an array-ref of Net::DNS::RR objects from zone walk
+#
+sub run_raxfr {
+    my $zone = shift;
+
+    my $resolver = App::DNS::Zonewalk->new(
+        retrans     => 1,
+        retry       => 1,
+        tcp_timeout => 3,
+        debug       => $debug,
+        $server ? ( nameservers => [$server] ) : (),
+    );
+
+    my $rec_zone_listing = $resolver->raxfr($zone);
+    unless (@$rec_zone_listing) {
+        warn "Cannot fetch '$zone': ", $resolver->errorstring, "\n";
+        exit 1;
+    }
+
+    return $rec_zone_listing;
+}
+
+#
+# print A, AAAA or PTR records as default
+# only when requested (-l) do a full RR listing
+#
+sub print_rec_zone {
+    my ($zone) = @_;
+
+    foreach my $rr (@$zone) {
+
+        if ($long_listing) {
+            $rr->print;
+            next;
+        }
+
+        # was this a reverse_zone walk, just print the PTR records
+        if ( $start_zone =~ m/ .* \.in-addr\.arpa $ | .* \.ip6\.arpa $/ix )
+        {
+            printf "%-30s %s\n", $rr->name, $rr->ptrdname
+              if $rr->type eq 'PTR';
+            next;
+        }
+
+        given ( $rr->type ) {
+
+            when ('A') {
+                printf "%-15s %s\n", $rr->address, $rr->name unless $v6;
+            }
+
+            when ('AAAA') {
+                printf "%-40s %s\n", $rr->address, $rr->name unless $v4;
+
+            }
+        }
+
+    }
+}
+
+=head1 AUTHOR
+
+Karl Gaissmaier, C<< <gaissmai(at)cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-app-dns-zonewalk at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-DNS-Zonewalk>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-DNS-Zonewalk>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/App-DNS-Zonewalk>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/App-DNS-Zonewalk>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/App-DNS-Zonewalk/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 Karl Gaissmaier.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut
+
+# vim: sw=2 ft=perl

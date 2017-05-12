@@ -1,0 +1,118 @@
+AxKit::XSP::Cookie - An XSP library for setting and getting HTTP cookies.
+
+Add the taglib to AxKit (via httpd.conf or .htaccess):
+AxAddXSPTaglib AxKit::XSP::Cookie
+
+Add the cookie: namespace to your XSP <xsp:page> tag:
+
+           <xsp:page
+                language="Perl"
+                xmlns:xsp="http://apache.org/xsp/core/v1"
+                xmlns:cookie="http://axkit.org/NS/xsp/cookie/v1"
+           >
+
+       Then, put the taglib to work:
+
+       Set a cookie:
+
+           <cookie:create name="newCookie" value="somevalue" />
+
+       Get the value for a previous cookie:
+
+           <cookie:fetch name="oldCookie" />
+
+       Fetch the value for a previous cookie whose name argument
+       is hard-coded into the script:
+
+           <cookie:fetch name="chocolateChip"/>
+
+       Fetch the value for a previous cookie whose name is
+       determined at run-time:
+
+           <cookie:fetch>
+             <cookie:name><xsp:expr>$perl_var_containing_cookiename</xsp:expr></cookie:name>
+           </cookie:fetch>
+
+       Set a cookie using only hard-coded arguments:
+
+           <cookie:create
+                   name="oatmealRaisin"
+                   value="tasty"
+                   expires="+3M"
+           >
+
+       Set a cookie using a mix of dynamic child elements and
+       static attributes:
+
+           <cookie:create
+                   name="peanutButter"
+                   domain=".mydomain.tld"
+                   secure="1"
+           >
+             <cookie:value><xsp:expr>$cookie_value</xsp:expr></cookie:value>
+             <cookie:expires><xsp:expr>$cookie_expiry</xsp:expr></cookie:expires>
+             <cookie:path><xsp:expr>$cookie_path</xsp:expr></cookie:path>
+           </cookie:create>
+
+       As stated above, you can pass static arguments either as
+       attributes or child elements of the enclosing tag. Thus:
+
+           <cookie:create name="pistachioChocolateChunk"/>
+             ...
+
+       and
+
+           <cookie:create>
+             <cookie:name>pistachioChocolateChunk</cookie:name>
+             ...
+
+       are functionally equivalent.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+28/Mar/2001            perl 5.005, patch 03                     4
+
+

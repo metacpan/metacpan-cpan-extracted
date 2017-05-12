@@ -1,0 +1,37 @@
+Revision history for App-Git-Workflow-Command-Take
+
+0.4   2017-01-02
+        Updating for release of version 0.4
+        Updated license (Ivan Wills)
+        Updated the description (Ivan Wills)
+        Updated the short description (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+        Adding config files (Ivan Wills)
+
+0.3   2015-08-14
+        Updating for release of version 0.3
+        Removed creation of makefile (Ivan Wills)
+
+0.2   2015-07-11
+        Updating for release of version 0.2
+        Added coveralls config (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.1     2015-06-14
+        Fixed more left over name change issues (Ivan Wills)
+        Updated readme (Ivan Wills)
+        Added documentation for functions (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+        Fixed after name change (Ivan Wills)
+        Added missing closing of write handle to flush buffer (Ivan Wills)
+        Added removing temp file (Ivan Wills)
+        Added replacing original file (Ivan Wills)
+        Now resolving (Ivan Wills)
+        Added executable bit (Ivan Wills)
+        Fixed version (Ivan Wills)
+        Fixed package names (Ivan Wills)
+        Renamed files to remove "mine" as now plan to make taking either side of the merge (Ivan Wills)
+        Added description (Ivan Wills)
+        Flagging for future CPAN release (Ivan Wills)
+        Preparing to add code (Ivan Wills)
+        Initial commit (Ivan Wills)

@@ -1,0 +1,328 @@
+<tag name="authenticate" global="1" body="1" accepts="type,realm">
+  <perl>
+    if (!$ENV{REMOTE_USER}) {
+      Authenticate($type, $realm);
+      print "\r\n";
+      print $body;
+      exit();
+    }
+  </perl>
+</tag>
+
+<tag name="setvar" global="1" body="1" accepts="name">
+  <perl>
+    setpvar($name, $body);
+  </perl> 
+</tag>
+
+<tag name="getvar" global="1" accepts="name">
+  <perl>
+    print getpvar($name);
+  </perl>
+</tag>
+
+<tag name="session" body="1" global="1" accepts="action,name,variable,seconds">
+  <perl>
+    require VelociGen::Session;
+    $action = lc $action;
+    if ($action eq "init") {
+	VelociGen::Session::session_init() || croak "PSP session init failed: $@";
+    }
+    if ($action eq "dump") {
+	my $str = VelociGen::Session::session_dump();
+	print "$str\n";
+    }
+    if ($action eq "insert") {
+	VelociGen::Session::session_insert($name, $body);
+    }
+    if ($action eq "delete") {
+	VelociGen::Session::session_delete($name);
+    }
+    if ($action eq "logout") {
+	VelociGen::Session::session_logout($name);
+    }
+    if ($action eq "update") {
+	VelociGen::Session::session_update($seconds);
+    }
+    if ($action eq "fetch") {
+	my $temp;
+	$temp= VelociGen::Session::session_fetch($name);
+	setpvar($variable, $temp);
+    }
+    if ($action eq "check") {
+	if(VelociGen::Session::session_check()) {
+		setpvar($variable, 1);
+	} else {
+		setpvar($variable, undef);
+	}
+    }
+  </perl>
+</tag>
+
+<tag name="cache" global="1" accepts="file">
+  <perl>
+    # redirect all output to a file, if needed
+    if (!$file) {
+      $file = $ENV{SCRIPT_FILENAME} . ".cache";
+    }
+
+    # check if psp file is newer than html
+    my $mtime1 = -M $ENV{SCRIPT_FILENAME};
+    my $mtime2 = -M $file;
+
+    if (defined($mtime2) && ($mtime2 < $mtime1)) {
+	# output the HTML file and exit
+        open(FILE, "$file");
+        local $/ = undef;
+        print <FILE>;
+        close(FILE);
+	exit();
+    }	
+
+    # create page
+    open(CACHE, ">$file") || croak "Cannot open file '$file': $!";
+    select(CACHE);
+    
+    # add clean up handler for outputting page
+    cleanup (sub {
+      close(CACHE);
+      select(STDOUT);
+      open(CACHE, $file);
+      local $/ = undef;
+      print <CACHE>;
+      close(CACHE);
+    });
+  </perl>
+</tag>
+
+<tag name="cookie" global="1" accepts="name,value,expires,path">
+  <perl>
+    SetCookie($name, $value, $expires, $path);
+  </perl>
+</tag>
+
+<tag name="ldap" global="1" body="1"
+  accepts="name,host,port,username,password,timeout,action,base,sort,attributes">
+  Unimplemented at this time.
+</tag>
+
+<tag name="location" global="1" accepts="url">
+  <perl>
+    Redirect($url);
+  </perl>
+</tag>
+
+
+<tag name="mail" body="1" global="1" accepts="host,port,to,from,cc,bcc,subject">
+  <perl>
+    $host = $host || "localhost";
+    $port = $port || "25";
+    my @to = split(/,/, $to);
+    my @cc = split(/,/, $cc);
+    my @bcc = split(/,/,$bcc);
+
+    Mail($host, $port, $from, \@to, \@cc, \@bcc, $subject, $body);
+  </perl>
+</tag>
+
+<tag name="webclient" body="1" global="1"
+  accepts="result,url,method,proxyserver,proxyport,timeout">
+  <perl>
+    my $tmp;
+    $tmp = LWP (
+                    $url, 
+                    $method, 
+                    $timeout, 
+                    $proxyserver, 
+                    $proxyport, 
+                    $body
+                   );
+    if ($result) {
+      setpvar($result, $tmp);
+    }
+  </perl>
+</tag>
+
+<tag name="exit" global="1">
+  <perl>
+    exit();
+  </perl>
+</tag>
+
+
+
+<tag name="sql" body="1" global="1" accepts="name,dbtype,db,username,password,action">
+  <perl>
+    my $sth;
+
+#    local $SIG{__DIE__} = sub {
+#	print STDERR @_;
+#    };
+
+    my $dbh = DBI->connect(
+        "DBI:$dbtype:$db", 
+        $username,
+        $password, 
+        {AutoCommit => 1}) || croak $DBI::errstr;
+
+#    $dbh->{Warn} = 0;
+    $sth = $dbh->prepare($body) || croak $dbh->errstr();
+
+    $sth->execute() || croak $dbh->errstr;
+
+#    cleanup (sub {
+#	$dbh->commit;
+#	$dbh->disconnect; 
+#    });
+
+    # set $name in the caller
+    setpvar($name, $sth);
+  </perl>
+</tag>
+
+<handler type="sql">
+    return $data->fetchrow_hashref;
+</handler>
+
+
+<tag name="xsl" global="1" body="1" accepts="template,xml">
+  <perl>
+    require XML::Sablotron;
+    my ($result, $xsldata, $xmldata);
+
+    local $/ = undef;
+    if (length($xml)>0) {
+      open(FILE, $xml) || croak "$! while loading '$xml'";
+      $xmldata = <FILE>;
+      close(FILE);
+    }
+    else {
+      $xmldata = $body;
+    }
+	
+    open(FILE, $template) || croak "$! while loading '$template'";
+    $xsldata = <FILE>;
+    close (FILE);
+
+    XML::Sablotron::ProcessStrings($xsldata, $xmldata, $result);
+    print $result;
+  </perl>
+</tag>
+
+<tag name="xml" global="1" accepts="name,file">
+  <perl>
+    require XML::Parser;
+    require XML::Simple;
+
+    my $data;
+    if (substr($file,0,1) ne "/") {
+        $file = "./" . $file;
+    }
+    $data = XML::Simple::XMLin($file);
+
+    # set $name in the caller
+    setpvar($name, $data);
+  </perl>
+</tag>
+
+
+<handler type="xml">
+  # $data, $fetch, $row
+
+  my $retval;
+  if (ref($data) eq "ARRAY") {
+    $retval = $data->[$row];
+  } elsif (ref($data) eq "HASH" && $row == 0) {
+    $retval = $data;
+  } else {
+    $retval = undef;
+  }
+  return $retval;
+</handler>
+
+<tag name="xql" global="1" body="1" accepts="name,file">
+  <perl>
+    require XML::XQL;
+    require XML::XQL::DOM;
+    my $data;
+    my $parser = new XML::DOM::Parser;
+    my $doc = $parser->parsefile($file);
+    my @results = $doc->xql($body);
+    $data = \@results;
+    setpvar($name, $data);
+  </perl>
+</tag>
+
+<handler type="nodelist">
+  # $data will contain NodeList
+  my $node = $data->[$row];
+  if (!defined($node)) {
+    return undef;
+  }
+
+  my %results;
+  my $nodeName = $node->getNodeName;
+
+  foreach my $item (@$fetch) {
+    if ($item eq $nodeName) {
+      $results{$item} = $node->getChildNodes();
+    } else {
+      my $node2 = $node->getElementsByTagName($item);
+      if ($node2->getLength > 0) {
+        $results{$item} = $node2;
+      }
+    }
+  }
+  return \%results;
+</handler>
+
+<handler type="nodevalue">
+  my $node = $data->[$row];
+  if (!defined($node)) {
+    return undef;
+  }
+
+  my %results;
+  my $nodeName = $node->getNodeName;
+  my $node2;
+  my $dataflag;
+
+  foreach my $item (@$fetch) {
+    if ($item eq $nodeName) {
+      $results{$item} = $node->getChildNodes->item(0)->getData;
+      $dataflag = 1;
+    } elsif (($node2 = $node->getAttributes()) && ($node2 = $node2->getNamedItem($item))) {
+      $results{$item} = $node2->getNodeValue;
+      $dataflag = 1;
+    } else {
+      $node2 = $node->getElementsByTagName($item);
+      if ($node2 && $node2->getLength > 0) {
+        $results{$item} = $node2->item(0)->toString;
+        $dataflag = 1;
+      }
+    }
+  }
+  if ($dataflag) {
+    return \%results;
+  } else {
+    return undef;
+  }
+</handler>
+
+<handler type="info">
+  # $data, $fetch, $row
+  if ($row > 0) {
+    return undef;
+  }
+  my %results;
+  foreach my $item (@$fetch) {
+    # pull this information from $data
+	my $sub = $data->can($item);
+	if ($sub) {
+	  $results{$item} = $sub->($data);
+	} else {
+	  $results{$item} = $data->{$item};
+	}
+  }
+  return \%results;
+</handler>

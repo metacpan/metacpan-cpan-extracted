@@ -1,0 +1,28 @@
+---
+abstract: 'AdaBoost learning algorithm'
+author:
+  - 'Koichi SATOH <sekia@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Algorithm-AdaBoost
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Smart::Args: 0.10
+  perl: 5.14.0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: https://github.com/sekia/Algorithm-AdaBoost.git
+version: 0.01

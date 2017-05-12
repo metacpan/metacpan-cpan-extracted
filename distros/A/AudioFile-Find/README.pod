@@ -1,0 +1,83 @@
+=head1 NAME
+
+AudioFile::Find - Finds audio files located on your system and maps them to L<AudioFile::Info> objects. 
+
+=head1 SYNOPSIS
+
+  use AudioFile::Find;
+
+  my $finder = AudioFile::Find->new( 'some/dir' );
+    
+  # find everything
+  my @audiofiles = $finder->search();
+  
+  # specify a search directory
+  my @audiofiles = $finder->search( 'some/other/dir' );
+  
+  #same for genre, title, track, artist and album
+  my @audiofiles = $finder->search( artist => 'Seeed' ); 
+  
+  #search using a regex
+  my @audiofiles = $finder->search( 'some/other/dir', title => qr/Ding/ ); 
+  
+  # anonymous subroutine that returns true or false
+  my @audiofiles = $finder->search( 'some/other/dir', track => sub { return shift > 10; } ); 
+
+=head1 METHODS
+
+=head2 new
+
+Creates an object of this class. Takes an optional single argument which is the directory to search in.
+
+=head2 new
+
+Sets and returns the directory to search.
+
+=head2 search 
+
+Starts the search and returns a hash of filenames as keys and AudioFile::Info-Objects as values.
+You may specify a search directory as the first argument 
+and also pass a hash with search criteria. See the synopsis for details.
+
+=head2 pass
+
+Checks whether a given L<AudioFile::Info> object meets given criteria.
+First argument is the L<AudioFile::Info> object, second argument is a reference to the criteria hash.
+
+=head2 extensions
+
+Discovers the extensions that are supported by the installed L<AudioFile::Info> plugins.
+
+=head1 AUTHORS
+
+=over 
+
+=item Markus, C<< <holli.holzer at googlemail.com> >>
+
+=item Joel Berger C<joel.a.berger@gmail.com>
+
+=back
+
+=head1 SOURCE REPOSITORY
+
+L<http://github.com/jberger/AudioFile-Find>
+
+=head1 BUGS
+
+Bugs may be reported to:
+
+=over
+
+=item L<http://github.com/jberger/AudioFile-Find/issues>
+
+=item L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=AudioFile-Find>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2008-2014 by Authors listed above, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

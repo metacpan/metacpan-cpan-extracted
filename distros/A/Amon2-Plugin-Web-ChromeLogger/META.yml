@@ -1,0 +1,32 @@
+---
+abstract: 'The Chrome Logger Plugin for Amon2'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  JSON: 0
+  JSON::XS: 0
+  MIME::Base64: 0
+  Test::More: 0.88
+  Test::WWW::Mechanize::PSGI: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Amon2-Plugin-Web-ChromeLogger
+provides:
+  Amon2::Plugin::Web::ChromeLogger:
+    file: lib/Amon2/Plugin/Web/ChromeLogger.pm
+    version: 0.03
+requires:
+  Amon2: 0
+  Web::ChromeLogger: 0.04
+  perl: 5.008001
+resources:
+  bugtracker: http://github.com/bayashi/Amon2-Plugin-Web-ChromeLogger/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Amon2-Plugin-Web-ChromeLogger
+version: 0.03

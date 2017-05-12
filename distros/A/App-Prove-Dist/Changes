@@ -1,0 +1,14 @@
+---
+version: 0.02
+date:    Tue Nov  8 15:31:04 PST 2011
+changes:
+- Honor PERLBREW_ROOT
+- Update docs
+- Change abstract
+- Honor PERL_PROVE_DIST_ROOT
+- Put common options in a role
+---
+version: 0.01
+date:    Mon Nov  7 20:25:12 PST 2011
+changes:
+- First Release

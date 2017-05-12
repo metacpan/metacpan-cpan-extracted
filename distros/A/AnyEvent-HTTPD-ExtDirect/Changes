@@ -1,0 +1,20 @@
+3.20  Tue Mar 31 23:05:03 PDT 2015
+    - Updated to support call metadata feature in RPC::ExtDirect 3.20
+    - Added unit tests
+    - RPC::ExtDirect dependency bumped to 3.20
+
+3.02  Fri Oct 24 21:29:45 PDT 2014
+    - Fixed a charset issue that caused grief to IE8 users
+    - Improved test suite robustness
+
+3.01  Mon Jun 16 20:05:48 PDT 2014
+    - Added HTTP::Request to the dependency list. I assumed that it
+      was required by AnyEvent::HTTPD but judging by the failure
+      reports from CPAN testers it is not so.
+    - Assorted tiny doc and misc touch-ups.
+
+3.00  Thu Jun 12 19:41:35 PDT 2014
+    - Initial version released. Version set to 3.00 to reflect that
+      this gateway requires RPC::ExtDirect 3.0+, and for consistency
+      with other gateways
+

@@ -1,0 +1,70 @@
+NAME
+    Apache::Geo::IP - Look up country by IP Address
+
+SYNOPSIS
+    # in httpd.conf 
+    # PerlModule Apache::HelloIP 
+    #<Location /ip> 
+    #   SetHandler perl-script 
+    #   PerlHandler Apache::HelloIP 
+    #   PerlSetVar GeoIPDBFile "/usr/local/share/geoip/GeoIP.dat" 
+    #   PerlSetVar GeoIPFlag Standard 
+    #</Location>
+
+    # file Apache::HelloIP
+
+    use Apache::Geo::IP; use strict;
+
+    use Apache::Constants qw(OK);
+
+    sub handler { 
+       my $r = Apache::Geo::IP->new(shift);
+       $r->content_type('text/plain'); 
+       my $country = uc($r->country_code_by_addr());
+
+       $r->print($country);
+  
+       return OK;
+    }
+
+DESCRIPTION
+    This module constitutes a mod_perl (both versions 1 and 2) interface 
+    to the Geo::IP and Geo::Mirror modules. Geo::IP is used to look up in 
+    a database a country of origin of an IP address, while Geo::Mirror
+    is used to select a mirror by country from a specified list. See
+    the documentation for Apache::Geo::IP and Apache::Geo::Mirror
+    for more details.
+
+    The included tests require Apache::Test, which can be obtained
+    in the mod_perl-2 sources or in the httpd-test distribution.
+    These tests need a network connection to run; some may fail
+    due to timeouts upon doing certain name lookups.
+
+    The mod_perl-2 modules included here, with prefix Apache2::*,
+    will only work with mod_perl-1.999022 and above (RC5 or greater
+    of the CPAN distribution).
+
+PPM PACKAGE
+    A Win32 ppm package, suitable for use with ActivePerl
+    compatible Perl packages, is available at
+        http://theoryx5.uwinnipeg.ca/ppmpackages/
+    for ActivePerl 6xx and at
+        http://theoryx5.uwinnipeg.ca/ppms/
+    for ActivePerl 8xx. To install, within the ppm shell set the 
+    repository to
+        http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer
+    for ActivePerl 6xx and to
+        http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer58
+    for ActivePerl 8xx, and then
+        ppm> install Apache-GeoIP
+
+AUTHOR
+
+    The look-up code for associating a country with an IP address 
+    is based on the GeoIP library and the Geo::IP Perl module, and is 
+    Copyright (c) 2002, T.J. Mather, tjmather@tjmather.com, New York, NY, 
+    USA. See http://www.maxmind.com/ for details. The mod_perl interface 
+    is Copyright (c) 2002, Randy Kobes <randy@theoryx5.uwinnipeg.ca>.
+
+   All rights reserved.  This package is free software; you can redistribute 
+   it and/or modify it under the same terms as Perl itself.

@@ -1,0 +1,47 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Alien::Ditaa;
+
+our $VERSION = '0.001';
+
+Alien::Ditaa->new->run_ditaa(@ARGV);
+
+1;
+
+=head1 NAME
+
+ditaa - Trivial wrapper script for ditaa.jar
+
+=head1 SYNOPSIS
+
+    ditaa infile.txt outfile.png
+
+=head1 DESCRIPTION
+
+Trivial wrapper to run ditaa.jar.
+
+=head1 SEE ALSO
+
+L<http://ditaa.sourceforge.net>
+
+=head1 INCLUDED SOFTWARE
+
+An unmodified copy of the latest varion of ditaa.jar is included in
+this package. The latest version and source code can be obtained
+from the URI above.
+
+=head1 AUTHOR
+
+    Tomas Doran (t0m) C< bobtfish@bobtfish.net >
+
+=head1 COPYRIGHT
+
+Copyright 2009 state51 (L<http://www.state51.co.uk>)
+
+=head1 LICENSE
+
+Licensed under the terms of the GNU GPL.
+
+=cut
+

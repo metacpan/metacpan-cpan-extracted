@@ -1,0 +1,209 @@
+=head1 NAME
+
+App::TimelogTxt::Tutorial - Describe normal use of the C<timelog> application.
+
+=head1 VERSION
+
+This tutorial applies to L<App::TimelogTxt> version 0.22.
+
+=head1 Getting Started
+
+To use the C<timelog> program, you need a directory where C<timelog> stores its
+log files. This directory may be specified in the F<.timelogrc> configuration
+file in your home directory. If that file does not exist, the program defaults
+to the F<timelog> directory in your home directory.
+
+You can use the B<init> command to set up the configuration file and directory
+for you. If the default configuration is satisfactory, just run the following
+command:
+
+  $ timelog init
+
+If you would like to change the directory where the logs are stored, supply
+that directory path as an argument to the B<init> command.
+
+  $ timelog init ~/my_timelog
+
+=head1 Example Usage
+
+In this example, we will see most of the C<timelog> commands you would use in a
+normal day. The B<start> and B<stop> commands are the minimum that you would
+need. To begin tracking a task, you use the B<start> command and supply text to
+describe the task you are beginning. The C<timelog> software assumes that you
+are only working a single thing at a time. I originally tried to support the
+ability to track more than one task at a time and found that I never actually
+used it.
+
+Let's walk through an example. Assume that it's just after lunch and you want
+to take care of your email before your team meeting at 1pm. At 10 minutes to 1,
+you start a task I<Email> in the I<Admin> project.
+
+   $ timelog start +Admin @Email
+
+Any group of non-whitespace characters beginning with 'C<+>' is considered the
+project. If there is an string of non-whitespace characters beginning with
+'C<@>', it is treated as the task. Any other text is explanatory details.
+
+At 1pm, the conference call with your team is going to begin. You start that
+task. Since we are going to be talking about the C<Foo> project, note that in
+the command.
+
+   $ timelog start +Foo @ConfCall Team Meeting
+
+The meeting is over and you need to change tasks. During the meeting, you
+agreed to do some general work on the manual for the project's software. Enter
+the task to begin working on that.
+
+   $ timelog start +Foo @Docs working on manual
+
+We are in the same project, so C<timelog> will be able to report the cumulative
+total of the last two tasks. About 20 minutes after you start on the manual,
+Sue comes by to ask about the project you were working on last week. Since this
+is will be a temporary interruption, we use the B<push> command. It saves the
+current task, so that we can restore it when the interruption is over.
+
+   $ timelog push +Bar @Help Sue questions
+
+When all of Sue's questions are answered, you want to go back to the manual
+work.
+
+   $ timelog pop
+
+The B<pop> command restores the task that was current when the last B<push>
+command was executed. This way you don't need to type in the whole command (or
+up-arrow through your command history), for short interruptions.
+
+A while later, you've finished with the manual for today and want to finish up
+the work on the database module for the I<Foo> project.
+
+   $ timelog start +Foo @Code database module
+
+You get some good uninterrupted time on this and finish up the module in time
+to stop at 5.
+
+   $ timelog stop
+
+As you can see, this requires the addition of a bit more to your daily work
+flow. Later in the manual we will cover a few features that can reduce your
+typing. The main benefit of all of this work though is the ability to generate
+reports of your work.
+
+=head2 Reports
+
+The most detailed report you might do is to list all of the events for a given
+day. If you executed the following command the day after the example above, you
+would get a list of the tasks for that day.
+
+   $ timelog ls yesterday
+
+The output of this command (assuming only the commands from the example) would
+look like this:
+
+    2013-07-01 12:50:02 +Admin @Email
+    2013-07-01 13:00:21 +Foo @ConfCall Team Meeting
+    2013-07-01 14:02:43 +Foo @Docs working on manual
+    2013-07-01 14:22:03 +Bar @Help Sue questions
+    2013-07-01 14:27:06 +Foo @Docs working on manual
+    2013-07-01 15:10:20 +Foo @Code database module
+    2013-07-01 17:00:24 stop
+
+This is the most detailed report, but it isn't really useful for much. Usually,
+you want some form of summarized information. The other reporting commands take
+care of that.
+
+=head3 Detail Report
+
+The report I use the most looks like the following:
+
+   $ timelog report yesterday
+
+This report shows the data for the given date grouped by project. Although the
+actual times are missing and the data is re-ordered, you can get a really good
+sense of where your time went with this report.
+
+    2013-07-01  4:10
+      Admin         0:10
+          Email                0:10
+      Bar           0:05
+          Help                 0:05 (Sue questions)
+      Foo           3:55
+          Code                 1:50 (database module)
+          Docs                 1:03 (working on manual)
+          ConfCall             1:02 (Team Meeting)
+
+=head3 Summary Report
+
+Sometimes, the normal report is still too much data. Let's say I only care
+about the aggregate amount of time spent on each project. I would then use the
+following command:
+
+   $ timelog summary yesterday
+
+This report has no task information, it just reports the time on each project
+for the day.
+
+    2013-07-01  4:10
+      Admin         0:10
+      Bar           0:05
+      Foo           3:55
+
+=head3 Hours Report
+
+Finally, you may only want the amount of time you spent for the whole day. That
+report is generated by the following command:
+
+   $ timelog hours yesterday
+
+This just tells how long you were working. Sometimes it is all you need.
+
+    2013-07-01  4:10
+
+=head1 Simplifying Usage with Aliases
+
+As you use the C<timelog> program more, typing long strings for individual
+events becomes annoying. If you are working on the same projects or tasks on a
+regular basis, you might find typing the detail annoying even if you want it
+for reporting.
+
+The C<timelog> program supports defining aliases in your F<.timelogrc> file.
+These aliases can be either full events or partial events. These aliases
+are defined in a C<[alias]> section in your F<.timelogrc> file. They take the
+following form:
+
+   email = start +Misc @Email
+   proja = start +ProjectA
+   int   = push +Misc @Questions
+
+When C<timelog> encounters an alias at the beginning of its command line, it
+replaces the alias with the string after the equals. This allows you to define
+full events or partial events easily. To use an alias, use the alias as the
+command when calling C<timelog>:
+
+   $ timelog email
+
+This gets converted to
+
+   $ timelog start +Misc @Email
+
+The I<proja> alias above is a good example of a partial event. You would use
+the alias like:
+
+   $ timelog proja @ConfCall Client design team
+
+which would be converted to
+
+   $ timelog start +ProjectA @ConfCall Client design team
+
+Over time, I often find myself adding new aliases for events relating to new
+projects and deleting aliases that I no longer use.
+
+=head1 AUTHOR
+
+G. Wade Johnson  C<< <gwadej@cpan.org> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2013, G. Wade Johnson C<< <gwadej@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.

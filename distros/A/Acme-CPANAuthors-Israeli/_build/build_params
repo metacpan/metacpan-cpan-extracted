@@ -1,0 +1,163 @@
+do{ my $x = [
+       {
+         'ARGV' => []
+       },
+       {},
+       {
+         'create_license' => undef,
+         'metafile2' => 'META.json',
+         '_added_to_INC' => [
+                              '/home/shlomif/apps/perl/modules/lib/perl5/site_perl/5.20.1/x86_64-linux-thread-multi',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/site_perl/5.20.1',
+                              '/home/shlomif/apps/perl/modules/lib/site_perl/5.20.1',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/5.20.1/x86_64-linux-thread-multi',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/5.20.1',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/site_perl/5.20.0/x86_64-linux-thread-multi',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/site_perl/5.20.0',
+                              '/home/shlomif/apps/perl/modules/lib/site_perl/5.20.0',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/5.20.0',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/site_perl/5.18.2/x86_64-linux-thread-multi',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/site_perl/5.18.2',
+                              '/home/shlomif/apps/perl/modules/lib/site_perl/5.18.2',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/5.18.2',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/site_perl/5.18.1',
+                              '/home/shlomif/apps/perl/modules/lib/site_perl/5.18.1',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/5.18.1'
+                            ],
+         'extra_manify_args' => undef,
+         'test_requires' => {},
+         'libdoc_dirs' => [
+                            'blib/lib',
+                            'blib/arch'
+                          ],
+         'autosplit' => undef,
+         'dist_author' => [
+                            'Shlomi Fish <shlomif@cpan.org>'
+                          ],
+         'original_prefix' => {},
+         'build_requires' => {
+                               'Test::More' => 0
+                             },
+         'include_dirs' => [],
+         'prefix' => undef,
+         'xs_files' => undef,
+         'tap_harness_args' => {},
+         'debug' => undef,
+         'extra_linker_flags' => [],
+         'destdir' => undef,
+         'verbose' => undef,
+         'sign' => undef,
+         'dynamic_config' => 1,
+         'magic_number' => undef,
+         'license' => 'mit',
+         'use_tap_harness' => 0,
+         'installdirs' => 'site',
+         'module_name' => 'Acme::CPANAuthors::Israeli',
+         'share_dir' => undef,
+         'build_script' => 'Build',
+         'prefix_relpaths' => {},
+         'pollute' => undef,
+         'mymetafile2' => 'MYMETA.json',
+         'script_files' => undef,
+         'prereq_action_types' => [
+                                    'requires',
+                                    'build_requires',
+                                    'test_requires',
+                                    'conflicts',
+                                    'recommends'
+                                  ],
+         'allow_pureperl' => 0,
+         'orig_dir' => '/home/shlomif/progs/perl/cpan/Acme/Acme-CPANAuthors-Israeli/Acme-CPANAuthors-Israeli',
+         'dist_version_from' => 'lib/Acme/CPANAuthors/Israeli.pm',
+         'create_makefile_pl' => 'traditional',
+         'mymetafile' => 'MYMETA.yml',
+         'use_rcfile' => 1,
+         'recurse_into' => [],
+         'pm_files' => undef,
+         'test_file_exts' => [
+                               '.t'
+                             ],
+         'dist_name' => 'Acme-CPANAuthors-Israeli',
+         'meta_merge' => {
+                           'resources' => {
+                                            'repository' => 'https://github.com/shlomif/perl-Acme-CPANAuthors-Israeli',
+                                            'license' => 'http://www.opensource.org/licenses/mit-license.php'
+                                          },
+                           'keywords' => [
+                                           'Acme',
+                                           'Authors',
+                                           'CPAN',
+                                           'CPANAuthors',
+                                           'israel',
+                                           'israeli',
+                                           'middle-east',
+                                           'module',
+                                           'stupid',
+                                           'vanity'
+                                         ]
+                         },
+         'configure_requires' => {
+                                   'Module::Build' => '0.37'
+                                 },
+         'meta_add' => {},
+         'cpan_client' => 'cpan',
+         'has_config_data' => undef,
+         'needs_compiler' => '',
+         'config_dir' => '_build',
+         'program_name' => undef,
+         'extra_compiler_flags' => [],
+         'requires' => {
+                         'Acme::CPANAuthors' => 0,
+                         'Acme::CPANAuthors::Register' => 0,
+                         'perl' => '5.006'
+                       },
+         'metafile' => 'META.yml',
+         'auto_configure_requires' => 1,
+         'install_path' => {},
+         'pod_files' => undef,
+         'install_base' => undef,
+         'install_base_relpaths' => {},
+         'c_source' => undef,
+         'config' => undef,
+         'bundle_inc' => [],
+         'blib' => 'blib',
+         'create_readme' => undef,
+         'PL_files' => undef,
+         'conflicts' => {},
+         'mb_version' => '0.421',
+         'build_class' => 'Module::Build',
+         'allow_mb_mismatch' => 0,
+         'create_packlist' => 1,
+         'dist_suffix' => undef,
+         'test_files' => undef,
+         'recursive_test_files' => undef,
+         'recommends' => {},
+         'scripts' => undef,
+         'bindoc_dirs' => [
+                            'blib/script'
+                          ],
+         'build_elements' => [
+                               'PL',
+                               'support',
+                               'pm',
+                               'xs',
+                               'share_dir',
+                               'pod',
+                               'script'
+                             ],
+         'install_sets' => {},
+         'html_css' => '',
+         'debugger' => undef,
+         'perl' => '/usr/bin/perl5.20.1',
+         'release_status' => 'stable',
+         'quiet' => undef,
+         'base_dir' => '/home/shlomif/progs/perl/cpan/Acme/Acme-CPANAuthors-Israeli/Acme-CPANAuthors-Israeli',
+         'dist_abstract' => undef,
+         'pureperl_only' => 0,
+         'dist_version' => '0.0201',
+         'bundle_inc_preload' => [],
+         'build_bat' => 0,
+         'get_options' => {}
+       }
+     ];
+$x; }

@@ -1,0 +1,25 @@
+---
+abstract: 'Build and install SFML 2.0 (RC)'
+author:
+  - 'Jake Bott <jake.anq@gmail.com>'
+configure_requires:
+  Alien::Base: 0
+  Alien::CMake: 0
+  Module::Build: 0.38
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-SFML
+provides:
+  Alien::SFML:
+    file: lib/Alien/SFML.pm
+    version: 0.02
+requires:
+  Alien::Base: 0
+  File::ShareDir: 1.00
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

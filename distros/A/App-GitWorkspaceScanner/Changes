@@ -1,0 +1,13 @@
+Revision history for App-GitWorkspaceScanner
+
+v1.1.0  2017-03-19
+        - Relicensed under Perl 5 terms.
+
+v1.0.2  2015-04-12
+        - Add "see also" section.
+
+v1.0.1  2015-03-22
+        - Clean up documentation.
+
+v1.0.0  2015-03-22
+        - Public release.

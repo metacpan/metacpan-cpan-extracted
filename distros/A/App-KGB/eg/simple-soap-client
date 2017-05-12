@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use utf8;
+
+use SOAP::Lite;
+
+my $s=SOAP::Lite->new(
+    uri=>"http://localhost:12700",
+    proxy=>"http://localhost:12700?session=Test",
+);
+
+my $som = $s->commit();
+
+die 'SOAP FAULT: ', $som->fault->{faultstring}, "\n", $som->fault->{detail}, "\n"
+    if $som->fault;
+
+print $som;

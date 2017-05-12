@@ -1,0 +1,10 @@
+Changes
+README
+MANIFEST
+MPG123.pm
+MPG123/Server.pm
+MPG123/Client.pm
+examples/server.pl
+examples/client.pl
+Makefile.PL
+test.pl

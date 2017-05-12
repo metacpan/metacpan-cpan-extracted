@@ -1,0 +1,224 @@
+=head1 NAME
+
+App::Wax - webify your CLI
+
+=head1 SYNOPSIS
+
+    use App::Wax;
+
+    exit App::Wax->new->run(\@ARGV);
+
+=head1 DESCRIPTION
+
+C<App::Wax> is the helper library for L<wax>, a command-line program which runs
+other command-line programs and converts their URL arguments to local file paths.
+
+See the L<wax> documentation for more details.
+
+=head1 ATTRIBUTES
+
+=head2 app_name
+
+B<Type>: Str, rw, default: C<wax>
+
+The application name used in L<debug|"debug"> and L<error|"log"> messages.
+
+=head2 cache
+
+B<Type>: Bool, rw, default: false.
+
+If set to true, the remote resource is stored to a persistent file whose path is
+substituted for the resource's URL on subsequent invocations of the command.
+
+If C<cache> and L<"mirror"> are both set to true, an exception is thrown.
+
+=head2 directory
+
+B<Type>: Str, rw, optional.
+
+The directory to download remote resources to. If not supplied,
+the system's L<temporary directory|https://en.wikipedia.org/wiki/Temporary_folder>
+is used.
+
+=head2 keep
+
+B<Type>: Bool, rw, default: false.
+
+True if L<"cache"> or L<"mirror"> are true, false otherwise.
+Used to determine which L<"resolve"> method to use.
+
+=head2 lwp_user_agent
+
+B<Type>: L<LWP::UserAgent>, rw.
+
+The L<LWP::UserAgent> instance used to perform network requests.
+
+=head2 mime_types
+
+B<Type>: L<Mime::Types>, rw.
+
+An instance of L<Mime::Types> used to help determine an extension for the file.
+
+=head2 mirror
+
+B<Type>: Bool, rw, default: false.
+
+If set to true, the remote resource is stored to a persistent file. On subsequent
+invocations, the resource is re-downloaded if it has been updated, and its path
+is substituted for the resource's URL.
+
+If L<"cache"> and L<"mirror"> are both set to true, an exception is thrown.
+
+=head2 separator
+
+B<Type>: Str, rw, optional.
+
+An optional token used to mark the end of C<wax>'s options.
+
+=head2 template
+
+B<Type>: Str, rw.
+
+The template format string supplied as the C<TEMPLATE> parameter to C<File::Temp-E<gt>new()>.
+
+=head2 timeout
+
+B<Type>: Int, rw, default: 60.
+
+The timeout (in seconds) for HTTP requests.
+
+=head2 user_agent
+
+B<Type>: Str, rw.
+
+The value of the L<user agent|"lwp_user_agent">'s HTTP C<User-Agent> header.
+
+=head2 verbose
+
+B<Type>: Bool, rw, default: false.
+
+If set to true, diagnostic messages are printed to STDERR.
+
+=head1 METHODS
+
+=head2 content_type
+
+B<Signature>: $url: Str -> $content_type: Str
+
+Returns the value of the HTTP C<Content-Type> header for the supplied URL e.g. C<text/html>.
+
+=head2 debug
+
+B<Signature>: $message: Str -> None
+
+Logs the message to STDERR if L<"verbose"> is set to true.
+
+B<Signature>: $template: Str, @args: List[Str] -> None
+
+Interpolates the arguments into the C<sprintf> template and logs the message to STDERR
+if L<"verbose"> is set to true.
+
+=head2 download
+
+B<Signature>: $url: Str, $path: Str -> Maybe[Str]
+
+Saves the contents of the URL to the path. Returns the error message if an error ocurred.
+
+=head2 extension
+
+B<Signature>: $url: Str -> $extension: Str
+
+Returns the file extension for the given URL (e.g. C<.html>) if one can be determined from
+the resource's C<Content-Type> header, or the path component of the URL if it's
+C<text/plain>. Otherwise, returns an empty string.
+
+=head2 is_url
+
+B<Signature>: $param: Str -> $components: ArrayRef[Str] | Undef
+
+Returns a true value (a reference to an array of URL components returned by
+L<URI::Split/uri_split>) if the supplied string is a valid absolute
+URL, false otherwise.
+
+=head2 log
+
+B<Signature>: $level: Str, $message: Str -> None
+
+Logs the message, with the level prefixed, to STDERR.
+
+B<Signature>: $level: Str, $template: Str, @args: List[Str] -> None
+
+Interpolates the arguments into the C<sprintf> template and logs the message,
+with the level prefixed, to STDERR.
+
+=head2 render
+
+B<Signature>: $command: ArrayRef[Str] -> Str
+
+Returns a string representation of the supplied command.
+
+=head2 resolve
+
+B<Signature>: $url: Str -> ($path: Str, $error: Maybe[Str]): List|ArrayRef
+
+Takes a URL and returns a list (list context) or ArrayRef (scalar context)
+containing the file path corresponding to the URL, and an optional error
+message if the download or I/O failed.
+
+The path is returned by L<"resolve_keep"> if L<"keep"> is true,
+or L<"resolve_temp"> otherwise.
+
+=head2 resolve_keep
+
+B<Signature>: $url: Str -> ($filename: Str, $error: Maybe[Str])
+
+Returns the path the L<cached|"cache"> or L<mirrored|"mirror"> URL should be saved to/retrieved
+from and an optional error message if creation of the index file (see below) failed.
+
+C<resolve_keep> uses an additional file to store the resource's extension. If this file
+can't be created, the error message is returned as the second element of the list.
+Otherwise, it's undef.
+
+=head2 resolve_temp
+
+B<Signature>: $url: Str -> $path: Str
+
+Returns the path of the temporary file the URL should be saved to.
+
+=head2 run
+
+B<Signature>: $command: ArrayRef[Str] -> $exit_code: Int
+
+Takes a command and runs it with filenames substituted for URLs. Returns the command's exit code.
+
+=head1 EXPORT
+
+None by default.
+
+=head1 VERSION
+
+1.1.0
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<wax>
+
+=item * L<RT #37347|http://rt.cpan.org/Public/Bug/Display.html?id=37347>
+
+=back
+
+=head1 AUTHOR
+
+chocolateboy <chocolate@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010-2016 by chocolateboy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

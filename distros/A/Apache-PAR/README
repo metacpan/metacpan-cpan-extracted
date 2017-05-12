@@ -1,0 +1,52 @@
+Apache/PAR version 0.30
+=======================
+
+Apache::PAR is a framework for including Perl ARchive files in a mod_perl (1.x or 2.x) environment.  It allows an author to package up a web application, including configuration, static files, Perl modules, and Registry and PerlRun scripts to include in a single file.  This archive can then be moved to other locations on the same system or distributed, and loaded with a single set of configuration options in the Apache configuration.
+
+These modules are based on PAR.pm by Autrijus Tang and Archive::Zip by Ned Konz, as well as the mod_perl modules.  They extend the concept of PAR files to mod_perl, similar to how WAR archives work for Java. An archive (which is really a zip file), contains one or more elements which can be served to clients making requests to an Apache web server.  Scripts, modules, and static content should then be able to be served from within the .par archive without modifications.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+PAR.pm       >= .74
+Archive::Zip >= 1.05
+MIME::Types  >= 1.004
+mod_perl     >= 1.26 (or > 1.99)
+Apache::Test >= 1.03
+Digest::MD5  >= 2.20
+File::Spec   >= .83
+File::Path   >= 1.05
+
+In addition, the following optional modules can provide additional functionality to Apache::PAR
+Cache::Cache >= 1.01 - Allows caching in the Apache::PAR::Static module
+
+
+MOD_PERL VERSION INFORMATION
+
+** Apache::PAR 0.20 has a non-backward compatible defaults change for Registry and PerlRun scripts, changing the default location from scripts/ to script/. **
+Please see the documentation for more information.
+
+Apache::PAR should work with both mod_perl 1.x and 2.x.  There are a few known issues however with this release and mod_perl 2.x:
+
+* mod_perl 2.x and Apache::Test support is still pretty new to this module, please report any problems you have to nathan@byrd.net or par@perl.org
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2002, 2003 by Nathan Byrd, <nathan@byrd.net>.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+

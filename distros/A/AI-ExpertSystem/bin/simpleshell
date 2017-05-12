@@ -1,0 +1,138 @@
+#!/usr/bin/perl
+
+######################################################################
+# This is a simple shell for the AI::ExpertSystem::Simple inference
+# engine class. The -t switch is used to provide an interface for the 
+# consult tcl/tk interface that allows the users to run the program
+# with a tk based gui.
+######################################################################
+
+use strict;
+use warnings;
+
+$| = -1;
+
+use Getopt::Std;
+
+use AI::ExpertSystem::Simple;
+
+my %opts;
+
+getopts('t',\%opts);
+
+my $tkinterface = defined $opts{t};
+
+if ( scalar(@ARGV) != 1 ) { die "usage: $0 [-t] <file.xml>"; }
+
+my $filename = $ARGV[0];
+
+if ( !-f $filename ) { die "The file '$filename' is not a file"; }
+if ( !-r $filename ) { die "The file '$filename' is not readable"; }
+
+######################################################################
+# The main loop
+######################################################################
+
+my $s = AI::ExpertSystem::Simple->new();
+
+$s->load($filename);
+
+say_status("Consulting $filename");
+
+my $continue = 'yes';
+
+while($continue eq 'yes') {
+	my $running = 1;
+
+	while ($running) {
+		my $r = $s->process();
+
+		process_log();
+
+		if ( $r eq 'question' ) {
+			$s->answer( ask_question( $s->get_question() ) );
+		}
+		elsif ( $r eq 'finished' ) {
+			say_status('The answer is : ' . $s->get_answer());
+			$s->explain();
+			process_log( 'explaination' , 1);
+			$running = undef;
+		}
+		elsif ( $r eq 'failed' ) {
+			say_status("Unable to answer your question");
+			$running = undef;
+		}
+	}
+
+	if($tkinterface) {
+		$continue = 'no';
+	} else {
+		$continue = ask_question( 'Another consoltation', 'yes', 'no' );
+		$s->reset();
+	}
+}
+
+######################################################################
+# Ask a question of the user showing the available responses
+######################################################################
+
+sub ask_question {
+	my ( $text, @responses ) = @_;
+
+	my $number = scalar(@responses);
+	my $x      = 0;
+
+	while ( $x < 1 or $x > $number ) {
+		say_question($text);
+
+		for ( my $y = 1 ; $y <= $number ; $y++ ) {
+			say_something('response', " $y : ", $responses[$y - 1]);
+		}
+
+		if($tkinterface) {
+			say_something('response', '', '*');
+		} else { 
+			print '** ';
+		}
+		$x = <STDIN>;
+
+		$x = 0 if $x !~ m#^[0-9]+$#;
+	}
+
+	return $responses[ $x - 1 ];
+}
+
+######################################################################
+# The various ways of printing out a message
+######################################################################
+
+sub say_status   { say_something('status',   '>> ', shift) }
+sub say_question { say_something('question', '',    shift) }
+
+sub say_something {
+	my ($tag1, $tag2, $text) = @_;
+
+	if($tkinterface) {
+		print "$tag1:$text\n";
+	} else {
+		print "$tag2$text\n";
+	}
+}
+
+######################################################################
+# The various ways of printing out a message
+######################################################################
+
+sub process_log {
+	my ($prefix, $override) = @_;
+
+	$prefix = 'information' unless $prefix;
+
+	my @log = $s->log();
+
+	if($tkinterface or $override) {
+		foreach my $line (@log) {
+			say_something($prefix, '', $line);
+		}
+	}
+}

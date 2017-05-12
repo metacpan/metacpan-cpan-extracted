@@ -1,0 +1,146 @@
+# source
+#   data_file:		acisf05124N001_evt2_gsf_ds_lc_sorted.fits
+#   interval:		energy=350:500
+#   arcsec/pixel:	0.492
+# background
+#   data_file:		acisf05124N001_evt2_gsf_ds_lc_sorted.fits
+# column units
+#   area:		arcsec**2
+#   surf_bri:		cnts/arcsec**2
+#   surf_err:		cnts/arcsec**2
+
+# summed background-subtracted results
+upto   net_counts     error   background    berror      area  surf_bri  surf_err
+---- ------------ --------- ------------ --------- --------- --------- ---------
+   1     1083.000    32.944        2.000     0.577   1860.26     0.582     0.018
+
+
+# background-subtracted results
+ reg   net_counts     error   background    berror      area  surf_bri  surf_err
+---- ------------ --------- ------------ --------- --------- --------- ---------
+   1     1083.000    32.944        2.000     0.577   1860.26     0.582     0.018
+
+
+# source_region(s):
+# # Region file format: DS9 version 4.0
+# # Filename: /data/mimir3/gaetz/reproc.cxo.e0102/5124/acisf05124N001_evt2_gsf_ds_lc_sorted.fits[EVENTS]
+# global color=green font="helvetica 10 normal" select=1 highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source
+# physical
+# circle(4163,4240,49.456451)
+
+# summed_source_data
+ reg       counts    pixels      sumcnts    sumpix
+---- ------------ --------- ------------ ---------
+   1     1085.000      7685     1085.000      7685
+
+
+# background_region(s)
+# # Region file format: DS9 version 4.0
+# # Filename: /data/mimir3/gaetz/reproc.cxo.e0102/5124/acisf05124N001_evt2_gsf_ds_lc_sorted.fits[EVENTS]
+# global color=green font="helvetica 10 normal" select=1 highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source
+# physical
+# circle(4108,4065,121.16295)
+
+# summed_background_data
+ reg       counts    pixels      sumcnts    sumpix
+---- ------------ --------- ------------ ---------
+   1       12.000     46113       12.000     46113
+
+
+# source
+#   data_file:		acisf05124N001_evt2_gsf_ds_lc_sorted.fits
+#   interval:		energy=500:1000
+#   arcsec/pixel:	0.492
+# background
+#   data_file:		acisf05124N001_evt2_gsf_ds_lc_sorted.fits
+# column units
+#   area:		arcsec**2
+#   surf_bri:		cnts/arcsec**2
+#   surf_err:		cnts/arcsec**2
+
+# summed background-subtracted results
+upto   net_counts     error   background    berror      area  surf_bri  surf_err
+---- ------------ --------- ------------ --------- --------- --------- ---------
+   1    29195.168   170.920       15.832     1.624   1860.26    15.694     0.092
+
+
+# background-subtracted results
+ reg   net_counts     error   background    berror      area  surf_bri  surf_err
+---- ------------ --------- ------------ --------- --------- --------- ---------
+   1    29195.168   170.920       15.832     1.624   1860.26    15.694     0.092
+
+
+# source_region(s):
+# # Region file format: DS9 version 4.0
+# # Filename: /data/mimir3/gaetz/reproc.cxo.e0102/5124/acisf05124N001_evt2_gsf_ds_lc_sorted.fits[EVENTS]
+# global color=green font="helvetica 10 normal" select=1 highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source
+# physical
+# circle(4163,4240,49.456451)
+
+# summed_source_data
+ reg       counts    pixels      sumcnts    sumpix
+---- ------------ --------- ------------ ---------
+   1    29211.000      7685    29211.000      7685
+
+
+# background_region(s)
+# # Region file format: DS9 version 4.0
+# # Filename: /data/mimir3/gaetz/reproc.cxo.e0102/5124/acisf05124N001_evt2_gsf_ds_lc_sorted.fits[EVENTS]
+# global color=green font="helvetica 10 normal" select=1 highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source
+# physical
+# circle(4108,4065,121.16295)
+
+# summed_background_data
+ reg       counts    pixels      sumcnts    sumpix
+---- ------------ --------- ------------ ---------
+   1       95.000     46113       95.000     46113
+
+
+# source
+#   data_file:		acisf05124N001_evt2_gsf_ds_lc_sorted.fits
+#   interval:		energy=1000:2000
+#   arcsec/pixel:	0.492
+# background
+#   data_file:		acisf05124N001_evt2_gsf_ds_lc_sorted.fits
+# column units
+#   area:		arcsec**2
+#   surf_bri:		cnts/arcsec**2
+#   surf_err:		cnts/arcsec**2
+
+# summed background-subtracted results
+upto   net_counts     error   background    berror      area  surf_bri  surf_err
+---- ------------ --------- ------------ --------- --------- --------- ---------
+   1    11491.167   107.261       11.833     1.404   1860.26     6.177     0.058
+
+
+# background-subtracted results
+ reg   net_counts     error   background    berror      area  surf_bri  surf_err
+---- ------------ --------- ------------ --------- --------- --------- ---------
+   1    11491.167   107.261       11.833     1.404   1860.26     6.177     0.058
+
+
+# source_region(s):
+# # Region file format: DS9 version 4.0
+# # Filename: /data/mimir3/gaetz/reproc.cxo.e0102/5124/acisf05124N001_evt2_gsf_ds_lc_sorted.fits[EVENTS]
+# global color=green font="helvetica 10 normal" select=1 highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source
+# physical
+# circle(4163,4240,49.456451)
+
+# summed_source_data
+ reg       counts    pixels      sumcnts    sumpix
+---- ------------ --------- ------------ ---------
+   1    11503.000      7685    11503.000      7685
+
+
+# background_region(s)
+# # Region file format: DS9 version 4.0
+# # Filename: /data/mimir3/gaetz/reproc.cxo.e0102/5124/acisf05124N001_evt2_gsf_ds_lc_sorted.fits[EVENTS]
+# global color=green font="helvetica 10 normal" select=1 highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source
+# physical
+# circle(4108,4065,121.16295)
+
+# summed_background_data
+ reg       counts    pixels      sumcnts    sumpix
+---- ------------ --------- ------------ ---------
+   1       71.000     46113       71.000     46113
+

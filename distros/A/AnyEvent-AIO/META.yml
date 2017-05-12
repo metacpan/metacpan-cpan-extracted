@@ -1,0 +1,29 @@
+{
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "generated_by" : "ExtUtils::MakeMaker version 6.50",
+   "distribution_type" : "module",
+   "version" : "1.1",
+   "name" : "AnyEvent-AIO",
+   "author" : [],
+   "license" : "unknown",
+   "build_requires" : {
+      "ExtUtils::MakeMaker" : 0
+   },
+   "requires" : {
+      "AnyEvent" : 3.4,
+      "IO::AIO" : 3
+   },
+   "abstract" : null,
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : 0
+   }
+}

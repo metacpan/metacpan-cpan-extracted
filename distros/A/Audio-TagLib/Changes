@@ -1,0 +1,174 @@
+Revision history for Perl extension TagLib.
+
+1.67 Resubmitting
+
+1.66 (requires taglib 1.11 or greater)
+     Thu Jul 28 13:54:25 PDT 2016
+     . Fix in Makefile.pl and iconv.c for issue #101294
+     Sat Jul 23 15:24:46 PDT 2016
+     . File properties should be checked with audacity. They are sensitive to 
+       (apparently) minor changes.
+     Tue Jul 12 15:52:52 PDT 2016
+     . Add options to the compile of XS modules to remove uninteresting errors
+       See the initialization of $xs_options in Makefilwe.PL
+     Wed Jun 29 14:27:01 PDT 2016
+     . Using version module to correct failing compare
+     Tue Jun 21 16:47:59 PDT 2016
+     . Construct paths using Path::Class::File() for Windoze
+       Hopefully, this will resolve issue #114906
+     Mon Jun 27 16:35:05 PDT 2016
+     . Added -lz to Makefile.PL for linux
+     Sun Jun 28 06:23:03 PDT 2015
+     . Updated README
+     1.65 Sun Oct 12 08:30:04 PDT 2014
+     . Improve taglib version error reporting
+
+1.64
+     Tue Jul 15 14:43:36 PDT 2014
+     . This is version 1.64. As of this version, code is being maintained under git,
+       although its not installed on github.
+     . .pm files now reset to version 1.1. The reasoning here is that after the 
+       initial cleanup of the .pm's there have been no modifications.
+       The distribution version is kept in lib/Audio/TagLib.pm
+     . Corrected INCLUDE error in TagLib.xs that resulted in certain Vorbis
+       routines not being loaded.
+     . Added code to make duplicate test files to test removing.
+     Wed Jun 11 15:24:22 PDT 2014
+     . Improvement to Dopy.pm, courtsey Festus.
+     Sat Jun  7 14:12:03 PDT 2014
+     . Changes from Festus: patches for issues: #82529, #79942, #82298, RT 664415 
+     . Require Test::Simple 0.99 (current is 1.001003) for t/TagLib_Ogg_File.t
+     Mon Dec 16 14:14:57 PST 2013
+     . Added include/MPEG_Header.pm that generates MPEG headers
+     Mon Dec  9 14:04:04 PST 2013
+     . Added version check for taglib. This required version.pm which was 
+       aded to Core in 5.10.0, so that's the reason for bumping MIN_PERL_VERSION.
+       If version.pm is available, MIN_PPERL_VERSION == 5.8.1 should be OK.
+     . Added include/MPEG_Header.pm to generate headers for t/TagLib_MPEG_Header.t
+       strictly speaking it would bw enough to use a raw number, but this 
+       way the header generated is clear.
+     Thu Nov 14 10:23:50 PST 2013
+     - Add version parameter to MPEG save()
+     . Add test for solaris to Makefile.PL. This is a WAG to have define _BSD_ICONV
+     . Repair t/TagLib_ID3v2_FrameFactory.t; header requires more than just tag.
+     Fri Oct 11 15:43:18 PDT 2013
+     - Bring scripts/update_template/ and the updated files into harmony, 
+       courtsey Festus.  Added README.updateiterator, ditto
+     - Repair for RT 85621, courtsey Sisyphus. Test $PERL_VERSION, create c++ define
+     Fri Jan 11 13:23:15 PST 2013
+    - Non-critical changes from Festus. UTF8 => UTF-8 in xs/TITERATOR.xs,
+      and other problems that happen if the .xs files are re-created.
+
+1.63 Sun Dec 23 13:02:04 PST 2012
+    - taglib version-dependent tests, beginning in 1.8.0
+      These tests had their result changed as a result of taglib bug fixes
+      t/TagLib_ID3v2_Header.t, t/TagLib_APE_Item.t
+
+    - Changes to xs to remove the use of WCHAT_T, which is system dependent,
+      and should never appear in "portable" code. Fixes [rt.cpan.org #82529]
+      Kudos to Festus, who did all of the work.
+
+1.62  Sat Sep  8 14:49:44 PDT 2012
+   - Patches for [rt.cpan.org #79442], [rt.cpan.org #79474] and [rt.cpan.org #79480]
+        making Windoze work 
+   - Patches for Win32 and FreeBSD, courtsey of Festus Hagen
+      Festus-01: xs/stringiterator.xs
+      iconv_open() fails, incorrect character set names, iconv expects a hyphen
+      in UTF names.
+      
+      Festus-02: xs/tstring.xs 
+      Changing where *fromcode is assigned it's value to a hyphenated version causes
+      implications further down the line, including with Taglib
+      Patch also resolves: warning: deprecated conversion from string constant to
+      'char*'
+
+      Festus-03: t/TagLib_ID3v2_Header.t and t/TagLib_APE_Item.t
+      Improvements to value checking
+
+      Festus-04: TagLib.xs and xs/apeitem.xs
+      Additional refinement to defines.
+
+    - Patch for tagLib.xs courtsey of Sisyphus
+      Sisyphus-01: MS Windows
+      Changes to defines
+
+    - Updates to Makefile.PL courtsey of Sisyphus
+      Sisyphus-02 /dev/null not portable
+      
+1.61  Mon Aug 13 21:12:54 PDT 2012
+   -  Added -liconv to freebsd libs. Grasping at straws
+
+1.60  Sat Aug 11 10:37:43 PDT 2012
+   -   Trying to resolve do_open again
+
+1.59  Thu Aug  9 14:53:03 PDT 2012
+   -   Removed the INSTALL file. The essence of redundant!
+   -   Added more modules to PREREQ_PM.
+
+1.58  Tue Aug  7 15:11:29 PDT 2012
+   -   Added a PREREQ_PM to Makefile.PL for TEST::Output
+       Ditto Test::Deep, just to be safe
+
+1.57  Tue Aug  7 15:11:29 PDT 2012
+   -   Another attempt fixing do-open, do_close. Seems to have worked
+
+1.56  Sun Aug  5 15:51:04 PDT 2012
+    -  Added #undef do_open and do_close to deal with complaints from C++
+
+1.55  Sat Aug  4 09:28:40 PDT 2012
+    -  Compile errors: in xs/apeitem.xs do_open, do_close cause problems, not used
+
+1.54 Wed Aug  1 11:56:54 PDT 2012
+    - CPAN testing revealed what appears to be an implementation-dependent
+      result in t/TagLib_ByteVector.t. That test has been deleted.
+    - A number of tests were in TODO: blocks. I expected that they
+      would be ignored, but it appears that some of the statements
+      resulted in errors that were not ignored. All of these blocks,
+      including the error above have geen enlosed in =if 0 ... =cut
+    - Finally, a test in t/TagLib_ID3v2_FrameList.t had a race condition
+      resulting from a failure to use parens. 
+
+1.52 Tue Jul 31 08:33:24 PDT 2012
+    - Corrected Makefile.PL error
+
+1.51 Wed Jul 11 16:21:06 PDT 2012
+    - Begin testing with taglib 1.7.2
+    - Looks good, except that I haven't covered new functionality
+
+1.50 Tue Jul 10 08:26:45 PDT 2012
+    - Final
+
+1.50.0 Sat Jan 22 15:41:45 PST 2011
+    - Based on taglib v 1.5. As of this writing, taglib is at v1.6.3,
+       consequently it's unlikely that this will be of much use to anyone.
+       It's being released as a checkpoint on the way to supporting that release.
+       Only fatal bugs will be addressed on this thread.
+    - While all of the tests pass, it's not guaranteed that all of the
+      TagLib functionality has been tested. YMMV!
+    - Add Audio:: to MODULE and DISTRIBUTION statements in xs/*
+        used script fix_dcls.pl
+    - Updated ppport.h
+    - Cleaned auto-inserted comments from t/*
+    - Fixed coding errors in t/*
+    - Swapped in guitar.* in sample/; adds .wav and .flac
+        Produced from guitar.wav using Audacity. Where guitar.wav came 
+        from is anybody's guess
+
+1.50_01 10.07.2009
+    - patch from CHOCOLATE _at_ cpan dot org (#36560)
+    - patch from Spr _at_ cpan dot org (#24410)
+    - enable build for taglib v1.5
+
+1.43 Tu 17.01.07
+    - support for MacOSX
+    - fix on MakeFile.PL
+
+1.42 Mo 17.04.06
+    - x86_64 support
+    - FreeBSD support(test required)
+
+1.41 Tu 20.12.05
+    - bug fix (stack manipulation bug and Makefile.PL)
+
+1.4   Mon Aug 15 18:47:30 2005
+	- original version; created by h2xs 1.23 with options -A -n TagLib

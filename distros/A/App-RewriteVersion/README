@@ -1,0 +1,187 @@
+NAME
+
+    App::RewriteVersion - A tool to rewrite and bump your Perl module
+    versions
+
+SYNOPSIS
+
+     use App::RewriteVersion;
+     my $app = App::RewriteVersion->new;
+     
+     # Options
+     $app->verbose(1)->follow_symlinks(0);
+     
+     # Bump versions for modules in current dist directory
+     $app->rewrite_versions($app->bump_version($app->current_version));
+     
+     # Bump versions in specified dist directory
+     $app->rewrite_versions($app->bump_version($app->current_version(dist_dir => $dist_dir)), dist_dir => $dist_dir);
+     
+     # Override module to read version from
+     $app->rewrite_versions($app->bump_version($app->current_version(file => $file)));
+     
+     # Bump versions in specific subdirectories
+     $app->rewrite_versions($app->bump_version($app->current_version), subdirs => ['foo','bar']);
+     
+     # Custom version bump algorithm
+     $app->rewrite_versions($app->bump_version($app->current_version, sub { shift + 0.05 }));
+     
+     # Don't bump, just synchronize versions with main module
+     $app->rewrite_versions($app->current_version);
+     
+     # Set versions to specified version
+     $app->rewrite_versions('0.065');
+     
+
+DESCRIPTION
+
+    App::RewriteVersion is a tool for managing Perl module versions in a
+    distribution. It is heavily based on the Dist::Zilla plugin
+    Dist::Zilla::Plugin::RewriteVersion. Similarly to that plugin, the V
+    environment variable can be used to override the version detected from
+    the main module.
+
+    Existing version assignments and new versions must be parseable with
+    the same rules as in "DESCRIPTION" in
+    Dist::Zilla::Plugin::RewriteVersion, that is to say, they should either
+    be a decimal number with a single decimal point, or a tuple version
+    with a leading v and at least 3 segments separated by decimal points.
+    Version assignments should be in the form our $VERSION = '...';.
+
+    See perl-rewrite-version and perl-bump-version for details on
+    command-line usage.
+
+ATTRIBUTES
+
+ allow_decimal_underscore
+
+     my $bool = $app->allow_decimal_underscore;
+     $app = $app->allow_decimal_underscore(1);
+
+    If true, decimal versions with underscores will be allowed. Defaults to
+    false. See "Using underscore in decimal $VERSION" in
+    Dist::Zilla::Plugin::BumpVersionAfterRelease for more information.
+
+ dry_run
+
+     my $bool = $app->dry_run;
+     $app = $app->dry_run(1);
+
+    If true, the module will process files as normal but not actually
+    modify them. Useful with "verbose" to verify expected functionality.
+
+ follow_symlinks
+
+     my $bool = $app->follow_symlinks;
+     $app = $app->follow_symlinks(1);
+
+    If true, the application will follow symlinked directories when
+    traversing the distribution for modules. Defaults to false.
+
+ global
+
+     my $bool = $app->global;
+     $app = $app->global(1);
+
+    If true, the application will replace all version assignments found
+    instead of just the first instance in each file. Defaults to false.
+
+ verbose
+
+     my $bool = $app->verbose;
+     $app = $app->verbose(1);
+
+    Enable progress messages to be printed to STDOUT. Defaults to false.
+
+METHODS
+
+ new
+
+     my $app = App::RewriteVersion->new;
+
+    Construct a new App::RewriteVersion object.
+
+ bump_version
+
+     my $new_version = $app->bump_version($version);
+     my $new_version = $app->bump_version($version, sub { $_[0] + 1 });
+
+    Increments a version string, returning the new version string. An
+    optional coderef can be passed for custom version bump logic. The
+    coderef will receive the current version string as the first argument
+    and is expected to return a new version string. By default,
+    Version::Next is used. An exception will be thrown if an invalid
+    version is passed according to the current settings.
+
+ current_version
+
+     my $current_version = $app->current_version;
+     my $current_version = $app->current_version(dist_dir => $dist_dir);
+     my $current_version = $app->current_version(file => $file);
+
+    Returns the current version of the distribution using "version_from".
+    If no file is passed, the main module filename will be guessed from
+    dist_dir (defaulting to current working directory), using heuristics
+    similar to Dist::Zilla::Plugin::NameFromDirectory and "main_module" in
+    Dist::Zilla. For example, if the directory is named Foo-Bar it will
+    look for lib/Foo/Bar.pm within the distribution, and if that doesn't
+    exist, the shortest module path found. If the V environment variable is
+    set, it will be returned regardless of other options. An exception will
+    be thrown if no version is found in the specified or guessed file, or
+    if no perl modules could be found.
+
+ rewrite_version
+
+     my $bool = $app->rewrite_version($file, $version);
+     my $bool = $app->rewrite_version($file, $version, is_trial => $is_trial);
+
+    Rewrites the version of the file at $file to $version if it has a
+    version assignment in the form our $VERSION = '...';. Returns true if
+    the version was rewritten, or false if no version assignment was found.
+    If is_trial is true, # TRIAL will be appended to the version assignment
+    line when rewriting. An exception will be thrown if an invalid version
+    is passed, or an I/O error occurs. A warning will be printed if
+    $version is lower than the version previously declared in the file.
+
+ rewrite_versions
+
+     $app = $app->rewrite_versions($version);
+     $app = $app->rewrite_versions($version, dist_dir => $dist_dir);
+     $app = $app->rewrite_versions($version, is_trial => 1);
+     $app = $app->rewrite_versions($version, subdirs => ['lib']);
+
+    Rewrites the versions of all perl files found in dist_dir (defaulting
+    to current working directory) to $version using "rewrite_version". The
+    subdirs option can be used to specify an arrayref of subdirectories
+    relative to dist_dir in which versions will be rewritten, otherwise
+    defaulting to lib, script, and bin. If passed, the is_trial option is
+    passed through to "rewrite_version". An exception will be thrown if an
+    invalid version is passed, or an I/O error occurs.
+
+ version_from
+
+     my $version = $app->version_from($file);
+
+    Attempts to read version from the file at $file. Returns undef if no
+    version assignment was found.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2015 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::RewriteVersion, Version::Next
+

@@ -1,0 +1,31 @@
+Revision history for App-pretty
+
+0.05    2016-03-10 (PERLANCAR)
+
+	- Replace JSON with JSON::MaybeXS.
+
+
+0.04    2016-03-05 (PERLANCAR)
+
+	- No functional changes.
+
+        - Fix a couple of typo & formatting.
+
+
+0.03    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.02    2014-04-09 (SHARYANTO)
+
+        - No functional changes.
+
+        - Add examples in Synopsis.
+
+
+0.01    2014-02-16 (SHARYANTO)
+
+        - First release.

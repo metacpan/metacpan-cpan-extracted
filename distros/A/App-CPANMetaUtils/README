@@ -1,0 +1,10 @@
+DESCRIPTION
+
+    This distribution contains CLI utilities related to CPAN Meta:
+
+    # INSERT_EXECS_LIST
+
+SEE ALSO
+
+    CPAN::Meta, CPAN::Meta::Validator
+

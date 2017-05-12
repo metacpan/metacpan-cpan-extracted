@@ -1,0 +1,18 @@
+
+lib/Acme/Roman.pm
+
+eg/fact.pl
+eg/fib.pl
+eg/guess.pl
+
+Build.PL
+Changes
+MANIFEST			This list of files
+META.yml
+README
+
+t/01_use.t
+t/02_objects.t
+t/03_autoload.t
+t/98_pod-coverage.t
+t/99_pod.t

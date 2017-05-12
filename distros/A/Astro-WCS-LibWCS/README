@@ -1,0 +1,25 @@
+                            Astro::WCS::LibWCS
+
+What is it?
+-----------
+   Astro::WCS::LibWCS is a Perl interface to the WCSTools libwcs
+   library. For more information on WCSTools, see
+   http://tdc-www.harvard.edu/software/wcstools/
+
+Where can (did) I get it?
+-------------------------
+   http://www.perl.com/CPAN/authors/id/P/PR/PRATZLAFF
+
+What version of wcstools does this module require?
+----------------------------------------------
+  Astro::WCS::LibWCS version 0.94 requires WCSTools version 3.8.1 or newer.
+
+Installation
+------------
+   For installation instructions, see the 'INSTALL' file in the base
+   distribution directory. Essentially, it just tells you to
+
+     $ env WCSTOOLS=/path/to/wcstools perl Makefile.PL
+     $ make
+     $ make test
+     $ make install

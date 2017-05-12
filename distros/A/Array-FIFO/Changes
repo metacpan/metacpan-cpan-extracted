@@ -1,0 +1,30 @@
+
+0.10 - 2015/11/13
+    - removed unused call to 'size'
+    - update description for clarity
+
+0.09 - 2015/10/31
+    - updating pod for clarity
+
+0.08 - 2015/10/30
+    - defer average and sum calculations until needed
+    - tweak pod
+
+0.06 - 2015/10/22
+    - clarify wording in pod
+
+0.05 - 2015/10/22
+    - use List::Util sum0 to add up values
+    - fix typos and bad DESCRIPTION
+
+0.04 - 2015/10/22
+    - renamed max_size to limit
+
+0.03 - 2015/10/21
+    - get 'size' from Array delegation
+    - return oldest element in array, useful if you need to know what 
+      gets deleted if the array is maxed 
+
+0.01 - 2015/10/21
+    - Initial release
+

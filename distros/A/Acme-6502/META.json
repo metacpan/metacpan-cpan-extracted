@@ -1,0 +1,53 @@
+{
+   "abstract" : "Pure Perl 65C02 simulator.",
+   "author" : [
+      "Andy Armstrong <andy@hexten.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-6502",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Term::ReadKey" : "0",
+            "Test::More" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::6502" : {
+         "file" : "lib/Acme/6502.pm",
+         "version" : "0.77"
+      },
+      "Acme::6502::Tube" : {
+         "file" : "lib/Acme/6502/Tube.pm",
+         "version" : "0.77"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-6502"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/AndyA/Acme--6502.git (fetch)"
+      }
+   },
+   "version" : "0.77"
+}

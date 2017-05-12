@@ -1,0 +1,28 @@
+Acme-Net-OdiousPlan version 0.0.1
+
+Acme::Net::OdiousPlan is a simple Web service client for Nat Torkington's 
+"Your odio.us Gateway to Web 2.0 Riches"
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Best Practical Solutions LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

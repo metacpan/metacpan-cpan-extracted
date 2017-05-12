@@ -1,0 +1,24 @@
+Revision history for Perl extension AMF::Connection.
+
+0.10	Wed Sep 22 15:56:04 BST 2010
+	- original version
+
+0.20
+	- updated AMF::Connection::OutputStream to report errors from Storable::AMF if any
+	- added Storable::AMF parse and serialization options with parse_option()
+
+0.21
+	- Fixed check on Storable version for parse_option()
+
+0.30	Wed May 11 18:07:11 BST 2011
+	- Added callBatch () to make AMF batch RPC possible
+
+0.31	Fri May 4 17:33:56 2012 +0100
+	- Support different source and destination in AMF remoting package (patch by Aleksey Komarov)
+
+0.32	Fri May  4 18:59:18 BST 2012
+	- Fixed bug to correctly decode the HTTP response using decoded_content() when the AMF
+	  gateway supports HTTP Accept-Encoding request headers (bug report by Markus Ortner)
+
+
+

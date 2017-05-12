@@ -1,0 +1,43 @@
+---
+abstract: 'Simple to use and highly available'
+author:
+  - 'Eric Johnson <eric.git@iijo.org>'
+build_requires:
+  Test::Most: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amazon-DynamoDB-Simple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Amazon::DynamoDB::Simple:
+    file: lib/Amazon/DynamoDB/Simple.pm
+    version: '0.01'
+requires:
+  Amazon::DynamoDB: '0'
+  Carp: '0'
+  DDP: '0'
+  JSON::XS: '0'
+  Moo: '0'
+  Try::Tiny: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kablamo/Amazon-DynamoDB-Simple/issues
+  homepage: https://github.com/kablamo/Amazon-DynamoDB-Simple
+  repository: git://github.com/kablamo/Amazon-DynamoDB-Simple.git
+version: '0.01'
+x_authority: cpan:KABLAMO

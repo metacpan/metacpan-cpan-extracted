@@ -1,0 +1,3 @@
+Combined action of two transcription factors regulates genes encoding spore coat proteins of Bacillus subtilis.
+In vitro transcription experiments suggest that the differential pattern of cot expression of gene results from the combined action of GerE and another transcription factor, SpoIIID.
+Transcription of the cotB, cotC, and cotX genes by final sigma(K) RNA polymerase is activated by a small, DNA-binding protein called GerE.

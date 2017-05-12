@@ -1,0 +1,81 @@
+0.12    2017-03-21 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to remove unneeded dependency on Perl::osnames.
+
+
+0.11    2015-12-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [build] Re-build with updated Perinci::To::POD (0.70) which fixes
+          rendering of modules' POD with regard to result_naked=1/args_as !=
+          'hash'.
+
+
+0.10    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.09    2014-09-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- D'oh, previous change not yet done.
+
+
+0.08    2014-09-06 (PERLANCAR)
+
+	- Adjust to Perinci::Sub::Wrapper 0.62
+	  (_perinci.sub.wrapper.validate_args is now renamed).
+
+
+0.07    2014-06-19 (SHARYANTO)
+
+        - No functional changes.
+
+        - Rename dist from App-cal-id to App-CalId to follow my convention as
+          follow: "For app dist, if binary name is a single word (e.g. foo) then
+          module name is App::foo and dist name App-foo. If binary is a multiple
+          word (e.g. foo-bar-baz) or there are multiple binaries, then module
+          name becomes camel case App::FooBarBaz and dist App-FooBarBaz."
+
+
+0.06    2014-05-26 (SHARYANTO)
+
+        - No functional changes.
+
+        - App 'use experimental smartmatch' for perl 5.18+.
+
+
+0.05    2013-10-31 (SHARYANTO)
+
+        - Add option 'time_zone' and defaults to $ENV{TZ}.
+
+
+0.04    2013-10-05 (SHARYANTO)
+
+        - Add option --show-joint-leave.
+
+
+0.03    2013-04-03 (SHARYANTO)
+
+        - No functional changes. Some display tweaks (short day of week names,
+          not showing prev/next month's days if we are showing more than one
+          month of calendar).
+
+
+0.02    2013-04-03 (SHARYANTO)
+
+        - Add options: -1, -3, -y, -h, -L.
+
+
+0.01    2013-04-03 (SHARYANTO)
+
+        - First release.

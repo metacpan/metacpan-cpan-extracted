@@ -1,0 +1,256 @@
+NAME
+    AnyEvent::FastPing - quickly ping a large number of hosts
+
+SYNOPSIS
+     use AnyEvent::FastPing;
+
+DESCRIPTION
+    This module was written for a single purpose only: sending ICMP ECHO
+    REQUEST packets as quickly as possible to a large number of hosts
+    (thousands to millions).
+
+    It employs a separate thread and is fully event-driven (using AnyEvent),
+    so you have to run an event model supported by AnyEvent to use this
+    module.
+
+FUNCTIONS
+    AnyEvent::FastPing::ipv4_supported
+        Returns true iff IPv4 is supported in this module and on this
+        system.
+
+    AnyEvent::FastPing::ipv6_supported
+        Returns true iff IPv6 is supported in this module and on this
+        system.
+
+    AnyEvent::FastPing::icmp4_pktsize
+        Returns the number of octets per IPv4 ping packet (the whole IP
+        packet including headers, excluding lower-level headers or trailers
+        such as Ethernet).
+
+        Can be used to calculate e.g. octets/s from rate ...
+
+           my $octets_per_second = $packets_per_second * AnyEvent::FastPing::icmp4_pktsize;
+
+        ... or convert kilobit/second to packet rate ...
+
+           my $packets_per_second = $kilobit_per_second
+                                    * (1000 / 8 / AnyEvent::FastPing::icmp4_pktsize);
+
+        etc.
+
+    AnyEvent::FastPing::icmp6_pktsize
+        Like AnyEvent::FastPing::icmp4_pktsize, but for IPv6.
+
+THE AnyEvent::FastPing CLASS
+    The AnyEvent::FastPing class represents a single "pinger". A "pinger"
+    comes with its own thread to send packets in the background, a
+    rate-limit machinery and separate idle/receive callbacks.
+
+    The recommended workflow (there are others) is this: 1. create a new
+    AnyEvent::FastPing object 2. configure the address lists and ranges to
+    ping, also configure an idle callback and optionally a receive callback
+    3. "start" the pinger.
+
+    When the pinger has finished pinging all the configured addresses it
+    will call the idle callback.
+
+    The pinging process works like this: every range has a minimum interval
+    between sends, which is used to limit the rate at which hosts in that
+    range are being pinged. Distinct ranges are independent of each other,
+    which is why there is a per-pinger "global" minimum interval as well.
+
+    The pinger sends pings as fats as possible, while both obeying the
+    pinger rate limit as well as range limits.
+
+    When a range is exhausted, it is removed. When all ranges are exhausted,
+    the pinger waits another "max_rtt" seconds and then exits, causing the
+    idle callback to trigger.
+
+    Performance: On my 2 GHz Opteron system with a pretty average nvidia
+    gigabit network card I can ping around 60k to 200k addresses per second,
+    depending on routing decisions.
+
+    Example: ping 10.0.0.1-10.0.0.15 with at most 100 packets/s, and
+    11.0.0.1-11.0.255.255 with at most 1000 packets/s. Also ping the IPv6
+    loopback address 5 times as fast as possible. Do not, however, exceed
+    1000 packets/s overall. Also dump each received reply.
+
+       use AnyEvent::Socket;
+       use AnyEvent::FastPing;
+
+       my $done = AnyEvent->condvar;
+
+       my $pinger = new AnyEvent::FastPing;
+
+       $pinger->interval (1/1000);
+       $pinger->max_rtt (0.1); # reasonably fast/reliable network
+
+       $pinger->add_range (v10.0.0.1, v10.0.0.15, 1/100);
+       $pinger->add_range (v11.0.0.1, v11.0.255.255, 1/1000);
+       $pinger->add_hosts ([ (v0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1) x 5 ]);
+
+       $pinger->on_recv (sub {
+          for (@{ $_[0] }) {
+             printf "%s %g\n", (AnyEvent::Socket::format_address $_->[0]), $_->[1];
+          }
+       });
+
+       $pinger->on_idle (sub {
+          print "done\n";
+          undef $pinger;
+       });
+
+       $pinger->start;
+       $done->wait;
+
+  METHODS
+    $pinger = new AnyEvent::FastPing
+        Creates a new pinger - right now there can be at most 65536 pingers
+        in a process, although that limit might change to something
+        drastically lower - you should be stingy with your pinger objects.
+
+    $pinger->on_recv ($callback->([[$host, $rtt], ...]))
+        Registers a callback to be called for ping replies. If no callback
+        has been registered than ping replies will be ignored, otherwise
+        this module calculates the round trip time, in seconds, for each
+        reply and calls this callback.
+
+        The callback receives a single argument, which is an array reference
+        with an entry for each reply packet (the replies will be batched for
+        efficiency). Each member in the array reference is again an array
+        reference with exactly two members: the binary host address (4
+        octets for IPv4, 16 for IPv6) and the approximate round trip time,
+        in seconds.
+
+        The replies will be passed to the callback as soon as they arrive,
+        and this callback can be called many times with batches of replies.
+
+        The receive callback will be called whenever a suitable reply
+        arrives, whether generated by this pinger or not, whether this
+        pinger is started or not. The packets will have a unique 64 bit ID
+        to distinguish them from other pinger objects and other generators,
+        but this doesn't help against malicious replies.
+
+        Note that very high packet rates can overwhelm your process, causing
+        replies to be dropped (configure your kernel with long receive
+        queues for raw sockets if this is a problem).
+
+        Example: register a callback which simply dumps the received data.
+
+           use AnyEvent::Socket;
+
+           $pinger->on_recv (sub {
+              for (@{ $_[0] }) {
+                 printf "%s %g\n", (AnyEvent::Socket::format_address $_->[0]), $_->[1];
+              }
+           });
+
+        Example: a single ping reply with payload of 1 from "::1" gets
+        passed like this:
+
+           [
+              [ "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\1", 0.000280141830444336 ]
+           ]
+
+        Example: ping replies for 127.0.0.1 and 127.0.0.2:
+
+           [
+              [ "\177\0\0\1", 0.00015711784362793 ],
+              [ "\177\0\0\2", 0.00090184211731 ]
+           ]
+
+    $pinger->on_idle ($callback->())
+        Registers a callback to be called when the pinger becomes *idle*,
+        that is, it has been started, has exhausted all ping ranges and
+        waited for the "max_rtt" time. An idle pinger is also stopped, so
+        the callback can instantly add new ranges, if it so desires.
+
+    $pinger->interval ($seconds)
+        Configures the minimum interval between packet sends for this pinger
+        - the pinger will not send packets faster than this rate (or
+        actually 1 / rate), even if individual ranges have a lower interval.
+
+        A value of 0 selects the fastest possible speed (currently no faster
+        than 1_000_000 packets/s).
+
+    $pinger->max_rtt ($seconds)
+        If your idle callback were called instantly after all ranges were
+        exhausted and you destroyed the object inside (which is common),
+        then there would be no chance to receive some replies, as there
+        would be no time of the packet to travel over the network.
+
+        This can be fixed by starting a timer in the idle callback, or more
+        simply by selecting a suitable "max_rtt" value, which should be the
+        maximum time you allow a ping packet to travel to its destination
+        and back.
+
+        The pinger thread automatically waits for this amount of time before
+        becoming idle.
+
+        The default is currently 0.5 seconds, which is usually plenty.
+
+    $pinger->add_range ($lo, $hi[, $interval])
+        Ping the IPv4 (or IPv6, but see below) address range, starting at
+        binary address $lo and ending at $hi (both $lo and $hi will be
+        pinged), generating no more than one ping per $interval seconds (or
+        as fast as possible if omitted).
+
+        You can convert IP addresses from text to binary form by using
+        "AnyEvent::Util::parse_address", "Socket::inet_aton",
+        "Socket6::inet_pton" or any other method that you like :)
+
+        The algorithm to select the next address is O(log n) on the number
+        of ranges, so even a large number of ranges (many thousands) is
+        manageable.
+
+        No storage is allocated per address.
+
+        Note that, while IPv6 addresses are currently supported, the
+        usefulness of this option is extremely limited and might be gone in
+        future versions - if you want to ping a number of IPv6 hosts, better
+        specify them individually using the "add_hosts" method.
+
+    $pinger->add_hosts ([$host...], $interval, $interleave)
+        Similar to "add_range", but uses a list of single addresses instead.
+        The list is specified as an array reference as first argument. Each
+        entry in the array should be a binary host address, either IPv4 or
+        IPv6. If all addresses are IPv4 addresses, then a compact IPv4-only
+        format will be used to store the list internally.
+
+        Minimum $interval is the same as for "add_range" and can be left
+        out.
+
+        $interlave specifies an increment between addresses: often address
+        lists are generated in a way that results in clustering - first all
+        addresses from one subnet, then from the next, and so on. To avoid
+        this, you can specify an interleave factor. If it is 1 (the
+        default), then every address is pinged in the order specified. If it
+        is 2, then only every second address will be pinged in the first
+        round, followed by a second round with the others. Higher factors
+        will create $interleave runs of addresses spaced $interleave indices
+        in the list.
+
+        The special value 0 selects a (hopefully) suitable interleave factor
+        automatically - currently 256 for lists with less than 65536
+        addresses, and the square root of the list length otherwise.
+
+    $pinger->start
+        Start the pinger, unless it is running already. While a pinger is
+        running you must not modify the pinger. If you want to change a
+        parameter, you have to "stop" the pinger first.
+
+        The pinger will automatically stop when destroyed.
+
+    $pinger->stop
+        Stop the pinger, if it is running. A pinger can be stopped at any
+        time, after which it's current state is preserved - starting it
+        again will continue where it left off.
+
+AUTHOR
+       Marc Lehmann <schmorp@schmorp.de>
+       http://home.schmorp.de/
+
+LICENSE
+       This software is distributed under the GENERAL PUBLIC LICENSE, version 2
+       or any later version or, at your option, the Artistic License.
+

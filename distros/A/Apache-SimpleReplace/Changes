@@ -1,0 +1,28 @@
+Revision history for Perl extension Apache::SimpleReplace.
+
+0.01  4.4.2000
+	- original version
+        - actually a rename of (the now obsolete) Apache::Wrapper_0.02
+
+0.02  05.08.2000
+	- fixed embarassing parsing of Filter PerlSetVar (whoops)
+	- TEMPLATE is no longer relative to server root
+        - minor pod changes
+
+0.03  05.15.2000
+        - corrected installation to install to a versioned
+          directory (whoops)
+
+0.04  05.25.2000
+        - fixed bug in status checking when not using Apache::Filter
+        - return SERVER_ERROR if Apache::Filter or Apache::File
+          can't open the file
+
+0.05  05.31.2000
+        - send headers when not using Apache::Filter
+
+0.06  11.06.2000
+        - make changes to fit in with Apache::Filter 1.013
+        - clean up output statements a bit
+        - changed warning to error for SERVER_ERROR
+        - modified pod

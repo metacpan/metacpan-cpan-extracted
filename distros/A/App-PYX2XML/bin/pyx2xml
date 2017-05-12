@@ -1,0 +1,114 @@
+#!/usr/bin/env perl
+
+# Pragmas.
+use strict;
+use warnings;
+
+# Modules.
+use App::PYX2XML;
+
+# Version.
+our $VERSION = 0.02;
+
+# Run.
+App::PYX2XML->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+pod2xml - Script to convert PYX to XML.
+
+=head1 SYNOPSIS
+
+ pyx2xml [-e in_enc] [-h] [-i] [--version] [filename] [-]
+
+=head1 DESCRIPTION
+
+ pyx2xml script uses PYX::SGML::Tags class to create XML output of PYX.
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-e in_enc>
+
+ Input encoding.
+ Default value is 'utf-8'.
+
+=item * C<-h>
+
+ Print help.
+
+=item * C<-i>
+
+ Indent output.
+
+=item * C<--version>
+
+ Print version of script.
+
+=item * C<filename>
+
+ Input file in PYX format.
+
+=item * C<->
+
+ Stdin with PYX input.
+
+=back
+
+=head1 EXAMPLE1
+
+ pyx2xml
+
+ # Output:
+ # Usage: pyx2xml [-e in_enc] [-h] [-i] [--version] [filename] [-]
+ #         -e in_enc       Input encoding (default value is utf-8).
+ #         -h              Print help.
+ #         -i              Indent output.
+ #         --version       Print version.
+ #         [filename]      Process on filename
+ #         [-]             Process on stdin
+
+=head1 EXAMPLE2
+
+ cat <<END | pyx2xml -
+ (element
+ -foo
+ )element
+ END
+
+ # Output:
+ # <element>foo</element>
+
+=head1 REPOSITORY
+
+L<https://github.com/tupinek/App-PYX2XML>
+
+=head1 AUTHOR
+
+Michal Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+ © 2015-2016 Michal Špaček
+ BSD 2-Clause License
+
+=head1 VERSION
+
+0.02
+
+=cut

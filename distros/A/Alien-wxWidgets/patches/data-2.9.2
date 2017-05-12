@@ -1,0 +1,25 @@
+my $VERSION = '2.9.2';
+   $URL   ||= "http://prdownloads.sourceforge.net/wxwindows";
+my $BASE    = 'wxWidgets';
+# $TYPE from Build.PL
+
+my @common = qw(wxWidgets-2.9.0-magic.patch);
+
+my $winsetuppatch = ( $FORCE_GTX ) ? 'wxMSW-2.9.2-setup_gctx.patch' : 'wxMSW-2.9.2-setup.patch';
+
+{ msw     => { unicode => [ 
+  'wxMSW-2.9.2-makefiles.patch',
+  $winsetuppatch, 
+  @common 
+  ],
+               },
+  mac     => { unicode => [ @common ],
+               },
+  unix    => { unicode => [ @common ],
+               },
+  data    => { url  => ( sprintf '%s/%s-%s.%s', $URL, $BASE, $VERSION, $TYPE ),
+               directory => ( sprintf '%s-%s', $BASE, $VERSION ),
+               archive   => ( sprintf '%s-%s.%s', $BASE, $VERSION, $TYPE ),
+               version   => $VERSION,
+               },
+  };

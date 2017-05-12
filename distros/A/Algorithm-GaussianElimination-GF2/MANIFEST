@@ -1,0 +1,9 @@
+Changes
+lib/Algorithm/GaussianElimination/GF2.pm
+Makefile.PL
+MANIFEST
+README
+samples/lights_on.pl
+t/Algorithm-GaussianElimination-GF2.t
+t/pods.t
+META.yml                                 Module meta-data (added by MakeMaker)

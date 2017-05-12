@@ -1,0 +1,55 @@
+{
+   "abstract" : "simple non-blocking client for image hosting ImageShack.us",
+   "author" : [
+      "Dmitry Konstantinov <konstantinov.dmitry@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "keywords" : [
+      "anyevent",
+      "imageshack"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-ImageShack",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::HTTP" : 0,
+            "HTTP::Request::Common" : 0
+         }
+      }
+   },
+   "provides" : {
+      "AnyEvent::ImageShack" : {
+         "file" : "lib/AnyEvent/ImageShack.pm",
+         "version" : "0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/konstantinov/AnyEvent-ImageShack.git"
+      }
+   },
+   "version" : "0.2"
+}

@@ -1,0 +1,40 @@
+TODO:
+    - Support more Meetup options
+
+0.025 Wednesday June 10 17:21:39 PDT 2009:
+    - Use Document::TriPart instead of Document::Stembolt
+
+0.024 Sunday April 26 10:50:19 PDT 2009:
+    - Updated minimum version for Data::Dump and JSON
+    - Fixed test function...
+    - Some config default shenaniganery
+
+0.023 Wednesday April 08 13:44:36 PDT 2009:
+    - Added use.perl support
+    - Image fetching/uploading
+
+0.022 Monday April 06 13:18:09 PDT 2009:
+    - Added 'config edit' command
+    - Clarified some documentation
+
+0.021 Sunday April 05 19:54:40 PDT 2009:
+    - Include Directory::Scratch prerequisite
+
+0.020 Sunday April 05 19:14:06 PDT 2009:
+    - Improved template (with help)
+    - Fixed link formatting for linkedin/greymatter
+    - Make sure to post the right event hour
+    - Add 'help' screen and documentation
+    - Generate better config stub
+    - Config checker
+    - Improve history display 
+    - Implement dry-run
+    - Improve logging
+    - Add reporting
+    - Datetime as "* ago"
+    - Abort unless have meetup_uri
+    - Change greymatter121c => greymatter
+
+0.010_1 2009-04-02:
+    - Initial release
+

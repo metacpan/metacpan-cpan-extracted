@@ -1,0 +1,63 @@
+App-Birthday
+
+Send birthday congratulation mails due to "birthday.json" file and a
+given configuration file for mail system.
+
+Input and configuration files are both in JSON format. To birthday
+person will be sent an e-mail with usual congratulations. To her friends
+will be sent reminder e-mailis, that their friend has today her birthday.
+
+If as only 'friends' "others" in the array inserted, all users minus
+current users (birthday person) will be sent an reminder email.
+
+Maintainer will receive an e-mail reminder, that he sent a
+birthday e-mail.
+
+Maintainer and host transport mail system confoiguration will be set in
+an separate configuration file. Default will be "config.json", if not
+any with option "c" given.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::Birthday
+
+    perldoc birthday
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Birthday
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-Birthday
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-Birthday
+
+    Search CPAN
+        http://search.cpan.org/dist/App-Birthday/
+
+    Repository
+        https://github.com/fouladi/App-Birthday
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Farhad Fouladi
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

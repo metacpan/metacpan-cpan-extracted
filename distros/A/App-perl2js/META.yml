@@ -1,0 +1,169 @@
+---
+abstract: 'A module that transpile Perl code to JavaScript as readable as possible.'
+author:
+  - 'hatz48 <hatz48@hatena.ne.jp>'
+build_requires:
+  Test::Class: '0'
+  Test::Fatal: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-perl2js
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::perl2js:
+    file: lib/App/perl2js.pm
+    version: '0.02'
+  App::perl2js::Context:
+    file: lib/App/perl2js/Context.pm
+  App::perl2js::Converter:
+    file: lib/App/perl2js/Converter.pm
+  App::perl2js::Converter::Node:
+    file: lib/App/perl2js/Converter/Node.pm
+  App::perl2js::Converter::Node::Array:
+    file: lib/App/perl2js/Converter/Node/Array.pm
+  App::perl2js::Converter::Node::ArrayRef:
+    file: lib/App/perl2js/Converter/Node/ArrayRef.pm
+  App::perl2js::Converter::Node::Block:
+    file: lib/App/perl2js/Converter/Node/Block.pm
+  App::perl2js::Converter::Node::BlockStmt:
+    file: lib/App/perl2js/Converter/Node/BlockStmt.pm
+  App::perl2js::Converter::Node::Branch:
+    file: lib/App/perl2js/Converter/Node/Branch.pm
+  App::perl2js::Converter::Node::CodeDereference:
+    file: lib/App/perl2js/Converter/Node/CodeDereference.pm
+  App::perl2js::Converter::Node::ControlStmt:
+    file: lib/App/perl2js/Converter/Node/ControlStmt.pm
+  App::perl2js::Converter::Node::Dereference:
+    file: lib/App/perl2js/Converter/Node/Dereference.pm
+  App::perl2js::Converter::Node::DoStmt:
+    file: lib/App/perl2js/Converter/Node/DoStmt.pm
+  App::perl2js::Converter::Node::ElseStmt:
+    file: lib/App/perl2js/Converter/Node/ElseStmt.pm
+  App::perl2js::Converter::Node::File:
+    file: lib/App/perl2js/Converter/Node/File.pm
+  App::perl2js::Converter::Node::ForStmt:
+    file: lib/App/perl2js/Converter/Node/ForStmt.pm
+  App::perl2js::Converter::Node::ForeachStmt:
+    file: lib/App/perl2js/Converter/Node/ForeachStmt.pm
+  App::perl2js::Converter::Node::Function:
+    file: lib/App/perl2js/Converter/Node/Function.pm
+  App::perl2js::Converter::Node::FunctionCall:
+    file: lib/App/perl2js/Converter/Node/FunctionCall.pm
+  App::perl2js::Converter::Node::Handle:
+    file: lib/App/perl2js/Converter/Node/Handle.pm
+  App::perl2js::Converter::Node::HandleRead:
+    file: lib/App/perl2js/Converter/Node/HandleRead.pm
+  App::perl2js::Converter::Node::Hash:
+    file: lib/App/perl2js/Converter/Node/Hash.pm
+  App::perl2js::Converter::Node::HashRef:
+    file: lib/App/perl2js/Converter/Node/HashRef.pm
+  App::perl2js::Converter::Node::IfStmt:
+    file: lib/App/perl2js/Converter/Node/IfStmt.pm
+  App::perl2js::Converter::Node::Label:
+    file: lib/App/perl2js/Converter/Node/Label.pm
+  App::perl2js::Converter::Node::Leaf:
+    file: lib/App/perl2js/Converter/Node/Leaf.pm
+  App::perl2js::Converter::Node::List:
+    file: lib/App/perl2js/Converter/Node/List.pm
+  App::perl2js::Converter::Node::Module:
+    file: lib/App/perl2js/Converter/Node/Module.pm
+  App::perl2js::Converter::Node::Nop:
+    file: lib/App/perl2js/Converter/Node/Nop.pm
+  App::perl2js::Converter::Node::Package:
+    file: lib/App/perl2js/Converter/Node/Package.pm
+  App::perl2js::Converter::Node::RegPrefix:
+    file: lib/App/perl2js/Converter/Node/RegPrefix.pm
+  App::perl2js::Converter::Node::RegReplace:
+    file: lib/App/perl2js/Converter/Node/RegReplace.pm
+  App::perl2js::Converter::Node::Regexp:
+    file: lib/App/perl2js/Converter/Node/Regexp.pm
+  App::perl2js::Converter::Node::Return:
+    file: lib/App/perl2js/Converter/Node/Return.pm
+  App::perl2js::Converter::Node::SingleTermOperator:
+    file: lib/App/perl2js/Converter/Node/SingleTermOperator.pm
+  App::perl2js::Converter::Node::ThreeTermOperator:
+    file: lib/App/perl2js/Converter/Node/ThreeTermOperator.pm
+  App::perl2js::Converter::Node::WhileStmt:
+    file: lib/App/perl2js/Converter/Node/WhileStmt.pm
+  App::perl2js::Node:
+    file: lib/App/perl2js/Node.pm
+  App::perl2js::Node::ArrayLiteral:
+    file: lib/App/perl2js/Node/ArrayLiteral.pm
+  App::perl2js::Node::Block:
+    file: lib/App/perl2js/Node/Block.pm
+  App::perl2js::Node::BlockStmt:
+    file: lib/App/perl2js/Node/BlockStmt.pm
+  App::perl2js::Node::Branch:
+    file: lib/App/perl2js/Node/Branch.pm
+  App::perl2js::Node::Class:
+    file: lib/App/perl2js/Node/Class.pm
+  App::perl2js::Node::ControlStmt:
+    file: lib/App/perl2js/Node/ControlStmt.pm
+  App::perl2js::Node::DoStmt:
+    file: lib/App/perl2js/Node/DoStmt.pm
+  App::perl2js::Node::ElseStmt:
+    file: lib/App/perl2js/Node/ElseStmt.pm
+  App::perl2js::Node::File:
+    file: lib/App/perl2js/Node/File.pm
+  App::perl2js::Node::ForStmt:
+    file: lib/App/perl2js/Node/ForStmt.pm
+  App::perl2js::Node::ForofStmt:
+    file: lib/App/perl2js/Node/ForofStmt.pm
+  App::perl2js::Node::Function:
+    file: lib/App/perl2js/Node/Function.pm
+  App::perl2js::Node::FunctionCall:
+    file: lib/App/perl2js/Node/FunctionCall.pm
+  App::perl2js::Node::FunctionExpression:
+    file: lib/App/perl2js/Node/FunctionExpression.pm
+  App::perl2js::Node::IfStmt:
+    file: lib/App/perl2js/Node/IfStmt.pm
+  App::perl2js::Node::Import:
+    file: lib/App/perl2js/Node/Import.pm
+  App::perl2js::Node::Leaf:
+    file: lib/App/perl2js/Node/Leaf.pm
+  App::perl2js::Node::List:
+    file: lib/App/perl2js/Node/List.pm
+  App::perl2js::Node::Method:
+    file: lib/App/perl2js/Node/Method.pm
+  App::perl2js::Node::Nop:
+    file: lib/App/perl2js/Node/Nop.pm
+  App::perl2js::Node::ObjectLiteral:
+    file: lib/App/perl2js/Node/ObjectLiteral.pm
+  App::perl2js::Node::PostSingleTermOperator:
+    file: lib/App/perl2js/Node/PostSingleTermOperator.pm
+  App::perl2js::Node::PreSingleTermOperator:
+    file: lib/App/perl2js/Node/PreSingleTermOperator.pm
+  App::perl2js::Node::PropertyAccessor:
+    file: lib/App/perl2js/Node/PropertyAccessor.pm
+  App::perl2js::Node::Return:
+    file: lib/App/perl2js/Node/Return.pm
+  App::perl2js::Node::ThreeTermOperator:
+    file: lib/App/perl2js/Node/ThreeTermOperator.pm
+  App::perl2js::Node::WhileStmt:
+    file: lib/App/perl2js/Node/WhileStmt.pm
+requires:
+  Compiler::Lexer: '0'
+  Compiler::Parser: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/hatz48/perl2js/issues
+  homepage: https://github.com/hatz48/perl2js
+  repository: git://github.com/hatz48/perl2js.git
+version: '0.02'
+x_authority: cpan:HATZ

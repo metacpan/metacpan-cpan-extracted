@@ -1,0 +1,7 @@
+Revision history for Perl extension Apache::Hadoop::Config.
+
+0.01  Thu Aug 13 10:50:49 2015
+    - first release
+    - feature includes recommended memory settings, basic
+      Hadoop configuration parameters and data volume 
+      creation along with tmp and logs.

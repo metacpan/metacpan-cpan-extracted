@@ -1,0 +1,30 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         AnnoCPAN
+version:      0.22
+version_from: lib/AnnoCPAN.pm
+installdirs:  site
+requires:
+    Archive::Tar:                  0
+    Archive::Zip:                  0
+    Carp:                          0
+    Class::DBI:                    0
+    CPAN::DistnameInfo:            0.06
+    DBD::SQLite:                   1.08
+    File::Path:                    0
+    File::stat:                    0
+    IO::String:                    0
+    Lingua::EN::Inflect:           0
+    List::Util:                    0
+    Pod::Parser:                   1.31
+    Pod::Select:                   0
+    String::Similarity:            1
+    Template:                      2
+    Test::More:                    0
+    Test::Pod:                     1.2
+    XML::RSS:                      0
+    XML::SAX:                      0
+    XML::Simple:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,16 @@
+#!/usr/bin/perl -w
+use strict;
+
+package App::Modular::Module::Input;
+
+use App::Modular;
+use base qw(App::Modular::Module);
+
+sub triggerevent {
+   my ($self) = @_;
+
+   $self->modularizer()->module('Events')->trigger('newinput', 
+       "this is a newly-entered line...");
+};
+
+1;

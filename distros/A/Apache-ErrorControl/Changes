@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache::ErrorControl.
+
+0.01  Mon Dec 10 01:43:00 2001
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Apache::ErrorControl
+

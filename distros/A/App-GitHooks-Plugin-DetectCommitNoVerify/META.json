@@ -1,0 +1,60 @@
+{
+   "abstract" : "Find out when someone uses --no-verify and append the pre-commit checks to the commit message.",
+   "author" : [
+      "Guillaume Aubert <aubertg@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-GitHooks-Plugin-DetectCommitNoVerify",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Git::Repository" : "0",
+            "Test::Exception" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0.94",
+            "Test::Requires::Git" : "1.005"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::GitHooks" : "0",
+            "Capture::Tiny" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "App::GitHooks::Plugin::DetectCommitNoVerify" : {
+         "file" : "lib/App/GitHooks/Plugin/DetectCommitNoVerify.pm",
+         "version" : "v1.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/guillaumeaubert/App-GitHooks-Plugin-DetectCommitNoVerify/issues"
+      },
+      "homepage" : "https://metacpan.org/release/App-GitHooks-Plugin-DetectCommitNoVerify",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/guillaumeaubert/App-GitHooks-Plugin-DetectCommitNoVerify"
+      }
+   },
+   "version" : "v1.0.3"
+}

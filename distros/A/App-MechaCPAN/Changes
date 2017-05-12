@@ -1,0 +1,55 @@
+Revision history for App-MechaCPAN
+
+0.19  2017-04-27 23:39:40 EDT
+  - Delete PERL_USE_UNSAFE_INC before running other module's tests (GH#5)
+  - Increase the default timeout to 60s
+  - Add a --devel flag so you can install unstable versions of perl
+  - Fix a bug that would try to install a module after it was determined that
+    it didn't need to be installed again
+
+0.18  2017-04-10 16:20:23 EDT
+  - Goofed up and did 'keys $req', which is not really okay
+
+0.17  2017-04-10 01:18:00 EDT
+  - Make --verbose and --quiet work
+  - Fix it so module load order doesn't prevent arguments
+  - Make sure module versions are revisited after seeing them
+  - Calculate the module name since it's not easily gotten
+  - Manually add . to the require path for perl 5.26 (GH#4)
+
+0.16  2017-03-09 23:48:57 EST
+  - Add --directory
+  - Add --update to Install and Deploy
+  - Start using CoreList when checking for library versions
+
+0.15  2017-02-10 00:07:28 EST
+  - Include PERL_USE_UNSAFE_INC environment variable to handle the upcoming
+    perl v5.26 change that will remove . from the default @INC. Fixes GitHub #3
+  - Disable certificate checking in git while testing. It is less than ideal,
+    but certificate faulures are not a good reason to fail the tests.
+
+0.14  2017-01-26 23:27:35 EST
+  - Make the command idle timeout an env variable
+  - Remove -j from make since not all makes accept it
+  - Update documentation
+
+0.13  2017-01-25 23:54:21 EST
+  - Deal with how to deal with Win32
+  - Prevent the building of perl on Win32
+  - Fix cases where test's cwd ne $dir, but were actually equal
+  - Add a 30 second idle timeout to &run
+
+0.12  2017-01-22 22:42:03 EST
+  - Remove fake documentation showing up on CPAN
+  - Stop using the local directory for tests
+  - Stop running git tests if git isn't available
+  - Fix run() so STDOUT and STDERR are actually shown on error
+  - Change the prereq logic to use Module::CoreList
+  - Spelling fixes via Greg Arnold/DrunkPyromaniac
+
+0.11  2017-01-18 01:18:44 EST
+  - Hide testing modules from the CPAN indexer
+
+0.10  2017-01-18 01:02:36 EST
+  - Initial release that includes installing perl and modules as well as
+    deploying with a cpanfile/cpanfile.snapshot. Includes pretty-like colors.

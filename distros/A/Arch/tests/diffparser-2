@@ -1,0 +1,35 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::DiffParser methods.
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+my $diff_content = <<ENDTEXT;
+--- file one	1975-03-09 22:00:19 -0800
++++ file two	2005-03-09 22:00:27 -0800
+@@ -1 +1,2 @@
+-old line
+\\ No newline at end of file
++new line
++new line
+\\ No newline at end of file
+ENDTEXT
+
+use Test::More tests => 12;
+use_ok("Arch::DiffParser");
+
+my $parser = Arch::DiffParser->new;
+isa_ok($parser, Arch::DiffParser, "create object");
+
+is($parser->parse($diff_content), $parser, "parse diff");
+is(${$parser->diff_data}{filename1}, $parser->filename1, "diff_data");
+
+is(scalar @{$parser->lines}, 8, "lines");
+is($parser->filename1, "file one", "filename1");
+is($parser->filename2, "file two", "filename2");
+is($parser->mtime1, "1975-03-09 22:00:19 -0800", "mtime1");
+is($parser->mtime2, "2005-03-09 22:00:27 -0800", "mtime2");
+is($parser->content, $diff_content, "content");
+is_deeply($parser->hunks, [ [ 1, 1, 1, 2, 2 ] ], "hunks");
+is_deeply($parser->changes, [ [ 1, 1, 1, 2, 3 ] ], "changes");

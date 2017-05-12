@@ -1,0 +1,82 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: serve a directory's contents via http
+# PODNAME: serve_dir
+
+use strict;
+use warnings;
+
+use Getopt::Long qw/ :config pass_through /;
+
+GetOptions(
+    'h|help|?'    => \my $help,
+    'v|version' => \my $version,
+);
+
+my @args = @ARGV;
+require App::SimpleHTTPServer;
+
+my $version_string = "$0 - version " .
+   ( $App::SimpleHTTPServer::VERSION // 'DEV' );
+
+if ($help) {
+    print <<"HELP";
+$version_string
+
+$0 [options] [port] [directory]
+
+Options:
+  -h/--help/-?   Show usage
+  -v/--version   Show version information
+
+Port:
+  Optionally specify a port to open the server on (default: 8000).
+
+Directory:
+  Optionally specify a directory to serve (default: .).
+
+  If the directory you specify is just a number, you must also specify a port,
+  otherwise it will be interpreted as a port number. You can also specify such
+  a directory with an absolute path, or include the current directory when
+  specifying it as a relative path: ./[directory] instead of just [directory].
+
+HELP
+    exit 0;
+}
+
+if ($version) {
+    print $version_string, "\n";
+    exit 0;
+}
+
+App::SimpleHTTPServer->import(@args);
+
+# Really, there's not much more to this...
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+serve_dir - serve a directory's contents via http
+
+=head1 VERSION
+
+version 0.002
+
+=head1 AUTHOR
+
+Andreas Guldstrand <andreas.guldstrand@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by Andreas Guldstrand.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

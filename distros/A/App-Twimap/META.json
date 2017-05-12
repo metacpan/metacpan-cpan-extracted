@@ -1,0 +1,63 @@
+{
+   "abstract" : "Push your Twitter home timeline to an IMAP server",
+   "author" : [
+      "Leon Brocard <acme@astray.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Twimap",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::TokenBucket" : "0",
+            "Config::Tiny" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Email::Date::Format" : "0",
+            "Email::MIME" : "0",
+            "Email::MIME::Creator" : "0",
+            "Encode" : "0",
+            "HTML::Entities" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "Mail::IMAPClient" : "0",
+            "Moose" : "0",
+            "Net::Twitter" : "4.00006",
+            "Test::Differences::Color" : "0",
+            "Text::Wrap" : "0",
+            "TryCatch" : "0",
+            "URI::WithBase" : "0",
+            "Web::oEmbed::Common" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Twimap" : {
+         "file" : "lib/App/Twimap.pm",
+         "version" : "0.03"
+      },
+      "App::Twimap::Tweet" : {
+         "file" : "lib/App/Twimap/Tweet.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/App-Twimap/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03"
+}

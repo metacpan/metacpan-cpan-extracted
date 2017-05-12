@@ -1,0 +1,18 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::ACL;
+
+die "Usage: $0 dir \n" if $#ARGV != 0;
+my $dir = shift;
+
+my $acl = AFS::ACL->new({ 'guest', AFS::ACL->crights('read')});
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+my $ok = $acl->apply($dir);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "ok = $ok\n"; }
+

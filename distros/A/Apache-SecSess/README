@@ -1,0 +1,261 @@
+
+        Apache::SecSess - README
+        ========================
+
+
+0.  Installation and other Documentation
+----------------------------------------
+
+In addition to this README file, which hopefully serves as a WHYTO, other 
+instructions and information can be found:
+
+./INSTALL                       Installation instructions.
+perldoc ./SecSess.pm            man page before installation.
+man Apache::SecSess             man page after installation.
+./rfc/*.txt                     Related IETF RFC's describing cookies.
+./COPYING,./LICENSE             Copyright and license info.
+
+
+1.  What Problems are We Trying to Solve?
+-----------------------------------------
+
+Problem 1: No Secure Single Sign-On.
+
+There is not as far as we know, an Apache module which will securely transfer 
+credentials from a login on one trusted host to multiple cooperating hosts, 
+across multiple DNS domains and across a range of SSL capabilities.
+
+Problem 2: HTTP Cookie Weaknesses.
+
+Not implicit from problem (1), is the subtle fact that considerable
+care must be taken to securely share credentials within a single DNS
+domain using HTTP state management (aka Netscape Cookies) as described
+in [RFC2109] and [RFC2965].  In fact, the traps and pitfalls are so numerous 
+that [RFC2964] generally forbids the use of cookies for any kind of security 
+authentication.
+  One way to look at this package is as a very simple cryptographic 
+protocol designed to defend against attacks which exploit known cookie 
+vulnerabilities.
+
+
+2.  Summary of Features
+-----------------------
+
+   * Secure sharing of multi-level credentials within and across DNS domains.
+   * Support for different representations of credentials with the ability to 
+     chain and interoperate between them.
+   * Built-in defense against on-line guessing attacks.
+   * Built-in session timeout, both idle and hard-limit.
+   * Built-in SU-type function for admins to switch user ID's.
+   * Encapsulated database interface.
+
+
+3.  Known Security Issues with HTTP Cookies
+-------------------------------------------
+
+Issue 1: The Caching Problem
+
+Even if no passive or active adversary is sitting between the client
+and server, an unauthorized user might still see the wrong data because
+any web-caching device along the way might cough up a request such
+as http://www.acme.com/creditcards.txt without ever referring it to
+the server, if a previous authorized user made the same request.  This
+is a no-no for the web-cache to do, but it happens anyway.
+
+Solution: There is no real solution, and RFC2964 is correct to discourage
+plaintext cookie-based authentication even over secure networks (like on an 
+intranet).  On the other hand, this really is a bug (what if web-caches 
+ignored POST arguments).
+
+
+Issue 2:  Wildcard Cookies Don't Always Go Where Intended
+
+Suppose in a heterogeneous environment with many .acme.com hosts, an
+authentication system is setup to share cookies between bruce.acme.com
+and wendel.acme.com.  Upon successful login, bruce issues an .acme.com
+cookie to a user who can then request resources from wendel.  Even
+if you don't admit either passive or active adversaries on the network, the 
+user's identity might still be compromised.  If hopkins.acme.com is
+compromised and the user visits *any* other compromised site, say
+www.fantasyland.org, a trojan .html document with a malicious image
+tag <img src="http://hopkins.acme.com">, will send the identity cookies 
+directly to hopkins who is waiting for them.  (This is the old 3rd-party
+cookie bugaboo exploited by *click.com.)
+
+Solution: Regardless of the mechanism used for representing user 
+credentials (cookies, URL's, etc), there will be some set of hosts
+included in the system (whether spanned by wildcard matches or server
+side redirects).  No untrusted host should be in that set.  This is 
+just classic host security.
+
+
+Issue 3:  Secure Wildcard Cookies Don't Always Have Intended Protection
+
+The underlying weakness in issue (2) is perhaps more relevant for so-called 
+secure cookies (with secure flag is set).  Even where host security can be 
+assumed across a large heterogeneous environment, there might be one
+host which only supports 40-bit SSL, say hopkins.acme.org again.  Supposed 
+bruce and wendel were properly configured for only 128-bit cipher suites 
+and issued only secure cookies for the .acme.com domain.  Then a malicious 
+image tag <img src="https://hopkins.acme.com"> will force a connection
+to hopkins.  If 40-bit encryption is negotiated (see next issue), the user's
+credentials are reduced from 128-bits to 40-bits.
+   Unlike issue (2), we cannot pass this off as a matter of host security, 
+because hopkins is not compromised.  A passive adversary who obtains
+a 40-bit encrypted copy of the credentials.  He can then do an offline crack 
+in order to assume the users identity.  Naively, bruce and wendel might
+think an implausible work factor of 2^128 would be necessary.
+
+Solution: A cookie-based authentication module must be configurable
+to treat a wildcard .acme.com domain as essentially weak.  Cookies
+used for strong authentication must be either confined to a single
+host, or to a more restrictive wildcard like '.secure.acme.com'.  The 
+demo software shows examples of both.
+
+
+Issue 4: SSLv2 Rollback Vulnerability
+
+An active adversary can force an SSL client and server to negotiate the
+*weakest* cipher suite which they share in common [SSL].  Recall that the 
+SSL cipher negotiation was intended to negotiate the *strongest* cipher 
+suite.  Thus under the stronger threat model of an active adversary, we are 
+far more likely to find a target such as hopkins to exploit in issue (3).  
+For a variety of reasons (sometimes legal and political), the larger the 
+DNS domain (in number or geography) the greater the likelihood of there 
+being one host which supports SSLv2 and 40-bits, or a newer SSL/TLS but 
+only 40-bits.
+
+Solution: Same as issue (3).
+
+
+Issue 5:  Persistent Cookies are Often Stored in Filesystem
+
+If a cookie is ever set with a future expiration date, browsers will copy 
+it, in the clear, to the filesystem for use upon next invocation of the 
+browser.  Such filesystems often shared across networks and so are
+available to a wide variety of users.
+
+Solution:  The fundamental session cookies in secure system should be
+ephemeral.  This does not preclude the use of persistent cookies as an
+initial user identity token if the threat model is appropriate (perhaps
+on a single-user laptop).
+
+
+5.  Security Architecture
+-------------------------
+
+5.1  The Authentication Processes
+---------------------------------
+
+There are three notions of 'authentication' in Apache::SecSess.
+
+    User Authentication: This serves to identify the user and to provide
+        a suitable proof of that identity.  This is typically a login form,
+        which interrupts the user, but it might transparently use other 
+        credentials which are already available electronically like an X.509
+        client certificate or a persistent cookie.
+
+    Session Authentication: This is Apache's notion of authentication as
+        carried out by PerlAuthenHandler.  Here, an actual resource, like an 
+        HTML doc, will be delivered if all is successful.
+
+    Chaining Authentication:  In this type of authentication, credentials
+        suitable for session authentication are interpreted instead as user
+        authentication in order to issue another type of credential.  In the 
+        demo for example, single sign-on across DNS domains is accomplished 
+        by double chaining.  Local cookies are used to the identify user and 
+        issue URL credentials during a redirect across the domain, where
+        the URL credentials are used to identify/authenticate the user again
+        in order to issue cookies within the *new* domain.
+
+
+5.2  The Security Mechanism
+---------------------------
+
+The fundamental security mechanism of Apache::SecSess is the issuance
+of simple cryptographic proofs of identity explicitly constructed to
+return to the system's various servers via HTTP(S) sessions which are 
+protected with sufficient strength, despite the malicious behavior by an 
+adversary.  This is achieved in a rather mundane way, namely by avoiding
+all the pitfalls of the enumerated issues in Sect. 3.  
+
+In the case of URL credentials, the current implementation requires all
+URL's to be explicitly configured.  All redirects are automatic, occurring
+under SSL of a specified strength.  There should be no surprises here; if
+URL credentials were stolen, the adversary would have had to crack one of
+a small number of SSL connections under the complete control of the security 
+administrator.
+
+In the case of Cookie credentials, *multiple* cookies are issued, one for 
+each anticipated security level.  For example, a user who logs in with an 
+X.509 client certificate might be issued 3 cookies: one cleartext cookie 
+intended for non-sensitive data, one SSL (secure flag) cookie broadly 
+distributed to .acme.com with 40-bit crypto possible, and finally one SSL 
+cookie intended only for the 128-bit originating host.  An adversary who 
+manages to steal either the cleartext or the 40-bit cookie cannot use it to 
+acquire 128-bit level resources, because the cookies themselves have 
+unforgeable assertions of security level which are checked during session 
+authentication as described in the next section.
+
+
+5.3  Credential Format
+----------------------
+
+Credentials in Apache::SecSess have a similar format:
+
+    URL Credentials:
+        realm=E_k(md5(hash),hash)
+
+    Cookie Credentials: 
+        realm:qop,authqop=E_k(md5(hash),hash)
+
+(The only difference is that the quality of protection parameters 
+discussed below, qop and authqop, are repeated in the clear for cookie
+credentials in order to ease processing.)
+
+The string 'realm' is any symbol (without obvious special characters 
+':', '=', etc) which is used to identify cooperating security services,
+thus providing a way to put credentials into their own namespace.
+
+The 'hash' is a string representation of a Perl hash of the form:
+
+    hash = {
+        uid => string: user ID
+        timestamp => integer: time stamp from time(),
+        qop => integer: session quality of protection,
+        authqop => integer: user authentication quality of protection
+    }
+
+See the source code of Wrapper.pm for details of how the hash is converted 
+into a string.
+
+The encryption function E_k is currently not very configurable.  It is 
+Rijndael (AES) in CBC mode with IV=0.  It is well known that CBC mode is 
+vulnerable to forgeries, so a cryptographic checksum is prepended to the 
+plaintext, as indicated.  
+
+The secret key k must be shared by all host or web servers which use the same
+realm.  Without the secret key, it should be cryptographically infeasible to 
+produce credentials in which the hash and checksum match.  It should 
+therefore be cryptographically infeasible for anyone to forge credentials or 
+alter them in any way.
+
+
+References
+----------
+
+[RFC2109] D. Kristol, L. Montulli, HTTP State Management Mechanism, 
+    RFC 2109, 1997.
+
+[RFC2964] K. Moore and N. Freed, Use of HTTP State Management
+    RFC 2964, BCP 44, October 2000.
+
+[RFC2965] D. Kristol, L. Montulli, HTTP State Management Mechanism, 
+    RFC 2965 (Obsoletes 2109), October 2000.
+
+[W3C] World Wide Web Consortium Security FAQ,
+    URL: http://www.w3.org/Security/Faq/.
+
+[SSL] D. Wagner, B. Schneier, "Analysis of the SSL 3.0 Protocol", 
+    1996, URL: http://www.counterpane.com/ssl.html.
+

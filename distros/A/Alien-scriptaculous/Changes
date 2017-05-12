@@ -1,0 +1,43 @@
+Revision history for Perl extension Alien::scriptaculous.
+
+1.8.0.2     Fri Apr 23 22:24 PDT 2010
+    - Switch to Git
+
+1.8.0.1     Fri Dec  7 21:46 PST 2007
+    - update to script.aculo.us 1.8.0 final
+
+1.7.1.2_3   Tue Oct  2 11:46 PDT 2007
+    - added POD coverage tests
+    - now depends on Alien::Prototype, instead of using the version that came
+      bundled with script.aculo.us.
+    - fix dependency on Archive::Tar; its a -build- dependency, not a
+      -configuration- dependency
+    - added "passthrough" Makefile.PL; we -NEED- to have Module::Build
+      installed, auto-generated compatibility Makefile.PLs are insufficient
+
+1.7.1.1_3   Sun Sep 30 13:30 PDT 2007
+    - added POD docs to Alien::scriptaculous
+    - added "--quiet" command line argument to "scriptaculous-install"
+    - Updated to script.aculo.us 1.7.1_beta3
+    - removed un-necessary "use" statements and imports from MY::Build
+    - changed versioning to "${scriptaculous_version}.${alien_release}" so that
+      releases could be issued out of sync with upstream script.aculo.us.
+
+1.7.0   Fri Jun 29 11:24 PDT 2007
+    - Updated to script.aculo.us 1.7.0
+
+1.6.5   Fri Jun 29 10:58 PDT 2007
+    - Switched versioning scheme to match that of script.aculo.us
+
+1.002   Thu Dec 28 14:21 PST 2006
+    - Patched the version of prototype that is bundled with script.actulo.us
+      1.6.5, fixing a problem with "evalResponse()" being called after
+      "onComplete".  This was noted as Bug #6727 back on Nov 29th, but hasn't
+      been fixed yet; (http://dev.rubyonrails.org/ticket/6727).
+
+1.001   Wed Nov  8 11:44 PST 2006
+    - updated dependencies in Build.PL
+    - updated to script.aculo.us 1.6.5
+
+1.000   Mon Oct  2 13:31 PDT 2006
+    - First public version.  Installs script.aculo.us 1.6.4

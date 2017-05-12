@@ -1,0 +1,188 @@
+NAME
+    API::Instagram - Object Oriented Interface for the Instagram REST and
+    Search APIs
+
+VERSION
+    version 0.013
+
+SYNOPSIS
+            use API::Instagram;
+
+            my $instagram = API::Instagram->new({
+                            client_id     => $client_id,
+                            client_secret => $client_secret,
+                            redirect_uri  => 'http://localhost',
+            });
+
+            # Authenticated user feed
+            my $my_user = $instagram->user;
+            my $feed    = $my_user->feed( count => 5 );
+
+            for my $media ( @$feed ) {
+
+                    printf "Caption: %s\n", $media->caption;
+                    printf "Posted by %s at %s (%d likes)\n\n", $media->user->username, $media->created_time, $media->likes;
+
+            }
+
+DESCRIPTION
+    This module implements an OO interface to Instagram REST API.
+
+  Authentication
+    Instagram API uses the OAuth2 for authentication, requering a
+    "client_id" and "client_secret". See
+    <http://instagr.am/developer/register/> for details.
+
+   Authorize
+    Get the AUTH URL to authenticate.
+
+            use API::Instagram;
+
+            my $instagram = API::Instagram->new({
+                            client_id     => 'xxxxxxxxxx',
+                            client_secret => 'xxxxxxxxxx',
+                            redirect_uri  => 'http://localhost',
+                            scope         => 'basic',
+                            response_type => 'code',
+                            granty_type   => 'authorization_code',
+            });
+
+            print $instagram->get_auth_url;
+
+   Authenticate
+    After authorization, Instagram will redirected the user to the URL in
+    "redirect_uri" with a code as an URL query parameter. This code is
+    needed to obtain an acess token.
+
+            $instagram->code( $code );
+            my $access_token = $instagram->get_access_token;
+
+   Request
+    With the access token its possible to do Instagram API requests using
+    the authenticated user credentials.
+
+            $instagram->access_token( $access_token );
+            my $me = $instagram->user;
+            print $me->full_name;
+
+METHODS
+  new
+            my $instagram = API::Instagram->new({
+                            client_id     => $client_id,
+                            client_secret => $client_secret,
+                            redirect_uri  => 'http://localhost',
+                            scope         => 'basic',
+                            response_type => 'code',
+                            granty_type   => 'authorization_code',
+                            no_cache      => 1,
+            });
+
+    Returns an API::Instagram object.
+
+    Set "client_id", "client_secret" and "redirect_uri" with the ones
+    registered to your application. See
+    <http://instagram.com/developer/clients/manage/>.
+
+    "scope" is the scope of access. See
+    <http://instagram.com/developer/authentication/#scope>.
+
+    "response_type" and "granty_type" do no vary. See
+    <http://instagram.com/developer/authentication/>.
+
+    By default, API::Instagram caches created objects to avoid duplications.
+    You can disable this feature setting a true value to "no_chace"
+    parameter.
+
+  instance
+            my $instagram = API::Instagram->instance;
+            print $instagram->user->full_name;
+
+            or
+
+            my $instagram = API::Instagram->instance({
+                            client_id     => $client_id,
+                            client_secret => $client_secret,
+                            redirect_uri  => 'http://localhost',
+            });
+
+    Returns the singleton instance of API::Instagram.
+
+    Note: if no instance was created before, creates a new API::Instagram
+    object initialized with arguments provided and then returns it.
+
+  get_auth_url
+            my $auth_url = $instagram->get_auth_url;
+            print $auth_url;
+
+    Returns an Instagram authorization URL.
+
+  get_access_token
+            my $access_token = $instagram->get_access_token;
+
+            or
+
+            my ( $access_token, $auth_user ) = $instagram->get_access_token;
+
+    Returns the access token string if the context is looking for a scalar,
+    or an array containing the access token string and the authenticated
+    user API::Instagram::User object if looking for a list value.
+
+  media
+            my $media = $instagram->media( $media_id );
+            say $media->type;
+
+    Get information about a media object. Returns an API::Instagram::Media
+    object.
+
+  user
+            my $me = $instagram->user; # Authenticated user
+            say $me->username;
+
+            my $user = $instagram->user( $user_id );
+            say $user->full_name;
+
+    Get information about an user. Returns an API::Instagram::User object.
+
+  location
+            my $location = $instagram->location( $location_id );
+            say $location->name;
+
+    Get information about a location. Returns an API::Instagram::Location
+    object.
+
+  tag
+            my $tag = $instagram->tag('perl');
+            say $tag->media_count;
+
+    Get information about a tag. Returns an API::Instagram::Tag object.
+
+  search
+            my $search = $instagram->search('user');
+            my $users = $search->find( q => 'larry' );
+            for my $user ( @$users ) {
+                    say $user->username;
+            }
+
+    Returns an API::Instagram::Search object, capable to search for the
+    given type.
+
+    Where type can be: "user", "media", "tag" or "location".
+
+    See API::Instagram::Search for more details and examples.
+
+  popular_medias
+            my $medias = $user->popular_medias( count => 3 );
+            print $_->caption . $/ for @$medias;
+
+    Returns a list of API::Instagram::Media objects of Instagram most
+    popular media at the moment.
+
+AUTHOR
+    Gabriel Vieira <gabriel.vieira@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Gabriel Vieira.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

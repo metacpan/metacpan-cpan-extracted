@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    :tabSize=2:indentSize=2:wrap=hard:
+    $Id: ChangeLog.xml 20 2009-08-10 17:04:56Z rjray $
+-->
+<changelog xmlns="http://www.blackperl.com/2009/01/ChangeLogML"
+    xmlns:sc="http://www.blackperl.com/2009/01/ChangeLogML/source-control"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xsi:schemaLocation="http://www.blackperl.com/XML/ChangeLog ../schemas/ChangeLogML.xsd">
+  <project>App::Changelog2x</project>
+  <title>Perl Module App::Changelog2x Change History</title>
+  <description>
+    This is sample Perl application that uses XML::LibXML and XML::LibXSLT to
+    process files from ChangeLogML to a variety of text-based and XHTML-based
+    layouts.
+  </description>
+  <release version="0.11" date="2009-08-10T10:10:00-07:00">
+    <change date="2009-02-07T11:56:50.745015Z" author="rjray">
+      <fileset revision="18">
+        <file path="bin/changelog2x"/>
+        <file path="lib/App/Changelog2x.pm"/>
+      </fileset>
+      <description>
+        Added warnings pragma.                                                
+      </description>
+    </change>
+    <change date="2009-08-10T10:00:26-07:00" author="rjray">
+      <fileset revision="19">
+        <file path="bin/changelog2x"/>
+        <file path="lib/App/Changelog2x.pm"/>
+      </fileset>
+      <description>
+        Documentation clean-up and better specification of the required Perl
+        version.
+      </description>
+    </change>
+  </release>
+  <release version="0.10" sc:tag="perl-v0_10" date="2009-01-22T01:16:00-08:00">
+    <change>
+      <fileset revision="10">
+        <file action="ADD" path="Build.PL" />
+        <file action="ADD" path="MANIFEST.SKIP" />
+        <file action="ADD" path="bin/changelog2x" />
+        <file action="ADD" path="ex/README" />
+        <file action="ADD" path="lib/App/Changelog2x.pm" />
+        <file action="ADD" path="t/00_load.t" />
+        <file action="ADD" path="t/01_pod.t" />
+        <file action="ADD" path="t/02_pod_coverage.t" />
+      </fileset>
+      <description>
+        Initial release. All basic functionality for the changelog2x script
+        and the App::Changelog2x module done.
+      </description>
+    </change>
+  </release>
+</changelog>

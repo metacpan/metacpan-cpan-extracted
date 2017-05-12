@@ -1,0 +1,40 @@
+--- #YAML:1.0
+name:               App-Foca
+version:            0.05
+abstract:           Foca application - server and client
+author:
+    - Pablo Fischer <pablo@yahoo-inc.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Cache::FastMmap:      0
+    Data::Dumper:         0
+    Exporter:             0
+    File::Basename:       0
+    FindBin:              0
+    HTTP::Daemon:         0
+    HTTP::Response:       0
+    HTTP::Status:         0
+    IPC::Cmd:             0
+    Linux::Proc::Net::TCP:  0
+    Log::Log4perl:        0
+    Moose:                0
+    Parallel::ForkManager:  0
+    Test::More:           0
+    Time::HiRes:          0
+    WWW::Curl::Easy:      0
+    YAML::Syck:           0
+resources:
+    repository:  https://github.com/pfischermx/foca-perl
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

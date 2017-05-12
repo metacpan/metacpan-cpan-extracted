@@ -1,0 +1,238 @@
+[% PROCESS header.html title="FAQ" %]
+[% PROCESS login_form.html %]
+[% PROCESS form.html %]
+
+<h2>Frequently Asked Questions</h2>
+
+<ol>
+    <li><a href="#what">What is AnnoCPAN?</a></li>
+    <li><a href="#who">Who's behind it?</a></li>
+    <li><a href="#how">How does it work?</a></li>
+    <li><a href="#others">How does this site relate with CPAN::Forum, CPANRatings, search.cpan.org, PerlMonks...?</a></li>
+    <li><a href="#create">How do I add a note?</a></li>
+    <li><a href="#pod">How can I format my notes?</a></li>
+    <li><a href="#edit">Can I edit my notes?</a></li>
+    <li><a href="#editall">Can I edit other people's notes?</a></li>
+    <li><a href="#delete">What's the difference between "hiding" and "deleting" a note?</a></li>
+    <li><a href="#unhide">How do I unhide a note?</a></li>
+    <li><a href="#author_rss">How can I know when someone posts a note to one of my modules?</a></li>
+    <li><a href="#author_update">What happens if I upgrade my documentation, making a note obsolete?</a></li>
+    <li><a href="#conf">What's the %confidence?</a></li>
+    <li><a href="#absurd">A note is in an absurd place! Why's that?</a></li>
+    <li><a href="#browser">What are the browser requirements?</a></li>
+    <li><a href="#uses">What does AnnoCPAN run on?</a></li>
+    <li><a href="#contact">Who can I contact?</a></li>
+    <li><a href="#missing">Why is <i>X</i> distribution missing, or module <i>Y</i> in the wrong place?</a></li>
+    <li><a href="#code">Can I get the code?</a></li>
+    <li><a href="#server">What are the technical requirements for installation?</a></li>
+    <li><a href="#license">What's the license for the notes?</a></li>
+    <li><a href="#rss">Can I get RSS feeds?</a></li>
+</ol>
+
+<h2>General Questions</h2>
+
+<a name="what"></a><h3>What is AnnoCPAN?</h3>
+
+<p>An "Annotated CPAN". This is a site where you can browse all the Perl
+documentation available on CPAN (including both the core perl distribution and
+the non-core modules), add your own annotations, and read the annotations left
+by other users.</p>
+
+<a name="who"></a><h3>Who's behind it?</h3>
+
+<p>The site was conceived, designed and implemented by <a
+href="http://ivan.tubert.org/">Ivan Tubert-Brohman</a> (known as <a
+href="/~itub">ITUB</a> on CPAN).  The Perl Foundation provided a grant to
+encourage him to finish and help pay for some of the expenses.
+</p>
+
+<a name="how"></a><h3>How does it work?</h3>
+
+<p>The AnnoCPAN site has the documentation for all the CPAN modules, and a 
+database of "notes" that can be added through the web interface. When
+a user views a module's documentation, the POD is shown as HTML together 
+with the notes. This allows users to write very short notes that fill gaps
+in the documentation; for example, it might be sufficient to say "warning:
+this method returns different things in scalar and in list context and the POD
+doesn't mention it!".</p>
+
+<a name="others"></a><h3>How does this site relate with CPAN::Forum, CPANRatings, search.cpan.org,
+PerlMonks...?</h3>
+
+<p>The goals of AnnoCPAN and all these sites overlap to varying degrees, but 
+each one fills a different niche:</p>
+
+<ul>
+
+<li><a href="http://search.cpan.org">search.cpan.org</a> has a better search
+engine, useful tools such as diff and grep, download links, and browsing.</li>
+
+<li><a
+href="http://cpan.uwinnipeg.ca/htdocs/faqs/cpan-search.html">cpan.uwinnipeg.ca</a>
+(also known as Kobes's search) provides an alternative search engine, and other
+features such as automatic module classification.</li>
+
+<li><a href="http://www.cpanforum.com">CPAN::Forum</a> has discussion forums
+categorized by module. This can be a good place for general discussions about
+specific modules whenever a module doesn't have designated discussion places
+such as mailing lists already.</li>
+
+<li><a href="http://cpanratings.perl.org">CPANRatings</a> is a good place to
+post short reviews and rate modules.</li>
+
+<li><a href="http://www.perlmonks.org">PerlMonks</a> is a community for
+learning and discussing all kinds of issues related to Perl.</li>
+
+<li>AnnoCPAN has the goal of letting the post short comments, corrections, or
+suggestions about very specific parts of the documentation.</li>
+
+</ul>
+
+<p>Since these websites complement each other, they are frequently linked to
+from AnnoCPAN.</p>
+
+<h2>Creating and modifying notes</h2>
+
+<a name="create"></a><h3>How do I add a note?</h3>
+
+<p>After you log in, click on the note icon next to the paragraph where you
+want to add the note</p>
+
+<a name="pod"></a><h3>How can I format my notes?</h3>
+
+<p>Currently a subset of POD is allowed.  You can use formatting sequences such
+as L&lt;&gt; (link), B&lt;&gt; (bold), I&lt;&gt; (italic), C&lt;&gt; (code),
+etc, and verbatim paragraphs (lines that start with a space).  What you can't
+use are the pod commands, such as =item, =head1, etc. For more information
+about the POD format, see [% link_perldoc_name('perlpod') %].  </p>
+
+<a name="edit"></a><h3>Can I edit my notes?</h3>
+
+<p>Yes, just click on the edit button. Make sure you are logged in first!</p>
+
+<a name="editall"></a><h3>Can I edit other people's notes?</h3>
+
+<p>No, unless you somehow get moderator privileges.</p>
+
+<a name="delete"></a><h3>What's the difference between "hiding" and "deleting" a note?</h3>
+
+<p>Deletion is irreversible and global, meaning that the note will disappear 
+from all versions of the POD; hiding is reversible and local, meaning that
+the note is hidden only for a specific version of the POD.</p>
+
+<a name="unhide"></a><h3>How do I unhide a note?</h3>
+
+<p>If you go to <code>[% root_uri_abs %]/note/<em>note_id</em></code>, you will
+see a list of where the note is listed for each version of a POD, along with
+checkboxes for hiding and unhiding notes.</p>
+
+<h2>For Module Authors</h2>
+
+<a name="author_rss"></a><h3>How can I know when someone posts a note to one of my modules?</h3>
+
+<p>You can subscribe to an RSS feed at <code>[% root_uri_abs
+%]/~<i>pauseid</i>/recent.rss</code> or view the notes directly at <code>[%
+root_uri_abs %]/~<i>pauseid</i>/recent.html</code>. There are plans for setting
+up an email notification system as well.</p>
+
+<a name="author_update"></a><h3>What happens if I upgrade my documentation, making a note obsolete?</h3>
+
+<p>The notes can be hidden from the new versions, while keeping them for the
+old versions of the documentation (if it's still on CPAN). If the change to the
+document was big enough, this might happen automatically; if note, either the
+note author or a moderator can do it manually.</p>
+
+<h2>Technical</h2>
+
+<a name="conf"></a><h3>What's the %confidence?</h3>
+
+<p>When a note is added to a document, the software tries to guess where
+would the same note go in other versions of the same document. This is based
+on a text similarity analysis which provides a quantitative estimate
+expressed as a percentage.</p>
+
+<p>For example, let's say that you add a note to My::Module in My-Dist-0.10,
+next to a paragraph that says "this is a paragraph". When version 0.20 comes
+out, let's say that the paragraph moved and was modified to say "this is
+one paragraph". The similarity search decides that this is still the same
+paragraph with a confidence of 95% and assigns the note accordingly.</p>
+
+<a name="absurd"></a><h3>A note is in an absurd place! Why's that?</h3>
+
+<p>The notes are assigned to other versions of the document by using the method
+discussed above. As with all heuristics, there will be mistakes, especially
+when a paragraph is completely deleted or modified very heavily. In these cases
+it is necessary to move the note manually or hide it if it no longer
+applies.</p>
+
+<a name="browser"></a><h3>What are the browser requirements?</h3>
+
+<p>IE 6, Mozilla/Firefox, Netscape 7, Opera 7, etc., although it should degrade
+gracefully in text browsers such as Lynx. It will likely not look reasonable
+in browsers with severely broken CSS implementations. JavaScript is recommended
+but not strictly required. Cookies are required for authentication. A monitor
+resolution of 1024x768 or greater is recommended, especially if you want the
+notes to show on the margin.</p>
+
+<a name="uses"></a><h3>What does AnnoCPAN run on?</h3>
+
+<p>Linux/Apache/MySQL/Perl. Some of the most notable modules used include
+the 
+[% link_dist_name("Template-Toolkit") %], 
+[% link_dist_name("Class-DBI") %], 
+[% link_dist_name("Archive-Tar") %], and
+[% link_dist_name("Archive-Zip") %].</p>
+
+<h2>Contact, Bugs &amp; Features</h2>
+
+<a name="contact"></a><h3>Who can I contact?</h3>
+
+<p>You can send general comments, suggestions, money, etc., to <a
+href="mailto:itub@cpan.org">itub@cpan.org</a>.  For bug reports please use the
+<a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=AnnoCPAN">request
+tracker</a>.</p>
+
+<a name="missing"></a><h3>Why is <i>X</i> distribution missing, or module
+<i>Y</i> in the wrong place?</h3>
+
+<p>Although most of the distributions on CPAN are packaged in reasonably 
+standard ways, there are a few with strange variations that confuse the
+AnnoCPAN software. If you find one of these cases, please report it.</p>
+
+<h2>AnnoCPAN Code and Data</h2>
+
+<a name="code"></a><h3>Can I get the code?</h3>
+
+<p>The code is available on CPAN under the same terms as Perl itself as the [%
+link_dist_name("AnnoCPAN") %] distribution. It is also available on <a
+href="http://sourceforge.net/cvs/?group_id=122046">anonymous CVS</a>, including
+a <a href="http://cvs.annocpan.org/viewcvs.py/annocpan/annocpan2">viewcvs web
+interface</a></p>
+
+<a name="server"></a><h3>What are the technical requirements for installation?</h3>
+
+<p>Besides the modules and software listed above, it needs a local CPAN mirror
+and a lot of space for the database. 4 GB or more of free space are
+recommended.</p>
+
+<a name="license"></a><h3>What's the license for the notes?</h3>
+
+<p>All the notes are available <a
+href="http://search.cpan.org/dist/perl/README">under the same terms as Perl
+itself</a>. The entire note database can be downloaded as an 
+<a href="[% root_uri_rel %]/note_dump.xml">XML Dump</a>.</p>
+
+<a name="rss"></a><h3>Can I get RSS feeds?</h3>
+
+<p>Yes, the sitewide recent notes are available as RSS 1.0: <a href="[%
+root_uri_rel %]/recent.rss">recent.rss</a>. The notes for a given PAUSE ID are
+available at <code>[% root_uri_abs %]/~<i>pauseid</i>/recent.rss</code> .  RSS
+feeds per module and per distribution are also being considered.  
+</p>
+<p>There is also a feed of new distributions at <a href="[%
+root_uri_rel %]/recent_dists.rss">recent_dists.rss</a>. Note that this feed
+includes only distributions that are completely new; it doesn't include 
+the ones that are merely a new version of a previous distribution.
+</p>
+
+[% PROCESS footer.html %]

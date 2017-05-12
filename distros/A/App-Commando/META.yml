@@ -1,0 +1,65 @@
+---
+abstract: 'Flexible library to build command-line apps'
+author:
+  - 'Michal Wojciechowski <odyniec@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  List::Util: 0
+  Test::Fatal: 0
+  Test::More: 0
+  perl: 5.010
+  version: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Commando
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  App::Commando:
+    file: lib/App/Commando.pm
+    version: 0.012
+  App::Commando::Command:
+    file: lib/App/Commando/Command.pm
+    version: 0.012
+  App::Commando::Logger:
+    file: lib/App/Commando/Logger.pm
+    version: 0.012
+  App::Commando::Option:
+    file: lib/App/Commando/Option.pm
+    version: 0.012
+  App::Commando::Presenter:
+    file: lib/App/Commando/Presenter.pm
+    version: 0.012
+  App::Commando::Program:
+    file: lib/App/Commando/Program.pm
+    version: 0.012
+requires:
+  Carp: 0
+  Getopt::Long: 0
+  Moo: 0
+  Scalar::Util: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/odyniec/p5-App-Commando/issues
+  homepage: https://github.com/odyniec/p5-App-Commando
+  repository: https://github.com/odyniec/p5-App-Commando.git
+version: 0.012

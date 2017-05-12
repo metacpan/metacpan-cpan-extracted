@@ -1,0 +1,103 @@
+{
+   "abstract" : "Run commands on a bunch of git repositories without having to deal with git subrepositories.",
+   "author" : [
+      "Alastair McGowan-Douglas <altreus@perl.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Multigit",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla::PluginBundle::Author::ALTREUS" : "0.002"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "JSON::MaybeXS" : "0"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Config::INI" : "0.025",
+            "Cwd" : "3.47",
+            "File::Find::Rule" : "0",
+            "File::Which" : "1.09",
+            "Future" : "0.3",
+            "Getopt::Long" : "2.42",
+            "HTTP::Tiny" : "0",
+            "IO::Async" : "0.67",
+            "IPC::Run" : "0",
+            "List::UtilsBy" : "0.09",
+            "Moo" : "2.000001",
+            "Path::Class" : "0.35",
+            "Pod::Usage" : "0",
+            "Try::Tiny" : "0.22",
+            "curry" : "1",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "provides" : {
+      "App::Multigit" : {
+         "file" : "lib/App/Multigit.pm",
+         "version" : "0.18"
+      },
+      "App::Multigit::Future" : {
+         "file" : "lib/App/Multigit/Future.pm",
+         "version" : "0.18"
+      },
+      "App::Multigit::Loop" : {
+         "file" : "lib/App/Multigit/Loop.pm",
+         "version" : "0.18"
+      },
+      "App::Multigit::Repo" : {
+         "file" : "lib/App/Multigit/Repo.pm",
+         "version" : "0.18"
+      },
+      "App::Multigit::Script" : {
+         "file" : "lib/App/Multigit/Script.pm",
+         "version" : "0.18"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Altreus/App-Multigit/issues"
+      },
+      "homepage" : "https://github.com/Altreus/App-Multigit",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Altreus/App-Multigit.git",
+         "web" : "https://github.com/Altreus/App-Multigit"
+      }
+   },
+   "version" : "0.18",
+   "x_contributors" : [
+      "Alastair McGowan-Douglas <alastair.mcgowan@opusvl.com>",
+      "Alastair McGowan-Douglas <altreus@altre.us>",
+      "Colin Newell <colin.newell@gmail.com>"
+   ]
+}
+

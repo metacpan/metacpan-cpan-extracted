@@ -1,0 +1,65 @@
+# Avoid archives of this distribution
+\bAlien-SOOT-\d+\.\d+(?:_\d+)?\.tar\.gz$
+
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+\B\.git\b
+\B\.cvsignore$
+\B\.gitignore$
+
+# Avoid Makemaker generated and utility files.
+\bMakefile$
+\bMakefile.old$
+\bMakefile.bak$
+\bblib
+\bMakeMaker-\d
+\bpm_to_blib$
+\bblibdirs$
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\bBuild.bat$
+\b_build
+
+# Avoid Devel::Cover generated files
+\bcover_db
+
+# Avoid temp and backup files.
+~$
+\.tmp$
+\.old$
+\.bak$
+\#$
+\.#
+\.rej$
+\.swp$
+\.swo$
+
+# Avoid OS-specific files/dirs
+#   Mac OSX metadata
+\B\.DS_Store
+#   Mac OSX SMB mount metadata files
+\B\._
+
+# avoid ROOT files
+\.root_hist$
+\.soot_hist$
+
+# avoid manual-testing artifacts
+\.eps$
+
+# avoid XS related build files
+\.o$
+pm_to_blib
+\bSOOT.bs$
+\.bs$
+
+# avoid ROOT related build files
+\broot/?$
+\broot-.*.tar.gz$
+
+^MYMETA.yml$
+^MYMETA\.json$

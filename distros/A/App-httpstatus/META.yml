@@ -1,0 +1,28 @@
+---
+abstract: httpstatus
+author:
+  - unknown
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-httpstatus
+no_index:
+  directory:
+    - inc
+provides:
+  App::httpstatus:
+    file: lib/App/httpstatus.pm
+    version: v2.0.0
+requires:
+  perl: 5.008005
+resources:
+  license: http://dev.perl.org/licenses/
+version: v2.0.0

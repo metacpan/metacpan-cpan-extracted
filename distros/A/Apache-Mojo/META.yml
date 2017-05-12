@@ -1,0 +1,11 @@
+--- 
+abstract: mod_perl handler for Mojo
+author: 
+  - Dave Sherohman <dave@sherohman.org>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.003
+license: perl
+name: Apache-Mojo
+requires: 
+  Apache: 0
+  Mojo: 0
+version: 0.003

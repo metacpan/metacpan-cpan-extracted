@@ -1,0 +1,150 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://kasei.us/about/foaf.xrdf#greg>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:gwilliams@cpan.org>;
+	foaf:name            "Gregory Todd Williams";
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/gwilliams>.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	dc:identifier        "AtteanX::Store::SPARQL"^^doap-deps:CpanId;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [ doap-deps:on "Attean 0.010"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Types::URI"^^doap-deps:CpanId ], [ doap-deps:on "LWP::UserAgent"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.014"^^doap-deps:CpanId ], [ doap-deps:on "Carp"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Log::Any"^^doap-deps:CpanId ], [ doap-deps:on "Data::Dumper"^^doap-deps:CpanId ];
+	doap-deps:runtime-suggestion [ doap-deps:on "RDF::Trine"^^doap-deps:CpanId ], [
+		doap-deps:on "HTTP::Message::PSGI"^^doap-deps:CpanId;
+	], [ doap-deps:on "RDF::Endpoint"^^doap-deps:CpanId ], [
+		doap-deps:on "Test::LWP::UserAgent 0.027"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::Modern"^^doap-deps:CpanId ], [ doap-deps:on "Test::Roo"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Trine"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Endpoint"^^doap-deps:CpanId ], [
+		doap-deps:on "Test::LWP::UserAgent 0.027"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "HTTP::Message::PSGI"^^doap-deps:CpanId;
+	];
+	doap:bug-database    <https://github.com/kjetilk/p5-atteanx-store-sparql/issues>;
+	doap:category        <http://dbpedia.org/resource/Category:Semantic_Web>, <http://dbpedia.org/resource/Category:Triplestores>;
+	doap:created         "2015-06-23"^^xsd:date;
+	doap:developer       <http://www.kjetil.kjernsmo.net/foaf#me>;
+	doap:download-page   <https://metacpan.org/release/AtteanX-Store-SPARQL>;
+	doap:helper          <http://kasei.us/about/foaf.xrdf#greg>;
+	doap:homepage        <https://metacpan.org/release/AtteanX-Store-SPARQL>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://www.kjetil.kjernsmo.net/foaf#me>;
+	doap:name            "AtteanX-Store-SPARQL";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-001>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-002>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-004>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-006>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-008>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-010>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/kjetilk/p5-atteanx-store-sparql>;
+		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-atteanx-store-sparql&serialization=PROV-O#>;
+	];
+	doap:shortdesc       "Attean SPARQL store".
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "AtteanX-Store-SPARQL-0.001"^^xsd:string;
+	dc:issued            "2015-12-24"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Store-SPARQL-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-002>
+	a                    doap:Version;
+	rdfs:label           "Simplify cost modelling";
+	dc:identifier        "AtteanX-Store-SPARQL-0.002"^^xsd:string;
+	dc:issued            "2016-01-11"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Store-SPARQL-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-004>
+	a                    doap:Version;
+	rdfs:label           "A few smaller changes";
+	dc:identifier        "AtteanX-Store-SPARQL-0.004"^^xsd:string;
+	dc:issued            "2016-02-09"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Store-SPARQL-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-006>
+	a                    doap:Version;
+	rdfs:label           "API change for plan";
+	dc:identifier        "AtteanX-Store-SPARQL-0.006"^^xsd:string;
+	dc:issued            "2016-03-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Rename AtteanX::Store::SPARQL::Plan::BGP to AtteanX::Plan::SPARQLBGP.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-004>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Store-SPARQL-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-008>
+	a                    doap:Version;
+	rdfs:label           "Add single-BGP access plan. Some fixes";
+	dc:identifier        "AtteanX-Store-SPARQL-0.008"^^xsd:string;
+	dc:issued            "2016-04-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Add single-BGP access plan.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Accept only JSON SPARQL results.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use the content method on the response object.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Do the SPARQL serialization in the impl method.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-006>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Store-SPARQL-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-010>
+	a                    doap:Version;
+	rdfs:label           "Quality improvements.";
+	dc:identifier        "AtteanX-Store-SPARQL-0.010"^^xsd:string;
+	dc:issued            "2016-05-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Set version in all perl modules.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Test model for costplanner support.";
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Remove the CostPlanner from the store.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-SPARQL/v_0-008>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Store-SPARQL-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://www.kjetil.kjernsmo.net/foaf#me>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2Fp5-atteanx-store-sparql&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://purl.org/NET/cpan-uri/person/kjetilk>.
+

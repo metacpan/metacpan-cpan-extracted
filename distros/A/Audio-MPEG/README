@@ -1,0 +1,144 @@
+Audio/MPEG
+==========
+
+I have been building a fairly extensive MP3 library, and decided to write
+some software to help manage the collection. It's turned out to be a rather
+cool piece of software (incidentally, I will be releasing it under the GPL
+shortly), with both a web and command line interface, good searching,
+integrated ripping, archive statistics, etc.
+
+However, I also wanted to be able to stream audio, and verify the integrity
+of files in the archive. It is certainly possible to stream audio (even
+with re-encoding at a different bitrate) without resorting to writing
+interface glue like this module, but verification of the files was
+clumsy at best (e.g. scanning stdout/err for strings), and useless at worst.
+
+Writing Audio::MPEG was my solution for this problem. It it Perl module
+interface to the MAD and LAME libraries for decoding/encoding MP3 files.
+
+This module will allow a Perl program to verify an MP3 file (fixed and
+variable bitrate), decode it into a high-resolution (24 bit) PCM stream,
+apply filtering effects to the data (stereo->mono, fade in/out, equalizer),
+transform that stream into an audio stream (M$ WAV, Sun AU, integer PCM,
+floating point PCM), and finally encode a PCM stream as an MP3.
+
+The interface is quite Perl-like, and treats the data stream as an opaque
+blob of data (however it is simple to transform, using unpack and pack,
+between the opaque data and a Perl array - recipes are given in the man
+page).
+
+It should be possible, given a reasonably modern computer, to
+decode/filter/re-encode an MP3 file in real-time.
+
+PLATFORM
+
+This module has been tested under Linux 2.4.x (PowerPC and Pentium III),
+and FreeBSD 4.3 (Pentium III). As both big and littlen endian machines
+work, I anticipate no serious problems getting this module to work under
+any of the Un*x variants (however, I have not tested it on a 64 bit integer
+machine - there may be some problems there...)
+
+In addition, being that I'm very down on Windows, I won't bother testing
+on this platform. However, since both MAD and LAME should compile under
+Windows, I'm guessing that this module could probably be coaxed to work.
+If anyone out there does manage to get this working under Windows, please
+let me know any special instructions, and I'll include this information.
+Also, if there are any code changes, please send me the patches. Note:
+if the libraries require patching, please send the patches to the respective
+authors, and not me, as I'm not maintaining those libraries.
+
+INSTALLATION
+
+This module requires Perl 5.00503 or later.
+
+Before this module may be installed, MAD and LAME libraries must be in
+installed (see DEPENDENCIES below). The following instructions may not
+be optimal for your installation, so please be sure to read the respective
+installation notes for each library. In addition, before pulling your hair
+out debugging this module, make sure both MAD and LAME work correctly
+by using their supplied programs (madplay(1) and lame(1) respectively) and
+verifying that those programs work as expected.
+
+To install MAD (see DEPENDENCIES below) expand the MAD tarball, and
+type the following in the MAD source directory:
+
+    ./configure
+    make
+    make install
+
+If you (like me) prefer shared libraries, add --enable-shared=yes to
+the configure command.
+
+To install LAME (see DEPENDENCIES below) expand the LAME tarball, and
+type the following in the LAME source directory:
+
+    ./configure --disable-gtktest --disable-analyzer-hooks --disable-decoder \
+       --disable-decoder-layer1 --disable-decoder-layer2 --with-vorbis=no \
+       --enable-brhist=no
+    make
+    make install
+
+If you (like me) prefer shared libraries, add --enable-shared=yes to
+the configure command.
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+If you haven't figured it out yet, installation of this module will require
+a C compiler...
+
+This module requires these other libraries:
+
+    MAD - MPEG Audio Decoder
+    Version:  0.13.0 (beta) or later
+    Location: http://www.mars.org/home/rob/proj/mpeg/
+
+    LAME - Lame Ain't MP3 Encoder
+    Version:  3.88 (beta 1)
+    Location: http://www.mp3dev.org/
+
+In addition, if there are any difficulties in finding these libraries, 
+I have placed copies of the required tarballs at:
+
+	http://timofejew.com/audiompeg/
+
+AUTHOR
+
+All code and documentation, unless otherwise noted, was authored by
+Peter Timofejew <peter@timofejew.com>
+
+CONTRIBUTORS
+
+Grant Fischer <gfisher@hub.org> helped test the module.
+
+LOCATION
+
+The current version of this module is located at
+
+    http://timofejew.com/audiompeg/
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2001 Peter Timofejew. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+$Id: README,v 1.4 2001/06/18 01:54:32 ptimof Exp $

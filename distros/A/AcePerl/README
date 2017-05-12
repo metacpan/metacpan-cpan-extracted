@@ -1,0 +1,200 @@
+This is version 1.86 of AcePerl, a Perl interface for the ACEDB
+object-oriented database.  Designed specifically for use in genome
+sequencing projects, ACEDB provides powerful modeling and management
+services for biological and laboratory data.  For others, it is a good
+open source introduction to the world of object-oriented databases
+
+See the ChangeLog for important notices, including recent user
+interfaces changes.  Please see DISCLAIMER.txt for disclaimers of
+warranty.
+
+INSTALLATION:
+
+In addition to this package, you will need Perl 5.00503 or higher
+(5.6.0 or higher recommended), and the Digest::MD5 module.  Both are
+available on CPAN (http://www.cpan.org).
+
+If you are using AcePerl to communicate with WormBase, a public server
+is running on host aceserver.cshl.org, port 2005.  You can open a
+connection to this server like this:
+
+   $db = Ace->connect('sace://aceserver.cshl.org:2005');
+
+Otherwise, if you wish to communicate with your own ACEDB database,
+you must use ACEDB version 4.8a or higher, available from this
+location:
+
+	ftp://ncbi.nlm.nih.gov/repository/acedb/
+	
+To take full advantage of the sequence annotation features in the
+Ace::Sequence and Ace::Sequence::Feature classes, you will need
+version 4.9r or higher.
+
+If you wish to use AcePerl in a client-server fashion, you must get
+sgifaceserver up and running.  Some hints on installing the
+sgifaceserver application are given later in this README.
+
+Follow these steps to unpack, build and install AcePerl:
+
+1. Unpack the AcePerl distribution with this command:
+
+  gunzip -c AcePerl-X.XX.tar.gz | tar xvf -
+
+  Replace X.XX with the current version number of AcePerl.
+
+2. cd AcePerl-X.XX
+
+3. perl Makefile.PL
+
+   This script will ask you whether you wish to build: (1) the minimal package
+   with support only for newer (socket) versions of the Ace server, (3) the maximum
+   package, which supports both older (RPC) and newer (socket) versions of the 
+   Ace server, or (2) a version that supports the socket server and has some C 
+   language optimizations.  Choice (3) is recommended.  All versions will support
+   local Acedb databases.
+
+   The script will also ask you whether you wish to install support for the 
+   AceBrowser Web server extensions.  Only answer yes if you are installing
+   on a machine that already runs a web server and you wish to have AceBrowser
+   installed.  If you answer in the affirmative, then you will be asked a number
+   of directory configuration questions.  See README.ACEBROWSER for more details
+   on installation.
+
+   At this point, Makefile.PL will create the make files necessary to build
+   AcePerl.  Among other things, the Makefile.PL script will attempt
+   to guess the type of your machine and its operating system.  This information
+   is needed to select the correct makefile in the ACEDB library
+   directory, AcePerl-X.XX/ace/.
+
+   If AcePerl fails to make correctly later in the process, it may be
+   because the script guessed wrong.  You can override this guess by
+   setting the machine type using the ACEDB_MACHINE environment
+   variable.  On a C-shell or TC-shell machine, use a command like
+   this one:
+ 
+     setenv ACEDB_MACHINE ALPHA_4_GCC; perl Makefile.PL
+  
+   On a Bourne-shell or Korn-shell system, use:
+
+    ACEDB_MACHINE=ALPHA_4_GCC; export ACEDB_MACHINE
+    perl Makefile.PL
+
+   You can find a list of machine definitions in
+   AcePerl-X.XX/ace/wmake.  There are lots of them, but only
+   one or two per operating system, so it's usually pretty
+   easy to choose the right one.  The definitions have names 
+   like ALPHA_4_GCC_DEF.  Before setting the corresponding
+   environment variable, remove the "_DEF" from the end of the name.
+   In case you're wondering the "4" stands for version 4 of the ACEDB
+   server.
+
+   Please drop me a line to let me know what you had to do to get
+   the ACEDB libraries to compile.  I'll fix up the Makefile so
+   that it works correctly for the next person who tries it.
+
+4. make
+
+   This will build the ACEDB client library, libaceperl.a, in the ace
+   subdirectory.  It will then link in the Perl client subs.
+
+5. make test (optional)
+
+   You may "make test" to test the system.  It will attempt to open a
+   connection to a database at beta.crbm.cnrs-mop.fr:20000100.  You may
+   change these defaults by setting the environment variables ACEDB_HOST
+   and ACEDB_PORT, or by defining them on the command line, as in:
+
+    make test ACEDB_HOST=localhost ACEDB_PORT=200005
+
+   However, since some of the tests are dependent on specific values in
+   the database, this may cause some tests to fail.  Do not be alarmed if
+   a handful of tests fail.  Do be alarmed if all of the tests fail.
+
+  6. make install
+
+  This will install AcePerl into your perl5 library directory.
+
+  You may need to be root (superuser) in order to "make install".  This
+  is because Perl will want to install the newly-built files into its
+  library tree, /usr/local/lib/perl5/site_perl (or something similar),
+  and this tree is usually not writable by mere mortals.  Do not
+  despair: see the next section.
+
+INSTALLING ACEPERL IN A NON-STANDARD LOCATION
+
+By default, Perl will install AcePerl's library files within the
+site-specific subdirectory of its library tree, usually
+/usr/local/lib/perl5/site_perl.  If you wish, you can install the
+library files elsewhere.
+
+Simply change to the AcePerl distribution directory and run the
+Makefile.PL script with the INSTALLSITELIB switch set to the full path 
+of the directory you want to install into:
+
+  perl Makefile.PL INSTALLSITELIB=/path/to/library
+
+Then "make" and "make install" as described before.  You will now have
+to tell Perl where to find AcePerl.  You can do this on a
+script-by-script basis, or by defining an environment variable that
+will affect all scripts.
+
+To tell a single script where to find AcePerl, add a "use lib" line
+to your script.  Put it _before_ the "use Ace" line:
+
+  use lib /path/to/library;
+  use Ace;
+
+To change Perl's library search path so that it finds AcePerl
+automatically, define the PERL5LIB environment variable in your
+.login, .cshrc or .profile script.  PERL5LIB is a colon-delimited list 
+of directories in which Perl will search for included libraries.  For
+example:
+
+  setenv PERL5LIB "/path/to/library";
+
+If AcePerl was built as part of the main Ace distribution, you will
+want to define PERL5LIB to be the location of the machine-specific 
+build directory.  For example:
+
+  setenv PERL5LIB $HOME/ace/bin.LINUX_4_OPT
+
+Or you could reinstall AcePerl in the main Perl library tree just by
+entering the wperl/ subdirectory, and rerunning "perl Makefile.PL"
+without defining INSTALLSITELIB.
+
+See ACEDB.HOWTO in the docs/ subdirectory for instructions on
+obtaining and setting up the ACeDB database.  You'll find other hints
+here too.
+
+USING ACEPERL
+
+A. Read the copious documentation
+   
+   perldoc Ace
+
+B. Review the examples
+
+A few useful examples can be found in the "examples" subdirectory.
+Among these is a script called "ace.pl", which implements a text
+interface to any local or remote ace database.  If you have the Perl
+Term::readline module installed, it gives you command-line editing,
+completion, and history.
+
+The script "dump_cdna.pl" shows you how to dump out all spliced cDNAs
+from wormbase.org.  Other dump scripts show similar tricks.  You can
+use these as templates for doing other biologically interesting
+tricks.
+
+There is also family of CGI scripts that run on top of AcePerl to give
+a WebAce-like interface to Ace (it is not as feature-full as WebAce,
+but it is probably easier to set up and run).  This package is now part
+of the AcePerl distribution, but is not installed unless you specifically
+request it.  See README.ACEBROWSER for details.
+
+INSTALLING THE ACEDB SERVER
+
+See ACEDB.HOWTO in the docs/ directory for instructions on compiling
+acedb and installing the server application to start up when needed.
+
+Lincoln Stein
+lstein@cshl.org

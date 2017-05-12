@@ -1,0 +1,45 @@
+[% PROCESS header.tmpl %]
+
+
+	<div id="section_one">
+		<div class="center">
+			<!-- CHOOSE WIFI COPY ************************ --> 
+			<div class="two_thirds left padding_top">
+				<h2 class="choose_wifi">Choose a WiFi option</h2>
+
+				<p>To get started choose a WiFi option that works best for you. We use the revenue from Ads on our free WiFi to pay for the internet so you don't have to. Thanks for understanding. However, if you really don't like Ads, choose one of our simple pay-per-use options and surf Ad Free. Thanks!</p>
+			
+			</div>
+			
+                       <!-- LOGO ************************ -->
+                        <div class="one_third left">
+                                <div id="custom_logo">
+                                        <a id="logo_image" href="[% provider_href %]" style="background: url([% provider_logo %]) no-repeat center center ">
+                                        <div id="gloss"> </div>
+                                        </a>
+                                </div>
+        [% PROCESS powered_by.tmpl %]
+
+</div>
+			<div class="clear"></div>
+			
+		<br />	
+			<!-- WIFI OPTION BUTTONS ************************ --> 
+			<div class="one_third left">
+                        <h3 class="free_service">Choose <a href="[% perlbal %]/free?url=[% url %]">Free service</a><br />30 minutes or 50 MB</a></h3>
+			</div>
+			<div class="one_third left">
+                        <h3 class="free_service">Choose <a href="[% perlbal %]/paid?url=[% url %]">Paid service</a><br />Unrestricted usage</a></h3>
+			</div>
+			<div class="clear"></div>
+	
+
+            </div>
+    </div>
+
+        [% PROCESS splash_ads.tmpl %]
+
+ [% PROCESS our_pledge.tmpl %]
+
+
+[% PROCESS footer.tmpl %]

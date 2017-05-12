@@ -1,0 +1,72 @@
+Version 0.000002005 | 2010-10-26 17:01:07Z (Tue, 26 Oct 2010) | 922dfa3
+
+    Internal/Behavioral Changes:
+     * Correctly deal with errors when calling sysread( ... )
+
+Version 0.000002004 | 2010-08-25 18:16:33Z (Wed, 25 Aug 2010) | bc1ea36
+
+    API Changes/Compatibility Information:
+     * Adding methods for global and per-object download totals
+
+Version 0.000002003 | 2010-07-04 01:48:52Z (Sun, 04 Jul 2010) | d908b81
+
+    Documentation/Sample Code/Test Suite/Metadata:
+     * Moving to META.json
+     * Network based (HTTP) tests are run concurrently to avoid save time
+
+Version 0.000002002 | 2010-06-24 03:04:03Z (Thu, 24 Jun 2010) | edb30dd
+
+    API Changes/Compatibility Information:
+     * The entire API has changed.
+       - All methods have been renamed to better fit their function which has
+           remained the same.
+     * New global limits.
+
+    Documentation/Sample Code/Test Suite/Metadata:
+     * New tests:
+       - t/http_global.t tests global bandwidth limits
+       - t/loopback.t fallback test when the http tests fail (system config?)
+     * (Hopefully) Updated bugtracker and repository metadata
+
+    Notes:
+     * Beijing! Family! Pictures! Food! Sleep!
+
+Version 0.000002001 | 2010-06-17 01:39:49Z (Thu, 17 Jun 2010) | 6ee738a
+
+     Resolved Issues/Bug Fixes:
+     * Instead of allowing unlimited transfer, an undefined download_rate
+       disabled download
+
+Version 0.000002 | 2010-06-15 04:33:43Z (Tue, 15 Jun 2010) | 4656007
+
+    Documentation/Sample Code/Test Suite:
+     * Spellcheck, ftw
+     * Correcting issue tracker URL in POD and README
+     * Slightly tighter tests
+     * Correcting requirement lists in Build.PL
+
+Version 0.000001 | 2010-06-15 00:31:17Z (Tue, 15 Jun 2010) | 8b45623
+
+    API Changes/Compatibility Information:
+     * It actually exists
+
+    Resolved Issues/Bug Fixes:
+     * ...see above
+
+    Internal/Behavioral Changes:
+     * ...see above
+
+    Documentation/Sample Code/Test Suite:
+     * ...see above
+
+    Notes:
+     * Meanwhile...
+         - ...stuff is going on.
+
+_ -.-. .... .- -. --. . ... _________________________________________
+For more information, see the commit log:
+    http://github.com/sanko/anyevent-handle-throttle/commits/master
+
+$Ver: 0.000002005 $ from git $Rev: 922dfa3 $
+$Date: 2010-10-26 17:01:07Z (Tue, 26 Oct 2010) $
+$Url: http://github.com/sanko/anyevent-handle-throttle/raw/master/Changes $

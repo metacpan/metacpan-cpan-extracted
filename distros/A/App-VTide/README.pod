@@ -1,0 +1,130 @@
+=pod
+
+=begin html
+
+<a href="https://travis-ci.org/ivanwills/App-VTide?branch=master"><img src="https://travis-ci.org/ivanwills/App-VTide.png?branch=master" alt="App-VTide"></a>
+<a href="https://coveralls.io/r/ivanwills/App-VTide?branch=master"><img src="https://coveralls.io/repos/ivanwills/App-VTide/badge.svg?branch=master" alt="Coverage Status" /></a>
+
+=end html
+
+=head1 App::VTide
+
+An IDE(ish) environment built on Tmux and Vim (or another editor if desired)
+
+=head1 INSTALLATION
+
+From cpan:
+
+    cpanm App::TVide
+    # or if you don't have cpnam
+    cpan App::TVide
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=head1 Usage
+
+  vtide init [name]
+  vtide start (project)
+  vtide edit [--save[=]name] (group|files)
+
+=head1 Configuration
+
+There are 2 global and 1 local configuration files
+
+=head2 .vtide.yml
+
+The individual projects configuration
+
+    ---
+    # optional name of project (default name is the directory)
+    name: myapp
+    # the total number of terminals to start up
+    count: 4
+    # default configs for terminals
+    default:
+        # when the command finishes restart the command (useful for running
+        # dev servers which may die or you may want to kill and restart)
+        restart: false
+        # run the command at first start or wait for the user to press enter
+        wait: false
+    # configure your editor
+    editor:
+        # the command to run
+        command:
+            # this will run vim -O pluse what ever files are found but the files config
+            - vim
+                -O
+        # files store the named file groups
+        files:
+            lib:
+                - lib/Myapp.pm
+                  lib/Myapp/Controller/Root.pm
+            db:
+                - database/*.sql
+    # configure the individual terminals
+    terminals:
+        1:
+            restart: true
+            command:
+                - plackup
+                  --port
+                  3000
+                  myapp.psgi
+        2:
+            edit:
+                - lib
+        3:
+            edit:
+                - db
+
+=head2 ~/.vtide.yml
+
+Global options/alias etc for all projects. This contains all the same values
+as C<.vtide.yml> but C<name> and C<terminals> will be ignored.
+
+=head2 ~/.vtide.rc
+
+Stores record of all used projects for command line helpers. As new sessions
+are started they will be recorded in this file. Also this will be updated if
+a session changes it's name.
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::VTide
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-VTide
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-VTide
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-VTide
+
+    Search CPAN
+        http://search.cpan.org/dist/App-VTide/
+
+    Source Code
+        git://github.com/ivanwills/App-VTide.git
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2016 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

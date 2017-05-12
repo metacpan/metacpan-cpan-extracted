@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/AnyEvent/Monitor/CPU.pm
+lib/AnyEvent/Monitor/pod2htmd.tmp
+lib/AnyEvent/Monitor/pod2htmi.tmp
+t/00-load.t
+t/02-overhead.t
+t/author-simple.t
+t/release-meta-yaml.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

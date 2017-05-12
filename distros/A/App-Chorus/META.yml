@@ -1,0 +1,47 @@
+---
+abstract: 'Markdown-based slidedeck server app'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  Module::Build: '0.3601'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Chorus
+provides:
+  App::Chorus:
+    file: lib/App/Chorus.pm
+    version: v1.1.0
+  App::Chorus::Slidedeck:
+    file: lib/App/Chorus/Slidedeck.pm
+    version: v1.1.0
+requires:
+  Dancer: '0'
+  File::ShareDir::Tarball: '0'
+  Getopt::Long: '0'
+  HTML::Entities: '0'
+  Moose: '0'
+  Path::Tiny: '0'
+  Plack::Loader: '0'
+  Text::Markdown: '0'
+  Web::Query: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/chorus/issues
+  homepage: https://github.com/yanick/chorus
+  repository: https://github.com/yanick/chorus.git
+version: 1.1.0
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Drew Taylor <drew@drewtaylor.com>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'

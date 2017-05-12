@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache-UpnpImgBrowser
+version:      0.01
+version_from: UpnpImgBrowser.pm
+installdirs:  site
+requires:
+    Cache::FileCache:              
+    Data::Dumper:                  
+    Image::Magick:                 
+    LWP::Simple:                   
+    Net::UPnP:                     
+    SOAP::Lite:                    
+    URI::Escape:                   
+    XML::Simple:                   
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

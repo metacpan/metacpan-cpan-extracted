@@ -1,0 +1,61 @@
+NAME
+    Apache2::PPI::HTML - Apache 2 interface to PPI::HTML
+
+DESCRIPTION
+    PPI::HTML is a HTML syntax highlighter for Perl source code. Because it
+    is based on PPI it can correctly parse just about anything you can
+    possibly throw at it, and then flexibly generate a HTML version based on
+    any arbitrary colour scheme you wish, or use a standalone CSS file for
+    it's style information.
+
+    This initial version is primarily intended to serve as a highlighting
+    service to a AJAX-based syntax highlighter.
+
+    The handler recieves a chunk of Perl source code from the browser in the
+    CGI 'code' parameter, and a second 'ajax' param determines if the
+    highlighter is running in AJAX mode.
+
+    In AJAX mode, the fragment of formatted HTML is handed back straight up,
+    without any surrounding body or headers or the other parts of the HTML
+    wrapper.
+
+    With AJAX mode off, it returns a complete HTML document.
+
+    With this initial version, you may have some difficulties getting CSS
+    actually working.
+
+    We recommend you wait for the next release, which will support a range
+    of pre-packaged colour schemes being created for PPI::HTML.
+
+TO DO
+    - Add support for PPI::HTML 0.06 colour schemes.
+
+    - Add support for acting as a content filter.
+
+    If you like the idea of this module, and would like to volunteer to help
+    maintain or improve it, your assistance you be greatly welcomed.
+
+    Inquiries via the PPI dicussion mailing list, located on the SourceForge
+    website. <http://sourceforge.net/projects/parseperl>.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Apache2-PPI-HTML>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+    Written by Pete Sergeant (in about 3 minutes) :)
+
+COPYRIGHT
+    Copyright 2005 - 2008 Pete Sergeant, Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

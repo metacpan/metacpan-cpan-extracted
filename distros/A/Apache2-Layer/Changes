@@ -1,0 +1,8 @@
+Revision history for Apache2-Layer
+
+1.103360    Thu Dec  2 12:38:24 2010
+            Add new directive DocumentRootLayersStripLocation 
+
+0.01        Thu Oct 21 21:05:56 2010
+            First version.
+

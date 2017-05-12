@@ -1,0 +1,89 @@
+# test
+
+use strict ;
+use warnings ;
+
+use Test::Exception ;
+use Test::Warn;
+use Test::NoWarnings qw(had_no_warnings);
+
+use Test::More 'no_plan';
+#use Test::UniqueTestNames ;
+
+use Test::Block qw($Plan);
+
+use App::Textcast ; 
+
+{
+local $Plan = {'' => } ;
+
+is(result, expected, "message") ;
+}
+
+=comment
+
+{
+local $Plan = {'' => } ;
+
+is(result, expected, 'message') ;
+
+throws_ok
+	{
+	
+	} qr//, '' ;
+
+lives_ok
+	{
+	
+	} '' ;
+
+like(result, qr//, '') ;
+
+warning_like
+	{
+	} qr//i, '';
+
+warnings_like
+	{
+	}
+	[
+	qr//i,
+	qr//i,
+	] '';
+
+
+is_deeply
+	(
+	generated,
+	[],
+	''
+	) ;
+
+
+use Directory::Scratch ;
+my $temp = Directory::Scratch->new();
+my $dir  = $temp->mkdir('foo/bar');
+my $file = $temp->touch('foo/bar/baz', qw(This is a file with lots of lines));
+
+
+use Directory::Scratch::Structured qw(create_structured_tree piggyback_directory_scratch) ; 
+my %tree_structure =
+	(
+	file_0 => [] ,
+	
+	dir_1 =>
+		{
+		subdir_1 =>{},
+		file_1 =>[],
+		file_a => [],
+		},
+	) ;
+
+my $temporary_directory = create_structured_tree(%tree_structure) ;
+$base = $temporary_directory->base() ;
+
+my $scratch = Directory::Scratch->new;
+$scratch->create_structured_tree(%tree_structure) ;
+}
+
+=cut

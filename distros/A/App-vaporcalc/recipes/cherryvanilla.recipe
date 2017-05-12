@@ -1,0 +1,33 @@
+{
+   "recipe" : {
+      "target_nic_per_ml" : 3,
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "TFA VBIC",
+            "percentage" : "3"
+         },
+         {
+            "type" : "PG",
+            "percentage" : "2",
+            "tag" : "Vanillin (10%)"
+         },
+         {
+            "tag" : "INW Cherries",
+            "percentage" : "0.8",
+            "type" : "PG"
+         },
+         {
+            "tag" : "TFA Vanilla Swirl",
+            "percentage" : "4",
+            "type" : "PG"
+         }
+      ],
+      "base_nic_type" : "PG",
+      "target_pg" : 30,
+      "target_quantity" : 120,
+      "base_nic_per_ml" : 100,
+      "target_vg" : 70,
+      "notes" : []
+   }
+}

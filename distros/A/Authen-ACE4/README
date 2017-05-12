@@ -1,0 +1,66 @@
+This is the README file for Authen::ACE4, the Perl interface to the
+RSA SecurID ACE client version 4.1, 5, 6.1 or better
+API on Windows, Linux and Unix.
+
+To build this module, you must have the SecurID ACE Agent client
+libraries from version 4.1, version 5
+or better installed.  The preferred version is 6.1. 
+You can get ACEAgentSDK61.zip from
+https://knowledge.rsasecurity.com, using your RSA support contract details.
+
+To test this module, you must have a SecurID
+ACE/Server or Authentication Manager 6.1 or 7.1 installed and running.
+
+Only version 4 API is supported. Legacy functions like sd_auth
+etc are not supported. 
+
+Synchronous functions like AceStartAuth, AceContinueAuth etc 
+are supported.
+Asynchronous functions like SD_Init, SD_Check, SD_Next etc are also supported,
+courtesy of "Paul Ewing Jr." <ewing@ima.umn.edu>
+
+This is version 1.1 of Authen::ACE4. It has been built
+and tested on Linux, Solaris, Windows NT and Windows Server 2003. The Windows
+version also runs on XP SP2. Please notify
+us of successful builds on other platforms. Patches accepted.
+
+AVAILABILITY
+
+The latest version of Authen::ACE4 is available from the Comprehensive
+Perl Archive Network (CPAN) or a precompiled version is available from:
+
+http://www.open.com.au/radiator/free-downloads
+
+INSTALLATION
+
+See the accompanying INSTALL file for detailed installation
+directions.
+
+EXAMPLES
+
+The eg directory contains a few example scripts. Some of them require
+entering PINs and tokenstoken codes. In these examples, ALL
+ENTERED PINS WILL WILL BE DISPLAYED IN PLAIN TEXT.
+
+SUPPORT
+
+This is unsupported software.
+You can send bug reports and suggestions for improvements
+to the author at mikem@open.com.au. 
+
+FUTURE WORK
+
+New 5.0 versions of legacy functions
+OO interface
+
+COPYRIGHT
+
+This module is Copyright © 2001-2009 Open System Consultants Pty Ltd.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. This module is distributed in the
+hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. The copyright holder of this module can not be held liable
+for any general, special, incidental or consequential damages arising
+out of the use of the module.

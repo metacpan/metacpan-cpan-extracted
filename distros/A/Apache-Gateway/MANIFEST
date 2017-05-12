@@ -1,0 +1,14 @@
+ChangeLog			history of this package
+Definitions.txt
+FAQ.txt
+Gateway.pm			the gateway module
+MANIFEST			this file
+Makefile.PL			Makefile generator
+README
+References.txt
+TODO				the To Do list for the module
+eg/gateway.conf
+eg/gateway/CPAN
+eg/gateway/debian
+eg/gateway/debian-non-US
+test.pl

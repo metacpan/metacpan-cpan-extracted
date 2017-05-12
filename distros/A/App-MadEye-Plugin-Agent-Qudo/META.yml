@@ -1,0 +1,25 @@
+---
+abstract: ~
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-MadEye-Plugin-Agent-Qudo
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  App::MadEye: 0
+  Qudo: 0
+resources:
+  repository: git://github.com/nekokak/App-MadEye-Plugin-Agent-Qudo.git
+version: 0.01

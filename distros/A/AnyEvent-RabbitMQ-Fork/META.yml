@@ -1,0 +1,39 @@
+---
+abstract: 'Run AnyEvent::RabbitMQ inside AnyEvent::Fork(::RPC)'
+author:
+  - 'William Cox <mydimension@gmail.com>'
+build_requires:
+  Data::Dumper: '0'
+  IO::Socket::INET: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-RabbitMQ-Fork
+requires:
+  AnyEvent::Fork: '0'
+  AnyEvent::Fork::RPC: '0'
+  AnyEvent::RabbitMQ: '1.18'
+  Carp: '0'
+  File::ShareDir: '0'
+  Guard: '0'
+  Moo: '0'
+  Net::AMQP: '0'
+  Scalar::Util: '0'
+  Types::Standard: '0'
+  constant: '0'
+  namespace::clean: '0'
+  perl: v5.6.1
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/mydimension/AnyEvent-RabbitMQ-Fork/issues
+  homepage: https://github.com/mydimension/AnyEvent-RabbitMQ-Fork
+  repository: https://github.com/mydimension/AnyEvent-RabbitMQ-Fork.git
+version: '0.5'

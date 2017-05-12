@@ -1,0 +1,30 @@
+The origins of this package are in the libinn utility library in INN.
+Some of the utility and portability functions here are directly inspired
+by or based on versions in older versions of INN, and I wrote and rewrote
+considerable additional portability code and utility libraries when I took
+over INN maintenance.  When I started maintaining other C packages, I
+started copying pieces of libinn into those packages and merging it with
+other portability and utility code.  Over time, each package gained a
+slightly different version of various utility functions, replacements for
+missing functions, and Autoconf macros.
+
+The goal of this package is to merge all the various versions of any
+portability or utility code that's used in more than one of my packages in
+one place.  Then, each package can update to the latest rra-c-util version
+before each release and gain from the improvements made for all other
+packages.  You can think of it as my version of
+[Gnulib](https://www.gnu.org/software/gnulib/), with everything released
+under a permissive license (no GPL).
+
+As well as C portability frameworks, Autoconf macros, and a general C
+utility library, this package has also accumulated a considerable
+collection of standard tests (for C and Perl packages) and a large library
+of test utilities and support functions.  It also includes extensive
+support for writing and testing PAM modules, and a portable implementation
+of AFS PAGs.
+
+This package uses the infrastructure of C TAP Harness for testing, but is
+not the canonical version of `tests/runtests.c`, `tests/tap/basic.[ch]`,
+`tests/tap/macros.h`, or `tests/tap/libtap.sh`.  Those files should be
+pulled from [C TAP
+Harness](https://www.eyrie.org/~eagle/software/c-tap-harness/) instead.

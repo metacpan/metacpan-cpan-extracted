@@ -1,0 +1,73 @@
+{
+   "abstract" : "A command line tool for launching a POE::Component::Server::IRC instance",
+   "author" : [
+      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Pocosi",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "utils",
+         "example"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.47",
+            "Test::Script" : "1.07"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0.06",
+            "Data::Dump" : 0,
+            "IO::WrapOutput" : "0.02",
+            "IRC::Utils" : "0.10",
+            "JSON::XS" : 0,
+            "Module::Pluggable" : 0,
+            "POE" : "1.310",
+            "POE::Component::Server::IRC" : "1.48",
+            "Proc::Daemon" : "0.02",
+            "Term::ANSIColor" : 0,
+            "Term::Cap" : "1.10",
+            "Term::ReadKey" : "2.21",
+            "YAML::XS" : 0,
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-App-Pocosi@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-Pocosi"
+      },
+      "homepage" : "http://metacpan.org/release/App-Pocosi",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hinrik/app-pocosi.git",
+         "web" : "http://github.com/hinrik/app-pocosi"
+      }
+   },
+   "version" : "0.03",
+   "x_authority" : "cpan:HINRIK"
+}
+

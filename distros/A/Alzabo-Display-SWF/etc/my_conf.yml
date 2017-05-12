@@ -1,0 +1,36 @@
+---
+schema:
+  fdb: Tahoma-B
+  color:
+    bg: xFFFFFF
+    fg: x330066
+  edge:
+    width:   2
+    opacity: 40
+
+table:
+  fdb: Tahoma-B
+  linestyle:
+    width: 2
+    color: x666666
+  color:
+    bg: xFF9900
+    fg: x330066
+  edge:
+    width:   2
+    opacity: 40
+  key:
+    primary: xFFFF66
+    foreign: x3333CC
+
+column:
+  fdb:
+    over: Tahoma-B
+    up:   Tahoma
+  color:
+    bg: xFFFFFF
+    fg:
+      over: x333300
+      up:   x000000
+
+fdb_dir: '.'

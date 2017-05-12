@@ -1,0 +1,6 @@
+App-AutoCRUD
+==================
+
+A Plack application for browsing and editing databases
+
+See lib/App/AutoCRUD.pm for details

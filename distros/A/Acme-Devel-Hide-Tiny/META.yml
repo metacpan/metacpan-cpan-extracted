@@ -1,0 +1,44 @@
+---
+abstract: 'Hide a perl module for testing, in one statement'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Devel-Hide-Tiny
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Acme::Devel::Hide::Tiny:
+    file: lib/Acme/Devel/Hide/Tiny.pm
+    version: '0.002'
+requires:
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Acme-Devel-Hide-Tiny/issues
+  homepage: https://github.com/dagolden/Acme-Devel-Hide-Tiny
+  repository: https://github.com/dagolden/Acme-Devel-Hide-Tiny.git
+version: '0.002'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Graham Knop <haarg@haarg.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

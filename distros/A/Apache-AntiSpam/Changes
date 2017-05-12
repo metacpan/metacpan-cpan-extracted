@@ -1,0 +1,21 @@
+Revision history for Perl extension Apache::AntiSpam.
+
+0.05  Fri May  3 22:27:43 JST 2002
+	- no tie()ing STDOUT to shut up bleadperl
+
+0.04  Thu Jun 21 04:59:13 JST 2001
+	+++ Major API Change +++
+	* Apache::AntiSpam now becomes base class.
+	* NoSpam, Heuristic, HTMLEncode subclasses are added.
+	- FilterTest module added on t/lib
+
+0.03  Wed Jun  6 12:24:31 JST 2001
+	* use Email::Find 0.04;
+
+0.02  Thu May 10 18:58:21 JST 2001
+	* uses its own regex if $Email::Find::VERSION <= 0.03
+	- went on CPAN.
+
+0.01  Tue May  8 07:19:45 2001
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,23 @@
+Model:
+category | P(category) 
+---+---
+S=Y      | 0.38        
+S=N      | 0.62        
+---+---
+
+category | C | P( C | category ) 
+---+---+---
+S=Y      | N | 0.368421052631 
+S=Y      | Y | 0.631578947368 
+---+---+---
+S=N      | N | 0.790322580645 
+S=N      | Y | 0.209677419354 
+---+---+---
+
+category | F    | P( F | category )                                         
+---+---+---
+S=Y      | real | Gaussian(mean=1.368421052631,stddev=0.935836242984)  
+---+---+---
+S=N      | real | Gaussian(mean=0.387096774193,stddev=0.793363503758) 
+---+---+---
+

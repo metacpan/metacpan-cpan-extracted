@@ -1,0 +1,21 @@
+.project
+.shipit
+bin/couchdb-push
+Changes
+edit
+eg/async
+eg/async-via-cb
+eg/NOTES
+eg/pager
+eg/replicate.pl
+lib/AnyEvent/CouchDB.pm
+lib/AnyEvent/CouchDB/Database.pm
+lib/AnyEvent/CouchDB/Exceptions.pm
+lib/AnyEvent/CouchDB/Stream.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00_basic.t
+t/10_attachments.t
+META.yml                                 Module meta-data (added by MakeMaker)

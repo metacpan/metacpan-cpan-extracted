@@ -1,0 +1,16 @@
+Revision history for Array-GroupBy
+
+0.0.4  Mon Jun 25 2012
+       Forgot to clean usage of Test::Exception in t/2.t
+
+0.0.3  Sun Jun 24 2012
+       Cleaned up use of Test::Exception and MooseX::StrictConstructor,
+       skipping if not installed.
+
+0.0.2  Wed Jun 20 2012
+       Put perlcriticrc-conway into t/ and editted t/perlcritic.t
+       to use it, and cleaned up the GroupBy.pm code
+
+0.0.1  Mon Mar  5 17:27:29 2012
+       Initial release.
+

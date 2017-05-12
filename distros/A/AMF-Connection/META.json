@@ -1,0 +1,42 @@
+{
+   "abstract" : "A simple library to write AMF clients.",
+   "author" : [
+      "Alberto Attilio Reggiori, <areggiori@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AMF-Connection",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::UserAgent" : "5.829",
+            "Storable::AMF" : "0.71"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.32"
+}

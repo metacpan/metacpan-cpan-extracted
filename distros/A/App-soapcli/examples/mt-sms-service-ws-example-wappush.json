@@ -1,0 +1,16 @@
+{
+  "SubmitBinaryMessage": {
+    "parameters": {
+      "sms": {
+        "recipient": "507998000",
+        "expiryDate": "2014-01-01T12:00:00",
+        "originator": "12345",
+        "content": "6E070605040B8423F0000601AE03056A0045C60E036D6574616370616E008803706F642F646973747269627574696F6E2F4170702D736F6170636C692F7363726970742F736F6170636C692E706C000AC3072015050220253310C307201505052025330103736F6170636C69000101"
+      }
+    },
+    "SecurityKey": {
+      "username": "LOGIN",
+      "password": "PASS"
+    }
+  }
+}

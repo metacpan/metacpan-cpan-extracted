@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+use App::MyPerl;
+
+App::MyPerl->run_if_script;
+
+=head1 NAME
+
+myperl - run code with your myperl settings for the script, lib/ and t/lib
+
+=head1 SYNOPSIS
+
+  $ myperl bin/script
+
+  $ myperl -Mother -Iperl -d:options bin/script
+
+See L<App::MyPerl> for more details.
+
+=head1 AUTHOR
+
+See L<App::MyPerl>
+
+=head1 COPYRIGHT
+
+See L<App::MyPerl>
+
+=head1 LICENSE
+
+See L<App::MyPerl>
+
+=cut

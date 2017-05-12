@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/app.psgi
+lib/Amon2/Auth/Site/Hatena.pm
+minil.toml
+t/00_compile.t
+META.yml
+MANIFEST

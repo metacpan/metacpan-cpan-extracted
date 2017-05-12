@@ -1,0 +1,30 @@
+---
+abstract: 'monitor a directory tree in a non-blocking way'
+author:
+  - 'Jonathan Rockway <jrockway@cpan.org>'
+build_requires:
+  Directory::Scratch: '0'
+  EV: '0'
+  MooseX::Declare: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Inotify-Simple
+requires:
+  AnyEvent: '0'
+  File::Next: '0'
+  Linux::Inotify2: '0'
+  Moose: '0'
+  MooseX::FileAttribute: '0'
+  MooseX::Types::Path::Class: '0'
+resources:
+  bugtracker: https://github.com/jrockway/anyevent-inotify-simple/issues
+  repository: git://github.com/jrockway/anyevent-inotify-simple.git
+version: '0.03'

@@ -1,0 +1,897 @@
+# PODNAME: Acme::PM::Barcelona::12x5_ca
+# ABSTRACT: 12 xerrades, 5 minuts cadascuna
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Acme::PM::Barcelona::12x5_ca - 12 xerrades, 5 minuts cadascuna
+
+=head1 VERSION
+
+version 0.05
+
+=head1 SINOPSI
+
+Introducció ràpida a Perl a càrrec del grup dels Perl Mongers de Barcelona.
+
+=head1 DESCRIPCIÓ
+
+12x5 és un format de presentació que en Mark Jason Dominus
+va mostrar al grup de Barcelona.pm el juliol de 2003. Ens va agradar
+tant que volem fer el mateix per presentar Perl i la nostra
+comunitat local de Perl a qualsevol que ens escolti.
+
+=head1 PRESENTACIONS
+
+=head2 Perl i els Perl Mongers
+
+=head3 Què és Perl?
+
+Perl és un llenguatge de programació dinàmic
+que va dissenyar un lingüista anomenat Larry Wall l'any 1987.
+
+Des d'aleshores ençà s'han publicat diverses versions
+amb canvis importants en el llenguatge, essent la versió 5
+la més utilitzada fins ara. La versió 6 incorporarà
+tants canvis que es considera un llenguatge diferent, Perl 6.
+
+=head3 Per què Perl?
+
+Bàsicament perquè és el llenguatge de
+programació que a mi més m'agrada. Hi ha gent
+que en prefereix d'altres però, és clar,
+hi ha d'haver gent per tot en aquest món.
+
+I a mi, per què m'agrada tant?
+
+=over 4
+
+=item * és divertit d'utilitzar i aprendre'l
+
+=item * hi ha molt de codi ja fet i disponible lliurement
+
+=item * la comunitat de Perl és gran i està disposada a ajudar
+
+=item * està disponible en molts més llocs del que us penseu
+
+=item * hi puc fer coses que no podria amb d'altres llenguatges
+
+=item * em permet fer les coses com m'agradin més
+
+=item * m'ajuda a fer la feina
+
+=back
+
+=head3 Què són els Perl Mongers?
+
+Perl Mongers és una mena associació internacional
+de tots els grups d'usuaris de Perl.
+
+Cada grup pot fer coses molt diferents del que fan els altres,
+però en la majoria de casos es tracta de grups d'usuaris
+d'un lloc determinat que es reuneixen periòdicament per
+parlar de Perl i d'altres temes relacionats.
+
+=head3 Barcelona.pm, els Perl Mongers de Barcelona
+
+Creat a principis de l'any 2003 per en Timothy Chen Allen,
+el grup de mongers de Barcelona es reuneix el darrer dijous
+de cada mes.
+
+De vegades, des del grup també s'organitzen festivals,
+xerrades i cursos de Perl aprofitant el pas per Barcelona
+d'alguns gurús de la comunitat internacional.
+
+=head2 Quinieles
+
+=head3 La sort és aleatòria
+
+Un company dels mongers diu que ell creu que les quinieles són
+tan aleatòries com la loteria, per tant fa una cosa com aquesta:
+
+  @resultat = ( 1, 'X', 2 );
+
+  foreach $fila ( 1 .. 14 ) {
+      print $fila, " ", $resultat[ int rand 3 ], "\n";
+  }
+
+=head3 Però potser no volem que ho sigui
+
+En canvi, la seva dona vol poder decidir quin resultat tindrà
+el seu equip favorit. Així doncs, cal una llista de resultats
+desitjats:
+
+  @resultat = ( 1, 'X', 2 );
+  %quiniela = (
+      # volem que l'equip de la fila 4 obtingui un 1
+      4 => 1,
+      # volem que l'equip de la fila 6 obtingui una X
+      6 => 'X',
+  );
+  foreach $fila ( 1 .. 14 ) {
+      if ( !exists $quiniela{$fila} ) {
+        $quiniela{$fila} = $resultat[ int rand 3 ];
+      }
+      print $fila, " ", $quiniela{$fila}, "\n";
+  }
+
+=head2 CPAN
+
+=head3 Comprehensive Perl Archive Network
+
+El CPAN és un repositori enorme de codi i documentació posats a
+l'abast de tothom per la comunitat de programadors de Perl d'arreu
+del món.
+
+Algunes dades:
+
+=over 4
+
+=item * es va posar en marxa el 26 d'octubre de 1995
+
+=item * hi ha 7664 autors
+
+=item * aquests autors han fet 16575 mòduls de Perl
+
+=item * existeixen 241 rèpliques del CPAN
+
+=item * l'espai ocupat a cada rèplica és de 6064 MB
+
+=back
+
+=head3 Com funciona?
+
+Publicar codi al CPAN és molt senzill, tothom pot demanar un
+compte al PAUSE, que és el servei que permet
+fer la publicació; un cop aprovat, es poden registrar els mòduls
+i publicar-los.
+
+=head3 Els mòduls
+
+Un mòdul és un fitxer de text que conté la definició d'un o més
+paquets de Perl. Per exemple el paquet C<Acme::PM::Barcelona::Meeting>
+defineix el codi que calcula quan serà la propera reunió dels mongers
+de Barcelona. Aquest paquet es troba al fitxer següent dins del
+directori de mòduls de Perl:
+
+  Acme/PM/Barcelona/Meeting.pm
+
+=head3 Els paquets
+
+Els paquets defineixen espais de noms reservats per a agrupar
+trossos de codi relacionat amb un mateix tema. Així s'hi poden
+utilitzar els noms de funcions que hom desitgi sense que això
+afecti a d'altres parts del codi.
+
+  package Acme::PM::Barcelona::Meeting;
+
+  sub festival {
+      # ...
+  }
+
+=head3 Les distribucions
+
+Els paquets s'agrupen dins els mòduls i aquests s'agrupen en
+distribucions. Una distribució no només conté el codi d'un o
+més mòduls sinó que a més a més disposa dels mecanismes adients
+per a fer-ne la configuració, la verificació i la instal·lació.
+
+Les distribucions de Perl acostumen a tenir un format concret,
+especialment si hom les vol publicar al CPAN.
+
+=head3 Avantatges del CPAN
+
+El CPAN posa a disposició dels autors que hi publiquen un gran
+ventall de serveis i avantatges a canvi de què el que publiquin
+sigui lliure. Alguns d'ells són:
+
+=over 4
+
+=item * un repositori replicat arreu del món
+
+=item * la publicació de la documentació dels mòduls
+
+=item * la possibilitat que els usuaris facin comentaris i anotacions
+
+=item * un sistema automàtic de tests de versions i plataformes
+
+=item * un servei de notificació i seguiment d'errors
+
+=back
+
+=head2 Tests en Perl
+
+=head3 Perl utilitza tests des del principi
+
+Ja des de la primera versió de Perl, un cop construït l'executable
+es verifica que es comporta com cal. El codi font de Perl inclou
+un gran nombre de tests de tot tipus, que no només permeten veure
+objectivament que la construcció de l'executable ha anat bé sinó
+que ajudaran a detectar errors en cas que passi res.
+
+=head3 La cultura dels tests
+
+Aquesta filosofia d'incorporar tests va quallar molt bé des de
+bon començament dins la comunitat de Perl i els autors que
+publicaven mòduls amb llicència lliure de seguida es van pujar
+al carro dels tests, afegint-los a les seves distribucions.
+
+=head3 Els tests al CPAN
+
+Avui en dia és imprescindible com a mínim tenir 1 test que
+funcioni per a poder publicar un mòdul al CPAN. Això a més
+facilita que els CPAN I<smokers> (robots que executen els
+tests periòdicament) puguin dedicar-se a provar tot el codi
+que hi ha el CPAN sense que els autors hagin de fer molts
+esforços.
+
+Com a resultat, els autors tenen informes d'error i d'èxit
+en múltiples plataformes a les quals habitualment no tenen
+accés i poden veure si els canvis que introdueixen en noves
+versions provoquen algun maldecap a d'altra gent.
+
+=head3 Com es poden provar els tests?
+
+En les distribucions basades en C<ExtUtils::MakeMaker>:
+
+  perl Makefile.PL
+  make
+  make test
+
+En les distribucions basades en C<Module::Build>:
+
+  perl Build.PL
+  perl Build
+  perl Build test
+
+=head2 WWW::Mechanize
+
+=head3 Robots web
+
+Amb Perl es poden escriure programes que naveguen per la web.
+
+=head3 La pàgina d'inici de La Vanguardia
+
+Aquest programa descarrega la pàgina web de La Vanguardia.
+
+  use WWW::Mechanize;
+  
+  $mech = WWW::Mechanize->new;
+  $mech->get("http://www.lavanguardia.es");
+  
+  print $mech->content;
+
+=head3 Una cerca a Google
+
+Aquest programa cerca la paraula "Perl" a Google.
+
+  use WWW::Mechanize;
+  
+  $mech = WWW::Mechanize->new;
+  
+  $mech->get('http://www.google.com');
+  $mech->field('q', 'Perl');
+  $mech->click('btnG');
+  
+  print $mech->content;
+
+=head3 L'extracte d'un compte de La Caixa
+
+Aquest programa treu per pantalla la primera pàgina de l'extracte
+d'un compte de La Caixa.
+
+  use WWW::Mechanize;
+  
+  $user = 'el-teu-dni';
+  $password = 'contrasenya';
+  
+  # fes-te passar per un iPhone
+  $iphone = "Mozilla/5.0 (iPhone; U; ...";
+  $mech = WWW::Mechanize->new(agent => $iphone);
+
+=for ToBeUsedInTheFuture =head3 L'extracte d'un compte de La Caixa (2)
+
+  # home page
+  $mech->get(
+      "http://lacaixa.mobi/apl/index_es.html?select=true"
+  );
+  $mech->follow_link(url_regex => qr/es-mobi-menu-lo/);
+  
+  # fes login
+  $mech->submit_form(
+  	form_name => "formu",
+  	fields => {
+  		E => $user,
+  		B => $password
+  	}
+  );
+
+=for ToBeUsedInTheFuture =head3 L'extracte d'un compte de La Caixa (3)
+
+  # segueix el primer enllac,	
+  $mech->follow_link(tag => 'a', n => 1);	
+  
+  # captura els moviments
+  ($movements) = $mech->content
+      =~ m{(<ul[^>]*>\s*<li[^>]*>\s*<a.*?</ul>)}i;
+  
+  $mov_regexp = qr{
+      <td\s+align="left"> (.+?) </td>
+      .*?
+      <font[^>]+> ([\d,-]+) .*? </font>
+      .*?
+      <li[^>]+> (\d+/\d+/\d+)
+  }sx;
+
+=for ToBeUsedInTheFuture =head3 L'extracte d'un compte de La Caixa (4)
+
+  print "$1, $2, $3\n"
+      while $movements =~ /$mov_regexp/g;
+  
+  # AHORRA EL CAMBIO, -2,10, 06/09/2009
+  # FRANKFURT PLATJA-, -14,40, 05/09/2009
+  # DECATHLON ILLA PR, -7,90, 05/09/2009
+  # CAPRABO, -7,64, 04/09/2009
+  # GESOIL S.A. LEVAN, -18,88, 04/09/2009
+  # ...
+
+=head2 Finance::Quote i Cache::FileCache
+
+=head3 Com està el canvi?
+
+Es pot obtenir el canvi actualitzat de la moneda d'arreu del món.
+
+=head3 Conversió de dòlars a euros
+
+  use Finance::Quote 1.16;
+
+  $quote = Finance::Quote->new();
+  $ratio = $quote->currency('USD', 'EUR');
+
+  print "10 USD = ", 10 * $ratio, " EUR\n";
+
+=head3 Millorem la velocitat amb una còpia temporal
+
+  use Cache::FileCache;
+  use Finance::Quote 1.16;
+
+  $cache = Cache::FileCache->new({
+    default_expires_in => '1 day',
+  });
+
+  $ratio = $cache->get("USD:EUR");
+  if ( !defined $ratio ) {
+    $quote = Finance::Quote->new();
+    $ratio = $quote->currency('USD', 'EUR')
+    $cache->set("USD:EUR", $ratio);
+  }
+
+  print "10 USD = ", 10 * $ratio, " EUR\n";
+
+=head2 Flickr::Upload
+
+=head3 Teniu compte al Flickr?
+
+Una eina que utilitza C<Flickr::API> per a publicar fotos a Flickr.
+
+=head3 flickr_upload
+
+La manera més fàcil d'utilitzar l'eina és amb
+l'ordre C<flickr_upload> des de l'intèrpret d'ordres. Primer
+heu de configurar l'accés al vostre compte de Flickr seguint
+les instruccions que us indicarà aquesta ordre:
+
+  $ flickr_upload --auth
+
+I un cop ho haureu fet, ja podreu publicar les fotos que vulgueu:
+
+  $ flickr_upload --progress --tag 'barcelona.pm' *.jpg
+
+=head3 Programar amb Flickr::Upload
+
+Però també es pot utilitzar des d'un programa que
+permeti triar amb més flexibilitat com voleu etiquetar
+les vostres fotos.
+
+  use Flickr::Upload;
+
+  $ua = Flickr::Upload->new({
+    'key'    => $key,
+    'secret' => $secret,
+  });
+
+  $ua->upload(
+    'auth_token' => $auth_token,
+    'photo'      => 'barcelona-pm.jpg',
+    'tags'       => 'barcelona.pm',
+    'is_public'  => 1,
+    'is_friend'  => 1,
+    'is_family'  => 1,
+  );
+
+=head2 Codis QR
+
+=head3 Què són?
+
+Els codis QR s'utilitzen per a codificar informació que pugui
+ser llegida i utilitzada de forma ràpida des d'un dispositiu
+lector.
+
+Es tracta d'un invent japonès per tal que es pugui llegir
+informació ràpidament des dels mòbils i
+es pugui utilitzar d'immediat sense haver d'escriure res, per exemple
+posant-ho en un anunci d'un diari o en una pancarta al carrer, etc.
+
+=head3 Tipus de dades
+
+S'assemblen als codis de barres però permeten emmagatzemar
+tot tipus de dades:
+
+=over 4
+
+=item * numèriques
+
+=item * alfanumèriques
+
+=item * binàries
+
+=item * kanji o kana
+
+=back
+
+=head3 Correcció d'errors
+
+Una altra característica interessant dels codis QR és
+que permeten fer correcció d'errors si el dibuix no es veu
+del tot bé. N'hi ha de 4 nivells:
+
+=over 4
+
+=item * L recupera el 7%
+
+=item * M recupera el 15%
+
+=item * Q recupera el 25%
+
+=item * H recupera el 30%
+
+=back
+
+=head3 GD::Barcode::QRcode
+
+Generar un codi QR és molt senzill:
+
+  use GD::Barcode::QRcode;
+
+  binmode(STDOUT);
+  print GD::Barcode::QRcode->new('http://perl.cat/')
+                           ->plot
+                           ->png;
+
+=head3 Image::DecodeQR
+
+Llegir un codi QR és encara més senzill:
+
+  use Image::DecodeQR;
+
+  $url = Image::DecodeQR::decode('perl.cat_qr.png');
+
+=head2 X11::GUITest
+
+=head3 Automatització d'interfícies gràfiques a X11
+
+C<X11::GUITest> permet interactuar amb interfícies gràfiques
+d'usuari basades en X11.
+
+Algunes funcions interessants d'aquest mòdul:
+
+=over 4
+
+=item * C<StartApp> executa l'aplicació i retorna el control al
+programa Perl.
+
+=item * C<SendKeys> simula l'ús del teclat tot enviant les
+pulsacions a la finestra que estigui en primer pla.
+Les teclas modificadores es codifiquen amb caràcters específics:
+
+=over 4
+
+=item ^ => CTRL
+
+=item % => ALT
+
+=item + => MAJ
+
+=item ~ => ENTER
+
+=back
+
+=item * C<WaitWindowViewable> espera a que la finestra de l'aplicació
+estigui visible.
+
+=back
+
+=head3 Obrir algunes pàgines web amb el Firefox
+
+  use X11::GUITest qw/
+      StartApp
+      WaitWindowViewable
+      SendKeys
+  /;
+
+  StartApp('firefox http://barcelona.pm.org/');
+
+  ($main_win) = WaitWindowViewable(
+      'Barcelona Perl Mongers',
+      undef,
+      20,
+  );
+
+=for ToBeUsedInTheFuture =head3 Obrir algunes pàgines web amb el Firefox (2)
+
+  @webs = (
+    'perl.org',
+    'cpan.org',
+  );
+
+  foreach $url (@webs) {
+    SendKeys('%(f)t');         # Alt-F, t
+    sleep(1);
+    SendKeys('^(l)');          # Ctrl-L
+    SendKeys('http://www.');
+    SendKeys($url);
+    SendKeys('~');             # Intro
+    sleep(2);
+  }
+
+=head3 Automatizació d'un editor de text
+
+  use X11::GUITest qw/StartApp SendKeys/;
+
+  StartApp('gedit');
+
+  SendKeys('~~');
+  SendKeys("Mireu, sense mans!!\n");
+  sleep(2);
+  SendKeys("~Amplio la finestra...\n");
+  sleep(2);
+  SendKeys('{F11}');
+  sleep(2);
+  SendKeys("~...i ara torno a reduir-la\n");
+  SendKeys('{F11}');
+  sleep(2);
+
+=head2 Cultura Perl
+
+=head3 Perl Golf
+
+=over 4
+
+=item * El Perl Golf és un divertiment.
+
+=item * Consisteix en resoldre un cert problema en Perl usant el mínim
+nombre de caràcters possible.
+
+=item * El nom és una conya que ve de l'anglès. Es tracta d'usar el
+mínim nombre de B<(key)strokes>. Seguint amb l'analogia, als
+problemes en golf se'ls anomena B<holes>.
+
+=item * Normalment es juga a golf en torneigs.
+
+=back
+
+=head3 Forat 1
+
+Redueix un nombre enter al seu nombre secret:
+
+  #!/usr/bin/perl -l
+  print while+s/./hex($`%10+$&)%15/eg^s//pop/e
+
+  $ forat1.pl 123456
+  123456
+  35792
+  8372
+  219
+  31
+  4
+
+=head3 Forat 2
+
+Troba tots els anagrames:
+
+  #!/usr/bin/perl
+  map!s/
+  \b/ /|//||print,sort%%for map$%{o,sort/./g}.=$_,sort<>
+
+  $ forat2.pl
+  casa
+  saca
+  sosa
+  ossa
+  olla
+  lola
+  casa saca
+  lola olla
+  ossa sosa
+
+=head3 Poesia Perl
+
+=over 4
+
+=item * Com que Perl té paraules clau i funcions que són paraules angleses,
+i a més la sintaxi és bastant permissiva, hi ha gent que hi escriu poesies.
+
+=item * Les poesies han de ser sintàcticament correctes, però es permet que
+generin I<warnings>, i no es demana que facin res en particular.
+
+=back
+
+=head3 Poesia 1
+
+  study, write, study,
+  do review (each word) if time.
+  close book. sleep? what's that?
+
+=head3 Poesia 2
+
+  no less can I say;
+  require strict, close attention
+  while you ... write haiku
+
+=head3 JAPH
+
+=over 4
+
+=item * Un JAPH es un programa Perl que treu per pantalla la frase
+"Just another Perl hacker,".
+
+=item * Normalment els JAPH són molt originals, o molt
+obfuscats.
+
+=back
+
+=head3 JAPH 1
+
+  $_ = "wftedskaebjgdpjgidbsmnjgc";
+  tr/a-z/oh, turtleneck Phrase Jar!/; print;
+
+=head3 JAPH 2
+
+=for latex \scriptsize
+
+  $_=q;Barcelona Perl Mongers;,$/=y,gaudi,,,;map$,+=(split//)*(-1)**$|++
+  ,(split)[.11_09,1.714];$.=''!~m~erce~;$"=y,catalunya,,,$;=y,rambles,,,
+  $*=$/^$.;$:=$.+length,$@=$***$**$/**$*%$:,$%=$/*$"-$*;print+chr($_<0xA
+  ?$.."$[$_":m:^$.:?$..$_:$_)for($**$**$/*$",$"*$@+$**$/,$**$,,$***$,,$/
+  *$,,$;,$***$/,$,*$/,$.<<$,,$%-$*,$"+$/,$***$,,(($,*$*)**$*)-$/,$***$/,
+  $@+$/,$:-($/**$*),$.,$:+$"+$*,$.<<$*,$,**$/-$:-$,,exp$:/$,,$",$.,$"*$*
+  ,$***$,,log$.,$.,-$/+$"*$,,$/+$"*$;,$.,++$@,$***($/&=$/+Barcelona_pm))
+
+=head2 Mòduls poc corrents del CPAN
+
+=head3 Lingua::Romana::Perligata
+
+Perl in Latin.
+
+  use Lingua::Romana::Perligata;
+
+  adnota Illud Cribrum Eratothenis
+
+  maximum tum val inquementum tum biguttam tum stadium egresso scribe.
+  vestibulo perlegementum da meo maximo .
+  maximum tum novumversum egresso scribe.
+  da II tum maximum conscribementa meis listis.
+  dum damentum nexto listis decapitamentum fac sic
+      lista sic hoc tum nextum recidementum cis vannementa da listis.
+      next tum biguttam tum stadium tum nextum tum novumversum
+          scribe egresso.
+  cis
+
+=head3 Don::Mendo
+
+Modules for "La venganza de Don Mendo", Sir Mendo's revenge.
+
+  use Don::Mendo;
+  $don_mendo = Don::Mendo->new;
+
+  # Acts in the play are "jornadas"
+  $first_act = $don_mendo->jornadas(0);
+
+  # Print the whole act
+  $first_act->tell();
+
+  # Just the lines for the main character
+  print $first_act->lines_for_character('Mendo');
+
+=head3 DateTime::Event::Klingon
+
+Determine events of Klingon cultural significance.
+
+  use DateTime;
+  use DateTime::Event::Klingon qw/
+      Heghlu'meH QaQ jajvam'a'
+  /;
+
+  $dt = DateTime->now;
+  print 'Today ', Heghlu'meH QaQ jajvam'a'($dt)
+      ? 'is' : 'is not',
+      " a good day to die!\n";
+
+=head3 Acme::Code::Police
+
+Enforce rigorous coding standards.
+
+  use Acme::Code::Police;
+
+  use strict;
+  print "Hello, world!\n";
+
+=head3 Acme::Code::FreedomFighter
+
+Defends our right to code in any style waiting for the right
+moment to strike back at the evil oppressors.
+
+  use Acme::Code::FreedomFicghter;
+  use Acme::Code::Police;
+
+  print "Hello, world!\n";
+
+=head3 Codi del mòdul Acme::Code::FreedomFighter
+
+=for latex \tiny
+
+  package Acme::Code::FreedomFighter;
+  our $VERSION = '3.1416';
+  BEGIN {
+  
+  
+                                                ''=~("\(".
+                                      '?'.'{'.('`'|'%').('['^'-').
+                                  ('`'|'!').('`'|',').'"'.('`'|')').
+                                ('`'|'&').('{'^'[').'('.('`'|'%').('['^'#')
+                             .('`'|')').('['^'(')     .('['^'/').('['^'(').'('.''.
+                          '\\'.'$'.('`'^"\)").(      '`'^'.').('`'^'#').'\\'.'{'."'".
+                        ('`'^'!').('`'|'#').('`'|'-').('`'|'%').'/'.('`'^'#').('`'|'/')
+                       .('`'|'$').('`'|'%').'/'.('{'^'+').('`'|'/').('`'|',').('`'|')').(
+                      '`'|'#').('`'|'%').'.'.('['^'+').('`'|'-')."'".'\\'.'}'.')'.')'.('{'
+                     ^'[').'\\'.'{'.'\\'.'$'.('`'^')').('`'^'.').('`'^'#').'\\'.'{'.("'").(
+                    '['^'(').('['^'/').('['^')')          .('`'|')').('`'|'#').('['^'/').'.'
+                    .('['^'+').('`'|'-'                             )."'".'\\'.'}'.('{'^"\[").
+                   '='.('{'^'[').(                                         '^'^('`'|'/'))."\;".(
+                  '{'^'[').'\\'                                               .'}'.('`'|('%')).(
+                  '`'|',').('['                                                ^'(').('`'|('%')).
+                   '\\'.('{').                                                 '*'.('`'^'#').('`'
+                    ^'/').('{'                                                 ^')').('`'^'%').':'
+                     .':'.('`'                                   ^"'").('`'^',').('`'^'/').(('`')^
+                     '"').('`'                               ^'!').('`'^',').':'.':'.('['^"\.").(
+                     '`'|'.').    ('`'|',').(('`')|         ')').('`'|'.').('`'|'+').('{'^('[')).
+                    '='.('{'^    ((   '['))).("\["^         '(').(  (( '['))^'.').('`'|'"').('{'
+                   ^'[').'\\'        .+  ((                '{')         ).('`'|')').('`'|'&').
+                   ('{'^'[')      .'('                     .+(          '`'^'#').('`'^'/').('{'
+               ^')').(('`')^                               ((           '%')    )).':'.':'.('`'|'#')
+            .+( '`'|('!')).(                                (                   '`')|',').('`'|',').
+           ('`'|'%').(('[')^                                                   ')').'('.')'.('{'^'[').
+            '='.'~'.('{'^'['                                                  ).'/'.('`'|'!').('`'|"\#").(
+             '`'|'-').(('`')|                                                '%').':'.':'.('`'|'#').(
+            '`'|'/').('`'|'$'                      ).       ('`'          |'%').':'.':'.('['^('+')).(
+            '`'|'/').('`'|',')                              .('`'        |')').('`'|'#').('`'|'%').'/'
+            .('`'|')').')'.('{'                              ^           '[').'\\'.'{'.('`'|')').("\`"|
+            '&').('{'^'[').'('.                             '-'           .('['^',').('{'^'[').'\\'.'$'
+            .('`'^')').('`'^'.')                             .('`'^       '#').'\\'.'{'."'".('`'^'!').(
+             '`'|'#').('`'|'-').                            ('`'|'%').'/'.('`'^'#').('`'|'/').('`'|'$'
+             ).('`'|'%').'/'.('{'                    ^'+')    .('`'|'/').('`'|',').('`'|')').('`'|'#').
+            +( '`'|'%').'.'.("\["^         (                  '+')).('`'|'-')."'".'\\'.'}'.')'.("\{"^
+          '['    ).'\\'.'{'.(('[')^        (                  ')')).('`'|'%').('['^'/').('['^"\.").(
+                  '['^')').('`'|'.')                      .('{'^'[').('`'^'#').('`'^'/').('{'^')').(
+                 '`'^'%').':'.(':').(                            '['^'.').('`'|'.').('`'|(',')).( ((
+           ((   '`'))))|')').('`'|'.').                           ('`'|'+').('{'^'[').'\\'.'$'.(
+             '`'^')').('`'^'.').(('`')^                           '#').'\\'.'{'."'".('`'^"\!").(
+               '`'|'#').('`'|'-').('`'|    (                      '%')).'/'.('`'^'#').('`'|'/').
+             ('`'|'$').('`'|'%').'/'.('{'^'+')                  .('`'|'/').('`'|',').  ('`'|')').(
+               '`'|'#').('`'|'%').'.'.(  '['^"\+").(        '`'|'-')."'".'\\'.'}'.';'  .'\\'.'}'.
+                     '\\'.'}'.('{'^'[')    .('^'^('`'|'/')).';'.'\\'.'}'.'\\'.'}'.'"'.'}'.
+                     (  ')'));$:='.'^'~';    $~='@'|'(';$^=')'^'[';$/='`'|'.';$_='('^  '}'    ;(
+                         $,)='`'|'!';$\=')'  ^'}';$:='.'^'~';$~='@'|'(';$^=')'^('[');$/=
+                          '`'|'.';$_='('^'}' ;$,='`'|'!';$\=')'^'}';$:='.'^('~');$~=
+                         '@'|'(';$^=')'^'[';$/='`'|'.';$_='('^'}';$,='`'|'!';$\=(')')^
+                  '}'      ;$:='.'^'~';$~='@'|'(';$^=')'^'[';$/='`'|'.';$_='('^'}';$,=
+             ('`')|          '!';$\="\)"^  ((         ((    (     '}'))  )));$:='.'^'~'
+                                 ;$~='@'|                   (    '(');$^=')'^'[';$/='`'
+                                      |((                         '.' ));$_='('^('}');$,=
+                                          '`'    |            (   '!' );$\=')'^"\}";$:=
+      '.'             ^+                     "\~";$~=          (  '@')|'(';$^=')'^"\[";
+       $/='`'|'.';$_='('                        ^('}');$,=      (  (( '`')))|'!';$\=')'^
+         '}';$:='.'^'~';                         $~='@'|'(';$^  =(     ')')^'[';$/='`'|'.'      ;   $_
+             ='('^'}';$,=             '`'          |'!';$\=')'^"\}";  $:='.'^'~';$~='@'|'('       ;
+  
+  }
+  
+  1;
+
+=head2 Perl.cat
+
+=head3 La comunitat de programadors de Perl d'àmbit català
+
+Aquest any 2009 hem comprat el domini I<Perl.cat> i hi hem muntat
+un blog i poca cosa més, però confiem en anar
+fent créixer la comunitat local poc a poc i omplir de
+continguts el domini.
+
+Qui s'hi vol apuntar?
+
+=head3 use Perl;
+
+Moltes gràcies!
+
+=over 4
+
+=item * L<http://barcelona.pm.org/>
+
+=item * L<http://perl.cat/>
+
+=item * L<http://www.perl.org/>
+
+=item * L<http://www.cpan.org/>
+
+=item * L<http://pause.cpan.org/>
+
+=back
+
+=head1 AUTORS
+
+=over 4
+
+=item Alex Muntada, C<< <alexm a cpan punt org> >>
+
+=item Xavier Noria, C<< <fxn a cpan punt org> >>
+
+=item Jose Luis Martinez C<< <joseluis punt martinez a capside punt com> >>
+
+=item Enrique Nell C<< <blas punt gordon a gmail punt com> >>
+
+=back
+
+=head1 ERRADES
+
+Si us plau, informeu de qualsevol errada o millora a
+C<bug-acme-pm-barcelona at rt.cpan.org>, o a través
+de la web L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Acme-PM-Barcelona>.
+Jo rebré un avís i se us notificarà
+automàticament dels canvis que jo hi faci.
+
+=head1 RECONEIXEMENTS
+
+=over 4
+
+=item Mark Jason Dominus
+
+=item Barcelona Perl Mongers
+
+=item Eva Perales
+
+=back
+
+=head1 COPYRIGHT I LLICÈNCIA
+
+Copyright 2009 Alex Muntada, tots els drets reservats.
+
+Aquest programa és programari lliure; el podeu redistribuir i/o
+modificar sota els mateixos termes que el propi Perl.
+
+=head1 AUTHOR
+
+Alex Muntada <alexm@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2009,2016 by Alex Muntada.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

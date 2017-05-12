@@ -1,0 +1,178 @@
+#!/usr/bin/cow
+#
+# NAME
+#
+#   hello.cow - print "Hello, World!"
+#
+# SYNOPSIS
+#
+#   hello.cow
+#
+# DESCRIPTION
+#
+#   This program prints the "Hello, World!" followed by a newline
+#   character (LF). It is equivalent to the UNIX command
+#
+#   printf 'Hello, World!\n'
+#
+# EXAMPLES
+#
+#   $ ./hello.cow
+#   Hello, World!
+#
+#   $ cow hello.cow
+#   Hello, World!
+#
+# COPYRIGHT
+#
+#   Copyright 2007-2010 Peter John Acklam.
+#
+#   This library is free software; you can redistribute it and/or modify
+#   it under the same terms as Perl itself, either Perl version 5.8.0 or,
+#   at your option, any later version of Perl 5 you may have available.
+#
+# AUTHOR
+#
+#   Author:      Peter John Acklam
+#   Time-stamp:  2010-03-27 12:51:14 +01:00
+#   E-mail:      pjacklam@online.no
+#   URL:         http://home.online.no/~pjacklam
+
+# increment the value of the first memory block to 72 (ordinal value of "H")
+
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO
+
+# print the "H"
+
+Moo
+
+# increment the value of the memory block to 101 (ordinal value of "e")
+
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO
+
+# print the "e"
+
+Moo
+
+# increment the value of the memory block to 108 (ordinal value of "l")
+
+MoO MoO MoO MoO MoO MoO MoO
+
+# print the "l" twice
+
+Moo Moo
+
+# increment the value of the memory block to 111 (ordinal value of "o")
+
+MoO MoO MoO
+
+# print the "e"
+
+Moo
+
+# rather than decrementing the ordinal value of the memory block to 44
+# (ordinal value of ","), we set its value to zero and increment
+
+OOO
+
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO
+
+# print the ","
+
+Moo
+
+# decrement the value of the memory block to 32 (ordinal value of " ")
+
+MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo
+MOo MOo
+
+# print the " "
+
+Moo
+
+# increment the value of the memory block to 87 (ordinal value of "W")
+
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO
+
+# print the "W"
+
+Moo
+
+# increment the value of the memory block to 111 (ordinal value of "o")
+
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO
+
+# print the "o"
+
+Moo
+
+# increment the value of the memory block to 114 (ordinal value of "r")
+
+MoO MoO MoO
+
+# print the "r"
+
+Moo
+
+# decrement the value of the memory block to 108 (ordinal value of "l")
+
+MOo MOo MOo MOo MOo MOo
+
+# print the "l"
+
+Moo
+
+# decrement the value of the memory block to 100 (ordinal value of "d")
+
+MOo MOo MOo MOo MOo MOo MOo MOo
+
+# print the "d"
+
+Moo
+
+# set the value of the memory block to zero and increment the value to
+# 33 (ordinal value of "!")
+
+OOO
+
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+MoO MoO MoO
+
+Moo
+
+# set the value of the memory block to zero and increment the value to
+# 10 (ordinal value of a LF/newline)
+
+OOO
+
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+
+# print the LF/newline
+
+Moo
+
+# Emacs Local Variables:
+# Emacs mode: sh
+# Emacs End:

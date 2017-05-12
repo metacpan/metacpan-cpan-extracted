@@ -1,0 +1,183 @@
+                                 Identification:
+TELESCOP= 'UKIRT, Mauna Kea, HI' / Telescope name
+INSTRUME= 'CGS4    '           / Instrument
+OBSERVER= 'nobody  '           / Observers present
+OBSREF  = '00      '           / PATT or other reference
+PROJECT = 'U/05A/25'           / Time-allocation code
+MSBID   = '4fc84b238f93cd9e6707f0a8a56831fb' / Id min.-schedulable block
+
+                                 eStar headers:
+RMTAGENT= 'none    '           / Name of remote agent
+AGENTID = 'none    '           / Unique identifier for remote agent
+
+RUN     =                   64 / Number of run
+OBJCLASS=                    0 / Class of observed object
+OBJECT  = 'star 2  '           / Object name from telescope
+
+                                 Data Reduction:
+OBSNUM  =                   64 / Number of observation
+GRPNUM  =                   58 / Number of observation group
+GRPMEM  =                    T / Group membership
+OBSTYPE = 'OBJECT  '           / Type of observation
+NOFFSETS=                    4 / Number of offset positions in a pattern
+STANDARD=                    F / Is the target a standard star observation?
+DRRECIPE= 'EXTENDED_SOURCE'    / Data-reduction recipe
+
+                                 Astrometric and time information:
+UTDATE  = 'Wednesday, 26-Jan-2005' / Weekday and date
+IDATE   =             20050126 / Date as integer
+EQUINOX =             2000.000 / [yr] Equinox of object position
+MEANRA  =            3.3295122 / [h] Object RA at equinox
+MEANDEC =           41.5259275 / [deg] Object Dec at equinox
+RABASE  =            3.3297149 / [h] Offset zero-point RA at equinox
+DECBASE =           41.5275208 / [deg] Offset zero-point Dec at equinox
+RAOFF   =               -8.192 / [arcsec] Offset RA at equinox
+DECOFF  =               -5.736 / [arcsec] Offset Dec at equinox
+AMSTART =                1.173 / Airmass at start of observation
+AMEND   =                1.181 / Airmass at end of observation
+RUTSTART=                7.116 / [h] Start time of observation
+RUTEND  =                7.186 / [h] End time of observation
+
+                                 Instrument aperture:
+APER_X  =                2.118 / [arcsec] Aperture X axis coordinate
+APER_Y  =               -5.167 / [arcsec] Aperture Y axis coordinate
+
+ISU2PORT= 'North   '           / ISU2 port name
+ISU2POFF=                   10 / ISU2 port offset
+ISU2TOFF=                   95 / ISU2 tilt offset
+GUIDFFOC=               -1.162 / Fast guider CCD fine focus
+
+IZ5     =             1232.000 / Astigmatism: IZ5
+HZ5SH   =             -890.000 / Astigmatism: HZ5SH
+HZ5CH   =              110.000 / Astigmatism: HZ5CH
+HZ5SD   =            -1530.000 / Astigmatism: HZ5SD
+HZ5CD   =                0.000 / Astigmatism: HZ5CD
+IZ6     =            -1261.000 / Astigmatism: IZ6
+HZ6SH   =             -685.000 / Astigmatism: HZ6SH
+HZ6CH   =              200.000 / Astigmatism: HZ6CH
+HZ6SD   =              165.000 / Astigmatism: HZ6SD
+HZ6CD   =              930.000 / Astigmatism: HZ6CD
+Z7      =             -968.000 / Coma: Z7
+Z8      =             1063.000 / Coma: Z8
+WEBEAM  =             -968.000 / Topend: W-E beam
+NSBEAM  =               45.000 / Topend: N-S beam
+IZ9     =             -315.000 / Trefoil: IZ9
+HZ9SH   =              169.000 / Trefoil: HZ9SH
+HZ9CH   =                0.000 / Trefoil: HZ9CH
+HZ9SD   =               90.000 / Trefoil: HZ9SD
+HZ9CD   =                0.000 / Trefoil: HZ9CD
+IZ10    =              234.000 / Trefoil: IZ10
+HZ10SH  =               74.000 / Trefoil: HZ10SH
+HZ10CH  =                0.000 / Trefoil: HZ10CH
+HZ10SD  =              -58.000 / Trefoil: HZ10SD
+HZ10CD  =                0.000 / Trefoil: HZ10CD
+Z11     =              300.000 / Spherical: Z11
+AAMP    =              589.328 / Astigmatism: amplitude
+APHI    =              -49.042 / Astigmatism: angle
+TAMP    =              290.792 / Trefoil: Amplitude
+TPHI    =               42.716 / Trefoil: angle
+AGFREQ  =               40.000 / Autoguider: Frequency
+FGMODE  = 'Fast Guider'        / Fast guider mode
+
+
+                                 Instrument configuration:
+EXPOSED =              120.000 / [s] Total exposure time for integration
+DEXPTIME=              120.000 / [s] Exposure time
+NINT    =                    2 / Number of integrations in observation
+NEXP    =                    1 / Exposures in integration
+NEXP_PH =                    0 / Exposures in each chop phase
+INTTYPE = 'STARE+NDR'          / Type of integration
+MODE    = 'ND_STARE'           / Observing mode
+DEPERDN =                6.000 / [electron/ADU] Gain
+DETINCR =                1.000 / [pixel] Increment between scan positions
+DETNINCR=                    2 / Number of scan positions in scan
+
+FILTER  = 'B1      '           / Combined filter name
+FILTERS = 'B1      '           / Combined filter name
+CHOPDIFF=                    T / Main-offset beam value stored
+IF_SHARP=                    F / Shift & add disabled
+LINEAR  =                    F / Linearisation disabled
+WPLANGLE=                0.000 / [deg] IRPOL waveplate angle
+
+DETECTOR= 'fpa046  '           / Detector array used
+DROWS   =                  178 / [pixel] Number of detectors in a readout row
+DCOLUMNS=                  256 / [pixel] Number of detectors in a readout column
+RDOUT_X1=                    1 / Start column of array readout
+RDOUT_X2=                  256 / End   column of array readout
+RDOUT_Y1=                   45 / Start row    of array readout
+RDOUT_Y2=                  222 / End   row    of array readout
+
+SANGLE  =             -125.000 / [deg] Angle of slit
+SLIT    = '0w      '           / Name of slit
+SLENGTH =               18.000 / [mm] Length of slit
+SWIDTH  =                2.000 / Width of slit
+DENCBASE=                  800 / Zeropoint (steps) of detector translation
+
+GRATING = '40_lpmm '           / Name of grating
+GLAMBDA =            1.2296880 / [um] Grating wavelength
+GANGLE  =            2.9373290 / [deg] Grating angle
+GORDER  =                    2 / Grating order
+GDISP   =            0.0011980 / [um/pixel] Grating dispersion
+
+CNFINDEX=                66429 / Index increments when hardware config. changes
+CVF     = 'open    '           / Name of CVF
+CLAMBDA =            0.0000000 / [um] CVF wavelength
+IRTANGLE=               65.743 / [deg] Image rotator angle
+LAMP    = 'off     '           / Name of calibration lamp
+BBTEMP  =             1071.716 / [K] Black body temperature
+CALAPER =                   10 / Aperture of tungsten-halogen lamp (%)
+THLEVEL =                    0 / Level of tungsten-halogen lamp
+
+                                 Environment:
+AIRTEMP =              -65.546 / [degC] Air temperature
+BARPRESS=              614.042 / Ambient pressure
+DEWPOINT=              -75.584 / [degC] Dewpoint
+DOMETEMP=                4.851 / [degC] Dome temperature
+HUMIDITY=               23.001 / Relative Humidity
+MIRR_NE =                5.139 / [degC] Mirror temperature NE
+MIRR_NW =                5.931 / [degC] Mirror temperature NW
+MIRR_SE =                4.953 / [degC] Mirror temperature SE
+MIRR_SW =                5.426 / [degC] Mirror temperature SW
+MIRRBTNW=                7.603 / [degC] Mirror bottom temp. SW
+MIRRTPNW=                6.491 / [degC] Mirror top temp. SW
+SECONDAR=                4.480 / [degC] Temperature of secondary
+TOPAIRNW=                5.612 / [degC] Top air NW
+TRUSSENE=                6.084 / [degC] Truss leg ENE
+TRUSSWSW=                4.193 / [degC] Truss leg WSW
+WIND_DIR=              265.415 / [deg] Wind direction, azimuth
+WIND_SPD=               45.026 / [km/s] Wind speed
+CSOTAU  =                0.049 / Tau at 225 GHz from CSO
+TAUDATE = '2005-01-26T07:01'   / Time and date of Tau reading
+TAUSRC  = 'CSO225GHZ'          / Source of opacity data
+
+
+                                 Engineering:
+DFOCUS  =                1.836 / Detector focus position
+RESET_DL=                0.200 / [s] NDR reset delay
+CHOP_DEL=                0.000 / [s] Chop delay
+READ_INT=                1.000 / [s] NDR read interval
+
+CLOCK0  =               -6.200 / [V] ALICE CLOCK0 voltage
+CLOCK1  =               -3.000 / [V] ALICE CLOCK1 voltage
+CLOCK2  =               -7.500 / [V] ALICE CLOCK2 voltage
+CLOCK3  =               -2.800 / [V] ALICE CLOCK3 voltage
+CLOCK4  =               -6.000 / [V] ALICE CLOCK4 voltage
+CLOCK5  =               -2.000 / [V] ALICE CLOCK5 voltage
+CLOCK6  =               -7.500 / [V] ALICE CLOCK6 voltage
+VSLEW   =                4.000 / [V] ALICE VSLEW voltage
+VDET    =               -3.020 / [V] ALICE VDET voltage
+DET_BIAS=                0.580 / [V] ALICE DET_BIAS voltage
+VDDUC   =               -3.600 / [V] ALICE VDDUC voltage
+VDETGATE=               -4.500 / [V] ALICE VDETGATE voltage
+VGG_A   =               -1.600 / [V] ALICE VGG_ACTIVE voltage
+VGG_INA =               -1.300 / [V] ALICE VGG_INACTIVE voltage
+VDDOUT  =               -1.000 / [V] ALICE VDDOUT voltage
+V3      =               -2.800 / [V] ALICE V3 voltage
+VLCLR   =               -3.000 / [V] ALICE VLCLR voltage
+VLD_A   =                4.000 / [V] ALICE VLOAD_ACTIVE voltage
+VLD_INA =                4.000 / [V] ALICE VLOAD_INACTIVE voltage
+WFREQ   =                1.000 / [Mhz] ALICE waveform state freq.
+
+
+                                 Subheader:
+DINDEX  =                    1

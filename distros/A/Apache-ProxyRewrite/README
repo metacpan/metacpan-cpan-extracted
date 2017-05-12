@@ -1,0 +1,11 @@
+Apache::ProxyRewrite acts as a reverse-proxy that will rewrite
+URLs embedded in HTML documents per apache configuration
+directives.
+ 
+This module was written to allow multiple backend services with
+discrete URLs to be presented as one service and to allow the
+proxy to do authentication on the client's behalf.
+
+See ProxyRewrite.pm pod for detailed documentation.
+
+$Id: README,v 1.1 2001/01/02 23:10:47 cgilmore Exp $

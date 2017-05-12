@@ -1,0 +1,77 @@
+{
+   "abstract" : "A Perl wrapper for the cleverbot.io API",
+   "author" : [
+      "Flavio Poletti <polettix@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "AI-CleverbotIO",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Path::Tiny" : "0.096",
+            "Template::Perlish" : "1.52",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0.070",
+            "IO::Socket::SSL" : "1.56",
+            "JSON::PP" : "0",
+            "Log::Any" : "1.045",
+            "Moo" : "2.003000",
+            "Net::SSLeay" : "1.49",
+            "Ouch" : "0.0410",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Path::Tiny" : "0.096",
+            "Test::Exception" : "0.43",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/polettix/AI-CleverbotIO/issues"
+      },
+      "homepage" : "https://github.com/polettix/AI-CleverbotIO",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/polettix/AI-CleverbotIO.git",
+         "web" : "https://github.com/polettix/AI-CleverbotIO"
+      }
+   },
+   "version" : "0.002",
+   "x_contributors" : [
+      "Flavio Poletti <flavio@polettix.it>"
+   ]
+}
+

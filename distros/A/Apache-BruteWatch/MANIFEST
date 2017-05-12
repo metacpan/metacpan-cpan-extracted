@@ -1,0 +1,6 @@
+LICENSE
+Makefile.PL
+README
+lib/Apache/BruteWatch.pm
+t/01_ini.t
+MANIFEST

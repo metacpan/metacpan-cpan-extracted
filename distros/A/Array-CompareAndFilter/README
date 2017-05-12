@@ -1,0 +1,33 @@
+Array-CompareAndFilter
+==========================
+
+Array::CompareAndFilter offers some different functions that can be used
+to compare and filter array contents. It is especially useful if arrays
+needs to be compared for 1:1 content, of same content or if the values 
+of on array is minimum listed in the other array. The filter functions 
+will cover some subtraction of arrays, the difference, merge and 
+singularize of array content.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module does not require other modules and/or libraries.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 H. Klausing. All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10 or,
+at your option, any later version of Perl 5.10 you may have available.
+
+

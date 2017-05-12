@@ -1,0 +1,17 @@
+<table align="center">
+<tr>
+: for $list -> $item {
+	<td><: $item.prompt :></td>
+	<td><input type="text" id="<: $item.id :>" size="40" value="<: $item.value :>"></td>
+	<td><: $item.type_menu :></td>
+	: if ( ($~item.count % 2) == 0) {
+		</tr>
+		: if ($~item.count < $~item.size) {
+			<tr>
+		: }
+	: }
+	: else if ($~item.count == $~item.size) {
+		</tr>
+	: }
+: }
+</table>

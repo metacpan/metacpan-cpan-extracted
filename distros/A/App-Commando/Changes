@@ -1,0 +1,13 @@
+Revision history for App-Commando
+
+0.012     2014-08-07
+          Updated documentation.
+
+0.011     2014-08-05
+          * Unknown command-line options (and other Getopt::Long warnings) now
+            result in a fatal error
+          * Updated documentation
+
+0.010     2014-08-02
+          First version, released on an unsuspecting world.
+

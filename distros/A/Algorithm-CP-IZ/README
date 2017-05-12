@@ -1,0 +1,94 @@
+Algorithm-CP-IZ version 0.02
+============================
+
+Algorithm::CP::IZ is an interface to iZ-C constraint programming library.
+This modules contains XS wrapper and simple OO interface.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Makefile.PL takes following command line options to specify path to iZ-C.
+
+  -I path_to_iz_h
+
+    Used to specify path to "iz.h".
+    (environment variable IZ_INC_DIR and some default directories are
+     used as default)
+
+  -L path_to_libiz_so
+
+    Used to specify path to "libiz.so"
+    (environment variable IZ_LIB_DIR and some default directories are
+     used as default)
+
+   On Linux platform, libiz.so must be symblic link to libiz.so.3, and
+   libiz.so.3 must be symbolic link to libiz.so.3.x.x. Create these
+   links if not exist.
+
+   On Windows platfrom (strawberry perl), you need two steps before make.
+     1. Remove CTRL-Z exists end of iz.h. (EOF character of good old CP/M)
+     2. Generate libiz.a from iz.dll.
+        (see http://www.mingw.org/wiki/msvc_and_mingw_dlls)
+        
+        $ pexports iz.dll > libiz.def
+        $ dlltool -d libiz.def -l libiz.a
+
+   And use "dmake" instead of make command.
+
+
+For more information:
+
+  L<https://github.com/tofjw/Algorithm-CP-IZ/wiki>
+
+
+DEPENDENCIES
+
+This module requires iZ-C library. This library can be downloaded from:
+
+  http://www.constraint.org/ja/izc_download.html
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2015 Toshimitsu FUJIWARA
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

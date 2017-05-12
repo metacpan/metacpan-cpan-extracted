@@ -1,0 +1,26 @@
+---
+abstract: 'Terminal app that provides an hourly weather forecast using Weather Underground API'
+author:
+  - 'David Farrell <dfarrell@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-wu
+requires:
+  Cache::FileCache: '0'
+  Carp: '0'
+  Try::Tiny: '0'
+  WWW::Wunderground::API: '0.06'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/sillymoose/App-wu
+  repository: https://github.com/sillymoose/App-wu.git
+version: '0.05'

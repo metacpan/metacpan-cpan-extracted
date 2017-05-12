@@ -1,0 +1,96 @@
+---
+abstract: 'yet another deployment tool'
+author:
+  - 'Tokuhiro Matsuno and Archer contributors.'
+build_requires:
+  IO::Scalar: '0'
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Archer
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Archer:
+    file: lib/Archer.pm
+    version: '0.18'
+  Archer::ConfigLoader:
+    file: lib/Archer/ConfigLoader.pm
+  Archer::Parallel::ForkManager:
+    file: lib/Archer/Parallel/ForkManager.pm
+  Archer::Plugin:
+    file: lib/Archer/Plugin.pm
+  Archer::Plugin::Confirm:
+    file: lib/Archer/Plugin/Confirm.pm
+  Archer::Plugin::Exec:
+    file: lib/Archer/Plugin/Exec.pm
+  Archer::Plugin::Exec::Local:
+    file: lib/Archer/Plugin/Exec/Local.pm
+  Archer::Plugin::Exec::Remote:
+    file: lib/Archer/Plugin/Exec/Remote.pm
+  Archer::Plugin::Flock:
+    file: lib/Archer/Plugin/Flock.pm
+  Archer::Plugin::MySQLDiff::Sledge:
+    file: lib/Archer/Plugin/MySQLDiff/Sledge.pm
+  Archer::Plugin::Rsync:
+    file: lib/Archer/Plugin/Rsync.pm
+  Archer::Plugin::SVN:
+    file: lib/Archer/Plugin/SVN.pm
+  Archer::Plugin::SVN::Diff:
+    file: lib/Archer/Plugin/SVN/Diff.pm
+  Archer::Plugin::SVN::Log:
+    file: lib/Archer/Plugin/SVN/Log.pm
+  Archer::Plugin::SVN::Update:
+    file: lib/Archer/Plugin/SVN/Update.pm
+  Archer::Shell:
+    file: lib/Archer/Shell.pm
+recommends:
+  File::Rsync: '0'
+  MySQL::Diff: '0'
+  SVN::Agent: '0'
+requires:
+  File::HomeDir: '0'
+  File::ShareDir: '0'
+  File::Util: '0'
+  IO::Prompt::Simple: '0'
+  Kwalify: '0'
+  List::MoreUtils: '0'
+  Net::SSH: '0'
+  Parallel::ForkManager: '0'
+  Path::Class: '0'
+  String::CamelCase: '0'
+  Template: '0'
+  Term::ANSIColor: '0'
+  UNIVERSAL::require: '0'
+  YAML: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Archer/issues
+  homepage: https://github.com/tokuhirom/Archer
+  repository: git://github.com/tokuhirom/Archer.git
+version: '0.18'
+x_contributors:
+  - 'otsune <otsune@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'mizzy <mizzy@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'walf443 <walf443@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'tokuhirom <tokuhirom@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'hirose31 <hirose31@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'tokuhirom <tokuhirom@gmail.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Songmu <y.songmu@gmail.com>'

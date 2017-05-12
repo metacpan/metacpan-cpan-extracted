@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-US" xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Email Fingerprint- and Monitoring XML Validator</title>
+<meta http-equiv="pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="no-cache" />
+<script type="text/javascript">
+  function validateXML(xml) {
+    // code for IE
+    if (window.ActiveXObject) {
+      var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+      xmlDoc.async="false";
+      xmlDoc.loadXML(document.all(xml).value);
+
+      if(xmlDoc.parseError.errorCode!=0) {
+        var txt="Error Code: " + xmlDoc.parseError.errorCode + "\n";
+        txt=txt+"Error Reason: " + xmlDoc.parseError.reason;
+        txt=txt+"Error Line: " + xmlDoc.parseError.line;
+        alert(txt);
+      } else {
+        alert("No errors found");
+      }
+    // code for Mozilla, Firefox, Opera, etc.
+    } else if (document.implementation.createDocument) {
+      var parser=new DOMParser();
+      var text=document.getElementById(xml).value;
+      var xmlDoc=parser.parseFromString(text, "text/xml");
+
+      if (xmlDoc.documentElement.nodeName=="parsererror") {
+        alert(xmlDoc.documentElement.childNodes[0].nodeValue);
+      } else {
+        alert("No errors found");
+      }
+    } else {
+      alert('Your browser cannot handle XML validation');
+    }
+  }
+
+  function validateXMLwithDTD(xml, dtd) {
+    // code for IE
+    if (window.ActiveXObject) {
+      var loadXML = document.all(xml).value;
+      loadXML = loadXML.replace( /<!DOCTYPE\s*.*\s*SYSTEM\s*".*">/gi, '');
+
+      var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+      xmlDoc.async="false";
+      xmlDoc.loadXML(document.all(dtd).value + loadXML);
+
+      if(xmlDoc.parseError.errorCode!=0) {
+        var txt="Error Code: " + xmlDoc.parseError.errorCode + "\n";
+        txt=txt+"Error Reason: " + xmlDoc.parseError.reason;
+        txt=txt+"Error Line: " + xmlDoc.parseError.line;
+        alert(txt);
+      } else {
+        alert("No errors found");
+      }
+    // code for Mozilla, Firefox, Opera, etc.
+    } else if (document.implementation.createDocument) {
+      var loadXML = document.getElementById(xml).value;
+      loadXML = loadXML.replace( /<!DOCTYPE\s*.*\s*SYSTEM\s*".*">/gi, '');
+
+      var parser=new DOMParser();
+      var text=document.getElementById(dtd).value + loadXML;
+      var xmlDoc=parser.parseFromString(text, "text/xml");
+
+      if (xmlDoc.documentElement.nodeName=="parsererror") {
+        alert(xmlDoc.documentElement.childNodes[0].nodeValue);
+      } else {
+        alert("No errors found");
+      }
+    } else {
+      alert('Your browser cannot handle XML validation');
+    }
+  }
+</script>
+</head>
+
+<body>
+<h1>Email Fingerprint- and Monitoring XML Validator</h1>
+<hr />
+<!--
+<p class="intro">Use our XML validator to syntax-check your XML.</p>
+<h2>Syntax-Check Your XML</h2>
+<p>To help you syntax-check your XML, we have created an XML validator.</p>
+<p>Paste your XML into the text area below, and syntax-check it by clicking the &quot;Validate&quot; button.</p>
+
+<form action="">
+<textarea id="validxml1" rows="10" cols="80">
+<?xml version="1.0" encoding="UTF-8"?><FingerprintEmail><Schema Value="1.0"/><Fingerprint From="BCSSPR.ATLANTIS@smals.be" To="application.monitor@smals-mvm.be" Destination="ASNMTAP" Plugin="check_BS2000-receive-mail.pl" Description="BCSSPR" Environment="PROD" Date="2008/10/28" Time="11:08:42" Epochtime="1225188522" Status="BS2000 Monitoring Status" /></FingerprintEmail>
+</textarea>
+<br />
+<input type="button" value="Validate" onclick="validateXML('validxml1')" />
+</form>
+
+<p><b>Note:</b> This only checks if your XML is &quot;Well formed&quot;. If you want to validate your XML against a DTD, see the last paragraph on this page.</p>
+
+<hr />
+-->
+<h2>Validate Your Email Fingerprint XML Against a Email Fingerprint DTD</h2>
+
+<form action="">
+<textarea cols="80" rows="23" id="validDTDFingerprintEmail" readonly="hidden">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FingerprintEmail [
+  <!ENTITY AUTHOR  "Alex Peeters">
+  <!ENTITY EMAIL   "Alex.Peeters@citap.com">
+  <!ENTITY PURPOSE "2005/11/15, dtd schema v1.0 for Fingerprint Email by XML">
+
+  <!ELEMENT FingerprintEmail (Schema, Fingerprint)>
+  <!ELEMENT Schema (#PCDATA)>
+  <!ATTLIST Schema Value CDATA #FIXED "1.0">
+  <!ELEMENT Fingerprint (#PCDATA)>
+  <!ATTLIST Fingerprint
+    From CDATA #REQUIRED
+    To CDATA #REQUIRED
+    Destination CDATA #REQUIRED
+    Plugin CDATA #REQUIRED
+    Description CDATA #REQUIRED
+    Environment (PROD|TEST|ACC|DEV|SIM|LOCAL) #REQUIRED
+    Date CDATA #REQUIRED
+    Time CDATA #REQUIRED
+    Epochtime CDATA #REQUIRED
+    Status CDATA #REQUIRED
+  >
+]>
+</textarea>
+<p>You have to validate your XML in the text area below.<br>Click the &quot;Validate&quot; button:</p>
+<textarea id="validXMLFingerprintEmail" rows="8" cols="80">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE FingerprintEmail SYSTEM "dtd/FingerprintEmail-1.0.dtd"><FingerprintEmail><Schema Value="1.0"/><Fingerprint From="alex.peeters@citap.com" To="asnmtap@citap.com" Destination="ASNMTAP" Plugin="mail-xml-citap-com.pl" Description="Mail XML plugin template for testing the 'Application Monitoring'" Environment="PROD" Date="2005/11/04/" Time="17:27:30" Epochtime="1131121650" Status="Application Monitoring Status Down" /></FingerprintEmail>
+</textarea>
+<br />
+<input type="button" value="Validate" onclick="validateXMLwithDTD('validXMLFingerprintEmail', 'validDTDFingerprintEmail')" />
+</form>
+
+<p><b>Note:</b> Only Internet Explorer will actually check your XML against the DTD. Firefox, Mozilla, Netscape, and Opera will not.</p>
+
+<hr />
+<h2>Validate Your Monitoring XML Against a Monitoring DTD</h2>
+
+<form action="">
+<textarea cols="80" rows="42" id="validDTDMonitoring" readonly="hidden">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MonitoringXML [
+  <!ENTITY AUTHOR  "Alex Peeters">
+  <!ENTITY PURPOSE "2005/12/21, DTD schema v1.0 for Monitoring by XML">
+
+  <!ELEMENT MonitoringXML (Monitoring)>
+  <!ELEMENT Monitoring (Schema, Results)>
+  <!ELEMENT Schema EMPTY>
+  <!ATTLIST Schema
+	Value CDATA #FIXED "1.0"
+  >
+  <!ELEMENT Results (Details, ErrorDetail?, ErrorStack?, Extension?)>
+  <!ELEMENT Details (#PCDATA)>
+  <!ELEMENT ErrorDetail (#PCDATA)>
+  <!ELEMENT ErrorStack (#PCDATA)>
+  <!ATTLIST Details
+	  Host CDATA #REQUIRED
+	  Service CDATA #REQUIRED
+	  Environment (PROD | TEST | ACC | DEV | SIM | LOCAL) #REQUIRED
+	  Date CDATA #REQUIRED
+	  Time CDATA #REQUIRED
+	  Epochtime CDATA #REQUIRED
+	  Status (0 | 1 | 2 | 3 | 4) #REQUIRED
+  	  StatusMessage CDATA #REQUIRED
+	  PerfData CDATA #IMPLIED
+  >
+  <!ELEMENT Extension (Element+)>
+  <!ELEMENT Element (#PCDATA)>
+  <!ELEMENT eName (#PCDATA)>
+  <!ELEMENT eDescription (#PCDATA)>
+  <!ELEMENT eType (#PCDATA)>
+  <!ELEMENT eValue (#PCDATA)>
+  <!ELEMENT ePerfData (#PCDATA)>
+  <!ATTLIST Element
+	  eName CDATA #REQUIRED
+	  eDescription CDATA #REQUIRED
+ 	  eType (INTEGER | FLOAT | STRING | ARRAY | HASH | XML | BLOB) #REQUIRED
+	  eFormat CDATA #IMPLIED
+  	  eValue CDATA #REQUIRED
+	  ePerfData CDATA #IMPLIED
+  >
+]>
+</textarea>
+<p>You have to validate your XML in the text area below.<br>Click the &quot;Validate&quot; button:</p>
+<textarea id="validXMLMonitoring" rows="28" cols="80">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MonitoringXML SYSTEM "dtd/Monitoring-1.0.dtd">
+<MonitoringXML>
+  <Monitoring>
+    <Schema Value="1.0"/>
+    <Results>
+      <Details Host="Host Name ..." Service="Service Name ..." Environment="LOCAL" Date="2005/11/04" Time="17:27:30" Epochtime="1131121650" Status="2" StatusMessage="StatusMessage ..." PerfData="'PerfData Label 1'=99ms;0;;; 'PerfData Label n'=99ms;0;;;"/>
+      <ErrorDetail><![CDATA[ErrorDetail .1.]]></ErrorDetail>
+      <ErrorStack><![CDATA[ErrorStack .1.]]></ErrorStack>
+      <Extension>
+        <Element eName="one integer" eDescription="description a" eType="INTEGER" eValue="1" ePerfData="'PerfData Label 1'=99ms;0;;; 'PerfData Label n'=99ms;0;;;"/>
+        <Element eName="one string" eDescription="description b" eType="STRING" eValue="string, no Format" ePerfData="'PerfData Label 1'=99ms;0;;; 'PerfData Label n'=99ms;0;;;"/>
+        <Element eName="one string" eDescription="description c" eType="STRING" eFormat="" eValue="string, no Perfdata"/>
+        <Element eName="one string" eDescription="description d" eType="STRING" eValue="string, no Format, no Perfdata"><![CDATA[ErrorDetail .1.]]></Element>
+      </Extension>
+    </Results>
+  </Monitoring>
+</MonitoringXML>
+</textarea>
+<br />
+<input type="button" value="Validate" onclick="validateXMLwithDTD('validXMLMonitoring', 'validDTDMonitoring')" />
+</form>
+
+<p><b>Note:</b> Only Internet Explorer will actually check your XML against the DTD. Firefox, Mozilla, Netscape, and Opera will not.</p>
+
+</body>
+</html>

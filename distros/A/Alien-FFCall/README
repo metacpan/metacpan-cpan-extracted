@@ -1,0 +1,47 @@
+NAME
+
+Alien::FFCall - an Alien package for the FFCall library (predecessor to libffi)
+
+DESCRIPTION
+
+This is maintained primarily for historical reasons. If you want a foreign
+function interface, you should look into FFI::Platypus, which uses the
+more robust and currently maintained libffi, rather than the older ffcall.
+
+This Alien package, built on Alien::Base, provides the FFCall library. FFCall
+has been surpassed by libffi and is rather hard to obtain these days, but Perl's
+original FFI module is built upon FFCall, so I decided to make it easy to distribute
+FFCall on CPAN.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+The best place to get help for this module is to file Issues on github:
+
+    https://github.com/run4flat/Alien-FFCall/issues
+
+Mostly, I don't expect that you'll want to use this module directly, but
+should look into FFI:
+
+    http://search.cpan.org/dist/FFI/
+
+AUTHOR AND COPYRIGHT
+
+Written by David Mertens, Copyright 2012 Northwestern University
+
+LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

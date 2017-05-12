@@ -1,0 +1,15 @@
+Revision history for Perl extension Acme::Test::Weather
+
+0.2	 Fri Feb 21 2003
+
+	 - Updated 'cloudy' tests to test for 'overcast' -ness
+
+	 - Ack! Removed extraneous debugging information.
+
+	 - Updated POD.
+
+0.1	 Thu Feb 20 2003
+	 
+	 - Initial public release
+
+# $Id: Changes,v 1.2 2003/02/21 19:25:34 asc Exp $

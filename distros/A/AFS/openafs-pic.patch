@@ -1,0 +1,109 @@
+--- ./src/packaging/RedHat/openafs.spec.in.orig	2010-03-08 18:31:42.000000000 +0100
++++ ./src/packaging/RedHat/openafs.spec.in	2010-04-09 13:46:11.000000000 +0200
+@@ -1537,6 +1537,8 @@
+ %defattr(-,root,root)
+ %{_libdir}/libafsauthent.a
+ %{_libdir}/libafsrpc.a
++%{_libdir}/libafsauthent_pic.a
++%{_libdir}/libafsrpc_pic.a
+ %if %{build_authlibs}
+ %{_libdir}/libafsauthent.so
+ %{_libdir}/libafsrpc.so
+--- ./src/shlibafsauthent/Makefile.in.orig	2010-03-08 18:31:42.000000000 +0100
++++ ./src/shlibafsauthent/Makefile.in	2010-04-09 13:46:11.000000000 +0200
+@@ -104,9 +104,12 @@
+ 	-ln -f -s ${LIBAFSAUTHENT} ${DEST}/lib/libafsauthent.${SHLIB_SUFFIX}
+ 	-ln -f -s ${LIBAFSAUTHENT} ${DEST}/lib/libafsauthent.${SHLIB_SUFFIX}.${LIBAFSAUTHENTMAJOR}
+ 
+-all: ${TOP_LIBDIR}/${LIBAFSAUTHENT}
++${DEST}/lib/libafsauthent_pic.a: libafsauthent_pic.a
++	${INSTALL} libafsauthent_pic.a ${DEST}/lib/libafsauthent_pic.a
+ 
+-install: ${DESTDIR}${libdir}/${LIBAFSAUTHENT}
++all: ${TOP_LIBDIR}/${LIBAFSAUTHENT} ${TOP_LIBDIR}/libafsauthent_pic.a
++
++install: ${DESTDIR}${libdir}/${LIBAFSAUTHENT} ${DESTDIR}${libdir}/libafsauthent_pic.a
+ 
+ ${LIBAFSAUTHENT}: ${LIBOBJS}
+ 	case ${SYS_NAME} in \
+@@ -120,6 +123,11 @@
+ 		${SHLIB_LINKER} -o ${LIBAFSAUTHENT} ${LIBOBJS} -L${TOP_LIBDIR} -lafsrpc ${MT_LIBS};; \
+ 	esac
+ 
++libafsauthent_pic.a: ${LIBOBJS}
++	$(RM) -f $@
++	$(AR) crv $@ ${LIBOBJS}
++	$(RANLIB) $@
++
+ audit.o: ${AUDIT}/audit.c
+ 	${CCRULE}
+ 
+@@ -282,9 +290,15 @@
+ 	-ln -f -s ${LIBAFSAUTHENT} ${DESTDIR}${libdir}/libafsauthent.${SHLIB_SUFFIX}
+ 	-ln -f -s ${LIBAFSAUTHENT} ${DESTDIR}${libdir}/libafsauthent.${SHLIB_SUFFIX}.${LIBAFSAUTHENTMAJOR}
+ 
++${DESTDIR}${libdir}/libafsauthent_pic.a: libafsauthent_pic.a
++	${INSTALL} libafsauthent_pic.a ${DESTDIR}${libdir}/libafsauthent_pic.a
++
+ ${TOP_LIBDIR}/${LIBAFSAUTHENT}: ${LIBAFSAUTHENT}
+ 	${INSTALL} ${LIBAFSAUTHENT} ${TOP_LIBDIR}/${LIBAFSAUTHENT}
+ 	-ln -f -s ${LIBAFSAUTHENT} ${TOP_LIBDIR}/libafsauthent.${SHLIB_SUFFIX}
+ 	-ln -f -s ${LIBAFSAUTHENT} ${TOP_LIBDIR}/libafsauthent.${SHLIB_SUFFIX}.${LIBAFSAUTHENTMAJOR}
+ 
+-dest: ${DEST}/lib/${LIBAFSAUTHENT}
++${TOP_LIBDIR}/libafsauthent_pic.a: libafsauthent_pic.a
++	${INSTALL} libafsauthent_pic.a ${TOP_LIBDIR}/libafsauthent_pic.a
++
++dest: ${DEST}/lib/${LIBAFSAUTHENT} ${DEST}/lib/libafsauthent_pic.a
+--- ./src/shlibafsrpc/Makefile.in.orig	2010-03-08 18:31:42.000000000 +0100
++++ ./src/shlibafsrpc/Makefile.in	2010-04-09 13:46:11.000000000 +0200
+@@ -134,15 +134,18 @@
+ 
+ LIBAFSRPC = libafsrpc.${SHLIB_SUFFIX}.${LIBAFSRPCMAJOR}.${LIBAFSRPCMINOR}
+ 
+-all: ${TOP_LIBDIR}/${LIBAFSRPC}
++all: ${TOP_LIBDIR}/${LIBAFSRPC} ${TOP_LIBDIR}/libafsrpc_pic.a
+ 
+-install: ${DESTDIR}${libdir}/${LIBAFSRPC}
++install: ${DESTDIR}${libdir}/${LIBAFSRPC} ${DESTDIR}${libdir}/libafsrpc_pic.a
+ 
+ ${DEST}/lib/${LIBAFSRPC}: ${LIBAFSRPC}
+ 	${INSTALL} ${LIBAFSRPC} ${DEST}/lib/${LIBAFSRPC}
+ 	-ln -f -s ${LIBAFSRPC} ${DEST}/lib/libafsrpc.${SHLIB_SUFFIX}
+ 	-ln -f -s ${LIBAFSRPC} ${DEST}/lib/libafsrpc.${SHLIB_SUFFIX}.${LIBAFSRPCMAJOR}
+ 
++${DEST}/lib/libafsrpc_pic.a: libafsrpc_pic.a
++	${INSTALL} libafsrpc_pic.a ${DEST}/lib/libafsrpc_pic.a
++
+ ${LIBAFSRPC}: ${LIBOBJS}
+ 	case ${SYS_NAME} in \
+ 	rs_aix4* | rs_aix5*) \
+@@ -157,6 +160,11 @@
+ 		${SHLIB_LINKER} -o ${LIBAFSRPC} ${LIBOBJS} ${MT_LIBS};; \
+ 	esac
+ 
++libafsrpc_pic.a: ${LIBOBJS}
++	$(RM) -f $@
++	$(AR) crv $@ ${LIBOBJS}
++	$(RANLIB) $@
++
+ rx_event.o: ${RX}/rx_event.c
+ 	${CCRULE}
+ 
+@@ -418,10 +426,15 @@
+ 	-ln -f -s ${LIBAFSRPC} ${DESTDIR}${libdir}/libafsrpc.${SHLIB_SUFFIX}
+ 	-ln -f -s ${LIBAFSRPC} ${DESTDIR}${libdir}/libafsrpc.${SHLIB_SUFFIX}.${LIBAFSRPCMAJOR}
+ 
++${DESTDIR}${libdir}/libafsrpc_pic.a: libafsrpc_pic.a
++	${INSTALL} libafsrpc_pic.a ${DESTDIR}${libdir}/libafsrpc_pic.a
++
+ ${TOP_LIBDIR}/${LIBAFSRPC}: ${LIBAFSRPC}
+ 	${INSTALL} ${LIBAFSRPC} ${TOP_LIBDIR}/${LIBAFSRPC}
+ 	-ln -f -s ${LIBAFSRPC} ${TOP_LIBDIR}/libafsrpc.${SHLIB_SUFFIX}
+ 	-ln -f -s ${LIBAFSRPC} ${TOP_LIBDIR}/libafsrpc.${SHLIB_SUFFIX}.${LIBAFSRPCMAJOR}
+ 
+-dest: ${DEST}/lib/${LIBAFSRPC}
++${TOP_LIBDIR}/libafsrpc_pic.a: libafsrpc_pic.a
++	${INSTALL} libafsrpc_pic.a ${TOP_LIBDIR}/libafsrpc_pic.a
+ 
++dest: ${DEST}/lib/${LIBAFSRPC} ${DEST}/lib/libafsrpc_pic.a

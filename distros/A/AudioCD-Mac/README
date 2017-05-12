@@ -1,0 +1,120 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+
+NAME
+    AudioCD::Mac - MacPerl extension for controlling Audio CDs
+
+SYNOPSIS
+        use AudioCD;
+        my $cd = new AudioCD;
+        $cd->volume(255);
+        $cd->play();
+
+DESCRIPTION
+    This is the MacPerl module to be used by the `AudioCD' module. Other
+    modules can be written for other platforms, but this one is Mac
+    specific, calling Mac OS APIs to control the CD player.
+
+FUNCTIONS
+    All functions except for `new' are methods that need to be called via
+    the `AudioCD' object. All functions attempt to return `undef' and set
+    `$^E' on failure, and unless otherwise specified, return `1' on
+    success.
+
+    Note that the data returned from the Mac OS APIs is often in BCD
+    format, but the functions that return track and time data convert it
+    to decimal.
+
+    new Should be called from `AudioCD', not `AudioCD::Mac', but should work
+        either way. Returns the object.
+
+    status
+        Returns the current status of the CD, one of: CD_PLAY, CD_PAUSE,
+        CD_MUTE, CD_FINISH, CD_ERR, CD_STOP, CD_OFFLINE.
+
+    info
+        Returns an array of information about the CD, with two sets of
+        times, one for the current track, one for the disc. The first item
+        in the list is the current track number.
+
+            #  0          1       2        3         4       5        6
+            ($t_number, $t_min, $t_sec, $t_frames, $a_min, $a_sec, $a_frames)
+                = $cd->info;
+
+    play([TRACK])
+        If called without a track number, will start from the first track
+        if stopped, or continue if paused. Otherwise will start at
+        specified track number, and continue until the CD is finished.
+
+    stop
+        Stops the CD. Time settings will likely be left at last play
+        point, not at beginning of CD.
+
+    pause
+        Will pause the CD if it is playing, or continue playing if paused.
+
+    continue
+        Will continue playing if paused.
+
+    eject
+        Will eject the CD drive. Will not unmount the volume (yet), so
+        don't use this unless the drive is empty.
+
+    volume([LEFT_VOLUME [, RIGHT_VOLUME]])
+        Sets the left and right channels to a valume from 0 to 255.
+        Returns the left and right channel volumes, unless the two have
+        the same value and the method is called in a scalar context, in
+        which case it returns just one value.
+
+        If `RIGHT_VOLUME' is not supplied, it will be set to the same
+        value as supplied in `LEFT_VOLUME'. If not values are supplied,
+        the current volume value(s) will be returned, and will remain
+        unchanged.
+
+    cd_toc
+        Returns the table of contents in an anonymous array, where each
+        element is another anonymous array, containing the track number
+        [0] and the track's starting time offset from the beginning of the
+        CD in minutes [1], seconds [2], and frames [3].
+
+    cddb_toc
+        Returns the same as above, but in a format suitable for passing to
+        the `CDDB' module.
+
+    last_track
+        Ideally, returns the last audio track number on the CD. If this
+        turns out to be wrong, let me know.
+
+TODO
+    Add support for multiple drives
+    Add support for moving forward/backward in tracks, and scanning.
+    Add support for modes (stereo/mono/etc., random/program/repeat/etc.)
+BUGS
+    `eject' is busted.  Kinda works, except for when it totally crashes
+    the computer.
+AUTHOR
+    Chris Nandor <pudge@pobox.com> http://pudge.net/
+
+    Copyright (c) 1998 Chris Nandor. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself. Please see the Perl Artistic License.
+
+VERSION
+    v0.20, Wednesday, December 9, 1998
+        Renamed to `AudioCD', added controls for Audio CD.
+
+    v0.10, Thursday, October 8, 1998
+        First version, made for Mac OS to get CDDB TOC data.
+
+SEE ALSO
+    CDDB.pm.
+
+-----BEGIN PGP SIGNATURE-----
+Version: PGPfreeware 5.0 for non-commercial use <http://www.pgp.com>
+Charset: noconv
+
+iQCVAwUBNm7s3yhcZja3bnKtAQEvOQP/U6DkjEOEhQgLvd1mo7IUldC69mfX4vEI
+3MwEbt6/DoF2Ac+BrIlO2QvWAPw9ADZ39eC0To4li4aYVc60iDxUG9zfTw7vASZo
+4o3JbQdMCjeB/yX9+vIVW0aeRhRv+/hcGmxXS+PU84y9lYW3zCsHwhuaZFTQky4m
+4JCl1FDAz5k=
+=9n7D
+-----END PGP SIGNATURE-----

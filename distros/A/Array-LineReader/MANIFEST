@@ -1,0 +1,9 @@
+Changes
+LineReader.pm
+Makefile.PL
+MANIFEST
+README
+t/00assertions.t
+t/10arrayref.t
+t/20hashref.t
+t/30direct.t

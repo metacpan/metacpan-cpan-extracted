@@ -1,0 +1,8 @@
+
+Travis Hildebrand (travis@jedi.net) was the original inspiration for
+this module.  He and Ren Maddox (renm@iname.com) came up with most of
+the additional features for this module in addition to being excellent
+beta testers and great suppliers of tons of pictures.
+
+Kevin Meltzer (perlguy@perlguy.com) for a bug report on a taint
+problem, suggestions + patches!

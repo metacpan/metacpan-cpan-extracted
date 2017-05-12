@@ -1,0 +1,23 @@
+---
+name: App-Install
+version: 0.03
+author:
+  - 'Kirrily "Skud" Robert <skud@cpan.org>'
+abstract: Install applications
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  File::Path: 0
+  File::ShareDir: 0
+  Text::Template: 0
+build_requires:
+  Test::More: 0
+provides:
+  App::Install:
+    file: lib/App/Install.pm
+    version: 0.03
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

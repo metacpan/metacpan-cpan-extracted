@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <title>AMF::Perl - Flash Remoting in Perl and Python</title>
+  <style>
+body {  
+	scrollbar-3d-light-color:		#000000; 
+	scrollbar-arrow-color:			#000066; 
+	scrollbar-base-color:			#003366; 
+	scrollbar-dark-shadow-color:	#FFFFFF; 
+	scrollbar-face-color:			#003366; 
+	scrollbar-highlight-color:		#FFFFFF; 
+	scrollbar-shadow-color:			#000000;
+	color: 							#000000;
+	font-family: 					verdana, arial, helvetica, sans-serif;
+	font-size: 						12px;
+	margin:							0px; 
+}
+
+span.text {
+	font-family: 	verdana, arial, helvetica, sans-serif;
+	font-size: 		12px;
+	color: 			#003366;
+}
+
+span.red {
+	font-family: 	verdana, arial, helvetica, sans-serif;
+	font-size: 		12px;
+	font-weight: 	bold;
+	color: 			#990000;
+}
+
+div.notes {
+	background: 	#dddddd;
+	font-family: 	Verdana, Arial, helvetica, sans-serif; 
+	font-size: 		12px; 
+	margin-left: 	10px; 
+	margin-right: 	10px; 
+	padding: 		5px; 
+	border-color: 	#000000;
+}
+
+div.tableSub {
+	background: 	#CCCCFF;
+	font-family: 	Verdana, Arial, helvetica, sans-serif;  
+	font-size: 		13px; 
+	color: 			#003366;
+	margin-left: 	0px; 
+	margin-right: 	0px; 
+	padding: 		2px; 
+	border-color: 	#000099;
+	border-size: 	2px;
+}
+	
+pre {
+	color: 			#3366CC; 
+	margin-left: 	40px; 
+	margin-right: 	40px; 
+	padding: 		10px; 
+	font-size: 		12px;
+}
+
+P {
+	font-family: 	Verdana, Arial, helvetica, sans-serif; 
+	font-size: 		11px;
+	color: 			#000000;
+}
+
+A:link    { color: #3366AA; text-decoration: none; }
+A:visited { color: #3366CC; text-decoration: none; }
+A:active  { color: #00CC99; text-decoration: none; }
+A:hover   { color: #FFFFFF; text-decoration: none; background-color: #6699CC; }
+
+A.noDec:link    { color: #000099; font-weight: bold; text-decoration: none; }
+A.noDec:visited { color: #000099; font-weight: bold; text-decoration: none; }
+A.noDec:active  { color: #000099; font-weight: bold; text-decoration: none; }
+A.noDec:hover   { color: #3366AA; font-weight: bold; text-decoration: underline; background-color: transparent; }
+
+A.plain:link    { color: #000033;  text-decoration: none; }
+A.plain:visited { color: #000033;  text-decoration: none; }
+A.plain:active  { color: #000033;  text-decoration: none; }
+A.plain:hover   { color: #3366AA;  text-decoration: none; background-color: transparent; }
+
+h2 {
+	color: 			#333333; 
+	font-size: 		20 px; 
+	font-weight: 	bold; 
+}
+
+h3 {
+	color: 			#333333; 
+	font-size: 		18 px; 
+	font-weight: 	bold; 
+}
+
+h4 {
+	color: 			#0066CC; 
+	font-size: 		14px; 
+	font-weight: 	bold;
+}	
+
+  </style>
+</head>
+<body
+ style="background-image: url(orn5.gif);">
+<div style="position: absolute; left: 20px;">
+<center>
+
+<h1>AMF::Perl - Flash Remoting in Perl and Python</h1>
+<h2>(Formerly known as Flash::FLAP)</h2>
+
+</center>
+<table cellpadding="7" cellspacing="7" border="0"
+ style="text-align: left">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;width: 400px"><br>
+      <h2> Open source Perl and Python implementation of Macromedia's AMF protocol </h2>
+			</td></tr>
+    <tr>
+      <td style="vertical-align: top;width: 400px"><br>
+
+      <a href="AMF-Perl-0.15.tar.gz">Download it! Current version is
+AMF-Perl-0.15.tar.gz.</a><br>
+   <br>
+      September 19, 2004. <a href="AMF-0.04.tar.gz">An alpha implementation of AMF in <B style="color:black;background-color:#A0FFFF">Python</B>. Version 0.04.</a> 
+      <br><br>
+      <a href="code.html">Usage instructions and code samples.</a><br>
+      <br>
+      <h2>What is this?</h2>
+      <h3> Short version<br>
+      </h3>
+      <a href="http://www.macromedia.com/software/flashremoting/">Flash
+Remoting</a> is a way for Flash movies running in a web browser to
+request structured data from the web server. The following data types
+are supported - strings, numbers, dates, arrays, dictionaries/hashes,
+objects, recordsets. Flash clients talk with the server using the AMF
+protocol, which is proprietary to Macromedia. However, it's not that
+hard to decode. <br>
+      <br>
+Using AMF::Perl, it is possible to send arbitrary
+data between client and server using very few lines of code. There is no
+need to pack complicated data structures into CGI form parameteres or
+XML strings. The coding time can be spent on better things - data
+preparation and graphical presentation, not data delivery.<br>
+      <br>
+      <h3>Long version</h3>
+<p>HTML forms are ugly. HTML itself is not well suited for presenting
+data. Everybody knows that but still uses them. However, the Rich
+Internet Client is back and it gets adopted more and         more. In
+part this has to do with Macromedia's eforts. <br>
+      <br>
+<p>Macromedia Flash has matured enough to <br>
+a) allow developers to build rich, visually attractive user interfaces
+and <br>
+b) receive data from the server in a convenient way.<br>
+      <p>But if you believe in the idea of more and more programmers
+taking a shot at developing clients in Flash, you must also see the need
+for a good data gateway between web clients (the Flash movie) and web
+servers. Macromedia offers just that in Macromedia Flash Remoting,
+available for ColdFusion, JRun, .NET, J2EE. </p>
+      <p>The Macromedia development tools are neither free nor
+open-source. The server costs go into thousands. (There are
+fully-fuctional trial versions available, though.)<br>
+However, by using Perl to implement the server-side part of the
+gateway, that part of the solution becomes free.<br>
+      </p>
+      <p> <a href="http://www.macromedia.com/software/flashremoting/">Flash
+Remoting</a> protocol (AMF) is similar to SOAP, but the protocol
+complexities are hidden from the developer. On the client side you call
+a local function, and your call is passed to the corresponding function
+on the server. Another function, a callback, is invoked by the framework
+when the data is received. On the server side you provide a handler
+with a certain name that registers certain functions, available to be
+used by the client. Everything on the server side is within the syntax
+of the server language. The client side uses ActionScript. <a
+ href="code.html">This is what the code looks like.</a><br>
+To build/export .swf files with Flash Remoting, you need to install
+Flash Remoting MX Components for free at:<br>
+http://www.macromedia.com/software/flashremoting/downloads/components/
+<br>
+This will install the scripts "NetServices.as" and "NetDebug.as" that are
+used in the ActionScript.
+      </p>
+      <p>We think that it is very important for the Open Source
+community to make this technology available in Perl and (why not?) in
+Python as well. We set out to decode the protocol, but soon discovered
+that <a href="http://amfphp.sourceforge.net/">PHP folks</a> beat us by a
+month, so we simply rewrote their code in Perl.</p>
+<p>We would like to hear the community feedback - the amount of time we
+will put into this project will be proportional to the need for it.<br>
+      <br>
+<p>Please respond if you are interested either in using AMF::Perl or in
+contributing to it.<br>
+      <br>
+      <br>
+      </td>
+			<td style="vertical-align: top;width: 400px">
+<h2>Examples</h2>
+<ul>
+<li><a href="examples/cpu/cpu.html">CPU Usage</a>
+	<br><br>
+<li><a href=examples/dataGrid/dataGrid.html>Data grid</a> that gets its data from the server as an array of objects.
+	<br><br>
+<li><a href=examples/basic/basic.html>Service discovery example</a>. It sends data from client to server and back. Now with exception handling!
+	<br><br>
+<li><a href=examples/sql/park.html>Accessing a Mysql database</a> 
+	<br><br>
+<li><a href=examples/petmarket/index.html><font color=red>PETMARKET!!!</font></a> 
+</ul>
+<h2>Applications</h2>
+<ul>
+<li>AMF::Perl is used for <a href=http://www.dnai.org/geneboy/>Geneboy</a>, a genetics educational tool written in Flash.
+<li><a href=http://www.artificially-intelligent.com/lyrics/
+>Collaborative music lyrics editor</a> by Dave Waller
+<li><a href=http://www.greetme.com>Animated greetings</a> by Jonathan Buhacoff.
+</ul>
+      <br>
+<h2>Administrivia</h2>
+<p>Authors:<br>
+      <br>
+      <a href="mailto:simonf@simonf.com"><span
+ style="font-style: italic;">Simon Ilyushchenko</span></a><br
+ style="font-style: italic;">
+      <a href="mailto:arva@cshl.edu"><span style="font-style: italic;">Adrian
+Arva</span></a><br style="font-style: italic;">
+      <br>
+<p>The initial code is based on the <a
+ href="http://amfphp.sourceforge.net/">AMF-PHP project.</a><br>
+<p>There also exists a <a href=http://www.flashorb.com>shareware (but not open-source) Java and .NET
+implementation</a> of server-side Flash Remoting.
+      <br><br>
+<p>Created on Feb 24, 2003.<br>
+      <p><a href="updates.html">Update history</a> (last updated July 06, 2004)
+<p>	Mailing list on SourceForge is set up. Please <a href=http://lists.sourceforge.net/lists/listinfo/flaph-general>go here to subscribe</a>.
+</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<br>
+<br>
+</body>
+</html>

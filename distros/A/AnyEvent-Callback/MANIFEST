@@ -1,0 +1,15 @@
+lib/AnyEvent/Callback.pm
+MANIFEST
+Makefile.PL
+Changes
+t/010-ae-cb.t
+t/030-ae-cbs.t
+t/020-pod.t
+debian/compat
+debian/rules
+debian/source/format
+debian/control
+debian/watch
+debian/changelog
+debian/copyright
+META.yml                                 Module meta-data (added by MakeMaker)

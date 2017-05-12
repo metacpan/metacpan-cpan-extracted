@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Unix::Uptime;
+use App::LoadWatcher;
+
+our $VERSION=$App::LoadWatcher::VERSION;
+
+GetOptions (
+    'l|load=f' => \my $threshold,
+    'i|interval=s' => \my $interval,
+    'c|continue' => \my $continue,
+    'h|help' => \my $help,
+    'v|version' => \my $version,
+) or pod2usage(2);
+$version and do { print "load_watcher: $VERSION\n"; exit 0 };
+pod2usage(1) if $help;
+
+$threshold ||= 1;
+$interval ||= 3;
+my @cmd = @ARGV;
+pod2usage(2) unless @cmd;
+
+while(1) {
+    my @load = Unix::Uptime->load();
+    if ( $load[0] > $threshold ) {
+        system(@cmd);
+        last unless $continue;
+    }
+    sleep $interval
+}
+
+__END__
+
+=head1 NAME
+
+load_watcher - watch load average and execute a command
+
+=head1 SYNOPSIS
+ 
+ load_watcher [options] -- [command ...]
+
+ Options:
+    -help -h                       brief help message
+    -load -l     = load average    threshold of load average
+    -interval -i = second interval seconds of checking load average
+    -continue -c                   repeat commands, defualt do not repeat
+
+=head1 AUTHOR
+
+Masahiro Nagano E<lt>kazeburo {at} gmail.comE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+

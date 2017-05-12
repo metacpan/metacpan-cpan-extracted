@@ -1,0 +1,32 @@
+---
+abstract: 'Ⓔⓝⓒⓛⓞⓢⓔⓓ Ⓐⓛⓟⓗⓐⓝⓤⓜⓔⓡⓘⓒⓢ Ⓔⓝⓒⓞⓓⓔⓡ'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-EnclosedChar
+provides:
+  Acme::EnclosedChar:
+    file: lib/Acme/EnclosedChar.pm
+    version: '0.09'
+requires:
+  Exporter: '0'
+  parent: '0'
+  perl: '5.008001'
+  utf8: '0'
+resources:
+  IRC:
+    url: irc://chat.freenode.org/#bayadev
+    web: http://webchat.freenode.net/?channels=%23bayadev
+  bugtracker: http://github.com/bayashi/Acme-EnclosedChar/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Acme-EnclosedChar
+version: '0.09'

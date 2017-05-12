@@ -1,0 +1,37 @@
+libanyevent-rfxcom-perl (1.111960-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Fri, 15 Jul 2011 23:02:03 +0100
+
+libanyevent-rfxcom-perl (1.110430-1) unstable; urgency=low
+
+  * Reduce perl version requirement to 5.8.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sat, 12 Feb 2011 10:33:02 +0000
+
+libanyevent-rfxcom-perl (1.103390-1) unstable; urgency=low
+
+  * Refactor test functions.
+  * Simpler AnyEvent::Handle usage.
+  * Ack timeout handling fix.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sun,  5 Dec 2010 22:27:34 +0000
+
+libanyevent-rfxcom-perl (1.103270-1) unstable; urgency=low
+
+  * Fix test after Device::RFXCOM change.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Tue, 23 Nov 2010 23:34:04 +0000
+
+libanyevent-rfxcom-perl (1.103240-2) unstable; urgency=low
+
+  * Fix depends.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sun, 21 Nov 2010 13:22:48 +0000
+
+libanyevent-rfxcom-perl (1.103240-1) unstable; urgency=low
+
+  * Initial CPAN release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sun, 21 Nov 2010 13:00:22 +0000

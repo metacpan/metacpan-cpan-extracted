@@ -1,0 +1,28 @@
+Acme-Thoroughly-Modern-Perl version v0.4.1
+=========================
+
+Release date: April 1, 2014
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Jim Bacon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.010001
+or, at your option, any later version of Perl 5 you may have available.
+
+DISCLAIMER
+
+As with all ACME software, this module comes with no warranties, express or
+implied, of any kind!

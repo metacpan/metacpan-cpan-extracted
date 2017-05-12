@@ -1,0 +1,7 @@
+---
+files:
+  Makefile.PL: ext/Module-Pluggable/Makefile.PL
+dirs-recursive:
+  lib/: ext/Module-Pluggable/lib/
+  t/: t/Module_Pluggable
+

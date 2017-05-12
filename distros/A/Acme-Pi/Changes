@@ -1,0 +1,27 @@
+Revision history for Acme-Pi
+
+3.141592  2016-03-14 18:04:51Z
+          - truncate $VERSION to 16 chars, to work with PAUSE's new sanity
+            checks (see https://github.com/andk/pause/issues/203)
+
+3.14159   2016-03-14 07:30:49Z
+          - updated some bits of the distribution packaging
+          - happy Pi Day 2016!
+
+3.1415    2015-04-17 14:45:27Z
+          - add $π as an exported variable
+          - remove all uses of PPI from this distribution's tooling (notably
+            Pod::Weaver) because of its inability to parse non-ascii tokens
+
+3.141     2015-03-14 20:55:41Z
+          - happy Pi Day 2015!
+
+3.14      2014-08-16 01:58:30Z
+          - toolchain advancements have resolved encoding issues in META.*
+
+3.1       2014-03-14 15:44:45Z
+          - more reference links
+          - re-released to get π into the meta keywords
+
+3         2014-03-14 13:04:25Z
+          - Initial release.

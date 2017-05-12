@@ -1,0 +1,45 @@
+---
+abstract: 'Work with a RPM'
+author:
+  - 'Chris Weyl <cweyl@alumni.drew.edu>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Archive-RPM
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Archive::RPM:
+    file: lib/Archive/RPM.pm
+    version: 0.07
+  Archive::RPM::ChangeLogEntry:
+    file: lib/Archive/RPM/ChangeLogEntry.pm
+    version: 0.07
+requires:
+  DateTime: 0
+  English: 0
+  Moose: 0
+  MooseX::AttributeHelpers: 0
+  MooseX::MarkAsMethods: 0
+  MooseX::Traits: 0
+  MooseX::Types::DateTime: 0
+  MooseX::Types::DateTimeX: 0
+  MooseX::Types::Path::Class: 0
+  Path::Class: 0
+  RPM2: 0.68
+resources:
+  homepage: http://github.com/RsrchBoy/archive-rpm/tree
+  license: http://opensource.org/licenses/lgpl-license.php
+  repository: git://github.com/RsrchBoy/archive-rpm.git
+version: 0.07

@@ -1,0 +1,22 @@
+# German messages for GNU hello.
+# Copyright (C) 1998, 2002 Free Software Foundation, Inc.
+# Karl Eichwalder <ke@suse.de>, 1998, 2000, 2001, 2002.
+# Karl Eichwalder <ke@ke.Central.DE>, 1996-97.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: GNU hello 2.0.50\n"
+"POT-Creation-Date: 2002-05-22 19:23+0200\n"
+"PO-Revision-Date: 2002-02-03 09:54+0100\n"
+"Last-Translator: Karl Eichwalder <ke@suse.de>\n"
+"Language-Team: German <de@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "hello, world\n"
+msgstr "hallo, Welt\n"
+
+msgid "Hello, world!"
+msgstr "Hallo, Welt!"
+

@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 e0099fb253f24400ac5cc88daf7577acb385ad83 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 7733f7ed88700011619055252a469bf8d5f57f8a Changes
+SHA1 db1f4a3dfe144305fa01546f556778b9c597499a INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 db794fce5430b4cf1eedd00852d758392719b8da MANIFEST
+SHA1 07822d2eb68aa88119050e658495546bcbe7c509 META.json
+SHA1 59d3d245228cb0a0fcbc5d0ba7115cf68d882c61 META.yml
+SHA1 96e539f82bc427570f0b71543ff8e199f04904fc Makefile.PL
+SHA1 7d0b015814ee762c28a4e067a0444d1ad5ebb928 README
+SHA1 14267e21d5c4db1adcb22bfdb50072660a2f267b bin/perl-metasyntactic
+SHA1 4dcbe10330456589915655b4488af608af71c66b dist.ini
+SHA1 e45c5ca5861c49ddeaa82bff7aeecc36ae389a9d doap.ttl
+SHA1 4ab81c4fd5cff20c01c2192b3e4a6e9bc7d1d435 lib/Acme/PPIx/MetaSyntactic.pm
+SHA1 095278435f36f4b49590156e2a4bef272a7b2f71 t/01basic.t
+SHA1 b0a6277556589082d81f4336fc59a2216ec0189a t/02relabel.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQQ2WoACgkQzr+BKGoqfTkZlACdHA/Sk/PjJSYlLM1s+6XVYCXq
++9UAmwegjoibDk9MMoX98t8uPsH5kyYE
+=i42R
+-----END PGP SIGNATURE-----

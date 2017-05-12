@@ -1,0 +1,17 @@
+[
+   "200",
+   "OK",
+   [
+      "Content-Type",
+      "application/json",
+      "Set-Cookie",
+      "chocolatechip=This bears no relation to any cookie set by Space Track; path=/; domain=www.space-track.org",
+      "Status",
+      "200"
+   ],
+   "\"\"",
+   {
+      "method" : "POST",
+      "uri" : "https://www.space-track.org/ajaxauth/login"
+   }
+]

@@ -1,0 +1,287 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.008_001;
+
+use Pod::Usage;
+
+use version; our $VERSION = 'v0.9.4';
+
+use App::Memcached::CLI::Main;
+
+if (__FILE__ eq $0) {
+    main()
+} else {
+    return 1;
+}
+
+sub main {
+    my $Cli_Class = 'App::Memcached::CLI::Main';
+    my $params = $Cli_Class->parse_args;
+    pod2usage(-verbose => 1) if $params->{help};
+    pod2usage(-verbose => 2) if $params->{man};
+    my $cli = $Cli_Class->new(%$params) or pod2usage(-verbose => 1);
+    $cli->run;
+}
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+B<memcached-cli> - Interactive/Batch CLI for Memcached
+
+=head1 SYNOPSIS
+
+Run an interactive CLI:
+
+    memcached-cli <HOST[:PORT] | /path/to/socket> [OPTIONS]
+    memcached-cli --addr|-a <HOST[:PORT] | /path/to/socket> [OPTIONS]
+    memcached-cli [OPTIONS]  # Connect to 127.0.0.1:11211
+
+These above turns into interactive mode like below:
+
+    memcached@SERVER:PORT>
+    memcached@SERVER:PORT> set foo Foo
+    OK
+    memcached@SERVER:PORT> add bar Bar 300
+    OK
+    memcached@SERVER:PORT> gets foo bar
+    Key:foo Value:Foo       Length:3B       Flags:0 Cas:219
+    Key:bar Value:Bar       Length:3B       Flags:0 Cas:220
+    memcached@SERVER:PORT> \cd 1  # Alias of 'cachedump'
+    Key:foo Value:Foo       Length:3B       Expire:2016-03-26 00:30:27      Flags:0 Cas:219
+    Key:bar Value:Bar       Length:3B       Expire:2016-03-26 09:53:19      Flags:0 Cas:220
+    Key:baz Value:Baz       Length:3B       Expire:2016-03-26 10:49:05      Flags:123       Cas:221
+    memcached@SERVER:PORT> delete foo
+    OK
+    memcached@SERVER:PORT> flush_all
+    OK
+    memcached@SERVER:PORT> \q     # Quit interactive mode
+
+Run as batch script:
+
+    memcached-cli [options] <command> [<args>]
+
+Show Help/Manual:
+
+    # For general usage
+    memcached-cli -h|--help
+    memcached-cli --man
+
+    # For available commands
+    memcached@SERVER:PORT> help
+    memcached@SERVER:PORT> help <command>
+
+=head1 DESCRIPTION
+
+This script runs an interactive CLI or batch utility for Memcached.
+
+In interactive mode, it connects to a specified Memcached server and
+interactively executes each command you run.
+
+In batch mode, you can execute any command which you can do in interactive mode.
+
+=head1 COMMANDS
+
+NOTE:
+
+A couple of features of following commands derives from
+L<memcached/memcached-tool|https://github.com/memcached/memcached/blob/master/scripts/memcached-tool>
+
+=over 4
+
+=item B<display|\d>
+
+Displays slabs statistics.
+
+This command comes from I<memcached/memcached-tool>.
+
+=item B<stats|\s> I<REGEXP>
+
+Shows general statistics of memcached server by C<stats> command.
+You can filter the parameters of stats by optional I<REGEXP> argument.
+
+Comes from I<memcached/memcached-tool>.
+
+=item B<settings|config|\c> I<REGEXP>
+
+Shows memcached server settings by C<stats settings> command.
+You can filter the parameters of stats by optional I<REGEXP> argument.
+
+Comes from I<memcached/memcached-tool>, too.
+
+=item B<cachedump|\cd> I<CLASS> [I<NUMBER>]
+
+Shows detailed information including expiration times of some items in specified
+slab I<CLASS>.
+
+You can specify I<NUMBER> of items to show.
+Without I<NUMBER> option, shows 20 items only by default.
+
+=item B<detaildump|\dd>
+
+Reports statistics about data access using KEY prefix. The default separator for
+prefix is ':'.
+
+If you have not enabled reporting at Memcached start-up, you can enable it by
+command C<detail on>.
+
+See man B<memcached(1)> for details.
+
+=item B<detail> I<MODE>
+
+Enables or disables stats collection for C<stats detail dump> reporting.
+
+I<MODE> should be either "on" or "off" to enable or to disable.
+
+=item B<dump_all>
+
+Dumps whole data in Memcached server.
+
+This command comes from I<memcached/memcached-tool>.
+
+Recommended to use in batch mode like bellow:
+
+    memcached-cli SERVER:PORT dump_all > /path/to/dump.txt
+
+=item B<restore_dump> I<FILE>
+
+Restore data from dump data file created by C<dump_all>.
+
+=item B<randomset|sample> [I<NUMBER> [I<MAX_LENGTH> [I<MIN_LENGTH> [I<NAMESPACE>]]]]
+
+Generates random sample data and SET all of them.
+
+By default, it generates 100 data whose length is between 1B and 1000kB with prefix "memcached-cli:sample";
+
+=item B<get> I<KEY1> [I<KEY2> ...]
+
+Gets items in memcached by specified I<KEYs> and shows their data.
+
+=item B<gets> I<KEY1> [I<KEY2> ...]
+
+Gets items with I<CAS> data in memcached by specified I<KEYs> and shows their
+data.
+
+=item B<set> I<KEY> I<VALUE> [I<EXPIRE> [I<FLAGS>]]
+
+Stores data into memcached by specified I<KEY>, I<VALUE> and optional I<EXPIRE>
+and I<FLAGS>.
+
+=item B<add> I<KEY> I<VALUE> [I<EXPIRE> [I<FLAGS>]]
+
+Stores data into memcached by specified I<KEY>, I<VALUE> and optional I<EXPIRE>
+and I<FLAGS> only when there is NO data with the same I<KEY> in the server.
+
+=item B<replace> I<KEY> I<VALUE> [I<EXPIRE> [I<FLAGS>]]
+
+Stores data into memcached by specified I<KEY>, I<VALUE> and optional I<EXPIRE>
+and I<FLAGS> only when there IS data with the same I<KEY> in the server.
+
+=item B<append> I<KEY> I<VALUE>
+
+Appends I<VALUE> after existing data in memcached which has specified I<KEY>.
+
+=item B<prepend> I<KEY> I<VALUE>
+
+Puts I<VALUE> before existing data in memcached which has specified I<KEY>.
+
+=item B<cas> I<KEY> I<VALUE> I<CAS> [I<EXPIRE> [I<FLAGS>]]
+
+Stores data into memcached by specified I<KEY>, I<VALUE> and optional I<EXPIRE>
+and I<FLAGS> only when I<CAS> of data is not changed from specified I<CAS> value.
+
+=item B<touch> I<KEY> I<EXPIRE>
+
+Update data expiration time with specified I<KEY> and I<EXPIRE>.
+
+=item B<incr> I<KEY> I<VALUE>
+
+Add numeric I<VALUE> for a data with specified I<KEY>.
+
+=item B<decr> I<KEY> I<VALUE>
+
+Subtract numeric I<VALUE> from a data with specified I<KEY>.
+
+=item B<delete> I<KEY>
+
+Deletes one item in memcached by specified I<KEY>.
+
+=item B<flush_all|flush> [I<DELAY>]
+
+Invalidates all data in memcached by C<flush_all> command.
+
+With I<DELAY> option, invalidation is delayed for specified seconds.
+
+See official documentation of I<memcached> for details.
+
+=item B<call> I<COMMAND> [I<ARGS> ...]
+
+Executes any commands given as arguments.
+
+With this command, you can execute any command against Memcached including what
+is not implemented as normal commands in this program.
+
+Here are some examples:
+
+    > call stats conns
+    > call slabs reassign 6 10
+    > call flush_all
+
+LIMITATION:
+
+Multi-lined queries like C<set> are not supported.
+
+=item B<version>
+
+Shows memcahed server version.
+
+=item B<quit|exit|\q>
+
+Exits program in interactive mode.
+
+=item B<help|\h> [I<COMMAND>]
+
+Shows available I<COMMANDs> and summary of their usage.
+
+With optional I<COMMAND> argument, shows detailed information of it.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-t|--timeout=Int>
+
+Sets connection timeout. Default is 1 seconds.
+
+=item B<-d|--debug>
+
+Shows debug logs.
+
+=back
+
+=head1 SEE ALSO
+
+L<App::Memcached::CLI::Main>,
+B<memcached(1)>,
+L<http://www.memcached.org/>
+
+=head1 AUTHORS
+
+YASUTAKE Kiyoshi E<lt>yasutake.kiyoshi@gmail.comE<gt>
+
+=head1 LICENSE
+
+Copyright (C) 2015 YASUTAKE Kiyoshi.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.  That means either (a) the GNU General Public
+License or (b) the Artistic License.
+
+=cut
+

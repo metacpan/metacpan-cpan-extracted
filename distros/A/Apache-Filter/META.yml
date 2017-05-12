@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name: Apache-Filter
+version: 1.024
+author:
+  - Ken Williams (kwilliams@cpan.org)
+abstract: Alter the output of previous handlers
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  mod_perl: 1.24_01
+provides:
+  Apache::Filter:
+    file: lib/Apache/Filter.pm
+    version: 1.024
+  Apache::PerlRunFilter:
+    file: lib/Apache/PerlRunFilter.pm
+  Apache::RegistryFilter:
+    file: lib/Apache/RegistryFilter.pm
+generated_by: Module::Build version 0.2702

@@ -1,0 +1,84 @@
+{
+   "abstract" : "Single interface to deal with file archives.",
+   "author" : [
+      "Clint Moore",
+      "Michael G Schwern (author emeritus)",
+      "Olaf Alders (current maintainer)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Archive-Any",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ],
+      "file" : [
+         "anonymize-archives"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "Archive::Zip" : "0",
+            "Cwd" : "0",
+            "File::MMagic" : "0",
+            "File::Spec::Functions" : "0",
+            "MIME::Types" : "0",
+            "Module::Find" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/oalders/Archive-Any/issues"
+      },
+      "homepage" : "https://github.com/oalders/archive-any",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/oalders/archive-any.git",
+         "web" : "https://github.com/oalders/archive-any"
+      }
+   },
+   "version" : "0.0945",
+   "x_contributors" : [
+      "jenishg <jenish.g@espn.com>",
+      "Olaf Alders <olaf@wundersolutions.com>",
+      "Philippe Bruhat (BooK) <book@cpan.org>",
+      "unknown <unknown>"
+   ]
+}
+

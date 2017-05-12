@@ -1,0 +1,52 @@
+---
+abstract: 'Code search engine'
+author:
+  - 'Jerome Eteve <jerome.eteve@gmail.com>'
+build_requires:
+  Carp::Always: '0'
+  File::Copy::Recursive: '0'
+  File::Slurp: '0'
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-CSE
+requires:
+  Carp: '0'
+  Class::InsideOut: '0'
+  Class::Load: '0'
+  DateTime: '0'
+  Encode: '0'
+  File::BaseDir: '0'
+  File::Find: '0'
+  File::MimeInfo::Magic: '0'
+  File::Slurp: '0'
+  File::stat: '0'
+  Filesys::Notify::Simple: '0'
+  Getopt::Long: '0'
+  IO::Interactive: '0'
+  JSON: '0'
+  Log::Dispatch::Syslog: '0'
+  Log::Log4perl: '0'
+  Lucy: '0.006000004'
+  Moose: '0'
+  PPI: '0'
+  Path::Class::Dir: '0'
+  Pod::Text: '0'
+  Regexp::Assemble: '0'
+  Scalar::Util: '0'
+  String::CamelCase: '0'
+  Term::ProgressBar: '2.17'
+  Text::Glob: '0.09'
+  Time::HiRes: '0'
+  XML::LibXML: '0'
+resources:
+  homepage: https://github.com/jeteve/App-CSE
+  repository: https://github.com/jeteve/App-CSE.git
+version: '0.012'

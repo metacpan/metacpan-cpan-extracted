@@ -1,0 +1,33 @@
+---
+abstract: 'plurk interface for AnyEvent-based programs'
+author:
+  - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: AnyEvent::Plurk
+name: AnyEvent-Plurk
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  AnyEvent: 5.202
+  AnyEvent::HTTP: 1.44
+  JSON: 2.15
+  Object::Event: 1.21
+  common::sense: 2.02
+  parent: 0.223
+  perl: 5.8.0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: http://github.com/gugod/AnyEvent-Plurk
+version: 0.12

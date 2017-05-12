@@ -1,0 +1,7 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Acme/RedShirt.pm
+Makefile.PL

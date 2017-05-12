@@ -1,0 +1,166 @@
+Revision history for AnyEvent-WebSocket-Client
+
+0.38      2017-01-31 13:11:24 -0500
+  - Fix skip in t/mojo_close_codes.t which requires EV to be installed
+
+0.37      2016-11-04 22:24:11 -0400
+  - Added max_payload_size to AnyEvent::WebSocket::Client and 
+    AnyEvent::WebSocket::Connection for limiting the size of
+    received frames
+  - Sending payloads larger than 65536 no longer causes an exception
+  - Added parse_error to AnyEvent::WebSocket::Connection
+
+0.36      2016-10-27 11:57:12 -0400
+  - Production version functionally identical to the 0.35_02 release.
+
+0.35_02   2016-10-25 13:04:54 -0400
+  - Added http_headers attribute which allows you to provide additional
+    arbitrary headers
+
+0.35_01   2016-10-24 18:28:00 -0400
+  - You may now specify the protocol version using the protocol_version
+    attribute for AnyEvent::WebSocket::Client.  All protocol versions
+    supported by Protocol::WebSocket should work.
+  - Added subprotocol attribute for AnyEvent::WebSocket::Client
+
+0.35      2016-08-04 13:47:36 -0400
+  - Production version functionally identical to the 0.34_01 release.
+
+0.34_01   2016-07-31 08:42:40 -0400
+  - Fixed bug where read data could be discarded when in TLS mode.
+    (gh#25 thanks Toshio Ito)
+
+0.34      2016-07-26 14:04:52 -0400
+  - Documentation improvements
+  - Production version functionally identical to the 0.33_01 release.
+
+0.33_01   2016-07-25 22:48:06 -0400
+  - Added optional code and reason arguments to $connection->close (gh#23 thanks José Joaquín Atria)
+
+0.33      2016-04-25 12:12:12 -0400
+  - t/ae_ssl.t may now be skipped by setting ANYEVENT_WEBSOCKET_TEST_SKIP_SSL
+
+0.32      2015-12-17 14:02:36 -0500
+  - URI 1.53 or better has been required for a while (if not since 0.01)
+    This is now reflected in the module metadata.
+    Thanks to Fabien Wernli (faxm0dem) for the report.
+
+0.31      2015-10-11 06:21:29 -0400
+  - Removed deprecated methods for AnyEvent::WebSocket::Connection class:
+    on_each_message
+    on_next_message
+    on_finish
+
+0.30      2015-03-03 23:33:03 -0500
+  - Require Moo 2.0, as older versions inadvertently turn on
+    fatal warnings
+
+0.29      2015-01-17 10:03:16 -0500
+  - document when deprecated methods will be removed.
+
+0.28      2014-12-08 12:43:53 -0500
+  - make confusing documentation less confusing.
+
+0.27      2014-08-20 03:54:14 -0400
+  - disable t/mojo_ssl.t since it is unreliable and we test the 
+    same features with t/ae_ssl.t now.
+
+0.26      2014-08-19 10:59:26 -0400
+  - if Crypt::Random::Source is already installed, require at least
+    version 0.08 to avoid Class::MOP deprecation warnings
+
+0.25      2014-08-11 14:35:11 -0400
+  - fix broken link in documentation
+
+0.24      2014-08-11 07:29:49 -0400
+  - documentation
+    (add a FAQ about AnyEvent that I keep getting)
+  - testing ssl
+    (without Mojo)
+
+0.23      2014-08-04 12:41:07 -0400
+  - documentation improvements
+  - use AE:: instead of AnyEvent-> for performance
+
+0.22      2014-06-19 15:33:56 -0400
+  - Mojo 5.x compat (testing only)
+
+0.21      2014-04-08 12:52:51 -0400
+  - Perl 5.8 support
+    Only useful if you force install Protocol::WebSocket, since it
+    has a failing test on 5.8
+
+0.20      2013-11-05 10:19:20 -0500
+  - prevent multiple finish callbacks in unusual cases (Toshio Ito gh#15)
+
+0.19      2013-11-04 07:26:19 -0500
+  [AE::WS::Connection enhacements (thanks Toshio Ito)]
+  - Automatically respond to a close frame with a close frame (RFC6455 5.5.1)
+  - Make sure "finish" callbacks are called only once.
+  - Automatically shutdown the socket on "finish" event. This makes sure EOF signal is sent to the peer.
+  - Refuse to send/receive frames after it sends/receives a close frame. (RFC6455 1.4, 5.5.1)
+  - Abort the connection when it receives a too huge message. The size limit is imposed by Protocol::WebSocket::Frame (RFC6455 10.4)
+  - Automatically respond to a ping frame with a pong frame of the same payload (RFC6455 5.5.2, 5.5.3)
+  - Add "masked" attribute. If set, outgoing frames are masked.
+  - Client's Connection now sets masked => true (RFC6455 5.3, 6.1).
+  - documentation
+
+0.18      2013-10-21 14:55:47 -0400
+  - documentation
+
+0.17      2013-10-16 10:58:41 -0400
+  - public API for creating Connection instance (thanks Toshio Ito gh#10)
+  - bug fix messages sent by server immediately after connect may have been lost (thanks Toshio Ito gh#12)
+
+0.16      2013-10-15 13:05:36 -0400
+  - skip ssl test if you have a bad combination of Mojolicious and Net::SSLeay (gh#11)
+
+0.15      2013-10-10 13:20:00 -0400
+  - actually require moo 1.001000, and use scalar default value
+    that feature should have been there to begin with.
+
+0.14      2013-10-10 13:09:42 -0400
+  - fix older Moo compat
+
+0.12      2013-10-10 07:07:42 -0400
+  - deprecate on_next_message, on_each_message and on_finish
+    (use $connection->on($event => sub { }) instead
+    see documentation for different calling convention.
+  - added AnyEvent::WebSocket::Message class
+  - You can now use Connection#send method to send Message
+    objects in addition to strings.
+
+0.11      2013-10-03 17:10:38 -0400
+  - fix mojo_ test plans for when mojo is not installed
+
+0.10      2013-10-03 16:55:28 -0400
+  - added a close method for the AnyEvent::WebSocket::Connection class
+  - better test coverage
+
+0.09      2013-10-03 09:42:47 -0400
+  - Fix for messages that Perl considers "false" (thanks Toshio Ito gh#4)
+
+0.08      2013-09-22 03:47:32 -0400
+  - require mojolicious 3.x or better for optional mojo tests
+    (not required for test or install)
+
+0.07      2013-09-20 10:13:32 -0400
+  - documentation
+
+0.06      2013-09-07 04:29:10 -0400
+  - require PerlX::Maybe 0.003 for "provided" method
+
+0.05      2013-09-05 15:34:56 -0400
+  - propagate connect error properly
+
+0.04      2013-08-30 09:52:42 -0400
+  - kill some memory cycles
+
+0.03      2013-08-30 08:53:30 -0400
+  - added SSL/TLS support
+
+0.02      2013-08-29 15:38:34 -0400
+  - added AnyEvent only test for when Mojo isn't installed
+
+0.01      2013-08-29 14:49:38 -0400
+  - initial version

@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+lib/Apache2/SQLRequest.pm
+lib/Apache2/SQLRequest/Config.pm
+t/htdocs/favicon.ico
+t/conf/extra.last.conf.in
+t/csv/DUAL
+t/response/TestApache/subclass.pm
+t/response/TestApache/conf.pm
+t/response/TestApache/call.pm
+t/TEST.PL
+t/conf.t

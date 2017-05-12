@@ -1,0 +1,13 @@
+#!/usr/bin/perl -w
+use strict;
+
+package App::Modular::Module::Noop;
+
+use App::Modular;
+use base qw(App::Modular::Module);
+
+sub noop {
+   return 1;
+};
+
+1;

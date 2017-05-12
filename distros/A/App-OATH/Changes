@@ -1,0 +1,10 @@
+
+1.20151002 2015-10-02 Australia/Melbourne
+
+ - Add a lock file to avoid race conditions
+ - Homedir discovery using File::HomeDir (cross platform improvements)
+ - Read password using Term::ReadPassword(::Win32) module
+
+1.20150914 2015-09-14 Australia/Melbourne
+
+ - First release

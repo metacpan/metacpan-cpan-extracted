@@ -1,0 +1,20 @@
+ChangeLog
+README
+GPL
+MANIFEST
+Makefile.PL
+Corlate.pm
+Wrapper/Makefile.PL
+Wrapper/Wrapper.pm
+Wrapper/Wrapper.xs
+Wrapper/Fortran/README
+Wrapper/Fortran/cluster_match_subs.f90
+Wrapper/Fortran/corlate.f90
+Wrapper/Fortran/define_star.f90
+Wrapper/Fortran/radec2rad.f90
+Wrapper/Fortran/libCorlate.a
+t/archive.cat
+t/new.cat
+t/wrapper.t
+t/corlate.t
+META.yml                                Module meta-data (added by MakeMaker)

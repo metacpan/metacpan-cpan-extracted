@@ -1,0 +1,28 @@
+@relation spam-b
+
+@attribute morning {Y,N}
+@attribute html    {Y,N}
+@attribute size1   {S,L}
+@attribute spam    {Y,N}
+
+@data
+Y, N, S, N
+N, Y, L, Y
+Y, Y, L, Y
+N, Y, S, Y
+N, N, S, N
+Y, Y, L, Y
+Y, Y, L, N
+N, Y, L, Y
+N, Y, L, Y
+N, Y, S, Y
+N, Y, S, Y
+N, Y, L, Y
+Y, Y, L, Y
+N, Y, L, Y
+Y, Y, L, Y
+N, Y, S, Y
+N, Y, S, Y
+Y, Y, L, Y
+Y, Y, S, Y
+N, N, S, Y

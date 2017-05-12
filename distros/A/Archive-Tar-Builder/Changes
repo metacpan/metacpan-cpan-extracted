@@ -1,0 +1,160 @@
+Version 2.0000
+
+    * Change to a versioning scheme more friendly to the mysterious
+      black box known as PAUSE
+
+    * Don't fail on EACCES when stat()ing file
+
+Version 1.9
+
+    * Fix a bug in b_find() wherein some error recovery code tried to destroy
+      the same object twice, potentially
+
+Version 1.8
+
+    [redacted for secret government purposes]
+
+Version 1.7
+
+    * Fix a variety of unit tests which depended on GNU tar availability as
+      indicated by CPANTS; make provisions for BSD tars as well
+
+    * Make t/lib-Archive-Tar-Builder_bitfile.t only run when TEST_BIGFILE=1 is
+      specified
+
+    * Don't produce archives with mismatched file sizes
+
+    * Implement 'gnu_extensions' flag to make support for arbitrarily long
+      filenames an explicit feature to enable, so as to help end developers
+      avoid producing archives that cannot be extracted by their native tar
+
+    * Set $! to ENAMETOOLONG when long filenames are detected and the
+      aforementioned 'gnu_extensions' flag is not specified
+
+    * Set $! to EINVAL when truncated files are detected
+
+    * Fix an issue in b_error_set() wherein the message actually got clobbered
+      due to a missing 'return' statement
+
+    * Retool $builder->archive_as() to display error names for archive members,
+      rather than their original filenames, in appropriate circumstances
+
+Version 1.6
+
+    * Avoid stat() calls on files excluded from archive
+
+Version 1.5
+
+    * Correct handling of files between 4 GiB & 8 GiB, inclusive
+
+Version 1.4
+
+    * Do not croak() on a warning
+
+Version 1.3
+
+    * Remove 2 GB file limit
+
+Version 1.2
+
+    * Correct handling of member names in LongLink blocks
+
+    * Correct handling of filenames between 100 and 156 characters
+
+Version 1.1
+
+    * Correct suffix length calculation for directories, so directory path
+      is set to archive_as value instead of absolutely path.
+
+Version 1.0
+
+    * Implement a large shared buffer; alleviate the need to copy tar file
+      headers and file contents from one place to another when reading and
+      writing
+
+    * Allow reading from the filesystem and writing to tar streams in large
+      blocks, thanks to a large shared buffer; no more reading and writing in
+      blocks of 512 bytes at a time, which becomes rather slow for very large
+      files
+
+    * Remove the need to memcpy() a new file header buffer for each file
+
+    * Allow the caller to specify a blocking factor in the constructor
+      Archive::Tar::Builder->new(), in multiples of 512 bytes
+
+    * Introduce a new Archive::Tar::Builder usage pattern; instead of allowing
+      caller to add "members" to the archive, new archive members are written
+      on-the-fly with the archive() and archive_as() methods, which are much
+      friendlier to making tarball streams from arbitrary parts of a filesystem
+
+    * Add 'flush()' method to Archive::Tar::Builder; allow caller to flush
+      buffers at the end of an archive
+
+    * Add 'finish()' method to Archive::Tar::Builder; allow caller to flush
+      buffers and die() if any errors are encountered at the end of an archive
+
+    * Use breadth-first, not depth-first, recursion in src/b_find.c, to prevent
+      loss of items upon extraction
+
+    * Add a 'follow_symlinks' option to Archive::Tar::Builder->new()
+
+    * Resolve an issue wherein certain long paths are split incorrectly
+
+    * Strip any leading slashes from paths generated while archiving
+
+    * As a bonus, much of the codebase has been simplified due to the unified
+      usage of a large shared buffer
+
+Version 0.9
+
+    * Resolve issues where files of certain sizes will cause no header value to
+      be written in the size field
+
+    * Ensure files >=8GB receive a proper base256-encoded size header field
+      value
+
+    * Implement a "ignore_errors" option which causes Archive::Tar::Builder to
+      not die() at the end of archiving a stream wherein non-fatal errors were
+      encountered
+
+Version 0.8
+
+    * Implemented an error handling mechanism which allows the presentation of
+      non-fatal warnings to the caller, but also causes Archive::Tar::Builder
+      to exit cleanly in otherwise fatal conditions; simple permissions issues
+      while building an archive will no longer stop the stream
+
+    * Allow caller to suppress warn()ings when archiving files
+
+Version 0.7
+
+    * No functional changes; drop unnecessary dependencies from PREREQ_PM in
+      Makefile.PL
+
+Version 0.6
+
+    * No functional changes; adds build and test support for Perl 5.6 toolchains
+      with the help of a variety of very ugly hacks in various places in unit
+      test t/lib-Archive-Tar-Builder.t
+
+Version 0.5
+
+    * Feature-for-feature reimplementation in C with a small XS layer
+
+    * Remove option of "GNU extensions"; GNU extensions are now always available
+      and use is implied
+
+    * Slightly better adherence to POSIX ustar header format, such as with ustar
+      header magic
+
+Version 0.4
+
+    * Resolve an issue of build-time modules in mk/ being picked up by
+      CPAN's indexer, resulting in an "UNAUTHORIZED RELEASE" warning, by
+      declaring the PMLIBDIRS value in Makefile.PL to include only 'lib', and
+      using a trick (thanks RURBAN!) to cause the PAUSE indexer to not pick up
+      the package declarations in the files in mk/
+
+Version 0.3
+
+    Initial release

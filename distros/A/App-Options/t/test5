@@ -1,0 +1,16 @@
+#!/usr/local/bin/perl
+
+use lib "lib";
+use lib "../lib";
+use App::Options (
+    options => [ "invoice_id", "cust_nm", "price" ],
+    option => {
+        invoice_id    => {default => 4, type => "integer"},
+        cust_nm       => {default => "Joe Smith"},
+        purchase_dttm => {default => "2003-10-31 23:59:59", type => "datetime"},
+        delivery_dt   => {type => "date"},
+        price         => {type => "float"},
+        sell_ind      => {type => '^(Y|N)$'},
+    },
+);
+

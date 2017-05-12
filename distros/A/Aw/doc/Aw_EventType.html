@@ -1,0 +1,47 @@
+<html>
+<head>
+  <title>Aw::EventType</title>
+</head>
+<body bgcolor="#f0f0f0" link="#cc0000" vlink="brown">
+
+<h1><u>Aw::EventType</u></h1>
+
+<table width="90%" border=1 bgcolor="#cccc99">
+<tr bgcolor="#bfbfbf"><th>Method</th><th>Arguments</th><th>Return</th><th>Throws<br>Exception</th></tr>
+<tr align="center"><th align="left"><a name="new"></a>new</th><td>( event_type_name )</td><td>Aw::EventType</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="DESTROY"></a>DESTROY</th><td>( )</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="delete"></a>delete</th><td>( )</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getErrorRequestTo"></a>getErrorRequestTo<br>&nbsp;&nbsp;<font size=-1>errorRequestTo</font></th><td>( [ to ] )<br><div align="left">The <code>errorRequestsTo</code> field is set if a <code>to</code> value is passed.  The current value is returned.</div></td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getInfoSets"></a>getInfoSets<br>&nbsp;&nbsp;<font size=-1>infoSets</font></th><td>( )</td><td>awVector *</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getMaxResults"></a>getMaxResults<br>&nbsp;&nbsp;<font size=-1>maxResults</font></th><td>( )</td><td>Number</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getName"></a>getName<br>&nbsp;&nbsp;<font size=-1>name</font></th><td>( )</td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getNextPublish"></a>getNextPublish<br>&nbsp;&nbsp;<font size=-1>nextPublish</font></th><td>( [ time ] )<br><div align="left">The <code>nextPublish</code> field is set if a <code>(time_t) time</code> value is passed.  The current value is returned.</div></td><td>time_t</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getPublishInterval"></a>getPublishInterval<br>&nbsp;&nbsp;<font size=-1>publishInterval</font></th><td>( [ interval ] )<br><div align="left">The <code>publishInterval</code> field is set if a <code>interval</code> value is passed.  The current value is returned.</div></td><td>Number</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getReplyName"></a>getReplyName<br>&nbsp;&nbsp;<font size=-1>replyName</font></th><td>( [ name ] )<br><div align="left">The <code>replyName</code> field is set if a <code>name</code> value is passed.  The current value is returned.</div></td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getSubscriptionFilter"></a>getSubscriptionFilter<br>&nbsp;&nbsp;<font size=-1>subscriptionFilter</font></th><td>( [ filter ] )<br><div align="left">The <code>subscriptionFilter</code> field is set if a <code>filter</code> value is passed.  The current value is returned. <b><i>Should Aw::Filter also be accepted?</i></b></div></td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="hasReply"></a>hasReply</th><td>( )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="isAutoCleanup"></a>isAutoCleanup</th><td>( )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="isPublish"></a>isPublish</th><td>( [ boolean ] )<br><div align="left">The <code>isPublish</code> field is set if a <code>boolean</code> value is passed.  The current value is returned.</div></td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="isPublishReply"></a>isPublishReply<br>&nbsp;&nbsp;<font size=-1>publishReply</font></th><td>( [ boolean ] )<br><div align="left">The <code>isPublishReply</code> field is set if a <code>boolean</code> value is passed.  The current value is returned.</div></th><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="needsAck"></a>needsAck</th><td>( )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="newSubscription"></a>newSubscription</th><td>( client )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setErrorRequestTo"></a>setErrorRequestTo</th><td>( to )</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setNextPublish"></a>setNextPublish</th><td>( )</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setPublishInterval"></a>setPublishInterval</th><td>( [ interval ] )<br><div align="left">The <code>publishInterval</code> is incremented by the <code>interval</code> value if passed or with the default value of 15.</div></td><td>Number</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setPublishReply"></a>setPublishReply</th><td>( publishReply )</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setReply"></a>setReply</th><td>( replyName )</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setSubscriptionFilter"></a>setSubscriptionFilter</th><td>( filter )</td><td>void</td><td>NO</td></tr>
+<tr bgcolor="#bfbfbf" align="left"><th colspan=4>Inherited Methods</th></tr>
+<tr align="center"><th align="left"><a name="err"></a>err</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="errmsg"></a>errmsg</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="error"></a>error</th><td>( )</td><td>Aw::Error</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="hello"></a>hello</th><td>( )<br><div align="left">Returns the string "hello".  Useful for debugging.</div></td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getWarn"></a>getWarn</th><td>( )<br><div align="left">Returns current warn <b><code>level</code></b>.</div></td><td>Number</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setWarn"></a>setWarn</th><td>( level )<br><div align="left">Sets new warn <b><code>level</code></b>.<dir>0 : No warnings (quiet mode)<br>1 : Terse (uses awErrorToString)<br>2 : Verbose (uses awErrorToCompleteString)</dir>The Aw extensions must be compiled with AWXS_WARNS defined.</div></td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="warn"></a>warn</th><td>( [string] )<br><div align="left">Warn message is <b><code>string</code></b> if passed, otherwise current err is converted to string.</div></td><td>void</td><td>YES</td></tr>
+</table>
+
+<p><hr size=3 noshade>
+
+</body>
+</html>

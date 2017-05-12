@@ -1,0 +1,11 @@
+Revision history for Perl extension App::Donburi
+
+0.03    Mon Jul  4 16:24:00 2011
+        - fixed deps, tests by tokuhirom, mikegrb
+        - add logging by tokuhirom
+
+0.02    Thu Jun 30 18:07:38 2011
+        - fixed typo
+
+0.01    Fri Jan 28 20:30:53 2011
+        - original version

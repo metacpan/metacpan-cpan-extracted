@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="NULL" type="application/x-xsp"?>
+<?xml-stylesheet href="/transforms/categories/xhtml/submit.xsl" type="text/xsl"?>
+<xsp:page
+  xmlns:xsp="http://www.apache.org/1999/XSP/Core"
+  xmlns:cat="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Category"
+  xmlns:user="http://www.kjetil.kjernsmo.net/software/TABOO/NS/User"
+  xmlns:ct="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Control"
+  xmlns:cust="http://www.kjetil.kjernsmo.net/software/TABOO/NS/CustomGrammar"
+  xmlns:param="http://www.axkit.org/2002/XSP/QueryParam"
+  xmlns:i18n="http://www.kjetil.kjernsmo.net/software/TABOO/NS/I18N">
+  <cust:category>
+    <param:if-exists name="submitted">
+      <cat:exists>
+	<cat:catname><param:get name="catname"/></cat:catname>
+	<cat:true><cust:title><i18n:insert>suggested-cat-exists</i18n:insert></cust:title></cat:true>
+	<cat:false>
+	  <cust:title><i18n:insert>suggested-cat-stored</i18n:insert></cust:title>
+	  <cat:store/>
+	</cat:false>
+      </cat:exists>
+    </param:if-exists>
+    <param:unless-exists name="submitted">
+      <cust:title><i18n:insert>submit-new-category</i18n:insert></cust:title>
+      
+
+      <ct:control element="input" type="text" name="name" size="30" maxlength="30">
+	<ct:title><i18n:insert>cat-name</i18n:insert></ct:title>
+	<ct:descr><i18n:insert>new-catfullname-descr</i18n:insert></ct:descr>
+      </ct:control>
+
+      <ct:control element="input" type="text" name="catname" size="15" maxlength="15">
+	<ct:title><i18n:insert>catname</i18n:insert></ct:title>
+	<ct:descr><i18n:insert>new-catname-descr</i18n:insert></ct:descr>
+      </ct:control>
+
+      
+      <ct:control element="select" name="type">
+	<ct:title><i18n:insert>cattype</i18n:insert></ct:title>
+	<ct:descr><i18n:insert>new-cattype-descr</i18n:insert></ct:descr>
+	<user:is-authorized authlevel="1">
+	  <user:true>
+	    <option value="frees"><i18n:insert>frees-menu</i18n:insert></option>
+	  </user:true>
+	</user:is-authorized>
+	<user:is-authorized authlevel="4">
+	  <user:true>
+	    <option value="categ"><i18n:insert>category-menu</i18n:insert></option>	   
+	    <option value="angle"><i18n:insert>angles-menu</i18n:insert></option>	  
+	  </user:true>
+
+	</user:is-authorized>
+	<user:is-authorized authlevel="6">	  
+	  <user:true>
+	    <option value="stsec"><i18n:insert>sections-menu</i18n:insert></option>
+	  </user:true>
+	</user:is-authorized>
+      </ct:control>
+
+
+      <ct:control element="input" type="text" name="description" size="80" maxlength="254">
+	<ct:title>
+	  <i18n:insert>cat-description</i18n:insert>
+	</ct:title>
+  	<ct:descr><i18n:insert>cat-description-descr</i18n:insert></ct:descr>
+      </ct:control>
+      
+      <ct:control element="input" type="text" name="uri" size="60" maxlength="254">
+	<ct:title>
+	  <i18n:insert>uri</i18n:insert>
+	</ct:title>
+  	<ct:descr><i18n:insert>cat-uri-descr</i18n:insert></ct:descr>
+      </ct:control>
+      
+      
+      <ct:control element="input" type="submit" name="submitted"> 
+	<ct:value><i18n:insert>register</i18n:insert></ct:value>
+      </ct:control>
+    </param:unless-exists>
+
+  </cust:category>
+</xsp:page>

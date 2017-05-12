@@ -1,0 +1,64 @@
+#!/home/ivan/bin/perl
+
+use strict;
+use warnings;
+
+use AnnoCPAN::Config;
+use AnnoCPAN::DBI;
+use AnnoCPAN::Perldoc::DBI;
+
+create_tables();
+copy_notes();
+
+sub copy_notes {
+    my $notes = AnnoCPAN::DBI::Note->retrieve_all;
+    while (my $note = $notes->next) {
+        print "note $note\n";
+        my $pd_note = AnnoCPAN::Perldoc::DBI::Note->create({
+            id   => $note->id,
+            note => $note->note,
+            user => $note->user->username,
+            time => $note->time,
+        });
+        for my $notepos ($note->notepos) {
+            next unless $notepos->is_visible;
+            my $podver = $notepos->podver;
+
+            my $pd_podver = AnnoCPAN::Perldoc::DBI::PodVer->retrieve(
+                signature => $notepos->podver->signature);
+            unless ($pd_podver) {
+                $pd_podver = AnnoCPAN::Perldoc::DBI::PodVer->create({
+                    name      => $podver->name,
+                    signature => $podver->signature,
+                });
+            }
+
+            AnnoCPAN::Perldoc::DBI::NotePos->create({
+                note   => $pd_note,
+                pos    => $notepos->section->pos,
+                podver => $pd_podver,
+            });
+        }
+    }
+}
+
+sub create_tables {
+    my $dsn   = AnnoCPAN::Config->option('annopod_dsn');
+    my ($fname) = $dsn =~ /dbname=(.*)/;
+    unlink $fname;
+    my $dbh = DBI->connect($dsn) or die $@;
+
+    # read schema
+    open F, '<', 'annopod.sqlite' or die;
+    my @tables = do { local $/ = ';'; <F> };
+    pop @tables;
+
+    # create tables
+    for my $sql (@tables) {
+        my ($name) = $sql =~ /(create.*?)\(/s;
+        $dbh->do($sql) or die "Error with SQL command <<<$sql>>>:$@";
+    }
+    $dbh->disconnect or die $@;
+}
+
+

@@ -1,0 +1,37 @@
+{
+   "abstract" : "terminal key input using C<libtermkey> with C<AnyEvent>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-TermKey",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : 0,
+            "Term::TermKey" : "0.08"
+         }
+      }
+   },
+   "provides" : {
+      "AnyEvent::TermKey" : {
+         "file" : "lib/AnyEvent/TermKey.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02"
+}

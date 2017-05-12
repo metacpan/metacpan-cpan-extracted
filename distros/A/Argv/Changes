@@ -1,0 +1,309 @@
+Revision history for Perl extension Argv.
+
+0.01  Thu May 27 14:32:34 1999
+	- original version; created by h2xs 1.18
+
+0.25  Tue Nov  2 22:42:50 EST 1999
+	- first CPAN release. NKNTW
+
+0.26  Tue Nov  9 19:36:17 EST 1999
+	- Fix Windows autoquoting for paths ending in \
+
+0.27  Thu Nov 11 09:37:06 EST 1999
+	- Fix Windows autoquoting again - turn embedded newlines back
+	into a literal "\n" so the &*@# cmd shell can turn it BACK.
+
+0.28  Thu Nov 11 22:09:44 EST 1999
+	- Bugfix: if ->qx has options but no args
+	- Removed unused ->script method.
+
+0.29  Sun Nov 14 12:55:37 EST 1999
+	- added Argv->count class method for metrics collection
+
+0.30  Mon Nov 15 12:05:47 EST 1999
+	- Bugfix: change shell quoting on Unix to be closer to Win32
+	  (quote embedded double-quotes, then double-quote the
+	  entire word, rather than try to use single quotes on Unix
+	  and the above on Windows).
+
+0.32  Tue Nov 16 16:01:56 EST 1999
+	- Added an integration with IPC::ChildSafe. This
+	  allows a user to request that commands be run
+	  in the context of a single co-process rather
+	  than doing a new fork/exec for each one.
+
+0.33  Fri Nov 19 11:45:44 EST 1999
+	- Fixed a bug in Argv->quote method.
+
+0.34  Mon Nov 29 13:03:31 EST 1999
+	- Lots of POD work.
+	- Implemented inheritance of attributes when constructor used
+	  as an instance method.
+	- Renamed exported qxargv() to qv().
+	- Modified many methods to return the object in 'set' mode.
+
+0.35  Wed Dec  8 23:22:54 EST 1999
+	- Some cosmetic work.
+	- Improved integration with IPC::ChildSafe with quoting fixes.
+
+0.39  Thu Dec 16 21:58:20 EST 1999
+	- Renamed 'ipc' method to 'childsafe'.
+	- Renamed 'dfltopts' method to 'dfltsets'.
+	- Added 'stdopts' method.
+	- Allow config data to be specified for methods calling
+	  Getopt::Long::GetOptions().
+
+0.40  Fri Dec 17 20:25:13 EST 1999
+	- Added 'autofail' method.
+	- Cleaned up PODs some.
+	- Reformatted to 4-space indenting.
+
+0.41 Wed Jan  5 12:31:18 EST 2000
+	- Renamed 'nativepath' to 'pathnorm'.
+	- Worked on 'stdopts' method.
+	- Removed overcomplicated 'dbglevel' stuff.
+
+0.42 Sun Jan  9 18:15:39 EST 2000
+	- POD work
+	- Fixed quoting bug.
+	- Defer errors to caller in ipc_childsafe call.
+
+0.45 Fri Jan 14 21:42:12 EST 2000
+	- Added anon-hash metthod of setting attrs
+	- Implemented non-sticky context-sensitive attrs.
+	- Implemented ->stdout(2) and ->stderr(1), etc.
+	- Renamed stdopts method to attropts.
+	- push(@EXPORT_OK, MSWIN) constant.
+
+0.46 Sun Jan 16 06:18:11 EST 2000
+	- bugfix in functional interface
+
+0.47 Tue Jan 18 21:09:41 EST 2000
+	- Regularized handling of qx/qv/ccqv/etc
+
+0.48 Sun Jan 30 22:40:17 EST 2000
+	- Renamed 'systemxargs' to 'syxargs'.
+	- Renamed 'pathnorm' to 'inpathnorm', and added
+	  an 'outpathnorm' method as well.
+	- Renamed 'cmd' method to 'argv' (to avoid
+	  confusion with $self->ipc_cleartool->cmd()
+	  method.
+	- Added ->syfail and ->qxfail attributes.
+	- Allow hashref attr specifiers to have a leading '-'.
+
+0.49 Wed Feb  2 14:56:04 EST 2000
+	- Bugfix - qx() was overwriting stderr output with stdout
+	  when both were redirected, in ipc_childsafe mode.
+	- Added an "exception-handling" capability. The autofail
+	  attr can be a code-ref indicating a function to
+	  call on failure, or an array-ref of which the first
+	  element is a code-ref as above and the remainder
+	  constitutes the arguments to pass to said sub.
+	- Allow constructor to be called as ->clone to clone
+	  an existing instance.
+	- Reworked ipc_childsafe to only allow derived classes
+	  access to the coprocess (since the base class cannot
+	  directly support it).
+	- Reworked attropts() to allow prefix_pattern to be specified.
+	- Normalised -dbglevel output somewhat - made normal mode
+	  show returned data at dbglevel >= 2 since ipc mode does so.
+
+0.50 Wed Feb 16 11:52:40 EST 2000
+	- Added experimental AUTOLOAD capability, analogous
+	  to "perldoc Shell".
+
+0.51 Mon Apr  3 17:26:46 EDT 2000
+	- The 'quote' method now returns $self instead of @_.
+	  This is to emphasize the fact that it modifies @_ in place.
+	- Propagate class attributes into the env to set the defaults
+	  for child processes.
+	- Cleaned up issues related to Getopt::Long::Configure and
+	  default settings.
+
+0.54 Thu Aug 10 11:54:14 EDT 2000
+	- Compatibility for old Data::Dumper builds without Dumpxs.
+
+0.55 Thu Nov 30 15:14:29 EST 2000
+	- Bugfix for case where ->exec returns on UNIX.
+	- Bugfix: previous versions silently removed '--' from @ARGV.
+	- POD work.
+
+----------------------------------------------------------------------------
+
+1.00 Wed Aug 29 00:10:24 EDT 2001
+	= Test Env: Solaris 8/Win2K SP2/Perl 5.6/CC 4.2
+	- Fixed a bug in the interaction with IPC::ChildSafe;
+	  the status from system() wasn't being correctly returned
+	  in coprocess mode.
+	- Added a ->quiet() attribute which suppresses stdout from
+	  system and exec (but not qx).
+	- Minor cosmetic fix: in verbose mode, quote whitespace
+	  so the resulting cmdline can be pasted back into a shell.
+	- Insist on a modern (>=2.23) Getopt::Long for simplicity.
+	- Bugfixes contributed by Silvio Wanka of alcatel.de.
+	- Try to use Clone or Storable modules for cloning if present;
+	  they're significantly faster. (Then removed Clone again
+	  for now, it's not ready for prime time).
+	- Minor new feature: the ->autofail exception-handling
+	  mechanism now allows a scalar-ref; the scalar will be
+	  incremented for each execution error.
+	- Improved verbosity (dbglevel=1) to show when cmd lines
+	  are split up for syxargs() reasons.
+	- Bugfix in ->summary class method.
+	- Recognizing that the API has reached maturity,
+	  I've moved the version to indicate a released state.
+	  I'll try hard to stay compatible with 1.00 in
+	  subsequent releases.
+
+1.01 Mon Sep  3 21:53:25 EDT 2001
+	- More cleanups of ->summary class method; try to make
+	  invocation and argument counts agree better.
+	- Bugfix in ->argv method.
+
+1.02 Tue Sep 25 10:17:42 EDT 2001
+	- *COMPATIBILITY ALERT*: The ->inpathnorm attribute now
+	  defaults to OFF on Windows (it's always been a no-op on
+	  UNIX so the only effect is on Windows). In previous
+	  versions the default was ON. Programs which depended on
+	  this default must now set it explicitly.
+	- Reworked ->outpathnorm to be overrideable. This does not
+	  change any semantics in Argv per se.
+
+1.03 Wed Oct  3 11:56:58 EDT 2001
+	- Added ->envp method to specify a custom environment for
+	  the child process.
+	- Added ->dump method (debugging aid).
+	- Defined a meaning for dbglevel=2; it now shows the $? from
+	  each child process.
+	- Defined a meaning for dbglevel=3; it now invokes ->dump before
+	  each execution.
+
+1.04 Thu Nov  1 10:52:36 EST 2001
+	- Clean up and release 1.03 work (1.03 was never released).
+
+1.05 Tue Nov 20 21:48:36 EST 2001
+	- Minor cleanup work.
+	- bugfix in ->warning method
+	- bugfix in interface to IPC::ChildSafe
+
+1.06 Fri Dec 21 07:54:24 EST 2001
+	- bugfix to let subclasses interface with their own
+	  in-process implementations.
+
+1.07 Sun Jan 13 22:23:38 EST 2002
+	- Cosmetic improvements to -> envp work (tighter scoping, no
+	  semantic effect).
+	- Cosmetic improvement to dbglevel=1 verbosity quoting.
+	- Fixed ->exec return codes on Windows ($?<<=8).
+
+1.08 Tue Mar  5 14:37:51 EST 2002
+	- Added ->readonly attribute. Helpful with ->noexec (see).
+
+1.09 Wed May  8 17:13:42 EDT 2002
+	- Changed autoquoting strategy to always respect single
+	  quotes on 'arg', escape "arg" to look like \"arg\", and
+	  allow a particular arg to opt out of autoquoting by
+	  prepending "^" as in ^arg.
+
+1.10 Tue Jul 22 10:35:41 EDT 2003
+	- Fixed contact data.
+
+1.11 Wed Dec 31 12:37:08 EST 2003
+	- Allow negative arguments to ->qxargs() and ->syxargs()
+	  to specify a maximum command-line length. As a special
+	  case, a value of -1 means to look up and use ARG_MAX.
+	  Also, the default was changed to -1. Thus cmd lines are
+	  now limited by length according to the OS limit instead
+	  of an arbitrary number.
+	  This was suggested by, and a sample implementation was
+	  provided by, Alex Harper of Digital Motorworks.
+	- Bugfix: chunked qx() would continue past a failed chunk
+	  and lose $?. It still continues but now remembers $?.
+	- Feature: the ->argv() method now returns the entire
+	  command line when called with no arguments.
+
+1.12 Thu Jan 29 12:31:07 EST 2004
+	- Added ->lastresults method for use in exception handlers.
+
+1.13 Fri Oct 29 17:57:01 EDT 2004
+	- Fixed a typo reported by Leo Sager which caused internal
+	  and external redirections to confuse each other.
+
+1.14 Mon Mar 14 11:13:42 EST 2005
+	- Allow ->stdout() and ->stderr() to specify any EXPR
+	  which is valid to open(), e.g. ->stdout(">>/tmp/foo");
+	- Show redirections in verbosity output.
+	- Previously, when std{in,out,err} were turned off, this was
+	  done by closing the handle. Now, the handle is connected to
+	  the null device (/dev/null or NUL) instead because closing
+	  these standard descriptors can raise complications.
+	- Various other cleanups vis-a-vis the -std*() redirection methods.
+	- Improve ->inpathnorm() reliability.
+	- Fix to autoquoting: on windows globbing is not handled
+	  by the shell so we let '*' go by.
+
+1.15 Tue Mar 29 23:47:15 EST 2005
+	- Show file redirections using \ on Windows.
+	- Removed CORE:: from exec functions: unnecessarily
+	  constrictive for users.
+	- Bugfix: enhanced redirection code was not working right
+	  for ->qx (reported by Andrew Maguire).
+	- Renamed the ->dump method to ->objdump to avoid name
+	  conflicts. I doubt anyone ever used this explicitly
+	  (if I'm wrong, sorry!).
+
+1.16 Tue Oct 24 14:40:00 EDT 2006
+	- Accepted patches contributed by Kenneth Olving implementing
+	  the new ->pipe method and surrounding support code for Win32:
+	-   Ensure cloning code also 'clones' the pipe callback
+	-   Added code in Makefile.PL to tell user about optional modules
+	    useful for the ->pipe method on Win32.
+	-   Updated docs and fixed some typos.
+
+1.17 Fri Oct 27 10:29:33 EDT 2006
+	- Minor documentation tweaks.
+
+1.18 Fri Oct 27 10:39:50 EDT 2006
+	- Fixed a minor POD typo.
+
+1.19 Wed Dec 27 11:25:31 EST 2006
+	- No change - dealing with CPAN versioning mistake.
+
+1.20 Tue Apr 24 08:55:06 EDT 2007
+	- Unreleased.
+	- Minor bugfix from Kenneth Olving for ->pipe method on Win32.
+	- Fix POD formatting bug.
+
+1.21 Thu Jul 26 07:12:03 EDT 2007
+	- A little more POD work.
+
+1.22 Thu Aug  2 16:02:34 EDT 2007
+	- Feature: "Inherit class attributes from subclass class attributes"
+	  added to support new work in ClearCase::Argv.
+
+1.23 Fri Sep  5 10:21:25 BST 2008
+	- Fix for ClearCase::Argv in fork mode: let double-quotes pass through
+	  in unix (revert part of change in 1.09)
+
+1.24 Sat Feb 21 19:54:58 EST 2009
+	- Fixed an uninitialized-value warning.
+
+1.25 Sat Jan  9 22:01:29 GMTST 2010
+     	- Fix contributed by Ken Ölwing to a regression introduced in 1.23 for the
+	  Windows case: double-quotes must be quoted.
+	- Minimal support for Cygwin.
+
+1.26 Mon Mar  8 06:11:24 GMTST 2010
+        - Protection against undef errors in command.
+	- Escape backslashes under cygwin
+	- Fix contributed by Stephen Rauch: handling same name as opt and arg
+
+1.27 Sun Jun  5 08:26:02 EDT 2011
+	- Fix contributed by Stephen Rauch: some verbosity was going to
+	  stdout instead of stderr where it should.
+	- remove defined(%Argv::Summary): deprecated in Perl 5.12
+	- silenced a spurious(?) 5.12 redefinition warning around exec.
+
+1.28 Sat Jan 26 18:15:48 CET 2013
+        - Restored Argv::Summary functionality, disabled by the previous fix.
+	  Fixes contributed by Marc Girod.

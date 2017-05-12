@@ -1,0 +1,9 @@
+
+0.03
+   * Alien::Base::ModuleBuild used in config_requires
+
+0.02
+   * licence field in Build.PL corrected
+
+0.01
+   * Initial release

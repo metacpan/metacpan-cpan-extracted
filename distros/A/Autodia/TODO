@@ -1,0 +1,25 @@
+To Do
+-----
+This file contains the things that I plan to do in the near future
+
+Redesign Diagram class to be a template class and move much of its logic
+into UMLDiagram class, this would allow AutoDia to handle different types
+of diagram.
+
+Write some new handlers for perl, PHP and Python using semantic parsing and grammars
+rather than hacked home rolled parsers.
+
+Add more error checking to ensure the application copes better with less
+sane code.
+
+Correctly layout components and relationships using a more complex layout
+system.
+
+Add an XML based configuration or policy system allowing you to predefine settings and
+even specify handlers and pattern matching without having to get your hands dirty in the
+code.
+
+Add ability to split projects into multiple diagrams and group contents of
+a diagram/subdir into system boxes - much improving clarity in big
+projects.
+

@@ -1,0 +1,29 @@
+Version 0.002 | 2012-03-16
+
+    Resolved Issues/Bug Fixes:
+     * Contact list SOAP URLs were changed in official client
+
+    Notes:
+     * There's a lot of incomplete stuff in this dist. If you see internal
+         debug/devel msgs on the console, don't worry about 'em.
+
+Version 0.001 | 2011-06-11
+
+    API Changes/Compatibility Information:
+     * ...see below
+
+    Resolved Issues/Bug Fixes:
+     * ...see below
+
+    Internal/Behavioral Changes:
+     * It actually exists
+
+    Documentation/Sample Code/Test Suite:
+     * ...see above
+
+    Notes:
+     * ...see... Oh, you get the point.
+
+_ -.-. .... .- -. --. . ... _________________________________________
+For more information, see the commit log:
+    http://github.com/sanko/anyevent-msn/commits/master/

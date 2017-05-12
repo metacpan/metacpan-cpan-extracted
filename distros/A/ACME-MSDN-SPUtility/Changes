@@ -1,0 +1,12 @@
+Revision history for ACME-MSDN-SPUtility
+
+0.01    2009.04.01/ 07:00 CST
+        First version, released on an unsuspecting world.
+0.02	2009.04.02/ 21:30 CST
+		Fix POD encoding, disable initialize();
+0.03	2009.04.03/ 21:26 CST
+		Fix few typo
+0.04	2009.04.04/ 15:44 CST
+		added Perl6::Say in Makefile.PL
+		to avoid make test error on darwin <http://www.nntp.perl.org/group/perl.cpan.testers/2009/04/msg3617464.html>
+

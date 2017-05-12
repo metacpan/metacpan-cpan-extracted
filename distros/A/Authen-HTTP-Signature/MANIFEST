@@ -1,0 +1,21 @@
+Build.PL
+Changes
+ignore.txt
+lib/Authen/HTTP/Signature.pm
+lib/Authen/HTTP/Signature/Method/HMAC.pm
+lib/Authen/HTTP/Signature/Method/RSA.pm
+lib/Authen/HTTP/Signature/Parser.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/01-basic-sign.t
+t/02-basic-verify.t
+t/03-hmac.t
+t/04-parser.t
+t/manifest.t
+t/pod.t
+t/t.pl
+t/version.t

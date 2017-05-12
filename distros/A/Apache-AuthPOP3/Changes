@@ -1,0 +1,9 @@
+Revision history for Apache-AuthPOP3
+
+0.02    03/12/2006
+        Fixed bug in importing constants.
+        Dropped pod-coverage test for now.
+
+0.01    03/09/2006
+        First version.
+

@@ -1,0 +1,4 @@
+This text file is converted to opish, by the test program in the t/
+directory, by saying:
+
+perl -MAcme::Opish -wle 'enop("../eg/test.txt")'

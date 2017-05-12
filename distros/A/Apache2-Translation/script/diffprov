@@ -1,0 +1,318 @@
+#!perl
+
+use strict;
+use Getopt::Long;
+use TX::Escape qw/html_esc/;
+use Encode;
+
+my (@old, @new, $notes, $numbers, $key, $uri, $json);
+
+sub config {
+  my $help;
+  Getopt::Long::Configure(qw/no_ignore_case/);
+  $notes=1;
+  $numbers=1;
+  GetOptions('old=s{,}'=>\@old,
+	     'new=s{,}'=>\@new,
+	     'notes!'=>\$notes,
+	     'numbers!'=>\$numbers,
+	     'key=s'=>\$key,
+	     'uri=s'=>\$uri,
+	     'json!'=>\$json,
+	     'h'=>\$help) && !$help or do {
+	       warn <<"USAGE";
+diffprov -h | [-nonotes] [-nonumbers] [-key KEY] [-uri URI] [-json] \
+              -old OLD... -new NEW...
+ compares 2 Apache2::Translation providers. Output as HTML table without
+ the surrounding <table></table> tags or as JSON array.
+
+ OLD, NEW specify the 2 providers.
+          Both expect an arbitrary number of string parameters. The first
+          string defines the provider type, e.g. File for
+          Apache2::Translation::File. All other strings are parameters
+          for the provider constructor.
+
+ Example:
+   (
+    echo echo '<html><body><table>'
+    diffprov -o File NotesDir notes ConfigFile trans \
+             -n MMapDB FileName trans.mmdb -nonotes
+    echo echo '</table></body></html>'
+   ) >diff.html
+
+ -nonotes    differences in notes only are disregarded
+ -nonumbers  disregard differences in BLOCK or ORDER fields only if the
+             resulting block order is the same
+ -key        compute the differences only for keys matching that regexp
+ -uri        compute the differences only for uris matching that regexp
+ -json       JSON output instead of HTML
+ -h          print this help
+USAGE
+	       exit 1;
+	     };
+}
+
+config;
+
+if( $json ) {
+  eval "require JSON::XS";
+  die "Need JSON::XS to produce JSON output.\n" if $@;
+} else {
+  eval "require Algorithm::Diff";
+  die "Need Algorithm::Diff to produce HTML output.\n" if $@;
+}
+
+my ($old, $new)=map {
+  my @param=@$_;
+  my $type=shift @param;
+  if( eval "require Apache2::Translation::$type" ) {
+    $type="Apache2::Translation::$type";
+    warn "Using $type (@param)\n";
+  } else {
+    eval "require $type" and warn "Using $type (@param)\n";
+  }
+  $type->new(@param) or die "$type->new(@param) ==> undef\n";
+} \@old, \@new;
+
+$old->start;
+$new->start;
+my @diff=$old->sdiff(
+		     $new,
+		     (defined $key ? (key=>qr/$key/) : ()),
+		     (defined $uri ? (uri=>qr/$uri/) : ()),
+		     notes=>$notes,
+		     numbers=>$numbers,
+		    );
+$new->stop;
+$old->stop;
+
+if( $json ) {
+  print JSON::XS::encode_json([map {$_->[0] eq 'u' ? () : [do {
+    my $l=$_;
+    local $_;
+    map {
+      ref $_
+	? [
+	   Encode::decode('utf8', $_->[0]), # key
+	   Encode::decode('utf8', $_->[1]), # uri
+	   $_->[2],			    # block
+	   $_->[3],			    # order
+	   Encode::decode('utf8', $_->[4]), # action
+	   Encode::decode('utf8', $_->[5]), # note
+	  ]
+	: ''
+    } @{$l}[1,2];
+  }]} @diff]);
+  exit 0;
+}
+
+sub TD {
+  if( @_==2 ) {
+    "    <td ".$_[0]."><div>".$_[1]."</div></td>\n";
+  } else {
+    "    <td><div>".$_[0]."</div></td>\n";
+  }
+}
+
+sub TR {
+  if( ref $_[0] ) {
+    my $style=${shift()};
+    "  <tr $style>\n".join('', @_)."  </tr>\n";
+  } else {
+    "  <tr>\n".join('', @_)."  </tr>\n";
+  }
+}
+
+sub blockdiff {
+  my @t1=split /\n/, $_[0], -1;
+  my @t2=split /\n/, $_[1], -1;
+  my @diff=Algorithm::Diff::sdiff(\@t1, \@t2);
+  my ($t1, $t2)=('','');
+
+  for my $el (@diff) {
+    if( $el->[0] eq 'u' ) {
+      $t1.=html_esc($el->[1])."\n";
+      $t2.=html_esc($el->[2])."\n";
+    } elsif( $el->[0] eq '-' ) {
+      $t1.='<span class="plus">'.html_esc($el->[1])."</span>\n";
+      $t2.="<span class=\"miss\"> </span>\n";
+    } elsif( $el->[0] eq '+' ) {
+      $t1.="<span class=\"miss\"> </span>\n";
+      $t2.='<span class="plus">'.html_esc($el->[2])."</span>\n";
+    } elsif( $el->[0] eq 'c' ) {
+      $t1.='<span class="chg">'.html_esc($el->[1])."</span>\n";
+      $t2.='<span class="chg">'.html_esc($el->[2])."</span>\n";
+    }
+  }
+
+  return $t1, $t2;
+}
+
+sub key {
+  if( 'u' eq shift ) {
+    return TR(\'class="firstline equal"',
+	      TD('class="col1"', "<b>Key:</b>&nbsp;".html_esc($_[0]->[0])),
+	      TD('class="col2"', "<b>Key:</b>&nbsp;".html_esc($_[1]->[0])));
+  }
+  if( ref $_[0] and ref $_[1] ) {
+    if( $_[0]->[0] eq $_[1]->[0] ) {
+      return TR(\'class="firstline"',
+		TD('class="col1"', "<b>Key:</b>&nbsp;".html_esc($_[0]->[0])),
+		TD('class="col2"', "<b>Key:</b>&nbsp;".html_esc($_[1]->[0])));
+    } else {
+      return TR(\'class="firstline"',
+		TD('class="attn col1"',
+		   "<b>Key:</b>&nbsp;".html_esc($_[0]->[0])),
+		TD('class="attn col2"',
+		   "<b>Key:</b>&nbsp;".html_esc($_[1]->[0])));
+    }
+  } elsif( ref $_[0] ) {
+    return TR(\'class="firstline"',
+	      TD('class="attn col1"',"<b>Key:</b>&nbsp;".html_esc($_[0]->[0])),
+	      TD('class="col2"', '&nbsp;'));
+  } else {			# ref $_[1]
+    return TR(\'class="firstline"',
+	      TD('class="col1"', '&nbsp;'),
+	      TD('class="attn col2"',"<b>Key:</b>&nbsp;".html_esc($_[1]->[0])));
+  }
+}
+
+sub uri {
+  if( 'u' eq shift ) {
+    return TR(\'class="equal"',
+	      TD('class="col1"', "<b>Uri:</b>&nbsp;".html_esc($_[0]->[1])),
+	      TD('class="col2"', "<b>Uri:</b>&nbsp;".html_esc($_[1]->[1])));
+  }
+  if( ref $_[0] and ref $_[1] ) {
+    if( $_[0]->[1] eq $_[1]->[1] ) {
+      return TR(TD('class="col1"', "<b>Uri:</b>&nbsp;".html_esc($_[0]->[1])),
+		TD('class="col2"', "<b>Uri:</b>&nbsp;".html_esc($_[1]->[1])));
+    } else {
+      return TR(TD('class="attn col1"',
+		   "<b>Uri:</b>&nbsp;".html_esc($_[0]->[1])),
+		TD('class="attn col2"',
+		   "<b>Uri:</b>&nbsp;".html_esc($_[1]->[1])));
+    }
+  } elsif( ref $_[0] ) {
+    return TR(TD('class="attn col1"',"<b>Uri:</b>&nbsp;".html_esc($_[0]->[1])),
+	      TD('class="col2"', '&nbsp;'));
+  } else {			# ref $_[1]
+    return TR(TD('class="col1"', '&nbsp;'),
+	      TD('class="attn col2"',"<b>Uri:</b>&nbsp;".html_esc($_[1]->[1])));
+  }
+}
+
+sub blockorder {
+  if( 'u' eq shift ) {
+    return TR(\'class="equal"',
+	      TD('class="col1"',
+		 "<b>Block:</b>&nbsp;".html_esc($_[0]->[2]).
+		 ", <b>Order:</b>&nbsp;".html_esc($_[0]->[3])),
+	      TD('class="col2"',
+		 "<b>Block:</b>&nbsp;".html_esc($_[1]->[2]).
+		 ", <b>Order:</b>&nbsp;".html_esc($_[1]->[3])));
+  }
+  if( ref $_[0] and ref $_[1] ) {
+    if( $_[0]->[2] == $_[1]->[2] and
+	$_[0]->[3] == $_[1]->[3] ) {
+      return TR(TD('class="col1"',
+		   "<b>Block:</b>&nbsp;".html_esc($_[0]->[2]).
+		   ", <b>Order:</b>&nbsp;".html_esc($_[0]->[3])),
+		TD('class="col2"',
+		   "<b>Block:</b>&nbsp;".html_esc($_[1]->[2]).
+		   ", <b>Order:</b>&nbsp;".html_esc($_[1]->[3])));
+    } else {
+      return TR(TD('class="attn col1"',
+		   "<b>Block:</b>&nbsp;".html_esc($_[0]->[2]).
+		   ", <b>Order:</b>&nbsp;".html_esc($_[0]->[3])),
+		TD('class="attn col2"',
+		   "<b>Block:</b>&nbsp;".html_esc($_[1]->[2]).
+		   ", <b>Order:</b>&nbsp;".html_esc($_[1]->[3])));
+    }
+  } elsif( ref $_[0] ) {
+    return TR(TD('class="attn col1"',
+		 "<b>Block:</b>&nbsp;".html_esc($_[0]->[2]).
+		 ", <b>Order:</b>&nbsp;".html_esc($_[0]->[3])),
+	      TD('class="col2"', '&nbsp;'));
+  } else {			# ref $_[1]
+    return TR(TD('class="col1"', '&nbsp;'),
+	      TD('class="attn col2"',
+		 "<b>Block:</b>&nbsp;".html_esc($_[1]->[2]).
+		 ", <b>Order:</b>&nbsp;".html_esc($_[1]->[3])));
+  }
+}
+
+sub action {
+  if( 'u' eq shift ) {
+    return TR(\'class="equal"',
+	      TD('class="col1"',
+		 "<b>Action:</b>&nbsp;<pre>".html_esc($_[0]->[4])."</pre>"),
+	      TD('class="col2"',
+		 "<b>Action:</b>&nbsp;<pre>".html_esc($_[1]->[4])."</pre>"));
+  }
+  if( ref $_[0] and ref $_[1] ) {
+    if( $_[0]->[4] eq $_[1]->[4] ) {
+      return TR(TD('class="col1"',
+		   "<b>Action:</b>&nbsp;<pre>".html_esc($_[0]->[4])."</pre>"),
+		TD('class="col2"',
+		   "<b>Action:</b>&nbsp;<pre>".html_esc($_[1]->[4])."</pre>"));
+    } else {
+      my ($t1, $t2)=blockdiff($_[0]->[4], $_[1]->[4]);
+      return TR(TD('class="attn col1"',
+		   "<b>Action:</b>&nbsp;<pre>".$t1."</pre>"),
+		TD('class="attn col2"',
+		   "<b>Action:</b>&nbsp;<pre>".$t2."</pre>"));
+    }
+  } elsif( ref $_[0] ) {
+    return TR(TD('class="attn col1"',
+		 "<b>Action:</b>&nbsp;<pre>".html_esc($_[0]->[4])."</pre>"),
+	      TD('class="col2"', '&nbsp;'));
+  } else {			# ref $_[1]
+    return TR(TD('class="col1"', '&nbsp;'),
+	      TD('class="attn col2"',
+		 "<b>Action:</b>&nbsp;<pre>".html_esc($_[1]->[4])."</pre>"));
+  }
+}
+
+sub note {
+  if( 'u' eq shift ) {
+    return TR(\'class="lastline equal"',
+	      TD('class="col1"',
+		 "<b>Note:</b>&nbsp;<pre>".html_esc($_[0]->[5])."</pre>"),
+	      TD('class="col2"',
+		 "<b>Note:</b>&nbsp;<pre>".html_esc($_[1]->[5])."</pre>"));
+  }
+  if( ref $_[0] and ref $_[1] ) {
+    if( $_[0]->[5] eq $_[1]->[5] ) {
+      return TR(\'class="lastline"',
+		TD('class="col1"',
+		   "<b>Note:</b>&nbsp;<pre>".html_esc($_[0]->[5])."</pre>"),
+		TD('class="col2"',
+		   "<b>Note:</b>&nbsp;<pre>".html_esc($_[1]->[5])."</pre>"));
+    } else {
+      my ($t1, $t2)=blockdiff($_[0]->[5], $_[1]->[5]);
+      return TR(\'class="lastline"',
+		TD('class="attn col1"',
+		   "<b>Note:</b>&nbsp;<pre>".$t1."</pre>"),
+		TD('class="attn col2"',
+		   "<b>Note:</b>&nbsp;<pre>".$t2."</pre>"));
+    }
+  } elsif( ref $_[0] ) {
+    return TR(\'class="lastline"',
+	      TD('class="attn col1"',
+		 "<b>Note:</b>&nbsp;<pre>".html_esc($_[0]->[5])."</pre>"),
+	      TD('class="col2"', '&nbsp;'));
+  } else {			# ref $_[1]
+    return TR(\'class="lastline"',
+	      TD('class="col1"', '&nbsp;'),
+	      TD('class="attn col2"',
+		 "<b>Note:</b>&nbsp;<pre>".html_esc($_[1]->[5])."</pre>"));
+  }
+}
+
+my $n=0;
+for my $el (@diff) {
+  $n++;
+  print(key(@{$el}), uri(@{$el}), blockorder(@{$el}), action(@{$el}),
+	note(@{$el}));
+}

@@ -1,0 +1,136 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Getopt::Long;
+use Config::General;
+use Pod::Usage;
+use Data::Dumper;
+use File::Basename;
+use Sys::Hostname;
+
+use Alvis::Convert;
+
+use Alvis::NLPPlatform;
+use Alvis::NLPPlatform::Convert;
+
+use Encode;
+
+my $man = 0;
+my $help = 0;
+my $rcfile ;
+
+my $current_dir;
+my $dirfile;
+my $file;
+
+warn "\nRunning Ogmios (Alvis NLP Platform) version " . $Alvis::NLPPlatform::VERSION . "\n\n";
+
+GetOptions('help|?' => \$help, man => \$man, "rcfile=s" => \$rcfile) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+if ((defined $rcfile) && (($rcfile eq "") || (!(-f $rcfile)))) {
+    warn "No such config file or config file is not set\n";
+    pod2usage(1);
+} 
+
+my %config = &Alvis::NLPPlatform::load_config($rcfile);
+
+
+
+my $mm = Alvis::NLPPlatform::Convert::load_MagicNumber(\%config);
+
+my $AlvisConverter = Alvis::NLPPlatform::Convert::html2alvis_init(\%config);
+
+my $HOSTNAME=hostname;
+my $doc;
+
+if (scalar @ARGV == 0) {
+
+    warn "Missing file or directory to analyse\n";
+    die "Try '" . basename($0) . " --help' for more information.\n";
+}
+
+
+foreach $file (@ARGV) {
+    if (-f $file) {
+	print STDERR "Converting the file $file ...\n";
+
+	# Insure that Input files will be returned
+
+	$config{"CONVERTERS"}->{"StoreInputFiles"} = 0;
+
+ 	$doc =  Alvis::NLPPlatform::Convert::conversion_file_to_alvis_xml($file, $AlvisConverter, \%config, $mm);
+
+ 	Alvis::NLPPlatform::standalone(\%config, $HOSTNAME, $doc);
+	print STDERR "\tdone\n";
+	
+    } else { 
+	if (-d $file) {
+	    $current_dir = $file;
+	    opendir DIR, $file;
+	    while ($dirfile = readdir DIR) {
+		if (($dirfile ne ".") && ($dirfile ne "..")) {
+		    push @ARGV, "$current_dir/$dirfile";
+		}
+	    }
+	    closedir DIR;
+	}
+    }
+}
+
+exit 0;
+
+
+__END__
+
+
+=head1 NAME
+
+ogmios-standalone - Perl script for linguistically annotating files
+given in argument and in various format (PDF, Word, etc.).
+
+=head1 SYNOPSIS
+
+ogmios-standalone [options] [<] [Input_document | Directory] > Annotated_Output_Document
+
+=head1 OPTIONS
+
+=over 4
+
+=item    B<--help>            brief help message
+
+=item    B<--man>             full documentation
+
+=item    B<--rcfile=file>     read the given configuration file
+
+=back
+
+=head1 DESCRIPTION
+
+This script linguistically annotates the document given in the
+standard input. Documents can be in various formats. They are firstly
+converted in the ALVIS XML format.  The annotated document is sent to
+the standard output.
+
+The linguistic annotation depends on the configuration variables and
+dependencies between annotation levels.
+
+=head1 SEE ALSO
+
+Alvis web site: http://www.alvis.info
+
+=head1 AUTHORS
+
+Thierry Hamon <thierry.hamon@lipn.univ-paris13.fr>
+
+=head1 LICENSE
+
+Copyright (C) 2005 by Thierry Hamon
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

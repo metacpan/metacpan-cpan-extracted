@@ -1,0 +1,13 @@
+Changes
+examples/forget1.in
+examples/forget2.in
+lib/App/SimpleScan/Plugin/Forget.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00.load.t
+t/01forget.t
+t/04pragma_base.t
+t/pod-coverage.t
+t/pod.t

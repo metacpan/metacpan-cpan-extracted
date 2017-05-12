@@ -1,0 +1,42 @@
+=head1 Apache2 REST Overview
+
+=head2 Request life cycle.
+
+The client performs a HTTP method on a resource uri.
+
+L<Apache2::REST> splits the uri in fragments.
+
+Apache2::REST builds a L<Apache2::REST::Handler> and let it handle the root fragment
+
+Apache2::REST then writes the response back to the client with the appropriate writer.
+
+If the response is written as a string (which is true for defaults writers),
+this string is a unicode string encoded in UTF-8 bytes.
+
+=head2 How a Apache2::REST::Handler works
+
+If the requested resource is terminal, it performs the requested HTTP method (if allowed).
+
+If the requested resource is not terminal, it solves the next fragment buy building
+the next handler. By default, the next handler is a class one level down in the package
+hierachy.
+
+=head2 A request lifecycle example.
+
+Client request: GET /foo/bar
+
+URI fragments are C<(foo bar)>
+
+A root handler is built according to Apache2RESTHandlerRootClass - See L<Apache2::REST>. Let's assume this root handler is C<MyApp::REST::API>. See L<Apache2::REST::Handler>.
+
+This root handle is not terminal for this request, so it builds the next handler.
+
+The next handler will be a MyApp::REST::API::foo
+
+One more step and the terminal handler is a MyApp::REST::API::foo::bar
+
+The method GET is called on the MyApp::REST::API::foo::bar instance.
+
+The L<Apache2::REST::Response> is written back to the client by L<Apache2::REST::Handler>
+
+=cut

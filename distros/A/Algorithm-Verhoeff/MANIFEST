@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Algorithm-Verhoeff.t
+lib/Algorithm/Verhoeff.pm

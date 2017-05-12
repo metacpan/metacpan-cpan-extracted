@@ -1,0 +1,59 @@
+---
+abstract: 'Amon2 plugins set for Japanese mobile phones'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  Amon2::Web: 0
+  App::Prove: 0
+  File::Temp: 0
+  Plack::Util: 0
+  Test::More: 0.98
+  Test::Requires: 0
+  Tiffany: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.0, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Amon2-MobileJP
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Amon2::MobileJP:
+    file: lib/Amon2/MobileJP.pm
+    version: 0.11
+  Amon2::Plugin::Web::MobileAgent:
+    file: lib/Amon2/Plugin/Web/MobileAgent.pm
+    version: 0.11
+  Amon2::Plugin::Web::MobileCharset:
+    file: lib/Amon2/Plugin/Web/MobileCharset.pm
+requires:
+  Amon2: 3.86
+  Amon2::Setup::Flavor::Large: 0
+  Amon2::Setup::Flavor::Minimum: 0
+  Amon2::Util: 0
+  Encode::JP::Mobile: 0.29
+  HTTP::MobileAgent: 0
+  HTTP::MobileAgent::Plugin::Charset: 0
+  Lingua::JA::Regular::Unicode: 0
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/tokuhirom/Amon2-MobileJP/issues
+  homepage: https://github.com/tokuhirom/Amon2-MobileJP
+  repository: git://github.com/tokuhirom/Amon2-MobileJP.git
+version: 0.11
+x_contributors:
+  - 'tokuhirom <tokuhirom@gmail.com>'

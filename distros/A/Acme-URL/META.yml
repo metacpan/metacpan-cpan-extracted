@@ -1,0 +1,26 @@
+---
+name: Acme-URL
+version: 0.01
+author:
+  - 'Barry Walsh <draegtun@cpan.org>'
+abstract: Bareword URL with HTTP request
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme::URL
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/draegtun/Acme-URL
+build_requires:
+  Test::More: 0
+requires:
+  Devel::Declare: 0.005011
+  LWP::Simple: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Acme::URL:
+    file: lib/Acme/URL.pm
+    version: 0.01
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

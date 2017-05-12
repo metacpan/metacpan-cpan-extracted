@@ -1,0 +1,49 @@
+Astro-UTDF is Copyright (C) 2010-2016 by Thomas R. Wyant, III
+
+DESCRIPTION
+
+This package contains a class to read data formatted in Universal
+Tracking Data Format (UTDF) and return the data in a set of objects
+whose accessors return various fields of the individual records, and
+selected data computable from these fields.
+
+This is ALPHA CODE. Among other things, this means that there are NO
+functional tests whatever, and the public interface is NOT stable.
+
+INSTALLATION
+
+This package is installable by your favorite CPAN client, or by either
+of the two usual incantations:
+
+    tar -xzf Astro-UTDF-9.999.tar
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+or
+
+    tar -xzf Astro-UTDF-9.999.tar
+    perl Build.PL
+    ./Build
+    ./Build test
+    sudo ./Build install
+
+You should substitute the appropriate program name for 'make', eg nmake
+(typically) under MSWin32, or mms or mmk under VMS. See
+ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe for a copy of
+nmake for MSWin32 if you need it.
+
+Of course, since it's pure Perl, you can just expand the kit and drop
+the .pm file into the Astro/ directory (creating it if necessary) in
+the appropriate place in your @INC directories.
+
+LICENSING INFORMATION
+
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

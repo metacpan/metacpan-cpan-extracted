@@ -1,0 +1,57 @@
+#!perl
+
+use strict;
+use warnings;
+use App::CPANfile2OPML;
+
+my $target;
+my @phases;
+
+while (my $argv = shift @ARGV) {
+    if ($argv eq '--phase') {
+        push @phases, split ',', shift @ARGV;
+        next;
+    }
+    $target = $argv;
+}
+
+my $app = App::CPANfile2OPML->new;
+
+print $app->convert_file($target, \@phases);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+cpanfile2opml - Command line tool to generate OPML from cpanfile
+
+=head1 SYNOPSIS
+
+    % cpanfile2opml PATH_TO_/cpanfile > myapp.opml
+
+Then, import OPML to your favorite feed reader.
+
+    % cpanfile2opml PATH_TO_/cpanfile --phase test,develop > myapp.opml
+
+With --phase option, you can set target phases. Default phases are configure,build,test,runtime,develop.
+
+=head1 DESCRIPTION
+
+cpanfile2opml is a coommand line tool to generate OPML from cpanfile.
+
+You can subscribe updates of your depending CPAN modules with your favorite feed reader.
+
+=head1 LICENSE
+
+Copyright (C) hitode909.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+hitode909 E<lt>hitode909@gmail.comE<gt>
+
+=cut

@@ -1,0 +1,94 @@
+%# -*- mason -*-
+# Copyright (c) 2009 by AdCopy
+# Author: Jeff Weisberg
+# Created: 2009-Oct-28 11:19 (EDT)
+# Function: test
+#
+# $Id: example.mrjob,v 1.1 2010/11/01 19:04:21 jaw Exp $
+
+<%doc>
+    map reduce example
+</%doc>
+%################################################################
+%# provide values for configurable parameters
+%# these override the defaults
+%# and params specified on the command line, override these
+<%config>
+    system      => blargh
+    tasktimeout => 120
+</%config>
+%################################################################
+%# common block is prepended to all other blocks.
+%# used to load modules
+<%common>
+    use AC::Misc;
+    use AC::Dumper;
+</%common>
+%################################################################
+%# init block runs once at startup.
+%# the return value can be retrieved by other blocks.
+%# used to calculate values or fetch things from a db.
+<%init>
+    $R->print("starting map/reduce job");
+
+    return {
+        mood    => 'joyous',
+    };
+</%init>
+%################################################################
+<%map>
+<%attr>
+%# override various parameters
+    maxrun      => 300
+    sortprog    => /bin/sort
+</%attr>
+    my $data = shift;   # one record from the input
+
+    # return a key + a value
+    return ( $data->{cmp}, 1 );
+</%map>
+%################################################################
+<%reduce>
+    my $key = shift;
+    my $itr = shift;    # an iterator object
+
+    # count
+    my $n = 0;
+    $itr->foreach( sub { $n ++ } );
+
+    # return a key + a value
+    return ($key, $n);
+</%reduce>
+%#
+%# additional reduce blocks can go here
+%#
+%################################################################
+%# final block runs once with the results of the previous reduce.
+%# used to generate report or insert to db
+<%final>
+<%attr>
+%# override various parameters
+    use_strict  => 0
+    in_package  => My::Private::Space
+</%attr>
+<%init>
+    # init sub-block runs at start of final block
+    my $report;
+</%init>
+<%cleanup>
+    # cleanup sub-block runs at end of final block
+
+    # get the values from the init block
+    my $iv = $R->initvalue();
+
+    # stdout is tied to $R. so plain print also works.
+
+    print "report for mood: $iv->{mood}\n";
+    print $report;
+
+</%cleanup>
+    my($key, $data) = @_;
+
+    $report .= "key: $key, value: $data\n";
+
+</%final>

@@ -1,0 +1,30 @@
+Revision history for Perl extension App::Sys::Info.
+
+0.24 Wed Jan 21 02:29:23 2015
+   => Fix RT#97724.
+
+0.23 Sat May 11 06:30:15 2013
+   => Fix memory display
+
+0.22 Sat May 11 06:12:58 2013
+   => Display the driver version
+
+0.21 Mon Aug 27 01:42:09 2012
+    => Distro fixes.
+
+0.20 Sun Aug 22 01:49:26 2010
+    => Replace Number::Format with Format::Human::Bytes.
+    => Internal cleanup.
+
+0.13 Sun Jul 11 23:57:33 2010
+    => Renamed the application to psysinfo.
+
+0.12 Sun Apr 11 05:03:19 2010
+    => Tidy up internals.
+    => Added more information sections.
+
+0.11 Thu Apr  8 03:04:47 2010
+    => Add conditionals for some windows specific features.
+
+0.10 Thu Apr  8 01:55:01 2010
+    => First release.

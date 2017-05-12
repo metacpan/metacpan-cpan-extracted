@@ -1,0 +1,16 @@
+Revision history for Perl extension Acme::POE::Knee
+
+1.10    Thu Aug 23 15:40:45 2001
+    - changed the way delay works:
+        there's no longer generic delay for ponies,
+        but you can specify maximum delay per pony now.
+
+1.02    Tue Aug 14 15:43:21 2001
+    - touched up the POD upon request
+    
+1.01    Tue Aug 14 10:19:43 2001
+    - small cosmetic changes
+
+1.00	Mon Aug 13 10:41:16 2001
+    - original version
+

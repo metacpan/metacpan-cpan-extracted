@@ -1,0 +1,75 @@
+#ifndef AWXS_DEF
+#define AWXS_DEF 1
+
+
+#define AWXS_BEGINTRANSACTION     1
+#define AWXS_ENDTRANSACTION       2
+#define AWXS_PROCESSREQUEST       4
+#define AWXS_PROCESSPUBLICATION   8
+#define AWXS_SETUPEVENT          16
+#define AWXS_BEGINSETUP		 32
+#define AWXS_ENDSETUP		 64
+#define AWXS_CLEANUPEVENTTYPE	128
+
+
+#define AWXS_USERDATADELETE       1
+#define AWXS_CALLBACKTEST       128
+
+
+
+/* lets make XS forward and backwards compatible... */
+
+#ifdef  PERL5004_COMPAT
+# define PL_na na
+# define PL_sv_yes sv_yes
+# define PL_sv_no sv_no
+# define PL_sv_undef sv_undef
+# define PL_stack_max stack_max
+# define PL_stack_sp stack_sp
+#endif /* PERL5004_COMPAT */
+
+
+typedef xsAdapter            * Aw__Adapter;
+typedef xsBrokerClient       * Aw__Client;
+typedef xsBrokerConnectionDescriptor * Aw__ConnectionDescriptor;
+typedef BrokerDate           * Aw__Date;
+typedef xsBrokerError        * Aw__Error;
+typedef xsBrokerEvent        * Aw__Event;
+typedef xsAdapterEventType   * Aw__EventType;
+typedef xsBrokerFilter       * Aw__Filter;
+typedef xsBrokerFormat       * Aw__Format;
+typedef xsAdapterLicense     * Aw__License;
+typedef xsAdapterLog         * Aw__Log;
+typedef xsAdapterReplies     * Aw__Replies;
+typedef BrokerSubscription   * Aw__Subscription;
+typedef BrokerSSLCertificate * Aw__SSLCertificate;
+typedef xsBrokerTypeDef      * Aw__TypeDef;
+typedef xsBrokerTypeDefCache * Aw__TypeDefCache;
+typedef xsAdapterUtil        * Aw__Util;
+// typedef O_HvRV               * Aw__Info;
+
+
+
+/* #include <glib.h> */
+
+#ifdef G_HAVE_GINT64
+#define HAVE_CORBA_LONG_LONG
+typedef gint64 CORBA_long_long;
+#else
+typedef long long CORBA_long_long;
+/*
+ #warning ""
+ #warning "You don't G_HAVE_GINT64 defined in glib."
+ #warning "Please make sure you don't have an old glibconfig.h lying around."
+ #warning ""
+*/
+#endif /* G_HAVE_GINT64 */
+
+
+typedef CORBA_long_long	CORBA__LongLong;
+
+
+#define AWXS_WARNS 1
+#undef  AWXS_DEBUG
+
+#endif /* AWXS_DEF */

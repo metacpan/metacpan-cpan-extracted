@@ -1,0 +1,256 @@
+NAME
+    ASP - a Module for ASP (PerlScript) Programming
+
+SYNOPSIS
+            use strict;
+            use ASP qw(:strict);
+
+            print "Testing, testing.<BR><BR>";
+            my $item = param('item');
+
+            if($item eq 'Select one...') {
+                die "Please select a value from the list.";
+            }
+
+            print "You selected $item.";
+            exit;
+
+DESCRIPTION
+    This module is based on Matt Sergeant's excellent Win32::ASP
+    module, which can be found at
+    <http://www.fastnetltd.ndirect.co.uk/Perl>. After using Mr.
+    Sergeant's module, I took on the task of customizing and
+    optimizing it for my own purposes. Feel free to use it if you
+    find it useful.
+
+NOTES
+    This module is designed to work with both ASP PerlScript on
+    IIS4, as well as mod_perl/Apache::ASP on *nix platforms.
+    Apache::ASP already provides some of the functionality provided
+    by this module; because of this (and to avoid redundancy),
+    ASP.pm attempts to detect its environment. Differences between
+    Apache and MS ASP are noted.
+
+    Both of the print() and warn() standard perl funcs are
+    overloaded to output to the browser. print() is also available
+    via the $ASP::ASPOUT->print() method call.
+
+    $Request->ServerVariables are only stuffed into %ENV on Win32
+    platforms, as Apache::ASP already provides this.
+
+    ASP.pm also exports the $ScriptingNamespace symbol (Win32 only).
+    This symbol allows PerlScript to call subs/functions written in
+    another script language. For example:
+
+        <%@ language=PerlScript %>
+        <%
+            use ASP qw(:strict);
+            print $ScriptingNamespace->SomeSub("arg1");
+        %>
+        <SCRIPT language=VBScript runat=server>
+        Function SomeSub (str)
+            SomeSub = SomethingThatReturnsSomething()
+        End Function
+        </SCRIPT>
+
+USE
+  use ASP qw(:basic);
+
+    Exports basic subs: Print, Warn, die, exit, param, param_count.
+    Same as `use ASP;'
+
+  use ASP qw(:strict);
+
+    Allows the use of the ASP objects under `use strict;'.
+
+    NOTE: This is not the only way to accomplish this, but I think
+    it's the cleanest, most convenient way.
+
+  use ASP qw(:all);
+
+    Exports all subs except those marked 'not exported'.
+
+  use ASP ();
+
+    Overloads print() and warn() and provides the $ASP::ASPOUT
+    object.
+
+FUNCTION REFERENCE
+  warn LIST
+
+    `warn' (or more specifically, the __WARN__ signal) has been re-
+    routed to output to the browser.
+
+    FYI: When implemented, this tweak led to the removal of the
+    prototypes Matt placed on his subs.
+
+  Warn LIST
+
+    `Warn' is an alias for the ASP::Print method described below.
+    The overloading of `warn' as described above does not currently
+    work in Apache::ASP, so this is provided.
+
+  print LIST
+
+    `print' is overloaded to write to the browser by default. The
+    inherent behavior of print has not been altered and you can
+    still use an alternate filehandle as you normally would. This
+    allows you to use print just as you would in CGI scripts. The
+    following statement would need no modification between CGI and
+    ASP PerlScript:
+
+        print param('URL'), " was requested by ", $ENV{REMOTE_HOST}, "\n";
+
+  Print LIST
+
+    Prints a string or comma separated list of strings to the
+    browser. Use as if you were using `print' in a CGI application.
+    Print gets around ASP's limitations of 128k in a single
+    $Response->Write() call.
+
+    NB: `print' calls Print, so you could use either, but print more
+    closely resembles perl.
+
+  DebugPrint LIST
+
+    Output is displayed between HTML comments so the output doesn't
+    interfere with page aesthetics.
+
+  HTMLPrint LIST
+
+    The same as `Print' except the output is HTML-encoded so that
+    any HTML tags appear as sent, i.e. < becomes &lt;, > becomes
+    &gt; etc.
+
+  die LIST
+
+    Prints the contents of LIST to the browser and then exits. die
+    automatically calls $Response->End for you, it also executes any
+    cleanup code you have added with `AddDeathHook'.
+
+  exit
+
+    Exits the current script. $Response->End is called automatically
+    for you. Any cleanup code added with `AddDeathHook' is also
+    called.
+
+  escape LIST
+
+    Escapes (URL-encodes) a list. Uses ASP object method $Server-
+    >URLEncode().
+
+  unescape LIST
+
+    Unescapes a URL-encoded list. Algorithms ripped from CGI.pm
+    method of the same name.
+
+  escapeHTML LIST
+
+    Escapes a list of HTML. Uses ASP object method $Server-
+    >HTMLEncode().
+
+    If passed an array reference, escapeHTML will return a reference
+    to the escaped array.
+
+  unescapeHTML LIST
+
+    Unescapes an HTML-encoded list.
+
+    If passed an array reference, unescapeHTML will return a
+    reference to the un-escaped array.
+
+  param EXPR [, EXPR]
+
+    Simplifies parameter access and makes switch from GET to POST
+    transparent.
+
+    Given the following querystring:
+
+            myscript.asp?x=a&x=b&y=c
+
+        param()      returns ('x', 'y')
+        param('y')   returns 'c'
+        param('x')   returns ('a', 'b')
+        param('x',1) returns 'a'
+        param('x',2) returns 'b'
+
+    NOTE: Under Apache::ASP, param() simply passes the arguments to
+    CGI::param() because Apache::ASP doesn't support the $obj-
+    >{Count} property used in this function.
+
+  param_count EXPR
+
+    Returns the number of times EXPR appears in the request (Form or
+    QueryString).
+
+    For example, if URL is
+
+            myscript.asp?x=a&x=b&y=c
+
+    then
+
+            param_count('x');
+
+    returns 2.
+
+    NOTE: Under Apache::ASP, param_count() performs some
+    manipulation using CGI::param() because Apache::ASP doesn't
+    support the $obj->{Count} property used in this function.
+
+  AddDeathHook LIST
+
+    Allows cleanup code to be executed when you `die' or `exit'.
+    Useful for closing database connections in the event of a fatal
+    error.
+
+            <%
+            my $conn = Win32::OLE-new('ADODB.Connection');
+            $conn->Open("MyDSN");
+            $conn->BeginTrans();
+            ASP::AddDeathHook( sub { $Conn->Close if $Conn; } );
+            %>
+
+    Death hooks are not executed except by explicitly calling the
+    die() or exit() methods provided by ASP.pm.
+
+    AddDeathHook is not exported.
+
+AUTHOR
+    Tim Hammerquist <tim@dichosoft.com>
+
+HISTORY
+    Version 1.07
+        Added Warn() because warn() overloading doesn't appear to
+        work under Apache::ASP.
+
+        Was forced to clear @DeathHooks array after calling _END()
+        because of the persistent state of Apache::ASP holding over
+        contents across executions.
+
+        Removed BinaryWrite(), SetCookie(), and Autoload
+        functionality.
+
+    Version 1.00
+        The escapeHTML() and unescapeHTML() functions now accept
+        array refs as well as lists, as Win32::ASP::HTMLEncode() was
+        supposed to. Thanks to Matt Sergeant for the fix.
+
+    Version 0.97
+        Optimized and debugged.
+
+    Version 0.77
+        Overloaded warn() and subsequently removed prototypes.
+
+        Exported $ScriptingNamespace object.
+
+        Added methods escape(), unescape(), escapeHTML(),
+        unescapeHTML(). Thanks to Bill Odom for pointing these out!
+
+        Re-implemented SetCookie and BinaryWrite functions.
+
+    Version 0.11
+        Optimized and debugged.
+
+SEE ALSO
+    ASP::NextLink(3)
+

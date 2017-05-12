@@ -1,0 +1,187 @@
+---
+name: App-CamelPKI
+version: 0.07
+author:
+  - 'Jérémie Klein <grm.klein@gmail.com>'
+abstract: A multi-purpose PKI.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  App::Info::HTTPD::Apache: 0
+  B: 0
+  Catalyst: 5.7006
+  Catalyst::Action::RenderView: 0
+  Catalyst::Engine::Apache: 0
+  Catalyst::Plugin::ConfigLoader: 0
+  Catalyst::Plugin::Static::Simple: 0
+  Catalyst::View::JSON: 0
+  Catalyst::View::TT: 0
+  Class::Inspector: 0
+  Crypt::OpenSSL::CA: 0.09
+  Crypt::X509: 0.32
+  DBD::SQLite: 0
+  DBIx::Class: 0.07
+  DateTime: 0
+  Error: 0
+  File::Slurp: 0
+  IO::Socket::INET: 0
+  IPC::Run: 0
+  JSON: 1.07
+  MIME::Base64: 0
+  NEXT: 0
+  SQL::Translator: 0.07
+  Sys::Hostname: 0
+  Test::Group: 0
+  Test::More: 0
+build_requires:
+  Catalyst::View::TT: 0
+  Convert::ASN1: 0.2
+  Cwd: 0
+  Errno: 0
+  Fatal: 0
+  File::Find: 0
+  File::Path: 0
+  File::Slurp: 0
+  File::Spec: 0
+  File::Spec::Functions: 0
+  File::Spec::Unix: 0
+  File::Temp: 0
+  File::Which: 0
+  FindBin: 0
+  HTML::TreeBuilder: 0
+  HTTP::Request: 0
+  HTTP::Request::Common: 0
+  HTTP::Request::Form: 0
+  IO::File: 0
+  IO::Socket::SSL: 0
+  LWP::Simple: 0
+  LWP::UserAgent: 0
+  Module::Build: 0
+  Module::Build::Compat: 0
+  Module::ScanDeps: 0
+  Test::Builder: 0
+  Test::Group: 0
+  Test::More: 0
+  Test::NoBreakpoints: 0
+  Test::Pod::Coverage: 1.04
+  URI::URL: 0
+provides:
+  App::CamelPKI:
+    file: lib/App/CamelPKI.pm
+    version: 0.07
+  App::CamelPKI::Action::JSON:
+    file: lib/App/CamelPKI/Action/JSON.pm
+  App::CamelPKI::CA:
+    file: lib/App/CamelPKI/CA.pm
+  App::CamelPKI::CA::CADBFacet:
+    file: lib/App/CamelPKI/CA.pm
+  App::CamelPKI::CA::FacetCRLOnly:
+    file: lib/App/CamelPKI/CA.pm
+  App::CamelPKI::CA::FacetCertTemplate:
+    file: lib/App/CamelPKI/CA.pm
+  App::CamelPKI::CA::FacetOperational:
+    file: lib/App/CamelPKI/CA.pm
+  App::CamelPKI::CA::FacetReadonly:
+    file: lib/App/CamelPKI/CA.pm
+  App::CamelPKI::CADB:
+    file: lib/App/CamelPKI/CADB.pm
+  App::CamelPKI::CADB::Cursor:
+    file: lib/App/CamelPKI/CADB.pm
+  App::CamelPKI::CADB::FacetReadOnly:
+    file: lib/App/CamelPKI/CADB.pm
+  App::CamelPKI::CRL:
+    file: lib/App/CamelPKI/CRL.pm
+  App::CamelPKI::CertTemplate:
+    file: lib/App/CamelPKI/CertTemplate.pm
+  App::CamelPKI::CertTemplate::CA0:
+    file: lib/App/CamelPKI/CertTemplate/CA.pm
+  App::CamelPKI::CertTemplate::CA1:
+    file: lib/App/CamelPKI/CertTemplate/CA.pm
+  App::CamelPKI::CertTemplate::CertBase:
+    file: lib/App/CamelPKI/CertTemplate/CertBase.pm
+  App::CamelPKI::CertTemplate::OpenVPNClient:
+    file: lib/App/CamelPKI/CertTemplate/VPN.pm
+  App::CamelPKI::CertTemplate::OpenVPNServer:
+    file: lib/App/CamelPKI/CertTemplate/VPN.pm
+  App::CamelPKI::CertTemplate::PKI1:
+    file: lib/App/CamelPKI/CertTemplate/PKI.pm
+  App::CamelPKI::CertTemplate::PKI2:
+    file: lib/App/CamelPKI/CertTemplate/PKI.pm
+  App::CamelPKI::CertTemplate::SSLClient:
+    file: lib/App/CamelPKI/CertTemplate/SSL.pm
+  App::CamelPKI::CertTemplate::SSLServer:
+    file: lib/App/CamelPKI/CertTemplate/SSL.pm
+  App::CamelPKI::CertTemplate::VPN1:
+    file: lib/App/CamelPKI/CertTemplate/VPN.pm
+  App::CamelPKI::Certificate:
+    file: lib/App/CamelPKI/Certificate.pm
+  App::CamelPKI::Controller::CA:
+    file: lib/App/CamelPKI/Controller/CA.pm
+  App::CamelPKI::Controller::CA::Template::Base:
+    file: lib/App/CamelPKI/Controller/CA/Template/Base.pm
+  App::CamelPKI::Controller::CA::Template::CA:
+    file: lib/App/CamelPKI/Controller/CA/Template/CA.pm
+  App::CamelPKI::Controller::CA::Template::SSL:
+    file: lib/App/CamelPKI/Controller/CA/Template/SSL.pm
+  App::CamelPKI::Controller::CA::Template::VPN:
+    file: lib/App/CamelPKI/Controller/CA/Template/VPN.pm
+  App::CamelPKI::Controller::Certificate:
+    file: lib/App/CamelPKI/Controller/Certificate.pm
+  App::CamelPKI::Controller::Root:
+    file: lib/App/CamelPKI/Controller/Root.pm
+  App::CamelPKI::Controller::Test:
+    file: lib/App/CamelPKI/Controller/Test.pm
+  App::CamelPKI::Error:
+    file: lib/App/CamelPKI/Error.pm
+  App::CamelPKI::Error::Database:
+    file: lib/App/CamelPKI/Error.pm
+  App::CamelPKI::Error::IO:
+    file: lib/App/CamelPKI/Error.pm
+  App::CamelPKI::Error::Internal:
+    file: lib/App/CamelPKI/Error.pm
+  App::CamelPKI::Error::OtherProcess:
+    file: lib/App/CamelPKI/Error.pm
+  App::CamelPKI::Error::Privilege:
+    file: lib/App/CamelPKI/Error.pm
+  App::CamelPKI::Error::State:
+    file: lib/App/CamelPKI/Error.pm
+  App::CamelPKI::Error::User:
+    file: lib/App/CamelPKI/Error.pm
+  App::CamelPKI::Model::CA:
+    file: lib/App/CamelPKI/Model/CA.pm
+  App::CamelPKI::Model::CA::FacetAny:
+    file: lib/App/CamelPKI/Model/CA.pm
+  App::CamelPKI::Model::WebServer:
+    file: lib/App/CamelPKI/Model/WebServer.pm
+  App::CamelPKI::PEM:
+    file: lib/App/CamelPKI/PEM.pm
+  App::CamelPKI::PrivateKey:
+    file: lib/App/CamelPKI/PrivateKey.pm
+  App::CamelPKI::PublicKey:
+    file: lib/App/CamelPKI/PublicKey.pm
+  App::CamelPKI::RestrictedClassMethod:
+    file: lib/App/CamelPKI/RestrictedClassMethod.pm
+  App::CamelPKI::RestrictedClassMethod::FakeBrand:
+    file: lib/App/CamelPKI/RestrictedClassMethod.pm
+  App::CamelPKI::Sys:
+    file: lib/App/CamelPKI/Sys.pm
+  App::CamelPKI::SysV::Apache:
+    file: lib/App/CamelPKI/SysV/Apache.pm
+  App::CamelPKI::Time:
+    file: lib/App/CamelPKI/Time.pm
+  App::CamelPKI::View::JSON:
+    file: lib/App/CamelPKI/View/JSON.pm
+  App::CamelPKI::View::TT:
+    file: lib/App/CamelPKI/View/TT.pm
+  Class::Facet:
+    file: lib/Class/Facet.pm
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+no_index:
+  directory:
+    - examples
+    - inc
+    - t

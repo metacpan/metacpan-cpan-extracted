@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Apache/XPointer.pm
+lib/Apache/XPointer/XPath.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load-base.t
+t/01-load-xpath.t

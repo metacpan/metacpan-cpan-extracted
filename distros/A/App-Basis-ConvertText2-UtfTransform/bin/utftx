@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+# PODNAME: utftx - Convert ascii text into UTF8 to simulate text formatting
+# ABSTRACT: Convert ascii text into UTF8 to simulate text formatting. Perform smilies transformations
+
+=head1 NAME
+
+utftx
+
+=head1 SYNOPSIS
+
+    > utftx "text string with <b>bold</b> and <i>italic</i> and <l>Leet speak</l>"
+
+    to get full help use
+    > utftx --help   
+
+=head1 DESCRIPTION
+
+Convert ascii text into UTF8 to simulate text formatting
+
+Note: You cannot embed one format within another, so you cannot have bold script, or bold italic.
+
+=cut
+
+# (c) kevin Mulholland, moodfarm@cpan.org
+# this code is released under the Perl Artistic License
+
+use 5.14.0;
+use strict;
+use warnings;
+use App::Basis;
+use App::Basis::ConvertText2::UtfTransform;
+
+# -----------------------------------------------------------------------------
+# main
+
+my $program = get_program();
+
+my %opt = init_app(
+    help_text    => "Convert ascii text into UTF8 to simulate text formatting",
+    help_cmdline => "text string or strings to transform",
+    options      => {}
+);
+
+# make sure we are processing utf properly for output
+binmode(STDOUT, ":utf8");
+say utf_smilies( utf_transform( join( " ", @ARGV ) )) ;

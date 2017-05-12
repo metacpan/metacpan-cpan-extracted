@@ -1,0 +1,49 @@
+
+SV *
+array(self, num = 1)
+	Anarres::Mud::Driver::Compiler::Type	 self
+	int		num
+	CODE:
+		{
+			/* I can't quite get the typemap to bless an output
+			 * reference to a scalar. */
+
+			int		 i;
+			SV		*out;
+
+			out = newSVpvn("", 0);
+			for (i = 0; i < num; i++) {
+				sv_catpvn(out, "*", 1);
+			}
+			sv_catsv(out, self);
+
+			RETVAL = sv_bless(newRV_noinc(out),
+					gv_stashpv(_AMD "::Compiler::Type", TRUE));
+		}
+	OUTPUT:
+		RETVAL
+
+SV *
+mapping(self, num = 1)
+	Anarres::Mud::Driver::Compiler::Type	 self
+	int		num
+	CODE:
+		{
+			/* I can't quite get the typemap to bless an output
+			 * reference to a scalar. */
+
+			int		 i;
+			SV		*out;
+
+			out = newSVpvn("", 0);
+			for (i = 0; i < num; i++) {
+				sv_catpvn(out, "#", 1);
+			}
+			sv_catsv(out, self);
+
+			RETVAL = sv_bless(newRV_noinc(out),
+					gv_stashpv(_AMD "::Compiler::Type", TRUE));
+		}
+	OUTPUT:
+		RETVAL
+

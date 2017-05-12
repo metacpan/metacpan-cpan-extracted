@@ -1,0 +1,39 @@
+[% PROCESS header.html title=distver.distver %]
+
+[% PROCESS login_form.html %]
+[% PROCESS form.html %]
+
+<h2>
+[% link_author(distver.pause_id) %]
+&gt;
+[% link_dist(distver.dist) %]
+[% distver.version %] 
+<span class="mtime">([% YMD.format(distver.mtime) %])</span>
+[% rating(distver.dist) %]
+</h2>
+
+<p class="sisters">
+[ 
+[% link_distver_search_cpan_org(distver) %] |
+[% link_distver_kobes(distver) %] |
+[% link_distver_cpanforum(distver) %] |
+[% link_distver_cpanratings(distver) %] |
+[% link_distver_rt(distver) %] |
+[% link_distver_cpantesters(distver) %] |
+[% link_distver_download(distver) %]
+]
+</p>
+
+<table>
+[% FOR podver = distver.podvers.sort('name') %]
+    <tr class="[% loop.count % 2 ? 'even' : 'odd' %]">
+        <td>[% link_podver(podver); %]</td>
+        <td>[% podver.description %]</td>
+        <td>[% SET count = podver.count_visible_notes; IF count > 0 %]
+            (<em>[% NO('note', count) %];
+                latest [% YMD.format(podver.pod.latest_note_date) %]</em>)[% END %]</td>
+    </tr>
+[% END %]
+</table>
+
+[% PROCESS footer.html %]

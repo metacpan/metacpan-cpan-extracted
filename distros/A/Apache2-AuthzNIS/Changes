@@ -1,0 +1,17 @@
+Revision history for Apache2-AuthzNIS
+
+0.13    Apr 16 2008
+        Modified test to skip if mod_perl2 is not found.
+
+0.12    Apr 10 2008
+        First version, forked from Apache::AuthzNIS 0.11.
+
+Revision history for Apache-AuthzNIS
+
+0.11    Aug 01  23:06 2003
+        Ported to work with both versions of modperl.
+        Changed Makefile.PL to use ExtUtils::AutoInstall.
+        Added test.pl file for 'make test'.
+ 
+0.10    Oct 25  23:06 1998
+        First Beta Release.

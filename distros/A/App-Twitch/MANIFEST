@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/twitch
+dist.ini
+lib/App/Twitch.pm
+t/00-load.t
+t/release-pod-syntax.t

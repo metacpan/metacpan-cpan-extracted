@@ -1,0 +1,49 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Registry with supermirror archives.
+# Usage: env DEBUG=1 USE_NETWORK=1 tests/registry-2
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More tests => 11;
+use_ok("Arch::Registry");
+
+my $registry = Arch::Registry->new;
+ok($registry && $registry->isa('Arch::Registry'), "create registry object");
+
+SKIP: {
+
+skip("network tests by default", 9) unless $ENV{USE_NETWORK};
+
+my $archives = $registry->supermirror_archives;
+unless (defined $archives) {
+	my $error = $registry->web_error;
+	$error? pass($error): fail("supermirror get failed without web error");
+	skip("- seems like you have no network", 8);
+}
+is(ref($archives), 'HASH', "got all supermirror archives");
+
+my $perl_gpl_archive = 'migo@homemail.com--Perl-GPL';
+my $arch_perl_version = 'arch-perl--devel--0';
+ok($archives->{$perl_gpl_archive}, "got $perl_gpl_archive location");
+
+my $archive_versions = $registry->supermirror_archive_versions;
+is(ref($archive_versions), 'HASH', "got all supermirror archive versions");
+my $versions = $archive_versions->{$perl_gpl_archive};
+my $is_array = ref($versions) eq 'ARRAY';
+print map { "\t$_\n" } @$versions if $ENV{DEBUG};
+ok($is_array && @$versions > 5, "got $perl_gpl_archive versions");
+ok($is_array && (grep /$arch_perl_version/, @$versions), "got $arch_perl_version version");
+
+$archives = $registry->search_supermirror('.*', '--cset-gui--');
+is(ref($archives), 'ARRAY', "search for cset-gui branch");
+ok(scalar(grep /$perl_gpl_archive/, @$archives), "got $arch_perl_version");
+
+$versions = $registry->search_supermirror('migo@.*', '.*-gui\b', 1);
+print map { "\t$_\n" } @$versions if $ENV{DEBUG};
+is(ref($versions), 'ARRAY', "search for migo@*/*-gui branch");
+my $archive = 'migo@homemail.com--archway-micro';
+ok(scalar(grep /$archive/, @$versions), "got $archive");
+
+}

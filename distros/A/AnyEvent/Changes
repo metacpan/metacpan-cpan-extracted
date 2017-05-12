@@ -1,0 +1,1293 @@
+Revision history for Perl extension AnyEvent.
+
+TODO: document TCP_*** constants
+TODO: add debug/trace logging to some modules
+TODO: use the eval-with-cb-call trick also to speed up JSON?
+TODO: FAQ: common pitfalls? invoke-before-return
+TODO: FAQ: scope-ids? hosts file order?
+TODO: AnyEvent::Handle with AnyEvent::IO?
+TODO: invalid. and localhost. specialcasing inside AEDNS and not AESocket (rfc6761)
+TODO: maybe implement env variable to give hosts precedence
+TODO: more formats for parse_ipv6 (single ipv6 address without port, ...p80, ...#80)
+
+TODO: inet_aton maybe pack C4? no, add a comment why not
+TODO: hosts read multiple times for initial concurrent tcp_connect's?
+
+7.13 Sat Sep 17 04:31:49 CEST 2016
+	- Only call tlsext_host_name for non-empty common names (reported
+          by Maxime Soulé).
+        - log a (single) notice message if SNI is not supported.
+        - upgrade to UTS-46:9.0.0 draft and switch to non-transitional
+          behaviour, beating thunderbird, ie, edge, chrome and safari to it :)
+          (see also https://bugzilla.mozilla.org/show_bug.cgi?id=1218179)
+        - turns out the UTS-46 IDNA testcase failures were indeed bugs in the
+          testcases and the specification and not in the code - the post-9.0.0
+          unicode files have all known problems fixed, so finally the AnyEvent
+          IDNA implementation can pass the full IDNA testsuite - without needing
+          a single fix :)
+        - guarantee (and document) that condvar callbacks will be removed
+          on invocation - important to avoid circular references.
+
+7.12 Wed Jan 27 19:12:26 CET 2016
+	- use common name as hostname for tls connects, if Net::SSLeay
+          supports SNI.
+        - fix documentation of tls_autostart read type in AnyEvent::Handle,
+          analyzed by Felix Ostmann.
+
+7.11 Thu Jul 16 14:36:00 CEST 2015
+	- AnyEvent::Socket::parse_ipv6 could accept malformed ipv6
+          addresses (extra "::" at end and similar cases).
+	- add a more explicit warning to AnyEvent::Handle that it doesn't
+          work on files, people keep getting confused.
+        - new function AnyEvent::Socket::tcp_bind.
+        - new functions AnyEvent::fh_block and AnyEvent::fh_unblock.
+	- aligned ipv6 address formatting with RFC 5952 (by not shortening
+          a single :0: to ::).
+        - added stability canary support.
+
+7.09 Sat May  2 16:38:53 CEST 2015
+	- AnyEvent::Debug called an internal function (AnyEvent::Log::ft)
+          that was renamed to AnyEvent::Log:format_time. uinder its old name
+          (analyzed by Michael Stovenour).
+        - update AnyEvent::DNS fallback resolver addresses:
+          seems google effectively killed most other free dns resolvers,
+          so remove them, but add cable and wireless (ecrc) since it was
+          stable for 20 years or so, official or not, and there should be
+          an alternative to google.
+        - perl5porters broke windows error codes in 5.20, and mapped
+          WSAEWOULDBLOCK on the (different) EWOULDBLOCK error code, and
+          WSAEINPROGRESS into the incompatible ERINPROGRESS code, probably
+          because they were so cool. They probably broke other error codes
+          for no reason, too, but I didn't care for checking, it's too
+          depressing. This version only works around the WSAEWOULDBLOCK
+          issue, because I don't have a nice way to work around the
+          WSAEINPROGRESS bug.
+
+7.08 Wed Dec 10 05:27:17 CET 2014
+        - work around a newly introduced bug in Socket 2.011 (an
+          errornous sun_length check) (analyzed by Maxime Soulé).
+	- AnyEvent::TLS didn't load (but refer to) AnyEvent::Socket
+          (analyzed by Ben Magistro).
+        - AnyEvent::Strict will now confess, not croak. This is in line with
+          it being a development/debugging tool.
+        - work around a number of libglib bugs (debug builds of libglib enforce
+          certain undocumented behaviour patterns such as not being able to
+          remove a child watch source after it has fired, which we will try
+          to emulate to avoid "criticals". what where they thinking...).
+        - mention json security issues in AnyEvent::Handle, now that Douglas
+          Crockford has foolishly and incompatibly changed JSON.
+        - changed default dns resolver "max_outstanding" value from 1 to 10,
+          the latter beinfg the intended value all along
+          (reported by Ilya Chesnokov).
+        - added new "AnyEvent::Impl::UV" interface module to the UV event lib
+          (written by Mike Lowell).
+
+7.07 Tue Dec 17 17:45:02 CET 2013
+	- the documentation for custom tls verify schemes was wrong. make it agree
+          with the code (reported by Maxime Soulé).
+	- added cbor read and write types to AnyEvent::Handle (using CBOR::XS).
+        - work around an API change in openssl that could cause wrong tls connection
+          aborts, likely on windows only (analyzed by sten).
+        - calling AnyEvent->now_update with AnyEvent::Impl::Perl caused an
+          endless loop (reported by Dietrich Rebmann).
+        - add tlsv1_1 and tlsv1_2 protocols to AnyEvent::TLS
+          (patch by Maxime Soulé).
+        - document AnyEvent::Impl::IOAsync::set_loop and
+          $AnyEvent::Impl::IOAsync::LOOP. Though only documented now, this
+          functionality has _always_ been available.
+	- force a toplevel domain name in t/81_hosts.t (analyzed by
+          David Jack Wange Olrik).
+        - document that AnyEvent::Log uses AnyEvent::IO.
+        - warn about AnyEvent::Filesys::Notify performance.
+        - praise the joys of AnyEvent::Fork::*.
+        - time for an =encoding directive.
+        - do no longer use JSON to create a default json coder, use
+          JSON::XS or JSON::PP directly.
+
+7.05 Wed Aug 21 10:38:08 CEST 2013
+	- uts46data.pl couldn't be found due to wrong naming of the file
+          (reported by Fulko Hew).
+        - handle lone \015's properly in AE::Handle's default line read
+          (reported by various people).
+        - untaint ip addresses found in /etc/hosts (patch by José Micó).
+        - the memleak fix in 7.03 caused resolving via /etc/hosts to always
+          fail on first use (reported and testcase by Andrew Whatson).
+        - expose AnyEvent::Log::format_time, and allow users to redefine it.
+        - expose AnyEvent::Log::default_format, and allow redefinition.
+        - expose AnyEvent::Log::fatal_exit, to allow redefinition.
+	- AnyEvent::Debug shell can now run coro shell commands, if available.
+	- t/63* tests were wrongly in MANIFEST.
+        - kernel.org's finger server went MIA, switch to freebsd.org and
+          icculus.org.
+        - clarify that IO::AIO and AnyEvent::AIO are needed for AnyEvent::IO
+          to function asynchronously (reported by Daniel Carosone).
+        - hard-disable $^W in most tests, it generates too much garbage output.
+        - use a (hopefully) more future-proof method to emulate common::sense.
+        - upgrade to UTS-46:6.2.0.
+        - switch to INSTLIB from INSTLIBDIR, as INSTLIBDIR was wrongly
+          documented. should not affect anything.
+
+7.04 Thu Nov 15 02:23:58 CET 2012
+	- debugging code left in.
+
+7.03 Thu Nov 15 02:16:11 CET 2012
+	- AnyEvent::Socket::inet_aton did not work when dns resolution was
+          used to find the addresses (analyzed and patch by Maxime Soulé).
+        - fix a memory leak in the /etc/hosts lookup code when hosts don't
+          resolve and are not in hosts (analyzed by sten).
+
+7.02 Tue Aug 14 04:27:58 CEST 2012
+	- AnyEvent::Util::run_cmd could block indefinitely (analyzed and test
+          program by Yorhel).
+	- verified that AnyEvent::Socket follows RFC5952.
+        - try to parse "ADDR#PORT" in addition to "ADDR PORT".
+
+7.01 Sun May 13 01:03:17 CEST 2012
+	- fail with EPROTO in AnyEvent::Handle wqhen TLS is requested but
+          not available, instead of throwing an exception.
+	- use File::Spec to get the tmpdir in t/*, to avoid needless
+          failures on (most, not mine :) windows boxes.
+        - new handle read types: tls_detect and tls_autostart.
+
+7.0  Fri Apr 13 06:33:30 CEST 2012
+        - child watchers are broken in POE 1.352 (also many earlier
+          versions) and there seems to be no way to work around it, as POE
+          itself is inherently racy. Document this regression and add a delay
+          in t/68_poe_03_child.t for the time being.
+	- new module AnyEvent::IO, that is a frontend to either a pure-perl
+          synchronous I/O implementation (AnyEvent::IO::Perl), or to the
+          asynchronous I/O extension IO::AIO (AnyEvent::IO::IOAIO).
+        - load /etc/hosts only when DNS has no answer.
+        - stat /etc/hosts on every access and reload it if it changed.
+        - load /etc/hosts via AnyEvent::IO - potentially asynchronous.
+        - fix a buggy croak in the dh parameter reading in AnyEvent::TLS.
+        - AnyEvent::Log log_to_file and log_to_path now use AnyEvent::IO. As
+          a side effect, they now use true appending as opposed to libc
+          appending, and the file might not have been opened when the function
+          returns.
+        - the default logging level was not properly documented in a variety of
+          places, this has hopefully been rectified.
+	- updated uts46data.pl for unicode 6.1.0.
+        - made log messages generated by AnyEvent submodules not
+          include the package name anymore, as it will be logged
+          by default already.
+        - upgrade to the trick used by common-sense 3.5 to work
+          around extra warning torture/breakage under perl 5.15.x.
+        - log messages by anyevent are now ucfirst, are usually full
+          sentences and do no longer include the package name.
+        - the storable read type would sometimes throw an exception instead
+          of causing EBADMSG (analyzed by Maxime Soulé).
+        - work around a bug in openssl 1.0.1 which enforces a minimum rsa
+          keysize (reported by Paul Howarth).
+	- documented Rocco fabricating statements about AnyEvent and me.
+
+6.14 Tue Jan 31 20:00:24 CET 2012
+	- AnyEvent::Impl::Tk was broken due to a mysterious "die" inside,
+          probably an editing mistake (reported by Darin McBride).
+
+6.13 Thu Jan 12 07:27:01 CET 2012
+	- AnyEvent::Util::fork_call checked for POSIX availability in the wrong way,
+          causing it to fail if POSIX wasn't loaded already (analysed by Rock Power).
+	- AnyEvent::Handle::push_read (line => did pass $1 directly, so
+          regex-matching inside the callback would change the parameter, despite
+          $1 being dynamically scoped per-block. this perl bug is now being
+          worked around (testcase by Cindy Wang).
+
+6.12 Mon Dec 12 13:21:10 CET 2011
+	- $! was clobbered by subsequent calls in tcp_connect, due to
+          the postpone not saving/restoring it (analyzed by Richard Garnish).
+
+6.11 Tue Nov 22 10:36:05 CET 2011
+	- Tk cannot create windows when tainted unless you set a title, so
+          set a dummy title for AnyEvent's dummy mainwindow. How dummy.
+	- escape any nonprintable/nonascii characters when stringifying
+          backtraces.
+        - log the reason loading an interface module fails to load at level debug.
+
+6.1  Tue Oct  4 19:44:30 CEST 2011
+	- INCOMPATIBLE CHANGE: the default log level is now "4" (error
+          and above), and some messages inside AnyEvent have been elevated
+          to higher log levels to print by default.
+        - AnyEvent::log, unlike AnyEvent::Log::log, did not always exit on fatal.
+        - work around yet another signal race bug, newly introduced by POE. My
+          how that module sucks.
+        - add google public ipv6 dns as fallback servers, so AE::DNS can finally
+          support ipv6-only operation even with defaults (also use ::1 instead
+          of 127.0.0.1).
+	- give better guidelines on how to chose a logging level.
+        - AnyEvent::Log can now cap (limit) log message priority by context.
+        - AE::log will now save and restore $! and $@, so callers don't have to.
+        - AE::Strict now checks that registered fds are still valid at regular
+          intervals.
+        - skip frequently called 'require' calls if the module appears loaded.
+	- increase signal latency test timer considerably for poor little osx,
+          which can't be bothered with basic posix functionality such as signal
+          delivery.
+        - mention some debugging aids in the tutorial.
+        - new env variable PERL_ANYEVENT_MAX_SIGNAL_LATENCY.
+        - private (%namespace) log contexts in PERL_ANYEVENT_LOG now have the name
+          of the context as title.
+        - AnyEvent::Strict would not restore read-write access to $_ when a callback
+          died - this is a user bug, but since AE::Strict exists to help dbeugging...
+	- detect the extremely evil IO::Async::Loop::AnyEvent module and refuse
+          to work with it - the author is well aware of the issues but refuses
+          to fix them. This extreme step has been taken because the module actively
+          attacks the goals of AnyEvent and makes it harder for module authors to use
+          AnyEvent.
+
+6.02  Fri Aug 26 20:08:31 CEST 2011
+        - log_to_syslog now accepts facility strings.
+	- log_to_syslog would not allow facilities - "$facility|$level"
+          *literally* means that string. sheesh.
+        - the CPAN parser got confused and thought we provide Sys::Syslog, try
+          to work around.
+        - renamed AnyEvent::Impl::FLTK2 to FLTK.
+
+6.01  Fri Aug 26 07:04:11 CEST 2011
+        - INCOMPATIBLE CHANGE: AnyEvent::DNS resource records now include
+          the TTL as fourth element - this affects ->resolve, ->request
+          and ->dns_unpack indirectly. Convenience functions such as
+          AnyEvent::DNS::{a,txt,mx,srv} are not affected, neither is
+          AnyEvent::Socket.
+        - INCOMPATIBLE CHANGE: backend authors now should not implement
+          one_event or loop, but instead the AnyEvent::CondVar::_wait and _poll
+          methods.
+        - INCOMPATIBLE CHANGE: verbosity levels have been redefined, see
+          AnyEvent (PERL_ANYEVENT_VERBOSE) and AnyEvent::Log for details.
+        - DEPRECIATION: please change
+          "use AnyEvent::Impl::Perl" to "use AnyEvent::Loop" and
+          "AnyEvent::Impl::Perl::loop" to "AnyEvent::Loop::run"
+          in your programs, for future compatibility.
+        - *blush* idle watcher emulation was borked.
+        - AnyEvent::Strict now checks the AE::xxx functions as well.
+        - querying too long domain names would barf deep inside AnyEvent::DNS - since
+          this is hard to avoid for applications, AnyEvent:.DNS::request now checks for
+          for too long domain names explicitly and passes an undef to the callback
+          instead (reported by James Bromberger).
+        - make AnyEvent::Util more robust against EINTR (analyzed by Andrew Suffield).
+        - new functions: AnyEvent::postpone, AnyEvent::log.
+        - new module: AnyEvent::Log, for simple logging needs.
+        - new env variable, PERL_ANYEVENT_LOG, for fine-grained logging config.
+        - new env variable, PERL_ANYEVENT_DEBUG_SHELL, to automatically start
+          a debug shell.
+        - new env variable, PERL_ANYEVENT_DEBUG_WRAP, to automatically enable
+          watcher instrumentation/wrapping (see AnyEvent::Debug::wrap).
+        - new env variable, PERL_ANYEVENT_HOSTS, to override the place where
+          /etc/hosts can be found.
+        - an empty PERL_ANYEVENT_RESOLV_CONF now selects the default
+          configuration.
+        - env variables can now be specified using AE_xyz instead of
+          PERL_ANYEVENT_xyz, subject to some rules.
+        - lots of new AnyEvent::Debug functionality.
+        - AnyEvent::Strict now checks for modifications of $_ by the callback
+          (by setting it to readonly while executing the callback, if possible).
+        - IO::Async sometimes cancels the wrong timer when you call cancel_timer.
+          Invest extra overhead to work around this peculiar behaviour.
+        - split the pure perl backend into a loop module and an impl
+          module (AnyEvent::Loop and AnyEvent::Impl::Perl).
+        - some read types (regex, netstring, json, storable) could
+          errornously keep an AE::Handle object alive on their own
+          (reported by Mohammad Toossi).
+        - AnyEvent::Socket::resolve_sockaddr and all functions using it now
+          supports /etc/hosts overrides.
+        - add more workarounds around child watcher bugs in IO::Async
+          and (newly introduced) in POE.
+        - use glib child watchers and try to work around its limitations,
+          if possible (based on a patch by Kevin Ryde).
+	- add support for FLTK (fltk2), via AnyEvent::Impl::FLTK2.
+        - many read types in AnyEvent::Handle would malfunction during
+          transitions to TLS because of a "delete $self->{rbuf}".
+          (reported by Gerald Galster).
+        - improve condvar blocking wait performance (probably only noticable
+          with faster backends), also make it easier for event loops that
+          do not support blocking waits.
+        - PERL_ANYEVENT_MODEL now also allows full module names, although
+          the usefulness of this feature is not yet clear.
+        - add tests for all supported event loops, conditional on PERL_ANYEVENT_LOOP_TESTS.
+        - add t/80_ssltext.t.
+        - no longer use AUTOLOAD for the initial loading (for no very good reason).
+        - tcp_server now tries to unlink unix domain sockets when it gets destroyed.
+        - do not run event loop detection multiple times when programs call their cached
+          copies of AnyEvent::detect.
+        - parse_hostport now accepts absolute paths als unix domain sockets.
+        - suppress the idiotic warning inside POE by patching the POE::Kernel
+          run flags instead of asking the user to jump through contortions.
+        - add Task::Weaken as dependency (as recommends only at this time).
+        - replace PF_UNSPEC by 0, for good old minix.
+
+6.0 (not officially released, but was on CPAN for about 15 minutes :/)
+
+5.34  Thu May 12 09:59:41 CEST 2011
+	- AE::TLS didn't support both cert_file and key at the same time,
+          due to some copy&paste bug (reported and analyzed by vti).
+	- improve AE::Handle timeout documentation slightly.
+
+5.33  Mon Feb  7 21:51:41 CET 2011
+	- never appeared on CPAN, for unknown reasons.
+	- AnyEvent::Handle on_connect_error - do not try to destroy a handle
+          object when it's already gone (analyzed by Ryan Bullock).
+	- update idna algorithm(s) to UTS#46 version 6.0.0.
+        - preserve trailing dot in idn_to_ascii - testsuite says to preserve,
+          uts46 says it's an error, and testsuite makes more sense.
+        - remove leading dots in idn_to_ascii - testsuite says to remove,
+          uts46 says it's an error, and testsuite makes more sense.
+        - fixed a bug in idn ignored character processing.
+        - passes the uts46 6.0.0 testsuite except for three cases which
+          apparently are bugs in the testsuite itself.
+        - passes the uts46 6.0.1 testsuite except for eleven cases which
+          apparently are bugs in the testsuite itself.
+
+5.31  Sun Jan 23 11:49:19 CET 2011
+	- work around a POE bug where POE would first poll for new events and
+          invoke handlers BEFORE handling the message queue.
+	- fix parsing of "domain" statement in resolv.conf (Johannes Plunien).
+	- stop_read now does just that in TLS mode. see its
+          documentation for caveats.
+	- update to common::sense 3.4 warning set (some warnings in perl impose
+          an arbitrary 32kb limit on regex matches, which affects
+          AnyEvent::Handle).
+        - AE::Handle had a broken rbuf_max method and missing wbuf_max method.
+        - new experimental AE::Handle::resettls method.
+
+5.3    Fri Dec 31 05:48:13 CET 2010
+	- major IOAsync patch by Paul Evans - 0.33 is required, as the major
+          issues with IO::Async have been solved in that version, including
+          the availabilty of a default loop!
+	- implement new wbuf_max parameter for AnyEvent::Handle.
+        - added Cocoa::EventLoop backend by Daisuke Murase.
+        - the default testsuite now honors PERL_ANYEVENT_MODEL (Paul Evans).
+        - clarify handle on_prepare documentation.
+	- set CLOEXEC flag on parent-side fd's in AnyEvent::Util::run_cmd,
+          to avoid leaking them to any child processes.
+        - try to force files into the arch-dependend lib directory, for the
+          half-"turly obsessive compulsive person"(s) that depend on it.
+
+5.29   Sun Dec  5 10:49:21 CET 2010
+        - convert EV backend to EV 4.00 API (so better upgrade EV too).
+        - AE::Handle: implement dynamic read_size adjustment, add
+          max_read_size parameter, reduce default read_size to 2048.
+        - add some FAQ entries for servers and/or on_eof vs. on_error.
+	- work around OS bugs (cygwin again) when lingering in AE::Handle.
+        - reduce memory usage slightly when connect was used in AE::Handle.
+        - wrok around more segfaults in Tk.
+        - document tls_ctx => undef as valid.
+        - detect WNOHANG value at compiletime.
+        - include some probably linux-only support for building AnyEvent
+          as part of the perl core.
+        - improve compatibility of t/08_idna.t to perl 5.8.
+        - make AnyEvent::Strict truly optional (in case somebody builds a
+          minimal perl...).
+
+5.28   Wed Oct 13 04:14:23 CEST 2010
+        - due to a glitch, AnyEvent's internal getprotobyname wasn't
+          actually used in tcp_server.
+        - implement AnyEvent::CondVar->new method, which was documented but
+          missing.
+        - support autoloading of read types in unshift_read.
+        - AnyEvent::Strict: do the test for invalid fh arguments differently,
+          resulting in more informative error messages.
+        - new AnyEvent::FAQ manpage.
+	- clarify that you can actually call push_read etc. in on_read.
+        - put keys and certs in /tmp, not into the current directory,
+          and document this in the SECURITY CONSIDERATIONS sections
+          of AnyEvent::TLS.
+        - support ";" as resolv.conf comment character in AnyEvent::DNS, as
+          requested by Ron Isaacson.
+        - document $AnyEvent::DNS::RESOLVER variable.
+        - incorporated major typo patches by Abhijit Menon-Sen.
+        - AnyEvent::Handle now croaks when negative timeouts are passed.
+        - add a shitload of TCP_xxx sockopt name constants to AnyEvent::Util,
+          undocumented, but who knows when they might come in handy.
+
+5.271  Tue Jun  8 12:05:46 CEST 2010
+	- backport to perl 5.8.x.
+
+5.27   Sun Jun  6 12:12:05 CEST 2010
+	- postpone differently in AnyEvent::Socket now, as
+          when not, canceling the connection attempt might fail
+          (found by Felix Antonius Wilhelm Ostmann).
+	- explicitly check for non-stream sockets in AE::Handle, too many
+          clueless people fell into the trap of this somehow working.
+	- simplified and reworked the "OTHER MODULES" section.
+        - better/more condvar examples.
+
+5.261 Wed Apr 28 16:13:36 CEST 2010
+	- AF_INET6 was not properly used from Socket6 during configuration
+          time (found by Andy Grundman).
+
+5.26  Mon Apr 12 04:49:35 CEST 2010
+	- don't generate spurious readyness notifications when select
+          returns EINTR in the pure perl backend (analysed and testcase
+          by Bas Denissen).
+        - give same examples in SYNOPSIS sections of AnyEvent and AE.
+        - provider faster implementations for AE::time/now/now_update for
+          EV and Perl backends.
+        - provide faster AE::cv and AE::time implementations for all
+          backends.
+        - no longer support lower/mixed-case signal names (this was
+          never documented nor universally supported).
+        - some more memory µ-optimisations, and somewhat less messy
+          code to cope with both AnyEvent and AE APIs.
+
+5.251 Sat Mar 13 00:58:21 CET 2010
+        - make test failed if it was run before make install on perl <=
+          5.8.8, and older versions of perl make our live very difficult,
+          so write constants.pl during Makefile.PL time.
+
+5.25  Sat Mar 13 00:23:14 CET 2010
+	- fix a race condition in AnyEvent::Handle that would cause
+          a "bio_read: unsupported method" error (in _another_
+          ssl connection) after user code threw an exception.
+        - added AnyEvent::Handle->destroyed method.
+	- speed up AnyEvent::Socket::format_address and ::format_ipv6.
+        - the AnyEvent::Util::fh_nonblocking function worked only
+          by lucky accident on win32.
+        - smaller and faster AnyEvent::Util::fh_nonblocking.
+        - when the (required!) Time::HiRes module is missing, AnyEvent
+          did not fall back to built-in time properly.
+        - do not load Fcntl at runtime, saving memory and loading time.
+        - precompile a number of constants and use them instead of runtime
+          detection and eval.
+        - free detection code after detection and similar memory optimisations.
+        - Perl backend timer interval best effort drift has been improved
+          (same algorithm as EV).
+        - update unicode idna mapping table.
+
+5.24  Tue Jan  5 11:39:43 CET 2010
+	- cygwin never reports errors from failed connects. 1.5 just gives
+          you continous readyness and EAGAIN, 1.7 is even more broken and
+          just hangs. work around both issues in a cygwin-specific hack.
+	- improve idle watcher documentation slightly.
+
+5.23  Sun Dec 20 23:48:00 CET 2009
+	- support IDNs in resolve_sockaddr, and therefore in tcp_connect.
+        - implement punycode_encode/decode, idn_nameprep,
+          idn_to_ascii and idn_to_unicode operations in AnyEvent::Util.
+	- provide $AE::VERSION.
+        - removed traces of "no strict 'refs'".
+
+5.22  Sat Dec  5 03:51:13 CET 2009
+	- downgrade-or-fail in AnyEvent::Handle::push_write, to
+          diagnose encoding failures earlier and more succinctly.
+          (this works around bugs in perl, throwing away encoding info
+          when passing scalar data to extensions).
+        - add more examples to AnyEvent::Socket manpage.
+        - upgrade internal warning set to the same as common::sense 2.03.
+        - use pack "n/a*" for pre-5.8.9 perl compatibility in AnyEvent::DNS
+          (John Beppu).
+        - AnyEvent::Socket::inet_aton now properly supports ipv6, as documented.
+        - add google public dns servers to fallback server set and make sure
+          we load-balance properly between the three sets. also add all
+          fallback dns servers, not just a random one, to each dns config.
+
+5.21  Thu Nov 19 02:48:47 CET 2009
+	- fix a problem where socket constants were called with parameters
+          (spotted by David Friedland).
+        - fork_call never use'd POSIX (reported by Daisuke Maki).
+        - improve perl 5.6 compatibility further (but it still won't work
+          unless you rip out everything but the core).
+        - prefer Net::DNS::Resolver over ipconfig, if installed, on win32.
+          uses 10MB of RAM, but doesn't open a console window. *sigh*.
+
+5.202 Wed Oct 14 22:35:44 CEST 2009
+	- AnyEvent::DNS would unexpectedly clobber $_ under windows
+          (analysed by Matthias Waldorf).
+        - AnyEvent::Handle::run_cmd can now pass the PID of the
+          newly-created process, which is much less useful than it might
+          sound (based on patch by Yann Kerherve).
+
+5.201 Tue Sep 29 12:09:25 CEST 2009
+	- AnyEvent:Handle::on_starttls/on_stoptls methods were broken
+          (reported by Torsten Foertsch).
+        - common::sense 2.0 could cause tcp_server to throw an exception
+          (analysed by elmex).
+
+5.2  Mon Sep 14 07:04:49 CEST 2009
+	- INCOMPATIBLE CHANGE: do no longer support register_read_type
+          and register_write_type in AnyEvent::Handle, instead support
+          package names (the facility was mostly abused).
+        - implement "packagename-as-read/write type" support in
+          AnyEvent::Handle.
+	- AnyEvent::Handle: new options "keepalive" and "oobinline".
+        - oobinline set by default to avoid security issues.
+        - the pure-perl event loop backend wrongly detected times() fallback
+          support (spotted by Pavel Boldin).
+
+5.12 Tue Sep  1 20:26:50 CEST 2009
+	- be more lenient when parsing resolv.conf files, as some people
+          use hashmarks as comment indicator inside directives (reported
+          by Michael S. Fischer).
+        - use same set of warnings as common::sense 2.0.
+	- fix a potential 32 bit overflow issue due to perl having problems
+          with large hex constants in the Perl backend.
+        - do not use the slower 5.6 version fo the enc_name code in AnyEvent::DNS
+          by default.
+        - fix some prototypes.
+	- (optionally) require Async::Interrupt 1.02.
+        - replace opendns fallbacks by verizon/level3 public dns servers.
+
+5.112 Fri Aug 21 13:59:04 CEST 2009
+        - AnyEvent::Handle could cause hard crashes in Net::SSLeay when
+          using starttls with an illegal/uncreatable tls context.
+        - port to broken win32 perls.
+
+5.111 Sun Aug 16 18:44:36 CEST 2009
+	- perl errornously requires sockaddr_un structures returned by the
+          kernel to have a specific length. work around this bug by padding
+          sockaddr_un structures (found to fail on OS X, as perl only uses
+          the correct code for GNU/Linux, but likely to fail on other
+          OSes as well).
+
+5.11 Wed Aug 12 17:49:37 CEST 2009
+        - fixed a bug in run_cmd with input from filename.
+        - create a json coder object when none is given in write direction
+          to reduce dependency on JSON.
+
+5.1  Tue Aug 11 03:17:32 CEST 2009
+        - tcp_connect now reports the correct error in $!, not an unrelated
+          one (was broken since 4.91).
+        - AE::Handle did not properly clear rtimeout/wtimeout watchers
+          when retrying a tcp_connect.
+        - new functions: AnyEvent::Util::run_cmd and close_all_fds_except.
+        - fixed wrong documentation in AE::Socket.
+
+5.01 Mon Aug 10 03:16:32 CEST 2009
+	- last release broke EV child watchers :/.
+
+5.0  Sun Aug  9 17:32:09 CEST 2009
+	- officially introduce and document the AE API.
+        - lowering the timeout at runtime did not have immediate effect
+          in AnyEvent::Handle.
+        - AE::Handle now has separate and independent read and write timeout
+          settings.
+        - probe for Guard module when AnyEvent::Util is loaded, not at
+          runtime (Event doesn't like eval "use" from callbacks, and it avoids
+          exporting the probe function).
+        - Impl::IOAsync's io watchers did not use the filehandle emulation
+          code to work around it's watcher limits.
+        - work around IO::Async's problems with overloaded objects.
+        - try to disable wearnings inside IO::Async, it's just too buggy.
+        - do no longer use Event by default, only EV or Perl, Event is too buggy.
+	- hackishly provide fast AE:: interface when EV or Perl is the backend.
+        - inherit VERSION from AnyEvent::VERSION in most modules.
+
+4.91 Thu Aug  6 15:42:45 CEST 2009
+	- AE::Handle::starttls could get out of sync when the read buffer
+          already contains some TLS handshake.
+	- AE::Handle did not properly free the TLS session, causing bigger
+          memory leaks in Net::SSLeay than expected (reported by toaster).
+        - AE::Socket::tcp_connect will now artificially delay invoking
+          the callback to avoid returning after invoking the callback.
+        - convert many internal watcher uses to AE API.
+
+4.9  Sat Aug  1 11:07:01 CEST 2009
+	- Glib silently fails when registering a timeout with
+          a negative value, so avoid that.
+        - call condvar callback immediately  when it is set
+          after the condition is already signalled.
+        - check rbuf_max condition only after trying to consume
+          data.
+	- normalise signal numbers to names when using the ae's
+          signal handling, but do not document this (yet).
+        - pure perl signal emulation did not properly set nonblocking
+          mode on the signal pipe on win32 (this is unlikely to have caused
+          any issues).
+        - new module: AnyEvent::Debug.
+        - AnyEvent::Strict now checks that a signal was specified
+          by name (not name or number).
+        - reduce memory footprint in typical cases by ~50kb by
+          only compiling signal code when necessary.
+        - add AnyEvent::Handle->rbuf_max.
+        - grab the AE namespace for future new API, implement stubs for
+          said future/alternative API.
+        - new function: AnyEvent::Socket::format_hostport.
+
+4.881 Tue Jul 28 12:51:53 CEST 2009
+	- work around a bug in local in pre-5.10 perls, causing
+          AnyEvent::Handle to recurse when it should not
+          (analysed by elmex).
+
+4.88 Tue Jul 28 04:04:37 CEST 2009
+	- re-bless the handle into a dummy package after calling
+          AnyEvent::Handle::destroy, so the user does not need to check
+          for errors after every push_write etc.
+        - do not attempt to run t/02_signals.t on obviously broken
+          platforms.
+
+4.87 Sun Jul 26 02:06:16 CEST 2009
+	- do not attempt to linger when there is no longer a valid fh.
+        - enforce tls mode to be either accept or connect, do not simply
+          segfault in Net::SSLeay.
+        - AnyEvent::Handle can now call tcp_connect itself (new parameters
+          connect, on_prepare, on_connect and on_connect_error). Updated
+          tutorial accordingly.
+	- add AnyEvent::Impl::Irssi backend.
+
+4.86 Mon Jul 20 23:52:29 CEST 2009
+	- since the verbose warning is not enough, explicitly document
+          that versions before 1.33 of Net::SSLeay are not secure.
+	- work around signal handling races in Event and (...) Event::Lib.
+        - try to align signal-race timer to full-second boundaries.
+        - work around Tk not liking negative timeouts.
+        - don't complain of different grades of environmental unfriendlyness
+          in IO::Async.
+
+4.85 Sat Jul 18 06:16:14 CEST 2009
+        - nail the signal race problem in perl once and for all
+          (see $AnyEvent::MAX_SIGNAL_LATENCY).
+        - take advantage of Async::Interrupt if it is available.
+        - load Time::HiRes and Guard modules on demand only.
+        - add optional/recommended modules section to AnyEvent
+          documentation.
+        - reduce memory usage considerably (and reduce startup penalty)
+          by not using "strict", "warnings" and "overload" modules.
+        - work around buggy windows/openbsd perls and provide EBADMSG
+          and EPROTO ourselves when missing.
+	- improve perl 5.6 compatibility of the core event loop.
+        - made Net::SSLeay version 1.33 a soft requirement.
+
+4.83 Fri Jul 17 16:56:26 CEST 2009
+	- implement AnyEvent::Socket::getprotobyname.
+	- AnyEvent::CondVar's will now detect recursive blocking
+          waits and will croak, as too many people fall into
+          this trap.
+        - AnyEvent::Handle will now call ->destroy on itself after
+          executing the on_error callback, instead of doing some
+          half-baked internal shutdown, for fatal errors.
+        - clarify on_eof behaviour w.r.t. the read queue and
+          on_read callbacks.
+	- ignore some possible spurious wake-ups in tcp_connect.
+
+4.82 Sat Jul 11 00:34:55 CEST 2009
+	- POE and Event backends didn't accept some callable objects as 
+          callbacks.
+	- use Config module instead of POSIX module to detect signal names
+          in AnyEvent::Strict and AnyEvent::Impl::EventLib, as the POSIX
+          module doesn't even have all POSIX signals :/.
+        - use more workarounds around the many refcnt/corruption bugs in
+          Event::Lib.
+        - work around a race condition in perl's select, causing t/03_child.t
+          to rarely fail.
+
+4.81 Thu Jul  9 10:30:30 CEST 2009
+        - AnyEvent::Handle didn't properly diagnose write errors
+          (it expected -1 from syswrite, how lame... :).
+	- support file descriptors in addition to file handles
+          in AnyEvent->io.
+	- new env variables: PERL_ANYEVENT_RESOLV_CONF,
+          PERL_ANYEVENT_MAX_OUTSTANDING_DNS, PERL_ANYEVENT_CA_FILE
+          and PERL_ANYEVENT_CA_PATH.
+        - provide a sensible synopsis section for AnyEvent::TLS.
+        - add a "supported backends" section to the manpage.
+        - added simple io watcher test to testsuite, using a
+          portable_socketpair.
+        - tried to improve the stability of the Event::Lib backend,
+          YMMV.
+
+4.8  Mon Jul  6 23:45:16 CEST 2009
+	- AnyEvent::DNS did not properly follow CNAME records with
+          uppercase targets.
+        - AnyEvent::DNS would errornously return AAAA records
+          with v4 mapped addresses (a faulty record) as ipv4 addresses,
+          causing AnyEvent::Socket to throw an exception.
+        - added new module AnyEvent::TLS for easier SSL/TLS context
+          creation, with many options including hostname verification,
+          secure default configuration, lots of documentation and,
+          predefined diffie-hellman keys for perfect forward security
+          and much more. get it while it's still fresh!
+        - use AnyEvent::TLS in AnyEvent::Handle for context management.
+	- load AnyEvent::Handle only on demand in AnyEvent::DNS,
+          so AnyEvent::Socket users have smaller memory footprint
+          in the common case.
+        - add AnyEvent::Handle->push_shutdown method.
+        - add an additional error message parameter to AnyEvent::Handle's
+          on_error callback (for TLS, $! is still available).
+        - add AnyEvent::Handle on_starttls/on_stoptls callbacks.
+        - make AnyEvent::Handle more robust against early connection
+          failures (during new), and return C<undef> in that case
+          from the constructor.
+        - AnyEvent::Handle will now try to load only JSON::XS first,
+          then fall back to JSON.
+        - format_ipv4/format_ipv6 are now exported by default, for symmetry,
+          and because it was documented that way.
+
+4.451 Fri Jul  3 00:28:58 CEST 2009
+	- do not clear rbuf when shutting down an AnyEvent::Handle
+          object - doing so breaks AnyEvent::HTTP.
+
+4.45  Mon Jun 29 22:59:26 CEST 2009
+        - a write error could cause AnyEvent::Handle to create
+          an I/O watcher with an undefined $fh.
+        - special-case mapped ipv4 addresses in both
+          AnyEvent::Socket::format_address and parse_address,
+          to treat them just like ipv4 addresses.
+        - updated and overhauled the AnyEvent::Intro doc.
+        - implement AnyEvent::Socket::format_ipv4/ipv6.
+	- slightly speed up portable_pipe/socketpair.
+        - expand condvar begin/end documentation.
+
+4.42  Fri Jun 26 08:32:18 CEST 2009
+	- preliminary and neccesarily incomplete support for IO::Async.
+	- reset SIGCHLD to DEFAULT when AnyEvent is loaded, in
+          case it was set to IGNORE, to ensure we can catch child statuses
+          even when the calling env acts stupidly.
+        - updated benchmarks with IO::Async, which performs very well.
+
+4.412 Wed Jun 24 01:35:57 CEST 2009
+	- support an "untaint" attribute for AnyEvent::DNS
+          and set it on the default resolver.
+	- implement and document AnyEvent::Impl::Perl::loop.
+        - remove all anyevent-env variables from %ENV
+          when running in tainted mode.
+        - mention and extend the IO::Lambda benchmark.
+
+4.411 Sun Jun  7 18:48:02 CEST 2009
+	- do not try to use F_SETFD on windows.
+
+4.41  Thu May 14 06:40:11 CEST 2009
+        - work around issues in older perls (5.8.0?) when
+          a signal handler is deleted from the %SIG hash.
+        - use POSIX::_exit in child test, to avoid running
+          destructors.
+        - speed up CHLD handling by relying on SIGCHLD being
+          synchronously delivered, even when we roll our own
+          implementation.
+	- AnyEvent::DNS: add the "dname" resource record name
+          for cosmetic reasons.
+
+4.4   Sun Apr 26 20:12:33 CEST 2009
+	- implemented idle watchers, where applicable.
+	- AnyEvent->time died when Event backend was in use.
+        - fix a memleak in the Tk backend.
+        - sped up Tk timer handling.
+        - clip negative "after" values to 0 in AnyEvent::Impl::Event
+          to avoid spamming out warning messages.
+        - fix Qt timers without interval.
+        - avoid Qt zero-timeout special case, in old libqt's.
+
+4.352 Mon Apr 20 16:31:11 CEST 2009
+	- fix AnyEvent::Strict error messages for child watchers.
+        - fix/update Makefile.PL "recommends" versions.
+        - add AnyEvent->now_update.
+
+4.351 Sat Apr 11 07:56:14 CEST 2009
+        - actually make the signal pipe work under win32.
+        - localise $! in signal handler to avoid changing $!, although
+          perl itself does not seem to save/restore errno either.
+	- set the cloexec flag on the signal pipe (normally set by perl too).
+
+4.35  Fri Mar 27 11:48:20 CET 2009
+        - event models relying on AnyEvent's signal watcher emulation did
+          invoke the callback asynchronously, contradicting documentation
+          and causing signals to get lost (this includes AnyEvent's own
+          event loop). AnyEvent now uses the standard pipe trick to make
+          callback execution synchronous to the event loop.
+        - AnyEvent::Handle didn't free TLS context data on DESTROY
+          (patch by Pavel Shaydo).
+        - work around the ever-incompatibly-changing API of MakeMaker.
+        - document that changing global variables without restoring them
+          is a bad idea in Perl (noted by Adam Rosenstein).
+        - AnyEvent::Strict now barfs if ->io is passed a file.
+
+4.34  Thu Feb 12 18:32:45 CET 2009
+	- separately buffer TLS read data, as otherwise the read queue could
+          deadlock as receiving data is not expected while draining the
+          read queue (which cna only happen with TLS).
+	- raise EBADMSG error on JSON decoding errors.
+        - fix some minor manpage bugs (reported by Maximilian Gaß).
+        - speed up select bitmask parsing quite a bit in the pure perl
+          backend.
+        - use CORE::select instead of just select in AnyEvent::Impl::Perl.
+
+4.331 Tue Jan  6 21:07:25 CET 2009
+	- socketpair fails on many vista machines because vista has
+          completely broken accept/getpeername and getsockname functions,
+          so we provide our own socketpair emulation that kind of works
+          (AnyEvent::Util::portable_pipe).
+        - new function: AnyEvent::Util::portable_socketpair.
+	- take advantage of the Guard module if it exists.
+
+4.33 Fri Nov 21 02:35:40 CET 2008
+	- AnyEvent::Strict did errornously flag a fileno of 0 as
+          illegal.
+	- reduce memory usage and slightly speed up the pure perl backend
+          by only storing the file descriptor, not the file handle.
+        - add missing autocork method to AnyEvent::Handle (reported
+          by Adam Rosenstein).
+        - AnyEvent::DNS->resolve errornously documented an $rcode result
+          argument, but there isn't (spotted by Henrik Krohns).
+        - the naked truth about Tk - it's basically unmaintained.
+
+4.32 Mon Nov  3 22:46:32 CET 2008
+	- fix AnyEvent::Socket::resolve_sockaddr to properly support
+          unix sockets again and choose a proper default for
+          the socket type.
+        - fix call to resolve_sockaddr in tcp_connect.
+
+4.31 Thu Oct 30 04:41:48 CET 2008
+	- implemented AnyEvent::Handle->destroy method.
+	- hint about unexpected effects in TLS mode.
+        - speed up AnyEvent::Impl::Perl by using more arrays
+          instead of hashes without the slightest loss of readability :)
+        - work around a perl argument refcounting bug.
+        - with some perl patches applied, AnyEvent now seems leak-free.
+
+4.3  Fri Oct  3 09:18:43 CEST 2008
+	- AnyEvent will now install a no-op signal handler for SIGPIPE,
+          unless one has been installed already.
+        - warn about not loaidng AnyEvent::Impl::POE early enough
+          (patch by Adam Rosenstein).
+	- fixed a great number of bugs and corner cases in AnyEvent::Handle.
+        - fix a bug in where in SSL connect mode, the
+          client would first wait for some data by the server and
+          otherwise hang. (reported and analysed in an absolutely
+          exemplary manner by Adam Rosenstein).
+        - fix a bug in where SSL EOF would not be treated
+          as stream EOF, putting the connection into a hung state.
+          (reported and analysed in an absolutely exemplary manner by Adam
+          Rosenstein).
+        - fix a potential segfault when the TLS context
+          would go missing in a read callback (e.g. due to stoptls) -
+          Net::SSLeay of course makes no type checking whatsoever.
+        - AnyEvent::Handle will not stop the read watcher in TLS mode.
+        - AnyEvent::Handle->stoptls will send a TLS close notify
+          instead of simply destroying the stream now.
+        - fix a bug where large blocks of data written in TLS mode
+          would not be sent unless triggered by receives.
+        - on_drain will now take the tls write buffer into account.
+        - SSL operations have been streamlined a bit and should be faster
+          now, more to come, though.
+        - added a FAQ section, will document nontrivial issues in there.
+
+4.234 Mon Sep 29 04:08:13 CEST 2008
+	- fix child watcher documentation: only child exits will be reported,
+          no trace events.
+        - mention SIGPIPE in AnyEvent::Handle.
+	- perl backend will now use POSIX::times as monotonic clock
+          when available and the monotonic clock option is not.
+        - run even without Time::HiRes in some cases now, but do not
+          provide sub-second accuracy (all *supported* perl versions have
+          Time::HiRes).
+
+4.233 Fri Aug 22 01:48:05 CEST 2008
+	- fix a bug in the testsuite, causing a hang.
+        - clarified lots of AnyEvent::Handle constructor arguments.
+
+4.232 Thu Aug 21 20:44:25 CEST 2008
+	- fix a bug in AnyEvent::Handle that could cause two fatal error
+          callbacks on EOF, which caused AnyEvent::HTTP to signal success twice
+          (testcase by Leon Brocard).
+        - clarified on_eof/on_error documentation a bit.
+
+4.231 Tue Jul 29 13:12:15 CEST 2008
+        - remove some debugging code left in AnyEvent::Util::fork_call
+          (and no, it's impossible to implement with the broken windows
+          perls without resource leaks or worse).
+
+4.23 Tue Jul 29 12:19:59 CEST 2008
+	- document the first parameter passed to condvar callbacks to be
+          the callback.
+        - add AnyEvent::Socket::{ntoa,aton} aliases.
+        - optimize the AE::Handle->push_read (line) for the default
+          eol marker.
+        - optimize push_read (packstring|storable) for small packets.
+        - invoke on_error callback when no on_eof callback is set.
+        - fix a bug in push_read (storable) of unknown impact.
+
+4.22 Sun Jul 20 16:34:13 CEST 2008
+	- new function AnyEvent::Socket::parse_hostport.
+        - as the bulkheads at microsoft can't even get getprotobyname reliably
+          working on their shitty fucking broken os we need to hardcode
+          some common protocol numbers in AnyEvent::Socket. How can
+          people even bother with such a pile of shit as windows.
+
+4.21 Thu Jul 17 14:40:05 CEST 2008
+	- INCOMPATIBLE CHANGE: AnyEvent::Util::fork_call now has a prototype
+          which is incompatible to previous invocation syntax.
+        - work around more windows perl bugs in fork_call. I cannot imagine
+          why anybody would bother implementing fork in such an obviously
+          unusable way.
+	- avoid calling $do_retry if the request has already finished in
+          AnyEvent::DNS, thus avoiding an exception (reported by Anatoly
+          K. Sharifulin).
+
+4.2  Sat Jul 12 22:42:11 CEST 2008
+	- support an "interval" argument for repeating timers.
+        - fix a bug in the pure perl event loop that caused timers to
+          be delayed under some circumstances.
+        - implement optional argument checking via PERL_ANYEVENT_STRICT.
+	- not importing anything from Event causes it to malfunction
+          and not use Time::HiRes, work around this bug.
+        - more bug workarounds against the endlessly broken Tk module,
+          seems to work now on 32 bit machines, but less so on 64 bit.
+        - minor optimisations applied to most backends.
+
+4.161 Fri Jul  4 14:24:48 CEST 2008
+        - fixed the t/handle/02_write.t, it read after write, with the
+          assumption that all data could be written before read
+          (reported by Jim Razmus).
+
+4.160 Thu Jul  3 04:02:21 CEST 2008
+	- re-registering signal watchers after unregistering one did
+          not work if a backend falls back on AnyEvent's default
+          implementation (also affected child watchers).
+	- new AnyEvent::Handle options: autocork and no_delay.
+
+4.152 Sun Jun 22 14:15:44 CEST 2008
+	- allow for 32-bit perls that implement shifts differently
+          on different architectures in parse_ipv4 (reported and
+          analysed by Keiichi DAIBA).
+
+4.151 Fri Jun  6 17:34:24 CEST 2008
+	- make sure specifying _only_ on_read and never pushing reads
+          works.
+
+4.15 Fri Jun  6 13:00:46 CEST 2008
+	- the pure perl backend would keep some watchers alive when more than
+          one watcher was registered for the same fd.
+	- new "packstring" and "storable" read and write types
+          for AnyEvent::Handle.
+        - allow on_eof handler to be called after on_error with EPIPE returns.
+        - do not immediately call on_read callback in handle constructor.
+
+4.14 Thu Jun  5 20:29:31 CEST 2008
+        - Fixed a bug in DNS SRV priority sorting.
+        - AnyEvent::Util::guard now reports runtime errors while
+          executing the guard block as warnings.
+        - handle 0-byte-reads just before EOF correctly in AnyEvent::Handle.
+
+4.13 Thu Jun  5 00:47:59 CEST 2008
+	- AnyEvent::DNS only followed cname chains with length 2,
+          contrary to documentation. bumped it up to 10, thanks to
+          microsoft, the current broken-dns-config-king.
+        - AnyEvent::DNS didn't check for socket return status
+          but instead relied on perl not creating filehandles in that
+          case - too bad it gives you a bogus file handle (reported
+          and analysed by Vladimir Timofeev).
+	- fix queue management logic in AnyEvent::Handle:
+          when on_read was registered, the queue was empty
+          and no progress could be made AnyEvent::Handle would
+          enter an endless loop.
+        - correctly start reading again when the handle became
+          busy again after idling.
+        - correctly treat tls shut-downs as EOF condition
+          (for the time being, would be nice to have a callback for that).
+        - correctly call eof callback under all conditions
+          (hopefully).
+        - the timeout callback did not expect that $self can go
+          away any time.
+
+4.12 Tue Jun  3 10:58:04 CEST 2008
+	- include AnyEvent::Intro, a tutorial for anyevent,
+          anyevent::socket and anyevent::handle.
+        - allow more options in on_error.
+
+4.11 Fri May 30 23:42:25 CEST 2008
+        - INCOMPATIBLE CHANGE: replace ptr by real PTR lookup, provide
+          reverse_lookup and reverse_verify to replace it, support
+          v4mapped and v4compat addresses.
+	- provide more documentation for the resolver class.
+        - really replace longest run of :0: by :: in format_address,
+          also properly convert :: and ::1 again.
+        - support NAPTR record name and decode it.
+        - implement random weight sampling for SRV records, as per
+          rfc 2782.
+        - correctly abort on srv-record targets of ".".
+        - added AnyEvent::DNS::wait_for_slot.
+        - in the unlikely event of a virtual circuit connection
+          being invalidated by a delayed udp reply, AnyEvent::DNS
+          could die. this has been fixed.
+        - plug a probable memleak in the DNS vc code.
+        - use configured timeout also for VC request phase.
+        - implement timeout and max_outstanding methods
+          for resolver class.
+        - update version numbers in all modules.
+
+4.1  Thu May 29 05:45:40 CEST 2008
+	- INCOMPATIBLE CHANGE: renamed xxx_ip functions to xxx_address
+          which mirrors their purpose better (old names still available
+          for a while). Also moved AnyEvent::DNS::addr to
+          AnyEvent::Socket::resolve_sockaddr.
+	- implement AnyEvent->time and AnyEvent->now.
+        - fix IPv6 support in pack_sockaddr.
+	- officially un-experimentalise all newly introduced code.
+        - support unix domain sockets everywhere by specifying
+          a host of "unix/" and the pathname as service.
+        - implement an activity timeout in AnyEvent::Handle.
+	- added a regex read type to AnyEvent::Handle.
+	- added a json read/write type to AnyEvent::Handle.
+        - always croak in on_error in AnyEvent::Handle.
+        - document how to subclass AnyEvent::Handle.
+        - implement AnyEvent::Util::fork_call.
+        - add support for IPv6 nameservers and nameserver statements.
+        - work around _yet_ _another_ windows perl bug in where empty
+          select masks cause errors in the pure perl backend (this
+          workaround cannot be implemented for the other event loops,
+          but EV also works around this).
+        - supply AnyEvent::Socket::address_type and make good use of it.
+        - clarify and fix the Handle documentation w.r.t $self vs. $handle
+          vs. callback arguments.
+	- add some recommends to the META.yml.
+
+4.05 Mon May 26 19:44:06 CEST 2008
+        - some platforms ignore the rfc and prepend an extra sa_len member to
+          the sockaddr structure, cater for those. also use sockaddr_family,
+          didn't know it was there, but comes in handy for the workaround.
+	- undo the import WIN32 hack.
+
+4.04 Mon May 26 08:03:31 CEST 2008
+	- try to work around yet another windows bug: failed connects are reported
+          as if it were out-of-band data. windows users: you suck. Only
+          EV, Glib, Event and the pure perl backend can handle this condition.
+        - optimize write algorithm in AnyEvent::Handle.
+	- properly parse PERL_ANYEVENT_PROTOCOLS and use the info correctly.
+        - tcp_connect now properly iterates through all targets.
+	- check wether IPv6 sockets can actually be created, otherwise, disable ipv6
+          support entirely. also hardcode some AF_INET6 constants for the
+          sake of perl 5.8.
+        - vastly improved nameserver/suffix detection algorithm for windows
+          (still a hack...)
+        - try to use a fallback dns server if no dns servers could be found.
+        - splatter around some local $SIG{__DIE__}'s to work around bad
+          die handlers.
+
+4.03 Sun May 25 05:05:57 CEST 2008
+	- work around perl bugs on windows, where perl returns undocumented
+          error codes for sysread, syswrite etc.
+	- fix AnyEvent::Handle::unshift_read to really unshift and not push.
+        - AnyEvent::Handle could sometimes stumble over 0-byte writes.
+        - fix unpack_sockaddr, now works for AF_INET6 sockaddr's.
+        - updated documentation.
+        - lots of workarounds for perl 5.8 quirks.
+        - implement a more flexible type system for both reads and writes
+          in AnyEvent::Handle.
+        - support IPv6 in tcp_server.
+        - pass local hostname and port to the prepare callback in tcp_server.
+        - make types extendable in AnyEvent::Handle.
+        - croak, not die, in AnyEvent::Handle;
+
+4.0  Sat May 24 19:58:08 CEST 2008
+	- added (experimental) AnyEvent::DNS module.
+        - added (experimental) AnyEvent::Socket module.
+        - added (experiemntal) support for TLS/SSL in AnyEvent::Handle.
+        - make condvar->end call ->send as documented.
+        - make condvar constructor support the documented cb => argument.
+        - overload condvars so you can use them instead of code references.
+        - support more of the POSIX forms instead of a pure dotted quad for
+          verbatim ip addresses.
+        - AnyEvent::Socket::inet_aton will use AnyEvent::DNS now and not fork anymore.
+	- try very hard not to freeze on broken windows perls.
+        - make on_eof optional in AnyEvent::Handle.
+	- support service names in tcp_connect and tcp_server.
+        - work around netbsd/openbsd bug causing unix sockets not to
+          become writable until empty.
+	- only make a dummy read for error detection when getpeername
+          returns ENOTCONN.
+        - defend AnyEvent::Util::inet_aton against Coro::LWP's brutal
+          override.
+        - new AnyEvent::Guard::cancel.
+
+3.5  Sat May 17 23:17:14 CEST 2008
+	- gracefully deal with systems not defining CLOCK_MONOTONIC
+          (as opposed to not supporting the clock itself, which worked in 3.41).
+	- added AnyEvent::Util::tcp_connect and AnyEvent::Util::tcp_server
+          helpers, to replace the ill-designed AnyEvent::Socket class.
+	- added some examples (eg/connect, eg/handle).
+	- added AnyEvent::Util::guard.
+        - AnyEvent::Util now exports most of its functions.
+	- fixed a bug in *_read_chunk, where the callback was called with $self as
+          first and second argument.
+        - simplified and fixed regex handling in AnyEvent::Handle::*_read_line.
+	- fix manpage condvars examples to use new syntax.
+        - considerably improve inet_aton with EV::ADNS backend to support
+          cname chains (common dns configuration bug, e.g. with www.google.de)
+          and aaaa records if no a record could be found.
+
+3.41 Sun May 11 19:53:13 CEST 2008
+	- work around a bug in perl 5.8.8's local. Reported by Yi Ma Mao.
+
+3.4  Sun May 11 00:29:25 CEST 2008
+	- complete re-implementation of condvars with a hopefully much more useful
+          API (backward compatible functions exist but are undocumented).
+	- AnyEvent::Handle fully rewritten with a hopefully more powerful API
+          (still subject to change).
+	- take advantage of CLOCK_MONOTONIC, if available, in AnyEvent::Impl::Perl.
+        - provide AnyEvent::post_detect and @AnyEvent::post_detect, which
+          allows module authors to avoid forcing event loop detection.
+          (used by Coro::AIO, Coro::BDB, Coro::AnyEvent for example).
+        - remove coro backends: Coro now provides generic support for AnyEvent
+          via Coro::AnyEvent.
+
+3.3  Mon Apr 28 09:51:06 CEST 2008
+        - added AnyEvent::Handle, AnyEvent::Socket and AnyEvent::Util modules.
+        - fix a bug in the pure perl backend that kept watchers alive
+          when multiple watchers were registered for the same fh/poll combo.
+	- add a benchmark section showing AnyEvent overhead and comparing
+          the different event loops with each other.
+        - prefer pure perl over tk when autoprobing, as it's about as fast,
+          but doesn't crash with many watchers.
+	- declare Qt support non-experimental.
+        - clarify the confusing section about the file descriptor being
+          kept alive.
+        - document the race between loading of an event module and
+          child processes exiting.
+        - support POE as "backend" (with some caveats, POE is not generic
+          enough, and darn slow).
+        - support Wx and Prima through POE.
+        - optimise perl backend to use 20% less memory and take advantage
+          of typical timeout behaviour. It can now compete with
+          select/poll-based C event loops in most cases (it is usually
+          faster than Event and Glib :).
+        - roughly cut EV memory use in half and increase its speed by 30%,
+          by removing undocumented functionality. Did something similar
+          to other event loops where possible.
+
+3.2  Thu Apr 24 10:10:40 CEST 2008
+	- do not die when anyevent watchers are destroyed while running callbacks
+          in the pureperl backend (could only happen when two watchers are registered
+          for the same fh/poll combo).
+        - support autoloading for child watchers, was broken in all versions.
+	- implement PERL_ANYEVENT_MODEL env variable.
+        - (experimental) implement interface to the (very crashy/buggy) Event::Lib module.
+        - (experimental) implement interface to the Qt module (cannot be autoprobed).
+        - this release is IO:AnyEvent-proof.
+
+3.12 Tue Apr 22 07:11:46 CEST 2008
+	- reinstate AUTHOR section that got lost somehow.
+        - do not hang in the testsuite with badly broken perls (activestate,
+          strawberry...), but instead diagnose the problem and continue.
+        - use INT instead of CHLD in an attempt to support broken windows perls
+          better (this decreases the test quality, unfortunately).
+        - do not send the signal to the process group
+          (no problem for CHLD, bad for INT :).
+
+3.11 Sat Apr 19 06:57:31 CEST 2008
+	- major documentation rework.
+        - document the fact that child watchers only watch for zombies.
+        - fix the child watcher example.
+
+3.1  Wed Apr 16 17:09:01 CEST 2008
+	- work around recurring bugs in Tk by dup'ing filehandles, the
+          only method with good success chances on Tk (the bugs apparently
+          don't get fixed anytime soon).
+        - lift the restriction of only one watcher per fh direction
+          (as the Tk bug workaround also lifts it and only Tk imposed
+          such strong limits).
+        - changed probe order to prefer coro adaptors.
+        - explain why recursion into the event loop is not supported
+          unless the backend supports it (only Coro::EV does without
+          any restrictions...).
+        - add simple manpages for all backend modules.
+
+3.0  Mon Apr  7 21:30:23 CEST 2008
+	- Coro::Signal changed semantics, roll our own, also cleaning
+          up the Coro implementation in general.
+        - rename Coro backend to CoroEvent.
+        - add some decision helping paragraph to the manpage that should
+          help people to decide whether AnyEvent is the right thing for them.
+
+2.9  Mon Jan 28 13:31:54 CET 2008
+	- update for EV 3.0 API changes.
+
+2.8  Sun Nov 25 15:06:03 CET 2007
+	- waitpid can validly return 0. accept this fact of life
+          instead of reporting it to any watchers.
+
+2.7  Fri Nov 23 11:41:14 CET 2007
+	- force use of AnyEvent::Impl::Perl in testsuite, there is
+          too much breakage outside AnyEvent.
+        - deliver signals synchronously in AnyEvent::Impl::Perl
+          or any other event loop that relies on AnyEvents child
+          watcher emulation. *Could* help with hanging testsuite
+          (except when Event or EV are installed).
+
+2.6  Fri Nov  9 20:36:35 CET 2007
+	- fix bug in testsuite.
+        - move EV adaptor modules to AnyEvent.
+        - add Coro+EV adaptor module.
+
+2.55 Tue Nov  6 17:41:32 CET 2007
+	- add EV to the list of supported event models.
+        - do not auto-reset pid watchers, pass pid and status to them.
+        - allow a pid of zero to watch for all children in child watchers.
+
+2.54 Wed Jul 18 17:36:23 CEST 2007
+	- work around a perl bug that results in
+          BEGIN not safe after errors--compilation aborted without
+          any discernible reason or error message by once
+          again not use'ing strict.
+
+2.53 Sun Jul  8 10:51:53 CEST 2007
+	- make Glib interface work again (spotted by elmex).
+
+2.52 Wed Mar  7 18:36:16 CET 2007
+	- child watchers stopped working permanently when
+          all current child watchers were destroyed.
+
+2.51 Mon Dec 11 21:33:24 CET 2006
+	- work around bugs in perl where eval "require Module" returns
+          true even if the module couldn't be loaded :/.
+
+2.5  Mon Dec 11 02:15:28 CET 2006
+	- avoid $AUTOLOAD because many perls corrupt it.
+        - AnyEvent::detect forces autodetection.
+        - implement signal watchers (experimental)
+          (Tk does not support async signals (<= 804.027 at least),
+          so they might get delayed indefinitely on Tk).
+        - implement child watchers (experimental).
+        - moved default condvar implementation into base module, simplifying
+          most implementation modules.
+
+2.1  Fri Nov 24 15:50:48 CET 2006
+	- better docs.
+        - simple testsuite.
+        - added AnyEvent->one_event method for special purposes.
+
+2.0  Wed Nov  1 02:21:30 CET 2006
+	- INCOMPATIBLE CHANGE: poll can now either be "r" or "w" but not both.
+	- INCOMPATIBLE CHANGE: io watcher callbacks have no arguments anymore.
+        - EXPERIMENTAL:
+          new pure-perl model added, AnyEvent now always finds a suitable
+          event model.
+        - improved documentation.
+        - reduced cpu overhead.
+
+1.02 Fri Jan 13 14:15:40 CET 2006
+	- add COPYING to clarify license.
+
+1.01 Sun Jan  8 05:48:09 CET 2006
+	- correctly cancel Event timers, avoid memory leaks.
+
+1.0  Sun Jan  8 05:40:58 CET 2006
+	- allow third-party interfaces to be added at runtime.
+        - fix version number.
+
+0.9  Fri Dec 30 02:25:41 CET 2005
+	- fixed errors in the documentation.
+        - going back to using $VERSION as "load check",
+          as suggested by Jörn Reder. Let's see why I stopped using
+          this method.
+        - add 'hup' to the list of events to receive for glib
+          and generate 'rw' events for it, as some versions of
+          glib seem to require this, while this breaks other
+          (older) versions of glib.
+        - implemented PERL_ANYEVENT_VERBOSE env variable.
+
+0.3   Sun Dec  4 10:43:33 CET 2005
+        - no changes to the code.
+	- fixed documentation.
+        - clarified some corner cases.
+        - vastly improved documentation with a long example.
+
+0.2   Thu Dec  1 22:18:49 CET 2005
+	- check whether a valid method was called, to avoid endless loops.
+        - move condvars into their own class (cleaner, safer).
+        - don't die when some modules are not available.
+        - Tk is too broken to allow for words. Will work once Tk works.
+
+0.1   Thu Dec  1 19:44:57 CET 2005
+	- spiced up and cleaned up for release.
+
+0.01  Tue Sep 21 18:12:09 CEST 2004
+	- original version; copied from Convert::Scalar.
+

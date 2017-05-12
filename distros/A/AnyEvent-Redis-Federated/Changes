@@ -1,0 +1,27 @@
+Revision history for Perl extension AnyEvent::Redis::Federated.
+
+0.08  Tue Nov 27 12:00:41 2012
+	- Doc cleanup.
+
+0.07  Thu Sep 13 12:00:41 2012
+	- Fixed retry logic, memory leak in poll(), and introduce node groups.
+
+0.06  Tue Aug 7 10:00:41 2012
+	- AnyEvent timer replaced with alarm since timers work in
+  	surprising ways
+
+0.05  Tue Jul 31 10:06:41 2012
+	- more Makefile.PL fixes
+
+0.04  Mon Jul 30 11:06:41 2012
+	- Makefile.PL fixes
+
+0.03  Mon Jul 30 10:06:41 2012
+	- fix tests to start redis-server if found
+
+0.02  Wed Jul 25 16:06:41 2012
+	- bump version so I can re-upload to CPAN
+
+0.01  Wed Jul 25 15:59:41 2012
+	- re-generated a few files, including Changes using h2xs
+

@@ -1,0 +1,13 @@
+blib*
+inc*
+Makefile
+Makefile.old
+Build
+_build*
+pm_to_blib*
+*.tar.gz
+.lwpcookies
+Archive-Any-Plugin-Rar-*
+cover_db
+*.sw*
+*.bak

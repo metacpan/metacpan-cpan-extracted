@@ -1,0 +1,189 @@
+{
+   "abstract" : "a rapid active commotion (framework for web-projects on Mojolicious)",
+   "author" : [
+      "ÐÑÐ°ÑÐ¸Ð¼Ð¸Ñ ÐÐµÑÐ¾Ð² <berov@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "keywords" : [
+      "Ado",
+      "Mojolicious",
+      "realtime",
+      "web",
+      "ERP",
+      "REST",
+      "CMS",
+      "enterprise"
+   ],
+   "license" : [
+      "lgpl_3_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ado",
+   "no_index" : {
+      "namespace" : [
+         "Ado::Model"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Apache::LogFormat::Compiler" : "0",
+            "DBD::SQLite" : "1.52",
+            "FCGI" : "0.74",
+            "FCGI::ProcManager" : "0.24",
+            "Mojo::Server::FastCGI" : "0.41",
+            "Plack" : "1.0030",
+            "SQL::Abstract" : "1.78"
+         },
+         "requires" : {
+            "DBIx::Simple::Class" : "1.009",
+            "Email::Address" : "1.905",
+            "Locale::Maketext" : "1.25",
+            "Mojolicious" : "6.58",
+            "Mojolicious::Plugin::DSC" : "1.005",
+            "Mojolicious::Plugin::OAuth2" : "1.52",
+            "Mojolicious::Plugin::SemanticUI" : "0.17",
+            "Text::MultiMarkdown" : "1.000035",
+            "perl" : "v5.14.0"
+         }
+      }
+   },
+   "provides" : {
+      "Ado" : {
+         "file" : "lib/Ado.pm",
+         "version" : "0.933"
+      },
+      "Ado::Build" : {
+         "file" : "lib/Ado/Build.pm"
+      },
+      "Ado::BuildPlugin" : {
+         "file" : "lib/Ado/BuildPlugin.pm"
+      },
+      "Ado::Command" : {
+         "file" : "lib/Ado/Command.pm"
+      },
+      "Ado::Command::adduser" : {
+         "file" : "lib/Ado/Command/adduser.pm"
+      },
+      "Ado::Command::generate" : {
+         "file" : "lib/Ado/Command/generate.pm"
+      },
+      "Ado::Command::generate::adoplugin" : {
+         "file" : "lib/Ado/Command/generate/adoplugin.pm"
+      },
+      "Ado::Command::generate::apache2htaccess" : {
+         "file" : "lib/Ado/Command/generate/apache2htaccess.pm"
+      },
+      "Ado::Command::generate::apache2vhost" : {
+         "file" : "lib/Ado/Command/generate/apache2vhost.pm"
+      },
+      "Ado::Command::generate::crud" : {
+         "file" : "lib/Ado/Command/generate/crud.pm"
+      },
+      "Ado::Command::version" : {
+         "file" : "lib/Ado/Command/version.pm"
+      },
+      "Ado::Control" : {
+         "file" : "lib/Ado/Control.pm"
+      },
+      "Ado::Control::Articles" : {
+         "file" : "lib/Ado/Control/Articles.pm"
+      },
+      "Ado::Control::Default" : {
+         "file" : "lib/Ado/Control/Default.pm"
+      },
+      "Ado::Control::Doc" : {
+         "file" : "lib/Ado/Control/Doc.pm"
+      },
+      "Ado::Control::Test" : {
+         "file" : "lib/Ado/Control/Test.pm"
+      },
+      "Ado::I18n" : {
+         "file" : "lib/Ado/I18n.pm"
+      },
+      "Ado::I18n::bg" : {
+         "file" : "lib/Ado/I18n/bg.pm"
+      },
+      "Ado::I18n::de" : {
+         "file" : "lib/Ado/I18n/de.pm"
+      },
+      "Ado::I18n::en" : {
+         "file" : "lib/Ado/I18n/en.pm"
+      },
+      "Ado::Model" : {
+         "file" : "lib/Ado/Model.pm",
+         "version" : "0.01"
+      },
+      "Ado::Model::Domains" : {
+         "file" : "lib/Ado/Model/Domains.pm"
+      },
+      "Ado::Model::Groups" : {
+         "file" : "lib/Ado/Model/Groups.pm"
+      },
+      "Ado::Model::Sessions" : {
+         "file" : "lib/Ado/Model/Sessions.pm"
+      },
+      "Ado::Model::SessionsOld" : {
+         "file" : "lib/Ado/Model/SessionsOld.pm"
+      },
+      "Ado::Model::UserGroup" : {
+         "file" : "lib/Ado/Model/UserGroup.pm"
+      },
+      "Ado::Model::Users" : {
+         "file" : "lib/Ado/Model/Users.pm"
+      },
+      "Ado::Plugin" : {
+         "file" : "lib/Ado/Plugin.pm"
+      },
+      "Ado::Plugin::AdoHelpers" : {
+         "file" : "lib/Ado/Plugin/AdoHelpers.pm"
+      },
+      "Ado::Plugin::Auth" : {
+         "file" : "lib/Ado/Plugin/Auth.pm"
+      },
+      "Ado::Plugin::I18n" : {
+         "file" : "lib/Ado/Plugin/I18n.pm"
+      },
+      "Ado::Plugin::MarkdownRenderer" : {
+         "file" : "lib/Ado/Plugin/MarkdownRenderer.pm"
+      },
+      "Ado::Plugin::Routes" : {
+         "file" : "lib/Ado/Plugin/Routes.pm"
+      },
+      "Ado::Sessions" : {
+         "file" : "lib/Ado/Sessions.pm"
+      },
+      "Ado::Sessions::Database" : {
+         "file" : "lib/Ado/Sessions/Database.pm"
+      },
+      "Ado::Sessions::File" : {
+         "file" : "lib/Ado/Sessions/File.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kberov/Ado/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/kberov/Ado"
+      }
+   },
+   "version" : "0.933",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

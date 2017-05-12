@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Attribute/Profiled.pm
+t/00_Profiled.t

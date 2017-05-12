@@ -1,0 +1,24 @@
+---
+abstract: 'Extensible package-local way to override glob()'
+author:
+  - 'Peter Corlett <abuse@cabal.org.uk>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Globule
+requires:
+  File::Glob: 0
+  Module::Load: 0
+  Regexp::Common: 0
+  perl: 5.006
+version: 0.004

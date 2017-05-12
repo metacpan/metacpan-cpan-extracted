@@ -1,0 +1,27 @@
+<IfModule mod_perl.c>
+
+  Alias /head-bin @ServerRoot@/perl-bin
+  <Location /head-bin>
+    SetHandler perl-script
+    PerlHandler Apache::HEADRegistry
+    Options +ExecCGI
+    PerlSendHeader On
+  </Location>
+
+  Alias /cgi-bin @ServerRoot@/perl-bin
+  <Location /cgi-bin>
+    SetHandler cgi-script
+    Options +ExecCGI
+  </Location>
+
+  Alias /perl-bin @ServerRoot@/perl-bin
+  <Location /perl-bin>
+    SetHandler perl-script
+    PerlHandler Apache::Registry
+    Options +ExecCGI
+    PerlSendHeader On
+  </Location>
+
+</IfModule>
+
+LogLevel debug

@@ -1,0 +1,18 @@
+0.03    2017-03-09 (PERLANCAR)
+
+	- [Bugfix] Fix off-by-one error in calculation using --rates.
+
+	- Tweak Rinci metadata: allow comma-separated in --rates.
+
+
+0.02    2015-12-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with update Perinci::To::POD to fix formatting of
+          examples.
+
+
+0.01    2015-12-18 (PERLANCAR)
+
+        - First release.

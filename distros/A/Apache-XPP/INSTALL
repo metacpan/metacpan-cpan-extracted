@@ -1,0 +1,79 @@
+#############################################################
+############## Apache::XPP Installation Guide ###############
+#############################################################
+
+	1.0	Get distribution and required packages
+	2.0	How to install Apache::XPP
+	2.1	Putting everything in the right place
+	2.2	Setting up the conf files
+	3.0	Include xpp.conf in httpd.conf
+	3.1	Restart the webserver
+	3.2	Jeopardy Example
+	4.0	Disclaimer
+
+1.0 Get distribution and required packages
+
+	Get the latest Apache::XPP distribution.  Apache::XPP requires that 
+	you also have these modules:
+
+	LWP
+	Can be found on CPAN.
+	<http://cpan.valueclick.com/modules/by-module/LWP/libwww-perl-5.48.tar.gz>
+	modperl
+	Can be found on CPAN.
+	<http://cpan.valueclick.com/modules/by-module/Apache/mod_perl-1.24.tar.gz>
+
+2.0 How to install Apache::XPP:
+
+	Installing Apache::XPP should be a fairly simple processes.
+	Download the the latest distriubtion, place it in your
+	main modules directory.  Setup the conf files.
+
+2.1 Putting everything in the right place:
+
+	Download a copy of Apache-XPP.tar.gz. From the directory Apache::XPP
+	is downloaded to do the following to extract the files 
+	and put them in the right place.
+
+	ie.
+	# cp Apache-XPP.tar.gz /home/www/apps/
+	# cd /home/www/apps/
+	# gunzip -c Apache-XPP.tar.gz | tar -xf -
+	# rm -f Apache-XPP.tar.gz
+
+2.2 Setting up the conf files:
+
+	The example conf file is: "conf/xpp.conf.template".  You can 
+	copy this file to "xpp.conf" or make a symbolic link to it in your 
+	webserver conf directory.
+
+	PerlSendHeader Off				- allows Perl to send HTTP headers
+
+	Setup Files location block for *.xpml pages
+	XPPIncludeDir	- the path to your include files
+	XPMLHeaders		- the header file that sets up your application variable
+
+3.0	Require xpp.conf in httpd.conf
+
+	"Include /home/www/apps/xpp/conf/xpp.conf", or use the path to your 
+	xpp.conf file.
+
+3.1	Restart the webserver
+
+4.0	Disclaimer
+
+	This release was developed and tested using version 5.005_03 
+	built for i386-linux.
+
+	Please contact me if you use this for anything non-trivial.  
+	This is not for permission, it's so I can get some idea of 
+	what folks are using the package for other than trivial scripts.
+
+	Please report any bugs/suggestions to <opensource@cnation.com>.
+
+	Copyright (c) 1998-2000 Cnation.
+
+	All rights reserved. This program is free software; you can
+	redistribute it and/or modify it under the same terms as Perl 
+	itself.
+

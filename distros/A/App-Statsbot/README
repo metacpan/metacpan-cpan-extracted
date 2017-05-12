@@ -1,0 +1,40 @@
+App-Statsbot version 1.000
+==========================
+
+statsbot is a simple IRC bot that tracks the people that inhabit a
+channel. It is able to answer queries of the form "In the last <time
+interval>, how much time did <nick> spend in this channel?".
+
+It was written as a single script in 2013 and repackaged as a module
+in 2015.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* POE::Component::IRC::State
+* IRC::Utils
+* DBI
+* DBD::SQLite
+* Text::ParseWords
+* Time::Duration
+* Time::Duration::Parse
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013-2015 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

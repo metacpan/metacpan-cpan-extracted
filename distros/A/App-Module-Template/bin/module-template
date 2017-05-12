@@ -1,0 +1,142 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::Module::Template;
+
+our $VERSION = '0.11';
+
+App::Module::Template->run(@ARGV);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+module-template - Perl project scaffolding from templates
+
+=head1 VERSION
+
+This documentation refers to module-template version 0.11.
+
+=head1 USAGE
+
+    module-template Module::Name -m <Module::Name>
+
+    module-template Module::Name -c /path/to/config -m <Module::Name>
+
+    module-template Module::Name -t /path/to/templates -m <Module::Name>
+
+=head1 REQUIRED ARGUMENTS
+
+The only required argument is a valid module name. If you don't enter one on the command line, you will be prompted.
+
+    -m module name
+
+=head1 OPTIONS
+
+    -c Path to configuration file
+
+    -t Path to template directory
+
+=head1 DESCRIPTION
+
+B<module-template> creates a Perl project directory based off a template you define in $HOME/.module-template/templates. The 'templates' directory can contain Template Toolkit files, plain files, and directories. The directory structure will be recreated in your project directory. Template Toolkit files are processed as you would expect and plain files are copied to their respective location in your project directory.
+
+You define any variables you want in F<$HOME/.module-template/config>. Those variables will be available in your TT templates. Three template variables are defined inside B<module-template>; C<module>, C<today>, and C<year>. Some variables are set up for you in the config file. Feel free to change or remove these as you see fit.
+
+The default license is Artistic 2.0. You can override that by creating your own LICENSE file and updating the C<license_type> and C<license_body> variables in your config file.
+
+The first time you run B<module-template>, a .module-template directory will be created for you in your $HOME directory.
+
+=head1 REQUIREMENTS
+
+Easy to use and quick to get running. This is all the documentation you need unless you don't know Template Toolkit.
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item C<-m %s is required>
+
+Module name is a required argument.
+
+=item C<%s is a %s, module-template exiting...>
+
+You have likely entered an invalid Perl module name. module-template will detect well formed names and reject top level and all lower-case namespaces. More checks may be added later.
+
+=item C<Destination directory %s exists>
+
+You tried to create a module project directory that already exists in your current directory.
+
+=item C<Could not locate configuration file %s>
+
+There was not a config file at the location you specified.
+
+=item C<Could not read configuration file %s>
+
+Your $HOME/.module-template/config or command line specified config file is unreadable.
+
+=item C<Directory %s exists. Manually remove this directory before proceeding.>
+
+module-template will not overwrite an existing .module-template directory in your home.
+
+=back
+
+=head1 CONFIGURATION
+
+Edit $HOME/.module-template/config.
+
+Define any variables you like and add them to your templates.
+
+There is a template_toolkit section where you can add any TT2 configuration you like.
+
+=head1 EXIT STATUS
+
+None.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * App::Module::Template
+
+=back
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any issues or feature requests to L<https://github.com/tscornpropst/App-Module-Template/issues>. Patches are welcome.
+
+=head1 AUTHOR
+
+Trevor S. Cornpropst <tscornpropst@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2014, Trevor S. Cornpropst <tscornpropst@gmail.com>. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut
+

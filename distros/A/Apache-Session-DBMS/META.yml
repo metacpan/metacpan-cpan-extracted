@@ -1,0 +1,27 @@
+---
+name: Apache-Session-DBMS
+version: 0.32
+author:
+  - Alberto Reggiori <alberto@asemantics.com>
+abstract: Session management via DBMS
+license: bsd
+requires:
+  Apache::Session: >= 1.6
+  DBMS: >= 1.7
+provides:
+  Apache::Session::DBMS:
+    file: lib/Apache/Session/DBMS.pm
+    version: 0.32
+  Apache::Session::Generate::DBMS:
+    file: lib/Apache/Session/Generate/DBMS.pm
+    version: 0.1
+  Apache::Session::Serialize::DBMS::Storable:
+    file: lib/Apache/Session/Serialize/DBMS/Storable.pm
+    version: 0.1
+  Apache::Session::Serialize::DBMS::YAML:
+    file: lib/Apache/Session/Serialize/DBMS/YAML.pm
+    version: 0.1
+  Apache::Session::Store::DBMS:
+    file: lib/Apache/Session/Store/DBMS.pm
+    version: 0.1
+generated_by: Module::Build version 0.2608

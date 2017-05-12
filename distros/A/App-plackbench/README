@@ -1,0 +1,16 @@
+plackbench
+==========
+
+Benchmarking/Debugging tool for Plack web requests
+
+    # Make a request 5 times, and print some stats
+    $ plackbench -n 5 /path/to/app.psgi '/search?q=stuff'
+
+    # Debug the same request
+    $ PERL5OPT=-d plackbench -n 5 /path/to/app.psgi '/search?q=stuff'
+
+    # Profile the same request
+    $ PERL5OPT=-d:NYTProf plackbench -n 5 /path/to/app.psgi '/search?q=stuff'
+    $ nytprofhtml -m
+
+See "perldoc plackbench" for more information.

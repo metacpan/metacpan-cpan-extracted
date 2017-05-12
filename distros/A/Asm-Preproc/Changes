@@ -1,0 +1,66 @@
+1.02	2015-12-28
+	Other
+	* Add link to git repository
+
+1.01	2015-04-18
+
+	Bug Fixes
+	* RT #87173: Fails with Iterator::Simple::Lookahead 0.03
+
+1.00	2013-07-26
+	Feature Changes
+	* Asm::Preproc::Stream removed, use Iterator::Simple::Lookahead instead
+
+0.08	2013-07-23
+	Bug Fixes
+	* Revert to 0.06 - changes impacted CPU::Z80::Assembler.
+
+0.07	2013-07-16
+	New Features
+	* Parse different eol combinations in input file (\r, \n, \r\n, \n\r) and
+	  convert all to \n. Read files in binary mode in chunks of 8K.
+	* Add option to do or not line continuation on lines ended with \\.
+	* Add option to define %include statement format.
+	* Add option to define %line statement format.
+	* Add option to define preprocessor lines to be ignored.
+
+	Other
+	* Asm::Preproc::Stream - Deprecated, use Iterator::Simple::Lookahead instead
+
+0.06	2010-10-15
+	Bug Fixes
+	* Solved problem with test scripts: 
+	  done_testing() requires Test::More 0.96
+
+0.05	2010-10-12
+	Bug Fixes
+	* Solved problem with test scripts: 
+	  Bareword "done_testing" not allowed while "strict subs" in use
+
+0.04	2010-09-30
+	New Features
+	* Add tokenizer Asm::Preproc::Lexer
+
+	Other
+	* Use Class::XSAccessor::Array for objects
+	* Asm::Preproc::Stream is simpler and faster
+
+0.03	2010-09-21
+	Bug Fixes
+	* Perl 5.6 can only declare one constant at a time; replace 
+	    use constant { A => 1, B => 2, ...}
+	  by
+	    use constant A => 1; use constant B => 2; ...
+
+0.02	2010-09-10
+	Bug Fixes
+	* Tests failed: missing dependencies in Makefile.PL
+
+	Other
+	* Add acknowledgement to HOP::Stream
+
+0.01	2010-09-10
+	Other
+	* First version, based on CPU::Z80::Assembler::Preprocessor.
+	* Made an independent module because it is not specific to the 
+	  Z80 assembly language.

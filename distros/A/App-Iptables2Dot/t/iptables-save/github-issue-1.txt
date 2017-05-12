@@ -1,0 +1,6 @@
+*filter
+:INPUT ACCEPT [0:0]
+-A INPUT -i em1 -p icmp -m icmp --icmp-type 3/1 -m comment --comment "ICMP host unreachable" -j ACCEPT
+-A INPUT -i em1 -p icmp -m icmp --icmp-type 3/4 -m comment --comment "ICMP frag needed but not set" -j ACCEPT
+-A INPUT -i em1 -p icmp -m icmp --icmp-type 11/0 -m comment --comment "ICMP TTL exceded" -j ACCEPT
+-A INPUT -i em1 -p icmp -m icmp --icmp-type 11/1 -m comment --comment "ICMP frag reassembly time exceeded" -j ACCEPT

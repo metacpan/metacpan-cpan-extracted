@@ -1,0 +1,19 @@
+Changes
+lib/AnyEvent/HTTPD/ExtDirect.pm
+lib/AnyEvent/HTTPD/ExtDirect.pod
+Makefile.PL
+MANIFEST
+README
+t/01_api.t
+t/02_router.t
+t/03_poll.t
+t/04_env.t
+t/data/cgi-data/bar.png
+t/data/cgi-data/foo.jpg
+t/data/cgi-data/qux.txt
+t/data/cgi-data/script.js
+t/lib/RPC/ExtDirect/Test/Util/AnyEvent.pm
+t/lib/server.pl
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

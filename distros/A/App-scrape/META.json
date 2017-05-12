@@ -1,0 +1,55 @@
+{
+   "abstract" : "simple HTML scraping",
+   "author" : [
+      "Max Maischein <corion@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-scrape",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Getopt::Long" : "0",
+            "HTML::Selector::XPath" : "0",
+            "HTML::TreeBuilder::XPath" : "0.1",
+            "LWP::Simple" : "0",
+            "Pod::Usage" : "0",
+            "Time::Piece" : "0",
+            "URI" : "0",
+            "XML::Atom::SimpleFeed" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/Corion/app-scrape"
+      }
+   },
+   "version" : "0.05"
+}

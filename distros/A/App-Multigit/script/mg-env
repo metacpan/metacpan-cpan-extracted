@@ -1,0 +1,121 @@
+#!perl
+
+use strict;
+use warnings;
+use 5.014;
+
+use Getopt::Long qw(:config gnu_getopt passthrough);
+use App::Multigit::Script;
+use App::Multigit qw(mg_each);
+use Path::Class;
+use Future;
+
+$options{absolute} = 1;
+$options{'path-dir'} = [];
+$options{reset} = 1;
+
+GetOptions(
+    \%options,
+    'absolute!',
+    'path!',
+    'path-dir=s@',
+    'reset!',
+    'reset-only!',
+);
+
+push @{$options{'path-dir'} }, qw(bin script);
+
+$ENV{MG_ENV_ORIGINAL_PERL5LIB} //= $ENV{PERL5LIB} || '';
+$ENV{MG_ENV_ORIGINAL_PATH} //= $ENV{PATH} || '';
+
+if ($options{reset}) {
+    say "PATH=$ENV{MG_ENV_ORIGINAL_PATH}; export PATH;";
+    say "PERL5LIB=$ENV{MG_ENV_ORIGINAL_PERL5LIB}; export PERL5LIB;";
+    say "unset MG_ENV_ORIGINAL_PATH; unset MG_ENV_ORIGINAL_PERL5LIB;";
+    exit if $options{'reset-only'};
+}
+
+my $future = mg_each(\&add_environment);
+
+say "$_=$ENV{$_}; export $_;"
+    for qw/ MG_ENV_ORIGINAL_PATH MG_ENV_ORIGINAL_PERL5LIB/;
+
+say for $future->get;
+
+sub add_environment {
+    my ($repo) = @_;
+
+    my $dir = $repo->config->{dir};
+    if ($options{absolute}) {
+        $dir = dir($dir)->absolute;
+    }
+
+    my @env;
+
+    if (-d (my $perl5dir = dir($dir, 'lib'))) {
+        @env = qq(PERL5LIB="$perl5dir:\$PERL5LIB"; export PERL5LIB;);
+    }
+
+    if ($options{path}) {
+        for (@{$options{'path-dir'}}) {
+            if (-d (my $pathdir = dir($dir, $_))) {
+                push @env, qq(PATH="$pathdir:\$PATH; export PATH;);
+            }
+        }
+    }
+
+    Future->done(@env);
+}
+
+# PODNAME: mg-env
+
+=head1 SYNOPSIS
+
+    mg env [ --path[=dir][, ...] ] [ --[no-]absolute ]
+    eval $(mg env)
+
+=head1 DESCRIPTION
+
+Outputs a bash-compatible script that sets environment variables,
+specifically PERL5LIB.
+
+=head1 OPTIONS
+
+=over
+
+=item --absolute
+
+=item --no-absolute
+
+Output absolute directories, which is the default. The alternative is
+relative to the mg root.
+
+=item --path
+
+Also output PATH. By default, directories C<bin> and C<script> are
+considered to contain things that make sense to PATH. Use L</--path-dir> to
+change it.
+
+=item --path-dir=dir
+
+Add values to the paths considered for PATH.
+
+    mg env --path --path-dir=scripts
+
+=item --reset
+
+=item --no-reset
+
+By default, affected environment variables will be reset to what they were
+before you ran mg env, allowing you to recreate them or switch context without
+having to manually fix your PERL5LIB or PATH. With no-reset, existing variables
+are maintained and appended to.
+
+=item --reset-only
+
+=item --no-reset-only
+
+Exit after resetting environment variables, instead of outputting the fresh
+ones.
+
+=back

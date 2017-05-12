@@ -1,0 +1,43 @@
+NAME
+
+AnyEvent::Delay::Simple - manage callbacks and control the flow of events
+by AnyEvent
+
+DESCRIPTION
+
+AnyEvent::Delay::Simple manages callbacks and controls the flow of events
+for AnyEvent. This module inspired by Mojo::IOLoop::Delay.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc
+command.
+
+    perldoc AnyEvent::Delay::Simple
+
+You can also look for information at:
+
+    Repository
+        http://github.com/AdCampRu/anyevent-delay-simple
+    Bug tracker
+        http://github.com/AdCampRu/anyevent-delay-simple/issues
+
+AUTHOR
+
+Denis Ibaev, dionys@cpan.org for AdCamp.ru.
+
+LICENSE
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+See http://dev.perl.org/licenses/ for more information.

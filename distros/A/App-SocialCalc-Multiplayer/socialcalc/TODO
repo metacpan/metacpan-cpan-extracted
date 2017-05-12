@@ -1,0 +1,14 @@
+02:28 < au> so in case of playing x,Y
+02:28 < danb> That's the way to do it. The unwind would be done on the client.
+02:28 < au> X1 -> Y1 -> X2
+02:28 < au> but X says X1/X2 first because of latency
+02:28 < au> then got Y1, then it needs to unwind X2 then reapply
+02:28 < au> yeah, server can do that already; I'll check in client code to do that.
+02:28 < au> danb++
+02:29 < au> and it needs to ensure that unwind doesn't affect the undo stack, so each player's undo
+            stack remai nthe same
+02:29 < danb> The case I though of was start edit, put in formula referring to cell. Other person
+              deletes row. Save edit. There are probably variations that would not fix up the
+              reference correctly.
+02:29 < danb> Yes.
+02:29 < au> (critical for Ctrl-Z to propagate correctly)

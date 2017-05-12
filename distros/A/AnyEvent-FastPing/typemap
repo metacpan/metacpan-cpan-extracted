@@ -1,0 +1,6 @@
+PINGER *	T_PVRV
+
+INPUT
+
+T_PVRV
+	$var = ($type)SvPVX (SvRV ($arg))

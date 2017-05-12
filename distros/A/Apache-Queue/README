@@ -1,0 +1,32 @@
+Apache::Queue version 0.6
+=========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Apache2
+  Apache::Connection
+  Apache::RequestIO
+  Apache::RequestRec
+  Apache::RequestUtil
+  Apache::SubRequest
+  Apache::Const
+  Apache::Log
+  Fcntl
+  DB_File
+  Template
+  
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Donald Becker <psyon@psyon.org>
+

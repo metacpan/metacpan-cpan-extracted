@@ -1,0 +1,61 @@
+cpanm (App::cpanminus) 1.7001 on perl 5.019009 built for darwin-2level
+Work directory is /Users/garu/.cpanm/work/1395021714.11121
+You have make /usr/bin/make
+You have LWP 6.05
+You have /usr/bin/tar: bsdtar 2.8.3 - libarchive 2.8.3
+You have /usr/bin/unzip
+Searching Module::CoreList on cpanmetadb ...
+--> Working on Module::CoreList
+Fetching http://www.cpan.org/authors/id/B/BI/BINGOS/Module-CoreList-3.07.tar.gz
+-> OK
+Unpacking Module-CoreList-3.07.tar.gz
+Entering Module-CoreList-3.07
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (6.88)
+Configuring Module-CoreList-3.07
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Module::CoreList
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have List::Util 0 ... Yes (1.38)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (6.88)
+Checking if you have version 0.88 ... Yes (0.9908)
+Checking if you have Test::More 0 ... Yes (1.001002)
+Building and testing Module-CoreList-3.07
+cp lib/Module/CoreList/Utils.pm blib/lib/Module/CoreList/Utils.pm
+cp lib/Module/CoreList.pod blib/lib/Module/CoreList.pod
+cp lib/Module/CoreList.pm blib/lib/Module/CoreList.pm
+cp lib/Module/CoreList/TieHashDelta.pm blib/lib/Module/CoreList/TieHashDelta.pm
+cp corelist5.19.9 blib/script/corelist5.19.9
+/Users/garu/perl5/perlbrew/perls/perl-5.19.9/bin/perl5.19.9 -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/corelist5.19.9
+Manifying blib/man1/corelist5.19.9.1
+Manifying blib/man3/Module::CoreList.3
+Manifying blib/man3/Module::CoreList::Utils.3
+PERL_DL_NONLAZY=1 /Users/garu/perl5/perlbrew/perls/perl-5.19.9/bin/perl5.19.9 "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/corelist.t ...... ok
+t/deprecated.t .... ok
+t/find_modules.t .. ok
+t/is_core.t ....... ok
+t/pod.t ........... skipped: Test::Pod 1.00 required for testing POD
+t/utils.t ......... ok
+All tests successful.
+Files=6, Tests=83,  1 wallclock secs ( 0.04 usr  0.02 sys +  1.14 cusr  0.03 csys =  1.23 CPU)
+Result: PASS
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Module/CoreList.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Module/CoreList.pod
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Module/CoreList/TieHashDelta.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/Module/CoreList/Utils.pm
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man1/corelist5.19.9.1
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Module::CoreList.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/man/man3/Module::CoreList::Utils.3
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/bin/corelist5.19.9
+Appending installation info to /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/5.19.9/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Module-CoreList-3.07 (upgraded from 3.06)
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/Module-CoreList-3.07/install.json
+Installing /Users/garu/perl5/perlbrew/perls/perl-5.19.9/lib/site_perl/5.19.9/darwin-2level/.meta/Module-CoreList-3.07/MYMETA.json
+1 distribution installed

@@ -1,0 +1,38 @@
+
+Changelog for ASP4x::Linker:
+
+2012-05-07      v1.002
+  - DEPRECATED
+  - ASP4 has been marked as deprecated, and so this module follows suit.
+
+2012-03-16      v1.002
+  - Disabled some failing tests temporarily until we can fix them.
+
+2012-02-03      v1.001
+  - Added chained widget-attribute-setters.
+    $widget->set(foo => 'bar', ...)->uri();
+    $widget->set(%args)->set(%more_args)->uri();
+  - Thanks to eric.hayes++ for the suggestion.
+
+2011-05-01      v1.000
+  - $widget->set( non_existent_attribute => "value" ) will result in an exception.
+  - Simplified the documentation for ASP4x::Linker - the simplified style of
+    $linker->widget(...)->get/set(...) interface is very much preferred.
+  - API has otherwise remained unchanged for over a year.  Time to go v1.000!!!
+
+2010-05-13      v0.003
+  - Now, $linker->uri({foo => 'bar'}) returns a uri with foo=bar in there someplace.
+  - Upgrade recommended.
+
+2010-04-01      v.0.002
+  - Added vars() method.
+  - Updated docs.
+  - Removed AUTOLOAD behavior from Widget and Linker.
+  - Added $widget->get( $attr ) and $widget->set( $attr => $value )
+  - Added $widget->on_change( $attr => sub { ... } )
+  - Added several tests.
+
+2010-04-01      v0.001
+  - Initial release.
+  - No joke!
+

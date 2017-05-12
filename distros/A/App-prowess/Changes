@@ -1,0 +1,13 @@
+Revision history for perl distribution App-prowess
+
+0.04 2016-10-02T20:11:39+0200
+ - Ignore dotfiles and backup files in the watch list #3
+
+0.03 2015-11-27T11:04:54+0100
+ - Fix http://cpantesters.org/cpan/report/3259e778-8ee4-11e5-b888-bf4ee0bfc7aa
+
+0.02 2015-11-19T09:31:20+0100
+ - Fix 'Time::HiRes::ualarm(): unimplemented in this platform'
+
+0.01 2015-10-24T10:52:43+0200
+ - Created script/prowess

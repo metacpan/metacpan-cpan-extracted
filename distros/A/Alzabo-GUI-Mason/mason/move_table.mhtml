@@ -1,0 +1,34 @@
+<%args>
+$schema
+$table
+$before => undef
+$after => undef
+</%args>
+
+<%init>
+my $s;
+eval
+{
+    $s = Alzabo::Create::Schema->load_from_file( name => $schema );
+
+    my %p = defined $before ? ( before => $s->table($before) ) : ( after => $s->table($after) );
+    $s->move_table( table => $s->table($table),
+		    %p );
+    $s->save_to_file;
+};
+
+my $e = $@;
+
+$m->comp( 'exception', $e ) if $e;
+
+$m->redirect( uri( path => 'view_table' . Alzabo::GUI::Mason::Config::mason_extension(),
+                   query => { schema => $s->name,
+                              table  => $table },
+                 ),
+            );
+
+</%init>
+
+<%flags>
+inherit => 'syshandler'
+</%flags>

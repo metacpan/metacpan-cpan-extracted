@@ -1,0 +1,153 @@
+==================================================
+Changes from 2013-09-09 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.003 at 2014-09-09 02:06:26 +0000
+------------------------------------------
+
+  Change: 4ab7bff6cd8498f9336b5baee235ab47876025c3
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-09-08 23:06:13 +0000
+
+    * v0.003 
+
+  Change: cd6948b6bacffe6cb902155f60f5d2f03373f170
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-09-08 22:58:15 +0000
+
+    * README: module short description 
+
+  Change: cca3dafb5a3b06a7dfcb7367dc9d084a5ad77185
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-09-08 22:57:37 +0000
+
+    * Serializer.pm: fix mistakes 
+
+  Change: 39b1f9694b2b71fd0b3dd30b814a3ad2e88bf87e
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-09-08 22:57:12 +0000
+
+    * AsciiTable: implemented 
+
+  Change: 768e79ab0c9e12fbcf503fea0a2d71f25600c616
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-09-08 22:38:33 +0000
+
+    * Table2YAML.pm: Fix POD in module name 
+
+  Change: aa5780b2d7b8fc8207a441044646bb559b5418e1
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-09-08 22:38:09 +0000
+
+    * dist.ini: +[ChangelogFromGit] 
+
+  Change: 97c00f081875a3627aee081737e27c6bd65d7a55
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-09-08 22:37:25 +0000
+
+    * table2yaml: small fixes 
+
+  Change: a54f91503758aa39590951649d35641acc6dd45c
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-09-08 20:33:19 +0000
+
+    * Serializer: remove looks_like_number 
+
+------------------------------------------
+version 0.002 at 2014-05-28 00:34:37 +0000
+------------------------------------------
+
+  Change: 37b2573435e8220507be6f0f6d05f2280f3fecc9
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-05-27 21:34:37 +0000
+
+    v0.002 
+
+  Change: 480dbc28e4d360de52b9535d79689c6cf4bb19d8
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-05-27 21:32:27 +0000
+
+    * v0.002 
+
+  Change: 584fd2aa511a2f50ffb363140b86c5286f1d0197
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-05-27 21:20:35 +0000
+
+    * add FixedWidth support 
+
+  Change: 50d6fe3dbae42fbd3c5d3b31189635efaaf24aac
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-05-27 19:40:02 +0000
+
+    * add pipe (STDIN) support 
+
+  Change: fffc8653de98070a8e57b84a7d3db0cea8dbf8ed
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-05-27 18:58:15 +0000
+
+    * fix uninitialized value in concatenation 
+
+  Change: e7544f45d28bf18db21f54feb8d8b26dd61aa7af
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-05-27 16:05:44 +0000
+
+    * fc bareword 
+
+  Change: cc086a6d14c12e565adb0127477dfb2c340e26c7
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-05-27 15:39:28 +0000
+
+    * remove smartmatch 
+
+  Change: 5322b36fe0cd64fdc53aaf1a016bde68ed898a75
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-05-26 10:41:15 +0000
+
+    * dist.ini: add repository.url 
+
+  Change: 896b2a4adc21b9b75f40d13d2e3becab96f40992
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-05-23 14:50:32 +0000
+
+    v0.001 
+
+  Change: 7b089746c9798ba681811adb7b9602ae3426c601
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-05-23 14:47:11 +0000
+
+    * new file: .gitignore 
+
+  Change: a870c2eceaec4465ab7fbb71433c16e61b06bcbb
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-05-23 14:46:55 +0000
+
+    * README update 
+
+  Change: 4286d053dd951ea2f5fa1ee25bc31914bc2aa8c1
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-05-23 14:46:17 +0000
+
+    * Test::Kwalitee 
+
+  Change: 1189a41f03a421fb241c16d33cd9610c3a89c639
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-05-23 14:46:02 +0000
+
+    * pod_coverage 
+
+  Change: 7415bf39c161ded9c856fb716c7c2a1aa77f13c5
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-05-23 12:57:01 +0000
+
+    * add '# VERSION' 
+
+  Change: 3e7496133d05a74f40c9e6e47b7e87347ddbd79b
+  Author: Ronaldo Ferreira de Lima <jimmy.tty@gmail.com>
+  Date : 2014-05-23 11:48:48 +0000
+
+    * Initial commit 
+
+================
+End of releases.
+================

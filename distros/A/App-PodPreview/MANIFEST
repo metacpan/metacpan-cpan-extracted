@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/podpreview
+dist.ini
+lib/App/PodPreview.pm
+t/00-compile.t
+t/release-pod-syntax.t

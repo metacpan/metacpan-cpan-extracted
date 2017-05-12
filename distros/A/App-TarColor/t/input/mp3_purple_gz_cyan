@@ -1,0 +1,11 @@
+drwxr-xr-x  0 friebel sysprog     0 Nov 16 23:42 lesspipe-1.72/
+drwxr-xr-x  0 friebel sysprog      0 Nov 16 23:27 lesspipe-1.72/contrib/
+drwxr-xr-x  0 friebel sysprog      0 Oct 17 07:31 lesspipe-1.72/testok/
+-rw-r--r--  0 friebel sysprog     29 Jul 10  2009 lesspipe-1.72/testok/a*b.gz
+-rw-r--r--  0 friebel sysprog   2092 Jul 10  2009 lesspipe-1.72/testok/test.mp3
+-rw-r--r--  0 friebel sysprog     29 Jul 10  2009 lesspipe-1.72/testok/a?b.gz
+-rw-r--r--  0 friebel sysprog     29 Jul 10  2009 lesspipe-1.72/testok/a]b.gz
+-rw-r--r--  0 friebel sysprog   1920 Jul 10  2009 lesspipe-1.72/testok/id3v2.mp3
+-rw-r--r--  0 friebel sysprog     35 Jul 10  2009 lesspipe-1.72/testok/a`data.gz
+-rw-r--r--  0 friebel sysprog     29 Jul 10  2009 lesspipe-1.72/testok/a[b.gz
+-rw-r--r--  0 friebel sysprog     45 Jul 10  2009 lesspipe-1.72/testok/perlstorable.gz

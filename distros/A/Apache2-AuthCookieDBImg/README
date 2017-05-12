@@ -1,0 +1,52 @@
+Apache2::AuthCookieDBImg
+========================
+
+NAME
+        Apache2::AuthCookieDBImg (perl extension)
+
+DESCRIPTION
+An AuthCookie module backed by a DBI database with second levelauthentication via image matching. This is very simple imageauthentication scheme that is only meant to prevent robotic logins to a web page by adding a 2nd level of authentication.
+
+REQUIRES
+	Apache::DBI
+	Apache2::AuthCookie
+	Apache2::Const
+	Apache2::ServerUtil
+	Date::Calc
+	Digest::MD5
+
+	Apache2::Session (if using sessions)
+	Cipher::CBC (if using CBC Ciphers)
+
+INSTALLATION
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+EXPORT
+        None by default.
+
+AUTHOR
+        Lance Cleveland, Advanced Internet Technology Consultant
+        Contact info@charlestonsw.com for more info.
+
+ABOUT CSA
+        Charleston Software Associates (CSA) is and advanced internet technology
+        consulting firm based in Charleston South Carolina.   We provide custom
+        software, database, and consulting services for small to mid-sized
+        businesses.
+
+        For more information, or to schedule a consult, visit our website at
+        www.CharlestonSW.com
+
+CONTRIBUTIONS
+        Like the script and want to contribute?
+        You can send payments via credit card or bank transfer using
+        PayPal and sending money to our info@charlestonsw.com PayPal address.
+
+COPYRIGHT
+        (c) 2006, Charleston Software Associates
+        This script is covered by the GNU GENERAL PUBLIC LICENSE.
+        View the license at http://www.charlestonsw.com/community/gpl.txt
+        or at http://www.gnu.org/copyleft/gpl.html

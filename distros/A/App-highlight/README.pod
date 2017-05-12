@@ -1,0 +1,195 @@
+=head1 NAME
+
+App::highlight - simple grep-like highlighter app
+
+=head1 SYNOPSIS
+
+=begin html
+
+<a href="https://travis-ci.org/kaoru/App-highlight"><img src="https://travis-ci.org/kaoru/App-highlight.png" /></a>
+
+=end html
+
+highlight is similar to grep, except that instead of removing
+non-matched lines it simply highlights words or lines which are
+matched.
+
+    % cat words.txt
+    foo
+    bar
+    baz
+    qux
+    quux
+    corge
+
+    % cat words.txt | grep ba
+    bar
+    baz
+
+    % cat words.txt | highlight ba
+    foo
+    <<ba>>r
+    <<ba>>z
+    qux
+    quux
+    corge
+
+If you give multiple match parameters highlight will highlight each of them in
+a different color.
+
+    % cat words.txt | highlight ba qu
+    foo
+    <<ba>>r
+    <<ba>>z
+    [[qu]]x
+    [[qu]]ux
+    corge
+
+=head1 Color Support
+
+If you have Term::ANSIColor installed then the strings will be highlighted
+using terminal colors rather than using brackets.
+
+Installing color support by installing Term::ANSIColor is highly reccommended.
+
+To get color support on Microsoft Windows you should install Term::ANSIColor
+and Win32::Console::ANSI.
+
+=head1 OPTIONS
+
+=head2 color / c
+
+This is the default if Term::ANSIColor is installed.
+
+App::highlight will cycle through the colours:
+
+    red green yellow blue magenta cyan
+
+If you do not have Term::ANSIColor installed and you specify --color or you do
+not specify --no-color then you will receive a warning.
+
+=head2 no-color / C
+
+This is the default if Term::ANSIColor is not installed.
+
+App::highlight will cycle through the brackets:
+
+    <<match>> [[match]] ((match))  {{match}} **match** __match__
+
+The examples in the rest of this document use this mode because showing color
+highlighting in POD documentation is not possible.
+
+=head2 escape / e
+
+This is the default and means that the strings passed in will be escaped so
+that no special characters exist.
+
+    % cat words.txt | highlight --escape 'ba' '[qux]'
+    foo
+    <<ba>>r
+    <<ba>>z
+    qux
+    quux
+    <<c>>org<<e>>
+
+=head2 no-escape / n / regex / r
+
+This allows you to specify a regular expression instead of a simple
+string.
+
+    % cat words.txt | highlight --no-escape 'ba' '[qux]'
+    foo
+    <<ba>>r
+    <<ba>>z
+    [[q]][[u]][[x]]
+    [[q]][[u]][[u]][[x]]
+    corge
+
+=head2 ignore-case / i
+
+This allows you to match case insensitively.
+
+    % cat words.txt | highlight --ignore-case 'BAZ' 'QuUx'
+    foo
+    bar
+    <<baz>>
+    qux
+    [[quux]]
+    corge
+
+=head2 full-line / l
+
+This makes highlight always highlight full lines of input, even when
+the full line is not matched.
+
+    % cat words.txt | highlight --full-line u
+    foo
+    bar
+    baz
+    <<qux>>
+    <<quux>>
+    corge
+
+Note this is similar to '--no-escape "^.*match.*$"' but probably much
+more efficient.
+
+=head2 one-color / o
+
+Rather than cycling through multiple colors, this makes highlight always use
+the same color for all highlights.
+
+Despite the name "one-color" this interacts with the --no-color option as you
+would expect.
+
+    % cat words.txt | highlight --one-color ba qu
+    foo
+    <<ba>>r
+    <<ba>>z
+    <<qu>>x
+    <<qu>>ux
+    corge
+
+=head2 show-bad-spaces / b
+
+With this option turned on whitespace characters which appear at the end of
+lines are colored red.
+
+For users familiar with git, this is replicating the default behaviour of "git
+diff".
+
+In non-color mode whitespace characters which appear at the end of lines are
+filled in with capital "X" characters instead.
+
+    % cat words_with_spaces | highlight --show-bad-spaces
+    test
+    test with spaces
+    test with spaces on the endXXXX
+    just spaces on the next line
+    XXXXXXXX
+    empty line next
+
+    end of test
+
+=head2 version / v
+
+Show the current version number
+
+    % highlight --version
+
+=head2 help / h
+
+Show a brief help message
+
+    % highlight --help
+
+=head1 Copyright
+
+Copyright (C) 2010 Alex Balhatchet
+
+=head1 Author
+
+Alex Balhatchet (kaoru@slackwise.net)
+
+Windows support patch from Github user aero.
+
+=cut

@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache2-ModProxyPerlHtml
+version:      3.2
+version_from: ModProxyPerlHtml.pm
+installdirs:  site
+requires:
+    IO::Uncompress::AnyInflate
+    IO::Compress::Deflate
+    IO::Compress::Gzip
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

@@ -1,0 +1,34 @@
+---
+abstract: 'Peek into archives without extracting them (using external tools)'
+author:
+  - 'Leon Brocard <acme@astray.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Archive-Peek-External
+provides:
+  Archive::Peek::External:
+    file: lib/Archive/Peek/External.pm
+    version: 0.35
+  Archive::Peek::External::Tar:
+    file: lib/Archive/Peek/External/Tar.pm
+    version: 0
+  Archive::Peek::External::Zip:
+    file: lib/Archive/Peek/External/Zip.pm
+    version: 0
+requires:
+  File::Which: 0
+  IPC::Run3: 0
+  Moose: 0
+  MooseX::Types::Path::Class: 0
+  Test::More: 0
+resources:
+  homepage: http://search.cpan.org/dist/Archive-Peek-External/
+  license: http://dev.perl.org/licenses/
+version: 0.35

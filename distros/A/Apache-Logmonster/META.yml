@@ -1,0 +1,30 @@
+---
+abstract: 'Apache log utility for merging, sorting, and processing web logs'
+author:
+  - 'Matt Simerson (msimerson@cpan.org)'
+build_requires:
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120630'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Apache-Logmonster
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Compress::Zlib: 2
+  Date::Parse: 2
+  LWP: 0
+  Mail::Send: 0
+  Params::Validate: 0.8
+  Regexp::Log: 0.04
+  URI: 1
+  perl: 5.008001
+version: 5.36

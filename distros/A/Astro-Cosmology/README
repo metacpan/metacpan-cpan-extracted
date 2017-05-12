@@ -1,0 +1,156 @@
+
+Astro::Cosmology
+----------------
+
+A set of routines to calculate cosmological measures (ie distance, volume, 
+and time) for commonly-used cosmological models. The interface is 
+object-orientated so that you don't have to keep on specifying the parameters
+of the model each time you call a routine (an example is included below).
+
+The module also provides a couple of useful constants, however this is only
+an interim measure as constants are probably better provided by another
+module (for instance see the Astroconst package at
+http://clavelina.as.arizona.edu/astroconst/).
+
+Although in the Astro namespace, this module *requires* that PDL is installed
+on your system.
+
+History
+-------
+
+04 Aug 2001 v0.90  more reorganisation. Hopefully CPAN-friendly now
+                   more tests (thanks Brad)
+02 Aug 2001 v0.84  minor reorganisation, no change to code or docs
+01 Aug 2001 v0.83  added version method, renamed string to stringify
+                   further documentation improvements
+                   improvements to test suite (thanks Brad)
+29 Jul 2001 v0.82  added STERADIAN to constants
+                   improved documentation
+28 Jul 2001 v0.81  renamed to Astro::Cosmology
+                   removed need for PDL::Astro::Constants
+19 Jul 2001 v0.5   initial "public" release (as PDL::Astro::Cosmology)
+
+Example
+-------
+
+ use Astro::Cosmology qw( :constants );
+
+ my $eds = Astro::Cosmology->new();
+ my $sn  = Astro::Cosmology->new( matter => 0.3, lambda => 0.7,
+	h0 => 70 );
+
+ print "$eds\n$sn\n";
+ [ Omega_matter = 1  Omega_lambda = 0  H0 = 50 km/s/Mpc ]
+ [ Omega_matter = 0.3  Omega_lambda = 0.7  H0 = 70 km/s/Mpc ]
+ 
+ my $z = (1 + sequence(10)) / 10;
+ my $de = 1.0e6 * PARSEC * $eds->lum_dist($z);
+ my $ds = 1.0e6 * PARSEC * $sn->lum_dist($z);
+  
+ wcols '%3.1f  %9.3e  %9.3e', $z, $de, $ds;
+ 0.1  1.894e+25  1.420e+25
+ 0.2  3.869e+25  3.024e+25
+ 0.3  5.914e+25  4.791e+25
+ 0.4  8.022e+25  6.703e+25
+ 0.5  1.019e+26  8.742e+25
+ 0.6  1.240e+26  1.089e+26
+ 0.7  1.466e+26  1.314e+26
+ 0.8  1.696e+26  1.548e+26
+ 0.9  1.930e+26  1.790e+26
+ 1.0  2.168e+26  2.039e+26
+
+Requirements
+------------
+
+Requires the PDL distribution, which is available from CPAN or 
+http://pdl.perl.org/. It should work on most recent (ie v2.1.1 and
+later) versions of PDL. It has been developed using v5.6.0 of perl,
+but should work with v5.005 .
+
+It has been developed on solaris and linux systems, but it should work
+on other "unix-like" systems.
+
+The additional tests, in the cpt/ and hogg/ directories of the distribution
+use the PGPLOT interface in PDL to produce graphical output. Therefore
+you need to have installed the perl PGPLOT module (available from CPAN) and
+the pgplot library ;)
+
+Build/Installation
+------------------
+
+The module should build and install using the standard perl approach of:
+
+   perl Makefile.PL
+   make 
+   make test
+   make install
+
+Note that the module will not build if the PDL module is not installed on
+your system. See the ExtUtils::MakeMaker documentation for customisation
+hints.
+
+Currently the test script is not very clever. I suggest you also try the 
+scripts discussed in the next section.
+
+Additional Tests
+----------------
+
+The test script mainly checks that the module is consistent - ie that it
+works as expected. Although there are some checks of the validity of the
+output, it is not guaranteed to catch all problems. I advise you to also
+run the additional scripts in the cpt/ and hogg/ directories: these produce 
+graphical output (using PGPLOT) and should be the same as some of the figures 
+in:
+
+   Carroll, Press & Turner, 1992, ARAA, 30, 499 (directory cpt/)
+   Hogg, Distance measures in cosmology, astro-ph/9905116 (directory hogg/)
+
+To run the angular diameter test in cpt/ you should be able to do
+
+   perl cpt/angular_diameter.pl
+
+after a successful 'make' (you do not need to have done a 'make install' since
+the scripts pick up the version in the blib/ directory).
+
+Notes
+-----
+
+If you compare the output from 'perl cpt/differential_comoving_volume.pl'
+and figure 6 (page 514) of Carroll, Press & Turner, you'll see that my
+values are slightly smaller than their values at z ~ 100. I don't know why this
+is; I'm hoping that it's just due to numerical differences, but it could be
+something wrong with this code. As I don't really work with objects much beyond 
+z = 1, it's not currently high on my priority list.
+
+To do
+-----
+
+.) Add Pen's approximations and more of the functionality from D Hogg's
+   astro-ph paper.
+.) release on CPAN
+
+Acknowledgements
+----------------
+
+Thanks to Brad Holden for trying out early versions of this module
+and for providing some of the test code.
+
+The cosmology routines make use of code based on routines from
+
+  NUMERICAL METHODS: FORTRAN Programs, (c) John H. Mathews 1994
+  NUMERICAL METHODS for Mathematics, Science and Engineering, 2nd Ed, 1992
+  Prentice Hall, Englewood Cliffs, New Jersey, 07632, U.S.A.
+
+The "Integration Technique" section of the documentation is based on that
+from from the Math::Integral::Romberg module by Eric Boesch (available
+on CPAN).
+
+Copyright
+---------
+
+Copyright (C) Douglas Burke <djburke@cpan.org> 1999, 2000, 2001.
+
+All rights reserved. There is no warranty. 
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+

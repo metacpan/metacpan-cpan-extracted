@@ -1,0 +1,156 @@
+# This is a sample configuration file.  It contains most valid
+# configuration options, but everything is turned off by default.  So,
+# if you install the module and use this file unmodified as your server 
+# configuration, your HTML files will be virtually unchanged!
+# If you want to change things, either edit this file or use a 
+# LookAndFeelConfig file.  I find it's nice to gently ease a site into
+# the module by using this sort of "transparent" configuration, and then
+# slowly easing in the changes.
+
+#################################################
+
+# Note:  using hash marks is a bogus comment.  It is just for visual
+# distinction -- the program will see a "commented" directive just as
+# well as an uncommented one.  It will also ignore text whether or not
+# it is "commented" with a hash mark.  The program searches for an
+# "@" followed by the directive name.  To comment out a directive without
+# erasing it, simply separate the "@" and the directive like this:
+
+@ BGCOLOR=#FFFFFF;
+
+#  The program will completely ignore that last directive.  
+
+# A few tips:  
+#
+#   1) make sure you terminate all your directives with a semicolon!
+#
+#   2) do -not- put quotation marks around things unless they need them
+#      (inside an <A HREF="whatever.html"> is fine, though).  See the
+#      examples below if you're confused.  Just don't go putting
+#      quotation marks around colours like BGCOLOR="#FFFFFF";
+#
+
+#######################################################################
+
+# This is the name of the local configuration file to look for.
+
+@LOCALCONFIGFILE=LOOKANDFEEL;
+
+
+
+# This next directive decides whether or not we have a sidebar by
+# default.  If it is set to "1", then there will be no sidebar unless
+# the users turn it on (if they are allowed to).  
+# The ALLOWNOSIDEBAR directive allows the users to toggle it on and
+# off. 
+
+@NOSIDEBAR=1;
+@ALLOWSIDEBARTOGGLE=1;
+
+# the server configuration gets to decide if mere mortals are allowed
+# to change things like the bgcolor and the sidebar colour.  
+# 
+
+@ALLOWBODYMOD=1;
+@ALLOWSIDEBARMOD=1;
+
+# Here is the default background colour and sidebar colour for all pages
+# Reactivate the TEXT directive, if you wish.
+
+@BGCOLOR=#FFFFFF;
+@SIDEBARCOLOR=#CCFFCC;
+@ TEXT=#000000;
+
+# this is the location, relative to the WEB DOCUMENT ROOT of a 1x1 pixel
+# blank gif.  A sample blank gif is provided with HTML::WWWTheme, but
+# you should create your own with photoshop or GIMP or something like
+# that.  I don't know about the legality of using .gif files created by
+# the GIMP (which the sample one was). 
+
+@BLANKGIF=/images/blank.gif;
+
+# this turns on the top & bottom nav bars.
+# 0 means no navbars by default.  Any user can always turn on the
+# navbars for their own page.
+
+@NAVBAR=0;
+
+# This sets the Next/up/last links on the top/bottom nav bars.
+
+@NEXTLINK=<a href="http://www.yahoo.com">Yahoo</a>;
+@UPLINK=<a href="http://www.yahoo.ca">Yahoo Canada</a>;
+@LASTLINK=<a href="http://www.metacrawler.com">Metacrawler</a>;
+
+# here we turn off the top and bottom navigation bars, because
+# they're usually annoying.  I'll set a default link just in 
+# case someone sets it but doesn't change the link.
+
+@TOPBAR=0;
+@BOTTOMBAR=0;
+@TOPBOTTOMLINKS=<A HREF="/">Home</a>;
+
+# This sets the color of the alink/vlink/link in the HTML BODY tag
+# Set them to something sensible and then reactivate them if you
+# want to use them.
+
+@ ALINK=#0000FF;
+@ VLINK=#00FF00;
+@ LINK=#FF0000;
+
+# This would give us a background picture (<BODY BACKGROUND=....> but
+# it's deactivated.  I don't like background pictures. :) 
+# If it's disallowed, the users won't be able to change this setting. :)
+
+@ALLOWBGPICTURE=1;
+@ BGPICTURE="/images/wallpaper";
+
+# this sets the name displayed at the top of the sidebar.  Normally you'd
+# put some kind of a title here.
+
+@SIDEBARTOP=Chad's Home Pages;
+
+# this is the title of the main sidebar subpanel
+
+@SIDEBARMENUTITLE=Good Stuff;
+
+
+# A comma-separated list of links to display in the main subpanel on the 
+# sidebar.  These should be major sections in your webtree or something
+# like that.
+
+@SIDEBARMENULINKS=<a href="http://www.jach.hawaii.edu">JAC</a>,
+	          <A href="http://www.dao.nrc.ca"     >DAO</a>;
+
+# Here are the so-called "infolinks" that appear in the second submenu
+# on the sidebar.  Notice that it is a comma-separated list, terminated
+# by a semi-colon.
+
+@INFO=<A HREF="http://www.slashdot.org">slashdot</a>,
+      <A HREF="http://www.sun.com"     >sun</a>;
+
+
+# toggle to use the side search box.  1 means "use it", 0 means "don't".
+# Naturally, if no sidebar is generated, there won't be a search box :) 
+
+@SIDEBARSEARCHBOX=1;
+
+# The template that the program uses to interface to the cgi search
+# engine.  You'll -definitely- have to edit this, unless you happen to 
+# have CNIDR's isearch installed, and you've got the same directory 
+# structure as I do :)  
+
+@SEARCHTEMPLATE=
+ <B>Search Site</B><BR><HR>
+ <DIV align="center">
+ <form method="POST" action="/cgi-bin/isearch">
+ <input name="SEARCH_TYPE" type=hidden  value="ADVANCED">
+ <input name="HTTP_PATH" type=hidden value="/WWW"> 
+ <input name="DATABASE" type=hidden value="webindex">
+ <input name="FIELD_1" type=hidden value="FULLTEXT">
+ <input name="WEIGHT_1" type=hidden value= "1">
+ <input name="ELEMENT_SET" type=hidden value="TITLE">
+ <input name="MAXHITS" type=hidden value="50">
+ <input name="ISEARCH_TERM" size="14" border="0">
+ </form>
+ </DIV>
+ <H6><a href="http://www.yoursite.edu/search.html">More searching....</a></h6>;

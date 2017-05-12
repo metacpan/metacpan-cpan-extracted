@@ -1,0 +1,232 @@
+Revision history for AnyEvent::HTTP
+
+TODO: provide lwp_request function that takes an lwp http requets and returns a http response.
+TODO: set_proxy hook
+TODO: use proxy hook
+TODO: maybe read big chunks in smaller portions for chunked-encoding + on_body.
+TODO: on_upgrade, for 101 responses?
+TODO: document session vs. sessionid correctly.
+TODO: support proxy username:password in both proxy switch and set_proxy string (dzagashev@gmail.com)
+TODO: remove "unexpectedly got a destructed handle"
+
+TODO: callback as body (Kostirya)
+TODO: infinite recursion(?) (Kostirya)
+TODO: default rbuf_max value maybe? how about reading large chunks in small parts?
+
+2.23 Sun Aug 28 11:30:33 CEST 2016
+	- relative redirects used the proxy schema instead of the request
+          url schema to generate the new url, which is wrong (analyzed by Felix
+          Ostmann).
+        - fix download example (reported by Felix Ostmann).
+
+2.22 Thu May 14 04:04:03 CEST 2015
+	- ipv6 literals were not correctly parsed (analyzed by Raphael Geissert).
+	- delete the body when mutating request to GET request when
+          redirecting (reported by joe trader).
+        - send proxy-authorization header to proxy when using CONNECT
+          (reported by dzagashev@gmail.com).
+	- do not send Proxy-Authroization header when not using a proxy.
+	- when retrying a persistent request, switch persistency off.
+        - added t/02_ip_literals.t.
+
+2.21 Mon Jun  9 01:35:54 CEST 2014
+	- correctly keep body when redirecting POSTs, instead of
+          deleting them.
+
+2.2  Mon Jun  9 01:31:46 CEST 2014
+	- connection header was malformed (patch by Raphael Geissert).
+	- add lots of known idempotent methods from httpbis.
+        - implement relative location headers (rfc 7231), with fallback on URI.
+        - add support for status code 308 from rfc 7238.
+        - recommend URI.
+
+2.15 Wed Nov 14 23:22:07 CET 2012
+	- use the recurse parameter to also limit the number of retries to be
+          done, avodiing endless loops with broken servers, as reported
+          by Carl Chambers.
+
+2.14 Sun Apr 22 14:57:51 CEST 2012
+	- Time::Local::timegm croaks on out-of-range values. Don't let
+          this disturb AnyEvent::HTTP (reported by: tell me, I forgot...).
+
+2.13 Wed Jul 27 17:53:58 CEST 2011
+	- garbled chunked responses caused AnyEvent::HTTP to malfunction
+          (patch by Dmitri Melikyan).
+        - fix GET => HEAD in one case in the documentation (James Bromberger).
+
+2.12 Tue Jun 14 07:22:54 CEST 2011
+	- fix a possible 'Can't call method "destroyed"' error (which would
+          have been reported by Carl Chambers).
+
+2.11 Tue May 10 14:33:28 CEST 2011
+	- the keepalive session cache wouldn't take port and scheme into account
+          when reusing connection - potentially causing information leaks
+          (reported by Nick Kostirya).
+	- bump AnyEvent dependency version (reported by Richard Harris).
+
+2.1  Thu Feb 24 13:11:51 CET 2011
+	- the keepalive and persistent parameters were actually named
+          differently in the code - they now work as documented.
+        - fix a bug where callbacks would sometimes never be called when
+          the request timeout is near or below the persistent connection
+          timeout (testcase by Cindy Wang).
+        - destroying the guard would have no effect when a request was
+          recursing or being retired.
+
+2.04 Sat Feb 19 07:45:24 CET 2011
+	- "proxy => undef" now overrides any global proxy when specified.
+        - require scheme in urls, also use a stricter match to match urls,
+          leading or trailing garbage is no longer tolerated.
+        - EXPERIMENTAL: allow '=' in cookie values.
+
+2.03 Tue Jan 18 18:49:35 CET 2011
+	- dummy reupload, file gone from cpan somehow.
+
+2.02 Wed Jan 12 04:29:37 CET 2011
+	- do not lowercase cookie names, only parameter names.
+
+2.01 Tue Jan 11 07:38:15 CET 2011
+	- add missing dependency on common::sense.
+        - add a resume download example.
+
+2.0  Tue Jan  4 09:16:56 CET 2011
+	- hopefully fully upgraded to HTTP/1.1.
+        - support HTTP/1.1 persistent and HTTP/1.0 keep-alive connections.
+	- drop https-proxy-connection support. seems unused and ill-specified.
+        - use more differentiated 59x status codes.
+        - properly use url (not proxy) hostname to verify server certificate.
+        - much improved cookie implementation:
+           - properly implement cookie expiry (for new cookies).
+           - new function to expire cookies and sessions: cookie_jar_expire.
+           - add special exception to parse broken expires= keys in
+             set-cookie headers.
+           - do not quote cookie values when not strictly necessary, to
+             improve compatibility with broken servers.
+           - accept and send lots of invalid cookie values exactly as
+             they were received - this should not impact valid values.
+           - lowercase cookie parameter names for improved compatibility.
+           - support the max-age cookie parameter, overrides expires.
+           - support cookie dates (and a few others) in parse_date.
+           - properly support value-less parameters (e.g. secure, httponly).
+        - do not send Host: header in a proxy CONNECT request.
+	- use common::sense.
+        - lowercase hostnames and schemes.
+        - ignore leading zeroes in http version.
+        - handle spaces in content-length headers more gracefully.
+
+1.5  Fri Dec 31 04:47:08 CET 2010
+	- bugfix: after headers were received, if any error occured the wrong
+          (server-sent) Status and Reason fields would be passed to the callback.
+        - when an error occurs during transfer, preserve status/reason.
+	- add socks4a connect example.
+	- new "tcp_connect" parameter.
+        - new format_date and parse_date functions.
+        - diagnose unexpected eof as such when the length is known.
+        - add 205 to the responses without body.
+
+1.46 Mon Sep  6 08:29:34 CEST 2010
+        - some (broken) servers differentiate between empty search parts
+          and nonexistant search parts, work around this (problem
+          analyzed by Sergey Zasenko).
+        - possibly increase robustness by always setting an on_error
+          callback on the AnyEvent::Handle object (especially in case
+          of user errors, such as nehative timeouts).
+        - we now always follow 301/302/303 redirects and mutate POST to GET.
+        - we now always follow 307 redirects, even for POST.
+        - header-less responses are not parsed correctly (at a negative
+          speed penatly :).
+
+1.45 Wed Jun 16 21:15:26 CEST 2010
+	- fix a bug where the handle would go away directly after a successful
+          connect (analyzed and patch by Maxim Dounin).
+        - due to popular demand, introduce the Redirect pseudo response header.
+        - document URL pseudo-header better.
+        - explain how to implement DNS caching.
+
+1.44 Sat Dec  5 16:36:20 CET 2009
+	- do not generate content-length on get requests (if the body is empty),
+          as there are even more broken servers out there.
+	- allow set_proxy to clear the proxy again.
+        - set_proxy will now croak on invalid urls.
+        - support overriding the Host-header (requested by Tatsuhiko Miyagawa).
+
+1.43 Fri Aug 14 17:02:02 CEST 2009
+	- provide on_prepare callback on common request.
+
+1.42 Wed Aug  5 18:43:01 CEST 2009
+	- allow suppression of auto-supplied header fields by specifying undef
+          (requested by Mr Guest).
+        - allow proxy scheme to be missing, as documented
+          (reported by Mr Guest).
+        - do not follow redirects if we do not have a location header
+          (requested by Mr Guest).
+
+1.41 Sat Jul 25 03:27:05 CEST 2009
+	- correctly parse completely headerless responses (e.g. by gatling).
+          (analysed by Robin Redeker).
+
+1.4  Tue Jul  7 02:14:53 CEST 2009
+	- http_request would not instantly clear the connection slot on
+          tcp_connect failures, potentially leading to deadlocks.
+        - fix a bug where a connection error is wrongly reported
+          as EINPROGRESS.
+        - new parameters: on_header, on_body, want_body_handle.
+        - redirects will be followed when recurse is enabled whether or not
+          the body dowload was successful or not.
+        - include :port in Host header when given in the url (many sites break
+          when it's always there, and many break if it's missing...).
+        - pass the empty string, not undef, when there is no body but
+          no error occured.
+        - allow passing of tls_ctx, predefine two https security profiles.
+	- ucfirst all error messages generated internally.
+        - include "U" token in User-Agent.
+        - document $AnyEvent::HTTP::MAX_PER_HOST.
+        - allow empty field names in response headers (microsoft hits. microsoft
+          hits. microsoft hits. you die).
+
+1.12 Thu Jun 11 14:45:18 CEST 2009
+	- $scheme wasn't optional in the proxy specification (reported by
+          Felix Antonius Wilhelm Ostmann).
+
+1.11 Fri Nov 21 09:18:11 CET 2008
+	- work around a perl core bug not properly refcounting function arguments,
+          causing "200 OK" with random body results (reported by Дмитрий Шалашов).
+
+1.1  Thu Oct 30 04:46:27 CET 2008
+	- work around different behaviour of AnyEvent::Handle in TLS mode.
+	- cleanup cookie implementation, many examples and comments were
+          provided by Дмитрий Шалашов.
+        - document the return values of http_* functions better.
+        - separate multiple header values by "," not "\x00" (this does not
+          break correctly written users of the old API).
+        - improve Set-Cookie: parsing.
+        - add experimental https-over-http-proxy support.
+        - downgrade https-over-https proxy to https-over-http.
+        - ignore spurious CR characters in headers, they show up
+          in the weirdest of places.
+        - ucfirst the request headers, for a slightly less weird look.
+        - work around (some) memleaks in perl regarding qr.
+
+1.05 Mon Sep 29 15:49:58 CEST 2008
+	- fix a regex when parsing cookie domains
+          (patch by Дмитрий Шалашов).
+
+1.04 Thu Jul 24 08:00:46 CEST 2008
+        - parse reason-less http status responses.
+	- parse more forms of broken location headers.
+
+1.03 Thu Jul  3 03:47:58 CEST 2008
+	- fix http_post, which was totally broken (patch by Pedro Melo).
+        - do not recurse on POST requests, as per HTTP/1.[01] (this might
+          change as the recommendation isn't followed by anybody else).
+        - implement preliminary support for 303/307 redirects.
+
+1.02 Thu Jun 12 13:50:08 CEST 2008
+        - make the request URL available in the callback of http_request.
+	- export http_post, http_head.
+
+1.01 Fri Jun  6 14:56:37 CEST 2008
+        - fixed prototypes for http_* functions
+
+1.0  Thu Jun  5 20:41:43 CEST 2008
+	- original version, an AnyEvent::AIO clone.

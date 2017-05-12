@@ -1,0 +1,52 @@
+Algorithm::Knapsack - brute-force algorithm for the knapsack problem
+
+
+DESCRIPTION
+
+The knapsack problem asks, given a set of items of various weights, find a
+subset or subsets of items such that their total weight is no larger than
+some given capacity but as large as possible.
+
+This module solves a special case of the 0-1 knapsack problem when the
+value of each item is equal to its weight. Capacity and weights are
+restricted to positive integers.
+
+
+INSTALLATION
+
+The distribution of Algorithm::Knapsack includes Makefile.PL so that the
+module can be installed the same way as the majority of other CPAN
+modules:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+The distribution of Algorithm::Knapsack also includes a program
+filesack. This program shows an example of using Algorithm::Knapsack, but
+it also can be used with practical implications to pack a file medium
+(for example, a recordable CD or DVD disc) with files to its maximum
+capacity. If you don't want to install filesack, then pass '-n' option to
+Makefile.PL:
+
+    perl Makefile.PL -n
+
+
+DOCUMENTATION
+
+POD style documentation is included in ./lib/Algorithm/Knapsack.pm and
+./bin/filesack. These are normally converted to manual pages and installed
+as part of the "make install" process.
+
+
+AUTHOR
+
+Alexander Anderson <a.anderson@utoronto.ca>
+
+
+COPYRIGHT
+
+Copyright (c) 2004 Alexander Anderson. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

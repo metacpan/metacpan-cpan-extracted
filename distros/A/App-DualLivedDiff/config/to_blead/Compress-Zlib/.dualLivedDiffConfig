@@ -1,0 +1,14 @@
+---
+files:
+  t/compress/CompTestUtils.pm: t/lib/compress/CompTestUtils.pm
+dirs-recursive:
+  .: ext/Compress-Zlib
+exclude-regexes:
+  - '^(?:\.?/)?META.yml$'
+  - '^(?:\.?/)?MANIFEST$'
+  - '^(?:\.?/)?ppport\.h$'
+  - '^(?:\.?/)?t/Test/'
+  - '^(?:\.?/)?t/\d*pod.*\.t$'
+  - '^(?:\.?/)?t/000prereq\.t$'
+  - '^(?:\.?/)?t/compress/CompTestUtils\.pm$'
+

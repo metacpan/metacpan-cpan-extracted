@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Amon2/Plugin/Web/CSRFDefender.pm
+lib/Amon2/Plugin/Web/CSRFDefender/Random.pm
+minil.toml
+t/009_csrf_defender.t
+t/00_compile.t
+t/011_csrf_defender_manual.t
+t/014_csrf_defender_post_only.t
+t/09_random.t
+META.yml
+MANIFEST

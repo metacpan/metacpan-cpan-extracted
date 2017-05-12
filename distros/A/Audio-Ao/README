@@ -1,0 +1,30 @@
+Ogg/Vorbis/Header version 0.01
+============================
+
+A Perl wrapper for the libao audio library, a modular cross-platfrom
+PCM output library.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Inline::C, libao
+
+Inline::C is available from CPAN.  Libao is available from xiph.org
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003, Dan Pemstein.  All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.  A copy of this license is included
+with this module (LICENSE.GPL).

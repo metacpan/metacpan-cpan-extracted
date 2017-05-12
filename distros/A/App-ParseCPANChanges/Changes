@@ -1,0 +1,40 @@
+Revision history for App-ParseCPANChanges
+
+0.06    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+
+0.05    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.04     2014-07-22 (SHARYANTO)
+
+         - No functional changes.
+
+         - Switch CLI scripts from using Perinci::CmdLine to
+           Perinci::CmdLine::Any to reduce size of dependencies.
+
+
+0.03    2013-11-01 (SHARYANTO)
+
+        - No functional changes. Mention some other modules and the rationale
+          for the script.
+
+
+0.02    2013-08-06 (SHARYANTO)
+
+        - No functional changes. Add missing dep [CT].
+
+
+0.01    2013-08-05 (SHARYANTO)
+
+        - First version.

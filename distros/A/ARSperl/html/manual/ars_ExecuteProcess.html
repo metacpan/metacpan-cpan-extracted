@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>
+      ARSperl Manual - ars_ExecuteProcess
+    </title>
+    <style type="text/css">
+/*<![CDATA[*/
+    body {
+    background-color: #FFFFFF;
+    }
+    dt.c1 {font-weight: bold}
+    p.c1 {font-style: italic}
+    /*]]>*/
+    </style>
+  </head>
+  <body>
+    <h2>
+      <code>ars_ExecuteProcess(ctrl, command, runOption=0)</code>
+    </h2>Execute the given command on the server host as the user-id that the server process is
+    running as. Requires Administrator privs to use.
+    <table border="1" width="50%">
+      <tr>
+        <td>
+          <code>runOption</code>
+        </td>
+        <td>
+          Explanation
+        </td>
+      </tr>
+      <tr>
+        <td align="center">
+          0
+        </td>
+        <td>
+          Wait for process to complete and then returned the process' returnStatus and any output
+          that the process had.
+        </td>
+      </tr>
+      <tr>
+        <td align="center">
+          1
+        </td>
+        <td>
+          Don't wait for process to complete.
+        </td>
+      </tr>
+    </table><br />
+    <dl>
+      <dt class="c1">
+        On success
+      </dt>
+      <dd>
+        Depending upon the runOption specified returns a list of <code>returnStatus</code> and
+        <code>returnString</code> or <b>1</b>
+      </dd>
+      <dt class="c1">
+        On failure
+      </dt>
+      <dd>
+        Returns undef.
+      </dd>
+    </dl>
+    <p>
+      Example:
+    </p>
+    <pre>
+        (($returnCode, $returnString) = ars_ExecuteProcess($ctrl, "/bin/ls -l /")) || 
+                die "$ars_errstr";
+      
+</pre>
+    <p>
+      Or as an equivalent, if your server is running on Windows:
+    </p>
+    <pre>
+        (($returnCode, $returnString) = ars_ExecuteProcess($ctrl, "cmd /c dir")) || 
+                die "$ars_errstr";
+</pre>
+    <p class="c1">
+      ars_ExecuteProcess was introduced in version 1.5 of ARSperl.
+    </p>
+    <p>
+      <a href="toc.html">Back to Table of Contents</a>
+    </p>
+    <address>
+      Last changes to this page 31st March 2009 by michiel.beijen@gmail.com<br />
+      © J.C.Murphy, J.W.Murphy 1997 arsperl@arsperl.org
+    </address>
+  </body>
+</html>

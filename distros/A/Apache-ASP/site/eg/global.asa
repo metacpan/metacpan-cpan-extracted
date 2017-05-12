@@ -1,0 +1,199 @@
+
+use DemoASP;
+
+# import basename() into global.asa namespace
+use File::Basename qw(basename);
+
+# when PerlSetVar UseStrict setting on, need to declare
+# global variables with "use vars"
+use vars qw($FontFace $GlobalFont %EG $title);
+
+# static read only global
+$GlobalFont = 'face=verdana,helvetica';
+
+# this is run every request for all scripts that share this global.asa
+sub Script_OnStart {
+    $Response->Debug("Script_OnStart $0 in global.asa");
+    $Session->{Started}++;
+    $title = '';
+}
+
+sub Script_OnEnd {
+    $Response->Debug("Script_OnEnd $0 in global.asa");
+    $Session->{Ended}++;
+}
+
+# modify data on the way out
+sub Script_OnFlush {
+    if($Response->{ContentType} eq 'text/html') {
+	my $data = $Response->{BinaryRef};
+	$$data =~ s/(\<(body|td).*?\>)/$1\<font $GlobalFont\>/isg;
+    }
+    my $data = $Response->{BinaryRef};
+    $Response->Debug("Script_OnFlush: about to flush ".length($$data)." bytes to client");
+}
+
+sub Session_OnStart {
+	$Session->{Count} = 10;
+	$Session->{onstart} = time();
+	$Application->{'Session'.$Session->SessionID} = '?';
+	$Response->AppendToLog("Session_OnStart! in ./eg/global.asa ". $Session->SessionID);
+}
+
+sub Session_OnEnd {
+	my $t_session_active = time() - $Session->{onstart};
+	$Application->{'Session'.$Session->SessionID} = $t_session_active;
+	$Response->AppendToLog("Session_OnEnd! in ./eg/global.asa ". $Session->SessionID);
+}
+
+sub Application_OnStart {
+	$Response->AppendToLog("Application_OnStart! in ./eg/global.asa");
+	$Application->{Count} = 20;
+}
+
+sub Application_OnEnd {
+	$Response->AppendToLog("Application_OnEnd! in ./eg/global.asa");
+}
+
+# you can share globals between scripts as of v.10, as all scripts, including 
+# the global.asa are compiled into the same module
+%EG = (
+	'.htaccess' => 'Configuration parameters that make Apache::ASP tick.',
+
+       'application.asp' => 'Uses $Application for incrementing a counter.',
+
+       'binary_write.htm' => '$Response->BinaryWrite() demo for an asp script serving a gif.',
+
+       'cgi.htm' => 'Shows compatibility with the CGI.pm library',
+
+       'counting.htm' => 'Simple asp syntax shown by wrapping a for loop around html and inserting a '.
+				'scalar value.',
+
+       'dynamic_includes.htm' => 'Shows an included file called as a subroutine.',
+
+       'error_document.htm' => 'Shows a custom error message using the $Response->ErrorDocument() API extension',
+
+       'filter.filter' => "Demonstrates Apache::ASP's ability to act both as a source and destination filter with Apache::Filter.",
+
+       'file_upload.asp' => 'File upload data can be read from the $Request->Form(), '.
+				'and is implemented via CGI.pm',
+
+	'footer.inc' => 'Footer include for most of the scripts listed.',
+
+       'form.asp' => 'Shows simple use of $Request->Form() and how to get raw input data '.
+			' from $Request->BinaryRead()',
+
+       'formfill.asp' =>
+       'Shows use of FormFill feature, which auto fills HTML forms from '.
+       '$Request->Form() data.  One must install HTML::FillInForm to use this feature. ',
+
+       'global.asa' => 'The global.asa is the nervous system of an ASP application and '.
+			'is where you define your event handlers.',
+
+       'global_asa_demo.asp' => 'Shows how the global.asa can be used to track users in an '.
+			'application',
+
+       'header.inc' => 'Header include for most of the scripts listed here.',
+
+       'include.htm' => 'Shows how you can decompose a script into common included files',
+
+#       'ordered_collections.ixhtm' => 
+#       'Used with Tie::IxHash, shows the natural ordering of the $Request->Form() collection '.
+#       'by how the browser submitted the data, useful for some.',
+
+       'register_cleanup.asp' => 'Demonstrates use of the API extension $Server->RegisterCleanup(). '.
+		'Execute code after a response completes in a fail safe way with this routine. ',
+
+       'response.asp' => 'Messy script showing much of the $Response object\'s functionality, '.
+		'including cookies and buffering.',
+
+       'row.inc' => 'File dynamically included in the dynamic_includes.htm example',
+
+       'server.htm' => 'Shows much of the $Server object\'s functionality',
+
+       'server_variables.htm' => '$Response->ServerVariables() are the equivalent of %ENV in ASP',
+
+       'session.asp' => 
+       'Shows use of the $Session object, and also demos one implementation '.
+       'of cookieless sessions.',
+
+       'session_query_parse.asp' =>
+       "Demonstrates automatic cookieless session support with the SessionQueryParse* ".
+       "settings.",
+
+       'source.asp' => 'Handy source code viewer used to let you easily view the source of '.
+		       'the other asp scripts.',
+
+       'ssi_filter.ssi' => 'Shows full SSI in action via Apache::Filter & Apache::SSI. You must compile '.
+			'your apache with stacked handlers and install these modules to see '.
+       '		this script',
+
+       'syntax_error.asp' => 'Demonstrates asp debugging with Debug 2 by creating a perl syntax error ',
+
+       'table.inc' => 'Another include used to demo dynamic_includes.htm',
+
+       'test.gif' => 'Source gif for the binary_write.htm example',
+
+       'transfer.htm' => '$Server->Transfer() use in action, for speedy redirect type behavior.',
+       
+       'xml_subs.asp' => 
+       'XMLSubsMatch XML Extensions demonstrated, which all custom tags '.
+       'to be created by the developer.',
+
+       'xml_subs_strict.asp' =>
+       'XMLSubsStrict setting causes XMLSubs to accept only string literals '.
+       'for arguments, conforming to XML standard more strictly, and '.
+       'controlling XMLSubs execution to compile time arguments.',
+       
+
+       'xslt.xml' => 'XSLT transformation of XML script, using XML::XSLT, and a DBM based cache with the XSLTCache setting. Also possible for the XSLTParser setting is XML::Sablotron for faster XSLT rendering.',
+);
+
+if($Apache::ASP::ModPerl2) {
+  delete $EG{'ssi_filter.ssi'};
+  delete $EG{'filter.filter'};
+}
+
+$SIG{__DIE__} = \&Carp::confess;
+
+# note if you include XMLSubs in the global.asa, make sure to 
+# switch the package context to the XMLSubs namespace to avoid
+# any odd variable scoping problems
+package my;
+
+sub my::include {
+    my($args, $text) = @_;
+
+    # reference the $Response object in the package namespace 
+    # since we are in the my:: package and not the GlobalPackage/global.asa
+    $main::Response->Include($args->{src}, title => $args->{title});
+}
+
+sub my::ttb {
+    my($args, $text) = @_;
+    print "<font face=courier size=-1><b>$text</b></font>";
+}
+
+sub my::table {
+    my($args, $text) = @_;
+    my $title = delete $args->{title};
+
+    my %args = (
+	     # set defaults, and override with %$args
+	     border => 0,
+	     bgcolor => 'white',
+	     width => '300',
+	     cellpadding => 3,
+	     cellspacing => 0,
+	     %$args
+	    );
+
+    print '<table '.join(' ', 
+			 map { "$_=$args{$_}" } keys %args,
+			). '>';
+    print ($title ? "<tr><td bgcolor=black><font color=white>$title</font></td></tr>" : '');
+    print "\n";
+    print "<tr><td>";
+    print $text;
+    print "</td></tr></table>";
+}

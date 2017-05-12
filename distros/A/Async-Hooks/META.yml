@@ -1,0 +1,26 @@
+---
+abstract: 'Hook system with asynchronous capabilities'
+author:
+  - 'Pedro Melo <melo@cpan.org>'
+build_requires:
+  Test::Deep: 0
+  Test::Fatal: 0
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112621'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Async-Hooks
+requires:
+  Carp: 0
+  Mo: 0.30
+  namespace::clean: 0
+resources:
+  bugtracker: https://github.com/melo/async-hooks/issues
+  homepage: http://search.cpan.org/dist/Async-Hooks/
+  repository: git://github.com/melo/async-hooks.git
+version: 0.16

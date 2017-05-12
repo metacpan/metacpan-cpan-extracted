@@ -1,0 +1,6 @@
+Revision history for Perl extension Attribute::Handlers::Prospective.
+
+0.01  Tue Oct  2 16:40:48 2001
+	- original version; created by h2xs 1.20 with options
+		-A -P -X -f -n Attribute::Handlers::Prospective
+

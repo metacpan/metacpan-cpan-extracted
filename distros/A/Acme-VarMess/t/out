@@ -1,0 +1,3 @@
+           use WWW::Mechanize;            my $A11241056652525f97f9b4147cafecee84a8b031a78 = WWW::Mechanize->new(); 
+           $A11241056652525f97f9b4147cafecee84a8b031a78->get( $l1124105665a5eb02f2e24db13fe5e4826cfd515b84 ); 
+           $A11241056652525f97f9b4147cafecee84a8b031a78->follow_link( n => 3 );            $A11241056652525f97f9b4147cafecee84a8b031a78->follow_link( text_regex => qr/download this/i );            $A11241056652525f97f9b4147cafecee84a8b031a78->follow_link( http://host.com/index. ); 

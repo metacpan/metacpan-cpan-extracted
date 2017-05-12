@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+author/Makefile
+author/ika.csv
+cpanfile
+lib/Acme/Ikamusume.pm
+share/euc-jp.dic
+share/utf8.dic
+t/00_compile.t
+t/01_geso.t
+t/02_parser.t
+META.yml
+MANIFEST

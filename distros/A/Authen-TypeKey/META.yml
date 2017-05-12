@@ -1,0 +1,17 @@
+name: Authen-TypeKey
+version: 0.05
+abstract: TypeKey Authentication
+author: Six Apart <cpan@sixapart.com>
+license: perl
+distribution_type: module
+requires:
+  Class::ErrorHandler: 0
+  Math::BigInt: 0
+  MIME::Base64: 0
+  Digest::SHA1: 0
+  LWP: 0
+no_index:
+  directory:
+    - t
+    - inc
+generated_by: Module::Install version 0.36

@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $issue  = qr/^ [[] [A-Z][A-Z0-9]+ - \d+ .* [\]]/xms;
+my $merge  = qr/^ Merge /xms;
+my $revert = qr/^ Revert /xms;
+my $regen  = qr/^ Regen /xms;
+my $pom    = qr/^ POM /xms;
+my $good   = qr/ $issue | $merge | $revert | $regen | $pom /xms;
+
+open my $fh, "<", $ARGV[0] or die "Can't read commit message!: $!\n";
+my $msg = do { local $/; <$fh> };
+
+if ( $msg !~ /$good/xms ) {
+    warn <<"MESSAGE";
+Bad message! '$ARGV[0]'
+Messages should be:
+    [JIRA-NNN]
+    Merge ...
+    Revert ...
+    Regen ...
+    POM ...
+MESSAGE
+    exit 1;
+}
+
+exit 0;

@@ -1,0 +1,61 @@
+{
+   "abstract" : "Build and install the GNU build system.",
+   "author" : [
+      "Richard Sim\u00c3\u00b5es <rsimoes AT cpan DOT org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300013, CPAN::Meta::Converter version 2.120900",
+   "license" : [
+      "lgpl_3_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-Autotools",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "ExtUtils::CChecker" : "0",
+            "File::Path" : "2.08",
+            "File::ShareDir" : "0",
+            "IPC::Cmd" : "0",
+            "Module::Build" : "0.3601",
+            "Net::FTP" : "0",
+            "perl" : "5.010_001",
+            "version" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rsimoes/alien-autotools/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Alien-Autotools",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rsimoes/alien-autotools.git",
+         "web" : "https://github.com/rsimoes/alien-autotools"
+      }
+   },
+   "version" : "v0.0.6"
+}
+

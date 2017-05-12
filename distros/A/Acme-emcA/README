@@ -1,0 +1,64 @@
+NAME
+    Acme::emcA - Acme::emcA
+
+VERSION
+    This document describes version 0.11 of Acme::emcA, released October 14,
+    2007.
+
+SYNOPSIS
+        use Acme::emcA;
+        print "Hello, World";
+
+DESCRIPTION
+    The first time you run a program under "use Acme::emcA", the module
+    takes your source file and makes an mirror image of it at both row- and
+    column- level. The code continues to work exactly as it did before, but
+    now it looks like this:
+
+                    ;use Acme::emcA esu;
+
+        ;"!dlroW ,olleH" tnirpprint "Hello, World!";
+
+        ;"!dlroW ,olleH" tnirpprint "Hello, World!";
+
+                    ;use Acme::emcA esu;
+
+DIAGNOSTICS
+    "Can't reverse "%s""
+        Acme::emcA could not access the source file to modify it.
+
+SEE ALSO
+    Acme::Palindrome - Code and documentation nearly taken verbatim from it.
+
+COPYRIGHT
+    Copyright 2003, 2005, 2007 by Audrey Tang <cpan@audreyt.org>.
+
+    This software is released under the MIT license cited below.
+
+  The "MIT" License
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 80:
+        You forgot a '=back' before '=head1'
+

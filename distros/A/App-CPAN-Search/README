@@ -1,0 +1,38 @@
+NAME
+    cpan-search - Script to search on CPAN archive.
+
+SYNOPSIS
+     cpan-search [-h] [--version] module_prefix
+
+ARGUMENTS
+    *       "-h"
+
+             Print help.
+
+    *       "--version"
+
+             Print version of script.
+
+    *       "module_prefix"
+
+             Perl module prefix.
+             e.g. Module::Install
+
+EXAMPLE
+     cpan-search Module::Install
+
+REPOSITORY
+    <https://github.com/tupinek/App-CPAN-Search>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.01
+

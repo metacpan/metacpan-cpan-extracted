@@ -1,0 +1,217 @@
+#!/usr/bin/env perl
+package    # Hide package name from PAUSE
+  Alien::ActiveMQ::Install;
+use Moose;
+use Method::Signatures::Simple;
+use MooseX::Types::Moose qw/Str Bool/;
+use MooseX::Types::Path::Class;
+use Path::Class qw/file dir/;
+use File::ShareDir qw/dist_dir/;
+use File::Temp qw/tempdir/;
+use LWP::Simple qw/get getstore/;
+use Archive::Extract;
+use File::Copy::Recursive qw/ dircopy /;
+use namespace::autoclean;
+use Const::Fast;
+
+with 'MooseX::Getopt';
+
+our $VERSION = '0.00005';
+
+const my $DEFAULT_ACTIVEMQ_VERSION => '5.10.0';
+
+has force => (
+    isa => Bool,
+    is => 'ro',
+    default => 0,
+);
+
+has install_dir => (
+    isa        => 'Path::Class::Dir',
+    is         => 'ro',
+    coerce     => 1,
+    lazy_build => 1,
+);
+
+method _build_install_dir {
+    dir( dist_dir('Alien-ActiveMQ'), $self->version_number );
+}
+
+has tarball => (
+    isa        => 'Path::Class::File',
+    is         => 'ro',
+    coerce     => 1,
+    lazy_build => 1
+);
+
+method _build_tarball {
+    my $tarball = $self->download_uri;
+    $tarball =~ s|.+/||;
+    file( $self->_temp_dir, $tarball );
+}
+
+has version_number => (
+    isa => Str,
+    is => 'ro',
+    required => 1,
+    lazy_build => 1,
+);
+
+has script_name => (
+    isa => Str,
+    is => 'ro',
+    required => 1,
+    lazy_build => 1,
+);
+
+method _build_script_name {
+    return file($0)->basename;
+}
+
+method _build_version_number {
+
+   # If we have a tarball, use the version from that.
+   # Otherwise, if we have a URI to download from, use the version from that.
+   # Otherwise, guess.
+   # None of this is done at all if the user gave a specific version, of course.
+
+    my $version_source = $self->has_tarball ? $self->tarball : undef;
+    if ( not defined $version_source ) {
+        $version_source = $self->has_download_uri ? $self->download_uri : undef;
+    }
+    return $DEFAULT_ACTIVEMQ_VERSION unless $version_source;
+    return $version_source =~ /activemq-(.+\d)/;
+}
+
+has download_uri => (
+    isa => Str,
+    is => 'ro',
+    lazy_build => 1,
+);
+
+method _build_download_uri {
+    return
+      sprintf(
+"http://www.apache.org/dyn/closer.cgi?path=/activemq/%s/apache-activemq-%s-bin.tar.gz",
+        $self->version_number, $self->version_number );
+}
+
+has archive_uri => (
+    isa => Str,
+    is => 'ro',
+    lazy_build => 1,
+);
+
+method _build_archive_uri {
+    return
+      sprintf(
+"http://archive.apache.org/dist/activemq/apache-activemq/%s/apache-activemq-%s-bin.tar.gz",
+        $self->version_number, $self->version_number );
+}
+
+has _temp_dir => (
+    isa     => 'Path::Class::Dir',
+    coerce  => 1,
+    is      => 'ro',
+    lazy    => 1,
+    default => sub { tempdir( CLEANUP => 1 ) },
+);
+
+has verbose => (
+    isa => 'Bool',
+    is => 'ro',
+    default => 0,
+);
+
+method output {
+    print @_, "\n" if $self->verbose;
+}
+
+# To make it easier to test
+method _get($uri) {
+    return get($uri);
+}
+
+method _getstore( $uri, $file ) {
+    return getstore( $uri, $file );
+}
+
+method download_tarball {
+    eval { return $self->download_current; };
+    if ($@) {
+        eval { return $self->download_archive; };
+    }
+    die "Could't download version " . $self->version_number . ": $@\n" if $@;
+    return $self->tarball;
+}
+
+method download_current {
+    $self->output( "Downloading mirror list from ", $self->download_uri );
+    my $mirror_list = $self->_get( $self->download_uri );
+    die( "Failed to download mirror location " . $self->download_uri . "\n" )
+      unless $mirror_list;
+
+    my ($file) = $mirror_list =~ /(http:[^"]+-bin\.tar.gz)/;
+    die( "Failed to extract mirror from " . $self->download_uri . "\n" )
+      unless $file;
+
+    $self->output("Downloading from $file");
+    my $res = $self->_getstore( $file, $self->tarball . '' );
+    die( "Failed to download mirrored file " . $file . "\n" )
+      unless $res == 200;
+    return $self->tarball;
+}
+
+method download_archive {
+    $self->output( "Downloading archived version from ", $self->archive_uri );
+    my $res = $self->_getstore( $self->archive_uri, $self->tarball . '' );
+    die( "Failed to download archive file " . $self->archive_uri . "\n" )
+      unless $res == 200;
+    return $self->tarball;
+}
+
+method unpack_tarball {
+    local $Archive::Extract::PREFER_BIN = 1;
+    my $tar = Archive::Extract->new( archive => $self->tarball . '' );
+    $tar->extract( to => $self->_temp_dir . '' );
+}
+
+method _dircopy( $from, $to ) {
+    return dircopy( $from, $to );
+}
+
+method run {
+    if ( -d $self->install_dir ) {
+        if ( $self->force ) {
+            warn($self->script_name . ": Already installed, but --force - reinstalling\n");
+        }
+        else {
+            warn($self->script_name . ": Already installed, you did not say --force - exiting\n");
+            exit 0;
+        }
+    }
+    my $tarball = $self->has_tarball ? $self->tarball : $self->download_tarball;
+
+    die "Can't read tarball $tarball: $!" unless -r $tarball;
+    $self->output("Downloaded tarball to: $tarball");
+
+    $self->unpack_tarball;
+    $self->output("Unpacked tarball $tarball");
+
+    my $dir = $self->_temp_dir->file( $tarball->basename );
+    $dir =~ s/\.tar\.gz$//;
+    $dir =~ s/-bin//;
+    die("Could not find where tarball unpacked") unless -d $dir;
+
+    $self->output( "From " . $dir . " to " . $self->install_dir );
+    $self->_dircopy( $dir => $self->install_dir );
+    $self->output( "ActiveMQ installed in " . $self->install_dir . "\n" );
+
+    return 1;
+}
+
+__PACKAGE__->meta->make_immutable;
+__PACKAGE__->new_with_options->run unless caller;
+1;
+
+__END__

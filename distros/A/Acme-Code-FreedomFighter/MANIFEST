@@ -1,0 +1,5 @@
+MANIFEST
+FreedomFighter.pm
+Makefile.PL
+t/Acme-Code-FreedomFighter.t
+

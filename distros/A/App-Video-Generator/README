@@ -1,0 +1,99 @@
+NAME
+    video-generator - Script to generate video.
+
+SYNOPSIS
+     video-generator [-d duration] [-f fps] [-h] [-i input_dir] [-s size] [-v] [--version] output_file
+
+DESCRIPTION
+     video-generator script uses Video::Generator class to create videos via ffmpeg.
+
+ARGUMENTS
+    *       "-d duration"
+
+             Duration.
+             Default value is 10000 (10s).
+
+    *       "-f fps"
+
+             Frame rate.
+             Default value is 60 frames per second.
+
+    *       "-h"
+
+             Print help.
+
+    *       "-i input_dir"
+
+             Input directory with images.
+             Default value is nothing, then generates random images.
+
+    *       "-s size"
+
+             Video size.
+             Default value is 1920x1080.
+
+    *       "-v"
+
+             Verbose mode.
+
+    *       "--version"
+
+             Print version of script.
+
+    *       "output_file"
+
+             Output file.
+             e.g. foo.mpg
+             e.g. foo.mp4
+
+EXAMPLE1
+     video-generator
+
+     # Output:
+     # Usage: video-generator [-d duration] [-f fps] [-h]
+     #         [-i input_dir] [-s size] [-v] [--version] output_file
+     #
+     #         -d duration     Duration (default value is 10000 (=10s)
+     #         -f fps          Frame rate
+     #         -h              Print help.
+     #         -i input_dir    Input directory with images (default value is nothing).
+     #         -s size         Size (default value is 1920x1080).
+     #         -v              Verbose mode.
+     #         --version       Print version.
+
+EXAMPLE2
+     video-generator foo.mpg
+
+     # Output:
+     # -nothing-
+     # Created foo.mpg file in local directory.
+
+EXAMPLE3
+     video-generator -s 100x100 foo.mp4
+
+     # Output:
+     # -nothing-
+     # Created foo.mp4 file in local directory.
+
+EXAMPLE4
+     video-generator -i /data/images/ foo.mpg
+
+     # Output:
+     # -nothing-
+     # Created foo.mpg file in local directory, generated from images in /data/images.
+
+REPOSITORY
+    <https://github.com/tupinek/App-Video-Generator>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.07
+

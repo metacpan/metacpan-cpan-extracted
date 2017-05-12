@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 92637832ba368e2c61a4d760f655de0af1c15ecf Build.PL
+SHA1 c54cf86f98c0a733e01c9a0d5c37b3b5c6989e8e Changes
+SHA1 d5628d91904780dd6f07116b6e96bf07b0e8a231 MANIFEST
+SHA1 c12ac6a3f7a1ce6f26d01cac3ac0cb565ed16985 META.yml
+SHA1 1c3cd12321bbfae36bca05004406d8e3cbcf3af7 Makefile.PL
+SHA1 78ac261dcaa6699c5b701110806ab4f5a0a79d96 README
+SHA1 5ff9349f1c51585aea89de6e8551b0238ee5a58e lib/Acme/Hello.pm
+SHA1 1c642e5c1673360bb7d8f86ed755d44ce0827151 lib/Acme/Hello/I18N.pm
+SHA1 c48ac05b7d9816e20cf8c70e9342ae14d29863b2 lib/Acme/Hello/I18N/ca.po
+SHA1 618c2a837ca924c94a62065175190245fa63965b lib/Acme/Hello/I18N/da.po
+SHA1 a811722192e21519819abf9fb846a1b34dab39e7 lib/Acme/Hello/I18N/de.po
+SHA1 70f0f32e6cf0deb3822bd1bc8f6a9607f7c1a941 lib/Acme/Hello/I18N/de_DE.po
+SHA1 c326fc9c4b7837619aa472dce8763905dd0ebad1 lib/Acme/Hello/I18N/el.po
+SHA1 8f84c5fbe232bb3d47f618f0892f1b46906d888c lib/Acme/Hello/I18N/en.po
+SHA1 60a7872382f9daf1e2af5597e50cca7901db4522 lib/Acme/Hello/I18N/eo.po
+SHA1 c52cd75b9475eb4988fcb0bc115d32deb67b2cda lib/Acme/Hello/I18N/es.po
+SHA1 e6919a491f92ae3b3bc0c79138e694c99edc9f18 lib/Acme/Hello/I18N/et.po
+SHA1 04c9d011279c355628d2ff036ca5eb4851f63dd2 lib/Acme/Hello/I18N/fi.po
+SHA1 33b7fc634bf19cb8a8bb4dd7cf6bb7f2921ac1ae lib/Acme/Hello/I18N/fr.po
+SHA1 e5aa9bd3abe7e77a6fbca8f49234517d0766a949 lib/Acme/Hello/I18N/gl.po
+SHA1 ba6258a603be476d8d989e4862a20e2e112ab5f2 lib/Acme/Hello/I18N/he.po
+SHA1 6874ff7b34457669a7a11b3b4176d41849bf9e30 lib/Acme/Hello/I18N/hr.po
+SHA1 75eed5bb61810b942617f48adb1aea299d5c707d lib/Acme/Hello/I18N/hu.po
+SHA1 dbf9ec46e579eac3d444521614d84587e876ba0c lib/Acme/Hello/I18N/id.po
+SHA1 589256ab9e8b19fb2143e215be2d617dc1ab2d68 lib/Acme/Hello/I18N/it.po
+SHA1 7ea0a284bbd26f4545e6e5a8b922b28c2a9bc1f3 lib/Acme/Hello/I18N/ja.po
+SHA1 960d23ad687496a77cf73619082f3fa7bedd0d32 lib/Acme/Hello/I18N/ko.po
+SHA1 a5bf4f31bf3f8fdf0da73d039525d1e1932f0387 lib/Acme/Hello/I18N/lv.po
+SHA1 b5a2494e88574836f3599785f57f55d638076b8a lib/Acme/Hello/I18N/nb.po
+SHA1 311ec7fb1bf66329fa31985a20d92721a5e0b3d3 lib/Acme/Hello/I18N/nl.po
+SHA1 2676ab02a8afea01995abccba7c11bf555ce976d lib/Acme/Hello/I18N/nn.po
+SHA1 e6f65427112211be80e73dfe7a8aef0e4e550885 lib/Acme/Hello/I18N/pl.po
+SHA1 7356b9c70948bc0ded622211b6b4f3ca7ab65632 lib/Acme/Hello/I18N/pt.po
+SHA1 1db28c3ee760fae9b7ac2d42dbc39da29b1ee2ec lib/Acme/Hello/I18N/pt_BR.po
+SHA1 3d29f1b892ac2053929a362de696e0ea52fe96ba lib/Acme/Hello/I18N/ru.po
+SHA1 c6bf2172dbaefd95a0abc4c9518f4d7db7fc3db3 lib/Acme/Hello/I18N/sk.po
+SHA1 adcff22df26b77f9ad0d612a5e8396b9082bf8a8 lib/Acme/Hello/I18N/sl.po
+SHA1 bba73916e9a627cd615dce00db57cddd72dce873 lib/Acme/Hello/I18N/sv.po
+SHA1 74e5cc715bc656335f45fa0b64a40ef477c27a27 lib/Acme/Hello/I18N/tr.po
+SHA1 199e852550056689c1aceb628a4b157ca46cea14 lib/Acme/Hello/I18N/uk.po
+SHA1 e6d1b36fe2ce2ab8356dd0286dfd3a94d8fa4e80 lib/Acme/Hello/I18N/zh_CN.po
+SHA1 65727887db46bcb198a04da395c9a9dc234ed347 lib/Acme/Hello/I18N/zh_TW.po
+SHA1 41afe2c04bb573b40e283e2b210ed70a47a3f8ba t/0-signature.t
+SHA1 0670031f169a21db817517a24d95a2e1fcfd5491 t/1-basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (Darwin)
+
+iEYEARECAAYFAky5CZQACgkQtLPdNzw1AaD7pACgnEgmDT8TX2BbREr7u9lpWKVl
+BJQAnjxaZy3WAOrZy0lEN0b/SSIW9M8t
+=3bCb
+-----END PGP SIGNATURE-----

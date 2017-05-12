@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - GetCharMenu Hash</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H2>GetCharMenu Hash</H2>
+
+
+<PRE>
+{
+ "changeDiary" =&gt; <i>list</I> of references to <a href="ds_diaryentry_hash.html">Diary Entry Structures</a>,
+ "helpText"     =&gt; string,
+ "lastChanged"  =&gt; string,
+ "menuType"     =&gt; string, (<code>list, query, file, </code> or <code>sql</code>)
+ "name"	        =&gt; string,
+ "owner"        =&gt; string,
+ "timestamp"    =&gt; integer,
+   <i>either (if menuType is Query)</i>  
+ "menuQuery"    =&gt; reference to <A HREF="ds_charmenu_query_hash.html">CharMenu Query Hash</A>
+   <i>or (if menuType is SQL)</i>
+ "menuSQL"      =&gt; reference to <A HREF="ds_charmenu_sql_hash.html">CharMenu SQL Hash</A>
+   <i>or (if menuType is File)</i>
+ "menuFile"     =&gt; reference to <A HREF="ds_charmenu_file_hash.html">CharMenu File Hash</A>
+   <i>or none (if menuType is Character)</i>
+ "refreshCode"  =&gt; one of: <CODE>connect, open</CODE> or <CODE>interval</CODE>
+ <font color='red'>"objPropList"     =&gt; <I>list</I> of references to <a
+	href="ds_prop_hash.html">Property Hash</a></font> <B>(&gt;= 4.5)</B>
+}
+</PRE>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 16 Sep 1998 by jcmurphy<br>
+&#169; J.C.Murphy, J.W.Murphy 1997 arsperl@arsperl.org
+</address>
+</BODY>
+</HTML>

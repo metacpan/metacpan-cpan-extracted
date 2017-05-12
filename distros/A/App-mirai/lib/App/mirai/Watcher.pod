@@ -1,0 +1,42 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with App::mirai::Watcher
+at lib/App/mirai/Watcher.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+App::mirai::Watcher - event class for L<App::mirai::Future> notifications
+
+=head1 VERSION
+
+version 0.003
+
+=head2 discard
+
+Disposes of this watcher. Will raise an exception if anything else is
+holding on to it.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2014-2015. Licensed under the same terms as Perl itself.

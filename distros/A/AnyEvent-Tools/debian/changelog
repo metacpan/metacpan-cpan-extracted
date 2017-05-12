@@ -1,0 +1,44 @@
+libanyevent-tools-perl (0.11-1) unstable; urgency=low
+
+  * Use aggressive_idle instead AE::idle.
+  * New upstream version.
+  * Use aggressive_idle's guard instead internal.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 01 Mar 2011 13:50:55 +0300
+
+libanyevent-tools-perl (0.09-1) unstable; urgency=low
+
+  * New upstream version (add unshift and unshift_back functions).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 16 Feb 2011 23:51:11 +0300
+
+libanyevent-tools-perl (0.08-1) unstable; urgency=low
+
+  * New upstream version (add unique_cb function).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 14 Feb 2011 17:59:52 +0300
+
+libanyevent-tools-perl (0.07-1) unstable; urgency=low
+
+  *  New upstream version.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 14 Feb 2011 10:57:44 +0300
+
+libanyevent-tools-perl (0.06-1) unstable; urgency=low
+
+  * New upstream version (add rlock_limit).
+  * A few tests were rewritten.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 11 Feb 2011 09:37:52 +0300
+
+libanyevent-tools-perl (0.04-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 08 Feb 2011 11:10:12 +0300
+
+libanyevent-tools-perl (0.02-1) unstable; urgency=low
+
+  * Initial release. (Closes: #XXXXXX)
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 07 Feb 2011 17:57:12 +0300

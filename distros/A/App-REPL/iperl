@@ -1,0 +1,205 @@
+#! /usr/bin/env perl
+use strict;
+use warnings;
+use Term::ANSIColor ':constants';
+$Term::ANSIColor::AUTORESET = 1;
+
+# ----------------------------------------------------------------------
+# This first, to keep PadWalker away from lexical variables below.
+sub scoped_eval {
+  print MAGENTA @_ if $App::REPL::DEBUG;
+  eval shift;
+  print BOLD YELLOW $@ if $@;
+}
+
+use PadWalker 'peek_my';
+use PPI;
+use PPI::Find;
+use Data::Dumper;
+use Symbol;
+use Term::ReadLine;
+$App::REPL::DEBUG = 0;
+
+{ my $in_package = 'App::REPL';
+  sub in_package { @_ ? $in_package = shift : $in_package }
+}
+
+# ----------------------------------------------------------------------
+# Added RESET as the color somehow bleeds into the prompt
+# -- when we use Term::ReadLine
+{ my $prompt;
+  my $term = Term::ReadLine->new('iperl');
+  sub pnew  { $prompt = RESET . in_package . ' _ ' }
+  sub pcont { $prompt = RESET . in_package . '. ' }
+  sub prompt {
+    my $s = $term->readline($prompt);
+    $term->addhistory($s) if defined($s) and $s =~ /\S/;
+    $s
+  }
+  pnew;
+  $term->ornaments(0)
+}
+
+sub eek { print STDERR BOLD RED @_, "\n"; goto REPL }
+
+
+# ----------------------------------------------------------------------
+# Magic.  This allows 'my' variables assigned within the eval to carry
+# through subsequent evals -- unless the eval'd returns from the eval,
+# in which case the next eval will get the same variables.
+#--
+use constant PRO_IN => <<'EOP';
+  use App::REPL;
+  use strict;
+  no warnings 'void';
+EOP
+sub PRO {
+  my $r = "no strict 'refs';\n"
+        . "package @{[in_package]};\n";
+  my $h = do { no strict 'refs'; ${in_package . '::REPL::env'} || {}};
+  for (keys %$h) {
+    /^(.)/;
+    $r .= "my $_ = $1" . q,{${", . in_package . q,::REPL::env"}->, . "{'$_'}};\n"
+  }
+  $r . PRO_IN
+}
+use constant EPI => <<'EOE';
+  ;
+  no strict 'refs';
+  for (Symbol::qualify('')) { s/::$//; main::in_package($_) }
+  ${main::in_package . '::REPL::env'} = PadWalker::peek_my(0)
+EOE
+
+# ----------------------------------------------------------------------
+# More magic.  This finds the final statement of some Perl, wherever
+# that statement may be (even if its result cannot escape the overall
+# evaluation), and saves its value in $App::REPL::ret
+#--
+$App::REPL::ret = '';
+{ my $f = PPI::Find->new(sub { shift->isa('PPI::Statement') });
+  sub save_ret {
+    my $d = shift;
+  
+    # don't even try if it contains something troublesome.
+    return $d->serialize if has_troublesome($d);
+  
+    my @s = $f->in($d);
+    for (reverse @s) {
+      next if within_constructor($_, $d);
+      print Dumper $d if $App::REPL::DEBUG > 1;
+      unshift @{$_->{children}},
+        bless({content => '$App::REPL::ret'}, 'PPI::Token::Symbol'),
+        bless({content => '='},               'PPI::Token::Operator');
+      return $d->serialize
+    }
+  
+    # try and save the whole thing
+    return '$App::REPL::ret = ' . $d->serialize if @s;
+
+    # give up
+    $d->serialize
+  }
+}
+
+
+{ my %troublesome = map { $_, 1 } qw(sub package use require my our local);
+  my $f = PPI::Find->new(sub {
+    return 0 unless (my $e = shift)->isa('PPI::Token::Word');
+    return 1 if exists $troublesome{$e->{content}};
+    0
+  });
+  sub has_troublesome { $f->in(shift) } 
+}
+  
+sub dump_ret {
+  return if ref $_[0] eq 'CODE';
+  print BOLD CYAN Dumper $App::REPL::ret if $App::REPL::ret;
+}
+
+{ my $fc = PPI::Find->new(sub { $_[0]->isa('PPI::Structure::Constructor')
+                             or $_[0]->isa('PPI::Structure::Block') });
+  sub within_constructor {
+    my ($s, $d) = @_;
+    my $fs = PPI::Find->new(sub { shift eq $s });
+    for ($fc->in($d)) {
+      return 1 for $fs->in($_);
+    }
+    0
+  }
+}
+
+# ----------------------------------------------------------------------
+# The PPI here handles the rest of the magic: it detects unfinished
+# blocks and such so that the repl can request more lines until they
+# complete.  Note that this does -not- handle e.g. qw(
+#--
+{ my $f = PPI::Find->new(sub {
+    my %h = %{+shift};
+    (exists $h{start} and !exists $h{finish}) ? 1 : 0
+  });
+  sub repl {
+    my $s = '';
+    REPL: while (defined($_ = prompt)) {
+      $s .= "\n" . $_;
+      my $d = PPI::Document->new(\$s);
+      if ($f->in($d)) {
+        pcont
+      }
+      else {
+        scoped_eval PRO . save_ret($d) . EPI;
+        dump_ret;
+        $App::REPL::ret = '';
+        $s = '';
+        pnew
+      }
+    }
+  }
+}
+
+
+# ----------------------------------------------------------------------
+package App::REPL;
+main::repl();
+
+
+
+# ----------------------------------------------------------------------
+BEGIN {
+  # Patch PPI 1.118 into suitability; subsequent versions should work fine.
+  # Yes, this is somewhat wrong, and will go away as soon as PPI >1.118
+  # comes out -- but in these early versions of App::REPL , it should be
+  # OK.
+  return unless $PPI::VERSION eq 1.118;
+  print "#-- Oh, you have PPI 1.118 -- we need to patch it up a bit.\n";
+  no warnings 'redefine';
+  package PPI::Find;
+  sub _execute {
+          my $self   = shift;
+          my $wanted = $self->{wanted};
+          my @queue  = ( $self->{in} );
+
+          # Pull entries off the queue and hand them off to the wanted function
+          while ( my $Element = shift @queue ) {
+                  my $rv = &$wanted( $Element, $self->{in} );
+
+                  # Add to the matches if returns true
+                  push @{$self->{matches}}, $Element if $rv;
+                  
+                  # Continue and don't descend if it returned undef
+                  # or if it doesn't have children
+                  next unless defined $rv;
+                  next unless $Element->isa('PPI::Node');
+
+                  # Add the children to the head of the queue
+                  if ( $Element->isa('PPI::Structure') ) {
+                          unshift @queue, $Element->finish if $Element->finish;
+                          unshift @queue, $Element->children;
+                          unshift @queue, $Element->start if $Element->start;
+                  } else {
+                          unshift @queue, $Element->children;
+                  }
+          }
+
+          1;
+  }
+}

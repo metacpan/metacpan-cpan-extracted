@@ -1,0 +1,43 @@
+cpanm (App::cpanminus) 1.7034 on perl 0.666 built for darwin-2level
+Work directory is /Users/lagrasta/.cpanm/work/1438721993.73742
+You have make /usr/bin/make
+You have LWP 6.13
+You have /usr/bin/tar: bsdtar 2.8.3 - libarchive 2.8.3
+You have /usr/bin/unzip
+Searching Params::Check () on cpanmetadb ...
+--> Working on Params::Check
+Fetching http://www.cpan.org/authors/id/B/BI/BINGOS/Params-Check-0.38.tar.gz
+-> OK
+Unpacking Params-Check-0.38.tar.gz
+Entering Params-Check-0.38
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.58 ... Yes (6.98)
+Configuring Params-Check-0.38
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Params::Check
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (6.98)
+Checking if you have Test::More 0 ... Yes (1.001014)
+Checking if you have Locale::Maketext::Simple 0 ... Yes (0.21)
+Building and testing Params-Check-0.38
+cp lib/Params/Check.pm blib/lib/Params/Check.pm
+Manifying blib/man3/Params::Check.3
+PERL_DL_NONLAZY=1 /Users/lagrasta/.plenv/versions/5.20.2/bin/perl5.20.2 "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01_Params-Check.t .. ok
+All tests successful.
+Files=1, Tests=91,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.03 cusr  0.00 csys =  0.06 CPU)
+Result: PASS
+Manifying blib/man3/Params::Check.3
+Installing /Users/lagrasta/.plenv/versions/5.20.2/lib/perl5/5.20.2/Params/Check.pm
+Installing /Users/lagrasta/.plenv/versions/5.20.2/man/man3/Params::Check.3
+Appending installation info to /Users/lagrasta/.plenv/versions/5.20.2/lib/perl5/5.20.2/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Params-Check-0.38
+Installing /Users/lagrasta/.plenv/versions/5.20.2/lib/perl5/site_perl/5.20.2/darwin-2level/.meta/Params-Check-0.38/install.json
+Installing /Users/lagrasta/.plenv/versions/5.20.2/lib/perl5/site_perl/5.20.2/darwin-2level/.meta/Params-Check-0.38/MYMETA.json
+1 distribution installed

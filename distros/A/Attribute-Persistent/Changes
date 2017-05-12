@@ -1,0 +1,6 @@
+Revision history for Perl extension Attribute::Persistent.
+
+0.01  Sat Aug 31 23:21:40 2002
+	- original version; created by h2xs 1.2 with options
+		-AX -n Attribute::Persistent
+

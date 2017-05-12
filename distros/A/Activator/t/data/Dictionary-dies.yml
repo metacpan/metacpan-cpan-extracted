@@ -1,0 +1,5 @@
+'Activator::Registry':
+  'Activator::Dictionary':
+    default_lang:  'en'
+    default_realm: 'dtest'
+    fail_mode: [ 'backup', 'die' ]

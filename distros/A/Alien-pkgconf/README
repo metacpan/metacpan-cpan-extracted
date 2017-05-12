@@ -1,0 +1,72 @@
+NAME
+    Alien::pkgconf - Discover or download and install pkgconf + libpkgconf
+
+SYNOPSIS
+     use Alien::pkgconf;
+ 
+     my $cflags = Alien::pkgconf->cflags;
+     my $libs   = Alien::pkgconf->libs;
+
+DESCRIPTION
+    This module provides you with the information that you need to invoke
+    "pkgconf" or link against "libpkgconf". It isn't intended to be used
+    directly, but rather to provide the necessary package by a CPAN module
+    that needs "libpkgconf", such as PkgConfig::LibPkgConf.
+
+METHODS
+  cflags
+     my $cflags = Alien::pkgconf->cflags;
+
+    The compiler flags for compiling against "libpkgconf".
+
+  libs
+     my $libs = Alien::pkgconf->libs;
+
+    The linker flags for linking against "libpkgconf".
+
+  dynamic_libs
+     my($dll) = Alien::pkgconf->dynamic_libs;
+
+    The ".so", ".dll" or <.dynlib> shared or dynamic library which can be
+    used via FFI.
+
+  version
+     my $version = Alien::pkgconf->version;
+
+    The "libpkgconf" version.
+
+  bin_dir
+     my($dir) = Alien::pkgconf->bin_dir;
+
+    The directory where you can find "pkgconf". If it is not already in the
+    "PATH". Adding this to "PATH" should make tools that require "pkgconf"
+    work.
+
+  install_type
+     my $type = Alien::pkgconf->install_type;
+
+    The type of install, should be either "share" or "system".
+
+HELPERS
+  pkgconf
+     %{pkgconf}
+
+    The name of the "pkgconf" binary. This is usually just "pkgconf".
+
+SEE ALSO
+    PkgConfig::LibPkgConf
+
+ACKNOWLEDGMENTS
+    Thanks to the "pkgconf" developers for their efforts:
+
+    <https://github.com/pkgconf/pkgconf/graphs/contributors>
+
+AUTHOR
+    Graham Ollis
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2016 Graham Ollis.
+
+    This is free software; you may redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

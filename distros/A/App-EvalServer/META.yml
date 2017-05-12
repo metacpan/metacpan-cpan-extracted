@@ -1,0 +1,45 @@
+---
+abstract: 'Evaluate arbitrary code in a safe environment'
+author:
+  - 'Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-EvalServer
+no_index:
+  directory:
+    - t
+    - utils
+recommends:
+  Inline::Lua: 0
+  Inline::Python: 0
+  Jplugin: 0
+  PHP::Interpreter: 0
+  Ruby: 0
+requires:
+  BSD::Resource: 0
+  File::Temp: 0.22
+  POE: 1.291
+  POE::Filter::JSON: 0
+  POE::Filter::Reference: 0
+  POE::Filter::Stream: 0
+  POE::Session: 0
+  POE::Wheel::ReadWrite: 0
+  POE::Wheel::Run: 0
+  POE::Wheel::SocketFactory: 0
+  Proc::Daemon: 0
+  perl: 5.008
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-EvalServer
+  homepage: http://search.cpan.org/dist/App-EvalServer/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hinrik/app-evalserver.git
+version: 0.08
+x_authority: cpan:HINRIK

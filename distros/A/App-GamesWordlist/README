@@ -1,0 +1,12 @@
+SYNOPSIS
+
+    See the included script games-wordlist.
+
+SEE ALSO
+
+    App::wordlist which greps WordList::* modules instead.
+
+    Games::Word::Wordlist
+
+    Games::Word::Phraselist
+

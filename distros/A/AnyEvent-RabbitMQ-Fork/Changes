@@ -1,0 +1,23 @@
+Revision history for AnyEvent-RabbitMQ-Fork
+
+0.5       2014-12-28 17:38:10-05:00 America/New_York
+    - update test suite to align with AnyEvent::RabbitMQ
+    - support bind_exchange & unbind_exchange methods
+    - in Worker: generate stand-in callbacks in a separate method
+
+0.4       2014-06-06 16:43:00-04:00 America/New_York
+    - improve handling object state attirbutes being reported to parent
+
+0.3       2014-06-05 08:49:21-04:00 America/New_York
+    - be less dynamic about building sub-class strings; no need to be fancy
+    - adhere closer to AnyEvent::RabbitMQ::Channel structure
+
+    (back fill changelog entries)
+
+0.2       2014-06-01 22:07:12-04:00 America/New_York
+    - fix Channel objects so that methods are chainable
+    - properly close RPC object on DESTROY
+    - support connection->drain_writes
+
+0.1       2014-05-26 21:39:13-04:00 America/New_York
+    - Initial release

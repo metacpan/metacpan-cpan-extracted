@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="NULL" type="application/x-xsp"?>
+<xsp:page xmlns:xsp="http://apache.org/xsp/core/v1"
+  xmlns:param="http://axkit.org/NS/xsp/param/v1"
+  xmlns:session="http://www.axkit.org/2002/XSP/BasicSession">
+
+<html>
+  <!-- Increment the page count session attribute -->
+  <session:set-attribute name="pagecount">
+    <session:value>
+      <xsp:expr><session:get-attribute name="pagecount"/> + 1</xsp:expr>
+    </session:value>
+  </session:set-attribute>
+
+  <body>
+    <p>
+      Welcome to the test of AxKit::XSP::BasicSession.
+    </p>
+    <p>
+      Your session ID is <tt>"<session:get-id/>"</tt>.
+    </p>
+    <p>
+      Page loaded <session:get-attribute name="pagecount"/> times.  This
+      session was last accessed on <session:get-last-accessed-time/> and
+      was first created on <session:get-creation-time/>
+    </p>
+    <p>
+      You can reset your session by
+      <a href="example.xsp?reset=1">
+        adding ?reset=1 to your query string
+      </a>. Don't forget to <a href="example.xsp">remove it before
+      continuing</a>, or else your session will keep getting re-set.
+    </p>
+
+      <xsp:logic>
+        if (<param:reset/>) {
+          <session:invalidate/>;
+          <p>
+            Your session is now reset.  Please load the page without the
+            reset parameter, and you will notice that the counter drops back
+            to 1.
+          </p>
+        }
+      </xsp:logic>
+  </body>
+
+</html>
+
+</xsp:page>

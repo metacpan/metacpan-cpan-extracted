@@ -1,0 +1,139 @@
+@prefix cpan:  <http://purl.org/NET/cpan-uri/person/> .
+@prefix cpant: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dbug:  <http://ontologi.es/doap-bugs#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix dcs:   <http://ontologi.es/doap-changeset#> .
+@prefix dist:  <http://purl.org/NET/cpan-uri/dist/Acme-Perl-Consensual/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix nfo:   <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+dist:project
+	a                 doap:Project;
+	doap:name         "Acme-Perl-Consensual";
+	cpant:readme_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Acme::Perl::Consensual";
+		nfo:fileName "lib/Acme/Perl/Consensual.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	cpant:test_requires "Test::More 0.61"^^cpant:dsWithVersion;
+	cpant:version_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Acme::Perl::Consensual";
+		nfo:fileName "lib/Acme/Perl/Consensual.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	dc:contributor    cpan:tobyink;
+	doap:bug-database <http://rt.cpan.org/Dist/Display.html?Queue=Acme-Perl-Consensual>;
+	doap:created      "2012-07-01"^^xsd:date;
+	doap:developer    cpan:mschwern;
+	doap:developer    cpan:tobyink;
+	doap:download-page <https://metacpan.org/release/Acme-Perl-Consensual>;
+	doap:homepage     <https://metacpan.org/release/Acme-Perl-Consensual>;
+	doap:license      <http://dev.perl.org/licenses/>;
+	doap:maintainer   cpan:tobyink;
+	doap:programming-language "Perl";
+	doap:release      dist:v_0-000_01;
+	doap:release      dist:v_0-000_02;
+	doap:release      dist:v_0-001;
+	doap:release      dist:v_0-002;
+	doap:repository   [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-acme-perl-consensual>;
+	];
+	doap:shortdesc    "check that your version of Perl is old enough to consent".
+
+dist:v_0-000_01
+	a                 cpant:DeveloperRelease;
+	a                 doap:Version;
+	rdfs:label        "Preview release";
+	dc:identifier     "Acme-Perl-Consensual-0.000_01"^^xsd:string;
+	dc:issued         "2012-07-05"^^xsd:date;
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Perl-Consensual-0.000_01.tar.gz>;
+	doap:revision     "0.000_01"^^xsd:string.
+
+dist:v_0-000_02
+	a                 cpant:DeveloperRelease;
+	a                 doap:Version;
+	dc:identifier     "Acme-Perl-Consensual-0.000_02"^^xsd:string;
+	dc:issued         "2012-07-26"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "Bundle perlhist info in __DATA__.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Perl-Consensual-0.000_02.tar.gz>;
+	doap:revision     "0.000_02"^^xsd:string.
+
+dist:v_0-001
+	a                 doap:Version;
+	rdfs:label        "first public release"@en;
+	dc:identifier     "Acme-Perl-Consensual-0.001"^^xsd:string;
+	dc:issued         "2012-07-30"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Update;
+			rdfs:label "perlhist data includes some 5.17.x release dates.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Perl-Consensual-0.001.tar.gz>;
+	doap:revision     "0.001"^^xsd:string.
+
+dist:v_0-002
+	a                 doap:Version;
+	dc:identifier     "Acme-Perl-Consensual-0.002"^^xsd:string;
+	dc:issued         "2013-05-18"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Update;
+			rdfs:label "perlhist data includes up to 5.18.0.";
+		];
+		dcs:item [
+			a dcs:Bugfix;
+			rdfs:label "LC_ALL is supposed to override all other LC_* variables.";
+			dcs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/81252>;
+			dcs:thanks cpan:mauke;
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Perl-Consensual-0.002.tar.gz>;
+	doap:revision     "0.002"^^xsd:string.
+
+cpan:mauke
+	a                 foaf:Person;
+	foaf:name         "Lukas Mai";
+	foaf:mbox         <mailto:mauke@cpan.org>;
+	foaf:nick         "MAUKE";
+	foaf:page         <https://metacpan.org/author/MAUKE>.
+
+cpan:mschwern
+	a                 foaf:Person;
+	foaf:name         "Michael G Schwern";
+	foaf:mbox         <mailto:mschwern@cpan.org>;
+	foaf:nick         "MSCHWERN";
+	foaf:page         <https://metacpan.org/author/MSCHWERN>.
+
+cpan:tobyink
+	a                 foaf:Person;
+	foaf:name         "Toby Inkster";
+	foaf:mbox         <mailto:tobyink@cpan.org>;
+	foaf:nick         "TOBYINK";
+	foaf:page         <https://metacpan.org/author/TOBYINK>.
+
+<http://dev.perl.org/licenses/>
+	dc:title          "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/rt/ticket/81252>
+	a                 dbug:Issue;
+	dbug:id           "81252"^^xsd:string;
+	dbug:page         <https://rt.cpan.org/Ticket/Display.html?id=81252>.
+

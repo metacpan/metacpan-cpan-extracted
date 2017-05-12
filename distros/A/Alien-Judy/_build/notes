@@ -1,0 +1,7 @@
+do{ my $x = {
+       'configure_args' => '--bindir=/usr/local/bin --datadir=/usr/local/lib/perl5/site_perl/5.12.2/i686-linux/Alien/Judy --datarootdir=/usr/local/lib/perl5/site_perl/5.12.2/i686-linux/Alien/Judy --includedir=/usr/local/lib/perl5/site_perl/5.12.2/i686-linux/Alien/Judy --libdir=/usr/local/lib/perl5/site_perl/5.12.2/i686-linux/Alien/Judy --libexecdir=/usr/local/bin --localstatedir=/usr/local/lib/perl5/site_perl/5.12.2/i686-linux/Alien/Judy --mandir=/usr/local/share/man --oldincludedir=/usr/local/lib/perl5/site_perl/5.12.2/i686-linux/Alien/Judy --sbindir=/usr/local/bin --sharedstatedir=/usr/local/lib/perl5/site_perl/5.12.2/i686-linux/Alien/Judy --sysconfdir=/usr/local/lib/perl5/site_perl/5.12.2/i686-linux/Alien/Judy',
+       'build_judy' => 1,
+       'your_make' => 'make',
+       'have_judy' => 1
+     };
+$x; }

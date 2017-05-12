@@ -1,0 +1,10 @@
+README
+lib/Apache/AuthCAS.pm
+Makefile.PL
+MANIFEST
+LICENSE
+Changes
+t/00basic.t
+Apache-AuthCAS.spec
+schema.sql
+schema_drop.sql

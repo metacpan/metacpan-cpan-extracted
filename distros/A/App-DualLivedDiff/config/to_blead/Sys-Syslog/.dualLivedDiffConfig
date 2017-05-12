@@ -1,0 +1,14 @@
+---
+exclude-regexes:
+  - '^(?:\.?/)?META.yml$'
+  - '^(?:\.?/)?MANIFEST$'
+  - '^(?:\.?/)?t/pod[^\.]*\.t$'
+  - '^(?:\.?/)?t/distchk\.t$'
+  - '^(?:\.?/)?t/portfs\.t$'
+  - '^(?:\.?/)?t/data-validation\.t$'
+  - '^(?:\.?/)?eg/'
+  - '^(?:\.?/)?ppport\.h$'
+base-path-in-blead: ext/Sys-Syslog
+dirs-recursive:
+  .: .
+

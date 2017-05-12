@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+bin/eachgit
+dist.ini
+lib/App/eachgit.pm

@@ -1,0 +1,1 @@
+perl Makefile.pl && BUILD && BUILD install && guiio

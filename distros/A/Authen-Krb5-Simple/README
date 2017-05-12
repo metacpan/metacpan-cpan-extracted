@@ -1,0 +1,58 @@
+Authen::Krb5::Simple version 0.42
+===============================================================================
+
+The Authen::Krb5::Simple module provides a means to authenticate a
+user/password using Kerberose 5.  Simply use this module and call its
+authenticate function with a username (or user@KRB_REALM) and a password.
+
+Detailed usage information can be found in the module's perldoc.
+
+INSTALLATION
+
+To install this module edit the CONFIG file to set test kerberos realm,
+username and password.  These are optional.  If either the username or
+password is not given, then the user auth tests will be skipped. If a
+realm is specified, it will be used for the test.  Otherwise, the default
+realm for the system will be used (if properly configured of course).
+
+You can also specify a location of the Kerberos include and libs directories
+in the environment variables KRB5_INCLUDE and KRB5_LIB respectively. Setting
+these will cause the build to try them first.  This would normally be used
+if your Kerberos libraries are in a non-standard location, or you wanted to
+overide the system defaults.
+
+Once that is done, then type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Note: In the absence of the KRB5_INCLUDE and KRB4LIB environment variables
+      mentioned above, the module will make an attempt to try and find
+      out the location of the Kerberos 5 include and lib files.  
+
+      If you continue to get "Can't build and link to 'xxx'" errors from
+      the "perl Makefile.PL" command. you can try setting the skip_lib_check
+      environment variable to skip the lib check (this was necessary on some
+      FreeBSD systems that had conflicting libkrb5.so files). For example:
+
+        skip_lib_check=1 perl Makefile.PL
+
+      If that doesn't work, you will need to manually override by setting
+      the environment variables (if not already set) or editing Makfile.PL
+      to directly.
+
+DEPENDENCIES
+
+This module requires the Kerberos 5 header and library files installed
+on the local system.
+
+-------------------------------------------------------------------------------
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003-2009 Damien S. Stuart. All rights reserved.
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

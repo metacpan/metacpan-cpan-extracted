@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/App/File/Grepper.pm
+t/00-load.t
+script/afg
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

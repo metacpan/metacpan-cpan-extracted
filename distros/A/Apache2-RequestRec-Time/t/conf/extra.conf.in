@@ -1,0 +1,7 @@
+
+PerlModule Apache::Test::Time
+<Location /test/time>
+	SetHandler modperl
+	PerlResponseHandler Apache::Test::Time
+</Location>
+

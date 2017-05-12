@@ -1,0 +1,35 @@
+Revision history for Perl extension Astro::Nova.
+
+0.07  Thu Nov 15 07:45 2013
+  - Upgrade to libnova 0.15.
+
+0.06  Sun Jan  3 13:50 2010
+  - Better diagnostics during libnova patching for funny OS's.
+  - New classes (with docs) for galactic cooridnates
+    (Astro::Nova::GalPosn) and equatorial coordinates
+    (Astro::Nova::EquPosn) with the necessary logic for conversion
+    between them.
+
+0.05  Wed Dec 16 22:00 2009
+  - Attempt band-aid fix for building libnova on Solaris and BSD.
+
+0.04  Mon Dec 14 22:02 2009
+  - Convert to Module::Build to fix the annoying re-compilation of
+    libnova and other stuff.
+  - Add some new dependencies in this context.
+  - Wrestled typemaps into submission.
+
+0.03  Mon Dec 14 17:47 2009
+  - XS constructors now take optional key/value pairs for initialization.
+  - Fix wrong order of arguments in equ_to_hequ
+  - Astro::Nova::HMS class
+  - From/to dms/hms conversion methods with docs
+
+0.02  Sun Dec 13 17:42 2009
+  - Much improved.
+  - Examples
+  - Wrapper classes for some structs
+
+0.01  Fri Dec 11 16:58 2009
+  - original version
+

@@ -1,0 +1,14 @@
+0.3 Mon Feb 09 2015
+
+	- Add --ignore option to add more things to the ignore list.
+
+	- Also ignore .# files by default.  Patch from Daniel Gempesaw.
+
+0.2 Mon Dec 22 2014
+
+	- Update prereqs to require Getopt::Long 2.36 or greater.
+	  Patch from Sergey Romanov 
+
+0.1 Thu Dec 04 2014
+
+	- Initial release.

@@ -1,0 +1,48 @@
+---
+abstract: 'A simple astronomical source plotter'
+author:
+  - 'Graham Bell <g.bell@eaobservatory.org>'
+  - 'Tim Jenness <tjenness@cpan.org>'
+  - 'Remo Tilanus <r.tilanus@jach.hawaii.edu>'
+  - 'Pam Shimek <pshimek@uvic.ca>'
+  - 'Casey Best <cbest@uvic.ca>'
+build_requires:
+  Test::More: 0
+  Test::Number::Delta: 0
+configure_requires:
+  Module::Build: 0.3
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-SourcePlot
+provides:
+  App::SourcePlot:
+    file: lib/App/SourcePlot.pm
+    version: 1.27
+  App::SourcePlot::Plotter::Tk:
+    file: lib/App/SourcePlot/Plotter/Tk.pm
+    version: 1.27
+  App::SourcePlot::Source:
+    file: lib/App/SourcePlot/Source.pm
+    version: 1.27
+requires:
+  Astro::Catalog: 2.01
+  Astro::Coords: 0.13
+  Astro::Coords::Planet: 0.05
+  Astro::PAL: 1.00
+  Astro::Telescope: 0.71
+  Config::IniFiles: 2.62
+  DateTime: 0
+  File::HomeDir: 0
+  File::ShareDir: 1.03
+  File::Spec: 0
+  Tk: 804.0
+  Tk::AstroCatalog: 0.12
+resources:
+  homepage: http://github.com/eaobservatory/perl-App-SourcePlot/tree/master
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  repository: git://github.com/eaobservatory/perl-App-SourcePlot.git
+version: 1.27

@@ -1,0 +1,135 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Digest::MD5 qw(md5_hex);
+use Digest::SHA1 qw(sha1_hex);
+
+use lib qw(../SVN-Dump/lib ./lib);
+
+use Getopt::Long;
+use SVN::Dump;
+
+my ($dump_file_name, $verbose, $help);
+my $getopt_okay = GetOptions(
+	'dump=s',       \$dump_file_name,
+	'verbose',      \$verbose,
+	'help',         \$help,
+);
+
+if ($help or !$getopt_okay) {
+	die(
+		"$0 usage:\n",
+		"  --dump=FILENAME  location of svn dump file to replay. - for STDIN\n",
+		"  --verbose        explain what's happening in great detail\n",
+		"  --help           you're soaking in it.\n",
+	);
+}
+
+unless (defined $dump_file_name and length $dump_file_name) {
+	die "$0: --dump=FILENAME required\n";
+}
+
+if ($dump_file_name ne '-') {
+	unless (-e $dump_file_name) {
+		die "$0: --dump path ($dump_file_name) doesn't exist\n";
+	}
+	unless (-f $dump_file_name) {
+		die "$0: --dump path ($dump_file_name) must be a file\n";
+	}
+}
+
+my $dump = SVN::Dump->new({ file => $dump_file_name });
+
+# Manage MD5 mappings.
+my %old_to_new;
+$old_to_new{md5_hex("")} = md5_hex("");
+$old_to_new{sha1_hex("")} = sha1_hex("");
+
+# Print each record.
+my $sequence = 0;
+
+my $record;
+while ($record = $dump->next_record()) {
+	snub_record($record);
+
+	my $included = $record->get_included_record();
+	snub_record($included) if $included;
+
+	print $record->as_string();
+}
+
+sub snub_record {
+	my $record = shift;
+
+	my $header = $record->get_headers_block();
+
+	if ($verbose and $record->type() eq "revision") {
+		warn "Revision ", $header->get('Revision-number'), "...\n";
+	}
+
+	# Rewrite copy source MD5 if present.
+	{
+		my $key = 'Text-copy-source-md5';
+		my $old_md5 = $header->get($key);
+		if (defined $old_md5) {
+			my $new_md5 = $old_to_new{$old_md5};
+			die "no new md5 for old $old_md5" unless defined $new_md5;
+			$header->set($key, $new_md5);
+		}
+	}
+
+	# Rewrite copy source SHA1 if present.
+	{
+		my $key = 'Text-copy-source-sha1';
+		my $old_sha1 = $header->get($key);
+		if (defined $old_sha1) {
+			my $new_sha1 = $old_to_new{$old_sha1};
+			die "no new sha1 for old $old_sha1" unless defined $new_sha1;
+			$header->set($key, $new_sha1);
+		}
+	}
+
+	my $old_text = $record->get_text();
+
+	# No old text to rewrite.
+	return unless defined $old_text;
+
+	# Rewrite ("snub") old text.
+	my ($new_md5, $new_sha1);
+	if (defined $old_text) {
+		my $new_text = "snubbed " . ++$sequence;
+		$new_md5     = md5_hex($new_text);
+		$new_sha1    = sha1_hex($new_text);
+		$record->set_text($new_text);
+	}
+
+	# Rewrite text content md5, if present.
+	{
+		my $key = 'Text-content-md5';
+		my $old_md5 = $header->get($key);
+		if (defined $old_md5) {
+			$header->set($key, $new_md5);
+			$old_to_new{$old_md5} = $new_md5;
+		}
+		else {
+			# Record the md5 hash mapping anyway, for copies.
+			$old_to_new{md5_hex($old_text)} = $new_md5 if defined $old_text;
+		}
+	}
+
+	# Rewrite text content sha1, if present.
+	{
+		my $key = 'Text-content-sha1';
+		my $old_sha1 = $header->get($key);
+		if (defined $old_sha1) {
+			$header->set($key, $new_sha1);
+			$old_to_new{$old_sha1} = $new_sha1;
+		}
+		else {
+			# Record the sha1 hash mapping anyway, for copies.
+			$old_to_new{sha1_hex($old_text)} = $new_sha1 if defined $old_text;
+		}
+	}
+}

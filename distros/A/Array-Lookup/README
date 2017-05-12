@@ -1,0 +1,44 @@
+Array::Lookup, version 2.3, is a Perl 5 module which performs a search through
+an array of strings, allowing for abbreviation of the search key.
+
+The Lookup subroutine is especially handy for doing keyword lookups in
+an array or hash table, where the keyword may be abbreviated.  Exact
+matches are give priority over abbreviated matches. 
+
+The module has embedded POD text with which man or HTML pages can be
+created.
+
+For detailed usage information, including examples, you can do:
+
+    pod2man Array::Lookup.pm | nroff -man 
+
+The module is accompanied with a Perl Makefile.PL, this README, a 
+test program (test.pl), a reference test output file, and the GNU 
+License, under which this software is freely available.
+
+To download the software:
+
+   git clone git@github.com:aks/array-lookup.git
+   cd array-lookup
+
+Or, if you have downloaded the tar archive, following this procedure:
+
+    gunzip Array-Lookup-2.3.tar.gz
+    tar xvf Array-Lookup-2.3.tar
+    cd Array-Lookup-2.3
+
+Then, within the distribution directory, do:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+The archives are available at the usual CPAN sites.  You can get 
+to your nearest CPAN site via:
+
+    http://cpan.perl.org/
+
+Contributions or improvements are welcome.
+________________________________
+Alan Stebbens <aks@stebbens.org>

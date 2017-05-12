@@ -1,0 +1,27 @@
+Changes
+docs/apache
+docs/README
+lib/Apache2/SiteControl.pm
+lib/Apache2/SiteControl/GrantAllRule.pm
+lib/Apache2/SiteControl/ManagerFactory.pm
+lib/Apache2/SiteControl/PermissionManager.pm
+lib/Apache2/SiteControl/Radius.pm
+lib/Apache2/SiteControl/Rule.pm
+lib/Apache2/SiteControl/User.pm
+lib/Apache2/SiteControl/UserFactory.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+README.UPGRADING_TO_1.0
+sample/apache_modperlinit.pl
+sample/apache_sitecontrol.conf
+sample/EditControlRule.pm
+sample/index.html
+sample/MyPermissionFactory.pm
+sample/README
+sample/samplelogin.pl
+sample/schema.psql
+sample/SimpleAuth.pm
+sample/site/index.html
+sample/site/logout.html

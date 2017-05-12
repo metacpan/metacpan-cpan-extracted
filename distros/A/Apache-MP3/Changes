@@ -1,0 +1,186 @@
+4.00
+	-Now works *only* with Apache2/mod_perl2.
+	-Removed searching functionality -- was not stable.
+        -Removed MP3::Icecast dependency -- this module cannot produce headers
+		needed by Apache2.
+
+3.05	Mon Oct  6 10:09:47 EDT 2003
+	-Put version back into Apache::Resample
+	-Performance and functionality improvements to search function
+	from Evan Harris.	
+
+3.04 Fri Nov 29 16:33:29 EST 2002
+	-Fixed incorrect HTML content type in the META tag.
+	-Fixed incorrect playlist port numbers when running in non-virtual
+		host, but using non-80 port.
+	-Added javascript functions for use with help pages.
+	-Chinese support from Autrijus Tang
+
+3.03 Sun Oct 13 23:21:00 EDT 2002
+	- Added generic filtering code to Apache::Resample contributed by
+	Caleb Epstein.
+	- Fixed bug in the playlist handling code that prevented individual files
+	from streaming when [stream] link pressed.
+
+3.01 Sun Aug 18 13:32:59 EDT 2002
+	-Changed the way that $VERSION is defined in the localization modules
+	in order to live peacefully with CPAN.
+
+3.00 Fri Aug 16 00:12:33 EDT 2002
+	- Extensive contribution from Sean Burke to provide localization and
+		internationalization.
+
+2.26 Wed Apr 17 11:03:24 EDT 2002
+	- Added patch from Tom Hughes to correctly escape paths in the playlist.
+	- Added patch from Tom Hughes to fetch the average bitrate for VBR Ogg
+		files rather than the nominal bitrate (which is meaningless).
+
+2.25 Tue Apr  9 12:35:44 EDT 2002
+	- Added patch from Clemens Schrimpe to handle diacritical marks in
+		CD icon names.
+	- Added patch from John Regehr to get CDDB information from an 
+	external index file, if present.
+        - Put warning in the error_log if PerlSetupEnv has been set to off
+        (thanks to Stas Bekman and Eric Hammond)  
+
+2.24 Sun Jan 27 08:42:58 MST 2002
+	- Playlists work again.  This was broken in version 2.22 when
+		support for non-MP3 playlists added.
+
+2.23 Thu Jan 24 18:44:42 EST 2002
+	- Fixed problem with not being able to stream from virtual hosts.
+	- Documented issues relating to not finding lame in the PATH when
+		downsampling.
+
+2.22 Sun Jan  6 15:25:07 EST 2002
+	- Folded in Devin Carraway's <apache-modmp3@devin.com> patches
+		for Ogg Vorbis Support.
+	- Added Wave file support, along with a new architecture to deal
+		with various media types.
+	- Added Allen Day's modifications for handling directory list icons
+		with some of my own modifications to make this more flexible.
+	- Bug fixes in the ICY headers.
+
+2.21 Tue Nov 20 11:44:43 EST 2001
+	- Folded in Allen Day's modifications for
+		handling .pls (audio/x-scpls) files.
+	- Folden in Iaian Wade's <iwade@habitue.net> modifications for 
+		handling ETags (speeds performance on big directories).
+	- Changes from Joshua Cantard to fix information sent prior to streaming.
+
+2.20 Mon Sun Sep 23 01:11:37 EDT 2001
+	- Multiple bugs fixed in playlist.
+
+2.19 Mon Jul 16 21:36:15 EDT 2001
+	- Patch for Ask Bjoern Hansen to support the scroll bar when
+		streaming to WinAmp.
+
+2.18 Sun Jun 10 17:21:36 EDT 2001
+	- Patch from Chris Nandor to get the file size approximately
+		right when streaming downsampled files.
+	- Patch from Chris Nandor to fix problems downloading
+		MP3 files when resampling turned on.
+	- Fixed an HTML-generating bug that prevented the browser window
+		title from being set.
+	- Removed hard-coded white background color from the resampling
+		window.
+
+2.17 Mon Feb 12 10:27:38 EST 2001
+	- Fixed problem of multiple fetch buttons appearing when
+		AllowStream is set to "no"
+
+2.16 Mon Apr 30 22:31:17 EDT 2001
+	- Added Apache::MP3::Resample, which provides dynamic downsampling
+		for people with slower connections.
+	- Added MS Media player to list of acceptable streaming clients.
+
+2.15 Mon Jan  1 22:20:24 EST 2001
+	- Fixed security bug which allowed people to bypass the AllowDownload setting.
+	- Made "AllowDownload no" compatible with cover art.
+
+2.14 Sat Dec 30 23:10:32 EST 2000
+	- Fixed documentation to indicate that AddType requires dots before the
+		.mp3 and .MP3 extension names.
+	- Made the cache writing taint safe.
+	- Fixed generation of extended playlists to work with earlier versions
+		of WinAmp.
+	- Added playlist and local streaming patches kindly provided by
+		Jamie O'Shaughnessy.
+	- Fixed display of directory path links when the current directory has same
+		name as a parent directory.
+
+2.13 Thu Nov 30 12:17:31 EST 2000
+	- Patch from Jeffrey Sumler to prevent faults when streaming files containing
+		regular expression metacharacters
+	- Fix to prevent entire directory from being streamed when the directory
+		has same name as the desired MP3 file (Jeffrey Sumler identified problem).
+
+2.12 Tue Nov 21 08:39:15 EST 2000
+	** IMPORTANT NOTE **
+	I have normalized field names and added some new fields.  In particular, "kbps" has
+	been renamed "bitrate".  If you are using the mp3info caching feature, please delete 
+	your cache directory so that the new fields are correctly cached
+
+	-Check for invalid songs in playlist and refuse to play them.
+	-Added Jeffrey Seifert's patch for cover art.  You can now place a file named
+		"cover.jpg" in an album subdirectory and have it appear next to
+		the album's name.
+	-Added Chris Nandor's patch for Accept-Range so that certain players can
+		fetch selected portions of the song (in theory at least).
+	-Added Kee Hinkley's extended playlist patch, which allows WinAmp (and other players?)
+		to display the title and duration of the song in the playlist.
+	-Added Gary Johnston's patch which fixes truncated songs when streaming from a
+		Windows server (the old binmode() trap).
+
+2.11 Sat Sep  9 18:04:55 EDT 2000
+	Added Tim Ayer's patches for sorting.  Now can sort playlists 
+		on multiple fields (nice!)
+	Detect when playlist cookie is full, alert user, and suppress 
+		further attempts to add to playlist.
+	Documentation fixes.
+
+2.10 Sun Sep  3 20:29:41 MET DST 2000
+	Ooops.  Playlist.pm was inadvertently left out; now it's back in.
+	Fixed divide by zero error on corrupt MP3 files.
+
+2.08 Wed Aug 30 22:39:38 EDT 2000
+	Added playlist functionality.
+	Temporarily changed form POST method to GET to work around an (apparent) bug
+		in mod_perl's ability to redirect from a POST to a GET (Apache hangs
+		after returning from handler).  It "used to work" just fine.
+	Suppressed appearance of authentication information
+		XMMS/WinAmp scrolling marquee
+
+2.07 Sat Aug 26 13:49:30 EDT 2000
+	Fixed caching routines so that information about failed mp3_info()
+		lookups is cached as well.
+
+2.06 Fri Aug 25 23:39:00 EDT 2000
+	Fixed bug in [stream] button that caused module to fail on
+		directories containing parentheses and other RE
+		metacharacters
+
+2.05 Fri Aug 25 08:10:04 EDT 2000
+	Changed directory layout to get faster loading
+	Now supports HTTP authentication (passwords)
+	Supports directories with spaces and funny characters
+
+2.04 Tue Aug 22 04:38:07 PDT 2000
+	Completely revamped to make more object oriented
+	Apahce::MP3::Sorted subclass
+	Added help page
+	
+2.02 Sun May 28 12:18:37 2000
+	More information on MP3::Info segfaults
+	Added installation directions to README
+
+2.01 Sat May 27 00:32:18 2000
+	Added information on a workaround for random segfaults related to MP3::Info
+
+2.00  Sat May 27 00:00:09 2000
+	- original version; created by h2xs 1.20 with options
+		-A -X -f -n Apache-MP3
+1.00  February 2000
+      Old defunct version.
+
+

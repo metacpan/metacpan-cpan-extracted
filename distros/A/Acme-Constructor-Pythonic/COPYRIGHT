@@ -1,0 +1,50 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Acme-Constructor-Pythonic
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Acme-Constructor-Pythonic
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ t/01basic.t
+ t/02moose.t
+ t/03subname.t
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: README
+ lib/Acme/Constructor/Pythonic.pm
+Copyright: This software is copyright (c) 2012, 2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

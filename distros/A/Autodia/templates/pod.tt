@@ -1,0 +1,140 @@
+[% classes = diagram.Classes %]
+[% FOREACH class = classes %]
+
+[% SET filename = class.Name.split('::').join('_') _ ".pod" %]
+[% USE String %]
+[% SET filename = String.new(class.Name).replace('::', '_') _ '.pod' %]
+creating pod for [% class.Name %] : [% filename %]
+
+[% FILTER redirect(filename) %]
+
+=head1 NAME
+
+[%class.Name%] - package for [% class.Name %]
+
+=head1 DESCRIPTION
+
+description goes here.
+
+lorum ipsum
+
+=head1 VERSION
+
+version 0.00
+
+=head1 SYNOPSIS
+
+Quick summary of what the module does.
+
+Perhaps a little code snippet.
+
+    use [%class.Name%];
+
+    my $foo = [%class.Name%]->new;
+
+[% FOREACH op = class.Operations %]
+
+my $xxx = [% class.Name %]->[% op.name %]( .. );
+
+[% END %]
+
+[% IF class.Attributes %]
+
+=head1 ATTRIBUTES
+
+=over 4
+
+  [% FOREACH at = class.Attributes %]
+
+=item [% at.name %]
+
+  [% END %]
+
+=back
+
+[% END %]
+
+[% IF class.Operations %]
+
+=head1 METHODS
+
+[% FOREACH op = class.Operations %]
+
+=head2 [% op.name %]
+
+
+my $xxx = [% class.Name %]->[% op.name %] ( [% FOREACH par = op.Param %] [% par.Name %] => xxx [% IF loop.last %] [% ELSE %], [% END %] [% END %] );
+
+takes arguments :  [% FOREACH par = op.Param %] [% par.Name %] [% IF loop.last %] [% ELSE %], [% END %] [% END %]
+
+returns : 
+
+[% END %]
+
+[% END %]
+
+=cut
+
+### CODE GOES HERE ###
+
+=head1 NOTES
+
+Created using Autodia (http://www.aarontrevena.co.uk/opensource/autodia/index.html) : autodia.pl -l perl -r -d path/to/files -t /path/to/pod.tt -F -O
+
+=head1 SEE ALSO
+
+[% IF class.Inheritances %]
+
+Inherits from : 
+
+=over 4
+
+[% FOREACH inheritence = class.Inheritances %]
+[% SET superclass = diagram.object_from_id(inheritence.Parent)  %] 
+=item [% superclass.Name%]
+
+[% END %]
+
+=back
+
+[% END %]
+
+[% IF class.Dependancies %]
+
+Requires / Uses : 
+
+=over 4
+
+[% FOREACH dependancy = class.Dependancies %]
+[% SET component = diagram.object_from_id(dependancy.Parent)  %] 
+
+=item [% component.Name %]
+
+[% END %]
+
+=back
+
+[% END %]
+
+=head1 AUTHOR
+
+A U Thor, C<< <xxxx@xxxx.com> >>
+
+=head1 BUGS
+
+Report bugs via http://rt.cpan.org
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright A U Thor 2007 All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.8.1 or, at your option, any later version of Perl 5 you may have available.
+
+=cut
+
+1; # End of [% class.Name %]
+
+[% END %]
+
+[% END %]
+

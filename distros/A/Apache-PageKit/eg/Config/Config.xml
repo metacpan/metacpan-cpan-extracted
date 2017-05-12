@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<CONFIG>
+
+<!-- this is a comment -->
+
+<GLOBAL
+	default_page = "index"
+	fop_command = "/usr/java/jdk1.3.0_02/bin/java -cp /usr/local/javaclass/fop org.apache.fop.apps.CommandLine"
+	gzip_output = "static"
+	login_page="login1"
+	model_base_class="MyPageKit::Common"
+	model_dispatch_prefix="MyPageKit::MyModel"
+	recent_login_timeout="10"
+	session_expires="+1y"
+/>
+<SERVERS>
+   <SERVER id="production"
+	reload="no"/>
+   <SERVER id="staging"
+	can_edit="yes"
+	reload="yes"/>
+</SERVERS>
+<VIEWS>
+   <VIEW id="pdf"/>
+   <VIEW id="wml"/>
+   <VIEW id="xml"/>
+</VIEWS>
+<PAGES>
+  <PAGE id="customize" request_param_in_tmpl="yes"/>
+  <PAGE id="restricted" require_login="recent"/>
+</PAGES>
+</CONFIG>

@@ -1,0 +1,45 @@
+Revision history for Perl extension Acme::rafl::Everywhere.
+
+0.011   26.05.2013
+        * Another fact.
+        * Two more facts were added by Toby Inkster in 0.010 but he didn't get
+          the proper credit. PLZ2FIX. (GH #9, #11)
+
+0.010   23.04.2013
+        * Fix Curiosity entry (Tadeusz Sośnierz, John SJ @genehack Anderson).
+
+0.009   15.01.2013
+        * Added another fact (thanks, Steve Scaffidi @hercynium)
+        * Small fix with exclamation mark.
+
+0.008   18.10.2012
+        * Added two more facts (thanks, garu and vti!).
+
+0.007   10.10.2012
+        * Added fan art, HTML'ified pics.
+        * Another fact.
+        * Added SEE ALSO (Toby Inkster).
+        * Added investigator credit to Damien Krotkine.
+
+0.006   06.10.2012
+        * More facts collected by new lead investigator: garu.
+
+0.005   06.10.2012
+        * Added contributors section.
+
+0.004   06.10.2012
+        * Added another fact by Getty & Toby Inkster.
+        * GH #3: Fixed idempotency by defining facts in code (thanks, Toby Inkster).
+
+0.003   25.08.2012
+        * Add another fact.
+        * Add proof for the fact.
+
+0.002   04.07.2012
+        * Some fixes.
+        * Added more facts.
+        * New fact by vti!
+        * Added request for help.
+
+0.001   03.07.2012
+        * rafl is so everywhere, his everywhere module is now on CPAN!

@@ -1,0 +1,4 @@
+only = 1
+include = Variables::ProhibitConditionalDeclarations
+include = TestingAndDebugging::RequireUseWarnings
+include = TestingAndDebugging::RequireUseStrict

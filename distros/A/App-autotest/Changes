@@ -1,0 +1,46 @@
+0.006     2015-05-03 16:30:50+02:00 Europe/Berlin
+
+  [ENHANCEMENTS]
+
+  Tests are run if the modules they are testing are changed. Alas, there is no
+  documentation for this feature yet, read the tests to see how to use it.
+  Thanks, totofuga!
+
+  Test::Differences changed the output of eq_or_diff so two test cases failed. Changed
+  to the new output.
+
+  Minor changes to some modules so perlcritic and dzil play along.
+  (https://github.com/rjbs/dist-zilla/pull/168 isn't merged yet)
+
+  [BUGS]
+
+  Updated dist.ini: MetaResources was misplaced so the meta information
+  wasn't collected in META.yml
+
+0.004     2012-11-18 01:03:13 Europe/Berlin
+
+  [BUGS]
+
+  Updated dist.ini: We need a minimum version 0.46 Test::Spec since we use
+  the method "with" which is introduced in that version.
+
+0.003     2012-11-13 22:08:29 Europe/Berlin
+
+  [BUGS]
+
+  Corrected a minor bug in a test: I guessed the order of directory entries.
+  Thanks to CPAN Testers this was caught.
+
+  The POD for autotest contained duplicate entries since I typed (manually)
+  what Dist::Zilla adds (automatically).
+
+0.002
+
+  [ENHANCEMENTS]
+
+  When the last run was red and the current run is green we're told that
+  things just got better.
+
+0.001
+
+initial version

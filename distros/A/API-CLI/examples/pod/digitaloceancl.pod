@@ -1,0 +1,121 @@
+=head1 NAME
+
+digitaloceancl - DigitalOcean API
+
+=head1 ABSTRACT
+
+
+
+=head1 DESCRIPTION
+
+
+
+=head2 GLOBAL OPTIONS
+
+    --data-file     File with data for POST/PUT/PATCH/DELETE requests
+    --debug -d      debug (flag)                                     
+    --verbose -v    verbose (flag)                                   
+    --help -h       Show command help (flag)                         
+
+
+=head2 SUBCOMMANDS
+
+=head3  GET
+
+    digitaloceancl  GET <subcommands>
+
+GET call
+
+
+=head3 GET /account
+
+    digitaloceancl GET /account
+
+Account information
+
+
+=head3 GET /droplets
+
+    digitaloceancl GET /droplets
+
+List all droplets
+
+
+=head3 GET /droplets/:id
+
+    digitaloceancl GET /droplets/:id <id>
+
+Retrieve a droplet by id
+
+Parameters:
+
+    id  *  
+
+=head3  POST
+
+    digitaloceancl  POST <subcommands>
+
+POST call
+
+
+=head3 POST /droplets/:id/actions
+
+    digitaloceancl POST /droplets/:id/actions
+
+Trigger droplet action
+
+
+=head3  help
+
+    digitaloceancl  help <subcommands> [options]
+
+Show command help
+
+Options:
+
+    --all     (flag)
+
+
+=head3  _meta
+
+    digitaloceancl  _meta <subcommands>
+
+Information and utilities for this app
+
+
+=head3 _meta completion
+
+    digitaloceancl _meta completion <subcommands>
+
+Shell completion functions
+
+
+=head3 _meta completion generate
+
+    digitaloceancl _meta completion generate [options]
+
+Generate self completion
+
+Options:
+
+    --name    name of the program (optional, override name in spec)
+    --zsh     for zsh (flag)                                       
+    --bash    for bash (flag)                                      
+
+
+=head3 _meta pod
+
+    digitaloceancl _meta pod <subcommands>
+
+Pod documentation
+
+
+=head3 _meta pod generate
+
+    digitaloceancl _meta pod generate
+
+Generate self pod
+
+
+
+

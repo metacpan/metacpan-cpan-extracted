@@ -1,0 +1,52 @@
+NAME
+    Apache::LogFile - Interface to Apache's logging routines
+
+SYNOPSIS
+      #in httpd.conf
+      PerlModule Apache::LogFile
+      PerlLogFile |perl/mylogger.pl My::Logger
+
+      #in a Perl script
+      print My::Logger "a message to the Log"
+
+DESCRIPTION
+    The PerlLogFile directive can be used to hook a Perl filehandle
+    to a piped logger or to a file open for appending. If the first
+    character of the filename is a `|', the file handle is opened as
+    a pipe to the given program. The file or program can be relative
+    to the ServerRoot.
+
+    The method interface was written before mod_perl directive
+    handlers were introduced, but it still works so the
+    documentation remains below:
+
+    The `new' method should be called by a server startup script or
+    module.
+
+    The last argument to `new' is optional, it is simply a name that
+    can be used to retrive the filehandle via the `handle' method.
+
+      #in a startup file
+      use Apache::LogFile ();
+      Apache::LogFile->new("|perl/mylogger.pl", "MyLogger");
+
+      #in a request-time file 
+      use Apache::LogFile ();
+      my $fh = Apache::LogFile->handle("MyLogger");
+      print $fh "a message to the log";
+
+    If this argument is not present, the filename will be used the
+    handle key, which can also be retrived via the `handle' method.
+    The `new' method will return a reference to the filehandle if
+    you wish to store it elsewhere, e.g.:
+
+     $MyLog::Pipe = Apache::LogFile->new("|perl/mylogger.pl");
+
+     $MyLog::Append = Apache::LogFile->new("logs/my_log");
+
+AUTHOR
+    Doug MacEachern
+
+SEE ALSO
+    Apache(3), mod_perl(3)
+

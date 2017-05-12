@@ -1,0 +1,22 @@
+package app_newstyle::M::a::model;
+
+use strict;
+use warnings;
+
+use base("Apache::Voodoo");
+
+sub get_foo {
+	my $self = shift;
+	my $p    = shift;
+
+	return "FOO!";
+}
+
+sub get_bar {
+	my $self = shift;
+	my $p    = shift;
+
+	return "bar";
+}
+
+1;

@@ -1,0 +1,51 @@
+#!/usr/local/bin/perl -w
+
+# NOTE: -T option would ignore PERL5LIB
+
+#############################################################################
+# $Id: call 3336 2004-02-27 14:05:10Z spadkins $
+#############################################################################
+
+BEGIN {
+    $| = 1;
+    open(STDERR, ">&STDOUT");
+    print "Content-type: text/plain\n\n";
+}
+
+use App::Options (
+    option => {
+        context_class => "App::Context::HTTP",
+    },
+);
+
+use App;
+
+my $context = App->context(\%App::options);
+my $request = $context->request();
+my $events = $request->get_events();
+my ($service, $name, $method, $args, @results, $result);
+foreach my $event (@$events) {
+    ($service, $name, $method, $args) = @$event;
+    @results = $context->call($service, $name, $method, $args);
+}
+my $returntype = $request->get_returntype() || "perl";
+if ($#results == -1) {
+    print "SUCCESS: NO RESULT\n";
+    exit(0);
+}
+if ($#results == 0 && ref($results[0]) eq "") {
+    print "$results[0]\n";
+    exit(0);
+}
+my $serializer_class = ucfirst($returntype);
+$serializer_class =~ s/_([a-z])/uc($1)/eg;
+$serializer_class = "App::Serializer::$serializer_class";
+my $serializer = $context->serializer($returntype, class => $serializer_class);
+if ($#results == 0) {
+    print $serializer->serialize($results[0]), "\n";
+}
+else {
+    print $serializer->serialize(\@results), "\n";
+}
+exit(0);
+

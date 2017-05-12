@@ -1,0 +1,14 @@
+Revision history for Perl module App::WIoZ
+
+0.004 Fri, 30 Aug 2013 17:30:11 +0200
+    - manage fonts
+
+0.003 Mon, 05 Aug 2013 09:53:49 +0200
+     - fix angle constraint on Moose 2.1004 by switching from Num to Str
+
+0.002 Sun, 04 Aug 2013 17:58:05 +0200
+     - try to fix default value for angle to 0.0 after cpantest bug reports
+     with Moose 2.1004
+
+0.001 Fri, 02 Aug 2013 13:38:30  +0200
+     - initial release

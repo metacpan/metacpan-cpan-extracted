@@ -1,0 +1,25 @@
+#--------------------------------------------------------------------------#
+# TODO for App-CPAN-Mini-Visit
+#--------------------------------------------------------------------------#
+
+- Decide on usage.  E.g.
+  
+  $ visitcpan [OPTIONS] program
+
+  $ visitcpan [OPTIONS] -- program program-opts
+
+- Filtering
+  - -f "regex" matched against AUTHOR/DistName-version.suffix
+
+- automate perl -e or -E
+
+- Deal with relative paths?  If things have "./XXXXX" replace "." with 
+absolute path of cwd?
+
+- Some sort of SQLite integration?  
+  - split output on space and insert?
+  - if output is YAML/JSON, insert?
+
+  $ visitcpan --db=output.db --db-input=yaml|json|perl|ini
+
+- explicit "--output|-o" option instead of using "tee"?

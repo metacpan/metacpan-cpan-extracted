@@ -1,0 +1,3 @@
+%%foo bar
+%%baz quux
+http://sample.org/<foo> /<baz>/ Y substitution test

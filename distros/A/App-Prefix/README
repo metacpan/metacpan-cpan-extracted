@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution App-Prefix,
+version 0.18:
+
+  provides 'prefix' filter, which prepends data to lines passed
+
+This software is copyright (c) 2013 by Josh Rabinowitz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

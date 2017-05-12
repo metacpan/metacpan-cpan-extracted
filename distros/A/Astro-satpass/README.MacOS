@@ -1,0 +1,86 @@
+This README covers MacPerl and Mac OS classic. If you are running
+Darwin (i.e. Mac OS X) this information does not apply.
+
+There are some extra steps necessary to use this module with
+MacPerl, mostly because of the difficulty of installing extra
+modules. But you CAN get there if you have a copy of Stuffit
+Expander.
+
+What you need to do is to obtain and expand the following
+distributions from CPAN:
+
+Astro-satpass
+Astro-SpaceTrack
+DateManip
+IO-String
+
+Once you have expanded the required kits, you need to convert
+them from Unix line terminations to Mac line terminations. This
+is not bad, just tedious. You need to make a MacPerl droplet out
+of the following Perl script:
+
+foreach (@ARGV) {
+    my $fn = $_;
+    print "Reading $fn\n";
+    open (IN, "<$fn") or die <<eod;
+Error - Failed to open input file $fn
+        $!
+eod
+    my @data;
+    while (<IN>) {push @data, split ('\r', $_)}
+    close IN;
+    print "Writing $fn\n";
+    open (OUT, ">$fn") or die <<eod;
+Error - Failed to open output file $fn
+        $!
+eod
+    foreach (@data) {print OUT "$_\n"}
+    close OUT;
+    }
+
+
+Then go through the expanded directories and delete any files except
+the contents of the 'bin' folder, and files that end in '.pm'. Drop the
+.pm files onto your droplet. It will save the converted file over the
+original. 
+
+Once you have done this, open folder 'MacPerl f' (or wherever
+your MacPerl is). Find the site_perl folder and open it. Create
+folders 'Astro', 'Date', and 'IO'. In folder 'Astro', create
+folder 'Coord'. Drag SpaceTrack.pm and the SpaceTrack folder
+with it into the 'Astro' folder. Drag ECI.pm and the ECI folder
+with it into the 'Coord' folder. Drag Manip.pm into the 'Date'
+folder. Drag String.pm into the 'IO' folder.
+
+Now find the satpass script in the bin folder of the
+Astro-satpass distribution. Run it through your droplet, and
+save the output to some convenient location. Then, open the
+script in MacPerl. MacPerl will complain about it being too
+big to edit, and invite you to save it. Save it as an
+executable. Then launch it.
+
+The initialization file goes wherever you put your executable.
+You should put into the initialization file at least the
+statement
+
+set tz your_time_zone_setting
+
+Unfortunately what you need for the time zone setting is not
+well-defined. You can try the Date::Manip docs. I live on
+the east coast of the U.S., and EST5EDT works for me.
+
+Caveats:
+
+Date::Manip is a heavyweight but useful module. Unfortunately,
+it also assumes that time 0 is January 1, 1970. But MacPerl's
+time 0 is January 1, 1904. Rather than try to get this patched,
+I have simply had the satpass script add a fudge factor. This
+implementation will break if Date::Manip ever gets wise to
+"non-standard" epochs. Be aware of this should you decide to
+use Date::Manip for other purposes.
+
+The satpass script's 'help' function doesn't work under MacPerl.
+This is because it tries to parse the POD out of the script, but
+when MacPerl converts the script to an executable, the POD gets
+lost. You can find the docs by hunting up the package at
+http://search.cpan.org/~wyant/

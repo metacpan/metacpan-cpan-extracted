@@ -1,0 +1,178 @@
+=head1 NAME
+
+Changes - HTTPD::Bench::ApacheBench change logfile
+
+=head1 CHANGES
+
+all changes without author attribution are by Adi Fairbank
+
+=over 3
+
+=item 0.73 - Apr 2, 2013
+
+workaround possible test failure in test3_execute.t when localhost returns response so fast it rounds to 0
+and causes a division by zero error
+
+remove obsolete sections of the documentation, and unmaintained dates
+
+=item 0.72 - Oct 18, 2011
+
+bugfix: fix a segmentation fault caused by improperly malloc'd memory for the auto_cookie feature
+(see rt.cpan.org bug #71698)
+
+increase default buffersize from 16384 (16K) to 262144 (256K) - used for http response body when memory >= 3
+
+increase default request_buffersize from 2048 (2K) to 8192 (8K)
+
+change timing logic to not include the time taken to generate a POST body using postdata
+coderefs; this allows using the postdata coderefs to do other useful things like inserting
+random delays to simulate real-world use - see perldoc for details
+
+add support for postdata functions that can generate CGI data for body of POST request
+by looking at the response body from the previous request in run - see perldoc for syntax
+
+minor changes so Run class can be subclassed
+
+add INSTALL.SKIP so *.[ch] files do not get installed to perl lib path unnecessarily
+
+fix t/test3_execute.t to skip call to execute() if http server on localhost is not running,
+to stop cpantesters from rightfully complaining
+
+=item 0.71 - Nov 15, 2010
+
+implement strnstr() function since glibc does not have it (in src/apachebench/util.c)
+
+reorganize all C code into logically separated libraries: src/apachebench/*.[ch]
+
+remove includes to apache header files ap.h, ap_config.h, ap_ctype.h, os.h, os-win32.h, etc;
+now we rely completely on system includes
+
+=item 0.70 - Nov 14, 2010
+
+add support for dynamic cookie management within runs (emulate what browsers do):
+- read "Set-Cookie:" headers from each response and append corresponding "Cookie:"
+  headers to subsequent requests later in same run
+- feature turned on by default, but can be disabled by run
+
+new method $b->num_runs() to return the number of runs currently configured
+
+clean up XS code some more, renaming variables to be more sensible
+
+get rid of Term::ReadKey based test requiring user input from t/test3_execute.t,
+to stop annoying e-mail from cpantesters
+
+modified behavior of request_body() and response_body() regression methods to
+return only the actual body content, instead of the entire headers and body;
+headers can still be retrieved from request_headers() and response_headers()
+
+better configuration error checking- verify Run->urls is a list of scalars with
+no trailing whitespace before executing, since xs code will segfault if not scalars
+and not process the requests correctly if trailing whitespace
+
+=item 0.63 - Oct 07, 2004
+
+bugfix hanging/infinitely repeating requests when HTTP response headers larger
+than 512 bytes: increased limit to 4096 bytes
+(thanks to John Fricker <jfricker@musiciansfriend.com> for patch)
+
+added 'get_headers' utility script that reads just the HTTP response headers
+from a given URL
+
+rewrote parse_url() function using strtok() calls; now also supports making
+http proxy requests (e.g. http://proxy.host:8080/http://destination.host/ )
+(proxy support submitted by Matthew H. Gerlach <mgerlach@lightsurf.com>)
+
+packaged in include file "hsregex.h" from Apache source distribution for
+WIN32 systems; still does not build on WIN32 however
+(spotted by Lee Goddard <Home@LeeGoddard.com>)
+
+=item 0.62 - Dec 02, 2001
+
+accurate tallying of sent, good, and failed requests; fixed incorrect
+total_requests_sent(), total_responses_received() methods, and added new
+total_responses_failed() method and per-run sent_requests(), good_responses(),
+and failed_responses() methods
+
+added support for global and per-url/per-run time limits
+
+updated header files from Apache 1.3.22 src/include/
+
+added support for HTTP HEAD requests per-url/per-run
+
+fixed a small bug that sent a GET request for a defined-but-empty string value
+in postdata() array; now it sends a POST request with Content-length: 0
+
+added support for HTTP KeepAlive feature on global or per-url/per-run basis
+
+=item 0.61 - Oct 23, 2001
+
+new methods ready_to_execute() and prepare_for_execute() to
+eliminate segmentation faults due to configuration errors
+
+new feature that allows adding arbitrary extra HTTP request headers
+
+fixed bug that caused segmentation fault when custom Content-type: headers
+were specified for POST
+
+removed 512 byte hard-coded maximum size of HTTP requests; now requests can be
+arbitrarily large
+
+regression methods that returned arrayrefs now can be passed an optional index
+parameter to cause them to return the specified value out of the array
+
+fixed bug in ApacheBench.xs reset_request() for null cookies - bug
+caused ApacheBench-Perl not to work properly with virtual hosts because
+a null "\0" char was embedded in the HTTP request before the Host: line
+(spotted by Raju M. Daryanani <rajumd@geocities.com>)
+
+store all HTTP requests sent to server, accessed by request_body() method
+
+improved documentation for postdata() method, on suggestion
+from Scott Croco <scott.croco@lucasfilm.com>
+
+=item 0.60 - Feb 23, 2001
+
+restructured regression hash; will break some scripts;
+see README.upgrading_0.5x-0.6x for details
+
+added new object-oriented API; see documentation for details
+
+renamed 'cookie' to 'cookies' and 'filesize' to 'buffersize' in
+configuration hash sent to ab() XS routine
+
+added support for customizable Content-type: headers in HTTP request
+
+added request time tracking (times taken to send each HTTP request)
+stored in 'request_time' array for each run iteration
+
+added global and per-run 'memory' setting to control how much regression
+data is remembered
+
+changed HTTP request User-Agent from ApacheBench/VERSION to
+ApacheBench-Perl/VERSION
+
+=item 0.52 - Nov 25, 2000
+
+added debugging printf() statements which can be turned on by defining
+AB_DEBUG at the top of ApacheBench.xs
+
+fixed segmentation fault that happened when ab() was called twice from
+a single process, which was due to bad data stored in global variables
+
+fixed annoying "Use of uninitialized value" warnings if undef values are
+passed as input to ApacheBench
+
+changed Content-type for POST requests to application/x-www-form-urlencoded
+
+=item 0.51 - Sep 26, 2000
+
+renamed module from ApacheBench to HTTPD::Bench::ApacheBench,
+suggested by Stas Bekman
+
+=item 0.5 - Sep 20, 2000
+
+initial public release
+
+=back
+
+=cut

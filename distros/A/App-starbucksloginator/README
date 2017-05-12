@@ -1,0 +1,29 @@
+NAME
+    App::starbucksloginator - Access the wireless at Starbucks (via AT&T)
+
+VERSION
+    version 0.0012
+
+SYNOPSIS
+        $ starbucksloginator
+
+DESCRIPTION
+        AT&T/Starbucks has an annoying connection screen needed access their wireless.
+
+        This is a commandline-based, no-hassle way to connect
+
+USAGE
+        Usage: starbucksloginator <options>
+
+            --agent <agent>         The agent to pass the loginator off as (user agent string).
+                                    Windows Firefox by default
+
+AUTHOR
+    Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

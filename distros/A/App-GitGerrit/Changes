@@ -1,0 +1,275 @@
+Revision history for Git::Gerrit. -*- text -*-
+
+0.022     2014-01-15 16:13:38 America/Sao_Paulo
+
+0.021     2013-11-04 21:15:31 America/Sao_Paulo
+
+  [New features]
+
+  - The new 'git gerrit fetch' sub-command fetches a list of changes
+    and creates local change-branches.
+
+  [Changes]
+
+  - The following commands now accept a list of changes as arguments
+    instead of a single one: cherry-pick, reviewer, review, abandon,
+    restore, revert, and submit.
+
+  [Documentation]
+
+  - The WORKFLOW section shows how the cherry-pick sub-command can be
+    useful.
+
+0.020     2013-10-27 10:18:17 America/Sao_Paulo
+
+  [Changes]
+
+  - Rename Git::Gerrit back to App::GitGerrit. The CPAN indexing
+    problem is solved and it had nothing to do with the module's name.
+
+0.019     2013-10-27 09:22:27 America/Sao_Paulo
+
+  [Changes]
+
+  - Another attempt to solve the CPAN indexing problem.
+
+0.018     2013-10-26 16:48:30 America/Sao_Paulo
+
+  [Changes]
+
+  - Rename App::GitGerrit back to its original name: Git::Gerrit. This
+    is an attempt to bypass a problem that is preventing the module
+    from being indexed at CPAN.
+
+  - A few changes in the documentation.
+
+0.017     2013-10-22 08:52:14 America/Sao_Paulo
+
+  [New features]
+
+  - The new 'git gerrit web' sub-command opens up in a web browser the
+    Gerrit pages corresponding to the list of changes it gets as
+    arguments.
+
+  - 'git gerrit show' now accepts a list of changes as arguments and
+    shows all of them.
+
+  - 'git gerrit checkout' now accepts a list of changes as arguments,
+    fetches of them and checks out the last one in the list.
+
+  - Bash completion support is implemented by the
+    etc/bash_completion.d/git-gerrit script.
+
+  [Changes]
+
+  - Issuging a 'git gerrit new' while in a change branch creates
+    another change-branch based on the same upstream. Previously it
+    was an error.
+
+  - The 'git gerrit checkout' and 'git gerrit cherry-pick'
+    sub-commands now check if the changes they operate on belong to
+    the current repository's project. If not, they issue an error.
+
+  - When issuing 'git gerrit push' with a dirty status, the options
+    --keep and --norebase are assumed by default.
+
+  - The git-gerrit manual had its sections completely reordered in an
+    attempt to offer a more natural read.
+
+0.016     2013-10-16 10:53:43 America/Sao_Paulo
+
+  [Fixes]
+  - When Gerrit was in any way inaccessible the error messages were
+    mangled.
+
+0.015     2013-10-15 21:57:11 America/Sao_Paulo
+
+  [New features]
+  - It's possible now to specify a default set of options for each
+    sub-command using the variable git-gerrit.options.COMMAND.
+
+  [Changes]
+  - Take off the message about this being beta code from README.
+
+  [Fixes]
+  - Remove dependency from File::Slurp in order to correctly support
+    locale-based encodings in the message file created by the editor.
+
+0.014     2013-10-12 22:03:10 America/Sao_Paulo
+
+  [New features]
+  - The configuration variables ('remote', 'baseurl', and 'project')
+    now have suitable defaults which should allow most users to start
+    using git-gerrit out of the box, without any pre-configuration
+    required.
+
+  - You can --force a 'git gerrit push' to succeed when the working
+    area is dirty.
+
+  [Changes]
+  - Gerrit error messages are now formatted in a way that make them
+    more understandable.
+
+  - The full path of the commit-msg hook being installed is shown in
+    the debug messages.
+
+  [Fixes]
+  - Usernames are now URI-escaped before being inserted in REST URLs.
+
+0.013     2013-10-07 23:19:19 America/Sao_Paulo
+
+  [Changes]
+  - Require, instead of just recommend, Text::Table and better format
+    the output of 'git gerrit reviewer'.
+
+  - The reviewer's names are always printed in full now.
+
+  - Reformat the output of 'git gerrit version' when Gerrit is version
+    pre-2.7.
+
+  [Fixes]
+  - Fix 'git gerrit query' to show the correct list of changes in a
+    multi-query invocation.
+
+  - Fix 'git gerrit reviewer' which was aborting when it tried to
+    print the reviewer list.
+
+  - Always strip the trailing zeroes from dates in the output of
+    'query' and 'show'.
+
+0.012     2013-10-06 19:30:36 America/Sao_Paulo
+
+  [New features]
+  - Implement the git-gerrit.reviewers configuration variable through
+    which it's now possible to specify default reviewers based on the
+    branch to which one pushes and also on the files being changed.
+
+  - Implement option 'git gerrit push --submit' to tell Gerrit to
+    auto-merge the change during the push, which is a feature
+    implemented in Gerrit 2.7.
+
+  - Implement option 'git gerrit push --base=BASE' to tell Gerrit to
+    select a new merge base during the push, which is a feature
+    implemented in Gerrit 2.7.
+
+  [Fixes]
+  - Require minimum versions of Gerrit::REST and Win32.
+
+0.011     2013-10-04 00:28:28 America/Sao_Paulo
+
+  [Changes]
+  - Improve instalation instructions.
+
+  - Consistently format all warning and error messages.
+
+  - Reformat the 'missing configuration' error message.
+
+0.010     2013-10-02 21:10:57 America/Sao_Paulo
+
+  [New Features]
+  - Implement 'git gerrit push --norebase' option to avoid rebases
+    for brand new change-branches.
+
+  - Make 'git gerrit version' tell the Perl version too.
+
+  [Changes]
+  - Use alternative methods to grok credentials for pre-1.8 Gits that
+    do not support the git-credential command. Git-gerrit now tries
+    alternative methods to grok credentials if it can't grok then via
+    git-credential, in this order:
+    
+    * From the userinfo part of git-gerrit.baseurl.
+    * From a .netrc file.
+    * Prompting the user.
+
+  - Remove trailing zeroes from dates in 'git gerrit show'.
+
+  - Improve 'git gerrit version' message for pre-2.6 Gerrits.
+
+  [Fixes]
+  - Fix 'git gerrit version' so that it works from an unreleased
+    version, directly from a git-gerrit Git repository clone.
+
+0.009     2013-10-02 10:54:29 America/Sao_Paulo
+
+  [Fixes]
+  - Drop Win32 dependency which was preventing the build on any other
+  platform.
+
+0.008     2013-09-30 22:53:58 America/Sao_Paulo
+
+  [Fixes]
+  - Fix 'git gerrit reviewers'. It wasn't adding reviewers correctly.
+
+  - Avoid the use of ':locale' IO layer on Windows, because it's not
+    well supported there.
+
+0.007     2013-09-29 22:26:20 America/Sao_Paulo
+
+  [Changes]
+  - Remove the --verbose option from 'git gerrit show', as it wasn't
+    adding anything useful.
+
+  - Improve the output formating of 'git gerrit show' and 'git gerrit
+    query' using the Text::Table module, if available.
+
+  - Change the module dependency information, making it recommend,
+    instead of require, the modules Text::Table and LWP::Simple.
+
+  - Improve documentation.
+
+  [New features]
+  - Implement the 'git gerrit cherry-pick' command.
+
+  - The output of 'git gerrit query' now shows a new column 'RC',
+    containing the most relevant vote for the 'Code-Review' label.
+
+  [Fixes]
+  - Fix 'git gerrit submit', which wasn't working at all.
+
+  - Fix 'git gerrit show', which wasn't outputting the votes for the
+    change labels.
+
+  - Fix credential management on Windows.
+
+  - Fix IO encoding/decoding making it locale-based.
+
+0.006     2013-09-26 21:33:39 America/Sao_Paulo
+
+  [Changes]
+  - Rename 'git gerrit backout' to 'git gerrit upstream', which is
+    more meaningful.
+
+  - The git-gerrit.username config variable doesn't exist anymore. The
+    username can be informed via the git-gerrit.baseurl variable.
+
+  - Improved documentation.
+
+  [New features]
+  - Now 'git gerrit co' is an alias for 'git gerrit checkout'.
+
+  - Now 'git gerrit up' is an alias for 'git gerrit upstream'.
+
+  - You can force 'git gerrit upstream' to delete a new change-branch
+    with the --delete option.
+
+0.005     2013-09-25 10:00:47 America/Sao_Paulo
+
+  - Small fix.
+
+0.004     2013-09-24 22:19:07 America/Sao_Paulo
+
+  - Just a little documentation reorganization.
+
+0.003     2013-09-23 22:08:59 America/Sao_Paulo
+
+  - Rename git-gerrit's distribution from Git::Gerrit to
+    App::GitGerrit.
+
+0.002     2013-09-22 21:45:17 America/Sao_Paulo
+
+  - Fix documentation.
+
+0.001     2013-09-22 17:01:46 America/Sao_Paulo
+
+  - First git-gerrit release. Still untested beta code.

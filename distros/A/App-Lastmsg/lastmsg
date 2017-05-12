@@ -1,0 +1,127 @@
+#!/usr/bin/perl
+use 5.014000;
+use strict;
+use warnings;
+
+use App::Lastmsg;
+
+App::Lastmsg::run;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+lastmsg - last(1) semblance for your inbox
+
+=head1 SYNOPSIS
+
+  # in ~/.lastmsgrc
+  inbox:
+    - /home/MGV/mail/inbox
+    - /home/MGV/mail/folder
+  sent:
+    - /home/MGV/mail/sent
+  track:
+    bestfriend:
+      - best@friend.com
+      - best.friend@freemail.com
+    someguy: SOMEGUY@cpan.org
+    nobody:
+      - nobody@example.com
+
+  # in your shell
+  mgv@somehost ~ $ lastmsg
+  bestfriend best@friend.com  Sat 31 Dec 2016 12:34:56 EET
+  someguy    SOMEGUY@cpan.org Thu 20 Nov 2016 12:00:00 EET
+  nobody                      NOT FOUND
+
+=head1 DESCRIPTION
+
+lastmsg reads your mail folders looking for emails you exchanged with
+a given set of people. Then for each person in the set it prints the
+time you last received an email from or sent an email to them and the
+email address used.
+
+The script takes no arguments (the settings are taken from a
+configuration file), and it prints a three-column table where the
+first column is the ID of a person, the second column is the email
+address last used (empty if you've never exchanged an email with that
+person), and the last column is the date of last contact (or the
+string C<NOT FOUND> if you've never exchanged an email). The rows are
+sorted by date of last contact (with the most recently contacted
+people at the top), and the people that you've never exchanged an
+email with are at the end.
+
+The configuration is in YAML format. Three keys are recognised:
+
+=over
+
+=item B<inbox>
+
+The path(s) to your inbox and other incoming mail folders (a single
+string or a list of strings). The C<From> field of these emails is
+scanned.
+
+If not provided, it defaults to F</var/mail/$ENV{USER}> and
+F<$ENV{HOME}/Maildir/>. If USER or HOME are not in the environment,
+the corresponding default directory is ignored. So on a system with
+neither of these variables defined, this option will default to an
+empty list.
+
+B<NOTE:> See L<Email::FolderType> for information on how the type of a
+folder is identified. In short, the suffix of the folder is analyzed:
+If F</>, the format is Maildir. If F</.>, the format is MH. If F<//>,
+the format is Ezmlm. Otherwise, some heuristics are checked and the
+fallback is Mbox.
+
+=item B<sent>
+
+The path(s) to your sent and other outgoing mail folders (a single
+string or a list of strings). The C<To>, C<Cc>, and C<Bcc> fields of
+these emails are scanned.
+
+If not provided, it default to an empty list. See B<NOTE:> above for
+information on how the type of a folder is identified.
+
+=item B<track>
+
+A hash of people to track. Each entry represents a person. The key is
+the ID of that person (used for display), and the value is the email
+address of that person or a list of email addresses of that person.
+
+If not provided, the script will die with an error.
+
+=back
+
+The configuration file can be named F<lastmsgconfig>,
+F<lastmsg.config>, F<lastmsgrc>, or F<.lastmsgrc> and can be placed in
+the current directory, in your home directory, in F</etc/>, and in
+F</usr/local/etc/>. See L<Config::Auto> for more information.
+
+=head1 ENVIRONMENT
+
+The only recognised environment variable is B<LASTMSG_DEBUG>, which if
+set to a true value causes the script to emit a lot of information on
+STDERR about what it is doing.
+
+=head1 TODO
+
+Should handle IRC and IM logs as well, not just emails. Should have
+better tests.
+
+=head1 AUTHOR
+
+Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016-2017 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

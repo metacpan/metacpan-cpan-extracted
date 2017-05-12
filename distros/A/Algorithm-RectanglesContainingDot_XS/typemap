@@ -1,0 +1,14 @@
+TYPEMAP
+struct algorithm *	T_PTROBJ_MAGIC
+
+INPUT
+
+T_PTROBJ_MAGIC
+	$var = ($type)_sv2obj(aTHX_ $arg, \"${type}\", 1);
+
+
+OUTPUT
+
+T_PTROBJ_MAGIC
+	$arg = _obj2sv(aTHX_ $var, ST(0), "$type");
+

@@ -1,0 +1,42 @@
+App::cpanm::meta::checker
+
+"cpanm" installs a few auxiliary files:
+
+    $SITELIB/.meta/DISTNAME-DISTVERSION/MYMETA.json
+    $SITELIB/.meta/DISTNAME-DISTVERSION/install.json
+
+These files describe several things, such as dependencies declared by
+upstream, and sniffed extra context.
+
+This tool exists to read those files, and verify that their dependencies
+are still holding true, that no new conflicting dependencies have been
+installed and are silently sitting there broken.
+
+Also, as "cpanm"'s auxiliary files are really a prototype for what may
+eventually become a tool-chain standard, this tool is also a prototype
+for a tool-chain standard checker.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

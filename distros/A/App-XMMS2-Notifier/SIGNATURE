@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 2a52399a3cd72b676aa2a06099626808f6a627dd Changes
+SHA1 ca94aff66cba1e8faeec09953fb5689a6c6d1cef MANIFEST
+SHA1 da38ccfe6e6c428cbddf86773fb22c5b7225f6ff META.json
+SHA1 f79a86e2ced8c0e62529ade87a0a07dd044b268a META.yml
+SHA1 a5a71e88657ce63f626a51a390a6322b3327a55f Makefile.PL
+SHA1 dc9340c1975bcae73f092a79d902365cae9c6bd2 README
+SHA1 ae12ed6666dbf97e601ed3fed85248f3a1e6512f lib/App/XMMS2/Notifier.pm
+SHA1 668edc62795d8e39f03af6fa6bff97f2cfdfba9f t/perlcritic.t
+SHA1 e4e0fd9a5add27aea8ea4b88c780bba779e973f6 t/perlcriticrc
+SHA1 814cb5fd09774742b16f06b95b559ea64a238e44 t/test.t
+SHA1 5eabe88479f02b190ccb5fd29fff307475c1617e xmms2-notifier
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJWtj/NAAoJEMoENb5ewbNiqNUP/A2nCCiyISJsVNaOm+b26u4T
+7wp/g8mI0jsGD2ReJdkc4QTKX//LWKfQjdlnIqI9j9LVNchfr0GZxJNYzJsMmMxo
+4HJW3gAvk4gRxP0BQfOAeDLow6CmtED1029EeGLy6B509uDoF17aj37xyu3h43qm
+BapoOSV2vI4SKSb8k4/9xybaZAW+pd3KCC27R0G5C7BomxFfdPAG1fg66jgSvkFU
+VdPt8zC+73af5h2ewmrV9L93Kv0t5kt+jqI6jbaa0pTqkhyrKof2fCpGYF/AuE0n
+E7Tmn90SMZNjw/1b0xdAeIYyXAe7+VRlbenkEH18llKDQjBvjhw8hCNk+2yUG9WL
+L7GsC0FqKx5CWIeTUqBIX6vEn81N6WT4x/+/Ugx8j//yYOOo0oHnJkCN0TBzzxJ8
+qW/dh8S7s+wI9G2dWBjwWpUappcbPa6A8OEsydZpq5l7e/L5+6pq64jqEWWT+lPg
+txnVi4TB3qrVDuT60JNQkkqiIXDcr5mDc9mFYSbb9Ke+1RyN38hi+8wXVeEwf5AI
+WEV3tL0KoRTY50ka/WkQ7/0BfwGPeYfYeF9AZaPROHWxtFYO6E9rKHi+hfh/zBYD
+4ZUn57dFXu5wjCtcofkD72lQEPs0gtfhBwLaE4JeiHnA6ng5WOHcNkxdNVmvoriP
+4XxGXmy+pb9Bg1kk0TPt
+=+GSJ
+-----END PGP SIGNATURE-----

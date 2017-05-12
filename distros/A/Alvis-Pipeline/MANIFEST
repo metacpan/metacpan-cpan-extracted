@@ -1,0 +1,22 @@
+Changes
+INSTALL.Debian
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+bin/README
+bin/alvis-pipeline-filter.pl
+bin/alvis-pipeline-get.pl
+bin/alvis-pipeline-put-documents.pl
+bin/alvis-pipeline-put.pl
+bin/alvis-zsink.pl
+etc/db/alvis.xml
+etc/db/xml-core.xml
+lib/Alvis/Logger.pm
+lib/Alvis/Pipeline.pm
+lib/Alvis/Pipeline/Read.pm
+lib/Alvis/Pipeline/Write.pm
+t/0-creation.t
+t/1-read.t
+t/2-unicode.t
+META.yml                                 Module meta-data (added by MakeMaker)

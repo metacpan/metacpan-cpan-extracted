@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/Acme/Oil.pm
+lib/Acme/Oil/ed.pm
+lib/Acme/Oil/ed/Scalar.pm
+lib/Acme/Oil/ed/Array.pm
+lib/Acme/Oil/Ashed/Scalar.pm
+lib/Acme/Oil/Ashed/Array.pm
+README
+t/01-base.t
+t/02-scalar.t
+t/03-array.t
+META.yml                                 Module meta-data (added by MakeMaker)

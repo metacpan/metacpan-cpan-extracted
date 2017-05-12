@@ -1,0 +1,40 @@
+Apache::JumpByReferer version 0.01
+==================================
+
+Apache::JumpByReferer is an access phase handler of Apache + mod_perl.
+You can block or let the user jump to another URL if the user was coming
+from your specified web site.
+
+This handler will check the last-modified time of the "RefererListFile",
+and will re-cache the settings when the file was modified after the last
+cached time. That is to say, you can rewrite to change your settings.
+
+Write a regular expressions (*REGEX*) of your specified URL in the
+"RefererListFile", and join a URL to jump behind the *REGEX* in the
+blank(s) if you want to let jump the user. Write and join "Forbidden"
+(case insensitive) string behind the *REGEX* in the blank(s) if you
+don't want to access to the directory.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  mod_perl
+  Apache::Constants
+  Text::ParseWords
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Koichi Taniguchi, Japan. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

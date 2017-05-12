@@ -1,0 +1,10 @@
+Revision history for App-eachgit
+
+0.3     2014-03-19
+          Converted into a CPAN package
+
+0.2     2014-03-19
+          Output to STDOUT instead of STDERR
+
+0.1     2014-03-19
+          first release

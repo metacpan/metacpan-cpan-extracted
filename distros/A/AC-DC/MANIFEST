@@ -1,0 +1,24 @@
+MANIFEST
+README
+lib/AC/SHA1File.pm
+lib/AC/DC/IO.pm
+lib/AC/DC/Debug.pm
+lib/AC/DC/IO/TCP/Server.pm
+lib/AC/DC/IO/TCP/Client.pm
+lib/AC/DC/IO/UDP/Server.pm
+lib/AC/DC/IO/TCP.pm
+lib/AC/DC/IO/Forked.pm
+lib/AC/DC/IO/UDP.pm
+lib/AC/DC/Protocol.pm
+lib/AC/DC/Sched.pm
+lib/AC/DC/Callback.pm
+lib/AC/Import.pm
+lib/AC/Misc.pm
+lib/AC/DC.pm
+lib/AC/Dumper.pm
+lib/AC/ISOTime.pm
+lib/AC/ConfigFile/Simple.pm
+lib/AC/Daemon.pm
+LICENSE
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

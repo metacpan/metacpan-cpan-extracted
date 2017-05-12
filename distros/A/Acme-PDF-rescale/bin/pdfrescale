@@ -1,0 +1,74 @@
+#!/usr/bin/perl
+use strict;
+use Getopt::Lucid qw(:all);
+use Acme::PDF::rescale qw(:all);
+
+my ($x) = $0 =~ /\/(\w*)$/; 
+my $usage = <<EOF
+$x [options] file.pdf
+$x is: 
+ 1) A pretext to upload something to the CPAN.
+ 2) A quick and dirty kluge to rescale a pdf file.
+
+ Options are:
+ --scale  <s>  scale (default 1)
+ --offset <o>  offset (default '0mm 0mm')
+ --stop        creates a .tex file and exit
+ -o <nom>      name of output file (default : file-scaled.pdf)
+EOF
+;
+
+=head1 NAME
+  
+pdfrescale - rescales pdf files
+
+=head1 SYNOPSIS
+
+pdfrescale [options] file.pdf
+
+=head1 DESCRIPTION
+
+pdfrescale was written as pretext to upload something to the CPAN.
+It provides a quick and dirty kluge to rescale a pdf file.
+ 
+Options are:
+
+=over 4
+
+=item B<--scale>  <s>  scale (default 1)
+
+=item B<--offset> <o>  offset (default '0mm 0mm')
+
+=item B<--stop>        creates a .tex file and exit
+
+=item B<-o> <nom>      name of output file (default : fichier-scaled.pdf)
+
+=back
+
+=head1 VERSION 
+
+This manual was written for pdfrescale version 0.1.
+
+=head1 SEE ALSO
+
+L<Acme::PDF::rescale>
+
+=cut
+
+my $file = pop @ARGV;
+my @specs = ( Param('--scale')->default(1), Param('--offset')->default('0 0'), Param('-o'), Param('--stop') );
+my $opt = Getopt::Lucid->getopt(\@specs);
+my $stop = $opt->get_stop();
+
+print $usage and exit if $file eq '';
+
+my $offset = $opt->get_offset();
+my $scale = $opt->get_scale();
+my $out = $opt->get_o();
+
+$out = base_name($file) if $out eq '';
+make_tex_file($out, $file, $scale, $offset);
+exit if $stop;
+
+compile_tex_file($out);
+clean_tex_files($out);

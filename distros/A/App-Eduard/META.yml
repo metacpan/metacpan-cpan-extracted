@@ -1,0 +1,35 @@
+---
+abstract: 'GnuPG email sign/encrypt testing bot'
+author:
+  - 'Marius Gavrilescu <marius@ceata.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Eduard
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Email::Sender::Simple: '0'
+  File::Share: '0'
+  File::Slurp: '0'
+  Getopt::Long: '0'
+  MIME::Entity: '5.419'
+  MIME::Parser: '5.419'
+  Mail::GnuPG: '0'
+  PerlX::Maybe: '0'
+  Template: '0'
+  Try::Tiny: '0'
+  perl: '5.014000'
+resources:
+  repository: git://gitorious.org/ceata/ceata-eduard.git
+version: '0.001002'

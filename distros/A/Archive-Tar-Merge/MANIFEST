@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+Merge.pm
+README
+t/001Basic.t
+t/002Conflict.t
+t/003Content.t
+t/004Filter.t
+t/005Split.t
+t/data/Makefile
+t/data/tar1.tgz
+t/data/tar1/a
+t/data/tar1/b
+t/data/tar2.tgz
+t/data/tar2/c
+t/data/tar3.tgz
+t/data/tar3/a
+t/data/tar3/c
+META.yml                                 Module meta-data (added by MakeMaker)

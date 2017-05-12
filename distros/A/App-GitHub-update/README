@@ -1,0 +1,44 @@
+NAME
+    App::GitHub::update - Update a github repository (description, homepage,
+    etc.) from the commandline
+
+VERSION
+    version 0.0011
+
+SYNOPSIS
+        # Update the description of github:alice/example
+        github-update --login alice --token 42fe60... --repository example --description "Xyzzy"
+
+        # Pulling login and token from $HOME/.github
+        github-update --repository example --description "Xyzzy"
+
+        # With homepage
+        github-update --repository example --description "The incredible Xyzzy" --homepage http://example/xyzzy
+
+        # Print usage
+        github-update --help
+
+DESCRIPTION
+    A simple tool for setting the description and homepage of a github
+    repository
+
+GitHub identity format ($HOME/.github or $HOME/.github-identity)
+        login <login>
+        token <token>
+
+    (Optionally GnuPG encrypted; see Config::Identity)
+
+SEE ALSO
+    App::GitHub::create
+
+    Config::Identity
+
+AUTHOR
+      Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

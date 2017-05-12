@@ -1,0 +1,15 @@
+Revision history for Perl extension AxKit::XSP::WebUtils.
+
+1.6
+    - Added lots more methods (Michael Kroell)
+
+1.5
+    - Allow redirect() to use the Refresh header instead of Location
+      which allows setting cookies to work with a redirect.
+
+1.3_90
+    - Code taken from Steve Willer's example, and documented in POD.
+
+0.01  Thu Jun  7 12:27:01 2001
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,14 @@
+Changes
+lib/Array/Transpose.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+scripts/Array-Transpose-example.pl
+t/001_load.t
+t/002_load.t
+t/003_empty.t
+Todo
+perl-Array-Transpose.spec
+META.yml                                 Module meta-data (added by MakeMaker)

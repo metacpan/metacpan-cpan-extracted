@@ -1,0 +1,103 @@
+<%args>
+    $sequenceset_html => undef
+    $organism_html    => undef
+    $sequence_input   => undef
+    $admin            => 0
+    $sequence_data_dir
+</%args>
+<script type="text/javascript" src="/js/mimosa-grid.js"></script>
+
+<div id="tabs1">
+ <div id="t1_content">
+    <div id="pagetitle">
+        <h2>Mimosa - Miniature Model Organism Sequence Aligner</h2>
+    </div>
+
+    <div id="mimosa-grid">
+    </div>
+
+<table border="0">
+<form method="post" enctype="multipart/form-data" action="/submit" name="main_input_form">
+  <input type="hidden" id="mimosa_sequence_set_ids" name="mimosa_sequence_set_ids" value="0" />
+  <input type="hidden" name="interface_type" value="simple" />
+  <input type="hidden" name="outformat" value="0" />
+  <br>
+<tr><td>
+  Program:</td><td> <select id="program_selector"   name="program">
+<option value="none">Choose a BLAST program</option>
+<option selected="true" value="blastn">BLASTN (nucleotide to nucleotide)</option>
+<option value="tblastx">TBLASTX (protein to protein; both database and query are translated)</option>
+<option value="tblastn">TBLASTN (protein to nucleotide; database translated to protein)</option>
+</select>
+</td></tr>
+    <tr><td>Name:</td><td> <input type="text" name="search_name" size="20" id="search_name"></td></tr>
+    <tr><td>Description:</td><td> <input type="text" name="search_description" size="20" id="search_description"></td></tr>
+
+    <tr><td><b>Query sequence</b></td></tr>
+    <tr><td colspan="2">
+    <textarea name="sequence" id="sequence_input" rows="8" cols="80"><% $sequence_input %></textarea></td></tr>
+    <tr><td>Upload query sequence file:</td><td> <input type="file" name="sequence_input_file" size="40"></td></tr>
+    </table>
+      <div><br/><input type="reset" value="Clear" onclick="clearField(); "> <input type="submit" name="search" value="Align" ></div>
+       <br/>
+        <input value="unchecked" type="checkbox" name="advanced" id="advanced_control" onclick="$('#advanced').toggle('slow', 'swing')">
+        <label for="advanced_control">Advanced Options</label>
+    <div class="info_table_fieldval">
+
+         <div id="advanced" style="display:none; width: 700px;">
+         <table>
+<tr><td>  Filter Query?: </td><td><input type="checkbox" checked="checked" name="filtered" value="T" /></td></tr>
+
+<tr><td>   Expect (e-value) Threshold </td><td><input type="text" size="6" value="1e-10" name="evalue" /></td></tr>
+
+    <tr><td>
+    Alignment View
+    </td><td>
+    <select id="alignment_views" name="alignment_view">
+    <option value="0">Pairwise</option>
+    <option value="1">Query-anchored showing identities</option>
+    <option value="2">Query-anchored no identities</option>
+    <option value="3">Flat query-anchored, show identities</option>
+    <option value="4">Flat query-anchored, no identities</option>
+    <option value="5">Query-anchored no identities and blunt ends</option>
+    <option value="6">Flat query-anchored, no identities and blunt ends</option>
+    <option value="7">XML Blast output</option>
+    <option value="8">Tabular</option>
+    <option value="9">Tabular with comment lines</option>
+    <option value="10">ASN text</option>
+    </select>
+    </td></tr>
+
+<tr><td>
+Substitution Matrix</td><td>
+      <select id="simple_selectbox_2"   name="matrix">
+            <option value="BLOSUM62">BLOSUM62 (default)</option>
+            <option value="BLOSUM80">BLOSUM80 (recent divergence)</option>
+            <option value="BLOSUM45">BLOSUM80 (ancient divergence)</option>
+            <option value="PAM30">PAM30</option>
+            <option value="PAM70">PAM70</option>
+    </select>
+    </td></tr>
+
+<tr><td>
+    Show Graphics</td><td>
+      <select id="simple_selectbox_3"   name="output_graphs">
+        <option value="bioperl_histogram">all</option>
+        <option value="none">none</option>
+        <option value="bioperl_only">alignment summary only</option>
+    </select>
+</td></tr>
+<tr><td>
+    Max hits to show: </td><td><input type="text" name="maxhits" size="6" value="100" />
+</td></tr>
+
+</table>
+    </div> <!-- advanced -->
+    </div>
+</form>
+
+</div> <!-- t1_content -->
+
+    <& tabs.mason, sequence_data_dir => $sequence_data_dir &>
+
+</div>

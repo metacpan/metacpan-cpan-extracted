@@ -1,0 +1,31 @@
+---
+abstract: 'We are Russian CPAN authors'
+author:
+  - 'Anatoly Sharifulin <sharifulin@gmail.com>'
+  - "Zoffix <'zoffix@cpan.org'>"
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+keywords:
+  - CPAN
+  - 'CPAN authors'
+  - Russian
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-CPANAuthors-Russian
+provides:
+  Acme::CPANAuthors::Russian:
+    file: lib/Acme/CPANAuthors/Russian.pm
+    version: 1.07
+requires:
+  Acme::CPANAuthors: 0
+  Acme::CPANAuthors::Register: 0
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/sharifulin/acme-cpanauthors-russian/tree
+version: 1.07

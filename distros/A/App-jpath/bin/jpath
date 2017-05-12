@@ -1,0 +1,216 @@
+#!perl
+
+our $DATE = '2016-03-11'; # DATE
+our $VERSION = '0.04'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long;
+use JSON::Path;
+
+my %Opts = (
+    input  => 'json',
+    output => 'json',
+);
+my $Expr;
+my $Input;
+my @Output;
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'input|i=s'  => \$Opts{input},
+        'output|o=s' => \$Opts{output},
+        'version|v'  => sub {
+            say "jpath version ", ($main::VERSION // '?');
+            exit 0;
+        },
+        'help|h'     => sub {
+            print <<USAGE;
+Usage:
+  jpath [options] <expr> [input_file]
+  jpath --version
+  jpath --help
+Examples:
+  jpath '\$.store.book[*]' < data.json
+Options:
+  --input=s, -i   Input format (json, yaml, perl; default is json).
+  --output=s, -o  Output format (json, yaml, perl, pretty; default is json).
+Consult manpage/documentation for more details.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+
+    if (!@ARGV) {
+        warn "Please specify JSONPath expression\n";
+        exit 99;
+    }
+    $Expr = shift @ARGV;
+}
+
+sub get_input {
+    local $/;
+    if ($Opts{input} eq 'json') {
+        require JSON::MaybeXS;
+        $Input = JSON::MaybeXS->new->allow_nonref->decode(~~<>);
+    } elsif ($Opts{input} eq 'yaml') {
+        require YAML::Syck;
+        $Input = YAML::Syck::Load(~~<>);
+    } elsif ($Opts{input} eq 'perl') {
+        $Input = eval(~~<>);
+    } else {
+        warn "Unknown input format, ".
+            "refer to documentation for available formats\n";
+        exit 99;
+    }
+}
+
+sub run {
+    require JSON::Path;
+    local $JSON::Path::Safe = 0;
+    @Output = JSON::Path->new($Expr)->values($Input);
+}
+
+sub show_output {
+    if ($Opts{output} eq 'json') {
+        require Data::Format::Pretty::JSON;
+        print Data::Format::Pretty::JSON::format_pretty(\@Output);
+    } elsif ($Opts{output} eq 'yaml') {
+        require Data::Format::Pretty::YAML;
+        print Data::Format::Pretty::YAML::format_pretty(\@Output);
+    } elsif ($Opts{output} eq 'perl') {
+        require Data::Format::Pretty::Perl;
+        print Data::Format::Pretty::Perl::format_pretty(\@Output);
+    } elsif ($Opts{output} eq 'pretty') {
+        require Data::Format::Pretty::Console;
+        print Data::Format::Pretty::Console::format_pretty(\@Output);
+    } else {
+        warn "Unknown output format, ".
+            "refer to documentation for available formats\n";
+        exit 99;
+    }
+}
+
+# MAIN
+
+parse_cmdline();
+get_input();
+run();
+show_output();
+
+1;
+# ABSTRACT: Command-line tool for JSON::Path
+# PODNAME: jpath
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+jpath - Command-line tool for JSON::Path
+
+=head1 VERSION
+
+This document describes version 0.04 of jpath (from Perl distribution App-jpath), released on 2016-03-11.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % jpath [OPTIONS] <JSONPATH_EXPR> < data.json
+
+=head1 DESCRIPTION
+
+This script provides a simple, relatively straightforward command-line interface
+for L<JSON::Path>. It accepts JSON input as well as several other formats; and
+similarly can output JSON or alternative formats.
+
+This script sets C<$JSON::Path::Safe> to 0 so you can eval Perl expressions.
+
+=head1 EXIT CODES
+
+0 on success.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=over
+
+=item * --input=STR, -i
+
+Pick input format. Available formats: json, yaml (using L<YAML::Syck>), perl.
+Default is json.
+
+=item * --output=STR, -o
+
+Pick output format. Available formats: json, yaml, perl, and pretty (using
+L<Data::Format::Pretty::Console>). Default is json.
+
+=back
+
+=head1 FAQ
+
+=head2 How do I turn off colors and line numbers?
+
+Use C<COLOR=0> and C<LINUM=0>, respectively. For example:
+
+ % LINUM=0 jpath ...
+
+See L<Data::Format::Pretty::JSON> and other Data::Format::Pretty::* for more
+details.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-jpath>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-jpath>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-jpath>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<JSON::Path>.
+
+L<App::dpath>, a similar command-line tool, for L<Data::DPath>.
+
+Someone should perhaps also write C<tpath> for L<TPath>
+(L<TPath::Forester::Ref>).
+
+L<jsonpath>, L<jcut> (from L<App::PipeFilter>). A command-line tool that works
+on a per-record basis.
+
+L<App::jt>, a command-line tool that deals specifically with JSON input and in
+addition to doing JSONPath also provides some extra tools like simple filtering
+capability for simple structures (e.g. arrays, array of hashes), convert to CSV,
+etc.
+
+L<App::SerializeUtils>, various command-line scripts to convert or check data
+structure in various formats.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

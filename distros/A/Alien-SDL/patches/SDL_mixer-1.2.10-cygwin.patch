@@ -1,0 +1,108 @@
+--- SDL_mixer-1.2.11/configure	2009-11-12 07:44:13.000000000 +0100
++++ SDL_mixer-1.2.11/configure	2011-07-20 15:10:08.138225500 +0200
+@@ -11653,17 +11653,8 @@
+ done
+ 
+ 
+-case "$host" in
+-    *-*-cygwin*)
+-        # We build SDL on cygwin without the UNIX emulation layer
+-        BASE_CFLAGS="-I/usr/include/mingw -mno-cygwin"
+-        BASE_LDFLAGS="-mno-cygwin"
+-        ;;
+-    *)
+-        BASE_CFLAGS="-D_GNU_SOURCE=1"
+-        BASE_LDFLAGS=""
+-        ;;
+-esac
++BASE_CFLAGS="-D_GNU_SOURCE=1"
++BASE_LDFLAGS=""
+ BUILD_CFLAGS="$CFLAGS $CPPFLAGS"
+ EXTRA_CFLAGS="$INCLUDE $BASE_CFLAGS"
+ BUILD_LDFLAGS="$LDFLAGS"
+@@ -11858,7 +11849,7 @@
+ fi
+ 
+ case "$host" in
+-    *-*-cygwin* | *-*-mingw32*)
++    *-*-mingw32*)
+         VERSION_SOURCES="$srcdir/version.rc"
+         EXE=".exe"
+         if test "$build" != "$host"; then # cross-compiling
+@@ -11892,6 +11883,7 @@
+ find_lib()
+ {
+     gcc_bin_path=`$CC -print-search-dirs 2>/dev/null | fgrep programs: | sed 's/[^=]*=\(.*\)/\1/' | sed 's/:/ /g'`
++    env_bin_path=[`echo $PATH | sed 's/:/ /g'`]
+     gcc_lib_path=`$CC -print-search-dirs 2>/dev/null | fgrep libraries: | sed 's/[^=]*=\(.*\)/\1/' | sed 's/:/ /g'`
+     env_lib_path=`echo $LIBS $LDFLAGS $* | sed 's/-L[ ]*//g'`
+     if test "$cross_compiling" = yes; then
+@@ -11899,7 +11891,7 @@
+     else
+         host_lib_path="/usr/$base_libdir /usr/local/$base_libdir"
+     fi
+-    for path in $gcc_bin_path $gcc_lib_path $env_lib_path $host_lib_path; do
++    for path in $gcc_bin_path $env_bin_path $gcc_lib_path $env_lib_path $host_lib_path; do
+         lib=`ls -- $path/$1 2>/dev/null | sort | sed 's/.*\/\(.*\)/\1/; q'`
+         if test x$lib != x; then
+             echo $lib
+@@ -12786,7 +12778,10 @@
+             *-*-darwin*)
+                 mikmod_lib=`find_lib libmikmod.dylib`
+                 ;;
+-            *-*-cygwin* | *-*-mingw32*)
++            *-*-cygwin*)
++                mikmod_lib=[`find_lib "cygmikmod-*.dll"`]
++                ;;
++            *-*-mingw32*)
+                 mikmod_lib=`find_lib "mikmod*.dll"`
+                 ;;
+             *)
+@@ -13112,7 +13107,10 @@
+                         ogg_lib=`find_lib libvorbisidec.[0-9]*`
+                     fi
+                     ;;
+-                *-*-cygwin* | *-*-mingw32*)
++                *-*-cygwin*)
++                    ogg_lib=[`find_lib "cygvorbisidec-*.dll"`]
++                    ;;
++                *-*-mingw32*)
+                     ogg_lib=`find_lib "vorbisidec*.dll"`
+                     ;;
+                 *)
+@@ -13343,7 +13341,10 @@
+                 *-*-darwin*)
+                     ogg_lib=`find_lib libvorbisfile.dylib`
+                     ;;
+-                *-*-cygwin* | *-*-mingw32*)
++                *-*-cygwin*)
++                    ogg_lib=[`find_lib "cygvorbisfile-*.dll"`]
++                    ;;
++                *-*-mingw32*)
+                     ogg_lib=`find_lib "libvorbisfile*.dll"`
+                     ;;
+                 *)
+@@ -13798,7 +13799,10 @@
+                 *-*-darwin*)
+                     flac_lib=`find_lib libFLAC.dylib`
+                     ;;
+-                *-*-cygwin* | *-*-mingw32*)
++                *-*-cygwin*)
++                    flac_lib=[`find_lib "cygFLAC-*.dll"`]
++                    ;;
++                *-*-mingw32*)
+                     flac_lib=`find_lib "libFLAC*.dll"`
+                     ;;
+                 *)
+@@ -14146,7 +14150,10 @@
+             *-*-darwin*)
+                 smpeg_lib=`find_lib libsmpeg.dylib`
+                 ;;
+-            *-*-cygwin* | *-*-mingw32*)
++            *-*-cygwin*)
++                smpeg_lib=[`find_lib "cygsmpeg-*.dll"`]
++                ;;
++            *-*-mingw32*)
+                 smpeg_lib=`find_lib "smpeg*.dll"`
+                 ;;
+             *)

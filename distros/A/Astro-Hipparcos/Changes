@@ -1,0 +1,41 @@
+Revision history for Perl extension Astro::Hipparcos.
+
+0.09  Thu Jan 14 22:30 2010
+  - Require ExtUtils::XSpp 0.06 for more portability
+    via INCLUDE_COMMAND.
+  - Updated, improved draw_projection.pl example.
+
+0.08  Sat Jan  2 22:30 2010
+  - Better projection example using Astro::SkyPlot.
+    (examples/draw_projection.pl)
+
+0.07  Sat Dec 19 00:02 2009
+  - Include simple reading/selecting/writing catalogs example
+    as examples/simple_selection.pl
+  - Include more elaborate Hammer projection plot example as
+    examples/draw_hammer_proj.pl
+  - Implement the append_record method of a catalog for adding
+    records. See the simple_selection example for how you can use
+    this to select a subsample of the catalog for further analysis.
+  - Implement Astro::Hipparcos::Record->get_line/set_line for holding
+    the full catalog line.
+
+0.06  Wed Dec 16 08:00 2009
+  - XS/C++ build hotfix
+
+0.05  Tue Dec 15 08:00 2009
+  - Distribution hotfix.
+
+0.04  Mon Dec 14 10:22 2009
+  - Require ExtUtils::XSpp 0.05 for EU::XSpp::Cmd
+  - Use EU::XSpp::Cmd instead of the command line tool to make the
+  module build in case the command line tool isn't available.
+
+0.03  Sun Dec 13 15:05 2009
+  - Fetching numbered records
+
+0.02  Sun Dec 13 14:45 2009
+  - distribution fixes
+
+0.01  Sun Dec 13 10:25 2009
+  - original version

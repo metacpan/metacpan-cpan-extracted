@@ -1,0 +1,296 @@
+#!/usr/bin/perl
+
+# Copyright 2007, 2008, 2009, 2014 Kevin Ryde
+
+# This file is part of Chart.
+#
+# Chart is free software; you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 3, or (at your option) any later version.
+#
+# Chart is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Chart.  If not, see <http://www.gnu.org/licenses/>.
+
+use strict;
+use warnings;
+use Module::Build;
+
+my $build = Module::Build->new
+  (dist_name         => 'Chart',
+   dist_abstract     => 'Stock and commodity charting program.',
+   dist_author       => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
+   dist_version_from => 'lib/App/Chart.pm',
+   license           => 'gpl',
+   script_files      => [ 'chart' ],
+
+   build_requires => { 'Test::MockTime' => 0,
+                     },
+
+   requires => { 'perl' => '5.10.0',
+
+                 'Archive::Zip' => 0,   # for float.com.au
+
+                 'Class::Singleton' => 0,
+                 'Date::Calc' => 0,
+                 'Date::Parse' => 0,
+                 'DBI' => 0,
+                 'DBD::SQLite' => 0,
+
+                 # builtin in perl 5.8, but also separately on CPAN, maybe
+                 'File::Spec' => 0,
+
+                 # this is builtin in perl 5.8 which is what Gtk2 needs
+                 # anyway, but it's also published separately (and newer) on
+                 # CPAN; probably any version ok
+                 'File::Temp' => 0,
+
+                 # need 1.190 for Glib::strerror
+                 'Glib' => '1.190',
+
+                 # 1.181 for misc bug fixes, and TickerView needs that
+                 # version anyway
+                 'Gtk2' => '1.181',
+
+                 # whatever version Gtk2 demands
+                 'Glib' => 0,
+
+                 'Glib::Ex::ConnectProperties' => 0,
+                 'Glib::Ex::SignalIds' => 0, # my Glib-Ex-ObjectBits
+
+                 # Gtk2::Ex::GtkGCobj => 0,
+                 'Gtk2::Ex::CrossHair' => 0,
+                 'Gtk2::Ex::Dragger' => 0,
+                 'Gtk2::Ex::Lasso' => 0,
+                 'Gtk2::Ex::NoShrink' => 0,
+                 'Gtk2::Ex::TickerView' => 0,
+
+                 # version 2 for busy() working on newly opened dialogs
+                 'Gtk2::Ex::WidgetCursor' => 2,
+
+                 'HTML::TableExtract' => 0,
+
+                 # only needed for an LME plastics hack actually
+                 'HTML::TreeBuilder' => 0,
+
+                 'IO::String' => 0,
+                 'List::MoreUtils' => 0,
+
+                 # need 1.16 for bind_textdomain_filter() to mung gettext
+                 # strings
+                 'Locale::TextDomain' => '1.16',
+
+                 # dunno what version actually needed, at least 5.803 for a
+                 # working "decoded_content".
+                 LWP => '5.803',
+
+                 'Math::Round' => 0,
+                 'Module::Load' => 0,
+
+                 # need 1.60 for fixups to initializing in locales like
+                 # de_DE with "."  as the monetary thousands sep
+                 'Number::Format' => '1.60',
+
+                 'Perl6::Slurp' => 0,
+                 'Proc::SyncExec' => 0,
+                 'Regexp::Common' => 0,
+                 'Scope::Guard' => 0,
+
+                 # 1.10 for contains_all_range()
+                 'Set::IntSpan::Fast' => '1.10',
+
+                 # 'Set::Object' => 0,
+                 'Storable' => 0, # builtin actually
+                 'Tie::Cache' => 0,
+                 'Time::Piece' => 0,
+                 'Term::Size' => 0,
+                 'Text::CSV_XS' => 0,
+                 'Text::Glob' => 0,
+                 'URI::Escape' => 0,
+
+                 # and if available:
+                 #   Test::Pod
+                 #   Test::UseAllModules
+
+                 # Stuff used variously for development:
+                 #   Module::ScanDeps
+                 #   Lisp::Reader  -- conversion of past data
+                 #   Parse::DebControl
+
+               },
+   recommends => {
+                  # Stuff used if available:
+                  'BSD::Resource' => 0,
+                  'Devel::Arena' => 0,
+                  'Devel::Mallinfo' => 0,
+                  'Devel::Peek' => 0,
+                  'Devel::StackTrace' => 0,
+                 },
+
+   # sign => 1,
+   meta_merge =>
+   { resources =>
+     { homepage=>'http://user42.tuxfamily.org/chart/index.html',
+       license =>'http://www.gnu.org/licenses/gpl.html',
+     },
+     no_index => { directory => 'devel' },
+   }
+  );
+$build->create_build_script;
+
+
+# sub MY::special_targets {
+#   my $self = shift;
+#   my $inherited = $self->SUPER::special_targets(@_);
+#   $inherited =~ s/^\.SUFFIXES *:/$& .mo .po/
+#     or die "Oops, couldn't add to .SUFFIXES";
+# #   $inherited =~ s/^\.PHONY *:/$& mo pot/
+# #     or die "Oops, couldn't add to .PHONY";
+#   return $inherited;
+# }
+
+# # $self is a MakeMaker object, return a string of rules for the po/mo files
+# sub generate_po_rules {
+#   my ($self) = @_;
+#   #   use Data::Dumper;
+#   #   print Dumper($self);
+#   my $ret = '';
+# 
+#   my @pmfiles = grep {/\.pm$/} keys %{$self->{'PM'}};
+#   my $pmfiles_list = $self->wraplist (@pmfiles);
+#   $ret .= "\
+# # basically all the .pm's from \$(TO_INST_PM)
+# PO_FILES = chart $pmfiles_list
+# ";
+# 
+#   my @mofiles;
+#   my @pofiles;
+#   foreach my $pofile (glob('po/*.po')) {
+#     my $lang = File::Basename::basename ($pofile, '.po');
+#     my $mofile = "lib/LocaleData/$lang/LC_MESSAGES/AppChart.mo";
+#     push @pofiles, $pofile;
+#     push @mofiles, $mofile;
+# 
+#     $ret .= "\
+# $pofile: po/AppChart.pot
+# 	msgmerge --verbose --update \$@ \$<
+# 	touch \$@
+# $mofile: $pofile
+# 	msgfmt --check --statistics --verbose -o \$@ \$<
+# ";
+#   }
+#   $ret = "mo: " . join(' ',@mofiles) . "\n" . $ret;
+#   $ret = "po: " . join(' ',@pofiles) . "\n" . $ret;
+# 
+#   return $ret;
+# }
+# 
+# sub MY::postamble {
+#   my ($self) = @_;
+#   my $ret = <<'MAKE_FRAG';
+# 
+# #------------------------------------------------------------------------------
+# # message translation stuff
+# 
+# pot: po/AppChart.pot
+# 
+# po/AppChart.pot: po/header.pot $(PO_FILES)
+# 	xgettext \
+# 	  --omit-header \
+# 	  --language=Perl \
+# 	  --keyword=__ \
+# 	  --add-comments=TRANSLATORS: \
+# 	  --width=78 \
+# 	  --msgid-bugs-address='Kevin Ryde <user42_kevin@yahoo.com.au>' \
+# 	  --copyright-holder="Kevin Ryde" \
+# 	  --default-domain=AppChart \
+# 	  --package-name=Chart \
+# 	  --package-version='$(VERSION)' \
+# 	  --output=AppChart.tmp \
+# 	  --from-code=utf-8 \
+# 	  --keyword=__ \
+# 	  --keyword=__x \
+# 	  $(PO_FILES)
+# 	cat po/header.pot AppChart.tmp >$@
+# 	rm AppChart.tmp
+# 
+# MAKE_FRAG
+#   $ret .= generate_po_rules($self);
+#   $ret .= <<'MAKE_FRAG';
+# 
+# 
+# #------------------------------------------------------------------------------
+# # doc stuff
+# 
+# doc/chart.info: doc/chart.texi doc/version.texi
+# 	cd doc; makeinfo chart.texi
+# 
+# doc/version.texi: Makefile
+# 	echo '@c  Generated by top-level Makefile, DO NOT EDIT' >doc/version.texi
+# 	echo '@set VERSION $(VERSION)' >>doc/version.texi
+# 
+# lib/App/Chart/chart.html: doc/chart.texi doc/version.texi
+# 	cd doc; makeinfo --html --no-split --output=../$@ chart.texi
+# 
+# doc: doc/chart.info lib/App/Chart/chart.html
+# 
+# 
+# #------------------------------------------------------------------------------
+# # development stuff
+# 
+# # filter-out is a GNU-ism
+# LINT_FILES = $(filter-out %/COPYING %.desktop %.html %.mo, $(TO_INST_PM))\
+#              t/*.t devel/*.pl examples/*.pl
+# lint:
+# 	for i in $(LINT_FILES); do \
+# 	  perl -I lib -MO=Lint,no-context,no-regexp-variables $$i; \
+# 	done
+# 	podchecker $(LINT_FILES)
+# pc:
+# 	perlcritic $(LINT_FILES)
+# 
+# myman:
+# 	mv MANIFEST MANIFEST.old
+# 	touch SIGNATURE
+# 	(make manifest 2>&1; diff -u MANIFEST.old MANIFEST) |less
+# 
+# # find files in the dist with mod times this year, but without this year in
+# # the copyright line
+# copyright-years-check: chart-$(VERSION).tar.gz
+# 	year=`date +%Y`; \
+# 	tar tvfz chart-$(VERSION).tar.gz \
+# 	| grep $$year- \
+# 	| sed 's:^.*chart-$(VERSION)/::' \
+# 	| (result=0; \
+# 	  while read i; do \
+# 	    case $$i in \
+# 	      '' | */ | *.gmo \
+# 	      | debian/changelog | debian/compat | debian/control \
+# 	      | debian/doc-base \
+# 	      | misc/* | doc/*.txt | doc/*.eps \
+# 	      | SIGNATURE | META.yml) \
+# 	      continue ;; \
+# 	    esac; \
+# 	    if test -e "$(srcdir)/$$i"; then f="$(srcdir)/$$i"; \
+# 	    else f="$$i"; fi; \
+# 	    if ! grep -q "Copyright.*$$year" $$f; then \
+# 	      echo "$$i:1: this file"; \
+# 	      grep Copyright $$f; \
+# 	      result=1; \
+# 	    fi; \
+# 	  done; \
+# 	  exit $$result)
+# 
+# debug-constants-check:
+# 	if egrep -n 'DEBUG => [1-9]' $(TO_INST_PM); then exit 1; else exit 0; fi
+# 
+# TAGS: $(TO_INST_PM)
+# 	etags $(TO_INST_PM)
+# 
+# MAKE_FRAG
+#   return $ret;
+# }

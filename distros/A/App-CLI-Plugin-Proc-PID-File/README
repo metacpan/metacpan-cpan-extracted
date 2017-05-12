@@ -1,0 +1,27 @@
+This is Perl module App::CLI::Plugin::Proc::PID::File.
+
+INSTALLATION
+
+App::CLI::Plugin::Proc::PID::File installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan App::CLI::Plugin::Proc::PID::File
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+App::CLI::Plugin::Proc::PID::File documentation is available as in POD. So you can do:
+
+    % perldoc App::CLI::Plugin::Proc::PID::File
+
+to read the documentation online with your favorite pager.
+
+Akira Horimoto

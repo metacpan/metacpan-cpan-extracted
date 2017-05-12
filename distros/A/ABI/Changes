@@ -1,0 +1,16 @@
+#$Id: Changes,v 1.1.1.1.2.2 2006/11/20 03:18:12 malay Exp $
+
+Revision history for Perl extension ABI.
+
+1.0  Sat Nov  18  04:22:53 2006
+	- Changed to Module::Build system
+	- Added test data
+	- Changed to Test::More
+	- Access to user modified sequence
+	- Access to user modified basecalls
+	
+
+0.01  Thu May  2 04:22:53 2002
+	- original version; created by h2xs 1.21 with options
+		-XA -n ABI
+

@@ -1,0 +1,441 @@
+<html>
+<head>
+  <script src="../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <link href="GvaScript_doc.css" rel="stylesheet" type="text/css">
+  <script>
+    document.observe('dom:loaded', function() { new GvaScript.TreeNavigator('TN_tree'); });
+    function jumpto_href(event) {
+      var label = event.controller.label(event.target);
+      if (label && label.tagName == "A") {
+        label.focus();
+        return Event.stopNone;
+      }
+    }
+  </script>
+</head>
+<body>
+<div id='TN_tree'>
+  <div class="TN_node">
+   <h1 class="TN_label">Alien::GvaScript::ProtoExtensions</h1>
+   <div class="TN_content">
+     <p><em>Extensions to prototype.js
+</em></p>
+     <div class="TN_node"  onPing="jumpto_href">
+       <h3 class="TN_label">Table of contents</h3>
+       <div class="TN_content">
+         <div class="TN_leaf">
+  <a class="TN_label" href="#NAME">NAME</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#SYNOPSIS">SYNOPSIS</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#DESCRIPTION">DESCRIPTION</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#METHODS">METHODS</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Events_delegation">Events delegation</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#Prototype_getJSON">Prototype.getJSON</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#Hash_utilities">Hash utilities</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Hash_expand">Hash.expand</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#Hash_flatten">Hash.flatten</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#String_extensions">String extensions</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#chomp">chomp</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#Element_extensions">Element extensions</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#flash">flash</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#hasAnyClass">hasAnyClass</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#getElementsByClassNames">getElementsByClassNames</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#navigateDom">navigateDom</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#autoScroll">autoScroll</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#outerHTML">outerHTML</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#Form_Element_extensions">Form.Element extensions</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#setValue">setValue</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#Event_extensions">Event extensions</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#detailedStop">detailedStop</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#stopAll">stopAll</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#Class_extensions">Class extensions</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#checkOptions">checkOptions</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#ASSERT">ASSERT</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#CSSPREFIX">CSSPREFIX</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+
+       </div>
+     </div>
+     <hr/>
+   </div>
+  </div>
+  <div class="TN_node" id="NAME">
+    <h2 class="TN_label">NAME</h2>
+    <div class="TN_content">
+      <p>Alien::GvaScript::ProtoExtensions - Extensions to prototype.js</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="SYNOPSIS">
+    <h2 class="TN_label">SYNOPSIS</h2>
+    <div class="TN_content">
+      <pre>  Element.hasAnyClass(elem, ["class1", "class2", ...]);  
+  Element.getElementsByClassNames(elem, ["class1", "class2", ...]);  
+
+  var stop_condition = function(elem) { return elem.tagName == "SPAN"};
+  Element.navigateDom(elem, "nextSibling", ["class1", "class2", ...],
+                       stop_condition);
+
+  this.options = Class.checkOptions(defaultOptions, receivedOptions);
+
+  Element.register(elem, 'input.active', 'mouseover', function(e) {
+    e._target.addClassName('hover');
+  });
+  Element.unregister(elem, 'input.active', 'mouseover');
+
+  Element.store(elem, key, value);
+  Element.retrieve(elem, key, default);</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="DESCRIPTION">
+    <h2 class="TN_label">DESCRIPTION</h2>
+    <div class="TN_content">
+      <p>Some extensions to the basic abstractions supplied by
+prototype.js.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="METHODS">
+    <h2 class="TN_label">METHODS</h2>
+    <div class="TN_content">
+        <div class="TN_node" id="Events_delegation">
+    <h3 class="TN_label">Events delegation</h3>
+    <div class="TN_content">
+      <pre>  Will be a part of prototype's core distribution starting version 1.7
+  as discussed here 
+  [https://prototype.lighthouseapp.com/projects/8886/tickets/435-eventdelegate-and-elementmethodsdelegate]</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="Prototype_getJSON">
+    <h3 class="TN_label">Prototype.getJSON</h3>
+    <div class="TN_content">
+      <pre>  Prototype.getJSON(url, callback)</pre>
+
+<p>based on: getJSON function by Juriy Zaytsev <a href="http://github.com/kangax/protolicious/tree/master/get_json.js">http://github.com/kangax/protolicious/tree/master/get_json.js</a></p>
+<p>A method to temporarily load JSON data (ideally hosted on a different domain and accessible via JSONP service) and send it over to callback method when ready.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Hash_utilities">
+    <h3 class="TN_label">Hash utilities</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="Hash_expand">
+    <h4 class="TN_label">Hash.expand</h4>
+    <div class="TN_content">
+      <pre>  var tree = Hash.expand(flat_hash);</pre>
+
+<p>Transforms a flat structure of key-value pairs into a nested tree
+structure, by splitting keys on dots.
+The idea and algorithm come from <i>CGI::Expand/expand_hash</i>.</p>
+<pre>  Hash.expand({a: '...', b.0.x: '...', b.0.y: '...', b.1.x: '...', b.1.y: '...'}) =&gt;
+  {a: '...', b: [{x: '...', y: '...'}, {x: '...', y: '...'}]}</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="Hash_flatten">
+    <h4 class="TN_label">Hash.flatten</h4>
+    <div class="TN_content">
+      <p>The exact opposite of Hash.expand</p>
+<p>Transforms a nested tree structure into a flat hash of key-value pairs
+where nested keys are joined by a dot.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="String_extensions">
+    <h3 class="TN_label">String extensions</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="chomp">
+    <h4 class="TN_label">chomp</h4>
+    <div class="TN_content">
+      <p>Strips any trailing line breaks (\r\n) from a String.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Element_extensions">
+    <h3 class="TN_label">Element extensions</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="flash">
+    <h4 class="TN_label">flash</h4>
+    <div class="TN_content">
+      <p>only applied to ['SPAN', 'DIV', 'INPUT', 'BUTTON', 'TEXTAREA', 'A'] elements.</p>
+<p>used to set a classname to the element for a brief moment of time.</p>
+<pre>  Element.flash(elem, {duration: I&lt;time_mes&gt;, classname: I&lt;classname_to_set&gt;});</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="hasAnyClass">
+    <h4 class="TN_label">hasAnyClass</h4>
+    <div class="TN_content">
+      <pre>  if (Element.hasAnyClass(elem, ["class1", "class2", ...]) {...}  
+
+  if (Element.hasAnyClass(elem, "class1") {...}</pre>
+
+<p>Returns true if the supplied element has any of the given classes. 
+For convenience, also accepts a single string instead of an array
+when testing for a single class.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="getElementsByClassNames">
+    <h4 class="TN_label">getElementsByClassNames</h4>
+    <div class="TN_content">
+      <pre>  var subElements 
+     = Element.getElementsByClassNames(rootElement, ["class1", "class2", ...]);</pre>
+
+<p>Returns an array of children of <code>rootElement</code> that have any
+of the given class names.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="navigateDom">
+    <h4 class="TN_label">navigateDom</h4>
+    <div class="TN_content">
+      <pre>  var wantedClasses = ["class1", "class2", ...];
+  
+  // which direction to navigate (could be "parentNode", etc.)
+  var direction     = "nextSibling"; 
+
+  // some criteria for stopping navigation (can be anything, here a stupid
+  // example)
+  var stopCondition = function(elem) {return elem.innerHTML.length &gt; 10}
+
+  var nextElement
+    = Element.navigateDom(startElement, direction, wantedClasses,
+                          stopCondition);</pre>
+
+<p>Returns an extended (prototype's <code>Element.extend()</code>) copy of HTMLElement.</p>
+<p>Walks through the DOM in the given direction, until finding an
+element that has one of the given classnames, or finding a stop
+condition (in which case <code>null</code> is returned).</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="autoScroll">
+    <h4 class="TN_label">autoScroll</h4>
+    <div class="TN_content">
+      <pre>  Element.autoScroll(elem, percentage)</pre>
+
+<p>Makes sure that <code>elem</code> is visible in the central area of 
+its offset parent; if not, the parent is scrolled.
+<code>percentage</code> is the ratio between the parent height and the 
+margin at which scrolling must occur, i.e. if 
+<code>percentage = 20</code> (the default), then scrolling
+occurs if the element is in the higher than the top 20% or 
+lower than the bottom 20% of the viewport.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="outerHTML">
+    <h4 class="TN_label">outerHTML</h4>
+    <div class="TN_content">
+      <pre>  Element.outerHTML(elem)</pre>
+
+<p>Returns a string representation of the DOM element,
+including tags and attributes. Implemented through
+the native <code>outerHTML</code> property, if present; otherwise
+constructs a string from tag name, attributes and 
+innerHTML property.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Form_Element_extensions">
+    <h3 class="TN_label">Form.Element extensions</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="setValue">
+    <h4 class="TN_label">setValue</h4>
+    <div class="TN_content">
+      <p>Form.Element.setValue method is wrapped to fire a
+'value:change' custom event with oldvalue and newvalue
+properties set in the event.memo</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Event_extensions">
+    <h3 class="TN_label">Event extensions</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="detailedStop">
+    <h4 class="TN_label">detailedStop</h4>
+    <div class="TN_content">
+      <pre>  Event.detailedStop(event, toStop);</pre>
+
+<p>Browser-independent method to control fine details of
+event stopping within event handlers. 
+The <code>toStop</code> argument is an object
+which may contain the following properties:</p>
+<ul>
+<li><a name="item_stopPropagation"></a><b>stopPropagation</b>
+<p>if true, the event will not be passed  to further
+handlers up the bubbling hierarchy.</p>
+</li>
+<li><a name="item_preventDefault"></a><b>preventDefault</b>
+<p>if true, the default behaviour of the browser
+for that event will be cancelled</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="stopAll">
+    <h4 class="TN_label">stopAll</h4>
+    <div class="TN_content">
+      <p>Just a convenience object, having both properties
+above set to true. So</p>
+<pre>  Event.detailedStop(event, Event.stopAll);</pre>
+
+<p>is equivalent to calling prototype's <code>Event.stop(event)</code>.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Class_extensions">
+    <h3 class="TN_label">Class extensions</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="checkOptions">
+    <h4 class="TN_label">checkOptions</h4>
+    <div class="TN_content">
+      <pre>  this.options = Class.checkOptions(defaultOptions, ctorOptions)</pre>
+
+<p>Utility for constructor methods. The first argument is an object
+containing a collection of default options (keys and values).
+The second argument is a similar object, containing options
+given to the constructor.</p>
+<p>If one of the keys in <code>ctorOptions</code> has no corresponding
+key in  <code>defaultOptions</code>, an error is generated (because
+the constructor does not expect such a key). Otherwise,
+the concatenation of both objects is returned (i.e. values
+in <code>ctorOptions</code> take precedence over values in 
+<code>defaultOptions</code>).</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="ASSERT">
+    <h3 class="TN_label">ASSERT</h3>
+    <div class="TN_content">
+      <pre>  ASSERT (cond, msg);</pre>
+
+<p>Checks if <code>cond</code> is true, and if not, generates an error 
+with message <code>msg</code>.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="CSSPREFIX">
+    <h3 class="TN_label">CSSPREFIX</h3>
+    <div class="TN_content">
+      <pre>  CSSPREFIX ();</pre>
+
+<p>Returns value of <code>CSS_PREFIX</code> global variable if found. If not,
+default to 'gva'.</p>
+<p>This value is used to prefix css classnames of html elements that are
+derived in some GvaScript classes.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

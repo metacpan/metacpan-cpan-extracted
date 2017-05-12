@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/App/watcher.pm
+script/watcher
+t/00_compile.t
+xt/001_version.t
+xt/002_run.t
+xt/003_signal.t
+xt/02_perlcritic.t
+META.yml
+MANIFEST

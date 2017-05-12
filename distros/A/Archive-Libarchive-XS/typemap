@@ -1,0 +1,26 @@
+TYPEMAP
+struct archive *	T_PTR
+struct archive_entry *	T_PTR
+struct archive_entry_linkresolver *	T_PTR
+struct archive_acl *	T_PTR
+__LA_INT64_T	T_INT64
+string_or_null	T_PV_OR_NULL
+dev_t	T_INT64
+int64_t	T_INT64
+uint64_t	T_UINT64
+
+INPUT
+T_PV_OR_NULL
+  $var = SvOK($arg) ? ($type)SvPV_nolen($arg) : NULL;
+T_INT64
+        $var = SvI64($arg);
+T_UINT64
+        $var = SvU64($arg);
+
+OUTPUT
+T_PV_OR_NULL
+  $var != NULL ? sv_setpv((SV*)$arg, $var) : sv_setsv((SV*)$arg, &PL_sv_undef);
+T_INT64
+        $arg = newSVi64($var);
+T_UINT64
+        $arg = newSVu64($var);

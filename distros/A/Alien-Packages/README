@@ -1,0 +1,143 @@
+NAME
+    Alien::Packages - Find information of installed packages
+
+SYNOPSIS
+        my $ap = Alien::Packages->new();
+
+        my @packages = $ap->list_packages();
+        foreach my $pkg (@packages)
+        {
+            print "$pkg->[0] version $pkg->[1]: $pkg->[2]\n";
+        }
+
+        my %perl_owners = $ap->list_fileowners( File::Spec->rel2abs( $^X ) );
+        while( my ($fn, $pkg) = each( %perl_owners ) )
+        {
+            print "$fn is provided by ", join( ", ", @$pkg ), "\n";
+        }
+
+SUBROUTINES/METHODS
+  new
+    Instantiates new Alien::Packages object. Attributes can be specified for
+    used finder (of type Module::Pluggable::Object). Additionally,
+
+    "only_loaded"
+        Use only plugins which are still loaded.
+
+    can be specified with a true value. This forces to grep %INC instead of
+    using Module::Pluggable.
+
+  list_packages
+    Lists the installed packages on the system (if the caller has the
+    permission to do).
+
+    Results in a list of array references, whereby each item contains:
+
+      {
+          PkgType => $pkg_type, # e.g. 'dpkg', 'pkgsrc', ...
+          Package => $pkg_name,
+          Version => $version,
+          Summary => $summary,
+      }
+
+    "type" is the packager type, e.g. *rpm*, *lpp* or *pkgsrc*.
+
+  list_fileowners
+    Provides an association between files on the system and the package
+    which reference it (has presumably installed it).
+
+    Returns a hash with the files names as key and a list of referencing
+    package names as value:
+
+      '/absolute/path/to/file' =>
+          [
+              {
+                  PkgType => $pkg_type,
+                  Package => $pkg_name,
+              }
+          ],
+      ...
+
+AUTHOR
+    Jens Rehsack, "<rehsack at cpan.org>"
+
+GETTING HELP
+    To get novice help, it's usually recommended to ask on typical platforms
+    like PerlMonks. To help you make the best use of the PerlMonks platform,
+    and any other lists or forums you may use, I strongly recommend that you
+    read "How To Ask Questions The Smart Way" by Eric Raymond:
+    <http://www.catb.org/~esr/faqs/smart-questions.html>.
+
+    If you really asks a question what noone can answer, please drop me a
+    note with the question URL to either my CPAN address or on
+    "irc.perl.org" in the channels "#toolchain" or "#devops". I'll try to
+    answer as best as I can (and as soon, as possible, of course).
+
+  Where can I go for help with a concrete version?
+    Bugs and feature requests are accepted against the latest version only.
+    To get patches for earlier versions, you need to get an agreement with a
+    developer of your choice - who may or not report the issue and a
+    suggested fix upstream (depends on the license you have chosen).
+
+  Business support and maintenance
+    For business support you can contact Jens via his CPAN email address
+    rehsackATcpan.org. Please keep in mind that business support is neither
+    available for free nor are you eligible to receive any support based on
+    the license distributed with this package.
+
+BUGS
+    This module is alpha software, the API may change in future releases.
+    See Alien::Packages::Roadmap for more details.
+
+    Please report any bugs or feature requests to "bug-alien-packages at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Alien-Packages>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Alien::Packages
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-Packages>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Alien-Packages>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Alien-Packages>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Alien-Packages/>
+
+    If you think you've found a bug then please also read "How to Report
+    Bugs Effectively" by Simon Tatham:
+    <http://www.chiark.greenend.org.uk/~sgtatham/bugs.html>.
+
+RESOURCES AND CONTRIBUTIONS
+    There're several ways how you can help to support future development:
+    You can hire the author to implement the features you require at most
+    (this also defines priorities), you can negotiate a support and
+    maintenance contract with the company of the author and you can provide
+    tests and patches. Further, you can submit documentation and links to
+    resources to improve or add packaging systems or grant remote access to
+    machines with insufficient supported packaging tools.
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2010 Jens Rehsack.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

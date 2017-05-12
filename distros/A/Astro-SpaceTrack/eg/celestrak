@@ -1,0 +1,46 @@
+#!/usr/local/bin/perl
+
+#	Retrieve data from Celestrak.com
+
+use strict;
+use warnings;
+
+our $VERSION = '0.098';
+
+use Astro::SpaceTrack;
+
+#	Instantiate our object. The arguments get passed to set ().
+#	We set direct true because Celestrak.com is a redistributor,
+#	and we can get the data without going to Space-Track and
+#	logging in. If we didn't do this, we would find out what
+#	to get from Celestrak.com, but the actual data would come
+#	from www.spacetrack.org, and we would need an account there.
+#	We set verbose to get a list of valid catalog names if we
+#	put in a bad one.
+
+my $st = Astro::SpaceTrack->new (direct => 1, verbose => 1);
+
+#	Default the catalog names to 'visual', which represents the
+#	hundred (or so) brightest.
+
+@ARGV or push @ARGV, qw{visual};
+
+#	Celestrak.com organizes the data by catalog name. For each
+#	one ...
+
+foreach my $catalog (@ARGV) {
+
+#	Attempt to retrieve the data.
+
+    my $rslt = $st->celestrak ($catalog);
+
+#	If we got it, send it to standard out; otherwise send the
+#	error to standard error.
+
+    if ($rslt->is_success) {
+	print $rslt->content;
+    } else {
+	warn $rslt->status_line;
+    }
+
+}

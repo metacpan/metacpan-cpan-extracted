@@ -1,0 +1,2 @@
+name = "AlignDB-Run"
+badges = ['travis', 'codecov', 'metacpan']

@@ -1,0 +1,227 @@
+[%#
+   Apache2::WebApp::Toolkit - Admin Control Panel (users.tt)
+   Copyright (C) 2010 Marc S. Brooks <mbrooks@cpan.org>
+
+   Licensed under the terms of the BSD License
+   http://www.opensource.org/licenses/bsd-license.php
+-%]
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Users</title>
+
+	<meta http-equiv="pragma" content="no-cache" />
+
+	<script type="text/javascript" src="/extras/admin/js/disable.js"></script>
+	<script type="text/javascript" src="/extras/admin/js/prompt.js"></script>
+
+	<style type="text/css">
+		@import url( /extras/admin/css/base.css );
+		@import url( /extras/admin/css/content.css );
+		@import url( /extras/admin/css/form.css );
+		@import url( /extras/admin/css/results.css );
+	</style>
+</head>
+<body>
+
+<noscript>
+	<h2>
+		To use this admin you must have a JavaScript-enabled browser
+	</h2>
+</noscript>
+
+
+<!-- page begin -->
+
+<div id="page">
+	<div class="print">
+		<a onClick="window.print()" title="Print">
+			Print
+		</a>
+	</div>
+
+	<h2 class="title">
+		Users
+	</h2>
+</div>
+
+<!-- page end -->
+
+
+<div id="split">
+	<hr></hr>
+</div>
+
+
+<!-- navtop begin -->
+
+<div id="navtop">
+
+
+	<!-- results begin -->
+
+	<div class="results">
+
+	[% IF data.results.total %]
+		Listing [% data.results.first %] - [% data.results.last %] of [% data.results.total %] users
+	[% ELSE %]
+		No results found..
+	[% END %]
+
+	</div>
+
+	<!-- results end -->
+
+
+	<!-- options begin -->
+
+	<div class="options">
+		<a href="/app/admin/users/add" title="Add User">
+			Add User
+		</a>
+	</div>
+
+	<!-- options end -->
+
+
+</div>
+
+<!-- navtop end -->
+
+
+[% IF data.pages.total > 1 %]
+<form method="post" action="/app/admin/users" name="view">
+<input type="hidden" name="cmd" value="submit" />
+<input type="hidden" name="username" value="[% username %]" />
+<input type="hidden" name="start" value="" />
+<input type="hidden" name="sc" value="[% sc %]" />
+<input type="hidden" name="so" value="[% so %]" />
+</form>
+
+<script type="text/javascript">
+<!--//
+function startWith(num) {
+	document.view.start.value = num;
+	document.view.submit();
+}
+//-->
+</script>
+
+
+<!-- pages begin -->
+
+<div id="pages">
+	<p class="info">
+		Page [% data.pages.current %] of [% data.pages.total %]
+	</p>
+
+	<p class="links">
+		[% data.pages.links %]
+	</p>
+</div>
+
+<!-- pages end -->
+[% END %]
+
+
+[% IF data.results.total %]
+<div id="shadow">
+
+<!-- table begin -->
+
+<table id="table">
+	<tr>
+		<td class="[% IF sc == 'username' %]on[% ELSE %]off[% END %] main_1">
+			<a class="[% IF so == 'desc' %]desc[% ELSE %]asc[% END %] main" href="/app/admin/users/?sc=username&so=[% IF sc == 'username' && so == 'desc' %]asc[% ELSE %]desc[% END %]&start=[% start %]" title="Sort [% IF so == 'desc' %]Desc[% ELSE %]Asc[% END %]">
+				<strong>
+					User Name
+				</strong>
+			</a>
+		</td>
+		<td class="off">
+			<span class="options">
+				<strong>
+					Options
+				</strong>
+			</span>
+		</td>
+		<td class="[% IF sc == 'created' %]on[% ELSE %]off[% END %]">
+			<a class="[% IF so == 'desc' %]desc[% ELSE %]asc[% END %] date" href="/app/admin/users/?sc=created&so=[% IF sc == 'created' && so == 'desc' %]asc[% ELSE %]desc[% END %]&start=[% start %]" title="Sort [% IF so == 'desc' %]Desc[% ELSE %]Asc[% END %]">
+				<strong>
+					Created
+				</strong>
+			</a>
+		</td>
+		<td class="[% IF sc == 'status' %]on[% ELSE %]off[% END %]">
+			<a class="[% IF so == 'desc' %]desc[% ELSE %]asc[% END %] select" href="/app/admin/users/?sc=status&so=[% IF sc == 'status' && so == 'desc' %]asc[% ELSE %]desc[% END %]&start=[% start %]" title="Sort [% IF so == 'desc' %]Desc[% ELSE %]Asc[% END %]">
+				<strong>
+					Status
+				</strong>
+			</a>
+		</td>
+	</tr>
+
+<!-- loop begin -->
+
+[% FOREACH row IN data.results.loop %]
+	<tr onMouseOver="this.bgColor='#FFFF00'" onMouseOut="this.bgColor='#FFFFFF'">
+		<td class="left main_2">
+			[% row.username %]
+		</td>
+		<td>
+			<a href="/app/admin/users/edit/?username=[% row.username %]" title="Edit &#040;[% row.username %]&#041;">
+				Edit</a>
+
+			&#124;
+
+			<a [% IF row.username != 'admin' %]onClick="confirmDelete('[% row.username %]','/app/admin/users/delete/?username=[% row.username %]&sc=[% sc %]&so=[% so %]&start=[% start %]')" title="Delete &#040;[% row.username %]&#041;"[% ELSE %]style="color: #CCCCCC"[% END %]>
+				Delete
+			</a>
+		</td>
+		<td>
+			[% row.created %]
+		</td>
+		<td class="right">
+			<form>
+
+			<select style="width:100px" onChange="window.open( '/app/admin/users/status/?username=[% row.username %]&value=' + this.value + '&sc=[% sc %]&so=[% so %]&start=[% start %]', '_self' )" [% IF row.username == 'admin' %]disabled=true[% END %]
+				<option value="Disabled" [% IF row.status == 'Disabled' %]selected[% END %]>Disabled</option>
+				<option value="Active" [% IF row.status == 'Active' %]selected[% END %]>Active</option>
+			</select>
+
+			</form>
+		</td>
+	</tr>
+[% END %]
+
+<!-- loop end -->
+
+</table>
+
+<!-- table end -->
+
+
+</div>
+[% END %]
+
+[% IF data.pages.total > 1 %]
+<!-- pages begin -->
+
+<div id="pages">
+	<p class="info">
+		Page [% data.pages.current %] of [% data.pages.total %]
+	</p>
+
+	<p class="links">
+		[% data.pages.links %]
+	</p>
+</div>
+
+<!-- pages end -->
+[% END %]
+
+</body>
+</html>

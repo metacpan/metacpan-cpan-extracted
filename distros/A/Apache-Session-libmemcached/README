@@ -1,0 +1,36 @@
+Apache-Session-libmemcached
+
+This module is an implementation of Apache::Session. It uses the fast
+Memcached::libmemcached module to store sessions in memcached. See the
+example, and the documentation for Apache::Session::libmemcached for more
+details.
+
+DEPENDENCIES
+
+Apache-Session
+Memcached-libmemcached
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Apache::Session::libmemcached
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Venda Ltd.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

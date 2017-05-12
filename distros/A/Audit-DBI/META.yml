@@ -1,0 +1,48 @@
+---
+abstract: 'Audit data changes in your code and store searchable log records in a database.'
+author:
+  - 'Guillaume Aubert <aubertg@cpan.org>'
+build_requires:
+  Config::Tiny: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  Test::Exception: '0'
+  Test::FailWarnings: '0'
+  Test::More: '0.94'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Audit-DBI
+no_index:
+  file:
+    - t/LocalTest.pm
+provides:
+  Audit::DBI:
+    file: lib/Audit/DBI.pm
+    version: v1.9.0
+  Audit::DBI::Event:
+    file: lib/Audit/DBI/Event.pm
+    version: v1.9.0
+  Audit::DBI::Utils:
+    file: lib/Audit/DBI/Utils.pm
+    version: v1.9.0
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Data::Dumper: '0'
+  Data::Validate::Type: '0'
+  MIME::Base64: '0'
+  Storable: '0'
+  Try::Tiny: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/guillaumeaubert/Audit-DBI/issues
+  homepage: https://metacpan.org/release/Audit-DBI
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/guillaumeaubert/Audit-DBI
+version: v1.9.0

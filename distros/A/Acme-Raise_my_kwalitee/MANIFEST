@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Acme-Raise_my_kwalitee.t
+lib/Acme/Raise_my_kwalitee.pm
+META.yml                                 Module meta-data (added by MakeMaker)

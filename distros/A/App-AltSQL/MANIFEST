@@ -1,0 +1,37 @@
+bin/altsql
+Changes
+lib/App/AltSQL.pm
+lib/App/AltSQL/Model.pm
+lib/App/AltSQL/Model/MySQL.pm
+lib/App/AltSQL/Plugin/Dump.pm
+lib/App/AltSQL/Plugin/Dump/Format.pm
+lib/App/AltSQL/Plugin/Dump/Format/csv.pm
+lib/App/AltSQL/Plugin/Dump/Format/html.pm
+lib/App/AltSQL/Plugin/Dump/Format/json.pm
+lib/App/AltSQL/Plugin/Dump/Format/perl.pm
+lib/App/AltSQL/Plugin/Dump/Format/sql.pm
+lib/App/AltSQL/Plugin/Dump/Format/xls.pm
+lib/App/AltSQL/Plugin/Dump/Format/xml.pm
+lib/App/AltSQL/Plugin/Dump/Format/yaml.pm
+lib/App/AltSQL/Plugin/Tail.pm
+lib/App/AltSQL/Role.pm
+lib/App/AltSQL/Term.pm
+lib/App/AltSQL/View.pm
+lib/App/AltSQL/View/Plugin/Color.pm
+lib/App/AltSQL/View/Plugin/UnicodeBox.pm
+Build.PL
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README.pod
+INSTALL
+t/001_arguments.t
+t/002_my_cnf.t
+t/003_custom_prompt.t
+t/sql/sakila-data.sql
+t/sql/sakila-schema.sql
+lib/App/AltSQL/View/Plugin/VerticalSorted.pm
+lib/App/AltSQL/Term/Plugin/SyntaxHighlight.pm
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,11 @@
+Change history for AnyEvent-Retry
+0.03     Sun Nov 7 01:15:49 CDT 2010
+    - add $VERSION number
+    - make everything immutable
+    - add optional prereq on Coro
+
+0.02     Fri Nov 5 04:41:33 CDT 2010
+    - add Coro support
+
+0.01     Fri Nov 5 03:34:00 CDT 2010
+    - initial release

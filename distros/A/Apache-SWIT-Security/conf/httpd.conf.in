@@ -1,0 +1,4 @@
+RewriteEngine on
+RewriteRule ^/$ /a/index/r [R]
+Alias /apache/swit/security/www @ServerRoot@/public_html 
+Alias /html-tested-javascript /usr/local/share/libhtml-tested-javascript-perl

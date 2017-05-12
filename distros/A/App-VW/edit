@@ -1,0 +1,2 @@
+#!/bin/bash
+${1:-vim} -p bin/vw bin/vw-bus lib/App/VW.pm lib/App/VW/{Help,Install,Setup,Start,Stop,Restart}.pm

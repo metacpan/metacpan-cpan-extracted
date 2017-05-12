@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+
+use v5.10;
+use App::Run;
+use Crypt::XkcdPassword;
+
+say Crypt::XkcdPassword->make_password;
+
+1;

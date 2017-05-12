@@ -1,0 +1,1508 @@
+head	1.10;
+access;
+symbols;
+locks;
+comment	@# @;
+
+
+1.10
+date	2007.12.08.03.19.43;	author atobey;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2002.07.31.16.44.14;	author Administrator;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2002.07.30.20.31.10;	author Administrator;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2002.07.30.20.16.01;	author Administrator;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2001.06.22.19.09.01;	author root;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2001.06.22.18.15.02;	author root;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2001.06.19.19.39.39;	author root;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2001.06.19.19.05.36;	author root;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2001.06.15.18.17.42;	author root;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2001.06.15.17.57.04;	author root;	state Exp;
+branches;
+next	;
+
+
+desc
+@Created
+@
+
+
+1.10
+log
+@Ported to mod_perl2 and updated HTML.
+@
+text
+@# $Id: Auth.pm,v 1.9 2002/07/31 16:44:14 Administrator Exp $
+
+package Apache2::AuthenSecurID::Auth;
+
+use strict;
+use ModPerl::Registry;
+use Apache2::porting;
+use Apache2::Request;
+use Apache2::Const qw(:common);
+use IO::Socket::INET;
+use Crypt::CBC;
+use CGI qw(:standard);
+use vars qw($VERSION);
+
+$VERSION = '0.5';
+
+sub handler {
+    my $r   = shift;
+    my $req = Apache2::Request->new($r);
+
+    # seed the random number generator
+    srand( time ^ $$ ^ unpack "%L*", `ps axww | gzip -f` );
+
+    #get params
+    my $username = $req->param('username');
+    my $passcode = $req->param('passcode');
+    my $type     = $req->param('type');
+    my $uri      = $req->param('a');
+
+    # get ace_initd config directives
+    my $ace_initd_server = $r->dir_config("ace_initd_server") || "localhost";
+    my $ace_initd_port   = $r->dir_config("ace_initd_port")   || 1969;
+
+    # grab apache session cookie
+    my ($session_id) =
+      ( ( $r->headers_in->{"Cookie"} || "" ) =~ /Apache=([^;]+)/ );
+
+    my $client = IO::Socket::INET->new(
+        PeerAddr => $ace_initd_server,
+        PeerPort => $ace_initd_port,
+        Proto    => 'udp'
+    );
+
+    my %ACE;
+    my $request;
+    my $message;
+    my $extra_input;
+
+    if (   ( !$username && !$passcode )
+        || ( $type ne "pin" && !$passcode )
+        || ( $passcode =~ /\:/ ) )
+    {
+        $message     = qq{
+            Please enter your username and passcode<br/>
+            Your passcode is your 4 - 8 digit pin plus<br/>
+            6 digit SecurID code.  If you do not have<br/>
+            a PIN yet just enter the 6 digit SecurID code.
+        };
+        $extra_input = qq{
+            <label for="passcode">Passcode :</label>
+            <input type="password" name="passcode" id="passcode"/>
+            <input type="hidden" name="type" value="check"/>
+            <input type="hidden" name="a" value="$uri"/>
+        };
+    }
+    else {
+        if ( $type eq "pin" ) {
+            ( $passcode, $message, $extra_input ) = check_pin( $r, $req );
+            if ($passcode) {
+                ( $message, $extra_input ) =
+                  Do_ACE( $username, $passcode, $type, $session_id, $client, $r, $req );
+            }
+        }
+        else {
+            ( $message, $extra_input ) =
+              Do_ACE( $username, $passcode, $type, $session_id, $client, $r, $req );
+        }
+
+    }
+
+    my $head = qq|
+<body>
+<head>
+    <title>SecurID Authentication</title>
+    <style>
+        label {
+            font-family: monospace;
+        }
+        p {
+            font-family: sans-serif;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<html>
+<!-- $session_id  -->
+<form method="post">
+    <fieldset style="width: 500px; margin-left: auto; margin-right: auto; background: #cccccc;">
+        <legend>SecurID Authorization</legend>
+        <p>$message</p>
+        <br/>
+        <label for="username">Username :</label>
+        <input type="text" name="username" value="$username" id="username"/>
+        <br/>
+        $extra_input
+        <br/>
+        <br/>
+        <input type="submit" name="Submit" value="Enter"/>
+        <input type="reset" name="reset"/>
+        <br/>
+    </fieldset>
+</form>
+</html>
+|;
+
+    $r->content_type('text/html');
+
+    #$r->send_http_header;
+    $r->print($head);
+
+    return Apache2::Const::OK;
+
+}
+
+sub check_pin {
+    my ( $r, $req ) = @@_;
+
+    my $pin1         = $req->param('pin1');
+    my $pin2         = $req->param('pin2');
+    my $alphanumeric = $req->param('alphanumeric');
+    my $min_pin_len  = $req->param('min_pin_len');
+    my $max_pin_len  = $req->param('max_pin_len');
+    my $uri          = $req->param('a');
+    my $message;
+
+    my $extra_info = qq{
+            <span style="font-weight: bold;">User Authenticated</span>
+            <label for="pin1">PIN :</label>
+            <input type="password" name="pin1" id="pin1"/>
+            <input type="hidden" name="type" value="pin"/>
+            <input type="hidden" name="a" value="$uri"/>
+            <input type="hidden" name="alphanumeric" value="$alphanumeric"/>
+            <input type="hidden" name="min_pin_len" value="$min_pin_len"/>
+            <input type="hidden" name="max_pin_len" value="$max_pin_len"/>
+            <label for="pin1">PIN ( Again ) :</label>
+            <input type="password" name="pin2" id="pin2"/>
+       };
+
+    if ( $pin1 != $pin2 ) {
+        $message = qq{
+        <span style="font-weight: bold;">New Pin Required</span>
+        <p>
+            Pins do not match!!
+        </p>
+        <p>
+            Please enter a $min_pin_len to $max_pin_len digit pin.
+        </p>
+       };
+        return ( 0, $message, $extra_info );
+    }
+
+    if ($alphanumeric) {
+        if ( $pin1 =~ /[^0-9a-zA-Z]/ ) {
+            $message = qq{
+                <span style="font-weight: bold;">New Pin Required</span>
+                <p>
+                    Pin must be alphanumeric!!
+                </p>
+                <p>
+                    Please enter a $min_pin_len to $max_pin_len digit pin.
+                </p>
+          };
+            return ( 0, $message, $extra_info );
+        }
+    }
+    else {
+        if ( $pin1 =~ /[^0-9]/ ) {
+            $message = qq{
+                <span style="font-weight: bold;">New Pin Required</span>
+                <p>
+                    Pin must be numeric!!
+                </p>
+                <p>
+                    Please enter a $min_pin_len to $max_pin_len digit pin.
+                </p>
+            };
+            return ( 0, $message, $extra_info );
+        }
+    }
+
+    my $pin_length = length($pin1);
+
+    if ( $pin_length < $min_pin_len || $pin_length > $max_pin_len ) {
+        $message = qq{
+            <span style="font-weight: bold;">New Pin Required</span>
+            <p>
+                Pin must be the correct length!!
+            </p>
+            <p>
+                Please enter a $min_pin_len to $max_pin_len digit pin.
+            </p>
+        };
+        return ( 0, $message, $extra_info );
+    }
+
+    return ( $pin1, 0, 0 );
+
+}
+
+sub Do_ACE {
+
+    my ( $username, $passcode, $type, $session_id, $client, $r, $req ) = @@_;
+
+    $ENV{'VAR_ACE'} ||= "/opt/ace/data";
+    my $message;
+    my $extra_input;
+    my $result;
+    my %info;
+    my $ace;
+    my $mesg;
+    my $my_rand = rand();
+    my $return_rand;
+
+    my $crypt_key = $r->dir_config("AuthCryptKey");
+    my $crypt = new Crypt::CBC( $crypt_key, "Blowfish" );
+
+    $mesg =
+      $crypt->encrypt_hex("$my_rand:$session_id:$type:$username:$passcode");
+    $client->send($mesg);
+
+    $client->recv( $mesg, 1024 );
+    $mesg = $crypt->decrypt_hex($mesg);
+
+    (
+        $return_rand, $result, $info{system_pin}, $info{min_pin_len},
+        $info{max_pin_len}, $info{alphanumeric}, $info{user_selectable}
+    ) = split /\:/, $mesg;
+
+    if ( $my_rand ne $return_rand ) {
+        $result = 100;
+    }
+    ( $message, $extra_input ) =
+      Ace_Result( $result, \%info, $r, $crypt, $req, $username );
+
+    return ( $message, $extra_input );
+
+}
+
+sub Ace_Result {
+
+    my ( $result, $info, $r, $crypt, $req, $username ) = @@_;
+    my $message;
+    my $uri  = $req->param('a');
+    my $extra_input = qq{
+        <label for="passcode">Passcode :</label>
+        <input type="password" name="passcode" id="passcode"/>
+        <input type="hidden" name="type" value="check"/>
+        <input type="hidden" name="a" value="$uri"/>
+    };
+    my $time = time();
+
+    if ( $result == 0 ) {
+
+        my $auth_cookie = $r->dir_config("AuthCookie") || "SecurID";
+        my $auth_user_cookie = $r->dir_config("AuthUserCookie")
+          || "SecurID_User";
+        my $crypt_cookie = $crypt->encrypt_hex("$time:$username");
+        $r->headers_out->add( "Set-Cookie" => $auth_user_cookie . "="
+              . $username
+              . "; path="
+              . "/" );
+        $r->headers_out->add( "Set-Cookie" => $auth_cookie . "="
+              . $crypt_cookie
+              . "; path="
+              . "/" );
+
+        $uri = $crypt->decrypt_hex($uri);
+
+        # success
+        $message = qq{
+            <span style="font-weight: bold;">User Authenticated</span>
+            <script language="javascript">
+                window.location="$uri";
+            </script>
+            <!-- <p>
+                If you do not have Java Script enabled<br/>
+                please click <a href="$uri">here</a> to go to<br/>
+                the protected page.
+            </p> -->
+            <p>
+                Plase enter your username and passcode<br/>
+                Your passcode is your 4 - 8 digit pin plus<br/>
+                6 digit SecurID code.  If you do not have<br/>
+                a PIN yet just enter the 6 digit SecurID code.
+            </p>
+        };
+        $extra_input = '';
+    }
+    elsif ( $result == 1 ) {
+        # failure
+        $message = qq{
+            <span style="font-weight: bold;">User Authenticated Failed</span>
+            <p>
+                Plase enter your username and passcode<br/>
+                Your passcode is your 4 - 8 digit pin plus<br/>
+                6 digit SecurID code.  If you do not have<br/>
+                a PIN yet just enter the 6 digit SecurID code.
+            </p>
+        };
+    }
+    elsif ( $result == 100 ) {
+        # failure
+        $message = qq{
+            <span style="font-weight: bold;">User Authenticated Failed</span>
+            <p>
+                The ACE server is either down or behaving<br/>
+                incorrectly.  Please conact your system<br/>
+                administrator.
+            </p>
+        };
+    }
+    elsif ( $result == 2 ) {
+        # next token code
+        $message = qq{
+            <span style="font-weight: bold;">Next Token Required</span>
+            <p>
+                Plase wait for you token to change and enter<br/>
+                the 6 digit SecurID token code.
+            </p>
+        };
+        $extra_input = qq{
+            <label for="passcode">Passcode :</label>
+            <input type="password" name="passcode" id="passcode"/>
+            <input type="hidden" name="type" value="next"/>
+            <input type="hidden" name="a" value="$uri"/>
+        };
+    }
+    elsif ( $result == 5 ) {
+        # New PIN required.
+        if ( $$info{user_selectable} >= 1 ) {
+            $message = qq|
+                <span style="font-weight: bold;">New Pin Required</span>
+                <p>
+                    Please enter a $$info{min_pin_len} to $$info{max_pin_len} digit pin.
+                </p>
+            |;
+            $extra_input = qq|
+                <label for="pin1">PIN :</label>
+                <input type="password" name="pin1" id="pin1"/>
+                <input type="hidden" name="type" value="pin"/>
+                <input type="hidden" name="a" value="$uri"/>
+                <input type="hidden" name="alphanumeric" value="$$info{alphanumeric}"/>
+                <input type="hidden" name="min_pin_len" value="$$info{min_pin_len}"/>
+                <input type="hidden" name="max_pin_len" value="$$info{max_pin_len}"/>
+                <label for="pin1">PIN ( Again ) :</label>
+                <input type="password" name="pin2" id="pin2"/>
+            |;
+
+        }
+        else {
+            $message = qq|
+                <span style="font-weight: bold;">You have been assigned a new PIN.</span>
+                <p>
+                    Your PIN is: <$$info{system_pin}</span><p>
+                    Please remember your PIN.  Do not share it<br/>
+                    with anyone else.
+                </p>
+                <p>
+                    Please enter your username and passcode<br/>
+                    Your passcode is your 4 - 8 digit pin plus<br/>
+                    6 digit SecurID code.
+                </p>
+            |;
+        }
+    }
+    elsif ( $result == 6 ) {
+        $message = qq{
+                <span style="font-weight: bold;">PIN Accepted</span>
+                <p>
+                    Please remember you PIN.  Do not share it<br/> 
+                    with anyone else.
+                </p>
+                <p>
+                    Please enter your username and passcode<br/>
+                    Your passcode is your 4 - 8 digit pin plus<br/>
+                    6 digit SecurID code.
+                </p>
+        };
+    }
+    elsif ( $result == 7 ) {
+        $message = qq{
+                <span style="font-weight: bold;">PIN Rejected</span>
+                <p>
+                    If you're having difficulties, please contact<br/>
+                    the system administrator.<br/><br/>
+                    Please enter your username and passcode<br/>
+                    Your passcode is your 4 - 8 digit pin plus<br/>
+                    6 digit SecurID code.
+                </p>
+        };
+    }
+    return ( $message, $extra_input );
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Apache2::AuthenSecurID::Auth - Authentication handler for Apache2::AuthenSecurID 
+
+=head1 SYNOPSIS
+
+ # Configuration in httpd.conf  
+
+<Location /path/of/authentication/handler>
+   SetHandler perl-script
+   PerlHandler Apache2::AuthenSecurID::Auth
+
+   PerlSetVar AuthCryptKey Encryption_Key
+   PerlSetVar AuthCookie Name_of_Authentication_Cookie
+   PerlSetVar AuthUserCookie Name_of_Username_Authentication_Cookie
+   PerlSetVar AuthCookiePath /path/of/authentication/cookie
+   PerlSetVar AuthApacheCookie Apache_Cookie
+   PerlSetVar ace_initd_server name.of.ace.handler.server.com
+   PerlSetVar ace_initd_port 1969
+</Location>
+
+=head1 DESCRIPTION
+
+This module allows authentication against a SecurID server.  A request
+is redirected to this handler if the authentication cookie does not
+exist or is no longer valid.  The handler will prompt for username and 
+passcode.  It will then construct and encrypt a UDP packet and send it to 
+the Ace request daemon.  This is necessary since libsdiclient.a needs to 
+persist for NEXT TOKEN MODE and SET PIN MODE.  If the authentication is 
+valid an encrypted Authentication Cookie is set and the request is redirected 
+to the originating URI.  If the user needs to enter NEXT TOKEN or set their 
+PIN they will be prompted to do so and if valid the request is then redirected 
+to the originating URI.
+
+
+=head1 LIST OF TOKENS
+
+
+=item *
+AuthCryptKey
+
+The Blowfish key used to encrypt and decrypt the authentication cookie. 
+It defaults to F<my secret> if this variable is not set.
+
+=item *
+AuthCookie
+
+The name of the of cookie to be set for the authentication token.  
+It defaults to F<SecurID> if this variable is not set.
+
+=item *
+AuthUserCookie
+
+The name of the of cookie that contains the value of the persons username
+in plain text.  This is checked against the contents of the encrypted cookie
+to verify user.  The cookie is set of other applications can identify 
+authorized users.  It defaults to F<SecurID_User> if this variable is not set.
+
+=item *
+AuthCookiePath
+
+The path of the of cookie to be set for the authentication token.  
+It defaults to F</> if this variable is not set.
+
+=item *
+AuthApacheCookie
+
+The name of the mod_usertrack cookie.  The mod_usertrack module must be
+compile and enabled in order to track user sessions.  This is set by the
+CookieName directive in httpd.conf.  It defaults to F<Apache> if this variable 
+is not set.
+
+=item *
+ace_initd_server
+
+The name of the server running the ACE request daemon.  This daemon is the
+actual process that communicates with the ACE Server.  If the user is in
+NEXT TOKEN MODE due to repeated failures or SET PIN MODE the Authen::ACE 
+object must persist beyond the initial request.  A request packet is 
+constructed with a random number, type of transaction, username, passcode
+and session identifier.  The request packet is then encrypted using Blowfish
+and sent to the ACE request daemon.  The ACE request daemon decrypts and
+parses the packet.  The request if forwarded to the ACE server and the 
+response is sent back to the handler.  The random number originally sent is
+returned to prevent attacks.  It defaults to F<localhost> if this variable 
+is not set.
+
+=item *
+ace_initd_port
+
+The port the that the Ace request daemon listens on.  It defaults to F<1969> 
+if this variable is not set.
+
+
+=head1 CONFIGURATION
+
+The module should be loaded upon startup of the Apache daemon.
+Add the following line to your httpd.conf:
+
+ PerlModule Apache2::AuthenSecurID::Auth
+
+=head1 PREREQUISITES
+
+For AuthenSecurID::Auth you need to enable the appropriate call-back hook 
+when making mod_perl: 
+
+  perl Makefile.PL PERL_AUTHEN=1
+
+AuthenSecurID::Auth requires Crypt::Blowfish and Crypt::CBC.
+
+For AuthenSecurID::Auth to properly track users mod_usertrack must be
+compiled and enabled.
+
+
+=head1 SEE ALSO
+
+L<Apache>, L<mod_perl>, L<Authen::ACE> L<Apache2::AuthenSecurID::Auth>
+
+=head1 AUTHORS
+
+=item *
+mod_perl by Doug MacEachern <dougm@@osf.org>
+
+=item *
+Authen::ACE by Dave Carrigan <Dave.Carrigan@@iplenergy.com>
+
+=item *
+Apache::AuthenSecurID by David Berk <dberk@@lump.org>
+
+=item *
+Apache::AuthenSecurID::Auth by David Berk <dberk@@lump.org>
+
+=item *
+port to mod_perl2 and cleanups by Al Tobey <tobert@@gmail.com>
+
+=head1 COPYRIGHT
+
+The Apache2::AuthenSecurID::Auth module is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+=cut
+
+@
+
+
+1.9
+log
+@*** empty log message ***
+@
+text
+@d1 1
+a1 1
+# $Id: Auth.pm,v 1.8 2002/07/30 20:31:10 Administrator Exp $
+d3 1
+a3 1
+package Apache::AuthenSecurID::Auth;
+d6 4
+a9 3
+use Apache;
+use Apache::Registry;
+use Apache::Constants qw(:common);
+d12 1
+d15 1
+a15 2
+$VERSION = '0.4';
+
+d18 2
+d21 2
+a22 1
+   my $r = shift;
+d24 54
+a77 2
+   # seed the random number generator
+   srand (time ^ $$ ^ unpack "%L*", `ps axww | gzip -f`);
+d79 1
+a79 57
+   #get params
+   my %params = ( $r->args, $r->content );
+   my $username = $params {'username'};
+   my $passcode = $params{'passcode'};
+   my $type = $params{'type'};
+   my $uri = $params{'a'};
+
+   # get ace_initd config directives
+   my $ace_initd_server  = $r->dir_config("ace_initd_server") || "localhost";
+   my $ace_initd_port  = $r->dir_config("ace_initd_port") || 1969;
+
+   # grab apache session cookie
+   my ( $session_id ) = ( ($r->header_in("Cookie") || "") =~
+                /Apache=([^;]+)/);
+
+   my $client = IO::Socket::INET->new ( PeerAddr   =>      $ace_initd_server,
+                                        PeerPort   =>      $ace_initd_port,    
+                                        Proto      =>      'udp' );
+
+   my %ACE;
+   my $request;
+   my $message;
+   my $extra_input;
+
+   if ( ( ! $username && ! $passcode ) || ( $type ne "pin"  && ! $passcode ) ||
+         	( $passcode =~ /\:/ ) ) {
+	$message = qq{
+		Please enter your username and passcode<br>
+		Your passcode is your 4 - 8 digit pin plus<br>
+		6 digit SecurID code.  If you do not have<br>
+		a PIN yet just enter the 6 digit SecurID code.
+	};
+	$extra_input = qq{
+		<tr>
+		   <td>
+			<font  color=000000 face="Arial, Helvetica, sans-serif">
+			<b>
+			Passcode :
+			</b>
+			</font>
+		   </td>
+		   <td>
+			<input type=password name=passcode>
+			<input type=hidden name=type value=check>
+			<input type=hidden name=a value=$uri>
+		   </td>
+		</tr>
+	};
+   } else {
+	if ( $type eq "pin" ) {
+		( $passcode, $message,$extra_input) = check_pin ( \%params ) ;
+		if ( $passcode )  {
+			($message,$extra_input) = Do_ACE($username,$passcode,$type,$session_id,$client,$r,\%params);
+		}
+	} else {
+		($message,$extra_input) = Do_ACE($username,$passcode,$type,$session_id,$client,$r,\%params);
+	}
+d81 15
+a95 5
+   }
+
+
+my $head = qq{
+<body bgcolor=F0F8FF link=FFFF00 alink=FFFF00 vlink=FFFF00>
+d98 15
+a112 59
+<center>
+<form method=post>
+<table>
+   <tr>
+	<td colspan=2>
+<table bgcolor=cccccc >
+   <tr>
+	<td>
+	   <table cellspacing=2 bgcolor=dddddd width=100%>
+		<tr>
+		   <td align=center>
+			<font size=+2 color=000000 face="Arial, Helvetica, sans-serif">
+			<b>
+			SecurID Authorization
+			</b>
+			</font>
+		   </td>
+		</tr>
+		<tr>
+		   <td>
+			<font color=000000 face="Arial, Helvetica, sans-serif">
+			$message
+			</font>
+		   </td>
+		</tr>
+	   </table>
+	</td>
+   </tr>
+   <tr>
+	<td align=right>
+	   <table cellspacing=0 cellpadding=0 bgcolor=dddddd width=100%>
+		<tr>
+		   <td>
+			<font  color=000000 face="Arial, Helvetica, sans-serif">
+			<b>
+			Username :
+			</b>
+			</font>
+		   </td>
+		   <td>
+			<input type=text name=username value=$username>
+		   </td>
+		</tr>
+		$extra_input
+	   </table>
+	</td>
+   </tr>
+</table>
+	</td>
+   </tr>
+   <tr>
+	<td>
+		<input type=submit name=Submit value="Enter">
+	</td>
+	<td>
+		<input type=reset name=reset>
+	</td>
+   </tr>
+</table>
+a113 1
+</center>
+d115 6
+a120 1
+};
+d122 1
+a122 3
+$r->content_type ('text/html');
+$r->send_http_header; 
+$r->print ($head);
+d127 1
+d129 62
+a190 1
+	my ( $params ) = @@_;
+d192 1
+a192 68
+	my $pin1 = $$params{'pin1'};
+	my $pin2 = $$params{'pin2'};
+	my $alphanumeric = $$params{'alphanumeric'};
+	my $min_pin_len = $$params{'min_pin_len'};
+	my $max_pin_len = $$params{'max_pin_len'};
+	my $uri = $$params{'a'};
+        my $message;
+
+	my $extra_info = qq{
+		<tr>
+		   <td>
+			<font  color=000000 face="Arial, Helvetica, sans-serif">
+			<b>
+			PIN :
+			</b>
+			</font>
+		   </td>
+		   <td>
+			<input type=password name=pin1>
+			<input type=hidden name=type value=pin>
+			<input type=hidden name=alphanumeric value=$alphanumeric>
+			<input type=hidden name=min_pin_len value=$min_pin_len>
+			<input type=hidden name=max_pin_len value=$max_pin_len>
+			<input type=hidden name=a value=$uri>
+		   </td>
+		</tr>
+		<tr>
+		   <td>
+			<font  color=000000 face="Arial, Helvetica, sans-serif">
+			<b>
+			PIN ( Again ) :
+			</b>
+			</font>
+		   </td>
+		   <td>
+			<input type=password name=pin2>
+		   </td>
+		</tr>
+	   };
+
+	if ( $pin1 != $pin2 ) {
+	   $message = qq{
+		<b>New Pin Required</b><p>
+		Pins do not match!!<p>
+		Please enter a $min_pin_len to $max_pin_len digit pin.
+	   };
+		return ( 0, $message, $extra_info );
+	}
+
+	if ( $alphanumeric ) {
+           if ( $pin1 =~ /[^0-9a-zA-Z]/ ) {
+	      $message = qq{
+		<b>New Pin Required</b><p>
+		Pin must be alphanumeric!!<p>
+		Please enter a $min_pin_len to $max_pin_len digit pin.
+	      };
+		return ( 0, $message, $extra_info );
+           }
+        } else {
+           if ( $pin1 =~ /[^0-9]/ ) {
+	      $message = qq{
+		<b>New Pin Required</b><p>
+		Pin must be numeric!!<p>
+		Please enter a $min_pin_len to $max_pin_len digit pin.
+	      };
+		return ( 0, $message, $extra_info );
+           }
+        }
+d194 12
+a205 1
+	my $pin_length = length ( $pin1 );
+d207 1
+a207 8
+	if ( $pin_length < $min_pin_len || $pin_length > $max_pin_len ) {
+	      $message = qq{
+		<b>New Pin Required</b><p>
+		Pin must be the correct length!!<p>
+		Please enter a $min_pin_len to $max_pin_len digit pin.
+	      };
+		return ( 0, $message, $extra_info );
+	}
+a208 2
+	return ( $pin1, 0, 0 );
+	
+d213 1
+a213 1
+	my ( $username,$passcode,$type,$session_id,$client,$r,$params ) = @@_;	
+d215 30
+a244 28
+	$ENV{'VAR_ACE'} = "/opt/ace/data";
+	my $message;
+	my $extra_input;
+	my $result;
+	my %info;
+	my $ace;
+	my $mesg;
+	my $my_rand = rand();
+	my $return_rand;
+
+	my $crypt_key = $r->dir_config("AuthCryptKey");
+	my $crypt = new Crypt::CBC ( $crypt_key, "Blowfish" );
+	
+	$mesg = $crypt->encrypt_hex ("$my_rand:$session_id:$type:$username:$passcode"); 
+	$client->send($mesg);
+
+	$client->recv($mesg, 1024);
+	$mesg = $crypt->decrypt_hex ( $mesg );
+
+
+	( $return_rand, $result, $info{system_pin}, $info{min_pin_len}, $info{max_pin_len}, 
+	$info{alphanumeric}, $info{user_selectable} )
+	   = split /\:/, $mesg;
+
+	if ( $my_rand ne $return_rand ) {
+		$result = 100;
+	}
+	($message,$extra_input)=Ace_Result($result,\%info,$r,$crypt,$params,$username);
+d246 1
+a246 1
+	return ( $message, $extra_input );
+d252 107
+a358 238
+	my ( $result, $info, $r, $crypt, $params,$username ) = @@_;
+	my $message;
+	my $extra_input;
+	my $uri = $$params{'a'};
+	my $time = time ();
+
+if ( $result == 0 ) {
+
+	my $auth_cookie = $r->dir_config("AuthCookie") || "SecurID";
+	my $auth_user_cookie = $r->dir_config("AuthUserCookie") || "SecurID_User";
+	my $crypt_cookie = $crypt->encrypt_hex ( "$time:$username" );
+	$r->headers_out->add("Set-Cookie" => $auth_user_cookie . "=" .
+		$username . "; path=" . "/");
+	$r->headers_out->add("Set-Cookie" => $auth_cookie . "=" .
+		$crypt_cookie . "; path=" . "/");
+
+	$uri = $crypt->decrypt_hex ( $uri );
+
+	# success
+	$message = qq{
+		<b>User Authenticated</b><p>
+		<SCRIPT LANGUAGE="JavaScript">
+		<!-- Begin
+		window.location="$uri";
+		// End -->
+		</script>
+		If you do not have Java Script enabled<br>
+		please click <a href="$uri">here</a> to go to<br>
+		the protected page.<p>
+		Plase enter your username and passcode<br>
+		Your passcode is your 4 - 8 digit pin plus<br>
+		6 digit SecurID code.  If you do not have<br>
+		a PIN yet just enter the 6 digit SecurID code.
+	};
+	$extra_input = qq{
+		<tr>
+		   <td>
+			<font  color=000000 face="Arial, Helvetica, sans-serif">
+			<b>
+			Passcode :
+			</b>
+			</font>
+		   </td>
+		   <td>
+			<input type=password name=passcode>
+			<input type=hidden name=type value=check>
+			<input type=hidden name=a value=$uri>
+		   </td>
+		</tr>
+	};
+} elsif ( $result == 1 ) {
+	# failure
+	$message = qq{
+		<b>User Authentication Failed</b><p>
+		Plase enter your username and passcode<br>
+		Your passcode is your 4 - 8 digit pin plus<br>
+		6 digit SecurID code.  If you do not have<br>
+		a PIN yet just enter the 6 digit SecurID code.
+	};
+	$extra_input = qq{
+		<tr>
+		   <td>
+			<font  color=000000 face="Arial, Helvetica, sans-serif">
+			<b>
+			Passcode :
+			</b>
+			</font>
+		   </td>
+		   <td>
+			<input type=password name=passcode>
+			<input type=hidden name=type value=check>
+			<input type=hidden name=a value=$uri>
+		   </td>
+		</tr>
+	};
+} elsif ( $result == 100 ) {
+	# failure
+	$message = qq{
+		<b>User Authentication Failed</b><p>
+		The ACE server is either down or behaving<br>
+		incorrectly.  Please conact your system<br>
+		administrator.
+	};
+	$extra_input = qq{
+		<tr>
+		   <td>
+			<font  color=000000 face="Arial, Helvetica, sans-serif">
+			<b>
+			Passcode :
+			</b>
+			</font>
+		   </td>
+		   <td>
+			<input type=password name=passcode>
+			<input type=hidden name=type value=check>
+			<input type=hidden name=a value=$uri>
+		   </td>
+		</tr>
+	};
+} elsif ( $result == 2 ) {
+	# next token code
+	$message = qq{
+		<b>Next Token Required</b><p>
+		Plase wait for you token to change and enter<br>
+		the 6 digit SecurID token code.
+	};
+	$extra_input = qq{
+		<tr>
+		   <td>
+			<font  color=000000 face="Arial, Helvetica, sans-serif">
+			<b>
+			Next Token Code :
+			</b>
+			</font>
+		   </td>
+		   <td>
+			<input type=password name=passcode>
+			<input type=hidden name=type value=next>
+			<input type=hidden name=a value=$uri>
+		   </td>
+		</tr>
+	};
+} elsif ( $result == 5 ) {
+	# New PIN required.
+	if ( $$info{user_selectable} >= 1 ) {
+	   $message = qq{
+		<b>New Pin Required</b><p>
+		Please enter a $$info{min_pin_len} to $$info{max_pin_len} digit pin.
+	   };
+	   $extra_input = qq{
+		<tr>
+		   <td>
+			<font  color=000000 face="Arial, Helvetica, sans-serif">
+			<b>
+			PIN :
+			</b>
+			</font>
+		   </td>
+		   <td>
+			<input type=password name=pin1>
+			<input type=hidden name=type value=pin>
+			<input type=hidden name=a value=$uri>
+			<input type=hidden name=alphanumeric value=$$info{alphanumeric}>
+			<input type=hidden name=min_pin_len value=$$info{min_pin_len}>
+			<input type=hidden name=max_pin_len value=$$info{max_pin_len}>
+		   </td>
+		</tr>
+		<tr>
+		   <td>
+			<font  color=000000 face="Arial, Helvetica, sans-serif">
+			<b>
+			PIN ( Again ) :
+			</b>
+			</font>
+		   </td>
+		   <td>
+			<input type=password name=pin2>
+		   </td>
+		</tr>
+	   };
+		
+	} else {
+	$message = qq{
+		<b>You have been assignes a new PIN.</b><p>
+		Your PIN is: <b>$$info{system_pin}</b><p>
+		Please remember your PIN.  Do not share it<br>
+		with anyone else.<p>
+		Please enter your username and passcode<br>
+		Your passcode is your 4 - 8 digit pin plus<br>
+		6 digit SecurID code.
+	};
+	$extra_input = qq{
+		<tr>
+		   <td>
+			<font  color=000000 face="Arial, Helvetica, sans-serif">
+			<b>
+			Passcode :
+			</b>
+			</font>
+		   </td>
+		   <td>
+			<input type=password name=passcode>
+			<input type=hidden name=type value=check>
+			<input type=hidden name=a value=$uri>
+		   </td>
+		</tr>
+	};
+	}
+} elsif ( $result == 6 ) {
+	$message = qq{
+		<b>PIN Accepted</b><p>
+		Please remember you PIN.  Do not share it<br> 
+		with anyone else.<p>
+		Please enter your username and passcode<br>
+		Your passcode is your 4 - 8 digit pin plus<br>
+		6 digit SecurID code.
+	};
+	$extra_input = qq{
+		<tr>
+		   <td>
+			<font  color=000000 face="Arial, Helvetica, sans-serif">
+			<b>
+			Passcode :
+			</b>
+			</font>
+		   </td>
+		   <td>
+			<input type=password name=passcode>
+			<input type=hidden name=type value=check>
+			<input type=hidden name=a value=$uri>
+		   </td>
+		</tr>
+	};
+
+} elsif ( $result == 7 ) {
+	$message = qq{
+		<b>PIN Rejected</b><p>
+		Please contact the system administrator.<p>
+		Please enter your username and passcode<br>
+		Your passcode is your 4 - 8 digit pin plus<br>
+		6 digit SecurID code.
+	};
+	$extra_input = qq{
+		<tr>
+		   <td>
+			<font  color=000000 face="Arial, Helvetica, sans-serif">
+			<b>
+			Passcode :
+			</b>
+			</font>
+		   </td>
+		   <td>
+			<input type=password name=passcode>
+			<input type=hidden name=type value=check>
+			<input type=hidden name=a value=$uri>
+		   </td>
+		</tr>
+	};
+d360 44
+a404 3
+	return ( $message, $extra_input );
+}
+
+d412 1
+a412 1
+Apache::AuthenSecurID::Auth - Authentication handler for Apache::AuthenSecurID 
+d420 1
+a420 1
+   PerlHandler Apache::AuthenSecurID::Auth
+d509 1
+a509 1
+ PerlModule Apache::AuthenSecurID::Auth
+d526 1
+a526 1
+L<Apache>, L<mod_perl>, L<Authen::ACE> L<Apache::AuthenSecurID::Auth>
+d542 3
+d547 1
+a547 1
+The Apache::AuthenSecurID::Auth module is free software; you can redistribute
+@
+
+
+1.8
+log
+@*** empty log message ***
+@
+text
+@d1 1
+a1 1
+# $Id: Auth.pm,v 1.7 2002/07/30 20:16:01 Administrator Exp $
+d13 1
+a13 1
+$VERSION = '0.3';
+@
+
+
+1.7
+log
+@*** empty log message ***
+@
+text
+@d1 1
+a1 1
+# $Id: Auth.pm,v 1.6 2001/06/22 19:09:01 root Exp $
+d58 1
+a58 1
+			<font  color=ffffff face="Arial, Helvetica, sans-serif">
+d93 1
+a93 1
+<table bgcolor=FFFF00 >
+d96 1
+a96 1
+	   <table cellspacing=2 bgcolor=00008B width=100%>
+d99 1
+a99 1
+			<font size=+2 color=ffffff face="Arial, Helvetica, sans-serif">
+d108 1
+a108 1
+			<font color=ffffff face="Arial, Helvetica, sans-serif">
+d118 1
+a118 1
+	   <table cellspacing=0 cellpadding=0 bgcolor=00008B width=100%>
+d121 1
+a121 1
+			<font  color=ffffff face="Arial, Helvetica, sans-serif">
+d173 1
+a173 1
+			<font  color=ffffff face="Arial, Helvetica, sans-serif">
+d190 1
+a190 1
+			<font  color=ffffff face="Arial, Helvetica, sans-serif">
+d322 1
+a322 1
+			<font  color=ffffff face="Arial, Helvetica, sans-serif">
+d347 1
+a347 1
+			<font  color=ffffff face="Arial, Helvetica, sans-serif">
+d371 1
+a371 1
+			<font  color=ffffff face="Arial, Helvetica, sans-serif">
+d394 1
+a394 1
+			<font  color=ffffff face="Arial, Helvetica, sans-serif">
+d417 1
+a417 1
+			<font  color=ffffff face="Arial, Helvetica, sans-serif">
+d434 1
+a434 1
+			<font  color=ffffff face="Arial, Helvetica, sans-serif">
+d459 1
+a459 1
+			<font  color=ffffff face="Arial, Helvetica, sans-serif">
+d485 1
+a485 1
+			<font  color=ffffff face="Arial, Helvetica, sans-serif">
+d510 1
+a510 1
+			<font  color=ffffff face="Arial, Helvetica, sans-serif">
+@
+
+
+1.6
+log
+@docs
+@
+text
+@d1 1
+a1 1
+# $Id: Auth.pm,v 1.5 2001/06/22 18:15:02 root Exp root $
+d252 1
+d277 1
+a277 1
+	my ($message,$extra_input)=Ace_Result($result,\%info,$r,$crypt,$params,$username);
+@
+
+
+1.5
+log
+@documentation
+@
+text
+@d1 1
+a1 1
+# $Id: Auth.pm,v 1.4 2001/06/19 19:39:39 root Exp root $
+d530 4
+d556 1
+a556 1
+will be redirected to this handler if the authentication cookie does not
+d563 2
+a564 2
+PIN they will be prompted to do so and then redirected to the originating
+URI.
+d579 1
+a579 1
+The name of the of cookie to be set for the authenticaion token.  
+d588 1
+a588 1
+authorizied users.  It defaults to F<SecurID_User> if this variable is not set.
+d593 1
+a593 1
+The path of the of cookie to be set for the authenticaion token.  
+d608 2
+a609 2
+actuall process that communicates with the ACE Server.  If the user is in
+NEXT TOKEN MODE due to repeated failures or SET PIN MODE the Authein::ACE 
+d611 1
+a611 1
+constructed ith a random number, type of transaction, the username, passcode
+d615 1
+a615 1
+responce is sent back to the handler.  The random number originally sent is
+d670 1
+@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@d1 1
+a1 1
+# $Id: Auth.pm,v 1.2 2001/06/19 19:05:42 root Exp root $
+a83 1
+
+d85 1
+a85 1
+<body bgcolor=F0F8FF >
+d87 1
+a87 1
+<!-- $session_id -->
+d276 1
+a276 1
+	my ($message,$extra_input)=Ace_Result($result,\%info,$r,$crypt,$params);
+d284 1
+a284 1
+	my ( $result, $info, $r, $crypt, $params ) = @@_;
+d288 1
+d293 5
+a297 2
+	my $crypt_cookie = $crypt->encrypt_hex ( "hello:hello" );
+	$r->err_header_out("Set-Cookie" => $auth_cookie . "=" .
+d529 137
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d1 1
+d20 1
+d23 1
+d30 5
+d38 3
+a40 4
+   my $client = IO::Socket::INET->new ( PeerAddr   =>      'dev.cbs.cbsig.net',
+                                        PeerPort   =>      1969,    
+                                        Proto      =>      'udp' )   
+       or die "Couldn't be a tcp server on port 1969: $!\n";
+a43 2
+
+
+a276 2
+	$r->print ("$mesg<br>\n");
+	$r->print ("$result,\%info,$r,$crypt,$params");
+d307 3
+@
+
+
+1.2
+log
+@convert to Apache::Registry
+@
+text
+@d6 1
+a6 1
+use Apache::Registery;
+d18 1
+d22 11
+a32 9
+   my $username = %params {'username'};
+   my $passcode = %params{'passcode'};
+   my $type = %params{'type'};
+
+   my $session_id = $query->cookie(-name=>'Apache');
+
+   my $client = IO::Socket::INET->new (       PeerAddr        =>      'srent02.local.nyc01.cbsig.net',
+                                        PeerPort        =>      1969,    
+                                        Proto           =>      'udp' )   
+a37 2
+   $r->content_type ('text/html');
+   $r->send_http_header; 
+d62 1
+d68 1
+a68 1
+		( $passcode, $message,$extra_input) = check_pin ( $query ) ;
+d70 1
+a70 1
+			($message,$extra_input) = Do_ACE($username,$passcode,$type,$session_id,$client);
+d73 1
+a73 1
+		($message,$extra_input) = Do_ACE($username,$passcode,$type,$session_id,$client);
+d80 1
+a80 1
+   my $head = qq{
+d97 1
+a97 1
+			SecurID Initalization
+d148 3
+a150 1
+$r->print $head;
+d156 1
+a156 1
+	my ( $query ) = @@_;
+d158 7
+a164 5
+	my $pin1 = $query->param('pin1');
+	my $pin2 = $query->param('pin2');
+	my $alphanumeric = $query->param('alphanumeric');
+	my $min_pin_len = $query->param('min_pin_len');
+	my $max_pin_len = $query->param('max_pin_len');
+d181 1
+d244 1
+a244 1
+	my ( $username, $passcode, $type, $session_id, $client ) = @@_;	
+d255 2
+a256 1
+	my $crypt = new Crypt::CBC ( "this is the key", "Blowfish" );
+d272 3
+a274 2
+
+	($message,$extra_input) = Ace_Result ( $result, \%info );
+d282 4
+a285 1
+	my ( $result, $info ) = @@_;
+d288 8
+d299 5
+d321 1
+d346 1
+d370 1
+d393 1
+d416 1
+d458 1
+d484 1
+d509 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a0 1
+#!/usr/local/bin/perl
+d2 6
+a7 1
+use CGI;
+d10 4
+a13 1
+use strict;
+d15 1
+d17 2
+a18 2
+my $query = new CGI;
+srand (time ^ $$ ^ unpack "%L*", `ps axww | gzip -f`);
+d20 4
+a23 3
+my $username = $query->param('username');
+my $passcode = $query->param('passcode');
+my $type = $query->param('type');
+d25 1
+a25 1
+my $session_id = $query->cookie(-name=>'Apache');
+d27 1
+a27 1
+my $client = IO::Socket::INET->new (       PeerAddr        =>      'srent02.local.nyc01.cbsig.net',
+d30 1
+a30 1
+    or die "Couldn't be a tcp server on port 1969: $!\n";
+d32 2
+a33 2
+my %ACE;
+my $request;
+d35 2
+a36 2
+print $query->header;
+ 
+d38 2
+a39 2
+my $message;
+my $extra_input;
+d41 2
+a42 2
+if ( ( ! $username && ! $passcode ) || ( $type ne "pin"  && ! $passcode ) ||
+	( $passcode =~ /\:/ ) ) {
+d64 1
+a64 1
+} else {
+d74 1
+a74 1
+}
+d78 1
+a78 1
+my $head = qq{
+d146 3
+a148 1
+print $head;
+d486 1
+@

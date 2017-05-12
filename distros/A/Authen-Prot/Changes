@@ -1,0 +1,29 @@
+Revision history for Perl extension Authen::Prot.
+
+$Log: Changes,v $
+Revision 1.7  1998/10/28 01:23:11  paulg
+Received information from a few Digital uses and attempting to add support.
+
+Revision 1.6.1.1  1998/10/28 01:03:55  paulg
+
+# Revision 1.6  98/03/06  12:09:37  12:09:37  paulg (Paul Gampe)
+# Added code to handle sco's unsigned short and skip void*
+# 
+# Revision 1.5  98/03/05  11:37:22  11:37:22  paulg (Paul Gampe)
+# Adding method for acceptable_password function, available on both hp and sco.
+# 
+# Revision 1.4  98/03/05  11:04:16  11:04:16  paulg (Paul Gampe)
+# *** empty log message ***
+# 
+# Revision 1.3  98/03/05  11:03:39  11:03:39  paulg (Paul Gampe)
+# Name change from Prot to Authen::Prot as suggested by modules@perl.org
+# 
+# Revision 1.2  98/03/05  11:03:03  11:03:03  paulg (Paul Gampe)
+# Added documentation
+# 
+# Revision 1.1  98/03/05  11:02:48  11:02:48  paulg (Paul Gampe)
+# Initial revision
+# 
+# 0.01  Tue Feb 24 14:00:47 1998
+#	- original version; created by h2xs 1.18
+#

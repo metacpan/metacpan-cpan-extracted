@@ -1,0 +1,14 @@
+name = "Algorithm-AdaGrad"
+# badges = ["travis"]
+authority="cpan:HIDEAKIO"
+c_source= ['lib/Algorithm']
+
+[build]
+build_class="builder::MyBuilder"
+
+[XSUtil]
+generate_ppport_h = 'lib/Algorithm/ppport.h'
+
+[no_index]
+directory = ['t', 'xt', 'inc', 'share', 'eg', 'examples', 'author', 'builder']
+

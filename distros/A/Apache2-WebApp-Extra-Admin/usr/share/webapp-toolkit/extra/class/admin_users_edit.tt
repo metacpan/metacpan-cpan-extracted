@@ -1,0 +1,160 @@
+package [% project_title %]::Admin::Users::Edit;
+
+use strict;
+use warnings;
+use base qw(
+  [% project_title %]::Admin
+  [% project_title %]::Admin::Users
+  );
+use [% project_title %]::Admin::Users::Error qw( :all );
+use Apache::Htpasswd;
+
+our $VERSION = 0.19;
+
+#----------------------------------------------------------------------------+
+# _default(\%controller)
+#
+# Dispatch the action.
+
+sub _default {
+    my ($self, $c) = @_;
+
+    $self->SUPER::_error($c, 'Error', ERROR_ACCESS_DENIED)
+      unless ($c->request->user eq 'admin');
+
+    $self->_view_page($c);
+}
+
+#----------------------------------------------------------------------------+
+# _view_page(\%controller, \%param, \%error)
+#
+# View the page.
+
+sub _view_page {
+    my ($self, $c, $param_ref, $error_ref) = @_;
+
+    $param_ref->{username} = $c->request->param('username');
+
+    $c->request->content_type('text/html');
+
+    $c->template->process(
+        'extras/admin/users_form.tt',
+        {
+            %{ $c->config },
+            param => ($param_ref) ? $param_ref : undef,
+            error => ($error_ref) ? $error_ref : undef,
+            edit  => 1
+        }
+      )
+      or $self->SUPER::_error($c, 'Template process failed', $c->template->error() );
+
+    exit;
+}
+
+#----------------------------------------------------------------------------+
+# Validate the form input, process the request.
+
+sub submit {
+    my ($self, $c) = @_;
+
+    # convert the form input into hash data
+    my %param = $c->plugin('CGI')->params($c);
+    my %error;
+
+    my $htpasswd = $c->config->{apache_doc_root} . '/conf/htpasswd';
+
+    my $pwd = new Apache::Htpasswd($htpasswd);
+
+    # check the username field data
+    if ($param{username}) {
+        unless ($param{username} =~ /\A (?: \w|\s|\-|\_){5,15} \z/x)
+        {
+            $error{username} = ERROR_USERNAME;
+        }
+        else {
+            if (!$pwd->fetchPass(      $param{username} ) &&
+                !$pwd->fetchPass('#' . $param{username} ) )
+            {
+                $error{username} = ERROR_USERNAME_DOESNT_EXIST;
+            }
+        }
+    }
+    else {
+        $error{username} = ERROR_REQUIRED;
+    }
+
+    # check the password field data
+    if ($param{password}) {
+        unless ($param{password} =~ /\A (?: .){8,15} \z/x)
+        {
+            $error{password} = ERROR_PASSWORD;
+        }
+    }
+    else {
+        $error{password} = ERROR_REQUIRED;
+    }
+
+    unless (values %error) {
+
+        $pwd->htpasswd($param{username}, $param{password}, { overwrite => 1 });
+
+        $self->SUPER::_log_action($c, 'Updated User (' . $param{username} . ')');
+
+        # list the users
+        $self->_list_users($c);
+    }
+    else {
+
+        $error{alert} = ERROR_FORM_INPUT;
+
+        # errors exist, reload the form
+        $self->_view_page($c, \%param, \%error);
+    }
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+[% project_title %]::Admin::Users::Edit - Web based admin control panel module
+
+=head1 SYNOPSIS
+
+  use [% project_title %]::Admin::Users::Edit;
+
+=head1 DESCRIPTION
+
+Edit an existing htpasswd user entry.
+
+=head1 OBJECT METHODS
+
+View the page.
+
+  $self->_view_page(\%controller, \%param, \%error);
+
+=head2 URI DISPATCHABLE
+
+=head2 submit
+
+Validate the form input, process the request.
+
+  http://domain.com/app/admin/users/edit/submit
+
+=head1 SEE ALSO
+
+L<Apache2::WebApp>, L<Apache2::WebApp::Admin>, L<Apache::Htpasswd>
+
+=head1 AUTHOR
+
+Marc S. Brooks, E<lt>mbrooks@cpan.orgE<gt> L<http://mbrooks.info>
+
+=head1 COPYRIGHT
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

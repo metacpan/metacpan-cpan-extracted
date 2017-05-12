@@ -1,0 +1,42 @@
+---
+abstract: 'send cpanm output to CPAN Testers'
+author:
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-cpanminus-reporter
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CPAN::Meta::Converter: '0'
+  CPAN::Testers::Common::Client: '0.13'
+  Capture::Tiny: '0'
+  Carp: '0'
+  Config::Tiny: '2.08'
+  File::HomeDir: '0.58'
+  File::Spec: '3.19'
+  Getopt::Long: '0'
+  IO::Prompt::Tiny: '0'
+  LWP::Protocol::https: '0'
+  Metabase::Resource: '0'
+  Parse::CPAN::Meta: '0'
+  Pod::Usage: '0'
+  Test::More: '0'
+  Test::Reporter: '1.54'
+  Test::Reporter::Transport::Metabase: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  repository: http://github.com/garu/App-cpanminus-reporter
+version: '0.17'

@@ -1,0 +1,12 @@
+.DS_Store
+lib/Apache2/WURFLFilter.pm
+lib/Apache2/ImageRenderFilter.pm
+lib/Apache2/AMFSwitcher.pm
+lib/Apache2/AMFCarrierDetection.pm
+lib/Apache2/AMFDeviceMonitor.pm
+lib/Apache2/AMFCommonLib.pm
+Makefile.PL
+MANIFEST
+CHANGE
+README
+META.yml                                 Module meta-data (added by MakeMaker)

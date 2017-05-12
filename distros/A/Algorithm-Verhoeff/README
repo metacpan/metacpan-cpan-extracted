@@ -1,0 +1,45 @@
+Algorithm-Verhoeff version 0.3
+==============================
+
+DESCRIPTION
+
+This module implements Verhoeff's check digit algorithm. It provides a method to
+generate check digits from numbers, and a method to verify if an existing number
+passes the check.
+
+Using numbers that pass the verhoeff check is useful for things like product
+codes. This is because such numbers almost never pass the verhoeff check if they
+as mis-typed. This includes common typos such as ommitted or repeated digits,
+transposed digits and so on.
+
+Since it only adds a single digit onto what might already be a longish number,
+it's a good algorithm for use where humans need to enter or read the numbers.
+
+To generate such a number, pick a starting number, call verhoeff_check() to get
+a check digit, and then APPEND that digit to the end of the original number.
+
+The new number will how pass the verhoeff_check(). 
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None, although using this with integers > 32bit will require the bignum module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Jon Peterson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

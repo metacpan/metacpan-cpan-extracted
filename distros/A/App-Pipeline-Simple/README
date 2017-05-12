@@ -1,0 +1,127 @@
+NAME
+    App::Pipeline::Simple - Simple workflow manager
+
+VERSION
+    version 0.9.1
+
+SYNOPSIS
+      # called from a script
+
+DESCRIPTION
+    Unless you want to change or extend the module, you probably do not need
+    to read this documentation. Runtime information is in spipe application.
+
+    Workflow management in computational (biological) sciences is a hard
+    problem. This module is based on assumption that UNIX pipe and redirect
+    system is closest to optimal solution with these improvements:
+
+    * Enforce the storing of all intermediate steps in a file.
+
+      This is for clarity, accountability and to enable arbitrarily big
+      data sets. Pipeline can contain independent steps that remove
+      intermediate files if so required.
+
+    * Naming of each step.
+
+      This is to make it possible to stop, restart, and restart at any
+      intermediate step after adjusting pipeline parameters.
+
+    * detailed logging
+
+      To keep track of all runs of the pipeline.
+
+    A pipeline is a collection of steps that are functionally equivalent to
+    a pipeline. In other words, execution of a pipeline equals to execution
+    of a each ordered step within the pipeline. From that derives that the
+    pipeline object model needs only one class that can recursively
+    represent the whole pipeline as well as individual steps.
+
+METHODS
+  new
+    Constructor for the class. One instance represents the whole pipeline,
+    and other instances are created for each step in the pipeline.
+
+  verbose
+    Controls logging output. Defaults to 0.
+
+    Setting verbose sets the logging level:
+
+      verbose   =  -1    0     1
+      log level =>  WARN INFO  DEBUG
+
+  config
+    Read in the named config file.
+
+  id
+    ID of the step
+
+  description
+    Verbose description of the step
+
+  name
+    Name of the program that will be executed
+
+  path
+    Path to the directory where the program resides. Can be used if the
+    program is not on path. Will be prepended to the name.
+
+  next_id
+    ID of the next step in execution. It typically depends on the output of
+    this step.
+
+  input
+    Value read in interactively from command line
+
+  itype
+    Type of input for the command line value
+
+  start
+    The ID of the step to start the execution
+
+  stop
+    The ID of the step to stop the execution
+
+  dir
+    Working directory where all files are stored.
+
+  step
+    Returns the step by its ID.
+
+  each_next
+    Return an array of steps after this one.
+
+  each_step
+    Return all steps.
+
+  run
+    Run this step and call the one(s).
+
+  debug
+    Run in debug mode and test the configuration file
+
+  logger
+    Reference to the internal Log::Logger4perl object
+
+  render
+    Transcribe the step into a UNIX command line string ready for display or
+    execution.
+
+  stringify
+    Analyze the configuration without executing it.
+
+  graphviz
+    Create a GraphViz dot file from the config.
+
+SEE ALSO
+    spipe
+
+AUTHOR
+    Heikki Lehvaslaiho, KAUST (King Abdullah University of Science and
+    Technology).
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Heikki Lehvaslaiho.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

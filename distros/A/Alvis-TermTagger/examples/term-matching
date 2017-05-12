@@ -1,0 +1,49 @@
+#!/usr/bin/perl -w
+
+
+use strict;
+use warnings;
+
+require Alvis::TermTagger;
+
+my %corpus = (1, {'line' => "During sporulation of Bacillus subtilis, spore coat proteins encoded by cot genes are expressed in the mother cell and deposited on the forespore.", 'offset' => 0});
+
+my %lc_corpus;
+
+my @termlist_input = ("sporulation", "sporulation", "Bacillus subtilis", "Bacillus subtilis" , "proteins", "protein", "genes", "gene" , "mother cell", "mother cell" );
+
+my @termlist;
+my @selected_term_list;
+my $term;
+
+my @regex_term_list;
+my %corpus_index;
+my %idtrm_select;
+
+my $key;
+
+foreach $key (keys %corpus) {
+    $lc_corpus{$key}->{'line'} = lc($corpus{$key}->{'line'});
+    $lc_corpus{$key}->{'offset'} = $corpus{$key}->{'offset'};
+}
+
+my $i = 0;
+
+for($i = 0;$i< scalar (@termlist_input); $i+=2) {
+    my @tmp = ($termlist_input[$i], $termlist_input[$i+1]);
+    push @termlist, \@tmp;
+}
+
+
+Alvis::TermTagger::get_Regex_TermList(\@termlist, \@regex_term_list);
+Alvis::TermTagger::corpus_Indexing(\%lc_corpus, \%corpus_index);
+Alvis::TermTagger::term_Selection(\%corpus_index, \@termlist, \%idtrm_select, 1);
+Alvis::TermTagger::term_tagging_offset_tab(\@termlist, \@regex_term_list, \%idtrm_select, \%corpus, \@selected_term_list);
+
+foreach $term (@selected_term_list) {
+  print "$term\n";
+}
+
+
+
+

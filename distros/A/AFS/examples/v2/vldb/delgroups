@@ -1,0 +1,26 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::VLDB;
+
+my ($vldb, $prefix, $server, $partition, $noexec);
+
+die "Usage: $0 prefix server partition [noexec] \n" if $#ARGV < 2;
+
+$prefix    = shift;
+$server    = shift;
+$partition = shift;
+$noexec    = shift;
+
+$noexec = 0 unless $noexec;
+
+$vldb = AFS::VLDB->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+my ($succ, $fail) = $vldb->delgroups($prefix, $server, $partition, $noexec);
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+if (! $noexec) { print "Deleted $succ VLDB entry \n"; }

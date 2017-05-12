@@ -1,0 +1,8 @@
+Revision history for Perl extension Apache::AuthzHtgroup.
+
+0.01  Mon March 29, 2004 
+	- original version; 
+
+0.02  Thu April 8, 2004 
+	- at behest of G. Young, changed name
+    to Apache::AuthzSplitDomainUser

@@ -1,0 +1,15 @@
+TODO:
+  - write documentation for CWB::CL package
+
+Version 3.0
+-----------
+
+This is the first official release of the redesigned Perl API for the low-level CL library.
+It is compatible with version 3.0 of the IMS Open Corpus Workbench.
+
+New features:
+
+  - all "scalar" CL functions are now vectorised in the XS/C code, making them up to
+    4x faster if called with long argument lists
+
+  - Perl wrappers around the API functions have been eliminated wherever possible

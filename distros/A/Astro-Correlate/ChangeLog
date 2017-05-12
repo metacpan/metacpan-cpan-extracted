@@ -1,0 +1,6 @@
+2009-07-30 Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+---- CPAN Release v1.0 ----
+
+* Method/RITMatch.pm: Add dynamic scaling to force coordinates to be
+  less than 500.

@@ -1,0 +1,17 @@
+README
+MANIFEST
+Changes
+Makefile.PL
+Mmap.pm
+Mmap.xs
+Handle.pm
+typemap
+t/tie.t
+t/mmap.t
+t/handle.t
+eg/MmapHandler.pm
+eg/bench.pl
+eg/bench2.pl
+eg/bench3.pl
+Artistic
+Copying

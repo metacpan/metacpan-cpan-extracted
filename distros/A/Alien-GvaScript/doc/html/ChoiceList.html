@@ -1,0 +1,271 @@
+<html>
+<head>
+  <script src="../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <link href="GvaScript_doc.css" rel="stylesheet" type="text/css">
+  <script>
+    document.observe('dom:loaded', function() { new GvaScript.TreeNavigator('TN_tree'); });
+    function jumpto_href(event) {
+      var label = event.controller.label(event.target);
+      if (label && label.tagName == "A") {
+        label.focus();
+        return Event.stopNone;
+      }
+    }
+  </script>
+</head>
+<body>
+<div id='TN_tree'>
+  <div class="TN_node">
+   <h1 class="TN_label">Alien::GvaScript::ChoiceList</h1>
+   <div class="TN_content">
+     <p><em>Dropdown list of choices with navigation
+</em></p>
+     <div class="TN_node"  onPing="jumpto_href">
+       <h3 class="TN_label">Table of contents</h3>
+       <div class="TN_content">
+         <div class="TN_leaf">
+  <a class="TN_label" href="#NAME">NAME</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#SYNOPSIS">SYNOPSIS</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#DESCRIPTION">DESCRIPTION</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#BEHAVIOUR">BEHAVIOUR</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#CONSTRUCTOR">CONSTRUCTOR</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Choices">Choices</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#Options">Options</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#METHODS">METHODS</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#destroy">destroy</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#fillContainer">fillContainer</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#EVENTS">EVENTS</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#onHighlight">onHighlight</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#onPing">onPing</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#onCancel">onCancel</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+
+       </div>
+     </div>
+     <hr/>
+   </div>
+  </div>
+  <div class="TN_node" id="NAME">
+    <h2 class="TN_label">NAME</h2>
+    <div class="TN_content">
+      <p>Alien::GvaScript::ChoiceList - Dropdown list of choices with navigation</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="SYNOPSIS">
+    <h2 class="TN_label">SYNOPSIS</h2>
+    <div class="TN_content">
+      <pre>  var choiceList = new GvaScript.ChoiceList(["foo", "bar", "buz"]);
+  choiceList.fillContainer($('myChoiceDiv'));</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="DESCRIPTION">
+    <h2 class="TN_label">DESCRIPTION</h2>
+    <div class="TN_content">
+      <p>Displays a list of "choices", handles navigation in those
+choices, and generates events when a choice is highlighted, then selected,
+or when the list display is cancelled.</p>
+<p>At any moment the choiceList is bound to maximum one "container",
+and highlights exactly one choice in the list.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="BEHAVIOUR">
+    <h2 class="TN_label">BEHAVIOUR</h2>
+    <div class="TN_content">
+      <p>Once a choice list is displayed, the user can move the mouse over the
+list, thus highlighting various choices; then click on the highlighted
+choice to select it. Alternatively, the user can navigate the list
+with keys <code>DOWN</code>, <code>UP</code>, <code>HOME</code>, <code>END</code>, and then use either
+<code>RETURN</code> (for selecting) or <code>ESCAPE</code> (for cancelling).</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="CONSTRUCTOR">
+    <h2 class="TN_label">CONSTRUCTOR</h2>
+    <div class="TN_content">
+      <pre>  var choiceList = new GvaScript.ChoiceList(choices, options);</pre>
+
+  <div class="TN_node" id="Choices">
+    <h3 class="TN_label">Choices</h3>
+    <div class="TN_content">
+      <p>The choice list must be an array. Each item in the list is either</p>
+<ul>
+<li><a name="item_a_plain_string"></a><b>a plain string</b>
+<p>this string will be displayed in the choice list</p>
+</li>
+<li><a name="item_an_inline_object"></a><b>an inline object</b>
+<p>this object is supposed to have a <code>label</code> property, which 
+will be displayed in the choice list. Actually, this is the default name
+for the property; it can be changed in the constructor options.</p>
+<p>The <code>label</code> property may contain rich HTML, i.e. including
+formatting tags.</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Options">
+    <h3 class="TN_label">Options</h3>
+    <div class="TN_content">
+      <p>The options to construct an choiceList object are :</p>
+<ul>
+<li><a name="item_labelField"></a><b>labelField</b>
+<p>Name of the field that contains the HTML to display
+(default is <code>label</code>).</p>
+</li>
+<li><a name="item_idForChoices"></a><b>idForChoices</b>
+<p>Prefix that will be used to generate ids for choice elements in
+the generated HTML. The default is <code>CL_choice</code>, so choice elements
+will have ids <code>CL_choice.0</code>, <code>CL_choice.1</code>, etc.</p>
+</li>
+<li><a name="item_keymap"></a><b>keymap</b>
+<p>If defined, the choiceList will add rules to the supplied keymap,
+instead of creating a new one.</p>
+</li>
+<li><a name="item_scrollCount"></a><b>scrollCount</b>
+<p>How many items to skip when hitting the 
+<code>PAGE_UP</code> or <code>PAGE_DOWN</code> keys. 
+Default is 5</p>
+</li>
+<li><a name="item_mouseovernavi"></a><b>mouseovernavi</b>
+<p>Boolean indicating whether the choices would be selected/deselected with the 
+mouseover event.
+Default is <code>true</code></p>
+</li>
+<li><a name="item_classes"></a><b>classes</b>
+<p>Classes that will be assigned to choice elements in the generated
+HTML. Possible classes are <code>choiceItem</code> (default value <code>CL_choiceItem</code>) and
+<code>choiceHighlight</code> (default value <code>CL_highlight</code>).</p>
+</li>
+<li><a name="item_htmlWrapper"></a><b>htmlWrapper</b>
+<p>Callback function for generating HTML for the choiceList.
+This function is called with some pre-built HTML containing
+all current choices; the wrapper has a chance to modify 
+that HTML for example for adding classes, borders or 
+table headers. Default is the identity function.</p>
+</li>
+<li><a name="item_choiceItemTagName"></a><b>choiceItemTagName</b>
+<p>HTML tag name for generating a choice entry in the choice list.
+Default is "div". Set it to "tr" if you want the choice list
+to be displayed as a table (but then you also have to 
+open and close the table within the <code>htmlWrapper</code> callback).</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="METHODS">
+    <h2 class="TN_label">METHODS</h2>
+    <div class="TN_content">
+        <div class="TN_node" id="destroy">
+    <h3 class="TN_label">destroy</h3>
+    <div class="TN_content">
+      <pre>  choiceList.destroy();</pre>
+
+<p>This method removes all handlers attached to different
+events on the choice list container.
+Call this method when the choice list container is removed
+from the DOM.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="fillContainer">
+    <h3 class="TN_label">fillContainer</h3>
+    <div class="TN_content">
+      <pre>  choiceList.fillContainer(someDiv);</pre>
+
+<p>This method generates HTML from the choice list, and inserts
+it in the <code>innerHTML</code> of the supplied container; furthermore,
+it registers a keymap on that container in order to manage navigation
+from keyboard (<code>DOWN</code>, <code>UP</code>, etc.).</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="EVENTS">
+    <h2 class="TN_label">EVENTS</h2>
+    <div class="TN_content">
+        <div class="TN_node" id="onHighlight">
+    <h3 class="TN_label">onHighlight</h3>
+    <div class="TN_content">
+      <p>This event is triggered when a choice in the list is highlighted.
+The event handler may use <code>event.index</code> to know the index of the
+highlighted choice.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="onPing">
+    <h3 class="TN_label">onPing</h3>
+    <div class="TN_content">
+      <p>This event is triggered when a choice in the list is "ping-ed", i.e.
+either by clicking or by pressing the <code>RETURN</code> key.
+Usually this means "select", but it is up to the event handler to decide
+how to interpret the event.
+The event handler may use <code>event.index</code> to know the index of the
+ping-ed choice.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="onCancel">
+    <h3 class="TN_label">onCancel</h3>
+    <div class="TN_content">
+      <p>This event is triggered when the user presses the <code>ESCAPE</code> key.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

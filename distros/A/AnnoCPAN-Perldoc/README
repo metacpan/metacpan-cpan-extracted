@@ -1,0 +1,50 @@
+AnnoCPAN-Perldoc version 0.10
+=============================
+
+AnnoCPAN is a web interface for the documentation of all the modules on CPAN,
+where users can add annotations on the margin of specific paragraphs throughout
+the POD. The master AnnoCPAN site is located at http://annocpan.org/.
+
+AnnoCPAN-Perldoc provides a substitute for the 'perldoc' command that displays
+the annotations locally and without requiring a connection to the Internet. 
+It works by using a local note database that can be downloaded from
+
+    http://annocpan.org/annopod.db
+
+This is an SQLite3 database; the file should be saved in one of these
+locations:
+
+$HOME
+$USERPROFILE
+$ALLUSERSPROFILE
+/var/annocpan
+
+It can also be called .annopod.db, to hide it in Unix-like systems. It is your
+resposibility to keep this file as up-to-date as you want. Future versions may
+include an automatic update feature (which will require network connectivity).
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+        perl-5.6
+
+        DBI
+        DBD::SQLite
+        IO::String
+        Digest::MD5
+        Pod::Perldoc    3.14
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 Ivan Tubert-Brohman <itub@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

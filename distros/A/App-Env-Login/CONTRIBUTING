@@ -1,0 +1,137 @@
+Introduction
+============
+
+Thanks for considering contributing to App::Env::Login.  As
+contributers to other projects, we understand and appreciate the
+effort it takes to make a contribution.
+
+These guidelines are meant to ensure that your work will be
+efficiently merged.  Just as we appreciate the effort you put in, and
+hope to minimize it, please also understand that these guidelines
+minimize the amount of effort we need to incorporate your work.  If
+there's something that you think could improve the workflow, please let us know.
+
+
+
+What to Contribute?
+===================
+
+Very welcome:
+
+* Documentation
+* Tests
+* New functionality
+* Typos.
+* Fixing bugs
+
+Things that might take some convincing:
+
+* Functionality that's too far from the core purpose of
+  this code
+* Invasive changes to make things work with older versions of Perl
+  (non-invasive changes are welcome!)
+
+
+Where's the Code?
+=================
+
+The primary repository for this code is on BitBucket:
+
+>  [https://bitbucket.org/djerius/App-Env-Login]()
+
+For those who prefer GitHub, the repo is mirrored there:
+
+>  [https://github.com/djerius/App-Env-Login]()
+
+
+Contribution Guidelines
+=======================
+
+* Courtesy is always rewarded. Courtesy is expected from contributers
+  and project members.
+
+* Code should be as cross platform as possible. Please use core
+  facilities whenever possible, unless the project already uses a
+  non-core module which provides better interface or functionality
+
+* Add only necessary dependencies.
+
+* Please communicate via the request tracker prior to making major changes.  There may be
+  competing interests that need to be accomodated.
+
+* Keep commits small and targeted.  It is much easier to review and
+  understand them.
+
+* Add tests.
+
+Support Questions
+=================
+
+Please send support questions to djerius@cpan.org.
+
+
+Bug Reports
+===========
+
+Please submit a short, self contained, correct
+example (see [http://sscce.org/]()) to
+
+>  [https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env-Login]()
+
+Please be sure to indicate which version of Perl you are using, and
+the version of App::Env::Login.
+
+
+Requests for Enhancement
+========================
+
+Please use the request tracker at rt.cpan.org:
+
+>  [https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env-Login]()
+
+
+
+Submitting Fixes and Enhancements
+=================================
+
+If the enhancement is significant, or would require substantial code
+change, please begin the conversation by filing a notice of what you'd
+like to do using the request tracker at rt.cpan.org:
+
+>  [https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env-Login]()
+
+
+Whenever possible, please submit patches or pull requests against
+the latest version of the code in the code repository.  Patches
+should be submitted to the request tracker at rt.cpan.org.
+
+Pull requests may be made at either the BitBucket
+
+>  [https://bitbucket.org/djerius/App-Env-Login]()
+
+or GitHub
+
+>  [https://github.com/djerius/App-Env-Login]()
+
+
+sites.
+
+If you're new to pull requests, here are a few resources:
+
+>  [http://makeapullrequest.com/]()
+>  [https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github]()
+>  [https://confluence.atlassian.com/bitbucket/work-with-pull-requests-223220593.html]()
+
+
+Need more information?
+======================
+
+Please email djerius@cpan.org if something needs clarification?
+
+
+Not Getting Any Response?
+=========================
+
+If you don't receive a response in a reasonable timeframe, please send
+an email to djerius@cpan.org.  It's quite possible that your original
+communication was somehow lost.

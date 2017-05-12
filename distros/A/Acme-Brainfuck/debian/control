@@ -1,0 +1,20 @@
+Source: libacme-brainfck-perl
+Section: interpreters
+Priority: optional
+Build-Depends: debhelper (>= 3.0.5), perl (>= 5.6.0-17), libmodule-build-perl
+Maintainer: Jaldhar H. Vyas <jaldhar@debian.org>
+Standards-Version: 3.6.1
+
+Package: libacme-brainfck-perl
+Architecture: all
+Depends: ${perl:Depends}
+Provides: libacme-brainfuck-perl
+Description:  Embed Brainf*ck in your perl code
+ Brainf*ck (yes, there is a u there.) is about the tiniest Turing-complete 
+ programming language you can get.  A language is Turing-complete if it can 
+ model the operations of a Turing machine--an abstract model of a computer 
+ defined by the British mathematician Alan Turing in 1936.  A Turing machine 
+ consists only of an endless sequence of memory cells and a pointer to one 
+ particular memory cell.  Yet it is theoretically capable of performing any
+ computation.  This module will allow you to mix Brainf*ck with your
+ perl code.

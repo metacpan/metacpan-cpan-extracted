@@ -1,0 +1,39 @@
+// Copyright (c) 2009 AdCopy
+// Author: Jeff Weisberg
+// Created: 2009-Mar-27 16:05 (EDT)
+// Function: yenta status exchanges
+//
+// $Id$
+
+import "std_ipport.proto";
+
+message ACPYentaStatus {
+        required string         hostname        = 1;
+        required string         datacenter      = 2;
+	required string		subsystem	= 3;
+        required string         environment     = 4;
+        required string         via             = 5;
+        repeated ACPIPPort      ip              = 6;
+        required int32          status          = 7;
+        required int64          timestamp       = 8;
+        required int64          lastup          = 9;
+        repeated string         map             = 10;
+        optional bool           uptodate        = 11;
+	optional int32		sort_metric	= 12;
+
+        required string         server_id       = 13;   // typically IP:PORT
+        required string         instance_id     = 14;   // for loop detection
+        optional string         path            = 15;   // for debugging
+
+        optional int32          capacity_metric = 16;   // bouncr slots
+};
+
+message ACPYentaStatusRequest {
+        optional ACPYentaStatus  myself          = 1;
+};
+
+message ACPYentaStatusReply {
+        repeated ACPYentaStatus  status          = 1;
+};
+
+

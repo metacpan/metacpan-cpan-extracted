@@ -1,0 +1,66 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::BOS;
+
+my $ok;
+
+my ($server, $cellname, $bos);
+
+die "Usage: $0 server [cell]\n" if $#ARGV < 0;
+
+$server   = shift;
+$cellname = shift;
+
+if ($cellname) { $bos = AFS::BOS->new($server, 0, 0, $cellname); }
+else           { $bos = AFS::BOS->new($server); }
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+die "not yet tested ... \n";
+
+print "bos->salvage()...\n";
+
+# these are all possible non MR-AFS parameters:
+my ($partition, $volume) = ('/vicepa', 'u.vanilla');
+my $all                  = 0;
+my $outName              = ''; # salvage log output file
+my $showlog              = 0;
+my ($parallel, $tmpDir)  = ('', '');
+my $orphans              = 'ignore'; # ignore | remove | attach
+my $localauth            = 0;
+
+
+$ok = $bos->salvage($partition, $volume);
+print "Error Code: $AFS::CODE\n" if ($AFS::CODE);
+print "Something went wrong\n" unless $ok;
+
+exit;
+
+
+## some error conditions:
+$ok = $bos->salvage();                            # no parameter is not allowed
+$ok = $bos->salvage('/vicepz');                   # partition does not exist
+$ok = $bos->salvage('/vicepa', 'does.not.exist'); # volume does not exist
+
+
+($partition, $volume) = ('', '');
+$all = 1;
+$ok = $bos->salvage($partition, $volume, $all);
+print "Error Code: $AFS::CODE\n" if ($AFS::CODE);
+print "Something went wrong\n" unless $ok;
+
+
+$all = 0;
+$ok = $bos->salvage($partition, $volume, $outName,
+                    $all, $showlog,
+                    $parallel, $tmpDir,
+                    $orphans,
+                    $localauth
+                   );
+print "Error Code: $AFS::CODE\n" if ($AFS::CODE);
+print "Something went wrong\n" unless $ok;
+
+$bos->DESTROY;

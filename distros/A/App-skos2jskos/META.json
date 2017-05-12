@@ -1,0 +1,70 @@
+{
+   "abstract" : "Convert SKOS/RDF to JSKOS format",
+   "author" : [
+      "Jakob Voss <voss@gbv.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.035, Dist::Milla version v1.0.8, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-skos2jskos",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.8",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "1.33",
+            "RDF::Query" : "0",
+            "RDF::Query::Client" : "0",
+            "RDF::Trine" : "0",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Output" : "0",
+            "Test::PerlTidy" : "0",
+            "Test::RequiresInternet" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gbv/skos2jskos/issues"
+      },
+      "homepage" : "https://github.com/gbv/skos2jskos",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gbv/skos2jskos.git",
+         "web" : "https://github.com/gbv/skos2jskos"
+      }
+   },
+   "version" : "0.1.4"
+}
+

@@ -1,0 +1,47 @@
+Revision history for App-VOJournal
+
+v0.4.5  2016-05-16/16:03
+	- fixed version strings
+
+v0.4.4  2016-05-16/04:03
+	- option '--resume' is now default
+	- fixed version numbers
+
+v0.4.3  2015-09-19/11:50
+	- t/bug-107065.t: use Probe::Perl to get same Perl for script
+	- t/VOTL.pm: unlink temporary file after testing
+
+v0.4.2	2015-09-16/10:07
+	- fixed bug #107065, added regression tests
+	- added command line options '--version'
+	- documented options '--basedir' and '--version'
+
+v0.4.1  2015-07-03/10:06
+	- fixed a bug that caused an access to an unitialized value
+
+v0.4.0  2015-06-26/14:54
+	- command line option '-[no]header' to insert a header
+	  indicating the date at the first line
+	- command line option '-basedir $dir' to specify a different
+	  base directory
+	- Build.PL: requires { 'Getopt::Long' => 2.38, } for
+	  GetOptionsFromArray()
+
+v0.3.0  2015-05-31/17:19
+	- command line option '-[no]resume' to carry forward old
+	  unchecked checkboxes
+	- command line option '-editor $editor' to select an editor
+	  different from `vim`
+
+v0.2.0	2015-01-11/15:15
+	- command line option '-date [[YYYY[MM]]DD' to use another date
+	  than today
+
+v0.1.0	2015-01-10/18:36
+	This does the basic things:
+	- create the necessary directories
+	- open journal file with vimoutliner
+
+0.01    1015-01-10/11:43
+        First version, not released on an unsuspecting world.
+

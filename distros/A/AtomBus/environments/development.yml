@@ -1,0 +1,15 @@
+# configuration file for development environment
+
+logger: "file"
+
+# core is the lowest, it shows Dancer's core log messages as well as yours
+# (debug, warning and error)
+
+#log: "core"
+log: "debug"
+
+# shoud Dancer consider warnings as critical errors?
+warnings: 1
+
+# should Dancer show a stacktrace when an error is caught?
+show_errors: 1

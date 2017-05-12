@@ -1,0 +1,9 @@
+^.git
+^blib
+.swp$
+^Makefile(?:\.old)?$
+^pm_to_blib$
+.bak$
+^(build|install)-stamp$
+^debian/
+.*\.tar\.gz$

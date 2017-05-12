@@ -1,0 +1,30 @@
+---
+abstract: 'Multi-Apps Runner'
+author:
+  - 'Michael Vu <email@michael.vu>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: restrictive
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Munner
+no_index:
+  package:
+    - App::Munner::Runner
+requires:
+  Cwd: '0'
+  Daemon::Control: '0'
+  File::Temp: '0'
+  Getopt::Long::Descriptive: '0'
+  IPC::Signal: '0'
+  List::MoreUtils: '0'
+  Mo: '0'
+  Module::Load: '0'
+  Parallel::ForkManager: '0'
+  Process::Child::Leash: '0'
+  YAML: '0'
+version: '1.01'

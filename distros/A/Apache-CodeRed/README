@@ -1,0 +1,33 @@
+Apache/CodeRed version 1.06
+===========================
+
+This module detects attacks from the CodeRed (and CodeRed II) worm.
+When such an attack occurs, it (a) sends e-mail to an address
+specified by SecurityFocus, and (b) attempts to send e-mail to
+administrative addresses at the attacking domain.  By sending
+automatic messages to the system administrators, we hope that an
+increasing number of computers will be patched, saving the Internet
+from eventual decline into oblivion.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+    Apache::Constants
+    Cache::FileCache
+    Mail::Sendmail
+    Net::DNS
+    Time::Zone
+
+COPYRIGHT AND LICENCE
+
+    You may distribute this module under the same license as Perl itself.
+
+

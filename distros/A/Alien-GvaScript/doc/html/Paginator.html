@@ -1,0 +1,302 @@
+<html>
+<head>
+  <script src="../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <link href="GvaScript_doc.css" rel="stylesheet" type="text/css">
+  <script>
+    document.observe('dom:loaded', function() { new GvaScript.TreeNavigator('TN_tree'); });
+    function jumpto_href(event) {
+      var label = event.controller.label(event.target);
+      if (label && label.tagName == "A") {
+        label.focus();
+        return Event.stopNone;
+      }
+    }
+  </script>
+</head>
+<body>
+<div id='TN_tree'>
+  <div class="TN_node">
+   <h1 class="TN_label">Alien::GvaScript::Paginator</h1>
+   <div class="TN_content">
+     <p><em>API for data pagination
+</em></p>
+     <div class="TN_node"  onPing="jumpto_href">
+       <h3 class="TN_label">Table of contents</h3>
+       <div class="TN_content">
+         <div class="TN_leaf">
+  <a class="TN_label" href="#NAME">NAME</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#SYNOPSIS">SYNOPSIS</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#DESCRIPTION">DESCRIPTION</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Pagination_Parameters">Pagination Parameters</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#Navigation_Links">Navigation Links</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#HTML">HTML</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#CSS">CSS</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#Programming_Interface">Programming Interface</a>
+  <div class="TN_content"><div class="TN_node">
+  <a class="TN_label" href="#Methods">Methods</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#new_GvaScript_Paginator">new GvaScript.Paginator</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#Flipping_the_Pages">Flipping the Pages</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#destroy">destroy</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+       </div>
+     </div>
+     <hr/>
+   </div>
+  </div>
+  <div class="TN_node" id="NAME">
+    <h2 class="TN_label">NAME</h2>
+    <div class="TN_content">
+      <p>Alien::GvaScript::Paginator - API for data pagination</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="SYNOPSIS">
+    <h2 class="TN_label">SYNOPSIS</h2>
+    <div class="TN_content">
+      <pre>  var url = '/app/my/paginated/data';
+  var mypaginator = new GvaScript.Paginator(url, {
+    list_container  : 'list_result_container', 
+    links_container : 'pagination_links_container'
+
+    onSuccess   : onSuccessHandler,
+    parameters  : {param1: 'val1', param2: 'val2'},
+    step        : 20
+  }</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="DESCRIPTION">
+    <h2 class="TN_label">DESCRIPTION</h2>
+    <div class="TN_content">
+      <p>Paginated data is a set of data that can be divided into differnent pages. 
+It is best described as a list of items that overflow one page and best presented in several pages.
+The Paginator Object is used in this case to manage retrieval (through AJAX Requests) and handling (through an onSuccess handler).
+It also will take care of creating the navigation links (first, prev, next, last) and rendering them into provided container.
+Navigation links are used for an on demand <i>page flipping</i>.</p>
+<p>Data will be requested using an HTTP call to a provided URL.
+Data Index and Size are decided using <code>INDEX</code> and <code>STEP</code> parameters respectively. 
+It is up to you to make use of these parameters to decide on the items to display.</p>
+  <div class="TN_node" id="Pagination_Parameters">
+    <h3 class="TN_label">Pagination Parameters</h3>
+    <div class="TN_content">
+      <p>The Paginator Object will manage the 2 request parameters</p>
+<ul>
+<li><a name="item__code_INDEX__code__start_index_of_items_to_retrieve"></a><b><code>INDEX</code> start index of items to retrieve</b>
+</li>
+<li><a name="item__code_STEP__code___number_if_items_to_include_per_page"></a><b><code>STEP</code>  number if items to include per page</b>
+<p>These two parameters would help you in deciding which part of the dataset to return.</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Navigation_Links">
+    <h3 class="TN_label">Navigation Links</h3>
+    <div class="TN_content">
+      <p>Navigation links are the icons used to navigate through pages (page flipping). Along with icons, a 
+text with start-to-end index of displayed records / number of total records is displayed.</p>
+  <div class="TN_node" id="HTML">
+    <h4 class="TN_label">HTML</h4>
+    <div class="TN_content">
+      <pre>  &lt;div class="gva-paginatorbar"&gt;
+    &lt;div title="Derni&#xe8;re page" class="last"/&gt;
+    &lt;div title="Page suivante" class="forward"/&gt;
+    &lt;div class="text"&gt;1 &#xe0; 11 de 115&lt;/div&gt;
+    &lt;div title="Page pr&#xe9;c&#xe9;dente" class="back inactive"/&gt;
+    &lt;div title="Premi&#xe8;re page" class="first inactive"/&gt;
+  &lt;/div&gt;</pre>
+
+<p>Note that the icons are aware if they should be active/inactive. An 'inactive' css classname would be set to differentiate.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="CSS">
+    <h4 class="TN_label">CSS</h4>
+    <div class="TN_content">
+      <p>Easy customization of icons</p>
+<p>By default, css classnames are prefixed by 'gva'.</p>
+<p>This can be overloaded by a global js variable: CSS_PREFIX
+if declared before the inclusion of this Library</p>
+<pre>  .gva-paginatorbar {float:right;width:250px;}
+  .gva-paginatorbar div {width:16px;height:16px;cursor:pointer;float:right;}
+  .gva-paginatorbar div.first {background:url(page-first.gif) no-repeat top center;}
+  .gva-paginatorbar div.last {background:url(page-last.gif) no-repeat top center;}
+  .gva-paginatorbar div.back {background:url(page-prev.gif) no-repeat top center;}
+  .gva-paginatorbar div.forward {background:url(page-next.gif) no-repeat top center;}
+  .gva-paginatorbar div.inactive {cursor:default;opacity:0.25;filter:alpha(opacity=25);}
+  .gva-paginatorbar div.text {text-align:center;width:140px;color:#4b34c5;font-size:10pt;}
+  
+  /* classname given to the list container while data is waiting to be loaded */
+  .gva-loading {
+    background:url(ajax_loading.gif) no-repeat center center;
+    position:absolute;
+    width:30px;height:30px;
+    top:50%;left:50%;
+  }</pre>
+
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Programming_Interface">
+    <h2 class="TN_label">Programming Interface</h2>
+    <div class="TN_content">
+        <div class="TN_node" id="Methods">
+    <h3 class="TN_label">Methods</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="new_GvaScript_Paginator">
+    <h4 class="TN_label">new GvaScript.Paginator</h4>
+    <div class="TN_content">
+      <pre>  var paginator = new GvaScript.Paginator(
+        url, 
+        {opt1:"val1", opt2:"val2", ...}
+  );</pre>
+
+<p>Creates the object that controls pages navigation. Arguments are</p>
+<ul>
+<li><a name="item__code_url__code_"></a><b><code>url</code></b>
+<p>URL used to retrieve pages content using HTTP request.</p>
+</li>
+<li><a name="item__code_options__code_"></a><b><code>options</code></b>
+</li>
+</ul>
+<p>Options used to define and customize the Paginator object.</p>
+<p>The Paginator object is returned as it might be useful for a programatic navigation of pages.</p>
+<p>Available options are:</p>
+<ul>
+<li><a name="item_links_container__i__String_HTMLElement___i_"></a><b>links_container <i>(String|HTMLElement)</i></b>
+<p>Element or an id of an HTML Element to render the navigation links into.</p>
+<p>required.</p>
+</li>
+<li><a name="item_list_container__i__String_HTMLElement___i_"></a><b>list_container <i>(String|HTMLElement)</i></b>
+<p>Element of an id of an HTML Element that is used to render the result of the pagination.
+A 'gva-loading' classname is set to this container in the duration of page request.  Also ajax timeout and error messages
+will be displayed in this container.</p>
+<p>required.</p>
+</li>
+<li><a name="item_step__i__numeric___i_"></a><b>step <i>(numeric)</i></b>
+<p>Number of items to display per page.  
+This number would be the value of <code>STEP</code> (HTTP Request Parameter) that is transferred with pagination calls.</p>
+<p>optional - defaulted to 20</p>
+</li>
+<li><a name="item_method__i__String___i_"></a><b>method <i>(String)</i></b>
+<p>String indicating the HTTP method to use in the AJAX request for retrieving paginated data.</p>
+<p>optional - defaulted to 'post'</p>
+</li>
+<li><a name="item_parameters__i__String_Hash___i_"></a><b>parameters <i>(String|Hash)</i></b>
+<p>String in the syntax of key1=val1&amp;key2=val2, or hash {key1: 'val1', key2: 'val2'} of key/value pairs of parameters to be 
+sent with the HTTP request</p>
+<p>optional - defaulted to {}</p>
+</li>
+<li><a name="item_onSuccess__i__function___i_"></a><b>onSuccess <i>(function)</i></b>
+<p>Function handler of the onSuccess of the AJAX HTTP request to retrieve paginated data.</p>
+<p>optional - defaulted to Prototype.emptyFunction</p>
+</li>
+<li><a name="item_lazy__i__boolean___i_"></a><b>lazy <i>(boolean)</i></b>
+<p>Boolean indicating whether to load first page with the initialization of the Paginator Object.
+<code>true</code> implies lazy loading of the first page - will wait for an explicit call to <code>loadContent</code> method.</p>
+<p>optional - defaulted to false</p>
+</li>
+<li><a name="item_timeoutAjax__i__Numeric___i_"></a><b>timeoutAjax <i>(Numeric)</i></b>
+<p>Number of seconds to wait before aborting the Ajax HTTP Request.  Upon abort, an error message will display in the <code>list_container</code>.</p>
+<p>optional - defaulted to 15</p>
+</li>
+<li><a name="item_errorMsg__i__String___i_"></a><b>errorMsg <i>(String)</i></b>
+<p>Error message to display on timeoutAjax.</p>
+<p>optional - defaulted to "Probl&#xe8;me de connexion. R&#xe9;essayer et si le probl&#xe8;me persiste, contacter un administrateur."</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Flipping_the_Pages">
+    <h4 class="TN_label">Flipping the Pages</h4>
+    <div class="TN_content">
+      <ul>
+<li><a name="item_hasNext__"></a><b>hasNext()</b>
+<p>Returns boolean indicating whether the paginator has more data to display.</p>
+</li>
+<li><a name="item_hasPrevious__"></a><b>hasPrevious()</b>
+<p>Returns boolean indicating whether the paginator has previous data to display.</p>
+</li>
+<li><a name="item_getFirstPage__"></a><b>getFirstPage()</b>
+<p>Returns boolean if successful.</p>
+</li>
+<li><a name="item_getPrevPage__"></a><b>getPrevPage()</b>
+<p>Returns boolean if successful.</p>
+</li>
+<li><a name="item_getNextPage__"></a><b>getNextPage()</b>
+<p>Returns boolean if successful.</p>
+</li>
+<li><a name="item_getLastPage__"></a><b>getLastPage()</b>
+<p>Returns boolean if successful</p>
+</li>
+<li><a name="item_loadContent__"></a><b>loadContent()</b>
+<p>Core method that initializes the AJAX HTTP Request to retrieve data and calls the onSuccess handler
+to dipplay the result.</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="destroy">
+    <h4 class="TN_label">destroy</h4>
+    <div class="TN_content">
+      <pre>  mypaginator.destroy();</pre>
+
+<p>This method will remove all handlers assigned to pagination buttons.
+Call this method when the paginator element is removed from the DOM.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

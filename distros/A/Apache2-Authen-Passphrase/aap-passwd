@@ -1,0 +1,76 @@
+#!/usr/bin/perl -T
+use 5.014000;
+use strict;
+use warnings;
+
+our $VERSION = 0.002001;
+
+use Apache2::Authen::Passphrase qw/pwset USER_REGEX/;
+
+use IO::Prompter [qw/-e* -stdio/];
+
+die "Usage: aap-passwd [rootdir] username\n" if @ARGV == 0 || @ARGV > 2;
+($Apache2::Authen::Passphrase::rootdir) = (shift =~ /(.*)/s) if @ARGV == 2;
+
+my $username = shift;
+die "Invalid username\n" unless $username =~ USER_REGEX;
+($username) = ($username =~ /(.*)/s);
+
+my $passwd = prompt 'Enter new Apache2::Authen::Passphrase password: ';
+my $confirm = prompt 'Retype new Apache2::Authen::Passphrase password: ';
+
+die "Sorry, passwords do not match\n" unless $passwd eq $confirm;
+pwset $username, $passwd;
+say 'Password updated successfully'; ## no critic (RequireCheckedSyscalls)
+
+__END__
+
+=head1 NAME
+
+aap-passwd - passwd utility for Apache2::Authen::Passphrase
+
+=head1 SYNOPSIS
+
+  user@hostname:~$ aap-passwd /path/to/rootdir marius
+  Enter new Apache2::Authen::Passphrase password: ***
+  Retype new Apache2::Authen::Passphrase password: ***
+  Password updated successfully
+
+=head1 DESCRIPTION
+
+aap-passwd updates the password of an Apache2::Authen::Passphrase user.
+
+It is used like this:
+
+    aap-passwd /path/to/rootdir username
+
+where the C<rootdir> is the first argument and the username whose password is to be changed is the second argument, or like this:
+
+    aap-passwd username
+
+where the C<rootdir> is taken from the environment and the username is the only argument.
+
+=head1 ENVIRONMENT
+
+=over
+
+=item AAP_ROOTDIR
+
+The default Apache2::Authen::Passphrase C<rootdir>, used if the C<rootdir> is not explicitly given.
+
+=back
+
+=head1 AUTHOR
+
+Marius Gavrilescu C<< <marius@ieval.ro> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013-2015 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

@@ -1,0 +1,20 @@
+#!/bin/perl
+use strict;
+use warnings;
+use App::Ikaros;
+use Data::Dumper;
+
+my $status = App::Ikaros->new({
+    config => 'config/ikaros.conf',
+    config_type => 'dsl',
+    config_options => [],
+    enable_profile => 0
+})->launch(sub {
+    my $failed_tests = shift;
+    my $failed_tests_num = scalar @$failed_tests;
+    print <<"MESSAGE";
+FAILED $failed_tests_num.
+start Retry testing...
+MESSAGE
+    print Dumper $failed_tests;
+});

@@ -1,0 +1,17 @@
+2009-07-28 14:29  cvs
+
+	* lib/Alister/Base/Sums.pm: Another pod error fixed. It turns out
+	  if you have lib/Module.pod and lib/Module.pm, if you have ANY pod
+	  directives in lib/Module.pm, it overrides lib/Module.pod!!!
+
+2009-07-28 09:22  cvs
+
+	* lib/Alister/Base/: Sums.pm, Sums.pod: touched up pod
+
+2009-07-27 18:09  cvs
+
+	* lib/Alister/Base/Sums.pm, lib/Alister/Base/Sums.pod,
+	  t/00_basic_compile.t, t/01_validate_args.t, t/02_sum_add.t,
+	  t/03_sum_get.t, t/04_sum_delete.t, t/05_sum_update.t,
+	  t/dev.dbh.conf: Initial revision
+

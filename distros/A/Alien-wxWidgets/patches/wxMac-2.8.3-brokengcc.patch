@@ -1,0 +1,12 @@
+diff -u include/wx/scopeguard.h include/wx/scopeguard.h
+--- include/wx/scopeguard.h	2007-11-21 21:17:54.000000000 +0100
++++ include/wx/scopeguard.h	2007-11-21 21:16:43.000000000 +0100
+@@ -108,7 +108,7 @@
+     // for OnScopeExit() only (we can't make it friend, unfortunately)!
+     bool WasDismissed() const { return m_wasDismissed; }
+ 
+-protected:
++public:
+     ~wxScopeGuardImplBase() { }
+ 
+     wxScopeGuardImplBase(const wxScopeGuardImplBase& other)

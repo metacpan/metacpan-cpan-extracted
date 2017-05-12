@@ -1,0 +1,10 @@
+Revision history for AnyEvent::BDB
+
+1.1  Tue Jul 21 05:24:54 CEST 2009
+        - when AnyEvent::BDB was loaded after event loop intiialise,
+          then the watcher would get destroyed again.
+        - take advantage of AnyEvent 3.81 API and simplify the module
+          immensely.
+
+1.0  Sat May 10 22:22:01 CEST 2008
+	- original version, a Net::SNMP::EV-clone.

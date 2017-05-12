@@ -1,0 +1,35 @@
+<div class="floatleft">
+<form method="POST" action="[% s.ubase %]/[% s.object %]/search">
+<table>
+	<caption>Search&nbsp;[% s.object %]</caption>
+	<tbody>
+	<tr>
+		<th>ID</th>
+		<td><input name="[% s.o.id %]" value="[% s.in.${s.o.id} %]"></td>
+	</tr>
+[% FOREACH f IN s.o.fields -%]
+	[% IF f.search %]
+	<tr>
+		<th>[% f.t %]</th>
+		<td>
+		[% IF f.r %]
+			<select name="[% f.r %]_id">
+				<option value=""></option>
+			[% FOREACH m IN hash.menu.${f.r} -%]
+				<option value="[% m.id %]"[% IF hash.${f.i} == m.id %] selected[% END %]>[% m.name %]</option>
+			[% END %]
+			</select>
+		[% ELSIF f.boolean %]
+			<input type="checkbox" name="[% f.k %]" value="1"[% IF hash.${f.k} %] checked[% END %]>
+		[% ELSE %]
+			<input name="[% f.k %]" value="[% hash.${f.k} %]">
+		[% END %]
+		</td>
+	</tr>
+	[% END %]
+[% END %]
+	</tbody>
+</table>
+<input type="submit" value="Search">
+</form>
+</div>

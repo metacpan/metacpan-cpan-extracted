@@ -1,0 +1,170 @@
+Astro::Catalog module
+---------------------
+
+What is it?
+-----------
+
+The module is a generic object orientated astronomical catalogue object.
+
+Requirements
+------------
+
+The madatory requirement of the Astro::Catalog package are,
+
+  Astro::Coords
+  Astro::Telescope
+  Time::Piece
+  File::Spec
+  Math::Libm
+  Net::Domain
+  LWP::UserAgent
+  SOAP::Lite
+  Test
+  Test::More
+  Data::Dumper
+  Carp
+  Astro::VO::VOTable
+  Astro::Flux
+  Number::Uncertainty
+  Misc::Quality
+
+See http://heasarc.gsfc.nasa.gov/classx/votable/index.html to obtain the GSFC
+Astro::VO::VOTable package. You need V0.9 or later of this module.
+
+Provides
+--------
+
+The package provides the following user level classes
+
+  Astro::Catalog
+    A generic catalogue object, includes pluggable I/O support.
+
+  Astro::Catalog::Item
+    A generic catalogue item.
+
+NB: Astro::Catalog::Star is maintained for backwards compatibility.
+
+The following classes can be used to query various online databases
+for astronomical objects. They all return an Astro::Catalog object
+populated with matching Astro::Catalog::Star objects.
+
+  Astro::Catalog::Query::2MASS
+    Queries the Two Micron All Sky Survey (2MASS) catalogue.
+
+  Astro::Catalog::Query::CMC
+    Queries the Carlsberg Meridian Catalogue (CMC/12).
+
+  Astro::Catalog::Query::GSC
+    Queries the Guide Star Catalog (GSC).
+
+  Astro::Catalog::Query::MPC
+    Queries the Minor Planet Center database for solar system objects.
+
+  Astro::Catalog::Query::Sesame
+    Queries the CDS Sesame web service.
+
+  Astro::Catalog::Query::SIMBAD
+    Queries the CDS SIMBAD database. Implements most of the functionality
+    of the Astro::SIMBAD module.
+
+  Astro::Catalog::Query::SkyCat
+    Queries SkyCat catalogues. For some catalogue queries, parsing of the
+    returned catalogue will not work. In some cases the URLs of the
+    resources may break this module's parsing code.
+
+  Astro::Catalog::Query::SuperCOSMOS
+    Queries the SuperCOSMOS catalogue.
+
+  Astro::Catalog::Query::USNOA2
+    Queries the USNO-A2.0 catalogue.
+
+  Astro::Catalog::Query::Vizier
+    Queries Vizier catalogues. For some catalogue queries, parsing of the
+    returned catalogue will not work.
+
+Additional classes provided by the package handle things that you don't
+need to concern yourself with, unless you want to write your own I/O or
+query plugins, these are
+
+  Astro::Catalog::IO::Astrom     (write only)
+  Astro::Catalog::IO::ASSM       (read only)
+  Astro::Catalog::IO::Binary     (read only)
+  Astro::Catalog::IO::Cluster
+  Astro::Catalog::IO::FINDOFF
+  Astro::Catalog::IO::FITSTable
+  Astro::Catalog::IO::GaiaPick   (read only)
+  Astro::Catalog::IO::JCMT
+  Astro::Catalog::IO::LCOGFITSTable
+  Astro::Catalog::IO::Northstar  (read only)
+  Astro::Catalog::IO::RITMatch
+  Astro::Catalog::IO::SExtractor (read only)
+  Astro::Catalog::IO::STL        (read only)
+  Astro::Catalog::IO::Simple
+  Astro::Catalog::IO::TST        (read only)
+  Astro::Catalog::IO::UKIRTBS    (read only)
+  Astro::Catalog::IO::VOTable
+  Astro::Catalog::IO::XY
+  Astro::Catalog::Transport::REST
+  Astro::Catalog::Transport::WebService
+  Astro::Catalog::Query
+  Astro::Catalog::Item::Morphology
+
+The user level query classes inherit from the Astro::Catalog::Transport::XXX
+classes, which in turn all inherit basic functionality from the Query base
+class Astro::Catalog::Query. The Astro::Catalog::IO modules provide pluggable
+polymorphic input/output.
+
+It should be noted that Astro::Catalog::IO::TST, STL, GaiaPick, SExtractor,
+and UKIRTBS do not currently provide a _write_catalog() function, and
+Astrom does not currently provide a _read_catalog() function.
+
+Where can I get it?
+-------------------
+
+The package is available from CPAN <http://www.cpan.org/> and from github
+at https://github.com/timj/perl-Astro-Catalog
+
+Installation
+------------
+
+Installation is automated using the Module::Build library
+
+     % perl Build.PL
+     % ./Build
+     % ./Build test
+     % ./Build install
+
+Authors
+-------
+
+The module was originally written by Alasdair Allan <aa@astro.ex.ac.uk>,
+of the University of Exeter Astrophysics Group (http://www.astro.ex.ac.uk/)
+as part of his work for the eSTAR project.
+
+The internal architecture of the module was extensively rewritten for v3.0
+by Tim Jenness <t.jenness@jach.hawaii.edu> of the Joint Astronomy Centre
+in Hawaii and Alasdair Allan <aa@astro.ex.ac.uk>, of the University of
+Exeter Astrophysics Group. Then rewritten again by Alasdair Allan <aa@astro.ex.ac.uk> for the v4.0 release.
+
+This version also includes patches supplied by Stephen Quinney
+<S.J.Quinney@durham.ac.uk> of Durham University, Tim Lister
+<tlister@lcogt.net> of Las Cumbres Observatory, and Luca Rizzi
+<l.rizzi@jach.hawaii.edu>, Graham Bell <g.bell@jach.hawaii.edu>
+and Brad Cavanagh <b.cavanagh@jach.hawaii.edu> of the Joint Astronomy
+Centre in Hawaii.
+
+License
+-------
+This package is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place,Suite 330, Boston, MA  02111-1307, USA

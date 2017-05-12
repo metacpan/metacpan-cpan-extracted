@@ -1,0 +1,14 @@
+# Revision history for Perl extension Attribute::Tie.
+#
+# $Id: Changes,v 0.2 2009/02/08 09:00:27 dankogai Exp dankogai $
+#
+$Revision: 0.2 $ $Date: 2009/02/08 09:00:27 $
+! t/02-array.t
+  Addressed: RT#40141 (Test failures (negative FETCHSIZE))
+  http://rt.cpan.org/Public/Bug/Display.html?id=40141
+
+
+0.01  Sat Dec 23 02:40:50 2006
+	- original version; created by h2xs 1.23 with options
+		-XA Attribute::Tie
+

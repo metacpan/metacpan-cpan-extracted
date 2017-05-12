@@ -1,0 +1,57 @@
+Revision history for Perl extension Archive::ByteBoozer.
+
+0.09  2016-04-01
+    - rebuilt a distribution package to include missing files "META.yml" and
+      "META.json"
+
+0.08  2016-01-09
+    - make test suite pass for the latest version of Params::Validate (>= 1.21)
+
+0.07  2013-09-21
+    - switched IO::Capture to Capture::Tiny, which is able to correctly capture
+      contents written into the standard output file handle
+    - fixed two randomly failing unit-tests, removed one duplicate test case
+    - fixed "Use of uninitialized value in subroutine entry" warning during
+      test suite execution
+
+0.06  2013-06-15
+    - introduced an additional "crunch" parameter named "relocate_output_up_to",
+      allowing to relocate compressed data to the given end address (as opposite
+      to the "relocate_output", which relocates data to the given start address)
+
+0.05  2013-01-16
+    - fixed "undefined symbol 'mXPUSHs'" compilation error for Perl 5.10.0 by
+      removing "mXPUSHs()" macro from the XS code (according to perl5101delta
+      "mXPUSHs()" macro for pushing SVs on the stack and mortalizing them has
+      been introduced in Perl 5.10.1)
+
+0.04  2013-01-13
+    - fixed "error: two or more data types in declaration specifiers"
+      compilation error on FreeBSD by reordering include directives in
+      "cruncher.h" and "file.h" header files, and thus making sure that "bb.h"
+      is always processed after "sys/types.h" header file (included by
+      "sys/stat.h"), which on FreeBSD redefines a "uint" type without checking
+      if the same type definition has already existed before
+
+0.03  2013-01-08
+    - fixed "error: expected identifier before numeric constant" compilation
+      error by replacing all occurrences of "true" and "false" constants with
+      "_true" and "_false" labels in the original source code right before
+      packaging the actual release of this module, so that it now successfully
+      compiles also Mac OS X (which, it turned out, has got those constants
+      already predefined)
+
+0.02  2013-01-05
+    - updated "ByteBoozer" source code to version 1.1, which was published by
+      David Malmborg on June the 14th, 2012
+    - fixed "error: expected ';', identifier or '(' before 'char'" compilation
+      error by replacing all occurrences of a newly defined "bool" type (first
+      defined in "bb.h") with "_bool" label in the original source code right
+      before packaging the actual release of this module, so that it now
+      successfully compiles also on most non-Linux systems as well as for
+      bleadperl
+
+0.01  2012-04-07
+    - initial version (provides Perl interface to David Malmborg's ByteBoozer,
+      supports crunching Commodore data files using the compression algorithm
+      implemented via ByteBoozer)

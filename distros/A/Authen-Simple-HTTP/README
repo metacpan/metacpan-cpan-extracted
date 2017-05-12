@@ -1,0 +1,66 @@
+NAME
+    Authen::Simple::HTTP - Simple HTTP authentication
+
+SYNOPSIS
+        use Authen::Simple::HTTP;
+    
+        my $http = Authen::Simple::HTTP->new( 
+            url => 'http://www.host.com/protected'
+        );
+    
+        if ( $http->authenticate( $username, $password ) ) {
+            # successfull authentication
+        }
+    
+        # or as a mod_perl Authen handler
+    
+        PerlModule Authen::Simple::Apache
+        PerlModule Authen::Simple::HTTP
+
+        PerlSetVar AuthenSimpleHTTP_url "http://www.host.com/protected"
+
+        <Location /protected>
+          PerlAuthenHandler Authen::Simple::HTTP
+          AuthType          Basic
+          AuthName          "Protected Area"
+          Require           valid-user
+        </Location>    
+
+DESCRIPTION
+    Authenticate against an HTTP server.
+
+METHODS
+    * new
+        This method takes a hash of parameters. The following options are
+        valid:
+
+        * url   Url to authenticate against. Required.
+
+                    url => 'http://www.host.com/protected'
+
+        * agent Any object that is a subclass of LWP::UserAgent.
+
+                    agent => LWP::UserAgent->new;
+
+        * log   Any object that supports "debug", "info", "error" and
+                "warn".
+
+                    log => Log::Log4perl->get_logger('Authen::Simple::HTTP')
+
+    * authenticate( $username, $password )
+        Returns true on success and false on failure.
+
+SEE ALSO
+    Authen::Simple.
+
+    LWP::UserAgent.
+
+    LWPx::ParanoidAgent.
+
+AUTHOR
+    Christian Hansen "ch@ngmedia.com"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

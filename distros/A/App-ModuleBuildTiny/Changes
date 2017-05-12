@@ -1,0 +1,78 @@
+Revision history for App-ModuleBuildTiny
+
+          - Added mint command
+
+0.018     2016-10-17
+          - Always follow symlinks when creating a tarball
+          - Include terminating newline in MANIFEST
+
+0.017     2016-10-11
+          - Always create a proper license object
+
+0.016     2016-08-26
+          - Encode generated files to utf-8
+
+0.015     2016-08-26
+          - Handle zero versions correctly
+
+0.014     2016-07-01
+          - Make failures about missing/unparseable NAME sections clearer
+          - Make explicit warning when =head1 AUTHOR is missing/unparsable.
+          - Skip attempting to extract licenses from empty sections
+          - Emit the name of the file the license can't be found in.
+
+0.013     2016-05-17
+          - Fix up for release engineering mistake
+
+0.012     2016-05-17
+          - Add a check for the changes file to the dist command
+          - Handle Module::Metadata failures more gracefully
+          - Allow null-version dependencies on mbt/ambt
+          - Require version 1.000009 of Module::Metadata
+
+0.011     2016-02-23
+          - Make conservative version logic slightly less conservative
+          - Allow setting the distribution name in metamerge, instead of insisting on using the dirname
+
+0.010     2015-09-19
+          - Update and fix see also section
+
+0.009     2015-04-04
+          Use more conservative MBT version dependency
+
+0.008     2015-03-28
+          Run Build correctly on Windows
+          Check METAfile dependencies more thoroughly
+
+0.007     2015-03-06
+          Add lib and script paths to appropriate environmental variables
+          Determine license from POD
+
+0.006     2015-02-14
+          Add creation comment to Build.PL
+          Add provides field to meta
+          Add --no-build option to run
+          Split shell out of run
+
+0.005     2015-01-30
+          Use existent MANIFEST if present
+          Add develop dependency on App::ModuleBuildTiny to generated dists
+
+0.004     2015-01-28
+          Handle generated files more sensibly
+          Load modules more lazily
+          Add support for mergefiles
+
+0.003     2014-12-17
+          Fix dependency on Getopt::Long 2.39
+
+0.002     2013-09-10
+          Switch to a generated files workflow
+          Document the mbtiny command
+          Added run action
+          Added generate action
+          Removed clean and realclean actions
+          Added --json to listdeps
+
+0.001     2013-09-09
+          First release

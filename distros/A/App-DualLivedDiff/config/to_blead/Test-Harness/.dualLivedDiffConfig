@@ -1,0 +1,20 @@
+---
+base-path-in-blead: ext/Test-Harness
+dirs-recursive:
+  .: .
+exclude-regexes:
+  - '^(?:\.?/)?META.yml$'
+  - '^(?:\.?/)?MANIFEST$'
+  - '^(?:\.?/)?examples/'
+  - '^(?:\.?/)?HACKING\.pod$'
+  - '^(?:\.?/)?inc/MyBuilder\.pm$'
+  - '^(?:\.?/)?README$'
+  - '^(?:\.?/)?xt/'
+  - '^(?:\.?/)?Changes-2\.64$'
+  - '^(?:\.?/)?perlcriticrc$'
+  - '^(?:\.?/)?t/lib/Test/More\.pm$'
+  - '^(?:\.?/)?t/lib/Test/Simple\.pm$'
+  - '^(?:\.?/)?t/lib/Test/Builder\.pm$'
+  - '^(?:\.?/)?t/lib/Test/Builder/Module\.pm$'
+  - '^(?:\.?/)?t/lib/if\.pm$'
+

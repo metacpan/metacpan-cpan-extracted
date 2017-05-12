@@ -1,0 +1,13 @@
+Revision history for Perl extension AnyEvent::IRC::Server
+
+0.03 2013-05-02T07:17:46Z
+
+0.03 2013-05-02T06:58:43Z
+    - fixed many bugs
+
+0.02    Mon Oct 18 01:34:15 2010
+        - support daemon_cmd_join
+          (thanks yappo)
+
+0.01    Fri Jan 22 12:47:12 2010
+        - original version

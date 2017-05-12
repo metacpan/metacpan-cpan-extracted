@@ -1,0 +1,25 @@
+Bug reports, patches:
+---------------------
+  Please always check the latest version from my home page
+  before reporting a bug. 
+    (http://www.mpg123.de/)
+  If you send me a patch, please use the 'unified' version.
+  (diff -u ...)
+
+Of course, there are some known bugs:
+-------------------------------------
+
+- Using the buffermode, the switching from foreground to background operation 
+  results in ugly noise  (-> hopefully fixed)
+- win32 port: problems with option handling
+- auto-config depending on audio capabilities not fully (buggy) implemented
+
+- Usually the versions are tested on Solaris and Linux, only. 
+  If you encounter a problem for any platform ,please let me know.
+  Audio parts are not heavily on some systems.
+
+  It also compiles under Aix 3.x with the 'make generic' version
+  SGI completly untested
+  SUNOS 4.x completly untested
+
+

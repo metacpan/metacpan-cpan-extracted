@@ -1,0 +1,264 @@
+Apache/CompressClientFixup version 0.07
+=======================================
+
+=head1 NAME
+
+Apache::CompressClientFixup - Perl extension for Apache-1.3.X to avoid C<gzip> compression
+for known buggy browsers.
+
+=head1 INTRODUCTION
+
+Standard gzip compression significantly scales bandwidth,
+and helps to satisfy clients, who receive the compressed content faster,
+especially on dialups.
+
+Obviously, the success of proper implementation of content compression depends on quality of both sides
+of the request-response transaction.
+Since on server side we have 6 open source modules/packages for web content compression (in alphabetic order):
+
+=over 4
+
+=item ·Apache::Compress
+
+=item ·Apache::Dynagzip
+
+=item ·Apache::Gzip
+
+=item ·Apache::GzipChain
+
+=item ·mod_deflate
+
+=item ·mod_gzip
+
+=back
+
+the main problem of implementation of web content compression deals with fact that some buggy web clients
+declare the ability to receive
+and decompress gzipped data in their HTTP requests, but fail to keep promises
+when the response arrives really compressed.
+
+All known content compression modules rely on C<Accept-Encoding: gzip> HTTP request header
+in accordance with C<rfc2616>. HTTP server should never respond with compressed content
+to the client which fails to declare self capability to uncompress data accordingly.
+
+Thinking this way, we would try to unset the incoming C<Accept-Encoding> HTTP header
+for those buggy clients, because they would better never set it up...
+
+We would separate this fixup handler from the main compression module for a good reason.
+Basically, we would benefit from this extraction, because in this case
+we may create only one common fixup handler for all known compression modules.
+It would help to
+
+=over 4
+
+=item ·Share specific information;
+
+=item ·Simplify the control of every compression module;
+
+=item ·Wider reuse the code of the requests' correction;
+
+=item ·Simplify further upgrades.
+
+=back
+
+=head2 Acknowledgments
+
+Thanks to Rob Bloodgood for the patch that helps to eliminate some unnecessary warnings.
+
+=head1 DESCRIPTION
+
+This handler is supposed to serve the C<fixup> stage on C<mod-perl> enabled C<Apache-1.3.X>.
+
+It unsets HTTP request header C<Accept-Encoding> for the following web clients:
+
+=head2 Microsoft Internet Explorer
+
+Internet Explorer sometimes loses the first 2048 bytes of data
+that are sent back by Web Servers that use HTTP compression,
+- Microsoft confirms for MSIE 5.5 in Microsoft Knowledge Base Article - Q313712
+(http://support.microsoft.com/default.aspx?scid=kb;en-us;Q313712).
+
+The similiar statement about MSIE 6.0 is confirmed in Microsoft Knowledge Base Article - Q312496.
+
+In accordance with Q313712 and Q312496, these bugs affect transmissions through
+
+=over 4
+
+=item HTTP
+
+=item HTTPS
+
+=item FTP
+
+=item Gopher
+
+=back
+
+and special patches for MSIE-5.5 and MSIE-6.0 were published on Internet.
+
+Microsoft confirmed that this was a problem in the Microsoft products.
+
+Microsoft states that this problem was first corrected in Internet Explorer 6 Service Pack 1.
+
+Since then, later versions of MSIE are not supposed to carry this bug at all.
+
+This version of the handler does not restrict compression for MSIE over HTTP.
+
+Restriction over HTTPS for all versions of MSIE could be configured with
+
+    PerlSetVar RestrictMSIEoverSSL On
+
+in httpd.conf if necessary.
+
+=over 4
+
+=item Note:
+
+It is not recommended any more to restrict MSIE over SSL since Vlad Jebelev reported
+successfull delivery of compressed content to MSIE over SSL providing dynamic Apache
+downgrade from HTTP/1.1 to HTTP/1.0 in accordance with SSL recommendations.
+Since then it would be considered preferable solution to downgrade the protocol for this client
+instead of discarding compression.
+
+This approach works fine with C<Apache::Dynagzip 0.09>, or later.
+
+=back
+
+=head2 Netscape 4.X
+
+This is C<HTTP/1.0> client.
+Netscape 4.X is failing to
+
+=over 4
+
+=item a) handle <script> referencing compressed JavaScript files (Content-Type: application/x-javascript)
+
+=item b) handle <link> referencing compressed CSS files (Content-Type: text/css)
+
+=item c) display the source code of compressed HTML files
+
+=item d) print compressed HTML files
+
+=back
+
+See detailed description of these bugs at
+http://www.schroepl.net/projekte/mod_gzip/browser.htm - Michael Schroepl's Web Site.
+
+This version serves cases (a) and (b) as default for this type of browsers.
+Namely, it unsets HTTP request header C<Accept-Encoding> for C<Content-Type: application/x-javascript>
+and for C<Content-Type: text/css> when the request is originated from Netscape 4.X client.
+
+This version serves cases (c) and (d) conditionally:
+To activate printability for C<Netscape Navigator 4.X> you need to place
+
+    PerlSetVar NetscapePrintable On
+
+in your C<httpd.conf>.
+In this case it turns off any compression for that buggy browser.
+
+On Wednesday January 15, 2003 Michael Schroepl wrote to C<mod_gzip@lists.over.net>:
+
+    ... Our customers still include 17% Netscape 4 users, sigh ...
+
+=head2 Partial Request from Any Web Client
+
+In accordance with C<rfc2616> server I<may> ignore C<Range> features of the request and respond
+with full HTTP body indeed. Usually you should not care about compression features in this case.
+
+Just in case this version unsets HTTP header C<Accept-Encoding> for any web client conditionally when
+
+    PerlSetVar RestrictRangeCompression On
+
+is present in your C<httpd.conf> and HTTP header C<Range> is present within the request.
+You may experiment with this option when you know what you are doing...
+
+=head1 INSTALLATION
+
+The installation consists of the two steps:
+
+ - Installation to your Perl Library
+ - Configuration of your Apache Server
+
+=head2 Installation to your Perl Library
+
+Use the regular procedure to install this module to your Perl Library.
+
+When you have your local copy of the package type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Note: You should be a root to succeed with the last step...
+
+To install the package from CPAN try to run
+
+   perl -CPAN -e "install Apache::CompressClientFixup"
+
+on your UNIX machine.
+
+=head2 Configuration of your Apache Server
+
+Use the idea of the following example to create your own configuration:
+
+  PerlModule Apache::CompressClientFixup
+  <Location /devdoc/Dynagzip>
+      SetHandler perl-script
+      PerlFixupHandler Apache::CompressClientFixup
+      Order Allow,Deny
+      Allow from All
+  </Location>
+
+You can, for example, restrict compression for MSIE over SSL
+and restrict compression for C<Netscape Navigator 4.X> with
+
+  PerlModule Apache::CompressClientFixup
+  <Location /devdoc/Dynagzip>
+    SetHandler perl-script
+    PerlFixupHandler Apache::CompressClientFixup
+    PerlSetVar RestrictMSIEoverSSL On
+    PerlSetVar NetscapePrintable On
+    Order Allow,Deny
+    Allow from All
+  </Location>
+
+You can restrict compression for partial requests if required.
+Please, do this ONLY when you know exactly what you are doing.
+From my personal point of view it should not be necessary as usual.
+
+=head1 DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Apache::Constants;
+   Apache::Log;
+   Apache::URI;
+
+which come bandled with C<mod_perl>. You don't need to install them additionally.
+
+=head1 AUTHOR
+
+Slava Bizyayev E<lt>slava@cpan.orgE<gt> - Freelance Software Developer & Consultant.
+
+=head1 COPYRIGHT AND LICENSE
+
+I<Copyright (C) 2002, 2003 Slava Bizyayev. All rights reserved.>
+
+This package is free software.
+You can use it, redistribute it, and/or modify it under the same terms as Perl itself.
+
+The latest version of this module can be found on CPAN.
+
+=head1 SEE ALSO
+
+C<mod_perl> at F<http://perl.apache.org>
+
+C<Apache::Dynagzip> at F<http://search.cpan.org/author/SLAVA/>
+
+Web Content Compression FAQ at F<http://perl.apache.org/docs/tutorials/client/compression/compression.html>
+
+Michael Schroepl's Web Site at F<http://www.schroepl.net/projekte/mod_gzip/browser.htm>
+
+=cut
+

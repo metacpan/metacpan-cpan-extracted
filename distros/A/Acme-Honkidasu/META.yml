@@ -1,0 +1,29 @@
+---
+abstract: '本気出すコピペ'
+author:
+  - 'hayajo <hayajo@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Honkidasu
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  POSIX::strftime::GNU: 0
+  Time::Piece: 1.20
+  perl: 5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hayajo/p5-Acme-Honkidasu.git
+version: 0.01

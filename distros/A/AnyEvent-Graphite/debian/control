@@ -1,0 +1,13 @@
+Source: libanyevent-graphite-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5), libmodule-build-perl, libanyevent-perl, libnet-snmp-perl, libanyevent-snmp-perl
+Build-Depends-Indep: perl (>= 5.6.10-12)
+Maintainer: Jeremy Jack <jjack@mediatemple.net>
+Standards-Version: 3.8.0
+Homepage: https://github.com/jjack/AnyEvent-Graphite
+
+Package: libanyevent-graphite-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}
+Description: AnyEvent::Graphite, packaged.

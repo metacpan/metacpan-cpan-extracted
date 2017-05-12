@@ -1,0 +1,113 @@
+NAME
+    iptables2dot - turn iptables-save output into graphs for GraphViz
+
+SYNOPSIS
+     iptables2dot [options] [iptables-save-output-file]
+
+OPTIONS
+    --help  Print a brief help message and exit.
+
+    --manual
+            Print the manual page and exit.
+
+    --add-optdef optdef
+            Provide an option definition for an iptables option that is
+            unknown to the rule parser from App::Iptables2Dot.
+
+            If the program dies with the message *unknown argument in rule:
+            --unknown-opt arg*, you could run it like this:
+
+             iptables2dot --add-optdef unknown-opt=s iptables-save-output
+
+            This may allow you to finish your analysis of
+            iptables-save-output-file without having to modify the module
+            source in *lib/App/Iptables2Dot.pm*. Look at App::Iptables2Dot
+            for further information.
+
+    --edgelabel
+            Provide labels at the edge showing the input or output device
+            for a jump rule.
+
+    --omittargets targetlist
+            Omit some jump targets in the *dot* graph when given together
+            with "--showrules". Multiple targets are separated by comma.
+
+    --showrules/--noshowrules
+            Show/don't show the rules for the chains. Default is
+            "--showrules".
+
+    --showunusednodes/--noshowunusednodes
+            Show/don't show chains without jumps to other chains. Default is
+            "--noshowunusednodes".
+
+    --tables tablelist
+            Only print the tables given in *tablelist*. The tables in
+            *tablelist* are separated by comma.
+
+            Possible tables are "nat", "raw", "mangle" and "filter".
+            Defaults to table "filter".
+
+DESCRIPTION
+    This program takes the output from the command "iptables-save" on Linux
+    and turns into input suitable for the "dot" program from GraphViz.
+
+    It takes the output form "iptables-save" either from standard input
+    (STDIN) or from a text file whose name was given on the command line.
+
+    It writes the graph description for the "dot" program to standard output
+    (STDOUT).
+
+    The main purpose of this program is to get an overview of a given
+    iptables configuration and understand the possible jumps between
+    different chains in the tables. I usually make a printout of the graph
+    for the different tables and have it at hand when studying the rules.
+
+    The typical workflow is:
+
+     $ sudo iptables-save \
+       | iptables2dot -noshowrules -table filter \
+       > iptables-filter-overview.dot
+     $ dot -Tpdf iptables-filter-overview.dot -o iptables-filter-overview.pdf
+
+    Although it is possible to make a detailed graph of an iptables
+    configuration containing all rules, I wouldn't recommend this in most
+    cases.
+
+    In those configurations, where you would need the graph to comprehend
+    the rules, the resulting graph would be a mess.
+
+    When the graph looks neat and is legible on A4 paper, you would probably
+    understand the configuration without it. But it could be handy to
+    explain the rules to someone else, following them with a pencil or your
+    finger.
+
+    You would do this to get a detailed graph:
+
+     $ sudo iptables-save \
+       | iptables2dot -edgelabel -table filter \
+       > iptables-filter.dot
+     $ dot -Tpdf iptables-filter.dot -o iptables-filter.pdf
+
+DIAGNOSTICS
+    "unknown argument in rule: %s"
+        The program will die with this message showing the rule for
+        *iptables-save* that contained an unknown option.
+
+        Since the rules are parsed by "GetOptionsFromString()" from module
+        *Getopt::Long*, you may workaround this by adding the unknown option
+        to the array @optdefs at the top of Apt/Iptables2Dot.pm. After that
+        please file a bug at <https://rt.cpan.org/> or send me a notice at
+        mamawe@cpan.org to have it fixed in one of the next releases of this
+        distribution.
+
+        Alternatively you may want to use the program like this
+
+         iptables2dot --add-optdef unknown-opt=s ...
+
+        if the program dies with message *unknown argument in rule:
+        --unknown-opt arg ...* and you don't want to touch the library file
+        *Apt/Iptables2Dot.pm*.
+
+AUTHOR
+    Mathias Weidner <mamawe@cpan.org>
+

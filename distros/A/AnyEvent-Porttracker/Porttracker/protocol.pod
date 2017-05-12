@@ -1,0 +1,1208 @@
+=head1 DESCRIPTION
+
+This document describes the porttracker API for third-party programs to
+use (it is also used internally to communicate with the tawnyd).
+
+=head1 CONVENTIONS
+
+In this document, command names, paths and similar entities are F<formatted like this>.
+
+   Preformatted sections are indented like this. This is used for verbatim
+   text. Portions of the section that need to be replaced by dynamic
+   content are enclosed in <angle brackets>.
+
+   < Lines starting with "< " are received from the server.
+   > Lines starting with "> " are sent to the server. # and this is a comment
+
+Both text refering to these variable sections and verbatim text inside
+other paragraphs is formatted C<like this>.
+
+=head1 OVERVIEW
+
+=head2 SOCKET LAYER
+
+The API uses a tcp connection to port 55 on the porttracker management
+machine. The TCP connection must be 8-bit-clean (as UTF-8 is used as
+character encoding) and can be driven either in binary or text mode.
+
+Alternatively, the server also listens on the Unix socket
+F</tmp/.tawny/.tawnyd> for local connections (where "none" is one of the
+guaranteed auth methods).
+
+There are currently no timeouts for the connection itself, but TCP
+keepalive might be enabled server-side.
+
+=head2 PACKAGE ENCAPSULATION LAYER
+
+The protocol is based on sending and receiving JSON arrays encoded as
+UTF-8. The server expects JSON arrays to be sent back-to-back, without any
+separators, but for testing purposes it is often convenient to end JSON
+arrays with ASCII LF (or ASCII CR LF) characters ("newline"), effectively
+treating it as a line-based protocol.
+
+To support programming languages without incremental JSON parsers,
+the server will append an ASCII LF character to each JSON array and
+additionally will make sure that its replies will never contain any ASCII
+LF characters, so instead of directly parsing the JSON stream, the client
+may also read single lines and then decode the JSON array contained in
+each line.
+
+Note 1: This means that one can use C<telnet> or a similar program to test
+the protocol, as the server ignores ASCII CR and LF characters but sends
+its responses as single lines.
+
+Note 2: There are two principal parsing strategies: the obvious one is to
+read a single (potentially very large) line and then decode it, and the
+less obvious one is to use a streaming parser and simply read JSON arrays
+one after each other.
+
+=head2 MESSAGE LAYER
+
+Server and client can send messages to each other at any time (usually the
+client first has to wait and parse the initial server greeting, though, to
+see what kind of authentication is required).
+
+All messages are JSON arrays in one of the following formats:
+
+   [<id>, <type>, <args...>]        # client request
+   [<id>, <status>, <args...>]      # server response
+   [null, <type>, <args...>]        # server notification
+
+The first member, C<id>, identifies the request/response pair: Each
+request the client sends has to use a unique ID not currently in use
+by any request that is still ongoing. Any string or number can be
+used for the C<id> value. The C<type> member is a string indicating
+the type of request to the server. The remaining members (if any) are
+request-specific.
+
+Each server response to a request will use the same C<id> value as the
+request. The second member, C<status>, is either C<0> for failure,
+followed by an error message and optionally more information, or C<1> for
+success and request-specific return values.
+
+The protocol supports pipelining (sending multiple requests without
+processing any replies) and responses to a request can come in any
+order. Most requests will be handled in parallel, only some (like the
+login messages) are guaranteed to get processed in order.
+
+If the first member is the JSON C<null> value, then the message is a
+server notification and the C<type> member identified the notification
+type. This mechanism is used for the initial server greeting and any fatal
+errors (such as wrongly formatted client requests).
+
+Note: The type model used for JSON is "soft", that is, numbers might
+sometimes be returned as strings, and vice versa. The only values in the
+protocol where you can be sure of the type are the C<id> and status return
+values, for other values you have to be liberal in what you accept.
+
+
+=head1 SESSION STRUCTURE
+
+When connecting, the server sends a server greeting notification
+("hello"), informing the client of the protocol version, whether
+authentication is required and which kind of authentication is supported.
+
+If the server indicated that authentication is required, the client will
+then have to send login requests until it successfully authenticated.
+
+After that, the server will continue serving client requests.
+
+To end a session, the client just should simply drop the connection.
+
+
+=head1 EXAMPLE SESSION
+
+   < [null,"hello",1,["login"]]
+     Server sent the initial greeting and requests the
+     use of a login request for authentication.
+
+   > ["someid", "realm_poll", 5100005442]
+   < ["someid",0,"you need to authenticate first"]
+     Most requests are only valid once logged-in.
+
+   > [100, "login", "username", "password"]
+   < [100,1]
+     The client sent a login request with credentials,
+     and the server accepted them.
+
+   > ["someid", "realm_poll", 5100005442]
+     Starts a poll, which takes a long time.
+
+   > [3, "ping"]
+   < [3,1,1202674637.64799,17372]
+     Ping simply returns a timestamp and the daemon pid as fast as possible.
+
+   > ["someid",1,{"port_updates":"2","device_seens":"88","device_inserts":"9","switch_updates":"3","port_seens":"73"}]
+     The result of the poll, with some statistical data.
+
+
+=head1 MESSAGE TYPES
+
+Messages might contain more than the documented number of array
+members. If that is the case, the application must simply ignore them.
+
+=head2 NOTIFICATIONS
+
+=over 4
+
+=item "hello" - initial server greeting
+
+   < [null, "hello", <version>, [<auth-types...>], <nonce>]
+
+The server usually sends this notification after the initial connect and
+never thereafter. The C<version> argument specified the protocol version
+(always C<1>), the C<auth-types> argument is an array of authentication
+types that the server accepts (there can be more than one). The nonce can
+be used to securely authenticate, and is base64-encoded.
+
+Before a client is authenticated, all other requests will fail.
+
+The defined authentication types are:
+
+=over 4
+
+=item "none"
+
+No additional authentication is required, the client can simply
+start sending other requests. This is available when the server
+detects a "secure" connection, e.g. from the local host, or when other
+authentication methods are used, such as an SSL certificate or IP-based
+authentication.
+
+=item "login"
+
+The client may use password authentication by sending a login request
+(described later).
+
+=item "login_cram_md6"
+
+The client may use a challenge response mechanism based on MD6 to authenticate.
+
+=back
+
+=item "info" - an informational message
+
+   < [null, "info", <informational-message>]
+
+The server sends an informational message. These can be ignored by the
+client, or logged, depending on taste.
+
+=item "error" - a fatal error has occured
+
+   < [null, "error", <error-message>]
+
+A fatal error has occurred. This should be logged, and the connection
+should probably be closed if the cause cannot be identified, as this
+signifies fatal events such as a non-decodable request or runtime errors
+in the server.
+
+=item "start_tls" - TLS negotiation starts
+
+   < [null, "start_tls"]
+
+This notice is sent when the server wants to start TLS/SSL negotiation,
+either because the server requires TLS to proceed, or because the client
+requested it via a C<start_tls> request.
+
+TLS negotiation will start directly after the final ASCII LF ending the
+notice. The protocol will continue as normal after the TLS handshake.
+
+=item "event" - subscribed system event
+
+   < [null, "event", <type>, <args...>]
+
+This notice is sent each time an event occurs that the session is
+subscribed to (see C<subscribe> and C<unsubscribe> commands).
+
+Currently known events are:
+
+=over 4
+
+=item realm_discover_start realm-gid
+
+Called with the GID of the realm that has just started a discovery process.
+
+=item realm_discover_stop realm-gid
+
+Called with the GID of the realm that has just finished a discovery process.
+
+=item realm_poll_start realm-gid
+
+Called with the GID of the realm that has just started a poll process.
+
+=item realm_poll_stop realm-gid
+
+Called with the GID of the realm that has just finished a poll process.
+
+=back
+
+=back
+
+
+=head2 REQUESTS AND RESPONSES
+
+=over 4
+
+=item "login" - username/password-based authentication
+
+   > [<id>, "login", <username>, <password>]
+   < [<id>, 1]
+
+Tries to log-in with the given username and password. The username
+and password must belong to a valid admin user configured in the user
+interface.
+
+=item "login_cram_md6" - secure username/password-based authentication
+
+   > [<id>, "login_cram_md6", <username>, <cr>, <cc>]
+   < [<id>, 1, <sr>]
+
+Tries to securely login with a username and password. First, a shared key
+is calculated, by using (all MD6 invocations are with blocksize 64 and
+hashsize 256):
+
+   key = hmac_md6 (password, username) # as defined by RFC 2104
+
+Then, the client generates a a nonce of any length (empty nonces are ok),
+called C<cc>. Then it calculates C<cr> using the C<key>, C<cc> and the
+server C<nonce> as follows ("+" means concatenation):
+
+   cr = hmac_md6 (key, cc + nonce)
+
+Then it sends both C<cr> and C<cc> in the login request, base64-encoded.
+
+If authentication is successful, the server responds with a base64-encoded
+C<sr>:
+
+   sr = hmac_md6 (key, nonce + cc)
+
+If the client used a non-empty C<cc>, then it can use the C<sr> value to
+shield against man-in-the-middle attacks by comparing it with its own
+calculation.
+
+Test vectors:
+
+   nonce/base64  = YWVlYWJkZjQzMWEzYWM2
+   username/text = user
+   password/text = pass
+   key/base64    = C1JQ4jnjsrBzJtTZXt8Po+wA/iXtaM5r4BIIjl0lfMA
+   cc/base64     = ZmZiOTczMjE=
+   cr/base64     = 5UJKUqehqBKwXiSk6RzYjsPWqivMJcEgE2crTLVyw04
+   sr/base64     = gGKEpOuv5WuuQ7ZbwDWNIdyJtAnCimVN/faM5qWtOZM
+
+=item "ping" - ping the server, return some informational data
+
+   > [<id>, "ping"]
+   < [<id>, 1, <timestamp>, <server-pid>]
+
+=item "start_tls" - request SSL/TLS handshake
+
+   > [<id>, "start_tls"]
+   < [null, "start_tls"]
+   <--tls negotiation-->
+   < [<id>, 1]
+
+This request request TLS negotiation. If accepted, the server replies
+first with a C<start_tls> notification, followed by the TLS handshake,
+followed by the request reply. If TLS is rejected, then there will be no
+notification and no handshake, just the reply.
+
+
+The client must not send anything after sending this request until
+the server sends a C<start_tls> notification (i.e. nothing must be
+written after the closing C<]> until either a reply or a notification is
+received).
+
+The handshake must be started immediately after the final ASCII LF that
+ends the notification reply.
+
+Note that it is quite possible to receive other responses and
+notifications before the TLS notification is received.
+
+=item "product_id" - return the product id
+
+   > [<id>, "product_id"]
+   < [<id>, 1, <branding>, <product-id>]
+
+Example:
+
+   > [1,"product_id"]
+   < [1,1,"n","00:1d:60:e8:6e:36"]
+
+Returns the branding (e.g. "n" for Porttracker, "i" for PortIQ) and
+product ID for licencing purposes.
+
+=item "subscribe" - subscribe to system events
+
+   > [<id>, "subscribe", <events...>]
+   < [<id>, <status>]
+
+Tries to subscribe to the specified events (see the C<event> notification
+earlier in this document for a list of supported events). As a special
+case, the event named C<*> matches all events.
+
+=item "unsubscribe" - unsubscribe from system events
+
+   > [<id>, "unsubscribe", <events...>]
+   < [<id>, <status>]
+
+Unsubscribes from the specified events - no further events of the
+specified types will be received by this session.
+
+=item "log" - log a message
+
+   > [<id>, "log", <message>, <priority>]
+   < [<id>, <status>]
+
+Logs the given message as if tawnyd had logged it. The C<priority> is a
+standard syslog priority, ranging from C<0> (C<emerg>) to 7 (C<debug>). IF
+it is missing, then the message will be logged with priority C<info>.
+
+=item "set_license" - configure a new licence
+
+   > [<id>, "set_license", <license-string>]
+   < [<id>, <status>]
+
+Configures the given licence string as new licence for the box. Returns
+successful if the licence is valid, fails otherwise.
+
+Setting the license requires admin privileges.
+
+=item "realm_info" - information about realms
+
+   > [<id>, "realm_info", [<fields...>], [<realms...>]]
+   < [<id>, 1, [ [<fields...>]... ]]
+
+Example:
+
+   > [1,"realm_info",["gid","description","polling","name","seeds"]]
+   < [1,1,["5000015442","","0","Realm Name","192.168.33.19"]]
+
+   > [1, "realm_info", ["gid", "discovery_result", "poll_result", "sync_result"]]
+   < [1,1,["64424509927",{"infrastructure":13},{"poll":{"infrastructure":13,
+        "ports":"339","end":"79"}},{"sync":{"qsync":null,"bsync":"Success"}}]]
+
+Requests information about the given realms (or all realms if specified as
+C<null>). The following fields can be requested, and their contents will be
+returned in the order specified in the C<fields> array:
+
+=over 4
+
+=item gid - the gid (id value) identifying the realm
+
+=item name - the user-specified name of the realm
+
+=item description - the user-specified description for this realm
+
+=item last_discover - timestamp of last discover run
+
+=item last_poll - timestamp of last poll run
+
+=item last_sync - timestamp of last sync run
+
+=item polling - 0 (not polling) or 1 (currently polling)
+
+=item syncing - 0 (not syncing) or 1 (currently syncing)
+
+=item seeds - the seed list (whitespace-separated list of seed devices)
+
+=item pollers - a list of poller-gids of pollers attached to the realm
+
+=item discovery_result - a hash with key as infrastructure and value as number of devices discovered 
+
+=item poll_result - a hash with keys infrastructure, ports and end and values as their counts
+
+=item sync_result - a hash with keys qsync and bsync and values as their results
+
+=item ageing_interval - ping sweep interval for this realm.
+
+=back
+
+=item "realm_info_modify" - edits the given realm
+
+   > [<id>, "realm_info_modify", <realm-gid>, {<prop>:<value>,...}]
+   < [<id>, 1]
+
+A property hash followed by a realm gid. Keys of the hash are name,
+description, discovery_poller and ageing_interval.
+
+Example:
+
+   > [1, "realm_info_modify", "38952865423", {"name":"default-1"}]
+   < [1, 1]
+
+=item "realm_modify" - adds and/or deletes realms
+
+   > [<id>, "realm_modify", [delete-ids...], [[add-realm],...]]
+   < [<id>, 1]
+
+Two arrays expected as input. First array is a list of realm gids needs to be deleted.
+Second array is a list of realm needs to be added. An array per realm can contain
+realm name and description.
+
+Example:
+
+   > [1, "realm_modify", ["38456782341"], [["Test Realm", "for test"]]]
+   < [1, 1]
+
+=item "realm_discover" - run discovery on a given realm
+
+   > [<id>, "realm_discover", <realm-gid>]
+   < [<id>, 1]
+
+=item "realm_poll" - run a poll on a given realm
+
+   > [<id>, "realm_poll", <realm-gid>]
+   < [<id>, 1, { <statistical data> } ]
+
+=item "switch_poll" - run a poll on a given realm and switch ip
+
+   > [<id>, "switch_poll", <realm-gid>, <switch ip>]
+   < [<id>, 1, { <statistical data> } ]
+
+=item "realm_sync" - run a sync on a given realm and plugin
+
+   > [<id>, "realm_sync", <realm-gid>, <sync module>]
+   < [<id>, 1]
+
+The C<sync module> can be either bsync or qsync.
+
+=item "realm_query" - query the database
+
+This request executes a database query with filtering, much like the
+device and switch views work in the user interface.
+
+   > [<id>, "realm_query", <realm-gid>, <type>
+      [<column-name>...], [<raw-column-name]>...],
+      {<column-name> : <filter-expression>...},
+      <history mask>, 
+      {<port unused period> : <unused value>}
+     ]
+   < [<id>, 1, [ [<result-data>]... ]]
+
+The C<realm-gid> is the GID of the realm to query, as returned by
+C<real_info>. The C<type> is the string C<device>, C<switch> or
+C<switch_detail>, which corresponds to the device view, switch view or
+switch detail view.
+
+The first array of C<column-name>s specifies which columns should be
+returned. The second array of C<raw-column-name>s works likewise, but
+the values returned will be the "raw" (possibly octet-encoded) database
+contents. Specifying the same column name in both array causes undefined
+behaviour.
+
+The hash of C<column-name> => C<filter-expression> pairs specifies
+additional filters. The syntax for the C<filter-expression> is the same as
+the ones used by the GUI.
+
+The C<history mask> is the history selection option.
+Value 0 means C<current>, value 1 means C<All> and value 2 means 
+C<All+Changes>. Default value is 0.
+
+The hash of C<port unused period> => C<unused> pairs specifies
+port unused time. The C<port unused period> can be days, months or years.
+
+The reply contains an array of result rows. Each row consists of data
+values using the same ordering as in the requested column-name arrays, raw
+columns last.
+
+The (JSON) type of each column depends on the column itself, and can vary
+between rows.
+
+=over 4
+
+=item valid columns for "device" query
+
+vlanname, port_pktcount, linkduplex, port_mac, device_log_end, 
+port_errorcount, vtpdomain, switch_ip, device_log_start, 
+linkstatus, linkspeed, device_mac, history_device, linkadminduplex, 
+ifname, device_comment, device_notes, vlan, device_dnsname, 
+ifalias, switch_uid, ifdescr, linkadminstatus, 
+port_error_percentage, device_ip
+
+=item valid columns for "switch" query
+
+number_ports, switch_action, switch_syslocation, 
+free_ports_percentage, switch_sysservices, switch_dnsname, 
+history_switch, switch_log_end, switch_pollduration, switch_model, 
+available_ports_percentage, switch_comment, ports_lastchange, 
+switch_ip, switch_sysdescr, switch_notes, available_ports, 
+poe_ports, switch_log_start, switch_uid, switch, free_ports
+
+=back
+
+Example:
+
+   > [1, "realm_query", "5100005442", "device",
+     ["switch_uid", "device_ip"],
+     ["device_mac"],
+     { "switch_uid" : "switch03%" }]
+   < [1,1,[["switch03.ibm.de","192.168.40.11","\u00000B\u0006D^"],...
+
+=item valid columns for "switch_detail" view
+
+port_pktcount, history_port, linkduplex, port_mac, port_comment, 
+port_log_start, port_errorcount, port_log_end, 
+detected_devices_current, linkstatus, linkspeed, linkadminduplex, 
+ifname, port_action, poe_power, ifalias, switch_uid, poe_status, switch, 
+ifdescr, linkadminstatus, port_error_percentage
+
+Example:
+
+   > [5, "realm_query", "5100005442", "switch_detail",
+     ["ifname"], [],
+     { "switch" : 27 }]
+   < [5,1,[["Fa0/11"],["Fa0/21"], ... ,["Fa0/5"]]]
+
+=item "report_info" - returns the available report list
+
+This request returns the report list for the logged-in user.
+
+   > [<id>, "report_info"]
+   < [<id>, 1, [ [<gid>, <name>], ...]]
+
+The reply will contains an array for each report. Each array will have gid 
+and name of the report.
+
+Example:
+
+   > [1, "report_info"]
+   < [1,1,[["3865500631171148","New Report 1"]]]
+
+=item "user_view_info" - return the available views list
+
+This request returns the report views list for the logged-in user.
+
+   > [<id>, "user_view_info", [<field-list>], [<type-list>]]
+   < [<id>, 1, [ [<fields>, ...], ...]]
+
+Valid fields are C<name> and C<gid> and valid types are C<switch>,
+C<port> and C<device>. The reply will contains an array for each view.
+
+Example:
+
+   > [1, "user_view_info", ["gid", "name"]]
+   < [1,1,[["107374182462","Ports:Default"],
+           ["94489280669","Ports:Multiple Devices on Port"],
+           ["107374182460","End Devices:Default"],
+           ["3865500631171226","End Devices:test"],
+           ["3865500631171236","End Devices:tns04"]]]
+
+=item "realm_view" - query database with given view in a given realm
+
+This request returns the database entries for the given view and the realm.
+
+   > [<id>, "realm_view", <realm-gid>, <view-gid>]
+   < [<id>, 1,[ [<result-data>]]]
+
+Valid view gid should be given followed by a valid realm gid.
+The reply will contain the results from database query and one array per 
+database row.
+
+Example:
+
+   > [1, "realm_view", "64424509927", "107374182461"]
+   < [1,1,[["tnsw04.uk.internal","S","26","15","15","58","0","2009-12-08 12:17:00",
+            "2009-12-08 12:17:00",null],["tnsw05.uk.internal","S","26","20","20"
+            ,"77","0","2009-12-08 12:17:00","2009-12-08 12:17:00",null]]]
+
+=item "realm_seed_list" - return the seed list 
+
+This request returns the seed list for the given realm.
+
+   > [<id>, "realm_seed_list", <realm-gid>]
+   < [<id>, 1, [ [<ip>, <flags>]... ]]
+
+The reply contains an array with all configured seed devices. Each device
+is represented by an array with the IP address in textual form and a flags
+bitset. The only defined bit value (not number) is C<2>, which indicates a
+manually-added seed entry.
+
+Example:
+
+   > [1, "realm_seed_list", "5100005442"]
+   < [1,1,[["192.168.40.11",0],["192.168.40.1",2]]]
+
+=item "realm_seed_list_modify" - add/remove seed list entries 
+
+This request modifies the seed list for a realm.
+
+   > [<id>, "realm_seed_list_modify", <realm-gid>, [<delete-ip>...], [<add-ip>...>]]
+   < [<id>, 1]
+
+The two arrays after the realm-gid specify the IP addresses (in textual
+form) of seed entries to remove, followed by a list of IP addresses to be
+added afterwards. Newly added IP addresses will have the manual flag set on them.
+
+Example: set the manually-added flag on 10.0.0.5, or add it if it didn't
+exist yet.
+
+   > [1, "realm_seed_list_modify", "5100005442", ["10.0.0.5"], ["10.0.0.5"]]
+   < [1,1]
+
+=item "realm_snmp_credential_list" - list snmp credentials
+
+This request returns the snmp credentials for the given realm.
+
+   > [<id>, "realm_snmp_credential_list", <realm-gid>]
+   < [<id>, 1, [ [<subnet>, <bits>, [ 2, [<community>...], [3, <v3 settings>] ], <flags>]... ]]
+
+The reply contains an array with all configured snmp credentials, one per
+subnet. Each snmp credential will contain the subnet address in textual
+form, the leading number of significant bits in the subnet (0..32 for
+IPv4, 0..128 for IPv6), an array per snmp v2 and v3 settings  and a flags bitset
+(bit value C<1> means it is an include, otherwise it is an exclude).
+v2 array starts with bit value C<2> means it is version v2 and followed by an array
+of community strings. v3 array starts with bit value C<3> means it is version v3 and
+followed by v3 user name, authentication password, privacy password, authentication
+algorithm and privacy algorithm.
+
+Example:
+
+   > [1, "realm_snmp_credential_list", "5100005442"]
+   < [1,1,[ ["10.1.0.0",16,[[2,["test"]], [3,"authPrivUser","authpass","privpass", null, "md5","aes"]],1] ]]
+
+=item "realm_snmp_credential_list_modify" - modify snmp credentials
+
+Removes and/or adds snmp credential entries.
+
+   > [<id>, "realm_snmp_credential_list_modify", <realm-gid>, [<remove-subnet>], [<add-subnet>...]]
+   < [<id>, 1]
+
+The two arrays after the realm-gid specify a list of subnet addresses to
+remove (only exact matches wil be removed) and a list of subnet-entries to
+be added afterwards. Each entry in the <add-subnet> list follows the same
+format as returned by C<realm_snmp_credentials>.
+
+Example:
+   > [1, "realm_snmp_credential_list_modify", "5100005442", [ ["10.0.0.0", 8], ["11.1.1.0", 24] ],
+            [ ["192.168.240.0", 24, [[2, ["w0rld", "peace"]], [3, "noAuthUser"]], 1] ]]
+   < [1, 1]
+
+=item "realm_device_assignment_list" - list all assignable devices for a realm 
+
+This request returns all assignable devices.
+
+   > [<id>, "realm_device_assignment", <realm-gid>]
+   < [<id>, 1, [ [<ip>, <poller-gid>] ]]
+
+The reply contains an array with all assignable devices in a realm.  Each
+device entry will contain the device IP address in textual form, and
+the gid of the poller it is assigned to, or C<null> if the device isn't
+currently assigned.
+
+Example:
+
+   > [1, "realm_device_assignment_list", "64424509927"]
+   < [1,1,[ ["192.168.71.21",null],["192.168.75.2",null],["1.1.1.1",64424509930],["5.5.5.5",64424509930]] ]
+
+=item "realm_device_assign" - assign a device to a poller
+
+Assigns or unassigns a device, or all devices.
+
+   > [<id>, "realm_device_assign", <realm-gid>]
+   < [<id>, 1]
+
+   > [<id>, "realm_device_assign", <realm-gid>, [<device-ip>, <poller-gid>]]
+   < [<id>, 1]
+
+If only a realm-gid is specified and device and poller-gid are missing,
+then all devices get auto-assigned to pollers, if possible.
+
+Otherwise, the specified device will be assigned to the specified
+C<poller-gid>, or unassigned if C<poller-gid> is C<null>.
+
+Example: 
+
+   > [1, "realm_device_assign", "64424509927"]
+   < [1, 1]
+
+   > [1, "realm_device_assign", "64424509927", ["1.1.1.1", null]]
+   < [1, 1]
+
+   > [1, "realm_device_assign", "64424509927", ["1.1.1.1", "64424509930"]]
+   < [1, 1]
+
+=item "realm_advanced_settings" - list advanced settings of a given realm
+
+This request returns all/specific properties and their values.
+
+   > [<id>, "realm_advanced_settings", <realm-gid>, [<property>,...]]
+   < [<id>, 1, [[<property>, <value>]...]]
+
+If only the realm-gid is specified then all the properties and their values returned.
+
+valid properties are
+
+snmp_parallel_requests, snmp_retries,
+snmp_timeout, skip_access_points,
+smtp_user, autoassign, autoassign_manual, skip_cisco_phones, skip_mitel_phones,
+block_port_macs, stp_enabled, cdp_enabled, lldp_enabled, ndp_enabled, bdp_enabled,
+edp_enabled, fdp_enabled
+
+Example:
+
+   > [1, "realm_advanced_settings", "64424509927", ["cdp_enabled"]]
+   < [1,1,[["cdp_enabled","1"]]]
+
+=item "realm_advanced_settings_modify" - modify advanced settings of a given realm
+
+This request modifies advanced settings of a given realm-gid.
+
+   > [<id>, "realm_advanced_settings_modify", <realm-gid>, [[<property>, <value>]...]]
+   < [<id>, 1]
+
+   > [<id>, "realm_advanced_settings_modify", <realm-gid>, [[<property>, [<delete-list>], [<add-list>]]]]
+   < [<id>, 1]
+
+realm-gid followed by a array of property and value pairs. one array for each property 
+and value pair.
+
+block_port_macs property expects two arrays in place of value. First array is a list of 
+macs needs to be deleted from port exclusion list and second array is a list of 
+macs needs to be added into port exclusion list. MAC addresses should be in the following 
+format "AA:BB:CC:DD:EE:FF".
+When no array given for block_port_macs property all the macs from port exclusion list
+will get deleted.
+
+Example:
+
+   > [1, "realm_advanced_settings_modify", "64424509927", [["cdp_enabled", "0"]]]
+   < [1, 1]
+
+   > [1, "realm_advanced_settings_modify", "64424509927", [["block_port_macs", 
+        ["11:00:0a:0b:11:22"], ["0a:11:22:44:0e:0b"]]]]
+   < [1, 1]
+
+=item "poller_info" - - information about pollers
+
+   > [<id>, "poller_info", [<fields...>], [<pollers...>]]
+   < [<id>, 1, [ [<fields...>]... ]]
+
+Example:
+
+   > [1, "poller_info", ["gid", "name", "description", "hostname"]]
+   < [1,1,[["64424509930","localhost","localhost","127.0.0.1"]]]
+
+
+Requests information about the given pollers (or all pollers if specified as
+C<null>). The following fields can be requested, and their contents will be
+returned in the order specified in the C<fields> array:
+
+=over 4
+
+=item gid - the gid (id value) identifying the poller
+
+=item name - the user-specified name of the poller
+
+=item description - the user-specified description for this poller
+
+=item hostname - hostname/ip of this poller
+
+=item dns_max_outstanding - maximum number of dns queries for this poller
+
+=back
+
+=item "poller_modify" - adds and/or deletes pollers
+
+This request adds and/or deletes given pollers.
+
+   > [<id>, "poller_modify", <realm-gid>, [<delete-gid>, ...], 
+        [[<name>, <description>, <hostname>, <secret>], ...]]
+   < [<id>, 1]
+
+Two arrays followed by a realm gid. First array is a list of poller gids 
+needs to be deleted. Second array is a list of pollers needs to be added. 
+An array per poller should contain poller name, description, hostname and
+secret password.
+
+Example:
+
+   > [1, "poller_modify", "385611201213", ["98456723211"], [["test1", 
+                  "Test poller", "127.0.0.1", "test"]]]
+   < [1, 1]
+
+=item "poller_info_modify - edits the given poller
+
+This request edits the given poller with new values.
+
+   > [<id>, "poller_info_modify", <poller-gid>, {<prop>:<value>,...}]
+   < [<id>, 1]
+
+A property hash followed by a poller gid. Keys expected in the hash
+are name, description, hostname, secret and dns_max_outstanding.
+
+Example:
+  
+   > [1, "poller_info_modify", "6789345621", {"name":"test1",
+         "secret":"test123", "hostname":"localhost",
+         "dns_max_outstanding":"65"}]
+   < [1, 1]
+
+=item "poller_subnet_list" - list subnets attached to a given poller
+
+This request returns all subnets attached to a given poller.
+
+   > [<id>, "poller_subnet_list", <poller-gid>]
+   < [<id>, 1, [ [<subnet>, <bits>, <ping-limit>, <flags>]... ]]
+
+The reply contains an array with all configured subnets. Each subnet
+will contain the subnet address in textual form, the leading number of
+significant bits in the subnet (0..32 for IPv4, 0..128 for IPv6), a ping
+limit (in kbit/s) and a flags value (bit value C<1> indicates whether the
+subnet is exclided (C<0>) or included (C<1>), bit value C<2> indicates
+whether pings are enabled (C<2>) or not).
+
+Example: 
+
+   > [1, "poller_subnet_list", "64424509930"]
+   < [1,1,[["1.1.1.1",32,1000,1,2],["10.1.1.1",32,1000,0,0]]]
+
+=item "poller_subnet_list_modify" - modify subnets of a poller 
+
+Removes and/or adds subnet entries.
+
+   > [<id>, "poller_subnet_list_modify", <poller-gid>, [<remove-subnet>], [<add-subnet>...]]
+   < [<id>, 1]
+
+The two arrays after the poller-gid specify a list of subnet addresses to
+remove (only exact matches wil be removed) and a list of subnet-entries to
+be added afterwards. Each entry in the <add-subnet> list follows the same
+format as returned by C<poller_subnet_list>.
+
+Example: 
+
+   > [ 1, "poller_subnet_list_modify", "64424509930",[["1.1.1.1",32,1000,1,2],
+         ["10.1.1.1",32,1000,0,0]], [["192.168.0.0", 16, 1200, 1,2]] ]
+   < [1, 1]
+
+=item "global_settings" - list global settings
+
+This request returns all global settings or specific settings.
+
+   > [<id>, "global_settings"]
+   < [<id>, 1, [ [<property>, <value>]... ]]
+
+The reply contains an array with all configured properties and values. Each property
+and value will be in textual form.
+
+valid properties are
+
+session_timeout, domain, smtp_server, max_history_length,
+smtp_user, max_log_length
+
+Example:
+
+   > [1, "global_settings"]
+   < [1,1,[["domain",""],["smtp_server",""],
+        ["max_history_length","0"],["smtp_user",""]]]
+
+   > [1, "global_settings", ["session_timeout"]]
+   < [1,1,[["session_timeout","86400"]]]
+
+=item "global_settings_modify" - modify global settings
+
+This request modifies global settings. Each property modified with a new value given.
+
+   > [<id>, "global_settings_modify", [ [<property>, <value>]... ]]
+   < [<id>, 1]
+
+one array for each property and value pair. Properties and values should be in
+textual format. 
+
+valid properties are
+
+session_timeout, domain, smtp_server, max_history_length,
+smtp_user, max_log_length
+
+Example:
+
+   > [1, "global_settings_modify", [["snmp_parallel_requests", "15"]]]
+   < [1, 1]
+
+=item "advanced_settings" - list advanced settings
+
+This request returns all advanced settings or specific settings.
+
+   > [<id>, "advanced_settings"]
+   < [<id>, 1, [ [<property>, <value>]... ]]
+
+The reply contains an array with all configured properties and values. Each property
+and value will be in textual form.
+
+valid properties are
+
+normalization_algorithm, max_parallel_jobs, max_debug_scans, debug_level
+
+Example:
+
+   > [1, "advanced_settings", ["max_parallel_jobs"]]
+   < [1,1,[["max_parallel_jobs","1000"]]]
+
+=item "advanced_settings_modify" - modify advanced settings
+
+This request modifies advanced settings. Each property modified with a new value given.
+
+   > [<id>, "advanced_settings_modify", [ [<property>, <value>]...]]
+   < [<id>, 1]
+
+one array for each property and value pair. Properties and values should be in
+textual format.                                    
+
+Example:
+
+   > [1, "advanced_settings_modify", [ ["max_parallel_jobs", "900"]]]
+   < [1, 1]
+
+
+=item "security_misc_settings" - lists misellenous security settings
+
+This request returns all misellenous settings or specific settings.
+
+   > [<id>, "security_misc_settings", [<property, ... ]]
+   < [<id>, 1, [<value>, ...] ]
+
+valid properties are
+
+login_banner enable_login_banner
+
+Example:
+
+   > [1, "security_misc_settings", ["login_banner"]]
+   < [1,1,["This system is the property of ..."]]
+
+=item "security_misc_settings_modify" - modifies given misellenous property
+
+This request modifies given property with the given new value.
+
+   > [<id>, "security_misc_settings_modify", {<property> : <value>, ... }]
+   < [<id>, 1]
+
+Example:
+
+   > [1, "security_misc_settings_modify", {"login_banner" : "Its My Box."}]
+   < [1, 1]
+
+=item "security_certificate_list" - lists available certificates
+
+This request returns all or given properties of all certificates.
+
+   > [<id>, "security_certificate_list", [<property>, ...] ]
+   < [<id>, 1, [ [<value>, ...] , ... ] ]
+
+Valid properties are
+
+name certificate
+
+Example:
+
+   > [1, "security_certificate_list"]
+   < [1, 1, [["System Default",""],["custom", ,"-----BEGIN RSA PRIVATE KEY..."]]]
+
+=item "security_certificate_list_modify" - adds/deletes given certificates
+
+This request deletes and adds given certificates.
+
+   > [<id>, "security_certificate_list_modify", [<delete-list>], [[<name>, <certificate>], ...]]
+   < [<id>, 1]
+
+delete-list contains list of certificate names.
+add-list should have a name and certificate one array per certificate. 
+
+Example:
+
+   > [1, "security_certificate_list_modify", ["old_custom"], [["new_custom", "-----BEGIN RSA PRIVATE KEY..."]
+                                             ]]
+   < [1, 1]
+
+=item "security_certificate_assignment_list" - lists all assignable certificates
+
+This request returns all certificate name and their current status.
+one array per certicate will be used. current status shows whether it is assigned
+to C<apache> or C<api> or C<null> for not in use.
+
+   > [<id>, "security_certificate_assignment_list"]
+   < [<id>, 1, [ [<name>, <status>], ... ]]
+
+Example:
+
+   > [1, "security_certificate_assignment_list"]
+   > [1,1,[["System Default","apache"],["System Default","api"],["custome",null]]]
+
+=item "security_certificate_assign" - assigns given certificate to api or apache
+
+This request assigns given certificate to apache or api.
+
+   > [<id>, "security_certificate_assign", [ [<name>, <assign>], ...] ]
+   < [<id>, 1]
+
+Example:
+
+   > [1, "security_certificate_assign", [["custom", "apache"], ["custom", "api"]]]
+   < [1, 1]
+
+=item "security_authentication_method_list" - lists authentication methods and settings
+
+This request returns all or specified properties of all or specified authentication method.
+First array contains the list of properties and the second array contains the list of gids
+of methods. Result array will have one array per authentication method.
+
+Valid properties are
+
+name gid inuse settings
+
+   > [<id>, "security_authentication_method_list", [<properties>, ...], [<method-gid>, ...]]
+   < [<id>, 1, [ [<value>, ...], ...]]
+
+Example:
+
+   > [1, "security_authentication_method_list", ["name"], ["90194313753", "90194313603"]]
+   < [1,1,[["RADIUS"],["Active Directory (LDAPS)"]]]
+
+=item "security_authentication_modify" - modifies given authentication methods
+
+This request edits given authentication method.
+First argument is the authentication method gid.
+All new values should be mentioned in a hash. 
+
+Valid properties are
+
+inuse server secret csecret domain ctrls certificate
+
+bit value C<inuse> will activate/inactivate the given authentication method.
+C<server> is the RADIUS server for RADIUS authentication method.
+C<secret> and C<csecret> are secret password and confirm secret password for RADIUS server.
+C<domain> is the domain name for LDAP and LDAPS authentication methods.
+C<ctrls> is the array of delete and add lists of domain controls.
+C<certificate> is the valid certificate name for LDAPS authentication method.
+C<timeout> is the value in seconds to be used when communicating with Active Directory servers.
+
+   > [<id>, "security_authentication_modify", <method-gid>, {<property> : <value>,... }]
+   < [<id>, 1]
+
+Example:
+
+   > [1, "security_authentication_modify", "90194313753", {"inuse" : 1, "server" : "4test"}]
+   < [1, 1]
+
+   > [1, "security_authentication_modify", "90194313603", {"certificate" : "custom", "domain" : "new"
+                                                   "ctrls" : [ ["10.1.50.1"], ["10.1.50.2"] ]}]
+   < [1, 1]
+
+=item "group_info" - lists group information
+
+This request returns all groups or specific groups. The request returns all
+fields or specific fields.
+
+   > [<id>, "group_info", [<field1>, <field2>, ...], [<group-gid>, ...]]
+   < [<id>, 1, [ [<value>, <value>, ...] , ...]
+
+The reply contains an array for each group with specified field values or all.
+
+Example:
+
+   > [1, "group_info", ["name"]]
+   < [1,1,[["helpme"],["Network Administrator"],["Network Operator"],["Super Admin"]]]
+   
+=item "group_modify" - adds and/or deletes groups
+
+This request adds and/or deletes given groups.
+
+   > [<id>, "group_modify", [<delete-gid>, ...], [[<name>, <description>], ...]]
+   < [<id>, 1]
+
+Two arrays expected as input. First array is a list of group gids needs to be deleted.
+Second array is a list of groups needs to be added. An array per group should contain 
+group name and description.
+
+Example:
+
+   > [1, "group_modify", ["9845672231"], [["test1", "Test group"]]]
+   < [1, 1]
+
+=item "group_settings" - lists permissions for a given group
+
+   > [<id>, "group_settings", <group-gid>, [<role>, <role>, ...], [<realm-gid>, ...]]
+   < [<id>, 1, [[[<system-role>, <permission>], ...], 
+                 [[<realm-gid>, [[<realm-role>, <permission>], ...]], ...]]]
+
+The input should have a valid group gid in textual format. Two arrays followed by group gid
+are list of roles and list of realm gids. These two arrays are optional.
+The result contains two arrays. First array is for system specific roles. One array per role.
+Second array is for realm specific roles. One array per realm. First element of the array is
+realm-gid in textual format followed by an array of realm specific roles and their permission.
+Permission will be referred in bit value. bit value C<0> means NO Access, C<1> means
+Read Access and C<2> means Read/Write Access.
+
+Example:
+
+   > [1, "group_settings", "98784248728"]
+   < [1,1,[[["API",2],["Add Realms",2],["Advanced Settings",1],["Global Settings",2]]
+           ,[["3865500631171652",[["Advanced Realm Settings",0],["Assign Devices",0]]]]]]
+
+   > [1, "group_settings", "98784248728", ["Add Realms", "Assign Devices"]]
+   < [1,1,[[["Add Realms",2]],[["3865500631171652",[["Assign Devices",0]]],
+           ["3865500631171517",[["Assign Devices",0]]]]]]
+
+
+=item "group_settings_modify" - edits group properties and permissions
+
+   > [<id>, "group_settings_modify", <group-gid>
+             , {"name":<group-name>, "description":<group description>}
+             , [[<system-role>, <permission>], ...], [[<realm-gid>, 
+                                         [[<realm-role>, <permission>], ...]], ...] ]
+   < [<id>, 1]
+
+The input should have a valid group gid. A property hash followed by the group gid.
+The values of keys C<name> and C<description> are new group name and description.
+Two arrays followed by hash. First array is for system specific roles. Format of the
+array is same as output of C<group_settings> query. Second array is for realm specific roles.
+One array per realm. Format of this array is same as output of C<group_settings> query.
+
+valid system specific roles are
+
+"API", "Add Realms", "Advanced Settings", "Global Settings", "Group Management", "License", 
+"Schedule Backup", "Security Settings", "System Utilities", "User Management", "View Log"
+
+valid realm specific roles are
+
+"Advanced Realm Settings", "Assign Devices", "Discovery Realm Settings", "Views",
+"Plugins", "Poller Settings", "Schedule Discovery","Schedule Poll","Schedule Report" 
+,"Schedule Sync"
+
+Example:
+
+   > [1, "group_settings_modify", "98784248723", {"name":"TEST"},
+                            [["Add Realms",0]]], [["386550063117151",[["Poller Setting",1]]]]]
+   < [1, 1]
+
+
+   > [1, "group_settings_modify", "98784248723", {},
+                            [["Add Realms",0],["Global Settings",1]]]
+   < [1, 1]
+
+=item "remote_backup" - runs the remote backup immediately
+
+   > [<id>, "remote_backup", <protocol>, <host>, <user>, <password>,
+                             <directory>, <email-recipient>]
+   < [<id>, 1]
+
+This request can be made without any arguments. When its requested without 
+arguments make sure backup settings configured in GUI. The valid values for 
+C<protocol> are C<SCP> and C<FTP>. The C<email-recipient> and C<directory> 
+arguments are optional.
+
+Example:
+
+   > [1, "remote_backup"]
+   < [1, 1]
+
+   > [1, "remote_backup", "SCP", "10.5.1.1", "admin", "admin", "/tmp"]
+   < [1, 1]
+
+=back
+
+=head1 AUTHOR
+
+Marc Lehmann <marc@nethype.de>.
+

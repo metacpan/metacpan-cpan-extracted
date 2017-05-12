@@ -1,0 +1,118 @@
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+use App::PAUSE::CheckPerms;
+
+my $app = App::PAUSE::CheckPerms->new_with_options();
+
+$app->execute();
+
+=head1 NAME
+
+pause-checkperms - check PAUSE permissions are consistent for all modules in a dist
+
+=head1 SYNOPSIS
+
+ pause-checkperms --user NEILB
+
+=head1 DESCRIPTION
+
+B<pause-checkperms> looks at the PAUSE permissions for all modules in
+CPAN distributions, and lets you know if they're consistent.
+It will typically be used to check all your CPAN distributions.
+My PAUSE id is C<NEILB>, so I'd run the following:
+
+ pause-checkperms --user NEILB
+
+This will check all dists where I have permissions for at least one
+module in the dist. It will only display details of distributions where
+the permissions are inconsistent.
+At the time I was writing this script, it would
+generate the following output for me:
+
+ PAUSE-Permissions
+   PAUSE::Permissions                 |      NEILB
+   PAUSE::Permissions::Entry          |      NEILB
+   PAUSE::Permissions::EntryIterator  |      NEILB
+   PAUSE::Permissions::Module         | ANDK neilb
+   PAUSE::Permissions::ModuleIterator |      NEILB
+
+This shows that I'm the owner of all modules in the C<PAUSE-Permissions>
+dist, except for L<PAUSE::Permissions::Module>, which C<ANDK> is the owner of,
+and I have co-maint permissions.
+The owner's PAUSE id is shown in upper case, and co-maints are listed in
+lower case.
+
+The permissions shown above are problematic for two reasons:
+
+=over 4
+
+=item *
+
+Neither ANDK or NEILB can grant co-maint permissions for the whole
+distribution. Only the owner of a module can grant co-maint.
+
+=item *
+
+Even though he owns one module, ANDK couldn't release this distribution.
+If he tried to, the I<indexing> stage of PAUSE would fail for the
+modules where ANDK doesn't have permissions.
+
+In search.cpan.org this would then be flagged as
+
+ * * UNAUTHORISED RELEASE * *
+
+You can use the PAUSE web interface to correct any inconsistent permissions.
+In this case I'll have to ask ANDK to transfer ownership 
+of C<PAUSE::Permissions::Module> to me.
+
+=back
+
+If you don't specify a user, pause-checkperms will check all
+distributions on CPAN.
+
+=head1 PAUSE Permissions model
+
+The PAUSE permissions model is based on I<modules> and not I<distributions>.
+If you're not familiar with the PAUSE permissions model,
+read the documentation for L<PAUSE::Permissions>, which explains it.
+
+=head1 CAVEAT
+
+This is my first attempt writing an App:: module
+and partner script using MooX::Options.
+It feels all wrong,
+but I've been wanting to release a tool to do this for a while,
+so I'm sucking it and seeing.
+
+Feel free to suggest better ways to do this.
+
+=head1 SEE ALSO
+
+L<App::PAUSE::Comaint> comes with a L<comaint> script which you can use to give
+someone co-maint permission for modules that you're owner of.
+
+L<App::PAUSE::CheckPerms> contains the body of this script.
+
+L<PAUSE::Permissions> lets you iterate over all PAUSE permissions data.
+It also details the PAUSE permissions model.
+
+L<PAUSE::Packages> lets you iterate over all distributions on CPAN,
+getting a list of modules in each distribution.
+
+
+=head1 REPOSITORY
+
+L<https://github.com/neilbowers/App-PAUSE-CheckPerms>
+
+=head1 AUTHOR
+
+Neil Bowers E<lt>neilb@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Neil Bowers <neilb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

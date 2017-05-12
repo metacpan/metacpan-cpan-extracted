@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual - ars_SetFilter</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_SetFilter(ctrl, name, filterHash)</CODE></H2>
+
+      This function modifies an existing filter. You must first
+      populate the <CODE>filterHash</CODE> before calling this routine.
+      <P><CODE>name</CODE> is the name of the filter.
+      <P><CODE>filterHash</CODE> is a partially assigned
+      <A HREF="ds_getfilter_hash.html">Filter Attributes</a> hash. 
+
+      <P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns 1
+          <DT><B>On failure</B><DD>
+              Returns 0
+      </DL>
+
+      <P>Example:
+
+      <P><BLOCKQUOTE>
+      <I> This example changes the name and execution order of an existing filter. </I></BLOCKQUOTE>
+
+      <PRE>
+      ($f = ars_GetFilter($c, "TEST:Filter")) ||
+	    die $ars_errstr;
+
+      ars_SetFilter( $c, $f->{name}, {
+        name  => $f->{name} . "(renamed)",
+        order => $f->{order} + 100,
+      } ) || die $ars_errstr;
+      </PRE>
+
+<P>
+<I>This function was introduced in version 1.90 of ARSperl</I>
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

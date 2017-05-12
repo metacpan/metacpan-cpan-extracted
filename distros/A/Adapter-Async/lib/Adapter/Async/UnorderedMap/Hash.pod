@@ -1,0 +1,47 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Adapter::Async::UnorderedMap::Hash
+at lib/Adapter/Async/UnorderedMap/Hash.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Adapter::Async::UnorderedMap::Hash - hashref adapter
+
+=head1 VERSION
+
+version 0.018
+
+=head1 DESCRIPTION
+
+See L<Adapter::Async::UnorderedMap> for the API.
+
+=head1 count
+
+=head1 get
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Adapter::Async::UnorderedMap>
+
+L<set|Adapter::Async::UnorderedMap/set>
+
+=item L<Adapter::Async>
+
+L<bus|Adapter::Async/bus>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2013-2015. Licensed under the same terms as Perl itself.

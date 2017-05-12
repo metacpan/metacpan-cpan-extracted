@@ -1,0 +1,42 @@
+---
+abstract: 'Run in parallel without pains.'
+author:
+  - 'Qiang Wang <wang-q@outlook.com>'
+build_requires:
+  Test::More: '0.88'
+  Test::Output: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.7, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AlignDB-Run
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  AlignDB::Run:
+    file: lib/AlignDB/Run.pm
+    version: v1.0.2
+requires:
+  Moose: '0'
+  POE: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/wang-q/AlignDB-Run/issues
+  homepage: https://github.com/wang-q/AlignDB-Run
+  repository: git://github.com/wang-q/AlignDB-Run.git
+version: 1.0.2
+x_contributors:
+  - 'wangq <wangqiang1997@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

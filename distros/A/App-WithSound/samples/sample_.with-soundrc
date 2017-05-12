@@ -1,0 +1,6 @@
+SUCCESS=~/Music/success.mp3
+FAILURE=~/Music/failure.mp3
+
+[prove]
+SUCCESS=~/Music/success_prove.mp3
+FAILURE=~/Music/failure_prove.mp3

@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+use v5.14;
+use warnings;
+
+use App::RemoteGnokii;
+
+App::RemoteGnokii::psgi;
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+rg-psgi - Webapp for sending text messages via gnokii-smsd
+
+=head1 SYNOPSIS
+
+  plackup -E deployment -p 8085 /path/to/rg-psgi
+
+=head1 DESCRIPTION
+
+This is a PSGI application that allows users to send text messages via HTTP.
+
+To send a message, make a POST request with the following parameters:
+
+=over
+
+=item numbers
+
+A comma-separated list of destination numbers
+
+=item password
+
+The password set in the configuration file
+
+=item text
+
+The message text.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over
+
+=item RGCONF
+
+The basename of the configuration file. For example, if the configuration file is '/srv/rg/config.yml', RGCONF should be set to '/srv/rg/config'. Defaults to '/etc/rg'.
+
+=back
+
+=head1 SEE ALSO
+
+L<App::RemoteGnokii>
+
+=head1 AUTHOR
+
+Marius Gavrilescu E<lt>marius@ieval.roE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Marius Gavrilescu
+
+This library is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+
+
+=cut

@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/AnyEvent/HTTP/LWP/UserAgent.pm
+t/async.t
+t/callbacks.t
+t/invalid_host.t
+t/main.t
+t/release-pod-syntax.t
+t/request_content_ref.t
+t/response_content_cb.t
+t/response_content_file.t

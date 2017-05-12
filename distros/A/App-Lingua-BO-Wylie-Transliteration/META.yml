@@ -1,0 +1,47 @@
+---
+abstract: 'Executable to `wylie-transliterate`'
+author:
+  - 'DBR <dbr@cpan.org>'
+build_requires:
+  Carp: 0
+  ExtUtils::MakeMaker: 0
+  File::Spec::Functions: 0
+  List::Util: 0
+  Module::Build: 0.3601
+  Scalar::Util: 0
+  Test::CheckDeps: 0.006
+  Test::More: 0.94
+  Test::UseAllModules: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Lingua-BO-Wylie-Transliteration
+provides:
+  App::Lingua::BO::Wylie::Transliteration:
+    file: lib/App/Lingua/BO/Wylie/Transliteration.pm
+    version: v0.1.0
+requires:
+  FindBin: 0
+  Moo: 0
+  MooX::Options: 0
+  MooX::Types::MooseLike::Base: 0
+  autovivification: 0
+  lib: 0
+  methods: 0
+  perl: v5.14.0
+  strict: 0
+  true: 0
+  utf8: 0
+  utf8::all: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/xdbr/App-Lingua-BO-Wylie-Transliteration
+  repository: https://github.com/xdbr/App-Lingua-BO-Wylie-Transliteration.git
+version: 0.1.0
+x_authority: cpan:DBR

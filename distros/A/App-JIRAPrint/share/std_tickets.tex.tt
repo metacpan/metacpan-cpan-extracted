@@ -1,0 +1,67 @@
+%%%%
+%
+% ticket.sty example file for visiting cards
+%
+%%%%
+% use the corresponding paper size for your ticket definition
+\documentclass[10pt]{letter}
+\usepackage[a4paper,margin=0in]{geometry}
+
+
+\usepackage{fontspec}
+\usepackage{textcomp}
+
+\setmainfont{Arial Black}
+
+% load ticket.sty with the appropriate ticket definition
+\usepackage[crossmark]{ticket}
+
+\unitlength=1mm
+\ticketNumbers{2}{3}
+\ticketSize{76}{76} % in unitlength
+\ticketDistance{15}{15} % in unitlength
+
+% load misc stuff
+\usepackage{graphicx}
+\usepackage{color}
+
+\usepackage{pst-barcode}
+
+% define something
+\definecolor{uni}{rgb}{.3019,.7216,.7019}
+
+% make your default ticket. \ticketdefault is somewhat like a background
+% here it is empty, because we use different tickets for the front an
+% the back of our card
+\renewcommand{\ticketdefault}{%
+}
+
+% now what do you like to put in your ticket
+\newcommand{\vcardfront}[5]{\ticket{%
+    \put(3,70){
+      \begin{minipage}[t]{70mm}
+        {\bfseries\Large #1}\hfill{#4}
+        
+        \hrulefill
+
+        \begin{flushleft}
+        {\huge #2}
+        \end{flushleft}
+        
+      \end{minipage}
+    }
+    \put(3,3){
+      \begin{pspicture}(2cm,2cm)  
+        \psbarcode{#3}{}{qrcode}
+      \end{pspicture}
+    }
+}}
+
+
+\begin{document}
+\sffamily
+% ten cards for the front
+[% FOREACH issue IN issues %]
+\vcardfront{[% issue.key %]}{[% issue.fields.summary FILTER tex %]}{[% issue.url FILTER tex %]}{[% issue.fields.issuetype.name FILTER tex %]}
+[% END %]
+\end{document}

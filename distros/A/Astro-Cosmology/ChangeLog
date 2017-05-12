@@ -1,0 +1,26 @@
+Release 0.90 2001-08-04 Doug Burke <djburke@cpan.org>
+
+- added more tests (thanks to Brad Holden)
+- more internal adjustments to the distribution (no
+  functional changes). Hopefully more compatible with CPAN now.
+
+Release 0.84 2001-08-02 Doug Burke <djburke@cpan.org>
+
+- documentation now in Cosmology.pod so that CPAN will
+  pick it up. No functional change to v0.83.
+
+Release 0.83 2001-08-01 Doug Burke <djburke@cpan.org>
+	
+- Added version method, renamed string method to stringify.
+- Further improvements to documentation.
+- t/cosmology.t now uses Test module, added more tests.
+- added t/cosmology2.t (thanks Brad)
+ 
+Release 0.82 2001-07-29 Doug Burke <djburke@cpan.org>
+
+- Added STERADIAN constant; improved documentation.
+
+Release 0.81 2001-07-28 Doug Burke <djburke@cpan.org>
+
+- Original version, adapted from PDL::Astro::Cosmology.
+

@@ -1,0 +1,41 @@
+Apache-Request-I18N version 0.06
+================================
+
+This module adds transparent support over Apache::Request for
+internationalized GET/POST parameters.  Form field names and values are
+automatically decoded and converted either to Perl's internal UTF-8 format, or
+to another character encoding.
+
+Since this module inherits from Apache::Request, it can be used as a drop-in
+replacement.  (It is not a perfect replacement, though; see the manpage for
+details.)  It can also be used in a PerlHandler directive, in which case all
+subsequent handlers will -- if they play nicely -- automatically see the
+converted names and values.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Perl 5.8 or later, as well as the following:
+
+  mod_perl
+  libapreq (aka Apache::Request) 1.11 or later
+  libwww-perl
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Frederic Briere
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

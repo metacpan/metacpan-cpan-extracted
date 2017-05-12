@@ -1,0 +1,30 @@
+#! perl
+
+use strict;
+use warnings;
+
+use App::TestOnTap;
+
+# This is very shallow; just pass @ARGV on to the A::TOT entry point
+#
+exit(App::TestOnTap::main(@ARGV));
+
+__END__
+
+=head1 NAME
+
+testontap
+
+The command-line entrypoint to App::TestOnTap, a tool for running a suite of test
+'executables' in arbitrary languages in a directory tree.
+
+It will aggregate and summarize their TAP (I<Test Anything Protocol>) output, optionally saving the results for later processing.
+
+For a description of valid options and arguments, see the L<App::TestOnTap::Args> documentation.
+
+For the manual, see L<App::TestOnTap>.
+
+Also see L<http://testanything.org> for general information about TAP, as well as the various
+Test::* and TAP::* modules.
+
+=cut

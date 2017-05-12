@@ -1,0 +1,25 @@
+# configuration file for Dancer2 environment
+# I've not yet found a way to set the Dancer2 environment to dancer2.yml
+
+logger: "console"
+log: "core"
+warnings: 1
+show_errors: 1
+auto_reload: 0
+
+content_location: content
+
+session: "YAML"
+
+template: "template_toolkit"
+
+engines:
+  session:
+    YAML: {}
+
+plugins:
+  Articulate:
+    components:
+      framework:
+        Articulate::FrameworkAdapter::Dancer2:
+          appname: PlainSpeaking

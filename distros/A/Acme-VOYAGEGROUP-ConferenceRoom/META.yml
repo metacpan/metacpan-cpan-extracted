@@ -1,0 +1,53 @@
+---
+abstract: "It's new $module"
+author:
+  - 'monmon <lesamoureuses@gmail.com>'
+build_requires:
+  Test::Base::Less: 0
+  Test::More: 0.98
+  Test::Pretty: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-VOYAGEGROUP-ConferenceRoom
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::VOYAGEGROUP::ConferenceRoom:
+    file: lib/Acme/VOYAGEGROUP/ConferenceRoom.pm
+    version: 0.01
+  Acme::VOYAGEGROUP::ConferenceRoom::Output::Color:
+    file: lib/Acme/VOYAGEGROUP/ConferenceRoom/Output/Color.pm
+  Acme::VOYAGEGROUP::ConferenceRoom::Output::JSON:
+    file: lib/Acme/VOYAGEGROUP/ConferenceRoom/Output/JSON.pm
+  Acme::VOYAGEGROUP::ConferenceRoom::Output::MessagePack:
+    file: lib/Acme/VOYAGEGROUP/ConferenceRoom/Output/MessagePack.pm
+  Acme::VOYAGEGROUP::ConferenceRoom::Output::XML:
+    file: lib/Acme/VOYAGEGROUP/ConferenceRoom/Output/XML.pm
+requires:
+  Data::MessagePack: 0
+  Encode::Locale: 0
+  JSON::XS: 0
+  UNIVERSAL::require: 0
+  XML::Smart: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/monmon/Acme-VOYAGEGROUP-ConferenceRoom/issues
+  homepage: https://github.com/monmon/Acme-VOYAGEGROUP-ConferenceRoom
+  repository: https://github.com/monmon/Acme-VOYAGEGROUP-ConferenceRoom.git
+version: 0.01

@@ -1,0 +1,17 @@
+Revision history for Perl extension AnySan-Provider-Slack
+
+0.04 2015-11-05T13:23:51Z
+    - `from_nickname` is user name now, not user id
+
+0.03 2015-10-18T05:53:07Z
+    - support reconnect
+    - support subtype fileter of messages
+    - do not use auth.test api
+
+0.02 2015-09-24T13:49:00Z
+    - fix encoding
+
+0.01 2015-09-24T09:27:59Z
+
+    - original version
+

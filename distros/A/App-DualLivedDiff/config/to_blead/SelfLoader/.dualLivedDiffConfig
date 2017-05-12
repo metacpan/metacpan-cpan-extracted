@@ -1,0 +1,6 @@
+---
+files:
+  lib/SelfLoader.pm: lib/SelfLoader.pm
+  t/01SelfLoader.t: lib/SelfLoader/t/01SelfLoader.t
+  t/02SelfLoader-buggy.t: lib/SelfLoader/t/02SelfLoader-buggy.t
+

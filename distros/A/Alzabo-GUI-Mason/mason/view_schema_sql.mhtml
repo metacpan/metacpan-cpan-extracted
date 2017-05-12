@@ -1,0 +1,51 @@
+  <td>
+
+<div class="page">
+
+<pre>
+<% join "\n\n", map {"$_;"} @sql | h %>
+</pre>
+% if (@sql) {
+<table width="50%">
+ <form action="execute_sql<% Alzabo::GUI::Mason::Config::mason_extension() %>" method="post">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+<& login_form.mas &>
+ <tr>
+  <td colspan="2">
+   <input type="submit" value="Execute SQL">
+  </td>
+ </tr>
+</table>
+% } else {
+<p>
+No SQL to display.  This probably means the schema has already been
+instantiated and no changes have been made to it.
+</p>
+
+<p>
+<a href="view_schema<% Alzabo::GUI::Mason::Config::mason_extension() %>?schema=<% $s->name | u %>">Back</a>
+</p>
+% }
+
+</div>
+
+  </td>
+<%args>
+$s
+</%args>
+<%init>
+my @sql;
+eval
+{
+    @sql = $s->make_sql;
+};
+
+my $e = $@;
+
+$m->comp( 'exception', $e ) if $e;
+
+</%init>
+
+<%attr>
+show_tables => 0
+</%attr>

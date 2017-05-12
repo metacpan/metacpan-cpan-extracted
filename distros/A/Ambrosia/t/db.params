@@ -1,0 +1,16 @@
+return {
+    DBI => [
+        {
+            engine_name   => 'mysql',
+            source_name   => 'Client',
+            catalog       => undef,
+            schema        => 'test',
+            host          => 'localhost',
+            port          => 3306,
+            user          => 'nick',
+            password      => '',
+            additional_params => { AutoCommit => 0, RaiseError => 1, LongTruncOk => 1 },
+            additional_action => sub { my $dbh = shift; $dbh->do('SET NAMES utf8')},
+        },
+    ]
+};

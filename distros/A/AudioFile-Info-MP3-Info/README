@@ -1,0 +1,32 @@
+AudioFile::Info::MP3::ID3Lib
+============================
+
+AudioFile::Info::MP3::ID3Lib is a plugin module for AudioFile::Info.
+It extracts information from MP files using the module MP3::ID3Lib.
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+The final step will probably need to be carried out with superuser
+permissions.  
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  * MP3::ID3Lib
+  * AudioFile::Info
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Dave Cross
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,11 @@
+Revision history for App-ListUbuntuReleases
+
+0.06    2015-09-22 (PERLANCAR)
+
+	- [Bugfix] Update package name (copy-paste mistake).
+
+
+0.05    2015-09-22 (PERLANCAR))
+
+        - First release, split from Ubuntu-Release to keep its dependencies
+          small.

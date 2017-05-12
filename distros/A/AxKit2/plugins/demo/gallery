@@ -1,0 +1,610 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+my @config = qw(
+    ProofSheetColumns
+    ImagesPerProofSheet
+    GalleryCache
+    GallerySizes
+    GalleryThumbQuality
+    );
+    
+sub init {
+    my $self = shift;
+    for my $item (@config) {
+        $self->register_config($item, sub { $self->store_cfg($item, @_) });
+    }
+}
+
+sub store_cfg {
+    my ($self, $item, $config, $value) = @_;
+    my $key = $self->plugin_name . "::$item";
+    $config->notes(lc($key), $value);
+}
+
+sub get_cfg {
+    my ($self, $item) = @_;
+    my $key = $self->plugin_name . "::$item";
+    $self->config->notes(lc($key));
+}
+
+use File::MMagic;
+use Imager;
+use Data::Page;
+use XML::LibXML::XPathContext;
+use File::Spec::Functions qw(catfile);
+use Image::ExifTool qw(ImageInfo);
+use RDF::Core;
+use RDF::Core::Storage::Memory;
+use RDF::Core::Model;
+use RDF::Core::Resource;
+use RDF::Core::Literal;
+use RDF::Core::Statement;
+use RDF::Core::Model::Serializer;
+use AxKit2::Utils qw(uri_decode uri_encode bytelength);
+
+our $DEFAULT_SIZE = '133 640 800 1024';
+
+sub hook_xmlresponse {
+    my ($self, $input) = @_;
+    
+    $self->log(LOGINFO, "running");
+    
+    my $client = $self->client;
+    
+    my $file = $client->headers_in->filename;
+    if (-d $file) {
+        return $self->serve_dir($input);
+    }
+    
+    $self->log(LOGINFO, "checking content type and format");
+    
+    my $mm = File::MMagic->new;
+    my $ct = $mm->checktype_filename($file);
+    
+    # we're only interested in images
+    return DECLINED unless $ct =~ /^image\//i;
+    
+    my $format = $client->param('format') || 'html';
+    
+    if ($format eq 'html') {
+        return $self->serve_image_page($input, $ct);
+    }
+    
+    # Now we just serve the raw image, possibly resized
+    $self->log(LOGINFO, "serving raw image");
+    
+    # Make sure the specified size is one we're configured to
+    # support.  If it isn't then use the default size
+    my $sizelist = $self->get_cfg('GallerySizes') || $DEFAULT_SIZE;
+    my @sizes = split(/\s+/, $sizelist);
+    my $size = $client->param('size') || '';
+    
+    # If the size is 'full' then we're sending back the full size
+    # image.  There's no work to do, so just return DECLINED
+    if ($size eq 'full') {
+        open(my $fh, $file) || die "open($file): $!";
+        $client->headers_out->header('Content-Length', -s $file);
+        $client->headers_out->header('Content-Type', $ct);
+        $client->send_http_headers;
+        local $/;
+        my $out = <$fh>;
+        $client->write(\$out);
+        return OK;
+    }
+    
+    if ($size eq 'thumb') {
+        $size = $sizes[0];
+    }
+    else {
+        $size = $sizes[1] unless grep { $_ eq $size } @sizes;
+    }
+    
+    my $cache = $self->cache;
+    if (my $cache_obj = $cache->get_object("$file+$size")) {
+        if ($cache_obj->get_created_at() >= (stat($file))[9]) {
+            my $out = $cache->get("$file+$size");
+            $self->log(LOGINFO, "Serving cached image");
+            $client->headers_out->header('Content-Length', bytelength($out));
+            $client->headers_out->header('Content-Type', $ct);
+            $client->send_http_headers;
+            # using ->get here makes sure Cache::Cache expires stuff
+            $client->write(\$out);
+            return OK;
+        }
+    }
+    
+    $self->log(LOGINFO, "Resizing image $file to size $size");
+    
+    my ($type) = $ct =~ /\/(.*)$/;
+    
+    my $out;
+    
+    $self->resize_image($size, $file, $type, \$out);
+    
+    $cache->set("$file+$size", $out);
+    
+    $client->headers_out->header('Content-Length', bytelength($out));
+    $client->headers_out->header('Content-Type', $ct);
+    $client->send_http_headers;
+    # using ->get here makes sure Cache::Cache expires stuff
+    $client->write(\$out);
+    return OK;
+}
+
+sub resize_image {
+    my ($self, $size, $file, $type, $out) = @_;
+    
+    my $image = Imager->new;
+    
+    $image->open(file => $file)
+        or die $image->errstr();
+
+    my($w, $h) = ($image->getwidth(), $image->getheight());
+    
+    $self->log(LOGINFO, "Original width x height: $w x $h");
+    
+    my $quality = $self->get_cfg('GalleryThumbQuality') || 'preview';
+    $quality = 'normal' if $quality ne 'preview';
+    $quality = 'normal' if $self->client->param('size') ne 'thumb';
+    
+    $self->log(LOGINFO, "Scaling to $size with quality: $quality");
+    
+    my $doublesize = $size < (($w > $h ? $w : $h)/2);
+    
+    if ($quality eq 'normal' && $doublesize) {
+        $self->log(LOGINFO, "Doing an initial shrinkage in preview mode");
+        my $thumb = $image->scale(qtype => "preview",
+                                  $w > $h ? (xpixels => $w/2)
+                                          : (ypixels => $h/2)
+                                 );
+        
+        $image = $thumb;
+    }
+    
+    my $thumb = $image->scale(qtype => $quality, 
+                               $w > $h ?
+                                   (xpixels => $size)
+                                 : (ypixels => $size)
+                             );
+    
+    if ($doublesize) {
+        $self->log(LOGINFO, "sharpening $thumb");
+        
+        # Sharpen a bit with a convolve filter
+        $thumb->filter(
+            type=>'conv',
+            coef => [-0.2, 1, -0.2]
+            ) if $quality eq 'normal';
+    }
+    
+    $thumb->write(data => $out, type => $type)
+        or die "Cannot write to scalar: ", $thumb->errstr;
+}
+
+sub serve_image_page {
+    my ($self, $input, $ct) = @_;
+    
+    $self->log(LOGINFO, "Serving Imagesheet");
+    
+    my $file = $self->client->headers_in->filename;
+    
+    my $filesize = (stat($file))[7];
+    my $mod  = (stat(_))[9];
+    
+    my $path;
+    ($path, $file) = $file =~ /(.*)\/(.*)/;    # Extract the path/file info
+    
+    my $mm = File::MMagic->new;
+    
+    opendir(DIR, $path);
+    my ($prev, $next);
+    my $found = 0;
+    for my $entry (sort readdir(DIR)) {
+        next if $entry =~ /^\./;
+        next if -d $entry;
+        if ($entry eq $file) {
+            $found++;
+            next;
+        }
+        my $type = $mm->checktype_filename("$path/$entry");
+        next unless $type =~ /^image\//;
+        if ($found) {
+            $next = $entry;
+            last;
+        }
+        else {
+            $prev = $entry;
+        }
+    }
+    
+    my $uri = $self->client->headers_in->request_uri;
+    $uri =~ s/\?.*//;
+    
+    # generate path and config data.
+    my ($uri_path) = $uri =~ /(.*)\//;
+    $uri =~ s/^\///;            # Trim the leading '/'
+    $uri = "<full><e>$uri</e><u>" . uri_decode($uri) . "</u></full>\n" .
+           "<path><e>$uri_path</e><u>" . uri_decode($uri_path) . "</u></path>\n" .
+        join("\n", 
+        map { "<component><e>$_</e><u>" . uri_decode($_) . "</u></component>" } split(/\//, $uri));
+    
+    my $xml = <<EOXML;
+<?xml version="1.0"?>
+<imagesheet>
+  <config>
+    <perl-vars>
+EOXML
+    
+    foreach my $var (qw(ProofsheetColumns ImagesPerProofsheet
+                        GalleryCache GalleryThumbQuality))
+    {
+        no warnings 'uninitialized';
+        $xml .= "<var name='$var'>" . $self->get_cfg($var) . "</var>\n";
+    }
+
+    my $size = $self->client->param('size') || '';
+
+    # Make sure the specified size is one we're configured to
+    # support.  If it isn't then use the default size
+    my $sizelist = $self->get_cfg('GallerySizes');
+    $sizelist = $DEFAULT_SIZE unless defined $sizelist;
+    my @sizes = split(/\s+/, $sizelist);
+
+    if ($size eq 'thumb') {
+        $size = $sizes[0];
+    }
+    else {
+        $size = $sizes[1] unless grep { $_ eq $size } @sizes;
+    }
+
+    $xml .= <<EOXML;
+<GallerySizes>
+  <size type="thumb">$sizes[0]</size>
+EOXML
+    foreach (@sizes[1..$#sizes]) {
+        if($_ eq $size) {
+            $xml .= "<size type=\"default\">$_</size>\n";
+        } else {
+            $xml .= "<size>$_</size>\n";
+        }
+    }
+    $xml .= "</GallerySizes>";
+    
+    # add image data
+    $xml .= <<EOXML;
+    </perl-vars>
+  </config>
+
+  <image>
+    <filename>$file</filename>
+    <filesize>$filesize</filesize>
+    <size>$size</size>
+    <modified>$mod</modified>
+    <uri>$uri</uri>
+    <dirpath>$path</dirpath>
+    <content-type>$ct</content-type>
+  </image>    
+</imagesheet>
+EOXML
+    
+    $input->dom($xml);
+    
+    my $rdf = $self->get_exif_rdf("$path/$file");
+    
+    if ($rdf) {
+        my ($image_node) = $input->dom->findnodes('/imagesheet/image');
+        $image_node->appendWellBalancedChunk($rdf);
+    }
+    
+    my $out = $input->transform(
+        XSLT($self->config->docroot . '/.stylesheets/imagesheet2html.xsl',
+             $prev ? ('prev' => uri_encode($prev)) : (),
+             $next ? ('next' => uri_encode($next)) : (),
+             )
+    );
+    
+    return OK, $out;
+}
+
+## here we extract the EXIF data and convert it to RDF.
+sub get_exif_rdf {
+    my ($self, $filename) = @_;
+    
+    my $cache = $self->cache;
+    my $rdf = $cache->get("${filename}+rdf");
+    
+    if (!$rdf) {
+        $rdf = '';
+        
+        my $info = {};
+        $info->{imageinfo} = ImageInfo($filename);
+        
+        if(! $info->{error}) {
+            # Work out the width/height ratio, and calculate
+            # what the generated thumbnail dimensions will be
+            my($w, $h) = ($info->{imageinfo}{ImageWidth}, 
+                          $info->{imageinfo}{ImageHeight});
+            my $larger = $w > $h ? $w : $h;
+            $info->{thumbs}{thumb} = [];
+            
+            my $sizelist = $self->get_cfg('GallerySizes');
+            $sizelist = $DEFAULT_SIZE unless defined $sizelist;
+            
+            foreach my $size (split(/ +/, $sizelist)) {
+                next if $size eq 'full';
+                my $sf = $size / $larger;
+                push @{$info->{thumbs}{thumb}}, 
+                            { filename => "$size.jpg",
+                              width => int($w * $sf),
+                              height => int($h * $sf),
+                              size => $size,
+                            };
+            }
+            
+            # Sanitise the data in $info->{imageinfo}
+            foreach (keys %{$info->{imageinfo}}) {
+                # Keys that start 'App' seem to more trouble than they're 
+                # worth, containing all sorts of odd crud.  Just delete them.
+                delete $info->{imageinfo}{$_} and next
+                    if $_ =~ /^App/;
+                
+                # Delete keys which contain non-printable data
+                delete $info->{imageinfo}{$_} and next 
+                    if $info->{imageinfo}{$_} =~ /[^[:print:]]/;
+                
+                # Delete keys that are ARRAY or HASH refs, they don't 
+                # get serialised properly
+                delete $info->{imageinfo}{$_} and next 
+                    if     ref($info->{imageinfo}{$_}) eq 'ARRAY'
+                        or ref($info->{imageinfo}{$_}) eq 'HASH';
+                
+                # The value might be an object that knows how to stringify
+                # itself.  Give it the chance to do so.
+                $info->{imageinfo}{$_} = "$info->{imageinfo}{$_}";
+            }
+            
+            my $stor = new RDF::Core::Storage::Memory;
+            my $model = new RDF::Core::Model(Storage => $stor);
+            my $subject = new RDF::Core::Resource("$filename");
+            my $predicate;
+            my $object;
+            my $statement;
+            
+            my ($inf, $ns);
+            
+            my %ns = ( image_info => 'http://www.cpan.org/authors/id/G/GA/GAAS/#',
+                       exif       => 'http://impressive.net/people/gerald/2001/exif#',
+                       aag        => 'http://search.cpan.org/~nikc/AxKit-App-Gallery/xml#',
+                       dc         => 'http://dublincore.org/documents/2003/02/04/dces/',
+                       foaf       => 'http://xmlns.com/foaf/0.1/'
+            );
+            
+            # Convert the Image::Info data to RDF.
+            foreach my $k (keys %{$info->{imageinfo}}) {
+                # Lower case keys are generic image info,
+                # keys that start uppercase are EXIF
+                if($k =~ /^[a-z]/) {
+                    $ns = $ns{'image_info'};
+                }
+                else {
+                    $ns = $ns{'exif'};
+                }
+                my $name = $k;
+                $name =~ s/\W//g; # strip non-word chars
+                
+                $predicate = $subject->new($ns, $name);
+                $object = new RDF::Core::Literal($info->{imageinfo}{$k});
+                
+                $statement = new RDF::Core::Statement($subject, $predicate, $object);
+                
+                $model->addStmt($statement);
+            }
+            
+            # Link in each thumbnail as a FOAF thumbnail
+            my $foaf = $subject->new($ns{'foaf'}, 'thumbnail');
+            foreach my $thumb (@{$info->{thumbs}{thumb}}) {
+                my $size = $thumb->{size};
+                $model->addStmt(RDF::Core::Statement->new($subject, $foaf,
+                        RDF::Core::Resource->new("$filename?size=$size")));
+            }
+        
+            # Convert the thumbnail data to RDF
+            foreach my $thumb (@{$info->{thumbs}{thumb}}) {
+                my $size = $thumb->{size};
+                $subject = new RDF::Core::Resource("$filename?size=$size");
+                
+                foreach (qw(height width)) {
+                    $predicate = $subject->new($ns{'image_info'}, $_);
+                    $object = new RDF::Core::Literal($thumb->{$_});
+                    $statement = new RDF::Core::Statement($subject, 
+                    $predicate, $object);
+                    $model->addStmt($statement);
+                }
+                
+                # Use my namespace for the thumbnail's size
+                foreach (qw(size)) {
+                    $predicate = $subject->new($ns{'aag'}, $_);
+                    $object = new RDF::Core::Literal($thumb->{$_});
+                    $statement = new RDF::Core::Statement($subject, 
+                    $predicate, $object);
+                    $model->addStmt($statement);
+                }
+                
+                # Use 'dc:title' for the thumbnail's filename.
+                #
+                # XXX This strikes me as being horribly wrong...
+                foreach (qw(filename)) {
+                    $predicate = $subject->new($ns{'dc'}, 'title');
+                    $object = new RDF::Core::Literal($thumb->{$_});
+                    $statement = new RDF::Core::Statement($subject,
+                    $predicate, $object);
+                    
+                    $model->addStmt($statement);
+                }
+            }
+            
+            # serialize
+            $rdf = '';
+            my $ser = RDF::Core::Model::Serializer->new(Model => $model, 
+                            Output => \$rdf);
+            $ser->serialize();
+            
+            $cache->set("${filename}+rdf", $rdf);
+        }
+    }
+    
+    return $rdf;
+}
+
+## Directories get turned into a "proofsheet" of images
+sub serve_dir {
+    my ($self, $input) = @_;
+    
+    $self->log(LOGINFO, "Serving DIR");
+    
+    my $dom = $input->dom;
+    
+    my $xc = XML::LibXML::XPathContext->new($dom);
+    $xc->registerNs('axdir', 'http://axkit.org/2002/filelist');
+    
+    # scrub files we don't want (dot-files)
+    for my $node ($xc->findnodes('//axdir:file[starts-with(text(), ".")]')) {
+        $node->parentNode->removeChild($node);
+    }
+    
+    # scrub dot-dirs
+    for my $node ($xc->findnodes('//axdir:directory[starts-with(text(), ".")]')) {
+        $node->parentNode->removeChild($node);
+    }
+    
+    my $out = $input->transform(
+        XSLT($self->config->docroot . "/.stylesheets/filelist2proofsheet.xsl")
+        );
+    
+    # Now we have the full proofsheet, we need to trim it down to just the
+    # images we want for this "page". We use Data::Page to tell us which
+    # images those are.
+    $dom = $out->dom;
+    
+    my $per_page = $self->get_cfg('ImagesPerProofsheet');
+    my $cur_page = $self->client->param('cur_page');
+    $cur_page = 1 if ! defined $cur_page;
+    $cur_page = 1 if $cur_page !~ /\d+/;
+    
+    
+    my @images = $dom->findnodes('/proofsheet/images/image/filename/text()');
+    
+    my $page   = Data::Page->new();
+    
+    $page->total_entries(scalar(@images));
+    $page->entries_per_page($per_page);
+    $page->current_page($cur_page);
+    
+    my $first  = $page->first;
+    my $last   = $page->last;
+    
+    my $xpath  = "//images/image[position() < $first or position() > $last]";
+    for my $node ($dom->findnodes($xpath)) {
+        $node->parentNode->removeChild($node);
+    }
+    
+    
+    # Now add in some XML for the page navigation
+    my $pages_xml = '<pages>';
+	for ($page->first_page .. $page->last_page) {
+		$pages_xml .= "<page number='$_'";
+		$pages_xml .= ' current=\'yes\'' if $_ == $cur_page;
+		$pages_xml .= '/>';
+	}
+	$pages_xml .= '</pages>';
+    
+    $dom->documentElement->appendWellBalancedChunk($pages_xml);
+    
+    # Add in some info about the URL and each image
+    my $uri = $self->client->headers_in->request_uri;
+    $uri =~ s/^\///;
+    $uri = join("\n",
+           map { 
+             "<component><e>$_</e><u>" . uri_decode($_) . "</u></component>" 
+           } split(/\//, $uri));
+    
+	my $dirpath = $self->client->headers_in->filename();
+	
+    my $mm = File::MMagic->new;
+    
+    $self->log(LOGINFO, "Augmenting images info");
+    
+	for my $node ($dom->findnodes('//images/image'), $dom->findnodes('//albums/album'))
+        {
+	   my $filename = $node->findnodes('./filename/text()');
+	   my $fullpath = catfile($dirpath, "$filename");
+       my $ct = $mm->checktype_filename($fullpath);
+       $node->appendWellBalancedChunk(<<EOXML);
+<dirpath>$dirpath</dirpath>
+<content-type>$ct</content-type>
+EOXML
+    }
+    
+    # Finally we add in the config info
+    $self->log(LOGINFO, "Augmenting config info");
+    
+	my @variables = qw(ProofsheetColumns ImagesPerProofsheet
+            			GalleryCache GalleryThumbQuality);
+
+	my $config_xml = "<perl-vars>\n";
+	foreach my $variable (@variables) {
+        $config_xml .= "<var name='$variable'>" . ($self->get_cfg($variable) || '') . "</var>\n";
+	}
+    
+    my $sizelist = $self->get_cfg('GallerySizes');
+    $sizelist = $DEFAULT_SIZE unless defined $sizelist;
+    my @sizes = split(/\s+/, $sizelist);
+    
+    $config_xml .= "</perl-vars>\n<GallerySizes>\n  <size type=\"thumb\">$sizes[0]</size>\n";
+    foreach (@sizes[1..$#sizes]) {
+        $config_xml .= "<size>$_</size>\n";
+    }
+    
+    $config_xml .= "</GallerySizes>\n";
+    
+    my $hostname = $self->client->headers_in->header('Host') || 'localhost';
+    $hostname =~ s/:\d+$//;
+    my $site = "http://$hostname";
+    my $port = $self->config->port;
+    
+    $config_xml .= <<EOXML;
+<server>
+  <site>$site</site>
+  <hostname>$hostname</hostname>
+  <port>$port</port>
+</server>
+EOXML
+    
+    $dom->documentElement->firstChild->appendWellBalancedChunk($config_xml);
+    $dom->documentElement->appendWellBalancedChunk("<uri>$uri</uri>");
+
+    XML::LibXSLT->register_function("urn:ax-app-gallery", "epoch-to-date",
+        sub { my $epoch = shift; my @p=gmtime($epoch); $p[4]++; $p[5]+=1900; return 
+"$p[5]-$p[4]-$p[3]"; });
+
+    $out = $out->transform(
+        XSLT($self->config->docroot . '/.stylesheets/proofsheet2html.xsl')
+    );
+    
+    return OK, $out;
+}

@@ -1,0 +1,11 @@
+Changes for Perl extension Aspect-Library-NYTProf
+
+1.00 Thu 26 May 2011
+	- Updating to 1.00 to indicate a stable release synced to Aspect 1.00
+
+0.98 24 May 2011
+	- Updated to Module::Install 1.01
+	- Updated to match syntax changes in Aspect 0.98
+
+0.01 Wed 20 Jan 2010
+	- Creating the initial release

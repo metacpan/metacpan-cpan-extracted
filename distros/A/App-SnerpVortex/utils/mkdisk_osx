@@ -1,0 +1,11 @@
+SIZE=1024m
+DMG=svworkspace.dmg
+
+hdiutil create -size $SIZE $DMG -layout NONE
+
+MYDEV=$(hdid -nomount $DMG)
+newfs_hfs -v snerp-vortex-workspace -s $MYDEV
+
+hdiutil eject $MYDEV
+
+hdid $DMG

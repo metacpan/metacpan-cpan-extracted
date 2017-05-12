@@ -1,0 +1,26 @@
+bootstrap original
+// Grays
+// -------------------------
+@black: #000;
+@grayDarker: #222;
+@grayDark: #333;
+@gray: #555;
+@grayLight: #999;
+@grayLighter: #eee;
+@white: #fff;
+
+
+# Fixpunkt
+Orange: #FC7717
+
+
+Blau: #0b77af
+Rot: #bf1637
+
+Grau Text:  #525051
+Grau:       #565656
+Grau mittel #808080 
+Grau Text heller und Linien/Rahmen: #a5a5a5
+Grau Fond: #efefef
+
+Font: Verdana

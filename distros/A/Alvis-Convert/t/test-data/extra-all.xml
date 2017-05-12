@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentCollection xmlns="http://alvis.info/enriched/" version="1.1">
+<documentRecord id="706D87D704893B9A3B40C28AC3620991" xmlns="http://alvis.info/enriched/" version="1.1">
+<relevance>
+    <scoreset type="sa50">
+      <score topicId="Untitled_1">0.949992</score>
+      <score topicId="Google co-founders">35.482662</score>
+    </scoreset>
+</relevance>
+</documentRecord>
+
+<documentRecord id="0717FBB236A4A067DC9BE4FA48801BE3" xmlns="http://alvis.info/enriched/" version="1.1">
+<relevance>
+    <scoreset type="sa50">
+      <score topicId="Untitled_1">2.953086</score>
+      <score topicId="E-mail spam">21.113569</score>
+    </scoreset>
+</relevance>
+</documentRecord>
+
+<documentRecord id="A40C00BE1D17086E4AE59ABB355FFF3C" xmlns="http://alvis.info/enriched/" version="1.1">
+<relevance>
+    <scoreset type="sa50">
+      <score topicId="Untitled_1">0.949992</score>
+      <score topicId="Google co-founders">35.482662</score>
+    </scoreset>
+</relevance>
+</documentRecord>
+
+</documentCollection>
+
+

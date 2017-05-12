@@ -1,0 +1,84 @@
+---
+abstract: 'A script for logging into devices'
+author:
+  - 'Robert Drake, C<< <rdrake at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Most: 0.25
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Tel
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  App::Tel:
+    file: lib/App/Tel.pm
+    version: '0.201601'
+  App::Tel::Color:
+    file: lib/App/Tel/Color.pm
+  App::Tel::Color::Base:
+    file: lib/App/Tel/Color/Base.pm
+    version: '0.2'
+  App::Tel::Color::Cisco:
+    file: lib/App/Tel/Color/Cisco.pm
+  App::Tel::Color::CiscoLog:
+    file: lib/App/Tel/Color/CiscoLog.pm
+  App::Tel::Color::CiscoPingRainbow:
+    file: lib/App/Tel/Color/CiscoPingRainbow.pm
+  App::Tel::Expect:
+    file: lib/App/Tel/Expect.pm
+  App::Tel::HostRange:
+    file: lib/App/Tel/HostRange.pm
+    version: '0.201503'
+  App::Tel::Macro:
+    file: lib/App/Tel/Macro.pm
+  App::Tel::Merge:
+    file: lib/App/Tel/Merge.pm
+  App::Tel::Passwd:
+    file: lib/App/Tel/Passwd.pm
+  App::Tel::Passwd::KeePass:
+    file: lib/App/Tel/Passwd/KeePass.pm
+  App::Tel::Passwd::Mock:
+    file: lib/App/Tel/Passwd/Mock.pm
+  App::Tel::Passwd::PWSafe:
+    file: lib/App/Tel/Passwd/PWSafe.pm
+  App::Tel::Passwd::Pass:
+    file: lib/App/Tel/Passwd/Pass.pm
+recommends:
+  Compress::Raw::Zlib: 0
+  Crypt::PWSafe3: 0
+  File::KeePass: 0
+  GnuPG::Interface: 0
+  IO::File: 0
+  IO::Handle: 0
+  NetAddr::IP: 0
+  Passwd::Keyring::Auto: 0
+  Term::ANSIColor: 0
+  Term::ReadKey: 0
+  XML::Parser: 0
+requires:
+  Cwd: 0
+  Expect: '0.0'
+  File::Temp: 0
+  Getopt::Long: 0
+  Getopt::Std: 0
+  IO::Stty: '0.0'
+  Scalar::Util: 0
+  Time::HiRes: 0
+  perl: 5.10.0
+resources:
+  bugtracker: https://github.com/rfdrake/tel/issues
+  homepage: http://search.cpan.org/dist/App-Tel
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/rfdrake/tel.git
+version: '0.201601'

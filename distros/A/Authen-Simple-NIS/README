@@ -1,0 +1,68 @@
+NAME
+    Authen::Simple::NIS - Simple NIS authentication
+
+SYNOPSIS
+        use Authen::Simple::NIS;
+    
+        my $nis = Authen::Simple::NIS->new;
+    
+        if ( $nis->authenticate( $username, $password ) ) {
+            # successfull authentication
+        }
+    
+        # or as a mod_perl Authen handler
+
+        PerlModule Authen::Simple::Apache
+        PerlModule Authen::Simple::NIS
+
+        PerlSetVar AuthenSimpleNIS_domain "domain"
+
+        <Location /protected>
+          PerlAuthenHandler Authen::Simple::NIS
+          AuthType          Basic
+          AuthName          "Protected Area"
+          Require           valid-user
+        </Location>
+
+DESCRIPTION
+    NIS authentication.
+
+METHODS
+    * new
+        This method takes a hash of parameters. The following options are
+        valid:
+
+        * domain
+                NIS domain. Required unless it can be obtained from
+                "yp_get_default_domain()".
+
+                    domain => 'domain'
+
+        * map   NIS map. Defaults to "passwd.byname".
+
+                    map => 'passwd.byname'
+
+        * log   Any object that supports "debug", "info", "error" and
+                "warn".
+
+                    log => Log::Log4perl->get_logger('Authen::Simple::NIS')
+
+    * authenticate( $username, $password )
+        Returns true on success and false on failure.
+
+SEE ALSO
+    Authen::Simple.
+
+    Net::NIS.
+
+    Net::NIS::Table.
+
+    ypclnt(3).
+
+AUTHOR
+    Christian Hansen "ch@ngmedia.com"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

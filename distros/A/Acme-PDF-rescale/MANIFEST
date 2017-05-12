@@ -1,0 +1,5 @@
+Makefile.PL
+MANIFEST
+bin/pdfrescale
+lib/Acme/PDF/rescale.pm
+META.yml                                 Module meta-data (added by MakeMaker)

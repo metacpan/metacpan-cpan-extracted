@@ -1,0 +1,8 @@
+Revision history for App-ZofCMS-PluginBundle-Naughty
+
+1.001002 2014-01-31
+    - Updated the POD to list what plugins are included
+
+1.001001 2014-01-31
+    - First version released on an unsuspecting world
+    - Placed all the troublesome plugins inside this dist

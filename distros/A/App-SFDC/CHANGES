@@ -1,0 +1,348 @@
+==================================================
+Changes from 2014-09-14 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.16 at 2015-09-14 08:41:36 +0000
+-----------------------------------------
+
+  Change: 7f889b1fbfc37352748861460c808b9ec386206c
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-09-03 14:59:09 +0000
+
+    Removed Test::Perl::Critic from dist.ini due to it causing test
+    failures in dzil test 
+
+  Change: 6a2fdcfceb07ed34c7e57a79a7e44de7901ef107
+  Author: Thomas Minney <Thomas.Minney@sophos.com>
+  Date : 2015-08-26 10:47:05 +0000
+
+    Remove duplicate output bugfix 
+
+-----------------------------------------
+version 0.15 at 2015-07-22 15:04:11 +0000
+-----------------------------------------
+
+  Change: b6d16d750ad2b73f4a8bcf015a347cca523f2035
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-22 16:04:11 +0000
+
+    Regression: commands should be case-insensitive 
+
+  Change: 33082072d16f505890ff5a094bb63c078930e791
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-22 15:50:50 +0000
+
+    Correct version requirement in Role::Credentials 
+
+-----------------------------------------
+version 0.14 at 2015-07-22 11:13:10 +0000
+-----------------------------------------
+
+  Change: 12f60d6e3531cd68d2d9a07ab5e15c06349564e9
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-22 12:13:10 +0000
+
+    Move ExecuteAnonymous to App::SFDC::Command::ExecuteAnonymous 
+
+  Change: 97c3b60c74f69c44c1d9ff5508c6cb92cfcebc15
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-22 11:24:26 +0000
+
+    Move DeployResult/JUnitOutput to App::SFDC::Metadata 
+
+  Change: 043656752f20180d795043359d53369c0d0419b0
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-22 10:20:52 +0000
+
+    Update dist.ini to write changes 
+
+  Change: 5350602ffbf99087fde75aef29c90ca3264e09a9
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-21 16:46:06 +0000
+
+    Move metadata tools into App::SFDC::Metadata 
+
+  Change: d164985411b759499293147b134c2d83d6716ee4
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-21 16:45:51 +0000
+
+    Prepare base modules for pluggability 
+
+-----------------------------------------
+version 0.13 at 2015-07-21 08:42:55 +0000
+-----------------------------------------
+
+  Change: fcaf9f086b9b48d00f980da4f99f09f65fe370b5
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-21 09:42:55 +0000
+
+    Add documentation on the executeAnonymous execute() method 
+
+  Change: 64436c510d017d665384d292eed573815a457573
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-20 14:39:35 +0000
+
+    Specify WWW::SFDC version 
+
+  Change: 4519b58663822b0c29658ddae6fe2769c54b5ee0
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-20 14:37:38 +0000
+
+    exit 1 is prettier than die() 
+
+  Change: 21843eb9770cf04d89a457a2a3dc639c201efda8
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-17 15:26:13 +0000
+
+    Added Anonymous Apex Code execution application functionality 
+
+-----------------------------------------
+version 0.12 at 2015-07-17 12:51:04 +0000
+-----------------------------------------
+
+  Change: 2b3d8f53d5644cb89bed1ea367148d901d1a0a58
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-17 13:51:04 +0000
+
+    Add zip file override option to deploy.pm 
+
+-----------------------------------------
+version 0.11 at 2015-07-15 15:04:06 +0000
+-----------------------------------------
+
+  Change: 8dbed481b22ed570c94ae20d2f232cde3023dfed
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-15 16:04:06 +0000
+
+    Should return a truthy value when no files are input 
+
+-----------------------------------------
+version 0.10 at 2015-07-15 10:37:23 +0000
+-----------------------------------------
+
+  Change: a0d6b4d5cfb8c2060bc48e1300c808224341562c
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-15 11:37:23 +0000
+
+    Ignore empty lines in the filelist on deployments 
+
+-----------------------------------------
+version 0.09 at 2015-07-15 08:53:15 +0000
+-----------------------------------------
+
+  Change: 40b35c0ce04b80b45fc921f6caeb254bdb618c34
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-15 09:53:15 +0000
+
+    Times given by SFDC are in ms but JUnit expects seconds 
+
+-----------------------------------------
+version 0.08 at 2015-07-14 15:30:35 +0000
+-----------------------------------------
+
+  Change: b254a98ae0ced38a23d9e222f8d63d927cab7dd9
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-14 16:30:35 +0000
+
+    Always output unit test results if requested
+
+    This is because Bamboo borks if it's expecting a results file and you
+    don't provide one 
+
+-----------------------------------------
+version 0.07 at 2015-07-14 08:41:36 +0000
+-----------------------------------------
+
+  Change: 91a6ea95f6b2fbda5282343800c258a77d382c0a
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-14 09:41:36 +0000
+
+    Add JUnit output to App::SFDC 
+
+  Change: c5cb10f835db3346771c0024475d2ff4866e1780
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-10 14:29:17 +0000
+
+    no input should product usage and no warnings 
+
+-----------------------------------------
+version 0.06 at 2015-07-08 13:30:37 +0000
+-----------------------------------------
+
+  Change: bef58441db2d083c8914f39bf85ad82eb9206b20
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-08 14:30:37 +0000
+
+    We need the deploy script to exit 1 on failure 
+
+  Change: 640ac43d2f550f9a9f649d58d4a4e4fc55012f0b
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-07 13:47:14 +0000
+
+    Add PkgVersion to set $VERSION 
+
+-----------------------------------------
+version 0.05 at 2015-07-07 11:08:22 +0000
+-----------------------------------------
+
+  Change: 0432af3e5a4f19e6ac3aafd069bfaa8ee264e317
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-07 12:08:22 +0000
+
+    Need to out the deployment ID to STDOUT for reference 
+
+  Change: 2f9132534d0d00bd3fe0cfac5ceb995559d4414c
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-07 11:03:12 +0000
+
+    Corrected capitalisation in deployment headers 
+
+  Change: 8bb2d78d897489050cbfdf978ee7e4ffeca40572
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-07 09:49:44 +0000
+
+    Remove experimental given/when 
+
+  Change: 2268c5689a1a35f8620d7e90e5d011565b4fd592
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-07 09:49:03 +0000
+
+    Default API version should be 34! 
+
+  Change: 9650599771bbed3f02e9df5f53d945ff2555a122
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-07 09:46:00 +0000
+
+    Should exit without doing anything if there is nothing to deploy 
+
+  Change: 5ef429654b20fbb8158687e95a037049be101978
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-07 09:45:21 +0000
+
+    Rollback should be set as the default 
+
+-----------------------------------------
+version 0.04 at 2015-07-06 13:52:16 +0000
+-----------------------------------------
+
+  Change: 53f728b826e0b0e19ce405ed4250d76d4f075423
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-06 14:52:16 +0000
+
+    Manifest has been generated from the wrong place 
+
+-----------------------------------------
+version 0.03 at 2015-07-01 08:56:20 +0000
+-----------------------------------------
+
+  Change: c6c1191b644772b12ac3ea90acc6a643ba8924cc
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-01 09:56:20 +0000
+
+    Files with newlines break zipfile creation, so need chomping 
+
+-----------------------------------------
+version 0.02 at 2015-07-01 08:06:56 +0000
+-----------------------------------------
+
+  Change: 6f70ed98ba0ca91f5eccf3240512022cd4aa41a7
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-01 09:06:56 +0000
+
+    Calling the credfile property caused death unnecessarily 
+
+-----------------------------------------
+version 0.01 at 2015-06-30 09:16:46 +0000
+-----------------------------------------
+
+  Change: 5198a05bfac3552d73bbebdc036b994c48ef0855
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-06-30 10:16:46 +0000
+
+    Skip problematic plugin 
+
+  Change: 2bcba5ee4da17111630038b3612bd99974d89374
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-06-30 09:54:35 +0000
+
+    read from STDIN rather than <> in order to prevent argument parsing
+    bugs 
+
+  Change: 45947010be764a652d5307fb7586b487119a1a55
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-06-17 19:19:56 +0000
+
+    Reintroduce documentation 
+
+  Change: 6309596e8ed68479ef895be07cc97bf505b96f23
+  Author: Alexander Brett <alex@alexander-brett.co.uk>
+  Date : 2015-06-15 07:59:32 +0000
+
+    changes to support refactoring of WWW-SFDC 
+
+  Change: 23d7af2a213181230ad625433e609913404446f8
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-06-10 17:31:51 +0000
+
+    Ignore unavoidable criticism 
+
+  Change: 798facb6164d78d78bb2e8941d5a726cb341fffb
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-06-10 15:53:17 +0000
+
+    Update gitignore to ignore dzil release files 
+
+  Change: ee9654ee9149ffadad84f2bfd68cc635e01459a9
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-06-10 15:49:29 +0000
+
+    Commit missing files 
+
+  Change: b5098407c3fb9fc30de4e8ce43aceab9a1628013
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-06-10 15:20:17 +0000
+
+    Refactoring for additional stability and ability to bundle with
+    PerlApp 
+
+  Change: a7dcefcb2a70a0c1aa0e481c9ffd1d6e8825da35
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-05-26 13:34:26 +0000
+
+    Ignore sublime files 
+
+  Change: a9703d42ba5b150c8ff3080effa0a4f24d67a625
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-05-20 17:06:54 +0000
+
+    Test & fix deployment side 
+
+  Change: f5dcb145ba4fc2b5ddc30bce39895ad2364fa69a
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-05-20 16:27:00 +0000
+
+    Ensure reading creds from file works, and normalise the -f options to
+    'file' singular 
+
+  Change: fd79ec4cca59deb1e20e21984dc9ccce4017d43d
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-05-19 18:16:10 +0000
+
+    Additional refinement 
+
+  Change: f8b060d72183636056296037e4228fe79593cc77
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-05-19 15:10:19 +0000
+
+    Tweaking build 
+
+  Change: 84a7cff2a2076c582a74ca5a1eb2e8f8b0263b60
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-05-19 13:54:17 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

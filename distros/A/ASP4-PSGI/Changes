@@ -1,0 +1,15 @@
+
+2012-02-01    v0.004
+  - Now if you have a '/404.asp' we will try to call it if we get a 404 error.
+
+2011-12-12    v0.003
+  - Now compatible with more recent versions of ASP4.
+
+2010-09-21    v0.002
+  - Woops!  Was not returning a coderef.  Now we are.
+
+2010-09-21    v0.001
+  - Initial version.
+  - Tested with Plack, Corona and Starman.
+
+

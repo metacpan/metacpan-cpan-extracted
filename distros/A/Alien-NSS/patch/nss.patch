@@ -1,0 +1,33 @@
+diff -rupN nss-3.15.1/nss/lib/certdb/crl.c ournss/nss/lib/certdb/crl.c
+--- nss-3.15.1/nss/lib/certdb/crl.c	2013-06-27 10:58:08.000000000 -0700
++++ ournss/nss/lib/certdb/crl.c	2013-08-30 16:04:24.000000000 -0700
+@@ -2609,7 +2609,7 @@ cert_CheckCertRevocationStatus(CERTCerti
+     PRBool lockedwrite = PR_FALSE;
+     SECStatus rv = SECSuccess;
+     CRLDPCache* dpcache = NULL;
+-    CERTRevocationStatus status = certRevocationStatusRevoked;
++    CERTRevocationStatus status = certRevocationStatusUnknown;
+     CERTCRLEntryReasonCode reason = crlEntryReasonUnspecified;
+     CERTCrlEntry* entry = NULL;
+     dpcacheStatus ds;
+@@ -2629,6 +2629,8 @@ cert_CheckCertRevocationStatus(CERTCerti
+         *revReason = reason;
+     }
+ 
++    return SECSuccess;
++
+     if (t && secCertTimeValid != CERT_CheckCertValidTimes(issuer, t, PR_FALSE))
+     {
+         /* we won't be able to check the CRL's signature if the issuer cert
+diff -rupN nss-3.15.1/nss/lib/certhigh/certvfy.c ournss/nss/lib/certhigh/certvfy.c
+--- nss-3.15.1/nss/lib/certhigh/certvfy.c	2013-06-27 10:58:08.000000000 -0700
++++ ournss/nss/lib/certhigh/certvfy.c	2013-08-30 16:04:44.000000000 -0700
+@@ -122,7 +122,7 @@ SECStatus
+ SEC_CheckCRL(CERTCertDBHandle *handle,CERTCertificate *cert,
+ 	     CERTCertificate *caCert, PRTime t, void * wincx)
+ {
+-    return CERT_CheckCRL(cert, caCert, NULL, t, wincx);
++       return SECSuccess;
+ }
+ 
+ /*

@@ -1,0 +1,113 @@
+{
+   "abstract" : "simple license checker for source files",
+   "author" : [
+      "Jonas Smedegaard (JONASS) <jonass@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "Licensing",
+      "Sourcecode"
+   ],
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Licensecheck",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Fcntl" : "0",
+            "Getopt::Long::Descriptive" : "0",
+            "List::Util" : "1.45",
+            "Moo" : "1.001000",
+            "Path::Iterator::Rule" : "0",
+            "Path::Tiny" : "0.062",
+            "Pod::Constants" : "0",
+            "Sort::Key::Multi" : "1.25",
+            "String::Copyright" : "0.003",
+            "String::Escape" : "0",
+            "Try::Tiny" : "0",
+            "autodie" : "0",
+            "experimental" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.014000",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Software::License" : "0.103008"
+         },
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Requires" : "0",
+            "Test::Roo" : "0",
+            "Test::Script" : "1.09",
+            "UNIVERSAL::require" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Licensecheck" : {
+         "file" : "lib/App/Licensecheck.pm",
+         "version" : "v3.0.29"
+      },
+      "Regexp::Pattern::License" : {
+         "file" : "lib/Regexp/Pattern/License.pm",
+         "version" : "v3.0.29"
+      },
+      "Regexp::Pattern::License::Parts" : {
+         "file" : "lib/Regexp/Pattern/License/Parts.pm",
+         "version" : "v3.0.29"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck"
+      },
+      "homepage" : "https://metacpan.org/release/App-Licensecheck",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://anonscm.debian.org/cgit/build-common/licensecheck.git"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project"
+   },
+   "version" : "v3.0.29",
+   "x_contributors" : [
+      "Paul Wise <pabs@debian.org>"
+   ],
+   "x_help_wanted" : [
+      "documenter",
+      "tester"
+   ],
+   "x_provides_scripts" : {
+      "licensecheck" : {
+         "file" : "bin/licensecheck"
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

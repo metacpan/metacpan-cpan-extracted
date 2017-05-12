@@ -1,0 +1,52 @@
+Version 0.04 - 14th December 2007
+    + Fixed bug 26767 reported by DAXIM
+      http://rt.cpan.org/Ticket/Display.html?id=26767
+    + Fixed Apache::Test / Apache::TestMB test suite not
+      working properly (I think).
+
+Version 0.03 - 29th January 2007
+    + Removed execute bits from Build.PL because that's
+      bad. oops. I'll finish the rest soon I promise. ;-)
+
+Version 0.02 - 3rd January 2007
+    + Fixed examples/apache/htdocs/favicon.ico.
+    + Mostly implemented the AddDescription configuration
+      directive handling code.
+    + Added RenderXSLT and RenderXSLTEnvVar Apache
+      configuration directives to control how and when
+      server-side XSLT rendering will happen using the
+      XML::LibXML and XML::LibXSLT modules.
+    + Updated example configuration to include dynamic
+      server-side XSLT rendering for older browsers.
+    + Added some Apache::Test unit tests.
+
+Version 0.01 - 25th December 2006
+    + Still development code.
+    + Changed default value of 'mycomputer_root' variable
+      in examples/apache/htdocs/index.xslt from 'true'
+      to 'false'.
+    + Improved examples/apache/htdocs/index.xslt in various
+      ways.
+    + Added propper parsing of apache configuration
+      directives.
+    + Mostly implemented the AddIcon configuration
+      directive handling code.
+    + Various other things.
+
+Version 0.00_1 - 8th December 2006
+    + Added some modules to be loaded that were mistakenly
+      not loaded.
+    + Updated Build.PL to reflect all the modules that are
+      required.
+    + Added XML::Quote quoting of the XML output for some
+      attributes that may contain harmful characters.
+    + Added some more icons.
+    + Tweaked the index.xslt a little.
+    + Tweaked some of the examples/*
+    + Fixed the MANIFEST.SKIP so as not to ship unwanted
+      files in the final distribution tarball.
+
+Version 0.00 - 26th November 2006
+    + Initial developer pre-release to save the namespace
+      and to discuss API prior to full release.
+

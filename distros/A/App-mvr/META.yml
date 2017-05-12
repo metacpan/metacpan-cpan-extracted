@@ -1,0 +1,45 @@
+---
+abstract: 'like mv, but clever'
+author:
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  Capture::Tiny: 0
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  IPC::Run3: 0
+  Module::Build: 0.3601
+  Test::Fatal: 0
+  Test::Is: 0
+  Test::More: 0
+  Test::Script::Run: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-mvr
+no_index:
+  directory:
+    - corpus
+    - inc
+    - examples
+requires:
+  Carp: 0
+  Exporter: 0
+  Getopt::Long: 0
+  POSIX: 0
+  Path::Tiny: 0.034
+  Pod::Usage: 0
+  Try::Tiny: 0
+  perl: v5.14.0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/doherty/App-mvr/issues
+  homepage: http://metacpan.org/release/App-mvr/
+  repository: git://github.com/doherty/App-mvr.git
+version: 0.005

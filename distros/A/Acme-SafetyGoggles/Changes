@@ -1,0 +1,27 @@
+Revision history for Acme-SafetyGoggles
+
+0.06	2013-01-24
+	- remove useless UNITCHECK block breaks in inhibits Perl <=v5.8.
+	- removing other useless special blocks
+
+0.05    2013-01-19
+	- Including Text::Diff dependency in Makefile.PL. No code changes.
+
+0.04    2013-01-18
+	- Remove (_) prototype in _set_current function, which is incompatible
+	  with Perl v5.8.
+
+0.03    2013-01-16
+	- Rewrite to get  -MAcme::SafetyGoggles  feature to work.
+	- Add  state, diff  methods.
+	- Added unit tests
+
+0.02    2010-05-12
+	- Now a pure Perl module without system grep/diff tool dependencies.
+	- Removed File::Slurp dependency.
+	- Added Text::Diff dependency.
+        - Don't warn about implicit source filtering provided by the __END__ token.
+
+0.01    2010-05-12
+	First version, released on an unsuspecting world.
+

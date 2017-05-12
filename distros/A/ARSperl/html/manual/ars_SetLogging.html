@@ -1,0 +1,63 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - ars_SetLogging</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_SetLogging(ctrl, logTypeMask, fileName)</CODE></H2>
+
+   <p>This function activates or deactivates client-side logging of API, Filter, SQL or
+    Plugin actions. 
+
+   <p>The <code>fileName</code> parameter is optional. If you specify a file name, the messages
+    are appended to that file. If <code>fileName</code> is omitted, then the log messages are
+    appended to <code>$ars_errstr</code>.
+
+   <p>The <code>logTypeMask</code> parameter allows you	to specify what type(s) of activities
+	will be logged: 
+	<UL> 
+	   Bit 1 = SQL logging (ARS::AR_DEBUG_SERVER_SQL)<br>
+	   Bit 2 = Filter logging (ARS::AR_DEBUG_SERVER_FILTER)<br>
+	   Bit 5 = API logging (ARS::AR_DEBUG_SERVER_API)<br>
+	   Bit 18 = Plugin logging (ARS::AR_DEBUG_SERVER_PLUGIN)<br>
+	</UL>
+
+	<DL>
+		<DT><B>On success</B><DD>
+		  returns 1
+		<DT><B>On failure</B><DD>
+		  returns 0
+	</DL>
+
+    <P>Example:
+
+      <PRE>
+  # start filter and sql logging
+  # (the logfile gets opened for appending)   
+  ars_SetLogging( $c, ARS::AR_DEBUG_SERVER_FILTER | ARS::AR_DEBUG_SERVER_SQL, 
+          "/var/log/filter_sql.log" ) ||
+		  die ("SetLogging (start): $ars_errstr");
+ 
+  # call any ARS API function
+  my $id = ars_CreateEntry( $c, "User", 101 => "TestUser", 109 => 1 );
+  
+  # stop logging (specify logTypeMask = 0 and no file)
+  # (the logfile gets closed)   
+  ars_SetLogging( $c, 0 ) ||
+		  die ("SetLogging (end): $ars_errstr");
+
+      </PRE>
+
+	<P>If SQL and Filter logging do appear as not working, it may be because the
+	  the user is not a member of the "client-side logging group."
+	  The client-side logging group can be configured via Remedy Admin Tool 
+	  (menu "File -> Server Information", tab "Log Files") or using the 
+	  <a href="ars_SetServerInfo.html">ars_SetServerInfo</a> function (server option ARS::AR_SERVER_INFO_DEBUG_GROUPID). 
+
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of
+	Contents </A>
+<p>
+</BODY>
+</HTML>

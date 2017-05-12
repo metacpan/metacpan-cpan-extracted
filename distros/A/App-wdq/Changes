@@ -1,0 +1,90 @@
+Revision history for App-wdq
+
+0.4.4  2016-04-07 10:26:33 CEST
+    - New options "label", "description", and "monochrome"
+    - Allow repeated options label, description, and text
+    - Renamed output format "pretty" to "text"
+    - Fix and extend help output (#23, #24)
+    - Fix text template format with uppercase field names
+
+0.4.3  2015-11-14 22:18:06 CET
+    - New option text to easily get names and descriptions
+    - Show count in text format when counting
+
+0.4.2  2015-11-10 15:10:09 CET
+    - New option count
+    - Minor fixes and cleanup
+
+0.4.1  2015-10-27 13:44:50 CET
+    - Fixed test
+    - New option enumerate
+ 
+0.4.0  2015-10-26 11:55:47 CET
+    - Implemented search mode
+    - Added colorized XML output format
+    - Refactoring
+
+0.3.6  2015-10-22 20:05:48 CEST
+    - More condense simple output format with color (#10)
+    - New output format pretty based on string templates
+    - Extended and reorganized help
+
+0.3.5  2015-10-20 12:25:46 CEST
+    - Use MediaWiki API to resolve URLs to Wikidata items
+    - New option no-mediawiki to disable MediaWiki API requests
+    - Validate option language
+    - SPARQL Query Results JSON format with color (#18)
+    - refactoring
+
+0.3.4  2015-10-19 16:10:08 CEST
+    - New option no-header to omit header in CSV or export format
+    - Extend option ids to more types of Wikidata URIs
+
+0.3.3  2015-10-17 21:11:41 CEST
+    - Better abbreviated URIs as qnames
+    - Fix lookup of "Property:P_"
+
+0.3.2  2015-10-16 14:14:24 CEST
+    - Fix zero-result-bug in lookup mode
+    - Support limit in lookup mode
+    - Enable streaming output of simple JSON format
+
+0.3.1  2015-10-16 11:13:18 CEST
+    - Simplify lookup by passing ids as command line arguments
+    - Implement proper exit codes and option to ignore errors
+
+0.3.0  2015-10-15 16:17:33 CEST
+    - Add lookup mode to look up Wikidata ids by URL/ID
+
+0.2.2  2015-10-12 13:19:57 CEST
+    - Added options to limit number of results
+    - Make brackets in abbreviated query optional
+    - Extended ontology help
+    - Add Blazegraph namespaces bd: and hint:
+
+0.2.1  2015-10-08 12:27:02 CEST
+    - Added option to show Wikibase ontology in a nutshell
+    - Improved colors
+
+0.2.0  2015-10-07 12:32:52 CEST
+    - Made simple format the default
+    - Fixed SPARQL csv format, including colors
+    - Added output format ldjson (Line Delimited JSON)
+    - Support export via Catmandu for more export formats
+
+0.1.2  2015-10-06 15:50:29 CEST
+    - Added option ids to abbreviate Wikidata identifiers
+
+0.1.1  2015-10-06 12:43:48 CEST
+    - Added output formats csv and simple
+
+0.1.0  2015-10-04 17:20:41 CEST
+    - Renamed option --sparql to --query
+    - Renamed option --sparql to --query
+    - Renamed option --dry to --no-execute
+    - Validate SPARQL with RDF::Query
+    - Support output format tsv
+    - Test with correct perl executable (issuee #3)
+
+0.0.1  2015-10-02 22:29:07 CEST
+    - Inital release at CPAN

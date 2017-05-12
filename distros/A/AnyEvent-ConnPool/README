@@ -1,0 +1,1 @@
+Simple connection pool based on AnyEvent for asynchronous db connections

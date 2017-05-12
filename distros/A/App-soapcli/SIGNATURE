@@ -1,0 +1,79 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d2251f02dda93c21ff5b63a0e8189f865c05e33c Build.PL
+SHA1 b7cac51ef4b52dbce266f9822f593e7816cf75cf Changes
+SHA1 bb888bcf4bc13996926c9c2c11bfa2b0b551399e LICENSE
+SHA1 a7aca6c10e3f14f9edfba461471e657b04f35a6e MANIFEST
+SHA1 4fee95333c7d4287697cab05a1e422afb19baf09 MANIFEST.SKIP
+SHA1 ee287f11bd8357a25fae2fadea98edbe412e93d7 META.json
+SHA1 e8da9e2a5731c8fa16635e982f746410e97392c6 META.yml
+SHA1 5a6e3a9e850890323f5733796da2c1e4509bed91 Makefile.PL
+SHA1 8083e89b1a84adcf439145a0009f35003a584890 README
+SHA1 ed3bbf2f390c4b93aaddf0d9a2cd30a3db81ca59 README.md
+SHA1 4fb6bf98233b9a0cd486ecb6b8674bbefb7ac937 examples/calculator-correct.json
+SHA1 f0224c6bc2bf36071bd3f10546f1d16da796aff8 examples/calculator-exception.json
+SHA1 df9288eb018c60137299714d828d293d8a4f81ac examples/calculator.pl
+SHA1 a9526a952ec5b107634df24bd572479ff96a008f examples/calculator.psgi
+SHA1 96ad8d2662a8b411cad09dff847ed61e67208b98 examples/calculator.url
+SHA1 978b707832faeea2fef0642e715a25e7f87f4099 examples/calculator.wsdl
+SHA1 6b375fa1442990aefa22845f851aef5696784a1e examples/globalweather.pl
+SHA1 46e060501378bc4cf82283c472036657c3d25973 examples/globalweather.url
+SHA1 95ab9cc85479e27f6a7c7f4a0425ef05c2156150 examples/globalweather.wsdl
+SHA1 e2bdab65cafc6106c4b0473d4a56fe3b0c2b3dee examples/globalweather.yml
+SHA1 d46e71fdba4960b7e679f7ce941a999a27111694 examples/mt-sms-service-ws-example-text.json
+SHA1 c6658b2b2e70ebd3ca07b5f2db4694ab94ef5927 examples/mt-sms-service-ws-example-text.pl
+SHA1 a1954a5713ee06701825213273099b46f1e75d0b examples/mt-sms-service-ws-example-wappush.json
+SHA1 78f990e2272a5704197fd49cf0e816c226b9e07f examples/mt-sms-service-ws-example-wappush.pl
+SHA1 9edea93dfc2a9522286f90042d0c03a53447cfd7 examples/mt-sms-service-ws.wsdl
+SHA1 ac8f68c8a6b75f740e73def9ffcc2d34722f153f inc/Module/Build/My.pm
+SHA1 150009c56da26e7cdb9fe4cda159c623aaa5bfed lib/App/soapcli.pm
+SHA1 481764557d467441aa447bb013a6a35b0cec6923 script/soapcli.pl
+SHA1 fe72e95277ee35dce36f92aede432dfe3a90f167 t/010_use.t
+SHA1 772e82d5843d576f0af39a2f4b9178942eaf0e99 t/120_examples_calculator_correct.t
+SHA1 6924c783c3f8857424fde71152b3f72075282045 t/125_examples_calculator_exception.t
+SHA1 46841f9c4a7756aa6570f3d5dc14e0b1e5e8cad7 t/130_examples_globalweather_soap.t
+SHA1 857026b5f73f49f20d96718282b7eae54245c7cc t/135_examples_globalweather_soap12.t
+SHA1 7b3235f01b8b2a80c770ceaedaa9dbae1ec260a5 t/140_examples_mt-sms-service-utf8.t
+SHA1 5ab9fc2b5090e5115669a42c465acd20dabba6e1 t/145_examples_mt-sms-service-wappush.t
+SHA1 e90d802fce3cf994afc27ec53c0c4713d9066ed5 t/test.pl
+SHA1 90353a99ac0f719b6f3e58029804d8556cedc2ab xt/check_changes.t
+SHA1 1c27e5840b0154e44120bc2edc02fbb507c76819 xt/consistent_version_numbers.t
+SHA1 67bb4c141ea95809f3db2d526ce91d9e6d894756 xt/copyright.t
+SHA1 650dccfa9b6f5a98cf731c89041bea8935dbc623 xt/cover.pl
+SHA1 632cd911581e4f8ccefe863b6846c5b60ddeee27 xt/cpan_changes.t
+SHA1 4f8f90e1c421bfd592e6806ec4d0a75f3d56406a xt/cpan_meta.t
+SHA1 48a67f01c35122165bb633264cba72d984d7a89e xt/dist_manifest.t
+SHA1 f5aac658ae1888964274e68d179413782082b7ad xt/distribution.t
+SHA1 af47b82dbac975ba494dfe6849d17d1e02941ac6 xt/eol.t
+SHA1 0f31d18a6a5d14438f2b9748183c120449ce2f02 xt/kwalitee.t
+SHA1 6e7f9dde7560793bcb40acc41561e07d163ad6d1 xt/minimumversion.t
+SHA1 1a1cd76027c4cc73ec56beadaf56680bbac1fd4a xt/no_tabs.t
+SHA1 e8daa0c73cfc304c240fad2d2c2b1b628175a89d xt/perlcritic.t
+SHA1 4713d7bd911f62249050ce2ec9799c998f10e36a xt/perlcriticrc
+SHA1 46aa111935ff192343c30b72d28da1a71ef4abf0 xt/pod_coverage.t
+SHA1 bef7d46eb5cbc3e67956d4e823ec199f41ab9268 xt/pod_spell.t
+SHA1 fb6bda810f63cda06b43e0fbd43233f734c34480 xt/pod_spellrc
+SHA1 87cb53d4ad0162a872d5c70013fc41719e030555 xt/pod_syntax.t
+SHA1 f2dd15ffc2836703f46f2622702e1676891eed21 xt/portability_files.t
+SHA1 a38994922fda6d64e2ee75198fadc464a221fea9 xt/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlVF2AEACgkQhMHHe8CxClvAWQCgrJVeUuPO9/DNDRdxXxwexMn+
+2lcAn25/ddbCC8/albhjYSvfP/u5X8/d
+=8zc9
+-----END PGP SIGNATURE-----

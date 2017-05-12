@@ -1,0 +1,19 @@
+<html>
+  <body>
+    <center>
+      <h1><MODEL_VAR file/></h1>
+
+      <MODEL_IF read_only>
+      <h2>File is readonly!</h2>
+      </MODEL_IF>
+
+      <form action="/pkit_edit/commit_file?file=<MODEL_VAR file/>&pkit_done=<MODEL_VAR pkit_done>" method=post enctype="application/x-www-form-urlencoded">
+        <p><textarea
+          name="content" wrap=off cols=100 rows=25
+          <MODEL_IF read_only>readonly</MODEL_IF>
+        ><MODEL_VAR content></textarea></p>
+        <MODEL_UNLESS read_only><input name="submit" type=submit value="Commit"> <input name="reset" type=reset value="Reset"></MODEL_UNLESS>
+      </form>
+    </center>
+  </body>
+</html>

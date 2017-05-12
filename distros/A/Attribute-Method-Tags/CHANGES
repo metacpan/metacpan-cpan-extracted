@@ -1,0 +1,7 @@
+v0.10 2010-08-25
+    - initial CPAN release
+
+v0.11 2010-08-29
+    - removed eval tests, due to spurious failures on some perl versions
+      (5.12 and 5.13 at least).  Will re-instate when have more info on cause
+      and how better to test this on these versions.

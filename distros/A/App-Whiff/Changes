@@ -1,0 +1,18 @@
+Revision history for App-Whiff
+
+0.005     2014-05-28 11:34:38-04:00 America/New_York
+        - if one of the args to whiff is an absolute path, it will be tested
+          for (-x) and returned verbatim if it exists and is executable
+
+0.004     2013-10-21 22:15:33 America/New_York
+        - update repository again; this time it should be done
+
+0.003     2013-06-18 13:28:54 America/New_York
+        - repackage
+
+0.002     2009-01-16
+        - add repo info to metadata
+
+0.001     2008-06-23
+        - first release; rjbs is irritated as which's awful behavior while
+          migrating to a new workstation

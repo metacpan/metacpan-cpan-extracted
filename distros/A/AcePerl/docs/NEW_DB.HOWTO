@@ -1,0 +1,101 @@
+HOW TO START A NEW DATABASE
+
+ACeDB stores its data in a fast-access binary form.  Data is
+ordinarily loaded and dumped from a human-readable flat-file format
+known as .ace.  To start a new database, you must:
+
+	1) create a database directory containing the following
+	subdirectories:
+
+		wspec/		schema and other files
+		database/	binary files
+		wgf/		DNA analysis files [optional]
+		whelp/		help files [optional]
+		wscript/	helper scripts [optional]
+
+	It's perfectly all right to ignore the optional directories.
+	They are only relevant for the original C. elegans database.
+
+	2) start acedb and allow it to initialize the binary
+	files.
+	
+	3) load one or more .ace files.
+
+Before you begin, you must have a models.wrm file and one or more .ace
+files containing the flat-file representation of the data.  For an
+example, see the moviedb example database, which is located at
+usr/local/apache/htdocs/AcePerl/archive/moviedb.tar.Z.
+
+The recipe for creating a new database from scratch using the
+interactive xace tool is this:
+
+	1) create a directory with the database's name
+	2) within that directory create a directory named "wspec" (where 
+		the schema lives) and another named "database"
+	3) populate the wspec subdirectory with the schema files,
+		which you can copy from another database, such as
+		the C. elegans database
+	4) run xace, giving it the database's directory as its
+		command-line argument
+	5) xace will prompt you to reinitialize the database, say "OK"
+	6) using the edit menu, select "read .ace" file.  Say "yes"
+	        when prompted for write access
+	7) choose "Open ace file" from the dialog box, and locate
+		the file you wish to load
+	8) select "Read all"
+	9) when done, close the window and select "Save..." from the
+		main xace window
+
+Read other .ace files in the same way.
+
+Rather than launching xace, you can do it all with tace.  Lines
+surrounded by <angle brackets> represent user input:
+
+	% <tace /usr/local/acedb/my_db>
+        // Database directory: /usr/local/acedb/my_db
+	The file /usr/local/acedb/my_db/database/ACEDB.wrm does not exist, 
+	indicating that the database is empty.
+	  Should I re-initialise the system? (y or n) <y>
+
+	// 13 objects read with 0 errors
+	// 0 objects read with 0 errors
+	// Indexing (this may take several minutes)
+	// Indexed 742 tags in 452 objects totalling 383 nodes 
+	// 13 objects read with 0 errors
+	// 0 objects read with 0 errors
+	// Indexing 
+	// Reindexed 742 tags in 0 classes containing 0 objects totalling 0 nodes 
+
+	**** Program tace,  compiled on: Jul  6 1999 10:58:24 ****
+	**** Using  ACEDB Version 4_7i,  compiled on: Jul  6 1999 10:58:14 ****
+
+	Code by: Jean Thierry-Mieg (CNRS, France) mieg@crbm.cnrs-mop.fr
+         Richard Durbin (Sanger Centre, UK) rd@sanger.ac.uk
+         Simon Kelley (Sanger Centre, UK) srk@sanger.ac.uk
+
+	You may redistribute this program and database subject to the
+	conditions in the accompanying copyright file.  Anyone interested in
+	maintaining an up-to-date version should contact one of the authors
+	at the above email addresses.
+
+	// Type ? for a list of options
+
+	acedb> <parse /usr/local/acedb/my_db/raw/my_content.ace>
+	// Parsing file  /usr/local/acedb/raw/my_content.ace
+	// 123 objects read with 0 errors
+	// 123 Active Objects
+	acedb> <save>
+	// 123 Active Objects
+	acedb> <quit>
+	
+	// A bientot
+
+To set up an ACeDB server, please see ACEDB.HOWTO and
+ACE_SERVER_TRAPS.HOWTO.
+
+Lincoln Stein
+lstein@cshl.org
+May 12, 2003
+
+
+

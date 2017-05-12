@@ -1,0 +1,30 @@
+<!DOCTYPE book
+  PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY features.xml SYSTEM "features.xml">
+<!ENTITY reference.xml SYSTEM "reference.xml">
+<!ENTITY introduction.xml SYSTEM "introduction.xml">
+]>
+<book><?dbhtml filename="index.html"?>
+<bookinfo>
+<title>PageKit 1.15</title>
+<subtitle>User's Guide</subtitle>
+<!-- $Id: -->
+<author>
+	<surname>Mather</surname>
+	<firstname>T.J.</firstname>
+</author>
+<author>
+	<surname>Zentner</surname>
+	<firstname>Boris</firstname>
+</author>
+<copyright>
+	<year>2004</year>
+	<holder>T.J. Mather</holder>
+</copyright>
+</bookinfo>
+
+&features.xml;
+&reference.xml;
+
+</book>

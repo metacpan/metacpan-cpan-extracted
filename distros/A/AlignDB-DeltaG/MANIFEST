@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+dump/dG.yml
+dump/dump_dG.pl
+lib/AlignDB/DeltaG.pm
+minil.toml
+t/00-load.t
+t/01-calc.t
+META.yml
+MANIFEST

@@ -1,0 +1,98 @@
+NAME
+    Acme::UseStrict - use strict constantly
+
+SYNOPSIS
+      use Acme::UseStrict;
+      # not in strict mode
+  
+      sub foo {
+        "use strict";
+        # in strict mode here
+      }
+  
+      sub bar {
+        no Acme::UseStrict;
+        "use strict";
+        # not in strict mode
+      }
+
+DESCRIPTION
+    ECMAScript 5.1 (i.e. Javascript) introduces a "strict mode" similar in
+    spirit to Perl's strict mode. Usually you enable Perl's strict mode like
+    this:
+
+     use strict;
+
+    But in ECMAScript it must be a quoted string:
+
+     "use strict";
+
+    It is received wisdom that Perl has an ugly syntax, so it naturally
+    follows that any change to make Perl's syntax closer to Javascript will be
+    welcome.
+
+    This module allows you use use strict by simply including the string
+    constant "use strict" anywhere in a scope.
+
+     sub do_stuff {
+       warn "use strict";
+       *{"do_more_stuff"} = sub { }; # dies because of strict refs.
+     }
+
+  import
+    But what if you'd rather have a different trigger to enable strict mode?
+    Yes, that can be done:
+
+     use Acme::UseStrict 'complain';
+ 
+     sub do_stuff {
+       my $foo = { complain => 'lots' };
+       *{"do_more_stuff"} = sub { }; # dies because of strict refs.
+     }
+
+    You can even provide a regular expression:
+
+     use Acme::UseStrict qr/^(complain|whine|moan|grumble)$/i;
+
+    Or an list of values:
+
+     use Acme::UseStrict [qw/complain whine moan grumble/];
+
+    Or basically anything that works as a right-hand-side with the smart match
+    operator.
+
+  unimport
+    You can disable this module for a lexical scope using:
+
+     no Acme::UseStrict;
+
+  in_effect
+    You can check if this module is enabled:
+
+     warn Acme::UseStrict::in_effect()
+       ? 'mind your language'
+       : 'curse freely';
+
+    Note that this checks if this module is enabled; not if strict is enabled.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Acme-UseStrict>.
+
+SEE ALSO
+    <https://developer.mozilla.org/en/JavaScript/Strict_mode>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2011, 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

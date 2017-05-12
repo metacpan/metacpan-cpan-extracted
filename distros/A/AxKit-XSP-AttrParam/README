@@ -1,0 +1,43 @@
+
+### AxKit::XSP::AttrParam - XSP taglib for HTTP request parameters
+
+The XSP AttrParam tag library implements a simple way to access HTTP
+request parameters (query string and posted form data) by field name.
+it is shamelessly stolen from Kip Hampton's AxKit::XSP::Param but
+allows one to use parameter names that may not be valid XML names, as
+well as parametre names derived from expressions.
+
+Prerequisites
+=============
+
+AxKit 1.3_95
+
+Installation
+============
+
+It can be installed in the usual ways:
+
+ - from within the cpan shell (perl -MCPAN -e shell):
+
+   install AxKit::XSP::AttrParam
+
+ - after having downloaded it from CPAN, and extracted from its
+ archive:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Support
+=======
+
+You may write to me for support, as well probably as to the
+axkit-users forum (see http://axkit.org/ for more details).
+
+This module is licensed under the same terms as Perl itself.
+
+-- Robin Berjon <robin@knowscape.com>
+The human brain is a wonderful thing, but it is also a result of
+three billion years' worth of "good enough" implementation. As a
+result, it is a giant hack with more than a few quirks.

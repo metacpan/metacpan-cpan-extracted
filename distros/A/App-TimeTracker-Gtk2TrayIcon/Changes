@@ -1,0 +1,13 @@
+Revision history for App::TimeTracker::Gtk2TrayIcon
+
+1.002    2011-09-13T22:37:01+0200
+    - start the event loop (unless testing...)
+
+
+1.001   2011-08-25T23:44:20+0200
+    - skip tests if there is no display
+
+
+1.000
+    - first release
+    - moved code from old A-TT (0.21) into a proper dist

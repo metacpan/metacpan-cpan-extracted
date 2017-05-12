@@ -1,0 +1,50 @@
+---
+abstract: 'Command-line interface for RESTful web services'
+author:
+  - 'Brian Phillips <bphillips@cpan.org>'
+  - 'Matt Perry <matt@mattperry.com> (current maintainer)'
+build_requires:
+  File::Basename: '0'
+  File::Spec: '0'
+  HTTP::Headers: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::MockObject: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Presto
+requires:
+  Data::DPath: '0'
+  Data::Dump: '0'
+  Data::Dumper: '0'
+  File::HomeDir: '0'
+  File::Path: '2.08'
+  File::Slurp: '0'
+  JSON: '0'
+  MIME::Base64: '0'
+  Module::Pluggable: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  REST::Client: '0'
+  Regexp::Common: '2013030901'
+  Scalar::Util: '0'
+  Term::ShellUI: '0'
+  URI: '0'
+  URI::QueryParam: '0'
+  YAML: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/mperry2/App-Presto.git
+version: '0.010'
+x_authority: cpan:MPERRY
+x_serialization_backend: 'YAML::Tiny version 1.69'

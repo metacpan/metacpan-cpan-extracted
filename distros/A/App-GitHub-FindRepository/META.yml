@@ -1,0 +1,28 @@
+---
+abstract: 'Determine the right case for a GitHub repository'
+author:
+  - 'Robert Krimen <rkrimen@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.87'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-GitHub-FindRepository
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Env::Path: 0
+  Getopt::Long: 0
+  Scalar::Util: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/robertkrimen/App-GitHub-FindRepository/tree/master
+version: 0.06

@@ -1,0 +1,8 @@
+Revision history for App-sourcepan
+
+0.02    2014/01/27 21:34:56
+        [CHANGES]
+         * Allow specification of module or distribution names on commandline
+
+0.01    First version, released on an unsuspecting world.
+

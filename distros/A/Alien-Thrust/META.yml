@@ -1,0 +1,36 @@
+---
+abstract: 'Download and install the Thrust cross-platform GUI framework'
+author:
+  - 'Doug Hoyte <doug@hcsw.org>'
+build_requires:
+  File::Path: 0
+  File::Spec::Functions: 0
+  IO::File: 0
+  IO::Uncompress::Unzip: 0
+  IPC::Open2: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  Module::Build: 0
+  Mozilla::CA: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-Thrust
+provides:
+  Alien::Thrust:
+    file: lib/Alien/Thrust.pm
+    version: 0.101
+requires:
+  File::ShareDir: 0
+resources:
+  bugtracker: https://github.com/hoytech/Alien-Thrust/issues
+  homepage: https://github.com/hoytech/Alien-Thrust
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hoytech/Alien-Thrust.git
+version: 0.101

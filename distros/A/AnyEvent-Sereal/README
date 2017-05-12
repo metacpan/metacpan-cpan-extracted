@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution AnyEvent-Sereal,
+version 0.004:
+
+  Sereal stream serializer/deserializer for AnyEvent
+
+This software is copyright (c) 2012 by Ijenko.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

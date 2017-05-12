@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Acme::MetaSyntactic "daleks";
+
+my $n = shift || 1;
+print join $/, metadaleks($n), "";

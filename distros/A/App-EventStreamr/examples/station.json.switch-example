@@ -1,0 +1,38 @@
+# config-file-type: JSON 1
+
+{
+    "devices" : [
+        {
+            "name": "standby loop",
+            "type": "file",
+            "id": "/home/av/eventstreamr/baseimage/video/standby.dv"
+        },
+        {
+            "name": "USB audio mixer input",
+            "type": "alsa",
+            "id": "1"
+        }
+    ],
+    "device_control" : {
+        "video0" : {"run":"0"},
+    },
+    "mixer" : {
+        "host" : "localhost",
+        "port" : "1234"
+    },
+    "nickname" : "CHANGEME",
+    "record_path" : "/localbackup/$room/$date",
+    "roles" : [
+        "mixer",
+        "record",
+        "ingest"
+    ],
+    "room" : "CHANGEME",
+    "run" : "1",
+    "stream" : {
+        "host" : "",
+        "password" : "",
+        "port" : "",
+        "stream" : ""
+    }
+}

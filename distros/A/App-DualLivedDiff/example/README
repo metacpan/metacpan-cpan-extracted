@@ -1,0 +1,19 @@
+The .dualLivedDiffConfig file in this directory contains the file
+mapping from the Filter::Simple CPAN distribution to bleadperl as of
+2009-03-07. You can test the program from the main distribution
+directory with the following command: (provided you have a CPAN.pm
+installation with a working setup)
+
+perl -Ilib script/dualLivedDiff -c example/.dualLivedDiffConfig -d Filter::Simple -b path/to/your/bleadperl/checkout
+
+You can add the option --output filter-simple.diff to write the diff
+to a file instead of STDOUT (where the CPAN.pm blurb goes as well).
+
+One option that's not shown by this example is the "base-path-in-blead"
+option. By setting it, the specified path is prepended to all paths in
+the blead perl checkout. Example (in YAML) that could be used to
+simplify the diff configuration for the Attribute::Handlers module:
+
+base-path-in-blead: ext/Attribute-Handlers
+
+

@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+  <link href="/test.css" rel="stylesheet" type="text/css" media="screen" />
+  <link href="/images/GvaScript.css" rel="stylesheet" type="text/css" media="screen"/>
+  <script src="../../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <script>
+    var countries_ac = 
+    new GvaScript.AutoCompleter("http://localhost:8085/ac/country/", {
+        minimumChars: 2,
+        autoSuggest: true,
+        typeAhead: false,
+        blankOK: true,
+        labelField: 'value',
+        multivalued: true
+    });
+  </script>
+</head>
+
+<body>
+    <h1>Multivalued Autocompleter</h1>
+
+    <p>
+    This autocompleter example is bound to a complete list of countries
+    served by the perl HTTP service at http://localhost:8085/ac/country/ that responds 
+    by an array: <tt>[{value: ..., label:  ..., code: ...}, ... ]</tt>
+    </p>
+
+    <h4>Ajax request</h4>
+    Select multi-countries:
+    <input type="text" class="AC_input" autocomplete="off" size="50" onfocus="countries_ac.autocomplete(this);"/>
+    <br/>
+
+</body>
+
+
+</html>

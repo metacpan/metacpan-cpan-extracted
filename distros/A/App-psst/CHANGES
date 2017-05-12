@@ -1,0 +1,478 @@
+Revision History for App-psst
+=============================
+
+v0.09 2011-12-02
+----------------
+
+commit 8e33e45f2124d7138c22dc6319a57abb22aa9e6a
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Fri Dec 2 09:16:37 2011 +0000
+
+    try harder for pidseq on busy systems
+    
+    will skip if they're still not smoking green
+
+commit e05d35653c77eb76596f044f28b0af5f0c4ee12c
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Fri Dec 2 09:06:27 2011 +0000
+
+    give up earlier if no Bash.
+    
+    (would prefer an NA for mswin32, rather than a big red FAIL,
+     this probably not enough?)
+    improve version display - some smoke fails on the ([0-9.}) match;
+    run preconds even without bash, they may be useful;
+    remaining tests need bash to work
+
+commit 890f273d01014e03d47f3b59c2f6c429bf3f565e
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Fri Dec 2 09:03:12 2011 +0000
+
+    bump Time::HiRes dep to current
+    
+    previous min version was set for ualarm, now using alarm;
+    seeing breakage on the smoketests (thank you!)
+     for various Un*ces, mostly Perl 5.8.9, all Time::HiRes 1.9715
+     where the alarm doesn't fire
+
+v0.08 2011-11-23
+----------------
+
+commit f8fa59a476337d69a136c58e7216c06ae8b59bc0
+Author: Syohei YOSHIDA <syohex@gmail.com>
+Date:   Wed Nov 23 09:57:03 2011 +0900
+
+    Fix checking bash version.
+      - use $BASH_VERSION environment variable instead of '--version' option,
+        because output of '--version' depends on locale.
+    
+        Regexp 'qr{\bbash\b.* version (.*)})' may not match '--version' output
+        on not English locale, if latest bash is installed on it.
+
+v0.06 2011-11-21
+----------------
+
+commit 48ae3f697625d765a6e1fd11558b0d09daaa3bd2
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Mon Nov 21 00:01:21 2011 +0000
+
+    remove "see the other code path" breakage
+
+commit 23ac21bb27a008f59a0b44d2fe1c80f03abc9e9c
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Sun Nov 20 23:51:26 2011 +0000
+
+    degrade to CORE::alarm
+     when Time::HiRes::alarm is not implemented
+
+commit 22840ca52060e9f572d116caf53dd88a31e33e6f
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Sun Nov 20 23:50:40 2011 +0000
+
+    decrease Un*x assumption: path_sep not always :
+    
+    use $Config{path_sep}, as local::lib does
+
+commit 55660dc080a1b3addb69c01f6c71ae97b2390d04
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Sun Nov 20 23:53:06 2011 +0000
+
+    decrease Un*x assumption: dirsep may not be /
+    
+    munge them so they are, for our regex
+
+commit 7264008557eadf873ba74b1f43feb7364c47b599
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Sun Nov 20 23:13:15 2011 +0000
+
+    when finding $HOME , fall back to getpwuid.
+    
+    we need it to ensure bash_interactive is not tromping user's history file,
+     so would prefer to match bash's way of finding ~
+     but as long as this runs on author's machine there should be no tromping anyway
+
+commit f7aba5a32a0d189d8905f588f6da5e43728b80f9
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Sun Nov 20 23:10:42 2011 +0000
+
+    YAML now required for testing, declare it.
+    
+    still optional for running, can't declare that
+
+v0.05 2011-11-10
+----------------
+
+commit 51ae3683c36952f89e423622465a463fdd45725c
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Thu Nov 10 17:37:20 2011 +0000
+
+    avoid ualarm.
+    
+    smoketesting fails where it is absent (Win32 strawberry),
+     and I chose ualarm by analogy with usleep,
+     not realising that Time::HiRes::alarm could do what I need,
+     and I now guess that alarm($frac) is supported on win32.
+    
+    warn reader of the delay, although it should generally be short;
+    s/ualarm/alarm/ , but still from Time::HiRes;
+    check also that it didn't take too long
+
+commit b6c116ee1a45ad040bcd3a2d233202b6012e489e
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Thu Nov 10 09:19:01 2011 +0000
+
+    deal with lack of tty.
+    
+    we don't use any job control features;
+    only needed for the few tests that compare
+     output, most just apply regexps
+
+commit 8d3a41da2d43bae5d0332aa5502f445b368a28df
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Thu Nov 10 00:22:43 2011 +0000
+
+    ditch deprompt in favour of setting PS1.
+    
+    incidentally validate PS1 overriding config;
+    I don't remember what I was thinking,
+     but it can't deal with custom prompts seen in some smoketest sandpits
+
+commit 941b5b043d8186935a0fd4a1a934e56a9bb19baf
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Thu Nov 10 00:16:21 2011 +0000
+
+    restore Dump, it was in use
+
+commit a4aba58447b1e9d7ebf687ce47b4d4aba2ddff30
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Thu Nov 10 00:00:59 2011 +0000
+
+    ensure PATH, HOME & TERM in %ENV
+    
+    explain where they are needed;
+    found when running under "env -i"
+
+commit 699e56dfada58ecaa03edc246a409e250d5f4761
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Thu Nov 10 17:38:59 2011 +0000
+
+    bash version: relax "modern-ish".
+    
+    still arbitrary, but 2.05b seen in smoketest;
+    report the version
+     because it is probably relevant for future problems
+
+v0.04 2011-10-23
+----------------
+
+commit b1619cd269d15b195c94a22037b34d71ad8ba3bb
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Sun Oct 23 23:17:43 2011 +0100
+
+    dist.ini: tidy + shove
+
+commit 417f8fddf91fa4fcbed8f579eccf528148b1adbf
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Sun Oct 23 22:53:24 2011 +0100
+
+    test L:L path substitution in prompt.
+    
+    check the configured PS1_substs works;
+    clarify in pidburn;
+    more deansi;
+    extract fn for removal of bash-x.y$
+
+commit bfa37ad1dd51ea910241430fb6a70dc8cf6b8f3d
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Wed Oct 19 17:41:39 2011 +0100
+
+    start testing the Prompt String.
+    
+    see there are no changes until local::lib shows up
+      assuming we consider $PERL_LOCAL_LIB_ROOT definitive;
+    see both LL) prefix and hovering-below detail;
+    improve deansi,
+      option for it to tell more about what it took out,
+      but no effort to let the tests pass when it does
+
+commit 42684eaa8ddd0995e20a4bc8c5128a0de5c23f46
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Tue Oct 18 23:02:52 2011 +0100
+
+    more ignorance.
+    
+    it's much quicker to
+       git checkout built/master Makefile.PL
+       perl Makefile.PL
+       make test
+    
+    than to
+       dzil test
+
+commit 1db6d1744ea3d7647d8021712bfebe8950a7bca2
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Mon Oct 17 23:46:41 2011 +0100
+
+    pidburn_tt tweaks.
+    
+    run in own sub / disconnect from prompt_tt;
+    fix & show threshold for stats
+
+commit 3810cf8cb16136595939ef2064b8bd7efde7acf9
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Sun Oct 16 23:03:38 2011 +0100
+
+    switch autogenerated README in source back to POD.
+    
+    because preformat style was lost (in translation to markdown or rendering?)
+     some L<> hyperlinks don't work, and retain L-prefix
+
+commit a5b3484c7fb477b42927e8de6012ec22df34dde5
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Fri Oct 14 09:01:46 2011 +0100
+
+    use [ExecDir]dir= default  for scripts.
+    
+    it still installs via blib/script/
+      so t/* don't need to change
+
+commit 4d7c9eee6fc0beff24ec121cca5e98b1358709cb
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Tue Oct 11 12:55:29 2011 +0100
+
+    comments
+
+commit 19009d029e68a9c4f24837de2098002221adc322
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Mon Oct 10 17:46:37 2011 +0100
+
+    mention some related tools
+    
+    POD update;
+    README.md rebuilt
+
+commit 39049e5d24c89e303f89df667b772f13e63bfa4e
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Sun Oct 9 14:59:46 2011 +0100
+
+    README for Github
+    
+    .html is not displayed, use markdown
+
+commit e98bb21a2f4674a7cd12d165529eb97987991fa8
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Sun Oct 9 14:07:12 2011 +0100
+
+    butchery to reduce diffs.
+    
+    Remove variable parts from generated POD.
+    There are better ways to do it.
+
+commit e096cdb5612815a00cba4f1cddbcb9c0bc7f9d91
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Sun Oct 9 13:04:14 2011 +0100
+
+    replace ReportPhase with Dist::Zilla::App::Command::dumpphases
+    
+    (it's quieter most of the time)
+
+commit fb9323a4c0f83576dbd3b7c64730c3e62dfad393
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Fri Oct 7 09:15:11 2011 +0100
+
+    fix up dzil edges.
+    
+    ignorance of failed-test builds;
+    pacify perlcritic;
+    add generated-to-source README
+      made by [ReadmeAnyFromPod / ForSource] in dist.ini
+      from App::psst
+
+commit 113e132f643f1fcf2d3180ef3a268fad670f5eaf
+Merge: ea07a35 d754fc0
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Fri Oct 7 09:10:52 2011 +0100
+
+    Merge branch 'dzil'
+    
+    replaces hand-maintenance of several files
+    with a heavy (author side) dependency chain
+    
+      cpan Dist::Zilla
+      DZPLUGS="$( dzil authordeps --missing | grep -v 'Current Command' )"
+      echo $DZPLUGS
+      cpan $DZPLUGS
+
+commit d754fc0f6a8f076293004429d2d85abe3639e8a1
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Thu Oct 6 22:32:26 2011 +0100
+
+    generate READMEs from POD.
+    
+    use DZP:ReadmeAnyFromPod to do the hard work;
+    generate text README in the dist;
+    maintain a README.html in the source, for the benefit of Github;
+    fix typo & authorship
+    
+    Why the confusion about the author?
+    I did part of the early research & implementation for this project at
+    $work, but most of the polishing and learning about dzil in my own
+    time.  It doesn't matter to me who "owns the copyright" while the
+    software is Free.
+
+commit cfc412443a24d8fb4477c84e692b6b10a5ac897a
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Tue Oct 4 17:46:16 2011 +0100
+
+    more plugins;
+    fix(?) plugin ordering;
+    mark sections
+
+commit e3c01c6f8679a9d1ad77edcd7bc6c26ec5d173d5
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Mon Oct 3 23:00:43 2011 +0100
+
+    prefer :G:DescribeVersion over :G:NextVersion
+     and :ChangelogFromGit over :ChangelogFromGit.
+    
+    (but this DescribeVersion can't make a
+     v0.01_0123 style version number)
+
+commit be050286cf45333e81ea08ec71707148869170c0
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Mon Oct 3 12:54:29 2011 +0100
+
+    more DZ plugins.
+    
+    keep the longer manual README for now;
+    generate LICENSE;
+    start collecting xt/ tests;
+    replace hardwired $VERSION with PkgVersion
+
+commit c35f32add5f1066b467eb91560dfe4961fd0ea88
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Mon Oct 3 09:14:59 2011 +0100
+
+    Git-related D:Z config
+    
+    (listing plugins that interest me, from
+     http://search.cpan.org/~cjm/Dist-Zilla-Plugin-PodLoom-4.00/lib/Dist/Zilla/Plugin/PodLoom.pm )
+
+commit ea07a357ed0585ea4ca005ca66e6e2b77cc50cca
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Fri Sep 30 21:59:04 2011 +0100
+
+    update MANIFEST (exactly the sort of reason I wanted dzil)
+
+commit c5671ff91eabd39939bf734618c82b60d0fc320f
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Fri Sep 30 22:59:14 2011 +0100
+
+    more D:Z:P
+
+commit b213e204b75c5ffc019245cb134648feaa561118
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Fri Sep 30 22:03:55 2011 +0100
+
+    switch to Dist::Zilla.
+    
+    replace MANIFEST* and Makefile.PL with dist.ini;
+    don't expect MANIFEST.bak to appear now;
+    fiddle with gather/prune/exec;
+    might as well specify rt.cpan.org
+    
+    optional_features not supported?
+    probably want the readonly git://
+
+commit 799414289c4afe64f2fab8c5f01e9ed176e6a8df
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Sat Oct 1 22:45:31 2011 +0100
+
+    split out sanity tests, to support BAIL.
+    
+    extract the BashRunner;
+    move out to new 00- test: preconds_tt, histzap_tt, interactiveness_tt;
+    do BAIL_OUT (latest possible END!)
+
+commit 15728fcb396bd6d6dc794bc2d637e3ebbdcfd6df
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Mon Sep 12 22:57:56 2011 +0100
+
+    test fix.
+    
+    remove a capture variable to prevent an extra clone(2);
+
+commit b8a97f67c9ef0f4be38a26a6940438d6bb8af6a8
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Mon Sep 12 22:28:42 2011 +0100
+
+    some testing.
+      fails due to esc=$( echo -e "\e" )
+    
+    test to establish sanity & exercise 'psst prompt';
+    extra config files during test;
+    note, psst uses $ENV{HOME} to find config;
+    note, test REQs;
+    manifest+=
+
+commit 3e64d3ea71713ec9a31840f70bbc45abc480217c
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Thu Sep 8 23:51:17 2011 +0100
+
+    update MANIFEST & ignorance
+
+commit 1ea5df4ce99eb82525759dc91867f5bb09164491
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Thu Sep 8 23:44:33 2011 +0100
+
+    version subcommand
+
+commit 56d14559d6979cfb7888035df509caafcde74451
+Author: Matthew Astley <beeep$mca@t8o.org>
+Date:   Thu Sep 8 23:44:23 2011 +0100
+
+    document & fix config use;
+    tell META.yml about YAML use
+
+v0.03 2011-09-08
+----------------
+
+commit f4bb40aff5a9a16758e4b49d27b8b8846dc1f782
+Author: Matthew Astley <mca@sanger.ac.uk>
+Date:   Thu Sep 8 10:35:21 2011 +0100
+
+    need local::lib >= 1.008000
+    
+    per http://cpansearch.perl.org/src/APEIRON/local-lib-1.008004/Changes
+
+commit a808f9b701468aec16538dfbbf5212b9a70423f0
+Author: Matthew Astley <mca@sanger.ac.uk>
+Date:   Tue Sep 6 15:44:47 2011 +0100
+
+    thanks
+
+commit 33b6bf0f272b18f9085bec1881e1e743d3f42044
+Author: Matthew Astley <mca@sanger.ac.uk>
+Date:   Mon Sep 5 11:40:40 2011 +0100
+
+    don't call it README.pod because ExtUtils::MakeMaker wants to install it
+
+v0.02 2011-09-05
+----------------
+
+commit 6c3476bdcb43210702fb4aa26704d964c77331c3
+Author: Matthew Astley <mca@sanger.ac.uk>
+Date:   Mon Sep 5 11:32:48 2011 +0100
+
+    rename and mention the config file;
+    accept config for old PS1
+
+commit 46fefb4c296c874543d4cb1bdaaf3b981059774f
+Author: Matthew Astley <mca@sanger.ac.uk>
+Date:   Mon Sep 5 10:49:14 2011 +0100
+
+    reindent to match Emacs shell-script mode
+
+===================================
+End of changes in the last 365 days
+===================================

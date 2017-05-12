@@ -1,0 +1,36 @@
+ TestPrj.chm:
+
+ spc    start   length   name
+ ===    =====   ======   ====
+   1   752560     4096   /#IDXHDR
+   0        0        0   /#ITBITS
+   1   757702      872   /#STRINGS
+   0      366     4302   /#SYSTEM
+   1   756656      224   /#TOPICS
+   1   757048      654   /#URLSTR
+   1   756880      168   /#URLTBL
+   1        0        0   /$FIftiMain
+   1   749809     2751   /$OBJINST
+   0        0        0   /$WWAssociativeLinks/
+   0        0        0   /$WWKeywordLinks/
+   1   363819    15583   /____ Advanced Computing Systems & Architectures - Teaching _.htm
+   1     4493    80948   /Cyber-Sex (haha!).html
+   1    85441     8709   /Facultatea AC din UTCN.htm
+   0        0        0   /Facultatea AC din UTCN_files/
+   1     3262     1231   /Index.hhk
+   1    94150    30113   /PlanetUnreal - UT 2003.htm
+   0        0        0   /PlanetUnreal - UT 2003_files/
+   1   124263    17035   /Secret Of Monkey Island Solution.html
+   0        0        0   /Secret Of Monkey Island Solution_files/
+   1   141298    34326   /Symantec Security Response - Backdoor_Trojan.htm
+   1   175624    20638   /Symantec Security Response - W32_Sasser Removal Tool.htm
+   1   196262    31358   /Symantec Security Response - W32_Sasser_B_Worm.htm
+   1   227620    19865   /Tabel de Derivate.htm
+   0        0        0   /Tabel de Derivate_files/
+   1   247485    19623   /Tabel de Integrale.htm
+   0        0        0   /Tabel de Integrale_files/
+   1        0     3262   /Table of Contents.hhc
+   1   267108    79635   /The Arreat Summit - Items Rune Words.htm
+   0        0        0   /The Arreat Summit - Items Rune Words_files/
+   1   346743    17076   /XML-Validator-Schema.pm.htm
+   0        0        0   /XML-Validator-Schema.pm_files/

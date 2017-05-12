@@ -1,0 +1,23 @@
+0.13  Thu Jul 18 17:16:36 EDT 2002
+
+      Table/Binary.pm: 
+       * optionally don't split vectors out of input data (VecSplit).
+         affects read_rows_array
+	         read_col_col_array
+		 read_row_row_array
+		 read_col_row_array
+
+       * allow caller to provide own hash or array for
+	       read_row_row_array
+	       read_row_row_hash
+	       read_col_row_array
+
+       * when possible, use cached internal buffers for i/o to prevent
+         memory thrashing.
+
+       * optimized access/converting of row/col data.  mostly
+         untested, as don't have any column oriented tables.
+	
+
+0.12  Tue Jul 16 23:03:28 EDT 2002
+      - added HeaderPars::pars()

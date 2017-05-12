@@ -1,0 +1,59 @@
+Apache2/AuthCAS version 0.4
+===========================
+
+The Apache2::AuthCAS module allows a user to protect their non-Java content on
+an Apache server with the Yale CAS authentication server.
+
+INSTALLATION
+
+    To install this module type the following:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    You should run one of the schema*.sql scripts or an equivalent script using
+    a database of your choice to initially create the session table.  The
+    chosen database name and table names should match the parameters configured
+    in either the module itself or the Apache directory configuration
+    specified.  This can be done for PostgreSQL like so:
+
+        psql -h <dbhost> -U <dbuser> -f schemaPg.sql <dbname>
+
+    Of course <dbhost>/<dbuser>/<dbname> should be replaced above by the
+    settings that match your environment.
+
+    If you are upgrading from a previous version, a new field has been added
+    to the session table!  Please be aware of this and compare the schema
+    files to your installation!
+
+DEPENDENCIES
+
+    This module requires these other modules and libraries:
+
+    Net:SSLeay
+    MIME::Base64
+    URI::Escape
+    XML::Simple
+    DBI
+    DBD::<module name> (i.e. DBD::Pg)
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2007 - Jason Hitt <jhitt@illumasys.com>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the Free
+    Software Foundation; either version 2 of the License, or (at your option)
+    any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+    more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc., 
+    59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+

@@ -1,0 +1,270 @@
+NAME
+    Acme::Letter - Perl extension for drawing beautiful letter
+
+SYNOPSIS
+      use Acme::Letter;
+      #create an Acme::Letter object
+      $letter = Acme::Letter->new();
+      $string = 'PDF::API 2'; 
+      $letter->printString($string);
+
+DESCRIPTION
+    This module draw several lines which like a letter. It is beautiful! You
+    can draw string with letter, colon and dot. Now I have no idea how to
+    desgin number. So you need to draw it by yourself.
+
+  Methods
+    *   $letter->printLetter($arg)
+
+        get a letter, such as a-z or A-Z, return several lines which like a
+        letter.
+
+    *   $letter->printString($string);
+
+        get a string, return several lines which like a letter. The String
+        include dot, colon.
+
+    *   $letter-saveToFile($string,$filename)
+
+        get a letter, such as a-z or A-Z, create several lines and put into
+        a file named $filename.
+
+  Examples
+    *   Examples foreach @Letter.
+
+        A.
+
+            _
+           / \
+          / _ \
+         / ___ \
+        /_/   \_\
+
+        B.
+
+         _____
+        |  _  \
+        |_|_)_/
+        | |_) \
+        |_____/
+
+        C.
+
+          _____
+         /  ___|
+        |  /
+        |  \___
+         \_____|
+
+         D.
+
+         _____
+        |  _  \
+        | | \  |
+        | |_/  |
+        |_____/
+
+        E.
+
+         _____
+        |  ___|
+        | |__
+        | |___
+        |_____|
+
+        F.
+
+         _____
+        |  ___|
+        | |_
+        |  _|
+        |_|
+
+        H.
+
+         _   _
+        | | | |
+        |_|_|_|
+        | | | |
+        |_| |_|
+
+        I.
+
+         _____
+        |__ __|
+          | |
+         _|_|_
+        |_____|
+
+        J.
+
+         _____
+        |__ __|
+          | |
+         _| |
+         \_/
+
+        K.
+
+         _   _
+        | | //
+        | |//
+        | |\\
+        |_| \\
+
+        L.
+
+         _
+        | |
+        | |
+        | |___
+        |_____)
+
+        N.
+
+         _    _
+        |  \ | |
+        | |\\| |
+        | | \| |
+        |_|  \_|
+
+        O.
+
+          _____  
+         /  _  \ 
+        |  / \  |
+        |  \_/  | 
+         \_____/
+
+        P.
+
+         ____ 
+        |  _ \
+        | |_) |
+        |  __/
+        |_|
+
+        R.
+
+         ____ 
+        |  _ \
+        | |_) |
+        | |  /
+        |_|\_\
+
+        T.
+
+         _____
+        |__ __|
+          | |
+          | |
+          |_|
+
+        M.
+
+         _      _
+        |  \  /  |
+        | |\\//| |
+        | | \/ | |
+        |_|    |_|
+
+        G.
+
+         _____ 
+        /  ___|
+        | / __
+        | \___|
+        \_____|
+
+        S.
+
+          ___
+         /___|
+         \\_ 
+          __\\
+         |___/
+
+        U.
+
+         _    _
+        | |  | |
+        | |  | |
+        | \__/ |
+         \____/
+
+        V.
+
+         __      __
+         \ \    / /
+          \ \  / /
+           \ \/ /
+            \__/
+
+        X.
+
+         _    _
+        \ \  / /
+         \ \/ /
+         / /\ \
+        /_/  \_\
+
+        Y.
+
+         _    _
+        \ \  / /
+         \_\/_/
+           | |
+           |_|
+
+        Z.
+
+         _____
+        |__   |
+        |  / /
+          / /___
+         |______|
+
+        Q.
+
+          ____ 
+         /  _ \
+        |  (_| |
+         \ __  |
+             |_|
+
+    *   Example for dot and colon
+
+        dot.
+
+         _
+        (_)
+
+        colon.
+
+         _
+        (_)
+         _
+        (_)
+
+    *   Example for Number
+
+        2.
+
+         ____    
+        |___ \   
+          __) |  
+         / __    
+        |_____|
+
+AUTHOR
+    Lei Xue (carmark@cpan.org/carmark.xue@gmail.com)
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010 by Lei Xue
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.1 or, at
+    your option, any later version of Perl 5 you may have available.
+
+    I love my girl, XiaoFu!
+

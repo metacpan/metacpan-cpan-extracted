@@ -1,0 +1,33 @@
+---
+abstract: 'Print JIRA Tickets on Postit sheets'
+author:
+  - 'Jerome Eteve <jerome.eteve@gmail.com>'
+build_requires:
+  Test::MockModule: '0.10'
+  Test::More: '1.001014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-JIRAPrint
+requires:
+  File::ShareDir: '1.102'
+  Hash::Merge: '0.200'
+  IPC::System::Simple: '0'
+  JIRA::REST: '0.011'
+  LWP::Protocol::https: '6.06'
+  LaTeX::Encode: v0.91.6
+  Log::Any: '1.032'
+  Moose: '2.1405'
+  Pod::Usage: '1.67'
+  Template: '2.26'
+  WWW::Shorten: '3.06'
+resources:
+  homepage: https://github.com/jeteve/App-JIRAPrint
+  repository: https://github.com/jeteve/App-JIRAPrint.git
+version: '0.003'

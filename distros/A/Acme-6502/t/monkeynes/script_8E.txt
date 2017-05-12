@@ -1,0 +1,12 @@
+clear
+power on
+regs
+
+op a2 55
+op 8e efbe
+
+# mem[$BEEF] and IX should = $55
+test ix = 55
+test m:beef = 55
+
+save verify_8E.txt

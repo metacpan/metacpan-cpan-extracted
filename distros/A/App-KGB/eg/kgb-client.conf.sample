@@ -1,0 +1,44 @@
+---
+# repo-id is mandatory
+repo-id: foo
+# optional list of regular expressions for matching branch and module name each
+# entry is matched against the changed path, $1 is supposed to be the branch
+# name, $2 - the module (package) name
+# forward slashes are escaped, so no special treatment is needed here
+# the sample is taken from pkg-perl SVN repository, which is Layout 2 (all
+# trunks under trunk/ and has a special place for applications and
+# almost-removed stuff)
+branch-and-module-re:
+ - "/(trunk|tags|apps|attic)/([^/]+)"
+ - "/branches/([^/]+)/([^/]+)"
+# for layout 1 package -> trunk/branches/tags) naturally the package name comes
+# into $1 and the branch - into $2. To remedy the situation, use the other
+# variant:
+# module-and-branch-re:
+# - "/packages/([^/]+)/branches/([^/]+)"
+# - "/packages/([^/]+)/(?:trunk|tags)/([^/]+)"
+#
+# some global parameters can be set for all servers
+password: "very secret"
+timeout: 15
+# also, a single server can be defined with 'uri'
+# uri: htp://somewhere/
+# or, a failover group of servers can be defined
+servers:
+ - uri: http://localhost:9999/
+   timeout: 5 # no point in waiting longer for localhost
+ - uri: http://remotehost:9999/
+   password: "overrides the global one"
+# status-dir is used to store the last successfuly contacted server
+# this information is used later in order to try to contact the same server
+# again (if later contact is within some not very big time frame)
+status-dir: /var/cache/kgb/client-status
+# a commit URL template to send to the server
+# ${module}, ${branch} and ${commit} are replaced with the data from the commit
+# Examples:
+#  "http://svn.debian.org/viewvc/kgb?view=revision&revision=${commit}"
+#  "http://git.debian.org/?p=our-project/${module}.git;a=commitdiff;h=${commit}"
+web-link: ~
+# An optional URL shortening service
+# see WWW::Shorten manual for the list of supported services
+short-url-service: ~

@@ -1,0 +1,105 @@
+#!/usr/bin/perl -w
+#
+# Copyright © 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+#                  Elizabeth Cassell <e_a_c@mailsnare.net>
+#
+# $Revision: 1.6 $ $Date: 2004/10/22 15:04:40 $ $Author: alfw $
+#
+
+use blib;
+use strict;
+use AFS::Monitor;
+use Data::Dumper;
+
+my @servers   = ("virtue");
+my $debugfile = "debug_out/debug";
+my $basename  = "openafs.org";
+
+my @tests;      # choose which tests to run
+$tests[1] = 1;  # blank
+$tests[2] = 1;  # blank
+
+my $all = 0;
+
+my $showdump = 1;   # print entire contents of hash for each test
+my $formatted = 0;  # print formatted, easy to read output
+my $scout = 1;      # print only the information displayed by the original (c) scout program
+
+print "# Starting now... #\n";
+my $result;
+
+
+if ($all || $tests[1]) {
+  print "\n******** TEST 1: ********\n";
+
+  print "\nscout -server ", join(" ", @servers),
+        " -debug $debugfile -basename $basename\n\n";
+
+  $result = scout(server   => \@servers,
+                  debug    => $debugfile,
+                  basename => $basename);
+  parse_result($result);
+}
+
+
+if ($all || $tests[2]) {
+  print "\n******** TEST 2: ********\n";
+
+  print "\nscout -server virtue.openafs.org\n\n";
+
+  $result = scout(server   => "virtue.openafs.org");
+  parse_result($result);
+}
+
+
+sub parse_result {
+  my $info = shift;
+
+  if ($AFS::CODE) {
+    print "Error case: ", ref($info), "\n" if (defined($info));
+    # die("Error: AFS::CODE = $AFS::CODE (", ($AFS::CODE+0), ")\n");
+    print "Error: AFS::CODE = $AFS::CODE (", ($AFS::CODE+0), ")\n";
+    return;
+  }
+
+  if ($showdump) {
+    local $Data::Dumper::Quotekeys = 0;
+    local $Data::Dumper::Sortkeys = 1;
+    local $Data::Dumper::Indent = 1;
+    local $Data::Dumper::Varname = "scout";
+    print Dumper($info);
+  }
+
+  if ($formatted) {
+    foreach my $connection (@$info) {
+      print $connection->{hostName}, "\n";
+      if ($connection->{probeOK}) {
+        print "  Results:\n";
+        foreach my $stat (sort keys %{$connection->{stats}}) {
+          print "    $stat  $connection->{stats}->{$stat}\n";
+        }
+      } else {
+        print "  Probe Failed.\n";
+      }
+    }
+  }
+
+  if ($scout) {
+    foreach my $connection (@$info) {
+      print $connection->{hostName}, "\n";
+      if ($connection->{probeOK}) {
+        print "   Conn: $connection->{stats}->{CurrentConnections}\n";
+        print "  Fetch: $connection->{stats}->{TotalFetchs}\n";
+        print "  Store: $connection->{stats}->{TotalStores}\n";
+        print "     Ws: $connection->{stats}->{WorkStations}\n";
+        print "  Disk attn:\n";
+        foreach my $disk (@{$connection->{stats}->{Disk}}) {
+          print "         $disk->{Name}:$disk->{BlocksAvailable} (";
+          printf "%0.2f%%)\n", ($disk->{TotalBlock} - $disk->{BlocksAvailable}) * 100 / $disk->{TotalBlock};
+        }
+      } else {
+        print "  Probe Failed.\n";
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+---
+abstract: 'EC2 API Tools Starter/Installer'
+author:
+  - 'Michael Vu <email@michael.vu>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690'
+license: restrictive
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-EC2-API-Tools
+version: '0.2'

@@ -1,0 +1,14 @@
+{
+    plugins => [
+        { AccessDenied => 2000 },
+    ],
+
+    plug_access_denied => {
+        role            => sub { $_[0]->{d}{user}{role} },
+        separator       => qr/\s*,\s*/,
+        key             => 'access_roles',
+        redirect_page   => '/access-denied',
+        master_roles    => 'admin',
+        no_exit         => 0,
+    },
+}

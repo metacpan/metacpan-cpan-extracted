@@ -1,0 +1,9 @@
+Asterisk::LCR - Least Cost Generator for Asterisk
+
+Does what it says on the tin. See POD documentation for more details.
+
+Copyright 2006 - Jean-Michel Hiver
+All rights reserved
+
+This module is free software and is distributed under the GPL version 2. See
+the LICENSE file. Use this software at your own risk.

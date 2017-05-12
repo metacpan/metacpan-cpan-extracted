@@ -1,0 +1,274 @@
+#! /usr/bin/perl
+# PODNAME: tprove
+# ABSTRACT: Tapper - alternative 'prove' which uploads results to a Tapper server
+
+# -----------------------------------------------------------
+# Keep this a single file with no external libs and only core
+# dependencies, so we can use that script in any restricted
+# environment. Similar spirit as bash-test-utils.
+# -----------------------------------------------------------
+
+use strict;
+use warnings;
+
+use Archive::Tar;
+use IO::Socket::INET;
+use Sys::Hostname "hostname";
+use File::Temp "tempfile", "tempdir";
+use File::Basename "basename", "dirname";
+use File::Copy;
+use File::Find;
+use YAML::XS "LoadFile", "DumpFile";
+use Cwd;
+
+use Data::Dumper;
+
+my $tap_archive_support;
+my $tmp_archive;
+my $tmp_dir;
+
+sub slurp {
+    my ($file) = @_;
+
+    my $FILE;
+    open $FILE, "<", $file and do {
+        local $/;
+        return <$FILE>;
+    };
+}
+
+sub get_tmp_dir {
+    $tmp_dir ||= tempdir(CLEANUP => 1);
+    return $tmp_dir;
+}
+
+sub get_prove {
+    my $prove = $^X;
+    $prove = dirname($^X)."/prove";
+    return $prove;
+}
+
+sub patch_args {
+    my @args = @_;
+
+    # skip potential archive options
+    @args = grep { ! ( /^-a$/ ... // ) } @args;
+    unshift @args, "-a", get_tmp_dir();
+    return @args
+}
+
+sub run_prove {
+    system get_prove(), @_;
+}
+
+# a Tapper::Archive is a .tgz containing: tests.(tap|tgz) and optional files.tgz
+sub pack_tapper_archive {
+    my $name = "tapper-archive.tgz";
+    my $full_name = get_tmp_dir."/$name";
+    system ("tar", "-C", get_tmp_dir, "-czf", $full_name, "tests.tgz");
+    return $full_name;
+}
+
+sub report_tapper_archive {
+    my ($archive) = @_;
+
+    my $report_server   = $ENV{TAPPER_REPORT_SERVER};
+    my $report_api_port = $ENV{TAPPER_REPORT_API_PORT} || '7358';
+    my $report_port     = $ENV{TAPPER_REPORT_PORT}     || '7357';
+
+    if (not $report_server) {
+        print "Generated TAP-Archive: $archive";
+        return;
+    }
+
+    my $gzipped_content = slurp($archive);
+
+    my $sock = IO::Socket::INET->new(PeerAddr => $report_server,
+                                     PeerPort => $report_port,
+                                     Proto    => 'tcp');
+    print STDERR "Report to Tapper at ".($report_server || "report_server=UNDEF").":".($report_port || "report_port=UNDEF");
+    unless ($sock) {
+        print STDERR "\nResult TAP in $archive can not be sent to Tapper server.\n";
+        die "\nCan't open connection to ", ($report_server || "report_server=UNDEF"), ":", ($report_port || "report_port=UNDEF"), ":$!"
+    }
+
+    my $report_id = <$sock>;
+    ($report_id) = $report_id =~ /(\d+)$/;
+    $sock->print($gzipped_content);
+    $sock->close();
+    print STDERR ", id=$report_id, url=http://$report_server".($report_server =~ /^(localhost|0)$/ ? ":3000" : "")."/tapper/reports/id/$report_id\n";
+    return $report_id;
+}
+
+# Return hostname for metainfo in typical Tapper notation, i.e., just
+# the hostname (without FQDN) in host context or C<host:guest> (colon
+# separated) in guest context.
+sub get_machine_name
+{
+        my $etc_tapper = "/etc/tapper";
+
+        my $hostname = hostname();
+        $hostname =~ s/\..*$//; # no FQDN
+        # combined machine name in Tapper automation guest environment
+        if ($ENV{TAPPER_HOSTNAME}) {
+                $hostname = "$ENV{TAPPER_HOSTNAME}:$hostname"
+        } elsif ( -r $etc_tapper ) {
+                my @tapper_config = ();
+                my $TAPPERCFG;
+                open $TAPPERCFG, "<", $etc_tapper and do {
+                        local $/;
+                        @tapper_config = <$TAPPERCFG>;
+                        close $TAPPERCFG;
+                };
+                my ($machinename) =
+                 map {
+                      my $m = $_ ; $m =~ s/^[^:]*:// ; $m
+                     }
+                  grep {
+                          /hostname:/
+                  } @tapper_config;
+                $hostname = "${machinename}:$hostname";
+        }
+        return $hostname;
+}
+
+sub relative_file_list {
+    my ($dir) = @_;
+
+    my @files;
+
+    my $olddir = cwd;
+    chdir $dir;
+    find({ wanted => sub { $_ =~ s/^\.\///; push @files, $_ if -f $_ and $_ !~ /\b(tests\.tgz|tapper-archive.tgz)$/ }, no_chdir => 1 }, ".");
+    chdir $olddir;
+
+    return sort @files;
+}
+
+sub report_meta {
+    my $hostname        = get_machine_name;
+    my $testrun_id      = $ENV{TAPPER_TESTRUN}         || '',
+    my $report_group    = $ENV{TAPPER_REPORT_GROUP}    || '',
+
+    my $suite_name = basename(cwd);
+    $suite_name = "unknown" if $suite_name eq "/";
+    my $suite_version = "";
+    ($suite_name, $suite_version) = $suite_name =~ m/^(\D*)-([\d.]+)/ if $suite_name =~ /-\d/;
+
+    my $report_meta = "Version 13\n1..1\n# Tapper-Suite-Name: $suite_name\n";
+    $report_meta   .= "# Tapper-Machine-Name: $hostname\n";
+    $report_meta   .= $suite_version ? "# Tapper-Suite-Version: $suite_version\n"        : "";
+    $report_meta   .= $testrun_id    ? "# Tapper-Reportgroup-Testrun: $testrun_id\n"     : "";
+    $report_meta   .= $report_group  ? "# Tapper-Reportgroup-Arbitrary: $report_group\n" : "";
+    $report_meta   .= "ok 1 - Tapper metainfo\n";
+    return $report_meta;
+}
+
+sub patch_archive_meta_file {
+    my ($meta_file) = @_;
+
+    my $succ = 1;
+    my $meta = {};
+    eval { $meta = LoadFile($meta_file) };
+    $succ = 0 if $@;
+    push @{$meta->{file_order}}, 'tapper-meta';
+    DumpFile($meta_file, $meta);
+
+    return $succ;
+}
+
+sub create_archive_file {
+    my ($dir, $report_meta, $files) = @_;
+
+    my $archive = "$dir/tests.tgz";
+
+    my $olddir = cwd;
+    chdir $dir;
+
+    my $tar = Archive::Tar->new;
+    $tar->add_data('tapper-meta', $report_meta);
+    $tar->add_files(@$files);
+    $tar->write($archive, COMPRESS_GZIP);
+
+    chdir $olddir;
+
+    return $archive;
+}
+
+sub patch_archive
+{
+    my $report;
+
+    my $report_meta = report_meta;
+    my @files = relative_file_list(get_tmp_dir);
+
+    unless (patch_archive_meta_file (get_tmp_dir."/meta.yml")) {
+        $report_meta .= "# Error loading meta.yml from archive: $@\n";
+        $report_meta .= "# Files in archive:\n";
+        $report_meta .= $_ foreach map { "#   $_\n" } @files;
+    }
+
+    return create_archive_file(get_tmp_dir, $report_meta, \@files);
+}
+
+sub check_tap_archive_support {
+    eval { require TAP::Harness::Archive };
+    die "No TAP-Archive support. Install TAP::Harness::Archive.\n"
+        if $@;
+}
+
+sub main {
+    check_tap_archive_support;
+    run_prove (patch_args(@ARGV));
+    my $tap_archive = patch_archive;
+    my $tapper_archive = pack_tapper_archive($tap_archive);
+    report_tapper_archive($tap_archive);
+    # TODO: send $tapper_archive, not $tap_archive (needs receiver support)
+}
+
+# are we a lib or a program, e.g., require'd during testing?
+{
+    no warnings 'uninitialized';
+    ((caller 0)[3] eq "(eval)") ? 1 : main;
+}
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+tprove - Tapper - alternative 'prove' which uploads results to a Tapper server
+
+=head1 SYNOPSIS
+
+ $ prove  -vl t/        # normal prove until satisfied
+ $ tprove -vl t/        # nearly the same, just a little "t" in front
+
+=head1 ABOUT
+
+This is a drop-in replacement for C<prove> to run TAP-based test suites.
+
+It executes the normal C<prove> but injects additional parameters to
+generate C<prove>'s results into a so called I<TAP-Archive>, then
+injects some meta information into this archive, and finally uploads
+the generated archive to your personal B<Tapper> instance, based on
+the environment variable C<TAPPER_REPORT_SERVER> (and optionally
+C<TAPPER_REPORT_PORT>).
+
+Learn more about Tapper on L<tapper-testing.org|http://tapper-testing.org>.
+
+=head1 AUTHOR
+
+Steffen Schwigon <ss5@renormalist.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Steffen Schwigon.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

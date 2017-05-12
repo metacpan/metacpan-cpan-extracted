@@ -1,0 +1,25 @@
+Revision history for Authen-Simple-IMAP
+
+0.0.1  2009-02-17
+	Initial release.
+
+0.0.2  2009-02-18
+	* added Authen::Simple to required in Build.PL
+	* documented "imap" param to new
+	* a few other doc tweaks
+
+0.0.3  2009-02-18
+	* fixed perlcritic.t to really skip if Test::Perl::Critic isn't found
+
+0.0.4 
+	* fixed doc re suggestions on PerlMonks
+
+0.1.0 2009-03-23 
+	* Oy!  Now it connects to IMAP server every time we authenticate... Duh..
+	* removed perlcritic.t - 'twas a pain
+
+0.1.1 2009-03-30 
+	* require at least perl 5.8.6
+
+0.1.2 2009-05-07
+	* fixed bug where it didn't disconnect after a failed auth

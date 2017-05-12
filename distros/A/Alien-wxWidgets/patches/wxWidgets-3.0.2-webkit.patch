@@ -1,0 +1,169 @@
+diff -u include/wx/defs.h include/wx/defs.h
+--- include/wx/defs.h	2014-10-06 22:33:44.000000000 +0100
++++ include/wx/defs.h	2017-04-08 18:52:20.308109800 +0100
+@@ -3169,14 +3169,22 @@
+ DECLARE_WXCOCOA_OBJC_CLASS(UIEvent);
+ DECLARE_WXCOCOA_OBJC_CLASS(NSSet);
+ DECLARE_WXCOCOA_OBJC_CLASS(EAGLContext);
++DECLARE_WXCOCOA_OBJC_CLASS(UIWebView);
+ 
+ typedef WX_UIWindow WXWindow;
+ typedef WX_UIView WXWidget;
+ typedef WX_EAGLContext WXGLContext;
+ typedef WX_NSString* WXGLPixelFormat;
++typedef WX_UIWebView OSXWebViewPtr;
++
++#endif
+ 
++#if wxOSX_USE_COCOA_OR_CARBON
++DECLARE_WXCOCOA_OBJC_CLASS(WebView);
++typedef WX_WebView OSXWebViewPtr;
+ #endif
+ 
++
+ #endif /* __WXMAC__ */
+ 
+ /* ABX: check __WIN32__ instead of __WXMSW__ for the same MSWBase in any Win32 port */
+diff -u include/wx/html/webkit.h include/wx/html/webkit.h
+--- include/wx/html/webkit.h	2014-10-06 22:33:44.000000000 +0100
++++ include/wx/html/webkit.h	2017-04-08 18:53:34.608334300 +0100
+@@ -18,7 +18,6 @@
+ #endif
+ 
+ #include "wx/control.h"
+-DECLARE_WXCOCOA_OBJC_CLASS(WebView); 
+ 
+ // ----------------------------------------------------------------------------
+ // Web Kit Control
+@@ -107,7 +106,7 @@
+     wxString m_currentURL;
+     wxString m_pageTitle;
+ 
+-    WX_WebView m_webView;
++    OSXWebViewPtr m_webView;
+ 
+     // we may use this later to setup our own mouse events,
+     // so leave it in for now.
+diff -u include/wx/osx/webview_webkit.h include/wx/osx/webview_webkit.h
+--- include/wx/osx/webview_webkit.h	2014-10-06 22:33:44.000000000 +0100
++++ include/wx/osx/webview_webkit.h	2017-04-08 18:56:04.314415300 +0100
+@@ -158,7 +158,7 @@
+     wxWindowID m_windowID;
+     wxString m_pageTitle;
+ 
+-    wxObjCID m_webView;
++    OSXWebViewPtr m_webView;
+ 
+     // we may use this later to setup our own mouse events,
+     // so leave it in for now.
+diff -u src/osx/webview_webkit.mm src/osx/webview_webkit.mm
+--- src/osx/webview_webkit.mm	2014-10-06 22:33:44.000000000 +0100
++++ src/osx/webview_webkit.mm	2017-04-08 19:03:24.676146300 +0100
+@@ -296,7 +296,7 @@
+     wxWebViewWebKit* webKitWindow;
+ }
+ 
+-- initWithWxWindow: (wxWebViewWebKit*)inWindow;
++- (id)initWithWxWindow: (wxWebViewWebKit*)inWindow;
+ 
+ @end
+ 
+@@ -305,7 +305,7 @@
+     wxWebViewWebKit* webKitWindow;
+ }
+ 
+-- initWithWxWindow: (wxWebViewWebKit*)inWindow;
++- (id)initWithWxWindow: (wxWebViewWebKit*)inWindow;
+ 
+ @end
+ 
+@@ -314,7 +314,7 @@
+     wxWebViewWebKit* webKitWindow;
+ }
+ 
+-- initWithWxWindow: (wxWebViewWebKit*)inWindow;
++- (id)initWithWxWindow: (wxWebViewWebKit*)inWindow;
+ 
+ @end
+ 
+@@ -442,7 +442,7 @@
+     if ( !m_webView )
+         return;
+ 
+-    [(WebView*)m_webView goBack];
++    [m_webView goBack];
+ }
+ 
+ void wxWebViewWebKit::GoForward()
+@@ -450,7 +450,7 @@
+     if ( !m_webView )
+         return;
+ 
+-    [(WebView*)m_webView goForward];
++    [m_webView goForward];
+ }
+ 
+ void wxWebViewWebKit::Reload(wxWebViewReloadFlags flags)
+@@ -849,7 +849,7 @@
+     if ( !m_webView )
+         return;
+ 
+-    [(WebView*)m_webView cut:m_webView];
++    [m_webView cut:m_webView];
+ }
+ 
+ void wxWebViewWebKit::Copy()
+@@ -857,7 +857,7 @@
+     if ( !m_webView )
+         return;
+ 
+-    [(WebView*)m_webView copy:m_webView];
++    [m_webView copy:m_webView];
+ }
+ 
+ void wxWebViewWebKit::Paste()
+@@ -865,7 +865,7 @@
+     if ( !m_webView )
+         return;
+ 
+-    [(WebView*)m_webView paste:m_webView];
++    [m_webView paste:m_webView];
+ }
+ 
+ void wxWebViewWebKit::DeleteSelection()
+@@ -873,7 +873,7 @@
+     if ( !m_webView )
+         return;
+ 
+-    [(WebView*)m_webView deleteSelection];
++    [m_webView deleteSelection];
+ }
+ 
+ bool wxWebViewWebKit::HasSelection() const
+@@ -1007,7 +1007,7 @@
+ 
+ @implementation WebViewLoadDelegate
+ 
+-- initWithWxWindow: (wxWebViewWebKit*)inWindow
++- (id)initWithWxWindow: (wxWebViewWebKit*)inWindow
+ {
+     [super init];
+     webKitWindow = inWindow;    // non retained
+@@ -1197,7 +1197,7 @@
+ 
+ @implementation WebViewPolicyDelegate
+ 
+-- initWithWxWindow: (wxWebViewWebKit*)inWindow
++-  (id)initWithWxWindow: (wxWebViewWebKit*)inWindow
+ {
+     [super init];
+     webKitWindow = inWindow;    // non retained
+@@ -1335,7 +1335,7 @@
+ 
+ @implementation WebViewUIDelegate
+ 
+-- initWithWxWindow: (wxWebViewWebKit*)inWindow
++- (id)initWithWxWindow: (wxWebViewWebKit*)inWindow
+ {
+     [super init];
+     webKitWindow = inWindow;    // non retained

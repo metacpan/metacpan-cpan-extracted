@@ -1,0 +1,137 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+=head1 NAME
+
+serve_cgi - AxKit2 can do CGIs too!
+
+=head1 SYNOPSIS
+
+  Plugin serve_cgi
+  CGI_Match \.(cgi|pl)$
+
+=head1 DESCRIPTION
+
+This plugin makes running CGI scripts from AxKit2 possible. These get run in the
+traditional CGI manner of forking off, so beware that they won't perform very
+well.
+
+=head1 CONFIG
+
+=head2 CGI_Match REGEXP
+
+Specify a perl regexp for files to run as CGIs. Files must also be executable.
+
+=cut
+
+sub init {
+    my $self = shift;
+    
+    $self->register_config('CGI_Match', sub { $self->matchfiles(@_) });
+}
+
+sub matchfiles {
+    my ($self, $conf) = (shift, shift);
+    
+    my $key = $self->plugin_name . '::match';
+    @_ and $conf->notes($key, shift);
+    $conf->notes($key);
+}
+
+
+sub setup_env {
+    my ($self, $hd) = @_;
+    
+    $ENV{DOCUMENT_ROOT} = $self->config->docroot;
+    $ENV{GATEWAY_INTERFACE} = "CGI/1.1";
+    my $remote = $self->client->peer_addr_string;
+    @ENV{qw(REMOTE_ADDR REMOTE_PORT)} = split(/:/, $remote);
+    $ENV{REQUEST_METHOD} = $hd->request_method;
+    $ENV{REQUEST_URI} = $hd->request_uri;
+    $ENV{SCRIPT_FILENAME} = $hd->filename;
+    $ENV{SERVER_PORT} = $self->config->port;
+    my $question = index($ENV{REQUEST_URI}, '?') + 1;
+    $ENV{QUERY_STRING} = $question ? substr($ENV{REQUEST_URI}, $question) : "";
+    
+    # TODO: PATH_INFO, CONTENT_LENGTH, CONTENT_TYPE, COOKIE
+}
+
+sub run_this_uri {
+    my $self = shift;
+    
+    my $hd = $self->client->headers_in;
+    
+    my $match = $self->matchfiles($self->config);
+    $self->log(LOGDEBUG, "looking for CGIs matching: $match");
+    
+    return unless $hd->filename =~ /$match/;
+    $self->log(LOGDEBUG, $hd->filename, " matches CGI regexp");
+    
+    return unless -x $hd->filename;
+    
+    return 1;
+}
+
+sub hook_body_data {
+    my ($self, $bdata) = @_;
+    # TODO: Save to a temp fh. Re-open STDIN on that FH when we exec the cgi
+    return DONE;
+}
+
+use POSIX qw(dup2);
+
+sub hook_response {
+    my ($self) = @_;
+    
+    my $hd = $self->client->headers_in;
+    
+    return DECLINED unless $self->run_this_uri;
+    
+    $self->log(LOGDEBUG, "running ", $hd->filename, " as a CGI");
+    
+    local %ENV;
+    $self->setup_env($hd);
+    
+    pipe(my $rd, my $wr);
+    
+    $self->client->watch_read(0);
+    $self->client->watch_write(0);
+    IO::Handle::blocking($self->client->sock, 1);
+
+    my $pid = fork;
+    if (!defined($pid)) {
+        die "Unable to fork: $!";
+    }
+    if ($pid) {
+        $self->log(LOGDEBUG, "CGI ", $hd->filename, " executing");
+        my $ready = <$rd>;
+        $self->log(LOGDEBUG, "CGI finished");
+        $self->client->close();
+        return OK;
+    }
+    
+    close(STDOUT);
+    close(STDIN);
+    my $sock = $self->client->sock;
+    dup2(fileno($sock), 0);
+    dup2(fileno($sock), 1);
+    print $wr "ready\n";
+    print $sock "HTTP/1.0 200 OK\r\n";
+    print $sock "Connection: close\r\n";
+    exec($hd->filename);
+    exit();
+}

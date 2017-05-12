@@ -1,0 +1,64 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+# ABSTRACT: Command line scrobbling client
+# PODNAME: App::scrobble
+our $VERSION = '0.03'; # VERSION
+
+use App::Scrobble;
+
+my $app = App::Scrobble->new_with_options();
+
+$app->scrobble();
+
+
+__END__
+=pod
+
+=head1 NAME
+
+App::scrobble - Command line scrobbling client
+
+=head1 VERSION
+
+version 0.03
+
+=head1 SYNOPSIS
+
+  # scrobble the tracks, limited output
+  scrobble --username foo --password bar --url http://www.mixcloud.com/LaidBackRadio/tj-kid-opolopo-the-best-of-tokyo-dawn-records/
+
+  # scrobble the tracks, verbose output
+  scrobble --username foo --password bar --url http://www.mixcloud.com/LaidBackRadio/tj-kid-opolopo-the-best-of-tokyo-dawn-records/ --verbose
+
+  # don't scrobble the tracks, verbose output
+  scrobble --username foo --password bar --url http://www.mixcloud.com/LaidBackRadio/tj-kid-opolopo-the-best-of-tokyo-dawn-records/ --verbose --dry-run
+
+=head1 DESCRIPTION
+
+Command line application for scrobbling track information to
+L<LastFM|http://www.last.fm>.
+
+Usage information can be optained by:
+
+  scrobble -? | scrobble --help | scrobble --usage | scrobble
+
+=head1 SEE ALSO
+
+L<App::Scrobble>
+
+=head1 AUTHOR
+
+Adam Taylor <ajct@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Adam Taylor.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

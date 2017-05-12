@@ -1,0 +1,72 @@
+=pod
+
+=head1 NAME
+
+Alzabo::PostgreSQL - Alzabo and PostgreSQL
+
+=head1 DESCRIPTION
+
+This documentation is about what special support Alzabo has for PostgreSQL,
+as well as what is lacking.
+
+Postgres support is based on the 7.3.x version of Postgres.  Alzabo
+should work with the 7.1 and 7.2 series, and may even work with the
+7.0 series.
+
+=head2 Mixed-case Table or Column Names
+
+By default, Postgres treats table and column names case-insensitively.
+Because of this, Alzabo always quotes these names when generating DDL
+SQL.  If you are using tables or columns that contain upper-case
+characters, you should always call C<<
+$schema->set_quote_identifiers(1) >> as soon as you load your schema
+object.  Otherwise, any method which generates DML SQL will fail.
+
+=head2 Reverse Engineering
+
+=over 4
+
+=item *
+
+Alzabo cannot determine from the existence of a sequence that the
+sequence is meant to be used for a particular column unless the
+sequence was created as a result of making a column's type SERIAL.
+
+This is because there is no link between the two in the Postgres' data
+dictionary tables and will probably never change.
+
+=back
+
+=head2 Transactions
+
+=over 4
+
+=item *
+
+Transactions are fully supported with Postgres.
+
+=back
+
+=head2 Outer joins
+
+=over 4
+
+=item *
+
+Left and right outer joins are supported.
+
+=item *
+
+Full outer joins are not supported.
+
+=back
+
+=head2 Constraints
+
+Column constraints can be specified as column attributes.  Table
+constraints can be specified as table attributes.
+
+Foreign key constraints are generated automatically based on the
+relationships defined by your schema.
+
+=cut

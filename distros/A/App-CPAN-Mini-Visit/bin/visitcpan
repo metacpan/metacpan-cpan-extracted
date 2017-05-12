@@ -1,0 +1,122 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# PODNAME: visitcpan
+# ABSTRACT: explore each distribution in a minicpan repository
+our $VERSION = '0.008'; # VERSION
+
+require App::CPAN::Mini::Visit;
+exit App::CPAN::Mini::Visit->run(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+visitcpan - explore each distribution in a minicpan repository
+
+=head1 VERSION
+
+version 0.008
+
+=head1 SYNOPSIS
+
+     $ visitcpan [OPTIONS] [PROGRAM]
+ 
+     $ visitcpan [OPTIONS] -- [PROGRAM] [ARGS]
+
+=head1 DESCRIPTION
+
+This program executes other programs against each distribution in a minicpan
+repository.  Given a program to run, for each distribution archive in the
+repository, it will:
+
+=over
+
+=item *
+
+extract the distribution archive to a temporary directory 
+
+=item *
+
+change to the temporary directory
+
+=item *
+
+execute the user-specified program
+
+=item *
+
+return to the original directory
+
+=item *
+
+clean up the temporary directory
+
+=back
+
+If no program to run is provided, C<<< visitcpan >>> will instead produce a listing of
+distribution files, one per line, that can be piped to other programs for
+analysis.
+
+To avoid conflicts between C<<< visitcpan >>> options and arguments provided to
+the program to run, use two dashes ('--') to separate minicpan options 
+from other arguments.
+
+By default, C<<< visitcpan >>> will use a local minicpan repository as defined 
+in a .minicpanrc file. 
+
+=head1 OPTIONS
+
+  --append|-a        --append=dist -> append distname after ARGS
+                     --append=path -> append tarball path after ARGS
+ 
+  -e|-E              run next argument via 'perl -E'
+ 
+  --help|-h          this usage info 
+ 
+  --minicpan|-m      directory of a minicpan (defaults to local minicpan 
+                     from CPAN::Mini config file)
+ 
+  --output|-o        file to save output instead of sending to terminal
+ 
+  --quiet|-q         silence warnings and suppress STDERR from tar
+ 
+  --version|-V       visitcpan program version
+ 
+  --                 indicates the end of options for visitcpan
+
+=head1 EXAMPLES
+
+   # count number of distributiosn in the minicpan
+   $ visitcpan | wc -l
+ 
+   # get a listing of all distributions using Build.PL
+   $ visitcpan -q -a dist -o listing.txt -e 'say shift if -f "Build.PL"'
+ 
+   # run a program against each distribution
+   $ visitcpan -q -- ack -a 'use version;'
+
+=head1 SEE ALSO
+
+L<CPAN::Mini::Extract> creates a minicpan with archives extracted.  Analyzing
+an extracted tree will be faster than C<<< visitcpan >>>, but the tree will take
+up substantially more space on disk.
+
+=head1 AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by David Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

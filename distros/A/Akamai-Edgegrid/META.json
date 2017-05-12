@@ -1,0 +1,47 @@
+{
+   "abstract" : "Akamai {OPEN} Edgegrid Authentication",
+   "author" : [
+      "Jonathan Landis <jlandis@akamai.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Akamai-Edgegrid",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "JSON" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::IniFiles" : "0",
+            "Data::UUID" : "0",
+            "LWP" : "5.834",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.5"
+}

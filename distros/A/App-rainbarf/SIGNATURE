@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e020afc623d3ef834e4300a7b882b4fdf800f1b4 Build.PL
+SHA1 bae5b71cf8a591e383cc8ed61bf9514a9c85be1c Changes
+SHA1 f03b298e25fe30d6b027e72f04f2ded01ebd8d4a LICENSE
+SHA1 76b70d347b10798b7c2e81ed110d709174655523 MANIFEST
+SHA1 74465d2726d458e1d7f311fe9493f1618429825c MANIFEST.SKIP
+SHA1 c4c6c2b0168cf295bfd024f10b40cb5765c7d51a META.json
+SHA1 4864ba9cd9756620f57f1b8f7f7fa1a7650c267f META.yml
+SHA1 8be842c0285b4a9d01e0ce04b6bf9781a501de5a README
+SHA1 f4aebce6a9907011a72aad5baffdcf1c56290c30 lib/App/rainbarf.pm
+SHA1 1cc5316b987c94fac9615d8ce2b361d9fcef0bde perlcritic.rc
+SHA1 1b8aa753d4e8fdf505f43a49f2cac445f9e6a19b rainbarf
+SHA1 0d178c35706b9205185a8b42ab2dcb31db598cf6 t/00-compile.t
+SHA1 53a43fe2b4b1afc441c2114c475b92609ddbe432 t/01-tmux.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+SHA1 2a4ded1fe37e912702d6682db5eb8e4fbce3b671 t/author-eol.t
+SHA1 7d3b616bb5a09bb59e6b222fb013b251e6de7d2c t/author-no-tabs.t
+SHA1 6c3dcb21edd9da7904c0ce1a152503fda9507170 t/release-consistent-version.t
+SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 d165f8ec069354540640243399f536af695046dd t/release-distmeta.t
+SHA1 a8a3b6c291113fff0f1765ef584a08bc4498bdc0 t/release-kwalitee.t
+SHA1 54ed25287b7e1c9ff328eaf126d438438c8a1d48 t/release-minimum-version.t
+SHA1 54b7f39e355424cbc367105b84ff02a6cb29d93b t/release-mojibake.t
+SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
+SHA1 4f2933df3566db6f337817aa885889deb213960b t/release-pod-linkcheck.t
+SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
+SHA1 327cbce635e237f8f2b7f93de33a1f16b3b0060d t/release-portability.t
+SHA1 af34d5f9f8bd79b21b6c01c69e0afdd81f25c16b t/release-test-version.t
+SHA1 17514255b5ff5f46ac8ce9e9e3c887c9a205c8ba t/release-unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXzo78AAoJEDlxU7ZVUpmivG4H/1g7jiTVYH28OzR2/4roe6Ll
+9eAqWMKsZi+xxbFjfbUOq7o8kiZnzOnv+pXiVUqbiSQeRbPvdd+UFklgROv7rqsj
+2snqGWMmsG+CkPansgfcmCvjQJSnK3hYSopivcOTcyEgXSuk4YrrbjBYJmlDHLQv
+RloRyMF8h28PgYwr0jJHFKEM1dbULEbwE5mutaitBPTHbYCtlI5KbxJ9tEBbh/TC
+uZkn3WHJrw4KZfggTrR0GHmjnOPDJbfR2pjPbVLHCITLow1HYjEmfnxvbWZOo33N
+NtMqmy7BfDTNo07e469CinProax2I0kCoKHxRE6As7Iwk3PMlfronWVi3Mb6Dbg=
+=od11
+-----END PGP SIGNATURE-----

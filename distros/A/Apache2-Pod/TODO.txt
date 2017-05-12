@@ -1,0 +1,14 @@
+Thu Jan  4 12:41:56 PST 2007
+
+To do:
+
+* Handle errors properly so that the handler returns SERVER_ERROR and
+  NOT_FOUND when appropriate instead of always returning OK.
+
+* Add debugging that can be easily turned on and off.
+
+* Grab the file timestamp of the pod file being viewed and set that in the
+  page header as the document timestamp.
+
+Theron Lewis <theron at theronlewis dot com>
+

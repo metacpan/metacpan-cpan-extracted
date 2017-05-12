@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Audio-ConvTools
+version:      0.08
+version_from: lib/Audio/ConvTools.pm
+installdirs:  site
+requires:
+    File::NCopy:                   0.32
+    File::Temp:                    0.17
+    Getopt::Long:                  0
+    Pod::Usage:                    0
+    String::ShellQuote:            1.03
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

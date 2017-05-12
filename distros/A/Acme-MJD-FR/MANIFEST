@@ -1,0 +1,6 @@
+lib/Acme/MJD/FR.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+t/advice.t
+META.yml                                 Module meta-data (added by MakeMaker)

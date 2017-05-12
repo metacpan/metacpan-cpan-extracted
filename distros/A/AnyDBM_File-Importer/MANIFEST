@@ -1,0 +1,10 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Build.PL
+lib/AnyDBM_File/Importer.pm
+t/001_import.t
+Makefile.PL
+META.yml

@@ -1,0 +1,20 @@
+----------------
+ AI::Perceptron
+----------------
+
+Revision history for AI::Perceptron.
+
+1.0
+    +	moved to Module::Build
+    +	restructured project directory tree
+    +	fixed bug in algorithm [reported by Himanshu Garg]
+    +	refactored api & code, things should be more obvious now.
+    +	more documentation & bugfixes
+    +	wrote a proper test-suite
+    +	weights & threshold no longer random
+
+0.01
+    +	original dist created Fri Feb 18 16:05:09 2000 by h2xs 1.19
+    +	project began July 20, 1999, originally designed on a napkin which,
+	sadly enough, I probably still have lying around somewhere.
+

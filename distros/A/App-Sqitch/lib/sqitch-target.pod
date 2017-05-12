@@ -1,0 +1,250 @@
+=head1 Name
+
+sqitch-target - Manage target database configuration
+
+=head1 Synopsis
+
+  sqitch target
+  sqitch target [-v | --verbose]
+  sqitch target add <name> <uri> [-s <property>=<value> ...]
+  sqitch target alter <name> [-s <property>=<value> ...]
+  sqitch target remove <name>
+  sqitch target rename <old> <new>
+  sqitch target show <name> [...]
+
+=head1 Description
+
+Manage the set of databases ("targets") you deploy to. Each target may have a
+number of properties:
+
+=over
+
+=item C<uri>
+
+The L<database connection URI|URI::db> for the target. Required. Its format is:
+
+  db:engine:[dbname]
+  db:engine:[//[user[:password]@][host][:port]/][dbname][?params][#fragment]
+
+Some examples:
+
+=over
+
+=item C<db:sqlite:widgets.db>
+
+=item C<db:pg://dba@example.net/blanket>
+
+=item C<db:mysql://db.example.com/>
+
+=item C<db:firebird://localhost//tmp/test.fdb>
+
+=back
+
+See the L<DB URI Draft|https://github.com/theory/uri-db> for details.
+
+=item C<registry>
+
+The name of the registry schema or database. The default is C<sqitch>.
+
+=item C<client>
+
+The command-line client to use. If not specified, each engine looks in the OS
+Path for an appropriate client.
+
+=item C<top_dir>
+
+The path to the top directory for the target. This directory generally
+contains the plan file and subdirectories for deploy, revert, and verify
+scripts, as well as reworked instances of those scripts. The default is F<.>,
+the current directory.
+
+=item C<plan_file>
+
+The plan file to use for this target. The default is C<$top_dir/sqitch.plan>.
+
+=item C<deploy_dir>
+
+The path to the deploy directory for the target. This directory contains all
+of the deploy scripts referenced by changes in the C<plan_file>. The default
+is C<$top_dir/deploy>.
+
+=item C<revert_dir>
+
+The path to the revert directory for the target. This directory contains all
+of the revert scripts referenced by changes in the C<plan_file>. The default
+is C<$top_dir/revert>.
+
+=item C<verify_dir>
+
+The path to the verify directory for the target. This directory contains all
+of the verify scripts referenced by changes in the C<plan_file>. The default
+is C<$top_dir/verify>.
+
+=item C<reworked_dir>
+
+The path to the reworked directory for the target. This directory contains all
+subdirectories for all reworked scripts referenced by changes in the
+C<plan_file>. The default is C<$top_dir>.
+
+=item C<reworked_deploy_dir>
+
+The path to the reworked deploy directory for the target. This directory
+contains all of the reworked deploy scripts referenced by changes in the
+C<plan_file>. The default is C<$reworked_dir/deploy>.
+
+=item C<reworked_revert_dir>
+
+The path to the reworked revert directory for the target. This directory
+contains all of the reworked revert scripts referenced by changes in the
+C<plan_file>. The default is C<$reworked_dir/revert>.
+
+=item C<reworked_verify_dir>
+
+The path to the reworked verify directory for the target. This directory
+contains all of the reworked verify scripts referenced by changes in the
+C<plan_file>. The default is C<$reworked_dir/verify>.
+
+=item C<extension>
+
+The file name extension to append to change names to create script file names.
+The default is C<sql>.
+
+=back
+
+Each of these overrides the corresponding engine-specific configuration
+managed by L<engine|sqitch-engine>.
+
+=head1 Options
+
+=over
+
+=item List Option
+
+=over
+
+=item C<-v>
+
+=item C<--verbose>
+
+  sqitch engine --verbose
+
+Be more verbose when listing engines.
+
+=back
+
+=item Add and Alter Options
+
+=over
+
+=item C<--uri>
+
+  sqitch target add devwidgets --uri db:pg:widgets
+
+Specifies the L<URI|https://github.com/theory/uri-db/> of the target database.
+
+=item C<--top-dir>
+
+  sqitch target add devwidgets --top-dir sql
+
+Specifies the top directory to use for the target. Typically contains the
+deployment plan file and the change script directories.
+
+=item C<--plan-file>
+
+  sqitch target add devwidgets --plan-file my.plan
+
+Specifies the path to the deployment plan file. Defaults to
+C<$top_dir/sqitch.plan>.
+
+=item C<--extension>
+
+  sqitch target add devwidgets --extension ddl
+
+Specifies the file name extension to use for change script file names.
+Defaults to C<sql>.
+
+=item C<--dir>
+
+  sqitch target add devwidgets --dir deploy=dep --dir revert=rev --dir verify=tst
+
+Sets the path to a script directory. May be specified multiple times.
+Supported keys are:
+
+=over
+
+=item * C<deploy>
+
+=item * C<revert>
+
+=item * C<verify>
+
+=item * C<reworked>
+
+=item * C<reworked_deploy>
+
+=item * C<reworked_revert>
+
+=item * C<reworked_verify>
+
+=back
+
+=item C<--registry>
+
+  sqitch target add devwidgets --registry meta
+  
+Specifies the name of the database object where Sqitch's state and history
+data is stored. Typically a schema name (as in PostgreSQL and Oracle) or a
+database name (as in SQLite and MySQL). Defaults to C<sqitch>.
+
+=item C<--client>
+
+  sqitch target add devwidgets --client /usr/local/pgsql/bin/psql
+
+Specifies the path to the command-line client for the target. Defaults to a
+client in the current path named appropriately for the engine specified by the
+URI.
+
+=back
+
+=back
+
+=head1 Actions
+
+With no arguments, shows a list of existing targets. Several actions are
+available to perform operations on the targets.
+
+=head2 C<add>
+
+Add a target named C<< <name> >> for the database at C<< <uri> >>. The
+C<--set> option specifies target-specific properties. A new plan file and new
+script script directories will be created if they don't already exist.
+
+=head2 C<alter>
+
+Alter target named C<< <name> >>. The C<--set> option specifies
+engine-specific properties to set. New script script directories will be
+created if they don't already exist.
+
+=head2 C<remove>, C<rm>
+
+Remove the target named C<< <name> >>. The plan file and script directories
+will not be affected.
+
+=head2 C<rename>
+
+Rename the target named C<< <old> >> to C<< <new> >>.
+
+=head2 C<show>
+
+Gives some information about the target C<< <name> >>, including the
+associated properties. Specify multiple target names to see information for
+each.
+
+=head1 Configuration Variables
+
+The targets are stored in the configuration file, but the command itself
+currently relies on no configuration variables.
+
+=head1 Sqitch
+
+Part of the L<sqitch> suite.

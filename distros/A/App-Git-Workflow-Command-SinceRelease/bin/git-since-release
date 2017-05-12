@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+# Created on: 2014-03-11 20:58:59
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use App::Git::Workflow::Command::SinceRelease;
+
+App::Git::Workflow::Command::SinceRelease->run();
+
+__DATA__
+

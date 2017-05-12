@@ -1,0 +1,48 @@
+Alvis-QueryFilter version 0.2
+================================
+
+This is a module providing a query filter for ALVIS SRU.
+
+Contains is script:
+
+    run_QF.pl
+
+and these libraries:
+
+    Alvis::QueryFilter,  Alvis::Treetagger
+
+INSTALLATION
+
+To install this module,
+first edit the file 'lib/Alvis/Treetagger.pm' at the line:
+  $taggerRoot = "/usr/local/treetagger";
+Place there the directory location of your installation of 
+Treetagger, with its lib/ and cmd/ directories etc.
+Then type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+You must have Treetagger installed from the University of Stuttgart.
+
+This module requires these other modules and libraries:
+
+	Carp Data::Dumper CQL::Parser URI::Escape
+
+Additionally, the scripts in bin/ require:
+
+	LWP::UserAgent HTTP::Daemon HTTP::Status HTTP::Response
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Kimmo Valtonen and Wray Buntine
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

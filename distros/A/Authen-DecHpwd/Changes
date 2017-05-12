@@ -1,0 +1,111 @@
+version 2.006; 2011-05-07
+
+  * implement AUTODIN-II CRC hashing, delegating to Digest::CRC to
+    perform the actual CRC calculation
+
+  * in documentation, refer to the VMS function principally as
+    "SYS$HASH_PASWORD" (which seems to be its primary name) and only
+    secondarily as "LGI$HPWD"
+
+  * in XS, use save stack to clean up temporarily allocated memory
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * in t/setup_pp.pl, avoid a warning that occurs if XSLoader::load()
+    is given no arguments, which is now a valid usage
+
+  * slightly reformat some C code to avoid exceeding 80 columns
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 2.005; 2010-07-30
+
+  * in XS, use the correct "PREINIT:" instead of "INIT:" to introduce
+    variable declarations
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * use simpler "parent" pragma in place of "base"
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * also test POD coverage of pure Perl implementation
+
+  * correct spelling of "build_recommends" in Build.PL
+
+  * in Build.PL, explicitly set needs_compiler to avoid bogus
+    auto-dependency on ExtUtils::CBuilder
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 2.004; 2009-03-15
+
+  * add a (hideously slow) pure Perl backup implementation for systems
+    that can't handle XS modules
+
+  * comprehensive UTF-8 tests, with non-ASCII test vectors, testing all
+    vectors both downgraded and upgraded, in a way that also works on
+    perl v5.6
+
+  * add casts for pointer target signedness, and other small changes to
+    the C code, to avoid compiler warnings
+
+  * small POD markup changes
+
+version 2.003; 2009-03-02
+
+  * bugfix: avoid memory leak when croaking
+
+  * bugfix: ensure appropriate alignment of qword struct for 64-bit
+    arithmetic on strict-alignment 64-bit systems
+
+  * add backward-compatibility definition of bytes_from_utf8() function
+
+  * disable, pending further analysis, assembler versions of the code that
+    have been observed to result in compilation failures on some systems
+
+  * remove ununsed dword_t and qword_t structs from the C code
+
+  * use full stricture in Build.PL
+
+version 2.002; 2007-09-17
+
+  * bugfix: correctly handle UTF8-encoded scalars
+
+  * don't use ppport.h, because it wasn't doing anything for perl v5.6+
+
+  * test POD syntax and coverage
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * rearrange source tree to fit Module::Build convention
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 2.001; 2006-08-30
+
+  * add vms_username() and vms_password() functions for syntax checking
+    and canonicalisation
+
+version 2.0; 2006-08-27
+
+  * rewrite by Zefram: based on a newer branch of Shawn Clifford's C
+    code; proper Perlish error handling; allow arbitrary byte strings
+    (including embedded NULs); new documentation; many test vectors
+
+version 1.0; 2003-09-11
+
+  * original version by <mikem@open.com.au>

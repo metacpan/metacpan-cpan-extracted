@@ -1,0 +1,12 @@
+#ifndef AWXS_ADMIN_DEF
+#define AWXS_ADMIN_DEF 1
+
+
+typedef xsAccessControlList  * Aw__Admin__AccessControlList;
+typedef xsBrokerAdminTypeDef * Aw__Admin__TypeDef;
+typedef xsBrokerLogConfig    * Aw__Admin__LogConfig;
+typedef xsServerClient       * Aw__Admin__ServerClient;
+typedef xsBrokerClient       * Aw__Admin__Client;
+
+
+#endif /* AWXS_ADMIN_DEF */

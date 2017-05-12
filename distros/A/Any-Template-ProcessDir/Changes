@@ -1,0 +1,37 @@
+Revision history for Template-Any-ProcessDir
+
+** denotes an incompatible change
+
+0.08  Feb 7, 2015
+
+- dist.ini and POD fixes - oaxlin
+
+0.07  May 14, 2012
+
+- Make writability test author-only as it does not work on all cpantesters
+
+0.06  Dec 1, 2011
+
+- Pass full path to ignore_files
+
+0.05  Nov 29, 2011
+
+- Don't chmod non-template files in single-dir mode
+
+0.04  Nov 27, 2011
+
+- Allow result files to be generated inside same dir instead of separate dir
+- Document that process_file and process_text take object as second arg
+
+0.03  Jun 15, 2011
+
+- Ignore errors when symlinking, e.g. for win32
+
+0.02  Jun 5, 2011
+
+- Add process_file as alternative to process_text
+
+0.01  Dec 3, 2009
+
+- Initial version
+

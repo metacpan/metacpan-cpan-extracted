@@ -1,0 +1,59 @@
+body {
+   background: #d0e4fe;
+   font-family: "Courier New", Courier, monospace;
+   font-size: 16px;
+   width: 900px;
+}
+p {
+   margin: 0 0 0 0;
+}
+.leftright {
+   padding: 0 10px 0 10px;
+   font-size: 0;
+   vertical-align: bottom;
+}
+.leftright *{
+   font-size: 1rem; 
+   display: inline-block;
+}
+.alignleft {
+   text-align: left;
+   width: 50%;
+}
+.alignright {
+   text-align: right;
+   width: 50%;
+}
+
+.boxtopbot {
+   padding: 10px;
+   border: solid;
+   line-height: 1.2;
+}
+
+.mainarea {
+   padding: 10px;
+   border-left: solid;
+   border-right: solid;
+   background: #ccc;
+}
+
+input, textarea {
+   font-family:    "Courier New",
+		Courier,
+		monospace;
+   font-size: 20px;
+   border-style:	none;
+   background-color:black;
+   color: #d0e4fe;
+   font-weight: bold;
+   padding-left: 2px;
+   resize: none;
+}
+
+input[type=submit] {
+    padding:5px 15px; background-color:#7D8998; color:black; border:2 none;
+    cursor:pointer;
+    -webkit-border-radius: 5px;
+    border-radius: 5px; 
+}

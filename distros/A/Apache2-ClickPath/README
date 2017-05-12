@@ -1,0 +1,416 @@
+NAME
+    Apache2::ClickPath - Apache WEB Server User Tracking
+
+SYNOPSIS
+     LoadModule perl_module ".../mod_perl.so"
+     PerlLoadModule Apache2::ClickPath
+     <ClickPathUAExceptions>
+       Google     Googlebot
+       MSN        msnbot
+       Mirago     HeinrichderMiragoRobot
+       Yahoo      Yahoo-MMCrawler
+       Seekbot    Seekbot
+       Picsearch  psbot
+       Globalspec Ocelli
+       Naver      NaverBot
+       Turnitin   TurnitinBot
+       dir.com    Pompos
+       search.ch  search\.ch
+       IBM        http://www\.almaden\.ibm\.com/cs/crawler/
+     </ClickPathUAExceptions>
+     ClickPathSessionPrefix "-S:"
+     ClickPathMaxSessionAge 18000
+     PerlTransHandler Apache2::ClickPath
+     PerlOutputFilterHandler Apache2::ClickPath::OutputFilter
+     LogFormat "%h %l %u %t \"%m %U%q %H\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" \"%{SESSION}e\""
+
+ABSTRACT
+    "Apache2::ClickPath" can be used to track user activity on your web
+    server and gather click streams. Unlike mod_usertrack it does not use a
+    cookie. Instead the session identifier is transferred as the first part
+    on an URI.
+
+    Furthermore, in conjunction with a load balancer it can be used to
+    direct all requests belonging to a session to the same server.
+
+DESCRIPTION
+    "Apache2::ClickPath" adds a PerlTransHandler and an output filter to
+    Apache's request cycle. The transhandler inspects the requested URI to
+    decide if an existing session is used or a new one has to be created.
+
+  The Translation Handler
+    If the requested URI starts with a slash followed by the session prefix
+    (see "ClickPathSessionPrefix" below) the rest of the URI up to the next
+    slash is treated as session identifier. If for example the requested URI
+    is "/-S:s9NNNd:doBAYNNNiaNQOtNNNNNM/index.html" then assuming
+    "ClickPathSessionPrefix" is set to "-S:" the session identifier would be
+    "s9NNNd:doBAYNNNiaNQOtNNNNNM".
+
+    Starting with version 1.8 a checksum is included in the session ID.
+    Further, some parts of the information contained in the session
+    including the checksum can be encrypted. This both makes a valid session
+    ID hard to guess. If an invalid session ID is detected an error message
+    is printed to the ErrorLog. So, a log watching agent can be set up to
+    catch frequent abuses.
+
+    If no session identifier is found a new one is created.
+
+    Then the session prefix and identifier are stripped from the current
+    URI. Also a potentially existing session is stripped from the incoming
+    "Referer" header.
+
+    There are several exceptions to this scheme. Even if the incoming URI
+    contains a session a new one is created if it is too old. This is done
+    to prevent link collections, bookmarks or search engines generating
+    endless click streams.
+
+    If the incoming "UserAgent" header matches a configurable regular
+    expression neither session identifier is generated nor output filtering
+    is done. That way search engine crawlers will not create sessions and
+    links to your site remain readable (without the session stuff).
+
+    The translation handler sets the following environment variables that
+    can be used in CGI programms or template systems (eg. SSI):
+
+    SESSION
+        the session identifier itself. In the example above
+        "s9NNNd:doBAYNNNiaNQOtNNNNNM" is assigned. If the "UserAgent"
+        prevents session generation the name of the matching regular
+        expression is assigned, (see "ClickPathUAExceptions").
+
+    CGI_SESSION
+        the session prefix + the session identifier. In the example above
+        "/-S:s9NNNd:doBAYNNNiaNQOtNNNNNM" is assigned. If the "UserAgent"
+        prevents session generation "CGI_SESSION" is empty.
+
+    SESSION_START
+        the request time of the request starting a session in seconds since
+        1/1/1970.
+
+    CGI_SESSION_AGE
+        the session age in seconds, i.e. CURRENT_TIME - SESSION_START.
+
+    REMOTE_SESSION
+        in case a friendly session was caught this variable contains it, see
+        below.
+
+    REMOTE_SESSION_HOST
+        in case a friendly session was caught this variable contains the
+        host it belongs to, see below.
+
+    EXPIRED_SESSION
+        if a session has expired and a new one has been created the old
+        session is stored here.
+
+    INVALID_SESSION
+        when a "ClickPathMachineTable" is used a check is accomplished to
+        ensure the session was created by on of the machines of the cluster.
+        If it was not a message is written to the "ErrorLog", a new one is
+        created and the invalid session is written to this environment
+        variable.
+
+    ClickPathMachineName
+        when a "ClickPathMachineTable" is used this variable contains the
+        name of the machine where the session has been created.
+
+    ClickPathMachineStore
+        when a "ClickPathMachineTable" is used this variable contains the
+        address of the session store in terms of
+        "Apache2::ClickPath::Store".
+
+  The Output Filter
+    The output filter is entirely skipped if the translation handler had not
+    set the "CGI_SESSION" environment variable.
+
+    It prepends the session prefix and identifier to any "Location" an
+    "Refresh" output headers.
+
+    If the output "Content-Type" is "text/html" the body part is modified.
+    In this case the filter patches the following HTML tags:
+
+    <a ... href="LINK" ...>
+    <area ... href="LINK" ...>
+    <form ... action="LINK" ...>
+    <frame ... src="LINK" ...>
+    <iframe ... src="LINK" ...>
+    <meta ... http-equiv="refresh" ... content="N; URL=LINK" ...>
+        In all cases if "LINK" starts with a slash the current value of
+        "CGI_SESSION" is prepended. If "LINK" starts with "http://HOST/" (or
+        https:) where "HOST" matches the incoming "Host" header
+        "CGI_SESSION" is inserted right after "HOST". If "LINK" is relative
+        and the incoming request URI had contained a session then "LINK" is
+        left unmodified. Otherwize it is converted to a link starting with a
+        slash and "CGI_SESSION" is prepended.
+
+  Configuration Directives
+    All directives are valid only in *server config* or *virtual host*
+    contexts.
+
+    ClickPathSessionPrefix
+        specifies the session prefix without the leading slash.
+
+    ClickPathMaxSessionAge
+        if a session gets older than this value (in seconds) a new one is
+        created instead of continuing the old. Values of about a few hours
+        should be good, eg. 18000 = 5 h.
+
+    ClickPathMachine
+        set this machine's name. The name is used with load balancers. Each
+        machine of a farm is assigned a unique name. That makes session
+        identifiers unique across the farm.
+
+        If this directive is omitted a compressed form (6 Bytes) of the
+        server's IP address is used. Thus the session is unique across the
+        Internet.
+
+        In environments with only one server this directive can be given
+        without an argument. Then an empty name is used and the session is
+        unique on the server.
+
+        If possible use short or empty names. It saves bandwidth.
+
+        A name consists of letters, digits and underscores (_).
+
+        The generated session identifier contains the name in a slightly
+        scrambled form to slightly hide your infrastructure.
+
+    ClickPathMachineTable
+        this is a container directive like "<Location>" or "<Directory>". It
+        defines a 3-column table specifying the layout of your WEB-server
+        cluster. Each line consists of max. 3 fields. The 1st one is the IP
+        address or name the server is listening on. Second comes an optional
+        machine name in in terms of the "ClickPathMachine" directive. If it
+        is omitted each machine is assigned it's line number within the
+        table as name. This means that each machine in a cluster must run
+        with exactly the same table regarding the line order. The optional
+        3rd field specifies the address where the session store is
+        accessible (see Apache2::ClickPath::Store for more information.
+
+    ClickPathUAExceptions
+        this is a container directive like "<Location>" or "<Directory>".
+        The container content lines consist of a name and a regular
+        expression. For example
+
+         1   <ClickPathUAExceptions>
+         2     Google     Googlebot
+         3     MSN        (?i:msnbot)
+         4   </ClickPathUAExceptions>
+
+        Line 2 maps each "UserAgent" containing the word "Googlebot" to the
+        name "Google". Now if a request comes in with an "UserAgent" header
+        containing "Googlebot" no session is generated. Instead the
+        environment variable "SESSION" is set to "Google" and "CGI_SESSION"
+        is emtpy.
+
+    ClickPathUAExceptionsFile
+        this directive takes a filename as argument. The file's syntax and
+        semantic are the same as for "ClickPathUAExceptions". The file is
+        reread every time is has been changed avoiding server restarts after
+        configuration changes at the prize of memory consumption.
+
+    ClickPathFriendlySessions
+        this is also a container directive. It describes friendly sessions.
+        What is a friendly session? Well, suppose you have a WEB shop
+        running on "shop.tld.org" and your company site running on
+        "www.tld.org". The shop does it's own URL based session management
+        but there are links from the shop to the company site and back.
+        Wouldn't it be nice if a customer once he has stepped into the shop
+        could click links to the company without loosing the shopping
+        session? This is where friendly sessions come in.
+
+        Since your shop's session management is URL based the "Referer" seen
+        by "www.tld.org" will be something like
+
+         https://shop.tld.org/cgi-bin/shop.pl?session=sdafsgr;clusterid=25
+
+        (if session and clusterid are passed as CGI parameters) or
+
+         https://shop.tld.org/C:25/S:sdafsgr/cgi-bin/shop.pl
+
+        (if session and clusterid are passed as URL parts) or something
+        mixed.
+
+        Assuming that "clusterid" and "session" both identify the session on
+        "shop.tld.org" "Apache2::ClickPath" can extract them, encode them in
+        it's own session and place them in environment variables.
+
+        Each line in the "ClickPathFriendlySessions" section decribes one
+        friendly site. The line consists of the friendly hostname, a list of
+        URL parts or CGI parameters identifying the friendly session and an
+        optional short name for this friend, eg:
+
+         shop.tld.org uri(1) param(session) shop
+
+        This means sessions at "shop.tld.org" are identified by the
+        combination of 1st URL part after the leading slash (/) and a CGI
+        parameter named "session".
+
+        If now a request comes in with a "Referer" of
+        "http://shop.tld.org/25/bin/shop.pl?action=showbasket;session=213"
+        the "REMOTE_SESSION" environment variable will contain 2 lines:
+
+         25
+         session=213
+
+        Their order is determined by the order of "uri()" and "param()"
+        statements in the configuration section between the hostname and the
+        short name. The "REMOTE_SESSION_HOST" environment variable will
+        contain the host name the session belongs to.
+
+        Now a CGI script or a modperl handler or something similar can fetch
+        the environment and build links back to "shop.tld.org". Instead of
+        directly linking back to the shop your links then point to that
+        script. The script then puts out an appropriate redirect.
+
+    ClickPathFriendlySessionsFile
+        this directive takes a filename as argument. The file's syntax and
+        semantic are the same as for "ClickPathFriendlySessions". The file
+        is reread every time is has been changed avoiding server restarts
+        after configuration changes at the prize of memory consumption.
+
+    ClickPathSecret
+    ClickPathSecretIV
+        if you want to run something like a shop with our session
+        identifiers they must be unguessable. That means knowing a valid
+        session ID it must be difficult to guess another one. With these
+        directives a significant part of the session ID is encrypted with
+        Blowfish in the cipher block chaining mode thus making the session
+        ID unguessable. "ClickPathSecret" specifies the key,
+        "ClickPathSecretIV" the initialization vector.
+
+        "ClickPathSecretIV" is a simple string of arbitrary length. The
+        first 8 bytes of its MD5 digest are used as initialization vector.
+        If omitted the string "abcd1234" is the IV.
+
+        "ClickPathSecret" is given as "http:", "https:", "file:" or "data:"
+        URL. Thus the secret can be stored directly as data-URL in the
+        httpd.conf or in a separate file on the local disk or on a possibly
+        secured server. To enable all modes of accessing the WEB the
+        http(s)-URL syntax is a bit extented. Maybe you have already used
+        "http://user:password@server.tld/...". Many browsers allow this
+        syntax to specify a username and password for HTTP authentication.
+        But how about proxies, SSL-authentication etc? Well, add another
+        colon (:) after the password and append a semicolon (;) delimited
+        list of "key=value" pairs. The special characters (@:;\) can be
+        quoted with a backslash (\). In fact, all characters can be quoted.
+        Thus, "\a" and "a" produce the same string "a".
+
+        The following keys are defined:
+
+        https_proxy
+        https_proxy_username
+        https_proxy_password
+        https_version
+        https_cert_file
+        https_key_file
+        https_ca_file
+        https_ca_dir
+        https_pkcs12_file
+        https_pkcs12_password
+          their meaning is defined in Crypt::SSLeay.
+
+        http_proxy
+        http_proxy_username
+        http_proxy_password
+          these are passed to LWP::UserAgent.
+
+          Remember a HTTP-proxy is accessed with the GET or POST, ...
+          methods whereas a HTTPS-proxy is accessed with CONNECT. Don't mix
+          them, see Crypt::SSLeay.
+
+        Examples
+
+         ClickPathSecret https://john:a\@b\;c\::https_ca_file=/my/ca.pem@secrethost.tld/bin/secret.pl?host=me
+
+        fetches the secret from
+        "https://secrethost.tdl/bin/secret.pl?host=me" using "john" as
+        username and "a@b;c:" as password. The server certificate of
+        secrethost.tld is verified against the CA certificate found in
+        "/my/ca.pem".
+
+         ClickPathSecret https://::https_pkcs12_file=/my/john.p12;https_pkcs12_password=a\@b\;c\:;https_ca_file=/my/ca.pem@secrethost.tld/bin/secret.pl?host=me
+
+        fetches the secret again from
+        "https://secrethost.tdl/bin/secret.pl?host=me" using "/my/john.p12"
+        as client certificate with "a@b;c:" as password. The server
+        certificate of secrethost.tld is again verified against the CA
+        certificate found in "/my/ca.pem".
+
+         ClickPathSecret data:,password:very%20secret%20password
+
+        here a data-URL is used that produces the content "password:very
+        secret password".
+
+        The URL's content is fetched by LWP::UserAgent once at server
+        startup.
+
+        Its content defines the secret either in binary form or as string of
+        hexadecimal characters or as a password. If it starts with "binary:"
+        the rest of the content is taken as is as the key. If it starts with
+        "hex:" "pack( 'H*', $arg )" is used to convert it to binary. If it
+        starts with "password:" or with neither of them the MD5 digest of
+        the rest of the content is used as secret.
+
+        The Blowfish algorithm allows up to 56 bytes as secret. In hex and
+        binary mode the starting 56 bytes are used. You can specify more
+        bytes but they won't be regarded. In password mode the MD5 algorithm
+        produces 16 bytes long secret.
+
+  Working with a load balancer
+    Most load balancers are able to map a request to a particular machine
+    based on a part of the request URI. They look for a prefix followed by a
+    given number of characters or until a suffix is found. The string
+    between identifies the machine to route the request to.
+
+    The name set with "ClickPathMachine" can be used by a load balancer. It
+    is immediately following the session prefix and finished by a single
+    colon. The default name is always 6 bytes long.
+
+  Logging
+    The most important part of user tracking and clickstreams is logging.
+    With "Apache2::ClickPath" many request URIs contain an initial session
+    part. Thus, for logfile analyzers most requests are unique which leads
+    to useless results. Normally Apache's common logfile format starts with
+
+     %h %l %u %t \"%r\"
+
+    %r stands for *the request*. It is the first line a browser sends to a
+    server. For use with "Apache2::ClickPath" %r is better changed to "%m
+    %U%q %H". Since "Apache2::ClickPath" strips the session part from the
+    current URI %U appears without the session. With this modification
+    logfile analyzers will produce meaningful results again.
+
+    The session can be logged as "%{SESSION}e" at end of a logfile line.
+
+  A word about proxies
+    Depending on your content and your users community HTTP proxies can
+    serve a significant part of your traffic. With "Apache2::ClickPath"
+    almost all request have to be served by your server.
+
+  Debugging
+    Sometimes it is useful to know the information encoded in a session
+    identifier. This is why Apache2::ClickPath::Decode exists.
+
+SEE ALSO
+    Apache2::ClickPath::Store Apache2::ClickPath::StoreClient
+    Apache2::ClickPath::Decode <http://perl.apache.org>,
+    <http://httpd.apache.org>
+
+AUTHOR
+    Torsten Foertsch, <torsten.foertsch@gmx.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004-2005 by Torsten Foertsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+INSTALLATION
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DEPENDENCIES
+    mod_perl 1.999022 (aka 2.0.0-RC5), perl 5.8.0
+

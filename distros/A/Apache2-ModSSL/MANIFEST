@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+ModSSL.xs
+README
+mk_README.sh
+lib/Apache2/ModSSL.pm
+t/TestSSL/is_https.pm
+t/TestSSL/lookup.pm
+t/1is_https.t
+t/2lookup.t
+t/TEST.PL
+t/conf/extra.conf.in
+t/conf/localhost.cert
+perl-Apache2-ModSSL.spec
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                AnyEvent-EditText
+version:             0.2
+abstract:            An easy way to startup a text editor
+license:             perl
+author:              
+    - Robin Redeker <elmex@ta-sa.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    AnyEvent:                      0
+    File::Temp:                    0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

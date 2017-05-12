@@ -1,0 +1,144 @@
+#!/usr/bin/perl -w -CSD
+
+
+=head1 NAME
+
+alvis-nlp-standalone - Perl script for linguistically annotating a corpus contained in a file
+
+=head1 SYNOPSIS
+
+alvis-nlp-standalone [options] < Input_document > Annotated_Output_Document
+
+=head1 OPTIONS
+
+=over 4
+
+=item    B<--help>            brief help message
+
+=item    B<--man>             full documentation
+
+=item    B<--rcfile=file>     read the given configuration file
+
+=back
+
+=head1 DESCRIPTION
+
+This script linguistically annotates the document given in the
+standard input. The annotated document is sent to the standard
+output.
+
+The linguistic annotation depends on the configuration variables and
+dependencies between annotation levels.
+
+=head1 SEE ALSO
+
+Alvis web site: http://www.alvis.info
+
+=head1 AUTHORS
+
+Thierry Hamon <thierry.hamon@lipn.univ-paris13.fr> and Julien Deriviere <julien.deriviere@lipn.univ-paris13.fr>
+
+=head1 LICENSE
+
+Copyright (C) 2005 by Thierry Hamon and Julien Deriviere
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+
+use strict;
+
+use Alvis::NLPPlatform;
+
+use Getopt::Long;
+use Pod::Usage;
+use Config::General;
+# use Data::Dumper;
+
+use Sys::Hostname;
+
+# Process Option
+
+my $man = 0;
+my $help = 0;
+my $rcfile = "";
+
+
+
+GetOptions('help|?' => \$help, man => \$man, "rcfile=s" => \$rcfile) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+if (($rcfile eq "") || (!(-f $rcfile))) {
+    pod2usage(1);
+    warn "No such config file or config file is not set\n";
+} 
+
+
+my %config = Alvis::NLPPlatform::load_config($rcfile);
+
+
+
+# print STDERR Dumper(%config);
+
+# document loading
+
+my $line;
+my $doc_xml = "";
+
+
+if ($#ARGV == -1) {
+    while($line=<STDIN>) {
+	$doc_xml .= $line;
+    }
+} else {
+    warn $ARGV[$#ARGV] . "\n";
+
+    if ( -f $ARGV[$#ARGV] ) {
+	open INPUTFILE, $ARGV[$#ARGV] or die "No such file or directory\n";
+	while($line=<INPUTFILE>) {
+	    $doc_xml .= $line;
+	}
+	close INPUTFILE;
+    } else {
+	die "No such file or dorectory\n";
+    }
+}
+
+# my @tab_docs_xml = Alvis::NLPPlatform::split_to_docRecs($doc_xml);
+
+# Alvis::NLPPlatform::Annotation::print_documentCollectionHeader(\*STDOUT);
+
+my $i;
+my $render_time;
+# my $stdout_cur_pos;
+# my $stdout_start_pos;
+my @cur_doc;
+my $j;
+my $tmpfile;
+my $HOSTNAME=hostname;
+       
+
+# for($i = 0; $i<scalar(@tab_docs_xml); $i++) {
+#     $tmpfile = $config{'ALVISTMP'} . "/$HOSTNAME.$$.outfile";
+#     open FILETMP_OUT, ">$tmpfile";
+#     $render_time = Alvis::NLPPlatform::standalone_main(\%config, ${$tab_docs_xml[$i]}[1], \*FILETMP_OUT, 0);
+#     close(FILETMP_OUT);
+
+#     open FILETMP_OUT, "$tmpfile" or die "No such file or directory\n";
+#     @cur_doc = <FILETMP_OUT>;
+#     $j = 0;
+#     while(($j< scalar @cur_doc) && ($cur_doc[$j] !~ s/\@RENDER_TIME_NOT_SET\@/$render_time/)) {
+# 	$j++;
+#     }
+#     close(FILETMP_OUT);
+#     unlink $tmpfile;
+#     print @cur_doc;
+    Alvis::NLPPlatform::standalone(\%config, $HOSTNAME, $doc_xml);
+# }
+
+# Alvis::NLPPlatform::Annotation::print_documentCollectionFooter(\*STDOUT);
+
+

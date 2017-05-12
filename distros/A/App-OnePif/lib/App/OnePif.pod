@@ -1,0 +1,153 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+App::OnePif - Read 1Password Interchange Format exports
+
+=head1 VERSION
+
+This document describes App::OnePif version 0.002.
+
+=head1 SYNOPSIS
+
+   use App::OnePif;
+   App::OnePif->run(@ARGV);
+
+=head1 DESCRIPTION
+
+This module implements an application to allow you to read 1Password
+Interchange Format exports interactively and get info out of them.
+
+Before you go on, remember that C<1pif> export directories are
+I<unencrypted>. This means that they are I<not secure>. Look in section
+L</SEE ALSO> for some projects that work directly on the encrypted
+database.
+
+Unless you want to fiddle with the module itself, you are probably
+interested into program C<1pif>.
+
+=head1 METHODS
+
+All C<do_*> methods are actually tied to commands available in the
+interactive shell. There are also some aliases set in L</run_interactive>.
+
+=head2 DEFAULT_records
+
+Automatically read records if they are not already loaded.
+
+=head2 DEFAULT_types
+
+Automatically desume record types from loaded recrods.
+
+=head2 attachments_for
+
+Get list of attachments for a record.
+
+=head2 clear_records
+
+Remove all records and autoloaded stuff (e.g. types).
+
+=head2 clipped_records_bytype
+
+Get a slice of available records, by type.
+
+=head2 do_exit
+
+Implementation of command C<exit> in the interactive shell.
+
+=head2 do_file
+
+Implementation of command C<file> in the interactive shell.
+
+=head2 do_help
+
+Implementation of command C<help> in the interactive shell.
+
+=head2 do_list
+
+Implementation of command C<list> in the interactive shell.
+
+=head2 do_print
+
+Implementation of command C<print> in the interactive shell.
+
+=head2 do_quit
+
+Implementation of command C<quit> in the interactive shell.
+
+=head2 do_search
+
+Implementation of command C<search> in the interactive shell.
+
+=head2 do_type
+
+Implementation of command C<type> in the interactive shell.
+
+=head2 do_types
+
+Implementation of command C<types> in the interactive shell.
+
+=head2 print
+
+Wrapper for printing out stuff in the interactive shell.
+
+=head2 real_type
+
+Get name of the I<main> type (resolving aliases if needed).
+
+=head2 run
+
+   App::OnePif->run(@ARGV);
+
+Class method that eventually calls L</run_interactive> (hence,
+it does not return).
+
+=head2 run_interactive
+
+Run the interactive shell. Does not return.
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs either through RT or GitHub (patches welcome).
+
+
+=head1 SEE ALSO
+
+On GitHub you can find a few projects for dealing directly with the
+original, I<encrypted> version of the 1Password database. For example, you
+might want to check out the following projects:
+
+=over
+
+=item *
+
+L<https://github.com/georgebrock/1pass>
+
+=item *
+
+L<https://github.com/oggy/1pass>
+
+=item *
+
+L<https://github.com/robertknight/passcards>
+
+=back
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

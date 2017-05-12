@@ -1,0 +1,38 @@
+App::PerlCalc (1.2.0)
+
+  * Add Binary output when the integer fits in 16 bits.
+  * Small comment and documentation changes.
+
+ -- David Caldwell <david@porkrind.org>  Thu, 30 May 2013 02:07:57 -0700
+
+App::PerlCalc (1.1.1)
+
+  * Need at least perl 5.8.0 so I can use parens in pack().
+
+ -- David Caldwell <david@porkrind.org>  Tue, 17 Nov 2009 10:27:11 -0800
+
+App::PerlCalc (1.1.0)
+
+  * Handle bigint failing better.
+  * Revamp power of 2 input and output support.
+
+ -- David Caldwell <david@porkrind.org>  Mon, 16 Nov 2009 14:07:33 -0800
+
+App::PerlCalc (1.0.2)
+
+  * Fix test trying to run pc from the PATH instead of the local copy.
+
+ -- David Caldwell <david@porkrind.org>  Thu, 12 Nov 2009 13:43:23 -0800
+
+App::PerlCalc (1.0.1)
+
+  * Fix some perldoc mistakes.
+  * Add a README.
+
+ -- David Caldwell <david@porkrind.org>  Thu, 12 Nov 2009 04:35:03 -0800
+
+App::PerlCalc (1.0.0)
+
+  * Initial CPAN release.
+
+ -- David Caldwell <david@porkrind.org>  Wed, 11 Nov 2009 15:07:28 -0800

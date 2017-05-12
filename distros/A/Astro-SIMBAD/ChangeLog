@@ -1,0 +1,51 @@
+2005-06-08 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Released as version 2.0.0
+
+2005-05-19  Mark Echeverri <mechever@ipac.caltech.edu>
+
+	* Query/Query.pm: Added object query; refactored the module
+
+	* Result/Object/Object.pm: Added new fields for object query
+	
+	* Bumped version number to 1.10.0
+
+
+2003-07-15  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * SIMBAD.pm: Mindor documeation tweak to bring the module into
+          line with the rest of my modules, and to get round a doc bug
+          in search.cpan.org
+          
+        * t/query.t: Fixed broken test case.  
+
+        * Fixed MANIFEST problem released as v1.9.5
+                  
+2002-05-30  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * t/query.t: Applied bug fix patch file for test harness
+          supplied by Sinan Kaan Yerli <sinan@sinan.physics.metu.edu.tr>
+
+2002-05-29  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Modification for special case RA and Dec 
+          returned by SIMBAD for large objects.
+          
+2001-12-03  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Added conditional test to see if $base_url is
+          defined before setting it in the method. Bug fix; added URL,
+          Timeout and Proxy to list of functions called by constructor.
+          Minor bugfix to URL extraction from query results.
+          
+2001-11-28 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Result.pm: listofobjects() method added
+        
+2001-11-27 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Inital release, minimal functionality
+
+2001-11-12 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Original version

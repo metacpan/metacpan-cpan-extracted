@@ -1,0 +1,29 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H4>Value Structure</H4>
+
+ARValueStruct is just converted to the associated perl type, with the 
+following exceptions: <P>
+
+<DL>
+<DT><B> Keyword </B><DD>
+  Keywords are denoted by a string surrounded by nulls.  For example,
+  $TIMESTAMP$ is converted to the perl string "\0timestamp\0".  C doesn't
+  allow nulls in strings so this doesn't introduce any ambiguity.
+<DT><B> Byte lists </B><DD>
+  Byte lists are translated into a <A HREF="ds_bytelist_hash.html">Byte List Hash</A>.
+<DT><B> Diary String </B><DD>
+  A Diary string is translated into a <A HREF="ds_diaryentry_hash.html">Diary Hash</A>.
+<DT><B> Coordinate List </B><DD>
+  A Coordinate List is translated into a <A HREF="ds_coord_hash.html">Coord Hash</A>.
+</DL>
+
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

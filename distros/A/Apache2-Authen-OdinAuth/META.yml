@@ -1,0 +1,34 @@
+---
+abstract: 'A cookie-based single sign-on system for Apache'
+author:
+  - 'Maciej Pasternacki <maciej@pasternacki.net>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache2-Authen-OdinAuth
+provides:
+  Apache2::Authen::OdinAuth:
+    file: lib/Apache2/Authen/OdinAuth.pm
+    version: '0.8'
+  Crypt::OdinAuth:
+    file: lib/Crypt/OdinAuth.pm
+    version: v0.2.1
+requires:
+  Digest::HMAC: '0'
+  Digest::SHA256: '0'
+  MIME::Base64: '3.13'
+  YAML::XS: '0'
+  perl: '5.006'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.8'

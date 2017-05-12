@@ -1,0 +1,67 @@
+This is the README file for "Alias", the Perl module
+that performs aliasing services.
+
+This is Version 2.32.
+
+Perl Version 5.003 or later is required, and you need to be
+on a system supported by MakeMaker (which comes with perl) and
+a C compiler.
+
+You may find this module useful if you:
+
+   * are tired of dereferencing hash-based object attributes
+
+   * wish perl could make-do with fewer $, -> and {} things 
+
+   * are a little scared of using typeglobs
+
+   * want the freedom to put what you want, when you want in
+     the symbol table without having to deal with wierd syntax
+
+   * need to use scalar constants in your program since you don't
+     trust yourself from changing $PI 
+
+Most notably, there is an C<attr> function that installs a whole 
+hash on the symbol table with implicit localization. This allows 
+you to access object attributes without having to deref the object 
+everytime, as in most other OO languages.
+
+The other functions are just convenient wrappers for "obscure" perl
+functionality.
+
+The C<attr> functionality may belong in the perl core, but I am
+making it available as part of this module for folks to see what
+it "feels like" to have it first.
+
+It would be interesting to benchmark how much less/more efficient 
+C<attr> is when compared to regular hash access of object 
+attributes under various degrees of use.
+
+Comments are always very welcome.
+
+ - Sarathy.
+   gsar@umich.edu
+
+-------------------
+INSTALL
+
+Installation is via the standard mantra.
+The distribution assumes you have dynamic linking available. Type
+
+      perl Makefile.PL
+      make
+      make test
+
+If the tests pass, you can type
+
+      make install
+
+to install the module.
+
+Look for newer versions of this module on CPAN.  The master site for
+CPAN currently is:
+
+   ftp://ftp.funet.fi/pub/languages/perl/CPAN
+
+There may be many others closer to your location.
+

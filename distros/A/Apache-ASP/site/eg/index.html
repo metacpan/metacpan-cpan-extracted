@@ -1,0 +1,66 @@
+#!/usr/bin/perl /usr/bin/asp-perl
+
+<%
+# split the page in 2 for nice formatting and english style sorting
+my(@col1, @col2);
+my @keys = sort keys %EG;
+@keys || die("\%EG is not defined, make sure you copied ./eg/global.asa correctly");
+my $half = int(@keys/2) + 1;
+
+for(my $i =0; $i <= $#keys; $i++) {
+	if($i < $half) {
+		push(@col1, $keys[$i]);
+	} else {
+		push(@col2, $keys[$i]);
+	}
+} 
+$Response->Debug('col1', \@col1, 'col2', \@col2);
+$title = 'Example ASP Scripts';
+%>
+
+<!--#include file=header.inc-->
+
+<table border=0>
+<% while(@col1) { 
+	my $col1 = shift @col1;
+	my $col2 = shift @col2;
+	%>
+	<tr>
+	<% for([$col1, $EG{$col1}], '', [$col2, $EG{$col2}]) { 
+		unless(ref $_) { 
+			print "<td width=10>&nbsp;</td>";
+			next;
+		} 
+		next unless $_->[0]; # last col / last row
+
+		# clean up the descriptions
+		$_->[1] =~ s/\s*\.\s*$//s;
+		$_->[1] .= '.';
+
+		%>
+		<td valign=top>
+			<nobr>
+			<font>
+				<b>
+				<a href=<%=$_->[0]%>><%=$_->[0]%></a>
+				<% if($_->[0] =~ /\.(htm|asp|ssi|xml)$/) { %>
+					&nbsp
+					<i>
+					(<a href=source.asp?file=<%=$_->[0]%>>source</a>)
+					</i>
+				<% } %>
+				</b>
+			</font>
+			</nobr>
+			<br>
+			<font size=-1><%=$_->[1]%></font>			
+		</td> 
+	<% } %>
+	</tr>
+<% } %>
+</table>
+
+<!--#include file=footer.inc-->
+
+
+	

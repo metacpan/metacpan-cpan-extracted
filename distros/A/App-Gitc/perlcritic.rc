@@ -1,0 +1,6 @@
+[-Subroutines::ProhibitExplicitReturnUndef]
+[-Subroutines::ProhibitSubroutinePrototypes]
+[-InputOutput::ProhibitInteractiveTest]
+
+# PkgVersion and use strict check are not compatible
+[-TestingAndDebugging::RequireUseStrict]

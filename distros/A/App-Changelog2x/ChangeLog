@@ -1,0 +1,41 @@
+                  Perl Module App::Changelog2x Change History               
+
+		This is sample Perl application that uses       
+		XML::LibXML and XML::LibXSLT to process files   
+		from ChangeLogML to a variety of text-based and 
+		XHTML-based layouts.                            
+
+0.11	Monday August 10, 2009, 10:10:00 AM -0700
+
+	Transaction revision: 18
+	* bin/changelog2x
+	* lib/App/Changelog2x.pm
+	Added warnings pragma.                                          
+
+	Transaction revision: 19
+	* bin/changelog2x
+	* lib/App/Changelog2x.pm
+	Documentation clean-up and better specification of the required 
+	Perl version.                                                   
+
+0.10	Thursday January 22, 2009, 01:16:00 AM -0800
+
+	Transaction revision: 10
+	* Build.PL (added)
+	* MANIFEST.SKIP (added)
+	* bin/changelog2x (added)
+	* ex/README (added)
+	* lib/App/Changelog2x.pm (added)
+	* t/00_load.t (added)
+	* t/01_pod.t (added)
+	* t/02_pod_coverage.t (added)
+	Initial release. All basic functionality for the changelog2x    
+	script and the App::Changelog2x module done.                    
+
+# Generated on Monday August 10, 2009, 10:07:24 AM -0700
+# Using changelog2x/0.11, App::Changelog2x/0.11, XML::LibXML/1.69,             
+# XML::LibXSLT/1.68, libxml/2.6.32, libxslt/1.1.24 (with exslt)                
+# XSLT sources:
+#     $Id: changelog2text.xslt 8 2009-01-19 06:46:50Z rjray $
+#     $Id: common-text.xslt 8 2009-01-19 06:46:50Z rjray $
+#     $Id: common.xslt 4 2009-01-07 13:02:06Z rjray $

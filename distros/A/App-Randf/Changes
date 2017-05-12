@@ -1,0 +1,7 @@
+Revision history for Perl extension App::Randf
+
+0.02    Wed Sep  9 09:29:07 JST 2015
+        - support rcfile(.randfrc)
+
+0.01    Fri Aug 28 15:42:6 JST 2015
+        - original version

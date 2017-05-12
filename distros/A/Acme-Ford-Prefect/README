@@ -1,0 +1,44 @@
+NAME
+    Acme::Ford::Prefect - Test Module for Alien::Base
+
+SYNOPSIS
+     use strict;
+     use warnings;
+     use Acme::Ford::Prefect;
+     use Test::More tests => 1;
+
+     is Acme::Ford::Prefect::answer(), 42;
+     # if 42 is returned then Acme::Alien::DontPanic
+     # properly provided the C library
+
+DESCRIPTION
+    Alien::Base comprises base classes to help in the construction of
+    "Alien::" modules. Modules in the Alien namespace are used to locate and
+    install (if necessary) external libraries needed by other Perl modules.
+
+    This module is a toy module to test the efficacy of the Alien::Base
+    system. This module depends on another toy module
+    Acme::Alien::DontPanic, which provides the needed the libdontpanic
+    library to be able to tell us the "answer".
+
+SEE ALSO
+    *   Alien::Base
+
+    *   Alien
+
+    *   Acme::Alien::DontPanic
+
+SOURCE REPOSITORY
+    <http://github.com/Perl5-Alien/Alien-Base-Extras>
+
+AUTHOR
+    Original author: Joel Berger, <joel.a.berger@gmail.com>
+
+    Current maintainer: Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012 by Joel Berger
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

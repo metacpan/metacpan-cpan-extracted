@@ -1,0 +1,13 @@
+name: Apache-Session-SQLite3
+version: 0.03
+abstract: Use DBD::SQLite 1.x for Apache::Session storage
+author: Autrijus Tang <autrijus@autrijus.org>
+license: perl
+distribution_type: module
+requires:
+  DBD::SQLite: 1.00
+  Apache::Session: 0.15
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

@@ -1,0 +1,11 @@
+libapp-rabbittail-perl (0.000-02-1) unstable; urgency=low
+
+  * Update package names for released version of RabbitFoot
+
+ -- Tomas Doran <t0m@state51.co.uk>  Wed, 10 Mar 2010 17:31:15 +0000
+
+libapp-rabbittail-perl (0.000-01-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Tomas Doran <t0m@state51.co.uk>  Tue, 02 Mar 2010 15:25:33 +0000

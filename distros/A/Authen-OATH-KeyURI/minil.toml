@@ -1,0 +1,4 @@
+name = "Authen-OATH-KeyURI"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

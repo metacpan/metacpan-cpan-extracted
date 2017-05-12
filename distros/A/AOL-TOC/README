@@ -1,0 +1,10 @@
+This is a perl module to integrate with AOL's TOC protocol for instant
+messaging. I found this a while ago on www.foo.org/~james/, which appears to
+have gone awol. As far as I know, there isn't anywhere else to get it, so
+I'm cleaning it up for CPAN and including it here. 
+
+The original author is james@foo.org, and his README file is included as
+README.old
+
+Joshua Harding
+xjharding@newbedford.k12.ma.us

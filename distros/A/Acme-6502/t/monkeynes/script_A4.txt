@@ -1,0 +1,33 @@
+clear
+power on
+regs
+
+# Normal condition ------------
+
+memset 0072 55
+op a4 72
+
+# Should be: IY=55
+test iy = 55
+
+# Zero condition ------------
+power on
+
+memset 0072 00
+op a4 72
+
+# Should be: IY=0, Z=1
+test iy = 0
+test z = 1
+
+# Negative condition ------------
+power on
+
+memset 0072 f2
+op a4 72
+
+# Should be: IY=F2, S=1
+test iy = f2
+test s = 1
+
+save verify_A4.txt

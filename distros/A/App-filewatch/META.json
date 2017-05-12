@@ -1,0 +1,60 @@
+{
+   "abstract" : "Watch files and directories for changes",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-filewatch",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::Loop" : "0",
+            "File::TypeCategories" : "0",
+            "Linux::Inotify2" : "0",
+            "Path::Tiny" : "0",
+            "perl" : "5.008",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::filewatch" : {
+         "file" : "lib/App/filewatch.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::filewatch"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/ivanwills/App-filewatch.git"
+      }
+   },
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

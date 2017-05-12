@@ -1,0 +1,23 @@
+Revision history for Perl module Win32::MSI::HighLevel
+
+1.000 Sat Oct 18 16:49:30 2008
+    - original version; created by ExtUtils::ModuleMaker 0.49
+
+1.002 Sun Oct 19 12:10:02 2008
+    - Fix manifest
+
+1.003 Thu Oct 23 08:20:23 2008
+    - Changed module name from AI::PSO::OO to AI::ParticleSwarmOptimization
+      on suggestion of PAUSE admins
+
+1.004
+    - call srand in init if -seedRand value was provided
+    - added plateau early exit code contributed by Kevin Balbi
+
+1.005
+    - Remove POD test files from distribution
+    - Remove bogus print left over from dev testing
+    - Fix possible undef warning
+
+1.006
+    - Fix Makefile.pl / Makefile.PL issue that caused *nix installs to fail!

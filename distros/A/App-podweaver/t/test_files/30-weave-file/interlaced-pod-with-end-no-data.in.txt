@@ -1,0 +1,46 @@
+package App::podweaver::TestPackage;
+
+# ABSTRACT: a test package for App::podweaver.
+
+=head1 NAME
+
+App::podweaver::TestPackage - a test package for App::podweaver.
+
+=head1 SYNOPSIS
+
+This is a packge to do some testing for App:podweaver, it doesn't
+actually do anything beyond act as a placeholder for some code
+stubs and some Pod in various layouts.
+
+=head1 FUNCTIONS
+
+=over
+
+=cut
+
+our $VERSION = '1.00';
+
+=item B<< a_function() >>
+
+This is a function.
+
+=cut
+
+sub a_function
+{
+    return( 1 );
+}
+
+=back
+
+=cut
+
+1;
+
+__END__
+
+=head1 AUTHOR
+
+Sam Graham
+
+=cut

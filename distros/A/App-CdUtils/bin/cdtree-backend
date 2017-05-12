@@ -1,0 +1,248 @@
+#!perl
+
+our $DATE = '2016-10-28'; # DATE
+our $VERSION = '0.005'; # VERSION
+
+#IFUNBUILT
+# use strict;
+# use warnings;
+#END IFUNBUILT
+
+use Cwd qw(cwd);
+
+our $DEBUG = $ENV{DEBUG};
+
+
+if (@ARGV != 1) { print ".\n"; exit }
+
+my $cwd = cwd;
+
+sub _search {
+    my ($wanted, $dir, $direlems, $search_siblings) = @_;
+    #warn "-> _search($wanted, $dir, [".join(",",@$direlems)."])\n" if $DEBUG;
+
+    if (-d $wanted) {
+        warn "cdtree: Found       $dir/$wanted\n" if $DEBUG;
+        return "$dir/$wanted";
+    }
+    opendir my($dh), "." or do {
+        warn "cdtree: Can't readdir($dir): $!, skipped\n" if $DEBUG;
+        return;
+    };
+
+    #warn "cdtree: Searching descendants\n" if $DEBUG;
+    for my $entry (sort readdir $dh) {
+        next if $entry eq '.' || $entry eq '..';
+        next unless (-d $entry) && !(-l $entry);
+        chdir $entry or do {
+            warn "cdtree: Can't chdir to $dir/$entry: $!, skipped\n" if $DEBUG;
+            next;
+        };
+        warn "cdtree: Looking in $dir/$entry\n" if $DEBUG;
+        my $found = _search($wanted, "$dir/$entry", [@$direlems, $entry]);
+        chdir ".." or die "cdtree: ERROR: Can't chdir back to $dir: $!\n";
+        return $found if $found;
+    }
+
+    if ($search_siblings) {
+        #warn "cdtree: Searching siblings\n" if $DEBUG;
+        my %exclude;
+        for (2..@$direlems-1) {
+            $exclude{ join("/", @{$direlems}[0..$_]) }++;
+        }
+        while (@$direlems > 1) {
+            pop @$direlems;
+            chdir ".." or die "cdtree: ERROR: Can't chdir ..: $!\n";
+            $dir = join("/", @$direlems);
+            opendir my($dh), "." or do {
+                warn "cdtree: Can't readdir($dir): $!, skipped\n" if $DEBUG;
+                next;
+            };
+            for my $entry (sort readdir $dh) {
+                next if $entry eq '.' || $entry eq '..';
+                next unless (-d $entry) && !(-l $entry);
+                next if $exclude{"$dir/$entry"};
+                chdir $entry or do {
+                    warn "cdtree: Can't chdir to $dir/$entry: $!, skipped\n" if $DEBUG;
+                    next;
+                };
+                warn "cdtree: Looking in $dir/$entry\n" if $DEBUG;
+                my $found = _search($wanted, "$dir/$entry", [@$direlems, $entry]);
+                chdir ".." or die "cdtree: ERROR: Can't chdir back to $dir: $!\n";
+                return $found if $found;
+            }
+        }
+    }
+
+    undef;
+}
+
+my $found = _search($ARGV[0], $cwd, [split m!/+!, $cwd], 1);
+
+if ($found) {
+    print "$found\n";
+} else {
+    warn "cdtree: Can't find any match, giving up\n" if $DEBUG;
+    print ".\n";
+}
+
+# ABSTRACT: Search tree for your directory
+# PODNAME: cdtree-backend
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cdtree-backend - Search tree for your directory
+
+=head1 VERSION
+
+This document describes version 0.005 of cdtree-backend (from Perl distribution App-CdUtils), released on 2016-10-28.
+
+=head1 SYNOPSIS
+
+To use in shell:
+
+ % cdtree() { cd `cdtree-backend "$1"`; }
+
+Take a look at this example filesystem layout:
+
+ media/
+   mv/
+     en/
+       a/
+         acdc/
+         ...
+       b/
+         bruno-mars/
+         ...
+       c/
+         carly-rae-japsen/
+         celine-dion/
+         charlie-puth/
+         ...
+       d/
+         demi-lovato/
+         dido/
+         ...
+     fr/
+       a/
+       b/
+       c/
+         celine-dion/
+         christophe-willem/
+         ...
+     it/
+     ...
+   music/
+     en/
+       a/
+       b/
+       c/
+         celine-dion/
+         ...
+     fr/
+       a/
+       b/
+       c/
+         celine-dion/
+         ...
+       ...
+     ...
+  ...
+
+Searching descendants, depth-first:
+
+ % cd /media/mv
+ % DEBUG=1 cdtree celine-dion
+ cdtree: Looking in /media/mv/en
+ cdtree: Looking in /media/mv/en/a
+ cdtree: Looking in /media/mv/en/a/acdc
+ ...
+ cdtree: Looking in /media/mv/en/b
+ cdtree: Looking in /media/mv/en/b/bruno-mars
+ ...
+ cdtree: Looking in /media/mv/en/c
+ cdtree: Found      /media/mv/en/c/celine-dion
+
+Searching siblings:
+
+ % cd /media/mv/en/c/celine-dion
+ % DEBUG=1 cdtree charlie-puth
+ cdtree: Looking in /media/mv/en/c
+ cdtree: Found      /media/mv/en/c/charlie-puth
+
+Searching parent's siblings:
+
+ % cd /media/mv/en/c/celine-dion
+ % DEBUG=1 cdtree evanescence
+ cdtree: Looking in /media/mv/en/c
+ cdtree: Looking in /media/mv/en/c/carly-rae-japsen
+ cdtree: Looking in /media/mv/en/c/charlie-puth
+ ...
+ cdtree: Looking in /media/mv/en/a
+ cdtree: Looking in /media/mv/en/acdc
+ ...
+ cdtree: Looking in /media/mv/en/b
+ cdtree: Looking in /media/mv/en/bruno-mars
+ ...
+ cdtree: Looking in /media/mv/en/d
+ cdtree: Looking in /media/mv/en/d/demi-lovato
+ cdtree: Looking in /media/mv/en/d/dido
+ ...
+ cdtree: Looking in /media/mv/en/e
+ cdtree: Found      /media/mv/en/e/evanescence
+
+=head1 DESCRIPTION
+
+B<cdtree> is a command to change directory by searching your argument in
+descendants (depth-first), then siblings (depth-first), then parent's siblings
+(depth-first), and so on until it tries the root's siblings. It stops after it
+finds the directory. It can take a while(!) but it's convenient.
+
+=head1 ENVIRONMENT
+
+=head2 DEBUG => bool
+
+If set to true, will print the directories as they are tried.
+
+=head1 TODO
+
+Timeouts/limits: number of seconds, number of directories searched.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CdUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CdUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CdUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<cdpart-backend>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

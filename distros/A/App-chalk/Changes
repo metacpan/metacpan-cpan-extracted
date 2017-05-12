@@ -1,0 +1,26 @@
+Revision history for App-chalk
+
+0.04    2015-07-22 (PERLANCAR)
+
+	- Observe envs COLOR & FORCE_COLOR (like in node's version).
+
+
+0.03    2015-07-22 (PERLANCAR)
+
+        - No functional changes.
+
+        - Add benchmark script.
+
+
+0.02    2015-07-21 (PERLANCAR)
+
+        - [Bugfix] Need to reset color before newline.
+
+        - [Bugfix] [dist] Remove unnecessary prereq to perl 5.010.
+
+        - [doc] Remove unnecessary example.
+
+
+0.01    2015-07-21 (PERLANCAR)
+
+        - First release.

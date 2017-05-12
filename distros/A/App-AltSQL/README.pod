@@ -1,0 +1,43 @@
+=encoding utf-8
+
+=head1 NAME
+
+App::AltSQL - A drop in replacement to the MySQL prompt with a pluggable Perl interface
+
+=head1 SYNOPSIS
+
+  ./altsql -h <host> -u <username> -D <database> -p<password>
+
+  altsql> select * from film limit 4;
+  ╒═════════╤══════════════════╤════════════════════════════
+  │ film_id │ title            │ description                
+  ╞═════════╪══════════════════╪════════════════════════════
+  │       1 │ ACADEMY DINOSAUR │ A Epic Drama of a Feminist 
+  │       2 │ ACE GOLDFINGER   │ A Astounding Epistle of a D
+  │       3 │ ADAPTATION HOLES │ A Astounding Reflection of 
+  │       4 │ AFFAIR PREJUDICE │ A Fanciful Documentary of a
+  ╘═════════╧══════════════════╧════════════════════════════
+  4 rows in set (0.00 sec)
+
+=head1 DESCRIPTION
+
+AltSQL is a way to improve your user experience with C<mysql>, C<sqlite3>, C<psql> and other tools that Perl has L<DBI> drivers for.  Currently written for MySQL only, the long term goal of this project is to provide users of the various SQL-based databases with a familiar command line interface but with modern improvements such as color, unicode box tables, and tweaks to the user interface that are fast and easy to prototype and experiment with.
+
+=head1 INSTALLATION
+
+It's best to use CPAN or L<cpanm|App::cpanminus> to install this application.  Should be as simple as:
+
+  $ sudo cpanm App::AltSQL
+
+=head1 COPYRIGHT
+
+Copyright (c) 2012 Eric Waters and Shutterstock Images (http://shutterstock.com).  All rights reserved.  This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the LICENSE file included with this module.
+
+=head1 AUTHOR
+
+Eric Waters <ewaters@gmail.com>
+
+=cut
+

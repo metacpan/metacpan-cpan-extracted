@@ -1,0 +1,27 @@
+---
+abstract: 'We are Belarusian CPAN authors'
+author:
+  - 'Sergey Romanov <sromanov@cpan.org>'
+build_requires: {}
+configure_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.131560'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-CPANAuthors-Belarusian
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Acme::CPANAuthors: 0.02
+resources:
+  bugtracker: http://github.com/sergeyromanov/acme-cpanauthors-belarusian/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/sergeyromanov/acme-cpanauthors-belarusian
+version: 0.03
+x_test_requires:
+  Test::More: 0.47

@@ -1,0 +1,108 @@
+NAME
+    Acme::POE::Knee - Time sliced pony race using the POE kernel.
+
+VERSION
+    version 1.12
+
+SYNOPSIS
+        #!/usr/bin/perl -w
+        use strict;
+
+        # Use POEny!
+        use Acme::POE::Knee;
+
+        # Every Acme::POE::Knee race will require a set of arguments.
+        # There are defaults but it's just more fun to set these
+        # yourselves. We set a distance the ponies must run and of course
+        # we name our race ponies! You'll have to specify the maximum
+        # delay a pony can have before reaching the next stage.
+        # The lower the delay, the higher the chances are the pony will
+        # win the race.
+
+        my $pony = new Acme::POE::Knee (
+                  dist   => 20,
+            ponies  => {
+                'dngor'     => 5,
+                'Abigail'   => 5.2,
+                'Co-Kane'   => 5.4,
+                'MJD'       => 5.6,
+                'acme'      => 5.8,
+            },
+        );
+
+        # start the race
+        $pony->race( );
+
+        exit;
+
+DESCRIPTION
+    POE::Knee is an acronym of "Pony". We all like ponies. And wouldn't we
+    love to race ponies? Well, that's what Acme::POE::Knee is for!
+
+    It's great for those friday afternoons at the office, where you wonder
+    who will pay the beer tab. Whoever 'wins' the race, loses!
+
+    You specify a distance the ponies must run, and a maximum delay before
+    the pony will reach the next step. So, the bigger the delay, the bigger
+    the distance between multiple ponies can be.
+
+    Of course this wouldn't be any fun if we couldn't name the ponies
+    ourselves. Here, we simply put all our race ponies in an array reference
+    and the Acme::POE::Knee module will take care of the rest.
+
+QUICK LINKS
+    Please see the samples directory in POE's distribution for several
+    well-commented sample and tutorial programs.
+
+    Please see <http://www.perl.com/pub/2001/01/poe.html> for an excellent,
+    and more importantly: gradual, introduction to POE.
+
+USING Acme::POE::Knee
+    Using Acme::POE::Knee is really easy. This simple progam would already
+    suffice:
+
+        use strict;
+        use Acme::POE::Knee;
+
+        my $pony = new Acme::POE::Knee;
+        $pony->race();
+        exit;
+
+    This will use the defaults of the POE::Knee module, but you can of
+    course specify your own arguments, as shown in the synopsis.
+
+The Use of Acme::POE::Knee
+    Use, yes... Usefull? Probably not. This was written in response to a
+    rather persistant meme on #perl (you know who you are!). Basicly, we all
+    wanted ponies. Well folks, here it is.
+
+    Its source might be interesting to look at for newcomers to POE to see
+    how this time slicing works.
+
+Learning more about POE
+    The POE Mailing List
+      POE has a mailing list at perl.org. You can receive subscription
+      information by sending e-mail:
+
+        To: poe-help@perl.org
+        Subject: (anything will do)
+
+        The message body is ignored.
+
+      All forms of feedback are welcome.
+
+    The POE Web Site
+      POE has a web site where the latest development snapshot, along with
+      the Changes file and other stuff may be found: <http://poe.perl.org/>
+
+AUTHORS
+    *   Jos Boumans <kane@cpan.org>
+
+    *   Rocco Caputo <rcaputo@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Jos Boumans.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

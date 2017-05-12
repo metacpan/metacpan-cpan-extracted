@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Array/KeepGrepped.pm
+t/01_basic.t

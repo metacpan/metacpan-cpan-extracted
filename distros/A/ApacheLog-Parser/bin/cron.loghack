@@ -1,0 +1,252 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2008 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+cron.loghack - fetch, import, archive
+
+=head1 Setup
+
+  cd /disks/logs/
+  mkdir mysite.{repo,archive,incoming}
+  mkdir mysite.{repo,archive,incoming}/{server1,server2}
+  mkdir mysite.repo/.config
+  vim /disks/logs/mysite/.config/report.conf
+
+Then your crontab entry is:
+
+  cron.loghack --site mysite --home /disks/logs
+    --path /var/log/apache2/foo.access.log.N.gz \
+    --number 2 \
+    --quiet
+
+Requires rsync.
+
+=cut
+
+package bin::cron_loghack;
+
+use Getopt::Helpful;
+use IPC::Run;
+
+use File::Fu;
+
+use Class::Accessor::Classy;
+ro qw(site path number quiet);
+no  Class::Accessor::Classy;
+# directory names:
+BEGIN {
+  foreach my $m (qw(repo archive incoming)) {
+    eval("sub $m {
+      my \$self = shift;
+      \$self->{$m} and return(\$self->{$m});
+      \$self->{$m} = File::Fu->dir(\$self->{site} . '.$m');
+    };");
+    $@ and die "I botched it $@";
+  }
+}
+
+
+sub main {
+  my (@args) = @_;
+
+  my %o = (
+    site   => undef,
+    path   => '/var/log/apache2/access.log.N.gz',
+    number => 2,
+    quiet  => 0,
+  );
+  my $home;
+  my $only;
+  my $hopt = Getopt::Helpful->new(
+    usage => 'CALLER [options]',
+    ['s|site=s',   \$o{site}, '<sitename>', 'for sitename.repo'],
+    ['home=s',     \$home,    '<homedir>', 'level above repositories'],
+    ['p|path=s',   \$o{path}, '<filepath>', 'logfilename template'],
+    ['n|number=i', \$o{number}, '2', 'logrotate file number'],
+    ['q|quiet',    \$o{quiet}, '', 'suppress output unless errors'],
+    ['o|only=s',   \$only,     '<a,b>', 'list of servers'],
+    '+help',
+  );
+  $hopt->Get_from(\@args);
+  my @only = $only ? split(/,/, $only) : ();
+
+  $o{site} ||= shift(@args);
+  $o{site} or die "must have a 'site' argument\n";
+
+  $home ||= shift(@args);
+  defined($home) or die "must have a 'home' argument!\n";
+  chdir($home) or die "cannot chdir('$home') $!";
+
+  $o{path} = File::Fu->file($o{path});
+
+  my $self = bless(\%o, __PACKAGE__);
+
+  local $SIG{__DIE__} = $self->quiet ? sub {
+    die @_ if $^S; # get out if we're in an eval
+    $self->stderr(@_);
+    $self->death(@_);
+  } : $SIG{__DIE__};
+
+  my @got = $self->do_fetch(@only ? @only : $self->servers);
+  my @links = $self->do_links(@got);
+  $self->do_import(@links);
+  $self->do_archive(@links);
+}
+
+sub servers {
+  my $self = shift;
+
+  opendir(my $dh, $self->repo) or die "cannot read repository $!";
+  return(grep({$_ !~ m/^\./} readdir($dh)));
+}
+
+sub do_fetch {
+  my $self = shift;
+  my (@servers) = @_;
+
+  my $num = $self->number;
+
+  my $target = $self->path &
+    sub { s/\.N\./.$num./ or die $self->path . " has no .N."};
+
+  my @fetched;
+  foreach my $server (@servers) {
+    my $local = $self->incoming / $server + $target->basename;
+    $self->remote_copy("$server:$target", "$local");
+    push(@fetched, $local);
+  }
+  return(@fetched);
+}
+sub do_links {
+  my $self = shift;
+  my @files = @_;
+
+  my $num = $self->number;
+  foreach my $file (@files) {
+    $file = File::Fu->file($file);
+    my $date = $self->capture('loghack', 'date', $file);
+    my $dest = $file & sub {
+      s/\.$num\./.$date./ or die "$file is not the right number"};
+    $file = $file->link($dest);
+  }
+  return(@files);
+}
+sub do_import {
+  my $self = shift;
+  my (@files) = @_;
+
+  chdir($self->repo) or die "cannot chdir $!";
+  $self->run('loghack', 'import', map({"../$_"} @files));
+  chdir('..') or die "cannot chdir back $!";
+}
+sub do_archive {
+  my $self = shift;
+  my (@files) = @_;
+
+  foreach my $file (@files) {
+    $file = File::Fu->file($file);
+    my $server = $file->dirname->part(-1);
+    (my $base = $file->file) =~ s/.*\.(\d{4}-\d{2}-\d{2})\./$server.$1./
+      or die "$file is a strange filename\n";
+    $base =~ s/\.gz$/\.bz2/;
+    my $dest = $self->archive / $server + $base;
+    $self->stdout("archive $file to $dest");
+    $dest->e and die "$dest already exists";
+    if($file =~ m/\.bz2$/) {
+      $file->rename($dest);
+    }
+    else {
+      IPC::Run::run(
+        [qw(gunzip -c)], '<', "$file", '|',
+        [qw(bzip2 -c)], '>', "$dest"
+      ) or die "archiving $dest failed";
+      $file->unlink;
+    }
+  }
+}
+chomp(my $rsync = `which rsync`);
+$rsync or die "you need rsync";
+sub remote_copy {
+  my $self = shift;
+  my ($from, $to) = @_;
+  $self->run($rsync, '-p', $from, $to);
+}
+
+sub _run {
+  my $self = shift;
+  my (@command) = @_;
+  my ($in, $out, $err);
+  my $ret = IPC::Run::run([@command], \$in, \$out, \$err);
+  return($ret, $out, $err);
+}
+
+sub run {
+  my $self = shift;
+  my (@command) = @_;
+
+  $self->stdout('running', "  @command");
+  my ($ret, $out, $err) = $self->_run(@command);
+  $self->stdout(split(/\n/, $out));
+  $self->stderr(split(/\n/, $err));
+  $ret or die "@command failed:\n$err";
+  return($out);
+}
+
+sub capture {
+  my $self = shift;
+  my ($ret, $out, $err) = $self->_run(@_);
+  $ret or die "@_ failed $err";
+  my @out = split(/\n/, $out);
+  (@out == 1) and return($out[0]);
+  return(@out);
+}
+
+sub death {
+  my $self = shift;
+  my (@last) = @_;
+
+  my %sym = (stderr => 'E ', stdout => '# ');
+  print "DEATH\n  @last\n";
+  my $out = $self->{outputs} ||= [];
+  foreach my $line (@$out) {
+    my $type = shift(@$line);
+    my $c = $sym{$type} || $type; # hmm
+    print join(' ', $c, @$line), "\n";
+  }
+}
+my %fh = (
+  stderr => \*STDERR,
+  stdout => \*STDOUT,
+);
+sub stderr {
+  my $self = shift;
+  $self->_store_io(stderr => @_);
+}
+sub stdout {
+  my $self = shift;
+  $self->_store_io(stdout => @_);
+}
+sub _store_io {
+  my $self = shift;
+  my ($type, @lines) = @_;
+  unless($self->quiet) {
+    my $fh = $fh{$type};
+    print $fh join("\n", @lines, '');
+  }
+  my $out = $self->{outputs} ||= [];
+  push(@$out, map({[$type, $_]} @lines));
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::cron_loghack::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::cron_loghack';

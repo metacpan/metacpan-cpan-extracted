@@ -1,0 +1,85 @@
+
+2012-05-07      v0.022
+  - DEPRECATED
+  - ASP4 was marked deprecated, so this module is also deprecated now.
+
+2012-02-12      v0.021
+  - Added support for multiple external "routes.json" files.
+
+2011-01-11      v0.020
+  - There was a bug causing routes like "/{state_href:[^\\.]+}.asp" to work in a
+    RequestFilter context but break under Apache.
+
+2010-11-12      v0.019
+  - All classes in config.app are now ->import'ed under non-mod_perl2 environment.
+
+2010-05-20      v0.018
+  - This release addresses several issues related to running multiple applications
+    under different VirtualHosts on the same apache server.
+
+2010-05-19      v0.017
+  - Some versions of Apache httpd don't always set $r->hostname, which causes
+    problems for us.  Declining those requests appears to be acceptable...let's see.
+
+2010-04-27      v0.016
+  - Now $ENV{REMOTE_ADDR} is set properly.
+
+2010-04-13      v0.015
+  - Properly sets $ENV{QUERY_STRING} when running in a mod_perl2 environment.
+
+2010-04-10      v0.014
+  - Fixed a bug that caused $Stash->{route} to not always be accessible.
+
+2010-04-08      v0.013
+  - $r->pnotes(route) is set even if we don't do routing.  This makes routing more consistent.
+
+2010-04-06      v0.012
+  - Handlers are now also covered by the "don't-route-if-the-file-actually-exists"
+    logic from v0.010-v0.011.
+  - Added tests to verify the new behavior.
+
+2010-04-06      v0.011
+  - Finished the whole "don't-route-if-the-file-actually-exists" thing that was
+    started in v0.010
+  - Requires ASP4 v1.025 because of a change in the way that $Config->web->router
+    is setup (now it actually happens inside of ASP4::ConfigNode::Web.
+
+2010-04-05      v0.010
+  - If /foo/bar.asp is a real file on disk then route-matching will be skipped.
+
+2010-04-05      v0.009
+  - Sometimes get_router() was returning strange values - added a workaround to
+    prevent this.
+
+2010-04-01      v0.008
+  - Miscellaneous bug fixes and minor enhancements all-around.
+
+2010-03-29      v0.007
+  - If we can't get a router object, ASP4x::Router will return "declined".
+
+2010-03-27      v0.006
+  - The TransHandler handler was not passing along $r->args properly.
+
+2010-03-26      v0.005
+  - The mod_perl handler sets $r->pnotes(__routed => 1), which the ASP4::TransHandler
+    now checks before performing any additional routing.  Otherwise we end up
+    doing twice the work!
+
+2010-03-26      v0.004
+  - The logic used for finding/constructing the router is updated.
+  - Updated POD.
+  - Downgraded Apache2::RequestRec requirement to a 'recommends'.
+  - Added dynamic inheritance based on whether requiring ASP4::TransHandler works or not.
+  - ASP4x::Router now will test for the existence of each matched uri from $router->match(...)
+    until it finds one that exists on disk.
+
+2010-03-24      v0.003
+  - Added prereq Apache2::RequestRec since that's needed for ASP4::TransHandler.
+
+2010-03-23      v0.002
+  - Changed the email address in the config.
+  - Updated the POD with examples and more description.
+
+2010-03-23      v0.001
+  - Original release.
+

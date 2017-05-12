@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 0484f4d2f37084ed95cc990ce3252ab2b769f6f5 Changes
+SHA1 5adcaed5a5fc000a5db38451eab75ecb08b6c5a5 MANIFEST
+SHA1 73bc0551f64c88f119a0ca37d4e93b19d1f7d702 META.json
+SHA1 97b0272d41bd95cda8cd69891bbfec604074b093 META.yml
+SHA1 9c7c0ce90f58953d564cbebd399e99a395727fdc Makefile.PL
+SHA1 b70c85f47b0ec289b2a10c8c79819b42df40b10b README
+SHA1 93f1af45400c403de00ad295fb20655b9f2a3962 aap-passwd
+SHA1 7e42fe74265fa8b26ab33124a147c6221bca11d3 lib/Apache2/Authen/Passphrase.pm
+SHA1 425c87ff4d5b886028315bf0f4d432695618f16f t/Apache2-Authen-Passphrase.t
+SHA1 190939b33d26a5900164708c5b5fd550d3e853f0 t/perlcritic.t
+SHA1 19d48dc9cb1480e88ed2f0e34f6a97fea61f2bfc t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJVfBX6AAoJEMoENb5ewbNiVb8QAJ5rB0i+cigu/yf+6UUYjwYt
+sIWHxUKqk76T4FSag7t3VkuNhboQI1CRJEH0nLgTAjGPHBV0SmbyjF7R/N642yoB
+AZ+Sf2UnoYm5BpiiiXk2GlGuC4aK7C3SZTfNJhuavNOdyA0qxGq9OO7XHB1E01bp
+mQFuHLMrWSjkAvc1eLq7LQu/98Eb9ZVSmKQFnyxG17Nj9BXk9V8f/b4B1xf3jlDJ
+yWSgTD8vk49jHhJp8BR/m76ovODOH7wBUEMMuUtPu+8e/ZLj0uPxCTxpTupvWMHZ
+Y6o/v9eAgo7v5dyemW11HEpV8tOdA1eKqVDCHnNFCS5X8IyVh8+Mgl1YsXOJ0b2t
+IdrIU2ZPGlAOnsF0vJQvpc0olcLj/euTirWKMCwZN/7/GCEYEKnD06mrTqefqu4W
+Rz7BxFIaOUa8/76PPum1tEvghZbwKn9Ua+JTVy/XYXO9sEML/hk7VZ+vXYiu3XS8
+KTQBR2W4kgqezpaBrQlBsmv3Mcox2ypyvAnVFXvj8h/fh2G0WkhFCWPXKaVxZibF
+FOUawSV6Iz5GlDFR6b7tlYfopVMb4uzfI1VFwiiwEHzDMwJnExiZKZvmYVeJx4Kp
+A8IdI275vsFZhwpJwYmA1a5rvtCxQgWkcrkby7e08mfmNAr+ptmLqJvuJyGTDl9/
+wgfIuAbv8EgyYvXCzBjy
+=rtSW
+-----END PGP SIGNATURE-----

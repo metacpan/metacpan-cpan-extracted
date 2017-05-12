@@ -1,0 +1,58 @@
+{
+   "abstract" : "Module to find git branches that would conflict if merged",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Git-Workflow-Command-BranchConflicts",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Git::Workflow::Command" : "0.8",
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Git::Workflow" : "0.8",
+            "App::Git::Workflow::Command" : "0.8",
+            "Capture::Tiny" : "0.44",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "App::Git::Workflow::Command::BranchConflicts" : {
+         "file" : "lib/App/Git/Workflow/Command/BranchConflicts.pm",
+         "version" : "0.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Git-Workflow-Command-BranchConflicts"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/ivanwills/App-Git-Workflow-Command-BranchConflicts.git"
+      }
+   },
+   "version" : "0.4",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

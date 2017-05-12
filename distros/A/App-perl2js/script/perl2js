@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::perl2js::Converter;
+
+my $filename = $ARGV[0];
+my $script;
+if ($filename) {
+    open(my $fh, "<", $filename) or die("Cannot open $filename: $!");
+    $script = do { local $/; <$fh> };
+} else {
+    $script = join('', <STDIN>);
+}
+
+print App::perl2js::Converter->new->convert($script);

@@ -1,0 +1,50 @@
+Revision history for App-SCM-Digest
+
+0.11    13 February 2016
+        - Catch 'init-db' errors in tests.
+        - Set user.name and user.email for Git repository clones in
+          tests.
+        - Fix wrong skip test count.
+
+0.10    10 Februry 2016
+        - Take account of 'ignore_errors' in get_email.
+        - Fix file-handling problems.
+
+0.09    30 January 2016
+        - Set user.name and user.email for Git repositories created in
+          tests.
+
+0.08    7 January 2016
+        - Fix wrong test skip count.
+
+0.07    6 January 2016
+        - Add an 'ignore_errors' configuration option.
+        - Simplify 'init-db' usage in tests, so that they work when
+          using older versions of Git.
+
+0.06    16 December 2015
+        - Fix file handle leak.
+
+0.05    26 November 2015
+        - Fix wrong test skip count.
+        - Use 'init-db' instead of 'init' for Git tests, so that they
+          work when using older versions of Git.
+
+0.04    21 November 2015
+        - Fix debug output problem, and print output whenever a
+          problem occurs.
+
+0.03    22 October 2015
+        - Do not assume that the 'master' branch exists for Git
+          repositories, when removing local branches that no longer
+          have corresponding remote branches.
+
+0.02    21 October 2015
+        - Fix commit ordering problem.
+        - Remove local branches that no longer exist in the remote
+          repository.
+        - Set dummy user when ui.username is not set, in Mercurial
+          tests (Syohei Yoshida).
+
+0.01    18 October 2015
+        - Initial release.

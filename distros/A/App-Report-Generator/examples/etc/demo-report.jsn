@@ -1,0 +1,17 @@
+{
+   "Report::Generator::Render::TT2" : {
+      "template" : "test2.tt2",
+      "options" : {},
+      "vars" : {
+         "ADD_TIMESTAMP" : "1"
+      },
+      "config" : {
+         "ABSOLUTE" : "1",
+         "INCLUDE_PATH" : [
+            "share"
+         ]
+      },
+      "output" : "demo.sql"
+   },
+   "renderer" : "Report::Generator::Render::TT2"
+}

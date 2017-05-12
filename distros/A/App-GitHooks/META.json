@@ -1,0 +1,205 @@
+{
+   "abstract" : "Extensible plugins system for git hooks.",
+   "author" : [
+      "Guillaume Aubert <aubertg@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-GitHooks",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "File::Spec" : "0",
+            "Git::Repository" : "0",
+            "Scalar::Util" : "0",
+            "Test::Compile" : "1.001",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::Git" : "0",
+            "Test::More" : "0",
+            "Test::Requires::Git" : "1.005",
+            "Test::Type" : "1.002"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "Config::Tiny" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "Data::Section" : "0",
+            "Data::Validate::Type" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "Git::Repository" : "0",
+            "Module::Pluggable" : "0",
+            "Parallel::ForkManager" : "0",
+            "Path::Tiny" : "0",
+            "Pod::Usage" : "0",
+            "Readonly" : "0",
+            "Storable" : "0",
+            "Term::ANSIColor" : "0",
+            "Term::Encoding" : "0",
+            "Term::ReadKey" : "0",
+            "Test::Exception" : "0",
+            "Test::Git" : "0",
+            "Test::More" : "0",
+            "Test::Requires::Git" : "1.005",
+            "Text::Wrap" : "0",
+            "Try::Tiny" : "0",
+            "autodie" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "App::GitHooks" : {
+         "file" : "lib/App/GitHooks.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::CommitMessage" : {
+         "file" : "lib/App/GitHooks/CommitMessage.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Config" : {
+         "file" : "lib/App/GitHooks/Config.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Constants" : {
+         "file" : "lib/App/GitHooks/Constants.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook" : {
+         "file" : "lib/App/GitHooks/Hook.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::ApplypatchMsg" : {
+         "file" : "lib/App/GitHooks/Hook/ApplypatchMsg.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::CommitMsg" : {
+         "file" : "lib/App/GitHooks/Hook/CommitMsg.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::PostApplypatch" : {
+         "file" : "lib/App/GitHooks/Hook/PostApplypatch.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::PostCheckout" : {
+         "file" : "lib/App/GitHooks/Hook/PostCheckout.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::PostCommit" : {
+         "file" : "lib/App/GitHooks/Hook/PostCommit.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::PostMerge" : {
+         "file" : "lib/App/GitHooks/Hook/PostMerge.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::PostReceive" : {
+         "file" : "lib/App/GitHooks/Hook/PostReceive.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::PostRewrite" : {
+         "file" : "lib/App/GitHooks/Hook/PostRewrite.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::PostUpdate" : {
+         "file" : "lib/App/GitHooks/Hook/PostUpdate.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::PreApplypatch" : {
+         "file" : "lib/App/GitHooks/Hook/PreApplypatch.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::PreAutoGc" : {
+         "file" : "lib/App/GitHooks/Hook/PreAutoGc.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::PreCommit" : {
+         "file" : "lib/App/GitHooks/Hook/PreCommit.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::PrePush" : {
+         "file" : "lib/App/GitHooks/Hook/PrePush.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::PreRebase" : {
+         "file" : "lib/App/GitHooks/Hook/PreRebase.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::PreReceive" : {
+         "file" : "lib/App/GitHooks/Hook/PreReceive.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::PrepareCommitMsg" : {
+         "file" : "lib/App/GitHooks/Hook/PrepareCommitMsg.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Hook::Update" : {
+         "file" : "lib/App/GitHooks/Hook/Update.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Plugin" : {
+         "file" : "lib/App/GitHooks/Plugin.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Plugin::Test::CustomReply" : {
+         "file" : "lib/App/GitHooks/Plugin/Test/CustomReply.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Plugin::Test::PrintSTDERR" : {
+         "file" : "lib/App/GitHooks/Plugin/Test/PrintSTDERR.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::StagedChanges" : {
+         "file" : "lib/App/GitHooks/StagedChanges.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Terminal" : {
+         "file" : "lib/App/GitHooks/Terminal.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Test" : {
+         "file" : "lib/App/GitHooks/Test.pm",
+         "version" : "v1.9.0"
+      },
+      "App::GitHooks::Utils" : {
+         "file" : "lib/App/GitHooks/Utils.pm",
+         "version" : "v1.9.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/guillaumeaubert/App-GitHooks/issues"
+      },
+      "homepage" : "https://metacpan.org/release/App-GitHooks",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/guillaumeaubert/App-GitHooks"
+      }
+   },
+   "version" : "v1.9.0"
+}

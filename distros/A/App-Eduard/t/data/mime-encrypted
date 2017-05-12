@@ -1,0 +1,31 @@
+From: Eduard <eduard@ceata.org>
+To: Eduard <eduard@ceata.org>
+Subject: MIME Encrypted
+MIME-Version: 1.0
+Content-Type: multipart/encrypted; boundary="=-=-=";
+	protocol="application/pgp-encrypted"
+
+--=-=-=
+Content-Type: application/pgp-encrypted
+
+Version: 1
+
+--=-=-=
+Content-Type: application/octet-stream
+
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v1
+
+hQEMAzLKYfkz3zGcAQf+M6wBMuL7OYJjNgGrdGUFnNWockCdoto+uM9k+dLO0dBE
+mL+oOtf8mdQ2D2G1VbvdLu9QyoW87BnlcukjUt1pV/TOnBfZtYgwYXQdWL2hr/yv
+IoY1LO3CEPbDlK0X01RGf7V8zRh4Xz0qQuKf7x+TyqZQt0DKobSGctM8IsqqexWy
+4UUQLh2yZvaZexa6vXt3RGnXdD7348lZKS7SV8TR2WpFkliihp0DIO2tme4o+aog
+O/09i/HrFuleZoTnaWI7pScZ+gJgsc/qLOlH7cmH/fdbp6JD98Ths4CbmirIeCmb
+YosPJQUa8kv/tjFGLu7I6TrKXgoyOpZKNip/Amt/aNKUAa+6GdQGPj1ddfoYtJqo
+s40+/ZwY5v8t/qTShNKTg8WShCZ1GNriN4NALQMBopjYg7Qy2zN+VpxZIR4fJ409
+MLlqt2dOHVI3hrtL0QBt7OaMO+vXJ04jt4kPO0VpUgJqcU6pAW/8PL+zeoeEajSp
+hUtbrcvSu6ECwzIarBEzQe5AGkanjDXGcaAcMWra8aj9ixdiPw==
+=o50Z
+-----END PGP MESSAGE-----
+--=-=-=--
+

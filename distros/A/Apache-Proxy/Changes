@@ -1,0 +1,11 @@
+Revision history for Perl extension Apache::Proxy.
+
+0.01  Mon Jul  6 11:12:08 1998
+	- original version; created by h2xs 1.18
+0.02  Fri Oct 15 18:47:34 1999
+        - Apache::Proxy is now maintained by
+          Ilya Obshadko (x-fire@mail.ru)
+          * fixed compilation errors
+          * added proxy_hash interface to convert
+            URLs to proxy hash filenames
+ 

@@ -1,0 +1,55 @@
+Revision history for Perl extension App::YG
+
+0.063   Mon Nov  3 17:55:02 JST 2014
+        - add new parser for vmstat log
+
+0.062   Sat Feb  9 18:35:02 JST 2013
+    [NO CODE CHAMGE]
+        - version 0.061 is broken
+
+0.061   Sat Feb  9 18:28:02 JST 2013
+    [NO CODE CHAMGE]
+        - added dependent module
+
+0.06    Sat Feb  9 15:53:29 JST 2013
+    [NEW FEATURE]
+        - be able to customize horizontal line
+            --nohr:     hide horizontal line
+            --hr:       change horizontal line character
+            --hr-count: change numer of hr character
+    [IMPROVEMENTS]
+        - change color for count number in the horizontal line(black -> red)
+
+0.05    Sat Feb  9 14:06:14 JST 2013
+    [NEW FEATURE]
+        - show LTSV log: with --ltsv option(LTSV=Labeled Tab-separated Values)
+        - show colorized log: with --color option
+    [INCOMPATIBLE CHANGES]
+        - --delimiter option was removed. use --tab or --space option.
+    [IMPROVEMENTS]
+        - fixed POD
+        - added sample logs
+
+0.041   Sun Dec  2 19:47:03 JST 2012
+    [NO CODE CHANGES]
+        - specified version of dependent module: Getopt::Long
+
+0.04    Wed Nov 21 08:05:00 JST 2012
+    [NO CODE CHANGES]
+        - added dependent module in Build.PL
+
+0.03    Tue Nov 13 08:32:00 JST 2012
+    [NO CODE CHANGES]
+        - fixed POD
+        - added dependency modules in Build.PL
+
+0.02    Sun Oct 21 19:00:00 JST 2012
+    [INCOMPATIBLE CHANGES]
+        - changed default parser(Apache-common -> Apache-combined)
+    [IMPROVEMENTS]
+        - wrote more documents
+        - moved sample log(apache-combined) to share directory
+        - tiny fix(removed use line it is unnecessary, added test for default parser)
+
+0.01    Sat Oct  6 17:00:00 JST 2012
+        - original version

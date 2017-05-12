@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 a985e8cf0a7dbc410dee16771e78b9db1c4dee2c Build.PL
+SHA1 cc97e889a41642cf85ee5f78e5ab4f1f81af9c00 COPYING
+SHA1 187c413fe859c130e9264e9ad01ace82837aa47f Changelog
+SHA1 f16ecff5d96f49fcbdba60426d3efab606b570f5 MANIFEST
+SHA1 6e04e7c2f0f30a0752decf4c07ccfc12f2745023 META.json
+SHA1 dd01407d76da0f7c8e96645bbb3c646dbb4c3c1e META.yml
+SHA1 db76c34971ece98b8fca3ebb718ad3467d246f8a README
+SHA1 2a3967a606e90f6401a35ed96200809dd2b4688d bin/hashl
+SHA1 8f020414ee67d3d8e2605263eab09c767f8a9e13 lib/App/Hashl.pm
+SHA1 a6d4088f568c71b5617a8d88a45be37e1b7b38a6 t/00-compile.t
+SHA1 fc484e69e1a91c4c501199b88a1275c64828ff32 t/10-pod-coverage.t
+SHA1 c6f4858749be515fbafd7627f3246b97b895a3fa t/29-app-hashl.t
+SHA1 c6028a53bd95983bb57122a93902143247693330 t/in/1k
+SHA1 8806e242d9ccb7dbfd58a50f022a2451b269bf6b t/in/1k-firsthalf
+SHA1 f1d2d2f924e986ac86fdf7b36c94bcdf32beec15 t/in/4
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEeBu3Bxxr9kjq6wihEA1b+1Fm4AUFAlhyDw4ACgkQEA1b+1Fm
+4AUwXQ//Ux4FKWWqc1wh77Dn9neBb1M0NJEUY4tbaXZ480xUBXALDVLzuyHE+fSd
+6C4JI85jN/LUSzF46tRh4x+CIHnWiJE6YkNVPaATvtjJ7Pmj1KW3z6VjWvLG3raH
+X0jfmKXPu+pR2Lv1fl1ZVMcxX2ggnDPNXt7HqT2qP8zofXlgWNXVmmwmofMeCOm0
+UQe4YNtagP2Ds/wZsa3Kkgg4/D2+btRKR3gKoHkVuITsOr430uyePTXzs0MiPwfV
+GobJZGOsqLdSTYtw1CK9NR10BE8CMc3aDV+mdk0YcnBN5jjxdq2+PenLxA0l5ubr
+Tzuq4kvA3bbfWqUah/kKYYJdjDZlYX1QiS1DqFHldV4j06hz8tE0ff/drdmhOj5i
+VvNfGgVaeEXCiedpcJj1zC/zmJBH+jUGMadASsNqeMgJWGETg74bFf27+7FkLiRq
+FTy9a1P5VnJFlM4g9ZTTZhi46NQb8Dwoc397EIJqZVwoefojDvlQX7SbrXOINjoc
+xTWeBe1CMnG87AZKzNTko3CTugk5Zw+DeY2FVlu9qOrP+drXLaT9fK7DPRIa76s0
+YaUFfpr7i82O9VZsU884wq94Ya/C27zIjfF+em4O0DWI20LFKOU0MCXwFzEV0CIZ
+pK6XtqDhu3w2nGQmgVvvydqtu7B+8B8x+XPAwhuX6BCu3iUOLSA=
+=h0jK
+-----END PGP SIGNATURE-----

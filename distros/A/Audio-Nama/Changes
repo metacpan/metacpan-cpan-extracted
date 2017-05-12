@@ -1,0 +1,127 @@
+Changes to Audio::Nama
+
+1.205 Dec 31, 2015
+
+1.110 Jan 1, 2014
+    * basic implementation of sequences/clips
+    * use git is now default: retain project history,
+      with tagging and branching of significant snapshots
+    * add undo/redo
+    * add remote control interface
+    * add multi engine support
+    * add hotkey mode
+    * do not delete marks that fades depend on
+    * retain playback position on project save/load
+    * wrap seeks in fades for smooth transitions
+    * many fixes - git repository is the authoritative source
+
+1.102 March 3, 2013
+
+    * new .namarc option 'use_git' for project management
+       + many internal changes to support git
+       + save/get commands handle branches similar to save/get files 
+    * drop backwards compatibility and project conversion
+       (checkout Rosetta for this)
+    * auto mp3/ogg encoding of mixdown files
+    * name mixdown files using project or branch name
+    * cleanup variable declarations
+    * dismantle eager mode 
+    * internal latency compensation option
+
+1.100 March 9, 2012
+
+	* New serialization format, prefer json
+	* convert_project_format() 
+	   + archives project state.yml files
+       + converts them to new format state.json 
+	   + run as nama> eval convert_project_format
+	* New class EffectChain used to specify presets, store bypass parameters
+	* Replace hated and maligned bus MON mode filter. 
+	  (Use 'rerecord' to toggle to previous REC setup.)
+    * Eager mode - get sound to soundcard ASAP. 
+      + Declare as eager_mode: doodle in .namarc
+      + Two varieties of eager: preview and doodle
+        - doodle: monitor "live" inputs only
+        - preview: monitor "live" inputs while playing back WAV files
+      + Issue the 'arm' command when ready to record.
+    * Optional use of Git for managing state
+      files and therefore project development. 
+	* Rename source files
+	* Replace 225 global variables by 16 "singletons",
+	  which are still global variables 
+    * support for multiple serialization formats
+    * Miscellaneous fixes
+		
+
+1.078 August 19, 2011
+
+     * new commands
+        +  view_waveform launches Mhwaveedit on current track/version/waveform
+        +  edit_waveform launches Audacity   on current track/version/waveform
+
+1.077 August 12, 2011
+
+     * fix: nosolo doesn't restore previous state (umutes all tracks)
+     * incorporate whatis.patch from debian
+
+1.076 August 8, 2011
+
+     * numerous fixes (consult git log for details)
+
+1.073 April 9, 2011
+
+     * fix bug with inserts
+     * move entire man page to executable
+
+1.070 March 27, 2011
+
+      New features
+      * track edits (non-destructive punch-in style recording)
+      * track comments
+      * version comments
+      * project templates
+      * autosave
+      * support jack.plumbing and jack_connect for JACK
+        client connections
+      * user-defined commands (custom.pl)
+
+      Other changes
+      * expanded test coverage
+      * initial support for Midish MIDI sequencer and filter
+      * separate code into multiple modules
+      * many fixes and improvements
+
+
+1.064  August 6, 2010
+      * fix Bug rt.cpan.org #60024: Audio::Nama::Assign::expand_tilde()
+
+1.063  August 2, 2010
+
+      * various minor improvements
+      * fix Bug#591166 (Debian build support)
+
+1.052  March 20, 2010 (summary)
+
+      * prompt displays current bus and current track
+      * configurable use of ea or eadb for volume control
+      * Ladish Level 1 support 
+      * big speedup by caching results of Track and Wav methods
+      * generate setup using graph representation and IO objects
+      * rewrite send- and sub-buses 
+      * track caching (track freezing)
+      * post-fader track inserts (send/receive) with wet/dry control
+      * more flexible track input 
+         + manual connection to JACK port
+         + auto connect to list of JACK ports
+      * track normalize and fixdc commands
+      * automix (normalized mixdown) command
+      * import audio: copy files unless resampling or converting format
+      * region shifting, with multiple regions per track
+      * effect chains (presets)
+      * effect profiles (effect chains over multiple tracks)
+      * non-recording preview and doodle modes
+      * unified event code for GUI and text modes
+      * rewrite support for Ecasound controllers
+      * test coverage for signal routing functions 
+      * new debugging options
+

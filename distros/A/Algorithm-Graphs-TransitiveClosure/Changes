@@ -1,0 +1,20 @@
+Version 2009110901
++ Modernized Makefile.PL
++ POD and Kwalitee tests
+
+Version 2009040901
++ Fix documentation issue (sinan.unur@gmail.com/RT #14870)
+
+Version 2009040601
++ Moved to git and github.
++ Modernization
+
+Revision 1.3  1999/03/01 19:51:11  abigail
++ Renamed primary namespace to Algorithm::
+
+Revision 1.2  1998/03/23 04:00:37  abigail
++ Fixed order of loop variables in the ARRAYREF case.
+  It's k, i, j, not i, j, k.
+
+Revision 1.1  1998/03/22 06:54:42  abigail
++ Initial revision

@@ -1,0 +1,24 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2007.05.23.20.32.12;	author doom;	state Exp;
+branches;
+next	;
+
+
+desc
+@but if this ain't the log message, what is it?
+@
+
+
+1.1
+log
+@About to change global_modifiers to override_modifiers
+@
+text
+@@

@@ -1,0 +1,50 @@
+#!/usr/bin/env perl
+# Dumps the version of the irc server and exits.
+#
+# Command line:
+#   $ ./version_dump <host> <port>
+#
+use common::sense;
+use AnyEvent;
+use AnyEvent::IRC::Client;
+use AnyEvent::IRC::Util qw/mk_msg parse_irc_msg encode_ctcp/;
+use Data::Dumper;
+
+my $nick = "vtest1";
+my ($server, $port) = @ARGV;
+
+my $c = AnyEvent->condvar;
+my $con = new AnyEvent::IRC::Client;
+
+$con->reg_cb (
+   connect => sub {
+      my ($con, $err) = @_;
+
+      if (defined $err) {
+         warn "Couldn't connect: $err\n";
+         $c->broadcast;
+      }
+
+      $con->register ($nick, $nick, $nick);
+   },
+   registered => sub {
+      my ($con, $msg) = @_;
+      $con->send_srv ('VERSION');
+   },
+   irc_351 => sub {
+      # < :irctest.test 351 elmex hybrid-7.2.3(SVN). irctest.test :eGgIKM6 TS6ow
+      my ($con, $msg) = @_;
+      my @v = @{$msg->{params}};
+      print "$v[1]\n";
+      $con->disconnect ("done");
+   },
+   disconnect => sub {
+      $c->broadcast
+   },
+);
+
+$con->ctcp_auto_reply ('VERSION', ['VERSION', 'VersionDump:0.1:Perl']);
+
+$con->connect ($server, $port || 6667);
+
+$c->wait;

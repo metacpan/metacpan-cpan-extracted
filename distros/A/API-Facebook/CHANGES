@@ -1,0 +1,20 @@
+Changelog for API-Facebook
+
+0.04 2015-10-11T08:11:05
+ - Updated build.
+ - Modified the implementation style and dependencies.
+
+0.03 2015-09-28T13:19:31
+ - v0.03
+ - Updated build.
+ - Updated inconsistency in documentation.
+ - Updated dist.ini to generate META files.
+
+0.02 2015-09-28T04:07:36
+ - v0.02
+ - Updated build.
+ - Refactored to derive from API::Client.
+
+0.01 2015-07-14T05:45:47
+ - v0.01
+ - Initial commit.

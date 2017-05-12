@@ -1,0 +1,5 @@
+0.02 Sat Oct 23 14:48:50 EDT 2004
+    - Bug fix in filesack that caused size not to be printed
+
+0.01 Fri Oct  8 23:34:32 2004
+    - original version; created by h2xs 1.19

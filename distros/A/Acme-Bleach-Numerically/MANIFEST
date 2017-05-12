@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Acme/Bleach/Numerically.pm
+t/00-Require.t
+t/01-RoundTrip.t
+t/helloworld.pl
+t/japh.pl
+META.yml                                 Module meta-data (added by MakeMaker)

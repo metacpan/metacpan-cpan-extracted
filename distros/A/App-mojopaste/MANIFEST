@@ -1,0 +1,21 @@
+.perltidyrc
+.ship.conf
+.travis.yml
+Changes
+cpanfile
+lib/App/mojopaste.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+script/mojopaste
+t/00-basic.t
+t/charts.t
+t/config.t
+t/Helper.pm
+t/mojopaste.conf
+t/mojopaste.t
+t/nonexisting.t
+t/safe-params.t
+t/unicode.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

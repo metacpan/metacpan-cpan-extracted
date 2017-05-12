@@ -1,0 +1,138 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+our $home;
+
+BEGIN {
+  use FindBin;
+  FindBin::again();
+
+  $home = ($ENV{NETDISCO_HOME} || $ENV{HOME});
+
+  # try to find a localenv if one isn't already in place.
+  if (!exists $ENV{PERL_LOCAL_LIB_ROOT}) {
+      use File::Spec;
+      my $localenv = File::Spec->catfile($FindBin::RealBin, 'localenv');
+      exec($localenv, $0, @ARGV) if -f $localenv;
+      $localenv = File::Spec->catfile($home, 'perl5', 'bin', 'localenv');
+      exec($localenv, $0, @ARGV) if -f $localenv;
+
+      die "Sorry, can't find libs required for App::Netdisco.\n"
+        if !exists $ENV{PERLBREW_PERL};
+  }
+}
+
+BEGIN {
+  use Path::Class;
+
+  # stuff useful locations into @INC and $PATH
+  unshift @INC,
+    dir($FindBin::RealBin)->parent->subdir('lib')->stringify,
+    dir($FindBin::RealBin, 'lib')->stringify;
+
+  use Config;
+  $ENV{PATH} = $FindBin::RealBin . $Config{path_sep} . $ENV{PATH};
+}
+
+use App::Netdisco;
+use Dancer ':script';
+use Dancer::Plugin::DBIC 'schema';
+
+use Try::Tiny;
+
+=head1 NAME
+
+netdisco-db-deploy - Database deployment for Netdisco
+
+=head1 USAGE
+
+This script upgrades or initialises a Netdisco database schema.
+
+ ~netdisco/bin/netdisco-db-deploy [--redeploy-all]
+
+This script connects to the database and runs without user interaction. If
+there's no Nedisco schema, it is deployed. If there's an unversioned schema
+then versioning is added, and updates applied.  Otherwise only necessary
+updates are applied to an already versioned schema.
+
+Pre-existing requirements are that there be a database table created and a
+user with rights to create tables in that database. Both the table and user
+name must match those configured in your environment YAML file (default
+C<~/environments/deployment.yml>).
+
+If you wish to force the redeployment of all database configuration, pass the
+C<--redeploy-all> argument on the command line.
+
+=head1 VERSIONS
+
+=over 4
+
+=item *
+
+Version 1 is a completely empty database schema with no tables
+
+=item *
+
+Version 2 is the "classic" Netdisco database schema as of Netdisco 1.1
+
+=item *
+
+Versions 5 to 16 add patches for Netdisco 1.2
+
+=item *
+
+Version 17 onwards deploys schema upgrades for Netdisco 2
+
+=back
+
+=cut
+
+my $schema = schema('netdisco');
+
+if (scalar @ARGV and $ARGV[0] and $ARGV[0] eq '--redeploy-all') {
+    $schema->storage->dbh_do(
+      sub {
+        my ($storage, $dbh, @args) = @_;
+        $dbh->do('DROP TABLE dbix_class_schema_versions');
+      },
+    );
+}
+
+# installs the dbix_class_schema_versions table with version "1"
+# which corresponds to an empty schema
+if (not $schema->get_db_version) {
+    $schema->install(1);
+    $schema->storage->disconnect;
+}
+
+# test for existing schema at public release version, set v=2 if so
+try {
+    $schema->storage->dbh_do(sub {
+      my ($storage, $dbh) = @_;
+      $dbh->selectrow_arrayref("SELECT * FROM device WHERE 0 = 1");
+    });
+
+    $schema->_set_db_version({version => 2})
+      if $schema->get_db_version == 1;
+    $schema->storage->disconnect;
+};
+
+# upgrade from whatever dbix_class_schema_versions says, to $VERSION
+# except that get_db_version will be 0 at first deploy
+my $db_version = ($schema->get_db_version || 1);
+my $target_version = $schema->schema_version;
+
+# one step at a time, in case user has applied local changes already
+for (my $i = $db_version; $i < $target_version; $i++) {
+    try {
+        $schema->upgrade_single_step($i, $i + 1);
+    }
+    catch {
+        warn "Error: $_"
+          if $_ !~ m/(does not exist|already exists)/;
+    };
+}
+
+exit 0;

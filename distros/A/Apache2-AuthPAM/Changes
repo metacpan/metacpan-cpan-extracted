@@ -1,0 +1,4 @@
+Revision history for Perl extension Apache2::AuthPAM.
+
+0.01  May 23rd 2008
+    Initial version created from Apache::AuthPAM 0.01

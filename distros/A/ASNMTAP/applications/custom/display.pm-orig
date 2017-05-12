@@ -1,0 +1,116 @@
+# ----------------------------------------------------------------------------------------------------------
+# © Copyright 2003-2011 Alex Peeters [alex.peeters@citap.be]
+# ----------------------------------------------------------------------------------------------------------
+# 2011/mm/dd, v3.002.003, module display.pm for ASNMTAP::Asnmtap::Applications::Display
+# ----------------------------------------------------------------------------------------------------------
+
+use strict;
+use warnings;           # Must be used in test mode only. This reduces a little process speed
+#use diagnostics;       # Must be used in test mode only. This reduces a lot of process speed
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+BEGIN { if ( $ENV{ASNMTAP_PERL5LIB} ) { eval 'use lib ( "$ENV{ASNMTAP_PERL5LIB}" )'; } }
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+sub printStatusMessageCustom {
+  my $statusMessage = shift(@_);
+
+  my $break = '';
+  my $errorMessage = '';
+
+  if ($statusMessage =~ /&lt;NIHIL&gt;/ ) {
+    $errorMessage = 'possible a problem with this execution for this plugin';
+  # ***************************************************************************
+  # Error codes indicate an error with DUMMY-Tn                               *
+  # ***************************************************************************
+  } elsif ($statusMessage =~ /Check Dummy:/ ) {
+    if ($statusMessage =~ /\+DUMMY-T1\+/ ) { $errorMessage = 'testing: <normal crontab>'; }
+    if ($statusMessage =~ /\+DUMMY-T2\+/ ) { $errorMessage = 'testing: noOFFLINE'; }
+    if ($statusMessage =~ /\+DUMMY-T3\+/ ) { $errorMessage = 'testing: multiOFFLINE'; }
+    if ($statusMessage =~ /\+DUMMY-T4\+/ ) { $errorMessage = 'testing: noTEST'; }
+  # ---------------------------------------------------------------------------
+  # Start custom code ---------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # ***************************************************************************
+  # Error codes indicate an error with eCommunities                           *
+  # ***************************************************************************
+  } elsif ($statusMessage =~ /eCommunities/ ) {
+    if ($statusMessage =~ /\+Q1\+/ ) { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'Q1: ADSL HTTPS.'; }
+    if ($statusMessage =~ /\+Q2\+/ ) { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'Q2: TEST WEBSERVER.'; }
+    if ($statusMessage =~ /\+Q3b\+/ ){ $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'Q3: TEST LOCAL.'; }
+    if ($statusMessage =~ /\+Q4\+/ ) { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'Q4: LOGIN.'; }
+    if ($statusMessage =~ /\+Q5\+/ ) { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'Q5: SEARCH.'; }
+    if ($statusMessage =~ /\+Q6\+/ ) { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'Q6: DOWNLOAD.'; }
+    if ($statusMessage =~ /\+Q7\+/ ) { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'Q7: LOGOUT.'; }
+  # ***************************************************************************
+  # Error codes indicate an error with KBO-BCE WI                             *
+  # ***************************************************************************
+  } elsif ($statusMessage =~ /KBO-BCE WI/ ) {
+    if ($statusMessage =~ /\+BIS\+/ )        { $errorMessage = 'Backend KSZ/BCSS not accessible, if needed call \'KSZ/BCSS\''; }
+    if ($statusMessage =~ /\+KBO-WI-BIS\+/ ) { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'KBO-WI-BIS @ ACCENTURE not available, if needed call \'Accenture\''; }
+    if ($statusMessage =~ /\+NIS\+/ )        { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'NIS database @ ACCENTURE not available, if needed call \'Accenture\''; }
+    if ($statusMessage =~ /\+KBO-WI-NIS\+/ ) { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'KBO-WI-NIS @ ACCENTURE not available, if needed call \'Accenture\''; }
+    if ($statusMessage =~ /\+RR\+/ )         { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'RIJKSREGISTER not available, if needed call \'RR/RN\''; }
+    if ($statusMessage =~ /\+KBO-WI-RR\+/ )  { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'KBO-WI-RR @ ACCENTURE not available, if needed call \'Accenture\''; }
+    if ($statusMessage =~ /\+KBO\+/ )        { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'KBO-WI problems, if needed call \'KBO/CBE\''; }
+    if ($statusMessage =~ /\+KBO-WI-KBO\+/ ) { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'KBO-WI-KBO @ ACCENTURE not available, if needed call \'Accenture\''; }
+
+    unless ( $errorMessage ) {
+      if ($statusMessage =~ /TOKEN AUTHENTIFICATIE/ ) {
+        $errorMessage = 'Problem with \'Authentification Software\' from \'Accenture\', call Accenture';
+      } elsif ($statusMessage =~ /Er is een fout voorgekomen/ ) {
+        $errorMessage = 'De volgende zaken kunnen deze fout veroorzaakt hebben: De back-end is niet beschikbaar, Een interne fout heeft zich voorgedaan in de back-end, U hebt geen toelating om deze request uit te voeren';
+      }
+    }
+  # ***************************************************************************
+  # Error codes indicate an error with ORGADON                                *
+  # ***************************************************************************
+  } elsif ($statusMessage =~ /ORGADON/ ) {
+    if ($statusMessage =~ /\+LASTCALL\+/ ) { $errorMessage = 'Het weergeven van de laaste opvraging is mislukt  (DB updates bezig? - Server zwaar belast?).'; }
+    if ($statusMessage =~ /\+SEARCH1\+/ )  { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'Consultatie op rijksregisternr mislukt.'; }
+    if ($statusMessage =~ /\+SEARCH2\+/ )  { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'Consultatie op naam en voornaam mislukt.'; }
+    if ($statusMessage =~ /\+SEARCH3\+/ )  { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'Consultatie op naam, voornaam en geboortedatum mislukt.'; }
+    if ($statusMessage =~ /\+LOGOFF\+/ )   { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'Logoff mislukt'; }
+  # ***************************************************************************
+  # Error codes indicate an error with the Sociale Zekerheid                  *
+  # ***************************************************************************
+  } elsif ($statusMessage =~ /Sociale Zekerheid/ ) {
+    if ($statusMessage =~ /Personeelsbestand/ ) {
+      if ($statusMessage =~ /fout(en) in applicatie/ ) {
+        $errorMessage = 'Dit wil zeggen dat niet alle opvragingsmethoden zijnde: online, csv, pdf en xml gelukt zijn.';
+      }
+    }
+  # ***************************************************************************
+  # Error codes indicate an error with TP Dimona Web (SP11)                   *
+  # ***************************************************************************
+  } elsif ($statusMessage =~ /TP Dimona Web/ ) {
+    if ($statusMessage =~ /\+CD\+/ )      { $errorMessage = 'Consultatie Dimona.'; }
+    if ($statusMessage =~ /\+FCRR\+/ )    { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'Fonetische consultatie van het Rijksregister.'; }
+    if ($statusMessage =~ /\+CRRINSZ\+/ ) { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'Consultatie van het Rijksregister op basis van het INSZ.'; }
+    if ($statusMessage =~ /\+CWR\+/ )     { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'Consultatie van het WerkgeversRepertorium op basis van het stamnummer.'; }
+  # ***************************************************************************
+  # Error codes indicate an error with the UME1 End-to-End controle           *
+  # ***************************************************************************
+  } elsif ($statusMessage =~ /Elektronisch loket/ ) {
+    if ($statusMessage =~ /CR - Aangemaakt en verzonden/ ) { $errorMessage = 'UME1 problem.'; }
+    if ($statusMessage =~ /\+R0010\+/ ) { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'RSZ.'; }
+    if ($statusMessage =~ /\+R0020\+/ ) { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'FOD Financien.'; }
+    if ($statusMessage =~ /\+R0060\+/ ) { $break = ($errorMessage) ? '<BR>' : ''; $errorMessage .= $break . 'Nationale Bank.'; }
+     
+ # ***************************************************************************
+  # } elsif ($statusMessage =~ /<string to find>/ ) {
+  #   if ($statusMessage =~ /\+<substring to find>\+/ ) { $errorMessage = '<erormessage to return>'; }
+  # ---------------------------------------------------------------------------
+  # End custom code -----------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  }
+
+  return $errorMessage;
+}
+
+# End display.pm -------------------------------------------------------------------------------------
+
+1;
+ 

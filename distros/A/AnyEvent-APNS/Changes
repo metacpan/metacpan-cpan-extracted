@@ -1,0 +1,45 @@
+Revision history for Perl extension AnyEvent::APNS
+
+0.10  2012-11-28T09:22:31+09:00
+      - use enhanced notification format (mash)
+      - added last_identifier, on_error_response property (mash)
+
+0.09  2012-08-28T15:54:19+09:00
+      - Fixed read error wasn't occurred correctly because didn't start read event watcher.
+      - Added optional on_eof handler.
+
+0.08  2012-08-27T18:27:56+09:00
+      - Added an option that accepts certificate and private_key datas directly instead of its file path. (shin1rosei)
+
+0.07  2010-02-16T14:08:32+09:00
+      - fix reconnect issue: ->connect warn 'already connected' but sometimes actially already be disconnected
+
+0.06  2009-10-15T17:19:13+09:00
+      - cast badge number to int value explicitly
+      - fix a bug trimming wring target... s/$payload->{alert}/$payload->{aps}{alert}/.
+
+0.05  2009-10-07T12:54:58+09:00
+      - now send method trimmed payload body if its length over 256bytes;
+        because payload exceed the size will be ignored by Apple APNs server.
+      - refactor handler managing
+      - fix some typos
+
+0.04  2009-09-09T12:00:10+09:00
+      - fixed a bug around error_handler
+
+0.03  2009-08-26T12:34:45+09:00
+      - fixed a bug that object doesn't cleanup correctly
+
+0.02  2009-07-31T19:52:15+09:00
+      - API Changed: now does not connect in new method,
+        so need to call connect method explicitly to connect APNS server.
+
+0.01002 2009-07-13T18:24:30+09:00
+      - added missing prereq: JSON::Any
+
+0.01001 2009-07-09T18:16:39+09:00
+      - some document fixed (Thanks to tokuhirom)
+      - no code changed
+
+0.01  2009-07-08T20:23:29+09:00
+      - original version

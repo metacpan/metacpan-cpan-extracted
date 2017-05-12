@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name:                Acme-Meta
+version:             0.02
+abstract:            Enhances the Meta package
+license:             unknown
+generated_by:        ExtUtils::MakeMaker version 6.30_02
+author:              Nicholas Clark <nick@unfortu.net>
+distribution_type:   module
+requires:     
+meta-spec:
+    url: <http://module-build.sourceforge.net/META-spec-new.html>;
+    version: 1.1

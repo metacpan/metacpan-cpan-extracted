@@ -1,0 +1,20 @@
+---
+name: Acme-Sub-Parms
+version: 1.02
+author:
+  - 'Benjamin Franz <snowhare@nihongo.org>'
+abstract: Function/Method parameter processing handlers
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Filter::Util::Call: 1.06
+provides:
+  Acme::Sub::Parms:
+    file: lib/Acme/Sub/Parms.pm
+    version: 1.02
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

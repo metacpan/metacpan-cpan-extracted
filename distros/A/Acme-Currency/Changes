@@ -1,0 +1,19 @@
+Revision history for Perl extension Acme::Currency.
+
+3.01  Thu Mar 31 08:01 2011
+	- Rats, forgot change log in previous release.
+
+3.00  Thu Mar 31 08:00 2011
+	- Fix test failure in blead perl (5.14 to be).
+
+2.00  Tue Mar 29 23:00 2011
+	- Remove useless signature.
+
+1.00  Thu Oct 06 21:00 2005
+	- Distribution upgrade.
+	- Now using Module::Build.
+	- Now using t/ test infrastructure.
+	- Now testing POD.
+
+0.01  Mon Apr 14 12:30:37 2003
+	- original version as uploaded to CPAN

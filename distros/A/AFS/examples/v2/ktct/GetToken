@@ -1,0 +1,20 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use Time::localtime;
+use AFS::KTC_TOKEN;
+use AFS::KTC_PRINCIPAL;
+use AFS::Cell qw(localcell);
+
+system "tokens";
+
+my $service = AFS::KTC_PRINCIPAL->new("afs","",localcell);
+my ($token, $user) = AFS::KTC_TOKEN->GetToken($service);
+
+print "User = ", $user->principal, "\n";
+print "  Token StartTime = ", ctime($token->startTime), "\n";
+print "        EndTime   = ", ctime($token->endTime), "\n";
+

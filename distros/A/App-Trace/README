@@ -1,0 +1,36 @@
+######################################################################
+## File: $Id: README 3442 2005-05-14 14:14:01Z spadkins $
+######################################################################
+
+1. What is the App-Trace distribution?
+
+The App-Trace distribution is a module which facilitates putting
+debug statements into your program.  These can normally be turned off,
+but can easily be turned on and controlled through command line
+options.
+
+2. What are the features?
+
+FEATURES OF App::Trace
+
+ o ...
+   ...
+
+3. It's easy to use.
+
+  #!/usr/bin/perl
+  use App::Trace;
+  use App::Options;
+  # now use the %App::options hash
+  print "yada yada\n" if ($App::options{verbose});
+
+4. How do I install it?
+
+To install this module, cd to the directory that contains this README
+file and type the following (as usual).
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

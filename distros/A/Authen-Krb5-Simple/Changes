@@ -1,0 +1,36 @@
+Revision history for Perl extension Authen::Krb5::Simple.
+
+0.42  Mon Aug 03 23:41 2009
+    - Changed handling of null/empty passwords.
+    - Added internal (non-krb) error message handling.
+    - Added null/empty password tests.
+    - Updated tests to use Test::More.
+    - Minor code refactoring.
+    - Updated docs.
+
+0.40  Sun Feb 24 18:35:42 2008
+    - Added the Devel::CheckLib.
+    - Changes to Makefile.PL and the way it tries to determine whether or
+      not the Kerberos libs are available using Devel::CheckLib.
+    - Documentation and test tweaks.
+
+0.32  Mon Feb 21 23:50:37 2005
+    - Documentation updates for clarification.
+
+0.31  Fri Mar 14 07:14:33 2003
+    - Fixed bug where realm was not properly set by the constructor (Thanks
+      to Jorgen Andreasen for pointing that out to me).
+
+0.30  Sun Jan 19 15:56:00 2003
+    - Removed export of authenticate method.
+    - Added the CONFIG file for user auth tests, which are now optional.
+    - Minor code tweaks.
+
+0.20  Wed Dec 25 20:53:23 2002
+	- Remove attempted support for empty passwords (currently causes a core
+      dump when perl exits).
+
+0.10  Wed Dec 25 12:04:23 2002
+	- original version; created by h2xs 1.21 with options
+		-A -n AuthKrb5 -v 0.10 -x
+

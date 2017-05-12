@@ -1,0 +1,125 @@
+
+Apache::DAV - Perl access to mod_dav
+
+Copyright (c) 2001-2002 Gerald Richter / ecos gmbh  www.ecos.de
+
+You may distribute under the terms of either the GNU General Public 
+License or the Artistic License, as specified in the Perl README file.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+$Id: README,v 1.2 2002/03/19 10:04:58 richter Exp $
+
+
+Apache::DAV provides an Perl interface to mod_dav. It allows to access mod_dav
+when running under mod_perl. Basicly it makes available
+all public functions and structures of mod_dav to Perl. Most of them are
+only usefull with a good knowlegde of mod_dav internals. Apache::DAV provides
+some highlevel interface functions which allows to access the mod_dav internals
+that is what is normaly want to use.
+
+NOTE: Further versions will provide high level access to more mod_dav functions and
+the possibility to write provider for mod_dav in Perl, for example to 
+store properties in a sql database.
+
+
+
+INSTALLATION
+============
+
+You need the Apache 1.3.x sources and the mod_dav 1.0.3 sources.
+
+1.) Apply the patch mod_dav-1.0.3.patch to the mod_dav sources.
+
+2.) Build Apache with the patched mod_dav. You also need to
+    build mod_perl. It's important to keep the correct order:
+
+    a.) run perl Makefile.PL of mod_perl
+    b.) run ./configure of mod_dav, build and install mod_dav
+    c.) build and install Apache and mod_perl
+
+3.) run
+
+    perl Makefile.PL APACHE_SRC=/patch/to/apache_1.3.x MODDAV_SRC=/path/to/moddav
+    make
+    make install
+
+
+SYNOPSIS
+========
+
+    # get a sub request of the actual document
+    $subr = $r -> lookup_uri($uri);
+
+    # get a mod_dav resource object
+    my ($err, $resource) =  $subr->get_resource;
+
+    # get the properties of the resource as xml text
+    my ($status, $text, $namespaces) = $resource -> propfind ($subr) ;
+
+    # get the properties of the resource as preparsed hash
+    my ($status, $props) = $resource -> propfind_hash ($subr) ;
+
+    # set and/or remove properties
+    ($status, $statustext) = $resource -> proppatch ($subr, \%set, \%remove) ;
+
+
+DESCRIPTION
+===========
+
+($err, $resource) = $r -> get_resource ;
+
+Gets the resource object for an Apache request. If you don't want to access the
+resource of the current request itself, issue a sub request to get the correct
+Apache request for the resource you want to access.
+
+Returns an error object and a resource object. The error object has the members
+status and desc, which can be used the examine the error.
+
+
+
+($status, $xmltext, $namespaces) = $resource -> propfind ($r) ;
+
+Finds all properties of the given resource. $r is a Apache request object.
+Returns $status, which is non zero when an error occurs and in $xmltext 
+all properties as xml. $namespaces is a reference to a hash which contains
+all namespaces that occurs in $xmltext.
+
+
+
+($status, $props) = $resource -> propfind_hash ($r) ;
+
+Same as propfind, but the xmltext text and the namespaces are preparsed and
+the result is given as a reference to a hash in $props. There is one hash
+entry for each top level property in hash. The hashkey is the namespace and
+the property name separated by a colon.
+
+
+
+($status, $statustext) = $resource -> proppatch ($r, \%set, \%remove) ;
+
+
+Set or remove properties. Will set/modify all properties given in the hash reference
+\%set and remove all properties given in the hashrefenece \%remove. The hashkey is 
+the namespace and the property name separated by a colon. The values in the \%remove hash
+are ignored.
+
+
+
+EXAMPLES
+========
+
+A example Embperl script, which can be used to display and modify properties
+can be found in eg/props.epl
+
+
+AUTHOR
+======
+
+Gerald Richter <richter@dev.ecos.de>
+
+
+
+

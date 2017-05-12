@@ -1,0 +1,75 @@
+Coding Style
+============
+
+Nice code should look nice and structured, there is no doubt about this. :)
+
+Please use lowercased_underscored_identifiers for variables and functions.
+
+Please use the strict K&R style with real Tab char for indentation levels.
+It is suggested to read the Linux Kernel Coding Style that is usually found
+in file /usr/src/linux/Documentation/CodingStyle on GNU/Linux systems.
+I request the code to be even more structured than this.
+
+The code should be stretchable, i.e. look correct regardless of the TAB size
+used, that may be 3, 4, 5, 8, 12 or any other value a developer prefers.
+
+Some "smart" editors are not configurable enough. If you use one of them,
+and can't live without auto-indentation, you may submit the code that
+doesn't follow these guidelines, but expect any such unstructured code to
+be reformatted. Basically, it's a good idea to disable auto-indentation
+completely and use two keys (real Tab and real Backspace) to insert and
+remove indentation levels. Any spaces in indentation are disallowed in
+this project; exactly one Tab is used for every new level in the code.
+
+Some simple K&R rules:
+
+* braces that start a block do not deserve separate lines on their own
+* functions (for example: localtime(time())) are not language constructions
+  (for example: while (1) {) and should be spaced differently
+* most of non-unary operators are surrounded by spaces
+* no space before comma and semicolon (and optionally "?" and ":")
+
+There is no requirement to keep lines shorter than 80 chars, but try to use
+short lines when possible (not at expense of meaningful names of course).
+There are several things you may do to improve readability. Use a smaller
+TAB size, set your editor not to wrap long lines. If the code is good, it
+should be clear what the line does just by glancing at its beginning anyway.
+
+Basically, please preserve the style of the existing code.
+
+The developers who use emacs, may add this to .emacs file:
+ 
+(c-add-style "arch-magic"
+	'("k&r"
+		(indent-tabs-mode . t)
+		(tab-width        . 4)
+		(c-basic-offset   . 4)
+		(c-offsets-alist
+			(arglist-intro . +)
+			(case-label    . +)
+			(inlambda      . c-lineup-dont-change)
+			(statement-block-intro . +))))
+ 
+(add-hook 'perl-mode-hook
+	(function (lambda ()
+		(c-set-style "arch-magic"))))
+
+To reformat existing code, marking all 'C-x h' and then 'M-x indent-region'.
+
+
+Arch Developement
+=================
+
+GNU Arch is naturally the revision control system used to develop the code.
+
+Please use explicit tags for files. Tagline adds several practical problems
+and no real benefit, please don't use this tagging method in this project.
+
+
+Perl Style
+==========
+
+Please read "man perlstyle" and "man perltoot".
+
+Happy coding!
+

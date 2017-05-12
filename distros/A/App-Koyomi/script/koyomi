@@ -1,0 +1,77 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.010_001;
+use Pod::Usage;
+
+use version; our $VERSION = 'v0.6.0';
+
+use App::Koyomi::Worker;
+
+my $opt = App::Koyomi::Worker->parse_args(@ARGV);
+pod2usage(-verbose => 1) if $opt->{help};
+pod2usage(-verbose => 2) if $opt->{man};
+
+App::Koyomi::Worker->new(%$opt)->run;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+B<koyomi> - koyomi worker
+
+=head1 SYNOPSIS
+
+    # Run worker
+    koyomi [--config|-c /path/to/config.toml] [--debug|-d]
+
+    # Show help or manual
+    koyomi --help|-h
+    koyomi --man
+
+=head1 DESCRIPTION
+
+This script is a job scheduler program like I<crond>.
+
+I<Koyomi> executes scheduled jobs every minute and keeps running until someone stops it.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--config|-c Str>
+
+Config file path.
+
+=item B<--debug|-d>
+
+Enable debug logging.
+
+=back
+
+=head1 DOCUMENTATION
+
+Full documentation is available on L<http://key-amb.github.io/App-Koyomi-Doc/>.
+
+=head1 SEE ALSO
+
+L<App::Koyomi>,
+L<App::Koyomi::Worker>
+
+=head1 AUTHORS
+
+YASUTAKE Kiyoshi E<lt>yasutake.kiyoshi@gmail.comE<gt>
+
+=head1 LICENSE
+
+Copyright (C) 2015 YASUTAKE Kiyoshi.
+
+This application is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.  That means either (a) the GNU General Public
+License or (b) the Artistic License.
+
+=cut
+

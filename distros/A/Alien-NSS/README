@@ -1,0 +1,14 @@
+Alien::NSS - Easy installation of the Mozilla NSS library
+=========================================================
+
+This module is meant to ease the installation of the 
+Mozilla Network Security Services (NSS) library.
+
+COPYRIGHT AND LICENCE
+
+Copyright 2012 by Johanna Amann
+
+This Library is subject to the terms of the Mozilla 
+Public License, v. 2.0. If a copy of the MPL was not 
+distributed with this library, You can obtain one at 
+http://mozilla.org/MPL/2.0/.

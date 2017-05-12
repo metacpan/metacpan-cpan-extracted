@@ -1,0 +1,15 @@
+Revision history for Any-Renderer-Data-Printer
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02    Tue Jun  7 23:00:40 EDT 2011
+        Updated Makefile.PL to include pre-reqs 
+
+0.03    Sat Jun 11 12:17:21 EDT 2011
+        Added repistory to Makefile.PL
+        POD coverage tests failed on fresh install 
+            and are not needed
+        Updated MANIFEST 
+
+0.04    Tests in Any::Renderer look for requires_template

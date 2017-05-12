@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use YAML;
+
+use App::MatrixClient;
+
+my $CONFIG = "client.yaml";
+
+GetOptions(
+   "C|config=s" => \$CONFIG,
+   "S|server=s" => \my $SERVER,
+   "ssl+"       => \my $SSL,
+   "D|dump-requests" => \my $DUMP_REQUESTS,
+) or exit 1;
+
+if( $DUMP_REQUESTS ) {
+   open my $requests_fh, ">>", "requests.log" or die "Cannot write requests.log - $!";
+   $requests_fh->autoflush;
+
+   require Net::Async::HTTP;
+   require Class::Method::Modifiers;
+   require Data::Dump;
+
+   Class::Method::Modifiers::install_modifier( "Net::Async::HTTP",
+      around => _do_request => sub {
+         my ( $orig, $self, %args ) = @_;
+         my $request = $args{request};
+
+         my $request_uri = $request->uri;
+         return $orig->( $self, %args )
+            ->on_done( sub {
+               my ( $response ) = @_;
+
+               my $data = eval { Data::Dump::pp( JSON::decode_json( $response->content ) ) };
+
+               print $requests_fh "Response from $request_uri:\n";
+               print $requests_fh "  $_\n" for split m/\n/, $data // $response->content;
+            });
+      }
+   );
+}
+
+my $config;
+if( -f $CONFIG ) {
+   $config = YAML::LoadFile( $CONFIG );
+   $SERVER //= $config->{server};
+   $SSL    //= $config->{ssl};
+}
+
+$SERVER //= "localhost:8080";
+
+App::MatrixClient->new(
+   server => $SERVER,
+   ssl    => $SSL,
+   ( map { $_ => $config->{$_} } qw( user_id password ) ),
+)->run;

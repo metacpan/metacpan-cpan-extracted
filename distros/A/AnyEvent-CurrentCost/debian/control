@@ -1,0 +1,18 @@
+Source: libanyevent-currentcost-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5)
+Build-Depends-Indep: perl (>= 5.6.10-12), libtest-requires-perl,
+  libtest-sharedfork-perl, libtest-warn-perl
+Maintainer: Mark Hindess <soft-debian@temporalanomaly.com>
+Standards-Version: 3.9.1.0
+Homepage: http://search.cpan.org/dist/AnyEvent-CurrentCost/
+
+Package: libanyevent-currentcost-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, libsub-name-perl,
+ libdevice-currentcost-perl (>= 1.130190-1),
+ libanyevent-serialport-perl (>= 1.130171-2)
+Description: AnyEvent::CurrentCost Perl Module
+ AnyEvent modules for reading from energy meters made by Current Cost
+ (http://www.currentcost.com/).

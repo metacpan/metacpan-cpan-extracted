@@ -1,0 +1,12 @@
+# local defaults for perlcritic
+severity = 3
+verbose = 4
+
+[-ErrorHandling::RequireCarping]
+[-InputOutput::RequireBriefOpen]
+[-RegularExpressions::RequireExtendedFormatting]
+[-Subroutines::RequireFinalReturn]
+[-TestingAndDebugging::ProhibitNoWarnings]
+[-TestingAndDebugging::RequireUseStrict]
+[-TestingAndDebugging::RequireUseWarnings]
+[-ValuesAndExpressions::ProhibitConstantPragma]

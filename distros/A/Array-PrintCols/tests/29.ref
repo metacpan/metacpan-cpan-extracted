@@ -1,0 +1,22 @@
+Test 29: Complex words, indent 3, total width 50
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+   3D                    SysNT_long            
+   FSPEC_complete        SysNT_short           
+   FSPEC_long            Win95Desktop_complete 
+   FSPEC_short           Win95Desktop_long     
+   ISPEC_complete        Win95Desktop_short    
+   ISPEC_long            front_end             
+   ISPEC_short           games                 
+   LargeApps             memory                
+   MMx_complete          photoshop             
+   MMx_long              sys32_win95_complete  
+   MMx_short             sys32_win95_long      
+   Multimedia_complete   sys32_win95_short     
+   NTDesktop_complete    ubench                
+   NTDesktop_long        vox                   
+   NTDesktop_short       wmt_ubench            
+   NT_other_complete     xmark96_complete      
+   NT_other_long         xmark96_long          
+   NT_other_short        xmark96_short         
+   SysNT_complete        
+12345678901234567890123456789012345678901234567890123456789012345678901234567890

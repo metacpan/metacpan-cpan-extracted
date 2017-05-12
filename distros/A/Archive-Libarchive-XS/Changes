@@ -1,0 +1,38 @@
+Revision history for Archive-Libarchive-XS
+
+0.0901    2015-12-15 22:44:18 -0500
+  - Remove accidental requirement for Perl 5.10
+    Minimum required Perl is probably 5.8.x, though may work on 5.6.x
+
+0.0900    2015-10-15 15:19:00 -0400
+  - New constant ARCHIVE_EXTRACT_SECURE_NOABSOLUTEPATHS
+  - Fixed synopsis for archive_entry_set_pathname style functions
+    (Documentation)
+
+0.0800    2014-06-10 14:26:54 -0400
+  - Documentation correction, return value for write callback
+    (Archive::Libarchive::XS::Callback)
+  - minor test diagnostic improvement
+  - Alien::Libarchive 0.18 compat
+
+0.0701    2014-02-10 19:16:56 -0500
+  - handle 64bit integers on older versions of libarchive (eg. 2.5.x)
+    (was intended for 0.07, but missed the release)
+
+0.07      2014-02-10 18:51:41 -0500
+  - preliminary support for libarchive 2.5.x
+  - fix for MSWin32 build failure
+  - improved test suite
+
+0.06      2014-02-05 15:11:38 -0500
+  - correctly escape @_ in callback generation (thanks chorny GH#34)
+  - fewer bogus warnings on MSWin32
+  - build/test fixes for netbsd / openbsd
+  - support older libarchives that don't have archive_read/write_free
+    (use archive_read/write_finish instead)
+
+0.05      2014-02-03 21:09:11 -0500
+  - include fix to MSVC++ that got missed in previous release
+
+0.04      2014-02-03 21:07:31 -0500
+  - firsty CPAN release

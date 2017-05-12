@@ -1,0 +1,33 @@
+
+AxKit2 TODO List
+================
+
+- Implement Apache::Request-a-like and figure out how to past to Transformers
+    - Sort of done. POST/PUT body data goes through the body_data hook. I have
+      not yet written a plugin to parse these but it should be straightforward.
+      Querystring data is parsed and available via the param() method.
+
+- Implement better output of HTTP headers. Particularly caching headers (ETags etc).
+
+- Add tests (eek!).
+    (started)
+
+- Support some form of .config for directories.
+
+- Vhost support
+
+- Support HTMLDoc.
+
+- Support PassiveTeX.
+
+- Allow console to reload plugins
+
+- Catalyst plugin
+
+- Jifty plugin
+
+- SAWA plugin
+
+- Make "make install" work (mostly involves figuring out where to put plugin dir)
+
+- Update axkit.org to reflect AxKit2.

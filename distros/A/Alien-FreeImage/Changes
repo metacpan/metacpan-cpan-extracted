@@ -1,0 +1,10 @@
+Revision history for Perl module Alien::FreeImage
+
+0.011   2014-12-09
+        - flag -fPIC strikes again
+
+0.010   2014-12-08
+        - x64 linux requires -fPIC and -lstdc++
+
+0.009   2014-11-30
+        - first working release

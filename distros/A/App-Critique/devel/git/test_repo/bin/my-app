@@ -1,0 +1,8 @@
+#!perl -w
+
+use strict;
+use warnings;
+
+print "HELLO WORLD\n";
+
+exit;

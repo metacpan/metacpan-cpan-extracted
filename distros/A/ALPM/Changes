@@ -1,0 +1,273 @@
+-*- org -*-
+
+:     _    _     ____  __  __    ____ _                                 
+:    / \  | |   |  _ \|  \/  |  / ___| |__   __ _ _ __   __ _  ___  ___ 
+:   / _ \ | |   | |_) | |\/| | | |   | '_ \ / _` | '_ \ / _` |/ _ \/ __|
+:  / ___ \| |___|  __/| |  | | | |___| | | | (_| | | | | (_| |  __/\__ \
+: /_/   \_\_____|_|   |_|  |_|  \____|_| |_|\__,_|_| |_|\__, |\___||___/
+:                                                       |___/           
+
+* Release 3.06
+- Add assumeinstalled option accessors/setters
+
+* Release 3.05
+- Add missing get_root and get_dbpath methods to ALPM.
+- Assign proper DB class to DB object returned by a package's DB accessor.
+- Fix $arch and $repo parsing in mirror list.
+
+Fixes by Andrew Gregory. Thank you!
+
+* Release 3.04
+
+Bugfix for DB::groups infinite while loop.
+
+Fixed by Andrew Gregory. Thank you!
+
+* Release 3.03
+
+ALPM::strerror had been typo-ed as the old ALPM::alpm_strerror in 03-Package.t.
+This was preventing errors from being displayed! The package format had been
+updated slightly, preventing the custom built packages from generating and
+loading properly.
+
+Reported by Stefan Majewsky. Thank you!
+
+* Release 3.02
+
+** Bugfix for find_satisfier and find_dbs_satisfier.
+
+These two functions were causing crashes because of my misuse of a macro
+that was screwing up the perl stack.
+
+Reported by Radu Andries. Thank you!
+
+* Release 3.01
+
+** set_pkg_reason moved to ALPM::DB::Local and renamed set_install_reason.
+
+The ALPM object method was relocated to the ALPM::DB::Local class and I have
+renamed it to set_install_reason. This was prompted by the libalpm function
+name change from alpm_db_set_pkgreason to alpm_pkg_set_reason.
+
+** New ALPM::Package accessors.
+
+ - origin
+ - validation
+ - signature
+
+** New "desc" field in depends hashref.
+
+If a dependency is optional, it contains a "desc" entry in the hash
+reference representation.
+
+** Delta options were renamed.
+
+The old option "usedelta" was renamed to "deltaratio". You'll have to lookup
+what this means in libalpm because I never use deltas.
+
+* Release 3.00
+
+** Major rewrite to continue compatibility with Pacman 4.
+
+I rewrote quit a bit of code in order to continue compatibility with the
+new pacman 4. This release comes a bit late after pacman 4 but I was
+seriously considering not updating this module anymore. I no longer use
+ArchLinux as much as I used to. I tried to keep things as backwards
+compatible as possible but there were many changes to the API that reflect
+libalpm's many API changes.
+
+** ALPM "handle" objects.
+
+The ALPM class now creates objects when an instance of ALPM is
+initialized. In libalpm these are called handles. Here they are simply
+objects. You will have to change every class method (ALPM->foo) to use
+an ALPM object method instead ($alpm->foo). Luckily I decided to use
+class methods years ago so this will be less painful.
+
+*** ALPM errors are stored inside handles.
+
+This makes things more difficult for me. Given an ALPM::DB object, if you
+call a method on that object and the method fails, I cannot croak an error
+message internally because the ALPM handle is not available.
+
+** ALPM::Group is no longer a class.
+
+Packages groups are now simply lists of packages. When you lookup one
+specific group then a list is returned. When querying every single
+group (i.e. with ALPM::DB's groups method) a list of name/value pairs
+is returned to store it into a hash.
+
+* Release 2.01
+
+** Fix tests to work with custom PKGEXT                              :BUGFIX:
+
+   Tests were failing to work when using a different PKGEXT.
+
+** load_pkgfile error changes to croak instead of die                :BUGFIX:
+
+   A minor problem I found.
+
+* Release 2.00
+
+** Upgrade for Pacman 3.5
+   Converted to the new libalpm that is distributed with pacman 3.5.
+
+*** alpm_db_register_local removed
+    You don't have to call ALPM->register() to register the local DB.
+    The local DB is registered automatically when you call
+    ALPM->localdb aka ALPM->get_opt( 'localdb' ).  ALPM::ParseConfig
+    no longer takes the 'autoregister' parameter.
+
+*** Transaction functions absorbed into install() and uninstall()
+    The two new ALPM::Transaction methods, install and uninstall,
+    replace the old sync, pkgfile, remove, and sync_from_db
+    methods.
+
+    The new methods take package objects as arguments. The old
+    methods took package names as arguments. This reflects the same
+    libalpm changes.
+
+** ALPM method aliases removed
+   For some reason I made aliases everytime I changed a function name.
+   I don't think anyone uses this module anyways so I just yanked out
+   a bunch of old method aliases I had setup. The following are
+   removed from the ALPM class, just use their alternate names.
+
+   |----------------+--------------|
+   | Removed Method | "New" Method |
+   |----------------+--------------|
+   | register_db    | register     |
+   | transaction    | trans        |
+   | action         | trans        |
+   | databases      | dbs          |
+   | repodb         | db           |
+   |----------------+--------------|
+
+** New Changelog Format
+   Ditched the old GNU-style ChangeLog format for an org-mode file. Old
+   ChangeLog entries are at the end of the file...
+
+* Previous Releases
+
+2011-03-05  Justin Davis  <juster@cpan.org>
+
+	* RELEASE (1.03)
+
+	* t: Fix many tests that rely on English language error messages.
+
+	* lib/ALPM/LoadConfig.pm (_make_parser): Change the pacman.conf
+	parser to properly recognize fields which are only field names.
+	"= <value>" does not necessary follow them.
+
+2011-03-04  Justin Davis  <juster@cpan.org>
+
+	* RELEASE (1.02)
+
+	* lib/ALPM/LoadConfig.pm: Fix bug where config file repos could
+	not have hyphens ("-"). Reported by knotty.
+
+2010-11-21  Justin Davis  <juster@cpan.org>
+
+	* lib/ALPM/Package.pm (attribs): Fix attribs to return a list and
+	not an array reference.
+
+2010-06-22  Justin Davis  <juster@cpan.org>
+
+	* lib/ALPM.pm (transaction): Removed type parameter from
+	transaction method.
+
+	* ALPM.xs: Renamed ALPM::DB method set_server to add_url.
+
+2010-05-29  Justin Davis  <juster@cpan.org>
+
+	* RELEASE (0.08): Uploaded to CPAN.
+
+	* typemap (find_group): Fix a bug with group type conversion.
+	This caused ALPM::DB::find_group() to croak instead of (properly)
+	returning undef when given a group name that didn't exist.
+	Reported by Andre Schmidt. Thanks!
+
+2010-05-24  Justin Davis  <juster@cpan.org>
+
+	* ALPM.xs (ALPM::Package): Renamed compute_requiredby method to
+	requiredby.
+
+2010-05-02  Justin Davis  <juster@cpan.org>
+
+	* t/04-FakeRepos.t: Add support for .pkg.tar.xz package files.
+
+	* lib/ALPM/LoadConfig.pm: Add support for UseDelta setting in
+	pacman.conf.
+
+2010-01-25  Justin Davis  <jrcd83@gmail.com>
+
+	* t/04-FakeRepos.t (create_repos): Fixed problems with test
+	04-FakeRepos where packages would fail to build.  Changed
+	generated test packages to arch "any" so we don't have to check
+	our arch.
+
+	* Makefile.PL: "make clean" will now delete the test repository
+	share directories (t/repos/share) and the test root
+	directory (t/root) automatically.
+
+
+2010-01-04  Justin Davis  <jrcd83@gmail.com>
+
+	* 0.5 (RELEASE)
+
+	* lib/ALPM/LoadConfig.pm (_make_parser): Tweaked regex to accept empty values.
+	Removed error when an unknown field name is given.
+
+	* lib/ALPM.pm: Added ability to set usedelta option, which was missing.
+
+	* Makefile.PL: Added repository URL to the META.yml.
+
+	* t/07-TiedOptions.t: Hides the warning for the last test using $SIG{__WARN__}.
+
+	* t/04-FakeRepos.t (create_repos): Fixed a bug where I must use
+	the --asroot option when running makepkg inside makepkg, because
+	of fakeroot.
+
+2009-10-29  Justin Davis  <jrcd83@gmail.com>
+
+	* 0.4: Released version 0.4
+
+2009-10-08  Justin Davis  <jrcd83@gmail.com>
+
+	* lib/ALPM.pm (transaction): 'flags' are now passed as a string
+	of flag names separated by spaces.  Added the sysupgrade
+	transaction 'type'.
+
+	* ALPM.xs: Added conv and progress callbacks for transactions.
+
+2009-09-03  Justin Davis  <jrcd83@gmail.com>
+
+	* ALPM.xs: s/alpm_pkg_get_/alpm_pkg_/;
+
+	* lib/ALPM/DB.pm: Renamed get_pkg_cache() to packages().
+
+	* lib/ALPM.pm: Changed methods local_db to localdb, get_sync_dbs
+	to syncdbs, get_repo_db to repodb, and added search.
+
+	- Updated to version 3.30 of pacman.  The upgrade changes
+	many constants and functions.
+	- I have declared war on the get_ named methods.  It seems silly
+	to have all these get_ methods when there is no set_ method for
+	anything except ALPM options (whose prefix I will keep).
+
+2005-08-05  Justin Davis  <jrcd83@gmail.com>
+	0.03
+        - Added transaction support with ALPM::Transaction.
+	- Implemented callback options to ALPM and also transaction
+        callbacks using the transaction() method.
+        - Created tied hash interface to ALPM options just for fun.
+
+2009-07-15  Justin Davis  <jrcd83@gmail.com>
+	0.02
+	- Added ALPM::LoadConfig which is used to load pacman.conf
+        config files
+
+2009-05-03  Justin Davis  <jrcd83@gmail.com>
+	0.01
+	- First public release, uploading to CPAN
+	- Has just about everything working except syncing/transactions

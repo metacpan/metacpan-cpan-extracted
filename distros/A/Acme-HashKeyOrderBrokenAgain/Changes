@@ -1,0 +1,9 @@
+######################################################################
+Revision history for Perl extension Acme::HashKeyOrderBrokenAgain
+
+0.02  (2014/07/29)
+    (ms) Setting anti-tumbling variables now before the interpreter starts,
+         as recommended in [rt.cpan.org #89278].
+
+0.01  (2014/03/26)
+    (ms) Where it all began.

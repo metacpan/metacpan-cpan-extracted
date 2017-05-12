@@ -1,0 +1,44 @@
+Revision history for Perl extension Attribute::Property.
+$Id: Changes,v 1.12 2003/04/21 16:04:14 juerd Exp $
+
+1.05  Sun Oct 12 17:10:11 2003
+        - Objects that use the New attribute can now be subclassed.
+        - More tests. 386 now :)
+        - Fixed Want.pm test.
+
+1.04  Mon Apr 21 17:54:12 2003
+        - Want.pm is no longer required, so the module can be used by people
+          that can't compile XS modules. If it is installed, it will be used,
+          but if it's not, it'll simply fall back to something that does work.
+
+1.03  Mon Mar  3 13:35:53 2003
+	- Fixed object passing and added tests for $_[0]
+	- Improved speed for rvalue calls, new dependency: Want.pm
+	- Moved the attribute handler from INIT to CHECK phase
+	- Added an attribute for creating constructors: New. See pod for info
+	- Improved existing tests, added some
+	- Added tests for the new New attribute
+	- Minor documentation updates and of course documentation additions
+
+1.02  Mon Feb 10 09:36:55 2003
+	- Even more tests
+	- Documented which hashes get used when
+	- Minor documentation updates
+	- Changed default error message to include property name
+
+1.01  Sun Feb  9 14:26:16 2003
+	- Added more tests
+	- Made object available as $_[0]
+	- Made new value available as $_[1] in addition to $_
+	- Documented that changes to $_ or $_[1] change the actual new values
+	- Changed abstract to something everyone understands
+
+1.00  Sat Feb  8 17:12:09 2003
+	- First CPAN release
+	- Added Test::More and Test::Builder to t/lib
+	- Added workaround for problem with Perl 5.6
+	- Removed debug message
+	- The module now reports errors for anon subs
+	- Minor speed ups
+	- Minor style fixes
+	- A module was born

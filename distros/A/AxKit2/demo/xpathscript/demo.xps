@@ -1,0 +1,36 @@
+<%
+    $template->set( chapter => { showtag => 0 } );
+    $template->set( title => { pre => '<h1>', post => '</h1>' } );
+    $template->set( para => { pre => '<p style="margin: 20px 40px 0 40px">', post => '</p>' } );
+    $template->set( emph => { pre => '<i>', post => '</i>' } );
+    
+%>
+<html>
+<head>
+    <title>AxKit2: XPathScript demo</title>
+</head>
+<body>
+
+<h1>Welcome to the AxKit2 XPathScript demo!</h1>
+
+<p>The server is running XPathScript version 
+    <%= $XML::XPathScript::VERSION %>
+</p>
+
+<p>original xml document:</p>
+
+<div style="background-color: lightgrey; margin: 10px">
+<pre>
+<%
+    $doc = XML::XPathScript::current->{dom}->toString; 
+    $doc =~ s/</&lt;/g;
+%>
+<%= $doc %>
+</pre></div>
+
+
+<p>transformed document:</p>
+<%~ / %>
+
+</body>
+</html>

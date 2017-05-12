@@ -1,0 +1,105 @@
+App/CamelPKI version 0.02
+========================
+
+To install this module type the usuall commands :
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install (which is not recommended as it will install the pki in perl libs)
+
+HOWTO CamelPKI Quick and Fast
+1. Installation of the required softwares :
+Some applications must be installed in order CamelPKI to work :
+I give between parenthesis the name of the package in Ubuntu (add all default repository to sources.list). Under gentoo, fonctionnalities
+are controled by use flags that are generally well explained.
+- apache (apache2) : php5 (libapache2-mod-php5), perl(libapache2-mod-perl2)
+- php (php5-cli) : mod_json(php5-json), curl(php5-curl)
+- libssl0.9.8
+- libssl-dev
+- libnet-ssleay-perl
+- build-essential
+
+So, to resume, under Ubuntu, for minimum requirements (tests won't all be runned) :
+In this case, the php front-end won't be usable with this apache instance(which is, by the way, not a good idea).
+#apt-get install apache2 apache2-threaded-dev libapache2-mod-perl2 build-essential libnet-ssleay-perl libssl-dev
+
+If you want to run the entire test suite, you need some other functionnalities. Install the with :
+#apt-get install libapache2-mod-php5 php5-common php5-cli php5-curl
+
+2. Installation of the Perl Modules :
+You have to install some perl modules from CPAN in order to make work the application.
+cpan > install Module::Build File::Slurp MIME::Base64 Error DateTime Sys::Hostname IO::Socket::INET Config::General Config::Tiny XML::Simple Catalyst Catalyst::Plugin::ConfigLoader Catalyst::Plugin::Static::Simple Catalyst::Action::RenderView Catalyst::Engine::Apache JSON Catalyst::View::JSON SQL::Translator Crypt::X509 IPC::Run Test::Group Test::More Test::Builder File::Which File::Slurp File::Find Cwd Errno LWP::Simple LWP::UserAgent Convert::ASN1 IO::Socket::SSL Catalyst::View::TT HTTP::Request::Form Data::Dump DBD::SQLite DBIx::Class Crypt::OpenSSL::CA App::Info::HTTPD::Apache
+
+And if you want to run the full test suite and for devs environments:
+cpan> install Module::ScanDeps Test::NoBreakpoints Test::Pod::Coverage Catalyst::Helper
+
+For the moment, App::Crypt::OpenSSL::CA won't install because of failing tests. These tests fails 
+because they aren't coded. You can install it by hand or by forcing it, making sure that only tests 12 and 13 of 
+lib/Crypt/OpenSSL/CA are failing.
+
+3. Extract the App-CamelPKI archive and create your own app_camelpki.yml (a sample can be found 'app_camelpki.yml.sample').
+
+3. Key Ceremony - Preparing the application
+	A good idea here is to make whole files only readable by the user who executes apache.go 
+	into CamelPKI root directory and type :
+	#chmod -R u+rw,g-rwx,o-rwx *
+	It is also important to fix the right for the directories containing the different keys (as defined in app_camelpki.yml).
+	
+	Key ceremony is an important task to do. You have to generate your own
+	Certificates and Private Keys for the CA. A script has been coded to do this easily :
+	$ perl Build.PL
+	$./Build
+	$./script/camel_pki_keyceremony.pl var/ # Where the CA keys should be put.
+	
+	From this point, the CA Certificate's and key's can be found in the var/ directory.
+	And now the tests :
+	$./Build test
+
+4. Launch the server
+	Be sure, before this phase to complete your own config file ('app_camelpki.yml')
+	If you have apache and mod_perl installed, you could launch the server with apache
+	$./script/start_stop_camel_pki.pl start (stop in order to stop it)
+
+	or you can use Catalyst itself :
+	$./script/camel_pki_server.pl
+	
+5.Generate Client's certificate in order to  generate and issue
+	new client's certificates (we suppose key and certificates are contained in 'var/')
+	For this operation we will use openssl :
+
+	$ cat var/admin.key var/admin.pem >	admin.glob
+	$ openssl pkcs12 -in admin.glob -export -nodes -out cert.p12
+	
+	From this point, the file cert.p12 is a certificate in pkcs12 format.
+	It can be handled by your browser to authenticate on the PKI.
+
+6.Enjoy the ride
+	Simples pages are delivered.
+	You can see them and generate certificates for SSL and VPN.
+	With a form :
+		https://ip:port/ca/template/ssl/certifyForm
+	or
+		https://ip:port/ca/template/vpn/certifyForm
+	You can use the same kind of url with JSON parameters.
+		https://ip:port/ca/template/ssl/certifyJSON for example.(see in t/ and t/php/ for sample).
+	
+	By default, the port used with apache is defined in app_camelpki.yml
+		and is 3000 if you are usng Catalyst. 
+
+TESTED PLATFORMS
+This package has been test under Ubuntu Hardy Heron,Intrepid Ibex and Gentoo (2006.1 and 2007.0 as these
+lines are written.
+
+
+SAMPLES
+
+Please, consult t/php/README for php code samples.
+
+ 
+
+COPYRIGHT AND LICENCE
+Copyright 2008
+
+This program is free software; you can redistribute it following the
+same terms as Perl itself.
+

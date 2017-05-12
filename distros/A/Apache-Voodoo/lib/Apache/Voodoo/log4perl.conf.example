@@ -1,0 +1,12 @@
+log4perl.logger.Apache.Voodoo = TRACE, voodoofile
+log4perl.appender.voodoofile          = Log::Log4perl::Appender::File
+log4perl.appender.voodoofile.filename = /tmp/voodoo.log
+log4perl.appender.voodoofile.layout   = Log::Log4perl::Layout::SimpleLayout
+
+# Fine grain loggers for Apache::Voodoo include
+# Apache.Voodoo.ReturnData
+# Apache.Voodoo.Url
+# Apache.Voodoo.Status
+# Apache.Voodoo.Params
+# Apache.Voodoo.TemplateConf
+# Apache.Voodoo.Session

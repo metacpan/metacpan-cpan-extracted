@@ -1,0 +1,43 @@
+{
+   "recipe" : {
+      "target_nic_per_ml" : "3",
+      "target_vg" : 60,
+      "notes" : [],
+      "target_pg" : "40",
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "percentage" : "5",
+            "tag" : "TFA Grape Juice"
+         },
+         {
+            "tag" : "TFA Grape Candy",
+            "percentage" : "2",
+            "type" : "PG"
+         },
+         {
+            "percentage" : "1.5",
+            "type" : "PG",
+            "tag" : "INW Sweet Watermelon"
+         },
+         {
+            "tag" : "INW Melon",
+            "type" : "PG",
+            "percentage" : "0.5"
+         },
+         {
+            "tag" : "TFA Pina Colada",
+            "type" : "PG",
+            "percentage" : "0.4"
+         },
+         {
+            "tag" : "TFA Peppermint",
+            "type" : "PG",
+            "percentage" : "0.3"
+         }
+      ],
+      "base_nic_type" : "PG",
+      "target_quantity" : "120",
+      "base_nic_per_ml" : 100
+   }
+}

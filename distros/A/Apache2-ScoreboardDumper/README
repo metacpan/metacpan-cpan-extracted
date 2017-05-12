@@ -1,0 +1,39 @@
+NAME
+    Apache2::ScoreboardDumper - Dumps the scoreboard to the error log when
+    server slots are full
+
+SYNOPSIS
+    In your httpd.conf:
+
+     PerlInitHandler Apache2::ScoreboardDumper
+     PerlSetVar ScoreboardDumpMethod All | LockFreq | Stochastic
+     PerlSetVar ScoreboardDumpFreq 5 # dump every 5th request
+     PerlSetVar ScoreboardDumpLock My::LockPackage # optional class to provide lock and unlock
+     PerlSetVar ScoreboardDumpStochastic 0.5 # 0-1, percentage of time to dump scoreboard
+
+DESCRIPTION
+    This module will dump the scoreboard to the error log at info level if
+    the number of httpd server slots becomes full. There are 3 different
+    ways this module can be configured.
+
+    All - dump the scoreboard each request.
+
+    LockFreq - dump the scoreboard every Nth request. You must supply a
+    locking package.
+
+    Stochastic - dump the scoreboard every time rand(1) is less than your
+    supplied threshold.
+
+SEE ALSO
+    Apache::Scoreboard, mod_perl2
+
+AUTHOR
+    Fred Moyer, <fred@redhotpenguin.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014 by Fred Moyer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.16.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

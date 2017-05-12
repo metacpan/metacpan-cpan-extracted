@@ -1,0 +1,33 @@
+clear
+power on
+regs
+
+memset beef 55
+
+op ce efbe
+
+# memory[$BEEF] should show 54
+test m:beef = 54
+
+# Wrap and Negative case -------------
+power on
+memset beef 00
+
+op ce efbe
+
+# Should be: memory[$BEEF]=FF, S=1
+test m:beef = ff
+test s = 1
+
+# Zero case -------------------
+power on
+
+memset beef 01
+
+op ce efbe
+
+# Should be: memory[$BEEF]=00, Z=1
+test m:beef = 00
+test z = 1
+
+save verify_CE.txt

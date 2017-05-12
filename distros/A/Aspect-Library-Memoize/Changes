@@ -1,0 +1,13 @@
+Changes for Perl extension Aspect-Library-Memoize
+
+1.00 Thu 26 May 2011
+	- Updating to 1.00 to indicate a stable release synced to Aspect 1.00
+
+0.98 Tue 24 May 2011
+	- Upgrading to Module::Install 1.01
+	- Updated to match syntax changes in Aspect 0.98
+
+0.32 Thu  7 Jan 2010
+	- Moved Aspect::Library::Memoize into its own distribution to remove
+	  the non-100% reliable Memoize dependency.
+	- Updated to match forever -> lexical change in Aspect 0.32

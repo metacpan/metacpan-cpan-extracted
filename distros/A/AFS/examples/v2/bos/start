@@ -1,0 +1,32 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::BOS;
+
+my ($server, $cellname, $instance, $bos, $ok);
+my ($nargs, @instance);
+
+die "Usage: $0 server instances [cell]\n" if $#ARGV < 1;
+
+$nargs    = $#ARGV;
+$server   = shift;
+$instance = shift if $nargs > 0;
+$cellname = shift if $nargs > 1;
+
+#warn ">$server< >$instance< >$cellname< \n";
+
+if (defined $instance and $instance =~ / /) { @instance = split / /, $instance; }
+
+if ($cellname) { $bos = AFS::BOS->new($server, 0, 0, $cellname); }
+else           { $bos = AFS::BOS->new($server); }
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+if (@instance) { $ok = $bos->start(\@instance); }
+else           { $ok = $bos->start($instance); }
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "OK = $ok \n"; }
+
+$bos->DESTROY;

@@ -1,0 +1,49 @@
+NAME
+    Acme::Bleach::Numerically - Fit the whole world between 0 and 1
+
+SYNOPSIS
+      # To bleach your script numerically
+      use Acme::Bleach::Numerically;
+      print "Hello, world!\n";
+
+      # Or do your own bleaching
+      use Acme::Bleach::Numerically qw/num2str str2num/;
+      my $world = str2num(qq{print "hello, world!\n";})
+
+DESCRIPTION
+    Georg Cantor has found that you can squeeze the whole world between zero
+    and one. Many say he went insane because of that but the reality is, he
+    just bleached himself with continuum hypothesis :)
+
+    This module does just that -- map your whole world onto a single point
+    between 0 and 1. Welcome to the Programming Continuum of Perl!
+
+  EXPORT
+    This module autobleaches when no argument is passed via "use". When you
+    pass arguments, you can import "str2num" and "num2str" functions on
+    demand.
+
+BUGS
+    This module is pretty slow when trying to bleach very large scripts.
+
+SEE ALSO
+    Georg Cantor <http://en.wikipedia.org/wiki/Georg_Cantor>
+
+    Acme::Bleach
+
+    Math::BigFloat
+
+AUTHOR
+    Dan Kogai, <dankogai@dan.co.jp>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005 by Dan Kogai
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.7 or, at
+    your option, any later version of Perl 5 you may have available.
+
+SIGNATURE
+      use Acme::Bleach::Numerically;
+      0.43924578615781276573636996716277576435622482573471906469302823689043324274942438624694293330322859397882541185113124301737140129679390558528856757159461814533814416533092575624304971700174578115589069897446392714317394330698719965791863652492717345302658253407691232285183052024315270516691972601467999332334238068845967684072917336379759944975376129150390625
+

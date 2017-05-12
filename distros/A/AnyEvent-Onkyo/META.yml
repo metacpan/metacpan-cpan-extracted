@@ -1,0 +1,37 @@
+---
+abstract: 'AnyEvent module for controlling Onkyo/Integra AV equipment'
+author:
+  - 'Mark Hindess <soft-cpan@temporalanomaly.com>'
+build_requires:
+  IO::Socket::INET: 0
+  Socket: 0
+  Test::More: 0
+  Test::Requires: 0
+  Test::SharedFork: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-Onkyo
+requires:
+  AnyEvent: 0
+  AnyEvent::Handle: 0
+  AnyEvent::SerialPort: 0
+  Carp: 0
+  Device::Onkyo: 0
+  Getopt::Long: 0
+  Pod::Usage: 0
+  Scalar::Util: 0
+  Sub::Name: 0
+  base: 0
+  constant: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/beanz/anyevent-onkyo-perl/issues
+  repository: git://github.com/beanz/anyevent-onkyo-perl.git
+version: 1.130220

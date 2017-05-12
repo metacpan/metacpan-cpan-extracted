@@ -1,0 +1,12 @@
+0.002   2017-02-05 (PERLANCAR)
+
+	- +Acme::PPIx::MetaSyntactic,
+
+        - +App::cpangrep.
+
+	- -App::squaretag (removed from CPAN).
+
+
+0.001   2016-12-21 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,296 @@
+=pod
+
+=begin readme text
+
+AnyEvent::HTTPD::ExtDirect
+==========================
+
+=end readme
+
+=for readme stop
+
+=head1 NAME
+
+AnyEvent::HTTPD::ExtDirect - RPC::ExtDirect gateway for AnyEvent::HTTPD
+
+=head1 SYNOPSIS
+
+    use RPC::ExtDirect::Config;
+    use AnyEvent::HTTPD::ExtDirect;
+    
+    # Ext.Direct Action packages go here
+    use My::Server::Foo;
+    use My::Server::Bar;
+    
+    my $config = RPC::ExtDirect::Config->new(
+        api_path    => '/api',
+        router_path => '/router',
+        poll_path   => '/events',
+    );
+    
+    my $httpd = AnyEvent::HTTPD::ExtDirect->new( config => $config );
+    
+    $httpd->run;
+
+=head1 DESCRIPTION
+
+=for readme continue
+
+This module provides an L<RPC::ExtDirect> gateway implementation for
+L<AnyEvent::HTTPD>, a simple lightweight event based web server.
+Unlike other gateways like L<Plack::Middleware::ExtDirect> or
+L<CGI::ExtDirect>, this module is in fact more of an application
+server than just a plugin. You can think of it as L<Plack> framework
+and L<Plack::Middleware::ExtDirect> combined into one package.
+
+That said, the asynchronous event based nature of AnyEvent::HTTPD
+allows using it both as a standalone application server, and as a part
+of a larger program that may do other things besides serving Ext.Direct
+or plain HTTP requests. See L</"Non-blocking server"> below.
+
+If you are not familiar with Ext.Direct, more information can be found
+in L<RPC::ExtDirect::Intro>.
+
+=for readme stop
+
+=head1 USAGE
+
+=head2 Configuration
+
+To configure an AnyEvent::HTTPD::ExtDirect instance, you will need to
+create an instance of L<RPC::ExtDirect::Config> with all required
+options set, and pass it to AnyEvent::HTTPD::ExtDirect
+L<constructor|/new> to be used. This step is optional; by default the
+Config instance in the
+L<global API instance|RPC::ExtDirect::API/"GLOBAL API TREE INSTANCE">
+will be used instead.
+
+Refer to L<RPC::ExtDirect::Config/OPTIONS> for the list of
+configuration options and their default values.
+
+=head2 Entry points
+
+AnyEvent::HTTPD::ExtDirect has three main entry points: the
+L<API|RPC::ExtDirect::Intro/API> generator, the
+L<Router|RPC::ExtDirect::Intro/Router>, and the
+L<Event Provider|RPC::ExtDirect::Intro/"Event Provider">. Each of
+these has to be assigned a unique server side URI that clients will
+GET/POST requests to. The API generator URI is usually hardcoded in
+the client; the Router and Event Provider URIs are advertised as a
+part of the L<API declaration|RPC::ExtDirect::Intro/"API declaration">
+provided by the API generator.
+
+The entry point URIs are configured with the
+L<api_path|RPC::ExtDirect::Config/api_path>,
+L<router_path|RPC::ExtDirect::Config/router_path>, and
+L<poll_path|RPC::ExtDirect::Config/poll_path> Config options as shown
+in the L</SYNOPSIS>. These configuration options have default values
+that will work out of box; refer to L<RPC::ExtDirect::Config> for
+details.
+
+=head2 Non-blocking server
+
+AnyEvent::HTTPD::ExtDirect can be used not only as a standalone event
+based application server, but also as an embedded Ext.Direct engine
+in a larger event based application. This is important and is worth
+repeating: the non-blocking server approach will only work if your
+application is event based, adhering to L<AnyEvent> conventions!
+
+To use AnyEvent::HTTPD::ExtDirect as a non-blocking server, create
+an instance of it, prime it by calling L</set_callbacks>, and
+save a reference to it:
+
+    my $httpd = AnyEvent::HTTPD::ExtDirect->new( config => $config );
+    $httpd->set_callbacks( ... );
+
+Saving a reference to the server instance is important; if you don't
+save it, the server instance will be destroyed soon after creation,
+and you will spend a lot of time trying to figure out why it does
+not accept requests. So, this will B<not> work as expected:
+
+    AnyEvent::HTTPD::ExtDirect->new( ... )->set_callbacks( ... );
+
+Same goes for other AnyEvent(ish) things you may want to create in
+your application, including file handle read, timed callbacks, etc.
+
+=head1 CAVEATS
+
+The considerations below are specific to AnyEvent::HTTPD::ExtDirect:
+
+=head2 Host names vs IP addresses
+
+L<AnyEvent::HTTPD> constructor does not perform host name lookup
+and will break if you pass in a host name string instead of IP
+address. The only exception is C<localhost> that will be substituted
+with C<127.0.0.1> loopback address.
+
+=head2 Environment objects
+
+For this gateway, the environment object is based on
+L<AnyEvent::HTTPD::Request>. While it does provide the methods described
+in L<RPC::ExtDirect/"ENVIRONMENT OBJECTS">, behavior of these methods
+can be slightly different from other environments.
+
+For example, C<< $env->http() >> in L<CGI::ExtDirect> will return
+the list of both environment variables and HTTP headers in upper case,
+while the same C<< $env->http() >> in AnyEvent::HTTPD::ExtDirect
+application will return only HTTP headers, lowercased.
+
+To avoid potential problems, always find the actual header name
+first and then use it:
+
+    use List::Util qw/ first /;
+    
+    my ($header) = first { /^Content[-_]Type$/i } $env->http();
+    my $value    = $env->http($header) if $header;
+    
+    ...
+
+=head1 OBJECT INTERFACE
+
+AnyEvent::HTTPD::ExtDirect provides several public methods:
+
+=over 4
+
+=item C<new>
+
+Constructor. Returns a new AnyEvent::HTTPD::ExtDirect object. Accepts
+named arguments in a hash or hashref.
+
+Parameters:
+
+=over 8
+
+=item C<api>
+
+Optional L<RPC::ExtDirect::API> instance to be used instead of the
+default L<global API tree|RPC::ExtDirect::API/"GLOBAL API TREE INSTANCE">.
+
+=item C<config>
+
+Optional L<RPC::ExtDirect::Config> instance to be used. If not provided,
+the Config instance in the API object (either default or passed in L</api>
+parameter) will be used.
+
+=item C<router_class_anyevent>
+
+Class name to be used instead of the default L<RPC::ExtDirect::Router>
+when instantiating Router objects in AnyEvent::HTTPD::ExtDirect
+environment.
+
+=item C<eventprovider_class_anyevent>
+
+Class name to be used instead of the default
+L<RPC::ExtDirect::EventProvider> when instantiating EventProvider
+objects in AnyEvent::HTTPD::ExtDirect environment.
+
+=item other
+
+Any other parameter will be passed on to the underlying
+L<AnyEvent::HTTPD> constructor.
+
+=back
+
+=item C<set_callbacks>
+
+Instance method. Registers Ext.Direct handlers for API generator,
+Router, and Event Provider with the AnyEvent::HTTPD transport
+mechanism, effectively "priming" the server instance without
+entering a blocking wait. Accepts named arguments in a hash.
+
+This method will be called internally by L</run> so you do not
+need to call it explicitly unless you want to use a non-blocking
+server option. See L</"Non-blocking server"> section above.
+
+Parameters:
+
+=over 8
+
+=item C<api_path>
+
+URI on which the API generator should listen to service discovery
+requests from the clients. Defaults to server Config option of
+the same name; this parameter mainly exists for testing overrides.
+
+=item C<router_path>
+
+URI on which the Router should listen to Ext.Direct Method
+invocation requests. Defaults to server Config option of the same
+name; this parameter mainly exists for testing overrides.
+
+=item C<poll_path>
+
+URI on which the Event Provider should listen to Ext.Direct event
+polling requests. Defaults to server Config option of the same
+name; this parameter mainly exists for testing overrides.
+
+=back
+
+=item C<run>
+
+Instance method. Sets the Ext.Direct callbacks with default Config
+URIs (see L</set_callbacks>), and enters a blocking wait by
+calling underlying AnyEvent::HTTPD's C<run> method.
+
+This method does not accept arguments, and never returns.
+
+=back
+
+=head1 ACCESSOR METHODS
+
+For AnyEvent::HTTPD::ExtDirect, the following
+L<accessor methods|RPC::ExtDirect::Config/"ACCESSOR METHODS"> are
+provided:
+
+=over 4
+
+=item C<api>
+
+Return the current L<RPC::ExtDirect::API> instance held in the
+server object, or set a new one.
+
+=item C<config>
+
+Return the current L<RPC::ExtDirect::Config> instance held in the
+server object, or set a new one.
+
+=back
+
+=begin readme
+
+=head1 INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make && make test
+    make install
+
+=end readme
+
+=for readme stop
+
+=head1 ACKNOWLEDGEMENTS
+
+I would like to thank IntelliSurvey, Inc for sponsoring my work
+on versions 2.x and 3.x of the RPC::ExtDirect suite of modules.
+
+=head1 BUGS AND LIMITATIONS
+
+At this time there are no known bugs in this module. Please report
+problems to the author, patches are always welcome.
+
+Use L<Github tracker|https://github.com/nohuhu/AnyEvent-HTTPD-ExtDirect/issues>
+to open bug reports, this is the easiest and quickest way to get your
+issue fixed.
+
+=for readme continue
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2013-2015 Alex Tokarev E<lt>tokarev@cpan.orgE<gt>.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.
+
+=cut

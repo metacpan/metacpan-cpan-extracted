@@ -1,0 +1,19 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'libcurl';
+
+plugin 'Probe::CommandLine' => (
+  command   => $_,
+  secondary => 1,
+) for qw( curl-config curl );
+
+share {
+
+  plugin Download => (
+    url     => 'https://curl.haxx.se/download/',
+    version => qr/^curl-([0-9\.]+)\.tar\.gz$/,
+  );
+  plugin Extract => 'tar.gz';
+  plugin 'Build::Autoconf' => ();
+
+};

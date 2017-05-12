@@ -1,0 +1,8 @@
+Revision history for Perl extension Amon2::Plugin::Web::Woothee
+
+0.02    Thu Jan 23 08:54:38 JST 2014
+        - fixed a module description
+        - cpanized
+
+0.01    Sun Jan  5 14:06:10 JST 2014
+        - original version

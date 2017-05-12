@@ -1,0 +1,16 @@
+#! /usr/bin/env perl
+use strict;
+use warnings;
+
+## Make that compatible with dev in code
+BEGIN{
+  my $code_dir = __FILE__;
+  $code_dir =~ s|bin/.+|lib|;
+  unshift ( @INC , $code_dir );
+}
+
+binmode STDOUT , ':utf8';
+binmode STDERR , ':utf8';
+
+use App::CSE;
+exit(App::CSE->new()->main());

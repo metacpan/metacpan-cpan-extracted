@@ -1,0 +1,49 @@
+{
+   "abstract" : "Modifiable priority queue using Array::Heap",
+   "author" : [
+      "Bob Mathews (bobmathews@alumni.calpoly.edu)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Array-Heap-ModifiablePriorityQueue",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Array::Heap" : "3",
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bobmath/ModifiablePriorityQueue.git",
+         "web" : "https://github.com/bobmath/ModifiablePriorityQueue"
+      }
+   },
+   "version" : "1.10"
+}

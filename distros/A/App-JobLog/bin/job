@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+# PODNAME: job
+
+# ABSTRACT: log what you do
+
+use App::JobLog;
+App::JobLog->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+job - log what you do
+
+=head1 VERSION
+
+version 1.042
+
+=head1 SYNOPSIS
+
+  job add Doing something important.
+  job add -t goof Doing something less important.
+  job done
+  ...
+  job resume
+  job done
+  job a Gathering primroses.
+
+=head1 DESCRIPTION
+
+This script facilitates keeping track of your time by entering
+when you start and finish things into a plain text log. You can
+categorize activities with tags. You can produce digests of your
+activities in particular periods. You can keep track of your
+vacation and hours off. You can determine when you've put in your
+8 hours for the day or 40 hours for the week.
+
+For more information try the C<help> or C<info> commands. E.g.,
+
+  job help
+
+=head1 AUTHOR
+
+David F. Houghton <dfhoughton@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by David F. Houghton.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

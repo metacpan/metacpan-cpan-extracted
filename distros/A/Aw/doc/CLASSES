@@ -1,0 +1,284 @@
+This file is not up to date but may still be helpful.
+See doc/index.html.
+
+#===============================================================================
+#  Aw::BaseClass
+#	::DESTROY
+#       ::err   			ala Mysql::
+#       ::errmsg			ala Mysql::
+#       ::error
+#       ::hello
+#       ::toString
+#===============================================================================
+#  Aw::Adapter
+#	::new
+#	::DESTROY-A
+#
+#	::addEvent			Java CADK 7-14
+#	::connectTest			Java CADK 7-16
+#	::checkPublication		Java CADK 7-16
+#	::createClient			Java CADK 7-17
+#	::deliverErrorEvent		Java CADK 7-18
+#	::getAdapterInfo		Java CADK 7-19
+#	::getAdapterType		Java CADK 7-20
+#	::getAdapterVersion		   C CADK
+#	::getAdminClient		Java CADK 7-20
+#	::getBroker			Java CADK 7-20
+#	::getBrokerClient-A		Java CADK 7-20
+#	::getBrokerHost			Java CADK 7-20
+#	::getBrokerName			Java CADK 7-20
+#	::getClient-A 			Java CADK 7-21
+#	::getClientGroup		Java CADK 7-21
+#	::getClientId			Java CADK 7-21
+#	::getClientName			   C CADK
+#	::getEventDef			Java CADK 7-21
+#	::getEvents			Java CADK 7-22
+#	::getPublishWaitTime		Java CADK 7-22
+#	::init				Java CADK 7-23
+#	::initStatusSubscriptions	Java CADK 7-23
+#	::isConnectTest			Java CADK 7-23
+#	::isMaster              	Java CADK 7-24
+#	::loadProperties		Java CADK 7-24
+#	::publishStatus			Java CADK 7-26
+#	::removeEvent			Java CADK 7-26
+#	::setDescriptorSSL		Java CADK 7-27
+#	::setStatusProperty		Java CADK 7-28
+#
+#       ::err-A   			ala Mysql::
+#       ::errmsg-A			ala Mysql::
+#       ::error-A
+#
+#	Routines for working while $self is in callback space:
+#	-----------------------------------------------------
+#	::createEvent-A      		Java CADK 7-91
+#	::deliverAckReplyEvent-A	Java CADK 7-92
+#	::deliverReplyEvent-A		Java CADK 7-93
+#	::eventDef	 	   	   C CADK 6-37 ("getEventTypeDef" J-CADK 7-94)
+#	::getStringField-A		Java CADK 7-96 / Java-I 15-118
+#	::newSubscription-A		Java CADK 7-99
+#	::publish-A			Java CADK 7-99/7-100
+#	::requestEvent-A		Perl CADK :-)
+#	::setStringField-A		Java CADK 7-101
+#===============================================================================
+#  Aw::AdapterET
+#	::new
+#	::DESTROY-A
+#
+#	::delete
+#	::isAutoCleanup			Java-CADK 7-38
+#	::isPublish			Java-CADK 7-38
+#	::isPublishReply-A		Java-CADK 7-39
+#	::publishInterval		Java-CADK 7-41    ("setPublishInterval")
+#	::publishReply			Java-CADK 7-34/41 ("get/setPublishReply")
+#	::name				Java-CADK 7-34    ("getName")
+#	::nextPublish			Java-CADK 7-34	  ("get/(set)NextPublish")
+#	::reply				Java-CADK 7-35/41 ("getReplyName"/"setReply")
+#	::setNextPublish		Java-CADK 7-41
+#	::subscriptionFilter		Java-CADK 7-37/42 ("get/setSubscriptionFilter
+#
+#       ::err-A                      	ala Mysql::
+#       ::errmsg-A                   	ala Mysql::
+#       ::error-A   			
+#===============================================================================
+#  Aw::AdapterLog
+#	::new
+#	::DESTROY-A
+#
+#	::alert				Java CADK 7-69
+#	::beQuiet			Java CADK 7-68
+#	::doPrintf			Java CADK 7-68
+#	::getMessage			Java CADK 7-71
+#	::getOptionList			Java CADK 7-72
+#	::info				Java CADK 7-74
+#	::isDebug			Java CADK 7-74
+#	::isDoPrintf			Java CADK 7-74
+#	::isInfo			Java CADK 7-74
+#	::isQuiet			Java CADK 7-75
+#	::setDebug			Java CADK 7-79
+#	::startLogging			Java CADK 7-81
+#	::warning			Java CADK 7-82
+#===============================================================================
+#  Aw::AdapterProperties
+#	::new
+#	::DESTROY-A
+#
+#	::getBooleanProperty-A		Java CADK 7-85
+#	::getIntegerProperty		Java CADK 7-85
+#	::getProperty-A			Java CADK 7-86
+#	::isProperty			Java CADK 7-87
+#	::loadProperties-A		Java CADK 7-87
+#					(for consistancy with Aw::Adapter::loadProperties)
+#	::setBooleanProperty-A		Java CADK 7-88 (setProperty)
+#	::setIntegerProperty-A		Java CADK 7-88 (setProperty)
+#	::setProperties			Java CADK 7-87
+#	::setProperty			Java CADK 7-88
+#===============================================================================
+#  Aw::AdapterUtil
+#	::new
+#	::DESTROY-A
+#
+#	::createEvent    		Java CADK 7-91
+#	::deliverAckReplyEvent		Java CADK 7-92
+#	::deliverReplyEvent 		Java CADK 7-93
+#	::eventDef	 	   	   C CADK 6-37 ("getEventTypeDef" J-CADK 7-94)
+#	::getStringField-A		Java-I 15-118
+#	::initHandle		   	   C CADK 6-41
+#	::newSubscription-A		Java CADK 7-99
+#	::publish-A			Java CADK 7-99/7-100
+#
+#       ::err-A				ala Mysql::
+#       ::errmsg-A			ala Mysql::
+#       ::error-A   			
+#===============================================================================
+#  Aw::Client
+#	::new
+#	::DESTROY-A
+#
+#	::getEvent			Java-I 15-42
+#	::newOrReconnect-A		Java-I 15-60
+#	::newSubscription		Java-I 15-64
+#	::publish			Java-I 15-69
+#	::reconnect			Java-I 15-172
+#
+#       ::err-A				ala Mysql::
+#       ::errmsg-A			ala Mysql::
+#       ::error-A   			
+#===============================================================================
+#  Aw::ConnectionDescriptor
+#	::new
+#	::DESTROY-A
+#
+#	::copy
+#	::getAccessLabelHint		Java-I 15-84
+#	::getAutomaticReconnect		Java-I 15-85
+#	::getConnectionShare		Java-I 15-85
+#	::getSSLCertificate		Java-I 15-86
+#	::getSSLCertificateDns		Java-I 15-87
+#	::getSSLCertificateFile		Java-I 15-87
+#	::getSSLDistinguishedName	Java-I 15-88
+#	::getSSLEncrypted		Java-I 15-88
+#	::getSSLEncryptionLevel		Java-I 15-88
+#	::getSSLRootDns			Java-I 15-89
+#	::getStateShare			Java-I 15-89
+#	::setAccessLabelHint		Java-I 15-90
+#	::setAutomaticReconnect		Java-I 15-90
+#	::setConnectionShare		Java-I 15-91
+#	::setSSLCertificate		Java-I 15-91
+#	::setSSLEncrypted		Java-I 15-92
+#	::setStateShare			Java-I 15-93
+#	::toString-A			Java-I 15-93
+#
+#       ::err-A   			ala Mysql::
+#       ::errmsg-A			ala Mysql::
+#       ::error-A
+#===============================================================================
+#  Aw::Date
+#	::new
+#	::DESTROY-A
+#
+#	::setDate			Java-I 15-99
+#	::setDateCtime			(Not in Java API)
+#	::setDateTime			Java-I 15-145
+#	::setTime			Java-I 15-100
+#	::toString-A			Java-I 15-100
+#===============================================================================
+#  Aw::Error
+#	::new
+#	::DESTROY-A
+#
+#	::delete
+#	::getCode			Java-I 15-147
+#	::getMinorCode			Java-I 15-148
+#	::setCurrent
+#	::toString-A			Java-I 15-149
+#	::toCompleteString		Java-I 15-149
+#
+#       ::err-A   			ala Mysql::
+#       ::errmsg-A			ala Mysql::
+#===============================================================================
+#  Aw::Event
+#	::new
+#	::DESTROY-A
+#
+#	::getDateField			Java-I 15-111  
+#	::getStringField		Java CADK 7-96
+#	::getTag 			Java-I 15-121
+#	::getTypeName			Java-I 15-122
+#	::isFieldSet			Java-I 15-124
+#	::setDateField 			Java-I 15-125
+#	::setTag 			Java-I 15-142
+#	::toString-A			Java-I 15-145
+#
+#       ::err-A   			ala Mysql::
+#       ::errmsg-A			ala Mysql::
+#       ::error-A   			
+#===============================================================================
+#  Aw::Field
+#	::new
+#	::DESTROY-A
+#
+#	::type				Java-I 15-150
+#	::value				Java-I 15-150
+#===============================================================================
+#  Aw::Filter
+#	::new
+#	::DESTROY-A
+#
+#	::getEventTypeName		Java-I 15-152
+#	::getFilterString-A		Java-I 15-153
+#	::match				Java-I 15-153
+#	::toString-A			Java-I 15-153
+#
+#       ::err-A   			ala Mysql::
+#       ::errmsg-A			ala Mysql::
+#       ::error-A
+#===============================================================================
+#  Aw::Format
+#	::new
+#	::DESTROY-A
+#
+#	::assemble			Java-I 15-156
+#	::format			Java-I 15-157
+#	::formatBindVariable		Java-I 15-157
+#	::free				     C
+#	::getTokenCount			Java-I 15-158
+#	::preparse			Java-I 15-159
+#	::setFormatMode			Java-I 15-160
+#
+#       ::err-A   			ala Mysql::
+#       ::errmsg-A			ala Mysql::
+#       ::error-A
+#===============================================================================
+#  Aw::SSLCertificate
+#	::new
+#	::DESTROY-A
+#
+#	::toString-A			   C ??
+#	::toIndentedString		   C ??
+#===============================================================================
+#  Aw::Subscription
+#	::new
+#	::DESTROY-A
+#===============================================================================
+#  Aw::TypeDef
+#	::new
+#	::DESTROY-A
+#
+#	::getFieldType			Java-I 15-170
+#
+#       ::err-A   			ala Mysql::
+#       ::errmsg-A			ala Mysql::
+#       ::error-A
+#===============================================================================
+#  Aw::TypeDefCache
+#	::new
+#	::DESTROY-A
+#
+#	::flushCache			Java-I 15-165
+#	::lockCache			Java-I 15-165
+#	::unlockCache			Java-I 15-165
+#
+#       ::err-A   			ala Mysql::
+#       ::errmsg-A			ala Mysql::
+#       ::error-A
+#===============================================================================

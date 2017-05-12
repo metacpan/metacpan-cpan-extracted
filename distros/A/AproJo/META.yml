@@ -1,0 +1,57 @@
+---
+abstract: 'A time recording application based on Mojolicious'
+author:
+  - 'Helmut Wollmersdorfer, <helmut.wollmersdorfer@gmail.com>'
+build_requires:
+  File::Basename: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AproJo
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Crypt::Eksblowfish::Bcrypt: '0'
+  DBD::SQLite: '0'
+  DBIx::Class: '0'
+  DBIx::Class::Candy: '0'
+  DBIx::Class::DeploymentHandler: '0'
+  DBIx::Class::EncodedColumn: '0'
+  DBIx::Class::Schema: '0'
+  Encode: '0'
+  File::Basename: '0'
+  File::Copy::Recursive: '0'
+  File::Next: '0'
+  File::ShareDir: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  Getopt::Long: '0'
+  Mojolicious: '6.0'
+  Mojolicious::Plugin::DBInfo: '0'
+  Mojolicious::Plugin::Form: '0.006'
+  Mojolicious::Plugin::I18N: '0'
+  Mojolicious::Plugin::ServerInfo: '0'
+  SQL::Translator: '0'
+  Term::Prompt: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/wollmers/AproJo/issues
+  homepage: https://github.com/wollmers/AproJo
+  repository: https://github.com/wollmers/AproJo.git
+version: '0.015'
+x_contributors:
+  - 'Helmut Wollmersdorfer <helmut.wollmersdorfer@fixpunkt.de>'
+  - 'Helmut Wollmersdorfer <helmut@wollmersdorfer.at>'
+  - 'wollmers <helmut.wollmersdorfer@fixpunkt.de>'

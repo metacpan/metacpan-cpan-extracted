@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                Apache2-Pod
+version:             0.27
+abstract:            base class for converting Pod files to prettier forms
+license:             ~
+author:              
+    - Theron Lewis <theron at theronlewis dot com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Apache2::Const:                0
+    File::Find:                    0
+    File::Spec:                    0
+    Pod::Find:                     1.3
+    Pod::Simple:                   3.01
+    Pod::Simple::HTML:             0
+    Pod::Simple::Text:             0
+    Test::More:                    0
+    URI::Escape:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

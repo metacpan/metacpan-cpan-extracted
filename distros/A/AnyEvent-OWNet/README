@@ -1,0 +1,208 @@
+SYNOPSIS
+
+      # IMPORTANT: the API is subject to change
+    
+      my $ow = AnyEvent::OWNet->new(host => '127.0.0.1',
+                                    on_error => sub { warn @_ });
+    
+      # Read temperature sensor
+      $ow->read('/10.123456789012/temperature',
+                sub {
+                  my ($res) = @_;
+                  # ...
+                });
+    
+      # List all devices
+      my $cv;
+      $cv = $ow->devices(sub {
+                           my $dev = shift;
+                           print $dev, "\n";
+                         });
+      $cv->recv;
+    
+      # Read the temperatures of all devices that are found
+      $cv = $ow->devices(sub {
+                           my $dev = shift;
+                           $cv->begin;
+                           $ow->get($dev.'temperature',
+                                    sub {
+                                      my $res = shift;
+                                      $cv->end;
+                                      my $value = $res->{data};
+                                      return unless (defined $value);
+                                      print $dev, ' = ', 0+$value, "\n";
+                                    });
+                         });
+      $cv->recv;
+    
+      # short version of the above
+      $cv = $ow->device_files(sub {
+                                my ($dev, $file, $value) = @_;
+                                print $dev, ' = ', 0+$value, "\n";
+                              }, 'temperature');
+      $cv->recv;
+    
+      # read humidity as well
+      $cv = $ow->device_files(sub {
+                                my ($dev, $file, $value) = @_;
+                                print $dev, $file, ' = ', 0+$value, "\n";
+                              }, ['temperature', 'humidity']);
+      $cv->recv;
+
+DESCRIPTION
+
+    AnyEvent module for handling communication with an owfs 1-wire server
+    daemon.
+
+    Constructs a new AnyEvent::OWNet object. The parameter hash can contain
+    values for the following keys:
+
+    host
+
+      The host IP of the running owserver daemon. Default is the IPv4
+      loopback address, 127.0.0.1.
+
+    port
+
+      The TCP port of the running owserver daemon. Default is 4304.
+
+    timeout
+
+      The timeout in seconds to wait for responses from the server. Default
+      is 5 seconds.
+
+    Perform an OWNet read operation for the given path.
+
+    Perform an OWNet write operation of the given value to the given path.
+
+    Perform an OWNet dir operation for the given path. The callback will be
+    called once with the list of directory entries in the data field which
+    isn't consistent with the (misguided?) low-latency intent of this
+    operation so using dirall() probably makes more sense provided the
+    server supports it.
+
+    Perform an OWNet present check on the given path.
+
+    Perform an OWNet dirall operation on the given path.
+
+    Perform an OWNet get operation on the given path.
+
+    Perform an OWNet dirall operation on the given path.
+
+    Perform an OWNet get operation on the given path.
+
+    This method returns the AnyEvent condvar that is used to track all
+    outstanding operations. It can also be used to set the initial value
+    but this is only sensible when no operations are currently outstanding
+    and is not normally necessary.
+
+    This method is called on error or when the closing the connection to
+    free up resources and notify any receivers of errors.
+
+    This method connects to the owserver daemon. It is called automatically
+    when the first command is attempted.
+
+    This method identifies all devices below the given path (or '/' if the
+    path is not given). An AnyEvent condvar may also be supplied that will
+    be used to track begin and end of all actions carried out during the
+    identification process. If no condvar is provided then one will be
+    created. The condvar used is returned by this method.
+
+    The supplied callback is called for each device with the path to each
+    device as the first argument and the condvar for the operation as the
+    second argument. The intention of passing the callback the condvar
+    (that if not provided is created by the initial call) is to enable the
+    callbacks that need to make further asynchronous calls to use begin
+    calls and end calls (in the async callback) on the condvar so that the
+    complete operation may be tracked. See the "SYNOPSIS" for an example.
+
+    This method currently assumes that the owserver supports the getslash
+    function and if this is not the case it will fail.
+
+    Visit each device using devices() and call the callback with the result
+    of successful get() calls for $file relative to each device found. If
+    $file is an array reference each array element is treated as a relative
+    file.
+
+    This method is used to register an AnyEvent::Handle read type to read
+    OWNet replies from an owserver daemon.
+
+TODO
+
+    The code assumes that the owserver supports persistence and does not
+    check the response flags to recognize when it does not.
+
+SEE ALSO
+
+    AnyEvent(3)
+
+    OWFS Website: http://owfs.org/
+
+    OWFS Protocol Document:
+    http://owfs.org/index.php?page=owserver-protocol
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 57:
+
+      Unknown directive: =method
+
+    Around line 80:
+
+      Unknown directive: =method
+
+    Around line 84:
+
+      Unknown directive: =method
+
+    Around line 88:
+
+      Unknown directive: =method
+
+    Around line 96:
+
+      Unknown directive: =method
+
+    Around line 100:
+
+      Unknown directive: =method
+
+    Around line 104:
+
+      Unknown directive: =method
+
+    Around line 108:
+
+      Unknown directive: =method
+
+    Around line 112:
+
+      Unknown directive: =method
+
+    Around line 116:
+
+      Unknown directive: =method
+
+    Around line 123:
+
+      Unknown directive: =method
+
+    Around line 128:
+
+      Unknown directive: =method
+
+    Around line 133:
+
+      Unknown directive: =method
+
+    Around line 153:
+
+      Unknown directive: =method
+
+    Around line 161:
+
+      Unknown directive: =method
+

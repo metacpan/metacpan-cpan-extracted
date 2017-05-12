@@ -1,0 +1,42 @@
+---
+abstract: 'Instagram auth integration for Amon2'
+author:
+  - 'ntakanashi <ntakanashi666 at gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.8.0, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Amon2-Auth-Site-Instagram
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Amon2::Auth::Site::Instagram:
+    file: lib/Amon2/Auth/Site/Instagram.pm
+    version: 0.01
+requires:
+  Amon2::Auth: 0.03
+  JSON: 2.59
+  LWP::UserAgent: 6.05
+  Mouse: 1.11
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/ntakanashi/Amon2-Auth-Site-Instagram/issues
+  homepage: https://github.com/ntakanashi/Amon2-Auth-Site-Instagram
+  repository: git://github.com/ntakanashi/Amon2-Auth-Site-Instagram.git
+version: 0.01

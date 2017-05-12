@@ -1,0 +1,42 @@
+language: "perl"
+perl:
+  - "5.16"
+  - "5.14"
+  - "5.12"
+  - "5.10"
+
+before_script:
+    #- cpanm Test::Pod # optional dependency
+    #
+    # These should all be handled by the standard dependency setup
+    #
+    #- cpanm Data::Buffer
+    #- cpanm Class::Loader
+    #- cpanm Sort::Versions
+    #- cpanm Convert::ASCII::Armour
+    #- cpanm Tie::EncryptedHash
+    #- cpanm Data::Dumper
+    #- cpanm Digest::MD2
+    #- cpanm Digest::MD5
+    #- cpanm Digest::SHA
+    #- cpanm Crypt::Blowfish
+    #- cpanm Crypt::CBC
+    #- cpanm Math::BigInt::GMP
+    #- cpanm Math::Prime::Util::GMP
+    #- cpanm Math::Prime::Util
+
+install:
+    #- cpanm -v --installdeps --notest --mirror http://cpan.mirrors.travis-ci.org --mirror http://dl.ambiweb.de/mirrors/ftp.cpan.org --mirror http://cpan.cse.msu.edu .
+    - cpanm -v --installdeps --notest .
+
+script: "perl Makefile.PL; make test"
+# branches:
+#   only:
+#     - master
+notifications:
+  recipients:
+    - dana@acm.org
+  email:
+    on_success: change
+    on_failure: always
+#env:

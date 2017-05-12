@@ -1,0 +1,223 @@
+NAME
+    Apache::SSI - Implement Server Side Includes in Perl
+
+SYNOPSIS
+    In httpd.conf:
+
+        <Files *.phtml>  # or whatever
+        SetHandler perl-script
+        PerlHandler Apache::SSI
+        </Files>
+
+    You may wish to subclass Apache::SSI for your own extensions. If so, compile
+    mod_perl with PERL_METHOD_HANDLERS=1 (so you can use object-oriented
+    inheritance), and create a module like this:
+
+        package MySSI;
+        use Apache::SSI ();
+        @ISA = qw(Apache::SSI);
+
+        #embedded syntax:
+        #<!--#something param=value -->
+        sub ssi_something {
+           my($self, $attr) = @_;
+           my $cmd = $attr->{param};
+           ...
+           return $a_string;   
+        }
+ 
+     Then in httpd.conf:
+ 
+        <Files *.phtml>
+         SetHandler perl-script
+         PerlHandler MySSI
+        </Files>
+
+DESCRIPTION
+    Apache::SSI implements the functionality of mod_include for handling
+    server-parsed html documents. It runs under Apache's mod_perl.
+
+    In my mind, there are two main reasons you might want to use this module:
+    you can sub-class it to implement your own custom SSI directives, and/or you
+    can parse the output of other mod_perl handlers, or send the SSI output
+    through another handler (use Apache::Filter to do this).
+
+    Each SSI directive is handled by an Apache::SSI method with the prefix
+    "ssi_". For example, <!--#printenv--> is handled by the ssi_printenv method.
+    attribute=value pairs inside the SSI tags are parsed and passed to the
+    method in a hash reference.
+
+    'Echo' directives are handled by the ssi_echo method, which delegates lookup
+    to methods with the prefix "echo_". For instance, <!--#echo
+    var=DOCUMENT_NAME--> is handled by the echo_DOCUMENT_NAME method.
+
+    You can customize behavior by inheriting from Apache::SSI and overriding
+    'ssi_*' and 'echo_*' methods, or writing new ones.
+
+  SSI Directives
+
+    This module supports the same directives as mod_include. At least, that's
+    the goal. =) For methods listed below but not documented, please see
+    mod_include's online documentation at http://www.apache.org/ .
+
+    * config
+    * echo
+    * exec
+    * fsize
+    * flastmod
+    * include
+    * printenv
+    * set
+    * perl
+        There are two ways to call a Perl function, and two ways to supply it
+        with arguments. The function can be specified either as an anonymous
+        subroutine reference, or as the name of a function defined elsewhere:
+
+         <!--#perl sub="sub { localtime() }"-->
+         <!--#perl sub="time::now"-->
+
+        If the 'sub' argument matches the regular expression /^\s*sub[^\w:]/, it
+        is assumed to be a subroutine reference. Otherwise it's assumed to be
+        the name of a function. In the latter case, the string "main::" will be
+        prepended to the function name if the name doesn't contain "::" (this
+        forces the function to be in the main package, or a package you
+        specify). Note that it's a pretty bad idea to put your code in the main
+        package, so I only halfheartedly endorse this feature.
+
+        In general, it will be slower to use anonymous subroutines, because each
+        one has to be eval()'ed and there is no caching. For best results,
+        pre-load any code you need in the parent process, then call it by name.
+
+        If you're calling a subroutine like "&Package::SubPack::handler", you
+        can omit the "handler" portion, making your directive like this:
+
+         <!--#perl sub="Package::Subpack"-->
+
+        If you want to supply a list of arguments to the function, you use
+        either the "arg" or the "args" parameter:
+
+         <!--#perl sub="sub {$_[0] * 7}" arg=7-->
+         <!--#perl sub=holy::matrimony arg=Hi arg=Lois-->
+         <!--#perl sub=holy::matrimony args=Hi,Lois-->
+
+        The "args" parameter will simply split on commas, meaning that currently
+        there's no way to embed a comma in arguments passed via the "args"
+        parameter. Use the "arg" parameter for this.
+
+        If you give a key-value pair and the key is not 'sub', 'arg', 'args', or
+        'pass_request' (see below), then your routine will be passed both the
+        key and the value. This lets you pass a hash of key-value pairs to your
+        function:
+
+         <!--#perl sub=holy::matrimony groom=Hi bride=Lois-->
+         Will call &holy::matrimony('groom', 'Hi', 'bride', 'Lois');
+
+        As of version 1.95, we pass the current Apache request object ($r) as
+        the first argument to the function. To turn off this behavior, give the
+        key-value pair 'pass_request=no', or put 'PerlSetVar SSIPerlPass_Request
+        no' in your server's config file.
+
+        See "http://perl.apache.org/src/mod_perl.html" for more information on
+        Perl SSI calls.
+
+    * if
+    * elif
+    * else
+    * endif
+        These four directives can be used just like in "mod_include", with one
+        important difference: the boolean expression is evaluated using Perl's
+        eval(). This means you use "==" or "eq" instead of "=" to test equality.
+        It also means you can use pre-loaded Perl subroutines in the conditions:
+
+         <!--#if expr="&Movies::is_by_Coen_Brothers($MOVIE)"-->
+          This movie is by the Coen Brothers.
+         <!--#else-->
+          This movie is not by the Coen Brothers.
+         <!--#endif-->
+
+        It can't handle very sophistocated Perl though, because it manually
+        looks for variables (of the form $var or ${var}, just like
+        "mod_include"), and will get tripped up on expressions like
+        $object->method or $hash{'key'}. I'll welcome any suggestions for how to
+        allow arbitrary Perl expressions while still filling in Apache
+        variables.
+
+CHAINING HANDLERS
+    There are two fairly simple ways for this module to exist in a stacked
+    handler chain. The first uses "Apache::Filter", and your httpd.conf would
+    look something like this:
+
+     PerlModule Apache::Filter
+     PerlModule Apache::SSI
+     PerlModule My::BeforeSSI
+     PerlModule My::AfterSSI
+     <Files ~ "\.ssi$">
+      SetHandler perl-script
+      PerlSetVar Filter On
+      PerlHandler My::BeforeSSI Apache::SSI My::AfterSSI
+     </Files>
+
+    The ""PerlSetVar Filter On"" directive tells the three stacked handlers that
+    they should use their filtering mode. It's mandatory.
+
+    The second uses "Apache::OutputChain", and your httpd.conf would look
+    something like this:
+
+     PerlModule Apache::OutputChain
+     PerlModule Apache::SSIChain
+     PerlModule My::BeforeSSI
+     PerlModule My::AfterSSI
+     <Files ~ "\.ssi$">
+      SetHandler perl-script
+      PerlHandler Apache::OutputChain My::AfterSSI Apache::SSIChain My::BeforeSSI
+     </Files>
+
+    Note that the order of handlers is reversed in the two different methods.
+    One reason I wrote "Apache::Filter" is to get the order to be more
+    intuitive. Another reason is that "Apache::SSI" itself can be used in a
+    handler stack using "Apache::Filter", whereas it needs to be wrapped in
+    "Apache::SSIChain" to be used with "Apache::OutputChain".
+
+    Please see the documentation for "Apache::OutputChain" and "Apache::Filter"
+    for more specific information. And look at the note in CAVEATS too.
+
+CAVEATS
+    * When chaining handlers via Apache::Filter, if you use <!--#include ...-->
+    or <!--#exec cgi=...-->, then Apache::SSI must be the last filter in the
+    chain. This is because Apache::SSI uses $r->lookup_uri(...)->run to include
+    the files, and this sends the output through C's stdout rather than Perl's
+    STDOUT. Thus Apache::Filter can't catch it and filter it.
+
+    If Apache::SSI is the last filter in the chain, or if you stick to simpler
+    SSI directives like <!--#fsize-->, <!--#flastmod-->, etc. you'll be fine.
+
+    * Currently, the way <!--#echo var=whatever--> looks for variables is to
+    first try $r->subprocess_env, then try %ENV, then the five extra environment
+    variables mod_include supplies. Is this the correct order?
+
+TO DO
+    Revisit http://www.apache.org/docs/mod/mod_include.html and see what else
+    there I can implement.
+
+    It would be nice to have a "PerlSetVar ASSI_Subrequests 0|1" option that
+    would let you choose between executing a full-blown subrequest when
+    including a file, or just opening it and printing it.
+
+    I'd like to know how to use Apache::test for the real.t test.
+
+SEE ALSO
+    mod_include, mod_perl(3), Apache(3), HTML::Embperl(3), Apache::ePerl(3),
+    Apache::OutputChain(3)
+
+AUTHOR
+    Ken Williams ken@mathforum.org
+
+    Concept based on original version by Doug MacEachern dougm@osf.org .
+    Implementation different.
+
+COPYRIGHT
+    Copyright 1998 Swarthmore College. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

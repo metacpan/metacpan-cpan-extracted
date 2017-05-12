@@ -1,0 +1,162 @@
+#!perl
+
+our $DATE = '2015-01-03'; # DATE
+our $VERSION = '0.04'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use File::MoreUtil qw(file_exists);
+use File::Spec;
+use Getopt::Long;
+
+my %Opts = (
+    check => 1,
+);
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'version|v'  => sub {
+            say "relpath version ", ($main::VERSION // '?');
+            exit 0;
+        },
+        'check|c!'   => \$Opts{check},
+        'C'          => sub { $Opts{check} = 0 },
+        'help|h'     => sub {
+            print <<USAGE;
+Usage:
+  relpath [OPTIONS] <filename> ...
+  relpath --version
+  relpath --help
+Options:
+  --nocheck, -C
+Consult manpage/documentation for more details.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+    unless (@ARGV) {
+        warn "relpath: need at least one filename\n";
+        exit 99;
+    }
+}
+
+sub run {
+    my $has_error = 0;
+
+    for (@ARGV) {
+        if ($Opts{check} && !file_exists($_)) {
+            $has_error++;
+            warn "relpath: No such file or directory: $_\n";
+            next;
+        }
+        say File::Spec->abs2rel($_);
+    }
+
+    exit $has_error ? 1:0;
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Return the relative pathname
+# PODNAME: relpath
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+relpath - Return the relative pathname
+
+=head1 VERSION
+
+This document describes version 0.04 of relpath (from Perl distribution App-relpath), released on 2015-01-03.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % relpath [OPTIONS] <filename> ...
+
+Examples:
+
+ % relpath /etc/passwd /home/titin/f1 subdir/f2
+ ../../etc/passwd
+ f1
+ subdir/f2
+
+=head1 DESCRIPTION
+
+This program complements the Unix command B<realpath>. B<realpath> converts
+relative pathnames to absolute ones, while B<relpath> does the opposite.
+
+The actual routine used is L<File::Spec>'s C<abs2rel()> function.
+
+By default, will check first that the filenames exist, unless C<--nocheck>
+(C<-C>) is specified.
+
+=head1 OPTIONS
+
+=over
+
+=item * --[no]check, -c
+
+Whether to check that file exists. Default is on.
+
+=item * -C
+
+Alias for C<--nocheck>.
+
+=back
+
+=head1 EXIT CODES
+
+0 on success.
+
+1 on some error, e.g. some filenames are not found (and --check is on).
+
+99 on command-line options error.
+
+=head1 FAQ
+
+=head1 SEE ALSO
+
+L<realpath>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-relpath>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-App-relpath>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-relpath>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

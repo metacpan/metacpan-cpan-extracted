@@ -1,0 +1,114 @@
+5.1.7 - 20th February 2017
+    * The __CUT__ feature works 100% in all supplied themes.
+    * Each supplied theme now supports "static pages".
+    * Static-pages can now explicitly specify their output path.
+    * Re-added support for lower-casing of output page names.
+    * Simple redirection pages will be created for the original mixed-case page.
+    * The "Recent Posts" template-snippet will correctly work when posts
+      included in that subset contain comments.
+    * Default theme now reports version number properly.
+	* Tag-output page shows related tags, in some themes.
+
+5.1.6 - 29th December 2016
+    * New release to add libclass-path to build-deps, debian-specific.
+
+5.1.5 - 29th April 2016
+    * Abstracted the template handling such that different modules
+      may be used to create the output.  The default is still HTML::Template,
+      but now Text::Xslate is also supported.
+      Contributed by Matthias Bethke.
+
+5.1.4 - 2nd March 2016
+    * Reworked how tags are fetched from entries.
+
+5.1.3 - 12th February 2016
+    * Accepted contribution from Matthias Bethke to allow UTF-8 filenames.
+
+5.1.2 - 2nd January 2016
+    * Load gravitars in a protocol-agnostic fashion.
+
+5.1.1 - 4th July 2015
+    * Updated default RSS-feed to validate correctly.
+
+5.1.0 - 16th June 2015
+    * Allow per-post templates.
+	* Allow posts to be truncated.
+	* Allow user to configure the man/max/step-size of the tag-cloud.
+	* Allow static-pages to be created via new plugin.
+	* Allow input-folder layout to be preserved via new plugin.
+	* Abort if entries don't have titles.
+	* Abort if titles aren't unique within a blog.
+
+5.0.9 - 18th April 2015
+    * Add App::Chronicle module to claim the namespace appropriately.
+	* Bump copyright year to 2015.
+
+5.0.8 - 29th December 2014
+	* Use Sys::Hostname rather than /bin/hostname for reading the hostname.
+	* Added `date_format` and `time_format` to the configuration file.
+	* Updated the `getBlog` function, available to plugins, to allow configuration variables to be read.
+
+5.0.7 - 4th October 2014
+	* Added Text::MultiMarkdown support, contributed by Stuart Skelton.
+	* Don't enable comments to the templates if not enabled.
+	* Don't regenerate "recent" blog-posts unless comments are enabled.
+	* Allow recursive detection of posts from beneath ./data/
+	  (Or whateverthe input path is.)
+	* New bootstrap2 theme, named 'bs2'.
+	* Tags are output ordered by name, case-insensitively.
+	* Tags are always lower-cased when inserted.
+	* Populate more global variables via Chronicle::Plugin::Snippets::Meta
+	* Allow the user to define an alternative to the default index file "index.html".
+	* Allow the use of a different suffix to ".html".
+	* Removed the need for themes to duplicate "index.rss".
+	* Added sample configuration-file.
+	* Allow blog-entries to link to next/prev entry.
+
+
+5.0.6 - 24rd September 2014
+	* Correctly load templates inside loops to avoid parameter reuse.
+	* Updated all plugins to declare a version.
+	* Updated all plugins and main script to include explicit license.
+	* Added top-level LICENSE.md file too, for redundency.
+	* Added Chronicle::Plugin::PostSpooler plugin.
+
+
+5.0.5 - 23rd September 2014
+	* Fixed POD for Chronicle::Plugin::Snippets::RecentTags
+	* Updated each _order method to link to Module::Pluggable::Ordered
+	* Updated POD for bin/chronicle
+
+
+5.0.4 - 23rd September 2014
+	* Added plugin to tidy HTML.
+	* Added plugin to allow blog-posts to be filtered.
+	* Added plugin to allow inline youtube videos.
+	* Significant POD updates.
+	* Added Test::Pod::Coverage to ensure our modules are documented.
+	* Don't generate output tags/archive if templates are missing.
+
+
+5.0.3 - 21st September 2014
+	* Avoid hardwiring two plugins as disabled in the code.
+	* Updated POD in script and plugins.
+	* Moved our main chronicle script into bin/.
+	* Allow empty values to be set in the configuration file,
+	  specifically so that "exclude-plugins=" will work.
+	* Perform environmental variable expansion in the config file values.
+	* Added pre-build and post-build command-execution support.
+
+
+5.0.2 - 21st September 2014
+	* This release was primarily made to fix CPAN testers warnings.
+	* Added ChangeLog
+	* Removed Makefile from distribution.
+	* Declare dependencies on Text::Markdown, Text::Textile.
+	* Added POD for Chronicle::Plugin::Generate::Tags.
+
+
+5.0.1 - 21st September 2014
+	* Misc. cleanups.
+
+
+5.0.0 - 20th September 2014
+	* Initial release of the new codebase.

@@ -1,0 +1,28 @@
+---
+abstract: 'Read from a TAP archive and convert it for displaying'
+author:
+  - 'Boris Däppen <bdaeppen.perl@gmail.com>, Renée Bäcker <module@renee-baecker.de>'
+build_requires:
+  Cwd: '0'
+  TAP::Formatter::HTML: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Archive-TAP-Convert
+requires:
+  Capture::Tiny: '0'
+  Exporter: '0'
+  TAP::Harness: '0'
+  TAP::Harness::Archive: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/borisdaeppen/Archive-TAP-Convert
+  repository: git://github.com/borisdaeppen/Archive-TAP-Convert
+version: '0.007'

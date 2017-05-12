@@ -1,0 +1,28 @@
+---
+abstract: 'Preview POD files in a browser'
+author:
+  - 'Peter Shangov <pshangov@yahoo.com>'
+build_requires:
+  File::Find: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102340, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-PodPreview
+requires:
+  Browser::Open: 0
+  Carp: 0
+  Config::Tiny: 0
+  File::HomeDir: 0
+  File::Spec: 0
+  File::Temp: 0
+  Perl6::Export::Attrs: 0
+  Pod::Simple::HTML: 0
+  Pod::Usage::CommandLine: 0
+  autodie: 0
+version: 0.002

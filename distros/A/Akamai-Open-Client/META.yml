@@ -1,0 +1,40 @@
+---
+abstract: 'The Akamai Open API Perl client structure for authentication data'
+author:
+  - 'Martin Probst <internet+cpan@megamaddin.org>'
+build_requires:
+  Cwd: 0
+  JSON: 0
+  Test::More: 0
+  Test::Pod: 1.41
+  URI: 0
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Akamai-Open-Client
+requires:
+  Data::Dumper: 0
+  Data::UUID: 0
+  Digest::SHA: 0
+  HTTP::Request: 0
+  LWP::UserAgent: 0
+  Log::Log4perl: 0
+  MIME::Base64: 0
+  Moose: 0
+  MooseX::Singleton: 0
+  POSIX: 0
+  URI: 0
+  URL::Encode: 0
+  constant: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://github.com/MegaMaddin/akamai-open-client-perl
+version: 0.03
+x_authority: cpan:PROBST

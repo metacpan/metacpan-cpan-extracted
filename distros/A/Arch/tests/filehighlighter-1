@@ -1,0 +1,125 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::FileHighlighter methods.
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+my $c_file_content = <<ENDTEXT;
+#include <stdio.h>
+#include <string.h>
+
+/* useful program */
+
+int main() {
+	memfrob((void *)main, 100);
+	return 0;
+}
+/* end */
+ENDTEXT
+
+use Test::More tests => 41;
+use_ok("Arch::FileHighlighter");
+
+my ($fh, $html_ref, @html_lines);
+my ($html_content, @ampersands, @tags);
+my @real_lines = Arch::Util::load_file($0) =~ /(.*)\n/g;
+
+sub comment ($) { qq(<span class="syntax_comment">$_[0]</span>) }
+
+# ----------------------------------------------------------------------------
+
+$fh = Arch::FileHighlighter->new([ 'internal', 'none', 'enscript' ]);
+isa_ok($fh, 'Arch::FileHighlighter', "creating object 1");
+
+$html_ref = $fh->highlight($0);
+ok($html_ref && ref($html_ref) eq 'SCALAR', "highlight script itself");
+@html_lines = $$html_ref =~ /(.*)\n/g;
+is(int @html_lines, int @real_lines, "number of markup lines");
+is($html_lines[0], comment('#!/usr/bin/perl -w'), "markup of sh-bang line");
+is($html_lines[1], '', "markup of empty line");
+is($html_lines[2], comment('# The script tests Arch::FileHighlighter methods.'), "markup of comment line");
+
+$html_ref = $fh->highlight("file.c", \$c_file_content);
+ok($html_ref && ref($html_ref) eq 'SCALAR', "highlight inline content");
+$html_content = $$html_ref;
+@ampersands = $html_content =~ /&/g;
+is(int @ampersands, 4, "entities/quoting");
+@html_lines = $html_content =~ /(.*)\n/g;
+is(int @html_lines, 10, "number of lines");
+@tags = $html_content =~ /</g;
+is(int @tags, 4, "number of tags");
+
+# ----------------------------------------------------------------------------
+
+$fh = Arch::FileHighlighter->new([ 'internal(c+pm)', 'none', 'enscript' ]);
+isa_ok($fh, 'Arch::FileHighlighter', "creating object 2");
+
+$html_ref = $fh->highlight($0);
+ok($html_ref && ref($html_ref) eq 'SCALAR', "highlight script itself");
+@html_lines = $$html_ref =~ /(.*)\n/g;
+is(int @html_lines, int @real_lines, "number of markup lines");
+is($html_lines[0], '#!/usr/bin/perl -w', "markup of sh-bang line");
+is($html_lines[1], '', "markup of empty line");
+is($html_lines[2], '# The script tests Arch::FileHighlighter methods.', "markup of comment line");
+
+$html_ref = $fh->highlight("file.c", \$c_file_content);
+ok($html_ref && ref($html_ref) eq 'SCALAR', "highlight inline content");
+$html_content = $$html_ref;
+@ampersands = $html_content =~ /&/g;
+is(int @ampersands, 4, "entities/quoting");
+@html_lines = $html_content =~ /(.*)\n/g;
+is(int @html_lines, 10, "number of lines");
+@tags = $html_content =~ /</g;
+is(int @tags, 4, "number of tags");
+
+# ----------------------------------------------------------------------------
+
+$fh = Arch::FileHighlighter->new([ 'none(c+pm)', 'internal', 'enscript' ]);
+isa_ok($fh, 'Arch::FileHighlighter', "creating object 3");
+
+$html_ref = $fh->highlight($0);
+ok($html_ref && ref($html_ref) eq 'SCALAR', "highlight script itself");
+@html_lines = $$html_ref =~ /(.*)\n/g;
+is(int @html_lines, int @real_lines, "number of markup lines");
+is($html_lines[0], comment('#!/usr/bin/perl -w'), "markup of sh-bang line");
+is($html_lines[1], '', "markup of empty line");
+is($html_lines[2], comment('# The script tests Arch::FileHighlighter methods.'), "markup of comment line");
+
+$html_ref = $fh->highlight("file.c", \$c_file_content);
+ok($html_ref && ref($html_ref) eq 'SCALAR', "highlight inline content");
+$html_content = $$html_ref;
+@ampersands = $html_content =~ /&/g;
+is(int @ampersands, 4, "entities/quoting");
+@html_lines = $html_content =~ /(.*)\n/g;
+is(int @html_lines, 10, "number of lines");
+@tags = $html_content =~ /</g;
+is(int @tags, 0, "number of tags");
+
+# ----------------------------------------------------------------------------
+
+SKIP: {
+skip("no /usr/bin/enscript", 10) unless -x "/usr/bin/enscript";
+
+$fh = Arch::FileHighlighter->new([ 'enscript(asis)', 'internal', 'none(c+pm)' ]);
+isa_ok($fh, 'Arch::FileHighlighter', "creating object 3");
+
+$html_ref = $fh->highlight($0);
+ok($html_ref && ref($html_ref) eq 'SCALAR', "highlight script itself");
+@html_lines = $$html_ref =~ /(.*)\n/g;
+is(int @html_lines, int @real_lines, "number of markup lines");
+is($html_lines[0], comment('#!/usr/bin/perl -w'), "markup of sh-bang line");
+is($html_lines[1], '', "markup of empty line");
+is($html_lines[2], comment('# The script tests Arch::FileHighlighter methods.'), "markup of comment line");
+
+$html_ref = $fh->highlight("file.c", \$c_file_content);
+ok($html_ref && ref($html_ref) eq 'SCALAR', "highlight inline content");
+$html_content = $$html_ref;
+@ampersands = $html_content =~ /&/g;
+is(int @ampersands, 4, "entities/quoting");
+@html_lines = $html_content =~ /(.*)\n/g;
+is(int @html_lines, 10, "number of lines");
+@tags = $html_content =~ /</g;
+is(int @tags, 20, "number of tags");
+
+}

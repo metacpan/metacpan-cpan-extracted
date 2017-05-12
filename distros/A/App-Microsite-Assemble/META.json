@@ -1,0 +1,50 @@
+{
+   "abstract" : "Assemble a microsite with Handlebars",
+   "author" : [
+      "Shawn M Moore <code@sartak.org>",
+      "Michael Reddick <michael.reddick@iinteractive.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Microsite-Assemble",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Next" : "0",
+            "JSON" : "0",
+            "Path::Class" : "0",
+            "Text::Handlebars" : "0",
+            "Text::Xslate" : "0",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/sartak/App-Microsite-Assemble",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sartak/App-Microsite-Assemble.git",
+         "web" : "https://github.com/sartak/App-Microsite-Assemble"
+      }
+   },
+   "version" : "0.03"
+}
+

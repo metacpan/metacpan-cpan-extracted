@@ -1,0 +1,11 @@
+Revision history for App-SimpleScan-Plugin-Cache
+
+0.02  Fri Nov 18 17:37:46 2005
+	- Change calls to stack_code to conform to
+	  App::SimpleScan 0.16 interface.
+	- Update Makefile.PL to require this level
+	  of App::SimpleScan
+
+0.01  Fri Sep 30 11:11:41 2005
+       Initial release.
+

@@ -1,0 +1,38 @@
+Revision history for Async-Defer
+
+v1.0.0  2016-02-19 11:49:06 EET
+	- Switch to Dist::Milla.
+
+0.9.5   2013-10-03 16:10:02 EEST
+	- remove MYMETA.*
+
+0.9.4	2012-12-02 16:21:42 EET
+	[Reported by toshioito [at] cpan.org]
+	- catch-all regexp should be /.*/ instead of //
+
+0.9.3	2012-11-20 04:25:51 EET
+	[Contributed by toshioito [at] cpan.org]
+	- do() now accepts multiple arguments. (t/5-interface_modifications.t)
+	- STATEMENTS methods (do, while, end_while, if, else, end_if, try, catch)
+	  return the object. (t/5-interface_modifications.t)
+	- run() method also accepts a subroutine reference as the first argument.
+	  (t/7-run_with_coderef.t)
+	- Substitute AE for EV in the tests. (2-do.t, 2-do_batch.t)
+	  Thus the tests now depend on AE (AnyEvent) instead of EV.
+	- Add documentation on nesting Async::Defer objects.
+	  Tests are also added. (t/8-nested_defers.t)
+
+0.9.0	2011-03-21 20:03:14 EET
+	- last() renamed to break()
+	- next() renamed to continue()
+	- added batch do()
+
+0.0.3	2011-03-20 18:23:53 EET
+	- bugfix: keep @result when entering try()
+	- added comments for non-obvious code
+
+0.0.2	2011-03-20 06:59:09 EET
+	- minor doc fixes and formatting
+
+0.0.1	2011-03-17 23:18:10 EET
+	- Initial release.

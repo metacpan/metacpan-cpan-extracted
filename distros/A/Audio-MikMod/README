@@ -1,0 +1,38 @@
+# $Id: README,v 1.2 1999/07/29 18:58:37 daniel Exp $
+
+	The source files in this distribution are 
+	Copyright (C) 1999, Daniel Sully, and are licensed for
+	use under the same terms as Perl itself.
+
+You need libmikmod 3.1.7 or later installed to use this package:
+
+http://mikmod.darkorb.net/
+
+And thus, a working sound system. Hey, this in in Audio::* !
+
+This package provides the following modules:
+
+ Audio::MikMod - Perl interface to the mikmod API
+
+The following players are included: 
+
+demo/player : 
+	Simple non-forking command line interface.
+	Usage: ./player <filename>
+
+The Gtk based player was based on code originally in the gtkmikmod package.
+
+demo/player-gtk-fork :
+	Perl-GTK based player, uses fork to control the update loop.
+	Works fairly well, some buginess with pause/unpause.
+
+demo/player-gtk-ipc :
+	Perl-GTK based player, uses IPC::ShareLite to control the
+	pause/unpause loop. Still forks update loop.
+
+demo/player-gtk-thread :
+	Perl-GTK based player, uses Thread for update loop.
+	Works very well, one thread, so no locking.
+
+-D
+daniel-cpan-mikmod@electricrain.com

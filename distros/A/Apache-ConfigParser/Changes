@@ -1,0 +1,309 @@
+This file lists the major changes made to Apache::ConfigParser.
+
+Sat May 23 18:27:38 PDT 2015 <blair@orcaware.com> Blair Zajac
+
+	* Release 1.02.
+
+	* Add support for Apache 2.4.x's IncludeOptional directive:
+	  http://httpd.apache.org/docs/2.4/mod/core.html#includeoptional
+
+	* The canonical location of the source code for this module is
+	  now at https://github.com/blair/perl-apache-configparser .
+
+Tue Nov 22 20:22:35 PST 2005 <blair@orcaware.com> Blair Zajac
+
+	* Release 1.01.
+
+	* Fix the AccessConfig, Include and ResourceConfig directives
+	  which were saving the directives in the specified files as
+	  daughters of the root of the tree, not of the context that
+	  the AccessConfig, Include or ResourceConfig directive
+	  appeared in.  Bug found by Jason Burnett
+	  <jmburnett@gmail.com>.
+
+	* Subversion repository for this package moved to
+	  http://www.orcaware.com/svn/repos/perl_apache_configparser/trunk/
+
+Sat Mar 26 21:02:12 PST 2005 <blair@orcaware.com> Blair Zajac
+
+	* Release 1.00.
+
+	* Greatly improve propagation of errors up to the caller and
+	  add a new method $parser->errstr() that allows the caller to
+	  get a human readable message why a method call failed.  The
+	  errstr() string is not cleared after a successful method
+	  call, so do not use it as a test for failure.  Use of $! to
+	  get error messages is no longer supported, although may
+	  still work.
+
+	* Apache::ConfigParser->new no longer takes a filename as one
+	  of its arguments, instead, after the Apache::ConfigParser
+	  object is created, the parse_file method must be used.  This
+	  separates a failure in object creation from an error in
+	  parsing the Apache configuration file.  Also, after the
+	  object is created, the errstr() method supports per parser
+	  error messages, instead of $! being shared for the entire
+	  Perl process.
+
+	* Add the ability to find and include configuration files that
+	  are identified by globs in the AccessConfig, Include and
+	  ResourceConfig directives, i.e. Include /etc/apache2/*.conf.
+
+	* Apache::ConfigParser now requires that the File::FnMatch
+	  module be installed to support the file globbing.
+
+	* Be more permissive in the whitespace appearing in starting
+	  and stopping a context, i.e. <Context></Context>.  Bug
+	  report and initial patch by Ron Savage <ron@savage.net.au>.
+
+	* No longer ignore any open(), close(), opendir() and
+	  closedir() errors.
+
+	* Bump the minimum supported version of Perl from 5.004_04 to
+	  5.004_05.
+
+	* New location of the Subversion repository hosting this
+	  module.  The active development trunk is located at
+
+	    http://www.orcaware.com/svn/repos/trunk/perl_apache_configparser/
+
+	  and the tagged released are located at
+
+	    http://www.orcaware.com/svn/repos/tags/perl_apache_configparser/
+
+Mon Dec  9 18:07:14 PST 2002 <blair@orcaware.com> Blair Zajac
+
+	* Release 0.06.
+
+Mon Dec  9 17:39:15 PST 2002 <blair@orcaware.com> Blair Zajac
+
+	* Changes: Rename CHANGES from Changes.
+
+	* Makefile.PL, add a prerequisite for Tree::DAG_Node
+	  1.04. This should make the module load easier from CPAN when
+	  Tree::DAG_Node is not previously installed into Perl.
+
+	* MANIFEST: Renamed Changes from CHANGES.
+
+	* README: Note that this package is hosted in a Subversion
+	  repository and give its URL.
+
+	* lib/Apache/ConfigParser/Directive.pm: Export DEV_NULL,
+	  DEV_NULL and is_dev_null via @EXPORT_OK.  Add
+	  %directive_value_path_element_pos and export it via
+	  @EXPORT_OK.  Rename %directive_value_takes_path to
+	  %directive_value_takes_abs_path.  Improve the POD for
+	  *value_is_{abs_,rel_,}path.  The set_value_array and
+	  set_orig_value_array methods now return the value of the
+	  array before the method was called.
+
+	* lib/Apache/ConfigParser.pm: For those directives that take
+	  path arguments, instead of always checking value array index
+	  0 to see if it should have ServerRoot prepended to it, which
+	  is incorrect for LoadModule among other directives, check
+	  all value array positions that may take a path.
+
+Mon Sep 17 21:58:48 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* Release version 0.05.
+
+Mon Sep 17 21:47:46 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* lib/Apache/ConfigParser.pm: Shorten the find_* method
+	  names.  Rename find_at_and_down_directive_names to
+	  find_down_directive_names and find_in_* to find_*.
+
+	* lib/Apache/ConfigParser.pod: Ditto.
+
+	* t/02parser.t: Ditto.
+
+Mon Sep 17 12:25:41 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* lib/Apache/ConfigParser.pm: Rename all of the find_* methods
+	  to use the word directive instead of option.  Change all of
+	  the comments and POD documentation to use the word directive
+	  instead of option.
+
+	* lib/Apache/ConfigParser.pod: Ditto.
+
+	* t/02parser.t: Ditto.
+
+Mon Sep 17 02:01:35 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* Release version 0.04.
+
+Mon Sep 17 01:17:00 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* lib/Apache/ConfigParser.pm: Move the setting of
+	  Apache::ConfigParser's ServerRoot hash value after the value
+	  array is set.  This removes any unnecessary quotes around
+	  the value.
+
+	* lib/Apache/ConfigParser.pod: Ditto.
+
+	* t/httpd02.answer: Update the answer file to reflect this
+	  change with ServerRoot.
+
+	* t/httpd04.answer: Ditto.
+
+	* lib/Apache/ConfigParser.pm: Move all of the code that
+	  checked if a particular directive's value is a path, a pipe
+	  or a syslog into lib/Apache/ConfigParser/Directive.pm since
+	  logically this code belongs with the directive and not with
+	  the user of the directive.  This meant moving the
+	  %directive_has_non_abs_path hash to the Directive module.
+	  Also rename the hash to %directive_value_takes_path to make
+	  the name more accurate.  Remove the declaration of
+	  @EXPORT_OK since the module does not export anything now.
+
+	* lib/Apache/ConfigParser.pod: Ditto.
+
+	* lib/Apache/ConfigParser.pm: Allow pre_transform_path_sub and
+	  post_transform_path_sub to operate on any file or directory
+	  path that is a hash key of %directive_value_takes_path but
+	  only prepend ServerRoot to directives that are a hash key of
+	  %directive_value_takes_rel_path that have relative files
+	  that are also not equal to File::Spec->devnull.  The new
+	  directives that can be transformed that previous would not
+	  be are: AgentLog, AuthDBGroupFile, AuthDBMGroupFile,
+	  AuthDBMUserFile, AuthDBUserFile, AuthDigestFile, CacheRoot,
+	  CoreDumpDirectory, Directory, DocumentRoot, MMapFile,
+	  RewriteLock and ServerRoot.
+
+	* lib/Apache/ConfigParser.pod: Ditto.
+
+	* lib/Apache/ConfigParser/Directive.pm: Add several new
+	  methods to Apache::ConfigParser::Directive to determine the
+	  file and directory properties of directives.  The new
+	  methods are:
+	    value_is_path and orig_value_is_path
+	      return true if the directive can take a file or
+	      directory path as its value array element 0 and that
+	      element is a file or directory path.
+	    value_is_abs_path and orig_value_is_abs_path
+	      Returns true if the directive can take either an
+	      absolute or relative file or directory path as its value
+	      array element 0 and that element is an absolute file or
+	      directory path.
+	    value_is_rel_path and orig_value_is_rel_path
+	      Returns true if C<$d>'s directive can take either an
+	      absolute or relative file or directory path as its value
+	      array element 0 and that element is a relative file or
+	      directory path.
+
+	* lib/Apache/ConfigParser/Directive.pod: Ditto.
+
+	* lib/Apache/ConfigParser/Directive.pm: Export via @EXPORT_OK
+	  the two hashes %directive_value_takes_path and
+	  %directive_value_takes_rel_path which are used by the new
+	  methods above and made available to other users of the
+	  module.
+
+	* t/01directive.t: Add tests to extensively test all of the
+	  new methods in Apache::ConfigParser::Directive.
+
+Sat Sep 15 23:00:54 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* Release version 0.03.
+
+Sat Sep 15 22:59:50 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* lib/Apache/ConfigParser.pm: Upgrade to version 0.03.
+	  README: Ditto.
+
+Sat Sep 15 22:50:27 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* lib/Apache/ConfigParser.pm: In
+	  &directive_value_is_not_dev_null_and_pipe_and_syslog allow
+	  0-9 to appear in the facility name and allow :facility to be
+	  optional.
+
+	* lib/Apache/ConfigParser.pm: Ditto.
+
+Fri Sep 14 21:44:24 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* Release version 0.02.
+
+Fri Sep 14 21:27:48 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* lib/Apache/ConfigParser.pm: Rename &relative_path_check to
+	  &directive_value_is_not_dev_null,
+	  &relative_path_check_for_pipe to
+	  &directive_value_is_not_dev_null_and_pipe and
+	  &relative_path_check_for_pipe_and_syslog to
+	  &directive_value_is_not_dev_null_and_pipe_and_syslog.
+
+	* lib/Apache/ConfigParser.pod: Ditto.
+
+Fri Sep 14 21:08:14 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* lib/Apache/ConfigParser.pm: Instead of checking if a file or
+	  directory is absolute to prepend the ServerRoot on just Unix
+	  and Windows systems, use File::Spec->file_name_is_absolute
+	  which handles many more operating systems.  For the
+	  AccessConfig, Include and ResourceConfig directives, do not
+	  include the file or directory if the filename is equal to
+	  File::Spec->devnull.
+
+	* lib/Apache/ConfigParser.pm: Ditto.
+
+Fri Sep 14 20:51:14 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* lib/Apache/ConfigParser.pm: Rename %directive_takes_rel_path
+	  to %directive_takes_rel_path to have a more accurate name.
+
+	* lib/Apache/ConfigParser.pod: Ditto.
+
+Fri Sep 14 20:41:50 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* lib/Apache/ConfigParser.pm: Require File::Spec 0.82 which is
+	  now used to do file and directory path tests.
+
+	* lib/Apache/ConfigParser.pod: Ditto.
+
+	* Makefile.PL: Ditto.
+
+Fri Sep 14 19:39:26 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* lib/Apache/ConfigParser.pm: Allow either a single subroutine
+	  reference or an array reference that contains as its
+	  first element a subroutine reference followed by zero or
+	  more arbitrary elements to be passed as the arguments to
+	  new's pre_transform_path_sub and post_transform_path_sub
+	  options.
+
+	* lib/Apache/ConfigParser.pod: Ditto.
+
+	* t/02parser.t: Add tests to make sure that passing arguments to 
+	  pre_transform_path_sub and post_transform_path_sub work.
+
+	* t/httpd05.answer: Ditto.
+
+	* t/httpd07.answer: Ditto.
+
+Thu Sep 13 14:12:43 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* lib/Apache/ConfigParser.pm: When checking for an absolute
+	  path name on Windows, also check for upper case drive
+	  letters.
+
+	* lib/Apache/ConfigParser.pod: ditto.
+
+Thu Sep 13 12:58:58 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* lib/Apache/ConfigParser.pm: Update version number to 0.02.
+
+	* lib/Apache/ConfigParser.pod: Ditto.
+
+	* README: Ditto.
+
+Thu Sep 13 12:50:59 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* lib/Apache/ConfigParser.pm: Reformat a POD comment to make
+	  sure it formats to an 80 character width screen.
+
+	* lib/Apache/ConfigParser.pod: Ditto.
+
+Thu Sep  6 19:14:34 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* Release version 0.01.

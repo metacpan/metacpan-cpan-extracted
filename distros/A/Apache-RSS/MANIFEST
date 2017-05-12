@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Apache/RSS.pm
+lib/Apache/RSS/Encoding.pm
+lib/Apache/RSS/Encoding/JcodeUTF8.pm
+t/00_compile.t
+t/01_declined.t
+t/02_forbidden.t
+t/03_default.t
+t/04_title.t
+t/05_order.t
+t/test_dir/1.html
+t/test_dir/2.html
+t/test_dir/foo.txt

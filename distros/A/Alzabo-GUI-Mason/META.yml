@@ -1,0 +1,20 @@
+---
+name: Alzabo-GUI-Mason
+version: 0.1201
+author:
+  - 'Dave Rolsky <autarch@urth.org>'
+abstract: A GUI for Alzabo using Mason
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  HTML::Mason: 1.1
+  URI::FromHash: 0
+provides:
+  Alzabo::GUI::Mason:
+    file: lib/Alzabo/GUI/Mason.pm
+    version: 0.1201
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

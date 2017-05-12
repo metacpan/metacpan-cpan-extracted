@@ -1,0 +1,44 @@
+Revision history for Perl extension Authorize::Rule.
+
+0.009   2016-10-14
+        * Provide a META.json file.
+
+0.008   2015-01-25
+        * Feature: global per resource rules. (Andrei Vereha)
+
+0.007   2014-12-21
+        * Bugfix: resources were deleted even if not groups. (Andrei Vereha)
+        * Only cleanup after expanding all aliases.
+        * Some code cleanup.
+
+0.006   2014-10-20
+        * Adding entity groups.
+        * Adding resource groups.
+        * Removed unnecessary List::Util dependency.
+
+0.005   2014-07-09
+        * Documentation updates and corrections.
+
+0.004   2014-07-08
+        (Moving to a new date format, don't be alarmed)
+        * [FEATURE] Callback as an action.
+        * [FEATURE] Callback as a rule.
+        * [FEATURE] Callback as a key value.
+        * [FEATURE] Regex as a key value, for regexp matching of value.
+        * [FEATURE] Allow checking for keys *not* existing as well.
+        * Decidingly supporting only flat parameters for now.
+        * Adhering to that decision better.
+        * Some docs improvement.
+
+0.003   06.07.14
+        *** A major rewrite ***
+        This new version addresses everything I felt was problematic
+        with the new version. Consider it a complete rewrite.
+
+0.002   09.09.13
+        * Small POD correction.
+          (thanks, Mr. Spaz)
+
+0.001   08.09.13
+        * It works. Yay!
+

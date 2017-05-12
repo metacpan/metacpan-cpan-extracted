@@ -1,0 +1,12 @@
+Revision history for App-errnos
+
+0.02    2015-09-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add sample output in script's POD.
+
+
+0.01    2015-09-10 (PERLANCAR)
+
+        - First release.

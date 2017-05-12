@@ -1,0 +1,127 @@
+#!/usr/bin/env perl
+
+use Getopt::Long ();
+use Config;
+use FindBin;
+use File::Spec;
+use lib File::Spec->catdir($FindBin::Bin, '..', 'lib');
+use App::local::lib::helper;
+
+if( @ARGV || App::local::lib::helper->has_local_lib_env) {
+    my $help = 0;
+    my $which_perl = $ENV{LOCALLIB_HELPER_WHICH_PERL} || $Config{perlpath};
+    my $target = $ENV{LOCALLIB_HELPER_TARGET} || undef;
+    my $helper_name = $ENV{LOCALLIB_HELPER_HELPER_NAME} || 'localenv';
+    my $helper_permissions = $ENV{LOCALLIB_HELPER_HELPER_PERMISSIONS} || '0755';
+
+    my $result = Getopt::Long::GetOptions(
+        'h|help' => \$help,
+        'p|which_perl=s' => \$which_perl,
+        't|target=s' => \$target,
+        'n|helper_name=s' => \$helper_name,
+        'p|helper_permissions=s' => \$helper_permissions,
+    );
+
+    if($help || !$result) {
+        print <<'END';
+Usage: perl Makefile.PL %OPTIONS
+
+Options:
+  -h,--help                 This help message
+  -p,--which_perl           The Perl binary we are building the helper for (default: $^X)
+  -t,--target               The local::lib we are building the helper for (default is current)
+  -n,--helper_name          Name of the helper script (default: localenv)
+  -p,--helper_permissions   Permissions given to the helper script (default 775)
+
+Type `perldoc App::local::lib::helper` or `perldoc App::local::lib::helper::rationale`
+for more details.
+
+END
+    } else {
+        App::local::lib::helper->run(
+            which_perl => $which_perl,
+            target => $target,
+            helper_name => $helper_name,
+            helper_permissions => $helper_permissions,
+        );
+    }
+} else {
+    print "No Arguments or local::lib detected!\n";
+}
+
+=head1 NAME
+
+local-lib-helper - A commandline utility that builds local-lib helper scripts
+
+=head1 SYNOPSIS
+
+    local-lib-helper 
+
+=head1 DESCRIPTION
+
+Although the primary purpose of this distribution is to make it trivial to use
+a given L<local::lib> you may, as part of a custom build or deployment system,
+need an easy way to programmatically create the helper scripts for either an
+activated or precreated L<local::lib>.  This script makes that easy.  If you
+are already in a L<local::lib> managed environment this script will detect that
+fact and automatically install the helpers into the C<bin> directory of that
+L<local::lib>.  If there is not a currently activated L<local::lib>, you can
+still install the helpers as long as you've already created a L<local::lib>
+in the past (say via the self bootstrap method outlined in the documention,
+or when you specified a C<-l> option with L<App::cpanminus>).  In that case
+since we can't auto detect the location of the L<local::lib> you need to use
+the C<target> option, which should be the root directory of the L<local::lib>
+(which is the directory that contains the C<bin> and C<lib> directories of
+the L<local::lib> you previously created).
+
+=head1 OPTIONS
+
+This script has the following options, which can also be veiwed in summary by
+typing C<local-lib-helper --help>.
+
+=over 4
+
+=item help (--help, -h)
+
+A summary of the help options.
+
+=item which_perl (--which_perl, -p)
+
+This should be the path to the perl binary that the L<local::lib> is built
+against. This defaults to the path of the perl binary under which we are
+currently running.  You should probably leave this one alone :)
+
+=item target (--target, -t)
+
+This is the target directory for the L<local::lib> you want to build the helper
+script against.  By default it will attempt to detect the currently running
+L<local::lib> and use that.  If we can't detect a running L<local::lib> and
+this option is undef, we die with a message.
+
+=item helper_name (--helper_name, -n)
+
+This is the name of the helper utility script.  It defaults to 'localenv'.
+
+=item helper_permissions (--helper_permissions, -p)
+
+These are the permissions the the helper utility script is set to.  By default
+we set the equivilent of 'chmod 755 [HELPER SCRIPT]'
+
+=back
+
+=head ALSO SEE
+
+L<App::local::lib::helper>, L<App::local::lib::helper::rationale>
+
+=head1 AUTHOR
+
+John Napiorkowski C< <<jjnapiork@cpan.org>> >
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010, John Napiorkowski
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

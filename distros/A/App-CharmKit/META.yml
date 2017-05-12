@@ -1,0 +1,41 @@
+---
+abstract: 'Sugary Juju charm authoring goodness'
+author:
+  - 'Adam Stokes <adamjs@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-CharmKit
+requires:
+  App::Cmd: '0.330'
+  Class::Tiny: '1.004'
+  Email::Address: '1.908'
+  Expect: '1.21'
+  Exporter::Tiny: '0.042'
+  File::ShareDir: '1.102'
+  Import::Into: '1.002005'
+  Module::Runtime: '0'
+  Path::Tiny: '0.076'
+  Rex: v1.3.3
+  Set::Tiny: '0.03'
+  Smart::Comments: '1.06'
+  YAML::Tiny: '1.69'
+  autobox: '0'
+  autobox::Core: '0'
+  boolean: '0.45'
+  'true': '0'
+resources:
+  IRC: "'irc://freenode.net/#ubuntu-solutions'"
+  bugtracker: https://github.com/charmkit/App-CharmKit/issues
+  homepage: https://github.com/charmkit/App-CharmKit
+  repository: https://github.com/charmkit/App-CharmKit.git
+version: '2.07'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,75 @@
+NAME
+    AnyEvent::Worker - Manage blocking task in external process
+
+SYNOPSIS
+        use AnyEvent 5;
+        use AnyEvent::Worker;
+    
+        my $worker1 = AnyEvent::Worker->new( [ 'Actual::Worker::Class' => @init_args ] );
+        my $worker2 = AnyEvent::Worker->new( sub { return "Cb 1 @_"; } );
+        my $worker3 = AnyEvent::Worker->new( {
+            class   => 'Actual::Worker::Class2',
+            new     => 'create', # alternative constructor
+            args    => [qw(arg1 arg2)],
+        } );
+    
+        # Invoke method `test' on Actual::Worker::Class with arguments @args
+        $worker1->do( test => @args , sub {
+            return warn "Request died: $@" if $@;
+            warn "Received response: @_";
+        });
+    
+        # Just call callback, passed to worker2 with arguments @args
+        $worker2->do( @args , sub {
+            return warn "Request died: $@" if $@;
+            warn "Received response: @_";
+        });
+
+CONSTRUCTOR
+  new $cb->($req), %args
+    Simple stateless worker. On any "do" a sub sill be invoked with "do"
+    arguments
+
+  new [ Class => @new_args ], %args
+    Stateful, object-based worker. After fork, Class will we "use"d, then
+    instantiated with new(@new_args).
+
+    First argument to "do" will be interpreted as object method, rest -- as
+    method arguments.
+
+  new { class => 'Class', args => \@new_args, new => 'constructor_method' }, %args
+    Same as previous, but allow to pass optional constructor name in "new"
+    arg
+
+  $args{on_error} = $cb->($worker,$error,$fatal,$file,$line)
+    When an unexpected error occurs (for ex: child process exited or killed)
+    "on_error" callback will be invoked
+
+METHODS
+  do @args, $cb->($res)
+    Only for stateless worker.
+
+  do method => @args, $cb->($res)
+    Only for stateful worker.
+
+METHODS
+    $worker->on_error ($cb->($worker, $filename, $line, $fatal))
+        Sets (or clears, with "undef") the "on_error" handler.
+
+    $worker->timeout ($seconds)
+        Sets (or clears, with "undef") the database timeout. Useful to
+        extend the timeout when you are about to make a really long query.
+
+    $worker->do ( @args, $cb->( $worker, @response ) )
+        Executes worker code and execure the callback, when response is
+        ready
+
+AUTHOR
+    Mons Anderson, "<mons@cpan.org>"
+
+ACKNOWLEDGEMENTS
+    This module based on Marc Lehmann's AnyEvent::DBI
+
+    Thanks to Vladimir Timofeev "<vovkasm@cpan.org>" for bugfixes and useful
+    notes
+

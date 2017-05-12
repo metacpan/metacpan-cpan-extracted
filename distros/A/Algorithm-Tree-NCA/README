@@ -1,0 +1,19 @@
+Algorithm/Tree/NCA version 0.01
+=================================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 by Mats Kindahl. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

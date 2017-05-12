@@ -1,0 +1,17 @@
+Revision history for Perl extension Apache::CacheContent.
+
+0.12  Thu Dec 13 00:21:51 PST 2001
+        - Cleanup the POD
+
+        - Add a ToDo 
+
+0.11
+	- Make sure Apache::Log is required in the main module 
+          (Tatsuhiko Miyagawa)
+	- Remove Cookbook reference from sample code (Tatsuhiko Miyagawa)
+
+0.10  Wed Dec  5 14:03:07 2001
+	- original version; created by h2xs 1.20 with options
+		-n Apache::CacheContent -X -A
+        - Imported from Cookbook::CacheContent module
+

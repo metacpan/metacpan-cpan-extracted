@@ -1,0 +1,110 @@
+Astro-App-Satpass2 is Copyright (C) 2009-2017 by Thomas R. Wyant, III
+
+This package contains an application to predict satellite visibility,
+using the Astro::Coord::ECI classes. The following classes are included:
+
+Astro::App::Satpass2 - The application class;
+Astro::App::Satpass2::ParseTime - Base class for time parsing;
+Astro::App::Satpass2::ParseTime::ISO8601 - Standalone ISO-8601-ish time parser;
+Astro::App::Satpass2::ParseTime::Date::Manip - Date::Manip parser base;
+Astro::App::Satpass2::ParseTime::Date::Manip::v5 - Date::Manip v5 parser;
+Astro::App::Satpass2::ParseTime::Date::Manip::v6 - Date::Manip v6 parser;
+Astro::App::Satpass2::Copier - Base class for the helper classes;
+Astro::App::Satpass2::Format - Base class for the output formatters;
+Astro::App::Satpass2::Format::Classic - Template-based output formatter;
+Astro::App::Satpass2::Format::Dump - Output dumper (for debugging);
+Astro::App::Satpass2::FormatTime - Base class for formatting times;
+Astro::App::Satpass2::FormatTime::Cldr - Manifest constants for cldr formatting;
+Astro::App::Satpass2::FormatTime::DateTime - DateTime common code;
+Astro::App::Satpass2::FormatTime::DateTime::Cldr - DateTime cldr formatting;
+Astro::App::Satpass2::FormatTime::DateTime::Strftime - DateTime strftime fmtg;
+Astro::App::Satpass2::FormatTime::POSIX::Strftime - POSIX strftime fmtg;
+Astro::App::Satpass2::FormatTime::Strftime - Manifest const for strftime fmtg;
+Astro::App::Satpass2::Utils - Utility functions needed by other modules;
+Astro::App::Satpass2::Warner - Manage how warnings are formatted.
+
+In addition, a 'satpass2' script is included, which simply uses
+Astro::App::Satpass2 and passes @ARGV to its run() method.
+
+There is also an Astro::App::Satpass2::TUTORIAL to help get started.
+
+There were several motivations for this package:
+
+* There was no good way to test the 'satpass' script that was included
+  in the Astro-satpass package. Restructuring it as an object made
+  testing easier; in fact, several bugs were found in 'satpass' while
+  writing this module.
+
+* Making a break with the old 'satpass' script gave the opportunity to
+  rethink a couple implementation decisions in the light of experience,
+  and drop obsolete functionality such as the SIMBAD 3 interface and the
+  associated setting to determine which SIMBAD interface to use. This
+  means that 'satpass2' is not quite command-compatable with 'satpass'.
+  The Astro::App::Satpass2 documentation describes the differences.
+
+* The output formatting of the 'satpass' script is not very flexable.
+  Astro::App::Satpass2::Format::Classic provides a huge amount of
+  freedom to custom-format output, though it turns out that you need to
+  learn your way around a fairly complex format specification mechanism
+  to take advantage of this flexability.
+
+* The dependencies of the 'satpass' script are significantly different
+  than those of the Astro::Coord::ECI classes. Separating the two (with
+  eventual abandonment of the Astro-satpass package in favor of an
+  Astro-Coord-ECI package without the 'satpass' script) means that
+  people only interested in the Astro::Coord::ECI classes will not have
+  to drag along the dependencies of the script.
+
+INSTALLATION
+
+Most Perl users will want to install using their favorite of either
+'cpan' or 'cpanp'. For either of these, installing Astro::App::Satpass2
+gets you everything. ActivePerl users will want to use ActiveState's
+'ppi', and install Astro-App-Satpass2.
+
+If for some reason none of these works for you, you can download the
+distribution and expand it using something like
+
+    tar -xzf Astro-App-Satpass2-9.999.tar.gz
+
+Users of MSWin32 (and perhaps other operating systems) may need to
+convert the line endings in the expanded files from Unix to their native
+system before proceeding.
+
+Then, issue one of the following two incantations:
+
+    perl Makefile.PL
+    make
+    make test
+    sudo make install
+
+or
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    sudo ./Build install
+
+You should substitute the appropriate program name for 'make', eg nmake
+(typically) under MSWin32, or mms or mmk under VMS. See
+ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe for a copy of
+nmake for MSWin32 if you need it.
+
+Unix users may want to use 'su' rather than 'sudo' for the install.
+Non-unix users may need to be logged in to an administrative or
+otherwise privileged accout, and turn on privileges (if applicable) for
+the install.
+
+Of course, since it's pure Perl, you can just expand the kit and drop
+the .pm files into the App directory (creating it if necessary) in the
+appropriate place in your @INC directories.
+
+LICENSING INFORMATION
+
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

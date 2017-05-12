@@ -1,0 +1,14 @@
+Revision history for Perl extension AI::FuzzyInference.
+
+0.01  Mon Jan 20 16:21:46 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n AI::FuzzyInference
+
+0.02  Renamed everything from AI::FIS to AI::FuzzyInference in preparation
+      to upload to CPAN.
+
+0.03  Fixed a small bug that gave bogus unitialized warnings.
+
+0.04  Changed the centroid algorithm to make it more accurate.
+
+0.05  Fixed bug 18214 reported on CPAN.

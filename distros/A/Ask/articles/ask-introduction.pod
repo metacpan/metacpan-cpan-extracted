@@ -1,0 +1,209 @@
+=head1 Ask not what your user can do for you...
+
+In many scripts, we need to prompt the end user for information - this
+could be a prompt for a file name, a selection from a list of options,
+or an answer to a yes/no question.
+
+The traditional approach to this sort of question is to print your
+question to STDOUT, read a line from STDIN, and apply some sort of
+parsing to the answer...
+
+   use 5.010;
+   use strict;
+   use warnings;
+   
+   my $answer;
+   until (defined $answer) {
+      print "Would you like fries with that?\n";
+      $_ = <>;
+      $answer = 1 if /^Y/i;
+      $answer = 0 if /^N/i;
+   }
+   
+   say "Adding fries!" if $answer;
+
+One issue with this approach is: what happens when your script is not
+running in a terminal?
+
+One attempt at solving this problem is L<IO::Prompt::Tiny> and its ilk.
+This performs a simple test to determine if the script is running on an
+interactive terminal and only prompts the user if the terminal is
+interactive. When the script is being run non-interactively (or if the
+C<PERL_MM_USE_DEFAULT> environment variable is set), then it returns a
+default answer instead.
+
+   use 5.010;
+   use strict;
+   use warnings;
+   use IO::Prompt::Tiny qw(prompt);
+   
+   my $answer;
+   until (defined $answer) {
+      # In non-interactive mode, assume they want no fries...
+      $_ = prompt("Would you like fries with that?", "No");
+      $answer = 1 if /^Y/i;
+      $answer = 0 if /^N/i;
+   }
+   
+   say "Adding fries!" if $answer;
+
+The problem with this is that it makes the assumption that when the
+terminal is non-interactive, there is absolutely no other way to prompt
+the user, and you should be happy with the default answer. This is not
+always a good assumption.
+
+=head2 Opening up a dialogue
+
+On some operating systems, double-clicking a Perl file will launch it
+without a terminal. In these cases, you can probably interact with the
+user by launching a dialog box. But how to do that? Doesn't that
+require complex programming in L<Tk> or L<Wx> (modules which are not
+in core, and not always straightforward to build)?
+
+Enter L<Ask>. Ask abstracts away the details of interacting with your
+user. It will do the terminal interaction test; it will check
+C<PERL_MM_USE_DEFAULT>; it will see if the L<Wx>, L<Gtk2> or L<Tk>
+modules are installed and usable; it will even use C</usr/bin/zenity>
+(a GNOME component for adding GUI dialog boxes to shell scripts) if
+it has to.
+
+It will only resort to using the default answer if there's no other
+possibility of interacting with the user. Here's our fast food worker
+using Ask:
+
+   use 5.010;
+   use strict;
+   use warnings;
+   use Ask qw(question);
+   
+   my $answer = question("Would you like fries with that?", default => 0);
+   say "Adding fries!" if $answer;
+
+=head2 That is the question
+
+In the previous example, we saw a yes-no question. How about something a
+bit harder?
+
+   use Ask qw( multiple_choice );
+   
+   my @answers = multiple_choice(
+      "Please choose some pizza toppings...",
+      choices => [
+         [ sauce        => 'Our famous pizza sauce' ],
+         [ cheese       => 'Oozing Mozzarella cheese' ],
+         [ ham          => 'Finest Bavarian ham' ],
+         [ pepperoni    => 'Spicy pepperoni' ],
+         [ onion        => 'Onion slices' ],
+         [ tinned_fruit => 'Chunky cuts of fresh pineapple' ],
+      ],
+   );
+   say "Adding $_" for @answers;
+
+Or if you just wish them to choose a single option from a list:
+
+   use Ask qw( single_choice );
+   
+   my $existance = single_choice(
+      "To be, or not to be; that is the question.",
+      choices => [
+         [ be     => "Be" ],
+         [ not_be => "Don't be" ],
+      ],
+   );
+
+Ask also has functions for file selection, text entry (including hidden
+text - passwords) and displaying information, warnings and errors.
+
+=head2 I object!
+
+If you object to using the functional interface, you can get an object
+using the C<< Ask->detect >> method and call C<question>,
+C<single_choice> and friends as object methods.
+
+   use 5.010;
+   use strict;
+   use warnings;
+   use Ask;
+   
+   my $interface = Ask->detect;
+   
+   my $answer = $interface->question(
+      text      => "Would you like fries with that?",
+      default   => 0,
+   );
+   say "Adding fries!" if $answer;
+
+The functional interface is just a friendly wrapper around Ask's
+object-oriented core.
+
+=head2 Boldly go
+
+Let's say that you want to hook up your script to your drive-through
+restaurant's voice recognition system. Ask's backends are all L<Moo>
+classes performing the L<Ask::API> role. It's really easy to write your
+own:
+
+   package Ask::VoiceRecognition {
+      
+      use MyApp::Voice::Generator ();
+      use MyApp::Voice::Recognition ();
+      
+      use Moo;
+      with 'Ask::API';
+      
+      has generator => (
+         is      => 'lazy',
+         default => sub { MyApp::Voice::Generator->new },
+      );
+      
+      has recognition => (
+         is      => 'lazy',
+         default => sub { MyApp::Voice::Recognition->new },
+      );
+      
+      sub info {
+         my $self = shift;
+         my %args = @_;
+         $self->generator->say($args{text});
+      }
+      
+      sub entry {
+         my $self = shift;
+         my %args = @_;
+         $self->info($args{text}) if exists $args{text};
+         return $self->recognition->listen(seconds => 30);
+      }
+   }
+
+That's all there is to it!
+
+The Ask::API provides default implementations of C<question>,
+C<file_selection>, C<multiple_choice>, etc, which you can override if
+you choose to, but that is optional.
+
+To force Ask to use your backend rather than the built-in ones, just set
+the C<PERL_ASK_BACKEND> environment variable to the name of your module.
+
+=head2 Ask the future
+
+Ask is a young module and still needs some work. In particular:
+
+=over
+
+=item *
+
+Detection of the best module for interacting with the user is naive.
+It can end up selecting, say, Gtk2 on a headless Linux box.
+
+=item *
+
+A native Windows GUI backend is planned. The Gtk2, Wx and Tk backends
+should all theoretically work on Windows, but rely on various library
+files being present.
+
+=back
+
+Ask is L<on GitHub|https://github.com/tobyink/p5-ask> and
+L<on Bitbucket|https://bitbucket.org/tobyink/p5-ask> so feel free to
+contribute improvements!
+

@@ -1,0 +1,9 @@
+Revision history for Perl extension Acme::Morse::Audible.
+
+1.10  Sun Aug 25 01:45:00 2002
+	- Some bug fixes.
+	- New 'no Acme::Morse::Audible;' feature.
+	- New test cases.
+
+1.00  Thu Aug 22 15:30:00 2002
+	- original version.

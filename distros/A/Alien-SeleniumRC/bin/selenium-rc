@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Alien::SeleniumRC;
+
+Alien::SeleniumRC::start("@ARGV"); # flatten the arg list

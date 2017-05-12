@@ -1,0 +1,49 @@
+NAME
+
+    AlignDB::SQL - An SQL statement generator.
+
+SYNOPSIS
+
+        my $sql = AlignDB::SQL->new();
+        $sql->select([ 'id', 'name', 'bucket_id', 'note_id' ]);
+        $sql->from([ 'foo' ]);
+        $sql->add_where('name',      'fred');
+        $sql->add_where('bucket_id', { op => '!=', value => 47 });
+        $sql->add_where('note_id',   \'IS NULL');
+        $sql->limit(1);
+    
+        my $sth = $dbh->prepare($sql->as_sql);
+        $sth->execute(@{ $sql->{bind} });
+        my @values = $sth->selectrow_array();
+    
+        my $obj = SomeObject->new();
+        $obj->set_columns(...);
+
+DESCRIPTION
+
+    AlignDB::SQL represents an SQL statement.
+
+    Most codes come from Data::ObjectDriver::SQL
+
+ATTRIBUTES
+
+ replace
+
+    with this, as_sql() method will replace strings in the final SQL
+    statement
+
+ACKNOWLEDGEMENTS
+
+    Sixapart
+
+AUTHOR
+
+    Qiang Wang <wang-q@outlook.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2008 by Qiang Wang.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

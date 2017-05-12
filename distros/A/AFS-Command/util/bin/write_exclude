@@ -1,0 +1,58 @@
+#!/ms/dist/perl5/bin/perl
+#
+# $Id: write_exclude,v 7.1 2004/01/13 19:01:44 wpm Exp $
+#
+# (c) 2003-2004 Morgan Stanley and Co.
+# See ..../src/LICENSE for terms of distribution.
+#
+# This is not used to build the distribution, just to keep that pesky
+# .exclude file up to date (which is used by me, wpm, to create the
+# tarball from a special Makefile)
+#
+# To run this, from the top level source directory, ./util/write_exclude
+#
+
+use Cwd;
+use File::Basename;
+
+@exclude = 
+  qw(
+     .options/rcsMajor
+     .msbaseline
+     .exclude
+    );
+
+warn "Searching source tree for RCS symlinks...\n";
+
+open(FIND,"find . -name RCS -print |") ||
+  die "Unable to fork find: $!\n";
+
+while ( <FIND> ) {
+    chomp;
+    s|^\./||;
+    push(@exclude,$_);
+}
+
+close(FIND) || 
+  die "Error running find: $!\n";
+
+warn "Writing new .exclude file...\n";
+
+$top = basename(cwd);
+
+open(NEW,">.exclude.$$") || 
+  die "Unable to open .exclude.$$: $!\n";
+foreach ( sort @exclude ) {
+    print NEW "$top/$_\n";
+}
+close(NEW) || 
+  die "Unable to close .exclude.$$: $!\n";
+
+rename(".exclude.$$",".exclude") || 
+  die "Unable to rename .exclude.$$ to .exclude: $!\n";
+
+exit 0;
+
+END {
+    unlink ".exclude.$$";
+}

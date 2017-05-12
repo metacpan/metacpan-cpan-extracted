@@ -1,0 +1,22 @@
+Revision history for Perl extension Apache::AuthenN2.
+
+0.05 2000 jul 14 14:15
+
+   o Allow config of multiple nt pdc:bdc pairs to try.
+   o Allow config of multiple default nt domains to try.
+   o Improve speed of NIS+ user lookup (thanks to Johannes Kornfellner).
+   o Promote AuthenCache and describe how to use it with this module
+     (thanks to Jason Bodnar).
+
+0.04 1999 may 13 11:55
+   o Allow nt domain qualification of username, e.g., "ENG\gary".
+
+0.03 1999 apr 13 11:45
+   o Gracefully handle error when nis+ tables are unaccessible.
+
+0.02 1999 mar 24
+   o Using Net::NISPlus instead of /usr/bin/nismatch.
+
+0.01 Wed Dec 16 16:12:39 1998
+   o Original version; created by h2xs 1.18.
+

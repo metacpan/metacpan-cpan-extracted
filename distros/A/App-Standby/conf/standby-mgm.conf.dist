@@ -1,0 +1,5 @@
+<App>
+    <Standby>
+        DBFile=/var/lib/standby-mgm/db.sqlite3
+    </Standby>
+</App>

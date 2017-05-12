@@ -1,0 +1,76 @@
+[% META title = "JandC.CO.CC" %]
+<div id="about">
+<p><b>What is</b>
+</p>
+<p>
+Welcome to JandC.CO.CC. This website is designed to demo how to use 
+<span style="font-weight: bold;">Catalyst</span> and <span style="font-weight: bold;">
+Moose</span> to build a 
+secured web application with less SQL, HTML, and JavaScript but more 
+flexibility and efficiency. <br><br>You can start from 
+<a href="[% Catalyst.uri_for('/menu/howto') %]">
+	How-To</a> 
+</p>
+<b>Features</b>
+<ul>
+<table>
+<tbody>
+<tr>
+<td ><li>LAMP</li></td>
+<td >Linux, Apache, MySQL, and Perl</td>
+</tr>
+<tr>
+<td ><li>Security</li></td>
+<td >Authentication and Role Based
+Access Control</td>
+</tr>
+<tr>
+<td ><li>CRUD</li></td>
+<td >Create, read, update and delete
+of persistent storage</td>
+</tr>
+<!--
+<tr>
+<td ><li>Portability</li></td>
+<td >Can switch to MySQL, SQLite and
+other DB easily<br>
+</td>
+</tr>
+<tr>
+-->
+<td ><li>ORM</li></td>
+<td >Object-Relational Mapping is
+used extensively</td>
+</tr>
+</tbody>
+</table>
+</ul>
+<p><b>Latest Movies</b>
+[% IF Catalyst.check_user_roles('admin') %]
+ | <a href="[% Catalyst.uri_for('/item/add/') %]">Add</a>
+[% END %]
+</p>
+<ul>
+[% WHILE (item = items.next) %]
+	<li>
+		<a href="[% Catalyst.uri_for('/item/detail/') _ item.id %]">[% item.title %]</a>		
+		[% item.release_date %]	
+	</li>
+[% END %]
+	<li><a HREF="[% Catalyst.uri_for('/menu/search') %]?sel=item">More...</a>
+	</li>
+</ul>
+<b>My Log</b> 
+[% IF Catalyst.check_any_user_role('sysadmin') %]
+| <a href="[% base %]news/add">Add</a>
+[% END %]
+<ul>
+[% WHILE (new = news.next) %]
+	<li>
+		[% new.title %] | [% new.release_date %]	
+	</li>
+[% END %]
+	<li><a HREF="[% Catalyst.uri_for('/menu/search') %]?sel=news">More...</a>
+	</li>
+</ul>
+</div>

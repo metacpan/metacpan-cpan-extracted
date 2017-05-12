@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Ante-Deluvian-Dialog.t
+t/test.pl
+lib/Ante/Deluvian/Dialog.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,32 @@
+---
+abstract: 'Application for Fidonet/FTN related processing in an SQL database supported by a Perl DBD module.'
+author:
+  - 'Robert James Clay <jame@rocasa.us>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-FTNDB
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  App::Cmd: 0
+  Config::Tiny: 0
+  DBD::SQLite: 0
+  DBI: 0
+  FTN::Database: 0.34
+  FTN::Log: 0.02
+  File::Spec: 0
+  Getopt::Std: 0
+  Test::More: 0
+  Test::Pod: 1.22
+  Test::Pod::Coverage: 1.08
+version: 0.39

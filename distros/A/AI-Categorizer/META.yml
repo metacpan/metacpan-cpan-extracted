@@ -1,0 +1,104 @@
+---
+name: AI-Categorizer
+version: 0.09
+author:
+  - 'Ken Williams <ken@mathforum.org>'
+  - |-
+    Discussion about this module can be directed to the perl-AI list at
+    <perl-ai@perl.org>.  For more info about the list, see
+    http://lists.perl.org/showlist.cgi?name=perl-ai
+abstract: Automatic Text Categorization
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Container: 0.09
+  File::Spec: 0
+  Lingua::Stem: 0.5
+  Params::Validate: 0.18
+  Statistics::Contingency: 0.06
+  Storable: 0
+  perl: 5.6.0
+build_requires:
+  Module::Build: 0.2
+recommends:
+  AI::DecisionTree: 0.06
+  Algorithm::NaiveBayes: 0
+  Algorithm::SVM: 0.06
+  Scalar::Util: 0
+  Time::Progress: 1.1
+provides:
+  AI::Categorizer:
+    file: lib/AI/Categorizer.pm
+    version: 0.09
+  AI::Categorizer::Category:
+    file: lib/AI/Categorizer/Category.pm
+  AI::Categorizer::Collection:
+    file: lib/AI/Categorizer/Collection.pm
+  AI::Categorizer::Collection::DBI:
+    file: lib/AI/Categorizer/Collection/DBI.pm
+  AI::Categorizer::Collection::Files:
+    file: lib/AI/Categorizer/Collection/Files.pm
+  AI::Categorizer::Collection::InMemory:
+    file: lib/AI/Categorizer/Collection/InMemory.pm
+  AI::Categorizer::Collection::SingleFile:
+    file: lib/AI/Categorizer/Collection/SingleFile.pm
+  AI::Categorizer::Document:
+    file: lib/AI/Categorizer/Document.pm
+  AI::Categorizer::Document::SMART:
+    file: lib/AI/Categorizer/Document/SMART.pm
+  AI::Categorizer::Document::Text:
+    file: lib/AI/Categorizer/Document/Text.pm
+  AI::Categorizer::Document::XML:
+    file: lib/AI/Categorizer/Document/XML.pm
+  AI::Categorizer::Document::XML::Handler:
+    file: lib/AI/Categorizer/Document/XML.pm
+  AI::Categorizer::Experiment:
+    file: lib/AI/Categorizer/Experiment.pm
+  AI::Categorizer::FeatureSelector:
+    file: lib/AI/Categorizer/FeatureSelector.pm
+  AI::Categorizer::FeatureSelector::CategorySelector:
+    file: lib/AI/Categorizer/FeatureSelector/CategorySelector.pm
+  AI::Categorizer::FeatureSelector::ChiSquare:
+    file: lib/AI/Categorizer/FeatureSelector/ChiSquare.pm
+  AI::Categorizer::FeatureSelector::DocFrequency:
+    file: lib/AI/Categorizer/FeatureSelector/DocFrequency.pm
+  AI::Categorizer::FeatureVector:
+    file: lib/AI/Categorizer/FeatureVector.pm
+  AI::Categorizer::Hypothesis:
+    file: lib/AI/Categorizer/Hypothesis.pm
+  AI::Categorizer::KnowledgeSet:
+    file: lib/AI/Categorizer/KnowledgeSet.pm
+  AI::Categorizer::Learner:
+    file: lib/AI/Categorizer/Learner.pm
+  AI::Categorizer::Learner::Boolean:
+    file: lib/AI/Categorizer/Learner/Boolean.pm
+  AI::Categorizer::Learner::DecisionTree:
+    file: lib/AI/Categorizer/Learner/DecisionTree.pm
+    version: 0.01
+  AI::Categorizer::Learner::Guesser:
+    file: lib/AI/Categorizer/Learner/Guesser.pm
+  AI::Categorizer::Learner::KNN:
+    file: lib/AI/Categorizer/Learner/KNN.pm
+  AI::Categorizer::Learner::KNN::Queue:
+    file: lib/AI/Categorizer/Learner/KNN.pm
+  AI::Categorizer::Learner::NaiveBayes:
+    file: lib/AI/Categorizer/Learner/NaiveBayes.pm
+  AI::Categorizer::Learner::Rocchio:
+    file: lib/AI/Categorizer/Learner/Rocchio.pm
+    version: 0.01
+  AI::Categorizer::Learner::SVM:
+    file: lib/AI/Categorizer/Learner/SVM.pm
+    version: 0.01
+  AI::Categorizer::Learner::Weka:
+    file: lib/AI/Categorizer/Learner/Weka.pm
+  AI::Categorizer::ObjectSet:
+    file: lib/AI/Categorizer/ObjectSet.pm
+  AI::Categorizer::Storable:
+    file: lib/AI/Categorizer/Storable.pm
+  AI::Categorizer::Util:
+    file: lib/AI/Categorizer/Util.pm
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

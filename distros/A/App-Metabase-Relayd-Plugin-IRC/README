@@ -1,0 +1,73 @@
+NAME
+    App::Metabase::Relayd::Plugin::IRC - IRC plugin for metabase-relayd
+
+VERSION
+    version 0.08
+
+SYNOPSIS
+      # example metabase-relayd configuration file
+
+      [IRC]
+
+      server = my.irc.server
+      nick = myrelayd
+
+DESCRIPTION
+    App::Metabase::Relayd::Plugin::IRC is an IRC plugin for
+    App::Metabase::Relayd and metabase-relayd that announces on IRC channels
+    when reports are received by the daemon.
+
+    Configuration is handled by a section in the metabase-relayd
+    configuration file.
+
+    When metabase-relayd starts a bot will join configured channels and
+    start announcing reports that it has received.
+
+CONFIGURATION
+    This plugin uses an "[IRC]" section within the metabase-relayd
+    configuration file.
+
+    The only mandatory required parameter is "server".
+
+    "server"
+        Specify the name or IP address of an ircd to connect to. Mandatory.
+
+    "nick"
+        The nickname to use. Defaults to "relayd" plus $$.
+
+    "port"
+        The ircd port to connect to. Defaults to 6667.
+
+    "ircname"
+        Some cute comment or something.
+
+    "username"
+        Your client's username.
+
+    "password"
+        The password that is required if your ircd is restricted.
+
+    "channels"
+        A comma-separated list of IRC channels to join, default is "#relayd"
+
+    "flood"
+        Set to a "true" value to disable anti-flood protection when sending
+        stuff to the ircd. Defaults to "false" if not specified. Care should
+        be used when enabling this option and it requires the cooperation of
+        a friendly irc oper to ensure that disconnects and k-lines are not
+        the side-effects of enabling this option.
+
+SEE ALSO
+    metabase-relayd
+
+    App::Metabase::Relayd::Plugin
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

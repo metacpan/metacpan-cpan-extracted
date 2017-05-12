@@ -1,0 +1,25 @@
+[% META title = "Search Result" %]
+<table>
+	<tr align="left">
+		<th>ID</th><th>NAME</th><th>OWNER</th><th>RELEASE TIME</th><th></th><th></th>
+	</tr>
+	[% WHILE (item = items.next) %]
+	<tr>
+		<td>[% item.id %]</td>
+		[% IF Catalyst.check_user_roles('user') %]
+		<td><a href="[% Catalyst.uri_for('detail/') _ item.id %]">[% item.title %]</a></td>
+		[% ELSE %]
+		<td>[% item.title %]</td>
+		[% END %]
+		<td>[% item.uid %]</td>
+		<td>[% item.release_date %]</td>
+		[% IF Catalyst.check_user_roles('user') %]
+		<td><a href="[% Catalyst.uri_for('checkout_do/') _ item.id _ '/' _ item.title %]">CHECKOUT</a></td>
+		[% END %]
+		[% IF (item.uid == Catalyst.user.obj.username) || 
+			Catalyst.check_user_roles('sysadmin') %]
+		<td><a href="[% Catalyst.uri_for('delete_do/') _ item.id _ '/' _ item.title %]">DELETE</a></td>
+		[% END %]
+	</tr>	
+	[% END %]
+</table>

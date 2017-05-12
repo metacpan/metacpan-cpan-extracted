@@ -1,0 +1,6 @@
+The HOWTO documents are notes on installing and using the ACeDB
+database.  The various .html documents are HTMLized versions of the
+AcePerl man pages that have been run through pod2html.
+
+Lincoln Stein
+July 1999

@@ -1,0 +1,104 @@
+NAME
+    Acme::Takahashi::Method - turns your script into slides accordingly to
+    the Takahashi Method
+
+SYNOPSIS
+      use Acme::Takahashi::Method;
+      # and the rest of your codes.
+
+DESCRIPTION
+    The Takahashi Method <http://www.rubycolor.org/takahashi/> is a strong,
+    powerful and impressive method that makes your presentation something
+    unforgettable. This module makes your script as impressive as those
+    presentations.
+
+    Seeing is believing. try
+
+      cp eg/fact.pl
+      perl -Ilib fact.pl 10
+
+    and see what I mean.
+
+  IMPORT DIRECTIVES
+    This module supports directives below. You can set as many directives as
+    you like as follows;
+
+      use Acme::Takahashi::Method columns => 132, rows => 50, noxec => 1;
+
+    columns
+      Default is 80. If you have larger terminals try
+
+        use Acme::Takahashi::Method columns => 132;
+
+      or something.
+
+    rows
+      Default is 24. If you have larger terminals try
+
+        use Acme::Takahashi::Method columns => 50;
+
+      or something.
+
+    noslideshow
+      By default, this module plays a slide show before it executes. If you
+      only need to make slides, turn this on as
+
+        use Acme::Takahashi::Method noslideshow => 1;
+
+    noclobber
+      By default, this module clobbers your original script. If you don't
+      want this kind of tragedy,
+
+        use Acme::Takahashi::Method noclobber => 1;
+
+      You still get nice slides.
+
+    noexec
+      If you just want to make slides and don't want to run scripts, do
+
+        use Acme::Takahashi::Method noexec => 1;
+
+  EXPORT
+    Are you kidding ?
+
+CAVEATS
+    no branches
+      Hey, you are making slides and slides are not suppose to branch!
+
+    no loops
+      Hey, don't make slides boring by repeating over and over. If you need
+      to EXECUTE loops use labels and "goto". Here is an example.
+
+        loop: 
+        $result *= $n--;
+        goto loop unless $n <= 1;
+
+    no braces that spans beyond lines
+      Natually a slide that only contains "{" and "}" are boring as hell. If
+      you need braces make it fit into one line.
+
+        do { stuff } while(cond); # ok
+
+        do {
+          stuff;
+        }
+        while(cond);              # perfectly NG
+
+SEE ALSO
+    The Takahashi Method (Japanese) <http://www.rubycolor.org/takahashi/>
+
+    Acme
+
+AUTHOR
+    Dan Kogai, <dankogai@dan.co.jp>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005 by Dan Kogai
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.7 or, at
+    your option, any later version of Perl 5 you may have available.
+
+    To be honest with you, I am too ashamed to insist copyright on this kind
+    of stuff :)
+

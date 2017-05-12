@@ -1,0 +1,30 @@
+<& /form.comp,
+	title => 'Change User ID', 
+	action => $action,
+	inputs => $inputs,
+	message => $message{$msg},
+	submit => 'Login'
+&>
+
+<%init>
+my $pta = 'Please try again.';
+my $sorry = 'Please contact the system administrator.';
+my $err = '<font color="red" size=5>An Error Occurred.</font><p>';
+my $noerr = '<font color="#000000" size=5>Logging in.</font><p>';
+my %message = (
+	empty => "$err One or more required fields contained no data.  $pta",
+	unknown => "$err Unknown user.  $pta",
+	again => "$err The supplied password was incorrect.  $pta",
+	disabled => "$err The account has been temporarily disabled. $sorry"
+);
+my $action = 'https://tom.acme.com/changeid';
+my $inputs = [
+	{name => 'newuid', prompt => 'Desired User ID:', type => 'text'},
+	{name => 'pw', prompt => 'Your Password:', type => 'password'}
+];
+</%init>
+
+<%args>
+$msg => undef
+$url => undef
+</%args>

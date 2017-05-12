@@ -1,0 +1,30 @@
+Revision history for Perl extension Audio::Opusfile.
+
+0.005001 2017-02-18T17:53+00:00
+ - Export op_current_link
+ - More functions die on error
+ - Fix POD errors
+
+0.005 2016-12-10T19:41+02:00
+ - Export functions for decoding an Opus stream to PCM
+
+0.004 2016-09-25T00:28+03:00
+ - Add Audio::Opusfile::Head module for extracting Opus header information
+ - Export more functions for obtaining information about a stream
+ - Simplify typemap
+
+0.003 2016-09-18T00:48+01:00
+ - Add function to parse in-memory buffers
+ - Add function to test if a buffer looks like an Opus stream
+ - Export some other minor functions
+
+0.002001 2016-08-06T16:45-04:00
+ - Fix MANIFEST
+
+0.002 2016-08-06T16:43-04:00
+ - Add /usr/local/include/opus to include path (RT #116603)
+ - Add support for parsing METADATA_BLOCK_PICTURE tags
+ - Add (undocumented) support for getting opus header information.
+
+0.001 2016-07-30T13:43-04:00
+ - Initial release

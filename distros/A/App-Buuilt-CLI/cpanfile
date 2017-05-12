@@ -1,0 +1,17 @@
+requires 'perl', '5.008001';
+
+on 'test' => sub {
+    requires 'Test::More', '0.98';
+};
+
+requires 'Moo';
+requires 'EV';
+requires 'AnyEvent';
+requires 'AnyEvent::Filesys::Notify';
+requires 'Mojo::UserAgent';
+requires 'Archive::Zip';
+requires 'Path::Class';
+requires 'Mojo::Asset::File';
+
+
+

@@ -1,0 +1,15 @@
+PerlSwitches -I@ServerRoot@/../lib
+
+PerlModule Apache2::Filter::CSS::LESS
+
+<LocationMatch "\.less$">
+    PerlOutputFilterHandler   Apache2::Filter::CSS::LESS
+</LocationMatch>
+
+# serve .less files as css in text/plain
+<LocationMatch "\.less.txt$">
+    PerlOutputFilterHandler   Apache2::Filter::CSS::LESS
+    PerlSetVar LessContentType "text/plain"
+</LocationMatch>
+
+# vim: ft=apache

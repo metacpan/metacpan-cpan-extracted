@@ -1,0 +1,57 @@
+---
+pod_spelling_system:
+  # list of words that are spelled correctly
+  # (regardless of what spell check thinks)
+  stopwords:
+    - libarchive
+    - perlish
+    - TODO
+    - grzip
+    - lrzip
+    - lzip
+    - lzma
+    - lzop
+    - bzip
+    - dearchived
+    - ar
+    - cpio
+    - gnutar
+    - iso
+    - lha
+    - mtree
+    - rar
+    - xar
+    - uudecode
+    - uudecoding
+    - uuencoded
+    - FFI
+    - pax
+    - shar
+    - ustar
+    - uuencode
+    - xz
+    - decompressor
+    - filetype
+    - optimizations
+    - uu
+    - unpadded
+    - birthtime
+    - hardlinks
+    - ino
+    - codeset
+    - gname
+    - hardlink
+    - ACL
+    - rdev
+    - AppleDouble
+    - multivolume
+    - dev
+    - unsets
+    - deregister
+    - sourcepath
+    - xattr
+
+pod_coverage:
+  # format is "Class#method" or "Class", regex allowed
+  # for either Class or method.
+  private: []

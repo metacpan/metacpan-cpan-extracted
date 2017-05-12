@@ -1,0 +1,12 @@
+<& $m->fetch_next, %ARGS &>
+<%once>
+use Alzabo::Create;
+use Alzabo::Config;
+use Alzabo::GUI::Mason::Config;
+use URI::FromHash qw( uri );
+
+eval 'use GraphViz 1.4'; # optional
+</%once>
+<%flags>
+inherit => undef
+</%flags>

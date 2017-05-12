@@ -1,0 +1,47 @@
+=head1 CHANGES (Apache::GTopLimit)
+
+=head1 ver 1.02
+
+* return DECLINED and not OK when not doing anything
+
+* made the request counter a package's private lexical variable, since
+  it shouldn't be accessible by other modules. 
+
+* Fix the $Apache::GTopLimit::CHECK_EVERY_N_REQUESTS logic, was doing
+  checking one request to often. Thanks to Alexandr Ciornii
+  <chorny@tri.md> for the spot
+
+=head1 ver 1.01 Thu Mar 14 13:53:16 SGT 2002
+
+* add an unshared memory threshold, similar to Apache::SizeLimit
+
+* improve the debug mode testing whether at least one threshold was
+  set
+
+* cache the previously fetched shared and/or size for reuse in the
+  unshared memory calculation, which makes things a bit faster.
+
+* update docs
+
+=head1 ver 1.0 Wed Feb 20 11:54:23 SGT 2002
+
+* making the DEBUG a constant variable, settable via PerlSetVar
+
+* A few code style changes and doc fixes
+
+* this module has spent enough time in alpha/beta incubator => going 1.0.
+
+=head1 ver 0.2 Mon Oct 16 23:04:01 2000
+
+* fixed the warnings generated on every request
+
+=head1 ver 0.1 Tue Aug 17 07:32:20 IDT 1999
+
+* Removed the use of global variables (save a few memory bits)
+ 
+* Rewrite of the memory size limit functionality to use GTop
+
+* Added a Shared memory limit functionality
+      
+* Added debug mode
+

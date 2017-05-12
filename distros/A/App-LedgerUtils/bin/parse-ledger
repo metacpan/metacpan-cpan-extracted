@@ -1,0 +1,265 @@
+#!perl
+
+our $DATE = '2016-01-18'; # DATE
+our $VERSION = '0.03'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use App::LedgerUtils;
+use Data::Clean::JSON;
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+$SPEC{parse_ledger} = {
+    v => 1.1,
+    summary => 'Parse Ledger using Ledger::Parser and display the raw parse result',
+    description => <<'_',
+
+Mostly only useful for developer for debugging purposes.
+
+If the result is undef (null in JSON), you can use the `--no-naked` option to
+see the error message.
+
+_
+    args => {
+        %App::LedgerUtils::common_args,
+    },
+    result_naked => 1,
+    'cmdline.default_format' => 'json-pretty',
+};
+sub parse_ledger {
+    my %args = @_;
+
+    my $parser = App::LedgerUtils::_get_parser(\%args);
+
+    my $res = $parser->read_string($args{ledger})->{_parsed};
+    $res;
+}
+
+my $cli = Perinci::CmdLine::Any->new(
+    url => '/main/parse_ledger',
+    pass_cmdline_object => 1,
+    cleanser => Data::Clean::JSON->new(-circular=>[clone => 0]),
+);
+
+# so help message can be more helpful
+$cli->{common_opts}{format}{default} = 'json-pretty';
+$cli->{common_opts}{naked_res}{default} = 1;
+
+$cli->run;
+
+# ABSTRACT: Parse Ledger using Ledger::Parser and display the raw parse result
+# PODNAME: parse-ledger
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+parse-ledger - Parse Ledger using Ledger::Parser and display the raw parse result
+
+=head1 VERSION
+
+This document describes version 0.03 of parse-ledger (from Perl distribution App-LedgerUtils), released on 2016-01-18.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % parse-ledger [options] <ledger>
+
+=head1 DESCRIPTION
+
+Mostly only useful for developer for debugging purposes.
+
+If the result is undef (null in JSON), you can use the C<--no-naked> option to
+see the error message.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ "json-pretty"
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--no-naked-res>
+
+When outputing as JSON, add result envelope.
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--ledger>=I<s>*
+
+Ledger file.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C parse-ledger parse-ledger
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete parse-ledger 'p/*/`parse-ledger`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at C<~/.config/parse-ledger.conf>, C<~/parse-ledger.conf> or C</etc/parse-ledger.conf> (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features. 
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+List of available configuration parameters:
+
+ format (see --format)
+ ledger (see --ledger)
+ naked_res (see --naked-res)
+
+=head1 ENVIRONMENT
+
+=head2 PARSE_LEDGER_OPT => str
+
+Specify additional command-line options
+
+=head1 FILES
+
+~/.config/parse-ledger.conf
+
+~/parse-ledger.conf
+
+/etc/parse-ledger.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-LedgerUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-App-LedgerUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-LedgerUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

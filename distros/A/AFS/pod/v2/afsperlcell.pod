@@ -1,0 +1,165 @@
+#------------------------------------------------------------------------------
+# RCS-Id: "@(#)$RCS-Id: pod/v2/afsperlcell.pod 2e2ca60 Tue Apr 15 13:04:20 2014 +0200 Norbert E Gruener$"
+#
+# © 2001-2014 Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<AFS::Cell> - Module to administer B<AFS Cells>
+
+=head1 SYNOPSIS
+
+  use AFS::Cell qw (configdir expandcell
+                    getcellinfo localcell
+                    whichcell wscell
+                   );
+
+  my $conf_dir = configdir;
+
+  my $cell = expandcell('mpa');
+  $cell = localcell;
+  $cell = whichcell('./');
+  $cell = wscell;
+
+  ($cell, my @hosts) = getcellinfo;
+  print "Cell: $cell\n";
+  foreach my $host (@hosts) {
+      print(" $host\n");
+  }
+
+=head1 DESCRIPTION
+
+This module provides several functions to configure and to maintain an
+B<AFS cell>.  It is used to maintain the configuration directory.  Any
+function required must by explicitly listed by the C<use> statement to be
+exported into the calling package.
+
+Some of these functions have the optional argument FOLLOW.  FOLLOW
+determines which file should be used should PATH be a symbolic link.  If
+FOLLOW be set to 1, then the symbolic link is followed to its target.
+If FOLLOW is set to 0, then the function applies to the symbolic link
+itself.  If not specified FOLLOW defaults to 1.
+
+=head1 COMPATIBILITY
+
+B<This release does NOT support any features and interfaces
+from version 1.>
+
+=head1 EXPORTS
+
+=head2 Standard Exports
+
+none
+
+=head2 Optional Exports
+
+The following functions will be exported into your namespace if you
+specifically ask that they be imported.
+
+=over 4
+
+=item B<$dir = configdir;>
+
+=item B<$ok = configdir(DIR);>
+
+Gets or sets the configuration directory for an AFS server/client
+machine. Default is C</usr/vice/etc>.
+
+=item B<$cellname = expandcell(CELL);>
+
+Expands CELL to the fully qualified cellname. Returns undef on error.
+
+=cut
+
+# does not work properly, return value $cell is not set properly ???
+
+# =item B<($cell, @servers)  = getcell(INDEX [,IP]);>
+
+# Displays the list of the database server machines that the Cache Manager
+# stores in kernel memory for its home cell and foreign cells.
+
+# Iterates through the Cache Manager's internal cell configuration,
+# using INDEX as an index. The index starts at 0. $AFS::CODE will
+# be set to a non-zero value when passed an invalid index. If IP is
+# set to 1 then IP addresses will be returned instead of hostnames.
+# Displays each database server machine's IP address rather than hostname.
+
+=item B<($cell @servers) = getcellinfo([CELL [,IP]]);>
+
+Gets information on CELL (default NULL) using CellServDB. If IP (default
+0) is set to 1 then IP addresses will be returned instead of hostnames.
+
+=item B<$cellname = localcell;>
+
+Returns the cellname of the local cell. Returns undef on error.
+
+=item B<$cellname = whichcell(PATH [,FOLLOW]);>
+
+Returns the name of the cell in which the volume that houses PATH
+resides.  Returns undef and sets CODE on error.
+
+=item B<$cellname = wscell;>
+
+Returns the name of the local machine's home cell.
+
+=back
+
+=head1 CURRENT AUTHOR
+
+Norbert E. Gruener E<lt>nog@MPA-Garching.MPG.deE<gt>
+
+=head1 AUTHOR EMERITUS
+
+Roland Schemers E<lt>schemers@slapshot.stanford.eduE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (c) 2001-2010 Norbert E. Gruener <nog@MPA-Garching.MPG.de>.
+ All rights reserved.
+
+ Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University.
+ All rights reserved.
+
+Most of the explanations in this document are taken from the original
+AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ File Server/Cache Manager Interface
+ Edward R. Zayas
+ Copyright (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ Copyright (c) IBM Corporation 2000.
+ All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=over 6
+
+=item The original module is covered by the following copyright:
+
+Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation,
+advertising materials, and other materials related to such
+distribution and use acknowledge that the software was developed
+by Stanford University.  The name of the University may not be used
+to endorse or promote products derived from this software without
+specific prior written permission.
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=back
+
+=head1 DOCUMENT VERSION
+
+Revision $Rev: 1059 $

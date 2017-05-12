@@ -1,0 +1,33 @@
+Revision history for Perl extension Acme::Perl::VM
+
+0.006 Wed Nov 18 10:35:46 2009
+    - Work on Perl 5.11
+    - Add descriptions
+
+0.0.5 Tue May 26 23:28:48 2009
+    - mention Devel::Optrace
+    - add pp_andassign/pp_orassign
+
+0.0.4 Sat May  2 15:34:24 2009
+    - fix some bugs
+    - add ppcodes
+
+0.0.3 Sun Apr 26 14:13:42 2009
+    - add description to Acme/Perl/VM/JA.pod
+    - add a number of ppcodes and tests
+    - improve trace mode
+
+0.0.2 Sun Apr 19 12:58:14 2009
+    - release for Shibuya.pm#11
+    - improve trace mode (APVM_DEBUG=trace)
+
+0.0.1_03 Fri Apr 17 23:33:58 2009
+    - fix pp_entersub
+    - add a number of ppcodes and tests
+    - remove Carp::Always dependency
+
+0.0.1_02 Wed Apr 15 18:11:26 2009
+    - implement OPpASSIGN_COMMON
+
+0.0.1_01 Sat Mar 28 16:40:41 2009
+    - original version; created by Module::Setup

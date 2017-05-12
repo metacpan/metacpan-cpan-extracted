@@ -1,0 +1,56 @@
+Audio/Gramofile version 0.08
+============================
+
+This module provides a Perl interface to Gramofile, a program for recording
+gramophone records. It is able to record hours of CD quality music, 
+split long sound files in separate tracks, and remove ticks and pops from 
+recordings. 
+
+Gramofile was written by Anne Bezemer and Ton Le.
+
+Gramofile is available from http://www.opensourcepartners.nl/~costar/gramofile/
+
+A library, libgramofile, derived from Gramofile, used by this module is 
+available from http://sourceforge.net/projects/libgramofile
+
+The advantage of using a Perl interface, rather than the curses interface, is
+that batch processing of large number of files is easier. Just put all the 
+raw .wav files into a directory, start the program, and return much later to 
+find a lot of processed files, without having to click-click for every file.
+This is useful if you are happy to use the same set of input parameters, or 
+just lazy :-)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+   perldoc Audio::Gramofile describes the methods provided by this module.
+
+DEPENDENCIES
+
+Depends on libgramofile, a library available from 
+http://sourceforge.net/projects/libgramofile
+
+CREDITS
+
+Anne Bezemer and Ton Le for writing Gramofile. Matt Sergeant for assistance 
+with the typemap and XS.
+ 
+EXAMPLES
+
+   The file, process_wav.pl, in the examples directory shows typical usage of
+the module, by splitting a wav file, and then processing the resultant files.
+
+COPYRIGHT AND LICENCE
+
+This module is : Copyright (C) 2003-2008 Bob Wilkinson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+Gramofile is : Copyright (C) 1998 J.A. Bezemer

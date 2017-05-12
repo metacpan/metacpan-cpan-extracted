@@ -1,0 +1,266 @@
+#!/usr/bin/perl -w
+
+# $Id: player-gtk-thread,v 1.1 1999/07/29 18:43:42 daniel Exp $
+use strict;
+use ExtUtils::testlib;
+use Audio::MikMod qw(:MikMod :Player);
+use Gtk;
+use Pixmaps;
+use Thread;
+use Time::HiRes qw(usleep);
+
+use constant TRUE  => 1;
+use constant FALSE => 0;
+
+my ($song_loaded,$song_playing,$song_paused,$update) = (0,0,0,1);
+my ($songfile,$songpath,$player_busy);
+my ($filelabel,$songlabel);
+my $url = 'http://electricrain.com/';
+
+my $subs = {
+	'exit'    => \&_exit,
+	'back'    => \&_back,
+	'play'    => \&_play,
+	'pause'   => \&_pause,
+	'stop'    => \&_stop,
+	'forward' => \&_forward,
+	'open'    => \&_open_fw,
+};
+
+##############
+# Here we go..
+Gtk->init;
+_init();
+
+my $thr    = Thread->new(\&_update);
+my $window = Gtk::Widget->new('Gtk::Window','type' => '-toplevel' );
+
+$window->set_usize(300, 200);
+$window->set_title('Foo!');
+$window->signal_connect('delete_event' => \&_exit);
+$window->realize;
+
+init_ui($window);
+
+_open($ARGV[0]) if defined $ARGV[0];
+
+Gtk->main;
+
+exit;
+
+############
+# Gtk setup.
+sub init_ui ($) {
+	my $window = shift;
+
+	my $mask  = '';
+    	my $style = $window->get_style;
+
+    	my $vbox = Gtk::VBox->new(FALSE, 1);
+	$window->add($vbox);
+	$vbox->show;
+
+	# Draw the logo..
+	my $pixmap = Gtk::Gdk::Pixmap->create_from_xpm(
+		$window->window, $mask, 'mikmod.xpm'
+	);
+
+	my $pixmapwid = Gtk::Pixmap->new($pixmap, $mask);
+	$pixmapwid->show;
+	$vbox->pack_start($pixmapwid, TRUE, TRUE, 0);
+
+	####################################
+	# label for currently open file path 
+	$filelabel = Gtk::Label->new('');
+	$vbox->pack_start($filelabel, FALSE, FALSE, 0);
+	$filelabel->show;
+
+	my $separator = Gtk::HSeparator->new;
+	$vbox->pack_start($separator, FALSE, TRUE, 1);
+    	$separator->show;
+
+	###################################
+	# label for currently open song and error/status messages 
+	$songlabel = Gtk::Label->new('');
+	$vbox->pack_start($songlabel, FALSE, FALSE, 0);
+	$songlabel->show;
+
+	# progress bar
+
+	###################################
+	# buttons will go in here 
+	my $buttonbox = Gtk::HBox->new(FALSE, 1);
+	$vbox->add($buttonbox);
+	$buttonbox->show;
+
+	for my $type (qw(exit back play pause stop forward open)) {
+		make_button($window, $pixmaps->{$type}, $subs->{$type},  $buttonbox);
+	}
+
+	$window->show;
+}
+
+sub make_button ($$$$) {
+	my ($window,$xpm,$func,$box) = @_;
+	my $mask;
+
+	my $pixmap = Gtk::Gdk::Pixmap->create_from_xpm_d($window->window,$mask,@$xpm);
+	my $pixmapwid = Gtk::Pixmap->new($pixmap, $mask);
+	$pixmapwid->show;
+
+	my $button = Gtk::Button->new;
+	$button->add($pixmapwid);
+	$button->signal_connect('clicked' => $func);
+
+	$box->pack_start($button, 1, 1, 0);
+	$button->show;
+}
+
+sub _open_fw {
+	my $fw = Gtk::FileSelection->new('Song Selection');
+
+	$fw->signal_connect('destroy', \&destroy_window, \$fw);
+
+	$fw->ok_button->signal_connect('clicked', sub {
+		_open($fw->get_filename);
+		$fw->destroy;
+	}, $fw);
+
+	$fw->cancel_button->signal_connect('clicked', sub { $fw->destroy });
+	$fw->show;
+}
+
+sub update_info ($$) {
+	my ($fname,$mfile) = @_;
+
+	if ($song_loaded) {
+		$fname =~ s#^\S+/##;
+		$filelabel->set($fname);
+	} else {
+		$filelabel->set($url);
+	}
+
+	$songlabel->set($mfile);
+}
+
+sub progress_update { 1 }
+
+sub destroy_window ($$$) {
+	my ($widget, $wref, $wref2) = @_;
+	$$wref = undef;
+	$wref2 = undef if defined $wref2;
+        return 0;
+}
+
+##################
+# Sound functions
+sub _init {
+	MikMod_RegisterAllLoaders();
+        MikMod_RegisterAllDrivers();
+
+	if (MikMod_Init()) {
+		printf STDERR "Could not initialize sound, reason: %s\n",
+			MikMod_strerror();
+		_done();
+	}
+}
+
+sub _play {
+	print "In _play()\n";
+	if ($song_loaded) {
+
+		if ($song_playing && $song_paused) {
+			_pause();
+		} elsif ($song_playing) {
+			Player_SetPosition(0);
+		} else {
+			$song_playing = 1;
+			Player_Start($songfile);	
+			Player_SetPosition(0);
+		}
+
+	} else {
+		$song_playing = 0; 
+		update_info($songpath, 'Open song first.');
+		$song_loaded = 0;
+		_open_fw($songpath);
+	}
+}
+
+sub _update {
+	while ($update) {
+		for (Player_Active() && $song_playing && !$song_paused) {
+			$player_busy = 1;
+			MikMod_Update();
+			#progress_update();
+			$player_busy = 0;
+		}
+		usleep(50000);
+	}
+}
+
+sub _stop {
+	print "In _stop()\n";
+	$song_paused  = 0;
+	$song_playing = 0;
+	usleep(1) while $player_busy;
+	Player_Stop();
+}
+
+sub _pause {
+	$song_paused = $song_paused ? 0 : 1;
+	print "In _pause(): $song_paused\n";
+	Player_TogglePause();
+}
+
+sub _back {
+	$song_paused = 0;
+	Player_PrevPosition();
+}
+
+sub _forward {
+	$song_paused = 0;
+	Player_NextPosition();
+}
+
+sub _open ($) {
+	my $file = shift;
+	print "In _open : $file\n";
+
+	$song_playing = 0;
+	$song_paused  = 0;
+
+	if ($song_loaded) {
+		$song_loaded = 0;
+
+		while ($player_busy) {
+			usleep(1);
+		}
+		Player_Free($songfile);
+	}
+
+	$songfile = Player_Load($file, 64, 0);
+	
+	if (!defined $songfile or !$songfile) {
+		$song_loaded = 0;
+		update_info($file, 'Error loading file.');
+
+	} else {
+		$song_loaded = 1;
+		$songpath    = $file;
+		update_info($file, Player_LoadTitle($file));
+		_play();
+	}
+	chdir $file;
+}
+
+sub _exit {
+	print "In _exit()\n";
+	_stop() if $song_playing;
+	$update = 0;
+	$thr->join;
+	MikMod_DisableOutput();
+	MikMod_Exit();
+	Gtk->main_quit;
+	exit 1;
+}

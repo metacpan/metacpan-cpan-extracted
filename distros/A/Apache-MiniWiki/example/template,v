@@ -1,0 +1,296 @@
+head	1.9;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.9
+date	2003.10.11.19.27.41;	author anonymous;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2003.10.11.19.17.11;	author anonymous;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2003.10.11.19.16.40;	author anonymous;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2003.10.11.19.16.06;	author anonymous;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2003.10.11.19.15.41;	author anonymous;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2002.05.24.04.04.31;	author wim;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2002.05.24.04.02.06;	author wim;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2002.05.24.03.50.34;	author wim;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2001.11.03.13.18.56;	author jonas;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checkin.
+@
+
+
+1.9
+log
+@adding some javascript, and a link to listlinks
+@
+text
+@<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head><title>Example Wiki: <TMPL_VAR NAME=title></title></head>
+<style><!--
+        BODY,A,LI,P,FONT,B,H1,H2,H3,STRONG,TD {
+                font-family:helvetica,arial,tahoma,sans-serif;
+                text-decoration:none;
+        }
+        A,A.link,a.visited,a.active {
+                font-weight:700;
+        }
+        a.active {
+                color:black;
+        }
+        A:hover {
+                text-decoration:underline;
+        }
+        h3 {
+                font-size: 1.3em;
+        }
+--></style>
+
+<script language="javascript"><!--
+
+function checkInLink(link) {
+  // checks if this link is a #link
+  // if so, expand that span
+  if (link.innerHTML.indexOf("#") >= 0) {
+    focusPage('links_' + link.innerHTML.replace(/#/, ""))
+  }
+}
+
+function showAllLinks() {
+   var expand_links = document.getElementsByName("expand_link");
+   for (i=0; i<expand_links.length; i++) {
+      html = expand_links[i].innerHTML;
+      if (html.indexOf("view links ") >= 0) {
+         expand_links[i].innerHTML = html.replace(/view/g, "hide");
+      }
+   }
+
+   var objects = document.getElementsByTagName("span");
+   for (i=0; i<objects.length; i++) {
+       if (objects[i].id.indexOf("links_") >= 0) {
+           objects[i].style.display='';
+       }
+   }
+}
+
+function hideAllLinks() {
+   var objects = document.getElementsByTagName("span");
+   for (i=0; i<objects.length; i++) {
+       if (objects[i].id.indexOf("links_") >= 0) {
+           objects[i].style.display = 'none';
+       }
+   }
+
+   var expand_links = document.getElementsByName("expand_link");
+   for (i=0; i<expand_links.length; i++) {
+      html = expand_links[i].innerHTML;
+      if (html.indexOf("hide links ") >= 0) {
+         expand_links[i].innerHTML = html.replace(/hide/g, "view");
+      }
+   }
+}
+
+function focusPage(thistag) {
+   styleObj = document.getElementById(thistag).style;
+   styleObj.display = '';
+}
+
+function expand(linktag, hidetag) {  
+   // linktag is the <a> tag the user clicked
+   // hidetag is the span we want to expand/collapse
+
+   styleObj = document.getElementById(hidetag).style;
+   if (styleObj.display=='none') {       //show
+      styleObj.display = '';
+      linktag.innerHTML = linktag.innerHTML.replace(/view/, "hide");
+   } else {       //hide
+      styleObj.display = 'none';
+      linktag.innerHTML = linktag.innerHTML.replace(/hide/, "view");
+   }
+}
+-->
+</script>
+
+<body bgcolor="black">
+
+<TABLE border=1 align=center width="100%" bgcolor="#eaeaea" cellpadding=2 cellspacing=0>
+<tr>
+ <td valign=top align=right bgcolor="#c8d2dc">
+   <a href="<TMPL_VAR NAME=vroot>/">Home</a>,
+   <a href="<TMPL_VAR NAME=vroot>/list">Pages</a>,
+   <a href="<TMPL_VAR NAME=vroot>/listlinks">Links</a>,
+   <a href="<TMPL_VAR NAME=vroot>/listchanges">Changes</a>,
+   <a href="<TMPL_VAR NAME=vroot>/edit">Help</a>,
+   <a href="<TMPL_VAR NAME=loglink>">Archive</a>,
+   <a href="<TMPL_VAR NAME=vroot>/(newpassword)">Password<sup>1</sup></a>,
+   <a href="<TMPL_VAR NAME=editlink>">Edit</a>
+ </td>
+</tr>
+<tr>
+ <td align=left valign=top>
+  <TMPL_VAR NAME=BODY> 
+<p><hr>
+<sup>1</sup>This will only work if authentification is enabled in
+Apache::MiniWiki. See the POD documentation, or the manual page for
+more information.
+ </td>
+</tr>
+<tr>
+ <td valign=top align=right bgcolor="#c8d2dc">
+   <a href="<TMPL_VAR NAME=vroot>/">Home</a>,
+   <a href="<TMPL_VAR NAME=vroot>/Main">Map</a>,
+   <a href="<TMPL_VAR NAME=vroot>/list">Pages</a>,
+   <a href="<TMPL_VAR NAME=vroot>/listlinks">Links</a>,
+   <a href="<TMPL_VAR NAME=vroot>/listchanges">Changes</a>,
+   <a href="<TMPL_VAR NAME=vroot>/edit">Help</a>,
+   <a href="<TMPL_VAR NAME=loglink>">Archive</a>,
+   <a href="<TMPL_VAR NAME=vroot>/(newpassword)">Password<sup>1</sup></a>,
+   <a href="<TMPL_VAR NAME=editlink>">Edit</a>
+ </td>
+</tr>
+</TABLE>
+<br><div align="right"><span style="bgcolor:black; color:white; font-weight:bold">
+Last Modified: <TMPL_VAR NAME=lastmod></span></div>
+</body></html>
+@
+
+
+1.8
+log
+@align right
+@
+text
+@d22 66
+d94 2
+a95 1
+   <a href="<TMPL_VAR NAME=vroot>/list">List</a>,
+d116 2
+a117 1
+   <a href="<TMPL_VAR NAME=vroot>/list">List</a>,
+@
+
+
+1.7
+log
+@align right
+@
+text
+@d58 2
+a59 2
+<br><span align=right style="bgcolor:black; color:white; font-weight:bold">
+Last Modified: <TMPL_VAR NAME=lastmod></span>
+@
+
+
+1.6
+log
+@align right
+@
+text
+@d58 1
+a58 1
+<br><span style="align:right; bgcolor:black; color:white; font-weight:bold">
+@
+
+
+1.5
+log
+@last modified
+@
+text
+@d58 1
+a58 1
+<br><span style="text-align:right; bgcolor:black; color:white; font-weight:bold">
+@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@d58 2
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d32 1
+d39 4
+d53 1
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d30 1
+a30 1
+   <a href="<TMPL_VAR NAME=vroot>/AboutThisWiki">About</a>,
+d46 1
+a46 1
+   <a href="<TMPL_VAR NAME=vroot>/AboutThisWiki">About</a>,
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d2 51
+a52 11
+  <html>
+    <head><title>Example MiniWiki</title></head>
+    <body>
+     [<a href="<TMPL_VAR NAME=editlink>">Edit</a>|<a href="/wiki/(newpassword)">Change Password<sup>1</sup></a>]<br>
+<TMPL_VAR NAME=BODY>
+<p><hr>
+<sup>1</sup>This will only work if authentification is enabled in
+Apache::MiniWiki. See the POD documentation, or the manual page for
+more information.
+    </body>
+  </html>
+@

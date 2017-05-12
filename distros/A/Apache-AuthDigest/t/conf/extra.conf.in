@@ -1,0 +1,68 @@
+<Perl>
+  # stuff to get Apache::Test to recognize shared object files
+  use blib;
+</Perl>
+
+PerlModule Apache::AuthDigest
+PerlModule Apache::AuthzDigest
+PerlModule Apache::AuthDigest::API
+PerlModule Apache::AuthDigest::API::Session
+PerlModule My::DigestAuthenticator
+PerlModule My::SessionAuthenticator
+PerlModule My::SessionGenerator
+
+Alias /protected @DocumentRoot@
+<Location /protected>
+  AuthType Digest
+  AuthName cookbook
+  Require valid-user
+  PerlAuthenHandler My::DigestAuthenticator
+</Location>
+
+Alias /dropin @DocumentRoot@
+<Location /dropin>
+  AuthType Digest
+  AuthName flatfile
+  Require valid-user
+  PerlAuthenHandler Apache::AuthDigest
+  AuthDigestFile @ServerRoot@/conf/password_file
+</Location>
+
+Alias /authz @DocumentRoot@
+<Location /authz>
+  AuthType Digest
+  AuthName flatfile
+  Require user test
+  PerlAuthenHandler Apache::AuthDigest
+  PerlAuthzHandler Apache::AuthzDigest
+  AuthDigestFile @ServerRoot@/conf/password_file
+</Location>
+
+Alias /session @DocumentRoot@
+<Location /session>
+  AuthType Digest
+  AuthName cookbook
+  Require valid-user
+  PerlAuthenHandler My::SessionAuthenticator
+  PerlAuthzHandler My::SessionAuthorizor
+  DigestSessionKey MYSESSION
+  PerlInitHandler My::SessionGenerator
+</Location>
+
+<Location /parse>
+  SetHandler perl-script
+  PerlHandler 'sub { my $r = shift; $r->send_http_header("text/plain"); print $r->pnotes(URI); return Apache::OK }'
+  AuthType Digest
+  AuthName cookbook
+  Require valid-user
+  PerlAuthenHandler My::DigestAuthenticator
+</Location>
+
+<Location /multi>
+  SetHandler perl-script
+  AuthName cookbook
+  Require valid-user
+  PerlAuthenHandler My::MultiAuthenticator
+</Location>
+
+LogLevel debug

@@ -1,0 +1,18 @@
+Revision history for Perl extension AnyEvent::FriendFeed::Realtime
+
+0.05  Tue Dec 14 14:35:56 PST 2010
+        - Catch JSON parsing errors (tokuhirom)
+
+0.04  Mon Oct 26 13:59:15 PDT 2009
+        - Fixed POD errors
+        - Reconnect when a long poll times out with an empty event (kappa)
+
+0.03  Mon Jul 20 11:34:12 PDT 2009
+        - Updated API and endpoint to v2. 'method' should now be 'request'.
+        - entry data structure has changed and is incompatible.
+
+0.02  Thu Jul 16 20:09:55 PDT 2009
+        - Remove debug bits
+
+0.01  Mon Jul 13 15:08:21 2009
+        - original version

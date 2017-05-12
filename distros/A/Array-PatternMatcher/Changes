@@ -1,0 +1,6 @@
+Revision history for Perl extension Array::PatternMatcher.
+
+0.01  Sun Jul  1 15:23:54 2001
+	- original version; created by h2xs 1.1.1.4 with options
+		-A -X -n Array::PatternMatcher
+

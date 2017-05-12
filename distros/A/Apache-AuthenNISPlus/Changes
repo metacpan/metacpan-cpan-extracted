@@ -1,0 +1,20 @@
+Revision history for Perl extension Apache::AuthenNISPlus.
+
+0.06 2000 jul 14 14:35
+   o Improve speed of NIS+ user lookup (thanks to Johannes Kornfellner).
+
+0.05 1999 apr 13 11:45
+   o Gracefully handle error when nis+ tables are unaccessible.
+
+0.04 1999 mar 24 16:05
+   o Using Net::NISPlus instead of /usr/bin/nismatch.
+
+0.03 1998 dec 16 16:30
+   o Bug fixes, slightly better documentation, and actual packaging.
+
+0.02 1998 sep 23 19:00
+   o Bug fixes.
+
+0.01  
+   o Original version.
+

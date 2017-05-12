@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings FATAL => 'all';
+
+use EV;
+use AnyEvent;
+
+use App::RoboBot;
+use File::ShareDir qw( dist_dir );
+use Getopt::Long::Descriptive;
+
+my ($opt, $usage) = describe_options(
+    'robobot %o',
+    [ 'config|c=s', 'Path to configuration file. Required.' ],
+    [],
+
+    [ 'migrate|m!', 'Perform database migrations as necessary. If not specified and database schema is out of date, program will exit.' ],
+    [],
+
+    [ 'sharedir!',  'Display share directory path and exit.' ],
+    [ 'version!',   'Display RoboBot version and exit.' ],
+    [ 'help|h!',    'Display this message and exit.' ],
+);
+
+do { print($usage->text); exit(0); } if $opt->help;
+do { print("$App::RoboBot::VERSION\n"); exit(0); } if $opt->version;
+do { print(dist_dir('App-RoboBot') . "\n"); exit(0); } if $opt->sharedir;
+
+die $usage->text unless defined $opt->config;
+die "Invalid configuration file path: " . $opt->config
+    unless -f $opt->config && -r _;
+
+App::RoboBot->new( config_paths => [$opt->config], do_migrations => $opt->migrate || 0 )->run;
+

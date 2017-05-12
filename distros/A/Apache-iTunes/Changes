@@ -1,0 +1,22 @@
+Apache::iTunes
+
+0.12 - Thu Jan  1 17:59:37 EST 2015
+	* Cutting this module loose to ADOPTME
+	* If you'd like to maintain this module, write to modules@perl.org
+
+0.11 - Thu Oct 25 21:31:21 2007
+	* Squashing warnings from the code.
+
+0.10 - Tue Jan  9 23:05:47 2007
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+0.09 - Wed May 17 22:22:22 2006
+	* updates to distro and kwalitee. No need to upgrade.
+
+0.07 - Tue Sep  7 19:08:04 2004
+	* cleaned up the distribution
+	* I need to fix some things in Mac::iTunes to get this to work again
+	* There is no need to upgrade, unless you enjoy pain and suffering
+
+0.05 - first release

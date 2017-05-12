@@ -1,0 +1,145 @@
+#!perl
+
+our $DATE = '2015-09-27'; # DATE
+our $VERSION = '0.05'; # VERSION
+
+# FRAGMENT id=shcompgen-hint completer=1 for=cpan-upload
+
+use 5.010001;
+use strict;
+use warnings;
+#use Log::Any '$log';
+
+use Complete::File qw(complete_file);
+use Filename::Archive qw(check_archive_filename);
+use Getopt::Long::Complete qw(GetOptionsWithCompletion);
+
+die "This script is for shell completion only\n"
+    unless $ENV{COMP_LINE};
+
+my $opt_spec =
+ # BEGIN DUMP TAG
+ do{my$a={"config|c=s"=>sub {    package Getopt::Long::Patch::DumpAndExit;    no warnings;    use strict;    no feature;    use feature ':5.10';    },"directory|d=s"=>'fix',"dry-run"=>'fix',"help|h"=>'fix',"http-proxy=s"=>'fix',"ignore-errors"=>'fix',"password|p=s"=>'fix',"user|u=s"=>'fix',"verbose|v"=>'fix'};$a->{"directory|d=s"}=$a->{"config|c=s"};$a->{"dry-run"}=$a->{"config|c=s"};$a->{"help|h"}=$a->{"config|c=s"};$a->{"http-proxy=s"}=$a->{"config|c=s"};$a->{"ignore-errors"}=$a->{"config|c=s"};$a->{"password|p=s"}=$a->{"config|c=s"};$a->{"user|u=s"}=$a->{"config|c=s"};$a->{"verbose|v"}=$a->{"config|c=s"};$a}
+ # END DUMP TAG
+
+
+;
+
+GetOptionsWithCompletion(
+    sub {
+        my %args = @_;
+        my $type = $args{type};
+        my $word = $args{word};
+
+        if ($type eq 'arg') {
+            return {
+                words => complete_file(
+                    word => $word,
+                    filter => sub {
+                        -d($_[0]) || check_archive_filename(filename => $_);
+                    },
+                ),
+                path_sep => '/',
+            };
+        }
+    },
+    %$opt_spec,
+);
+
+# ABSTRACT: Shell completer for cpan-upload
+# PODNAME: _cpan-upload
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+_cpan-upload - Shell completer for cpan-upload
+
+=head1 VERSION
+
+This document describes version 0.05 of Getopt::Long::Patch::DumpAndExit (from Perl distribution App-ShellCompleter-CpanUpload), released on 2015-09-27.
+
+=head1 SYNOPSIS
+
+To install, install this module and then in your bash (and/or bash startup
+file):
+
+ complete -C _cpan-upload cpan-upload
+
+or, you can use L<shcompgen> to do that for you automatically.
+
+Now L<cpan-upload> has bash completion:
+
+ % cpan-upload <tab>
+ % cpan-upload --ig<tab>
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C _cpan-upload _cpan-upload
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete _cpan-upload 'p/*/`_cpan-upload`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ShellCompleter-CpanUpload>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ShellCompleter-CpanUpload>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ShellCompleter-CpanUpload>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

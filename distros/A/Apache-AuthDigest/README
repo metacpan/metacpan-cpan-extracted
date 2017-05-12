@@ -1,0 +1,29 @@
+This is a suite of applications for using Digest authentication
+with mod_perl.  It contains:
+
+Apache::AuthDigest - re-implementation of the authentication part of
+                     mod_digest.c in Perl
+
+Apache::AuthzDigest - pick up the authorization pieces of mod_digest
+
+Apache::AuthDigest::API - mod_perl API for Digest authentication a 
+                          la mod_digest
+
+Apache::AuthDigest::API::Full - fully RFC 2617 compliant Digest API
+                                (not yet implemented)
+
+Apache::AuthDigest::API::Session - experimental interface that uses
+                                   the nonce part of a Digest challenge
+                                   as a state maintenance mechanism
+
+
+INSTALLATION:
+
+  $ perl Makefile.PL
+  $ make
+  $ make test (requires Apache::Test)
+  $ sudo make install
+
+
+see the Apache::AuthDigest and Apache::AuthDigest::API manpages for
+more information, as well as the code samples in t/lib/perl

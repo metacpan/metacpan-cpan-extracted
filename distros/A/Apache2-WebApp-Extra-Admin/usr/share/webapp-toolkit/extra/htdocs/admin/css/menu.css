@@ -1,0 +1,71 @@
+/*
+ *  Apache2::WebApp::Toolkit - Admin Control Panel (menu.css)
+ *  Copyright (C) 2010 Marc S. Brooks <mbrooks@cpan.org>
+ *
+ *  Licensed under the terms of the BSD License
+ *  http://www.opensource.org/licenses/bsd-license.php
+ */
+
+/*--------------------------------------------------------------------------*/
+/* defaults - override                                                      */
+
+body {
+	background-color: #CCCCCC;
+	margin: 0px;
+}
+
+
+/*--------------------------------------------------------------------------*/
+/* menu - container                                                         */
+
+#menu {
+	padding: 0px 0px 7px 10px;
+	position: relative;
+	top: 42px;
+	width: 123px;
+}
+	
+#menu div.button {
+	background-color: #EEEEEE;
+	border: 1px solid #999999;
+	margin: 7px 0px 7px 0px;
+}
+	
+#menu div.button a {
+	color: #000000;
+	display: block;
+	padding: 3px 0px 3px 3px; 
+}	 
+
+#menu div.button a:hover {
+	text-decoration: none;
+}
+
+#menu div.button a:visited {
+	color: #000000;
+}
+
+#menu div.button strong {
+	font-weight: normal;
+}
+
+#menu div.menu {
+	background-color: #FFFFFF;
+	border: 1px solid #999999;
+	border-right: 1px solid #999999;
+	border-top: 1px solid #CCCCCC;
+	left: 14px;
+	position: relative;
+	top: -8px;
+	width: 100%;
+}
+
+#menu div.menu ul.options {
+	font-size: 12px;
+	list-style: circle;
+	padding: 2px 2px 2px 22px;
+}
+
+#menu div.menu li {
+	padding: 2px 0px 2px 0px;
+}

@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="NULL" type="application/x-xsp"?>
+<?xml-stylesheet href="/transforms/news/xhtml/comment.xsl" type="text/xsl"?>
+<xsp:page xml:base="/news/"
+  xmlns:xsp="http://www.apache.org/1999/XSP/Core"
+  xmlns:ct="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Control"
+  xmlns:cust="http://www.kjetil.kjernsmo.net/software/TABOO/NS/CustomGrammar"
+  xmlns:user="http://www.kjetil.kjernsmo.net/software/TABOO/NS/User"
+  xmlns:comm="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Comment"
+  xmlns:cat="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Category"
+  xmlns:i18n="http://www.kjetil.kjernsmo.net/software/TABOO/NS/I18N"
+  xmlns:val="http://www.kjetil.kjernsmo.net/software/TABOO/NS/FormValues"
+  xmlns:param="http://www.axkit.org/2002/XSP/QueryParam">
+  <cust:submit>
+    <cust:title><i18n:insert>submit-comment</i18n:insert></cust:title>
+    <param:if-exists name="submitted">
+      <comm:store/>
+    </param:if-exists>
+    <param:if-exists name="previewed">
+      <comm:this-comment/>
+    </param:if-exists>    
+    <param:unless-exists name="submitted">
+      <cat:get-category>
+	<cat:catname><param:get name="sectionid"/></cat:catname>
+      </cat:get-category>
+
+      <ct:control name="title" type="text" element="input" size="40" maxlength="40">
+	<ct:title><i18n:insert>comment-title</i18n:insert></ct:title>
+	<ct:descr><i18n:insert>comment-descr</i18n:insert></ct:descr>
+	<ct:value><param:get name="title"/></ct:value>
+      </ct:control>
+      <ct:control name="content" element="textarea" rows="18" cols="60">
+	<ct:title><i18n:insert>content</i18n:insert></ct:title>
+	<ct:descr>
+	  <i18n:insert>content-descr</i18n:insert>	
+	</ct:descr>
+	<ct:value><param:get name="content"/></ct:value>
+      </ct:control>
+      <ct:control element="input" type="hidden" name="parentcpath"> 
+	<ct:value><param:get name="parentcpath"/></ct:value>
+      </ct:control>
+      <ct:control element="input" type="hidden" name="storyname"> 
+	<ct:value><param:get name="storyname"/></ct:value>
+      </ct:control>
+      <ct:control element="input" type="hidden" name="sectionid"> 
+	<ct:value><param:get name="sectionid"/></ct:value>
+      </ct:control>
+      <ct:control element="input" type="submit" name="submitted"> 
+	<ct:value><i18n:insert>send</i18n:insert></ct:value>
+      </ct:control>
+      <ct:control element="input" type="submit" name="previewed"> 
+	<ct:value><i18n:insert>preview</i18n:insert></ct:value>
+      </ct:control>
+      
+      <param:if-regex name="parentcpath" value="/\w+">
+	<comm:get-comment>
+	  <comm:storyname><param:get name="storyname"/></comm:storyname>
+	  <comm:sectionid><param:get name="sectionid"/></comm:sectionid>
+	  <comm:commentpath><param:get name="parentcpath"/></comm:commentpath>
+	</comm:get-comment>
+      </param:if-regex>
+    </param:unless-exists>
+  </cust:submit>
+</xsp:page>
+
+

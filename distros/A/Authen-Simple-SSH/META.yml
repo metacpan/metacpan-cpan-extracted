@@ -1,0 +1,15 @@
+---
+name: Authen-Simple-SSH
+version: 0.1
+author:
+  - Christian Hansen C<ch@ngmedia.com>
+abstract: Simple SSH authentication
+license: perl
+requires:
+  Authen::Simple: 0
+  Net::SSH::Perl: 0
+provides:
+  Authen::Simple::SSH:
+    file: lib/Authen/Simple/SSH.pm
+    version: 0.1
+generated_by: Module::Build version 0.2611

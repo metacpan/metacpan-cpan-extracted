@@ -1,0 +1,20 @@
+Revision history for Perl extension Alien::GSL.
+
+1.01 2017-03-10
+  - Depend on Alien::Base::ModuleBuild in dependencies
+
+1.00 2015-05-30
+  - Breaking change!
+  - Converted to Alien::Base
+
+0.03 2011-10-26
+  - uses Module::Build
+  - has platform specific instruction
+    - download and compile when possible
+    - download precompiled library on MSWindows
+
+0.02 2011-08-01
+  - version incremented as upload to PAUSE wasn't complete
+
+0.01 2011-07-31
+  - original version

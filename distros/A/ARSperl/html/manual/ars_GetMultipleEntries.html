@@ -1,0 +1,82 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - ars_GetMultipleEntries</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_GetMultipleEntries(ctrl,schema,[ entryID_list ],...)</CODE></H2>
+
+This function retrieves multiple entries from a schema, in the form of
+a hash (or list, if preferred) of entryIDs and references to
+fieldID/value pairs.  The <CODE>[ entryID_list ]</CODE> argument is a
+reference to a list of entryIDs.  If you specify any fieldIDs after the
+<CODE>[ entryID_list ]</CODE> parameter, only the values for those
+fields will be returned, otherwise all field id value pairs are returned.
+<P>
+
+The format of the returned list is <I>(entryID, {field_value_hash})</I>
+pairs.  The list can be stored in an array or hash.  Using an
+array preserves the original order of <CODE>[ entryID_list ]</CODE>.  Each referenced
+field_value_hash has the same format as the return of a single
+<CODE>ars_GetEntry</CODE> call: the hash keys are the fieldIDs and the
+hash values are the field values.  If the entryID was not found, the
+field_value_hash reference is <CODE>undef</CODE>.
+<p>
+<DL>
+    <DT><B>On success</B><DD>
+        Returns a list of <i>(entryID, {field_value_hash})</i> pairs.
+    <DT><B>On failure</B><DD>
+        Returns <CODE>undef</CODE>.
+</DL>
+
+<P>Example:
+
+<PRE>
+    @elist = ( "000000001", "0000000046", "0000000138" );
+    #
+    # Get Status and History for each entry
+    #
+    ( %Entries = ars_GetMultipleEntries(
+                          $ctrl, $schema, \@elist,
+                          FieldID("Status"), FieldID("History")
+                                        ) )
+       || die( "GME Failed: $arr_errstr" );
+</PRE>
+<p>Example returned hash:
+<PRE>
+    %Entries = ( "0000000001" => { 7 => 1,
+                                  10 => { decoded_history_hash } },
+                 "0000000046" => undef,         # entry does not exist
+                 "0000000138" => { 7 => 3,
+                                  10 => { another_diary } }
+               )
+</PRE>
+<p>
+<b>Notes:</b> <CODE>ars_GetMultipleEntries</CODE> can download a lot
+of data with one API call. It is advisable to use
+the fieldID list to specify only the fields you need. Care should
+be taken to delete the returned data structure (e.g., with "<CODE>undef
+%Entries</CODE>") when it is no longer needed.<p>
+
+The underlying <CODE>ARGetMultipleEntries</CODE> API call has an inherent limit
+to the number of entries that can be returned in a single call.
+The ARS 4.5 Programmer's Guide recommends using lists of 100 or fewer
+entries for each request.<p>
+
+<CODE>ars_GetMultipleEntries</CODE> can only be used with API
+version 4.0 or later.<p>
+
+
+See Also: <A HREF="ars_GetEntry.html">ars_GetEntry</A>, <A HREF="ars_GetListEntryWithFields.html">ars_GetListEntryWithFields</A>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 3rd October 2002 by gdf@uiuc.edu<br>
+&#169; J.C.Murphy, J.W.Murphy 2002 arsperl@arsperl.org
+</address>
+</BODY>
+</HTML>

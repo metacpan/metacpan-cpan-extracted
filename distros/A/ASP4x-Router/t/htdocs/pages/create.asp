@@ -1,0 +1,1 @@
+CreatePage <%= $Form->{type} %>

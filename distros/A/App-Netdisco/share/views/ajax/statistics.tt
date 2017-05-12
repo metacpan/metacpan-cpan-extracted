@@ -1,0 +1,77 @@
+[% USE Number.Format %]
+    <div class="row">
+      <div class="span5 offset1">
+      <h4>Built using Open Source</h4>
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th>Software</th>
+              <th>Version</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th><b><a href="http://netdisco.org">App::Netdisco</a></b></th>
+              <th>[% disco_ver | html_entity %]</th>
+            </tr>
+            <tr>
+              <th><a href="https://metacpan.org/module/netdisco-db-deploy">DB Schema</a></th>
+              <th>v[% schema_ver | html_entity %]</th>
+            </tr>
+            <tr>
+              <th><a href="http://perldancer.org/">Dancer</a></th>
+              <th>[% dancer_version | html_entity %]</th>
+            </tr>
+            <tr>
+              <th><a href="http://getbootstrap.com">Bootstrap</a></th>
+              <th>[%# Can't determine magically %] 2.3.1</th>
+            </tr>
+            <tr>
+              <th><a href="http://www.postgresql.org">PostgreSQL</a></th>
+              <th>
+                [% db_version| html_entity %].<br />
+                &nbsp;DBI [% dbi_ver | html_entity %],
+                DBD::Pg [% dbdpg_ver | html_entity %]
+              </th>
+            </tr>
+            <tr>
+              <th><a href="https://github.com/netdisco/snmp-info">SNMP::Info</a></th>
+              <th>[% snmpinfo_ver | html_entity %]</th>
+            </tr>
+            <tr>
+              <th><a href="http://www.perl.org">Perl</a></th>
+              <th>[% perl_version | html_entity %]</th>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="span4 offset1">
+      <h4>Statistics for this installation</h4>
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>[% device_count | format_number %] devices with [% device_port_count | format_number %] interfaces
+                  using [% device_count + device_ip_count | format_number %] IPs</th>
+            </tr>
+            <tr>
+              <th>[% device_links | format_number %] layer 2 links between devices</th>
+            </tr>
+            <tr>
+              <th>[% node_count | format_number %] nodes in [% node_table_count | format_number %] entries</th>
+            </tr>
+            <tr>
+              <th>[% ip_count | format_number %] IPs in [% ip_table_count | format_number %] entries</th>
+            </tr>
+            <tr>
+              <th>Statistics took [% process_time %] seconds to process.</th>
+            </tr>
+            <tr><th></th></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>

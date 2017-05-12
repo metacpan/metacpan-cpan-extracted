@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+SessionManager.pm
+SessionManager/cookpod.pod
+t/00base.t
+t/01real.t
+t/protected/login.html
+t/lib/PrintEnv.pm
+t/lib/PrintEnvOO.pm
+t/lib/MyAuth.pm
+patches/Apache-Session-File-Lock1.54-patch
+patches/PLP-3.18.patch
+patches/README
+META.yml                                 Module meta-data (added by MakeMaker)

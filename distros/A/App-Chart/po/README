@@ -1,0 +1,43 @@
+Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2016 Kevin Ryde
+
+This file is part of Chart.
+
+Chart is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Chart is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Chart.  If not, see <http://www.gnu.org/licenses/>.
+
+---------------------------------------------------------------------
+
+
+The translations here are mainly to see the setups work.  There's very
+little actually translated, and most messages aren't settled enough to
+want to put work into translating them.
+
+"charset=UTF-8" should be used in .po files because that's what
+App::Chart asks for, to become Perl wide-char strings everywhere
+internally.  A charset other than utf-8 works, it just means gettext
+must convert at runtime.  The .pot file, incidentally, is all ASCII.
+
+
+The "msgctxt" context is used to distinguish separate uses of the same
+or similar short string, in the usual way.
+
+Context "manual-node" is a node name, ie. @node, in chart.texi.
+Unless the manual is translated too then they should be left
+untranslated to go to the English copy.
+
+
+
+---------------------------------------------------------------------
+Local variables:
+mode: text
+End:

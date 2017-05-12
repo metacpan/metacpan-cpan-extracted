@@ -1,0 +1,130 @@
+{
+   "abstract" : "Aspose.OCR Cloud SDK for Perl",
+   "author" : [
+      "Farooq Sheikh <support@aspose.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AsposeOcrCloud-OcrApi",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.10"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AsposeStorageCloud::StorageApi" : "0",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Date::Parse" : "0",
+            "DateTime" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "Exporter" : "0",
+            "File::Slurp" : "0",
+            "HTTP::Headers" : "0",
+            "HTTP::Request::Common" : "0",
+            "HTTP::Response" : "0",
+            "HTTP::Status" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Log::Any" : "0",
+            "MIME::Base64" : "0",
+            "Module::Runtime" : "0",
+            "Scalar::Util" : "0",
+            "Test::Exception" : "0",
+            "URI::Escape" : "0",
+            "URI::Query" : "0",
+            "perl" : "v5.6.0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "AsposeOcrCloud::ApiClient" : {
+         "file" : "lib/AsposeOcrCloud/ApiClient.pm"
+      },
+      "AsposeOcrCloud::Configuration" : {
+         "file" : "lib/AsposeOcrCloud/Configuration.pm"
+      },
+      "AsposeOcrCloud::Object::BaseObject" : {
+         "file" : "lib/AsposeOcrCloud/Object/BaseObject.pm"
+      },
+      "AsposeOcrCloud::Object::HttpResponseMessage" : {
+         "file" : "lib/AsposeOcrCloud/Object/HttpResponseMessage.pm"
+      },
+      "AsposeOcrCloud::Object::HttpStatusCode" : {
+         "file" : "lib/AsposeOcrCloud/Object/HttpStatusCode.pm"
+      },
+      "AsposeOcrCloud::Object::LineNumberRestartMode" : {
+         "file" : "lib/AsposeOcrCloud/Object/LineNumberRestartMode.pm"
+      },
+      "AsposeOcrCloud::Object::NumberStyle" : {
+         "file" : "lib/AsposeOcrCloud/Object/NumberStyle.pm"
+      },
+      "AsposeOcrCloud::Object::OCRResponse" : {
+         "file" : "lib/AsposeOcrCloud/Object/OCRResponse.pm"
+      },
+      "AsposeOcrCloud::Object::Orientation" : {
+         "file" : "lib/AsposeOcrCloud/Object/Orientation.pm"
+      },
+      "AsposeOcrCloud::Object::PageBorderAppliesTo" : {
+         "file" : "lib/AsposeOcrCloud/Object/PageBorderAppliesTo.pm"
+      },
+      "AsposeOcrCloud::Object::PageBorderDistanceFrom" : {
+         "file" : "lib/AsposeOcrCloud/Object/PageBorderDistanceFrom.pm"
+      },
+      "AsposeOcrCloud::Object::PageVerticalAlignment" : {
+         "file" : "lib/AsposeOcrCloud/Object/PageVerticalAlignment.pm"
+      },
+      "AsposeOcrCloud::Object::PagesInfo" : {
+         "file" : "lib/AsposeOcrCloud/Object/PagesInfo.pm"
+      },
+      "AsposeOcrCloud::Object::PaperSize" : {
+         "file" : "lib/AsposeOcrCloud/Object/PaperSize.pm"
+      },
+      "AsposeOcrCloud::Object::PartsInfo" : {
+         "file" : "lib/AsposeOcrCloud/Object/PartsInfo.pm"
+      },
+      "AsposeOcrCloud::Object::ReportType" : {
+         "file" : "lib/AsposeOcrCloud/Object/ReportType.pm"
+      },
+      "AsposeOcrCloud::Object::SectionStart" : {
+         "file" : "lib/AsposeOcrCloud/Object/SectionStart.pm"
+      },
+      "AsposeOcrCloud::Object::StyleIdentifier" : {
+         "file" : "lib/AsposeOcrCloud/Object/StyleIdentifier.pm"
+      },
+      "AsposeOcrCloud::Object::TextEffect" : {
+         "file" : "lib/AsposeOcrCloud/Object/TextEffect.pm"
+      },
+      "AsposeOcrCloud::Object::Underline" : {
+         "file" : "lib/AsposeOcrCloud/Object/Underline.pm"
+      },
+      "AsposeOcrCloud::OcrApi" : {
+         "file" : "lib/AsposeOcrCloud/OcrApi.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "1.01"
+}

@@ -1,0 +1,13 @@
+Revision history for Perl extension AIX::ODM.
+
+1.0		2004-06-30
+		- first public release
+
+1.0.1		2004-06-30
+		- corrected package referencing problem with test.pl script
+
+1.0.2		2004-09-15
+		- Added syntax clarification for 'C|P' argument
+
+
+

@@ -1,0 +1,37 @@
+PerlWarn On
+LogLevel debug
+AddDefaultCharset On
+
+PerlRequire conf/modperl_startup.pl
+PerlModule Apache::EnvDir
+
+PerlPostReadRequestHandler Apache::EnvDir
+
+EnvDir envdir ONE
+EnvDir envdir/empty EMPTY
+EnvDir envdir/noprefix
+
+<IfModule mod_perl.c>
+  Alias /perl @ServerRoot@/cgi
+  <Location /perl>
+    SetHandler perl-script
+    PerlHandler Apache::Registry
+    Options +ExecCGI
+  </Location>
+</IfModule>
+
+<IfModule mod_cgi.c>
+  ScriptAlias /cgi @ServerRoot@/cgi
+  <Location /cgi>
+    Options +ExecCGI
+  </Location>
+</IfModule>
+
+AddHandler server-parsed .shtml
+AddType text/plain .shtml
+
+<IfModule mod_include.c>
+  <FilesMatch "\.shtml$">
+    Options +Includes
+  </FilesMatch>
+</IfModule>

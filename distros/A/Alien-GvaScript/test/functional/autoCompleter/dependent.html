@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <link href="../../test.css" rel="stylesheet" type="text/css">
+    <link href="../../images/GvaScript.css" rel="stylesheet" type="text/css">
+    <script src="../../../lib/Alien/GvaScript/lib/prototype.js"></script>
+    <script src="../../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+
+    <script>
+      var choices = [
+        {price: "8$",  value: "falafel"},
+        {price: "12$", value: "kebab"},
+        {price: "6$",  value: "hummos"}
+      ];
+
+      var ac = new GvaScript.AutoCompleter(choices, {
+         minimumChars: 0,
+         typeAhead : false,
+         strict: true,
+         labelField: 'value',
+         dependentFields : {detail: 'price'}
+       });
+    </script>
+  </head>
+
+  <body>
+
+    <h1>Autocompleter with dependent fields</h1>
+
+    <p>Conveniently relate other inputs to the autocompleter</p>
+
+    <form>
+
+      Sandwich : <input name="main" class="AC_input" onfocus="ac.autocomplete(this)" />
+      Price :    <input name="detail" size="4" disabled style="border: 1px solid #ddd;background-color: #eee"/>
+
+      <input type=submit value="place order" />
+
+    </form>
+
+  </body>
+</html>

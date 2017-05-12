@@ -1,0 +1,47 @@
+{
+   "abstract" : "GitHub Command Tools",
+   "author" : [
+      "Fayland Lam <fayland@gmail.com>",
+      "William Orr <will@worrbase.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300013, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-GitHub",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Getopt::Long" : "0",
+            "IPC::Cmd" : "0",
+            "JSON::XS" : "2.232",
+            "Moose" : "0",
+            "Net::GitHub" : "0.43",
+            "Pod::Usage" : "0",
+            "Term::ReadKey" : "0",
+            "Term::ReadLine" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/worr/perl-app-github.git",
+         "web" : "http://github.com/worr/perl-app-github"
+      }
+   },
+   "version" : "1.0.1"
+}
+

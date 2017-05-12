@@ -1,0 +1,40 @@
+---
+abstract: 'loop keyword'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::6 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Loopy
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Acme::Loopy:
+    file: lib/Acme/Loopy.pm
+    version: '0.004'
+  Acme::Loopy::Guard:
+    file: lib/Acme/Loopy.pm
+    version: '0.004'
+requires:
+  Keyword::Simple: '0'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Acme-Loopy/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Acme-Loopy
+  homepage: https://metacpan.org/release/Acme-Loopy
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-acme-loopy.git
+version: '0.004'

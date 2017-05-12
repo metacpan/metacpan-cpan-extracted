@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL
+MegaHAL.xs
+README
+lib/AI/MegaHAL.pm
+libmegahal.c
+megahal.h
+t/pod.t
+t/test.t
+megahal.trn
+META.json                                Module JSON meta-data (added by MakeMaker)

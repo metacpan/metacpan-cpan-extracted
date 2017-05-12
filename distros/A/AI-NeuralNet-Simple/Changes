@@ -1,0 +1,28 @@
+Revision history for Perl extension AI::NeuralNet::Simple.
+
+0.11  November 18, 2006
+      Converted from Inline::C to XS
+      No longer require 5.008.  5.005 and above should be fine.
+
+0.10  December 29, 2005
+      The following changes are all courtesy of Raphael Manfredi
+      <Raphael_Manfredi [at] pobox.com>.
+      Added tanh (bipolar) activation function.
+      train_set() can now accept an error target to avoid over-training.
+      Multiple network support.
+      Persistence via storable.
+
+0.02  September 21 2005
+      Added pod and pod coverage tests
+      Added Sub::Uplevel dependency to stop that annoying error failure :(
+
+0.01  Sat Jan 31 12:19:00 2004
+      Applied patch from "Daniel L. Ashbrook" <anjiro [at] cc.gatech.edu>
+      to fix a small memory allocation bug in infer()
+
+      Added learn_rate() method to expose the network.learn_rate.  This 
+      should help programmers who wish to fine-tune the network training.
+
+0.01  Sun Oct  5 10:03:18 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n AI::NeuralNet::Simple

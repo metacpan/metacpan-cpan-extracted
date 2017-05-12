@@ -1,0 +1,55 @@
+{
+   "abstract" : "Perl interface to SLAlib positional astronomy library",
+   "author" : [
+      "Tim Jenness E<gt>tjenness@cpan.orgE<lt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Astro-SLA",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::F77" : "0",
+            "Test::More" : "0",
+            "Test::Number::Delta" : "1"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::F77" : "0",
+            "Module::Build" : "0.3"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Astro::SLA" : {
+         "file" : "lib/Astro/SLA.pm",
+         "version" : "1.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/timj/perl-Astro-SLA/tree/master",
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ],
+      "repository" : {
+         "url" : "git://github.com/timj/perl-Astro-SLA.git"
+      }
+   },
+   "version" : "1.03"
+}

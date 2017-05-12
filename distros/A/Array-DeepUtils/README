@@ -1,0 +1,87 @@
+Array-DeepUtils version 0.2
+============================
+
+DESCRIPTION
+
+    This module is a collection of subroutines for the manipulation of
+    deeply nested arrays. It provides routines for iterating along
+    coordinates and for setting, retrieving and deleting values. The
+    functions binary and unary are provided for applying arbitrary operators
+    as code references to deeply nested arrays. With shape() and reshape()
+    there are methods to determine and change the dimensions.
+
+    By default nothing is exported. The subroutines can be imported all at
+    once via the ':all' tag.
+
+    Subroutine short description
+
+      binary          - appply a binary operator between two nested arrays
+
+      collapse        - flatten a nested array to a one dimensional vector
+
+      dcopy           - extract part of a nested array between two vectors
+
+      idx             - build an index vector for values of another vector
+
+      purge           - remove elements by value from a nested array
+
+      remove          - remove elements by index
+
+      reshape         - transform nested array by dimension vector
+
+      rotate          - rotate a data structure along its axes
+
+      scatter         - build a new data structure with data and index vector.
+
+      shape           - get nested array dimension vector
+
+      subscript       - extract nested array values by index vector
+
+      transpose       - transpose a nested array
+
+      unary           - appply a unary operator to all values of a nested array
+
+      value_by_path   - extract nested array values by coordinate vector
+
+      vector_iterator - creates a subroutine for iterating between two
+                            coordinates
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+    only Carp and Storable which are standard modules.
+
+COPYRIGHT AND LICENCE
+
+    Put the correct copyright and licence information here.
+
+AUTHOR
+
+    Thomas Kratz <tomk@cpan.org>
+
+    Bernd Ulmann <ulmann@vaxman.de>
+
+COPYRIGHT
+
+    Copyright (C) 2011 by Thomas Kratz, Bernd Ulmann
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+
+Copyright (C) 2011 by A. U. Thor
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself, either Perl version 5.8.4 or,
+    at your option, any later version of Perl 5 you may have available.
+
+

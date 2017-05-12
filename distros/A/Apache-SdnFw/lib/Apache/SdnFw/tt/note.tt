@@ -1,0 +1,16 @@
+<div class="floatleft">
+<table>
+	<caption>[% s.object %]&nbsp;[% s.in.${s.o.id} %]&nbsp;notes</caption>
+	<tbody>
+[% FOREACH l IN list -%]
+	<tr>
+		<td>
+		[% l.created_ts %]<br>
+		[% l.employee_name %]<br>
+		<p>[% l.note_text %]</p>
+		</td>
+	</tr>
+[% END -%]
+	</tbody>
+</table>
+</div>

@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Attribute/Abstract.pm
+lib/Attribute/Alias.pm
+lib/Attribute/Memoize.pm
+lib/Attribute/Method.pm
+lib/Attribute/SigHandler.pm
+lib/Attribute/Util.pm
+t/00load.t
+t/01alias.t
+t/02abstract.t
+t/03memoize.t
+t/04sighandler.t
+t/05method.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

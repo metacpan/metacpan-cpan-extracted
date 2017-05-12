@@ -1,0 +1,281 @@
+#!perl
+
+our $DATE = '2016-01-18'; # DATE
+our $VERSION = '0.02'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+
+$SPEC{dump_data_section_seekable} = {
+    v => 1.1,
+    summary => 'Dump Data::Section::Seekable structure in a Perl file or module',
+    args_rels => {
+        req_one => [qw/file module/],
+    },
+    args => {
+        file => {
+            schema=>'str*',
+            'x.schema.entity' => 'filename',
+            pos => 0,
+        },
+        module => {
+            schema=>'str*',
+            'x.schema.entity' => 'modulename',
+        },
+    },
+};
+sub dump_data_section_seekable {
+    my %args = @_;
+
+    my $path;
+    if ($args{module}) {
+        require Module::Path::More;
+        $path = Module::Path::More::module_path(module => $args{module})
+            or return [404, "No such module"];
+    } else {
+        $path = $args{file};
+    }
+
+    (-f $path) or return [404, "No such file"];
+    open my($fh), "<", $path or return [500, "Can't open file '$path': $!"];
+
+    my $found;
+    while (<$fh>) {
+        chomp;
+        do {$found++; last} if /\A__DATA__\z/;
+    }
+    return [412, "No __DATA__ found in file"] unless $found;
+
+    require Data::Section::Seekable::Reader;
+    my $reader = Data::Section::Seekable::Reader->new(handle=>$fh);
+
+    my @parts = $reader->parts;
+
+    [200, "OK", {
+        num_parts => ~~@parts,
+        parts => [map {+{
+            name => $_,
+            content => $reader->read_part($_),
+            extra => $reader->read_extra($_),
+        }} @parts],
+    }];
+}
+
+Perinci::CmdLine::Any->new(url => '/main/dump_data_section_seekable')->run;
+
+# ABSTRACT: Dump Data::Section::Seekable structure in a Perl file or module
+# PODNAME: dump-data-section-seekable
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dump-data-section-seekable - Dump Data::Section::Seekable structure in a Perl file or module
+
+=head1 VERSION
+
+This document describes version 0.02 of dump-data-section-seekable (from Perl distribution App-DataSectionSeekableUtils), released on 2016-01-18.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % dump-data-section-seekable [options] [file]
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--file>=I<filename>
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--module>=I<modulename>
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C dump-data-section-seekable dump-data-section-seekable
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete dump-data-section-seekable 'p/*/`dump-data-section-seekable`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at C<~/.config/dump-data-section-seekable.conf>, C<~/dump-data-section-seekable.conf> or C</etc/dump-data-section-seekable.conf> (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features. 
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+List of available configuration parameters:
+
+ file (see --file)
+ format (see --format)
+ module (see --module)
+ naked_res (see --naked-res)
+
+=head1 ENVIRONMENT
+
+=head2 DUMP_DATA_SECTION_SEEKABLE_OPT => str
+
+Specify additional command-line options
+
+=head1 FILES
+
+~/.config/dump-data-section-seekable.conf
+
+~/dump-data-section-seekable.conf
+
+/etc/dump-data-section-seekable.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-DataSectionSeekableUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-DataSectionSeekableUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-DataSectionSeekableUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,32 @@
+Apache::Voodoo
+==============
+
+Apache Voodoo, or just Voodoo for short is a web based application framework
+for Apache 1.3, Apache 2 and mod_perl. 
+
+Website / Documentation: http://www.apachevoodoo.com
+Source repository: http://github.com/maverick/ApacheVoodoo
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+AUTHOR
+
+Maverick, /\/\averick@smurfbaneDOTorg
+
+COPYRIGHT
+
+Copyright (c) 2005-2010 Steven Edwards.  All rights reserved.
+
+You may use and distribute Voodoo under the terms described in the LICENSE file
+included with this package.  The summary is it's a legalese version of the 
+Artistic License, but you should read it anyway :)
+

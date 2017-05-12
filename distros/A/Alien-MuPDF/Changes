@@ -1,0 +1,53 @@
+0.007 2016-11-23 02:10:08-0600
+  - Fix the t/inline.t version number test so that it works with
+    the MuPDF v1.10 release.
+
+    Fixes RT#118882 <https://rt.cpan.org/Ticket/Display.html?id=118882>,
+    <https://github.com/project-renard/p5-Alien-MuPDF/issues/22>.
+    Thanks to SREZIC++ for the bug report.
+
+0.006 2016-08-25 05:52:48-0500
+  - Change syntax in test so that it runs on Perl v5.8
+    Fixes <https://github.com/project-renard/p5-Alien-MuPDF/issues/20>.
+
+0.005_03 2016-08-21 13:40:09-0500
+  - Use File::Which to get path to mutool binary in t/use.t. This allows for
+    checking extensions (.exe) on Windows systems.
+    Fixes <https://github.com/project-renard/p5-Alien-MuPDF/issues/18>.
+
+0.005_02 2016-08-06 18:43:25-0500
+  - Apply patch that removes `HAVE_INCBIN` define on FreeBSD. This allows for
+    building on FreeBSD's C compiler.
+    Fixes <https://github.com/project-renard/p5-Alien-MuPDF/issues/16>.
+
+0.005_01 2016-07-25 18:40:54-0500
+  - Fix the path to `mutool` during build-time.
+    Fixes <https://github.com/project-renard/p5-Alien-MuPDF/issues/12>.
+  - Build: Use Alien::gmake to build on more *nix systems.
+    Fixes <https://rt.cpan.org/Ticket/Display.html?id=110287>,
+    <https://github.com/project-renard/p5-Alien-MuPDF/issues/11>.
+    SREZIC++ for the bug report.
+
+0.005 2016-05-29 06:23:45-0500
+  - Add `mutool_path` method to get the path the `mutool` binary
+    <https://github.com/project-renard/p5-Alien-MuPDF/issues/6>.
+  - Fix the Inline::C `INC` and `AUTO_INCLUDE` parameters
+    <https://github.com/project-renard/p5-Alien-MuPDF/issues/7>.
+
+0.004 2016-04-14 20:13:44-0500
+  - Actual release. Forgot to pull upstream changes. Eek!
+  - Changes are as listed in v0.003.
+
+0.003 2016-04-14 20:03:25-0500
+  - Improved handling for intermediate releases (e.g., version 1.7a).
+  - Remove strict build requirement for OpenGL viewer.
+  - Add wrapper for adding the `mutool` binary to the path.
+  - Added a minimum version version for Alien::Base `configure_requires`.
+    Thanks to Graham Ollis (PLICEASE++)!
+
+0.002 2015-01-24 14:41:49-0600
+  - add ExtUtils::Depends support
+
+0.001 2013-07-15 06:50:14-0500
+  - first version
+  - packages MuPDF v1.2

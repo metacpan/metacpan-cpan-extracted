@@ -1,0 +1,29 @@
+INSTALL :
+% perl Makefile.PL
+% make
+% make test
+% make install
+
+
+ABOUT :
+A silly module to make perl act a bit more like Damian Conway ...
+
+Well, he's done so much for the Perl community we might as well 
+make him feel more at home <grin>
+
+
+This was inspired by Ron Kimball's skit at the p5p impressions 
+BOF at TPC5 in San Diego.
+
+
+AUTHOR :
+Simon Wistow <simon@twoshortplanks.com>
+
+COPYING :
+This module is distributed under the same terms as Perl itself.
+
+
+
+
+
+

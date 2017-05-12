@@ -1,0 +1,31 @@
+---
+abstract: 'Calculate e-liquid recipes for DIY vaping'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Modern: '0.01'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-vaporcalc
+requires:
+  Defaults::Modern: '0.009003'
+  Exporter::Tiny: '0'
+  JSON::MaybeXS: '1.001'
+  Module::Pluggable: '5'
+  Term::ANSIColor: '4'
+  Term::ReadLine: '0'
+  Term::UI: '0'
+  Text::ParseWords: '0'
+  Throwable: '0.2'
+resources:
+  repository: git://github.com/avenj/app-vaporcalc.git
+version: '0.005004'

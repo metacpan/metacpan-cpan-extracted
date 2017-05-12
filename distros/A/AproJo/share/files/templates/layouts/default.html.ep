@@ -1,0 +1,35 @@
+<% my $skin = 'default'; =%>
+<!DOCTYPE html>
+<html>
+<head>
+ 
+<link type="image/x-icon" rel="shortcut icon" href="/skins/<%= $skin %>/img/favicon.ico">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="/skins/<%= $skin %>/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="screen, print, projection">
+<link href="/skins/<%= $skin %>/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css" media="screen, print, projection">
+
+<link href="/skins/<%= $skin %>/css/base.css" rel="stylesheet" type="text/css" media="screen, print, projection">
+
+<title><%= title %></title>
+
+</head>
+<body>
+
+<div class="container" id="center"><!-- CENTER -->
+
+<%= include 'front/macros/header', skin => $skin %>              
+                
+<%= content %>
+
+<%= include 'front/macros/footer' %>
+
+</div><!-- END CENTER -->
+
+<script src="/skins/<%= $skin %>/jquery-ui-1.9.1.custom/js/jquery-1.8.2.js" type="text/javascript"></script>
+<script src="/skins/<%= $skin %>/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<!-- script src="/skins/<%= $skin %>/js/application.js"></script -->
+
+</body>
+</html>

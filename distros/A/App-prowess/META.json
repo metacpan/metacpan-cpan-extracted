@@ -1,0 +1,52 @@
+{
+   "abstract" : "Watch files for changes and re-run prove",
+   "author" : [
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-prowess",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Prove" : "3.35",
+            "Filesys::Notify::Simple" : "0.12"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jhthorsen/app-prowess/issues"
+      },
+      "homepage" : "https://github.com/jhthorsen/app-prowess",
+      "repository" : {
+         "url" : "https://github.com/jhthorsen/app-prowess.git"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

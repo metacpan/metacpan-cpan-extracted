@@ -1,0 +1,66 @@
+In this file:
+
+* Notes for end users
+* Notes for developers
+
+Notes for end users
+-------------------
+
+You only need this package when something else requires it.
+
+Install examples:
+# Compile and install
+cmake -DCMAKE_INSTALL_PREFIX=/opt/kde4/ . && make && make install
+# Compile with debugging enabled and point to the used ruby version
+cmake -DCMAKE_BUILD_TYPE=debugfull -DRUBY_INCLUDE_PATH=/usr/lib/ruby/1.8/i486-linux/ -DRUBY_LIBRARY=/usr/lib/libruby1.8.so .
+# Compile smokeqt but not smokekde
+cmake -DENABLE_SMOKE=on -DENABLE_SMOKEKDE=off .
+# Disable compiling of Qyoto
+cmake -DENABLE_QYOTO=off .
+# Disable compiling of QtRuby and Korundum
+cmake -DENABLE_QTRUBY=off -DENABLE_KORUNDUM=off .
+# Disable compiling of PyKDE
+cmake -DENABLE_PYKDE4=off .
+# Disable compiling of the Kross Ruby and Python backends
+cmake -DENABLE_KROSSRUBY=off -DENABLE_KROSSPYTHON=off .
+# Enable compiling of the Kross Java and Falcon backends
+cmake -DENABLE_KROSSJAVA=on -DENABLE_KROSSFALCON=on .
+
+Notes for developers
+--------------------
+
+This package contains:
+* working:
+  * smoke: Language independent library for Qt and KDE bindings. Used by QtRuby, 
+    PerlQt and Qyoto.
+  * kalyptus: a header parser and bindings generator for Qt/KDE. Used for Smoke.
+  * qtruby: Qt bindings for Ruby
+  * korundum: KDE bindings for ruby
+  * Qyoto: Qt bindings for C#
+  * Kimono: KDE bindings for C#
+  * PyKDE: KDE bindings for python, requires PyQt from riverbankcomputing.co.uk
+  * KrossPython is the Python plugin for the kdelibs/kross scripting framework.
+  * KrossRuby is the Ruby plugin for the kdelibs/kross scripting framework.
+  * KrossJava is the Java plugin for the kdelibs/kross scripting framework.
+  * KrossFalcon is the Falcon (http://www.falconpl.org) plugin for the kdelibs/kross scripting framework.
+
+* possibly broken: 
+  * xparts: allows you to embed non-KDE apps as a KPart
+
+* obsolete:
+  * dcopperl: DCOP bindings for Perl
+    => perldbus
+  * kjsembed: javascript scripting support library for KDE applications
+    => moved to kdelibs
+  * qtjava: Qt bindings for Java JNI to use Qt/KDE classes with Java
+    => QtJambi
+  * kdejava: KDE bindings for Java JNI to use Qt/KDE classes with Java
+    => QtJambi
+  * dcoppython: DCOP bindings for Python
+    => pythondbus
+  * dcopc: DCOP bindings for C 
+    => qdbus
+  * dcopjava: DCOP bindings for JAVA
+    => QtJambi
+  * qtsharp: C# bindings for Qt
+    => Qyoto

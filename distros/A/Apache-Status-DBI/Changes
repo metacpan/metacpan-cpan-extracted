@@ -1,0 +1,24 @@
+=head1 NAME
+    
+Changes - List of significant changes to Apache::Status::DBI
+    
+As of $Date: 2007-03-23 13:48:54 +0000 (Fri, 23 Mar 2007) $
+
+$Revision: 9845 $
+
+=head2 Changes in 1.012 (svn rev 9845),  16th August 2007
+
+  Fixed escape_html for mod_perl2
+  Tweaked auto detection of mod_perl2 when MOD_PERL_API_VERSION not set.
+
+=head2 Changes in 1.011 (svn rev 9802),  26th July 2007
+
+  Add mod_perl2 support, thanks to Philip M. Gollucci
+  Improve err formatting to show Info and Warn states
+  Remove need for version module.
+
+=head2 Changes in 1.00 (svn rev 9324),  24th March 2007
+
+  Initial release.
+
+=cut

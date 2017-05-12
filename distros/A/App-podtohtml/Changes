@@ -1,0 +1,13 @@
+0.002   2017-02-06 (PERLANCAR)
+
+	- [ux] Replace perl_modname_or_filename schema with the newer
+	  perl::pod_or_pm_filename which will do the coercion of Foo::Bar
+	  to filesystem path for us automatically, and will more
+	  appropriately prioritize .pod over .pm (so e.g. podtohtml Rinci
+	  will work and process Rinci.pod even though Rinci.pm also
+	  exists).
+
+
+0.001   20167-01-31 (PERLANCAR)
+
+        - First release.

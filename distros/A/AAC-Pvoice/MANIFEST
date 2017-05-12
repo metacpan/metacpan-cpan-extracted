@@ -1,0 +1,15 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/AAC/Pvoice.pm
+lib/AAC/Pvoice/Bitmap.pm
+lib/AAC/Pvoice/Input.pm
+lib/AAC/Pvoice/Panel.pm
+lib/AAC/Pvoice/Row.pm
+lib/AAC/Pvoice/EditableRow.pm
+lib/AAC/Pvoice/Dialog.pm
+t/001_load.t
+Makefile.PL
+META.yml

@@ -1,0 +1,6 @@
+Revision history for Perl extension Algorithm::QuadTree.
+
+0.1   Mon Aug  9 13:56:27 2004
+	- original version; created by h2xs 1.21 with options
+		-AX -n Algorithm::QuadTree
+

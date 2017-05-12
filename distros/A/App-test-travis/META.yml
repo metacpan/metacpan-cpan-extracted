@@ -1,0 +1,49 @@
+---
+abstract: 'Runs Travis-CI scripts (.travis.yml)'
+author:
+  - 'Fuji, Goro (gfx) <gfuji@cpan.org>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.5, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-test-travis
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::test::travis:
+    file: lib/App/test/travis.pm
+    version: v0.9.7
+requires:
+  File::Spec: 0
+  File::Temp: 0
+  Getopt::Long: 0
+  Pod::Usage: 0
+  YAML: 0
+  perl: v5.10.0
+  version: 0.77
+resources:
+  bugtracker: https://github.com/gfx/App-test-travis/issues
+  homepage: https://github.com/gfx/App-test-travis
+  repository: git://github.com/gfx/App-test-travis.git
+version: v0.9.7
+x_contributors:
+  - 'mooz <stillpedant@gmail.com>'
+  - 'Hideo Hattori <hattori-h@klab.com>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 'Fuji, Goro <goro-fuji@cookpad.com>'

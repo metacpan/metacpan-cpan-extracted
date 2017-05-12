@@ -1,0 +1,42 @@
+Revision history for Perl extension Audio::File.
+
+0.11  Fri Aug 25 15:21:22 2006
+	- Fix a test failure in the mp3 tag tests.
+
+0.10  Mon Feb 28 16:03:12 2005
+	- Better test suite.
+	- Added Audio::File::Tag::all().
+	- Added Audio::File::AudioProperties::all().
+	- Audio::FLAC -> Audio::FLAC::Header.
+
+0.09  Fri Feb 18 00:20:08 2005
+	- Fixed README.
+	- Removed 'use 5.008004;' from Makefile.PL.
+	- Added test suite.
+	- Added Audio::File::Tag::total().
+
+0.08  Tue Sep 14 07:45:37 2004
+	- Fixed problems when loading type-secific plugins using eval in File.pm.
+
+0.06  Mon Aug 30 01:24:26 2004
+	- Added a better description.
+
+0.05  Sat Aug 21 01:31:12 2004
+	- yet another damn typo! I really should start testing *before* releasing a
+	  new version..
+
+0.04  Sat Aug 21 01:25:32 2004
+	- fixed typos of previous fix.
+
+0.03  Sat Aug 21 01:18:45 2004
+	- fixed Mp3 suppport.
+
+0.02  Thu Aug  5 19:02:21 2004
+	- fixed README.
+
+0.01  Wed Aug  4 15:58:39 2004
+	- original version; created by h2xs 1.23 with options
+		-AXO -n Audio::File
+	- implemented basic functionality of reading tags and audio properties for
+	  Flac, Ogg and MP3.
+

@@ -1,0 +1,29 @@
+---
+abstract: 'LWP::UserAgent subclass for a CAS aware UserAgent'
+author:
+  - 'Daniel Frett <daniel.frett@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Authen-CAS-UserAgent
+provides:
+  Authen::CAS::UserAgent:
+    file: lib/Authen/CAS/UserAgent.pm
+    version: 0.91
+requires:
+  Exporter: 0
+  HTTP::Message: 0
+  LWP::UserAgent: 0
+  URI: 0
+  XML::LibXML: 0
+resources:
+  license: http://www.opensource.org/licenses/BSD-3-Clause
+  repository: https://github.com/frett/perl-Authen-CAS-UserAgent
+version: 0.91

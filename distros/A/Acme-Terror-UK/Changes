@@ -1,0 +1,29 @@
+Revision history for Perl extension Acme::Terror::UK.
+
+0.06  Fri May 14 14:34:00 2010
+	- Added dependancy for LWP::Simple to Makefile.PL
+
+0.05  Wed May 12 14:48:00 2010
+	- Change screen scraping to new new page on the MI5
+		website. Patch supplied by Neil Stott.
+
+0.04  Wed Jun 11 09:41:00 2008
+	- Changed screen scraping to use new page on the MI5
+		website. Patch supplied by B10m
+
+0.03  Thu Aug 10 09:40:00 2006
+	- Changed the screen scraping site to access the MI5
+		website instead as the original Home Office site
+		was returning inconsistant data.
+
+0.02  Mon Aug  7 13:25:00 2006
+	- Added level() method to return the current threat
+		level in a nicer format.
+	- Improved documentation and added details for all
+		public methods.
+	- Added some extra tests.
+
+0.01  Wed Aug  2 09:00:13 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n Acme::Terror::UK
+

@@ -1,0 +1,21 @@
+
+This is Authen::CyrusSASL version 0.01. Authen::CyrusSASL is a Perl 5 module
+which allows you to authenticate/account usernames from a cyrus-sasl's
+pwcheck or saslauthen server.
+
+See the file 'INSTALL' for installation instructions. See the file 'Changes' 
+for modifications or new additions to the module interface. Type 'perldoc 
+Authen::CyrusSASL' for a quick synopsis of the available methods.
+There are two types of possible authentication methods with
+cyrus-sasl authentication interface. In cyrus-sasl v1.5.x 
+there was only pwcheck method available (unconnected socket type - no fork).
+In v2.x there is new saslauthd daemon - replacement for pwcheck
+(connected socket type - forking processes). I think the next stage
+would be connected socket without forking but with threads.
+
+Authen::CyrusSASL was developed & tested on Solaris8. Interfacse is based
+on the Authen::Radius package.
+
+Authen::CyrusSASL is (c)2001 Piotr Klaban.
+See the Perl Artistic License for copying and usage policy.
+

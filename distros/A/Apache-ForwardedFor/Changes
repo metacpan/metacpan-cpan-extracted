@@ -1,0 +1,20 @@
+Revision history for Perl extension Apache::ForwardedFor.
+
+0.5  Thu Jul 06:29:22 2002-07-11
+     - some doc fixes
+
+0.4  Tue Jul 12:12:00 2002-07-09
+     - changed configuration variable names to more reasonable ones
+     - cleaned up logic
+     - commented out TRACEs
+
+0.3  Tue Jul 10:14:25 2002-07-09
+     - Version for Solaris testing
+
+0.2  Tue Jul 02 16:48:00 2002
+     - Added handling of PerlSetVars
+     - Added trace option
+
+0.1  Tue Jul 02 13:36:11 2002
+	 - original version; created by ExtUtils::ModuleMaker 0.204
+

@@ -1,0 +1,29 @@
+=head1 INSTALLATION
+
+    cpanm App::Exifpic
+
+=head1 SYNOPSIS
+
+    # Extract embedded jpegs from all .CR2 files in the current dir
+
+    $ exifpic *.CR2
+
+=head1 DESCRIPTION
+
+This is a super-simple program to extract embedded (full-size) jpegs
+from RAW camera files.  EXIF headers are copied to the new file, which
+will always have the same name as the old file, but with a .jpg extension.
+
+The code will use as many cores as you have available, and assumes you're
+running a threaded perl.
+
+=head1 BUGS
+
+Plenty! The code assumes you have a F</proc/cpuinfo> so it can count
+cores. It's only been tested on Canon .CR2 files. There are probably
+more.
+
+Patches are I<super-welcome>.  You can find the code repo at
+L<https://github.com/pfenwick/app-exifpic> .
+
+=cut

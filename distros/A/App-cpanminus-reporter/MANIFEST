@@ -1,0 +1,46 @@
+bin/cpanm-reporter
+Changes
+lib/App/cpanminus/reporter.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP			Stuff that should be skipped
+README.md
+t/00.load.t
+t/01.basic.t
+t/02.parser.single.t
+t/03.parser.single_extended.t
+t/04.parser.nothing_to_do.t
+t/05.parser.configure_failed.t
+t/06.parser.version_strings.t
+t/07.parser.module_dir.t
+t/07.parser.verbose_cpanm.t
+t/08.parser.dist_subdir.t
+t/09.parser.dist_subdir2.t
+t/10.parser.cloudweights.t
+t/11.local.t
+t/12.parser.version_mismatch.t
+t/13.parser.moose.t
+t/14.parser.fresh.t
+t/15.parser.na.t
+t/16.missing.t
+t/17.parser.local.t
+t/data/build.cloudweights.log
+t/data/build.configure_failed.log
+t/data/build.dist_subdir.log
+t/data/build.module_dir.log
+t/data/build.nothing_to_do.log
+t/data/build.single.log
+t/data/build.single_extended.log
+t/data/build.verbose_cpanm.log
+t/data/build.version_strings.log
+t/data/build.version_mismatch.log
+t/data/build.moose.log
+t/data/build.fresh.log
+t/data/build.na.log
+t/data/build.missing.log
+t/data/build.local.log
+xt/perlcritic.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

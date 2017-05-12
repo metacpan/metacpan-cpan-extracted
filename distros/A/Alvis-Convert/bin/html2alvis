@@ -1,0 +1,289 @@
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+use Pod::Usage;
+
+use Alvis::Convert;
+
+use strict;
+
+my $PrintManual=0;
+my $PrintHelp=0;
+my $Warnings=1;
+my $HTMLSuffix='html';
+my $MetaSuffix='meta';
+my $ODir='.';  
+my $NPerOurDir=1000;
+my $MetaEncoding='iso-8859-1';
+my $HTMLEncoding=undef;
+my $HTMLEncodingFromMeta=0;
+my $IncOrigDoc=1;
+
+GetOptions('help|?'=>\$PrintHelp, 
+	   'man'=>\$PrintManual,
+	   'warnings!'=>\$Warnings,
+	   'html-ext=s'=>\$HTMLSuffix,
+	   'meta-ext=s'=>\$MetaSuffix,
+	   'out-dir=s'=>\$ODir,
+	   'N-per-out-dir=s'=>\$NPerOurDir,
+	   'meta-encoding=s'=>\$MetaEncoding,
+	   'html-encoding=s'=>\$HTMLEncoding,
+	   'html-encoding-from-meta!'=>\$HTMLEncodingFromMeta,
+	   'original!'=>\$IncOrigDoc) or 
+    pod2usage(2);
+pod2usage(1) if $PrintHelp;
+pod2usage(-exitstatus => 0, -verbose => 2) if $PrintManual;
+pod2usage(1) if (@ARGV!=1);
+
+my $SDir=shift @ARGV;
+
+$|=1;
+
+my $C=Alvis::Convert->new(outputRootDir=>$ODir,
+			  outputNPerSubdir=>$NPerOurDir,
+			  outputAtSameLocation=>0,
+			  metaEncoding=>$MetaEncoding,
+			  sourceEncoding=>$HTMLEncoding,
+			  includeOriginalDocument=>$IncOrigDoc,
+                          sourceEncodingFromMeta=>$HTMLEncodingFromMeta);
+
+my %Seen;
+$C->init_output();
+if (!&_convert_collection($SDir,{htmlSuffix=>$HTMLSuffix,
+				 metaSuffix=>$MetaSuffix}))
+{
+    die("Conversion failed. " . $C->errmsg());
+}
+
+
+sub _parse_entries
+{
+    my $entries=shift;
+    my $options=shift;
+    my $html_entries=shift;
+    
+    for my $e (@$entries)
+    {
+	if ($Seen{$e})
+	{
+	    next;
+	}
+	
+	$Seen{$e}=1;
+	if (-d $e)
+	{
+	    my @entries=glob("$e/*");;
+	    &_parse_entries(\@entries,$options,$html_entries);
+	    next;
+	}
+
+	my ($basename,$suffix);
+	if ($e=~/^(.*)\.([^\.]+)$/)
+	{
+	    $basename=$1;
+	    $suffix=$2;
+	}
+	else
+	{
+	    warn "Skipping non-suffixed non-directory entry \"$e\"." if 
+		$Warnings;
+	    next;
+	}
+	
+	if ($suffix eq $options->{metaSuffix})
+	{
+	    $html_entries->{$basename}{metaF}=$e;
+	}
+	elsif ($suffix eq $options->{htmlSuffix})
+	{
+	    $html_entries->{$basename}{htmlF}=$e;
+	}
+    }
+}
+
+sub _convert_collection
+{
+    my $root_dir=shift;
+    my $options=shift;
+
+    my @entries=glob("$root_dir/*");
+    my %html_entries=();
+    %Seen=();
+    print "Parsing the source directory entries...\r";
+    &_parse_entries(\@entries,$options,\%html_entries);	
+    print "                                       \r";
+
+    for my $base_name (keys %html_entries)
+    {
+	my ($meta_txt,$html_txt);
+
+	if (exists($html_entries{$base_name}{metaF}))
+	{
+	    $meta_txt=$C->read_meta($html_entries{$base_name}{metaF});
+	    if (!defined($meta_txt))
+	    {
+		warn "Reading meta file " .
+		    "\"$html_entries{$base_name}{metaF}\" failed. " .
+		    $C->errmsg() if 
+		    $Warnings;
+		$C->clearerr();
+		next;
+	    }
+	}
+	else # no meta file
+	{
+	    warn "No Meta file for basename \"$base_name\"." if 
+		$Warnings;
+	    next;
+	}
+
+	my $alvisXML;
+	
+	if (exists($html_entries{$base_name}{htmlF}))
+	{
+	    $html_txt=$C->read_HTML($html_entries{$base_name}{htmlF},
+                                    $meta_txt);
+	    if (!defined($html_txt))
+	    {
+		warn "Reading the HTML for basename \"$base_name\" failed. " .
+		    $C->errmsg() if 
+		    $Warnings;
+		$C->clearerr();
+		next;
+	    }
+	}
+	else
+	{
+	     warn "No HTML file for basename \"$base_name\"." if 
+		$Warnings;
+	     next;
+	}
+
+	$alvisXML=$C->HTML($html_txt,$meta_txt);
+	if (!defined($alvisXML))
+	{
+	    warn "Obtaining the Alvis version of the " .
+		"\"$base_name\"'s HTML file failed. " . $C->errmsg() if 
+		$Warnings;
+	    $C->clearerr();
+	    next;
+	}
+
+	if (!$C->output_Alvis([$alvisXML],$base_name))
+	{
+	    warn "Outputting the Alvis records for base name \"$base_name\" failed. " . $C->errmsg() if 
+		$Warnings;
+	    $C->clearerr();
+	    next;
+	}
+    }
+
+    return 1;
+}
+
+__END__
+
+=head1 NAME
+    
+    html2alvis - HTML to Alvis XML converter
+    
+=head1 SYNOPSIS
+    
+    html2alvis [options] [source directory ...]
+
+  Options:
+
+    --html-ext                 HTML file identifying filename extension
+    --meta-ext                 meta file identifying filename extension
+    --out-dir                  output directory
+    --N-per-out-dir            # of records per output directory
+    --meta-encoding            the encoding of the meta files
+    --html-encoding            the encoding of all HTML files
+    --html-encoding-from-meta  take the encoding of the HTML files from
+                               the meta files (attribute 'detected-charset')
+    --[no]original             include original document?
+    --help                     brief help message
+    --man                      full documentation
+    --[no]warnings             warnings output flag
+    
+=head1 OPTIONS
+    
+=over 8
+
+=item B<--html-ext>
+
+    Sets the HTML file identifying filename extension. 
+    Default value: 'html'.
+
+=item B<--meta-ext>
+
+    Sets the  meta file identifying filename extension.
+    The meta file syntax is
+
+          <feature name>\t<feature value>\n
+
+    Special features are url,title,date,detectedCharSet.
+    Default value: 'meta'.
+
+=item B<--out-dir>
+
+    Sets the output directory. Default value: '.'.
+
+=item B<--N-per-out-dir>
+
+    Sets the # of records per output directory. Default value: 1000.
+
+=item B<--meta-encoding>
+
+    Specifies the encoding of all meta files. Default value 'iso-8859-1'.
+
+=item B<--html-encoding>
+
+    Specifies the encoding of all HTML files. Default value 'iso-8859-1'.
+    Default: undef (meaning 'guess').
+
+=item B<--html-encoding-from-meta>
+
+    Specifies whether the encoding of an HTML file should be read from
+    the corresponding meta file. If no information is given there,
+    --html-encoding is used, if that is not given, the encoding is guessed.
+    Default: no.
+
+=item B<--[no]original>
+
+    Shall the original document be included in the output? Default
+    value: yes.
+
+=item B<--help>
+
+    Prints a brief help message and exits.
+
+=item B<--man>
+
+    Prints the manual page and exits.
+
+=item B<--[no]warnings>
+
+    Output (or suppress) warnings. Default value: yes.
+
+=back
+
+=head1 DESCRIPTION
+
+    Goes recursively through the files under the source directory
+    and converts them to Alvis XML files. Meta information (such
+    as the URL or the detected character set, title of the document
+    etc.) can be given in a separate meta file, one per each document,
+    recognized by the shared basename. E.g. the HTML document is
+    called foo.original and the meta information is in foo.meta.
+    In this case html2alvis should be called like this:
+   
+          html2.alvis --html-ext original --meta-ext meta  
+    
+=cut
+
+

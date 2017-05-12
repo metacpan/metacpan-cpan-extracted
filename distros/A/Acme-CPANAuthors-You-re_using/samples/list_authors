@@ -1,0 +1,9 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Acme::CPANAuthors;
+
+my $authors = Acme::CPANAuthors->new("You're_using");
+print $authors->name($_) . " ($_)\n" for $authors->id;

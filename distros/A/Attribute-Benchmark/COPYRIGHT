@@ -1,0 +1,45 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Attribute-Benchmark
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Attribute-Benchmark
+
+Files: Changes
+ META.json
+ META.yml
+ Makefile.PL
+ dist.ini
+ doap.ttl
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ lib/Attribute/Benchmark.pm
+ t/01basic.t
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+License: Artistic-1.0
+ This software is Copyright (c) 2013 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2013 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

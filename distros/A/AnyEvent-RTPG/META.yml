@@ -1,0 +1,32 @@
+---
+abstract: 'A RTPG interface for AE'
+author:
+  - 'Tka Lu C<< <tka@handlino.com> >>, Kang-min Liu  C<< <gugod@gugod.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: AnyEvent::RTPG
+name: AnyEvent-RTPG
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  AnyEvent: 5.202
+  Object::Event: 1.21
+  RTPG: 0.3
+  common::sense: 2.02
+  parent: 0.223
+  perl: 5.8.0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: http://github.com/gugod/AnyEvent-RTPG
+version: 0.01

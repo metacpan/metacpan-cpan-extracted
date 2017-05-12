@@ -1,0 +1,6 @@
+
+* Add replay gain support.
+
+* Skip & Until
+
+* Seeking - time_tell(), etc.

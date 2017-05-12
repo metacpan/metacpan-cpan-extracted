@@ -1,0 +1,48 @@
+=head1 Apache::Traffic CHANGES
+
+=over 3
+
+=item 1.02 - January 9, 1997
+
+Improved documentation.
+
+Modified Makefile.PL to change traffic script's #! path to $Config{perlpath} 
+
+Modified traffic script to handle date ranges and removal function.
+Date::Parse is now required.
+
+Patched IPC::Shareable 0.28 to handle semaphore overflow.
+
+Semaphore locking is now handled by us to take advantage of the
+SEM_UNDO flag. IPC::SysV is now required.  
+
+Old data is now transparently stored in a DBM file to reduce logging time.
+DB_File is now required.
+
+Fake users can now be used in Owner variables, in which case the names
+are stored (rather than their non-existent UIDs).
+
+Using GM time now so daylight savings time doesn't bite us.
+
+Rarely called fuctions are now autoloaded.
+
+Moved logger to $r->post_connection as suggested by Tom <tom@SDF.COM>, with
+patch from Doug MacEachern.
+
+Shared memory tie is now persistent as suggested by Stephane Bortzmeyer.
+
+fetch() and remove() fuctions now fail if shared memory segment does
+not exist. Suggested by Stephane Bortzmeyer.
+
+Returns DECLINED on all error conditions, as suggested by
+Stephane Bortzmeyer.
+
+Added remove() fuction.
+
+=item 1.01 - December 22, 1997
+
+Initial release.
+
+=back
+
+=cut

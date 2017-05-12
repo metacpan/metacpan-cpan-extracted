@@ -1,0 +1,36 @@
+slackeria - Project status overview
+--------------------------------------------------------
+
+* <http://derf.homelinux.org/projects/App-Slackeria/>
+
+
+Dependencies
+------------
+
+ * perl version 5.10.1 or newer
+ * Config::Tiny
+ * File::BaseDir
+ * File::ShareDir
+ * HTML::Template
+
+Plus various plugin dependencies, see their documentation.
+
+Note: You need Module::Build version 0.36 or better to build App::Slackeria.
+The version shipped with perl 5.10 is 0.34.
+
+Installation
+------------
+
+$ perl Build.PL
+$ perl Build
+$ sudo perl Build install
+
+You can then run 'man slackeria' for more information.
+
+Testing
+-------
+
+$ perl Build test
+
+Note that this will require the Test::More, Test::Compile and Test::Pod
+modules.

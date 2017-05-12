@@ -1,0 +1,79 @@
+NAME
+	ACH::Parser - Parse an ACH formatted file to ACH perl object
+	
+VERSION
+	Version: 0.01
+	May 2006
+
+DESCRIPTION
+	ACH::Parser is a simple, generic ACH file to ACH object parser.
+	It's intentional use is for testing purposes ONLY.  ACH-Parser will
+	allow a developer to look at the particular fields in an ACH formatted
+	file.
+
+USING ACH-Parser
+	use ACH::Parser;
+
+	my $file = 'RETODC0104A.ACH';
+	my $ach = new ACH;
+	$ach->parse($file);
+
+METHODS
+  parse
+	Parses the ACH data into the ACH object
+
+CAVEATS
+	This package is created for testing purposes only.  It shouldn't be used 
+	for production programs or scripts.  There are other commercial products
+	out there that may be a more efficient solution for accomplishing your
+	goals.
+
+	All records in an ACH file must be formatted in the following sequence
+	of records.  IF the file is not formatted in this exact sequence, it
+	may be rejected.
+
+	ACH File Layout:
+	1 - File Header Record
+	5 - First Company/Batch Header Record
+	6 - First Entry Detail Record
+	7 - First Entry Detail Addenda Record (optional)
+		|
+	Multiples of Entry Detail Records
+		|
+	6 - Last Entry Detail Record
+	7 - Last Entry Detail Addenda Record (optional)
+	8 - First Company/Batch Control Record
+		|
+	Multiples of Company/Batches
+		|
+	5 - Last Company/Batch Header Record
+	6 - First Entry Detail Record
+	7 - First Entry Detail Addenda Record (optional)
+		|
+	Multiples of Entry Detail Records
+		|
+	6 - Last Entry Detail Record
+	7 - Last Entry Detail Addenda Record (optional)
+	8 - Last Company/Batch Control Record
+	9 - File Control Record
+	9999...9999 (optional)
+
+AUTHOR
+	Author: Christopher Kois
+	Date: May, 2006
+	Contact: cpkois@cpan.org
+
+COPYRIGHTS
+	The ACH-Parser module is Copyright (c) May, 2006 by Christopher Kois. 
+	http://www.christopherkois.com All rights reserved.  You may distribute this 
+	module under the terms of GNU General Public License (GPL). 
+
+SUPPORT/WARRANTY
+	ACH-Parser is free Open Source software. IT COMES WITHOUT WARRANTY OR SUPPORT OF ANY KIND.
+
+KNOWN BUGS
+	This is version 0.01 of ACH::Parser.  There are currently no known bugs.
+
+SEE ALSO
+	ACH, ACH::Generator
+

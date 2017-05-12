@@ -1,0 +1,143 @@
+#!/usr/bin/env perl
+
+# Pragmas.
+use strict;
+use warnings;
+
+# Modules.
+use App::Video::Generator;
+
+# Version.
+our $VERSION = 0.07;
+
+# Run.
+exit App::Video::Generator->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+video-generator - Script to generate video.
+
+=head1 SYNOPSIS
+
+ video-generator [-d duration] [-f fps] [-h] [-i input_dir] [-s size] [-v] [--version] output_file
+
+=head1 DESCRIPTION
+
+ video-generator script uses Video::Generator class to create videos via ffmpeg.
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-d duration>
+
+ Duration.
+ Default value is 10000 (10s).
+
+=item * C<-f fps>
+
+ Frame rate.
+ Default value is 60 frames per second.
+
+=item * C<-h>
+
+ Print help.
+
+=item * C<-i input_dir>
+
+ Input directory with images.
+ Default value is nothing, then generates random images.
+
+=item * C<-s size>
+
+ Video size.
+ Default value is 1920x1080.
+
+=item * C<-v>
+
+ Verbose mode.
+
+=item * C<--version>
+
+ Print version of script.
+
+=item * C<output_file>
+
+ Output file.
+ e.g. foo.mpg
+ e.g. foo.mp4
+
+=back
+
+=head1 EXAMPLE1
+
+ video-generator
+
+ # Output:
+ # Usage: video-generator [-d duration] [-f fps] [-h]
+ #         [-i input_dir] [-s size] [-v] [--version] output_file
+ #
+ #         -d duration     Duration (default value is 10000 (=10s)
+ #         -f fps          Frame rate
+ #         -h              Print help.
+ #         -i input_dir    Input directory with images (default value is nothing).
+ #         -s size         Size (default value is 1920x1080).
+ #         -v              Verbose mode.
+ #         --version       Print version.
+
+=head1 EXAMPLE2
+
+ video-generator foo.mpg
+
+ # Output:
+ # -nothing-
+ # Created foo.mpg file in local directory.
+
+=head1 EXAMPLE3
+
+ video-generator -s 100x100 foo.mp4
+
+ # Output:
+ # -nothing-
+ # Created foo.mp4 file in local directory.
+
+=head1 EXAMPLE4
+
+ video-generator -i /data/images/ foo.mpg
+
+ # Output:
+ # -nothing-
+ # Created foo.mpg file in local directory, generated from images in /data/images.
+
+=head1 REPOSITORY
+
+L<https://github.com/tupinek/App-Video-Generator>
+
+=head1 AUTHOR
+
+Michal Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+ © 2015 Michal Špaček
+ BSD 2-Clause License
+
+=head1 VERSION
+
+0.07
+
+=cut

@@ -1,0 +1,83 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+# Tests cmd_new()'s prompt_for_other_options() subroutine that uses Term::UI to
+# ask the user questions. This "test script" is called by
+# t/bin-fetchware-new.t's using Test::Expect, if its optionally installed.
+# And Test::Expect answer's the questsions that this script asks thereby testing
+# add_mirrors() Q&A interface.
+
+
+use Test::More;
+use Test::Builder;
+use Term::ReadLine;
+
+use App::Fetchware 'prompt_for_other_options';
+
+my $term = Term::ReadLine->new('testing fetchware new');
+
+my $other_options_hashref = prompt_for_other_options($term,
+        temp_dir => {
+            prompt => <<EOP,
+What temp_dir configuration option would you like? 
+EOP
+            print_me => <<EOP
+temp_dir is the directory where fetchware creates a temporary directory that
+stores all of the temporary files it creates while it is building your software.
+The default directory is /tmp on Unix systems and C:\\temp on Windows systems.
+EOP
+        },
+        user => {
+            prompt => <<EOP,
+What user configuration option would you like? 
+EOP
+            print_me => <<EOP
+user specifies what user fetchware will drop priveleges to on Unix systems
+capable of doing so. This allows fetchware to download files from the internet
+with user priveleges, and not do anything as the administrative root user until
+after the downloaded software package has been verified as exactly the same as
+the author of the package intended it to be. If you use this option, the only
+thing that is run as root is 'make install' or whatever this package's
+install_commands configuratio option is.
+EOP
+        },
+    );
+
+###BUGALERT### Add tests for testing specific options.
+if ($other_options_hashref) {
+    ok($other_options_hashref,
+        'checked prompt_for_other_options() answered Y success.');
+    for my $option (keys %$other_options_hashref) {
+        is($other_options_hashref->{$option}, '/var/tmp',
+            'checked prompt_for_other_options() temp_dir success.')
+            if $option eq 'temp_dir';
+        is($other_options_hashref->{$option}, 'dly',
+            'checked prompt_for_other_options() user success.')
+            if $option eq 'user';
+    }
+} else {
+    ok( ! $other_options_hashref,
+        'checked prompt_for_other_options() answered N success.');
+}
+
+# Spit out # of tests run.
+done_testing();
+
+# Print a bogus "prompt" to keep Expect from freaking out, because it presumes
+# the prompt works like it does in a shell, but fetchware new is not a shell.
+print "Bogus shell: \n";
+
+# Because we're in a child process not the same one that is running the main
+# test suite, if any tests fail this failure will not be reported back to our
+# caller. So, we use Test::Builder to check if our tests have passed, and if
+# they have we do nothing and return succes, but if not we throw an exception.
+my $test = Test::Builder->new();
+unless ($test->is_passing()) {
+    diag explain \[$test->details()];
+    die <<EOD;
+add_mirrors test file for testing add_mirrors() using Test::Expect has failed!
+The details() method of this process's Test::Builder object should have been
+printed above to help you figure out what went wrong.
+EOD
+}

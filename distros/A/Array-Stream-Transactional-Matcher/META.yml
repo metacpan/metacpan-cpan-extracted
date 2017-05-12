@@ -1,0 +1,82 @@
+--- #YAML:1.0
+name: Array-Stream-Transactional-Matcher
+version: 1.00
+license: perl
+distribution_type: module
+requires:
+  Array::Stream::Transactional: 1.02
+  Test::More: 0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Array::Stream::Transactional::Matcher:
+    file: lib/Array/Stream/Transactional/Matcher.pm
+    version: 1.00
+  Array::Stream::Transactional::Matcher::Flow:
+    file: lib/Array/Stream/Transactional/Matcher/Flow.pm
+    version: 1.00
+  ? |-
+    Array::Stream::Transactional::Matcher::Flow::optional
+:
+    file: lib/Array/Stream/Transactional/Matcher/Flow.pm
+    version: 1.00
+  ? |-
+    Array::Stream::Transactional::Matcher::Flow::repetition
+:
+    file: lib/Array/Stream/Transactional/Matcher/Flow.pm
+    version: 1.00
+  ? |-
+    Array::Stream::Transactional::Matcher::Flow::sequence
+:
+    file: lib/Array/Stream/Transactional/Matcher/Flow.pm
+    version: 1.00
+  Array::Stream::Transactional::Matcher::Logical:
+    file: lib/Array/Stream/Transactional/Matcher/Logical.pm
+    version: 1.00
+  ? |-
+    Array::Stream::Transactional::Matcher::Logical::and
+:
+    file: lib/Array/Stream/Transactional/Matcher/Logical.pm
+    version: 1.00
+  ? |-
+    Array::Stream::Transactional::Matcher::Logical::not
+:
+    file: lib/Array/Stream/Transactional/Matcher/Logical.pm
+    version: 1.00
+  Array::Stream::Transactional::Matcher::Logical::or:
+    file: lib/Array/Stream/Transactional/Matcher/Logical.pm
+    version: 1.00
+  ? |-
+    Array::Stream::Transactional::Matcher::Logical::xor
+:
+    file: lib/Array/Stream/Transactional/Matcher/Logical.pm
+    version: 1.00
+  Array::Stream::Transactional::Matcher::Rule:
+    file: lib/Array/Stream/Transactional/Matcher/Rule.pm
+    version: 1.00
+  Array::Stream::Transactional::Matcher::Value:
+    file: lib/Array/Stream/Transactional/Matcher/Value.pm
+    version: 1.00
+  Array::Stream::Transactional::Matcher::Value::eq:
+    file: lib/Array/Stream/Transactional/Matcher/Value.pm
+    version: 1.00
+  Array::Stream::Transactional::Matcher::Value::ge:
+    file: lib/Array/Stream/Transactional/Matcher/Value.pm
+    version: 1.00
+  Array::Stream::Transactional::Matcher::Value::gt:
+    file: lib/Array/Stream/Transactional/Matcher/Value.pm
+    version: 1.00
+  Array::Stream::Transactional::Matcher::Value::isa:
+    file: lib/Array/Stream/Transactional/Matcher/Value.pm
+    version: 1.00
+  Array::Stream::Transactional::Matcher::Value::le:
+    file: lib/Array/Stream/Transactional/Matcher/Value.pm
+    version: 1.00
+  Array::Stream::Transactional::Matcher::Value::lt:
+    file: lib/Array/Stream/Transactional/Matcher/Value.pm
+    version: 1.00
+  Array::Stream::Transactional::Matcher::Value::ne:
+    file: lib/Array/Stream/Transactional/Matcher/Value.pm
+    version: 1.00
+generated_by: Module::Build version 0.21

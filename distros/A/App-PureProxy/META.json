@@ -1,0 +1,54 @@
+{
+   "abstract" : "a Pure Perl HTTP proxy server",
+   "author" : [
+      "Piotr Roszatycki <dexter@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-PureProxy",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Plack::Middleware::TrafficLog" : "0"
+         },
+         "requires" : {
+            "Plack::App::Proxy::Backend::HTTP::Tiny" : "0",
+            "Plack::Middleware::Proxy::Connect::IO" : "0",
+            "Plack::Middleware::Proxy::Requests" : "0",
+            "Starlight" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "App::PureProxy" : {
+         "file" : "lib/App/PureProxy.pm",
+         "version" : "0.0100"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/dex4er/PureProxy/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/dex4er/PureProxy"
+      }
+   },
+   "version" : "0.0100"
+}

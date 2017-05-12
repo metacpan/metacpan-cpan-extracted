@@ -1,0 +1,13 @@
+Acme-WTF-0.02_03.tar.gz
+Changes
+ignore.txt
+lib/Acme/WTF.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/sum.t

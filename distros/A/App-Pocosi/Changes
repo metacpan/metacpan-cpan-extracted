@@ -1,0 +1,15 @@
+Revision history for App-Pocosi
+
+0.03  Sat Jul 30 00:14:24 GMT 2011
+    - Strip the unhelpful "at FOO line BAR" suffix from eval errors in the
+      console UI
+    - Test isa() after creating components and plugins
+
+0.02  Wed May 25 06:24:58 GMT 2011
+    - Replaced the IO wrapping code in ReadLine.pm with IO::WrapOutput
+    - Depend on Term::Cap and Term::ReadKey, which are needed by
+      POE::Wheel::ReadLine
+
+0.01  Sun May 22 17:37:21 GMT 2011
+    - Initial release
+

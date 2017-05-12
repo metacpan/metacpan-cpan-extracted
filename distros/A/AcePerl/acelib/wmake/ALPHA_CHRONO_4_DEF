@@ -1,0 +1,28 @@
+# $Id: ALPHA_CHRONO_4_DEF,v 1.1 2002/11/14 20:00:06 lstein Exp $
+
+#################################################################
+############### acedb: R.Durbin and J.Thierry-Mieg ##############
+########### wmake/DEC_ALPHA_DEF    March-18-1993       ##########
+#################################################################
+
+#################################################################
+########## Machine dependant compiler modification ##############
+####### for the DEC-Alpha 3000 model 500 running Unix ###########
+#################################################################
+########### This file is included by wmake/truemake #############
+######  Edit this file to adapt the ACeDB to a new machine ######
+#####   following the explanations given in wmake/truemake  #####
+#################################################################
+
+NAME = ALPHA
+COMPILER = cc -g -std1 -DACEDB4 -DCHRONO
+LINKER = cc
+
+LIBS = -lm 
+
+.c.o:
+	$(CC)  $*.c
+
+#################################################################
+#################################################################
+

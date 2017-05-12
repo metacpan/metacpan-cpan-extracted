@@ -1,0 +1,41 @@
+AxKit2 Changes
+
+These are just what seemed relevant for the release. For a full timeline see
+http://trac.axkit.org/axkit2/timeline
+
+1.1
+    --  Only load Data::Dumper and Devel::GC::Helper in the forked process when
+        doing "leaks" in the console so as not to bloat the parent.
+    --  Many fixes to serve_file
+    --  Continuation support
+    --  Much improved error handling
+    --  Implemented error output for most non-OK responses
+    --  Improved gallery speed
+    --  Made keep-alives work
+    --  Numerous performance improvements
+    --  New config directive system
+    --  Added typeless_uri plugin
+    --  Work around a bug in debian's libxml-perl-sax-base
+    --  Fix small security hole in doc_viewer plugin
+    --  Implemented test framework (and some tests)
+    --  Fully implement AIO versions of uri_to_file and serve_file
+    --  Support HTTP/0.9 requests
+    --  Support If-Modified-Since/Last-Modified in serve_file
+    --  Fully fix path_info parsing to be same as Apache HTTPD
+    --  Added typeless URI plugin
+    --  Added LOADS of documentation
+    --  New plugin configuration API allows plugins to add config items
+        trivially with almost zero code
+    --  Accept inbound connections faster
+    --  Added initial version of webmail plugin
+    --  Added parse_post_data plugin (for parsing POST request data)
+    --  Added spod5 presentation sytem (better than AxPoint!)
+    --  Support dumping the stack trace in the log for error_xml plugin
+    --  Added generic_transform plugin, a static transformation pipeline
+        builder as it was common in AxKit1
+    --  Added moewiki - a tiny AxKit2 wiki in 30 lines of code
+    --  Added a favicon.ico
+
+1.0
+    -- Initial release
+

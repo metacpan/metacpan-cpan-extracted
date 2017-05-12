@@ -1,0 +1,42 @@
+Alien::Base is a base class and framework for creating Alien 
+distributions.  The goal of the project is to make things as simple and 
+easy as possible for both developers and users of Alien modules.
+
+Alien is a Perl namespace for defining dependencies in CPAN for 
+libraries and tools which are not "native" to CPAN.  Alien modules will 
+typically use the system libraries if they are available, or download 
+the latest version from the internet and build them from source code. 
+These libraries can then be used by other Perl modules, usually modules 
+that are implemented with XS or FFI.
+
+To install Alien::Base, use cpanminus:
+
+ cpanm Alien::Base
+ 
+Once installed you can read the project documentation using the perldoc 
+command, or via the metacpan.org website.  If you are an Alien 
+developer, see the authoring documentation:
+
+ perldoc Alien::Base::Authoring
+ http://metacpan.org/pod/Alien::Base::Authoring
+
+The FAQ also contains hints on dealing with specific challenges, like 
+dealing with specific tools:
+
+ perldoc Alien::Base::FAQ
+ http://metacpan.org/pod/Alien::Base::FAQ
+
+If you are a user of an Alien module, you will likely be more interested 
+in the Alien::Base interface itself:
+
+ perldoc Alien::Base
+ http://metacpan.org/pod/Alien::Base
+
+For questions that aren't answered in the documentation, please feel 
+free to contact the Alien::Base team:
+
+ * IRC: #native on irc.perl.org
+ * mailing list at https://groups.google.com/forum/#!forum/perl5-alien
+ * GitHub issue tracker at https://github.com/Perl5-Alien/Alien-Base/issues
+
+

@@ -1,0 +1,20 @@
+Build.PL
+Changes
+COPYING
+inc/Test/Run/Builder.pm
+lib/App/XML/DocBook/Builder.pm
+lib/App/XML/DocBook/Docmake.pm
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+script/bump-version-number.pl
+script/docmake
+script/tag-release.pl
+t/00-load.t
+t/01-use.t
+t/boilerplate.t
+t/cpan-changes.t
+t/pod-coverage.t
+t/pod.t
+t/style-trailing-space.t
+META.json

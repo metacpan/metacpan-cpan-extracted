@@ -1,0 +1,5 @@
+$Id$
+
+- It would be nice if we could link straight to the login form without going
+  through the subrequests (Possibly use config directive
+  TicketLoginDefaultURI?).

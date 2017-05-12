@@ -1,0 +1,365 @@
+<html>
+<head>
+  <script src="../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <link href="GvaScript_doc.css" rel="stylesheet" type="text/css">
+  <script>
+    document.observe('dom:loaded', function() { new GvaScript.TreeNavigator('TN_tree'); });
+    function jumpto_href(event) {
+      var label = event.controller.label(event.target);
+      if (label && label.tagName == "A") {
+        label.focus();
+        return Event.stopNone;
+      }
+    }
+  </script>
+</head>
+<body>
+<div id='TN_tree'>
+  <div class="TN_node">
+   <h1 class="TN_label">Alien::GvaScript::Repeat</h1>
+   <div class="TN_content">
+     <p><em>Support for repeated sections
+</em></p>
+     <div class="TN_node"  onPing="jumpto_href">
+       <h3 class="TN_label">Table of contents</h3>
+       <div class="TN_content">
+         <div class="TN_leaf">
+  <a class="TN_label" href="#NAME">NAME</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#SYNOPSIS">SYNOPSIS</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#DESCRIPTION">DESCRIPTION</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Terminology">Terminology</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#HTML">HTML</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Markup_of_repeat_elements">Markup of repeat elements</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#String_substitutions_within_repeat_elements">String substitutions within repeat elements</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#METHODS">METHODS</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#init">init</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#add">add</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#remove">remove</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#EVENTS">EVENTS</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#onAdd">onAdd</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#onRemove">onRemove</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#SEE_ALSO">SEE ALSO</a>
+  <div class="TN_content"></div>
+</div>
+
+       </div>
+     </div>
+     <hr/>
+   </div>
+  </div>
+  <div class="TN_node" id="NAME">
+    <h2 class="TN_label">NAME</h2>
+    <div class="TN_content">
+      <p>Alien::GvaScript::Repeat - Support for repeated sections</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="SYNOPSIS">
+    <h2 class="TN_label">SYNOPSIS</h2>
+    <div class="TN_content">
+      <pre>  &lt;div repeat="foo"&gt;
+    &lt;h2&gt;Foo #{foo.count}&lt;/h2&gt;
+    This is the repeated foo section
+    &lt;table&gt;
+      &lt;tr repeat="bar"&gt;
+        &lt;td&gt;Item #{bar.count}&lt;/td&gt;
+        &lt;td&gt;&lt;input name="#{bar.path}.buz"&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;button onclick="GvaScript.Repeat.remove('#{bar.path}')"&gt;
+              Remove this row
+            &lt;/button&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+     &lt;button onclick="GvaScript.Repeat.add('#{foo.path}.bar')"&gt;
+        Add a bar
+     &lt;/button&gt;
+  &lt;/div&gt;  
+  &lt;button onclick="GvaScript.Repeat.add('foo')"&gt;Add a foo&lt;/button&gt;
+
+  &lt;script&gt;
+    GvaScript.Repeat.init(document.body);
+  &lt;/script</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="DESCRIPTION">
+    <h2 class="TN_label">DESCRIPTION</h2>
+    <div class="TN_content">
+      <p>This module of <i>Alien::GvaScript</i> implements a mechanism for repeated
+elements within an HTML page. The main use is within forms, for
+dynamic expansion of subforms, so it is quite likely that you will
+want to use the <i>Alien::GvaScript::Form</i> API instead of calling the
+present module directly. However, the repeat mechanism will work for
+any kind of HTML element.</p>
+<p>The design is partially inspired by the <code>Web Forms 2.0</code> proposal
+(<a href="http://www.whatwg.org/specs/web-forms/current-work/">http://www.whatwg.org/specs/web-forms/current-work/</a>), but is 
+not an attempt to implement the proposed specification: there are
+some differences both in syntax and in semantics.</p>
+  <div class="TN_node" id="Terminology">
+    <h3 class="TN_label">Terminology</h3>
+    <div class="TN_content">
+      <p>At initialization stage, the DOM is inspected for finding
+<i>repeat elements</i> (elements having a <code>repeat</code> attribute).
+These elements are removed from the DOM and replaced
+by <i>placeholders</i> (empty DOM elements, just marking where
+the repetition blocks should be inserted).
+Each placeholder stores a <i>template</i>, which is 
+a plain string representation of the repeat element, with 
+special markup for template instanciation. 
+The template may then be dynamically instanciated into
+<i>repetition blocks</i> by calling the <a href="#add">/add</a> method.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="HTML">
+    <h2 class="TN_label">HTML</h2>
+    <div class="TN_content">
+        <div class="TN_node" id="Markup_of_repeat_elements">
+    <h3 class="TN_label">Markup of repeat elements</h3>
+    <div class="TN_content">
+      <pre>  &lt;div repeat="foo" repeat-start="3" repeat-min="2" repeat-max="6" 
+                    repeat-prefix=""&gt;
+    &lt;!-- content to be repeated, using #{foo.ix}, #{foo.path}, etc. --&gt;
+  &lt;/div&gt;</pre>
+
+<p>Any element marked with a non-empty <code>repeat</code> attribute is
+a <i>repeat element</i>; the value of that attribute defines
+the <i>repeat name</i>. Repeat elements can be nested, and their
+repeat names are used to distinguish at which level a repetition
+block should be instanciated.</p>
+<p>Other attributes of the repetion model all start with 
+the <code>repeat</code> prefix, as listed below; these attributes are optional.</p>
+<ul>
+<li><a name="item_repeat"></a><b>repeat</b>
+<p>marks the element as a repeat element, and defines the repeat name.</p>
+</li>
+<li><a name="item_repeat_start"></a><b>repeat-start</b>
+<p>defines how many repetition blocks should be automatically
+created as initialization time. Default is 1.</p>
+</li>
+<li><a name="item_repeat_min"></a><b>repeat-min</b>
+<p>minimum number of repetition blocks. Prevents deletion
+of repetition blocks under that number. Default is 0.</p>
+</li>
+<li><a name="item_repeat_max"></a><b>repeat-max</b>
+<p>maximum number of repetition blocks. Prevents addition
+of repetition blocks over that number. Default is 99.</p>
+</li>
+<li><a name="item_repeat_prefix"></a><b>repeat-prefix</b>
+<p>defines the initial fragment of the <code>repeat path</code> (see 
+explanation below). Only valid for top-level repetition elements, 
+because nested repetition elements are automatically prefixed
+by their parent repetition element. Default is the empty string.</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="String_substitutions_within_repeat_elements">
+    <h3 class="TN_label">String substitutions within repeat elements</h3>
+    <div class="TN_content">
+      <p>The content of a repeat element may contain special markup
+for repetition variables, which will be replaced by values
+when the element is instanciated into a repetition block.</p>
+<p>Variables are written <code>#{&lt;repetition name&gt;.&lt;variable&gt;}</code>, like for
+example <code>#{foo.ix}</code>, <code>#{foo.count}</code> or <code>#{bar.path}</code>. The
+repetition name is the value of the <code>repeat</code> attribute of the repeat
+element, as explained above; in this namespace, the following
+variables are defined</p>
+<ul>
+<li><a name="item_count"></a><b>count</b>
+<p>current number of repetition blocks for that repeat element, starting at 1.</p>
+</li>
+<li><a name="item_ix"></a><b>ix</b>
+<p>integer index of the current repetition block, starting at 0.</p>
+</li>
+<li><a name="item_path"></a><b>path</b>
+<p>cumulated list of repetition name and repetition indices, separated
+by dots.</p>
+</li>
+<li><a name="item_min"></a><b>min</b>
+<p>value of the <code>repeat-min</code> attribute.</p>
+</li>
+<li><a name="item_max"></a><b>max</b>
+<p>value of the <code>repeat-max</code> attribute.</p>
+</li>
+</ul>
+<p>The <code>path</code> is unique within any nesting of repeat elements,
+and therefore is typically used for ids or for
+names of input elements :</p>
+<pre>  &lt;tr repeat="bar"&gt;
+    &lt;td&gt;Item #{bar.count}&lt;/td&gt;
+    &lt;td&gt;&lt;input name="#{bar.path}.buz"&gt;&lt;/td&gt;
+  &lt;/tr&gt;</pre>
+
+<p>Within the 3rd repetition block of <code>bar</code>, nested
+within the 2nd repetition block of <code>foo</code>, the value of
+<code>#{bar.path}</code> will be <code>foo.2.bar.3</code> and therefore
+in this example the input name would be
+<code>foo.2.bar.3.buz</code>.</p>
+<p><i>Implementation note</i>: the <code>#{...}</code> syntax for
+variables is borrowed from <code>prototype.js</code>'s <code>Template</code>
+class; however, the implementation of substitutions
+is done in plain javascript, without calling
+<code>Template.evaluate()</code> method.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="METHODS">
+    <h2 class="TN_label">METHODS</h2>
+    <div class="TN_content">
+        <div class="TN_node" id="init">
+    <h3 class="TN_label">init</h3>
+    <div class="TN_content">
+      <pre>  GvaScript.Repeat.init(element)</pre>
+
+<p>Walks down the DOM under the given element, finds all 
+elements having a <code>repeat</code> attribute, replaces these
+by placeholders.</p>
+<p>The <code>element</code> argument will be fed to <code>prototype.js</code>'s
+<code>$()</code> function, so it can be either a DOM element or
+an id string.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="add">
+    <h3 class="TN_label">add</h3>
+    <div class="TN_content">
+      <pre>  GvaScript.Repeat.add(repeat_name, count)</pre>
+
+<p>Creates one or several new repetition blocks in the DOM, 
+after the current blocks, by instanciating
+the repeat element <code>repeat_name</code> (including prefix).
+The  <code>count</code> argument is optional and states how many blocks
+should be added; default is 1. Returns the final number of 
+repetition blocks for that repeat element.</p>
+<p>If the repeat structure looks like</p>
+<pre>  &lt;div repeat="foo" repeat-prefix="top"&gt;
+     &lt;div repeat="bar"&gt;</pre>
+
+<p>then a new <code>foo</code> repetition block is instanciated
+through <code>add('top.foo')</code>, and a new <code>bar</code> repetition
+block is instanciated through <code>add('#{foo.path}.bar')</code>.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="remove">
+    <h3 class="TN_label">remove</h3>
+    <div class="TN_content">
+      <pre>  GvaScript.Repeat.remove(repetition_block[, live_update])</pre>
+
+<p>Removes a repetition block from the DOM. The argument is either
+a DOM element or a string containing the element id.</p>
+<p>param <code>Boolean</code> live_update: flag to indicate whether the 'remaining'
+repeatable sections are to be also removed from DOM, recreated by re-merging
+the data with repeat template, then finally re-appended to the DOM.
+Default true.</p>
+<p>All repetition blocks below the removed block are renumbered,
+leaving no hole in the index sequence. To do so, these
+blocks are also removed from the DOM, and then added
+again through the <a href="#add">/add</a> method.</p>
+<p>If the repetition block is within a form, you probably
+want to call <i>Alien::GvaScript::Form/remove</i> instead
+of the present method, in order to properly preserve
+current form data.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="EVENTS">
+    <h2 class="TN_label">EVENTS</h2>
+    <div class="TN_content">
+      <p>For a general explanation on registering handlers
+for GvaScript events, see the <i>event</i> documentation.</p>
+  <div class="TN_node" id="onAdd">
+    <h3 class="TN_label">onAdd</h3>
+    <div class="TN_content">
+      <pre>  &lt;div repeat="Foo" 
+       onAdd="alert('a new Foo is born with index #{Foo.ix}')"&gt;</pre>
+
+<p>This event is triggered whenever a new repetition block
+is created through the <a href="#add">/add</a> method
+(including when the <a href="#init">/init</a> method
+instantiates <code>repeat-start</code> initial repetition blocks).</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="onRemove">
+    <h3 class="TN_label">onRemove</h3>
+    <div class="TN_content">
+      <pre>  &lt;div repeat="Foo" 
+       onRemove="alert(event.target.id + ' is removed')"&gt;</pre>
+
+<p>This event is triggered whenever a repetition block
+is removed through the <a href="#remove">/remove</a> method.
+Since this method also removes all repetition blocks
+above the requested block, the event will be triggered
+once for each block.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="SEE_ALSO">
+    <h2 class="TN_label">SEE ALSO</h2>
+    <div class="TN_content">
+      <p><i>Alien::GvaScript</i></p>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

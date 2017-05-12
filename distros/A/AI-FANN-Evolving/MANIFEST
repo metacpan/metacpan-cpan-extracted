@@ -1,0 +1,23 @@
+lib/AI/FANN/Evolving.pm
+lib/AI/FANN/Evolving/Chromosome.pm
+lib/AI/FANN/Evolving/Experiment.pm
+lib/AI/FANN/Evolving/Factory.pm
+lib/AI/FANN/Evolving/Gene.pm
+lib/AI/FANN/Evolving/TrainData.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README.md
+script/aivolver
+t/00-load.t
+t/01-run.t
+t/02-data.t
+t/03-fann-wrapper.t
+t/perl-critic.t
+t/perlcriticrc
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

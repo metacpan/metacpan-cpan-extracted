@@ -1,0 +1,30 @@
+Revision history for Array-Set
+
+0.05    2016-09-16 (PERLANCAR)
+
+	- [optimize] Provide fast version of symdiff/union when
+	  ignore_{blanks,space} are not enabled.
+
+
+0.04    2016-09-15 (PERLANCAR)
+
+	- [optimize] Delay loading Tie::IxHash until needed.
+
+
+0.03    2016-09-15 (PERLANCAR)
+
+	- [optimize] Provide fast version of diff/intersect when
+	  ignore_{blanks,case} are not enabled.
+
+
+0.02    2015-11-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add note about performance; mention Set::Array,
+	  Array::AsObject, Set::Object, Set::Tiny.
+
+
+0.01    2015-11-13 (PERLANCAR)
+
+        - First release.

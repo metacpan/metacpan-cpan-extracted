@@ -1,0 +1,10 @@
+v 000.400.000 2015-12-03
+  * Breaking changes - probably not an issue as no one uses this module :)
+      * most methods now require arguments to be passed in a hashref
+  * queue wildcards
+  * pub-sub features
+  * semantic version number
+v0.3 2014-04-14
+  * fix testing, so it does not attempt SQLite on platforms that do not have it
+v0.2 2014-04-11
+	* first release to CPAN and github

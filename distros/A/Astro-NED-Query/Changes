@@ -1,0 +1,70 @@
+0.31  Mon Jan 11 12:04:41 EST 2010
+
+        * Handle new NED output column, "Mag./Filter".
+
+0.30  Tue Oct 30 16:46:07 EDT 2007
+
+	* NED output has added "Spectra" column which caused "RA" column to be
+	  mismatched.
+
+	* improved internal checks on column matching and added data
+	  validity checks to (hopefully) prevent future silent errors
+	  if NED output format changes.
+
+	* new Response::Object::dumpstr method; dump method has added
+	  parameter.
+
+0.20  Mon Oct 29 18:54:53 EDT 2007
+
+	* Astro::Ned::Query::reset and set_default methods are now
+	  set_to_defaults and save_as_defaults.  The old method names are
+	  now deprecated.
+	
+	* Astro::Ned::Query::set_to_defaults should actually do something now.
+	
+	* passing field values via the Astro::Ned::Query::XXX constructor
+	  didn't work.
+	
+	* internal and test cleanups to modernize things and make
+	  perlcritic --brutal happier
+	
+0.12  Thu Sep 20 19:57:38 EDT 2007
+        - make work with modern versions of WWW::Mechanize
+	- added perlcritic & pod coverage tests
+	- internal mods to clean things up a bit.
+
+2004-12-20 22:58  Diab Jerius  <djerius@cfa.harvard.edu>
+
+	* Version 0.11
+	* Makefile.PL, lib/Astro/NED/Query.pm: [no log message]
+
+2004-12-20 22:58  Diab Jerius  <djerius@cfa.harvard.edu>
+
+	* Version 0.1
+	* t/: byname.t, nearname.t, nearposn.t: minor changes to work with
+	  current NED database results
+	* lib/Astro/NED/Response/Objects.pm: NED now provides diameter data
+	* lib/Astro/NED/Query/CoordExtinct.pm, t/coordextinct.t,
+	  lib/Astro/NED/Response/CoordExtinct.pm: new interface to
+	  coordinate transforms and galactic extinction
+
+2003-02-06 11:45  Diab Jerius  <djerius@cfa.harvard.edu>
+
+	* Changes, LICENSE, MANIFEST, MANIFEST.SKIP, Makefile.PL, README,
+	  lib/Astro/NED/Query.pm, lib/Astro/NED/Query/ByName.pm,
+	  lib/Astro/NED/Query/NearName.pm,
+	  lib/Astro/NED/Query/NearPosition.pm,
+	  lib/Astro/NED/Query/Objects.pm, lib/Astro/NED/Response/Object.pm,
+	  lib/Astro/NED/Response/Objects.pm, t/byname.t, t/nearname.t,
+	  t/nearposn.t: Initial revision
+
+2003-02-06 11:45  Diab Jerius  <djerius@cfa.harvard.edu>
+
+	* Changes, LICENSE, MANIFEST, MANIFEST.SKIP, Makefile.PL, README,
+	  lib/Astro/NED/Query.pm, lib/Astro/NED/Query/ByName.pm,
+	  lib/Astro/NED/Query/NearName.pm,
+	  lib/Astro/NED/Query/NearPosition.pm,
+	  lib/Astro/NED/Query/Objects.pm, lib/Astro/NED/Response/Object.pm,
+	  lib/Astro/NED/Response/Objects.pm, t/byname.t, t/nearname.t,
+	  t/nearposn.t: [no log message]
+

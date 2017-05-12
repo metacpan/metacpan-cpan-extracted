@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+XS.xs
+t/Algorithm-StringHash-FromCSharp35-XS.t
+t/01.t
+lib/Algorithm/StringHash/FromCSharp35/XS.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,25 @@
+NAME
+    Alt::Date::Extract::SHARYANTO - SHARYANTO's alternate implementation of
+    Date::Extract
+
+VERSION
+    version 0.05.01
+
+DESCRIPTION
+    This alternate implementation contains some things that are not (yet) in
+    Date::Extract. Currently this includes:
+
+    *   The 'combined' format
+
+SEE ALSO
+    Alt
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

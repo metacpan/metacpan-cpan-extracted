@@ -1,0 +1,34 @@
+NAME
+    Apache::Session::Generate::AutoIncrement - Use monotonically increasing
+    IDs
+
+SYNOPSIS
+     use Apache::Session::Generate::AutoIncrement;
+ 
+     $id = Apache::Session::Generate::AutoIncrement::generate();
+
+DESCRIPTION
+    This module fulfills the ID generation interface of Apache::Session. The
+    IDs are generated using a monotonically increasing counter value. This
+    counter is file-based using the File::Counter module, so it is probably
+    not very efficient and fast.
+
+    This module can also examine session IDs to ensure that they are,
+    indeed, session ID numbers and not evil attacks. The reader is
+    encouraged to consider the effect of bogus session ID numbers in a
+    system which uses these ID numbers to access disks and databases.
+
+    This modules takes two arguments in the usual Apache::Session style. The
+    first argument is IDLength, and the value, between 0 and 32, tells this
+    modulevwhere to truncate the session ID. Without this argument, the
+    session ID will be 10 digits. The second argument is CounterFile, which
+    is the file in which the counted value will reside. This parameter is
+    given directly to the File::Counter module.
+
+AUTHOR
+    This module was written by Pascal Fleury <fleury@users.sourceforge.net>.
+
+
+SEE ALSO
+    the Apache::Session manpage, the File::Counter manpage
+

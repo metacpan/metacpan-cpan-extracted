@@ -1,0 +1,59 @@
+{
+   "abstract" : "L<GTK>-based interactive explorer for L<Devel::MAT>",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Devel-MAT-Explorer-GTK",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Devel::MAT" : "0.23",
+            "File::ShareDir" : "0",
+            "Glib" : "0",
+            "Gtk2" : "0",
+            "Gtk2::SimpleList" : "0",
+            "List::Util" : "1.29",
+            "List::UtilsBy" : "0",
+            "Struct::Dumb" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Devel::MAT::Explorer::GTK" : {
+         "file" : "lib/App/Devel/MAT/Explorer/GTK.pm",
+         "version" : "0.03"
+      },
+      "App::Devel::MAT::Explorer::GTK::Resources" : {
+         "file" : "lib/App/Devel/MAT/Explorer/GTK/Resources.pm",
+         "version" : "0.03"
+      },
+      "App::Devel::MAT::Explorer::GTK::SVDetail" : {
+         "file" : "lib/App/Devel/MAT/Explorer/GTK/SVDetail.pm",
+         "version" : "0.03"
+      },
+      "App::Devel::MAT::Explorer::GTK::Utils" : {
+         "file" : "lib/App/Devel/MAT/Explorer/GTK/Utils.pm"
+      },
+      "App::Devel::MAT::Explorer::GTK::Widgets" : {
+         "file" : "lib/App/Devel/MAT/Explorer/GTK/Widgets.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

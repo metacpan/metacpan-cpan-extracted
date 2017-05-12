@@ -1,0 +1,49 @@
+Revision history for App-Rangeops
+
+0.1.0 2017-05-07T19:44:32Z
+    - Switch to Minilla
+    - Mature enough
+
+0.0.14  2016-12-09 22:16:36 CST
+    - Release to CPAN
+
+0.0.13  2016-07-07 22:34:11 CST
+    - Add codecov badge
+
+0.0.12  2016-06-30 11:11:13 CST
+    - Add --name to command create
+
+0.0.11  2016-06-26 09:15:16 CST
+    - Simplify command create
+    - Improve command clean
+
+0.0.10  2016-06-26 07:29:30 CST
+    - Add --bundle to command clean
+
+0.0.9  2016-06-25 23:28:28 CST
+    - Command create
+
+0.0.8  2016-06-24 03:36:08 CST
+    - Command circos
+
+0.0.7  2016-06-23 02:28:24 CST
+    - Command filter
+
+0.0.6  2016-06-22 20:41:02 CST
+    - Internal cleanup
+
+0.0.5  2016-06-20 02:35:23 CST
+    - Command connect
+
+0.0.4  2016-06-19 13:05:09 CST
+    - Rename command replace to clean
+
+0.0.3  2016-06-19 11:34:45 CST
+    - Command replace
+
+0.0.2  2016-06-19 08:15:16 CST
+    - Command sort
+
+0.0.1  2016-06-19 04:38:49 CST
+    - Init commit
+    - Command merge works

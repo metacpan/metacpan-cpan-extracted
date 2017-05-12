@@ -1,0 +1,45 @@
+Revision history for Perl extension App::FQStat.
+
+6.3  Wed Mar 18 15:08 2009
+  - Summary mode!
+  - In summary mode, optionally either collapses all jobs of each
+    user into one line with a brief status count and avrg. prio. and
+    run time or collapses only jobs with similar names.
+  - Copyright date update.
+  - Miscellaneous small bug fixes.
+
+6.2  Mon Oct  9 14:25 2008
+  - Save/load/delete named color schemes.
+  - Two color schemes to choose from by default.
+  - More dynamic menu generation.
+
+6.1  Mon Oct  6 14:25 2008
+  - Configurable color scheme.
+  - Eliminate various imports to save a grand total of 1MB of memory.
+
+6.0  Mon Oct  6 11:21 2008
+  - Restart self after four hours to prevent currently unfixable
+    memory leak from making my collegues kill me.
+  - Display a friendly "initializing" warning during the initial
+    job scan.
+
+5.9  Mon Jul 21 14:11 2008
+  - Jobs-in-deletion should be highlighted as a problem.
+
+5.8  Fri Jul 18 15:37 2008
+  - Change user highlight color scheme.
+
+5.7  Fri Jul  4 12:01 2008
+g(x)*x^(-g)+c*log(x)^2*x^(-g)
+  - Highlight current user by default.
+
+5.6  Fri Jul  4 11:24 2008
+  - Fix bug wrt display offset when going from 
+    a display with many jobs to an empty display.
+
+5.5  Wed May 14 11:00 2008
+  - Add support for four-chars wide statuses.
+
+5.4  Fri May  9 14:23 2008
+  - original version
+

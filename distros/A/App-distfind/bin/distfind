@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+# ABSTRACT: Find Perl module distributions within a directory hierarchy
+use warnings;
+use strict;
+use App::distfind;
+App::distfind->run;
+

@@ -1,0 +1,159 @@
+#!/usr/bin/perl -w
+use v5.14;
+
+use App::Statsbot;
+use Getopt::Long;
+use sigtrap qw/die normal-signals/;
+
+GetOptions(
+	'debug!'     => \$App::Statsbot::DEBUG,
+	'tick=i'     => \$App::Statsbot::TICK,
+	'nickname=s' => \$App::Statsbot::NICKNAME,
+	'server=s'   => \$App::Statsbot::SERVER,
+	'port=i'     => \$App::Statsbot::PORT,
+	'ssl!'       => \$App::Statsbot::SSL,
+	'channel=s'  => \@App::Statsbot::CHANNELS,
+	'db=s'       => \$App::Statsbot::DB,
+);
+
+App::Statsbot->run;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+statsbot - simple IRC bot that tracks time spent in a channel
+
+=head1 SYNOPSIS
+
+  statsbot --nickname=sbot --channel='#somechan'
+  # Bot will respond to queries of the forms:
+  # < mgv> !presence mgv
+  # < mgv>   presence mgv '1 day'
+  # < mgv> BOTNICK: !presence mgv '1 year' 2
+  # < mgv> BOTNICK,    presence   mgv
+  # < mgv>   !help
+  # < mgv> BOTNICK:    help
+  # < mgv> BOTNICK,  help
+
+=head1 DESCRIPTION
+
+statsbot is a simple IRC bot that tracks the people that inhabit a
+channel. It is able to answer queries of the form "In the last <time
+interval>, how much time did <nick> spend in this channel?".
+
+It responds to queries of the form C<presence NICK [TIME
+[PRECISION]]>, optionally preceded by C<BOTNICK:> or C<BOTNICK,>.
+There can also be an optional "!" sign before the word "presence".
+
+where BOTNICK is the nickname of the bot, NICK is the nickname of a
+channel inhabitant, TIME is the interval that is considered, and
+PRECISION is the number of units to display. For example, if a
+PRECISION of 3 yields "1 hour, 2 minutes and 10 seconds", a PRECISION
+of 2 would yield "1 hour and 2 minutes" while a PRECISION of 1 would
+yield "1 hour".
+
+By default, the interval that is considered is one day and the result
+is displayed in hours.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--debug>, B<--no-debug>
+
+If B<--debug>, prints some debug information. Defaults to B<--no-debug>.
+
+=item B<--tick>=I<60>
+
+How often (in seconds) to poll the channel for nicks. Defaults to 10
+seconds.
+
+=item B<--nickname>=I<"timebot">
+
+The nickname of the bot. Defaults to "statsbot".
+
+=item B<--server>=I<"irc.oftc.net">
+
+The IRC server. Defaults to "irc.freenode.net".
+
+=item B<--port>=I<6697>
+
+The port. Defaults to 6667.
+
+=item B<--ssl>, B<--no-ssl>.
+
+If B<--ssl>, connect via SSL. Defaults to B<--no-ssl>.
+
+=item B<--channel>=I<"#mychan">
+
+The channel that should be monitored. Multiple channels can be
+monitored by repeating this option.
+
+=item B<--db>=I</path/to/some/file.sqlite>
+
+Path to SQLite database. Must be writable. Will be created if it does
+not exist. Defaults to C</var/lib/statsbot/db>.
+
+=back
+
+=head1 ENVIRONMENT
+
+All options can be passed via the environment. If an option is passed both as an environment variable and as an argument, the argument takes priority.
+
+=over
+
+=item B<STATSBOT_DEBUG>=I<1>
+
+Equivalent to B<--debug>.
+
+=item B<STATSBOT_TICK>=I<60>
+
+Equivalent to B<--tick>=I<60>.
+
+=item B<STATSBOT_NICKNAME>=I<"timebot">
+
+Equivalent to B<--nickname>=I<"timebot">.
+
+=item B<STATSBOT_SERVER>=I<"irc.oftc.net">
+
+Equivalent to B<--server>=I<"irc.oftc.net">.
+
+=item B<STATSBOT_PORT>=I<6697>
+
+Equivalent to B<--port>=I<6697>.
+
+=item B<STATSBOT_SSL>=I<1>
+
+Equivalent to B<--ssl>.
+
+=item B<STATSBOT_CHANNELS>=I<"#mychan #otherchan">
+
+Equivalent to B<--channel>=I<#mychan> B<--channel>=I<#otherchan>.
+
+=item B<STATSBOT_DB>=I<"/path/to/some/file.sqlite">
+
+Equivalent to B<--db>=I<"/path/to/some/file.sqlite">.
+
+=back
+
+=head1 SEE ALSO
+
+L<App::Statsbot>
+
+=head1 AUTHOR
+
+Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013-2016 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

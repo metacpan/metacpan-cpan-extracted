@@ -1,0 +1,125 @@
+NAME
+    Acme::ComeFrom - Parallel Goto-in-reverse
+
+VERSION
+    This document describes version 0.10 of Acme::ComeFrom, released October
+    14, 2007.
+
+SYNOPSIS
+        use Acme::ComeFrom;
+
+        sub func { print "@_" }; func("Start\n");
+        print "This won't happen\n";
+
+        comefrom &func; print "Branch 1\n"; exit;
+        comefrom &func; print "Branch 2\n";
+
+        label: print "This won't happen either\n";
+
+        comefrom label; print "Branch 2.1\n"; exit;
+        comefrom label; print "Branch 2.2\n";
+
+        EXPR0: print "To be\n"; exit;
+        comefrom "EXPR".int(rand(2)); print "Not to be\n";
+
+DESCRIPTION
+    INTERCAL programmers have for a long time monopolized the enormously
+    powerful construct "COME FROM", both as a flow-control replacement to
+    "goto", and as a simple way to mark parallel execution branches in the
+    multi-thread variant.
+
+    But now, with Acme::ComeFrom, we Perl hackers can finally be on par with
+    them in terms of wackiness, if not in obfuscation.
+
+    Just like "goto", "comefrom" comes in three different flavors:
+
+    comefrom LABEL
+        The "comefrom-LABEL" form finds the statement labeled with "LABEL"
+        and jumps to the "comefrom" each time just *before* that statement's
+        execution. The "comefrom" may not be inside any construct that
+        requires initialization, such as a subroutine or a "foreach" loop,
+        unless the targeting "LABEL" is also in the same construct.
+
+    comefrom EXPR
+        The "comefrom-EXPR" form expects a label name, whose scope will be
+        resolved dynamically. This allows for computed "comefrom"s by
+        checking the "EXPR" before every label (a.k.a. watchpoints), so you
+        can write:
+
+            # $i below evaluates in the LABEL's scope
+            comefrom ("FOO", "BAR", "GLARCH")[$i];
+
+        Starting from version 0.05, the value of EXPR is evaluated each
+        time, instead of the old *frozen at the first check* behaviour. If
+        this breaks your code -- as if there's any code based on comefrom --
+        You may retain the original behaviour by assigning a true value to
+        $Acme::ComeFrom::CacheEXPR.
+
+    comefrom &NAME
+        The "comefrom-&NAME" form is quite different from the other forms of
+        "comefrom". In fact, it isn't a comefrom in the normal sense at all,
+        and doesn't have the stigma associated with other "comefrom"s.
+        Instead, it installs a post-processing handler for the subroutine,
+        and a jump would be made just *after* the subroutine's execution.
+
+    If two or more "comefrom" were applied to the same LABEL, EXPR or NAME,
+    they will be executed simultaneously via "fork()". The forking are
+    ordered by their occurrances, with the parent process receiving the last
+    one.
+
+BUGS
+    This module does not really parse perl; it guesses label names quite
+    accurately, but the regex matching the "comefrom" itself could catch
+    many false-positives. Perhaps some day a brave soul somewhere will
+    volunteer to patch this module to use PPI instead...
+
+ACKNOWLEDGEMENTS
+    To the INTERCAL language, for its endless inspiration.
+
+    As its manual states: "The earliest known description of the COME FROM
+    statement in the computing literature is in [R. L. Clark, "A linguistic
+    contribution to GOTO-less programming," Commun. ACM 27 (1984), pp.
+    349-350], part of the famous April Fools issue of CACM. The subsequent
+    rush by language designers to include the statement in their languages
+    was underwhelming, one might even say nonexistent. It was therefore
+    decided that COME FROM would be an appropriate addition to C-INTERCAL."
+
+    To Maestro Damian Conway, the source of all magic bits in Hook::LexWrap
+    and Filter::Simple, on which this module is based.
+
+    To Ton Hospel, for his tolerance on my semantic hackeries, and for
+    suggesting the correct behaviour of "comefrom-LABEL" and
+    "comefrom-EXPR".
+
+SEE ALSO
+    Hook::LexWrap, Filter::Simple, "goto" in perlfunc
+
+AUTHORS
+    Audrey Tang <cpan@audreyt.org>
+
+COPYRIGHT
+    Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007 by Audrey Tang
+    <cpan@audreyt.org>.
+
+    This software is released under the MIT license cited below.
+
+  The "MIT" License
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

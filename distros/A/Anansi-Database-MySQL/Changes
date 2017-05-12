@@ -1,0 +1,9 @@
+Revision history for Perl extension Anansi::Database::MySQL.
+
+0.01  Fri May 24 11:37:16 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Anansi::Database::MySQL
+0.02  Wed Jun 05 17:35:06 2013
+	- modified "connect" to use environment variables and a PORT parameter.
+0.03  Thu Jun 06 20:07:54 2013
+	- modified the POD to accommodate changes to "Anansi::Class".

@@ -1,0 +1,105 @@
+This directory contains examples of how to use Astro::Coord::ECI and
+its subclasses. The following examples are provided:
+
+almanac
+    This Perl script produces an almanac of Sun and Moon positions for
+    the current day, or optionally for the next day. By default the
+    almanac is for 1600 Pennsylvania Avenue Washington DC, but this can
+    be changed by setting environment variable ALMANAC_POSITION, or
+    specifying latitude north (degrees), longitude east (degrees),
+    and height (meters) on the command. The option -help gets you
+    brief help.
+
+Astro-Coord-ECI.yml
+    This CPAN client prefs file causes the satpass script to be
+    installed by default. To use this file, place a copy of it in your
+    CPAN client's preferences directory (e.g. .cpan/prefs for the 'cpan'
+    client and a Unix-like operating system.)
+
+azimuth
+    This Perl script finds the next time the Sun passes a given azimuth
+    (defaulting to 180 degrees) at Number 10 Downing Street.
+
+closest
+    This Perl script takes as input a time (suitable for Date::Manip), a
+    right ascension and declination (both in degrees) and a list of the
+    names of files containing TLE data. The output is the OID, right
+    ascension, declination, and angular separation (in degrees) of the
+    bodies closest to the given position as seen from Parliament House
+    in Australia.
+
+convert_tle
+    This Perl script reads orbital data in either TLE or JSON format,
+    and converts it to the other format. The JSON is similar to (read:
+    uses the same keys as) the Space Track REST interface. The -help
+    option gets you the documentation.
+
+iridium
+    This Perl script uses Astro::SpaceTrack (not included) to download
+    Iridium data from http://celestrak.com/ and predict flares for the
+    next two days at the given location, which is hard-coded as Los
+    Pinos, Ciudad Mexico, Mexico. It takes about 30 seconds on a
+    lightly-loaded 800 MHz PowerPC G4.
+
+iss
+    This Perl script uses Astro::SpaceTrack (not included) to download
+    orbital data from http://spaceflight.nasa.gov/realdata/elements/ and
+    predict visibility for the next week from the given location, which
+    is hard-coded as 80 Wellington Street Ottawa Ontario Canada.
+
+passes
+    This Perl script is kind of a "poor man's satpass", which downloads
+    TLE data for the requested satellites (Astro::SpaceTrack and a Space
+    Track account are required), and lists rise and set times in
+    chronological order. You specify your location, Space Track account
+    information, and other options either on the command line, in an
+    initialization file, or both places. The --help option gets you the
+    documentation.
+
+positions
+    This Perl script takes on its command line the names of files
+    containing TLE data. All are read, and the elevation, azimuth and
+    range of all satellites is displayed at one minute intervals for the
+    current GMT day. Output is supressed when the satellite is below the
+    horizon. The position is hard-wired to Parliament House, Australia.
+
+sh_script
+    This shell script executes the satpass Perl script (which comes with
+    this distribution) passing it commands from a 'here document.' These
+    commands download International Space Station data from
+    http://spaceflight.nasa.gov/realdata/elements/ and predict
+    visibility at the current time from 1600 Pennsylvania Avenue,
+    Washington DC, USA.
+
+solstice
+    This Perl script calculates equinoxes and solstices for the given
+    year, defaulting to the current year, in either UTC or local time.
+    If DateTime::Calendar::Christian is available, dates will be given
+    in the Julian or Gregorian calendars as appropriate.
+
+tle_period.t
+    This is not really a test, since I have no canonical data to test
+    against. It is really a demonstration of the effect the model chosen
+    and geophysical constants used have on the calculation of period. It
+    expects to be run from the main distribution directory  as (e.g.)
+
+    perl -Mblib eg/tle_period.t
+
+    and it expects to find the orbital elements file sgp4-ver.tle in the
+    t directory.
+
+t/xml
+    This demonstration script downloads International Space Station TLE
+    data from Celestrak, predicts passes over The Hague, Netherlands,
+    and displays the results as XML, using XML::Writer. The pass_variant
+    attribute is used to control what events of a pass are displayed.
+
+visual
+    This script has nothing directly to do with this package. What it
+    does is to download the Celestrak web site's list of visual
+    satellites, and Mike McCants' visual list (with magnitudes) and
+    compares the two. With the -merge option, it also gets McCants'
+    total list and produces a magnitude table suitable for
+    Astro::Coord::ECI::TLE, which is why this script is here.
+
+# ex: set textwidth=72 autoindent :

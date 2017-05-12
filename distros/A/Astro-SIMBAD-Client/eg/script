@@ -1,0 +1,62 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use Astro::SIMBAD::Client;
+use File::Basename;
+
+@ARGV or do {print <<eod; exit};
+
+Execute one or more SIMBAD 4 scripts, displaying the results.
+
+usage: @{[basename $0]} file ...
+
+eod
+
+my $simbad = Astro::SIMBAD::Client->new ();
+
+foreach my $fn (@ARGV) {
+    eval {
+	print $simbad->script_file ($fn);
+	1;
+    } or warn ( $@ || 'An unknown error occurred' );
+}
+__END__
+
+=head1 TITLE
+
+script - Execute one or more SIMBAD scripts.
+
+=head1 SYNOPSIS
+
+ script arcturus.simple
+ script         # Rudimentary help
+
+=head1 OPTIONS
+
+None.
+
+=head1 DETAILS
+
+This script takes as its arguments the names of SIMBAD script files,
+submits them to the script interface, and displays the obtained
+information on standard out.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006, 2008, 2010-2016 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+# ex: set textwidth=72 :

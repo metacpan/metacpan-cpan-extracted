@@ -1,0 +1,15 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Acme/IRC/Art.pm
+t/001_load.t
+t/002_new.t
+t/003_pixel.t
+t/004_rectangle.t
+t/005_text.t
+t/006_save.t
+t/007_load.t
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

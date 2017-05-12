@@ -1,0 +1,202 @@
+2008-03-06  Diab Jerius  <djerius@cfa.harvard.edu>
+
+	Tag 0.08
+
+2008-03-06 11:54 -0500  djerius  <djerius@cfa.harvard.edu>  (96968281ae9d [tip])
+
+	* test.pl:
+	calculate the number of tests before the first test else Test::More
+	croaks strictified the code.
+
+2006-04-17 19:36 -0400  gaetz  <gaetz@mimir.cfa.harvard.edu>  (9e4759f48f6c)
+
+	* make.log:
+	removed make.log
+
+2006-04-17 19:24 -0400  gaetz  <gaetz@mimir.cfa.harvard.edu>  (2e64e10020a4)
+
+	* .hgtags:
+	parse_funcnts returns ARRAY or ARRAYREF
+
+2006-04-17 19:23 -0400  gaetz  <gaetz@mimir.cfa.harvard.edu>  (6075b4c9bee6 [V0_07])
+
+	* GNUmakefile.local, make.log, test.pl:
+	parse_funcnts returns ARRAY or ARRAYREF
+
+2006-04-17 19:06 -0400  gaetz  <gaetz@mimir.cfa.harvard.edu>  (ee7f88c93c22)
+
+	* .hgtags:
+	parse_funcnts returns ARRAY or ARRAYREF
+
+2006-04-17 19:05 -0400  gaetz  <gaetz@mimir.cfa.harvard.edu>  (eba23307df2d)
+
+	* GNUmakefile.local, data/funcnts-i.log.p, data/funcnts_01.log.p,
+	data/funcnts_02.log.p, data/funcnts_s.log.p,
+	data/funcnts_s_-s.log.p, data/funcnts_sb.log.p,
+	data/funcnts_sb_-i.log.p, data/funcnts_sb_-ie.log.p,
+	data/funcnts_sb_-im.log.p, data/funcnts_sb_-is.log.p,
+	data/funcnts_sb_-ism.log.p, data/funcnts_sb_-m.log.p,
+	data/funcnts_sb_-s.log.p, data/funcnts_sb_-sm.log.p, make.log:
+	minor fixup (in test create)
+
+2006-04-17 19:02 -0400  gaetz  <gaetz@mimir.cfa.harvard.edu>  (66787e8c7ca6)
+
+	* ChangeLog, NEWS:
+	parse_funcnts returns ARRAY or ARRAYREF depending context
+
+2006-04-17 18:35 -0400  gaetz  <gaetz@mimir.cfa.harvard.edu>  (00ade0760522)
+
+	* .hgtags:
+	make parse_funcnts return value more sensible
+
+2006-04-17 18:34 -0400  gaetz  <gaetz@mimir.cfa.harvard.edu>  (9007ced1129a)
+
+	* Parse.pm, data/funcnts_01.log.p, data/funcnts_02.log.p,
+	data/funcnts_s.log.p, data/funcnts_s_-s.log.p,
+	data/funcnts_sb.log.p, data/funcnts_sb_-m.log.p,
+	data/funcnts_sb_-s.log.p, data/funcnts_sb_-sm.log.p:
+	fixed parse_funcnts_file to return an ARRAY or and ARRAYREF
+	depending on wantarray
+
+2006-03-20 17:52 -0500  gaetz  <gaetz@mimir.cfa.harvard.edu>  (3354b8a31998)
+
+	* Parse.pm, data/funcnts_01.log.p, data/funcnts_s_-s.log.p,
+	data/funcnts_sb_-is.log.p, data/funcnts_sb_-ism.log.p,
+	data/funcnts_sb_-s.log.p, data/funcnts_sb_-sm.log.p:
+	added missing {table} level in sum_bkgd_sub and bkgd_sub
+
+2006-03-17 19:33 -0500  gaetz  <gaetz@mimir.cfa.harvard.edu>  (f09be53a42af)
+
+	* .hgtags:
+	Added tag V0_06 for changeset
+	79d21b9560bbdf0794af68df9543b570a4d8b52e
+
+2006-03-17 19:32 -0500  gaetz  <gaetz@mimir.cfa.harvard.edu>  (79d21b9560bb [V0_06])
+
+	* Parse.pm, data/funcnts-i.log.p, data/funcnts_02.log.p,
+	data/funcnts_s.log.p, data/funcnts_sb.log.p,
+	data/funcnts_sb_-i.log.p, data/funcnts_sb_-ie.log.p,
+	data/funcnts_sb_-im.log.p, data/funcnts_sb_-m.log.p:
+	fix to correct {tables} for bkgd_sb
+
+2006-03-17 23:29 +0000  gaetz  <gaetz>  (396783b460c5)
+
+	* ChangeLog, NEWS, Parse.pm, README, data/funcnts-i.log,
+	data/funcnts-i.log.p, data/funcnts_01.log, data/funcnts_01.log.p,
+	data/funcnts_02.log, data/funcnts_02.log.p, data/funcnts_s.log,
+	data/funcnts_s.log.p, data/funcnts_s_-s.log,
+	data/funcnts_s_-s.log.p, data/funcnts_sb.log, data/funcnts_sb.log.p,
+	data/funcnts_sb_-i.log, data/funcnts_sb_-i.log.p,
+	data/funcnts_sb_-ie.log, data/funcnts_sb_-ie.log.p,
+	data/funcnts_sb_-im.log, data/funcnts_sb_-im.log.p,
+	data/funcnts_sb_-is.log, data/funcnts_sb_-is.log.p,
+	data/funcnts_sb_-ism.log, data/funcnts_sb_-ism.log.p,
+	data/funcnts_sb_-m.log, data/funcnts_sb_-m.log.p,
+	data/funcnts_sb_-s.log, data/funcnts_sb_-s.log.p,
+	data/funcnts_sb_-sm.log, data/funcnts_sb_-sm.log.p,
+	data/funhist_01.log.p, test.pl:
+	substantial rewrite to support the -i funcnts option.
+
+2006-03-17 13:41 -0500  gaetz  <gaetz@mimir.cfa.harvard.edu>  (704536a02b56)
+
+	* .hgtags:
+	Added tag V0_05 for changeset
+	9f148c9f4646b29df9bb231f50f2d47941d190c8
+
+2006-02-21 22:02 +0000  gaetz  <gaetz>  (9f148c9f4646 [V0_05])
+
+	* Changes, NEWS, Parse.pm:
+	Updated because of changes in the funcnts output format (affecting
+	parsing of the region information)
+
+2006-02-21 21:26 +0000  gaetz  <gaetz>  (8cad08046cb8)
+
+	* ChangeLog:
+	added ChangeLog
+
+2002-04-20 22:52 +0000  dj  <dj>  (ca99bec834e1)
+
+	* LICENSE, MANIFEST, README:
+	Empty changelog
+
+2002-04-20 22:45 +0000  dj  <dj>  (fed4749268c8)
+
+	* GNUmakefile, MANIFEST:
+	Empty changelog
+
+2002-04-20 22:42 +0000  dj  <dj>  (06fc08cc7233)
+
+	* Parse.pm:
+	Module name change. fixed problem with global excluded regions
+
+2002-04-20 22:41 +0000  dj  <dj>  (c02119c5ad15)
+
+	* Changes, MANIFEST, MANIFEST.SKIP, Makefile.PL, README,
+	data/funcnts_01.log.p, data/funcnts_02.log, data/funcnts_02.log.p,
+	data/funcnts_s.log.p, data/funcnts_s_-s.log.p,
+	data/funcnts_sb.log.p, data/funcnts_sb_-m.log.p,
+	data/funcnts_sb_-s.log.p, data/funcnts_sb_-sm.log.p,
+	data/funhist_01.log.p, test.pl:
+	Empty changelog
+
+2006-03-17 13:41 -0500  gaetz  <gaetz@mimir.cfa.harvard.edu>  (4ef50d9788fa)
+
+	* .hgtags:
+	Added tag V0_03 for changeset
+	16330099d6afa5e3c90a52c3a6c22534e11f9943
+
+2001-08-17 22:20 +0000  dj  <dj>  (16330099d6af [V0_03])
+
+	* Changes, Parse.pm, data/funhist_01.log, test.pl:
+	- added parse_funhist and parse_funhist_file
+	       - now outputs "width" of column (really just width of
+	separators)
+
+2006-03-17 13:41 -0500  gaetz  <gaetz@mimir.cfa.harvard.edu>  (2efc794e1226)
+
+	* .hgtags:
+	Added tag V0_02 for changeset
+	1f0d915367d244f649247f8e4ce165961f3976ee
+
+2001-06-26 22:47 +0000  dj  <dj>  (1f0d915367d2 [V0_02])
+
+	* Changes, Parse.pm:
+	new version of funcnts put blank line between header and data. work
+	around that.
+
+2006-03-17 13:41 -0500  gaetz  <gaetz@mimir.cfa.harvard.edu>  (89075761e82c)
+
+	* .hgtags:
+	Added tag V0_01 for changeset
+	e193a4d296f38efe3872e55f457c27ffbb2f59ab
+
+2001-03-01 23:16 +0000  dj  <dj>  (e193a4d296f3 [V0_01])
+
+	* Parse.pm, test.pl:
+	Empty changelog
+
+2001-03-01 23:08 +0000  dj  <dj>  (fb7838573c2f)
+
+	* Parse.pm:
+	Empty changelog
+
+2006-03-17 13:41 -0500  gaetz  <gaetz@mimir.cfa.harvard.edu>  (2dc13ea3396d)
+
+	* .hgtags:
+	Added tag initial for changeset
+	d28fc191d027c7217d82b394873ed05404e16ffd
+
+2006-03-17 13:41 -0500  gaetz  <gaetz@mimir.cfa.harvard.edu>  (d28fc191d027 [initial])
+
+	* .hgtags:
+	Added tag initial for changeset
+	dc0320fb6023b2bd0da49637bfb4780855302509
+
+2001-03-01 22:22 +0000  dj  <dj>  (dc0320fb6023)
+
+	* .hgignore, Changes, GNUmakefile, MANIFEST, Makefile.PL, Parse.pm,
+	data/funcnts_01.log, data/funcnts_s.log, data/funcnts_s_-s.log,
+	data/funcnts_sb.log, data/funcnts_sb_-m.log, data/funcnts_sb_-s.log,
+	data/funcnts_sb_-sm.log, test.pl:
+	Initial revision
+

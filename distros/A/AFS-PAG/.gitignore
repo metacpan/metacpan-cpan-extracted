@@ -1,0 +1,11 @@
+/Build
+/MANIFEST.bak
+/MYMETA.json
+/MYMETA.yml
+/_build/
+/blib/
+/config.log
+/cover_db
+/glue/
+/lib/AFS/PAG.c
+*.o

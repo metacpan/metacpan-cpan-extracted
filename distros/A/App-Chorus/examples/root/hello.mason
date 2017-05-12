@@ -1,0 +1,12 @@
+<html>
+<body>
+    <h1>Hi there, <% $fo  %>!</h1>
+</body>
+</html>
+<%args>
+$name
+%baz => ( a => 1, b => 2 )
+</%args>
+<%init>
+my $fo = "gogog";
+</%init>

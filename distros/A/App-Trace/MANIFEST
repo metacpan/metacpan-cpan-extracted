@@ -1,0 +1,8 @@
+CHANGES
+MANIFEST
+Makefile.PL
+META.yml
+README
+TODO
+lib/App/Trace.pm
+t/main.t

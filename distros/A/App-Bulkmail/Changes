@@ -1,0 +1,11 @@
+Revision history for App-Bulkmail
+
+0.02 - Tue Dec  8 09:13:25 2009
+	Add dependency on Any::Moose
+
+0.01 - Fri Nov 27 11:48:04 2009
+	Initial release
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

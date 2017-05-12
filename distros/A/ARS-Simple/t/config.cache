@@ -1,0 +1,7 @@
+package CCACHE;
+# enter your remedy server, username and password below.
+
+sub server { 'devserver' ; }
+sub user     { 'greg' ; }
+sub password { 'password' ; }
+1;

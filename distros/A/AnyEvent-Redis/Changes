@@ -1,0 +1,72 @@
+Revision history for Perl extension AnyEvent::Redis
+
+0.24  Wed 12 Dec 16:18:42 GMT 2012
+         - Many error handling improvements (chip)
+         - Reconnect logic (leedo)
+         - Fix for tests with redis-server 2.6 (typester)
+         - Fix leak of connections (dgl)
+
+0.23  Wed 12 Jan 2011 23:34:58 GMT
+         - Fix to always allow condvar as final param (chip)
+
+0.23_01  Wed Dec 15 20:17:42 PST 2010
+         - Added character encoding support (mfischer, dgl)
+	 - New read handler, about 10% faster (mfischer)
+	 - Moved read handler to AnyEvent::Redis::Protocol (mfischer)
+	 - Updated documentation (mfischer)
+
+0.22  Sun Oct 31 20:38:52 PDT 2010
+        - Fixed memory leaks with MULTI commands (dgl)
+
+0.21  Fri Oct 29 15:18:52 PDT 2010
+        - Fixed async buffering issue with LRANGE command (leedo, dgl)
+        - Fixed circular reference memory leaks (jzawodny)
+
+0.20  Sun Sep 12 12:46:36 PDT 2010
+        - cleanup on connection failure (leedo)
+
+0.19_01 Wed Aug 25 12:46:59 PDT 2010
+        - Added PubSub support (dgl)
+        - Documentations improved (dgl)
+        - Fixed KEYS for 1.2 server (dgl)
+        - Bumped Test::TCP dep (dgl)
+
+0.12  Sun Aug  8 23:34:59 PDT 2010
+        - Added HSETNX (clkao)
+        - Reset the state when EOF or on error (clkao)
+
+0.11  Fri Aug  6 23:09:41 PDT 2010
+        - Refactored the decoder so nested MULTI/EXEC responses work (clkao)
+
+0.10  Fri Jul  2 17:02:16 PDT 2010
+        - Support command operations on hashes for Redis 2.0 (franck)
+        - Fixed MGET on non-existent keys (franck)
+
+0.09  Thu Apr 15 10:46:46 PDT 2010
+        - Fixed the test (hanekomu)
+
+0.08  Tue Mar  9 11:44:33 JST 2010
+        - Immediately send [] if the length is 0 for multi-bulk replies (leedo)
+
+0.07  Tue Feb 23 15:40:02 PST 2010
+        - Bug fix to handle nonexistent keys in multi-bulk replies (jbarratt)
+
+0.06  Mon Feb 15 19:20:50 PST 2010
+        - Add more bulk commands: getset, smove, zadd, zrem, zscore, zincrby, append (Leon Brocard)
+
+0.05  Fri Feb 12 10:33:44 PST 2010
+        - Fixed a typo in the on_error callback (jzawodn)
+
+0.04  Tue Nov 10 22:55:59 PST 2009
+        - Fixed deps
+
+0.03  Tue Nov 10 20:33:38 PST 2009
+        - Changed the object construction API to always use new()
+        - Implemented on_error for callback based error handling
+
+0.02  Tue Nov 10 17:49:39 PST 2009
+        - Fixed all_cv interface
+        - Fixed redis-server check in tests
+
+0.01  Sun Nov  8 00:51:03 2009
+        - original version

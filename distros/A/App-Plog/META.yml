@@ -1,0 +1,57 @@
+---
+abstract: 'A rudimentary blog'
+author:
+  - 'Nadim ibn hamouda el Khemir. <nkh@cpan.org>'
+build_requires:
+  Test::Block: 0
+  Test::Exception: 0
+  Test::NoWarnings: 0
+  Test::Warn: 0
+  Text::Diff: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Plog
+provides:
+  App::Plog:
+    file: lib/App/Plog.pm
+    version: 0.01
+  App::Plog::Aggregator::Template::Inline:
+    file: lib/App/Plog.pm
+  App::Plog::Commands:
+    file: lib/App/Plog.pm
+  App::Plog::Feed::Atom:
+    file: lib/App/Plog.pm
+  App::Plog::RCS::Git:
+    file: lib/App/Plog.pm
+  App::Plog::Renderer::Extension:
+    file: lib/App/Plog.pm
+  App::Plog::Renderer::HTML:
+    file: lib/App/Plog.pm
+  App::Plog::Renderer::HTML::Asciidoc:
+    file: lib/App/Plog.pm
+  App::Plog::Renderer::HTML::Pod:
+    file: lib/App/Plog.pm
+requires:
+  File::Copy::Recursive: 0
+  File::HomeDir: 0
+  File::Path: 0
+  File::Slurp: 0
+  File::Temp: 0
+  FileHandle: 0
+  Getopt::Long: 0
+  IPC::Open2: 0
+  IPC::Open3: 0
+  Pod::Simple::HTML: 0
+  Readonly: 0
+  Sub::Exporter: 0
+  Symbol: 0
+  Tie::Hash::Indexed: 0
+  XML::Atom::SimpleFeed: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.01.12

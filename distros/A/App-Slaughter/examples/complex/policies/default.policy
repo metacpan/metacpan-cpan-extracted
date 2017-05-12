@@ -1,0 +1,31 @@
+###
+# The master "default.policy" file.
+#
+# This file is requested by each managed client, whenever slaughter runs.
+##
+###
+
+
+
+#
+#  Ensure slaughter runs on each node once an hour.
+#
+FetchPolicy  "slaughter.policy";
+
+
+#
+#  Alert if any partition is getting too full.
+#
+FetchPolicy "disk-check.policy";
+
+
+#
+#  Misc Cleanup
+#
+FetchPolicy "tidy.policy";
+
+
+#
+#  Update /etc/motd
+#
+FetchPolicy "motd.policy";

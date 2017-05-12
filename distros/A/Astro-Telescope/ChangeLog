@@ -1,0 +1,75 @@
+2010-12-30 Tim Jenness <tjenness@cpan.org>
+
+	---- Release 0.70 to CPAN ----
+
+	* Build.PL: Now uses Module::Build
+
+	* t/sla.t: Use newer JCMT position (so with an older Astro::SLA
+	this may not work.
+
+2008-03-14 Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* Reduce dependency on Astro::SLA module so that some
+	functionality is available without that module.
+
+2007-02-02  Tim Jenness  <tjenness@cpan.org>
+
+	* Telescope.pm (limits): Default limits now refer to the source
+	being above the horizon rather than simply being undefined.
+	(setlimits):  Can now set specific telescope limits for an object.
+
+	* tmpl/MPC.pm.stub (parse_table): Obscode longitude should be
+	reported in radians and not degrees.
+
+2006-06-06  Tim Jenness  <tjenness@cpan.org>
+
+	* Telescope.pm (obsgeo): Add obsgeo() method.
+
+2004-12-29  Tim Jenness  <tjenness@cpan.org>
+
+	---- Release 0.60 to CPAN ----
+
+2004-07-19  Brad Cavanagh  <b.cavanagh@jach.hawaii.edu>
+
+	* Makefile.PL: add quotes around Astro::SLA to prevent bareword error.
+
+2003-02-23  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* Telescope.pm: Version 0.60.
+
+	* Telescope.pm: Add geocentric latitude, geocentric distance,
+	  parallax constants, observatory code. Allow for different
+	  parameters in constructor. Automatically get information from
+	  observatory code data file.
+
+	* Telescope/MPC.pm.stub: Auto-generation of MPC.pm when running
+	  perl Makefile.PL.
+
+	* Telescope/MPC.dat: Auto-generation of MPC.pm when running
+	  perl Makefile.PL.
+
+	* t/simple.t: Add tests for new accessors, observatory code
+	  information.
+
+2002-05-24  Tim Jenness  <tjenness@cpan.org>
+
+	* Telescope.pm: CPAN release 0.50
+
+	* t/simple.t: Add limit tests.
+
+	* Telescope.pm: Add telescope limits.
+
+2001-09-10  Tim Jenness  <tjenness@cpan.org>
+
+	* t/simple.t: Write proper test.
+
+	* Telescope.pm: Complete rewrite from the ground up to support the
+	 OMP interface.
+	 (see http://www.jach.hawaii.edu/JACpublic/JAC/software/omp)
+
+2000-03-28  Tim Jenness  <tjenness@cpan.org>
+
+	* t/simple.t: Add test
+
+	* Telescope.pm: Tweak of Pod
+

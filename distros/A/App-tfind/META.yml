@@ -1,0 +1,32 @@
+---
+abstract: 'command line file finding utility that understands TPath'
+author:
+  - 'David F. Houghton <dfhoughton@gmail.com>'
+build_requires:
+  File::Spec: 0
+  File::Temp: 0
+  FindBin: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  IPC::Run: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-tfind
+no_index: {}
+requires:
+  Cwd: 0
+  Getopt::Long::Descriptive: 0
+  Pod::Usage: 0
+  TPath: 0.020
+  TPath::Forester::File: 0.002
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+version: 0.001

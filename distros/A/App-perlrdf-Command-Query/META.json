@@ -1,0 +1,84 @@
+{
+   "abstract" : "SPARQL extension for App-perlrdf",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-perlrdf-Command-Query",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::perlrdf" : "0",
+            "JSON" : "2.00",
+            "RDF::Query" : "2.900",
+            "RDF::Query::Client" : "0.112",
+            "Spreadsheet::Wright" : "0",
+            "YAML::XS" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "App::perlrdf::Command::Query" : {
+         "file" : "lib/App/perlrdf/Command/Query.pm",
+         "version" : "0.004"
+      },
+      "App::perlrdf::Command::QueryParse" : {
+         "file" : "lib/App/perlrdf/Command/QueryParse.pm",
+         "version" : "0.004"
+      },
+      "App::perlrdf::Command::RDQL" : {
+         "file" : "lib/App/perlrdf/Command/RDQL.pm",
+         "version" : "0.004"
+      },
+      "App::perlrdf::FileSpec::OutputBindings" : {
+         "file" : "lib/App/perlrdf/FileSpec/OutputBindings.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=App-perlrdf-Command-Query"
+      },
+      "homepage" : "https://metacpan.org/release/App-perlrdf-Command-Query",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-app-perlrdf-command-query.git",
+         "web" : "https://github.com/tobyink/p5-app-perlrdf-command-query"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/App-perlrdf-Command-Query/project"
+   },
+   "version" : "0.004"
+}

@@ -1,0 +1,71 @@
+--- #YAML:1.0 !perl/AI::NaiveBayes1
+attributes:
+  - size1
+  - morning
+  - html
+attvals:
+  html:
+    - N
+    - Y
+  morning:
+    - Y
+    - N
+  size1:
+    - S
+    - L
+labels:
+  - spam=N
+  - spam=Y
+model:
+  condprob:
+    html:
+      N:
+        spam=N: 0.666666666666667
+        spam=Y: 0.0588235294117647
+      Y:
+        spam=N: 0.333333333333333
+        spam=Y: 0.941176470588235
+    morning:
+      N:
+        spam=N: 0.333333333333333
+        spam=Y: 0.647058823529412
+      Y:
+        spam=N: 0.666666666666667
+        spam=Y: 0.352941176470588
+    size1:
+      L:
+        spam=N: 0.333333333333333
+        spam=Y: 0.588235294117647
+      S:
+        spam=N: 0.666666666666667
+        spam=Y: 0.411764705882353
+  labelprob:
+    spam=N: 0.15
+    spam=Y: 0.85
+  numerical_attr: {}
+numof_instances: 20
+stat_attributes:
+  html:
+    N:
+      spam=N: 2
+      spam=Y: 1
+    Y:
+      spam=N: 1
+      spam=Y: 16
+  morning:
+    N:
+      spam=N: 1
+      spam=Y: 11
+    Y:
+      spam=N: 2
+      spam=Y: 6
+  size1:
+    L:
+      spam=N: 1
+      spam=Y: 10
+    S:
+      spam=N: 2
+      spam=Y: 7
+stat_labels:
+  spam=N: 3
+  spam=Y: 17

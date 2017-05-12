@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache-AxKit-Language-SpellCheck
+version:      0.03
+version_from: SpellCheck.pm
+installdirs:  site
+requires:
+    AxKit:                         1.6
+    Text::Aspell:                  0.04
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

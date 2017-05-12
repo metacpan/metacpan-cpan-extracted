@@ -1,0 +1,45 @@
+---
+abstract: 'Macro processor for creating static HTML pages'
+author:
+  - 'Moritz Lenz'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Mowyw
+provides:
+  App::Mowyw:
+    file: lib/App/Mowyw.pm
+    version: v0.8.0
+  App::Mowyw::Datasource:
+    file: lib/App/Mowyw/Datasource.pm
+  App::Mowyw::Datasource::Array:
+    file: lib/App/Mowyw/Datasource/Array.pm
+  App::Mowyw::Datasource::DBI:
+    file: lib/App/Mowyw/Datasource/DBI.pm
+  App::Mowyw::Datasource::XML:
+    file: lib/App/Mowyw/Datasource/XML.pm
+  App::Mowyw::Lexer:
+    file: lib/App/Mowyw/Lexer.pm
+recommends:
+  DBI: '0'
+  Text::VimColor: '0'
+  XML::Simple: '0'
+requires:
+  Carp: '0'
+  Config::File: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::Compare: '0'
+  File::Temp: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  perl: v5.8.1
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: v0.8.0

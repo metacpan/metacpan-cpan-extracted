@@ -1,0 +1,14 @@
+This patch prevents the tests from being built. This is required for platforms that do not support pthreads.
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -278,8 +278,8 @@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+ ACLOCAL_AMFLAGS = -I config
+-@BUILD_PGM_FALSE@SUBDIRS = src doc perf tests
+-@BUILD_PGM_TRUE@SUBDIRS = foreign/openpgm src doc perf tests
++@BUILD_PGM_FALSE@SUBDIRS = src doc
++@BUILD_PGM_TRUE@SUBDIRS = foreign/openpgm src doc
+ DIST_SUBDIRS = foreign/openpgm src doc perf tests builds/msvc
+ EXTRA_DIST = \
+ 	autogen.sh	\

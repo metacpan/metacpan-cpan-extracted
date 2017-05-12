@@ -1,0 +1,102 @@
+=head1 NAME
+
+Apache2::Translation::File - A provider for Apache2::Translation
+
+=head1 SYNOPSIS
+
+  <TranslationProvider File>
+      ConfigFile /path/to/file
+      NotesDir   /path/to/directory
+  </TranslationProvider>
+
+  or
+
+  $provider=Apache2::Translation::File->new(ConfigFile=>..., ...);
+
+  $provider->start;
+  $provider->stop;
+
+=head1 DESCRIPTION
+
+The C<File> provider implements the C<Apache2::Translation> provider interface
+as documented in L<Apache2::Translation::_base>. It provides for all optional
+functions. No additional functions are supported.
+
+=head2 B<Parameters>
+
+=over 2
+
+=item B<configfile /path/to/file>
+
+the configuration file.
+
+=item B<notesdir /path/to/directory>
+
+a directory where comments to the configuration can be stored. Only valid
+in combination with the admin interface.
+
+=back
+
+The C<File> provider is also capable to read a config file from an open file
+handle. Just pass it as C<configfile>. In this case the C<commit> method
+returns immediately doing nothing. All changes are lost when the provider
+object is purged from memory.
+
+=head2 B<Config File Format>
+
+Notes are stored in separate files in the notes directory. So the config file
+can be taken care of on one system and then moved to the production system
+where notes are not needed.
+
+The file format is designed to be human readable and writeable and to hold
+multilined actions.
+
+A block starts with a line that starts with the string C<E<gt>E<gt>E<gt>>
+then on the same line follow separated by spaces C<ID>, C<KEY>, C<URI>,
+C<BLOCK> and C<ORDER>. The action follows in the next few lines up to but
+not including a line that starts again with C<E<gt>E<gt>E<gt>>.
+
+Example:
+
+ >>> 1 key uri 0 1
+ action1
+ action1
+ ...
+ >>> 2 key2 uri2 1 2
+ action2
+ action2
+ ...
+ >>> 3 key uri 0 2
+ action3
+ action3
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Apache2::Translation>
+
+=item L<Apache2::Translation::DB>
+
+=item L<Apache2::Translation::BDB>
+
+=item L<Apache2::Translation::_base>
+
+=back
+
+=head1 AUTHOR
+
+Torsten Foertsch, E<lt>torsten.foertsch@gmx.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2008 by Torsten Foertsch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+# Local Variables:
+# mode: perl
+# End:

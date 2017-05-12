@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Archive/TAP/Peek.pm
+t/00_load.t
+t/01_archives.t
+t/archives/fail_tests.tar.gz
+t/archives/tests.tar.gz

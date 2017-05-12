@@ -1,0 +1,22 @@
+  <td>
+
+<div class="page">
+
+Are you <b>sure</b> you want to delete this schema?
+
+<form action="delete_schema<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+ <input type="hidden" name="schema" value="<% $s->name %>">
+ <input type="submit" value="Delete schema">
+</form>
+
+</div>
+
+   </td>
+
+<%args>
+$s
+</%args>
+
+<%attr>
+show_tables => 0
+</%attr>

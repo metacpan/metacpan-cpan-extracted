@@ -1,0 +1,79 @@
+'playtab' is a perl program that generates PostScript to print the
+chords of songs. 
+
+Important: This is a 'snapshot' release. I've been using it for
+several years now with much pleasure but your mileage may vary.
+
+The input for playtab is plain ASCII. It contains the chords, the
+division in bars, with optional annotations.
+
+An example:
+
+    !t Blue Bossa
+
+    Bossanova
+    =
+    | c-9 ... | f-9 ... | d% . g7 . | c-9 ... |
+    | es-9 . as6 . | desmaj7 ... | d% . g7 . | c-9 . d% g7 |
+
+The first line, '!t' denotes the title of the song. Each song must
+start with a title line.
+
+The title line may be followed by '!s', a subtitle, for example to
+indicate the composer.
+
+The text "Bossanova" is printed below the title and subtitle.
+
+The "=" indicates some vertical space.
+
+The next lines show the bars of the song. In the first bar is the c-9
+chord (Cminor9), followed by three dots. The dots indicate that this
+chord is repeated for all 4 beats of this bar. In the 3rd bar each
+chord take two beats: d5% (d half dim), a dot, g7 and another dot.
+
+Run playtab with "-h" or "--help" for the syntax of chords.
+
+If you use "=" followed by some text, the printout is indented and the
+text sticks out to the left. With this you can tag groups of bars, for
+example the parts of a song that must be played in a certain order.
+For example:
+
+    !t Donna Lee
+    !s Charlie Parker
+
+    Order: A B A B
+
+    = A
+    | as . | f7 . | bes7 . | bes7 . |
+    | bes-7 . | es7 . | as . | es-7 D7 |
+    | des . | des-7 . | as . | f7 . |
+    | bes7 . | bes7 . | bes-7 . | es7 . |
+
+    = B
+    | as . | f7 . | bes7 . | bes7 . |
+    | c7 . | c7 . | f- . | c7#9 . |
+    | f- . | c7 . | f- . | aso . |
+    | as f7 | bes-7 es7 | as - | bes-7 es7 |
+
+You can modify the width of the bars with a '!w' control. Standard
+width of a beat is 30. '!w +5' increases the width to 35. '!w 25' sets
+it to 25. You get the idea. You can also change the height with '!h'
+(default is 15) and margin with '!m' (default width is 40).
+
+Look at the examples, that is (currently) the best way to get grip on
+what the program does.
+
+Oh, I almost forgot: it can print guitar chord diagrams as well. 
+See "bluebossa", "sophisticatedlady" and some others.
+
+If you are a LilyPond adept, it can accept chord specifications the
+LilyPond way as well.
+
+Have fun, and let me know your ideas!
+
+----------------------------------------------------------------------------
+Johan Vromans                                           jvromans@squirrel.nl
+Squirrel Consultancy                                  Exloo, the Netherlands
+http://www.squirrel.nl                              http://johan.vromans.org
+PGP Key 1024D/1298C2B4                  http://johan.vromans.org/pgpkey.html
+----------------------- "Arms are made for hugging" ------------------------

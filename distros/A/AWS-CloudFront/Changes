@@ -1,0 +1,14 @@
+
+Changelog for perl module AWS::CloudFront
+
+2012-01-05      v0.003
+  - Worked on the OriginAccessIdentity api.
+  - Inching toward a 1.000 release.
+
+2012-01-04      v0.002
+  - Now we can create, fetch, update, list and delete distributions.
+  - Still missing a lot of features, but it's moving ahead nicely.
+
+2011-11-20      v0.001
+  - Initial release.
+

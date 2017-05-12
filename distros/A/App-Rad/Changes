@@ -1,0 +1,76 @@
+Revision history for App-Rad
+
+1.05    2013-06-06
+ 
+        *** YAPC::NA mainenance release ***
+        - As a lot of App::Rad users are aware, the framework has gone
+          through a lot of rethinking in order to be more easily
+          maintainable and expandable, which requires a big rewrite, some
+          back-incompat decisions and a lot of time which I have failed to
+          give in the past few years. Because of this, we have been under
+          a long code freeze which I hope to end in the future. Until then
+          new releases will be made only for bugfixes, like this one.
+        - bugfix: --someoption=0 now sets options->{someoption} to 0
+          instead of 1 (ironcamel++)
+        - changelog updated to follow the CPAN Changes spec more closely.
+
+1.04	2009-05-04
+
+		***MINOR API CHANGE*** => default is now to register only subs that do *not* start with an underscore
+
+		- Fixed documentation (bug reported by FCO)
+		- Single (no value) options are now stored in $c->options with '1' value, so you don't have to explicitly use 'defined' to test them.
+		- Increment single options' value if argument is passed more than one time (so -v -v will make $c->options->{v} == 2)
+		- Now configuration files can have whole strings as options
+		- Now $c->cmd is an lvalue and can be changed w/o fiddling with internals
+		- Added CONTRIBUTORS section in POD
+		- Updated test suite
+
+1.03    2009-04-24
+        - App::Rad::Config.pm was not in the MANIFEST
+
+1.02    2009-04-24
+        - Fixed bug where $c->getopt would not set $c->argv correctly and change @ARGV instead (reported by FCO)
+        - load_config() factored out, now in App::Rad::Config;
+        - Updated (+fixed) documentation.
+
+1.01    2009-04-13
+        - Fixed bug where single words inside :Help attribute (received as arrayref) were not dereferenced correctly.
+        - Added $c->plugins() method, with an ordered list of loaded plugins
+        - Added some plugin tests.
+        - Updated documentation.
+
+1.00    2009-04-10
+        - Added plugins support!
+        - Getopt::Long requirement is specific to getopt() method.
+        - Updated documentation.
+
+0.09    2008-12-22
+        - Fixed dependencies check and documentation typo.
+
+0.08    2008-12-21
+        - Added Help() attribute. Put help, include and exclude into separated modules. Updated documentation. More tests.
+
+0.07    2008-11-12
+        - SMALL API CHANGE: $c->register_commands()'s parameters ignore_prefix, ignore_suffix and ignore_regexp now *must* start with a dash.
+        - $c->register_commands() helper method now can be used to include context documentation on available commands (RT #40578).
+        - Updated documentation. More tests.
+
+0.06    2008-11-03
+        - Fixed POD. Added license to Meta.yml. Added load_config and config methods.
+
+0.05    2008-10-28
+        - Separated default() into default() and invalid(). Updated documentation. More tests.
+
+0.04    2008-10-26
+        - Fixed some testing issues. Added Stash, and improved TODO list.
+
+0.03    2008-10-22
+        - Added getopt integration. First public release, on an unsuspecting world.
+
+0.02    2008-10-05
+        - Added controller object and documentation.
+
+0.01    2008-09-20
+        - First version, for internal use only.
+

@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:                App-FQStat
+version:             6.3
+abstract:            Interactive console front-end for Sun's grid engine
+license:             ~
+author:              
+    - Steffen Mueller <smueller@cpan.org
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    DateTime:                      0
+    File::HomeDir:                 0
+    String::ShellQuote:            0
+    String::Trigram:               0
+    Term::ANSIScreen:              0
+    Term::CallEditor:              0
+    Term::ReadKey:                 0
+    threads:                       0
+    threads::shared:               0
+    Time::HiRes:                   0
+    Time::Zone:                    0
+    YAML::Tiny:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

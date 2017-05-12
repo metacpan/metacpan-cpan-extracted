@@ -1,0 +1,10 @@
+BUGS
+* http uris skipped in footnotes
+* hide the truncated line $ marker
+
+TODO
+* delete mutliple / mark read multiple
+* trash
+* folder view
+* POE / AnyEvent - background and scheduled fetch
+* terminal.app rendering

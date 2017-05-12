@@ -1,0 +1,22 @@
+To install mowyw, just copy the 'mowyw' executable to a place where you
+operating system searches for binaries (and make sure that it is executed by
+perl), and copy Mowyw/Lexer.pm to a directory where perl searches for Modules.
+
+You can find out where this is by running
+perl -e 'piornt join "\n", @INC'
+
+On my system that gives
+/etc/perl
+/usr/local/lib/perl/5.8.8
+/usr/local/share/perl/5.8.8
+/usr/lib/perl5
+/usr/share/perl5
+/usr/lib/perl/5.8
+/usr/share/perl/5.8
+/usr/local/lib/site_perl
+/usr/local/lib/perl/5.8.4
+/usr/local/share/perl/5.8.4
+.
+
+e.g. you could create a Directory Mowyw in any of theses places and copy
+Lexer.pm in this new directory.

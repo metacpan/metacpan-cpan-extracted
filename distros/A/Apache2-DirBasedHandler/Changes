@@ -1,0 +1,19 @@
+0.04. (2016-10-15) - Adam Prime <adam.prime@utoronto.ca>
+
+    - made it possible to return a 200 on a blank page.
+
+0.03. (2008-06-29) - Adam Prime <adam.prime@utoronto.ca>
+
+	- changed the debug interface to use the ::set_debug function rather than 
+	  the package variable.  recommended usage would be in your subclasses init
+	  function
+	- added more documentation
+	- renamed the index method to root_index, because index is also the name of a 
+	  perl builtin.
+
+0.02. (2008-02-09) - Adam Prime <adam.prime@utoronto.ca>
+
+	- Added Apache2::DirBasedHandler::Debug, which will turn on some warn messages.  
+	- Cleaned up the perldoc.  
+	- added uri_to_function so if one wanted to alter it's behavoir they could.
+

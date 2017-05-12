@@ -1,0 +1,67 @@
+Revision history for Perl module Acme::Playpen
+
+0.19 2017-02-10 NEILB
+    - Testing to see if I can first-come if I have a package
+      with the same name as someone else, but different case
+
+0.17 2014-04-15
+    - testing no_index in various ways
+
+0.16 2014-04-05
+    - simplified abstract
+
+0.15 2014-03-23
+    - Versions for all modules the same
+
+0.14 2014-03-20
+    - Change ::Utilities so doc is clearly developer version
+
+0.13 2014-03-20
+    - Acme::Playpen has version 0.13
+    - Acme::Playpen::Utilities has version 0.12_01
+    - The release is 0.13
+    - The previous version of Acme::Playpen::Utilities should be in the index
+    - What will MetaCPAN do ... ?
+
+0.12 2014-03-20
+    - Explicitly set version in packages
+    - Want to undex ::Utilities this time
+
+0.11 2014-03-17
+    - Argh, wrote the changes entry but didn't actually fix the abstract :-(
+
+0.10 2014-03-17
+    - Rats, had double dash in abstract from when I was testing summat else
+
+0.09 2014-03-17
+    - multi-line abstract
+
+0.08 2014-02-28
+    - Wanted to do a release so I can track timezone differences with
+      BackPAN and CPAN.
+
+0.07 2014-02-25
+    - ok, so no_index and separate pod, the pod is linked in MetaCPAN.
+      Now what if the pod's in the file which is no-linked?
+
+0.06 2014-02-25
+    - no_index a module but give it pod, what does MetaCPAN do ...
+
+0.05 2014-02-25
+    - more mucking about with abstracts
+
+0.04 2014-02-25
+    - mucking about with abstracts
+
+0.03 2014-02-16
+    - Added this file.
+    - Tried to address all Kwalitee checks to get 'CPANTS clean',
+      but have a malformed abstract, to see what I get.
+
+0.02 2014-02-16
+    - Added a module which is already on CPAN with someone else having
+      permission, but with no_index in metadata.
+
+0.01 2014-02-16
+    - First release to CPAN
+

@@ -1,0 +1,26 @@
+Build.PL
+Changes
+ignore.txt
+lib/Archive/Rgss3a.pm
+lib/Archive/Rgssad.pm
+lib/Archive/Rgssad/Entry.pm
+lib/Archive/Rgssad/Keygen.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+README.md
+script/rgssad
+t/00-load.t
+t/boilerplate.t
+t/Entry.t
+t/Keygen.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/Rgss3a.t
+t/Rgssad.t
+t/sample/Data/Scripts.rvdata
+t/sample/Dummy
+t/sample/Graphics/System/1x1.png

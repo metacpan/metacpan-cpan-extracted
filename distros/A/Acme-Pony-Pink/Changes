@@ -1,0 +1,19 @@
+Acme-Pony-Pink
+==============
+
+Created:      2012-06-14
+Home page:    <https://metacpan.org/release/Acme-Pony-Pink>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Acme-Pony-Pink>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.003	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.002	2012-06-15
+
+ [ Packaging ]
+ - Add dependency information.
+
+0.001	2012-06-14	Initial release

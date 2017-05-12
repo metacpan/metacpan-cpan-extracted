@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/prefix
+dist.ini
+lib/App/Prefix.pm
+t/actualtest.t
+t/author-critic.t
+t/boilerplate.t
+t/one_word.dat
+t/release-pod-syntax.t
+t/sample.dat
+t/two_words.dat
+t/versions.t

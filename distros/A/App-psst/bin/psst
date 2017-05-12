@@ -1,0 +1,244 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+
+
+=head1 NAME
+
+psst - prompt string setting tool
+
+=head1 VERSION
+
+version 0.09
+
+=head1 SYNOPSIS
+
+In F<~/.bashrc> add
+
+ # XXX: set up PATH and PERL5LIB as necessary
+ 
+ # Set shell and environment variables and create a function for
+ # prompt updating
+ eval "$( psst prompt "$PS1" )"
+
+Then use L<local::lib> as normal, by whatever means.
+
+=head1 GOALS
+
+This script is intended to run during the login profile.  It ought to
+be reliable and failsafe, lightweight and require minimal early
+configuration.
+
+=head1 CONFIGURATION
+
+Configuration goes in F<~/.psst.yaml> and should consist of key/value
+pairs for one hash (dictionary).  It is entirely optional, but can
+only be read if L<YAML> is installed.
+
+=over 4
+
+=item PS1_old
+
+Write the base value for $PS1 here to avoid the need to pass it to
+each call to C<psst prompt>.
+
+=item PS1_substs
+
+If present, should be a list of C<< [ $text, $replacement ] >> pairs.
+These are applied in order to the C<$PERL_LOCAL_LIB_ROOT> by Bash,
+after being munged into a set of Bash Variable Substitutions.
+
+=back
+
+=head1 CAVEATS
+
+Author reserves the right to turn this into the Portable Sanity
+Support Tool by adding other subcommands.  A symlink-farm in F<~/bin/>
+is a likely next target.
+
+=cut
+
+
+sub main {
+  syntax() if "@ARGV" =~ /^(--help|-h)\b/ || !@ARGV;
+
+  my $subcmd = shift @ARGV;
+  if ($subcmd eq 'prompt') {
+    die "$0 prompt: takes one optional parameter, got ".@ARGV if @ARGV > 1;
+    my $old_ps1 = prompt_base(PS1 => @ARGV);
+    print prompt_set(PS1 => $old_ps1);
+  } elsif ($subcmd =~ /^((--)?version|-v)$/) {
+    require App::psst;
+    print "psst $App::psst::VERSION\n";
+  } else {
+    die "Unknown subcommand '$subcmd'\n";
+  }
+}
+
+
+sub syntax {
+  die <<"MSG";
+Syntax: $0 prompt [ "old prompt string" ]
+
+Emits to STDOUT a text munging function and a new definition for \$PS1
+
+The old prompt string is not required if it can be recovered by other
+means,
+ - from the environment, by export of some other variable made by psst
+ - from the configuration file
+ - from the environment, by export PS1; trimming off what we added before
+
+These are taken in priority order.
+
+MSG
+}
+
+
+sub prompt_base {
+  my ($key, $arg_var) = @_;
+  my $out;
+
+  # 4. shell variable, if exported
+  $out = prompt_strip($key, $ENV{$key}) if defined $ENV{$key};
+
+  # 3. config file
+  $out = config("${key}_old" => undef) if !defined $out;
+
+  # 2. environment we exported.  YAGNI.
+
+  # 1. given parameter
+  $out = $arg_var if defined $arg_var;
+
+  die "Cannot recover old prompt string $key, please supply it\n"
+    unless defined $out;
+
+  return $out;
+}
+
+sub prompt_strip {
+  my ($key, $val) = @_;
+  if ($val =~ /PERL_LOCAL_LIB_ROOT/) {
+    return (); # XXX: removing our extra stuff is not implemented
+  } else {
+    return $val;
+  }
+}
+
+sub prompt_set {
+  my ($key, $base) = @_;
+
+  my @out;
+  push @out, <<'TXT';
+_psst_format() {
+    local out esc
+
+    # Homedir replacement
+    out="${PERL_LOCAL_LIB_ROOT//~/~}"
+TXT
+
+  my @substs = @{ config($key.'_substs', []) };
+  if (@substs) {
+    push @out, qq{\n  # Name substitutions\n};
+    foreach my $subst (@substs) {
+      my ($match, $replace) = @$subst;
+      $match =~ s{([\/#%])}{\\$1}g;
+      push @out, qq{    out="\${out//$match/$replace}"\n};
+    }
+  }
+
+  push @out, <<"TXT";
+
+    esc="\x1b" # One literal ESC (else we must generate or store it)
+TXT
+
+  push @out, <<'TXT';
+
+    # Colour & space path :s
+    out="${out//:/ $esc[36m:$esc[32m }"
+    printf "%s" "$out"
+}
+# Calling this from PS1 is done by pipes & clone(2) i.e. subshell in
+# its own process.  It seems to be the only way to nest substitutions.
+# We don't call it unless PERL_LOCAL_LIB_ROOT is set.
+TXT
+
+  $base =~ s{'}{'"'"'}g;
+  push @out, <<"TXT";
+
+### Prefix the prompt with local::lib indicator
+#
+# First, reset to default prompt
+PS1='$base'
+TXT
+
+  push @out, <<'TXT';
+#
+# Then prefix with indicator pokery
+PS1='${PERL_LOCAL_LIB_ROOT:+\[\e7\r\e[3B\e[2K\e[B\e[2Kl:l=\e[32m$( _psst_format )\e8\e[32m\]LL)\[\e[0m\] }'"$PS1"
+
+TXT
+
+# Another option would be a minimal "LL) " indicator, plus a quick "What PERL_LOCAL_LIB_ROOT do I have?" command.  The default for `psst`?
+#
+#   /etc/profile gives '\u@\h:\w\$ '
+#   /etc/skel/.bashrc and /etc/bash.bashrc give assorted debian_chroot indicators
+#   /etc/bash_completion.d/git.dpkg-dist has recommendations for Git
+
+  return join '', @out;
+}
+
+
+my %CONFIG;
+sub config {
+  my $key = shift;
+  my $have_default = !!@_;
+  my $default = shift;
+
+  if (!keys %CONFIG) {
+    my $ok = eval { config_load("$ENV{HOME}/.psst.yaml") };
+    if (!$ok) {
+      # Load failed.  Make the problem available for later.
+      $CONFIG{_load_failed} = $@;
+    }
+  }
+
+  if (!exists $CONFIG{$key}) {
+    return $default if $have_default;
+    die "No configuration for '$key'";
+  } else {
+    return $CONFIG{$key};
+  }
+}
+
+sub config_load {
+  my ($fn) = @_;
+  require YAML;
+  my @load = YAML::LoadFile($fn);
+  die "$fn: Expected one hash item, got ".@load." items"
+    unless 1==@load && ref($load[0]) eq 'HASH';
+  %CONFIG = (%{ $load[0] }, _src => $fn);
+  return 1;
+}
+
+main();
+
+# XXX:? local lib names,
+# s/dir/name patterns held in bash env
+# updating needed to abbreviate the new
+
+
+=head1 FILES
+
+F<~/.psst.yaml> is the configuration file, taking C<~> from C<%ENV>.
+
+=head1 AUTHOR
+
+Copyright (C) 2011 Genome Research Limited
+
+Author Matthew Astley L<mca@sanger.ac.uk>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

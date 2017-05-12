@@ -1,0 +1,79 @@
+use 5.006;
+use strict;
+use warnings;
+
+use Module::Build;
+
+
+my $class = Module::Build->subclass(
+    code =>
+    q|
+        # Override 'test' to support running extended tests in the xt/
+        # directory.
+        sub ACTION_test
+        {
+            my ( $self ) = @_;
+
+            $self->recursive_test_files(1);
+
+            $self->test_files( 't', 'xt' )
+                if $ENV{'RELEASE_TESTING'};
+
+            return $self->SUPER::ACTION_test();
+        }
+
+        # Force running extended tests when testing the distribution.
+        sub ACTION_disttest
+        {
+            my ( $self ) = @_;
+
+            local $ENV{ RELEASE_TESTING } = 1;
+
+            return $self->SUPER::ACTION_disttest();
+        }
+    |,
+);
+
+my $builder = $class->new(
+    module_name          => 'App::GitHooks::Plugin::RubyCompile',
+    license              => 'GPL_3',
+    dist_author          => q{Jacob Maurer <jmaurer@cpan.org>},
+    dist_version_from    => 'lib/App/GitHooks/Plugin/RubyCompile.pm',
+    build_requires       =>
+    {
+        'Capture::Tiny'        => 0,
+        'Test::Exception'      => 0,
+        'Test::FailWarnings'   => 0,
+        'Test::Git'            => 0,
+        'Test::More'           => 0.94,
+        'Test::Type'           => 0,
+    },
+    requires             =>
+    {
+        'App::GitHooks'        => 0,
+        'App::GitHooks'        => 0,
+        'perl'                 => 5.010,
+        'System::Command'      => 0,
+    },
+    add_to_cleanup       =>
+    [
+        'App-GitHooks-Plugin-RubyCompile-*',
+    ],
+    create_makefile_pl   => 'traditional',
+    configure_requires   =>
+    {
+        'Module::Build'        => 0,
+    },
+    meta_merge           =>
+    {
+        resources              =>
+        {
+            repository  => 'https://github.com/jacobmaurer/App-GitHooks-Plugin-RubyCompile',
+            homepage    => 'https://metacpan.org/release/App-GitHooks-Plugin-RubyCompile',
+            bugtracker  => 'https://github.com/jacobmaurer/App-GitHooks-Plugin-RubyCompile/issues',
+        },
+    },
+    recursive_test_files => 1,
+);
+
+$builder->create_build_script();

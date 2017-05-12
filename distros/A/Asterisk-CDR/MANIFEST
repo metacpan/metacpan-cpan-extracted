@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Asterisk-CDR.t
+lib/Asterisk/CDR.pm
+META.yml                                 Module meta-data (added by MakeMaker)

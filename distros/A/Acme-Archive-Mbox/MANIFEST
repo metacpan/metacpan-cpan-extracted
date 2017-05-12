@@ -1,0 +1,15 @@
+Changes
+lib/Acme/Archive/Mbox.pm
+lib/Acme/Archive/Mbox/File.pm
+Makefile.PL
+MANIFEST
+README
+TODO
+t/00-load.t
+t/archive.t
+t/file.t
+t/pod-coverage.t
+t/pod.t
+bin/mboxify
+bin/mboxextract
+META.yml                                 Module meta-data (added by MakeMaker)

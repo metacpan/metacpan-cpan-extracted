@@ -1,0 +1,57 @@
+2006-02-01  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Funeral, kind of. I'll continue to use Apache::HeavyCGI in
+	legacy projects but will move away from it on the next occasion.
+
+	The README is not a manpage anymore but an eulogy (as leo
+	translates "Grabrede").
+
+2001-03-22  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Execution plan is now mandatory. A call to prepare will die if
+	there is no execution plan in the Apache::HeavyCGI object.
+
+	* Execution plan now cleaner and more useful than ever before:
+	DEBUG and WATCHVARIABLE can be set for debugging and WALKTYPE can
+	be set for avoiding method call overhead.
+
+2001-02-08  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* lib/Apache/HeavyCGI.pm: we now have all form widgets coded as in
+	CGI.pm. The reason why we do that is: CGI.pm is slow but we like
+	the interfce it provides.
+
+	* Apache::HeavyCGI::Date now without 'use fields'. It has been
+	observed that use fields can cause core dumps under up to now
+	unknown conditions. Maybe it's due to the combination of overload
+	and fields pragma? I don't know, but I need to be cautious:-(
+
+1999-11-25  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Improvements on Exeplan: DEBUG and FUNCTIONAL as instance
+	variables
+
+1999-11-21  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Shortcut makes faster and more flexible instance_of method
+
+1999-10-17  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Fixed an uninitialized warning in SquidRemoteAddr and
+	HeavyCGI.pm
+
+1999-10-12  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* $@ was checked for isa, but isa() was a method call instead of
+	an UNIVERSAL::isa function call.
+
+1999-08-16  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* ExePlan now executes the plan as a series of function calls
+	instead of method calls. Only a little bit benchmarked and seems
+	to be a little bit better. Can be switched back to method calls by
+	manually setting FUNCTIONAL to false
+
+	* can_utf8 now reflects the protocol. HTTP/1.1 allows UTF-8 unless
+	they have an Accept-Encoding header
+

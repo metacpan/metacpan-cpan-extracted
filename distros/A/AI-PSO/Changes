@@ -1,0 +1,34 @@
+Revision history for Perl extension AI::PSO.
+
+0.86  Tue Nov 21 20:41:23 2006
+    - updated documentation
+    - added support for original RE & JK algorithm
+    - abstracted initialization function
+
+0.85  Wed Nov 15 22:30:47 2006
+    - corrected the fitness function in the test
+    - added perceptron c++ code that I wrote a long time ago ;)
+    - added an example (pso_ann.pl) for training a simple feed-forward neural network
+    - updated POD
+
+0.82  Sat Nov 11 22:20:31 2006
+    - fixed POD to correctly 'use AI::PSO'
+    - fixed fitness function in PSO.t
+	- added research paper to package
+	- moved into a subversion repository
+	- removed requirement for perl 5.8.8
+	- removed printing of solution array in test
+
+0.80  Sat Nov 11 14:22:27 2006
+	- changed namespace to AI::PSO
+	- added a pso_get_solution_array function
+
+0.70  Fri Nov 10 23:50:32 2006
+	- added user callback fitness function
+	- added POD
+	- added tests
+	- fixed typos
+	- changed version to 0.70 because I like 0.7
+
+0.01  Fri Nov 10 18:53:56 2006
+	- initial version

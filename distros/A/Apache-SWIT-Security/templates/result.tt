@@ -1,0 +1,11 @@
+<html>
+<body>
+Hello, [% username %] <br />
+[% IF request.pnotes('SWITSession').is_allowed('../userform/r') %]
+<a href="../userform/r">Add more users</a> <br />
+<a href="../userrolelist/r">User Role List</a> <br />
+[% END %]
+</form> <br />
+<a href="../login/r?logout=[% username %]">Logout</a>
+</body>
+</html>

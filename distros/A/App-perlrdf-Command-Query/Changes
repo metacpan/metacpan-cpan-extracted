@@ -1,0 +1,25 @@
+App-perlrdf-Command-Query
+=========================
+
+Created:      2012-07-19
+Home page:    <https://metacpan.org/release/App-perlrdf-Command-Query>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=App-perlrdf-Command-Query>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-09-14
+
+ [ Packaging ]
+ - Add repo link.
+
+0.003	2014-09-14
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.002	2013-07-16
+
+ - Added: Support --query_method option, and PERL_QUERY_METHOD environment
+   variable.
+ - Improved error messages.
+
+0.001	2012-07-19	Initial release: happy pi day!

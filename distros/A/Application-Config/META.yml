@@ -1,0 +1,25 @@
+---
+abstract: ~
+author:
+  - 'James A. Duncan <james@reasonablysmart.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: MIT
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Application-Config
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Config::Tiny: 0
+  File::HomeDir: 0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 0.5

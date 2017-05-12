@@ -1,0 +1,13 @@
+
+    This distribution contains several CLI's related to Indonesian banking:
+
+    # INSERT_EXECS_LIST
+
+SEE ALSO
+
+    Finance::Bank::ID::BCA
+
+    Finance::Bank::ID::BPRKS
+
+    Finance::Bank::ID::Mandiri
+

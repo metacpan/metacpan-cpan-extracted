@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::PodPreview;
+use Pod::Usage::CommandLine;
+
+BEGIN { our $VERSION = $App::PodPreview::VERSION; }
+
+App::PodPreview::podpreview(shift);
+
+=head1 NAME
+
+podpreview - Preview POD files in a browser
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+  podpreview /path/to/file.pod
+
+=head1 DESCRIPTION
+
+This is a very simple module to preview files containing POD documentation in a browser.
+
+Given the path to a file, C<podpreview> exports it to a temporary html file and displayes it in a browser using L<Browser::Open>. Any options contained in C<$HOME/.podpreview> are passed to L<Pod::Simple::HTML>. The configuration file is parsed using L<Config::Tiny>.
+
+=head1 AUTHOR
+
+Peter Shangov <pshangov at yahoo dot com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Peter Shangov.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

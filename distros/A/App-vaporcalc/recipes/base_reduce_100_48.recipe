@@ -1,0 +1,15 @@
+{
+   "recipe" : {
+      "flavor_array" : [],
+      "target_pg" : "100",
+      "base_nic_per_ml" : 100,
+      "base_nic_type" : "PG",
+      "target_quantity" : 30,
+      "target_nic_per_ml" : "48",
+      "target_vg" : "0",
+      "notes" : [
+         "Reduce 100mg/ml nicotine in PG -> 48mg/ml",
+         "This is useful for creating a somewhat safer working set."
+      ]
+   }
+}

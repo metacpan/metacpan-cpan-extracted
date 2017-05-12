@@ -1,0 +1,22 @@
+Revision history for App-podweaver
+
+1.00    Version released at 2011-10-09-21:44.
+        Updated copyright year.
+        Added SEE ALSO section to POD.
+        Make Build.PL autogenerate README from POD.
+        Add configure_requires to Build.PL.
+        Use /usr/bin/env perl shebang to play nice with perlbrew.
+
+0.99_04 Version released at 2010-12-11-17:06.  *** Development version. ***
+        Move from deprecated Module::Build::ModuleInfo to Module::Metadata.
+
+0.99_03 Version released at 2010-10-19-17:27.  *** Development version. ***
+        Added missing Test::Command to build_requires.
+        Remove "no package found" hacks: new Pod::Weaver handles this fine.
+
+0.99_02 Version released at 2010-10-18-10:42.  *** Development version. ***
+        Added optional configuration file for command-line defaults.
+        Added basic tests for the command-line script.
+
+0.99_01 Version released at 2010-10-12-13:25.  *** Development version. ***
+        Initial release.

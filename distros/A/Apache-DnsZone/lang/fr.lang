@@ -1,0 +1,88 @@
+#!/usr/bin/perl -w
+
+# edited by khali@linux-fr.org (2001/03/24)
+# $Id: fr.lang,v 1.5 2001/04/25 19:29:21 thomas Exp $
+
+use strict;
+
+sub lang () {
+    my %text = (
+		'SUBMIT'            => 'Confirmer',
+		'CANCEL'            => 'Abandonner',
+		'HELP'              => 'Aide',
+		'EDIT'              => '&Eacute;diter',
+		'ADD'               => 'Ajouter',
+		'REMOVE'            => 'Enlever',
+		'LOCKED'            => 'Prot&eacute;g&eacute;',
+		'SETTINGS'          => 'Personnalisation',
+		'LIST_DOMAIN'       => 'Liste des domaines',
+		'LOGOUT'            => 'D&eacute;connexion',
+		'LANGUAGE'          => 'Langue',
+		'EMAIL'             => 'E-mail',
+		'NEW_PASSWORD'      => 'Nouveau mot de passe',
+		'CONFIRM_PASSWORD'  => 'Confirmation',
+		'AUTH_NS'           => 'Serveur de nom autoritaire',
+		'SERIAL'            => 'Num&eacute;ro de s&eacute;rie',
+		'ADMIN_EMAIL'       => 'E-mail administratif',
+		'REFRESH'           => 'D&eacute;lai de rafra&icirc;chissement',
+		'RETRY'             => 'Temps entre les essais',
+		'EXPIRE'            => 'D&eacute;lai d\'expiration',
+		'TTL'               => 'Dur&eacute;e de vie',
+		'HOST'              => 'H&ocirc;te',
+		'IP_ADDRESS'        => 'Adresse IP',
+		'CNAME'             => 'Nom canonique',
+		'MX'                => '&Eacute;changeur mail',
+		'PREFERENCE'        => 'Pr&eacute;f&eacute;rence',
+		'ZONE'              => 'Zone',
+		'NS'                => 'Serveur de noms',
+		'TXT'               => 'Texte',
+		'DNS'               => 'Syst&egrave;me de nom par domaine',
+		'SOA'               => 'D&eacute;but d\'autorit&eacute;',
+		'PAGE_LIST_DOMAIN'  => 'Domaines g&eacute;r&eacute;s avec DnsZone',
+		'PAGE_VIEW_DOMAIN'  => 'Propri&eacute;t&eacute;s du domaine $domain',
+		'PAGE_HELP'         => 'Aide',
+		'PAGE_SETTINGS'     => 'Personnalisation',
+		'PAGE_EDIT'         => '&Eacute;dition de l\'enregistrement $record sur $domain',
+		'PAGE_ADD'          => 'Ajout de l\'enregistrement $record &agrave; $domain',
+		'PAGE_DEL'          => 'Suppression de l\'enregistrement $record sur $domain',
+		'ERROR_CORRECT'     => 'Veuillez corriger la ou les erreur(s) suivantes&nbsp;:',
+		'ERROR_DUPLICATE'   => 'Un doublon existe',
+		'ERROR_IP'          => 'Valeur incorrecte pour "Adresse IP"',
+		'ERROR_HOST'        => 'Valeur incorrecte pour "H&ocirc;te"',
+		'ERROR_TTL'         => 'Valeur incorrecte pour "Dur&eacute;e de vie"',
+		'ERROR_CNAME'       => 'Valeur incorrecte pour "Nom canonique"',
+		'ERROR_MX'          => 'Valeur incorrecte pour "&Eacute;changeur mail',
+		'ERROR_PREFERENCE'  => 'Valeur incorrecte pour "Pr&eacute;f&eacute;rence',
+		'ERROR_ZONE'        => 'Valeur incorrecte pour "Zone"',
+		'ERROR_NS'          => 'Valeur incorrecte pour "Serveur de noms"',
+		'ERROR_TXT'         => 'Valeur incorrecte pour "Texte"',
+		'ERROR_EMAIL'       => 'Valeur incorrecte pour "E-mail"',
+		'ERROR_PASSWORD'    => 'Les mots de passent diff&egrave;rent',
+		'ERROR_ADMIN_EMAIL' => 'Valeur incorrecte pour "E-mail administratif"',
+		'ERROR_REFRESH'     => 'Valeur incorrecte pour "D&eacute;lai de rafra&icirc;chissement"',
+		'ERROR_RETRY'       => 'Valeur incorrecte pour "Temps entre les essais"',
+		'ERROR_EXPIRE'      => 'Valeur incorrecte pour "D&eacute;lai d\'expiration"',
+		'FILLOUT_FIELDS'    => 'Veuillez remplir les champs suivants&nbsp;:',
+		'EDIT_FIELDS'       => 'Veuillez &eacute;diter les champs&nbsp;:',
+		'DELETE_RECORD'     => 'Vous &ecirc;tes sur le point de supprimer un enregistrement&nbsp;:',
+		'USERNAME'          => 'Nom d\'utilisateur',
+		'PASSWORD'          => 'Mot de passe',
+		'LOGIN_BUTTON'      => 'Connexion',
+		'PAGE_LOGIN'        => 'Page d\'accueil',
+		'LOGIN_NOTE'        => 'Note&nbsp;: Votre navigateur doit &ecirc;tre configur&eacute; pour accepter les <I>cookies</I>. Il vous sera demand&eacute; de vous reconnecter au bout d\'un certain temps.',
+		'IDLE_TIMEOUT'      => 'D&eacute;connexion (raison&nbsp;: Inactivit&eacute; prolong&eacute;e)',
+		'MALFORMED_TICKET'  => 'D&eacute;connexion (raison&nbsp;: Ticket mal form&eacute;)',
+		'INVALID_HASH'      => 'D&eacute;connexion (raison&nbsp;: Ticket inconnu)',
+		'EXPIRED_TICKET'    => 'D&eacute;connexion (raison&nbsp;: Ticket p&eacute;rim&eacute;)',
+		'MISSING_SECRET'    => 'D&eacute;connexion (raison&nbsp;: impossible de charger le <I>Server secret</I>)',
+		'TAMPERED_HASH'     => 'D&eacute;connexion (raison&nbsp;: Ticket corrompu)',
+		'PASSWORD_CHANGE'   => 'Le mot de passe ne sera modifi&eacute; que si vous remplissez les champs ci-dessous.'
+		);
+    
+    return %text;
+}
+
+1;
+
+
+

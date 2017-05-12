@@ -1,0 +1,18 @@
+---
+abstract: 'corrects PERL to Perl in strings automatically'
+author:
+  - chromatic
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-PERL-Autocorrect
+requires:
+  optimizer: 0
+version: 1.20110629

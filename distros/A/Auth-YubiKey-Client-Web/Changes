@@ -1,0 +1,12 @@
+Revision history for Auth-YubiKey-Client-Web
+
+0.0.2     2015-11-23 17:19:26+00:00 UTC
+
+ - default to https for API URL
+ - add skeleton POD for author tests
+ - replace NoTabsTests with Test::NoTabs (dzil)
+ - swap PkgVersion and PkgDist order (dzil)
+ - add blank line after package declaration (dzil)
+
+0.0.1     2013-12-19 10:45:18 UTC
+    - Initial release

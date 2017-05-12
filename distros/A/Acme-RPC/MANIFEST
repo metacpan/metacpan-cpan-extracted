@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/Acme-RPC.t
+lib/Acme/RPC.pm
+META.yml                                 Module meta-data (added by MakeMaker)

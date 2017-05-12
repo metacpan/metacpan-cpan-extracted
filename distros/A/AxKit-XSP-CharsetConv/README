@@ -1,0 +1,13 @@
+
+AxKit::XSP::CharsetConv - AxKit XSP taglib for charset conversion
+
+
+The XSP CharsetConv taglib implements character set conversion as
+implemented in iconv(), through the Apache::AxKit::CharsetConv module
+that comes with your standard AxKit install. You may wish to use it
+to convert data from misc. sources (databases, files, browser posts,
+the environment, etc...) that are not UTF-8 yet need to be included in
+the output of your XSP.
+
+
+-- Robin Berjon, <robin@knowscape.com>

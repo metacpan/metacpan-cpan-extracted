@@ -1,0 +1,8 @@
+Revision history for Perl extension Apache::SiteConfig
+
+0.03    一  7/25 17:37:17 2011
+        - Provide su, chown attributes
+        - Add httpd.conf detection
+
+0.01    Sun Jul 24 00:53:16 2011
+        - original version

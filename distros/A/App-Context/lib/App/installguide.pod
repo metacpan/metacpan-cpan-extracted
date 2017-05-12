@@ -1,0 +1,229 @@
+#!perl -w
+# run this document through perl to check its syntax
+use Pod::Checker;
+podchecker(\*DATA);
+__END__
+
+=head1 NAME
+
+App::installguide - App Installation Guide
+
+=head1 INTRODUCTION
+
+This is the Installation Guide to the
+App (Perl 5 Enterprise Environment).
+You can find out more background to the project on the web.
+
+  http://www.officevision.com/pub/p5ee
+  http://p5ee.perl.org
+
+Installation of the App requires the following:
+
+ * install Perl (at least 5.5.3) (5.005_03)
+   (you can test this by typing "perl -v")
+ * install Apache or other web server
+ * install dependent Perl modules from CPAN
+ * install App software
+
+We will discuss the last item first, because it is assumed
+that most people know how to do the first three or they 
+are already done.
+
+=head1 SET UP THE ENVIRONMENT
+
+You could just install all of the software into "/usr/local" or
+wherever your Perl is installed.  In that case, skip this section.
+
+If however, you are setting up a development environment, or
+if you wish to install multiple versions of the App software,
+it is advisable you choose an approach as follows.
+
+=head2 Set Up a Development Environment (Unix)
+
+Choose a directory that will be the base of all App
+environments (i.e. /usr/mycompany, any base directory will do).
+
+  /usr/mycompany
+
+Create a subdirectory for each separate developer/tester.
+You may wish to choose groups rather than users (i.e. "devel", "qagroup").
+(In this case, you would have several developers working in
+one directory tree.  This may cause more conflicts between
+developers during development, but the
+conflicts get worked out more quickly than when developers
+work in separate directories.)
+
+  /usr/mycompany/spadkins
+  /usr/mycompany/joe
+  /usr/mycompany/marysue
+  /usr/mycompany/devel
+  /usr/mycompany/qagroup
+
+These are independent development "sandboxes".
+Later, when we start making releases of the software (which includes the App
+framework), we will create other environment directories like this.
+
+  /usr/mycompany/0.5.0
+  /usr/mycompany/0.5.1
+  /usr/mycompany/1.0.0
+  /usr/mycompany/2.17.10
+
+All of these directories will have their own self-contained installation
+of software.  Named versions (i.e. "test", "qa", "prod") are simply
+symbolic links to the particular version to which they currently apply.
+
+In your chosen development directory, you should set the permissions
+to allow access to be granted by group.
+
+  chgrp -R spadkins /usr/mycompany/spadkins  # all files and dirs owned by group
+  chmod 775 `find /usr/mycompany/spadkins -type d -print` # dirs writable by the group
+  chmod g+s `find /usr/mycompany/spadkins -type d -print` # setgid bit keeps files in the group
+
+Within each directory, you should create a default set of subdirectories.
+
+  cd /usr/mycompany/spadkins
+  mkdir src lib bin man etc include src/tar
+
+You should set up in your ".profile" some appropriate variables.
+
+  PREFIX=/usr/mycompany/spadkins; export PREFIX
+  PATH=$PREFIX/bin:$PATH; export PATH
+  LD_LIBRARY_PATH=$PREFIX/lib:$LD_LIBRARY_PATH; export LD_LIBRARY_PATH
+  LIBPATH=$PREFIX/lib:$LIBPATH; export LIBPATH  # for AIX? (instead of LD_LIBRARY_PATH)
+  MANPATH=$PREFIX/man:$MANPATH; export MANPATH
+
+Note: If no initial MANPATH was set, setting the MANPATH this way
+could inhibit the "man" command
+from finding all of the standard "man" pages.  You may need to create
+an initial MANPATH something like this and then add the $PREFIX/man
+directory to it.
+
+  MANPATH=`find /usr /opt /man -type d -name man -print 2> /dev/null`
+  MANPATH=`echo $MANPATH | sed 's/ /:/g'`
+  export MANPATH
+
+Note: It may be similar for LD_LIBRARY_PATH, and you may need to set an
+initial LD_LIBRARY_PATH something like this.
+
+  LD_LIBRARY_PATH=`find /usr /opt /lib -type d -name lib -print 2> /dev/null`
+  LD_LIBRARY_PATH=`echo $LD_LIBRARY_PATH | sed 's/ /:/g'`
+  export LD_LIBRARY_PATH
+
+Now log out and log in again so that your ".profile" variables
+are in your environment.
+
+=head2 Set Up a Development Environment (Windows)
+
+See L<App::installguide::win32>.
+
+=head1 INSTALL DEPENDENT SOFTWARE
+
+=head2 Install Dependent Modules from CPAN
+
+  perl -MCPAN -e shell
+  cpan> install Date::Parse
+  cpan> install Date::Format
+  cpan> install Data::Dumper
+  cpan> install Compress::Zlib
+  cpan> install MIME::Base64
+  cpan> install Storable
+  cpan> install Exception::Class
+  cpan> install Class::MethodMaker
+  cpan> install Hook::LexWrap
+  cpan> install Aspect
+  cpan> exit
+
+If anyone finds other dependent modules, please let me know.
+
+=head1 GET App SOFTWARE
+
+=head2 Get App From CPAN
+
+The App is not yet on CPAN.
+Try one of the other methods.
+
+=head2 Get App from CVS (to develop App)
+
+You should use this method if you *do* have commit access
+on the App CVS repository.  (Note, substitute your CVS
+user id for "LOGIN" below.)
+
+  cd $PREFIX/src
+  cvs -d :pserver:LOGIN@cvs.perl.org:/cvs/public login
+  [enter your perl.org password]
+  cvs -d :pserver:LOGIN@cvs.perl.org:/cvs/public co p5ee
+
+Later, when you want to refresh your directory with the latest software
+from CVS, you can repeat the same commands or you can do the following.
+
+  cd $PREFIX/src/p5ee
+  cvs update -dP
+
+See a CVS document to find out how to create, delete, and modify files
+and then submit changes.
+
+=head2 Get App from CVS (anonymous, read-only access to latest App)
+
+You should use this method if you do *not* have commit access
+on the App CVS repository but you do want to stay up to date with the
+latest App software (recommended, because there are no releases yet).
+
+  cd $PREFIX/src
+  cvs -d :pserver:anonymous@cvs.perl.org:/cvs/public login
+  [press enter at the password prompt]
+  cvs -d :pserver:anonymous@cvs.perl.org:/cvs/public co p5ee
+
+Later, when you want to refresh your directory with the latest software
+from CVS, you can repeat the same commands or you can do the following.
+
+  cd $PREFIX/src/p5ee
+  cvs update -dP
+
+The "cvs update" method is the preferred way to get updates.
+
+=head2 Get App from a Snapshot
+
+If you do not have CVS on your system, you can still get reasonably 
+recent sources from http://cvs.perl.org/snapshots/p5ee/.
+
+  cd $PREFIX/src
+  wget -O tar/p5ee-latest.tar.gz http://cvs.perl.org/snapshots/p5ee/p5ee-latest.tar.gz
+  gunzip < tar/p5ee-latest.tar.gz | tar xvf -
+
+If you don't have "wget" (http://www.gnu.org/software/wget/wget.html),
+you can use Perl's own LWP.
+
+  cd $PREFIX/src
+  perl -MLWP::Simple -e 'getstore("http://cvs.perl.org/snapshots/p5ee/p5ee-latest.tar.gz", "tar/p5ee-latest.tar.gz")'
+  gunzip < tar/p5ee-latest.tar.gz | tar xvf -
+
+=head1 INSTALL App SOFTWARE
+
+=head2 Install Perl Modules, Man Pages, HTML Pages
+
+  cd $PREFIX/src/p5ee/App
+  make
+  make test    (these may or may not work. the tests themselves are under development.)
+  make install
+
+=head2 Edit Main Config File
+
+You will need to do this one time.
+
+  cd $PREFIX/src/p5ee/App-/cgi-bin
+  cp demo.conf p5ee.conf
+  vi p5ee.conf
+  # edit the following lines:
+  #   * perlinc       = list of perl include paths
+  #   * scriptDir     = absolute path for directory which the "p5x" script will be in
+  #   * scriptUrlDir  = path from http://localhost to the scriptDir
+  #   * htmlDir       = absolute path for the "htdocs" directory
+  #   * htmlUrlDir    = path from http://localhost to the htmlDir
+  #   * ttTemplateDir = apsolute path for the "templates" directory
+
+=head2 Make HTML Pages Visible on the Webserver
+
+=head2 Make CGI Programs Visible on the Webserver
+
+=cut
+

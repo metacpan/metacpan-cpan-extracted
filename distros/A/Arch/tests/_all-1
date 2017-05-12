@@ -1,0 +1,24 @@
+#!/usr/bin/perl -w
+
+# The script simply compiles all Arch classes.
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use vars '@classes';
+
+BEGIN {
+	my $arch_pm_file = "$FindBin::Bin/../perllib/Arch.pm";
+	open SRC, "<$arch_pm_file" || die "No $arch_pm_file\n";
+	my $content = join('', <SRC>);
+	close SRC;
+	@classes = $content =~ /L<(Arch::.*?)>/g;
+	die "No Arch classes in $arch_pm_file pod\n" unless @classes;
+	unshift @classes, 'Arch';
+}
+
+use Test::More tests => scalar @classes;
+
+use_ok($_) foreach @classes;

@@ -1,0 +1,31 @@
+Revision history for Perl extension Alien::RRDtool
+
+0.06 2014-06-30 13:09:13
+    - add /usr/lib64/pkgconfig to default PKG_CONFIG_PATH (kazeburo)
+
+0.05 2013-03-31 23:26:59
+    - Do not override PKG_CONFIG_PATH for one to set it (thanks to kazeburo)
+
+0.04 2013-03-30 23:51:44
+    - Apply patch to work RRDtool 1.4.7 on MacOSX 10.8 (kazeburo)
+      see https://github.com/oetiker/rrdtool-1.x/issues/374
+    - set PKG_CONFIG_PATH for homebrew-ed pkg-config(1)
+
+0.03 2012-05-17 14:39:23
+    - Ship with RRDTool 1.4.7
+
+0.02 2011-12-01 23:43:29
+    - Install rrd* commands to perl's bin/
+
+0.01_04 2011-12-01 01:20:59
+    - Re-packaging
+
+0.01_03 2011-12-01 01:13:34
+    - Re-packaging
+
+0.01_02 2011-12-01 01:01:22
+    - Include rrdtool.tar.gz in the dist
+
+0.01_01 2011-12-01 00:20:42
+    - original version; created by dim
+      at Mon Nov 28 22:04:16 2011.

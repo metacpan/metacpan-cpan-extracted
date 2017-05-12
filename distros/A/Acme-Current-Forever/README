@@ -1,0 +1,3 @@
+Acme::Current gives you all the power of those myriad of date/time
+modules without all that complexity, as long as all you want is the
+current date (GMT-based), and you keep the module up to date.

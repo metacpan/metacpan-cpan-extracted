@@ -1,0 +1,71 @@
+Greetings Perlfolk,
+
+** What is this?
+
+AI::NeuralNet::Mesh is an optimized, accurate neural network Mesh.
+It was designed with accruacy and speed in mind. 
+
+This network model is very flexable. It will allow for clasic binary
+operation or any range of integer or floating-point inputs you care
+to provide. With this you can change activation types on a per node or
+per layer basis (you can even include your own anonymous subs as 
+activation types). You can add sigmoid transfer functions and control
+the threshold. You can learn data sets in batch, and load CSV data
+set files. You can do almost anything you need to with this module.
+This code is deigned to be flexable. Any new ideas for this module?
+Contact Josiah Bryan at <jdb@wcoil.com>
+
+This module is designed to also be a customizable, extensable 
+neural network simulation toolkit. Through a combination of setting
+the $Connection variable and using custom activation functions, as
+well as basic package inheritance, you can simulate many different
+types of neural network structures with very little new code written
+by you. (See ex_aln.pl)
+
+As always, included is a cleaned, CSS-ed, HTML-format of the POD docs.
+
+** What's new?
+
+>From the POD:
+This is version 0.44, an bug fix for the third release of the module.
+
+This fixed a compatibilty issue that 0.43 had with Perl 5.3.3
+
+With this version I have gone through and tuned up many area
+of this module, including the descent algorithim in learn(),
+as well as four custom activation functions, and several export 
+tag sets. With this release, I have also included a few
+new and more practical example scripts. (See ex_wine.pl) This release 
+also includes a simple example of an ALN (Adaptive Logic Network) made
+with this module. See ex_aln.pl. Also in this release is support for 
+loading data sets from simple CSV-like files. See the load_set() method 
+for details. This version also fixes a big bug that I never knew about 
+until writing some demos for this version - that is, when trying to use 
+more than one output node, the mesh would freeze in learning. But, that 
+is fixed now, and you can have as many outputs as you want (how does 3 
+inputs and 50 outputs sound? :-) Also in this release is output range
+limiting via the range() activation function.
+
+** What do you think?
+
+Now I know you people are out there that are using the module...
+I can hear the fists hitting the keyboards in frustration. :-) Relieve
+some of that frustration by e-mailing me and letting me know what
+you think of the module and any suggestions you got. 
+
+Use it, let me know what you all think. This is just a
+groud-up write of a neural network, no code stolen or
+anything else. Don't expect a classicist view of nerual 
+networking here. I simply wrote from operating theory, 
+not math theory. Any die-hard neural networking gurus out 
+there? Let me know how far off I am with
+this code! :-)
+	
+Regards,
+
+        ~ Josiah Bryan, <jdb@wcoil.com>
+
+Latest Version:
+
+        http://www.josiah.countystart.com/modules/get.pl?mesh:README
+

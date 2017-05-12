@@ -1,0 +1,189 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Carp;
+use Getopt::Long;
+use File::Basename;
+
+use Arepa::Config;
+use Arepa::Repository;
+use Arepa::BuilderFarm;
+use Arepa::Builder::Sbuild;
+
+my $config_file = '/etc/arepa/config.yml';
+
+sub show_help {
+    print STDERR <<EOD;
+SYNTAX: arepa-admin <command> [options]
+where <command> is one of:
+  createbuilder
+  init
+  uninit
+
+arepa-admin createbuilder /var/mybuilder ftp://... squeeze
+arepa-admin createbuilder --arch i386 /var/mybuilder ftp://... squeeze
+
+arepa-admin createdistribution mysqueeze
+arepa-admin createdistribution --arch "amd64 source" mysqueeze
+arepa-admin createdistribution --components "main contrib" mysqueeze
+arepa-admin createdistribution --extra-field version:5.0 mysqueeze
+
+arepa-admin init
+arepa-admin init just_this_builder
+
+arepa-admin uninit
+arepa-admin uninit just_this_builder
+EOD
+    exit 1;
+}
+
+if (scalar @ARGV == 0) {
+    print STDERR "arepa-admin needs a command\n";
+    show_help;
+}
+
+my $command = shift;
+if ($command eq 'createbuilder') {
+    my $arch = undef;
+    my $r = GetOptions('arch=s' => \$arch);
+    if (!$r) {
+        print STDERR "Invalid options for createbuilder command\n";
+        show_help;
+    }
+
+    my ($builder_dir, $mirror, $distribution) = @ARGV;
+    if (scalar @ARGV != 3) {
+        print STDERR "createbuilder needs exactly three arguments\n";
+        show_help;
+    }
+    my %create_opts = ();
+    if (defined $arch) {
+        $create_opts{arch} = $arch;
+    }
+
+    # Check that there isn't any builder by that name already registered
+    my $config = Arepa::Config->new($config_file);
+    my $builder_name = basename($builder_dir);
+    my $exists = 0;
+    eval { $config->get_builder_config($builder_name); $exists = 1; };
+    if ($exists) {
+        print STDERR "There is already a builder called '$builder_name'\n";
+        print STDERR "Use another name or remove the appropriate file in /etc/arepa/builders/\n";
+        exit 1;
+    }
+
+    Arepa::Builder::Sbuild->create($builder_dir, $mirror, $distribution,
+                                   %create_opts);
+}
+elsif ($command eq 'createdistribution') {
+    my ($arch, $components, @extra_fields) =
+            ("source " . `dpkg-architecture -qDEB_BUILD_ARCH`, 'main');
+    my $r = GetOptions('arch=s'        => \$arch,
+                       'components=s'  => \$components,
+                       'extra-field=s' => \@extra_fields);
+    if (!$r) {
+        print STDERR "Invalid options for createdistribution command\n";
+        show_help;
+    }
+
+    my ($codename, $suites) = @ARGV;
+    if (scalar @ARGV < 1 or scalar @ARGV > 2) {
+        print STDERR "createdistribution needs one or two arguments\n";
+        show_help;
+    }
+    my $repo = Arepa::Repository->new($config_file);
+    $r = $repo->add_distribution(codename      => $codename,
+                                 components    => $components,
+                                 architectures => $arch,
+                                 map {
+                                         my ($field, $value) =
+                                                 split(/:\s*/, $_);
+                                         (ucfirst($field) => $value);
+                                     }
+                                     @extra_fields);
+    if (! $r) {
+        print STDERR "There was a problem adding the new distribution " .
+                        "'$codename'.\nProbably a distribution with that " .
+                        "codename or suite already exists?\n";
+    }
+}
+elsif ($command eq 'init') {
+    Arepa::Builder->ui_module("Arepa::UI::Null");
+    my $farm = Arepa::BuilderFarm->new($config_file);
+    if (scalar @ARGV) {
+        foreach my $builder (@ARGV) {
+            $farm->init_builder($builder);
+        }
+    }
+    else {
+        $farm->init_builders;
+    }
+}
+elsif ($command eq 'uninit') {
+    Arepa::Builder->ui_module("Arepa::UI::Null");
+    my $farm = Arepa::BuilderFarm->new($config_file);
+    if (scalar @ARGV) {
+        foreach my $builder (@ARGV) {
+            if (! $farm->uninit_builder($builder)) {
+                print STDERR "Couldn't uninit builder '$builder'. Are you root?\n";
+            }
+        }
+    }
+    else {
+        $farm->uninit_builders;
+    }
+}
+else {
+    print STDERR "Unknown command '$command'\n";
+    exit 1;
+}
+
+__END__
+
+=head1 AUTHOR
+
+Esteban Manchado Velázquez <estebanm@opera.com>.
+
+=head1 LICENSE AND COPYRIGHT
+
+This code is offered under the Open Source BSD license.
+
+Copyright (c) 2010, Opera Software. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+=over 4
+
+=item
+
+Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+=item
+
+Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+=item
+
+Neither the name of Opera Software nor the names of its contributors may
+be used to endorse or promote products derived from this software without
+specific prior written permission.
+
+=back
+
+=head1 DISCLAIMER OF WARRANTY
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

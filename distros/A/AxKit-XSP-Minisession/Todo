@@ -1,0 +1,4 @@
+$Id: /local/CPAN/AxKit-XSP-Minisession/Todo 1418 2005-03-05T18:07:22.924154Z claco  $
+TODO list for Perl module AxKit::XSP::Minisession
+
+    - Change set-value to accept input via parse_char

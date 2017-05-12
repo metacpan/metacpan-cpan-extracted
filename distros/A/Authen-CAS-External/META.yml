@@ -1,0 +1,55 @@
+---
+abstract: "Authenticate with CAS servers as a browser\nwould."
+author:
+  - 'Douglas Christopher Wilson <doug@somethingdoug.com>'
+build_requires:
+  Test::More: 0
+  Test::Requires: 0.02
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Authen-CAS-External
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Authen::CAS::External:
+    file: lib/Authen/CAS/External.pm
+    version: 0.08
+  Authen::CAS::External::Library:
+    file: lib/Authen/CAS/External/Library.pm
+    version: 0.08
+  Authen::CAS::External::Response:
+    file: lib/Authen/CAS/External/Response.pm
+    version: 0.08
+  Authen::CAS::External::UserAgent:
+    file: lib/Authen/CAS/External/UserAgent.pm
+    version: 0.08
+requires:
+  HTML::Form: 5.817
+  HTML::TokeParser: 3.00
+  HTTP::Status: 5.817
+  LWP::UserAgent: 5.819
+  Moose: 0.89
+  Moose::Role: 0.89
+  MooseX::StrictConstructor: 0.08
+  MooseX::Types: 0.08
+  MooseX::Types::Moose: 0
+  MooseX::Types::URI: 0
+  Scalar::Util: 1.14
+  URI: 1.22
+  URI::QueryParam: 0
+  namespace::clean: 0.04
+  perl: 5.008001
+resources:
+  homepage: http://github.com/dougwilson/perl5-authen-cas-external/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/dougwilson/perl5-authen-cas-external.git
+version: 0.08

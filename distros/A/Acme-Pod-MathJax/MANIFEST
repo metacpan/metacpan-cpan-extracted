@@ -1,0 +1,8 @@
+Build.PL
+Changes
+lib/Acme/Pod/MathJax.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README.pod
+t/compile.t

@@ -1,0 +1,34 @@
+---
+abstract: 'AnyEvent::HTTP OO-wrapper'
+author:
+  - 'Denis Ibaev <dionys@cpan.org>'
+build_requires:
+  AnyEvent: 0
+  HTTP::Request::Common: 0
+  Test::Deep: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-UserAgent
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  AnyEvent::HTTP: 0
+  HTTP::Cookies: 0
+  HTTP::Message: 0
+  Moo: 0
+  namespace::clean: 0
+resources:
+  bugtracker: http://github.com/AdCampRu/anyevent-useragent/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/AdCampRu/anyevent-useragent
+version: 0.07

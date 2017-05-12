@@ -1,0 +1,61 @@
+NAME
+    App::BCSSH - Back channel SSH messaging
+
+SYNOPSIS
+        client$ bcssh ssh host
+        host$ bcssh vi file
+
+        # bashrc
+        alias ssh=bcssh ssh
+        bcssh ping && alias vi=bcssh vi
+
+        # help
+        bcssh commands
+        bcssh help ssh
+
+BETA RELEASE
+    This is a beta release and there is no guarantee the API will not
+    change.
+
+DESCRIPTION
+    This module enables commands on run on a server to be forwarded back to
+    the client that established the SSH connection. Specifically, it is
+    meant to enable opening files in a local editor via commands run on the
+    server.
+
+    This is same concept that bcvi uses, but using a different messaging
+    protocol to fix some issues with it's design.
+
+    bcvi uses remote port forwards to enable communicating with the local
+    machine. These may not be enabled on the server. It also overloads the
+    TERM environment variable to pass information to the server, but this is
+    problematic if the server doesn't have bcvi set up on it to fix TERM.
+
+    SSH already provides a mechanism for the server to communicate with the
+    client machine in the form of ssh agent forwarding. bcssh abuses this
+    protocol to allow passing custom messages. It sets itself up as a proxy
+    for the messages, passing through most messages. It can identify
+    messages intended for BCSSH though, and use this to pass arbitrary
+    information back and forth to the server. This also allows the server to
+    probe the agent for BCSSH support, removing the need to overload TERM.
+
+CAVEATS
+    This is all probably a terrible idea.
+
+SEE ALSO
+    App::BCVI - The inspiration for this concept
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+  CONTRIBUTORS
+    None yet.
+
+COPYRIGHT
+    Copyright (c) 2013 the App::BCSSH "AUTHOR" and "CONTRIBUTORS" as listed
+    above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c93d958878f48e29765c96917f63d5489072cab1 Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 5971329410399a092e4c115aad7dbe69526fcdd8 MANIFEST
+SHA1 6475a5065cb20d1e057f9295b12e577997735647 META.json
+SHA1 f73d065e93b4c7b1898f59b6c52f54b843910ef7 META.yml
+SHA1 09ee8f946dac9c6f0c2ccfb3e7167c639e89b43c Makefile.PL
+SHA1 9e3473bc2c3280f0688d44ef7c07d9af2a7ed70f README
+SHA1 4b67b5d684f734a5744921d8d2a3816a3bb9832e eg/show-errors
+SHA1 e6c0cd98d43808a826b8efd83d923d50489f691f lib/Acme/EdError.pm
+SHA1 83d6546227ec983f81372fd54bbf2d983cb55f3e t/1.t
+SHA1 3ef65383d82f059f56f43236663119c01974decb t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJU0AZWAAoJEDTEVWqwTuCUrhcH/RqZJqVuWmCAtmW6pVlknS06
+NIuaGU6ilpLRuRdOAPHRRiiDQkEYkjtOorgLOQhJ35l9xD+Fbin3KY6tzTl5vxt+
+fAcOxd28UHPDK8mS63rTCL+RHkXzCFCjpEFuQ2rnWdLvLVEnjUk3LIRrpuhMaEVS
+v/fd12ulcfbxeym/rGlmAO1fbZh69ZRE5Mc+OK3FQFQ0KN+Rj23oJLWOl2OlZyfr
+yhm5PUZYOM9f1ZNQRuB7Ot6Yj2XDi+JaHncm/y0HSTCE5+ahpbFL74OpJ9EyJNIy
+W6H2eZu6/Tf8Cw0jpzI/jNuByGGuZjQcdKbkC18QVmfmVL9c5t+qTFuvOnCcG48=
+=YLPQ
+-----END PGP SIGNATURE-----

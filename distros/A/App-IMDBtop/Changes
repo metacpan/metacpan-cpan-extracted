@@ -1,0 +1,7 @@
+Revision history for Perl extension App::IMDBtop.
+
+0.001001 2016-11-12T18:39+00:00
+ - Make this module work on non-patched IMDB::Film
+
+0.001 2016-10-31T23:41+00:00
+ - Initial release

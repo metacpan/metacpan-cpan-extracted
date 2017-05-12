@@ -1,0 +1,197 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+=head1 NAME
+
+error_xml - Convert 500 errors to XML and process through XSLT
+
+=head1 SYNOPSIS
+
+  Plugin error_xml
+  ErrorStylesheet /path/to/error.xsl
+  # optional
+  StackTrace On
+
+=head1 DESCRIPTION
+
+This plugin turns AxKit exceptions into XML structures to be transformed via
+XSLT and output to the browser. Simply specify an F<error.xsl> to transform
+with, or use the one provided with AxKit (in F<demo/error.xsl>).
+
+If you wish to include a full stack trace, add the config as listed below.
+
+Note: This plugin does add some overhead so it is suggested to only use it in
+development.
+
+=head1 FORMAT
+
+The error XML is in the following format:
+
+  <?xml version="1.0"?>
+  <error>
+    <file>./plugins/foosle</file>
+    <msg>Can't locate object method "foobar" via package 
+      "AxKit2::Plugin::foosle" at ./plugins/foosle line 37.
+    </msg>
+    <stack_trace>
+      <bt level="0">
+        <package>AxKit2::Plugin::foosle</package>
+        <file>./plugins/foosle</file>
+        <line>37</line>
+        <subroutine>AxKit2::Plugin::error_xml::__ANON__(...)</subroutine>
+      </bt>
+      <bt level="1">
+        <package>AxKit2::Plugin</package>
+        <file>lib/AxKit2/Plugin.pm</file>
+        <line>35</line>
+        <subroutine>AxKit2::Plugin::foosle::hook_xmlresponse(...)</subroutine>
+      </bt>
+      ...
+    </stacktrace>
+  </error>
+
+=head1 CONFIG
+
+=head2 ErrorStylesheet STRING
+
+An XSLT stylesheet to use for transforming the error XML to HTML.
+
+=head2 StackTrace ( On | Off | 1 | 0 | Yes | No )
+
+Takes a boolean value (to the extreme!) to determine whether to include a
+stack trace in the output or not.
+
+=head2 StackTraceLog ( On | Off | 1 | 0 | Yes | No )
+
+Takes a boolean value to determine whether to output the stack trace to the log
+as well as the browser.
+
+=cut
+
+sub conf_ErrorStylesheet;
+sub conf_StackTrace : Validate(TAKEBOOL);
+sub conf_StackTraceLog : Validate(TAKEBOOL);
+
+sub init {
+    $SIG{__DIE__} = sub { die AxKit2::StructuredError->new($_[0]) };
+}
+
+sub hook_error {
+    my $self = shift;
+    my $error = shift;
+    
+    $self->log(LOGDEBUG, "Turning error into XML");
+    
+    if ($self->config('StackTraceLog')) {
+        $self->log(LOGERROR, $error->to_string(1));
+    }
+    my $with_trace = $self->config('StackTrace');
+    my $xml = $error->to_xml($with_trace);
+    
+    my $stylesheet = $self->config('ErrorStylesheet');
+    if (!$stylesheet) {
+        $self->log(LOGERROR, "Need an ErrorStylesheet to transform the XML");
+        $self->log(LOGERROR, $xml);
+        return DECLINED;
+    }
+    
+    my $input = AxKit2::Processor->new($self->client, $self->client->headers_in->filename);
+    $input->dom($xml);
+    
+    my $out = $input->transform(XSLT($stylesheet));
+    
+    $out->output();
+    
+    return OK;
+}
+
+package AxKit2::StructuredError;
+
+use AxKit2::Utils qw(xml_escape);
+
+use overload
+    '""'   => \&to_string,
+    'bool' => sub { 1 };
+
+sub new {
+    my $class = shift;
+    my $err = shift;
+    return bless { error => $err, stacktrace => _stack_trace() }, $class;
+}
+
+sub to_string {
+    my $self = shift;
+    my $with_stack = shift;
+    return $self->{error} unless $with_stack;
+    return join("\n", $self->{error}, map { "    from $_->[1]:$_->[2]" } @{$self->{stacktrace}});
+}
+
+sub _stack_trace {
+    my @stack;
+    my $pos = 2;
+    while (1) {
+        # $package, $filename, $line, $subroutine, $hasargs,
+        # $wantarray, $evaltext, $is_require, $hints, $bitmask
+        my @caller = caller($pos++);
+        last unless @caller;
+        push @stack, \@caller;
+    }
+    return \@stack;
+}
+
+# <error>
+# 	<file>filename</file>
+# 	<msg>error message</msg>
+# 	<stack_trace>
+# 		<bt level="0">
+# 			<file>filename</file>
+# 			<line>line number</line>
+# 		</bt>
+# 		<bt level="2">
+# 		<!--etc-->
+# 		</bt>
+# 	</stack_trace>
+# </error>
+
+sub to_xml {
+    my $self = shift;
+    my $with_stack = shift;
+    
+    my $stack = $self->{stacktrace};
+    my $msg = $self->{error};
+    my $xml = "<error>\n<file>" . xml_escape($stack->[0]->[1]) . "</file>\n";
+    $xml   .= "<msg>" . xml_escape($msg) . "</msg>\n";
+    
+    if ($with_stack) {
+        $xml .= "<stack_trace>\n";
+        my $level = 0;
+        for my $stack_data (@$stack) {
+            $xml .= "<bt level='$level'>\n";
+            $xml .= "  <package>" . xml_escape($stack_data->[0]) . "</package>\n";
+            $xml .= "  <file>" . xml_escape($stack_data->[1]) . "</file>\n";
+            $xml .= "  <line>" . xml_escape($stack_data->[2]) . "</line>\n";
+            $xml .= "  <subroutine>" . xml_escape($stack_data->[3]) . "(...)</subroutine>\n";
+            $xml .= "</bt>\n";
+            $level++;
+        }
+        $xml .= "</stack_trace>\n";
+    }
+    
+    $xml .= "</error>\n";
+    return $xml;
+}
+

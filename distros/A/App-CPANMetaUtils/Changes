@@ -1,0 +1,55 @@
+0.008   2017-03-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use JSON::MaybeXS in all instances, remove dependency on JSON.
+
+	- Tweak Abstract for gen-cpan-meta.
+
+
+0.007   2017-03-04 (PERLANCAR)
+
+	- [Incompatible] Merge
+	  validate-cpan-meta-with-{sah,cpan-meta-validator} into
+	  validate-cpan-meta.
+
+
+0.006   2017-03-03 (PERLANCAR)
+
+        - Add utility: convert-cpan-meta.
+
+
+0.005   2017-03-03 (PERLANCAR)
+
+	- Tweak Rinci metadata.
+
+	- [Bugfix] gen-cpan-meta: We haven't validated the generated CPAN
+	  META.
+
+
+0.004   2017-03-02 (PERLANCAR)
+
+        - Add utility: gen-cpan-meta.
+
+
+0.003   2017-03-02 (PERLANCAR)
+
+	- [Incompatible] Rename dist from App-ValidateCPANMetaWithSah to
+	  App-CPANMetaUtils.
+
+        - Add script: validate-cpan-meta-with-cpan-meta-validator.
+
+        - [ux] When file is not specified, look at current dir's
+          META.json/META.yml.
+
+
+0.002   2017-01-08 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention CPAN::Meta, CPAN::Meta::Validator.
+
+
+0.001   2016-07-22 (PERLANCAR)
+
+        - First release.

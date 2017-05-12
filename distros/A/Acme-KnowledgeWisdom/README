@@ -1,0 +1,31 @@
+NAME
+    Acme::KnowledgeWisdom - knowledge and wisdom interface through
+    questioning
+
+SYNOPSIS
+        use Acme::KnowledgeWisdom;
+        use Test::Exception;
+    
+        my $kw_questions = Acme::KnowledgeWisdom->new();
+        dies_ok { $kw_questions->get };
+
+DESCRIPTION
+    What if the knowledge is not in answers, but in questions?
+
+ACCESSORS
+  in_questions
+    Boolean, default value is true.
+
+  has_already
+    Boolean, default value is false.
+
+METHODS
+  get
+    Get the knowledge and wisdom.
+
+  ask
+    Ask a question.
+
+AUTHOR
+    Jozef
+

@@ -1,0 +1,10 @@
+[% FOREACH l IN list %]
+<[% s.object %]>
+	<[% s.o.id %]>[% l.${s.o.id} %]</[% s.o.id %]>
+	[% FOREACH f IN s.o.fields -%]
+		[% UNLESS f.hidelist %]
+	<[% f.k %]>[% s.escape(l.${f.k}) %]</[% f.k %]>
+		[% END %]
+	[% END %]
+</[% s.object %]>
+[% END %]

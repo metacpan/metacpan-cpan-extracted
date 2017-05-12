@@ -1,0 +1,10 @@
+\.gitignore
+MYMETA\.(?:yml|json)
+blib/
+_alien/
+_share/
+\..*\.sw[op]
+Build$
+_build/
+\.git/
+MANIFEST\.bak

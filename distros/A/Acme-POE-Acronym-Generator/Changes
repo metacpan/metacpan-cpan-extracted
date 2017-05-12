@@ -1,0 +1,43 @@
+==================================================
+Changes from 2008-04-05 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.20 at 2013-04-04 19:44:50 +0000
+-----------------------------------------
+
+  Change: 89ad699c0bca7bd8533dc8d00434ad8cba85cd1b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-04-04 20:44:50 +0000
+
+    Switch to Dist::Zilla 
+
+-----------------------------------------
+version 1.18 at 2009-05-18 09:38:52 +0000
+-----------------------------------------
+
+  Change: 36aea20a36c0f9f0d3c5ea373c2a9141db4a25ad
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-05-18 10:38:52 +0000
+
+    Added auto_provides, auto_license and githubmeta to Makefile.PL 
+
+-----------------------------------------
+version 1.16 at 2009-04-20 10:16:00 +0000
+-----------------------------------------
+
+  Change: e5a27ca60e66afe867f6d32dc5cce2385ddf3063
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-04-20 11:16:00 +0000
+
+    Set the repository in META.yml. Tidy the POD slightly 
+
+  Change: 82f6250036435a76a7c81a27d4b1d4be56c521c4
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-03-31 14:33:29 +0000
+
+    Initial import into git 
+
+================
+End of releases.
+================

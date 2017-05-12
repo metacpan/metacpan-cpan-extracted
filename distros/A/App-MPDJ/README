@@ -1,0 +1,94 @@
+NAME
+    App::MPDJ - MPD DJ.
+
+SYNOPSIS
+      > mpdj
+      > mpdj --before 2 --after 6
+      > mpdj --no-daemon --conlog info
+
+DESCRIPTION
+    "App::MPDJ" is an automatic DJ for your "MPD" server. It will manage a
+    queue of random songs for you just like a real DJ.
+
+OPTIONS
+    --mpd
+        Sets the MPD connection details. Should be a string like
+        password@host:port. The password and port are both optional.
+
+    -s, --syslog
+        Turns on sending of log information to syslog at specified level.
+        Level is a required parameter can be one of debug, info, notice,
+        warn[ing], err[or], crit[ical], alert or emerg[ency].
+
+    -l, --conlog
+        Turns on sending of log information to console at specified level.
+        Level is a required parameter can be one of debug, info, notice,
+        warn[ing], err[or], crit[ical], alert or emerg[ency].
+
+    --no-daemon
+        Run in the foreground instead of trying to fork and exit.
+
+    -b, --before
+        Number of songs to keep in the playlist before the current song. The
+        default is 2.
+
+    -a, --after
+        Number of songs to queue up in the playlist after the current song.
+        The default is 2.
+
+    -c, --calls-freq
+        Frequency in seconds for call signs to be injected. The default is
+        3600 (one hour). A value of 0 will disable call sign injection.
+
+    --calls-path
+        Path to call sign files. The default is 'calls'.
+
+    --music-path
+        Path to music files. The default is 'music'.
+
+    -f --conf
+        Config file to use
+
+    -V, --version
+        Show the current version of the script installed and exit.
+
+    -h, --help
+        Show this help and exit.
+
+CONFIGURATION FILES
+    The configuration file is formatted as an INI file. See AppConfig for
+    details. If no configuration file is given, the file "/etc/mpdj.conf"
+    will be read (if it exists) followed by the file "~/.mpdjrc" (if it
+    exists). The values in the latter file will override anything in the
+    first file. Command line parameters will override anything given in any
+    configuration file.
+
+AUTHOR
+    Alan Berndt <alan@eatabrick.org>
+
+COPYRIGHT
+    Copyright 2014 Alan Berndt
+
+LICENSE
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+SEE ALSO
+    Net::MPD>
+

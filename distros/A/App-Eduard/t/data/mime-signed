@@ -1,0 +1,32 @@
+From: Eduard <eduard@ceata.org>
+To: Eduard <eduard@ceata.org>
+Subject: MIME Signed
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+
+This is a PGP/MIME signed message.
+=2D-=20
+Marius Gavrilescu
+
+--=-=-=
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBCgAGBQJTuFSGAAoJEPduLdg0sigGl/AH+wf5+jPP+v5LEYnKzSCLpvCF
+/CMEH/XK0XEkxzGYi52pQjGFyX5gO3NSBP/bqx7OqXfv6rV4SImxExl5HHKqqZkc
+cDXjN1nU88r8q2K+apRAaU4g9ukmusoyPQQahEb1kOyzK2uplartYxnWB4PWhxpM
+MIWVaKfINGpZ2e2mTAAelaj36LUATeCwB8A5U68NudRLVvd26tUfKphHbV2msJaW
+1ZV5GgLp7kXPZm0F7GbY9b+3i0vCwNO3UJ5Nht5RnOMrnxqdT5ehbRPxfmH16PdA
+ebTLh23sPEgmXjzIi0oN5LxfWj+26mViTp/7jsAsj8whmVrSfBKPF2pMWsIrB88=
+=BvqQ
+-----END PGP SIGNATURE-----
+--=-=-=--
+

@@ -1,0 +1,39 @@
+
+DirectoryIndex view
+
+SetHandler axkit
+
+AxGzipOutput On
+
+# If you have an error.xsl, uncomment this
+#AxErrorStylesheet text/xsl /stylesheets/error.xsl
+
+AxAddStyleMap text/xsl Apache::AxKit::Language::LibXSLT
+
+AxDebugLevel 0
+AxLogDeclines Off
+
+AxAddXSPTaglib AxKit::XSP::Wiki
+
+AxAddRootProcessor application/x-xsp NULL xspwiki
+AxAddRootProcessor text/xsl wiki.xsl xspwiki
+
+# Use this option for heavy debugging
+#AxTraceIntermediate /tmp/axkit-trace
+
+# you must create this directory, and it must be
+# writable by the apache user
+PerlSetVar WikiDBRoot /tmp/wikidbs
+
+# The default "Wiki" to use if none is specified in the URL
+#PerlSetVar WikiDB     AxKit
+
+# The default root page of the wiki
+#PerlSetVar DefaultPage  DefaultPage
+
+# Who to send email diffs to
+#PerlSetVar WikiEmailTo  root@localhost
+
+<Files *.css>
+SetHandler default-handler
+</Files>

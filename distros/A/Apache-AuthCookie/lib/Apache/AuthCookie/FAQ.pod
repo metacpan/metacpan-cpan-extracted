@@ -1,0 +1,66 @@
+# make Dist::Zilla happy.
+package Apache::AuthCookie::FAQ;
+
+# ABSTRACT: Frequently Asked Questions about Apache::AuthCookie.
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Apache::AuthCookie::FAQ - Frequently Asked Questions about Apache::AuthCookie.
+
+=head1 VERSION
+
+version 3.26
+
+=head1 DESCRIPTION
+
+This document serves to answer the most frequently asked questions about L<Apache::AuthCookie>.
+
+=head2 How can I protect an entire site (/) with Apache::AuthCookie?
+
+You have to give an Apache C<require> directive that applies to all requests
+for B<except> for your login handler.  The easiest way to do this is to
+override the auth handlers for your login script. For example, if your login
+handler is C</LOGIN>, then you need to use something like the following:
+
+ <Location />
+   AuthType My::AuthCookieHandler
+   AuthName Whatever
+   PerlAuthenHandler My::AuthCookieHandler->authenticate
+   PerlAuthzHandler My::AuthCookieHandler->authorize
+   require valid-user
+ </Location>
+
+ <Location /LOGIN>
+   PerlAuthenHandler Apache2::Const::OK
+   PerlAuthzHandler Apache2::Const::OK
+ </Location>
+ ...
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/mschout/apache-authcookie>
+and may be cloned from L<git://github.com/mschout/apache-authcookie.git>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to bug-apache-authcookie@rt.cpan.org or through the web interface at:
+ http://rt.cpan.org/Public/Dist/Display.html?Name=Apache-AuthCookie
+
+=head1 AUTHOR
+
+Michael Schout <mschout@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2000 by Ken Williams.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,43 @@
+Revision history for Perl extension Acme::Roman.
+
+    $Id: Changes 560 2006-07-17 16:52:16Z me $
+
+0.0.2.12 Jun 06 2008
+       - no code changes
+       - has a POD coverage test (skipped, but has one)
+       - you know, gotta please CPANTS
+
+0.0.2.11 Jul 20 2007
+       - search.cpan and Module::Build are not ready yet
+         for artistic2 (even though CPAN is) - back to 
+         Perl licenses
+       - Damn! 5.9.5 keeps warning about "v-string in use/require non-portable"
+         because Roman 1.20 uses "use 5.6.0"
+
+0.0.2.10 Jul 20 2007
+       - "license => 'mit'" slipped instead of "license => 'artistic2'"
+
+0.0.2.9  Jul 20 2007
+       - make sure only uppercase (I, II, X) is accepted
+         and no lowercase Roman numerals: ii, x, vi
+       - the example (eg/roman.pl) was broken into three
+         files
+       - license update to Artistic 2.0
+       - added 'configure_requires' to META.yml
+
+0.0.2  Jun 29 2007
+       - I + 'II' is alright
+       - def_prototypes gets twice as fast using set_prototype
+         (from Scalar::Util) rather than eval STRING
+       - example at eg/roman.pl
+
+0.0.1  Jun 28 2007
+       - First unreleased version.
+
+       TODO:
+       + Acme::Roman::AUTOLOAD - declares Acme::Roman::XX, etc.
+       + imported AUTOLOAD - exports XX, etc.
+       + document in "begin private"
+       + pass "t/98_pod-coverage.t"
+       + POD in example files
+

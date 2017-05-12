@@ -1,0 +1,48 @@
+App-MakeEPUB version 0.0.1
+
+This Module is a wrapper around the script make-epub.
+
+This script takes a directory containing XHTML, images, stylesheets and
+turns them into a digital book in EPUB format, the standard by the by
+the International Digital Publishing Forum (IDPF).
+
+The script is intended to be used from the command line or together with
+something like make.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+	HTML::TreeBuilder
+
+HISTORY
+
+This module started as a script to generate an EPUB ebook from the LaTeX
+sources of the german magazine UpTimes (http://www.guug.de/uptimes/). The
+script just does the last part of the task: taking the HTML, CSS and image
+files below a directory and make an ebook thereof. Later I decided to put it
+to more general use and adapted the script to generate EPUB ebooks from the
+HTML RFCs at https://tools.ietf.org/html/ (see exampls directory on how to do
+this).
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013, Mathias Weidner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

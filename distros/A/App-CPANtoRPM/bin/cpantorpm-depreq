@@ -1,0 +1,318 @@
+#!/usr/bin/perl
+# Copyright (c) 2012-2016 Sullivan Beck.  All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+# This script will analyze a list of perl modules to get either the list
+# of packages that it provides, or a list or requirements that it has.
+#
+# Some of the script is taken from the RPM tools perl.prov and perl.req.
+# Unfortunately, these tools are not always available, or do not always
+# work, so I provide my own version for cpantorpm.
+
+###############################################################################
+
+use strict;
+use warnings;
+use IO::File;
+
+our $VERSION    = "1.00";
+
+#use re 'debug';
+
+###############################################################################
+# HELP
+###############################################################################
+
+our($usage);
+my $COM = $0;
+$COM =~ s/^.*\///;
+
+$usage=
+  "usage: $COM OPTIONS FILE FILE ...
+
+   Options:
+      -h/--help        : Print help.
+      -v/--version     : Print out the version of this program
+
+      -p/--provides    : Print out a list of packages provided
+      -r/--requires    : Print out a list of requirements
+
+      -m/--modlist     : By default, it the list is in a format
+                         used by rpm:
+                            perl(Foo::Bar)
+                         With this option, it is just a list of
+                         modules:
+                            Foo::Bar
+
+Only one of -p and -r should be given, and it defaults to -p.
+";
+
+###############################################################################
+# PARSE ARGUMENTS
+###############################################################################
+
+our $OP     = 'prov';
+our $LIST   = 'rpm';
+our @FILES;
+
+while ($_ = shift) {
+   (print $usage),          exit  if ($_ eq '-h'  ||  $_ eq '--help');
+   print "$VERSION\n",      exit  if ($_ eq '-v'  ||  $_ eq '--version');
+
+   $OP = 'prov',            next  if ($_ eq '-p'  ||  $_ eq '--provides');
+   $OP = 'req',             next  if ($_ eq '-r'  ||  $_ eq '--requires');
+   $LIST = 'mod',           next  if ($_ eq '-m'  ||  $_ eq '--modlist');
+
+   @FILES = ($_,@ARGV);
+   last;
+}
+
+die "ERROR: no files given:\n\n$usage"  if (! @FILES);
+
+my @tmp;
+foreach my $file (@FILES) {
+   if (-r $file) {
+      push(@tmp,$file);
+   } else {
+      warn "WARNING: file not readable: $file\n";
+   }
+}
+
+die "ERROR: no readable files given:\n\n$usage"  if (! @tmp);
+@FILES = @tmp;
+
+############################################################################
+# MAIN PROGRAM
+############################################################################
+
+our %result;
+my $in = new IO::File;
+
+# Some regular expressions for identifying module names and versions.
+#
+# A package name is any number of names separated by double colons (::).
+# Each name is alphanumeric plus underscore.  The first name must not
+# start with a digit.
+#
+#   $modrx    : a regexp matching and capturing a valid module name
+#
+# A version is either: v1.2.3 ... (minimum of three components) or
+# a decimal number 1.2_3_4
+#
+#   $vrx      : a regexp matching a valid version, with no capture
+#   $verrx    : a regexp matching and capturing a valid version
+#   $verqrx   : a regexp matching a quoted version number
+#
+# package NAME lines:
+#   $endvrx   : a regexp matching what can come after a version in
+#               a good package line
+#   $endmrx   : a regexp matching what can come after a module name
+#               in a good package line not containing a version
+#
+# $VERSION = VERS lines:
+#   $verqrx   : a regexp matching version numbers either alone, enclosed
+#               in quotes, or enclosed in q() or qq() (the general form
+#               of q#...# is not yet supported)
+
+
+#   $vprrx    : a "prefix" that might be used before the version number
+#               'VERS', "VERS", q(VERS), qq(VERS)
+
+
+#   $endrx    : a regexp matching what can come after a module name or
+#               a version in a 'package' line
+#   $begrx    : matches an optional 'BEGIN {'
+#   $seprx    : matches the string that can separate portions of a perl
+#               command (including whitespace, newlines, and trailing
+#               comments) in a multi-line form
+
+my $modrx  = qr/([A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z0-9_]+)*)/;
+my $vrx    = qr/v\d+(?:\.\d+){2,}|\d*\.\d+(?:_\d+)*|\d+\.?/;
+my $verrx  = qr/($vrx)/;
+my $verqrx = qr/(?:($vrx)|'($vrx)'|"($vrx)"|q\(($vrx)\)|qq\(($vrx)\))/;
+
+my $endvrx = qr/(?:;|\s|\{|\#|$)/;
+my $endmrx = qr/(?:\s*;|\s*\{)/;
+
+my $vprrx  = qr/(?:'|"|qq.|q.)/;
+my $begrx  = qr/(?:BEGIN\s*\{\s*)?/;
+my $seprx  = qr/(?:\#.*?\n|\s+|\n)+/;
+
+my $endrx  = qr/(?:;|\s|\{|\(|\#|$)/;
+
+foreach my $file (@FILES) {
+   if (! $in->open($file)) {
+      warn "Unable to open file: $file: $!\n";
+      next;
+   }
+
+   my $inpod   = 0;
+   my $inhere  = '';
+
+   # The following are for searching for packages being provided by this file
+   my $package = '';   # package currently being provided
+
+   LINE:
+   while (<$in>) {
+
+      # Skip all the POD stuff.  POD stuff SHOULD start with
+      # =pod, but most of the pod commands actually trigger the
+      # start of POD documentation.
+
+      $inpod=0, next if (/^=cut/);
+      $inpod=1, next if (/^=(pod|head[1-4]|over|item|back|begin|end|for|encoding)/);
+      next           if ($inpod);
+
+      # The automatic RPM tools try to skip here documents and quoted
+      # strings.  That would be nice... but they make too many assumptions
+      # about how the perl is written.  There are way too many ways to
+      # specify these in a perl module, so I'm not going to do this.  Once
+      # we've got a list of provides or requires, we'll need to manually
+      # filter out any bad ones.
+
+      # Skip everything after __DATA__ or __END__
+      last  if (m/^__(DATA|END)__$/);
+
+
+      if ($OP eq 'prov') {
+
+         #
+         # Get the packages provided by this file.
+         #
+
+         # Lines of the form:
+         #    package NAME;
+         #    package NAME VERS;
+         #    package NAME { ... };
+         #    package NAME VERS { ... };
+         # (which may be split across lines)
+
+         if (/^\s*package/) {
+            my($pack,$ver);
+
+            while (1) {
+               if      (/\A\s*package$seprx$modrx$seprx$verrx$endvrx/s) {
+                  ($pack,$ver) = ($1,$2);
+                  last;
+               } elsif (/\A\s*package$seprx$modrx$endmrx/s) {
+                  ($pack,$ver) = ($1,'');
+                  last;
+               } elsif (/\A\s*package$seprx?\z/s  ||
+                        /\A\s*package$seprx$modrx$seprx?\z/s) {
+                  $_ .= <$in>;
+                  next;
+               } else {
+                  warn "Malformed package line\n";
+                  next LINE;
+               }
+            }
+
+            $result{$pack} = $ver;
+            $package       = $pack;
+
+            next LINE;
+         }
+
+
+         # Lines containing:
+         #    $[NAME::]VERSION = VERS;
+         #                    or 'VERS', "VERS", q(VERS), qq(VERS)
+         #    $[NAME::]VERSION = .* $Revision: VERS $
+         #
+         # Currently, we'll only support single-line defintions.
+
+         next LINE  if (! $package);
+         my @m;
+         if (@m = (/\$(?:${package}::)?VERSION\s*=\s*$verqrx/s)) {
+            foreach my $m (@m) {
+               next  if (! defined $m);
+               $result{$package} = $m;
+               next LINE;
+            }
+            next LINE;
+         }
+
+      } else {
+
+         #
+         # Get the modules required by this file.
+         #
+
+         # Lines of the form:
+         #   require VERSION
+         #   require MODULE
+         #   use VERSION
+         #   use MODULE
+         #   use MODULE VERSION
+         #   BEGIN { any_of_the_above .* }
+
+         # The standard tool ignores indented require statements as
+         # they are very often inside an 'if' statement and by including
+         # them, there are too many false positives.  This might be worth
+         # adding.
+
+         my ($mod,$ver);
+
+         if      (/^\s*$begrx(?:use)$seprx$modrx$seprx$verrx$endrx/s) {
+            ($mod,$ver) = ($1,$2);
+
+         } elsif (/^\s*$begrx(?:use|require)$seprx$modrx$endrx/s) {
+            ($mod,$ver) = ($1,0);
+
+         } elsif (/^\s*$begrx(?:use|require)$seprx$verrx$endrx/s) {
+            ($mod,$ver) = ('',$1);
+
+         } else {
+            next LINE;
+         }
+
+         next LINE  if ($mod eq 'vars'     ||
+                        $mod eq 'strict'   ||
+                        $mod eq 'integer'  ||
+                        $mod eq 'warnings' ||
+                        $mod eq 'feature'  ||
+                        $mod eq 'constant' ||
+                        $mod eq 'base'     ||
+                        $mod eq 're'       ||
+                        $mod eq 'Exporter'
+                       );
+
+         if ($mod) {
+            $result{$mod} = $ver
+              unless (exists $result{$mod}  &&
+                      $result{$mod}         &&
+                      ! $ver);
+         } else {
+            $result{'perl'} = $ver;
+         }
+      }
+   }
+}
+
+foreach my $mod (sort keys %result) {
+   my $obj = $mod;
+   $obj    = "perl($mod)"  if ($LIST eq 'rpm'  &&  $mod ne 'perl');
+   my $vers = $result{$mod};
+   if ($vers) {
+      if ($OP eq 'prov') {
+         print "$obj = $vers\n";
+      } else {
+         print "$obj >= $vers\n";
+      }
+   } else {
+      print "$obj\n";
+   }
+}
+
+1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 3
+# cperl-continued-statement-offset: 2
+# cperl-continued-brace-offset: 0
+# cperl-brace-offset: 0
+# cperl-brace-imaginary-offset: 0
+# cperl-label-offset: 0
+# End:

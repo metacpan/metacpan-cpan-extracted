@@ -1,0 +1,9 @@
+The App-psort distribution provides the "psort" program, a
+perl-enhanced sort.
+
+Installation:
+
+	perl Makefile.PL
+	make
+	make test
+	make install

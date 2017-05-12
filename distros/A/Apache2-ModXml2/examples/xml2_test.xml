@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $Id: xml2_test.xml 15 2011-09-13 06:58:46Z jo $ -->
+<data>
+  <title test="sax &amp; drags"
+      test-length="We want a tag that is longer tha 128 bytes"
+      test-additional="For this we need a bit more nonsense">This is the Cindy Test Page</title>
+  <content>Hello &amp; Test</content>
+	<replace>This is NOT bold.</replace>
+  <?test Prozessing Instruction ?>
+	<omit>1</omit>
+  <![CDATA[ >>CData Test<< ]]>
+	<!-- attributes are done with content -->
+	<size>+2</size>
+  <empty />
+	<color>red</color>
+  <repeat>
+    <row>
+      <value>1</value>
+      <text>one</text>
+    </row>
+    <row>
+      <value>2</value>
+      <text>two</text>
+      <selected>1</selected>
+    </row>
+    <row>
+      <value>3</value>
+      <text>three</text>
+    </row>
+  </repeat>
+	<cfalse>0</cfalse>
+	<ctrue>1</ctrue>
+  <filter>
+    <first>1</first>
+    <second>2</second>
+    <third>3</third>
+  </filter>
+</data>

@@ -1,0 +1,36 @@
+drop trigger BIR_<<<TABLENAME>>>
+~
+drop sequence <<<TABLENAME>>>_SEQ
+
+~
+drop table <<<TABLENAME>>>
+
+~
+CREATE TABLE <<<TABLENAME>>> (
+    ID           NUMBER(20)    NOT NULL,
+    LOOKUP       VARCHAR(14)   NOT NULL,
+    DATASTRING   VARCHAR2(50)  NOT NULL,
+    FLAG         CHAR(1) NOT NULL,
+    DATANUM      NUMBER(20)  NOT NULL,
+	PCODE_SREF   BLOB,
+    BIN_SREF     BLOB,
+    NOTE_SREF    BLOB,
+    CHANGEDATE_T    DATE    NOT NULL,
+    RECORDDATE_T    DATE    DEFAULT SYSDATE
+)
+
+~
+-- create a sequence
+create sequence <<<TABLENAME>>>_SEQ
+
+~
+-- do not forget the ; at the end of the trigger
+create trigger BIR_<<<TABLENAME>>>
+before insert on <<<TABLENAME>>>
+for each row
+begin
+    select <<<TABLENAME>>>_SEQ.nextval into :new.ID from dual;
+end;
+
+~alter table <<<TABLENAME>>> add constraint <<<TABLENAME>>>_PK primary key(ID)
+

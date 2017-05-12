@@ -1,0 +1,33 @@
+1.11  2015-05-21
+    - Bad key in META_MERGE prevented installation
+
+1.10  2010-02-28
+    - New maintainer: Alexandr Ciornii
+    - Better error messages
+    - Tests fixed and expanded (RT#34734)
+    - SCALAR, HASH, ARRAY now work (RT#32247, RT#34734)
+    - Warning fixed
+    - Now calls sub with goto, means that croak/carp will work correctly
+      (still does not work when checking return)
+    - Add pod.t and fix a pod error
+    - Better Makefile.PL
+
+1.02   30 Oct 2001
+    - Patches by Leon Brocard:
+    - new test suite (100 tests!) to expose bugs
+    - renamed int to integer so that it now works
+    - string now works
+    - number now works
+    - can now set and check returned values using 'returns'
+    (note associated change in getSignature)
+
+1.01   22 Aug 2001
+    - now when a class name is passed it checks via
+
+           if ((blessed( $class ) || string( $class )) && $class->isa( $shouldbe )) {
+
+      so that you can call it as a class method and still pass the signature.
+
+1.00   21 Aug 2001
+    - initial release
+

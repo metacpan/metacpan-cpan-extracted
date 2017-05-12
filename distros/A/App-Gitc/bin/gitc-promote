@@ -1,0 +1,609 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-promote
+# ABSTRACT: Promote changesets to a higher development level
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    cache_meta_data
+    confirm
+    current_branch
+    environment_preceding
+    full_changeset_name
+    git
+    git_tag
+    guarantee_a_clean_working_directory
+    is_suspendable
+    is_valid_ref
+    is_merge_commit
+    its_for_changeset
+    meta_data_add
+    meta_data_rm
+    new_version_tag
+    project_config
+    project_name
+    restore_meta_data
+    short_ref_name
+    sort_changesets_by_name
+    unpromoted
+);
+use App::Gitc::Reversible;
+use POSIX qw( strftime );
+use Getopt::Long qw( :config pass_through );
+
+# git 1.7.10 added interactive logging of merges.  Since promotions can
+# involve hundreds of merges, we really don't want interactive logging.
+$ENV{GIT_MERGE_AUTOEDIT} = 'no';
+
+our $dry_run;
+our $ignore_dependencies;
+our $force;
+our $verify_promotion = 1;
+our $except;
+our $without_theirs;
+our $new_major_version;
+GetOptions(
+    'except|X=s' => \$except,
+    'force|f' => \$force,
+    'no-verify' => sub { $verify_promotion = 0 },
+    'dry-run|n' => \$dry_run,
+    'I|ignore-changeset-dependencies' => \$ignore_dependencies,
+    'without-theirs' => \$without_theirs,
+    'new-major-version' => \$new_major_version,
+);
+is_suspendable();
+
+my $refs;
+my $changesets_list;
+our $target;
+git "remote update -p origin";
+( $target, $refs, $changesets_list ) = parse_command_line(@ARGV);
+
+my @refs = @$refs;
+
+# calculate the changeset list based on --except
+my $source = environment_preceding($target);
+my @available = unpromoted( "origin/$source", "origin/$target" );
+if ($except) {
+    die   "You gave --except and a list of changesets.  You may only specify "
+        . "one or the other\n"
+        if @refs;
+    my %except = map { $_ => 1 } split /,/, $except;
+    @refs = map { $except{$_} ? () : full_changeset_name($_) } @available;
+    die "It looks like you excluded all the changesets\n" if not @refs;
+}
+my $cherry_pick = @refs ? 1 : 0;
+
+# handle dependencies for cherry pick promotions
+if ($cherry_pick) {
+    if ( not $ignore_dependencies ) {
+        while ( my @missing = find_missing_dependencies( $target, @refs ) ) {
+            @refs = handle_missing_dependencies( \@refs, \@missing );
+        }
+    }
+
+    # prevent out of order promotions (it must go master->test->stage->prod)
+    my %available = map { ( $_ => 1 ) } @available;
+    my @out_of_order =
+        grep { not $available{$_} }
+        map  { short_ref_name($_) }
+        @refs;
+    if (@out_of_order) {
+        warn "These changesets have not yet been promoted to $source:\n";
+        sort_changesets_by_name(\@out_of_order);
+        warn "  - $_\n" for @out_of_order;
+        exit 1;
+    }
+}
+
+# don't do any real work if this is just a dry run
+if ($dry_run) {
+    if ($cherry_pick) {
+        warn "Would promote the following changesets:\n";
+        my @changesets = map { short_ref_name($_) } @refs;
+        sort_changesets_by_name(\@changesets);
+        warn sprintf(" - %s\n", short_ref_name($_) ) for @changesets;
+    }
+    else {
+        warn "Promoting all of $source to $target would promote:\n";
+        sort_changesets_by_name(\@available);
+        warn " - $_\n" for @available;
+    }
+    exit;
+}
+
+my $original_branch = current_branch();
+my $stash;
+my @new_tags;
+reversibly {
+    failure_warning "\nCanceling promotion to $target\n";
+
+    $stash = guarantee_a_clean_working_directory();
+    to_undo { git "stash apply $stash" if $stash; $stash = undef };
+
+    # create an integration branch for merging all the changesets
+    my $integration_branch_existed = is_valid_ref($target);
+    if ( $integration_branch_existed ) {
+        git "checkout $target";
+        git "reset --hard origin/$target";
+        to_undo { git "checkout -f $original_branch" };
+    }
+    else {
+        git "checkout --no-track -b $target origin/$target";
+        to_undo {
+            git "checkout -f $original_branch";
+            git "branch -D $target";
+        };
+    }
+
+    # what kind of promotion are we facing?
+    my ( $refs, $new_tags )
+        = $cherry_pick ? cherry_pick_promotion(@refs) : full_promotion();
+    @refs     = @$refs;
+    @new_tags = @$new_tags;
+    die "You promoted nothing\n" if not @new_tags;
+
+    # display a summary of the promotion
+    warn "\nThe proposed promotion has these changes\n";
+    git "--no-pager diff --name-status origin/$target $target";
+
+    # encourage the promoter to verify his promotion
+    verify_promotion() if $verify_promotion;
+
+    # tag the head of this branch so we have a name for this promotion
+    my $tag_name = strftime( "$target/%FT%H_%M_%S", gmtime );
+    git_tag( $tag_name, 'HEAD' );
+    push @new_tags, $tag_name;
+    to_undo { pop @new_tags; git_tag( '-d', $tag_name ); };
+
+    if (project_config()->{use_version_tags}) {
+        my $version_tag = new_version_tag( $target, $new_major_version );
+        my $cs_msg = join "\n", @$changesets_list;
+        git_tag( "-m 'Promoting to $target:\n\n$cs_msg'", $version_tag, 'HEAD' );
+        push @new_tags, $version_tag;
+        to_undo { pop @new_tags; git_tag( '-d', $version_tag ); };
+    }
+
+    # publish the new branch
+    my @tag_refs = map { "refs/tags/$_:refs/tags/$_" } @new_tags;
+    my $integrate = git "rev-parse $target";
+    failure_warning "\nCanceling promotion to $target.\n"
+        . "Your integration branch is $integrate\n"
+        . "in case you need it\n"
+        ;
+    git "checkout -f $original_branch";
+    to_undo { git "checkout $target" };
+    git "branch -D $target" if not $integration_branch_existed;
+    to_undo { git "branch $target $integrate" };
+    git "push origin $integrate:$target @tag_refs";
+};
+
+# integrate with Eventum.  failing here is not worth rolling back
+if (@new_tags) {
+    my $tag_name = pop @new_tags;
+    my @changesets = map { m{^cs/([^/]+)/to-} ? $1 : () } @new_tags;
+    my $all = join ', ', @changesets;
+    my $project = project_name();
+    my %seen;
+    for my $cs (@changesets) {
+        my $its = its_for_changeset($cs);
+        if ($its) {
+            my $its_name = $its->label_service;
+            my $issue = $its->get_issue($cs) or next;
+            # only update each issue once
+            next if $seen{ $its->issue_number($issue) }++;
+            eval {
+                my $what_happened = $its->transition_state({
+                    command   => 'promote',
+                    issue     => $issue,
+                    target    => $target,
+                    message   => "Promoted $project#$cs to $target "
+                              .  "($tag_name) along with $all",
+                    changeset => $cs,
+                });
+                warn $what_happened;
+            };
+            warn "$its_name Error: ".$@ if $@;
+        }
+    }
+
+    # prevent trivial conflicts for the next 'gitc pass'
+    if ( $cherry_pick and $target eq project_config()->{ open_onto } ) {
+        git "fetch origin";
+        git "checkout master" if $original_branch ne 'master';
+        git "reset --hard origin/master";
+        git "merge -s ours origin/$target";
+        git "push origin master";
+        git "checkout -f $original_branch" if $original_branch ne 'master';
+    }
+}
+
+# reinstate any changes present when we started
+git "stash apply $stash" if $stash;
+
+
+########################## helper subs ###########################
+
+# determine what we're promoting and where
+sub parse_command_line {
+    my @argv = @_;
+
+    # extract structure from the command line
+    my $target = pop @argv;
+    my @changesets = grep { !/^-/ } @argv;
+
+    # validate the promotion target
+    die "You must specify a promotion target\n" if not $target;
+    die "Invalid promotion target '$target'\n"
+        if not defined environment_preceding($target);
+
+    # validate changesets
+    my $refs = validate_changesets( $target, @changesets );
+    return ( $target, $refs, \@changesets );
+}
+
+# checks a list of changeset names for sanity. dies on anything bad.
+# if the changesets are ok, it returns an arrayref of Git refs for
+# those changesets
+sub validate_changesets {
+    my ( $target, @changesets ) = @_;
+    return ( $target, [] ) if not @changesets;
+    die "You may not cherry pick promote to prod\n"
+        if !$force and $target eq 'prod' and @changesets;
+
+    warn "Validating changesets\n";
+    my @refs;
+    my @already_promoted;
+    my %seen;
+    for my $changeset (@changesets) {
+        die "You may not cherry pick '$changeset' to $target\n"
+            if $changeset =~ m/^(master|test|stage|prod)$/;
+        die   "You asked to promote '$changeset' twice.  Did you mean\n"
+            . "to list it once or did you mistype some other changeset?\n"
+            if $seen{$changeset}++;
+        push @refs, full_changeset_name($changeset);
+        push @already_promoted, $changeset
+            if is_valid_ref("cs/$changeset/to-$target");
+    }
+    if (@already_promoted) {
+        my $msg = "These changesets have already been promoted to $target:\n";
+        $msg .= "  - $_\n" for @already_promoted;
+        die $msg;
+    }
+    return \@refs;
+}
+
+# quickly locate any changeset dependencies that were not explicitly listed.
+# takes a promotion target and a list of refs to promote.
+# returns a list of the refs for those dependencies
+sub find_missing_dependencies {
+    my ( $target, @wanted ) = @_;
+    my @extras = map { full_changeset_name($_) }
+        unpromoted( \@wanted, "origin/$target" );
+
+    # find refs that weren't explicitly listed
+    my %extras = map { ( $_ => 1 ) } @extras;
+    delete @extras{@wanted};
+    return keys %extras;
+}
+
+# given a list of requested changeset refs and a list of missing dependency
+# refs, prompts the user what to do and returns a new list of requested
+# changeset refs
+sub handle_missing_dependencies {
+    my ( $wanted, $missing ) = @_;
+
+    my @pretty = map { short_ref_name($_) } @$missing;
+    sort_changesets_by_name(\@pretty);
+    warn "The following changeset dependencies are missing:\n";
+    warn "  - $_\n" for @pretty;
+    die "Exiting promotion because of missing dependencies\n" if not -t STDIN;
+    print STDERR 'What do you want to do? '
+        . '(p)romote these too, e(x)it, see (d)etails: ';
+    chomp ( my $choice = <STDIN> );
+    if ( $choice eq 'p' ) {
+        return ( @$wanted, @$missing );
+    }
+    elsif ( $choice eq 'd' ) {
+        warn "\n";
+        my $dep = build_ref_dependency_tree( $wanted, { select => 1 } );
+        for my $ref (@$wanted) {
+            my @also = map { short_ref_name($_) } @{ $dep->depends($ref) };
+            next if not @also;
+            warn '  '
+                . short_ref_name($ref)
+                . ' --> '
+                . join( ', ', @also ) . "\n";
+        }
+        die "\nPlease change the promotion list and try again\n";
+    }
+
+    die "Exiting promotion because of missing dependencies\n";
+}
+
+# given an arrayref of wanted refs, returns an Algorithm::Dependency::Ordered
+# object representing all the dependencies.
+sub build_ref_dependency_tree {
+    my ( $wanted, $args ) = @_;
+    our $target;
+
+    warn "Calculating changeset dependency tree\n";
+    my %dependencies;
+    my @outstanding_refs = @$wanted;
+    while ( my $ref = shift @outstanding_refs ) {
+        next if $dependencies{$ref};
+        my @refs =
+            grep { $_ ne $ref }
+            map  { full_changeset_name($_) }
+            unpromoted( $ref, "origin/$target" );
+        push @outstanding_refs, @refs;
+        $dependencies{$ref} = [ @refs ];  # copy the list of dependencies
+    }
+
+    # build the object
+    require Algorithm::Dependency::Ordered;
+    require Algorithm::Dependency::Source::HoA;
+    my $source = Algorithm::Dependency::Source::HoA->new(\%dependencies);
+    return Algorithm::Dependency::Ordered->new(
+        source   => $source,
+        $args->{select} ? ( selected => $wanted ) : (),
+    );
+}
+
+# promote some changesets and leave the rest behind
+# this must be run inside a reversibly() block.
+sub cherry_pick_promotion {
+    my (@refs) = @_;
+    our $target;
+
+    # merge changesets according to dependencies
+    my @promoted_refs;
+    my @new_tags;
+    if ( $ignore_dependencies ) {
+        @refs = schedule_refs_by_merge_time(@refs);
+    }
+    else {
+        @refs = schedule_refs_by_dependency(@refs);
+    }
+
+    cache_meta_data(@refs);
+
+    CHANGESET:
+    while ( my $ref = shift @refs ) {
+        my $changeset = short_ref_name($ref);
+        eval {
+            warn "Promoting '$changeset'\n";
+            if ( $ignore_dependencies ) {
+                my $ref = "cs/$changeset/to-master";
+                my $m = is_merge_commit($ref) ? '-m 1' : '';
+                git "cherry-pick $m $ref";
+            }
+            else {
+                git "merge --no-ff --quiet $ref"
+            }
+            to_undo { git "reset --hard HEAD~1" };
+        };
+        if ($@) {  # there was a problem during the merge
+            my $now_what = let_user_resolve_conflict($changeset);
+            return ( \@promoted_refs, \@new_tags )
+                if $now_what eq 'skip rest';
+        }
+        push @promoted_refs, $ref;
+        to_undo { pop @promoted_refs };
+        my $id = meta_data_add({
+            action    => 'promote',
+            changeset => $changeset,
+            target    => $target,
+            flush     => 0,
+        });
+        to_undo { meta_data_rm(id => $id, changeset => $changeset, flush => 0) };
+        my $tag_name = "cs/$changeset/to-$target";
+        git_tag( $tag_name, 'HEAD' );
+        push @new_tags, $tag_name;
+        to_undo { pop @new_tags; git_tag( '-d', $tag_name ); };
+
+        # remove a demotion tag, if there is one
+        my $rm_tag = "cs/$changeset/rm-$target";
+        if ( my $ref = is_valid_ref($rm_tag) ) {
+            git "tag -d $rm_tag";
+            to_undo { git "tag $rm_tag $ref" };
+        }
+    }
+
+    # flush the changes
+    to_undo { restore_meta_data(); };
+    meta_data_rm();
+    meta_data_add();
+
+    return ( \@promoted_refs, \@new_tags );
+}
+
+# tells the user to resolve any merge conflicts, suspends this process
+# and waits to be resumed.  Once resumed, verify that the conflict
+# was resolved and committed.  If not, let the user try again or
+# die.
+sub let_user_resolve_conflict {
+    my ($changeset) = @_;
+    our $target;
+
+    warn  "\nThere was a conflict promoting '$changeset' to $target.\n"
+        . "This process will suspend so that you can manually resolve\n"
+        . "the conflict and commit.  Once you've done that, 'fg' this\n"
+        . "process and the promotion will continue.\n"
+        ;
+    my $suspended = 1;
+    local $SIG{CONT} = sub { $suspended = 0 };
+    kill STOP => $$;
+    while ($suspended) { } # spin while signals propagate (necessary?)
+
+    # we're back, verify the state of the tree
+    if( git('diff') or git('diff --cached') ) {
+        warn "You shouldn't continue promoting with a dirty tree.\n";
+        if ( confirm('Do you want to try resolving conflicts again?') ) {
+            return let_user_resolve_conflict($changeset);
+        }
+        warn "You left unresolved conflicts.\n";
+        print STDERR
+            "What now? p)romote what you have, d)iscard everything: ";
+        chomp( my $answer = <STDIN> );
+        return 'skip rest' if $answer eq 'p';
+        die "You didn't resolve a merge conflict\n";
+    }
+
+    return 'continue';
+}
+
+# promotes all code into the $target
+sub full_promotion {
+    our $target;
+
+    # is there anything to promote?
+    my $source = environment_preceding($target);
+    my @unpromoted = unpromoted( "origin/$source", "origin/$target" );
+    die "There's nothing to promote from $source to $target\n"
+        if not @unpromoted;
+
+    # A note about this merge step is in order.  The simplest
+    # way to promote $source to $target would just be to merge
+    # the two branches.  In the common case, that would work fine.
+    # Unfortunately, promotions sometimes cause merge
+    # conflicts.  If those conflicts are resolved incorrectly, a
+    # direct commit to the $target branch might be required. If that
+    # happens, we don't want to incorporate those changes into
+    # the $target branch permanently.  They are just stop gap
+    # commits until the entire $source branch is promoted.
+    #
+    # Using a 'theirs' merge gives us these benefits without
+    # having to rewind the $target branch each time this kind of
+    # promotion happens.
+    warn "Promoting all of $source to $target\n";
+    my $theirs = $without_theirs ? '' : '-s theirs';
+    git "merge --quiet --no-ff $theirs origin/$source";
+    to_undo { git "reset --hard HEAD~1" };
+
+    # force contents to be the same, if necessary.
+    # this overcomes rare problems with 'theirs' merges
+    if ( my $diff = git "diff --shortstat --no-color origin/$source" ) {
+        warn "Cleaning up erroneous 'theirs' merge\n";
+        git "read-tree origin/$source";
+        git "commit -m 'fixing erroneous theirs merge'";
+        git "reset --hard";
+    }
+
+    cache_meta_data(@unpromoted);
+
+    # add meta data and create the necessary tags
+    my @new_tags;
+    for my $changeset (@unpromoted) {
+        push @$changesets_list, $changeset;
+        my $id = meta_data_add({
+            action    => 'promote',
+            changeset => $changeset,
+            target    => $target,
+            flush     => 0,
+        });
+        to_undo { meta_data_rm(id => $id, changeset => $changeset, flush => 0,) };
+
+        my $tag_name = "cs/$changeset/to-$target";
+        git "tag $tag_name HEAD";
+        push @new_tags, $tag_name;
+        to_undo { pop @new_tags; git "tag -d $tag_name" };
+    }
+    
+    # flush the changes
+    to_undo { restore_meta_data(); };
+    meta_data_rm();
+    meta_data_add();
+
+    return ( [], \@new_tags );
+}
+
+# allows the promoter to verify the content of the promotion before publishing
+# it.  This should be called from inside a reversibly block
+sub verify_promotion {
+    warn  "\nNow that the promotion is prepared, please verify that\n"
+        . "the code works correctly.  This would be a good time to run\n"
+        . "the test suite.  When you're finished, 'fg' this process and\n"
+        . "you'll have a choice of publishing or canceling the promotion\n"
+        ;
+
+    my $suspended = 1;
+    local $SIG{CONT} = sub { $suspended = 0 };
+    kill STOP => $$;
+    while ($suspended) { } # spin while signals propagate (necessary?)
+
+    # we're back, verify the state of the tree
+    return if confirm('Is the promotion code correct?');
+    die "You said the promotion code was wrong\n";
+}
+
+# given the name of a Git tag, returns the corresponding commit time
+# as the number of seconds since the Unix epoch
+sub tag_time {
+    my ($tag) = @_;
+    my ($time) = git "log -1 --pretty=format:%ct $tag";
+    die "Unable to find tag time for '$tag'" if not $time;
+    return $time;
+}
+
+# returns @refs sorted by "merge to master time" from oldest to youngest
+sub schedule_refs_by_merge_time {
+    my (@refs) = @_;
+
+    return map  { $_->[0] }
+           sort { $a->[1] <=> $b->[1] }
+           map  { [ $_, tag_time($_) ] }
+           @refs;
+}
+
+# returns @refs sorted so that changesets come after their dependencies
+sub schedule_refs_by_dependency {
+    my (@refs) = @_;
+    my $dep = build_ref_dependency_tree(\@refs);
+    @refs = @{ $dep->schedule(@refs) };
+    return @refs;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-promote - Promote changesets to a higher development level
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

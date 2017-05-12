@@ -1,0 +1,42 @@
+{
+   "abstract" : "Simple implementation based on Data::CosineSimilarity",
+   "author" : [
+      "Antoine Imbert <antoine.imbert@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Algorithm-ContextVector",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::CosineSimilarity" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      }
+   },
+   "provides" : {
+      "Algorithm::ContextVector" : {
+         "file" : "lib/Algorithm/ContextVector.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

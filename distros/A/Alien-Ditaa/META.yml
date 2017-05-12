@@ -1,0 +1,33 @@
+---
+abstract: 'Use the ditaa text to diagram package in perl'
+author:
+  - 'Tomas Doran (t0m) C< bobtfish@bobtfish.net >'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+  script/ditaa: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-Ditaa
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::ShareDir: 0
+  File::Which: 0
+  IPC::Run: 0
+  Method::Signatures::Simple: 0
+  Moose: 0
+  Path::Class: 0
+  namespace::autoclean: 0
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: git://github.com/bobtfish/Alien-Ditaa.git
+version: 0.002

@@ -1,0 +1,25 @@
+TAP version 13
+1..6
+ok 1 - use Data::DPath;
+   ---
+     - name: 'Hash one'
+       value: 1
+     - name: 'Hash two'
+       value: 2
+   ...
+ok 2 - KEYs + PARENT
+ok 3 - quoted KEY containg slash
+pragma +strict
+not ok 4 # TODO spec only
+#   Failed (TODO) test at t/data_dpath.t line 144.
+#     Structures begin differing at:
+#          $got->[0] = Does not exist
+#     $expected->[0] = ARRAY(0x8e4c238)
+ok 5 - ANYWHERE + KEY + FILTER int # TODO spec only
+ok 6 # skip rethink twice
+not ok 7 # TODO spec only
+#   Failed (TODO) test at t/data_dpath.t line 356.
+#     Structures begin differing at:
+#          $got->[0] = Does not exist
+#     $expected->[0] = 'interesting value'
+ok 8 - FILTER eval regex # TODO too dirty, first cleanup _filter_eval

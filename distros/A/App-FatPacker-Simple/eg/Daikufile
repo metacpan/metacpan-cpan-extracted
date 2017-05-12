@@ -1,0 +1,30 @@
+=head1 HOW TO USE
+
+First install Daiku:
+
+    $ cpanm Daiku
+
+And
+
+    $ daiku
+    # you'll get hello.fatpack.pl!
+
+More help?
+
+    $ daiku -T
+
+=cut
+
+task default => "fatpack";
+
+desc "fatpack!";
+task fatpack => sub {
+    sh qw(carton install);
+    sh qw(cpanm --reinstall -Llocal -nq HTTP::Tiny parent);
+    sh "fatpack-simple", "--exclude", "Module::Build,CPAN::Meta", "hello.pl";
+};
+
+desc "clean!";
+task clean => sub {
+    sh qw(rm -rf local cpanfile.snapshot hello.fatpack.pl);
+};

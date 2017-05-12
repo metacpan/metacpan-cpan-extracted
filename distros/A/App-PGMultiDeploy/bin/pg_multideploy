@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+package pg_multideploy;
+use strict;
+use warnings;
+use Getopt::Long;
+use App::PGMultiDeploy;
+
+my ($config_file, $change_file, $dbgroup);
+
+GetOptions ("config=s" => \$config_file,
+              "sql=s"   => \$change_file,
+              "dbgroup=s"  => \$dbgroup)
+or die("Error in command line arguments\n");
+
+die '--config option required' unless defined $config_file;
+die '--sql option required' unless defined $change_file;
+die '--dbgroup option required' unless defined $dbgroup; 
+
+
+
+my $deployment = App::PGMultiDeploy->new(
+         config_file => $config_file,
+         change_file => $change_file,
+         dbgroup     => $dbgroup
+);
+$deployment->deploy;

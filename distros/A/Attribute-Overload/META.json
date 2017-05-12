@@ -1,0 +1,39 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/Attribute-Overload/",
+      "repository" : "http://github.com/hanekomu/Attribute-Overload",
+      "bugtracker" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Attribute-Overload"
+   },
+   "generated_by" : "Dist::Zilla version 1.100660",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "1.100710",
+   "name" : "Attribute-Overload",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "provides" : {
+      "Attribute::Overload" : {
+         "version" : "1.100710",
+         "file" : "lib/Attribute/Overload.pm"
+      }
+   },
+   "requires" : {
+      "Test::More" : "0",
+      "perl" : "5.008",
+      "Scalar::Util" : "0",
+      "Attribute::Handlers" : "0",
+      "English" : "0",
+      "File::Find" : "0",
+      "File::Temp" : "0",
+      "Carp" : "0"
+   },
+   "abstract" : "Attribute that makes overloading easier",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}

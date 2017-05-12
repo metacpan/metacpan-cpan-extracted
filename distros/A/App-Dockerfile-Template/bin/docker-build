@@ -1,0 +1,203 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use File::Temp qw( tempdir );
+use Module::Load qw( load );
+use Template;
+
+=head1 NAME
+
+docker-build - Docker Build from a template file
+
+=head1 USAGE
+
+Using the same arguments as "docker build"
+
+=head1 DATA POINTS
+
+By default all the data points are from the environment variables.
+
+If you need to pass in dynamic data points, there are some examples as below:
+
+=head2 Add a function to the template to get a list of files
+
+In the Dockerfile template
+
+ [% FOREACH file IN list %]
+ ADD [% file %] /home/here/[% file %]
+ [% END %]
+
+From the command line
+
+ docker-build =Slist 'split /\n/, qx{find . -type f}' --tag some/image .
+
+=head2 Load a File::Slurp to list the directory
+
+In the Dockerfile template
+
+ [% FOREACH file IN list %]
+ ADD [% file %] /home/here/[% file %]
+ [% END %]
+
+From the command line
+
+ docker-build =MFile::Slurp =Slist 'read_dir(".")' --tag some/image .
+
+=head2 Add an extra key value
+
+In the Dockerfile template
+
+ FROM base/image
+
+ AUTHOR [% author %]
+
+ ...
+
+From the command line
+
+ docker-build =KVauthor "$USER <$EMAIL>" --tag some/image .
+
+=cut
+
+sub MAIN {
+    my %args          = _parse_command_arguments(@_);
+    my %docker_args   = _get_args_from_docker(%args);
+    my %template_args = _get_args_for_template(%args);
+
+    my $buildable_dockerfile = _get_dockerfile_template(%template_args);
+
+    my $tempdir = tempdir( CLEANUP => 1 );
+    system "cp", "-a", ".", $tempdir;
+
+    _create_dockerfile( $tempdir, $buildable_dockerfile );
+    chdir $tempdir;
+
+    if ( !$docker_args{"-t"} && !$docker_args{"--tag"} ) {
+        die "You might forget the name of image to be built\n";
+    }
+
+    if ( !$docker_args{"--force-rm"} ) {
+        $docker_args{"--force-rm"} = qq{};
+    }
+
+    my @command = ( "docker", "build", %docker_args );
+
+    if ( $ENV{DEBUG} ) {
+        print "================================\n";
+        printf "BUILD COMMAND >> %s\n", join " ", @command;
+        print "================================\n";
+    }
+
+    exit system @command;
+}
+
+sub _get_dockerfile_template {
+    my %data_points_from_command_line = @_;
+    my %data_points_from_environment  = %ENV;
+    my %data_points_merged =
+      ( %data_points_from_environment, %data_points_from_command_line, );
+
+    my $dockerfile = $data_points_merged{Dockerfile} ||= "Dockerfile";
+
+    if ( !-f $dockerfile ) {
+        die "Dockerfile template '$dockerfile' is not found.\n";
+    }
+
+    my ( $base_dir, $template ) =
+        ( $dockerfile =~ m{^/} )
+      ? ( $dockerfile =~ m{(.*)/(.*)} )
+      : ( $ENV{PWD}, $dockerfile );
+
+    my $tt = Template->new( INCLUDE_PATH => $base_dir );
+    my $content = qq{};
+    $tt->process(
+        $template => \%data_points_merged,
+        \$content
+    ) or die sprintf "[X] Dockerfile template has error %s\n", $tt->error;
+
+    return $content;
+}
+
+sub _create_dockerfile {
+    my $dir     = shift;
+    my $content = shift;
+    open my $FILE, ">:utf8", "$dir/Dockerfile"
+      or die "Unable to create buildable Dockerfile at $dir.\n";
+    print $FILE $content;
+    close $FILE;
+
+    if ( $ENV{DEBUG} ) {
+        print "================================\n";
+        print "Output to >> $dir/Dockerfile\n";
+        print "================================\n";
+        print "$content\n";
+    }
+}
+
+sub _need_help {
+    return
+      if !grep { /-h|--help/ } @ARGV;
+    exec perldoc => $0;
+}
+
+sub _parse_command_arguments {
+    my @raw_list = @_;
+    my %args     = ();
+    while (@raw_list) {
+        my $item1 = shift @raw_list;
+        my $item2 = shift @raw_list;
+        $item1 = defined($item1) && length($item1) ? $item1 : qq{};
+        $item2 = defined($item2) && length($item2) ? $item2 : qq{};
+        if ( $item1 =~ /^[-=]/ && $item2 =~ /^[-=]/ ) {
+            $args{$item1} = qq{};
+            unshift @raw_list, $item2;
+        }
+        elsif ( $item1 =~ /^[-=]/ && $item2 !~ /^[-=]/ ) {
+            $args{$item1} = $item2;
+        }
+    }
+    return %args;
+}
+
+sub _get_args_for_template {
+    my %args                          = @_;
+    my %data_points_from_command_line = ();
+    while ( my ( $key, $value ) = each %args ) {
+        if ( $key =~ /^=S(.+)/ ) {
+            my $method = $1;
+            $data_points_from_command_line{$method} = eval "sub { $value }";
+            if ( my $error = $@ ) {
+                die "[X] Adding method $method with error $error\n";
+            }
+            if ( $ENV{DEBUG} ) {
+                print ">> Added method: $method\n";
+            }
+        }
+        elsif ( $key =~ /^=M(.+)/ ) {
+            my $module = $1;
+            $data_points_from_command_line{$module} = load $module;
+            if ( $ENV{DEBUG} ) {
+                print ">> Load module: $module\n";
+            }
+        }
+        elsif ( $key =~ /^=KV(.+)/ ) {
+            $key = $1;
+            $data_points_from_command_line{$key} = $value;
+        }
+    }
+    return %data_points_from_command_line;
+}
+
+sub _get_args_from_docker {
+    my %args        = @_;
+    my %docker_ones = ();
+    while ( my ( $key, $value ) = each %args ) {
+        if ( $key =~ /^-/ ) {
+            $docker_ones{$key} = $value;
+        }
+    }
+    return %docker_ones;
+}
+
+caller || _need_help() || MAIN(@ARGV);

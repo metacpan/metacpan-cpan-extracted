@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+bin/iops
+dist.ini
+lib/App/Iops.pm
+t/load.t
+t/load.t~
+t/release-pod-coverage.t
+t/release-pod-syntax.t

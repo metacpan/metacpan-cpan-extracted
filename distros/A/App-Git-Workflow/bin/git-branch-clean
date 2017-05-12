@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+
+# Created on: 2014-03-11 20:58:59
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use App::Git::Workflow::Command::BranchClean;
+
+App::Git::Workflow::Command::BranchClean->run();
+
+__DATA__
+
+=head1 NAME
+
+git-branch-clean - Clean old branches out of the repository
+
+=head1 VERSION
+
+This documentation refers to git-branch-clean version 1.0.1
+
+=head1 SYNOPSIS
+
+   git-branch-clean [option]
+
+ OPTIONS:
+  -r --remote   Only remote branches (defaults to local branches)
+  -a --all      All branches
+  -m --max-age[=]days
+                Maximum age of a branch with out changes before it is cleaned
+                weather it's merged to master or not. (Default 0, no max age)
+  -n --min-age[=]days
+                Leave branches this number of days or new alone even if merged
+                to master. (default 7 days)
+  -e --exclude[=]regex
+                Regular expression to exclude specific branches from deletion.
+                You can specify --exclude multiple times for more control.
+     --exclude-file[=]file
+                A file of exclude regular expressions, blank lines and lines
+                starting with a hash (#) are ignored.
+  -t --tag      Create tags of the same name as the branch
+  -p --tag-prefix[=]str
+                When converting a branch to a tag prepend it with "str"
+  -s --tag-suffix[=]str
+                When converting a branch to a tag apend it with "str"
+     --test     Don't actually delete branches just report on what branches
+                would be deleted.
+
+  -v --verbose  Show more detailed option
+     --version  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for git-branch-clean
+
+=head1 DESCRIPTION
+
+C<git-branch-clean> deletes branches merged to master (but not newer than
+C<--min-age> days). Optionally also deleting branches that haven't been
+modified more than C<--max-age> days. When deleting branches they can be
+converted to tags (C<--tag>) with optional an prefix (C<--tag-prefix>) and/or
+an optional suffix (C<--tag-suffix>) added.
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2014 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

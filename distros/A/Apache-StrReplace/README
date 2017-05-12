@@ -1,0 +1,83 @@
+NAME
+       Apache::StrReplace - Filter between string replace
+
+SYNOPSIS
+       Apache httpd.conf
+
+           PerlModule Apache::StrReplace
+           PerlSetVar StrReplaceSearch replace_before_string
+           PerlSetVar StrReplaceReplace replace_after_string
+           PerlSetVar StrReplaceOption replace_option
+           PerlOutputFilterHandler Apache::StrReplace
+
+DESCRIPTION
+       StrReplaceSearch ... search strings.
+
+       StrReplaceReplace ... replace strings.
+
+       StrReplaceOption ... regexp options. ( default "g" )
+
+       StrReplaceContentType ... target Content-Type ( default "text/html" )
+
+       run code image.
+
+           if ($f->r->content_type~/$contentType/) {
+               eval ’$f->ctx->{body}=~s/$search/’."$replace/$option;";
+           }
+
+EXAMPLE
+       simple replace.
+
+           PerlModule Apache::StrReplace
+           PerlSetVar StrReplaceSearch hoge
+           PerlSetVar StrReplaceReplace foo
+           PerlOutputFilterHandler Apache::StrReplace
+
+       The numbered match variables.
+
+           PerlModule Apache::StrReplace
+           PerlSetVar StrReplaceSearch "([a-z]*).example.com"
+           PerlSetVar StrReplaceReplace "dev.$1.example.com"
+           PerlOutputFilterHandler Apache::StrReplace
+
+       Perl code.
+
+           PerlModule Apache::StrReplace
+           PerlSetVar StrReplaceSearch "<taxes>(\d+)</taxes>"
+           PerlSetVar StrReplaceReplace "int( $1 * 1.05 )"
+           PerlSetVar StrReplaceOption "eg"
+           PerlOutputFilterHandler Apache::StrReplace
+
+       text/plain support.
+
+           PerlModule Apache::StrReplace
+           PerlSetVar StrReplaceSearch "<taxes>(\d+)</taxes>"
+           PerlSetVar StrReplaceReplace "int( $1 * 1.05 )"
+           PerlSetVar StrReplaceOption "eg"
+           PerlSetVar StrReplaceContentType "text/(html│plain)"
+           PerlOutputFilterHandler Apache::StrReplace
+
+SEE ALSO
+       Apache2, Apache2::Filter
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+    mod_perl
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007 by Shinichiro Aska
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.

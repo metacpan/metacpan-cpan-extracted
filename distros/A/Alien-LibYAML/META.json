@@ -1,0 +1,69 @@
+{
+   "abstract" : "Build and install libyaml, a C-based YAML parser and emitter",
+   "author" : [
+      "Richard Sim\u00f5es <rsimoes AT cpan DOT org>",
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-LibYAML",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "0.25",
+            "Alien::Build::MM" : "0.25",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "0.25",
+            "Alien::Build::MM" : "0.25",
+            "ExtUtils::MakeMaker" : "6.52",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Bundle::Extended" : "0",
+            "Test::Alien" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rsimoes/alien-libyaml/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Alien-LibYAML",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rsimoes/alien-libyaml.git",
+         "web" : "https://github.com/rsimoes/alien-libyaml"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "2.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+}
+

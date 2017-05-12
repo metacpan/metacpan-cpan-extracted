@@ -1,0 +1,15 @@
+Build.PL
+Makefile.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README.txt
+scriptaculous-js-1.8.0.tar.gz
+bin/scriptaculous-install
+inc/MY/Build.pm
+lib/Alien/scriptaculous.pm
+t/01-loads.t
+t/02-install.t
+t/pod.t
+t/pod-coverage.t

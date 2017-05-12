@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+t/AnyEvent-FCGI.t
+lib/AnyEvent/FCGI.pm
+lib/AnyEvent/FCGI/Connection.pm
+lib/AnyEvent/FCGI/Request.pm

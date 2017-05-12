@@ -1,0 +1,39 @@
+#!perl
+use strict;
+use warnings;
+use App::Term2HTML;
+
+App::Term2HTML->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+term2html - the converter of colored terminal output to HTML
+
+=head1 SYNOPSIS
+
+    $ ls --color=always | term2html
+
+=head2 OPTIONS
+
+    -h,  --help          show this help
+    -v,  --version       show the version
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+
+=head1 SEE ALSO
+
+L<http://mattn.kaoriya.net/software/lang/go/20151201160529.htm>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=cut

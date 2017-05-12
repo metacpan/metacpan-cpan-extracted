@@ -1,0 +1,112 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Getopt::Long;
+use Pod::Usage;
+use Encode;
+
+use Alvis::Utils qw(open_file);
+
+use encoding 'utf8';
+use open ':utf8';
+
+my $xml_header = '<?xml version="1.0" encoding="UTF-8"?>';
+my $doc_col = '<documentCollection xmlns="http://alvis.info/enriched/" version="1.1">';
+my $doc_col_end = '</documentCollection>';
+
+################################################################################
+# main
+
+join_files(read_params());
+
+################################################################################
+sub join_files {
+
+	my $files = shift;
+
+	print $xml_header, "\n", $doc_col, "\n";
+	for my $file ( @{$files} ) {
+		my $FP = open_file($file);
+		for my $str (<$FP>) {
+			if ( $str =~ /^<\?xml version/ ) {
+				next;
+			}
+			elsif ( $str =~ /^\s*<documentCollection/ ) {
+				next;
+			}
+			elsif ( $str =~ /^\s*<\/documentCollection/ ) {
+				next;
+			}
+			else {
+				print $str;
+			}
+		}
+		close $FP;
+	}
+	print $doc_col_end, "\n";
+}
+
+################################################################################
+sub read_params 
+{
+	my @files;
+	GetOptions(
+		'<>' => sub { push @files, @_ },    
+		'h|help' => sub { pod2usage(1) }
+	);
+
+	pod2usage( -message => "ERROR: list of files is not specified" )
+	  if ( !defined( $files[0] ) );
+
+	# TODO: this is the case then directory is emty
+	return \() if ($files[0] =~ /\/\*/ && not(-e $files[0]));  
+	for my $file (@files) {
+		pod2usage( -message => "ERROR: file does not exist '$file'" )
+		  unless (-f $file);
+	}  
+	return \@files;
+}
+################################################################################
+
+__END__
+
+=head1 NAME
+
+    alvisXMLjoin.pl - script to join ALVIS XML files into one ALVIS XML file.
+
+=head1 SYNOPSIS
+
+    alvisXMLjoin alvis_xml_file ...
+
+  Options:
+
+    -h, --help          display help message and exit.
+        --man           print man page and exit.
+
+=head1 DESCRIPTION
+
+=head1 AUTHOR
+
+Poroshin Vladimir
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 Poroshin Vladimir
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+=cut

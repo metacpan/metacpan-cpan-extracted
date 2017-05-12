@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/Acme/WalkMethods.pm
+t/01-basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

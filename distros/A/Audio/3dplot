@@ -1,0 +1,6 @@
+#!/bin/sh 
+perl -Mblib lpc "$@"
+cat <<END | gnuplot -persist
+set data style lines
+splot "3d.dat"
+END

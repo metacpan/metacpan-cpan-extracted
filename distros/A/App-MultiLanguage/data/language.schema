@@ -1,0 +1,191 @@
+attributetype ( 1.3.6.1.4.1.7777.666.99.1 NAME 'ca'
+	DESC 'Catalan'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.2 NAME 'hr'
+	DESC 'Croatian'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.3 NAME 'cs'
+	DESC 'Czech'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.4 NAME 'da'
+	DESC 'Danish'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.5 NAME 'nl'
+	DESC 'Dutch'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.6 NAME 'en'
+	DESC 'English'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.7 NAME 'eo'
+	DESC 'Esperanto'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.8 NAME 'et'
+	DESC 'Estonian'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.9 NAME 'fr'
+	DESC 'French'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.10 NAME 'de'
+	DESC 'German'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.11 NAME 'el'
+	DESC 'Greek-Modern'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.12 NAME 'he'
+	DESC 'Hebrew'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.13 NAME 'it'
+	DESC 'Italian'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.14 NAME 'ja'
+	DESC 'Japanese'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.15 NAME 'ko'
+	DESC 'Korean'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.16 NAME 'ltz'
+	DESC 'Luxembourgeois'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.17 NAME 'nn'
+	DESC 'Norwegian Nynorsk'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.18 NAME 'no'
+	DESC 'Norwegian'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.19 NAME 'pl'
+	DESC 'Polish'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.20 NAME 'pt'
+	DESC 'Portugese'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.21 NAME 'pt-br'
+	DESC 'Brazilian Portuguese'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.22 NAME 'ru'
+	DESC 'Russian'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.23 NAME 'sv'
+	DESC 'Swedish'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.24 NAME 'zh-cn'
+	DESC 'Simplified Chinese'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.25 NAME 'es'
+	DESC 'Spanish'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+
+attributetype ( 1.3.6.1.4.1.7777.666.99.26 NAME 'zh-tw'
+	DESC 'Traditional Chinese'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+
+objectclass ( 1.3.6.1.4.1.7777.666.100.1 NAME 'language'
+    DESC 'A range of language names'
+    SUP top STRUCTURAL
+    MUST cn
+    MAY ( ca $ hr $ cs $ da $ nl $ en $ eo $ et $ fr $ de $
+	  el $ he $ it $ ja $ ko $ ltz $ nn $ no $ pl $ pt $
+	  pt-br $ ru $ sv $ zh-cn $ es $ zh-tw ) )

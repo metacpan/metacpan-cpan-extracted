@@ -1,0 +1,159 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+Alien::GvaScript::ChoiceList - Dropdown list of choices with navigation
+
+=head1 SYNOPSIS
+
+  var choiceList = new GvaScript.ChoiceList(["foo", "bar", "buz"]);
+  choiceList.fillContainer($('myChoiceDiv'));
+
+=head1 DESCRIPTION
+
+Displays a list of "choices", handles navigation in those
+choices, and generates events when a choice is highlighted, then selected,
+or when the list display is cancelled.
+
+At any moment the choiceList is bound to maximum one "container",
+and highlights exactly one choice in the list.
+
+=head1 BEHAVIOUR
+
+Once a choice list is displayed, the user can move the mouse over the
+list, thus highlighting various choices; then click on the highlighted
+choice to select it. Alternatively, the user can navigate the list
+with keys C<DOWN>, C<UP>, C<HOME>, C<END>, and then use either
+C<RETURN> (for selecting) or C<ESCAPE> (for cancelling).
+
+
+
+=head1 CONSTRUCTOR
+
+  var choiceList = new GvaScript.ChoiceList(choices, options);
+
+=head2 Choices
+
+The choice list must be an array. Each item in the list is either
+
+=over
+
+=item a plain string
+
+this string will be displayed in the choice list
+
+=item an inline object
+
+this object is supposed to have a C<label> property, which 
+will be displayed in the choice list. Actually, this is the default name
+for the property; it can be changed in the constructor options.
+
+The C<label> property may contain rich HTML, i.e. including
+formatting tags.
+
+=back
+
+
+
+=head2 Options
+
+The options to construct an choiceList object are :
+
+=over
+
+=item labelField
+
+Name of the field that contains the HTML to display
+(default is C<label>).
+
+=item idForChoices
+
+Prefix that will be used to generate ids for choice elements in
+the generated HTML. The default is C<CL_choice>, so choice elements
+will have ids C<CL_choice.0>, C<CL_choice.1>, etc.
+
+=item keymap
+
+If defined, the choiceList will add rules to the supplied keymap,
+instead of creating a new one.
+
+=item scrollCount
+
+How many items to skip when hitting the 
+C<PAGE_UP> or C<PAGE_DOWN> keys. 
+Default is 5
+
+=item mouseovernavi 
+
+Boolean indicating whether the choices would be selected/deselected with the 
+mouseover event.
+Default is C<true>
+
+=item classes
+
+Classes that will be assigned to choice elements in the generated
+HTML. Possible classes are C<choiceItem> (default value C<CL_choiceItem>) and
+C<choiceHighlight> (default value C<CL_highlight>).
+
+
+=item htmlWrapper
+
+Callback function for generating HTML for the choiceList.
+This function is called with some pre-built HTML containing
+all current choices; the wrapper has a chance to modify 
+that HTML for example for adding classes, borders or 
+table headers. Default is the identity function.
+
+
+=item choiceItemTagName
+
+HTML tag name for generating a choice entry in the choice list.
+Default is "div". Set it to "tr" if you want the choice list
+to be displayed as a table (but then you also have to 
+open and close the table within the C<htmlWrapper> callback).
+
+
+=back
+
+=head1 METHODS
+
+=head2 destroy
+
+  choiceList.destroy();
+
+This method removes all handlers attached to different
+events on the choice list container.
+Call this method when the choice list container is removed
+from the DOM.
+
+=head2 fillContainer
+
+  choiceList.fillContainer(someDiv);
+
+This method generates HTML from the choice list, and inserts
+it in the C<innerHTML> of the supplied container; furthermore,
+it registers a keymap on that container in order to manage navigation
+from keyboard (C<DOWN>, C<UP>, etc.).
+
+
+=head1 EVENTS
+
+=head2 onHighlight
+
+This event is triggered when a choice in the list is highlighted.
+The event handler may use C<event.index> to know the index of the
+highlighted choice.
+
+=head2 onPing
+
+This event is triggered when a choice in the list is "ping-ed", i.e.
+either by clicking or by pressing the C<RETURN> key.
+Usually this means "select", but it is up to the event handler to decide
+how to interpret the event.
+The event handler may use C<event.index> to know the index of the
+ping-ed choice.
+
+
+=head2 onCancel
+
+This event is triggered when the user presses the C<ESCAPE> key.

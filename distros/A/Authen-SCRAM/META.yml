@@ -1,0 +1,67 @@
+---
+abstract: 'Salted Challenge Response Authentication Mechanism (RFC 5802)'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::FailWarnings: '0'
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  base: '0'
+  lib: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Authen-SCRAM
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Authen::SCRAM:
+    file: lib/Authen/SCRAM.pm
+    version: '0.005'
+  Authen::SCRAM::Client:
+    file: lib/Authen/SCRAM/Client.pm
+    version: '0.005'
+  Authen::SCRAM::Role::Common:
+    file: lib/Authen/SCRAM/Role/Common.pm
+    version: '0.005'
+  Authen::SCRAM::Server:
+    file: lib/Authen/SCRAM/Server.pm
+    version: '0.005'
+recommends:
+  String::Compare::ConstantTime: '0.310'
+requires:
+  Authen::SASL::SASLprep: '0'
+  Carp: '0'
+  Crypt::URandom: '0'
+  Encode: '0'
+  MIME::Base64: '0'
+  Moo: '1.001000'
+  Moo::Role: '1.001000'
+  PBKDF2::Tiny: '0.003'
+  Try::Tiny: '0'
+  Types::Standard: '0'
+  namespace::clean: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Authen-SCRAM/issues
+  homepage: https://github.com/dagolden/Authen-SCRAM
+  repository: https://github.com/dagolden/Authen-SCRAM.git
+version: '0.005'
+x_authority: cpan:DAGOLDEN

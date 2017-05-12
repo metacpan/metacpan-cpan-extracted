@@ -1,0 +1,31 @@
+Revision history for Perl extension Acme::SuddenlyDeath
+
+0.09 2014-08-17T08:34:01Z
+        - Fix bug in sudden-death command.
+
+0.08 2013-11-22T07:13:14Z
+        - Delete suddely_death/suddely_death_single function.
+
+0.07 2013-06-16T14:01:17Z
+        - Fix bug in sudden-death command.
+
+0.06 2013-06-16T06:46:09Z
+        - Add sudden-death command.
+
+0.05    Mon Jun 10 11:47:07 JST 2013
+        - Changed builder module to Minilla.
+        - Add sudden_death/sudden_death_single function.
+
+0.04    Wed Feb 27 15:45:31 JST 2013
+        - Changed builder module to Module::Build.
+        - Corresponding to the multi-line input.
+
+0.03    Fri Jan 18 12:12:43 JST 2013
+        - Fixed a problem of failing some tests.
+
+0.02    Sun Jan 06 00:52:03 JST 2013
+        - Request "Encode" module for testing.
+
+0.01    Fri Dec 21 07:04:44 JST 2012
+        - original version
+

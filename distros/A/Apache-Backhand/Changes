@@ -1,0 +1,5 @@
+0.02	- upgrade release
+	- fixed byPerl.c to use the new ServerSlot structure
+	- added ncpu hash element to serverstats
+	- updated README and TODO files
+0.01	- first public release

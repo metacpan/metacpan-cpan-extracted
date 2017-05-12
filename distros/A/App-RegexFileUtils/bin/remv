@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use App::RegexFileUtils;
+
+# ABSTRACT: move with regex
+# PODNAME: remv
+our $VERSION = '0.07'; # VERSION
+
+
+App::RegexFileUtils->main($0, @ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+remv - move with regex
+
+=head1 VERSION
+
+version 0.07
+
+=head1 SEE ALSO
+
+L<App::RegexFileUtils>
+
+=head1 AUTHOR
+
+Graham Ollis <plicease@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Graham Ollis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

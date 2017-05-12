@@ -1,0 +1,55 @@
+{
+   "abstract" : "Build and install libffcall",
+   "author" : [
+      "David Mertens <dcmertens.perl@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-FFCall",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0.021",
+            "Module::Build" : "0.42",
+            "parent" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.021",
+            "File::ShareDir" : "1.00",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::FFCall" : {
+         "file" : "lib/Alien/FFCall.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "dcmertens.perl@gmail.com",
+         "web" : "http://github.com/run4flat/Alien-FFCall/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/run4flat/Alien-FFCall.git",
+         "web" : "http://github.com/run4flat/Alien-FFCall"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

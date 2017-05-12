@@ -1,0 +1,91 @@
+Resource Management
+
+The purist in me wants to only receive PIDs, but let's examine that.
+
+incoming message:
+$message_ref = {
+    resourceWatcher_PID => $,
+    resourceWatcher_timeout => $seconds, #how long this process is allowed to be up
+
+};
+
+When do we emit?
+1. When a process exits:
+    a. On its own, and we notice it's no longer there
+    b. We terminate it.
+2. On an interval, so other tasks can graph/monitor
+
+Back to my inner purist: one very likely use case is to use this to monitor/graph resources for various processes not related to MultiModule.  In that case, it will make a lot of sense to accept regexes.
+
+How to gather:
+
+Look at P9Y::ProcessTable
+
+Yah, this looks good:
+#!/usr/local/toolsx/bin/perl
+
+use Modern::Perl;
+use Data::Dumper;
+use P9Y::ProcessTable;
+ 
+my @process_table = P9Y::ProcessTable->table;
+
+say Dumper \@process_table;
+
+https://metacpan.org/pod/P9Y::ProcessTable
+
+
+          bless( {
+                   'stime' => '0.02',
+                   'time' => '0.19',
+                   'pgrp' => '7783',
+                   'cwd' => '/root',
+                   'exe' => '/usr/local/toolsx/bin/perl',
+                   'ttlflt' => 3149,
+                   'start' => '1461627291.8',
+                   'uid' => 0,
+                   'fname' => 'perl',
+                   'minflt' => 3149,
+                   'ppid' => '6806',
+                   'cmajflt' => 0,
+                   'ttynum' => '34842',
+                   'cminflt' => 0,
+                   'cutime' => 0,
+                   'ctime' => 0,
+                   'flags' => '4194560',
+                   'rss' => 16457728,
+                   'size' => '58707968',
+                   'gid' => 0,
+                   'cttlflt' => 0,
+                   'cmdline' => 'perl p3',
+                   'utime' => '0.17',
+                   'cpuid' => '3',
+                   'threads' => '1',
+                   'majflt' => 0,
+                   'sess' => '6315',
+                   'priority' => '20',
+                   'pid' => '7783',
+                   'wchan' => '0',
+                   '_pt_obj' => $VAR1->[0]{'_pt_obj'},
+                   'state' => 'run',
+                   'cstime' => 0,
+                   'environ' => {
+                                  'SHLVL' => '1',
+                                  'SHELL' => '/bin/bash',
+                                  'LANG' => 'en_US.UTF-8',
+                                  'PATH' => '/usr/local/toolsx/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+                                  'LS_COLORS' => '!!',
+                                  'PWD' => '/root',
+                                  'MAIL' => '/var/mail/root',
+                                  'USER' => 'root',
+                                  'LESSCLOSE' => '/usr/bin/lesspipe %s %s',
+                                  'HOME' => '/root',
+                                  'TERM' => 'xterm-256color',
+                                  'LESSOPEN' => '| /usr/bin/lesspipe %s',
+                                  'LOGNAME' => 'root',
+                                  '_' => '/usr/local/toolsx/bin/perl',
+                                  'QT_QPA_PLATFORMTHEME' => 'appmenu-qt5'
+                                },
+                   'root' => '/'
+                 }, 'P9Y::ProcessTable::Process' )
+

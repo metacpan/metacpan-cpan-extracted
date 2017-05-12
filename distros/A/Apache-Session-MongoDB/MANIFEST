@@ -1,0 +1,11 @@
+Changes
+lib/Apache/Session/MongoDB.pm
+lib/Apache/Session/Serialize/MongoDB.pm
+lib/Apache/Session/Store/MongoDB.pm
+Makefile.PL
+MANIFEST
+README
+README.md
+t/Apache-Session-MongoDB.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

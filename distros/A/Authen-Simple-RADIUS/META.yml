@@ -1,0 +1,15 @@
+---
+name: Authen-Simple-RADIUS
+version: 0.1
+author:
+  - Christian Hansen C<ch@ngmedia.com>
+abstract: Simple RADIUS authentication
+license: perl
+requires:
+  Authen::Radius: 0
+  Authen::Simple: 0
+provides:
+  Authen::Simple::RADIUS:
+    file: lib/Authen/Simple/RADIUS.pm
+    version: 0.1
+generated_by: Module::Build version 0.2611

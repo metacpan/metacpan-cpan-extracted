@@ -1,0 +1,123 @@
+The template system for DnsZone is implemented using CGI::FastTemplate, so if you want a better understanding of how the templating system actually works you will need to read the pod in CGI::FastTemplate.
+
+Easiest way to create a new set of templates is to copy all of the existing templates into a new directory and edit them from there, that way you are sure to get everything that is needed to make DnsZone work.
+
+It is important that you do not change any of the variable names in the template files since all language operations depend on them.
+
+In your template directory you need the following files:
+
+layout.tpl
+menu.tpl
+settings.tpl
+list_domain_record.tpl
+login.tpl
+a/edit.tpl
+a/add.tpl
+a/remove.tpl
+cname/edit.tpl
+cname/add.tpl
+cname/remove.tpl
+view_domain.tpl
+list_domain.tpl
+soa/edit.tpl
+ns/edit.tpl
+ns/remove.tpl
+ns/add.tpl
+txt/edit.tpl
+txt/remove.tpl
+txt/add.tpl
+mx/edit.tpl
+mx/remove.tpl
+mx/add.tpl
+view_domain/a.tpl
+view_domain/a_record.tpl
+view_domain/soa.tpl
+view_domain/cname.tpl
+view_domain/cname_record.tpl
+view_domain/mx_record.tpl
+view_domain/mx.tpl
+view_domain/ns_record.tpl
+view_domain/ns.tpl
+view_domain/txt_record.tpl
+view_domain/txt.tpl
+
+reserved for later:
+help.tpl
+
+Generally speaking the layout is formed like this in the standard template with DnsZone:
+
++----------------------------+
+| layout                     |
+| +------------------------+ |
+| | menu                   | |
+| +------------------------+ |
+| +------------------------+ |
+| | main                   | |
+| |                        | |
+| |                        | |
+| |                        | |
+| +------------------------+ |
++----------------------------+
+
+Each file and what needs to be in it:
+
+layout.tpl:
+This file contains the layout that will be used for generating all pages.
+Interpolated variables from this template: $TITLE, $MENU, $MAIN
+
+menu.tpl:
+This file contains the menu links in the top of the standard layout. 
+It is advised to use the standard file for this template so you get the links right.
+Interpolated variables from this template: $ADDITIONAL_MENU, $SETTINGS, $LOGOUT
+
+All other templates have their content displayed where the $MAIN variable is.
+
+$MAIN => 
+         settings.tpl
+
+         list_domain.tpl 
+             $LIST => list_domain_record.tpl
+
+         login.tpl
+
+         view_domain.tpl 
+             $SOA_RR => view_domain/soa.tpl
+             $A_RR => view_domain/a.tpl $A_RECORD => view_domain/a_record.tpl
+             $CNAME_RR => view_domain/cname.tpl $CNAME_RECORD => view_domain/cname_record.tpl
+             $MX_RR => view_domain/mx.tpl $MX_RECORD => view_domain/mx_record.tpl
+             $NS_RR => view_domain/ns.tpl $NS_RECORD => view_domain/ns_record.tpl
+             $TXT_RR => view_domain/txt.tpl $TXT_RECORD => view_domain/txt_record.tpl
+
+         soa/edit.tpl
+
+         a/add.tpl
+
+         a/edit.tpl
+
+         a/remove.tpl
+
+         cname/add.tpl
+
+         cname/edit.tpl
+
+         cname/remove.tpl
+
+         mx/add.tpl
+
+         mx/edit.tpl
+
+         mx/remove.tpl
+
+         ns/add.tpl
+
+         ns/edit.tpl
+
+         ns/remove.tpl
+
+         txt/add.tpl
+
+         txt/edit.tpl
+
+         txt/remove.tpl
+
+

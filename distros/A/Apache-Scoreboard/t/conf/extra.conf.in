@@ -1,0 +1,51 @@
+# make sure that we test under Taint mode
+PerlSwitches -wT
+
+<IfModule mod_status.c>
+    # XXX: can try to loadmodule mod_status if it's not loaded and DSO
+    ExtendedStatus On
+</IfModule>
+
+PerlModule Apache::Scoreboard
+<Location /scoreboard>
+    SetHandler modperl
+    PerlResponseHandler Apache::Scoreboard::send
+</Location>
+
+# XXX: one day will add this to the test suite (need to automate the C
+# module build first though, see Apache-Test's c-modules for know-how)
+# LoadModule scoreboard_send_module @ServerRoot@/../apxs/.libs/mod_scoreboard_send.so
+#<Location /scoreboard2>
+#     SetHandler scoreboard-send-handler
+#</Location>
+
+
+## Configuration in httpd.conf
+#PerlModule Apache::VMonitor
+#<Location /system/vmonitor>
+#    SetHandler perl-script
+#    PerlResponseHandler Apache::VMonitor
+#</Location>
+
+##### DEVMODE: Remove in production ###
+PerlModule Apache2::Reload
+PerlInitHandler Apache2::Reload
+PerlSetVar ReloadAll Off
+PerlSetVar ReloadModules "Apache::Scoreboard"
+PerlSetVar ReloadDebug On
+
+#PerlModule Apache::Response
+
+#  # startup file or <Perl> section:
+#  use Apache::VMonitor();
+#  $Apache::VMonitor::Config{BLINKING} = 1;
+#  $Apache::VMonitor::Config{REFRESH}  = 0;
+#  $Apache::VMonitor::Config{VERBOSE}  = 0;
+#  $Apache::VMonitor::Config{SYSTEM}   = 1;
+#  $Apache::VMonitor::Config{APACHE}   = 1;
+#  $Apache::VMonitor::Config{PROCS}    = 1;
+#  $Apache::VMonitor::Config{MOUNT}    = 1;
+#  $Apache::VMonitor::Config{FS_USAGE} = 1;
+#  $Apache::VMonitor::Config{SORT_BY}  = 'size';
+  
+#  $Apache::VMonitor::PROC_REGEX = join "\|", qw(httpd mysql squid);

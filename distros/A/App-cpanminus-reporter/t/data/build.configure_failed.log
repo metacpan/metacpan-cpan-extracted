@@ -1,0 +1,30 @@
+cpanm (App::cpanminus) 1.7001 on perl 5.019009 built for darwin-2level
+Work directory is /Users/garu/.cpanm/work/1395033276.12482
+You have make /usr/bin/make
+You have LWP 6.05
+You have /usr/bin/tar: bsdtar 2.8.3 - libarchive 2.8.3
+You have /usr/bin/unzip
+Searching X86::Udis86 on cpanmetadb ...
+--> Working on X86::Udis86
+Fetching http://www.cpan.org/authors/id/B/BO/BOBW/X86-Udis86-1.7.2.3.tar.gz
+-> OK
+Unpacking X86-Udis86-1.7.2.3.tar.gz
+Entering X86-Udis86-1.7.2.3
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (6.88)
+Configuring X86-Udis86-v1.7.2.3
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Warning (mostly harmless): No library found for -ludis86
+Generating a Unix-style Makefile
+Writing Makefile for X86::Udis86
+Writing MYMETA.yml and MYMETA.json
+udis86 1.7.2 not found - this module depends upon it.
+Please install udis86 from http://sourceforge.net/projects/udis86;
+if installed locally, invoke Makefile.PL with LIBS and INC set appropriately.
+e.g. perl Makefile.PL LIBS='-L/home/bob/src/udis86-1.7.2/libudis86/.libs -ludis86' INC='-I/home/bob/src/udis86-1.7.2 -I.'
+-> N/A
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (6.88)
+-> FAIL Configure failed for X86-Udis86-v1.7.2.3. See /Users/garu/.cpanm/work/1395033276.12482/build.log for details.

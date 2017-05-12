@@ -1,0 +1,5 @@
+type: sbuildfake
+results_from: t/fixtures/build-results/lenny32
+architecture: i386
+distribution: lenny-opera
+distribution_aliases: [lenny, unstable]

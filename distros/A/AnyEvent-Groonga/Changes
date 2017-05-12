@@ -1,0 +1,29 @@
+Revision history for Perl extension AnyEvent::Groonga
+
+0.08    2012/07/04
+        - patched some bugs and add 1 test ( it was given from SATOH.Koichi )
+
+0.07    2011/11/18
+        - remove some debug code.
+        - add timeout option
+
+0.06    2011/11/8
+        - fix a syntax error as 'filter' option was used.
+
+0.05    2011/11/3
+        - fix a syntax error as 'filter' option was used.
+        - add a test
+
+0.04    2011/3/3
+        - fix a bug on AnyEvent::Groonga::Result::Select
+        - when use the load commnad with http mode, it had some bugs
+
+0.03    2011/3/1 
+        - add a test directory 't/data'
+
+0.02    2011/3/1 
+        - 
+
+0.01    2011/2/28
+        - original version
+

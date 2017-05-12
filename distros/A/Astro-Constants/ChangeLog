@@ -1,0 +1,76 @@
+v0.10
+=====
+A couple of interface-breaking changes:
+* 'list_constants' and 'describe_constant' have been removed and
+	people are directed to the docs, 'perldoc Astro::Constants'
+* 'precision' is broken at the moment and will be fixed in the next version
+
+These changes are enhancements/improvements:
+* Short name constants are now *actually* constant and cannot be assigned to
+* Values are now stored in an XML file, PhysicalConstants.xml
+* Values have been updated using NIST's CODATA 2014 and the IAU 2009/2012
+	System of Astronomical Constants
+* Long names have an added alternate name to facilitate migrating from
+	adjective_noun to noun_adjective.
+
+
+List of name changes
+====================
+New names have replaced the old names which are retained in the file using 
+the <alternateName> tag
+
+old					new
+===					===
+LIGHT_SPEED			SPEED_LIGHT
+ELECTRON_CHARGE 	CHARGE_ELEMENTARY
+A_RAD				DENSITY_RADIATION
+VACUUM_IMPEDANCE	IMPEDANCE_VACUUM
+HBAR				H_BAR
+ELECTRON_MASS		MASS_ELECTRON
+PROTON_MASS			MASS_PROTON
+NEUTRON_MASS		MASS_NEUTRON
+HYDROGEN_MASS		MASS_HYDROGEN
+SOLAR_MASS			MASS_SOLAR
+SOLAR_RADIUS		RADIUS_SOLAR
+SOLAR_LUMINOSITY	LUMINOSITY_SOLAR
+EARTH_MASS			MASS_EARTH
+EARTH_RADIUS		RADIUS_EARTH
+RHO_C				DENSITY_CRITICAL_RHOc
+EARTH_MASS			MASS_EARTH
+EARTH_RADIUS		RADIUS_EARTH
+THOMSON_XSECTION	THOMSON_CROSS_SECTION
+ELECTRON_RADIUS		RADIUS_ELECTRON
+BOHR_RADIUS			RADIUS_BOHR
+SOLAR_TEMPERATURE	TEMPERATURE_SOLAR_SURFACE
+CMB_TEMPERATURE		TEMPERATURE_CMB
+SOLAR_DENSITY		DENSITY_SOLAR
+EARTH_DENSITY		DENSITY_EARTH
+SOLAR_GRAVITY		GRAVITY_SOLAR
+EARTH_GRAVITY		GRAVITY_EARTH
+SOLAR_V_MAG			MAGNITUDE_SOLAR_V
+SOLAR_V_ABS_MAG		MAGNITUDE_SOLAR_V_ABSOLUTE
+LUNAR_RADIUS		RADIUS_LUNAR
+LUNAR_MASS			MASS_LUNAR
+LUNAR_SM_AXIS		AXIS_SM_LUNAR
+LUNAR_ECCENTRICITY	ECCENTRICITY_LUNAR
+
+These 2 have had new names added, but I'm not sure which I like more
+PERMITIV_FREE_SPACE	PERMITIVITY_0
+PERMEABL_FREE_SPACE	PERMEABILITY_0
+
+add in new definitions to <category>conversion
+YEAR_TROPICAL			365.242 190
+YEAR_SIDEREAL			365.256 363
+YEAR_ANOMALISTIC		365.259 635
+YEAR_ECLIPSE			346.620 073
+
+Candidates for removal
+======================
+
+HUBBLE_TIME - this constant is inherited from Jeremy Bailin's Astroconst.
+	It is the inverse of the Hubble constant, valued at 100 km/s/Mpc and
+	is not constant.  Suggest moving it into Astro::Cosmology
+
+Introduced
+==========
+MASS_ALPHA	- mass of the alpha particle

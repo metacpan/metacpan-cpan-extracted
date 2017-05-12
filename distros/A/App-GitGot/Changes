@@ -1,0 +1,234 @@
+Changes file for App-GitGot
+
+1.333     2016-04-22 09:47:11-07:00 America/Los_Angeles
+
+  * Add `--show-branch` option to `update-status` too
+
+1.332     2016-04-17 13:53:37-04:00 America/New_York
+
+  * Fix Path::Tiny dep in got-complete. Thanks @perlpunk [#58]
+  * Add `--show-branch` option for `got status` [@perlpunk] [#59]
+
+1.331     2016-01-03 20:30:14-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+  * Depend on Path::Tiny 0.072. Thx to SawyerX for pointing out this issue.
+
+1.330     2015-04-14 21:27:19-07:00 America/Los_Angeles
+
+  * No changes from last trial release.
+  * No new features since last stable release.
+
+1.32      2015-04-10 11:23:50-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+  * Update a number of tests to pass under Windows
+  * Replace ENV{HOME} with File::HomeDir everywhere
+  * Depend on a version of Git::Wrapper that doesn't use File::pushd
+
+1.31      2015-04-05 21:42:56-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+  * Tweak some test code to maybe not blow up on Windows (John
+    Anderson)
+  * Set a minimum version of MooX::HandlesVia to avoid test failures
+    (John Anderson)
+
+1.30      2015-03-27 21:25:15-07:00 America/Los_Angeles
+
+  * Make 'got fork' add the forked repo as remote 'upstream' unless
+    -N/--noremoteadd option is given. (John Anderson)
+  * See also changes for dev releases v1.25 through v1.29
+
+1.29      2015-03-26 11:58:24-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+  * Docs for 'clone' and 'fork'. (John Anderson)
+  * Be a bit more lenient in parsing GitHub URLs (John Anderson)
+  * Make 'fork' more verbose [#51] (John Anderson)
+  * Tweak 'clone' to be a bit better (John Anderson)
+
+1.28      2015-03-23 22:32:27-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+  * Tweak missing directory error detection regex (John Anderson)
+
+1.27      2015-03-22 19:46:53-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+  * Add some safety code to prevent mux from opening errything (John Anderson)
+  * Add '-e' flag to 'tmux' subcommand [#41] (John Anderson)
+
+1.26      2015-03-18 22:04:39-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+  * Lock Moo to version 2 or greater (John Anderson)
+  * Report Git version being used in test suite (John Anderson)
+
+1.25      2015-03-17 20:51:55-07:00 America/Los_Angeles
+
+  * Fix failing tests. (Thanks Travis CI!) (John Anderson)
+
+1.24      2015-03-16 16:56:55-07:00 America/Los_Angeles
+
+  * Update copyright to 2015 (John Anderson)
+  * Lock Net::GitHub to at least v0.74 [#47] (John Anderson)
+  * Various testing improvements (John Anderson)
+  * Turn off IO::Page in 'got all' (John Anderson)
+  * Get rid of Term::Readline in favor of IO::Prompt::Simple (John Anderson)
+  * Move towards using Path::Tiny for errything (John Anderson)
+  * Whitespace cleanup (John Anderson)
+  * Clean up 'use' stanzas (John Anderson)
+  * delete 'version' command [#48] (John Anderson)
+
+1.23      2015-03-15 01:50:42-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+  * Port to Moo (John Anderson)
+  * Silence warning if PERL5LIB is not defined (Yanick Champoux)
+  * Specify minimum version on List::AllUtils (John Anderson)
+
+1.22      2015-02-26 07:40:05-08:00 America/Los_Angeles
+
+  * Really fixed test failures (John Anderson)
+
+1.21      2015-02-24 19:15:58-08:00 America/Los_Angeles
+
+  * Fixed test failures (John Anderson)
+
+1.20      2015-02-23 17:51:14-08:00 America/Los_Angeles
+
+  * Add 'lib' subcommand (Yanick Champoux)
+  * Add 'tag' subcommand (Yanick Champoux)
+  * Add 'do' subcommand (Yanick Champoux)
+  * Add '--json' option to 'got list' (Yanick Champoux)
+  * Extend the 'add' subcommand in a number of ways:
+      * Allow to pass more than one directory as arguments.
+      * Add '--recursive', to hunt down git repos under a main
+        directory.
+      * Make '--tag X' set the default tag(s) to X
+      * If there's only one remote, don't ask, use that one.
+      * Instead of asking the user to type the remote URI, give the
+        choice between the remote name/URL pairs.
+
+1.19      2014-08-29 22:07:03-07:00 America/Los_Angeles
+
+  * Make 'mux' work with multiple repos instead of just one
+  * Add 'dirty' flag to 'mux' to make it open all repos with unclear
+    status
+
+1.18      2014-08-12 22:03:34-05:00 America/Chicago
+
+  * Documentation updates for 'fetch' and 'gc' (Dan McCracken)
+
+1.17      2014-07-24 10:03:54-07:00 America/Los_Angeles
+
+  * Modify dist.ini to pull the INSTALL file from the build back into
+    the repo (addresses #28)
+
+1.16      2014-07-23 16:19:42-07:00 America/Los_Angeles
+
+  * Load Net::GitHub on the fly in the 'fork' command. Make it an
+    optional dep. Provide nice error message if it is not installed
+    when the 'fork' command is used.
+
+1.15      2014-05-08 21:19:33-07:00 America/Los_Angeles
+
+  * Fix stupid bugs because File::Slurp::Tiny does things _just_
+    slightly differently on some versions of Perl because we don't get
+    to have nice things ever.
+
+1.14      2014-05-08 18:06:22-07:00 America/Los_Angeles
+
+  * Move from File::Slurp to File::Slurp::Tiny (#25)
+
+1.13      2014-04-26 10:40:00-07:00 America/Los_Angeles
+
+  * __sigh__       
+
+1.12      2014-04-22 20:54:41-07:00 America/Los_Angeles
+  
+1.11      2014-04-22 18:53:24-07:00 America/Los_Angeles
+
+  * Add 'fetch' subcommand (Rolando Pereira)
+
+1.10      2013-12-15 20:28:02 America/Los_Angeles
+
+  * Add 'that' subcommand; refactor 'this' (Mike Greb)
+  * Add '-s' (session) support to 'mux' (Chris Prather)
+
+1.09      2013-10-06 11:01:46 America/New_York
+
+  * Add --skip-tags for skipping repos with given tag(s) (Mike Greb)
+
+1.08      2013-07-04 14:37:24 America/Los_Angeles
+
+  * Remove given/when constructs (which will silence the warnings on newer Perls)
+    (Thanks to Heikki Lehvaslaiho for raising this issue.)
+
+1.07      2013-04-24 20:27:45 America/Los_Angeles
+
+  [BUGFIX]
+
+  * Fix mocking so that test doesn't fail on older Perls
+
+1.06      2013-04-14 17:28:20 America/Los_Angeles
+
+  [BUGFIXES]
+
+  * Make 'got mux' more resilant with re-attaching (Github issue #7) (John SJ Anderson)
+  * Update for Net::GitHub API chaneg (Github issue #4) (John SJ Anderson)
+
+  [ENHANCEMENT]
+
+  * Add 'got move' command (Yanick Champoux)
+  
+1.05      2013-03-15 09:29:24 America/Los_Angeles
+
+  [ENHANCEMENTS]
+
+  * Add 'tmux' command to open tmux window in repo (Yanick Champoux)
+  * Add 'got-complete' bash-complete helper (Yanick Champoux)
+  * Use 'bin/got' POD for dist abstract
+
+1.04      2011-12-12 21:27:40 America/New_York
+
+  [BUGFIX]
+
+  * And another broken test...
+
+1.03      2011-12-11 22:16:13 America/New_York
+
+  [BUGFIX]
+
+  * Fix broken tests; d'oh.
+
+1.02      2011-12-07 09:36:01 America/New_York
+
+  [ENHANCEMENTS]
+
+  * Add 'this' command to show if current repo is known to got (Yanick)
+  * Add '--origin' option for 'add' command (Yanick)
+  * Convert to MouseX::App::Cmd. (Thanks to Ingy for pointing that
+    this module exists...)
+
+1.01      2011-07-08 21:42:32 America/New_York
+
+  [BUGFIX]
+
+  * Add specific dep on Git::Wrapper version. (RT#69342)
+
+1.0       2011-05-12 16:39:16 America/New_York
+
+  [ENHANCEMENTS]
+
+  * Add 'update_status' command (alias 'upst') which first does 'got
+    update' followed by 'got status'.
+
+  * Add 'push' command (as suggested by Brock Wilcox and Chas Owens)
+    to do batch pushes of selected repos.
+
+  * Add 'gc' command to trigger garbage collection in managed Git repos.
+
+  * Tests, tests, tests
+
+  [BUG FIXES]
+  * Tweak $ENV{LESS} to work better with 256 color terms.
+
+  * Remove '_bright_' from various colors in the dark-themed
+    outputter.
+
+OLDER:
+  * Hadn't been maintaining Changes file. Bad coder, no cookie.

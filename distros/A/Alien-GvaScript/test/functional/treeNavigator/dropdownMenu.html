@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <link href="../../test.css" rel="stylesheet" type="text/css">
+  <link href="../../images/GvaScript.css" rel="stylesheet" type="text/css">
+  <script src="../../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <style>
+      #menu { 
+        display: none;
+        position: absolute;
+        border: 1px solid blue;
+        background-color: white;
+        padding: 4px;
+      }
+
+      /* icons on the right for dropdown menus */
+      .TN_node .TN_label {
+         background-image: url(special_icons/navopen.gif);
+         background-repeat: no-repeat;
+         background-position: center right;
+         padding-right: 20px;
+      }
+
+      .TN_closed .TN_label {
+         background-image: url(special_icons/navclose.gif);
+      }
+
+      .TN_leaf .TN_label {
+         background-image: none;
+      }
+    </style>
+    <script>
+      var treeNav;       // GvaScript.TreeNavigator associated with the menu
+      var treeNav_rules; // keymap rules of that object
+      var textboxKeymap; // keymap associated with the input textbox
+      var menuVisible = false;
+
+      function showMenu(event) {
+         if (menuVisible) return;
+         menuVisible = true;
+         
+         // make the menu visible under the textbox
+         var textbox = $('textbox');
+         var coords = textbox.cumulativeOffset();
+         var dim = Element.getDimensions(textbox);
+         with ($('menu').style) {
+           display = 'block';
+           left    = coords[0] + 'px';
+           top     = coords[1] + dim.height + 'px';
+         };
+         if (!treeNav) { // if first time here, instantiate GvaScript.TreeNavigator
+           treeNav = new GvaScript.TreeNavigator('menu', {
+             treeTabIndex  : -1,
+             tabIndex      : -1,           // no tabbing 
+             createButtons : false,        // no +/- buttons
+             keymap        : textboxKeymap // reuse keymap from textbox
+            });
+         }
+         else            // else reuse rules popped from last hideMenu()
+           textboxKeymap.rules.push(treeNav_rules);  
+         textbox.style.backgroundImage = "url(special_icons/navopen.gif)";
+
+         if (event) Event.stop(event);
+      }
+
+      function hideMenu(event) {
+        if (!menuVisible) return;
+        menuVisible = false;
+
+        $('menu').style.display = "none";
+        treeNav_rules = textboxKeymap.rules.pop();
+        $('textbox').style.backgroundImage = "url(special_icons/navclose.gif)";
+
+        if (event) Event.stop(event);
+      }
+
+      function selectEntry(event) {
+        var node = Event.element(event);
+        if (treeNav.isLeaf(node)) {
+          $('textbox').value = node.getAttribute("value");
+          hideMenu();
+        }
+        else {
+          var method = treeNav.isClosed(node) ? treeNav.open : treeNav.close;
+          method.call(treeNav, node);
+        }
+      }
+
+      function maybeToggleMenu(event) { // when clicking on the textbox
+        // only handle clicks in the area right 20px of the textbox
+        var x = event.offsetX || event.layerX; // MSIE || FIREFOX
+        if (x > Element.getDimensions('textbox').width - 20) {
+          var handler = menuVisible ? hideMenu : showMenu;
+          handler(event);
+        }
+      }
+
+      function maybeBackFocus(event) { // when leaving the textbox
+        // if leaving the textbox because of a click in menu, we must
+        // bring back focus to the textbox
+        var x = Event.pointerX(event);
+        var y = Event.pointerY(event);
+        if (Position.within($('menu'), x, y))
+          $('textbox').focus();
+        else 
+          hideMenu();
+      }
+
+      function setup() {  
+         var textbox = $('textbox');
+
+         // bind event handlers to the textbox
+         textboxKeymap = new GvaScript.KeyMap({DOWN:showMenu,
+                                            ESCAPE: hideMenu});
+         textboxKeymap.observe('keydown', textbox,  {preventDefault:false,
+                                              stopPropagation:false});
+         Event.observe(textbox, "click", maybeToggleMenu);
+         Event.observe(textbox, "blur",  maybeBackFocus);
+        
+         with (textbox.style) {
+          backgroundImage    = "url(special_icons/navclose.gif)";
+          backgroundRepeat   = "no-repeat";
+          backgroundPosition = "center right";
+        }
+
+        textbox.focus();
+      }
+
+      document.observe('dom:loaded', setup);
+    </script>
+
+
+  </head>
+
+  <body>
+
+    <h1>Tree Navigator as a dropdown menu</h1>
+
+    Press the DOWN arrow or click on the triangle: <input id='textbox'>
+
+    <div id='menu' onPing="selectEntry" >
+      <div class="TN_leaf" value="value1" >
+        <div class="TN_label">entry 1</div> 
+      </div>
+      <div class="TN_leaf" value="value2">
+        <div class="TN_label">very <big><b>big</b></big> entry 2</div> 
+      </div>
+      <div class="TN_leaf" value="value3">
+        <div class="TN_label">an <em>emphasized</em> entry 3</div> 
+      </div>
+      <div class="TN_node TN_closed">
+        <div class="TN_label">entry 4: a submenu</div> 
+        <div class="TN_content">
+          <div class="TN_leaf" value="subvalue4.1">
+            <div class="TN_label">subentry 4.1</div> 
+          </div>
+          <div class="TN_node TN_closed">
+            <div class="TN_label">subsubmenu</div> 
+            <div class="TN_content">
+              <div class="TN_leaf" value="subvalue4.2.1">
+                <div class="TN_label">subentry 4.2.11</div> 
+              </div>
+              <div class="TN_leaf" value="subvalue4.2.2">
+                <div class="TN_label">subentry 4.2.2</div> 
+              </div>
+
+            </div>
+          </div>
+
+          <div class="TN_leaf" value="subvalue4.3">
+            <div class="TN_label">subentry 4.3</div> 
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>

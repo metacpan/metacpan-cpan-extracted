@@ -1,0 +1,72 @@
+? my ($app, $options, @windows) = @_;
+        <script type="text/javascript">
+          WEB_SOCKET_SWF_LOCATION = "/static/WebSocketMain.swf";
+          document.observe("dom:loaded", function () {
+            alice.options = <?= Text::MicroTemplate::encoded_string(JSON::to_json $options, {ascii => 1}) ?>;
+
+            // disable inline media and avatars on phones
+            if (alice.isMobile) {
+              alice.options.images = "hide";
+              alice.options.avatars = "hide";
+            }
+
+            if (alice.options.avatars == "hide") document.body.addClassName('noavatars');
+
+            <? my $tabsets = {map {$_->name => $_->windows } $app->tabsets}; ?>
+            alice.tabsets = <?= Text::MicroTemplate::encoded_string(JSON::to_json $tabsets, {ascii => 1}) ?>;
+
+            <? my $msgid = $app->message_store->msgid; ?>
+            <? for my $window (@windows) { ?>
+            alice.openWindow(
+              <?= Text::MicroTemplate::encoded_string(JSON::to_json $window->serialized, {ascii => 1}) ?>,
+              <?= $msgid ?>
+            );
+            <? } ?>
+
+            alice.ready();
+
+            <? if ($app->config->first_run or !grep {$_->is_connected or $_->is_connecting} $app->ircs) { ?>
+            alice.toggleConfig();
+            <? } ?>
+          });
+        </script>
+        <ul id="nicklist"></ul>
+      </div>
+
+      <div id="connection_status" class="ok"></div>
+
+      <div id="tab_bar">
+        <div class="dropdown bottom" id="tabset_dropdown">
+          <?= $_mt->render_file('tabset_menu.html', $_[0]); ?>
+        </div>
+
+        <div class="dropdown tab_menu bottom" id="tab_menu_left">
+          <ul></ul>
+        </div>
+
+        <div id="tabs_container">
+          <ul id="tabs">
+          <? for my $window (@windows) { ?>
+            <?= $_mt->render_file('tab.html', $_[0], $window) ?>
+          <? } ?>
+          </ul>
+        </div>
+
+        <div class="dropdown tab_menu bottom" id="tab_menu_right">
+          <ul></ul>
+        </div>
+        <div id="join_button"></div>
+      </div>
+
+      <div id="input">
+        <form>
+          <input type="hidden" value="" name="source" id="source" />
+          <div class="textarea_wrap"><textarea name="msg" id="msg" rows="1" autocapitalize="off"></textarea></div>
+          <input type="submit" id="submit" class="send" value="Send">
+        </form>
+      </div>
+
+    <?= $_mt->render_file('help.html', $_[0]) ?>
+
+  </body>
+</html>

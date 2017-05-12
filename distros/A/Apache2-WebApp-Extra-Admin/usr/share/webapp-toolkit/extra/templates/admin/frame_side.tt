@@ -1,0 +1,108 @@
+[%#
+  Apache2::WebApp::Toolkit - Admin Control Panel (frame_side.tt)
+  Copyright (C) 2010 Marc S. Brooks <mbrooks@cpan.org>
+
+  Licensed under the terms of the BSD License
+  http://www.opensource.org/licenses/bsd-license.php
+-%]
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Side</title>
+
+	<meta http-equiv="pragma" content="no-cache" />
+
+	<script type="text/javascript" src="/extras/admin/js/disable.js"></script>
+	<script type="text/javascript" src="/extras/admin/js/cookie.js"></script>
+	<script type="text/javascript" src="/extras/admin/js/menu.js"></script>
+
+	<style type="text/css">
+		@import url( /extras/admin/css/base.css );
+		@import url( /extras/admin/css/menu.css );
+	</style>
+</head>
+
+[% USE dir = Directory("$apache_doc_root/templates/extras") %]
+
+<body>
+
+<noscript>
+	<h2>
+		To use this admin you must have a JavaScript-enabled browser
+	</h2>
+</noscript>
+
+<h1 id="version">
+	[% project_title FILTER truncate(12, '..') %]
+		<br />
+	<small>v[% project_version %]</small>
+</h1>
+
+<div id="menu">
+	<div class="button">
+		<a href="/app/admin/?load=default" target="main" [% IF username == 'admin' %]onClick="viewOptions('menu_1')"[% END %]>
+			<strong>
+				Control Panel
+			</strong>
+		</a>
+	</div>
+
+[% IF username == 'admin' %]
+	<div id="menu_1" class="menu">
+		<ul class="options">
+			<li>
+				<a href="/app/admin/users" target="main">
+					Users
+				</a>
+			</li>
+		</ul>
+		<ul class="options">
+			<li>
+				<a href="/app/admin/logs" target="main">
+					Logs
+				</a>
+			</li>
+		</ul>
+	</div>
+[% END %]
+
+[%
+	admin = (username == 'admin') ? 1 : 0;
+	count = 0
+%]
+
+[% FOREACH file = dir.dirs %]
+[% NEXT IF file.name == 'admin' %]
+[% count = count + 1 %]
+[% INCLUDE "extras/$file.name/menu.tt", number = (count + admin) %]
+[% END %]
+
+[% INCLUDE "extras/admin/menu.tt", number = (dir.dirs.size + admin) %]
+
+</div>
+
+<script type="text/javascript">
+<!--//
+window.onload = function() {
+	initMenus([% dir.dirs.size + admin %]);
+};
+//-->
+</script>
+
+
+<!-- do not remove - use 'display: none' instead -->
+
+<p id="copy" style="display:none">
+	<span>Apache2 WebApp::Toolkit</span>
+		<br />
+	by: <a href="http://search.cpan.org/~mbrooks/" target="_new">Marc S. Brooks</a>
+</p>
+
+<!-- do not remove - use display: none instead -->
+
+
+</body>
+</html>

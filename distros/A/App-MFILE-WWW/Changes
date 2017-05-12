@@ -1,0 +1,942 @@
+Revision history for App::MFILE::WWW
+
+*** N.B.: for versions 0.001-0.078 the distro was known as App::Dochazka:WWW on
+    CPAN and the code was included in the 'dochazka' project on SourceForge
+
+0.001  2014-08-11 17:22 CEST
+- establish App::Dochazka::WWW on a green field (more or less)
+
+0.002  2014-08-11 19:11 CEST
+- modifications to get it to pass "bare basic" test suite
+
+0.003  2014-08-12 10:23 CEST
+- WWW.pm: write some POD
+
+0.003  2014-08-12 16:57 CEST
+- bring in Resource.pm from App-Dochazka-REST and start adapting it
+
+0.004  2014-08-13 03:37 CEST
+- bin/dochazka-www: bring in server startup script from App-Dochazka-REST
+  and adapt to our needs
+- config/WWW_Config.pm: add some config params
+- WWW.pm: bring in initialization routine from App-Dochazka-REST, adapt it, and
+  call it from dochazka-www
+- Resource.pm: eliminate large chunks of App-Dochazka-REST code that we don't
+  need here; add debug messages; think through how requests will be validated
+  by writing comments
+- looking good overall -- the server starts and displays placeholder
+  credentials dialog
+
+0.005  2014-08-13 08:36 CEST
+- change distro sharedir from 'config/' to 'share/', move config/ into it
+- make a new 'comp/' subdir under share/, for Mason components
+- make a new 'auth.mc' top-level Mason component for the credentials dialog
+- WWW.pm: instantiate Mason interpreter and export it as $Mason singleton;
+  load our distro sharedir instead of App-Dochazka-REST's; replace 
+  placeholder auth dialog with one constructed by Mason on the fly from
+  the template stored in 'share/comp/auth.mc'
+
+0.006  2014-08-13 13:17 CEST
+- Resource: add 'service_available' method for purpose of logging incoming
+  HTTP requests, as it is the first method Web::Machine calls
+- dochazka-cli: serve files in 'js/' and 'css/' directories statically using
+  Plack::Middleware::Static
+
+0.007  2014-08-13 13:27 CEST
+- MANIFEST: add bin/dochazka-www
+
+0.008  2014-08-13 14:56 CEST
+- MANIFEST: add missing files
+- share/comp: bring in index.html.mc, dhandler.mc, and auth.mi from my old
+  'mfile-mason' project; start adapting them to our purposes
+- share/js: bring in jquery.js from jquery.com/download
+- WWW.pm: export $VERSION so we can get to it from dhandler.mc
+- executive summary: server starts and displays login dialog
+
+0.009  2014-08-13 15:04 CEST
+- WWW.pm: POD - add Jonathan Swartz's suggestions regarding a
+  'Mason::Plugin::Utf8' to the 'Development notes' section
+
+0.010  2014-08-13 16:05 CEST
+- Build.PL: update dependencies
+- MANIFEST: add auth.mi
+
+0.011  2014-08-14 09:15 CEST
+- add COPYING file with text of BSD license
+- WWW.pm: write some POD
+- add license boilerplate to Mason components
+- auth.mi: get length of username and password fields from site configuration
+- tickets/: work on tickets
+
+0.012  2014-08-14 14:58 CEST
+- share/config/WWW_Config.pm: add DOCHAZKA_WWW_HOST and DOCHAZKA_WWW_PORT
+- bin/dochazka-www: look into how we could allow admin to specify host/port on
+  command line, yet default to values in site configuration if they are not
+  specified there
+
+0.013  2014-08-14 17:01 CEST
+- fighting with web technologies
+
+0.014  2014-08-14 20:18 CEST
+- add new JavaScript file js/02auth.js with authentication dialog-related
+  functions
+- Resource.pm: fix bug "don't die when no context at line 349"
+- comp/auth.mi: eliminate useless legacy iframe; do not submit form -
+  leave everything to the JavaScript code
+- work on tickets
+
+0.015  2014-08-15 11:14 CEST
+- comp/: add license boilerplate; merge comp/index.html.mc into dhandler.mc
+- js/02auth.js: merge beginnings of auth_check code
+
+0.016  2014-08-15 17:47 CEST
+- use jQuery 2.0 instead of 1.1.1
+- jettisoned idea of having the JS code open a connection to the REST
+  server via Ajax calls -- instead, will store a LWP::UserAgent object
+  in the session data 
+
+0.017  2014-08-16 10:15 CEST
+- lots of trial-and-error work to get login dialog to authenticate against REST
+  server with LWP::UserAgent object in session data
+- current state: login dialog displays and user can enter credentials; each
+  time the form is submitted, the credentials are authenticated to the REST
+  server and the REST server's response is displayed
+
+0.018  2014-08-18 10:06 CEST
+- fix bug "messages not getting loaded properly due to typo in name of
+  WWW_Message_en.conf file"
+- rename 'auth.mi' to more descriptive 'login_dialog.mi'
+- WWW.pm: add some POD detailing the request-response cycle
+- Resource.pm: eliminate resource_exists and integrate _validate_session into
+  is_authorized; improve session recognition; clarify that all POST requests 
+  are treated as form submits and handled in 'process_post', which will not
+  be reached if session not authorized
+- dhandler.mc: clarify what dhandler.mc's job is 
+- 02auth.js: rename to login_dialog.js and refactor to work with new
+  generalized JSON structure for form submits
+
+0.019  2014-08-18 10:43 CEST
+- fix bug: "exception in Resource.pm->is_authorized"
+- login_dialog.js: display reassuring message before attempting to
+  authenticate to REST server
+
+0.020  2014-08-18 11:45 CEST
+- Resource.pm: fix 'known_content_type'
+- add comp/main.mi and js/main.js
+- dhandler.mc: modifications to enable display of main page when session is
+  authorized; add debug messages
+- login_dialog.mi: call MFILE.main() upon successful auth
+
+0.021  2014-08-18 17:02 CEST
+- WWW.pm: edit POD to get rid of 'Use of uninitialized value $_ in pattern
+  match (m//)' error
+- lots of other changes (WIP)
+
+0.022  2014-08-18 22:19 CEST
+- config/mainMenu_Config.pm: add config file for runtime generation of
+  the main menu
+- add mainLogout.{mi,js}
+- rename main_menu.{mi,js} -> mainMenu.{mi,js}
+- rename login_dialog.{mi,js} -> loginDialog.{mi,js}
+- Resource.pm: move init_session function to WWW.pm
+- Form.pm: fix logic; add mainMenu and setSessionTarget targets
+- js/mainMenu.pm: add mainMenuFormSubmit function with AJAX call
+- status: login dialog works, dynamically-generated main menu is displayed,
+  mainLogout works
+- NEXT: cache Mason-generated source in the JavaScript top-level object so we
+  can switch between forms/targets without triggering a page reload
+
+0.023  2014-08-19 14:16 CEST
+- WWW.pm: write POD
+- Form.pm: add a debug message
+- Resource.pm: add debug messages; don't push session object onto context; 
+  refactor is_authorized
+
+0.024  2014-08-19 16:59 CEST
+- attempt to cache subcomponent output in JavaScript object (failing so far
+  due to quoting issues)
+
+0.025  2014-08-19 23:37 CEST
+- IMPLEMENT SUBCOMPONENT CACHING
+- WWW.pm: export a $tcache singleton
+- Form.pm: import $tcache singleton; fix mainLogout function; make
+  mainMenu function return cached content if available; convert
+  setSessionTarget into getTargetCache
+- dhandler.mc: import $tcache singleton; get rid of previous caching attempt; 
+  use content from $tcache if available so subcomponents are not called
+  more than once
+- mainMenu.js: add JS code to check the tcache and display the subcomponent source directly if
+  available in MFILE.tcache object (not tested -- need to implement at least two subcomponents
+  other than "mainLogout")
+- Resource.pm: simplify _render_response_html; cleanup
+- mainLogout.mi: remove <%perl> block -- these can no longer be used in subcomponents
+  unless it's OK for them to run only once
+- mainLogout.js: add AJAX call to send 'mainLogout' form submit
+- status: caching implemented but only sketchily tested, and no testing yet on
+  the JavaScript side
+
+0.026  2014-08-20 16:19 CEST
+- start implementing submenus
+
+0.027  2014-08-21 09:44 CEST
+- rename mainMenu.js to menu.js as we will use a single JS file for all
+  menus/submenus
+- WWW.pm: add 'generate_menu' function called from dhandler.mc
+- Form.pm: add generalized '_processMenuSelection' function and call it
+  from the form-submit function of each menu/submenu
+- menu.js: refactor for multiple menus/submenus - kludgey, but it works
+
+0.028  2014-08-21 10:53 CEST
+- WWW.pm: 'generate_menu' now generates entire form, not just the entries
+- mainMenu.mi, mainEmployee.mi: remove duplicated code
+- menu.js: mitigate kludginess
+
+0.029  2014-08-21 11:24 CEST
+- Form.pm: make menu selections case insensitive
+- mainLogout.mi: display a goodbye message for 1 second on logout
+- WWW_Config.pm: add DOCHAZKA_WWW_LOGOUT_MESSAGE site param
+- mainMenu_Config.pm: rename to menu_Config.pm, change logout selector from
+  '10' to 'X'
+- MANIFEST: menu_Config.pm was missing - add it
+- mainLogout.js: wait one second before reloading the page
+
+0.030  2014-08-21 11:53 CEST
+- WWW.pm, bin/dochazka-www: write log messages to file defined in site
+  param instead of relying on App::CELL::Test::LogToFile, which creates a
+  temporary file each time
+- WWW_Config.pm: add DOCHAZKA_WWW_LOG_FILE and DOCHAZKA_WWW_LOG_FILE_REST
+  params
+
+0.031  2014-08-21 12:23 CEST
+- fix bug "cache not being reset after logout"
+
+0.032  2014-08-21 14:13 CEST
+- start implementing empProfile target
+
+0.033  2014-08-21 15:36 CEST
+- Form.pm: provide 'cookie_jar' parameter to LWP::UserAgent->new as this
+  is necessary for session management to work; implement 'loadCurrentEmployee'
+  target function
+- empProfile.mi: improve HTML, uncomment JS handler call
+- menu_Config.pm: add 'loadCurrentEmployee' to DOCHAZKA_WWW_FORMS
+- empProfile.js: add some debug messages
+- current state of empProfile implementation: HTML form is displayed,
+  AJAX call gets current employee object and values from it appear in
+  the form; single-line minimenu is displayed; NEXT: enable user to make a
+  selection from the minimenu and process that selection
+
+0.034  2014-08-22 10:56 CEST
+- Form.pm: cleanup; comment out some debug messages; add empProfileMiniMenu
+- menu_Config.pm: add DOCHAZKA_WWW_EMPPROFILE_MINIMENU
+- empProfile.js: add call to MFILE.menu( 'empProfileMiniMenu' ) and started
+  to debug why it doesn't work as expected
+
+0.035  2014-08-22 11:15 CEST
+- fix bug "empProfileMiniMenu submits the wrong form, breaking the
+  application"
+- dhandler.mc: refrain from setting MFILE.target
+- menu_Config.pm: add missing 'empProfileMiniMenu' form to
+  DOCHAZKA_WWW_FORMS
+- menu.js: move misplaced console.log statement to right place
+
+0.036  2014-08-22 16:44 CEST
+- embark on major refactor after realizing that the current model
+  of treating everything (including menu selections) as a "form submit" 
+  is bogus -- WIP
+
+0.037  2014-08-23 09:06 CEST
+- continue stabilizing the application and converting Mason components
+  to JavaScript -- the goal is to remove Mason completely. Mason is
+  nice, but it makes sense to have it only when the application consists
+  of a number of different, complex pages and page reloads are used to 
+  switch between them. This application consists of very simple HTML
+  that can easily be stored in JavaScript variables and keeping all the 
+  navigation on the JavaScript side eliminates page reloads and makes
+  working with the application much faster. Also, conceptually it is 
+  easier to understand because AJAX calls are used only to communicate
+  with the REST server.
+- js/: add 03empProfile.js; rename 03simpleMenu.js to 04simpleMenu.js;
+  work on both
+
+0.038  2014-08-24 20:34 CEST
+- eliminate obsolete Form.pm module
+- WWW.pm: write some POD
+- Resource.pm: instead of representing the current employee with three separate
+  session attributes, do it with a single 'currentEmployee' hashref containing
+  the entire employee object; now that Form.pm is gone, we have to do
+  login/logout POST handling here -- add the necessary code
+- dhandler.mc: use 'currentEmployee' session attribute
+- 01init.js: since we are no longer thinking in terms of "submitting forms", 
+  but rather in terms of AJAX calls, change MFILE.lib.submitForm to MFILE.lib.AJAX
+- js/: convert all "form submits" to AJAX calls
+- status: everything works as it did before, except that all the "on-screen
+  action" takes place on the JavaScript side, and AJAX calls are used only to
+  communicate with the REST server; editEmpProfile is still WIP; menu system
+  still needs work (ACL profile, incorporate minimenu into form) 
+
+0.039  2014-08-24 20:47 CEST
+- get rid of lots of code made obsolete by the recent redesign
+
+0.040  2014-08-24 22:38 CEST
+- Build.PL: eliminate Mason dependency
+- MANIFEST: eliminate comp/, data/; add lib/App/Dochazka/WWW/HTML.pm
+- WWW.pm: eliminate exports, Mason
+- HTML.pm: new module replaces Mason templates
+- Resource.pm: convert from Mason to HTML.pm
+- status: works without Mason
+
+0.041  2014-08-25 08:51 CEST
+- WWW.pm: write POD; cleanup; eliminate 'verbose' parameter to init routine;
+  move 'init_session' to Resource.pm as it is used there only
+- Resource.pm: eliminate dependency on WWW.pm 
+
+0.042  2014-08-25 10:22 CEST
+- started working on JavaScript code
+- rename 01init.js to 01initlib.js
+- Resource.pm: log body of all incoming requests
+- 01initlib.js: refactor MFILE.lib.AJAX so it takes an object instead of
+  three variables; bring in contents of 02loginDialog.js; display a polite
+  message when user logs out
+
+0.043  2014-08-25 12:39 CEST
+- js/: rearrange code
+
+0.044  2014-08-25 16:11 CEST
+- implement dynamic generation of "simple forms"
+- simple forms consist of a title, a set of read-only span elements, 
+  a set of read/write input elements, and a minimenu
+- each form entry/element has an ACL profile
+- individual menuItems also have ACL profile
+- miniMenu logic autodetects presence of additional input elements above
+  'sel' and enables user to use TAB and SHIFT-TAB to navigate the entire
+  form
+- ready to implement empProfileEditSave
+
+0.045  2014-08-25 20:26 CEST
+- implementing empProfileEditSave (WIP)
+
+0.046  2014-08-25 22:13 CEST
+- js/: start refactoring to take advantage of prototypes and methods
+
+0.047  2014-08-26 13:40 CEST
+- js/: complete refactor of "targets" object model underway; "targets"
+  are simple menus, mini menus, simple forms, and direct actions;
+  all targets "inherit" from the MFILE.target prototype; now being 
+  much more careful about the order in which I define objects so I
+  don't refer to objects that don't yet exist; hopefully this change
+  will streamline the code and facilitate addition of additional targets
+- HTML.pm: get names of JavaScript code files from site configuration
+  parameter, instead of having them hardcoded
+- status: login, logout, and simple menus are working again; rest is broken
+
+0.048  2014-08-26 14:49 CEST
+- MANIFEST: update JavaScript source files
+- 002lib.js: expand MFILE.lib.AJAX to take success and failure callbacks
+- js/: change all MFILE.lib.AJAX calls to send success and failure callbacsk
+- 011simpleMenu2.js: use anonymous function call to loop over all simple
+  menus
+- status: ready to re-implement simple forms
+
+0.049  2014-08-26 15:52 CEST
+- WIP refactoring JavaScript code for the new 'target' prototype
+  and to use object references wherever possible
+
+0.050  2014-08-27 16:18 CEST
+- ironing out bugs in the JavaScript code
+
+0.051  2014-08-27 21:22 CEST
+- finally finish migration to new object model (simple forms implementation)
+- implement empProfileUpdate (formerly empProfileEditSave)
+- split off 'priv' and 'schedule' properties from MFILE.currentEmployee into
+  MFILE.currentEmployeePriv and MFILE.currentEmployeeSchedule, respectively,
+  so the MFILE.currentEmployee object's properties match those of the employee
+  object in the REST server's data model
+- remove 'priv' from empProfile and empProfileEdit, as it is not a property
+  of the employee data model object and it's presence here might confuse users   
+
+0.052  2014-08-27 22:31 CEST
+- add 'new employee' simple form
+- 013simpleForm2.js: fix some minor issues in makeSimpleFormSource function
+
+0.053  2014-08-28 10:03 CEST
+- 006simpleForm1.js: add 'dispEmployee' target; add preamble text to 'empProfileEdit' target; 
+  Nick is a required field, so it gets a star
+- 011simpleMenu2.js: clear '#result' before displaying the menu
+- 013simpleForm2.js: text of Back menu entry is now configurable; add 'dispEmployee' target;
+  makeSimpleFormSource display preamble; menu selection defaults to 'X' (back) when there
+  are no other menu entries
+- 110empProfile.js: add 'dispEmployee' target; newEmployee target now calls 'dispEmployee'
+  upon successful insert
+
+0.054  2014-08-28 16:16 CEST
+- WWW/Resource.pm: trying to tame JSON encoding/decoding
+- js/: start working on employee search/browse
+- status: implemented new 'Search employee' menu item, simple form for
+  getting search key, AJAX call to REST server, "browse" results in cases
+  when 0 or 1 employees found
+
+0.055  2014-08-28 22:29 CEST
+- js/: first shot at employee search functionality for administrators: simple 
+  form gathers a nick search key (e.g. 'ro%') which matches 'n' records,
+  which can then be displayed/browsed using a clumsy set of forms -- it is 
+  enough to see that:
+  (a) it can be done using the simple forms, but
+  (b) realistically, a new widget will be needed
+
+0.056  2014-08-29 08:53 CEST
+- js/: add 'changePassword' target
+- status: changePassword works, but REST server does not allow passerbies and
+  inactives to change their passwords -- need to look at that
+
+0.057  2014-08-29 13:42 CEST
+- Resource.pm: 'rest_req' now returns entire HTTP::Response object instead
+  of just its 'code' property: adapt our code to handle that; AJAX calls 
+  return HTTP response code _and_ message
+- js/: run JSlint on all the JavaScript source files and fix all errors
+
+0.058  2014-08-29 16:18 CEST
+- css/: widen application frame by "50 pixels"
+- Build.PL: require App::Dochazka version 0.164 minimum
+- 002lib.js: fix MFILE.lib.rightPadSpaces (broken by JSlint-related
+  changes)
+- 013simpleForm2.js: fix bug "form submit broken when clicking on submit
+  button"
+
+0.059  2014-08-29 17:20 CEST
+- Resource.pm->_login_dialog: improve error displayed on login failure
+- 007directAction.js: constructor gives dA objects a default start method
+  if one is not provided in the argument object; add 'insertEmployee' dA
+- 100login.js: refactor MFILE.loginDialogFormSubmit, improve error message
+  displayed on login failure
+- 110empProfile.js: refactor MFILE.directAction.newEmployee.start so it
+  properly validates the nick before attempting the insert, which is
+  implemented by calling the new 'insertEmployee' dA target
+
+0.060  2014-08-29 22:36 CEST
+- implement "Masquerade as different employee" feature
+- js/: add 'masqEmployee' target; rename 003targets.js to 003prototypes.js
+  after adding MFILE.empProfile prototype to it; minor cleanup
+- 011simpleMenu2.pm: check MFILE.currentEmployee's heritage each time we enter
+  a menu, and fix it if necessary (it loses its heritage on each page reload,
+  but each page reload takes us to the main menu, where we restore the heritage)
+- HTML.pm: give 'userbox' an id so we can refer to it
+- test and debug MFILE.empProfile.sanitize function, now using it to ensure
+  that employee objects don't have illegal properties when sending them to
+  the REST server
+
+0.061  2014-09-01 07:49 CEST
+- Unicode hell
+
+0.062  2014-09-02 17:57 CEST
+- Unicode hell
+- js/: split JS source files into 'mfile' and 'dochazka' trees -- 'mfile'
+  is the "framework" and 'dochazka' is our "application" (preparation for
+  Hackweek 11), minor cleanup
+- HTML.pm, config/WWW_Config.pm: instead of having all the JS source code files
+  in a single array ref, each source file now has its own site param
+
+0.063  2014-09-02 18:42 CEST
+- js/: js/mfile/004simpleMenu1.js contains "general" code, while the "real"
+  simple menus are defined in js/dochazka/004simpleMenu1.js, which overwrites
+  the MFILE.simpleMenu object; eliminate MFILE.listOfAllSimpleMenus array since
+  this information can easily be derived from the MFILE.simpleMenu object
+
+0.064  2014-09-03 12:21 CEST
+- js/: separating general ('MFILE') from specific ('DOCHAZKA') code,
+  implementing privilege history submenu (WIP)
+
+0.065  2014-09-03 13:58 CEST
+- Resource.pm, WWW_Config.pm: implement DOCHAZKA_WWW_BYPASS_LOGIN_DIALOG
+  site configuration parameter so we don't have to type in credentials 
+  a gazillion times a day
+
+0.066  2014-09-03 16:40 CEST
+- js/: get crazy idea to add a "Run unit tests" entry to the main menu,
+  start implementing it
+
+0.067  2014-09-03 17:34 CEST
+- js/: move "specific" simple forms code to /js/dochazka, eliminate
+  MFILE.listOfAllSimpleForms because it is trivial to derive the list
+  from the MFILE.simpleForm object; add "Run unit tests" entry to main
+  menu (WIP)
+
+0.068  2014-09-03 22:44 CEST
+- Resource.pm: fix bug ('ip_addr' and 'last_seen' not getting set properly 
+  following addition of DOCHAZKA_WWW_BYPASS_LOGIN_DIALOG); add more
+  debug messages
+- js/: move some code to mfile/002lib.js, move more Dochazka-specific code
+  from mfile/ to dochazka/
+
+0.069  2014-09-04 11:12 CEST
+- HTML.pm, config/WWW_Config.pm: fix bug (DOCHAZKA_WWW_JS_PRIVHISTORY was not
+  defined and hence not being loaded at runtime)
+- dochazka/004simpleMenu1.js: generate 'start' method of objects in
+  MFILE.simpleMenu using a loop, instead of assigning them manually
+- {mfile,dochazka}/013simpleForm2: move Dochazka-specific code to 
+  the right place
+- 120privHistory.js: fix bug (Dochazka-specific code in wrong place)
+- 120privHistory.js: fix bug (wrong concatenation operator)
+- mfile/002lib.js: fix bug (new MFILE.lib.hairCut method was broken)
+
+0.070  2014-09-04 20:39 CEST
+- js/mfile/003prototypes.js: fix bug in 'sanitize' method (missing return)
+- js/dochazka/110empProfile.js: fix bug in MFILE.directAction.empProfileUpdate.start 
+  (failure callback was not displaying server error message)
+- js/: add some debug messages, bring in RequireJS
+
+0.071  2014-09-08 09:31 CEST
+- 110empProfile.pm: don't let user masquerade as herself
+
+0.072  2014-09-08 22:07 CEST
+- start migrating to RequireJS (WIP)
+
+0.073  2014-09-09 10:12 CEST
+- js/: move code from mfile/002lib.js into 'ajax.js' and 'lib.js', migrate it
+  to RequireJS
+
+0.074  2014-09-09 11:40 CEST
+- HTML.pm: gut module and move remaining code into Resource.pm
+- js/: continue migrating existing code to RequireJS - login dialog now
+  works
+
+0.075  2014-09-09 14:13 CEST
+- migrate prototypes to RequireJS
+- migrate dmenu, dform, daction initialization routines to RequireJS
+- Resource.pm: add 'app' paths config entry - JavaScript modules in 
+  this directory are considered "application-specific" yet still referred
+  to by this general name ('app')
+
+0.076  2014-09-09 17:51 CEST
+- hack like mad to get a menu to appear (still no joy)
+
+0.077  2014-09-10 09:39 CEST
+- js/: cleanup, delete deprecated code
+- js/current-user.js: include 'obj' and 'priv' properties in module object
+- js/daction.js: add 'logout' to the set of "core" dactions
+- js/dform.js: integrate entries object
+- js/dmenu.js: work on introductory comments; add demoForm to demoMenu
+- js/lib.js: fix priv_check; add 'entries' and 'back' properties to dmenu
+  constructor; add 'hookGetObj' property to dform constructor
+- js/main.js: start demo menu instead of main menu
+
+0.078  2014-09-10 11:03 CEST
+- implement phased initialization of dmenu and dform objects
+- dforms now working and can be included in dmenus
+- js/dmenu.js: rewrite introductory documentation; move initialization of
+  'entries' and 'back' properties to js/init/
+- js/init/dform-source-start.js: rename from init/dform; adapt to
+  restructured dform.XYZ.menu object
+- js/init/dmenu-source-start.js: rename from init/dmenu
+- js/main.js: initialize dforms by requiring init/dform-source-start
+
+0.079  2014-09-10 15:22 CEST
+- migration to RequireJS complete
+- rename to App::MFILE::WWW
+
+0.080  2014-09-10 16:14 CEST
+- hack css
+
+0.081  2014-09-10 17:22 CEST
+- js/html.js: iff currentUser is an admin, display 'ADMIN' next to her nick
+
+0.082  2014-09-10 17:48 CEST
+- WWW.pm: massage POD
+
+0.083  2014-09-10 17:59 CEST
+- js/ajax.js: cleanup and document
+
+0.084  2014-09-10 18:02 CEST
+- js/cf.js: cleanup and improve in-line documentation
+
+0.085  2014-09-10 18:08 CEST
+- js/current-user.js: cleanup; improve in-line documentation
+
+0.086  2014-09-11 09:31 CEST
+- js/: {dmenu,dform,daction} object initialization was subject to race
+  conditions, so had to be redesigned - the new system treats all three
+  types of objects as instances of a single type "target" and all targets
+  are stored in a single module, target.js, and initialized in
+  app/target-init.js
+
+0.087  2014-09-11 09:55 CEST
+- fix bugs in MANIFEST and t/00-load.t
+
+0.088  2014-09-11 10:00 CEST
+- Build.PL: update dependencies
+
+0.089  2014-09-11 11:49 CEST
+- js/mfile-www/daction-start.js: single source for daction start methods
+- js/mfile-www/{daction,dform,dmenu}-init.js: each target type has its 
+  own method for initialization round one
+- js/mfile-www/target-init.js: function that initializes all targets
+  (called from main.js)
+- js/main.js: adapt to new targets system
+- js/init/{dmenu,dform}-source-start.js: (target init round two) adapt to
+  new targets system
+
+0.090  2014-09-11 12:25 CEST
+- js/: fix lots of bugs introduced by the last refactor
+
+0.091  2014-09-11 14:46 CEST
+- add unit testing infrastructure
+- Resource.pm: adapt for QUnit (URLs containing 'test' will cause unit
+  tests to be run); rename 'gen_html' to 'main_html'; new '_require_js'
+  generates shared RequireJS HTML code
+- js/: set up QUnit with a single "dummy test"; move require.js to libs/;
+  add 'test.js' unit testing script and 'tests/' directory for unit tests
+
+0.092  2014-09-11 16:12 CEST
+- js/tests: implement 'cf' test, start work on 'current-user' test
+- Resource.pm: fix first bug uncovered by the new unit tests
+
+0.093  2014-09-11 21:42 CEST
+- js/: add a few unit tests
+
+0.094  2014-09-12 10:28 CEST
+- add more unit tests
+
+0.095  2014-09-12 16:46 CEST
+- Build.PL: add 'Getopt::Long' dependency
+- bin/mfile-www: start refactoring startup script to work in two
+  different modes: "standalone operation" and "derived distro"
+- WWW.pm: write POD on the new operating modes
+- WWW_Config.pm: change default location of logfile to $HOME/.mfile-www.log 
+  to increase probability of it being user-writable
+
+0.096  2014-09-12 18:00 CEST
+- bin/mfile-www: start extending the script to handle "standalone" and "derived
+  distro" modes
+- WWW.pm: fix some errors in the new POD
+
+0.097  2014-09-15 21:38 CEST
+- js/: move all core JS files to js/core 
+- bin/mfile-www: start refactoring startup script to support "standalone"
+  and "derived distribution" modes
+- Resource.pm: more annotation of the JavaScript initialization code
+- config/WWW_Config.pm: add config parameters that will be needed for
+  "standalone" and "derived distribution" modes
+- t/pod-coverage.t: fix typo in test that was causing it to fail on one
+  platform
+
+0.098  2014-09-17 17:54 CEST
+- implemented feature standalone/derived distribution mode (so far, only
+  standalone mode has been tested)
+- WWW.pm: add 'mode' param to 'init' routine - if mode is 'STANDALONE', 
+  set META_WWW_CONNECT_TO_REST_SERVER meta param to the string 'false'
+- REST.pm: pass META_WWW_CONNECT_TO_REST_SERVER to cf.js
+- WWW_Config.pm: eliminate MFILE_WWW_CONNECT_TO_REST_SERVER site param
+  as we are using meta for this
+- js/core/main.cf: bring in 'cf' as a dependency; do mode-specific setup
+  and hard-set nick to 'demo' if we are in standalone mode. This has effect
+  of bypassing the login dialog
+
+0.099  2014-09-17 22:17 CEST
+- js/core/ajax.js: in standalone mode there is no REST server
+- js/mfile-www/: add a "demo submenu"
+
+0.100  2014-09-18 08:18 CEST
+- Resource.pm: in 'is_authorized' routine, session is authorized if
+  META_WWW_CONNECT_TO_REST_SERVER is false
+- js/core/logout.js: eliminate 'logoutSource' (duplicated code); in standalone
+  mode, emulate actual logout
+
+0.101  2014-09-18 08:48 CEST
+- js/: divide 'sampleAction' into three demo actions
+
+0.102  2014-09-18 12:33 CEST
+- bin/mfile-www: edit POD; make sitedir configurable and optional
+
+0.103  2014-09-18 15:12 CEST
+- minor POD fix
+
+0.104  2014-09-19 09:27 CEST
+- WWW.pm: move startup script-related POD to startup script
+- Resource.pm: clarify logic in 'is_authorized'
+- js/core/current-user.js: refactor, document
+- js/core/lib.js: refactor 'privCheck'
+- js/core/tests/current-user.js: test differently in standalone mode
+- js/core/tests/lib.js: adapt to changes in current-user.js
+- tickets: add some tickets
+
+0.105  2014-09-19 13:59 CEST
+- Resource.pm: do not use quotation marks when we send 'false/true' value
+  of META_WWW_CONNECT_TO_REST_SERVER to JavaScript side
+- js/: adapt to true/false value of cf('connectToRestServer'); deal with
+  current-user being null in standalone mode; make privCheck test use new
+  lib.privCheck "API"
+
+0.106  2014-09-19 17:25 CEST
+- add initialization code for derived distribution mode
+
+0.107  2014-09-19 18:10 CEST
+- bin/mfile-www: fix various oversights
+- current_user.js: make 'obj' switch return null if there is no nick
+- main.js: fix derived distribution mode
+- status: server starts in ddist mode, login dialog is displayed
+
+0.108  2014-09-20 08:20 CEST
+- make target-init return name of target to be called first (by main.js)
+
+0.109  2014-09-20 22:53 CEST
+- lib.js: clean up deprecated constructor functions
+
+0.110  2014-09-21 00:33 CEST
+- bin/mfile-www, Resource.pm: add code to get the right version string so we
+  don't display App::MFILE::WWW version in derived distro mode
+
+0.111  2014-09-22 21:02 CEST
+- Resource.pm: fix bug "App::MFILE::WWW version number in HTML title, but 
+  in derived distribution mode the version number should be that of the
+  derived distribution"
+
+0.112  2014-09-24 10:19 CEST
+- js/core/dform-source-start.js: fix two bugs relating to how miniMenu length
+  is determined
+
+0.113  2014-09-24 11:53 CEST
+- Resource.pm: fix bug "privilege reverts to passerby on page reload"
+
+0.114  2014-09-24 13:47 CEST
+- do the right thing when user hits ENTER at a menu or miniMenu
+
+0.115  2014-09-24 15:27 CEST
+- js/: two minor clarifications
+
+0.116  2014-09-25 10:29 CEST
+- WWW.pm: massage POD
+
+0.117  2014-09-27 10:53 CEST
+- js/: start refactor in preparation for adding new 'browser' widget
+
+0.118  2014-10-03 12:46 CEST
+- ajax.js: expand commentary
+- js/: start work on 'dbrowser' widget (target type)
+
+0.119  2014-10-06 08:13 CEST
+- html.js: first shot at dbrowser HTML generator; modularize some snippets of
+  code
+
+0.120  2014-10-10 12:05 CEST
+- js/: debug latest round of changes
+- NEXT: start testing dbrowser functionality
+
+0.121  2014-10-10 17:01 CEST
+- js/: work on dbrowser (progress)
+
+0.122  2014-10-11 14:53 CEST
+- lib.js: add 'holdObject' routine
+- start.js: add 'dbrowserSubmit' routine; when dbrowsing, use 'lib.holdObject'
+  to store the current object so we can return to it
+- dform-init.js: start work on a 'demoEditFromBrowser' target
+
+0.123  2014-10-11 17:15 CEST
+- start.js: add warning about argument passed by dform handler to start
+  method of item picked from the dform miniMenu; store dbrowser state in a
+  descriptively-named object; rewrite dbrowser method to enable it to be
+  called either with an argument ("new" dbrowser) or without (return to
+  existing dbrowser state)
+- daction-{init,start}.js: add 'returnToBrowser' action for returning to
+  the saved dbrowser state
+- dform-init.js: make the 'Back' miniMenu selection in 'demoEditFromBrowser' 
+  call the 'returnToBrowser' target
+
+0.124  2014-10-11 19:34 CEST
+- dbrowser-init.js: use lib.holdObject for the hook and store the sample
+  result set there before initializing the target
+
+0.125  2014-10-11 20:34 CEST
+- html.js: add comment; remove useless arguments from 'dbrowser' function
+  declaration
+- lib.js: add comment
+- start.js: fix bug "start.dbrowser not reinitializing state"; add comments
+
+0.126  2014-10-11 21:57 CEST
+- current-user.js: add flag1 property, which we will use to store
+  masquerade state but which could be used for anything
+- html.js: fill 'userbox' element from app/lib.js
+- mfile-www/lib.js: new module with one method so far: 'fillUserBox' (based
+  on code that used to be in html.js)
+
+0.127  2014-10-11 22:39 CEST
+- start.css: change 'dbstatus' to 'noticesline'
+- html.js: add notices line to body HTML
+- mfile-www/app.js: add 'fillNoticesLine' method
+
+0.128  2014-10-11 23:13 CEST
+- start.js: notify console log and clear 'result' element whenever a dmenu,
+  dform, or dbrowser is started
+
+0.129  2014-10-13 15:25 CEST
+- WWW.pm: work on POD
+- core/html.js, css/start.css: rework CSS code in light of
+  http://stackoverflow.com/questions/26339186/different-font-sizes-and-justifications-on-a-single-line
+  and get rid of several deprecated classes
+- mfile-www/lib.js: tweak notices line
+
+0.130  2014-10-13 15:52 CEST
+- start.css: fix bug "#result element has fixed height, causing text to
+  overflow the border whenever more than one line is displayed"
+- core/ajax.js: display '* * * Communicating with REST server * * *' in the
+  #result line before each AJAX call
+- lib.js: add 'clearResult' library function
+- star.js: use 'clearResult' library function
+
+0.131  2014-10-13 16:47 CEST
+- js/: CSS tweaks
+
+0.132  2014-10-13 17:53 CEST
+- core/lib.js: stop logging every keypress
+- core/start.js: move miniMenu keyhandler into its own routine, thereby
+  eliminating some code duplication and preparing the code for a 'dnotice'
+  target type 
+
+0.133  2014-10-14 08:41 CEST
+- js/: implement dnotice feature
+
+0.134  2014-10-14 09:20 CEST
+- js/: fix bug "privHistory dnotice: race condition in AJAX call"
+
+0.135  2014-10-14 09:32 CEST
+- core/html.js: put dnotice in a <div> instead of a <form>
+
+0.136  2014-10-14 10:58 CEST
+- mfile-www/dnotice-hooks.js: make demoNotice display a random number to
+  illustrate that noticeText is generated at runtime
+
+0.137  2015-08-07 13:17 CEST
+- migrate to GitHub
+- Tame $VERSION strings
+- Tame READMEs
+
+0.138 2016-09-04 17:45 CEST
+- WWW.pm: export $VERSION variable correctly
+- Resource.pm: use match method to check content type
+- Travis CI
+- MANIFEST: drop ignore.txt
+
+0.139 2016-09-05 08:29 CEST
+- tests: drop t/boilerplate.t
+
+0.140 2016-09-11 22:22 CEST
+- current-user: do not fall back to passerby if priv undefined
+- doc: fix POD markup in bin/mfile-www
+- Resource.pm: start with null currentUserPriv
+- core/lib.js: improve diagnostic message
+- js: add console.log() calls to shed light on code paths
+- config: set MFILE_WWW_PORT to right value
+- bin/mfile-www: improved --ddist handling
+- cleanup: concentrate subroutines at the top in bin/mfile-www
+- Move is_authorized() from Resource.pm to Dispatch.pm
+- Implement standaloneMode boolean config param
+- Get listen host/port from configuration
+- Move login dialog and POST processing to Dispatch.pm
+- bin/mfile-www: use $dispatch_module instead of hard-coding
+- Make debug mode controllable via MFILE_WWW_DEBUG_MODE config param
+- Resource.pm, Dispatch.pm: support login/logout
+- Implement login/logout functionality in standalone mode
+- login dialog: fail properly on bad login creds
+
+0.141 2016-09-12 10:17 CEST
+- cleanup: remove all mentions of REST
+- doc: drop version section from README.rst
+- js: drop connectToRestServer config param
+- cleanup: drop over-verbose comments in login-dialog.js
+- Initialize currentUserPriv (fixes login dialog)
+
+0.142 2016-09-16 00:18 CEST
+- doc: improve comments and log messages
+- dform: calculate length of form entry text
+- js: replace for-loop with reduce method in core/html.js
+- js: display (none) if no value in dform
+
+0.143 2016-09-19 12:46 CEST
+- js: add forceArray() function to core lib
+- js: handle null in array concatenation (core/html.js)
+
+0.144 2016-09-25 09:46 CEST
+- bin/mfile-www: add --init option for perlbrew installs
+- Log user out if AJAX call returns 401
+
+0.145 2016-09-27 17:00 CEST
+- Resource.pm: eliminate a warning
+- cleanup: improve debug messages
+- bin/mfile-www: save session data in temporary file
+- js: handle various form field values better in html.js
+- Port dform display improvements to dbrowser
+- dbrowser: rename aclProfile -> aclProfileRead
+- dbrowser: fire itemHook in listener function
+
+0.146 2016-09-28 18:58 CEST
+- Remove dbrowser "itemHook", bad idea
+- js: export dbrowserListen and dbrowserState in start.js
+- _load_config: make sitedir take priority
+- build/ops: set OBS_PROJECT to Application:Dochazka
+
+0.147 2016-09-28 22:58 CEST
+- dtable boilerplate
+- dtable: everything except table rendering
+- js: fix ACL profile property name in entry definitions
+- build/ops: fix session management
+- js: rename charsNeeded() to maxLength() and generalize
+- dtable: finalize initial feature implementation
+
+0.148 2016-09-29 00:43 CEST
+- html.js: handle null entries prop in miniMenu()
+- js: take headings into account when calculating column widths
+- js: grammatically correct "Displaying table" message
+- js: add readableDate() function to core lib
+
+0.149 2016-09-29 01:09 CEST
+- html.js: restore proper padding in dform
+- js: make readableDate() take full "YYYY-MM-DD HH:DD:SS+TZ"
+
+0.150 2016-11-03 19:22 CET
+- Resource.pm: expose REST server URI to JavaScript side
+- Resource.pm: export foreign site params only if defined
+- js demo: dtable return to demoSubmenu instead of demoMenu
+- js demo: implement a proper hook for dbrowser demo
+- html.js: do not concatenate undefined entries
+- html.js: use text prop to determine max length
+- html.js: implement and use getObjStr()
+- start.js: simplify dtable start/listen code
+- Implement a drowselect target (widget)
+  - demo: plumb in the new "drowselect" widget
+  - demo: implement proper dtable, drowselect hooks
+  - html.js: initial HTML for drowselect widget
+  - start.js: add drowselect start and listen functions
+  - html.js: put spans around table/rowselect rows
+  - core: implement drowselect reverse video, arrow-key navigation
+  - html.js: remove potential code duplication (dtable/drowselect)
+
+0.151 2016-11-04 22:02 CET
+- demo: storage and accessors for dbrowser data set
+- demo: move rowselect demo to submenu
+- demo: enable editing in dbrowser/drowselect demos
+- core: refactor to eliminate code duplication (and fix a bug)
+
+0.152 2016-11-05 21:18 CET
+- core: prevent miniMenu entries from being undefined in start.js
+- core: library function for displaying error messages
+- core: improve display of empty table/rowselect in html.js
+- core: display drowselect navigation only if rows > 1
+
+0.153 2017-02-25 09:30 CET
+- Refrain from making a new Plack::Session object
+- doc: tweak log messages
+- Resource.pm: implement session and session_id methods
+- script: store sessions in a dedicated directory in /tmp
+- Display session data on all screens
+- login: do not trigger page reload when bad credentials
+- Dispatch.pm: remove dead code
+- Control display of session data by config parameter
+- doc: better description of MFILE_APPNAME config param
+- Control display of session data via configuration parameter
+
+0.154 2017-02-27 15:40 CET
+- build/ops: require recent versions of dependencies
+- Cleanup session data display
+- html.js: handle null entriesWrite array
+- Implement a special divider dform entry, including rendering
+- Implement a special dform entry that is just an empty line
+- html: handle null elem.text in maxLength
+

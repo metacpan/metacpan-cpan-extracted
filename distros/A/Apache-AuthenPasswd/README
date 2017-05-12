@@ -1,0 +1,89 @@
+        **************** NOTICE *********************
+        Please, please, realize that this module will
+        only work with passwords that are stored in
+        /etc/passwd.  Most systems use shadow
+        passwords now, and the call that this module
+        uses to access the password ONLY checks for
+        the password in the /etc/passwd file.  Also,
+        the call that is needed to access passwords
+        in /etc/shadow cannot be called by anyone
+        other than root, so, (unless you are crazy
+        enough to run apache as root), you will not
+        be able to access /etc/shadow.
+
+        For more info on shadow passwords:
+        http://www.tldp.org/HOWTO/Shadow-Password-HOWTO.html
+
+        For alternatives that can access /etc/shadow from
+        apache:
+        http://mod-auth-shadow.sourceforge.net/
+        *********************************************
+
+NAME
+     Apache::AuthenPasswd - mod_perl passwd Authentication module
+
+SYNOPSIS
+         <Directory /foo/bar>
+         # This is the standard authentication stuff
+         AuthName "Foo Bar Authentication"
+         AuthType Basic
+
+         PerlAuthenHandler Apache::AuthenPasswd
+
+         # Standard require stuff, /etc/passwd users or /etc/group groups, and
+         # "valid-user" all work OK
+         require user username1 username2 ...
+         require group groupname1 groupname2 ... # [Need Apache::AuthzPasswd]
+         require valid-user
+
+         # The following is actually only needed when authorizing
+         # against /etc/group. This is a separate module.
+         PerlAuthzHandler Apache::AuthzPasswd
+
+         </Directory>
+
+         These directives can also be used in the <Location> directive or in
+         an .htaccess file.
+
+
+DESCRIPTION
+     This perl module is designed to work with mod_perl and the
+     Net::NIS module by Rik Haris (rik.harris@fulcrum.com.au).
+     It is a direct adaptation (i.e. I modified the code) of
+     Michael Parker's (parker@austx.tandem.com) Apache::AuthenSmb
+     module.
+
+     The module uses getpwnam to retrieve the passwd entry from
+     the /etc/passwd file, using the supplied username as the
+     search key.  It then uses crypt() to verify that the
+     supplied password matches the retrieved hashed password.
+
+     Apache::AuthenPasswdApache::AuthzPasswd
+
+     I've taken "authentication" to be meaningful only in terms
+     of a user and password combination, not group membership.
+     This means that you can use Apache::AuthenPasswd with the
+     require user and require valid-user directives.  In the
+     /etc/passwd and /etc/group context I consider require group
+     to be an "authorization" concern.  I.e., group authorization
+     consists of establishing whether the already authenticated
+     user is a member of one of the indicated groups in the
+     require group directive.  This process may be handled by
+     Apache::AuthzPasswd.  Admittedly, AuthzPasswd is a misnomer,
+     but I wanted to keep AuthenPasswd and AuthzPasswd related,
+     if only by name.
+
+     I welcome any feedback on this module, esp. code
+     improvements, given that it was written hastily, to say the
+     least.
+
+AUTHOR
+     Demetrios E. Paneras <dep@media.mit.edu> and
+     Shannon Eric Peevey <speeves@unt.edu>
+
+COPYRIGHT
+     Copyright (c) 1998, 2003 Demetrios E. Paneras, MIT Media
+     Laboratory.
+
+     This library is free software; you can redistribute it
+     and/or modify it under the same terms as Perl itself.

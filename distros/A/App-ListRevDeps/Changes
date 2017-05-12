@@ -1,0 +1,96 @@
+Revision history for App-ListRevDeps
+
+0.15    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+        - Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.14    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.13    2015-08-17 (PERLANCAR)
+
+	- Mention App::lcpan instead of the old CPAN::SQLite::CPANMeta.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.12     2014-09-16 (PERLANCAR)
+
+         - Fix typo.
+
+
+0.11     2014-09-04 (PERLANCAR)
+
+         - A couple of bug fixes.
+
+
+0.10     2014-09-04 (PERLANCAR)
+
+         - Adjust to new version of MetaCPAN::Client.
+
+
+0.09     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.08    2014-05-27 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace the deprecated MetaCPAN::API with MetaCPAN::Client.
+
+
+0.07    2014-03-07 (SHARYANTO)
+
+        - No functional changes. Rebuild with DZP::Rinci::Wrap for testing
+          embedding wrapper code.
+
+
+0.06    2014-03-07 (SHARYANTO)
+
+        - Log API response only under LOG_API_RESPONSE.
+
+
+0.05    2014-03-07 (SHARYANTO)
+
+        - Add option --nocache.
+
+        - Update to changed CSS of MetaCPAN webpage.
+
+        - Log raw API output at trace level.
+
+
+0.04    2013-09-13 (SHARYANTO)
+
+        - (Temporarily?) remove --recursive.
+
+
+0.03    2013-09-13 (SHARYANTO)
+
+        - Accept dist names too.
+
+        - Bug fixes.
+
+
+0.02    2013-09-13 (SHARYANTO)
+
+        - Add option --exclude-re.
+
+
+0.01    2013-09-12 (SHARYANTO)
+
+        - First release.

@@ -1,0 +1,65 @@
+Apache/AuthPAM version 0.01
+===========================
+
+We used to use PAM within CGI programs, written in perl and CGI.pm,
+so I freed the ugly script logon process and put the authentication 
+job within apache.
+
+It is working with RedHat Linux 7.2, apache-1.3.22-6, perl-5.6.1-26.72.3,
+mod_perl-1.26-2 and Authen::PAM-0.13. It is a friendly environment, 
+I haven't test it within a hostile one. Let me know if it works 
+with something that is not a PC.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+CONFIGURATION
+
+   # /etc/httpd.conf
+   <Directory /var/www/https/secured-area/>
+     AuthType Basic
+     AuthName "your server account"
+     PerlAuthHandler Apache::AuthPAM
+     PerlSetVar PAMservice check_user
+     require valid-user
+   </Directory>
+
+   # /etc/pam.d/check_user
+   #%PAM-1.0
+   auth        required    /lib/security/pam_pwdb.so nodelay
+   account     required    /lib/security/pam_pwdb.so
+
+FEATURES
+
+You can select different PAM service name for different directories
+or locations in your web server filesystem space.
+
+BUGS
+
+Apache::AuthPAM is running as the same user mod_perl is running
+(on RedHat Linux it is apache). It is running without privileges.
+I am working a revision using an auxiliar suid process.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Authen::PAM by Nikolay Pelov <nikip@iname.com>
+
+COPYRIGHT AND LICENCE
+
+This apache perl module is Free Software, and can be used under 
+the terms of the GNU General Public License v2.0 or later.
+
+Copyright (C) 2002 Héctor Daniel Cortés González <hdcg@cie.unam.mx>
+
+HELP WANTED!
+
+This is my very first apache perl module. Your feedback is welcome.
+

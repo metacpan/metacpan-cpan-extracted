@@ -1,0 +1,27 @@
+# $Id: README,v 1.7 2007/04/12 11:23:06 dk Exp $
+
+Array::Slice - context-dependent array iterator
+===============================================
+
+Iterate over an array assigning several items per cycle. Three:
+
+    while ( my ( $x, $y, $z) = slice @arr) { ... }
+
+or two:
+
+    while ( my ( undef, $second) = slice @arr) { ... }
+
+or even forty-two:
+
+    while ( @a = slice @arr, 42) { ... }
+
+
+Dmitry Karasik <dmitry@karasik.eu.org>.
+
+Installation
+============
+
+perl Makefile.PL
+make
+make test
+sudo make install

@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+pride.pm
+README
+t/Bad.pm
+t/Naughty.pm
+t/GagMe.pm
+t/naughty_modules.t
+t/whip_them_into_line.t
+META.yml                                Module meta-data (added by MakeMaker)

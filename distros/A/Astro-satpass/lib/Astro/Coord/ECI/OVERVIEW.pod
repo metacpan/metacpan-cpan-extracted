@@ -1,0 +1,699 @@
+=head1 NAME
+
+Astro::Coord::ECI::OVERVIEW - Overview of Astro::Coord::ECI and friends
+
+=head1 MOTIVATION
+
+This package was created in order to be able to forecast satellite
+visibility. This is not quite rocket science, but like many endeavors
+the devil is in the details, which in part accounts for the complexity
+of the package.
+
+=head1 DESCRIPTION
+
+Any system to forecast the visibility of an object in the sky needs to
+be told a few things: where you are, where the object in the sky is, and
+(maybe) what source of illumination is being used. This package provides
+classes for all these. Some of the objects (e.g.
+L<Astro::Coord::ECI::Sun|Astro::Coord::ECI::Sun>) are pretty much
+self-sufficient. Others (e.g.
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>) need to be initialized
+before they can be used.
+
+Typically a calculation is done by initializing an object representing
+the L<station|/Station> (i.e. you), another representing the orbiting
+L<body|/Body> (i.e. the satellite), then calling a method on one of them
+and passing it the other one.
+
+For example, to calculate visibility of the International Space Station
+from your front yard you would initialize an
+L<Astro::Coord::ECI|Astro::Coord::ECI> object with the latitude (in
+B<radians>), longitude (in B<radians>), and height above sea level (in
+B<kilometers>). You would also initialize an
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> object with L<TLE|/TLE>
+data for the space station.  Then you would call method
+L<pass()|Astro::Coord::ECI::TLE/pass> on the space station object,
+giving it the object that represents your location, and the times (as
+Perl times) you are interested in. The result would be an array of
+hashes with the visibility data.
+
+This is actually a worst case. The position of a satellite is not
+dependent on you, so if all you need to know is it's position over the
+globe, all you need to do is set its object's time. This will cause the
+model to run. Then you call the method that gives the position in the
+coordinates you want. For absolute coordinates (e.g. geodetic latitude
+and longitude) no other objects are involved. For relative coordinates
+(e.g. azimuth and elevation) you need to make use of the object the
+coordinates are relative to.
+
+This documentation assumes that you are interested in satellites, but
+there are a couple supporting classes which can equally well be used in
+their own right: L<Astro::Coord::ECI::Sun|Astro::Coord::ECI::Sun>, which
+represents the Sun, and
+L<Astro::Coord::ECI::Moon|Astro::Coord::ECI::Moon>.
+
+So far this explanation has been in terms of a single
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> object. But there are
+cases (e.g. a Space Shuttle launch) where a single
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> object can not
+represent a single physical object over a conveniently-long period of
+time (say, a week, starting some time before the launch). In this case,
+the multiple L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> objects
+can be aggregated into a single
+L<Astro::Coord::ECI::TLE::Set|Astro::Coord::ECI::TLE::Set> object, using
+that class' L<aggregate()|Astro::Coord::ECI::TLE::Set/aggregate> method.
+This method will assort its arguments into the appropriate number of
+containers, and return one object per L<OID|/OID>. By default this will
+be an L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> object if there
+is only one instance of the given L<OID|/OID> in the input, or an
+L<Astro::Coord::ECI::TLE::Set|Astro::Coord::ECI::TLE::Set> object if
+there is more than one.
+
+The L<Astro::Coord::ECI::TLE::Set|Astro::Coord::ECI::TLE::Set> object
+can be used anywhere an L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>
+object can. There is a slight performance penalty, but on the other hand
+you get better results, or in extreme cases you actually get results
+where you would not with a single TLE.
+
+=head1 EXAMPLES
+
+The example code in the SYNOPSIS sections of the various modules is (or
+at least should be) working Perl. If you find that it is not working
+perl, please submit a bug report.
+
+Other examples are available in the F<eg> directory of the distribution. 
+
+Both the module documentation and the F<eg> directory are available
+online at L<http://search.cpan.org/dist/Astro-satpass/>. For the F<eg>
+directory you will need to follow the [F<browse>] link near the top of
+the page.
+
+=head1 BUGS
+
+Bugs should be reported to queue Astro-satpass at
+L<http://rt.cpan.org/>, or to the author via electronic mail at
+F<wyant at cpan dot org>.
+
+=head1 UNITS
+
+Different units of measure are usual in different applications. Since
+these modules span the disciplines of geodesy, aeronautics, and
+astronomy, a somewhat Procrustean approach has been necessary to provide
+consistency of interface and try to preserve the sanity of the author.
+
+=head2 Angles
+
+All angles, both input and output, are in radians. The
+L<Astro::Coord::ECI::Utils> module exports functions
+L<deg2rad|Astro::Coord::ECI::Utils/deg2rad> and
+L<rad2deg|Astro::Coord::ECI::Utils/rad2deg> to convert degrees to and
+from radians. The user is on his or her own for degrees, minutes and
+seconds, or for hours, minutes and seconds of right ascension.
+
+The expected range of an angle depends on what is customary for the
+quantity being measured. Values outside the customary range will
+generate warnings.
+
+=head2 Distances
+
+All distances, both input and output, are in kilometers.
+
+=head2 Times
+
+All times are seconds since the system's epoch. That is, the kind of
+time returned by C<time()>.
+
+=head1 TERMINOLOGY
+
+Forecasting satellite visibility is an activity on the border between
+aeronautics and astronomy. It needs technical words, and borrows from
+both these disciplines, tending to prefer the aeronautical term when
+there is conflict. There is a fairly exhaustive
+L<TERMINOLOGY AND CONVENTIONS|Astro::Coord::ECI/TERMINOLOGY AND CONVENTIONS>
+section in the documentation for L<Astro::Coord::ECI|Astro::Coord::ECI>,
+but a few key terms will be covered here:
+
+=head2 Body
+
+Short for 'orbiting body', this is the satellite, spent booster, dropped
+hammer, or other orbiting item that you are trying to observe. Bodies of
+all sorts are identified by an L<OID|/OID>. Several models have been
+published to predict the position of such an item at a given body.
+
+Orbiting bodies are represented in this package by an
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> object.  Before this
+object can be used, it needs to be initialized with data for the
+specific satellite of interest. The standard representation of this data
+is called L<TLE|/TLE>, and is explained below.
+
+=head2 Epoch
+
+In general and in astronomical calculations, the epoch is a date and
+time to which time-dependent calculations are referred. For example, the
+position of a star or planet may be given in epoch J2000, meaning the
+coordinates for Julian year 2000.
+
+But in orbital calculations it can also be used as a proxy for the
+'as-of' date of the orbital data. This is important for L<TLE|/TLE> data
+because this data has a limited 'shelf life', and the farther from the
+epoch you are the worse the predictions are. In extreme cases the model
+itself fails because it cannot handle the type of orbit predicted.
+
+Typically the 'shelf life' of a L<TLE|/TLE> is a couple weeks for casual
+use, though data for satellites in near-Earth orbits (defined as a
+period of less than two and a half hours) are usually updated every
+couple days.  In extreme cases (e.g. the first arc of a Space Shuttle
+flight) the model may fail within a couple days of the epoch. See the
+L<TLE|/TLE> documentation for more information.
+
+=head2 OID
+
+Short for 'Object ID', this is a unique number assigned to an object by
+NORAD or its successors when the orbiting L<body|/Body> is detected. The
+OID may also be called the 'Satellite ID', the 'Satellite Number', or
+simply the 'ID'.
+
+=head2 Station
+
+Short for 'observing station', this is the location of the observer.
+This package only supports observers on the surface of the Earth, so the
+observer will be represented by an
+L<Astro::Coord::ECI|Astro::Coord::ECI> object.
+
+This object will need to be initialized by calling its
+L<geodetic()|Astro::Coord::ECI/geodetic> method, passing the observer's
+latitude and longitude B<in radians> and height above sea level
+B<in kilometers>. Latitude is negative south of the Equator, and
+longitude negative west of Greenwich, England. The
+L<Astro::Coord::ECI::Utils|Astro::Coord::ECI::Utils> packages exports
+L<deg2rad()|Astro::Coord::ECI::Utils/deg2rad> to do the angle
+conversion.
+
+=head2 TLE
+
+Short for 'Two line elements', this is the standard representation of
+the data used to initialize any of the usual models for the positions of
+L<orbiting bodies|/Body>. It is basically two lines of text, and owes a
+lot to the days when computers were fed data by making holes in pieces
+of cardboard.
+
+A common variant of this format is sometimes called 'NASA TLE'. The
+format is the same, but the two lines of model data are preceded by a
+line containing the common name of the L<body|/Body> being modeled.
+
+With the introduction of the REST (or Version 2) interface to the Space
+Track web site, a third representation of TLE data, as JSON, has become
+available.
+
+Given a chunk of TLE data, the
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>
+L<parse()|Astro::Coord::ECI::TLE/parse> method can be used to turn it
+into L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> or
+L<Astro::Coord::ECI::TLE::Iridium|Astro::Coord::ECI::TLE::Iridium>
+objects. If your data are in JSON format, you will need the optional
+L<JSON|JSON> module installed.
+
+In practice, TLE data have an effective date, and a shelf life measured
+from that effective date. Unfortunately, the TLE data do not contain
+either of these.
+
+NASA's Human Space Flight data, available from
+L<http://spaceflight.nasa.gov/realdata/elements/>, specify an effective
+date (see the C<Vector Time> information on that web page), but this is
+not part of the TLE. The L<Astro::SpaceTrack|Astro::SpaceTrack> package
+is capable of returning this data by jamming it onto the first line of a
+NASA TLE, and this package's
+L<< Astro::Coord::ECI::TLE->parse()|Astro::Coord::ECI::TLE/parse >> is
+capable of populating the object from this information. If an effective
+date is needed but not available, the L<epoch|/Epoch> is used.
+
+For casual use, the 'shelf life' of a set of TLE data is a week or so.
+But this can vary based on circumstances. For example, if the data
+represent a coasting arc for a shuttle launch, the shelf life may be a
+matter of minutes. For something like the International Space Station,
+the shelf life is cut short when the station is boosted into a higher
+orbit. One would hope that the Human Space Flight data would take
+account of this, but in fact it appears not always to do so.
+
+Most sources of data provide only a single current TLE for a given
+object. If you are processing historical data from Space Track, or if
+you are processing NASA Human Space Flight data, you may have multiple
+TLEs for a given object. In this case, you should use the
+L<< Astro::Coord::ECI::TLE::Set->aggregate()|Astro::Coord::ECI::TLE::Set/aggregate >>
+method to aggregate all the data for a given satellite into a single
+L<Astro::Coord::ECI::TLE::Set|Astro::Coord::ECI::TLE::Set> object. This
+object behaves pretty much like an
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> object, but when doing
+things like pass calculations, it selects the appropriate TLE data for a
+given time from its contents. The C<aggregate()> method does B<not> need
+for all its input to represent the same satellite; it returns an array
+of objects, with the input appropriately assigned. If there is only a
+single L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> object for a
+given OID, this object is B<not> wrapped in a set, to avoid the overhead
+involved.
+
+Even with all this, if you anticipate that you may use data far from its
+effective date, or that you may have bad data, you should call the
+L<< Astro::Coord::ECI::TLE->validate()|Astro::Coord::ECI::TLE/validate >>
+method before doing pass calculations. Among other things, this gives
+the L<Astro::Coord::ECI::TLE::Set|Astro::Coord::ECI::TLE::Set> object a
+chance to groom its own data.
+
+This package does not deal with the acquisition of TLE data. See
+L</WHERE TO GET TLE DATA>, below, for that.
+
+=head1 STRUCTURE
+
+The modules in this package are organized functionally for the most
+part, with utility functions separate. The following list names the
+modules, and briefly states their function.
+
+=head2 Astro::Coord::ECI
+
+The L<Astro::Coord::ECI|Astro::Coord::ECI> module is the base for the
+inheritance tree. It provides position and time transformations to its
+subclasses, and doubles as the object used to represent a location fixed
+to the surface of the Earth.
+
+For the latter use you probably would construct the object by calling
+L<< Astro::Coord::ECI->geodetic()|Astro::Coord::ECI/geodetic >> method,
+passing it the latitude and longitude B<in radians>, and the height
+above sea level B<in kilometers>. The
+L<Astro::Coord::ECI::Utils|Astro::Coord::ECI::Utils> module exports a
+L<deg2rad|Astro::Coord::ECI::Utils/deg2rad> function to convert degrees
+to radians. Remember that latitude is negative south of the equator, and
+longitude is negative west of the Prime Meridian in Greenwich, England.
+Other prime meridians are not supported.
+
+=head2 Astro::Coord::ECI::Moon
+
+The L<Astro::Coord::ECI::Moon|Astro::Coord::ECI::Moon> module is a
+subclass of L<Astro::Coord::ECI|Astro::Coord::ECI> which represents the
+Moon. All you have to do to use it is to instantiate it (say, with
+C<< my $moon = Astro::Coord::ECI::Moon->new() >>), and then set the time
+with something like C<< $moon->universal($time) >>, where the $time is a
+Perl time, such as is returned by the time() built-in. Then you can
+retrieve the position using one of the methods inherited from
+L<Astro::Coord::ECI|Astro::Coord::ECI>.
+
+You can pass an L<Astro::Coord::ECI::Moon|Astro::Coord::ECI::Moon>
+object to the L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>
+L<pass()|Astro::Coord::ECI::TLE/pass> method, and it will report on
+close approaches to the Moon. How close depends on the setting of the
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> object's 'appulse'
+attribute. This defaults to 0, which means no appulse calculations are
+done.
+
+=head2 Astro::Coord::ECI::Star
+
+The L<Astro::Coord::ECI::Star|Astro::Coord::ECI::Star> module is a
+subclass of L<Astro::Coord::ECI|Astro::Coord::ECI> which represents a
+star. It is initialized by calling the
+L<position()|Astro::Coord::ECI::Star/position> method to set the star's
+position in right ascension and declination B<in radians>, and
+optionally its distance and proper motion. After this, simply setting
+the time of the object (e.g. by C<$star-E<gt>universal($time)>, $time
+being a Perl time) will cause its position to be calculated. The
+position can be retrieved using one of the methods inherited from
+L<Astro::Coord::ECI|Astro::Coord::ECI>.
+
+You can pass an L<Astro::Coord::ECI::Star|Astro::Coord::ECI::Star>
+object to the
+L<< Astro::Coord::ECI::TLE->pass()|Astro::Coord::ECI::TLE/pass >>
+method, and it will report on close approaches to the star. How
+close depends on the setting of the
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> object's 'appulse'
+attribute. This defaults to 0, which means no appulse calculations are
+done.
+
+=head2 Astro::Coord::ECI::Sun
+
+The L<Astro::Coord::ECI::Sun|Astro::Coord::ECI::Sun> module is a
+subclass of L<Astro::Coord::ECI|Astro::Coord::ECI> which represents the
+Sun. All you have to do to use it is to instantiate it (say, with
+C<< my $sun = Astro::Coord::ECI::Sun->new() >>), and then set the time
+with something like C<< $sun->universal($time) >>, where the $time is a
+Perl time, such as is returned by the time() built-in. Then you can
+retrieve the position using one of the methods inherited from
+L<Astro::Coord::ECI|Astro::Coord::ECI>.
+
+This object is implicitly used by the
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>
+L<pass()|Astro::Coord::ECI::TLE/pass> method to calculate whether the
+satellite is illuminated, and whether it is day, dusk, or night at the
+observing station.
+
+You can pass an L<Astro::Coord::ECI::Sun|Astro::Coord::ECI::Sun> object
+to the L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>
+L<pass()|Astro::Coord::ECI::TLE/pass> method, and it will report on
+close approaches to the Sun. How close depends on the setting of the
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> object's 'appulse'
+attribute. This defaults to 0, which means no appulse calculations are
+done.
+
+=head2 Astro::Coord::ECI::TLE
+
+The L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> module is a
+subclass of L<Astro::Coord::ECI|Astro::Coord::ECI> which represents a
+satellite or other body in orbit around the Earth. This representation
+is in terms of one of a number of related computational models, defined
+in I<Space Track Report Number 3> and
+I<Revisiting Spacetrack Report #3>, both of which are available at
+L<http://celestrak.com/NORAD/documentation/>.
+
+It is possible to construct an
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> object by setting the
+requisite attributes directly, but it is probably more convenient to do
+so using the
+L<< Astro::Coord::ECI::TLE->parse()|Astro::Coord::ECI::TLE/parse >>
+method. This method accepts L<TLE|/TLE> data, and returns an array of
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> objects parsed from the
+data.
+
+The position of a satellite is computed by setting the time represented
+by the object. This is typically done using the
+L<universal()|Astro::Coord::ECI/universal> method (inherited from
+L<Astro::Coord::ECI|Astro::Coord::ECI>), by passing it a Perl time (i.e.
+the kind returned by the time() built-in). Once the position is
+computed, it can be retrieved by using any of the positional methods
+defined on L<Astro::Coord::ECI|Astro::Coord::ECI>.
+
+This module also offers the L<pass()|Astro::Coord::ECI::TLE/pass>
+method, which calculates visible passes over an observer's location
+during a given time interval.
+
+One of the complications of using this module is that the L<TLE|/TLE>
+data are only good for a limited amount of time around the
+L<epoch|/Epoch> of the data. In most cases this just results in a loss
+of precision, but in extreme cases (such as the first predicted element
+of a Space Shuttle launch) use of the data by as little as a day or so
+before its epoch can cause the model computations to fail. For cases
+like this there is a 'backdate' attribute, which tells the
+L<pass|Astro::Coord::ECI::TLE/pass> method whether it should consider
+times before the L<epoch|/Epoch> of the data. It defaults to true
+because that represents the general case. But you may wish to set it
+false (e.g. by something like C<$tle-E<gt>set(backdate =E<gt> 0);>) if
+you are using the predicted data downloaded from the L<NASA Human Space
+Flight> web site. You may also wish to call the
+L<validate()|Astro::Coord::ECI::TLE/validate> method before making pass
+calculations if you suspect that your TLE data may not all be valid.
+
+=head2 Astro::Coord::ECI::TLE::Iridium
+
+This module is a subclass of
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> representing an Iridium
+satellite. The L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>
+L<parse()|Astro::Coord::ECI::TLE/parse> method produces these
+automatically when fed L<TLE|/TLE> data representing Iridium satellites.
+
+This module adds to the L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>
+functionality the ability to calculate Iridium flares. The
+L<flare()|Astro::Coord::ECI::TLE::Iridium/flare> method is passed the
+L<observers' location|/Station> and the desired time range for the
+prediction. It returns a list of hashes representing the predicted
+flares. This prediction is modified by attributes giving limiting
+magnitudes for daytime and nighttime flares, and whether you want
+predictions for am (between midnight and sunrise), day (between sunrise
+and sunset), and/or pm (between sunset and midnight) flares.
+
+=head2 Astro::Coord::ECI::TLE::Set
+
+This module is not a member of the
+L<Astro::Coord::ECI|Astro::Coord::ECI> inheritance tree. It is a
+container for one or more
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> objects representing
+the same L<OID|/OID>, and is usable pretty much anywhere an
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> object is.
+
+The L<Astro::Coord::ECI::TLE::Set|Astro::Coord::ECI::TLE::Set> object
+exposes all the methods of its contained objects, but overrides some of
+them to work its magic.
+L<Astro::Coord::ECI::TLE::Set|Astro::Coord::ECI::TLE::Set> works on the
+principle that one of its contained objects is the current object, which
+is used to satisfy data requests. So the most important override is of
+the L<universal()|Astro::Coord::ECI/universal> method, which selects as
+the current object the one best representing the given time. In this
+context, 'best' means the object having the most recent effective date
+(or L<epoch|/Epoch>) before the given time. If there is no such object,
+the object having the earliest L<epoch|/Epoch> is used.
+
+There are a couple other small magics involved in
+L<Astro::Coord::ECI::TLE::Set|Astro::Coord::ECI::TLE::Set>:
+
+* The can() method is overridden, so that an
+L<Astro::Coord::ECI::TLE::Set|Astro::Coord::ECI::TLE::Set> object
+appears to implement the methods of whatever class it was populated
+with.
+
+* The set() method is overridden so that attributes characteristic of
+the L<OID|/OID> (such as 'name', 'backdate', and so on) being
+represented are set on all contained objects, but attributes
+characteristic of a specific L<TLE|/TLE> data set are set only on the
+selected object.
+
+* For select methods, such as L<pass()|Astro::Coord::ECI::TLE/pass> and
+L<flare|Astro::Coord::ECI::TLE::Iridium/flare>, the
+L<Astro::Coord::ECI::TLE::Set|Astro::Coord::ECI::TLE::Set> object passes
+itself to to the method in the role of $self, rather than passing the
+current object. This way such methods transparently switch L<TLE|/TLE>
+data sets whenever appropriate.
+
+=head2 Astro::Coord::ECI::Utils
+
+The L<Astro::Coord::ECI::Utils|Astro::Coord::ECI::Utils> module is not a
+member of the L<Astro::Coord::ECI|Astro::Coord::ECI> inheritance
+hierarchy, but is a container for all those utility subroutines that
+are not intrinsically object-oriented. These are generally conversion
+routines of some sort, such as the previously-mentioned
+L<deg2rad()|Astro::Coord::ECI::Utils/deg2rad> and its inverse
+L<rad2deg|Astro::Coord::ECI::Utils/deg2rad>, and conversions among the
+various time representations used in the various models.
+
+=head1 WHERE TO GET TLE DATA
+
+There are a number of places to get the L<TLE|/TLE> data on line. Some of
+these are accessible through the L<Astro::SpaceTrack|Astro::SpaceTrack>
+Perl module (not included in this package, but available from CPAN), but
+you can always simply download the data and then read the file and pass
+its contents to
+L<Astro::Coord::ECI::TLE-E<gt>parse()|Astro::Coord::ECI::TLE/parse>.
+
+Please note that anything specific said here about the functionality of
+Astro::SpaceTrack is B<not> definitive. You should consult
+L<Astro::SpaceTrack|Astro::SpaceTrack> for the latest.
+
+=head2 Space Track
+
+The 'most official' source of L<TLE|/TLE> data is
+L<http://www.space-track.org/>, which requires you to register and use a
+username and password. Other sources may get their data from here, which
+means their data are hours to days older.
+L<Astro::SpaceTrack|Astro::SpaceTrack> will retrieve data from this
+site, but of course you have to give it a username and password before
+it will do so.
+
+As of about April 13 2011, you will need
+L<Astro::SpaceTrack|Astro::SpaceTrack> version C<0.052> or higher to
+access Space Track. On or about that date they changed from straight
+http to secure http (C<https:>), and C<0.052> is the version at which
+L<Astro::SpaceTrack|Astro::SpaceTrack> gained this functionality.
+
+As of about July 16 2013, you will need
+L<Astro::SpaceTrack|Astro::SpaceTrack> version C<0.054> or higher to
+access Space Track. On or about that date they will retire the version 1
+interface, so you will need an L<Astro::SpaceTrack|Astro::SpaceTrack>
+that adequately supports the new interface.
+
+=head2 CelesTrak
+
+Dr. T. S. Kelso's L<http://celestrak.com/> is a good source for the more
+popular satellites. It redistributes data from L<Space Track>,
+but you can get Dr. Kelso's data without registering.
+L<Astro::SpaceTrack|Astro::SpaceTrack> will retrieve data from this
+site, but by default is simply gets the L<OID|/OID> from Dr. Kelso, and
+then retrieves the data from Space Track, so you will need a username
+and password. If you don't have them, you can configure
+L<Astro::SpaceTrack|Astro::SpaceTrack> to work for this site
+without them.
+
+=head2 NASA Human Space Flight
+
+NASA makes International Space Station data available at
+L<http://spaceflight.nasa.gov/realdata/elements/>, but the L<TLEs|/TLE>
+have to be dug out of the data.  L<Astro::SpaceTrack|Astro::SpaceTrack>
+will dig out the data for you, and you do not need a username or
+password.  Unlike the other sources, these data include predictions of
+future TLEs.
+
+=head2 Amateur Radio Satellite Corporation
+
+The Amateur Radio Satellite Corporation (AMSAT) keeps orbital elements
+at L<http://www.amsat.org/amsat-new/tools/keps.php>. They appear to get
+the data from Dr. Kelso. L<Astro::SpaceTrack|Astro::SpaceTrack> will get
+this data for you, and you need no username or password.
+
+=head2 Heavens Above
+
+Heavens Above at L<http://www.heavens-above.com/> does visibility
+predictions, and will give you L<TLE|/TLE> data if you drill down far
+enough on an individual satellite. I do not know where they get their
+data. I have observed it to be a day or so behind Space Track, but they
+also carry data from classified satellites (which Space Track does not).
+You can create an account for yourself, but this is not necessary to use
+the site. Astro::SpaceTrack does not retrieve data from this site.
+
+=head1 COMPARISON TO HEAVENS ABOVE
+
+Because Heavens Above (L<http://www.heavens-above.com/>) is a good
+source of local satellite visibility predictions, you may wish to try to
+duplicate its predictions as part of your process for qualifying this
+software. Part of the problem with doing this is that Heavens Above's
+prediction parameters are not documented. Some (like horizon) can be
+inferred from their predictions, others can not.
+
+For the closest approach to Heavens Above's predictions, you should use
+TLE data of the same epoch that Heavens Above uses. Beyond this, the
+following settings seem to duplicate Heavens Above fairly well:
+
+* Horizon - 10 degrees;
+
+* Twilight - -3 degrees (passes), or -1.8 degrees (Iridium flares).
+
+The C<edge_of_earths_shadow> attribute is so new I have no firm idea
+what setting would best duplicate Heavens Above, but there is some
+evidence that, for satellite passes at least, C<-1> gives results more
+like those of Heavens Above than the default of C<1>.
+
+Since Heavens Above only predicts one pass at a time, it may actually
+choose a different twilight for each satellite, based on the satellite's
+brightness. The same may be true for Iridium flares. If you are trying
+to validate this software against Heavens Above, you will want to make
+its settings a little more permissive, to make sure you pick up
+everything Heavens Above picks up.
+
+=head1 HISTORICAL CALCULATIONS
+
+This package was written with the intent of tracking artificial
+satellites. Modules that represent astronomical objects (in particular
+the Sun and Moon) were implemented using the fastest and least-accurate
+algorithm in Jean Meeus' book, because the stated accuracy of that
+algorithm was sufficient for my purposes, which were generally telling
+whether a satellite was illuminated.
+
+I am not an expert in historical astronomical calculations, nor do I
+play one on television. I do not know the behavior of the algorithms
+used in this module when well away from the present, nor do I know how
+authoritative other resources are. But for the curious, I present
+comparisons of my results with resources that are available to me.
+
+The modules in this package do calculations in terms of epoch time (i.e.
+the kind returned by C<time()>). With the usual C<0> being midnight
+January 1 1970 UTC, you will need a fairly modern Perl with 64-bit times
+to go back before about 1902.
+
+If you go far enough back, there are problems converting between
+internal and external representations. The only documented restrictions
+on the built-ins C<gmtime()> and C<localtime()> are the ones on the size
+of the time representation, discussed above. Going the other way (from
+year/month/day to epoch) can be done with core module
+L<Time::Local|Time::Local>, but once the year becomes less than 1000, it
+means something other than a literal Gregorian year. The
+L<DateTime|DateTime> module does not have this limitation, but you need
+to be aware that the L<DateTime::TimeZone|DateTime::TimeZone> modules
+representing Olson zones (at least the ones I investigated) represent
+time before standard time was adopted as local mean time in the zone's
+city. C<UTC> does not have this problem, and I believe that offsets and
+the C<'floating'> "zone" do not either.
+
+The other problem is that of what calendar is in use. Strictly speaking,
+the Julian calendar was in use before the Gregorian calendar was
+adopted, at various times ranging from October 15 1542 to April 4 1919,
+depending on where you are. If you want Julian-calendar dates,
+L<DateTime::Calendar::Christian|DateTime::Calendar::Christian> will
+provide dates in the Julian calendar before the reform date (whichever
+one you choose to use) and Gregorian dates after. But you need to be a
+little careful with it, because it does not implement the full
+L<DateTime|DateTime> interface.
+
+One of the resources for comparison data is CalSky
+(L<http://calsky.com/>). This does astronomical calculations back to
+2999 BC, but there are problems if you go too far back. In particular I
+got no Sunrise time for any location I tried before about 1508 BC, and
+only one phase of the Moon for the entire month of July 2999 BC. Times
+appear to be presented in the Julian calendar before 1543, but I have
+not investigated whether they convert on October 15, and I have not yet
+found documentation where they say what they are doing. I also have no
+idea how they extend time zones back before there were time zones, so I
+have asked for times in UTC.
+
+Another resource is Stellarium (L<http://www.stellarium.org/>, which is
+open source planetarium software. I could not figure out how to get
+things like equinox/solstice and Moon phases out of it, but rise times
+and locations can be obtained just by setting the time appropriately and
+then running it. Because resetting the time zone is fairly dodgy, I
+simply added five hours to my computed times in UT-5 and reported them.
+It does report that times are Gregorian or Julian when you set them. But
+instead of setting the year to (e.g.) 2999BC you have to set it to
+-2998. The calculations were done with Stellarium 0.15.0.
+
+=head2 Sun
+
+For the Sun I present calculations for the northern solstice in 1508 BC,
+that being the earliest one I could find that with sunrise data. Times
+are UTC on July 7 1508 BC in the Julian calendar, and sunrise data are
+as observed from the Royal Observatory in Greenwich England.
+
+                          Solstice     Sunrise    Azimuth
+ Astro::Coord::ECI::Sun   00:15:46     03:32:32   48.1
+                 CalSky   21h53.8m (1)  3h33.0m   48.1
+             Stellarium   16:36:57 (2) 03:35:16   48.5
+
+=over
+
+=item 1) The CalSky solstice was on the previous day, July 6. I reported
+the sunrise data for July 7 because CalSky did not report a Sunrise or
+sunset on July 6.
+
+=item 2) The Stellarium solstice was the moment at which the ecliptic
+longitude on the date was 90 degrees, and was also on the previous day
+(i.e. the July 6).
+
+=back
+
+=head2 Moon
+
+For the Moon I present calculations for the first quarter in July 2999
+BC, which took place on July 22 Julian. Moon rise data are as observed
+from the Royal Observatory in Greenwich England.
+
+                          First Quarter  Moon rise  Azimuth
+ Astro::Coord::ECI::Moon  18:04:46       11:55:07   96.8
+                  CalSky  13h13.0m       12h12m     99
+              Stellarium  11:07:50 (1)   12:14:16   99.3
+
+=over
+
+=item 1) The Stellarium first quarter was the moment at which the phase
+angle was 90 degrees.
+
+=back
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009-2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

@@ -1,0 +1,17 @@
+---
+abstract: "Perl interface to Atheme's XML-RPC methods"
+author:
+  - 'Pippijn van Steenhoven <pip88nl@gmail.com>'
+  - 'Stephan Jauernick <stephan@stejau.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.11
+generated_by: 'Dist::Zilla version 1.100711'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Atheme
+requires:
+  RPC::XML: 0
+version: 0.0001

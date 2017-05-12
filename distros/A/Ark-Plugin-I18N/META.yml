@@ -1,0 +1,43 @@
+---
+abstract: 'Ark plugin for I18N'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.9.0, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Ark-Plugin-I18N
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Ark::Plugin::I18N:
+    file: lib/Ark/Plugin/I18N.pm
+    version: 0.01
+requires:
+  Ark: 0
+  Locale::Maketext::Lexicon: 0
+  Locale::Maketext::Simple: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/ark-framework/Ark-Plugin-I18N/issues
+  homepage: https://github.com/ark-framework/Ark-Plugin-I18N
+  repository: git://github.com/ark-framework/Ark-Plugin-I18N.git
+version: 0.01
+x_contributors:
+  - 'Songmu <y.songmu@gmail.com>'

@@ -1,0 +1,66 @@
+#!/usr/bin/perl -w
+
+# play sound files via Audio::Audiere
+
+my $VERSION = '0.01';
+
+BEGIN { $|++; }
+
+use Getopt::Long;
+use strict;
+use warnings;
+use lib '../lib';
+use lib '../blib/arch';
+use Audio::Audiere;
+
+print "PSP - Perl Sound Player v$VERSION (c) by Tels 2004.\n\n";
+
+my $device = '';
+my $volume = 1;
+my $pan = 0;
+my $file = '../t/test.wav';
+
+#############################################################################
+# Create and open the sound device
+
+my $au = Audio::Audiere->new( $device );
+
+die ("Error: ". $au->error()) if $au->error();
+
+print "Using ", $au->getVersion(),
+      " with audio device '", $au->getName(),"'.\n\n";
+print " File  : '$file'\n";
+
+#############################################################################
+# If everything went ok, create a sound stream from the file we want to play
+
+my $stream = $au->addStream( $file, 0 );	# 0 = stream from disk
+die ("Error: ".$stream->error()) if $stream->error();
+
+#############################################################################
+# if everything is fine so far, set the volume and play the sound,
+
+$stream->setVolume ( $volume );
+$stream->play();
+
+print " Length: ", $stream->getLength()," frames\n\n";
+
+#############################################################################
+# and loop while the sound is playing and print out some info
+
+while ($stream->isPlaying()) 
+  {
+  sleep(1);
+  if ($stream->isSeekable())
+    {
+    print "\r at frame ", $stream->getPosition();
+    print ", pan ",$stream->getPan()," (left: -1, right: +1)";
+    print ", volume ", int(100*$stream->getVolume()),"%    ";
+    }
+  }
+
+#############################################################################
+# cleanup happens automatically
+
+1;
+

@@ -1,0 +1,53 @@
+package [% package_name %];
+
+use strict;
+use warnings;
+use base '[% project_title %]::Base';
+
+our $VERSION = [% project_version || '0.01' %];
+
+#----------------------------------------------------------------------------+
+# _default(\%controller)
+
+sub _default {
+    my ($self, $c) = @_;
+
+    $c->request->content_type('text/html');
+
+[%- IF template_name %]
+    $c->template->process(
+        '[% template_name %].tt', undef
+      )
+      or $self->_error( $c, 'Template process failed', $c->template->error() );
+[%- ELSE %]
+    print "It works!\n";
+[%- END %]
+
+    exit;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+[% package_name %] - New project class
+
+=head1 SYNOPSIS
+
+  use [% package_name %];
+
+=head1 DESCRIPTION
+
+None
+
+=head1 OBJECT METHODS
+
+None
+
+=head1 AUTHOR
+
+[% project_author || 'Your Name Here' %], E<lt>[% project_email || 'alias@domain.com' FILTER lower %]E<gt>
+
+=cut

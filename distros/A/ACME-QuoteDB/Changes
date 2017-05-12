@@ -1,0 +1,18 @@
+Revision history for ACME-QuoteDB
+
+0.1.2   Wed Sep 30 23:26:11 PDT 2009
+  bug fixes:
+  * Build.PL install changes - SQLite3 could not actually write to the database,
+    even though, the db file was world writeable. The container dir 
+    also needs to be writable, now it is.
+  * ensure the database is 0666 for tests as well
+
+0.1.1   Fri Sep 18 02:11:02 PDT 2009
+  bug fixes:
+  * default constructor values were not getting set on the object as they should
+  * loosen untaint filepath - for the dist test failures
+
+0.1.0   Wed Sep  9 23:43:56 PDT 2009
+        Initial public pre-release (minor version)
+
+

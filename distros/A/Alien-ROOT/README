@@ -1,0 +1,161 @@
+NAME
+    Alien::ROOT - Utility package to install and locate CERN's ROOT library
+
+SYNOPSIS
+      use Alien::ROOT;
+
+      my $aroot = Alien::ROOT->new;
+
+DESCRIPTION
+    Installs or detects CERN's ROOT library.
+
+    This version of "Alien::ROOT" will download and install "ROOT v5.30.0"
+    if necessary. If an existing (and compatible) installation of ROOT was
+    detected, the module will not download/compile/install a new version of
+    ROOT.
+
+METHODS
+  Alien::ROOT->new
+    Creates a new "Alien::ROOT" object, which essentially just has a few
+    convenience methods providing useful information like the path to the
+    ROOT installation ("ROOTSYS" environment variable) and the path to the
+    root-config utility.
+
+  $aroot->installed
+    Determine if a valid installation of ROOT has been detected in the
+    system. This method will return a true value if it is, or undef
+    otherwise.
+
+    Example code:
+
+      print "okay\n" if $aroot->installed;
+
+  $aroot->run
+    Sets up the ROOT environment (see "setup_environment") and then invokes
+    the ROOT shell by simply calling "root".
+
+  $aroot->setup_environment
+    Sets up the "PATH" and "LD_LIBRARY_PATH" environment variables to point
+    at the correct paths for ROOT.
+
+    Throws an exception if ROOT was not found, so wrap this in an "eval" or
+    check "$aroot->installed" before using this.
+
+  $aroot->version
+    Determine the installed version of ROOT, as a string.
+
+    Example code:
+
+      my $version = $aroot->version;
+
+  $aroot->ldflags
+  $aroot->linker_flags
+    This returns the flags required to link C code with the local
+    installation of ROOT.
+
+    Example code:
+
+      my $ldflags = $aroot->ldflags;
+
+  $aroot->cflags
+  $aroot->compiler_flags
+    This method returns the compiler option flags to compile C++ code which
+    uses the ROOT library (typically in the CFLAGS variable).
+
+    Example code:
+
+      my $cflags = $aroot->cflags;
+
+  $aroot->features
+    This method returns a string of ROOT features that were enabled when
+    ROOT was compiled.
+
+    Example code:
+
+      my $features = $aroot->features;
+      if ($features !~ /\bexplicitlink\b/) {
+        warn "ROOT was built without the --explicitlink option";
+      }
+
+  $aroot->bindir
+    This method returns the path to the executable directory of ROOT.
+
+    Example code:
+
+      my $dir = $aroot->bindir;
+      system(File::Spec->catfile($dir, 'root'));
+
+  $aroot->libdir
+    This method returns the path to the library (lib/) directory of ROOT.
+
+    Example code:
+
+      my $dir = $aroot->libdir;
+
+  $aroot->incdir
+    This method returns the path to the include directory of ROOT.
+
+    Example code:
+
+      my $dir = $aroot->incdir;
+
+  $aroot->etcdir
+    This method returns the path to the 'etc' directory of ROOT.
+
+    Example code:
+
+      my $dir = $aroot->etcdir;
+
+  $aroot->private_root
+    This method returns true if the copy of ROOT that is being used was
+    installed by "Alien::ROOT" and is considered private.
+
+    Example code:
+
+      my $is_private = $aroot->private_root;
+
+AUTHOR
+    Steffen Mueller <smueller@cpan.org>
+
+ACKNOWLEDGMENTS
+    This package is based upon Jonathan Yu's Alien::libjio and Mattia
+    Barbon's Alien::wxWidgets. They kindly allowed me to use their work as a
+    starting point.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Alien::ROOT
+
+    You can also look for information at:
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Alien-ROOT>
+
+    *   CPAN Request Tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-ROOT>
+
+    *   CPAN Testers Platform Compatibility Matrix
+
+        <http://cpantesters.org/show/Alien-ROOT.html>
+
+REPOSITORY
+    You can access the most recent development version of this module at:
+
+    <git://github.com/tsee/ROOT.git>
+
+SEE ALSO
+    SOOT, the Perl-ROOT wrapper.
+
+    SOOT::App, the SOOT shell.
+
+    Alien, the Alien manifesto.
+
+LICENSE
+    This module is licensed under the GNU General Public License 2.0 or at
+    your discretion, any newer version of the GPL. You can find a copy of
+    the license in the LICENSE file of this package or at
+    <http://www.opensource.org/licenses/gpl-2.0.php>
+

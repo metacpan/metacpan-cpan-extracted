@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Algorithm-KNN-XS
+version:            0.01001
+abstract:           A class that performs a fast KNN search
+author:
+    - Stephan Conrad <conrad@stephanconrad.de>
+license:            lgpl
+distribution_type:  module
+configure_requires:
+    Alien::LibANN:        0.01000
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Alien::LibANN:        0.01000
+    ExtUtils::MakeMaker:  0
+requires:
+    ExtUtils::XSpp:  0.01000
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

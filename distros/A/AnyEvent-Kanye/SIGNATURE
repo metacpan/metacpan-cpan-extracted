@@ -1,0 +1,29 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6da71da8cf8d64503b2e7525ee910e8b7d59ddcd MANIFEST
+SHA1 606bd6424682249397d63caf905f651178a4d6cc MANIFEST.SKIP
+SHA1 c092295055a0647412488e230f77df1e79f150c0 META.yml
+SHA1 0ecfce9dd065c93bb3dfae7c69841603cc93ec21 Makefile.PL
+SHA1 bf109699e3fdbfa42f2c831782f2ec74a02a4d02 lib/AnyEvent/Kanye.pm
+SHA1 f416932fed622efdd1d8ecd72e8660675dd33993 t/basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.12 (Darwin)
+
+iEYEARECAAYFAkq2/B0ACgkQVCwRwOvSdBi0VACZAT/uBuQ7ZS+eZzw6jmSlEz2J
+W/kAnAj0ExVZhxeP9WIjvcrnLp8KLLfy
+=945/
+-----END PGP SIGNATURE-----

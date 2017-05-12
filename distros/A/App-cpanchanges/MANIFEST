@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+cpanfile
+dist.ini
+lib/App/cpanchanges.pm
+script/cpanchanges
+t/basic.t
+t/release-pod-syntax.t

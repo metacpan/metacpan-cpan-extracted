@@ -1,0 +1,19 @@
+
+PerlSwitches -I@ServerRoot@/../lib
+
+PerlModule My::Thingy
+PerlModule Apache2::DirBasedHandler
+
+Alias /thingy @DocumentRoot@
+<Location /thingy>
+    SetHandler modperl
+    PerlResponseHandler My::Thingy
+</Location>
+
+Alias /dbh @DocumentRoot@
+<Location /dbh>
+    SetHandler modperl
+    PerlResponseHandler Apache2::DirBasedHandler
+</Location>
+
+

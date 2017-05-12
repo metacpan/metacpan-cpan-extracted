@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Getopt::Std;
+use Cwd;
+use Config;
+use open qw<:encoding(UTF-8)>;
+use App::ssl4curl qw< get_ca install_ca >;
+
+my( %option, $mozilla_ca_path, $mk_ca_bundle_script ) = ();
+getopts('hpi', \%option);
+
+my $CURL_CA_BUNDLE = get_ca();
+
+if(defined $option{p}){ 
+    print "export CURL_CA_BUNDLE=$CURL_CA_BUNDLE" if get_ca();
+} elsif(defined $option{i}){
+    print "initialized\n" if install_ca();
+} elsif(defined $option{h}){
+    system("perldoc $0");
+    die;
+} else {
+    print "CURL_CA_BUNDLE=$CURL_CA_BUNDLE\n" if get_ca();
+}
+
+

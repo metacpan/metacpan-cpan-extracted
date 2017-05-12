@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:                Apache2-PageKit
+version:             2.15
+abstract:            ~
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Apache2::URI:                  0
+    Apache2::Util:                 0
+    Apache::SessionX:              0
+    Apache::Test:                  1.05
+    Compress::Zlib:                0
+    Data::FormValidator:           0
+    Encode:                        0
+    HTML::Clean:                   0
+    HTML::FillInForm:              0.12
+    HTML::Template:                2.2
+    HTML::Template::XPath:         0.1
+    mod_perl2:                     2
+    XML::LibXML:                   1.53
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - T.J. Mather <tjmather\@thoughtstore.com>

@@ -1,0 +1,383 @@
+#!perl
+
+our $DATE = '2016-06-02'; # DATE
+our $DIST = 'App-PerlbrewUtils'; # DIST
+our $VERSION = '0.04'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use App::PerlbrewUtils;
+use Perinci::CmdLine::Any;
+use String::ShellQuote;
+
+our %SPEC;
+
+$SPEC{module_version} = {
+    v => 1.1,
+    summary => 'Check module version in each installed perl',
+    args => {
+        %App::PerlbrewUtils::common_args,
+        module => {
+            schema => 'str*',
+            'x.schema.entity' => 'modulename',
+            req => 1,
+            pos => 0,
+        },
+    },
+};
+sub module_version {
+    require App::perlbrew;
+    require ExtUtils::MakeMaker;
+    require File::Which;
+
+    my %args = @_;
+    my $mod = $args{module};
+
+    $mod =~ s!/!::!g;
+    #my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
+
+    my $probe_path = File::Which::which("__perlbrewutils-probe")
+        or return [412, "Can't find probe script __perlbrewutils-probe ".
+                   "in PATH, make sure App::PerlbrewUtils has been ".
+                   "installed first"];
+
+    my $pb = App::perlbrew->new;
+    my @perls = $pb->installed_perls;
+
+    my @res;
+    my %resmeta = ('table.fields' => [qw/perl has_module module_version/]);
+    for my $perl (@perls) {
+        next unless App::PerlbrewUtils::_filter_perl($perl, \%args);
+        my $cmd = shell_quote($perl->{executable})." ".shell_quote($probe_path)." ".shell_quote($mod);
+        my $info_str = `$cmd`;
+        my $info = eval $info_str;
+        next if $@;
+
+        my $path;
+        my $v;
+        if ($path = $info->{modules}{$mod}) {
+            $v = MM->parse_version($path);
+            $v = undef if defined($v) && $v eq 'undef';
+        }
+
+        push @res, {
+            perl           => $perl->{name},
+            has_module     => $path ? 1:"",
+            module_version => $v,
+        };
+    }
+    [200, "OK", \@res, \%resmeta];
+}
+
+Perinci::CmdLine::Any->new(
+    url => '/main/module_version',
+)->run;
+
+# ABSTRACT: Check module version in each installed perl
+# PODNAME: perlbrew-module-version
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+perlbrew-module-version - Check module version in each installed perl
+
+=head1 VERSION
+
+This document describes version 0.04 of perlbrew-module-version (from Perl distribution App-PerlbrewUtils), released on 2016-06-02.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % perlbrew-module-version [options] <module>
+
+=head1 DESCRIPTION
+
+This command is like L<module-version> or L<pmversion> but repeated for each
+installed perl.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--exclude-dev>
+
+Exclude dev perl(s).
+
+=item B<--exclude-json>=I<s>
+
+Exclude perl(s) by name (JSON-encoded).
+
+See C<--exclude>.
+
+=item B<--exclude-version-json>=I<s>
+
+Exclude perl(s) by version (JSON-encoded).
+
+See C<--exclude-version>.
+
+=item B<--exclude-version>=I<s@>
+
+Exclude perl(s) by version.
+
+You can specify e.g. `5.22` to exclude all 5.22.* version.
+
+
+Can be specified multiple times.
+
+=item B<--exclude>=I<s@>
+
+Exclude perl(s) by name.
+
+Can be specified multiple times.
+
+=item B<--include-json>=I<s>
+
+Include perl(s) by name (JSON-encoded).
+
+See C<--include>.
+
+=item B<--include-version-json>=I<s>
+
+Include perl(s) by version (JSON-encoded).
+
+See C<--include-version>.
+
+=item B<--include-version>=I<s@>
+
+Include perl(s) by version.
+
+You can specify e.g. `5.22` to include all 5.22.* version.
+
+
+Can be specified multiple times.
+
+=item B<--include>=I<s@>
+
+Include perl(s) by name.
+
+Can be specified multiple times.
+
+=item B<--max-version>=I<s>
+
+Maximum perl version to include.
+
+=item B<--min-version>=I<s>
+
+Minimum perl version to include.
+
+=item B<--xmax-version>=I<s>
+
+Only include perl version lesser than this.
+
+=item B<--xmin-version>=I<s>
+
+Only include perl version greater than this.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--module>=I<modulename>*
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C perlbrew-module-version perlbrew-module-version
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete perlbrew-module-version 'p/*/`perlbrew-module-version`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at ~/.config/perlbrew-module-version.conf, ~/perlbrew-module-version.conf or /etc/perlbrew-module-version.conf (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> (filter by profile). Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=foo ...]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ exclude (see --exclude)
+ exclude_dev (see --exclude-dev)
+ exclude_version (see --exclude-version)
+ format (see --format)
+ include (see --include)
+ include_version (see --include-version)
+ max_version (see --max-version)
+ min_version (see --min-version)
+ module (see --module)
+ naked_res (see --naked-res)
+ xmax_version (see --xmax-version)
+ xmin_version (see --xmin-version)
+
+=head1 ENVIRONMENT
+
+=head2 PERLBREW_MODULE_VERSION_OPT => str
+
+Specify additional command-line options
+
+=head1 FILES
+
+~/.config/perlbrew-module-version.conf
+
+~/perlbrew-module-version.conf
+
+/etc/perlbrew-module-version.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-PerlbrewUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-PerlbrewUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PerlbrewUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

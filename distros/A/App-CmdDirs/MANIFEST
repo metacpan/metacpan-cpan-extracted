@@ -1,0 +1,18 @@
+bin/cmddirs
+build/build.PL
+build/cmddirs.PL
+DEVELOPING
+lib/App/CmdDirs/Traverser/Base.pm
+lib/App/CmdDirs/Traverser/Git.pm
+lib/App/CmdDirs/Traverser/Subversion.pm
+lib/App/CmdDirs.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/10-critic.t
+t/50-unit.t
+t/90-build.t
+t/lib/App/CmdDirsTest.pm
+t/perlcriticrc
+META.yml                                 Module meta-data (added by MakeMaker)

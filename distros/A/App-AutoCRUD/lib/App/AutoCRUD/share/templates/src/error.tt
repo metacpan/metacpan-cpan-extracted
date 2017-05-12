@@ -1,0 +1,7 @@
+[% META title = 'TT Error' %]
+<p>
+  An error has occurred.
+</p>
+<p>
+  <span class="error">[% error %]</span>
+</p>

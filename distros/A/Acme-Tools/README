@@ -1,0 +1,57 @@
+Acme::Tools version 0.21
+========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   wget http://search.cpan.org/CPAN/authors/id/K/KJ/KJETIL/Acme-Tools-0.16.tar.gz
+   tar zxf Acme-Tools-0.16.tar.gz
+   cd Acme-Tools-0.16
+
+   perl Makefile.PL
+   make test
+   make install
+
+Or using the cpan command:
+
+   cpan Acme::Tools
+
+Or if you've installed 'App::cpanminus' and have the 'cpanm' tool available, run:
+
+   cpan App::cpanminus     #or:  apt-get -y install cpanminus  #on ubundu or debian
+   cpanm Acme::Tools
+
+To install system wide, run make install, cpanm or cpan as root.
+
+WHAT
+
+Acme::Tools is a collection of more or less useful subs lumped together in one module.
+
+All subs are exported, so beware of name space pollution. (What did you expect of an acme module?)
+
+To import just some subs, do:
+
+ use Acme::Tools qw(pivot ansicolor);
+
+See documentation for more.
+
+
+DEPENDENCIES
+
+This module in itself does not require these modules to be used, but
+some of the subs in  Acme::Tools  require  them:
+
+ require Compress::Zlib;
+ require Digest::MD5
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2008-2017 Kjetil Skotheim
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

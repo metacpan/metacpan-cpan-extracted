@@ -1,0 +1,15 @@
+Revision history for Perl extension Affix::Infix2Postfix.
+
+0.01  Fri Nov 19 02:23:11 1999
+	- original version; created by h2xs 1.19
+
+0.02  Sat Nov 20 14:23:57 1999
+	- Generated a larger example and fixed the
+        regexp generating routine so the operators
+	and functions can now be prefixes of each
+	others.
+
+0.03  Mon Jan  3 22:01:58 2000
+  - Fixed the documents a bit and made some 
+  alterations to the test code.  First CPAN upload
+	of this module.

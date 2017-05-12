@@ -1,0 +1,7 @@
+Revision history for AAAA-Mail-SpamAssassin
+
+0.002     2012-12-14
+        - POD cleanup and minimal test
+
+0.001     2012-12-12
+        - initial CPAN release

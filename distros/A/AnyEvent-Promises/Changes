@@ -1,0 +1,29 @@
+Revision history for AnyEvent::Promises
+
+0.06 Tuesday, Mar. 11th 2014
+
+- if no AE::postpone available (old AnyEvent), uses its own (Svyatoslav Usachev)
+
+0.05 Tuesday, Jan. 7th 2014
+
+- make_promise($promise) returns $promise
+- merge_promises() returns fulfilled promise
+
+0.04 Thursday, Dec. 11th 2013
+
+- correction of sync called in scalar context
+
+0.03 Thursday, Dec. 05th 2013
+
+- corrected POD
+- added $promise->sync 
+
+0.02 Monday, Nov. 18th  2013 
+
+- removed the only occurence of // operator
+- removed forgotten use Data::Dump 
+
+0.01 Wednesday, Nov. 13th  2013 
+
+- initial release
+

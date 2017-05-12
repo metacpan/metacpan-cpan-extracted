@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+# PODNAME: nag
+# ABSTRACT: send yourself a reminder
+
+use Modern::Perl;
+use App::Nag;
+
+# do initial validation of arguments
+my ( $opt, $usage, $name ) = App::Nag->validate_args;
+
+# now we validate the time expression
+my ( $verbosity, $text, $synopsis, $seconds ) =
+  App::Nag->validate_time( $opt, $usage, @ARGV );
+
+# still good, so we run it
+App::Nag->run( $name, $seconds, $text, $synopsis, $verbosity );
+
+
+
+=pod
+
+=head1 NAME
+
+nag - send yourself a reminder
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+  $ nag 2h drink coffee
+  $ nag 20s inhale
+  $ nag 40s exhale
+  
+  $ nag 8am pull on pants
+  $ nag 9 stretch
+  
+  $ nag --nudge 9:00pm go home
+  $ nag --shake 9:30pm brush teeth
+  $ nag --slap 10:00pm go to bed
+  
+  $ nag --help
+  nag [-nps] [long options...] <time> <text>+
+	           
+	Send yourself a reminder.
+	           
+	-n --nudge   low key reminder
+	-p --poke    reminder with no particular urgency (default)
+	-s --shake   urgent reminder
+	--slap       do this!!!
+	           
+	--help       print usage message and exit
+
+=head1 DESCRIPTION
+
+B<nag> is a utility to facilitate invoking C<Gtk2::Notify> to send your future
+self reminders. It causes a notification window with a somewhat eye catching icon
+to appear on your screen, linger a moment, and then fade away.
+
+=head1 AUTHOR
+
+David F. Houghton <dfhoughton@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by David F. Houghton.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+__END__
+

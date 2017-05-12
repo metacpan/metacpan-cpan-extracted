@@ -1,0 +1,322 @@
+body { 
+  background: #fff;
+  margin: 0;
+  padding: 0;
+  font-family: "Trebuchet MS", Arial, sans-serif;
+}
+
+
+div.main-header {
+  background: #369;
+  border-bottom: 1px solid #D5C7AA;
+  margin: 0 0 0 0; 
+  padding: 1ex 1em;
+  text-align: right;
+  color: #fff;
+}
+
+
+div.main-header h1 {  
+  margin: 0em;
+  padding: 0em;
+  clear: none;
+  color: #fff;
+  font-size: xx-large;
+}
+
+div.main-header .slogan {  
+  padding: 0em;
+  margin: 0em;
+  color: #fff;
+  font-size: medium;
+}
+
+div.main-header a:link, div.main-header a:visited {  
+  color: #fff;
+  text-decoration: none;
+}
+
+div.main-header h1 a:active, div.main-header a:hover {  
+  text-decoration: underline;
+  color: #B7CAE7;
+}
+
+#footer {  
+  clear: both;
+  text-align: center;
+}
+
+#footer .fields { 
+  padding: 0 1ex;
+}
+
+div.menu { 
+  margin: 0 0 0 0.5ex;
+  padding: 0 5px;
+  width: 10em;
+  background: #b7cae7;
+  border: 2px solid #369;
+  font-size: large;
+  float: left;
+}
+
+div.menu .menu-header {
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+
+div.menu ul {
+  margin: 0;
+  list-style-type: none;
+  padding: 2px 1ex;
+  font-size: medium;
+}
+
+div.menu div.login { 
+  font-size: medium;
+  text-align: right;
+}
+
+div.menu input { 
+  width: 90%;
+}
+
+div.main { 
+  margin-left: 15em;
+  padding: 0 1em;
+  max-width: 41em;
+  margin-right: 12em;
+}
+
+div.menu-section ul li { 
+  padding-left: 0;
+}
+
+div.catlist {  
+  float : left;
+  clear : left;
+  width : 10em;
+  margin : 1em;
+}
+
+div.catlist h2 {  
+  font-size : 110%;
+}
+
+div.rightsidebar {  
+  float : right;
+  width : 10em;
+}
+
+h2#sectionhead, h2.pagetitle {
+  padding: 0.4em 0.7em;
+  clear: both;
+  margin: 0 0 0 11%;
+  font-size: xx-large;
+  font-weight: 900;
+}
+
+div.editor-ok, div.editor-not-ok, div#the-story, div#user-info {  
+  border: 2px solid;
+  margin: 0;
+  margin-bottom: 1em;
+  padding: 0;
+  background: #fff;
+}
+
+div#the-story { 
+  margin-bottom: 0em;
+}
+
+div.editor-not-ok { 
+  border: 3px solid red;                    
+}
+div.editor-ok h3, div.editor-not-ok h3, div#the-story h2, div.comm-head h3, div#user-info h2 { 
+  margin: 0em;
+  background: #b7cae7;
+  border-bottom: 2px solid #000;
+  padding-left: 0.3em;
+  padding-bottom: 0.1ex;                                                       
+}
+
+div.editor-ok h3 a, div.editor-not-ok h3 a, div#the-story h2, div#the-story h2 a, div.comm-head h3 a, div#user-info h2 { 
+  color: #473000;
+  text-decoration: none;
+}
+
+div.editor-ok h3 a:hover, div.editor-not-ok h3 a:hover, div#the-story h2 a:hover, div.comm-head h3 a:hover {
+  text-decoration: underline;
+}
+
+div.headerdata, div.comm-timeinfo, div.comm-timeinfo, div.comm-byline {  
+  color: #333;
+  background: #f0f0ff;
+  font-size: small;
+  margin: 0;
+  padding: 0 4px;
+}
+
+dl.articlelist dt a.article-title {  
+  font-size: larger;
+  font-weight: bold;
+}
+
+dl.articlelist dt span.byline {  
+  font-size: small;
+}
+
+div.headerdata, div.comm-timeinfo {
+  border-bottom: 1px solid #333;
+}
+
+div.readmorelink { 
+   margin: 0 1ex;
+}
+ 
+div.reply-link { 
+  margin: 0;
+  padding: 2px 1ex;
+  background: #b7cae7;
+  border: 1px solid #55C;
+  border-top: 0;
+}
+
+
+
+div.minicontent, div.content {  
+  background: #fff;
+  margin: 0;
+  padding: 1ex;
+}
+
+div.minicontent {
+  overflow: auto;
+}
+
+
+div.editlink {  
+  text-align : right;
+}
+
+div.main div.control {  
+  margin-bottom: 1em;
+}
+
+div.main div.control p {  
+  font-style: italic;
+  margin: 0.4em 1em;
+}
+
+div.reply {  
+  margin: 2em 1em 1em 2em;
+  border: 1px solid #338;
+
+}
+
+div.comm-content {  
+  padding: 0.7em;
+  background: #fff;
+}
+
+div.commentlist {  
+  background: #b7cae7;
+  margin: 2em 0;
+  padding: 0;
+  border: 1px solid #338;
+}
+
+div.fields {  
+  margin-top: 0.5em;
+}
+
+div.fields div.control, table  { 
+  margin-top: 1em;
+  padding: 0.3em;
+  border: 1px solid #338;
+  background: #f0f0ff;
+}
+
+
+
+
+div.fields div.control label, table caption {  
+  font-weight: bold;
+  color: #473000;
+}
+
+div#breadcrumb {  
+  padding: 0.3ex 0.1em;
+  margin-bottom: 0.2em;
+}
+
+div#user-info dt {  
+  padding: 0.3em;
+  font-weight: bold;
+}
+
+div.foundcats h2 {  
+  color: #473000;
+  margin-bottom: 0.2em;
+}
+div.foundcats p.description {  
+  font-size: smaller;
+  padding-left: 4em;
+  margin-top: 0.3em;
+}
+
+
+@media print {
+  body { 
+    color: #000;
+    background: #fff;
+  }
+  div.rightsidebar, div.menu, div#breadcrumb, div.reply-link, div.commentlist, div#footer { 
+    display:none 
+  }
+  div.main {
+    margin: 2em 5em;
+    max-width: 64em;
+  }
+  div.editor-ok, div.editor-not-ok, div#the-story, div#user-info {  
+    border: none;
+  }
+  
+  div.editor-ok, div.editor-not-ok {  
+    page-break-inside : avoid;
+  }
+}
+
+@media handheld {
+  body { 
+    color: #000;
+    background: #fff;
+  }
+  div.rightsidebar, div.menu, div.catlist, span.user-poster, span.last-changed { 
+    display:none;
+  }
+  div.catinfo, div.timeinfo, div.byline, div#catinfo, div#timeinfo, div#byline {  
+    display:inline;
+  }
+
+  div.main {
+    margin: 0.5em;
+  }
+}
+
+@media projection {
+  div.main {
+    font-size : 200%;
+  }	
+  h2#sectionhead, h2.pagetitle {
+    font-size: 300%;
+  }
+  div.editor-ok h3, div.editor-not-ok h3, div#the-story h2, div.comm-head h3, div#user-info h2 { 
+    font-size: 120%;
+  }
+  div.menu {  
+    font-size: xx-small;
+  }
+
+
+}		

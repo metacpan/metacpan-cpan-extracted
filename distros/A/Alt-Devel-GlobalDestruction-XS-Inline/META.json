@@ -1,0 +1,48 @@
+{
+   "abstract" : "Alternate Faster implementation of the Devel::GlobalDestruction API (using Inline::Module)",
+   "author" : [
+      "Ingy döt Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alt-Devel-GlobalDestruction-XS-Inline",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "inc",
+         "lib/Devel"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Inline::Module" : "0.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.06"
+}

@@ -1,0 +1,15 @@
+name: user_login
+method: POST
+title: Address
+fields:	
+	username:
+		label: User Id
+		size: 30
+		required: 1
+	password:
+		label: Password
+		size: 30
+		type: Password
+		required: 1
+submit: Submit
+stylesheet: 1

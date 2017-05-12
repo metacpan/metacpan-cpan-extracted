@@ -1,0 +1,127 @@
+Revision history for App-Genpass
+
+2.401   14.10.16
+        * Provide a META.json file.
+
+2.400   12.10.16
+
+        * Cleanup Pod. (Brian Manning)
+        * Create passwords in a more secure fashion (ie not simply rand()).
+          (Arthur Axel fREW Schmidt)
+
+2.34    04.08.14
+        * GH #3: When provided some empty types, it would loop forever.
+
+2.33    20.11.12
+        * Reinstate configuration reading which was removed with the move
+          to Moo.
+        * RT #81287: Update docs to reflect Mouse no longer used.
+          (Props to zaxon)
+
+2.32    01.07.12
+        * RT #77652: Depend directly on MooX::Types::MooseLike.
+          (nice catch, Brad Bowman!)
+
+2.31    26.06.12
+        * number was accidentally a Bool instead of Int.
+          (nice catch, Jonathan Swartz! *COUGH*USETHECHI*COUGH*)
+
+2.30    26.03.12
+        - Move from Mouse to Moo - MUCH FASTER!
+
+2.20    27.11.11
+        - Add minlength and maxlength (Neil Bowers).
+        - Correct warning (Neil Bowers).
+
+2.10    08.08.11
+        - Removing the need for "special" boolean flag. Using 'noreadable'
+        or readable => 0 will negate special. Readable will exclude special
+        characters.
+        (Tim Heaney - oylenshpeegul)
+
+2.04    06.08.11
+        - Clarify the distribution contains an application as well.
+        (Neil Bowers).
+        - POD fix.
+        (Tim Heaney)
+
+2.03    03.08.11
+        (this release, as the previous, are due to Neil Bowers, so thanks!)
+        - Using readable with special now throws an exception. Added in docs.
+        - Typo in POD.
+
+2.02    03.08.11
+        - RT #69980: clarify the usage of default number of passwords in
+        generate() method. (reported by Neil Bowers, thanks!)
+
+2.01    10.03.11
+        - Fix tests by requiring namespace::clean at least 0.2
+
+2.00    17.02.11
+        ** Major change **
+        - Moving to Mouse instead of Moose. Should work much faster for users
+          without causing problems.
+          (since it's a big change, I'm noting this as a very major release)
+
+1.01    18.07.10
+        - Fixed small test bug, must return from default coderef
+        - Explaining how much "speeds" noverify adds
+        (0.1 secs for 500 passwords of 500 char length)
+
+1.00    17.07.10
+        [API Change]
+        - renamed "repeat" (-r) to "number" (-n)
+        - renamed -e to -r.
+
+        [Docs]
+        - Document default configuration files
+
+0.11    16.07.10
+        - Correctly implement optional default configuration file
+        - Add optional homefolder configuration file
+        - Moving to Dist::Zilla... it's awesome!
+
+0.10    07.06.10
+        - Minimum requirement of MooseX::Getopt => 0.12
+
+0.09    31.05.10
+        - Auto-read default configuration file (/etc/genpass.yaml)
+
+0.08    30.05.10
+        - Added description for genpass app
+          Now --help works
+
+0.07    30.05.10
+        - Added MX::* to Build.PL
+        - Added single char options (-l, -v, etc.)
+
+0.06    29.05.10
+        - Finally adding genpass CLI !!
+        - POD fix C<> vs. <code></code>
+
+0.05    01.01.09
+        - added documentation for all attributes
+        - first stable finished release
+
+0.04    01.01.09
+        - replaced die with Carp's croak
+        - added test for wantarray options
+        - adding documentation for wantarray options
+
+0.03    14.12.09
+        - fixed small bug in password repetition
+        - adding test that statistically catches it
+
+0.02    11.12.09
+        - removing special chars, refactored nicely
+        - added verification process
+        - more tests
+        - rewrote some tests
+        - fixed bug that appeared in original genpass, where unreadable chars
+          would be inserted into the chars array twice
+        - removed BUILD
+        - adding test for number of types wanted with a die
+
+0.01    10.12.09
+        First version, released on an unsuspecting world.
+

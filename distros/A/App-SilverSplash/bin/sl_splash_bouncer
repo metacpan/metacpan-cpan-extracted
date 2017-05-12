@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Config::SL;
+use App::SilverSplash ();
+use App::SilverSplash::IPTables ();
+
+use Data::Dumper;
+
+our $Config = Config::SL->new;
+
+use constant DEBUG => $ENV{SL_DEBUG} || 0;
+
+my @ads_users = App::SilverSplash::IPTables->ads_users;
+
+foreach my $user (@ads_users) {
+
+    warn("user " . Dumper($user)) if DEBUG;
+    # check data overage
+    my $overage = App::SilverSplash::IPTables->check_overage($user->[1], $user->[0]);
+
+    if ($overage) {
+        warn(sprintf("$$ mac %s, ip %s expired", $user->[1], $user->[0]))
+             if DEBUG;
+        App::SilverSplash::IPTables->delete_from_ads_chain($user->[1], $user->[0]);
+    }
+
+    # check timed overage
+    my $not_timed_out = App::SilverSplash->not_timed_out($user->[1], $user->[0]);
+    unless ($not_timed_out) {
+        warn(sprintf("$$ mac %s, ip %s expired", $user->[1], $user->[0]))
+             if DEBUG;
+        App::SilverSplash::IPTables->delete_from_ads_chain($user->[1], $user->[0]);
+    }
+
+}
+
+
+my @paid_users = App::SilverSplash::IPTables->paid_users;
+
+foreach my $user (@paid_users) {
+
+    my $not_timed_out = App::SilverSplash->not_timed_out($user->[1], $user->[0]);
+    unless ($not_timed_out) {
+        warn(sprintf("$$ mac %s, ip %s expired, removing", $user->[1], $user->[0]));
+        App::SilverSplash::IPTables->delete_from_paid_chain($user->[1], $user->[0]);
+    }
+}
+
+

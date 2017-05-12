@@ -1,0 +1,57 @@
+{
+   "abstract" : "knowledge and wisdom interface through questioning",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "keywords" : [
+      "knowledge",
+      "wisdom"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-KnowledgeWisdom",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Acme::KnowledgeWisdom" : {
+         "file" : "lib/Acme/KnowledgeWisdom.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jozef/Acme-KnowledgeWisdom/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/jozef/Acme-KnowledgeWisdom.git"
+      }
+   },
+   "version" : "0.01"
+}

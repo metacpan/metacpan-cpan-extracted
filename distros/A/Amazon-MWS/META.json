@@ -1,0 +1,83 @@
+{
+   "abstract" : "Perl interface to Amazon Marketplace Web Services",
+   "author" : [
+      "Paul Driver <paul@plainblack.com>",
+      "Phil Smith <phil.smith@rsdvd.com>",
+      "Marco Pessotto <melmothx@gmail.com>",
+      "Stefan Hornburg (Racke) <racke@linuxia.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amazon-MWS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "HTTP::Response" : "0",
+            "Test::Deep" : "0",
+            "Test::MockObject" : "0",
+            "Test::MockObject::Extends" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::InsideOut" : "0",
+            "DBI" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::ISO8601" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "Digest::MD5" : "0",
+            "Exception::Class" : "0",
+            "Exporter" : "0",
+            "HTTP::Request" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "MIME::Base64" : "0",
+            "Moo" : "0",
+            "MooX::Types::MooseLike" : "0",
+            "Path::Tiny" : "0",
+            "Readonly" : "0",
+            "SQL::Abstract" : "0",
+            "Try::Tiny" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "XML::Compile::Schema" : "1.46",
+            "XML::LibXML::Simple" : "0",
+            "XML::Simple" : "0",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/interchange/Amazon-MWS/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/interchange/Amazon-MWS"
+      },
+      "x_IRC" : "irc://irc.freenode.net/#interchange"
+   },
+   "version" : "0.141",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

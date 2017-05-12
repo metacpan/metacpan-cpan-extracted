@@ -1,0 +1,15 @@
+clear
+power on
+regs
+
+op 78
+
+# I flag should now be 1
+test i = 1
+
+op 58
+
+# I flag should now be 0 again
+test i = 0
+
+save verify_58.txt

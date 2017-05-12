@@ -1,0 +1,16 @@
+bin/usb-key-copy-con
+Changes
+lib/App/USBKeyCopyCon.pm
+lib/App/USBKeyCopyCon/Chrome.pm
+lib/App/USBKeyCopyCon/copy-complete.wav
+lib/App/USBKeyCopyCon/profiles/copyfiles-reader.sh
+lib/App/USBKeyCopyCon/profiles/copyfiles-writer.sh
+lib/App/USBKeyCopyCon/TroubleShooting.pod
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,118 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+=head1 NAME
+
+dir_to_xml - Convert a directory request to XML
+
+=head1 SYNOPSIS
+
+  Plugin dir_to_xml
+  # optional
+  DirExternalEncoding iso-8859-1
+
+=head1 DESCRIPTION
+
+This module turns a directory request into XML so that other plugins can
+process the directory in the same way as other XML inputs.
+
+=head1 FORMAT
+
+The following is an example of the XML format to expect from this plugin:
+
+  <?xml version="1.0" encoding="UTF-8"?>
+  <filelist xmlns="http://axkit.org/2002/filelist">
+    <directory size="4096" atime="1077320634" mtime="1077312841" ctime="1077312841" readable="1" executable="1">.</directory>
+    <directory size="4096" atime="1077316522" mtime="1076743711" ctime="1076743711" readable="1" executable="1">..</directory>
+    <file size="0" atime="1076770889" mtime="1076770889" ctime="1076770889" readable="1">index.xml</file>
+    <directory size="4096" atime="1076954718" mtime="1076774280" ctime="1076774280" readable="1" executable="1">images</directory>
+    <file size="580626" atime="1077319951" mtime="1076774007" ctime="1076774007" readable="1">link-4.1a.tar.gz</file>
+    <file size="708" atime="1077319951" mtime="1076774018" ctime="1076774018" readable="1" executable="1">Bender.pl</file>
+  </filelist>
+
+=head1 CONFIG
+
+=head2 DirExternalEncoding STRING
+
+File systems aren't consistent with what encodings they use to represent
+accented filenames or filenames in non-ascii encodings. In order to cope with
+these sorts of filenames you need to specify an encoding. The filenames will
+then be converted to unicode using the perl Encode module.
+
+By default, filenames are accepted as either UTF-8 or ISO-8859-15, autodetecting
+the character set of each filename. This makes transition to UTF-8 filenames rather
+painless.
+
+A warning on encodings: On some platforms,you may get different byte sequences for
+the same character. For example, Perl on MacOS X seems to like
+[base-letter+combining-char] more than [combined character], while on other systems
+it doesn't care. This doesn't affect XSLT or other truly XML aware processors but may
+hit you when you process the resulting XML with regexes or similar.
+
+=cut
+
+use File::Spec::Functions qw(catfile);
+use Encode;
+use utf8;
+
+sub conf_DirExternalEncoding;
+
+sub hook_xmlresponse {
+    my ($self, $input) = @_;
+    my $dir = $self->client->headers_in->filename;
+    return DECLINED unless -d $dir;
+    
+    my $enc = $self->config('DirExternalEncoding') || 'ISO-8859-15';
+    
+    opendir(DIR, $dir) || die "opendir($dir): $!";
+    
+    my $output = '<?xml version="1.0" encoding="UTF-8"?>
+<filelist xmlns="http://axkit.org/2002/filelist">
+';
+    for my $line (sort readdir(DIR)) {
+        my $xmlline = _to_utf8($enc, $line);
+        $xmlline =~ s/&/&amp;/;
+        $xmlline =~ s/</&lt;/;
+        my @stat = stat(catfile($dir,$line));
+        no warnings 'uninitialized';
+        my $attr = "size=\"$stat[7]\" atime=\"$stat[8]\" mtime=\"$stat[9]\" ctime=\"$stat[10]\"";
+        $attr .= ' readable="1"' if (-r _);
+        $attr .= ' writable="1"' if (-w _);
+        $attr .= ' executable="1"' if (-x _);
+        
+        if (-f _) {
+            $output .= "<file $attr>$xmlline</file>\n";
+        } elsif (-d _) {
+            $output .= "<directory $attr>$xmlline</directory>\n";
+        } else {
+            $output .= "<unknown $attr>$xmlline</unknown>\n";
+        }
+    }
+    $output .= "</filelist>\n";
+    
+    $input->dom($output);
+    
+    return DECLINED;
+}
+
+sub _to_utf8 {
+    my ($enc, $line) = @_;
+    # NB: We croak because it's useless returning a dir we can't convert
+    my $res = eval { decode_utf8($line, Encode::FB_CROAK) };
+    return $res unless $@;
+    return Encode::decode($enc, $line, Encode::FB_CROAK);
+}

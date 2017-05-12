@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache-Request-I18N
+version:      0.08
+version_from: I18N.pm
+installdirs:  site
+requires:
+    Apache::Constants:             0
+    Apache::Request:               0.32
+    Apache::Table:                 0
+    Apache::Test:                  1.13
+    HTTP::Headers::Util:           0
+    HTTP::Request:                 0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

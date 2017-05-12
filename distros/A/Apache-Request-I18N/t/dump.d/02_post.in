@@ -1,0 +1,5 @@
+# Basic POST request
+POST / HTTP/1.0
+Content-Type: application/x-www-form-urlencoded
+
+foo=bar&foofoo=barbar

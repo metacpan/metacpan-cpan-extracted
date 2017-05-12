@@ -1,0 +1,29 @@
+NAME
+    Apache::No404Proxy - 404 free Proxy
+
+SYNOPSIS
+      # in httpd.conf
+      PerlTransHandler Apache::No404Proxy # default uses ::Google
+      PerlSetVar GoogleLicenseKey **************
+
+DESCRIPTION
+    Oops, 404 Not found. But wait..., there is a Google cache!
+
+    Apache::No404Proxy serves as a proxy server, which automaticaly detects
+    404 responses and fetches Google cache via SOAP. You need your Google
+    account to use this module. See Google Web API terms for details.
+
+    Set your browser's proxy setting to Apache::No404Proxy based server, and
+    it becomes 404 free now!
+
+AUTHOR
+    Tastuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    This module comes WITHOUT ANY WARRANTY.
+
+SEE ALSO
+    the Apache::ProxyPassThru manpage, http://www.google.com/apis/
+

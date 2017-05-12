@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+Sendmail.pm
+SIGNATURE
+t/01basic.t

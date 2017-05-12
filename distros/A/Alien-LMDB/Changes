@@ -1,0 +1,13 @@
+0.103  2017-01-15
+  * use Alien::gmake as alien_bin_requires (thanks Graham Ollis)
+  * add windows support (thanks Graham Ollis)
+  * Upgrade to LMDB 0.9.19
+
+0.102  2016-06-01
+  * Attempt to support BSD systems
+
+0.101  2016-03-04
+  * Include META.* in manifest
+
+0.100  2016-03-03
+  * Initial release: LMDB 0.9.18

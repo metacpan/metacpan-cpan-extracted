@@ -1,0 +1,21 @@
+.cvsignore
+aKodePlayer.xs
+Changes
+example/player.pl
+example/sample.mp3
+example/sample.ogg
+example/sample.wav
+lib/Audio/aKodePlayer.pm
+Makefile.PL
+MANIFEST
+perlobject.map
+player.pl
+README
+t/00-load.t
+t/01-sinks.pl
+t/10-player.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,50 @@
+Archive::Chm version 0.06
+====================
+
+Archive::Chm is a module that provides access to Microsoft Compiled
+HTML Help files (chm files). A lot of today's software ships with
+documentation in .chm format. However Microsoft only provides
+viewing tools for their own OS and the company doesn't disclose
+the format specification.
+
+Unofficial specs can be found at: http://www.speakeasy.org/~russotto/chm/chmformat.html
+
+The module is basically a wrapper of Jed Wing's chmlib, a C library
+that provides access to all ITSS archives, though .chm is the only
+ITSS type file in use today.
+
+Currently access to .chm files is read-only and this will change over
+time if Jed Wing upgrades his library. Supported operations are getting
+a listing of the contents, extracting one or all items in the archive
+and retrieving an item's length.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   
+Note: if you don't install it with root privilages, you might get an error after
+make install, something like "Permission denied at /.../somefolder/.packlist".
+Don't worry, it works, and I'm still trying to get to the bottom of this. Any
+hints would be appreciated.
+   
+DEPENDENCIES
+
+This module requires Jed Wing's chmlib, that can be found at the
+following address: http://66.93.236.84/~jedwin/projects/chmlib/
+
+You need to have it installed in a directory that ld knows about or 
+modify Chm.pm before make, to load chmlib from the directory
+you have installed it to, with the -Lyourlibdir flag.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Alexandru Palade, NetSoft S.R.L.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.

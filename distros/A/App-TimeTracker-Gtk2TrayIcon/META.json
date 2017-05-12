@@ -1,0 +1,56 @@
+{
+   "abstract" : "Show TimeTracker status in a GTK tray applet",
+   "author" : [
+      "Thomas Klausner <domm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200014, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-TimeTracker-Gtk2TrayIcon",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : 0,
+            "App::TimeTracker::Data::Task" : 0,
+            "App::TimeTracker::Proto" : 0,
+            "File::ShareDir" : 0,
+            "FindBin" : 0,
+            "Gtk2" : 0,
+            "Gtk2::TrayIcon" : 0,
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0,
+            "Test::Most" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/domm/App-TimeTracker-Gtk2TrayIcon.git",
+         "web" : "http://github.com/domm/App-TimeTracker-Gtk2TrayIcon"
+      }
+   },
+   "version" : "1.002"
+}
+

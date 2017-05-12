@@ -1,0 +1,10 @@
+.shipit
+Changes
+inc/Devel/CheckLib.pm
+lib/Alien/Gearman.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+src/gearmand-0.12.tar.gz
+t/00-use.t
+META.yml                                 Module meta-data (added by MakeMaker)

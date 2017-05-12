@@ -1,0 +1,87 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.014;
+
+use Getopt::Long qw(:config gnu_getopt);
+use App::Multigit qw(mgconfig mg_parent all_repositories mg_each write_config);
+use App::Multigit::Script ();  # Avoid trying to get --workdir and chdir to it.
+use Future;
+use curry;
+
+use Cwd qw(getcwd);
+use File::Copy;
+use HTTP::Tiny;
+use Path::Class;
+use Try::Tiny;
+use JSON::MaybeXS;
+
+my %options = App::Multigit::Script::get_default_options;
+GetOptions(\%options,
+    'readonly',
+);
+$options{workdir} //= getcwd;
+
+chdir $options{workdir};
+
+$options{workdir} = dir($options{workdir});
+
+my $user = shift;
+die "Must specify github user." unless $user;
+
+sub github_repo_list
+{
+    my $user = shift;
+    my $readonly = shift;
+    my @repos;
+    my $page = 1;
+    my $count = 0;
+    do {
+        my $response = HTTP::Tiny->new->get("https://api.github.com/users/$user/repos?page=$page");
+        my $url = $readonly ? "clone_url" : "git_url";
+        if($response->{success})
+        {
+            my $content = decode_json($response->{content});
+            push @repos, map { {
+                name => $_->{name},
+                url => $_->{$url},
+                branch => $_->{default_branch}
+            } } @$content;
+            $count = @$content;
+        }
+        $page++;
+    } while($count);
+    return \@repos;
+}
+
+my $existing_mg = try {
+    mg_parent
+}
+catch {
+    return;
+};
+
+if (not $existing_mg)
+{
+    App::Multigit::mkconfig($options{workdir});
+}
+
+my $readonly = $options{readonly};
+my $info = github_repo_list($user, $readonly);
+my %config = map { $_->{url} => { dir => $_->{name}, url => $_->{url}, branch => $_->{branch} } } @$info;
+my %existing_config = try {
+    %{ all_repositories(mg_parent) }
+} catch {};
+write_config({ %existing_config, %config });
+
+=head1 SYNOPSIS
+
+    mg github-config [--readonly] username
+
+Create a .mgconfig file for the github user I<username>.
+
+=head1 OPTIONS
+
+=head2 --readonly
+
+Use the readonly (https) github URLs.

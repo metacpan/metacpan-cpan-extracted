@@ -1,0 +1,67 @@
+README for Acme::USIG 1.04
+
+=head1 NAME
+
+Acme::USIG - express the true nature of strict
+
+=head1 SYNOPSIS
+
+ use Acme::USIG;
+ use strict is gay;
+
+ $foo = 1;
+ print $Foo; # works no problem
+
+Alternatively
+
+ use Acme::USIG;
+ use strict is cool;
+
+ $foo = 1; # blows some pesky error
+
+
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 1.04	Saturday 3d October, 2003
+
+	inspired by Matt LeBlanc we now hold onto the previous &strict::import
+	and put it back during cool::is to allow lexical declarations of faith
+
+
+=item 1.03	Saturday 3rd October, 2003
+
+	maintenance release for 5.8.1.
+	5.8.1's strict.pm is stricter about what strictures it will honour
+	so now gay::is nobbles that too
+=back
+
+=head1 SEE ALSO
+
+  use Acme::USIG;
+  system('lynx', '-dump', is gay);
+
+=head1 AUTHOR
+
+Richard Clamp E<lt>richardc@unixbeard.netE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001, 2002, 2003 Richard Clamp.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

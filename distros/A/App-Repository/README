@@ -1,0 +1,32 @@
+######################################################################
+## File: $Id: README 3255 2003-03-22 04:04:37Z spadkins $
+######################################################################
+
+WHAT IS THIS?
+
+This is the App-Repository distribution,
+adding the data access layer service to App-Context.
+For more information, see the web pages at
+
+   http://www.officevision.com/pub/App-Repository
+   http://www.officevision.com/pub/App-Context
+
+and/or join the mailing list at
+
+   p5ee@perl.org
+
+The mailing list is described at
+
+   http://p5ee.perl.org/mailinglist/
+   http://lists.perl.org/showlist.cgi?name=p5ee
+
+HOW DO I INSTALL IT?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

@@ -1,0 +1,4 @@
+Revision history for Perl extension Audio::BASSXS.
+
+0.01  First version
+0.02  Added the const char* and float to the typemap

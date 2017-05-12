@@ -1,0 +1,75 @@
+Apache::Centipaid Frequently Asked questions
+--------------------------------------------
+
+Q) Why would I need Apache::Centipaid?
+If you have a site that you want to grant paid access to then you may want to
+choose between the Apache::Centipaid or the PHP module available at centipaid.com
+
+If you have an existing site that already has mod_perl support, then Apache::Centipaid
+will be a great tool since it will be invisible to your web developers and content
+managers.  It does all teh work to direct user to pay, collect payment, and grant access.
+
+Q) Can I see a demo?
+Definetly! Centipaid has many demos showing the various types of businesses where
+centipaid can be used.  The Apache::Centipaid is demonstrated at 
+http://demo.centipaid.com
+
+Q)I installed Apache::Centipaid and everything installed properly without 
+any error messages.  However when I try to access a section that is
+protected I get an apache error.  What is going on?
+
+1)First insure that all the proper perl modules are installed.  You can simply
+check that by running make test in the Apache::Centipaid directory.
+
+---> if this condition is met, thenm proceed to next test
+
+2)Check that the local database "centipaid_rcpt" is installed and can be accessed
+  using the username/password specified in the configuration
+
+---> if this condition is met, thenm proceed to next test
+
+3)Check the error logs of your virtual host with Apache::Centipaid
+ If you see an error log that references to CGI/Cookie.pm (see example)
+ then you need to reinstall CGI.pm - We have included a tested version
+ of CGI.pm in the contrib directory, however it is recommended to get the
+ latest version from http://www.perl.com/CPAN/modules/by-module/CGI/
+
+ >Attempt to free unreferenced scalar.
+ >[Wed Jan 15 14:36:45 2003] [error] Undefined subroutine &CGI::unescape called at 
+ >/usr/lib/perl5/5.6.1/CGI/Cookie.pm line 75.
+
+---> if this condition is met, thenm proceed to next test
+
+4) Check which type of authetication has been chosen. i.e. is it an httpd.conf
+   configuration? or an .htaccess
+
+-->  If it is an httpd.conf and the steps above did not resolve it, please check
+   support forum for more information.
+
+--> If it is an .htaccess configuration, then you need to make sure that the
+    the directory (document root) where the .htaccess is installed is allowed to 
+    over-write httpd.cof settings.  Check that the following line is included
+    in the httpd.conf
+
+	<Directory "/var/www/demo.centipaid.com">
+	    Options Indexes FollowSymLinks
+	    AllowOverride AuthConfig  #<---- this line must include AuthConfig
+	    Order allow,deny
+	    Allow from all
+	</Directory>
+
+
+5) If the problem persists, then upgrade the DBI::mysql package (a tested DBI::mysql)
+   is included in contrib directory.
+
+
+Q) Where do I find more help?
+Centipaid maintains current support issues in the Knowledgebase at 
+http://www.centipaid.com/faq/ and the support forums at
+http://www.centipaid.com/centi/forum/
+
+
+
+Q) I think I found a bug what do I do?
+Please email bug reports to <bugs /at/ centipaid . com>
+

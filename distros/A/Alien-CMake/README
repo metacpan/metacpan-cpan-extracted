@@ -1,0 +1,72 @@
+NAME
+    Alien::CMake - Build and make available CMake library -
+    <http://cmake.org/>
+
+VERSION
+    Version 0.08
+
+SYNOPSIS
+    Alien::CMake during its installation does one of the following:
+
+    *   Builds *CMake* binaries from source codes and installs dev files
+        (headers: *.h, static library: *.a) into *share* directory of
+        Alien::CMake distribution.
+
+    Later you can use Alien::CMake in your module that needs to link with
+    *libode* like this:
+
+        # Sample Build.pl
+        use Module::Build;
+        use Alien::CMake;
+
+        my $build = Module::Build->new(
+          module_name => 'Any::CMake::Module',
+          # + other params
+          build_requires => {
+                        'Alien::CMake' => 0,
+                        # + others modules
+          },
+          configure_requires => {
+                        'Alien::CMake' => 0,
+                        # + others modules
+          },
+          extra_compiler_flags => Alien::CMake->config('cflags'),
+          extra_linker_flags   => Alien::CMake->config('libs'),
+        )->create_build_script;
+
+    NOTE: Alien::CMake is required only for building not for using
+    'Any::CMake::Module'.
+
+DESCRIPTION
+    In short "Alien::CMake" can be used to detect and get configuration
+    settings from an already installed CMake. It offers also an option to
+    download CMake source codes and build binaries from scratch.
+
+METHODS
+  config()
+    This function is the main public interface to this module:
+
+        Alien::CMake->config('prefix');
+        Alien::CMake->config('version');
+        Alien::CMake->config('libs');
+        Alien::CMake->config('cflags');
+
+  bin_dir()
+    For compatability with Alien::Base, this will return the path containing
+    "cmake" or empty list if it is already in the "PATH".
+
+BUGS
+    Please post issues and bugs at
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-CMake>
+
+AUTHOR
+    KMX, <kmx at cpan.org>, FROGGS, <froggs at cpan.org>, plicease <plicease
+    at cpan.org>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

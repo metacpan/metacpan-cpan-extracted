@@ -1,0 +1,1505 @@
+Revision history for Perl extension App::Sqitch
+
+0.9995 2016-07-27T09:23:55Z
+     - Taught the `add` command not to ignore the `--change` option.
+     - The `add` command now emits a usage statement when no change name is
+       passed to it.
+     - The `add` command now helpfully suggests using the --change option when
+       attempting to add a change with the same name as a target. Thanks to
+       Ivan Nunes for the report!
+     - The `tag` command now helpfully suggests using the --tag option when
+       attempting to add a tag with the same name as a target.
+     - Added `--global` as an alias for `--user` to the `config` command. This
+       alias benefits the muscle memory of Git users.
+     - Added a note for Git users to the `sqitch-revert` documentation, to
+       head off potential confusion with `git revert`. Thanks to Eric
+       Bréchemier for the "time travel" analogy and wording.
+     - Fixed an "uninitialized value" error when creating a registry database
+       on Windows. Thanks to Steven C. Buttgereit for the report (Issue #289).
+     - Fixed editor selection to prioritize the `core.editor` configuration
+       variable over the `$EDITOR` environment variable. The `$SQITCH_EDITOR`
+       environment variable still trumps all. Thanks to Jim Nasby for the pull
+       request (#296).
+     - Added detection of the `$VISUAL` environment variable to Editor
+       selection, prioritzed after the `core.editor` configuration variable
+       and before the `$EDITOR` environment variable. Thanks to Jim Nasby for
+       the pull request (#296).
+     - Updated the DateTime code to set the locale via `set_locale()` instead
+       of `set()`, as the latter may actually change the local time
+       unintentionally, and has been deprecated since DateTime v1.04. Thanks
+       to Dave Rolsky for the pull request (#304).
+
+0.9994 2016-01-08T19:46:43Z
+     - Reduced minimum required MySQL engine from 5.1.0 to 5.0.0. Thanks to
+       @dgc-wh for testing it (Issue #251).
+     - Fixed floating-point rounding issue with SQLite registry versions on
+       Perls with 16-byte doubles. Thanks to H. Merijn Brand for the report
+       and testing.
+     - Fixed an error when adding an engine with the `engine` command. Thanks
+       to Victor Mours for the report and fix!
+     - Updated the Oracle engine to support Oracle Wallet connection strings,
+       where no username or host is in the connection URI. Thanks to Timothy
+       Procter for the patch!
+     - Improved the installer's selection of the prefix in which to install
+       `etc` files to better match the `--installdirs` option, which defaults
+       to the "site" directories. Thanks to @carragom for the pull request
+       (#265).
+     - Added missing dash to `-engine` in sample calls to `sqitch init` in the
+       tutorials. Thanks to Andrew Dunstan for the spot (Issue #268).
+     - Fixed broken Vertica documentation links.
+     - Attempting to revert a database with no associated registry no longer
+       reports the registry as version 0, but correctly reports that no
+       registry can be found. Thanks to Arnaldo Piccinelli for the spot (Issue
+       #271).
+     - Fixed the search for change IDs in engines to match the search for
+       changes. Specifically, change ID seaerch now properly handles the
+       offset characters `~` and `^`. This bug mainly affected the `verify`
+       command, but it's good to address the inconsistency, done mainly by
+       adding the `find_change_id` and `change_id_offset_from_id` methods to
+       complement the `find_change` and `change_offset_from_id` methods.
+       Thanks to Andrew Dunstan for the spot (Issue #272).
+     - Fixed the `flips` table example in the MySQL tutorial. It was
+       inappropriately copied from the PostgreSQL tutorial at some point.
+       Thanks to Jeff Carpenter for the spot (Issue #254)!
+
+0.9993  2015-08-17T17:55:26Z
+     [Bug Fixes]
+     - Eliminated test failures due to warnings from DateTime::Locale when
+       `LC_TIME` is set to C.UTF-8. Thanks to Shantanu Bhadoria for the report
+       and Dave Rolsky for the workaround.
+     - Fixed an error checking the registry version when the local uses a
+       comma for decimal values. Thanks to Steffen Müller for the report
+       (Issue #234).
+     - Worked around an error setting the MySQL storage engine using versions
+       of DBI prior to 1.631. Thanks to melon-babak for the report!
+     - Fixed an error from the Oracle engine when deploying more than 1000
+       changes. Thanks to Timothy Procter and Minh Hoang for the report and
+       testing the fix.
+     - Fixed a bunch of typos in error messages, comments, and documentation.
+       Thanks to Dmitriy for the pull request!
+     - Fixed test failures due to new warnings from File::Path on Perl
+       5.23.1.
+     - On Firebird, Looking up a change and tag in the database (via the
+       `--onto` option to `rebase` or the `--to` option to `revert`, among
+       others) would sometimes return the incorrect change if the change has
+       been reworked two or more times. Was fixed for the other engines in
+       v0.9991.
+     - Fixed the `--all` option used to apply a command to all known targets
+       so that it loads only targets specified by the local configuration.
+       Otherwise, user and system configuration can get in the way when they
+       specify engines and targets not used by the current project.
+     [Improvements]
+     - Added support for the `--set` option when deploying to MySQL. Thanks to
+       Chris Bandy for figuring out how to do it!
+     - Added support for a "reworked directory". By default, reworked change
+       scripts live in the deploy, revert, and verify directories along with
+       all the other change scripts. But if that starts to get too messy, or
+       you simply don't want to see them, add a `reworked_dir` setting to the
+       core, engine, or target config and reworked scripts will be stored
+       there, instead. Also supported are `reworked_deploy_dir`,
+       `reworked_revert_dir`, and `reworked_verify_dir`.
+     - Added the `--dir` option to the `init`, `engine`, and `target`
+       commands.
+     - Copied the core configuration options (`--engine`, `--target`,
+       `--plan-file`, `--registry`, etc.) to the `init`, `engine`, and
+       `target` commands. This means that they can be specified after the
+       command, which is a bit more natural. It also means that the
+       `--registry` and `--client` options of the `target` are no longer
+       deprecated.
+     - The `init` command on longer writes out commented values for the
+       `deploy_dir`, `revert_dir`, or `verify_dir` settings. I think these
+       settings are not commonly used, and it would start to get crowded if we
+       also added their "reworked" variants, which will be used still less.
+     - Added the `alter` action to the `engine` and `target` commands to set
+       engine and target properties.
+     - Added support for setting reworked directories to the `engine` and
+       `target` commands.
+     - Reformatted the output of the `engine` and `target` command `show`
+       actions to include reworked directories, and to bit a bit less flat.
+     - Attempting to add or alter an engine with a target URI that connects to
+       a different engine now triggers an error. For example, you can't set
+       the target for engine `pg` to `db:sqlite:`.
+     - The `add` and `alter` actions of the `engine` and `target` commands
+       now create script directories if they don't already exist.
+     - The `add` action of the `engine` and `target` commands now creates a
+       plan file if one does not exist in the specified location for the
+       engine or target.
+     - Added the `deploy_dir`, `revert_dir`, and `verify_dir` methods to
+       App::Sqitch::Plan::Change. Each points to the proper directory for the
+       target depending on whether or not the change has been reworked.
+     - In the MySQL engine, the following URI query params will be converted
+       to options passed to the command-line client, if they're present:
+       * mysql_compression=1   => --compress
+       * mysql_ssl=1           => --ssl
+       * mysql_connect_timeout => --connect_timeout
+       * mysql_init_command    => --init-command
+       * mysql_socket          => --socket
+       * mysql_ssl_client_key  => --ssl-key
+       * mysql_ssl_client_cert => --ssl-cert
+       * mysql_ssl_ca_file     => --ssl-ca
+       * mysql_ssl_ca_path     => --ssl-capath
+       * mysql_ssl_cipher      => --ssl-cipher
+     [Documentation]
+     - Added the "Overworked" section to sqitch-configuration guide with an
+       example of how to move reworked change scripts into a `reworked_dir`.
+     [Deprecations]
+     - Deprecated the `set-*` actions in the `engine` and `target` commands in
+       favor of the new `alter` action.
+     - The core `--deployed-dir`, `--revert-dir`, and `--verify-dir` options
+       are deprecated in favor of the `--dir` option on the `init`, `engine`,
+       and `target` command.
+
+0.9992 2015-05-20T23:51:41Z
+     - On PostgreSQL, Sqitch now sets the `client_encoding` parameter to
+       `UTF8` for its own connection to the database. This ensures that data
+       sent to and from the databse should always be properly encoded and
+       decoded. Users should still set the proper encodings for change scripts
+       as appropriate.
+     - Fixed test failures due to path differences on Windows.
+     - DateTime::TimeZone is now explicitly required in an attempt to head off
+       "Cannot determine local time zone" errors.
+     - Corrected some typos and thinkos in `sqitchtutorial-oracle`, thanks to
+       George Hartzell.
+     - Improved the script to upgrade an Oracle registry to v1.0 to support
+       versions prior to Oracle 12, thanks to Timothy Procter.
+     - Added missing closing parenthesis to the "Nothing to deploy" message.
+       Thanks to George Hartzell for the pull request (Issue #226).
+     - Replaced the unique constraint on the `script_hash` column in the
+       `changes` registry table with a unique constraint on `project` and
+       `script_hash`. This is to allow a deploy script to be used in more than
+       one project in a single database. This change increments the registry
+       version to v1.1. Thanks to Timothy Procter for the report.
+     - Updated the registry check constraints to have consistent names on the
+       engines that support them. This will make it easier to modify the
+       constraints in the future.
+     - Fixed precision issues with the registry version on MySQL and Firebird.
+     - Added comment to sqitch-passwords guide that MySQL::Config is required
+       to read passwords from the MySQL configuration files. Thanks to
+       Sterling Hanenkamp for the patch!
+
+0.9991 2015-04-03T23:14:39Z
+     [Improvements]
+     - Reduced minimum required MySQL engine from 5.6.4 to 5.1.0. Versions
+       prior to 5.6.4 lose the following features:
+       * Versions earlier than 5.6.4 is fractional second precision on
+         registry `DATETIME` columns. Since the ordering of those timestamps
+         is so important to the functioning of Sqitch, it will sleep in 100 ms
+         increments between logging changes to the registry until the time has
+         ticked over to the next second. Naturally, reverts and deploys will
+         be a little slower on versions of MySQL before 5.6.4, but accurate.
+       * Versions earlier than 5.5.0 lose the `checkit()` functions, which
+         would otherwise be used to emulate CHECK constraints in the registry,
+         as well as in user-created verify scripts, as recommended in the
+         MySQL tutorial, `sqitchtutorial-mysql`.
+     - Added a script to update the `DATETIME` columns in a MySQL Sqitch
+       registry that was upgraded to MySQL 5.6.4 or higher. It will be
+       installed as `tools/upgrade-registry-to-mysql-5.6.4.sql` in the
+       directory returned by `sqitch --etc`.
+     - Added a script to add the `checkit()` function and registry triggers to
+       emulate CHECK constraints to a MySQL Sqitch registry that was upgraded
+       to MySQL 5.5.0 or higher. It will be installed as
+       `tools/upgrade-registry-to-mysql-5.5.0.sql` in the directory returned
+       by `sqitch --etc`.
+     - The `init` command now throws an error when the plan file already
+       exists and is invalid or defined for a different project. Thanks to
+       Gabriel Potkány for the suggestion (Issue #214).
+     - All commands that take target arguments can now specify them as engine
+       names or plan file paths as well as target names and URIs.
+     - Added the `--all` option and the `$command.all` configuration variable
+       to the `add`, `rework`, `tag`, and `bundle` commands. This option tells
+       the commands to do their thing for all plans known from the
+       configuration, not just the default plan.
+     - Pass engine, target, or plan file names to the `add`, `rework`, `tag`,
+       and `bundle` commands` commands to specify specify one or more targets,
+       engines, and plans to act on.
+     - Added the `--change` option to the `add`, `rework`, and `tag` commands
+       to distinguish the change to be added, reworked, or tagged from
+       plan-specifying arguments, if necessary.
+     - Added the `--tag` option to the `tag` command to distinguish the tag to
+       be added from plan-specifying arguments, if necessary.
+     - Changed the short variant of the `--conflicts` option to the `add` and
+       `rework` commands from `-c` to `-x`. The `-c` option is now used as the
+       short variant for `--change` (and `--conflicts` has almost certainly
+       never been used, anyway).
+     - Added the `engine` and `project` variables to the execution of script
+       templates by the `add` command. The default templates now use it to
+       make their first lines one of:
+       * -- Deploy [% project %]:[% change %] to [% engine]
+       * -- Revert [% project %]:[% change %] from [% engine]
+       * -- Verify [% project %]:[% change %] on [% engine]
+     [Bug Fixes]
+     - DateTime::TimeZone::Local::Win32 is now required on Windows.
+     - The MySQL engine no longer passes `--skip-pager` on Windows, since
+       it is not supported there. Thanks to Gabriel Potkány for the report
+       (Issue #213).
+     - Fixed "no such table: changes" error when upgrading the SQLite
+       registry.
+     - Fixed upgrade failure on PostgreSQL 8.4. Thanks to Phillip Smith for
+       the report!
+     - Fixed an error when the `status` command `show_changes` and `show_tags`
+       configuration variables were set. Thanks to Adrian Klaver for the
+       report (Issue #219).
+     - Fixed `log` and `plan` usage statements to properly spell `--abbrev`.
+       Thanks to Adrian Klaver for the report (Issue #220).
+     - Fixed the formatting of change notes so that a space precedes the `#`
+       character whether the note was added by the `--note` option or via an
+       editor.
+     - Fixed a bug when parsing plan files with DOS/Windows line endings.
+       Thanks to Timothy Procter for the report (Issue #212).
+     - Looking up a change and tag in the database (via the `--onto` option to
+       `rebase` or the `--to` option to `revert`, among others) would
+       sometimes return the incorrect change if the change has been reworked
+       two or more times. Thanks to BryLo for the report!
+     [Documentation]
+     - Updated docs to be consistent in referring to the location of the system
+       configuration and template location as `$(prefix)/etc/sqitch`. Also
+       added notes pointing to the `--etc-dir` to find out exactly what that
+       resolves to. Suggested by Joseph Anthony Pasquale Holsten (Issue #167).
+     [Deprecations]
+     - Reverted deprecation of the database connection options. Target URIs
+       are still generally preferred, but sometimes you want to use a target
+       but just change the user name or database name. Retaining the options
+       is the easiest way to do this. Plus, a fair number of people have
+       scripts that use these options, and it seems petty to break them. Sorry
+       for the double-take here! The list of un-deprecated options is:
+       * `--db-client`
+       * `--db-host`
+       * `--db-port`
+       * `--db-username`
+       * `--db-password`
+       * `--db-name`
+
+0.999  2015-02-12T19:43:45Z
+     - Improved MySQL missing table error detection by relying on error codes
+       instead of matching a (possibly localized) error string.
+     - Made the registry upgrade more transparent when deploying. Sqitch is
+       now is a little more vigilent in checking for things being out-of-date
+       and updating them.
+     - Fixed an issue where the `status` command would return an error when
+       run against a an older version of the registry.
+     - Fixed a Postgres test failure when DBD::Pg is installed but psql is not
+       in the path.
+     - Now require Config::GitLike 1.15 to build on Windows in order to avoid
+       test failures when Cwd::abs_path dies on non-existant paths.
+     - Clarified the behavior of each `deploy` reversion mode with regard to
+       deploy script vs. verify script failures, and with the expectation that
+       deploy scripts are atomic.
+     - Target passwords can now be set via a single environment variable,
+       `$SQITCH_PASSWORD`. Its value will override URI-specified password.
+     - Added the sqitch-passwords and sqitch-environment guides.
+
+0.998  2015-01-15T22:17:44Z
+     - Fixed a bug in `sqitch engine update-config` where it would add data to
+       config files that did not previously have them, or report that data was
+       present in nonexistent config files.
+     - Added the `releases` table to the databases. This table will keep track
+       of releases of the Sqitch registry schema.
+     - The Oracle `registry` variable is now always `DEFINE`d when Oracle
+       scripts run.
+     - Added the `upgrade` command, which upgrades the schema for the Sqitch
+       registry for a target database.
+     - Added the `script_hash` column to the `changes` registry table. This
+       column contains a SHA-1 hash of the deploy script for the change at the
+       time it was deployed. For existing registries, the upgrade script sets
+       its value to be the same as the change ID. This value is update the
+       next time a project is deployed to the database.
+     - The error message when `deploy` cannot find the currently-deployed
+       change ID in the plan now includes more contextual information,
+       including the change name, associated tags, and the plan file name.
+       Suggested by Curtis Poe (Issue #205).
+     - Comments on Firebird registry objects are now created with the
+       `COMMENT` command, rather than INSERTs into catalog tables.
+     - Added support for "merge" events, though none are logged, yet.
+
+0.997 2014-11-04T22:52:23Z
+     [New Features]
+     - Added support for new target properties. In addition to the existing
+       `uri`, `client`, and `registry` properties, targets may also configure
+       these properties via the new `--set` option to and `set-*` actions on
+       the `target` command:
+       * `top_dir`
+       * `plan_file`
+       * `extension`
+       * `deploy_dir`
+       * `revert_dir`
+       * `verify_dir`
+     - Added support for new engine configuration variables. In addition to
+       the existing `target`, `client`, and `registry` variables, engine
+       configuration may also include these variables:
+       * `top_dir`
+       * `plan_file`
+       * `extension`
+       * `deploy_dir`
+       * `revert_dir`
+       * `verify_dir`
+     - Rationalized the hierarchical configuration of deployment targets. The
+       properties of any given target will now be determined by examining
+       values in the following order:
+       * Command-line options
+       * Target configuration
+       * Engine configuration
+       * Core configuration
+       * Reasonable engine-specific defaults
+     - Added the `engine` command to simplify engine configuration. This
+       complements the newly-improved `target` command. Run `sqitch engine
+       update-config` to update deprecated engine configurations and start
+       using it.
+     - Added the sqitch-configuration guide to provide an overview of core,
+       engine, and target configuration. Includes some use-case examples and
+       best suggested practices.
+     [Improvements]
+     - Simplified the output of `sqitch help`, and added the more important
+       options to it.
+     - Added the `--guide` option to `sqitch help` to list Sqitch guides.
+     - Renamed the `--db-client` option to `--client`. `--db-client` still
+       works, but is deprecated.
+     - Added the `--registry` core option for parity with `--client`,
+       `--top-dir`, `--plan-file`, and the rest of the hierarchical
+       configuration properties.
+     - Updated the `init` documentation to better cover all the options
+       processed.
+     - Incremented the version plan file format version to v1.0.0. No changes;
+       it has been stable for at least a year, so it's time.
+     [Bug Fixes]
+     - At runtime, the Vertica engine now properly requires DBD::ODBC
+       instead of DBD::Pg.
+     - The Vertica engine now supports Vertica 6, as documented.
+     - Fixed a warning from Type::Utils, thanks to a report from Géraud
+       CONTINSOUZAS.
+     - The `status` command once again notices if the specified database is
+       uninitialized and says as much, rather than dying with an SQL error.
+     - The `--etc-path` option works again.
+     [Deprecations]
+     - Deprecated `core.$engine` configuration in favor of `engine.$engine`. A
+       warning will be emitted if Sqitch sees the former. Run `sqitch engine
+       update-config` to update your configurations. Existing `core.$engine`
+       configurations will be left in place for compatibility with older
+       versions of Sqitch, but the `sqitch engine` command will not modify
+       them, so they can get out-of-sync. Run `sqitch config --remove-section
+       core.$engine` to remove them.
+     - Formally deprecated the database connection options in favor of target
+       URIs. If any of these options is used, a warning will be issued. They
+       will be dropped in v1.0:
+       * `--db-host`
+       * `--db-port`
+       * `--db-username`
+       * `--db-password`
+       * `--db-name`
+     - Formally deprecated the database connection configuration variables in
+       favor of target URIs. If any of these variables is used, a warning will
+       be issued. Run `sqitch engine update-config` to update your
+       configurations. Existing `core.$engine` configurations will be left in
+       place for compatibility with older versions of Sqitch, but the `sqitch
+       engine` command will not modify them, so they can get out-of-sync. Run
+       `sqitch config --remove-section core.$engine` to remove them. Sqitch
+       will cease to support them in v1.0:
+       * `core.$engine.host`
+       * `core.$engine.port`
+       * `core.$engine.username`
+       * `core.$engine.password`
+       * `core.$engine.db_name`
+     - Deprecated the `--registry` and `--client` options of the `target`
+       command. All target properties should now be set via the new `--set`
+       option, such as `--set registry=reg`.
+     - Formally deprecated the following options of the `add` command. They
+       have been replaced with the `--with`, `--without`, and `--use` options
+       since v0.991. Their use will emit a warning, and they will be removed
+       in v1.0:
+       * `--deploy-template`
+       * `--revert-template`
+       * `--verify-template`
+       * `--deploy`
+       * `--no-deploy`
+       * `--revert`
+       * `--no-revert`
+       * `--verify`
+       * `--no-verify`
+     - Dropped support for the long-deprecated (and likely never used outside
+       ancient tests long deleted) engine configuration variables
+       `core.sqlite.sqitch_db` and `core.pg.sqitch_schema`. Both have been
+       replaced with `engine.$engine.registry`, which applies to all engines.
+     - Formally deprecated the `@FIRST` and `@LAST` symbolic tags. Their use
+       will trigger a warning to use `@ROOT` and `@HEAD`, instead. They will
+       be removed in v1.0.
+     [Internals]
+     - Moved target and engine configuration from App::Sqitch and
+       App::Sqitch::Engine to a new class, App::Sqitch::Target. This class is
+       solely responsible for finding the appropriate values for attributes on
+       every run. The target knows what plan and engine to use, based on those
+       properties. App::Sqitch is now responsible solely for encapsulating
+       command-line options, configuration, and utilities. Classes are now
+       responsible for instantiating both an App::Sqitch and
+       App::Sqitch::Target options as appropriate.
+     - Updated all classes to create both Sqitch and Target objects as
+       appropriate. This change touched almost every class.
+     - Replaced attributes in App::Sqitch that were previously set from
+       command-line options or configuration with a single attribute,
+       `options`, which is a hash only of the command-line options. Classes
+       are now responsible for finding the proper values in config or options.
+       Mostly this requirement is encapsulated by the new App::Sqitch::Target
+       class.
+     - Updated the command classes to use either a "default target" derived
+       from command-line options, engine configuration, and core
+       configuration, or a target looked up by name in the configuration
+       maintained by the `target` command.
+
+0.996  2014-09-05T21:11:00Z
+     - Fixed one more test failure due to the introduction of "Negative repeat
+       count does nothing" warning in Perl 5.21.1.
+     - Fixed "Redundant argument in printf" warning on Perl 5.21.2.
+     - Switched from Digest::SHA1, which is deprecated, to Digest::SHA for
+       generating SHA-1 IDs.
+     - Switched from Mouse and Moose to Moo. Sqitch no longer depends on any
+       modules that use Moose, either. This results in an approximately 40%
+       startup time speedup.
+     - Loading of App::Sqitch::DateTime is now deferred until it's needed.
+       This is because DateTime is rather expensive to load. Since a number of
+       commands don't need it, it seems silly to load it in those cases.
+     - Now recommend Type::Tiny::XS and Class::XSAccessor for improved
+       performance.
+     - The `check` command now properly fails on a plan parse error, instead
+       of blindly continuing on.
+     - Fixed a failing test on PostgreSQL due to localization issues. Thanks
+       to Sven Schoberf for the report (Issue #171).
+     - Added the `revert.prompt_accept`, `rebase.prompt_accept`, and
+       `checkout.prompt_accept` boolean configuration variables. Set these
+       variables to false to change the default answer to the revert prompt to
+       "No". When rebasing or checking out, if the variables specific to those
+       commands are not set, Sqitch will fall back on the value of
+       `revert.prompt_accept`. Suggested by Graeme Lawton (Issue #164).
+     - The MySQL engine now sets the `$MYSQL_PWD` environment variable if a
+       password is provided in a target. This should simplify authentication
+       when running MySQL change scripts through the `mysql` client client
+       (Issue #150).
+     - The MySQL engine now reads `client` and `mysql` groups in the MySQL
+       configuration files for a password when connecting to the registry
+       database, and when the target URI includes no password. The MySQL
+       client already read those files, of course, but now the internal
+       database connection does as well (Issue #150).
+     - The Firebird engine now sets the `$ISC_PASSWORD` environment variable
+       if a password is provided in a target. This should simplify
+       authentication when running Firebird change scripts through the `isql`
+       client client. Patch from Ștefan Suciu.
+     - No longer passing URI query params as DBI params, because they are
+       already included in the DSN provided by URI::db.
+     - Added the Vertica engine.
+
+0.995  2014-07-13T22:24:53Z
+     - Fixed test failures due to the introduction of "Negative repeat count
+       does nothing" warning in Perl 5.21.1.
+     - Fixed more test failures when DBD::Firebird is installed but Firebird
+       isql cannot be found.
+     - Fixed registry file naming issues on Win32 for the SQLite engine, and
+       as well as the tests that failed because of it.
+     - Worked around Config::GitLike bug on Windows in the target test.
+     - Changed the exit value for an attempt to deploy to an up-to-date
+       database from 1 to 0. In other words, it no longer looks like an error
+       (Issue #147).
+
+0.994  2014-06-20T02:58:10Z
+     - Fixed installation failure due to missing IO::File module on Windows.
+     - Fixed file test failure for the Oracle engine on Windows.
+     - Fixed bug where namespace-autoclean: 0.16 caused errors such as
+       "Invalid object instance: 'yellow'".
+     - Fixed Oracle SQL*Plus capture test failure on Windows.
+
+0.993  2014-06-04T20:14:34Z
+     - Fixed engine loading to prefer the engine implied by the target URI
+       over the `core.engine` configuration variable. This means that you no
+       longer have to pass `--engine` when using commands that accept a target
+       option or argument, such as `deploy`.
+     - Fixed test failure when DBD::Firebird is installed but Firebird isql
+       cannot be found.
+     - Fixed issue where the revert command fails to execute the proper revert
+       script. This can occur when a change has been reworked in the plan, but
+       the reworked version of the change has not been deployed to the
+       database. Thanks to Timothy Procter for the report (Issue #166).
+     - Fixed issue with aggregating text values with `COLLECT()` on Oracle.
+       Thanks to Timothy Procter for the digging and invocation of an Oracle
+       support request (Issue #91).
+     - Fixed issue where SQL*Plus could not run rework scripts because of the
+       `@` in the file name. It now uses a symlink (or copied file on Windows)
+       to circumvent the problem. Thanks to Timothy Procter for the report
+       (Issue #165).
+     - Fix issue where, on first deploy, the MySQL engine would fail to notice
+       that the server was not the right version of MySQL. Thanks to Luke
+       Young for the report (Issue #158).
+     - Made the `checkit()` MySQL function DETERMINISTIC, to improve
+       compatability with MariaDB. Thanks to Jesse Luehrs for the report
+       (Issue #158).
+     - Fixed deployment to PostgreSQL 8.4 so that it no longer chokes on the
+       `:tableopts`. Thanks to Justin Hawkins for the report!
+
+0.992  2014-03-05T00:34:49Z
+     - Fixed target test failures on Windows.
+     - Added support for Postgres-XC to the PostgreSQL engine. Sqitch registry
+       tables are distributed by replication to all data nodes.
+     - Added support to MariaDB 5.3 and higher to the MySQL engine, thanks to
+       Ed Silva.
+
+0.991  2014-01-16T23:24:33Z
+     - Greatly simplified determining the Firebird ISQL client. It no longer
+       tries so hard to find a full path, but does seach through the path list
+       for a likely candidate between fbsql, isql-fb, and isql (or equivalents
+       ending in .exe on Windows).
+     - Removed a bunch of inappropriately pasted stuff from the Firebird
+       tutorial, and updated it a bit.
+     - `HEAD` and `ROOT` are now recognized as aliases for `@HEAD` and
+       `@ROOT`, when querying the database, too. That means that `revert --to
+       HEAD` now works the same as `revert --to @HEAD`, as had been expected
+       in v0.990.
+     - Eliminated "use of uninitialized value" warnings when database
+       connections fail.
+     - Reduced the minimum required DBD::Firebird to v1.11.
+     - Fixed the `--verbose` option to the `target` command.
+     - Eliminated more user-configuration issues in tests, thanks to
+       chromatic.
+     - Fixed test failures when the `$PGPASSWORD` environment variable is set,
+       thanks to Ioan Rogers's test smoker.
+
+0.990  2014-01-04T01:14:24Z
+     [New Features]
+     - Added new command and feature: `target`. Use it to manage multiple
+       database targets, each with an associated URI and, optionally, a
+       registry name and command-line client. Inspired by Git remotes.
+     - Added Firebird engine. Three cheers to Ștefan Suciu for this
+       contribution!
+     - Added support for the generation of arbitrary scripts from templates to
+       the `add` command. Just add template files to subdirectories of the
+       `templates` directory, and scripts will be created in a directory of
+       the same name based on those templates.
+     - Added `--open-editor` option (and aliases) to the `add` and `rework`
+       commands. This option will open the newly-added change scripts in the
+       preferred editor. Thanks to Thomas Sibley for the patch!
+
+     [Improvements]
+     - Improved database driver loading to ensure the proper version of the
+       driver is required.
+     - Non-fatal but possibly unexpected messages -- which correspond to exit
+       value 1 -- now send their messages to STDOUT instead of STDERR, and
+       respect the `--quiet` option. Thanks to @giorgio-v for the report!
+     - Added or replaced the `--target` option to commands that connect to a
+       database to specify the name of target managed by the new `target`
+       command or a database URI.
+     - `HEAD` and `ROOT` are now recognized as aliases for `@HEAD` and
+       `@ROOT`, respectively, since they are disallowed as change names,
+       anyway, and folks often use them out of habit from Git.
+
+     [Internals]
+     - Replaced the engine-specific connection attributes with three
+       attributes use by every engine:
+       * `target`: The name of a target managed by the new `target` command.
+         Defaults to a value stored for the `core.$engine.target`
+         configuration variable. If that variable does not exist, the target
+         falls back on the stringification of `uri`.
+       * `uri`: a database URI with the format `db:{engine}:{dbname}` or
+         `db:{engine}://{user}:{password}@{host}:{port}/{dbname}`. If its
+         value is not passed to the constructor, a `uri` value is looked up
+         for the associated `target`. If `target` is not passed or configured,
+         or if it has no URI associated with it, the `config.$engine.uri`
+         configuration variable is used. If that value does not exist, the URI
+         defaults to `db:$engine:`. In any of these cases, if any of the
+         `--db-*` options are passed, they will be merged into the URI.
+       * `registry`: the name to use for the Sqitch registry schema or
+         database, where Sqitch's own data will be stored, as appropriate to
+         each engine. If its value is not passed to the constructor, a
+         `registry` value is looked up for the associated `target`. If
+         `target` is not passed or configured, or if it has no registry
+         associated with it, the `config.$engine.registry` configuration
+         variable is used. If no value is found there, it defaults to an
+         engine-specific value, usually "sqitch".
+
+     [Bug Fixes]
+     - Fixed a bug when installing under local::lib. Thanks to Thomas Sibley
+       for the pull request!
+     - Eliminated "Wide character in print" warnings when piping the `log`
+       command.
+     - Documented that reworked changes do not have their verify tests run by
+       the `verify` command. They do run when using the `--verify` deploy
+       option.
+     - Removed the documentation for the `add.with_deploy`, `add.with_revert`,
+       and `add.with_verify` configuration variables, which were never
+       implemented.
+
+     [Deprecations]
+     - Deprecated engine-specific connection attributes and configuration
+       variables. See the "Internals" section for their replacements. The
+       deprecated options are:
+       * `core.$engine.username`
+       * `core.$engine.password`
+       * `core.$engine.db_name`
+       * `core.$engine.host`
+       * `core.$engine.port`
+       * `core.$engine.sqitch_schema`
+       * `core.$engine.sqitch_db`
+     - Deprecated all command-specific options with the string "target" in
+       them, such as `--to-target`, `--upto-target`, etc. They have been
+       replaced with options containing the string "change", instead, such as
+       `--to-change` and `--upto-change`. Few people used these options,
+       preferring their shorter aliases (`--to`, `--upto`, etc.).
+     - Deprecated the `--deploy-template`, `--revert-template`, and
+       `--verify-template` options to the `add` command. They are replaced
+       with a single option, `--use` which takes a key/value pair for the
+       script name and template path. This makes it useful for arbitrary
+       script generation, as well.
+     - Deprecated the `--deploy`, `--revert`, and `--verify` options to the
+       `add` command, as well as their `--no-*` variants. They are replaced
+       with two new options, `--with` and `--without`, to which a script name
+       is passed. These are useful for arbitrary script generation, as well.
+     - Deprecated the `add.deploy_template`, `add.revert_template`, and
+       `add.verify_template` configuration settings. They have been replaced
+       with a section, `add.templates`, which is more general, and supports
+       arbitrary script generation, as well.
+
+     [Incompatibilities]
+     - Removed the undocumented `--test` option to the `add` command.
+     - Changed the meaning of `--target` from specifying a change to
+       specifying a deployment target. Use the new `--change` option to
+       specify a change.
+
+0.983  2013-11-21T21:50:12Z
+     - Fixed "Use of uninitialized value" in the MySQL engine. Thanks to
+       Jean-Michel REY for the report.
+     - All tests now protect against failures due to the presence of the
+       `$SQITCH_CONFIG` environment variable (issue #114).
+     - The installer now respects the `distdir` option to `Build.PL` when
+       searching for existing templates. Important for packaging.
+     - Fixed the error "Table 'sqitch.changes' doesn't exist" when deploying
+       to a MySQL database that exists but has not been initialized. Thanks to
+       Jean-Michel REY for the report!
+     - Refactored the handling of the C<--log-only> option so it sets an
+       engine attribute, rather than passing the flag to a whole stack of
+       method calls.
+     - Fixed "Argument "en_us" isn't numeric" error on Windows.
+     - Now using `LC_ALL` instead of `LC_MESSAGES` when setting the locale, as
+       the latter is not present on Windows.
+     - The sqitch-pg RPM now requires DBD::Pg 2.0.0 or higher.
+     - Improved handling of invalid command names so that the error message is
+       less ambiguous when triggered by a Perl parse error.
+     - Added `-m` as an alias for `--note`, for you Git folks out there.
+     - Added exception handling to the Postgres and Oracle engines to avoid
+       unexpected errors when deploying to a database that has not been
+       deployed to before.
+     - Updated detection of an uninitialized database to double-check with the
+       engine that it really thinks it's uninitialized, not just that the
+       "changes" table is missing. This should catch the case where the
+       database has its own "changes" table unrelated to Sqitch.
+
+0.982  2013-09-11T18:26:07Z
+     - Errors thrown by Template toolkit are no longer silently ignored.
+     - Variables passed to change templates are now cloned before the
+       execution of each template. This prevents one template from deleting
+       variable values another template might also need.
+     - Fixed "The getpwnam function is unimplemented" errors on Win32.
+     - No longer runs revert scripts when deploying with `--log-only` and a
+       verify script fails, as that could lead to data loss (yikes!). Thanks
+       to BryLo for the report (issue #112).
+
+0.981  2013-09-06T00:22:26Z
+     - Now use Encode::Locale to try to decode the user's full name from the
+       system encoding when fetched from the system on all OSes. Note that
+       this is not necessary if the `user.name` config is explicitly set, as
+       recommended. Issue #107.
+     - Removed the special-case handling of the user's full name fetched from
+       the system on OS X.
+     - Added call to `sleep` to test in an attempt to fix SQLite failures.
+     - The SQLite engine now requires that the SQLite client be 3.3.9 or
+       later, for support of the `-bail` option.
+     - Bug fix: The MySQL engine now properly uses the host, port, and
+       password options when connecting to the database. Thanks to vreb87 for
+       the report!
+
+0.980  2013-08-28T21:40:00Z
+     - Changed the default SQLite Sqitch database name from
+       `$dbname-sqitch.$suffix` to `sqitch.$suffix`. The `$suffix` still
+       comes from the destination database name. This breaks compatibility
+       with previous releases. If you need the old name, set it with
+       `sqitch config core.sqlite.sqitch_db $dbname`.
+     - Fixed encoding of the user's full name when fetched from the system on
+       OS X. Thanks to Tomohiro Hosaka for the pull request!
+     - Fixed test failures when DBD::SQLite is installed but compiled with
+       SQLite 3.7.10 or lower.
+     - Fixed a bug where declaring a dependency on a reworked change would
+       incorrectly result in the error "Key "foo" matches multiple changes".
+       Thanks to BryLo for the report (issue #103).
+     - Modified tests to allow them to run in parallel without stomping on
+       each other.
+     - Bundling of options, such as `-vvv`, now works properly (issue #108).
+     - Added alias `--get-regexp` for `--get-regex` to the `config` command.
+       This brings it in line with the documentation for the `config` command
+       (Issue #110).
+     - Fixed all of the `config` command actions that contain a dash so that
+       they actually work. Thanks to Ștefan Suciu for the report (issue #110).
+     - All leading and trailing white space is now trimmed from plan notes,
+       rather than just vertical white space. Thanks to Ronan Dunklau for the
+       report (issue #106).
+     - The `status` command now notices if the specified database is
+       uninitialized and says as much, rather than dying with an SQL error
+       (issue #109).
+     - When reading the user's username from the system Sqitch now uses
+       Encode::Locale to try to decode the value from the system encoding.
+       Issue #107.
+     - Compatibility change: Changed the location and name of script template
+       files. Previously they were called `deploy.tmpl`, `revert.tmpl`, and
+       `verify.tmpl`, and they lived in the `templates` subdirectory of the
+       system-wide and user-specific configuration directories. They now live
+       in subdirectories of the `templates` directory named for each action
+       (deploy, revert, and verify), and with file names matching engine names
+       (`pg.tmpl`, `sqlite.tmpl`, `oracle.tmpl`, and `mysql.tmpl`). The
+       installer will move old files from the system-wide config directory
+       (`sqitch --etc-path`) to their new homes, named `pg.tmpl` and
+       `sqlite.tmpl`. It assumes no customizations exist for Oracle. If that's
+       not true in your case, simply copy the `pg.tmpl` files to
+       `oracle.tmpl`.
+     - Added the `--template-name` option to the `add` command. By default, it
+       looks for templates named for the current engine. The option allows for
+       the user of task-specific templates. For example, if you create
+       templates named `createtable.tmpl` in the `deploy`, `revert`, and
+       `verify` subdirectories of `~/.sqitch/templates`, You can specify
+       `--template-name createtable` to use those templates when adding a
+       change.
+     - Added the `--exists` option to the `show` command.
+     - Fixed the `--set` option to the `add` command so that duplicate keys
+       have their values passed to the template as an array, as documented.
+     - If Template::Toolkit is installed, the `add` command will use it for
+       processing templates instead of Template::Tiny. This makes it easy to
+       upgrade the templating environment just by installing a module.
+
+0.973  2013-07-03T13:47:22Z
+     - Now Require DBD::SQLite compiled with SQLite 3.7.11 or higher. It
+       always has, but now it throws a meaningful exception if an older
+       version is compiled into DBD::SQLite. Thanks to Damon Buckwalter for
+       the report.
+     - When a deploy fails because of missing dependencies, the list of
+       missing dependencies no longer contains duplicates. Thanks to Damon
+       Buckwalter for the report.
+
+0.972  2013-05-31T23:26:52Z
+     - Fixed test failures on Windows.
+     - Fixed locale configuration on Windows so that `sqitch` will actually
+       run, rather than exiting with an error about `LC_MESSAGES` not being
+       set.
+     - Fixed a test hang on Windows when DBD::Oracle is installed but the
+       Oracle libraries (`OCI.dll`) are not or cannot be found. This was
+       triggering a UI dialog that did not dismiss itself. Using Win32::API
+       to work around this issue. Thanks to Jan Dubois for the fix.
+
+0.971  2013-05-18T21:08:51Z
+     - Removed most uses of the smartmatch operator, since as of Perl 5.17.11
+       it is marked as experimental, and silenced the warning where it is
+       still used.
+     - Added 0.1s sleep between logging changes back-to-back in the engine
+       tests, mostly to try to get SQLite to generate different timestamps.
+       Pretty sure the recent test failures have been due to the passage of
+       less than a millisecond between the two inserts.
+     - Added the `shell` and `quote_shell` methods to Sqitch.pm for shelling
+       out a command.
+     - Sqitch now shells out to an editor when opening a file for the user to
+       edit. For example, if the `$EDITOR` environment variable is set to
+       `"emacs -nw"`, it will now work. Thanks to Florian Ragwitz for the
+       report (issue #80).
+     - Removed the pod-checking tests from the distribution.
+
+0.970 2013-05-09T00:21:06Z
+     - Fixed the default ordering of changes displayed by the `plan` command.
+       They are now ascending by default.
+     - Switched to PerlIO::utf8_strict for fast character encoding and
+       decoding.
+     - The help emitted when an unknown option is passed to `sqitch` now
+       consists of a usage statement and brief table of options, rather than
+       the entire man page.
+     - Added the project name in a header to the output of the `plan` command.
+     - Added the Oracle engine.
+     - Added `sqitchtutorial-oracle.pod`, a Oracle-specific variant of
+       `sqitchtutorial.pod`.
+     - Added missing version declaration to the App::Sqitch::Plan::* modules.
+     - Devel::StackTrace 1.30 is now properly required (it was previously
+       recommended).
+     - The `--show-tags` and `--show-changes` options to the `status` command
+       now show the changes when the project plan cannot be found (issue #90).
+
+0.965  2013-04-23T16:25:59Z
+     - Fixed failing test due to line-ending character variations on Windows.
+       Many thanks to Jan Dubois for the testing help.
+     - Replaced all uses of `$/` in output to `"\n"`. Thanks to Jan Dubois for
+       pointing out the incorrect use of `$/`.
+     - Fixed build error that prevented installation on Perl 5.10 when the
+       parent module was not installed.
+
+0.964  2013-04-15T18:47:30Z
+     - Fixed test failures on Perl versions lower than 5.14 when DBD::SQLite
+       or DBD::Pg is not installed.
+     - Removed DBD::SQLite from the list of build dependencies.
+     - Fixed test failures due to encoded (wide-character) warnings on
+       triggered on systems with non-english locales. Thanks to Alexandr
+       Ciornii for the smoke testing that revealed this issue.
+     - Removed overriding of Throwable's `previous_exception` in
+       App::Sqitch::X on Throwable 0.200007 and higher, where it is no longer
+       needed.
+     - Changed test comparing file contents that fails on Windows to do a
+       looser comparison and hopefully fix the test failure.
+
+0.963  2013-04-12T19:11:29Z
+     - Fixed a test failure when Git is in the execution path and the test is
+       not run from a Git checkout.
+     - Added `plan` to `sqitchchanges`, the contents of which are shown when
+       Sqitch is run with no command.
+     - Removed the unique constraint on tag names in the database, as it
+       prevented two projects from having the same tag name. Replaced it with
+       a unique constraint on the project and tag names. Folks with production
+       PostgreSQL installs should run these queries:
+           ALTER TABLE sqitch.tags DROP CONSTRAINT tags_tag_key, ADD UNIQUE(project, tag);
+           COMMENT ON COLUMN sqitch.tags.tag IS 'Project-unique tag name.';
+     - Fixed failing tests when DBD::SQLite is not installed.
+     - Removed dependency on Git::Wrapper. The `checkout` command does things
+       very simply, and we already have tools for running command-line
+       applications. So we just take advantage of that. The code is no more
+       complicated than it was before.
+     - Added the `core.vcs.client` configuration setting. Defaults to `git`
+       (or `git.exe` on Windows).
+
+0.962  2013-04-10T17:10:05Z
+     - Fixed failing test on Perl 5.12 and lower.
+     - Fixed the French translation by re-encoding it in UTF-8 (Ronan
+       Dunklau).
+     - Fixed the loading of the editor with placeholder text to properly
+       encode that text as UTF-8 (Ronan Dunklau).
+
+0.961  2013-04-09T19:21:15Z
+     - Fixed error when running on PostgreSQL 9.0.
+     - Added support for PostgreSQL 8.4.
+     - Fixed the SQLite tests to skip the live tests when `sqlite3` cannot be
+       found.
+     - Fixed the Postgres tests to skip the live tests if `psql` cannot be
+       found or cannot connect to the database.
+     - Fixed the `checkout` test to skip tests that depend on Git and Git is
+       not found in the path.
+     - Fixed test failures on Windows (hopefully).
+     - Made the order of commented configuration variables in the project
+       configuration file deterministic. It will now always be the same order
+       as specified by the engine class. This fixes test failures on Perl
+       5.17.
+     - Fixed encoding issue that caused test failures on Perl 5.17.
+     - Requiring Devel::StackTrace 1.30, as earlier versions can
+       intermittently suppress errors.
+     - Added hack to `App::Sqitch::X::hurl()` to work around a bug in
+       Throwable that prevents `previous_exception` from being set half the
+       time on v5.17.
+
+0.960  2013-04-05T23:04:35Z
+     - Removed `-CAS` from the shebang line on Perl 5.10.0. This is to
+       eliminate `Too late for "-CAS" option` errors. This means that UTF-8
+       semantics will be suboptimal on Perl 5.10.0. Consider upgrading to 5.12
+       or higher.
+     - Added the `checkout` command. Pass it the name of a VCS branch, and it
+       will compare the plans between that branch and the current branch,
+       revert to the last common change, check out the branch, and then
+       redeploy. This makes it easy to switch between working branches that
+       have different sets of commits. Git-only for now. Idea and code by
+       Ronan Dunklau.
+     - The `rebase` command no longer fails if the database is already
+       reverted, but just makes a note of it and goes on to the deploy.
+     - Added the `plan` command. It's like `log`, but shows a list of changes
+       in the plan, rather than events recorded in the database.
+     - Added `search_changes()` to Plan. Used by the `plan` command.
+     - Added the `--oneline` option to the `log` command.
+     - Allow tagging of an arbitrary change, not just the last change in the
+       plan, by passing a change specification (name, ID, or tag) as the
+       second argument to the `tag` command.
+     - Updated error messages to note that blank characters are not allowed in
+       project, change, or tag names.
+     - Factored most of the engine-specific code into
+       App::Sqitch::Role::DBIEngine. Future DBI-based engines should be able
+       to use this role to handle most of the work.
+     - Factored the live engine tests int `t/lib/DBIEngineTest`. Future
+       DBI-based engines can use this module to do all or most of the live
+       testing.
+     - Added the SQLite engine. The Sqitch metadata is stored in a separate
+       file from a database, by default in the same directory as the database
+       file.
+     - Added `sqitchtutorial-sqlite.pod`, a SQLite-specific variant of
+       `sqitchtutorial.pod`.
+
+0.953  2013-02-21T23:37:57Z
+     - Fixed test failure in `t/engine.t` triggered by a clock tick.
+     - Changed the verify template to end with `ROLLBACK` rather than
+       `COMMIT`. This it to encourage folks to make no lasting changes in
+       verify tests.
+     - Fixed exception triggered on an attempt to revert or rebase `--to` a
+       change that does not exist in the database.
+     - Added recommendation for Pod::Simple to the build process.
+     - Added the `--etcdir` build option to specify the directory in which
+       configuration and template files should be installed. Defaults to the
+       `etc/sqitch` subdirectory of the `--prefix`, `--install_base`, or
+       Perl's prefix.
+     - Added the `--installed_etcdir` build option. This is used to set
+       the location of the system etc directory. Defaults to the value of
+       `--etcdir`.
+     - When building with `--prefix` or `--install_base`, and without
+       `--etcdir`, the configuration files and tmeplates are now installed
+       into `etc/sqitch` in that directory, rather than just `etc`. This is to
+       enable packaging systems to move the directory to the proper location.
+
+0.952  2013-01-12T00:02:54Z
+     - Switched from Moose to Mouse whever possible. Speeds load and runtime
+       20-30%. Thanks to Michael Schwern for the pull request!
+
+0.951  2013-01-08T00:21:58Z
+     - Fixed double "@" displayed for tags in the output of `revert`.
+     - Fixed reversion of reworked changes to run the original revert script,
+       rather than the reworked script.
+     - Added `is_reworked` accessor to App::Sqitch::Plan::Change.
+     - Changed the behavior determining the file name to use for reworked
+       change scripts. It now looks for a deploy script using the name of any
+       tag between the reworked instances of a change and selects the first
+       one it finds that exists. This will allow Sqitch to find the proper
+       script name even if new tags have been added to the plan (issue #70).
+
+0.950  2013-01-03T23:09:42Z
+     - Fixed the "Name" header in `sqitch-rebase` so that it will actually
+       show up on the CPAN search sites.
+     - Fixed test failure triggered by the passage of time in `t/engine.t`.
+     - At the start of a `deploy`, if the most recently deployed change has
+       any unlogged tags (that is, tags added since the last `deploy`), they
+       will be logged before the `deploy` continues (issue #60).
+     - Added the `--no-log` option to `deploy`, `revert`, and `rebase`. This
+       causes the changes to be logged as deployed without actually running
+       the deploy scripts. Useful for an existing database that is being
+       converted to Sqitch, and you need to log changes as deployed because
+       they have been deployed by other means in the past.
+     - Now check that dependencies are required for all changes to be deployed
+       or reverted before deploying or reverting anything, rather than
+       checking dependencies for each change just before deploying or reverting
+       it. This allows a or revert deploy to fail sooner, with no database
+       changes, when dependencies are not met.
+     - The `deploy` command now checks that no changes its about to deploy are
+       already deployed.
+     - Added `--mode` to the `rebase` command.
+     - Added the `--verify` option to `deploy` and `rebase`. Specify this
+       option to run the verify script, if it exists, for each change after it
+       is deployed. If the verify script dies, the deploy will be considered a
+       failure and the requisite reversion (as specified for `--mode`) will
+       begin.
+     - Added the `verify` command, which verifies that a database is valid
+       relative to the plan and each deployed change's verification scripts.
+     - Changed the format of the list of changes output by `deploy` and
+       `revert` so that each now gets "ok" or "not ok" printed on success or
+       failure.
+     - Added short aliases for commonly-used core options:
+       * -f for --plan-file
+       * -v for --verbose
+       * -h for --db-host
+       * -p for --db-port
+
+0.940  2012-12-04T05:49:45Z
+     - Fixed tests that failed due to I18N issues, with thanks to Arnaud
+       (Arhuman) ASSAD!
+     - Localized messages are now properly encoded in UTF-8. Thanks to Ronan
+       Dunklau for the report (issue #46) and to Guido Flohr for details on
+       how to address the issue.
+     - The variables defined for the `add`, `deploy`, and `revert` commands
+       now have the case of there names preserved if Config::GitLike 1.10 or
+       later is installed. Thanks to Ronan Dunklau for the report (issue #48)
+       and to Alex Vandiver for the case-preserving update to Config::GitLike.
+     - Attempting to run `sqitch` with no command now outputs the list of
+       supported commands (`sqitchcommands`), rather than the list of core
+       options. Thanks to BryLo for the suggestion.
+     - Changed the plan parser so that it no longer changes the order of
+       changes based on the dependency graph. Unfortunately, this meant that
+       the order could change from one run to another, especially if new
+       changes were added since the last deploy. The planner now throws an
+       exception if the order in the plan is wrong, and suggests that the user
+       move changes in the plan file to get it to work properly.
+     - Fixed bug where the `core.plan_file` configuration variable was
+       ignored.
+     - Improved error handling when deploying and reverting a change. If the
+       change successfully deployed but the logging of the deployment to the
+       database failed, there was just a rollback message. Sqitch will now
+       emit the underlying error *and* run the revert script for the
+       just-deployed change.
+     - Modified the text hashed for change and tag IDs. Both now include the
+       note, if present, the ID of the preceding change, and the list of
+       dependencies. The result is that, when a change is modified or moved in
+       the plan, it gets a new ID ID. The upshot is that things *must* be in
+       order for a deploy to succeed. Existing deployments will automatically
+       have their IDs updated by the `deploy` command.
+     - Changed the `revert` command so that it *only* fetches information about
+       changes to be reverted from the database, rather than the plan.
+     - Deprecated the `@LAST` and `@FIRST` symbolic tags. With `revert` now
+       fetching change information from the database, there is no longer a
+       need to specify that changes be found in the database. It's possible
+       some other way to search database changes will be added in the future,
+       but if so, it will be less limiting than `@LAST` and `@FIRST`, because
+       it will likely allow searches by literal tags.
+     - Added the `rebase` command. This command combines a `revert` and a
+       `deploy` into a single command, which should allow for more natural
+       deployment testing during development. `sqitch rebase @HEAD^` should
+       become a common command for database developers.
+     - Duplicate values passed via `--requires` and `--conflicts` in the `add`
+       and `rework` actions are now ignored.
+     - The `add` command now throws an exception if `--template-directory` is
+       passed or specified in the configuration file, and the specified
+       directory does not exist or is not a directory. Thanks to Ronan Dunklau
+       for the report! (Issue #52).
+     - The `revert` command now prompts for confirmation before reverting
+       anything. The prompt can be skipped via the `-y` option or setting the
+       `revert.no_prompt` configuration variable. Works for rebase, too, which
+       reads `rebase.no_prompt` before `revert.no_prompt`.' (Issue #49.)
+     - Added the `show` command, which show information about changes or tags,
+       or the contents of change script files. (Issue #57.)
+     - Renamed the `test` scripts and planned command to `verify`.
+
+0.938 2012-10-12T19:16:57Z
+     - Added a primary key to the PostgreSQL `events` table, which should make
+       it easier to support replication.
+
+0.937 2012-10-09T21:54:36Z
+     - Fixed the `--to` option to `deploy` and `revert`, which was ignored
+       starting in v0.936.
+
+0.936 2012-10-09T19:11:5Z2
+     - Added `--set` option to the `deploy` and `revert` commands. Useful for
+       setting database client variables for use in scripts. Used by the
+       PostgreSQL engine.
+     - Merged the contents of `dist/sqitch-pg.spec` into a subpackage in
+       `sqitch.spec`. This allows both RPMs are created from a single build
+       process. Simplifies things quite a bit and improves the flexibility for
+       adding other engines in the future.
+     - Reduced required Perl version from 5.10.1 to 5.10.0.
+     - Fixed inconsistent handling of command options with dashes where some
+       were ignored.
+     - The bundle command now properly copies scripts for changes with slashes
+       in their names -- that is, where the scripts are in subdirectories.
+
+0.935 2012-10-02T19:21:05Z
+     - Updated `dist/sqitch-pg.spec` to require `postgresql` rather than
+       "postgresql91". The version doesn't matter so much.
+     - All known Windows issues and failures fixed, with many thanks to Randy
+       Stauner for repeatedly running tests and supplying patches:
+       - Fixed "'2' is not recognized as an internal or external command,
+         operable program or batch file" error on Windows.
+       - Fixed multiple errors detecting Windows. The OS name is "MSWin32",
+         not "Win32". The test failure thus addressed was the setting of the
+         DateTime locale.
+       - Fixed failing tests that were incorrectly comparing subprocess errors
+         messages on Windows
+       - Fixed bug in `bundle` where a file would be re-copied even if the
+         source and destination had the same timestamps, as they seem to do
+         during tests on Windows. Patch from Randy Stauner.
+       - Fixed failing test that failed to include `.exe` in a file name on
+         Windows. Patch from Randy Stauner.
+     - Added French translation, with thanks to Arnaud (Arhuman) ASSAD!
+
+0.934 2012-09-28T16:43:43Z
+     - Fixed typo in error handling that prevented an I/O error message from
+       being properly emitted.
+
+0.933 2012-09-27T18:04:53Z
+     - The `init` command no longer fails if `--top-dir` does not exist. It
+       creates it.
+     - Yet another attempt to fix "List form of pipe open not implemented" bug
+       on Windows.
+
+0.932 2012-09-26T21:32:48Z
+     - One more attempt to fix "List form of pipe open not implemented" bug on
+       Windows.
+
+0.931 2012-09-25T19:09:14Z
+     - Now properly require Text::LocaleDomain 1.20.
+     - Stubbed out French and German localization files. Translators wanted!
+     - Added LocaleTextDomain dzil support (no impact on distribution).
+     - Fix "List form of pipe open not implemented" bug on Windows by using
+       Win32::ShellQuote to quote commands.
+
+0.93  2012-08-31T22:29:41Z
+     - Added forward and reverse change references. Append ^ to a change
+       reference to mean the change before, or ~ to mean the change following.
+       Use ~~ and ^^ to select two changes forward and back, and ~n and ^n,
+       where n is an integer, to select that number of changes forward or
+       back. Idea stolen from Git, though the meanings of the characters are
+       different.
+     - Added the @FIRST and @LAST symbolic references to refer to the first
+       and last changes deployed to the database, respectively. These vary
+       from the existing @ROOT and @HEAD symbolic references, which refer to
+       the first and last changes listed in the plan.
+     - Updated the tutorial to use the new symbolic references and ^ and ~
+       qualifiers where appropriate.
+     - The messages output by the `deploy` and `revert` commands now show the
+       resolved name of the `--to` target, rather than the value passed to
+       `--to`. This is most useful when using a symbolic reference, so you
+       can see what you're actually deploying or reverting to.
+
+0.922 2012-08-30T17:41:59Z
+     - Loosened constraint to disallow only `/[~^/=%]/` before digits at the
+       end of name. This allows, for example, a tag to be named "v1.2-1".
+     - Added the `bundle` command to the documentation displayed by `sqitch
+       help`.
+     - Updated the mention of the `bundle` command in the main `sqitch`
+       documentation.
+
+0.921 2012-08-30T00:09:56Z
+     - Made Win32::Locale required only on Windows.
+     - Fixed some module minimum version requirements so that dependencies
+       will be properly listed in `Build.PL`.
+
+0.92  2012-08-28T23:14:37Z
+     - Added the `bundle` command.
+     - Attempts to deploy a project with a different name or URI than
+       previously registered now throws an exception.
+     - Added UNIQUE constraint to `projects.uri` in the PostgreSQL Sqitch
+       schema.
+     - Added ON UPDATE actions to foreign key constraints in the PostgreSQL
+       Sqitch schema.
+
+0.913  2012-08-28T17:31:29Z
+     - Fixed oversight in test that still relied on `$ENV{USER}` instead of
+       `Sqitch->sysuser`,
+
+0.912 2012-08-27T21:23:19Z
+     - Fall back on `Sqitch->sysuser` when looking for the PostgreSQL user,
+       rather than just `$ENV{USER}`. The method does a lot more work to find
+       the system user name. This will hopefully also fix test failures on
+       systems where `$ENV{USER}` is not set.
+     - Use Win32::Locale to set the locale on DateTime objects on Windows.
+
+0.911 2012-08-23T19:19:17Z
+     - Fixed more platform-specific test failures in `t/base.t`.
+     - Increased liklihood of finding a user's full name on Windows. Thanks to
+       H. Merijn Brand for testing.
+
+0.91  2012-08-23T00:37:36Z
+     - Moved `requires` and `conflicts` array columns from the `changes` table
+       to an new table, `dependencies`, where there is just one per row.
+     - Requirements are now checked before reverting a change. If the change
+       is depended on by other changes, it will not be reverted (Issue #36).
+     - Fixed bug where the `status` command would show changes and/or tags
+       from other projects when `--show-tags` or `--show-changes` were used.
+     - Fixed test failures on Windows.
+     - Added more ways to look up the current username to minimize the chances
+       that none is found.
+     - Added Windows-specific way of finding the current user's full name,
+       since the existing approach died on Windows.
+     - Windows-specific modules are no longer required, but are recommended on
+       Windows. They will be listed by `./Build` and added to the "recommends"
+       section of the the generated `MYMETA.*` files on Windows.
+     - Fixed a bug where dependencies on other projects would be rejected
+       in calls to `add` and `rework`.
+
+0.902 2012-08-20T21:14:08Z
+     - Fixed another occasional test failure due to a clock tick in `t/pg.t.`
+     - Fixed test failures in `t/status.t` on systems without DBD::Pg.
+
+0.901 2012-08-20T19:31:03Z
+     - Fix test failure in `t/status.t` caused by failing to ignore a
+       pre-existing `~/.sqitch/sqitch.conf` configuration file.
+     - Eliminated "Use of uninitialized value in length" warnings.
+
+0.90  2012-08-18T00:05:41Z
+     - Added `dist/sqitch.spec`. This file was created to generate an RPM for
+       CentOS 6.1.
+     - Added `dist/sqitch-pg.spec` to use for creating RPMs for Sqitch with
+       PostgreSQL support.
+     - Fixed an occasional test failure due to a clock tick in `t/pg.t.`
+     - Switched to Dist::Zilla for creating the distribution. For end-users,
+       this just means that `Build.PL` is now a generated file.
+     - Required module versions are now declared in code. This is so that they
+       are enforced at runtime, and also so that they will be picked up by
+       Dist::Zilla for inclusion in the generated `Build.PL` and `META` files.x
+     - Added support for declaring dependencies (required and conflicting
+       changes) from other Sqitch projects. This allows one project to depend
+       on changes from another. The syntax is `--requires $projname:$change`.
+       This use of the colon required a few changes to the Plan syntax:
+       + Pragmas may now appear only in the first "header" section of the
+         plan, separated from the changes in the "body" of the plan by a blank
+         line.
+       + Required dependencies no longer begin with ":". Conflicts still must
+         begin with "!".
+       + Object names may no longer contain ":", as it is used for project
+         specification.
+       + Project-qualified dependencies are supported by the project name
+         appearing before the change name, separated by a colon.
+     - Added App::Sqitch::Plan::Depend, an object to parse, represent, and
+       serialize dependencies.
+     - The plan parser does not validate changes required from other projects,
+       as it has no access to the plans from those projects.
+     - The engine interface validates cross-project dependencies before
+       deploying changes.
+     - Project data is not included in the Sqitch metadata tables in the
+       database. There is a table for all known projects, as well as foreign
+       key references in the `changes`, `tags`, and `events` tables.
+     - Project information is now displayed in the output of `sqitch status`
+       and `sqitch log` (in some formats).
+     - Added `--project` option to `sqitch status` to identify the project for
+       which to display the status. Defaults to the current project, if there
+       is one, or to the project in the database, if there is only one
+       registered project.
+     - Added `--project` option to `sqitch log` to allow searching for events
+       from projects matching a regular expression.
+     - Now require Config::GitLike 1.09 for its improved character encoding
+       support.
+     - Dependencies can now be declared as SHA1 hash IDs, including for IDs
+       from other projects.
+     - Fixed change and tag name validation to count "_" as a non-punctuation
+       character, and therefore able to be used at the beginning or end of
+       names.
+     - Replaced the `appuser` change in `sqitchtutorial` with `appschema`.
+       This simplifies things, since users are global objects in PostgreSQL,
+       while schemas are not. As a result, a bunch of irrelevant code was
+       removed from the tutorial.
+
+0.82  2012-08-03T21:25:27Z
+     - Now require Moose 2.0300, since MooseX::Role::Parameterized, which
+       requires Role::HasMessage, requires it, anyway,
+     - Fixed test failure in `t/pg.t` when running on Test::More 0.94.
+     - Require POSIX in `t/datetime.t` to fix test failure with CentOS 6
+       Perl. Not sure why it did not fail anywhere else, but it's harmless
+       enough to make sure it's loaded early.
+
+0.81  2012-08-03T11:34:46Z
+     - Removed wayward `/l` from a regular expression, which breaks Perls
+       earlier than 5.14, and is not needed anyway.
+     - Fixed error in `log` that caused invalid output on Perls earlier than
+       5.14. Seems that `return` is required for `when` statements meant to
+       return a value, and postfix `when` is not supported in Perl 5.10.
+
+0.80  2012-08-01T21:54:00Z
+     - Added the `log` command to `sqitchcommands.pod`, which is shown as the
+       output of `sqitch help`.
+     - Added  `user.name` and `user.email` configuration variables.
+     - Now using `user.name` and `user.email`, rather than the system or
+       database user name, to log the user committing changes to a database.
+     - Database-specific options are now prefixed with `--db-`.
+     - Added "raw" format to App::Sqitch::DateTime. It is ISO-8601 format in
+       UTC.
+     - Modified the "raw" log format to use the raw DateTime format.
+     - Added timestamp and planner info to the plan. This is additional
+       metadata included in every change and tag: The planner's name and email
+       address and the current timestamp. This makes it easier to audit who
+       added changes to a plan and when.
+     - Added the `--note` option to the `add`, `rework`, and `tag` commands.
+     - For consistency throughout, renamed all attributes and options from
+       "message" and "comment" to "note", which is shorter and better reflects
+       their purpose.
+     - The planner's name and email address, as well as the plan time and
+       note, are now stored in the database whenever changes or tags are
+       committed and logged.
+     - Renamed various database columns to be more consistent, with the terms
+       "commit", "plan", and "note".
+     - Added `requires` and `conflicts` columns to the events table, so that
+       they can become available to the `log` command.
+     - Various `log` format changes:
+       * Renamed %n (newline) to %v (vertical space)
+       * Renamed %c to %n (change name)
+       * Replaced %a (committer name) with %c (committer info). It takes an
+         optional argument:
+         + "name" or "n" for committer name
+         + "email" or "e" for committer email
+         + "d" or "date" for commit date
+         + "d:$format" or "date:$format" for formatted commit date
+       * Added %p (planner info). It takes an optional argument just like
+         "%c" does:
+         + "name" or "n" for planner name
+         + "email" or "e" for planner email
+         + "d" or "date" for plan date
+         + "d:$format" or "date:$format" for formatted plan date
+       * Added special argument to "%C", `:event", which returns a color based
+         on the value of the event type:
+         + Green for "deploy"
+         + Blue for "revert"
+         + Red for "fail"
+       * Added "%r" and "%R" for lists of required changes.
+       * Added "%x" and "%X" for lists of conflicting changes.
+       * Added "%a" to display an unlocalized attribute name and value.
+       * Added "planner", "committer", "planned", and "email" arguments to %_.
+       * Documented that the dates can take CLDR or strftime formats, too.
+       * Added the %s, %b, and %B format for "subject", "body", and raw body
+         akin to Git. The values are taken from the note value, if available.
+       * Added committer email addresses to default formats.
+       * Added plan data to default formats.
+       * Added note data to default formats.
+       * Added lists of required and conflicting changes to the "raw" and
+         "full" formats.
+       * Switched to event-driven colors for event types and change IDs in
+         default formats.
+       * Added color to the event type and change ID output in the "raw"
+         format.
+    - Added detailed descriptions of the default formats to `sqitch-log.pod`.
+    - Updated the Change object to encode and decode vertical whitespace in a
+      note, so that all data remains on a single line for each object in the
+      plan file.
+    - Now require a note when adding, reworking, or tagging a change. If
+      `--note` is not specified, an editor will be launched and the user
+      prompted to write a note. This is similar to how `git commit` behaves,
+      and encourages documentation of changes.
+    - Added required "project" and optional "uri" pragmas to the plan.
+    - Added `--project` and `--uri` attributes to the `init` command.
+    - Removed the `core.uri` configuration variable and corresponding core
+      `--uri` option (since it has been replaced with the `init` command's
+      `--uri` option.
+    - Command-line arguments are now all assumed to be UTF-8, and are parsed
+      as such.
+    - Added workaround to force the configuration file to be written and read
+      as UTF-8. Requires an unreleased version of Config::GitLike to actually
+      work properly.
+    - Text passed to a pager (as when running `sqitch log`) is now encoded in
+      UTF-8.
+    - Fixed `--quiet` option so that it properly trumps `--verbose`.
+
+0.71  2012-07-12T15:30:27Z
+     - Updated the example `sqitch log` output in `sqitchtutorial`.
+     - Changed the terms "actor", "agent" to "committer" throughout the API
+       and output.
+     - Renamed the `events` table columns from `logged_at` and `logged_by` to
+       `committed_at` and `committed_by`.
+
+0.70  2012-07-12T13:24:13Z
+     - Changed the `current_changes()` and `current_tags()` Engine methods so
+       that they return iterator code references instead of lists.
+     - Added the `search_events()` Engine method, to search the event log.
+     - Added the `pager` attribute and `page()` methods to App::Sqitch.
+     - Added support for `strftime:` and `cldr:` options to the `status`
+       command's `--date-format` option.
+     - Added the `log` command.
+     - Added the `strftime:$string` and `cldr:$string` options to
+       `--date-format` in the `status` and `log` commands.
+
+0.60  2012-07-07T11:12:26Z
+     - Removed some discussion of VCS integration, since it is not yet
+       implemented, and it may be a while before it is.
+     - Added `sqitchcommands`, documentation of the most common Sqitch
+       commands, and fixed `--help` to show it.
+     - Fixed `--man` to show the sqitch command documentation.
+     - Fixed error handling for unknown commands, so that it displays a
+       message saying the command is unknown, rather than a stack trace.
+     - Adding a change after a tag now also inserts a blank line into the plan
+       between the tag and the new change, for nicer plan file formatting.
+     - Added the `status` command.
+     - Added App::Sqitch::DateTime, a DateTime subclass with named formats.
+
+0.51  2012-07-04T18:34:07Z
+     - Added Role::HasMessage to the list or requirements in `Build.PL`. Was
+       an oversight that it was omitted in v0.50.
+     - Removed the `--dry-run` option. It was completely ignored. Maybe it
+       will return someday.
+     - Removed `fail()`, `bail()`, `unfound()`, and `help()`. It's better for
+       commands not to exit, so have them throw exceptions in the appropriate
+       places, instead.
+     - Replaced all uses of Carp and non-exception handling uses of `die` with
+       our own localized exceptions.
+     - Localized all output and exception messages.
+
+0.50  2012-07-03T19:55:20Z
+     - Require a plan file.
+     - Renamed "steps" to "changes".
+     - New plan file spec.
+       + Tags are just labels on a particular change, no longer a list of
+         changes.
+       + Dependencies now specified in the plan file, not in the deploy
+         script.
+       + Changes can be specified as deploys or reverts, though reverts
+         are not currently supported.
+       + Changes can be specified with an optional leading `+` for deploy or
+         `-` for revert, which will eventually be important for conflict
+         management.
+       + Dependencies can be specified as other change names, tags, or a
+         change as of a tag (e.g., `foo@beta`).
+       + Pragmas can be specified with a leading `%`. Only `%syntax-version`
+         is currently recognized; all others are ignored.
+     - Renamed the `add-step` command to just `add`.
+     - Added the `tag` command.
+     - Added the `revert` command.
+     - Added the `rework` command.
+     - Added exception objects and started using them.
+     - Added localization support and started using it.
+     - Added IDs to changes and tags. These are SHA1s generated from the return
+       value of the new `info` method, which describes the change or tag.
+     - Updated the PostgreSQL engine to comply with the new Engine API.
+     - Updated the PostgreSQL engine to use IDs for tracking changes and tags.
+     - Eliminated the term "node" from the plan implementation and docs.
+     - Updated the engine base class for the new plan API, and to just deploy
+       changes one-at-a-time.
+     - Added many new ways to look for changes in the plan, including:
+       + `change_name`
+       + `@tag_name`
+       + `change_name@tag_name`
+       + `change_id`
+       + `tag_id`
+     - The plan file can now be written out with nearly all white space and
+       comments preserved.
+     - Changed the `add` command to write out the plan file after a new change
+       is added.
+     - Change names can now be duplicated, as long as a tag name appears
+       between them.
+     - Renamed `target` to destination in Engine.
+     - Started referring to the change to deploy or revert to in docs as the
+       "target".
+     - PostgreSQL errors will now be thrown as Sqitch exceptions, for proper
+       handling during command execution.
+     - Added required `core.uri` configuration setting. Used to keep change
+       IDs unique across projects.
+     - Added `--mode` option to `deploy`, to trigger reverts on failure to
+       either:
+       + Not at all: keep the latest successful change.
+       + To the last deployed tag
+       + To the point at which the current deploy started
+     - Added the implicit tags `@ROOT` and `@HEAD` for looking up changes in
+       the plan.
+     - Renamed `sql_dir` to `top_dir` and made it default to the current
+       directory.
+     - Changed the location of the plan file to the top directory. This will
+       make it easier to have plans and scripts for multiple database
+       platforms in a single project.
+     - Fixed a bug in the build process so that template files will be
+       properly written to the `etc` directory.
+     - Rewrote `sqitchtutorial` to reflect the new realities.
+     - Updated `sqitch` documentation, and moved the plan file information to
+       App::Sqitch::Plan.
+
+0.31  2012-05-21T22:29:42Z
+     - Fixed some typos and failing tests.
+
+0.30  2012-05-18T15:43:12Z
+     - The `init` command now properly writes out the `[core]` section header
+       when there are only commented core settings.
+     - The `--requires` and `--conflicts` options to `add` now work
+       properly.
+     - Fixed anticipated Win32 test failures in `t/init.t`.'
+     - Fixed the `--plan-file`, `--top-dir`, and other directory options so
+       that they no longer throw errors, but actually work.
+     - Implemented the plan parser. It's designed to later be subclassed to
+       support VCS integration. Includes dependency parsing and sorting.
+     - Switched to IPC::System::Simple instead for system/capture code.
+     - Implemented Engine interface for deploying and reverting tags.
+     - Implemented PostgreSQL engine. It uses a lock to ensure that only one
+       deployment can run at any time.
+     - Added the `deploy` command. it is now possible to deploy to a
+       PostgreSQL database.
+
+0.20  2012-05-01T02:48:47Z
+     - Added `--local` option to `sqitch config`.
+     - Renamed `project_file()` to `--local_file()` in App::Sqitch::Config.
+     - `sqitch init` now writes core and engine config settings with default
+       values to the configuration file. This makes it easier for folks to get
+       started editing it.
+     - Implemented `add` command. Includes support for system-wide or
+       use-specific templates using Template::Tiny.
+     - Added `etc` directory with default templates. This is installed into
+       `$Config{prefix}/etc/skitch`, unless built with `--prefix` or
+       `--install_base`, in which case it will simply be installed into `etc`
+       in that directory.
+     - Added `--etc-path`, so that one can know where the system-wide
+       configuration and templates are to be found.
+
+0.11  2012-04-27T06:44:54Z
+     - Implemented `init` command.
+     - Started sketching out the engine interface, with preliminary PostgreSQL
+       and SQLite implementations.
+     - Require Perl v5.10.1 (did before, but in the wrong place, so it was
+       ignored).
+     - Fixed test failures on different verions of Moose.
+     - Fixed test failure on Perl 5.12.
+
+0.10  2012-04-25T20:46:59Z
+      - Initial unstable release.
+      - Implemented `help` command.
+      - Implemented `config` command, very similar to `git-config`.

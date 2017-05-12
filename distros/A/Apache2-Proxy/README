@@ -1,0 +1,15 @@
+NAME
+    Apache2::Proxy - a mod_perl based http proxy base class
+
+SYNOPSIS
+    A mod_perl based HTTP proxy base class
+
+COPYRIGHT
+    Copyright 2012 Red Hot Penguin Consulting LLC
+
+LICENSE
+    This software is licensed under the same terms as Perl itself.
+
+SEE ALSO
+    mod_perl
+

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Acme-MorseComments.t
+lib/Acme/MorseComments.pm

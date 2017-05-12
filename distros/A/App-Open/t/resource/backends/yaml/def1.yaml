@@ -1,0 +1,4 @@
+---
+"gz": "gunzip %s"
+"http:": echo
+"http": not_a_url

@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <link href="/test.css" rel="stylesheet" type="text/css" media="screen" />
+  <link href="/images/GvaScript.css" rel="stylesheet" type="text/css" media="screen"/><html>
+  <script src="../../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+
+  <title>GvaScript Grid</title>
+</head>
+
+  <body>
+      <h1>Paginated Grid</h1>
+
+      <p>
+      This grid example is bound to a complete list of countries
+      served by the perl HTTP service at http://localhost:8085/g/country/ that responds 
+      by an object: <tt>{liste: [{value: ..., code: ...}, ... ], total: xxx}</tt>
+      </p>
+      
+      <br/> 
+      <form onsubmit="setup($F('countries_prefix')); return false;">
+        <input type="text" id="countries_prefix" />
+        <input type="submit" value="Go!" />
+      </form>
+      <br/>
+      
+      <div id="wrapper" style="height:500px">
+        <div id="grid_container" tabIndex="0"></div>
+        <div id="toolbar_container" style="height:28px"></div>
+      </div>
+
+  </body> 
+
+  <script type="text/javascript">
+    var url = "http://localhost:8085/g/country/";
+   
+    function setup(prefix) {
+      prefix = prefix || '';  
+      new GvaScript.Grid("my_grid", url+prefix, {
+          grid_container: 'grid_container',
+          toolbar_container: 'toolbar_container',
+          columns: [
+              {label: 'Country',      value: function(e) {return '['+e.code+']'}},
+              {label: 'Country Code', value: 'value'}
+          ],
+          actions: [
+            {label:'Action', condition: function() {return true;}, callback: function() {alert('grid action fired');}},
+            {label:'Erase Grid', callback: function() {
+                GvaScript.Grids.get('my_grid').clear('starting from scratch');
+              }
+            },
+            {label:'CONDITION FALSE', condition: false}
+          ],
+          onEmpty: function() { this.clearResult('huh no word!'); },        
+          onPing: function(target) { alert('Ping\n'+$H(target).inspect()); }, 
+          onCancel: function() {alert('ESC has been pressed')}
+      });
+   }
+   setup();
+  </script>
+
+</html>

@@ -1,0 +1,128 @@
+diff --git a/configure b/configure
+index b92239d..48537ca 100755
+--- a/configure
++++ b/configure
+@@ -18655,6 +18655,96 @@ _ACEOF
+ 
+ fi
+ 
++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for regcomp in -lregex" >&5
++$as_echo_n "checking for regcomp in -lregex... " >&6; }
++if ${ac_cv_lib_regex_regcomp+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++  ac_check_lib_save_LIBS=$LIBS
++LIBS="-lregex  $LIBS"
++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++
++/* Override any GCC internal prototype to avoid an error.
++   Use char because int might match the return type of a GCC
++   builtin and then its argument prototype would still apply.  */
++#ifdef __cplusplus
++extern "C"
++#endif
++char regcomp ();
++int
++main ()
++{
++return regcomp ();
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_link "$LINENO"; then :
++  ac_cv_lib_regex_regcomp=yes
++else
++  ac_cv_lib_regex_regcomp=no
++fi
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
++LIBS=$ac_check_lib_save_LIBS
++fi
++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_regex_regcomp" >&5
++$as_echo "$ac_cv_lib_regex_regcomp" >&6; }
++if test "x$ac_cv_lib_regex_regcomp" = xyes; then :
++  cat >>confdefs.h <<_ACEOF
++#define HAVE_LIBREGEX 1
++_ACEOF
++
++  LIBS="-lregex $LIBS"
++
++fi
++
++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for puts in -lwsock32" >&5
++$as_echo_n "checking for puts in -lwsock32... " >&6; }
++if ${ac_cv_lib_wsock32_puts+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++  ac_check_lib_save_LIBS=$LIBS
++LIBS="-lwsock32  $LIBS"
++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++
++/* Override any GCC internal prototype to avoid an error.
++   Use char because int might match the return type of a GCC
++   builtin and then its argument prototype would still apply.  */
++#ifdef __cplusplus
++extern "C"
++#endif
++char puts ();
++int
++main ()
++{
++return puts ();
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_link "$LINENO"; then :
++  ac_cv_lib_wsock32_puts=yes
++else
++  ac_cv_lib_wsock32_puts=no
++fi
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
++LIBS=$ac_check_lib_save_LIBS
++fi
++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_wsock32_puts" >&5
++$as_echo "$ac_cv_lib_wsock32_puts" >&6; }
++if test "x$ac_cv_lib_wsock32_puts" = xyes; then :
++  cat >>confdefs.h <<_ACEOF
++#define HAVE_LIBWSOCK32 1
++_ACEOF
++
++  LIBS="-lwsock32 $LIBS"
++
++fi
++
+ 
+ # Checks for typedefs, structures, and compiler characteristics.
+ 
+diff --git a/configure.ac b/configure.ac
+index 871082f..069aed3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -95,6 +95,8 @@ AC_DEFINE([HAVE_LIBPTHREAD], 0, [pthread library] )
+ AC_CHECK_HEADERS([pthread.h])
+ 
+ AC_CHECK_LIB(m, log10)
++AC_CHECK_LIB(regex, regcomp)
++AC_CHECK_LIB(wsock32, puts)
+ 
+ # Checks for typedefs, structures, and compiler characteristics.
+ 
+diff --git a/tables.c b/tables.c
+index f3f056f..50f4378 100644
+--- a/tables.c
++++ b/tables.c
+@@ -33,6 +33,9 @@
+  */
+ 
+ 
++#ifdef _WIN32
++#include <winsock2.h>
++#endif
+ #include "flexdef.h"
+ #include "tables.h"
+ 

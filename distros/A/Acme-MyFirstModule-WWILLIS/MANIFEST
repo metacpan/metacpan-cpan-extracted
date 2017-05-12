@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Acme/MyFirstModule/WWILLIS.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.json

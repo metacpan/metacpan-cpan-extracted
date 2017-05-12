@@ -1,0 +1,25 @@
+mod_reCaptcha version 0.1
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Documentation is in POD
+
+DEPENDENCIES
+
+Catpcha::reCAPTCHA
+LWP::UserAgent
+HTML::Tiny
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Aaron Collins
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

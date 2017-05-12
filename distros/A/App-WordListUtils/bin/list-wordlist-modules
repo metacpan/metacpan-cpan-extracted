@@ -1,0 +1,78 @@
+#!perl
+
+our $DATE = '2016-06-09'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+#use 5.010001;
+use strict;
+use warnings;
+
+use PERLANCAR::Module::List;
+
+my @not_wl_modules = (
+    'WordList::MetaSyntactic', # only a base class
+);
+
+my $res = PERLANCAR::Module::List::list_modules(
+    'WordList::', {list_modules=>1, recurse=>1});
+for my $mod (sort keys %$res) {
+    # exclude some known false-positives
+    next if grep { $mod eq $_ } @not_wl_modules;
+    print "$mod\n";
+}
+
+# ABSTRACT: List all installed WordList modules
+# PODNAME: list-wordlist-modules
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-wordlist-modules - List all installed WordList modules
+
+=head1 VERSION
+
+This document describes version 0.001 of list-wordlist-modules (from Perl distribution App-WordListUtils), released on 2016-06-09.
+
+=head1 SYNOPSIS
+
+ % list-wordlist-modules
+
+=head1 DESCRIPTION
+
+This is a simple script to list all installed WordList modules.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-WordListUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-WordListUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-WordListUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

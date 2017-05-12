@@ -1,0 +1,29 @@
+Revision history for AE-AdHoc
+
+0.08	Sat Oct 27 2012
+        * API: Add ae_action { CODE } for delayed execution.
+		* API: Add timeout and soft_timeout options to ae_recv.
+
+0.07    Sun Sep 16 2012
+        * API: Add magic variables for error handling
+        * FIX: Fix ae_goal, add verbose error messages for leftover callbacks
+
+0.05    Sun Sep 09 2012
+        * API: Add multiple goal interface (ae_goal)
+
+0.04    Sun Sep 09 2012
+        * API: Add arglist support to callbacks: ae_recv { ae_send->(1..5) };
+        * API: Add extra arguments to callback: ae_recv { ae_send(1..5) };
+        * Example added (port-probe.pl)
+
+0.03    Thu Sep 06 2012
+        * API: Make empty/zero $timeout illegal.
+
+0.0203  Tue Aug 14 2012
+        * Fixed empty $timeout undef warning.
+        * Minor code cleanup.
+
+0.02    Sat Aug 11 2012
+        First version, released on an unsuspecting world.
+        - ae_recv, ae_send and ae_croak wotk and pass most basic tests
+

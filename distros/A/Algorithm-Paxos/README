@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Algorithm-Paxos,
+version 0.001:
+
+  An implementation of the Paxos protocol
+
+This software is copyright (c) 2012 by Chris Prather.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

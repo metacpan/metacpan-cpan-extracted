@@ -1,0 +1,5 @@
+PerlSetEnv PERL5LIB @ServerRoot@/../lib
+<Location /count>
+    SetHandler perl-script
+    PerlHandler Acme::PETEK::Testkit::modperl1
+</Location>

@@ -1,0 +1,65 @@
+{
+   "abstract" : "Represent Universal Tracking Data Format (UTDF) data",
+   "author" : [
+      "Tom Wyant (wyant at cpan dot org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Astro-UTDF",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "IO::File" : "0",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "Time::Local" : "0",
+            "perl" : "5.006002",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Astro::UTDF" : {
+         "file" : "lib/Astro/UTDF.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-UTDF"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/trwyant/perl-Astro-UTDF.git",
+         "web" : "https://github.com/trwyant/perl-Astro-UTDF"
+      }
+   },
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

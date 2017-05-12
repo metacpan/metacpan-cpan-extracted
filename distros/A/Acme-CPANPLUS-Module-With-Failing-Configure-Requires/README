@@ -1,0 +1,28 @@
+NAME
+    Acme::CPANPLUS::Module::With::Failing::Configure::Requires - Fake module
+    with a configure prereq that fails for testing CPANPLUS
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+     # erm
+
+     cpanp -i Acme::CPANPLUS::Module::With::Failing::Configure::Requires
+
+DESCRIPTION
+    Acme::CPANPLUS::Module::With::Failing::Configure::Requires is a fake
+    module that has a configure requires module that fails so I can test
+    something in CPANPLUS and CPANPLUS::YACSmoke
+
+    No moving parts and nothing to see.
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

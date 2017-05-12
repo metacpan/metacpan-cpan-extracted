@@ -1,0 +1,41 @@
+---
+abstract: 'Extensible Static Site Generator.'
+author:
+  - 'Steve Kemp <steve@steve.org.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Templer
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Getopt::Long: '0'
+  HTML::Template: '0'
+  Image::Size: '0'
+  Module::Pluggable: '0'
+  Redis: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::NoTabs: '0'
+  Test::Pod: '0'
+  Test::Strict: '0'
+  Text::Markdown: '0'
+  Text::Template: '0'
+  Text::Textile: '0'
+  perl: '5.008'
+resources:
+  GitMirror: http://git.steve.org.uk/skx/templer
+  bugtracker: https://github.com/skx/templer/issues
+  homepage: https://github.com/skx/templer/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/skx/templer.git
+version: '1.2'

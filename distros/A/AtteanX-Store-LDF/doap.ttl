@@ -1,0 +1,170 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://kasei.us/about/foaf.xrdf#greg>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:gwilliams@cpan.org>;
+	foaf:name            "Gregory Todd Williams";
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/gwilliams>.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/hochsten>, <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	dc:identifier        "AtteanX::Store::LDF"^^doap-deps:CpanId;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "Attean 0.010"^^doap-deps:CpanId ], [ doap-deps:on "Types::URI"^^doap-deps:CpanId ], [ doap-deps:on "RDF::LDF"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.014"^^doap-deps:CpanId ], [ doap-deps:on "Carp"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Log::Any"^^doap-deps:CpanId ], [ doap-deps:on "Data::Dumper"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ];
+	doap-deps:runtime-suggestion [
+		doap-deps:on "RDF::LinkedData 0.74"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "HTTP::Message::PSGI"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Test::LWP::UserAgent 0.027"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.88"^^doap-deps:CpanId ], [ doap-deps:on "Test::Exception"^^doap-deps:CpanId ], [ doap-deps:on "Test::Roo"^^doap-deps:CpanId ], [
+		doap-deps:on "RDF::LinkedData 0.74"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "RDF::Generator::Void"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Test::LWP::UserAgent 0.027"^^doap-deps:CpanId;
+	];
+	doap:bug-database    <https://github.com/phochste/AtteanX-Store-LDF/issues>;
+	doap:category        <http://dbpedia.org/resource/Category:Semantic_Web>, <http://dbpedia.org/resource/Category:Triplestores>;
+	doap:created         "2015-07-03"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/hochsten>, <http://www.kjetil.kjernsmo.net/foaf#me>;
+	doap:download-page   <https://metacpan.org/release/AtteanX-Store-LDF>;
+	doap:helper          <http://kasei.us/about/foaf.xrdf#greg>;
+	doap:homepage        <https://metacpan.org/release/AtteanX-Store-LDF>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/hochsten>, <http://www.kjetil.kjernsmo.net/foaf#me>;
+	doap:name            "AtteanX-Store-LDF";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-001>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-002>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-003>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-006>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-01>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-02>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-04>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/phochste/AtteanX-Store-LDF>;
+		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/phochste/AtteanX-Store-LDF.git&serialization=PROV-O#>;
+	];
+	doap:shortdesc       "Attean Linked Data Fragments store".
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "AtteanX-Store-LDF-0.001"^^xsd:string;
+	dc:issued            "2015-07-03"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/hochsten>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/H/HO/HOCHSTEN/AtteanX-Store-LDF-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-002>
+	a                    doap:Version;
+	rdfs:label           "Setting minimum requirements for RDF::LinkedData test";
+	dc:identifier        "AtteanX-Store-LDF-0.002"^^xsd:string;
+	dc:issued            "2015-07-06"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/hochsten>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/H/HO/HOCHSTEN/AtteanX-Store-LDF-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-003>
+	a                    doap:Version;
+	rdfs:label           "changing count_triples into more accurate count_triples_estimate";
+	dc:identifier        "AtteanX-Store-LDF-0.003"^^xsd:string;
+	dc:issued            "2015-08-17"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/hochsten>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/H/HO/HOCHSTEN/AtteanX-Store-LDF-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-006>
+	a                    doap:Version;
+	rdfs:label           "LDF query planning";
+	dc:identifier        "AtteanX-Store-LDF-0.006"^^xsd:string;
+	dc:issued            "2016-02-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix bugs so that variables can be passed to selecting methods.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Lots of changes related to integrating LDF into query planning.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "endpoint_url attribute has been deprecated in favour of a start_url attribute.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-003>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Store-LDF-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-01>
+	a                    doap:Version;
+	rdfs:label           "Dist::Inkt packaging";
+	dc:identifier        "AtteanX-Store-LDF-0.01"^^xsd:string;
+	dc:issued            "2016-02-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Use Dist::Inkt packaging.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-006>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Store-LDF-0.01.tar.gz>;
+	doap:revision        "0.01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-02>
+	a                    doap:Version;
+	rdfs:label           "API change for plan";
+	dc:identifier        "AtteanX-Store-LDF-0.02"^^xsd:string;
+	dc:issued            "2016-03-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Rename AtteanX::Store::LDF::Plan::Triple to AtteanX::Plan::LDF::Triple.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-01>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Store-LDF-0.02.tar.gz>;
+	doap:revision        "0.02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-04>
+	a                    doap:Version;
+	rdfs:label           "Quality improvements";
+	dc:identifier        "AtteanX-Store-LDF-0.04"^^xsd:string;
+	dc:issued            "2016-05-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Use the CostPlanner API correctly.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Change hashbang to use env.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/AtteanX-Store-LDF/v_0-02>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Store-LDF-0.04.tar.gz>;
+	doap:revision        "0.04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/hochsten>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:patrick.hochstenbach@ugent.be>;
+	foaf:name            "Patrick Hochstenbach";
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fphochste%2FAtteanX-Store-LDF.git&serialization=PROV-O#user-Patrick-Hochstenbach>.
+
+<http://www.kjetil.kjernsmo.net/foaf#me>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fphochste%2FAtteanX-Store-LDF.git&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://purl.org/NET/cpan-uri/person/kjetilk>.
+

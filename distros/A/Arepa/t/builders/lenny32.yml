@@ -1,0 +1,5 @@
+type: sbuild
+architecture: i386
+distribution: lenny-opera
+distribution_aliases: [lenny]
+bin_nmu_for: [unstable]

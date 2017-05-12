@@ -1,0 +1,7 @@
+#!/bin/sh
+# Switchs back xterm title
+oldtitle=`xwininfo -id $WINDOWID | grep xwininfo | awk '{print $5}'`
+mpg123 --title $*
+/bin/echo "\033]0;" $oldtitle "\007"
+
+

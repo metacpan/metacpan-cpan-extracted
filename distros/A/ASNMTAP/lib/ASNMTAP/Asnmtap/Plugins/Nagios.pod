@@ -1,0 +1,306 @@
+=head1 NAME
+
+ASNMTAP::Asnmtap::Plugins::Nagios provides a nice object oriented interface for building Nagios (http://www.nagios.org) compatible plugins.
+
+ASNMTAP::Asnmtap::Plugins::Nagios Subclass of ASNMTAP::Asnmtap::Plugins
+
+=head1 SYNOPSIS
+
+use ASNMTAP::Asnmtap::Plugins::Nagios;
+
+my $objectNagios = ASNMTAP::Asnmtap::Plugins::Nagios->new ();
+
+=head1 Description
+
+This module that provides a nice object oriented interface for building Nagios (http://www.nagios.org) compatible plugins.
+
+=head1 EXAMPLE
+
+use ASNMTAP::Asnmtap::Plugins::Nagios v3.002.003;
+
+use ASNMTAP::Asnmtap::Plugins::Nagios;
+
+my $objectNagios = ASNMTAP::Asnmtap::Plugins::Nagios->new ();
+
+$objectNagios->dumpData ();
+
+$objectNagios->exit (7);
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item _programGetOptions:
+
+ -o, --ostype=<ostype>
+   AIX
+   Cygwin
+   FreeBSD
+   Linux
+   HP-UX
+   Irix
+   MacOS
+   MiNT
+   NetBSD
+   NetWare
+   OpenBSD
+   OS2
+   SCO
+   Solaris
+   Stratus
+   Unix
+   VMS
+   Win32
+
+ -m, --metric=<k|M|G>
+   where k=kB (default), M=MB or G=GB
+
+=item _getOptionsArgs
+
+scalar, the program command line entered options returned values (the equivalent of the assignment)
+
+=item _getOptionsValues
+
+=over 4
+
+=item ostype
+
+equals ostype
+
+=item metric
+
+equals kB for k, MB for M and GB for G
+
+=back
+
+=item _pluginValues
+
+there are no specific plugin values defined for ASNMTAP::Asnmtap::Plugins::Nagios!
+
+=back
+
+=head1 Public functions
+
+=over 4
+
+=item convert_to_KB()
+
+convert scalar value to KB
+
+=item convert_from_KB_to_metric()
+
+convert scalar value in KB to given metric where equals kB for k, MB for M and GB for G
+
+=back
+
+=head1 INHERITS from ASNMTAP::Asnmtap
+
+=head2 Attributes
+
+_programName
+_programDescription
+_programVersion
+_programUsagePrefix
+_programHelpPrefix
+_programGetOptions
+_debug
+
+=head2 Object accessor methods
+
+programName()
+programDescription()
+programVersion()
+
+getOptionsArgv()
+getOptionsValue()
+
+debug()
+
+=head2 Class accessor methods
+
+=over 4
+
+=item dumpData()
+
+=back
+
+=head2 Utility methods
+
+printRevision()
+printUsage()
+printHelp()
+
+get_timeslot()
+
+get_yyyymmddhhmmsswday()
+
+get_datetimeSignal()
+get_datetime()
+
+get_logfiledate()
+get_csvfiledate()
+get_csvfiletime()
+
+get_epoch()
+get_week()
+get_wday()
+get_hour()
+get_min()
+get_seconds()
+get_day()
+get_month()
+get_year()
+get_yearMonthDay()
+
+=head1 INHERITS from ASNMTAP::Asnmtap::Plugins
+
+=head2 Attributes
+
+_timeout
+_SSLversion
+_browseragent
+
+=head2 Object accessor methods
+
+appendPerformanceData()
+browseragent()
+SSLversion()
+clientCertificate()
+pluginValue()
+proxy()
+timeout()
+
+=head2 Class accessor methods
+
+setEndTime_and_getResponsTime()
+
+=head2 Utility methods
+
+call_system()
+
+=over 4
+
+=item exit()
+
+=back
+
+=head1 METHODS
+
+=head2 Object accessor methods
+
+=head2 Class accessor methods
+
+=head2 Utility methods
+
+=head1 EXPORT
+
+=head2 TAGS
+
+=over 4
+
+=item *
+
+ALL
+
+  $APPLICATION $BUSINESS $DEPARTMENT $COPYRIGHT $SENDEMAILTO
+  $CAPTUREOUTPUT
+  $PREFIXPATH $PLUGINPATH $LOGPATH $PIDPATH $PERL5LIB $MANPATH $LD_LIBRARY_PATH
+  %ERRORS %STATE %TYPE
+  $CHATCOMMAND $DIFFCOMMAND $KILLALLCOMMAND $PERLCOMMAND $PPPDCOMMAND $ROUTECOMMAND $RSYNCCOMMAND $SCPCOMMAND $SSHCOMMAND
+  &convert_to_KB &convert_from_KB_to_metric
+
+=item *
+
+NAGIOS
+
+  $APPLICATION $BUSINESS $DEPARTMENT $COPYRIGHT $SENDEMAILTO
+  $CAPTUREOUTPUT
+  $PREFIXPATH $PLUGINPATH $LOGPATH $PIDPATH $PERL5LIB $MANPATH $LD_LIBRARY_PATH
+  %ERRORS %STATE %TYPE
+  &convert_to_KB &convert_from_KB_to_metric
+
+=item *
+
+COMMANDS
+
+  $CHATCOMMAND $DIFFCOMMAND $KILLALLCOMMAND $PERLCOMMAND $PPPDCOMMAND $ROUTECOMMAND $RSYNCCOMMAND $SCPCOMMAND $SSHCOMMAND
+
+=back
+
+=head1 AUTHOR
+
+Alex Peeters [alex.peeters@citap.be]
+
+=head1 SEE ALSO
+
+ASNMTAP::Asnmtap, ASNMTAP::Asnmtap::Plugins
+
+  check_fs-stat.pl
+  check_iowait.pl
+  check_memory-free.pl
+  check_memory-top.pl
+  check_nagios-comments-cleanup.pl
+  check_nagiosv3-comments-cleanup.pl
+  check_network_interface_status.pl
+  check_network_interface_traffic.pl
+  check_pargs.pl
+  check_snmptt_traps.pl
+  check_snmptt_traps.plN
+  check_swap.pl
+  check_swap-allocated.pl
+  snmptt_traps_remove_pending_and_duplicated.pl
+
+  check_template-ftp.pl
+  check_template-ldap.pl
+  check_template-nagios.pl
+	check_template-sftp.pl
+  check_xml-monitoring.pl
+  check_xml-monitoring-1.2.pl
+  check_xml.pl
+
+=head1 DEPENDENCIES
+
+  ASNMTAP::Asnmtap::Plugins
+  Time::Local
+
+  check_template-ldap.pl
+  Net::LDAP
+
+    Dependencies Net::LDAP:
+    Convert::ASN1   - required
+    URI::ldap       - optional, needed for URL parsing
+    Digest::MD5     - optional, needed for SASL CRAM-MD5 auth
+    Net::SSLeay     - optional, needed for IO::Socket::SSL
+                        needed OpenSSL-0.9.7b or newer...
+    IO::Socket::SSL - optional, needed for Net::LDAPS
+    XML::Parser     - optional, needed for Net::LDAP::DSML
+
+=head1 COPYRIGHT NOTICE
+
+(c) Copyright 2000-2011 by Alex Peeters [alex.peeters@citap.be],
+                        All Rights Reserved.
+
+ASNMTAP is based on 'Process System daemons v1.60.17-01', Alex Peeters [alex.peeters@citap.be]
+
+ Purpose: CronTab (CT, sysdCT),
+          Disk Filesystem monitoring (DF, sysdDF),
+          Intrusion Detection for FW-1 (ID, sysdID)
+          Process System daemons (PS, sysdPS),
+          Reachability of Remote Hosts on a network (RH, sysdRH),
+          Rotate Logfiles (system activity files) (RL),
+          Remote Socket monitoring (RS, sysdRS),
+          System Activity monitoring (SA, sysdSA).
+
+'Process System daemons' is based on 'sysdaemon 1.60' written by Trans-Euro I.T Ltd
+
+=head1 LICENSE
+
+This ASNMTAP CPAN library and Plugin templates are free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+The other parts of ASNMTAP may be used and modified free of charge by anyone so long as this copyright notice and the comments above remain intact. By using this code you agree to indemnify Alex Peeters from any liability that might arise from it's use.
+
+Selling the code for this program without prior written consent is expressly forbidden. In other words, please ask first before you try and make money off of my program.
+
+Obtain permission before redistributing this software over the Internet or in any other medium. In all cases copyright and header must remain intact.
+
+=cut

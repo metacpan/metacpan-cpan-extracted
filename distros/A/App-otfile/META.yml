@@ -1,0 +1,37 @@
+---
+abstract: 'Serve a single file, once, via HTTP over the local network.'
+author:
+  - 'Mike Greb <michael@thegrebs.com'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-otfile
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+recommends:
+  Clipboard: '0'
+  File::MMagic: '0'
+  Term::Progressbar: '0'
+  URI::Escape: '0'
+  UUID::Tiny: '0'
+requires:
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/mikegrb/One-Time-File/issues
+  homepage: https://github.com/mikegrb/One-Time-File
+  repository: https://github.com/mikegrb/One-Time-File.git
+version: '0.06'
+x_contributors:
+  - 'mikegrb <mgreb@linode.com>'

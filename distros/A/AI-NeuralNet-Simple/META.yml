@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                AI-NeuralNet-Simple
+version:             0.11
+abstract:            An easy to use backprop neural net.
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Log::Agent:                    0.208
+    Sub::Uplevel:                  0
+    Test::Exception:               0.15
+    Test::More:                    0.48_01
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Curtis "Ovid" Poe <ovid@cpan.org>

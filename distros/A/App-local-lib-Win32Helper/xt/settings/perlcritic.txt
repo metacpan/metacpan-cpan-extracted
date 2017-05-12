@@ -1,0 +1,58 @@
+verbose = %f:%l:%c:\n %p: %m\n
+theme = (core || more)
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = MooseX::Singleton metaclass MooseX::Types
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = MooseX::Singleton metaclass MooseX::Types
+
+[Modules::ProhibitExcessMainComplexity]
+max_mccabe = 30
+
+[ControlStructures::ProhibitPostfixControls]
+allow = if unless
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 7
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print
+
+[Variables::ProhibitPackageVars]
+add_packages = Module::CoreList CPAN::Config CPAN Storable
+
+[Modules::PerlMinimumVersion]
+version = 5.008001
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME | VERSION | SYNOPSIS | CONFIGURATION AND ENVIRONMENT | DEPENDENCIES | BUGS AND LIMITATIONS | AUTHOR | SUPPORT | LICENSE AND COPYRIGHT
+script_sections = NAME | USAGE | OPTIONS | EXIT STATUS | AUTHOR
+	
+# Temporary exclusions to use while cleaning up.
+#[-CodeLayout::RequireTidyCode]
+#[-CodeLayout::ProhibitTrailingWhitespace]
+
+# Exclusions
+#
+# I disagree with this one.
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+
+# I don't use RCS keywords.
+[-Miscellanea::RequireRcsKeywords]
+
+# Excluded because we filter out development versions.
+[-ValuesAndExpressions::RequireConstantVersion]
+
+# Excluded because we use 4-space tabs as our standard. 
+[-CodeLayout::ProhibitHardTabs]
+
+# Excluded because I do my pod my own way.
+[-Documentation::RequirePodAtEnd]
+
+# I don't use Emacs, why use this?
+[-Editor::RequireEmacsFileVariables]
+
+# We've decided not to use exceptions here.
+[-ErrorHandling::RequireUseOfExceptions]

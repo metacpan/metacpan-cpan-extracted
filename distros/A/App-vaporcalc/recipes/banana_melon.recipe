@@ -1,0 +1,28 @@
+{
+   "recipe" : {
+      "target_nic_per_ml" : "3",
+      "notes" : [],
+      "target_vg" : 60,
+      "target_pg" : "40",
+      "flavor_array" : [
+         {
+            "percentage" : "5",
+            "type" : "PG",
+            "tag" : "TFA Cantelope"
+         },
+         {
+            "type" : "PG",
+            "percentage" : "0.5",
+            "tag" : "INW Melon"
+         },
+         {
+            "type" : "PG",
+            "percentage" : "0.5",
+            "tag" : "INW Banana"
+         }
+      ],
+      "base_nic_type" : "PG",
+      "target_quantity" : "90",
+      "base_nic_per_ml" : 100
+   }
+}

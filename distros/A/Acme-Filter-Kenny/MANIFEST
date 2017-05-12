@@ -1,0 +1,16 @@
+bin/kennyfy
+Build.PL
+Changes
+COPYING
+lib/Acme/Filter/Kenny.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+SIGNATURE
+t/01.t
+t/02.t
+t/pod.t
+
+SIGNATURE    Added here by Module::Build

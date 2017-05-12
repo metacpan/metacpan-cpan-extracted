@@ -1,0 +1,63 @@
+Step -1.
+
+Read the README file to make sure this is what you are looking for.
+
+Step 0.
+
+# perl Makefile.PL
+# make
+# make install
+
+Step 1.
+
+Edit Apache/App/Mercury/Config.pm for your site.  Ignore the *_CLASS
+variables for now - you'll set them in the following steps.
+
+Step 2.
+
+Create the MySQL database and tables that will hold your users' messages.
+See the Apache::App::Mercury manpage under the section DATABASE SETUP.
+Update the DBI_* variables in Config.pm if necessary.
+
+Step 3.
+
+Modify your application's controller class (as in MVC design pattern),
+as described in the Apache::App::Mercury and Apache::App::Mercury::Controller
+manpages.  Look at the source of Apache/App/Mercury/Controller.pm to
+give you an idea of how Apache::App::Mercury should be instantiated and
+its methods called.
+
+If you wrote a new controller class for use only with Apache::App::Mercury
+(or extended and/or got to work the distributed
+Apache/App/Mercury/Controller.pm class), then set the CONTROLLER_CLASS
+variable (in Config.pm) to your new class name.  You do not need to set
+this variable if your controller class is already loaded into your
+mod_perl server.
+
+Step 4.
+
+Write a user manager class for your application (or extend an existing
+class with the necessary methods), as described in the
+Apache::App::Mercury and Apache::App::Mercury::UserManager manpages.
+Set the USER_MANAGER_CLASS variable to your UserManager class name in
+Config.pm.
+
+Step 5. (optional)
+
+Subclass the Apache::App::Mercury::Display class and override
+its methods (and/or add new ones) for your specific site look.
+Set the DISPLAY_CLASS variable to your Display class name in Config.pm.
+(Sorry there is currently no documentation on Display methods -
+this will be done soon.  For now you just need to look at the source
+if you want to extend or override the default Display class)
+
+Step 6. (optional)
+
+To enable e-mail auto-forwarding (sending e-mail notifications when
+messages arrive in users' mailboxes), install the file scripts/smtp_send
+so it starts/stops when your webserver starts/stops.  Alternatively, you
+could run it under cron by setting $CROND = 1 in smtp_send, and adding a
+file with a line like so (to run once every 30 minutes) to your
+/etc/cron.d/ directory:
+
+*/30 * * * * root /etc/httpd/lib/perl/smtp_send

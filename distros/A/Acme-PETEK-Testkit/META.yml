@@ -1,0 +1,20 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Acme-PETEK-Testkit
+version:      1.00
+version_from: lib/Acme/PETEK/Testkit.pm
+installdirs:  site
+requires:
+    Apache::Test:                  0
+    DBD::SQLite:                   0
+    Test::DatabaseRow:             0
+    Test::Expect:                  0
+    Test::Inline:                  0
+    Test::Legacy:                  0
+    Test::More:                    0
+    Test::Pod:                     1.14
+    Test::Pod::Coverage:           1.04
+    Test::WWW::Mechanize:          0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

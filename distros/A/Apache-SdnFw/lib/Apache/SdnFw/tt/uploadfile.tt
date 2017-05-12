@@ -1,0 +1,14 @@
+<form method="POST" action="[% s.uof %]" enctype="multipart/form-data">
+<div class="floatleft">
+<table>
+	<caption>Upload File</caption>
+	<tbody>
+		<tr>
+			<th>File to Import</th>
+			<td>[% s.html_upload('file',50) %]</td>
+		</tr>
+	</tbody>
+</table>
+[% s.html_submit('Upload File') %]
+</div>
+</form>

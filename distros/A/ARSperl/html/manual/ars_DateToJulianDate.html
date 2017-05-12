@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>
+      ARSperl Programmer's Manual
+    </title>
+    <style type="text/css">
+/*<![CDATA[*/
+    dt.c1 {font-weight: bold}
+    p.c1 {font-style: italic}
+    /*]]>*/
+    </style>
+  </head>
+  <body>
+    <h2>
+      <code>ars_DateToJulianDate(control, year, month, day)</code>
+    </h2>
+    <p>
+      Converts a year, month, and day value to a Julian date. The Julian date is the number of days
+      since noon, Universal Time, on January 1, 4713 BCE (on the Julian calendar). The changeover
+      from the Julian calendar to the Gregorian calendar occurred in October, 1582. The Julian
+      calendar is used for dates on or before October 4, 1582. The Gregorian calendar is used for
+      dates on or after October 15, 1582.
+    </p>
+    <dl>
+      <dt class="c1">
+        On success
+      </dt>
+      <dd>
+        Returns an integer.
+      </dd>
+      <dt class="c1">
+        On failure
+      </dt>
+      <dd>
+        Returns undef.
+      </dd>
+    </dl>
+    <p>
+      Example:
+    </p>
+    <pre>
+    my $juliandate = ars_DateToJulianDate($ctrl, 1066, 10, 14);
+    print &quot;The Battle of Hastings was on October 14th, 1066.\n&quot;;
+    print &quot;This is $juliandate days after January 1st, 4713 BCE.\n&quot;;
+</pre>
+    <p class="c1">
+      ars_DateToJulianDate was introduced in version 1.92 of ARSperl
+    </p>
+    <p>
+      <a href="toc.html">Back to Table of Contents</a>
+    </p>
+    <address>
+      Last changes to this page 30 March 2009 by michiel.beijen@gmail.com<br />
+    </address>
+  </body>
+</html>

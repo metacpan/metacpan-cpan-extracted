@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Acme-AlgebraicToRPN
+version:             0.02
+abstract:            convert algebraic notation to sane RPN
+license:             perl
+author:              
+    - X Cramps <cramps.the@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Math::Symbolic:                0.603
+    Math::SymbolicX::ParserExtensionFactory: 3.02
+    Perl6::Attributes:             0.04
+    Regexp::Common:                2.120
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

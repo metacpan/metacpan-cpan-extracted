@@ -1,0 +1,1529 @@
+<html><head><title> ARSperl: Revision History </title></head>
+
+<body bgcolor='white' text='black'><h2>Changes for ARSperl</h2>
+ <table  border='0'>
+ <tr><td>BM</td><td>=</td><td>Bill Middleton {wjm at metronet.com}</td></tr>
+ <tr><td>GDF</td><td>=</td><td>G. David Frye {gdf at uiuc.edu}</td></tr>
+ <tr><td>JCM</td><td>=</td><td>Jeff Murphy {jeffmurphy at sourceforge.net}</td></tr>
+ <tr><td>JWM</td><td>=</td><td>Joel Murphy {jmurphy at buffalo.edu}</td></tr>
+ <tr><td>TS</td><td>=</td><td>Thilo Stapff {tstapff at sourceforge.net}</td></tr>
+ <tr><td>CL</td><td>=</td><td>Chris Leach {Chris.Leach at kaz-group.com}</td></tr>
+ <tr><td>JL</td><td>=</td><td>John Luthgers {jls17 at gmx.net}</td></tr>
+ </table>
+ <P>
+ The following lists the changes that have been made
+ for each release of ARSperl.
+ <P>
+ Items in <font color='red'>red</font> 
+ denote changes that are incompatible with
+ previous versions of ARSperl and may require altering of some ARSperl
+ scripts.<P>
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>05/27/2015</B></td>
+              <td width='50%'>Version: <B>2.00</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JL)</td><td width='90%'><font color='black'>Linux 64-bit is working using GCC 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JL)</td><td width='90%'><font color='black'>Compiling using ARAPI 8.0 / 8.1 possible 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JL)</td><td width='90%'><font color='black'>added new functions: ars_GetSessionConfiguration, ars_SetOverlayGroup, ars_SwitchToBestPracticeMode and ars_SwitchToBaseMode 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JL)</td><td width='90%'><font color='black'>automatic API-Version detection in Makefile.PL 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JL)</td><td width='90%'><font color='black'>dropped support to compile ARSperl using ARAPI below version 4.5 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JL)</td><td width='90%'><font color='black'>small bugfixes 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>08/01/2011</B></td>
+              <td width='50%'>Version: <B>1.93</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed exsi.pl enumeration gap problem 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added lengthUnits,storageOptionForCLOB attributes to ARCharLimitsStruct,ARDisplayLimits 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed ars_GetServerInfo() keys 325-332 problem 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>modifications for AR 7.6.3 API 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>ars_GetEntryBLOB bugfix by Conny Martin 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed "hv_fetch error" problem in case of undefined ARValueStruct  
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed SignalTypeMap problem 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>package directory reorganization/cleanup 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>additional ars_Login parameters by Conny Martin 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>implemented ars_GetList/Get/Create/Set/DeleteImage 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed incorrect AR_ARITH_OP_NEGATE handling in rev_ARArithOpStruct 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed wrong operand evaluation for AR_ARITH_OP_NEGATE in perl_ARArithOpStruct 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed ars_SetServerInfo() memory violation in case of more than one key/value pair 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>ars_GetFieldTable performance improvement by using ARGetMultipleFields 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>removed unnecessary second invocation of ARGetField in ars_GetField 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>code cleanup (#ifdef statements) in ARGetFieldCached, ars_GetField, ars_GetFieldByName 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='red'>appended ARControlStruct pointer address to server key in %ARS::field_cache 
+(affects only scripts which make explicit use of the internal field_cache structure) </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(CL)</td><td width='90%'><font color='red'>enhanced ARS OO interface to handle custom enum fields 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed return value of ars_Import 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed memory violation in ars_GetListContainer 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>implemented ars_qualifier_ptr function (inverse of ars_perl_qualifier) 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added ownerObjList parameter to ars_GetListContainer 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed AR_SERVER_INFO type identification in infra/exsi.pl 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>updated version numbers in INSTALLATION 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added ars_DateToJulianDate, ars_GetListLicense, ars_ValidateMultipleLicenses, 
+ars_GetServerCharSet, ars_GetClientCharSet </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed actionList/elseList bug in ars_SetActiveLink 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added AR_DATA_TYPE_VIEW handling to perl_ARValueStruct_Assign,rev_ARActiveLinkActionList 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>modified Makefile.PL for easier automated testing (handling of ARSPERLTEST_PARAM) 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added ars_GetListRole, ars_Signal, ars_GetTextForErrorMessage 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='red'>changed return struct of ars_GetListGroup 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed IVLD macro in support-h.template 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>05/06/2008</B></td>
+              <td width='50%'>Version: <B>1.91</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed ars_padEntryid to work correctly if entry ID prefix is defined 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>replaced malloc-on-windows patch by UNDEF_PERL_MALLOC compilation option in Makefile.PL 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed pointer initialization error in ars_SetVUI 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>modified ars_Create/Get/SetFilter for API 7.1 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed ars_GetAlertCount 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(MB)</td><td width='90%'><font color='black'>removed legacy ars_NT Notifier and ars_AdminExtension calls 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(MB)</td><td width='90%'><font color='red'>added ars_VerifyUser implementation by Thilo Stapff 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(MB)</td><td width='90%'><font color='red'>changed ars_APIVersion to use AR_CURRENT_API_VERSION rather than AR_EXPORT_VERSION 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(MB)</td><td width='90%'><font color='black'>fixed ars_GetActiveLink, ars_GetFilter, ars_GetEscalation, ars_GetField so they  
+return undef on failure. </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>buffer overflow in perl_BuildEntryList 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>malloc-on-windows patch by John Unsworth 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed memory leak in ars_Get... functions (added "sv_2mortal( (SV*) RETVAL )") 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>bugfix in dup_Value (support.c) for API version <= 5.0.1 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>changed enum limits processing in perl_ARFieldLimitStruct for API version <= 5.0.1 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>updated MANIFEST file 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>replaced strdup() by arsperl_strdup() for win32 to fix problems with VisualStudio8 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>changed type of "owner" attribute: ARNameType -> ARAccessNameType 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>corrected function signature for ars_SetVUI, ars_CreateSchema 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed memory leak in sv_to_ARValue (support.c) 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed memory leak in ars_GetMultipleEntries, ars_GetListEntryWithFields 
+XPUSHs(newRV_noinc(...)) -> XPUSHs(sv_2mortal(newRV_noinc(...))) </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added "name" value to schemaHash returned by ars_GetSchema 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed rev_ARArchiveInfo Struct, moved function from supportrev_generated.c to supportrev.c 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>changed $ARS_LIBS variable for 7.0 Unix API in Makefile.pl (-licuuc -> -licuucbmc) 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>03/12/2007</B></td>
+              <td width='50%'>Version: <B>1.90</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added missing ARError_reset() to ars_GetListVUI 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added ars_CreateCharMenu, ars_SetCharMenu 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added handling of case AR_CHAR_MENU_LIST in ars_GetCharMenu 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>changed handling of qualifier struct in ars_GetCharMenu, case AR_CHAR_MENU_QUERY 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>corrected function signature for ars_SetField, ars_CreateContainer 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>bugfix in ars_GetCharMenu (incorrect array length for "labelFields", "labelIndex") 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added ars_SetImpersonatedUser 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>bugfix in ARError (support.c, memory violation if appendedText == NULL) 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>ars_SetLogging: changed declaration "int len" to "STRLEN len" because of  
+compilation problems on Solaris </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added ars_BeginBulkEntryTransaction, ars_EndBulkEntryTransaction 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added AR_FIELD_OFFSET handling in perl_ARFieldValueOrArithStruct (support.c) 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added ars_SetSessionConfiguration 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>completed sv_to_ARCurrencyStruct (support.c) 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>ARS.pm: set $ARS::logging_file_ptr = 0 to avoid "uninitialized" warning  
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>changed t/01import.t to import form "ARSperl Test3" 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added ars_CreateContainer, ars_SetContainer 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added ars_CreateFilter, ars_SetFilter, ars_CreateEscalation, ars_SetEscalation, 
+ars_SetActiveLink </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added declaration of boolcpyHVal(...) to supportrev.h 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added declaration of revTypeName(...) to supportrev.h 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added "rev_ARReferenceStruct" to supportrev.c 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>changed perl_ARReferenceStruct (added "value_dataType" key, necessary for 
+ars_CreateContainer) </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>changed ars_CreateActiveLink to read "schemaList" from alDef struct 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>bugfix in rev_ARMessageStruct 
+( hv_exists(h,"messageType"... ->  hv_exists(a,"messageType"... ) </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>moved declaration of rev_ARMessageStruct from supportrev.c to supportrev.h 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>bugfix in rev_ARAssignFieldStruct_helper: hv_exists needs key length 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>bugfix in rev_ARAssignFieldStruct_helper: hv_exists needs key length 
+(dup_qualifier2(...) != NULL ... return ...) </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added case: AR_COND_OP_FROM_FIELD to dup_qualifier2 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added functions perl_ARSetFieldsActionStruct, perl_ARPushFieldsActionStruct; 
+changed perl_ARFilterActionStruct accordingly. </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>bugfix in rev_ARFunctionAssignStruct (parameterList[i] -> parameterList[i-1]) 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>bugfix in rev_ARArithOpAssignStruct_helper (AR_ARITH_OP_NEGATE uses operandRight, 
+not operandLeft), fixed condition for AR_ARITH_OP_NEGATE. </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>bugfix in rev_ARAssignSQLStruct 
+(strcpyHVal(hr,"sqlCommand"...)  -> strmakHVal(hr, "sqlCommand"...)) </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>bugfix in rev_ARActiveLinkMacroParmList (... == SVt_PVAV -> ... == SVt_PVHV)  
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>bugfix in rev_ARActiveLinkMacroParmList (copymem -> strdup)  
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>changed rev_ARValueStructDiary to support non-hashref diary values 
+(necessary in ARAssignStruct context) </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added ars_CreateSchema, ars_SetSchema, ars_CreateField, ars_SetField, 
+ars_CreateVUI, ars_SetVUI </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added scripts (StructDef.pl, rev_AR_template.pl) for automatic generation of 
+conversion code (perl data structures -> AR API structs) </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added module (ARS/CodeTemplate.pm) for code generation 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>change in perl_ARFieldValueOrArithStruct; if tag == AR_VALUE, put dataType into hash 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added check for h != NULL to strcpyHVal  
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added "case AR_COND_OP_FROM_FIELD" to perl_qualifier() 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>changed handling of qualifier structs in perl_ARFieldLimitStruct, perl_ARJoinSchema, 
+perl_ARArchiveInfoStruct; those functions now return the converted perl structure instead of the pointer to a C structure.  </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed Makefile.PL to work with $ARSAPI containing spaces on Windows 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added ars_DeleteContainer (changes to ARS.xs, ARS.pm) 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed Makefile.PL to use $ra_arlibs for Version <= 5.0 on Windows 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed rev_ARValueStructStr2Type: use strcasecmp instead of strncasecmp 
+(failure to differentiate between string and substring) </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added "case AR_DATA_TYPE_CURRENCY" to perl_ARValueStruct 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>moved existing code for AR_DATA_TYPE_CURRENCY from sv_to_ARValueStruct 
+to new function sv_to_ARCurrencyStruct, completed ARCurrencyStruct handling </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added handling of AR_DATA_TYPE_DATE, AR_DATA_TYPE_TIME_OF_DAY, 
+to rev_ARValueStruct, sv_to_ARValueStruct </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added conversion functions rev_ARDisplayInstanceList, 
+rev_ARDisplayInstanceStruct and rev_ARPermissionList </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed DESTROY(ctrl) (use safefree if allocated with safemalloc) 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>minor fix in in rev_ARValueStructKW2KN (*keyword == '\0') 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>minor fix in rev_ARCoordList_helper ( if (hv_exists("x"... ) 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>changed handling of keyword values in rev_ARValueStruct 
+(assume "keyword" if first character == '\0' and length > 0)   </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>minor update to example scripts Dump_User*.pl 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>09/20/2005</B></td>
+              <td width='50%'>Version: <B>1.85</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added binmode-statements in t/10entry.t (test failed on win32) 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>warning cleanup in test files (t/02export.t, t/13join.t) 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added ars_SetLogging (changes to ARS.xs, ARS.pm, support.c, support-h.template, 
+html/manual/toc.html;  new files: html/manual/ars_SetLogging.html, t/21setlogging.t) </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed pointer dereferencing error in supportrev.c:strmakHval 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed supportrev.c:strcasecmp, strncasecmp; failure to differentiate between  
+string and substring (e.g. "page_holder" and "page") </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed support.c:perl_ARByteList (Bug ID 1213180) 
+(David Lindes {lindes at users.sourceforge.net}) </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added support for DATA_TYPE_CURRENCY to perl_ARFieldLimitStruct 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added function perl_ARCurrencyDetailList 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(TS)</td><td width='90%'><font color='black'>fixed support.c:my_strtok, perl_BuildEntryList 
+(ars_GetEntry crashed when retrieving join form entries) </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(TS)</td><td width='90%'><font color='black'>added preprocessor directives (ARS.xs, support.c, support-h.template) 
+for conditional compilation depending on API version (compiles now against version 4.5.1 to 6.3.0) </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added ars_encodeStatusHistory() routine  
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>06/24/2005</B></td>
+              <td width='50%'>Version: <B>1.84</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed 'autosplit' issue in Makefile.PL 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(IT)</td><td width='90%'><font color='black'>Updates by Ian Trimnell for ars_GetListContainer and ars_GetContainer 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>03/14/2005</B></td>
+              <td width='50%'>Version: <B>1.83</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed "lang" compilation error for API 6.3 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>variable initialization 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JG)</td><td width='90%'><font color='black'>doc updates 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>09/20/2004</B></td>
+              <td width='50%'>Version: <B>1.82</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(QGM)</td><td width='90%'><font color='black'>AR 6.x compatibility, AR encryption compatibility 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JMc)</td><td width='90%'><font color='black'>Makefile.PL changes, code cleanup for Windows build 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>08/09/2003</B></td>
+              <td width='50%'>Version: <B>1.81</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>memory/multithreaded issue with errhash fixed { steve.drew  at hp.com } 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>uninitialized variable issue fixed { steve.drew  at  hp.com } 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>memory free'ing on win32 issues fixed { steve.drew  at hp.com } 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>minor fix to OO->query (forgot the new firstretrieve param) 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>04/16/2003</B></td>
+              <td width='50%'>Version: <B>1.8001</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>memory leak fixed in ars_CreateEntry 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>memory leak fixed in ars_SetEntry 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>memory leak fixed in ars_MergeEntry 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>memory leak fixed in ars_Export 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>memory leak fixed in ars_GetListEntry wrt to join forms 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>memory leak fixed in QualifierStructPtr destructor 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>memory leak fixed in ControlStruct destructor 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>various other memory related cleanups 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>bad/NULL ref fixed in ExpandCharMenu 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added new params to ars_Login: lang, authString, tcpport, rpcnumber 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added new rv's to ars_GetControlStructFields: lang, authString 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>updated example and test scripts  
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added Alert functions (replaces NT/Notifier functions) 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='red'>5.x (5.0.1, 5.1, 5.1.1) integration<BR> 
+functions that no longer are available or always return errors indicating they are no longer implemented: <blockquote> ars_NT*()   [notifier functions] </blockquote> functions whose parameters have changed: <blockquote> ars_GetListEntry()<BR> ars_GetListEntryWithFields() </blockquote> functions whose return values have changed: <blockquote> ars_GetCharMenu() </blockquote> </table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>11/13/2002</B></td>
+              <td width='50%'>Version: <B>1.74</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(GDF)</td><td width='90%'><font color='black'>added ars_GetMultipleEntries, ars_GetListEntryWithFields 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(GDF)</td><td width='90%'><font color='black'>remove unused num_entries parameter from ARGetListEntry 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added ARTermination calls to ars_Login 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>11/13/2001</B></td>
+              <td width='50%'>Version: <B>1.73</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed windows cpp error in support.c 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed a leftover fprintf warning in support.c that was causing 
+compilation warnings on windows </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>disabled t/11entry.t 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>minor Makefile.PL tweak 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>bug fix in perl_ARStatusStruct that caused segv with api >= 4.0 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>10/24/2001</B></td>
+              <td width='50%'>Version: <B>1.72</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>modified Makefile.PL to handle changes to _SERVER_INFO definitions 
+in 4.5.x </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>memory leak fixes 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>duplicate free badness in ars_Login() fixed 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>updated doc for ars_MergeEntry 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added form->merge() call to OO layer 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed 4.5.2 induced warning (now there's a FilterActionStruct) 
+modified Makefile.PL so you can specify ARVERSION=4.52  </table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>10/30/2000</B></td>
+              <td width='50%'>Version: <B>1.71</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>modified support-h.template to compile against api3.0 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>9/21/2000</B></td>
+              <td width='50%'>Version: <B>1.70</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>modified support-h.template to compile against api3.2 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>bug fix to ars_Import() 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>8/31/2000</B></td>
+              <td width='50%'>Version: <B>1.69</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added ars_SetServerInfo() call 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added infra/pcpp.pl which is used to convert the xs 
+and c files into something that will compile against activestate perl 5.6 </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>modifications to Makefile.PL to ease win32 compilations 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed bug in support.c:lookUpTypeName 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>enhanced ars_Export to handle all possible export types 
+in whatever api we're compiled against </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>enhanced ars_Import to handle all possible import types 
+in whatever api we're compiled against </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>typo fix in ARS.xs for perl5.6 compatibility 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>documenation update (ars_Import) 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>7/4/2000</B></td>
+              <td width='50%'>Version: <B>1.68</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>modifications to example/ars_GetListEntry.pl to make 
+it function with different revisions of the User form. </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>arsperl now requires at minimum perl 5.004. 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>converted "na" "sv_unref" to PL_ namespace.  
+added perl-version checking so it will still compile against 5.004. </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='red'>ars4.5 compatibility changes. the following functions 
+have altered return values which will break scripts that use them <U>if you compile against 4.5 or later libraries</U> <blockquote> ars_GetActiveLink<BR> ars_GetFilter<BR> ars_GetEscalation<BR> ars_CreateActiveLink<BR> </blockquote> see the documentation on the return values of these functions for details on what has changed. </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='red'>changed ars_GetCharMenu so that {'menuType'} is returned 
+as a string (decoded) instead of an integer. </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='red'>added a parameter to ars_Import which will require that existing 
+scripts be updated. see documentation for details. </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added patch submitted by Geoff Endresen which enabled decoding 
+of push fields actions in GetFilter() </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>enhanced Makefile.PL to be more intelligent when h2ph fails or 
+doesnt exist </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added/decoded schemaType (within GetSchema()/CompoundSchema structure) 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>documentation updates 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>2/17/00</B></td>
+              <td width='50%'>Version: <B>1.67</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>ars_SetServerPort() added 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed bug in ars_GetListSQL() 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>12/3/99</B></td>
+              <td width='50%'>Version: <B>1.66</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed a typo in support.c  
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>11/23/99</B></td>
+              <td width='50%'>Version: <B>1.65</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added better support for decoding filters/activelinks 
+for arsystem 4.0 (not finished yet) </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added support for data type "decimal" when performing 
+(Set|Create)Entry </table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>04/7/99</B></td>
+              <td width='50%'>Version: <B>1.6403 BETA</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>tested/fixed compiling against pre-4.0 apis.  
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>OO: now checks named params to ensure you don't 
+mis-spell them. </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>attachment allows specify a 'name' hash key so you can 
+customize the name that appears in the attachment field in the usertool.  (Nick Stoughton {NickS at ISRWORLD.com}) </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>OO: form->setSort method added 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>OO: better error handling/catching 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>OO: fixed bug in value2internal 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed NTRegisterServer(), fixed example/3.x/Notifier.pl 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>OO: fixed ARS::AR_RETURN_* bugs { erik.dorfman at intelsat.int } 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed bug in ars_GetListServer() for api &gt;= 4.0 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>03/12/99</B></td>
+              <td width='50%'>Version: <B>1.6400 BETA</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added new LIBS line to Makefile.PL to cover NCR Unix 
+("Hill, David K" {david.k.hill at intel.com}) </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added ars_GetEntryBLOB (attachment field handling)  
+thanks to  "Kaelin Colclasure" {kaelin at talarian.com} for supplying part of the code for the BLOB functions. </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>simplified Makefile.PL configuration steps 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added attachment example scripts 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added basic OO layer 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added small test suite 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed some broken 4.0 related conditional compilation 
+stuff </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>makefile now automatically converts C header files into 
+perl files so that all constants (C 'defines') are available. </table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>01/04/99</B></td>
+              <td width='50%'>Version: <B>1.63</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed some missing conditional compilation #if's in code 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>changes "require Config" to "use Config" in Makefile.PL 
+at the request of activestate </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added MANIFEST file to distribution 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>12/28/98</B></td>
+              <td width='50%'>Version: <B>1.62</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added extra decoding code to GetFilter.pl example script 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>syntax errors fixed in some example scripts 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added bug fix to NTRegisterServer from  G David Frye {gdf at uiuc.edu} 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='red'>ars4.0 integration (see RELNOTES for important compatibility 
+information) </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='red'>perl_qualifier() now takes a control struct  
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>if compiled against API &gt;= 4.0 then __ars_init __ars_term 
+no longer do anything (but are still there). the functionality of each of these have been rolled into ars_Login and ars_Logoff respectively. </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added ars_APIVersion()  
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>GetActiveLink, when compiled against 4.0 returns ARMessageStruct 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>applied some changes contributed by Murray Nesbitt  
+{murray at ActiveState.com} so that it will compile against the active state version of perl more easily.  </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>changed licensing to match that of perl itself. 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>09/16/98</B></td>
+              <td width='50%'>Version: <B>1.61</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>new utility: example/AddUsersToGroup.pl - bulk add a bunch 
+of users to a specified group  </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>new utility: example/DelUsersFromGroup.pl - bulk delete a bunch 
+of users from a specified group  </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed uninitialized variable warnings 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed various problems with join schema entry-id handling 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed bug in indexList returned by ars_GetSchema() 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='red'>updated all Get&lt;object&gt; functions so that changeDiary 
+is fully decoded. </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='red'>changed return value of ars_DeleteEntry() so that 
+ars_DeleteEntry() || die() will work as expected. </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed problem in example/Show_ALink.pl 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added/updated helper func: ars_decodeStatusHistory() 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added example/ars_decodeStatusHistory.pl 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed ars_GetSchema typo/bug w/regards to adminGroupList 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed GetField.pl example so that it decodes everything 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>patch for bug in ars_GetServerInfo() 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>updated Makefile.PL to dynamically generate the support.h 
+file based on the ar.h file specified. </table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>05/04/98</B></td>
+              <td width='50%'>Version: <B>1.6001 BETA</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(BM)</td><td width='90%'><font color='black'>patch for bug in ars_CreateEntry() 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added ARS32 conditional compilation for AdminExtension  
+routines (which were removed as of ars3.2 api) </table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>03/31/98</B></td>
+              <td width='50%'>Version: <B>1.6000 BETA</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(BM)</td><td width='90%'><font color='black'>removed most of the PPERLC and AWP stuff that was intended 
+to help the port to ActiveState perl.  Use the One True Perl. </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(BM)</td><td width='90%'><font color='black'>Changed many of the allocations to use perl's memory manager, 
+except where the structure or element is grown further internally by ARS, or where the structure is non-trivial to free().  I still have concerns about some of the un-freed allocations in  supportrev.c, but at least ALL of the demo scripts,  including ARSDoc-1.11 (with small patch submitted to list) now  run, and produce the right results. </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(BM)</td><td width='90%'><font color='black'>Removed all references to ZEROMEM in favor of perl's Zero, which 
+is guaranteed to work everywhere, and doesn't need additional logic. </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(BM)</td><td width='90%'><font color='black'>fixed a couple of small typos, including one in a elliptical  
+declaration (...) which didn't have a comma separator. </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(BM)</td><td width='90%'><font color='black'>Changed the logic of CVLD in one place that was attempting to free() 
+null pointers. </table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>03/31/98</B></td>
+              <td width='50%'>Version: <B>1.56</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed a problem caused by some debugging code that 
+was left in 1.55 accidentally. </table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>03/30/98</B></td>
+              <td width='50%'>Version: <B>1.55</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added ars_GetListEntry.pl example to show how to use 
+custom query-list fields. </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>numerous documentation updates by {D.J.Adams at soton.ac.uk} 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed bug in macroParm decoding. {D.J.Adams at soton.ac.uk} 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed bug when decoding results of GetFilter/GetActiveLink 
+in regards to set fields actions: values assigned to diary fields were not being interpretted correctly. {D.J.Adams at soton.ac.uk} </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>patched perl_BuildEntryIdList to make it more robust 
+(Ulrich Pfeifer {pfeifer at wait.de}) </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>patched ars_GetCharMenu for bug "GetCharMenu doesn't 
+return a qualifier for query menus" {D.J.Adams at soton.ac.uk} </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed dup_FieldValueOrArith to support decoding of 
+query style menus.  </table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>02/09/98</B></td>
+              <td width='50%'>Version: <B>1.54</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed bug in ars_EncodeDiary() 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added ars_MergeEntry.pl example script 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>12/15/97</B></td>
+              <td width='50%'>Version: <B>1.53</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed some minor errors in doc 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>11/19/97</B></td>
+              <td width='50%'>Version: <B>1.5206</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added ars_GetVUI to the ARS.pm exports line. 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added refreshCode to GetCharMenu hash 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed bug in groupList value change in 1.5205 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>11/04/97</B></td>
+              <td width='50%'>Version: <B>1.5205</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>updated the groupList value returned by GetSchema() 
+so that it contains the correct key words. </table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>10/29/97</B></td>
+              <td width='50%'>Version: <B>1.5204</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added ars_GetControlStructFields() 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>10/20/97</B></td>
+              <td width='50%'>Version: <B>1.5203</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>beginnings of a WinNT port (not completed yet) 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added "timestamp" to the return hash of GetEscalation() 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added some extra malloc/free debugging stuff 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>10/13/97</B></td>
+              <td width='50%'>Version: <B>1.5202</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>removed a superfluous debugging statement 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>10/09/97</B></td>
+              <td width='50%'>Version: <B>1.5201</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed problem in GetEscalation      
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>10/08/97</B></td>
+              <td width='50%'>Version: <B>1.52</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed core dump problem due to uninitialized variable(s) 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>10/07/97</B></td>
+              <td width='50%'>Version: <B>1.51</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed some typos/symbol errors. added a missing routine. 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>10/06/97</B></td>
+              <td width='50%'>Version: <B>1.50</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>removed ars_errstr from C code. replaced with ars_errhash. 
+modified ARS.pm to refer to hash when $ars_errstr is  accessed. $ars_errstr no longer tie'd to main:: package. </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>bug fix (Sid Van den Heede) "affecting getting of 
+displayInstanceList" </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>bug fix (James LewisMoss) for ars_GetCharMenu() 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>bug fix (Ian Flanigan) for perl_ARIndexStruct() 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>modified GetListEntry(), GetEntry(), SetEntry() and  
+DeleteEntry() to make operations on join schemas  transparent. </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added a ARVerifyUser call to ars_Login so that 
+ars_Login() || die() will work as one would expect it to. </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added $VERSION to the perl module file. 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added "log to file" action to GetFilter action hash  
+(requested by {D.J.Adams at soton.ac.uk}) </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added updated doc tree to main distribution (contributed by 
+{D.J.Adams at soton.ac.uk}) </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>new functions and doc on new functions and new examples for some 
+of these new functions. </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='red'>altered return value of perl_ARStatusStruct so that it  
+returns a hash of the various StatusStruct members so that reversing the operation is simpler. scripts that, for example, retrieve active link definitions and print them out that previous expected the {message} key to point to a string will need to be updated. </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added valueType to the assign structure to assist in  
+reversing the operation (converting perl to C API assign  structure). </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added displayTag as an optional parameter to ars_LoadQualifier() 
+so that you can build queries against customized views (that are stored on the server). </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>altered ARError() so that return codes of OK or WARNING don't 
+signal an error. For example, GetListEntries would return nothing if you matched more than the max allowed, now it returns the max allowable number of records and places a warning message into the error hash.  </table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>05/22/97</B></td>
+              <td width='50%'>Version: <B>1.46</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JWM)</td><td width='90%'><font color='black'>bug fixes 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JWM)</td><td width='90%'><font color='black'>new function: ars_MergeEntry(), ars_EncodeDiary() 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>04/25/97</B></td>
+              <td width='50%'>Version: <B>1.45</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>bug fix to GetListSchema routine 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>02/20/97</B></td>
+              <td width='50%'>Version: <B>1.44</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added some minor code to aid in decoding qualifier 
+structs. added some examples of decoding them. </table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>02/18/97</B></td>
+              <td width='50%'>Version: <B>1.42</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JWM)</td><td width='90%'><font color='black'>added destructors for the ARS package that will correctly 
+call ARTermination when the package is unloaded (when your script exits). </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JWM)</td><td width='90%'><font color='black'>fixed minor type casting problem that prevented compilation 
+on HP-UX </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>compiled with -Wall and cleaned up some suspicious code. 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>02/17/97</B></td>
+              <td width='50%'>Version: <B>1.41</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added NT routines to html doc 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>fixed a few compile-time problems 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>02/13/97</B></td>
+              <td width='50%'>Version: <B>1.4</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>re-organized documentation and web pages 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>added NT (notifier) functions 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JWM)</td><td width='90%'><font color='black'>bug fixes for 1.32beta 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>02/10/97</B></td>
+              <td width='50%'>Version: <B>1.32beta</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JWM)</td><td width='90%'><font color='black'>3.0 integration 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>11/11/96</B></td>
+              <td width='50%'>Version: <B>1.31</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>minor stuff: added an ifndef in the GetCharMenu routine 
+for ars 2.0 users. 2.0 doesnt support SQL menu constructions. </table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>11/11/96</B></td>
+              <td width='50%'>Version: <B>1.3</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JWM)</td><td width='90%'><font color='black'>undef works in setEntry now. 
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JWM)</td><td width='90%'><font color='black'>added ars_Import to complement ars_Export 
+</font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>Profiling code added to keep track of number of 
+queries made. </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JWM)</td><td width='90%'><font color='black'>Field caching code added to make some of the functions 
+more efficient. </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>New functions: ars_GetFilter(), ars_GetCharMenu(),  
+ars_GetServerStatistics </font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JWM)</td><td width='90%'><font color='black'>Internal GetField call now caches results to minimize 
+number of queries made. </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>Examples of new functions.  
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>"WhoUsesIt.pl" utility 
+</table></td></tr></table>
+
+<P>
+
+
+    <TABLE CELLSPACING='0'
+      CELLPADDING='2'
+      WIDTH='100%'
+      BORDER='0' 
+      BGCOLOR='black'>
+      <TR>
+	<TD width='100%'>
+	  <TABLE CELLSPACING='0' CELLPADDING='3' WIDTH='100%' BORDER='0'
+	    BGCOLOR='lightblue'>
+	    <tr><td colspan='2'>
+  <table width='100%' border='0'><tr>
+	      <td width='50%'>Released: <B>01/12/96</B></td>
+              <td width='50%'>Version: <B>1.0beta</B></td>
+  </tr></table></td>
+            </tr><tr bgcolor='#eeeeee'><td width='10%'>(JWM)</td><td width='90%'><font color='black'>First release  
+</font></td></tr>
+<tr bgcolor='#dddddd'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>Installation, history, and Gnu documentation added. 
+Removed -lars from makefile (internal C library that wasn't released), not needed for arsperl. </font></td></tr>
+<tr bgcolor='#eeeeee'><td width='10%'>(JCM)</td><td width='90%'><font color='black'>Added example scripts and html documentation. 
+</table></td></tr></table>
+
+<P>
+
+
+<P>
+<PRE>$Header$</PRE></body></html>

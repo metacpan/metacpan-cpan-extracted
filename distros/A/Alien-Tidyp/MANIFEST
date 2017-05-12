@@ -1,0 +1,20 @@
+Build.PL
+Changes
+inc/My/Builder.pm
+inc/My/Builder/Unix.pm
+inc/My/Builder/Windows.pm
+lib/Alien/Tidyp.pm
+MANIFEST			This list of files
+META.yml
+patches/config.guess
+patches/config.sub
+patches/Makefile.mingw
+patches/Makefile.nmake
+README
+sharedir/share
+t/00-load.t
+t/10-config.t
+t/20-compile.t
+t/pod-coverage.t
+t/pod.t
+TODO

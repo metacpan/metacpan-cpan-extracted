@@ -1,0 +1,27 @@
+#!/bin/bash
+
+IFS=$'\n'
+urldecode(){
+  echo -e "$(sed 's/+/ /g; s/%/\\x/g')"
+}
+
+
+if [ ! $MICRO_LANG ]
+ then
+  MICRO_LANG=en
+fi
+search=$1;
+search=$(perl -e "print ucfirst($search)");
+nogo="http:\/\/|Articles|Artikel|Wikipedia|Commons|Tracking_|Hidden_|Talk_|_talk|Use_dmy_dates|_Diskussion|Pages_containing "
+function getcat(){
+search=$(perl -e "print ucfirst('$1')");
+q="http://$MICRO_LANG.wikipedia.org/wiki/$search";
+for i in `mojo get "$q" a  attr href   | egrep "^\/wiki\/(Category|Kategorie)" | egrep -vi "("$nogo")" |   sort | sed -s "s/\/wiki\///"`; do q=$i;   echo $i | urldecode; done
+}
+
+getcat $search
+
+#qq=$(echo "$search" | sed "s/^.*.://" | tr "_" "|");
+#q=$1; cat=$(for i in `getcat "$q"`; do getcat "$i"; done); echo "$cat" | data-freq | egrep -v "http" |  sed -s "s/^.*.: //" | egrep -i "($qq)"
+#q=$1; cat=$(for i in `getcat "$q"`; do qq=$(echo "$q" | sed -s "s/^.*.\://");  getcat "$i"; done);    echo "$cat" | egrep -vi "http:" | data-freq | sort -n
+#echo -e "\n"

@@ -1,0 +1,523 @@
+AceBrowser Version 3.1
+September 20, 2001
+
+The AcePerl distribution now includes a collection of CGI scripts that
+run on top of AcePerl to provide a simple browsable interface to ACEDB
+databases.  Some of the code has been tuned for the C. elegans
+database, but most of it is fully generic.
+
+Demos are running at http://stein.cshl.org/elegans/.
+
+REQUIREMENTS:
+
+1. AcePerl 1.76 or higher (available at http://stein.cshl.org/AcePerl/)
+2. Perl 5.6.0 or higher
+3. CGI.pm 2.77 or higher (available at http://stein.cshl.org/WWW/software/CGI)
+4. A Web server
+5. sgifaceserver 4.8c or higher.  For best results, use the version of
+   sgifaceserver available at http://www.acedb.org/.
+   The socket server is generally a better choice than the older RPC-based
+   server.
+
+INSTALLATION:
+
+1. Read README first.  This describes how to install AcePerl.  
+
+2. During the installation, you will be asked whether you wish to
+install AceBrowser.  Answer "yes."  
+
+3. You will be asked for the installation locations for several groups
+of files.  The answers depend on the configuration of your web server
+The install script will attempt to create any directories that do not
+already exist.
+
+  a. Site-specific configuration file directory
+
+	Acebrowser needs access to one or more configuration files.
+	Each file describes a data source and how information from
+	the data source is to be rendered.  All configuration files
+	are stored in a directory at the location indicated here.
+
+	The default is /usr/local/apache/conf/ace/.
+
+  b. Acebrowser CGI script directory
+
+        The core of Acebrowser is a set of CGI scripts.  This is the
+	directory that will contain them.  Choose a directory that will
+	be recognized by the web server as containing CGI script.  If
+	you are using Apache/mod_perl, select a directory under the 
+	control of Apache::Registry.
+
+        The default is /usr/local/apache/cgi-bin/ace/
+
+  c. Acebrowser HTML files and images
+
+	Acebrowser uses a small number of static HTML files and images.
+	This is the directory that will contain them.  Choose a directory
+	that is located under the web server's document root.
+
+	The default is /usr/local/apache/htdocs/ace/
+
+Depending on the permissions of your web server directories, you may
+have to be root in order to create some of these directories.
+
+4. Run "make", "make test" and "make install" as described in the main
+README.  If this is successful, run "make install-browser".  This will
+copy the acebrowser files into the directories chosen in step (3).
+Depending on the permissions of your web server directories, you may
+have to be root in order to complete this step.
+
+5. If you installed the CGI scripts in their default location, you
+should now be able to search the C. elegans database by fetching the
+following URL:
+
+	http://your.host/cgi-bin/ace/searches/text
+
+You can then follow the links to browse the database.  A slightly more 
+sophisticated search allows you to search a subset of object classes:
+
+        http://your.host/cgi-bin/ace/searches/basic
+
+or the entire list of object classes:
+
+        http://your.host/cgi-bin/ace/searches/browser
+
+There is also a default Acebrowser "home page" installed at the URL:
+
+	http://your.host/ace/index.html
+
+You may have to adjust these URLs for the locations of the directories
+chosen in step (3).
+
+CONFIGURATION
+
+Acebrowser is configured to allow access to multiple ACEDB databases.
+You can customize each database extensively by changing the appearance
+of pages, adding new search capabilities, and adding new displays for
+particular Ace object classes.
+
+Each database has a symbolic name, and each symbolic name corresponds
+to a configuration file located in the site-specific configuration
+directory.  There are three databases defined in a new Acebrowser
+installation: 
+
+  simple   An acedb database running on port 2005 of the 
+	   local host
+
+  moviedb  An example database of movies running on port 200008 
+	   of stein.cshl.org
+
+  default  An oldish snapshot of the C. elegans database running
+	   on port 2005 of stein.cshl.org
+
+To select among the data sources, append the symbolic name to the end
+of the URL of the desired CGI script.  For example, to do a text
+search on the "moviedb" database, fetch this URL:
+
+  http://your.site/cgi-bin/ace/searches/text/moviedb
+
+If no symbolic name is specified, the default database is assumed.
+  http://your.site/cgi-bin/ace/searches/text 
+
+is equivalent to
+
+  http://your.site/cgi-bin/ace/searches/text/default
+
+As described in EXTENDING ACEBROWSER, another way to select among
+databases is to place the CGI script itself in a directory with the
+same name as the database.  For example, if you have written a
+specialized CGI script called screenplay that is designed to work with 
+the "moviedb" database, you could place it in a subdirectory named
+moviedb, and refer to it this way:
+
+  http://your.site/cgi-bin/ace/moviedb/screenplay
+
+The symbolic name can actually appear anywhere in the path, so this
+would work as well:
+
+  http://your.site/cgi-bin/ace/moviedb/custom/screenplay
+
+THE CONFIGURATION FILES
+
+The configuration files are located in the directory selected for
+acebrowser configuration.  Their names are formed by appending ".pm"
+to the symbolic name of the database.  For example, the configuration
+file "simple.pm" corresponds to the database "simple".
+
+Each of the configuration files is actually an executable Perl script.
+As such it can use any Perl constructions you wish, including variable
+interpolation.  The purpose of the configuration file is to set a
+series of configuration variables, which by convention are all
+uppercase.  For example, here is an excerpt from the default.pm
+configuration file:
+
+ $HOST = 'stein.cshl.org';
+ $PORT = 2005;
+ $USERNAME = '';
+ $PASSWORD = '';
+
+In addition to scalar variables, the configuration file is used to set 
+arrays, hashes and specially-named functions.
+
+If you are only interested in accessing a single database, it is
+easiest to modify the default.pm configuration file.  To serve
+multiple databases, just make a copy of default.pm and edit the copy.
+
+If, for some reason, Acebrowser cannot find its configuration files,
+it will generate an internal server error.  The location of the
+configuration files directory is stored in the module
+Ace::Browser::LocalSiteDefs, typically somewhere inside the
+"site_perl" subdirectory of the Perl library directory (use "perl -V"
+to see where that is).  You can find out where Acebrowser expects to
+find its configuration files by running the following command:
+
+  perl -MAce::Browser::LocalSiteDefs \
+       -e 'print $Ace::Browser::LocalSiteDefs::SITE_DEFS,"\n"'
+
+To change this value, either reinstall Aceperl or edit
+LocalSiteDefs.pm manually.
+
+EDITING THE CONFIGURATION FILE
+
+The settings in the default.pm configuration file distributed with
+AcePerl should work with little, if any modification.  The following
+variables may need to be tweaked:
+
+  $ROOT = '/cgi-bin/ace';
+
+This is the root (top level) for all the Acebrowser CGI scripts.
+Change this if necessary.
+
+ $DOCROOT = '/ace';
+
+This is the root (top level) for all of Acebrowser's static HTML files
+and images.  You will need to change this if the static files are
+installed somewhere else.
+
+ $ICONS = "$DOCROOT/ico";
+
+This is where Acebrowser expects to find its icons. This subdirectory
+holds icons and other small static images.  Note how the
+previously-defined $DOCROOT variable is used.  You will probably not
+need to change this.
+
+ $IMAGES = "$DOCROOT/images";
+
+This is where Acebrowser expects to find its "images" subdirectory.
+This directory contains images generated dynamically by the ACEDB
+database.  It *must* be writable by the web server user, usually
+"nobody".  When the AcePerl install script creates this directory, it
+makes it world-writable by default.  You may prefer to make it owned
+by the "nobody" user and/or group.
+
+ $HOST = 'stein.cshl.org';
+
+This is the name of the host where the desired acedb server can be
+found.
+
+ $PORT = 2005;
+
+This is the network port on which the desired acedb server is
+listening.  Network ports in the range 1024-65535 are assumed to
+correspond to the newer socket-based sgifaceserver.  Ports in the
+range 65536-4,294,967,296 are assumed to correspond to the older
+RPC-based gifaceserver.
+
+ $USERNAME = '';
+ $PASSWORD = '';
+
+For password-protected ACEDB databases, these variables contain the
+username and password.
+
+ $STYLESHEET = "$DOCROOT/stylesheets/aceperl.css";
+
+This is the cascading stylesheet used to set the background color,
+font, table colors, and so forth.  You probably don't need to change
+this, but you might want to modify the stylesheet itself.
+
+ @PICTURES = ($IMAGES => "$HTML_PATH/images");
+
+This array indicates the location of the "images" subdirectory.  The
+first element of the array is the location of the directory as a URL,
+and the second element is the location of the directory as a physical
+path on the file system.  This array is ignored when running under
+modperl/Apache::Registry; modperl uses $IMAGES to look up the
+corresponding physical path.
+
+ @SEARCHES   = (
+	       basic => {
+			name   => 'Basic Search',
+			url    =>"$ROOT/searches/basic",
+		       },
+	       text => {
+			name   => 'Text Search',
+			url    =>"$ROOT/searches/text",
+		       },
+	       browser => {
+			   name => 'Class Browser',
+			   url  => "$ROOT/searches/browser",
+			  },
+	       query => {
+			 name => 'Acedb Query',
+			 url  => "$ROOT/searches/query",
+			 },
+	       );
+ $SEARCH_ICON = "$ICONS/unknown.gif";
+
+The @SEARCHES array sets the searches made available to users.  The
+first element in each pair is the symbolic name for the search.  The
+second element is a hash reference containing the keys "name" and
+"url".  The name is the bit of human readable text printed in the
+list of searches located at the top of the AceBrowser page.  The url
+is the URL of the script that performs the search.
+
+The $SEARCH_ICON variable selects an icon to use for the search
+button.
+
+
+ @HOME      = (
+	      $DOCROOT => 'Home Page'
+	     );
+
+
+Select the URL and label for the "home" link appearing on the bottom
+of each Acebrowser-generated page.  By default, the home will point to 
+"/ace" directory on the local machine.
+
+ %DISPLAYS = (	
+	     tree => {
+		      'url'     => "generic/tree",
+		      'label'   => 'Tree Display',
+		      'icon'    => '/ico/text.gif' },
+	     pic => {
+		     'url'     => "generic/pic",
+		     'label'   => 'Graphic Display',    
+		     'icon'    => '/ico/image2.gif' },
+	    );
+
+As described in EXTENDING ACEBROWSER, the %DISPLAYS hash declares a
+set of pages, or "displays", to be used for displaying certain Ace
+object types.
+
+ %CLASSES = (	
+	     Default => [ qw/tree pic/ ],
+	   );
+
+As described in EXTENDING ACEBROWSER, the %CLASSES hash describes how
+Acedb classes correspond to displays.
+
+ sub URL_MAPPER {
+   my ($display,$name,$class) = @_;
+   ...
+ }
+
+As described in EXTENDING ACEBROWSER, the URL_MAPPER subroutine allows
+you to tinker with the way in which Acedb classes are turned into
+links.
+
+ $BANNER = <<END;
+ <center><span class=banner><font size=+3>Default Database</font></span></center><p>
+ END
+
+The $BANNER variable contains HTML text that will be displayed at the
+top of each generated page.  You will probably want to change this.
+
+ $FOOTER = '';
+
+The $FOOTER variable contains HTML text that is displayed at the
+bottom of each generated page.  You will probably want to change this.
+
+ $PRINT_PRIVACY_STATEMENT = 1;
+
+If this variable is set to true, then AceBrowser will generate a link
+in the footer that displays a privacy statement explaining
+AceBrowser's use of cookies.
+
+ @FEEDBACK_RECIPIENTS = (
+			[ " $ENV{SERVER_ADMIN}", 'general complaints and suggestions', 1 ]
+ );
+
+This array contains a list of recipient e-mail addresses for the
+"feedback" page.  Each recipient is an array reference containing
+least two elements, the e-mail address and a comment.  A third,
+optional, element, if true, indicates that this recipient should be
+selected by default.  The default is the webmaster's e-mail address.
+Comment out the entire section of you do not want the feedback link to 
+appear.
+
+ # configuration for the "basic" search script
+ @BASIC_OBJECTS = 
+   ('Any'          =>   '<i>Anything</i>',
+    'Locus'        =>   'Confirmed Gene',
+    'Predicted_gene'    =>   'Predicted Gene',
+    'Sequence'     =>   'Sequence (any)',
+    'Genome_sequence', => 'Sequence (genomic)',
+    'Author'       =>    'Author',
+    'Genetic_map'  => 'Genetic Map',
+    'Sequence_map' => 'Sequence Map',
+    'Strain'       =>  'Worm Strain',
+    'Clone'        => 'Clone'
+   );
+
+The @BASIC_OBJECTS array is used by the "basic" search script.  It
+indicates the Acedb classes to offer to the user to search on, and the
+labels to use for each class.  For example, the default configuration
+will present the user with a radio button labeled "Confirmed Gene" for
+use in searching the Acedb class "Locus".
+
+USING ACEBROWSER WITH MOD-PERL
+
+Acebrowser is designed to work well with modperl
+(http://perl.apache.org).  In fact, using it with a modperl-enabled
+Apache server will increase its performance dramatically.
+
+To use Acebrowser with modperl, install the CGI scripts into a
+directory that is under the control of Apache::Registry.  The
+<Location> section in httpd.conf should look like this:
+
+ Alias /acedb/ /usr/local/apache/cgi-bin/ace/
+
+ <Location /acedb>
+   SetHandler Perl-script
+   PerlHandler Apache::Registry
+   PerlSendHeader On
+   Options +ExecCGI +Indexes
+ </Location>
+
+Change the paths as appropriate.  The Acebrowser scripts located in
+/usr/local/apache/cgi-bin/ace can now be accessed under modperl at the 
+URL /acedb, as in:
+
+  http://your.site/acedb/searches/text
+
+When running under modperl, you can force all the CGI scripts in a
+directory to use a particular configuration file by defining the
+AceBrowserConf configuration variable .  For example, to create a
+virtual directory named /movies and force all the scripts within it to
+use the moviedb configuration file:
+
+ Alias /movies/ /usr/local/apache/cgi-bin/ace/
+
+ <Location /movies>
+   SetHandler Perl-script
+   PerlHandler Apache::Registry
+   PerlSendHeader On
+   Options +ExecCGI +Indexes
+   PerlSetVar AceBrowserConf /usr/local/apache/conf/acebrowser/moviedb.pm
+ </Location>
+
+Be sure also to edit moviedb.pm $ROOT variable to indicate the correct
+location of scripts in URL space:
+
+ $ROOT = '/movies';
+
+
+EXTENDING ACEBROWSER
+
+Acedb is fundamentally object based.  In addition to having a name,
+each object has a class, such as "Sequence".  Acebrowser takes
+advantage of this object structure by allowing you to assign one or
+more displays to a class.  Each display is a CGI script that fetches
+the desired object from the database, formats it, and displays it as
+HTML or an image.
+
+Whenever Acebrowser is called upon to display an object, it consults
+the configuration file to determine what displays are registered for
+the object, and then presents a row of display names across the top of
+the window.  In Acebrowser jargon, this line of displays is called the
+"type selector."  The user can change the display to use by selecting
+the corresponding link.
+
+Three generic displays, which will work with all databases, come with
+Acebrowser:
+
+  tree  an HTML representation of the Acedb object which
+	presents the object in the form of a collapsible outline.
+
+  xml   an XML representation of the Acedb object
+
+  pic   a clickable GIF image, as returned from gifaceserver.
+
+
+Writing New Display Scripts
+---------------------------
+
+To register a new display script with the system, you will need to do
+three things:
+
+1. Write the script.  The easiest way to do this is to take the
+moviedb "misc/movie" script, copy it, and go from there. 
+
+The script will be invoked with the CGI parameters "name" and "class",
+corresponding to the name and class of the Acedb object to display.
+For example, if the script is located in /cgi-bin/ace/newscript, it
+will be invoked as:
+
+  http://your.site/cgi-bin/ace/newscript?name=foo;class=bar
+
+2. Register the display with the %DISPLAYS hash in the configuration
+file, by adding a hash entry like the following:
+
+	     newdisplay => {
+		 url   => "/cgi-bin/ace/newscript",
+		 label => 'New Display',
+		 icon  => '/ico/layout.gif',
+		 },
+
+The hash key, in this case "newdisplay", is a symbolic name for the
+display.  It can correspond to the acual name of the CGI script, or
+not.  The hash value is itself an anonymous hash containing the
+required keys "url" and "label", and the optional key "icon".  "url"
+gives the path to the script that will display, and "label" gives a
+human readable label for the link that Acebrowser puts in the type
+selector. The "icon" key, if present, will display the indicated icon
+in the type selector.
+
+3. Bind this display to the class (or classes) for which this display
+is valid, by adding an entry to the %CLASSES array.  For example:
+
+	  NewObject    => ['newdisplay'],
+
+This indicates that whenever Acebrowser is called upon to display an
+object of type "NewObject", it will display the object using the CGI
+script designated by the "newdisplay" display.  If you have several
+displays that are appropriate for a class, you can bind them all to
+the class in the following fashion:
+
+          NewObject => ['newdisplay','newerdisplay','newestdisplay'],
+
+When creating a link for an Acedb object, Acebrowser will choose the
+first display in the array.  When the object is displayed, all three
+of the alternative displays will appear in the type selector.
+
+More information on writing display scripts can be found in the
+documentation for Ace::Browser::AceSubs.  From the command line, run:
+
+  perldoc Ace::Browser::AceSubs
+
+Writing New Searches
+--------------------
+
+To create a new search, 
+
+1. Write a script following the model of one of the existing scripts.
+Ace::Browser::SearchSubs exports subroutines that are useful in
+managing the multiple pages of results produced by most search
+scripts.
+
+2. Register the new script in the @SEARCHES array.  Provide an
+explanatory name for the search script, and a pointer to its URL.
+
+More information on writing search scripts can be found in the
+documentation for Ace::Browser::SearchSubs.  From the command line, run:
+
+  perldoc Ace::Browser::SearchSubs
+
+FOR HELP
+
+Please write to the Acedb newsgroup, acedb@sanger.ac.uk for help or to
+report possible bugs.  If you get really stuck, write to the author,
+lstein@cshl.org.
+
+Lincoln D. Stein
+September 24, 2001

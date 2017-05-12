@@ -1,0 +1,80 @@
+App-Toodledo
+
+Toodledo (http://www.toodledo.com/) is a web-based capability for managing
+to-do lists along Getting Things Done (GTD) lines.  This module
+provides a Perl-based access to its API.  This is a complete rewrite to
+version 2 of the API.
+
+THIS MODULE IS NOT BACKWARDS COMPATIBLE WITH ANY PREVIOUS VERSIONS.
+
+What do you need the API for?  Doesn't the web interface do everything
+you want?  Not always.  See the examples included with this distribution.
+For instance, Toodledo has only one level of notification and it's either
+on or off.  With the API you can customize the heck out of notification.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+	... or, just 'cpan App::Toodledo'
+
+You can enable live tests by giving your Toodledo userid and password
+on the first line:
+
+        perl Makefile.PL --user_id td23943abe402  --password secret
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::Toodledo
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Toodledo
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-Toodledo
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-Toodledo
+
+    Search CPAN
+        http://search.cpan.org/dist/App-Toodledo/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011, 2012 Peter J. Scott
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+DISCLAIMER
+
+THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
+APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
+HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM 'AS IS' WITHOUT
+WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND
+PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE
+DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR
+CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR
+CONVEYS THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
+INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES
+ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT
+NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR
+LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM
+TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER
+PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.

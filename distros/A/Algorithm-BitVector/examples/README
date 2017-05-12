@@ -1,0 +1,10 @@
+
+
+All of the example code in this directory is in the 
+executable file
+
+   BitVectorDemo.pl
+
+In case of any doubt regarding what sort of arguments (and
+in what order) to supply to the methods and how to use the
+overloaded operators, please consult this script.

@@ -1,0 +1,10 @@
+# This bounding is supposed to go with hist3.csv histogram
+
+# The first row of this file shows the start and the end of the horizontal
+# extent of the bounding box.  The second row does the same for the vertical
+# extent.
+
+# In each line, the first value must be smaller than the second
+
+ -71.772016,  -70.431923
+ -34.254251,   -33.203240

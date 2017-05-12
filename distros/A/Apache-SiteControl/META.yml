@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache-SiteControl
+version:      1.01
+version_from: lib/Apache/SiteControl.pm
+installdirs:  site
+requires:
+    Apache::AuthCookie:            3.04
+    Apache::Session::File:         1.54
+    Crypt::CAST5:                  0.04
+    Crypt::CBC:                    2.14
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

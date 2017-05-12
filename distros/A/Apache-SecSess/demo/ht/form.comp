@@ -1,0 +1,41 @@
+<& /index.comp, title => $title, content => $content &>
+
+<%init>
+my $content = '';
+my $prompt;
+
+## top matter
+if ($message) { $content .=	"<center><h2>$message</h2></center>\n"; }
+$content .= <<"ENDCONTENT";
+Please enter the following information:
+<form method="POST" action="$action">
+<table>
+ENDCONTENT
+
+## inputs
+for (@$inputs) {
+	$prompt = ($_->{type} eq 'hidden') ? '' : $_->{prompt};
+	$content .= sprintf(
+		'<tr><td>%s</td><td><input type="%s" name="%s" value="%s"></td></tr>',
+		$prompt, $_->{type}, $_->{name}, $_->{value}
+	);
+}
+
+## end matter
+$content .= <<"ENDCONTENT";
+<tr><td></td><td>
+  <input type="submit" value="$submit">
+</td></tr>
+</table>
+</form>
+ENDCONTENT
+
+</%init>
+
+<%args>
+$title => 'What are you looking at?'
+$action => 'http://localhost/'
+$inputs => [{name => 'what', prompt => 'What?', type => 'text'}]
+$message => ''
+$submit => 'Say What'
+</%args>

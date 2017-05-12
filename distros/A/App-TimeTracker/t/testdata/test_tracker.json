@@ -1,0 +1,41 @@
+{
+   "perl" : {
+      "parent" : "default"
+   },
+   "vienna.pm" : {
+      "plugins" : [
+         "RT"
+      ],
+      "parent" : "default"
+   },
+   "default" : {
+      "post2irc" : {
+         "secret" : "12345",
+         "host" : "http://irc.example.com/"
+      },
+      "plugins" : [
+         "SyncViaGit"
+      ],
+      "rt" : {
+         "set_owner_to" : "domm"
+      }
+   },
+   "CPANTS" : {
+      "parent" : "vienna.pm",
+      "rt" : {
+         "set_owner_to" : null
+      }
+   },
+   "App-TimeTracker" : {
+      "plugins" : [
+         "Git",
+         "SyncViaGit",
+         "RT",
+         "Post2IRC"
+      ],
+      "parent" : "perl",
+      "rt" : {
+         "update_time_worked" : "1"
+      }
+   }
+}

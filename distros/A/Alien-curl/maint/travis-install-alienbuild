@@ -1,0 +1,27 @@
+#!/bin/bash -x
+
+set -euo pipefail
+IFS=$'\n\t'
+
+rm -rf /tmp/Alien-Build /tmp/Dist-Zilla-Plugin-AlienBuild /tmp/Test-Alien
+
+cpanm -n Dist::Zilla
+
+git clone --depth 2 https://github.com/plicease/Alien-Build.git /tmp/Alien-Build
+cd /tmp/Alien-Build
+dzil authordeps --missing | cpanm -n
+dzil listdeps   --missing | cpanm -n
+dzil install --install-command 'cpanm -n -v .'
+
+git clone --depth 2 https://github.com/plicease/Dist-Zilla-Plugin-AlienBuild.git /tmp/Dist-Zilla-Plugin-AlienBuild
+cd /tmp/Dist-Zilla-Plugin-AlienBuild
+dzil authordeps --missing | cpanm -n
+dzil listdeps   --missing | cpanm -n
+dzil install --install-command 'cpanm -n -v .'
+
+git clone --depth 2 https://github.com/plicease/Test-Alien.git /tmp/Test-Alien
+cd /tmp/Test-Alien
+dzil authordeps --missing | cpanm -n
+dzil listdeps   --missing | cpanm -n
+dzil install --install-command 'cpanm -n -v .'
+

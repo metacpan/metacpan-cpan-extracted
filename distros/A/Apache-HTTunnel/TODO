@@ -1,0 +1,7 @@
+CODE:
+	- Test more with SSL
+	- Test with more kinds of proxies
+	- Retest UDP
+	- Make status page?
+
+DOCS:

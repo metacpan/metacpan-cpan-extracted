@@ -1,0 +1,59 @@
+This is yet another run loop for wmii, this time written in Perl.
+
+Not quite as lightweight as some, and be warned that I'm using it as a place to
+experiment with Moo, IO::Async or whatever takes my fancy so it might need a
+recent version of perl, esoteric modules, etc.
+
+To install and use:
+
+  cpanm App::wmiirc
+  ln -sf $(which wmiirc.pl) ~/.wmii-hg/wmiirc
+
+(~/.wmii-hg assumes you are using the hg version of wmii, the path may be
+~/.wmii if you are using a released version.)
+
+This will get you the most basic configuration. I'm assuming you've some idea
+how wmii works if you're here. The default modkey in App::wmiirc is Mod4 (the
+'Windows' key, usually), you can change this with:
+
+  echo modkey Mod2 >> ~/.wmii-hg/config
+
+(See xmodmap and xev if you're unsure what keys you have mapped.)
+
+There are some modules you might be interested in:
+
+  * backlight - Control laptop backlight
+  * battery - Show battery status (on Linux)
+  * client - A few useful things like Modkey-v to go to a client by name
+  * clock - As you'd expect, with some support for switching timezone
+  * dwim - Somewhat useful (albeit quirky) launcher type thing, for files/URLs
+  * loadavg - Load average
+  * lock - Run a screen locker on demand
+  * msg - Status and whatever you like via: wmiir xwrite /event msg hi
+  * screenshot - Take a screenshot
+  * ssh - SSH host menu
+  * volume - ALSA volume controller
+
+Load a particular module with:
+
+  echo client >> ~/.wmii-hg/modules
+
+You may have noticed the configuration is built out of files under the wmii
+config directory. That's deliberate. For anything beyond basic usage you'll
+probably want to copy the example configs I've put in etc/ in the dist tarball
+to ~/.wmii-hg and customise them.
+
+(As wmii is mostly unmaintained these days I have a somewhat patched copy at
+http://github.com/dgl/wmii although this should also work with the vanilla
+version.)
+
+License as Perl 5.14. No warranty.
+
+There's some screenshots at: https://github.com/dgl/wmii-perl/wiki/Screenshots
+Although most of it isn't really visible in a screenshot (if someone wants to
+send me a screencast you're welcome, but I don't feel like doing one).
+
+PS: Coding style for this is (in Vim terms): et sw=2 tw=80
+
+-- 
+David Leadbeater <dgl@dgl.cx>, April 2012

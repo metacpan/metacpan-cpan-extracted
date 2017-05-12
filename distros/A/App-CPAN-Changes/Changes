@@ -1,0 +1,13 @@
+Revision history for App-CPAN-Changes
+
+0.002   2016-10-11 (PERLANCAR)
+
+	- [Bugfix] Die instead of return error response in _parse() to keep
+	  code simple.
+
+	- Tweak Abstract.
+
+
+0.001   2016-10-10 (PERLANCAR) (unreleased)
+
+        - First early release.

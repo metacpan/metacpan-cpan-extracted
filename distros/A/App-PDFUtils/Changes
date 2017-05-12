@@ -1,0 +1,9 @@
+0.002   2017-04-22 (PERLANCAR)
+
+	- [Bugfix] Logic error, forgot to 'last' after successful
+	  decrypting.
+
+
+0.001   2017-04-09 (PERLANCAR)
+
+        - First release, replaces App-RemovePdfPassword.

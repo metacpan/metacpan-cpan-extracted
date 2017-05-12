@@ -1,0 +1,112 @@
+{
+   "abstract" : "commands to interact with a Matrix home-server",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-MatrixTool",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Slurper" : "0",
+            "Future" : "0.33",
+            "IO::Async::Resolver" : "0.68",
+            "IO::Async::Resolver::DNS" : "0.06",
+            "IO::Async::SSL" : "0",
+            "JSON" : "0",
+            "List::Util" : "1.29",
+            "MIME::Base64" : "0",
+            "Module::Pluggable::Object" : "0",
+            "Module::Runtime" : "0",
+            "Net::Async::HTTP" : "0.40",
+            "Protocol::Matrix" : "0",
+            "Protocol::Matrix::HTTP::Federation" : "0",
+            "Struct::Dumb" : "0",
+            "URI::Escape" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "App::MatrixTool" : {
+         "file" : "lib/App/MatrixTool.pm",
+         "version" : "0.08"
+      },
+      "App::MatrixTool::Command::client" : {
+         "file" : "lib/App/MatrixTool/Command/client.pm",
+         "version" : "0.08"
+      },
+      "App::MatrixTool::Command::client::json" : {
+         "file" : "lib/App/MatrixTool/Command/client/json.pm",
+         "version" : "0.08"
+      },
+      "App::MatrixTool::Command::client::list_rooms" : {
+         "file" : "lib/App/MatrixTool/Command/client/list_rooms.pm",
+         "version" : "0.08"
+      },
+      "App::MatrixTool::Command::client::login" : {
+         "file" : "lib/App/MatrixTool/Command/client/login.pm",
+         "version" : "0.08"
+      },
+      "App::MatrixTool::Command::client::sync" : {
+         "file" : "lib/App/MatrixTool/Command/client/sync.pm",
+         "version" : "0.08"
+      },
+      "App::MatrixTool::Command::client::upload" : {
+         "file" : "lib/App/MatrixTool/Command/client/upload.pm",
+         "version" : "0.08"
+      },
+      "App::MatrixTool::Command::directory" : {
+         "file" : "lib/App/MatrixTool/Command/directory.pm",
+         "version" : "0.08"
+      },
+      "App::MatrixTool::Command::notary" : {
+         "file" : "lib/App/MatrixTool/Command/notary.pm",
+         "version" : "0.08"
+      },
+      "App::MatrixTool::Command::resolve" : {
+         "file" : "lib/App/MatrixTool/Command/resolve.pm",
+         "version" : "0.08"
+      },
+      "App::MatrixTool::Command::server_key" : {
+         "file" : "lib/App/MatrixTool/Command/server_key.pm",
+         "version" : "0.08"
+      },
+      "App::MatrixTool::HTTPClient" : {
+         "file" : "lib/App/MatrixTool/HTTPClient.pm",
+         "version" : "0.08"
+      },
+      "App::MatrixTool::ServerIdStore" : {
+         "file" : "lib/App/MatrixTool/ServerIdStore.pm",
+         "version" : "0.08"
+      },
+      "App::MatrixTool::SubCommands" : {
+         "file" : "lib/App/MatrixTool/SubCommands.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

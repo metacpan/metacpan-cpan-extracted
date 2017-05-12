@@ -1,0 +1,590 @@
+NAME
+    App::combinesheets - command-line tool merging CSV and TSV spreadsheets
+
+VERSION
+    version 0.2.14
+
+SYNOPSIS
+       combinesheets -h
+       combinesheets -help
+       combinesheets -man
+       combinesheets -version
+
+       combinesheets -config <config-file> -inputs <input-files> [<options>] [-outfile <output-file>]
+
+          where <input-files> has the form: <input-ID>=<filename> [<input-ID>=<filename>...]
+          where <options> are: -check
+
+DESCRIPTION
+    combinesheets is a command-line tool merging together two or more
+    spreadsheets. The spreadsheets can be COMMA-separated or TAB-separated
+    files, each of them having the first line with column headers. Data in
+    one of the column (it can be a different column in each input
+    spreadsheet) serve to match lines. For example, having two spreadsheets,
+    PERSON and CAR, with the following contents:
+
+       persons.tsv:
+
+       Surname      First name  Sex  Age  Nickname
+       Novak        Jan         M    52   Honza
+       Gudernova    Jitka       F    56
+       Senger       Martin      M    61   Tulak
+
+       cars.tsv:
+
+       Model  Year  Owned by
+       Praga  1936  Someone else
+       Mini   1968  Gudernova
+       Skoda  2002  Senger
+
+    we want to merge these spreadsheet by "Surname" in persons.tsv and by
+    "Owned by" in cars.tsv. There are two possible results, depending which
+    spreadsheet is used as the first one (a primary one). If the persons.tsv
+    is the first, the result will be (which columns are included in the
+    result will be described later in this document):
+
+       combinesheets -cfg config.cfg -in PERSON=persons.tsv CAR=cars.csv
+
+       First name  Surname    Model  Sex  Nickname  Age  Year  Owned by
+       Jitka       Gudernova  Mini   F              56   1968  Gudernova
+       Jan         Novak             M    Honza     52
+       Martin      Senger     Skoda  M    Tulak     61   2002  Senger
+
+    Or, if the cars.tsv is the first, the result will be:
+
+       combinesheets -cfg config.cfg -in CAR=cars.csv PERSON=persons.tsv
+
+       First name  Surname    Model  Sex  Nickname  Age  Year  Owned by
+       Jitka       Gudernova  Mini   F              56   1968  Gudernova
+       Martin      Senger     Skoda  M    Tulak     61   2002  Senger
+                              Praga                      1936  Someone else
+
+    Of course, if both input spreadsheets have only the matching lines, both
+    results will be the same (it will not matter which one of them is
+    considered the primary one).
+
+    The rows in the resulting spreadsheet are sorted by values in the column
+    that was used as a matching column in the primary input.
+
+    The information which columns should be used to match the input
+    spreadsheets and which columns should appear in the resulting
+    spreadsheet is read from a configuration file (see the "-config" - or
+    "-cfg" - argument).
+
+    The command-line arguments and options can be specified with single or
+    double dash. Most of them can be abbreviated to the nearest non-biased
+    length. They are case-sensitive.
+
+  Duplicated values in the matching columns
+    If there are repeated (the same) values in the column that serves as
+    matching criterion then the resulting spreadsheet will have as many
+    output lines (for a particular matching value) as is the number of all
+    combinations of the lines with that matching values in all input
+    spreadsheets. For example, let's have "books.tsv" and "authors.tsv",
+    assuming that a book can have more authors and any author can contribute
+    to any number of books:
+
+       books.tsv:
+       Title   Note    Author
+       Book 1  from B1-a       Kim
+       Book 2  from B2-b       Kim
+       Book 3  from B3-c       Katrin
+       Book 1  from B1-d       Blanka
+       Book 2  from B2-e       Katrin
+
+       authors.tsv:
+       Age     Name
+       28      Kim
+       20      Katrin
+       30      Blanka
+       50      Lazy author
+
+    The output (again, depending on which input is considered a primary
+    input) will be (a list of included column is defined in the
+    configuration file - see later):
+
+       combinesheets -cfg books_to_authors.cfg -in BOOK=books.tsv AUTHOR=authors.tsv
+
+       Name    Title   Age Note
+       Blanka  Book 1  30  from B1-d
+       Katrin  Book 3  20  from B3-c
+       Katrin  Book 2  20  from B2-e
+       Kim     Book 1  28  from B1-a
+       Kim     Book 2  28  from B2-b
+
+       combinesheets -cfg books_to_authors.cfg -in AUTHOR=authors.tsv BOOK=books.tsv
+
+       Name        Title   Age  Note
+       Blanka      Book 1  30   from B1-d
+       Katrin      Book 3  20   from B3-c
+       Katrin      Book 2  20   from B2-e
+       Kim         Book 1  28   from B1-a
+       Kim         Book 2  28   from B2-b
+       Lazy author         50
+
+ADVANCED USAGE
+    Additionally to the merging columns from one or more spreadsheets, this
+    script can also add completely new columns to the resulting spreadsheet,
+    the columns that do not exist in any of the input spreadsheet. Such
+    columns are called "calculated columns".
+
+    Each "calculated column" is created either by an external, command-line
+    driven, program, or by a Perl subroutine. In both cases, the user must
+    create (write) such external program or such Perl subroutine. Therefore,
+    this usage is meant more for developers than for the end users.
+
+    Note that this advanced feature is meant only for new columns, not for
+    new rows. Therefore, it cannot be used, for example, to create rows with
+    totals of columns.
+
+  Calculated columns by external programs
+    If specified, an external program is invoked for each row. It can be
+    specified either by a keyword PROG or by a keyword PROGS - see syntax in
+    the *configuration* section. In both cases, the value of the standard
+    output of these programs become the value of the calculated column (a
+    trailing newline of this standard output is removed and other newlines
+    are replaced by spaces).
+
+    A program defined by the PROGS is called without any arguments ("S" in
+    *PROGS* stands for a *Simple*). That's why it does not have any
+    knowledge for which row it has been invoked. Its usage is, therefore,
+    for column values that are not dependent on other values from the
+    spreadsheet. For example, for the "cars.tsv" shown above, you can add a
+    column "Last updated" by calling a UNIX program "date" - again, see an
+    example the *configuration* section.
+
+    A program defined by the PROG is called with one argument which is a
+    filename. This file contains the current row; each of its lines has two,
+    TAB-separated, fields. The first field is the column name and the second
+    field is the column value. For example, when processing the last row of
+    the "cars.tsv" given above, the file will have the following content:
+
+       Model       Skoda
+       Year        2002
+       Owned by    Senger
+
+    The files are only temporary and will be removed when "combinesheets"
+    finishes.
+
+  Calculated columns by a Perl subroutine
+    If specified by the keyword PERL, a Perl subroutine is called for each
+    row with the three arguments:
+
+    1   A hashref with information about the current column. Not often used
+        but may be handy if the same subroutine deals with more columns and,
+        therefore, needs to know for which column it was invoked. See the
+        *flights* example in the *configuration* section.
+
+    2   An arrayref with all column names.
+
+    3   An arrayref with all column values - in the same order as the column
+        names.
+
+    Actually, depending how the subroutine is defined in the configuration,
+    it may get as the first argument the module/class name where it belongs
+    to. If you define it like this:
+
+       PERL   Module::Example::test
+
+    the "test" subroutine is called, indeed, with the three arguments as
+    described above. However, if your definition is rather:
+
+       PERL   Module::Example->test
+
+    then the "test" subroutine is considered a Perl method and its first
+    argument is the module/class name. It is up to you to decide how you
+    want/need to write your functions. Again, an example is available in the
+    *configuration* section.
+
+    The return value of the subroutine will become a new value in the
+    calculated column. Do not return undef but rather an empty string if the
+    value cannot be created.
+
+    What is an advantage of writing my own module/package if I can simply
+    write an external program (perhaps also in Perl) doing exactly the same?
+    The Perl module stays in the memory for the whole time of processing all
+    input rows and, therefore, you can re-use some calculations done for the
+    previous rows. An example about it ("flights") is given in the
+    *configuration* section.
+
+ARGUMENTS and OPTIONS
+    -config <config-file>
+        A filename with a configuration file. This is a mandatory parameter.
+        The configuration file describes:
+
+        *   which columns in individual input spreadsheets should be
+            included in the resulting spreadsheet,
+
+        *   what names should be given to the resulting columns
+
+        *   in which order should be the columns in the resulting
+            spreadsheet
+
+        *   which columns should be used to match individual lines,
+
+        The configuration file is a TAB-separated file (with no header
+        line). Empty lines and lines starting with a "#" character are
+        ignored. Each line has two columns, in some cases there is an
+        optional third column. Here is a configuration file used in the
+        example above:
+
+           # Columns to match records from individual inputs
+           MATCH   PERSON=Surname
+           MATCH   CAR=Owned by
+           MATCH   CHILD=Parent
+
+           # Columns - how they be in rows
+           PERSON  First name
+           PERSON  Surname
+           CAR     Model
+           PERSON  Sex
+           CHILD   Name
+           CHILD   Born
+           PERSON  Nickname
+           PERSON  Age
+           CAR     Year
+           CAR     Owned by
+
+        The first column is either a reserved word "MATCH", or an identifier
+        of an input spreadsheet. There are also few other reserved words -
+        see more about them a bit later.
+
+        The identifier can be almost anything (and it does not appear in the
+        input spreadsheet itself). It is also used in the command-line
+        argument "-inputs" where it corresponds to a real file name of the
+        input. The lines with identifiers define what columns will be in the
+        result: the second column is the header of the wanted columns and an
+        optional third column (not used in the example above) is the header
+        used in the result. The resulting columns will be in the same order
+        as are these lines in the configuration file.
+
+        The reserved word "MATCH" is used to define how to match lines in
+        the input spreadsheets. The format of its second column is:
+
+           <input-ID>=<column-header>
+
+        There should be one MATCH line for each input spreadsheet. The data
+        in the column defined by the "column-header" will be used to find
+        the corresponding lines. In our example, the data in the column
+        *Surname* in the "persons.tsv" will be matched with the data in the
+        column *Owned by* in the "cars.tsv" (the rows having the same values
+        in these two columns will be merged into one resulting row).
+
+        Advanced configuration
+
+        If you want to add so-called *calculated columns* as described in
+        the "ADVANCED USAGE" you need to use few additional reserved words
+        in the configuration file. These words are PROG, PROGS and/or PERL.
+        They are used in the place where the new calculated column should be
+        placed. Their lines have the program name or the Perl subroutine
+        name in the second column, and they have mandatory third column with
+        the resulting name of the calculated column.
+
+        For example, we wish to add two columns to the input spreadsheet
+        "cars.tsv". The input file (the same as in the introduction) is:
+
+           Model  Year  Owned by
+           Praga  1936  Someone else
+           Mini   1968  Gudernova
+           Skoda  2002  Senger
+
+        We wish to add a column *Car age* that shows the difference between
+        the actual year and the value from the *Year* column. We have a
+        shell script "age.sh" doing it:
+
+           #!/bin/bash
+           YEAR=`grep Year $1 | cut -f2`
+           NOW=`date +%Y`
+           echo $(($NOW-$YEAR))
+
+        The configuration file "cars.cfg" (assuming that we want the other
+        columns to remain the same) is:
+
+           MATCH   CAR=Owned by
+
+           CAR     Owned by
+           CAR     Model
+           CAR     Year
+           PROG    age.sh  Car age
+
+        When we run:
+
+           combinesheets -config cars.cfg -inputs CAR=cars.tsv
+
+        we get this result:
+
+           Owned by        Model   Year    Car age
+           Gudernova       Mini    1968    44
+           Senger          Skoda   2002    10
+           Someone else    Praga   1936    76
+
+        You can see that there is no need to use "combinesheets" for really
+        combining *more* sheets, an input can be just one sheet.
+
+        Another example adds a *fixed* column to the same input, a column
+        named *Last updated* that gets its value from a UNIX command "date".
+        This program does not get any information which row it has been
+        invoked for. The configuration file is now (note the new line with
+        the PROGS):
+
+           MATCH   CAR=Owned by
+
+           CAR     Owned by
+           CAR     Model
+           CAR     Year
+           PROG    age.sh  Car age
+           PROGS   date    Last updated
+
+        and the result is now:
+
+           Owned by        Model   Year    Car age   Last updated
+           Gudernova       Mini    1968    44        Mon Feb 27 12:32:04 AST 2012
+           Senger          Skoda   2002    10        Mon Feb 27 12:32:04 AST 2012
+           Someone else    Praga   1936    76        Mon Feb 27 12:32:04 AST 2012
+
+        The last possibility is to call a Perl subroutine - using the
+        reserved word PERL in the configuration file. Let's have an input
+        spreadsheet ("flights.tsv") with data about flights:
+
+           Date         Flight    Airport From      Airport To
+           2009-01-18   AY838     London LHR        Helsinki Vantaa
+           2009-01-22   AY839     Helsinki Vantaa   London LHR
+           2009-03-15   NW2       Manila            Tokyo Narita
+           2009-03-21   NW1       Tokyo Narita      Manila
+           2011-05-06   SV326     Sharm El Sheik    Jeddah
+           2011-07-31   RJ700     Amman             Jeddah
+           2011-09-21   ME369     Jeddah            Beirut
+           2011-09-24   ME368     Beirut            Jeddah
+           2011-12-02   EZY3064   Prague            London Stansted
+           2011-12-09   EZY3067   London Stansted   Prague
+           2012-01-26   MS663     Cairo             Jeddah
+
+        We want to add columns with the international airport codes for both
+        *Airport From* and *Airport To*. The new columns will be named *Code
+        From* and *Code To*. The Perl subroutine will use a web service to
+        find the code. The subroutine will use a closure that will remember
+        already fetched codes so the web service does not need to be called
+        several times for the same airport name.
+
+        The configuration file "flights.cfg" is:
+
+           MATCH   FLY=Date
+
+           FLY     Date
+           FLY     Flight
+           FLY     Airport From
+           PERL    Airport->find_code      Code From
+           FLY     Airport To
+           PERL    Airport->find_code      Code To
+
+        The name of the subroutine is attached to the module where it comes
+        from by either :: or -> notation.
+
+        The invocation is:
+
+           combinesheets -config flights.cfg -inputs FLY=flights.tsv
+
+        The full code for the module "Airport", the file "Airport.pm" is
+        here:
+
+           package Airport;
+           use warnings;
+           use strict;
+
+           use LWP::Simple;
+           use JSON;
+
+           # preparing a closure in order not to fetch the same airport code again and again
+           my $already_found = make_already_found();
+           sub make_already_found {
+              my $already_found = {};
+              return sub {
+                 my ($airport_name, $airport_code) = @_;
+                 if (exists $already_found->{$airport_name}) {
+                    if ($airport_code) {
+                        $already_found->{$airport_name} = $airport_code;
+                    }
+                    return $already_found->{$airport_name};
+                 } else {
+                    $already_found->{$airport_name} = ($airport_code ? $airport_code : 1);
+                    return 0;
+                 }
+              }
+           }
+
+           sub find_code {
+              my ($class, $column, $header_line, $data_line) = @_;
+
+              my $column_with_airport_name = $column->{ocol};
+              $column_with_airport_name =~ s{Code}{Airport};
+
+              my $airport_name;
+              for (my $i = 0; $i < @$header_line; $i++) {
+                 if ($header_line->[$i] eq $column_with_airport_name) {
+                    $airport_name = $data_line->[$i];
+                    last;
+                 }
+              }
+              return '' unless $airport_name;
+
+              # now we have an airport name...
+              my $airport_code = $already_found->($airport_name);
+              return $airport_code if $airport_code;
+
+              #... go and find its airport code
+              $airport_code = '';
+              my $escaped_airport_name = $airport_name;
+              $escaped_airport_name =~ tr{ }{+};
+              my $url = "http://airportcode.riobard.com/search?q=$escaped_airport_name&fmt=json";
+              my $content = get ($url);
+              warn "Cannot get a response for '$url'\n"
+                 unless defined $content;
+              my $json = JSON->new->allow_nonref;
+              my $data = $json->decode ($content);
+              foreach my $code (@$data) {
+                 $airport_code .= $code->{code} . ",";
+              }
+              chop ($airport_code) if $airport_code;  # removing the trailing comma
+
+              $already_found->($airport_name, $airport_code);
+              return $airport_code;
+           }
+           1;
+
+        When run it creates the following output. Note that some airports
+        have more than one code because the name was ambiguous. Well, this
+        is just an example, isn't it?
+
+           Date         Flight    Airport From      Code From   Airport To       Code To
+           2009-01-18   AY838     London LHR        LHR         Helsinki Vantaa  HEL
+           2009-01-22   AY839     Helsinki Vantaa   HEL         London LHR       LHR
+           2009-03-15   NW2       Manila            MXA,MNL     Tokyo Narita     NRT
+           2009-03-21   NW1       Tokyo Narita      NRT         Manila           MXA,MNL
+           2011-05-06   SV326     Sharm El Sheik    SSH         Jeddah           JED
+           2011-07-31   RJ700     Amman             ADJ,AMM     Jeddah           JED
+           2011-09-21   ME369     Jeddah            JED         Beirut           BEY
+           2011-09-24   ME368     Beirut            BEY         Jeddah           JED
+           2011-12-02   EZY3064   Prague            PRG         London Stansted  STN
+           2011-12-09   EZY3067   London Stansted   STN         Prague           PRG
+           2012-01-26   MS663     Cairo             CAI,CIR     Jeddah           JED
+
+    -inputs <input_ID=<filename> [<input_ID>=<filename>...]>
+        Each "-inputs" can have one or more file names, and there can be one
+        or more "-inputs" arguments. It defines what are the input
+        spreadsheets and how they are identified in the configuration file
+        (see the "-config" argument). For example, the inputs for our
+        example above can be specified in any of these ways:
+
+           -inputs PERSON=persons.tsv -inputs CAR=cars.tsv
+           -inputs PERSON=persons.tsv CAR=cars.tsv
+           -inputs PERSON=persons.tsv,CAR=cars.tsv
+
+        The first file name is considered to be the "primary" input (see the
+        description above): the resulting spreadsheet will have the same
+        number of lines as the primary input.
+
+        The file names ending with the ".csv" are considered to be in the
+        COMMA-separated formats, all others are considered to be
+        TAB-separated.
+
+        This is a mandatory parameter.
+
+    -outfile <output-file>
+        An optional parameter specifying a filename of the combined result.
+        By default, it is created on STDOUT. It is always in the
+        TAB-separated format.
+
+    -check
+        This option causes that the configuration file and the input files
+        (only their header lines will be read) will be checked for errors
+        but no resulting spreadsheet will be created.
+
+    -ignorecases
+        Not yet implemented.
+
+    General options
+
+        -h      Print a brief usage message and exits.
+
+        -help   Print a brief usage message with options and exit.
+
+        -man    Print a full usage message and exit.
+
+        -version
+                Print the version and exit.
+
+ENVIRONMENT VARIABLES
+   COMBINE_SHEETS_EXT_PATH
+    It contains a path that is used when looking for external programs (when
+    the reserved words PROG or PROGS are used). For example, the "examples"
+    directory in the source distribution of this package has an external
+    program "age.sh". The full invocation can be done by:
+
+       COMBINE_SHEETS_EXT_PATH=examples bin/combinesheets -cfg examples/cars.cfg --inputs CAR=examples/cars.csv
+
+DEPENDENCIES
+    In order to run this tool you need Perl and the following Perl modules
+    to be installed:
+
+       App::Cmd::Simple
+       Text::CSV::Simple
+       Text::CSV_XS
+       File::BOM
+       Getopt::Long::Descriptive
+       Pod::Usage
+       Algorithm::Loops
+
+    Optionally (if your configuration file uses the reserved word PROG or
+    PROGS for calculated columns):
+
+       IO::CaptureOutput
+
+KNOWN BUGS, MISSING FEATURES
+    *   Columns are identified by their header names. There is no way to
+        identify them simply by their order (column number).
+
+    *   The input spreadsheet are read first into memory. Which may be a
+        problem with really huge spreadsheets.
+
+    *   The inputs can be COMMA-separated or TAB-separated. It would be
+        perhaps nice to allow also the Excel spreadsheets.
+
+    *   Comparing header names and rows is case-sensitive only. There is a
+        plan to implement the option "-ignorecases",
+
+    Some of these missing features may be implemented later.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc App::combinesheets
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-combinesheets>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/App-combinesheets>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/App-combinesheets>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/App-combinesheets/>
+
+AUTHOR
+    Martin Senger <martin.senger@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Martin Senger, CBRC - KAUST
+    (Computational Biology Research Center - King Abdullah University of
+    Science and Technology) All Rights Reserved..
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

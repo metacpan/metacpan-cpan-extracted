@@ -1,0 +1,77 @@
+2005-06-24 Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* Fluxes.pm: Add ability to look up flux for a specific flux
+	  type via flux() method, defaulting to 'mag'.
+	* Flux.pm: Add type() accessor to retrieve flux object's type.
+
+2005-06-23 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Serious changes to the internal architecture of Flux.pm and
+	  Fluxes.pm. Should have no external changes on the API with
+	  a following wind and a bit of luck...
+
+2005-06-21 Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+        * Flux.pm: Add obsid() accessor to allow for observation
+          identifier for each flux measurement (e.g. filename from
+          which the measurement was taken).
+ 
+2005-06-21 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Fluxes.pm: Added datestamp() routine and supporting infrastrcutre
+	  to Flux.pm so that you can stamp all the Astro::Flux objects in
+	  an Astro::Fluxes object with a DateTime object in one go.
+	  
+2005-06-15 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Fluxes.pm: Added merge() support for Fluxes objects.Moved the
+	  hash of arrays containing the fluxes down a level in the blessed
+	  class, added two more array references to give a simple list of
+	  original colors and fluxes. Added query methods to get at this
+	  information.
+	
+	* FluxColor.pm, Flux.pm & Fluxes.pm: Added more time stamp support  
+
+2005-06-14 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Fluxes.pm: Added whatwavebands().
+	
+	* Flux.pm & FluxColor.pm: Strings are automatically promoted 
+	  to Astro::WaveBand objects if we don't have one already.
+	
+2005-06-13 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Fluxes.pm: Added allfluxes() and fluxesbywaveband() methods.
+	
+	* Flux.pm: Moved $quanitity to be a Number::Uncertainty object,
+	  added support to date stamp the flux using a DateTime object,
+	  and support to retreieve the error independantly. All changes
+	  should be backwards compatible. 
+	  
+	* Added some more tests  
+
+2005-06-10  Alasdair Allan <aa@astro.ex.ac.uk>
+        
+	* Fluxes.pm & Flux.pm: Replaced Astro::Quality with Misc::Quality
+	
+	* Fluxes.pm: Added a pushfluxes() method to allow us to add fluxes
+	  after creation time.
+
+2004-12-16  Brad Cavanagh  <b.cavanagh@jach.hawaii.edu>
+
+	* FluxColor.pm: New class to handle astronomical colours.
+
+	* Fluxes.pm: New class to handle collections of Astro::Flux and
+	  Astro::FluxColor objects.
+
+	* Flux.pm: Add quality, reference waveband accessors.
+
+2004-12-07  Brad Cavanagh  <b.cavanagh@jach.hawaii.edu>
+
+	* Flux.pm (Repository): Added 'measured' accessor.
+
+2004-11-23  Brad Cavanagh  <b.cavanagh@jach.hawaii.edu>
+
+	* Flux.pm (Repository): initial addition
+
+

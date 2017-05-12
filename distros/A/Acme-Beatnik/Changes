@@ -1,0 +1,8 @@
+Revision history for Perl extension Acme::Beatnik.
+
+0.01  Thu July 24 18:44:00 2003
+          - Basic source filter based on Filter::Simple
+
+0.02  Sun July 27 09:48:00 2003
+          - Fixed & Updated POD
+	  - Cleaned up code

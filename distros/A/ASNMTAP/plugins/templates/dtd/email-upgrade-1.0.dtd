@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ENTITY AUTHOR "Alex Peeters">
+<!ENTITY EMAIL "Alex.Peeters@citap.com">
+<!ENTITY PURPOSE "2005/11/15, dtd schema v1.0 for Check Upgrade Email by XML">
+
+<!ELEMENT BaseServiceReport (Ressource)>
+<!ELEMENT Ressource (Server, Name, Date, Time, Environment, ErrorStack, ErrorDetail)>
+<!ELEMENT Server (#PCDATA)>
+<!ELEMENT Name (#PCDATA)>
+<!ELEMENT Date (#PCDATA)>
+<!ELEMENT Time (#PCDATA)>
+<!ELEMENT Environment (#PCDATA)>
+<!ELEMENT ErrorStack (#PCDATA)>
+<!ELEMENT ErrorDetail (#PCDATA)>

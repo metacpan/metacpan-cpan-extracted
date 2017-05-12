@@ -1,0 +1,58 @@
+NAME
+
+    Acme::CPANAuthors::French - We are French CPAN authors
+                                Nous sommes des auteurs CPAN francophones
+
+
+DESCRIPTION
+
+    This class provides a hash of French CPAN authors' PAUSE ID and name to
+    the Acme::CPANAuthors module.
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+    Alternatively, to install with Module::Build, you can use the 
+    following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+    After installing, you can find documentation for this module with the
+    perldoc command.
+
+        perldoc Acme::CPANAuthors::French
+
+    You can also look for information at:
+
+        RT, CPAN's request tracker
+            http://rt.cpan.org/Dist/Display.html?Queue=Acme-CPANAuthors-French
+
+        AnnoCPAN, Annotated CPAN documentation
+            http://annocpan.org/dist/Acme-CPANAuthors-French
+
+        CPAN Ratings
+            http://cpanratings.perl.org/d/Acme-CPANAuthors-French
+
+        Search CPAN
+            http://search.cpan.org/dist/Acme-CPANAuthors-French
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2008 Sébastien Aperghis-Tramoni
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

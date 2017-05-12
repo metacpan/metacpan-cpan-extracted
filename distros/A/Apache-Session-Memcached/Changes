@@ -1,0 +1,18 @@
+Revision history for Perl extension Apache::Session::Memcached.
+
+Legenda: + = new feature, ! = updated feature/bug fix, - = removed feature
+
+
+0.03  Mon Sep 20 13:00:00 2004
+	! Fixed 'remove' session method with 'delete' Cache::Memcached call
+	+ Added delete calls in tests
+
+0.02  Fri Sep 17 08:00:00 2004
+	+ First CPAN public release
+	+ Added tests and improved docs
+
+0.01  Mon Sep 13 16:37:12 2004
+	+ original version; created by h2xs 1.23 with options
+		-X -A -n Apache::Session::Memcached
+	+ Posted the RFC (and an alpha release) to comp.lang.perl.modules and
+	  module-authors@perl.org mailing list

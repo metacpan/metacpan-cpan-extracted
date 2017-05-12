@@ -1,0 +1,8 @@
+~$
+^Makefile$
+^blib/
+^MANIFEST.bak$
+^Makefile.old$
+^pm_to_blib$
+^pod2htm.
+^Acme-Lambda-[\d.]+\.tar\.gz$

@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+# testdb - test DB and interface module
+#
+# $Id: testdb,v 1.6 2002/05/19 05:15:31 pliam Exp $
+#
+
+use Apache::SecSess::DBI;
+
+$dbo = Apache::SecSess::DBI->new(dbifile => 'dbilogin.txt');
+
+@uids = ('bob', 'guest');
+
+for $uid (@uids) {
+	printf("groups(%s): ('%s')\n", $uid, 
+		join("','", $dbo->get_groups($uid))
+	); 
+	printf("%s is valid: %d\n", $uid, $dbo->is_valid_user($uid)); 
+	printf("%s is super: %d\n", $uid, $dbo->is_super_user($uid)); 
+	printf("%s is admin: %d\n", $uid, $dbo->is_administrator($uid)); 
+	printf("verified = '%s'\n", $dbo->validate_user_pass($uid, 'sekret'));
+}
+
+## invalidate guest
+$uid = 'guest';
+printf("verified = '%s'\n", $dbo->validate_user_pass($uid, 'sekret'));
+printf("verified = '%s'\n", $dbo->validate_user_pass($uid, 'sekret'));
+printf("verified = '%s'\n", $dbo->validate_user_pass($uid, 'sekret'));
+printf("status(%s) = %s\n", $uid, $dbo->get_user_status($uid));
+printf("verified = '%s'\n", $dbo->validate_user_pass($uid, 'johnanon'));
+
+printf("re-enabling user '%s'\n", $uid);
+$dbo->enable_user($uid);
+printf("status(%s) = %s\n", $uid, $dbo->get_user_status($uid));
+
+## see if it works for multivalued auths
+$uid = 'bob';
+printf("verified = '%s'\n", $dbo->validate_user_pass($uid, 'secret'));
+printf("verified = '%s'\n", $dbo->validate_user_pass($uid, 'secret'));
+printf("verified = '%s'\n", $dbo->validate_user_pass($uid, 'secret'));
+printf("verified = '%s'\n", $dbo->validate_user_pass($uid, 'secret'));
+printf("status(%s) = %s\n", $uid, $dbo->get_user_status($uid));
+printf("re-enabling user '%s'\n", $uid);
+$dbo->enable_user($uid);
+printf("status(%s) = %s\n", $uid, $dbo->get_user_status($uid));
+
+## resolve X509 emails to uids
+for $uid (@uids) {
+	$email = $dbo->get_stored_token($uid, 'x509email');
+	next unless $email;
+	printf("uid('%s') = '%s'\n", $email, $dbo->x509email_to_uid($email));
+}
+

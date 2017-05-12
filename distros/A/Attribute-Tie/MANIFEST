@@ -1,0 +1,11 @@
+Changes
+lib/Attribute/Tie.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-hash.t
+t/02-array.t
+t/03-scalar.t
+t/04-error.t
+META.yml                                 Module meta-data (added by MakeMaker)

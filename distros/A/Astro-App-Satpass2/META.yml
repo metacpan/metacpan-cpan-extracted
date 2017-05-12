@@ -1,0 +1,152 @@
+---
+abstract: 'Predict satellite visibility using Astro::Coord::ECI'
+author:
+  - 'Tom Wyant (wyant at cpan dot org)'
+build_requires:
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4222, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Astro-App-Satpass2
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Astro::App::Satpass2:
+    file: lib/Astro/App/Satpass2.pm
+    version: '0.034'
+  Astro::App::Satpass2::Copier:
+    file: lib/Astro/App/Satpass2/Copier.pm
+    version: '0.034'
+  Astro::App::Satpass2::Format:
+    file: lib/Astro/App/Satpass2/Format.pm
+    version: '0.034'
+  Astro::App::Satpass2::Format::Dump:
+    file: lib/Astro/App/Satpass2/Format/Dump.pm
+    version: '0.034'
+  Astro::App::Satpass2::Format::Template:
+    file: lib/Astro/App/Satpass2/Format/Template.pm
+    version: '0.034'
+  Astro::App::Satpass2::FormatTime:
+    file: lib/Astro/App/Satpass2/FormatTime.pm
+    version: '0.034'
+  Astro::App::Satpass2::FormatTime::Cldr:
+    file: lib/Astro/App/Satpass2/FormatTime/Cldr.pm
+    version: '0.034'
+  Astro::App::Satpass2::FormatTime::DateTime:
+    file: lib/Astro/App/Satpass2/FormatTime/DateTime.pm
+    version: '0.034'
+  Astro::App::Satpass2::FormatTime::DateTime::Cldr:
+    file: lib/Astro/App/Satpass2/FormatTime/DateTime/Cldr.pm
+    version: '0.034'
+  Astro::App::Satpass2::FormatTime::DateTime::Strftime:
+    file: lib/Astro/App/Satpass2/FormatTime/DateTime/Strftime.pm
+    version: '0.034'
+  Astro::App::Satpass2::FormatTime::POSIX::Strftime:
+    file: lib/Astro/App/Satpass2/FormatTime/POSIX/Strftime.pm
+    version: '0.034'
+  Astro::App::Satpass2::FormatTime::Strftime:
+    file: lib/Astro/App/Satpass2/FormatTime/Strftime.pm
+    version: '0.034'
+  Astro::App::Satpass2::FormatValue:
+    file: lib/Astro/App/Satpass2/FormatValue.pm
+    version: '0.034'
+  Astro::App::Satpass2::FormatValue::Formatter:
+    file: lib/Astro/App/Satpass2/FormatValue/Formatter.pm
+    version: '0.034'
+  Astro::App::Satpass2::Geocode:
+    file: lib/Astro/App/Satpass2/Geocode.pm
+    version: '0.034'
+  Astro::App::Satpass2::Geocode::OSM:
+    file: lib/Astro/App/Satpass2/Geocode/OSM.pm
+    version: '0.034'
+  Astro::App::Satpass2::Locale:
+    file: lib/Astro/App/Satpass2/Locale.pm
+    version: '0.034'
+  Astro::App::Satpass2::Locale::C:
+    file: lib/Astro/App/Satpass2/Locale/C.pm
+    version: '0.034'
+  Astro::App::Satpass2::Macro:
+    file: lib/Astro/App/Satpass2/Macro.pm
+    version: '0.034'
+  Astro::App::Satpass2::Macro::Code:
+    file: lib/Astro/App/Satpass2/Macro/Code.pm
+    version: '0.034'
+  Astro::App::Satpass2::Macro::Command:
+    file: lib/Astro/App/Satpass2/Macro/Command.pm
+    version: '0.034'
+  Astro::App::Satpass2::ParseTime:
+    file: lib/Astro/App/Satpass2/ParseTime.pm
+    version: '0.034'
+  Astro::App::Satpass2::ParseTime::Code:
+    file: lib/Astro/App/Satpass2/ParseTime/Code.pm
+    version: '0.034'
+  Astro::App::Satpass2::ParseTime::Date::Manip:
+    file: lib/Astro/App/Satpass2/ParseTime/Date/Manip.pm
+    version: '0.034'
+  Astro::App::Satpass2::ParseTime::Date::Manip::v5:
+    file: lib/Astro/App/Satpass2/ParseTime/Date/Manip/v5.pm
+    version: '0.034'
+  Astro::App::Satpass2::ParseTime::Date::Manip::v6:
+    file: lib/Astro/App/Satpass2/ParseTime/Date/Manip/v6.pm
+    version: '0.034'
+  Astro::App::Satpass2::ParseTime::ISO8601:
+    file: lib/Astro/App/Satpass2/ParseTime/ISO8601.pm
+    version: '0.034'
+  Astro::App::Satpass2::Utils:
+    file: lib/Astro/App/Satpass2/Utils.pm
+    version: '0.034'
+  Astro::App::Satpass2::Warner:
+    file: lib/Astro/App/Satpass2/Warner.pm
+    version: '0.034'
+  Astro::App::Satpass2::Wrap::Array:
+    file: lib/Astro/App/Satpass2/Wrap/Array.pm
+    version: '0.034'
+requires:
+  Astro::Coord::ECI: '0.077'
+  Astro::Coord::ECI::Moon: '0.077'
+  Astro::Coord::ECI::Star: '0.077'
+  Astro::Coord::ECI::Sun: '0.077'
+  Astro::Coord::ECI::TLE: '0.077'
+  Astro::Coord::ECI::TLE::Iridium: '0.077'
+  Astro::Coord::ECI::TLE::Set: '0.077'
+  Astro::Coord::ECI::Utils: '0.077'
+  Carp: '0'
+  Clone: '0'
+  Cwd: '0'
+  File::Glob: '0'
+  File::HomeDir: '0.93'
+  File::Spec: '0'
+  File::Temp: '0'
+  Getopt::Long: '2.39'
+  I18N::LangTags: '0'
+  I18N::LangTags::Detect: '0'
+  IO::File: '1.14'
+  IO::Handle: '0'
+  IPC::System::Simple: '0'
+  List::Util: '0'
+  POSIX: '0'
+  Scalar::Util: '1.26'
+  Template: '2.21'
+  Template::Constants: '2.21'
+  Template::Provider: '2.21'
+  Text::Abbrev: '0'
+  Text::ParseWords: '0'
+  Text::Wrap: '0'
+  Time::Local: '0'
+  constant: '0'
+  parent: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trwyant/perl-Astro-App-Satpass2.git
+version: '0.034'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

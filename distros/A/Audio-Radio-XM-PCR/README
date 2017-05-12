@@ -1,0 +1,38 @@
+Radio-XM-PCR version 0.01
+=========================
+
+This module provides an interface to the PCR radio from XM.  It allows for most of the functionality of the windows based client, and should work for the newer XMDirect w/adapter radios as well. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Win32::SerialPort -> Windows
+
+  Device::SerialPort -> non-Windows   
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Peter Bowen
+
+XM, XM Direct, and PCR are trademarks of XM Sattelite Radio.
+Windows is a trademark of Microsoft Corp.
+
+Use of this library may be limited by the XM Service and Subscription Terms
+availalble at http://www.xmradio.com/get_xm/customer_service.html.  
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+

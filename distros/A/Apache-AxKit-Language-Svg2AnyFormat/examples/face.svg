@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding= "UTF-8"?>
+<svg width="200" height="200">
+  <title>Made with DrawSWF 1.2 (http://drawswf.sf.net)</title>
+  <g transform="scale(0.05)">
+    <ellipse cx="773.0" cy="20.0" rx="0.0" ry="0.0"  fill="#000000" fill-opacity="1.0" stroke="#000000" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <ellipse cx="1956.0" cy="1963.0" rx="1210.0" ry="1863.0"  fill="#000000" fill-opacity="1.0" stroke="#000000" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <ellipse cx="1896.5" cy="2466.0" rx="1036.5" ry="1240.0"  fill="#ffffff" fill-opacity="1.0" stroke="#000000" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <ellipse cx="933.0" cy="3509.5" rx="627.0" ry="356.5"  fill="#ffcc66" fill-opacity="1.0" stroke="#ff9933" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <ellipse cx="2803.0" cy="3579.5" rx="610.0" ry="326.5"  fill="#ffcc66" fill-opacity="1.0" stroke="#ff9933" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <ellipse cx="1190.0" cy="636.0" rx="430.0" ry="450.0"  fill="#ffffff" fill-opacity="1.0" stroke="#000000" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <ellipse cx="1756.0" cy="613.0" rx="430.0" ry="460.0"  fill="#ffffff" fill-opacity="1.0" stroke="#000000" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <ellipse cx="1209.5" cy="579.5" rx="36.5" ry="93.5"  fill="#ffffff" fill-opacity="1.0" stroke="#3333ff" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <ellipse cx="1466.0" cy="596.5" rx="40.0" ry="103.5"  fill="#ffffff" fill-opacity="1.0" stroke="#3333ff" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <ellipse cx="566.5" cy="1666.0" rx="313.5" ry="280.0"  fill="#000000" fill-opacity="1.0" stroke="#000000" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <ellipse cx="3409.5" cy="1716.0" rx="343.5" ry="290.0"  fill="#000000" fill-opacity="1.0" stroke="#000000" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <line x1="920.0" y1="1446.0" x2="1446.0" y2="1046.0"  stroke="#ffcc33" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <line x1="920.0" y1="1446.0" x2="1466.0" y2="1073.0"  stroke="#ffcc33" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <line x1="913.0" y1="1453.0" x2="1493.0" y2="1106.0"  stroke="#ffcc33" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <line x1="926.0" y1="1446.0" x2="1500.0" y2="1140.0"  stroke="#ffcc33" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <line x1="906.0" y1="1460.0" x2="1526.0" y2="1180.0"  stroke="#ffcc33" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <line x1="920.0" y1="1480.0" x2="1540.0" y2="1233.0"  stroke="#ffcc33" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <line x1="880.0" y1="1473.0" x2="1566.0" y2="1280.0"  stroke="#ffcc33" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <line x1="893.0" y1="1513.0" x2="1580.0" y2="1313.0"  stroke="#ffcc33" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <line x1="1433.0" y1="993.0" x2="1626.0" y2="1313.0"  stroke="#ff9933" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <line x1="1626.0" y1="1313.0" x2="873.0" y2="1526.0"  stroke="#ff9933" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <line x1="853.0" y1="1473.0" x2="1413.0" y2="993.0"  stroke="#ff9933" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+    <line x1="873.0" y1="1473.0" x2="1540.0" y2="1226.0"  stroke="#ff9933" stroke-width="60.0" stroke-opacity="1.0" stroke-linecap="round"/>
+  </g>
+</svg>

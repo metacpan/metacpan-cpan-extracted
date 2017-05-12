@@ -1,0 +1,14 @@
+Change log for perl distribution Alien::GfsmXL
+
+v0.004 Wed, 02 Mar 2016 15:35:13 +0100 moocow
+	* specify Alien::Base::ModuleBuild in configure_requires, fixes RT bug #112614
+
+v0.003 Mon, 29 Feb 2016 08:39:33 +0100 moocow
+	* require minimum Alien::Base v0.027 for 'alien_env' support
+	  - using extra_(compiler|linker)_flags doesn't seem to work for alien libgfsmxl build itself
+
+v0.002 Wed, 24 Feb 2016 14:27:38 +0100 moocow
+	* added Alien::Gfsm to Build.PL 'configure_requires'
+
+v0.001 Mon, 22 Feb 2016 13:29:45 +0100 moocow
+	* initial version

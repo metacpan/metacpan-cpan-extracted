@@ -1,0 +1,17 @@
+\.o$
+^\.cvsignore$
+/\.cvsignore$
+\.cvsignore$
+CVS/[^/]+$
+^Makefile$
+/Makefile$
+^blib/
+\.swp$
+\.bak$
+\.pdf$
+\.ps$
+pm_to_blib
+\.pdf$
+\.tar.gz$
+\.tgz$
+^META.yml$

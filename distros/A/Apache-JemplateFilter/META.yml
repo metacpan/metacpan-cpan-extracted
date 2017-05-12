@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Apache-JemplateFilter
+version:             0.02
+abstract:            Jemplate complie filter for Apache
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Jemplate:                      0.12
+    mod_perl:                      1.21
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - FUJIWARA Shunichiro <fujiwara@topicmaker.com>

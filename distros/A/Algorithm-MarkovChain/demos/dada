@@ -1,0 +1,27 @@
+#!/usr/bin/perl -w
+use strict;
+use lib qw(../blib/lib ./blib/lib);
+use Algorithm::MarkovChain;
+
+use Data::Dumper;
+
+my $mc = Algorithm::MarkovChain->new();
+
+my $infile = shift;
+if ($infile) {
+    $| = 1;
+    print "seeding from $infile\n";
+
+    open IN, $infile;
+    while (<IN>) {
+        $mc->seed(symbols => [m/(\S+)/g],
+                  longest => 4);
+        print "\r$.        ";
+    }
+    print "\nseeded\n";
+}
+
+
+while (<>) {
+    print join(' ', $mc->spew(length => 30)),"\n";
+}

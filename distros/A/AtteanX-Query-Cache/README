@@ -1,0 +1,12 @@
+AtteanX::Query::Cache -- A prefetching SPARQL query cacher
+
+This module is intended to be installed on a caching proxy, and given
+a SPARQL query, it would analyze the query, find parts it can cache,
+prefetch those, and lighten the burden on a remote endpoint.
+
+It can also use Triple Pattern Fragments servers where that makes
+sense, but it will mostly allow the remote endpoint to do joins.
+
+The current releases should be considered early alphas, they are not
+stable and not complete. They are mostly released to ease
+collaboration amongst the authors.

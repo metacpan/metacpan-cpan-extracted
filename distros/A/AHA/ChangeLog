@@ -1,0 +1,6 @@
+2014-05-28  Roland Huss  <roland@consol.de>
+
+	* Released 0.55
+
+	* AHA.pm (list): Fixed bogus regexp for #94480 
+

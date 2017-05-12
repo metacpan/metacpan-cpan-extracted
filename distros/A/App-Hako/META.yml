@@ -1,0 +1,40 @@
+---
+abstract: 'keep apps away from your home'
+author:
+  - 'Marty Pauley <marty@martian.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.8, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Hako
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Hako:
+    file: lib/App/Hako.pm
+    version: '0.03'
+  App::Hako::MagicNumbers:
+    file: lib/App/Hako/MagicNumbers.pm
+requires:
+  Getopt::Long: '2.24'
+  perl: '5.12'
+resources:
+  bugtracker: https://github.com/maokt/hako/issues
+  homepage: https://github.com/maokt/hako
+  repository: git://github.com/maokt/hako.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="NULL" type="application/x-xsp"?>
+<?xml-stylesheet href="/transforms/xhtml/match-menu.xsl" type="text/xsl"?>
+
+<xsp:page
+  xmlns:xsp="http://www.apache.org/1999/XSP/Core"
+  xmlns:menu="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Menu"
+  xmlns:i18n="http://www.kjetil.kjernsmo.net/software/TABOO/NS/I18N"
+  xmlns:ct="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Control"
+  xmlns:cat="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Category"
+  xmlns:story="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Story"
+  xmlns:user="http://www.kjetil.kjernsmo.net/software/TABOO/NS/User">
+    
+  <menu:menu>
+    <menu:section>
+      <menu:header><i18n:insert>stories-title-menu</i18n:insert></menu:header>
+      <menu:li>
+	<menu:text><i18n:insert>submit-story-menu</i18n:insert></menu:text>
+	<menu:url>/news/submit</menu:url>
+      </menu:li>
+      
+      <user:is-authorized authlevel="5">
+	<user:true>
+	  <menu:li>
+	    <menu:text>
+	      <i18n:insert>subqueue-story-menu</i18n:insert>
+	      (<story:number-of-unapproved sectionid="subqueue"/>)
+	    </menu:text>
+	    <menu:url>/news/subqueue</menu:url>
+	  </menu:li>
+	</user:true>
+      </user:is-authorized>
+      <cat:get-categories type="stsec"/>
+    </menu:section>
+
+    <user:is-authorized authlevel="1">
+      <user:true>
+	<menu:section>
+	  <menu:header><i18n:insert>cats-title-menu</i18n:insert></menu:header>
+	  <menu:li>
+	    <menu:text>
+	      <i18n:insert>suggest</i18n:insert>
+	      <i18n:insert>new</i18n:insert>
+	    </menu:text>
+	    <menu:url>/categories/submit</menu:url>
+	  </menu:li>
+	</menu:section>
+      </user:true>
+    </user:is-authorized>
+
+    <menu:section>
+      <menu:header><i18n:insert>articles-title-menu</i18n:insert></menu:header>
+      <menu:li>
+	<menu:text><i18n:insert>submit-article-menu</i18n:insert></menu:text>
+	<menu:url>/articles/submit</menu:url>
+      </menu:li>
+    </menu:section>
+
+    <menu:section>
+      <menu:header><i18n:insert>users-title-menu</i18n:insert></menu:header>
+      <user:is-authorized authlevel="1">
+	<user:true>
+	  <menu:li>
+	    <menu:text><i18n:insert>me</i18n:insert></menu:text>
+	    <menu:url>/user/<user:authnuser/></menu:url>
+	  </menu:li>
+	</user:true>
+	<user:false>
+	  <menu:li>
+	    <menu:text><i18n:insert>submit-new-user</i18n:insert></menu:text>
+	    <menu:url>/user/submit/new</menu:url>
+	  </menu:li>
+	  <menu:li id="login">
+	    <ct:control element="input" type="text"
+	    name="username" maxlength="8">
+	      <ct:title>
+		<i18n:insert>username</i18n:insert>:
+	      </ct:title>
+	    </ct:control>
+	    <ct:control element="input" type="password" name="clear">
+	      <ct:title>
+		<i18n:insert>password</i18n:insert>:
+	      </ct:title>
+	    </ct:control>
+	    <ct:control element="input" type="submit" name="login">
+	      <ct:value><i18n:insert>login</i18n:insert></ct:value>
+	    </ct:control>
+	  </menu:li>
+	</user:false>
+      </user:is-authorized>
+    </menu:section>
+  </menu:menu>
+</xsp:page>
+

@@ -1,0 +1,58 @@
+Revision history for AnnoCPAN
+
+0.22  Aug 02 2004
+        - Bug fixes
+            * Fixed some bugs in L<>
+            * Fixed note propagation bug
+            * Found cause of database connection bug (version of DBD::mysql)
+            * Fixed =begin count persistence bug
+        - Site structure and navigation
+            * Redirect perldoc.cgi
+            * Redirect when a dist has only one distver
+            * Added a pager in the front page
+            * Use 302 redirects by default
+            * /note mode that shows and edits version bindings for a note
+            * Use Lingua::EN::Inflect to avoid saying '1 notes'
+            * Support POD formatting in notes
+            * Added help to edit form
+        - RSS
+            * RSS of new dists
+            * Refactored RSS code into AnnoCPAN::Feed
+        - Backend / database
+            * Added CPANRatings data
+            * Added maturity data to distver table
+            * Added "creation_time" to dist table
+        - Miscelaneous features
+            * Compression
+            * Added note_id to note elements in XML dump
+            * Plain text note counts
+
+0.21  Jul 12 2005
+        - Site structure and navigation
+            * Added support for urls such as /~id/dist/path
+            * Added note count and latest date to show_dist, show_author, etc.
+            * Added note navigation and bookmarkability (#13603)
+            * Added a show_author_recent mode 
+            * Added a news section
+            * Added B&F link to the footer
+            * Added missing Kobes link to author pages
+            * Added note text to note tables
+        - RSS feeds
+            * Added timestamps
+            * Added author feed; Bug #13505
+            * Changed link format to /~id/Dist/Path#note_id; Fixed bug #13507
+        - Site tools
+            * Added an annocpan_undump script and a sample update.sh
+        - Various bug fixes:
+            * Removed spurious debugging message on Create
+            * Removed absolute uri on redirects and join form submission
+            * Fixed object_param to work with multiple values (required by join)
+            * Omitted hidden notes from front page (#13585)
+            * Made undump actually load the note text and reference section
+            * Make sure tests pass
+            * Accept .tgz distributions
+            * Accept packages where the first directory doesn't contain a slash
+            * Use UTF-8 for everything
+
+0.20  Jun 26 2005
+        - First release

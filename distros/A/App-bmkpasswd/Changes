@@ -1,0 +1,293 @@
+Revision history for Perl module App::bmkpasswd
+
+2.012002 2016-07-26
+
+  - Safer Bytes::Random::Secure::Tiny require()
+
+2.012001 2016-07-25
+
+  - Safer Crypt::Passwd::XS require() (ignore '.' in @INC)
+
+  - bmkpasswd executable always drops '.' from @INC
+
+  - Default salt generator now package-scoped
+
+  - Test suite improvements
+
+2.011006 2016-03-20
+
+  - Improved check for POSIX::Termios in `bmkpasswd`
+
+  - Minor `bmkpasswd` cleanups; take advantage of IO::Handle methods as long
+    as we have it
+
+2.011005 2016-03-09
+
+  - Skip 'bmkpasswd' command tests on MSWin32
+
+    While the utility is reported to work without issue, the test does not,
+    and I lack access to an appropriate machine for deeper diving.
+
+2.011004 2016-03-09
+
+  - Fall back to Term::ReadKey on MSWin32
+
+2.011003 2016-03-09
+
+  - Fall back to Term::ReadKey to turn off terminal echo on 5.8.x, if
+    available; if not, warn loudly and suggest it before prompting for a
+    password to crypt
+
+2.011002 2016-03-09
+
+  - Fix `bmkpasswd` executable on 5.8.x (no POSIX::ECHO available)
+
+2.011001 2016-03-08
+
+  - Add `bmkpasswd --available` for listing available crypt methods
+
+  - Adjust constant time comparison to avoid potentially leaking any
+    information regarding the length of random-length SHA salts
+
+  - Add proper Test::Cmd tests for `bmkpasswd`
+
+2.010001 2015-10-23
+
+  - Reintroduce constant time comparison for hashes
+
+  - Minor test expansion
+
+2.009001 2015-08-08
+
+  - Support calling Crypt::Bcrypt::Easy->crypt as a class method
+
+2.008002 2015-08-02
+
+  - Bytes::Random::Secure::Tiny now defaults to seeding from nonblocking
+    sources; fix our constructor call when 'strong' salts are enabled
+
+2.008001 2015-07-02
+
+  - Switch to Bytes::Random::Secure::Tiny
+
+2.007001 2015-06-21
+
+  - API change; passwdcmp now returns explicit undef rather than an empty
+    list
+
+  - API change; export mkpasswd and passwdcmp by default
+
+  - Add 'reset_seed' option to Crypt::Bcrypt::Easy's constructor as sugar for
+    calling 'mkpasswd_forked' at object construction time
+
+2.006001 2015-06-21
+
+  - Add 'mkpasswd_forked' function for resetting salt generator seeds in child
+    processes or threads.
+
+2.005004 2015-03-11
+
+  - 'use strictures 2;' for saner fatal warnings behavior
+
+  - Faster tests
+
+2.005003 2014-12-02
+
+  - Kill constant time comparison completely; this was a silly addition that
+    has only introduced bugs.
+
+  - Switch to 'cpanfile' dependency list
+
+2.005002 2014-09-18
+
+  - Better Crypt::Bcrypt::Easy documentation.
+
+  - Improvements to constant time comparison.
+
+  - Minor optimizations & cleanups.
+
+2.005001 2014-09-11
+
+  - SECURITY; passwdcmp() constant time comparison fixes.
+    
+    The last character of a hash can be skipped during constant time
+    comparison in previous versions (starting at 1.82.4).
+    
+    Real-world risk is reasonably low, but this does make collisions more
+    likely. Mea culpa.
+
+  - POD / test expansion
+
+2.004002 2014-05-12
+
+  - Minor cleanups & test improvements
+
+2.004001 2013-10-16
+
+  - Fix MD5 failures on machines without Crypt::Passwd::XS
+
+2.004000 2013-10-15
+
+  - Add mkpasswd_available function for checking avail hash methods
+
+2.003001 2013-10-14
+
+  - Fix failing t/04_hashopts.t on machines without SHA support
+
+  - Use Pod::Usage to provide --help / --usage / --man
+
+2.003000 2013-10-13
+
+  - Support for passing in a salt generator coderef
+  
+  - mkpasswd() can accept parameters via a HASH
+
+2.002000 2013-09-12
+
+  - Use Exporter::Tiny
+
+2.001003 2013-09-01
+
+  - No code changes; drop prereq to perl-5.6
+
+2.001002 2013-08-09
+
+  - No code changes; fix 'Changes' to match CPAN::Changes::Spec
+
+2.001001 2013-06-18
+
+  - Kill Term::ReadKey dependency entirely; instead use POSIX::Termios to turn
+    off terminal echo.  (haarg clued me in to this in a conversation he was
+    having with tobyink on irc.perl.org #web-simple -- thanks!)
+
+2.001000 2013-05-02
+
+  - Output `bmkpasswd` prompts to STDERR for more sensible redirection
+
+  - Make Term::ReadKey optional and warn if we don't have it
+
+2.000003 2013-04-21
+
+  - Cleaner --bench output
+
+  - POD/test cleanups
+
+2.000002 2013-04-19
+
+  - Fix single-digit work-cost adjustment
+
+  - Crypt::Bcrypt::Easy:
+    Add ->cost() method
+    Possible to pass a 'type =>' to ->crypt()
+    (undocumented -- bcrypt is your friend, use it)
+
+2.000001 2013-04-19
+
+  - Add Crypt::Bcrypt::Easy
+
+1.082005 2013-04-08
+
+  - Better passwdcmp() argument-checking
+
+  - Trap dying 'crypt()' calls in tests to avoid fuzzy fails like
+    http://www.cpantesters.org/cpan/report/be021b42-9e64-11e2-8d62-e95aab8f1a3b
+
+1.082004 2013-04-05
+
+  - Use constant time comparison when comparing hashes.
+
+  - POD enhancements.
+
+1.082003 2013-04-01
+
+  - POD tweaks
+
+1.082002 2013-02-23
+
+  - Lazy-build Bytes::Random::Secure instances
+
+1.082001 2013-02-23
+
+  - Use Bytes::Random::Secure-0.24
+
+1.082000 2013-02-17
+
+  - Use NonBlocking => 1 unless --strong is specified
+
+1.081002 2013-02-17
+
+  - Fix stray reference to deprecated HAVE_PASSWD_XS in bin/bmkpasswd
+
+1.081001 2013-02-17
+ 
+  - Use Crypt::Random::Seed in blocking mode to generate salts securely.
+
+  - Switch to dzil & semantic versioning
+
+
+1.07 2012-06-10
+
+  - Slightly more sane Crypt::Passwd::XS checking.
+
+  - Improved POD.
+
+1.06 2012-06-09
+
+  - Small t/ readability cleanup.
+
+  - Missing changelog for 1.05.
+
+1.05 2012-06-09
+
+  - Skip MD5 tests on systems without Crypt::Passwd::XS or working MD5.
+
+  - Fixes test failures on Windows builds without proper crypt(),
+    MD5 is only included for compat with ancient hashes anyway.
+
+1.04 2012-06-09
+
+  - Fix a broken test on systems missing SHA support.
+
+  - More consistent POD between bmkpasswd(1) and App::bmkpasswd
+
+1.03 2012-06-08
+
+  - croak() if specified work cost factor is not numeric.
+  
+  - croak() on unknown types.
+
+  - Clean up an old check that is no longer relevant; have_sha() will now 
+    do the Right Thing if Crypt::Passwd::XS is missing, so we don't need 
+    to check if someone was stupidly futzing with package variables.
+
+1.02 2012-06-08
+
+  - Typo/style cleanups
+
+1.01 2012-06-08
+
+  - Try::Tiny rather than raw block eval, 'use strictures'
+
+  - Improved tests
+
+1.00 2012-05-23
+
+  - Minor cleanups, 1.00
+
+0.05 2012-04-07
+
+  - t/04_sha: mention Crypt::Passwd::XS if SHA is missing
+
+  - Include . / in standard salt possibles (MD5/SHA)
+
+  - croak() rather than die() from bmkpasswd.pm
+
+0.04 2012-04-02
+
+  - Don't export mkpasswd/passwdcmp unless requested.
+
+0.03 2012-03-29
+
+  - First known-working CPAN-able dist; based on code pulled out of the
+    Bot::Cobalt IRC bot, with POD updates, optional Crypt::Passwd::XS
+    detection/use, better tests

@@ -1,0 +1,12 @@
+Build.PL
+lib/AHA.pm
+lib/AHA/Switch.pm
+example/lava_lamp.pl
+README.md
+LICENSE
+MANIFEST			This list of files
+META.yml
+META.json
+MANIFEST.SKIP
+ChangeLog
+t/70_pod.t

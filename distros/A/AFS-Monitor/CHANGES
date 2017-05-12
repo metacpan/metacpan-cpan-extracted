@@ -1,0 +1,55 @@
+Version 0.3.3 (released July 6, 2011)
+  * changed ownership from Alf Wachsmann to Steven Jenkins
+  * incorporated patches from Jeff Blaine
+
+Version 0.3.2 (released May 14, 2007)
+  * removed spurious lib subdirectory from tar file
+    Thanks to David Cantrell <david at cantrell.org.uk>
+
+Version 0.3.1 (released April 4, 2007)
+
+ * changed permissions from 755 to 0755 in Makefile.PL
+ * ExtUtils::MakeMaker's PERL_MM_USE_DEFAULT environment variable is now obeyed
+ * fixed a problem to make it compile on 32 bit RHEL4
+ All fixes were submitted by Wolfgang Friebel <Wolfgang.Friebel at desy.de> - Thanks!
+
+
+Version 0.3.0 (released April 27, 2006)
+
+ * made everything work with OpenAFS-1.4.1
+ * cmdebug: PrintCacheEntries() now contains the strings and not the number of the file types
+ * added new CallBack statistics from OpenAFS-1.4.1 file servers to xstat_fs_test()
+ * added example for CallBack statistics to examples/xstat_fs_test
+ * added new statistics "rx_nBusies", "fs_nBusies", "fs_GetCapabilities" to xstat_fs_test()
+ * changed call by value to call by reference in a number of functions which reduces the
+   memory usage
+ * some general code cleanup
+
+
+Version 0.2.2 (released January 17, 2005)
+
+ * Added a README file as preparation for CPAN
+
+
+Version 0.2.1 (released November 4, 2004)
+
+ * Handling of shared AFS libraries.
+   Thanks to Wolfgang Friebel <Wolfgang.Friebel at desy.de>
+
+
+Version 0.2.0 (released October 14, 2004)
+
+ * Extended user interface of some functions. They now not only
+   take array refs but also single names as string as input.
+   Thanks to Peter Scott <Peter.J.Scott at jpl.nasa.gov>
+
+
+Version 0.1.2 (released September 1, 2004)
+
+ * Added changes for Mac OS X
+   Thanks to Sebastian Hagedorn <Hagedorn at uni-koeln.de>
+
+
+Version 0.1 (released August 15, 2004, revision 1.9)
+
+ * First public release

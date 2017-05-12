@@ -1,0 +1,41 @@
+NAME
+    Archive::Peek::External - Peek into archives without extracting them
+    (using external tools)
+
+SYNOPSIS
+      use Archive::Peek::External;
+      my $peek = Archive::Peek::External->new( filename => 'archive.tgz' );
+      my @files = $peek->files();
+      my $contents = $peek->file('README.txt')
+
+DESCRIPTION
+    This module lets you peek into archives without extracting them. It
+    currently supports tar files and zip files using external tools such as
+    'tar' and 'unzip'.
+
+METHODS
+  new
+    The constructor takes the filename of the archive to peek into:
+
+      my $peek = Archive::Peek::External->new( filename => 'archive.tgz' );
+
+  files
+    Returns the files in the archive:
+
+      my @files = $peek->files();
+
+  file
+    Returns the contents of a file in the archive:
+
+      my $contents = $peek->file('README.txt')
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2011, Leon Brocard.
+
+LICENSE
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

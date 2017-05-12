@@ -1,0 +1,51 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+
+# Copyright (c) 2010 by Jeff Weisberg
+# Author: Jeff Weisberg <jaw @ tcp4me.com>
+# Created: 2010-Jan-26 12:53 (EST)
+# Function: mrmagoo job submit client
+#
+# $Id: mrgamoo,v 1.1 2010/11/01 19:02:57 jaw Exp $
+
+my %opt;
+use Getopt::Long qw(:config no_ignore_case);
+use AC::MrMagoo::Client;
+use strict;
+
+GetOptions(\%opt,
+           "check",
+           "verbose|v",
+           "debug|d",
+           "console",
+           "start=s",
+           "end=s",
+          ) || exit;
+
+
+my $mrm = AC::MrMagoo::Client->new( $ARGV[0],  \%opt );
+
+if( $opt{check} ){
+    $mrm->check_code();
+    exit;
+}
+
+$mrm->open_console() if $opt{console};
+
+# run job
+my $id = $mrm->submit( seedlist() );
+die "could not run job\n" unless $id;
+
+print STDERR "job: $id\n" if $opt{verbose};
+$SIG{INT} = $SIG{QUIT} = sub{ $mrm->abort(); exit; };
+$mrm->run_console() if $opt{console};
+
+exit;
+
+################################################################
+
+sub seedlist {
+    # determine list of servers to try
+    return '10.200.2.3:3504';
+}
+

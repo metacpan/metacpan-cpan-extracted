@@ -1,0 +1,593 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+our $VERSION = '1.001007'; # VERSION
+
+use lib '../lib';
+use Getopt::Long;
+use File::Path;
+use File::Copy;
+use File::Find;
+use Cwd;
+
+require File::Spec;
+
+my %Show_Plugins;
+
+
+my %opts = (
+    site         => 'zcms',
+    core         => '',
+    plugins      => '',
+    nocore       => '',
+    cpan         => '',
+    pages        => '',
+    show_plugins => '',
+);
+
+GetOptions(
+    'site=s'    => \ $opts{site},
+    'core=s'    => \ $opts{core},
+    'plugins=s' => \ $opts{plugins},
+    'nocore'    => \ $opts{nocore},
+    'show_plugins'    => \ $opts{show_plugins},
+    'cpan=s'    => \ $opts{cpan},
+    'pages=s'   => \ $opts{pages},
+    'overwrite_existing_plugins' => \ $opts{overwrite_existing_plugins},
+);
+
+$opts{core} = $opts{site} . '_site'
+    unless length $opts{core};
+
+
+@opts{ qw/core_modules data templates cpan_dir/ } = (
+    File::Spec->catdir( $opts{core}, 'App', 'ZofCMS' ),
+    File::Spec->catdir( $opts{core}, 'data' ),
+    File::Spec->catdir( $opts{core}, 'templates' ),
+    File::Spec->catdir( $opts{core}, 'CPAN' ),
+);
+
+@opts{ qw/plug_dir execs/ } = (
+    File::Spec->catdir( $opts{core_modules}, 'Plugin' ),
+    File::Spec->catdir( $opts{core_modules}, 'Execs' ),
+);
+
+
+mkpath(
+    [ @opts{ qw/site data templates plug_dir execs  cpan_dir/ } ],
+    1, 0777
+);
+
+if ( $opts{cpan} ) {
+    prepare_cpan( @opts{ qw/core cpan/} );
+}
+
+if ( $opts{show_plugins} ) {
+    show_plugins( @opts{qw/core  site/} );
+    exit;
+}
+
+if ( $opts{plugins} ) {
+    prepare_plugins( @opts{qw/core plugins  overwrite_existing_plugins/} );
+}
+
+if ( $opts{pages} ) {
+    for my $page ( split /,/, $opts{pages} ) {
+        my @dirs = split '/', $page;
+        if ( @dirs > 1 ) {
+            mkpath( [
+                    File::Spec->catdir( $opts{core}, 'data', @dirs[0 .. $#dirs - 1] )
+                ], 1, 0777
+            );
+            mkpath( [
+                    File::Spec->catdir( $opts{core}, 'templates', @dirs[0 .. $#dirs - 1] )
+                ], 1, 0777
+            );
+        }
+        $dirs[-1] .= '.tmpl';
+        my $data = File::Spec->catfile( $opts{core}, 'data', @dirs );
+
+        my @template_dirs = @dirs;
+        my $c = do( File::Spec->catfile( $opts{core}, 'config.txt' ) )
+            or die "Failed to load config.txt $@ $!";
+
+        if ( $c->{zcms_template_extension} ) {
+            $template_dirs[-1] =~ s/\.tmpl/$c->{zcms_template_extension}/;
+        }
+
+        my $template = File::Spec->catfile(
+                $opts{core}, 'templates', @template_dirs
+        );
+
+        if ( -e $data ) {
+            print "$data file exists, omitting...\n";
+        }
+        else {
+            my $fh_data;
+            unless ( open $fh_data, '>', $data ) {
+                warn "Failed to open $data [$!]\n";
+            }
+            else {
+                close $fh_data;
+            }
+        }
+
+        if ( -e $template ) {
+            print "$template file exists, omitting...\n";
+        }
+        else {
+            my $fh_template;
+            unless ( open $fh_template, '>', $template ) {
+                warn "Failed to open $template [$!]\n";
+            }
+            else {
+                my $body_file = File::Spec->catfile( @dirs );
+                my $title = join ' - ', map do { s/-(.)/ \u$1/g; $_ },
+                    map ucfirst, grep length, reverse split m{/}, $page;
+
+                print $fh_template <<"END";
+use strict;
+use warnings;
+
+{
+    body => \\'$body_file',
+    title => '$title',
+    plugins => [
+    ],
+};
+
+__END__
+END
+                close $fh_template;
+            }
+        }
+    }
+}
+
+exit
+    if $opts{nocore};
+
+@opts{ qw/index base index_tmpl index_html_tmpl 404  config_file/ } = (
+    File::Spec->catfile( $opts{site}, 'index.pl' ),
+    File::Spec->catfile( $opts{core}, 'data', 'base.tmpl' ),
+    File::Spec->catfile( $opts{core}, 'templates', 'index.tmpl' ),
+    File::Spec->catfile( $opts{core}, 'data', 'index.tmpl' ),
+    File::Spec->catfile( $opts{core}, 'templates', '404.tmpl' ),
+    File::Spec->catfile( $opts{core}, 'config.txt' ),
+);
+
+open my $fh, '>', $opts{index}
+    or die "Failed to open/create $opts{index} [$!]";
+
+print $fh make_index_pl( $opts{core} );
+close $fh;
+chmod 0755, $opts{index};
+
+open $fh, '>', $opts{base}
+    or die "Failed to open/create $opts{base} [$!]";
+
+print $fh make_base();
+
+open $fh, '>', $opts{index_tmpl}
+    or die "Failed to open/create $opts{index_tmpl} [$!]";
+
+print $fh make_index_tmpl();
+
+
+open $fh, '>', $opts{index_html_tmpl}
+    or die "Failed to open/create $opts{index_html_tmpl} [$!]";
+
+print $fh make_index_html_tmpl();
+
+
+open $fh, '>', $opts{404}
+    or die "Failed to open/create $opts{404} [$!]";
+
+print $fh make_404();
+
+
+open $fh, '>', $opts{config_file}
+    or die "Failed to open/create $opts{config_file} [$!]";
+
+print $fh make_config_file( $opts{core} );
+
+
+copy_module( $_, $opts{core} )
+    for qw/
+        App::ZofCMS::Config
+        App::ZofCMS::Template
+        App::ZofCMS::Output
+    /;
+
+sub show_plugins {
+    my ( $core, $site ) = @_;
+
+    find(\&show_plugins_plugin_found, File::Spec->catdir($core, 'templates') );
+
+    if ( my $t = do File::Spec->catfile( $core, 'config.txt' ) ) {
+        for my $key ( grep /^plugins\d*/, keys %$t ) {
+            ref $t->{$key} eq 'ARRAY'
+                or next;
+
+            for ( @{ $t->{$key} || [] } ) {
+                if ( ref $_ eq 'HASH' ) {
+                    $Show_Plugins{ (keys %$_)[0] } = 1;
+                    next;
+                }
+                $Show_Plugins{ $_ } = 1;
+            }
+        }
+
+        for my $key ( grep /^plugins\d*/, keys %{ $t->{template_defaults} } ) {
+            ref $t->{template_defaults}{$key} eq 'ARRAY'
+                or next;
+
+            for ( @{ $t->{template_defaults}{$key} || [] } ) {
+                if ( ref $_ eq 'HASH' ) {
+                    $Show_Plugins{ (keys %$_)[0] } = 1;
+                    next;
+                }
+                $Show_Plugins{ $_ } = 1;
+            }
+        }
+    }
+
+    print "The following plugins were found:\n";
+    print "$_\n" for map "App::ZofCMS::Plugin::$_", sort keys %Show_Plugins;
+    print "--end--\n";
+    print "zofcms_helper --nocore --site $site --plugins "
+        . join(q|,|, sort keys %Show_Plugins) . "\n";
+    exit;
+}
+
+sub show_plugins_plugin_found {
+
+    return
+        if -d;
+
+    print "About to process template: $File::Find::name\n";
+
+    my $t = do $_
+        or return;
+
+    ref $t eq 'HASH'
+        or return;
+
+    for my $key ( grep /^plugins\d*/, keys %$t ) {
+        ref $t->{$key} eq 'ARRAY'
+            or return;
+
+        for ( @{ $t->{$key} || [] } ) {
+            if ( ref $_ eq 'HASH' ) {
+                $Show_Plugins{ (keys %$_)[0] } = 1;
+                next;
+            }
+            $Show_Plugins{ $_ } = 1;
+        }
+    }
+}
+
+
+sub prepare_plugins {
+    my ( $core, $plugins, $do_overwrite ) = @_;
+    my @plugins = map "App::ZofCMS::Plugin::$_", split /\s*,\s*/, $plugins;
+
+    copy_module( $_, $core, $do_overwrite )
+        for @plugins;
+}
+
+sub prepare_cpan {
+    my ( $core, $mods ) = @_;
+    my @mods = split ',', $mods;
+
+    my @paths;
+    for ( @mods ) {
+        my @bits = split /::/;
+        pop @bits;
+        push @paths, File::Spec->catdir( $core, 'CPAN', @bits );
+    }
+    mkpath( \@paths, 1, 0777 );
+
+    copy_module( $_, File::Spec->catdir($core, 'CPAN') )
+        for @mods;
+}
+
+sub copy_module {
+    my ( $mod, $core, $do_overwrite ) = @_;
+    eval "use $mod;";
+    if ( $@ ) {
+        print "ERROR: $@\n";
+        return;
+    }
+
+    my $mod_file = $mod . '.pm';
+    $mod_file =~ s|::|/|g;
+
+    my $mod_path = $mod_file;
+    $mod_path =~ s|[^\\/]+$||;
+
+    mkpath( [ File::Spec->catdir( $core, $mod_path ) ], 1, 0777 );
+
+    my $core_mod_file = File::Spec->catfile( $core, $mod_file );
+
+    if ( -e $core_mod_file and not $do_overwrite ) {
+        print "$core_mod_file already exists. Use `--overwrite_existing_plugins` option to overwrite\n";
+    }
+    else {
+        copy $INC{$mod_file}, $core_mod_file
+            or print "ERROR: failed to copy $mod [$!]";
+    }
+}
+
+sub make_index_pl {
+    my $core = '../' . shift;
+    if ( substr($core, -1) eq '/' ) {
+        $core = substr $core, 0, -1;
+    }
+    my $code = <<'END_CODE';
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib qw([{LIB}] [{LIB}]/CPAN);
+use App::ZofCMS::Config;
+use App::ZofCMS::Template;
+use App::ZofCMS::Output;
+
+use CGI::Carp qw/fatalsToBrowser/;
+
+my $config = App::ZofCMS::Config->new;
+
+my $conf = $config->load( '[{CONFIG}]' );
+
+my $template;
+
+RELOADS: {
+    $template = App::ZofCMS::Template->new( $config );
+
+    $template->load;
+    $template->prepare_defaults;
+    $template->execute_before;
+    $template->assemble;
+    $template->execute
+        or redo RELOADS;
+}
+
+my $output = App::ZofCMS::Output->new( $config, $template );
+print $output->headers;
+print $output->output;
+exit;
+END_CODE
+
+    $code =~ s/\Q[{LIB}]/$core/g;
+    $code =~ s|\Q[{CONFIG}]|${core}/config.txt|;
+    return $code;
+}
+
+sub make_base {
+    return <<'END_HTML';
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title><tmpl_var name="title"></title>
+
+<link rel="stylesheet" type="text/css" href="/main.css" media="screen,tv,projection">
+<link rel="stylesheet" type="text/css" href="/print.css" media="print">
+
+<!--[if IE]>
+    <link rel="stylesheet" type="text/css" href="/ie.css" media="screen,tv,projection">
+<![endif]-->
+
+<div id="main">
+    <tmpl_var name="body">
+</div>
+END_HTML
+}
+
+sub make_index_tmpl {
+    return <<'END_CODE';
+use strict;
+use warnings;
+
+{
+    body => \'index.tmpl',
+    title => '',
+}
+END_CODE
+}
+
+sub make_index_html_tmpl {
+    return 'Fill me up!'
+}
+
+sub make_404 {
+    return <<'END_CODE';
+{
+    body => \'404.tmpl',
+    title => '404 - Page Not Found',
+}
+END_CODE
+}
+
+sub make_config_file {
+    my $core_dir = shift;
+    return <<"END_CONFIG";
+use strict;
+use warnings;
+
+{
+    valid_pages => {
+        dirs => [
+            '/'
+        ],
+    },
+    data_store => '../$core_dir/data',
+    templates    => '../$core_dir/templates',
+    template_defaults => {
+        conf => {
+            base => 'base.tmpl',
+        },
+    },
+}
+END_CONFIG
+}
+
+1;
+__END__
+
+=head1 NAME
+
+zofcms_helper - helper script for ZofCMS web-framework/templating system
+
+=head1 SYNOPSYS
+
+mkdir site_dir;
+cd site_dir;
+zofcms_helper --site example --plugins QueryToTemplate,DBI,SomeOtherPlugin;
+
+=head1 DESCRIPTION
+
+C<zofcms_helper> is a helper script supplied with L<App::ZofCMS>. It is used
+to create "startup" structure for your site as well as adding plugin files,
+which isn't necessary if you installed them on your server via CPAN.
+
+=head1 SUPPORTED ARGUMENTS
+
+=head2 C<--site>
+
+    zofcms_helper --site example
+
+The C<--site> argument specifies the directory to use for your web
+accessible directory of ZofCMS, this is where you'll have your C<index.pl>
+file (the helper script will create it). If you don't specify the
+C<--core> argument (see below) it will automatically created from the
+C<--site> argument by appending C<_site> to whatever you specify. If you
+don't provide C<--site> argument, the default is C<zcms>.
+
+=head2 C<--core>
+
+    zofcms_helper --site example --core example_core
+
+The C<--core> argument specifies the name of directory for the "data"
+directory of ZofCMS, in other words, this is web-inaccessible directory
+in which you will have your config file, "data_storage" and "templates"
+directory (see L<App::ZofCMS::Config> for description) as well as
+any of ZofCMS plugins. The helper script creates config file, all of those
+directories as well as directory C<Execs> (see L<App::ZofCMS::Template>)
+and C<Extras> (see L<App::ZofCMS::Extras>). The helper script also creates
+basic C<base.tmpl>, C<index.tmpl> and C<404.tmpl> in C<data/> directory
+inside the directory specified by C<--core> as well as basic
+C<index.tmpl> inside C<templates/> directory. If C<--core> parameter is not
+specified it will be created by appending C<_site> to whatever you've
+gave to C<--site> argument.
+
+B<Note:> currently there is no support [in the helper script]
+to have C<--core> point to a directory on a different level than C<--site>.
+If you desperatelly need this please let me know and I will add that
+support. For now, you can simply edit the created C<index.pl> file, in
+particular it's two lines:
+
+    use lib '../core_dir';
+
+    ....
+
+    my $conf = $config->load( '../core_dir/config.txt' );
+
+
+=head2 C<--plugins>
+
+    zofcms_helper --site zcms --plugins DBI,QueryToTemplate,OtherPlugin
+
+This options takes a comma (C<,>) separated list of plugin names to copy
+over into your "core" directory. This is useful if your server does
+not support module installation from CPAN; i.e. the helper script
+copies the modules installed on your system into "core" directory from
+where ZofCMS can load them, thus when you are done with your site you
+can simply upload C<--site> and C<--core> directories to your server and
+everything should work just fine.
+
+B<NOTE:> do not include the C<App::ZofCMS::Plugin::> part of the name
+of the modules, the above command installs L<App::ZofCMS::Plugin::DBI>,
+L<App::ZofCMS::Plugin::QueryToTemplate> and
+C<App::ZofCMS::Plugin::OtherPlugin> modules into the "core" directory.
+
+B<Note:> the command presented above will recreate the "core" files and
+C<index.pl> file. To avoid that, i.e. just add the plugins, use the
+<--nocore> option
+
+=head2 C<--overwrite_existing_plugins>
+
+    zofcms_helper --site zcms --plugins DBI,QueryToTemplate,OtherPlugin --overwrite_existing_plugins
+
+The C<--plugins> option above will NOT overwrite any existing files by default. To force overwriting,
+use the C<--overwrite_existing_plugins> option.
+
+=head2 C<--cpan>
+
+    zofcms_helper --site zcms --cpan Data::Tranformer,Foo::Bar::Baz
+
+This option has the same purpose as the C<--plugins> except this one
+copies your installed CPAN modules to $core_dir/CPAN/
+
+For example, Data::Transformer module is required by L<App::ZofCMS::Tagged>
+plugin, using the C<--cpan> command you can copy it over into ZofCMS
+"core directory" and upload your application to the server that does
+not have Data::Transformer installed. B<Note:> this option is not that
+smart, it's not going to copy anything but the actual .pm file for
+the module you've specified.
+
+=head2 C<--nocore>
+
+    zofcms_helper --nocore --site zcms --plugins DBI,QueryToTemplate
+
+The C<--nocore> option tells the helper script not to create any "core"
+directories or files, the command above will only install C<DBI> and
+C<QueryToTemplate> plugins into the "core" directory.
+
+=head2 C<--pages>
+
+    zofcms_helper --nocore --site zcms --pages foo,foo/bar,foo/bar/baz
+
+The C<--pages> argument tells C<zofcms_helper> to create "page templates". The value to
+C<--pages> argument is a comma separated list of pages you wish to create. With this argument
+the script will try to be smart and create an empty file in C<data> directory as well as
+a ZofCMS Template file in C<templates> directory. Just run the script with the example above
+and check out your data and templates dirs to see the result.
+
+=head2 C<--show_plugins>
+
+    zofcms_helper --nocore --site zcms --show_plugins
+
+Takes no arguments, when present, zofcms_helper will show a list of all the plugins
+used by the site (note that plugins listed in Main Config File under C<dir_defaults> key
+are currently not shown by this function).
+
+=head1 REPOSITORY
+
+Fork this module on GitHub:
+L<https://github.com/zoffixznet/App-ZofCMS>
+
+=head1 BUGS
+
+To report bugs or request features, please use
+L<https://github.com/zoffixznet/App-ZofCMS/issues>
+
+If you can't access GitHub, you can email your request
+to C<bug-App-ZofCMS at rt.cpan.org>
+
+=head1 AUTHOR
+
+Zoffix Znet <zoffix at cpan.org>
+(L<http://zoffix.com/>, L<http://haslayout.net/>)
+
+=head1 LICENSE
+
+You can use and distribute this module under the same terms as Perl itself.
+See the C<LICENSE> file included in this distribution for complete
+details.
+
+=cut
+

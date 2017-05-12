@@ -1,0 +1,47 @@
+<div id="main">
+<h1>Repository contents</h1>
+
+<div id="repo-package-list">
+<% foreach my $package (sort keys %$packages) { %>
+  <div class="repo-package-line">
+    <span class="package-name"><%= $package %></span>
+    <% foreach my $comp (sort keys %{$packages->{$package}}) { %>
+    <span class="repo-package-info">
+      <span class="repo-package-component-info"><%= $comp %>:
+        <% my @versions = sort keys %{$packages->{$package}->{$comp}};
+           my $cnt = 0;
+           foreach my $version (@versions) { %>
+            <span class="repo-package-version"><%= $version %></span>
+            (<% my $cnt2 = 0;
+                my @arches = @{$packages->{$package}->{$comp}->{$version}};
+             foreach my $arch (@arches) {
+                if ($arch eq "source") {
+                    if ($comments->{$package}->{$version}) {
+%><a class="source-package-name" title="<%= $comments->{$package}->{$version} %>" href="<%= url_for('generic_id', controller => 'repository', action => 'view', id => $package) %>"><%= $arch %> (*)</a><%
+                    }
+                    else {
+%><a class="source-package-name" title="<%= $comments->{$package}->{$version} %>" href="<%= url_for('generic_id', controller => 'repository', action => 'view', id => $package) %>"><%= $arch %></a><%
+                    }
+                }
+                else {
+                    %><%= $arch %><%
+                }
+
+                if ($cnt2 < $#arches) {
+                    %>, <%
+                }
+                $cnt2++;
+             }
+             %>)<%
+
+             if ($cnt < $#versions) {
+                %>, <%
+             }
+             $cnt++;
+           } %>
+        </span>
+    </span>
+    <% } %>
+  </div>
+<% } %>
+</div>

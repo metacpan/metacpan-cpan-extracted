@@ -1,0 +1,31 @@
+#!/bin/sh
+
+CURDIR=`dirname "$0"`
+cd "$CURDIR"
+VERSION="0.68"
+
+SOURCE_PACKAGE="pdf2json-$VERSION.tar.gz"
+WIN32_BIN_PACKAGE="pdf2json-$VERSION-win32.zip"
+EXTRACTED="pdf2json-$VERSION"
+TARGET_DIR="../inc/" # relative to $CURDIR
+EXTERNAL_DIR="../../external/" # relative to $CURDIR
+
+wget -c \
+	https://pdf2json.googlecode.com/files/"$SOURCE_PACKAGE" \
+	https://pdf2json.googlecode.com/files/"$WIN32_BIN_PACKAGE"
+
+mkdir "$EXTRACTED"
+tar -C "$EXTRACTED" -xzvf "$SOURCE_PACKAGE"
+
+# patch
+perl -pi -e 's/\r\n/\n/g' $EXTRACTED/Makefile.in
+perl -pi -e 's/^\QCXX = g++\E$//g' $EXTRACTED/splash/Makefile.in
+
+tar -czvf "$TARGET_DIR/$SOURCE_PACKAGE" "$EXTRACTED"
+cp -p "$WIN32_BIN_PACKAGE" "$TARGET_DIR/$WIN32_BIN_PACKAGE"
+
+rm -Rf "$EXTRACTED"
+
+if [ -d $EXTERNAL_DIR ]; then
+	cp -puvR "$SOURCE_PACKAGE" "$WIN32_BIN_PACKAGE" "$EXTERNAL_DIR"
+fi

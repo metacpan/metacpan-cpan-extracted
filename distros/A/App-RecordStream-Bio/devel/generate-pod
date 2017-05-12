@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Basename qw(basename);
+
+# Don't let the actual terminal size affect POD everytime we generate it.
+# LINES isn't used by us, but is required for Term::ReadKey::GetTerminalSize()
+# to use COLUMNS.
+$ENV{'COLUMNS'} = 80;
+$ENV{'LINES'}   = 50;
+
+generate_pod($_) for grep { -f $_ } <lib/App/RecordStream/Operation/*.pm>;
+
+sub generate_pod {
+    my $script = shift;
+
+    print "Generating pod documentation for $script\n";
+
+    $script = basename($script, ".pm");
+
+    my @help = `recs $script --help 2>/dev/null`;
+
+    open my $fh, '>', "doc/recs-$script.pod"
+        or die "Could not open doc/recs-$script.pod: $!";
+
+    print $fh <<HEADER;
+=head1 NAME
+
+$script
+
+=head1 USAGE
+
+HEADER
+
+    print $fh "    $_" for @help;
+
+    print $fh <<FOOTER;
+
+=head1 SEE ALSO
+
+L<App::RecordStream::Bio>
+
+=cut
+
+FOOTER
+
+    close $fh;
+}

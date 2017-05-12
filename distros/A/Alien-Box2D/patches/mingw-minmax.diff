@@ -1,0 +1,16 @@
+diff -ru build_src.orig/Box2D_v2.1.2/Box2D/Box2D/Common/b2Math.h build_src/Box2D_v2.1.2/Box2D/Box2D/Common/b2Math.h
+--- build_src.orig/Box2D_v2.1.2/Box2D/Box2D/Common/b2Math.h	2010-04-13 00:48:44.000000000 +0200
++++ build_src/Box2D_v2.1.2/Box2D/Box2D/Common/b2Math.h	2011-05-31 09:48:43.924407900 +0200
+@@ -21,6 +21,12 @@
+ 
+ #include <Box2D/Common/b2Settings.h>
+ 
++#ifdef __MINGW32__
++/* otherwise: macro "min" requires 2 arguments, but only 1 given */
++#undef min
++#undef max
++#endif
++
+ #include <cmath>
+ #include <cfloat>
+ #include <cstddef>

@@ -1,0 +1,21 @@
+INSTALLATION INSTRUCTIONS
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    make clean
+
+CREATE NEW VERSION (FOR DEVELOPER ONLY)
+
+    * README              -- In documentation
+    * CHANGES             -- Result of command: localtime | gclip
+    * lib/App/DistSync.pm -- In documentation (VERSION) & in code $VERSION
+    * bin/distsync        -- In documentation (VERSION)
+    * sftp://abalama@web.sourceforge.net:22/home/project-web/app-distsync/htdocs
+
+TESTING
+
+    D:\modules\App-DistSync>perl -I lib bin\distsync -d -D d:\dist
+    D:\>perl -Id:\modules\App-DistSync\lib d:\modules\App-DistSync\bin\distsync -D d:\dist -d
+    D:\dist>perl -Id:\modules\App-DistSync\lib d:\modules\App-DistSync\bin\distsync -d

@@ -1,0 +1,195 @@
+NAME
+    Apache::ProxyConf - Generate Proxy Configuration for browsers.
+
+SYNOPSIS
+      # In httpd.conf:
+
+      <Location />
+        SetHandler perl-script
+        PerlHandler Apache::ProxyConf
+        PerlSetVar ProxyConfConfig "/some/location/proxyconf.ini"
+      </Location>
+
+DESCRIPTION
+    The Apache::ProxyConf is used to configure the proxy settings in
+    browsers automatically. The modules returns a script that conforms to
+    the Navigator Proxy Auto-Config File Format. The module is suitable for
+    large scale installations that have multiple (cascading) proxies. It can
+    be used to return 'the closest proxy' based on the network topology.
+    Failover and load distribution is also provided.
+
+  Browser configuration
+
+    The (virtual) webserver must be entered in the 'Autoconfigure URL' of
+    the browser to make use of the ProxyConf script.
+
+    http://proxyconf.some.domain/
+
+    In IE the URL must be specified in the 'Address' field, just below the
+    'Use automatic configuration script' tickbox.
+
+THE CONFIGURATION FILE
+    The ProxyConf module first reads a .ini-style configuration file to
+    determine the proxy settings of the network. The configuration file
+    contains three sections: proxy, noproxy and https.
+
+  The proxy section
+
+    The sections proxy and https have an identical format. They contain
+    lines of the form "subnet=proxyip:port".
+
+    Single proxy
+         [proxy]
+         172.16.32.0/20=172.16.32.10:3128
+
+        The subnet 172.16.32.0/20 has a single proxy defined. The proxy
+        server is 172.16.32.10 and it listens on port 3128.
+
+    Multiple proxies
+         [proxy]
+         172.16.0.0/20=172.16.0.10:3128,172.16.0.20:3128
+
+        Multiple proxy servers are defined in a comma separated list. In
+        this example clients in the 172.16.0.0/20 subnet use 172.16.0.10 as
+        their primary proxy server. When this server becomes unavailable,
+        the clients will move over to 172.16.0.20 for their proxy requests.
+
+    Multiple proxies with load distribution
+         [proxy]
+         172.16.0.0/20=(172.16.0.10:3128,172.16.0.20:3128)
+
+        When proxy servers are placed between brackets, the load is
+        distribution amongst the proxies. Some clients will have the first
+        proxy as primary and some clients will have the second proxy as
+        primary. The other proxy is used as a backup. The order in which the
+        proxies are tried depends on the IP address of the client. The
+        script is deterministic, so for a given IP address the priority list
+        is always the same.
+
+    To determine the proxy list for a given IP address multiple rules may be
+    applied. Subnets are tried from the highest to the lowest mask. The
+    module puts all proxies that are found in a list.
+
+  The noproxy section
+
+    The noproxy section contains hosts that should be contacted by the
+    clients directly. Noticeably, web servers that use NTLM authentication
+    will not work when clients connect to them via a proxy server. The
+    syntax for specifying noproxy hosts is "subnet=fqhn1,fqhn2,..".
+    Alternatively, the multiline syntax can be used, as shown in this
+    example.
+
+     [noproxy]
+     0.0.0.0/0=<<EOT
+     webserver1.some.domain
+     webserver2.some.domain
+     EOT
+
+    This section defines webservers that are non-proxyable for all networks.
+
+  The https section
+
+    The https section works like the proxy section. It is used to define
+    other proxies for secure HTTP traffic than for the normal HTTP traffic.
+    If this section is missing, or for a specific IP address there are no
+    https rules, then the normal proxy rules apply.
+
+EXAMPLE
+    Consider the network in figure 1.
+
+              Network A: 172.16.0.0/20
+
+                 _.-"""""""""""""""""-._
+               .'                       `.
+              /                           \
+            |    Proxy A1: 172.16.0.10    |
+            |                             |
+            |    Proxy A2: 172.16.0.20    |
+             \                           /
+              `._                     _.'\
+                 `-.................-'    \
+                                           \
+                                            \  Network B: 172.16.16.0/20
+                                             \
+                                              \ _.-"""""""""""""""""-._
+                                              .'                       `.
+                                             /                           \
+                                            |                             |
+                                            |    Proxy B: 172.16.16.10    |
+                                            |                             |
+                                             \                           /
+                                              `._                     _.'
+                                              /  `-.................-'
+                                             /
+                                            /
+              Network C: 172.16.32.0/20    /
+                                          /
+                _.-"""""""""""""""""-._  /
+              .'                       `.
+             /                           \
+            |                             |
+            |    Proxy C: 172.16.32.10    |
+            |                             |
+             \                           /
+              `._                     _.'
+                 `-.................-'
+
+                                        Figure 1.
+
+    The proxies have the following connectivity:
+
+     Proxy A1       Internet connectivity
+     Proxy A2       Internet connectivity
+     Proxy B        parents with proxy A1 and A2
+     Proxy C        parents with proxy B and A1
+
+    Clients in the three networks need to get the following proxy
+    configuration:
+
+     172.16.0.0/20  Half of the clients connect to proxy A1 and use proxy A2
+                    as fallback, the other half use proxy A2 with A1 as
+                    fallback.
+     172.16.16.0/20 Clients use proxy B with proxy A2 as fallback.
+     172.16.32.0/20 Clients use proxy C with proxy B as fallback.
+
+    For secure HTTP traffic special rules apply. Because this traffic is not
+    cached all clients connect to proxy A1 and A2 directly spreading the
+    load equally.
+
+    This is how the proxyconf.ini looks:
+
+     [proxy]
+     172.16.0.0/20=(172.16.0.10:3128,172.16.0.20:3128)
+     172.16.16.0/20=172.16.16.10:3128,172.16.0.20:3128
+     172.16.32.0/20=172.16.32.10:3128,172.16.16.10:3128
+
+     [https]
+     172.16.0.0/16=(172.16.0.10:3128,172.16.0.20:3128)
+
+EXTRA OPTIONS
+    It is possible to add additional noproxy hosts in the 'Autoconfigure
+    URL' in the browser. This way a local webserver can be tested without
+    losing the benefits of the proxy config. The following string must be
+    entered in the 'Autoconfigure URL'.
+
+    http://proxyconf.some.domain/?noproxy=hostname.some.domain
+
+    Multiple hostnames are specified using a comma as separator.
+
+    http://proxyconf.some.domain/?noproxy=fqhn1,fqhn2
+
+DEBUGGING
+    The proxy config service can be called with a debug option. Type the
+    following URL in a browser:
+
+    http://proxyconf.some.domain/?debug=1&ipaddr=172.16.0.100
+
+    The script will generate a html page which contains the settings of all
+    variables and displays the script it sends to the browser for the
+    specified IP address.
+
+AUTHOR
+    Patrick Schoo <pschoo@playbeing.com>
+
+    Originally written by Bert Driehuis <driehuis@playbeing.org>
+

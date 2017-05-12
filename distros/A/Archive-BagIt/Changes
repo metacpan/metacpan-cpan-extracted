@@ -1,0 +1,42 @@
+Revision history for Archive-BagIt
+
+
+0.052     2014-11-20
+  - Fixed dist.ini to include dotfiles (needed for dotbagit test)
+
+0.051     2014-11-19
+  - Significant changes to create a base clase
+  - DotBagIt class now available for an app
+
+0.050     2014-11-10
+  - Full Release 
+
+0.049-TRIAL     2014-11-04
+  - Fixed a bug in the filehandle cleanup
+  - Added a test in verify_bag for the version number (catches an empty bagit.txt)
+
+0.048-TRIAL     2014-11-03
+  - Demoted Archive::BagIt::App to suggests while it is still broken
+  - Separated the bagit.pl script into a separate module to avoid MooseX::App::Cmd dep
+  - Added some more testing through Dist::Zilla, trying to improve code quality
+  - removed all bare filehandles (pretty significant change!)
+  - ran basic tests, but might need further testing...
+
+0.047-TRIAL     2014-10-14 15:24:15-04:00 America/Toronto (TRIAL RELEASE)
+
+0.045     2014-05-02 14:48:44-04:00 America/Toronto
+
+0.044     2014-04-30 09:06:20-04:00 America/Toronto
+        Just fixed a bug that only really showed up in testing on older perls
+        
+0.043     2014-04-29 11:37:16-04:00 America/Toronto 
+
+0.033   2014-04-01 09:00:00 America/Toronto
+        A blur, I didn't really update this, there is some stuff at github
+
+0.02    2012-10-9 22:42:44 EDT
+        Added bagit.pl as a command-line interface
+
+0.01    2012-10-2 22:36:53 EDT
+        First version, released on an unsuspecting world.
+

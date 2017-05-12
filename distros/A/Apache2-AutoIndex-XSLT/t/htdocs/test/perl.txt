@@ -1,0 +1,57 @@
+http://www.perl.com - Perl.com: The Source for Perl -- perl development, perl conferences
+http://www.cpan.org - CPAN
+http://search.cpan.org - The CPAN Search Site - search.cpan.org
+http://www.wall.org/~larry/ - Larry Wall's Home Page
+http://www.perlfoundation.org - The Perl Foundation
+http://news.perlfoundation.org - The Perl Foundation
+http://www.perltraining.org - Directory of Perl training companies in the world
+http://www.theperlreview.com - The Perl Review
+http://www.parrotcode.org - Parrot Virtual Machine - parrotcode
+http://www.poniecode.org - Project Ponie - 
+http://www.perlmonks.org - Perl Monks - The Monastery Gates
+http://www.perl.org - The Perl Directory - perl.org
+http://apprentice.perl.org - 
+http://archive.perl.org - nntp.perl.org  - perl.org lists
+http://auth.perl.org - auth.perl.org
+http://bio.perl.org - bioperl.org - Main page
+http://bioperl.org - bioperl.org - Main page
+http://books.perl.org - Perl Books
+http://bugs6.perl.org - bugs6.perl.org
+http://bugs.perl.org - rt.perl.org: PerlBug
+http://catalyst.perl.org - Catalyst - Web Framework
+http://dev.catalyst.perl.org - Catalyst - Trac
+http://cpanratings.perl.org - Ratings and Reviews for CPAN - 
+http://cpants.perl.org - CPANTS - CPAN Testing Service
+http://cvs.perl.org - cvs for project - 
+http://datetime.perl.org - 
+http://dbi.perl.org - Perl DBI - dbi.perl.org
+http://dev.perl.org - Perl Development - 
+http://faq.perl.org - perlfaq
+http://history.perl.org - Welcome to CPAST
+http://imager.perl.org - Imager - News
+http://inline.perl.org - INLINE.PERL.ORG: INLINE HOME
+http://www.irc.perl.org - irc.perl.org
+http://ldap.perl.org - Homepage - Perl-LDAP
+http://learn.perl.org - learn.perl.org: The site for people learning Perl.
+http://lists.perl.org - The Perl Mailing List Database
+http://log.perl.org - Perl NOC
+http://maypole.perl.org - 
+http://news.perl.org - use Perl: All the Perl that's Practical to Extract and Report
+http://nntp.perl.org - nntp.perl.org  - The perl.org news server
+http://www.nntp.perl.org - nntp.perl.org  - The perl.org news server
+http://noc.perl.org - The Perl NOC - perl.org
+http://p5ee.perl.org - P5EE - 
+http://pause.cpan.org - PAUSE: menu
+http://pdl.perl.org - PDL - The Perl Data Language
+http://perl4lib.perl.org - Perl4lib
+http://perl.apache.org - mod_perl: Welcome to the mod_perl world
+http://planet.perl.org - Planet Perl
+http://poe.perl.org - POE: Perl Object Environment
+http://ppt.perl.org - PPT: Unix Reconstruction Project
+http://qa.perl.org - Perl Quality Assurance Projects - 
+http://rt.perl.org - bugs6.perl.org
+http://sax.perl.org - 
+http://sdl.perl.org - Simple DirectMedia Library Bindings for Perl - 
+http://svn.perl.org - svn.perl.org
+http://tpj.perl.org - 
+http://use.perl.org - use Perl: All the Perl that's Practical to Extract and Report

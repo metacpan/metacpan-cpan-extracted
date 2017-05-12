@@ -1,0 +1,87 @@
+% my $form = form_handler($table);
+% my $fields = $form->from_schema(schema,$table)->ordered_elements;
+% #my $columns = [schema->source($table)->columns];
+% my $columns = $form->ordered_elements;
+% my $order = $form->order_by;
+% my $id_field = $form->id_field;
+% my $name_field = $form->name_field;
+% my $object = $table;
+
+% my $result = schema->resultset($table)->single({$id_field => $id});
+% #my $columns_info = schema->source($table)->columns_info($columns);
+
+<form class="form-horizontal" action="/admin/save/<%= $table %>" method="post">
+  % for my $column (@$columns) {
+      % next if ($column eq $id_field);
+      % # my $required = $columns_info->{$column}->{is_nullable} ? '' : 'required';
+      % my $required = $form->elements->{$column}->{required} ? 'required' : '';
+  <fieldset>
+    <div class="control-group">
+      <label class="control-label-left" for="<%= $column %>"><%= l $column %> 
+      % if ($required) {
+        <span class="required" title="<%= l 'required field' %>">*</span>
+      % }
+      </label>
+      
+      % my $col_base = $column;
+      % $col_base =~ s/_id$//;
+      % if ($form->elements->{$col_base}->{'type'} eq 'Block' ) {
+      
+        % # my $multiple;schema->source($table)->_relationships->{$col_base}
+
+      <select name="<%= $column %>" id="<%= $column %>" class="<%= $required %>" <%= $required %> >
+        % my $rel_class = schema->source($table)->_relationships->{$col_base}->{class};
+        % $rel_class =~ s/^.*::([a-zA-Z_]+)$/$1/;
+        % my $rel_result = schema->resultset($rel_class)->search;
+        % # my $rel_order = source_id($rel_class);
+        % my $rel_form = form_handler($rel_class)->from_schema(schema,$rel_class);
+        % # my $rel_order = $rel_form->order_by;
+        % my $rel_order = $rel_form->id_field;
+        % my $rel_name = $rel_form->name_field;
+           
+        % while ( my $rel_record = $rel_result->next ) {        
+          % if ($result && $result->$column eq $rel_record->$rel_order ) {
+        <option selected="selected" value="<%= $result->$column %>"><%= $rel_record->$rel_name %></option>
+          % }
+          % else {
+        <option value="<%= $rel_record->$rel_order %>"><%= $rel_record->$rel_name %></option>
+          % }          
+        % }             
+      </select> 
+
+      % }
+      % elsif ($form->elements->{$col_base}->{'type'} eq 'Multi' ) {
+      <select name="<%= $column %>" id="<%= $column %>" class="<%= $required %>" <%= $required %> ></select>
+      % }
+      % elsif ($form->elements->{$column}->{type} =~ m/checkbox/) {
+        % my $checked = ($result && $result->$column) ? 'checked="checked"' : ''; 
+      <div class="controls"> 
+        <input class="type-check" id="<%= $column %>" name="<%= $column %>"
+          % my $placeholder = $result ? $result->$column : 0;
+               type="checkbox"   <%= $checked %>>
+      </div>
+      % }     
+      % else {
+      <div class="controls">
+        <input class="input-xlarge" id="<%= $column %>" name="<%= $column %>"
+          % my $placeholder = $result ? $result->$column : '';
+          % $placeholder = $placeholder ? $placeholder : $form->elements->{$column}->{default};
+               type="text"  value="<%= $placeholder %>" <%= $required %>>
+      </div>
+      % }
+    </div>
+  </fieldset>
+  % }
+
+  <input id="<%= $id_field %>" name="<%= $id_field %>"
+    % my $placeholder = $result ? $result->$id_field : 0;
+    type="hidden"   value="<%= $placeholder %>">
+
+  <div class="control-group">
+    <div class="controls">
+      <div class="float_right">
+        <button type="submit" class="btn btn-primary"><%= l 'store' %> ▶</button>
+      </div>
+    </div>
+  </div>
+</form>

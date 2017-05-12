@@ -1,0 +1,22 @@
+Revision history for Acme-PM-Paris-Meetings
+
+200905.04  2009-05-22T18:16:00 +0200 (METDST)
+           Forgot to update MANIFEST in previous release, so the distrib
+           was broken. :(
+           So added missing t/basic.t and script/paris-pm.
+           Added release test: t/version.t. Should make a module from this.
+
+200905.03  2009-05-19T19:51:00 +0200 (METDST)
+           Added missing installation of 'paris-pm' script.
+
+200905.02  2009-05-14T18:58:00 +0200 (METDST)
+           Changed numbering scheme to show more clearly how old is the installed version.
+           Added 'next_meeting' function.
+           Added 'paris-pm' script. TODO: doc.
+           Fixed the ICal expression which limited the recurrence to 12 occurrences.
+           Added tests: t/basic.t.
+
+0.01       2009-05-13T18:23:00 +0200 (METDST)
+           First version, released just before a Paris.pm meeting.
+           TODO: doc in french.
+

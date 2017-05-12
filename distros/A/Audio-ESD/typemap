@@ -1,0 +1,13 @@
+my_esd_t		T_FILEDESC
+esd_server_info_t *	T_PTROBJ
+esd_info_t *		T_PTROBJ
+
+INPUT
+
+T_FILEDESC
+	$var = PerlIO_fileno(IoIFP(sv_2io($arg)))
+
+OUTPUT
+
+T_FILEDESC
+	$var not implemented

@@ -1,0 +1,21 @@
+Revision history for Perl extension Audio::Gramofile.
+
+0.08  Tue Feb  5 18:08:00 2008
+        - brought versions up to date
+
+0.07  Tue Feb  5 18:02:00 2008
+        - updated url of original Gramofile project
+
+0.06  Tue Jun 14 21:32:00 2005
+        - implement begin/end times and framesize adjustment
+
+0.05  Sat Jul  3 21:52:00 2004
+        - brought versions up to date
+
+0.02  Sat Oct 11 23:33:00 2003
+        - added support for Sylvain Deschenes normalize filter
+
+0.01  Sat Jan 25 00:50:19 2003
+	- original version; created by h2xs 1.22 with options
+		-b 5.5.0 -A -n Audio::Gramofile
+

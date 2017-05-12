@@ -1,0 +1,31 @@
+Revision history for Perl module App::DNS::Adblock
+
+0.015 Fri Mar 7 02:51:40 EST 2014
+    - kludge win32 test
+
+0.014 Mon Mar 3 05:44:16 EST 2014
+    - fix win32 test
+
+0.013 Sat Feb 15 07:28:41 EST 2014
+    - simplify object, replace stub and test scripts
+
+0.012 Tue Feb 11 11:41:50 EST 2014
+    - fix timeout, test scripts
+
+0.011 Fri Feb 7 10:21:07 EST 2014
+    - require min. versions of Net::DNS and Perl
+
+0.01 Mon Jan 6 12:28:01 EST 2014
+    - apply feature request 90614 from Net::DNS::Dynamic::Adfilter
+
+0.004 Mon Dec 30 2013
+    - initial release
+
+0.003 Fri Sep 14 2012
+    - preparations for release
+
+0.002 Wed Sep 12 2012
+    - mooseless
+
+0.001 Tue Aug 28 2012
+    - base commit

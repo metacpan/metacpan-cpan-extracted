@@ -1,0 +1,82 @@
+{
+   "abstract" : "Ark plugins for Reproxy",
+   "author" : [
+      "Daisuke Murase <typester@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.8.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ark-Plugin-ReproxyCallback",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Ark::Plugin" : "0",
+            "HTTP::Request" : "0",
+            "URI" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Ark::Plugin::ReproxyCallback" : {
+         "file" : "lib/Ark/Plugin/ReproxyCallback.pm",
+         "version" : "0.02"
+      },
+      "Ark::Plugin::ReproxyCallback::OpenSocial" : {
+         "file" : "lib/Ark/Plugin/ReproxyCallback/OpenSocial.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ark-framework/Ark-Plugin-ReproxyCallback/issues"
+      },
+      "homepage" : "https://github.com/ark-framework/Ark-Plugin-ReproxyCallback",
+      "repository" : {
+         "url" : "git://github.com/ark-framework/Ark-Plugin-ReproxyCallback.git",
+         "web" : "https://github.com/ark-framework/Ark-Plugin-ReproxyCallback"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Songmu <y.songmu@gmail.com>"
+   ]
+}

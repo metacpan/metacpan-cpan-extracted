@@ -1,0 +1,193 @@
+=encoding utf8
+
+=head1 NAME
+
+Any::Daemon::HTTP::Source - source of information
+
+=head1 INHERITANCE
+
+ Any::Daemon::HTTP::Source is extended by
+   Any::Daemon::HTTP::Directory
+   Any::Daemon::HTTP::Proxy
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+Each L<Any::Daemon::HTTP::VirtualHost|Any::Daemon::HTTP::VirtualHost> will define where the files
+are located.  Parts of the URI path can map on different (virtual)
+resources, with different access rights.
+
+=over 4
+
+=item *
+
+Directories containing files are handled by L<Any::Daemon::HTTP::Directory|Any::Daemon::HTTP::Directory>
+objects.
+
+=item *
+
+User directories, like used in the URI C<<http://xx/~user/yy>> are
+implemented in L<Any::Daemon::HTTP::UserDirs|Any::Daemon::HTTP::UserDirs>, which extends this class.
+
+=item *
+
+Forwarding proxies translate a path into requests to a remote server.
+The reply is returned.  Various rules can be applied.  Implemented in
+L<Any::Daemon::HTTP::Proxy|Any::Daemon::HTTP::Proxy>.
+
+=back
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Any::Daemon::HTTP::Source-E<gt>B<new>(%options|\%options)
+
+ -Option--Default
+  allow   <undef>
+  deny    <undef>
+  name    path
+  path    '/'
+
+=over 2
+
+=item allow => CIDR|HOSTNAME|DOMAIN|CODE|ARRAY
+
+Allow all requests which pass any of these parameters, and none
+of the deny parameters.  See L</Allow access>.  B<Be warned> that
+the access rights are not inherited from directory configurations
+encapsulating this one.
+
+=item deny => CIDR|HOSTNAME|DOMAIN|CODE|ARRAY
+
+See C<allow> and L</Allow access>
+
+=item name => STRING
+
+=item path => PATH
+
+If the directory PATH (relative to the document root C<location>) is not
+trailed by a '/', it will be made so.
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<name>()
+
+=item $obj-E<gt>B<path>()
+
+=back
+
+=head2 Permissions
+
+=over 4
+
+=item $obj-E<gt>B<allow>($session, $request, $uri)
+
+BE WARNED that the $uri is the rewrite of the $request uri, and therefore
+you should use that $uri.  The $session represents a user.
+
+See L</Allow access>.
+
+=item $obj-E<gt>B<collect>($vhost, $session, $request, $uri)
+
+Try to produce a response (HTTP::Response) for something inside this
+directory structure.  C<undef> is returned if nothing useful is found.
+
+=back
+
+=head2 Actions
+
+=head1 DETAILS
+
+=head2 Resource restrictions
+
+=head3 Allow access
+
+The L<allow()|Any::Daemon::HTTP::Source/"Permissions"> method handles access rights.  When a trueth value is
+produced, then access is permitted.
+
+The base class implements access rules via the C<allow> or C<deny> option
+of L<new()|Any::Daemon::HTTP::Source/"Constructors">.  These parameters are exclusive (which is slightly different
+from Apache); you can either allow or deny, but not both at the same time.
+B<Be warned> that the access rights are also not inherited from directory
+configurations encapsulating this one.
+
+The parameters to C<allow> or C<deny> are an ARRAY with any combination of
+
+=over 4
+
+=item IPv4 and IPv6 address ranges in CIDR notation
+
+=item hostname
+
+=item domain name (leading dot)
+
+=item your own CODE reference, which will be called with the IP address,
+
+  the hostname, the session, and the rewritten URI.
+
+=back
+
+B<. Example: new(allow) parameters>
+
+ my $vhost = My::VHOST::Class->new( allow =>
+    [ '192.168.2.1/32         # IPv4 CIDR, single address
+    , '10/8'                  # IPv4 CIDR
+    , '10.0.0.0-10.3.255.255' # IPv4 range
+    , '::dead:beef:0:0/110'   # IPv6 range
+    , 'www.example.com'       # hostname
+    , '.example.com'          # domain and subdomains
+    , 'example.com'           # only this domain
+    ], ...
+
+B<. Example: create own access rules>
+
+If you have an ::VirtualHost extension class, you do this:
+
+ sub allow($$$)
+ {   my ($self, $session, $request, $uri) = @_;
+
+     # General rules may refuse access already
+     $self->SUPER::allow($session, $request, $uri)
+         or return 0;
+
+     # here your own checks
+     # $session is a Any::Daemon::HTTP::Session
+     # $request is a HTTP::Request
+     # $uri     is a URI::
+
+     1;
+ }
+
+You may also pass a code-ref to L<new(allow)|Any::Daemon::HTTP::Source/"Constructors">:
+
+ my $vhost = Any::Daemon::HTTP::VirtualHost
+     ->new(allow => \&my_rules, ...);
+
+ sub my_rules($$$$)   # called before each request
+ {   my ($ip, $host, $session, $uri) = @_;
+     # return true if access is permitted
+ }
+
+=head1 SEE ALSO
+
+This module is part of Any-Daemon-HTTP distribution version 0.26,
+built on September 19, 2016. Website: F<http://perl.overmeer.net/any-daemon/>
+
+=head1 LICENSE
+
+Copyrights 2013-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

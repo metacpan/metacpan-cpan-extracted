@@ -1,0 +1,16 @@
+Revision history for Perl module Apache::AuthCASSimple
+
+0.0.4 Thu, 2 Apr 2009 14:05:39 +0200
+    - clean cookie path (thx to A. Le Drezen)
+    - clean login_url
+
+0.0.3 Fri, 11 Apr 2008 10:31:45 +0200
+    - better Makefile, more pod test
+
+0.0.2 Thu Mar 06 11:03:00 2008
+    - add missing inc and META.yml
+
+0.01 Mon Jan 28 16:25:19 2008
+    - original version; created by ExtUtils::ModuleMaker 0.49
+
+

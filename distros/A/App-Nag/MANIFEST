@@ -1,0 +1,11 @@
+Changelog.txt
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/nag
+dist.ini
+lib/App/Nag.pm
+lib/App/Nag/Slap.pm
+t/arg_validation.t

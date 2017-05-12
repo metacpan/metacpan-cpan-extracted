@@ -1,0 +1,33 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.38.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 17c29f29ed3106cc0195d9180d44ed93047c07c5 Changes
+SHA1 246e1310f6bc36273c4375620946fd079f1012b7 MANIFEST
+SHA1 6d7536ca6b3e46821add8e3bbfbd869c5cc490a7 MANIFEST.SKIP
+SHA1 5c0dd682361d5ddafbbebbec2656888bb8198e66 META.yml
+SHA1 c2ca2c83c443c8db576428813e6ce4695e307ae3 Makefile.PL
+SHA1 6649537832b8bb47b6cd468f175251b394aad59b README
+SHA1 5fd072e89302039e919d1eb2ac95e9df517bfb64 lib/Astro/SolarParallax.pm
+SHA1 32bc95ae3d532617fc44c30467a53f42ca7353ce lib/Astro/SolarParallax/Observer.pm
+SHA1 4f9ac07628c49375d91703fce2e93314ca024c6b lib/Geo/Coordinates.pm
+SHA1 e53c6af861a184e451db1aa6e084c1813a478d71 t/Astro-SolarParallax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQFBJohjlE/Gp2pqC7wRArmcAKCYNZTi7xquM3V96EXR6hLdjy4K8QCgqTIg
+yDzbgX/1OJQphIDoMHpVSS4=
+=3JGo
+-----END PGP SIGNATURE-----

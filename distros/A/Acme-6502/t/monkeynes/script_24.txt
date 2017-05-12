@@ -1,0 +1,34 @@
+clear
+power on
+regs
+
+# use bit to turn on V
+memset 00ab 40
+op 24 ab
+
+# V should be 1
+test v = 1
+
+# use bit to turn on S
+memset 00ab 80
+op 24 ab
+
+# S should be 1
+test s = 1
+
+# this should turn off Z
+memset 00ab 01
+op a9 ff
+op 24 ab
+
+# Z should be 0
+test z = 0
+
+# this should turn on Z
+memset 00ab 00
+op 24 ab
+
+# Z should be 1
+test z = 1
+
+save verify_24.txt

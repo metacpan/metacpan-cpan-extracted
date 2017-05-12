@@ -1,0 +1,9 @@
+Revision history for Authen-Krb5-Effortless
+
+0.02    March 15, 2013  
+        * removed perl 5.10.1 dependency as the parent module can be downloaded from CPAN for earlier releases.
+        * updated POD/documentation
+
+0.01    March 11, 2013  
+        * First version, released on an unsuspecting world.
+

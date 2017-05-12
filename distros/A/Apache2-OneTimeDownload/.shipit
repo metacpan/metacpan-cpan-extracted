@@ -1,0 +1,8 @@
+# auto-generated shipit config file.
+steps = FindVersion, ChangeVersion, CheckChangeLog, DistTest, Commit, Tag, MakeDist, UploadCPAN
+
+svn.tagpattern = %v
+#svn.tagpattern = http://projects.stejau.de/svn/Apache2-OneTimeDownload/tags/%v
+
+CheckChangeLog.files = ChangeLog 
+#, MyProj.CHANGES

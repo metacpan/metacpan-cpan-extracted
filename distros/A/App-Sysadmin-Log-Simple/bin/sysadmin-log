@@ -1,0 +1,264 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use v5.10.1;
+use Getopt::Long;
+use Pod::Usage;
+use File::HomeDir;
+use App::Sysadmin::Log::Simple;
+
+# PODNAME: sysadmin-log
+# ABSTRACT: maintain a single-host system administration log
+our $VERSION = '0.009'; # VERSION
+
+my %opts = (
+    user        => $ENV{SUDO_USER} || $ENV{USER},
+    do_udp      => 1,
+    do_file     => 1,
+    do_http     => 0,
+    do_twitter  => 0,
+);
+my $HOME = File::HomeDir->users_home($opts{user});
+$opts{logdir} = "$HOME/sysadmin-log";
+$opts{index_preamble} = <<'END';
+INDEX
+=====
+
+This page indexes all the logs. For each line, you see a timestamp
+for the line, the user who added the line, and then the comments.
+This method of logging is less transparent than logging to the
+wiki, but is more reliable:
+
+* We can't rely on having apache and MySQL available, especially
+  since logging is often due to issues with those.
+* In fact, all that's needed is filesystem access.
+* Shell access is required to log, so there probably aren't bogus
+  log entries.
+END
+
+GetOptions( \%opts,
+    'help|?',
+    'version',
+    'view',
+    'date:s',
+    'logdir:s',
+    'refresh-index',
+    'udp!',
+    'twitter!',
+    'file!',
+    'http!',
+) or exit;
+
+$opts{do_udp}     = delete $opts{udp};
+$opts{do_file}    = delete $opts{file};
+$opts{do_http}    = delete $opts{http};
+$opts{do_twitter} = delete $opts{twitter};
+
+my %udp_data = ( irc => 1, port => 9002, host => 'localhost' );
+GetOptions( 'udp-data=s' => \%udp_data) or exit;
+$opts{udp} = \%udp_data if $opts{do_udp};
+
+my %http_data = ( http => 1, method => 'post', uri => 'http://localhost' );
+GetOptions( 'http-data=s' => \%http_data) or exit;
+$opts{http} = \%http_data if $opts{do_http};
+
+
+pod2usage(
+    -verbose => 2,
+) if $opts{help};
+
+
+if ($opts{version}) {
+    say "$0 version " . (defined __PACKAGE__->VERSION ? __PACKAGE__->VERSION : 'dev');
+    exit 0;
+}
+
+
+my $mode = delete $opts{view}
+    ? 'view'
+    : delete $opts{'refresh-index'} ? 'refresh-index' : 'log';
+
+$opts{read_from} = \*STDIN;
+
+App::Sysadmin::Log::Simple->new(%opts)->run($mode);
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+sysadmin-log - maintain a single-host system administration log
+
+=head1 VERSION
+
+version 0.009
+
+=head1 SYNOPSIS
+
+B<sysadmin-log> [--date YYYY/MM/DD] [--view] [--version] [--help]
+
+Options:
+    B<--date>       Read from/write to a date other than today's
+    B<--view>       View a log file instead of add to it
+    B<--logdir>     Use a different log directory
+    B<--twitter>    Send your log entry to Twitter
+    B<--http>       Send your log entry to Http
+    B<--http-data>  Sets HTTP data:
+                        - method to send using
+                        - uri to send to
+    B<--no-file>    Skip logging to file
+    B<--no-udp>     Skip sending log data over UDP
+    B<--udp-data>   Sets UDP data:
+                        - whether to apply IRC colour encoding
+                        - port and host to send to
+    B<--refresh-index> Just refresh the index
+    B<--version>    Print version information, then exit
+    B<--help>       Show this manpage
+
+=head1 DESCRIPTION
+
+C<B<sysadmin-log>> allows you to maintain a single-host system
+administration log with simple shell commands.
+
+=head2 OPTIONS
+
+=over 4
+
+=item B<--date>
+
+Which date to use instead of today's date. This allows you to add
+entries to old logs, or view old logs. Providing a future date is
+a fatal error.
+
+=item B<--view>
+
+View a log instead of adding to it.
+
+=item B<--logdir>
+
+Sets the log directory to use - defaults to F</var/log/sysadmin>.
+
+=item B<--twitter>, --no-twitter
+
+Whether to send your log entry to Twitter. Default is false.
+
+=item B<--http>, --no-http
+
+Whether to send your log entry via HTTP. Default is false.
+
+=item B<--http-data>
+
+Sets data related to HTTP. Specify a single key-value pair:
+
+=over 4
+
+=item * uri - the uri to send to - default is http://localhost
+
+=item * method - the method to send using - default is POST
+
+=back
+
+Use it multiple times to set multiple key-value pairs:
+
+    log --http-data uri=http://localhost --http-data method=post
+
+=item B<--file>, --no-file
+
+Whether to log to a file. Default is true.
+
+=item B<--udp>, --no-udp
+
+Whether to send data by UDP in addition to logging (default) or not.
+If true, use --udp-data to specify where to send the data.
+
+=item B<--udp-data>
+
+Sets data related to UDP. Specify a single key-value pair:
+
+=over 4
+
+=item * irc - whether to apply IRC colour encoding or not - default is on
+
+=item * host - the host to send to - default is localhost
+
+=item * port - the port to send to - default is 9002
+
+=back
+
+Use it multiple times to set multiple key-value pairs:
+
+    log --udp-data host=localhost --udp-data port=9002
+
+=item B<--refresh-index>
+
+Refresh the index of logs and exit.
+
+=item B<--help>, --man, -?
+
+View this documentation.
+
+=item B<--version>
+
+View version data.
+
+=back
+
+=head1 EXAMPLES
+
+B<sysadmin-log>
+
+Add something to today's log.
+
+B<sysadmin-log --view --date 2011/01/01>
+
+View the log for January 1, 2011, if it exists.
+
+B<sysadmin-log --no-udp>
+
+Don't send a UDP datagram while adding to today's log
+
+B<sysadmin-log --refresh-index>
+
+Re-generate the index page for the logs.
+
+B<sysadmin-log --udp-data host=192.168.0.3 --udp-data port=5001>
+
+Send the UDP datagram somewhere other than the default.
+
+B<sysadmin-log --udp-data irc=0>
+
+Don't apply IRC colouring to the log data send via UDP.
+
+=head1 AVAILABILITY
+
+The project homepage is L<http://p3rl.org/App::Sysadmin::Log::Simple>.
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<https://metacpan.org/module/App::Sysadmin::Log::Simple/>.
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/doherty/App-Sysadmin-Log-Simple>
+and may be cloned from L<git://github.com/doherty/App-Sysadmin-Log-Simple.git>
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://github.com/doherty/App-Sysadmin-Log-Simple/issues>.
+
+=head1 AUTHOR
+
+Mike Doherty <doherty@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Mike Doherty.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+test.pl
+lib/AutoSession.pm
+lib/AutoSession/Base64.pm
+lib/AutoSession/Driver.pm
+lib/AutoSession/TieHandle.pm
+lib/AutoSession/Driver/File.pm
+

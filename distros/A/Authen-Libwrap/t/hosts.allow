@@ -1,0 +1,24 @@
+# special hosts.allow for testing Authen::Libwrap
+
+tcp_wrappers_test : ALL : deny
+
+foo : 10.1.1.1 : allow
+foo : foo.com : allow
+foo : ALL : deny
+
+bar : bar.com : deny
+bar : ALL : allow
+
+baz : PARANOID : deny
+baz : ALL : allow
+
+quux : 10.1.1. : allow
+quux : 10.2.1. : deny
+quux : 10. : allow
+quux : ALL : deny
+
+gzonk : KNOWN : allow
+gzonk : ALL : deny
+
+wibble : UNKNOWN : deny
+wibble : ALL : allow

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+LICENSE
+t/Apache-TS-AdminClient.t
+lib/Apache/TS/AdminClient.pm
+META.yml                                 Module meta-data (added by MakeMaker)

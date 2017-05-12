@@ -1,0 +1,24 @@
+diff -u im.orig/src/libtiff/tiffiop.h im.new/src/libtiff/tiffiop.h
+--- im.orig/src/libtiff/tiffiop.h	2016-06-21 16:52:25.000000000 +0200
++++ im.new/src/libtiff/tiffiop.h	2016-07-09 19:58:51.024081400 +0200
+@@ -59,7 +59,7 @@
+ */
+ #endif
+ 
+-#ifdef WIN32
++#if defined(WIN32) && !defined(__CYGWIN__)
+ #define snprintf _snprintf
+ #if _MSC_VER >= 1900 /* IMLIB vc14 */
+ #undef snprintf
+diff -u im.orig/src/libexif/config.h im.new/src/libexif/config.h
+--- im.orig/src/libexif/config.h	2015-02-05 16:54:16.956068700 +0100
++++ im.new/src/libexif/config.h	2015-02-06 18:52:07.037795100 +0100
+@@ -6,7 +6,7 @@
+ /* The gettext domain we're using */
+ #define GETTEXT_PACKAGE "libexif-9"
+ 
+-#ifdef WIN32
++#if defined(WIN32) && !defined(__CYGWIN__)
+ #define exif_snprintf _snprintf
+ #else
+ #define exif_snprintf snprintf

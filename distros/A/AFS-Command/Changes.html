@@ -1,0 +1,717 @@
+    <HTML> 
+	<HEAD> 
+	    <TITLE>distro/Changes</TITLE> 
+	</HEAD>
+
+	<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#CHanges_in_1_9">CHanges in 1.9</A>
+	<LI><A HREF="#Enhancements">Enhancements</A>
+	<LI><A HREF="#Changes_in_1_8">Changes in 1.8</A>
+	<LI><A HREF="#Bug_Fixes">Bug Fixes</A>
+	<UL>
+
+		<LI><A HREF="#vos_examine_did_not_pick_up_the_">vos examine did not pick up the LOCKED flag</A>
+		<LI><A HREF="#pts_membership_error_checking_wa">pts membership error checking was bogus</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_1_7">Changes in 1.7</A>
+	<LI><A HREF="#Enhancements">Enhancements</A>
+	<UL>
+
+		<LI><A HREF="#Boolean_flags_can_be_turned_off_">Boolean flags can be turned off, as well as on</A>
+	</UL>
+
+	<LI><A HREF="#Bugs">Bugs</A>
+	<UL>
+
+		<LI><A HREF="#vos_examine_by_numeric_ID_did_no">vos examine by numeric ID did not parse Volume Headers</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_1_6">Changes in 1.6</A>
+	<LI><A HREF="#Enhancements">Enhancements</A>
+	<LI><A HREF="#AFS_Object_VolumeHeader_new_a">AFS::Object::VolumeHeader: new attribute 'attached'</A>
+	<LI><A HREF="#Bugs">Bugs</A>
+	<LI><A HREF="#Changes_in_1_5">Changes in 1.5</A>
+	<LI><A HREF="#Enhancements">Enhancements</A>
+	<UL>
+
+		<LI><A HREF="#Principal_names_as_user_supplie">Principal names, as user supplied arguments, are lowercased</A>
+		<LI><A HREF="#AFS_Command_VOS_restore_argum">AFS::Command::VOS->restore arguments added</A>
+	</UL>
+
+	<LI><A HREF="#Bugs">Bugs</A>
+	<UL>
+
+		<LI><A HREF="#AFS_Object_VolumeHeader_acces">AFS::Object::VolumeHeader 'accesses' attribute was incorrect</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_1_4">Changes in 1.4</A>
+	<LI><A HREF="#Enhancements">Enhancements</A>
+	<UL>
+
+		<LI><A HREF="#Test_suite_is_disabled_by_defaul">Test suite is disabled by default.</A>
+	</UL>
+
+	<LI><A HREF="#Bugs">Bugs</A>
+	<UL>
+
+		<LI><A HREF="#Volume_status_value_inconsistenc">Volume status value inconsistency</A>
+		<LI><A HREF="#AFS_Command_VOS_examine_parse">AFS::Command::VOS->examine parses busy and offline messages</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_1_3">Changes in 1.3</A>
+	<LI><A HREF="#Enhancements">Enhancements</A>
+	<UL>
+
+		<LI><A HREF="#AFS_Command_VOS_release_suppo">AFS::Command::VOS->release support both -f and -force</A>
+	</UL>
+
+	<LI><A HREF="#Bugs">Bugs</A>
+	<UL>
+
+		<LI><A HREF="#AFS_Command_BOS_listhosts">AFS::Command::BOS->listhosts</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_1_2">Changes in 1.2</A>
+	<LI><A HREF="#Enhancements">Enhancements</A>
+	<UL>
+
+		<LI><A HREF="#AFS_Command_VOS_offline_and">AFS::Command::VOS->offline() and ->online()</A>
+	</UL>
+
+	<LI><A HREF="#Bugs">Bugs</A>
+	<LI><A HREF="#Changes_in_1_1">Changes in 1.1</A>
+	<LI><A HREF="#Enhancements">Enhancements</A>
+	<UL>
+
+		<LI><A HREF="#AFS_Command_VOS_status_">AFS::Command::VOS->status()</A>
+		<LI><A HREF="#AFS_Object_VLDB_data_is_now_ke">AFS::Object::VLDB data is now keyed on volume ID, as well as name</A>
+	</UL>
+
+	<LI><A HREF="#Bugs">Bugs</A>
+	<UL>
+
+		<LI><A HREF="#AFS_Command_BOS_status">AFS::Command::BOS->status</A>
+		<LI><A HREF="#AFS_Command_FS_several_metho">AFS::Command::FS->(several methods)</A>
+		<LI><A HREF="#AFS_Command_FS_lsmount">AFS::Command::FS->lsmount</A>
+		<LI><A HREF="#AFS_Command_FS_sysname">AFS::Command::FS->sysname</A>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="CHanges_in_1_9">CHanges in 1.9
+
+</A></H1>
+<P>
+<HR>
+<H1><A NAME="Enhancements">Enhancements
+
+</A></H1>
+A new argument is supported by AFS::Command::Base-&gt;new():
+
+
+<P>
+
+<PRE>    my $vos = AFS::Command::VOS-&gt;new( timestamps =&gt; 1 );
+</PRE>
+
+<P>
+
+This will result in ISO timestamps being prepended to each line of output
+when it is collected into the $vos-&gt;errors(). This is useful for
+profiling the performance of operations such as vos release:
+
+
+<P>
+
+<PRE>    my $result = $vos-&gt;release
+      (
+       id               =&gt; 'somevol',
+       cell             =&gt; 'somecell',
+      ) || die $vos-&gt;errors();
+</PRE>
+
+<P>
+
+When this works, the $vos-&gt;errors() will have the verbose output, which
+can be logged even in the successful case, for diagnostics. Here's an
+example for a failure:
+
+
+<P>
+
+<PRE>    [2004-11-18 17:20:36] Could not lock the VLDB entry for the volume 536998569.
+    [2004-11-18 17:20:36] VLDB: no permission access for call
+    [2004-11-18 17:20:36] Error in vos release command.
+    [2004-11-18 17:20:36] VLDB: no permission access for call
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_1_8">Changes in 1.8
+
+</A></H1>
+<P>
+<HR>
+<H1><A NAME="Bug_Fixes">Bug Fixes
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="vos_examine_did_not_pick_up_the_">vos examine did not pick up the LOCKED flag
+
+</A></H2>
+The code to parse the VLDB header was missing the LOCKED flag, if it was
+present, so this attribute was not being set properly. It is now.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="pts_membership_error_checking_wa">pts membership error checking was bogus
+
+</A></H2>
+Well, it still is bogus, actually, since the code has to deal with the fact
+that pts has never produced meaningful return codes, so a failed pts
+membership command can still exit 0, and we have to figure out if it failed
+by other means. This is done by looking for the known error messages that
+pts prints out, which is a good example of why parsing the ASCII test
+output of commands like this is a weak architecture.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_1_7">Changes in 1.7
+
+</A></H1>
+<P>
+<HR>
+<H1><A NAME="Enhancements">Enhancements
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Boolean_flags_can_be_turned_off_">Boolean flags can be turned off, as well as on
+
+</A></H2>
+If an argument to a method (and its corresponding command line argument)
+doesn't take a value, it is treated like a Boolean flag. However, the code
+used to assume that the existence of a Boolean key in the argument list
+implied the Boolean argument was always true.
+
+
+<P>
+
+Now, the truth of the arguments <EM>value</EM> is tested to determine if the flag should be set on or off. This makes it
+easy to have subroutines that just blindly pass certain arguments along,
+without haing to test them, and allows for much cleaner code.
+
+
+<P>
+
+For example:
+
+
+<P>
+
+<PRE>    my $result = $vos-&gt;release
+      (
+       name             =&gt; $name,
+       force            =&gt; $force,
+      );
+</PRE>
+
+<P>
+
+Will work as you probably expected it to, namely if <CODE>$force</CODE> is
+zero, it will NOT be passed to the ``vos release'' command. In previous
+releases, regardless of the value of $force, the mere existence of the
+force key in the argument hash would have caused the -force option to be
+used.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Bugs">Bugs
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="vos_examine_by_numeric_ID_did_no">vos examine by numeric ID did not parse Volume Headers
+
+</A></H2>
+The code to parse the volume headers in the output from ``vos examine'' was
+looking for a pattern match based on the ``id'' argument. However, the
+headers always print the name first, and we were assuming that the id
+argument was the volume name, when it can also be the volume ID.
+
+
+<P>
+
+The parsing is less strict now, and works for both a volume name od a
+numeric ID.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_1_6">Changes in 1.6
+
+</A></H1>
+<P>
+<HR>
+<H1><A NAME="Enhancements">Enhancements
+
+</A></H1>
+<P>
+<HR>
+<H1><A NAME="AFS_Object_VolumeHeader_new_a">AFS::Object::VolumeHeader: new attribute 'attached'
+
+</A></H1>
+When a volume's status is ``offline'', there is really more than one status
+the volume can be in. A volume might be unattached, and offline, or it
+might be attached, but adminitratively offline. For example, ``vos
+offline'' put a vlume in the latter state, and if for some reason there are
+two volumes with the same ID on the same fileserver, they will both be
+attached (if possible), but only the first one encountered will be brought
+online.
+
+
+<P>
+
+Changing the value of status would been a non-backwards compatible change,
+and caused some subtle problems for some applications. Rather than
+introduce such a change, I have chosen to represent this state with an
+additional attribute ``attached'', which is just a Boolean, indicating
+whether or not the volume is attached.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Bugs">Bugs
+
+</A></H1>
+<P>
+<HR>
+<H1><A NAME="Changes_in_1_5">Changes in 1.5
+
+</A></H1>
+<P>
+<HR>
+<H1><A NAME="Enhancements">Enhancements
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Principal_names_as_user_supplie">Principal names, as user supplied arguments, are lowercased
+
+</A></H2>
+As a convenience, when PTS names are passed to methods like
+<CODE>getUserByName(),</CODE> they will be lower-cased before looking up
+the user, or group. Since PTS is a case-insensitive database, this will
+avoid the need for applications to <CODE>lc()</CODE> some strings, although
+not in all cases.
+
+
+<P>
+
+For example, you can pass a mixed case string to pts-&gt;creategroup(), and
+then use the same string to query the resulting AFS::Object::Group object
+using <CODE>getGroupByName().</CODE>
+
+
+<P>
+
+The object's ``group'' attribute, however, will be in lower case, since
+that will be the value returned by the pts command itself.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="AFS_Command_VOS_restore_argum">AFS::Command::VOS->restore arguments added
+
+</A></H2>
+Documentation for two important new vos restore arguments was added to the
+documentation (-creation and -lastupdate). These options are only available
+in a patch to vos, which should be in one the next two major OpenAFS 1.2.X
+releases.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Bugs">Bugs
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="AFS_Object_VolumeHeader_acces">AFS::Object::VolumeHeader 'accesses' attribute was incorrect
+
+</A></H2>
+The actual attribute on the objects was named ``access''. Oops. The
+attribute was changed to ``accesses'' to match the documentation, and the
+string that is parsed in vos output.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_1_4">Changes in 1.4
+
+</A></H1>
+<P>
+<HR>
+<H1><A NAME="Enhancements">Enhancements
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Test_suite_is_disabled_by_defaul">Test suite is disabled by default.
+
+</A></H2>
+There is a well intentioned effort to automatically test all new
+submissions to CPAN (see <A
+HREF="http://testers.cpan.org).">http://testers.cpan.org).</A>
+Unfortunately, the AFS-Command package can't be tested automatically, since
+it requires a fair amount of configuration. You have to specify a cell
+name, some fileserver names and partitions, etc.
+
+
+<P>
+
+By default, the tests will all be skipped if the configured cell name in
+the CONFIG file has not been modified, thus allowing the automated CPAN
+testing to continue, automatically, without the author getting a bunch of
+bogus emails.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Bugs">Bugs
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Volume_status_value_inconsistenc">Volume status value inconsistency
+
+</A></H2>
+!!!!!!!! WARNING !!!!!!!!
+
+
+<P>
+
+This change is NOT backwards compatible with previous releases, so verify
+that your code handles the new, consistent values correctly.
+
+
+<P>
+
+The ``status'' field returned from either vos-&gt;examine() or
+vos-&gt;listvol(), in previous releases, had inconsistent values. When a
+volume is online, the status would be one of:
+
+
+<P>
+
+<PRE>    online
+    On-line
+</PRE>
+
+<P>
+
+Likewise, when offline, one of:
+
+
+<P>
+
+<PRE>    offline
+    Off-line
+</PRE>
+
+<P>
+
+These values have all been normalized to: online, offline
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="AFS_Command_VOS_examine_parse">AFS::Command::VOS->examine parses busy and offline messages
+
+</A></H2>
+When a volume is busy or can not be attached, ``vos examine'' will be
+unable to display the volume headers. Instead, a one line message is
+printed, such as one of the following:
+
+
+<P>
+
+<PRE>    **** Volume 123456789 is busy ****
+    **** Could not attach volume 123456789 ****
+</PRE>
+
+<P>
+
+The examine method now parses these, and the AFS::Object::VolumeHeader
+object will have only the 'id' and 'status' attributes. Previously, those
+lines were incorrectly parsed and the 'name' attribute set to '****', which
+is pretty obviously wrong.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_1_3">Changes in 1.3
+
+</A></H1>
+<P>
+<HR>
+<H1><A NAME="Enhancements">Enhancements
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="AFS_Command_VOS_release_suppo">AFS::Command::VOS->release support both -f and -force
+
+</A></H2>
+Someone at some point changed vos release's force argument from -f to
+-force. API calls written with one of those will not work with a vos binary
+that doesn't agree on the choice of force option. This would have require
+developers to write code like this:
+
+
+<P>
+
+<PRE>   $vos-&gt;release
+     (
+      id                =&gt; $id,
+      cell              =&gt; $cell,
+      ( $vos-&gt;supportsArgument('release','force') ?
+        ( force         =&gt; 1 ) :
+        ( f             =&gt; 1 )
+      ),
+     );
+</PRE>
+
+<P>
+
+OK, that's the authors twisted way of doing it, and it seems like needless
+complexity. Both f and force are now supported as options, using a simply
+alias mechanism to translate from one to the other, based on what is
+supported by the vos binary.
+
+
+<P>
+
+The documentation hasn't been changed, since you can use 'force' in all
+cases, and since that is the newer of the two, the docs will stay as they
+are. The fact that your vos binary really wants 'f' is hidden from you, and
+will stay that way.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Bugs">Bugs
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="AFS_Command_BOS_listhosts">AFS::Command::BOS->listhosts
+
+</A></H2>
+The returned object has a cell attribute, as well as the hosts attribute,
+but the docs forgot to mention this.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_1_2">Changes in 1.2
+
+</A></H1>
+<P>
+<HR>
+<H1><A NAME="Enhancements">Enhancements
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="AFS_Command_VOS_offline_and">AFS::Command::VOS->offline() and ->online()
+
+</A></H2>
+Both of these ``hidden'' vos commands are now supported by the API. These
+commands are part of the vos command suite, but they do not show up in the
+output of ``vos help''.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Bugs">Bugs
+
+</A></H1>
+<P>
+<HR>
+<H1><A NAME="Changes_in_1_1">Changes in 1.1
+
+</A></H1>
+<P>
+<HR>
+<H1><A NAME="Enhancements">Enhancements
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="AFS_Command_VOS_status_">AFS::Command::VOS->status()
+
+</A></H2>
+This method now parses the individual transaction stanzas, and the API
+provides access to objects that encapsulate each of them. So, instead of
+just finding out how many transactions are active, you can analyze each of
+them in detail.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="AFS_Object_VLDB_data_is_now_ke">AFS::Object::VLDB data is now keyed on volume ID, as well as name
+
+</A></H2>
+This changes the way the AFS::Object::VLDB data can be extracted. In 1.0,
+the API allowed AFS::Object::VLDBEntry object to be queried only by name,
+but 3 new methods calls allow this data to be queried by numeric ID as well
+as name:
+
+
+<P>
+
+<PRE>    getVLDBEntryById($id)
+    getVLDBEntryByName($name)
+    getVolumeIds()
+</PRE>
+
+<P>
+
+The API for getVLDBEntry has changed, and the single argument usage:
+
+
+<P>
+
+<PRE>    getVLDBEntry($name)         # DEPRECATED!!!!
+</PRE>
+
+<P>
+
+has been deprecated. If warnings are enabled (perl -w), then the API will
+carp at you. In the next release (1.2), that usage will no longer be
+supported. Upgrade your code, or pay the price.
+
+
+<P>
+
+The new usage of getVLDBEntry is one of:
+
+
+<P>
+
+<PRE>    getVLDBEntry( name =&gt; $name )
+    getVLDBEntry( id =&gt; $id )
+</PRE>
+
+<P>
+
+The internal method <CODE>_addEntry()</CODE> now manages the data by id as
+well as name, but you're not supposed to know that anyway...
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Bugs">Bugs
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="AFS_Command_BOS_status">AFS::Command::BOS->status
+
+</A></H2>
+When querying a specific instance, if it wasn't there, the API would try to
+add an undefined instance object to the result, and croak. Now, you just
+get a result object with no instances.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="AFS_Command_FS_several_metho">AFS::Command::FS->(several methods)
+
+</A></H2>
+If you pass a list of paths to methods such as <CODE>whichcell(),</CODE>
+then the error handling was a bit intrusive. The way it used to work, in
+1.0, was to return an error if we didn't see output for one or more of the
+paths. Now, the code is more forgiving, and if have no idea what happened
+for one of the given paths, we'll return a Path object for that path which
+has a generic error.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="AFS_Command_FS_lsmount">AFS::Command::FS->lsmount
+
+</A></H2>
+The ``File 'foo' doesn't exist'' error message wasn't trapped as a
+recognized error. It is now.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="AFS_Command_FS_sysname">AFS::Command::FS->sysname
+
+</A></H2>
+The pattern matching was a bit greedy and the trailing single quote was
+showing up in the returned sysname value.
+
+
+<P>
+
+</DL>
+    </BODY>
+
+    </HTML>

@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/App/Cerberus/Plugin/Woothee.pm
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-syntax.t

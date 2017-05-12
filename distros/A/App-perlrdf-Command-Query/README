@@ -1,0 +1,37 @@
+NAME
+    App::perlrdf::Command::Query - SPARQL extension for App-perlrdf
+
+SYNOPSIS
+     $ perlrdf query -e 'SELECT * WHERE { ?s ?p ?o }' -i data.rdf
+
+     $ perlrdf query -e 'SELECT * WHERE { ?s ?p ?o }' -Q store.sqlite
+
+DESCRIPTION
+    This module adds query abilities to the `perlrdf` command-line client.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=App-perlrdf-Command-Query>.
+
+ENVIRONMENT
+    Set `PERLRDF_QUERY_METHOD` to "GET" or "POST" specify a query method.
+
+SEE ALSO
+    App::perlrdf, RDF::Query, RDF::Query::Client, Spreadsheet::Wright.
+
+    The rqsh tool that comes with RDF::Query.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

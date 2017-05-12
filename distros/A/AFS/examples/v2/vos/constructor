@@ -1,0 +1,25 @@
+#!/usr/local/bin/perl
+
+use v5.10.0;
+use blib;
+use strict;
+use warnings;
+
+use AFS::VOS;
+
+my ($verbose, $vos);
+
+die "Usage: $0 [verbose]\n" if $#ARGV > 0;
+
+$verbose = shift // 0;
+
+$vos = AFS::VOS->new($verbose);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "OK \n"; }
+
+test_it($vos);
+
+sub test_it {
+    my $self = shift;
+    $self->DESTROY;
+}

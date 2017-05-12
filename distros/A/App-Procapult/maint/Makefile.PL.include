@@ -1,0 +1,21 @@
+BEGIN {
+  -e 'Distar'
+    or system("git clone git://git.shadowcat.co.uk/p5sagit/Distar.git")
+}
+use lib 'Distar/lib';
+use Distar;
+
+author 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>';
+
+manifest_include 'bin' => qr/.*/;
+
+sub MY::postamble {
+  (my $postamble = <<'  END') =~ s/^    //mg;
+    distdir: mangle_script
+    mangle_script:
+    	rm $(DISTVNAME)/bin/procapult # it's a hard link. wtf.
+    	(cat bin/procapult; <lib/App/Procapult.pm perl -ne '$$x++ if /=head1 SYNOPSIS/; print if $$x') >$(DISTVNAME)/bin/procapult
+    	chmod 755 $(DISTVNAME)/bin/procapult
+  END
+  $postamble;
+}

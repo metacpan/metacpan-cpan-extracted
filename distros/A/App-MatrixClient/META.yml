@@ -1,0 +1,52 @@
+---
+abstract: 'a C<Tickit>-based terminal UI client for F<Matrix>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-MatrixClient
+provides:
+  App::MatrixClient:
+    file: lib/App/MatrixClient.pm
+    version: '0.01'
+  App::MatrixClient::Matrix:
+    file: lib/App/MatrixClient/Matrix.pm
+    version: '0.01'
+  App::MatrixClient::RoomTab:
+    file: lib/App/MatrixClient/RoomTab.pm
+requires:
+  Convert::Color::XTerm: '0'
+  Data::Dump: '0'
+  Event::Distributor: '0.04'
+  Future: '0'
+  IO::Async::Loop: '0'
+  IO::Async::Timer::Countdown: '0'
+  Image::ExifTool: '0'
+  List::Util: '1.33'
+  Net::Async::Matrix: '0'
+  Net::Async::Matrix::Utils: '0'
+  POSIX: '0'
+  String::Tagged: '0.11'
+  Tickit: '0.48'
+  Tickit::Async: '0'
+  Tickit::Console: '0.07'
+  Tickit::Widget::FloatBox: '0'
+  Tickit::Widget::Frame: '0.31'
+  Tickit::Widget::GridBox: '0'
+  Tickit::Widget::ScrollBox: '0'
+  Tickit::Widget::Static: '0'
+  Tickit::Widget::VBox: '0'
+  YAML: '0'
+  curry: '0'
+  perl: '5.014'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'

@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use App::mookview;
+use Plack::Runner;
+use Pod::Usage qw/pod2usage/;
+
+my $mookview = App::mookview->new(pop) or pod2usage(0);
+my $app = $mookview->psgi_app();
+my $runner = Plack::Runner->new;
+$runner->parse_options(@ARGV);
+$runner->run($app);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+mookview - run a web application showing Markdown texts as a "Mook-book"
+
+=head1 SYNOPSIS
+
+    mookview [plackup options] text.md
+
+=head1 LICENSE
+
+Copyright (C) Yusuke Wada.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Yusuke Wada E<lt>yusuke@kamawada.comE<gt>
+
+=cut
+

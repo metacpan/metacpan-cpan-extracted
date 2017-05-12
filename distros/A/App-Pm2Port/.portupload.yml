@@ -1,0 +1,6 @@
+---
+category: 'devel'
+maintainer: andrey@kostenko.name
+master_sites: http://freebsd.dev.rambler.ru/distfiles/rambler/
+requires:
+    porttools: 0

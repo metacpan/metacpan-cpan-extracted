@@ -1,0 +1,20 @@
+Revision history for App-MetaCPAN-Gtk2-Notify
+
+0.05 Tue Sep 25 2012 Pavel Shaydo <zwon@cpan.org>
+    * set User-Agent header
+    * use plain ExtUtils::MakeMaker instead of Module::Install
+
+0.04 Sat Apr  7 2012 Pavel Shaydo <zwon@cpan.org>
+    * Reinitialize Gtk::Notify every time before sending notifications.
+      Fixes problem with xfce4-notifyd
+
+0.03 Sun Dec  4 2011 Pavel Shaydo <zwon@cpan.org>
+    * Fix icons' urls, they were broken in my xfce with libnotify 0.7.4
+    * Add link to distribution page on metacpan into notification
+
+0.02 Mon Aug  8 2011 Pavel Shaydo <zwon@cpan.org>
+    * Show avatars
+
+0.01 Fri Jul 29 2011 Pavel Shaydo <zwon@cpan.org>
+    * initial version
+

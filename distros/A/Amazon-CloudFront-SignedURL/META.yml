@@ -1,0 +1,43 @@
+---
+abstract: 'A module to generate AWS CloudFront signed URLs.'
+author:
+  - 'zoncoen <zoncoen@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amazon-CloudFront-SignedURL
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Amazon::CloudFront::SignedURL:
+    file: lib/Amazon/CloudFront/SignedURL.pm
+    version: '0.03'
+requires:
+  Carp: '0'
+  Crypt::OpenSSL::RSA: '0'
+  Data::Validator: '0'
+  MIME::Base64: '0'
+  Mouse: '0'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/zoncoen/Amazon-CloudFront-SignedURL/issues
+  homepage: https://github.com/zoncoen/Amazon-CloudFront-SignedURL
+  repository: git://github.com/zoncoen/Amazon-CloudFront-SignedURL.git
+version: '0.03'
+x_authority: cpan:ZONCOEN

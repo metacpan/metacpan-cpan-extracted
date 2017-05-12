@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         AAC-Pvoice
+version:      0.91
+version_from: lib/AAC/Pvoice.pm
+installdirs:  site
+requires:
+    Device::ParallelPort:          0
+    Device::ParallelPort::drv::win32: 0
+    File::Cache:                   0
+    File::stat:                    0
+    File::Temp:                    0
+    Image::Magick:                 6
+    IO::Scalar:                    0
+    Text::Wrap:                    0
+    Wx:                            0.15
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

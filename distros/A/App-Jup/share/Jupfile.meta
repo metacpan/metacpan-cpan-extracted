@@ -1,0 +1,15 @@
+# -*- mode: perl -*-
+# Example Huhufile for deploying nginx
+
+use Huhu::DSL;
+
+meta {
+    name => 'nginx',
+    author => 'adam stokes <adam.stokes@ubuntu.com>',
+    description => 'Nginx installer',
+    version => '0.1'
+};
+
+install {
+    packages => ['vim', 'emacs']
+};

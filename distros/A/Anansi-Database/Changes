@@ -1,0 +1,8 @@
+Revision history for Perl extension Anansi::Database.
+
+0.01  Fri May 24 11:14:55 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Anansi::Database
+0.02  Wed Jun 05 18:47:56 2013
+	- modified the POD to accommodate changes to "Anansi::Class".
+	- modified the POD to accommodate changes to "Anansi::ComponentManager".

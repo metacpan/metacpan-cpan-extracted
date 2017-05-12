@@ -1,0 +1,22 @@
+---
+abstract: 'Use the cpantesters cloud for testing bugs and features.'
+author:
+  - 'Jeff Black <blackj@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Study-BLACKJ
+provides:
+  Acme::Study::BLACKJ:
+    file: lib/Acme/Study/BLACKJ.pm
+    version: '0.01'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: '0.01'

@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Apache/ACEProxy.pm
+lib/Apache/ACEProxy/RACE.pm
+lib/Apache/ACEProxy/SJIS_RACE.pm
+lib/Apache/ACEProxy/UTF8_RACE.pm
+t/00_aceproxy.t

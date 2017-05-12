@@ -1,0 +1,28 @@
+---
+abstract: 'Representing the Community for SuperCollider Programming'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.88'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Acme::SuperCollider::Programming
+name: Acme-SuperCollider-Programming
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.005
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Acme-SuperCollider-Programming
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Acme-SuperCollider-Programming
+version: 0.02

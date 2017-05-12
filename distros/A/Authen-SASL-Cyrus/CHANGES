@@ -1,0 +1,71 @@
+History of updates to Authen::SASL::Cyrus
+
+0.13
+Updated the WRITE() method to use syswrite() and account for
+variable buffer sizes in SASL.
+
+0.12
+Made Cyrus.xs more compatible with Perl API by changing function calls
+like Perl_warn() to just warn(), and defining PERL_NO_GET_CONTEXT.
+Made SASL properties which take an IP address and load it into the SASL
+library more robust by determining if the passed address is in
+"struct sockaddr" format or in "IP1.IP2.IP3.IP4;PORT" format.
+Fixed passing of "function + params" as a callback. 
+
+0.11
+Fixed t/callback.t to NOT try connecting to the LDAP server
+on localhost since that, well, doesn't work at Pause.
+
+0.10
+Added better callback management, Perl memory management,
+and three test scripts, as written by Ulrich Pfeifer.
+
+0.09
+Changed securesocket GLOB, as suggested by Marius Tomaschewski.
+Extended SASL2 support.
+
+0.08
+Changed the "code" routine to return the result code of the
+last SASL library call. This allows differentiation of the
+result of the client_step returning a zero byte string vs.
+it saying authentication is complete.
+
+0.07
+Memcpy fix provided by Maurice Massar
+
+0.06
+Added SASL V2 support patch provided by Leif Johansson.
+
+0.05
+Added the SASL_CB_PASS callback. This callback, unfortunately, does
+not put the caller's "context" as the first parameter to the callback
+function. This means that the PerlCallback() function has to be able
+to determine if the _perlcontext is the first parameter or the second.
+Added a magic number as the first field of the _perlcontext struct
+to help PerlCallback() decide which parameter is the perl context.
+
+0.04
+Added a method "securesocket" that takes a file handle and returns a
+new file handle that is tied to the Security subclass added in 0.03. 
+In this way, a client program can take the object returned from
+client_new() and call the securesocket() method on it, passing in the
+client's file handle, without ever having to know about the Security
+subclass.  Also added a "tiehandle" method which will take the same
+file handle as "securesocket", and tie it directly to the Security
+subclass. The difference being "securesocket" returns a new file handle,
+and "tiehandle" ties the handle passed in.
+
+0.03  
+Added encryption layer. Cyrus.xs now has encode() and decode()
+methods. Added a "Security" subclass that can be used to tie a
+filehandle to perform encryption on write() and decryption on read().
+The new() method ties a passed in glob to the class.
+
+0.02
+Encryption layer not ready yet, so changed the "secflag" param in the
+call to sasl_client_new() from 1 to 0.  Otherwise, the server will
+start expecting encrypted requests and sending encrypted responses
+after the authentication, and the client cannot encrypt/decrypt.
+
+0.01
+Initial release

@@ -1,0 +1,8 @@
+Revision history for Algorithm-Voting
+
+0.01
+   * implemented Plurality
+   * implemented Sortition according to RFC 3797
+   * 100% test coverage
+   * added Test::Perl::Critic to test suite
+

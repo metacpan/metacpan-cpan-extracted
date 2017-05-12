@@ -1,0 +1,38 @@
+############################
+# AUTOSESSION VERSION 0.01 #
+############################
+
+
+################
+# INSTALLATION #
+################
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+################
+# DEPENDENCIES #
+################
+
+Storable
+
+##########
+# AUTHOR #
+##########
+
+Graciliano M. P. <gm@virtuasites.com.br>
+
+I will appreciate any type of feedback (include your opinions and/or suggestions). ;-P
+
+#############
+# COPYRIGHT #
+#############
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

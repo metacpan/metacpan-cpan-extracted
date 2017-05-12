@@ -1,0 +1,70 @@
+{
+   "abstract" : "perl5 alien library for AntTweakBar",
+   "author" : [
+      "DMOL, dmol@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4206",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-AntTweakBar",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Archive::Extract" : "0",
+            "Devel::CheckLib" : "1.01",
+            "Digest::SHA" : "0",
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::Command" : "0",
+            "ExtUtils::Liblist" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Fetch" : "0",
+            "File::Path" : "0",
+            "File::ShareDir" : "0",
+            "File::chdir" : "0.1008",
+            "Module::Build" : "0",
+            "Text::Patch" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::ShareDir" : "1.00",
+            "File::Spec" : "0",
+            "Text::ParseWords" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::AntTweakBar" : {
+         "file" : "lib/Alien/AntTweakBar.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlGameDev/Alien-AntTweakBar/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/PerlGameDev/Alien-AntTweakBar"
+      }
+   },
+   "version" : "0.03"
+}

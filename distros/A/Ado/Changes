@@ -1,0 +1,711 @@
+Revision history for Ado
+
+0.933 2016-12-05
+  - Fixed occasionally failing test in t/basic.t.
+  - Required some higher versions for recommended modules.
+
+0.932 2016-12-04
+  - Upgraded to Mojolicious 7.11, Mojolicious::Plugin::OAuth2 1.53
+    and probably others.
+  - Fixed failing test in t/basic.t.
+  - Cleared trailing spaces - RTKH (Artur Khabibullin).
+  - Made some sub arguments assignment slightly more
+    efficient - KABANOID (Michael Katasonov).
+
+0.931 2016-07-06
+  - Upgraded to Mojolicious 7.01.
+  - Fixed some failing tests with the new Mojo.
+  - Unnoticeable pod reformatting.
+
+0.930 2016-04-15
+  - Upgraded to Mojolicious 6.58.
+  - Expanded templates from Ado::Plugin::Auth.
+  - Fixed bugs related to improper dynamic routes names usage.
+  - $CODENAME changed to "ИЖЕ" U+2C0A GLAGOLITIC CAPITAL LETTER INITIAL IZHE (Ⰺ).
+
+0.921 2015-06-03
+  - Fixed query from i18n table to retrieve translated messages.
+  - Rearranged Plugin::MarkdounRender tests to avoid potential failures.
+
+0.92 2015-06-01
+  - Ado::Control::list_for_json() accepts a new argument $meta for arbitrary
+  content, specific to the served resource.
+  - Removed a lot of debug messages.
+  - Added database storage for lexicons to Ado::I18n.
+    Now plugins can store their translated messages in i18n table.
+    See Ado::Plugin::Vest as example.
+  - Refactored and improved /articles section.
+  - Decided not to remove documents from public/doc. They will be used as
+    end-user documentation and written when time permits.
+  - $CODENAME changed to "иже" U+2C09 GLAGOLITIC CAPITAL LETTER IZHE (Ⰹ)
+
+0.91 2015-05-10
+  - Upgraded to Mojolicious::Plugin::SemanticUI 0.17 to use only some of
+    Semantic UI components. This way the first rendering of the default
+    page is faster on the browser side.
+  - Implemented header_css and header_javascript helpers to add minimalistic asset
+    management. Used to refer specific Semantic UI components from templates
+    and render links to them in the <head> section of the default layout.
+  - The /help section is deprecated and will be removed in the next release.
+  - Other cleanups...
+
+0.901 2015-05-01
+  - Fixed bug in Ado::Plugin::Auth. Now you can disable local authentication
+    and use only OAuth2 authentication methods.
+  - Tested and works with Mojolicious 6.10.
+  - Cleaned up some (now seeming meaningless) TODOs.
+
+0.90 2015-04-26
+  - Using $app->moniker instead of hardcodded 'ado' in
+    Ado::Command::generate::apache2htaccess.
+  - Allow when Ado is installed globally application specific plugin 
+    configuration to override the global plugin configuration.
+  - Improved test coverage of Ado, Ado::Plugin and 
+    Ado::Command::generate::adoplugin. Total: 81.7% with TEST_AUTHOR set.
+
+0.89 2015-04-19
+  - Added hard dependency to Mojolicious::Plugin::OAuth2.
+  - Upgraded to Mojolicious::Plugin::OAuth2 1.52.
+  - Upgraded to Mojolicious 6.08.
+  - Added method by_email to Ado::Model::Users.
+
+0.88 2015-04-18
+  - Updated Ado::Manual::Intro Ado::Manual::Plugins and Ado::Manual::Installation.
+    Created Ado::Manual::FiveMinutes.
+  - Ado::Plugin::MarkdownRenderer also makes its configuration available for
+    usage at runtime by controller classes.
+  - Implemented Ado::Control::Articles specifically for Ado::Manual::FiveMinutes.
+
+0.87 2015-03-30
+  - Moved table domains to Ado::Plugin::Site.
+  - Improved Error reporting in do_sql_file in Ado::Plugin::AdoHelpers.
+  - Fixed bug in Ado::Sessions. It was failing to set default session type.
+
+0.86 2015-03-30
+  - Started work in Ado::Build to handle upgrades beside installations
+    so the sqlite database is not replaced with the newly installed version
+    and thus destroing content of unconscious users - Alpha.
+  - Writing Ado::Manual::Intro.
+  - Upgraded to Mojolicious 6.05!
+
+0.85 2015-03-22
+  - Added hook 'after_login', emited by Ado::Plugin::Auth.
+  - Added possibilty to add items to the adobar menu
+    via session->{adobar_links}.
+  - $CODENAME changed to
+    "земля" - U+2C08 GLAGOLITIC CAPITAL LETTER ZEMLJA (Ⰸ)
+  - Showing current controller and action only when in development mode
+    (templates/layouts/default.html.ep).
+  - Upgraded to Mojolicious::Plugin::SemanticUI 0.15!
+  - Upgraded to DBIx::Simple::Class 1.009!
+  - Upgraded to Mojolicious::Plugin::DSC 1.005!
+  - Upgraded to Mojolicious 6.03!
+  - Aded 'query' - hash reference - containing the parameters in Ado::Control::list_for_json().
+
+0.84 2015-03-13
+  - Requiring Mojolicious 6.0 explicitly.
+  - Using Perl::Critic 1.124. Simplified t/.perlcriticrc.
+  - Fixed bug in comands apache2htaccess and apache2vhost.
+    They were failing to find their templates.
+    Feedback by Francisco Ortiz-Muñoz. Thanks Francisco!
+
+0.83 2015-02-27
+  - Continued with cleanups. New changes are applyed as need
+    arises while working on Ado::Plugin::Admin.
+  - Upgraded to Mojolicious 6.0!
+
+
+0.82 2015-02-24
+- Improved Ado::_initialise.
+- Adding paths to bundled files only in case Ado is used as a
+  library. Otherwise Mojo does it anyway.
+
+  
+0.81 2015-02-24
+  - Implemented Ado::ado_home - pointing always to where
+    Ado is installed.
+  - Moved default initialisation from ado.conf to Ado::_initialise.
+  - Improved Ado::Manual.
+
+0.80 2015-02-22
+  - Implemented do_sql_file application helper in Ado::Plugin::AdoHelpers.
+  - Improved documentation.
+    Added the newly created google group Ado-dev to Ado::Manual page.
+  - Upgraded to Mojolicious 5.81.
+  - Upgraded to Mojolicious::Plugin::DSC 1.002.
+
+0.79 2015-02-15
+  - $ENV{MOJO_HOME} is not set explicitly any more.
+    Detecting properly app->home and falling back to Mojo::home.
+  - Cleanups.
+    - Moved Ado::Control::Ado to Ado-Plugin-Admin where it logically belongs.
+  - Fixed broken tests with Mojolicious < 5.78 - Renee Baecker (RENEEB). Thanks!
+  - Works with Mojolicious 5.79 too.
+
+0.78 2015-02-01
+  - Improved documentation.
+  - Cleanups.
+    - Moved Ado::Control::Ado::Users and
+      Ado::Control::Ado::Default to Ado::Plugin::Admin distribution.
+    - Moved generic routes to be always defined last.
+
+0.77 2015-01-24
+  - Happy Christmass and New Year!
+  - Applied for Grant from TPF:
+    http://news.perlfoundation.org/2015/01/grant-proposal-ado---a-rapid-a.html
+    This proposal will be used as roadmap.
+  - Fixed typo in Ado::Build SYNOPSIS. Thanks RSAVAGE, WEBY.
+  - Do not use deprecated in Mojolicious 5.73 $c->render_exception()
+    and $c->render_not_found(). Use $c->reply->not_found() and
+    $c->reply->exception() instead.
+  - Started cleanups:
+    Removed templates/добре/ок.html.ep just to reduce
+    http://cpants.cpanauthors.org/dist/Ado/errors
+  - Noted in etc/ado.conf that arbitrary Perl code can be executed
+    when connecting to the database.
+  - POD improvements and cleanups.
+  - Upgraded to Mojolicious::Plugin::SemanticUI 0.11.
+
+0.76 2014-12-14
+  - Cleaned up Login form. It is used for local login only.
+  - Not using flags for languages. Language menu is now a dropdown menu.
+  - Upgraded to Mojolicious::Plugin::DSC 1.000 to be able to execute
+    perl code upon connecting to the database.
+  - Implemented unicode aware upper() and lower() for SQLite.
+  - The name of the authentication method is now shown beside its icon
+    in the "Sign in" dropdown menu.
+
+0.75 2014-11-26
+  - $CODENAME changed to
+    "Дзело" - U+2C07 GLAGOLITIC CAPITAL LETTER DZELO (Ⰷ)
+  - Cleaned up Ado::Build and Ado::BuildPlugin.
+  - Implemented experimental authentication via Facebook.
+  - Improved Ado::Plugin::Auth documentation.
+
+0.74 2014-11-22
+  - Fixed path to reset.min.js from Semantic-UI.
+  - Fixed regression with I18n and Mojolicious 5.62.
+  - Code optimisations.
+
+0.73 2014-11-17
+  - Upgraded to Mojolicious::Plugin::SemanticUI 0.08.
+  - Works with Mojolicious 5.62.
+
+0.72 2014-11-15
+  - Emphasized the passwordless login feature in Ado::Plugin::Auth.
+  - overeall improvement of Ado::Plugin::Auth documentation.
+  - Added Mojolicious::Plugin::OAuth2 as a recommended dependency.
+    It will be required only if some of the supported providers is enabled.
+  - Implemented experimental authentication via Google.
+  - Added hook "after_user_add" emited by Ado::Plugin::Auth.
+  - Added German language (Joachim Astel). Thanks!
+  - Improved Ado::Manual::Plugins a lot.
+
+0.71 2014-11-01
+  - Fixed bug in Ado::Plugin::home_dir(). Wrong assumption regarding %INC keys.
+  - Removed unused Test::AdoPlugin.
+  - Improved Test coverage (total: 85.9).
+  - Works with Mojolicious 5.56. New versions will not be required in Build.PL
+    unless necessary.
+
+0.70 2014-10-28
+  - Implemented more safe $c->user and user helper 
+    in which some fields are not available.
+  - Improved Ado::Control::require_formats(@formats).
+  - Improved Ado::Model::Users::by_group_name($group, $limit, $offset).
+  - TODO: Improve Test Coverage.
+
+
+0.69 2014-10-26
+  - $CODENAME changed to
+    "Живете" - U+2C06 GLAGOLITIC CAPITAL LETTER ZHIVETE (Ⰶ)
+  - Switched from favicon.ico to favicon.png for better quality.
+  - Fixed popup positioning and appearance of the logo in the main menu.
+  - Added the condition 'ingroup' to Ado::Plugin::Auth.
+  - Implemented Ado::Model::Users::by_group_name($group, $limit, $offset).
+
+0.68 2014-10-25
+  - Upgraded to Mojolicious 5.54.
+  - Added templates/not_found.html.ep.
+  - Upgraded to DBD::SQLite 1.44.
+  - Dramatic performance improvement with 'PRAGMA synchronous = OFF' and
+    'PRAGMA journal_mode=WAL'.
+  - Improved Ado::Command::adduser documentation.
+
+0.67 2014-10-10
+  - Fixed failing tests for Ado::Plugin::I18n after upgrade and improved it.
+  - Added universal exception.html.ep.
+  - Upgraded to Mojolicious 5.48.
+  - Added helper to_json to Ado::Plugin::AdoHelpers, same as
+    Mojo::JSON::to_json.
+  - Assuming stupidly an UTF-8 terminal for command 'adduser'.
+  - Defined defaults - stash variables $language and $language_from
+    in Ado::Plugin::I18n.
+
+0.66 2014-09-30
+  - Improved Ado::Control::list_for_json() to accept an arrayref of simple hashes.
+  - Upgraded to Mojolicious 5.47.
+  - Fixed failing test with Mojolicious 5.47.
+  - Fixed detection of Ado::Plugin home directory under Windows.
+  - Upgraded to Mojolicious::Plugin::SemanticUI 0.06.
+
+0.65 2014-09-21
+    - Removed plugin "vest" listed in etc/ado.conf but not yet on CPAN.
+
+0.64 2014-09-21
+    - Preparing for the first Ado plugin - Ado::Plugin::Vest,
+      that will be an example of how to build applications on Ado.
+    - Upgraded to Mojolicious::Plugin::SemanticUI 0.05.
+    - Renamed method PERL_FILES to PERL_DIRS in Ado::Build. 
+    - Importing PERL_DIRS in Ado::BuildPlugin so it can be used
+      for plugins like Ado::Build is used for installing Ado.
+    - Upgraded to Mojolicious 5.42.
+    - Fixed bug in Ado::Control::validate_input().
+    - Added dummy records in tables groups and users.
+    - Test::AdoPlugin is deprecated.
+    - In Ado::Plugin::initialise() now we also check for plugin specific
+      public folder and add it to Ado $app->static->paths.
+    - Downgraded to Module::Build 0.42.
+
+0.63 2014-09-09
+    - Deleted public/vendor/Semantic-UI. 
+    - Now example pages depend on Mojolicious::Plugin::SemanticUI,
+      but you can just comment 'SemanticUI' in ado.conf and it will not be loaded.
+    - Today in 1944 the communists took over Bulgaria. 
+      As a consequence in 1951 my grand-daddy got bitten and killed by them.
+      http://en.wikipedia.org/wiki/Bulgarian_coup_d%27%C3%A9tat_of_1944
+
+0.62 2014-09-07
+    - Ado::Plugin: simplified guessing of home_dir and speeded it up.
+    - Upgraded to Mojolicious 5.39.
+    - Started work on Mojolicious::Plugin::SemanticUI.
+      Semantic UI will go there and Ado will depend on this plugin.
+
+0.61 2014-09-01
+    - Fixed failing test of crud.pm on Windows.
+    - Added example configuration for Hypnotoad in etc/ado.conf.
+    - Upgraded to Mojolicious 5.36.
+    - Upgraded to Module::Build 0.4210.
+    - Upgraded to Email::Address 1.905.
+    - Upgraded to Locale::Maketext 1.25.
+
+0.60 2014-08-31
+    - Upgraded to Mojolicious 5.35.
+    - Changed option in Ado::Command::generate::apache2htaccess
+      from m|module=s@ to M|modules=s@ and explained the limitation in
+      Ado::Command.
+    - Fixed failing test on Windows in t/command/adoplugin-01.t.
+
+0.59 2014-08-28
+    - Upgraded to Mojolicious 5.33.
+    - Improved guessing of 'home_dir', 'lib' and 'templates_root' for CRUD in
+      Ado::Command::generate::adoplugin. 'templates_root' defaults to 'templates'.
+    - Improved guessing of 'lib' in Ado::Command::generate::crud.
+    - Added guessing of templates folder to Ado::Plugin.
+      Developing plugins should now be easy!!!
+    - $CODENAME changed to
+      "Есть" - U+2C05 GLAGOLITIC CAPITAL LETTER YESTU (Ⰵ)
+    - Cleanups, test fixes and documentation improvements.
+    - Presented Ado at YAPC::EU 2014 in Sofia, Bulgaria on 23 August
+      http://act.yapc.eu/ye2014/talk/5652
+    - Published presentation on Slideshare: 
+      http://www.slideshare.net/kberov/ado-yapceu2014
+    - Improved Ado::Sessions::File.
+
+0.58 2014-08-18
+    - Set specific minimum versions of required modules when
+      $ENV{TEST_AUTHOR} is 1.
+    - Ado::Plugin::config_dir now defaults to etc/plugins
+      relative to the plugin base directory.
+    - Implemented Ado::Plugin::home_dir, pointing to the plugin
+      base directory, no matter where the plugin is installed.
+    - Moved 'app' accessor up to Ado::Command::generate so it can be reused
+      by other generators.
+    - Implemented Ado::Command::generate::crud->routes and used it in
+      Ado::Command::generate::adoplugin.
+    - In Ado::Command::generate::crud: 
+      - renamed argument 'lib_root' to 'lib';
+      - added argument home_dir, so files can be dumped to arbitrary directory,
+        and at the same time keeping the file structure.
+      - Removed 'TODO' marker in crud.t
+    - Upgraded to Mojolicious 5.29.
+    - Updtaed the default index page.
+
+0.57 2014-08-14
+    - Cleanups and clarifications in "Changes" file - no code changes.
+
+0.56 2014-08-14
+    - Improved documentation. TODO - fix pod-spelling.t (falselly passing).
+    - Upgraded to Mojolicious 5.28.
+    - Improved tests and refactored Ado::Command::generate::crud.
+
+0.55 2014-08-03
+    - $CODENAME changed to
+      "Добро" - U+2C04 GLAGOLITIC CAPITAL LETTER DOBRO (Ⰴ).
+    - Added SQL::Abstract as recommended module.
+    - Upgraded to DBIx::Simple::Class 1.008.
+    - Upgraded to Semantic UI 0.19.0.
+    - Added highly experimental Ado::Command::generate::crud
+      to boost adoption of Ado even more.
+    - Improved documentation.
+
+0.54 2014-07-25
+    - Implemented experimental Ado::Command::generate::adoplugin.
+      This command should boost Ado expansion.
+    - Implemented Ado::Plugin::initialise() to reduce boilerplate code
+      and improved Ado::Plugin::config().
+    - Refactored all Ado plugins accordingly.
+    - Upgraded to Mojolicious 5.17.
+
+
+0.53 2014-07-20
+    - Improved Ado::Plugin. Added support for Mojolicious::Plugin::JSONConfig
+      and arbitrary configuration format per plugin.
+    - Removed monkey-patched Text::MultiMarkdown code from
+      Ado::Plugin::MarkdownRenderer. My patch was accepted. Thanks BOBTFISH.
+    - Upgraded to Text::MultiMarkdown 1.000035.
+    - Upgraded to Mojolicious 5.15.
+
+0.52 2014-07-13
+    - Added new MIME type .manifest to apache2htaccess.ep.
+      Removed rule for external 302 redirects for static files.
+      Let mod_rewrite just internally rewrite the path.
+    - Added method define_mime_types to Ado.
+    - Did cleanups recommended by SRI.
+    - Upgraded to Mojolicious 5.13.
+
+0.51 2014-07-05
+    - Fixing  failing tests under Windows.
+
+0.50 2014-07-04
+    - Fixed tests for commands "generate apache2*" to properly initialise
+        $MOJO_HOME.
+    - Made sure we have forward slashes in produced Apache configuration files.
+    - Fixed failing tests for Ado::Plugin::Example due to stupidly ignored file.
+    - Improved Ado::Plugin.
+    - Upgraded to Mojolicious 5.12.
+
+0.49 2014-07-03
+    - Fixed again failing tests on Windows ("The getpwuid function is unimplemented").
+    - Added support for mode specific plugin configuration files.
+    - Preferred Plack + FCGI + FCGI::ProcManager over Mojo::Server::FastCGI and
+      improved apache2htaccess.ep.
+
+0.48 2014-06-29
+    - Fixed again failing tests on Windows.
+      Replaced backslashes with forward slashes.
+    - Moved most of the INSTALL section from READMEs
+      to Ado::Manual::Installation.
+    - Made READMEs smaller.
+    - Upgraded to Mojolicious 5.10.
+
+0.47 2014-06-18
+    - $CODENAME changed to
+      "Глаголи" - U+2C03 GLAGOLITIC CAPITAL LETTER GLAGOLI (Ⰳ)
+    - No more major features (plugins, commands) will be added to Ado for now.
+      Ado core will be polished, made more stable and some
+      of the current features and assets will eventually go to plugins.
+      It is time for plugins.
+    - Fixed failing tests on Windows.
+    - Improved and fixed apache2htaccess.ep.
+      Using $^X in FcgidWrapper so bin/ado is executed with our own Perl.
+    - Upgraded to Mojolicious 5.09.
+    - Requiring Module::Build 0.4204 now because $self->install_base
+      returns string (the path) and not an ARRAY reference when
+      using --install_base=/custom/path.
+    - Added notes about local::lib to Ado::Manual/INSTALL.
+
+0.46 2014-06-16
+    - Added new command Ado::Command::generate::apache2vhost.
+    - Added new command Ado::Command::generate::apache2htaccess.
+    - Upgraded to Mojolicious 5.07.
+    - Fixed tests and code using "redirect_to" according to the new behavior.
+    - Upgraded to Semantic UI 0.18.0.
+
+0.45 2014-06-02
+    - Fixed failing tests with Mojolicious 5.00
+      (caused by "Changed return value of path_for method in Mojolicious::Routes::Match.").
+    - Upgraded to Mojolicious 5.02.
+    - Improved documentation a bit.
+
+0.44 2014-05-29
+    - Fixed typos in documentation.
+
+0.43 2014-05-25
+    - Default page now has a Bulgarian variant.
+
+0.42 2014-05-18
+    - Fixed typos and improved POD.
+    - Added Ado::Plugin::I18n to the list of the end-user
+      features at the bottom of the home page.
+    - Created and used templates/partials/logo.html.ep.
+    - Created embedded template languages_menu.html.ep in Ado::Plugin::I18n
+      and used it on the home page. This is a usage example.
+    - Added jQuery Cookie Plugin v1.4.1.
+    - Added some flag icons from http://www.famfamfam.com.
+    - Upgraded to Mojolicious 4.99.
+    - Upgraded to Semantic UI 0.17.0
+
+0.41 2014-05-11
+    - Translated intro.md. to Bulgarian.
+    - Menu items in adobar.html.ep now are only icons.
+    - Implemented Ado::Plugin::I18n.
+      First lexicons are in English and Bulgarian.
+    - Upgraded to Mojolicious 4.98.
+    - Removed unneeded Ado::Model::SqliteSequence
+    - $CODENAME changed to
+      "Веди" - U+2C02 GLAGOLITIC CAPITAL LETTER VEDE (Ⰲ)
+      because we have multilanguage support now.
+    - На 11 май Българската православна църква (БПЦ)
+      почита Светите братя Кирил и Методий и отбелязва
+      възстановяването на Българската патриаршия през 1953 г.
+
+0.40 2014-05-04
+    - Started translation of end-user documentation to English.
+      Translated in English cover.md ,rewrote intro.md.
+      Started translation of intro.md. to Bulgarian.
+    - Temporarily monkey-patched Text::MultiMardown to support
+      anchors when <base href="<%= url_for('/')->base %>" /> tag
+      is used in templates.
+    - Upgraded to Mojolicious 4.97.
+    - Upgraded to Semantic UI 0.16.1
+
+
+0.39 2014-04-15
+    - Fixed missing 'require' in Build.PL for Email::Address.
+    - Fixed 'require' in Build.PL for Mojolicious 4.93.
+
+0.38 2014-04-14
+    - Bugfix in ado build test.
+    - Improved "adduser" functionality.
+    - Added Email::Address for validating... well, email addresses.
+    - Upgraded to Mojolicious 4.93.
+    - Upgraded to Semantic UI 0.15.5
+    - Drawn the public/img/Ado-Building-Blocks.svg diagram.
+
+
+0.37 2014-04-05
+    - Added experimental Ado::Command::adduser.
+    - Small improvements and higher test coverage in Ado::Plugin::Auth.
+    - Made Ado::Command more consistent with Ado::Plugin.
+
+0.36 2014-03-22
+    - Improved documentation.
+    - Added sha1.js from CryptoJS v3.1.2.
+    - Fixed typos and improved the home page.
+    - Added a subset of Free Serif font to use the GLAGOLITIC alphabet
+      directly.
+    - Upgraded to Mojolicious 4.90.
+    - Upgraded to Semantic UI 0.15.1
+    - Shamelessly stollen and modified a background pattern from jQuery UI.
+    - Added Ado::Plugin::AdoHelpers.
+    - Added Ado::Control::Test controller for testing plugins.
+    - Implemented experimental digest access authentication with Ado::Plugin::Auth.
+
+0.35 2014-03-01
+    - Честита Баба Марта!
+    - Improved documentation.
+    - Added default/index.html.ep template and
+      default index page content.
+    - Upgraded to Mojolicious 4.85.
+    - Fixed failing test in t/sessions/database.t
+
+0.34 2014-02-23
+    - Optimised /help User Unterface for hand-held devices.
+    - Added text in Bulgarian to cover.md, intro.md. admin.md, domains.md,
+      groups.md, users.md, cms.md, pages.md, articles.md, blog.md - TODO:
+      Translate them to English.
+    - Optimized Ado::Control::generator().
+    - Added markdown() helper to MarkdownRenderer plugin.
+
+0.33 2014-02-20
+    - Really fixed failing test under Windows.
+    - Really upgraded to Mojolicious 4.83.
+
+0.32 2014-02-19
+    - Fixed failing test under Windows.
+    - Removed base_url option passed to Text::MultiMarkdown.
+    - Implemented "next" and "previous" page navigation in help app.
+    - Upgraded to Mojolicious 4.83.
+
+0.31 2014-02-16
+    - Implementented Ado::Plugin::MarkdownRenderer
+    - Included "Semantic UI" CSS and JavaScript framework.
+      It will be the default UI framwework for Ado.
+    - Implemented simple functional documentation system (/help)
+      and used Ado::Plugin::MarkdownRenderer and Semantic UI
+      to render documentation. Added dummy "lorem ipsum" content.
+    - $CODENAME changed to
+      "Буки" - U+2C01 GLAGOLITIC CAPITAL LETTER BUKY (Ⰱ)
+      because we have the first end-user application in Ado now.
+    - We started adding end-user features now.
+    - Added accessor 'CODENAME' to Ado.
+    - Added accessors 'keywords' and 'description' to Ado::Control.
+    - Upgraded to Mojolicious 4.81.
+
+0.30 2014-02-02
+    - Fixed tests by making sure touched files have proper permissions.
+    - Removed unneeded t/etc.
+
+0.29 2014-02-02
+    - Upgraded to Mojolicious 4.75.
+    - Fixed stupid mistakes in t/session/database.t.
+
+0.28 2014-02-02
+    - This is a bugfix release.
+    - Have a testing copy of ado.conf and ado.sqlite in t/etc.
+    - Checking for Test::Output in t/command/version.t.
+    - Creating README only if $ENV{TEST_AUTHOR}.
+
+0.27 2014-01-29
+    - Upgraded to Mojolicious 4.71.
+    - Experimental CORS-ready Ado::Sessions with file
+      and database storage.
+    - Fixed bug in Ado::Build::ACTION_dist.
+      It was not emptying log files.
+
+0.26 2014-01-11
+    - Improved Ado::Command::version output.
+    - Improved Ado::Manual.
+    - Not depending on Mojo::Util in Ado::Build.
+    - Fixed small bug in create_readme() and optimized it.
+    - Installing to the more popular "siteprefix" by default.
+    - Fixed failing test because of missing Test::Output.
+
+0.25 2014-01-01 20:27:50 CET
+    - Added more tests for Ado::Build (test coverage is > 90%).
+    - Fixed ACTION_perltidy. We do not modify Build.PL any more.
+    - Fixed stupid bug in manifest.t
+
+0.24 2013-12-31 17:09:24 CET
+    - This is an important release.
+      CODENAME: "Азь" - U+2C00 GLAGOLITIC CAPITAL LETTER AZU(Ⰰ)
+    - Introduced Ado::Command::version and the concept of $CODENAME.
+    - We have a stabilised Build process.
+    - Fixed ACTION_uninstall and ACTION_fakeuninstall (Valcho).
+    - Fixed failing pod-coverage.t because of -T switch (Valcho).
+    - Fixed ACTION_perltidy - was not tidying t/*.t files.
+    - Added tests for ACTION_perltidy.
+    - Introduced t/ado-build.t.
+
+0.23 2013-12-30 03:14:17 CET
+    - Added experimental tests for Ado::Build.
+    - Fixed ACTION_perltidy - did not tidy Build.PL
+    - Dynamically generating  META.json and META.yml
+      depending on if $ENV{TEST_AUTHOR} is set
+      thus requiring fewer dependencies.
+    - Updated Manual.pod
+    - Added uninstall and fakeuninstall actions to Ado::Build (Valcho).
+    - Fixed wrong install_path for lib directory
+      when "--install_base" is not passed as argument.
+    - Using Perl's $Config{siteprefixexp} for
+      other directories: qw(etc public log templates).
+
+0.22 2013-12-29 03:30:38 CET
+    - Refactored creation of README.md, kept README.
+    - Wellcome Valcho to the core team :)!
+    - Removed $ADO_HOME (by popular demand)
+      and symplified installation process a lot.
+    - Improved Manual.pod/README.
+
+0.21 2013-12-28 03:37:42 CET
+    - Added build action submit (draft).
+    - Added build action "perltidy" - see Ado::Build.
+      deleted:    bin/ado_perltidy
+      Thanks to Vulcho Nedelchev(WEBY) for the inspiration.
+    - Improved list_for_json in Ado::Control.
+    - Implemented validate_input in Ado::Control.
+    - Implemented Test::AdoPlugin.
+    - Huge enhancements in documentation
+      (mostly in Ado::Manual::Contributing).
+    - Shut up "Wide character in print" from Pod::Spelling.
+
+0.20 2013-12-24 03:22:10 CET
+    - Removed dependency IO::Socket::SSL - not mandatory yet
+    - Upgraded to Mojolicious 4.63
+    - Enhanced Ado::Manual
+    - Skipping pod-coverage.t under Perl 5.014
+
+0.19 2013-12-23 00:37:22 CET
+    - More strict checks regarding --install_base.
+      use 5.014 to enable say().
+
+0.18 2013-12-22 17:34:32 CET
+    - Removed release_status=>'unstable' from Build.PL.
+      This does not mean much.
+    - Started developing an external plugin - Ado::Plugin::Mess.
+    - First attempt for a logo.
+
+0.17 2013-12-21 00:11:06 CET
+    - Refactored list() in Ado::Control::Ado::Users
+      and implemented list_for_json in Ado::Control.
+    - Added test users test1 and test2.
+    - Added dummy missing actions to Ado::Control::Ado::Users.
+    - Added $c->require_formats(['json', 'xml', 'etc']) to Ado::Control.
+    - Enhanced _set_env in Ado::Build.
+    - Lower required Perl version to 5.014000.
+    - Enhanced POD.
+    - Requiering EV and  IO::Socket::IP as recommended
+      in Mojo::IOLoop for better scalabality and non-blocking apps.
+    - Added tests for POD spelling.
+    - Spellchecked and corrected all the POD.
+
+0.16 2013-12-19 00:03:47 CET
+    - Implemented Ado::BuildPlugin (untested).
+    - Enhanced Ado::Build documentation and
+      added $ENV{HOME} directory detection.
+    - Moved code from Build.PL to Ado::Build::create_build_script().
+    - Requiring Mojolicious 4.60
+
+0.15 2013-12-15 17:44:48 CET
+    - Now we requre and set ADO_HOME upon install so plugins can
+      easily find their installation paths
+    - Put bin/ado environment initialization into _set_env().
+      Added informative message about ADO_HOME.
+    - Set lib and arch install paths to "lib".
+    - Enhanced documentation.
+    - Implemented custom automatic README
+      generation from Ado::Nabual.
+    - Improved Build.PL
+
+0.14 2013-12-14 14:11:45 CET
+    - Setting explicitly MOJO_MODE in bin/ado
+    - Better detection for MOJO_HOME and MOJO_CONFIG
+    - Enhanced the Build process,
+      added ACTION_build, ACTION_dist process_log_files
+      and _empty_log_files to Ado::Build.
+    - Enhanced Ado::Plugin::Routes, added tests.
+    - Implemented Ado::Plugin::Routes.
+    - Again changed the routes structure in config.
+      Every route description is simply a HASHREF.
+    - Enhanced documentation.
+    - Reenabled pod-coverage tests.
+
+0.13 2013-12-10 01:44:30 CET
+    - Removed usage of PoweredBy.
+    - Lower required Perl version to 5.014002.
+    - Temporarily disabled pod-coverage tests.
+
+0.12  2013-12-09 00:33:05 CET
+    - Requiring Mojolicious::Plugin::DSC 0.999,
+      IO::Socket::SSL 1.957, Mojolicious 4.59.
+    - Changed plugins description in config file
+      from HASHREF to ARRAYREF.
+    - Added Ado::Control::Ado::Users, Ado::Plugin, Ado::Manual::Plugin,
+      Ado::Manual::RESTAPI
+    - $config->{routes} is now an ARRAYREF.
+    -Implemented example (Ado::Control::Ado::Users::list()) of following
+    "RESTful Service Best Practices" from www.RestApiTutorial.com
+
+0.11  2013-11-30 14:04:39 CET
+    - Added minimal database schema and data SQL files.
+    - Added generated by DBIx::Simple::Class::Schema
+      classses for manipulating tables.
+    - Fixed typos in documentation here and there.
+    - Ado::Manual is the default page for PODRenderer
+    - Added ACTION_install to Ado::Build.
+    - Switched from prefix to install_base.
+
+0.10  2013-11-23 19:56:09 CET
+    - We have a working application with several common
+      predefined routes and controllers.

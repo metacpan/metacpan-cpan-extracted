@@ -1,0 +1,23 @@
+NAME
+
+Acme::RemoteINC - Slowest Possible Module Loading
+
+LANGUAGE
+
+Pure Perl, 5.8 or greater required.
+
+DESCRIPTION
+
+For your SlowCGI pleasure, loads perl modules via FTP from remote sites.
+
+Requires Perl 5.8.x or greater, for loading objects into @INC.
+
+
+To install the module...
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

@@ -1,0 +1,33 @@
+$Id: Changes,v 1.2 2011/12/29 06:03:24 mikem Exp mikem $
+Changes file for Authen::ACE4
+
+Copyright (C) 2001-2004 Open System Consultants
+
+1.0 12 Jul 2001
+Initial release
+
+1.1 11 Sep 2002
+Improvements and clarification to installation documentation
+
+Patch contributed by "Paul Ewing Jr." <ewing@ima.umn.edu> adding
+asynchronous client interface, Pin SD_Init SD_Check SD_Next etc.
+Thanks Paul!
+
+1.2 16 Jun 2004
+Improved compile on Windows Server 2003 with latest Windows SDK
+
+1.3 2008-12-16
+- Added AceSetUserClientAddress, but it appears only to be useful with
+AceClientCheck, which is not yet implemented.
+- Reduced size of prompt strings in line with RSA suggestions.
+- Workaround for a bug in the AceAgent 6.1 SDK: AceContinueAuth promptStrLen
+is unreliable.
+- Modified Makefile.PL to work with SDK version 6.1.
+- Updated doc for SDK version 6.1, which is now preferred.
+
+1.4 2012-01-02
+- Testing against RSA AuthSDK 8.1 on Unix and Windows. Updated documentation to
+  reflect this. AuthSDK 8.1 is now the preferred SDK version and
+  RSA Authentication Manager 7.1 is preferred over ACE Server.
+- Improved building with Makefile.PL
+

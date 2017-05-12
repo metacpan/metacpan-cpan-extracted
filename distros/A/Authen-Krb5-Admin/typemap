@@ -1,0 +1,35 @@
+TYPEMAP
+Authen::Krb5::Ccache           T_PTROBJ_NU
+Authen::Krb5::Principal        T_PTROBJ_NU
+Authen::Krb5::Admin            T_PTROBJ_NU
+Authen::Krb5::Admin::Config    T_PTROBJ_NU
+Authen::Krb5::Admin::Key       T_PTROBJ_NU
+Authen::Krb5::Keyblock         T_PTROBJ_NU
+Authen::Krb5::Admin::Policy    T_PTROBJ_NU
+Authen::Krb5::Admin::Principal T_PTROBJ_NU
+
+kadm5_ret_t    T_LONG
+krb5_deltat    T_INT
+krb5_flags     T_INT
+krb5_int16     T_INT
+krb5_kvno      T_U_INT
+krb5_octet *   T_PTR
+krb5_timestamp T_INT
+krb5_ui_4      T_U_INT
+
+INPUT
+
+T_PTROBJ_NU
+    if ($arg == &PL_sv_undef) {
+        $var = 0;
+    } else if (sv_isa($arg, \"${ntype}\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR($type, tmp);
+    } else {
+        croak(\"$var is not of type ${ntype}\");
+    }
+
+OUTPUT
+
+T_PTROBJ_NU
+    sv_setref_pv($arg, \"${ntype}\", (void*)$var);

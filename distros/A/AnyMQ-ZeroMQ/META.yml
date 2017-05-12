@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               AnyMQ-ZeroMQ
+version:            0.06
+abstract:           AnyMQ adaptor for ZeroMQ
+author:
+    - Mischa Spiegelmock <revmischa@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Any::Moose:        0
+    AnyEvent:          0
+    AnyEvent::ZeroMQ:  0.34
+    JSON:              0
+    Test::More:        0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

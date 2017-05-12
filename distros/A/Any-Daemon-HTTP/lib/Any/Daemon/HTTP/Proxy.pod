@@ -1,0 +1,289 @@
+=encoding utf8
+
+=head1 NAME
+
+Any::Daemon::HTTP::Proxy - proxy request to a remote server
+
+=head1 INHERITANCE
+
+ Any::Daemon::HTTP::Proxy
+   is a Any::Daemon::HTTP::Source
+
+=head1 SYNOPSIS
+
+ my $proxy = Any::Daemon::HTTP::Proxy->new(path => '/forward');
+
+ my $vh = Any::Daemon::HTTP::VirtualHost->new(proxies => $proxy);
+
+=head1 DESCRIPTION
+
+[Available since v0.24] B<Warning: new code, not intensively tested.>
+
+There are two kinds of proxies:
+
+=over 4
+
+=item 1.
+
+Each L<Any::Daemon::HTTP::VirtualHost|Any::Daemon::HTTP::VirtualHost> may define as many proxies as it
+needs: selected by location inside a virtual host namespace, just like other
+directories.  These requests are forwarded to some proxy server.
+
+=item 2.
+
+The HTTP daemon itself collects proxies which use C<forward_map>'s; mapping
+incoming requests for (one or) many domains to (one or) many destinations.
+
+=back
+
+The current implementation does not support all features of proxies.
+For instance, it does not combine incoming connections into new
+outgoing connections.  You may take a look at IOMux::HTTP::Gateway
+for that.
+
+Proxy loop detection is used by adding C<Via> header fields (which
+can be removed explicitly).
+
+Extends L<"DESCRIPTION" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"Constructors">.
+ 
+=over 4
+
+=item Any::Daemon::HTTP::Proxy-E<gt>B<new>(%options|\%options)
+
+A proxy has either a C<path> various, in which case it is part of
+a single VirtualHost, or has a C<forward_map> when it becomes a child
+of the http daemon itself.
+
+ -Option            --Defined in               --Default
+  add_req_headers                                []
+  add_resp_headers                               []
+  allow               Any::Daemon::HTTP::Source  <undef>
+  change_request                                 undef
+  change_response                                undef
+  deny                Any::Daemon::HTTP::Source  <undef>
+  forward_map                                    <undef>
+  forward_timeout                                100
+  name                Any::Daemon::HTTP::Source  path
+  path                Any::Daemon::HTTP::Source  '/'
+  remote_proxy                                   undef
+  reverse                                        true
+  strip_req_headers                              []
+  strip_resp_headers                             []
+  user_agent                                     undef
+  via                                            "$host:$port"
+
+=over 2
+
+=item add_req_headers => ARRAY|CODE
+
+=item add_resp_headers => ARRAY|CODE
+
+=item allow => CIDR|HOSTNAME|DOMAIN|CODE|ARRAY
+
+=item change_request => CODE
+
+After adding and deleting headers, you may make other changes to the
+request.  The CODE is called with the proxy object, request and (rewritten)
+uri as parameters.
+
+=item change_response => CODE
+
+After adding and deleting headers, you may make other changes to the
+request. The CODE is called with the proxy object, request and (rewritten)
+uri as parameters.
+
+=item deny => CIDR|HOSTNAME|DOMAIN|CODE|ARRAY
+
+=item forward_map => CODE|'RELAY'
+
+When there is a C<forward_map>, you can only add this proxy object to
+the daemon.  The map describes how incoming domains need to be handled.
+
+The special constant C<RELAY> will make all requests being accepted
+and forwarded without uri rewrite.
+
+=item forward_timeout => SECONDS
+
+=item name => STRING
+
+=item path => PATH
+
+=item remote_proxy => PROXY|CODE
+
+When this proxy speaks to an other PROXY.  This can either be a fixed
+address or name, or computed for each connection via a CODE reference.
+See L<remoteProxy()|Any::Daemon::HTTP::Proxy/"Attributes">.
+
+=item reverse => BOOLEAN
+
+Enable reverse proxy behavior as well, which means that redirection
+responses from the remote will be modified to have the redirected
+passing through this proxy as well.
+
+=item strip_req_headers => NAME|REGEX|ARRAY|CODE
+
+See L<stripHeaders()|Any::Daemon::HTTP::Proxy/"Action">.
+
+=item strip_resp_headers => NAME|REGEX|ARRAY|CODE
+
+See L<stripHeaders()|Any::Daemon::HTTP::Proxy/"Action">.
+
+=item user_agent => LWP::UserAgent
+
+=item via => WORD
+
+To be included in the "Via" header line, which detects proxy loops.
+
+=back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<Any::Daemon::HTTP::Source/"Attributes">
+
+=item $obj-E<gt>B<path>()
+
+Inherited, see L<Any::Daemon::HTTP::Source/"Attributes">
+
+=item $obj-E<gt>B<remoteProxy>($protocol, $session, $request, $uri)
+
+Returns a list of remote proxies (at least one) to be used for $uri.
+If undef or empty, then there is direct connection to the destination.
+
+=item $obj-E<gt>B<userAgent>()
+
+=item $obj-E<gt>B<via>()
+
+=back
+
+=head2 Permissions
+
+Extends L<"Permissions" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"Permissions">.
+ 
+=over 4
+
+=item $obj-E<gt>B<allow>($session, $request, $uri)
+
+Inherited, see L<Any::Daemon::HTTP::Source/"Permissions">
+
+=item $obj-E<gt>B<collect>($vhost, $session, $request, $uri)
+
+Inherited, see L<Any::Daemon::HTTP::Source/"Permissions">
+
+=back
+
+=head2 Actions
+
+Extends L<"Actions" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"Actions">.
+ 
+=head2 Action
+
+=over 4
+
+=item $obj-E<gt>B<addHeaders>($message, PAIRS|ARRAY|CODE)
+
+Add header lines to the request or response $message.  Existing headers
+with the same name are retained.
+
+   add_req_headers   => [ Server => 'MSIE' ]
+   add_req_headers   => sub { my ($proxy,$msg,$uri) = @_; ... }
+
+=item $obj-E<gt>B<forwardRequest>($session, $request, $uri)
+
+=item $obj-E<gt>B<forwardRewrite>($session, $request, $uri)
+
+=item $obj-E<gt>B<proxify>($request, $uri)
+
+The $uri is the result of a rewrite of the destination mentioned in the
+$request.  To be able to forward the $request to the next server, we need
+to rewrite its headers.
+
+It is also possible the the original request originates from browser
+which is not configured for proxying.  That will be repared as well.
+
+=item $obj-E<gt>B<stripHeaders>($message, $name|Regexp|ARRAY|CODE|LIST)
+
+Convert a specification about which headers should be stripped into
+a singled CODE reference to remove the specified fields from a request
+(to a proxy) or response (by the proxy).
+
+   strip_req_headers => 'ETag'
+   strip_req_headers => qr/^X-/
+   strip_req_headers => [ 'ETag', qr/^X-/ ]
+   
+   strip_req_headers => sub { my ($proxy,$msg,$uri) = @_; ... }
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"DETAILS">.
+ 
+=head2 Resource restrictions
+
+Extends L<"Resource restrictions" in Any::Daemon::HTTP::Source|Any::Daemon::HTTP::Source/"Resource restrictions">.
+ 
+=head2 Using the proxy-map
+
+The proxy map will only be used when the access rules permit the client
+to access this source.  When the map returns a new URI as result, that
+will be the new destination of the request.  When C<undef> is returned,
+there may be an other proxy specification which will accept it.
+
+A typical usage could be:
+
+  Any::Daemon::HTTP::Proxy->new(forward_map => \&mapper);
+
+  sub mapper($$$)
+  {   my ($proxy, $session, $request, $uri) = @_;
+
+      if(lc $uri->authority eq 'my.example.com')
+      {   my $new = $uri->clone;
+          $new->authority('somewhere.else.org');
+          return $new;
+      }
+
+      undef;
+  }
+
+You can do anything you need: build lookup tables, rewrite parameter
+lists, and more.  However: the final URI needs to be an absolute URI.
+Please create regression tests for your mapper function.
+
+=head2 Proxy to a proxy
+
+An open forwarding proxy can be made with
+
+  Any::Daemon::HTTP::Proxy->new
+    ( forward_map  => 'RELAY'
+    , remote_proxy => 'proxy.firewall.me'
+    );
+
+=head1 SEE ALSO
+
+This module is part of Any-Daemon-HTTP distribution version 0.26,
+built on September 19, 2016. Website: F<http://perl.overmeer.net/any-daemon/>
+
+=head1 LICENSE
+
+Copyrights 2013-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

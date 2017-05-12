@@ -1,0 +1,147 @@
+NAME
+    algorithm-networksort-chooser - Helper utility for
+    Algorithm::Networksort
+
+SYNOPSIS
+    The "algorithm-networksort-chooser" script helps you find the best
+    sorting network for your particular use-case.
+
+        $ algorithm-networksort-chooser 9  ## find best sorting network for array size 9
+        $ algorithm-networksort-chooser 9 --all  ## show all candiate networks
+        $ algorithm-networksort-chooser 9 --algorithms=batcher,bitonic  ## only consider batcher and bitonic algos
+
+        $ algorithm-networksort-chooser 9 --opt=comparators  ## optimise for comparators (default)
+        $ algorithm-networksort-chooser 9 --opt=stages  ## optimise for stages
+        $ algorithm-networksort-chooser 9 --opt=swaps  ## optimise for average swaps
+
+        $ algorithm-networksort-chooser 9 --median  ## best median network
+        $ algorithm-networksort-chooser 9 --selection=4  ## also best median network
+        $ algorithm-networksort-chooser 9 --selection=0,1,2  ## top-3 elements selection net
+
+        $ algorithm-networksort-chooser 9 --validate  ## run 0-1 validation test
+        $ algorithm-networksort-chooser 9 --show  ## show network as ASCII diagram
+        $ algorithm-networksort-chooser 9 --raw  ## show network as raw comparators
+
+DESCRIPTION
+    This module uses Algorithm::Networksort to experiment with sorting
+    networks.
+
+    Introduction To Sorting Networks
+    <http://hoytech.github.io/sorting-networks/>
+
+    By default this script examines the output of all implemented algorithms
+    and the currently best known special-cases, and chooses the one that
+    best meets your specified criteria.
+
+    This module allows you to trim sorting networks into median or selection
+    networks.
+
+    You can then choose the optimal net based on comparators (total number
+    of operations) or on stages (number of operations considering
+    parallelism).
+
+    Normally the output is something like this:
+
+        $ algorithm-networksort-chooser --median 22
+        Network size: 22
+        Network type: Median network
+
+        Optimisation criteria: stages
+
+        Optimal network:
+          Algorithm "best":
+            Comparators: 86
+            Stages: 12
+
+    For the description of the various algorithms and best-known special
+    cases, see Algorithm::Networksort's documentation and source code.
+
+    In order to use this output in another program, there is a "--raw"
+    switch. Its output is "eval"able perl and is valid JSON:
+
+        $ algorithm-networksort-chooser --median 7 --raw
+        [[0,4],[1,5],[2,6],[0,2],[1,3],[4,6],[2,4],[3,5],[0,1],[2,3],[4,5],[1,4],[3,6],[3,4]]
+
+    Algorithm::Networksort's ASCII output can be seen with "--show":
+
+        $ algorithm-networksort-chooser --median 7 --show
+        Network size: 7
+        Network type: Median network
+
+        Optimisation criteria: comparators
+
+        Optimal network:
+          Algorithm "batcher":
+            Comparators: 14
+            Stages: 6
+
+        o--^--------^-----^-----------------o
+           |        |     |                  
+        o--|--^-----|--^--v--------^--------o
+           |  |     |  |           |         
+        o--|--|--^--v--|--^-----^--|--------o
+           |  |  |     |  |     |  |         
+        o--|--|--|-----v--|--^--v--|--^--^--o
+           |  |  |        |  |     |  |  |   
+        o--v--|--|--^-----v--|--^--v--|--v--o
+              |  |  |        |  |     |      
+        o-----v--|--|--------v--v-----|-----o
+                 |  |                 |      
+        o--------v--v-----------------v-----o
+
+    The "--all" switch shows all networks that were considered.
+
+    Sometimes which algorithm or which best special-case network is
+    surprising. For instance, selecting the top-3 elements in a size-9 array
+    is best done by adapting Hibbard's algorithm, even though there is a
+    special best (by comparators) network for size 9:
+
+        $ algorithm-networksort-chooser 9 --selection=0,1,2 --all
+        Network size: 9
+        Network type: Selection network: 0,1,2
+
+        Optimisation criteria: comparators
+
+        Optimal network:
+          Algorithm "hibbard":
+            Comparators: 18
+            Stages: 7
+
+        Additional candidate networks:
+          Algorithm "batcher":
+            Comparators: 20
+            Stages: 8
+          Algorithm "bosenelson":
+            Comparators: 22
+            Stages: 10
+          Algorithm "best":
+            Comparators: 23
+            Stages: 9
+          Algorithm "bitonic":
+            Comparators: 24
+            Stages: 8
+          Algorithm "bubble":
+            Comparators: 36
+            Stages: 15
+
+FUTURE IDEAS
+    Algorithm::Networksort::Validate::XS
+
+SEE ALSO
+    Introduction To Sorting Networks
+    <http://hoytech.github.io/sorting-networks/>
+
+    Algorithm-Networksort-Chooser github repo
+    <https://github.com/hoytech/Algorithm-Networksort-Chooser>
+
+    John Gamble's Algorithm-Networksort github repo
+    <https://github.com/jgamble/Algorithm-Networksort>
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2013-2016 Doug Hoyte.
+
+    This module is licensed under the same terms as perl itself.
+

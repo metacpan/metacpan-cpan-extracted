@@ -1,0 +1,58 @@
+#
+# $Header$
+#
+
+AI::LibNeural version 0.02
+==========================
+
+This module provides access to the c++ library libneural.
+(http://ieee.uow.edu.au/~daniel/software/libneural/ or search for libneural on
+freshmeat.net.) libneural is a simple, but useful, backpropagation neural
+network. It isn't packed with features or a speed demon, but it works and it's
+easy to learn how to use.
+
+INSTALLATION
+
+> perl Makefile.PL
+or 
+> perl Makefile.PL PREFIX=/some/non/system/place
+(then setting PERL5LIB as appropriate based on ^ is a good ideal)
+ignore the warnings about CC and LD being unknown parameters, then
+> make all test install
+
+Provided that everything goes well this should build the module, test it out,
+and install it. If you encounter problems try e-mailing the author with as
+much detail as possible. System type, os version, perl version, libneural
+version, cpp compiler, script of the failing Makefile creation and compile
+process.
+
+USE
+
+For information on using this library see the POD within AI::LibNeural.pm by
+typing 'perldoc LibNeural.pm' in the same directory as this README or by
+typing 'perldoc AI::LibNeural' after installtion.
+
+DEPENDENCIES
+
+libneural v1.0.3 or newer (it may work with older versions, but they have not
+been tested.)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 by Ross McFarland
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the 
+Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
+Boston, MA  02111-1307  USA.
+

@@ -1,0 +1,80 @@
+
+                README For Regression Tree Examples
+
+
+In order to become familiar with the regression tree capabilities of this
+module, start by executing the following scripts without changing them and
+seeing what sort of output is produced by them:
+
+    regression4.pl
+
+    regression5.pl
+
+    regression6.pl
+
+    regression8.pl
+
+IMPORTANT NOTE: With all these scripts, try all three choices for the
+                 constructor parameter jacobian_choice.  As mentioned in
+                 the main documentation page, it can be set to one of three
+                 values: 0, 1, or 2.  Its default is 0.  When set to 0,
+                 your regression coefficients are estimated only with
+                 linear least-squares and they are NOT refined further with
+                 gradient descent.  To benefit from the full power of
+                 gradient descent, set jacobian_choice to 2.  However, note
+                 that your computation time will go up significantly with a
+                 nonzero value for jacobian_choice.
+
+
+
+Here is a brief description of what is achieved by each of these four
+scripts:
+
+1.  regression4.pl:
+
+    This script involves just one predictor variable and one dependent
+    variable. The training data is drawn from the file
+
+          gendata4.csv
+
+    This data file contains strongly nonlinear data.  When you run the
+    script regression4.pl, you will see how much better tree regression is
+    compared to linear regression.
+
+
+2.  regression5.pl:
+
+    This script is essentially the same as the previous script except for
+    the fact that the training data in the file
+
+          gendata5.csv
+
+    consists of three noisy segments, as opposed to just two in the
+    previous case.
+
+         
+3.  regression6.pl:
+
+    In this script we deal with the case when we have two predictor
+    variables and one dependent variable.  You can think of the data as
+    consisting of noisy height values over an (x1,x2) plane.
+
+    The data used in this script is drawn from the csv file
+
+          gen3Ddata1.csv
+
+
+4.  regression8.pl:
+
+    This script shows how you can carry out BULK prediction for all of your
+    test records in a disk file.  This particular example involves one
+    predictor variable and one dependent variable.
+
+    The training data used in this script is from the file
+
+        gendata4.csv
+
+    and the test data for bulk prediction is in the file
+
+        bulk_testing_data.csv
+

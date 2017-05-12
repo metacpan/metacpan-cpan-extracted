@@ -1,0 +1,23 @@
+Revision history for Perl extension Apache::RandomLocation.
+
+0.5   Sun Nov  7 23:16:12 CDT 1999 (randy@theory.uwinnipeg.ca)
+
+- fixed bug whereby some particular forms of the <Location>
+  directive did not maintain their own images (spotted by
+  Charlie Reitsma <Reitsmac@cc.denison.edu>).
+- added ability to use "home" directory configuration files
+  based on a <LocationMatch> directive.
+
+0.02  Thu Oct 15 09:17:35 CDT 1998 (randy@theory.uwinnipeg.ca)
+
+ - create ability to maintain different <Location> directives
+   on the same server;
+ - permit perl regular expressions in reading the list of 
+   files on the server;
+ - introduce the ability to function like the CPAN multiplexer
+   code in redirecting clients to a nearby mirror site.
+
+0.01  Tue Jun  2 22:52:08 1998 (matthew@davin.otttawa.on.ca)
+
+ - original version; created by h2xs 1.18
+

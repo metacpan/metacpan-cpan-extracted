@@ -1,0 +1,64 @@
+{
+   "abstract" : "A Password safe",
+   "author" : [
+      "Copyright (C) 2011-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Raps2",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Compile" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::Tiny" : "0",
+            "Crypt::CBC" : "0",
+            "Crypt::Eksblowfish" : "0",
+            "Crypt::Eksblowfish::Bcrypt" : "0",
+            "File::BaseDir" : "0",
+            "File::Path" : "2.0605",
+            "File::Slurp" : "0",
+            "Getopt::Long" : "0",
+            "POSIX" : "0",
+            "Term::ReadLine" : "0",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Raps2" : {
+         "file" : "lib/App/Raps2.pm",
+         "version" : "0.54"
+      },
+      "App::Raps2::Password" : {
+         "file" : "lib/App/Raps2/Password.pm",
+         "version" : "0.54"
+      },
+      "App::Raps2::UI" : {
+         "file" : "lib/App/Raps2/UI.pm",
+         "version" : "0.54"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.54",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

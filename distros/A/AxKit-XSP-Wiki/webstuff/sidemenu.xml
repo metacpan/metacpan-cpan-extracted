@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<sidemenu>
+  <menu>
+   <title>Menu</title>
+   <item url="/">Home</item>
+   <item url="About">About</item>
+   <item url="FAQ">FAQ</item>
+  </menu>
+</sidemenu>

@@ -1,0 +1,55 @@
+{
+   "abstract" : "Wrapper module for aws-cli",
+   "author" : [
+      "HIROSE Masaaki"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AWS-CLIWrapper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IPC::Cmd" : "0",
+            "JSON" : "2",
+            "String::ShellQuote" : "0",
+            "perl" : "5.008001",
+            "version" : "0.77"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hirose31/AWS-CLIWrapper.git",
+         "web" : "https://github.com/hirose31/AWS-CLIWrapper"
+      }
+   },
+   "version" : "1.12"
+}

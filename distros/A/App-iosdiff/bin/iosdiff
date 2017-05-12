@@ -1,0 +1,201 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings FATAL => 'all';
+
+use File::Slurp;
+use Regexp::Common 'net';
+use Net::DNS; # core
+use App::iosdiff ();
+
+our $VERSION = 1.200001;
+
+sub help {
+    print <<ENDHELP
+    iosdiff - Cisco IOS Config Diff Utility
+
+    usage:
+        iosdiff [options] left_file right_file
+
+    options:
+        -B          suppress printing of banner
+ENDHELP
+}
+
+if (scalar @ARGV < 2) {
+    help();
+    exit 1;
+}
+
+my $right_file = pop @ARGV;
+my $left_file  = pop @ARGV;
+
+defined $left_file and -r $left_file
+    or die "missing left file\n";
+
+defined $right_file and -r $right_file
+    or die "missing right file\n";
+
+my $device = $right_file; # should be an option
+
+# list of devices for which we do not want a diff
+my @device_ignore =
+        read_file( '/etc/iosdiff-ignore', err_mode => 'quiet' );
+exit 0 if grep {m/^$device\n?$/} @device_ignore;
+
+# the business
+my @output = App::iosdiff::diff({
+    left => $left_file,
+    right => $right_file,
+});
+exit 0 if scalar @output == 0;
+
+# hack!
+my $suppress_banner = pop @ARGV;
+unless (defined $suppress_banner and $suppress_banner eq '-B') {
+    if ($device =~ m/($RE{net}{IPv4})/) {
+        $device = $1;
+        my $res   = Net::DNS::Resolver->new;
+        my $query = $res->search($device);
+
+        if ($query) {
+            foreach my $rr ($query->answer) {
+                next unless $rr->type eq 'PTR';
+                $device = $rr->ptrdname;
+                last;
+            }
+        }
+        else {
+            $device = "[$device]";
+        }
+    }
+
+    print "~~~ Config diff for device $device\n";
+    print '=' x 67, "\n";
+}
+
+print @output;
+exit 0;
+
+# ABSTRACT: Cisco IOS Config Diff Utility
+# PODNAME: iosdiff
+
+
+__END__
+=pod
+
+=head1 NAME
+
+iosdiff - Cisco IOS Config Diff Utility
+
+=head1 SYNOPSIS
+
+ $> iosdiff 192.0.2.1 192.0.2.1.new
+
+ ~~~ Config diff for device 192.0.2.1
+ ===================================================================
+ - snmp-server enable traps ccme
+ + snmp-server enable traps srst
+
+=head1 DESCRIPTION
+
+The C<iosdiff> program will intelligently diff two files which are in Cisco
+IOS-style configuration file format.
+
+Whilst an ordinary diff works on IOS-style configuration files, it doesn't
+show the context in a useful way. For example if one line changes within an
+interface configuration, you're likely not to see the interface name in a
+standard 3-line contextual diff. This program improves that by showing the
+full context of any difference.
+
+In terms of IOS-style configuration, this context means either the "section"
+such as an interface or class-map (a header with indented lines), or the
+command group such as an access control list, where the lines share common
+leading text.
+
+=head1 USAGE
+
+The C<iosdiff> command takes only two arguments, which are the names of the
+two files to diff.
+
+ $> iosdiff from-this-file to-this-file
+
+Lines in the files which are comments (begin with "C<!>") will be stripped
+from the file before the comparison is made.
+
+=head2 Options
+
+=over 4
+
+=item C<-B>
+
+Use this option to I<suppress> the banner which is printed before the diff
+output. Of course, no banner is printed anyway if there's no difference
+between the two files being compared. The banner looks like:
+
+ ~~~ Config diff for device 192.0.2.1
+ ===================================================================
+
+The device name in the banner depends on the name of the "right hand" file
+provided for comparison (that is, the second file name passed in the command
+line arguments). If there's an IP in the file name, it is resolved to a host
+name using the DNS and printed. Otherwise the IP is used, but if there's no IP
+then the file name itself is used.
+
+ $> iosdiff -B from-this-file to-this-file
+
+=back
+
+=head1 CONFIGURATION
+
+You can provide a file with a list of devices to ignore. If the device having
+its configuration diffed is mentioned in the file, the program exits silently.
+
+The name of the device is the "right hand" file provided for comparison (that
+is, the second file name passed in the command line arguments). For RANCID,
+not that this will probably have a suffix of "C<.new>".
+
+The file used for this list is C</etc/iosdiff-ignore>. Patches are welcome to
+make this feature smarter. Its contents should be one name per line, only.
+
+=head1 RANCID INTEGRATION
+
+If you use RANCID with Subversion, edit the RANCID user's
+C<~/.subversion/config> to contain the following line:
+
+ diff-cmd=iosdiff
+
+The effect will be that this program is called instead of the system diff
+utility, and smarter output produced in email notices.
+
+=head1 CAVEATS
+
+=head2 RANCID
+
+Unfortunately where the difference between files is within the comments lines,
+RANCID will emit a notice about the difference, but you'll get nothing more.
+That's because comments are ignored by this program. The fix would be to patch
+RANCID to spot when the diff program emits no output.
+
+Also, if you use RANCID for devices which do not save IOS-style configuration
+files, then setting C<diff-cmd=iosdiff> will probably not be as useful. There
+is no workaround, as it's a global setting for RANCID.
+
+=head2 Use with C<patch> Utility
+
+The contextual diff output produced by this program is not suitable as input
+to the C<patch> utility.
+
+=head1 AUTHOR
+
+Oliver Gorwits <oliver@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by University of Oxford.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

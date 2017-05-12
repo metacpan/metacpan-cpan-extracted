@@ -1,0 +1,40 @@
+<SOFTPKG NAME="Authen-ACE4" VERSION="1,4,0,0">
+	<TITLE>Authen-ACE4</TITLE>
+	<ABSTRACT></ABSTRACT>
+	<AUTHOR></AUTHOR>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="MSWin32-x86-multi-thread/Authen-ACE4.tar.gz" />
+	</IMPLEMENTATION>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+		<CODEBASE HREF="MSWin32-x86-multi-thread-5.8/Authen-ACE4.tar.gz" />
+	</IMPLEMENTATION>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.10" />
+		<CODEBASE HREF="MSWin32-x86-multi-thread-5.10/Authen-ACE4.tar.gz" />
+	</IMPLEMENTATION>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.12" />
+		<CODEBASE HREF="MSWin32-x86-multi-thread-5.12/Authen-ACE4.tar.gz" />
+	</IMPLEMENTATION>
+        <IMPLEMENTATION>
+                <OS NAME="MSWin32" />
+                <ARCHITECTURE NAME="MSWin32-x64-multi-thread-5.8" />
+                <CODEBASE HREF="MSWin32-x64-multi-thread-5.8/Authen-ACE4.tar.gz" />
+        </IMPLEMENTATION>
+        <IMPLEMENTATION>
+                <OS NAME="MSWin32" />
+                <ARCHITECTURE NAME="MSWin32-x64-multi-thread-5.10" />
+                <CODEBASE HREF="MSWin32-x64-multi-thread-5.10/Authen-ACE4.tar.gz" />
+        </IMPLEMENTATION>
+        <IMPLEMENTATION>
+                <OS NAME="MSWin32" />
+                <ARCHITECTURE NAME="MSWin32-x64-multi-thread-5.12" />
+                <CODEBASE HREF="MSWin32-x64-multi-thread-5.12/Authen-ACE4.tar.gz" />
+        </IMPLEMENTATION>
+</SOFTPKG>

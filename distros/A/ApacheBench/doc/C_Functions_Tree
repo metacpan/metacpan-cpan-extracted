@@ -1,0 +1,61 @@
+ab()
+  initialize();
+  test();
+
+test()
+  foreach (concurrent request slot) {
+    start a new connection; start_connect()
+  }
+  while (there are more requests to be sent) {
+    foreach (concurrent request slot) {
+      if (this slot needs no more resources) continue with next slot;
+      if (an exception occurred)
+        -> mark as failed and start a new connection; start_connect()
+      else if (there is data available to read on this slot)
+        -> read the data; read_connection()
+      else if (this slot is ready to write to)
+        -> send a new request; write_request()
+    }
+  }
+
+start_connect()
+  if (a socket error occurred)
+    -> close connection and return; close_connection()
+  open a socket connection;
+  if (socket connection succeeded)
+    -> return;
+  else if (this is the 10th failure)
+    -> close_connection(); return;
+  else
+    -> try again; start_connect()
+
+close_connection()
+  save request-response statistics; store_regression_data()
+  close the socket connection;
+  schedule and start the next request; schedule_next_request(), start_connect()
+
+read_connection()
+  read a chunk of data from a socket;
+  if (all data has been read OR an error occurred)
+    -> close_connection(); return;
+  if (there is no data available to read at the moment: read returned EAGAIN)
+    -> return;
+  if (we have not received the full http header)
+    if (this chunk of data contains end of http header: "\r\n\r\n" or "\n\n")
+      -> check response header for Keep-Alive and mark accordingly;
+    else
+      -> return;
+  if (response indicated keepalive and we've received entire response)
+    -> store_regression_data();
+    -> schedule_next_request();
+    if (next scheduled request is keepalive and the hostname/port are same)
+      -> write_request();
+    else
+      -> close the connection and start a fresh one: start_connect();
+
+write_request()
+  reset_request();
+  write full http request to socket;
+
+reset_request()
+  build http request according to GET/HEAD/POST settings;

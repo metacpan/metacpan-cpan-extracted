@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+#  PODNAME: mcores
+# ABSTRACT: Executable for App::OS::Detect::MachineCores
+
+use v5.10;
+use strict;
+use warnings;
+
+use FindBin;
+
+use lib "$FindBin::Bin/../lib";
+
+use App::OS::Detect::MachineCores;
+
+say App::OS::Detect::MachineCores->new_with_options->cores;
+
+=begin wikidoc
+
+= SYNOPSIS
+
+On different systems, different approaches are needed to detect the number of cores for that machine.
+
+This Module is a wrapper around these different approaches.
+
+= USAGE
+
+This is the executable to [App::OS::Detect::MachineCores], please see the documentation there for usage.
+
+=end wikidoc

@@ -1,0 +1,6 @@
+Changes
+MANIFEST			This list of files
+Makefile.PL
+lib/Apache/Session/Serialize/YAML.pm
+t/00_compile.t
+t/01_session.t

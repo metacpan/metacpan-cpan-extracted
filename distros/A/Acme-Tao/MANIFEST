@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+README
+Tao.pm
+t/00basic.t
+t/01tao.t
+t/02foo.t
+t/03soup.t

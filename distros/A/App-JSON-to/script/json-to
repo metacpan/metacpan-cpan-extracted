@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+use App::JSON::to;
+exit App::JSON::to::run(@ARGV)
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+json-to - Convert JSON data to other formats
+
+=head1 VERSION
+
+version 1.000
+
+=head1 SYNOPSIS
+
+    $ echo "{\"a\":4}"| json-to Perl
+    {a => 4}
+
+    $ echo "{\"a\":4}"| json-to YAML
+    ---
+    a: 4
+
+=head1 DESCRIPTION
+
+C<json-to> is a command line tool to convert JSON data into other formats.
+
+Built-in formats:
+
+=over 4
+
+=item *
+
+C<perl>: Perl 5 code
+
+=item *
+
+C<YAML>: L<YAML|http://www.yaml.org/>.
+
+=back
+
+=head1 EXTENDING
+
+C<json-to> is written in Perl. Formatters are plugins in the C<App::JSON::to::>
+namespace. See L<App::JSON::to::perl> and L<App::JSON::to::yaml> for examples.
+
+=head1 AUTHOR
+
+Olivier MENGUÉ, L<mailto:dolmen@cpan.org>.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Olivier MENGUÉ.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.
+
+=cut

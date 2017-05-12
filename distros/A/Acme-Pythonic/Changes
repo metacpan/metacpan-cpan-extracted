@@ -1,0 +1,149 @@
+Revision history for Perl extension Acme::Pythonic.
+
+0.47 Fri Feb 10 23:53 2012
+    - No code changes, just copyright updates. Also indicate
+      the module is not abandoned.
+
+0.46 Tue Sep 11 21:57:37 2007
+    - Fixed a test about $^V on t/constant.t that prevented skipping
+      the tests on 5.6.2, were they are not expected to work.
+
+0.45 Tue Sep 13 17:26:43 CEST 2005
+    - Fixes building errors due to the addition of metadata files by Apple's
+      enhaced tar.
+
+0.44 Sun Sep 11 19:24:00 2005
+    - Minor tweaks.
+    - Added ports of some programs of HOP in t/hop.t.
+    - POD coverage is tested in t/pod-coverage.t.
+    - Testing by Test::Pod added in t/pod.t.
+    - t/pod.t renamed to t/with_pod.t.
+
+0.43 Sun Jan  2 02:02:49 2005
+    - Uncuddles do {} modifier.
+    - Required Perl version relaxed to 5.6.1.
+    - A few more tests.
+    - A regex was fixed.
+
+0.42 Fri Dec  3 09:39:08 2004
+    - Removed Filter::tee from a test, which made
+      make test fail since it is not a dependency.
+    - A typo was corrected in the documentation.
+
+0.41 Thu Dec  2 20:18:26 2004
+    - use constant HASHREF is no longer allowed in Pythonic
+      form, that was a wrong choice.
+    - Added t/constant.t.
+    - The last statement in a block has now a semicolon.
+    - Minor code improvements.
+    - Documentation fixes.
+    - Added mention to Filter::ExtractSource in documentation.
+
+0.40 Thu Jul  8 15:12:51 2004
+    - Documentation fixes and improvements.
+    - Tested in perl 5.8.4 (Mac OS X).
+    - LIMITATIONS revised.
+
+0.33
+    - Minor documentation improvements.
+    - The section about labels was rewritten.
+    - Added Acme::Dot to SEE ALSO.
+
+0.32 Sat Jun 19 16:09:44 2004
+    - Added OVERVIEW to POD.
+    - Minor documentation enhancements.
+
+0.31 Sat Jun 12 14:58:32 2004
+    - Test::More required version relaxed to 0.45.
+    - Perl required version relaxed to 5.8.0.
+
+0.30 Fri Jun 11 19:09:20 2004
+    - Added a meticolous port of Text::Wrap in t/text_wrap.t.
+    - BEGIN blocks and friends didn't get their colon removed, fixed.
+    - The check of prototypes of subroutines didn't work with subroutines
+      with a package prefix, fixed.
+    - Uncuddling wasn't taking into account possible closing brackets
+      ending comments, fixed.
+
+0.25 Wed Jun  9 09:55:55 2004
+    - Minor cleanup.
+    - Better t/pass.t.
+    - Uses $Filter::Simple::placeholder instead of explicit patterns.
+
+0.24 Tue Jun  8 03:29:09 2004
+    - Minor documentarion fixes.
+    - Added t/pass.t.
+    - The refactoring forgot "pass", restored (ugh, Test::More has a pass() that
+      made the tests compile an run!)
+    - The removal of some semicolons didn't work with trailing comments, fixed.
+    - Removed a comment that no longer applied.
+
+0.23 Mon Jun  7 02:56:29 2004
+    - Port of the calculator example in Stroustrup's in t/calculator.t.
+    - Fixed: use constant HASHREF didn't get a semicolon.
+    - In debug mode blanked out chunks are substituted with
+      the label "BLANKED_OUT" for easy identification.
+    - The module got confused with newlines added by
+      Filter::Simple, fixed.
+    - Removed an old, no longer used subroutine.
+
+0.22 Sat Jun  5 14:33:13 2004
+    - Just Re-uploaded. Changes was not saved in 0.21.
+
+0.21 Sat Jun  5 14:30:32 2004
+    - Fixed a minor mistake in the POD.
+    - Comments needed a revision after the refactoring. Done.
+
+0.20 Wed Jun  2 23:21:27 2004
+    - Main algorithm rewritten, unpythonization is done in one pass now.
+    - Added complete support for line joining, as in
+          for 1,
+              2:
+              # stuff
+      kind of constructions.
+    - Supports backslashes before a trailing comment, which is
+      more in the line of Perl forgiveness IMHO.
+
+0.14
+    - "while:" is now correctly converted to "while ()"
+    - Added support for &-prototyped subroutines
+
+0.13 Sun May 30 00:37:12 2004
+    - Added manhattan_intersection() implementation to t/algorithms.t
+    - Fixed: Broken code was being generated in lines with comments
+      following a Pythonic colon.
+    - Better conformance to perlstyle in some foreach patterns.
+    - Handling of continuation lines simplified.
+
+0.12 Sat May 29 02:23:53 2004
+    - Added bubblesort in t/algorithms.t
+    - The code that inserts " {"s was breaking $#array, fixed.
+    - Changed SYNOPSIS.
+    - Fixed the documentation about backslashes in lines with comments.
+    - Fixed the link to LIMITATIONS.
+
+0.11 Fri May 28 01:09:45 2004
+    - Regexps slightly more robust.
+    - Fixed: There was a bug that might prevent the stack from being emptied.
+    - Fixed: Whitespace after backlashes in comments could be modified.
+
+0.1
+    - More tests
+    - Implicit line joining is more Pythonic
+    - Comments and blank lines are preserved
+    - Genereated code tries to follow perlstyle
+    - Refactoring
+
+0.03 Mon May 24 23:36:55 2004
+    - More tests
+    - pass wasn't being ignored at the beginning of line
+    - Fixed a bug handling fors
+    - More documentation fixes
+
+0.02 Mon May 24 15:31:42 2004
+	- Minor fixes in documentation
+
+0.01  Mon May 17 23:14:00 2004
+	- original version; created by h2xs 1.23 with options
+		-XA -n Acme::Pythonic
+

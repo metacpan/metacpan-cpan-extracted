@@ -1,0 +1,34 @@
+Revision history for App-grindperl
+
+0.004     2015-12-09 14:52:03-05:00 America/New_York
+
+    [ADDED]
+
+    - Added the '-A' flag for Configure
+
+0.003     2015-02-22 06:56:11-05:00 America/New_York
+
+    [DOCS]
+
+    - fixed a typo
+
+0.002     2013-05-30 22:42:20 America/New_York
+
+    [ADDED]
+
+    - experimental "--32" option to try to force 32 bit builds even on 64
+      bit machines
+
+    [CHANGED]
+
+    - default installation directory is now set to File::Spec->tmpdir,
+      not hardcoded as '/tmp'
+
+    [FIXED]
+
+    - exit code was accidentally inverted
+
+0.001     2011-07-21 16:38:44 America/New_York
+
+    - First release to CPAN
+

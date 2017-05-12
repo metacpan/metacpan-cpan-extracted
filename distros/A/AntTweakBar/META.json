@@ -1,0 +1,69 @@
+{
+   "abstract" : "Perl bindings for AntTweakBar",
+   "author" : [
+      "DMOL, dmol@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AntTweakBar",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::AntTweakBar" : "0.02",
+            "Alien::SDL" : "1.44",
+            "Devel::CheckLib" : "1.01",
+            "Module::Build" : "0.42",
+            "perl" : "5.008"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::AntTweakBar" : "0.02",
+            "Alien::SDL" : "1.444",
+            "Carp" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "AntTweakBar" : {
+         "file" : "lib/AntTweakBar.pm",
+         "version" : "0.05"
+      },
+      "AntTweakBar::Type" : {
+         "file" : "lib/AntTweakBar/Type.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlGameDev/AntTweakBar/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/PerlGameDev/AntTweakBar"
+      }
+   },
+   "version" : "0.05"
+}

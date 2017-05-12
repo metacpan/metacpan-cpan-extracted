@@ -1,0 +1,20 @@
+{
+    valid_pages => {
+        dirs => [
+            '/'
+        ],
+    },
+    data_store => '../vet_site/data',
+    templates    => '../vet_site/templates',
+    template_defaults => {
+        conf => {
+            base => 'base.tmpl',
+        },
+    },
+    comments_plugin => {
+        dsn     => "DBI:mysql:database=test;host=localhost",
+        user    => 'root', # user,
+        pass    => undef, # pass
+        opts     => { RaiseError => 1, AutoCommit => 0 },
+    },
+}

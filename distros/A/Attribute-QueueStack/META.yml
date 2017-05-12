@@ -1,0 +1,46 @@
+---
+abstract: 'designate an array as a queue or a stack'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Attribute-QueueStack
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Attribute::QueueStack:
+    file: lib/Attribute/QueueStack.pm
+    version: '0.003'
+  Tie::Array::Queue:
+    file: lib/Tie/Array/Queue.pm
+    version: '0.003'
+  Tie::Array::Stack:
+    file: lib/Tie/Array/Stack.pm
+    version: '0.003'
+requires:
+  Attribute::Handlers: '0'
+  Devel::StrictMode: '0'
+  perl: '5.006'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Attribute-QueueStack/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Attribute-QueueStack
+  homepage: https://metacpan.org/release/Attribute-QueueStack
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-attribute-queuestack.git
+version: '0.003'

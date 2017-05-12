@@ -1,0 +1,4 @@
+name = "Acme-PriPara"
+badges = ["travis", "coveralls"]
+module_maker="ModuleBuildTiny"
+

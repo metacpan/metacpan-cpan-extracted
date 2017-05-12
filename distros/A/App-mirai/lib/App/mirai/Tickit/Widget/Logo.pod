@@ -1,0 +1,22 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with App::mirai::Tickit::Widget::Logo
+at lib/App/mirai/Tickit/Widget/Logo.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Tickit::Widget>
+
+L<get_style_pen|Tickit::Widget/get_style_pen>, L<get_style_text|Tickit::Widget/get_style_text>, L<get_style_values|Tickit::Widget/get_style_values>, L<key_focus_next_after|Tickit::Widget/key_focus_next_after>, L<key_focus_next_before|Tickit::Widget/key_focus_next_before>, L<new|Tickit::Widget/new>, L<on_pen_changed|Tickit::Widget/on_pen_changed>, L<parent|Tickit::Widget/parent>, L<pen|Tickit::Widget/pen>, L<redraw|Tickit::Widget/redraw>, L<requested_cols|Tickit::Widget/requested_cols>, L<requested_lines|Tickit::Widget/requested_lines>, L<requested_size|Tickit::Widget/requested_size>, L<reshape|Tickit::Widget/reshape>, L<resized|Tickit::Widget/resized>, L<set_parent|Tickit::Widget/set_parent>, L<set_pen|Tickit::Widget/set_pen>, L<set_requested_size|Tickit::Widget/set_requested_size>, L<set_style|Tickit::Widget/set_style>, L<set_style_tag|Tickit::Widget/set_style_tag>, L<set_window|Tickit::Widget/set_window>, L<style_classes|Tickit::Widget/style_classes>, L<take_focus|Tickit::Widget/take_focus>, L<window|Tickit::Widget/window>, L<window_gained|Tickit::Widget/window_gained>, L<window_lost|Tickit::Widget/window_lost>
+
+=back
+

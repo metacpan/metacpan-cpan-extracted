@@ -1,0 +1,273 @@
+NAME
+    Apache::AxKit::Language::XSP::ObjectTaglib - Helper for OO Taglibs
+
+SYNOPSIS
+        package MyTaglib;
+        use strict;
+        use warnings;
+        use base 'Apache::AxKit::Language::XSP::ObjectTaglib';
+        use vars qw(@specification);
+
+        @specification = (
+            ...
+        );
+
+DESCRIPTION
+    This is an AxKit tag library helper for easily wrapping object-oriented
+    classes into XSP tags. The interface to the class is through a
+    specification which your taglib provides as a package variable. You may
+    wrap single or multiple classes within the same taglib, iterate over
+    several objects, and call methods on a given object.
+
+    Here is a sample specification:
+
+        @specification = (
+          {
+            tag     => 'name',
+            context => 'resources',
+            target  => 'resource'
+          }, {
+            tag      => 'resources',
+            target   => 'course',
+            type     => 'loop',
+            iterator => 'resource'
+          }, {
+            tag   => 'courses',
+            type  => 'special',
+            start => \&start_courses,
+            end   => \&end_courses
+          }, {
+            tag    => 'name',
+            target => 'course'
+          }, {
+            tag    => 'code',
+            target => 'course'
+          }, {
+            tag    => 'description',
+            target => 'course',
+            type   => 'as_xml'
+          }, {
+            tag    => 'summary',
+            target => 'course',
+            type   => 'as_xml'
+          }, {
+            tag      => 'presentations',
+            target   => 'course',
+            type     => 'loop',
+            iterator => 'presentation'
+          }, {
+            tag    => 'size',
+            key    => 'calculateSize',
+            target => 'presentation',
+            notnull => 1
+          }, {
+            tag      => 'prerequisites',
+            target   => 'course',
+            type     => 'loop',
+            iterator => 'course'
+          }
+        );
+
+    This is the specification used in the sample
+    "AxKit::XSP::ObjectTaglib::Demo" Taglib so all variable names used in
+    the examples below start with "_xsp_axkit_xsp_objecttaglib_demo_".
+    Here's what this means:
+
+          {
+            tag     => 'name',
+            context => 'resources',
+            target  => 'resource'
+          }, {
+
+    Define a tag called "name" which occurs inside of another tag called
+    "resources". (We'll define a top-level "name" tag for "courses" later,
+    so this context-sensitive override has to come first.) When this tag is
+    seen, the method "name" will be called on the variable
+    @_xsp_axkit_xsp_objecttaglib_demo_resource.
+
+          }, {
+            tag      => 'resources',
+            target   => 'course',
+            type     => 'loop',
+            iterator => 'resource'
+          }, {
+
+    Define a tag called "resources" that will loop through each "resource"
+    returned by the method "resources" on the "course" object. When combined
+    with the first defined tag, the code generated looks something like
+    this:
+
+        for $_xsp_axkit_xsp_objecttaglib_demo_resource
+          ($_xsp_axkit_xsp_objecttaglib_demo_course->resources) {
+          $_xsp_axkit_xsp_objecttaglib_demo_course->name;
+        };
+
+    Now, on the main looping tag "courses".
+
+          }, {
+            tag   => 'courses',
+            type  => 'special',
+            start => \&start_courses,
+            end   => \&end_courses
+          }, {
+
+    "courses" will be the main entry point for our tag library, and as such
+    needs to do some special things to set itself up. Hence, it uses a
+    "special" type, and provides its own handlers to handle the start and
+    end tag events. These handlers will be responsible for setting up
+    $_xsp_axkit_xsp_objecttaglib_demo_courses, used in the following tags,
+    and looping over the possible courses, setting
+    $_xsp_axkit_xsp_objecttaglib_demo_course appropriately.
+
+          }, {
+            tag    => 'name',
+            target => 'course'
+          }, {
+            tag    => 'code',
+            target => 'course'
+          }, {
+            tag    => 'description',
+            target => 'course',
+            type   => 'as_xml'
+          }, {
+            tag    => 'summary',
+            target => 'course',
+            type   => 'as_xml'
+          }, {
+
+    When we see the "name" tag, we call the "name" method on each
+    $_xsp_axkit_xsp_objecttaglib_demo_course object within the loop.
+    Similarly, the "code" tag calls the "code" method on the same object.
+
+    The "description" and "summary" tags call the "description" and
+    "summary" methods on each course object with the loop, this time making
+    sure that the result is valid XML instead of plain text. (This is
+    because we store the description in the database as XML, and don't want
+    it escaped before AxKit throws it onto the page.)
+
+          }, {
+            tag      => 'presentations',
+            target   => 'course',
+            type     => 'loop',
+            iterator => 'presentation'
+          }, {
+
+    Each course object has a "presentations" method, which is wrapped by the
+    "presentations" tag. This method returns a list of objects representing
+    the presentations of a course; the "presentations" tag sets up a loop,
+    with $_xsp_axkit_xsp_objecttaglib_demo_presentation as the iterator.
+    Hence, inside of a "presentations" tag, "target => "presentation"" will
+    cause the method to be called on each presentation object in turn.
+
+          }, {
+            tag    => 'size',
+            key    => 'calculateSize',
+            target => 'presentation',
+            notnull => 1
+          }, {
+
+    Like the course "name" tag, we'll declare a "size" tag for the
+    "presentation" object.
+
+          }, {
+            tag      => 'prerequisites',
+            target   => 'course',
+            type     => 'loop',
+            iterator => 'course'
+          }
+
+    This is slightly dirty. We want a "prerequisites" tag to refer to other
+    course objects, namely, the courses which are required for admission to
+    the current course. ie:
+
+        <demo:prerequisites>
+          <prerequisite>
+            <name><demo:name/></name>
+            <code><demo:code/></code>
+          </prerequisite>
+        </demo:prerequisites>
+
+    So when we see the "prerequisites" tag, we call the "prerequisites"
+    method on our "course" target, $_xsp_axkit_xsp_coursebooking_course.
+    This returns a list of new prerequisite objects, which we loop over.
+    ("type =" "loop">)
+
+    Our loop iterator will be $_xsp_axkit_xsp_objecttaglib_demo_course
+    itself, so the other tags will work properly on the iterated courses.
+
+    Some code is worth a thousand words. The generated perl will look
+    something like this:
+
+        for my $_xsp_axkit_xsp_objecttaglib_demo_course
+            ($_xsp_axkit_xsp_objecttaglib_demo_course->prerequisites) {
+            ... $_xsp_axkit_xsp_objecttaglib_demo_course->name ...
+        }
+
+    Because we want to use the "name" tag within the prerequisites and the
+    courses, we chose the slightly dirty method above. We could also have
+    declared a new tag called "reqname" and chosen a cleaner iterator like
+    so
+
+          }, {
+            tag      => 'prerequisites',
+            target   => 'course',
+            type     => 'loop',
+            iterator => 'prerequisite'
+          }, {
+            tag      => 'reqname',
+            target   => 'prerequisite'
+          }
+
+    and then use slightly different XSP like this
+
+        <demo:prerequisites>
+          <prerequisite>
+            <name><demo:reqname/></name>
+            <code><demo:code/></code>
+          </prerequisite>
+        </demo:prerequisites>
+
+    Here's another quick example:
+
+        our @specification = (
+            { tag => "person", type => "special",
+                                start => \&start_person, end => \&end_person },
+            { tag => "name", key => "cn", target => 'person'},
+            ...
+        );
+
+    This comes from a wrapper around LDAP. As before, the "person" tag at
+    the top level has two subroutines to set up the "person" target. (which
+    in this case will be $_xsp_axkit_xsp_ldap_person) When a "name" tag is
+    seen inside of the "person" tag, a method is called on that target. This
+    time, we use "key" to say that the method name is actually "cn", rather
+    than "name". Hence the following XSP:
+
+        <b:person dn="foo">
+           <b:name/>
+        </b:person>
+
+    generates something like this:
+
+        {
+        my $_xsp_axkit_xsp_ldap_person = somehow_get_ldap_object(dn => "foo");
+
+           ...
+           $_xsp_axkit_xsp_ldap_person->cn();
+           ...
+        }
+
+    All clear?
+
+SEE ALSO
+    AxKit::XSP::ObjectTaglib::Demo
+
+AUTHOR
+        Christopher H. Laco
+        CPAN ID: CLACO
+        claco@chrislaco.com
+        http://today.icantfocus.com/blog/
+
+AUTHOR EMERITUS
+    The original version was created by Simon Cozens.
+

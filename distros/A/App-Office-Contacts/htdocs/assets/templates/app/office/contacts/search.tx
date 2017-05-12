@@ -1,0 +1,26 @@
+<form id="search_form">
+
+<table align="center">
+	<tr>
+		<td colspan="2"><div class="blue_centered">Search</div></td>
+	</tr>
+	<tr>
+		<td colspan="2">Search keys can be (fragments of): personal or organizational names, email addresses, or phone numbers</td>
+	</tr>
+</table>
+
+<table align="center">
+	<tr>
+		<td>Search key:</td>
+		<td align="left"><input id="search_name" type="text" size="40" maxlength="100"></td>
+	</tr>
+	<tr>
+		<td align="center"><input type="submit" value="Search"></td>
+		<td align="center"><input type="reset"  value="Reset"></td>
+	</tr>
+</table>
+
+<input type="hidden" id="search_sid" value="<: $sid :>">
+</form>
+
+<div id="search_result_div"></div>

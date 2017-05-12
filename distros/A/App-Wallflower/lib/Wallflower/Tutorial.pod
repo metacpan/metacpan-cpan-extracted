@@ -1,0 +1,217 @@
+=pod
+
+=head1 NAME
+
+Wallflower::Tutorial - Turn your Plack app into a static site
+
+=head1 SYNOPSIS
+
+    # do cool stuff using Plack-aware frameworks,
+    # to generate static web sites
+
+=head1 INTRODUCTION: THE BENEFITS OF STATIC WEBSITES
+
+Static websites have a lot of advantages, when serving data
+that changes rarely:
+
+=over 4
+
+=item *
+
+speed
+
+=item *
+
+security
+
+=item *
+
+deployment by copy
+
+=back
+
+Dynamic websites have more to do with JavaScript than with C<POST> or
+query strings. JavaScript code run on the client can take advantage of
+JSON files containing useful data. Updates to the data do not necessarily
+have to be performed on the public side of the site.
+
+=head1 WRITING A PSGI APPLICATION FOR WALLFLOWER
+
+The point of saving URLs from a PSGI application to files is not simply
+to make a static version of a fully dynamic site.
+
+Unlike many static website generators, L<wallflower> does
+I<not> enforce any conventions on its users.
+
+B<L<wallflower> makes it very easy to write a static website using
+the web framework of your choice.>
+
+To make the most of a static website, there are a few simple
+rules to follow, listed below:
+
+=head2 All URLs should have an extension
+
+A PSGI/Plack application can specify the C<Content-Type> returned
+for any URL content.
+
+On the other hand, static servers use the file extension to decide what
+C<Content-Type> to send for a given file. When unable to decide what
+the file content is, servers usually send C<application/octet-stream>
+as the C<Content-Type>.
+
+Since the goal of a L<Wallflower> application is to generate a static
+website, I<all URL pathnames should have an extension>.
+
+=head2 All responses should have a C<Content-Type> header
+
+Similarly, L<wallflower> decides to check the body of a response for
+links it may contain based on its C<Content-Type> header, as links
+only make sense for HTML and CSS files.
+
+If the response has no C<Content-Type> header, L<wallflower> will miss
+some of the links, and thus not properly crawl the whole site.
+
+=head2 Hide the non-static elements in a specific Plack environment
+
+Because the website can be written with any modern web framework, it's
+also very easy to have URLs that reply to C<POST> requests. Obviously,
+these pages cannot be saved on the static destination.
+
+It's very easy to use the Plack environment to decide which pages
+to enable. By default, L<plackup> sets the Plack environment to
+C<development>, while L<wallflower> sets it to C<deployment>.
+
+It's therefore possible to hide the dynamic parts of the application
+in the C<development> environment, while only the static elements are
+reachable from the C<deployment> environment.
+
+=head2 Make all URLs eventually reachable from the root
+
+By default, L<wallflower> starts by loading C</>, and automatically
+and repeatedly follows all URLs found in HTML and CSS documents, until
+all reachable URLs have been processed.
+
+The simplest way to generate the full static site is to make
+sure that all URLs can be reached by repeatedly following links from the root.
+
+When using the C<--url> option to "mount" your application under some path,
+don't forget to call L<wallflower> with that path as the root:
+
+    wallflower --application myapp.psgi --url http://localhost/myapp /myapp/
+
+=head1 URL SEMANTICS COMPARED TO DIRECTORY SEMANTICS
+
+A Plack application deals with URLs. Nothing prevents the application
+from treating F</thunk> and F</thunk/> differently and returning
+different content bodies for them.
+
+From the perspective of a filesystem, however, if F<thunk> is a directory,
+then it is semantically equivalent to F<thunk/>. And it is impossible
+to have both a file and a directory with the same name inside the same
+parent directory.
+
+When dealing with a static site, the server maps the URLs to the
+filesystem. If F<thunk> is a directory, the server usually redirects the
+client to F<thunk/> (using a C<301 Moved Permanently> response). Then the
+default file is picked for the content, traditionally F<thunk/index.html>.
+
+Because L<Wallflower> does not know the conventions used by the Plack
+application it calls, it cannot decide if F</thunk> should be understood
+as a "file" or as a "directory" when generating the file name that will
+receive the content for that URL.
+
+So, if your application treats F</thunk> and F</thunk/> as identical,
+you should:
+
+=over 4
+
+=item *
+
+B<Always> request F</thunk/> when providing a list of URLs to L<wallflower>.
+Otherwise you might end up with the F<thunk> file already existing when
+it tries to create files under the F<thunk/> directory, or vice-versa.
+
+=item *
+
+Make sure that links provided by your application are I<always> to F</thunk/>,
+so that when L<wallflower> follows links automatically, we're back to the
+previous case.
+
+=item *
+
+Try to make the application reply with status C<301 Moved Permanently>
+to requests for F<thunk>. This is what a well-behaved web server serving
+static pages will do when a user-agent requests a "directory" without
+a final C</>.
+
+=back
+
+At this point, you know that an application that treats F</thunk> ("file")
+and F</thunk/> ("directory") differently will B<not work> with L<wallflower>.
+
+L<wallflower> will show a status code of C<999> (not a valid HTTP status)
+in the following two cases:
+
+=over 4
+
+=item *
+
+when trying to create F<thunk/pam> after having created a F<thunk> file,
+(warning: C<Can't open thunk/pam for writing: Not a directory>)
+
+=item *
+
+when trying to create F<thunk> after having created a F<thunk/> directory.
+(warning: C<Can't open thunk for writing: Is a directory>)
+
+=back
+
+See also the section L</"All URLs should have an extension">, for why you
+should avoid extensionless URLs.
+
+=head1 REFERENCES
+
+A few articles about L<wallflower> have been published,
+and are listed below:
+
+=over 4
+
+=item *
+
+L<http://blogs.perl.org/users/book1/2012/09/sorry-i-cant-dance-im-holding-on-to-my-friends-purse.html>
+
+The wallflower announcement on L<http://blogs.perl.org/>.
+
+=item *
+
+L<http://perladvent.pm.org/2012/2012-12-22.html>
+
+Wallflower in the L<Perl Advent Calendar 2012|http://perladvent.pm.org/2012/>.
+
+=item *
+
+L<http://perltricks.com/article/102/2014/7/15/Generate-static-websites-from-dynamic-Perl-web-apps>
+
+A presentation of Wallflower by one of its users.
+
+=item *
+
+L<http://perltricks.com/article/103/2014/7/22/Create-static-web-apps-with-Wget>
+
+A comparison of using Wget and Wallflower to generate static web sites.
+
+=back
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2012-2015 by Philippe Bruhat (BooK).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

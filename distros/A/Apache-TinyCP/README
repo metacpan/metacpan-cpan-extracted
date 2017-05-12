@@ -1,0 +1,152 @@
+NAME
+    Apache::TinyCP - a tiny content provider to put up content really
+    quickly
+
+SYNOPSIS
+    In your Apache configuration:
+
+        PerlModule Apache::TinyCP
+    
+        <Location />
+            SetHandler  perl-script
+            PerlHandler Apache::TinyCP
+
+            DirectoryIndex HomePage
+
+            PerlSetVar  ContentDir       /home/www/content
+            PerlSetVar  TemplateDir      /home/www/templates
+            PerlSetVar  CacheDir         /home/www/var/contentcache
+            PerlSetVar  ModTimeFormat    %d.%b.%y
+        </Location>
+
+    In your "ContentDir" directory, a file named HomePage, along with other
+    content files:
+
+        Hello, world! *This* is the HomePage!
+    
+        Here's a link to AnotherPage.
+    
+        See [=Text::KwikiFormatish] for more info on the default formatter
+
+    In your "TemplateDir" directory, a file named layout:
+
+        <html>
+            <head>
+                <title>My Site - [% title %]</title>
+            </head>
+            <body>
+                <h1>[% title %]</h1>
+                <hr/>
+                [% content %]
+                <hr/>
+                <p>Last modified: [% modtime %]</p>
+            </body>
+        </html>
+
+DESCRIPTION
+    This module is a very simple handler that takes files from ContentDir,
+    formats them somehow, and stamps on a header and footer using the
+    template file template in TemplateDir. The default formatter is
+    Text::KwikiFormatish and the end result is somewhat of a pseudo-wiki web
+    site. It was created because I enjoyed the ease and functionality of
+    Kwiki text for creating content, but wanted something like a single-user
+    wiki.
+
+    To set this up, create the three directories and set them as
+    "TemplateDir", "ContentDir" and "CacheDir" in the Apache configuration,
+    like in "SYNOPSIS".
+
+    By default the content files located in ContentDir are formatted with
+    Text::KwikiFormatish and cached with Cache::File, which uses the path
+    specified at CacheDir to store cache files. The default templating
+    system is Template::Toolkit. The handler uses the layout template
+    wrapper in "TemplateDir". The tags "[% content %]", "[% title %]" and
+    "[% modified %]" are replaced by the formatted content, the filename,
+    and the formatted modification date (respectively).
+
+    You could probably do this by writing a formatting handler and filtering
+    that through Apache::Template, though I'm not sure how the caching would
+    work. You might also want to check out Apache::Sandwich. If any of these
+    ways works for you, more power to ya.
+
+    My goal was to have all my content files in one place (not htdocs) as
+    well as use wiki text for the rapid creation of content for my site.
+
+EXTENDING
+  Changing the Formatter
+    Say you wanted to write your pages in POD instead of Kwikish text. You
+    would create a custom package, override the "format_content()" method
+    and use that as your PerlHandler. In your Apache configuration:
+
+        <Perl>
+            use Pod::Simple::HTML ();
+        
+            package Local::TinyCP;
+            use base qw( Apache::TinyCP );
+        
+            sub format_content {
+                my ( $self, $data, $r ) = @_;
+                my $output;
+            
+                my $parser = Pod::Simple::HTML->new;
+                $parser->output_string( \$output );
+                $parser->parse_string_document( $data );
+            
+                return $output;
+            }
+        </Perl>
+    
+        <Location />
+            ...
+            PerlHandler Local::TinyCP
+            ...
+        </Location>
+
+  Futher Customization
+    Here are all of the methods you can override. All methods are passed
+    $self, the name of the package, as the first argument and sometimes $r,
+    the Apache request object.
+
+    * get_filename( $self, $r )
+        Returns the absolute path to the content file.
+
+    * get_content( $self, $filename, $r )
+        Returns the formatted content to be inserted into the "[% content
+        %]" template variable. By default, this formats with
+        Text::KwikiFormatish and caches the formatted content using
+        Cache::File.
+
+    * format_content( $self, $data, $r )
+        Return the formatted version of $data, the contents of the content
+        file.
+
+        This method is only used by "get_content". If you override
+        "get_content", you will not need to override this method.
+
+    * print_content( $self, $content, $r )
+        Print the given $content to STDOUT. By default this method wraps the
+        content in a template, and provides two extra variables: "[% title
+        %]", the name of the document without a leading slash, and "[%
+        modtime %]", the modification time of the document. The modification
+        time format is configurable -- see "SYNOPSIS".
+
+    * get_content_type( $self )
+        Return the content type returned. Default is "text/html".
+
+        This method is only used by "print_content". If you override
+        "print_content", you will not need to override this method.
+
+    * handler( $self, $r )
+        mod_per1 handler method. You do not need to override this method
+        unless you want to change the core logic.
+
+AUTHOR
+    Ian Langworth, "<ian@cpan.org>"
+
+SEE ALSO
+    Cache::File, Template, Text::KwikiFormatish
+
+LICENSE
+    This is free software. You may use it and redistribute it under the same
+    terms as Perl itself.
+

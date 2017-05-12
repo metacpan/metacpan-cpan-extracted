@@ -1,0 +1,13 @@
+SYNOPSIS
+
+     % perl -MAcme::MetaSyntactic=christmas -le 'print metaname'
+     rudolph
+    
+     % meta christmas 2
+     santa
+     frosty
+
+SEE ALSO
+
+    Acme::MetaSyntactic
+

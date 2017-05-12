@@ -1,0 +1,4 @@
+^cover_db/
+^temp/
+.*~
+^libanyevent-rfxcom-perl_.*

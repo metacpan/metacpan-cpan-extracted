@@ -1,0 +1,24 @@
+---
+name: AnyDBM_File-Importer
+version: 0.012
+author: []
+abstract: Import DBM package symbols when using AnyDBM_File
+license: perl
+resources:
+  license: ~
+requires:
+  AnyDBM_File: 0
+  perl: 5.008
+build_requires:
+  Module::Build: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::Warn: 0
+provides:
+  AnyDBM_File::Importer:
+    file: lib/AnyDBM_File/Importer.pm
+    version: 0.012
+generated_by: Module::Build version 0.31012
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

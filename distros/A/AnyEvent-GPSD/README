@@ -1,0 +1,161 @@
+NAME
+    AnyEvent::GPSD - event based interface to GPSD
+
+SYNOPSIS
+       use AnyEvent::GPSD;
+
+DESCRIPTION
+    This module is an AnyEvent user, you need to make sure that you use and
+    run a supported event loop.
+
+    This module implements an interface to GPSD (http://gpsd.berlios.de/).
+
+    You need to consult the GPSD protocol desription in the manpage to make
+    better sense of this module.
+
+  METHODS
+    $gps = new AnyEvent::GPSD [key => value...]
+        Creates a (virtual) connection to the GPSD. If the "hostname:port"
+        argument is missing then "localhost:2947" will be used.
+
+        If the connection cannot be established, then it will retry every
+        second. Otherwise, the connection is put into watcher mode.
+
+        You can specify various configuration parameters, most of them
+        callbacks:
+
+        host => $hostname
+            The host to connect to, default is "locahost".
+
+        port => $port
+            The port to connect to, default is 2947.
+
+        min_speed => $speed_in_m_per_s
+            Sets the mininum speed (default: 0) that is considered real for
+            the purposes of replay compression or estimate. Speeds below
+            this value will be considered 0.
+
+        on_error => $cb->($gps)
+            Called on every connection or protocol failure, reason is in $!
+            (protocl errors are signalled via EBADMSG). Can be used to bail
+            out if you are not interested in retries.
+
+        on_connect => $cb->($gps)
+            Nornormally used: Called on every successful connection
+            establish.
+
+        on_response => $cb->($gps, $type, $data, $time)
+            Not normally used: Called on every response received from GPSD.
+            $type is the single letter type and $data is the data portion,
+            if any. $time is the timestamp that this message was received
+            at.
+
+        on_satellite_info => $cb->($gps, {satellite-info}...)
+            Called each time the satellite info changes, also on first
+            connect. Each "satellite-info" hash contains at least the
+            following members (mnemonic: all keys have three letters):
+
+            "prn" holds the satellite PRN (1..32 GPS, anything higher is
+            wASS/EGNOS/MCAS etc, see GPS::PRN).
+
+            "ele", "azi" contain the elevation (0..90) and azimuth (0..359)
+            of the satellite.
+
+            "snr" contains the signal strength in decibals (28+ is usually
+            the minimum value for a good fix).
+
+            "fix" contains either 1 to indicate that this satellite was used
+            for the last position fix, 0 otherwise. EGNOS/WAAS etc.
+            satellites will always show as 0, even if their correction info
+            was used.
+
+            The passed hash references are read-only.
+
+        on_fix => $cb->({point})
+            Called regularly (usually about once/second), even when there is
+            no connection to the GPSD (so is useful to update your idea of
+            the current position). The passed hash reference must *not* be
+            modified in any way.
+
+            If "mode" is 2 or 3, then the "{point}" hash contains at least
+            the following members, otherwise it is undefined which members
+            exist. Members whose values are not known are "undef" (usually
+            the error values, speed and so on).
+
+               time         when this fix was received (s)
+
+               lat          latitude (S -90..90 N)
+               lon          longitude (W -180..180 E)
+               alt          altitude
+
+               herr         estimated horizontal error (m)
+               verr         estimated vertical error (m)
+
+               bearing      bearing over ground (0..360)
+               berr         estimated error in bearing (degrees)
+               speed        speed over ground (m/s)
+               serr         estimated error in speed over ground (m/s)
+               vspeed       vertical velocity, positive = upwards (m/s)
+               vserr        estimated error in vspeed (m/s)
+
+               mode         1 = no fix, 2 = 2d fix, 3 = 3d fix
+
+    ($lat, $lon) = $gps->estimate ([$max_seconds])
+        This returns an estimate of the current position based on the last
+        fix and the time passed since then.
+
+        Useful for interactive applications where you want more frequent
+        updates, but not very useful to store, as the next fix might well be
+        totally off. For example, when displaying a real-time map, you could
+        simply call "estimate" ten times a second and update the cursor or
+        map position, but you should use "on_fix" to actually gather data to
+        plot the course itself.
+
+        If the fix is older then $max_seconds (default: 1.9 times the update
+        interval, i.e. usually 1.9 seconds) or if no fix is available,
+        returns the empty list.
+
+    $gps->record_log ($path)
+        If $path is defined, then that file will be created or truncated and
+        a log of all (raw) packets received will be written to it. This log
+        file can later be replayed by calling "$gps->replay_log ($path)".
+
+        If $path is undefined then the log will be closed.
+
+    $gps->replay_log ($path, %options)
+        Replays a log file written using "record_log" (or stops replaying
+        when $path is undefined). While the log file replays, real GPS
+        events will be ignored. This comes in handy when testing.
+
+        Please note that replaying a log will change configuration options
+        that will not be restored, so it's best not to reuse a gpsd object
+        after a replay.
+
+        The "AnyEvent::GPSD" distribution comes with an example log
+        (eg/example.aegps) that you can replay for testing or enjoyment
+        purposes.
+
+        The options include:
+
+        compress => 1
+            If set to a true value (default: false), then passages without
+            fix will be replayed much faster than passages with fix. The
+            same happens for passages without much movement.
+
+        stretch => $factor
+            Multiplies all times by the given factor. Values < 1 make the
+            log replay faster, values > 1 slower. Note that the frequency of
+            fixes will not be increased, o stretch factors > 1 do not work
+            well.
+
+            A stretch factor of zero is not allowed, but if you want to
+            replay a log instantly you may speicfy a very low value (e.g.
+            1e-10).
+
+SEE ALSO
+    AnyEvent.
+
+AUTHOR
+       Marc Lehmann <schmorp@schmorp.de>
+       http://home.schmorp.de/
+

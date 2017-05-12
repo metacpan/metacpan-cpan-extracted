@@ -1,0 +1,22 @@
+---
+abstract: 'build and find uPB (a.k.a. Unleaded)'
+author:
+  - 'Mattia Barbon <mattia@barbon.org>'
+build_requires:
+  Module::Build: '0.28'
+configure_requires:
+  Alien::Base::ModuleBuild: '0.023'
+  Alien::ProtoBuf: '0.01'
+  ExtUtils::CppGuess: '0.11'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-uPB
+resources:
+  homepage: https://github.com/mbarbon/alien-upb
+  repository: https://github.com/mbarbon/alien-upb.git
+version: '0.09'

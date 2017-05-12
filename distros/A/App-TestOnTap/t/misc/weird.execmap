@@ -1,0 +1,3 @@
+[EXECMAP]
+match1 = regexp(\.weird[12]$)
+cmd1 = perl

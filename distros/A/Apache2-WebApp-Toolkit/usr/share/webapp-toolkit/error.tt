@@ -1,0 +1,41 @@
+<!--
+    This is where the HTML content resides.
+
+    For more information on directives that can be used
+    within this template, please refer to:
+
+    http://template-toolkit.org/docs/manual
+-->
+
+[%- stag = "[\%" etag = "%\]" %]
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>[% project_title %] - Error</title>
+</head>
+<body>
+	<h1>Error</h1>
+
+	<hr></hr>
+
+	<h3>[% stag; 'title'; etag %]</h3>
+
+[% stag; 'IF output'; etag %]
+	<p>[% stag; 'output'; etag %]</p>
+[% stag; 'ELSE'; etag %]
+	<p>Please try one of the following:</p>
+
+	<ul>
+		<li>Click your browser's REFRESH button to try reconnecting to this page.</li>
+		<li>Click your browser's BACK button to return to the previous page.</li>
+		<li>Click <a href="javascript:window.history.go(-1)" title="Back">here</a> to go to the [% apache_domain FILTER upper %] homepage.</li>
+		<li>If you continue to experience this error, click <a href="mailto:[% project_email %]">here</a> to report it.</li>
+	</ul>
+[% stag; 'END'; etag %]
+
+	<hr></hr>
+</body>
+</html>

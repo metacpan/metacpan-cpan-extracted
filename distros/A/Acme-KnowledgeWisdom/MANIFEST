@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Acme/KnowledgeWisdom.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/01_Acme-KnowledgeWisdom.pm
+t/distribution.t
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

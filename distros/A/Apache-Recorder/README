@@ -1,0 +1,29 @@
+Overview: 
+The Apache::Recorder module is an implementation of a session recorder, 
+much like a macro recorder that you might use with a GUI application.  
+It allows you to "record" each of the clicks that you make during an 
+http session for later playback.  However, Apache::Recorder does not 
+provide capabilities to "play-back" a recorded session.  To "play-back" 
+a session, you need two additional modules: (1) HTTP::RecordedSession 
+to "thaw" the session, and format it appropriately; and (2) A module 
+(such as HTTP::Monkeywrench or HTTP::WebTest) which wraps testing 
+logic around the "thawed" session.
+
+Architecture:
+1. Use recorder.pl to set a cookie.
+2. Apache::Recorder will look for sessions containing a valid recorder.pl 
+   cookie.  When it finds such a session it will write information to the 
+   filesystem which can be played back at some later point.  See INSTALL
+   for httpd.conf instructions.
+3. Write a brief script which calls HTTP::RecordedSession to configure 
+   your session data appropriately for HTTP::Monkeywrench or HTTP::
+   WebTest.  perldoc HTTP::RecordedSession after installation for a 
+   sample script.
+
+Installation:
+
+See INSTALL.
+
+Copyright (c) 2001, 2002 Chris Brooks. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

@@ -1,0 +1,46 @@
+---
+abstract: 'Indicate out-of-date modules by walking the metacpan releases backwards'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  HTTP::Tiny: '0'
+  Test::Differences: '0'
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-cpanoutdated-fresh
+provides:
+  App::cpanoutdated::fresh:
+    file: lib/App/cpanoutdated/fresh.pm
+    version: '0.001006'
+recommends:
+  Moo: '1.000008'
+requires:
+  Carp: '0'
+  Getopt::Long: '0'
+  Module::Metadata: '0'
+  Moo: '0'
+  MooX::Lsub: '0'
+  Path::ScanINC: '0'
+  Pod::Usage: '0'
+  Search::Elasticsearch: '0'
+  perl: '5.006'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/App-cpanoutdated-fresh/issues
+  homepage: https://github.com/kentnl/App-cpanoutdated-fresh
+  repository: https://github.com/kentnl/App-cpanoutdated-fresh.git
+version: '0.001006'

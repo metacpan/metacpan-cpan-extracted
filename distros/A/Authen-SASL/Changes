@@ -1,0 +1,236 @@
+Authen-SASL 2.16 -- Tue Sep  4 11:01:18 CDT 2012
+
+  * SASL.pod: fix typo [Peter Marschall]
+  * Perl.pm: avoid warning on "uninitialized value" [Peter Marschall]
+
+Authen-SASL 2.15 -- Wed Jun 2 13:47:41 CDT 2010
+
+  * Makes sure that user callbacks are called [Yann Kerherve]
+
+Authen-SASL 2.1401 -- Mon Mar 29 14:22:54 CDT 2010
+
+  * Add META.yml to release
+
+Authen-SASL 2.14 -- Thu Mar 11 08:21:07 CST 2010
+
+  * Documentation updates  [Yann Kerherve]
+  * Added server API description [Yann Kerherve]
+  * Bugfixes to LOGIN, PLAIN and DIGEST_MD5 [Yann Kerherve]
+  * Added server support for LOGIN, PLAINaand DIGEST_MD5 [Yann Kerherve]
+  * Compatiblity with Authen::SASL::XS [Yann Kerherve]
+
+Authen-SASL 2.13 -- Thu Sep 24 17:27:47 CDT 2009
+
+  * RT#42191 Only use pass for GSSAPI credentials if it is an object of type GSSAPI::Cred
+  * RT#675 Authorization with Authen::SASL::Perl::External
+  * Call client_new and server_new inside eval so further plugins can be tried before failing
+  * Prefer to use Authen::SASL::XS over Authen::SASL::Cyrus
+
+Authen-SASL 2.12 -- Mon Jun 30 21:35:21 CDT 2008
+
+Enhancements
+  * GSSAPI implement protocol according to RFC, but by default, remain compatible with cyrus sasl lib
+  * DIGEST-MD5 implement channel encryption layer
+
+Authen-SASL 2.11 -- Mon Apr 21 10:23:19 CDT 2008
+
+Enhancements
+  * implement securesocket() in the ::Perl set of plugins
+
+Bug Fixes
+  * fix parsing challenges from GnuSASL
+  * update tests for DIGEST-MD5
+  * New test from Phil Pennock for testing final server response
+
+Authen-SASL 2.10 -- Sat Mar 25 13:11:47 CST 2006
+
+Enhancements
+  * Added Authen::SASL::Perl::GSSAPI
+  * Added error method to Authen::SASL to obtain error from last connection
+
+Bug Fixes
+  * Authen::SASL::Perl::DIGEST_MD5
+    - Fixed response to server to pass digest-uri
+    - Correct un-escaping behaviour when reading the challenge,
+    - check for required fields (according to the RFC),
+    - allow for qop not to be sent from the server (according to the RFC),
+    - add a callback for the realm.
+
+Authen-SASL 2.09 -- Tue Apr 26 06:55:10 CDT 2005
+
+Enhancements
+  * authname support in Authen::SASL::Perl::DIGEST_MD5
+  * flexible plugin selection in Authen::SASL using import()
+     i.e.    use Authen::SASL qw(Authen::SASL::Cyrus);
+  * new documentation for
+    - Authen::SASL::Perl::ANONYMOUS
+    - Authen::SASL::Perl::CRAM_MD5
+    - Authen::SASL::Perl::EXTERNAL
+    - Authen::SASL::Perl::LOGIN
+    - Authen::SASL::Perl::PLAIN
+    - Authen::SASL::Perl
+  * updates in the tests
+
+Authen-SASL 2.08 -- Tue May 25 11:24:21 BST 2004
+
+Bug Fixes
+  * Fix the handling of qop in Digest-MD5
+
+Authen-SASL 2.07 -- Sat Apr 10 09:06:21 BST 2004
+
+Bug Fixes
+  * Fixed test bug if Digest::HMAC_MD5 was not installed
+  * Fixed order of values sent in the PLAIN mechanism
+
+Enhancements
+  * Added support in the framework for server-side plugins
+
+2003-11-01 18:48  Graham Barr
+
+	* lib/Authen/SASL.pm:
+
+	Release 2.06
+	
+2003-10-21 19:59  Graham Barr
+
+	* MANIFEST, lib/Authen/SASL/Perl.pm,
+	lib/Authen/SASL/Perl/ANONYMOUS.pm,
+	lib/Authen/SASL/Perl/CRAM_MD5.pm,
+	lib/Authen/SASL/Perl/DIGEST_MD5.pm,
+	lib/Authen/SASL/Perl/EXTERNAL.pm, lib/Authen/SASL/Perl/LOGIN.pm,
+	lib/Authen/SASL/Perl/PLAIN.pm, t/order.t:
+
+	Add ordering so we always pich the best of the available methods instead of
+	just the first
+	
+2003-10-17 22:12  Graham Barr
+
+	* lib/Authen/SASL.pm:
+
+	Release 2.05
+	
+2003-10-17 22:06  Graham Barr
+
+	* MANIFEST, Makefile.PL:
+
+	use Module::Install to generate Makefile and add SIGNATURE and META.yml
+	
+2003-10-17 21:19  Graham Barr
+
+	* lib/Authen/SASL/Perl/DIGEST_MD5.pm:
+
+	Fix typo
+	
+2003-10-17 21:17  Graham Barr
+
+	* lib/Authen/SASL/: Perl.pm, Perl/DIGEST_MD5.pm:
+
+	Don't call die in DIGEST_MD5, but call set_error and return an empty list
+	
+2003-10-17 21:16  Graham Barr
+
+	* lib/Authen/SASL.pod:
+
+	Update docs to reflect that client_start and client_step return an emtpy list on error
+	
+2003-05-19 22:41  Graham Barr
+
+	* lib/Authen/SASL.pm:
+
+	Release 2.04
+	
+2003-05-19 22:40  Graham Barr
+
+	* t/digest_md5.t:
+
+	Avoid used only once warning
+	
+2003-05-19 17:06  Graham Barr
+
+	* MANIFEST, lib/Authen/SASL/Perl/DIGEST_MD5.pm, t/digest_md5.t:
+
+	Add DIGEST-MD5 mechanism
+	
+2003-05-19 16:42  Graham Barr
+
+	* MANIFEST, t/login.t:
+
+	Add test for login mechanism
+	
+2003-01-21 19:15  Graham Barr
+
+	* lib/Authen/SASL.pm:
+
+	Release 2.03
+	
+2003-01-21 12:22  Graham Barr
+
+	* lib/Authen/SASL/Perl/LOGIN.pm:
+
+	Fix LOGIN mechanism to respond with the username when prompted
+	
+2002-05-28 15:22  Graham Barr
+
+	* lib/Authen/SASL.pm:
+
+	Release 2.02
+	
+2002-05-28 14:36  Graham Barr
+
+	* MANIFEST, lib/Authen/SASL/Perl/LOGIN.pm:
+
+	Add LOGIN mechanism commonly used by SMTP
+	
+2002-03-31 15:39  Graham Barr
+
+	* lib/Authen/SASL.pm:
+
+	Release 2.01
+	
+2002-03-22 10:13  Graham Barr
+
+	* t/cram_md5.t:
+
+	Skip cram_md5 test if Digest::HMAC_MD5 is not installed
+	
+2002-02-18 16:56  Graham Barr
+
+	* lib/Authen/SASL/Perl.pm:
+
+	Add securesocket to the ::Perl base class.
+	
+2002-01-28 19:52  Graham Barr
+
+	* MANIFEST, lib/Authen/SASL.pm, t/anon.t, t/callback.t,
+	t/cram_md5.t, t/external.t, t/plain.t:
+
+	Add some tests
+	
+2002-01-24 15:21  Graham Barr
+
+	* lib/Authen/SASL/Perl.pm:
+
+	Allow callback to be called on the connection object
+	
+2002-01-24 12:04  Graham Barr
+
+	* MANIFEST, Makefile.PL, api.txt, compat_pl, example_pl,
+	lib/Authen/SASL.pm, lib/Authen/SASL.pod,
+	lib/Authen/SASL/CRAM_MD5.pm, lib/Authen/SASL/EXTERNAL.pm,
+	lib/Authen/SASL/Perl.pm, lib/Authen/SASL/Perl/ANONYMOUS.pm,
+	lib/Authen/SASL/Perl/CRAM_MD5.pm, lib/Authen/SASL/Perl/EXTERNAL.pm,
+	lib/Authen/SASL/Perl/PLAIN.pm:
+
+	Initial revision
+	
+2002-01-24 12:04  Graham Barr
+
+	* MANIFEST, Makefile.PL, api.txt, compat_pl, example_pl,
+	lib/Authen/SASL.pm, lib/Authen/SASL.pod,
+	lib/Authen/SASL/CRAM_MD5.pm, lib/Authen/SASL/EXTERNAL.pm,
+	lib/Authen/SASL/Perl.pm, lib/Authen/SASL/Perl/ANONYMOUS.pm,
+	lib/Authen/SASL/Perl/CRAM_MD5.pm, lib/Authen/SASL/Perl/EXTERNAL.pm,
+	lib/Authen/SASL/Perl/PLAIN.pm:
+
+	import
+	

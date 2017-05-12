@@ -1,0 +1,312 @@
+/*---------------- Header ------------------*/
+
+
+/*---------------- Menu bar ------------------*/
+#menu li {
+	list-style-image: URL(/img/arrow.gif);
+}
+#menu {
+  	float: left;
+	border: 1px solid #000000;
+	border-bottom-style: solid;
+	border-top-style: solid;
+	padding: 1em;
+	width: 13%;
+	margin-left: 10px;
+	font: italic 10pt/20pt;
+	font-family:"Comic Sans MS","lucida grande",helvetica,arial,sans-serif;
+}
+
+/*--Test--*/
+dl, dt, dd, ul, li {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+#menu dl {
+	float: left;
+	width: 9.71em;
+	margin: 0 1px;
+}
+#menu dt {
+	cursor: pointer;
+	<!--color: #fff;--!>
+	text-align: center;
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 15px;
+	<!--background: #000;--!>
+	border: 1px solid #B4B079;
+}
+#menu dd {
+	<!--border: 1px solid #B4B079;--!>
+}
+#menu li {
+	text-align: left;
+	<!--background: #000;--!>
+}
+
+#menu li a, #menu dt a {
+<!--color: #fff;--!>
+	display: block;
+	height: 100%;
+	border: 0 none;
+}
+#menu li a:hover, #menu dt a:hover {
+	<!--color: #FBF591;--!>
+}
+
+/*---------------- Site body ------------------*/
+.content {
+  margin-left: 20%;
+  margin-right: 10px;
+  font: 9pt/17pt;
+  font-family:"Georgia","lucida grande";
+}
+
+.content table {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.content table td, .content table th {
+  font-size: 9pt;
+  font-family:"Georgia","lucida grande";
+}
+
+
+/*---------------- Footer ------------------*/
+#copyright{
+  font-family: "lucida grande";
+}
+
+/*---------------- Navigation links ------------------*/
+a { color: black; }
+a:link    {  text-decoration: none; }
+a:visited { text-decoration: none; }
+a:hover   { text-decoration: none; }
+a:active  { text-decoration: none; }
+a.bold { font-weight: bold; }
+a.info:link    { cursor:none;  border-bottom: 1px dotted #333 }
+a.info:visited { cursor:none;  border-bottom: 1px dotted #333 }
+a.info:hover   { cursor:help;  text-decoration: none}
+a.info:active  { cursor:help;  text-decoration: none}
+
+
+*{
+margin:0;
+padding:0;
+}
+
+body{
+font-family:"lucida grande",helvetica,arial,sans-serif;
+text-align:center;
+color:#333;
+font-size: 76%;
+}
+
+h1, h2, h3, h4{
+font-weight:normal;
+font-style: italic;
+}
+
+h1{
+color: #003d4c;
+margin:0.3em 0;
+font-size: 200%
+}
+
+h1.title {
+    padding: 4px;
+    margin: 0px;
+}
+
+h2{
+color:#c6c65b;
+padding-top: 1em;
+margin:0.3em 0;
+padding-bottom: 1em;
+font-size: 180%;
+}
+
+h3{
+color:#c6c65b;
+padding-top:1em;
+font-size: 140%;
+}
+
+h4{
+color:#c6c65b;
+padding-top:0.5em;
+font-weight:normal;
+}
+
+em {
+font-size: 12px;
+}
+
+ul, li {
+margin: 0 12px;
+}
+
+/* Layout */
+
+#container{
+text-align:left;
+}
+
+#header{
+margin-top: 1em;
+margin-bottom: 1em;
+padding: 4px 20px;
+background-color: [% site.col.head %];
+border-bottom: 1px solid [% site.col.line %];
+}
+
+#footer{
+margin-top: 1em;
+margin-bottom: 1em;
+padding: 4px 20px;
+background-color: [% site.col.head %];
+border-bottom: 1px solid [% site.col.line %];
+text-align: center;
+}
+
+/* tables */
+
+table {
+border: 1px solid #ccc;
+color:#333;
+background-color: #fff;
+padding: 0;
+margin: 0 0 2em 0;
+white-space: normal;
+}
+th {
+background-color: #e2e2e2;
+border-top: 1px solid #fff;
+border-left: 1px solid #fff;
+border-right: 1px solid #003d4c;
+border-bottom: 1px solid #003d4c;
+text-align: center;
+padding:1px 4px;
+}
+table tr td {
+padding:4px 4px;
+vertical-align:top;
+text-align: center;
+}
+table tr.altRow td {
+background: #f4f4f4;
+}
+table td.actions {
+	white-space: nowrap;
+}
+/* scaffold show */
+
+div.related {
+clear:both;
+display:block;
+}
+
+
+/* notices and errors */
+
+#flashMessage, .error, .error_message {
+color:#000000;
+font-size: 13px;
+margin: 8px 0px;
+font-weight: bold;
+}
+.error_message {
+clear: both;
+}
+.error em {
+font-size: 18px;
+color: #003d4c;
+}
+.notice {
+color: #656565;
+font-size: 14px;
+background-color: #f4f4f4;
+padding: 0.5em;
+margin: 1em 0;
+display:block;
+}
+.tip {
+color: #656565;
+background-color: #ddd;
+}
+
+/* forms */
+
+form {
+margin-top: 2em;
+}
+form div{
+vertical-align: text-top;
+margin-left: 1em;
+margin-bottom:2em;
+}
+form div.date{
+margin-left: 0em;
+}
+label {
+display: block;
+float:left;
+width: 140px;
+font-size: 14px;
+padding-right: 20px;
+}
+input[type=checkbox] {
+float: left;
+clear: left;
+margin: 2px 6px 7px 2px;
+}
+input, textarea {
+clear: both;
+display:block;
+font-size: 14px;
+font-family: inherit;
+}
+select {
+clear: both;
+vertical-align: text-bottom;
+font-size: 14px;
+font-family: inherit;
+}
+option {
+font-size: 14px;
+font-family: inherit;
+padding: 0 0.3em;
+}
+input[type=submit] {
+display: inline;
+vertical-align: bottom;
+}
+div.required {
+clear: both;
+color:#222;
+font-weight:bold;
+}
+div.optional {
+clear: both;
+color:#555;
+}
+div.submit {
+clear: both;
+margin-top: 40px;
+margin-left: 140px;
+}
+/* action links */
+ul.actions {
+float: left;
+margin-left:20px;
+width: 200px;
+}
+ul.actions li {
+margin-top: 4px;
+}
+pre {
+padding: 1em;
+}

@@ -1,0 +1,57 @@
+{
+   "abstract" : "Resolve merge conflicts by only taking one side of each conflicted section",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Git-Workflow-Command-Take",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0.016"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Git::Workflow" : "0.96009",
+            "App::Git::Workflow::Command" : "0.96009",
+            "Path::Tiny" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "App::Git::Workflow::Command::Take" : {
+         "file" : "lib/App/Git/Workflow/Command/Take.pm",
+         "version" : "0.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::Git::Workflow::Command::Take"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/ivanwills/App-Git-Workflow-Command-Take.git"
+      }
+   },
+   "version" : "0.4",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

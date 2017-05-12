@@ -1,0 +1,33 @@
+no time plan associated - not even an order implied.
+
+
+** distribution:
+
+- sign module using Module::Signature.
+
+
+** module enhancements
+
+- implementing missing methods in am::collection (random, etc.)
+    . artists_matching (yup, no way to have it with mpd's api)
+    . albums_matching (ditto)
+    . random_song / random_songs
+    . songs_by_artist_from_album
+    . songs_by_artist_without_album
+    . songs_without_artist
+- extending and harmonizing subs in am::playlist (add() should allow
+  multiple arguments, for example)
+- what about improving am::* to allow for auto-update?
+
+
+** dialog with mpd
+
+- more extensive coverage of supported mpd instruction set.
+- better communication with mpd (including auto-reconnect).
+
+
+** mpd scripts:
+
+- mpd proxy adding song ratings on-the-fly.
+- small daemon watching collection dir (inotify) and updating mpd
+

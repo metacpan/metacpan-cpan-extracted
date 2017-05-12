@@ -1,0 +1,140 @@
+Apache::MP3 Version 4.0
+
+This module takes a hierarchy of directories containing MP3, Ogg
+Vorbis, or Wav audio files and presents it as a browsable and
+searchable song library for streaming over the web.  It requires the
+Apache (version 2) web server, the mod_perl (version 2) embedded Perl
+interpreter, and either or both of the MP3::Info and Ogg::Vorbis
+modules. In addition, you must have Locale::Maketext and CGI::Session
+installed.
+
+Audio files are displayed in a list that shows the title, artist, duration
+and bitrate.  Subdirectories are displayed with "CD" icons. The user can
+download an MP3 file to disk by clicking on its title, stream it to an MP3
+decoder by clicking on the "play" link. Users can also stream the entire
+contents of a directory, or select a subset of songs to play.
+
+A DEMO is available at http://www.modperl.com/Songs.  In this demo, stream
+time is limited to 30 seconds in order to avoid copyright infringement.
+
+See the "screenshots" directory for some pictures of Apache::MP3 in action.
+
+See below for CHANGES.
+
+INSTALLATION
+
+1. Prequisites
+
+This module requires mod_perl, MP3::Info, MP3::Icecast and Locale::Maketext,
+all of which are available on CPAN.  Locale::Maketext in turn requires
+I18N::LangTags.
+
+2. Configure MIME types
+
+Apache must be configured to recognize the mp3 and MP3 extensions as MIME
+type audio/mpeg.  Add the following to httpd.conf or srm.conf:
+
+ AddType audio/mpeg mp3 MP3
+ AddType audio/playlist m3u M3U
+
+If you plan to use Shoutcast-style playlists, add the following as well:
+
+ AddType audio/x-scpls pls PLS
+
+If you plan to use Ogg Vorbis, add the following as well:
+
+ AddType application/x-ogg ogg OGG
+
+3. Install icons and stylesheet
+
+This module uses a set of icons and a cascading stylesheet to generate its
+song listings.  By default, the module expects to find them at the url
+/apache_mp3.  Create a directory named apache_mp3 in your document root,
+and copy into it the contents of the F<apache_mp3> directory from the
+Apache::MP3 distribution.
+
+You may change the location of this directory by setting the I<BaseDir>
+configuration variable.  See the I<Customizing> section for more details.
+
+4. Set Apache::MP3 to be the handler for the songs directory
+
+In httpd.conf or access.conf, create a E<lt>LocationE<gt> or
+E<lt>DirectoryE<gt> section, and make Apache::MP3 the handler for this
+directory.  This example assumes you are using the URL /Songs as the
+directory where you will be storing song files:
+
+  <Location /Songs>
+    SetHandler perl-script
+    PerlHandler Apache::MP3
+  </Location>
+
+If you would prefer the song file listing that allows the user to sort it
+in various ways, set the handler to use the Apache::MP3::Sorted subclass
+instead.  A further elaboration is Apache::MP3::Playlist, which uses
+cookies to manage a persistent playlist for the user.
+
+5. Load MP3::Info in the Perl Startup file (optional)
+
+For the purposes of faster startup and memory efficiency, you may load the
+MP3::Info module at server startup time.  If you have a mod_perl "startup"
+file, enter these lines:
+
+  use MP3::Info;
+  use Apache::MP3;
+
+6. Set up song directory
+
+Create a directory in the web server document tree that will contain the
+audio files to be served.  The module recognizes and handles
+subdirectories appropriately.  I suggest organizing directories
+hierarchically by artist and/or album name.
+
+If you place a file named "cover.jpg" in any of the directories, that
+image will be displayed at the top of the directory listing.  You can use
+this to display cover art.
+
+If you place a list of .mp3 file names in a file with the .m3u extension,
+it will be treated as a playlist and displayed to the user with a
+distinctive icon.  Selecting the playlist icon will download the playlist
+and stream its contents.  The playlist must contain relative file names,
+but may refer to subdirectories, as in this example:
+
+  # file: folk_favorites.m3u
+  Never_a_Moment_s_Thought_v2.mp3
+  Peter Paul & Mary - Leaving On A Jet Plane.mp3
+  Simon and Garfunkel/Simon And Garfunkel - April Come She Will.mp3
+
+7. Set up an information cache directory (optional)
+
+In order to generate its MP3 listing, Apache::MP3 must open each sound
+file, extract its header information, and close it.  This is time
+consuming, particularly when recursively generating playlists across
+multiple directories.  To speed up this process, Apache::MP3 has the
+ability cache MP3 file information in a separate directory area.
+
+To configure this, choose a directory that the Web server has write access
+for, such as /usr/tmp.  Then add a configuration variable like the
+following to the <Location> directive:
+
+ PerlSetVar  CacheDir       /usr/tmp/mp3_cache
+
+If the designated directory does not exist, Apache::MP3 will attempt to
+create it, limited of course by the Web server's privileges.  You may need
+to create the mp3_cache directory yourself if /usr/tmp is not world
+writable.
+
+TESTING IT
+
+Open up the MP3 URL in your favorite browser.  You should be able to see
+directory listings, and download and stream your songs.  If things don't
+seem to be working, checking the server error log for messages.
+
+Run "perldoc Apache::MP3" for more configuration information.
+
+CHANGES
+
+See Changes.
+
+AUTHORS
+
+Lincoln Stein, <lstein@cshl.org>

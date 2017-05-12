@@ -1,0 +1,50 @@
+---
+abstract: 'Implementation of the HyperLogLog cardinality estimation algorithm'
+author:
+  - 'Hideaki Ohno <hide.o.j55 {at} gmail.com>'
+build_requires:
+  File::Temp: 0
+  Test::Fatal: 0.008
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+  Module::Build::XSUtil: 0.09
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Algorithm-HyperLogLog
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Algorithm::HyperLogLog:
+    file: lib/Algorithm/HyperLogLog.pm
+    version: 0.23
+  Algorithm::HyperLogLog::PP:
+    file: lib/Algorithm/HyperLogLog/PP.pm
+    version: 0.23
+requires:
+  Carp: 0
+  Digest::MurmurHash3::PurePerl: 0.02
+  XSLoader: 0
+  perl: 5.008008
+resources:
+  bugtracker: https://github.com/hideo55/p5-Algorithm-HyperLogLog/issues
+  homepage: https://github.com/hideo55/p5-Algorithm-HyperLogLog
+  repository: git://github.com/hideo55/p5-Algorithm-HyperLogLog.git
+version: 0.23
+x_contributors:
+  - 'Damian Gryski <damian@gryski.com>'
+  - 'hideo55 <hide.o.j55@gmail.com>'

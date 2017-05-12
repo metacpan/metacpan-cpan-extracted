@@ -1,0 +1,36 @@
+%# adobar.html.ep
+  <nav id="adobar" class="ui borderless inverted fixed menu">
+    <%= include 'partials/logo' %>
+  % # 'popup' related js and css strings are just for test coverage
+  % head_css([$sui_path.'/menu.min.css']);
+  % head_css begin
+  /* content for head_css */
+  % end;
+  % head_javascript begin
+  //content for head_javascript
+  $(function(){
+    $('#adobar a.popup').popup({position : 'bottom left'})
+  });
+  % end ;
+    <a class="popup icon book item" href="<%=url_for('/perldoc')%>"
+      data-content="Manual"><i class="book icon"></i></a>
+    <a class="popup icon help item" data-content="About"
+      href="<%=url_for("/help/$language/cover.md")%>"><i class="icon help"></i></a>
+    <a class="popup icon github item" data-content="View project on Github" 
+      href="https://github.com/kberov/Ado" target="_blank">
+      <i class="icon github"></i>
+    </a>
+    <a class="popup icon item" href="https://metacpan.org/release/Ado"
+    data-content="CPAN"><b>:&nbsp;:</b></a>
+
+
+    %# Some plugins may include adobar in layouts and push items to the adobar
+    % foreach my $link ( @{session->{adobar_links}} ) {
+    <a class="popup item" data-content="<%= $link->{text} ? l($link->{text}) : '' %>" 
+      href="<%= $link->{href} ? $link->{href}:'' %>" target="<%= $link->{target} ? $link->{target} : '' %>">
+      <i class="icon <%= $link->{icon} %>"></i>
+    </a>
+    % }
+    %= include 'partials/authbar' unless current_route =~ m'login'
+    %= include 'partials/language_menu'
+  </nav>

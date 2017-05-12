@@ -1,0 +1,10 @@
+bin/perldolicious
+Build.PL
+Changes
+lib/App/perldolicious.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/perldolicious.t

@@ -1,0 +1,33 @@
+==================================================
+Changes from 2010-06-30 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.04 at 2015-06-29 19:27:04 +0000
+-----------------------------------------
+
+  Change: 00c1adf5105554583be606130c71fbb3c5500487
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-06-29 20:27:04 +0000
+
+    Add failing test, which was kind of the whole point of this 
+
+-----------------------------------------
+version 0.02 at 2015-06-29 18:52:36 +0000
+-----------------------------------------
+
+  Change: e49d98c4a0bfd6993d10a26bbd46e07775ee2b20
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-06-29 19:52:36 +0000
+
+    doh 
+
+  Change: cdd6440a97c76fb8eb45b9eba1554cbb105e36d8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-06-29 19:52:13 +0000
+
+    It has to start somewhere 
+
+================
+End of releases.
+================

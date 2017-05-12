@@ -1,0 +1,40 @@
+Acme-CPANAuthors-InMemoriam
+===========================
+
+This module was created to remember those CPAN Authors who are no longer with
+us, who have given us their inspiration in the form of code, to continue and
+celebrate their time with us.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these modules:
+
+  Acme::CPANAuthors
+
+For testing the module requires these modules:
+
+  IO::File
+  Test::More
+
+For optional testing the module would like these modules:
+
+  Test::CPAN::Meta
+  Test::CPAN::Meta::JSON
+  Test::Pod
+  Test::Pod::Coverage
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2013-2015 Barbie for Miss Barbell Productions
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

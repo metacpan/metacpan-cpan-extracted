@@ -1,0 +1,8 @@
+Revision history for AnyData2
+
+0.002	2016-07-06
+    - add drop capability to API for DBD::AnyData2
+    - add license files to the distribution
+
+0.001	2015-07-10
+    - First version, released on an unsuspecting world.

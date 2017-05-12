@@ -1,0 +1,16 @@
+Changes
+examples/amfclient.pl
+examples/get-brightcove-videos-metadata.pl
+lib/AMF/Connection.pm
+lib/AMF/Connection/InputStream.pm
+lib/AMF/Connection/Message.pm
+lib/AMF/Connection/MessageBody.pm
+lib/AMF/Connection/MessageHeader.pm
+lib/AMF/Connection/OutputStream.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,93 @@
+
+=pod
+
+=head1 NAME
+
+Apache2::ASP::Manual::GettingStarted - Getting started with Apache2::ASP
+
+=head1 DESCRIPTION
+
+L<Apache2::ASP> is a web application development framework similar to Microsoft
+Classic ASP, Microsoft ASP.Net, JSP, ColdFusion or PHP.
+
+B<NOTE:> Apache2::ASP is B<not> an exact copy of Microsoft Classic ASP or ASP.Net, and
+code written for Classic ASP or ASP.Net will not function under Apache2::ASP.
+
+Right out of the box, L<Apache2::ASP> provides a robust set of tools and 
+best-practices that make it easy to build web applications.
+
+=head1 INSTALLATION: LINUX
+
+Installation on any UNIX/Linux system is fairly straightforward.
+
+Just follow these steps:
+
+=over 4
+
+=item * Install Apache httpd 2.x
+
+If installed from source, you get all the development libraries and tools by default.
+
+If it is installed from an RPM, DEB or other package, make sure to install the
+"development" libraries as well.  Otherwise, you will not be able to install
+other modules that Apache2::ASP depends on.
+
+=item * Install mod_perl 2.04 or higher.
+
+Previous versions had some issues.
+
+Just install via CPAN or from source, available at L<http://perl.apache.org/download/>.
+
+=item * Install libapreq2
+
+This generally goes well via CPAN, by installing L<Apache2::Request>.
+
+If you run into problems, go to L<http://httpd.apache.org/apreq/download.cgi> and 
+download C<libaprec2.x> yourself and install from source.
+
+B<THEN> you can install L<Apache2::Request> via CPAN.  Skip the tests - 
+you're probably fine.
+
+=item * Install L<CGI::Apache2::Wrapper> via CPAN.
+
+It's generally not necessary to run the test suite.  Feel free to skip the tests.
+
+=item * Make sure you have libxml2.
+
+B<Ubuntu:> C<sudo aptitude search libxml2>
+
+B<Redhat:> C<rpm -qa | grep libxml>
+
+B<OSX:> ???
+
+B<Solaris:> ???
+
+=item * Install L<Apache2::ASP>
+
+With the main prerequisites out of the way, you are all set.
+
+=back
+
+=head1 INSTALLATION: WINDOWS
+
+If you're trying to run Apache2::ASP on Windows, you'll need to get the 
+following installed before you install Apache2::ASP:
+
+=over 4
+
+=item * Apache httpd 2.x
+
+=item * mod_perl 2.x
+
+You will also need the development headers, so just installing the DLL won't work.
+
+=item * libapreq2.x
+
+=item * sqlite
+
+You will also need the development headers, so just installing the DLL won't work.
+
+=back
+
+=cut
+

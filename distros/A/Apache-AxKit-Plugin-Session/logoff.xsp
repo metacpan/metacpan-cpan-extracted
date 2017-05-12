@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<xsp:page language="Perl"
+ xmlns:xsp="http://www.apache.org/1999/XSP/Core"
+ xmlns:session="http://www.apache.org/1999/XSP/Session"
+ xmlns:auth="http://www.creITve.de/2002/XSP/Auth"
+ xmlns="http://www.w3.org/1999/xhtml"
+>
+<html>
+<head>
+<title>Logout</title>
+</head>
+<body>
+<xsp:logic>
+if (<auth:is-logged-in/>) {
+        <auth:logout/>
+}
+<auth:clear-reason/>;
+<auth:get-location/>;
+</xsp:logic>
+<h1>Goodbye!</h1>
+<p>You are now logged off.</p>
+</body>
+</html>
+</xsp:page>

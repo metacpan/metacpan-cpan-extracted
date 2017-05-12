@@ -1,0 +1,107 @@
+Revision history for Perl extension App::sh2p.
+
+0.01  Sun Aug 31 12:09:03 2008
+	- original version; created by h2xs 1.23 with options
+		-A -n App::sh2p
+0.02  Wed Sep 03 17:00:00 2008
+	- fix for 5.6 and CPAN testers in Builtins.pm
+	  syntax error reported in 5.6 but not in 5.10
+	- amended version requirement because of above
+	- changed input parameters - script no longer writes to STDOUT by default
+	  See documentation for details
+	- implemented unset, chmod, chown
+	- improved variable assignment to empty strings and integers
+	- implemented some variable expansion: ${var:?}, $#var
+	- limited support for case/esac statement
+	- limited support for basic shell pattern matching
+	- redirection from echo/print now supported
+	- fixed a bug where function calls after a conditional were seen as strings
+	- fixed a bug concerning ++ and --
+	- fixed a bug where 'echo' was not converted to 'print'
+	- fixed bug where calculations failed to have a trailing ;
+	- fixed bug where return without an argument had a \n before ;
+	- fixed bug where external calls from variables were not handled correctly
+0.03  Fri Sep 12 17:00:00 2008
+	- improvements to POD
+	- improvements to formatting and indentation
+	- improved numeric handling
+	- support for local (alias in ksh, built-in in Bash)
+	- support for shift
+	- support for default read variable $REPLY
+	- support for extended pattern matching
+	- support for exec (but not the fd version)
+	- added option support for unset
+	- added support for autoload and typeset -fu
+	- #! line now takes the path from the current perl configuration
+	- improved environment variable handling
+	- improved variable expansion, now supports ${var##pat} and ${var%%pat}
+	- output file is now given the same permissions as the input
+	- the default list in 'for' is now @ARGV in main, or @_ in a subroutine
+	- ~ added to glob characters
+	- improved handling of multi-line statements
+	- fixed bug where $0 was translated to $ARGV[-1]
+	- fixed bug where a free-standing colon (':') failed
+	- fixed bug concerning comment after redirection
+	- fixed bug when testing the 'system' command - now test explictly for zero return.
+	- fixed bug where a user function call with no arguments gave a single double-quote.
+0.04  Wed Oct 06 17:00:00 2008
+	- removed the Runtime module and the -r option
+	- added -t option for test output (not for general use)
+	- heredoc subroutines are now appended as required
+	- support for true and false
+	- support for text permissions in chmod
+	- implemented 'let', umask, chgrp
+	- built-in support for tr (which may use lc or uc)
+	- built-in support for touch
+	- some improvements to string handling
+	- improvements to cd
+	- arrays are supported, including set -A, [*] and [@] quoted and non-quoted, ${!array[@]}, ${#array[@]}
+	- improvements to pipeline handling
+	- limited support for subshells
+	- fixed bugs concerning multiple and logical operators in test, [, and [[
+	- fixed bug when a comment followed a compound statement (while, if, else, etc.)
+	- fixed bug concerning variable handling in case statement
+	- fixed bug where some glob constructs were incorrectly quoted
+	- fixed implementation of chown
+	- fixed bug where some INSPECT messages could be displayed several times 
+	  for each occurence
+	- Improved error reporting
+0.05  Sat Feb 07 17:00:00 2009
+	- new modules: Trap.pm, Statement.pm
+	- internal structure changes concerning BREAK markers (which fixed '7' bugs)
+	- fixed bugs concerning shortcuts (|| and &&) following external calls and print/echo 
+	- fixed bug in Builtins.pm (do_print) where a variable was declared twice
+	- fixed bug in case statements where the do{} block was not terminated with ;
+	- fixed bug in case statement where statements were concatenated
+	- fixed bug with case statement nested inside other conditional
+	- fixed indentation with trailing } in esac
+	- fixed bug in 'let' where variable omitted sigil
+	- fixed bug where 'if' statements were sometimes unterminated
+	- fixed bug where an uninitialised array index was not declared with 'my'
+	- fixed bug in subshells where new variables were not declared in the correct scope
+	- fixed bugs where empty strings "" were handled incorrectly
+	- fixed bug with back-ticks embedded inside " quotes
+	- fixed bug where command name was a variable inside "
+	- fixed bug with -t option handling of multi-line commands
+	- fixed bug concerning declare/typeset and "Token count wrong!" 
+	- fixed bug where a | embedded in a string was seen as a pipe
+	- fixed bugs concerning commands embedded in quotes
+	- conversion of advise command in back-ticks changed to be a concat. string
+	- support for trap - see documentation for restrictions 
+	- the & operator (run in background) is now placed inside a system call.
+	- improvements to 'here' document handling
+	- improvements to $* handling
+	- improvements to redirection
+	- improvements to testing, including the provision of main()
+0.06  Sun Feb 08 17:00:00 2009
+	- fixed bug in chmod, chown, chgrp, which gave "Token count wrong!"
+	- fixed bug in kill which gave "Token count wrong!"
+	- fixed bug with filename quoting in chmod, et. al.
+	- fixed bug where a bare Perl reference was displayed
+	- fixed bug in export where environment vars. on rhs were not recognised
+	- corrected quoting of bareword value in export
+	- corrected quoting in source/. command
+	- corrected quoting in touch command
+	- fixed bug where variable type (integer, etc.) was sometimes missed
+	- improved diagnostics when using shopt
+	

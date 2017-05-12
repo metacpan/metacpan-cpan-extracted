@@ -1,0 +1,55 @@
+Authen/SimplePam
+================
+
+Authen::SimplePAM simplifies the use of PAM
+to authenticate users, so that there is no need to 
+know how PAM really works.
+
+Refer to the pod documentation
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+Note that make test won't work.
+
+PROGRAMS
+
+There are a few scripts in the bin/ dir.
+They are simple programs that might be a start point on
+how to use Authen::SimplePam.
+
+auth_user.pl - authenticates a user.
+               checks if the user password is correct.
+
+change_password.pl - change a user's password.
+                     probably will only work as root.
+
+chngpwd - an script to change a user password.
+          this script needs to be run suid.
+          It was written to let a non-root user change
+          any user password as long as he knows the current
+          password.
+          A directly use for it is as a tool to be used from
+          a CGI script to change a user password thru web.
+          I tryed to make it as secure as possible, however
+          I do not garantee anything.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Authen::PAM
+
+COPYRIGHT AND LICENCE
+
+This module is GPLed.
+I don't garantee that this will work or even will not destroy your system.
+Use at your own risk.
+
+Copyright (C) 2002 Raul Dias <raul@dias.com.br>
+

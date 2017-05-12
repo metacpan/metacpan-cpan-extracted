@@ -1,0 +1,10 @@
+Revision history for Acme-Test-crypt
+
+0.02    2016-01-21 (PERLANCAR)
+
+        - Add tests for BCRYPT.
+
+
+0.01    2016-01-20 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,313 @@
+#!/usr/bin/perl
+use utf8;
+use v5.10;
+
+use strict;
+use warnings;
+
+use vars qw( %Content $VERSION $Quiet $Rc_directory $Dir_sep );
+
+use App::scriptdist qw(:all);
+
+use Cwd;
+use ExtUtils::Command;
+use ExtUtils::Manifest;
+use File::Basename qw(basename);
+use File::Spec;
+use File::Spec::Functions;
+use FindBin ();
+
+$VERSION = '0.241';
+
+=encoding utf8
+
+=head1 NAME
+
+scriptdist - create a distribution for a perl script
+
+=head1 SYNOPSIS
+
+	% scriptdist script.pl
+
+=head1 DESCRIPTION
+
+The scriptdist program takes a script file and builds, in the current
+working directory, a Perl script distribution around it.  You can add
+other files to the distribution once it is in place.
+
+This script is designed to be a stand-alone program.  You do not need
+any other files to use it.  However, you can create a directory named
+.scriptdist in your home directory, and scriptdist will look for local
+versions of template files there.  Any files in C<~/.scriptdist/t>
+will show up as is in the script's t directory (until I code the parts
+to munge those files).  The script assumes you have specified your
+home directory in the environment variable HOME.
+
+You can turn on optional progress and debugging messages by setting
+the environment variable SCRIPTDIST_DEBUG to a true value.
+
+=head2 The process
+
+=over 4
+
+=item Check for release information
+
+The first time the scriptdist is run, or any time the scriptdist cannot
+find the file C<.scriptdistrc>, it prompts for CPAN and SourceForge
+developer information that it can add to the .releaserc file. (NOT
+YET IMPLEMENTED)
+
+=item Create a directory named after the script
+
+The distribution directory is named after the script name,
+with a <.d> attached.  The suffix is there only to avoid a
+name conflict. You can rename it after the script is moved
+into the directory.  If the directory already exists, the
+script stops. You can either move or delete the directory
+and start again.
+
+=item Look for template files
+
+The program looks in C<.scriptdistrc> for files to copy into
+the target script distribution directory. After that, it
+adds more files unless they already exist (i.e. the script
+found them in the template directory).  The script replaces
+strings matching C<%%SCRIPTDIST_FOO%%> with the internal
+value of FOO.  The defined values are currently SCRIPT, which
+substitutes the script name, and VERSION, whose value is
+currently hard-coded at '0.10'.
+
+While looking for files, scriptdist skips directories named
+F<CVS>, F<.git>, and F<.svn>.
+
+=item Add Changes
+
+A bare bones Changes file
+
+=item Create the Makefile.PL
+
+=item Create the t directory
+
+=item Add compile.t, pod.t, prereq.t
+
+=item Create test_manifest
+
+=item Copy the script into the directory
+
+=item Run make manifest
+
+=item Create git repo
+
+Unless you set the C<SCRIPTDIST_SKIP_GIT>, C<scriptdist> creates
+a git repo, adds everything, and does an initial import.
+
+=back
+
+=head2 Creating the Makefile.PL
+
+A few things have to show up in the Makefile.PL---the name of
+the script and the prerequisites modules are the most important.
+Luckily, scriptdist can discover these things and fill them in
+automatically.
+
+=head1 TO DO
+
+* add support for Module::Build (command line switch)
+
+* Create Meta.yml file
+
+* Copy modules into lib directory (to create module dist)
+
+* Command line switches to turn things on and off
+
+=head2 Maybe a good idea, maybe not
+
+* Add a cover.t and pod coverage test?
+
+* Interactive mode?
+
+* automatically import into Git?
+
+=head1 SOURCE AVAILABILITY
+
+This source is part of a Github project.
+
+	https://github.com/briandfoy/scriptdist
+
+=head1 CREDITS
+
+Thanks to Soren Andersen for putting this script through its paces
+and suggesting many changes to actually make it work.
+
+=head1 AUTHOR
+
+brian d foy, C<< <bdfoy@cpan.org> >>
+
+=head1 COPYRIGHT
+
+Copyright © 2004-2017, brian d foy <bdfoy@cpan.org>. All rights reserved.
+
+This code is available under the Artistic License 2.0.
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+my %Defaults = (
+	version              => '0.10',   # version for the copied script, not this one
+	minimum_perl_version => 5,
+	modules              => [],
+	name                 => $FindBin::Script,
+	home                 => ( $ENV{HOME} // '' ),
+	quiet                => defined $ENV{SCRIPTDIST_DEBUG} ? !$ENV{SCRIPTDIST_DEBUG} : 0,
+	path                 => $ARGV[0],
+	dir_sep              => do {
+       if(    $^O =~ m/MSWin32/ ) { '\\' }
+       elsif( $^O =~ m/Mac/  )    { ":"  }
+       else                       { '/'  }
+       },
+	);
+
+$Defaults{script}    = basename( $Defaults{path} );
+$Defaults{directory} = "$Defaults{script}.d";
+$Defaults{rc_dir}    = catfile( $Defaults{home}, "." . $Defaults{name} );
+
+my $show_message = sub {
+	return if $Defaults{quiet};
+	print STDERR $_[0];
+	};
+
+$show_message->( "Processing $Defaults{script}...\n" );
+$show_message->( "Quiet is $Defaults{quiet}\n" );
+$show_message->( "Home directory is $Defaults{home}\n" );
+
+my $Config_file  = catfile(
+	$Defaults{home}, "." . $Defaults{name} . "rc" );
+
+warn <<"HERE" unless $Defaults{home} ne '';
+The environment variable HOME has no value, so I will look in
+the current directory for $Defaults{rc_dir} and $Config_file. Set
+the HOME environment variable to choose another directory.
+HERE
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Extract included modules
+{
+my $class = 'Module::Extract::Use';
+if( eval "use $class; 1" ) {
+	my $extor   = $class->new;
+	my $modules = $extor->get_modules_with_details( $Defaults{path} );
+
+	$show_message->( "\tFound modules\n\t\t", join "\n\t\t",
+		map { $_->module . " => " . ( $_->version // '0' ) } @$modules
+		);
+
+	$Defaults{modules} = $modules;
+	}
+else {
+	$show_message->( "Install $class to detect prerequisites\n" );
+	}
+}
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Extract declared Perl version
+{
+my $class = 'Module::Extract::DeclaredMinimumPerl';
+if( eval "use $class; 1" ) {
+	my $extor   = $class->new;
+	my $version = $extor->get_minimum_declared_perl( $Defaults{path} );
+
+	$show_message->( "\tFound minimum version $version\n" );
+
+	$Defaults{minimum_perl_version} = $version;
+	}
+else {
+	$show_message->( "Install $class to detect minimum versions\n" );
+	}
+}
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Make directories
+die <<"HERE" if -d $Defaults{directory};
+Directory $Defaults{directory} already exists! Either delete it or
+move it out of the way, then rerun this program.
+HERE
+
+foreach my $dir (
+		map { $_, catfile( $_, "t" ) } $Defaults{directory} ) {
+	$show_message->( "Making directory $dir...\n" );
+	mkdir $dir, 0755 or die "Could not make [$dir]: $!\n";
+	}
+
+# Copy local template files
+$show_message->( "RC directory is $Defaults{rc_dir}\n" );
+$show_message->( "cwd is ", getcwd, "\n" );
+
+if( -d $Defaults{rc_dir} ) {
+	$show_message->( "Looking for local templates...\n" );
+	foreach my $input ( find_files( $Defaults{rc_dir} ) ) {
+		$show_message->( "rc_dir is $Defaults{rc_dir}\n" );
+		$show_message->( "dir_sep is $Defaults{dir_sep}\n" );
+		$show_message->( "Input is $input\n" );
+		my( $path ) = $input =~ m/\Q$Defaults{rc_dir}$Defaults{dir_sep}\E(.*)/g;
+		$show_message->( "Path is $path\n" );
+
+		my @path = File::Spec->splitdir( $path );
+		my $file = pop @path;
+		$show_message->( "File is $file\n" );
+
+		if( @path ) {
+			local @ARGV = catfile( $Defaults{directory}, @path );
+			ExtUtils::Command::mkpath unless -d $ARGV[0];
+			}
+
+		my $output = catfile( $Defaults{directory}, $path );
+		$show_message->( "Output is $file\n" );
+		copy( $input, $output, \%Defaults );
+		}
+	}
+
+
+FILE: foreach my $filename ( sort keys %{ content( \%Defaults ) } ) {
+	my @path = split m|\Q$Defaults{dir_sep}|, $filename;
+
+	my $file = catfile( $Defaults{directory}, @path );
+
+	$show_message->( "Checking for file [$filename]... " );
+	if( -e $file ) { $show_message->( "already exists\n" ); next FILE }
+
+	$show_message->( "Adding file [$filename]...\n" );
+	open my($fh), '>:utf8', $file or do {
+		warn "Could not write to [$file]: $!\n";
+		next FILE;
+		};
+
+	no warnings 'uninitialized';
+	print $fh $Content{$filename};
+	}
+
+# Add the script itself
+{
+$show_message->( "Adding [$Defaults{script}]...\n" );
+my $dist_script = catfile( $Defaults{directory}, $Defaults{script} );
+
+if( -e $Defaults{path} ) {
+	$show_message->( "Copying script...\n" );
+	copy( $Defaults{path}, $dist_script );
+	}
+else {
+	$show_message->( "Using script template...\n" );
+	open my $fh, '>:utf8', $dist_script;
+	print { $fh } script_template( $Defaults{script} );
+	}
+}
+
+# Create the MANIFEST file
+$show_message->( "Creating MANIFEST...\n" );
+chdir $Defaults{directory} or die "Could not change to $Defaults{directory}: $!\n";
+$ExtUtils::Manifest::Verbose = 0;
+ExtUtils::Manifest::mkmanifest;
+
+gitify();

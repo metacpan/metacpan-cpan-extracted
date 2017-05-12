@@ -1,0 +1,73 @@
+{
+   "abstract" : "rename functions and variables in a PPI::Document using Acme::MetaSyntactic",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::7 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-PPIx-MetaSyntactic",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::MetaSyntactic" : "1.000",
+            "Acme::MetaSyntactic::haddock" : "0",
+            "Moo" : "1.002000",
+            "PPI" : "1.215",
+            "Perl::Critic::Utils" : "1.118",
+            "Type::Utils" : "0.001",
+            "Types::Standard" : "0.001",
+            "namespace::sweep" : "0.006"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::PPIx::MetaSyntactic" : {
+         "file" : "lib/Acme/PPIx/MetaSyntactic.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Acme-PPIx-MetaSyntactic"
+      },
+      "homepage" : "https://metacpan.org/release/Acme-PPIx-MetaSyntactic",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "hg",
+         "web" : "https://bitbucket.org/tobyink/p5-acme-ppix-metasyntactic"
+      }
+   },
+   "version" : "0.003",
+   "x_provides_scripts" : {
+      "perl-metasyntactic" : {
+         "file" : "bin/perl-metasyntactic"
+      }
+   }
+}

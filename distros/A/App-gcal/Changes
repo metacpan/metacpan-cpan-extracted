@@ -1,0 +1,23 @@
+1.121460  2012-05-25 21:33:38 Europe/London
+    Don't need to show the full path to gcal in usage info.
+
+1.121310  2012-05-10 19:42:27 Europe/London
+    Use ICal::Format::Natural to parse text.
+    Ensure we are creating the events in the local timezone.
+    Add note about Google's two factor authentication.
+
+1.120860  2012-03-26 13:33:44 Europe/London
+    Doc updates. No code changes.
+
+1.120850  2012-03-25 19:54:23 Europe/London
+    Allow user to pass in a username and password as arguments to gcal.
+
+1.120110  2012-01-11 12:43:55 Europe/London
+    Support wildcards on Windows.
+    Better error message if we can't find credentials.
+
+1.113460  2011-12-12 13:49:09 Europe/London
+    Don't die if event does not have a description or location.
+
+1.113220  2011-11-18 08:08:10 Europe/Zurich
+    Initial version.

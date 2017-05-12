@@ -1,0 +1,39 @@
+NAME
+
+    App::redis_traffic_stats - Redis query analyzer for counting, traffic
+    stats by command
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+DESCRIPTION
+
+    See redis-traffic-stats.
+
+AUTHOR
+
+    HIROSE Masaaki <hirose31@gmail.com>
+
+REPOSITORY
+
+    https://github.com/hirose31/redis-traffic-stats
+
+        git clone https://github.com/hirose31/redis-traffic-stats.git
+
+    patches and collaborators are welcome.
+
+COPYRIGHT
+
+    Copyright HIROSE Masaaki
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

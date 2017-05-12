@@ -1,0 +1,87 @@
+#!perl
+use warnings;
+use strict;
+
+use File::Basename qw/basename/;
+use Getopt::Long;
+
+use App::gcal;
+$main::VERSION = $App::gcal::VERSION || 0;
+
+# PODNAME:  gcal
+# ABSTRACT: Command Line Interface to Google Calendar.
+
+my $scriptname = basename($0);
+my $help_message =
+  "Usage: $scriptname [events.ical, 'tomorrow at noon. Lunch with Bob', ...]\n";
+my $version_message = "$scriptname version $main::VERSION\n";
+
+# init Getopt::Long
+my $username;
+my $password;
+my $version;
+my $help;
+GetOptions(
+    'username=s' => \$username,
+    'password=s' => \$password,
+    'help'       => \$help,
+    'version'    => \$version,
+);
+
+if ($help) {
+    print $help_message;
+
+    exit 0;
+}
+if ($version) {
+    print $version_message;
+
+    exit 0;
+}
+
+# support wildcards on Windows
+my @args = ( $^O eq 'MSWin32' ) ? map { glob } @ARGV : @ARGV;
+
+# need at least one argument
+unless (@args) {
+    print $version_message;
+    print "\n";
+    print $help_message;
+
+    exit 0;
+}
+
+# run
+App::gcal::run( \@args, $username, $password );
+
+
+__END__
+=pod
+
+=head1 NAME
+
+gcal - Command Line Interface to Google Calendar.
+
+=head1 VERSION
+
+version 1.121460
+
+=head1 OVERVIEW
+
+For usage, run C<gcal --help>.
+
+See L<App::gcal> for more information.
+
+=head1 AUTHOR
+
+Andrew Jones <andrew@arjones.co.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Andrew Jones.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

@@ -1,0 +1,10 @@
+requires 'perl', '5.008001';
+requires 'Moo', ' 2.000001';
+requires 'MooX::Types::MooseLike::Base', '0.28';
+requires 'namespace::clean', '0.25';
+requires 'Carp', '0.36';
+
+on 'test' => sub {
+    requires 'Test::More', '0.98';
+};
+

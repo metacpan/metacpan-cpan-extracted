@@ -1,0 +1,123 @@
+
+This is the README file for the Perl extension module bundle AFS (Version v2.6.4)
+
+
+DESCRIPTION
+    The AFS module bundle is a dynamically loadable extension to Perl.
+    It gives the AFS user and AFS administrator access to many of the
+    AFS programming APIs, allowing them to make these calls directly from
+    Perl, rather than processing the output of a command.
+
+
+WHAT'S NEW?
+    Version v2.6.4 is just a bug fixing release.
+    For more details, please see the file named 'CHANGES' which should
+    have been included in the AFS module distribution.
+
+
+RESTRICTIONS
+    This release
+        * does not support Transarc/IBM AFS system libraries version
+          3.4 or version 3.5 !!!
+        * does not support features and styles from Perl AFS module
+          "major version 1"
+
+
+DEPRECATION
+    The module AFS::KAS is deprecated and will be removed in version v2.8.0
+
+
+INSTALLATION
+    If you want to install the AFS module bundle on a 32-bit platform
+    read the 'INSTALL' file. For installation on a 64-bit platform read
+    the 'INSTALL_64' file.
+
+
+DOCUMENTATION
+    The POD documentation is automatically installed to the system wide
+    Perl documentation.  It is readable with the 'perldoc' utility.
+
+    For information about HTML documentation, please check the file
+    'pod/v2/README'.
+
+
+EXAMPLES
+    The 'examples' directory contains some simple examples how to use
+    the AFS modules.  However I do not guarantee these scripts to
+    work.
+
+
+COMPATIBILITY
+    This release does NOT support any features and interfaces from Perl
+    AFS modules major version 1.
+
+
+CAVEATS
+    A few methods from the AFS command suite BOS are not yet
+    released.  For details, please see 'AFS::BOS.pod'.
+
+
+BUGS
+    Development questions, bug reports, and patches should be sent to
+    Norbert E Gruener <nog@MPA-Garching.MPG.de>.
+
+    Bug reports are also welcome at
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=AFS>.
+
+    When reporting bugs/problems please include information about
+    operating system version, perl version, AFS version, AFS module
+    version. Comments and suggestions are always welcome.
+
+
+CURRENT AUTHOR
+    Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+
+
+AUTHOR EMERITUS
+    Roland Schemers <schemers@stanford.edu>
+
+
+CREDITS
+    See 'AFS.pod' for details.
+
+
+COPYRIGHT AND DISCLAIMER
+    © 2001-2014 Norbert E. Gruener <nog@MPA-Garching.MPG.de>.
+    All rights reserved.
+
+    © 1994 Board of Trustees, Leland Stanford Jr. University.
+    All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.
+
+    You should have received a copy of the Perl license along with
+    Perl; see the file 'README' in Perl distribution.
+
+    You should have received a copy of the GNU General Public License
+    along with Perl; see the file 'COPYING'.  If not, write to the Free
+    Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+    02111-1307, USA.
+
+    You should have received a copy of the Artistic License
+    along with Perl; see the file 'Artistic'.
+
+    The original module is covered by the following copyright:
+       Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University
+
+       Redistribution and use in source and binary forms are permitted
+       provided that the above copyright notice and this paragraph are
+       duplicated in all such forms and that any documentation,
+       advertising materials, and other materials related to such
+       distribution and use acknowledge that the software was developed
+       by Stanford University.  The name of the University may not be
+       used to endorse or promote products derived from this software
+       without specific prior written permission.  THIS SOFTWARE IS
+       PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES,
+       INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+       MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Share and Enjoy!
+
+Norbert

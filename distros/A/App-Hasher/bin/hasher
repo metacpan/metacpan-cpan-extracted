@@ -1,0 +1,150 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings FATAL => 'all';
+use feature 'say';
+use utf8;
+use open qw(:std :utf8);
+
+# PODNAME: hasher
+
+
+use Carp;
+use Digest::SHA1;
+use File::Basename qw(fileparse);
+use Term::ANSIColor qw(colored);
+
+sub _get_hash_from_file_name {
+    my ($file_name) = @_;
+
+    my $result = open my $fh, '<', $file_name;
+
+    if (not $result) {
+        say "Error. Can't open file '$file_name' - $!.";
+        exit 1;
+    }
+
+    # $sha1->b64digest
+    #
+    # Same as $sha1->digest, but will return the digest as a base64 encoded
+    # string. The length of the returned string will be 27 and it will only
+    # contain characters from this set: 'A'..'Z', 'a'..'z', '0'..'9', '+' and
+    # '/'.
+    my $digest = Digest::SHA1->new->addfile($fh)->b64digest;
+
+    # I don't want to have '+' and '/' in the file name (I'm afraid of some
+    # problems, when such symbols are in the url).
+    $digest =~ s{\+}{-}g;
+    $digest =~ s{/}{_}g;
+
+    close $fh;
+
+    return $digest;
+}
+
+sub _get_file_extension {
+    my ($file_name) = @_;
+
+    my $extension;
+
+    $file_name =~ m{
+        (?:.*/)?
+        .*
+        (\.[^./]*)
+        \z
+    }x;
+
+    if (defined $1) {
+        $extension = $1;
+        $extension = lc($extension);
+    } else {
+        $extension = "";
+    }
+
+    return $extension;
+}
+
+# main
+sub main {
+
+    if (not defined $ARGV[0]) {
+        say "Error. Expecting at least one filename as the parameters to the script.";
+        exit 1;
+    };
+
+    foreach my $argument (@ARGV) {
+
+        next if -d $argument;
+
+        my $hash = _get_hash_from_file_name($argument);
+        my $extension = _get_file_extension($argument);
+
+        my ($original_file_name, $dir) = fileparse $argument;
+        my $new_file_name = $hash . $extension;
+
+        say sprintf
+            "%s{ %s -> %s }",
+            $dir,
+            colored($original_file_name, 'red'),
+            colored($new_file_name, 'green'),
+            ;
+
+        my $result = rename(
+            $dir . $original_file_name,
+            $dir . $new_file_name
+        );
+
+        if (not $result) {
+            say "Error. Can't rename file '$dir$original_file_name' to '$dir$new_file_name' - $!.";
+            exit 1;
+        }
+
+    }
+
+}
+main() if not caller;
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+hasher
+
+=head1 VERSION
+
+version 1.0.2
+
+=head1 SYNOPSIS
+
+hasher file_name1 [file_name2...]
+
+Script renames every specified file. New file name is the hash of file
+content plus lower cased extension.
+
+    $ hasher a 123/*
+    ./{ a -> 2jmj7l5rSw0yVb_vlWAYkK_YBwk }
+    123/{ file.TXT -> q4PtNF0fwY8TtGr4WDWoLCSdRdU.txt }
+    123/{ photo.JPG -> H2U3hP1EbpKnjO1GuYiHSfOmGvU.jpg }
+
+=head1 SOURCE CODE
+
+The source code for this module is hosted on GitHub
+L<https://github.com/bessarabov/App-Hasher>
+
+=head1 AUTHOR
+
+Ivan Bessarabov <ivan@bessarabov.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Ivan Bessarabov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

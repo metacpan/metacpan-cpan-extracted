@@ -1,0 +1,96 @@
+{
+   "abstract" : "Configuration, Error-handling, Localization, and Logging",
+   "author" : [
+      "Smithfarm <presnypreklad@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-CELL",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::ShareDir::Install" : "0.11",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Log::Any::Test" : "0",
+            "Params::Validate" : "0",
+            "Test::Warnings" : "0",
+            "Try::Tiny" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Software::License" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Format" : "0",
+            "File::HomeDir" : "0",
+            "File::Next" : "0",
+            "File::ShareDir" : "1",
+            "Log::Any" : "0",
+            "Log::Any::Adapter" : "0.1",
+            "Params::Validate" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "provides" : {
+      "App::CELL" : {
+         "file" : "lib/App/CELL.pm",
+         "version" : "0.222"
+      },
+      "App::CELL::Config" : {
+         "file" : "lib/App/CELL/Config.pm"
+      },
+      "App::CELL::Guide" : {
+         "file" : "lib/App/CELL/Guide.pm",
+         "version" : "0.222"
+      },
+      "App::CELL::Load" : {
+         "file" : "lib/App/CELL/Load.pm"
+      },
+      "App::CELL::Log" : {
+         "file" : "lib/App/CELL/Log.pm"
+      },
+      "App::CELL::Message" : {
+         "file" : "lib/App/CELL/Message.pm"
+      },
+      "App::CELL::Status" : {
+         "file" : "lib/App/CELL/Status.pm"
+      },
+      "App::CELL::Test" : {
+         "file" : "lib/App/CELL/Test.pm"
+      },
+      "App::CELL::Test::LogToFile" : {
+         "file" : "lib/App/CELL/Test/LogToFile.pm"
+      },
+      "App::CELL::Util" : {
+         "file" : "lib/App/CELL/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/smithfarm/cell/issues"
+      },
+      "license" : [
+         "http://opensource.org/licenses/bsd-license.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/smithfarm/cell"
+      }
+   },
+   "version" : "0.222",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

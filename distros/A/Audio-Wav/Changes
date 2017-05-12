@@ -1,0 +1,109 @@
+Revision history for Perl extension Audio::Wav.
+
+0.14  Sun Apr 27 00:50:07 EDT 2014
+  - bugfix for https://rt.cpan.org/Public/Bug/Display.html?id=94951,
+    thanks to Haruka Kataoka
+
+0.13  Fri Mar 30 21:17:18 GMT 2012
+  - read: don't call close() at DESTROY time when the file handle
+    creationfailed during new() (Murali Ramanathan)
+      https://rt.cpan.org/Ticket/Display.html?id=71462
+  - apply patch to allow read/write of files from handle (Dan Church)
+      https://rt.cpan.org/Ticket/Display.html?id=71715
+  - fix problem with $^X under mod_perl (thanks, mario and david!)
+      https://rt.cpan.org/Ticket/Display.html?id=62060
+  - fix bug in perldoc (Sergei Steshenko)
+      https://rt.cpan.org/Ticket/Display.html?id=57114
+  - fix problem with writing 24,32 bps files reported by Sergei Steshenko:
+      http://rt.cpan.org/Public/Bug/Display.html?id=57093
+  - spelling fixes from debian
+      http://rt.cpan.org/Public/Bug/Display.html?id=69644
+
+0.12  Sun May 30 08:45:03 GMT 2010
+  - don't use values > MAXINT. +2147483648 is not a valid unsigned
+    int32 (it's MAXINT+1). while we're at it, put all constants in
+    the XS in hex format for clarity. possibly fixes:
+      http://www.cpantesters.org/cpan/report/6945385
+  - fall back to pureperl when Inline::C is installed but not functional
+    as reported by Michel Lanne.
+
+0.11  Fri Mar 12 04:12:44 GMT 2010
+  - fix two bugs triggered with inline on win32 - one related to assuming 
+    C99 support and one related to lack of stdint.h or equivalent. tested
+    with strawberry perl, should work with msvc too. bug report here:
+      http://www.cpantesters.org/cpan/report/6920668
+    same smoker reports tests with 0.11 here:
+      http://www.cpantesters.org/cpan/report/6930825 
+
+0.10  Sun Feb 14 04:09:00 GMT 2010
+  - add COPYRIGHT information for debian folks
+  - include xt/
+
+0.09  Thu Feb 11 14:58:37 GMT 2010
+  - Support 24 and 32 bit wav reading w/o Inline::C (from Wolfram humann)
+    ( see https://rt.cpan.org/Public/Bug/Display.html?id=36452 )
+  - add a META.yml and some other easy kwalitee tweaks
+  - Audio::Wav::Read::_has_inline moved to Audio::Wav::_has_inline so
+    it can be queried before instantiating a reader (and later be used
+    internally for Audio::Wav::Write)
+
+0.08  Tue Feb 09 06:29:43 GMT 2010
+  - fix regression: read() returned bogus samples when Inline::C not available
+
+0.07  Sun Feb 07 18:05:41 GMT 2010
+  - change API so you can call Audio::Wav->{read|write} w/o new() if preferred
+  - increase pure perl read speed by a factor of ~2.4
+    * remove unnecessary bounds check
+    * put block in closure, avoiding double hash lookup
+    * put $block assign in _init_read_sub, put read_sub in closure, too
+    * pull $handle into closure:
+    * get rid of closure, and get rid of read() - inline it with $read_sub
+  - use Inline::C (if available) to increase read speed by a factor of ~2.3
+  - experimental support for reading 24- and 32- bit data (suspected to
+    work on little endian machines that use Inline::C)
+
+0.06  Wed Mar 22 12:00:00 2006
+  - Fixed a circular reference in Audio::Wav::Write::Header that was causing
+    memory to leak (thanks Sumitro Chowdhury).
+  - Tidied up bits and pieces.
+  - Added very basic support for WAVEFORMATEXTENSIBLE.
+  - When writing files, finish() will now be called by DESTROY if necessary.
+
+0.05  Tue Oct 25 12:20:00 2005
+  - Audio::Wav::Read::position_samples should have divided by block_align
+    rather than multiplied (thanks David Brandt).
+  - Fixed bug where unknown blocks weren't skipped (thanks Robert Hiller).
+
+0.04  Thu Dec 30 07:47:00 2004
+  - fixed a bug in Audio::Wav::Read::move_to, now adds where the data
+    actually starts to the position given.
+  - Audio::Wav::Read::move_to now rereads data length to see if file has
+    grown since this was last read.
+  - added method Audio::Wav::Read::reread_length, rereads the length of
+    the file in case it is being written to as we are reading it.
+  - added method Audio::Wav::Read::read_raw_samples which will read X
+    samples in raw format.
+  - added method Audio::Wav::Read::position_samples which returns the
+    current audio data position in samples.
+  - in method Audio::Wav::Write::add_cue, if sample position supplied
+    is undefined, then the position will be the current position (end
+    of all data written so far).
+  - in method Audio::Wav::Write, moved the option of not caching data
+    from the write_raw method to new.
+
+0.03  Fri Jun 11 13:29:00 2004
+  - minor bug fix to pass tests with Perl 5.8.3 (thanks to Jeremy Devenport).
+
+0.02  Sat Sep 01 15:15:00 2001
+  - works on big endian machines!
+  - no need for Audio::Tools anymore
+  - added support for info & sampler blocks.
+  - now honours padding bytes
+  - read & read_raw no longer return non-audio data.
+  - added error handler.
+  - slight speed improvement for read & write methods
+  - some other fixes.
+
+0.01  Fri Dec 11 05:54:22 1998
+  - original version; created by h2xs 1.18
+

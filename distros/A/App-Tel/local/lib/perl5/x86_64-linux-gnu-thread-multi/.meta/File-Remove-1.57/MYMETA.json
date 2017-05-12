@@ -1,0 +1,65 @@
+{
+   "abstract" : "Remove files and directories",
+   "author" : [
+      "Shlomi Fish <shlomif@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.046, CPAN::Meta::Converter version 2.150001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Remove",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "3.29",
+            "File::Glob" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "3.29",
+            "constant" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Copy" : "0",
+            "File::Spec" : "3.29",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Remove"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/shlomif/File-Remove.git"
+      }
+   },
+   "version" : "1.57",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

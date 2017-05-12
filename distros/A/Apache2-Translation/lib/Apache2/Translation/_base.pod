@@ -1,0 +1,250 @@
+=head1 NAME
+
+Apache2::Translation::_base - The Apache2::Translation provider interface
+
+=head1 DESCRIPTION
+
+A translation provider must implement the following interface. It is free to
+support more functions.
+
+=head2 B<Methods>
+
+=over 4
+
+=item B<new( NAME=E<gt>VALUE, ... )>
+
+the constructor. It is called once from the master Apache during its
+configuration.
+
+=item B<child_init>
+
+This method is optional. If defined it is called from a
+C<PerlChildInitHandler> and can be used to do some initializations.
+The C<DB> provider connects here to the database and decides to use
+a singleton or not.
+
+=item B<start>
+
+This method is called at start of each uri translation. The DB provider
+checks the cache here.
+
+=item B<stop>
+
+is called after each uri translation.
+
+=item B<fetch( $key, $uri, $with_notes )>
+
+is called to fetch a list of blocks. The result is a list of arrays:
+
+ ([block, order, action],
+  [block, order, action],
+  ...)
+
+If the adminstration WEB interface is to be used C<fetch> must return a
+list of:
+
+ ([block, order, action, id],
+  [block, order, action, id],
+  ...)
+
+where C<id> is a unique key.
+
+If the C<$with_notes> parameter is true C<fetch> is called from the
+admin interface and wants to fetch also notes. In this case the return
+value is a list like this:
+
+ ([block, order, action, id, note],
+  [block, order, action, id, note],
+  ...)
+
+Notes are comments on actions for the user of the admin interface. They are
+not evaluated otherwize.
+
+=back
+
+The following interface is optional. It has to be implemented if the provider
+is to be used also with the administration WEB interface.
+
+=over 4
+
+=item B<can_notes>
+
+returns true if a provider supports notes in its current configuration.
+
+=item B<list_keys>
+
+returns a sorted list of known keys.
+
+=item B<list_keys_and_uris( $key )>
+
+C<$key> is a string.
+
+The function returns a sorted list of C<[KEY, URI]> pairs. If C<$key> is empty
+all pairs are returned. Otherwise only pairs where C<$key eq KEY> are
+returned.
+
+=item B<begin>
+
+=item B<commit>
+
+=item B<rollback>
+
+A change conducted via the WEB interface is a sequence of C<update>, C<insert>
+or C<delete> operations. Before it is started C<begin> is called. If there
+has no error occured C<commit> is called otherwise C<rollback>. C<commit> must
+save the changes to the storage. C<rollback> must cancel all changes.
+
+=item B<update( [@old], [@new] )>
+
+=item B<insert( [@new] )>
+
+=item B<delete( [@old] )>
+
+All these functions return something >0 on success. C<@old> is a list of
+C<KEY, URI, BLOCK, ORDER, ID> that specifies an existing action. If there
+is no such action the functions must return C<0>. C<@new> is a list of
+C<KEY, URI, BLOCK, ORDER, ACTION> that is to be inserted or has to replace
+an existing action.
+
+=back
+
+The following interface is optional.
+
+=over 4
+
+=item B<clear>
+
+deletes all entries from the provider. Is to be called within a C<begin> -
+C<commit> wrapper. Returns boolean.
+
+=item B<iterator>
+
+returns a function reference that can be used the following way to step
+all entries currently hold by the provider. Lists of blocks are traversed
+in ascending alphabetical order with C<KEY> as the major ordering element and
+C<URI> the minor. Within a block list elements are traversed in ascending
+numerical order with C<BLOCK> as the major ordering element and C<ORDER> the
+minor.
+
+ my $iterator=$other->iterator;
+ while( my $el=$iterator->() ) {
+   # $el is an array ref as expected by insert().
+ }
+
+=back
+
+The following interface is implemented by C<Apache2::Translation::_base>
+itself and can be used.
+
+=over 4
+
+=item B<append( $other_provider, %options )>
+
+Expects a provider object that implements the C<iterator> function. C<append>
+then C<insert()>s all elements of C<$other_provider>.
+
+If C<drop_notes> is passed as a true value in C<%options> then notes are not
+copied.
+
+=item B<diff( $other_provider, %options )>
+
+If L<Algorithm::Diff> and L<JSON::XS> are installed this method computes
+a difference between 2 providers. If C<key> or C<uri> are given in
+C<%options> they act as filters.
+The difference is calculated only for elements that pass that filter.
+The value of C<key> or C<uri> can either be a string in which case the
+matching operation is a simple C<eq> or a C<Regexp> object (C<qr/.../>).
+
+If C<notes> is specified in C<%options> as a false value differences
+in notes only are disregarded.
+
+If C<numbers> is specified in C<%options> as a false value differences
+in C<BLOCK> and C<ORDER> numbers only are disregarded.
+
+For more information about the output format see C<diff()> in
+L<Algorithm::Diff>.
+
+=item B<sdiff( $other_provider, %options )>
+
+Does the same as the C<diff> method but differs in the output format.
+
+For more information see C<sdiff()> in L<Algorithm::Diff>.
+
+=item B<dump( $format, $filehandle )>
+
+Requires the C<iterator> function to be implemented and dumps all elements
+formatted according to C<$format> to C<$filehandle>.
+
+Both parameters are optional. Standard C<$filehandle> is C<STDOUT>, standard
+format is:
+
+ ######################################################################
+ %{KEY} & %{URI} %{BLOCK}/%{ORDER}/%{ID}
+ %{paction> ;ACTION}
+ %{pnote> ;NOTE}
+
+C<$format> is an arbitrary string that contains substrings of the form
+
+  %{flags NAME}
+
+where C<NAME> is on of C<KEY>, C<URI>, C<BLOCK>, C<ORDER>, C<ACTION>,
+C<NOTE> or C<ID>. These substrings are then replaced by the values for
+KEY, etc.
+
+C<flags> is optional. It is a semicolon separated list of strings. If given
+it must also be separated from C<NAME> by a semicolon.
+
+Currently 2 flags are known:
+
+=over 4
+
+=item * p string
+
+Trailing spaces are cut from the current value. Then all occurences of
+C<\r?\n> are replaced by C<\nstring>. Also, C<string> is inserted at
+start if the current value.
+
+Example:
+
+Suppose an ACTION holds a multilined value:
+
+ PerlHandler: sub {
+   my $r=shift;
+   $r->content_type( 'text/plain' );
+   $r->print( "OK\n" );
+   return 0;
+ }
+
+Then %{paction> ;ACTION} will be formatted as:
+
+ action> PerlHandler: sub {
+ action>   my $r=shift;
+ action>   $r->content_type( 'text/plain' );
+ action>   $r->print( "OK\n" );
+ action>   return 0;
+ action> }
+
+=item * s l|t
+
+C<sl> strips off leading spaces and C<st> trailing spaces.
+
+=back
+
+=back
+
+=head1 AUTHOR
+
+Torsten Foertsch, E<lt>torsten.foertsch@gmx.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2008 by Torsten Foertsch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+# Local Variables:
+# mode: perl
+# End:

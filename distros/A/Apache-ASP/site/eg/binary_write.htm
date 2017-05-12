@@ -1,0 +1,38 @@
+#!/usr/bin/perl /usr/bin/asp-perl
+
+<%
+use File::Basename;
+
+if($Request->QueryString('type') eq 'gif') {
+    $Response->{ContentType} = 'image/gif';
+    open(FILE, 'test.gif') || die "can't open test.gif";
+    binmode FILE;
+    $/ = undef;
+    my $data = <FILE>;
+    $Response->Clear;
+    $Response->AddHeader('Content-Length', length $data);
+    $Response->BinaryWrite($data);
+    $Response->End;
+} else {
+%>
+
+<!--#include file=header.inc-->
+
+ We are going to load a gif through this
+ same script as an example of doing a $Response->BinaryWrite()...
+
+ <p>
+ 
+ <img src="<%=basename($0)%>?type=gif">
+
+ <p>
+
+ Please note that if you are on Win32, you will need to 
+ call binmode on a file handle before reading, if 
+ its data is binary.
+
+<!--#include file=footer.inc-->
+
+<% } %>
+
+

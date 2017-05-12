@@ -1,0 +1,7 @@
+#!/usr/local/bin/perl -w
+use strict;
+
+     # Program:
+use App::Daemon qw( daemonize );
+daemonize();
+sleep(100);

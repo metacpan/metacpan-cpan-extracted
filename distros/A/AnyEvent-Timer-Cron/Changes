@@ -1,0 +1,14 @@
+Revision history for AnyEvent-Timer-Cron
+
+0.002000 - 2015-07-09
+  - calculate cron syntax under the specified time zone
+
+0.001002 - 2015-06-28
+  - correct links in metadata
+  - add x_static_install to metadata
+
+0.001001 - 2015-04-16
+  - correct perl prerequisite
+
+0.001000 - 2013-02-11
+  - initial release

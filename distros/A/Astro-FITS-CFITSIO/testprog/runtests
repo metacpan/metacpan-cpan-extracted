@@ -1,0 +1,64 @@
+#!/bin/sh
+
+usage() {
+
+	cat 2>&1 <<EOP
+Usage: $0 cfitsio_dir
+
+    cfitsio_dir - location of cfitsio distribution
+
+    This small script runs each of the testprog*.pl scripts, validating
+    their outputs against the output of the testprog.c program which
+    comes with cfitsio. It should be called with the location of the
+    normal cfitsio (not Astro::FITS::CFITSIO) distribution
+
+EOP
+
+	exit 1
+}
+
+[ $# -eq 1 ] || usage
+cfitsio=$1
+
+if [ ! -f $cfitsio/testprog.out ]
+then
+	echo 1>&2 $0: cannot find file $cfitsio/testprog.out
+	usage
+elif [ ! -f $cfitsio/testprog.std ]; then
+	echo 1>&2 $0: cannot find file $cfitsio/testprog.std
+	usage
+fi
+
+
+for f in testprog*pl ;
+do
+	echo perl $f \> testprog.lis
+	perl $f > testprog.lis
+	if [ $? -ne 0 ];
+	then
+		echo 1>&2 \*\*\* failed running $f
+		exit
+	fi
+
+	echo diff -u testprog.lis $cfitsio/testprog.out
+	diff -u testprog.lis $cfitsio/testprog.out
+	if [ $? -ne 0 ];
+	then
+		echo 1>&2 \*\*\* failed diffing testprog.lis and $cfitsio/testprog.out
+		exit
+	fi
+
+	echo cmp testprog.fit $cfitsio/testprog.std
+	cmp testprog.fit $cfitsio/testprog.std
+	if [ $? -ne 0 ];
+	then
+		echo 1>&2 \*\*\* failed cmping testprog.fit and $cfitsio/testprog.std
+		exit
+	fi
+
+	echo
+done
+
+echo
+echo All tests succeeded
+echo

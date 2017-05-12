@@ -1,0 +1,36 @@
+Revision history for App-devmode
+
+0.0.8   2014-09-14
+        Fixed test to use correct perl version (Ivan Wills)
+
+0.0.7   2014-09-14
+        Changed to using old YAML as YAML::Syck seems to not work in newer perl versions (Ivan Wills)
+
+0.0.6   2014-08-30
+        Updated boilerplate test (Ivan Wills)
+        Moved loading Term::Title to only when needed (Ivan Wills)
+
+0.0.5   2014-08-27
+        Updated to latest year
+        Got test working fully
+        Synced release version numbers
+        Fixed spelling and kwalitee issues
+        Changed boilerplate to test README or README.pod
+        Added files to be skipped
+        Added documentation about config files
+        Fixed test to actually work
+        Changed mode config files to being YAML config files (stil supporting the Perl one but converting on load)
+        Cleaned up test
+        Fixed abstracts to match spec per http://neilb.org/2014/02/19/compliant-abstract.html
+        Adding tag files
+        Added testing of script
+        Reorganised so that a local config can modify the ssh params for a remote config (eg add port forwards)
+        Ignoring more words
+        Trying to get perlcritic to not criticise things I don't care about
+        Cleaned up some critic issues
+        More POD cleanups
+        Lots of getting tests working
+        Added missing dependencies
+        Cleaned up POD
+        Got boilerplait test passing
+        Initial commit (moved devemode from App-Useful)

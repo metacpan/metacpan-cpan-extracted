@@ -1,0 +1,9 @@
+Revision history for Apache2-HttpEquiv
+
+1.00   2014-01-04
+	- No functional changes
+	- Tests now use Moo instead of Moose (runtime doesn't use either)
+	- Release tests moved to xt/
+
+0.01   2012-03-03
+	- Initial release

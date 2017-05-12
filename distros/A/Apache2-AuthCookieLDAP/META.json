@@ -1,0 +1,49 @@
+{
+   "abstract" : "An Apache2::AuthCookie backend for LDAP based authentication",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Apache2-AuthCookieLDAP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache2::AuthCookie" : "3.19",
+            "Apache2::Connection" : 0,
+            "Apache2::Const" : 0,
+            "Apache2::RequestRec" : 0,
+            "Apache2::ServerUtil" : 0,
+            "Crypt::CBC" : "2.13",
+            "Digest::MD5" : 0,
+            "Net::LDAP" : "0.54",
+            "mod_perl2" : "1.999022"
+         }
+      }
+   },
+   "provides" : {
+      "Apache2::AuthCookieLDAP" : {
+         "file" : "lib/Apache2/AuthCookieLDAP.pm",
+         "version" : "1.15"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.15"
+}

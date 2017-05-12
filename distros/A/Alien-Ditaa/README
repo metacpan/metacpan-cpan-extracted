@@ -1,0 +1,42 @@
+NAME
+    Alien::Ditaa - Use the ditaa text to diagram package in perl
+
+SYNOPSIS
+        use Alien::Ditaa;
+        my $ditaa = Alien::Ditaa->new;
+        $ditaa->run_ditaa($input_fn, $output_dn, @args);
+
+DESCRIPTION
+    Trivial wrapper to run ditaa from perl.
+
+METHODS
+  run_ditaa ($input_fn, $output_fn, [@args])
+    Runs ditaa on the input file to produce an output png.
+
+    See the ditaa documentation for additional arguments you may want (but
+    probably don't).
+
+    Returns the exit status of the java process (i.e. 0 for success)
+
+  last_run_output
+    The STDOUT of the child java process running ditaa for the last call to
+    the "run_ditaa" method. This is not normally useful except as
+    information to help debug the problem when a run fails.
+
+SEE ALSO
+    <http://ditaa.sourceforge.net>
+
+INCLUDED SOFTWARE
+    An unmodified copy of the latest varion of ditaa.jar is included in this
+    package. The latest version and source code can be obtained from the URI
+    above.
+
+AUTHOR
+        Tomas Doran (t0m) C< bobtfish@bobtfish.net >
+
+COPYRIGHT
+    Copyright 2009 state51 (<http://www.state51.co.uk>)
+
+LICENSE
+    Licensed under the terms of the GNU GPL.
+

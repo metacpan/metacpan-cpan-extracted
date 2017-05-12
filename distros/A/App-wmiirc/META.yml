@@ -1,0 +1,46 @@
+---
+abstract: 'An event loop for wmii (X11 window manager)'
+author:
+  - 'David Leadbeater <dgl@dgl.cx>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-wmiirc
+requires:
+  Color::Model::RGB: 0
+  Const::Fast: 0
+  Data::Dump: 0
+  Data::Dumper: 0
+  Exporter: 0
+  File::Which: 0
+  File::stat: 0
+  FindBin: 0
+  IO::Async::Loop: 0
+  IO::Async::Process: 0
+  IO::Async::Stream: 0
+  IO::Async::Timer::Absolute: 0
+  IO::Async::Timer::Countdown: 0
+  IPC::Open2: 0
+  Moo: 0
+  Moo::Role: 0
+  POSIX: 0
+  Try::Tiny: 0
+  URI::Escape: 0
+  Unix::Uptime: 0
+  User::pwent: 0
+  parent: 0
+  perl: 5.014
+  strict: 0
+  strictures: 1
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-wmiirc
+  repository: git://github.com/dgl/wmii-perl
+version: 1.000

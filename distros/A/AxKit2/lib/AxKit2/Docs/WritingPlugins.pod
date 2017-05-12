@@ -1,0 +1,357 @@
+=head1 Writing Plugins
+
+Everything in AxKit2 is controlled via plugins. This helps keep the core of
+AxKit2 very simple and lightweight, yet makes it very powerful and extensible.
+
+Although AxKit comes with some included plugins to deliver flat files, and some
+demo plugins to show how to transform XML, the real power of AxKit2 will only
+be realised when you write your own plugin. Don't be afraid - this is very
+simple to do.
+
+To make life easy, lets step through a working example.
+
+=head1 A Simple XSLT Engine
+
+We'll start with a simple plugin that transforms XML files to HTML using
+XSLT. This example will cover some of the basics of how the XML transformation
+system of AxKit2 works.
+
+=head2 Setting up the Directories
+
+Start in the AxKit2 root directory (where you can run C<./axkit> from). First
+we'll create a directory to store your XML and your stylesheets:
+
+  $ mkdir myfirstplugin
+  $ mkdir myfirstplugin/webroot
+  $ mkdir myfirstplugin/stylesheets
+  $ mkdir myfirstplugin/plugins
+
+=head2 Server Configuration
+
+Now we need to tell AxKit where all our files are and what port to listen on.
+Here's a minimal config which you should store in F<myfirstplugin/axkit.conf>:
+
+  # Setup error logging to the maximum level:
+  Plugin    logging/warn
+  LogLevel  LOGDEBUG
+  
+  # we need to load this to map URLs to filenames
+  Plugin uri_to_file
+  
+  # Setup our server
+  <Server>
+    Port 8080
+    DocumentRoot myfirstplugin/webroot
+    DirectoryIndex index.xml
+    
+    # Load our plugin
+    PluginDir myfirstplugin/plugins
+    Plugin    serve_xml
+  </Server>
+
+Now we can try and start AxKit and see what happens:
+
+  $ ./axkit -c myfirstplugin/axkit.conf
+  L7 uri_to_file register_hook: uri_translation => hook_uri_translation
+  could not open myfirstplugin/plugins/serve_xml: No such file or directory
+  at lib/AxKit2/Plugin.pm line 103, <$fh> line 13.
+
+Well we should have expected this -- we haven't written our plugin yet!
+
+=head2 Plugin Code
+
+So load up your editor on F<myfirstplugin/plugins/serve_xml> and enter the
+following perl code:
+
+  #!/usr/bin/perl -w
+  
+  sub hook_xmlresponse {
+    my ($self, $input) = @_;
+    
+    $self->log(LOGDEBUG, "Serving up a file");
+    
+    my $stylesheet = './myfirstplugin/stylesheets/default.xsl';
+    
+    my $out = $input->transform(XSLT($stylesheet));
+    
+    return OK, $out;
+  }
+
+The key part of this is the C<< $input->transform(...) >> method call, which
+transforms the input using the given transformation types. Available types
+include C<XSP()>, C<TAL()>, C<XPathScript()> and of course C<XSLT()>.
+
+Once the transformation is done we return C<< OK, $out >> to let AxKit know that
+the transformation was successful and we should deliver the result to the
+browser.
+
+[As a sidenote here, I include the #! perl shebang line to help syntax
+highlighters know that this is perl code.]
+
+Now if you run AxKit again we shouldn't see any error, but instead some debug
+output telling us our plugin was loaded:
+
+  $ ./axkit -c myfirstplugin/axkit.conf
+  L7 uri_to_file register_hook: uri_translation => hook_uri_translation
+  L7 serve_xml register_hook: xmlresponse => hook_xmlresponse
+
+Now if we point a web browser at this server we will get an error because we
+haven't created an F<index.xml> and F<default.xsl> yet. So lets do that now.
+
+=head2 XML and XSLT Files
+
+F<myfirstplugin/webroot/index.xml>:
+
+  <?xml version="1.0"?>
+  <dromedaries>
+    <species name="Camel">
+      <humps>1 or 2</humps>
+      <disposition>Cranky</disposition>
+    </species>
+    <species name="Llama">
+      <humps>1 (sort of)</humps>
+      <disposition>Aloof</disposition>
+    </species>
+    <species name="Alpaca">
+      <humps>(see Llama)</humps>
+      <disposition>Friendly</disposition>
+    </species>
+  </dromedaries>
+
+F<myfirstplugin/stylesheets/default.xsl>:
+
+    <?xml version="1.0"?>
+    <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    version="1.0">
+    <xsl:template match="/">
+      <html>
+      <head><title>Know Your Dromedaries</title></head>
+      <body>
+        <table bgcolor="eeeeee" border="1">
+        <tr>
+        <th>Species</th>
+        <th>No of Humps</th>
+        <th>Disposition</th>
+        </tr>
+        <xsl:for-each select="dromedaries">
+          <xsl:apply-templates select="./species" />
+      </xsl:for-each>
+      </table>
+      </body>
+      </html>
+    </xsl:template>
+    <xsl:template match="species">
+      <tr>
+      <td><xsl:value-of select="@name" /></td>
+      <td><xsl:value-of select="./humps" /></td>
+      <td><xsl:value-of select="./disposition" /></td>
+      </tr>
+    </xsl:template>
+    </xsl:stylesheet>
+
+Now when you request the page you should get a HTML table listing the
+dromedaries in the index.xml file.
+
+Some browsers might also request the non-existant favicon.ico too, which may
+cause an error to appear in the terminal. Don't worry about that for now.
+
+Congratulations, your first plugin is complete!
+
+
+
+=head1 Making Your Plugin Configurable
+
+One area where AxKit2 really shines is that each plugin can define its own
+configuration parameters. Our plugin is a perfect candidate for that because
+we hard-coded the XSLT stylesheet. Lets make that configurable now.
+
+To add configuration parameters we need to specify them as soon as the plugin
+is loaded, in the plugin's C<init()> method.
+
+
+
+=over 4
+
+B<A Sidetrack - What is a 'Plugin'?>
+
+Skip this section if you don't want to know the gory details - you don't need
+to know about for writing simple plugins.
+
+Knowledgable perl hackers will have noticed that our C<hook_xmlresponse> method
+above received two parameters, the first being C<$self>, and yet we didn't
+create a perl class with all the annoying C<bless> verbiage. Well yes, a plugin
+is a perl class, and C<$self> is an instance of that class. We simply went out
+of our way to hide all the horrible perl guts from you.
+
+If you prefer all the perl guts to be exposed, you can create a full blown
+package as your plugin instead, install it in the usual perl install locations,
+and load it with:
+
+  Plugin My::Plugin
+
+As long as it has '::' in the name, AxKit will recognise it as a perl module and
+load it that way. Just be sure to 'use base q(AxKit2::Plugin)' so you get all
+the base class methods.
+
+=back
+
+To add configuration directives we just add sub definitions starting with "conf_":
+
+  sub conf_XSLTStyle;
+
+There we added a configuration directive called C<XSLTStyle> which we'll use
+to define our stylesheet. Using this default behaviour, AxKit will store any data
+in the configuration file as C<< $self->config('XSLTStyle') >>, returning an array if
+multiple values were given.
+
+Simple huh?
+
+Now we need to tie all that together. First add this to your config after
+"C<Plugin serve_xml>":
+
+  XSLT_Style myfirstplugin/stylesheets/default.xsl
+
+And now modify your C<hook_xmlresponse()> method to get this new value using
+C<< $self->config(...) >>:
+
+  sub hook_xmlresponse {
+    my ($self, $input) = @_;
+    $self->log(LOGDEBUG, "Serving up a file");
+    
+    my $stylesheet = $self->config('XSLTStyle');
+    my $out = $input->transform(XSLT($stylesheet));
+    
+    return OK, $out;
+  }
+
+And we're done! Run (or restart) axkit (C<./axkit -c myfirstplugin/axkit.conf>)
+and ensure that it all works.
+
+
+
+
+=head1 Chained Transformations
+
+One of the powerful features of AxKit was always being able to easily chain
+transformations together, this makes complex XSLT transformations much simpler,
+among other benefits.
+
+Lets modify our plugin to support multiple XSLT transformations.
+
+The simplest way to do this is to modify our C<XSLT_Style> directive to support
+multiple values, each value being a new XSLT stylesheet. First lets modify our
+configuration to detail what we want:
+
+  XSLT_Style myfirstplugin/stylesheets/sort.xsl \
+             myfirstplugin/stylesheets/default.xsl
+
+The idea here being that one XSLT will sort our dromedaries, and the second will
+turn them into HTML.
+
+Lets create our F<sort.xsl> file first:
+
+  <?xml version="1.0" encoding="ISO-8859-1" ?>
+  <xsl:stylesheet 
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+    version="1.0">
+  
+  <xsl:template match="dromedaries">
+  <dromedaries>
+    <xsl:apply-templates select="species">
+        <xsl:sort select="@name"/>
+    </xsl:apply-templates>
+  </dromedaries>
+  </xsl:template>
+  
+  <!-- Identity Template -->
+  <xsl:template match="*|@*">
+    <xsl:copy>
+      <xsl:copy-of select="@*"/>
+      <xsl:apply-templates/>
+    </xsl:copy>
+  </xsl:template>
+  </xsl:stylesheet>
+
+Note the use of the identity template. If you haven't used XSLT before take
+note of that - it's a very useful template for debugging.
+
+So now we need to have a list of XSLT stylesheets in our config, and make use
+of a list in the C<< ->transform() >> method.
+
+The nice thing about AxKit's configuration mechanism is that it automatically copes with
+multi-valued configuration. We don't have to change anything to cope with multiple values.
+
+When we retrieve the values, we just call C<< $self->config(...) >> in array context and we get all values instead of just one.
+
+  sub hook_xmlresponse {
+    my ($self, $input) = @_;
+    $self->log(LOGDEBUG, "Serving up a file");
+    
+    my @stylesheets = $self->config('XSLTStyle');
+    my $out = $input->transform(map XSLT($_), @stylesheets);
+    
+    return OK, $out;
+  }
+
+So instead of running C<XSLT()> once, we map it over C<@stylesheets>.
+
+And that's it. Restart AxKit and make sure this returns a table of sorted results.
+
+
+
+
+
+=head1 What Are the APIs?
+
+We've glossed over a lot of what's actually going on under the hood here, so if
+you want to know more, here are some pointers to extended documentation.
+
+
+=head2 Plugins
+
+To find our more about the B<Plugin> class, which is the C<$self> object in the
+examples above, see L<AxKit2::Plugin>. This document also covers all the
+available hooks and what effect the return codes for each of those hooks may
+have.
+
+=head2 Transformations
+
+In AxKit2 the C<< $input->transform() >> method is provided by the Processor
+module. See L<AxKit2::Processor> for the API details in there.
+
+=head2 Config
+
+So far only seen in our C<get_style()> method. The config object gives us access
+to the axkit.conf file and a storage place for plugin-specific configuration
+parameters. See L<AxKit2::Config> for details on the API available.
+
+=head2 The Connection
+
+So far we haven't dealt with the client at all - AxKit did all that work for us.
+However many plugins will want to read headers, set outbound headers, and
+maybe even write data directly to the client. This is done through the
+Connection object which is accessed via C<< $self->client >> in a plugin. See
+L<AxKit2::Connection> for the available API.
+
+There are three client APIs which I'll detail here as a shortcut as they are the
+most used (though more documented in the above link).
+
+C<< $client->headers_in >> returns the inbound headers.
+
+C<< $client->headers_out >> returns the outbound headers.
+
+C<< $client->send_http_headers >> writes the outbound headers to the client.
+
+For documentation on the header object that C<headers_in()> and C<headers_out()>
+return, see L<AxKit2::HTTPHeaders>.
+
+=head2 Constants
+
+Finally, for a list of constants useful as return values from plugins, see
+L<AxKit2::Constants>.
+
+=head1 Copyright
+
+This document is Copyright 2006 Apache Software Foundation.
+
+=cut

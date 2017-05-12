@@ -1,0 +1,5 @@
+exists:
+centos-release
+do not:
+redhat_version
+lsb-release

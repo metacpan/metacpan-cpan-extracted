@@ -1,0 +1,49 @@
+NAME
+       Apache::ClearSilver - Apache/mod_perl interface to the ClearSilver tem-
+       plate system.
+
+SYNOPSIS
+           # add the following to your httpd.conf
+           PerlModule          Apache::Template
+
+           # set various configuration options, e.g.
+           HDFLoadPath /path/to/loadpath /path/to/anotherpath
+           HDFFile     /path/to/mydata.hdf /path/to/mydata2.hdf
+           HDFSetValue Foo bar
+           CSContentType "text/html; charset=utf-8"
+
+           # now define Apache::Clearsilver as a PerlHandler, e.g.
+           <Files *.cs>
+             SetHandler   perl-script
+             PerlHandler  Apache::Template
+           </Files>
+
+DESCRIPTION
+       Apache::ClearSilver is Apache/mod_perl interface to the ClearSilver
+       template system.
+
+       implementing ClearSilver CGI Kit.
+
+CONFIGURATION
+       HDFLoadPath
+           added to hdf.loadpaths.
+
+       HDFFile
+           HDF Dataset files into the current HDF object.
+
+       HDFSetValue
+           set HDF value.
+
+       CSContentType
+           set Content-Type. (default text/html)
+
+AUTHOR
+       Jiro Nishiguchi <jiro@cpan.org>
+
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+SEE ALSO
+       Apache
+
+       ClearSilver Documentation:  <http://www.clearsilver.net/docs/>

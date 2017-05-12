@@ -1,0 +1,24 @@
+Changes
+COPYING
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+lib/Any/Template.pm
+lib/Any/Template/Backend.pm
+lib/Any/Template/Backend/Text/Template.pm
+lib/Any/Template/Backend/HTML/Template.pm
+lib/Any/Template/Backend/Text/MicroMason.pm
+lib/Any/Template/Backend/TemplateToolkit.pm
+t/any_template.t
+t/text_template.t
+t/text_micromason.t
+t/html_template.t
+t/templatetoolkit.t
+t/html_template.tmpl
+t/template_toolkit.tmpl
+t/text_micromason.tmpl
+t/text_template.tmpl
+t/pod_coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

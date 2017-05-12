@@ -1,0 +1,241 @@
+# NAME
+
+App::local::lib::helper - Make it easy to run code against a local-lib
+
+# SYNOPSIS
+
+Installing and using the helper (common usage)
+
+    cpanm --local-lib ~/mylib App::local::lib::helper
+    ~/mylib/bin/localenv bash
+
+Customizing the helper creation (advanced use only)
+
+    use App::local::lib::helper;
+    App::local::lib::helper->run(%opts);
+
+Note, if you don't have `cpanm` already installed you can use the web service
+version like so instead for all examples:
+
+    curl -L http://cpanmin.us/ | perl - --local-lib ~/mylib App::local::lib::helper
+
+# DESCRIPTION
+
+This is an object which provide the functionality to create a [local::lib](http://search.cpan.org/perldoc?local::lib)
+'helper' script in either the currently loaded [local::lib](http://search.cpan.org/perldoc?local::lib) environment or in
+a target directory of choice.  By default the script is called `localenv` and
+can be used to invoke a command under the [local::lib](http://search.cpan.org/perldoc?local::lib) which it was built
+against.  For example, assume you build a [local::lib](http://search.cpan.org/perldoc?local::lib) like so:
+
+    cpanm --local-lib ~/mylib App::local::lib::helper
+
+Note what is happening.  First, you are telling cpanminus to install everything
+to a local::lib directory called `~/mylib` (cpanminus behind the scenes uses
+[local::lib](http://search.cpan.org/perldoc?local::lib) to do this for you) then you are telling cpanminus to install the
+distribution [App::local::lib::helper](http://search.cpan.org/perldoc?App::local::lib::helper) into that created [local::lib](http://search.cpan.org/perldoc?local::lib) directory.
+When the `Makefile.PL` script for [App::local::lib::helper](http://search.cpan.org/perldoc?App::local::lib::helper) runs, it notices
+the fact that it is being asked to install into a locally lib managed directory
+and will additionally generate a helper script into `~/mylib/bin` called `localenv`.
+
+Now, if you want to invoke a perl application and use libs installed into 
+`~/mylib`, you can do so like:
+
+    ~/mylib/bin/localenv perl [SOME COMMAND]
+
+The command `localenv` will make sure the same [local::lib](http://search.cpan.org/perldoc?local::lib) that was active
+when [App::local::lib::helper](http://search.cpan.org/perldoc?App::local::lib::helper) was originally installed is again installed
+into the environment before executing the commands passed in `@ARGV`.  Upon
+completing the command, the `%ENV` is restored so that you can use this to fire
+off an application against a specific [local::lib](http://search.cpan.org/perldoc?local::lib) without needing to deal
+with the details of how to activate the [local::lib](http://search.cpan.org/perldoc?local::lib) or how to make sure
+your `%ENV` stays clean.
+
+The arguments given to `localenv` don't need to be a perl application.  For
+example, I often like to open a sub shell under a particular [local::lib](http://search.cpan.org/perldoc?local::lib)
+managed directory.
+
+    ~/mylib/bin/localenv bash
+
+Now, if I do:
+
+    perl -V
+
+I'll see that i`~/mylib` has been added to `@INC`.  Additionally, `~/mylib/bin` will
+have been added to `$PATH`, so that any command line perl applications installed
+into the [local::lib](http://search.cpan.org/perldoc?local::lib) (such as `ack` or `cpanm`) can be accessed easily.
+
+Another example usage would be when you want to install an application from
+CPAN, install it and all its dependencies to a single directory root and 
+then run it without a lot of effort.  For example:
+
+    cpanm --local-lib ~/gitalyst-libs Gitalist App::local::lib::helper
+    ~/gitalyst-libs/bin/localenv gitalyst-server.pl
+
+And presto! Your cpan installed application is running, fully self-contained to
+one root directory all under regular user privileges.
+
+[local::lib](http://search.cpan.org/perldoc?local::lib) does all the real work, but I find this to be the easiest way to
+run given code against a [local::lib](http://search.cpan.org/perldoc?local::lib) root.  
+
+## Additional Helpers
+
+In addition to the `localenv` script which is documented above, we also create
+two snippets of code suitable for including in your `.bashrc` or `.cshrc`.
+These are created to help people that only want or need a single local lib and
+would like to activate it at login.  If you'd like to use these, simple add the
+following tot he end of your `.bashrc`
+
+    source $TARGET/bin/localenv-bashrc
+
+Where $TARGET is the root of your local lib (the directory that contains your
+`bin` and `lib` directories created when you ran the helper).
+
+Next time you log in, you can do `perl -V` and should see that your local-lib
+has automatically been activated.
+
+There will also be a `source $TARGET/bin/localenv-cshrc` created for those of
+you using csh.  Currently this is not going to work with Windows shell users,
+but should be easy to setup, collaborations very welcomed.
+
+# OPTIONS
+
+This class supports the following options.
+
+- which_perl
+
+This should be the path to the perl binary that the [local::lib](http://search.cpan.org/perldoc?local::lib) is built
+against. This defaults to the path of the perl binary under which we are
+currently running.  You should probably leave this one alone :)
+
+- target
+
+This is the target directory for the [local::lib](http://search.cpan.org/perldoc?local::lib) you want to build the helper
+script against.  By default it will attempt to detect the currently running
+[local::lib](http://search.cpan.org/perldoc?local::lib) and use that.  If we can't detect a running [local::lib](http://search.cpan.org/perldoc?local::lib) and
+this option is undef, we die with a message.
+
+- helper_name
+
+This is the name of the helper utility script.  It defaults to 'localenv'.
+
+- helper_permissions
+
+These are the permissions the the helper utility script is set to.  By default
+we set the equivilent of 'chmod 755 [HELPER SCRIPT]'
+
+# HELPERS
+
+This distribution installs the following [local::lib](http://search.cpan.org/perldoc?local::lib) helpers
+
+## localenv
+
+This is a perl script that runs a single command in [local::lib](http://search.cpan.org/perldoc?local::lib) aware context.
+You can use the `helper-name` option to set a different name.
+
+Typically I will use this to 'enable' a previously setup [local::lib](http://search.cpan.org/perldoc?local::lib) with
+commands like:
+
+    ~/mylocallib/bin/localenv bash
+    ~/mylocallib/bin/localenv screen
+
+Or I can use it to run a single command wrapped in the [local::lib](http://search.cpan.org/perldoc?local::lib) target
+and exit cleanly:
+
+    ~/mylocallib/bin/localenv perl app.pl
+    ~/mylocallib/bin/localenv plackup app.psgi
+
+## localenv-relative
+
+NOTE: Experimental feature.  Please prefer using [localenv](#pod_localenv) unless you 
+absolutely need this functionality.
+
+This perl script functions (or should function) identically to [localenv](http://search.cpan.org/perldoc?localenv) as
+documented.  However, instead of having hardcoded full paths to your Perl
+binary and [local::lib](http://search.cpan.org/perldoc?local::lib) target directories, we instead try to use relative
+pathing.  For example, here is the helper script built on my server for the
+standard [localenv](#pod_localenv) script:
+
+    #!/Users/johnn/perl5/perlbrew/perls/perl-5.14.1/bin/perl
+
+    use strict;
+    use warnings;
+
+    use lib '/Users/johnn/locallib_5_14_1/lib/perl5';
+    use local::lib '/Users/johnn/locallib_5_14_1';
+
+    unless ( caller ) {
+        if ( @ARGV ) {
+            exec @ARGV;
+        }
+    }
+
+And here is the example same version for the relative script:
+
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+
+    use FindBin;
+    use File::Spec;
+    use lib File::Spec->catdir($FindBin::Bin, '..', 'lib', 'perl5');
+    use local::lib File::Spec->catdir($FindBin::Bin, '..');
+
+    unless ( caller ) {
+        if ( @ARGV ) {
+            exec @ARGV;
+        }
+    }
+
+The goal here is to be more friendly when you need to relocate your
+installation of Perl and/or your [local::lib](http://search.cpan.org/perldoc?local::lib) target directory.  You might
+wish to try this if you are copying a 'seed' Perl and [local::lib](http://search.cpan.org/perldoc?local::lib) setup to
+multiple developer home directories (as a way to speed up first time developer
+setup, for example) or if your deployment system copies your application from
+your build enviroment to a QA or Production that is not identical.
+
+Personally I prefer to build Perl and my application in each location that is
+different, since I find that works very effectively.  However I understand some
+shops have existing build systems that deploy code by copying Perl dependencies
+from box to box, and these boxes are not always identical in directory layout.
+For example, there might be a build or integration point in development, with
+a [local::lib](http://search.cpan.org/perldoc?local::lib) target of `/home/integration/webapp-cpan-locallib` and you
+wish to copy that directory recursively to your qa/production server, which 
+might be located at `/home/qa/local-lib`.
+
+I'd like to accomodate this approach as best I can, however I can't be certain
+that moving Perl and [local::lib](http://search.cpan.org/perldoc?local::lib) around rather than performing a true install
+is going to work consistently. Caveat emptor!
+
+Please also note that the following shell snippets are not relative tested.
+
+## localenv-bashrc
+
+a snippet suitable for sourcing in your .bashrc, which will automatically
+activate a local-lib at login.  Name will follow from `helper-name`.
+
+Here's an example of the line I might add to .bashrc (assumes you have setup
+[local::lib](http://search.cpan.org/perldoc?local::lib) in `$HOME/mylocal`
+
+    source $HOME/mylocal/localenv-bashrc
+
+Then next time you open a shell you should see that `$PATH` and `PERL5LIB`
+have been properly changed.
+
+## localenv-cshrc
+
+a snippet suitable for sourcing in your .cshrc, which will automatically
+activate a local-lib at login.  Name will follow from `helper-name`.
+
+
+
+# AUTHOR
+
+John Napiorkowski ` <<jjnapiork@cpan.org`> >
+
+# COPYRIGHT & LICENSE
+
+Copyright 2011, John Napiorkowski
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

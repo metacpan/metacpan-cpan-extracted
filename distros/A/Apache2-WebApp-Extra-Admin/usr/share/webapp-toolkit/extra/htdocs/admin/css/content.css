@@ -1,0 +1,205 @@
+/*
+ *  Apache2::WebApp::Toolkit - Admin Control Panel (content.css)
+ *  Copyright (C) 2010 Marc S. Brooks <mbrooks@cpan.org>
+ *
+ *  Licensed under the terms of the BSD License
+ *  http://www.opensource.org/licenses/bsd-license.php
+ */
+
+/*--------------------------------------------------------------------------*/
+/* info - container                                                         */
+
+#info {
+	float: left;
+	margin-bottom: 10px;
+	position: relative;
+}
+
+
+/* info - title text */
+
+#info h3.title {
+	color: #787878;
+	font-size: 14px;
+	font-weight: bold;
+	padding: 3px;
+}
+
+#info p.text, #info p.text_center {
+	display: block;
+	padding-top: 10px;
+}
+
+#info p.text {
+	text-align: center;
+	padding-right: 6px;
+}
+
+#info p.text_center {
+	text-align: center;
+	width: 480px;
+}
+
+#info div.html {
+	display: block;
+	padding: 6px;
+}
+
+#info p.notes, p.steps {
+	clear: both;
+	display: block;
+	padding: 6px;
+	text-align: center;
+}
+
+#info p.steps {
+	background-color: #FFFFFF;
+	color: #787878;
+	display: block;
+	font-size: 14px;
+	margin: 10px 0px 10px 0px;
+	padding: 6px;
+	text-align: center;
+}
+
+#info p.steps em {
+	color: #787878;
+	font-style: normal;
+	font-weight: bold;
+}
+
+
+/* info - list default */
+
+#info div.list {
+	margin: 0px 20px 10px 20px;
+}
+
+#info div.list ul {
+	color: #000000;
+	font-size: 13px;
+	list-style: square;
+	padding: 2px;
+}
+
+#info div.list li {
+	margin-top: 10px;
+}
+
+
+/* info - image */
+
+#info div.image {
+	margin: 20px auto 20px auto;
+	width: 445px;
+}
+
+#info div.image img {
+	border: 0px;
+}
+
+ 
+/* info - address text */
+
+#info address {
+	margin: 10px;
+}
+
+
+/* info - table */
+
+#info table {
+	border: 1px dashed #DDDDDD;
+	margin: 10px auto 10px auto;
+	width: 100%;
+}
+
+#info table td {
+	font-size: 12px;
+	padding: 5px;
+}
+
+
+/* info - list */
+
+#info dl {
+	margin: 10px;
+	width: 430px;
+}
+
+#info dl dd {
+	padding: 3px;
+}
+
+
+/* info - back to top */
+
+#info div.top {
+	float: right;
+	padding: 10px 0px 10px 0px;
+	text-align: right;
+}
+
+#info div.top a {
+	color: #999999;
+}
+
+/*--------------------------------------------------------------------------*/
+/* page - container                                                         */
+
+#page {
+	clear: both;
+	left: -4px;
+	position: relative;
+}
+
+#page a:hover {
+	background-color: transparent;
+}
+
+
+/* page - title text */
+
+#page h2.title {
+	font-weight: bold;
+}
+
+#page h2.title {
+	font-size: 20px;
+	padding: 3px;
+}
+
+
+/* page - back */
+
+#page div.back {
+	float: right;
+	position: relative;
+}
+
+#page div.back a {
+	background-image: url( /extras/admin/images/back.gif );
+	background-repeat: no-repeat;
+	display: block;
+	height: 24px;
+	padding-left: 35px;
+	padding-top: 4px;
+	text-align: right;
+}
+
+
+/* page - print */
+
+#page div.print {
+	float: right;
+}
+
+#page div.print a {
+	background-image: url( /extras/admin/images/print.gif );
+	background-repeat: no-repeat;
+	display: block;
+	height: 24px;
+	padding-left: 35px;
+	padding-top: 4px;
+	text-align: right;
+}

@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+    if 0;
+
+use App::PAUSE::cleanup;
+App::PAUSE::cleanup->run( @ARGV );

@@ -1,0 +1,151 @@
+#!/usr/bin/env perl
+
+# Given a snaalyze sqlite database, automatically try to recognize
+# tags, branches, and subprojects.
+
+use warnings;
+use strict;
+use lib qw(./lib);
+
+use Getopt::Long;
+use SVN::Analysis;
+
+my ($help, $analysis_db);
+my $getopt_okay = GetOptions(
+	"help"        => \$help,
+	"analysis=s"  => \$analysis_db,
+);
+
+if ($help or !$getopt_okay) {
+	die(
+		"$0 usage:\n",
+		"  --analysis=FILENAME  location of snanalyze sqlite database\n",
+		"  --help               you're soaking in it.\n",
+	);
+}
+
+die "$0: --analysis=FILENAME required\n" unless (
+	defined $analysis_db and length $analysis_db
+);
+die "$0: --analysis path ($analysis_db) doesn't exist\n" unless (
+	-e $analysis_db
+);
+die "$0: --analysis path ($analysis_db) must be a file\n" unless (
+	-f $analysis_db
+);
+
+### Load the Subversion analysis.
+
+warn time(), " attaching to database...\n";
+my $analysis = SVN::Analysis->new(db_file_name => $analysis_db);
+
+warn time(), " analyzing...\n";
+$analysis->analyze();
+
+warn time(), " finding tags, etc...\n";
+$analysis->auto_tag(\&get_entity_hint);
+
+warn time(), " fixing copy targets...\n";
+$analysis->fix_copy_targets();
+
+warn time(), " done.\n";
+exit;
+
+sub get_entity_hint {
+	my ($path, $rev_first, $op_first, $rev_last, $op_last, $is_modified) = @_;
+
+	# Returns (entity type, entity name, prefix to remove, prefix to prepend);
+
+	# Prefixes to remove must not end in path separators.
+
+	# Branches and tags.
+	return("branch", "branch-$2", $1, "") if (
+		$path =~ m!^(branch(?:es)?/([^/]+))(?:/|$)!
+	);
+	return("tag", "tag-$2", $1, "") if (
+		$path =~ m!^(tags?/([^/]+))(?:/|$)!
+	);
+	return("branch", "master", $1, "") if (
+		$path =~ m!^(trunk)(?:/|$)!
+	);
+
+	# Special project paths.  Nothing to do.
+	#	return("branch", "proj-root", "", "") if (
+	#		$path =~ m!^[^/]+/(trunk|tags?|branch(?:es)?)$!
+	#	);
+
+	# Project directories.
+	return("branch", "proj-$2", $1, "") if (
+		$path =~ m!^(([^/]+)/trunk)(?:/|$)!
+	);
+	return("branch", "proj-$2-branch-$3", $1, "") if (
+		$path =~ m!^(([^/]+)/branch(?:es)?/([^/]+))(?:/|$)!
+	);
+	return("tag", "proj-$2-tag-$3", "$1", "") if (
+		$path =~ m!^(([^/]+)/tags?/([^/]+))(?:/|$)!
+	);
+
+	# Catch-all.  Must go at the end.
+	return("branch", "master", "", "");
+}
+
+__END__
+
+=head1 NAME
+
+snassign-auto - Automatically assign tags and branches in a snanalyze index.
+
+=head1 SYNOPSIS
+
+	snassign-auto --analysis index.sqlite3
+
+=head1 DESCRIPTION
+
+snassign-auto converts paths in the snanalyze index database into tags
+and branches according to some simple rules:
+
+Anything in /trunk is considered to be in the "master" branch.
+
+Anything in /tag or /tags is considered to be a tag.  Tags that are
+subsequently altered will be treated as branches, however, since git
+doesn't permit edits within true tags.
+
+Anything in /branch or /branches is considered to be a branch.
+However, any branches that aren't modified will subsequently be
+converted to tags.
+
+The rules are encoded in get_entity_hint() within snassign-auto.  To
+define new rules, it's expected that you copy snassign-auto and modify
+get_entity_hint().
+
+=head1 USAGE
+
+=head2 --analysis DB_FILENAME
+
+The location of the SQLite database holding the index.  Required.
+
+=head1 SEE ALSO
+
+L<App::SnerpVortex> - Main documentation for Snerp Vortex.
+
+L<SVN::Dump> - Subversion dumps are parsed by SVN::Dump.
+
+snanalyze - Analyze a Subversion dump, and produce an index database
+for other tools to process.
+
+snassign-gui - Graphical snanalyze index browser.  Future plans will
+allow users to assign branches and tags by hand.  Requires Gtk.
+
+snauthors - Extract a basic authors.txt file from a Subversion dump.
+
+snerp - Convert a Subversion repository to a flat filesystem or Git.
+Uses the snanalyze index, with help from the snassign tools, to
+intelligently branch and tag as it goes.
+
+=head1 AUTHORS AND LICENSE
+
+Snerp Vortex is Copyright 2010 by Rocco Caputo and contributors.
+
+It is released under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,56 @@
+{
+   "abstract" : "Simple DNS resolver with caching",
+   "author" : [
+      "Emmanuel Rodriguez <potyl@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-CacheDNS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec::Functions" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::Spec::Functions" : 0,
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : 0,
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "AnyEvent::CacheDNS" : {
+         "file" : "lib/AnyEvent/CacheDNS.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/potyl/perl-AnyEvent-CacheDNS/issues"
+      },
+      "homepage" : "http://github.com/potyl/perl-AnyEvent-CacheDNS",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/potyl/perl-AnyEvent-CacheDNS"
+      }
+   },
+   "version" : "0.08"
+}

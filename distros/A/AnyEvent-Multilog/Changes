@@ -1,0 +1,7 @@
+Change history for AnyEvent-Multilog
+1.102861 Fri Jul 15 05:53:47 CDT 2011
+  - skip_all instead of BAIL_OUT for cpantesters sanity
+  - dist.ini cleanup
+
+1.102860     Wed Oct 13 01:19:08 CDT 2010
+  - initial release

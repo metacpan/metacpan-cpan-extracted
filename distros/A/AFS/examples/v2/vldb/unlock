@@ -1,0 +1,20 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::VLDB;
+
+my ($vldb, $volume, $ok);
+
+die "Usage: $0 volume\n" if $#ARGV != 0;
+
+$volume = shift;
+
+$vldb = AFS::VLDB->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+$ok = $vldb->unlock($volume);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "Released lock on vldb entry for volume $volume\n"; }

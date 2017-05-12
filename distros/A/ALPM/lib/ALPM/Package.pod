@@ -1,0 +1,152 @@
+=head1 NAME
+
+ALPM::Package - libalpm packages of files, with dependencies, etc.
+
+=head1 SYNOPSIS
+
+  use ALPM::Conf qw(/etc/pacman.conf);
+  my $perlpkg = $alpm->localdb->find('perl');
+
+  ## All package methods are accessors.
+
+  my $name = $perlpkg->name();
+  print "$name rocks!\n";
+
+  ## Here is an ugly trick. Please forgive me.
+  print "@{[$perlpkg->name]} rocks!\n";
+
+  ## Dependencies are arrayrefs of hashrefs (AoH):
+  print "$name depends on:\n";
+  for my $deps (@{$perlpkg->depends}){
+      print "\t@{$dep}{'name', 'mod', 'version'}\n";
+  }
+
+  ## File lists are also arrayrefs of hashrefs (AoH):
+  print "$name owns files:\n";
+  for my $f (@{$perlpkg->files}){
+      printf "\t%s %o %d\n", $f->{'name'}, $f->{'mode'}, $f->{'size'};
+  }
+  
+  ## Others lists are arrayrefs of scalars:
+  print "$name is licensed under: @{$perlpkg->licenses}";
+
+=head1 DESCRIPTION
+
+This class is a wrapper for all of the C<alpm_pkg_...> C library functions
+of libalpm.  You retrieve the package from the database and you can then
+access its information.
+
+=head1 ACCESSORS
+
+The accessors are named almost exactly the same as the C<alpm_pkg_get...>
+functions. I have removed the get_ prefix on the accessors.  This is
+because you can't really I<set> anything so you should know it's a get
+anyways.
+
+=over
+
+=item * filename
+
+=item * name
+
+=item * version
+
+=item * desc
+
+=item * url
+
+=item * builddate
+
+=item * installdate
+
+=item * packager
+
+=item * arch
+
+=item * size
+
+=item * isize
+
+=item * reason
+
+=item * licenses
+
+=item * groups
+
+=item * depends
+
+=item * optdepends
+
+=item * conflicts
+
+=item * provides
+
+=item * deltas
+
+=item * replaces
+
+=item * files
+
+=item * backup
+
+=item * has_scriptlet
+
+=item * download_size
+
+=item * changelog
+
+=item * requiredby
+
+=item * optionalfor
+
+=item * db
+
+=item * checkmd5sum
+
+=item * origin
+
+=item * validation
+
+=item * signature
+
+=back
+
+Attributes with plural names return an arrayref of strings.
+I<depends> and I<files> return an arrayref of hashrefs.
+I<db> returns an L<ALPM::DB> object.
+
+=head2 origin
+
+This should be either C<"file">, C<"localdb">, or <"syncdb">. If this returns C<"unknown"> something went wrong.
+
+=head2 validation
+
+This returns a string which can either be C<"unknown">, C<"none"> or one or
+more of the following seperated by spaces:
+C<"MD5">, C<"SHA">, or C<"PGP">.
+
+=head2 signature
+
+Returns the package signature as a string encoded in Base64.
+
+=head1 SEE ALSO
+
+L<ALPM>, L<ALPM::DB>
+
+=head1 AUTHOR
+
+Justin Davis, C<< <juster at cpan dot org> >>
+
+Andrew Gregory <apg@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Justin Davis
+
+Copyright (C) 2015 by Andrew Gregory <apg@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

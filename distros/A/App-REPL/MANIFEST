@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+META.yml
+lib/App/REPL.pm
+iperl
+t/00-load.t
+t/01-kwalitee.t
+t/pod-coverage.t
+t/pod.t

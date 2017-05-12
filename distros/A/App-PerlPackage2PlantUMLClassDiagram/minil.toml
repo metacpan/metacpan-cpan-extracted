@@ -1,0 +1,6 @@
+name = "App-PerlPackage2PlantUMLClassDiagram"
+# badges = ["travis"]
+authority="cpan:HITODE"
+
+module_maker="ModuleBuildTiny"
+readme_from="script/package2plantumlclassdiagram"

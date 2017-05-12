@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+dist.ini~
+lib/Acme/#Anything.pod#
+lib/Acme/Anything.pm
+t/imaginary.t

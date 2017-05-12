@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/App-sh2p.t
+lib/App/sh2p/Builtins.pm
+lib/App/sh2p/Compound.pm
+lib/App/sh2p/Handlers.pm
+lib/App/sh2p/Here.pm
+lib/App/sh2p/Operators.pm
+lib/App/sh2p/Parser.pm
+lib/App/sh2p/Statement.pm
+lib/App/sh2p/Trap.pm
+lib/App/sh2p/Utils.pm
+lib/App/sh2p.pod
+bin/sh2p.pl

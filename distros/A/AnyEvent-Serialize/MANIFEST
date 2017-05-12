@@ -1,0 +1,12 @@
+Changes
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+lib/AnyEvent/Serialize.pm
+Makefile.PL
+MANIFEST
+README
+t/serialize.t
+META.yml                                 Module meta-data (added by MakeMaker)

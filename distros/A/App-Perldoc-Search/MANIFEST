@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/perldoc-search
+dist.ini
+lib/App/Perldoc/Search.pm
+lib/App/Perldoc/Search/_Parser.pm
+t/App-Perldoc-Search.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

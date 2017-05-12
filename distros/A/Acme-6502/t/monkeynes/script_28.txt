@@ -1,0 +1,35 @@
+clear
+power on
+regs
+
+# Turn on some values in the PS
+op 38
+op 78
+op F8
+
+# Should be: SP=FF, PS=2D
+test sp = ff
+test ps = 2d
+
+op 08
+
+# Should be: SP=FE, PS=2D, mem[$01FF]=2D
+test sp = fe
+test ps = 2d
+test m:01ff = 2d
+
+# Clear out the values in the PS
+op 18
+op 58
+op d8
+
+# Should be: PS=20
+test ps = 20
+
+op 28
+
+# Should be: SP=FF, PS=2D
+test sp = ff
+test ps = 2d
+
+save verify_28.txt

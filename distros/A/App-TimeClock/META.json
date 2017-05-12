@@ -1,0 +1,78 @@
+{
+   "abstract" : "Provides timeclock.pl, a reporting utility for timeclock, which is a time tracking package for GNU Emacs.",
+   "author" : [
+      "SÃ¸ren Lund <soren@lund.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-TimeClock",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "App::TimeClock" : {
+         "file" : "lib/App/TimeClock.pm",
+         "version" : "0.13"
+      },
+      "App::TimeClock::Daily::ConsolePrinter" : {
+         "file" : "lib/App/TimeClock/Daily/ConsolePrinter.pm"
+      },
+      "App::TimeClock::Daily::CsvPrinter" : {
+         "file" : "lib/App/TimeClock/Daily/CsvPrinter.pm"
+      },
+      "App::TimeClock::Daily::HtmlPrinter" : {
+         "file" : "lib/App/TimeClock/Daily/HtmlPrinter.pm"
+      },
+      "App::TimeClock::Daily::PrinterInterface" : {
+         "file" : "lib/App/TimeClock/Daily/PrinterInterface.pm"
+      },
+      "App::TimeClock::Daily::Report" : {
+         "file" : "lib/App/TimeClock/Daily/Report.pm"
+      },
+      "App::TimeClock::Weekly::ConsolePrinter" : {
+         "file" : "lib/App/TimeClock/Weekly/ConsolePrinter.pm"
+      },
+      "App::TimeClock::Weekly::PrinterInterface" : {
+         "file" : "lib/App/TimeClock/Weekly/PrinterInterface.pm"
+      },
+      "App::TimeClock::Weekly::Report" : {
+         "file" : "lib/App/TimeClock/Weekly/Report.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/soren/App-TimeClock/issues"
+      },
+      "license" : [
+         "http://opensource.org/licenses/gpl-3.0.html"
+      ],
+      "repository" : {
+         "url" : "https://github.com/soren/App-TimeClock/"
+      }
+   },
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

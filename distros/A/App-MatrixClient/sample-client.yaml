@@ -1,0 +1,9 @@
+# The hostname/port of the homeserver
+server: '127.0.0.1:8448'
+
+# True if https should be used
+ssl: 1
+
+# Login details of an already-registered user
+user_id: '@user:my.host.name'
+password: 's3cr3t'

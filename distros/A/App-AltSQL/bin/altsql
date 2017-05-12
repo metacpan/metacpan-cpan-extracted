@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use App::AltSQL;
+
+my $c = App::AltSQL->new_from_cli();
+$c->run();

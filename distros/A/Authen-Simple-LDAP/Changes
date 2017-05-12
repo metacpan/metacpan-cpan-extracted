@@ -1,0 +1,13 @@
+Revision history for Perl extension Authen::Simple::LDAP
+
+0.3 2012-04-19
+    - Corrected typos in arguments passed to Net::LDAP constructor (RT #65426)
+    - Changed Perl module installer from Module::Build to Module::Install
+
+0.2 2006-01-05
+    - return dn on successful authentication
+    - log using error level unless invalid credentials
+
+0.1 2006-01-03
+    - first release
+

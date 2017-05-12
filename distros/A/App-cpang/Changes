@@ -1,0 +1,17 @@
+0.03    08.09.10
+        * Moved to App::cpang
+        * Moved to object structure
+        * Moved to Dist::Zilla
+        * Adding binary
+        * Adding documentation
+        * Allowing to change title by attr
+
+0.02    11.07.10
+        [ All changes here by pancake ]
+        * Adding statusbar
+        * Terminal hidden by default
+        * Check for cpanm and sudo
+
+0.01    04.07.10
+        * 10 minutes of work, pretty sweet
+

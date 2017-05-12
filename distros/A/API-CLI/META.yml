@@ -1,0 +1,54 @@
+---
+abstract: 'Generic Framework for REST API Command Line Clients'
+author:
+  - 'Tina Müller <cpan2@tinita.de>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: API-CLI
+provides:
+  API::CLI:
+    file: lib/API/CLI.pm
+    version: '0.001'
+  API::CLI::App::Spec:
+    file: lib/API/CLI/App/Spec.pm
+    version: '0.001'
+  API::CLI::Cmd:
+    file: lib/API/CLI/Cmd.pm
+    version: '0.001'
+  API::CLI::Request:
+    file: lib/API/CLI/Request.pm
+    version: '0.001'
+requires:
+  App::AppSpec: '0'
+  App::Spec: '0'
+  App::Spec::Run::Cmd: '0'
+  File::Share: '0'
+  HTTP::Request: '0'
+  JSON::XS: '0'
+  LWP::UserAgent: '0'
+  Moo: '0'
+  URI: '0'
+  YAML::XS: '0'
+  base: '0'
+  feature: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/perlpunk/API-CLI-p5/issues
+  repository: git://github.com/perlpunk/API-CLI-p5.git
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.69'

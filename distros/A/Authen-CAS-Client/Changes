@@ -1,0 +1,65 @@
+changes from 0.07 to 0.08
+=========================
+
+  * updated Makefile.PL to reflect changes in default @INC handling v5.25+.
+  * fleshed README with documentation
+  * added README.md for GitHub
+  * updated to 'Nil' license
+
+changes from 0.06 to 0.07
+=========================
+
+  * changed license to MIT for consistency with other module distributions
+
+  * removed MYMETA.yml and MYMETA.json from module distribution
+    per CPAN standards
+
+  * updated documentation to reflect new formatting standards
+
+
+changes from 0.05 to 0.06
+=========================
+
+ * fixed a bug when using defined on an array
+
+ * minor documentation fixup referencing incorrect package for response objects
+
+
+changes from 0.04 to 0.05
+=========================
+
+  * added doc() accessor to response types
+
+  * added better error handling with better error messages
+
+  * updated perldocs with new functionality and consistency fixes
+
+  * changed user-agent string to reflect module name
+
+
+changes from 0.03 to 0.04
+=========================
+
+  * changed fatal behavior to throw strings instead of objects
+
+
+changes from 0.02 to 0.03
+=========================
+
+  * added more tests that were previously not included
+
+  * changed to Module::Install for dist packaging
+
+
+changes from 0.01 to 0.02
+=========================
+
+  * added Perl 5.6.1 dependency
+
+  * changed Authen::CAS::Client::Response is_* methods to be more consistent
+    across all response types
+
+  * added tests for better code coverage
+
+  * various minor internal fixups to maintain consistency
+

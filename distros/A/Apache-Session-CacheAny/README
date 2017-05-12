@@ -1,0 +1,45 @@
+NAME
+    Apache::Session::CacheAny - use Cache::* for Apache::Session storage
+
+SYNOPSIS
+      use Apache::Session::CacheAny;
+      tie %session, 'Apache::Session::CacheAny', $sid, {
+          CacheImpl => 'Cache::FileCache',
+      };
+
+      tie %size_aware_session, 'Apache::Session::CacheAny', $sid, {
+          CacheImpl        => 'Cache::SizeAwareFileCache',
+          Namespace        => 'apache-session-cacheany',
+          DefaultExpiresIn => '2 hours',
+          AutoPurgeOnGet   => 0,
+          AutoPurgeOnSet   => 1,
+          MaxSize          => 10_000,
+          CacheRoot        => 'cache_root',
+          CacheDepth       => 'cache_depth',
+          DirectoryUmask   => 'directory_umask',
+      };
+
+DESCRIPTION
+    Apache::Session::CacheAny is a bridge between Apache::Session and
+    Cache::Cache. This module provides a way to use Cache::Cache subclasses
+    as Apache::Session storage implementation.
+
+ARGUMENTS
+    You must specify class name of Cache::Cache implementation (like
+    Cache::SharedMemoryCache) in arguments to the constructor. See the
+    Apache::Session::Store::CacheAny manpage for details about other
+    optional arguments.
+
+NOTE
+    Apache::Session::CacheAny uses Apache::Session::Lock::Null as its
+    locking scheme. You can use Apache::Session::Flex to change that.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Apache::Session manpage, the Cache::Cache manpage
+

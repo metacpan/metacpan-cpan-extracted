@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use App::Devmode2;
+
+exit App::Devmode2->run;

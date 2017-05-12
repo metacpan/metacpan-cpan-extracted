@@ -1,0 +1,227 @@
+#!/usr/bin/env perl
+#ABSTRACT: Facilitate building Debian packages with templates
+#PODNAME: makedpkg
+our $VERSION = '0.05'; #VERSION
+
+use App::makedpkg;
+App::makedpkg->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+makedpkg - Facilitate building Debian packages with templates
+
+=head1 VERSION
+
+version 0.05
+
+=head1 DESCRIPTION
+
+The B<makedpkg> command line application helps building Debian packages based
+on configuration files and templates.
+
+=head1 OPTIONS
+
+    -c --config        configuration file (makedpkg.{yml,json,...} by default)
+    -v --verbose       enable verbose output
+    -t --templates     template directory (./makedpkg by default)
+    --init             initialize or update template directory
+    -n --dry           don't build, just show
+    -p --prepare       don't build, just prepare sources
+    -f --force         use the force, Luke!
+
+=head1 CONFIGURATION
+
+Unless explicitly specified via the C<config> option, a config file with name
+C<makedpkg.yaml> (or any other extension recognized by L<Config::Any>) is
+expected. Important configuration variables include:
+
+=over 4
+
+=item name
+
+package name
+
+=item version
+
+package version
+
+=item author
+
+package author
+
+=item changes
+
+changes to be used in C<changelog> template
+
+=item timestamp
+
+timestamp to be used in C<changelog> template
+
+=item section
+
+section to be used in C<control> template
+
+=item priority
+
+priority to be used in C<control> template (for instance C<extra>)
+
+=item build_depends
+
+build dependencies, to be used in C<control> template (for instance C<< perl (>= 5.14) >>)
+
+=item binary_depends
+
+binary dependencies, to be used in C<control> template
+
+=item architecture
+
+architecture, to be used in C<control> template
+
+=item description
+
+description, to be used in C<control> template
+
+=item build
+
+Build configuration, consisting of C<directory>, C<before>, C<files>, and
+C<options>.
+
+=over
+
+=item directory
+
+Directory to build package in (default is C<debuild>).
+
+=item before
+
+List of commands to execute before build. Commands are executed before files
+are copied to the package directory, so more files can be generated or
+processed via commands listed in this field.
+
+=item files
+
+package files, to be used in C<install> template (L<see Debian
+manual|http://www.debian.org/doc/manuals/maint-guide/dother.en.html#install>).
+Files can be specified as mapping which files to copy to which directory, such
+as
+
+    files:
+        copy:
+            "lib/*": "srv/myapp/lib"
+            "index.html": "srv/myapp"
+
+and/or as list which directories and files to copy from to which directory
+
+    files:
+        to: srv/myapp
+        from:
+            - lib
+            - index.html
+
+=item command
+
+Command to execute build. Set to C<debuild> by default. This option can be used
+for instance to add command line options, e.g. C<debuils -uc -us>.
+
+=back
+
+=item verbose
+
+Autmatically set to C<0> or C<1> by the C<--verbose> command line flag, this
+variable is used to disable or enable verbose mode of C<debhelper> in the default
+C<rules> template.
+
+=back
+
+=head1 CONFIGURATON EXPANSION
+
+After reading the config file, all values having the form C<`...`> are expanded
+by executing C<...> in a shell. For instance
+
+    curdir: `pwd`
+
+Will be expanded by setting C<curdir> to the output of command C<pwd>. To give
+a more complex example, the following config file value can be used to get the
+date of the latest git commit in RFC form: 
+
+    timestamp: "`git log -n1 --format=\"%ad\" --date=rfc`"
+
+=head1 TEMPLATES
+
+Template are evaluated with L<Text::Template>, so make sure to escape braces
+(C<{> and C<}>) with a backslash (C<\>). All configuration values are available
+as template variables.
+
+The CPAN distribution of this packages includes a set of default templates
+which are used if no template directory is selected with option C<templates>.
+use C<--init> to copy these default templates into subdirectory C<makedpkg>
+for further modification. 
+
+Typical templates files include:
+
+=over
+
+=item
+
+C<control> (included as default template)
+
+=item
+
+C<changelog> (included as default template)
+
+=item
+
+C<rules> (included as default template)
+
+=item
+
+C<compat> (included as default template)
+
+=item
+
+C<source/format> (included as default template)
+
+You should remove this file unless you explicitly include the sources.
+
+=item
+
+the control scripts C<preinst>, C<postinst>, C<prerm>, and C<postrm>
+
+=item
+
+C<copyright>
+
+=item
+
+C<upstart>
+
+=item
+
+...
+
+=back
+
+=head1 SEE ALSO
+
+The L<Debian New Maintainers'
+Guide|http://www.debian.org/doc/manuals/maint-guide/>, especially chaper 4 to
+6.
+
+=head1 AUTHOR
+
+Jakob Voß
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Jakob Voß.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,16 @@
+table.c
+lib/Algorithm/PageRank/XS.pm
+pagerank.h
+table.h
+MANIFEST
+t/fruitarcs.dat
+t/fruitarcs.ranks
+t/pr.t
+t/fruit.t
+Makefile.PL
+typemap
+pagerank.c
+XS.xs
+META.yml
+README
+ppport.h

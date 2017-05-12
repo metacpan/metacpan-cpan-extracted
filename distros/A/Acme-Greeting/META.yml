@@ -1,0 +1,28 @@
+---
+abstract: 'Greeting from Perl.'
+author:
+  - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.62
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.62
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Acme::Greeting
+name: Acme-Greeting
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.12.3
+  self: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.0.3

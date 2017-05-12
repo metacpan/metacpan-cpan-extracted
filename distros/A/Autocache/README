@@ -1,0 +1,12 @@
+
+Autocache - An automatic caching framework for Perl.
+
+This code came about as the result of attempting to refactor, simplify and
+extend the caching used on a rather large website.
+
+It provides a framework for configuring multiple caches at different levels,
+process, server, networked and declaratively configuring which functions
+have their results cached, and how.
+
+Please see the INSTALLATION and LICENCE files in this directory for more
+information.

@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 954bf745c96e4c05d11319208a9bfa4141a7c85a CHANGES
+SHA1 649a387b1fc8bd6cd605f8712fefb05ba762772d MANIFEST
+SHA1 4f963febc3ee01fb16198e515a915054e3fa680c MANIFEST.SKIP
+SHA1 dc543da0f23492057f013ccdba307346a4a52e7b META.yml
+SHA1 4930b28f2b113354b538fe8c8c21d1977991799a Makefile.PL
+SHA1 28ff113310ebef413385eed443065ac2c3c06f95 README
+SHA1 804fce4947f12829d4f64a1cedb8f4aae59575b2 XS.pm
+SHA1 c3b552323798ab9093474393404b2e8f50c70663 XS.pod
+SHA1 aaed57ea2b5525b20515ab5850277e3c321d40a0 XS.xs
+SHA1 fea5ed89441e8aa79bf51c68a88e172ac1703dfb lib/Authen/SASL/XS/Security.pm
+SHA1 dbb14eb467b1c29c8deec206bf43b896ef6fd70e t/common.pl
+SHA1 4583572055496b294339e78cc74f11341fe7ba69 t/gssapiskel.pl
+SHA1 c88bab5e85629c3d33f43f8371bfc5230130ae6c t/plain.t
+SHA1 181a86243075af7c2c6e9d8774296179397717a5 typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (Darwin)
+
+iEYEARECAAYFAkq6wtAACgkQR0BL4gbYw3SQqgCdHMcDLW+gvriMbRQl3cVaQPf+
+B3wAn3wzZzHKaqxCahTas8t20pqMx3LF
+=vIPV
+-----END PGP SIGNATURE-----

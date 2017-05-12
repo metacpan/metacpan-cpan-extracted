@@ -1,0 +1,36 @@
+Apache/EnvDir version 1.00
+==========================
+
+This module allows dynamic updating of Apache Environment variables via
+a directory of files. A new Apache configuration directive, EnvDir, takes
+either one or two arguments. The first is a directory containing files
+to be turned into environment variables, where the name of the file becomes
+the variable name and the contents of the file become the value. The second
+argument is an optional prefix that will be prepended to the variable name.
+
+The environment variables are visible to other Apache modules such as
+mod_cgi and mod_include. The file contents are cached in memory at startup,
+but changes to the files are reflected immediately without restarting the
+server.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+  This module only works in the 1.3 Apache tree at this point. The
+  "test" target requires Apache::Test and CGI.pm.
+
+COPYRIGHT AND LICENCE
+
+  This library is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.
+
+Copyright (C) 2003 Michael Cramer <cramer@webkist.com>. All Rights Reserved.
+

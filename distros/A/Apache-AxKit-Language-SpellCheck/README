@@ -1,0 +1,24 @@
+Apache::AxKit::Language::SpellCheck 
+
+   XML Text Spell Checker
+
+This language module processes an incoming XML document, either loaded
+from disk or returned from the previous pipeline stage, and processes
+its text nodes with Text::Aspell.  It injects additional XML elements
+in the document representing which words are incorrectly spelled, and
+optionally offers spelling suggestions.
+
+Installation
+============
+
+If you have all the pre-requisites installed you just run:
+
+ $ perl Makefile.PL
+ $ make test
+ # as superuser
+ $ make install
+
+IMPORTANT NOTE:
+
+This is free software, you may use it and distribute it under the same
+terms as Perl itself.

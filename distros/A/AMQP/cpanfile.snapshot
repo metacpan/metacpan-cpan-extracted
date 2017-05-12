@@ -1,0 +1,650 @@
+# carton snapshot format: version 1.0
+DISTRIBUTIONS
+  AnyEvent-7.05
+    pathname: M/ML/MLEHMANN/AnyEvent-7.05.tar.gz
+    provides:
+      AE undef
+      AE::Log::COLLECT undef
+      AE::Log::FILTER undef
+      AE::Log::LOG undef
+      AnyEvent 7.05
+      AnyEvent::Base 7.05
+      AnyEvent::CondVar 7.05
+      AnyEvent::CondVar::Base 7.05
+      AnyEvent::DNS undef
+      AnyEvent::Debug undef
+      AnyEvent::Debug::Backtrace undef
+      AnyEvent::Debug::Wrap undef
+      AnyEvent::Debug::Wrapped undef
+      AnyEvent::Debug::shell undef
+      AnyEvent::Handle undef
+      AnyEvent::IO undef
+      AnyEvent::IO::IOAIO undef
+      AnyEvent::IO::Perl undef
+      AnyEvent::Impl::Cocoa undef
+      AnyEvent::Impl::EV undef
+      AnyEvent::Impl::Event undef
+      AnyEvent::Impl::EventLib undef
+      AnyEvent::Impl::FLTK undef
+      AnyEvent::Impl::Glib undef
+      AnyEvent::Impl::IOAsync undef
+      AnyEvent::Impl::Irssi undef
+      AnyEvent::Impl::POE undef
+      AnyEvent::Impl::Perl undef
+      AnyEvent::Impl::Qt undef
+      AnyEvent::Impl::Qt::Io undef
+      AnyEvent::Impl::Qt::Timer undef
+      AnyEvent::Impl::Tk undef
+      AnyEvent::Log undef
+      AnyEvent::Log::COLLECT undef
+      AnyEvent::Log::Ctx undef
+      AnyEvent::Log::FILTER undef
+      AnyEvent::Log::LOG undef
+      AnyEvent::Loop undef
+      AnyEvent::Socket undef
+      AnyEvent::Strict undef
+      AnyEvent::TLS undef
+      AnyEvent::Util undef
+    requirements:
+      ExtUtils::MakeMaker 0
+  AnyEvent-RabbitMQ-1.15
+    pathname: B/BO/BOBTFISH/AnyEvent-RabbitMQ-1.15.tar.gz
+    provides:
+      AnyEvent::RabbitMQ 1.15
+      AnyEvent::RabbitMQ::Channel 1.15
+      AnyEvent::RabbitMQ::LocalQueue 1.15
+    requirements:
+      AnyEvent 0
+      Devel::GlobalDestruction 0
+      ExtUtils::MakeMaker 6.59
+      File::ShareDir 0
+      List::MoreUtils 0
+      Net::AMQP 0.06
+      Readonly 1.03
+      Test::Exception 0
+      Test::More 0
+      namespace::clean 0
+      perl 5.006
+      version 0
+  B-Hooks-EndOfScope-0.12
+    pathname: B/BO/BOBTFISH/B-Hooks-EndOfScope-0.12.tar.gz
+    provides:
+      B::Hooks::EndOfScope 0.12
+      B::Hooks::EndOfScope::PP 0.12
+      B::Hooks::EndOfScope::XS 0.12
+    requirements:
+      ExtUtils::CBuilder 0.26
+      ExtUtils::MakeMaker 6.30
+      Module::Implementation 0.05
+      Module::Runtime 0.012
+      Sub::Exporter::Progressive 0.001006
+      Test::More 0.88
+      Variable::Magic 0.48
+  Class-Accessor-0.34
+    pathname: K/KA/KASEI/Class-Accessor-0.34.tar.gz
+    provides:
+      Class::Accessor 0.34
+      Class::Accessor::Fast 0.34
+      Class::Accessor::Faster 0.34
+    requirements:
+      ExtUtils::MakeMaker 0
+      base 1.01
+  Class-Data-Inheritable-0.08
+    pathname: T/TM/TMTM/Class-Data-Inheritable-0.08.tar.gz
+    provides:
+      Class::Data::Inheritable 0.08
+    requirements:
+      ExtUtils::MakeMaker 0
+  Class-Inspector-1.28
+    pathname: A/AD/ADAMK/Class-Inspector-1.28.tar.gz
+    provides:
+      Class::Inspector 1.28
+      Class::Inspector::Functions 1.28
+    requirements:
+      ExtUtils::MakeMaker 6.59
+      File::Spec 0.80
+      Test::More 0.47
+      perl 5.006
+  Devel-GlobalDestruction-0.11
+    pathname: H/HA/HAARG/Devel-GlobalDestruction-0.11.tar.gz
+    provides:
+      Devel::GlobalDestruction 0.11
+    requirements:
+      ExtUtils::CBuilder 0.27
+      ExtUtils::MakeMaker 0
+      Sub::Exporter::Progressive 0.001006
+      perl 5.006
+  Dist-CheckConflicts-0.09
+    pathname: D/DO/DOY/Dist-CheckConflicts-0.09.tar.gz
+    provides:
+      Bar 0.02
+      Bar::Bar 0.01
+      Bar::Bar::Bad 0.01
+      Bar::Bar::Good 0.02
+      Bar::Baz 0.02
+      Bar::Baz::Bad 0.01
+      Bar::Baz::Good 0.02
+      Bar::Conflicts undef
+      Bar::Conflicts2 undef
+      Bar::Conflicts3 undef
+      Bar::Conflicts::Bad undef
+      Bar::Conflicts::Bad2 undef
+      Bar::Conflicts::Bad3 undef
+      Bar::Conflicts::Good undef
+      Bar::Conflicts::Good2 undef
+      Bar::Conflicts::Good3 undef
+      Bar::Foo 0.01
+      Bar::Foo::Bad 0.01
+      Bar::Foo::Good 0.02
+      Bar::Quux 0.02
+      Bar::Quux::Bad 0.01
+      Bar::Quux::Good 0.02
+      Bar::Three 0.02
+      Bar::Two 0.02
+      Broken undef
+      Dist::CheckConflicts 0.09
+      Foo undef
+      Foo::Bar 0.01
+      Foo::Baz 0.02
+      Foo::Conflicts undef
+      Foo::Conflicts2 undef
+      Foo::Conflicts::Bad undef
+      Foo::Conflicts::Broken undef
+      Foo::Conflicts::Good undef
+      Foo::Foo 0.01
+      Foo::Quux 0.02
+      Foo::Thing 0.02
+      Foo::Three 0.02
+      Foo::Two 0.02
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.30
+      List::MoreUtils 0.12
+      Module::Runtime 0
+      base 0
+      strict 0
+      warnings 0
+  File-ShareDir-1.03
+    pathname: A/AD/ADAMK/File-ShareDir-1.03.tar.gz
+    provides:
+      File::ShareDir 1.03
+    requirements:
+      Carp 0
+      Class::Inspector 1.12
+      ExtUtils::MakeMaker 6.42
+      File::Spec 0.80
+      Test::More 0.47
+      perl 5.005
+  List-MoreUtils-0.33
+    pathname: A/AD/ADAMK/List-MoreUtils-0.33.tar.gz
+    provides:
+      List::MoreUtils 0.33
+    requirements:
+      ExtUtils::CBuilder 0.27
+      ExtUtils::MakeMaker 6.52
+      Test::More 0.82
+      perl 5.00503
+  Module-Implementation-0.07
+    pathname: D/DR/DROLSKY/Module-Implementation-0.07.tar.gz
+    provides:
+      Module::Implementation 0.07
+      T::Impl1 undef
+      T::Impl2 undef
+      T::ImplFails1 undef
+      T::ImplFails2 undef
+    requirements:
+      Carp 0
+      ExtUtils::MakeMaker 6.30
+      Module::Runtime 0.012
+      Try::Tiny 0
+      strict 0
+      warnings 0
+  Module-Runtime-0.013
+    pathname: Z/ZE/ZEFRAM/Module-Runtime-0.013.tar.gz
+    provides:
+      Module::Runtime 0.013
+    requirements:
+      Module::Build 0
+      Test::More 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Mojolicious-4.34
+    pathname: S/SR/SRI/Mojolicious-4.34.tar.gz
+    provides:
+      Mojo undef
+      Mojo::Asset undef
+      Mojo::Asset::File undef
+      Mojo::Asset::Memory undef
+      Mojo::Base undef
+      Mojo::ByteStream undef
+      Mojo::Cache undef
+      Mojo::Collection undef
+      Mojo::Content undef
+      Mojo::Content::MultiPart undef
+      Mojo::Content::Single undef
+      Mojo::Cookie undef
+      Mojo::Cookie::Request undef
+      Mojo::Cookie::Response undef
+      Mojo::DOM undef
+      Mojo::DOM::CSS undef
+      Mojo::DOM::HTML undef
+      Mojo::Date undef
+      Mojo::EventEmitter undef
+      Mojo::Exception undef
+      Mojo::Headers undef
+      Mojo::HelloWorld undef
+      Mojo::Home undef
+      Mojo::IOLoop undef
+      Mojo::IOLoop::Client undef
+      Mojo::IOLoop::Delay undef
+      Mojo::IOLoop::Server undef
+      Mojo::IOLoop::Stream undef
+      Mojo::JSON undef
+      Mojo::JSON::Pointer undef
+      Mojo::JSON::_Bool undef
+      Mojo::Loader undef
+      Mojo::Log undef
+      Mojo::Message undef
+      Mojo::Message::Request undef
+      Mojo::Message::Response undef
+      Mojo::Parameters undef
+      Mojo::Path undef
+      Mojo::Reactor undef
+      Mojo::Reactor::EV undef
+      Mojo::Reactor::Poll undef
+      Mojo::Server undef
+      Mojo::Server::CGI undef
+      Mojo::Server::Daemon undef
+      Mojo::Server::Hypnotoad undef
+      Mojo::Server::Morbo undef
+      Mojo::Server::PSGI undef
+      Mojo::Server::PSGI::_IO undef
+      Mojo::Server::Prefork undef
+      Mojo::Template undef
+      Mojo::Transaction undef
+      Mojo::Transaction::HTTP undef
+      Mojo::Transaction::WebSocket undef
+      Mojo::URL undef
+      Mojo::Upload undef
+      Mojo::UserAgent undef
+      Mojo::UserAgent::CookieJar undef
+      Mojo::UserAgent::Transactor undef
+      Mojo::Util undef
+      Mojolicious 4.34
+      Mojolicious::Command undef
+      Mojolicious::Command::cgi undef
+      Mojolicious::Command::cpanify undef
+      Mojolicious::Command::daemon undef
+      Mojolicious::Command::eval undef
+      Mojolicious::Command::generate undef
+      Mojolicious::Command::generate::app undef
+      Mojolicious::Command::generate::lite_app undef
+      Mojolicious::Command::generate::makefile undef
+      Mojolicious::Command::generate::plugin 0.01
+      Mojolicious::Command::get undef
+      Mojolicious::Command::inflate undef
+      Mojolicious::Command::prefork undef
+      Mojolicious::Command::psgi undef
+      Mojolicious::Command::routes undef
+      Mojolicious::Command::test undef
+      Mojolicious::Command::version undef
+      Mojolicious::Commands undef
+      Mojolicious::Controller undef
+      Mojolicious::Lite undef
+      Mojolicious::Plugin undef
+      Mojolicious::Plugin::Charset undef
+      Mojolicious::Plugin::Config undef
+      Mojolicious::Plugin::Config::Sandbox undef
+      Mojolicious::Plugin::DefaultHelpers undef
+      Mojolicious::Plugin::EPLRenderer undef
+      Mojolicious::Plugin::EPRenderer undef
+      Mojolicious::Plugin::HeaderCondition undef
+      Mojolicious::Plugin::JSONConfig undef
+      Mojolicious::Plugin::Mount undef
+      Mojolicious::Plugin::PODRenderer undef
+      Mojolicious::Plugin::TagHelpers undef
+      Mojolicious::Plugins undef
+      Mojolicious::Renderer undef
+      Mojolicious::Routes undef
+      Mojolicious::Routes::Match undef
+      Mojolicious::Routes::Pattern undef
+      Mojolicious::Routes::Route undef
+      Mojolicious::Sessions undef
+      Mojolicious::Static undef
+      Mojolicious::Types undef
+      Test::Mojo undef
+      ojo undef
+    requirements:
+      ExtUtils::MakeMaker 0
+  Net-AMQP-0.06
+    pathname: C/CH/CHIPS/Net-AMQP-0.06.tar.gz
+    provides:
+      Net::AMQP 0.06
+      Net::AMQP::Common undef
+      Net::AMQP::Frame undef
+      Net::AMQP::Frame::Body undef
+      Net::AMQP::Frame::Header undef
+      Net::AMQP::Frame::Heartbeat undef
+      Net::AMQP::Frame::Method undef
+      Net::AMQP::Frame::OOBBody undef
+      Net::AMQP::Frame::OOBHeader undef
+      Net::AMQP::Frame::OOBMethod undef
+      Net::AMQP::Frame::Trace undef
+      Net::AMQP::Protocol undef
+      Net::AMQP::Protocol::Base undef
+      Net::AMQP::Protocol::v0_8 undef
+      Net::AMQP::Value undef
+    requirements:
+      Class::Accessor 0
+      Class::Data::Inheritable 0
+      File::Temp 0.19
+      Module::Build 0.40
+      Scalar::Util 0
+      Test::Deep 0
+      Test::More 0.88
+      XML::LibXML 0
+  Package-Stash-0.36
+    pathname: D/DO/DOY/Package-Stash-0.36.tar.gz
+    provides:
+      Package::Stash 0.36
+      Package::Stash::PP 0.36
+    requirements:
+      B 0
+      Carp 0
+      Config 0
+      Dist::CheckConflicts 0.02
+      ExtUtils::MakeMaker 6.30
+      File::Find 0
+      File::Spec 0
+      File::Temp 0
+      Getopt::Long 0
+      Module::Implementation 0.06
+      Package::Stash::XS 0.26
+      Scalar::Util 0
+      Symbol 0
+      Test::Fatal 0
+      Test::More 0.88
+      Test::Requires 0
+      Text::ParseWords 0
+      base 0
+      constant 0
+      lib 0
+      strict 0
+      warnings 0
+  Package-Stash-XS-0.28
+    pathname: D/DO/DOY/Package-Stash-XS-0.28.tar.gz
+    provides:
+      CompileTime undef
+      Package::Stash::XS 0.28
+    requirements:
+      ExtUtils::MakeMaker 6.30
+      XSLoader 0
+      strict 0
+      warnings 0
+  Readonly-1.03
+    pathname: R/RO/ROODE/Readonly-1.03.tar.gz
+    provides:
+      Readonly 1.03
+      Readonly::Array 1.03
+      Readonly::Hash 1.03
+      Readonly::Scalar 1.03
+    requirements:
+      ExtUtils::MakeMaker 0
+  Sub-Exporter-Progressive-0.001010
+    pathname: F/FR/FREW/Sub-Exporter-Progressive-0.001010.tar.gz
+    provides:
+      Sub::Exporter::Progressive 0.001010
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0.88
+  Sub-Uplevel-0.24
+    pathname: D/DA/DAGOLDEN/Sub-Uplevel-0.24.tar.gz
+    provides:
+      Sub::Uplevel 0.24
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.30
+      File::Find 0
+      File::Temp 0
+      Test::More 0
+      constant 0
+      strict 0
+      warnings 0
+  Test-Deep-0.110
+    pathname: R/RJ/RJBS/Test-Deep-0.110.tar.gz
+    provides:
+      Test::Deep 0.110
+      Test::Deep::All undef
+      Test::Deep::Any undef
+      Test::Deep::Array undef
+      Test::Deep::ArrayEach undef
+      Test::Deep::ArrayElementsOnly undef
+      Test::Deep::ArrayLength undef
+      Test::Deep::ArrayLengthOnly undef
+      Test::Deep::Blessed undef
+      Test::Deep::Boolean undef
+      Test::Deep::Cache undef
+      Test::Deep::Cache::Simple undef
+      Test::Deep::Class undef
+      Test::Deep::Cmp undef
+      Test::Deep::Code undef
+      Test::Deep::Hash undef
+      Test::Deep::HashEach undef
+      Test::Deep::HashElements undef
+      Test::Deep::HashKeys undef
+      Test::Deep::HashKeysOnly undef
+      Test::Deep::Ignore undef
+      Test::Deep::Isa undef
+      Test::Deep::ListMethods undef
+      Test::Deep::MM undef
+      Test::Deep::Methods undef
+      Test::Deep::NoTest undef
+      Test::Deep::Number undef
+      Test::Deep::Ref undef
+      Test::Deep::RefType undef
+      Test::Deep::Regexp undef
+      Test::Deep::RegexpMatches undef
+      Test::Deep::RegexpRef undef
+      Test::Deep::RegexpRefOnly undef
+      Test::Deep::RegexpVersion undef
+      Test::Deep::ScalarRef undef
+      Test::Deep::ScalarRefOnly undef
+      Test::Deep::Set undef
+      Test::Deep::Shallow undef
+      Test::Deep::Stack undef
+      Test::Deep::String undef
+      Test::Deep::SubHash undef
+      Test::Deep::SubHashElements undef
+      Test::Deep::SubHashKeys undef
+      Test::Deep::SubHashKeysOnly undef
+      Test::Deep::SuperHash undef
+      Test::Deep::SuperHashElements undef
+      Test::Deep::SuperHashKeys undef
+      Test::Deep::SuperHashKeysOnly undef
+    requirements:
+      ExtUtils::MakeMaker 0
+      List::Util 1.09
+      Scalar::Util 1.09
+      Test::More 0
+      Test::NoWarnings 0.02
+      Test::Tester 0.04
+  Test-Exception-0.32
+    pathname: A/AD/ADIE/Test-Exception-0.32.tar.gz
+    provides:
+      Test::Exception 0.32
+    requirements:
+      Module::Build 0.38
+      Sub::Uplevel 0.18
+      Test::Builder 0.7
+      Test::Builder::Tester 1.07
+      Test::Harness 2.03
+      Test::More 0.7
+      Test::Simple 0.7
+  Test-Fatal-0.010
+    pathname: R/RJ/RJBS/Test-Fatal-0.010.tar.gz
+    provides:
+      Test::Fatal 0.010
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 6.30
+      Test::Builder 0
+      Test::Builder::Tester 0
+      Test::More 0.47
+      Try::Tiny 0.07
+      overload 0
+      strict 0
+      warnings 0
+  Test-NoWarnings-1.04
+    pathname: A/AD/ADAMK/Test-NoWarnings-1.04.tar.gz
+    provides:
+      Test::NoWarnings 1.04
+      Test::NoWarnings::Warning 1.04
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::Builder 0.86
+      Test::More 0.47
+      Test::Tester 0.107
+      perl 5.006
+  Test-Requires-0.07
+    pathname: T/TO/TOKUHIROM/Test-Requires-0.07.tar.gz
+    provides:
+      Test::Requires 0.07
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      ExtUtils::MakeMaker 6.59
+      Module::Build 0.38
+      Test::Builder::Module 0
+      Test::More 0.61
+      perl 5.008_001
+  Test-Tester-0.109
+    pathname: F/FD/FDALY/Test-Tester-0.109.tar.gz
+    provides:
+      Test::Tester 0.109
+      Test::Tester::Capture undef
+      Test::Tester::CaptureRunner undef
+      Test::Tester::Delegate undef
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::Builder 0
+  Try-Tiny-0.18
+    pathname: D/DO/DOY/Try-Tiny-0.18.tar.gz
+    provides:
+      Try::Tiny 0.18
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.30
+      base 0
+      constant 0
+      strict 0
+      warnings 0
+  Variable-Magic-0.53
+    pathname: V/VP/VPIT/Variable-Magic-0.53.tar.gz
+    provides:
+      Variable::Magic 0.53
+    requirements:
+      Carp 0
+      Config 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      Test::More 0
+      XSLoader 0
+      base 0
+      perl 5.008
+  XML-LibXML-2.0105
+    pathname: S/SH/SHLOMIF/XML-LibXML-2.0105.tar.gz
+    provides:
+      XML::LibXML 2.0105
+      XML::LibXML::Attr 2.0105
+      XML::LibXML::AttributeHash 2.0105
+      XML::LibXML::Boolean 2.0105
+      XML::LibXML::CDATASection 2.0105
+      XML::LibXML::Comment 2.0105
+      XML::LibXML::Common 2.0105
+      XML::LibXML::Devel 2.0105
+      XML::LibXML::Document 2.0105
+      XML::LibXML::DocumentFragment 2.0105
+      XML::LibXML::Dtd 2.0105
+      XML::LibXML::Element 2.0105
+      XML::LibXML::ErrNo 2.0105
+      XML::LibXML::Error 2.0105
+      XML::LibXML::InputCallback 2.0105
+      XML::LibXML::Literal 2.0105
+      XML::LibXML::NamedNodeMap 2.0105
+      XML::LibXML::Namespace 2.0105
+      XML::LibXML::Node 2.0105
+      XML::LibXML::NodeList 2.0105
+      XML::LibXML::Number 2.0105
+      XML::LibXML::PI 2.0105
+      XML::LibXML::Pattern 2.0105
+      XML::LibXML::Reader 2.0105
+      XML::LibXML::RegExp 2.0105
+      XML::LibXML::RelaxNG 2.0105
+      XML::LibXML::SAX 2.0105
+      XML::LibXML::SAX::AttributeNode 2.0105
+      XML::LibXML::SAX::Builder 2.0105
+      XML::LibXML::SAX::Generator 2.0105
+      XML::LibXML::SAX::Parser 2.0105
+      XML::LibXML::Schema 2.0105
+      XML::LibXML::Text 2.0105
+      XML::LibXML::XPathContext 2.0105
+      XML::LibXML::XPathExpression 2.0105
+      XML::LibXML::_SAXParser 2.0105
+    requirements:
+      ExtUtils::MakeMaker 6.56
+      Test::More 0
+      XML::NamespaceSupport 1.07
+      XML::SAX 0.11
+      base 0
+      strict 0
+      vars 0
+      warnings 0
+  XML-NamespaceSupport-1.11
+    pathname: P/PE/PERIGRIN/XML-NamespaceSupport-1.11.tar.gz
+    provides:
+      XML::NamespaceSupport 1.11
+    requirements:
+      ExtUtils::MakeMaker 6.42
+      Test::More 0.47
+  XML-SAX-0.99
+    pathname: G/GR/GRANTM/XML-SAX-0.99.tar.gz
+    provides:
+      XML::SAX 0.99
+      XML::SAX::DocumentLocator undef
+      XML::SAX::ParserFactory 1.01
+      XML::SAX::PurePerl 0.99
+      XML::SAX::PurePerl::DebugHandler undef
+      XML::SAX::PurePerl::Exception undef
+      XML::SAX::PurePerl::Productions undef
+      XML::SAX::PurePerl::Reader undef
+      XML::SAX::PurePerl::Reader::Stream undef
+      XML::SAX::PurePerl::Reader::String undef
+      XML::SAX::PurePerl::Reader::URI undef
+    requirements:
+      ExtUtils::MakeMaker 0
+      File::Temp 0
+      XML::NamespaceSupport 0.03
+      XML::SAX::Base 1.05
+  XML-SAX-Base-1.08
+    pathname: G/GR/GRANTM/XML-SAX-Base-1.08.tar.gz
+    provides:
+      XML::SAX::Base 1.08
+      XML::SAX::Base::NoHandler 1.08
+      XML::SAX::Exception 1.08
+    requirements:
+      ExtUtils::MakeMaker 6.31
+      Test::More 0.88
+  namespace-clean-0.24
+    pathname: R/RI/RIBASUSHI/namespace-clean-0.24.tar.gz
+    provides:
+      namespace::clean 0.24
+    requirements:
+      B::Hooks::EndOfScope 0.12
+      ExtUtils::CBuilder 0.27
+      Package::Stash 0.23
+      Test::More 0.88

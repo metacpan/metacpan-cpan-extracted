@@ -1,0 +1,9 @@
+Build.PL
+Changes
+INSTALL
+lib/Algorithm/WordLevelStatistics.pm
+Makefile.PL
+MANIFEST
+META.yml
+t/1.t
+t/Relativity.test

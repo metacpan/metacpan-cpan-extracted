@@ -1,0 +1,16 @@
+abstract: build and evaluate include/exclude lists
+author: Jonathan Rockway, C<< <jrockway at cpan.org> >>
+build_requires: 
+  Test::Exception: 0
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Algorithm-IncludeExclude
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Carp: 0
+version: 0.01

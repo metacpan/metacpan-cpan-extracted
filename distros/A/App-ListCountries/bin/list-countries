@@ -1,0 +1,476 @@
+#!perl
+
+# Note: This script is a CLI  for Riap function /App/ListCountries/list_countries
+# and generated automatically using Perinci::CmdLine::Gen version 0.28
+
+our $DATE = '2016-02-13'; # DATE
+our $DIST = 'App-ListCountries'; # DIST
+our $VERSION = '0.01'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => "/App/ListCountries/list_countries",
+    program_name => "list-countries",
+)->run;
+
+# ABSTRACT: List countries
+# PODNAME: list-countries
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-countries - List countries
+
+=head1 VERSION
+
+This document describes version 0.01 of list-countries (from Perl distribution App-ListCountries), released on 2016-02-13.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % list-countries [options] [query]
+
+=head1 DESCRIPTION
+
+Source data is generated from C<Locale::Codes::Country_Codes>. so make sure you
+have a relatively recent version of the module.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for alpha2 options
+
+=over
+
+=item B<--alpha2-contains>=I<s>
+
+Only return records where the 'alpha2' field contains specified text.
+
+=item B<--alpha2-in-json>=I<s>
+
+Only return records where the 'alpha2' field is in the specified values (JSON-encoded).
+
+See C<--alpha2-in>.
+
+=item B<--alpha2-in>=I<s@>
+
+Only return records where the 'alpha2' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--alpha2-is>=I<s>
+
+Only return records where the 'alpha2' field equals specified value.
+
+=item B<--alpha2-isnt>=I<s>
+
+Only return records where the 'alpha2' field does not equal specified value.
+
+=item B<--alpha2-max>=I<s>
+
+Only return records where the 'alpha2' field is less than or equal to specified value.
+
+=item B<--alpha2-min>=I<s>
+
+Only return records where the 'alpha2' field is greater than or equal to specified value.
+
+=item B<--alpha2-not-contains>=I<s>
+
+Only return records where the 'alpha2' field does not contain specified text.
+
+=item B<--alpha2-not-in-json>=I<s>
+
+Only return records where the 'alpha2' field is not in the specified values (JSON-encoded).
+
+See C<--alpha2-not-in>.
+
+=item B<--alpha2-not-in>=I<s@>
+
+Only return records where the 'alpha2' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--alpha2-xmax>=I<s>
+
+Only return records where the 'alpha2' field is less than specified value.
+
+=item B<--alpha2-xmin>=I<s>
+
+Only return records where the 'alpha2' field is greater than specified value.
+
+=item B<--alpha2>=I<s>
+
+Only return records where the 'alpha2' field equals specified value.
+
+=back
+
+=head2 Filtering for en_name options
+
+=over
+
+=item B<--en-name-contains>=I<s>
+
+Only return records where the 'en_name' field contains specified text.
+
+=item B<--en-name-in-json>=I<s>
+
+Only return records where the 'en_name' field is in the specified values (JSON-encoded).
+
+See C<--en-name-in>.
+
+=item B<--en-name-in>=I<s@>
+
+Only return records where the 'en_name' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--en-name-is>=I<s>
+
+Only return records where the 'en_name' field equals specified value.
+
+=item B<--en-name-isnt>=I<s>
+
+Only return records where the 'en_name' field does not equal specified value.
+
+=item B<--en-name-max>=I<s>
+
+Only return records where the 'en_name' field is less than or equal to specified value.
+
+=item B<--en-name-min>=I<s>
+
+Only return records where the 'en_name' field is greater than or equal to specified value.
+
+=item B<--en-name-not-contains>=I<s>
+
+Only return records where the 'en_name' field does not contain specified text.
+
+=item B<--en-name-not-in-json>=I<s>
+
+Only return records where the 'en_name' field is not in the specified values (JSON-encoded).
+
+See C<--en-name-not-in>.
+
+=item B<--en-name-not-in>=I<s@>
+
+Only return records where the 'en_name' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--en-name-xmax>=I<s>
+
+Only return records where the 'en_name' field is less than specified value.
+
+=item B<--en-name-xmin>=I<s>
+
+Only return records where the 'en_name' field is greater than specified value.
+
+=item B<--en-name>=I<s>
+
+Only return records where the 'en_name' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--query>=I<s>, B<-q>
+
+Search.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort>=I<s>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<i>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<i>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-countries list-countries
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-countries 'p/*/`list-countries`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at ~/.config/list-countries.conf, ~/list-countries.conf or /etc/list-countries.conf (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> (filter by profile). Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=foo ...]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ alpha2 (see --alpha2)
+ alpha2.contains (see --alpha2-contains)
+ alpha2.in (see --alpha2-in)
+ alpha2.is (see --alpha2-is)
+ alpha2.isnt (see --alpha2-isnt)
+ alpha2.max (see --alpha2-max)
+ alpha2.min (see --alpha2-min)
+ alpha2.not_contains (see --alpha2-not-contains)
+ alpha2.not_in (see --alpha2-not-in)
+ alpha2.xmax (see --alpha2-xmax)
+ alpha2.xmin (see --alpha2-xmin)
+ detail (see --detail)
+ en_name (see --en-name)
+ en_name.contains (see --en-name-contains)
+ en_name.in (see --en-name-in)
+ en_name.is (see --en-name-is)
+ en_name.isnt (see --en-name-isnt)
+ en_name.max (see --en-name-max)
+ en_name.min (see --en-name-min)
+ en_name.not_contains (see --en-name-not-contains)
+ en_name.not_in (see --en-name-not-in)
+ en_name.xmax (see --en-name-xmax)
+ en_name.xmin (see --en-name-xmin)
+ fields (see --field)
+ format (see --format)
+ naked_res (see --naked-res)
+ query (see --query)
+ random (see --random)
+ result_limit (see --result-limit)
+ result_start (see --result-start)
+ sort (see --sort)
+ with_field_names (see --with-field-names)
+
+=head1 ENVIRONMENT
+
+=head2 LIST_COUNTRIES_OPT => str
+
+Specify additional command-line options
+
+=head1 FILES
+
+~/.config/list-countries.conf
+
+~/list-countries.conf
+
+/etc/list-countries.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ListCountries>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ListCountries>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListCountries>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

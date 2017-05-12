@@ -1,0 +1,25 @@
+
+To install the Authen::CyrusSASL Client module for Perl 5, proceed as follows :
+
+1 Unpack the Authen-SASL source archive into a suitable directory with
+
+	gunzip -cf Authen-SASL-x.xx.tar.gz |tar xvf -
+
+2 Go into the newly created directory with
+
+	cd Authen-SASL-x.xx
+
+3 Build the module as usual :
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Note that for 'make test' to work, you should have a Sasl Authen/Pwcheck server running
+with the IP address & secret of the target machine in its clients file. You
+should also know a username & password in order to test if authentication
+works OK. Doing a 'make test' will first ask you for each of these.
+
+Piotr Klaban
+

@@ -1,0 +1,42 @@
+Apache2-REST
+
+This module provides a framework for quick and easy implementation of a RESTful API under apache2/mod_perl2/apreq2
+
+Dependencies are listed in Makefile.PL.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Apache2::REST
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Apache2-REST
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Apache2-REST
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Apache2-REST
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Apache2-REST
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2010 The authors.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

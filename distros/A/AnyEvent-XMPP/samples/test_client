@@ -1,0 +1,58 @@
+#!/opt/perl/bin/perl
+use strict;
+use utf8;
+use AnyEvent;
+use AnyEvent::XMPP qw/xep-86/;
+use AnyEvent::XMPP::Client;
+use Encode;
+
+binmode STDOUT, ":utf8";
+
+my $j = AnyEvent->condvar;
+my $cl = AnyEvent::XMPP::Client->new (debug => 1);
+$cl->set_presence ('away', 'I\'m a bot now.', 1);
+$cl->add_account (@ARGV, undef, undef);
+$cl->reg_cb (
+   connected => sub {
+      $cl->send_message ("Hello!" => 'elmex@jabber.org');
+      0
+   },
+   roster_update => sub {
+      my ($cl, $acc, $roster, $contacts) = @_;
+      $roster->debug_dump;
+      #$acc->connection ()->send_presence ('probe' => undef, to => 'elmex@jabfber.org');
+      #print "OEOFWEFIEJWFEWO\n" if not $roster->is_retrieved;
+      1
+   },
+   presence_update => sub {
+      my ($cl, $acc, $roster, $contact, $old, $new) = @_;
+      $roster->debug_dump;
+      1
+   },
+   error => sub {
+      my ($cl, $acc, $error) = @_;
+      print "ERROR: ".$error->string."\n";
+   },
+   disconnect => sub { warn "DISCON[@_]\n"; 1 },
+);
+
+$cl->reg_cb (contact_request_subscribe => sub {
+   my ($cl, $acc, $roster, $contact) = @_;
+   $contact->send_subscribe;
+   0
+});
+
+$cl->reg_cb (contact_did_unsubscribe => sub {
+   my ($cl, $acc, $roster, $contact, $rdoit) = @_;
+   1
+});
+
+$cl->reg_cb (roster_update => sub {
+   my ($cl, $acc, $roster, $contacts) = @_;
+   $roster->debug_dump;
+   0
+});
+
+$cl->start;
+
+$j->wait;

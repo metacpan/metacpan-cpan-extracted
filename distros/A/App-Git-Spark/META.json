@@ -1,0 +1,90 @@
+{
+   "abstract" : "Plot your git commit history on the command line with sparklines",
+   "author" : [
+      "Eric Johnson <cpan at iijo dot nospamthanks dot org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Git-Spark",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Encode" : "0",
+            "Getopt::Long::Descriptive" : "0",
+            "List::AllUtils" : "0",
+            "Math::Round" : "0",
+            "Term::Spark" : "0",
+            "Term::Vspark" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "List::Util" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Git::Spark" : {
+         "file" : "lib/App/Git/Spark.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kablamo/git-spark/issues"
+      },
+      "homepage" : "https://metacpan.org/release/App-Git-Spark",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kablamo/git-spark.git",
+         "web" : "https://github.com/kablamo/git-spark"
+      }
+   },
+   "version" : "0.006",
+   "x_contributors" : [
+      "Eric Johnson <eric.git@iijo.org>"
+   ]
+}
+

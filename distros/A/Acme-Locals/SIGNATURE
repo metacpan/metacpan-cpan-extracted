@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e53c2bfca9bc8f715b6994b9c49e87d1b8671af2 Changes
+SHA1 280931ea27a49ef74b80cfa6e3f7fc313e24fb71 MANIFEST
+SHA1 915ef5f521a95e57e105fabe0876ed97a26319fe META.yml
+SHA1 4525498b0e2ccfe6dcba0031403baf6483d298a8 Makefile.PL
+SHA1 dacc649938bbb4b8ac6eb9d7f50eeb2ca7685d48 README
+SHA1 cbc37c95028abd4525b5431065c8c9d0d1f1c70d devel/build_wikidoc.pl
+SHA1 a17269ffafa982debf86b73394e1db7d0a7ca56f devel/curversion
+SHA1 bc0316b51ebe88f527eec920c41fd1e65facc88e devel/grepversion.sh
+SHA1 d161ba99a55ec8bdda464b31add26e58bc375428 devel/incrementversion.sh
+SHA1 9b8f9a4e23040a24b3ef692a842002a511d2a829 examples/locals-python.pm
+SHA1 c63514758dda6994a5ccddd716bd55aa3c7555a6 examples/locals-ruby.pm
+SHA1 603bb9de29fb8cba7f13409c546750972eff645d inc/Module/AutoInstall.pm
+SHA1 7e2cfa1b9efe0d502ee57717649c90ba4bd28ba9 inc/Module/Install.pm
+SHA1 182a0df45b65151afdc2be0b7246a2d02d0f0567 inc/Module/Install/AutoInstall.pm
+SHA1 6e1392d80a0f239eecd5664f7f21f922cedb9329 inc/Module/Install/Base.pm
+SHA1 f69417fe831d9cc22a78f00a617afadceade4d81 inc/Module/Install/Can.pm
+SHA1 c61d02895330310048bf388881b5e2e064031561 inc/Module/Install/Fetch.pm
+SHA1 4933b00c3a646da8d223c6957f94552bbd62f8c6 inc/Module/Install/Include.pm
+SHA1 54fcbed19232ec959bb17cfb4410599afc7f0779 inc/Module/Install/Makefile.pm
+SHA1 7d3be9b158e37b2b2c22084740099955623b1d56 inc/Module/Install/Metadata.pm
+SHA1 0a8b66180229ba2f9deaea1fedd0aacf7a7ace6b inc/Module/Install/Win32.pm
+SHA1 d3352eb33fe43a5f3ead513f645224fe34d73bc9 inc/Module/Install/WriteAll.pm
+SHA1 3732bfbd5a87ce5f0267702cd7af151de968c94e lib/Acme/Locals.pm
+SHA1 ea983a0ef9019aebc7afbc8f8e57818ec6f389e7 lib/Acme/Locals.pod
+SHA1 16b968332d807eb4482a38a64775975f287f97f3 t/.01-basic.t.swp
+SHA1 21f8ed1abe787084395121f62cb255b0a6b069f1 t/00-Kwalitee.t
+SHA1 9418f8ecbcba8a2039f14789812e0c5026d83130 t/00-YAML-META_valid.t
+SHA1 f1d475a83ce0ff8bbd25d460ee1045701022d3ba t/minimum_version.t
+SHA1 1b72fe2d24d370c72a5c0dc4bc0e291eb666e6a8 t/perlcritic.t
+SHA1 17476e3901529a486d55570e2f2fb12da6d79bd6 t/perlcriticrc
+SHA1 552fffe0af10146adc966fc8579d0a64e9352971 t/pod-coverage.t
+SHA1 304f70d1485ebbc7f0d23d7cd714f1620f5ee2f2 t/pod-spell.t
+SHA1 2079a598b5cab7c848b8f21c46dfc3e144b07cb7 t/pod.t
+SHA1 7ccc33fda466df84dcf5a4cd1ee16c94c6139a78 t/stopwords-asksh.txt
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2.2 (Darwin)
+
+iD8DBQFHRVU9J6CUX3jsf/oRAgOtAJ99nn/+wuRzZ43W8SCyC/UJz5WTSgCeLurG
+Hz4MzhO0bSrXu8CnXmlOwqU=
+=20c2
+-----END PGP SIGNATURE-----

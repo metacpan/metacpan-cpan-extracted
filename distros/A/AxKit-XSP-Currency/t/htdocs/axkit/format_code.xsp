@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: /local/CPAN/AxKit-XSP-Currency/t/htdocs/axkit/format_code.xsp 1434 2005-03-05T01:08:13.559154Z claco  $ -->
+<xsp:page xmlns:xsp="http://apache.org/xsp/core/v1"
+	xmlns:currency="http://today.icantfocus.com/CPAN/AxKit/XSP/Currency"
+>
+	<body>
+		<price>
+			<currency:format code="CAD">
+				<currency:price>10.5</currency:price>
+			</currency:format>
+		</price>
+	</body>
+</xsp:page>

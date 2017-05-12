@@ -1,0 +1,11 @@
+
+To add/fix drivers look at Play/Makefile.PL to see how the 
+architecture specific sub-class is built.
+
+Then edit Play/config/* and re-run Makefile.PL
+
+Only Play/config/sun* have been tested
+     Play/config/next* have been fully converted
+  
+Rest of Play/config/* are really .c files from rsynth-2.0 and 
+need coberting to true .xs files.

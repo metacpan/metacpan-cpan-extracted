@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/AnyEvent/HTTP/LWP/UserAgent/Determined.pm
+t/01_about_verbose.t
+t/10_determined_test.t
+t/11_determined_test_async.t
+t/author-critic.t
+t/release-kwalitee.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+weaver.ini

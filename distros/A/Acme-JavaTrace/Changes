@@ -1,0 +1,33 @@
+Version History
+---------------
+
+2011.02.19 - 0.08
+  - Converted files to UTF-8.
+
+2008.01.13 - 0.07
+  - Tests: Fixed t/03showrefs1.t so it passes under Perl 5.005
+
+2005.07.13 - 0.06
+  - Tests: Modified 03showrefs1.t so that it passes under Perl 5.004
+  - Updated documentation.
+
+2005.07.31 - 0.05
+  - Bugfix: added support for references and objects passed to die().
+  - Added import option 'showrefs'.
+  - Added test scripts 03showrefs0.t, 03showrefs1.t
+
+2005.05.18 - 0.04
+  - Updated documentation.
+
+2005.03.20 - 0.03
+  - Added test scripts 00load.t, 00prereq.t, podcover.t
+  - Updated documentation.
+
+2004.12.12 - 0.02
+  - Bugfix: last line was incorrectly always printing "main::". 
+  - Improved documentation. 
+  - Added link to the slides of my "Entreprise Perl" lightning talk.
+  - Added tests t/distchk.t, t/pod.t, t/portfs.t
+
+2004.03.29 - 0.01
+  - Initial release. 

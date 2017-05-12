@@ -1,0 +1,37 @@
+This is an Apache::Session extension module that stores the 
+session data in Shared memory (so, does exactly what it says 
+on the tin then) using IPC::Cache (and hence IPC::ShareLite).
+
+
+To install
+
+
+  % perl Makefile.PL
+  % make
+  % make test
+  % make install
+
+.. you know, the usual.
+
+
+As far as I know it doesn't leak memory and is about as fast as 
+Apache::Session::File, if not faster, but you don't have to start 
+fiddling round setting up directories that the Webserver can 
+write to but which browsers don't have access.
+
+It probably isn't hugely scaleable. Maybe it is. I haven't had 
+and oppurtunity to check. Get back to me if you find out either 
+way. 
+
+IPC::ShareLite had problems with perl 5.6 last time I checked. 
+This may be fixed. If not, bug the author, not me ;)
+
+
+This module is Copyright (c) 2000, 2001 Simon Wistow <simon@twoshortplanks.com>. 
+
+All rights reserved. This program is free software; you can redistribute 
+it and/or modify it under the same terms as Perl itself
+
+
+
+

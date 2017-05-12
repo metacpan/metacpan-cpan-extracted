@@ -1,0 +1,47 @@
+filename(./headers)
+formtitle(Process Headers)
+proc(id)
+proctags(h1=>toitalic,h2=>underline,h3=>toitalic,h4=>underline)
+desc(headersDesc)
+
+##
+
+sub headersDesc {
+    return "<br>Change headers content only. H1 content is processed by toupper function, H2 by tobold and H3 by toitalic as defined in application's DSL.<br><pre>
+cginame(./headers)
+formtitle(Process Headers)
+proc(id)
+proctags(h1=>uc,h2=>tobold,h3=>toitalic)
+desc(headersDesc)
+</pre>
+Good example to test: <a href='http://nrc.homelinux.org/headers.html'>http://nrc.homelinux.org/headers.html</a><br>Example's source: <pre>
+&lt;body&gt;
+&lt;h1&gt;This is header 1&lt;/h1&gt;
+content blah
+&lt;h2&gt;This is header 2&lt;/h2&gt;
+content blah
+&lt;h3&gt;This is header 3&lt;/h3&gt;
+content blah
+&lt;h4&gt;This is header 4&lt;/h4&gt;
+content blah
+&lt;/body&gt;
+</pre>
+";
+}
+
+sub id {
+    my $item = shift;
+    return $item;
+}
+
+sub underline {
+    my $t = shift;
+    return "<u>$t</u>";
+
+}
+
+sub toitalic {
+    my $t = shift;
+    return "<i>$t</i>";
+}
+

@@ -1,0 +1,40 @@
+ChangeLog
+Changes
+data/funcnts-i.log
+data/funcnts-i.log.p
+data/funcnts_01.log
+data/funcnts_01.log.p
+data/funcnts_02.log
+data/funcnts_02.log.p
+data/funcnts_s.log
+data/funcnts_s.log.p
+data/funcnts_s_-s.log
+data/funcnts_s_-s.log.p
+data/funcnts_sb.log
+data/funcnts_sb.log.p
+data/funcnts_sb_-i.log
+data/funcnts_sb_-i.log.p
+data/funcnts_sb_-ie.log
+data/funcnts_sb_-ie.log.p
+data/funcnts_sb_-im.log
+data/funcnts_sb_-im.log.p
+data/funcnts_sb_-is.log
+data/funcnts_sb_-is.log.p
+data/funcnts_sb_-ism.log
+data/funcnts_sb_-ism.log.p
+data/funcnts_sb_-m.log
+data/funcnts_sb_-m.log.p
+data/funcnts_sb_-s.log
+data/funcnts_sb_-s.log.p
+data/funcnts_sb_-sm.log
+data/funcnts_sb_-sm.log.p
+data/funhist_01.log
+data/funhist_01.log.p
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+Parse.pm
+README
+test.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

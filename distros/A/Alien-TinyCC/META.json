@@ -1,0 +1,60 @@
+{
+   "abstract" : "Ensure the Tiny C Compiler is installed on your system",
+   "author" : [
+      "David Mertens <dcmertens.perl@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-TinyCC",
+   "no_index" : {
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "File::ShareDir" : "0",
+            "Module::Build" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::ShareDir" : "0",
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::TinyCC" : {
+         "file" : "lib/Alien/TinyCC.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/run4flat/Alien-TinyCC/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/run4flat/Alien-TinyCC"
+      }
+   },
+   "version" : "0.06"
+}

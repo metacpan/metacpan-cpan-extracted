@@ -1,0 +1,80 @@
+.::DSS(3)             User Contributed Perl Documentation            .::DSS(3)
+
+
+
+NNAAMMEE
+       Audio::DSS - Extract meta data from Digital Speech Standard (DSS) files
+
+SSYYNNOOPPSSIISS
+         use Audio::DSS;
+         my $dss = new Audio::DSS;
+         $dss->{file} = 'dss_is_cool.dss';
+         $dss->getDSSMetaData();
+
+         or
+
+         my $dss = new Audio::DSS(file=>'dss_is_cool.dss');;
+
+         print $dss->{file};
+         print $dss->{create_date};
+         print $dss->{complete_date};
+         print $dss->{length};
+         print $dss->{comments};
+
+DDEESSCCRRIIPPTTIIOONN
+       Extract the meta information from a Digital Speech Standard (DSS) file.
+       DSS is a compact file format used for recording voice.  It is used in
+       Olympus Digital Voice Recorders.
+
+       To be precise, I assume it is used all over, but I _know_ that it is
+       used in the Olympus DS-330 Digital Voice Recorder.
+
+       My voice recorder supports five different folders, and many different
+       tracks in each folder.  The interface software then sucks my recordings
+       from the voice recorder onto my iBook, putting clips into individual
+       dss files in one of five different directories.
+
+       The DSS header includes the time a track was created, when it was last
+       edited, the total time, and up to 100 characters of comments.  The key
+       use case for this module is to pull time stamps then use the as yet
+       unwritten and not really named 'Geo::Track::Interpolate' to syncronize
+       DSS files with GPS track logs based on the time stamps.
+
+       Huh?  Time is the universal foreign key!  If you know what time some-
+       thing occurred then you can syncronize it with your GPS track log.
+       Digital photos, voice records, heart rate monitoring, temperature, ran-
+       dom stuff, etc.
+
+       Double huh?  Syncronizing 'media' (Schuyler thinks these are all media,
+       and I get wierded out by that language so put it in scare quotes) with
+       position, or 'geocoding the media' is the key component of Quantitative
+       Psychogeography.  This is the quantitative study of spaces and our
+       relationships with those spaces.  Among other things.
+
+       As an aside, or intercalery, how much POD do I need to write for this
+       module before my code to pod ratio exceeds all known limits?
+
+       EEXXPPOORRTT
+
+       None by default.
+
+SSEEEE AALLSSOO
+       See http://www.mappinghacks.com, which might be cool.  http://loca-
+       tive.us is another site of potential interest.  http://geocoder.us is a
+       US Geocoder written by Schuyler Erle.
+
+       You should 'probably' think about using the GPX format if you want to
+       share these tracks with other people.
+
+AAUUTTHHOORR
+       Rich Gibson, <rgibson@cpan.org>
+
+CCOOPPYYRRIIGGHHTT AANNDD LLIICCEENNSSEE
+       Copyright 2004 by Rich Gibson
+
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+
+
+perl v5.8.1                       2004-08-17                         .::DSS(3)

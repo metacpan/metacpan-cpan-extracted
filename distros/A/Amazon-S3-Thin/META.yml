@@ -1,0 +1,50 @@
+---
+abstract: 'A thin, lightweight, low-level Amazon S3 client'
+author:
+  - DQNEO
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amazon-S3-Thin
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Amazon::S3::Thin:
+    file: lib/Amazon/S3/Thin.pm
+    version: '0.16'
+  Amazon::S3::Thin::SignerV2:
+    file: lib/Amazon/S3/Thin/SignerV2.pm
+requires:
+  Digest::HMAC_SHA1: '0'
+  Digest::MD5: '0'
+  Encode: '0'
+  HTTP::Date: '0'
+  LWP::UserAgent: '0'
+  MIME::Base64: '0'
+  URI::Escape: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/DQNEO/Amazon-S3-Thin/issues
+  homepage: https://github.com/DQNEO/Amazon-S3-Thin
+  repository: git://github.com/DQNEO/Amazon-S3-Thin.git
+version: '0.16'
+x_contributors:
+  - 'Timothy Appnel <tim@appnel.com>'
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+  - 'Bob Stockdale <bstockdale@zappos.com>'
+  - 'DQNEO <dqneoo@gmail.com>'

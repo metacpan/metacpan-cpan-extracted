@@ -1,0 +1,371 @@
+# NAME
+
+App::Followme::Guide - How to install, configure, and run followme
+
+# SYNOPSIS
+
+    followme [directory]
+
+# DESCRIPTION
+
+Updates a static website after changes. Constant portions of each page are
+updated to match, text files are converted to html, and indexes are created
+for files in the archive.
+
+The followme script is run on the directory or file passed as its argument. If
+no argument is given, it is run on the current directory.
+
+If a file is passed, the script is run on the directory the file is in. In
+addition, the script is run in quick mode, meaning that only the directory
+the file is in is checked for changes. Otherwise, not only that directory, but
+all directories below it are checked.
+
+# CHANGES
+
+This version is the first beta release for version two of followme. The code
+changes have been made and pass test, but I need to update the documentation to
+match the code changes. The major changes are all internal. In the past the code
+qconstructed a hash and passed it to the template, which used the values in the
+hash to produce the web page. In version two the code passes an object to the
+template, which calls the build method for each vaiable in the template, passing
+the name of the variable and a filename to retrieve it from as arguments. The
+module then returns the value, which is used to fill in the template. The major
+user visible change is that the template syntax has changed, the new syntax is a
+subset of the previous syntax. Please see [App::Followme::Template](https://metacpan.org/pod/App::Followme::Template) for a
+description of the template syntax. The other change is that the configuration
+parameters of some of the modules has changed. The new configuration parameters
+are described in each module. The motivation for the change is that placing the
+variable building in a separate class allows more than one type of file to be
+handled by modules placed in the configurarion file. Each class handles a type
+of file and the name of the class which builds the variables is a configuration
+parameter.
+
+The beta release will be used to build a website documenting followme and the
+process of building the site will be used to debug any remaining problems.
+When this process is finished, the version will be bumped to 2.00.
+
+# INSTALLATION
+
+First, install the App::Followme module from CPAN. It will copy the
+followme script to /usr/local/bin, so it will be on your search path.
+
+    sudo cpanm App::Followme
+
+Then create a folder to contain the new website. Run followme with the
+init option in that directory
+
+    mkdir website
+    cd website
+    followme --init
+
+When you run followme with the --init flag, it will install the initial
+templates and configuration files. The initial setup is configured to update
+pages to maintain a consistent look for the site and simplify the onboarding of
+new content.
+
+The first page will serve as a prototype for the rest of your site. When you
+look at the html page, you will see that it contains comments looking like
+
+    <!-- section primary -->
+    <!-- endsection primary -->
+
+These comments mark the parts of the prototype that will change from page to
+page from the parts that are constant across the entire site. Everything
+outside the comments is the constant portion of the page. When you have
+more than one html page in the folder, you can edit any page, run followme,
+and the other pages will be updated to match it.
+
+So you should edit your first page and add any other files you need to create
+the look of your site, such as the style sheets.
+
+You can also use followme on an existing site. Run the command
+
+    followme --init
+
+in the top directory of your site. The init option will not overwrite any
+existing files in your site. Then look at the page template it has
+created:
+
+    cat templates/page.htm
+
+Edit an existing page on your site to have all the section comments in this
+template. In the template shipped with this package there are three section
+names: meta, primary, and secondary. The meta section is in the html header
+and contains the page metadata, although it may also contain other content
+tht varies between pages. The primary section contains the page content that
+is maintained by you. None of this package's modules will change it. The
+secondary section contains content that is updated by the modules in this
+package and you will not normally change it.
+
+After you edit a single page, you can place the App::Followme::EditSections
+module in the configuration file, as described in the next section. If
+you then run followme, it will modify the other pages on your website to
+match the page you have edited. Then remove the EditSections module from
+the configuration file.
+
+# CONFIGURATION
+
+The configuration file for followme is followme.cfg in the top directory of
+your site. Configuration file lines are organized as lines containing
+
+    NAME = VALUE
+
+pairs. Configuration files may also contain blank lines or comment lines
+starting with a `#`. Subdirectories of the top directory may also contain
+configuration files. Values in these configuration files are combined with those
+set in the configuration files in directories above it, If it has a parameter of
+the same name as a configuration file in a higher directory, it overrides it for
+that directory and its subdirectories.
+
+Configuration files contain the names of the Perl modules to be run by followme
+in the parameters named run\_before and run\_after
+
+    run_before = App::Followme::FormatPage
+    run_before = App::Followme::ConvertPage
+    run_after = App::Followme::CreateSitemap
+
+Perl modules are run in the order they appear in the configuration file. If they
+are named run\_before then they are run before modules in any configuration files
+contained in subdirectories. If they are named run\_after, they are run after
+modules which are named in the configuration files in subdirectories. Other
+parameters in the configuration files are written to a hash. This hash is passed
+to the new method of each module as it loaded, overriding the default values of
+the parameters when creating the new object.
+
+Configuration files may also contain module names between square brackets, like
+this:
+
+    [App::Followme::ConvertPage]
+
+Values after a bracketed module name will only apply to that module. Values at
+the top of the file, before any bracketed module name, will apply to all modules.
+The run\_before and run\_after parameters should always be placed before any
+bracketed section names.
+
+These modules are distributed with followme:
+
+- [App::Followme::FormatPage](https://metacpan.org/pod/App::Followme::FormatPage)
+
+    This module updates the web pages in a folder to match the most recently
+    modified page. Each web page has sections that are different from other pages
+    and other sections that are the same. The sections that differ are enclosed in
+    html comments that look like
+
+        <!-- section name-->
+        <!-- endsection name -->
+
+    and indicate where the section begins and ends. When a page is changed, this
+    module checks the text outside of these comments. If that text has changed. the
+    other pages on the site are also changed to match the page that has changed.
+    Each page updated by substituting all its named blocks into corresponding block
+    in the changed page. The effect is that all the text outside the named blocks
+    are updated to be the same across all the web pages.
+
+    In addition to normal section blocks, there are per folder section blocks.
+    The contents of these blocks is kept constant across all files in a folder and
+    all subfolders of it. If the block is changed in one file in the folder, it will
+    be updated in all the other files. Per folder section blocks look like
+
+        <!-- section name in folder_name -->
+        <!-- endsection name -->
+
+    where folder\_name is the the folder the content is kept constant across. The
+    folder name is not a full path, it is the last folder in the path.
+
+- [App::Followme::ConvertPage](https://metacpan.org/pod/App::Followme::ConvertPage)
+
+    This module changes Markdown files to html files. Markdown format is described
+    at:
+
+        http://daringfireball.net/projects/markdown/
+
+    It builds several variables and substitutes them into the page template. The
+    most significant variable is body, which is the contents of the text file
+    after it has been converted by Markdown. The title is built from the title of
+    the Markdown file if one is put at the top of the file. If the file has no
+    title, it is built from the file name, replacing dashes with blanks and
+    capitalizing each word, The url and absolute\_url are built from the html file
+    name. To change the look of the html page, edit the page template. Only blocks
+    inside the section comments will be in the resulting page, editing the text
+    outside it will have no effect on the resulting page.
+
+- [App::Followme::CreateIndex](https://metacpan.org/pod/App::Followme::CreateIndex)
+
+    This module builds an index for a directory containing links to all the files
+    with the specified extension contained in it. The same variables mentioned above
+    are calculated for each file, with the exception of body. Comments that look like
+
+        <!-- for @filenames -->
+        <!-- endfor -->
+
+    indicate the section of the template that is repeated for each file contained
+    in the index.
+
+- [App::Followme::CreateNews](https://metacpan.org/pod/App::Followme::CreateNews)
+
+    This module generates an html file from the most recently updated files in the
+    news directory. It also creates index files in each directory and
+    subdirectory in the news directory. The same variables mentioned under
+    [App::Followme::ConvertPages](https://metacpan.org/pod/App::Followme::ConvertPages) are calculated for each file included in the
+    indexes.
+
+- [App::Followme::CreateSitemap](https://metacpan.org/pod/App::Followme::CreateSitemap)
+
+    This module creates a sitemap file, which is a text file containing the url of
+    every page on the site, one per line. It is also intended as a simple example of
+    how to write a module that can be run by followme.
+
+- [App::Followme::UploadSite](https://metacpan.org/pod/App::Followme::UploadSite)
+
+    This module uploads changed files to a remote site. The default method to do the
+    uploads is local copy, but that can be changed by changing the parameter upload\_pkg.
+    This package computes a checksum for every file in the site. If the checksum has
+    changed since the last time it was run, the file is uploaded to the remote site.
+    If there is a checksum, but no local file, the file is deleted from the remote
+    site. If followme is run in quick mode, only files whose modification date is
+    later then the last time it was run are checked.
+
+# RUNNING
+
+The followme script is run on the directory or file passed as its argument. If
+no argument is given, it is run on the current directory. If a file is passed,
+the script is run on the directory the file is in and followme is run in
+quick mode. Quick mode is an implicit promise that only the named file has
+been changed since last time. Each module can make up this assumption what it
+will, but it is supposed to shorten the list of files examined.
+
+Followme looks for its configuration files in all the directories above the
+directory it is run from and runs all the modules it finds in them. But they are
+are only run on the folder it is run from and subfolders of it. Followme only
+looks at the folder it is run from to determine if other files in the folder
+need to be updated. So after changing a file, followme should be run from the
+directory containing the file.
+Templates support the basic control structures in Perl: "for" loops and
+"if-else" blocks. Creating output is a two step process. First you generate a
+subroutine from one or more templates, then you call the subroutine with your
+data to generate the output.
+
+The template format is line oriented. Commands are enclosed in html comments
+(&lt;!-- -->). A command may be preceded by white space. If a command is a block
+command, it is terminated by the word "end" followed by the command name. For
+example, the "for" command is terminated by an "endfor" command and the "if"
+command by an "endif" command.
+
+All lines may contain variables. As in Perl, variables are a sigil character
+('$' or '@') followed by one or more word characters. For example, `$name` or
+`@names`. To indicate a literal character instead of a variable, precede the
+sigil with a backslash. When you run the subroutine that this module generates,
+you pass it a metadata object. The subroutine replaces variables in the template
+with the value in the field built by the metadata object.
+
+If the first non-white characters on a line are the command start string, the
+line is interpreted as a command. The command name continues up to the first
+white space character. The text following the initial span of white space is the
+command argument. The argument continues up to the command end string.
+
+Variables in the template have the same format as ordinary Perl variables,
+a string of word characters starting with a sigil character. for example,
+
+    $body @files
+
+are examples of variables. The following commands are supported in templates:
+
+- do
+
+    The remainder of the line is interpreted as Perl code.
+
+- for
+
+    Expand the text between the "for" and "endfor" commands several times. The
+    argument to the "for" command should be an expression evaluating to a list. The
+    code will expand the text in the for block once for each element in the list.
+
+        <ul>
+        <!-- for @files -->
+            <li><a href="$url">$title</a></li>
+            <!-- endfor -->
+            </ul>
+
+- if
+
+    The text until the matching `endif` is included only if the expression in the
+    "if" command is true. If false, the text is skipped.
+
+            <div class="column">
+        <!-- for @files -->
+        <!-- if $count % 20 == 0 -->
+        </div>
+            <div class="column">
+        <!-- endif -->
+            $title<br />
+            <!-- endfor -->
+            </div>
+
+- else
+
+    The "if" and "for" commands can contain an `else`. The text beforethe "else"
+    is included if the expression in the enclosing command is true and the
+    text after the "else" is included if the "if" command is false or the "for"
+    command does not execute. You can also place an "elsif" command inside a block,
+    which includes the following text if its expression
+    is true.
+
+# TEMPLATES
+
+Templates are read either from the same directory as the configuration file
+containing the name of the module being run or from the \_templates subdirectory
+of the top directory of the site.
+
+# MODULES
+
+New modules can be written and then invoked via the configuration file, exactly
+like the modules that have been distributed with App::Followme. Each module to
+be run must have new and run methods. An object of the module's class is created
+by calling the new method with the a reference to a hash containing the
+configuration parameters. The run method is then called with the directory as
+its argument.
+
+The signature of the new method is
+
+    $obj = $module_name->new($configuration);
+
+where $configuration is a reference to a hash containing the configuration
+parameters. $module name is the same as the name in the configuration file.
+
+All the modules distributed with App::Followme subclass
+App::Followme::Module to access its methods, which provide consistent
+behavior, such as looping over files and template handling. It also supplies a
+new method, so if you subclass it, you will not need to supply a new method in
+your class.
+
+The signature of the run method is
+
+    $obj->run($directory);
+
+where $obj is the object created by the new method and $directory is the name
+of the directory the module is being run on. All modules included in
+App::Followme use [App::Followme::Module](https://metacpan.org/pod/App::Followme::Module) as a base class, so they can use its
+methods, such as visiting all files in a directory and compiling a template. If
+you wish to write your own module, you can use [App::Followme::Sitemap](https://metacpan.org/pod/App::Followme::Sitemap) as a
+guide. If you use App::Followme::Module as a base class, you should not supply
+your own new method, but rely on the new method in
+[App::Followme::ConfiguredObject](https://metacpan.org/pod/App::Followme::ConfiguredObject), which you will inherit.
+
+# LICENSE
+
+Copyright (C) Bernie Simon.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+# AUTHOR
+
+Bernie Simon <bernie.simon@gmail.com>
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 321:
+
+    You forgot a '=back' before '=head1'

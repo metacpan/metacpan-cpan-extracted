@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/Array-Frugal.t
+lib/Array/Frugal.pm
+META.yml                                 Module meta-data (added by MakeMaker)

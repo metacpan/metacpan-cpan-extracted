@@ -1,0 +1,21 @@
+Win32 build instructions:
+
+Tested with Visual Studio 2010 Express.
+
+zlib
+----
+Download zlib from http://zlib.net/zlib128.zip and extract
+Open command prompt using MS Visual Studio start menu entry or run the vcvars file,
+ for example C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat
+nmake -f win32/Makefile.msc
+Copy zlib.lib, zlib.h, zconf.h into the Audio::Scan win32 directory (overwriting latter two files)
+
+Audio::Scan
+-----------
+Install ActivePerl.
+Open command prompt using MS Visual Studio start menu entry or run the vcvars file,
+ for example C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat
+perl Makefile.PL
+nmake
+nmake test
+

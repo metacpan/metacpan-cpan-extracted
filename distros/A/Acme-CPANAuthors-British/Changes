@@ -1,0 +1,92 @@
+Revision history for Acme-CPANAuthors-British
+=============================================
+
+1.03    2015-02-24
+        - James Aitken sadly died last year.
+        - extended META test suite.
+
+1.02    2014-08-18
+        - fixed license fields in META.json to be lists.
+        - added new Authors: PRICHMOND, PWR.
+
+1.01    2014-03-28
+        - added new Author: MJEVANS (via github, thanks Martin).
+
+1.00    2014-03-21
+        - added LICENSE file.
+        - added new Authors: ABABLABAB, DCHESTER, EDWARDSON, GEOFFR, GHARPER
+          and HOUSTON.
+        - added new Companies: INTERINFO and RECKON.
+
+0.20    2013-12-08
+        - added BRIANG and WDH.
+
+0.19    2013-06-09
+        - added MJEMMESON (Michael Jemmeson)
+
+0.18    2012-12-02
+        - fixed skip test counts
+
+0.17    2012-11-25
+        - gravatar tests just not working at the moment :(
+
+0.16    2012-11-18
+        - more robust tests.
+
+0.15    2012-11-04
+        - removed JMCNAMARA.
+
+0.14    2012-11-04
+        - change quality test for a company with distros!
+
+0.13    2012-09-19
+        - implemented Perl::Critic suggestions.
+        - change file dates changed to meet W3CDTF standards.
+        - updated ping test to api.cpanauthors.org
+        - added BOB (Bob Walker)
+
+0.12    2012-08-21
+        - added NEWELLC (Colin Newell)
+
+0.11    2012-07-03
+        - added JAITKEN (James Aitken)
+
+0.10    2012-04-29
+        - more reliable skip tests added to 11companies.t.
+
+0.09    2012-04-22
+        - further spelling fix (Florian Schlichting).
+        - more reliable skip tests.
+
+0.08    2012-04-17
+        - spelling fix. (thanks to Florian Schlichting & Gregor Herrmann).
+        - added minimum perl version (5.006).
+        - fixed test pre-requisites.
+        - reworked Makefile.PL for clarity.
+        - more documentation.
+
+0.07    2012-04-09
+        - added NEILB and IOANR as British authors.
+
+0.06    2012-04-08
+        - added missing test pre-requisite, IO::File.
+        - added 1 British CPAN company.
+        - added 34 British CPAN authors.
+
+0.05    2012-04-06
+        - fixed CPANTS tests.
+        - added META.json and test script.
+
+0.04    2010-11-04
+        - fixed skip count and updated pingtest for 11companies.t.
+
+0.03    2010-10-31
+        - revised pingtest.
+        - added CJK, CYCLES, SKX and XEONTIME as British authors.
+
+0.02    2009-12-09
+        - added DOTTK as a British Company (RT#51438, thanks DAXIM).
+
+0.01    2009-11-10
+        First version, released because no-one else dared!
+

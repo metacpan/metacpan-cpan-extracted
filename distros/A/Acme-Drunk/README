@@ -1,0 +1,110 @@
+NAME
+    Acme::Drunk - Get Drunk, Acme Style
+
+SYNOPSIS
+        use Acme::Drunk;
+
+        my $bac = drunk(
+                        gender         => MALE, # or FEMALE
+                        hours          => 2,    # since start of binge
+                        body_weight    => 160,  # in lbs
+                        alcohol_weight => 3,    # oz of alcohol
+                       );
+
+       $bac >= 0.08 ? call_cab() : walk_home();
+
+DESCRIPTION
+    Calculating an accurate Blood Alcohol Concentration isn't as easy as it
+    sounds. Acme::Drunk helps eleviate the burden placed on the Average Joe,
+    or Jane, to know if they've had too much to drink.
+
+    You might think to yourself, "but wait a minute, all I need is a fancy
+    breathalizer test!" You'd be wrong. For the same reasons that The Man
+    are often wrong on the street, and have to bring you in for a blood
+    test. Those generic devices don't take into account important issues in
+    drunkedness, but Acme::Drunk does.
+
+    Now all you need to be a law abiding citizen is your laptop, and we all
+    have those at the pub, right? Right.
+
+  Constants
+    Acme::Drunk exports two constants, "MALE" and "FEMALE". You're drunk if
+    you don't know which one to use.
+
+  "drunk()"
+    "drunk()" takes four named parameters, detailed below, and returns the
+    Blood Alcohol Concentration (BAC) as a number. Note that "drunk()"
+    couldn't return a true value for drunkedness because not all
+    juristictions agree on what the proper BAC level is to be drunk.
+
+    gender
+        Currently Acme::Drunk only works for humans, and only recognizes
+        "MALE" and "FEMALE" human genders. Use the constants exported for
+        you to identify your gender.
+
+        If your gender or species isn't supported, please email the author.
+
+        If you don't know your gender or species, you are drunk.
+
+    hours
+        This numeric value represents how long you have been drinking. If
+        you took your first sip three hours ago, it's important to note.
+        Your body metabolizes alchohol at a steady per-hour pace.
+
+    body_weight
+        Your body weight is also important. Not all people are created
+        equal, and the amount of alcohol one body can saturate is much
+        different than another body.
+
+    alcohol_weight
+        The weight of alcohol you've had in ounces. This can be hard to
+        calculate, and two helpful functions are exported for your use. Here
+        is a common example, Guiness Gold Lager.
+
+          my $alcohol_weight = floz_to_etoh( 16, proof_to_percent( 8.48 ) );
+
+        Acme::Drunk can't do these sorts of calculations for you. You might
+        be a raging alcoholic, drinking 45 beers a night, or so many
+        different drinks that Acme::Drunk can no-longer keep track.
+
+        If there is interest, Acme::Drunk may have an accompanying
+        Acme::Drunk::Drinks package containing constants such as
+        "GUINESS_DRAUGHT_CAN", "JACK_DANIELS", or "NyQUIL". Please contact
+        the author. Here would be an example.
+
+          alcohol_weight => ( GUINESS_DRAUGHT_CAN*7 + JACK_DANIELS*3 ),
+
+        If you can't come up with the alcohol_weight you've had, don't
+        worry, you might not yet be drunk.
+
+  "proof_to_percent()"
+    Accepts one argument, the proof number. Does a simple calculation to
+    convert it to percent. Returns the percentage.
+
+  "floz_to_etoh()"
+    Accepts two arguments, the number of ounces a drink was, and the
+    percentage of that drink that was alcohol. Returns the fluid ounces of
+    alcohol contained in the drink.
+
+  "ml_to_etoh()"
+    For our less US-centric friends, this function is exactly like
+    "floz_to_etoh()", except its first argument is the number of milileters
+    in a drink.
+
+  How it Works
+    Widmark's Formula for Blood Alcohol Content
+
+      ( ( (FlozEtOH * 0.0514 lb/flozEtOH) * 1.044 g/ml )
+        / (Lbs of person * Widmark r g%/mlhr) )
+      - (Hours since first drink * Widmark beta)
+      = BAC g%/ml = BAC g/dL = BAC% w/v
+
+    'nuff said.
+
+AUTHOR
+    Casey West <casey@geeknest.com>
+
+COPYRIGHT
+    Copyright (c) 2003 Casey West, All Rights Reserved. This module is
+    released under the same terms as Perl itself.
+

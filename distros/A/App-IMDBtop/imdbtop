@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+use v5.14;
+use warnings;
+
+use App::IMDBtop;
+
+App::IMDBtop->run;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+imdbtop - list actors that are popular in your movie collection
+
+=head1 SYNOPSIS
+
+  # List all actors in the given movies, sorted by number of (given)
+  # movies they starred in
+  imdbtop < list_of_movie_ids
+
+  # As above, but only lists top 20 actors
+  imdbtop -n 20 < list_of_movie_ids
+
+  # As above, but only lists actors that appeared in at least 5 of the
+  # given movies
+  imdbtop -m 5 a_list_of_movie_ids another_list
+
+=head1 DESCRIPTION
+
+This script solves a simple problem: you have a list of movies you've
+watched (in the form of IMDB IDs), and you are looking for the actors
+that have starred most often in these movies.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-n> I<count>, B<--nr> I<count>
+
+Only print the top I<count> actors.
+
+=item B<-m> I<min>, B<--min-count> I<min>
+
+Do not print actors that appear in less than I<min> of the given
+movies.
+
+=item B<-c>, B<--cache>, B<--no-cache>
+
+If B<--cache>, stores the content of retrieved pages in a cache.
+Defaults to B<--no-cache>.
+
+=item B<--cache-root> F<path>
+
+Location where cached pages are stored. Defaults to F</tmp>.
+
+=back
+
+=head1 SEE ALSO
+
+L<http://imdb.com>
+
+=head1 AUTHOR
+
+Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.0 or,
+at your option, any later version of Perl 5 you may have available.
+b
+
+=cut

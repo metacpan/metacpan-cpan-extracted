@@ -1,0 +1,35 @@
+---
+abstract: 'connect to Apache Tika'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  Carp: 0
+  Exporter: 5
+  File::Basename: 0
+  File::Copy: 0
+  File::Find: 0
+  File::Path: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Apache-Tika-Async
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Exporter: 5
+  JSON::XS: 0
+  LWP::UserAgent: 6
+  Moo: 0
+  Promises: 0
+  perl: 5.012
+resources:
+  repository: https://github.com/Corion/apache-tika
+version: 0.06

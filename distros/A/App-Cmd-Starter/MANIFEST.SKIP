@@ -1,0 +1,13 @@
+.git/
+.svn
+blib
+pm_to_blib
+MANIFEST.bak
+MANIFEST.SKIP~
+MYMETA.yml
+cover_db
+Makefile$
+.DS_Store
+Makefile.old$
+^App-Cmd-Starter-
+^.gitignore

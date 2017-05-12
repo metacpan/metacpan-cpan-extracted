@@ -1,0 +1,62 @@
+{
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+        "url" : "svn://repo.example.com/foo-bar#fakeanchor",
+        "web" : "http://www.example.com"
+      }
+   },
+   "generated_by" : "Foo::Bar v1.2.3",
+   "meta-spec" : {
+      "version" : "2",
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+   },
+   "version" : "3.14",
+   "name" : "Fake-Distro",
+   "dynamic_config" : 1,
+   "author" : [
+      "John Doe <johndoe@example.com>"
+   ],
+   "release_status" : "stable",
+   "license" : [
+      "perl_5"
+   ],
+   "description" : "A fake distro",
+   "prereqs" : {
+      "configure" : {
+          "requires" : {
+            "X::Configure::Requires" : "0"
+          }
+      },
+      "develop" : {
+          "requires" : {
+            "X::Develop::Requires" : "0"
+          }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "X::Runtime::Requires" : "0"
+         },
+         "recommends" : {
+            "X::Runtime::Recommends" : "0"
+         },
+         "suggests" : {
+            "X::Runtime::Suggests" : "0"
+          }
+      },
+      "build" : {
+         "requires" : {
+            "X::Build::Requires": "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "X::Test::Requires" : "0"
+         }
+      }
+   },
+   "abstract" : "Pretend to be real"
+}

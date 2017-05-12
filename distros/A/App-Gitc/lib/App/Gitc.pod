@@ -1,0 +1,39 @@
+# PODNAME: App::Gitc
+# ABSTRACT: Git Changesets - tools for managing your git changes
+
+__END__
+
+=pod
+
+=head1 NAME
+
+App::Gitc - Git Changesets - tools for managing your git changes
+
+=head1 VERSION
+
+version 0.60
+
+=head1 INSTALLATION
+
+Read the L<HOWTO|https://raw.github.com/GrantStreetGroup/gitc/master/HOWTO> for information on
+setting up Gitc.  Example configuration files are available.
+
+=head1 SEE ALSO
+
+L<Gitc Wiki|https://github.com/GrantStreetGroup/gitc/wiki>
+
+L<App::Gitc::Util>
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

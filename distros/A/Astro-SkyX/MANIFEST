@@ -1,0 +1,34 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+SkyX_Test.pl
+t/SkyX.t
+lib/Astro/SkyX.pm
+lib/Astro/SkyX/Application.pm
+lib/Astro/SkyX/AutomatedImageLinkSettings.pm
+lib/Astro/SkyX/ClosedLoopSlew.pm
+lib/Astro/SkyX/ImageLink.pm
+lib/Astro/SkyX/ImageLinkResults.pm
+lib/Astro/SkyX/OpticalTubeAssembly.pm
+lib/Astro/SkyX/SelectedHardware.pm
+lib/Astro/SkyX/WeatherUtil.pm
+lib/Astro/SkyX/TheSkyXAction.pm
+lib/Astro/SkyX/ccdsoftCameraImage.pm
+lib/Astro/SkyX/ccdsoftAutoguiderImage.pm
+lib/Astro/SkyX/ccdsoftCamera.pm
+lib/Astro/SkyX/sky6DataWizard.pm
+lib/Astro/SkyX/sky6DirectGuide.pm
+lib/Astro/SkyX/sky6Dome.pm
+lib/Astro/SkyX/sky6MyFOVs.pm
+lib/Astro/SkyX/sky6ObjectInformation.pm
+lib/Astro/SkyX/sky6RASCOMTele.pm
+lib/Astro/SkyX/sky6RASCOMTheSky.pm
+lib/Astro/SkyX/sky6Raven.pm
+lib/Astro/SkyX/sky6StarChart.pm
+lib/Astro/SkyX/sky6TheSky.pm
+lib/Astro/SkyX/sky6Utils.pm
+lib/Astro/SkyX/sky6Web.pm
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

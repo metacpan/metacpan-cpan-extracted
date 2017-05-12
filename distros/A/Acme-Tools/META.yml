@@ -1,0 +1,28 @@
+---
+abstract: 'Lots of more or less useful subs lumped together and exported into your namespace'
+author:
+  - 'Kjetil Skotheim <kjetilskotheim@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Tools
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0.01'
+  Compress::Zlib: '0.01'
+  MIME::Base64: '0.01'
+  Test::More: '0.01'
+  Time::HiRes: '0.01'
+  perl: '5.006002'
+version: '0.21'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,16 @@
+--- PLP.pm	Fri Oct 18 21:47:07 2002
++++ PLP.pm-patched	Fri May 30 11:38:37 2003
+@@ -317,6 +317,13 @@
+     {
+ 	package PLP::Script;
+ 	use vars qw(%headers %header %cookies %cookie %get %post %fields);
++
++	use vars qw($session);
++	eval { require Apache::SessionManager };
++	unless ( $@ ) {
++		$session = Apache::SessionManager::get_session(Apache->request);
++	}
++
+ 	*headers = \%header;
+ 	*cookies = \%cookie;
+ 	PLP::Functions->import();

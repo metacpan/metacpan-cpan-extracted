@@ -1,0 +1,46 @@
+=head1 Installation
+
+=head2 Debian or Ubuntu
+
+L<cme> is provided as Debian package. Just type
+
+  sudo apt-get install cme
+
+Or use your favorite installer
+
+=head2 Fedora or RedHat
+
+L<cme> is now packaged by RedHat. Type:
+
+  sudo yum install perl-App-Cme
+
+=head2 Mac OSX
+
+L<cme> is provided as ppm package by L<ActiveState|http://www.activestate.com/>:
+
+=over
+
+=item *
+
+Install L<perl from ActiveState|http://www.activestate.com/activeperl/downloads>
+
+=item *
+
+Update your $PATH variable to run ActiveState's perl
+
+=item *
+
+Run ppm to install L<App::Cme package|http://code.activestate.com/ppm/App-Cme/>
+
+=back
+
+=head2 Windows
+
+You can also install L<App::Cme> from  L<ActiveState|http://www.activestate.com/>. See the
+instructions for Mac OSX for details.
+
+=head2 Other systems
+
+For other systems, you should install L<App::Cme> from CPAN:
+
+  cpanp install App::Cme

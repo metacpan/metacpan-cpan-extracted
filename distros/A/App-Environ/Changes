@@ -1,0 +1,46 @@
+Revision history for Perl extension App::Environ.
+
+0.22 Sat Apr 1 16:00:22 MSK 2017
+  - README.pod replaced by README.md.
+
+0.20 Thu Feb 16 14:51:05 MSK 2017
+  - Added handling of environment variable APPCONF_EXPORT_ENV.
+  - Added description for all environment variables used by
+    App::Environ::Config.
+  - Added README.pod file instead of README file.
+
+0.18 Thu Dec 8 18:06:30 MSK 2016
+  - FEATURE: Changed concept of asynchronous processing.
+    Backward compatible was broken.
+
+0.16 Thu Dec 1 17:34:05 MSK 2016
+  - BUGFIX: Fixed issue with repeatable initialization/finalization in
+    App::Environ::Config.
+
+0.14 Wed Nov 30 17:07:55 MSK 2016
+  - BUGFIX: Fixed error handling for asynchronous mode.
+
+0.12 Fri Nov 25 12:09:30 MSK 2016
+  - Removed garbage from example.
+
+0.10 Fri Nov 25 12:03:05 MSK 2016
+  - Fixes in POD.
+  - Light refactoring.
+
+0.08 Wed Nov 23 17:17:05 MSK 2016
+  - FEATURE: Added ability to handle errors in asynchronous mode.
+  - BUGFIX: Fixed handling of unknown events in asynchronous mode.
+  - Improved POD.
+  - Improved test.
+
+0.06 Tue Nov 22 12:22:40 MSK 2016
+  - Removed "finalize:r" handler from App::Environ.
+  - Refactoring.
+
+0.04 Mon Nov 21 14:30:20 MSK 2016
+  - Added "finalize:r" handler in App::Environ.
+  - Do not die if handler has already registered.
+  - Fixed handling of ENV variables in App::Environ::Config.
+
+0.02 Wed Nov 16 16:11:20 MSK 2016
+	- Initial release.

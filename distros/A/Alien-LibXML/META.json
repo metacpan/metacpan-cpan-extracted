@@ -1,0 +1,59 @@
+{
+   "abstract" : "install the C libxml2 library on your system",
+   "author" : [
+      "Toby Inkster <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-LibXML",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base" : "0.001",
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.005",
+            "File::ShareDir" : "1.00",
+            "perl" : "v5.8.9"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Which" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::LibXML" : {
+         "file" : "lib/Alien/LibXML.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Alien-LibXML"
+      },
+      "homepage" : "https://metacpan.org/release/Alien-LibXML",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "git://github.com/tobyink/p5-alien-libxml.git"
+      }
+   },
+   "version" : "0.003",
+   "x_contributors" : [
+      "Graham Ollis (PLICEASE) <plicease@cpan.org>"
+   ]
+}

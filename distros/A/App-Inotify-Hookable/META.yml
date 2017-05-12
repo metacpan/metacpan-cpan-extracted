@@ -1,0 +1,41 @@
+---
+abstract: 'blocking command-line interface to inotify'
+author:
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300040, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Inotify-Hookable
+no_index: {}
+requires:
+  Class::Inspector: 0
+  Data::BitMask: 0
+  Data::Dumper: 0
+  Linux::Inotify2: 0
+  List::MoreUtils: 0
+  Moose: 0
+  MooseX::Getopt::Dashes: 0
+  MooseX::Types::Moose: 0
+  POSIX: 0
+  Time::HiRes: 0
+  Try::Tiny: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Inotify-Hookable
+  homepage: http://metacpan.org/release/App-Inotify-Hookable
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/avar/app-inotify-hookable.git
+version: 0.09
+x_authority: cpan:AVAR

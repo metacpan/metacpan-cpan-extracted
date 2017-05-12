@@ -1,0 +1,76 @@
+NAME
+    Audio::Extract::PCM - Extract PCM data from audio files
+
+VERSION
+    Version 0.04
+
+SYNOPSIS
+    This module's purpose is to extract PCM data from various audio formats.
+    PCM is the format in which you send data to your sound card driver. This
+    module aims to provide a single interface for PCM extraction from
+    various audio formats, compressed and otherwise.
+
+    Currently the implementation makes use of the external "sox" program. As
+    of 2008, sox's supported input formats include "wav", "mp3",
+    "ogg/vorbis", "flac", if you have compiled sox with support for them,
+    but do not include "wma" or "aac".
+
+    I have chosen the use of "sox" for the first implementation of this
+    module because it already has an abstract interface to many formats.
+    However I plan to include more implementations to (1) maybe include more
+    formats, (2) make the implementation more perlish and (3) make the
+    module more portable. CPAN has specialized modules like Audio::Mad and
+    Ogg::Vorbis::Decoder, to which I could implement an abstract interface.
+
+    If you have suggestions how to include more implementations, or if you
+    simply need them and want to motivate me, please contact me.
+
+    Usage example:
+
+        use Audio::PCM::Extract;
+        my $extractor = Audio::PCM::Extract->new('song.ogg');
+        my $pcm = $extractor->pcm(44100, 2, 2) or die $extractor->error;
+
+METHODS
+  new
+    Parameters: "filename"
+
+    Constructs a new object to access the specified file.
+
+  pcm
+    Parameters: "frequency", "samplesize", "channels"
+
+    Extracts PCM data.
+
+    The sample size is specified in bytes, so 2 means 16 bit sound.
+
+    Returns the pcm data as a reference to a string, or an empty list in
+    case of an error (cf. "error").
+
+  error
+    Returns the last error that occured for this object.
+
+SEE ALSO
+    *       Audio::Mad - Module to decode MPEG files, in particular MP3
+
+    *       Ogg::Vorbis::Decoder - Module to decode Vorbis files
+
+    *       <http://en.wikipedia.org/wiki/Pulse-code_modulation> - PCM
+            (Pulse-code modulation)
+
+    *       <http://sox.sourceforge.net/> - SoX homepage
+
+AUTHOR
+    Christoph Bussenius, "<pepe at cpan.org>"
+
+    Please include the name of this module in the subject of your emails so
+    they won't get lost in spam.
+
+    If you find this module useful, I'll be glad if you drop me a note.
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Christoph Bussenius, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+# PODNAME: shotgun
+# ABSTRACT: mass upload of files via SCP/FTP/...
+
+binmode STDOUT, ":utf8";
+
+use App::Shotgun;
+App::Shotgun->new_with_options->shot;
+
+
+
+=pod
+
+=head1 NAME
+
+shotgun - mass upload of files via SCP/FTP/...
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNPOSIS
+
+  shotgun --filelist a_filelist.txt \
+	--target FTP:hostname=localhost:username=testftp:password=test
+  shotgun --file first_file.txt --file second_file.txt \
+	--target FTP:hostname=localhost:username=testftp:password=test \
+	--target FTP:hostname=remote.server.com:username=testftp:password=test
+
+=head2 DESCRIPTION
+
+TODO
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Torsten Raudssus <torsten@raudssus.de>
+
+=item *
+
+Apocalypse <APOCAL@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Raudssus Social Software L<http://www.raudssus.de/>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+__END__
+

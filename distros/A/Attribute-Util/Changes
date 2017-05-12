@@ -1,0 +1,54 @@
+# Revision history for Perl extension Attribute::Util.
+#
+# $Id: Changes,v 1.7 2013/02/24 09:14:26 dankogai Exp dankogai $
+#
+$Revision: 1.7 $ $Date: 2013/02/24 09:14:26 $
+! *.pm
+  Fixed mail address
+! lib/Attribute/Method.pm
+  Fixed: #74232: Bleadperl v5.15.6-147-g415d4c6 breaks
+  https://rt.cpan.org/Ticket/Display.html?id=74232
+
+1.06 2010/05/04 06:55:09
+! t/05method.t
+  Addressed: #52643: GitLive-blead-2143-g09330df breaks 1.05
+  http://rt.cpan.org/Public/Bug/Display.html?id=52643
+
+1.05 2009/05/27 11:36:04
+! lib/Attribute/Method.pm
+  Addressed: #46403: Attribute::Method
+  - not preserving line number information and sub names
+  http://rt.cpan.org/Public/Bug/Display.html?id=46403
+
+1.04 2009/03/24 13:28:55
+! lib/Attribute/Method.pm
+  POD fixes
+  Message-Id:	<20090324131233.GQ21585@home.power>
+  CAVEAT on require vs use
+  http://rt.cpan.org/Public/Bug/Display.html?id=41638
+
+1.03 2008/05/19 06:02:40
+! lib/Attribute/Util.pm
++ lib/Attribute/Method.pm
++ t/05method.t
+  Attribute::Method added
+
+1.02 2007/04/06 12:10:14
+! t/04sighandler.t
+  Resolved RT #15527 (alarm unsupported on Win32)
+  
+1.01  2006/05/02 15:33:22
+! lib/Attribute/*.pm
+  Oops.  MARCEL, not MERCEL.
+
+1.00  2006/05/02 14:52:40
+* *
+  Refactored by dankogai
+	
+0.02  Wed May 30 22:37:56 2001
+	- added documentation, tests
+
+0.01  Wed May 30 16:23:09 2001
+	- original version; created by h2xs 1.20 with options
+		-XAn Attribute::Util
+

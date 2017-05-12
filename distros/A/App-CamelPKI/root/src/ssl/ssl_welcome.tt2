@@ -1,0 +1,8 @@
+[% META title = 'SSL Certificates' %]
+<p> SSL certificates are generally used beetwen a webserver and a client.
+They are used to crypt the transmission and to be sure the client is really
+who he prentends to be. Certificates can be used with internet browsers.
+</p>
+<p> From this page, you can either revoke or issue a certificate :</p>
+<p> - <a href="/ca/template/ssl/certifyForm">Issuance</a></p>
+<p> - <a href="/ca/template/ssl/revokeForm">Revocation</a></p>

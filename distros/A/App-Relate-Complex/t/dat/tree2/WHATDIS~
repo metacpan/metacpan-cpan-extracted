@@ -1,0 +1,12 @@
+Sun May 27 01:15:44 2007
+~/End/Cave/Relate/Wall/List-Filter/lib/List/Filter/App/t/dat/tree2/WHATDIS
+
+This is another tree of files to be indexed locally by slocate 
+over here: 
+
+~/End/Cave/Relate/Wall/List-Filter/lib/List/Filter/App/t/dat/slocate2
+
+My intention is to make tree2 indefinitely extensible, by making some 
+informal notes about what the existing tests expect to see there, 
+so that later extensions won't impact already existing tests. 
+

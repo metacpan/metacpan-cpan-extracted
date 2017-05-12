@@ -1,0 +1,391 @@
+NAME
+    AnyEvent::FCP - freenet client protocol 2.0
+
+SYNOPSIS
+       use AnyEvent::FCP;
+
+       my $fcp = new AnyEvent::FCP;
+
+       # transactions return condvars
+       my $lp_cv = $fcp->list_peers;
+       my $pr_cv = $fcp->list_persistent_requests;
+
+       my $peers = $lp_cv->recv;
+       my $reqs  = $pr_cv->recv;
+
+DESCRIPTION
+    This module implements the freenet client protocol version 2.0, as used
+    by freenet 0.7. See Net::FCP for the earlier freenet 0.5 version.
+
+    See <http://wiki.freenetproject.org/FreenetFCPSpec2Point0> for a
+    description of what the messages do.
+
+    The module uses AnyEvent to find a suitable event module.
+
+    Only very little is implemented, ask if you need more, and look at the
+    example program later in this section.
+
+  EXAMPLE
+    This example fetches the download list and sets the priority of all
+    files with "a" in their name to "emergency":
+
+       use AnyEvent::FCP;
+
+       my $fcp = new AnyEvent::FCP;
+
+       $fcp->watch_global (1, 0);
+       my $req = $fcp->list_persistent_requests;
+
+    TODO for my $req (values %$req) { if ($req->{filename} =~ /a/) {
+    $fcp->modify_persistent_request (1, $req->{identifier}, undef, 0); } }
+
+  IMPORT TAGS
+    Nothing much can be "imported" from this module right now.
+
+THE AnyEvent::FCP CLASS
+    $fcp = new AnyEvent::FCP key => value...;
+        Create a new FCP connection to the given host and port (default
+        127.0.0.1:9481, or the environment variables "FREDHOST" and
+        "FREDPORT").
+
+        If no "name" was specified, then AnyEvent::FCP will generate a
+        (hopefully) unique client name for you.
+
+        The following keys can be specified (they are all optional):
+
+        name => $string
+            A unique name to identify this client. If none is specified, a
+            randomly generated name will be used.
+
+        host => $hostname
+            The hostname or IP address of the freenet node. Default is
+            $ENV{FREDHOST} or 127.0.0.1.
+
+        port => $portnumber
+            The port number of the FCP port. Default is $ENV{FREDPORT} or
+            9481.
+
+        timeout => $seconds
+            The timeout, in seconds, after which a connection error is
+            assumed when there is no activity. Default is 7200, i.e. two
+            hours.
+
+        keepalive => $seconds
+            The interval, in seconds, at which keepalive messages will be
+            sent. Default is 540, i.e. nine minutes.
+
+            These keepalive messages are useful both to detect that a
+            connection is no longer working and to keep any (home) routers
+            from expiring their masquerading entry.
+
+        on_eof => $callback->($fcp)
+            Invoked when the underlying AnyEvent::Handle signals EOF,
+            currently regardless of whether the EOF was expected or not.
+
+        on_error => $callback->($fcp, $message)
+            Invoked on any (fatal) errors, such as unexpected connection
+            close. The callback receives the FCP object and a textual error
+            message.
+
+        on_failure => $callback->($fcp, $type, $backtrace, $args, $error)
+            Invoked when an FCP request fails that didn't have a failure
+            callback. See "FCP REQUESTS" for details.
+
+  FCP REQUESTS
+    The following methods implement various requests. Most of them map
+    directory to the FCP message of the same name. The added benefit of
+    these over sending requests yourself is that they handle the necessary
+    serialisation, protocol quirks, and replies.
+
+    All of them exist in two versions, the variant shown in this manpage,
+    and a variant with an extra "_" at the end, and an extra $cb argument.
+    The version as shown is *synchronous* - it will wait for any replies,
+    and either return the reply, or croak with an error. The underscore
+    variant returns immediately and invokes one or more callbacks or
+    condvars later.
+
+    For example, the call
+
+       $info = $fcp->get_plugin_info ($name, $detailed);
+
+    Also comes in this underscore variant:
+
+       $fcp->get_plugin_info_ ($name, $detailed, $cb);
+
+    You can thinbk of the underscore as a kind of continuation indicator -
+    the normal function waits and returns with the data, the "_" indicates
+    that you pass the continuation yourself, and the continuation will be
+    invoked with the results.
+
+    This callback/continuation argument ($cb) can come in three forms
+    itself:
+
+    A code reference (or rather anything not matching some other
+    alternative)
+        This code reference will be invoked with the result on success. On
+        an error, it will invoke the "on_failure" callback of the FCP
+        object, or, if none was defined, will die (in the event loop) with a
+        backtrace of the call site.
+
+        This is a popular choice, but it makes handling errors hard - make
+        sure you never generate protocol errors!
+
+        If an "on_failure" hook exists, it will be invoked with the FCP
+        object, the request type (the name of the method), a (textual)
+        backtrace as generated by "Carp::longmess", and arrayref containing
+        the arguments from the original request invocation and the error
+        object from the server, in this order, e.g.:
+
+           on_failure => sub {
+              my ($fcp, $request_type, $backtrace, $orig_args, $error_object) = @_;
+
+              warn "FCP failure ($type), $error_object->{code_description} ($error_object->{extra_description})$backtrace";
+              exit 1;
+           },
+
+    A condvar (as returned by e.g. "AnyEvent->condvar")
+        When a condvar is passed, it is sent ("$cv->send ($results)") the
+        results when the request has finished. Should an error occur, the
+        error will instead result in "$cv->croak ($error)".
+
+        This is also a popular choice.
+
+    An array with two callbacks "[$success, $failure]"
+        The $success callback will be invoked with the results, while the
+        $failure callback will be invoked on any errors.
+
+        The $failure callback will be invoked with the error object from the
+        server.
+
+    "undef"
+        This is the same thing as specifying "sub { }" as callback, i.e. on
+        success, the results are ignored, while on failure, the "on_failure"
+        hook is invoked or the module dies with a backtrace.
+
+        This is good for quick scripts, or when you really aren't interested
+        in the results.
+
+    $peers = $fcp->list_peers ([$with_metdata[, $with_volatile]])
+    $notes = $fcp->list_peer_notes ($node_identifier)
+    $fcp->watch_global ($enabled[, $verbosity_mask])
+    $reqs = $fcp->list_persistent_requests
+    $sync = $fcp->modify_persistent_request ($global, $identifier[,
+    $client_token[, $priority_class]])
+        Update either the "client_token" or "priority_class" of a request
+        identified by $global and $identifier, depending on which of
+        $client_token and $priority_class are not "undef".
+
+    $info = $fcp->get_plugin_info ($name, $detailed)
+    $status = $fcp->client_get ($uri, $identifier, %kv)
+        %kv can contain (<http://wiki.freenetproject.org/FCP2p0ClientGet>).
+
+        ignore_ds, ds_only, verbosity, max_size, max_temp_size, max_retries,
+        priority_class, persistence, client_token, global, return_type,
+        binary_blob, allowed_mime_types, filename, temp_filename
+
+    $status = $fcp->remove_request ($identifier[, $global])
+        Remove the request with the given isdentifier. Returns true if
+        successful, false on error.
+
+    ($can_read, $can_write) = $fcp->test_dda ($local_directory,
+    $remote_directory, $want_read, $want_write))
+        The DDA test in FCP is probably the single most broken protocol -
+        only one directory test can be outstanding at any time, and some
+        guessing and heuristics are involved in mangling the paths.
+
+        This function combines "TestDDARequest" and "TestDDAResponse" in one
+        request, handling file reading and writing as well, and tries very
+        hard to do the right thing.
+
+        Both $local_directory and $remote_directory must specify the same
+        directory - $local_directory is the directory path on the client
+        (where AnyEvent::FCP runs) and $remote_directory is the directory
+        path on the server (where the freenet node runs). When both are
+        running on the same node, the paths are generally identical.
+
+        $want_read and $want_write should be set to a true value when you
+        want to read (get) files or write (put) files, respectively.
+
+        On error, an exception is thrown. Otherwise, $can_read and
+        $can_write indicate whether you can reaqd or write to freenet via
+        the directory.
+
+  REQUEST CACHE
+    The "AnyEvent::FCP" class keeps a request cache, where it caches all
+    information from requests.
+
+    For these messages, it will store a copy of the key-value pairs,
+    together with a "type" slot, in "$fcp->{req}{$identifier}":
+
+       persistent_get
+       persistent_put
+       persistent_put_dir
+
+    This message updates the stored data:
+
+       persistent_request_modified
+
+    This message will remove this entry:
+
+       persistent_request_removed
+
+    These messages get merged into the cache entry, under their type, i.e. a
+    "simple_progress" message will be stored in
+    "$fcp->{req}{$identifier}{simple_progress}":
+
+       simple_progress        # get/put
+
+       uri_generated          # put
+       generated_metadata     # put
+       started_compression    # put
+       finished_compression   # put
+       put_failed             # put
+       put_fetchable          # put
+       put_successful         # put
+
+       sending_to_network     # get
+       compatibility_mode     # get
+       expected_hashes        # get
+       expected_mime          # get
+       expected_data_length   # get
+       get_failed             # get
+       data_found             # get
+       enter_finite_cooldown  # get
+
+    In addition, an event (basically a fake message) of type
+    "request_changed" is generated on every change, which will be called as
+    "$cb->($fcp, $kv, $type)", where $type is the type of the original
+    message triggering the change,
+
+    To fill this cache with the global queue and keep it updated, call
+    "watch_global" to subscribe to updates, followed by
+    "list_persistent_requests_sync".
+
+       $fcp->watch_global_sync_; # do not wait
+       $fcp->list_persistent_requests; # wait
+
+    To get a better idea of what is stored in the cache, here is an example
+    of what might be stored in "$fcp->{req}{"Frost-gpl.txt"}":
+
+       {
+          identifier     => "Frost-gpl.txt",
+          uri            => 'CHK@Fnx5kzdrfE,EImdzaVyEWl,AAIC--8/gpl.txt',
+          binary_blob    => "false",
+          global         => "true",
+          max_retries    => -1,
+          max_size       => 9223372036854775807,
+          persistence    => "forever",
+          priority_class => 3,
+          real_time      => "false",
+          return_type    => "direct",
+          started        => "true",
+          type           => "persistent_get",
+          verbosity      => 2147483647,
+          sending_to_network => {
+             identifier => "Frost-gpl.txt",
+             global     => "true",
+          },
+          compatibility_mode => {
+             identifier    => "Frost-gpl.txt",
+             definitive    => "true",
+             dont_compress => "false",
+             global        => "true",
+             max           => "COMPAT_1255",
+             min           => "COMPAT_1255",
+          },
+          expected_hashes    => {
+             identifier => "Frost-gpl.txt",
+             global     => "true",
+             hashes     => {
+                ed2k   => "d83596f5ee3b7...",
+                md5    => "e0894e4a2a6...",
+                sha1   => "...",
+                sha256 => "...",
+                sha512 => "...",
+                tth    => "...",
+             },
+          },
+          expected_mime      => {
+             identifier      => "Frost-gpl.txt",
+             global          => "true",
+             metadata        => { content_type => "application/rar" },
+          },
+          expected_data_length => {
+             identifier      => "Frost-gpl.txt",
+             data_length     => 37576,
+             global          => "true",
+          },
+          simple_progress    => {
+             identifier      => "Frost-gpl.txt",
+             failed          => 0,
+             fatally_failed  => 0,
+             finalized_total => "true",
+             global          => "true",
+             last_progress   => 1438639282628,
+             required        => 372,
+             succeeded       => 102,
+             total           => 747,
+          },
+          data_found           => {
+             identifier      => "Frost-gpl.txt",
+             completion_time => 1438663354026,
+             data_length     => 37576,
+             global          => "true",
+             metadata        => { content_type => "image/jpeg" },
+             startup_time    => 1438657196167,
+          },
+       }
+
+EXAMPLE PROGRAM
+       use AnyEvent::FCP;
+
+       my $fcp = new AnyEvent::FCP;
+
+       # let us look at the global request list
+       $fcp->watch_global_ (1);
+
+       # list them, synchronously
+       my $req = $fcp->list_persistent_requests;
+
+       # go through all requests
+    TODO
+       for my $req (values %$req) {
+          # skip jobs not directly-to-disk
+          next unless $req->{return_type} eq "disk";
+          # skip jobs not issued by FProxy
+          next unless $req->{identifier} =~ /^FProxy:/;
+
+          if ($req->{data_found}) {
+             # file has been successfully downloaded
+         
+             ... move the file away
+             (left as exercise)
+
+             # remove the request
+
+             $fcp->remove_request (1, $req->{identifier});
+          } elsif ($req->{get_failed}) {
+             # request has failed
+             if ($req->{get_failed}{code} == 11) {
+                # too many path components, should restart
+             } else {
+                # other failure
+             }
+          } else {
+             # modify priorities randomly, to improve download rates
+             $fcp->modify_persistent_request (1, $req->{identifier}, undef, int 6 - 5 * (rand) ** 1.7)
+                if 0.1 > rand;
+          }
+       }
+
+       # see if the dummy plugin is loaded, to ensure all previous requests have finished.
+       $fcp->get_plugin_info_sync ("dummy");
+
+SEE ALSO
+    <http://wiki.freenetproject.org/FreenetFCPSpec2Point0>, Net::FCP.
+
+BUGS
+AUTHOR
+     Marc Lehmann <schmorp@schmorp.de>
+     http://home.schmorp.de/
+

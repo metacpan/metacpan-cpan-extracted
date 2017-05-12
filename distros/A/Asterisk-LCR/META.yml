@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Asterisk-LCR
+version:      0.08
+version_from: lib/Asterisk/LCR.pm
+installdirs:  site
+requires:
+    Config::Mini:                  0.01
+    Finance::Currency::Convert::XE: 0.10
+    FreezeThaw:                    0.43
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

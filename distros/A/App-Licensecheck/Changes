@@ -1,0 +1,456 @@
+App-Licensecheck
+================
+
+Created:      2000-01-28
+Home page:    <https://metacpan.org/release/App-Licensecheck>
+Home page:    <https://metacpan.org/pod/App::Licensecheck>
+Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
+Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
+
+v3.0.29	2017-01-24
+
+ [ REGRESSIONS ]
+ - Drop gpl+aladdin combo license: Too exotic.
+
+ [ Bug Fixes ]
+ - Fix detect BSD licenses as bare name.
+   Vasudev Kamath++
+ - Fix don't choke on unspecificed BSD license.
+
+ [ Documentation ]
+ - Document Regexp::Pattern::License as a private module.
+
+ [ Other ]
+ - Added: Add license patterns ofl aladdin rpsl mit_cmu mit_cmu_warranty.
+ - Improve license patterns ftl mit_feh mit_enna cube eurosym libpng zlib
+   zlib_acknowledgement.
+ - Sort before enumerating ambiguously related combo licenses.
+ - Streamline license parsing: Process loops of similar patterne.
+
+v3.0.28	2016-11-25
+
+ [ Bug Fixes ]
+ - Fix detect dual licensing mit_new mit_old (and speed up partsing while
+   at it).
+ - Fix tighten detection of ISC license (was misdetecting curl).
+ - Fix tighten detection of mit_new license (was misdetecting other MIT
+   flavors).
+ - Fix tighten license pattern curl (was misdetecting other MIT variants).
+
+ [ Documentation ]
+ - Extend license pattern dsdp with alternate fedora name PetSC.
+ - Fix typo in changelog.
+ - Tidy changelog: Improve distinction between newly added and
+   added-to-patternlist entries.
+
+ [ Other ]
+ - Add license pattern ISC to Regexp::Pattern::License::Pattern.
+ - Added: Add new license pattern icu.
+ - Added: Add new license pattern mit_advertising.
+ - Added: Add new license patterns mit_enna mit_feh.
+ - Drop unused and too broad trait pattern disclaimer.
+ - List license mit_new alternate fedora name Modern Style with sublicense.
+ - Tidy Regexp::Pattern::License: Remove stray bogus regexp.
+ - Tidy Regexp::Pattern::License::Pattern: Fix sort pattern list.
+ - Tidy Regexp::Pattern::License::Pattern: Rename pattern
+   provided_no_warranty → asis_expr_warranty.
+ - Tidy Regexp::Pattern::License::Pattern: Rename pattern
+   repro_notice_cond_discl → note_repro_notice_cond_discl.
+ - Tidy Regexp::Pattern::License::Pattern: Rename pattern
+   retain_notice_cond_discl → note_retain_notice_cond_discl.
+ - Tidy Regexp::Pattern::License::Pattern: Rename pattern discl →
+   asis_sw_name.
+ - Tidy Regexp::Pattern::License::Pattern: Rename pattern discl_disclaim →
+   discl_name_warranties.
+ - Tidy Regexp::Pattern::License::Pattern: Rename pattern discl_provide →
+   asis_name_sw.
+ - Tidy Regexp::Pattern::License::Pattern: Rename pattern name_no_ad →
+   nopromo_written_prior.
+ - Tidy Regexp::Pattern::License::Pattern: Rename pattern promo_no_author →
+   nopromo_neither.
+ - Tidy Regexp::Pattern::License::Pattern: Rename pattern retain_notice →
+   note_invar.
+ - Tighten license pattern bsd-2-clause. Tidy
+   Regexp::Pattern::License::Pattern: Rename pattern asis_sw_name →
+   asis_sw_by_name.
+
+v3.0.27	2016-11-23
+
+ [ REGRESSIONS ]
+ - Drop too exotic licensing phrase, and corresponding test case.
+
+ [ Bug Fixes ]
+ - Fix avoid detection of GPL/LGPL fulltext (rarely if ever used as grant).
+ - Fix detect license FSFULLR (was misdetected as bogus FSFULR).
+ - Fix detect license MPL-2.0 (was misdetected as MPL-2.0 or AGPL).
+ - Fix detect licenses mit_old mit_unspecified (was misdetected as
+   mit_new).
+ - Fix version identifier to use + only in machine-readable mode.
+
+ [ Other ]
+ - Add combo pattern perl to Regexp::Pattern::License.
+ - Add license pattern afl to Regexp::Pattern::License.
+ - Add license pattern agpl to Regexp::Pattern::License.
+ - Add license pattern apache to Regexp::Pattern::License.
+ - Add license pattern artistic to Regexp::Pattern::License.
+ - Add license pattern beerware to Regexp::Pattern::License.
+ - Add license pattern cc_by_sa to Regexp::Pattern::License.
+ - Add license pattern ftl to Regexp::Pattern::License.
+ - Add license pattern llgpl to Regexp::Pattern::License.
+ - Add license pattern mpl to Regexp::Pattern::License.
+ - Add license pattern ms_pl to Regexp::Pattern::License.
+ - Add license pattern openssl to Regexp::Pattern::License.
+ - Add license pattern public_domain to Regexp::Pattern::License.
+ - Add license pattern python to Regexp::Pattern::License.
+ - Add license pattern qpl to Regexp::Pattern::License.
+ - Add license pattern sgi_b to Regexp::Pattern::License.
+ - Add license pattern wtfpl to Regexp::Pattern::License.
+ - Add license patterns adobe_2006 adobe_glyph apafml to
+   Regexp::Pattern::License.
+ - Add license patterns bsd_2_clause bsd_3_clause bsd_4_clause to
+   Regexp::Pattern::License.
+ - Add license patterns cddl cecill cecill_1 cecill_1_1 cecill_2 cecill_2_1
+   cecill_b cecill_c epl to Regexp::Pattern::License.
+ - Add license patterns fsfap fsful fsfullr to Regexp::Pattern::License.
+ - Add license patterns gpl lgpl to Regexp::Pattern::License.
+ - Add license patterns libpng zlib zlib_acknowledgement to
+   Regexp::Pattern::License.
+ - Add license patterns mit_new mit_new_materials mit_old mit_unspecified
+   postgresql, and group pattern mit to Regexp::Pattern::License.
+ - Add license patterns unicode_strict unicode_tou to
+   Regexp::Pattern::License.
+ - Added: Add new group pattern bsd.
+ - Added: Add new group pattern gnu.
+ - Added: Add new license pattern ms_rl.
+ - Added: Add new license patterns cc_by cc_by_nc cc_by_nc_nd cc_by_nc_sa
+   cc_by_nd cc_cc0 cc_sp.
+ - Added: Add new license patterns cube eurosym.
+ - Added: Add new license patterns curl dsdp mit_oldstyle
+   mit_oldstyle_disclaimer mit_oldstyle_permission ntp ntp_disclaimer.
+ - Added: Add new license patterns gfdl gfdl_niv.
+ - Added: Add new trait pattern clause_advertising_always.
+ - Added: Add new trait pattern license_prefix.
+ - Added: Add new trait pattern license_version.
+ - Added: Add new trait patterns clause_retention clause_reproduction
+   clause_advertising clause_non_endorsement disclaimer.
+ - Added: Add new trait patterns fsf_unlimited fsf_unlimited_retention.
+ - Added: Add new trait patterns version_later version_later_paragraph
+   version_later_postfix.
+ - Added: Introduce new modules: Pattern::License Pattern::License::Parts.
+ - Clean m4 dnl comment marker.
+ - Drop no longer used internal license shortname list.
+ - Emulate Regexp::Common -keep syntax to capture version number.
+ - Improve detection of license GPL.
+ - Improve license detections artistic perl.
+ - Relax detection of license GPL.
+ - Relax license pattern cc_by_ca.
+ - Tidy code: Drop noop code.
+ - Tighten regexes: Generalize abbreviated AGPL/LGPL/GPL matching.
+ - Tighten regexes: Generalize and improve LGPL matching.
+ - Use Regexp::Pattern::License for shortname resolving (with internal list
+   as fallback until phased out).
+
+v3.0.26	2016-09-22
+
+ [ Bug Fixes ]
+ - Fix exclude AGPL false positives.
+
+ [ Other ]
+ - Use generalized license string composition at more places.
+
+v3.0.25	2016-09-21
+
+ [ Bug Fixes ]
+ - Fix avoid non-digit in version of license Artistic.
+ - Fix delimit multiple licenses with "and/or" (not "or") when ambiguous.
+ - Fix parse whole file for test info-at-eof.h (default length only
+   approximates lines and is too short since String::Copyright 0.003003).
+
+ [ Test Suite ]
+ - Fix tighten runtime-requirement on PAth__Tiny for visit().
+   Slaven Rezić++
+ - Update testsuite to reflect Perl license detection.
+
+ [ Other ]
+ - Apply fallback marker "UNKNOWN" after (not during) license detection.
+ - Detect license CC-BY-SA.
+ - Detect licenses APAFML Adobe-Glyph Adobe-2006 Aladdin SIL FSFAP FSFUL
+   FSFULLR JSON PostgreSQL Unicode-strict Unicode-TOU zlib-acknowledgement.
+ - Enhance detection of Perl license.
+ - Generalize license string composition.
+ - Improve detection of license AGPL.
+ - Improve detection of license Apache.
+ - Improve non-version descriptor matching.
+ - Improve version matching in license detections.
+ - Tighten regexes: Generalize and improve version matching.
+ - Tighten regexes: Simplify space matching (string already normalized).
+ - Tighten regexes: Treat affero as alternative (not prefix) to GPL
+   prefixes lesser and library.
+
+v3.0.24	2016-09-03
+
+ [ Bug Fixes ]
+ - Fix apply options --check --ignore to full path (not basename).
+
+v3.0.23	2016-09-01
+
+ [ Bug Fixes ]
+ - Fix skip parsing non-files (regression since v3.0.5).
+ - Fix stop ignore options --check --ignore (regression since v3.0.5).
+
+ [ Other ]
+ - Use Path::Iterator::Rule.
+
+v3.0.22	2016-08-21
+
+ [ Bug Fixes ]
+ - Fix have option --deb-machine imply option --deb-fmt.
+
+ [ Other ]
+ - Adjust SPDX-like shortnames to match Debian format.
+ - Improve detection of GPL/LGPL/AGPL versions.
+ - Stop merge differently cased owners.
+ - Use List::Util and Sort::Key::Multi.
+ - Use https protocol in deb-machine header.
+
+v3.0.21	2016-08-20
+
+ [ Bug Fixes ]
+ - Really fix strip copyright sign unconditionally.
+
+v3.0.20	2016-08-20
+
+ [ Bug Fixes ]
+ - Fix strip copyright sign unconditionally.
+ - Fix strip trailing newline from copyrights.
+
+v3.0.19	2016-08-19
+
+ [ Bug Fixes ]
+ - Fix strip copyright sign with option --deb-machine.
+
+ [ Documentation ]
+ - Mention in description of --deb-machine option that it implies
+   --copyright.
+
+ [ Other ]
+ - Add option --copyright-delimiter, including comma by default.
+ - Handle missing year or owner with option --deb-machine.
+ - Require well-formed years when splitting ownerlines with option
+   --deb-machine.
+
+v3.0.18	2016-08-13
+
+ [ Bug Fixes ]
+ - Fix defaults for options --list-delimiter and --rfc822-delimiter (was
+   one space too many).
+ - Fix stop use obsolete undocumented String::Copyright blocks method.
+ - Fix use NONE for no authors with option --deb-machine.
+
+ [ Packaging ]
+ - Tighten dependency on String::Copyright.
+
+v3.0.17	2016-08-12
+
+ - Fix avoid bogus "generated-file" as SPDX license.
+ - Have option --deb-machine imply option --deb-fmt.
+
+v3.0.16	2016-08-11
+
+ - Add "Auto Generated" to the generated file detection.
+   Paul Wise++
+
+v3.0.15	2016-08-11
+
+ [ Documentation ]
+ - Mention in description of --lines option that it does optimistic search.
+
+ [ Packaging ]
+ - Tighten dependency on String::Copyright to versions supporting
+   configurable threshold.
+
+ [ Other ]
+ - Do full search when parsing whole file.
+
+v3.0.14	2016-08-01
+
+ [ Test Suite ]
+ - Flag test involving multi-line multi-statements as TODO (regression
+   since moving to String::Copyright).
+
+v3.0.13	2016-07-25
+
+ [ Packaging ]
+ - Fix tighten runtime-requirement on PAth__Tiny for visit().
+   Stuart Prescott++
+
+v3.0.12	2016-07-24
+
+ [ Test Suite ]
+ - Fix devscripts test to use curly quotes as metacharacters (not
+   Paranthesis also used within, triggering warnings on some versiones of
+   perl).
+
+v3.0.11	2016-07-24
+
+ [ Packaging ]
+ - Fix declare runtime-requirement on String::Copyright.
+
+v3.0.10	2016-07-24
+
+ [ REGRESSIONS ]
+ - No longer detect multi-line multi-statement copyright strings (not yet
+   suppported by String::Copyright).
+ - Now misdetects some chatter as copyright statements (not yet suppported
+   by String::Copyright).
+
+ [ Test Suite ]
+ - Relax devscripts test: Ignore trailing dot and "All rights reserved"
+   boilerplate.
+
+ [ Other ]
+ - Use String::Copyright.
+
+v3.0.9	2016-07-24
+
+ [ Documentation ]
+ - Drop old licensing header from devscripts test: Fully rewritten by now.
+ - Fix decode "©" in --version option output (workaround for Pod::Constants
+   not supporting UTF-8).
+ - Fix some categorizations of old changelog entries.
+
+ [ Test Suite ]
+ - Rewrite devscripts test to match patterns (not exact strings), and
+   handle varying output on encoding failure.
+
+ [ Packaging ]
+ - Drop superfluous test-requirement on strictures: Already declared as
+   runtime-requirement.
+ - Fix declare test-recommendation on Software::License (not too vague
+   recommends).
+
+ [ Other ]
+ - Stop use Unicode features: We don't really do any complex Unicode, so
+   let's try target older perl.
+ - Update headers of module and tests: Strip hashbang; consistently use
+   strictures.
+
+v3.0.8	2016-07-24
+
+ [ Bug Fixes ]
+ - Avoid superfluous regex modifier /l.
+
+ [ Packaging ]
+ - Fix tighten test requirement for Test::Script to versions checking for
+   stdout/stderr.
+
+ [ Other ]
+ - Add "Generated with" to the generated file detection.
+   Paul Wise++
+ - Pseudo-decode alternative representations for copyright sign and
+   hyphen-minus.
+
+v3.0.7	2016-07-20
+
+ [ Test Suite ]
+ - Bail out gracefully if Software::License fails to create some licenses.
+
+ [ Packaging ]
+ - Make Software::License test optional.
+
+v3.0.6	2016-07-20
+
+ [ Packaging ]
+ - Fix require experimental (for switch feature).
+
+ [ Other ]
+ - Improve separation of copyright parsing from comment stripping and
+   copyright serializing
+
+v3.0.5	2016-07-19
+
+ [ SECURITY ]
+ - Fix: Stop dereference symbolic links: non-intuitive and potentially
+   dangerous (possibly introduced in error intended to enable recursion).
+   Sandro Mani++
+
+ [ Test Suite ]
+ - Fix tighten rest-requirement on Software::License to versions supporting
+   new_from_short_name().
+
+ [ Other ]
+ - Avoid type constraints and all but one coercion, for a 30% speedup in
+   script initialization.
+ - Move find routine to library.
+ - Stop call system command find in script (uses Path::Tiny::visit
+   instead).
+ - Tidy script to rename $file → $path and $files_count → $paths_count
+   where not yet resolved as file.
+
+v3.0.4	2016-07-18
+
+ [ Test Suite ]
+ - Drop non-working option "--installed" from script tests (leftover from
+   Debian autopkgtest support).
+ - Stop use Path::Tiny in test where unneeded.
+ - Use Test::Script to ensure correct perl invokes script in tests.
+   Slaven Rezić++
+
+v3.0.3	2016-07-18
+
+ [ Test Suite ]
+ - Use Test::Roo and library calls (not script) for devscripts corpus
+   license coverage tests.
+
+ [ Packaging ]
+ - Fix require strictures for tests.
+
+v3.0.2	2016-07-16
+
+ [ Test Suite ]
+ - Add devscripts test tied to devscripts corpus, converted from earlier
+   shunit2 script.
+ - Rewrite Software-License test to stop rely on Debian fork of
+   Software::License (see bug#828218).
+ - Rewrite Software-License test to use Test::Command.
+
+ [ Packaging ]
+ - Run perlcritic with tidyall, and move tidyall test to xt dir.
+
+ [ Other ]
+ - Bump license to GPL-3+.
+ - Resolve only regexes actually used.
+ - Use Getopt::Long::Descriptive.
+ - Use experimental given/when switch.
+
+v3.0.1	2016-06-29
+
+ [ Documentation ]
+ - Add CPAN Request Tracker as alternative bug-database.
+ - Add myself as current author, and claim copyright for recent changes.
+ - Add pre-CPAN changelog entries.
+ - Adjust copyright notice to mention initial committer (not later
+   maintainer).
+ - Link to script from POD DESCRIPTION of library.
+
+ [ Packaging ]
+ - Tighten tidyall config to avoid cruft in bin dir.
+
+v3.0.0	2016-06-27
+
+ [ Bug Fixes ]
+ - Fix tighten to use Getopt::Long 2.24: Needed for :config option.
+
+ [ Documentation ]
+ - Rewrite documentation of options, and --help putput.
+
+ [ Packaging ]
+ - Initial CPAN release (after being in Debian since 2007, and before that
+   in KDE SDK since 2000).
+
+ [ Other ]
+ - Added: Add --deb-machine option for Debian "deb5" copyright file format.
+ - Refactor codebase, with up to 400% speedup and reusable parts in a Moo
+   library.
+ - Removed: Drop support for reading configuration from files: Limited use,
+   legacy filenames, and odd parsing by use of risky shell call.

@@ -1,0 +1,24 @@
+bin/install_deps.pl
+bin/logmonster.pl
+Changes
+examples/daily_email_report.txt
+FAQ
+INSTALL
+lib/Apache/Logmonster.pm
+lib/Apache/Logmonster/Utility.pm
+lib/Regexp/Log/Monster.pm
+logmonster.conf
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00.load.t
+t/Filehandle.t
+t/Logmonster.t
+xt/pod-coverage.t
+xt/pod.t
+xt/Test-coverage.pl
+t/Utility.t
+TODO
+META.json                                Module JSON meta-data (added by MakeMaker)

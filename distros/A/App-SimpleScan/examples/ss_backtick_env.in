@@ -1,0 +1,2 @@
+%%language "$ENV{LANGUAGE}"
+http://<language>.org  /<language>/i Y <language>.org

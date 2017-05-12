@@ -1,0 +1,10 @@
+# Changes for App-HTTPThis
+
+0.002 Thu Jul 29 10:59:43 UTC 2010
+     * Use Plack::Runner higher-level interface instead of
+       Plack::Handler::Standalone directly
+     * Deal with port-already-in-use better, with prettier messages
+     * Added --name option to announce the server over Bonjour
+
+0.001 Wed Jul 28 15:52:36 UTC 2010
+     * Initial release

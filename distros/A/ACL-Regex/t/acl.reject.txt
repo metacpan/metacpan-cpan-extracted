@@ -1,0 +1,4 @@
+# Don't allow domain admins to delete mailboxes on weekends or mondays
+/action=[mac-delete-mailbox] account=[.*@domain.net.adm] group=[domain-admin] dow=[sat|sun|mon]/	Domain admins can only delete mailboxes during the week
+# Reject mail from brazil
+/account=[.*@example.net] ip=[200..*] group=[user] action=[send-mail]/	No mail to be sent from Brazil!

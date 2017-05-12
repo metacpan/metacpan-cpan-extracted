@@ -1,0 +1,39 @@
+NAME
+
+Array::Base - array index offseting
+
+DESCRIPTION
+
+This module implements automatic offsetting of array indices.  In normal
+Perl, the first element of an array has index 0, the second element has
+index 1, and so on.  This module allows array indexes to start at some
+other value.  Most commonly it is used to give the first element of an
+array the index 1 (and the second 2, and so on), to imitate the indexing
+behaviour of FORTRAN and many other languages.  It is usually considered
+poor style to do this.
+
+The array index offset is controlled at compile time, in a
+lexically-scoped manner.  Each block of code, therefore, is subject to
+a fixed offset.  It is expected that the affected code is written with
+knowledge of what that offset is.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2009, 2010, 2011, 2012
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution AnyEvent-Debounce,
+version 0.01:
+
+  condense multiple temporally-nearby events into one
+
+This software is copyright (c) 2011 by Jonathan Rockway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

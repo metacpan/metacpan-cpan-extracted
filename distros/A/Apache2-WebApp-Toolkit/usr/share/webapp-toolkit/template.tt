@@ -1,0 +1,31 @@
+<!--
+    This is where the HTML markup resides.
+
+    For more information on directives that can be used
+    within this template, please refer to:
+
+    http://template-toolkit.org/docs/manual
+-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>[% IF package_name %]Apache2::WebApp::Toolkit -[% END %] [% project_title %]</title>
+</head>
+<body>
+[%- IF package_name %]
+<h2>It works!</h2>
+
+<p>
+	This page is used to test your project after it has been created.
+
+		<br />
+		<br />
+
+	If you can read this page it means that the Apache2::WebApp::Toolkit is working properly.
+</p>
+[% END -%]
+</body>
+</html>

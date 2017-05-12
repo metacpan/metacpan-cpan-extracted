@@ -1,0 +1,5 @@
+<%
+ BEGIN {
+  $test_value++
+ };
+%>

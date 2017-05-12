@@ -1,0 +1,29 @@
+Revision history for Perl extension Apache::Request::Redirect.
+
+00.05  (2004-04-15)
+===================
+- Now initialized apachereq method is not more required and, indeed,
+  is deprecated. Now module automatically detect Apache::Request object.
+
+00.04  (2003-09-03)
+===================
+- In the previous version when request is of type POST all query string
+  parameters was put in the content body of the HTTP request also if some
+  of this parameters came from uri query string. This cause problems for
+  script that make difference between query string parameters and 
+  content POST parameters. Now if the request type is POST the redirect 
+  request have uri query string unchanged regarding the original request.
+
+00.03  (2003-07-28)
+===================
+- Add a new boolean method/parameter use_http10. If this parameter is set to 1 
+  remote page is request using HTTP/1.0 protocol indeed of HTTP/1.1 which is
+  the default.
+
+00.02  (2003-07-23)
+===================
+- Lost pod documentation in the MANIFEST file and so in the distribution file too.
+
+00.01  (2003-07-22)
+===================
+- original version

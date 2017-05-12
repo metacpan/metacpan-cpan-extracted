@@ -1,0 +1,33 @@
+NAME
+
+    Acme::RandomEmoji - pick an emoji randomly
+
+SYNOPSIS
+
+DESCRIPTION
+
+    Acme::RandomEmoji picks an emoji randomly.
+
+    Emoji data is taken from:
+
+    http://unicode.org/Public/emoji/latest/emoji-data.txt
+
+    http://unicode.org/Public/emoji/latest/emoji-sequences.txt
+
+    http://unicode.org/Public/emoji/latest/emoji-zwj-sequences.txt
+
+SEE ALSO
+
+    Full Emoji Data http://unicode.org/emoji/charts/full-emoji-list.html
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2016 Shoichi Kaji <skaji@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    Note that this library uses emoji-data.txt, emoji-sequences.txt and
+    emoji-zwj-sequences.txt, which have their own license. Please refer to
+    http://www.unicode.org/copyright.html
+

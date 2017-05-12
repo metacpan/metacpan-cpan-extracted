@@ -1,0 +1,4 @@
+name, upper_name
+Contractor, CONTRACTOR
+Manager, MANAGER
+Programmer, PROGRAMMER

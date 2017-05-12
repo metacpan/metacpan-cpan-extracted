@@ -1,0 +1,11 @@
+DESCRIPTION
+
+    This distribution provides the following command-line utilities related
+    to Getopt::Long::Subcommand:
+
+    #INSERT_EXECS_LIST
+
+SEE ALSO
+
+    Getopt::Long::Subcommand
+

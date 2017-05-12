@@ -1,0 +1,47 @@
+# Put this file into any directory, and it will affect any file within
+# that directory and all of its subdirectories.  These files are good
+# for setting a look and feel for a set of physically related files.
+# For example, say you have a directory of files all on one subject, and
+# you decide they should all have a blue background.  You could go
+# something like this:
+
+@BGCOLOR=#9999FF;
+
+# Please recall that you can NOT "comment out" a directive.  You must
+# deactivate it by separating the "@" from the directive name.  
+
+@ NOSIDEBAR=0;
+
+# That directive above is deactivated.
+
+# Note that just about any directive is valid in the LookAndFeelConfig.  
+# Depending on the configuration in the main server file, however, most
+# directives might be ignored!!  If the server configuration (the file
+# pointed to by CONFIG_FILE in the httpd.conf file) has disallowed a 
+# whole bunch of things by setting ALLOWBODYMOD, ALLOWNOSIDEBAR, etc to
+# 0.  In that case, most of the settings in this file will be ignored. 
+# It doesn't hurt to set them, however.
+
+# A few settings will always work.  These are:
+
+# turning on and off the top/bottom navigation bars...
+
+@NAVBAR=0;
+
+# setting the next/up/last links
+
+@ UPLINK=<a href="top.html">Top</a>;
+
+# However, the NEXTLINK/UPLINK/LASTLINK directives really only make sense
+# on a file-by-file basis (for example, if you have an online book).  To 
+# set them for a whole directory tree is kind of silly, except maybe for
+# the uplink.
+
+# The INFO directive is always user-configurable.  If there is no
+# sidebar, it won't be used.  It doesn't hurt to set it though.
+
+@ INFO=<A href="http://www.sluggy.com">Sluggy</a>,
+            <A HREf="http://www.technotronic.com">Technotronic</a>;
+
+# if you like, check out the documentation (perlmod SetWWWTheme.pm)
+# to find out more about the settings that are available.

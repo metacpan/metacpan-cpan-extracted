@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+MPL-1.1.txt
+README
+t/PSO.t
+lib/AI/PSO.pm
+extradoc/ReactivePower-PSO-wks.pdf
+examples/NeuralNet/pso_ann.pl
+examples/NeuralNet/pso.dat
+examples/NeuralNet/Makefile
+examples/NeuralNet/NeuralNet.h
+examples/NeuralNet/NeuralNet.cpp
+examples/NeuralNet/main.cpp
+META.yml                                 Module meta-data (added by MakeMaker)

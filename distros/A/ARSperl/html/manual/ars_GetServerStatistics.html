@@ -1,0 +1,49 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - ars_GetServerStatistics</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+    <H2><CODE>ars_GetServerStatistics(ctrl, statisticNumber)</CODE></H2>
+
+	Returns a HASH consisting of server statistics. <CODE>statisticNumber</CODE>
+        is the enumerated statistic value as listed in the <CODE>ar.h</CODE>
+        header file. In addition, you can use the <CODE>ARServerStats</CODE>
+        hash to convert from a statistic name to a statistic number.
+
+	<P>
+        Here is an example:<P>
+
+        <PRE>
+	%stats = ars_GetServerStatistics($ctrl, $ARServerStats{'START_TIME'},
+						$ARServerStats{'API_REQUESTS'});
+        </PRE>
+
+	This will return a HASH where the key is the enumerated value of the
+	requested statistic and the value of the hash is the actual statistic
+	value. To reference a statistic in the above HASH you can do this:
+
+	<PRE>
+	print $stats{$ARServerStats{'START_TIME'}}."\n";
+	</PRE>
+
+        <DL>
+          <DT><B>On success</B><DD>
+		returns a HASH
+          <DT><B>On failure</B><DD>
+		returns undef
+        </DL>
+       <P>
+<em>ars_GetServerStatistics was introduced in version 1.3 of ARSperl.</em>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 26th June 1997 by d.j.adams@soton.ac.uk<br>
+&#169; J.C.Murphy, J.W.Murphy 1997 arsperl@arsperl.org
+</address>
+</BODY>
+</HTML>

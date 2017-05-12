@@ -1,0 +1,14 @@
+This is the README file for Acme::Test, a perl module for continuous
+100% test coverage
+
+Please refer to 'perldoc Acme::Test' after installation for details.
+
+
+Acme::Test follows the standard perl module install process
+
+perl Makefile.PL
+make
+make test
+make install
+
+The module uses no C or XS parts, so no c-compiler is required.

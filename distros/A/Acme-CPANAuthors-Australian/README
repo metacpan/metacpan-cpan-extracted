@@ -1,0 +1,50 @@
+NAME
+    Acme::CPANAuthors::Australian - we are Australian CPAN authors
+
+SYNOPSIS
+     use strict;
+     use warnings;
+     use Acme::CPANAuthors;
+ 
+     my $authors = Acme::CPANAuthors->new('Australian');
+     my $count   = $authors->count;
+ 
+     print "Count of Australian CPAN authors: $count\n";
+
+DESCRIPTION
+    This class provides a hash of Australian CPAN authors' PAUSE ID and name
+    to be used with the Acme::CPANAuthors module.
+
+    This module was created simply because nobody had written it and uploaded
+    it to CPAN before me :)
+
+MAINTENANCE
+    If you are an Australian CPAN author not listed here, please send me your
+    ID/name via RT so I can always keep this module up to date. If there's a
+    mistake and you're listed here but are not Australian (or just don't want
+    to be listed), sorry for the inconvenience: please contact me and I'll
+    remove the entry right away.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Acme-CPANAuthors-Australian>.
+
+SEE ALSO
+    Acme::CPANAuthors.
+
+    Not to be confused with: Acme::CPANAuthors::Austrian.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

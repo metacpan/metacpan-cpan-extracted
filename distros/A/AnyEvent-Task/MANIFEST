@@ -1,0 +1,30 @@
+Changes
+COPYING
+lib/AnyEvent/Task.pm
+lib/AnyEvent/Task/Client.pm
+lib/AnyEvent/Task/Client/Checkout.pm
+lib/AnyEvent/Task/Logger.pm
+lib/AnyEvent/Task/Server.pm
+lib/AnyEvent/Task/Server/Worker.pm
+lib/AnyEvent/Task/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/args.t
+t/dont_refork_after_error.t
+t/error-clears-checkout-queue.t
+t/logger.t
+t/manual-request-abort.t
+t/max_checkouts.t
+t/sequential.t
+t/setup-errors.t
+t/setup.t
+t/surge.t
+t/timeout-connect.t
+t/timeout-hung-worker.t
+t/timeout-in-progress.t
+t/timeout-log-defer.t
+t/worker-_exits.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,32 @@
+#!/usr/bin/perl -w
+use strict;
+#use modularizer::module;
+
+package App::Modular::Module::Family::Child;
+
+use App::Modular;
+use base qw(App::Modular::Module);
+
+sub module_depends {
+   my ($self) = shift;
+   $self->modularizer()->mlog(99, "child: I depend on parents");
+   return "Family::Parents";
+};
+
+sub parents {
+   my ($self) = shift;
+
+   return 
+      ($self->modularizer()->module('Family::Parents')->mother(),
+       $self->modularizer()->module('Family::Parents')->father());
+       
+}
+
+sub greet {
+   my ($self) = shift;
+   
+   print STDERR "Hello, I am a child. My parents are: ".
+         (join ' and ', $self->parents()).". Who are you?\n";
+}
+
+1;

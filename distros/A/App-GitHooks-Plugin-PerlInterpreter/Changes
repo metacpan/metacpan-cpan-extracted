@@ -1,0 +1,24 @@
+Revision history for App-GitHooks-Plugin-PerlInterpreter
+
+v1.2.0  2017-03-19
+        - Switched to Test::Requires::Git instead of the now obsolete
+          Test::Git::has_git(). Thank you, Philippe Bruhat!
+        - Relicensed under Perl 5 terms.
+
+v1.1.0  2014-06-09
+        - Added configuration option to recommend a correct interpreter when
+          the check fails (GH-1).
+
+v1.0.3  2014-06-08
+        - Noted git version in tests to help troubleshooting.
+        - Required git v1.7.4.1.
+
+v1.0.2  2014-06-02
+        - Sync manifest.
+
+v1.0.1  2014-06-01
+        - Added display of incorrect interpreter lines, to help with quick
+          troubleshooting.
+
+v1.0.0  2014-05-31
+        - Public release.

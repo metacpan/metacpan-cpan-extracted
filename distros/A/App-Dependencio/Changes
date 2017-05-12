@@ -1,0 +1,17 @@
+Revision history for Perl extension Dependencio
+
+0.09 2016-06-18T12:31:18Z
+
+0.02 2014-02-10T20:06:45Z
+    - original version
+0.03 2014-02-10T21:02:00Z
+    - this is the first initial version
+
+0.04 2014-02-11T20:15:03Z
+    -fixed install dependencies
+
+0.07 2015-08-24T17:54:58Z
+    -send non zero output to shell if no dependencies achieved
+0.09 2016-06-18T14:27:34Z
+    -now the module scans performed by Module::Extract::Use
+

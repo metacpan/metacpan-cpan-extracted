@@ -1,0 +1,36 @@
+Revision history for Perl extension Acme-2zicon
+0.7 2016-05-24T11:11:36Z
+    - remove NagataMinari
+
+0.6 2015-12-31T12:33:40Z
+    - add Otsuka Miyu and Yamato Ao
+    - remove Kinoshita Hiyori and Nishi Nanami
+
+0.5 2015-08-19T12:58:55Z
+    - remove Yoshimura Nana
+
+0.4 2014-11-21T14:22:02Z
+    - measure to decrease versions
+
+0.3.1 2014-11-02T13:43:25Z
+    - add Tsurumi Moe's introduction
+
+0.3 2014-10-31T14:06:17Z
+    - add Moe Tsurumi(new member)
+
+0.2.2 2014-10-15T13:05:36Z
+
+    - bug fix(forgot \n)
+
+0.2.1 2014-10-11T06:33:41Z
+
+    - bug fix(delete space)
+
+0.2 2014-10-11T05:10:27Z
+
+    - add introduction
+
+0.1 2014-10-08T18:26:48Z
+
+    - original version
+

@@ -1,0 +1,86 @@
+Revision history for Perl extension Async::Interrupt.
+
+1.21 Wed Feb 11 20:31:01 CET 2015
+	- upgrade ecb.h for C11 compatibility.
+
+1.2   Fri Apr 11 06:22:38 CEST 2014
+	- perl5porters broke Async::Interrupt, BDB, EV, IO::AIO, OpenCL
+          without warning by switching the meaning of USE_SOCKETS_AS_HANDLES
+          in 5.18. What's so attractive about giving a shit about backwards
+          compatibility - I will never understand.
+
+1.1   Wed Apr 25 00:46:08 CEST 2012
+	- new $async->handle method.
+	- new $async->pipe_drain method.
+        - use memory fences for !x86, and x86 future
+          proofing. use libecb for implementation.
+
+1.05  Sat May 15 02:06:33 CEST 2010
+	- implement $epipe->signal_func method.
+
+1.04  Wed Mar 31 02:46:49 CEST 2010
+        - a double fork partially killed the event pipe (great testcase
+          by dormando). affects IO::AIO, BDB and Async::Interrupt.
+
+1.03  Tue Nov 24 14:31:10 CET 2009
+	- port to loser platform.
+
+1.02  Tue Sep  1 18:41:09 CEST 2009
+	- prototypes for sig2name/sig2num were missing.
+
+1.01  Wed Aug  5 13:50:59 CEST 2009
+	- evpipe->wait did immediately return on !windows.
+
+1.0   Thu Jul 30 05:58:55 CEST 2009
+        - implement signal_hysteresis.
+        - implement scope_block_func.
+        - implement sig2name/sig2num convenience functions.
+
+0.6   Sat Jul 18 07:09:33 CEST 2009
+	- add autodrain setting.
+        - added Async::Interrupt::EventPipe class.
+        - fixed a potential race issue by removing the internal
+          epipe state.
+        - destroying asyncs inside their handler callback could lead
+          to segfaults.
+        - destroying an interrupt object did not properly remove it
+          from the asyncs list (classical case of side-effect-inside-assert).
+
+0.501 Fri Jul 17 16:58:51 CEST 2009
+	- do no longer errornously do operations on fd 0 if no pipe
+          is associated with the interrupt object.
+
+0.5   Fri Jul 17 03:53:21 CEST 2009
+	- INCOMPATIBLE CHANGE: signalling the value 0 is no longer allowed.
+	- added automatic pipe creation code, including post_fork method.
+        - added ->c_var method, and the ability to use a perl scalar as
+          signal checker.
+
+0.042 Tue Jul 14 21:51:04 CEST 2009
+	- enforce initialisation of perl's signal handling framework,
+          avoiding crashes otherwise.
+	- switched to common::sense.
+        - freely sprinkle around more volatiles.
+        - fix initialisation code (XSLoader).
+        - ported to win32.
+
+0.041 Sun Jul 12 18:32:46 CEST 2009
+        - oh my, I forgot to include the typemap.
+	- improved documentation.
+
+0.04  Sun Jul 12 00:24:02 CEST 2009
+	- added ability to block the pipe write temporarily.
+        - added the ability to call signal when the process receives
+          a (POSIX) signal.
+	- removed debugging output in constructor.
+        - support eventfd instead of a pipe (untested).
+
+0.03  Fri Jul  3 23:11:05 CEST 2009
+	- port to perl <= 5.8.9.
+
+0.02  Thu Jul  2 17:17:30 CEST 2009
+	- first release, rather untested.
+
+0.01  Thu Jul  2 13:18:00 CEST 2009
+	- original version; cloned from Convert::Scalar.
+

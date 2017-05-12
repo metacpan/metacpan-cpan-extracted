@@ -1,0 +1,18 @@
+Revision history for App-opan
+
+0.002001 - 2017-01-22
+  - port to new Mojo::File API
+  - Changes file actually in dist
+
+0.002000 - 2016-09-24
+  - set OPAN_AUTOPIN given --autopin to cpanm/carton commands, because you
+    already explicitly asked for autopin so it's silly not to
+
+0.001003 - 2016-08-07
+  - I ... forgot ... the shebang line. Fixed.
+
+0.001002 - 2016-08-07
+  - fix 'make dist' to copy the code into lib/App/opan.pm as well
+
+0.001001 - 2016-08-07
+  - released onto an unsuspecting world

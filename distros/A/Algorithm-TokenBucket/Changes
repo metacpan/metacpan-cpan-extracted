@@ -1,0 +1,33 @@
+Revision history for Perl extension Algorithm::TokenBucket.
+
+0.38 2016-07-01T08:51:35Z
+
+0.37 2015-10-05T20:26:54Z
+	- Convert to Minilla
+	- Unconditionally depend on Time::HiRes
+
+0.36  Sun Jun 23 12:20:54 MSK 2013
+	- Increase some epsilons in tests to account for really slow test
+	  boxes. No functional changes.
+
+0.32  Tue Feb 19 18:22:38 MSK 2008
+	- Restore 5.6 compatibility lost in 0.3.
+
+0.31  Tue Feb 19 16:04:40 MSK 2008
+	- Avoid token flow in _init() and state() to make cloning
+	  reliable. This may break code which directly
+	  interprets state() result or messes with object's
+	  attributes. Such code deserves it.
+	- Reach 100% cond coverage.
+	- Also, use more cmp_ok's in test.pl to better diagnose cpantest FAILs.
+
+0.3  Tue Feb 19 00:53:44 MSK 2008
+	- Storable.pm support and _init() method. Patch by Yuval
+	  Kogman.
+
+0.21  Tue Feb 19 00:52:43 MSK 2008
+	- until() method, patch submitted by Yuval Kogman.
+
+0.2  Wed, 27 October 2004 20:59 (MSD)
+	- Original version, written, podified and cpanified in 5
+	  hours.

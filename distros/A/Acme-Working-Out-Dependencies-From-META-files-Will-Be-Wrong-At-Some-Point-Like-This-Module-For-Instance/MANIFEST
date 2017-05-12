@@ -1,0 +1,10 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+dist.ini
+lib/Acme/Working/Out/Dependencies/From/META/files/Will/Be/Wrong/At/Some/Point/Like/This/Module/For/Instance.pm
+t/00-compile.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

@@ -1,0 +1,276 @@
+NAME
+    AI::FuzzyInference - A module to implement a Fuzzy Inference System.
+
+SYNOPSYS
+        use AI::FuzzyInference;
+
+        my $s = new AI::FuzzyInference;
+
+        $s->inVar('service', 0, 10,
+              poor      => [0, 0,
+                            2, 1,
+                            4, 0],
+              good      => [2, 0,
+                            4, 1,
+                            6, 0],
+              excellent => [4, 0,
+                            6, 1,
+                            8, 0],
+              amazing   => [6, 0,
+                            8, 1,
+                            10, 0],
+              );
+
+        $s->inVar('food', 0, 10,
+              poor      => [0, 0,
+                            2, 1,
+                            4, 0],
+              good      => [2, 0,
+                            4, 1,
+                            6, 0],
+              excellent => [4, 0,
+                            6, 1,
+                            8, 0],
+              amazing   => [6, 0,
+                            8, 1,
+                            10, 0],
+              );
+
+        $s->outVar('tip', 5, 30,
+               poor      => [5, 0,
+                             10, 1,
+                             15, 0],
+               good      => [10, 0,
+                             15, 1,
+                             20, 0],
+               excellent => [15, 0,
+                             20, 1,
+                             25, 0],
+               amazing   => [20, 0,
+                             25, 1,
+                             30, 0],
+               );
+
+        $s->addRule(
+                'service=poor      & food=poor'      => 'tip=poor',
+                'service=good      & food=poor'      => 'tip=poor',
+                'service=excellent & food=poor'      => 'tip=good',
+                'service=amazing   & food=poor'      => 'tip=good',
+
+                'service=poor      & food=good'      => 'tip=poor',
+                'service=good      & food=good'      => 'tip=good',
+                'service=excellent & food=good'      => 'tip=good',
+                'service=amazing   & food=good'      => 'tip=excellent',
+
+                'service=poor      & food=excellent' => 'tip=good',
+                'service=good      & food=excellent' => 'tip=excellent',
+                'service=excellent & food=excellent' => 'tip=excellent',
+                'service=amazing   & food=excellent' => 'tip=amazing',
+
+                'service=poor      & food=amazing'   => 'tip=good',
+                'service=good      & food=amazing'   => 'tip=excellent',
+                'service=excellent & food=amazing'   => 'tip=amazing',
+                'service=amazing   & food=amazing'   => 'tip=amazing',
+
+                );
+
+        $s->compute(service => 2,
+                food    => 7);
+
+DESCRIPTION
+    This module implements a fuzzy inference system. Very briefly, an FIS is
+    a system defined by a set of input and output variables, and a set of
+    fuzzy rules relating the input variables to the output variables. Given
+    crisp values for the input variables, the FIS uses the fuzzy rules to
+    compute a crisp value for each of the output variables.
+
+    The operation of an FIS is split into 4 distinct parts: *fuzzification*,
+    *inference*, *aggregation* and *defuzzification*.
+
+  Fuzzification
+
+    In this step, the crisp values of the input variables are used to
+    compute a degree of membership of each of the input variables in each of
+    its term sets. This produces a set of fuzzy sets.
+
+  Inference
+
+    In this step, all the defined rules are examined. Each rule has two
+    parts: the *precedent* and the *consequent*. The degree of support for
+    each rule is computed by applying fuzzy operators (*and*, *or*) to
+    combine all parts of its precendent, and generate a single crisp value.
+    This value indicates the "strength of firing" of the rule, and is used
+    to reshape (*implicate*) the consequent part of the rule, generating
+    modified fuzzy sets.
+
+  Aggregation
+
+    Here, all implicated fuzzy sets of the fired rules are combined using
+    fuzzy operators to generate a single fuzzy set for each of the output
+    variables.
+
+  Defuzzification
+
+    Finally, a defuzzification operator is applied to the aggregated fuzzy
+    set to generate a single crisp value for each of the output variables.
+
+    For a more detailed explanation of fuzzy inference, you can check out
+    the tutorial by Jerry Mendel at
+    http://sipi.usc.edu/~mendel/publications/FLS_Engr_Tutorial_Errata.pdf.
+
+    Note: The terminology used in this module might differ from that used in
+    the above tutorial.
+
+PUBLIC METHODS
+    The module has the following public methods:
+
+    new()
+        This is the constructor. It takes no arguments, and returns an
+        initialized AI::FuzzyInference object.
+
+    operation()
+        This method is used to set/query the fuzzy operations. It takes at
+        least one argument, and at most 2. The first argument specifies the
+        logic operation in question, and can be either "&" for logical
+        *AND*, "|" for logical *OR*, or "!" for logical *NOT*. The second
+        argument is used to set what method to use for the given operator.
+        The following values are possible:
+
+    &
+        min     The result of "A and B" is "min(A, B)". This is the default.
+
+        product The result of "A and B" is "A * B".
+
+    |
+        max     The result of "A or B" is "max(A, B)". This is the default.
+
+        sum     The result of "A or B" is "min(A + B, 1)".
+
+    !
+        complement
+                The result of "not A" is "1 - A". This is the default.
+
+        The method returns the name of the method to be used for the given
+        operation.
+
+    implication()
+        This method is used to set/query the implication method used to
+        alter the shape of the implicated output fuzzy sets. It takes one
+        optional argument which specifies the name of the implication method
+        used. This can be one of the following:
+
+        clip    This causes the output fuzzy set to be clipped at its
+                support value. This is the default.
+
+        scale   This scales the output fuzzy set by multiplying it by its
+                support value.
+
+    aggregation()
+        This method is used to set/query the aggregation method used to
+        combine the output fuzzy sets. It takes one optional argument which
+        specifies the name of the aggregation method used. This can be one
+        of the following:
+
+        max     The fuzzy sets are combined by taking at each point the
+                maximum value of all the fuzzy sets at that point. This is
+                the default.
+
+    defuzzification()
+        This method is used to set/query the defuzzification method used to
+        extract a single crisp value from the aggregated fuzzy set. It takes
+        one optional argument which specifies the name of the
+        defuzzification method used. This can be one of the following:
+
+        centroid
+                The centroid (aka *center of mass* and *center of gravity*)
+                of the aggregated fuzzy set is computed and returned. This
+                is the default.
+
+    inVar()
+        This method defines an input variable, along with its universe of
+        discourse, and its term sets. Here's an example:
+
+              $obj->inVar('height',
+                          5, 8,   # xmin, xmax (in feet, say)
+                          'tall' => [5,   0,
+                                     5.5, 1,
+                                     6,   0],
+                          'medium' => [5.5, 0,
+                                     6.5, 1,
+                                     7, 0],
+                          'short' => [6.5, 0,
+                                     7, 1]
+                          );
+
+        This example defines an input variable called *height*. The minimum
+        possible value for height is 5, and the maximum is 8. It also
+        defines 3 term sets associated with height: *tall*, *medium* and
+        *short*. The shape of each of these triangular term sets is
+        completely specified by the supplied anonymous array of indices.
+
+    outVar()
+        This method defines an output variable, along with its universe of
+        discourse, and its term sets. The arguments are identical to those
+        for the "inVar()" method.
+
+    addRule()
+        This method is used to add the fuzzy rules. Its arguments are
+        hash-value pairs; the keys are the precedents and the values are the
+        consequents. Each antecedent has to be a combination of 1 or more
+        strings. The strings have to be separated by "&" or "|" indicating
+        the fuzzy *AND* and *OR* operations respectively. Each consequent
+        must be a single string. Each string has the form: "var = term_set".
+        Spaces are completely optional. Example:
+
+            $obj->addRule('height=short & weight=big' => 'diet = necessary',
+                          'height=tall & weight=tiny' => 'diet = are_you_kidding_me');
+
+        The first rule basically says *If the height is short, and the
+        weight is big, then diet is necessary*.
+
+    compute()
+        This method takes as input a set of hash-value pairs; the keys are
+        names of input variables, and the values are the values of the
+        variables. It runs those values through the FIS, generating
+        corresponding values for the output variables. It always returns a
+        true value. To get the actual values of the output variables, look
+        at the "value()" method below. Example:
+
+            $obj->compute(x => 5,
+                          y => 24);
+
+        Note that any subsequent call to "compute()" will implicitly clear
+        out the old computed values before recomputing the new ones. This is
+        done through a call to the "reset()" method below.
+
+    value()
+        This method returns the value of the supplied output variable. It
+        only works for output variables (defined using the "outVar()"
+        method), and only returns useful results after a call to "compute()"
+        has been made.
+
+    reset()
+        This method resets all the data structures used to compute crisp
+        values of the output variables. It is implicitly called by the
+        "compute()" method above.
+
+INSTALLATION
+    It's all in pure Perl. Just place it somewhere and point your @INC to
+    it.
+
+    But, if you insist, here's the traditional way:
+
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+AUTHOR
+    Copyright 2002, Ala Qumsieh. All rights reserved. This library is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+
+    Address bug reports and comments to: ala_qumsieh@yahoo.com.
+

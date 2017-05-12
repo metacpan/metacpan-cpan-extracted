@@ -1,0 +1,9 @@
+Acme::PM::Berlin::Meetings
+--------------------------
+
+Get the (likely) date of the next Perl meeting.
+
+Together with the module comes a script "berlin-pm", which returns the
+date and time of the next meeting.
+
+Author: Slaven Rezic

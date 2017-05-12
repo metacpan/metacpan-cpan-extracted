@@ -1,0 +1,18 @@
+t/pod.t
+t/manifest.t
+t/pod-coverage.t
+t/boilerplate.t
+t/00-load.t
+Makefile.PL
+README
+examples/foca-server
+examples/foca-client
+examples/example_commands.yaml
+LICENSE
+MANIFEST
+lib/App/Foca/Server.pm
+lib/App/Foca/Tools/Logger.pm
+lib/App/Foca/Server/HTTP.pm
+lib/App/Foca/Client.pm
+Changes
+META.yml                                 Module meta-data (added by MakeMaker)

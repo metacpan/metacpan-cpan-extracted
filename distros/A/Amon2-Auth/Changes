@@ -1,0 +1,49 @@
+Revision history for Perl module Amon2::Plugin::Auth
+
+0.07 2017-04-11T07:56:30Z
+
+    Facebook's API style was changed. follow it.
+    (Kan Fushihara https://github.com/tokuhirom/Amon2-Auth/pull/6)
+
+0.06 2015-01-15T05:49:10Z
+
+    commit a8490a0208a01582c4d0df5caa9c1f89ae9a234f
+    Author: Tomoyuki Sato <bay@1101.com>
+    Date:   Wed Jan 14 06:49:47 2015 +0000
+
+        Support Plack::App::URLMap
+
+0.05 2014-09-02T21:11:33Z
+
+    commit 46b0793d23a3de9789ae35b6d0471123a09e34dc
+    Author: Wataru TOYA <watrty@gmail.com>
+    Date:   Tue Sep 2 15:53:22 2014 +0900
+
+        use ssl connection to twitter
+
+0.04 2014-05-04T23:49:06Z
+
+    commit 90629cc8584f593c28dd9a3e31ec715e11c887f1
+    Author: Kenta Kase <kesin1202000@gmail.com>
+    Date:   Sun May 4 16:53:15 2014 +0900
+
+        Support Twitter API v1.1
+
+        Change Net::Twitter::Lite to Net::Twitter::Lite::WithAPIv1_1
+
+0.03 2013-04-24T06:11:16Z
+
+    - Site::Twitter: catch exception from Net::Twitter::Lite and
+      rethrow it to callback function
+      (tokuhirom)
+    - Site::Twitter: handle "Access denied" error
+      (such as "Return to App" on the Deny and Cancel screens)
+        (Takumi Akiyama)
+
+0.02 2011-10-15
+
+    - docs
+
+0.01 2011-10-13
+
+    - original version

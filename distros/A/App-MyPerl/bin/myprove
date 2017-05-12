@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+use App::MyProve;
+
+App::MyProve->run_if_script;
+
+=head1 NAME
+
+myprove - run tests with your myperl settings
+
+=head1 SYNOPSIS
+
+  $ myprove t/foo.t
+
+will execute t/foo.t with the myperl script (prove options are passed through).
+
+=head1 AUTHOR
+
+See L<App::MyPerl>
+
+=head1 COPYRIGHT
+
+See L<App::MyPerl>
+
+=head1 LICENSE
+
+See L<App::MyPerl>
+
+=cut
+

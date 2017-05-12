@@ -1,0 +1,116 @@
+These are the changes to the Alien::SVN wrapper distribution.
+Changes to Subversion itself can be seen in src/subversion/CHANGES.
+
+1.8.11.0  Mon Jan 12 16:08:47 PST 2015
+    Features
+    * Upgraded to Subversion 1.8.11
+
+    Documentation
+    * Depend on SVN::Core, not Alien::SVN
+
+
+1.7.19.0  Mon Jan 12 15:22:51 PST 2015
+    Features
+    * Upgraded to Subversion 1.7.19
+
+    Bug Fixes
+    * The build failures trying to build wc-queries.h have been fixed.
+      [github #4]
+
+    Distribution Changes
+    * Repository has been moved to the evalEmpire organization.
+    * The bug tracker is now on Github.
+
+1.7.17.1  Thu Jun 12 10:03:41 PDT 2014
+    Bug Fixes
+    * Accidentally left out the subversion build/ directory causing
+      configure to fail.
+
+
+1.7.17.0  Wed Jun 11 20:41:57 PDT 2014
+    Features
+    * Upgraded to Subversion 1.7.17
+
+
+1.7.3.1  Sun Mar 18 15:08:45 PDT 2012
+    Distribution Fixes
+    * The Build.PL will now properly error out if SVN's configure
+      does not succeed.  This was causing a lot of false smoke.
+
+
+1.7.3.0  Thu Mar  1 16:21:10 PST 2012
+    Features
+    * Upgraded to Subversion 1.7.3
+
+
+1.6.12.1  Wed, 23 Feb 2011 11:39:10 +1100
+    Misc
+    * Update the repository URL to point at the real github repo.
+    * Make Matt the author in the metadata.
+
+    Docs
+    * Clarify who to report SVN::Core issues to.
+
+
+1.6.12.0  Wed Aug 18 00:45:00 GMT 2010
+    Features
+    * Upgraded to Subversion 1.6.12
+
+    Bug Fixes
+    * Pass options through to svn's configure properly
+
+
+1.4.6.0  Wed Dec 26 21:16:33 PST 2007
+    Features
+    * Upgraded to subversion 1.4.6.
+
+    Bug Fixes
+    * --with-perl was the wrong solution to the "not default perl" issue.
+      Fixed it correctly.
+    * Add a work around for FreeBSD's gutting of neon's libtool la file.
+
+    Installer Improvements
+    * Will now install into your perl architecture directory.  This avoids
+      interfering with, or interference from, other installations of libsvn.
+    * The license has been clarified.  It's now just "open source" because
+      of the mixed Perl (Alien::SVN) and Apache (Subversion) licensing.
+
+1.4.5.3  Wed Dec 26 00:04:27 PST 2007
+    Bug Fixes
+    * Added --with-perl to the default Subversion configuration so
+      Alien::SVN should work properly if your perl is not the default
+      perl.
+
+    Doc Fixes
+    * Add bug and feedback instructions.
+
+    Installer Improvements
+    * Users can now override the Subversion configure arguments.  This is
+      handy for things like --disable-neon-version-check.
+
+1.4.5.2  Fri Sep 21 04:40:01 PDT 2007
+    Bug Fixes
+    * Last minute change to the last version broke the build.
+    
+    Portability Fixes
+    * Fixed the running of configure so it works on Cygwin.
+
+1.4.5.1  Thu Sep 20 17:41:55 PDT 2007
+    Now it really works!  Tried it on a clean Ubuntu machine with no
+    SVN libraries installed.
+    
+    Bug Fixes
+    * Now doing a complete SVN build to ensure everything is built properly
+    * All the SVN libraries are installed along with the Perl bindings
+    
+    Portability Fixes
+    * Now uses $Config{make} instead of a hard coded make
+    * Asks what make to use.
+
+    Installation Improvements
+    * Asks if the user wants to run Subversion's configure (default yes)
+    * Checks if configure has already been run and asks if it has (default no)
+
+1.4.5.0  Wed Sep 12 03:10:01 PDT 2007
+    First release.  Turns out it doesn't really work unless libsvn is
+    already installed.

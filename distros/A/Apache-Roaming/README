@@ -1,0 +1,273 @@
+NAME
+        Apache::Roaming - A mod_perl handler for Roaming Profiles
+
+SYNOPSIS
+          # Configuration in httpd.conf or srm.conf
+          # Assuming DocumentRoot /home/httpd/html
+
+          PerlModule Apache::Roaming
+          <Location /roaming>
+            PerlHandler Apache::Roaming->handler
+            PerlTypeHandler Apache::Roaming->handler_type
+            AuthType Basic
+            AuthName "Roaming User"
+            AuthUserFile /home/httpd/.htusers
+            require valid-user
+            PerlSetVar BaseDir /home/httpd/html/roaming
+          </Location>
+
+      In theory any AuthType and require statement should be possible
+      as long as the $r->connection()->user() method returns something
+      non trivial.
+
+DESCRIPTION
+    With Apache::Roaming you can use your Apache webserver as a Netscape
+    Roaming Access server. This allows you to store you Netscape
+    Communicator 4.5 preferences, bookmarks, address books, cookies etc. on
+    the server so that you can use (and update) the same settings from any
+    Netscape Communicator 4.5 that can access the server.
+
+    The source is based on mod_roaming by Vincent Partington
+    <vincentp@xs4all.nl>, see
+
+        http://www.xs4all.nl/~vincentp/software/mod_roaming.html
+
+    Vincent in turn was inspired by a Perl script from Frederik Vermeulen
+    <Frederik.Vermeulen@imec.be>, see
+
+        http://www.esat.kuleuven.ac.be/~vermeule/roam/put
+
+    Compared to Apache::Roaming, this script doesn't need mod_perl. On the
+    other hand it doesn't support the MOVE method, thus you need to set the
+    li.prefs.http.useSimplePut attribute in your Netscape preferences. Due
+    to the missing MOVE method, it may be even slower than Apache::Roaming
+    and perhaps a little bit less stable.
+
+    The modules features are:
+
+    *       GET, HEAD, PUT, DELETE and MOVE are handled by the module. In
+            particular the Non-standard MOVE method is implemented, although
+            Apache doesn't know it by default. Thus you need no set the
+            li.prefs.http.useSimplePut attribute to true.
+
+    *       Directories are created automatically.
+
+    *       The module is subclassable, so that you can create profiles on
+            the fly or parse and modify the user preferences. See the
+            Apache::Roaming::LiPrefs(3) manpage for an example subclass.
+
+INSTALLATION
+    First of all you need an Apache Web server with mod_perl support. The
+    TypeHandler must be enabled, so you need to set PERL_TYPE=1 when running
+    Makefile.PL. For example, I use the following statements to build
+    Apache:
+
+        cd mod_perl-1.16
+        perl Makefile.PL APACHE_SRC=../apache_1.3.X/src DO_HTTPD=1 \
+            USE_APACI=1 PERL_METHOD_HANDLERS=1 PERL_AUTHEN=1 \
+            PERL_CLEANUP=1 PREP_HTTPD=1 PERL_STACKED_HANDLERS=1 \
+            PERL_FILE_API=1
+        cd ../apache-1.3.3
+        ./configure --activate-module=src/modules/perl/libperl.a
+        make
+        make install
+        cd ../mod_perl-1.16
+        make
+        make install
+
+    See the mod_perl docs for details.
+
+    Once the web server is installed, you need to create a directory for
+    roaming profiles, I assume /home/httpd/html/roaming in what follows,
+    with /home/httpd/html being the servers root directory. Be sure, that
+    this directory is writable for the web server, better for the web server
+    only. For example I do
+
+        mkdir /home/httpd/html/roaming
+        chown nobody /home/httpd/html/roaming
+        chgrp nobody /home/httpd/html/roaming
+        chmod 700 /home/httpd/html/roaming
+
+    with *nobody* being the web server user.
+
+    Access to the roaming directory must be restricted and enabled via
+    password only. Finally tell the web server, that Apache::Roaming is
+    handling requests to this directory by adding something like this to
+    your srm.conf or access.conf:
+
+        PerlModule Apache::Roaming
+        <Location /roaming>
+          PerlHandler Apache::Roaming->handler
+          PerlTypeHandler Apache::Roaming->handler_type
+          AuthType Basic
+          AuthName "Roaming User"
+          AuthUserFile /home/httpd/.htusers
+          require valid-user
+          PerlSetVar BaseDir /home/httpd/html/roaming
+        </Location>
+
+    That's it!
+
+NETSCAPE COMMUNICATOR CONFIGURATION
+    Assuming your document root directory is /home/httpd/html and you want
+    your profile files being located under http://your.host/roaming, do the
+    following:
+
+    1.)     Create a directory /home/httpd/html/roaming. Make it writable by
+            the web server and noone else, for example by doing a
+
+                mkdir /home/httpd/html/roaming
+                chown nobody /home/httpd/html/roaming
+                    # Insert your web servers UID here
+                chmod 700 /home/httpd/html/roaming
+
+    2.)     Start your communicator and open Preferences/Roaming User. Click
+            the "Enable Roaming Access for this profile" checkbox.
+
+    3.)     Open Preferences/Roaming User/Server Information. Click the
+            "HTTP Server" checkbox and enter the Base URL
+            "http://your.host/roaming/$USERID".
+
+    That's all. Now hit the Ok button. A directory with the name of your
+    user id should automatically be generated under /roaming and files
+    should be stored there.
+
+METHOD INTERFACE
+    As already said, the Apache::Roaming module is subclassable. You can
+    well use it by itself, but IMO the most important possibility is
+    overwriting the GET method for complete control over the users settings.
+
+  handler
+
+      $result = Apache::Roaming->handler($r);
+
+    (Class Method) The *handler* method is called by the Apache server for
+    any request. It receives an Apache request $r. The methods main task is
+    creating an instance of Apache::Roaming by calling the *new* method and
+    then passing control to the *Authenticate*, *CheckDir* and *GET*, *PUT*,
+    *DELETE* or *MOVE*, respectively, methods.
+
+  handler_type
+
+      $status = Apache::Roaming->handler_type($r)
+
+    (Class Method) This method is required only, because the Apache server
+    would refuse other methods than GET otherwise. It checks whether the
+    requested method is GET, PUT, HEAD, DELETE or MOVE, in which case it
+    returns the value OK. Otherwise the value DECLINED is returned.
+
+  new
+
+      $ar_req = Apache::Roaming->new(%attr);
+
+    (Class Method) This is the modules constructor, called by the *handler*
+    method. Instances of Apache::Request have the following attributes:
+
+    basedir The roaming servers base directory, as an absolute path. You set
+            this using a PerlSetVar instruction, see the INSTALLATION
+            manpage above for an example.
+
+    file    This is the path of the file being created (PUT), read (GET),
+            deleted (DELETE) or moved (MOVE). It's an absolute path.
+
+    method  The requested method, one of HEAD, GET, PUT, MOVE or DELETE.
+
+    request This is the Apache request object.
+
+    status  If a method dies, it should set this value to a return code like
+            SERVER_ERROR (default), FORBIDDEN, METHOD_NOT_ALLOWED, or
+            something similar from Apache::Constants. See the
+            Apache::Constants(3) manpage. The *handler* method will catch
+            Perl exceptions for you and generate an error page.
+
+    user    Name the user authenticated as.
+
+  Authenticate
+
+      $ar_req->Authenticate();
+
+    (Instance Method) This method is checking whether the user has
+    authorized himself. The current implementation is checking only whether
+    user name is given via $r->connection()->user(), in other words you can
+    use simple basic authentication or something similar.
+
+    The method should throw an exception in case of problems.
+
+  CheckDir
+
+      $ar_req->CheckDir();
+
+    (Instance method) Once the user is authenticated, this method should
+    determine whether the user is permitted to access the requested URI. The
+    current implementation verifies whether the user is accessing a file in
+    the directory $basedir/$user. If not, a Perl exception is thrown with
+    $ar_req->{'status'} set to FORBIDDEN.
+
+  GET, PUT, MOVE, DELETE
+
+      $ar_req->GET();
+      $ar_req->PUT();
+      $ar_req->MOVE();
+      $ar_req->DELETE();
+
+    (Instance Methods) These methods are called finally for performing the
+    real action. With the exception of GET, they call *Success* finally for
+    reporting Ok.
+
+    Alternative method names are possible, depending on the name of the
+    requested file. For example, if you request the file *liprefs* via GET,
+    then it is checked whether your sublass has a method *GET_liprefs*. If
+    so, this method is called rather than the default method *GET*. The
+    alternative method names are obtained by removing all non-alpha- numeric
+    characters from the files base name. That is, if you request a file
+    *pab.na2*, then the alternative name is *pabna2*. Note, these method
+    names are case sensitive!
+
+  MkDir
+
+      $ar_req->MkDir($file);
+
+    (Instance Method) Helper function of *PUT*, creates the directory where
+    $file is located, if it doesn't yet exist. Works recursively, if more
+    than one directory must be created.
+
+  Success
+
+      $ar_req->Success($status, $text);
+
+    (Instance Method) Creates an HTML document with status $status,
+    containing $text as success messages.
+
+AUTHOR AND COPYRIGHT
+    This module is
+
+        Copyright (C) 1998    Jochen Wiedmann
+                              Am Eisteich 9
+                              72555 Metzingen
+                              Germany
+
+                              Phone: +49 7123 14887
+                              Email: joe@ispsoft.de
+
+    All rights reserved.
+
+    You may distribute this module under the terms of either the GNU General
+    Public License or the Artistic License, as specified in the Perl README
+    file.
+
+SEE ALSO
+    the Apache(3) manpage, the mod_perl(3) manpage
+
+    An example subclass is Apache::Roaming::LiPrefs. See the
+    Apache::Roaming::LiPrefs(3) manpage.
+
+    A C module for Apache is mod_roaming, by Vincent Partington
+    <vincentp@xs4all.nl>, see
+
+        http://www.xs4all.nl/~vincentp/software/mod_roaming.html
+
+    Frederic Vermeulen <Frederik.Vermeulen@imec.be> has written a CGI binary
+    for roaming profiles. It's missing a MOVE method, though.
+
+        http://www.esat.kuleuven.ac.be/~vermeule/roam/put
+

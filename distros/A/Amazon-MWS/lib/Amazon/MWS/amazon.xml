@@ -1,0 +1,9 @@
+<amazon>
+	<access_key_id>ACCESS KET HERE</access_key_id>
+        <secret_key>SECRET KEY HERE</secret_key>
+        <merchant_id>MERCHANT ID HERE</merchant_id>
+        <marketplace_id>HOME MARKETPLACE HERE</marketplace_id>
+        <endpoint>ENDPOINT HERE </endpoint>
+	<debug>0</debug>
+	<logfile>LOG FILE PATH HERE</logfile>
+</amazon>

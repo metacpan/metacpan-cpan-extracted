@@ -1,0 +1,40 @@
+2002-08-17  Tom Hughes  <tom@compton.nu>
+
+        * TempFile.pm
+          Changed version number to 0.05.
+
+        * README
+        * TempFile.pm
+          Changed email address to tom@compton.nu.
+
+        * t/use.t
+          Added a basic test that the module can be loaded.
+
+1998-08-14  Tom Hughes  <tom@compton.demon.co.uk>
+
+	* TempFile.pm
+	  Changed version number to 0.04.
+
+	* TempFile.pm
+	  Add an END block to cleanup any files on exit and only try and
+	  register a cleanup handler if in a mod_perl environment.
+
+1998-08-12  Tom Hughes  <tom@compton.demon.co.uk>
+
+	* TempFile.pm
+	  Changed version number to 0.03.
+	
+	* TempFile.pm
+	  Removed the tempfile() function as it is unecessary and the same
+	  result can be achieved with IO::File::new_tmpfile instead.
+
+1998-08-12  Tom Hughes  <tom@compton.demon.co.uk>
+
+	* TempFile.pm
+	  Changed version number to 0.02.
+
+        * TempFile.pm (tempname)
+	  Allow the TMPDIR environment variable to override the default
+          location for temporary files.
+
+$Id: ChangeLog,v 1.4 2002/08/17 22:33:39 tom Exp $

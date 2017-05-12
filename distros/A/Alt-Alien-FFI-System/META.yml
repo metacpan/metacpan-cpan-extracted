@@ -1,0 +1,31 @@
+---
+abstract: 'Simplified alternative to Alien::FFI that uses system libffi'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::Suite: '0.000060'
+  Test::Alien: '0'
+  Test::More: '0.94'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alt-Alien-FFI-System
+no_index:
+  file:
+    - lib/Alien/FFI.pm
+requires:
+  IPC::Cmd: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/plicease/Alt-Alien-FFI-System/issues
+  homepage: https://metacpan.org/pod/Alt::Alien::FFI::System
+  repository: git://github.com/plicease/Alt-Alien-FFI-System.git
+version: '0.16'
+x_serialization_backend: 'YAML::Tiny version 1.70'

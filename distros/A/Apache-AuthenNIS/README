@@ -1,0 +1,80 @@
+NAME
+     Apache::AuthenNIS - mod_perl NIS Authentication module
+
+SYNOPSIS
+         <Directory /foo/bar>
+         # This is the standard authentication stuff
+         AuthName "Foo Bar Authentication"
+         AuthType Basic
+
+         PerlAuthenHandler Apache::AuthenNIS
+
+         # Set if you want to allow an alternate method of authentication
+         PerlSetVar AllowAlternateAuth yes | no
+
+         # Standard require stuff, NIS users or groups, and
+         # "valid-user" all work OK
+         require user username1 username2 ...
+         require group groupname1 groupname2 ... # [Need Apache::AuthzNIS]
+         require valid-user
+
+         # The following is actually only needed when authorizing
+         # against NIS groups. This is a separate module.
+         PerlAuthzHandler Apache::AuthzNIS
+
+         </Directory>
+
+         These directives can also be used in the <Location> directive or in
+         an .htaccess file.
+
+
+DESCRIPTION
+     This perl module is designed to work with mod_perl and the
+     Net::NIS module by Rik Haris (rik.harris@fulcrum.com.au).
+     It is a direct adaptation (i.e. I modified the code) of
+     Michael Parker's (parker@austx.tandem.com) Apache::AuthenSmb
+     module.
+
+     The module uses Net::NIS::yp_match to retrieve the "passwd"
+     entry from the passwd.byname map, using the supplied
+     username as the search key.  It then uses crypt() to verify
+     that the supplied password matches the retrieved hashed
+     password.
+
+     Apache::AuthenNIS vs. Apache::AuthzNIS
+
+     I've taken "authentication" to be meaningful only in terms
+     of a user and password combination, not group membership.
+     This means that you can use Apache::AuthenNIS with the
+     require user and require valid-user directives.  In the NIS
+     context I consider require group to be an "authorization"
+     concern.  I.e., Group authorization consists of establishing
+     whether the already authenticated user is a member of one of
+     the indicated groups in the require group directive.  This
+     process can be handled by Apache::AuthzNIS.
+
+     I welcome any feedback on this module, esp. code
+     improvements, given that it was written hastily, to say the
+     least.
+
+     Parameters
+     
+     PerlSetVar AllowAlternateAuth
+
+     This attribute allows you to set an alternative method of authentication
+     (Basically, this allows you to mix authentication methods, if you don't have
+     all users in the NIS database). It does this by returning a DECLINE and checking
+     for the next handler, which could be another authentication, such as
+     Apache-AuthenNTLM or basic authentication.
+  
+
+AUTHOR
+     Demetrios E. Paneras <dep@media.mit.edu>
+     Ported by Shannon Eric Peevey <speeves@unt.edu>
+
+COPYRIGHT
+     Copyright (c) 1998 Demetrios E. Paneras, MIT Media
+     Laboratory.
+
+     This library is free software; you can redistribute it
+     and/or modify it under the same terms as Perl itself.

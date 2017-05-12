@@ -1,0 +1,36 @@
+SYNOPSIS
+
+      use Array::Iter qw(array_iter list_iter);
+    
+      my $iter = array_iter([1,2,3,4,5]);
+      while (my $val = $iter->()) { ... }
+    
+      $iter = list_iter(1,2,3,4,5);
+      while (my $val = $iter->()) { ... }
+
+DESCRIPTION
+
+    This module provides a simple iterator which is a coderef that you can
+    call repeatedly to get elements of a list/array. When the elements are
+    exhausted, the coderef will return undef. No class/object involved.
+
+    The principle is very simple and you can do it yourself with:
+
+     my $iter = do {
+         my $i = 0;
+         sub {
+             if ($i < @$ary) {
+                 return $ary->[$i++];
+             } else {
+                 return undef;
+             }
+         };
+      }
+
+    Caveat: if list/array contains an undef element, it cannot be
+    distinguished with an exhausted iterator.
+
+SEE ALSO
+
+    Array::Iterator, which also lists some other related modules.
+

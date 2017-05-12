@@ -1,0 +1,81 @@
+=item 0.14 - April 27, 2008
+
+Added patch from Niko Tyni which fixes Apache::DB for use with Perl 5.10
+
+=item 0.13 - April 17, 2006 
+
+Fixed Apache::DProf and Apache::SmallProf to work when using taint mode. 
+
+=item 0.12 - April 3, 2006 
+
+Fixed mod_perl 1.x bug in Apache::SmallProf that was using mp2 code mistakenly.
+
+Add $ENV{APACHE_DPROF_PATH_ABSOLUTE} override for those unlucky soles 
+that can NOT write to ServerRoot.  [Philip M. Gollucci <pgollucci@p6m7g8.com>]
+
+=item 0.11 - January 24, 2006 
+
+Refactored how we were detecting mod_perl 1.x vs mod_perl 2.x
+
+Cleaned up a small documentation bug in Apache::SmallProf
+
+=item 0.10 - May 15, 2005 
+
+Ported all modules to mod_perl 2.0.0-RC6 including API changes. 
+
+Added documentation regarding necessary steps when debugging with SELinux
+thanks to Dave Hageman <dhageman@dracken.com>.
+
+Added missing license information. 
+
+Added fix for graphical debuggers thanks to 
+Eric Promislow <ericp@ActiveState.com>.
+
+General documentation cleanup.
+
+=item 0.09 - May 11, 2004
+
+Fix required module problems in Apache::SmallProf, thanks to 
+Jens Gassmann <jens.gassmann@atomix.de> for spotting the problem.
+
+=item 0.08 - April 14, 2004
+
+Increment version to fix PAUSE upload problem. 
+
+=item 0.07 - April 7, 2004
+
+Ported modules to work with mod_perl 2.0 [Frank Wiles <frank@wiles.org>]
+
+Fixed compilation problem on WIN32 platform.
+
+=item 0.06 - October 11, 1999
+
+fix APACHE_DPROF_PATH [Balazs Rauznitz <balazs@Commissioner.com>]
+
+fix Apache::DB for 5.005_6x+
+
+sync Apache::SmallProf w/ Devel::SmallProf 0.07 (cpu time support)
+
+=item 0.05 - June 6, 1999
+
+included example perldb.conf
+
+included Apache::SmallProf
+
+included Apache::DProf
+
+=item 0.04 - April 14, 1999
+
+added init() function
+
+updated docs
+ 
+=item 0.03 - April 5, 1999
+
+fix for threaded Perl
+
+=item 0.02 - April 1, 1999
+
+first public release
+
+

@@ -1,0 +1,29 @@
+
+- test memcached
+
+- add shared memory store
+
+- add way of getting cache sizes out (what did I mean by this?)
+
+- honour function strategy directives in config
+
+- honour function stratgey parameter in code
+
+- add option to conflate both scalar and list context results if the
+  function returns equivalent data in either case
+
+- add more POD for all packages
+
+- add manual POD
+
+- add cookbook for common use-cases
+
+- enhance MemoryLRU to not store objects larger than some maximum size
+
+- enhance MemoryLRU, or add another class that allows us to store a maximum
+  number of objects rather than size
+
+- look for other neat Cache::* classes that we might be able to simply add
+
+- add multi-level caching
+

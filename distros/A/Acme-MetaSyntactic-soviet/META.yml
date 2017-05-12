@@ -1,0 +1,35 @@
+---
+abstract: 'Metasyntactic theme with NATO codenames for Soviet-designed equipment'
+author:
+  - 'Jean Forget <JFORGET@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-MetaSyntactic-soviet
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Acme::MetaSyntactic::soviet:
+    file: lib/Acme/MetaSyntactic/soviet.pm
+    version: '0.05'
+requires:
+  Acme::MetaSyntactic::MultiList: '1'
+  Test::More: '0'
+  perl: v5.6.2
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/jforget/Acme-MetaSyntactic-soviet.git
+version: '0.05'

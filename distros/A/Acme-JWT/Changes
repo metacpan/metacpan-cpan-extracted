@@ -1,0 +1,13 @@
+Revision history for Perl extension Acme::JWT
+
+0.04    Sat Dec 17 17:22:45 2011 2011
+        - append algorithm check for Crypt::OpenSSL::RSA.
+
+0.03    Sun Dec 04 12:33:39 2011 2011
+        - remove warning in test.
+
+0.02    Thu Dec 01 16:24:50 2011
+        - append dependency to Test::More::done_testing
+
+0.01    Thu Nov 24 00:35:31 2011
+        - original version

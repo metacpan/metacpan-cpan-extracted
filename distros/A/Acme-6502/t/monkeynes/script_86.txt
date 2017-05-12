@@ -1,0 +1,15 @@
+clear
+power on
+regs
+
+# Set mem[$0072] to some other value 1st
+memset 0072 ab
+
+op a2 55
+op 86 72
+
+# mem[$0072] and IX should = $55
+test ix = 55
+test m:0072 = 55
+
+save verify_86.txt

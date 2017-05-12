@@ -1,0 +1,82 @@
+=head1 NAME
+
+HISTORY - release history for Alias
+
+=head1 DESCRIPTION
+
+=over 8
+
+=item 2.32
+
+No change in functionality.  Added #defines for compatibility with the
+5.006 development branch (courtesy Nathan Torkington <gnat@frii.com>).
+
+=item 2.31
+
+save_gp() is now exported from core, so use it instead of our own
+version.  Thanks to Larry Virden <lvirden@cas.org> for the bug report.
+
+Require 5.004.
+
+=item 2.3
+
+The developer versions after 5.003 broke XSUB call semantics when the
+C<-d> switch is used (to invoke debugger or profiler).  The problem is
+fixed in versions >= 5.003_19.  Added the necessary logic to make use
+of the escape in Alias.xs. Thanks to Josh Purinton <joshp@silmaril.com>
+for reporting the problem.  
+
+Objects are not automatically dereferenced by attr().  They are available
+as scalars instead, thanks to a feature request from Peter Seibel 
+<seibel@organic.com>. ***INCOMPATIBLE CHANGE***
+
+Using attr() in DESTROY subs resulted in deep recursion, fixed.  Thanks
+to Helmut Jarausch <jarausch@igpm.rwth-aachen.de>.
+
+=item 2.2
+
+Two new options C<$KeyFilter>, and C<$AttrPrefix> added for controlling
+which hash entries are aliased by C<attr>.  This offers one way to avoid
+C<use vars> when using C<use strict 'vars';>.
+
+Documentation, testsuite additions.
+
+=item 2.1    
+
+C<attr> now returns the passed value.
+
+We C<require 5.002>.
+
+C<attr> is now prototyped to ($).
+
+*a = \*b work around has been removed (fixed in 5.002)
+
+"private" methods are now supported.
+
+Documentation, testsuite additions.
+
+=item 2.0    
+
+Added implicit localization for C<attr> via XS code.
+
+=item 1.3    
+
+Added C<attr> (unreleased).
+
+=item 1.2    
+
+Bugfix in the while loop, and other cleanup. Thanks to Ian Phillips
+<ian@pipex.net>.
+
+=item 1.1
+
+Added named closures to pod.
+
+=item 1.0
+
+Released to perl5-porters@nicoh.com.
+
+=back
+
+=cut
+

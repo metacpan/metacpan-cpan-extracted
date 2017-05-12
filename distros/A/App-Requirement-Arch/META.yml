@@ -1,0 +1,65 @@
+---
+abstract: 'App::Requirement::Arch - Easy requirements creation and handling'
+author:
+  - 'Khemir Nadim ibn Hamouda. <nadim@khemir.net>'
+build_requires:
+  Directory::Scratch::Structured: 0
+  Test::Block: 0
+  Test::Exception: 0
+  Test::NoWarnings: 0
+  Test::Warn: 0
+  Text::Diff: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Requirement-Arch
+provides:
+  App::Requirement::Arch:
+    file: lib/App/Requirement/Arch.pm
+    version: 0.02
+  App::Requirement::Arch::Categories:
+    file: lib/App/Requirement/Arch/Categories.pm
+    version: 0.01
+  App::Requirement::Arch::Filter:
+    file: lib/App/Requirement/Arch/Filter.pm
+    version: 0.01
+  App::Requirement::Arch::Format::Flat:
+    file: lib/App/Requirement/Arch/Format/Flat.pm
+    version: 0.01
+  App::Requirement::Arch::HTML::Flat:
+    file: lib/App/Requirement/Arch/HTML/Flat.pm
+    version: 0.01
+  App::Requirement::Arch::Requirements:
+    file: lib/App/Requirement/Arch/Requirements.pm
+    version: 0.01
+  App::Requirement::Arch::Spellcheck:
+    file: lib/App/Requirement/Arch/Spellcheck.pm
+    version: 0.01
+requires:
+  App::Chained: 0
+  Check::ISA: 0.04
+  Cwd: 0
+  Data::TreeDumper: 0
+  Data::TreeDumper::Renderer::DHTML: 0
+  Data::TreeDumper::Utils: 0
+  Devel::Cycle: 0
+  File::Basename: 0
+  File::HomeDir: 0.86
+  File::Slurp: 0
+  File::Spec: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  Module::Util: 0
+  Proc::InvokeEditor: 0
+  Readonly: 0
+  Scalar::Util: 1.19
+  Sub::Exporter: 0
+  Text::Pluralize: 0
+  Tie::IxHash: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.02.16

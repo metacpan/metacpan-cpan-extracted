@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Plack::Runner;
+use App::FakeCDN;
+
+my ($opt, $argv) = App::FakeCDN->parse_options(@ARGV);
+my $agent  = App::FakeCDN->new($opt);
+my $runner = Plack::Runner->new;
+$runner->parse_options('--port=4907', @$argv);
+$runner->run($agent->to_app);
+
+__END__
+
+=head1 SYNOPSIS
+
+    % fake-cdn --root=static
+
+=head1 DESCRIPTION
+
+L<App::FackCDN> launcher
+
+=head1 SEE ALSO
+
+L<App::FackCDN>
+
+=head1 AUTHORS
+
+Masayuki Matsuki

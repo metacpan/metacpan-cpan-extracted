@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache-Watchdog-RunAway
+version:      1.00
+version_from: RunAway.pm
+installdirs:  site
+requires:
+    Apache::Scoreboard:            0.15
+    Apache::Test:                  1.15
+    mod_perl:                      1.25
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.25

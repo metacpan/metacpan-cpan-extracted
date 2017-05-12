@@ -1,0 +1,116 @@
+Revision history for Acme-CPANAuthors
+
+0.26 2015/12/09
+  - repackaging to add recommendation in META files (GH #4, XSAWYER++)
+
+0.25 2015/01/25
+  - improved pod coverage (PJACKLAM++)
+
+0.24 2015/01/18
+  - make sure if authors method is actually availabl (RT#101597 ETHER++)
+  - switched to JSON::PP and HTTP::Tiny
+  - changed look_for method to look for registered authors if called
+    from an instance (instead of looking for all the registered authors
+    in installed packages).
+
+0.23 2013/07/08
+  - added Acme::CPANAuthors::Factory (ETHER)
+  - added categories method (ETHER) 
+
+0.22 2013/07/07
+  - listed new module: Australian
+  - fixed example in ::Utils (ETHER)
+  - not to require packages if ->author is available
+
+0.21 2013/05/31
+  - new author lists added (ETHER)
+  - avatar_url falls back to <id>@cpan.org when no match is found from
+    the email address (ETHER)
+  - warning is issued when trying to fetch a gravatar when Gravatar::URL is
+    not installed; Gravatar::URL added to recommended prereqs (ETHER)
+  - id() now always assumes list context for the caller (ETHER)
+  - added repository information to metadata
+
+0.20 2012/11/01
+  - listed new module: Czech
+  - various pod fixes
+  - Gravatar::URL is now optional
+
+0.19 2012/03/10
+  - no redefine warning
+  - listed new module: Catalonian
+
+0.18 2011/10/20
+  - listed new modules: Danish, Spanish
+
+0.17 2011/10/18
+  - listed several new modules: British, India, Swedish
+  - website announcement
+
+0.16 2011/03/09
+  - listed several new modules: DualLife, GitHub, Search
+  - ignore Search while looking for authors
+
+0.15 2011/03/05
+  - tweaked end of line handling
+  - better API server error handling (RT #66394, thanks to ANDK)
+
+0.14 2010/09/30
+  - stopped trying hard to find cpan mirror in the hard drive,
+    and try downloading index files if necessary.
+    Set ACME_CPANAUTHORS_HOME environmental variable to use local
+    indices.
+
+0.13 2010/09/26
+  - forgot to remove Parse::CPAN::* bit in a test
+
+0.12 2010/09/25
+  - added ToBeLike to the list.
+  - bundled Parse::CPAN::* alternatives to cut off antlers.
+
+0.11 2010/09/20
+  - oops, forgot to update dependencies
+
+0.10 2010/09/20
+  - use Try::Tiny for better trapping
+  - added several modules to the subordinate modules list
+  - launched a new api server to fetch kwalitee data as json.
+    no need to scrape kwalitee pages anymore
+
+0.09 2009/08/23
+  - added Arabic and German to the subordinate modules list,
+    and rearranged the list a bit.
+  - added a reason why I wrote this
+  - added a tentative workaround to t/03_extra.t. hope this works...
+
+0.08 2009/04/21
+  - added more lists to the pod
+  - added $VERSION to the ::Utils not to break installers (RT #43388)
+
+0.07 2009/02/19
+  - added 'look_for' method and its test
+  - added a list of Acme::CPANAuthors:: modules to the pod
+
+0.06 2008/11/01
+  - removed CPAN::Config dependency (RT #40560 by Slaven Rezic)
+  - try to find CPAN sources via CPANPLUS configuration too
+
+0.05 2008/10/27
+  - skip extra gravatar test if CPAN.pm is not properly configured
+
+0.04 2008/07/14
+  - bumped up the version req of Parse::CPAN::Authors to 2.27
+  - try harder to find 01mailrc file when there's a local CPAN
+    mirror in the urllist of CPAN::Config
+
+0.03 2008/05/30
+  - "What's actually broken is Parse::CPAN::Authors 2.26" release
+  - tentatively skip a test if Parse::CPAN::Authors 2.26 is loaded.
+
+0.02 2008/05/22
+  - "YAPC::Asia 2008 hackathon" release
+  - made Acme::CPANAuthors::(Specific)->authors context sensitive.
+  - better cpan config loading
+
+0.01 2007/12/26
+  - ported from former Acme::JapaneseCPANAuthors (not released)

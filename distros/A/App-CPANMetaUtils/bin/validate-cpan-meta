@@ -1,0 +1,353 @@
+#!perl
+
+our $DATE = '2017-03-04'; # DATE
+our $VERSION = '0.008'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+
+$SPEC{validate_cpan_meta} = {
+    v => 1.1,
+    summary => 'Validate CPAN META',
+    args => {
+        file => {
+            schema => 'filename*',
+            pos => 0,
+        },
+        method => {
+            summary => 'Choose the method of validation',
+            schema => ['str*', in=>['sah', 'cmv']],
+            default => 'cmv',
+            description => <<'_',
+
+`cmv` which is the default means to use <pm:CPAN::Meta::Validator> which is the
+"official way". Another alternative is to use <pm:Data::Sah> and the schema
+<pm:Sah::Schema::cpan::meta20>.
+
+_
+        },
+    },
+};
+sub validate_cpan_meta {
+    require File::Slurper;
+
+    my %args = @_;
+    my $method = $args{method} // 'cmv';
+    my $file = $args{file};
+    unless (defined $file) {
+        if (-f "META.json") {
+            $file = "META.json";
+        } elsif (-f "META.yml") {
+            $file = "META.yml";
+        } else {
+            return [400, "Please specify file"];
+        }
+    }
+    my $content = File::Slurper::read_text($file);
+
+    my $cpanmeta;
+    if ($file =~ /\.json$/i) {
+        require JSON::MaybeXS;
+        $cpanmeta = JSON::MaybeXS::decode_json($content);
+    } else {
+        require YAML::XS;
+        $cpanmeta = YAML::XS::Load($content);
+    }
+
+    my $is_error;
+    my $raw_res;
+    if ($method eq 'cmv') {
+        require CPAN::Meta::Validator;
+        my $cmv = CPAN::Meta::Validator->new($cpanmeta);
+        unless ($cmv->is_valid) {
+            my @errors = $cmv->errors;
+            warn "ERROR: $_\n" for @errors;
+            $is_error++;
+            $raw_res = \@errors;
+        }
+    } elsif ($method eq 'sah') {
+        require Data::Sah;
+        my $validator = Data::Sah::gen_validator(
+            'cpan::meta20*',
+            {return_type => 'full'},
+        );
+        $raw_res = $validator->($cpanmeta);
+
+        if ($raw_res->{errors} && keys %{ $raw_res->{errors} }) {
+            $is_error++;
+            for my $loc (sort keys %{ $raw_res->{errors} }) {
+                warn "ERROR: $raw_res->{errors}{$loc}\n";
+            }
+        }
+
+        if ($raw_res->{warnings} && keys %{ $raw_res->{warnings} }) {
+            for my $loc (sort keys %{ $raw_res->{warnings} }) {
+                warn "WARN: $raw_res->{warnings}{$loc}\n";
+            }
+        }
+    } else {
+        return [400, "Unknown method '$method'"];
+    }
+
+    [
+        $is_error ? 400:200,
+        $is_error ? "Does not validate":"Validates",
+        undef,
+        {
+            ("func.raw"=>$raw_res) x !!defined($raw_res),
+        },
+    ];
+}
+
+Perinci::CmdLine::Any->new(
+        url => '/main/validate_cpan_meta',
+)->run;
+
+# ABSTRACT: Validate CPAN META
+# PODNAME: validate-cpan-meta
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+validate-cpan-meta - Validate CPAN META
+
+=head1 VERSION
+
+This document describes version 0.008 of validate-cpan-meta (from Perl distribution App-CPANMetaUtils), released on 2017-03-04.
+
+=head1 SYNOPSIS
+
+ % validate-cpan-meta path/to/META.json; # or path/to/META.yml
+ % validate-cpan-meta path/to/META.json --method sah ;# use Sah schema instead of CPAN::Meta::Validator to validate
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--file>=I<s>
+
+=item B<--method>=I<s>
+
+Choose the method of validation.
+
+Default value:
+
+ "cmv"
+
+Valid values:
+
+ ["sah","cmv"]
+
+`cmv` which is the default means to use <pm:CPAN::Meta::Validator> which is the
+"official way". Another alternative is to use <pm:Data::Sah> and the schema
+<pm:Sah::Schema::cpan::meta20>.
+
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C validate-cpan-meta validate-cpan-meta
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using L<shcompgen>) at installation time,
+so you can immediately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete validate-cpan-meta 'p/*/`validate-cpan-meta`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/validate-cpan-meta.conf>, F<~/validate-cpan-meta.conf>, or F</etc/validate-cpan-meta.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ file (see --file)
+ format (see --format)
+ method (see --method)
+ naked_res (see --naked-res)
+
+=head1 ENVIRONMENT
+
+=head2 VALIDATE_CPAN_META_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/validate-cpan-meta.conf>
+
+F<~/validate-cpan-meta.conf>
+
+F</etc/validate-cpan-meta.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CPANMetaUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ValidateCPANMetaWithSah>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CPANMetaUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<CPAN::Meta>, L<CPAN::Meta::Validator>
+
+L<Data::Sah>, L<Sah::Schema::cpan::meta20>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

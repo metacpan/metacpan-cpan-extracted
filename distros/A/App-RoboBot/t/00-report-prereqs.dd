@@ -1,0 +1,86 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'File::ShareDir::Install' => '0.06'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Acme::Zalgo' => '0',
+                                      'AnyEvent' => '0',
+                                      'AnyEvent::IRC::Client' => '0',
+                                      'AnyEvent::Mattermost' => '0',
+                                      'AnyEvent::SlackRTM' => '0',
+                                      'App::Sqitch' => '0',
+                                      'Clone' => '0',
+                                      'Config::Any::Merge' => '0',
+                                      'Config::General' => '0',
+                                      'DBD::Pg' => '0',
+                                      'DBIx::DataStore' => '0',
+                                      'Data::Dumper' => '0',
+                                      'DateTime' => '0',
+                                      'DateTime::Format::Pg' => '0',
+                                      'EV' => '0',
+                                      'Exporter::Easy' => '0',
+                                      'File::HomeDir' => '0',
+                                      'File::ShareDir' => '0',
+                                      'FileHandle' => '0',
+                                      'Getopt::Long::Descriptive' => '0',
+                                      'HTML::TreeBuilder::LibXML' => '0',
+                                      'HTML::TreeBuilder::XPath' => '0',
+                                      'HTTP::Request' => '0',
+                                      'IPC::Open2' => '0',
+                                      'JSON' => '0',
+                                      'JSON::Path' => '0',
+                                      'LWP::Protocol::https' => '0',
+                                      'LWP::Simple' => '0',
+                                      'LWP::UserAgent' => '0',
+                                      'Lingua::EN::Tagger' => '0',
+                                      'List::Util' => '0',
+                                      'Log::Dispatch::Screen' => '0',
+                                      'Log::Log4perl' => '0',
+                                      'Log::Log4perl::Appender::Screen' => '0',
+                                      'Module::Loaded' => '0',
+                                      'Module::Pluggable::Object' => '0',
+                                      'Moose' => '0',
+                                      'MooseX::ClassAttribute' => '0',
+                                      'MooseX::SetOnce' => '0',
+                                      'Number::Format' => '0',
+                                      'Pod::Simple::SimpleTree' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Term::ExtendedColor' => '0',
+                                      'Text::Aspell' => '0',
+                                      'Text::Levenshtein' => '0',
+                                      'Text::Wrap' => '0',
+                                      'Time::HiRes' => '0',
+                                      'Try::Tiny' => '0',
+                                      'URI' => '0',
+                                      'URI::Find' => '0',
+                                      'URI::QueryParam' => '0',
+                                      'XML::LibXML' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'perl' => 'v5.20.0',
+                                      'strict' => '0',
+                                      'vars' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

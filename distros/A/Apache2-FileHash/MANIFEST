@@ -1,0 +1,11 @@
+Changes
+FileHash.yml
+MANIFEST
+Makefile.PL
+README
+lib/Apache2/FileHash.pm
+lib/Apache2/FileHash/GET.pm
+lib/Apache2/FileHash/PUT.pm
+startup.pl
+t/Apache2-FileHash.t
+META.yml                                 Module meta-data (added by MakeMaker)

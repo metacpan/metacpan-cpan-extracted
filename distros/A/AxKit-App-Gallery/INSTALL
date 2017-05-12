@@ -1,0 +1,65 @@
+$Id: INSTALL,v 1.1 2004/02/26 18:01:53 nik Exp $
+
+AxKit::App::Gallery is installed in the traditional Perl manner;
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+However, it has a number of additional dependencies, many of which are
+undergoing relatively rapid development.  This can make it difficult to
+get a set of libraries installed which work properly.
+
+These are notes from installing AxKit::App::Gallery on a clean FreeBSD
+system.  As a minimum the libraries and modules here with these version
+numbers are known to work.
+
+If you're not familiar with FreeBSD's "portupgrade" command, the use of it
+here ensures that the application/library/module is installed, and that
+any of the libraries or applications that it depends on that might be out
+of date are also installed.  Consult the documentation for your package
+management tool (apt, rpm, ...) for equivalent functionality.
+
+The "Installed" column notes what was installed, the "Using" column is 
+either "Port", "CPAN", or "CVS".
+
+Installed	Version		Using	Notes
+-------------------------------------------------------------------------
+apache 		1.3.29_1	Ports	
+
+mod_perl	1.28		Ports
+
+Data::Page	0.18		CPAN
+
+Imager		0.41_1		Ports	Using the ports tree meant that
+					Imager's other dependencies, such
+					as libtiff, were pulled down and
+					installed automatically.
+
+Image::Info	1.16		CPAN
+
+XML::Parser	2.34		CPAN
+
+RDF::Core	0.30		CPAN
+
+XML::LibXML	1.56		Ports	This has known bugs.  However,
+					by installing it from the ports
+					tree, I get all its dependencies
+					installed as well.
+
+XML::LibXML	1.57		CVS	First, delete XML::LibXML 1.56
+					installed in the previous step.
+					Then pull down 1.57 from the
+					XML::LibXML CVS tree, and install
+					using the traditional 
+					"perl Makefile.PL" approach
+
+XML::LibXSLT	1.53_1		Ports
+
+GnuPG::Interface 0.33_1		Ports	Some of AxKit's dependencies need
+					this, or they refuse to install.
+
+AxKit		1.6.2		CPAN	During the install, ensure that
+					you install XML::XPath when
+					prompted.

@@ -1,0 +1,11 @@
+--- a/src/rrd_graph.c  2012-01-24 19:08:48.000000000 +0900
++++ b/src/rrd_graph.c  2013-03-29 14:13:53.000000000 +0900
+@@ -4066,6 +4066,8 @@
+     static PangoFontMap *fontmap = NULL;
+     PangoContext *context;
+ 
++    g_type_init();
++
+ #ifdef HAVE_TZSET
+     tzset();
+ #endif

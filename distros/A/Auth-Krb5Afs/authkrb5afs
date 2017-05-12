@@ -1,0 +1,24 @@
+#! /usr/bin/perl
+# be like an authlib(7) module
+
+use Auth::Krb5Afs;
+use Data::Dumper;
+
+open(F, "<&3") || open(F, "<&STDIN");
+my($in);
+read(F, $in, 4096) 
+    or die("read: $!");
+close(F);
+my($srv, $cmd, $user, $pass) = split(/\n/, $in);
+
+my($err, $pwent) = Auth::Krb5Afs->authenticate($user, $pass, $srv);
+if( $err ) {
+    print(STDERR "error: ", join(" ", values(%$err)), "\n");
+    exit(1);
+}
+
+
+chdir($pwent->{home})
+    or die("couldn't open home directory $pwent->{home}: $!");
+
+exec(@ARGV);

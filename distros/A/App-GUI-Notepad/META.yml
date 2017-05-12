@@ -1,0 +1,19 @@
+abstract: A cross-platform CPAN-installable Perl Notepad
+author: Ben Marsh
+build_requires:
+  Test::More: 0.47
+  Test::NeedsDisplay: 0
+distribution_type: module
+generated_by: Module::Install version 0.56
+license: perl
+name: App-GUI-Notepad
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Dumper: 0
+  File::Spec: 0.80
+  Wx: 0.25
+  perl: 5.005
+version: 0.03

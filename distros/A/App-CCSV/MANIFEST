@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+README
+lib/App/CCSV.pm
+lib/App/CCSV/TieCSV.pm
+examples/CL.pm
+examples/.CCSVConf
+t/00-load.t
+t/pod.t

@@ -1,0 +1,33 @@
+---
+abstract: 'TLS/SSL tunnel'
+author:
+  - 'Viacheslav Tykhanovskyi <vti@cpan.org>'
+build_requires: {}
+configure_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.130880'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-TLSMe
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  AnyEvent: 5.34
+  IO::Handle: 0
+  Net::SSLeay: 0
+  Pod::Usage: 0
+  Proc::Pidfile: 0
+  Scalar::Util: 0
+  Test::More: 0
+  Time::Piece: 0
+  perl: 5.008007
+resources:
+  bugtracker: http://github.com/vti/app-tlsme/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/vti/app-tlsme
+version: 0.11

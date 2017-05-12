@@ -1,0 +1,6 @@
+Revision history for Perl extension ACME::Error::Coy.
+
+0.01  Fri Sep 20 14:56:27 2002
+	- original version; created by h2xs 1.2 with options
+		-XAn ACME::Error::Coy
+

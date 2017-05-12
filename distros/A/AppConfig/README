@@ -1,0 +1,18 @@
+
+    README for Perl module AppConfig
+
+A Perl 5 module for reading configuration files and parsing command line
+arguments.
+
+You can read a nicely formatted version of the documentation for
+this module online:
+
+    https://metacpan.org/pod/AppConfig
+
+You should be able to install this using your usual method for installing
+modules from CPAN. If you don't have one, have a look at:
+
+    http://www.cpan.org/modules/INSTALL.html
+
+This module was written by Andy Wardley and others.
+Some maintenance releases have been done by Neil Bowers <neilb@cpan.org>

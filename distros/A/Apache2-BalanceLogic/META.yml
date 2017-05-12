@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                Apache2-BalanceLogic
+version:             0.0.1
+abstract:            Perl extension for mod_proxy_balancer
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Apache2::Connection:           2.000002
+    Apache2::Const:                2.000002
+    Apache2::RequestIO:            2.000002
+    Apache2::RequestRec:           2.000002
+    APR::Table:                    0.009
+    CGI::Cookie:                   1.26
+    Net::CIDR::Lite:               0.2
+    UNIVERSAL::require:            0.11
+    YAML:                          0.65
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Takeshi Miki <miki@cpan.org>

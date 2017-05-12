@@ -1,0 +1,13 @@
+Revision history for Acme-CPANAuthors-MetaSyntactic
+
+1.002 Sun Jun 19 2016
+    - Added new metasyntactic author: PERLANCAR
+
+1.001 Mon Dec 28 2015
+    - Added new metasyntactic author: SHLOMIF
+    - Added some actual tests in t/basic.t
+
+1.000 Sun May 25 2014
+    - First version of the list of Acme::MetaSyntactic theme authors
+    - Includes: ABIGAIL, BINGOS, BOOK, ELBEHO, ELLIOTJS, JFORGET, JQUELIN,
+      MARKF, MCARTMELL, SAPER.

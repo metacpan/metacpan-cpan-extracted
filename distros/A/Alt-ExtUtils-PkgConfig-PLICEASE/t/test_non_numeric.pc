@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name: TestNN
+Description: Bla blub
+Version: 2.0b2.4
+Libs: -L${libdir} -ltest-nn
+Cflags: -I${includedir}/test-nn

@@ -1,0 +1,16 @@
+# Name
+Site created
+Site updated
+Site deleted
+Design created
+Design updated
+Design deleted
+Page created
+Page updated
+Page deleted
+Asset created
+Asset updated
+Asset deleted
+Content created
+Content updated
+Content deleted

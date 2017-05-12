@@ -1,0 +1,72 @@
+NAME
+    Authen::Simple::CDBI - Simple Class::DBI authentication
+
+SYNOPSIS
+        use Authen::Simple::CDBI;
+    
+        my $cdbi = Authen::Simple::CDBI->new(
+            class => 'MyApp::Model::User'
+        );
+    
+        if ( $cdbi->authenticate( $username, $password ) ) {
+            # successfull authentication
+        }
+    
+        # or as a mod_perl Authen handler
+
+        PerlModule Authen::Simple::Apache
+        PerlModule Authen::Simple::CDBI
+
+        PerlSetVar AuthenSimpleDBI_class "MyApp::Model::User"
+
+        <Location /protected>
+          PerlAuthenHandler Authen::Simple::CDBI
+          AuthType          Basic
+          AuthName          "Protected Area"
+          Require           valid-user
+        </Location>
+
+DESCRIPTION
+    Class::DBI authentication.
+
+METHODS
+    * new
+        This method takes a hash of parameters. The following options are
+        valid:
+
+        * class Class::DBI subclass. Required.
+
+                    class => 'MyApp::Model::User'
+
+        * username
+                Name of "username" column. Defaults to "username".
+
+                    username => 'username'
+    
+        * password
+                Name of "password" column. Defaults to "password".
+
+                    password => 'password'
+
+        * log   Any object that supports "debug", "info", "error" and
+                "warn".
+
+                    log => Log::Log4perl->get_logger('Authen::Simple::CDBI')
+
+    * authenticate( $username, $password )
+        Returns true on success and false on failure.
+
+SEE ALSO
+    Authen::Simple.
+
+    Authen::Simple::Password.
+
+    Class::DBI.
+
+AUTHOR
+    Christian Hansen "ch@ngmedia.com"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

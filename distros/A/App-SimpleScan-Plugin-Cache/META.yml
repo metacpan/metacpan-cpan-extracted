@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         App-SimpleScan-Plugin-Cache
+version:      0.02
+version_from: lib/App/SimpleScan/Plugin/Cache.pm
+installdirs:  site
+requires:
+    App::SimpleScan:               0.16
+    Module::Pluggable:             0
+    Test::More:                    0
+    WWW::Mechanize::Pluggable:     0.08
+    WWW::Mechanize::Plugin::Cache: 0.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.28

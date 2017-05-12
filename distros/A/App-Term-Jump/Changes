@@ -1,0 +1,191 @@
+commit 7fdd6b8799d8a796eb2905de2968ff2dbd1ecb5b (HEAD, master)
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Sun Apr 26 21:32:03 2015 +0200
+
+    FIXED: Documentation
+
+commit 29ecb533449091d5a268130452087c68c9fd68c2 (origin/master, origin/HEAD)
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Sun Apr 26 18:43:37 2015 +0200
+
+    ADDED: sub documentation
+
+commit 889c4f4fce51a004853f1a316d92c5c1fd620708
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Sun Apr 26 15:20:05 2015 +0200
+
+    CHANGED: moved documentation to script
+
+commit 6d0dfda15f83375412ada0dd8cb3402fd1609b23
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Sun Apr 26 13:37:55 2015 +0200
+
+    FIXED: quoting of path in cdd
+
+commit c8a214094edb1af040063be44b9c449ebb3f42fa
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Sat Apr 25 10:02:54 2015 +0200
+
+    FIXED: sort order and optimized search
+
+commit 5159a9c51795665361f653aeccf14b9dc5c4b017
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Fri Apr 24 13:26:12 2015 +0200
+
+    ADDED: display searched paths in debug mode
+
+commit 60da121ccc3197b51afaf206105ff09837e8bd38
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Fri Apr 24 12:24:50 2015 +0200
+
+    ADDED: --ignore_path
+
+commit 31b5943f0ffb9d606a46b585e71d59cf8b4297cc
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Wed Apr 22 02:15:04 2015 +0200
+
+    FIXED: refactored away module variables
+
+commit 9273cf5ec27e6da5601b4f55653c878457eeb985
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Tue Apr 21 23:52:51 2015 +0200
+
+    ADDED: test file belonging to previous commited change
+
+commit 7085bd95dc03908859098bae0f61f63c0d8955de
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Tue Apr 21 23:51:45 2015 +0200
+
+    FIXED: match argument in form "aaa/bbb"
+
+commit ac557bb47d617c5968a6ec179fbaa80d9e4acdfa
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Tue Apr 21 22:06:28 2015 +0200
+
+    FIXED: accept path with trailing slash
+
+commit 5e6135e355734584df4099e87420f8bedddbde69
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Tue Apr 21 21:33:01 2015 +0200
+
+    FIXED: match return order
+
+commit 5b379140a91bdbef7c37a8bbbb478a207d3eefb7
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Mon Apr 20 20:24:44 2015 +0200
+
+    CHANGED: bash completion
+
+commit cca5a8ea9db770632c786d0ad073f32281344190
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Mon Apr 20 00:59:30 2015 +0200
+
+    CHANGED: bash integration
+
+commit 6da480db97db3cc6e0bee081dbbe6e71307c0d9d
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Sun Apr 19 23:32:05 2015 +0200
+
+    CHANGED: moved bash completion in module
+
+commit ad3d2222c24916e4fb575b60814747497b89e397
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Sun Apr 19 17:44:19 2015 +0200
+
+    CHANGED: completion returns full path matched
+
+commit 4f00188e58375b1622d5d03a02f8c1d91c5f4c1a
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Sun Apr 19 10:19:05 2015 +0200
+
+    CHANGED: option parsing in completion code
+
+commit 1b9a640e4a26e27e425db346947e0bc25f4f871e
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Wed Apr 8 08:13:37 2015 +0200
+
+    CHANGED: option parsing
+
+commit 2e30330ea20b71dea0c20ddcc599b290b7db9d0a
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Mon Apr 6 17:11:36 2015 +0200
+
+    FIXED: completion for mathing options
+
+commit 1a979885f2e8a42b410c58631c7846905e0f0f8b
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Mon Apr 6 12:14:23 2015 +0200
+
+    ADDED: --file option
+
+commit 8052d082d1d6491622b1ea53282483000567cfa5
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Fri Apr 3 00:39:38 2015 +0200
+
+    CHANGED: never return the same match twice
+
+commit eb443f49a0ed6c730771573525447b441d2b2ed8
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Thu Apr 2 22:07:12 2015 +0200
+
+    CHANGED: search stops after database entries, complete does not
+
+commit b29eb80c762c94f2642c0204fc14611667f22334
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Mon Mar 23 10:25:28 2015 +0100
+
+    ADDED: remove_all regex and tests
+
+commit 6714d73f64aebf9842709b05771d362269ba043f
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Mon Mar 23 09:36:26 2015 +0100
+
+    ADDED: command speciic completion
+
+commit f11cfe69ecc91040c23b02a4b621f4ff2af35eca
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Sun Mar 22 18:50:21 2015 +0100
+
+    CHANGED: return a path only once, independentl of what method found it
+
+commit c8b36e3730471691688fb35d3d62707b7ed9fb26
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Sun Mar 22 12:17:01 2015 +0100
+
+    ADDED: debug option
+
+commit 1b08d5763e7a70b2a05a24e17fb4f930b69ea950
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Fri Mar 20 20:09:48 2015 +0100
+
+    ADDED: completion skeletton
+
+commit b8fbcf83487518c856536f5a0f21f11d8e2f1cbe
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Thu Mar 19 14:08:31 2015 +0100
+
+    ADDD: search options in the documentation
+
+commit 5508fea5967745f7e645156c5be07a7116fdaee6
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Thu Feb 26 12:33:41 2015 +0100
+
+    FIXED: tests
+
+commit 2d6aa85429dc4d66ba6273d83b32a69ac6c920f9
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Thu Feb 26 11:37:50 2015 +0100
+
+    CHANGED: tests structure
+
+commit 314f74d4ef1314fcdf5e5149956274a103e09354
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Thu Feb 12 00:16:34 2015 +0100
+
+    ADDED: code base
+
+commit 2d904717f88d46e2b9254b95b9c776bb2c347d65
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Wed Feb 11 22:46:34 2015 +0100
+
+    Initial commit

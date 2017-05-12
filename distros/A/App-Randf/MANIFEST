@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/App/Randf.pm
+LICENSE
+Makefile.PL
+cpanfile
+MANIFEST			This list of files
+META.json
+README.pod
+script/randf
+t/00_compile.t
+t/01_basic.t
+xt/01_perlcritic.t
+xt/02_pod-coverage.t
+xt/03_pod.t
+xt/04_notabs.t
+xt/05_code_metrics.t
+xt/06_no_use_vars.t
+META.yml

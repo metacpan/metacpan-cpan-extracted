@@ -1,0 +1,100 @@
+Fragments of a GNU-ish configure.in   to remind me
+what was tested in the non-perl package this stuff is based on.
+
+hplay=dummy
+
+case "$host" in
+*-sun-*) hplay=sun; AC_CHECK_HEADERS(sys/ioccom.h sys/audioio.h sun/audioio.h);;
+*-sgi-*) hplay=sgi ;;
+*-next-*) hplay=NeXT; AC_CHECK_HEADERS(libc.h) ;;
+*-*-freebsd*) hplay=linux ;;
+*-*-linux*) hplay=linux ;;
+*-*-hpux*)  hplay=hpux ;;
+*-*-*) echo "Unknown host type $host" ;;
+esac
+
+if test "$hplay" = linux; then
+ AC_CHECK_HEADERS(sys/soundcard.h machine/soundcard.h,break,hplay=dummy)
+ if test -c /dev/dsp ; then 
+  AC_DEFINE(HAVE_DEV_DSP)
+ fi 
+ if test -c /dev/sbdsp ; then 
+  AC_DEFINE(HAVE_DEV_SBDSP)
+ fi 
+fi
+
+
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_OFF_T
+
+dnl See if float can be used in protos followed by K&R definition
+AC_MSG_CHECKING(if we can use float in prototypes)
+AC_TRY_COMPILE([#include "$srcdir/proto.h"],[
+} int func PROTO((float a));
+int func(a) float a; { ],AC_MSG_RESULT(yes),[
+AC_DEFINE(NOPROTOFLOAT)
+AC_MSG_RESULT(no)
+])
+
+if test -d $prefix/include; then 
+ CPPFLAGS="$CPPFLAGS -I$prefix/include"
+fi 
+
+if test -d $prefix/lib; then 
+ LIBS="-L$prefix/lib $LIBS"
+fi 
+
+AC_ARG_WITH(gdbm,[  --with-gdbm[=<path>]    Uninstalled GNU gdbm source directory],[
+if test "$withval" != "" && test -d "$withval" ; then
+ CPPFLAGS="-I$withval $CPPFLAGS"
+ LIBS="-L$withval $LIBS" 
+else 
+ echo "--with-gdbm=$withval" 
+fi]) 
+
+if test "$hplay" = sgi; then
+AC_CHECK_LIB(audio,ALopenport)
+fi 
+
+AC_CHECK_LIB(M,atan)
+AC_CHECK_LIB(m,atan)
+
+dnl Checking for X11
+AC_PATH_XTRA
+if test -n "$x_includes" ; then 
+CPPFLAGS="$CPPFLAGS -I$x_includes"
+fi 
+
+AC_CHECK_LIB(socket,socket,XLIBS="-lsocket $XLIBS")
+AC_CHECK_LIB(nsl,inet_addr,XLIBS="-lnsl $XLIBS")
+AC_CHECK_LIB(X11,XauReadAuth,[
+XLIBS="$X_LIBS -lX11 $XLIBS"
+AC_DEFINE(HAVE_LIBX11)
+],,$X_LIBS $XLIBS $LIBS)
+
+dnl See if we can find nas audio library
+AC_CHECK_HEADERS(audio/audiolib.h)
+if test "$ac_cv_header_audio_audiolib_h" = yes ; then
+  AC_CHECK_LIB(audio,AuOpenServer,[
+  XLIBS="-laudio $XLIBS"
+  AC_DEFINE(HAVE_NAS)
+  ],,$XLIBS $LIBS)
+  if test "$ac_cv_lib_audio" = yes; then
+   if test "$hplay" = dummy; then
+    hplay="na" 
+    LIBS="$XLIBS $LIBS"
+    XLIBS=""
+   else
+    PROGS="$PROGS nasay"
+   fi 
+ fi 
+fi
+
+dnl Check for obscure but speed-enhancing sun hack 
+if test "$hplay" = sun; then
+AC_TRY_LINK(,nonstandard_arithmetic();,AC_DEFINE(HAVE_NONSTDARITH))
+fi 
+
+

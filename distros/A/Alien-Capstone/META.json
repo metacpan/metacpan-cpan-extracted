@@ -1,0 +1,58 @@
+{
+   "abstract" : "Alien module for Capstone Engine from www.capstone-engine.org",
+   "author" : [
+      "Vikas N. Kumar <vikas@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-Capstone",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0.029",
+            "Alien::gmake" : "0.11",
+            "Module::Build" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0.029",
+            "Module::Build" : "0",
+            "Pod::Readme" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.029",
+            "File::ShareDir" : "1.00"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Capstone" : {
+         "file" : "lib/Alien/Capstone.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/selectiveintellect/p5-alien-capstone/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/selectiveintellect/p5-alien-capstone"
+      }
+   },
+   "version" : "0.07"
+}

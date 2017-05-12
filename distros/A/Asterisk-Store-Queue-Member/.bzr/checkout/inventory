@@ -1,0 +1,17 @@
+<inventory format="5">
+<file file_id="bzrignore-20070516172547-as7bied0t9vx66x0-1" name=".bzrignore" />
+<file file_id="changes-20070516172547-as7bied0t9vx66x0-2" name="Changes" />
+<file file_id="manifest-20070516172547-as7bied0t9vx66x0-3" name="MANIFEST" />
+<file file_id="makefile.pl-20070516172547-as7bied0t9vx66x0-4" name="Makefile.PL" />
+<file file_id="readme-20070516172547-as7bied0t9vx66x0-5" name="README" />
+<file file_id="todo-20070516172547-as7bied0t9vx66x0-6" name="TODO" />
+<directory file_id="lib-20070516172547-as7bied0t9vx66x0-7" name="lib" />
+<directory file_id="asterisk-20070516172547-as7bied0t9vx66x0-10" name="Asterisk" parent_id="lib-20070516172547-as7bied0t9vx66x0-7" />
+<directory file_id="store-20070516172547-as7bied0t9vx66x0-13" name="Store" parent_id="asterisk-20070516172547-as7bied0t9vx66x0-10" />
+<directory file_id="queue-20070516172547-as7bied0t9vx66x0-14" name="Queue" parent_id="store-20070516172547-as7bied0t9vx66x0-13" />
+<file file_id="member.pm-20070516172547-as7bied0t9vx66x0-15" name="Member.pm" parent_id="queue-20070516172547-as7bied0t9vx66x0-14" />
+<directory file_id="log-20070516172547-as7bied0t9vx66x0-8" name="log" />
+<file file_id="exists-20070516172547-as7bied0t9vx66x0-11" name=".exists" parent_id="log-20070516172547-as7bied0t9vx66x0-8" />
+<directory file_id="t-20070516172547-as7bied0t9vx66x0-9" name="t" />
+<file file_id="asteriskstorequeueme-20070516172547-as7bied0t9vx66x0-12" name="Asterisk-Store-Queue-Member.t" parent_id="t-20070516172547-as7bied0t9vx66x0-9" />
+</inventory>

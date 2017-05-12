@@ -1,0 +1,103 @@
+######################################################################
+Revision history for Perl extension Archive::Tar::Wrapper
+
+0.23  (2015/05/28)
+   (ms) Mark Gardner added separate skips in the test suite to deal 
+        with the absense of GNU tar:
+        https://github.com/mschilli/archive-tar-wrapper-perl/pull/7
+
+0.22  (2015/03/08)
+   (ms) Added tar_gnu_write_options option suggested by Csaba Major with
+        tests and docs.
+
+0.21  (2014/10/16)
+   (ms) [rt.cpan.org 87536] Setting default umask to get predictable test 
+        results regardless of local umask settings.
+
+0.20  (2014/09/29)
+   (ms) Ignore errors on chown/chgrp when files from different owners/groups
+        are copied into a tarball, accept the limitation that they'll be
+        owned by the script user unless we're running as superuser.
+
+0.19  (2014/02/16)
+   (ms) RsrchBoy added support for bzip2-compressed tarfiles.
+
+0.18  (2013/07/15)
+   (ms) Moved to tmpdir() in t/002Mult.t because some smoke testers don't
+        like writing into t/data.
+
+0.17  (2013/07/01)
+   (ms) Sanko Robinson replaced bin_find() by File::Which::which() to allow
+        for better Win32 portability.
+
+0.16  (2012/03/19)
+   (ms) [rt.cpan.org 75770] Allow add() with directories, and now preserves
+        directory permissions.
+
+0.15  (2011/12/20)
+   (ms) [RT 73046] Randy Stauner submitted a patch to reset the directory if a 
+        write() fails (e.g. because no files have been added).
+        https://github.com/mschilli/archive-tar-wrapper-perl/pull/1
+
+0.14  (2011/02/12)
+   (ms) Added 'ramdisk' feature for Linux
+   (ms) More search paths for 'tar'
+
+0.13  2010/02/01
+   (ms) Added GNU tar check is_gnu()
+   (ms) Added tar_gnu_read_options to specify options like --numeric-owner
+
+0.12  2008/07/03
+   (ms) Applied modified patch by Daniel Barthel to enable more
+        files added to a tarball than there are allowed on the command
+        line.
+
+0.11  2008/03/09
+   (ms) Skipping one test case for FreeBSD's tar, which does not complain
+        if asked to extract non-existent files.
+
+0.10  2007/07/21
+   (ms) Skipping unicode tests for perl < 5.8
+
+0.09  2007/07/20
+   (ms) Added utf8 support in add($dataref)
+   (ms) Fixed bug in add($ref) for adding string data, 
+        patch submitted by Karthik Joshi.
+   (ms) Changed tempfile CLEANUP to UNLINK in test suite
+
+0.08  2006/08/21
+   (ms) Added tardir() method to obtain the directory the tarball was
+        unpacked in.
+
+0.07  2006/04/02
+   (ms) Fixed list_all() to return a ref to an array of arrayrefs, as
+        explained in the docs.
+   (ms) Added "dirs" option to list directories as well.
+
+0.06  2005/09/22
+   (ms) Fixed logging message in tar->read().
+   (ms) Additional options can be passed to tar (tar_read/write_options)
+   (ms) failed read() no longer chdirs out of the current directory
+   (ms) Fixed test suite for different umasks
+
+0.05  2005/09/10
+   (ms) 'tar' is now running via IPC::Run
+   (ms) read() takes an optional list of files to save space
+        in case only a limited number of files is needed from the
+        tarball.
+
+0.04  2005/07/24
+   (ms) Added eg/tarflat and more test cases
+
+0.03  2005/05/23
+   (ms) tarup() no longer uses "." as a directory, but globs for all
+        top-level entries
+   (ms) critical fix for location of tarred files
+   (ms) tmp dir cleanup now handled manually to avoid 
+        File::Temp warnings
+
+0.02  2005/04/20
+   (ms) Added lots of documentation.
+
+0.01  2005/04/10
+   (ms) Where it all began.

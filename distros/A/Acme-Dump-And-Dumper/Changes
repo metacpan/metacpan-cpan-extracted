@@ -1,0 +1,19 @@
+Revision history for Acme-Dump-And-Dumper
+
+1.001005  2015-03-21
+    - Fixed issues where objects that are referenced more
+        than once weren't roperly processed (Issue #2)
+
+1.001004  2014-02-05
+    - Fixed issue #9 ('ambiguous use' warnings from ref())
+
+1.001003  2014-01-30
+    - Fixed up broken tests
+
+1.001002  2014-01-30
+    - Fixed up a grammar error and changed align on the Dumb and Dumber
+      pic; releasing as I don't plan to touch this module for quite
+      some time.
+
+1.001001  2014-01-30
+    - First version released on an unsuspecting world

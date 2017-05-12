@@ -1,0 +1,31 @@
+#!/usr/local/bin/perl
+# 
+# foca-client
+# 
+# Author(s): Pablo Fischer (pablo@pablo.com.mx)
+# Created: 08/01/2012 12:43:34 AM UTC 12:43:34 AM
+
+use strict;
+use warnings;
+use Data::Dumper;
+use FindBin;
+use lib "$FindBin::RealBin/../lib/";
+use App::Foca::Client;
+
+my $command         = shift @ARGV || 'true';
+my $port            = 6666;
+my $debug           = 1;
+
+my $client = App::Foca::Client->new(
+        port                => $port,
+        debug               => $debug);
+
+my @hosts = qw(localhost);
+my @result = $client->run(\@hosts, $command);
+
+die "Not able to collect any data" unless @result;
+
+foreach my $host (@result) {
+    my $status = $host->{'ok'} ? 'OK' : 'ERROR';
+    print "$status: $host->{'hostname'}: $host->{'output'}\n";
+}

@@ -1,0 +1,7 @@
+[% META title = 'Captcha' %]
+
+<form action="" method="post">
+[% rc.get_html( key , err ) %]
+<br>
+<input type="submit" value="submit" />
+</form>

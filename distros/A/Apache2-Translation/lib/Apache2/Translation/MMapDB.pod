@@ -1,0 +1,165 @@
+=head1 NAME
+
+Apache2::Translation::MMapDB - A provider for Apache2::Translation
+
+=head1 SYNOPSIS
+
+  <TranslationProvider MMapDB>
+      FileName /path/to/file
+      ReadOnly 1
+      BaseKey  transdb
+  </TranslationProvider>
+
+  or
+
+  $provider=Apache2::Translation::MMapDB->new(FileName=>..., ...);
+
+  $provider->start;
+  $provider->stop;
+
+=head1 DESCRIPTION
+
+The C<MMapDB> provider implements the C<Apache2::Translation> provider
+interface as documented in L<Apache2::Translation::_base>. All optional
+functions are implemented.
+
+It uses the L<MMapDB> module that maps the whole database into the calling
+process's address space. So, all subsequent operations are simple RAM
+accesses.
+
+=head2 Database Structure
+
+The database structure is chosen so that it leaves room for additional
+information stored alongside the translation information. So all this
+information can be changed as a transaction.
+
+A L<MMapDB> database can be interpreted as hash of hashes of hashes ...
+of arrays. Within this structure the translation database is addressed
+by a list of keys. This list is called the C<basekey>.
+
+Think of something like this:
+
+ $transdb=$root->{basekey1}->{basekey2}->...->{basekeyN}
+
+The C<basekey> points to a hash with only 2 elements, C<actn> and C<note>.
+The C<actn> hash stores the block lists. The C<block> and C<order> fields
+are joined to derive an order field suitable for L<MMapDB> by
+C<pack('N2', $block, $order)>. This means C<block> and C<order> must be
+32-bit integer numbers.
+
+ $transdb->{'actn'}->{$key}->{$uri}=
+     [[pack('N2', $block1, $order1), $action1],
+      [pack('N2', $block2, $order2), $action2],
+      ...,
+      [pack('N2', $blockN, $orderN), $actionN]]
+
+The C<note> branch of the database is similar organized but instead of
+actions notes are stored.
+
+ $transdb->{'note'}->{$key}->{$uri}=
+     [[pack('N2', $block1, $order1), $note1],
+      [pack('N2', $block2, $order2), $note2],
+      ...,
+      [pack('N2', $blockN, $orderN), $noteN]]
+
+It would have been simpler to join notes and actions into one field and avoid
+thus having 2 branches. But the performance relevant operation of this module
+is fetching block lists without notes. When looking up the database it is
+probably faster to decide only once to dive into the C<actn> branch than to
+dissemble action and note from the joined field for each block list element.
+
+=head2 Parameters
+
+All parameters can be passed to the constructor method C<new()> as well
+as be specified as configuration directives in a
+C<< <TranslationProvider MMapDB> >> container in the C<httpd.conf>.
+Parameter names are case insensitive.
+
+=head3 filename
+
+C<Filename> specifies the name of the database file. Alongside a file with
+the same name but C<.lock> appended is used as lock file.
+
+If C<filename> is ommitted and another MMapDB provider has been created within
+the same perl interpreter its database object is inherited. Otherwise an
+error is thrown.
+
+Thus, multiple databases can reside in one database file using different
+base keys. The database file is still mapped only once into the processes
+address space.
+
+=head3 readonly
+
+specifies if write access to the database should be denied. Default is off.
+
+=head3 root
+
+If the passed C<filename> is relative the C<root> parameter is prepended.
+
+=head3 basekey
+
+Here a string or array can be passed that specified the C<basekey>, the
+root of the translation database within the MMapDB object.
+
+If a string is passed and if it starts with an arbitrary amount of spaces
+followed by an open bracket (C<[>) and ends with a closing bracket (C<]>)
+followed by an arbitrary amount of spaces it is assumed to be the
+string representation of an array and passed through perl's C<eval>.
+The resulting array is then taken as base key.
+
+So a multi-level base key can be specified in the httpd.conf as well.
+
+Any other string is taken as a one-level base key.
+
+Examples:
+
+These 2 are equivalent. The translation database is accessed as
+C<< $root->{my}->{trans}->{db} >>.
+
+  <TranslationProvider MMapDB>
+      BaseKey  [qw/my trans db/]
+  </TranslationProvider>
+
+  $provider=Apache2::Translation::MMapDB->new(BaseKey=>[qw/my trans db/]);
+
+But these use a one-level key (C<< $root->{'qw/my trans db/'} >>):
+
+  <TranslationProvider MMapDB>
+      BaseKey  qw/my trans db/
+  </TranslationProvider>
+
+  $provider=Apache2::Translation::MMapDB->new(BaseKey=>'qw/my trans db/');
+
+=head3 nolock
+
+If set to true no lockfile is used to serialize access to the underlying
+L<MMapDB> object.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Apache2::Translation>
+
+=item L<MMapDB>
+
+=item L<Apache2::Translation::_base>
+
+=back
+
+=head1 AUTHOR
+
+Torsten Foertsch, E<lt>torsten.foertsch@gmx.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Torsten Foertsch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+# Local Variables:
+# mode: perl
+# End:

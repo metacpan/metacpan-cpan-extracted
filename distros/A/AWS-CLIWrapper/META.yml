@@ -1,0 +1,28 @@
+---
+abstract: 'Wrapper module for aws-cli'
+author:
+  - 'HIROSE Masaaki'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AWS-CLIWrapper
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IPC::Cmd: '0'
+  JSON: '2'
+  String::ShellQuote: '0'
+  perl: '5.008001'
+  version: '0.77'
+resources:
+  repository: https://github.com/hirose31/AWS-CLIWrapper.git
+version: '1.12'

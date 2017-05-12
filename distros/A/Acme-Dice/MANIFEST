@@ -1,0 +1,12 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Acme/Dice.pm
+t/01_load.t
+t/10_roll_dice.t
+t/20_roll_craps.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

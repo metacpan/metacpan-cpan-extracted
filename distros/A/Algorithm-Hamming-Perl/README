@@ -1,0 +1,90 @@
+NAME
+     Algorithm::Hamming::Perl - Perl implementation of ECC
+     Hamming encoding, for single bit auto error correction.
+
+SYNOPSIS
+     use Algorithm::Hamming::Perl  qw(hamming unhamming);
+
+     $code = hamming($data);              # Encode $data
+
+     $data = unhamming($code);            # Decode and fix errors
+     ($data,$errors) = unhamming($code);  #  + return error count
+
+DESCRIPTION
+     This is an Error Correction Code module, implementing
+     Hamming encoding (8 bits data, 4 bits Hamming - ie increases
+     data size by 50%). Data can be encoded so that single bit
+     errors within a byte are auto-corrected.
+
+     This may be useful as a precaution before storing or sending
+     data where single bit errors are expected.
+
+     Hamming encoding was invented by Richard Hamming, Bell Labs,
+     during 1948.
+
+EXPORT SUBROUTINES
+     hamming (SCALAR)
+         Returns the Hamming code from the provided input data.
+
+     unhamming (SCALAR)
+         Returns the original data from the provided Hamming
+         code. Single bit errors are auto corrected.
+
+     unhamming_err (SCALAR)
+         Returns the original data from the provided Hamming
+         code, and a number counting the number of bytes that
+         were corrected. Single bit errors are auto corrected.
+
+OTHER SUBROUTINES
+     Algorithm::Hamming::Perl::hamming_faster ()
+         This is an optional subroutine that will speed Hamming
+         encoding if it is run once at the start of the program.
+         It does this by using a larger (hash) cache of
+         preprocessed results. The disadvantage is that it uses
+         more memory, and can add several seconds to invocation
+         time. Only use this if you are encoding more than 1 Mb
+         of data.
+
+INSTALLATION
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+DEPENDENCIES
+     ExtUtils::MakeMaker
+
+EXAMPLES
+     See the example perl programs provided with this module
+     "example*". An encoding and decoding example,
+
+        use Algorithm::Hamming::Perl  qw(hamming unhamming);
+
+        $data = "Hello";
+        $hamcode = hamming($data);
+
+        $original = unhamming($hamcode);
+
+
+LIMITATIONS
+     This is Perl only and can be slow. The Hamming encoding used
+     can only repair a single bit error within a byte - ie if two
+     bits are damaged within the one byte then this encoding
+     cannot auto correct the error.
+
+BUGS
+     Try not to join Hamming encoded strings together - this may
+     give results that look like a bug. If an odd number of input
+     byes is encoded, the output code is short half a byte - and
+     so is padded with '0' bits. Joining these with a string
+     concatenation will contain the padding bits that will
+     confuse decoding.
+
+     The above problem can occur when inputing and outputing
+     certain lengths to filehandles. To be safe, my example code
+     uses a buffer of 3072 bytes - a safe size to use with
+     filehandles.
+
+AUTHOR
+     Brendan Gregg <brendan.gregg@tpg.com.au> [Sydney, Australia]
+

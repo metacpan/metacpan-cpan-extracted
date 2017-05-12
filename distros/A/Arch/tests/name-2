@@ -1,0 +1,96 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Name methods.
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More tests => 42;
+use_ok("Arch::Name");
+
+my $archive = 'some@archive';
+my $category = 'cat-meow';
+my $branchless = "$archive/$category--5.6.7.8--patch-1";
+my @branchless_items = split('--|/', $branchless);
+splice(@branchless_items, 2, 0, '');
+my $branchless2 = join('--', @branchless_items); $branchless2 =~ s!--!/!;
+
+# test branchless names
+my $name = Arch::Name->new($branchless);
+isa_ok($name, "Arch::Name",        "branchless");
+is($name->branch, '',              "branchless branch");
+is($name->level(1), "revision",    "branchless level");
+is($name->fqn, $branchless,        "branchless name");
+is(join('|', $name->get), join('|', @branchless_items), "branchless items");
+
+$name->set([@branchless_items]);
+is($branchless, $name->fqn,        "branchless set");
+is(Arch::Name->new("$archive/$category--0")->branch, '', "branchless branch");
+
+my $name2 = Arch::Name->new($branchless2);
+is($name2->branch, '',             "branchless2 branch");
+isa_ok($name, "Arch::Name",        "branchless2");
+is($name2->fqn, $branchless,       "branchless2 name");
+
+# test is_valid thoroughly
+ok($name->is_valid,                "is_valid");
+ok($name->is_valid('revision'),    "is_valid revision");
+ok(!$name->is_valid('category'),   "is_valid category");
+ok(!$name->is_valid('archive'),    "is_valid archive");
+ok($name->is_valid('branch+'),     "is_valid branch+");
+ok($name->is_valid('archive+'),    "is_valid archive+");
+
+# test new/set/apply thoroughly
+$name = Arch::Name->new([ $archive ]);
+isa_ok($name, "Arch::Name",        "new with archive arrayref");
+is($name->level, 1,                "level");
+is($name->archive, $archive,       "archive");
+
+$name2 = Arch::Name->new({ archive => $archive });
+isa_ok($name2, "Arch::Name",       "new with archive hashref");
+is($name2->level, 1,               "level");
+is($name2->archive, $archive,      "archive");
+
+$name->apply($category);
+is($name->level, 2,                "apply category level");
+$name2->apply({ category => $category });
+is($name->level, 2,                "apply category level");
+is($name->fqn, $name2->fqn,        "compare two names");
+
+$name->new([ $archive, $category ]);
+isa_ok($name, "Arch::Name",        "new from object");
+is($name->fqn, $name2->fqn,        "compare two names");
+
+$name->set($archive);
+$name2->apply([undef]);
+is($name->fqn, $name2->fqn,        "compare two names");
+
+# test clone/cast thoroughly
+my $name3 = $name->clone($category, "branch", "0", "base-0");
+isa_ok($name3, "Arch::Name",       "clone with apply");
+is($name3->level, 5,               "level");
+isnt($name->fqn, $name3->fqn,      "compare two names");
+
+my $name4 = $name3->cast(5);
+isa_ok($name4, "Arch::Name",       "valid cast to 5");
+is($name4->level, 5,               "level");
+is($name->cast(5), undef,          "invalid cast to 5");
+is($name3->fqn, $name4->fqn,       "compare two names");
+
+$name4 = $name3->cast("version");
+isa_ok($name4, "Arch::Name",       "valid cast to version");
+is($name4->level, 4,               "level");
+is($name->cast("version"), undef,  "invalid cast to version");
+isnt($name3->fqn, $name4->fqn,     "compare two names");
+
+is($name->clone->fqn, $name3->cast(1)->fqn, "compare clone and cast names");
+isnt($name->fqn, $name3->fqn,      "compare two names");
+
+# test all setters thoroughly
+
+# test errors thoroughly
+
+# test multiple objects thoroughly
+

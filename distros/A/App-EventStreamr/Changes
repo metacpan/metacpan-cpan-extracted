@@ -1,0 +1,9 @@
+0.5       2015-08-02 21:02:32+08:00 Australia/Perth
+          Bug Fix - Crash on boot with missing ALSA device #54
+          Add YouTube Streaming Capability #80
+
+0.4       2015-04-14 16:54:52+08:00 Australia/Perth
+          Bug fix - Missing 'MixerWait' for streaming process
+
+0.3       2015-03-25 20:00:41WST+0800 Australia/Perth
+          Add IceCast Streaming Capability

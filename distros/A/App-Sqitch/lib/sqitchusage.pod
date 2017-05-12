@@ -1,0 +1,32 @@
+=begin private
+
+Keep private so it's not displayed, but will still be indexed by the CPAN
+toolchain.
+
+=head1 Name
+
+sqitchusage - Sqitch usage statement
+
+=end private
+
+=head1 Usage
+
+  sqitch [<options>] <command> [<command-options>] [<args>]
+
+=head1 Options
+
+  -f --plan-file  FILE      Path to a deployment plan file.
+     --engine     ENGINE    Database engine.
+     --registry   REGISTRY  Registry schema or database.
+     --db-client  PATH      Path to the engine command-line client.
+  -d --db-name    NAME      Database name.
+  -u --db-user    USER      Database user name.
+  -h --db-host    HOST      Database server host name.
+  -p --db-port    PORT      Database server port number.
+     --top-dir    DIR       Path to directory with plan and scripts.
+     --etc-path             Print the path to the etc directory and exit.
+     --quiet                Quiet mode with non-error output suppressed.
+  -v --verbose              Increment verbosity.
+     --version              Print the version number and exit.
+     --help                 Show a list of commands and exit.
+     --man                  Print the introductory documentation and exit.

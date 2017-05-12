@@ -1,0 +1,47 @@
+Acme-Grep2D
+
+Search a 2D block of text for regular expressions. A Grep
+method looks left, right, up, down, diagonally to the left,
+diagonally to the right (in both the up and down direction
+along diagonal).
+
+Useful for?? You tell me.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Acme::Grep2D
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-Grep2D
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Acme-Grep2D
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Acme-Grep2D
+
+    Search CPAN
+        http://search.cpan.org/dist/Acme-Grep2D/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 X Cramps
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,41 @@
+Revision history for App-CSelUtils
+
+0.07    2016-09-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention CSel::Examples.
+
+
+0.06    2016-09-01 (PERLANCAR)
+
+	- [Bugfix] ddsel: Don't skip root node if it's the only result.
+
+
+0.05    2016-08-27 (PERLANCAR)
+
+	- Add utility: ddsel.
+
+
+0.04    2016-08-27 (PERLANCAR)
+
+        - Provide common options and actions to accommodate jsonsel & yamlsel.
+
+        - [doc][Bugfix] Fix Typo which caused list of utilities not generated.
+
+        - [doc] Mention htmlsel, orgsel, jsonsel, yamlsel.
+
+
+0.03    2016-05-28 (PERLANCAR)
+
+	- Add stuffs for orgsel & htmlsel.
+
+
+0.02    2016-03-20 (PERLANCAR)
+
+         - Updates.
+
+
+0.01    2016-03-13 (PERLANCAR)
+
+         - First release.

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Acme-SOAP-Dodger.t
+lib/Acme/SOAP/Dodger.pm
+META.yml                                 Module meta-data (added by MakeMaker)

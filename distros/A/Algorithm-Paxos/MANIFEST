@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+docs/paxos-simple.pdf
+lib/Algorithm/Paxos.pm
+lib/Algorithm/Paxos/Exception.pm
+lib/Algorithm/Paxos/Role/Acceptor.pm
+lib/Algorithm/Paxos/Role/Learner.pm
+lib/Algorithm/Paxos/Role/Proposer.pm
+t/00-load.t
+t/01-basic.t
+weaver.ini

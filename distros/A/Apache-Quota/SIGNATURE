@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 61a4297f31a9fa2db58db6092b4f4527b8d1e274 Build.PL
+SHA1 d1aacad1d2209c8f6c7e91d184d0ad5e94c7f54c Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 17b1205c8635120a64a1ba1faf13809dbef70d53 MANIFEST
+SHA1 2fb5752a08d4df6396e86afa127fa0c8be533bde MANIFEST.SKIP
+SHA1 0f8c2767df2868e3bcdccec7630160452e5b06a9 META.yml
+SHA1 cd14ada78fb37a0d926edd86eddcdf7f939de582 Makefile.PL
+SHA1 9dc5ebf7aa3bf28c4625d7b9b263b3dbba4e531a README
+SHA1 afc31f70e7b27b4b49b50e6b5ef6773339c78304 lib/Apache/Quota.pm
+SHA1 711d2a8c2e101e571ee8565ad3d9860149501f49 lib/Apache/Quota/BerkeleyDB.pm
+SHA1 b6189a58186b586f4daaf3f049ed508d54fff0ae lib/Apache/Quota/DB_File/Lock.pm
+SHA1 7a40137dd06f4727f1deee2ddc123dffa0e575aa t/01-basic.t
+SHA1 68bfb50de78160a31baeec58fbe0a10e2e8c5dac t/pod-coverage.t
+SHA1 37307177c8305132ecc2c9b0778f53fa48f1691e t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFGDSz93Or3ZzQuifMRAguCAKCuIsJIC7g15d0WWuqde6ZBzvcyMQCeILQ5
+kjFk8pG9hHzF7cYVFUpQehY=
+=ztrT
+-----END PGP SIGNATURE-----

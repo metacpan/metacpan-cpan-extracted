@@ -1,0 +1,56 @@
+NAME
+
+ARSObject - high level interface above ARS module
+
+
+DESCRIPTION
+
+This module is intended for capable scripts above ARS module.
+
+It caches metadata alike Remedy::ARSTools, but uses Data::Dumper or Storable module. And metadata model is directly given from ARS::ars_GetFieldTable()/ARS::ars_GetField(), unlike ARSOOForm and Remedy::ARSTools. And additional description level (-metadn/-metaid) added to unify field names and extend conversion capabilities of field values.
+
+Field names and values are translated as possible.
+
+query() method supports iterator sub{} and uses ARS::ars_GetListEntry(), ARS::ars_GetListEntryWithFields(), ARS::ars_GetEntry() calls as appropriate with parameters given.
+
+entry(), entryIns(), entryUpd(), entryDel() methods are usual to manipulate records.
+
+entryNew() method may be used to form new record hash with default values for entryIns().
+
+entryDif() method may be used to minimise data for entryUpd().
+
+AUTOLOAD() method is to call 'ARS::ars_XXX' functions as methods.
+
+Special processing added for 'HPD:Help Desk' ITSM Suite form.
+
+Variable files may be used to cache any data.
+
+Misc Utility Methods intended for strings, dates, data structures.
+
+Utility Objects added to simplify and unify access to DBI, CGI, Net::SMTP modules.
+
+
+
+LICENSE
+
+    This is free software; you can use redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+
+    Andrew V Makarow <makarow at mail.com>, for Bank of Russia in Archangel
+	
+PREREQUISITES
+
+    Currently implemented and tested on Win32 Active Perl 5.8.
+
+HOW TO BUILD AND INSTALL
+
+    Type:
+	
+	perl Makefile.PL
+	make
+	make install
+    Or:
+	copy ./lib/* into perl/site/lib/
+

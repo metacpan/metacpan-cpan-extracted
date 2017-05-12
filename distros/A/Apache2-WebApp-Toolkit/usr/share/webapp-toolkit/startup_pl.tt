@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+$ENV{MOD_PERL} or die "Not running under mod_perl";
+
+[%- USE dir = Directory("$source/plugin/startup") -%]
+
+[%- FOREACH file = dir.files %]
+[% IF loop.count == 1 %]# Load before all other modules[% END %]
+[% PROCESS "$source/plugin/startup/$file.name" %]
+[%- END -%]
+
+use lib '[% apache_doc_root %]/app';
+
+# Preload application classes
+while (<DATA>) {
+    unless ( $_->can('isa') ) {
+        eval "require $_";
+
+        die  "Failed to load package '$_': $@" if $@;
+    }
+}
+
+1;
+
+# Modules added here will be URI accessible
+__DATA__
+[% project_title %]::Example 

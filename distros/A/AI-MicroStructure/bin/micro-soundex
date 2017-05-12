@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+use File::Copy;
+use Data::Dumper;
+use Data::Printer;
+sub soundex
+{
+
+p 	@_;
+    my $dir = `pwd | tr -d "\n"`;
+    my $file = shift; 
+    push @_,$file;
+    local( @res ) = map {$_=$_}@_; local($i, $t,$_); 
+    for ( @res ) { tr/a-zA-Z//cd; tr/a-zA-Z/A-ZA-Z/s;
+    	($i,$t) = /(.)(.*)/;
+       $t =~ tr/BFPVCGJKQSXZDTLMNRAEHIOUWY/111122222222334556/sd;
+       $_ = substr(($i||'Z').$t.'000', 0, 4 );
+       
+    }
+    my $maindir = substr($res[0],0,1);
+    my $targetdir = sprintf("%s/%s/%s",$dir, $maindir,substr($res[0],0,2));
+    if(! -d $targetdir){
+ #     `mkdir -p $targetdir`;
+    }
+#    move($file,$targetdir);
+    return [$dir,$targetdir,@res,substr($res[0],0,2),$file];
+}
+
+
+#print Dumper glob '*/*json';
+
+print Dumper soundex(@ARGV);
+

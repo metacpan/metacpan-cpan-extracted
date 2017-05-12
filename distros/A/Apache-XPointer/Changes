@@ -1,0 +1,38 @@
+# $Id: Changes,v 1.6 2004/11/16 03:56:18 asc Exp $
+
+1.1     Tue Nov 16, 2004
+
+	* This package is NOT backwards compatible with packages
+	  that subclass Apache::XPointer < 1.1
+
+	- Added support for HTTP 1.1 Accept header and/or
+	  CGI parameter
+
+	- Updated to return 206 or 406, rather than 200
+	
+	- Updated to use CGI::param in a mod_perl 2.x context
+
+	- Made XPointerSendRangeAs mandatory
+
+	- Renamed XPointerAllowCGIRange as XPointerAllowCGI
+	  and added XPointerCGIAcceptParam config options
+
+	- Updated internal (undocumented) code to try and make
+	  subclassing a little cleaner
+
+	- Updated POD
+
+1.01    Mon Nov 15, 2004
+
+	- updated POD to include Apache::XPointer::RDQL in
+	  list of supported schemes
+
+1.0     Sat Nov 13, 2004
+
+	- Bless as 1.0
+
+	- use Module::Build
+
+1.0_01	Sat Nov 13, 2004
+
+	- initial release

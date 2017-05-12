@@ -1,0 +1,33 @@
+---
+abstract: 'A CPAN overlay for darkpan and pinning purposes'
+author:
+  - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-opan
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Capture::Tiny: '0.27'
+  Dist::Metadata: '0.926'
+  File::Open: '1.0001'
+  File::chdir: '0.1010'
+  IPC::System::Simple: '1.21'
+  Import::Into: '1.002004'
+  List::UtilsBy: '0.09'
+  Mojolicious: '7.15'
+  Test::More: '0.88'
+  perl: '5.006'
+  strictures: '2'
+version: '0.002001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

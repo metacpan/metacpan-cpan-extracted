@@ -1,0 +1,11 @@
+0.04
+    2011-10-06
+        * Fix bug where compile was importing entire glob not just the {'CODE'}
+
+0.03
+    2010-07-14
+        * Change regexes every where to not depend on (?=) which they changed the behavior of in 5.12
+
+0.01
+    2010-07-02
+        * First release

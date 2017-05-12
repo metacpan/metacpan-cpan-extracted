@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+use strict 'vars';
+use vars qw/$DB $URL $NAME $CLASS %PAPERS/;
+
+use Ace 1.38;
+use CGI 2.42 qw/:standard :html3 escape/;
+use CGI::Carp qw/fatalsToBrowser/;
+use Ace::Browser::AceSubs;
+
+AceInit();
+$NAME  = param('name');
+#$PARMS = param('parms');
+
+# fetch database handle
+$DB = OpenDatabase() || AceError("Couldn't open database.");
+
+AceHeader();
+AceError(<<END) unless $NAME ;
+Call this script with URL parameters of
+<VAR>name</VAR> and <VAR>parms,</VAR> where
+"name" is the name of a table definition in acedb
+END
+
+display_table($NAME," ");
+exit 0;
+
+sub display_table {
+  my ($name,$parms) = @_;
+  my $obj = $DB->raw_query("table -title -n $name $parms") || AceMissing($name,$parms);
+  my ($n,$c) = (escape($name),escape($parms));
+
+
+  print
+    start_html(-Title=>"$name: $parms",
+	       -Style=>STYLE,
+	       -Class=>'tree',
+	       -Bgcolor=>BGCOLOR_TREE),
+    h1("$name: $parms"),
+    &show_table($obj),
+    #$obj->asHTML() || strong('No more text information about this object in the database'),
+    FOOTER,
+    end_html;
+}
+
+
+sub show_table {
+  my $obj = shift;
+  my $dna = "$obj";
+  #$dna=~s/(\w{50})/$1/g;
+  return (pre($dna),0);
+}
+
+

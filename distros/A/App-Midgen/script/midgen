@@ -1,0 +1,264 @@
+#!perl
+
+use 5.008001;
+use strict;
+use warnings FATAL => 'all';
+
+our $VERSION = '0.34';
+
+use English qw( -no_match_vars );
+local $OUTPUT_AUTOFLUSH = 1;
+
+use Data::Printer {caller_info => 1,};
+
+# we are doing this so we can run from git during development
+# perl ~/GitHub/App-Midgen/script/midgen
+use FindBin qw($Bin);
+use lib map {"$Bin/$_"} qw( lib ../lib );
+
+use App::Midgen;
+use Time::Stamp 'gmstamp';
+
+#######
+# get options from ~/.midgenrc
+#######
+
+# Encode and decode JSON
+use JSON::Tiny;
+my $json = JSON::Tiny->new;
+
+use File::Spec;
+use File::Slurp::Tiny qw(read_file write_file);
+
+my $midgenrc = File::Spec->catfile($ENV{HOME}, '.midgenrc');
+
+my $config;
+if (-e $midgenrc) {
+	$config = $json->decode(read_file($midgenrc));
+}
+
+#######
+# Start of Menu
+#######
+use Getopt::Long;
+Getopt::Long::Configure('bundling');
+use Pod::Usage;
+my $help         = 0;
+my $core         = $config->{core} || 0;
+my $dual_life    = $config->{dual_life} || 0;
+my $verbose      = $config->{verbose} || 1;
+my @format       = $config->{format} || 'dsl';
+my $experimental = 0;
+my $quiet        = $config->{quiet} || 0;
+my $zero         = $config->{zero} || 0;
+my $debug        = 0;
+my $write        = 0;
+GetOptions(
+	'verbose|v+'     => \$verbose,
+	'core|c!'        => \$core,
+	'dual_life|l!'   => \$dual_life,
+	'help|h|?'       => \$help,
+	'experimental|x' => \$experimental,
+	'format|f=s'     => \@format,
+	'quiet|q'        => \$quiet,
+	'zero|z!'        => \$zero,
+	'debug|d'        => sub {
+		$core    = 1;
+		$verbose = 3;
+		$debug   = 1;
+	},
+	'write|w' => \$write,
+) or pod2usage(2);
+pod2usage(1) if $help;
+
+#######
+# run App::Midgen
+#######
+
+if ($verbose > 0) {
+	print 'Running midgen v' . $VERSION . "\n";
+	print 'Stamped -> ' . gmstamp($BASETIME) . "\n";
+	print 'Honouring $ENV{ANSI_COLORS_DISABLED}' . "\n"
+		if $ENV{ANSI_COLORS_DISABLED};
+}
+
+my $midgen = App::Midgen->new(
+	core         => $core,
+	dual_life    => $dual_life,
+	verbose      => $verbose,
+	format       => $format[-1],
+	experimental => $experimental,
+	quiet        => $quiet,
+	zero         => $zero,
+	debug        => $debug,
+);
+
+p $midgen if $debug;
+
+$midgen->run();
+
+#######
+# write config to ~/.midgenrc
+#######
+if ($write) {
+	my $midgenrc_data = $json->encode(
+		{
+			core      => $core,
+			dual_life => $dual_life,
+			format    => $format[-1],
+			quiet     => $quiet,
+			zero      => $zero,
+		}
+	);
+
+	p $midgenrc_data;
+	write_file($midgenrc, $midgenrc_data);
+}
+
+#######
+# time and exit
+#######
+if ($verbose > 0) {
+	my $run_time = time - $BASETIME;
+	print 'I just spent ' . $run_time . "s doing all that, for you, enjoy\n";
+	print "__END__\n";
+}
+exit(0);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+midgen - Check B<requires> & B<test_requires> of your package for CPAN inclusion.
+
+=head1 VERSION
+
+This document describes midgen version: 0.34
+
+=head1 SYNOPSIS
+
+Change to the root of your package and run, command line options always
+ overwrite options from ~/.midgenrc if you have one.
+
+ midgen
+
+Now with a Getopt --help or -?
+
+ midgen -?
+
+or
+
+ midgen [options]
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help or -h>
+
+Prints a help message and exits.
+
+ Options:
+   --help           brief help message
+   --format         change output format
+   --dual_life      show dual-life modules
+   --core           show all perl core modules
+   --verbose        show detailed progress of files we are processing
+   --experimental   this feature under development
+   --zero           show a 0 instead of core
+   --debug          show much more information relevant to self development
+
+=item B<--format or -f>
+
+By default we output to STDOUT in 'dsl' format, so you can check,
+ copy n paste or select an alternative format as shown below.
+
+ midgen -f dsl		# Module::Include::DSL
+ midgen -f mi		# Module::Include
+ midgen -f mb		# Module::Build
+ midgen -f eumm		# ExtUtils::MakeMaker
+ midgen -f dist		# dist.ini
+ midgen -f cpanfile	# cpanfile prereqs
+ midgen -f metajson	# META.json
+ midgen -f infile	# show module in-files
+
+=item B<--dual_life or -l>
+
+Shows modules that are in Perl core and CPAN, some modules have a version
+ number eg; constant, Carp.
+
+ midgen -l
+
+=item B<--core or -c>
+
+Shows all modules that are in Perl core, including dual-life,
+ some have a version of 0 eg; strict, English.
+
+ midgen -c
+
+=item B<--verbose or -v>
+
+Show file names that we are checking, as we go.
+
+ midgen -v
+
+=item B<--experimental or -x>
+
+This experimental feature turns on extra passing, that removes twins
+and noisy_children, replacing them with there parent(dist),
+giving a minimalist output, you might conceive this as controversial,
+if so don't enable it. It also scans xt/ directory if you have one.
+If you find it to noisy you can add a '-q' for --quiet.
+
+ midgen -x
+
+=item B<--zero or z>
+
+Use a '0' instead of 'core' for core module version number,
+ suggest you incorporate it with core for maximum affect.
+
+ midgen -cz
+
+=item B<--write or -w>
+
+You can now write your current options to ~/.midgenrc in JSON format
+ (core, dual_life, format, zero), to be used again.
+ I you want to edit your ~./midgenrc file, you could use the Getopt
+ --no-option to negate an option, or you can edit/delete the file, your choice.
+
+ midgen --no-z -w
+
+=item B<--debug or -d>
+
+Provides a vast amount of output, relevant to development also enables
+ (core, verbose), uses L<Data::Printer>.
+
+Suggest you consider redirecting STDERR when the debug option is used.
+
+ midgen -d 2>debug.txt
+
+=back
+
+=head1 AUTHOR
+
+See L<App::Midgen>
+
+=head2 CONTRIBUTORS
+
+See L<App::Midgen>
+
+=head1 COPYRIGHT
+
+See L<App::Midgen>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

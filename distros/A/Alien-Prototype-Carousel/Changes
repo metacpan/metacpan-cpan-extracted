@@ -1,0 +1,19 @@
+Revision history for Perl extension Alien::Prototype::Carousel.
+
+0.26.3  Fri Apr 23 22:21 PDT 2010
+    - Switch to Git.
+
+0.26.2  Tue Oct  2 11:44 PDT 2007
+    - added POD coverage tests
+    - now depends on Alien::scriptaculous
+    - added "passthrough" Makefile.PL; we -NEED- to have Module::Build
+      installed, auto-generated compatibility Makefile.PLs are insufficient
+
+0.26.1  Sun Sep 30 13:28 PDT 2007
+    - added POD docs to Alien::Prototype::Carousel
+    - added "--quiet" command line argument to "prototype-carousel-install"
+    - changed versioning to "${Carousel_version}.${alien_release}", so that
+      releases could be issued out of sync with upstream Carousel component.
+
+0.26    Tue Jul 17 22:32 PDT 2007
+    - First public version.  Installs Carousel 0.26

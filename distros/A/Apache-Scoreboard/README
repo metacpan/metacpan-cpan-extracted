@@ -1,0 +1,6 @@
+Perl interface to ap_scoreboard_image (for mod_status-like functionality)
+
+see Stas Bekman's Apache::VMonitor for example usage (and a killer tool!)
+
+Enjoy,
+-Doug

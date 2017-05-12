@@ -1,0 +1,9 @@
+name = "App-KV2JSON"
+# badges = ["travis"]
+authority="cpan:SONGMU"
+
+module_maker="ModuleBuildTiny"
+readme_from="script/kv2json"
+
+[FileGatherer]
+exclude_match = ['^author/.*', '^kv2json$']

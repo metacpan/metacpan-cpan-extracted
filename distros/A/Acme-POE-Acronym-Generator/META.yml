@@ -1,0 +1,22 @@
+---
+abstract: 'Generate random POE acronyms.'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-POE-Acronym-Generator
+requires:
+  Math::Random: 0.69
+  perl: 5.006
+resources:
+  homepage: https://github.com/bingos/acme-poe-acronym-generator
+  repository: https://github.com/bingos/acme-poe-acronym-generator.git
+version: 1.20

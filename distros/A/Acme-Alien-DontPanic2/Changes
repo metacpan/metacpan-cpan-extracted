@@ -1,0 +1,20 @@
+Revision history for Perl Acme-Alien-DontPanic2
+
+0.3200    2017-03-29 14:39:20 -0400
+  - Require Alien::Build 0.32 Alien::Build::MB 0.02
+
+0.2100    2017-03-06 00:26:02 -0500
+  - Require Alien::Build 0.21
+
+0.1900    2017-03-02 06:41:27 +1100
+  - Require Alien::Build 0.19
+
+0.1100    2017-02-08 08:03:38 -0500
+  - Require Alien::Build 0.11
+
+0.0800    2017-02-04 11:50:13 -0500
+  - Require Alien::Build 0.08
+
+0.0500    2017-02-02 13:37:39 -0500
+  - Fork of the original Acme::Alien::DontPanic that uses
+    Alien::Build + Alien::Build::MB

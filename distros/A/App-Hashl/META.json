@@ -1,0 +1,53 @@
+{
+   "abstract" : "Partially hash files, check if files are equal etc.",
+   "author" : [
+      "Copyright (C) 2011-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Hashl",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Compile" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Digest::SHA" : "0",
+            "File::Copy" : "0",
+            "File::Find" : "0",
+            "Getopt::Long" : "0",
+            "IO::Handle" : "0",
+            "List::MoreUtils" : "0",
+            "Storable" : "0",
+            "Time::Progress" : "0",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Hashl" : {
+         "file" : "lib/App/Hashl.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

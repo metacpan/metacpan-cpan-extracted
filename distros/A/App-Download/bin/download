@@ -1,0 +1,165 @@
+#!/usr/bin/perl
+
+
+# PODNAME: script to download files from git version control system.
+
+
+# common modules
+use strict;
+use warnings FATAL => 'all';
+use feature 'say';
+use utf8;
+use open qw(:std :utf8);
+
+use Carp;
+use File::Basename qw(dirname);
+use File::Copy;
+use File::Find;
+use File::Temp qw(tempdir);
+use Getopt::Long::Descriptive;
+use Term::ANSIColor qw(colored);
+
+# global vars
+
+# subs
+sub exit_with_error_message {
+    my ($msg) = @_;
+
+    say colored($msg, 'red');
+    exit 1;
+}
+
+sub run_cmd {
+    my ($cmd) = @_;
+
+    say colored('$ ' . $cmd, 'green');
+    my $exit_code = system($cmd);
+
+    if ($exit_code != '0') {
+        exit_with_error_message('Error. Command exited with non zero exit code');
+    }
+}
+
+sub mkdir_recursive {
+    my $path = shift;
+    mkdir_recursive(dirname($path)) if not -d dirname($path);
+    mkdir $path or die "Could not make dir $path: $!" if not -d $path;
+    return;
+}
+
+sub mkdir_and_copy {
+    my ($from, $to) = @_;
+    mkdir_recursive(dirname($to));
+    copy($from, $to) or die "Couldn't copy: $!";
+    return;
+}
+
+# main
+sub main {
+
+    my ($opt, $usage) = describe_options(
+        'download git_repo_url <some-arg>',
+        [ 'commit=s', 'sha1, branch or tag. Default HEAD', { required => 1, default => 'HEAD'  } ],
+        [ 'include_re=s', 'regular expression to filter number of files. Default ^(?!\.git/)', {default => '^(?!\.git/)'}  ],
+        [ 'to_dir=s', 'directory to save files. Default ./', { required => 1, default => './'  } ],
+        [ 'help', 'print usage message and exit' ],
+    );
+
+    if ($opt->help()) {
+        print $usage->text;
+        exit;
+    } else {
+        my $url = $ARGV[0];
+
+        if (not $url) {
+            exit_with_error_message('No git repo url. Please run `download git@github.com:bessarabov/App-Download.git`');
+        }
+
+        my $tempdir = tempdir( CLEANUP => 1 );
+
+        run_cmd("git clone $url $tempdir");
+
+        if ($opt->commit() ne 'HEAD') {
+            run_cmd("cd $tempdir; git checkout " . $opt->commit());
+        }
+
+        say colored('Copying files', 'green');
+
+        my $cp_count = 0;
+        find(
+            {
+                wanted => sub {
+                    if (-f $File::Find::name) {
+                        $File::Find::name =~ m{$tempdir/(.*)};
+                        my $relative_name = $1;
+                        my $re = $opt->include_re();
+                        if ($relative_name =~ /$re/) {
+
+                            say $relative_name;
+
+                            # http://stackoverflow.com/questions/229357/what-is-the-best-way-in-perl-to-copy-files-into-a-yet-to-be-created-directory-tr/229382#229382
+                            mkdir_and_copy(
+                                $File::Find::name,
+                                $opt->to_dir() . '/' . $relative_name,
+                            );
+
+                            $cp_count++;
+                        }
+                    }
+                },
+                no_chdir => 1,
+            },
+            $tempdir,
+        );
+
+        if ($cp_count == 0) {
+            exit_with_error_message('No files copied');
+        }
+
+    }
+
+}
+main();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+script to download files from git version control system.
+
+=head1 VERSION
+
+version 1.0.1
+
+=head1 DESCRIPTION
+
+    $ download --help
+    download git_repo_url <some-arg>
+            --commit STR       sha1, branch or tag. Default HEAD
+            --include_re STR   regular expression to filter number of files.
+                               Default ^(?!\.git/)
+            --to_dir STR       directory to save files. Default ./
+            --help             print usage message and exit
+
+The `git` binary is needed for the script to work.
+
+Script exits with non zero code in case of error.
+
+The most common way of using this script is to specify --include_re ^lib/
+
+=head1 AUTHOR
+
+Ivan Bessarabov <ivan@bessarabov.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Ivan Bessarabov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

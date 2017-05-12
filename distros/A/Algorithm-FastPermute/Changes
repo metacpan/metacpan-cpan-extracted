@@ -1,0 +1,40 @@
+Revision history for Perl extension Algorithm::FastPermute.
+
+0.01  Fri Aug 24 23:04:02 2001
+	- original version; created by h2xs 1.1.1.4 with options
+		-Acn Algorithm::FastPermute
+
+0.02  Mon Aug 27 20:04:28 BST 2001
+	- bail out if the array is empty
+	- allocate big enough buffers :-)
+	- speed improvement: move AvARRAY assignment out of inner loop
+	- cope with tied arrays
+	- use CXt_NULL instead of CXt_SUB, and hide the outer contexts
+	- Unix line-endings on README file
+	- handle exceptions (via JMPENV)
+
+0.03  Sat Sep  1 12:00:53 BST 2001
+	- use je_mustcatch (CATCH_[GS]ET) rather than manual JMPENV_*
+	  (thanks to Graham Barr)
+
+0.04  Tue Sep  4 11:17:27 BST 2001
+	- make it compile with 5.005
+
+0.05  Tue Mar  5 15:10:48 GMT 2002
+	- remove dependence on GCC-specific feature (assignment to AvARRAY(av))
+	- steal Graham Barr's cxinc trick from Scalar-List-Utils, so we can
+	  compile on ActiveState (Win32)
+
+0.06  Sun Feb  1 10:12:39 GMT 2004
+	- fix cxinc (again) with Win32 versions of 5.8
+
+0.07  Tue Dec  7 16:23:40 GMT 2004
+	- Don't compile with -pg; use -O2 instead
+          (caused compilation failures on some systems)
+
+0.99  Mon Oct 31 16:14:53 GMT 2005
+	- Fix eval handling;
+	- Use multicall interface.
+
+0.999 Sun Feb 24 09:42:16 GMT 2008
+	- Make it compatible with Perl 5.10

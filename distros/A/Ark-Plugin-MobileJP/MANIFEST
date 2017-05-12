@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Ark/Plugin/Encoding/MobileJP.pm
+lib/Ark/Plugin/MobileAgent.pm
+lib/Ark/Plugin/MobileJP.pm
+minil.toml
+t/00_compile.t
+t/plugin_encoding_mobilejp.t
+t/plugin_encoding_mobilejp_called_parameters_before.t
+META.yml
+MANIFEST

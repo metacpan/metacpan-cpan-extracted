@@ -1,0 +1,3 @@
+return $ARGV[0]->isa( 'Astro::App::Satpass2' ) ? 'OK' : "First argument is '$ARGV[0]'";
+
+# ex: set filetype=perl textwidth=72 :

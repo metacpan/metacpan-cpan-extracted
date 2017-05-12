@@ -1,0 +1,6 @@
+Revision history for Perl extension App::CLI::Plugin::Log::Dispatch::Configurator::YAML
+
+1.1     Mon Sep 19 11:02:59 JST 2011
+        - change dependencies module Class::Accessor::Grouped (before Class::Data::Accessor)
+1.0     Mon Apr  5 23:53:15 2010
+        - original version

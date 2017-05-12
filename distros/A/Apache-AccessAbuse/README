@@ -1,0 +1,29 @@
+Apache/AccessAbuse version 0.003
+===============================
+
+Avoid access abuse to your web site.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   IPC::Shareable
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003. Centro de Investigacion en Energia,
+Universidad Nacional Autonoma de Mexico.
+Copyright (C) 2033. 'Aztec Eagle' Turbo <turbo@cie.unam.mx>
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

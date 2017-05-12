@@ -1,0 +1,66 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Acme-RunDoc
+Upstream-Contact: TOBYINK <tobyink@cpan.org> and Toby Inkster <tobyink@cpan.org>
+Source: https://metacpan.org/release/Acme-RunDoc
+
+Files: CONTRIBUTING
+ FAQ
+ INSTALL
+ LICENSE
+ foo.pl
+ foo2.pl
+ p5-acme-rundoc/.hg/00changelog.i
+ p5-acme-rundoc/.hg/branch
+ p5-acme-rundoc/.hg/dirstate
+ p5-acme-rundoc/.hg/hgrc
+ p5-acme-rundoc/.hg/requires
+ t/Local/TestModule.docm
+ t/test-file.doc
+ word-examples/helloworld.doc
+ word-lib/Hello/World.docm
+Copyright: Unknown
+License: Unknown
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+ t/02do.t
+ t/03use.t
+Copyright: Copyright 2012 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: README
+ lib/Acme/RunDoc.pm
+ lib/icrosoft/Word.pm
+Copyright: This software is copyright (c) 2012 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

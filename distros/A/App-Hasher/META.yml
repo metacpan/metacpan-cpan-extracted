@@ -1,0 +1,31 @@
+---
+abstract: 'script to change file name to be hash of its content'
+author:
+  - 'Ivan Bessarabov <ivan@bessarabov.ru>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Hasher
+requires:
+  Carp: '0'
+  Digest::SHA1: '0'
+  File::Basename: '0'
+  Term::ANSIColor: '0'
+  feature: '0'
+  open: '0'
+  perl: v5.10.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/bessarabov/App-Hasher/issues
+  homepage: https://github.com/bessarabov/App-Hasher
+  repository: https://github.com/bessarabov/App-Hasher.git
+version: 1.0.2

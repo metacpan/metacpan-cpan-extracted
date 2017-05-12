@@ -1,0 +1,261 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use File::Basename;
+use Getopt::Long;
+use POSIX;
+use APP::REST::RestTestSuite;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+
+my ( $config_file, $log_dir, $action, $suite );
+my $client  = File::Basename::basename($0);
+my %options = (
+    'c|configfile=s'      => \$config_file,
+    'l|logdir=s'          => \$log_dir,
+    'r|run-test-suite'    => \$action->{runtestsuite},
+    't|test-load=s'       => \$action->{testload},
+    's|get-sample-config' => \$action->{getsampleconfig},
+    'd|debug'             => \$action->{debug},
+    'h|help'              => \&usage,
+    'V|version' =>
+      sub { print "Version : ", APP::REST::RestTestSuite->VERSION, "\n"; exit; },
+
+);
+
+mini_usage() unless @ARGV;
+GetOptions(%options) or mini_usage();
+
+sub mini_usage {
+    print STDERR <<HELP;
+
+Usage: $client [options] command [...]
+
+Try `$client --help` for more options.
+
+HELP
+    exit;
+}
+
+sub usage {
+    print STDERR <<HELP;
+
+Usage: $client [options] command [...]
+
+Options:
+  -h,--help                 Display this usage. 
+  -V,--version              Print the version of the tool. 
+  -c,--configfile=<file>    Input the config file with full path.
+  -l,--logdir=<dir>         Input full path of the directory where you want to log the test results.
+  -t,--test-load=n          Test the average response time by simulating 'n' number of requests on the web server.
+
+Commands:
+  -r,--run-test-suite       Test the configured web services defined in the config file.
+  -g,--get-sample-config    Get a sample config file to configure your web services as test suite. 
+
+***Note: 
+By default tool uses the sample-config file. You need to get that and configure the suite.
+
+Examples:
+  $client --get-sample-config           
+                # Get sample config file for configuring web services in the current directory.
+
+  $client --run-test-suite --configfile=<rest_config_file> 
+                # Execute the test suite against the supplied config file. 
+                # Supply the full path of config file if it is not present in current directory.
+
+  $client --test-load=10 --configfile=<rest_config_file> 
+                # Send parallel requests (10* number of web services configured in config file). 
+                # Give average response time by simulating huge traffic in the web server.
+
+  $client --run-test-suite --configfile=<rest_config_file>  --logdir=<log-directory-path>
+  $client --test-load=10   --configfile=<rest_config_file>  --logdir=<log-directory-path>
+                # Create LOG files in the path specified by executing the test cases. 
+
+HELP
+    exit;
+}
+
+print
+"\n===============================Rest Test Automation Tool=============================\n";
+
+if ( $^O =~ /Win/ ) {
+    $config_file =~ s/\//\\/g if ($config_file);
+    $log_dir     =~ s/\//\\/g if ($log_dir);
+}
+if ( $config_file && $log_dir ) {
+
+    print "Parsing Config File : $config_file\n";
+    print "Using log dir as    : $log_dir\n";
+
+    $suite = new APP::REST::RestTestSuite(
+        REST_CONFIG_FILE => $config_file,
+        LOG_FILE_PATH    => $log_dir,
+    );
+} elsif ($config_file) {
+
+    print "Parsing Config File : $config_file\n\n";
+    $suite = new APP::REST::RestTestSuite( REST_CONFIG_FILE => $config_file, );
+
+} elsif ($log_dir) {
+
+    print <<HELP;
+  Using log dir as    : $log_dir
+
+  Using the default test suite. This is just for a demo purpose.
+  Use below options to specify the config file and log path.
+
+  $client --configfile=<rest_config_file> --logdir=<log-directory-path>
+
+HELP
+    $suite = new APP::REST::RestTestSuite( LOG_FILE_PATH => $log_dir, );
+
+} else {
+    unless ( $action->{getsampleconfig} ) {
+        print <<HELP;
+  Using the default test suite. This is just for a demo purpose.
+  Use below options to specify the config file and log path.
+
+  $client --configfile=<rest_config_file> --logdir=<log-directory-path>
+
+  Use below option to get a sample config. Edit the config file to configure your web services
+
+  $client --get-sample-config
+
+HELP
+    }
+    $suite = new APP::REST::RestTestSuite();
+}
+
+if ( $action->{debug} ) {
+
+    print Dumper $suite;
+    exit;
+
+} elsif ( $action->{runtestsuite} ) {
+
+    $suite->execute_test_cases( $suite->get_test_cases() );
+    my ( $config, $total, $skip, $pass, $fail ) = $suite->get_result_summary();
+    print "=" x 70, "\n";
+    print "Summary of web service Suite    \n";
+    print "=" x 70, "\n";
+    print "Total test cases configured : $config\n";
+    print "Total test cases executed   : $total\n";
+    print "Total test cases skipped    : $skip\n";
+    print "Total test cases pass       : $pass\n";
+    print "Total test cases failed     : $fail\n";
+    print "=" x 70, "\n";
+    exit;
+
+} elsif ( $action->{testload} ) {
+
+    die "--test-load accepts only numeric argument\n"
+      unless ( $action->{testload} =~ /^\d+$/ );
+    my %test_cases = $suite->get_test_cases();
+
+    #increase the count to load your API $load times with the number of TC
+    my $tc_in_config = scalar keys %test_cases;
+    my $load         = $action->{testload};
+
+    #$load = floor(500 / $tc_in_config);
+
+    my %load_test_cases;
+
+    #If config file has 10 test cases, formula for $tc_count is 10*$load
+    my $total_tc = 0;
+
+    while ( $load > 0 ) {
+
+        foreach my $num ( sort { $a <=> $b } keys(%test_cases) ) {
+            my $tc = $test_cases{$num};
+            $total_tc++;
+            $load_test_cases{$total_tc} = $tc;
+        }
+        $load--;
+
+    }
+
+    #    require Data::Dumper;
+    #    $Data::Dumper::Indent = 1;
+    #    print Dumper $suite;
+    #    foreach my $num (sort { $a <=> $b } keys(%load_test_cases)) {
+    #        print Dumper $load_test_cases{$num};
+    #    }
+    #    print sort{ $a <=> $b } keys %load_test_cases;
+    #    exit;
+
+    $suite->execute_test_cases_in_parallel(%load_test_cases);
+
+    my ( $config, $total, $skip, $pass, $fail ) = $suite->get_result_summary();
+
+    print "=" x 70, "\n";
+    print "Summary of web service load test  \n";
+    print "=" x 70, "\n";
+    print "Total test cases in config: $config\n";
+    print "Total test cases executed : $total\n";
+    print "Total test cases skipped  : $skip\n";
+    print "=" x 70, "\n";
+    exit;
+
+} elsif ( $action->{getsampleconfig} ) {
+
+    $suite->get_sample_test_suite();
+    print "Sample Config file to configure the web services got created\n";
+    print "in ", $suite->get_sample_config_file(), "\n";
+    print "Edit and rename this file as project specific test suite.\n\n";
+    exit;
+
+} else {
+
+    print "\nUse below options to execute the test cases\n\n";
+    print "$client --configfile=<rest_config_file> --run-test-suite\n\n";
+    exit;
+
+}
+
+__END__
+
+=head1 NAME
+
+rest-client - Test automation tool for restful web services
+
+=head1 SYNOPSIS
+
+Usage: rest-client [options] command [...]
+
+Options:
+  -h,--help                 Display this usage. 
+  -V,--version              Print the version of the tool. 
+  -c,--configfile=<file>    Input the config file with full path.
+  -l,--logdir=<dir>         Input full path of the directory where you want to log the test results.
+  -t,--test-load=n          Test the average response time by simulating 'n' number of requests on the web server.
+
+Commands:
+  -r,--run-test-suite       Test the configured web services defined in the config file.
+  -g,--get-sample-config    Get a sample config file to configure your web services as test suite. 
+
+***Note: 
+By default tool uses the sample-config file. You need to get that and configure the suite.
+
+Examples:
+  rest-client --get-sample-config           
+                # Get sample config file for configuring web services in the current directory.
+
+  rest-client --run-test-suite --configfile=<rest_config_file> 
+                # Execute the test suite against the supplied config file. 
+                # Supply the full path of config file if it is not present in current directory.
+
+  rest-client --test-load=10 --configfile=<rest_config_file> 
+                # Send parallel requests (10* number of web services configured in config file). 
+                # Give average response time by simulating huge traffic in the web server.
+
+  rest-client --run-test-suite --configfile=<rest_config_file>  --logdir=<log-directory-path>
+  rest-client --test-load=10   --configfile=<rest_config_file>  --logdir=<log-directory-path>
+                # Create LOG files in the path specified by executing the test cases. 
+
+
+=head1 SEE ALSO
+ 
+L<https://github.com/rkmithun/APP-REST-RestTestSuite>
+ 
+=cut

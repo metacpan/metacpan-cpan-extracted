@@ -1,0 +1,8 @@
+Revision history for Perl module App::Nopaste::Service::WerePaste
+
+0.02 2015-11-19
+	- Minor layout changes, preparation for submission to CPAN
+	- Testing added
+
+0.01 2015-04-13
+	- Initial release

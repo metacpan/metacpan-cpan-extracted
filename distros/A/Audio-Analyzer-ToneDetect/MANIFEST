@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+TODO
+cpanfile
+dist.ini
+lib/Audio/Analyzer/ToneDetect.pm
+t/basic.t
+t/data/01.wav
+t/release-pod-syntax.t

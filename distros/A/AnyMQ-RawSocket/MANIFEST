@@ -1,0 +1,11 @@
+lib/AnyMQ/RawSocket.pm
+lib/AnyMQ/Topic/Trait/RawSocket.pm
+lib/AnyMQ/Trait/RawSocket.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/manifest.t
+.shipit
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

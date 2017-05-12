@@ -1,0 +1,18 @@
+NAME
+    App::Cmd::Starter - Module::Starter plugin to build App::Cmd
+    distributions
+
+SYNOPSYS
+     appcmd-starter
+        --author   "JJ"
+        --email    "jj@jonallen.info"
+        --module   "My::Command"
+        --script   "mycmd"
+        --commands "foo,bar,baz"
+
+COPYRIGHT and LICENSE
+    Copyright (C) 2012 Jon Allen (JJ)
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

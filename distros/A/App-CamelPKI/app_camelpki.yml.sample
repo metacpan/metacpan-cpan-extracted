@@ -1,0 +1,16 @@
+---
+Model::CA:
+  #DNS of the webserver
+  dns_webserver: www.camelpki.com
+  #Where certificates for the CA are stored
+  db_dir: /home/grm/App-CamelPKI/var/
+  #Size of the encryption key for the CA
+  keysize: 2048
+Model::WebServer:
+  #Location of Apache's files
+  home_dir: /home/grm/App-CamelPKI/var/
+  #Port to use with Apache webserver
+  https_port: 3443
+Controller::CA::Template::Base:
+  #Key sizes for generated certificates
+  keysize: 2048

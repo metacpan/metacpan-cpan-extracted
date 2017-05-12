@@ -1,0 +1,52 @@
+Auth-Yubikey_Decrypter
+
+The Yubikey Decrypter can be used to decrypt the AES encrypted output
+generated from the one time password USB generator from Yubico.
+
+You need to have the AES key to perform the decryption.  You can obtain
+it by contacting Yubico, or by seeding your own AES key to the Yubikey.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Auth::Yubikey_Decrypter
+
+You can also look for information at:
+
+    Yubico
+        http://www.yubico.com
+
+    massyn.net
+        http://www.massyn.net
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Auth-Yubikey_Decrypter
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Auth-Yubikey_Decrypter
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Auth-Yubikey_Decrypter
+
+    Search CPAN
+        http://search.cpan.org/dist/Auth-Yubikey_Decrypter
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Phil Massyn
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

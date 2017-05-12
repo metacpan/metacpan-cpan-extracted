@@ -1,0 +1,303 @@
+Revision history for Algorithm-QuineMcCluskey
+
+0.16
+     2017-02-27
+	- The test in 24-solve.t, "A problem with sixteen possible covers",
+	  had typos in four of its covers, all involving the term that
+	  should have been BC'D' (the D variable was missing its complement
+	  symbol).
+
+0.15
+     2017-01-31
+	- Stupidly didn't upgrade the version number in QuineMcCluskey.pm.
+	- Fix tests in 24-solve.t and 27-solve.t that had a typo in their
+	  solution sets.
+0.14
+     2017-01-19
+	- Had set the weed-out-expensive-solutions cost at the start of
+	  the loop at 2**width, wrongly thinking that that would be the
+	  maximum cost. Found a couple cases where that's not true,
+	  making solve() return them as "()". Put those cases in a new
+	  test file 27-solve.t.
+	- Changed the weeding-out code to use an actual cost from the
+	  covers array for the starting value.
+0.13
+     2017-01-5
+	- The special cases where all entries are covered (i.e., all 1s or
+	  all 0s in the truth table) causes a cover of all dc characters,
+	  which returns "()" for solve(). That's a little unhelpful, so
+	  check for that and return either a "(1)" or "(0)".
+0.12
+     2016-10-8
+	- In BUILD, limit 'vars' to the number of variables actually needed.
+	- With that change, remove array slice of 'vars' in other parts of
+	  the code.
+	- Add an 'order_by' attribute (undocumented for now) for use in
+	  to_boolean().
+	- Removed an unnecessary loop in to_boolean().
+	- Corrected the sorting in the get_covers() example.
+	- Update comments and Smart Comments.
+
+0.11
+     2016-8-25
+	- Add method all_solutions(). Update the POD concerning using
+	  get_covers() to refer to all_solutions().
+0.10
+     2016-7-20
+	- Check to see if the terms (minterms, maxterms, or
+	  dont-cares) are larger than 'width' in bit size.
+	  It's possible I made that mistake myself recently.
+	- And although it's not an error, run the terms through
+	  sort and uniq before converting to bitstrings. It
+	  makes visual inspection of the debug output easier.
+0.09
+     2016-6-27
+	- Found a case where don't-care terms with no covers
+	  were nonetheless included with the prime implicants.
+	  Fixed by changing a map{}-everything-will-work into
+	  a loop with an if statement to check for that.
+	- New test file 25-solve.t (Rock Paper Scissors) that
+	  covers the above problem.
+	- Streamlined the bit term functions, and added some
+	  more 'smart' comments to show the bit terms.
+	- Added a release_status key to the Build.PL hash.
+0.08
+     2016-4-21
+	- Changed a "sum map" to a "scalar grep" in countels(),
+	  and inlined the diffposes() code in hdist() and diffpos().
+	  This let us eliminate the last cases of calling sum().
+	- These changes, along with using the any() function from
+	  List::MoreUtils instead of List::Util, mean that we don't
+	  need to load List::Util anymore.
+	- Edited Build.PL add 'provides' and 'add-to-cleanup' keys;
+	  bumped the min version requirement of List::MoreUtils to 0.401;
+	  Removed List::Util and bumped the dist version.
+	- Module now at version 0.08.
+0.07
+     2015-8-14
+	- List::MoreUtils wasn't in the list of required modules
+	  in Build.PL. Added it.
+	- The description of get_covers() in the documentation
+	  wasn't enough. Extended the example.
+	- Bump the version to 0.07.
+0.06
+     2015-8-1
+	- The changes of 2015-5-30 mean that the check for an empty
+	  array in row_dominance() isn't needed anymore.
+	- Use a simple join() in uniqel() instead of Data::Dumper.
+	- Remove Data::Dumper from 'requires' key in Build.PL.
+	- Bumped Version everywhere to 0.06; up to CPAN.
+0.05
+     2015-7-29
+	- Documented methods get_primes(), get_essentials(), and
+	  get_covers().
+	- Changed attribute essentials from HashRef to ArrayRef.
+	  It makes get_essentials() a bit more useful.
+	- Renamed tableform() function to chart().
+	- Updated README to current status of the API.
+	- Version 0.05 now, and up to CPAN.
+0.04
+     2015-6-13
+	- The build-and-break-a-columnstring mechanism for making
+	  complements and duals of the object was clear but involved
+	  using extra memory, potentially a lot. Removed that and
+	  use the get_complement() function of List::Compare::Functional
+	  instead.
+	- I hadn't listed namespace::autoclean in the dependency list
+	  in Build.PL, and I am hearing about it from the testers.
+	- Similarly, some testers have a List::Utils module that's older
+	  than October 2013, when any() was introduced. Specified version
+	  1.35 in Build.PL to be safe.
+	- Bump everthing's version up to 0.04. Up to CPAN.
+0.03
+     2015-6-12
+	- The minimum perl required was 5.10.1, but the module
+	  was using the /r modifier on the tr// operator, which
+	  doesn't appear until 5.14. Oops. Changed the string
+	  assignment order in dual() and complement().
+	- Version goes to 0.03, and up to CPAN.
+0.02
+     2015-6-11
+	- Realized that the maskmatcher regex could be changed to
+	  not require the don't-care character, which means it doesn't
+	  need to be in the parameter list of maskmatcher(),
+	  purge_elements(), or remels().
+	- Renamed maskmatcher() maskedmatch(), because the grammar
+	  was bugging me.
+	- With that, Version 0.02 is ready for CPAN.
+     2015-6-3
+	- Util.pm now has an %EXPORT_TAGS.
+	- Change the covers attribute to contain all of the minimal
+	  covers, not just the one that happens to be in the zeroth
+	  position in the covers array.
+	- Change solve() to return a scalar.
+	- With solve() now returning a scalar, change tests to look
+	  for an answer in a set of possible answers (some terms sets
+	  can be covered by more than one equation.)
+     2015-5-30
+	- Make remels() remove the hash key if the array ref is empty.
+	- Change columns() to not auto-create empty keys.
+     2015-4-18
+	- Made the primes attribute "lazy", so that one can look
+	  up prime implicants without going through the solving
+	  process.
+     2015-4-15
+	- Replace row_dom() and col_dom() with row_dominance()
+	  in Util.pm. When they were changed to returning keys
+	  instead of deleting from the hash immediately, they
+	  became essentially the same function, just called
+	  with different parameters.
+     2015-3-27
+	- Changed row_dom() and col_dom() to return the rows/cols
+	  to remove, instead of removing them inside.
+	- Changed row_dom() and col_dom() from methods to functions,
+	  and moved the code to Util.pm
+     2015-3-6
+	- Method find_essentials() is essentially a single-term search
+	  through the hash of arrays. Changed it from a method to a
+	  function and moved it to Util.pm.
+	- Found an error in remels(), which was only removing one
+	  matched array element instead of all matched elements.
+     2015-1-26
+	- Changed argument list to purge_essentials(). Had been
+	  taking an esssentials hash, but since it was only using the
+	  keys of the hash, we only need to pass those.
+	- In purge_essentials() change the order of deletion. The
+	  primes hash "rows" (hash entries) are removed first,
+	  *before* going through the hash to look for the "column"
+	  in the array ref. Shortens the search for the "column".
+	- The argument list change lets me use purge_essentials()
+	  later in recurse_solve(), replacing a remels()/delete
+	  pair of lines.
+	- Renamed purge_essentials() to purge_elements(), since
+	  the above change means we're not just purging essentials
+	  now.
+     2015-1-18
+	- Removed sortterms attribute -- always sort.
+	- Simplified covers loop (helped by removing sortterms).
+	- Moved a constant calculation of the %reduced hash out
+	  a loop.
+     2015-1-16
+	- New function tableformat() (current name, at least) to show
+	  primes hash in the table form used in textbook Quine-McCluskey
+	  descriptions. Should help users understand what's going on,
+	  and help in debugging too.
+	- New module to contain tableforms() (and future functions),
+	  named it Algorithm::QuineMcCluskey::Format.
+	- Do-while using is_LequivalentR() was supposed to be comparing
+	  hash keys, but a 'keys' had been left off on one side.
+	  Fixing that saves at least one loop.
+	- Avoid calling recurse_solve() if the reduced primes hash is
+	  empty.
+     2015-1-6
+	- Added new object-creating methods dual() and complement().
+	- Added tests for the new methods.
+     2015-1-1
+	- No default parameters for find_essentials(). The primes
+	  hash must be passed in, while the binary-formatted terms
+	  are collectd from the object.
+	- Found spots in QM.pm and Util.pm where a "sum map {}"
+	  construct can be replaced with "any {}", which has the
+	  advantage of early break out of the loop on a match.
+     2014-12-3
+	- The weight count in find_primes() and the cost count in
+	  recursive_solve() were using sum of a map block using
+	  split. A match in list context is much simpler, changed
+	  them to that (and put the function for it in Util.pm).
+     2014-11-27
+	- Add \Q and \E around don't-care character in maskmatcher()
+	  substitution code in case someone chose a substitution
+	  metacharacter as their don't-care character.
+     2014-11-26
+	- Was looping around remel() for each arrayref in the hash.
+	  Now just pass the hash in directly (this necessitated
+	  changing one of the outer loops in purge_essentials,
+	  and remel() becomes remels()).
+     2014-11-13
+	- The test with don't-care terms randomly fails two thirds
+	  of the time. Separate it into its own file, and add
+	  debugging statements.
+
+     2014-11-4
+	- Extended the object test to consider minterms, maxterms,
+	  and columnstrings methods of creation.
+	- deAlias considered finished and merged into the master
+	  branch.
+     2014-10-31
+	- Added columnstring attribute, and wrote bitstring code
+	  for setting and getting it.
+	- Changed minterms, maxterms, and dontcares back to
+	  'rw', allowing the columnstring attribute to set them.
+     2014-10-28
+	- Changed to_boolean() to take an argument list instead of
+	  automatically using the covers attribute internally. This
+	  will allow the user (or the test files) to check terms before
+	  or during minimization.
+	- Separated out the var-by-var code from to_boolean(). Now it
+	  calls a new method to_boolean_term() for each individual term
+	  in the covers (or other) list, for easier output manipulation.
+     2014-09-28
+	- The 'covers' attribute gets changed from ArrayRef[Int] to
+	  ArrayRef[Str].
+     2014-09-21
+	- Added namespace::autoclean as recommended in the Moose Best
+	  Practices manual.
+	- Changed the all the "terms" attributes to 'ro'.
+     2014-09-19
+	- For internal clarity, renamed allterms() to all_bit_terms(),
+	  and minmax_terms() to minmax_bit_terms().
+	- Methods maskmatch() and maskmatches() now combined into a single
+	  method (one called the other, but there was no reason for the
+	  separate internal function, and it saved re-creating
+	  utility variables over and over).
+	- Check if there's an overlap between the don't-care list and
+	  the min or max term list, and call it an error if there is.
+	- Attributes actually check their type now (thanks Moose) so
+	  the qw operators around the term lists are now removed in
+	  the documentation and in the test files.
+     2014-08-20
+	- No more default arguments (in the form of $self->get_primes())
+	  for row_dom(), col_dom(), and purge_essentials(). Always
+	  pass in the argument -- it's less confusing that way.
+	- Trim Util.pm of tobits() -- it's embedded in BUILD now.
+     2014-08-19
+	- More work in find_primes(). An array slice in a hash isn't
+	  working as originally coded (I seem to recall the rules
+	  changing some time ago). Changed it to two statements for
+	  now.
+     2014-07-07
+	- After looking over the labeling in the run.t file, added
+	  a new attribute, "title". We can now say what the A::QMcC
+	  object actually represents.
+	- Broke up run.t into separate test files. The original
+	  file was compact and in theory easy to add to, but I was
+	  having trouble figuring out what was causing my Moose
+	  errors. Plus, there were too many eval calls in the code.
+	- The original code changed the minterms, maxterms, and
+	  dontcares attributes from the passed-in list of decimal
+	  into bitstrings, and saved them back in the attributes.
+	  We can't do that now, because Moose has set those fields
+	  typed as 'ArrarRef[Int]'.
+	  So, set up three new fields that represent the three fields
+	  in their bitstring form: min_bits, max_bits, and dc_bits.
+     2014-04-30
+	- Moosified ("has" declarations) the attributes.
+	- Achieved a compile-error-free version using Moose instead
+	  of Alias. Now to make it runtime-error-free.
+	- As part of the compilation process, moved from a Makefile.PL
+	  base (which was creating errors of its own) to Build.PL,
+	  which Just Works.
+	- Turned attributes boolean, imp, and bits into a local
+	  variables as they were only used in single functions.
+	- Defined and made use of predicate functions for attributes
+	  minterms, maxterms, and dontcares. Simplifies some sanity
+	  checks.
+	- Added methods allterms() and minmax_terms() to simplify
+	  coding.
+	- List::MoreUtils isn't actually being used in A::QMcC (it is
+	  used in A::QMcC::Util though).
+
+0.01	2006-06-24T21:32-0500
+		First version, released on an unsuspecting world. Supports
+		single-output problems only.
+

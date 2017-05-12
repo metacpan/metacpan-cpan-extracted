@@ -1,0 +1,28 @@
+Revision history for App-Scaffolder-Puppet
+
+0.002001  2015-02-28 14:35:04 Europe/Zurich
+
+ - Fix tests on Windows
+
+0.002000  2015-02-26 20:59:30 Europe/Zurich
+
+ - Add 'ensure' parameter to 'package' and 'service' templates
+ - Add --package option to provide package name, use package name where it
+   seems reasonable in existing templates
+ - Add 'puppetclass' command to create single or related classes which don't
+   constitute a complete Puppet module
+ - Add 'subpackage' template which can be used with the 'puppetclass' command
+ - Enhance some methods to better support the new 'subpackage' template
+ - Change template search path to include the command name (so if templates
+   were put in eg. /etc/puppet/scaffolder_templates, they will have to be moved
+   to /etc/puppet/scaffolder_templates/{puppetmodule,puppetclass} now)
+
+0.001001  2014-02-01 16:54:57 Europe/Zurich
+
+ - Add --quiet option in test to avoid output
+ - Make tests more robust on platforms that don't necessarily use '/' as
+   directory/file separator
+
+0.001000  2014-01-18 16:25:52 Europe/Zurich
+
+ - Initial release

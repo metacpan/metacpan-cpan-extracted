@@ -1,0 +1,5 @@
+DESCRIPTION
+
+    This distribution is created for testing crypt() support on various
+    platforms. See the test suite.
+

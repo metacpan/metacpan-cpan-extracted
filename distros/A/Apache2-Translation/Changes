@@ -1,0 +1,112 @@
+Revision history for Perl extension Apache2::Translation.
+
+0.34  Sat May 14 17:36:20 CEST 2011
+	- AT::BDB: typo corrected
+        - t/003provider-BDB.t: $prov->timestamp($val) was called without
+          a transaction (failed with BerkeleyDB 4.3)
+
+0.33  Fri May  6 17:08:26 CEST 2011
+	- :withtestmore ==> -withtestmore, see Apache::Test
+        - test bug: success depended on the test order
+
+0.32  Fri Nov 27 12:51:47 CET 2009
+	- pass options to diff() and sdiff() provider methods as KEY,VALUE
+	  pairs
+	- "notes" and "numbers" options to diff() and sdiff()
+	- diffprov script
+
+0.31  Wed Nov 25 14:04:44 CET 2009
+	- do not require YAML anymore in Makefile.PL
+	- diff() and sdiff() provider methods implemented in _base.pm
+	- cpprov script
+
+0.30  Sat Nov 14 16:17:55 CET 2009
+	- SERVER_MERGE
+
+0.28  Mon Aug 24 19:18:53 CEST 2009
+        - MMapDB provider documentation
+
+0.27  Sat Jul  4 16:38:41 CEST 2009
+	- MMapDB provider
+
+0.26  Tue Sep 30 14:50:31 CEST 2008
+	- $ctx revived as pointer to \%CTX for compatibility
+
+0.25  Sat Aug  2 17:08:13 CEST 2008
+	- small bugfixes in the test suite
+
+0.24  Sat Apr  5 20:02:03 CEST 2008
+	- silenced a warning in BDB
+	- logger now server related instead of request related
+	- $ctx is gone. $STATE and $RC are now simple variables,
+	  $MATCHED_PATH_INFO, $MATCHED_URI, $KEY members of
+	  $r->notes.
+	- new %CTX hash.
+
+0.23  Wed Mar 26 17:56:03 CET 2008
+	- ServerRoot passed to provider as Root-parameter
+	- File and BDB provider accepts Root-Parameter
+	- environment variable expansion in provider spec
+
+0.22  Mon Mar 17 17:49:54 CET 2008
+	- $SIG{__WARN__} handler
+	- some additional images that were forgot to include in 0.21
+	- include an additional menu if configured
+
+0.21  Thu Feb 28 14:55:20 CET 2008
+	- The Doc action now adds a Content-Length header
+	- :LOOKUPFILE: state like :PREPROC:, call handler also in MapToStorage
+
+0.20  Sun Feb 17 16:30:08 CET 2008
+	- better admin interface
+	- Doc action
+
+0.19  Sat Jan 12 17:54:18 CET 2008
+	- File provider can now read from a filehandle, e.g. \*DATA
+	- bugfix, see t/012recursion.t
+	- stress test & deadlock detection in BDB provider
+
+0.18  Thu Nov 29 20:03:15 CET 2007
+	- new DB provider parameter "dbinit": contains an DB-specific
+          SQL statement that is issued to the database immediately after
+	  connecting to it. Can be used to submit session settings.
+        - BDB provider
+	- added clear() and append() methods to providers.
+
+0.17  Sun Jul 22 17:16:39 CEST 2007
+	- removed "use YAML" from Apache2::Translation to save memory where it
+	  is not used.
+	- moved Apache2::Translation::Config into a separate module.
+	- Fixup action
+
+0.16  Wed Apr 18 09:50:46 CEST 2007
+	- Bugfix: handle_eval() was called in the response phase but the global
+	  $r was not set up.
+	- PerlScript and CGIScript actions with parameter.
+
+0.15  Tue Apr 17 15:18:49 CEST 2007
+	- "notes" field added
+	- dump/restore provider methods added
+
+0.14  Wed Apr 11 15:45:38 CEST 2007
+	- Bugfix: Redirect now works if $r is the result of and ErrorDocument
+	- Bugfix: Redirect now returns RFC conforming Location headers
+	- Call action now accepts parameters and stores them in @ARGV
+
+0.13  Tue Mar 20 10:24:57 CET 2007
+	- Bugfix: Perlhandler: sub {...} with worker mpm
+	- case-insensitive provider spec keys
+	- PerlHandler action now pays attention to the method attribute of a
+	  handler
+
+0.12  Wed Mar 14 14:00:38 CET 2007
+	- Admin interface
+	- File provider
+	- worker MPM
+
+0.08  Tue Mar  7 21:49:50 CET 2006
+	- initial public version
+
+0.01  Mon Dec 12 16:36:09 2005
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.8.0 -n Apache2::Translation -XS

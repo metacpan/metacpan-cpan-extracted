@@ -1,0 +1,60 @@
+{
+   "abstract" : "We are Icelandic CPAN authors",
+   "author" : [
+      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-CPANAuthors-Icelandic",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "utils"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::CPANAuthors" : 0,
+            "Acme::CPANAuthors::Register" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Acme-CPANAuthors-Icelandic@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANAuthors-Icelandic"
+      },
+      "homepage" : "http://search.cpan.org/dist/Acme-CPANAuthors-Icelandic/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hinrik/acme-cpanauthors-icelandic.git",
+         "web" : "http://github.com/hinrik/acme-cpanauthors-icelandic"
+      }
+   },
+   "version" : "0.04",
+   "x_authority" : "cpan:HINRIK"
+}
+

@@ -1,0 +1,60 @@
+=pod
+
+=begin html
+
+<a href="https://travis-ci.org/ivanwills/App-TemplateCMD?branch=master"><img src="https://travis-ci.org/ivanwills/App-TemplateCMD.png?branch=master" alt="App-TemplateCMD"></a>
+<a href="https://coveralls.io/r/ivanwills/App-TemplateCMD?branch=master"><img src="https://coveralls.io/repos/ivanwills/App-TemplateCMD/badge.svg?branch=master" alt="Coverage Status" /></a>
+
+=end html
+
+=head1 App-TemplateCMD
+
+This module provides a tools to use Template Toolkit from the command line.
+It installs the program templatecmd which provides an interface to the
+App::TemplateCMD modules.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    templatecmd --help
+    perldoc App::TemplateCMD
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-TemplateCMD
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-TemplateCMD
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-TemplateCMD
+
+    Search CPAN
+        http://search.cpan.org/dist/App-TemplateCMD/
+
+    Source Code
+        git://github.com/ivanwills/App-TemplateCMD.git
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

@@ -1,0 +1,7 @@
+This example includes a more complex service example.
+
+The service is just a subclass of App::Standby::Service::HTTP and
+sends the whole queue. It also provides a cronjob which calls the
+service once a day to keep your endpoint up to date.
+
+The endpoint examines the request and updates your complex service.

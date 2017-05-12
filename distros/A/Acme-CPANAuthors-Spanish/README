@@ -1,0 +1,41 @@
+Acme-CPANAuthors-Spanish
+
+List of Spanish CPAN authors.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Acme::CPANAuthors::Spanish
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-CPANAuthors-Spanish
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Acme-CPANAuthors-Spanish
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Acme-CPANAuthors-Spanish
+
+    Search CPAN
+        http://search.cpan.org/dist/Acme-CPANAuthors-Spanish/
+
+	Github, clone from:
+		git://github.com/salva/p5-Acme-CPANAuthors-Spanish.git
+		
+COPYRIGHT AND LICENCE
+
+This module is in the public domain.
+

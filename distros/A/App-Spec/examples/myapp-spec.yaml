@@ -1,0 +1,152 @@
+---
+name: myapp
+appspec: { "version": 0.001 }
+class: App::Spec::Example::MyApp
+title: My Very Cool App
+abstract: This app can do very cool things
+description: |
+  This is a very useful description for myapp.
+  This is a very useful description for myapp.
+  This is a very useful description for myapp.
+  This is a very useful description for myapp.
+options:
+  -
+    name: verbose
+    summary: be verbose
+    type: flag
+    multiple: true
+    aliases: ["v"]
+
+subcommands:
+  cook:
+    summary: Cook something
+    op: cook
+    parameters:
+      -
+        name: drink
+        summary: What to drink
+        required: true
+        type: string
+        enum: ["tea", "coffee"]
+    options:
+      -
+        name: with
+        summary: Drink with ...
+        type: string
+        enum: ["almond milk", "soy milk", "oat milk", "spelt milk", "cow milk"]
+      -
+        name: sugar
+        type: flag
+        aliases: ["s"]
+        summary: add sugar
+
+  weather:
+    summary: Weather
+    subcommands:
+      show:
+        summary: Show Weather forecast
+        op: weather
+        options:
+          - name: temperature
+            summary: show temperature
+            aliases: [T]
+            type: flag
+          - name: celsius
+            summary: show temperature in celsius
+            aliases: [C]
+            type: flag
+          - name: fahrenheit
+            summary: show temperature in fahrenheit
+            aliases: [F]
+            type: flag
+        parameters:
+          - name: country
+            required: true
+            summary: Specify country
+            values:
+              op: weather_complete
+            completion:
+              op: weather_complete
+          - name: city
+            required: true
+            multiple: true
+            summary: Specify city or cities
+            values:
+              op: weather_complete
+            completion:
+              op: weather_complete
+      countries:
+        summary: show list of countries
+        op: countries
+      cities:
+        summary: show list of cities
+        op: cities
+        options:
+          - name: country
+            aliases: ["c"]
+            multiple: true
+            summary: country name(s)
+            completion:
+              command:
+                - replace: SELF
+                - weather
+                - countries
+
+  palindrome:
+    summary: Check if a string is a palindrome
+    op: palindrome
+    parameters:
+    - name: string
+      required: true
+      completion:
+        command_string: |
+          cat /usr/share/dict/words | perl -nle'print if $_ eq reverse $_'
+
+  convert:
+    summary: Various unit conversions
+    op: convert
+    parameters:
+    - name: type
+      summary: The type of unit to convert
+      type: string
+      required: true
+      values:
+        op: convert_complete
+      completion: true
+    - name: source
+      summary: The source unit to convert from
+      type: string
+      required: true
+      values:
+        op: convert_complete
+      completion: true
+    - name: value
+      summary: The value to convert
+      required: true
+      type: integer
+    - name: target
+      summary: The target unit
+      type: string
+      required: true
+      multiple: true
+      unique: true
+      values:
+        op: convert_complete
+      completion: true
+
+  config:
+    summary: configuration
+    op: config
+    options:
+    - name: set
+      summary: key=value pair(s)
+      multiple: true
+      mapping: true
+      values:
+        mapping:
+          color: [auto, never, always]
+          push.default: [current, matching, nothing, simple, upstream]
+          name: null
+          email: null
+
+# vim:et:sts=2:sws=2:sw=2:foldmethod=indent

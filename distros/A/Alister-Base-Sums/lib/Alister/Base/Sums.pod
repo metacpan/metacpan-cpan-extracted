@@ -1,0 +1,172 @@
+=pod
+
+=head1 NAME
+
+Alister::Base::Sums - subroutines for managing a sum disgest database table
+
+=head1 DESCRIPTION
+
+I have a package Alister and a package Zack, they both need to track metadata with a 'sum' as main 
+identifier (of the main data of interest).
+
+This is a stand-alone module which lets you:
+
+   -Create and manage a 'sums' table in a database to track a collection of unique sum digests.
+   -It is by itself not OO, but meant to be perhaps used to implement this in OO fashion.
+
+This package does not include features on interacting with the filesystem, this is out of scope.
+For good reasons. To isolate the problems.
+This package was part of Alister. But Alister is complicated, potentially. I hope to isolate some probems here.
+
+(The goal here is to isolate the tracking of sums.
+This stores a sum, retrieves it, etc to a db table.
+
+This is used by Alister, and could be used by Zack.
+And other programs storing info against md5sums in general. )
+
+=head1 SUBS
+
+None are exported by default.
+
+=head2 validate_argument_sum()
+
+Argument is a 'sum'. 
+Returns same argument. 
+Dies if argumement is missing.
+If not real sum, returns undef.
+
+
+=head2 validate_argument_id()
+
+Argument is a 'id', returns same argument or undef if not a id. 
+A id is a number such as in the table.
+
+=head2 sum_add()
+
+First argument is 'dbh'.
+Second argument is 'sum'.
+Returns id.
+
+Warns and returns undef on failure.
+
+If you do not pass any argument as sum, will throw an exception.
+
+sum_add() is designed so you can it multiple times for same sum, and will return same id.
+It does not guarantee that the sum was not already in there.
+
+
+
+=head2 sum_get()
+
+First argument is 'dbh'.
+Second argument is either 'sum' or 'id'. If argument is sum, returns id, if is id, returns sum.
+On fail, returns undef.
+
+If you do not pass any argument as dbh and sum, will throw an exception.
+
+   sum_get($dbh, 5);
+   sum_get($dbh, '4446d445d6fc77b0b8d12e5e0e5da6f5');
+
+If the sum is not there, returns 
+
+=head2 sum_delete()
+
+First argument is dbh.
+Second argument is either a sum or a sum id.
+Returns how many were deleted. (should be one or 0)
+
+=head2 sum_update()
+
+First argument is dbh.
+Second argument is either a sum or a sum id.
+Returns true or false.
+
+If this returns true, it's because you tried to update to a sum that already exists elsewhere.
+
+   unless( sum_update( $dbh, $oldsum, $newsum ) ){
+      # already there?
+      my $id = sum_get($newsum);
+      warn("Already exists with id $newsum.");
+      
+      # maybe delete old one?
+      sum_delete( $dbh, $oldsum );
+   }
+
+It seems that if the sum is already there, it should update in some way anyways, but this is out of scope here.
+
+
+=head2 table_create_sums()
+
+Argument is dbh. Table must not already exist.
+
+=head2 table_reset_sums()
+
+Argument is dbh.
+If table exists, drops before creating.
+
+
+=head2 $Alister::Base::Sums::TABLE_NAME
+
+By default, 'sums'.
+
+=head2 $Alister::Base::Sums::SQL_LAYOUT
+
+Holds table layout.
+By default:
+
+   CREATE TABLE $TABLE_NAME (
+      id int(20) AUTO_INCREMENT PRIMARY KEY,
+      sum varchar(32) NOT NULL UNIQUE 
+   );
+   
+
+Obviously if you chose to override validate_sum() for use with some other digest algorythm, 
+this needs to be altered.
+
+
+=head1 TERMINOLOGY
+
+=over 4
+
+=item sum
+
+A sum is a string 32 characters long. The characters can be 0-9 and a-f.
+
+=item sum_id
+
+This is the id in the sums table
+
+=item dbh
+
+This is a DBI object. The creation of this object is out of scope here.
+
+=item sums
+
+This is the default name of the sums table.
+
+=back
+
+
+
+
+=pod
+
+=head1 CAVEATS
+
+This module is in development. Not ready as API.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut

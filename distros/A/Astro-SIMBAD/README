@@ -1,0 +1,84 @@
+Astro::SIMBAD modules
+---------------------  
+
+What is it?
+-----------
+
+The Astro::SIMBAD module is an objected orientated Perl interface to the
+SIMBAD astronomical database. SIMBAD provides basic data, cross-identifications
+and bibliography for astronomical objects outside the solar system.
+
+I'd like to point anyone interested in the Astro::SIMBAD module towards the 
+Astro::Catalog module, which does most of what Astro::SIMBAD does, and a
+whole lot more. It may be more suitable for your needs.
+
+Why do it?
+----------
+
+Due to the requirements of the eSTAR project for which this module was
+written I needed a modern object-orientated interface I could use for
+data mining SIMBAD. This module was the result.
+
+Requirements
+------------
+
+The module requires the libwww-perl-5.60 package written by Gisle Aas
+<gisle@ActiveState.com> v5.53 or above. This package can be obtained
+via CPAN at http://search.cpan.org/search?dist=libwww-perl
+
+Also required is the Net::Domain module, v2.13 or above, by Graham
+Barr <gbarr@pobox.com>. This module has been included in the base
+distribution since Perl 5.7.2, but otherwise can be downloaded from
+CPAN as part of the libnet package, see
+http://search.cpan.org/search?dist=libnet
+
+Provides
+--------
+
+The package provides the following classes
+
+    Astro::SIMBAD::Query
+    Astro::SIMBAD::Result
+    Astro::SIMBAD::Result::Object
+    
+Where can I get it?
+-------------------
+
+The package is availabe from CPAN <http://www.cpan.org/> and from
+http://www.astro.ex.ac.uk/people/aa/pages/computing/estar.html
+
+Installation
+------------
+
+Installation is automated using the ExtUtils::MakeMaker library
+
+     % perl Makefile.PL
+     % make
+     % make test
+     % make install
+
+Authors
+-------
+
+This module was written by Alasdair Allan <aa@astro.ex.ac.uk>, of the 
+University of Exeter Astrophysics Group (http://www.astro.ex.ac.uk/) 
+as part of his work for the eSTAR project.
+
+As of release V2..0 the module includes patches written by Mark Echeverri
+<echever@ipac.caltech.edu> to support object-type queries in addition
+to "list"-type queries.
+
+License
+-------
+This package is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA

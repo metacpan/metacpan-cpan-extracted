@@ -1,0 +1,16 @@
+Revision history for Alien-Base-Wrapper
+
+0.04      2017-04-04 15:40:13 -0400
+  - Fix bug related to multiple aliens
+  - Add mm_args method
+  - Add mb_args method
+
+0.03      2017-03-21 15:26:28 -0400
+  - Sorry, more documentation changes only.
+    The previous version was still pretty terrible!
+
+0.02      2017-03-21 15:11:32 -0400
+  - Documentation only changes
+
+0.01      2017-03-21 15:10:19 -0400
+  - initial version

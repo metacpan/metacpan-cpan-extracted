@@ -1,0 +1,18 @@
+Revision history for Perl extension Apache::AuthenProgram.
+
+0.93  Tue Sep 21 10:21:57 2004
+    - Updated Program.pm, Makefile.PL, Program.pm, and
+      README with new email address and company name.
+
+0.92  Wed Mar 26 21:17:50 2003
+	- Updated PREREQ in Makefile.PL for Apache::Constants.
+    - Added DESIGN NOTES to POD on speed vs. flexibility.
+
+0.91  Fri Nov  8 13:38:17 2002
+	- Apache::AuthenProgram -> Apache::Authen::Program.
+	- Used h2xs for CPAN modlist-compatible Makefile.PL.
+
+0.90  Mon Oct  7 10:07:00 2002
+        - Prepared for CPAN upload.
+      Thu Sep 26 07:18:00 2002
+        - Adapted from from Apache::AuthenSmb module.

@@ -1,0 +1,25 @@
+---
+abstract: 'prompt string setting tool'
+author:
+  - 'Matthew Astley <mca1001@users.sourceforge.net>'
+build_requires:
+  Test::More: 0
+  Time::HiRes: 1.9724
+  YAML: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-psst
+requires:
+  local::lib: 1.008
+  perl: 5.008
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-psst
+  homepage: https://github.com/mca-wtsi/psst
+  repository: git://github.com/mca-wtsi/psst
+version: 0.09

@@ -1,0 +1,156 @@
+<HTML>
+<HEAD>
+<TITLE>Apache::Wombat - embed Wombat within an Apache/mod_perl server</TITLE>
+<LINK REL="stylesheet" HREF="../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Apache::Wombat - embed Wombat within an Apache/mod_perl server</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  # the following, or something equivalent, goes in httpd.conf or a
+  # PerlRequire'd script. any of the standard configuration techniques
+  # for mod_perl are acceptable.</PRE>
+<PRE>
+  # create an Apache::Wombat instance, telling it where to find its
+  # home directory and deployment descriptor
+  &lt;Perl&gt;
+  unless ($Apache::Server::Starting) {
+     require Apache::Wombat;
+     my $home = '/usr/local/apache';
+     my $config = '/usr/local/apache/conf/server.xml';
+     $Apache::Wombat = Apache::Wombat-&gt;new($home, $config);
+  }
+  &lt;/Perl&gt;</PRE>
+<PRE>
+  # configure Apache to use Wombat for servlets only, and the default
+  # handler for all static content, and to deny access to
+  # webapp-private resources.
+  Alias /wombat-examples /usr/local/apache/webapps/examples
+  &lt;Location /wombat-examples&gt;
+    Options Indexes
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  &lt;/Location&gt;
+  &lt;Location /wombat-examples/servlet&gt;
+    SetHandler perl-script
+    PerlHandler $Apache::Wombat-&gt;handler
+    &lt;IfDefine SSL&gt;
+      SSLOptions +StdEnvVars
+    &lt;/IfDefine&gt;
+  &lt;/Location&gt;
+  IndexIgnore WEB-INF META-INF
+  &lt;LocationMatch (WEB|META)-INF&gt;
+    deny from all
+  &lt;/LocationMatch&gt;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This class embeds a Wombat servlet engine within an Apache/mod_perl
+server and enables it to act as an Apache request handler during the
+content handling phase.</P>
+<P>Typically an instance of <STRONG>Apache::Wombat</STRONG> is created at server
+startup time and configured as a method handler for requests that
+should be served by Wombat.</P>
+<P>In order to use this class, mod_perl must be built with
+<CODE>PERL_METHOD_HANDLERS</CODE> enabled.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new($home, $configFile)</A></STRONG><BR>
+<DD>
+Create and return an instance.
+<P>A couple of assumptions are made with regard to the Wombat server's
+configuration:</P>
+<OL>
+<LI>
+Exactly one Service is configured, with exactly one Engine and one or
+more Hosts beneath it. If more than one service is configured, only
+the first will be used. If the Service or Engine are not configured,
+the constructor will die.
+<P></P>
+<LI>
+At most one standard Connector (<STRONG>Apache::Wombat::Connector</STRONG>) and one
+secure Connector are configured. Any further Connectors will be
+ignored.
+<P></P></OL>
+<P>Assuming everything goes OK, for each child process, <CODE>await()</CODE> will
+be called on the child's copy of the server during the child init
+phase, and <CODE>stop()</CODE> will be called on it during the child exit
+phase. Note that active sessions are not expired when httpd is
+shutdown (due to some kind of mod_perl bug with registering a server
+cleanup handler). This is <STRONG>NOT</STRONG> a session persistence mechanism and
+should not be relied upon as such.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24home">$home</A></STRONG><BR>
+<DD>
+the path to Wombat's home directory, either absolute or relative
+to the Apache ServerRoot (defaults to the ServerRoot)
+<P></P>
+<DT><STRONG><A NAME="item_%24configFile">$configFile</A></STRONG><BR>
+<DD>
+the path to Wombat's server deployment descriptor, <CODE>server.xml</CODE>,
+either absolute or relative to the home directory (defaults to
+<CODE>$home/conf/server.xml</CODE>)
+<P></P></DL>
+<P>Dies if a configuration problem is encountered or if the server cannot
+be started.</P>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_handler"><CODE>handler($r)</CODE></A></STRONG><BR>
+<DD>
+Delegate request processing to the Wombat server. If <CODE>$ENV{HTTPS}</CODE> is
+set, the request is handed to the configured secure Connector;
+otherwise, the configured standard Connector gets the request.
+<P>Make sure your SSL module sets <CODE>$ENV{HTTPS}</CODE>! With mod_ssl, you can
+do this with <CODE>SSLOptions +StdEnvVars</CODE>.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24r">$r</A></STRONG><BR>
+<DD>
+the <STRONG>Apache</STRONG> request object
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><EM>mod_perl</EM>,
+<EM>Apache</EM>,
+<A HREF="../../api/Wombat/Server.html">the Wombat::Server manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

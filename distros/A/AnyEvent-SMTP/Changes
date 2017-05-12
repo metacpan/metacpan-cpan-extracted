@@ -1,0 +1,45 @@
+Revision history for AnyEvent-SMTP
+
+TODO: More documentation for Server
+TODO: More capabilities for Client
+TODO: Authorization for Client
+TODO: TLS
+
+0.09    2013-02-12
+        * And nobody tells me, that since 6.01 MX resolving became broken ;) Fixed.
+
+0.08    2011-11-21
+        * Add information about remote host/port
+        * Add more complex example to show capabilities of validation
+        * Add ready event to notify when server started
+
+0.07    2011-09-20
+        * #66582 multiple responses to invalid MAIL and RCPT commands.
+        * #66581: typo in smtp command 'help'
+        * #65579: Can't call method "reply" on unblessed reference
+        * #66580: recipient validation
+
+0.06    2009-08-26
+        * Try to cheat with cpants game ;) (At all common::sense is a strict)
+
+0.05    2009-08-13
+        * Add connection limits to Client
+        * Add global vars to inform about activity
+        * More tests
+
+0.04    2009-08-12
+        * Use Impl::Perl in tests
+        * Fix tests
+
+0.03    2009-08-11
+        * Fixes rt.cpan.org #48586 (thanks to Marc Lehmann)
+          - fix "mail from: <addr>" => "mail from:<addr>" 
+          - fix "rcpt to: <addr>" => "rcpt to:<addr>"
+          - replace dependency on AnyEvent::common_sense() with use common::sense;
+        * Fix test for erroneous host
+
+0.02    2009-08-10
+        Fix failed tests
+
+0.01    2009-08-10
+        First version, Beta

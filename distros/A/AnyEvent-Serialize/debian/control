@@ -1,0 +1,23 @@
+Source: libanyevent-serialize-perl
+Section: perl
+Homepage: http://search.cpan.org/~unera/AnyEvent-Serialize/
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+VCS-Browser: http://git.uvw.ru/?p=anyevent-serialize;a=summary
+Build-Depends: debhelper (>= 7), cdbs,
+    libanyevent-perl,
+    libdata-streamdeserializer-perl,
+    libdata-streamserializer-perl,
+    libanyevent-aggressiveidle-perl
+Standards-Version: 3.9.1
+Priority: extra
+
+Package: libanyevent-serialize-perl
+Depends: ${perl:Depends}, ${misc:Depends},
+    libanyevent-perl,
+    libdata-streamdeserializer-perl,
+    libdata-streamserializer-perl,
+    libanyevent-aggressiveidle-perl
+Architecture: all
+Description: serializer and deserializer for AnyEvent
+ The package provides a few non-blocking methods to serialize and
+ deserialize perl object.

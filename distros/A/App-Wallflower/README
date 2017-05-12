@@ -1,0 +1,23 @@
+App-Wallflower
+
+DESCRIPTION
+
+wallflower is a command-line tool to render a Plack application as
+a set of static files.
+
+wallflower is not a "static site generator": it is a tool to write your
+own static file generator using any Perl web framework or even a hand-crafted
+Plack application.
+
+The best way to use it is to actually design your Plack application to
+serve "static" files. Please consult the Wallflower::Tutorial manual page
+for tips on how to write your Plack application to work with wallflower.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2012 Philippe Bruhat (BooK)
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

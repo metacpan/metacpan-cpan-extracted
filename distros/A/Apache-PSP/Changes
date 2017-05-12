@@ -1,0 +1,65 @@
+Revision history for Apache::PSP
+
+0.1  16 Aug 2001
+  - first open source version
+
+0.2  01 Apr 2002
+  - updated PSP namespace to Template:PSP
+
+0.3  03 Apr 2002
+  - first make-able version
+  - removed reliance on File::PathConvert
+  - moved Tags.psp to permanent (?) location
+
+0.31 O4 Apr 2002
+  - removed 5.6.1-dependent code
+  - downgraded requirement to 5.005
+
+0.4  03 Jun 2002
+  - improved Apache::PSP error handling (red text instead of 500)
+  - reformatted Template::PSP to 2-space-indent Perl style
+  - fixed error in HTML comment display (inadvertently removed HTML comments)
+  
+0.5  23 Oct 2002
+  - extended red-text error handling to include page-load errors
+  - Template::PSP now retains all template formatting including whitespace
+  - %QUERY hash is available courtesy of CGI::Minimal and Scott Kiehn
+  - improved recovery from page-load errors by causing interpreter to restart
+    after these errors
+  - Apache::PSP now declares 404 errors when a file is not found (instead 
+    of red text and 200)
+  - minor bug fixes and reformatting
+
+0.6  XX Dec 2002 (not publicly released)
+  - replaced VEP-reliant code with new routines to fill
+    %CGI, %QUERY, and %COOKIE hashes
+    
+0.7  29 Jan 2003
+  - replaced Cwd::abs_path with built-in abs_path for
+    more intuitive includes (thanks again to Scott Kiehn),
+    plus ~/foo.psp shortcut to $ENV{DOCUMENT_ROOT}
+  - fixed error in HEAD processing which resulted in HEAD
+    requests generating a full page
+  - improved recovery from in-page fatal errors by causing interpreter 
+    to restart after these errors
+  - replaced erroneous reference to HTML::TokeParser with HTML::Parser
+
+0.80  29 Jan 2003
+  - updated include tag to use new abs_path
+  - noticed that 0.7 is being treated as "older" than 0.51,
+    which means that 1.0 will have to be just around the corner...
+    
+0.81  03 Feb 2003
+  - updated %COOKIE hash code to handle url-encoded cookies properly
+
+0.82  22 Apr 2003
+  - special non-CGI::Minimal version for Charles Cowdrick
+
+0.91  25 Sep 2003
+  - incorporated site-custom changes into CPAN version
+  - Template::PSP now clears cookies before each request
+
+1.00  19 Mar 2004
+  - <output> and <pspescape> tags handle extra end tags more gracefully
+  - initial support for <autoloop> and autoforms
+  - finally deemed Out Of Beta(tm)

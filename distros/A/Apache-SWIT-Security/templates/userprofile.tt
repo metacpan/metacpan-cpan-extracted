@@ -1,0 +1,33 @@
+<html>
+<body>
+[% form %]
+[% user_id %]
+[% IF error %]
+<h2>[% error %]</h2>
+[% END %]
+User name: [% name %] <br />
+[% IF swit_errors.name == 'defined' %]
+The name cannot be empty
+[% END %]
+
+Old password: [% old_password %] <br />
+[% IF swit_errors.old_password == 'defined' %]
+The password cannot be empty
+[% ELSIF swit_errors.old_password == 'wrong' %]
+Wrong password
+[% END %]
+
+New password: [% new_password %] <br />
+[% IF swit_errors.new_password == 'defined' %]
+New password cannot be empty
+[% ELSIF swit_errors.new_password == 'mismatch' %]
+Passwords do not match
+[% END %]
+New password confirm: [% new_password_confirm %] <br />
+[% IF swit_errors.new_password_confirm == 'defined' %]
+Confirmation password cannot be empty
+[% END %]
+<input type="submit" />
+</form>
+</body>
+</html>

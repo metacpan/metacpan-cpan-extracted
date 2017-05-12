@@ -1,0 +1,26 @@
+Apache::AxKit::Provider::File::Syntax
+
+   A file syntax provider for AxKit
+
+Apache::AxKit::Provider::File::Syntax processes a requested file and,
+instead of outputting it verbatim, it marks the file up as XML
+representing the syntax of the source document.  This is very useful
+for displaying JavaScript, Perl, or other non-XML markup and
+syntax-colorizing it for display on a website.
+
+Installation
+============
+
+If you have all the pre-requisites installed you just run:
+
+ $ perl Makefile.PL
+ $ make test
+ # as superuser
+ $ make install
+
+IMPORTANT NOTE:
+
+This is free software, you may use it and distribute it under the same
+terms as Perl itself.
+
+Copyright (C) 2004 Michael A Nachbaur, All rights reserved.

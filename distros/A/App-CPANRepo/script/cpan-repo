@@ -1,0 +1,21 @@
+#!perl
+use strict;
+use warnings;
+use App::CPANRepo;
+App::CPANRepo->run(@ARGV);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+cpan-repo - resolve repository URL by CPAN::Module::Name
+
+=head1 SYNOPSIS
+
+    % cpan-repo Module::Name [Module::Name2...]
+
+=head1 DESCRIPTION
+
+cpan-repo is a command to resolve repository URL by CPAN module names.

@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/AxKit/Provider/HTML.pm
+t/00basic.t
+t/01str.t
+test.html

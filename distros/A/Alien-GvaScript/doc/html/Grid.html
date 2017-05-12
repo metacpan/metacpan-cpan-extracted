@@ -1,0 +1,756 @@
+<html>
+<head>
+  <script src="../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <link href="GvaScript_doc.css" rel="stylesheet" type="text/css">
+  <script>
+    document.observe('dom:loaded', function() { new GvaScript.TreeNavigator('TN_tree'); });
+    function jumpto_href(event) {
+      var label = event.controller.label(event.target);
+      if (label && label.tagName == "A") {
+        label.focus();
+        return Event.stopNone;
+      }
+    }
+  </script>
+</head>
+<body>
+<div id='TN_tree'>
+  <div class="TN_node">
+   <h1 class="TN_label">Alien::GvaScript::Grid</h1>
+   <div class="TN_content">
+     <p><em>ChoiceList based Grid with Pagination
+</em></p>
+     <div class="TN_node"  onPing="jumpto_href">
+       <h3 class="TN_label">Table of contents</h3>
+       <div class="TN_content">
+         <div class="TN_leaf">
+  <a class="TN_label" href="#NAME">NAME</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#SYNOPSIS">SYNOPSIS</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#DESCRIPTION">DESCRIPTION</a>
+  <div class="TN_content"><div class="TN_node">
+  <a class="TN_label" href="#GvaScript_Grids">GvaScript.Grids</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#GvaScript_Grids_get_id_">GvaScript.Grids.get(id)</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#BEHAVIOUR">BEHAVIOUR</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Grid_Navigation_Behaviour">Grid Navigation Behaviour</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#JSON_Datasource">JSON Datasource</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#CONSTRUCTOR">CONSTRUCTOR</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#id">id</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#url">url</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#options">options</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#PROPERTIES">PROPERTIES</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#grid_container">grid_container</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#toolbar_container">toolbar_container</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#paginatorbar_container">paginatorbar_container</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#actionsbar_container">actionsbar_container</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#METHODS">METHODS</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#clearResult">clearResult</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#clearToolbar">clearToolbar</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#clearActionButtons">clearActionButtons</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#clear">clear</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#addActionButtons">addActionButtons</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#destroy">destroy</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#EVENTS">EVENTS</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#onShow">onShow</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#onHighlight">onHighlight</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#onPing">onPing</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#onCancel">onCancel</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#onEmpty">onEmpty</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#EXAMPLE">EXAMPLE</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#JAVASCRIPT">JAVASCRIPT</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#HTML">HTML</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#CSS">CSS</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#DEPENDENCIES">DEPENDENCIES</a>
+  <div class="TN_content"></div>
+</div>
+
+       </div>
+     </div>
+     <hr/>
+   </div>
+  </div>
+  <div class="TN_node" id="NAME">
+    <h2 class="TN_label">NAME</h2>
+    <div class="TN_content">
+      <p>Alien::GvaScript::Grid - ChoiceList based Grid with Pagination</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="SYNOPSIS">
+    <h2 class="TN_label">SYNOPSIS</h2>
+    <div class="TN_content">
+      <pre>  var my_url  = "/app/path/to/data/list";
+  var grid_id = "my_unique_grid_id";
+  
+  var my_grid = new GvaScript.Grid(grid_id, my_url, {
+        css: 'grid-class-name',
+        grid_container: 'grid_will_display_here',
+        toolbar_container: 'grid_toolbar_will_display_here',
+        dto: {VUE: 'JSON'},
+        columns: [
+            {label: 'Full Name', value: function(e) { 
+                return e.lname.toUpperCase() + ' ' + e.name;
+            }},
+            {label: 'Gender', value: 'gender', css: 'tcenter', default_value: 'unknown'}
+        ],
+        actions: [
+            {
+                label: 'Add', 
+                condition: function() {return this.rights.can_create},
+                callback: function()  {alert('Add action has been called')}
+            }
+        ],
+        grabfocus: true,
+        onShow: function() {
+        
+        },
+        onEmpty: function() {
+            $('grid_will_display_here').update('empty list was retrieved');
+        },        
+        onPing: function(target) {
+            alert('record:\n'+$H(target).inspect() + '\nin grid has been pinged!')}
+        }, 
+        onCancel: function() {alert('ESC pressed')}
+    });</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="DESCRIPTION">
+    <h2 class="TN_label">DESCRIPTION</h2>
+    <div class="TN_content">
+      <p>Displays a dataset in a grid format.  
+Dataset is bound to a JSON datasource retrieved via an AJAX request.</p>
+<p>JSON object has a predefined format that the Grid class understands and renders.</p>
+<p>A Grid is made up of two components:</p>
+<ul>
+<li><a name="item_Grid_Result"></a><b>Grid Result</b>
+<p>The grid (table) that would be the container to display the result dataset.
+Result is displayed with the help of <code>GvaScript.ChoiceList</code>.</p>
+</li>
+<li><a name="item_Grid_Toolbar"></a><b>Grid Toolbar</b>
+<p>The grid's toolbar that would be the container to display grid's actions and pagination links.
+Toolbar is displayed with the help of <code>GvaScript.CustomButtons</code> and <code>GvaScript.Paginator</code></p>
+</li>
+</ul>
+  <div class="TN_node" id="GvaScript_Grids">
+    <h3 class="TN_label">GvaScript.Grids</h3>
+    <div class="TN_content">
+      <p>interface that provides one useful method:</p>
+  <div class="TN_node" id="GvaScript_Grids_get_id_">
+    <h4 class="TN_label">GvaScript.Grids.get(id)</h4>
+    <div class="TN_content">
+      <p>finds and returns the Grid instance where id is the unique id of the grid.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="BEHAVIOUR">
+    <h2 class="TN_label">BEHAVIOUR</h2>
+    <div class="TN_content">
+      <p>Grid's display is based on a <code>GvaScript.ChoiceList</code> object and thus has the behaviour of that of a choice list.</p>
+  <div class="TN_node" id="Grid_Navigation_Behaviour">
+    <h3 class="TN_label">Grid Navigation Behaviour</h3>
+    <div class="TN_content">
+      <ul>
+<li><a name="item__code_DOWN__code_____code_UP__code_"></a><b><code>DOWN</code> / <code>UP</code></b>
+<p>navigate by recordCustomButtons</p>
+</li>
+<li><a name="item__code_HOME__code_____code_END__code_"></a><b><code>HOME</code> / <code>END</code></b>
+<p>start/end of current page
+CustomButtons</p>
+</li>
+<li><a name="item__code_RETURN__code_"></a><b><code>RETURN</code></b>
+<p>fires <code>onPing</code> event handler</p>
+</li>
+<li><a name="item__code_ESC__code_"></a><b><code>ESC</code></b>
+<p>fires <code>onCancel</code> event handler</p>
+</li>
+<li><a name="item__code_PAGEUP___LEFT__code__and__code_PAGEDOWN___RIGHT__code_"></a><b><code>PAGEUP / LEFT</code> and <code>PAGEDOWN / RIGHT</code></b>
+<p>navigate by page</p>
+</li>
+<li><a name="item__code__Ctrl_HOME___code__and__code__Ctrl_END___code_"></a><b><code>[Ctrl-HOME]</code> and <code>[Ctrl-END]</code></b>
+<p>navigate to first and last page correspondingly.</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="JSON_Datasource">
+    <h2 class="TN_label">JSON Datasource</h2>
+    <div class="TN_content">
+      <p>As mentioned before, the Grid expects the JSON datasource object to be of a predefined format.</p>
+<pre>  json = {
+    'liste'  : [
+        {'fname': 'John',    'lname': 'Stiles', 'gender': 'm'},
+        {'fname': 'Mary',    'lname': 'Major',  'gender': 'f'},
+        {'fname': 'Richard', 'lname': 'Miles',  'gender': 'm'}
+    ], 
+    'total'  : 15,
+    'rights' : {
+        can_create : 0,
+        can_update : 1,
+        can_delete : 0
+    }
+  };</pre>
+
+<ul>
+<li><a name="item_liste__i__Array___i_"></a><b>liste <i>(Array)</i></b>
+<p>array of records.</p>
+<p>mandatory.</p>
+</li>
+<li><a name="item_total__i__numeric___i_"></a><b>total <i>(numeric)</i></b>
+<p>total number of records that are being paginated.</p>
+<p>mandatory.</p>
+</li>
+<li><a name="item_rights__i__JSON_Object___i_"></a><b>rights <i>(JSON Object)</i></b>
+<p>object containing the access rights to the records in the list. Rights values should be boolean expressions.
+this object will be stored and referenced later via <code>grid.rights</code> for grid actions conditions.</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="CONSTRUCTOR">
+    <h2 class="TN_label">CONSTRUCTOR</h2>
+    <div class="TN_content">
+      <pre>  var grid = new GvaScript.Grid(id, url, options);</pre>
+
+  <div class="TN_node" id="id">
+    <h3 class="TN_label">id</h3>
+    <div class="TN_content">
+      <p>A unique id to identify a Grid.  Might be later used in <code>GvaScript.Grids.get(id)</code> to retrieve the grid instance.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="url">
+    <h3 class="TN_label">url</h3>
+    <div class="TN_content">
+      <p>Url for AJAX request to retrieve current page dataset.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="options">
+    <h3 class="TN_label">options</h3>
+    <div class="TN_content">
+      <ul>
+<li><a name="item_css__i__String___i_"></a><b>css <i>(String)</i></b>
+<p>A string value of space seperated list of class names to be applied to the table element.</p>
+<p>optional - defaulted to ''</p>
+</li>
+<li><a name="item_dto__i__JSON_Object___i_"></a><b>dto <i>(JSON Object)</i></b>
+<p>Data transfer Object to the AJAX request. <code>Ex: {param1: 'value1', param2: 'value2'}</code></p>
+<p>optional - defaulted to <code>{VUE: 'JSON'}</code></p>
+</li>
+<li><a name="item_method__i__String___i_"></a><b>method <i>(String)</i></b>
+<p>HTTP method to open in the AJAX request.</p>
+<p>optional - defaulted to <code>'post'</code></p>
+</li>
+<li><a name="item_columns__i__Array___i_"></a><b>columns <i>(Array)</i></b>
+<p>Array of objects that defines the grid columns.</p>
+<p>Ex column object:</p>
+<pre>    {
+        label: 'Gender',  
+        value: 'gender', 
+        css: 'tcenter', 
+        default_value: 'unknown'
+    }</pre>
+
+<ul>
+<li><a name="item_label__i__string___i_"></a><b>label <i>(string)</i></b>
+<p>column label. can be an empty string</p>
+<p>mandatory.</p>
+</li>
+<li><a name="item_value__i__string_Function___i_"></a><b>value <i>(string|Function)</i></b>
+<p>string representing the key of the json element that the column is bound to.</p>
+<p>Function that takes the records as an argument and returns string value of the column.
+Ex: <code>value: function(e) {return e.fname + ' ' + e.lname}</code></p>
+<p>mandatory.</p>
+</li>
+<li><a name="item_default_value__i__string___i_"></a><b>default_value <i>(string)</i></b>
+<p>string value representing the column's default value if no value was found in the JSON datasource.</p>
+<p>optional.</p>
+</li>
+<li><a name="item_css__i__string_Array___i_"></a><b>css <i>(string|Array)</i></b>
+<p>a single css class or and array of css classes to be given to the column header/cells.</p>
+<p>optional.</p>
+</li>
+</ul>
+</li>
+<li><a name="item_actions__i__Array___i_"></a><b>actions <i>(Array)</i></b>
+<p>Array that defines the grids list of actions (to be rendered in the grid's tool bar).</p>
+<p>Action object here is identical to GvaScript.CustomButtons.Button.options</p>
+</li>
+<li><a name="item_grabfocus__i__boolean___i_"></a><b>grabfocus <i>(boolean)</i></b>
+<p>boolean indicating whether the grid container is to grab focus right after the grid has been initialized.</p>
+<p>optional - defaulted to <code>true</code></p>
+</li>
+<li><a name="item_pagesize__i__numeric__auto____i_"></a><b>pagesize <i>(numeric|'auto')</i></b>
+<p>a numeric specifying number of records to show on a page. To keep this number variable and dependant on grid's container available space, set it to 'auto'.</p>
+<p>optional - defaulted to <code>'auto'</code></p>
+</li>
+<li><a name="item_gridheight__i__numeric__auto____i_"></a><b>gridheight <i>(numeric|'auto')</i></b>
+<p>height to set to the grid. To keep this number variable and dependant on the grid's container available space, set it to 'auto'.</p>
+<p>optional - defaulted to <code>'auto'</code></p>
+</li>
+<li><a name="item_recordheight__i__numeric___i_"></a><b>recordheight <i>(numeric)</i></b>
+<p>height to set to the grid record.</p>
+<p>optional - defaulted to <code>21</code></p>
+</li>
+<li><a name="item_requestTimeout__i__numeric___i_"></a><b>requestTimeout <i>(numeric)</i></b>
+<p>time in seconds to wait before aborting the AJAX request.</p>
+<p>optional - defaulted to 15</p>
+</li>
+<li><a name="item_errorMsg__i__string___i_"></a><b>errorMsg <i>(string)</i></b>
+<p>message to display in the grid container area when the request times out.</p>
+<p>optional - defaulted to "Probl&#xe8;me de connexion. R&#xe9;essayer et si le probl&#xe8;me persiste, contacter un administrateur.".</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="PROPERTIES">
+    <h2 class="TN_label">PROPERTIES</h2>
+    <div class="TN_content">
+      <p>Here's a list of useful properties of the Grid Object.</p>
+  <div class="TN_node" id="grid_container">
+    <h3 class="TN_label">grid_container</h3>
+    <div class="TN_content">
+      <pre>  grid.grid_container</pre>
+
+<p><code>HTMLElement</code> container of the grid list</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="toolbar_container">
+    <h3 class="TN_label">toolbar_container</h3>
+    <div class="TN_content">
+      <pre>  grid.toolbar_container</pre>
+
+<p><code>HTMLElement</code> container of the toolbar (pagination links + action buttons)</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="paginatorbar_container">
+    <h3 class="TN_label">paginatorbar_container</h3>
+    <div class="TN_content">
+      <pre>  grid.paginatorbar_container</pre>
+
+<p><code>HTMLElement</code> container of the pagination links</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="actionsbar_container">
+    <h3 class="TN_label">actionsbar_container</h3>
+    <div class="TN_content">
+      <pre> grid.actionsbar_container</pre>
+
+<p><code>HTMLElement</code> container of the action buttons</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="METHODS">
+    <h2 class="TN_label">METHODS</h2>
+    <div class="TN_content">
+        <div class="TN_node" id="clearResult">
+    <h3 class="TN_label">clearResult</h3>
+    <div class="TN_content">
+      <pre>  grid.clearResult(msg)</pre>
+
+<p>This method clears the grid result container and displays <code>msg</code> instead.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="clearToolbar">
+    <h3 class="TN_label">clearToolbar</h3>
+    <div class="TN_content">
+      <pre>  grid.clearToolbar()</pre>
+
+<p>This methods clears the grid toolbar container.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="clearActionButtons">
+    <h3 class="TN_label">clearActionButtons</h3>
+    <div class="TN_content">
+      <pre>  grid.clearActionButtons()</pre>
+
+<p>This method clears the action buttons container and thus removes the buttons</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="clear">
+    <h3 class="TN_label">clear</h3>
+    <div class="TN_content">
+      <pre>  grid.clear(msg)</pre>
+
+<p>This method is equivalent to <code>grid.clearResult(msg)</code> and <code>grid.clearToolbar()</code></p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="addActionButtons">
+    <h3 class="TN_label">addActionButtons</h3>
+    <div class="TN_content">
+      <pre>  grid.addActionButtons()</pre>
+
+<p>This method renders the action buttons based on the grids actions. 
+NOTE that the actions conditions will be re-evaluated.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="destroy">
+    <h3 class="TN_label">destroy</h3>
+    <div class="TN_content">
+      <pre>  my_grid.destroy();</pre>
+
+<p>This method will unregister the Grid in the GvaScript.Grids namespace and 
+will iteratively call the destructor on all the grid's depedencies
+this removing all handlers attached.
+Call this method when the grid is removed
+from the DOM.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="EVENTS">
+    <h2 class="TN_label">EVENTS</h2>
+    <div class="TN_content">
+        <div class="TN_node" id="onShow">
+    <h3 class="TN_label">onShow</h3>
+    <div class="TN_content">
+      <p>This event is triggered of the table is rendered and displayed.
+Useful for attaching custom events on table records/cells.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="onHighlight">
+    <h3 class="TN_label">onHighlight</h3>
+    <div class="TN_content">
+      <p>This event is triggered when a choice in the list is highlighted.
+The event handler may use <code>event.index</code> to know the index of the
+highlighted choice.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="onPing">
+    <h3 class="TN_label">onPing</h3>
+    <div class="TN_content">
+      <p>This event is triggered when a choice in the list is "ping-ed", i.e.
+either by dblclicking, clicking on selected row or by pressing the <code>RETURN</code> key.
+The event handler will recieve 1 arguement <code>target</code> which is the record object that has been "Pinged".</p>
+<p>Ex: <code>{'fname': 'Mary', 'lname': 'Major', 'gender': 'f'}</code></p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="onCancel">
+    <h3 class="TN_label">onCancel</h3>
+    <div class="TN_content">
+      <p>This event is triggered when the user presses the <code>ESCAPE</code> key.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="onEmpty">
+    <h3 class="TN_label">onEmpty</h3>
+    <div class="TN_content">
+      <p>This event is triggered when the list is empty.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="EXAMPLE">
+    <h2 class="TN_label">EXAMPLE</h2>
+    <div class="TN_content">
+        <div class="TN_node" id="JAVASCRIPT">
+    <h3 class="TN_label">JAVASCRIPT</h3>
+    <div class="TN_content">
+      <pre>  var my_url  = "/app/path/to/data/list";
+  var my_grid = new GvaScript.Grid("ex_grid", my_url, {
+    grid_container: 'ex_grid_list',
+    toolbar_container: 'ex_grid_toolbar',
+    dto: {VUE: 'JSON'},
+    pagesize: 3,
+    columns: [
+        {label: 'Full Name', value: function(e) { 
+            return e.fname + ' ' + e.lname;
+        }},
+        {label: 'Gender', value: 'gender', css: 'tcenter', default_value: 'unknown'}
+    ],
+    actions: [
+        {
+            label: 'Add', 
+            condition: function() {return this.rights.can_create},
+            callback: function()  {alert('Add action has been called')}
+        }
+    ]
+  });
+
+  // my_url response : Content-type "application/json"
+  {
+    'liste'  : [
+        {'fname': 'John',    'lname': 'Stiles', 'gender': 'm'},
+        {'fname': 'Mary',    'lname': 'Major',  'gender': 'f'},
+        {'fname': 'Richard', 'lname': 'Miles',  'gender': 'm'}
+    ], 
+    'total'  : 15,
+    'rights' : {
+        can_create : 0,
+        can_update : 1,
+        can_delete : 0
+    }
+  }</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="HTML">
+    <h3 class="TN_label">HTML</h3>
+    <div class="TN_content">
+      <pre>  &lt;div id="ex_container"&gt;
+     
+   &lt;div tabindex="0" id="ex_grid_list"&gt;
+     &lt;table class="dmweb-grid"&gt;
+       &lt;thead&gt;
+         &lt;tr&gt;
+           &lt;th class="grid-marker"&gt;&#xa0;&lt;/th&gt;
+           &lt;th class="grid-header"&gt;Full Name&lt;/th&gt;
+           &lt;th class="grid-header"&gt;Gender&lt;/th&gt;
+        &lt;/tr&gt;
+       &lt;/thead&gt;
+       &lt;tbody&gt;
+        &lt;tr id="ex_grid_list.CL_choice.0" class="CL_choiceItem liste_highlight"&gt;
+           &lt;td class="grid-marker"&gt;&#xa0;&lt;/td&gt;
+           &lt;td valign="top" class="grid-cell index_0"&gt;John Stiles&lt;/td&gt;
+           &lt;td valign="top" class="grid-cell index_0 tcenter"&gt;m&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr id="ex_grid_list.CL_choice.1" class="CL_choiceItem"&gt;
+           &lt;td class="grid-marker"&gt;&#xa0;&lt;/td&gt;
+           &lt;td valign="top" class="grid-cell index_1"&gt;Mary Major&lt;/td&gt;
+           &lt;td valign="top" class="grid-cell index_1 tcenter"&gt;f&lt;/td&gt;
+        &lt;/tr&gt;
+         &lt;tr id="ex_grid_list.CL_choice.3" class="CL_choiceItem"&gt;
+           &lt;td class="grid-marker"&gt;&#xa0;&lt;/td&gt;
+           &lt;td valign="top" class="grid-cell index_0"&gt;Richard Miles&lt;/td&gt;
+           &lt;td valign="top" class="grid-cell index_0 tcenter"&gt;m&lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+   &lt;/div&gt;
+  
+   &lt;div id="ex_grid_toolbar" class="dmweb-grid-toolbar"&gt;
+    &lt;div class="dmweb-paginatorbar"&gt;
+      &lt;div title="Derni&#xe8;re page" class="last"&gt;&lt;/div&gt;
+      &lt;div title="Page suivante" class="forward"&gt;&lt;/div&gt;
+      &lt;div class="text"&gt;1 &#xe0; 3 de 15&lt;/div&gt;
+      &lt;div title="Page pr&#xe9;c&#xe9;dente" class="back inactive"&gt;&lt;/div&gt;
+      &lt;div title="Premi&#xe8;re page" class="first inactive"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="dmweb-grid-actionsbar"&gt;
+      &lt;span id="grid_id_btn_0" class="dmweb-btn-container"&gt;
+        &lt;span class="left"/&gt;
+        &lt;span class="center"&gt;
+          &lt;button class="btn" style="width: auto;" type="button"&gt;Add&lt;/button&gt;
+        &lt;/span&gt;
+        &lt;span class="right"/&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+   &lt;/div&gt;
+ 
+  &lt;/div&gt;</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="CSS">
+    <h3 class="TN_label">CSS</h3>
+    <div class="TN_content">
+      <pre>  /* class given to grid list container when an AJAX request is being affected */
+  .dmweb-loading {
+    background:url(ajax_loading.gif) no-repeat center center;
+    position:absolute;
+    width:30px;height:30px;
+    top:50%;left:50%;
+  }
+
+  /* grid toolbar */
+  .dmweb-grid-toolbar {
+    background:#C5CCE8 url(glass-bg-n.gif) repeat-x scroll left top;
+    border:1px solid #A3BAD9;
+    height:28px;
+  }
+  .dmweb-grid-actionsbar {float:left;}
+  .dmweb-paginatorbar {float:right;width:250px;}
+  .dmweb-paginatorbar div {width:16px;height:16px;cursor:pointer;float:right;}
+  .dmweb-paginatorbar div.first {background:url(page-first.gif) no-repeat top center;}
+  .dmweb-paginatorbar div.last {background:url(page-last.gif) no-repeat top center;}
+  .dmweb-paginatorbar div.back {background:url(page-prev.gif) no-repeat top center;}
+  .dmweb-paginatorbar div.forward {background:url(page-next.gif) no-repeat top center;}
+  .dmweb-paginatorbar div.inactive {cursor:default;opacity:0.25;filter:alpha(opacity=25);}
+  .dmweb-paginatorbar div.text {text-align:center;width:140px;color:#4b34c5;font-size:10pt;}
+  .dmweb-paginatorbar span.dmweb-btn-container {display:block;margin-right:4px;}
+  
+  /* grid table */
+  .dmweb-grid {width:100%;}
+  .dmweb-grid th.grid-header {
+    text-align:center;
+    padding:2px;
+    font-size:75%;
+    color: #183E6C;
+    background-color: #D0D6ED;
+    border:1px solid #6F82A5;
+  }
+  .dmweb-grid td {font-size:75%;color:#183E6C;}
+  .dmweb-grid .grid-marker {width:15px;background-color: #D0D6ED;border:1px solid #6F82A5;}
+  .dmweb-grid tr.liste_highlight td.grid-marker {
+    background: #D0D6ED url(selector.gif) no-repeat center center;
+  }
+  .dmweb-grid tr.liste_highlight td.grid-cell {background-color: #6F82A5 !important;color:#f5f5f5 !important;}
+  .dmweb-grid td.grid-cell {padding:2px !important;border:1px solid #e8e8e8;}
+  .dmweb-grid td.grid-cell.index_1 {background-color:#EFEFEF;}
+  .dmweb-grid td.grid-cell.center {text-align:center;float:none;}
+  .dmweb-grid td.grid-cell.right {text-align:right;float:none;}
+  .dmweb-grid td.grid-cell.red {color:red;}</pre>
+
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="DEPENDENCIES">
+    <h2 class="TN_label">DEPENDENCIES</h2>
+    <div class="TN_content">
+      <p>This class depends on the following GvaScript classes:</p>
+<ul>
+<li><a name="item_GvaScript_ChoiceList"></a><b>GvaScript.ChoiceList</b>
+</li>
+<li><a name="item_GvaScript_Paginator"></a><b>GvaScript.Paginator</b>
+</li>
+<li><a name="item_GvaScript_CustomButtons"></a><b>GvaScript.CustomButtons</b>
+</li>
+</ul>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

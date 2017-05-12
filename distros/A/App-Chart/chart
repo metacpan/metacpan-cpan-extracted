@@ -1,0 +1,397 @@
+#!perl -w
+
+# Copyright 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2016 Kevin Ryde
+
+# This file is part of Chart.
+#
+# Chart is free software; you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 3, or (at your option) any later version.
+#
+# Chart is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Chart.  If not, see <http://www.gnu.org/licenses/>.
+
+use 5.010;
+use strict;
+use warnings;
+
+# BEGIN {
+#   use Carp; # 0.22 needs this pre-loaded for the prototypes
+#   $ENV{'LIST_MOREUTILS_PP'} = 1;
+# }
+use File::Spec;
+use Getopt::Long;
+use Glib 1.200; # for strerror()
+use Encode;
+use Encode::Locale 0.02;  # version 0.02 for console_in,console_out
+use List::Util qw(min max);
+use Locale::Messages;
+use Locale::TextDomain 'App-Chart';
+
+use App::Chart;
+
+if (@ARGV >= 1 && ($ARGV[0] eq '--subprocess' || $ARGV[0] eq '--emacs')) {
+  binmode (STDOUT, ':utf8') or die;
+  binmode (STDERR, ':utf8') or die;
+
+} else {
+  # locale encoding conversion on the tty, wide-chars everywhere internally
+  require Encode::Locale;
+  require PerlIO::encoding;
+  unless (binmode(STDIN, ":encoding(console_in)")
+          && binmode(STDOUT, ":encoding(console_out)")
+          && binmode(STDERR, ":encoding(console_out)")) {
+    warn "Cannot set :encoding on stdin/out: $!\n";
+  }
+
+  # Old code:
+  #
+  # # version 0.06 for bug fix of a struct size for perl 5.10 (there's some
+  # # fragile duplication)
+  # require Encode;           # Encode::PERLQQ
+  # require PerlIO::locale; PerlIO::locale->VERSION(0.06);
+  # { no warnings 'once';
+  #   local $PerlIO::encoding::fallback = Encode::PERLQQ; # \x{1234} style
+  #   (binmode (STDOUT, ':locale') && binmode (STDERR, ':locale'))
+  #     or die "Cannot set :encoding on stdout/stderr: $!\n";
+  # }
+  # Makefile: 'PerlIO::locale' => '0.06',
+  # , libperlio-locale-perl (>= 0.06)
+}
+
+my $option_output;
+my $option_mode;
+my @args;
+
+{
+  # callback option arg in perl 5.8 is a string, but in 5.10 it's a
+  # Getopt::Long::Callback object, must stringize to get the plain name
+  my $set_mode = sub {
+    my ($opt) = @_;
+    if ($option_mode) {
+      print STDERR __x("chart: already got mode option --{mode}\n",
+                       mode => $option_mode);
+      exit 1;
+    }
+    $option_mode = "$opt";
+  };
+  my $set_output = sub {
+    my ($opt) = @_;
+    if ($option_output) {
+      print STDERR __x("chart: already got output option --{output}\n",
+                       output => $option_output);
+      exit 1;
+    }
+    $option_output = "$opt";
+  };
+  my $add_symlist = sub {
+    my ($opt) = @_;
+    my $key = "$opt";
+    if ($key eq 'favorites') { $key = 'favourites'; }
+    require App::Chart::Gtk2::Symlist;
+    push @args, App::Chart::Gtk2::Symlist->new_from_key ($key);
+  };
+  my $help = sub {
+    print __("chart [--options] [SYMBOL...]\n");
+    my @opts =
+      (['-h, --help',    __('Print this help')],
+       ['-v, --version', __('Print Chart version')],
+       ['--verbose',     __('Print extra messages')],
+       ['--download',    __('Download data for selected symbols, don\'t run the GUI')],
+       ['--ticker',      __('Run just the stock ticker, on selected symbols')],
+       ['--all',         __('Select all symbols')],
+       ['--alerts',      __('Select alerts list symbols')],
+       ['--favourites',  __('Select favourites list symbols')],
+       ['--display=DPY',
+        __("X display to use (default DISPLAY environment variable)")],
+       ['--<gtk-options>', __('Standard Gtk options')]);
+    my $width = 2 + max (map { length ($_->[0]) } @opts);
+    foreach (@opts) {
+      printf "%-*s%s\n", $width, $_->[0], $_->[1];
+    }
+    print "\n";
+    print __"When running the GUI, the SYMBOL argument is an initial chart to show\n(can be a partial match, as in the open dialog).\n";
+    print __"When running download or ticker, the SYMBOL... arguments select specific\nsymbols to show or download (must be full symbols, no partial matches).\n";
+    exit 0;
+  };
+
+  GetOptions (require_order => 1,
+              'help|?' => $help,
+              version => sub {
+                print "chart version $App::Chart::VERSION\n";
+                exit 0;
+              },
+              all        => $add_symlist,
+              favourites => $add_symlist,
+              favorites  => $add_symlist,
+              historical => $add_symlist,
+              alerts     => $add_symlist,
+              '<>'       => sub { my ($value) = @_;
+                                  # stringize to avoid Getopt::Long object
+                                  push @args, "$value";
+                                },
+              download   => $set_mode,
+              ticker     => $set_mode,
+              watchlist  => $set_mode,
+              subprocess => $set_mode,  # undocumented
+              emacs      => $set_mode,  # undocumented
+              vacuum     => $set_mode,  # undocumented yet
+
+              verbose    => \$App::Chart::option{'verbose'},
+              'all-status' => $set_output,  # undocumented
+
+              'lwp-debug' => sub {
+                require LWP::Debug;
+                LWP::Debug::level('+');
+              },
+             )
+    or exit 1;
+}
+
+# $filename is in filesystem charset bytes.
+#
+# The file should end with some non-undef value, since otherwise it's
+# indistinguishable from undef for the various do/require errors.
+#
+sub initfile {
+  my ($filename) = @_;
+  if (! -e $filename) { return; }
+  $! = 0;
+  my $ret = do $filename;
+  if (! defined $ret) {
+    my $display_filename = Glib::filename_display_name($filename);
+    if ($@) {
+      my $err = $@;
+      unless (utf8::is_utf8($err)) { $err = Encode::decode('locale',$err); }
+      print __x("chart: error in {filename}\n{error}\n  (starting anyway)\n",
+                filename => $display_filename,
+                error => $err);
+    } elsif ($! != 0) {
+      my $err = Glib::strerror($!);
+      print __x("chart: cannot read {filename}: {error}\n  (starting anyway)\n",
+                filename => $display_filename,
+                error => $err);
+    } else {
+      print __x("chart: {filename} didn't end with a true value\n",
+                filename => $display_filename);
+    }
+  }
+}
+
+$option_mode   ||= 'gui';
+$option_output ||= 'tty';
+
+unshift @INC, File::Spec->catdir (App::Chart::chart_directory(), 'lib');
+initfile (File::Spec->catfile (App::Chart::chart_directory(), 'init.pl'));
+
+if ($option_mode eq 'gui') {
+  # default is the gui
+  require App::Chart::Gtk2::Main;
+  App::Chart::Gtk2::Main->main (\@args);
+
+} elsif ($option_mode eq 'download') {
+  require App::Chart::Download;
+  App::Chart::Download->command_line_download ($option_output, \@args);
+
+} elsif ($option_mode eq 'subprocess') {
+  require App::Chart::SubprocessMain;
+  App::Chart::SubprocessMain->main ();
+
+} elsif ($option_mode eq 'vacuum') {
+  require App::Chart::Vacuum;
+  App::Chart::Vacuum->command_line_vacuum ($option_output, \@args);
+
+} elsif ($option_mode eq 'emacs') {
+  require App::Chart::EmacsMain;
+  App::Chart::EmacsMain->main ();
+
+} elsif ($option_mode eq 'watchlist') {
+  require App::Chart::Gtk2::WatchlistDialog;
+  App::Chart::Gtk2::WatchlistDialog->main (\@args);
+
+} elsif ($option_mode eq 'ticker') {
+  require App::Chart::Gtk2::TickerMain;
+  App::Chart::Gtk2::TickerMain->main (\@args);
+}
+
+exit 0;
+
+__END__
+
+=for stopwords Gtk BHP BHP.AX bh wildcards Wildcards filenames tty ie watchlist Watchlist --watchlist SQLite Ryde
+
+=head1 NAME
+
+chart -- Stock and commodity price charting and downloading
+
+=head1 SYNOPSIS
+
+chart [--options] [symbol...]
+
+=head1 DESCRIPTION
+
+Chart is a stock and commodity charting program written in Perl and using
+the Gtk toolkit.
+
+For a summary of the command line options run C<chart --help>.  Full
+documentation is provided in the manual:
+
+=over 4
+
+=item F<doc/chart.info>
+
+Info format, can be viewed with Emacs or the stand-alone Info viewer.
+
+=item F<lib/App/Chart/doc/chart.html>
+
+HTML, can be viewed from within Chart (Help/Manual menu entry), or with any
+browser.
+
+=back
+
+=head1 OPTIONS
+
+The default is to start the Gtk graphical interface, with an optional
+initial symbol to display.  Just a part of a symbol can be given, the same
+as in the File/Open dialog, so for instance
+
+    chart bh
+
+is enough to start on BHP.AX, if that's the only "bh" in the database.
+
+=over 4
+
+=item --display=DPY
+
+Specify the X display name for Gtk.  The default is the C<DISPLAY>
+environment variable, as usual.  This is a standard Gtk option, see the
+C<gtk-options> man page for others (none of which do much).
+
+=item --download
+
+Download data for the given symbols, lists, or wildcards instead of running
+the GUI.  For example
+
+    chart --download BHP.AX GM
+    chart --download "*.NZ"
+    chart --download --all
+
+Wildcards usually have to be quoted to stop the shell expanding them as
+filenames.  On a tty a status line is shown with progress.
+
+=item --all
+
+The "All" list of all current symbols (ie. non-historical) for download
+etc.
+
+=item --alerts
+
+The "Alerts" list of symbols for download etc.
+
+=item --favourites
+
+The "Favourites" list of user symbols for download etc.
+
+=item --watchlist
+
+Start in the Watchlist dialog, with a selected symbols list, per the options
+above, or the Favourites list by default.  For example
+
+    chart --watchlist --all
+
+=item --ticker
+
+Run just the scrolling stock ticker display, not the whole GUI.  Symbols,
+lists or wildcards select what to display (in order).  For example
+
+    chart --ticker BHP.AX --favourites GM "*.NZ"
+
+=item --verbose
+
+Print extra messages (to standard output).  This is mainly for
+C<--download>.
+
+=item -v, --version
+
+Print the program version number and exit.
+
+=item -h, --help
+
+Print a summary of the command line options and exit.
+
+=back
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item C<CHART_DIRECTORY>
+
+Directory name to use instead of the default F<~/Chart>.
+
+=item C<HOME>
+
+For default F<~/Chart> directory.
+
+=item C<TZ>
+
+Local timezone.
+
+=back
+
+Chart uses C<LWP> for various downloading.  See L<LWP> on the several
+environment variables it takes (such as HTTP proxies etc).
+
+=head1 FILES
+
+=over 4
+
+=item F<~/Chart/init.pl>
+
+User extensions (Perl code).
+
+=item F<~/Chart/gui.pl>
+
+User GUI extensions (Perl code).
+
+=item F<~/Chart/notes.sqdb>
+
+User annotations and saved preferences (SQLite database).
+
+=item F<~/Chart/database.sqdb>
+
+Downloaded data (SQLite database).
+
+=back
+
+=head1 SEE ALSO
+
+C<gtk-options(7)>, C<info(1)>
+
+=head1 HOME PAGE
+
+L<http://user42.tuxfamily.org/chart/index.html>
+
+=head1 LICENCE
+
+Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2016 Kevin Ryde
+
+Chart is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 3, or (at your option) any later version.
+
+Chart is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+Chart; see the file F<@chartdatadir@/COPYING>.  Failing that, see
+L<http://www.gnu.org/licenses/>.
+
+=cut

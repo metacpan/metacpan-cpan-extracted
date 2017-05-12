@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use utf8;
+use Encode::Locale;
+use Acme::VOYAGEGROUP::ConferenceRoom;
+
+Encode::Locale::decode_argv;
+
+print conference_room(@ARGV), "\n";
+
+exit(0);
+
+__END__

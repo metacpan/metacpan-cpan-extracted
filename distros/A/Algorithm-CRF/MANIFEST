@@ -1,0 +1,16 @@
+CRF.xs
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+common.h
+encoder.h
+lib/Algorithm/CRF.pm
+t/0-basic.t
+t/1-crf_learn.t
+t/pod.t
+t/pod-coverage.t
+t/template
+t/test.data
+t/train.data

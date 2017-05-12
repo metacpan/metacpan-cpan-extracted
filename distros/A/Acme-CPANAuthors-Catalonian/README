@@ -1,0 +1,63 @@
+NAME
+    Acme::CPANAuthors::Catalonian - We are the Catalonian CPAN Authors
+
+SYNOPSIS
+            use Acme::CPANAuthors;
+
+            my $authors = Acme::CPANAuthors->new('Catalonian');
+
+            my $number   = $authors->count;
+            my @ids      = $authors->ids();
+            my @distros  = $authors->distributions('MRUIZ');
+            my $url      = $authors->avatar_url('ENELL');
+
+DESCRIPTION
+    This class provides a hash of Catalonian CPAN authors' PAUSE ID and name
+    to the Acme::CPANAuthors module.
+
+MAINTENANCE
+    If you are an Catalonian CPAN author not listed here, please send me
+    your ID/name via email or RT so we can always keep this module up to
+    date. If there's a mistake and you're listed here but are not Catalan
+    (or just don't want to be listed), sorry for the inconvenience: please
+    contact me and I'll remove the entry right away.
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-acme-cpanauthors-catalonian@rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Acme-CPANAuthors-Catalon
+    ian>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Acme::CPANAuthors::Catalonian
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-CPANAuthors-Catalonia
+        n>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Acme-CPANAuthors-Catalonian>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Acme-CPANAuthors-Catalonian>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Acme-CPANAuthors-Catalonian/>
+
+    *   Github - get the source code
+
+        <http://github.com/pplu/p5-Acme-CPANAuthors-Catalonian>
+
+COPYRIGHT & LICENSE
+    This module is in the public domain.
+

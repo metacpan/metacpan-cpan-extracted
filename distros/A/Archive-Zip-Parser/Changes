@@ -1,0 +1,21 @@
+Revision history for Archive-Zip-Parser
+
+0.0.3 Sunday, 07 March 2010
+      - Added build_requires and corrected repository meta
+
+0.0.2 Sunday, 24 January 2010
+      - Removed Perl::Critic test
+
+0.0.1 Saturday, 23 January 2010
+      - Updated/corrected data descriptor POD
+
+0.0.0_03 Friday, 22 January 2010
+         - Implemented data descriptor
+         - Added 'SEE ALSO' section
+
+0.0.0_02 Friday, 22 January 2010
+         - Skip respective tests if Test::Pod::Coverage or Test::Perl::Critic
+           are not present
+
+0.0.0_01 Thursday, 21 January 2010
+         - Initial version

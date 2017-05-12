@@ -1,0 +1,115 @@
+#!/usr/bin/perl
+#
+# Author: Duncan Ferguson, (c) 2011
+
+use strict;
+use warnings;
+
+package main;
+
+use App::bk;
+
+App::bk::backup_files();
+
+__END__
+
+=head1 NAME
+
+bk
+
+=head1 SYNOPSIS
+
+  bk [-?hV]
+  bk [filename] [...]
+
+=head1 DESCRIPTION
+
+Command to ease backing up a file before editting.  If a previously backed
+up file exists and has a matching checksum a new backup is not made.  Backed up
+files have date/time appended as necessary.
+
+When invoked as root the username is not appended to the backup file name.
+
+Backups are stored relative to file being backed up.
+
+=head1 OPTIONS
+
+=over
+
+=item --help, -?, -h
+
+Display basic help 
+
+=item --man
+
+Display man page
+
+=item --debug [0-9], --debug [--debug [...]]
+
+Enable debugging mode (using more than once increases verbosity, or specify
+a level explicitly to a maximum of level 8) 
+
+=item --version, -V
+
+Show version information
+
+=item --diff, -d
+
+Show the differences between the file and its last backup (using 'diff -u')
+
+=item --edit, -e
+
+After the file has been backed up, edit them (using EDITOR or VISUAL 
+environment variables)
+
+=back
+
+=head1 ARGUMENTS
+
+=over
+
+=item <filename> [...]
+
+filename to be backed up.  Multiple filenames can be provided.
+
+=back
+
+=head1 NOTES
+
+None.
+
+=head1 FILES
+
+None
+
+=head1 AUTHOR AND COPYRIGHT
+
+Copyright (C) 2011 Duncan Ferguson.  All rights reserved.
+
+This is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Opsview; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=head1 KNOWN BUGS
+
+Please report any bugs or feature requests via the web interface at 
+L<https://github.com/duncs/perl-app-bk/issues> . 
+I will be notified, and then you'll automatically be notified of 
+progress on your bug as I make changes.
+
+
+=head1 SEE ALSO
+
+L<perl>
+
+=cut

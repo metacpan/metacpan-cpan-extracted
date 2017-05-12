@@ -1,0 +1,40 @@
+---
+abstract: 'Review the latest changes to a git repository'
+author:
+  - 'Eric Johnson <cpan at iijo dot nospamthanks dot org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Git-Ribbon
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  App::Git::Ribbon:
+    file: lib/App/Git/Ribbon.pm
+    version: 0.003
+requires:
+  Getopt::Long::Descriptive: 0
+  IO::Prompter: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/kablamo/git-ribbon/issues
+  homepage: https://metacpan.org/release/App-Git-Ribbon
+  repository: git://github.com/kablamo/git-ribbon.git
+version: 0.003

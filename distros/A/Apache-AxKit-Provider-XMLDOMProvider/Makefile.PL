@@ -1,0 +1,18 @@
+use 5.008004;
+use ExtUtils::MakeMaker;
+# See lib/ExtUtils/MakeMaker.pm for details of how to influence
+# the contents of the Makefile that is written.
+WriteMakefile(
+    NAME              => 'Apache::AxKit::Provider::XMLDOMProvider',
+    VERSION_FROM      => 'lib/Apache/AxKit/Provider/XMLDOMProvider.pm', # finds $VERSION
+    PREREQ_PM         => {
+	    			'Apache' => 0,
+	    			'LWP::UserAgent' => 0 ,
+				'XML::LibXML' => 0,
+	                  	'AxKit' => 0,
+				'Time::Piece' => 0
+			 },
+    ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
+      (ABSTRACT_FROM  => 'lib/Apache/AxKit/Provider/XMLDOMProvider.pm', # retrieve abstract from module
+       AUTHOR         => 'Severin Gehwolf <severin.gehwolf@uibk.ac.at>') : ()),
+);

@@ -1,0 +1,11 @@
+Revision history for Perl extension API::ParallelsWPB
+
+0.03    Tue Jul 1 08:40:44 2014 +0000
+
+    - fixed utf8 flag in request
+    - JSON replaced with JSON::XS
+    - If error is not in JSON, it is returned "as is"
+
+
+0.01    Tue Nov 26 12:22:16 2013
+        - first release;

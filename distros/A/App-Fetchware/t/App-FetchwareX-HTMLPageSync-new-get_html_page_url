@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+# Tests HTMLPageSync's get_html_page_url() new() helper subroutine that uses
+# Term::UI to ask the user questions. This "test script" is called by
+# t/App-FetchwareX-HTMLPageSync.t's test suite using Test::Expect, if its
+# optionally installed. And Test::Expect answer's the questsions that this
+# script asks thereby testing get_html_page_url()'s Q&A interface.
+
+
+use Test::More;
+use Test::Builder;
+use Term::ReadLine;
+
+use App::FetchwareX::HTMLPageSync ':TESTING';
+
+my $term = Term::ReadLine->new('testing HTMLPageSync new');
+
+my $page_name = get_html_page_url($term);
+
+is($page_name, 'http://fake.url/Test-HTMLPageSync.html',
+    'checked get_html_page_url() received correct input');
+
+# Spit out # of tests run.
+done_testing();
+
+# Print a bogus "prompt" to keep Expect from freaking out, because it presumes
+# the prompt works like it does in a shell, but fetchware new is not a shell.
+print "Bogus shell: \n";
+
+# Because we're in a child process not the same one that is running the main
+# test suite, if any tests fail this failure will not be reported back to our
+# caller. So, we use Test::Builder to check if our tests have passed, and if
+# they have we do nothing and return succes, but if not we throw an exception.
+my $test = Test::Builder->new();
+unless ($test->is_passing()) {
+    diag explain \[$test->details()];
+    die <<EOD;
+get_html_page_url test file for testing get_html_page_url() using Test::Expect has
+failed!  The details() method of this process's Test::Builder object should have
+been printed above to help you figure out what went wrong.
+EOD
+}

@@ -1,0 +1,70 @@
+#!/usr/bin/perl -w
+use v5.14;
+
+use App::MusicExpo;
+
+App::MusicExpo->run;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+musicexpo - script which generates a HTML table of music tags
+
+=head1 SYNOPSIS
+
+    # Creates a table with the songs a.mp3 and b.flac using the default template and without caching. The download links point to /music/a.mp3 and /music/b.mp3
+    musicexpo a.mp3 b.flac
+
+    # Caches to 'cache.db', and the download links point to /download/a.flac, /download/b.flac, /download/c.flac
+    musicexpo --cache 'cache.db' --prefix /download/ my/music/a.flac my/music/b.flac othermusic/c.flac
+
+    # Caches into /tmp/musicexpocache and uses directory/file.tmpl as template
+    musicexpo --cache /tmp/musicexpocache --template directory/file.tmpl my-music/*.mp3
+
+=head1 DESCRIPTION
+
+musicexpo creates a HTML table from a list of songs.
+
+The default template looks like:
+
+    | Title   | Artist  | Album           | Genre   | Track | Year | Type |
+    |---------+---------+-----------------+---------+-------+------+------|
+    | Cellule | Silence | L'autre endroit | Electro | 01/09 | 2005 | FLAC |
+
+where the title is a download link. If you have multiple files with the same
+basename (such as C<cellule.flac> and C<cellule.ogg>), they will be treated
+as two versions of the same file, so a row will be created with two download
+links, one for each format.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--template> I<template>
+
+Path to the HTML::Template::Compiled template used for generating the music table. If '' (empty), uses the default format. Is empty by default.
+
+=item B<--prefix> I<prefix>
+
+Prefix for download links. Defaults to '/music/'.
+
+=item B<--cache> I<filename>
+
+Path to the cache file. Created if it does not exist. If '' (empty), disables caching. Is empty by default.
+
+=back
+
+=head1 AUTHOR
+
+Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.

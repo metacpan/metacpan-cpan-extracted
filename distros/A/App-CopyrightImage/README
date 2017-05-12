@@ -1,0 +1,197 @@
+NAME
+
+    App::CopyrightImage - Easily add Copyright information to your images
+
+SYNOPSYS
+
+        # single image, will be put into ./ci_picture.jpg
+        # we set the 'Copyright' and 'Creator' EXIF tags
+    
+        imgcopyright --image picture.jpg --name "Steve Bertrand"
+    
+        # all images within a directory, images put into
+        # /home/user/Pictures/ci
+    
+        imgcopyright -i /home/user/Pictures -n "Steve Bertrand"
+    
+        # check an image (or directory of images) for files with no
+        # copyright info
+    
+        imgcopyright -i /home/user/Pictures --check
+    
+        # add an email along with your name to the 'Creator' tag
+    
+        imgcopyright -i picture.jpg -n "Steve Bertrand" --email "steveb@cpan.org"
+    
+        # specify an alternate directory for the altered images
+    
+        imgcopyright -i /home/user/Pictures -name "steve" --dst ~/mypics
+    
+        # remove copyright info from image(s)
+    
+        imgcopyright -i picture.jpg --remove
+    
+        # force over a previous copyright
+    
+        imgcopyright -i picture.jpg -n "steve" --force
+
+DESCRIPTION
+
+    This imgcopyright application allows you to add copyright information
+    to the EXIF data within image files. It also allows you to check images
+    for missing copyright info and remove info.
+
+    It works on individual files, as well as recurses (top-level only) of a
+    supplied directory.
+
+    It does NOT modify the original file. We create a subdirectory named ci
+    in whatever path you specify (current working directory if a path is
+    not sent in), and we then take a copy of each original file, modify it,
+    prefix the filename with a ci_, and place it into the new ci directory.
+
+ARGUMENTS
+
+ -i, --image
+
+    Mandatory in all cases.
+
+    Name of a single image file, or a directory containing image files. In
+    the case of a directory, we'll iterate over the top level, and work on
+    all image files found.
+
+ -n, --name
+
+    Mandatory, unless using --check.
+
+    This is the name that will be used in the copyright string for the
+    Copyright EXIF tag, as well as the Creator tag.
+
+ -e, --email
+
+    Optional.
+
+    This is appended to the --name when populating the Creator EXIF tag if
+    it is sent in.
+
+ -c, --check
+
+    Optional.
+
+    Checks for missing Copyright and/or Creator EXIF tags in the image(s)
+    sent in with the --image option.
+
+ -d, --dst
+
+    Optional.
+
+    By default, we use the directory sent in with --image (current working
+    directory if a path isn't provided), and put all modified images in a
+    new ci directory under it.
+
+    Send in a directory path with this option and we'll put the image files
+    there instead.
+
+ -r, --remove
+
+    Optional.
+
+    Removes copyright EXIF information for files sent in with --image.
+
+ -f, --force
+
+    By default, if an image already has EXIF copyright information, we skip
+    over it and do nothing. Set this option to overwrite any found
+    copyright info.
+
+App::CopyrightImage API
+
+ EXPORTS
+
+    Exports imgcopyright by default.
+
+ FUNCTIONS
+
+  imgcopyright(%opts)
+
+    Sets up various configurations, and then executes the EXIF changes to
+    images sent in.
+
+    We set the Copyright EXIF tag to Copyright (C) YEAR by NAME, where YEAR
+    is auto-generated, and NAME is sent in as an option (see below).
+
+    We also set the Creator EXIF tag to NAME (EMAIL). If EMAIL is not sent
+    in as an option, it, and the parens around it will be omitted.
+
+    Returns a hash reference with the following keys: ok and fail. Each key
+    contains an array reference. The former contains a list of the image
+    names that succeeded, and the latter, a list of image names that
+    failed.
+
+    Options:
+
+   image
+
+    A string containing either an image filename (including full path if
+    not local), or the name of a directory containing images. If the value
+    is a directory, we'll operate on all images in that dir.
+
+    We will, by default, create a new sub-directory named ci in the
+    directory found in the value, and if the directory is current working
+    directory, we'll create the sub directory there.
+
+    All updated images will be copied into the new ci directory with the
+    same filename, with a <C>ci_</c> prepended to it.
+
+    Eg: "/home/user/Pictures"
+
+   check
+
+    We won't make any changes, we'll simply check all images specified with
+    the image option, and if they are missing either Copyright or Creator
+    EXIF data, we'll print this information to STDOUT.
+
+   name
+
+    A string containing the name you want associated with the copyright
+    notice. It will be used in both the Copyright and Creator EXIF tags.
+
+    Eg: "Steve Bertrand"
+
+   email
+
+    A string containing the email address of the copyright holder. This
+    will be included in the Creator EXIF tag if sent in.
+
+    Eg: "steveb@cpan.org"
+
+   dst
+
+    A string containing the name of a directory to be used to store the
+    manipulated images. By default, we use the path sent in with the image
+    option.
+
+    Eg: "/home/user/backup"
+
+   remove
+
+    Bool. If set, we'll remove all copyright information on the image(s).
+
+   force
+
+    Bool. If set, if an image already has copyright information set, we'll
+    overwrite it. By default we skip these files.
+
+AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2016 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

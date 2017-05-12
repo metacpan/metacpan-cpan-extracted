@@ -1,0 +1,71 @@
+Revision history for App-PlUtils
+
+0.11    2016-07-20 (PERLANCAR)
+
+        - Use more specific schemas for the arguments (filename & perl::modname
+          instead of str) to reduce duplication.
+
+
+0.10    2015-09-17 (PERLANCAR)
+
+	- Adjust to Complete::Util 0.36 (complete_program() split to
+	  Complete-Program).
+
+
+0.09    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.08    2015-03-21 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Documentation] Mention list of utilities in main module, add FAQ
+	  & more complete See Also.
+
+
+0.07    2015-01-25 (PERLANCAR)
+
+	- Add utility: pllines.
+
+
+0.06    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.05    2014-12-28 (PERLANCAR)
+
+	- Depend on Complete::Module (and Complete::Util) directly instead
+	  of App::PMUtils (and App::PlUtils).
+
+
+0.04    2014-12-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch {SHARYANTO::Module::Path,Module::Path::More}.
+
+
+0.03    2014-11-09 (PERLANCAR)
+
+        - Add utility: plcost.
+
+
+0.02    2014-09-17 (PERLANCAR)
+
+        - No functional changes.
+
+        - Add sample outputs in Synopsis.
+
+
+0.01    2014-09-17 (PERLANCAR)
+
+        - First release.

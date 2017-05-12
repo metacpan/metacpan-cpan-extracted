@@ -1,0 +1,4 @@
+---
+backend:
+    "YAML":
+        - "t/resource/backends/yaml/def1.yaml"

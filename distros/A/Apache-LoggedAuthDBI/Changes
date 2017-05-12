@@ -1,0 +1,11 @@
+Revision history for Perl extension Apache::LoggedAuthDBI.
+
+
+0.12  Aug 10, 2005 - Added Digest::MD5 and Digest::SHA1 to the distribution to possibly enhance installation. Also fixed an error in the POD
+
+
+0.11  Jul 15, 2005 - removed serverspecific code to make this module CPAN-friendly.
+
+
+0.10  until Jul 15, 2005
+	- original version developed for 1200Group LLC

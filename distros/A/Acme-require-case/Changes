@@ -1,0 +1,94 @@
+Revision history for Acme-require-case
+
+0.012     2014-02-04 14:07:34-05:00 America/New_York
+
+    [FIXED]
+
+    - Avoids polluting %INC with absolute paths of modules loaded
+
+0.011     2013-09-25 11:22:15 America/New_York
+
+    [FIXED]
+
+    - Compile test could hang on Windows
+
+    [PREREQS]
+
+    - Dropped configure_requires for ExtUtils::MakeMaker to 6.17
+
+    [META]
+
+    - Updated some support files
+
+0.010     2013-09-06 22:58:42 America/New_York
+
+    [META]
+
+    - Updated distribution metadata
+
+0.009     2013-04-05 04:57:54 America/New_York
+
+    [FIXED]
+
+    - Fixed bug where absolute paths could not be loaded
+
+0.008     2013-03-15 09:56:52 America/New_York
+
+    [FIXED]
+
+    - fixed test for Perl 5.10.0 and older with latest
+      version.pm
+
+0.007     2013-02-28 11:19:55 America/New_York
+
+    [FIXED]
+
+    - resets $! on successful load, just like CORE::require
+
+    - even closer to CORE::require semantics for checking version numbers
+
+0.006     2013-02-27 18:08:30 America/New_York
+
+    [FIXED]
+
+    - localize %^H (fixes some bugs on Perls < 5.12);
+      Not as good as Lexical::SealRequireHints, but passable
+
+    - corrected error message to match perl's
+
+0.005     2013-02-21 17:37:11 America/New_York
+
+    [FIXED]
+
+    - wasn't catching compilation errors
+    
+    [TESTING]
+    
+    - added tests to get to 100% coverage
+
+0.004     2013-02-21 15:24:47 America/New_York
+
+    [FIXED]
+
+    - file being required now sees proper package as its caller
+
+0.003     2013-02-21 10:48:48 America/New_York
+
+    [CHANGED]
+
+    - improved error message with a suggestion for proper case
+
+0.002     2013-02-21 08:57:00 America/New_York
+
+    [CHANGED]
+
+    - s/die/croak/
+
+    [FIXED]
+
+    - Don't catch $!
+
+0.001     2013-02-21 05:11:15 America/New_York
+
+    - First release
+

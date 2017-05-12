@@ -1,0 +1,147 @@
+#------------------------------------------------------------------------------
+# RCS-Id: "@(#)$RCS-Id: pod/v2/afsperlktck.pod 2e2ca60 Tue Apr 15 13:04:20 2014 +0200 Norbert E Gruener$"
+#
+# © 2001-2014 Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<AFS::KTC_EKEY> - Class to handle the B<AFS structure ktc_encryptionkey>
+
+=head1 SYNOPSIS
+
+  use AFS::KTC_EKEY;
+  use AFS::Cell qw(localcell);
+
+  my $key = AFS::KTC_EKEY->ReadPassword('Password:');
+  print 'KEY = ', $key->string, " \n";
+
+  my $string = AFS::KTC_EKEY->UserReadPassword('Password:');
+  $key = AFS::KTC_EKEY->StringToKey($string, localcell);
+  print 'KEY = ', $key->string, " \n";
+
+  $key = AFS::KTC_EKEY->des_string_to_key('aaa');
+  print 'KEY = ', $key->string, " \n";
+
+  undef $key;
+
+=head1 DESCRIPTION
+
+This class provides methods to handle the B<AFS structure ktc_encryptionkey>.
+This structure represents an encryption key which is used in the I<Kernel
+Token Cache> (KTC). The KTC is part of the Cache Manager.  It is used to
+create B<ktc_encryptionkey> instances.
+
+=head1 COMPATIBILITY
+
+B<This release does NOT support any features and interfaces
+from version 1.>
+
+=head1 METHODS
+
+=over 4
+
+=item B<CONSTRUCTOR>
+
+=item S< >
+
+=item B<$key = AFS::KTC_EKEY-E<gt>des_string_to_key(STRING);>
+
+The STRING string is converted to a DES encryption key and this key is
+returned as an AFS::KTC_EKEY object.  It calls the AFS system library
+function 'des_string_to_key'.
+
+=item B<$key = AFS::KTC_EKEY-E<gt>ReadPassword(PROMPT [, VERIFY [, CELL]]);>
+
+Prints out a PROMPT and reads a string from the terminal, turning off
+echoing.  If VERIFY (default 0) is set to 1 it requests that the string
+be entered again and the two strings are compared.  CELL defaults to
+NULL. The string is then converted to a DES encryption key and the
+encryption key is returned as an AFS::KTC_EKEY object.  It calls the AFS
+system library function 'ka_ReadPassword'.
+
+=item B<$key = AFS::KTC_EKEY-E<gt>StringToKey(PASSWD, CELL);>
+
+The PASSWD string is converted to a DES encryption key and this key is
+returned as an AFS::KTC_EKEY object.  It calls the AFS system library
+function 'ka_StringToKey'.
+
+=item B<CLASS METHODS>
+
+=item S< >
+
+=item B<$string = AFS::KTC_EKEY-E<gt>UserReadPassword(PROMPT [, REASON]);>
+
+Prints out a PROMPT and reads a string from the terminal, turning off
+echoing.  This string is returned.  On error the error message is
+returned in REASON.  It calls the AFS system library function
+'ka_UserReadPassword'.
+
+=item B<ATTRIBUTES ACCESS>
+
+=item S< >
+
+=item B<$key-E<gt>string;>
+
+Returns the whole encryption key as a string.
+
+=back
+
+=head1 CURRENT AUTHOR
+
+Norbert E. Gruener E<lt>nog@MPA-Garching.MPG.deE<gt>
+
+=head1 AUTHOR EMERITUS
+
+Roland Schemers E<lt>schemers@slapshot.stanford.eduE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (c) 2001-2010 Norbert E. Gruener <nog@MPA-Garching.MPG.de>.
+ All rights reserved.
+
+ Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University.
+ All rights reserved.
+
+Most of the explanations in this document are taken from the original
+AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ Authentication Server Interface
+ Edward R. Zayas
+ Copyright (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ Copyright (c) IBM Corporation 2000.
+ All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=over 6
+
+=item The original module is covered by the following copyright:
+
+Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation,
+advertising materials, and other materials related to such
+distribution and use acknowledge that the software was developed
+by Stanford University.  The name of the University may not be used
+to endorse or promote products derived from this software without
+specific prior written permission.
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=back
+
+=head1 DOCUMENT VERSION
+
+Revision $Rev: 1059 $

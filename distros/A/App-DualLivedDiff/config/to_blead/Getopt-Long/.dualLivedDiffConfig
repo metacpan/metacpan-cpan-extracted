@@ -1,0 +1,8 @@
+---
+files:
+  lib/Getopt/Long.pm: lib/Getopt/Long.pm
+  README: lib/Getopt/Long/README
+  CHANGES: lib/Getopt/Long/CHANGES
+dirs-recursive:
+  t/: lib/Getopt/Long/t/
+

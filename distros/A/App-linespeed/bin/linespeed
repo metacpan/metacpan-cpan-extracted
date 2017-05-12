@@ -1,0 +1,208 @@
+#!perl
+
+our $DATE = '2016-10-01'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use strict;
+use warnings;
+
+use Getopt::Long::Complete;
+use Time::HiRes qw(time);
+
+my %Opts = (
+);
+
+sub _with_unit {
+    my ($n2, $n1, $t2, $t1) = @_;
+    if ($t2 == $t1) {
+        return (0, "");
+    } else {
+        my $s = ($n2-$n1) / ($t2-$t1);
+        if ($s > 1.5e9) {
+            return ($s/1e9, "Gi/s");
+        } elsif ($s > 1.5e6) {
+            return ($s/1e6, "Mi/s");
+        } elsif ($s > 1.5e3) {
+            return ($s/1e3, "Ki/s");
+        } else {
+            return ($s, "/s");
+        }
+    }
+}
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'version|v'     => sub {
+            no warnings;
+            print "linespeed version $main::VERSION ($main::DATE)\n";
+            exit 0;
+        },
+        'help|h'        => sub {
+            print <<USAGE;
+Usage:
+  linespeed [OPTIONS]... < INPUT
+  linespeed --version, -v
+  linespeed --help, -h
+Options:
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+}
+
+sub run {
+    $|++;
+    my $num_lines = 0;
+    my $prev_time = time();
+    my $prev_num_lines;
+    my ($first_num_lines, $first_time);
+    my $msg = "";
+    while (<>) {
+        $num_lines++;
+
+        my $time = time();
+
+	unless (defined $prev_num_lines) {
+            $prev_num_lines = $num_lines;
+            $prev_time = time();
+            $first_num_lines = $num_lines;
+            $first_time = $prev_time;
+            next;
+        }
+
+        # don't report speed too often
+        next unless $time - $prev_time >= 0.5;
+
+        my $new_msg = sprintf(
+            "Cur speed: %8.3f%-4s  Avg: %8.3f%-4s",
+            _with_unit($num_lines, $prev_num_lines , $time, $prev_time ),
+            _with_unit($num_lines, $first_num_lines, $time, $first_time),
+        );
+
+        print "\b" x length $msg;
+        print $new_msg, "\e[K"; # clear to EOL
+
+        $msg = $new_msg;
+        $prev_num_lines = $num_lines;
+        $prev_time = $time;
+    }
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Calculate how fast input lines are coming in
+# PODNAME: linespeed
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+linespeed - Calculate how fast input lines are coming in
+
+=head1 VERSION
+
+This document describes version 0.001 of linespeed (from Perl distribution App-linespeed), released on 2016-10-01.
+
+=head1 SYNOPSIS
+
+ % tail -f some-log | linespeed
+ Cur speed: 33.3/s  Avg: 31.6/s_
+
+=head1 DESCRIPTION
+
+C<linespeed> receives lines from standard input (or files) and calculates how
+fast the lines are coming in. It can be used to measure, e.g. the current HTTP
+requests/sec a server is getting from the webserver access log.
+
+=head1 TODO
+
+Add option: --si to use power of 1000 not 1024 (but 1000 is the default).
+
+Show speed in the last minute, 5 mins, 15 mins (or customizable).
+
+=head1 HISTORY
+
+First written in 2000-04-14.
+
+=head1 OPTIONS
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C linespeed linespeed
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete linespeed 'p/*/`linespeed`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-linespeed>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-linespeed>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-linespeed>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<numspeed>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,604 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Carp;
+
+use Glib qw( TRUE FALSE );
+use Gtk2 -init;
+use Gtk2::SimpleList;
+
+use Devel::MAT;
+
+use List::Util qw( pairs );
+use List::UtilsBy qw( sort_by );
+
+use App::Devel::MAT::Explorer::GTK::Resources qw( get_icon );
+use App::Devel::MAT::Explorer::GTK::SVDetail;
+use App::Devel::MAT::Explorer::GTK::Utils qw( bytes2size );
+use App::Devel::MAT::Explorer::GTK::Widgets qw( framed vscrollable );
+
+my $pmat;
+my $df;
+
+my $win = Gtk2::Window->new( "toplevel" );
+$win->signal_connect( destroy => sub { Gtk2->main_quit } );
+$win->resize( 1000, 600 );
+my $winbox = Gtk2::VBox->new( 0, 0 );
+$win->add( $winbox );
+
+my $menu = Gtk2::MenuBar->new;
+$winbox->pack_start( $menu, FALSE, TRUE, 0 );
+
+my $filemenu = add_submenu( $menu, "File" );
+add_menuitem( $filemenu, "Quit" => sub { Gtk2->main_quit } );
+
+my $navmenu = add_submenu( $menu, "Navigate" );
+
+my $toolbar = Gtk2::Toolbar->new;
+$toolbar->set_style( 'both' );
+$winbox->pack_start( $toolbar, FALSE, TRUE, 0 );
+
+my $backbtn = $toolbar->append_item( "Back", "Go back to the previous SV", "",
+   Gtk2::Image->new_from_stock("gtk-go-back", "small-toolbar"), \&history_back );
+my $forwardbtn = $toolbar->append_item( "Forward", "Go forward to the next SV", "",
+   Gtk2::Image->new_from_stock("gtk-go-forward", "small-toolbar"), \&history_forward );
+
+my $svs_loaded;
+
+my $outrefs_mth = "outrefs";
+my $inrefs_mth = "inrefs";
+{
+   my %mode_buttons;
+
+   my %mode_tooltip = (
+      All    => "Display and count every kind of inref and outref",
+      Direct => "Display and count only direct inrefs and outrefs",
+      Strong => "Display and count only strong direct inrefs and outrefs",
+   );
+
+   Devel::MAT::UI->provides_radiobutton_set(
+      map {
+         my $filter = $_ eq "All" ? "" : "_\L$_";
+
+         Devel::MAT::UI->register_icon(
+            name => "refs-$_",
+            svg => "icons/refs-$_.svg"
+         );
+
+         {
+            text    => $_,
+            icon    => "refs-$_",
+            tooltip => $mode_tooltip{$_},
+            code    => sub {
+               $outrefs_mth = "outrefs$filter";
+               $inrefs_mth  = "inrefs$filter";
+
+               reset_svlist_refs() if $svs_loaded;
+               redisplay_sv();
+            },
+         }
+      } qw( All Direct Strong )
+   );
+
+   Devel::MAT::UI->provides_sv_detail(
+      order => 1E6,
+      type => "widget",
+      title => "Outrefs",
+      render => sub {
+         my ( $sv ) = @_;
+         my $outrefs = Gtk2::SimpleList->new(
+            " "    => "pixbuf",
+            "Ref"  => "text",
+            "Addr" => "text",
+            "Desc" => "text",
+         );
+         foreach my $ref ( sort_by { $_->name } $sv->$outrefs_mth ) {
+            my $strength = $ref->strength;
+            push @{ $outrefs->{data} }, [ get_icon( "strength-$strength" ), $ref->name, sprintf( "%#x", $ref->sv->addr ), $ref->sv->desc ];
+         }
+         $outrefs->signal_connect( row_activated => sub {
+            my( $self, $path, $column ) = @_;
+            my $data = $self->get_row_data_from_path( $path );
+
+            my $addr = hex $data->[2];
+            my $sv = $df->sv_at( $addr );
+            history_nav( $sv );
+         });
+         return vscrollable( $outrefs );
+      },
+      expand => TRUE,
+   );
+
+   Devel::MAT::UI->provides_sv_detail(
+      order => 1E6 + 1,
+      type => "widget",
+      title => "Inrefs",
+      render => sub {
+         my ( $sv ) = @_;
+         my $inrefs = Gtk2::SimpleList->new(
+            " "    => "pixbuf",
+            "Ref"  => "text",
+            "Addr" => "text",
+            "Desc" => "text",
+         );
+         foreach my $ref ( sort_by { $_->name } $sv->$inrefs_mth ) {
+            my $strength = $ref->strength;
+            if( $ref->sv ) {
+               push @{ $inrefs->{data} }, [ get_icon( "strength-$strength" ), $ref->name, sprintf( "%#x", $ref->sv->addr ), $ref->sv->desc ];
+            }
+            else {
+               push @{ $inrefs->{data} }, [ get_icon( "strength-$strength" ), $ref->name, "-", "ROOT" ];
+            }
+         }
+         $inrefs->signal_connect( row_activated => sub {
+            my( $self, $path, $column ) = @_;
+            my $data = $self->get_row_data_from_path( $path );
+
+            my $addr = hex $data->[2];
+            my $sv = $df->sv_at( $addr );
+            history_nav( $sv ) if $sv;
+         });
+         return vscrollable( $inrefs );
+      },
+      expand => TRUE,
+   );
+}
+
+### History management
+{
+   my @back_sv;
+   my @forward_sv;
+   my $current_sv;
+
+   $backbtn->set_sensitive( FALSE );
+   $forwardbtn->set_sensitive( FALSE );
+
+   sub history_back
+   {
+      return unless @back_sv;
+
+      unshift @forward_sv, $current_sv if $current_sv;
+      $current_sv = pop @back_sv;
+
+      $backbtn->set_sensitive( scalar @back_sv );
+      $forwardbtn->set_sensitive( scalar @forward_sv );
+
+      display_sv( $current_sv );
+   }
+
+   sub history_forward
+   {
+      return unless @forward_sv;
+
+      push @back_sv, $current_sv if $current_sv;
+      $current_sv = shift @forward_sv;
+
+      $backbtn->set_sensitive( scalar @back_sv );
+      $forwardbtn->set_sensitive( scalar @forward_sv );
+
+      display_sv( $current_sv );
+   }
+
+   sub history_nav
+   {
+      my ( $sv ) = @_;
+
+      push @back_sv, $current_sv if $current_sv;
+      $current_sv = $sv;
+
+      if( @forward_sv and $sv == $forward_sv[0] ) {
+         shift @forward_sv;
+      }
+      else {
+         @forward_sv = ();
+      }
+
+      $backbtn->set_sensitive( scalar @back_sv );
+      $forwardbtn->set_sensitive( scalar @forward_sv );
+
+      display_sv( $current_sv );
+   }
+
+   sub redisplay_sv
+   {
+      display_sv( $current_sv ) if $current_sv;
+   }
+}
+
+add_menuitem( $navmenu, "Back" => \&history_back );
+add_menuitem( $navmenu, "Forward" => \&history_forward );
+
+add_menuitem( $navmenu, "By address..." => sub {
+   defined( my $addr = entry_dialog( "Enter SV address" ) ) or return;
+
+   $addr = hex $addr;
+   if( my $sv = $df->sv_at( $addr ) ) {
+      history_nav( $sv );
+   }
+   else {
+      progress( sprintf "Cannot navigate by address: no such SV at 0x%x", $addr );
+   }
+});
+
+add_menuitem( $navmenu, "By symbol..." => sub {
+   defined( my $symb = entry_dialog( "Enter symbol name" ) ) or return;
+
+   if( my $sv = eval { $pmat->find_symbol( $symb ) } ) {
+      history_nav( $sv );
+   }
+   else {
+      chomp( my $e = $@ );
+      progress( "Cannot navigate by symbol: $e" );
+   }
+});
+
+my $rootmenu = add_submenu( $menu, "Roots" );
+
+my $toolmenu;
+foreach my $tool ( sort Devel::MAT->available_tools ) {
+   my $tool_class = "Devel::MAT::Tool::$tool";
+   next unless $tool_class->can( "FOR_UI" ) and $tool_class->FOR_UI;
+
+   $toolmenu ||= add_submenu( $menu, "Tools" );
+   add_menuitem( $toolmenu, $tool, sub {
+      my ( $mi ) = @_;
+
+      $mi->set_sensitive( FALSE );
+
+      my $tool = $pmat->load_tool( $tool, progress => \&progress );
+      $tool->init_ui( "Devel::MAT::UI" );
+      progress( "Done" );
+   });
+}
+
+my $pane = Gtk2::HPaned->new;
+$winbox->add( $pane );
+
+my $statusbar = Gtk2::Statusbar->new;
+$winbox->pack_end( $statusbar, FALSE, TRUE, 0 );
+
+$statusbar->pack_start( framed( my $perlver_label = Gtk2::Label->new( "" ) ), FALSE, FALSE, 0 );
+$statusbar->pack_start( framed( my $svcount_label = Gtk2::Label->new( "" ) ), FALSE, FALSE, 0 );
+$statusbar->pack_start( framed( my $bytetotal_label = Gtk2::Label->new( "" ) ), FALSE, FALSE, 0 );
+
+$win->show_all;
+
+{
+   my $id;
+   sub progress
+   {
+      $statusbar->pop( $id ) if $id;
+      $id = $statusbar->push( $statusbar->get_context_id("progress"), "Progress: $_[0]" );
+      Gtk2->main_iteration_do( FALSE ) while Gtk2->events_pending;
+   }
+}
+
+my $filename = $ARGV[0] or die "Need dumpfile\n";
+
+$win->set_title( "$filename - pmat-explore-gtk" );
+
+$pmat = Devel::MAT->load( $filename, progress => \&progress );
+$df = $pmat->dumpfile;
+
+$perlver_label->set_text( join " ", "Perl",
+   $df->perlversion,
+   ( $df->ithreads ? "thread" : () ),
+   ( $df->ptr_len * 8 ) . "bit",
+);
+$svcount_label->set_text( scalar($df->heap) . " SVs" );
+
+# We're going to be using Inrefs
+$pmat->load_tool( "Inrefs", progress => \&progress );
+
+foreach ( pairs $df->roots ) {
+   my ( $desc, $sv ) = @$_;
+   add_menuitem( $rootmenu, $desc, sub { history_nav( $sv ) } ) if $sv;
+}
+
+my $svlist_model = Gtk2::ListStore->new(
+   "Glib::String",
+   "Glib::Int",
+   "Glib::String",
+   "Glib::Int",
+   "Glib::String",
+   "Glib::Int",
+   "Glib::Int",
+);
+
+# UI column constants
+sub Devel::MAT::UI::COLUMN_TYPE   () { 0 }
+sub Devel::MAT::UI::COLUMN_ADDR   () { 1 }
+sub Devel::MAT::UI::COLUMN_DESC   () { 2 }
+sub Devel::MAT::UI::COLUMN_SIZE   () { 3 }
+sub Devel::MAT::UI::COLUMN_BLESSED() { 4 }
+sub Devel::MAT::UI::COLUMN_OUTREFS() { 5 }
+sub Devel::MAT::UI::COLUMN_INREFS () { 6 }
+
+my $svlist_view = Gtk2::TreeView->new;
+$svlist_view->set_model( $svlist_model );
+
+sub add_svlist_column
+{
+   my %args = @_;
+
+   my $column = Gtk2::TreeViewColumn->new_with_attributes(
+      $args{title}, Gtk2::CellRendererText->new, text => $args{idx},
+   );
+   $column->set_sort_column_id( $args{idx} );
+
+   $svlist_view->append_column( $column );
+}
+
+# First two columns are special
+$svlist_view->insert_column_with_data_func( -1, " ",
+   Gtk2::CellRendererPixbuf->new, sub {
+      my ( $column, $renderer, $model, $iter ) = @_;
+      my $type = $model->get( $iter, Devel::MAT::UI->COLUMN_TYPE );
+      my $icon = get_icon( "type-$type" );
+
+      $renderer->set( pixbuf => $icon ) if $icon;
+   }, undef
+);
+$svlist_view->insert_column_with_data_func( -1, "Address",
+   Gtk2::CellRendererText->new, sub {
+      my ( $column, $renderer, $model, $iter ) = @_;
+      my $addr = $model->get( $iter, Devel::MAT::UI->COLUMN_ADDR );
+      $renderer->set( text => sprintf "%#x", $addr );
+   }, undef
+);
+
+add_svlist_column title => "Description", idx => 2;
+
+$svlist_view->insert_column_with_data_func( -1, "Size",
+   Gtk2::CellRendererText->new, sub {
+      my ( $column, $renderer, $model, $iter ) = @_;
+      my $bytes = $model->get( $iter, Devel::MAT::UI->COLUMN_SIZE );
+      $renderer->set( text => bytes2size $bytes );
+   }, undef
+);
+
+add_svlist_column title => "Blessed",     idx => 4;
+add_svlist_column title => "Outrefs",     idx => 5;
+add_svlist_column title => "Inrefs",      idx => 6;
+
+$svlist_view->get_column( $_ )->set_sort_column_id( $_ ) for 0, 1, 3;
+
+$pane->add1( vscrollable( $svlist_view ) );
+
+my $total = scalar $df->heap;
+my $count = 0;
+my $bytes = 0;
+foreach my $sv ( $df->heap ) {
+   my $iter = $svlist_model->append;
+   $svlist_model->set( $iter,
+      0 => $sv->type,
+      1 => $sv->addr,
+      2 => $sv->desc,
+      3 => $sv->size,
+      4 => ( $sv->blessed ? $sv->blessed->stashname : "" ),
+      5 => scalar $sv->$outrefs_mth,
+      6 => scalar $sv->$inrefs_mth,
+   );
+   $count++;
+   progress( sprintf "Loading GTK TreeView %d of %d (%.2f%%)",
+      $count, $total, $count*100 / $total ) if ($count % 1000) == 0;
+   $bytes += $sv->size;
+}
+
+$svs_loaded = 1;
+
+sub reset_svlist_refs
+{
+   my $count = 0;
+   for ( my $iter = $svlist_model->get_iter_first; $iter; $iter = $svlist_model->iter_next( $iter ) ) {
+      my $addr = $svlist_model->get( $iter, 1 );
+      my $sv = $df->sv_at( $addr );
+
+      $svlist_model->set( $iter,
+         5 => scalar $sv->$outrefs_mth,
+         6 => scalar $sv->$inrefs_mth,
+      );
+
+      $count++;
+      progress( sprintf "Loading GTK TreeView %d of %d (%.2f%%)",
+         $count, $total, $count*100 / $total ) if ($count % 1000) == 0;
+   }
+
+   progress( "Done" );
+}
+
+$bytetotal_label->set_text( $bytes . " bytes" );
+
+my $table = Gtk2::Table->new( 1, 3 );
+$pane->add2( $table );
+
+$svlist_view->signal_connect( row_activated => sub {
+   my( $self, $path, $column ) = @_;
+   my $iter = $svlist_model->get_iter( $path );
+   my $addr = $svlist_model->get( $iter, 1 );
+
+   my $sv = $df->sv_at( $addr );
+   history_nav( $sv );
+});
+
+progress( "Done" );
+
+$win->show_all;
+Gtk2->main;
+
+sub display_sv
+{
+   my ( $sv ) = @_;
+
+   $table->remove( $_ ) foreach $table->get_children;
+   $table->resize( 1, 1 );
+
+   App::Devel::MAT::Explorer::GTK::SVDetail::display_sv_in_table( $sv, $table );
+
+   $table->show_all;
+
+   for( my $iter = $svlist_model->get_iter_first; $iter; $iter = $svlist_model->iter_next( $iter ) ) {
+      my $addr = $svlist_model->get_value( $iter, 1 );
+
+      if( $sv->addr == $addr ) {
+         my $path = $svlist_model->get_path( $iter );
+         $svlist_view->scroll_to_cell( $path, $svlist_view->get_column( 0 ), '' );
+         $svlist_view->get_selection->select_path( $path );
+         last;
+      }
+   }
+}
+
+sub add_submenu
+{
+   my ( $menu, $name ) = @_;
+
+   my $mi = Gtk2::MenuItem->new( $name );
+   my $submenu = Gtk2::Menu->new;
+   $mi->set_submenu( $submenu );
+
+   $menu->append( $mi );
+
+   return $submenu;
+}
+
+sub add_menuitem
+{
+   my ( $menu, $name, $code ) = @_;
+
+   my $mi = Gtk2::MenuItem->new( $name );
+   $mi->signal_connect( activate => $code );
+
+   $menu->append( $mi );
+}
+
+sub entry_dialog
+{
+   my ( $question ) = @_;
+
+   my $d = Gtk2::Dialog->new( $question, $win,
+      [ qw( modal destroy-with-parent )],
+      'gtk-cancel' => 'reject',
+      'gtk-ok'     => 'accept',
+   );
+   $d->set_default_response( 'accept' );
+
+   my $entry = Gtk2::Entry->new();
+   $entry->set_activates_default( TRUE );
+
+   my $vbox = $d->vbox;
+   $vbox->pack_start( $entry, 0, 0, 4 );
+   $vbox->show_all;
+
+   my $response = $d->run;
+   my $text = $entry->get_text;
+
+   $d->destroy;
+
+   return $text if $response eq 'accept';
+   return;
+}
+
+sub Devel::MAT::UI::provides_radiobutton_set
+{
+   shift;
+
+   $toolbar->append_space;
+
+   my $group;
+   foreach my $button ( @_ ) {
+      my $code = $button->{code};
+
+      my $button = $toolbar->append_element(
+         "radiobutton", undef, $button->{text}, $button->{tooltip}, "",
+         $button->{icon} ? Gtk2::Image->new_from_pixbuf( get_icon( $button->{icon} ) // die "No icon $button->{icon}" ) : undef,
+         sub {
+            my ( $button ) = @_;
+            return unless $button->get_active;
+
+            goto &$code;
+         },
+      );
+
+      $button->set_group( $group ) if $group;
+      $group //= $button->get_group;
+   }
+}
+
+my %COLTYPES; BEGIN { %COLTYPES = (
+   int  => { store_type => "Glib::Int",    renderer => "Gtk2::CellRendererText",   attr => "text"   },
+   text => { store_type => "Glib::String", renderer => "Gtk2::CellRendererText",   attr => "text"   },
+   icon => { store_type => "Glib::String", renderer => "Gtk2::CellRendererPixbuf", func => sub {
+      my ( $column, $cell, $model, $iter, $idx ) = @_;
+      my $name = $model->get( $iter, $idx ) or return;
+      $cell->set( pixbuf => get_icon( $name ) );
+   } },
+); }
+sub Devel::MAT::UI::provides_svlist_column
+{
+   shift;
+   my %args = @_;
+
+   my $type = $COLTYPES{$args{type}} or
+      croak "Unrecognised column type $args{type}";
+
+   my $idx = $svlist_model->get_n_columns;
+
+   # Cannot add a new column to a model, we'll have to make a new bigger model,
+   # copy the data, set it
+   my $new_model = Gtk2::ListStore->new(
+      ( map { $svlist_model->get_column_type($_) } 0 .. $idx-1 ),
+      $type->{store_type},
+   );
+
+   for ( my $src_iter = $svlist_model->get_iter_first; $src_iter; $src_iter = $svlist_model->iter_next( $src_iter ) ) {
+      my $dest_iter = $new_model->append;
+      my @values = $svlist_model->get( $src_iter ), undef;
+      $new_model->set( $dest_iter, map { $_ => $values[$_] } 0 .. $#values );
+   }
+
+   $svlist_view->set_model( $svlist_model = $new_model );
+
+   my $column = Gtk2::TreeViewColumn->new_with_attributes(
+      $args{title},
+      my $renderer = $type->{renderer}->new,
+   );
+
+   if( $type->{attr} ) {
+      $column->set_attributes( $renderer, $type->{attr} => $idx );
+   }
+   elsif( $type->{func} ) {
+      $column->set_cell_data_func( $renderer, $type->{func}, $idx );
+   }
+   $svlist_view->append_column( $column );
+   $column->set_sort_column_id( $idx );
+
+   return $idx;
+}
+
+sub Devel::MAT::UI::set_svlist_column_values
+{
+   shift;
+   my %args = @_;
+
+   my $idx = $args{column};
+   my $from = $args{from};
+   ref $from eq "CODE" or croak "Expected 'from' as a CODE reference";
+
+   my $total = scalar $df->heap;
+   my $count = 0;
+   for ( my $iter = $svlist_model->get_iter_first; $iter; $iter = $svlist_model->iter_next( $iter ) ) {
+      my $addr = $svlist_model->get( $iter, 1 );
+      my $data = $from->( $df->sv_at( $addr ) );
+
+      $svlist_model->set( $iter, $idx, $data );
+
+      $count++;
+      progress( sprintf "Loading GTK TreeView %d of %d (%.2f%%)",
+         $count, $total, $count*100 / $total ) if ($count % 1000) == 0;
+   }
+
+   progress( "Done" );
+}

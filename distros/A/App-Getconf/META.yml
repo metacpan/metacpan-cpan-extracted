@@ -1,0 +1,17 @@
+name:                App-Getconf
+version:             0.20.04
+abstract:            singleton-like config store for command-line applications
+license:             perl
+distribution_type:   module
+prereqs:
+  runtime:
+    requires:
+      base:        0
+      Exporter:    0
+      Carp:        0
+      Tie::IxHash: 0
+  test:
+    requires:
+      YAML: 0
+author:
+  - Stanislaw Klekot <cpan@jarowit.net>

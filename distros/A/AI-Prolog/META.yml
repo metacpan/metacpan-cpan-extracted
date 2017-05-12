@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               AI-Prolog
+version:            0.741
+abstract:           Perl extension for logic programming.
+author:
+    - Curtis "Ovid" Poe
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    aliased:         0.11
+    Clone:           0.15
+    Exporter::Tidy:  0.06
+    Hash::AsObject:  0.05
+    Hash::Util:      0
+    Pod::Usage:      1.12
+    Regexp::Common:  2.119
+    Scalar::Util:    0
+    Term::ReadKey:   2.21
+    Term::ReadLine:  1.01
+    Text::Balanced:  1.95
+    Text::Quote:     0.03
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

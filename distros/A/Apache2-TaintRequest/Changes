@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache2-TaintRequest.
+
+0.01  Fri Apr  6 16:13:30 2012
+	- original version; created by h2xs 1.23 with options
+		-X Apache2-TaintRequest
+

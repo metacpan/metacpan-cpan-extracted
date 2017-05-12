@@ -1,0 +1,19 @@
+.cvsignore
+Build.PL
+Changes
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+lib/AuthCAS.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.json
+META.yml			# Will be created by "make dist"
+README
+sampleCasClient.pl
+t/00.load.t
+t/pod-coverage.t
+t/pod.t
+t/simple.t

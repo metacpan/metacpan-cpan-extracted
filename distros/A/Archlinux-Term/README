@@ -1,0 +1,55 @@
+-*- org -*-
+    _             _     _ _                     _____                   
+   / \   _ __ ___| |__ | (_)_ __  _   ___  ___ |_   _|__ _ __ _ __ ___  
+  / _ \ | '__/ __| '_ \| | | '_ \| | | \ \/ (_|_)| |/ _ \ '__| '_ ` _ \ 
+ / ___ \| | | (__| | | | | | | | | |_| |>  < _ _ | |  __/ |  | | | | | |
+/_/   \_\_|  \___|_| |_|_|_|_| |_|\__,_/_/\_(_|_)|_|\___|_|  |_| |_| |_|
+                                                                        
+Archlinux::Term - Print messages to the terminal in Archlinux style
+
+* Background
+  Archlinux has a distinctive and simple style for displaying messages
+  on the terminal. This style is used in the init scripts and pacman
+  to give a cohesive look to Archlinux's terminal. This module makes
+  it easy to use that style in your perl scripts.
+
+* Installation
+  To install this module follow these steps. If you have already
+  downloaded and extracted the distribution tarball in order to read
+  this README file skip to step 4.
+  
+  1) Download the distribution tarball from CPAN.
+  2) Extract the tarball.
+  3) *cd* into the extracted directory (Archlinux-Term-<version>)
+  4) Run *perl Makefile.PL* to create a *Makefile*
+  5) Run *make* to build the module using the *Makefile*
+  6) (Optional) Run *make test* to run automated self-tests.
+  7) Run *make install* to install the perl module into a system directory.
+
+  Or better yet use a CPAN shell to do it for you! Cpanminus is available
+  on CPAN under the name "App-cpanminus".
+
+** Example
+   :curl -O http://search.cpan.org/.../Archlinux-Term-0.01.tar.gz
+   :tar xf Archlinux-Term-0.01.tar.gz
+   :cd Archlinux-Term-0.01
+   :perl Makefile.PL
+   :make
+   :make test
+   :sudo make install
+
+* See Also
+** Archlinux
+   http://www.archlinux.org
+** Git Repository
+   http://github.com/juster/perl-archlinux-messages
+
+* Author
+  Justin Davis `<juster at cpan dot org>'
+
+* Copyright and License
+  Copyright 2010 Justin Davis, all rights reserved.
+
+  This program is free software; you can redistribute it and/or modify it
+  under the same terms as Perl itself.
+

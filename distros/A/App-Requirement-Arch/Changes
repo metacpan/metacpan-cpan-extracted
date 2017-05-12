@@ -1,0 +1,104 @@
+commit d479b4022b84856262eb783c9a3150e7d3ce8a52 (HEAD, master)
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Apr 26 08:34:51 2010 +0200
+
+    CHANGED: extract ra help directly from pod
+    CHANGED: documentation about completion script generation
+
+commit c32983ddb944107510a79c2e1396284b39c06a56
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Apr 26 00:32:25 2010 +0200
+
+    ADDED: front end "ra" and bash completion
+
+commit ca5daf437c4bf9b6b51481a18cb8d0f699757bee
+Author: nadim khemir <nkh@cpan.org>
+Date:   Fri Apr 16 01:05:44 2010 +0200
+
+    ADDED: template instalation
+
+commit 8cdf2ba677e830cdea01ab965fe9552ed0190a0e
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Mar 27 21:08:28 2010 +0100
+
+    ADDED: free form template  in ra_edit
+
+commit a43deecf1faec4848e79bf6453d569525d6c7afb
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Mar 27 20:33:51 2010 +0100
+
+    ADDED: unified checks in ra_edit
+
+commit 5f0b12c60fe916985279fca335fee2cdbbf28ea0
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Mar 27 19:27:27 2010 +0100
+
+    ADDED: ra_edit
+
+commit 61617e5c31f1da037ae7b3d38adfa54748eef9a9
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Feb 28 02:22:19 2010 +0100
+
+    CHANGED: completed ra_new_batch
+    ADDED: entries in Todo.txt
+
+commit 03e48524da5fc04a002e7494eea5c17640432665
+Author: nadim khemir <nkh@cpan.org>
+Date:   Tue Feb 16 10:18:11 2010 +0100
+
+    FIXED: formating of flat document
+
+commit 654069e8fc740938b84637afc9107f3e49c82531
+Author: nadim khemir <nkh@cpan.org>
+Date:   Tue Feb 16 10:17:38 2010 +0100
+
+    FIXED: formating of flat document
+
+commit b7abe8b2bc19920c2064684f86cdd327954b3eb9
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Jan 16 19:08:45 2010 +0100
+
+    FIXED: flat document wasn't taking categories into account
+    CHANGED: split ra_show into ra_show and ra_show_flat
+
+commit 0e2f384b88f5794a2721c4b645ba4b7dcf1f0d34
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Jan 16 18:03:23 2010 +0100
+
+    ADDED: default location for templates
+
+commit f0923bd49c2259a02bd635b2e4f342036572bc5d
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Jan 16 01:22:41 2010 +0100
+
+    ADDED: --requirement_fields_filter_file
+    CHANGED: removed non generic categories from master_categories.pl
+    ADDED: master_template.pl dumps its contents when called as a command
+
+commit d7ed7cb9bdc07fc902098dee4659cf45f2277056
+Author: nadim khemir <nkh@cpan.org>
+Date:   Fri Jan 15 12:53:42 2010 +0100
+
+    CHANGED: Builds as a perl module
+    
+    CHANGED: All scripts running
+    CHANGED: Build.PL
+
+commit ebd7d7be7842d0c6b4b1f0a6a1ce70ef7ed391ae
+Author: nadim khemir <nkh@cpan.org>
+Date:   Fri Jan 15 02:52:51 2010 +0100
+
+    CHANGED: ra_show_sorted_by_abstraction_level ra_show_usecases working
+
+commit b50e8ffa6e8d78e5d943a64ca809ad18ab9c07b7
+Author: nadim khemir <nkh@cpan.org>
+Date:   Fri Jan 15 01:57:54 2010 +0100
+
+    CHANGED: ra_check
+    ra_new ra_spellcheck working
+
+commit c0d78d86e1f71318e8d2770762ea92961555dc82
+Author: nadim khemir <nkh@cpan.org>
+Date:   Thu Jan 14 14:56:00 2010 +0100
+
+    Initial commit

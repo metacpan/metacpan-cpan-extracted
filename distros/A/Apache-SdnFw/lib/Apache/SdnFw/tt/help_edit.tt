@@ -1,0 +1,14 @@
+<FORM method="POST" action="[% s.ubase %]/[% s.object %]/[% s.function %]">
+[% s.html_hidden('f','save') %]
+<div class="floatleft">
+<table>
+	<caption>Edit Help for <a href="[% s.ubase %]/[% s.function %]">[% s.function %]</a></caption>
+	<tbody>
+		<tr>
+			<td width="600"><textarea name="help_text" cols="80" rows="25">[% s.help_text %]</textarea></td>
+		</tr>
+	</tbody>
+</table>
+<input type="submit" value="Save">
+</div>
+</form>

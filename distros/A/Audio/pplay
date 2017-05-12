@@ -1,0 +1,30 @@
+#!/usr/local/bin/perl -w
+use strict;
+use Audio::Data;
+use Audio::Play;
+use IO::File;
+
+my $svr = Audio::Play->new;
+
+my $name;
+foreach $name (@ARGV)
+ {
+  my $fh = new IO::File "<$name" or die "Cannot open $name:$!";
+  binmode($fh);
+  my $au = Audio::Data->new(Load => $fh);
+  my $com = $au->comment || '';
+  print "$name ";
+  print "($com)" if length $com;
+  printf " @ %dHz %.3gs\n",$au->rate,$au->duration;
+  $fh->close;
+  if ($au->rate != $svr->rate)
+   {
+    $svr->rate($au->rate);
+    if ($au->rate != $svr->rate)
+     {
+      warn "Converting to ".$svr->rate."Hz\n";
+      $au->rate($svr->rate) 
+     } 
+   }
+  $svr->play($au);
+ }

@@ -1,0 +1,54 @@
+---
+abstract: 'SPARQL 1.1 Protocol Endpoint'
+author:
+  - 'Gregory Todd Williams  C<< <gwilliams@cpan.org> >>'
+  - 'Gregory Todd Williams <gwilliams@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  HTTP::Message::PSGI: 0
+  Test::Exception: 0
+  Test::LWP::UserAgent: 0
+  Test::Modern: 0
+  Test::Moose: 0
+  Test::More: 0.88
+  Test::Roo: 0
+  Test::WWW::Mechanize::PSGI: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AtteanX-Endpoint
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Attean: 0.013
+  File::ShareDir: 0
+  HTML::HTML5::Parser: 0
+  HTML::HTML5::Writer: 0
+  HTTP::Negotiate: 0
+  IO::Compress::Gzip: 0
+  JSON: 0
+  List::MoreUtils: 0
+  Moo: 1.006
+  MooX::Log::Any: 0
+  Plack: 0
+  TryCatch: 0
+  Types::Standard: 0
+  namespace::clean: 0
+  perl: 5.14.0
+resources:
+  IRC: irc://irc.perl.org/#perlrdf
+  bugtracker: https://github.com/kasei/atteanx-endpoint/issues
+  homepage: http://search.cpan.org/dist/AtteanX-Endpoint/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/kasei/atteanx-endpoint/
+version: 0.001

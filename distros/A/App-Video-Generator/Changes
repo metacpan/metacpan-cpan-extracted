@@ -1,0 +1,36 @@
+0.07 2015-11-06T13:01:08+01:00
+ - Fix width and height for -i option.
+ - Update examples/ directory.
+
+0.06 2015-09-30T17:18:12+02:00
+ - Add support for generating of video from image files.
+ - Fix number of chars on line (80).
+ - Fix EXAMPLE3 in bin/video-generator doc.
+
+0.05 2015-09-18T14:57:36+02:00
+ - Add support for duration suffixes min (minute) and h (hour).
+
+0.04 2015-09-16T11:30:18+02:00
+ - Add support for ms/s suffix in -d argument.
+ - Fix output in EXAMPLE in doc.
+ - Fix man page of video-generator script.
+ - Move author tests to xt/ directory.
+ - Remove obsolete dependency.
+
+0.03 2015-09-15T22:35:35+02:00
+ - Add proper exit code.
+ - Add test for constructor.
+ - Add verbose mode (-v).
+ - Move argument processing to run() method.
+ - Remove obsolete code from Generator.pm.
+ - Sort argument default values.
+
+0.02 2015-08-20T08:51:16+02:00
+ - Add examples/ directory.
+ - Fix output of example in doc.
+ - Fix repository in doc.
+ - Fix script description in doc.
+ - Improve help.
+
+0.01 2015-08-09T11:30:04+02:00
+ - First version.

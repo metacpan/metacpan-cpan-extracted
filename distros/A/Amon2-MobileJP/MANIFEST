@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Amon2/MobileJP.pm
+lib/Amon2/Plugin/Web/MobileAgent.pm
+lib/Amon2/Plugin/Web/MobileCharset.pm
+t/00_compile.t
+t/01_mobile_agent.t
+t/02_charset.t
+xt/02_perlcritic.t
+META.yml
+MANIFEST

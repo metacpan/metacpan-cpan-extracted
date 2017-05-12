@@ -1,0 +1,1310 @@
+=encoding iso-8859-1
+
+=head1 NAME
+
+Acme::PM::Berlin::Meetings::History - the history of past Berlin PM
+meetings
+
+=head1 Map
+
+All Berlin PM meetings visualized on a map:
+L<http://berlin.pm.org/history_map.html>
+
+=head1 September 2010 and later
+
+Please see L<http://berlin.pm.org/history.html>.
+
+=head1 2010
+
+=head2 Treffen im August 2010
+
+Mittwoch, 25. August 2010 ab 20 Uhr c.t.
+
+Wo: Turnhalle in Friedrichshain, Holteistraﬂe 6-9 (Ecke
+Sonntagstraﬂe), 10245 Berlin, L<http://www.dieturnhalle.de/>
+
+Karte
+L<http://www.openstreetmap.org/?lat=52.50716&lon=13.4653&zoom=17&layers=M>
+- BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Holteistr/Sonntagstr>
+
+L<geo:52.50716,13.4653>
+
+=head2 Treffen im Juli 2010
+
+Mittwoch, 28. Juli 2010, ab 20 Uhr c.t.
+
+Wo: Zollpackhof, Elisabeth-Abegg-StraE<szlig>e 1 (direkt an der Spree,
+gegenueber vom Bundeskanzleramt) S-Hauptbahnhof
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Elisabeth-Abegg-Str> -
+Google Maps
+L<http://maps.google.com/maps?oe=utf-8&client=firefox-a&ie=UTF8&q=zollpackhof&fb=1&hq=zollpackhof&cid=0,0,16858087506954263585&ei=X-lPTMjCC-LGOKeZmb8B&ved=0CBoQnwIwAQ&hnear=&ll=52.519459,13.380876&spn=0.028699,0.03047&z=15>
+
+L<geo:52.521293,13.367068>
+
+=head2 Treffen im Juni 2010
+
+Mittwoch, 30. Juni 2010, ab 20 Uhr c.t.
+
+Wo: Brauerei EschenbrE<auml>u L<http://www.eschenbraeu.de/>,
+TriftstraE<szlig>e 67, 13353 Berlin-Wedding (U Leopoldplatz, S Wedding)
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Triftstr(wedding)/brunnenstr>
+- Google Maps
+L<http://maps.google.de/maps?f=q&hl=de&geocode=&q=Triftstr+67+13353+berlin>
+
+L<geo:52.492937,13.401261>
+
+=head2 Treffen im Mai 2010
+
+Mittwoch, 26. Mai, ab 20 Uhr c.t.
+
+Wo: Walhalla L<http://www.walhalla-berlin.de/>, Krefelder Str. 6
+(Tiergarten), U-Bhf. TurmstraE<szlig>e (U 9)
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Krefelder+Straﬂe>
+- Google Maps
+L<http://maps.google.de/maps?f=q&hl=de&geocode=&q=Krefelder+Straﬂe,+berlin>
+
+=head2 Treffen im April 2010
+
+Mittwoch, 28. April, ab 20 Uhr c.t.
+
+Wo: Schleusenkrug L<http://www.schleusenkrug.de/>,
+ME<uuml>ller-Breslau-StraE<szlig>e (Charlottenburg), S-/U-Zoo
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Mueller+Breslau+Str>
+- Google Maps
+L<http://maps.google.de/maps?f=q&hl=de&geocode=&q=M¸ller+Breslau+Straﬂe,+berlin>
+
+=head2 Treffen im Maerz 2010
+
+Mittwoch, 31. Maerz, ab 20 Uhr c.t.
+
+Wo: Restaurant Honigmond
+L<http://www.honigmond-berlin.de/html/kaffeehaus-restaurant.html>,
+TieckstraE<szlig>e 12/Ecke Borsigstr., S-Nordbahnhof, U6 Museum
+fE<uuml>r Naturkunde
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Tieckstr/Borsigstr.>
+- Google Maps
+L<http://maps.google.de/maps?f=q&hl=de&geocode=&q=Tieckstra%C3%9Fe+12,+10115+berlin>
+
+=head2 Treffen im Februar 2010
+
+Mittwoch, 24. Februar, ab 20 Uhr c.t.
+
+Wo: Cafe Nord Sud
+L<http://www.tip-berlin.de/essen-und-trinken/restaurants-und-bars/nord-sud>,
+AuguststraE<szlig>e 87, U6 Oranienburger Tor, S-Oranienburger Str.
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Auguststr+(Mitte)> -
+Google Maps
+L<http://maps.google.de/maps?f=d&hl=de&geocode=&saddr=52.526196,13.391926&daddr=&mra=dme&mrcr=0&mrsp=0&sz=16&doflg=ptk&sll=52.528232,13.392527&sspn=0.011527,0.012982&ie=UTF8&z=16>
+
+=head2 Treffen im Januar 2010
+
+Mittwoch, 27. Januar, 20 Uhr c. t.
+
+Wo: Orient Lounge, OranienstraE<szlig>e 13, 10999 Berlin, U-Kottbusser
+Tor, U-GE<ouml>rlitzer Bahnhof
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Heinrichplatz&zielc=11725%2C10534>
+- OpenStreetMap
+L<http://www.openstreetmap.org/?lat=52.500234&lon=13.423365&zoom=18&layers=B000FTF>
+
+=head1 2009
+
+=head2 Treffen im Dezember 2009
+
+(wie immer auf den Januar verschoben)
+
+Mittwoch, 6. Januar, 20 Uhr c. t.
+
+Wo: Assel, Oranienburger StraE<szlig>e 21, S-Oranienburger Str,
+S-Hackescher Markt
+
+Google Maps
+L<http://maps.google.de/maps?f=q&source=s_q&hl=de&geocode=&q=Oranienburger+Stra%C3%9Fe+21,+10178+Berlin,+Restaurant+Assel&sll=52.524734,13.396111&sspn=0.009465,0.017231&gl=de&ie=UTF8&hq=Restaurant+Assel&hnear=Oranienburger+Stra%C3%9Fe+21,+Berlin&ll=52.524577,13.396111&spn=0.009465,0.017231&z=16>
+- BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?start=&startcharimg.x=&startcharimg.y=&startmapimg.x=&startmapimg.y=&via=&viacharimg.x=&viacharimg.y=&viamapimg.x=&viamapimg.y=&ziel=Oranienburger+Str.+(Mitte)&zielcharimg.x=&zielcharimg.y=&zielmapimg.x=&zielmapimg.y=&scope=>
+
+=head2 Treffen im November 2009
+
+Mittwoch, 25. Nov, 20 Uhr c.t.
+
+Wo: Ankerklause L<http://www.ankerklause.de/>, Kottbusser Damm
+104/Maybachufer (Neukoelln). U-Kottbusser Tor/U-Schoenleinstr
+
+Google Maps
+L<http://maps.google.de/maps?f=q&source=s_q&hl=de&geocode=&q=Ankerklause+Gastst%C3%A4tte,+Kottbusser+Damm+104,+Kreuzberg,+Berlin,+Berlin&sll=51.151786,10.415039&sspn=13.768323,27.421875&ie=UTF8&hq=Ankerklause+Gastst%C3%A4tte,&hnear=Kottbusser+Damm+104,+10967+Berlin&ll=52.496264,13.419135&spn=0.006519,0.01339&z=16>
+- BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?start=&startcharimg.x=&startcharimg.y=&startmapimg.x=&startmapimg.y=&via=&viacharimg.x=&viacharimg.y=&viamapimg.x=&viamapimg.y=&ziel=Kottbusser+Damm%2FMaybachufer&zielcharimg.x=mg.y=&zielmapimg.x=&zielmapimg.y=&scope=>
+
+=head2 Treffen im Oktober 2009
+
+Mittwoch, 28. Oktober, 20 Uhr c.t.
+
+Wo: Brechtkeller L<http://brechtkeller.de/>, Chauseestr. 125 (Naehe
+Schlegelstr), S-Nordbahn/Hauptbahnhof, U6 Zinnowitzer Str, Tram
+
+Google Maps
+L<http://maps.google.de/maps?f=q&source=s_q&hl=de&geocode=&q=Chausseestra%C3%9Fe+125,+10115+Berlin&sll=52.528598,13.384116&sspn=0.011448,0.015213&ie=UTF8&hq=&hnear=Chausseestra%C3%9Fe+15,+Mitte+10115+Berlin&ll=52.52942,13.384588&spn=0.011448,0.015213&z=16>
+- BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?start=&startcharimg.x=&startcharimg.y=&startmapimg.x=&startmapimg.y=&via=&viacharimg.x=&viacharimg.y=&viamapimg.x=&viamapimg.y=&ziel=chausseestr%2Fschlegelstr&zielcharimg.x=&zielcharimg.y=&zielmapimg.x=&zielmapimg.y=&scope=zielname=Brechtkeller>
+
+=head2 Treffen im September 2009
+
+Mittwoch, 30. September, 20 Uhr c.t.
+
+Wo: Datscha L<http://cafe-datscha.de/>, Gabriel-Max-StrE<szlig>e 1/Ecke
+WE<uuml>hlischstraE<szlig>e, Friedrichshain, zwischen S-Warschauer Str.
+und S-Ostkreuz
+
+Google Maps
+L<http://bbbike.de/cgi-bin/bbbikegooglemap.cgi?zoom=1&coordsystem=polar&maptype=hybrid&wpt_or_trk=13.457973,52.509326>
+- BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielc_wgs84=13.457973,52.509326;zielname=Datscha>
+
+(Schade, das Wiki kann nur iso-8859-1 und &#1044;&#1072;&#1095;&#1072;
+wird nicht akzeptiert...)
+
+=head2 Treffen im August 2009
+
+Mittwoch, 26. August, 20 Uhr c.t.
+
+Wo: Freischwimmer Berlin L<http://www.freischwimmer-berlin.de/>, Vor dem
+Schlesischen Tor 2a, U-Schlesisches Tor, S Treptower Park
+
+Google Maps
+L<http://maps.google.de/maps?f=q&source=s_q&hl=de&geocode=&q=Vor+dem+Schlesischen+Tor+2a,+berlin&sll=51.151786,10.415039&sspn=23.066577,44.560547&ie=UTF8&z=16>
+- BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?ziel=Vor+dem+Schlesischen+Tor>
+
+L<geo:52.497206,13.450492>
+
+=head2 Treffen im Juli 2009
+
+Mittwoch, 29. Juli, 20 Uhr c.t.
+
+Wo: Prater L<http://www.pratergarten.de>, Kastanienallee, U-Eberswalder
+Str.
+
+Google Maps
+L<http://maps.google.de/maps?f=q&source=s_q&hl=de&geocode=&q=Kastanienallee+7,10435+Berlin&sll=52.592885,13.400883&sspn=0.010285,0.016115&ie=UTF8&z=16&iwloc=A>
+- BBBike-Route
+L<http://www.bbbike.de/cgi-bin/bbbike.cgi?zielname=Prater%2C%20Kastanienallee&zielc=10795%2C14881>
+
+=head2 Treffen im Juni 2009
+
+Mittwoch, 24. Juni, ab 20 Uhr c.t.
+
+Wo: Cafe E<Uuml>bereck, LenbachstraE<szlig>e 8 (Ecke
+SonntagstraE<szlig>e im Friedrichshain), S Ostkreuz
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=lenbachstr/sonntagstr> -
+Google Maps
+L<http://maps.google.de/maps?q=lenbachstra%C3%9Fe+8+10245+berlin> - Bing
+Maps L<http://www.bing.com/maps/default.aspx?q=berlin+lenbachstr+8>
+
+=head2 Treffen im Mai 2009
+
+Mittwoch, 27. Mai, ab 20 Uhr c.t.
+
+Wo: Alpenstueck L<http://www.alpenstueck.de/>, Gartenstr. 9 (Ecke
+Schroederstr), S-Nordbahnhof
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Gartenstr.+(Mitte%2C+Wedding)>
+- Google Maps
+L<http://maps.google.de/maps?f=q=de&geocode=&q=Gartenstr+9,+10115+berlin>
+
+=head2 Treffen im April 2009
+
+Mittwoch, 29. April, ab 20 Uhr c.t.
+
+Wo: Schleusenkrug L<http://www.schleusenkrug.de/>,
+ME<uuml>ller-Breslau-StraE<szlig>e (Charlottenburg), S-/U-Zoo
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Mueller+Breslau+Str>
+- Google Maps
+L<http://maps.google.de/maps?f=q&hl=de&geocode=&q=Mueller+Breslau+Str,+berlin>
+
+=head2 Treffen im ME<auml>rz 2009
+
+Mittwoch, 25. ME<auml>rz, ab 20 Uhr c.t.
+
+Wo: Locus L<http://www.locus-berlin.de/), Marheinekeplatz 4 (Kreuzberg>,
+U-Bhf. Gneisenaustr. (U7)
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Marheinekeplatz/Mittenwalder>
+- Google Maps
+L<http://maps.google.de/maps?f=q&hl=de&geocode=&q=Marheinekeplatz+4,+berlin>
+
+=head2 Treffen im Februar 2009
+
+(das Treffen im Februar wurde auf Anfang Maerz verschoben wegen dt.
+Perl Workshop)
+
+Mittwoch, 4. Maerz, ab 20 Uhr c.t.
+
+Wo: Restaurant Honigmond
+L<http://www.honigmond-berlin.de/html/kaffeehaus-restaurant.html>,
+TieckstraE<szlig>e 12/Ecke Borsigstr., S-Nordbahnhof, U6 Museum
+fE<uuml>r Naturkunde
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Tieckstr/Borsigstr.>
+- Google Maps
+L<http://maps.google.de/maps?f=q&hl=de&geocode=&q=Tieckstra%C3%9Fe+12,+10115+berlin>
+
+=head2 Treffen im Januar 2009
+
+Mittwoch, 28. Januar, ab 20 Uhr c.t.
+
+Wo: Spaghetti Western
+L<http://www.berlinerfresse.de/2008/02/10/spaghetti-western-der-name-verrat-alles/>,
+TorstraE<szlig>e 179/Gartenstr, U6 Oranienburger Tor, S-Nordbahn, U8
+Rosenthaler Platz, Tram M8/M10/12
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Torstr/Gartenstr> -
+Google Maps
+L<http://maps.google.de/maps?f=q&hl=de&geocode=&q=torstr+179,+10115+berlin&sll=51.151786,10.415039&sspn=23.699893,42.011719&ie=UTF8&z=16&g=torstr+179,+berlin&iwloc=addr>
+
+=head1 2008
+
+=head2 Treffen im Dezember 2008
+
+(das Treffen im Dezember wird auf Anfang Januar verschoben)
+
+Mittwoch, 7. Januar, ab 20 Uhr c.t.
+
+Wo: Cafe Nord Sud
+L<http://www.tip-berlin.de/essen-und-trinken/restaurants-und-bars/nord-sud>,
+AuguststraE<szlig>e 87, U6 Oranienburger Tor, S-Oranienburger Str.
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Auguststr+%28Mitte%29> -
+Google Maps
+L<http://maps.google.de/maps?f=d&hl=de&geocode=&saddr=52.526196,13.391926&daddr=&mra=dme&mrcr=0&mrsp=0&sz=16&doflg=ptk&sll=52.528232,13.392527&sspn=0.011527,0.012982&ie=UTF8&z=16>
+
+=head2 Treffen im November 2008
+
+Mittwoch, 26. November, ab 20 Uhr
+
+Wo: Ein Brief von Gestern
+
+BE<auml>nschstr. 25 (Ecke Proskauer StraE<szlig>e), 10247 Berlin
+
+Google Maps
+L<http://maps.google.de/maps?f=q&hl=de&q=B%C3%A4nschstra%C3%9Fe+25,+Friedrichshain+10247+Berlin,+Berlin,+Berlin&sll=51.151786,10.415039&sspn=13.823643,39.550781&ie=UTF8&cd=1&geocode=FfVfIQMdqmrNAA&ll=52.51955,13.462179&spn=0.006541,0.019312&t=h&z=16&g=B%C3%A4nschstra%C3%9Fe+25,+Friedrichshain+10247+Berlin,+Berlin,+Berlin>
+
+BBBike
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=baenschstr/proskauer>
+
+E<Ouml>ffentliche: Tram 21, Ringbahn (S Storkower StraE<szlig>e), U 5
+(Frankfurter Tor oder SamariterstraE<szlig>e)
+
+=head2 Treffen im Oktober 2008
+
+Mittwoch, 29. Oktober, ab 19:30 Uhr c.t.
+
+Wo: Zeitlos (Coctailbar, da gibt's uch Bier)
+
+L<http://www.cocktailbarzeitlos.de/>
+
+FranklinstraE<szlig>e 10
+
+10587 Charlottenburg, Berlin
+
+=head2 Treffen im September 2008
+
+Mittwoch, 24. September, ab 20 Uhr c.t.
+
+Wo: Cafe Nord Sud
+L<http://www.tip-berlin.de/essen-und-trinken/restaurants-und-bars/nord-sud>,
+AuguststraE<szlig>e 87, U6 Oranienburger Tor, S-Oranienburger Str.
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Auguststr+%28Mitte%29> -
+Google Maps
+L<http://maps.google.de/maps?f=d&hl=de&geocode=&saddr=52.526196,13.391926&daddr=&mra=dme&mrcr=0&mrsp=0&sz=16&doflg=ptk&sll=52.528232,13.392527&sspn=0.011527,0.012982&ie=UTF8&z=16>
+
+=head2 Treffen im August 2008
+
+Mittwoch, 27. August, ab 20 Uhr c.t.
+
+Wo: Nola's am Weinberg L<http://www.nola.de/>, das Restaurant oben im
+Weinbergspark, Zugang ueber Weinbergsweg oder Veteranenstr., U8
+Rosenthaler Platz
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=veteranenstr> - Google
+Maps
+L<http://maps.google.de/maps?f=d&hl=de&geocode=&saddr=52.532383,13.402162&daddr=&mra=mi&mrsp=0&sz=16&sll=52.531887,13.404114&sspn=0.009907,0.015364&ie=UTF8&z=16>
+
+=head2 Treffen im Juli 2008
+
+Mittwoch, 30. Juli, ab 20 Uhr c.t.
+
+Wo: Z-Bar L<http://www.z-bar.de/>, Bergstr 2/Ecke Torstr,
+S-Nordbahnhof/Oranienburger, U8 Rosenthaler Platz
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Bergstr.+%28Mitte%29&startplz=10115>
+- Google Maps L<http://maps.google.de/maps?q=bergstr+2,+berlin+10115>
+
+=head2 Treffen im Juni 2008
+
+Mittwoch, 25. Juni, ab 18 Uhr c.t.
+
+Wo: Restaurant Paris-Moskau L<http://www.paris-moskau.de/>, Alt-Moabit
+141 (Das frei stehende Fachwerkhaus), S-Hauptbahnhof
+
+BBBike-Route L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Alt-Moabit>
+- Google Maps L<http://maps.google.de/maps?q=Alt-Moabit+141,+berlin>
+
+=head2 Treffen im Mai 2008
+
+Mittwoch, 28. Mai, 20 Uhr c.t.
+
+Wo: Bundespressestrand
+L<http://www.derbundespressestrand.de/content/view/6/32/>, Kapelle-Ufer
+1 (auch Ecke Schiffbauerdamm/Reinhardstr),
+S-Hauptbahnhof/S-Friedrichstr
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Kapelle-Ufer.> - Google
+Maps L<http://maps.google.de/maps?q=kapelle+ufer+1,+berlin>
+
+=head2 Treffen im April 2008
+
+Mittwoch, 30. April, 20 Uhr c.t.
+
+Wo: Die Turnhalle L<http://www.dieturnhalle.de/>, HolteistraE<szlig>e 6
+- 9 (Ecke SonntagstraE<szlig>e), S-Bhf. Ostkreuz
+
+BBBike-Route L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Holteistr.>
+- Stadtplan
+L<http://www.berliner-stadtplan.com/topic/bln/str/x_wgs/27.9/y_wgs/30.41/a/-/message/Holteistra%DFe/from/form.html>
+
+=head2 Treffen im Maerz 2008
+
+Mittwoch, 26. Maerz, 20 Uhr c.t.
+
+Wo: PapE<agrave> Pane di Sorrento L<http://www.papapane.de/>,
+AckerstraE<szlig>e 23/Ecke Invalidenstr., U8 Rosenthaler Platz,
+S-Nordbahn, Strassenbahn
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?ziel=Ackerstr&zielplz=10115> -
+Google Maps L<http://maps.google.de/maps?q=Ackerstr+23,+berlin>
+
+=head2 Treffen im Februar 2008
+
+Mittwoch, 27. Feb, 20 Uhr c.t.
+
+Wo: Zur Letzten Instanz L<http://www.zurletzteninstanz.de/>, Waisenstr.
+14-16, U2 Klosterstr, auch U+S Alex/Jannowitzstr
+
+BBBike-Route L<http://bbbike.de/cgi-bin/bbbike.cgi?ziel=Waisenstr> -
+Google Maps L<http://maps.google.de/maps?q=Waisenstr+14,+berlin>
+
+=head2 Treffen im Januar 2008
+
+Mittwoch, 30. Jan, 20 Uhr c.t.
+
+Wo: c-base, Rungestr. 20 (letzter Hinterhof, direkt am Wasser),
+U8/S-Jannowitzbruecke
+
+BBBike-Route L<http://bbbike.de/cgi-bin/bbbike.cgi?ziel=rungestr> -
+Google Maps L<http://maps.google.de/maps?q=rungestr+20,+berlin>
+
+=head1 2007
+
+=head2 Treffen im Dezember 2007
+
+(das Treffen im Dezember wird auf Anfang Januar verschoben)
+
+Mittwoch, 2. Jan, 20 Uhr c.t.
+
+Wo: CafE<eacute> Kneipe Restaurant locus, Marheinekeplatz 4
+
+BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Locus&zielc=9916%2C9282>
+- Google Map
+L<http://www.bbbike.de/cgi-bin/bbbikegooglemap.cgi?maptype=hybrid&wpt=Locus%219916%2C9282&zoom=1&autosel=1>
+
+=head2 Treffen im November 2007
+
+Mittwoch, 28. Nov, 20 Uhr c.t.
+
+Wo: Sankt Oberholz, Rosenthaler StraE<szlig>e 72a I</ U8 Rosenthaler
+Platz /> BrunnenstraE<szlig>e/TorstraE<szlig>e
+
+Google Maps
+L<http://www.bbbike.de/cgi-bin/bbbikegooglemap.cgi?maptype=hybrid&wpt=Sankt%20Oberholz%2C%20Rosenthaler%20Stra%C3%9Fe%2072a%2110211%2C13772&zoom=1&autosel=1>
+- BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Sankt%20Oberholz%2C%20Rosenthaler%20Stra%C3%9Fe%2072a&zielc=10211%2C13772>
+
+=head2 Treffen im Oktober 2007
+
+Mittwoch, 31. Okt, 20 Uhr c.t.
+
+Wo: CafE<eacute> Uebereck, Sonntagstr./Lenbachstr.
+
+Google Maps
+L<http://www.bbbike.de/cgi-bin/bbbikegooglemap.cgi?maptype=hybrid&wpt=Cafe%20Uebereck%2114660%2C11150&zoom=1&autosel=1>
+- BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Cafe%20Uebereck&zielc=14660%2C11150>
+
+=head2 Treffen im September 2007
+
+Mittwoch, 26. Sep, 20 Uhr c.t.
+
+Wo: Powow in Kreuzberg, Grimmstr. 20.
+
+Google Maps
+L<http://bbbike.de/cgi-bin/bbbikegooglemap.cgi?wpt_or_trk=%2111124%2C9656>
+
+=head2 Treffen im August 2007
+
+Mittwoch, 29. Aug, 20 Uhr c.t.
+
+Wo: Prater, Kastanienallee, U-Eberswalder Str.
+
+Google Maps
+L<http://bbbike.de/cgi-bin/bbbikegooglemap.cgi?zoom=-1&wpt=13.410616,52.539608&coordsystem=polar&maptype=hybrid>
+- BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Prater%2C%20Kastanienallee&zielc=10795%2C14881>
+
+=head2 Treffen im Juli 2007
+
+Mittwoch, 25. Juli, 20 Uhr c.t.
+
+Wo: auf dem Kreuzberg im Biergarten "Golgatha", (offiziell Dudenstr.
+48, 10965 Berlin), U Platz der LuftbrE<uuml>cke
+
+Google Maps
+L<http://maps.google.com/maps/ms?f=q&hl=de&geocode=&ie=UTF8&t=h&om=1&num=10&msa=0&msid=101327570112598381777.00000113739e37493aa95&ll=52.48674,13.37858&spn=0.00946,0.020084&z=16>
+- BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Golgatha&zielc=8708%2C9066>
+
+=head2 Treffen im Juni 2007
+
+Mittwoch, 27. Juni, 20 Uhr c.t.
+
+Wo: "Die Turnhalle", HolteistraE<szlig>e 6--9, 10245 Berlin, S-Bahn
+Ostkreuz
+
+Google Maps
+L<http://www.berliner-stadtplan.com/?strasse=Holteistra%DFe&hausnummer=6&plz=10245>
+- BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Holteistr.&zielplz=10245>
+
+=head2 Treffen im Mai 2007
+
+Mittwoch, 30. Mai, 20 Uhr c.t.
+
+Wo: Deponie, Georgenstr. 5, S-Bahn Friedrichstr
+
+Stadtplan
+L<http://www.berliner-stadtplan.com/?strasse=Georgenstra%DFe&hausnummer=5&plz=10117>
+
+=head2 Treffen im April 2007
+
+Mittwoch, 25. April, 20 Uhr c.t.
+
+Wo: META - Restaurant & Cafe, Am Falkplatz 1, 10437 Berlin
+
+S-SchE<ouml>nhauser Allee
+
+Stadtplan
+L<http://www.berliner-stadtplan.com/topic/bln/str/x_wgs/24.39/y_wgs/32.81/from/form.html>
+- BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Am+Falkplatz>
+
+=head2 Treffen im Maerz 2007
+
+Mittwoch, 28. Maerz, 20 Uhr c.t.
+
+Wo: Ballhaus Mitte, Auguststr 24
+
+Stadtplan
+L<http://www.berliner-stadtplan.com/topic/bln/str/x_wgs/23.75/y_wgs/31.59/from/form.html>
+- BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Ballhaus%20Mitte&zielc=9897%2C13481>
+
+=head2 Treffen im Februar 2007
+
+Mittwoch, 28. Feb, 20 Uhr c.t.
+
+Wo: CafE<eacute> Altes Europa, Gipsstr. 11, U8 WeinmeisterstraE<szlig>e
+
+Stadtplan
+L<http://www.berliner-stadtplan.com/topic/bln/str/x_wgs/24.06/y_wgs/31.6/from/form.html>
+- BBBike-Route
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Cafe%20Altes%20Europa&zielc=10218%2C13437>
+
+taz L<http://www.taz.de/pt/2006/12/12/a0251.1/text>
+
+=head2 Treffen im Januar 2007
+
+Mittwoch, 31. Jan, 20 Uhr c.t.
+
+Wo: KE<uuml>ltE<uuml>rzeit in F-Hain. Ecke Revaler- / Ecke
+Simon-Dach-StraE<szlig>e
+
+Stadtplan
+L<http://www.berliner-stadtplan.com/topic/bln/str/x_wgs/27.32/y_wgs/30.46/from/bbbike.html>
+
+=head1 2006
+
+=head2 Treffen im Dezember 2006
+
+Mittwoch, 20. Dezember, 20 Uhr c.t.
+
+Wo: Stiege Oranienstrasse 47A, U8-Moritzplatz
+
+Stadtplan
+L<http://www.berliner-stadtplan.com/topic/bln/str/x_wgs/24.85/y_wgs/30.16/from/form.html>
+
+=head2 Treffen im November 2006
+
+Mittwoch, 29. November, 20 Uhr c.t.
+
+Wo: wieder im Cafe E<Uuml>bereck, Sonntagstr. 31 in Friedrichshain.
+
+=head2 Treffen im Oktober 2006
+
+Mittwoch, 25. Oktober, 20 Uhr c.t.
+
+Wo: Cafe E<Uuml>bereck, Sonntagstr. 31 in Friedrichshain.
+
+Hinkommen: S-Bhf. Ostkreuz
+
+=head2 Treffen im Sept 2006
+
+Mittwoch, 26. Sept, 20:00 Uhr (ct)
+
+Restaurant GlE<uuml>hwurm L<http://www.restaurant-gluehwurm.de/>
+
+HandjerystraE<szlig>e 77
+
+NE<auml>he U-Bhf. Friedrich-Wilhelm-Platz
+
+Stadtplan
+L<http://www.berliner-stadtplan.com/topic/bln/str/x_wgs/19.97/y_wgs/28.27/from/bbbike.html>
+- BBBike
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Restaurant%20Gl%C3%BChwurm&zielc=5656%2C7190>
+
+=head2 Treffen im August 2006
+
+Mittwoch, 30. August, 20:00 Uhr (ct)
+
+Das Speisezimmer
+L<http://www.sarahwieners.de/html/?show=das.speisezimmer>, Chauseestr. 8
+(Ecke Torstr), zweiter Innenhof alte Lokfabrik
+
+Zugang auch ueber Novalisstr 11 (Verlaengerung der Eichendorffstr).
+
+U6 Oranienburger Tor, S-Nordbahn, Tram
+
+oesterreichisch-mediterane Kueche
+
+Stadtplan
+L<http://www.berliner-stadtplan.com/topic/bln/str/x_wgs/23.26/y_wgs/31.69/from/form.html>
+
+=head2 Treffen im Juli 2006
+
+Wann: Mittwoch, 26. Juli, 20:00 Uhr (ct)
+
+Wo: SchE<ouml>nwetter, Bernauer Str. 63, 13555 Berlin-Wedding, U8
+Bernauer Str, U2 Eberswalder Str, Tram M10
+
+50m westlich vom Mauerpark
+L<http://www.schoenwetter-berlin.de/downloads/lageplan.gif>, zwischen
+Oderberger und Wolliner Str, ist der Eingang zum Gewerbegebiet. 50m
+laufen und dann nach rechts und man steht vor dem SchE<ouml>nwetter
+L<http://www.schoenwetter-berlin.de/>, eine kleine Strandbar hinter
+einem weissem Zaun.
+
+Stadtplan
+L<http://www.berliner-stadtplan.com/topic/bln/str/x_wgs/24.17/y_wgs/32.45/from/form.html>
+- BBBike
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Schoenwetter&zielc=10262.5,14943.75>
+
+=head2 Treffen im Juni 2006
+
+Wann: Mittwoch, 28. Juni, 20:00 Uhr (ct)
+
+Wo: Stadtstrand, Friedrichshain
+
+OberbaumbrE<uuml>cke, ME<uuml>hlenstr, an der East-Side Gallery, direkt
+neben dem Speicher
+
+Stadtplan
+L<http://www.berliner-stadtplan.com/topic/bln/str/x_wgs/26.68/y_wgs/30.17/from/form.html>
+- BBBike
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=Stadtstrand&zielc=13268%2C10881>
+
+=head2 Treffen im Mai 2006
+
+Wann: Mittwoch, 31. Mai, 20:00 Uhr (ct)
+
+Wo: Schraders (http://www.schraders-berlin.de/
+L<http://www.schraders-berlin.de/)> im Wedding
+
+BBBike
+L<http://bbbike.de/cgi-bin/bbbike.cgi?zielname=schraders&zielc=7168%2C16156>
+- Stadtplan
+L<http://www.berliner-stadtplan.com/topic/bln/str/x_wgs/21.47/y_wgs/33.09/from/bbbike.html>
+
+=head2 Treffen im April 2006
+
+Wurde verschoben auf Mittwoch, den 3. Mai, 20:00 Uhr (ct)
+
+Im "Rocco und seine BrE<uuml>der"
+
+http://www.berlinonline.de/essen-und-trinken/_bin/details.php/gastronomie/?id=4837
+L<http://www.berlinonline.de/essen-und-trinken/_bin/details.php/gastronomie/?id=4837>
+
+Lausitzer Platz 13, Kreuzberg
+
+=head2 Treffen im ME<auml>rz 2006
+
+Mittwoch, der 29.3., 20 Uhr
+
+Eine Kneipe in der NE<auml>he des S-Bhf. SchE<ouml>neberg, genauer Name
+folgt noch (??? Cafe Resonanz, Ebersstr. 73???)
+
+=head2 Treffen im Februar 2006
+
+Mittwoch, der 22.2., 20 Uhr
+
+Cafe Rizz
+
+Grimmstrasse 21
+
+10967 Berlin (NeukE<ouml>lln)
+
+Stadtplan
+L<http://www.berliner-stadtplan.com/topic/bln/str/x_wgs/24.86/y_wgs/29.58/a/-/message/Grimmstra%DFe/from/form.html>
+
+=head2 Treffen im Januar 2006
+
+Mittwoch, der 25.1., 20 Uhr
+
+Istoria, Kollwitz Str. 64 direkt am Kollwitzplatz an der Ampel. Ein
+Tisch ist auf den Namen 'Schulz' bestellt.
+
+Stadtplan
+L<http://www.berliner-stadtplan.com/topic/bln/str/x_wgs/25.09/y_wgs/32.13/from/form.html>
+- BBBike
+L<http://www.de/cgi-bin/bbbike.cgi?zielname=istoria&zielc=11269%2C14459>
+
+=head1 2005
+
+=head2 Treffen im Dezember 2005
+
+abgesagt, dafE<uuml>r:
+
+=head2 Ersatztreffen am 3. Januar 2006
+
+=over
+
+=item * 2005-11-30
+
+=back
+
+=over
+
+CafE<eacute> Mirell in der Crellestrasse
+
+=back
+
+=over
+
+=item * 2005-10-17
+
+=back
+
+=over
+
+Cafe Bilderbuch, Akazienstr. 28, 10823 Berlin-SchE<ouml>neberg,
+NE<auml>he U-Bhf. Eisenacher Str.
+
+=back
+
+=over
+
+=item * 2005-09-28
+
+=back
+
+=over
+
+frarosa, Weinlokal gegenueber der Zionskirche in der Zionskirchstr 40
+(Lokal mit leichtem Rotstich) (HE<ouml>he der Bezahlung war hier
+Ermessenssache, oder?)
+
+=back
+
+=over
+
+=item * 2005-08-31
+
+=back
+
+=over
+
+Restaurant Toulouse, Schwarzer Weg 71, Berlin-Tegel
+
+=back
+
+=over
+
+=item * 2005-07-27
+
+=back
+
+=over
+
+Cafe Aroma (Hochkirchstr. 8, NE<auml>he GroE<szlig>gE<ouml>rschenstr.).
+
+=back
+
+=over
+
+=item * 2005-06-29
+
+=back
+
+=over
+
+Restaurantschiff "CAPT'N SCHILLOW", Strasse des 17. Juni/Am
+Charlottenburger Tor
+
+=back
+
+=over
+
+=item * 2005-05-25
+
+=back
+
+=over
+
+Der Zollpackhof ist ein Restaurant mit Biergarten, direkt gegenueber
+vom Bundeskanzleramt, am noerdlichen Ufer der Spree.
+
+=back
+
+=over
+
+=item * 2005-04-27
+
+=back
+
+=over
+
+Old Emerald Isle am Wassertorplatz (inklusive FussballE<uuml>betragung)
+
+=back
+
+=over
+
+=item * 2005-03-30
+
+=back
+
+=over
+
+geplant Strandbad Mitte, Kleine Hamburger Str. 16 / Ecke Auguststr.,
+direkt neben dem Fussballplatz, aber wegen E<Uuml>berfE<uuml>llung in
+ein nahes Weinlokal gegangen
+
+=back
+
+=over
+
+=item * 2005-02-23
+
+=back
+
+=over
+
+Locus (Marheinekeplatz 4, Kreuzberg, Naehe U-Bhf. Gneisenaustr.)
+
+=back
+
+=over
+
+=item * 2005-01-26
+
+=back
+
+=over
+
+???
+
+=back
+
+=head1 2004
+
+=over
+
+=item * 2004-12-22
+
+=back
+
+=over
+
+cafE<eacute> buchhandlung, tucholskystr. 32
+
+=back
+
+=over
+
+=item * 2004-11-24
+
+=back
+
+=over
+
+Cocktailbar "Zeitlos 5", Franklinstr. 10
+
+=back
+
+=over
+
+=item * 2004-10-27
+
+=back
+
+=over
+
+ausgefallen
+
+=back
+
+=over
+
+=item * 2004-09-29
+
+=back
+
+=over
+
+Cafe Hundertwasser, Simon-Dach-Str. 39 / Krossener Str
+
+=back
+
+=over
+
+=item * 2004-08-25
+
+=back
+
+=over
+
+Golgatha am Kreuzberg
+
+=back
+
+=over
+
+=item * 2004-07-28
+
+=back
+
+=over
+
+Das Uebereck ist in der Sonntagsstr. Ecke Lenbachstr.
+
+=back
+
+=over
+
+=item * 2004-06-30
+
+=back
+
+=over
+
+ausgefallen (FuE<szlig>ball, Deutscher Perl-Workshop)
+
+=back
+
+=over
+
+=item * 2004-05-26
+
+=back
+
+=over
+
+Zwiebelfisch
+
+=back
+
+=over
+
+=item * 2004-04-28
+
+=back
+
+=over
+
+"Tiroler Alpenstadl", Wichertstrasse 43, Prenzlauer Berg
+
+=back
+
+=over
+
+=item * 2004-03-31
+
+=back
+
+=over
+
+tiergarten-quelle, Bachstrasse 6, Stadtbahnbogen 482, 10555 Berlin
+
+=back
+
+=over
+
+=item * 2004-02-25
+
+=back
+
+=over
+
+Jalla Jalla, Kopenhagener Str. 3 (bei der Nummer bin ich mir nicht
+sicher, vielleicht ist es auch 4)
+
+=back
+
+=over
+
+=item * 2004-01-28
+
+=back
+
+=over
+
+Irish Pub "Last century pub" in der Lenbachstrasse 1 nahe S-Bhf.
+Ostkreuz (aber in der Zwischenzeit wurde der Pub in "The happy pig"
+umbenannt)
+
+=back
+
+=head1 2003
+
+=over
+
+=item * 2003-12-17
+
+=back
+
+=over
+
+SchE<ouml>neberg, Cafe Gottlob, Akazienstr. 16
+
+=back
+
+=over
+
+=item * 2003-11-26
+
+=back
+
+=over
+
+JWD, nE<auml>mlich im Schollenkrug bei der S-Bahn Waidmannslust,
+Waidmannsluster Damm 77
+
+=back
+
+=over
+
+=item * 2003-10-29
+
+=back
+
+=over
+
+Bergwerk, Bergstr. 68
+
+=back
+
+=over
+
+=item * 2003-09-24
+
+=back
+
+=over
+
+Kuchenkaiser, Oranienplatz 1
+
+=back
+
+=over
+
+=item * 2003-08-27
+
+=back
+
+=over
+
+"Josef Heinrich" in Friedrichshagen, BE<ouml>lschestr. 11
+
+=back
+
+=over
+
+=item * 2003-07-30
+
+=back
+
+=over
+
+Schleusenkrug am Landwehrkanal im Tiergarten um 20.00
+
+=back
+
+=over
+
+=item * 2003-06-25
+
+=back
+
+=over
+
+"Entweder Oder", Prenzlauer Berg
+
+=back
+
+=over
+
+=item * 2003-05-28
+
+=back
+
+=over
+
+Strassenbahn, Laubacher Str. 29, 14197 Berlin Wilmersdorf
+
+(Das einzige und damit legendE<auml>re von ANDK organisierte Treffen :)
+:( )
+
+=back
+
+=over
+
+=item * 2003-04-30
+
+=back
+
+=over
+
+"Las cascadas" in der Feuerbachstrasse 31 (12163 Steglitz)
+
+=back
+
+=over
+
+=item * 2003-03-26
+
+=back
+
+=over
+
+Hundertwasser in Friedrichshain, Simon-Dach-StraE<szlig>e 39
+
+=back
+
+=over
+
+=item * 2003-02-27
+
+=back
+
+=over
+
+CafE<eacute> Garbaty, Breite Str. 43A, Pankow
+
+=back
+
+=over
+
+=item * 2003-01-29
+
+=back
+
+=over
+
+"Dicker Engel", Birkenstr. 44 (Moabit, direkt am U-Bahnhof)
+
+=back
+
+=head1 2002
+
+=over
+
+=item * 2002-12-18
+
+=back
+
+=over
+
+Speedy Gonzales, Kastanienallee 26, Berlin Prenzlauer Berg
+
+=back
+
+=over
+
+=item * 2002-11
+
+=back
+
+=over
+
+Tante Elli (Wedding)
+
+=back
+
+=over
+
+=item * 2002-10
+
+=back
+
+=over
+
+?? Locus (Kreuzberg) ??
+
+=back
+
+=over
+
+=item * 2002-09
+
+=back
+
+=over
+
+CafE<eacute> Orange (Mitte)
+
+=back
+
+=over
+
+=item * 2002-08
+
+=back
+
+=over
+
+?? (Prenzlberg) ??
+
+=back
+
+=over
+
+=item * 2002-07
+
+=back
+
+=over
+
+Schwarzes Cafe (Charlottenburg)
+
+=back
+
+=over
+
+=item * 2002-06
+
+=back
+
+=over
+
+Entweder Oder???
+
+=back
+
+=over
+
+=item * 2002-05-29
+
+=back
+
+=over
+
+"Entweder/Oder" at 8pm. The address is Oderberger Str. 15.
+
+(laut Mail, laut Wiki war es im E<Uuml>bereck in Friedrichshain)
+
+=back
+
+=over
+
+=item * 2002-04
+
+=back
+
+=over
+
+Joe Penaz (Kreuzberg)
+
+=back
+
+=over
+
+=item * 2002-03
+
+=back
+
+=over
+
+Tadshikische Teestube (Mitte) ??
+
+=back
+
+=over
+
+=item * 2002-02
+
+=back
+
+=over
+
+CafE<eacute> Orange (Mitte)
+
+=back
+
+=head1 NOTE
+
+Converted by taking the pages L<http://perlmongers.de/?BerlinPM> and
+L<http://perlmongers.de/?BerlinPMNochAeltereTreffen> using
+L<Pod::HTML2Pod> and manual work.
+
+=head1 TODO
+
+Add the entries between 2010 and 2014.
+
+=cut

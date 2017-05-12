@@ -1,0 +1,10 @@
+<html>
+<body>
+<form action="u" method="post">
+[% FOREACH user_list %]
+[% ht_id %] [% role_id %] [% check %] [% name %] [% role_name %]
+[% END %]
+<input type="submit" />
+</form>
+</body>
+</html>

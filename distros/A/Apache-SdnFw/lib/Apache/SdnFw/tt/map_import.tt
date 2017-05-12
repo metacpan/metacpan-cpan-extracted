@@ -1,0 +1,72 @@
+<form method="POST" action="[% s.ubase %]/[% s.object %]/import">
+<input type="hidden" name="process" value="1">
+[% IF s.subof_key %]<input type="hidden" name="[% s.subof_key %]" value="[% s.subof_id %]">[% END %]
+<div class="floatleft">
+<table>
+	<caption>Map Fields For [% s.object %]s Import</caption>
+	<thead>
+	<tr>
+		<th>Import File Field</th>
+		<th>Object Field</th>
+	</tr>
+	</thead>
+	<tbody>
+[% FOREACH f IN header %]
+	<tr>
+		<td>[% f %]</td>
+		<td><select name="f:[% loop.count %]">
+			<option value=""></option>
+	[% FOREACH of IN s.o.fields %]
+			<option value="[% of.k %]">[% of.t %]</option>
+	[% END %]
+			</select></td>
+	</tr>
+[% END %]
+	</tbody>
+</table>
+</div>
+<div class="floatleft">
+<table>
+	<caption>Override Values For Import</caption>
+	<thead>
+	<tr>
+		<th>Object Field</th>
+		<th>Override Value</th>
+		<th>NULL Only</th>
+	</tr>
+[% FOREACH f IN s.o.fields %]
+	<tr>
+		<td>[% f.t %]</td>
+		<td>
+	[% IF f.r %]
+			<select name="default:[% f.i %]">
+				<option value=""></option>
+		[% FOREACH m IN s.menu.${f.r} -%]
+				<option value="[% m.id %]">[% m.name %]</option>
+		[% END %]
+			</select>
+		</td>
+		<td><input type="checkbox" name="default:[% f.i %]:null" value="1"></td>
+	[% ELSE %]
+			<input name="default:[% f.k %]" value="">
+		</td>
+		<td><input type="checkbox" name="default:[% f.k %]:null" value="1"></td>
+	[% END %]
+	</tr>
+[% END %]
+	</tbody>
+</table>
+</div>
+<div class="floatleft">
+<table>
+	<caption>Processing Options</caption>
+	<tbody>
+	<tr>
+		<td><input type="checkbox" name="clear" value="1"></td>
+		<td>Delete existing [% s.object %]s and replace them with this list</td>
+	</tr>
+	</tbody>
+</table>
+<input type="submit" value="Process Import File">
+</div>
+</form>

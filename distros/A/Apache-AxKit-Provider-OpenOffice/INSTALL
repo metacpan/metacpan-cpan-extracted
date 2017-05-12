@@ -1,0 +1,40 @@
+Installing the AxKit OpenOffice Provider module.
+================================================
+
+Installation is simple - follow the regular perl module installation
+system:
+
+  perl Makefile.PL
+  make test install
+
+This installs the perl modules.
+
+Please note that the installation assumes a currently working AxKit
+installation. If you do not have that, please install AxKit from
+http://axkit.org/ - or ask your axkit.com representative about help
+getting AxKit installed.
+
+Now to get the OpenOffice files working on your web server, you need
+to add some Apache configuration options. Here is a simple example:
+
+<Files *.sxw>
+  AddHandler axkit .sxw
+  AxAddPlugin Apache::AxKit::Plugin::OpenOffice
+  AxContentProvider Apache::AxKit::Provider::OpenOffice
+  AxAddProcessor text/xsl /stylesheets/oo2html.xsl
+</Files>
+
+Now simply copy the stylesheets directory to the root of your web
+server's filesystem (normally /path/to/apache/htdocs) such that
+you could point your browser at 
+http://myserver/stylesheets/oo2html.xsl, and get that particular
+file (if that does not work, then the OpenOffice plugin will not
+do what you expect).
+
+Having done all of that, you are ready to start serving OpenOffice
+files direct to your browser. Simply save them within the document
+root somewhere, and point your browser at them.
+
+If any of this fails, or you get stuck, please contact a representative
+of axkit.com, who will be glad to help you.
+

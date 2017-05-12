@@ -1,0 +1,115 @@
+NAME
+    Apache::Bootstrap - Bootstraps dual life mod_perl and mod_perl2 Apache
+    modules
+
+SYNOPSIS
+    In your Makefile.PL
+
+     use Apache::Bootstrap 0.06;
+
+     my $bootstrap;
+
+     BEGIN {
+        # check to make sure we have mod_perl 1 installed
+        $bootstrap = Apache::Bootstrap->new({ mod_perl => 0 });
+
+        # or check for mod_perl 2
+        $bootstrap = Apache::Bootstrap->new({ mod_perl2 => '1.99022' });
+     }
+
+     # check for Apache::Test, return the installed version if exists
+     my $has_apache_test = $bootstrap->check_for_apache_test();
+
+     # see if mod_perl2 is installed (useful when both mp1 and mp2 are installed)
+     my $mp_generation = $bootstrap->satisfy_mp_generation( 2 );
+
+     unless ($mp_generation) {
+
+         # no mod_perl2?  look for mod_perl 1
+         $mp_generation = $bootstrap->satisfy_mp_generation( 1 );
+     }
+
+     # any mod_perl version will do
+     $mp_generation = Apache::Bootstrap->satisfy_mp_generation();
+     unless ( $mp_generation ) {
+          warn( 'No mod_perl installation was found' )
+     } else {
+          warn( "mod_perl generation $mp_generation was found" );
+     }
+
+     # write the Makefile using a mod_perl version dependent build subsystem
+     $bootstrap->WriteMakefile( %maker_options );
+
+DESCRIPTION
+    Writing modules for mod_perl that work under both mod_perl and mod_perl2
+    is not fun.
+
+    This module is here to make that endeavour less painful. mod_perl2 is
+    great, but a lot of users are still using mod_perl. Migrating to
+    mod_perl2 while maintaining mod_perl compatibility isn't easy, and this
+    module is here to make that transition as painless as possible.
+
+METHODS
+  new()
+     # try to find these versions of mod_perl, die if none are found
+     $bootstrap = Apache::Bootstrap->new({
+         mod_perl2 => 1.99022, # after mp2 renaming
+         mod_perl  => 0,       # any verison of mp1
+     });
+
+    These code checks to see if either mp1 or mp2 versions are present. One
+    successful version check means that it returns a valid object.
+
+  mp_prereqs()
+     returns the prerequisites for mod_perl versions in a hash reference
+
+  check_for_apache_test()
+     $apache_test_version = Apache::Bootstrap->check_for_apache_test;
+
+    Returns the version of Apache::Test installed. Returns undefined if
+    Apache::Test is not installed.
+
+  satisfy_mp_generation()
+     # see if mod_perl2 is installed
+     my $mp_generation = $bootstrap->satisfy_mp_generation( 2 );
+
+     unless ($mp_generation) {
+
+         # no mod_perl2?  look for mod_perl 1
+         $mp_generation = $bootstrap->satisfy_mp_generation( 1 );
+     }
+
+     # any mod_perl version will do, check for mp2 first
+     $mp_generation = $bootstrap->satisfy_mp_generation();
+     unless ( $mp_generation ) {
+         warn( 'No mod_perl installation was found' )
+     } else {
+         warn( "mod_perl generation $mp_generation was found" );
+     }
+
+  apache_major_version()
+     $apache_major_version = $bootstrap->apache_major_version;
+
+    The major version number of the target apache install
+
+  WriteMakefile()
+     $bootstrap->write_makefile( %makefile_options );
+
+    Writes the makefile using the appropriate make engine depending on what
+    mod_perl version is in use. Same API as ExtUtils::MakeMaker or
+    ModPerl::BuildMM
+
+AUTHOR
+    Fred Moyer <fred@redhotpenguin.com>
+
+    The mod_perl development team "<dev at perl.apache.org"> and numerous
+    contributors.
+
+    This code was lifted from Apache::SizeLimit in an effort to make it
+    useful to other modules such as Apache::Reload, Apache::Dispatch, any
+    dual life Apache module.
+
+BUGS
+    Please report bugs to the mod_perl development mailing list "<dev at
+    perl.apache.org">
+

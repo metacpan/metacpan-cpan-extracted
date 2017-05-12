@@ -1,0 +1,27 @@
+struct archive *         T_ARCHIVE_LIBARCHIVE_ARCHIVE
+struct archive_entry *   T_ARCHIVE_LIBARCHIVE_ARCHIVE_ENTRY
+__LA_INT64_T             T_INT64
+string_or_null           T_PV_OR_NULL             
+
+OUTPUT
+T_ARCHIVE_LIBARCHIVE_ARCHIVE
+  sv_setref_pv($arg, \"Archive::Libarchive::XS::archive\", (void*) $var);
+
+T_ARCHIVE_LIBARCHIVE_ARCHIVE_ENTRY
+  sv_setref_pv($arg, \"Archive::Libarchive::XS::archive_entry\", (void*) $var);
+
+INPUT
+T_ARCHIVE_LIBARCHIVE_ARCHIVE
+  if(sv_isobject($arg) && sv_derived_from($arg, \"Archive::Libarchive::XS::archive\"))
+    $var = INT2PTR($type, SvIV((SV *) SvRV($arg)));
+  else
+    Perl_croak(aTHX_ \"$var is not of type Archive::Libarchive::XS::archive\");
+
+T_ARCHIVE_LIBARCHIVE_ARCHIVE_ENTRY
+  if(sv_isobject($arg) && sv_derived_from($arg, \"Archive::Libarchive::XS::archive_entry\"))
+    $var = INT2PTR($type, SvIV((SV *) SvRV($arg)));
+  else
+    Perl_croak(aTHX_ \"$var is not of type Archive::Libarchive::XS::archive_entry\");
+
+T_PV_OR_NULL
+  $var = SvOK($arg) ? ($type)SvPV_nolen($arg) : NULL;

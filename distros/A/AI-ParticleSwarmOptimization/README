@@ -1,0 +1,18 @@
+Module:   AI::ParticleSwarmOptimization
+Version:  1.004
+Released: September 2011
+
+Short description.
+
+AI::ParticleSwarmOptimization implements the Particle Swarm Optimization technique for finding
+the minimum point of a hyper surface.
+
+Long description
+
+The module provides an OO interface to a PSO engine that is highly configurable
+and may be further altered through derivation.
+
+The module is easy to use despite a moderately large number of configuration
+options through provision of good defaults for most configuration parameters.
+
+See the POD documentation for a full description of the module.

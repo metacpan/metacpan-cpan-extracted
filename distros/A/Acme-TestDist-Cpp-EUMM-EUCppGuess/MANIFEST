@@ -1,0 +1,17 @@
+Changes
+EUCppGuess.xs
+lib/Acme/TestDist/Cpp/EUMM/EUCppGuess.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.json
+META.yml			Module meta-data (added by MakeMaker)
+nuratest.cpp
+nuratest.h
+ppport.h
+README
+t/author-minimum-version.t
+t/author-pod-coverage.t
+t/author-pod-spelling.t
+t/author-pure-ascii.t
+t/use.t

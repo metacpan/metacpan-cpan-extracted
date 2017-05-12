@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ENTITY AUTHOR  "Alex Peeters">
+<!ENTITY EMAIL   "Alex.Peeters@citap.com">
+<!ENTITY PURPOSE "2005/11/15, dtd schema v1.0 for check_xml.pl, Check Nagios by XML">
+
+<!ELEMENT ServiceReports (Schema, ServiceReport)>
+<!ELEMENT Schema (#PCDATA)>
+<!ATTLIST Schema Value CDATA #FIXED "1.0">
+<!ELEMENT ServiceReport (#PCDATA)>
+<!ATTLIST ServiceReport
+  Host CDATA #REQUIRED
+  Service CDATA #REQUIRED
+  Environment (PROD|TEST|ACC|DEV|SIM|LOCAL) #REQUIRED
+  Date CDATA #REQUIRED
+  Time CDATA #REQUIRED
+  Epochtime CDATA #REQUIRED
+  Status (0|1|2|3|4) #REQUIRED
+  StatusMessage CDATA #REQUIRED
+  PerfData CDATA #IMPLIED
+>

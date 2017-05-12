@@ -1,0 +1,29 @@
+# this file will be Include-d by @ServerRoot@/conf/httpd.conf
+
+LogLevel emerg
+
+PerlPostConfigRequire @ServerRoot@/lib/startup.pl
+  
+# where Apache::ExtDirect::* can be found
+PerlSwitches -I@ServerRoot@/../lib -I@ServerRoot@/lib -I/home/intellisurvey/versions/6.7/isbase/temp/RPC-ExtDirect/lib
+
+# preload the modules
+PerlModule Apache::ExtDirect::API
+PerlModule Apache::ExtDirect::Router
+PerlModule Apache::ExtDirect::EventProvider
+
+<Location /api>
+    SetHandler perl-script
+    PerlResponseHandler Apache::ExtDirect::API
+</Location>
+
+<Location /router>
+    SetHandler perl-script
+    PerlResponseHandler Apache::ExtDirect::Router
+</Location>
+
+<Location /events>
+    SetHandler perl-script
+    PerlResponseHandler Apache::ExtDirect::EventProvider
+</Location>
+

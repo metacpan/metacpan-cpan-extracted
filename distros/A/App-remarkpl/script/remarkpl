@@ -1,0 +1,106 @@
+#!/usr/bin/env perl
+use Mojolicious::Lite;
+use App::remarkpl;
+my $presentation = shift @ARGV || $ENV{REMARK_PRESENTATION} || '';
+
+unless ($ENV{MOJO_APP_LOADER}) {
+  exec perldoc => -tT => $INC{'App/remarkpl.pm'} unless $presentation;
+  die qq(Cannot read presentation file "$presentation".\n) unless $presentation eq 'example.markdown' or -r $presentation;
+  unshift @ARGV, 'daemon';
+}
+
+require Cwd;
+app->renderer->paths([split /:/, ($ENV{REMARK_PUBLIC} // File::Spec->catdir(Cwd::getcwd(), 'templates'))]);
+app->static->paths([split /:/, ($ENV{REMARK_STATIC} // Cwd::getcwd())]);
+push @{app->static->paths},
+  Cwd::abs_path(File::Spec->catdir(File::Basename::dirname($INC{'App/remarkpl.pm'}), qw( remarkpl public )));
+
+$presentation ||= 'example.markdown';
+app->defaults(title => $presentation);
+
+if (grep {/^--print/} @ARGV) {
+  print read_presentation();
+  exit 0;
+}
+
+app->log->info(qq(Looking for static files in ) . join ', ', @{app->static->paths});
+app->log->info(qq(Looking for templates in ) . join ', ',    @{app->renderer->paths});
+app->log->info(qq(Serving presentation "$presentation"));
+
+get '/' => sub {
+  shift->render(template => 'index', presentation => read_presentation());
+};
+
+app->start;
+
+sub read_presentation {
+  Mojo::Util::decode(
+    'UTF-8',
+    -e $presentation ? Mojo::File->new($presentation)->slurp : Mojo::Loader::data_section(__PACKAGE__, $presentation)
+  );
+}
+
+__DATA__
+@@ index.html.ep
+<!DOCTYPE html>
+<html>
+<head>
+  <title>remark - <%= title %></title>
+  <meta charset="utf-8">
+  %= stylesheet '/fonts.css'
+  %= stylesheet '/basic.css'
+</head>
+<body>
+  <textarea id="source"><%= $presentation %></textarea>
+  %= javascript '/remark.min.js'
+  %= javascript '/custom.js'
+  <script>var slideshow = remark.create();</script>
+</body>
+</html>
+@@ example.markdown
+class: center, middle, inverse
+
+# remark presentation example
+
+"class" can be center, middle, bottom, left, center, right, inverse.
+
+---
+
+# Agenda
+
+1. Introduction
+2. Deep-dive
+
+<img src="example.jpg" class="h400">
+
+---
+
+# Code
+
+```perl
+my $foo = "Code formatting";
+```
+
+```
+.left[Left-aligned text]
+.center[Centered text]
+.right[Right-aligned text]
+```
+
+---
+class: contrast, inverse
+background-image: url(example.jpg)
+
+# Lists
+
+- Item 1
+
+- Item 2
+
+  With a paragraph
+
+---
+class: center, middle
+# The end
+
+[jhthorsen@cpan.org](mailto:jhthorsen@cpan.org)

@@ -1,0 +1,126 @@
+name: subrepo
+appspec: { "version": 0.001 }
+title: Git Submodule Alternative
+markup: swim
+description: |
+  This is just an example for generating completion for an existing
+  command, https://github.com/ingydotnet/git-subrepo
+
+  This git command "clones" an external git repo into a subdirectory of your
+  repo. Later on, upstream changes can be pulled in, and local changes can be
+  pushed back. Simple.
+
+  = Benefits
+
+  This command is an improvement from `git-submodule` and `git-subtree`; two
+  other git commands with similar goals, but various problems.
+
+options: []
+subcommands:
+  clone:
+    summary: Add a repository as a subrepo in a subdir of your repository.
+    parameters:
+      -
+        name: repository
+        type: string
+        required: true
+      -
+        name: subdir
+        type: file
+    options:
+      - &option_branch
+        name: branch
+        summary: Upstream branch
+        aliases: ["b"]
+      -
+        name: force
+        aliases: ["f"]
+        summary: 'reclone (completely replace) an existing subdir.'
+        type: flag
+  init:
+    summary: Turn an existing subdirectory into a subrepo.
+    parameters:
+      -
+        name: subdir
+        required: true
+        type: file
+    options:
+      - &option_remote
+        name: remote
+        aliases: ["r"]
+        summary: Specify remote repository
+      -  *option_branch
+  pull:
+    summary: Update the subrepo subdir with the latest upstream changes.
+    parameters: &pull_parameters
+      - &param_subrepo_optional
+        name: subrepo
+        required: false
+        summary: Subrepo
+        completion:
+          command:
+            - replace: SELF
+            - status
+            - '--quiet'
+    options: &pull_options
+      - &option_all
+        name: all
+        type: flag
+        summary: All subrepos
+      - *option_branch
+      - *option_remote
+      -
+        name: update
+        aliases: ["u"]
+        summary: update
+  push:
+    summary: Push a properly merged subrepo branch back upstream.
+    parameters: *pull_parameters
+    options: *pull_options
+  fetch:
+    summary: Fetch the remote/upstream content for a subrepo.
+    parameters:
+      - *param_subrepo_optional
+    options:
+      - *option_all
+  branch:
+    summary: Create a branch with local subrepo commits since last pull.
+    parameters:
+      -   *param_subrepo_optional
+    options:
+      -   *option_all
+  commit:
+    summary: Add subrepo branch to current history as a single commit.
+    parameters:
+      - &param_subrepo
+        name: subrepo
+        required: true
+        summary: Subrepo
+        completion:
+          command:
+            - replace: SELF
+            - status
+            - '--quiet'
+      -
+        name: subreporef
+        summary: Subrepo ref
+  status:
+    summary: Get the status of a subrepo.
+    parameters:
+      -   *param_subrepo_optional
+    options:
+      -
+        name: quiet
+        aliases: ["q"]
+        summary: Just print names
+  clean:
+    summary: 'Remove artifacts created by `fetch` and `branch` commands.'
+    parameters:
+      -   *param_subrepo_optional
+    options:
+      -   *option_all
+  help:
+    summary: 'Same as `git help subrepo`'
+  version:
+    summary: 'display version information about git-subrepo'
+# vim:et:sts=2:sws=2:sw=2:foldmethod=indent

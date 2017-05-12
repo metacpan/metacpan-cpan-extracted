@@ -1,0 +1,424 @@
+#!perl -w
+# run this document through perl to check its syntax
+use Pod::Checker;
+podchecker(\*DATA);
+__END__
+
+=head1 NAME
+
+App::quickstart - App::Context Developer's Quick-Start Guide
+
+=head1 INTRODUCTION
+
+This is the Developer's Quickstart Guide to the App::Context Framework.
+Its focus is to give a minimum amount of theoretical or explanatory
+background and get right into learning by example.
+
+=head1 DOCUMENTATION OVERVIEW
+
+That having been said, it is also important to let you know
+what documentation exists and what state it is in.
+
+I got started building the App::Context framework a while ago.
+The documentation is very limited.  This is an effort to bring it all together.
+This list shows how all of the documentation fits together and in what state
+it is.
+
+=head2 PURE DOCUMENTATION
+
+The following documentation is in good shape.
+To get started, read them more or less in the order shown.
+ 
+=over
+
+=item * L<App::quickstart> - This quick start guide.
+
+=item * L<App::installguide::hosted> - Installing the App::Context Framework on a non-root web hosting account
+
+=back
+
+The following documentation also is in good shape.
+It is background reference material.
+
+=over
+
+=item * L<App::datetime> - Guidance on date, time, and datetime types in perl.
+
+=item * L<App::exceptions> - Guidance on exceptions in perl.
+
+=back
+
+The following documentation is in a state that needs review, modification, or completion.
+ 
+=over
+
+=item * L<App::perlstyle> - A perl style guide that builds minimally on L<perlstyle>.
+
+=item * L<App::faq> - Questions about P5EE.
+
+=item * L<App::installguide> - Installing the App::Context Framework on Unix.
+
+=item * L<App::installguide::win32> - Installing the App::Context Framework on Windows.
+
+=item * L<App::devguide> - Developers' Guide.
+
+=item * L<App::devguide> - Developers' Guide.
+
+=item * L<App::adminguide> - Administrators' Guide.
+
+=item * L<App::adminguide::cvs> - Admin Guide, setting up CVS source control.
+
+=back
+ 
+=head2 CLASS/MODULE DOCUMENTATION (indented entries are subclasses)
+
+Most of this documentation needs review, modification, and completion.
+ 
+=over
+
+=item * L<App> - The module that bootstraps the use of the App::Context Framework.
+
+=item * L<App::Context> - Abstract class representing the the runtime context of the program.
+
+=item *  +-- L<App::Context::Cmd> - A program running in a command-line context.
+
+=item *  +-- L<App::Context::HTTP> - A program running in a CGI/mod_perl context.
+
+=item *  +-- L<App::Context::Server> - A program running in a multi-process server context.
+
+=item *  =====+-- L<App::Context::ClusterController> - Running in a multi-node cluster context.
+
+=item *  =====+-- L<App::Context::ClusterNode> - Running on a single node of a cluster.
+
+=item *  +-- L<App::Context::NetServer> - Another flavor of server context (not yet implemented).
+
+=item * L<App::Exceptions> - Defines the exceptions used in the framework.
+
+=item * L<App::UserAgent>
+
+=item * L<App::Request>
+
+=item *  +-- L<App::Request::CGI>
+
+=item * L<App::Response>
+
+=item * L<App::Session>
+
+=item *  +-- L<App::Session::HTMLHidden>
+
+=item *  +-- L<App::Session::Cookie>
+
+=item * L<App::Reference>
+
+=item *  +-- L<App::Conf>
+
+=item *  =====+-- L<App::Conf::File>
+
+=item * L<App::Service>
+
+=item *  +-- L<App::Serializer>
+
+=item *  =====+-- L<App::Serializer::Properties>
+
+=item *  =====+-- L<App::Serializer::Ini>
+
+=item *  =====+-- L<App::Serializer::Perl>
+
+=item *  =====+-- L<App::Serializer::Xml>
+
+=item *  =====+-- L<App::Serializer::Yaml>
+
+=item *  =====+-- L<App::Serializer::OneLine>
+
+=item *  =====+-- L<App::Serializer::TextArray>
+
+=item *  =====+-- L<App::Serializer::Storable>
+
+=item *  +-- L<App::SessionObject>
+
+=item *  +-- L<App::Authentication>
+
+=item *  +-- L<App::Authorization>
+
+=item *  +-- L<App::ValueDomain>
+
+=item *  +-- L<App::SharedDatastore>
+
+=item *  +-- L<App::MessageDispatcher>
+
+=item *  +-- L<App::CallDispatcher>
+
+=item *  =====+-- L<App::CallDispatcher::HTTPSimple>
+
+=item *  +-- L<App::ResourceLocker>
+
+=item *  =====+-- L<App::ResourceLocker::IPCSemaphore>
+
+=item *  =====+-- L<App::ResourceLocker::IPCLocker>
+
+=item * L<Apache::Framework::App>
+
+=back
+
+=head1 INSTALLATION
+
+You can go through one of the installation guides.
+Installing the App::Context Framework generally involves several distributions
+and should just work when installed from CPAN.
+
+  perl -MCPAN -e shell
+  cpan> install App::Options
+  cpan> install App::Context
+  cpan> install App::Repository
+  cpan> install App::Widget
+  cpan> exit
+
+If it's not this easy, I need to work on making it easier.
+Please let me know (spadkins@gmail.com) and I'll fix it.
+
+=head1 QUICK START TO COMMAND LINE DATABASE PROGRAMS
+
+One of the big advantages of using the App::Context Framework for
+command-line programs is in developing a suite of database programs
+(particularly for a MySQL database).
+
+Choose a root directory for your system, assigning it to the PREFIX variable.
+
+vi ~/.bash_profile
+
+  export PREFIX=/usr/mycompany/prod
+
+vi $PREFIX/etc/app.conf
+
+  dbhost  = localhost
+  dbname  = test
+  dbuser  = scott
+  dbpass  = tiger
+
+vi $PREFIX/etc/app.pl
+
+  $conf = {
+    Repository => {
+      default => { alias => "db", },
+      db => {
+        class => "App::Repository::MySQL",
+      },
+    },
+  };
+
+vi $PREFIX/bin/prog
+
+  #!/usr/bin/perl -w
+  use strict;
+  use App::Options (
+      options => [qw(dbhost dbname dbuser dbpass)],
+      option => {
+          dbhost => {
+              description => "database host",
+              required => 1,
+          },
+          dbname => {
+              description => "database name",
+              required => 1,
+          },
+          dbuser => {
+              description => "database user",
+              required => 1,
+          },
+          dbpass => {
+              description => "database password",
+              required => 1,
+          },
+      },
+  );
+  use App;
+  use App::Repository;
+  {
+      my $context = $App->context();
+      my $db = $context->repository();
+      # perform database ops like ...
+      # my $rows = $db->get_rows("customer", { last_name => "Smith" }, ["first_name", "last_name", "birth_dt"]);
+      # my $hashes = $db->get_hashes("customer", { "birth_dt.le" => "2000-01-01" }, ["first_name", "last_name", "birth_dt"]);
+      # my $age = $db->get("customer", { customer_id => 45 }, "age");
+  }
+
+The best parts about writing database programs with App::Repository in the App::Context framework
+is that all of your programs get automatic SQL debugging, timing, and explaining.
+
+  prog --debug_sql      # show all SQL statements and their timings
+  prog --debug_sql=2    # show all SQL statements and their timings and all rows returned from selects
+  prog --debug_sql --explain_sql   # show SQL statements and explain them
+
+See L<App::Options>, L<App::Repository::quickstart>, and L<App::Repository::devguide> for more info on this.
+
+=head1 QUICK START TO OBJECT-ORIENTED COMMAND LINE PROGRAMS
+
+Another of the big advantages of using the App::Context Framework for
+command line programs is in developing programs which use and operate on Business Objects
+(the object-oriented analysis concept, not the commercial reporting software).
+
+Many "object-oriented" programs are written without ever using a true Business Object.
+The reason for this is that the issues of maintaining object state are so tricky that
+people rarely get around to using Business Objects in their command line programs.
+
+Business Objects come in two types: Business Entity Objects and Business Process Objects.
+Business Entity Objects represent things in the business realm: Customer, Store, Employee,
+Product, PurchaseOrder.  Business Process Objects are those objects that model business
+processes.
+
+The following abstractions exist in order to subclass for your business objects.
+As you get into using them, you will learn when to use which one, and you will find that
+there is of course more than one way to do it.
+
+=over
+
+=item * L<App::RepositoryObject> - An object whose state is shared across multiple sessions as a single row in a database (repository).  These are generally the Business Entity Objects.
+
+=item * L<App::SessionObject> - A named object whose state is maintained throughout the session.  These are generally the Business Process Objects.
+
+=item * L<App::SessionObject::RepositoryObjectSet> - A named object with session state and shared state consisting of a set of rows from a single table in a database (repository).
+
+=item * L<App::SessionObject::RepositoryObjectDomain> - A named object with session state and shared state consisting of a set of related sets of rows from multiple tables in a database (repository).
+
+=back
+
+The big advantage of writing object-oriented programs is for code reuse.
+Whenever someone whips up a perl script to do some processing on the system, that
+programming logic is unavailable for use in any other program (such as an interactive
+web application).
+
+One way to cure this is to have an L<App::SessionObject> where all of the logic
+for a command line program is implemented as a single method call.
+
+The choice of how many SessionObjects to use for all of the logic is a matter of
+preference.  You could put all this logic on one kitchen-sink-style SessionObject
+or you could group the functions into like types and put them on different
+SessionObjects.  You may wish to have these SessionObject take on the responsibilities
+of different "roles" played by members of the organization or tasks performed by
+different departments.  These can easily be reorganized later.  The important
+thing is to get the logic out of the command line programs and into objects
+so that the logic can be reused later.
+
+When viewed in this light, the command line program only becomes a user interface
+for a method call provided by a SessionObject.  The easy way to start is just to
+pass the %App::options hash (shown below).  However, in many cases the program
+will do a few more steps to make a more natural call to the SessionObject's method.
+
+=head2 EXAMPLES
+
+vi $PREFIX/etc/app.pl
+
+  $conf = {
+    Repository => {
+      default => { alias => "db", },
+      db => {
+        class => "App::Repository::MySQL",
+      },
+    },
+    SessionObject => {
+      credit_manager => {
+        class => "App::SessionObject::CreditManager",
+      },
+    },
+  };
+
+vi $PREFIX/lib/App/SessionObject/CreditManager.pm
+
+  use App;
+  use App::Repository;
+  package App::SessionObject::CreditManager;
+  $VERSION = "0.50";
+  @ISA = ("App::SessionObject");
+  use strict;
+
+  sub check_customer_credit {
+      my ($self, $options) = @_;
+      my $customer_id = $options->{customer_id} || die "No customer ID provided";
+      my $context = $self->{context};   # every Service has a reference to its Context
+      my $db = $context->repository();  # get the default repository from the Context
+
+      # There must be a table named customer with primary key of "customer_id" and
+      # at least the columns "approval_ind char(1)", "denial_msg varchar(255)",
+      # "first_name varchar(255)", and "last_name varchar(255)".
+      my $customer = $db->get_object("customer", $customer_id);  # returns an App::RepositoryObject
+
+      my ($approval_ind, $denial_msg);
+
+      # ... do some processing ...
+      if ($customer->{first_name} eq "Bill" && $customer->{last_name} eq "Gates") {
+          $approval_ind = "N";
+          $denial_msg = "Too rich";
+      }
+      else {
+          $approval_ind = "N";
+      }
+
+      if ($approval_ind eq "Y") {
+          $customer->set("approval_ind",$approval_ind);
+          print "Customer $customer_id approved.\n";
+      }
+      else {
+          $customer->set(["approval_ind","denial_msg"],[$approval_ind,$denial_msg]);
+          print "Customer $customer_id denied: $denial_msg.\n";
+      }
+  }
+
+  1;
+
+vi $PREFIX/bin/check_customer_credit
+
+  #!/usr/bin/perl -w
+  # NOTE: All of this code is about the User Interface to the logic.
+  #       The logic itself is hidden away in "App::SessionObject::CreditManager".
+  use strict;
+  use App::Options (
+      options => [qw(dbhost dbname dbuser dbpass customer_id)],
+      option => {
+          dbhost => {
+              description => "database host",
+              required => 1,
+          },
+          dbname => {
+              description => "database name",
+              required => 1,
+          },
+          dbuser => {
+              description => "database user",
+              required => 1,
+          },
+          dbpass => {
+              description => "database password",
+              required => 1,
+          },
+          customer_id => {
+              description => "the ID of the customer to check",
+              required => 1,
+              type => "integer",
+          },
+      },
+  );
+  use App;
+  use App::Repository;
+  {
+      my $context = $App->context();
+      my $db = $context->repository();
+      my $credit_manager = $context->session_object("credit_manager");
+      $credit_manager->check_customer_credit(\%App::options);
+  }
+
+=head1 QUICK START TO WEB PROGRAMS
+
+A web program is simply choosing a widget to display on the browser.
+Widgets may be arbitrarily complex, containing other widgets, and so taking
+the form of an entire web application.  Since any widget can be viewed in a
+browser, additional widgets may be developed and debugged before they are
+integrated into a larger applications.
+
+Widgets (L<App::Widget>) are simply SessionObject's with an html() method
+which allows them to be viewed nicely by a web browser.  They maintain their
+state throughout the duration of the session.
+
+
+
+=cut
+

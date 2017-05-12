@@ -1,0 +1,9 @@
+Revision history for Algorithm::KNN::XS
+
+0.01001  Wed Nov 09 2011
+         - Moved Alien::LibANN from requires to configure_requires in META.yml
+         - Moved Alien::LibANN from PREREQ_PM to BUILD_REQUIRES in Makefile.PL
+         - Removed unneeded LIBS fallback '-lm' and comment from Makefile.PL
+
+0.01000  Sun Sep 04 2011
+         - Initial release.

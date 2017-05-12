@@ -1,0 +1,28 @@
+Asterisk CoroManager
+by Fredrik Liljegren <fredrik@liljegren.org>
+
+This is an almost complete makeover of Asterisk::Manager, although the
+API is quite similar.  It is now event-based and uses Coro for
+continuations, Coro::AnyEvent for event handling.
+
+NB: I have only tested Asterisk::CoroManager with Coro::EV installed
+(AnyEvent choses based on what event handler is loaded and what is
+available.)
+
+I decided to release this as a separate package (rather than asking to
+have it included in asterisk-perl) since it has heavy dependancies
+that are not relevant for the other asterisk-perl modules.
+
+I am available on the asterisk-perl mailing list.  You can subscribe
+by sending an empty email to
+asterisk-perl-subscribe@lists.gnuinter.net
+
+Documentation is available in pod: perldoc Asterisk::CoroManager
+
+To install these modules just do:
+	perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+There is a simple example usage in examples/manager-test.pl

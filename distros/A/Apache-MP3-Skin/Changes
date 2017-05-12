@@ -1,0 +1,10 @@
+0.91  June 24, 2001
+      Four new variables ALLOW_STREAM, ALLOW_DOWNLOAD, STREAM_TIMEOUT, BASE_DIR to make skins more portable.
+      Minor bug fixes, some performance increases.
+      Still a beta. 
+
+0.90  June 22, 2001
+      First functioning beta with default template.
+
+
+

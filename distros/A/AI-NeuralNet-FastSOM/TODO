@@ -1,0 +1,11 @@
+- skip some tests if Storable not found (for old perls).
+  versions ok: 2.21, 2.20, 2.19, 2.18
+  perls found in: 5.11.0, 5.10.1, 5.10.0, 5.8.8, 5.8.9p35104, 5.8.9, 5.8.8, 5.6.2
+
+- "passing argument 3 of 'Perl_newXS' discards qualifiers
+   from pointer target type". is this still a problem?
+
+- clean up!
+
+- figure out how to call perl's exp(), log() and getpid() functions.
+

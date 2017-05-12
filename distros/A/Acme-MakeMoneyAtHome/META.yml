@@ -1,0 +1,18 @@
+---
+abstract: 'I made 17047 dollars just posting Acme dists to CPAN'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-MakeMoneyAtHome
+resources:
+  repository: git://github.com/avenj/acme-makemoneyathome.git
+version: 1.004001

@@ -1,0 +1,16 @@
+NAME
+    Apache::Proxy - Perl interface to mod_proxy
+
+SYNOPSIS
+      use Apache::Proxy ();
+
+DESCRIPTION
+        my $status = Apache::Proxy->pass($r, "http://perl.apache.org/"); 
+        my $hash_file = Apache::Proxy->proxy_hash($r, $url);
+
+AUTHOR
+    Doug MacEachern, Ilya Obshadko
+
+SEE ALSO
+    perl(1).
+

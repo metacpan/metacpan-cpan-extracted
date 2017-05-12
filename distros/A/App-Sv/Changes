@@ -1,0 +1,76 @@
+Revision history for Perl module App::Sv
+
+0.014 2014-01-19T11:12:59Z
+  * Supervised services now run in their own process group
+  * Updated documentation and test suite
+
+0.013 2013-12-07T21:59:41Z
+  * Fixed svc
+
+0.012 2013-11-18T16:21:26Z
+  * Added support for executing code references
+  * Added support for passing args as arrays to run
+  * Added tests more tests for run options
+  * Modified the documentation to reflect the above changes
+  * Replace exit() with POSIX::_exit() to prevent listener from being destroyed
+
+0.011 2013-10-20T19:40:44Z
+  * Fixed namespaces for modules under App::Sv
+  * Added experimental run->{cwd} option
+
+0.010 2013-10-12T08:04:01Z
+  * Moved umask and environment preparation in the child
+  * Fixed a bug where the child would lose the environment if it terminates
+  * As a consequence, App::Sv::Util isn't used anymore
+
+0.009 2013-10-06T09:41:55Z
+  * Added experimental run->{env} option
+  * Added functions to save/resore %ENV into App::Sv::Util
+  * Moved logger to App::Sv::Log
+  * Use version global to avoid depending on version
+  * Fixed license in META.json
+
+0.008 2013-09-21T08:45:52Z
+  * _status() now calls $self->{cmds}->{status}->()
+  * Fixed start_retries behaviour when <= 0
+  * Forced > 0 on *_delay and *_wait params
+  * Changed stop_wait default to 0
+  * More checks on run params
+  * Properly mark failed services started with once
+  * Document changes
+  
+0.007 2013-09-11T05:39:28Z
+  * Required minimum perl version
+  * Bumped AnyEvent requirement to 6.01
+  * Fixed x-contributors
+  * Other housekeeping changes
+
+0.006 2013-09-09T19:08:58Z
+ * Updated documentation
+ * Switched build to Minilla
+ 
+0.005 2013-09-07T08:53:50Z
+  * New command system
+  * Removed stop_signal and restart_signal run options
+  * Added stop_wait and start_wait run options
+  * Socket rewritten using AnyEvent::Handle
+  * Logging system using AnyEvent::Log
+  * Added process controller script (svc)
+  * Updated tests and documentation
+
+0.004 2013-08-06T08:01:49Z
+  * Added a socket for supervised process control
+  * Added a command system for process control
+  * Added server script (svd)
+  * Added per service options
+  * Use YAML::Tiny for configuration
+  * Updated tests and documentation
+
+0.003 2013-01-25T12:26:02Z
+  * Add double Ctrl-C to exit supervisor feature
+
+0.002 2013-01-25T12:05:43Z
+  * Add support for commands as list references
+
+0.001 2011-05-25 18:13:00 Europe/Lisbon
+  * Initial release

@@ -1,0 +1,78 @@
+{
+   "abstract" : "We are Korean CPAN Authors! (우리는 CPAN Author 다!)",
+   "author" : [
+      "Jeen Lee <jeen@perl.kr>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-CPANAuthors-Korean",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::CPANAuthors" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::CPANAuthors::Korean" : {
+         "file" : "lib/Acme/CPANAuthors/Korean.pm",
+         "version" : "0.16"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/JEEN/p5-Acme-CPANAuthors-Korean/issues"
+      },
+      "homepage" : "https://github.com/JEEN/p5-Acme-CPANAuthors-Korean",
+      "repository" : {
+         "url" : "git://github.com/JEEN/p5-Acme-CPANAuthors-Korean.git",
+         "web" : "https://github.com/JEEN/p5-Acme-CPANAuthors-Korean"
+      }
+   },
+   "version" : "0.16",
+   "x_contributors" : [
+      "Karen Etheridge <ether@cpan.org>",
+      "Jeen Lee <aiatejin@gmail.com>",
+      "Keedi Kim <keedi.k@gmail.com>"
+   ]
+}

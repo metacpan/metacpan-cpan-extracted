@@ -1,0 +1,6 @@
+Rip out explicit calls to git porcelain with Git::Repository.
+
+Rip out calls to git porcelain entirely, and glom directly onto git
+plumbing.  Calling git porcelain is way faster than cloning with
+git-svn, but the git folks highly recommend using the plumbing
+directly.

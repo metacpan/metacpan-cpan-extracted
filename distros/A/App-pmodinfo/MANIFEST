@@ -1,0 +1,17 @@
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/pmodinfo
+dist.ini
+lib/App/pmodinfo.pm
+t/00-compile.t
+t/000-report-versions-tiny.t
+t/release-distmeta.t
+t/release-eol.t
+t/release-has-version.t
+t/release-pod-syntax.t
+t/release-unused-vars.t

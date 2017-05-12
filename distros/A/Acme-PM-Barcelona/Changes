@@ -1,0 +1,19 @@
+Revision history for Acme-PM-Barcelona
+
+0.05    Sun Sep  4 17:05:26 CEST 2016
+        - Convert to Dist::Zilla.
+        - Remove boilerplate documentation.
+        - Improve kwalitee.
+
+0.04    Wed Nov 11 20:54:01 CET 2009
+        Tweak Acme::PM::Barcelona::12x5_ca NAME/NOM head1
+
+0.03    Tue Nov 10 21:36:38 CET 2009
+        Add presentation Acme::PM::Barcelona::12x5_ca.pod
+
+0.02    Fri Sep  4 02:29:10 CEST 2009
+        New module Acme::PM::Barcelona::Meeting
+
+0.01    Wed Sep  2 02:00:29 CEST 2009
+        First version, not very interesting yet
+

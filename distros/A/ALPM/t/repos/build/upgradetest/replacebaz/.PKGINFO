@@ -1,0 +1,8 @@
+arch = any
+pkgname = replacebaz
+license = GPL
+replaces = baz
+pkgdesc = Replaces Baz
+pkgver = 1.0-1
+depends = bar
+url = http://www.baz.com/replaced

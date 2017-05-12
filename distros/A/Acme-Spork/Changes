@@ -1,0 +1,40 @@
+Revision history for Perl extension Acme::Spork.
+
+0.0.1  Fri Jan  6 12:02:38 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Acme::Spork
+
+0.0.2  Mon Jan  9 20:36:42 2006
+	- made spork return PID of sporked process
+
+0.0.3  Mon Jan  9 20:36:78 2006
+	- realized I hadn't put this in the change log after uploading 0.0.2, doh!
+        - or updated the version in README
+	- added "the" to the POD near plastic for good measure
+	- make spork() return (instead of croak) if fork fails so you can handle the failure as need be
+	- added child sig so zombies do not happen, we hope anyhoo ;p
+        - slowed down to hopefully not miss the stupid stuff
+
+0.0.4  Tue Sep 12 20:38:30 CDT 2006
+    - added daemonize_without_close_on()
+    - added local $SIG{'HUP'} until Proc::Daemon comes around
+	- fixed 0.0.3 above :)
+	- fixed daemonize() example use of Unix::Pid to properly do pid file after daemonize changes the pid
+	
+0.0.5  Wed Nov 15 17:51:02 2006
+	- keeps $SIG{'CHLD'} if defined instead of using IGNORE
+	- local()ize'd $SIG{'CHLD'}
+
+0.0.6  	Tue Jan 16 23:54:01 2007
+    - added @reopen_to
+
+0.0.7  Wed Jan 17 09:52:55 2007
+	- changed 0.0.6 to %reopen_stdfhs_to for clarity
+	
+0.0.8  Wed Apr  1 21:52:29 2009
+    - Double fork to avoid needing to munge $SIG{CHLD} outside of spork()
+    - pipe() to get spork()ed process's PID back for return
+    - $SIG{CHLD} so that $? inside spork() is correct (i.e. not -1 for auto reaped)
+    - the 3 things above also make it zombie safe for when the parent outlives the child
+    - explicit exit after coderef call to avoid "fork doubling"
+    - Ability to define Acme::Spork::setsid() to not use POSIX::setsid() (i.e. to not load POSIX)

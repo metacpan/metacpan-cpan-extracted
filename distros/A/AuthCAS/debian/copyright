@@ -1,0 +1,17 @@
+This is the debian package for the AuthCAS module.
+It was created by Lionel Porcheron <lionel.porcheron@anyware-tech.com> using dh-make-perl.
+
+It was downloaded from http://sourcesup.cru.fr/perlcas/
+
+The upstream author is: Olivier Salaun <os@cru.fr>
+
+Copyright (C) 2003 Comite Reseau des Universites (http://www.cru.fr). All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Perl is distributed under your choice of the GNU General Public License or
+the Artistic License.  On Debian GNU/Linux systems, the complete text of the
+GNU General Public License can be found in `/usr/share/common-licenses/GPL'
+and the Artistic Licence in `/usr/share/common-licenses/Artistic'.
+

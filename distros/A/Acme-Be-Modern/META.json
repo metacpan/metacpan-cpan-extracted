@@ -1,0 +1,49 @@
+{
+   "abstract" : "enables your script to \"be modern\"",
+   "author" : [
+      "SÃ¸ren Lund <slu@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Be-Modern",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Loaded" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "Software::License" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Filter::Util::Call" : 0,
+            "Modern::Perl" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Be::Modern" : {
+         "file" : "lib/Acme/Be/Modern.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ]
+   },
+   "version" : "0.03"
+}

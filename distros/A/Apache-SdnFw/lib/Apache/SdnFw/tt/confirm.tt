@@ -1,0 +1,20 @@
+<div class="floatleft" style="clear: both;">
+<table>
+	<caption>Confirm&nbsp;[% s.object %]&nbsp;[%  s.function %]</caption>
+	<tbody>
+	<tr>
+		<td colspan=2>
+			[% message %]
+		</td>
+	</tr>
+	<tr>
+		<td width="50%" align="center">
+			<a href="[% s.ubase %]/[% s.object %]/[% s.function %]?[% s.args %][% IF s.args %]&[% END %]confirm=1" class="action">Yes</a>
+		</td>
+		<td width="50%" align="center">
+			<a href="[% IF s.confirm_no %][% s.confirm_no %][% ELSE %][% s.ubase %]/[% s.object %]/display?[% s.args %][% END %]" class="action">No</a>
+		</td>
+	</tr>
+	</tbody>
+</table>
+</div>

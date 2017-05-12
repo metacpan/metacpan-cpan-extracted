@@ -1,0 +1,48 @@
+{
+   "abstract" : "HTTP::Server::Simple based server for CPANIDX",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-CPANIDX-HTTP-Server",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::CPANIDX" : "0.28",
+            "Config::Tiny" : "2.12",
+            "HTTP::Server::Simple" : "0.43",
+            "HTTP::Server::Simple::CGI" : 0,
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/app-cpanidx-http-server",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/app-cpanidx-http-server.git",
+         "web" : "https://github.com/bingos/app-cpanidx-http-server"
+      }
+   },
+   "version" : "0.08"
+}
+

@@ -1,0 +1,56 @@
+# Aspose.Email Cloud SDK for Perl
+
+This repository contains Aspose.Email Cloud SDK for Perl source code. This SDK allows you to work with Aspose.Email Cloud REST APIs in your Perl applications quickly and easily. 
+
+## How to use the SDK?
+
+The complete source code is available in this repository folder. For more details, please visit our [documentation website](http://www.aspose.com/docs/display/emailcloud/How+to+Setup+Aspose.Email+Cloud+SDK+for+perl).
+
+## Quick SDK Tutorial
+```javascript
+
+use lib 'lib';
+use strict;
+use warnings;
+use AsposeStorageCloud::StorageApi;
+use AsposeStorageCloud::ApiClient;
+use AsposeStorageCloud::Configuration;
+
+use AsposeEmailCloud::EmailApi;
+use AsposeEmailCloud::ApiClient;
+use AsposeEmailCloud::Configuration;
+
+$AsposeEmailCloud::Configuration::app_sid = 'XXX';
+$AsposeEmailCloud::Configuration::api_key = 'XXX';
+
+$AsposeEmailCloud::Configuration::debug = 1;
+$AsposeStorageCloud::Configuration::app_sid = $AsposeEmailCloud::Configuration::app_sid;
+$AsposeStorageCloud::Configuration::api_key = $AsposeEmailCloud::Configuration::api_key;
+
+#Instantiate Aspose.Storage API SDK 
+my $storageApi = AsposeStorageCloud::StorageApi->new();
+
+#Instantiate Aspose.Email API SDK
+my $emailApi = AsposeEmailCloud::EmailApi->new();
+
+my $data_path = '../data/';
+
+#set input file name
+my $fileName =  "email_test2";
+my $name =  $fileName . ".eml";
+my $format = "msg";
+
+#upload file to aspose cloud storage 
+my $response = $storageApi->PutCreate(Path => $name, file => $data_path.$name);
+
+#invoke Aspose.Email Cloud SDK API to convert message to other formats                 
+$response = $emailApi->GetDocumentWithFormat(name=> $name, format=>$format);
+
+if($response->{'Status'} eq 'OK'){
+	#download converted email message from api response 
+	my $output_file = 'C:/temp/'. $fileName . '.' . $format;
+	write_file($output_file, { binmode => ":raw" }, $response->{'Content'});
+}
+
+
+```

@@ -1,0 +1,36 @@
+<Perl>
+  use strict;
+  use Apache2::ModLogConfig ();
+  use Apache2::RequestUtil ();
+
+  sub My::Hnd {
+    my ($r)=splice @_, 1, 1;
+    $r->notes->{'My::Hnd'}="@_[1,2]";
+  }
+
+  sub My::Fmt {
+    $_[0]->is_initial_req+0;
+  }
+</Perl>
+
+CustomLog logs/perl.log "%I %<{My::Fmt}^ %>{My::Fmt}^ %O"
+CustomLog "@perl: sub {My::Hnd(q{sentinel}, @_, q{sentinel})}" "%I%O"
+
+LogLevel warn
+
+PerlModule TestLib::print
+<Location /print>
+  PerlResponseHandler TestLib::print
+  SetHandler modperl
+</Location>
+
+PerlModule TestLib::redir
+<Location /redir>
+  PerlResponseHandler TestLib::redir
+  SetHandler modperl
+</Location>
+
+<VirtualHost FRITZ>
+  CustomLog logs/perl-fritz.log "%I %<{My::Fmt}^ %>{My::Fmt}^ %O"
+  CustomLog "@perl: sub {My::Hnd(q{fritz}, @_, q{fritz})}" "%I%O"
+</VirtualHost>

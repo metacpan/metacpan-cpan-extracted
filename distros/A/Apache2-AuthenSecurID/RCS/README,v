@@ -1,0 +1,733 @@
+head	1.5;
+access;
+symbols;
+locks;
+comment	@# @;
+
+
+1.5
+date	2007.12.08.03.26.51;	author atobey;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2002.07.31.16.43.55;	author Administrator;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2002.07.30.20.15.39;	author Administrator;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2001.06.22.19.08.42;	author root;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2001.06.19.19.45.55;	author root;	state Exp;
+branches;
+next	;
+
+
+desc
+@Created
+@
+
+
+1.5
+log
+@updated
+@
+text
+@# $Id: README,v 1.4 2002/07/31 16:43:55 Administrator Exp atobey $
+
+In order to install and use this package you will need Perl version
+5.6 or better, mod_perl2, libapreq (Apache2::Request), Crypt::CBC,
+Crypt::Blowfish and Authen::ACE. 
+
+Installation as usual:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+There are three components to Apache::AuthenSecurID.
+
+Apache::AuthenSecurID
+Apache::AuthenSecurID::Auth
+ace_initd
+
+There are support files for Redhat-based systems in the redhat directory.
+
+NAME
+    Apache2::AuthenSecurID - Authentication via a SecurID server
+
+SYNOPSIS
+     # Configuration in httpd.conf or access.conf 
+
+    PerlModule Apache2::AuthenSecurID
+
+    <Location /secure/directory> AuthName SecurID AuthType Basic
+
+     PerlAuthenHandler Apache2::AuthenSecurID
+
+     PerlSetVar AuthCryptKey Encryption_Key 
+     PerlSetVar AuthCookie Name_of_Authentication_Cookie 
+     PerlSetVar AuthUserCookie Name_of_Username_Authentication_Cookie 
+     PerlSetVar AuthCookiePath /path/of/authentication/cookie
+     PerlSetVar AuthCookieTimeOut 30 
+     PerlSetVar Auth_Handler /path/of/authentication/handler
+
+     require valid-user
+    </Location>
+
+DESCRIPTION
+    This module allows authentication against a SecurID server. It detects
+    whether a user has a valid encrypted cookie containing their username
+    and last activity time stamp. If the cookie is valid the module will
+    change the activity timestamp to the present time, encrypt and send the
+    cookie. If the cookie is not valid the module will redirect to the
+    authentication handler to prompt for username and passcode.
+
+LIST OF TOKENS
+    * AuthCryptKey
+    The Blowfish key used to encrypt and decrypt the authentication cookie.
+    It defaults to my secret if this variable is not set.
+
+    * AuthCookie
+    The name of the of cookie to be set for the authentication token. It
+    defaults to SecurID if this variable is not set.
+
+    * AuthUserCookie
+    The name of the of cookie that contains the value of the persons
+    username in plain text. This is checked against the contents of the
+    encrypted cookie to verify user. The cookie is set of other applications
+    can identify authorized users. It defaults to SecurID_User if this
+    variable is not set.
+
+    * AuthCookiePath
+    The path of the of cookie to be set for the authentication token. It
+    defaults to / if this variable is not set.
+
+    * AuthCookieTimeOut
+    The time in minute a cookie is valid for. It is not recommended to set
+    below 5. It defaults to 30 if this variable is not set.
+
+    * Auth_Handler
+    The path of authentication handler. This is the URL which request with
+    invalid cookie are redirected to. The handler will prompt for username
+    and passcode. It does the actual authentication and sets the initial
+    cookie. This mechanism is used instead of get_basic_auth_pw because
+    get_basic_auth_pw will do multiple authentication attempt on pages that
+    contain frames. The ACE server will deny simultaneous authentication
+    attempts since it considers this a type of attack. It defaults to
+    /ace_init if this variable is not set. Please see
+    Apache2::AuthenSecurID::Auth to properly configure this functionality.
+
+CONFIGURATION
+    The module should be loaded upon startup of the Apache daemon. Add the
+    following line to your httpd.conf:
+
+     PerlModule Apache2::AuthenSecurID
+
+PREREQUISITES
+    For AuthenSecurID you need to enable the appropriate call-back hook when
+    making mod_perl:
+
+      perl Makefile.PL PERL_AUTHEN=1
+
+    AuthenSecurID requires Crypt::Blowfish and Crypt::CBC.
+
+SEE ALSO
+    Apache, mod_perl, Authen::ACE Apache2::AuthenSecurID::Auth
+
+AUTHORS
+    * mod_perl by Doug MacEachern <dougm@@osf.org>
+    * Authen::ACE by Dave Carrigan <Dave.Carrigan@@iplenergy.com>
+    * Apache::AuthenSecurID by David Berk <dberk@@lump.org>
+    * mod_perl2 port and other modifications by Al Tobey <tobert@@gmail.com>
+
+COPYRIGHT
+    The Apache2::AuthenSecurID module is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
+
+NAME
+    Apache2::AuthenSecurID::Auth - Authentication handler for
+    Apache2::AuthenSecurID
+
+SYNOPSIS
+     # Configuration in httpd.conf  
+
+    <Location /path/of/authentication/handler> SetHandler perl-script
+    PerlHandler Apache2::AuthenSecurID::Auth
+
+       PerlSetVar AuthCryptKey Encryption_Key
+       PerlSetVar AuthCookie Name_of_Authentication_Cookie
+       PerlSetVar AuthUserCookie Name_of_Username_Authentication_Cookie
+       PerlSetVar AuthCookiePath /path/of/authentication/cookie
+       PerlSetVar AuthApacheCookie Apache_Cookie
+       PerlSetVar ace_initd_server name.of.ace.handler.server.com
+       PerlSetVar ace_initd_port 1969
+    </Location>
+
+DESCRIPTION
+    This module allows authentication against a SecurID server. A request is
+    redirected to this handler if the authentication cookie does not exist
+    or is no longer valid. The handler will prompt for username and
+    passcode. It will then construct and encrypt a UDP packet and send it to
+    the Ace request daemon. This is necessary since libsdiclient.a needs to
+    persist for NEXT TOKEN MODE and SET PIN MODE. If the authentication is
+    valid an encrypted Authentication Cookie is set and the request is
+    redirected to the originating URI. If the user needs to enter NEXT TOKEN
+    or set their PIN they will be prompted to do so and if valid the request
+    is then redirected to the originating URI.
+
+LIST OF TOKENS
+    * AuthCryptKey
+    The Blowfish key used to encrypt and decrypt the authentication cookie.
+    It defaults to my secret if this variable is not set.
+
+    * AuthCookie
+    The name of the of cookie to be set for the authentication token. It
+    defaults to SecurID if this variable is not set.
+
+    * AuthUserCookie
+    The name of the of cookie that contains the value of the persons
+    username in plain text. This is checked against the contents of the
+    encrypted cookie to verify user. The cookie is set of other applications
+    can identify authorized users. It defaults to SecurID_User if this
+    variable is not set.
+
+    * AuthCookiePath
+    The path of the of cookie to be set for the authentication token. It
+    defaults to / if this variable is not set.
+
+    * AuthApacheCookie
+    The name of the mod_usertrack cookie. The mod_usertrack module must be
+    compile and enabled in order to track user sessions. This is set by the
+    CookieName directive in httpd.conf. It defaults to Apache if this
+    variable is not set.
+
+    * ace_initd_server
+    The name of the server running the ACE request daemon. This daemon is
+    the actual process that communicates with the ACE Server. If the user is
+    in NEXT TOKEN MODE due to repeated failures or SET PIN MODE the
+    Authen::ACE object must persist beyond the initial request. A request
+    packet is constructed with a random number, type of transaction,
+    username, passcode and session identifier. The request packet is then
+    encrypted using Blowfish and sent to the ACE request daemon. The ACE
+    request daemon decrypts and parses the packet. The request if forwarded
+    to the ACE server and the response is sent back to the handler. The
+    random number originally sent is returned to prevent attacks. It
+    defaults to localhost if this variable is not set.
+
+    * ace_initd_port
+    The port the that the Ace request daemon listens on. It defaults to 1969
+    if this variable is not set.
+
+CONFIGURATION
+    The module should be loaded upon startup of the Apache daemon. Add the
+    following line to your httpd.conf:
+
+     PerlModule Apache2::AuthenSecurID::Auth
+
+PREREQUISITES
+    For AuthenSecurID::Auth you need to enable the appropriate call-back
+    hook when making mod_perl:
+
+      perl Makefile.PL PERL_AUTHEN=1
+
+    AuthenSecurID::Auth requires Crypt::Blowfish and Crypt::CBC.
+
+    For AuthenSecurID::Auth to properly track users mod_usertrack must be
+    compiled and enabled.
+
+SEE ALSO
+    Apache, mod_perl, Authen::ACE Apache2::AuthenSecurID::Auth
+
+AUTHORS
+    * mod_perl by Doug MacEachern <dougm@@osf.org>
+    * Authen::ACE by Dave Carrigan <Dave.Carrigan@@iplenergy.com>
+    * Apache::AuthenSecurID by David Berk <dberk@@lump.org>
+    * Apache::AuthenSecurID::Auth by David Berk <dberk@@lump.org>
+    * port to mod_perl2 and cleanups by Al Tobey <tobert@@gmail.com>
+
+COPYRIGHT
+    The Apache2::AuthenSecurID::Auth module is free software; you can
+    redistribute it and/or modify it under the same terms as Perl itself.
+
+NAME
+    ace_initd - ACE Authentication daemon for Apache::AuthenSecurID::Auth
+
+SYNOPSIS
+    nohup ./ace_initd --listen=127.0.0.1 --facility=local2 --secret=123456
+    --port=1969 --var_ace=/var/ace
+
+DESCRIPTION
+    This daemon handles the ACE authentication requests for the
+    Apache::SecurID::Auth module. It is a single threaded, single fork
+    server that listens on a specified UDP port. Incoming requests are
+    decrypted and requests forwarded to the ACE server. If a specific
+    request is in either in NEXT TOKEN MODE or SET PIN MODE the Authen::ACE
+    object is not deleted. It is instead kept in memory to handle those
+    specific requests later.
+
+LIST OF TOKENS
+    * --var_ace
+    Specifies the location of the sdconf.rec file. It defaults to
+    $ENV{VAR_ACE} if this variable is not set.
+
+    * --secret
+    The Blowfish key used to encrypt and decrypt the authentication cookie.
+    It defaults to my secret if this variable is not set.
+
+    * --port
+    The port the that the Ace request daemon listens on. It defaults to 1969
+    if this variable is not set.
+
+    * --facility
+    The syslog facility ace_initd logs to. It defaults to local2 if this
+    variable is not set.
+
+    * --daemon
+    Break off from the shell and become a daemon.
+
+CONFIGURATION
+    Either run from the command line;
+
+    prompt$ nohup ./ace_initd &
+
+    or write the appropriate scripts in the /etc/rc directories.
+
+PREREQUISITES
+    ace_initd requires Crypt::Blowfish, Crypt::CBC and Authen::ACE.
+
+SEE ALSO
+    Authen::ACE Apache::AuthenSecurID Apache::AuthenSecurID::Auth
+
+AUTHORS
+    * mod_perl by Doug MacEachern <dougm@@osf.org>
+    * Authen::ACE by Dave Carrigan <Dave.Carrigan@@iplenergy.com>
+    * Apache::AuthenSecurID by David Berk <dberk@@lump.org>
+    * Apache::AuthenSecurID::Auth by David Berk <dberk@@lump.org>
+    * Various changes by Al Tobey <tobert@@gmail.com>
+
+COPYRIGHT
+    ace_initd is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@d1 1
+a1 1
+# $Id: README,v 1.3 2002/07/30 20:15:39 Administrator Exp $
+d4 3
+a6 1
+5.004 or better, mod_perl Crypt::CBC, Crypt::Blowfish and Authen::ACE. 
+d20 4
+d25 2
+a26 1
+Apache::AuthenSecurID(3)curID(3)
+d28 1
+d30 1
+a30 3
+NAME
+       Apache::AuthenSecurID - Authentication via a SecurID
+       server
+d32 1
+a32 17
+SYNOPSIS
+        # Configuration in httpd.conf or access.conf
+	
+       PerlModule Apache::AuthenSecurID
+
+       <Location /secure/directory>
+        AuthName SecurID
+        AuthType Basic
+
+        PerlAuthenHandler Apache::AuthenSecurID
+
+        PerlSetVar AuthCryptKey Encryption_Key
+        PerlSetVar AuthCookie Name_of_Authentication_Cookie
+        PerlSetVar AuthUserCookie Name_of_Username_Authentication_Cookie
+        PerlSetVar AuthCookiePath /path/of/authentication/cookie
+        PerlSetVar AuthCookieTimeOut 30
+        PerlSetVar Auth_Handler /path/of/authentication/handler
+d34 6
+a39 2
+        require valid-user
+       </Location>
+d41 2
+d45 6
+a50 8
+       This module allows authentication against a SecurID
+       server.  It detects whether a user has a valid encrypted
+       cookie containing their username and last activity time
+       stamp.  If the cookie is valid the module will change the
+       activity timestamp to the present time, encrypt and send
+       the cookie.  If the cookie is not valid the module will
+       redirect to the authentication handler to prompt for
+       username and passcode.
+d53 33
+a85 44
+       o AuthCryptKey
+              The Blowfish key used to encrypt and decrypt the
+              authentication cookie.  It defaults to my secret if
+              this variable is not set.
+
+       o AuthCookie
+              The name of the of cookie to be set for the
+              authentication token.  It defaults to SecurID if
+              this variable is not set.
+
+       o AuthUserCookie
+              The name of the of cookie that contains the value
+              of the persons username in plain text.  This is
+              checked against the contents of the encrypted
+              cookie to verify user.  The cookie is set of other
+              applications can identify authorized users.  It
+              defaults to SecurID_User if this variable is not
+              set.
+
+       o AuthCookiePath
+              The path of the of cookie to be set for the
+              authentication token.  It defaults to / if this
+              variable is not set.
+
+       o AuthCookieTimeOut
+              The time in minute a cookie is valid for.  It is
+              not recommended to set below 5.  It defaults to 30
+              if this variable is not set.
+
+       o Auth_Handler
+              The path of authentication handler.  This is the
+              URL which request with invalid cookie are
+              redirected to.  The handler will prompt for
+              username and passcode.  It does the actual
+              authentication and sets the initial cookie.  This
+              mechanism is used instead of get_basic_auth_pw
+              because get_basic_auth_pw will do multiple
+              authentication attempt on pages that contain
+              frames.  The ACE server will deny simultaneous
+              authentication attempts since it considers this a
+              type of attack.  It defaults to /ace_init if this
+              variable is not set.  Please see
+              Apache::AuthenSecurID::Auth to properly configure
+              this functionality.
+d88 2
+a89 4
+       The module should be loaded upon startup of the Apache
+       daemon.  Add the following line to your httpd.conf:
+
+        PerlModule Apache::AuthenSecurID
+d91 1
+d94 2
+a95 2
+       For AuthenSecurID you need to enable the appropriate call-
+       back hook when making mod_perl:
+d97 1
+a97 1
+         perl Makefile.PL PERL_AUTHEN=1
+d99 1
+a99 1
+       AuthenSecurID requires Crypt::Blowfish and Crypt::CBC.
+d102 1
+a102 2
+       the Apache manpage, the mod_perl manpage, the Authen::ACE
+       manpage the Apache::AuthenSecurID::Auth manpage
+d105 4
+a108 7
+       o mod_perl by Doug MacEachern <dougm@@osf.org>
+
+       o Authen::ACE by Dave Carrigan
+       <Dave.Carrigan@@iplenergy.com>
+
+       o Apache::AuthenSecurID by David Berk <dberk@@lump.org>
+
+d111 2
+a112 8
+       The Apache::AuthenSecurID module is free software; you can
+       redistribute it and/or modify it under the same terms as
+       Perl itself.
+
+
+
+Apache::AuthenSecurID::Auth(3)curID::Auth(3)
+
+d115 2
+a116 2
+       Apache::AuthenSecurID::Auth - Authentication handler for
+       Apache::AuthenSecurID
+d119 1
+a119 1
+        # Configuration in httpd.conf
+d121 2
+a122 12
+       <Location /path/of/authentication/handler>
+          SetHandler perl-script
+          PerlHandler Apache::AuthenSecurID::Auth
+
+          PerlSetVar AuthCryptKey Encryption_Key
+          PerlSetVar AuthCookie Name_of_Authentication_Cookie
+          PerlSetVar AuthUserCookie Name_of_Username_Authentication_Cookie
+          PerlSetVar AuthCookiePath /path/of/authentication/cookie
+          PerlSetVar AuthApacheCookie Apache_Cookie
+          PerlSetVar ace_initd_server name.of.ace.handler.server.com
+          PerlSetVar ace_initd_port 1969
+       </Location>
+d124 8
+d134 10
+a143 13
+       This module allows authentication against a SecurID
+       server.  A request is redirected to this handler if the
+       authentication cookie does not exist or is no longer
+       valid.  The handler will prompt for username and passcode.
+       It will then construct and encrypt a UDP packet and send
+       it to the Ace request daemon.  This is necessary since
+       libsdiclient.a needs to persist for NEXT TOKEN MODE and
+       SET PIN MODE.  If the authentication is valid an encrypted
+       Authentication Cookie is set and the request is redirected
+       to the originating URI.  If the user needs to enter NEXT
+       TOKEN or set their PIN they will be prompted to do so and
+       if valid the request is then redirected to the originating
+       URI.
+d146 41
+a186 53
+       o AuthCryptKey
+              The Blowfish key used to encrypt and decrypt the
+              authentication cookie.  It defaults to my secret if
+              this variable is not set.
+
+       o AuthCookie
+              The name of the of cookie to be set for the
+              authentication token.  It defaults to SecurID if
+              this variable is not set.
+
+       o AuthUserCookie
+              The name of the of cookie that contains the value
+              of the persons username in plain text.  This is
+              checked against the contents of the encrypted
+              cookie to verify user.  The cookie is set of other
+              applications can identify authorized users.  It
+              defaults to SecurID_User if this variable is not
+              set.
+
+       o AuthCookiePath
+              The path of the of cookie to be set for the
+              authentication token.  It defaults to / if this
+              variable is not set.
+
+       o AuthApacheCookie
+              The name of the mod_usertrack cookie.  The
+              mod_usertrack module must be compile and enabled in
+              order to track user sessions.  This is set by the
+              CookieName directive in httpd.conf.  It defaults to
+              Apache if this variable is not set.
+
+       o ace_initd_server
+              The name of the server running the ACE request
+              daemon.  This daemon is the actual process that
+              communicates with the ACE Server.  If the user is
+              in NEXT TOKEN MODE due to repeated failures or SET
+              PIN MODE the Authen::ACE object must persist beyond
+              the initial request.  A request packet is
+              constructed with a random number, type of
+              transaction, username, passcode and session
+              identifier.  The request packet is then encrypted
+              using Blowfish and sent to the ACE request daemon.
+              The ACE request daemon decrypts and parses the
+              packet.  The request if forwarded to the ACE server
+              and the response is sent back to the handler.  The
+              random number originally sent is returned to
+              prevent attacks.  It defaults to localhost if this
+              variable is not set.
+
+       o ace_initd_port
+              The port the that the Ace request daemon listens
+              on.  It defaults to 1969 if this variable is not
+              set.
+d189 2
+a190 4
+       The module should be loaded upon startup of the Apache
+       daemon.  Add the following line to your httpd.conf:
+
+        PerlModule Apache::AuthenSecurID::Auth
+d192 1
+d195 2
+a196 2
+       For AuthenSecurID::Auth you need to enable the appropriate
+       call-back hook when making mod_perl:
+d198 1
+a198 1
+         perl Makefile.PL PERL_AUTHEN=1
+d200 1
+a200 2
+       AuthenSecurID::Auth requires Crypt::Blowfish and
+       Crypt::CBC.
+d202 2
+a203 2
+       For AuthenSecurID::Auth to properly track users
+       mod_usertrack must be compiled and enabled.
+d206 1
+a206 2
+       the Apache manpage, the mod_perl manpage, the Authen::ACE
+       manpage the Apache::AuthenSecurID::Auth manpage
+d209 5
+a213 9
+       o mod_perl by Doug MacEachern <dougm@@osf.org>
+
+       o Authen::ACE by Dave Carrigan
+       <Dave.Carrigan@@iplenergy.com>
+
+       o Apache::AuthenSecurID by David Berk <dberk@@lump.org>
+
+       o Apache::AuthenSecurID::Auth by David Berk
+       <dberk@@lump.org>
+d216 2
+a217 7
+       The Apache::AuthenSecurID::Auth module is free software;
+       you can redistribute it and/or modify it under the same
+       terms as Perl itself.
+
+
+ACE_INITD(1)   User Contributed Perl Documentation   ACE_INITD(1)
+
+d220 1
+a220 2
+       ace_initd -  ACE Authentication daemon for
+       Apache::AuthenSecurID::Auth
+d223 2
+a224 7
+        # Configuration in /etc/ace_initd.conf
+
+        VAR_ACE /the/ace/data/directory
+        port 1969
+        AuthCryptKey Encryption_Key
+        syslog local2
+
+d227 7
+a233 8
+       This daemon handles the ACE authentication requests for
+       the Apache::SecurID::Auth module.  It is a single
+       threaded, single fork server that listens on a specified
+       UDP port.  Incoming requests are decrypted and requests
+       forwarded to the ACE server.  If a specific request is in
+       either in NEXT TOKEN MODE or SET PIN MODE the Authen::ACE
+       object is not deleted.  It is instead kept in memory to
+       handle those specific requests later.
+d236 18
+a253 18
+       o VAR_ACE
+              Specifies the location of the sdconf.rec file.  It
+              defaults to /opt/ace/data if this variable is not
+              set.
+
+       o AuthCryptKey
+              The Blowfish key used to encrypt and decrypt the
+              authentication cookie.  It defaults to my secret if
+              this variable is not set.
+
+       o ace_initd_port
+              The port the that the Ace request daemon listens
+              on.  It defaults to 1969 if this variable is not
+              set.
+
+       o syslog
+              The syslog facility ace_initd logs to.  It defaults
+              to local2 if this variable is not set.
+d256 1
+a256 1
+       Either run from the command line;
+d258 1
+a258 1
+       prompt$ nohup ./ace_initd &
+d260 1
+a260 2
+       or write the appropriate scripts in the /etc/rc
+       directories.
+d263 1
+a263 3
+       ace_initd requires Crypt::Blowfish, Crypt::CBC and
+       Authen::ACE.
+
+d266 1
+a266 2
+       the Authen::ACE manpage the Apache::AuthenSecurID manpage
+       the Apache::AuthenSecurID::Auth manpage
+d269 5
+a273 9
+       o mod_perl by Doug MacEachern <dougm@@osf.org>
+
+       o Authen::ACE by Dave Carrigan
+       <Dave.Carrigan@@iplenergy.com>
+
+       o Apache::AuthenSecurID by David Berk <dberk@@lump.org>
+
+       o Apache::AuthenSecurID::Auth by David Berk
+       <dberk@@lump.org>
+d276 2
+a277 5
+       ace_initd is free software; you can redistribute it and/or
+       modify it under the same terms as Perl itself.
+
+
+Copyright 2001, David Berk <dberk@@mobygames.com>
+a278 2
+The Apache::AuthenSecurID module is free software; you can redistribute 
+it and/or modify it under the same terms as Perl itself.
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d1 1
+a1 1
+# $Id: README,v 1.2 2001/06/22 19:08:42 root Exp $
+d28 2
+@
+
+
+1.2
+log
+@docs
+@
+text
+@d1 1
+a1 1
+# $Id: README,v 1.1 2001/06/19 19:45:55 root Exp root $
+d40 1
+a40 1
+        PerlSetVar AuthCookieHandler /path/of/authentication/handler
+d86 1
+a86 1
+       o AuthCookieHandler
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 1
+# $Id: README,v 1.1 2001/01/18 20:50:28 root Exp $
+d4 2
+a5 1
+5.004 or better, mod_perl and Authen::ACE. Installation as usual:
+d12 339
+a350 1
+Copyright 2000, David Berk <dberk@@lump.org>
+@

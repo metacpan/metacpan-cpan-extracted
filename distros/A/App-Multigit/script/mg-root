@@ -1,0 +1,15 @@
+#!perl
+use strict;
+use warnings;
+use 5.014;
+
+use App::Multigit;
+use App::Multigit::Script;
+
+say App::Multigit::mg_parent();
+
+=head1 SYNOPSIS
+    
+    mg root
+
+Reports the closest parent directory with a .mgconfig file in it.

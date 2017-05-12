@@ -1,0 +1,41 @@
+App-TimelogTxt version 0.12
+
+This is a modulized version of a script I've been using for the last few years
+to track my time spent on various projects at home and at work. It is based
+loosely on two other projects.
+
+For well over a decade I used the program TEAK on Palm OS to track this
+information. Now that Palm is defunct, I needed something else. I've also been
+using Gina Trapani's Todo.txt tools to track my todo list. Her simple text file
+based design solved the biggest problem I had with the time logging software.
+
+So the original timelog script was born. This program is the result of a few
+years of refining that design.
+
+In addition to the text-based format, I also stole the concept of configuration
+based aliases from git. This turns out to make the timelog tool much more
+useful.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+GET STARTED
+
+Follow the "Getting Started" instructions in App::TimelogTxt::Tutorial.
+
+DEPENDENCIES
+
+Time::Local, Getopt::Long, Config::Tiny, List::Util, App::CmdDispatch.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013, G. Wade Johnson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

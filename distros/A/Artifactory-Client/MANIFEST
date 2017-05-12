@@ -1,0 +1,10 @@
+Makefile.PL
+Changes
+lib/Artifactory/Client.pm
+MANIFEST			This list of files
+README.md
+t/01_unit.t
+t/data/test.xml
+t/data/test.json
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

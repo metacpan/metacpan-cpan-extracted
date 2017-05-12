@@ -1,0 +1,40 @@
+Revision history for Algorithm::Bucketizer.
+
+0.13 (01/14/2013)
+    (ms) Added github repo
+    (ms) Fix for prefilled buckets
+
+0.12  04/21/2007
+    (ms) Added 'bucketize' script
+
+0.11  02/25/2006
+    (ms) Added support for multiple bucket sizes (add_bucket() method)
+
+0.10  04/04/2003
+    * fixed Algorithm::Bucketize::Bucket to Algorithm::Bucketizer::Bucket
+    * Bucketizer's add_item method now returns the bucket object on
+      success
+
+0.09  03/12/2003
+    * Corrected documents
+
+0.06  06/18/2002
+    * Added test cases for random optimization
+
+0.05  06/18/2002
+    * Added optimization test case, fixed bug
+
+0.04  06/17/2002
+    * Added optimization method
+
+0.03  06/14/2002
+    * Added documentation
+    * Added level() function for Buckets
+
+0.02  06/13/2002 
+    * Added prefill_bucket method
+    * Added indexing of buckets
+    * Added optimized/simple algorithm
+
+0.01  Wed Jun 12 20:08:51 2002
+    First version.

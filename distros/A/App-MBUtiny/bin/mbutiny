@@ -1,0 +1,420 @@
+#!/usr/bin/perl -w
+# $Id: mbutiny 75 2014-09-22 15:09:39Z abalama $
+#perl2exe_include "XSLoader.pm";
+#perl2exe_include "utf8.pm";
+#perl2exe_include "Encode/Byte.pm";
+#perl2exe_include "Encode.pm";
+#perl2exe_include "Encode/Config.pm";
+#perl2exe_include "Encode/ConfigLocal_PM.e2x";
+#perl2exe_include "Package/Stash.pm";
+#perl2exe_include "Package/Stash/XS.pm";
+#perl2exe_include "Class/Load/XS.pm";
+#perl2exe_include "Class/MOP/Mixin.pm";
+#perl2exe_include "Class/MOP/Object.pm";
+#perl2exe_include "Class/MOP/Method/Generated.pm";
+#perl2exe_include "Class/MOP/Method/Inlined.pm";
+#perl2exe_include "Class/MOP/Module.pm";
+#perl2exe_include "Class/MOP/Package.pm";
+#perl2exe_include "Class/MOP/Class/Immutable/Trait.pm";
+#perl2exe_include "Moose/Meta/Method.pm";
+#perl2exe_include "Moose/Meta/Object/Trait.pm";
+#perl2exe_include "Moose/Meta/Mixin/AttributeCore.pm";
+#perl2exe_include "Tie/Hash/NamedCapture.pm";
+#perl2exe_include "Tie/Handle.pm";
+#perl2exe_include "CTK/CLI.pm";
+#perl2exe_include "CTK/CPX.pm";
+#perl2exe_include "ExtUtils/MM_Win32.pm";
+#perl2exe_include "CTK/File.pm";
+#perl2exe_include "CTK/Crypt.pm";
+#perl2exe_include "CTK/Arc.pm";
+#perl2exe_include "CTK/Net.pm";
+#perl2exe_include "CTK/Log.pm";
+#perl2exe_include "File/Pid.pm";
+#perl2exe_include "Class/Accessor/Fast.pm";
+#perl2exe_include "Class/Accessor.pm";
+#perl2exe_include "App/MBUtiny/Skel/Config.pm";
+
+use strict;
+
+=encoding windows-1251
+
+=head1 NAME
+
+mbutiny - easily interact with App::MBUtiny from the command line
+
+=head1 VERSION
+
+Version 1.49
+
+=head1 SYNOPSIS
+
+    mbutiny [options] [commands [args]] 
+
+    mbutiny [-dlvt]
+
+    mbutiny [--debug] [--log] [--testmode] [--conf=CONFFILE] [--datadir=DATADIR]
+            [ test | void | backup [HOSTs] | restore [HOSTs] [YYYY.MM.DD] |
+              checkup [HOSTs] [YYYY.MM.DD] ]
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--conf=CONFFILE, --config=CONFFILE>
+
+Full path of the configuration file. The configuration file allows determine the 
+basic default settings, which will use the system if it fails to specify additional 
+configuration files in $CONFDIR directory. The default system 
+path /etc/mbutiny/mbutiny.conf
+
+=item B<-d, --debug>
+
+Enable debug mode. In this mode, debug messages are displayed on the screen
+
+=item B<-D DATADIR, --datadir=DATADIR, --dir=DATADIR>
+
+The directory of temporary files. Default: system temp directory
+
+=item B<-h, --help>
+
+Show help information
+
+=item B<-l, --log>
+
+Enabling write debug information to the log file mbutiny_debug.log.
+Do not confuse the debug logging from regular logging to a file mbutiny.log.
+Regular logging allows you to store information in mbutiny.log on the progress of the processes 
+module (test, backup, restore), whereas debug logging for debugging of the internal components 
+of the module.
+
+To control the level of debugging mbutiny.log see parameter LogEnable and LogLevel.
+
+=item B<-t, --testmode>
+
+Enabling test mode. The use is not recommended
+
+=item B<-v, --verbose>
+
+Enabling at which displays information about the progress on the screen
+
+=back
+
+=head1 COMMANDS
+
+=over 8
+
+=item B<test [HOSTs]>
+
+Testing of these hosts. Default - all included in the work of the hosts.
+
+=item B<void>
+
+The program starts and does nothing. Is used to test run
+
+=item B<backup [HOSTs]>
+
+Compressing all the objects for the specified hosts and then send the resulting archive to 
+the repository.
+
+Default - all included in the work of the hosts.
+
+=item B<restore [HOSTs] [DATE]>
+
+Download the file from the repository previously created backup by hostname. 
+Each downloaded file is unpacked into a directory named host.
+
+Default - all included in the work of the hosts.
+
+DATE - Date of backup. In format: DD.MM.YYYY or YYYY.MM.DD
+
+=item B<checkup [HOSTs] [DATE]>
+
+Checking backups by hostname.
+
+Default - all included in the work of the hosts.
+
+DATE - Date of backup. In format: DD.MM.YYYY or YYYY.MM.DD
+
+=back
+
+=head1 DESCRIPTION
+
+BackUp system for Your WEBsites. See C<README> file
+
+=head1 HISTORY
+
+=over 8
+
+=item B<1.00 / Sun Aug 17 11:10:13 2014 GMT>
+
+Init version
+
+=back
+
+See C<CHANGES> file
+
+=head1 DEPENDENCIES
+
+L<CTK>, L<WWW::MLite>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+Coming soon
+
+=head1 SEE ALSO
+
+C<perl>, L<CTK>, L<WWW::MLite>
+
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is distributed under the GNU GPL v3.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+See C<LICENSE> file
+
+=cut
+
+#use Data::Dumper; $Data::Dumper::Deparse = 1;
+
+use Getopt::Long;
+use Pod::Usage;
+use Text::Unidecode;
+
+use CTK;
+use CTK::FilePid;
+use CTK::ConfGenUtil;
+
+use App::MBUtiny;
+use App::MBUtiny::Helper;
+
+use constant {
+    PIDFILE   => 'mbutiny.pid',
+    PREFIX    => 'mbutiny',
+
+    # Команды и их параметры.
+    CMDDEFAULT => 'backup',
+    CMD => {
+        void    => {},
+        test    => {
+            foo      => 'qwerty',
+            bar      => [],
+        },
+        config      => {}, # Конфигурация программы
+        configure   => {}, # Конфигурация программы (alias)
+        backup      => {}, # Резервное копирование, бэкап (!!! default !!!)
+        restore     => {}, # Резервное копирование, бэкап (!!! default !!!)
+        checkup     => {}, # Проверка выполненных бэкапов на коллекторах
+    },
+
+};
+
+# Режимы команд
+Getopt::Long::Configure ("bundling");
+
+GetOptions(\%OPT,
+    "help|usage|h",
+    "longhelp|man|m|?",
+    "debug|d",
+    "log|l",
+    "testmode|test|t",   # Test mode
+    "conf|config|c=s", # CONFFILE
+    "verbose|v",
+    "datadir|dir|D=s", # DATADIR
+) || pod2usage(-exitval => 1, -verbose => 0);
+pod2usage(-exitval => 0, -verbose => 1) if $OPT{help};
+pod2usage(-exitval => 0, -verbose => 2) if $OPT{longhelp};
+
+# Определяем команду
+my $command   = @ARGV ? shift @ARGV : CMDDEFAULT; # Команда
+my @arguments = @ARGV ? @ARGV : (); # Аргументы команд
+my @commands  = keys %{sub{CMD}->()}; # @{sub{COMMANDS}->()}
+pod2usage(-exitval => 1, -verbose => 99, -sections => 'SYNOPSIS|OPTIONS|COMMANDS')
+    if ( (grep {$_ eq $command} @commands) ? 0 : 1 );
+
+my $SYSCONFDIR = CTK::sysconfdir(); # Системная конфигурация
+
+# CTK VARS
+$DATADIR = $OPT{datadir} || CTK::catfile(CTK::tmpdir(),PREFIX); # Основная рабочая папка (DATADIR) на базе TEMP
+$LOGDIR  = CTK::syslogdir();
+$LOGFILE = CTK::catfile($LOGDIR,PREFIX."_debug.log");
+$CONFFILE= $OPT{conf} && (-d $OPT{conf}) ? CTK::catfile($OPT{conf}, PREFIX.'.conf') : ($OPT{conf} || CTK::catfile($SYSCONFDIR,PREFIX,PREFIX.'.conf'));
+$CONFDIR = $OPT{conf} ? (CTK::splitpath( $CONFFILE ))[1] : CTK::catfile($SYSCONFDIR,PREFIX);
+
+# checks
+CTK::preparedir( $DATADIR );
+exception( "You must have specify valid temp directory to store temporary files ($DATADIR)" ) unless ($DATADIR && -e $DATADIR);
+exception( "You must have specify valid log directory to store log files ($LOGDIR)" ) unless ($LOGDIR && -e $LOGDIR);
+
+my $c = new CTK ( 
+    cfgfile     => $CONFFILE || CTK::CFGFILE,
+    voidfile    => CTK::catfile($DATADIR,'[DEFAULT]'),
+);
+CTK::touch($c->voidfile()); # Создаем void файл функцией touch
+my $config = $c->config;
+
+# Definitions
+my $pidfile = new CTK::FilePid({ file => CTK::catfile($c->tmpdir, PIDFILE) });
+my $pidstat = $pidfile->running || 0;
+exception("PID STATE (".$pidfile->file()."): ALREADY EXISTS (PID: $pidstat)" ) if $pidstat;
+$pidfile->write;
+
+START: debug "-"x16, " START ", (testmode() ? 'IN TEST MODE ' : ''), tms," ","-"x16;
+{
+    my %cmddata;
+    my $code = __PACKAGE__->can(uc($command));
+    if ($code && ref($code) eq 'CODE') {
+        %cmddata = %{CMD->{$command}};
+        $cmddata{arguments} = [@arguments];
+        exception("Configuration mismatch. Please run \"mbutiny config\" command") 
+            unless ($command eq 'config' or $command eq 'configure') || $c->config->{loadstatus};
+        if (value($config => "logenable")) {
+            $c->loglevel(value($config => "loglevel"));
+            $c->logfile(CTK::catfile($LOGDIR,PREFIX.'.log'));
+        }
+        $c->log_info("==== START COMMAND: ".uc($command)." ====");
+        &{$code}($c, %cmddata); # Передается в процедуру Хэш данных и параметров
+        $c->log_info("==== FINISH COMMAND: ".uc($command)." ====");
+    } else {
+        exception("Sub \"".uc($command)."\" undefined");
+    }
+}
+FINISH: debug "-"x16, " FINISH ", (testmode() ? 'IN TEST MODE ' : '') ,tms," ","-"x16;
+$pidfile->remove;
+exit(0);
+
+1;
+
+sub VOID {
+    my $c = shift;
+    my %cmd = @_;
+    
+    debug("VOID CONTEXT");
+    
+    #debug(sprintf("DATADIR  : %s",$DATADIR));
+    #debug(sprintf("LOGDIR   : %s",$LOGDIR));
+    #debug(sprintf("CONFDIR  : %s",$CONFDIR));
+    #debug(sprintf("LOGFILE  : %s",$LOGFILE));
+    #debug(sprintf("CONFFILE : %s",$CONFFILE));
+    
+    #debug("CMD "."*"x76);
+    #debug(Dumper(\%cmd));
+    #debug("C "."*"x78);
+    #debug(Dumper($c));
+    
+    1;
+}
+sub CONFIGURE { goto &CONFIG }
+sub CONFIG { # Конфигурирование (генерация новых файлов конфигурации)
+    my $c = shift;
+    my $overwrite = "yes";
+    my $file = $c->cfgfile;
+    say("Aborted. Configuration directory missing") && return unless $CONFDIR;
+    $overwrite = $c->cli_prompt("File \"$file\" already exists. Overwrite?:", "no") if -e $file;
+    say("Aborted") && return unless $overwrite =~ /^y/i;
+    say("Creating configuration...");
+    debug(sprintf("Creating configuration to %s",$CONFDIR));
+    
+    my $h = new App::MBUtiny::Helper ( $CONFDIR );
+    my $hstat = $h->build();
+
+    say($hstat ? "OK" : "ERROR");
+    say("Your configuration located in \"$CONFDIR\" directory") if $hstat;
+    1;
+}
+sub TEST { # Тестирование функционала
+    my $c = shift;
+    my %cmd = @_;
+    
+    my $mbu = new App::MBUtiny( $c );
+    my $status = $mbu->test( $cmd{arguments} );
+    if ($c->debugmode) {
+        debug $mbu->msg;
+        debug $status ? "OK" : "ERROR"
+    } else {
+        if ($OPT{verbose}) {
+            say $mbu->msg;
+            say $status ? "OK" : "ERROR";
+        }
+    }
+    
+    1;
+}
+sub BACKUP { # Резервное копирование
+    my $c = shift;
+    my %cmd = @_;
+
+    my $mbu = new App::MBUtiny( $c );
+    my $status = $mbu->backup( $cmd{arguments} );
+    if ($c->debugmode) {
+        debug $mbu->msg;
+        debug $status ? "OK" : "ERROR"
+    } else {
+        if ($OPT{verbose}) {
+            say $mbu->msg;
+            say $status ? "OK" : "ERROR";
+        }
+    }
+   
+    1;
+}
+sub RESTORE { # Восстановление предыдущего созданного бэкапа
+    my $c = shift;
+    my %cmd = @_;
+
+    my $mbu = new App::MBUtiny( $c );
+    my $status = $mbu->restore( $cmd{arguments} );
+    if ($c->debugmode) {
+        debug $mbu->msg;
+        debug $status ? "OK" : "ERROR"
+    } else {
+        if ($OPT{verbose}) {
+            say $mbu->msg;
+            say $status ? "OK" : "ERROR";
+        }
+    }
+    say $mbu->show if $mbu->show;
+    1;
+}
+sub CHECKUP { # Проверка выполненных бэкапов на коллекторах
+    my $c = shift;
+    my %cmd = @_;
+
+    my $mbu = new App::MBUtiny( $c );
+    my $status = $mbu->checkup( $cmd{arguments} );
+    if ($c->debugmode) {
+        debug $mbu->msg;
+        debug $status ? "OK" : "ERROR"
+    } else {
+        if ($OPT{verbose}) {
+            say $mbu->msg;
+            say $status ? "OK" : "ERROR";
+        }
+    }
+    say $mbu->show if $mbu->show;
+    1;
+}
+
+__END__
+debug("Coming soon...");
+    

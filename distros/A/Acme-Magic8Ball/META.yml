@@ -1,0 +1,23 @@
+---
+abstract: 'ask the Magic 8 Ball a question'
+author:
+  - 'Simon Wistow <simon@thegestalt.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Magic8Ball
+provides:
+  Acme::Magic8Ball:
+    file: lib/Acme/Magic8Ball.pm
+    version: 1.3
+requires:
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.3

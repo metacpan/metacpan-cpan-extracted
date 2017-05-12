@@ -1,0 +1,6 @@
+name = "App-CPANRepo"
+# badges = ["travis"]
+authority="cpan:SONGMU"
+
+module_maker="ModuleBuildTiny"
+

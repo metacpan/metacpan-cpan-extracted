@@ -1,0 +1,27 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::PTS;
+
+die "Usage: $0 name convertids\n" if $#ARGV !=1;
+
+my $name = shift;
+my $convert = shift;
+
+my $pts = AFS::PTS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+my $over = 0;
+my @members = $pts->members($name, $convert, $over);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else {
+    print "over = $over\n";
+    print "members for $name\n";
+
+    foreach my $mem (sort @members) {
+        printf("  $mem\n");
+    }
+}

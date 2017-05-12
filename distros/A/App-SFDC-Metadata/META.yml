@@ -1,0 +1,34 @@
+---
+abstract: 'Metadata tools module for App::SFDC'
+author:
+  - 'Alexander Brett <alexander.brett@sophos.com> L<http://alexander-brett.co.uk>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-SFDC-Metadata
+requires:
+  App::SFDC: '0.14'
+  App::SFDC::Role::Credentials: '0'
+  App::SFDC::Role::Logging: '0'
+  Data::Dumper: '0'
+  File::Find: '0'
+  File::HomeDir: '0'
+  File::Path: '0'
+  File::Share: '0'
+  FindBin: '0'
+  Log::Log4perl: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  MooX::Options: '0'
+  WWW::SFDC::Manifest: '0'
+  WWW::SFDC::Zip: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.21'

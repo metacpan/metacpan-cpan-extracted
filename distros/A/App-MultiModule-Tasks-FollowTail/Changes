@@ -1,0 +1,7 @@
+1.161190  2016-04-27 18:28:45-07:00 America/Los_Angeles
+   * Named captures
+   * Bug fix to handle MultiModule running with external processes
+
+1.141220  2014-05-01 20:58:20PDT-0700 America/Los_Angeles
+   * Initial release
+

@@ -1,0 +1,6 @@
+Revision history for Perl extension Audio::Daemon.
+
+1.0  Thu Oct  3 21:22:22 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Audio::Daemon -v 1.0
+

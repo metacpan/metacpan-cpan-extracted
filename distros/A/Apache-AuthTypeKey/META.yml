@@ -1,0 +1,14 @@
+name: Apache-AuthTypeKey
+version: 0.03
+abstract: Apache authorization handler using TypeKey
+author: Six Apart <cpan@sixapart.com>
+license: perl
+distribution_type: module
+requires:
+  Authen::TypeKey: 0.02
+  Apache::AuthCookie: 3.08
+no_index:
+  directory:
+    - t
+    - inc
+generated_by: Module::Install version 0.36

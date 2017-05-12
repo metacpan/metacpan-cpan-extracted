@@ -1,0 +1,10 @@
+#!/usr/bin/env perl
+
+!$ENV{GATEWAY_INTERFACE} or die "This script should be run from the command-line";
+
+use strict;
+use Apache2::WebApp::Helper::Extra;
+
+my $helper = Apache2::WebApp::Helper::Extra->new;
+
+$helper->process;

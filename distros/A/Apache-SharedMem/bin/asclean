@@ -1,0 +1,43 @@
+#!/usr/bin/perl -w
+
+BEGIN
+{
+    use strict;
+    use Apache::SharedMem qw(:lock :status);
+}
+
+{
+    my $rootkey = shift(@ARGV);
+    
+    my $share = new Apache::SharedMem((defined $rootkey ? (rootkey=>$rootkey) : ()), debug=>0)
+      || die($Apache::SharedMem::ERROR);
+
+    $share->destroy;
+    
+    die $share->error if($share->status == FAILURE);
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ascleaner - Apache::SharedMem segments cleaner
+
+=head1 DESCRIPTION
+
+Clean all namespace found on the root map given in argument and root map itself. If no
+root map key is given, try to find the root map key based on actual UID and current
+working directory.
+
+=head1 USAGE
+
+asclean [rootkey]
+
+rootkey: Specify a rootkey. Default is based on you actual working directory and UID.
+         see L<Apache::SharedMem> for more details.
+
+=head1 AUTHOR
+
+Olivier Poitrey E<lt>F<rs@rhapsodyk.net>E<gt>

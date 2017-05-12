@@ -1,0 +1,21 @@
+<table cellspacing="0" cellpadding="0">
+<tmpl_loop name=tr_loop>
+<tr>
+<!-- Left -->
+<td>
+<tmpl_if name=__first__><tmpl_if name=__last__><div class="last_odd_left"><tmpl_else><div class="odd_left"></tmpl_if>
+<tmpl_else><tmpl_if name=__last__>
+<tmpl_if name=__odd__><div class="last_odd_left"><tmpl_else><div class="last_even_left"></tmpl_if>
+<tmpl_else><tmpl_if name=__odd__><div class="odd_left"><tmpl_else><div class="even_left"></tmpl_if></tmpl_if></tmpl_if>
+<tmpl_var name=left_td escape=html></div>
+</td>
+<!-- Right -->
+<td>
+<tmpl_if name=__first__><tmpl_if name=__last__><div class="last_odd_right"><tmpl_else><div class="odd_right"></tmpl_if>
+<tmpl_else><tmpl_if name=__last__><tmpl_if name=__odd__><div class="last_odd_right"><tmpl_else><div class="last_even_right"></tmpl_if>
+<tmpl_else><tmpl_if name=__odd__><div class="odd_right"><tmpl_else><div class="even_right"></tmpl_if></tmpl_if></tmpl_if>
+<tmpl_var name=right_td></div>
+</td>
+</tr>
+</tmpl_loop>
+</table>

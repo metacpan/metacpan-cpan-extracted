@@ -1,0 +1,2167 @@
+cpanm (App::cpanminus) 1.7034 on perl 5.022000 built for darwin-2level
+Work directory is /Volumes/amaretto/Users/ether/.cpanm/work/1461315748.80190
+You have make /usr/bin/make
+You have LWP 6.13
+You have /usr/bin/tar: bsdtar 2.8.3 - libarchive 2.8.3
+You have /usr/bin/unzip
+Searching Moose () on metacpan ...
+--> Working on Moose
+Fetching http://cpan.metacpan.org/authors/id/E/ET/ETHER/Moose-2.1705-TRIAL.tar.gz
+-> OK
+Unpacking Moose-2.1705-TRIAL.tar.gz
+Entering Moose-2.1705
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::HasCompiler 0.013 ... No (0.011 < 0.013)
+Checking if you have ExtUtils::MakeMaker 6.58 ... Yes (7.10)
+Checking if you have Dist::CheckConflicts 0.02 ... Yes (0.11)
+==> Found dependencies: ExtUtils::HasCompiler
+Searching ExtUtils::HasCompiler (0.013) on metacpan ...
+--> Working on ExtUtils::HasCompiler
+Fetching http://www.cpan.org/authors/id/L/LE/LEONT/ExtUtils-HasCompiler-0.013.tar.gz
+-> OK
+Unpacking ExtUtils-HasCompiler-0.013.tar.gz
+Entering ExtUtils-HasCompiler-0.013
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.58 ... Yes (7.10)
+Configuring ExtUtils-HasCompiler-0.013
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for ExtUtils::HasCompiler
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have warnings 0 ... Yes (1.32)
+Checking if you have Exporter 0 ... Yes (5.72)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have File::Basename 0 ... Yes (2.85)
+Checking if you have File::Temp 0 ... Yes (0.2304)
+Checking if you have base 0 ... Yes (2.22)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.10)
+Checking if you have ExtUtils::Mksymlists 0 ... Yes (7.10)
+Checking if you have File::Spec::Functions 0 ... Yes (3.56_01)
+Checking if you have DynaLoader 0 ... Yes (1.32)
+Building ExtUtils-HasCompiler-0.013
+Manifying 1 pod document
+Manifying 1 pod document
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/ExtUtils/HasCompiler.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/ExtUtils::HasCompiler.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed ExtUtils-HasCompiler-0.013 (upgraded from 0.011)
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/.meta/ExtUtils-HasCompiler-0.013/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/.meta/ExtUtils-HasCompiler-0.013/install.json
+Configuring Moose-2.1705
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Warning: prerequisite List::Util 1.45 not found. We have 1.42.
+Generating a Unix-style Makefile
+Writing Makefile for Moose
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have CPAN::Meta::Requirements 0 ... Yes (2.133)
+Checking if you have File::Spec 0 ... Yes (3.56_01)
+Checking if you have Class::Load 0.09 ... Yes (0.23)
+Checking if you have Sub::Exporter 0.980 ... Yes (0.987)
+Checking if you have parent 0.223 ... Yes (0.234)
+Checking if you have Data::OptList 0.107 ... Yes (0.109)
+Checking if you have Module::Runtime 0.014 ... Yes (0.014)
+Checking if you have Test::Requires 0.05 ... Yes (0.10)
+Checking if you have Dist::CheckConflicts 0.02 ... Yes (0.11)
+Checking if you have Devel::OverloadInfo 0.004 ... Yes (0.004)
+Checking if you have Eval::Closure 0.04 ... Yes (0.13)
+Checking if you have strict 1.03 ... Yes (1.09)
+Checking if you have Test::Fatal 0.001 ... Yes (0.014)
+Checking if you have Sub::Identify 0 ... Yes (0.12)
+Checking if you have Module::Metadata 0 ... Yes (1.000027)
+Checking if you have Carp 1.22 ... Yes (1.36)
+Checking if you have Devel::GlobalDestruction 0 ... Yes (0.13)
+Checking if you have Class::Load::XS 0.01 ... Yes (0.09)
+Checking if you have Package::DeprecationManager 0.11 ... Yes (0.14)
+Checking if you have CPAN::Meta::Check 0.011 ... Yes (0.011)
+Checking if you have warnings 1.03 ... Yes (1.32)
+Checking if you have Module::Runtime::Conflicts 0.002 ... Yes (0.002)
+Checking if you have Test::More 0.94 ... Yes (1.001014)
+Checking if you have Sub::Name 0.05 ... Yes (0.14)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.10)
+Checking if you have Params::Util 1.00 ... Yes (1.07)
+Checking if you have Test::Warnings 0.016 ... Yes (0.021)
+Checking if you have Test::CleanNamespaces 0.13 ... Yes (0.18)
+Checking if you have Try::Tiny 0.17 ... Yes (0.22)
+Checking if you have Devel::StackTrace 1.33 ... Yes (2.00)
+Checking if you have Package::Stash 0.32 ... Yes (0.37)
+Checking if you have List::Util 1.45 ... No (1.42 < 1.45)
+Checking if you have Scalar::Util 1.19 ... Yes (1.42)
+Checking if you have Package::Stash::XS 0.24 ... Yes (0.28)
+Checking if you have MRO::Compat 0.05 ... Yes (0.12)
+==> Found dependencies: List::Util
+Searching List::Util (1.45) on metacpan ...
+--> Working on List::Util
+Fetching http://www.cpan.org/authors/id/P/PE/PEVANS/Scalar-List-Utils-1.45.tar.gz
+-> FAIL Download http://www.cpan.org/authors/id/P/PE/PEVANS/Scalar-List-Utils-1.45.tar.gz failed. Retrying ... 
+-> OK
+Unpacking Scalar-List-Utils-1.45.tar.gz
+Entering Scalar-List-Utils-1.45
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.58 ... Yes (7.10)
+Configuring Scalar-List-Utils-1.45
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for List::Util
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Test::More 0 ... Yes (1.001014)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.10)
+Building and testing Scalar-List-Utils-1.45
+Running Mkbootstrap for List::Util ()
+chmod 644 "Util.bs"
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/typemap"  ListUtil.xs > ListUtil.xsc && mv ListUtil.xsc ListUtil.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -O3   -DVERSION=\"1.45\" -DXS_VERSION=\"1.45\"  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/darwin-2level/CORE"  -DPERL_EXT ListUtil.c
+rm -f blib/arch/auto/List/Util/Util.bundle
+env MACOSX_DEPLOYMENT_TARGET=10.3 cc  -bundle -undefined dynamic_lookup -L/opt/local/lib -fstack-protector-strong ListUtil.o  -o blib/arch/auto/List/Util/Util.bundle   \
+            \
+      
+ld: warning: object file (ListUtil.o) was built for newer OSX version (10.10) than being linked (10.4)
+chmod 755 blib/arch/auto/List/Util/Util.bundle
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" -MExtUtils::Command::MM -e 'cp_nonempty' -- Util.bs blib/arch/auto/List/Util/Util.bs 644
+Manifying 4 pod documents
+Running Mkbootstrap for List::Util ()
+chmod 644 "Util.bs"
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/00version.t ......... ok
+t/any-all.t ........... ok
+t/blessed.t ........... ok
+t/first.t ............. ok
+t/dualvar.t ........... ok
+t/getmagic-once.t ..... ok
+t/isvstring.t ......... ok
+t/maxstr.t ............ ok
+t/minstr.t ............ ok
+t/lln.t ............... ok
+t/max.t ............... ok
+t/min.t ............... ok
+t/pair.t .............. ok
+t/openhan.t ........... ok
+t/prototype.t ......... ok
+t/readonly.t .......... ok
+t/product.t ........... ok
+t/reduce.t ............ ok
+t/refaddr.t ........... ok
+t/reftype.t ........... ok
+t/rt-96343.t .......... ok
+t/scalarutil-proto.t .. ok
+t/shuffle.t ........... ok
+t/stack-corruption.t .. ok
+t/sum0.t .............. ok
+t/tainted.t ........... ok
+t/sum.t ............... ok
+t/uniq.t .............. ok
+t/weak.t .............. ok
+t/subname.t ........... ok
+All tests successful.
+Files=30, Tests=464,  0 wallclock secs ( 0.10 usr  0.04 sys +  0.77 cusr  0.13 csys =  1.04 CPU)
+Result: PASS
+Manifying 4 pod documents
+Files found in blib/arch: installing files in blib/lib into architecture dependent library tree
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/auto/List/Util/Util.bundle
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/List/Util.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/List/Util/XS.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Scalar/Util.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Sub/Util.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/List::Util.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/List::Util::XS.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Scalar::Util.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Sub::Util.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Scalar-List-Utils-1.45 (upgraded from 1.42)
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/.meta/Scalar-List-Utils-1.45/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/.meta/Scalar-List-Utils-1.45/install.json
+Building and testing Moose-2.1705
+Running Mkbootstrap for Moose ()
+chmod 644 "Moose.bs"
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/typemap"  xs/Attribute.xs > xs/Attribute.xsc && mv xs/Attribute.xsc xs/Attribute.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -I. -O3   -DVERSION=\"2.1705\" -DXS_VERSION=\"2.1705\" -o xs/Attribute.o  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/darwin-2level/CORE"   xs/Attribute.c
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/typemap"  xs/AttributeCore.xs > xs/AttributeCore.xsc && mv xs/AttributeCore.xsc xs/AttributeCore.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -I. -O3   -DVERSION=\"2.1705\" -DXS_VERSION=\"2.1705\" -o xs/AttributeCore.o  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/darwin-2level/CORE"   xs/AttributeCore.c
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/typemap"  xs/Class.xs > xs/Class.xsc && mv xs/Class.xsc xs/Class.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -I. -O3   -DVERSION=\"2.1705\" -DXS_VERSION=\"2.1705\" -o xs/Class.o  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/darwin-2level/CORE"   xs/Class.c
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/typemap"  xs/Generated.xs > xs/Generated.xsc && mv xs/Generated.xsc xs/Generated.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -I. -O3   -DVERSION=\"2.1705\" -DXS_VERSION=\"2.1705\" -o xs/Generated.o  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/darwin-2level/CORE"   xs/Generated.c
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/typemap"  xs/HasAttributes.xs > xs/HasAttributes.xsc && mv xs/HasAttributes.xsc xs/HasAttributes.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -I. -O3   -DVERSION=\"2.1705\" -DXS_VERSION=\"2.1705\" -o xs/HasAttributes.o  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/darwin-2level/CORE"   xs/HasAttributes.c
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/typemap"  xs/HasMethods.xs > xs/HasMethods.xsc && mv xs/HasMethods.xsc xs/HasMethods.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -I. -O3   -DVERSION=\"2.1705\" -DXS_VERSION=\"2.1705\" -o xs/HasMethods.o  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/darwin-2level/CORE"   xs/HasMethods.c
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/typemap"  xs/Inlined.xs > xs/Inlined.xsc && mv xs/Inlined.xsc xs/Inlined.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -I. -O3   -DVERSION=\"2.1705\" -DXS_VERSION=\"2.1705\" -o xs/Inlined.o  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/darwin-2level/CORE"   xs/Inlined.c
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/typemap"  xs/Instance.xs > xs/Instance.xsc && mv xs/Instance.xsc xs/Instance.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -I. -O3   -DVERSION=\"2.1705\" -DXS_VERSION=\"2.1705\" -o xs/Instance.o  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/darwin-2level/CORE"   xs/Instance.c
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/typemap"  xs/Method.xs > xs/Method.xsc && mv xs/Method.xsc xs/Method.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -I. -O3   -DVERSION=\"2.1705\" -DXS_VERSION=\"2.1705\" -o xs/Method.o  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/darwin-2level/CORE"   xs/Method.c
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/typemap"  xs/Moose.xs > xs/Moose.xsc && mv xs/Moose.xsc xs/Moose.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -I. -O3   -DVERSION=\"2.1705\" -DXS_VERSION=\"2.1705\" -o xs/Moose.o  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/darwin-2level/CORE"   xs/Moose.c
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/typemap"  xs/MOP.xs > xs/MOP.xsc && mv xs/MOP.xsc xs/MOP.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -I. -O3   -DVERSION=\"2.1705\" -DXS_VERSION=\"2.1705\" -o xs/MOP.o  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/darwin-2level/CORE"   xs/MOP.c
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/typemap"  xs/Package.xs > xs/Package.xsc && mv xs/Package.xsc xs/Package.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -I. -O3   -DVERSION=\"2.1705\" -DXS_VERSION=\"2.1705\" -o xs/Package.o  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/darwin-2level/CORE"   xs/Package.c
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/xsubpp"  -typemap "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/ExtUtils/typemap"  xs/ToInstance.xs > xs/ToInstance.xsc && mv xs/ToInstance.xsc xs/ToInstance.c
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -I. -O3   -DVERSION=\"2.1705\" -DXS_VERSION=\"2.1705\" -o xs/ToInstance.o  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/darwin-2level/CORE"   xs/ToInstance.c
+xs/ToInstance.xs:31:29: warning: comparison of constant 255 with expression of type 'svtype' is always true [-Wtautological-constant-out-of-range-compare]
+            if (SvTYPE (sv) != SVTYPEMASK
+                ~~~~~~~~~~~ ^  ~~~~~~~~~~
+1 warning generated.
+cc -c   -fno-common -DPERL_DARWIN -fno-strict-aliasing -pipe -fstack-protector-strong -I/opt/local/include -I. -O3   -DVERSION=\"2.1705\" -DXS_VERSION=\"2.1705\" -o mop.o  "-I/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/lib/5.22.0/darwin-2level/CORE"   mop.c
+rm -f blib/arch/auto/Moose/Moose.bundle
+env MACOSX_DEPLOYMENT_TARGET=10.3 cc  -bundle -undefined dynamic_lookup -L/opt/local/lib -fstack-protector-strong xs/Attribute.o xs/AttributeCore.o xs/Class.o xs/Generated.o xs/HasAttributes.o xs/HasMethods.o xs/Inlined.o xs/Instance.o xs/Method.o xs/Moose.o xs/MOP.o xs/Package.o xs/ToInstance.o mop.o  -o blib/arch/auto/Moose/Moose.bundle   \
+            \
+      
+ld: warning: ld: warning: object file (xs/Attribute.o) was built for newer OSX version (10.10) than being linked (10.4)object file (xs/AttributeCore.o) was built for newer OSX version (10.10) than being linked (10.4)
+
+ld: warning: object file (xs/Class.o) was built for newer OSX version (10.10) than being linked (10.4)
+ld: warning: object file (xs/Generated.o) was built for newer OSX version (10.10) than being linked (10.4)
+ld: warning: ld: warning: object file (xs/HasMethods.o) was built for newer OSX version (10.10) than being linked (10.4)object file (xs/HasAttributes.o) was built for newer OSX version (10.10) than being linked (10.4)
+ld: warning: ld: warning: 
+object file (xs/Instance.o) was built for newer OSX version (10.10) than being linked (10.4)object file (xs/Inlined.o) was built for newer OSX version (10.10) than being linked (10.4)
+
+ld: warning: object file (xs/Method.o) was built for newer OSX version (10.10) than being linked (10.4)
+ld: warning: ld: warning: ld: warning: ld: warning: object file (xs/MOP.o) was built for newer OSX version (10.10) than being linked (10.4)ld: warning: object file (xs/Package.o) was built for newer OSX version (10.10) than being linked (10.4)object file (xs/Moose.o) was built for newer OSX version (10.10) than being linked (10.4)object file (xs/ToInstance.o) was built for newer OSX version (10.10) than being linked (10.4)
+object file (mop.o) was built for newer OSX version (10.10) than being linked (10.4)
+
+
+
+chmod 755 blib/arch/auto/Moose/Moose.bundle
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" -MExtUtils::Command::MM -e 'cp_nonempty' -- Moose.bs blib/arch/auto/Moose/Moose.bs 644
+cp bin/moose-outdated blib/script/moose-outdated
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/moose-outdated
+Manifying 133 pod documents
+Running Mkbootstrap for Moose ()
+chmod 644 "Moose.bs"
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t t/attributes/*.t t/basics/*.t t/bugs/*.t t/cmop/*.t t/compat/*.t t/examples/*.t t/exceptions/*.t t/immutable/*.t t/metaclasses/*.t t/moose_util/*.t t/native_traits/*.t t/recipes/*.t t/roles/*.t t/test_moose/*.t t/todo_tests/*.t t/type_constraints/*.t
+t/000_load.t ..................................................... ok
+t/attributes/accessor_inlining.t ................................. ok
+t/attributes/accessor_context.t .................................. ok
+t/attributes/accessor_override_method.t .......................... ok
+# 
+# Versions for all modules listed in MYMETA.json (including optional ones):
+# 
+# === Configure Requires ===
+# 
+#     Module                 Want  Have
+#     --------------------- ----- -----
+#     Dist::CheckConflicts   0.02  0.11
+#     ExtUtils::HasCompiler 0.013 0.013
+#     ExtUtils::MakeMaker     any  7.10
+# 
+# === Configure Suggests ===
+# 
+#     Module      Want    Have
+#     -------- ------- -------
+#     JSON::PP 2.27300 2.27300
+# 
+# === Build Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker  any 7.10
+# 
+# === Test Requires ===
+# 
+#     Module                    Want     Have
+#     ------------------------ ----- --------
+#     CPAN::Meta::Check        0.011    0.011
+#     CPAN::Meta::Requirements   any    2.133
+#     File::Spec                 any  3.56_01
+#     Module::Metadata           any 1.000027
+#     Test::CleanNamespaces     0.13     0.18
+#     Test::Fatal              0.001    0.014
+#     Test::More                0.94 1.001014
+#     Test::Requires            0.05     0.10
+#     Test::Warnings           0.016    0.021
+# 
+# === Test Recommends ===
+# 
+#     Module         Want     Have
+#     ---------- -------- --------
+#     CPAN::Meta 2.120900 2.150005
+# 
+# === Runtime Requires ===
+# 
+#     Module                       Want  Have
+#     --------------------------- ----- -----
+#     Carp                         1.22  1.36
+#     Class::Load                  0.09  0.23
+#     Class::Load::XS              0.01  0.09
+#     Data::OptList               0.107 0.109
+#     Devel::GlobalDestruction      any  0.13
+#     Devel::OverloadInfo         0.004 0.004
+#     Devel::StackTrace            1.33  2.00
+#     Dist::CheckConflicts         0.02  0.11
+#     Eval::Closure                0.04  0.13
+#     List::Util                   1.45  1.45
+#     MRO::Compat                  0.05  0.12
+#     Module::Runtime             0.014 0.014
+#     Module::Runtime::Conflicts  0.002 0.002
+#     Package::DeprecationManager  0.11  0.14
+#     Package::Stash               0.32  0.37
+#     Package::Stash::XS           0.24  0.28
+#     Params::Util                 1.00  1.07
+#     Scalar::Util                 1.19  1.45
+#     Sub::Exporter               0.980 0.987
+#     Sub::Identify                 any  0.12
+#     Sub::Name                    0.05  0.14
+#     Try::Tiny                    0.17  0.22
+#     parent                      0.223 0.234
+#     strict                       1.03  1.09
+#     warnings                     1.03  1.32
+# 
+# === Runtime Suggests ===
+# 
+#     Module             Want Have
+#     ------------------ ---- ----
+#     Devel::PartialDump 0.14 0.17
+# 
+# === Other Modules ===
+# 
+#     Module                             Have
+#     ---------------------------- ----------
+#     Algorithm::C3                      0.10
+#     DBM::Deep                       missing
+#     DateTime                           1.19
+#     DateTime::Calendar::Mayan       missing
+#     DateTime::Format::MySQL            0.05
+#     Declare::Constraints::Simple    missing
+#     Dist::CheckConflicts               0.11
+#     HTTP::Headers                      6.05
+#     IO::File                           1.16
+#     IO::String                         1.08
+#     Locale::US                      missing
+#     Module::Refresh                    0.17
+#     MooseX::NonMoose                   0.26
+#     Params::Coerce                  missing
+#     Regexp::Common                  missing
+#     SUPER                        1.20120705
+#     Test::Deep                        0.117
+#     Test::DependentModules          missing
+#     Test::LeakTrace                    0.15
+#     Test::Output                       1.03
+#     URI                                1.67
+# 
+t/00-report-prereqs.t ............................................ ok
+t/attributes/accessor_overwrite_warning.t ........................ ok
+t/attributes/attribute_custom_metaclass.t ........................ ok
+t/attributes/attribute_accessor_generation.t ..................... ok
+t/attributes/attr_dereference_test.t ............................. ok
+t/attributes/attribute_delegation.t .............................. ok
+t/attributes/attribute_does.t .................................... ok
+t/attributes/attribute_lazy_initializer.t ........................ ok
+t/attributes/attribute_names.t ................................... ok
+t/attributes/attribute_inherited_slot_specs.t .................... ok
+t/attributes/attribute_reader_generation.t ....................... ok
+t/attributes/attribute_required.t ................................ ok
+t/attributes/attribute_traits.t .................................. ok
+t/attributes/attribute_traits_n_meta.t ........................... ok
+t/attributes/attribute_traits_parameterized.t .................... ok
+t/attributes/attribute_traits_registered.t ....................... ok
+t/attributes/attribute_without_any_methods.t ..................... ok
+t/attributes/attribute_triggers.t ................................ ok
+t/attributes/attribute_type_unions.t ............................. ok
+t/attributes/attribute_writer_generation.t ....................... ok
+t/attributes/bad_coerce.t ........................................ ok
+t/attributes/chained_coercion.t .................................. ok
+t/attributes/default_class_role_types.t .......................... ok
+t/attributes/clone_weak.t ........................................ ok
+t/attributes/default_undef.t ..................................... ok
+t/attributes/delegation_and_modifiers.t .......................... ok
+t/attributes/delegation_arg_aliasing.t ........................... ok
+t/attributes/delegation_target_not_loaded.t ...................... ok
+t/attributes/inherit_lazy_build.t ................................ ok
+t/attributes/illegal_options_for_inheritance.t ................... ok
+t/attributes/lazy_no_default.t ................................... ok
+t/attributes/misc_attribute_coerce_lazy.t ........................ ok
+t/attributes/method_generation_rules.t ........................... ok
+t/attributes/no_init_arg.t ....................................... ok
+t/attributes/more_attr_delegation.t .............................. ok
+t/attributes/misc_attribute_tests.t .............................. ok
+t/attributes/no_slot_access.t .................................... ok
+t/attributes/non_alpha_attr_names.t .............................. ok
+t/attributes/numeric_defaults.t .................................. ok
+t/attributes/trigger_and_coerce.t ................................ ok
+t/basics/always_strict_warnings.t ................................ ok
+t/attributes/type_constraint.t ................................... ok
+t/basics/basic_class_setup.t ..................................... ok
+t/basics/buildargs.t ............................................. ok
+t/basics/buildargs_warning.t ..................................... ok
+t/basics/create.t ................................................ ok
+t/basics/create_anon.t ........................................... ok
+t/basics/deprecations.t .......................................... ok
+t/basics/destruction.t ........................................... ok
+t/basics/import_unimport.t ....................................... ok
+t/basics/error_handling.t ........................................ ok
+t/basics/inner_and_augment.t ..................................... ok
+t/basics/load_into_main.t ........................................ ok
+t/basics/global_destruction.t .................................... ok
+t/basics/method_modifier_with_regexp.t ........................... ok
+t/basics/methods.t ............................................... ok
+t/basics/moose_object_does.t ..................................... ok
+t/basics/override_and_foreign_classes.t .......................... ok
+t/basics/moose_respects_type_constraints.t ....................... ok
+t/basics/override_augment_inner_super.t .......................... ok
+t/basics/rebless.t ............................................... ok
+t/basics/require_superclasses.t .................................. ok
+t/basics/super_and_override.t .................................... ok
+t/basics/universal_methods_wrappable.t ........................... ok
+t/basics/super_warns_on_args.t ................................... ok
+t/basics/wrapped_method_cxt_propagation.t ........................ ok
+t/bugs/anon_method_metaclass.t ................................... ok
+t/bugs/application_metarole_compat.t ............................. ok
+t/bugs/apply_role_to_one_instance_only.t ......................... ok
+t/bugs/augment_recursion_bug.t ................................... ok
+t/bugs/attribute_trait_parameters.t .............................. ok
+t/bugs/create_anon_recursion.t ................................... ok
+t/bugs/coerce_without_coercion.t ................................. ok
+t/bugs/constructor_object_overload.t ............................. ok
+t/bugs/create_anon_role_pass.t ................................... ok
+t/bugs/delete_sub_stash.t ........................................ ok
+t/bugs/DEMOLISH_eats_mini.t ...................................... ok
+t/bugs/DEMOLISH_fails_without_metaclass.t ........................ ok
+t/bugs/DEMOLISHALL.t ............................................. ok
+t/bugs/DEMOLISH_eats_exceptions.t ................................ ok
+t/bugs/DEMOLISHALL_shortcutted.t ................................. ok
+t/bugs/handles_foreign_class_bug.t ............................... ok
+t/bugs/immutable_n_default_x2.t .................................. ok
+t/bugs/inheriting_from_roles.t ................................... ok
+t/bugs/immutable_metaclass_does_role.t ........................... ok
+t/bugs/inline_reader_bug.t ....................................... ok
+t/bugs/Moose_Object_error.t ...................................... ok
+t/bugs/instance_application_role_args.t .......................... ok
+t/bugs/mark_as_methods_overloading_breakage.t .................... ok
+t/bugs/lazybuild_required_undef.t ................................ ok
+t/bugs/moose_exporter_false_circular_reference_rt_63818.t ........ ok
+t/bugs/moose_octal_defaults.t .................................... ok
+t/bugs/native_trait_handles_bad_value.t .......................... ok
+t/bugs/reader_precedence_bug.t ................................... ok
+t/bugs/overloading_edge_cases.t .................................. ok
+t/bugs/role_caller.t ............................................. ok
+t/bugs/subclass_use_base_bug.t ................................... ok
+t/bugs/subtype_conflict_bug.t .................................... ok
+t/bugs/subtype_quote_bug.t ....................................... ok
+t/bugs/traits_with_exporter.t .................................... ok
+t/bugs/super_recursion.t ......................................... ok
+t/cmop/advanced_methods.t ........................................ ok
+t/bugs/type_constraint_messages.t ................................ ok
+t/cmop/anon_class.t .............................................. ok
+t/cmop/add_attribute_alternate.t ................................. ok
+t/cmop/add_method_debugmode.t .................................... ok
+t/cmop/add_method_modifier.t ..................................... ok
+t/cmop/anon_class_create_init.t .................................. ok
+t/cmop/anon_class_keep_alive.t ................................... ok
+t/cmop/anon_class_leak.t ......................................... ok
+t/cmop/anon_class_removal.t ...................................... ok
+t/cmop/ArrayBasedStorage_test.t .................................. ok
+t/cmop/attribute_duplication.t ................................... ok
+t/cmop/attribute_get_read_write.t ................................ ok
+t/cmop/anon_packages.t ........................................... ok
+t/cmop/attribute_initializer.t ................................... ok
+t/cmop/attribute_introspection.t ................................. ok
+t/cmop/attribute_errors_and_edge_cases.t ......................... ok
+t/cmop/attribute.t ............................................... ok
+t/cmop/attribute_non_alpha_name.t ................................ ok
+t/cmop/attributes.t .............................................. ok
+t/cmop/basic.t ................................................... ok
+t/cmop/AttributesWithHistory_test.t .............................. ok
+t/cmop/before_after_dollar_under.t ............................... ok
+t/cmop/BinaryTree_test.t ......................................... ok
+t/cmop/C3MethodDispatchOrder_test.t .............................. ok
+t/cmop/Class_C3_compatibility.t .................................. ok
+t/cmop/class_is_pristine.t ....................................... ok
+t/cmop/class_precedence_list.t ................................... ok
+t/cmop/ClassEncapsulatedAttributes_test.t ........................ ok
+t/cmop/constant_codeinfo.t ....................................... ok
+t/cmop/deprecated.t .............................................. ok
+t/cmop/get_code_info.t ........................................... ok
+t/cmop/class_errors_and_edge_cases.t ............................. ok
+t/cmop/immutable_custom_trait.t .................................. ok
+t/cmop/create_class.t ............................................ ok
+t/cmop/immutable_w_constructors.t ................................ ok
+t/cmop/custom_instance.t ......................................... ok
+t/cmop/immutable_w_custom_metaclass.t ............................ ok
+t/cmop/inline_and_dollar_at.t .................................... ok
+t/cmop/insertion_order.t ......................................... ok
+t/cmop/instance_inline.t ......................................... ok
+t/cmop/inline_structor.t ......................................... ok
+t/cmop/immutable_metaclass.t ..................................... ok
+t/cmop/instance.t ................................................ ok
+t/cmop/InsideOutClass_test.t ..................................... ok
+t/cmop/LazyClass_test.t .......................................... ok
+t/cmop/InstanceCountingClass_test.t .............................. ok
+t/cmop/load.t .................................................... ok
+t/cmop/magic.t ................................................... ok
+t/cmop/meta_method.t ............................................. ok
+t/cmop/instance_metaclass_incompat.t ............................. ok
+t/cmop/instance_metaclass_incompat_dyn.t ......................... ok
+t/cmop/meta_package.t ............................................ ok
+t/cmop/meta_package_extension.t .................................. ok
+t/cmop/make_mutable.t ............................................ ok
+t/cmop/metaclass_inheritance.t ................................... ok
+t/cmop/metaclass.t ............................................... ok
+t/cmop/metaclass_loads_classes.t ................................. ok
+t/cmop/metaclass_incompatibility_dyn.t ........................... ok
+t/cmop/metaclass_incompatibility.t ............................... ok
+t/cmop/methods.t ................................................. ok
+t/cmop/modify_parent_method.t .................................... ok
+t/cmop/metaclass_reinitialize.t .................................. ok
+t/cmop/method.t .................................................. ok
+t/cmop/method_modifiers.t ........................................ ok
+t/cmop/null_stash.t .............................................. ok
+t/cmop/numeric_defaults.t ........................................ ok
+t/cmop/package_variables.t ....................................... ok
+t/cmop/Perl6Attribute_test.t ..................................... ok
+t/cmop/random_eval_bug.t ......................................... ok
+t/cmop/new_and_clone_metaclasses.t ............................... ok
+t/cmop/rebless_instance_away.t ................................... ok
+t/cmop/rebless_overload.t ........................................ ok
+t/cmop/rebless_with_extra_params.t ............................... ok
+t/cmop/RT_39001_fix.t ............................................ ok
+t/cmop/RT_27329_fix.t ............................................ ok
+t/cmop/RT_41255.t ................................................ ok
+t/cmop/scala_style_mixin_composition.t ........................... ok
+t/cmop/subclasses.t .............................................. ok
+t/cmop/rebless_instance.t ........................................ ok
+t/cmop/subname.t ................................................. ok
+t/cmop/self_introspection.t ...................................... ok
+t/cmop/universal_methods.t ....................................... ok
+t/compat/composite_metaroles.t ................................... ok
+t/compat/foreign_inheritence.t ................................... ok
+t/compat/extends_nonmoose_that_isa_moose_with_metarole.t ......... ok
+t/compat/inc_hash.t .............................................. ok
+t/compat/module_refresh_compat.t ................................. ok
+t/examples/example_Moose_POOP.t .................................. skipped: Test requires module 'DBM::Deep' but it's not found
+t/compat/moose_respects_base.t ................................... ok
+t/examples/example2.t ............................................ ok
+t/examples/Child_Parent_attr_inherit.t ........................... ok
+t/examples/example_w_DCS.t ....................................... skipped: Test requires module 'Declare::Constraints::Simple' but it's not found
+t/examples/example1.t ............................................ ok
+t/examples/example_Protomoose.t .................................. ok
+t/examples/record_set_iterator.t ................................. ok
+t/examples/example_w_TestDeep.t .................................. ok
+t/exceptions/class-mop-attribute.t ............................... ok
+t/exceptions/class-mop-class-immutable-trait.t ................... ok
+t/exceptions/class-mop-method-constructor.t ...................... ok
+t/exceptions/attribute.t ......................................... ok
+t/exceptions/class-mop-class.t ................................... ok
+t/exceptions/class-mop-method-accessor.t ......................... ok
+t/exceptions/class-mop-method-generated.t ........................ ok
+t/exceptions/class-mop-method-meta.t ............................. ok
+t/exceptions/class-mop-method-wrapped.t .......................... ok
+t/exceptions/class-mop-method.t .................................. ok
+t/exceptions/class-mop-mixin-hasattributes.t ..................... ok
+t/exceptions/class-mop-mixin-hasmethods.t ........................ ok
+t/exceptions/class-mop-module.t .................................. ok
+t/exceptions/class-mop-object.t .................................. ok
+t/exceptions/class-mop-package.t ................................. ok
+t/exceptions/class.t ............................................. ok
+t/exceptions/cmop.t .............................................. ok
+t/exceptions/exception-lazyattributeneedsadefault.t .............. ok
+t/exceptions/frame-leak.t ........................................ ok
+t/exceptions/meta-role.t ......................................... ok
+t/exceptions/metaclass.t ......................................... ok
+t/exceptions/moose-exporter.t .................................... ok
+t/exceptions/moose-meta-attribute-native-traits.t ................ ok
+t/exceptions/moose-meta-class-immutable-trait.t .................. ok
+t/exceptions/moose-meta-method-accessor-native-collection.t ...... ok
+t/exceptions/moose-meta-method-accessor-native-grep.t ............ ok
+t/exceptions/moose-meta-method-accessor-native-array.t ........... ok
+t/exceptions/moose-meta-method-accessor-native-hash-set.t ........ ok
+t/exceptions/moose-meta-method-accessor-native-hash.t ............ ok
+t/exceptions/moose-meta-method-accessor-native-string-match.t .... ok
+t/exceptions/moose-meta-method-accessor-native-string-replace.t .. ok
+t/exceptions/moose-meta-method-accessor-native-string-substr.t ... ok
+t/exceptions/moose-meta-method-accessor-native.t ................. ok
+t/exceptions/moose-meta-method-accessor.t ........................ ok
+t/exceptions/moose-meta-method-augmented.t ....................... ok
+t/exceptions/moose-meta-method-constructor.t ..................... ok
+t/exceptions/moose-meta-method-delegation.t ...................... ok
+t/exceptions/moose-meta-method-destructor.t ...................... ok
+t/exceptions/moose-meta-method-overridden.t ...................... ok
+t/exceptions/moose-meta-role-application-rolesummation.t ......... ok
+t/exceptions/moose-meta-role-application-toclass.t ............... ok
+t/exceptions/moose-meta-role-application.t ....................... ok
+t/exceptions/moose-meta-role-application-torole.t ................ ok
+t/exceptions/moose-meta-role-attribute.t ......................... ok
+t/exceptions/moose-meta-role-composite.t ......................... ok
+t/exceptions/moose-meta-typecoercion-union.t ..................... ok
+t/exceptions/moose-meta-typecoercion.t ........................... ok
+t/exceptions/moose-meta-typeconstraint-enum.t .................... ok
+t/exceptions/moose-meta-typeconstraint-parameterizable.t ......... ok
+t/exceptions/moose-meta-typeconstraint-parameterized.t ........... ok
+t/exceptions/moose-meta-typeconstraint-registry.t ................ ok
+t/exceptions/moose-util-metarole.t ............................... ok
+t/exceptions/moose-meta-typeconstraint.t ......................... ok
+t/exceptions/moose-role.t ........................................ ok
+t/exceptions/moose-util-typeconstraints.t ........................ ok
+t/exceptions/object.t ............................................ ok
+t/exceptions/moose.t ............................................. ok
+t/exceptions/rt-92818.t .......................................... ok
+t/exceptions/overload.t .......................................... ok
+t/exceptions/rt-94795.t .......................................... ok
+t/exceptions/stringify.t ......................................... ok
+t/exceptions/traits.t ............................................ ok
+t/exceptions/util.t .............................................. ok
+t/exceptions/typeconstraints.t ................................... ok
+t/immutable/apply_roles_to_immutable.t ........................... ok
+t/immutable/buildargs.t .......................................... ok
+t/immutable/constructor_is_not_moose.t ........................... ok
+t/immutable/constructor_is_wrapped.t ............................. ok
+t/immutable/default_values.t ..................................... ok
+t/immutable/definition_context.t ................................. ok
+t/immutable/immutable_constructor_error.t ........................ ok
+t/immutable/immutable_destroy.t .................................. ok
+t/immutable/immutable_meta_class.t ............................... ok
+t/immutable/immutable_metaclass_with_traits.t .................... ok
+t/immutable/immutable_moose.t .................................... ok
+t/immutable/immutable_roundtrip.t ................................ ok
+t/immutable/immutable_trigger_from_constructor.t ................. ok
+t/immutable/inline_fallbacks.t ................................... ok
+t/immutable/inlined_constructors_n_types.t ....................... ok
+t/immutable/multiple_demolish_inline.t ........................... ok
+t/metaclasses/create_anon_with_required_attr.t ................... ok
+t/metaclasses/custom_attr_meta_as_role.t ......................... ok
+t/metaclasses/export_with_prototype.t ............................ ok
+t/metaclasses/custom_attr_meta_with_roles.t ...................... ok
+t/metaclasses/easy_init_meta.t ................................... ok
+t/metaclasses/exporter_also_with_trait.t ......................... ok
+t/metaclasses/exporter_meta_lookup.t ............................. ok
+t/metaclasses/exporter_sub_names.t ............................... ok
+t/metaclasses/goto_moose_import.t ................................ ok
+t/metaclasses/immutable_metaclass_compat_bug.t ................... ok
+t/metaclasses/meta_name.t ........................................ ok
+t/metaclasses/metaclass_compat_no_fixing_bug.t ................... ok
+t/metaclasses/metaclass_compat_role_conflicts.t .................. ok
+t/immutable/inline_close_over.t .................................. ok
+t/metaclasses/metaclass_parameterized_traits.t ................... ok
+t/metaclasses/metaclass_compat.t ................................. ok
+t/metaclasses/metaclass_traits.t ................................. ok
+t/metaclasses/metarole_combination.t ............................. ok
+t/metaclasses/metarole_on_anon.t ................................. ok
+t/metaclasses/metarole.t ......................................... ok
+t/metaclasses/metarole_w_metaclass_pm.t .......................... ok
+t/metaclasses/metaroles_of_metaroles.t ........................... ok
+t/metaclasses/moose_exporter_trait_aliases.t ..................... ok
+t/metaclasses/moose_for_meta.t ................................... ok
+t/metaclasses/moose_nonmoose_metatrait_init_order.t .............. ok
+t/metaclasses/moose_exporter.t ................................... ok
+t/metaclasses/moose_nonmoose_moose_chain_init_meta.t ............. ok
+t/metaclasses/new_metaclass.t .................................... ok
+t/metaclasses/new_object_BUILD.t ................................. ok
+t/metaclasses/moose_w_metaclass.t ................................ ok
+t/metaclasses/overloading.t ...................................... ok
+t/metaclasses/use_base_of_moose.t ................................ ok
+t/moose_util/apply_roles.t ....................................... ok
+t/metaclasses/reinitialize.t ..................................... ok
+t/moose_util/create_alias.t ...................................... ok
+t/moose_util/ensure_all_roles.t .................................. ok
+t/moose_util/moose_util.t ........................................ ok
+t/moose_util/moose_util_does_role.t .............................. ok
+t/moose_util/method_mod_args.t ................................... ok
+t/moose_util/moose_util_search_class_by_role.t ................... ok
+t/moose_util/resolve_alias.t ..................................... ok
+t/moose_util/with_traits.t ....................................... ok
+t/native_traits/array_from_role.t ................................ ok
+t/native_traits/array_coerce.t ................................... ok
+t/native_traits/array_trigger.t .................................. ok
+t/native_traits/array_subtypes.t ................................. ok
+t/native_traits/collection_with_roles.t .......................... ok
+t/native_traits/hash_coerce.t .................................... ok
+t/native_traits/hash_trigger.t ................................... ok
+t/native_traits/hash_subtypes.t .................................. ok
+t/native_traits/remove_attribute.t ............................... ok
+t/native_traits/shallow_clone.t .................................. ok
+t/native_traits/custom_instance.t ................................ ok
+t/native_traits/trait_code.t ..................................... ok
+t/native_traits/trait_bool.t ..................................... ok
+t/native_traits/trait_counter.t .................................. ok
+t/recipes/basics_bankaccount_methodmodifiersandsubclassing.t ..... ok
+t/native_traits/trait_number.t ................................... ok
+t/native_traits/trait_hash.t ..................................... ok
+t/recipes/basics_company_subtypes.t .............................. ok
+t/recipes/basics_binarytree_attributefeatures.t .................. ok
+t/recipes/basics_datetime_extendingnonmooseparent.t .............. ok
+t/recipes/basics_http_subtypesandcoercion.t ...................... ok
+t/native_traits/trait_string.t ................................... ok
+t/recipes/basics_document_augmentandinner.t ...................... ok
+t/recipes/basics_genome_overloadingsubtypesandcoercion.t ......... ok
+t/recipes/basics_point_attributesandsubclassing.t ................ ok
+t/recipes/extending_mooseish_moosesugar.t ........................ ok
+t/recipes/extending_debugging_baseclassrole.t .................... ok
+t/native_traits/trait_array.t .................................... ok
+t/recipes/legacy_debugging_baseclassreplacement.t ................ ok
+t/recipes/meta_labeled_attributetrait.t .......................... ok
+t/recipes/legacy_labeled_attributemetaclass.t .................... ok
+t/recipes/meta_globref_instancemetaclass.t ....................... ok
+t/recipes/meta_privateorpublic_methodmetaclass.t ................. ok
+t/recipes/meta_table_metaclasstrait.t ............................ ok
+t/recipes/roles_comparable_codereuse.t ........................... ok
+t/recipes/roles_applicationtoinstance.t .......................... ok
+t/roles/anonymous_roles.t ........................................ ok
+t/recipes/roles_restartable_advancedcomposition.t ................ ok
+t/roles/application_toclass.t .................................... ok
+t/roles/build.t .................................................. ok
+t/roles/create_role.t ............................................ ok
+t/roles/apply_role.t ............................................. ok
+t/roles/conflict_many_methods.t .................................. ok
+t/roles/create_role_subclass.t ................................... ok
+t/roles/empty_method_modifiers_meta_bug.t ........................ ok
+t/roles/free_anonymous_roles.t ................................... ok
+t/roles/meta_role.t .............................................. ok
+t/roles/imported_required_method.t ............................... ok
+t/roles/extending_role_attrs.t ................................... ok
+t/roles/method_exclusion_in_composition.t ........................ ok
+t/roles/method_modifiers.t ....................................... ok
+t/roles/method_aliasing_in_composition.t ......................... ok
+t/roles/methods.t ................................................ ok
+t/roles/more_alias_and_exclude.t ................................. ok
+t/roles/new_meta_role.t .......................................... ok
+t/roles/overloading_combine_to_class.t ........................... ok
+t/roles/overloading_combine_to_instance.t ........................ ok
+t/roles/overloading_combine_to_role.t ............................ ok
+t/roles/more_role_edge_cases.t ................................... ok
+t/roles/overloading_remove_attributes_bug.t ...................... ok
+t/roles/overloading_to_class.t ................................... ok
+t/roles/overloading_to_instance.t ................................ ok
+t/roles/overloading_composition_errors.t ......................... ok
+t/roles/overloading_to_role.t .................................... ok
+t/roles/reinitialize_anon_role.t ................................. ok
+t/roles/role_attribute_conflict.t ................................ ok
+t/roles/role.t ................................................... ok
+t/roles/overriding.t ............................................. ok
+t/roles/role_attr_application.t .................................. ok
+t/roles/role_attrs.t ............................................. ok
+t/roles/role_composite.t ......................................... ok
+t/roles/role_composite_exclusion.t ............................... ok
+t/roles/role_compose_requires.t .................................. ok
+t/roles/role_composition_attributes.t ............................ ok
+t/roles/role_composition_conflict_detection.t .................... ok
+t/roles/role_composition_method_mods.t ........................... ok
+t/roles/role_composition_errors.t ................................ ok
+t/roles/role_composition_methods.t ............................... ok
+t/roles/role_composition_override.t .............................. ok
+t/roles/role_composition_req_methods.t ........................... ok
+t/roles/role_conflict_edge_cases.t ............................... ok
+t/roles/role_consumers.t ......................................... ok
+t/roles/role_conflict_detection.t ................................ ok
+t/roles/role_exclusion.t ......................................... ok
+t/roles/role_exclusion_and_alias_bug.t ........................... ok
+t/roles/role_for_combination.t ................................... ok
+t/roles/roles_and_method_cloning.t ............................... ok
+t/roles/roles_and_req_method_edge_cases.t ........................ ok
+t/roles/run_time_role_composition.t .............................. ok
+t/roles/roles_applied_in_create.t ................................ ok
+t/test_moose/test_moose.t ........................................ ok
+t/roles/runtime_roles_and_nonmoose.t ............................. ok
+t/roles/runtime_roles_w_params.t ................................. ok
+t/roles/runtime_roles_and_attrs.t ................................ ok
+t/roles/use_base_does.t .......................................... ok
+t/test_moose/test_moose_does_ok.t ................................ ok
+t/test_moose/test_moose_has_attribute_ok.t ....................... ok
+t/todo_tests/moose_and_threads.t ................................. ok
+t/todo_tests/exception_reflects_failed_constraint.t .............. ok
+t/test_moose/test_moose_meta_ok.t ................................ ok
+t/test_moose/with_immutable.t .................................... ok
+t/todo_tests/immutable_n_around.t ................................ ok
+t/todo_tests/replacing_super_methods.t ........................... ok
+t/todo_tests/role_insertion_order.t .............................. ok
+t/todo_tests/role_attr_methods_original_package.t ................ ok
+t/todo_tests/required_role_accessors.t ........................... ok
+t/type_constraints/advanced_type_creation.t ...................... ok
+t/todo_tests/wrong-inner.t ....................................... ok
+t/todo_tests/various_role_features.t ............................. ok
+t/type_constraints/class_type_constraint.t ....................... ok
+t/type_constraints/class_subtypes.t .............................. ok
+t/type_constraints/coerced_parameterized_types.t ................. ok
+t/type_constraints/container_type_constraint.t ................... ok
+t/type_constraints/container_type_coercion.t ..................... ok
+t/type_constraints/custom_parameterized_types.t .................. ok
+t/type_constraints/custom_type_errors.t .......................... ok
+t/type_constraints/define_type_twice_throws.t .................... ok
+t/type_constraints/duck_type_handles.t ........................... ok
+t/type_constraints/duck_types.t .................................. ok
+t/type_constraints/enum.t ........................................ ok
+t/type_constraints/match_type_operator.t ......................... ok
+t/type_constraints/inlining.t .................................... ok
+t/type_constraints/maybe_type_constraint.t ....................... ok
+t/type_constraints/misc_type_tests.t ............................. ok
+t/type_constraints/normalize_type_name.t ......................... ok
+t/type_constraints/parameterize_from.t ........................... ok
+t/type_constraints/name_conflicts.t .............................. ok
+t/type_constraints/role_type_constraint.t ........................ ok
+t/type_constraints/subtype_auto_vivify_parent.t .................. ok
+t/type_constraints/subtyping_parameterized_types.t ............... ok
+t/type_constraints/subtyping_union_types.t ....................... ok
+t/type_constraints/type_coersion_on_lazy_attributes.t ............ ok
+t/type_constraints/throw_error.t ................................. ok
+t/type_constraints/type_names.t .................................. ok
+t/type_constraints/type_notation_parser.t ........................ ok
+t/type_constraints/union_is_a_type_of.t .......................... ok
+t/type_constraints/union_types.t ................................. ok
+t/type_constraints/util_find_type_constraint.t ................... ok
+t/type_constraints/types_and_undef.t ............................. ok
+t/type_constraints/union_types_and_coercions.t ................... ok
+t/type_constraints/util_more_type_coercion.t ..................... ok
+t/type_constraints/util_type_coercion.t .......................... ok
+t/type_constraints/util_type_constraints.t ....................... ok
+t/type_constraints/util_type_constraints_export.t ................ ok
+t/type_constraints/util_type_reloading.t ......................... ok
+t/type_constraints/with-specio.t ................................. ok
+t/zzz-check-breaks.t ............................................. ok
+t/type_constraints/util_std_type_constraints.t ................... ok
+All tests successful.
+Files=472, Tests=19574, 22 wallclock secs ( 2.99 usr  0.81 sys + 93.10 cusr  6.66 csys = 103.56 CPU)
+Result: PASS
+Manifying 133 pod documents
+Files found in blib/arch: installing files in blib/lib into architecture dependent library tree
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/auto/Moose/Moose.bundle
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/metaclass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/oose.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Attribute.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Class.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Deprecated.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Instance.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Method.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/MiniTrait.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Mixin.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Module.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Object.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Overload.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Package.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Class/Immutable/Trait.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Method/Accessor.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Method/Constructor.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Method/Generated.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Method/Inlined.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Method/Meta.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Method/Wrapped.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Mixin/AttributeCore.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Mixin/HasAttributes.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Mixin/HasMethods.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Class/MOP/Mixin/HasOverloads.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Conflicts.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Deprecated.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exporter.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Intro.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Object.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Role.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Unsweetened.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Util.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Style.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Basics/BankAccount_MethodModifiersAndSubclassing.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Basics/BinaryTree_AttributeFeatures.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Basics/BinaryTree_BuilderAndLazyBuild.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Basics/Company_Subtypes.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Basics/DateTime_ExtendingNonMooseParent.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Basics/Document_AugmentAndInner.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Basics/Genome_OverloadingSubtypesAndCoercion.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Basics/HTTP_SubtypesAndCoercion.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Basics/Immutable.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Basics/Person_BUILDARGSAndBUILD.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Basics/Point_AttributesAndSubclassing.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Extending/Debugging_BaseClassRole.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Extending/ExtensionOverview.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Extending/Mooseish_MooseSugar.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Legacy/Debugging_BaseClassReplacement.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Legacy/Labeled_AttributeMetaclass.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Legacy/Table_ClassMetaclass.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Meta/GlobRef_InstanceMetaclass.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Meta/Labeled_AttributeTrait.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Meta/PrivateOrPublic_MethodMetaclass.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Meta/Table_MetaclassTrait.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Meta/WhyMeta.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Roles/ApplicationToInstance.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Roles/Comparable_CodeReuse.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Roles/Restartable_AdvancedComposition.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Snack/Keywords.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Cookbook/Snack/Types.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/AccessorMustReadWrite.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/AddParameterizableTypeTakesParameterizableType.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/AddRoleTakesAMooseMetaRoleInstance.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/AddRoleToARoleTakesAMooseMetaRole.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/ApplyTakesABlessedInstance.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/AttachToClassNeedsAClassMOPClassInstanceOrASubclass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/AttributeConflictInRoles.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/AttributeConflictInSummation.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/AttributeExtensionIsNotSupportedInRoles.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/AttributeIsRequired.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/AttributeMustBeAnClassMOPMixinAttributeCoreOrSubclass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/AttributeNamesDoNotMatch.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/AttributeValueIsNotAnObject.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/AttributeValueIsNotDefined.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/AutoDeRefNeedsArrayRefOrHashRef.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/BadOptionFormat.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/BothBuilderAndDefaultAreNotAllowed.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/BuilderDoesNotExist.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/BuilderMethodNotSupportedForAttribute.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/BuilderMethodNotSupportedForInlineAttribute.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/BuilderMustBeAMethodName.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CallingMethodOnAnImmutableInstance.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CallingReadOnlyMethodOnAnImmutableInstance.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CanExtendOnlyClasses.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CanOnlyConsumeRole.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CanOnlyWrapBlessedCode.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CanReblessOnlyIntoASubclass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CanReblessOnlyIntoASuperclass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotAddAdditionalTypeCoercionsToUnion.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotAddAsAnAttributeToARole.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotApplyBaseClassRolesToRole.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotAssignValueToReadOnlyAccessor.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotAugmentIfLocalMethodPresent.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotAugmentNoSuperMethod.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotAutoDerefWithoutIsa.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotAutoDereferenceTypeConstraint.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotCalculateNativeType.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotCallAnAbstractBaseMethod.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotCallAnAbstractMethod.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotCoerceAWeakRef.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotCoerceAttributeWhichHasNoCoercion.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotCreateHigherOrderTypeWithoutATypeParameter.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotCreateMethodAliasLocalMethodIsPresent.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotCreateMethodAliasLocalMethodIsPresentInClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotDelegateLocalMethodIsPresent.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotDelegateWithoutIsa.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotFindDelegateMetaclass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotFindType.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotFindTypeGivenToMatchOnType.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotFixMetaclassCompatibility.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotGenerateInlineConstraint.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotInitializeMooseMetaRoleComposite.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotInlineTypeConstraintCheck.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotLocatePackageInINC.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotMakeMetaclassCompatible.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotOverrideALocalMethod.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotOverrideBodyOfMetaMethods.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotOverrideLocalMethodIsPresent.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotOverrideNoSuperMethod.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotRegisterUnnamedTypeConstraint.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CannotUseLazyBuildAndDefaultSimultaneously.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CircularReferenceInAlso.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/ClassDoesNotHaveInitMeta.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/ClassDoesTheExcludedRole.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/ClassNamesDoNotMatch.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CloneObjectExpectsAnInstanceOfMetaclass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CodeBlockMustBeACodeRef.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CoercingWithoutCoercions.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CoercionAlreadyExists.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CoercionNeedsTypeConstraint.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/ConflictDetectedInCheckRoleExclusions.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/ConflictDetectedInCheckRoleExclusionsInToClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/ConstructClassInstanceTakesPackageName.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CouldNotCreateMethod.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CouldNotCreateWriter.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CouldNotEvalConstructor.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CouldNotEvalDestructor.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CouldNotFindTypeConstraintToCoerceFrom.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CouldNotGenerateInlineAttributeMethod.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CouldNotLocateTypeConstraintForUnion.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CouldNotParseType.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CreateMOPClassTakesArrayRefOfAttributes.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CreateMOPClassTakesArrayRefOfSuperclasses.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CreateMOPClassTakesHashRefOfMethods.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CreateTakesArrayRefOfRoles.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CreateTakesHashRefOfAttributes.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/CreateTakesHashRefOfMethods.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/DefaultToMatchOnTypeMustBeCodeRef.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/DelegationToAClassWhichIsNotLoaded.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/DelegationToARoleWhichIsNotLoaded.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/DelegationToATypeWhichIsNotAClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/DoesRequiresRoleName.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/EnumCalledWithAnArrayRefAndAdditionalArgs.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/EnumValuesMustBeString.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/ExtendsMissingArgs.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/HandlesMustBeAHashRef.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/IllegalInheritedOptions.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/IllegalMethodTypeToAddMethodModifier.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/IncompatibleMetaclassOfSuperclass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InitMetaRequiresClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InitializeTakesUnBlessedPackageName.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InstanceBlessedIntoWrongClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InstanceMustBeABlessedReference.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InvalidArgPassedToMooseUtilMetaRole.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InvalidArgumentToMethod.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InvalidArgumentsToTraitAliases.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InvalidBaseTypeGivenToCreateParameterizedTypeConstraint.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InvalidHandleValue.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InvalidHasProvidedInARole.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InvalidNameForType.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InvalidOverloadOperator.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InvalidRoleApplication.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InvalidTypeConstraint.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InvalidTypeGivenToCreateParameterizedTypeConstraint.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/InvalidValueForIs.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/IsaDoesNotDoTheRole.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/IsaLacksDoesMethod.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/LazyAttributeNeedsADefault.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/Legacy.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MOPAttributeNewNeedsAttributeName.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MatchActionMustBeACodeRef.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MessageParameterMustBeCodeRef.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MetaclassIsAClassNotASubclassOfGivenMetaclass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MetaclassIsARoleNotASubclassOfGivenMetaclass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MetaclassIsNotASubclassOfGivenMetaclass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MetaclassMustBeASubclassOfMooseMetaClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MetaclassMustBeASubclassOfMooseMetaRole.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MetaclassMustBeDerivedFromClassMOPClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MetaclassNotLoaded.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MetaclassTypeIncompatible.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MethodExpectedAMetaclassObject.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MethodExpectsFewerArgs.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MethodExpectsMoreArgs.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MethodModifierNeedsMethodName.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MethodNameConflictInRoles.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MethodNameNotFoundInInheritanceHierarchy.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MethodNameNotGiven.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustDefineAMethodName.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustDefineAnAttributeName.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustDefineAnOverloadOperator.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustHaveAtLeastOneValueToEnumerate.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustPassAHashOfOptions.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustPassAMooseMetaRoleInstanceOrSubclass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustPassAPackageNameOrAnExistingClassMOPPackageInstance.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustPassEvenNumberOfArguments.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustPassEvenNumberOfAttributeOptions.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustProvideANameForTheAttribute.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustSpecifyAtleastOneMethod.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustSpecifyAtleastOneRole.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustSpecifyAtleastOneRoleToApplicant.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustSupplyAClassMOPAttributeInstance.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustSupplyADelegateToMethod.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustSupplyAMetaclass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustSupplyAMooseMetaAttributeInstance.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustSupplyAnAccessorTypeToConstructWith.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustSupplyAnAttributeToConstructWith.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustSupplyArrayRefAsCurriedArguments.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/MustSupplyPackageNameAndName.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/NeedsTypeConstraintUnionForTypeCoercionUnion.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/NeitherAttributeNorAttributeNameIsGiven.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/NeitherClassNorClassNameIsGiven.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/NeitherRoleNorRoleNameIsGiven.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/NeitherTypeNorTypeNameIsGiven.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/NoAttributeFoundInSuperClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/NoBodyToInitializeInAnAbstractBaseClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/NoCasesMatched.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/NoConstraintCheckForTypeConstraint.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/NoDestructorClassSpecified.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/NoImmutableTraitSpecifiedForClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/NoParentGivenToSubtype.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/OnlyInstancesCanBeCloned.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/OperatorIsRequired.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/OverloadConflictInSummation.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/OverloadRequiresAMetaClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/OverloadRequiresAMetaMethod.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/OverloadRequiresAMetaOverload.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/OverloadRequiresAMethodNameOrCoderef.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/OverloadRequiresAnOperator.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/OverloadRequiresNamesForCoderef.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/OverrideConflictInComposition.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/OverrideConflictInSummation.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/PackageDoesNotUseMooseExporter.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/PackageNameAndNameParamsNotGivenToWrap.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/PackagesAndModulesAreNotCachable.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/ParameterIsNotSubtypeOfParent.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/ReferencesAreNotAllowedAsDefault.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/RequiredAttributeLacksInitialization.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/RequiredAttributeNeedsADefault.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/RequiredMethodsImportedByClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/RequiredMethodsNotImplementedByClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/RoleDoesTheExcludedRole.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/RoleExclusionConflict.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/RoleNameRequired.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/RoleNameRequiredForMooseMetaRole.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/RolesDoNotSupportAugment.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/RolesDoNotSupportExtends.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/RolesDoNotSupportInner.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/RolesDoNotSupportRegexReferencesForMethodModifiers.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/RolesInCreateTakesAnArrayRef.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/RolesListMustBeInstancesOfMooseMetaRole.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/SingleParamsToNewMustBeHashRef.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/TriggerMustBeACodeRef.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/TypeConstraintCannotBeUsedForAParameterizableType.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/TypeConstraintIsAlreadyCreated.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/TypeParameterMustBeMooseMetaType.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/UnableToCanonicalizeHandles.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/UnableToCanonicalizeNonRolePackage.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/UnableToRecognizeDelegateMetaclass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/UndefinedHashKeysPassedToMethod.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/UnionCalledWithAnArrayRefAndAdditionalArgs.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/UnionTakesAtleastTwoTypeNames.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/ValidationFailedForInlineTypeConstraint.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/ValidationFailedForTypeConstraint.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/WrapTakesACodeRefToBless.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/WrongTypeConstraintGiven.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/Role/Attribute.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/Role/AttributeName.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/Role/Class.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/Role/EitherAttributeOrAttributeName.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/Role/Instance.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/Role/InstanceClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/Role/InvalidAttributeOptions.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/Role/Method.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/Role/ParamsHash.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/Role/Role.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/Role/RoleForCreate.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/Role/RoleForCreateMOPClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Exception/Role/TypeConstraint.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/Attributes.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/BestPractices.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/Classes.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/Concepts.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/Construction.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/Contributing.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/Delegation.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/Delta.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/Exceptions.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/FAQ.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/MOP.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/MethodModifiers.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/MooseX.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/Resources.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/Roles.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/Support.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/Types.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/Unsweetened.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Manual/Exceptions/Manifest.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Attribute.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Class.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Instance.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Role.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/TypeCoercion.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/TypeConstraint.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Attribute/Native.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Attribute/Native/Trait.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Attribute/Native/Trait/Array.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Attribute/Native/Trait/Bool.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Attribute/Native/Trait/Code.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Attribute/Native/Trait/Counter.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Attribute/Native/Trait/Hash.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Attribute/Native/Trait/Number.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Attribute/Native/Trait/String.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Class/Immutable/Trait.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Augmented.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Constructor.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Delegation.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Destructor.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Meta.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Overridden.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Collection.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Reader.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Writer.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/Writer.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/accessor.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/clear.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/count.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/delete.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/elements.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/first.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/first_index.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/get.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/grep.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/insert.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/is_empty.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/join.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/map.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/natatime.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/pop.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/push.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/reduce.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/set.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/shallow_clone.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/shift.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/shuffle.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/sort.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/sort_in_place.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/splice.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/uniq.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Array/unshift.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Bool/not.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Bool/set.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Bool/toggle.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Bool/unset.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Code/execute.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Code/execute_method.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Counter/Writer.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Counter/dec.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Counter/inc.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Counter/reset.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Counter/set.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash/Writer.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash/accessor.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash/clear.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash/count.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash/defined.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash/delete.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash/elements.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash/exists.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash/get.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash/is_empty.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash/keys.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash/kv.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash/set.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash/shallow_clone.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Hash/values.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Number/abs.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Number/add.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Number/div.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Number/mod.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Number/mul.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Number/set.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/Number/sub.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/String/append.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/String/chomp.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/String/chop.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/String/clear.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/String/inc.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/String/length.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/String/match.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/String/prepend.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/String/replace.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Method/Accessor/Native/String/substr.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Mixin/AttributeCore.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Object/Trait.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Role/Application.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Role/Attribute.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Role/Composite.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Role/Method.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Role/Application/RoleSummation.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Role/Application/ToClass.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Role/Application/ToInstance.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Role/Application/ToRole.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Role/Method/Conflicting.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/Role/Method/Required.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/TypeCoercion/Union.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/TypeConstraint/Class.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/TypeConstraint/DuckType.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/TypeConstraint/Enum.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/TypeConstraint/Parameterizable.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/TypeConstraint/Parameterized.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/TypeConstraint/Registry.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/TypeConstraint/Role.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Meta/TypeConstraint/Union.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Spec/Role.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Util/MetaRole.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Util/TypeConstraints.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Moose/Util/TypeConstraints/Builtins.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/Test/Moose.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Attribute.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Class.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Class::Immutable::Trait.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Deprecated.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Instance.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Method.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Method::Accessor.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Method::Constructor.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Method::Generated.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Method::Inlined.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Method::Meta.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Method::Wrapped.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::MiniTrait.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Mixin.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Mixin::AttributeCore.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Mixin::HasAttributes.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Mixin::HasMethods.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Mixin::HasOverloads.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Module.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Object.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Overload.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Class::MOP::Package.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Basics::BankAccount_MethodModifiersAndSubclassing.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Basics::BinaryTree_AttributeFeatures.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Basics::BinaryTree_BuilderAndLazyBuild.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Basics::Company_Subtypes.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Basics::DateTime_ExtendingNonMooseParent.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Basics::Document_AugmentAndInner.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Basics::Genome_OverloadingSubtypesAndCoercion.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Basics::HTTP_SubtypesAndCoercion.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Basics::Immutable.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Basics::Person_BUILDARGSAndBUILD.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Basics::Point_AttributesAndSubclassing.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Extending::Debugging_BaseClassRole.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Extending::ExtensionOverview.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Extending::Mooseish_MooseSugar.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Legacy::Debugging_BaseClassReplacement.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Legacy::Labeled_AttributeMetaclass.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Legacy::Table_ClassMetaclass.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Meta::GlobRef_InstanceMetaclass.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Meta::Labeled_AttributeTrait.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Meta::PrivateOrPublic_MethodMetaclass.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Meta::Table_MetaclassTrait.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Meta::WhyMeta.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Roles::ApplicationToInstance.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Roles::Comparable_CodeReuse.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Roles::Restartable_AdvancedComposition.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Snack::Keywords.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Snack::Types.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Cookbook::Style.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Deprecated.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Exception.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Exporter.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Intro.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::Attributes.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::BestPractices.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::Classes.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::Concepts.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::Construction.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::Contributing.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::Delegation.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::Delta.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::Exceptions.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::Exceptions::Manifest.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::FAQ.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::MOP.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::MethodModifiers.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::MooseX.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::Resources.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::Roles.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::Support.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::Types.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Manual::Unsweetened.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Attribute.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Attribute::Native.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Attribute::Native::Trait.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Attribute::Native::Trait::Array.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Attribute::Native::Trait::Bool.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Attribute::Native::Trait::Code.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Attribute::Native::Trait::Counter.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Attribute::Native::Trait::Hash.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Attribute::Native::Trait::Number.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Attribute::Native::Trait::String.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Class.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Class::Immutable::Trait.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Instance.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Method.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Method::Accessor.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Method::Augmented.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Method::Constructor.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Method::Delegation.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Method::Destructor.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Method::Meta.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Method::Overridden.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Mixin::AttributeCore.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Object::Trait.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Role.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Role::Application.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Role::Application::RoleSummation.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Role::Application::ToClass.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Role::Application::ToInstance.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Role::Application::ToRole.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Role::Attribute.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Role::Composite.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Role::Method.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Role::Method::Conflicting.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::Role::Method::Required.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::TypeCoercion.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::TypeCoercion::Union.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::TypeConstraint.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::TypeConstraint::Class.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::TypeConstraint::DuckType.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::TypeConstraint::Enum.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::TypeConstraint::Parameterizable.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::TypeConstraint::Parameterized.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::TypeConstraint::Registry.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::TypeConstraint::Role.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Meta::TypeConstraint::Union.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Object.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Role.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Spec::Role.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Unsweetened.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Util.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Util::MetaRole.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Util::TypeConstraints.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Moose::Util::TypeConstraints::Builtins.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Test::Moose.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/metaclass.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/oose.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/bin/moose-outdated
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Moose-2.1705 (upgraded from 2.1603)
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/.meta/Moose-2.1705-TRIAL/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/.meta/Moose-2.1705-TRIAL/install.json
+Searching Dist::Zilla () on metacpan ...
+--> Working on Dist::Zilla
+Fetching http://www.cpan.org/authors/id/R/RJ/RJBS/Dist-Zilla-5.044.tar.gz
+-> OK
+Unpacking Dist-Zilla-5.044.tar.gz
+Entering Dist-Zilla-5.044
+Checking configure dependencies from META.json
+Checking if you have File::ShareDir::Install 0.06 ... Yes (0.10)
+Checking if you have ExtUtils::MakeMaker 6.58 ... Yes (7.10)
+Configuring Dist-Zilla-5.044
+Running Makefile.PL
+Warning: prerequisite App::Cmd::Setup 0.330 not found. We have 0.328.
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Dist::Zilla
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Archive::Tar 0 ... Yes (2.04)
+Checking if you have CPAN::Meta::Converter 2.101550 ... Yes (2.150005)
+Checking if you have MooseX::Role::Parameterized 1.01 ... Yes (1.08)
+Checking if you have Config::MVP::Section 2.200009 ... Yes (2.200010)
+Checking if you have Perl::Version 0 ... Yes (1.013)
+Checking if you have Config::MVP::Reader::Findable::ByExtension 0 ... Yes (2.200010)
+Checking if you have CPAN::Uploader 0.103004 ... Yes (0.103009)
+Checking if you have File::Path 0 ... Yes (2.09)
+Checking if you have warnings 0 ... Yes (1.32)
+Checking if you have Moose 0.92 ... Yes (2.1705)
+Checking if you have Term::ReadLine 0 ... Yes (1.15)
+Checking if you have CPAN::Meta::Check 0.011 ... Yes (0.011)
+Checking if you have Encode 0 ... Yes (2.73)
+Checking if you have Config::MVP::Assembler 0 ... Yes (2.200010)
+Checking if you have parent 0 ... Yes (0.234)
+Checking if you have MooseX::Types::Moose 0 ... Yes (0.46)
+Checking if you have File::Spec 0 ... Yes (3.56_01)
+Checking if you have Class::Load 0.17 ... Yes (0.23)
+Checking if you have Sub::Exporter 0 ... Yes (0.987)
+Checking if you have Software::License::None 0 ... Yes (0.103010)
+Checking if you have File::Find::Rule 0 ... Yes (0.33)
+Checking if you have Test::FailWarnings 0 ... Yes (0.008)
+Checking if you have MooseX::LazyRequire 0 ... Yes (0.11)
+Checking if you have Test::Fatal 0 ... Yes (0.014)
+Checking if you have Data::Dumper 0 ... Yes (2.158)
+Checking if you have File::pushd 0 ... Yes (1.009)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have CPAN::Meta::Prereqs 2.120630 ... Yes (2.150005)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have App::Cmd::Command::version 0 ... Yes (0.328)
+Checking if you have ExtUtils::Manifest 1.66 ... Yes (1.70)
+Checking if you have String::Formatter 0.100680 ... Yes (0.102084)
+Checking if you have Path::Class 0.22 ... Yes (0.35)
+Checking if you have Test::File::ShareDir 0 ... Yes (1.001001)
+Checking if you have Perl::PrereqScanner 1.016 ... Yes (1.023)
+Checking if you have App::Cmd::Tester 0.306 ... Yes (0.328)
+Checking if you have Log::Dispatchouli 1.102220 ... Yes (2.012)
+Checking if you have PPI::Document 0 ... Yes (1.220)
+Checking if you have Test::Deep 0 ... Yes (0.117)
+Checking if you have Digest::MD5 0 ... Yes (2.54)
+Checking if you have List::Util 1.45 ... Yes (1.45)
+Checking if you have JSON::MaybeXS 0 ... Yes (1.003005)
+Checking if you have Moose::Role 0 ... Yes (2.1705)
+Checking if you have App::Cmd::Tester::CaptureExternal 0 ... Yes (0.328)
+Checking if you have MooseX::SetOnce 0 ... Yes (0.200002)
+Checking if you have Moose::Util::TypeConstraints 0 ... Yes (2.1705)
+Checking if you have Params::Util 0 ... Yes (1.07)
+Checking if you have App::Cmd::Setup 0.330 ... No (0.328 < 0.330)
+Checking if you have utf8 0 ... Yes (1.17)
+Checking if you have File::Copy::Recursive 0 ... Yes (0.38)
+Checking if you have Path::Tiny 0.052 ... Yes (0.072)
+Checking if you have Module::CoreList 0 ... Yes (5.20150620)
+Checking if you have Config::MVP::Assembler::WithBundles 2.200010 ... Yes (2.200010)
+Checking if you have File::HomeDir 0 ... Yes (1.00)
+Checking if you have Term::Encoding 0 ... Yes (0.02)
+Checking if you have autodie 0 ... Yes (2.27)
+Checking if you have Config::INI::Reader 0 ... Yes (0.025)
+Checking if you have lib 0 ... Yes (0.63)
+Checking if you have Config::MVP::Reader 2.101540 ... Yes (2.200010)
+Checking if you have File::ShareDir::Install 0.03 ... Yes (0.10)
+Checking if you have Mixin::Linewise::Readers 0.100 ... Yes (0.108)
+Checking if you have Test::More 0.96 ... Yes (1.001014)
+Checking if you have Sub::Exporter::ForMethods 0 ... Yes (0.100052)
+Checking if you have File::ShareDir 0 ... Yes (1.102)
+Checking if you have Data::Section 0.200002 ... Yes (0.200006)
+Checking if you have MooseX::Types::Perl 0 ... Yes (0.101343)
+Checking if you have DateTime 0.44 ... Yes (1.19)
+Checking if you have CPAN::Meta::Requirements 2.121 ... Yes (2.133)
+Checking if you have Term::UI 0 ... Yes (0.46)
+Checking if you have MooseX::Types 0 ... Yes (0.46)
+Checking if you have YAML::Tiny 0 ... Yes (1.67)
+Checking if you have Term::ReadKey 0 ... Yes (2.32)
+Checking if you have Software::License 0.101370 ... Yes (0.103010)
+Checking if you have Config::MVP::Reader::Finder 0 ... Yes (2.200010)
+Checking if you have String::RewritePrefix 0.006 ... Yes (0.007)
+Checking if you have Scalar::Util 0 ... Yes (1.45)
+Checking if you have Sub::Exporter::Util 0 ... Yes (0.987)
+Checking if you have Config::MVP::Reader::INI 2.101461 ... Yes (2.101463)
+Checking if you have Pod::Eventual 0.091480 ... Yes (0.094001)
+Checking if you have File::Temp 0 ... Yes (0.2304)
+Checking if you have version 0 ... Yes (0.9912)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.10)
+Checking if you have Text::Template 0 ... Yes (1.46)
+Checking if you have Try::Tiny 0 ... Yes (0.22)
+Checking if you have CPAN::Meta::Validator 2.101550 ... Yes (2.150005)
+Checking if you have namespace::autoclean 0 ... Yes (0.26)
+Checking if you have Software::LicenseUtils 0 ... Yes (0.103010)
+Checking if you have MooseX::Types::Path::Class 0 ... Yes (0.06)
+Checking if you have Text::Glob 0.08 ... Yes (0.09)
+Checking if you have CPAN::Meta::Merge 0 ... Yes (2.150005)
+==> Found dependencies: App::Cmd::Setup
+Searching App::Cmd::Setup (0.330) on metacpan ...
+--> Working on App::Cmd::Setup
+Fetching http://www.cpan.org/authors/id/R/RJ/RJBS/App-Cmd-0.330.tar.gz
+-> OK
+Unpacking App-Cmd-0.330.tar.gz
+Entering App-Cmd-0.330
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.58 ... Yes (7.10)
+Configuring App-Cmd-0.330
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for App::Cmd
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.10)
+Checking if you have base 0 ... Yes (2.22)
+Checking if you have File::Spec 0 ... Yes (3.56_01)
+Checking if you have Class::Load 0.06 ... Yes (0.23)
+Checking if you have Sub::Exporter 0 ... Yes (0.987)
+Checking if you have parent 0 ... Yes (0.234)
+Checking if you have Data::OptList 0 ... Yes (0.109)
+Checking if you have Capture::Tiny 0.13 ... Yes (0.30)
+Checking if you have IPC::Cmd 0 ... Yes (0.92)
+Checking if you have Module::Pluggable::Object 0 ... Yes (5.1)
+Checking if you have strict 0 ... Yes (1.09)
+Checking if you have Pod::Usage 1.61 ... Yes (1.67)
+Checking if you have Test::Fatal 0 ... Yes (0.014)
+Checking if you have Data::Dumper 0 ... Yes (2.158)
+Checking if you have IO::TieCombine 0 ... Yes (1.004)
+Checking if you have Text::Abbrev 0 ... Yes (1.02)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have lib 0 ... Yes (0.63)
+Checking if you have String::RewritePrefix 0 ... Yes (0.007)
+Checking if you have Getopt::Long::Descriptive 0.084 ... Yes (0.099)
+Checking if you have warnings 0 ... Yes (1.32)
+Checking if you have Sub::Exporter::Util 0 ... Yes (0.987)
+Checking if you have Test::More 0.96 ... Yes (1.001014)
+Checking if you have Sub::Install 0 ... Yes (0.928)
+Checking if you have File::Basename 0 ... Yes (2.85)
+Checking if you have Getopt::Long 2.39 ... Yes (2.47)
+Checking if you have constant 0 ... Yes (1.33)
+Building and testing App-Cmd-0.330
+Manifying 14 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+# Testing App::Cmd 0.330
+t/00-load.t ............ ok
+t/abbrev.t ............. ok
+t/callback.t ........... ok
+t/setup-broken.t ....... ok
+t/basic.t .............. ok
+t/setup-ignored.t ...... ok
+# 
+# Versions for all modules listed in MYMETA.json (including optional ones):
+# 
+# === Configure Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker  any 7.10
+# 
+# === Build Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker  any 7.10
+# 
+# === Test Requires ===
+# 
+#     Module              Want     Have
+#     ------------------- ---- --------
+#     Data::Dumper         any    2.158
+#     ExtUtils::MakeMaker  any     7.10
+#     File::Spec           any  3.56_01
+#     IPC::Cmd             any     0.92
+#     Test::Fatal          any    0.014
+#     Test::More          0.96 1.001014
+#     base                 any     2.22
+#     lib                  any     0.63
+# 
+# === Test Recommends ===
+# 
+#     Module         Want     Have
+#     ---------- -------- --------
+#     CPAN::Meta 2.120900 2.150005
+# 
+# === Runtime Requires ===
+# 
+#     Module                     Want  Have
+#     ------------------------- ----- -----
+#     Capture::Tiny              0.13  0.30
+#     Carp                        any  1.36
+#     Class::Load                0.06  0.23
+#     Data::OptList               any 0.109
+#     File::Basename              any  2.85
+#     Getopt::Long               2.39  2.47
+#     Getopt::Long::Descriptive 0.084 0.099
+#     IO::TieCombine              any 1.004
+#     Module::Pluggable::Object   any   5.1
+#     Pod::Usage                 1.61  1.67
+#     String::RewritePrefix       any 0.007
+#     Sub::Exporter               any 0.987
+#     Sub::Exporter::Util         any 0.987
+#     Sub::Install                any 0.928
+#     Text::Abbrev                any  1.02
+#     constant                    any  1.33
+#     parent                      any 0.234
+#     strict                      any  1.09
+#     warnings                    any  1.32
+# 
+t/00-report-prereqs.t .. ok
+t/setup-inner.t ........ ok
+t/setup-nocmd.t ........ ok
+t/capture-ext.t ........ ok
+t/setup.t .............. ok
+t/simple-args.t ........ ok
+t/simple-help.t ........ ok
+t/simple-require.t ..... ok
+t/simple-use.t ......... ok
+t/subdispatch.t ........ ok
+t/tester-exit.t ........ ok
+t/version.t ............ ok
+All tests successful.
+Files=18, Tests=81,  0 wallclock secs ( 0.06 usr  0.03 sys +  1.43 cusr  0.18 csys =  1.70 CPU)
+Result: PASS
+Manifying 14 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/App/Cmd.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/App/Cmd/ArgProcessor.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/App/Cmd/Command.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/App/Cmd/Plugin.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/App/Cmd/Setup.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/App/Cmd/Simple.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/App/Cmd/Subdispatch.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/App/Cmd/Tester.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/App/Cmd/Tutorial.pod
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/App/Cmd/Command/commands.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/App/Cmd/Command/help.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/App/Cmd/Command/version.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/App/Cmd/Subdispatch/DashedStyle.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/App/Cmd/Tester/CaptureExternal.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/App::Cmd.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/App::Cmd::ArgProcessor.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/App::Cmd::Command.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/App::Cmd::Command::commands.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/App::Cmd::Command::help.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/App::Cmd::Command::version.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/App::Cmd::Plugin.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/App::Cmd::Setup.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/App::Cmd::Simple.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/App::Cmd::Subdispatch.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/App::Cmd::Subdispatch::DashedStyle.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/App::Cmd::Tester.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/App::Cmd::Tester::CaptureExternal.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/App::Cmd::Tutorial.0
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed App-Cmd-0.330 (upgraded from 0.328)
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/.meta/App-Cmd-0.330/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/.meta/App-Cmd-0.330/install.json
+Building and testing Dist-Zilla-5.044
+cp bin/dzil blib/script/dzil
+"/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/dzil
+Manifying 1 pod document
+Manifying 138 pod documents
+PERL_DL_NONLAZY=1 "/Volumes/amaretto/Users/ether/perl5/perlbrew/perls/22.0/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t t/commands/*.t t/diagnostics/*.t t/plugins/*.t
+t/commands/authordeps.t ......... ok
+# 
+# Versions for all modules listed in MYMETA.json (including optional ones):
+# 
+# === Configure Requires ===
+# 
+#     Module                  Want Have
+#     ----------------------- ---- ----
+#     ExtUtils::MakeMaker      any 7.10
+#     File::ShareDir::Install 0.06 0.10
+# 
+# === Configure Suggests ===
+# 
+#     Module      Want    Have
+#     -------- ------- -------
+#     JSON::PP 2.27300 2.27300
+# 
+# === Build Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker  any 7.10
+# 
+# === Test Requires ===
+# 
+#     Module                    Want     Have
+#     ------------------------ ----- --------
+#     CPAN::Meta::Check        0.011    0.011
+#     CPAN::Meta::Requirements 2.121    2.133
+#     ExtUtils::MakeMaker        any     7.10
+#     ExtUtils::Manifest        1.66     1.70
+#     File::Spec                 any  3.56_01
+#     Software::License::None    any 0.103010
+#     Test::FailWarnings         any    0.008
+#     Test::Fatal                any    0.014
+#     Test::File::ShareDir       any 1.001001
+#     Test::More                0.96 1.001014
+#     lib                        any     0.63
+#     utf8                       any     1.17
+# 
+# === Test Recommends ===
+# 
+#     Module         Want     Have
+#     ---------- -------- --------
+#     CPAN::Meta 2.120900 2.150005
+# 
+# === Runtime Requires ===
+# 
+#     Module                                         Want       Have
+#     ------------------------------------------ -------- ----------
+#     App::Cmd::Command::version                      any      0.330
+#     App::Cmd::Setup                               0.330      0.330
+#     App::Cmd::Tester                              0.306      0.330
+#     App::Cmd::Tester::CaptureExternal               any      0.330
+#     Archive::Tar                                    any       2.04
+#     CPAN::Meta::Converter                      2.101550   2.150005
+#     CPAN::Meta::Merge                               any   2.150005
+#     CPAN::Meta::Prereqs                        2.120630   2.150005
+#     CPAN::Meta::Requirements                      2.121      2.133
+#     CPAN::Meta::Validator                      2.101550   2.150005
+#     CPAN::Uploader                             0.103004   0.103009
+#     Carp                                            any       1.36
+#     Class::Load                                    0.17       0.23
+#     Config::INI::Reader                             any      0.025
+#     Config::MVP::Assembler                          any   2.200010
+#     Config::MVP::Assembler::WithBundles        2.200010   2.200010
+#     Config::MVP::Reader                        2.101540   2.200010
+#     Config::MVP::Reader::Findable::ByExtension      any   2.200010
+#     Config::MVP::Reader::Finder                     any   2.200010
+#     Config::MVP::Reader::INI                   2.101461   2.101463
+#     Config::MVP::Section                       2.200009   2.200010
+#     Data::Dumper                                    any      2.158
+#     Data::Section                              0.200002   0.200006
+#     DateTime                                       0.44       1.19
+#     Digest::MD5                                     any       2.54
+#     Encode                                          any       2.73
+#     ExtUtils::Manifest                             1.66       1.70
+#     File::Copy::Recursive                           any       0.38
+#     File::Find::Rule                                any       0.33
+#     File::HomeDir                                   any       1.00
+#     File::Path                                      any       2.09
+#     File::ShareDir                                  any      1.102
+#     File::ShareDir::Install                        0.03       0.10
+#     File::Spec                                      any    3.56_01
+#     File::Temp                                      any     0.2304
+#     File::pushd                                     any      1.009
+#     JSON::MaybeXS                                   any   1.003005
+#     List::Util                                     1.45       1.45
+#     Log::Dispatchouli                          1.102220      2.012
+#     Mixin::Linewise::Readers                      0.100      0.108
+#     Module::CoreList                                any 5.20150620
+#     Moose                                          0.92     2.1705
+#     Moose::Role                                     any     2.1705
+#     Moose::Util::TypeConstraints                    any     2.1705
+#     MooseX::LazyRequire                             any       0.11
+#     MooseX::Role::Parameterized                    1.01       1.08
+#     MooseX::SetOnce                                 any   0.200002
+#     MooseX::Types                                   any       0.46
+#     MooseX::Types::Moose                            any       0.46
+#     MooseX::Types::Path::Class                      any       0.06
+#     MooseX::Types::Perl                             any   0.101343
+#     PPI::Document                                   any      1.220
+#     Params::Util                                    any       1.07
+#     Path::Class                                    0.22       0.35
+#     Path::Tiny                                    0.052      0.072
+#     Perl::PrereqScanner                           1.016      1.023
+#     Perl::Version                                   any      1.013
+#     Pod::Eventual                              0.091480   0.094001
+#     Scalar::Util                                    any       1.45
+#     Software::License                          0.101370   0.103010
+#     Software::LicenseUtils                          any   0.103010
+#     String::Formatter                          0.100680   0.102084
+#     String::RewritePrefix                         0.006      0.007
+#     Sub::Exporter                                   any      0.987
+#     Sub::Exporter::ForMethods                       any   0.100052
+#     Sub::Exporter::Util                             any      0.987
+#     Term::Encoding                                  any       0.02
+#     Term::ReadKey                                   any       2.32
+#     Term::ReadLine                                  any       1.15
+#     Term::UI                                        any       0.46
+#     Test::Deep                                      any      0.117
+#     Text::Glob                                     0.08       0.09
+#     Text::Template                                  any       1.46
+#     Try::Tiny                                       any       0.22
+#     YAML::Tiny                                      any       1.67
+#     autodie                                         any       2.27
+#     namespace::autoclean                            any       0.26
+#     parent                                          any      0.234
+#     strict                                          any       1.09
+#     version                                         any     0.9912
+#     warnings                                        any       1.32
+# 
+# === Runtime Recommends ===
+# 
+#     Module                Want    Have
+#     --------------------- ---- -------
+#     Archive::Tar::Wrapper 0.15    0.23
+#     Term::ReadLine::Gnu    any missing
+# 
+# === Runtime Suggests ===
+# 
+#     Module  Want  Have
+#     ------- ---- -----
+#     PPI::XS  any 0.902
+# 
+t/00-report-prereqs.t ........... ok
+t/diagnostics/plugin-fail.t ..... ok
+t/diagnostics/main-module.t ..... ok
+t/empty-abstract.t .............. ok
+t/commands/listdeps.t ........... ok
+t/compile.t ..................... ok
+t/load_config.t ................. ok
+t/file.t ........................ ok
+t/file-addedby.t ................ ok
+t/plugins/autolicense.t ......... ok
+t/minter.t ...................... ok
+t/plugins/autoname.t ............ ok
+t/plugins/autoversion.t ......... ok
+t/plugins/autoprereqs.t ......... ok
+t/plugins/distmeta-merge.t ...... ok
+t/plugins/confirmrelease.t ...... ok
+t/plugins/encoding.t ............ ok
+t/plugins/extratests.t .......... ok
+t/plugins/distmeta.t ............ ok
+t/plugins/filter-b.t ............ ok
+t/plugins/ffbyname.t ............ ok
+t/plugins/filefinders.t ......... ok
+t/plugins/fakerelease.t ......... ok
+t/plugins/gatherdir.t ........... ok
+t/plugins/generatefile.t ........ ok
+t/plugins/makemaker.t ........... ok
+t/plugins/license.t ............. ok
+t/plugins/installdirs.t ......... ok
+t/plugins/manifest.t ............ ok
+t/plugins/metanoindex.t ......... ok
+t/plugins/metaresources.t ....... ok
+t/plugins/misctests.t ........... ok
+t/plugins/munger-that-prunes.t .. ok
+t/plugins/modulebuild.t ......... ok
+t/plugins/pkgdist.t ............. ok
+t/plugins/podsyntaxtests.t ...... ok
+t/plugins/nextrelease.t ......... ok
+t/plugins/podversion.t .......... ok
+t/plugins/pkgversion.t .......... ok
+t/plugins/prereqs.t ............. ok
+t/plugins/release_status.t ...... ok
+t/plugins/prunes.t .............. ok
+t/plugins/readme.t .............. ok
+t/tester-sort.t ................. ok
+t/util.t ........................ ok
+t/plugins/testrelease.t ......... ok
+t/plugins/uploadtocpan.t ........ ok
+t/tester-demo.t ................. ok
+t/tester.t ...................... ok
+t/zzz-check-breaks.t ............ ok
+All tests successful.
+Files=51, Tests=459, 10 wallclock secs ( 0.22 usr  0.08 sys + 45.62 cusr  3.31 csys = 49.23 CPU)
+Result: PASS
+Manifying 1 pod document
+Manifying 138 pod documents
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Prereqs.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Tester.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Tutorial.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Types.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Util.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Command.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Tester.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Command/add.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Command/authordeps.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Command/build.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Command/clean.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Command/install.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Command/listdeps.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Command/new.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Command/nop.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Command/release.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Command/run.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Command/setup.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Command/smoke.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Command/test.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/App/Command/version.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Chrome/Term.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Chrome/Test.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Dist/Builder.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Dist/Minter.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/File/FromCode.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/File/InMemory.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/File/OnDisk.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/MVP/Assembler.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/MVP/RootSection.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/MVP/Section.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/MVP/Assembler/GlobalConfig.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/MVP/Assembler/Zilla.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/MVP/Reader/Finder.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/MVP/Reader/Perl.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/MintingProfile/Default.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/AutoPrereq.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/AutoPrereqs.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/AutoVersion.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/BumpVersion.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/CPANFile.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/ConfirmRelease.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/DistINI.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/Encoding.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/ExecDir.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/ExtraTests.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/FakeRelease.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/FinderCode.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/GatherDir.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/GenerateFile.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/InlineFiles.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/License.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/MakeMaker.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/Manifest.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/ManifestSkip.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/MetaConfig.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/MetaJSON.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/MetaNoIndex.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/MetaResources.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/MetaTests.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/MetaYAML.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/ModuleBuild.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/ModuleShareDirs.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/NextRelease.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/PkgDist.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/PkgVersion.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/PodCoverageTests.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/PodSyntaxTests.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/PodVersion.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/Prereq.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/Prereqs.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/PruneCruft.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/PruneFiles.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/Readme.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/RemovePrereqs.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/ShareDir.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/TemplateModule.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/TestRelease.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/UploadToCPAN.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/FileFinder/ByName.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/FileFinder/Filter.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/GatherDir/Template.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Plugin/MakeMaker/Runner.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/PluginBundle/Basic.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/PluginBundle/Classic.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/PluginBundle/FakeClassic.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/PluginBundle/Filter.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/AfterBuild.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/AfterMint.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/AfterRelease.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/BeforeArchive.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/BeforeBuild.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/BeforeMint.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/BeforeRelease.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/BuildPL.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/BuildRunner.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/Chrome.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/ConfigDumper.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/EncodingProvider.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/ExecFiles.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/File.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/FileFinder.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/FileFinderUser.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/FileGatherer.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/FileInjector.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/FileMunger.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/FilePruner.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/InstallTool.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/LicenseProvider.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/MetaProvider.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/MintingProfile.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/ModuleMaker.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/MutableFile.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/NameProvider.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/PPI.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/Plugin.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/PluginBundle.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/PrereqSource.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/ReleaseStatusProvider.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/Releaser.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/ShareDir.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/Stash.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/StubBuild.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/TestRunner.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/TextTemplate.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/VersionProvider.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/MintingProfile/ShareDir.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/PluginBundle/Easy.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/Stash/Authors.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Role/Stash/Login.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Stash/Mint.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Stash/PAUSE.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Stash/Rights.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Stash/User.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Dist/Zilla/Util/AuthorDeps.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/Test/DZil.pm
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man1/dzil.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Command.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Command::add.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Command::authordeps.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Command::build.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Command::clean.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Command::install.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Command::listdeps.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Command::new.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Command::nop.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Command::release.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Command::run.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Command::setup.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Command::smoke.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Command::test.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Command::version.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::App::Tester.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Chrome::Term.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Chrome::Test.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Dist::Builder.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Dist::Minter.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::File::FromCode.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::File::InMemory.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::File::OnDisk.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::MVP::Assembler.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::MVP::Assembler::GlobalConfig.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::MVP::Assembler::Zilla.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::MVP::Reader::Finder.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::MVP::Reader::Perl.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::MVP::RootSection.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::MVP::Section.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::MintingProfile::Default.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::AutoPrereq.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::AutoPrereqs.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::AutoVersion.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::BumpVersion.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::CPANFile.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::ConfirmRelease.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::DistINI.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::Encoding.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::ExecDir.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::ExtraTests.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::FakeRelease.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::FileFinder::ByName.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::FileFinder::Filter.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::FinderCode.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::GatherDir.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::GatherDir::Template.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::GenerateFile.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::InlineFiles.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::License.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::MakeMaker.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::MakeMaker::Runner.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::Manifest.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::ManifestSkip.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::MetaConfig.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::MetaJSON.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::MetaNoIndex.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::MetaResources.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::MetaTests.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::MetaYAML.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::ModuleBuild.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::ModuleShareDirs.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::NextRelease.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::PkgDist.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::PkgVersion.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::PodCoverageTests.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::PodSyntaxTests.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::PodVersion.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::Prereq.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::Prereqs.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::PruneCruft.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::PruneFiles.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::Readme.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::RemovePrereqs.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::ShareDir.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::TemplateModule.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::TestRelease.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Plugin::UploadToCPAN.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::PluginBundle::Basic.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::PluginBundle::Classic.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::PluginBundle::FakeClassic.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::PluginBundle::Filter.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Prereqs.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::AfterBuild.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::AfterMint.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::AfterRelease.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::BeforeArchive.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::BeforeBuild.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::BeforeMint.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::BeforeRelease.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::BuildPL.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::BuildRunner.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::Chrome.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::ConfigDumper.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::EncodingProvider.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::ExecFiles.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::File.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::FileFinder.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::FileFinderUser.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::FileGatherer.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::FileInjector.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::FileMunger.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::FilePruner.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::InstallTool.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::LicenseProvider.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::MetaProvider.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::MintingProfile.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::MintingProfile::ShareDir.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::ModuleMaker.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::MutableFile.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::NameProvider.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::PPI.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::Plugin.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::PluginBundle.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::PluginBundle::Easy.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::PrereqSource.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::ReleaseStatusProvider.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::Releaser.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::ShareDir.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::Stash.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::Stash::Authors.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::Stash::Login.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::StubBuild.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::TestRunner.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::TextTemplate.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Role::VersionProvider.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Stash::Mint.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Stash::PAUSE.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Stash::Rights.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Stash::User.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Tester.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Tutorial.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Types.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Util.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Dist::Zilla::Util::AuthorDeps.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/man/man3/Test::DZil.0
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/bin/dzil
+Appending installation info to /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Dist-Zilla-5.044 (upgraded from 5.039)
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/.meta/Dist-Zilla-5.044/MYMETA.json
+Installing /Volumes/amaretto/Users/ether/.perlbrew/libs/22.0@std/lib/perl5/darwin-2level/.meta/Dist-Zilla-5.044/install.json
+5 distributions installed

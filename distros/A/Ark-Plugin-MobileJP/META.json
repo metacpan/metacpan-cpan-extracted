@@ -1,0 +1,88 @@
+{
+   "abstract" : "Ark plugins for japanese feature phones",
+   "author" : [
+      "Daisuke Murase <typester@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.9.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ark-Plugin-MobileJP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Ark" : "0",
+            "Encode::JP::Mobile" : "0",
+            "HTTP::MobileAgent" : "0",
+            "HTTP::MobileAgent::Plugin::Charset" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Ark::Plugin::Encoding::MobileJP" : {
+         "file" : "lib/Ark/Plugin/Encoding/MobileJP.pm"
+      },
+      "Ark::Plugin::MobileAgent" : {
+         "file" : "lib/Ark/Plugin/MobileAgent.pm"
+      },
+      "Ark::Plugin::MobileJP" : {
+         "file" : "lib/Ark/Plugin/MobileJP.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ark-framework/Ark-Plugin-MobileJP/issues"
+      },
+      "homepage" : "https://github.com/ark-framework/Ark-Plugin-MobileJP",
+      "repository" : {
+         "url" : "git://github.com/ark-framework/Ark-Plugin-MobileJP.git",
+         "web" : "https://github.com/ark-framework/Ark-Plugin-MobileJP"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Songmu <y.songmu@gmail.com>"
+   ]
+}

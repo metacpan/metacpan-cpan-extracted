@@ -1,0 +1,46 @@
+NAME
+    Apache2::AuthColloquy - mod_perl authentication against the Colloquy
+    users.lua file
+
+SYNOPSIS
+     AuthName "Talker Members Area"
+     AuthType Basic
+
+     # Full path to your users.lua file or users/ directory
+     PerlSetVar users_lua /home/system/colloquy/data
+
+     # Set if you want to allow an alternate method of authentication
+     PerlSetVar AllowAlternateAuth yes | no
+
+     require valid-user
+     PerlAuthenHandler Apache2::AuthColloquy
+
+DESCRIPTION
+    Apache2::AuthColloquy is an Apache 2 authentication module. It will
+    authenticate against a Colloquy users.lua user database file using the
+    newer password2 field.
+
+    This script munges the users.lua file in to executable perl code which
+    is then evaluated. It should therefore be used with caution if you
+    cannot gaurentee the integrity of the users.lua file. See Colloquy::Data
+    for more details.
+
+SEE ALSO
+    Colloquy::Data
+
+VERSION
+    $Id$
+
+AUTHOR
+    Nicola Worthington <nicolaw@cpan.org>
+
+    <http://perlgirl.org.uk>
+
+COPYRIGHT
+    Copyright 2005,2006 Nicola Worthington.
+
+    This software is licensed under The Apache Software License, Version
+    2.0.
+
+    <http://www.apache.org/licenses/LICENSE-2.0>
+

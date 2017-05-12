@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               App-CmdDirs
+version:            1.02
+abstract:           Perform a command in subdirectories
+author:
+    - Drew Stephens <drew@dinomite.net>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    App::FatPacker:      0.009006
+    Perl::Critic:        1.113
+    Test::Class:         0.36
+    Test::Perl::Critic:  1.02
+requires:  {}
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

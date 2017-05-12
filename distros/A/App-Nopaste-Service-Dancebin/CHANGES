@@ -1,0 +1,101 @@
+==================================================
+Changes from 2011-08-28 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2012-08-27 21:07:57 +0000
+------------------------------------------
+
+  Change: 73bf7349565252651fcbe2825b76c09dc0eed0b6
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-08-27 14:06:47 +0000
+
+    Merge pull request #1 from throughnothing/credentials
+
+    Allow use of BasicAuth credentials. 
+
+  Change: 5a4f035cfe788d024014edfe98104e42b06d8fa9
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-08-27 14:04:49 +0000
+
+    Allow use of BasicAuth credentials. 
+
+------------------------------------------
+version 0.003 at 2012-05-17 23:08:07 +0000
+------------------------------------------
+
+  Change: 93f5a7248c5acdffb40d803c59fd6f461ead7b45
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-05-17 16:08:07 +0000
+
+    v0.003 
+
+  Change: 1bec6a66c34db144cffd3d6e8b80f5f89de57434
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-05-17 16:06:12 +0000
+
+    Add Lang support 
+
+------------------------------------------
+version 0.002 at 2012-05-08 20:50:59 +0000
+------------------------------------------
+
+  Change: e0528fc86d8093f78329a21a7beb3e49044bc206
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-05-08 16:50:59 +0000
+
+    v0.002 
+
+  Change: f8447253ddb3b507d73faa6035df57e16b00d785
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-05-08 16:50:18 +0000
+
+    update .gitignore 
+
+  Change: f75d3f4fd432c621dab9bff4f25d43efa31ed8c4
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-05-08 16:49:58 +0000
+
+    Add Ability to set Expiration on posts. 
+
+------------------------------------------
+version 0.001 at 2012-05-05 05:50:53 +0000
+------------------------------------------
+
+  Change: 8205626a8f39575b474e4e07db114fb22dfa0430
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-05-05 01:50:53 +0000
+
+    v0.001 
+
+  Change: 27719c53ad969eb4aa2d777019c3fa65c36b3276
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-05-05 01:50:09 +0000
+
+    updates 
+
+  Change: 2876739105260e713ba1a8986c5b5743b3a252b3
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-05-05 01:44:48 +0000
+
+    fix url 
+
+  Change: d29e9b32171cc28780784b621e19f9aed9c8244c
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-05-04 23:58:26 +0000
+
+    initial commit 
+
+------------------------------------------
+version 0.000 at 2012-05-05 01:13:54 +0000
+------------------------------------------
+
+  Change: f668a23a861a7c4f847d01cba6f8c5abac4e394f
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-05-04 21:13:54 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

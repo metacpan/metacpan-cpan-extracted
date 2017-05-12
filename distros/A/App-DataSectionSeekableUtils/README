@@ -1,0 +1,11 @@
+DESCRIPTION
+
+    This distribution provides the following command-line utilities related
+    to Data::Section::Seekable:
+
+    #INSERT_EXECS_LIST
+
+SEE ALSO
+
+    Data::Section::Seekable
+

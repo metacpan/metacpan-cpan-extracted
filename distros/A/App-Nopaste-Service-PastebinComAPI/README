@@ -1,0 +1,106 @@
+NAME
+    App::Nopaste::Service::PastebinComAPI - App::Nopaste service for
+    www.pastebin.com using their API
+
+CONFIGURATION
+    To use this App::Nopaste service, you need to setup two environmental
+    variables: APP_NOPASTE_PASTEBINCOM_API_KEY and
+    APP_NOPASTE_PASTEBINCOM_USER_KEY
+
+  "APP_NOPASTE_PASTEBINCOM_API_KEY"
+    The "APP_NOPASTE_PASTEBINCOM_API_KEY" environmental variable needs to
+    contain your pastebin.com API key. To obtain the key, create a free
+    pastebin.com account, and then go on <http://pastebin.com/api> and the
+    key will be shown in the 'Your Unique Developer API Key' section.
+
+  "APP_NOPASTE_PASTEBINCOM_USER_KEY"
+    The "APP_NOPASTE_PASTEBINCOM_USER_KEY" environmental variable needs to
+    contain your pastebin.com USER key. You can obtain a user key by running
+    this piece of code, changing "YOUR_API_KEY_HERE" to your pastebin.com
+    API key, "YOUR_PASTEBIN_LOGIN_HERE" to your pastebin.com login, and
+    "YOUR_PASTEBIN_PASSWORD_HERE" to your pastebin.com password:
+
+        perl -MWWW::Pastebin::PastebinCom::API -wle "print WWW::Pastebin::PastebinCom::API->new( api_key =>  q|YOUR_API_KEY_HERE|)->get_user_key(qw/YOUR_PASTEBIN_LOGIN_HERE  YOUR_PASTEBIN_PASSWORD_HERE/);"
+
+    Note: pastebin.com/api has this to say about the user key: "if an
+    invalid api_user_key or no key is used, the paste will be created as a
+    guest".
+
+SEE ALSO
+    WWW::Pastebin::PastebinCom::API, App::Nopaste,
+    App::Nopaste::Service::PastebinCom
+
+AUTHOR
+    Zoffix Znet, "<zoffix at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-app-nopaste-service-pastebincomapi at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Nopaste-Service-Past
+    ebinComAPI>. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc App::Nopaste::Service::PastebinComAPI
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Nopaste-Service-Pasteb
+        inComAPI>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/App-Nopaste-Service-PastebinComAPI>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/App-Nopaste-Service-PastebinComAPI>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/App-Nopaste-Service-PastebinComAPI/>
+
+LICENSE AND COPYRIGHT
+    Copyright 2014 Zoffix Znet.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a copy
+    of the full license at:
+
+    <http://www.perlfoundation.org/artistic_license_2_0>
+
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
+
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
+
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
+
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by the
+    Package. If you institute patent litigation (including a cross-claim or
+    counterclaim) against any party alleging that the Package constitutes
+    direct or contributory patent infringement, then this Artistic License
+    to you shall terminate on the date that such litigation is filed.
+
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

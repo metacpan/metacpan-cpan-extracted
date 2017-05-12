@@ -1,0 +1,136 @@
+#!/opt/perl/bin/perl
+use strict;
+use utf8;
+use AnyEvent;
+use AnyEvent::XMPP::Client;
+use AnyEvent::XMPP::Ext::Disco;
+use AnyEvent::XMPP::Ext::DataForm;
+use Storable;
+use XML::DOM::XPath;
+
+our $J = AnyEvent->condvar;
+our $datafile = "conferences.stor";
+our $data = {};
+
+# locking mechanism for requests
+our %req;
+our $id = 0;
+sub addreq { my $k = $id . "_" . $_[0]; $req{$k} = 1; $id++; $k }
+sub finreq { delete $req{$_[0]}; my @k = keys %req; $J->broadcast if @k == 0 }
+
+# timer for status output
+our $t;
+sub mktimer {
+   $t = AnyEvent->timer (after => 1, cb => sub {
+      my @keys = keys %req;
+      my @ok = grep { $_ !~ /_timer_/ } @keys;
+      my $timers = scalar (grep { $_ =~ /_timer_/ } @keys);
+      print "\t*** pending requests $timers timers, and : " . join (',', @ok) . "\n";
+      mktimer ();
+   });
+}
+mktimer;
+
+# server data cache
+eval { $data = retrieve $datafile };
+print "finished data: " . join (',', keys %$data) . "\n";
+sub sync_data { store $data, $datafile }
+
+# MAIN START
+my @servers = map { s/^\s*(\S+)\s*$/\1/; $_ } <STDIN>;
+my $cl = AnyEvent::XMPP::Client->new ();
+my $d  = AnyEvent::XMPP::Ext::Disco->new;
+$cl->add_extension ($d);
+$cl->add_account ('net_xmpp2@jabber.org/test', 'test');
+
+sub disco_info {
+   my ($con, $jid, $cb) = @_;
+
+   my $ID = addreq ("di_$jid");
+   $d->request_info ($con, $jid, undef, sub {
+      my ($d, $i, $e) = @_;
+      if ($e) {
+         print "error on disco info on $jid: " . $e->string . "\n";
+      } else {
+         $cb->($i);
+      }
+      finreq ($ID)
+   });
+}
+
+sub disco_items {
+   my ($con, $jid, $cb) = @_;
+
+   my $ID = addreq ("dit_$jid");
+   $d->request_items ($con, $jid, undef, sub {
+      my ($d, $i, $e) = @_;
+      if ($e) {
+         print "error on disco items on $jid: " . $e->string . "\n";
+      } else {
+         $cb->($i);
+      }
+      finreq ($ID)
+   });
+}
+
+my %req_timers;
+
+$cl->reg_cb (
+   error => sub {
+      my ($cl, $acc, $err) = @_;
+      print "ERROR: " . $err->string . "\n";
+   },
+   iq_result_cb_exception => sub {
+      my ($cl, $acc, $ex) = @_;
+      print "EXCEPTION: $ex\n";
+   },
+   session_ready => sub {
+      my ($cl, $acc) = @_;
+      print "session ready, requesting items for $ARGV[0]\n";
+      my $c = $acc->connection ();
+      $c->set_default_iq_timeout (30);
+
+      my $timer_step = 0.1;
+      my $timer_cnt = 0;
+
+      for my $SERVER (@servers) {
+         next if $data->{$SERVER};
+         my $t = $timer_cnt;
+
+         my $ID = addreq ("timer_$t");
+         $req_timers{$t} = AnyEvent->timer (after => $t,
+            cb => sub {
+               disco_items ($c, $SERVER, sub {
+                  my ($i) = @_;
+                  print "got items for $SERVER\n";
+                  for my $it ($i->items) {
+                     disco_info ($c, $it->{jid}, sub {
+                        my ($i) = @_;
+                        my @f = grep { $_ =~ /^muc/ } keys %{$i->features || {}};
+                        my @c = grep { $_->{category} eq 'conference' && $_->{type} eq 'text' } $i->identities ();
+                        if (@c && !@f) {
+                           $data->{$SERVER}->{$i->jid} = 1;
+                           print "\t*** found conference " . $i->jid . "\n";
+                           sync_data ();
+                        }
+                     });
+                  }
+               });
+               delete $req_timers{$t};
+               finreq ($ID);
+            }
+         );
+
+         $timer_cnt += $timer_step;
+      }
+      $cl->unreg_me;
+   },
+   message => sub {
+      my ($cl, $acc, $msg) = @_;
+      print "message from: " . $msg->from . ": " . $msg->any_body . "\n";
+   }
+);
+
+$cl->start;
+
+$J->wait

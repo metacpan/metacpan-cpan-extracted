@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: Apache-Compress
+version: 1.005
+author:
+  - Ken Williams, KWILLIAMS@cpan.org
+abstract: Auto-compress web files with Gzip
+license: perl
+requires:
+  Apache: 1.00
+  Compress::Zlib: 1.08
+build_requires:
+  File::Spec: 0
+  Module::Build: 0.21
+  Test: 0
+provides:
+  Apache::Compress:
+    file: Compress.pm
+    version: 1.005
+generated_by: Module::Build version 0.26

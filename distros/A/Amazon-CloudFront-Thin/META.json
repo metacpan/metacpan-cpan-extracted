@@ -1,0 +1,57 @@
+{
+   "abstract" : "A thin, lightweight, low-level Amazon CloudFront client",
+   "author" : [
+      "Breno G. de Oliveira <garu@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amazon-CloudFront-Thin",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Digest::SHA" : "0",
+            "HTTP::Message" : "0",
+            "LWP::Protocol::https" : "0",
+            "Test::More" : "0.88",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/garu/Amazon-CloudFront-Thin/issues/"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/garu/Amazon-CloudFront-Thin"
+      }
+   },
+   "version" : "0.04"
+}

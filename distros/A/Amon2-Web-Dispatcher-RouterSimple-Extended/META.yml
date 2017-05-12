@@ -1,0 +1,24 @@
+---
+abstract: 'extending Amon2::Web::Dispatcher::RouterSimple'
+author:
+  - 'Taiyoh Tanaka <sun.basix@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Amon2-Web-Dispatcher-RouterSimple-Extended
+no_index:
+  directory:
+    - inc
+provides:
+  Amon2::Web::Dispatcher::RouterSimple::Extended:
+    file: lib/Amon2/Web/Dispatcher/RouterSimple/Extended.pm
+    version: 0.05
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

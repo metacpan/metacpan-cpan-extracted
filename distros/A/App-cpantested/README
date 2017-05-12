@@ -1,0 +1,47 @@
+NAME
+
+    App::cpantested - delegate testing to the cloud
+
+VERSION
+
+    version 0.003
+
+SYNOPSIS
+
+        cpan-outdated | cpan-tested | cpanm -n
+
+DESCRIPTION
+
+    Pre-filter the output from the cpan-outdated utility, joining it with
+    the results from the CPAN Testers Reports <http://cpantesters.org/>.
+
+    By default, considers "installable" a distribution that has any test
+    that:
+
+      * Has a PASS grade;
+
+      * Has the same Perl version as the target system;
+
+      * Has the same OS name as the target system.
+
+SEE ALSO
+
+      * App::cpanoutdated
+
+      * App::cpanminus
+
+      * App::cpantimes
+
+      * CPAN Testers Reports <http://cpantesters.org/>
+
+AUTHOR
+
+    Stanislaw Pusep <stas@sysd.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Stanislaw Pusep.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

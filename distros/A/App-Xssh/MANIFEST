@@ -1,0 +1,22 @@
+bin/xssh
+Build.PL
+Makefile.PL
+Changes
+lib/App/Xssh.pm
+lib/App/Xssh/Config.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-compile-scripts.t
+t/00-compile.t
+t/10-app-xssh-config.t
+t/20-app-xssh.t
+t/21-app-xssh--multiple-profiles.t
+t/25-app-xssh--upgrade.t
+t/26-app-xssh--hostmatch.t
+t/30-bin-xssh.t
+t/99-pod.t
+t/99-podcoverage.t
+t/99-version.t
+META.json

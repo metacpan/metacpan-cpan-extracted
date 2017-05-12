@@ -1,0 +1,24 @@
+Release history for Algorithm::Diff::HTMLTable
+==============================================
+
+0.04  2015-07-30
+
+      [IMPROVEMENTS]
+      * Make the tests work under Windows
+
+0.03  2015-07-29
+
+      [BUGFIX]
+      * use HTML::Entities to escape some html entities in the compared content
+        A diff should show the plain content, not the "interpreted" HTML ;-)
+
+0.02  2015-07-28
+
+      [IMPROVEMENTS]
+      * Now Arrayrefs (instead of filenames) can be passed to the `diff` method
+      * Titles can be set
+
+0.01  2015-07-28
+
+      * initial release
+

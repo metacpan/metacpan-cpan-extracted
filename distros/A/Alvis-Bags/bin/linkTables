@@ -1,0 +1,435 @@
+#!/usr/bin/perl -w
+
+use strict;
+use POSIX;
+use HTML::Entities;
+use Alvis::URLs;
+use Getopt::Long;
+use Pod::Usage;
+
+
+# encoding pragmas follow any includes like "use"
+use encoding 'utf8';
+use open ':utf8';
+binmode STDIN, ":utf8";
+binmode STDERR, ":utf8";
+
+#  ensure sort handles UTF8 order
+my $SORTCODE = "LC_ALL=en_US.UTF-8; export LC_ALL;" ;
+
+my $MINCOUNT = 1;
+my $linktext = 0;
+my $titletext = 0;
+my $stopfile = "";
+my $fixdocs = 0;    # set this to fix everything but .docs 
+my %stops = ();
+
+
+#  check options
+
+GetOptions(
+     'man'       => sub {pod2usage(-exitstatus => 0, -verbose => 2)},
+      'stopfile=s' => \$stopfile,
+      'mincount=i' => \$MINCOUNT,
+      'docs' => \$fixdocs,
+      'linktext' => \$linktext,
+      'titletext' => \$titletext,
+      'noclean' => \$Alvis::URLs::noclean,
+      'nocase' => \$Alvis::URLs::nocase,
+      'h|help'       => sub {pod2usage(1)}
+);
+
+pod2usage(-message => "ERROR: need input file and stem")
+      if ( $#ARGV != 1 );
+
+my $file = shift();
+my $stem = shift();
+
+my $doccount = 0;
+my $featcount = 0;
+#  maps a cleaned URL's hash to a docID 
+my %docmap = ();
+#  maps a docID to a sequence number
+my %docid = ();
+#  token value plus count
+my %token = ();
+my %tokencnt = ();
+
+if ( $stopfile ) {
+  open(S,"<$stopfile");
+  while ( ($_=<S>) ) {
+    chomp();
+    $stops{lc($_)} = 1;
+  }
+  close(S);
+}
+
+sub tabletext() {
+  my $tw = $_[0];
+  #  strip punctuation
+  $tw =~ s/[!-\/:-@\{\}\|~\[-_\`]+/ /g;
+  #  break at spaces
+  $tw =~ s/\s+/ /g; 
+  $tw =~ s/^\s//; 
+  $tw =~ s/\s$//; 
+  foreach my $k ( split(/ /,$tw) ) {
+    #  lower case by default
+    $k = lc($k);
+    if ( ! defined($stops{$k}) ) {
+      &table("text",$k);
+    }
+  }
+}
+
+#  ensure to make "link" entries dominate, they should never be
+#  dropped in favor of non-link entries
+sub table() {
+  my $tp = $_[0];
+  my $text = $_[1];
+  my $code = "$tp $text";
+  # print STDERR "Table $code\n";
+  my $h = &Alvis::URLs::easyhash64char($code);
+  if ( defined($token{$h}) ) {
+    if ( $token{$h} ne $code ) {
+      if ( defined($docmap{$h}) ) {
+	#  documents always override
+	if ( $tp eq "link" ) {
+	  print STDERR "Dropping token '$token{$h}' with hash $h due to clash\n";
+	  $token{$h} = $code;
+	} else {
+	  print STDERR "Dropping token '$code' with hash $h due to clash\n";
+	}
+      } else {
+	print STDERR "Dropping token '$code' with hash $h due to clash\n";
+      }
+    } else {
+      $tokencnt{$h}++;
+    }
+  } else {
+    if ( $tp eq "link" || ! defined($docmap{$h}) ) {
+      $token{$h} = $code;
+      $tokencnt{$h}++;
+    }
+  }
+}
+
+if ( $fixdocs ) {
+  #  we just update the docs file
+  #
+  my $line = 0;
+  if ( -f "$stem.docs" ) {
+    #  read last line to get last document number
+    open(ND,"tail -1 $stem.docs |") or die "Cannot read $stem.docs: $!\n";
+    $_ = <ND>;
+    close(ND);
+    if ( /^([0-9]+) / ) {
+      $line = int($1) + 1;
+    } else {
+      print STDERR "Cannot read document index from $stem.docs\n";
+      exit(1);
+    }
+    #  now start from here, update .docs
+    open(DOCS,">>$stem.docs");
+    open(I,"<$file") or die "Cannot open input linkdata file $file: $!";
+    while (($_=<I>) ) {
+      chomp();
+      if ( /^D ([^ ]*) ([^ ]*) (.*)$/ ) {
+	my $inu = &Alvis::URLs::StandardURL($1);
+	my $id = uc($2);
+	my $titles = $3;
+	my $hash = &Alvis::URLs::easyhash64char("link " .$inu);
+	print DOCS "$line $inu $id $hash $titles\n";
+	$line ++;
+	for ( $_=<I>,chomp(); $_ && $_ ne "EOD";
+	      $_=<I>,chomp() ) {
+	  #  skip to end of record
+	}
+      }
+    }
+    close(I);
+    close(DOCS);
+    #  update .srcpar
+    open(SRCPAR,"<$stem.srcpar");
+    my $sp = "";
+    while ( ($_=<SRCPAR>) ) {
+      $sp .= $_;
+    }
+    close(SRCPAR);
+    $sp =~ s/\nmaxdoc=.*/\nmaxdoc=$line/;
+    open(SRCPAR,">$stem.srcpar");
+    print SRCPAR $sp;
+    close(SRCPAR);
+    exit(0);
+  } else {
+    print STDERR "Cannot open $stem.docs\n";
+    exit(1);
+  }
+}
+
+#  one pass fills tables
+open(DOCS,">$stem.docs");
+open(I,"<$file") or die "Cannot open input linkdata file $file: $!";
+my $line = 0;
+while (($_=<I>) ) {
+  chomp();
+  if ( /^D ([^ ]*) ([^ ]*) (.*)$/ ) {
+    my $inu = &Alvis::URLs::StandardURL($1);
+    my $id = uc($2);
+    my $titles = $3;
+    my $hash = &Alvis::URLs::easyhash64char("link " .$inu);
+    # print STDERR "DOCS > $line $hash $inu $id $titles\n";
+    print DOCS "$line $inu $id $hash $titles\n";
+    #   notice we overwrite any previous docID
+    $docid{$id} = $line;
+    if ( defined($docmap{$hash}) ) {
+      $docmap{$hash} .= " $id";
+    } else {
+      $docmap{$hash} = $id;
+    }
+    $line ++;	  
+    if ( $titletext ) {
+      &tabletext($titles);
+    }
+    #   now process links
+    for ( $_=<I>,chomp(); $_ && $_ ne "EOD" && $_ ne "EOL";
+	  $_=<I>,chomp() ) {
+      my $link = $_;
+      $link =~ s/ .*//;
+      # print STDERR "LINK: $link $_\n";
+      $link = &Alvis::URLs::StandardURL($link);
+      &table("link",$link);
+      if ( $linktext && /^([^ ]+) (.*)$/ ) {
+	&tabletext($2);
+      }
+    }
+    if ( $_ eq "EOL" ) {
+      #   now process tokens
+      for ( $_=<I>,chomp(); $_ && $_ ne "EOD";
+	    $_=<I>,chomp() ) {
+	if ( /^([^ ]+) (.*)$/ ) {
+	  if ( $1 eq "text" ) {
+	    &tabletext($2);
+	  } else {
+	    &table($1,$2);
+	  }
+	}
+      }
+    }
+  } elsif ( /^D / ) {
+    print STDERR "Unmatched document entry: (($_))\n";
+  }
+}
+close(I);
+close(DOCS);
+print STDERR "Processed $line documents\n";
+$doccount = $line;
+
+# we have insured that any hash that belongs to a document
+# is reserved for links
+open(TMP,">$stem.tokens.tmp");
+foreach my $t ( keys(%token) ) {
+  if ( $docmap{$t} ) {
+    $token{$t} =~ /^([^ ]+) (.*)/;
+    if ( $1 ne "link" ) {
+      print STDERR "Dropped token $t '$token{$t}', should be 'link'\n";
+    } else {
+      print TMP "doc $t $tokencnt{$t} $2\n";
+    }
+  } elsif ( $tokencnt{$t}>= $MINCOUNT ) {
+    $token{$t} =~ /^([^ ]+) (.*)/;
+    print TMP "$1 $t $tokencnt{$t} $2\n";
+  }
+}
+close(TMP);
+
+#  discard unused tables
+%token = ();
+%tokencnt = ();
+
+# now sort by type, docs first, and add line number
+# also print doc mappings, i.e., feature to original document
+
+my @typecnt = ();
+my @typename = ();
+my $types = 0;
+
+open(TMP,"$SORTCODE ( grep '^doc ' $stem.tokens.tmp | sort ) |");
+open(TOKENS,">$stem.tokens");
+open(TOKENMAP,">$stem.words");
+open(DOCMAP,">$stem.docfeats");
+$line = 0;
+while ( ($_=<TMP>) ) {
+  chomp();
+  my $tok = $_;
+  $tok =~ s/^([^ ]+) ([^ ]+) ([^ ]+) //;
+  print TOKENS "$tok\n";
+  print TOKENMAP "$line $_\n";
+  $_ =~ /^doc ([^ ]+) /;
+  my $h = $1;
+  foreach my $id ( split(/ /,$docmap{$h}) ) {
+    if ( !defined($docid{$id}) ) {
+      print STDERR "Lost doc sequence number for docID $id\n";
+    }
+    print DOCMAP "$line $docid{$id}\n";
+  }
+  $line++;
+}
+if ( $line>0 ) {
+  #  keep track of type details
+  $typename[0] = "doc";
+  $typecnt[0] = $line;
+  $types++;
+}
+close(TMP);
+open(TMP,"$SORTCODE ( grep -v '^doc ' $stem.tokens.tmp | sort ) |");
+my $type = "";
+my $type_start = $line;
+while ( ($_=<TMP>) ) {
+  chomp();
+  my $tok = $_;
+  $tok =~ s/^([^ ]+) ([^ ]+) ([^ ]+) //;
+  print TOKENS "$tok\n";
+  print TOKENMAP "$line $_\n";
+  my $ntype = $_;
+  $ntype =~ s/ .*//;
+  if ( $ntype ne $type ) {
+    if ( $type ) {
+      $typename[$types] = $type;
+      $typecnt[$types] = $line - $type_start;
+      $type_start = $line;
+      $types ++;
+    }
+    $type = $ntype;
+  }
+  $line++;
+}
+$typename[$types] = $type;
+$typecnt[$types] = $line - $type_start;
+$type_start = $line;
+$types ++;
+close(TOKENS);
+close(TOKENMAP);
+close(DOCMAP);
+unlink("$stem.tokens.tmp");
+$featcount = $line;
+
+#  now create some dimensions in .srcpar
+open(SRCPAR,">$stem.srcpar");
+print SRCPAR "datastem=\"$stem\"\n";
+print SRCPAR "linkstem=\"$stem\"\n";
+print SRCPAR "maxdoc=$doccount\n";
+print SRCPAR "maxfeat=$featcount\n";
+print SRCPAR "maxcomp=1\n";
+print SRCPAR "dims.n_dims=$types\n";
+print SRCPAR "dims.tot=$featcount\n";
+print SRCPAR "dims.names=" . join(",",@typename) . "\n";
+print SRCPAR "dims.dims=" . join(",",@typecnt) . "\n";
+close(SRCPAR);
+
+exit 0;
+
+__END__
+
+=head1 NAME
+    
+linkTables - input file of links and tokens for document set, 
+and generated token and document tables.
+
+=head1 SYNOPSIS
+    
+linkTables [--docs|--linktext|--nocase|--noclean|--titletext] 
+           [--mincount N] [--stopfile FILE] LINK-FILE STEM
+
+Options:
+
+    LINK-FILE           Filename for input link file usually created by XSL
+    STEM                Stem for output file, several extensions read and made
+    --docs              only update the .docs file, all else remains fixed
+    --linktext          add link text, delimit by spaces, to text type
+    --mincount M        only add tokens with this many
+    --nocase            ignore case of URLs
+    --noclean           don't use built-in URL cleaning
+    --stopfile F        do not enter these words in text tables
+    --titletext         add title text, delimit by spaces, to text type
+    -h, --help          display help message and exit.
+     --man              print man page and exit.
+
+=head1 DESCRIPTION
+
+Input file of links, link text and redirects in the data format described
+next.  Use file name '-' to input stdin.  Builds the 
+tables used in bag processing: 
+   STEM.tokens        N-th line is the token for items with index (N-1). 
+   STEM.words         A map for the token file includes token, its type and the hash code.      
+   STEM.docs          N-th line is the details for the N-th document
+   STEM.docfeats      mapping of token index to document index
+
+The token to document index in .docfeats is implied after standardising OUTGOING-URLs 
+for a document and the document URls themselves
+
+=head1 DATA FORMAT
+
+Input lines can have the R form for redirects:
+     R <URL> <URL-REDIRECTED-TO>
+
+These entries are ignored by this script, and should be first 
+eliminated with 
+I<linkRedir>(1).  The main input is the
+D form for documents and their links and link text
+        D <URL> <HASHID> <TITLE>
+        <OUTGOING-URL> <LINK-TEXT>
+        ...
+        EOL
+        <TYPE> <TOKEN>
+        ...
+        EOD
+
+The text "EOD" acts as a
+document terminator and can be missing if no tokens exist.
+The text "EOL" is a link terminator.  The <URL>s and <HASHID>s must not have
+spaces or the processing will get confused since R and D records are
+split on spaces.   Note text at the end of the line is an exception.
+<HASHID> is any externally defined record identifier.  ALVIS default
+is a 32 character hexadecimal from an MD5 hash of the text.
+
+<TYPE> is intended to be a short bit of alphabetic text describing the
+type such as 'person', 'company', etc.
+Reserved <TYPE>s are 'doc', link to a document in the collection,
+'link' which is a link out of the collection, and 'text' which
+is any text.
+
+=head1 SEE ALSO
+
+I<Alvis::URLs>(3), 
+I<linkBags>(1), 
+I<linkMpca>(1), 
+I<linkRedir>(1), 
+I<mpdata>(1).
+
+MPCA website is 
+F<http://www.componentanalysis.org>
+
+=head1 AUTHOR
+
+Wray Buntine
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2006 Wray Buntine
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+=cut

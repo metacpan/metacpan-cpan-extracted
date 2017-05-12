@@ -1,0 +1,16 @@
+
+############################################################################## 
+Audio::Audiere:
+
+* add more gracefull error handling with better error messages
+* Audio/Audiere/Stream is a (needless?) hash ref and mirrors all functions
+  from the XS code. I am sure this can be simplified and put entirely into
+  XS, making the Perl code needless.
+* let psp use command line options (and add keyboard control to set volume,
+  pan, pitch etc?)
+* 3D sound is not yet finished
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

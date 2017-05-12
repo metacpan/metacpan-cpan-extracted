@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               AnyEvent-Postfix-Logs
+version:            0.01
+abstract:           Event based parsin of Postfix log files
+author:
+    - Peter Makholm <peter@makholm.net>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::More:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

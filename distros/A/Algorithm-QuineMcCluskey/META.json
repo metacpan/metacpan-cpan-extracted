@@ -1,0 +1,70 @@
+{
+   "abstract" : "Solve sets of Boolean terms with the Quine-McCluskey algorithm",
+   "author" : [
+      "Darren Kulp <darren@kulp.ch>",
+      "John M. Gamble <jgamble@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4218",
+   "keywords" : [
+      "boolean",
+      "boolean-algebra",
+      "quine-mccluskey"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Algorithm-QuineMcCluskey",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "List::Compare::Functional" : "0.53",
+            "List::MoreUtils" : "0.401",
+            "Moose" : "2.16",
+            "Tie::Cycle" : "1.19",
+            "namespace::autoclean" : "0.16",
+            "perl" : "v5.10.1"
+         }
+      }
+   },
+   "provides" : {
+      "Algorithm::QuineMcCluskey" : {
+         "file" : "lib/Algorithm/QuineMcCluskey.pm",
+         "version" : "0.16"
+      },
+      "Algorithm::QuineMcCluskey::Format" : {
+         "file" : "lib/Algorithm/QuineMcCluskey/Format.pm",
+         "version" : "0.16"
+      },
+      "Algorithm::QuineMcCluskey::Util" : {
+         "file" : "lib/Algorithm/QuineMcCluskey/Util.pm",
+         "version" : "0.16"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/jgamble/Algorithm-QuineMcCluskey"
+      }
+   },
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

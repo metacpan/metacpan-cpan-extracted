@@ -1,0 +1,3 @@
+%% bad_line 'this line has a 
+line break in it'
+http://perl.org /<bad_line>/ N Demo the linebreak message

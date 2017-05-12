@@ -1,0 +1,13 @@
+bin/twimap
+Build.PL
+CHANGES
+lib/App/Twimap.pm
+lib/App/Twimap/Tweet.pm
+MANIFEST			This list of files
+t/email.t
+twimap.conf
+README
+LICENSE
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

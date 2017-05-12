@@ -1,0 +1,42 @@
+Apache-No404Proxy-Mogile
+
+Apache::No404Proxy::Mogile is one of the implementations of
+Apache::No404Proxy. This module uses MogileFS and LWP::UserAgent to fetch
+content from mogile.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Apache::No404Proxy::Mogile
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Apache-No404Proxy-Mogile
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Apache-No404Proxy-Mogile
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Apache-No404Proxy-Mogile
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Apache-No404Proxy-Mogile
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Nick Gerakines
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

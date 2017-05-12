@@ -1,0 +1,1 @@
+before <?= $self->render('include_target', 'foo', 'bar'); ?> after

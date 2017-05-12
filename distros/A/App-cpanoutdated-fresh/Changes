@@ -1,0 +1,54 @@
+Release history for App-cpanoutdated-fresh
+
+0.001006 2017-03-09T06:03:03Z 2e29975
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+ - Bugfix: Make compatible with ES5
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001005, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +15 ↑4 -3 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 -2 (recommends: +1)
+ - test: +1 (recommends: ↑1 ↓1)
+
+0.001005 2014-09-19T07:03:13Z
+ [Bugfix]
+ - Handle fields being undef in string concat.
+
+0.001004 2014-09-15T10:46:44Z
+ [Bugfix]
+ - Handle module->version being undef
+
+0.001003 2014-09-15T02:48:14Z
+ [Bugfix]
+ - Be less overzealous about avoiding IO and catch upgrades where not all dists have version changes.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001002, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - test: (recommends: ↑1)
+
+0.001002 2014-08-30T10:32:13Z
+ [Bugfix]
+ - Fix parsing timestamps to work as described.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - test: +3 ↑1
+
+ [Tests]
+ - 50% coverage improvement.
+
+0.001001 2014-08-30T00:39:10Z
+ [00 Trivial]
+ - metadata
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - develop: +1 ↑2 (suggests: ↑2)
+
+ [Metadata]
+ - Fix author
+
+0.001000 2014-08-13T01:49:59Z
+ - First version.

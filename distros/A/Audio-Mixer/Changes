@@ -1,0 +1,17 @@
+Revision history for Perl extension Mixer.
+
+0.01  Wed Mar 14 18:32:54 2001
+	- original version; created by h2xs 1.19
+
+0.4   Mon Apr 29 20:46:35 2002
+	- bug  with close_mixer() is fixed.
+
+0.5   Sat Jan 11 09:35:00 EST 2003
+        - added set_mixer_dev() function to set a different
+          device name than /dev/mixer
+
+0.6   Fri Jan 17 13:34:09 EST 2003
+	- some cleanup
+
+0.7   Wed Mar 12 13:56:16 SAST 2003
+	- added record source control - Mike Yudaken

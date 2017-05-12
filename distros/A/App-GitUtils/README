@@ -1,0 +1,17 @@
+SYNOPSIS
+
+    This distribution provides the following command-line utilities:
+
+    #INSERT_EXECS_LIST
+
+    These utilities provide some shortcuts and tab completion to make it
+    more convenient when working with git con the command-line.
+
+FAQ
+
+    #INSERT_BLOCK: App::PMUtils faq
+
+SEE ALSO
+
+    #INSERT_BLOCK: App::PMUtils see_also
+

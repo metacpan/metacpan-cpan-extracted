@@ -1,0 +1,431 @@
+# Provides the commands:
+#
+#   perl_backtrace_5_10_0
+#   perl_backtrace_5_10_1
+#   perl_backtrace_5_12_x
+#   perl_backtrace_5_14_x
+#
+# Example usage:
+#
+#     gdb -p 7107
+#     (gdb) source gdbinit.txt
+#     (gdb) perl_backtrace_5_14_x
+#     (gdb) detach
+#     (gdb) quit
+
+set $DEBUG = 0
+set $CXTYPEMASK = 0xf
+set $PERL_ITHR_JOINABLE           =  0
+set $PERL_ITHR_DETACHED           =  1
+set $PERL_ITHR_JOINED             =  2
+set $PERL_ITHR_FINISHED           =  4
+set $PERL_ITHR_THREAD_EXIT_ONLY   =  8
+set $PERL_ITHR_NONVIABLE          = 16
+set $PERL_ITHR_DIED               = 32
+
+set $PERL_ITHR_UNCALLABLE  = $PERL_ITHR_DETACHED | $PERL_ITHR_JOINED
+
+define perl_backtrace_an_interp
+    set $stackinfo = (PERL_SI*)$interpreter->Icurstackinfo
+    while $stackinfo != 0
+        set $cxstack = $stackinfo->si_cxstack
+        set $cxix = $stackinfo->si_cxix
+        set $i = 0
+        while $i <= $cxix
+            set $context = $cxstack[$i]
+            set $type = $context->cx_u.cx_subst.sbu_type & $CXTYPEMASK
+            if $type == $CXt_SUB || $type == $CXt_EVAL || $type == $CXt_FORMAT
+                set $file = 0
+                set $cop = $context->cx_u.cx_blk.blku_oldcop
+                set $file = $cop->cop_file
+                if $file == 0
+                    set $file = "undef"
+                end
+                set $line = $cop->cop_line
+                printf "%s:%d\n", $file, $line
+            else
+                if $DEBUG
+                    printf "%d\t... # (context*){cx_type=%d}\n", $i, $type
+                end
+            end
+            set $i = $i + 1
+        end
+        set $stackinfo = $stackinfo->si_prev
+    end
+end
+define perl_backtrace_a_thread
+    set $tid = $thread->tid
+    set $statei = $thread->state
+    if $statei == $PERL_ITHR_DETACHED
+      set $state = "detached"
+    else
+      if $statei == $PERL_ITHR_JOINED
+        set $state = "joined"
+      else
+        if $statei = $PERL_ITHR_FINISHED
+          set $state = "finished"
+        else
+          if $statei == $PERL_ITHR_THREAD_EXIT_ONLY
+            set $state = "exit()"
+          else
+            if $statei == $PERL_ITHR_NONVIABLE
+              set $state = "thread creation failed"
+            else
+              if $statei == $PERL_ITHR_DIED
+                set $state = "died"
+              else
+                if $statei == $PERL_ITHR_UNCALLABLE
+                  set $state = "uncallable"
+                else
+                  set $state = "???"
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+    printf "thread %d %s:\n", $tid, $state
+    set $interpreter = $thread->interp
+    perl_backtrace_an_interp
+end
+define perl_backtrace_nothreads
+    set $stackinfo = PL_curstackinfo
+    while $stackinfo
+        set $cxstack = $stackinfo->si_cxstack
+        set $cxix = $stackinfo->si_cxix
+        set $i = 0
+        while $i <= $cxix
+            set $context = $cxstack[$i]
+            set $type = $context->cx_u.cx_subst.sbu_type & $CXTYPEMASK
+            if $type == $CXt_SUB || $type == $CXt_EVAL || $type == $CXt_FORMAT
+                set $file = 0
+                set $cop = $context->cx_u.cx_blk.blku_oldcop
+                set $gv = $cop->cop_filegv
+                if $gv
+                    set $sv = $gv->sv_u.svu_gp->gp_sv
+                    if $sv
+                        set $file = $sv->sv_u.svu_pv
+                    end
+                end
+                if ! $file
+                    set $file = "undef"
+                end
+                set $line = $cop->cop_line
+                printf "%s:%d\n", $file, $line
+            end
+            set $i = $i + 1
+        end
+        set $stackinfo = $stackinfo->si_prev
+    end
+end
+
+define perl_backtrace_5_8_an_interp
+    set $stackinfo = (PERL_SI*)$interpreter->Tcurstackinfo
+    while $stackinfo
+        set $cxstack = $stackinfo->si_cxstack
+        set $cxix = $stackinfo->si_cxix
+        set $i = 0
+        while $i <= $cxix
+            set $context = $cxstack[$i]
+            set $type = $context->cx_type & $CXTYPEMASK
+            if $type == $CXt_SUB || $type == $CXt_EVAL || $type == $CXt_FORMAT
+                set $file = 0
+                set $cop = $context->cx_u.cx_blk.blku_oldcop
+                set $file = $cop->cop_file
+                if ! $file
+                    set $file = "undef"
+                end
+                set $line = $cop->cop_line
+                printf "%s:%d\n", $file, $line
+            else
+                if $DEBUG
+                    printf "%d\t... # (context*){cx_type=%d}\n", $i, $type
+                end
+            end
+            set $i = $i + 1
+        end
+        set $stackinfo = $stackinfo->si_prev
+    end
+end
+define perl_backtrace_5_8_nothreads
+    set $stackinfo = PL_curstackinfo
+    while $stackinfo
+        set $cxstack = $stackinfo->si_cxstack
+        set $cxix = $stackinfo->si_cxix
+        set $i = 0
+        while $i <= $cxix
+            set $context = $cxstack[$i]
+            set $type = $context->cx_type & $CXTYPEMASK
+            if $type == $CXt_SUB || $type == $CXt_EVAL || $type == $CXt_FORMAT
+                set $cop = $context->cx_u.cx_blk.blku_oldcop
+                set $gv = $cop->cop_filegv
+                if $gv
+                    set $sv = (((struct xpvgv*)($gv)->sv_any)->xgv_gp)->gp_sv
+                    if $sv
+                        set $file = ((struct xpv*)  ($sv)->sv_any)->xpv_pv
+                    else
+                        set $file = "undef"
+                    end
+                else
+                    set $file = "undef"
+                end
+                set $line = $cop->cop_line
+                printf "%s:%d\n", $file, $line
+            end
+            set $i = $i + 1
+        end
+        set $stackinfo = $stackinfo->si_prev
+    end
+end
+define perl_backtrace_5_8_a_thread
+    if $thread
+        set $tid = $thread->tid
+        set $statei = $thread->state
+        if $statei == $PERL_ITHR_DETACHED
+          set $state = "detached"
+        else
+          if $statei == $PERL_ITHR_JOINED
+            set $state = "joined"
+          else
+            if $statei = $PERL_ITHR_FINISHED
+              set $state = "finished"
+            else
+              if $statei == $PERL_ITHR_THREAD_EXIT_ONLY
+                set $state = "exit()"
+              else
+                if $statei == $PERL_ITHR_NONVIABLE
+                  set $state = "thread creation failed"
+                else
+                  if $statei == $PERL_ITHR_DIED
+                    set $state = "died"
+                  else
+                    if $statei == $PERL_ITHR_UNCALLABLE
+                      set $state = "uncallable"
+                    else
+                      set $state = "???"
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+        printf "thread %d %s:\n", $tid, $state
+        set $interpreter = $thread->interp
+    else
+        set $interpreter = my_perl
+    end
+    perl_backtrace_5_8_an_interp
+end
+define perl_backtrace_5_8_threads
+    set $main_thread = threads
+    set $thread = $main_thread
+    perl_backtrace_5_8_a_thread
+    if $thread
+        set $thread = $thread->next
+        while $thread && $thread != $main_thread
+            perl_backtrace_5_8_a_thread
+            set $thread = $thread->next
+        end
+    end
+end
+define perl_backtrace_5_8
+    set $CXt_SUB = 1
+    set $CXt_EVAL = 2
+    set $CXt_FORMAT = 6
+    set $interpreter = (PerlInterpreter*)Perl_get_context()
+    if $interpreter
+        perl_backtrace_5_8_threads
+    else
+        perl_backtrace_5_8_nothreads
+    end
+end
+
+define perl_backtrace_5_8_9_an_interp
+    set $stackinfo = (PERL_SI*)$interpreter->Icurstackinfo
+    while $stackinfo
+        set $cxstack = $stackinfo->si_cxstack
+        set $cxix = $stackinfo->si_cxix
+        set $i = 0
+        while $i <= $cxix
+            set $context = $cxstack[$i]
+            set $type = $context->cx_u.cx_subst.sbu_type & $CXTYPEMASK
+            if $type == $CXt_SUB || $type == $CXt_EVAL || $type == $CXt_FORMAT
+                set $file = 0
+                set $cop = $context->cx_u.cx_blk.blku_oldcop
+                set $file = $cop->cop_file
+                if ! $file
+                    set $file = "undef"
+                end
+                set $line = $cop->cop_line
+                printf "%s:%d\n", $file, $line
+            else
+                if $DEBUG
+                    printf "%d\t... # (context*){cx_type=%d}\n", $i, $type
+                end
+            end
+            set $i = $i + 1
+        end
+        set $stackinfo = $stackinfo->si_prev
+    end
+end
+define perl_backtrace_5_8_9_nothreads
+    perl_backtrace_5_8_nothreads
+end
+define perl_backtrace_5_8_9_a_thread
+    set $tid = $thread->tid
+    set $statei = $thread->state
+    if $statei == $PERL_ITHR_DETACHED
+      set $state = "detached"
+    else
+      if $statei == $PERL_ITHR_JOINED
+        set $state = "joined"
+      else
+        if $statei = $PERL_ITHR_FINISHED
+          set $state = "finished"
+        else
+          if $statei == $PERL_ITHR_THREAD_EXIT_ONLY
+            set $state = "exit()"
+          else
+            if $statei == $PERL_ITHR_NONVIABLE
+              set $state = "thread creation failed"
+            else
+              if $statei == $PERL_ITHR_DIED
+                set $state = "died"
+              else
+                if $statei == $PERL_ITHR_UNCALLABLE
+                  set $state = "uncallable"
+                else
+                  set $state = "???"
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+    printf "thread %d %s:\n", $tid, $state
+    set $interpreter = $thread->interp
+    perl_backtrace_5_8_9_an_interp
+end
+define perl_backtrace_5_8_9_threads
+    set $main_thread = threads
+    set $thread = $main_thread
+    perl_backtrace_5_8_9_a_thread
+    if $thread
+        set $thread = $thread->next
+        while $thread && $thread != $main_thread
+            perl_backtrace_5_8_9_a_thread
+            set $thread = $thread->next
+        end
+    end
+end
+define perl_backtrace_5_8_9
+    set $CXt_SUB = 1
+    set $CXt_EVAL = 2
+    set $CXt_FORMAT = 6
+    set $interpreter = (PerlInterpreter*)Perl_get_context()
+    if $interpreter
+        set $POOL_KEY = "threads::_pool1.71"
+        set $POOL_KEY_LEN = 18
+        perl_backtrace_5_8_9_threads
+    else
+        perl_backtrace_5_8_nothreads
+    end
+end
+
+define perl_backtrace_5_10_threads
+    set $modglobal = $interpreter->Imodglobal
+    set $my_pool_svp = Perl_hv_fetch($interpreter, $modglobal, $POOL_KEY, $POOL_KEY_LEN, 0)
+    if $my_pool_svp
+        set $my_pool_sv = *$my_pool_svp
+        set $my_pool_svval = (struct xpvuv*)($my_pool_sv->sv_any)
+        set $my_poolp = (my_pool_t*)($my_pool_svval->xuv_u.xuvu_uv)
+        set $main_thread = &($my_poolp->main_thread)
+        set $thread = $main_thread
+        perl_backtrace_a_thread
+        set $thread = $main_thread->next
+        while $thread != $main_thread
+            perl_backtrace_a_thread
+            set $thread = $thread->next
+        end
+    else
+        set $interpreter = my_perl
+        perl_backtrace_an_interp
+    end
+end
+define perl_backtrace_5_10_0
+    set $CXt_SUB = 1
+    set $CXt_EVAL = 2
+    set $CXt_FORMAT = 6
+    set $interpreter = (PerlInterpreter*)Perl_get_context()
+    if $interpreter
+        set $POOL_KEY = "threads::_pool1.67"
+        set $POOL_KEY_LEN = 18
+        perl_backtrace_5_10_threads
+    else
+        perl_backtrace_nothreads
+    end
+end
+define perl_backtrace_5_10_1
+    set $CXt_SUB = 1
+    set $CXt_EVAL = 2
+    set $CXt_FORMAT = 6
+    set $interpreter = (PerlInterpreter*)Perl_get_context()
+    if $interpreter
+        set $POOL_KEY = "threads::_pool1.72"
+        set $POOL_KEY_LEN = 18
+        perl_backtrace_5_10_threads
+    else
+        perl_backtrace_nothreads
+    end
+end
+
+define perl_backtrace_5_12_threads
+    set $modglobal = $interpreter->Imodglobal
+    set $my_pool_svp = Perl_hv_fetch($interpreter, $modglobal, $POOL_KEY, $POOL_KEY_LEN, 0)
+    if $my_pool_svp
+        set $my_pool_sv = *$my_pool_svp
+        set $my_pool_svval = (struct xpvuv*)($my_pool_sv->sv_any)
+        set $my_poolp = (my_pool_t*)($my_pool_svval->xuv_u.xivu_uv)
+        set $main_thread = &($my_poolp->main_thread)
+        set $thread = $main_thread
+        perl_backtrace_a_thread
+        set $thread = $main_thread->next
+        while $thread != $main_thread
+            perl_backtrace_a_thread
+            set $thread = $thread->next
+        end
+    else
+        set $interpreter = my_perl
+        perl_backtrace_an_interp
+    end
+end
+define perl_backtrace_5_12_x
+    set $CXt_SUB = 8
+    set $CXt_FORMAT = 9
+    set $CXt_EVAL = 10
+    set $interpreter = (PerlInterpreter*)Perl_get_context()
+    if $interpreter
+        set $POOL_KEY = "threads::_pool1.75"
+        set $POOL_KEY_LEN = 18
+        perl_backtrace_5_12_threads
+    else
+        perl_backtrace_nothreads
+    end
+end
+
+define perl_backtrace_5_14_x
+    set $CXt_SUB = 8
+    set $CXt_FORMAT = 9
+    set $CXt_EVAL = 10
+    set $interpreter = (PerlInterpreter*)Perl_get_context()
+    if $interpreter
+        set $POOL_KEY = "threads::_pool1.83"
+        set $POOL_KEY_LEN = 18
+        perl_backtrace_5_12_threads
+    else
+        perl_backtrace_nothreads
+    end
+end

@@ -1,0 +1,7 @@
+ARTISTIC
+GPL
+Changes
+CryptHash.pm
+MANIFEST
+Makefile.PL
+t/basic.t

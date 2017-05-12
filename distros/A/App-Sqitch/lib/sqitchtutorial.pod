@@ -1,0 +1,1645 @@
+=encoding UTF-8
+
+=head1 Name
+
+sqitchtutorial - A tutorial introduction to Sqitch change management on PostgreSQL
+
+=head1 Synopsis
+
+  sqitch *
+
+=head1 Description
+
+This tutorial explains how to create a sqitch-enabled PostgreSQL project, use
+a VCS for deployment planning, and work with other developers to make sure
+changes remain in sync and in the proper order.
+
+We'll start by creating a new project from scratch, a fictional antisocial
+networking site called Flipr. All examples use L<Git|http://git-scm.com/> as
+the VCS and L<PostgreSQL|http://www.postgresql.org/> as the storage engine,
+but for the most part you can substitute other VCSes and database engines in
+the examples as appropriate.
+
+If you'd like to manage an SQLite database, see L<sqitchtutorial-sqlite>.
+
+If you'd like to manage an Oracle database, see L<sqitchtutorial-oracle>.
+
+If you'd like to manage an MySQL database, see L<sqitchtutorial-mysql>.
+
+If you'd like to manage an Firebird database, see L<sqitchtutorial-firebird>.
+
+If you'd like to manage an Vertica database, see L<sqitchtutorial-vertica>.
+
+=head1 Starting a New Project
+
+Usually the first thing to do when starting a new project is to create a
+source code repository. So let's do that with Git:
+
+  > mkdir flipr
+  > cd flipr
+  > git init .
+  Initialized empty Git repository in /flipr/.git/
+  > touch README.md
+  > git add .
+  > git commit -am 'Initialize project, add README.'
+
+If you're a Git user and want to follow along the history, the repository
+used in these examples is L<on GitHub|https://github.com/theory/sqitch-intro>.
+
+Now that we have a repository, let's get started with Sqitch. Every Sqitch
+project must have a name associated with it, and, optionally, a unique URI. We
+recommend including the URI, as it increases the uniqueness of object
+identifiers internally, so let's specify one when we initialize Sqitch:
+
+  > sqitch init flipr --uri https://github.com/theory/sqitch-intro/ --engine pg
+  Created sqitch.conf
+  Created sqitch.plan
+  Created deploy/
+  Created revert/
+  Created verify/
+
+Let's have a look at F<sqitch.conf>:
+
+  > cat sqitch.conf
+  [core]
+  	engine = pg
+  	# plan_file = sqitch.plan
+  	# top_dir = .
+  # [engine "pg"]
+  	# target = db:pg:
+  	# registry = sqitch
+  	# client = psql
+
+Good, it picked up on the fact that we're creating changes for the PostgreSQL
+engine, thanks to the C<-engine pg> option, and saved it to the file.
+Furthermore, it wrote a commented-out C<[engine "pg"]> section with all the
+available PostgreSQL engine-specific settings commented out and ready to be
+edited as appropriate.
+
+By default, Sqitch will read F<sqitch.conf> in the current directory for
+settings. But it will also read F<~/.sqitch/sqitch.conf> for user-specific
+settings. Since PostgreSQL's C<psql> client is not in the path on my system,
+let's go ahead an tell it where to find the client on our computer:
+
+  > sqitch config --user engine.pg.client /opt/local/pgsql/bin/psql
+
+And let's also tell it who we are, since this data will be used in all
+of our projects:
+
+  > sqitch config --user user.name 'Marge N. O’Vera'
+  > sqitch config --user user.email 'marge@example.com'
+
+Have a look at F<~/.sqitch/sqitch.conf> and you'll see this:
+
+  > cat ~/.sqitch/sqitch.conf
+  [engine "pg"]
+  	client = /opt/local/pgsql/bin/psql
+  [user]
+  	name = Marge N. O’Vera
+  	email = marge@example.com
+
+Which means that Sqitch should be able to find C<psql> for any project, and
+that it will always properly identify us when planning and committing changes.
+
+Back to the repository. Have a look at the plan file, F<sqitch.plan>:
+
+  > cat sqitch.plan
+  %syntax-version=1.0.0
+  %project=flipr
+  %uri=https://github.com/theory/sqitch-intro/
+  
+
+Note that it has picked up on the name and URI of the app we're building.
+Sqitch uses this data to manage cross-project dependencies. The
+C<%syntax-version> pragma is always set by Sqitch, so that it always knows how
+to parse the plan, even if the format changes in the future.
+
+Let's commit these changes and start creating the database changes.
+
+  > git add .
+  > git commit -am 'Initialize Sqitch configuration.'
+  [master 85e8d7c] Initialize Sqitch configuration.
+   2 files changed, 19 insertions(+)
+   create mode 100644 sqitch.conf
+   create mode 100644 sqitch.plan
+
+=head1 Our First Change
+
+First, our project will need a schema. This creates a nice namespace for all
+of the objects that will be part of the flipr app. Run this command:
+
+  > sqitch add appschema -n 'Add schema for all flipr objects.'
+  Created deploy/appschema.sql
+  Created revert/appschema.sql
+  Created verify/appschema.sql
+  Added "appschema" to sqitch.plan
+
+The L<C<add>|sqitch-add> command adds a database change to the plan and writes
+deploy, revert, and verify scripts that represent the change. Now we edit
+these files. The C<deploy> script's job is to create the schema. So we add
+this to F<deploy/appschema.sql>:
+
+  CREATE SCHEMA flipr;
+
+The C<revert> script's job is to precisely revert the change to the deploy
+script, so we add this to F<revert/appschema.sql>:
+
+  DROP SCHEMA flipr;
+
+Now we can try deploying this change. We tell Sqitch where to send the change
+via a L<database URI|https://github.com/theory/uri-db/>:
+
+  > createdb flipr_test
+  > sqitch deploy db:pg:flipr_test
+  Adding registry tables to db:pg:flipr_test
+  Deploying to db:pg:flipr_test
+    + appschema .. ok
+
+First Sqitch created registry tables used to track database changes. The
+structure and name of the registry varies between databases (PostgreSQL uses a
+schema to namespace its registry, while SQLite and MySQL use separate
+databases). Next, Sqitch deploys changes. We only have one so far; the C<+>
+reinforces the idea that the change is being C<added> to the database.
+
+With this change deployed, if you connect to the database, you'll be able to
+see the schema:
+
+  > psql -d flipr_test -c '\dn flipr'
+  List of schemas
+   Name  | Owner 
+  -------+-------
+   flipr | marge
+
+=head2 Trust, But Verify
+
+But that's too much work. Do you really want to do something like that after
+every deploy?
+
+Here's where the C<verify> script comes in. Its job is to test that the deploy
+did was it was supposed to. It should do so without regard to any data that
+might be in the database, and should throw an error if the deploy was not
+successful. In PostgreSQL, the simplest way to do so for non-queryable objects
+such as schemas is to take advantage the
+L<access privilege inquiry functions|http://www.postgresql.org/docs/current/static/functions-info.html#FUNCTIONS-INFO-ACCESS-TABLE>.
+These functions conveniently throw exceptions if the object being inquired
+does not exist. For our new schema, C<has_schema_privilege()> will do very
+nicely. Put this query into F<verify/appschema.sql>:
+
+  SELECT pg_catalog.has_schema_privilege('flipr', 'usage');
+
+Such functionality may not be available to other databases, but you can use
+I<any> query that will throw an exception if the schema doesn't exist. One
+handy way to do that is to divide by zero if an object doesn't exist. So for
+other databases, assuming division by zero is fatal, you could do something
+like this:
+
+  SELECT 1/COUNT(*) FROM information_schema.schemata WHERE schema_name = 'flipr';
+
+Either way, run the C<verify> script with the L<C<verify>|sqitch-verify>
+command:
+
+  > sqitch verify db:pg:flipr_test
+  Verifying db:pg:flipr_test
+    * appschema .. ok
+  Verify successful
+
+Looks good! If you want to make sure that the verify script correctly dies if
+the schema doesn't exist, temporarily change the schema name in the script to
+something that doesn't exist, something like:
+
+  SELECT pg_catalog.has_schema_privilege('nonesuch', 'usage');
+
+Then L<C<verify>|sqitch-verify> again:
+
+  > sqitch verify db:pg:flipr_test
+  Verifying db:pg:flipr_test
+    * appschema .. psql:verify/appschema.sql:5: ERROR:  schema "nonesuch" does not exist
+  # Verify script "verify/appschema.sql" failed.
+  not ok
+  
+  Verify Summary Report
+  ---------------------
+  Changes: 1
+  Errors:  1
+  Verify failed
+
+It's even nice enough to tell us what the problem is. Or, for the
+divide-by-zero example, change the schema name:
+
+  SELECT 1/COUNT(*) FROM information_schema.schemata WHERE schema_name = 'nonesuch';
+
+Then the verify will look something like:
+
+  > sqitch verify db:pg:flipr_test
+  Verifying db:pg:flipr_test
+    * appschema .. psql:verify/appschema.sql:5: ERROR:  division by zero
+  # Verify script "verify/appschema.sql" failed.
+  not ok
+
+  Verify Summary Report
+  ---------------------
+  Changes: 1
+  Errors:  1
+  Verify failed
+
+Less useful error output, but enough to alert us that something has gone
+wrong.
+
+Don't forget to change the schema name back before continuing!
+
+=head2 Status, Revert, Log, Repeat
+
+For purely informational purposes, we can always see how a deployment was
+recorded via the L<C<status>|sqitch-status> command, which reads the registry
+tables from the database:
+
+  > sqitch status db:pg:flipr_test
+  # On database db:pg:flipr_test
+  # Project:  flipr
+  # Change:   c7981df861183412b01be706889e508a63d445ca
+  # Name:     appschema
+  # Deployed: 2013-12-30 15:27:15 -0800
+  # By:       Marge N. O’Vera <marge@example.com>
+  # 
+  Nothing to deploy (up-to-date)
+
+Let's make sure that we can revert the change:
+
+  > sqitch revert db:pg:flipr_test
+  Revert all changes from db:pg:flipr_test? [Yes]
+    - appschema .. ok
+
+The L<C<revert>|sqitch-revert> command first prompts to make sure that we
+really do want to revert. This is to prevent unnecessary accidents. You can
+pass the C<-y> option to disable the prompt. Also, notice the C<-> before the
+change name in the output, which reinforces that the change is being
+I<removed> from the database. And now the schema should be gone:
+
+  > psql -d flipr_test -c '\dn flipr'
+  List of schemas
+   Name | Owner 
+  ------+-------
+
+And the status message should reflect as much:
+
+  > sqitch status db:pg:flipr_test
+  # On database db:pg:flipr_test
+  No changes deployed
+
+Of course, since nothing is deployed, the L<C<verify>|sqitch-verify> command
+has nothing to verify:
+
+  > sqitch verify db:pg:flipr_test
+  Verifying db:pg:flipr_test
+  No changes deployed
+
+However, we still have a record that the change happened, visible via the
+L<C<log>|sqitch-log> command:
+
+  > sqitch log db:pg:flipr_test
+  On database db:pg:flipr_test
+  Revert c7981df861183412b01be706889e508a63d445ca
+  Name:      appschema
+  Committer: Marge N. O’Vera <marge@example.com>
+  Date:      2013-12-30 15:38:17 -0800
+
+      Add schema for all flipr objects.
+
+  Deploy c7981df861183412b01be706889e508a63d445ca
+  Name:      appschema
+  Committer: Marge N. O’Vera <marge@example.com>
+  Date:      2013-12-30 15:27:15 -0800
+
+      Add schema for all flipr objects.
+
+Note that the actions we took are shown in reverse chronological order, with
+the revert first and then the deploy.
+
+Cool. Now let's commit it.
+
+  > git add .
+  > git commit -m 'Add flipr schema.'
+  [master d812132] Add flipr schema.
+   4 files changed, 22 insertions(+)
+   create mode 100644 deploy/appschema.sql
+   create mode 100644 revert/appschema.sql
+   create mode 100644 verify/appschema.sql
+
+And then deploy again. This time, let's use the C<--verify> option, so that
+the C<verify> script is applied when the change is deployed:
+
+  > sqitch deploy --verify db:pg:flipr_test
+  Deploying changes to db:pg:flipr_test
+    + appschema .. ok
+
+And now the schema should be back:
+
+  > psql -d flipr_test -c '\dn flipr'
+  List of schemas
+   Name  | Owner 
+  -------+-------
+   flipr | marge
+
+When we look at the status, the deployment will be there:
+
+  > sqitch status db:pg:flipr_test
+  # On database db:pg:flipr_test
+  # Project:  flipr
+  # Change:   c7981df861183412b01be706889e508a63d445ca
+  # Name:     appschema
+  # Deployed: 2013-12-30 15:40:53 -0800
+  # By:       Marge N. O’Vera <marge@example.com>
+  # 
+  Nothing to deploy (up-to-date)
+
+=head1 On Target
+
+I'm getting a little tired of always having to type C<db:pg:flipr_test>,
+aren't you? This L<database connection URI|https://github.com/theory/uri-db/>
+tells Sqitch how to connect to the deployment target, but we don't have
+to keep using the URI. We can name the target:
+
+  > sqitch target add flipr_test db:pg:flipr_test
+
+The L<C<target>|sqitch-target> command, inspired by
+L<C<git-remote>|http://git-scm.com/docs/git-remote>, allows management of one
+or more named deployment targets. We've just added a target named
+C<flipr_test>, which means we can use the string C<flipr_test> for the target,
+rather than the URI. But since we're doing so much testing, we can also use
+the The L<C<engine>|sqitch-engine> command to tell Sqitch to deploy to the
+C<flipr_test> target by default:
+
+  > sqitch engine add pg flipr_test
+
+Now we can omit the target argument altogether, unless we need to deploy to
+another database. Which we will, eventually, but at least our examples will be
+simpler from here on in, e.g.:
+
+  > sqitch status
+  # On database flipr_test
+  # Project:  flipr
+  # Change:   c7981df861183412b01be706889e508a63d445ca
+  # Name:     appschema
+  # Deployed: 2013-12-30 15:40:53 -0800
+  # By:       Marge N. O’Vera <marge@example.com>
+  # 
+  Nothing to deploy (up-to-date)
+
+Yay, that allows things to be a little more concise. Let's also make sure that
+changes are verified after deploying them:
+
+  > sqitch config --bool deploy.verify true
+  > sqitch config --bool rebase.verify true
+
+We'll see the L<C<rebase>|sqitch-rebase> command a bit later. In the meantime,
+let's commit the new configuration and and make some more changes!
+
+  > git commit -am 'Set default deployment target and always verify.'
+  [master a6267d3] Set default deployment target and always verify.
+   1 file changed, 8 insertions(+)
+
+=head1 Deploy with Dependency
+
+Let's add another change, this time to create a table. Our app will need
+users, of course, so we'll create a table for them. First, add the new change:
+
+  > sqitch add users --requires appschema -n 'Creates table to track our users.'
+  Created deploy/users.sql
+  Created revert/users.sql
+  Created verify/users.sql
+  Added "users [appschema]" to sqitch.plan
+
+Note that we're requiring the C<appschema> change as a dependency of the new
+C<users> change. Although that change has already been added to the plan and
+therefore should always be applied before the C<users> change, it's a good
+idea to be explicit about dependencies.
+
+Now edit the scripts. When you're done, F<deploy/users.sql> should look like
+this:
+
+  -- Deploy flipr:users to pg
+  -- requires: appschema
+
+  BEGIN;
+
+  SET client_min_messages = 'warning';
+
+  CREATE TABLE flipr.users (
+      nickname  TEXT        PRIMARY KEY,
+      password  TEXT        NOT NULL,
+      timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );
+
+  COMMIT;
+
+A few things to notice here. On the second line, the dependence on the
+C<appschema> change has been listed. This doesn't do anything, but the default
+C<deploy> PostgreSQL template lists it here for your reference while editing
+the file. Useful, right?
+
+Notice that all of the SQL code is wrapped in a transaction. This is handy for
+PostgreSQL deployments, because PostgreSQL DDLs are transactional. The upshot
+is that if any part of this deploy script fails, the whole change fails. Such
+may work less-well for database engines that don't support transactional DDLs.
+
+The table itself will be created in the C<flipr> schema. This is why we need
+to require the C<appschema> change.
+
+Now for the verify script. The simplest way to check that the table was
+created and has the expected columns without touching the data? Just select
+from the table with a false C<WHERE> clause. Add this to F<verify/users.sql>:
+
+  SELECT nickname, password, timestamp
+    FROM flipr.users
+   WHERE FALSE;
+
+Now for the revert script: all we have to do is drop the table. Add this to
+F<revert/users.sql>:
+
+  DROP TABLE flipr.users;
+
+Couldn't be much simpler, right? Let's deploy this bad boy:
+
+  > sqitch deploy
+  Deploying changes to flipr_test
+    + users .. ok
+
+We know, since verification is enabled, that the table must have been created.
+But for the purposes of visibility, let's have a quick look:
+
+  > psql -d flipr_test -c '\d flipr.users'
+                        Table "flipr.users"
+    Column   |           Type           |       Modifiers        
+  -----------+--------------------------+------------------------
+   nickname  | text                     | not null
+   password  | text                     | not null
+   timestamp | timestamp with time zone | not null default now()
+  Indexes:
+      "users_pkey" PRIMARY KEY, btree (nickname)
+
+We can also verify all currently deployed changes with the
+L<C<verify>|sqitch-verify> command:
+
+  > sqitch verify
+  Verifying flipr_test
+    * appschema .. ok
+    * users ...... ok
+  Verify successful
+
+Now have a look at the status:
+
+  > sqitch status
+  # On database flipr_test
+  # Project:  flipr
+  # Change:   77398e1dbc5fbce58b05eb67d201f15774718727
+  # Name:     users
+  # Deployed: 2013-12-30 15:51:09 -0800
+  # By:       Marge N. O’Vera <marge@example.com>
+  # 
+  Nothing to deploy (up-to-date)
+
+Success! Let's make sure we can revert the change, as well:
+
+  > sqitch revert --to @HEAD^ -y
+  Reverting changes to appschema from flipr_test
+    - users .. ok
+
+Note that we've used the C<--to> option to specify the change to revert to.
+And what do we revert to? The symbolic tag C<@HEAD>, when passed to
+L<C<revert>|sqitch-revert>, always refers to the last change deployed to the
+database. (For other commands, it refers to the last change in the plan.)
+Appending the caret (C<^>) tells Sqitch to select the change I<prior> to the
+last deployed change. So we revert to C<appschema>, the penultimate change.
+The other potentially useful symbolic tag is C<@ROOT>, which refers to the
+first change deployed to the database (or in the plan, depending on the
+command).
+
+Back to the database. The C<users> table should be gone but the C<flipr> schema
+should still be around:
+
+  > psql -d flipr_test -c '\d flipr.users'
+  Did not find any relation named "flipr.users".
+
+The L<C<status>|sqitch-status> command politely informs us that we have
+undeployed changes:
+
+  > sqitch status
+  # On database flipr_test
+  # Project:  flipr
+  # Change:   c7981df861183412b01be706889e508a63d445ca
+  # Name:     appschema
+  # Deployed: 2013-12-30 15:40:53 -0800
+  # By:       Marge N. O’Vera <marge@example.com>
+  # 
+  Undeployed change:
+    * users
+
+As does the L<C<verify>|sqitch-verify> command:
+
+  > sqitch verify
+  Verifying flipr_test
+    * appschema .. ok
+  Undeployed change:
+    * users
+  Verify successful
+
+Note that the verify is successful, because all currently-deployed changes are
+verified. The list of undeployed changes (just "users" here) reminds us about
+the current state.
+
+Okay, let's commit and deploy again:
+
+  > git add .
+  > git commit -am 'Add users table.'
+  [master d58ea2f] Add users table.
+   4 files changed, 31 insertions(+)
+   create mode 100644 deploy/users.sql
+   create mode 100644 revert/users.sql
+   create mode 100644 verify/users.sql
+  > sqitch deploy
+  Deploying changes to flipr_test
+    + users .. ok
+
+Looks good. Check the status:
+
+  > sqitch status
+  # On database flipr_test
+  # Project:  flipr
+  # Change:   77398e1dbc5fbce58b05eb67d201f15774718727
+  # Name:     users
+  # Deployed: 2013-12-30 15:57:14 -0800
+  # By:       Marge N. O’Vera <marge@example.com>
+  # 
+  Nothing to deploy (up-to-date)
+
+Excellent. Let's do some more!
+
+=head1 Add Two at Once
+
+Let's add a couple more changes to add functions for managing users.
+
+  > sqitch add insert_user --requires users --requires appschema \
+    -n 'Creates a function to insert a user.'
+  Created deploy/insert_user.sql
+  Created revert/insert_user.sql
+  Created verify/insert_user.sql
+  Added "insert_user [users appschema]" to sqitch.plan
+
+  > sqitch add change_pass --requires users --requires appschema \
+    -n 'Creates a function to change a user password.'
+  Created deploy/change_pass.sql
+  Created revert/change_pass.sql
+  Created verify/change_pass.sql
+  Added "change_pass [users appschema]" to sqitch.plan
+
+Now might be a good time to have a look at the deployment plan:
+
+  > cat sqitch.plan
+  %syntax-version=1.0.0
+  %project=flipr
+  %uri=https://github.com/theory/sqitch-intro/
+
+  appschema 2013-12-30T23:19:45Z Marge N. O’Vera <marge@example.com> # Add schema for all flipr objects.
+  users [appschema] 2013-12-30T23:49:00Z Marge N. O’Vera <marge@example.com> # Creates table to track our users.
+  insert_user [users appschema] 2013-12-30T23:57:36Z Marge N. O’Vera <marge@example.com> # Creates a function to insert a user.
+  change_pass [users appschema] 2013-12-30T23:57:45Z Marge N. O’Vera <marge@example.com> # Creates a function to change a user password.
+
+Each change appears on a single line with the name of the change, a bracketed
+list of dependencies, a timestamp, the name and email address of the user who
+planned the change, and a note.
+
+Let's write the code for the new changes. Here's what
+F<deploy/insert_user.sql> should look like:
+
+  -- Deploy flipr:insert_user to pg
+  -- requires: users
+  -- requires: appschema
+  
+  BEGIN;
+
+  CREATE OR REPLACE FUNCTION flipr.insert_user(
+      nickname TEXT,
+      password TEXT
+  ) RETURNS VOID LANGUAGE SQL SECURITY DEFINER AS $$
+      INSERT INTO flipr.users VALUES($1, md5($2));
+  $$;
+
+  COMMIT;
+
+Here's what F<verify/insert_user.sql> might look like:
+
+  BEGIN;
+  SELECT has_function_privilege('flipr.insert_user(text, text)', 'execute');
+  ROLLBACK;
+
+We simply take advantage of the fact that C<has_function_privilege()> throws
+an exception if the specified function does not exist.
+
+And F<revert/insert_user.sql> should look something like this:
+
+  -- Revert flipr:insert_user from pg
+  BEGIN;
+  DROP FUNCTION flipr.insert_user(TEXT, TEXT);
+  COMMIT;
+
+Now for C<change_pass>; F<deploy/change_pass.sql> might look like this:
+
+  -- Deploy flipr:change_pass to pg
+  -- requires: users
+  -- requires: appschema
+
+  BEGIN;
+
+  CREATE OR REPLACE FUNCTION flipr.change_pass(
+      nick    TEXT,
+      oldpass TEXT,
+      newpass TEXT
+  ) RETURNS BOOLEAN LANGUAGE plpgsql SECURITY DEFINER AS $$
+  BEGIN
+      UPDATE flipr.users
+         SET password = md5($3)
+       WHERE nickname = $1
+         AND password = md5($2);
+      RETURN FOUND;
+  END;
+  $$;
+
+  COMMIT;
+
+Use C<has_function_privilege()> in F<verify/change_pass.sql> again:
+
+  BEGIN;
+  SELECT has_function_privilege('flipr.change_pass(text, text, text)', 'execute');
+  ROLLBACK;
+
+And of course, its C<revert> script, F<revert/change_pass.sql>, should look
+something like:
+
+  -- Revert flipr:change_pass from pg
+  BEGIN;
+  DROP FUNCTION flipr.change_pass(TEXT, TEXT, TEXT);
+  COMMIT;
+
+Try em out!
+
+  > sqitch deploy
+  Deploying changes to flipr_test
+    + insert_user .. ok
+    + change_pass .. ok
+
+Do we have the functions? Of course we do, they were verified. Still, have a
+look:
+
+  > psql -d flipr_test -c '\df flipr.*'
+                                      List of functions
+   Schema |    Name     | Result data type |          Argument data types          |  Type  
+  --------+-------------+------------------+---------------------------------------+--------
+   flipr  | change_pass | boolean          | nick text, oldpass text, newpass text | normal
+   flipr  | insert_user | void             | nickname text, password text          | normal
+
+And what's the status?
+
+  > sqitch status
+  # On database flipr_test
+  # Project:  flipr
+  # Change:   01a4f6964b89284525cb5877d222df8be70d1647
+  # Name:     change_pass
+  # Deployed: 2013-12-30 15:59:44 -0800
+  # By:       Marge N. O’Vera <marge@example.com>
+  # 
+  Nothing to deploy (up-to-date)
+
+Looks good. Let's make sure revert works:
+
+  > sqitch revert -y --to @HEAD^^
+  Reverting changes to users from flipr_test
+    - change_pass .. ok
+    - insert_user .. ok
+  > psql -d flipr_test -c '\df flipr.*'
+                         List of functions
+   Schema | Name | Result data type | Argument data types | Type 
+  --------+------+------------------+---------------------+------
+
+Note the use of C<@HEAD^^> to specify that the revert be to two changes prior
+the last deployed change. Looks good. Let's do the commit and re-deploy dance:
+
+  > git add .
+  > git commit -m 'Add `insert_user()` and `change_pass()`.'
+  [master c9b4d68] Add `insert_user()` and `change_pass()`.
+   7 files changed, 65 insertions(+)
+   create mode 100644 deploy/change_pass.sql
+   create mode 100644 deploy/insert_user.sql
+   create mode 100644 revert/change_pass.sql
+   create mode 100644 revert/insert_user.sql
+   create mode 100644 verify/change_pass.sql
+   create mode 100644 verify/insert_user.sql
+ 
+  > sqitch deploy
+  Deploying changes to flipr_test
+    + insert_user .. ok
+    + change_pass .. ok
+
+  > sqitch status
+  # On database flipr_test
+  # Project:  flipr
+  # Change:   01a4f6964b89284525cb5877d222df8be70d1647
+  # Name:     change_pass
+  # Deployed: 2013-12-30 16:00:50 -0800
+  # By:       Marge N. O’Vera <marge@example.com>
+  # 
+  Nothing to deploy (up-to-date)
+  
+  > sqitch verify
+  Verifying flipr_test
+    * appschema .... ok
+    * users ........ ok
+    * insert_user .. ok
+    * change_pass .. ok
+  Verify successful
+
+Great, we're fully up-to-date!
+
+=head1 Ship It!
+
+Let's do a first release of our app. Let's call it C<1.0.0-dev1> Since we want
+to have it go out with deployments tied to the release, let's tag it:
+
+  > sqitch tag v1.0.0-dev1 -n 'Tag v1.0.0-dev1.'
+  Tagged "change_pass" with @v1.0.0-dev1
+  > git commit -am 'Tag the database with v1.0.0-dev1.'
+  [master 0acef3e] Tag the database with v1.0.0-dev1.
+   1 file changed, 1 insertion(+)
+  > git tag v1.0.0-dev1 -am 'Tag v1.0.0-dev1'
+
+We can try deploying to make sure the tag gets picked up like so:
+
+  > createdb flipr_dev
+  > sqitch deploy db:pg:flipr_dev
+  Adding registry tables to db:pg:flipr_dev
+  Deploying changes to db:pg:flipr_dev
+    + appschema ................. ok
+    + users ..................... ok
+    + insert_user ............... ok
+    + change_pass @v1.0.0-dev1 .. ok
+
+Great, all four changes were deployed and C<change_pass> was tagged with
+C<@v1.0.0-dev1>. Let's have a look at the status:
+
+  > sqitch status db:pg:flipr_dev
+  # On database db:pg:flipr_dev
+  # Project:  flipr
+  # Change:   01a4f6964b89284525cb5877d222df8be70d1647
+  # Name:     change_pass
+  # Tag:      @v1.0.0-dev1
+  # Deployed: 2013-12-30 16:02:19 -0800
+  # By:       Marge N. O’Vera <marge@example.com>
+  # 
+  Nothing to deploy (up-to-date)
+
+
+Note the listing of the tag as part of the status message. Now let's bundle
+everything up for release:
+
+  > sqitch bundle
+  Bundling into bundle/
+  Writing config
+  Writing plan
+  Writing scripts
+    + appschema
+    + users
+    + insert_user
+    + change_pass @v1.0.0-dev1
+
+Now we can package the F<bundle> directory and distribute it. When it gets
+installed somewhere, users can use Sqitch to deploy to the database. Let's try
+deploying it:
+
+  > cd bundle
+  > createdb flipr_prod
+  > sqitch deploy db:pg:flipr_prod
+  Adding registry tables to db:pg:flipr_prod
+  Deploying changes to db:pg:flipr_prod
+    + appschema ................. ok
+    + users ..................... ok
+    + insert_user ............... ok
+    + change_pass @v1.0.0-dev1 .. ok
+
+Looks much the same as before, eh? Package it up and ship it!
+
+=head1 Flip Out
+
+Now that we've got the basics of user management done, let's get to work on
+the core of our product, the "flip." Since other folks are working on other
+tasks in the repository, we'll work on a branch, so we can all stay out of
+each other's way. So let's branch:
+
+  > git checkout -b flips
+  Switched to a new branch 'flips'
+
+Now we can add a new change to create a table for our flips.
+
+  > sqitch add flips -r appschema -r users -n 'Adds table for storing flips.'
+  Created deploy/flips.sql
+  Created revert/flips.sql
+  Created verify/flips.sql
+  Added "flips [appschema users]" to sqitch.plan
+
+You know the drill by now. Edit F<deploy/flips.sql>:
+
+  -- Deploy flipr:flips to pg
+  -- requires: appschema
+  -- requires: users
+
+  BEGIN;
+
+  SET client_min_messages = 'warning';
+
+  CREATE TABLE flipr.flips (
+      id        BIGSERIAL   PRIMARY KEY,
+      nickname  TEXT        NOT NULL REFERENCES flipr.users(nickname),
+      body      TEXT        NOT NULL DEFAULT '' CHECK ( length(body) <= 180 ),
+      timestamp TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
+  );
+
+  COMMIT;
+
+Edit F<verify/flips.sql>:
+
+  -- Verify flipr:flips on pg
+
+  BEGIN;
+
+  SELECT id
+       , nickname
+       , body
+       , timestamp
+    FROM flipr.flips
+   WHERE FALSE;
+
+  ROLLBACK;
+
+And edit F<revert/flips.sql>:
+
+  -- Revert flipr:flips from pg
+
+  BEGIN;
+
+  DROP TABLE flipr.flips;
+
+  COMMIT;
+
+And give it a whirl:
+
+  > sqitch deploy
+  Deploying changes to flipr_test
+    + flips .. ok
+
+Look good?
+
+  > sqitch status --show-tags
+  # On database flipr_test
+  # Project:  flipr
+  # Change:   4d164ef5986450f00a565735518b1d126f8ee69d
+  # Name:     flips
+  # Deployed: 2013-12-30 16:34:38 -0800
+  # By:       Marge N. O’Vera <marge@example.com>
+  # 
+  # Tag:
+  #   @v1.0.0-dev1 - 2013-12-30 16:34:38 -0800 - Marge N. O’Vera <marge@example.com>
+  # 
+  Nothing to deploy (up-to-date)
+
+Note the use of C<--show tags> to show all the deployed tags. Now make it so:
+
+  > git add .
+  [flips e8f4655] Add flips table.
+  > git commit -am 'Add flips table.'
+   4 files changed, 37 insertions(+)
+   create mode 100644 deploy/flips.sql
+   create mode 100644 revert/flips.sql
+   create mode 100644 verify/flips.sql
+
+=head1 Wash, Rinse, Repeat
+
+Now comes the time to add functions to manage flips. I'm sure you have things
+nailed down now. Go ahead and add C<insert_flip> and C<delete_flip> changes
+and commit them. The C<insert_flip> deploy script might look something like:
+
+  -- Deploy flipr:insert_flip to pg
+  -- requires: flips
+  -- requires: appschema
+  -- requires: users
+
+  BEGIN;
+
+  CREATE OR REPLACE FUNCTION flipr.insert_flip(
+     nickname TEXT,
+     body     TEXT
+  ) RETURNS BIGINT LANGUAGE sql SECURITY DEFINER AS $$
+      INSERT INTO flipr.flips (nickname, body)
+      VALUES ($1, $2)
+      RETURNING id;
+  $$;
+
+  COMMIT;
+
+And the C<delete_flip> deploy script might look something like:
+
+  -- Deploy flipr:delete_flip to pg
+  -- requires: flips
+  -- requires: appschema
+  -- requires: users
+
+  BEGIN;
+
+  CREATE OR REPLACE FUNCTION flipr.delete_flip(
+     flip_id BIGINT
+  ) RETURNS BOOLEAN LANGUAGE plpgsql SECURITY DEFINER AS $$
+  BEGIN
+      DELETE FROM flipr.flips WHERE id = flip_id;
+      RETURN FOUND;
+  END;
+  $$;
+
+  COMMIT;
+
+The C<verify> scripts are:
+
+  -- Verify flipr:insert_flip on pg
+
+  BEGIN;
+
+  SELECT has_function_privilege('flipr.insert_flip(text, text)', 'execute');
+
+  ROLLBACK;
+
+And:
+
+  -- Verify flipr:delete_flip on pg
+
+  BEGIN;
+
+  SELECT has_function_privilege('flipr.delete_flip(bigint)', 'execute');
+
+  ROLLBACK;
+
+The C<revert> scripts are:
+
+  -- Revert flipr:insert_flip from pg
+
+  BEGIN;
+
+  DROP FUNCTION flipr.insert_flip(TEXT, TEXT);
+
+  COMMIT;
+
+And:
+
+  -- Revert flipr:delete_flip from pg
+
+  BEGIN;
+
+  DROP FUNCTION flipr.delete_flip(BIGINT);
+
+  COMMIT;
+
+Check the L<example git repository|https://github.com/theory/sqitch-intro> for
+the complete details. Test L<C<deploy>|sqitch-deploy> and
+L<C<revert>|sqitch-revert>, then commit it to the repository. The status
+should end up looking something like this:
+
+  > sqitch status --show-tags
+  # On database flipr_test
+  # Project:  flipr
+  # Change:   9a645034b35fa46df37a3725c480982628cc64ec
+  # Name:     delete_flip
+  # Deployed: 2013-12-30 16:37:51 -0800
+  # By:       Marge N. O’Vera <marge@example.com>
+  # 
+  # Tag:
+  #   @v1.0.0-dev1 - 2013-12-30 16:34:38 -0800 - Marge N. O’Vera <marge@example.com>
+  # 
+  Nothing to deploy (up-to-date)
+
+Good, we've finished this feature. Time to merge back into C<master>.
+
+=head2 Emergency
+
+Let's do it:
+
+  > git checkout master
+  Switched to branch 'master'
+  > git pull
+  Updating 0acef3e..d4cbd7d
+  Fast-forward
+   deploy/delete_list.sql | 20 ++++++++++++++++++++
+   deploy/insert_list.sql | 17 +++++++++++++++++
+   deploy/lists.sql       | 16 ++++++++++++++++
+   revert/delete_list.sql |  7 +++++++
+   revert/insert_list.sql |  7 +++++++
+   revert/lists.sql       |  7 +++++++
+   sqitch.plan            |  4 ++++
+   verify/delete_list.sql |  7 +++++++
+   verify/insert_list.sql |  7 +++++++
+   verify/lists.sql       |  9 +++++++++
+   10 files changed, 101 insertions(+)
+   create mode 100644 deploy/delete_list.sql
+   create mode 100644 deploy/insert_list.sql
+   create mode 100644 deploy/lists.sql
+   create mode 100644 revert/delete_list.sql
+   create mode 100644 revert/insert_list.sql
+   create mode 100644 revert/lists.sql
+   create mode 100644 verify/delete_list.sql
+   create mode 100644 verify/insert_list.sql
+   create mode 100644 verify/lists.sql
+
+Hrm, that's interesting. Looks like someone made some changes to C<master>.
+They added list support. Well, let's see what happens when we merge our
+changes.
+
+  > git merge --no-ff flips
+  Auto-merging sqitch.plan
+  CONFLICT (content): Merge conflict in sqitch.plan
+  Automatic merge failed; fix conflicts and then commit the result.
+
+Oh, a conflict in F<sqitch.plan>. Not too surprising, since both the merged
+C<lists> branch and our C<flips> branch added changes to the plan. Let's try a
+different approach.
+
+The truth is, we got lazy. Those changes when we pulled master from the origin
+should have raised a red flag. It's considered a bad practice not to look at
+what's changed in C<master> before merging in a branch. What one I<should> do
+is either:
+
+=over
+
+=item *
+
+Rebase the F<flips> branch from master before merging. This "rewinds" the
+branch changes, pulls from C<master>, and then replays the changes back on top
+of the pulled changes.
+
+=item *
+
+Create a patch and apply I<that> to master. This is the sort of thing you
+might have to do if you're sending changes to another user, especially if the
+VCS is not Git.
+
+=back
+
+So let's restore things to how they were at master:
+
+  > git reset --hard HEAD
+  HEAD is now at ff60b9b Merge branch 'lists'
+
+That throws out our botched merge. Now let's go back to our branch and rebase
+it on C<master>:
+
+  > git checkout flips
+  Switched to branch 'flips'
+  > git rebase master
+  First, rewinding head to replay your work on top of it...
+  Applying: Add flips table.
+  Using index info to reconstruct a base tree...
+  M	sqitch.plan
+  Falling back to patching base and 3-way merge...
+  Auto-merging sqitch.plan
+  CONFLICT (content): Merge conflict in sqitch.plan
+  Failed to merge in the changes.
+  Patch failed at 0001 Add flips table.
+  The copy of the patch that failed is found in:
+     .git/rebase-apply/patch
+
+  When you have resolved this problem, run "git rebase --continue".
+  If you prefer to skip this patch, run "git rebase --skip" instead.
+  To check out the original branch and stop rebasing, run "git rebase --abort".
+
+Oy, that's kind of a pain. It seems like no matter what we do, we'll need to
+resolve conflicts in that file. Except in Git. Fortunately for us, we can tell
+Git to resolve conflicts in F<sqitch.plan> differently. Because we only ever
+append lines to the file, we can have it use the "union" merge driver, which,
+according to L<its
+docs|http://git-scm.com/docs/gitattributes#_built-in_merge_drivers>:
+
+=over
+
+Run 3-way file level merge for text files, but take lines from both versions,
+instead of leaving conflict markers. This tends to leave the added lines in
+the resulting file in random order and the user should verify the result. Do
+not use this if you do not understand the implications.
+
+=back
+
+This has the effect of appending lines from all the merging files, which is
+exactly what we need. So let's give it a try. First, back out the botched
+rebase:
+
+  > git rebase --abort
+
+Now add the union merge driver to F<.gitattributes> for F<sqitch.plan>
+and rebase again:
+
+  > echo sqitch.plan merge=union > .gitattributes
+  > git rebase master                            
+  First, rewinding head to replay your work on top of it...
+  Applying: Add flips table.
+  Using index info to reconstruct a base tree...
+  M	sqitch.plan
+  Falling back to patching base and 3-way merge...
+  Auto-merging sqitch.plan
+  Applying: Add functions to insert and delete flips.
+  Using index info to reconstruct a base tree...
+  M	sqitch.plan
+  Falling back to patching base and 3-way merge...
+  Auto-merging sqitch.plan
+
+Ah, that looks a bit better. Let's have a look at the plan:
+
+  > cat sqitch.plan
+  %syntax-version=1.0.0
+  %project=flipr
+  %uri=https://github.com/theory/sqitch-intro/
+
+  %syntax-version=1.0.0
+  %project=flipr
+  %uri=https://github.com/theory/sqitch-intro/
+
+  appschema 2013-12-30T23:19:45Z Marge N. O’Vera <marge@example.com> # Add schema for all flipr objects.
+  users [appschema] 2013-12-30T23:49:00Z Marge N. O’Vera <marge@example.com> # Creates table to track our users.
+  insert_user [users appschema] 2013-12-30T23:57:36Z Marge N. O’Vera <marge@example.com> # Creates a function to insert a user.
+  change_pass [users appschema] 2013-12-30T23:57:45Z Marge N. O’Vera <marge@example.com> # Creates a function to change a user password.
+  @v1.0.0-dev1 2013-12-31T00:01:22Z Marge N. O’Vera <marge@example.com> # Tag v1.0.0-dev1.
+
+  lists [appschema users] 2013-12-31T00:39:40Z Marge N. O’Vera <marge@example.com> # Adds table for storing lists.
+  insert_list [lists appschema users] 2013-12-31T00:41:29Z Marge N. O’Vera <marge@example.com> # Creates a function to insert a list.
+  delete_list [lists appschema users] 2013-12-31T00:41:37Z Marge N. O’Vera <marge@example.com> # Creates a function to delete a list.
+  flips [appschema users] 2013-12-31T00:32:39Z Marge N. O’Vera <marge@example.com> # Adds table for storing flips.
+  insert_flip [flips appschema users] 2013-12-31T00:35:59Z Marge N. O’Vera <marge@example.com> # Creates a function to insert a flip.
+  delete_flip [flips appschema users] 2013-12-31T00:36:34Z Marge N. O’Vera <marge@example.com> # Creates a function to delete a flip.
+
+Note that it has appended the changes from the merged "lists" branch, and then
+merged the changes from our "flips" branch. Test it to make sure it works as
+expected:
+
+  > sqitch rebase -y
+  Reverting all changes from flipr_test
+    - delete_flip ............... ok
+    - insert_flip ............... ok
+    - flips ..................... ok
+    - change_pass @v1.0.0-dev1 .. ok
+    - insert_user ............... ok
+    - users ..................... ok
+    - appschema ................. ok
+  Deploying changes to flipr_test
+    + appschema ................. ok
+    + users ..................... ok
+    + insert_user ............... ok
+    + change_pass @v1.0.0-dev1 .. ok
+    + lists ..................... ok
+    + insert_list ............... ok
+    + delete_list ............... ok
+    + flips ..................... ok
+    + insert_flip ............... ok
+    + delete_flip ............... ok
+
+Note the use of L<C<rebase>|sqitch-rebase>, which combines a
+L<C<revert>|sqitch-revert> and a L<C<deploy>|sqitch-deploy> into a single
+command. Handy, right? It correctly reverted our changes, and then deployed
+them all again in the proper order. So let's commit F<.gitattributes>; seems
+worthwhile to keep that change:
+
+  > git add .
+  > git commit -m 'Add `.gitattributes` with union merge for `sqitch.plan`.'
+  [flips f5ad242] Add `.gitattributes` with union merge for `sqitch.plan`.
+   1 file changed, 1 insertion(+)
+   create mode 100644 .gitattributes
+
+=head2 Merges Mastered
+
+And now, finally, we can merge into C<master>:
+
+  > git checkout master
+  Switched to branch 'master'
+  > git merge --no-ff flips
+  Merge made by the 'recursive' strategy.
+   .gitattributes         |  1 +
+   deploy/delete_flip.sql | 17 +++++++++++++++++
+   deploy/flips.sql       | 16 ++++++++++++++++
+   deploy/insert_flip.sql | 17 +++++++++++++++++
+   revert/delete_flip.sql |  7 +++++++
+   revert/flips.sql       |  7 +++++++
+   revert/insert_flip.sql |  7 +++++++
+   sqitch.plan            |  3 +++
+   verify/delete_flip.sql |  7 +++++++
+   verify/flips.sql       | 12 ++++++++++++
+   verify/insert_flip.sql |  7 +++++++
+   11 files changed, 101 insertions(+)
+   create mode 100644 .gitattributes
+   create mode 100644 deploy/delete_flip.sql
+   create mode 100644 deploy/flips.sql
+   create mode 100644 deploy/insert_flip.sql
+   create mode 100644 revert/delete_flip.sql
+   create mode 100644 revert/flips.sql
+   create mode 100644 revert/insert_flip.sql
+   create mode 100644 verify/delete_flip.sql
+   create mode 100644 verify/flips.sql
+   create mode 100644 verify/insert_flip.sql
+
+And double-check our work:
+
+  > cat sqitch.plan
+  %syntax-version=1.0.0
+  %project=flipr
+  %uri=https://github.com/theory/sqitch-intro/
+
+  appschema 2013-12-30T23:19:45Z Marge N. O’Vera <marge@example.com> # Add schema for all flipr objects.
+  users [appschema] 2013-12-30T23:49:00Z Marge N. O’Vera <marge@example.com> # Creates table to track our users.
+  insert_user [users appschema] 2013-12-30T23:57:36Z Marge N. O’Vera <marge@example.com> # Creates a function to insert a user.
+  change_pass [users appschema] 2013-12-30T23:57:45Z Marge N. O’Vera <marge@example.com> # Creates a function to change a user password.
+  @v1.0.0-dev1 2013-12-31T00:01:22Z Marge N. O’Vera <marge@example.com> # Tag v1.0.0-dev1.
+
+  lists [appschema users] 2013-12-31T00:39:40Z Marge N. O’Vera <marge@example.com> # Adds table for storing lists.
+  insert_list [lists appschema users] 2013-12-31T00:41:29Z Marge N. O’Vera <marge@example.com> # Creates a function to insert a list.
+  delete_list [lists appschema users] 2013-12-31T00:41:37Z Marge N. O’Vera <marge@example.com> # Creates a function to delete a list.
+  flips [appschema users] 2013-12-31T00:32:39Z Marge N. O’Vera <marge@example.com> # Adds table for storing flips.
+  insert_flip [flips appschema users] 2013-12-31T00:35:59Z Marge N. O’Vera <marge@example.com> # Creates a function to insert a flip.
+  delete_flip [flips appschema users] 2013-12-31T00:36:34Z Marge N. O’Vera <marge@example.com> # Creates a function to delete a flip.
+
+Much much better, a nice clean master now. And because it is now identical to
+the "flips" branch, we can just carry on. Go ahead and tag it, bundle, and
+release:
+
+  > sqitch tag v1.0.0-dev2 -n 'Tag v1.0.0-dev2.'
+  Tagged "delete_flip" with @v1.0.0-dev2
+  > git commit -am 'Tag the database with v1.0.0-dev2.'
+  [master 230603b] Tag the database with v1.0.0-dev2.
+   1 file changed, 1 insertion(+)
+  > git tag v1.0.0-dev2 -am 'Tag v1.0.0-dev2'
+  > sqitch bundle --dest-dir flipr-1.0.0-dev2
+  Bundling into flipr-1.0.0-dev2
+  Writing config
+  Writing plan
+  Writing scripts
+    + appschema
+    + users
+    + insert_user
+    + change_pass @v1.0.0-dev1
+    + lists
+    + insert_list
+    + delete_list
+    + flips
+    + insert_flip
+    + delete_flip @v1.0.0-dev2
+
+Note the use of the C<--dest-dir> option to C<sqitch bundle>. Just a nicer way
+to create the top-level directory name so we don't have to rename it from
+F<bundle>.
+
+=head1 In Place Changes
+
+Uh-oh, someone just noticed that MD5 hashing is not particularly secure. Why?
+Have a look at this:
+
+  > psql -d flipr_test -c "
+      SELECT flipr.insert_user('foo', 'secr3t'), flipr.insert_user('bar', 'secr3t');
+      SELECT * FROM flipr.users;
+  "
+   nickname |             password             |           timestamp           
+  ----------+----------------------------------+-------------------------------
+   foo      | 9695da4dd567a19f9b92065f240c6725 | 2013-12-31 00:56:20.240481+00
+   bar      | 9695da4dd567a19f9b92065f240c6725 | 2013-12-31 00:56:20.240481+00
+
+If user "foo" ever got access to the database, she could quickly discover that
+user "bar" has the same password and thus be able to exploit the account. Not
+a great idea. So we need to modify the C<insert_user()> and C<change_pass()>
+functions to fix that. How?
+
+We'll use
+L<C<pgcrypto>|http://www.postgresql.org/docs/current/static/pgcrypto.html>'s
+C<crypt()> function to encrypt passwords with a salt, so that they're all
+unique. We just add a change to add C<pgcrypto> to the database, and then we
+can use it. The deploy script should be:
+
+  CREATE EXTENSION pgcrypto;
+
+And the revert script should be:
+
+  DROP EXTENSION pgcrypto;
+
+=over
+
+If you're on PostgreSQL 9.0 or lower, you won't be able to deploy C<pgcrypto>
+with a Sqitch change, alas. You'll have to install it manually, like so:
+
+    psql -d flipr_test -f /path/to/pgsql/share/contrib/pgcrypto.sql
+
+Don't forget to do this with your staging and production databases, too. Or
+consider upgrading to PostgreSQL 9.1 or higher; the SQL-level extension
+support is amazingly useful.
+
+=back
+
+We're going to use the C<crypt()> and C<gen_salt()> functions, so in the
+C<verify> script, let's make sure that the extension exists I<and> that both
+those functions exist:
+
+  SELECT 1/count(*) FROM pg_extension WHERE extname = 'pgcrypto';
+  SELECT has_function_privilege('crypt(text, text)', 'execute');
+  SELECT has_function_privilege('gen_salt(text)', 'execute');
+
+Now we can use C<pgcrypto>. But how to deploy the changes to C<insert_user()>
+and C<change_pass()>?
+
+Normally, modifying functions in database changes is a
+L<PITA|http://www.urbandictionary.com/define.php?term=pita>. You have to make
+changes like these:
+
+=over
+
+=item 1.
+
+Copy F<deploy/insert_user.sql> to F<deploy/insert_user_crypt.sql>.
+
+=item 2.
+
+Edit F<deploy/insert_user_crypt.sql> to switch from C<MD5()> to C<crypt()>
+and to add a dependency on the C<pgcrypto> change.
+
+=item 3.
+
+Copy F<deploy/insert_user.sql> to F<revert/insert_user_crypt.sql>.
+Yes, copy the original change script to the new revert change.
+
+=item 4.
+
+Copy F<verify/insert_user.sql> to F<verify/insert_user_crypt.sql>.
+
+=item 5.
+
+Edit F<verify/insert_user_crypt.sql> to test that the function now properly
+uses C<crypt()>.
+
+=item 6.
+
+Test the changes to make sure you can deploy and revert the
+C<insert_user_crypt> change.
+
+=item 7.
+
+Now do the same for the C<change_pass> scripts.
+
+=back
+
+But you can have Sqitch do it for you. The only requirement is that a tag
+appear between the two instances of a change we want to modify. In general,
+you're going to make a change like this after a release, which you've tagged
+anyway, right? Well we have, with C<@v1.0.0-dev2> added in the previous
+section. With that, we can let Sqitch do most of the hard work for us, thanks
+to the L<C<rework>|sqitch-rework> command, which is similar to
+L<C<add>|sqitch-add>, including support for the C<--requires> option:
+
+  > sqitch rework insert_user --requires pgcrypto -n 'Change insert_user to use pgcrypto.'
+  Added "insert_user [insert_user@v1.0.0-dev2 pgcrypto]" to sqitch.plan.
+  Modify these files as appropriate:
+    * deploy/insert_user.sql
+    * revert/insert_user.sql
+    * verify/insert_user.sql
+
+Oh, so we can edit those files in place. Nice! How does Sqitch do it? Well, in
+point of fact, it has copied the files to stand in for the previous instance
+of the C<insert_user> change, which we can see via C<git status>:
+
+  > git status
+  # On branch master
+  # Changes not staged for commit:
+  #   (use "git add <file>..." to update what will be committed)
+  #   (use "git checkout -- <file>..." to discard changes in working directory)
+  #
+  #	modified:   revert/insert_user.sql
+  #	modified:   sqitch.plan
+  #
+  # Untracked files:
+  #   (use "git add <file>..." to include in what will be committed)
+  #
+  #	deploy/insert_user@v1.0.0-dev2.sql
+  #	revert/insert_user@v1.0.0-dev2.sql
+  #	verify/insert_user@v1.0.0-dev2.sql
+  no changes added to commit (use "git add" and/or "git commit -a")
+
+The "untracked files" part of the output is the first thing to notice. They
+are all named C<insert_user@v1.0.0-dev2.sql>. What that means is: "the
+C<insert_user> change as it was implemented as of the C<@v1.0.0-dev2> tag."
+These are copies of the original scripts, and thereafter Sqitch will find them
+when it needs to run scripts for the first instance of the C<insert_user>
+change. As such, it's important not to change them again. But hey, if you're
+reworking the change, you shouldn't need to.
+
+The other thing to notice is that F<revert/insert_user.sql> has changed.
+Sqitch replaced it with the original deploy script. As of now,
+F<deploy/insert_user.sql> and F<revert/insert_user.sql> are identical. This is
+on the assumption that the deploy script will be changed (we're reworking it,
+remember?), and that the revert script should actually change things back to
+how they were before. Of course, the original deploy script may not be
+L<idempotent|http://en.wikipedia.org/wiki/Idempotence> -- that is, able to be
+applied multiple times without changing the result beyond the initial
+application. If it's not, you will likely need to modify it so that it
+properly restores things to how they were after the original deploy script was
+deployed. Or, more simply, it should revert changes back to how they were
+as-of the deployment of F<deploy/insert_user@v1.0.0-dev2.sql>.
+
+Fortunately, our function deploy scripts are already idempotent, thanks to the
+use of the C<OR REPLACE> expression. No matter how many times a deployment
+script is run, the end result will be the same instance of the function, with
+no duplicates or errors.
+
+As a result, there is no need to explicitly add changes. So go ahead. Modify the
+script to switch to C<crypt()>. Make this change to
+F<deploy/insert_user.sql>:
+
+  @@ -1,6 +1,7 @@
+   -- Deploy flipr:insert_user to pg
+   -- requires: users
+   -- requires: appschema
+  +-- requires: pgcrypto
+ 
+   BEGIN;
+ 
+  @@ -8,7 +9,7 @@ CREATE OR REPLACE FUNCTION flipr.insert_user(
+       nickname TEXT,
+       password TEXT
+   ) RETURNS VOID LANGUAGE SQL SECURITY DEFINER AS $$
+  -    INSERT INTO flipr.users VALUES($1, md5($2));
+  +    INSERT INTO flipr.users values($1, crypt($2, gen_salt('md5')));
+   $$;
+ 
+   COMMIT;
+
+Go ahead and rework the C<change_pass> change, too:
+
+  > sqitch rework change_pass --requires pgcrypto -n 'Change change_pass to use pgcrypto.'
+  Added "change_pass [change_pass@v1.0.0-dev2 pgcrypto]" to sqitch.plan.
+  Modify these files as appropriate:
+    * deploy/change_pass.sql
+    * revert/change_pass.sql
+    * verify/change_pass.sql
+
+And make this change to F<deploy/change_pass.sql>:
+
+  @@ -1,6 +1,7 @@
+   -- Deploy flipr:change_pass to pg
+   -- requires: users
+   -- requires: appschema
+  +-- requires: pgcrypto
+ 
+   BEGIN;
+ 
+  @@ -11,9 +12,9 @@ CREATE OR REPLACE FUNCTION flipr.change_pass(
+   ) RETURNS BOOLEAN LANGUAGE plpgsql SECURITY DEFINER AS $$
+   BEGIN
+       UPDATE flipr.users
+  -       SET password = md5($3)
+  +       SET password = crypt($3, gen_salt('md5'))
+        WHERE nickname = $1
+  -       AND password = md5($2);
+  +       AND password = crypt($2, password);
+       RETURN FOUND;
+   END;
+   $$;
+
+And then try a deployment:
+
+  > sqitch deploy
+  Deploying changes to flipr_test
+    + insert_user .. ok
+    + change_pass .. ok
+
+So, are the changes deployed?
+
+  > psql -d flipr_test -c "
+      DELETE FROM flipr.users;
+      SELECT flipr.insert_user('foo', 'secr3t'), flipr.insert_user('bar', 'secr3t');
+      SELECT * FROM flipr.users;
+  "
+   nickname |              password              |           timestamp           
+  ----------+------------------------------------+-------------------------------
+   foo      | $1$pRNfJjI9$CdcEXJ9xCoJPD.R5Z/7.R1 | 2013-12-31 01:03:15.398572+00
+   bar      | $1$Nf1LcU.p$B9sKzdu8vMgu5oxbimo5P1 | 2013-12-31 01:03:15.398572+00
+
+Awesome, the stored passwords are different now. But can we revert, even
+though we haven't written any reversion scripts?
+
+  > sqitch revert --to @HEAD^^ -y
+  Reverting changes to pgcrypto from flipr_test
+    - change_pass .. ok
+    - insert_user .. ok
+
+Did that work, are the C<MD5()> passwords back?
+
+  > psql -d flipr_test -c "
+      DELETE FROM flipr.users;
+      SELECT flipr.insert_user('foo', 'secr3t'), flipr.insert_user('bar', 'secr3t');
+      SELECT * FROM flipr.users;
+  "
+   nickname |             password             |           timestamp           
+  ----------+----------------------------------+-------------------------------
+   foo      | 9695da4dd567a19f9b92065f240c6725 | 2013-12-31 01:03:57.263583+00
+   bar      | 9695da4dd567a19f9b92065f240c6725 | 2013-12-31 01:03:57.263583+00
+
+Yes, it works! Sqitch properly finds the original instances of these changes
+in the new script files that include tags.
+
+But what about the verify script? How can we verify that the functions have
+been modified to use C<crypt()>? I think the simplest thing to do is to
+examine the body of the function, using
+L<C<pg_get_functiondef()>|http://www.postgresql.org/docs/9.2/static/functions-info.html#FUNCTIONS-INFO-CATALOG-TABLE>. So the C<insert_user> verify script looks like this:
+
+  -- Verify flipr:insert_user on pg
+
+  BEGIN;
+
+  SELECT has_function_privilege('flipr.insert_user(text, text)', 'execute');
+
+  SELECT 1/COUNT(*)
+    FROM pg_catalog.pg_proc
+   WHERE proname = 'insert_user'
+     AND pg_get_functiondef(oid) LIKE $$%crypt($2, gen_salt('md5'))%$$;
+
+  ROLLBACK;
+
+And the C<change_pass> verify script looks like this:
+
+  -- Verify flipr:change_pass on pg
+
+  BEGIN;
+
+  SELECT has_function_privilege('flipr.change_pass(text, text, text)', 'execute');
+
+  SELECT 1/COUNT(*)
+    FROM pg_catalog.pg_proc
+   WHERE proname = 'change_pass'
+     AND pg_get_functiondef(oid) LIKE $$%crypt($3, gen_salt('md5'))%$$;
+
+  ROLLBACK;
+
+Make sure these pass by re-deploying:
+
+  > sqitch deploy
+  Deploying changes to flipr_test
+    + insert_user .. ok
+    + change_pass .. ok
+
+Excellent. Let's go ahead and commit these changes:
+
+  > git add .
+  > git commit -m 'Use pgcrypto to encrypt passwords.'
+  [master 4257ae6] Use pgcrypto to encrypt passwords.
+   13 files changed, 107 insertions(+), 9 deletions(-)
+   create mode 100644 deploy/change_pass@v1.0.0-dev2.sql
+   create mode 100644 deploy/insert_user@v1.0.0-dev2.sql
+   create mode 100644 revert/change_pass@v1.0.0-dev2.sql
+   create mode 100644 revert/insert_user@v1.0.0-dev2.sql
+   create mode 100644 verify/change_pass@v1.0.0-dev2.sql
+   create mode 100644 verify/insert_user@v1.0.0-dev2.sql
+
+  > sqitch status
+  # On database flipr_test
+  # Project:  flipr
+  # Change:   d3ffa30b72abaf9619ae1f0e726026667612f2b1
+  # Name:     change_pass
+  # Deployed: 2013-12-30 17:05:08 -0800
+  # By:       Marge N. O’Vera <marge@example.com>
+  # 
+  Nothing to deploy (up-to-date)
+
+=head1 More to Come
+
+Sqitch is a work in progress. Better integration with version control systems
+is planned to make managing idempotent reworkings even easier. Stay tuned.
+
+=head1 Author
+
+David E. Wheeler <david@justatheory.com>
+
+=head1 License
+
+Copyright (c) 2012-2015 iovation Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=cut

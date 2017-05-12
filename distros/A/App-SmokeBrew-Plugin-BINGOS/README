@@ -1,0 +1,77 @@
+NAME
+
+    App::SmokeBrew::Plugin::BINGOS - a smokebrew plugin to configure things
+    like BINGOS does
+
+VERSION
+
+    version 0.12
+
+SYNOPSIS
+
+      # smokebrew.cfg
+    
+      [BINGOS]
+      relay = myrelay
+      port = 8080
+    
+      # then run
+    
+      $ smokebrew --plugin App::SmokeBrew::Plugin::BINGOS
+
+DESCRIPTION
+
+    App::SmokeBrew::Plugin::BINGOS is a App::SmokeBrew::Plugin for
+    smokebrew which configures the built perl installations for CPAN
+    Testing with CPANPLUS::YACSmoke and sending test reports to a
+    metabase-relayd host using Test::Reporter::Transport::Socket.
+
+    It will set up the CPANPLUS / CPANPLUS::YACSmoke base locations to be
+    in the conf directory under the given prefix directory with a directory
+    for each perl version.
+
+CONFIGURATION
+
+    This plugin requires two attributes: relay - the hostname or IP address
+    of a metabase-relayd host and port - the TCP port of the
+    metabase-relayd on that host.
+
+    These attributes should be specified in the smokebrew.cfg file under a
+    named section:
+
+      [BINGOS]
+    
+      relay = some.host
+      port = 8080
+
+METHODS
+
+    configure
+
+      Called by smokebrew to perform the CPAN Testing configuration.
+
+SEE ALSO
+
+    App::SmokeBrew::Plugin
+
+    smokebrew
+
+    CPANPLUS
+
+    CPANPLUS::YACSmoke
+
+    metabase-relayd
+
+    Test::Reporter::Transport::Socket
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

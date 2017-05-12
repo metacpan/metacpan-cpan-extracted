@@ -1,0 +1,8 @@
+- bugfix: stereo 16,24,32 bit code fails make test - 8 bit stereo, all mono ok
+- revamp testing code. include 8, 16, 24, 32 bit, mono+stereo testing.
+- check the above with and without inline
+- check the above on big-endian platforms (so far just tested on little)
+- re: 0x80000000 bug: can reproduce warning using 32 bit cc
+- optimize Wav/Write as was done for Wav/Read - use _init_write_sub() first,
+  then Inline::C
+- use XS instead of Inline for portability if time

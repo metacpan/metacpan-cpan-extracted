@@ -1,0 +1,24 @@
+Acme/ScriptoPhrenic version 0.0.2
+=====================
+
+See Pod for documentation or 
+ perldoc Acme::ScriptoPhrenic
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+or
+
+  perl -MCPAN -e 'install Acme::ScriptoPhrenic;'
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Daniel Muey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

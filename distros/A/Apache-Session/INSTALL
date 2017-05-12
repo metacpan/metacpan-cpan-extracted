@@ -1,0 +1,13 @@
+
+First, build, test, and install mod_perl and Apache.  You may also need to 
+install one or more of the following modules from CPAN: DBI, IPC::Shareable,
+Storable, FreezeThaw, MD5.
+
+After all of that:
+
+ perl Makefile.PL
+ make install
+ perldoc Apache::Session
+
+Have fun,
+Jeffrey

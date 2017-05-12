@@ -1,0 +1,30 @@
+---
+abstract: 'A console to manage your etherpad instance'
+author:
+  - 'Luc Didry <luc@didry.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-padconsole
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Browser::Open: '0'
+  Config::YAML: '0'
+  DateTime: '0'
+  Etherpad: v1.2.10.3
+  Term::ReadLine: '0'
+  URI::Escape: '0'
+resources:
+  repository: git://github.com/ldidry/padconsole.git
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

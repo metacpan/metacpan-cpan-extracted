@@ -1,0 +1,11 @@
+DESCRIPTION
+
+    This distribution contains various examples of Apachish configuration
+    files in its per-dist share dir. It also serves as a spectest.
+
+SEE ALSO
+
+    Apachish
+
+    Config::Apachish, Config::Apachish::Reader
+

@@ -1,0 +1,1 @@
+<a href="[% s.ubase %]/[% args.object %]/[% args.function %][% args.params %]" class="action">[% args.title %]</a>

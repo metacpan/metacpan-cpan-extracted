@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               AC-MrGamoo
+version:            1
+abstract:           Map/Reduce Framework
+author:
+    - AdCopy <http://www.adcopy.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    AC::DC:               0
+    Digest::SHA1:         0
+    Google::ProtocolBuffers:  0
+    JSON:                 0
+    POSIX:                0
+    Sys::Hostname:        0
+    Time::HiRes:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

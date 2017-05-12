@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+ProxyScan.pm
+Makefile.PL
+test.pl
+README
+eg/sophos.pl
+eg/clamav.pl
+eg/mcafee.pl
+eg/rav.pl

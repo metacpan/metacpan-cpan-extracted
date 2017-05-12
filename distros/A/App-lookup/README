@@ -1,0 +1,206 @@
+NAME
+    lookup - search the internet from your terminal
+
+VERSION
+    Version 0.06.
+
+USAGE
+      lookup [--help] [--man] [--abbrevs] [--config-file FILE] [--sites]
+             [--web-browser COMMAND] [--abbrevs] SITE QUERY
+
+EXAMPLES
+      # search google for the phrase 'perl is pretty awesome'
+      lookup google 'perl is pretty awesome'
+
+      # same thing, with abbreviated SITE g (or go, or goo, or goog
+      # or ... you get the idea)
+      lookup g 'perl is pretty awesome'
+
+      # ditto, but arguments to QUERY are not quoted
+      lookup google perl is pretty awesome
+
+DESCRIPTION
+    This is a simple command line program which lets you search the internet
+    from the terminal. It's not exactly the most original idea out there. I
+    personally have used various programs which pretty much do the same
+    thing, (most of these even offer better user interface): custom web
+    search feature in Firefox, similar feature in Quicksilver
+    <http://www.qsapp.com/> and Launchy <http://www.launchy.net/>, a fairly
+    sophisticated command line program called googlecl
+    <http://code.google.com/p/googlecl/>, and an emacs lisp library called
+    webjump <http://www.emacswiki.org/emacs/WebJump>.
+
+    But this raises quiet a few problems, namely:
+
+    *   The inability to share my own custom sites defined in one program
+        with another.
+
+    *   Some programs are tied to a specific platform, e.g. Quicksilver on
+        OSX, Launchy on Windows, and webjump on emacs :p. See also: problem
+        #1.
+
+    This program offers a simple solution to said problems. It uses a plain
+    text file configuration which you can use to add your own custom sites
+    (and aliases, but more on that later). You can also use it to interface
+    with other programs, see the section "INTEGRATION WITH EMACS" for an
+    example.
+
+    By default you're only able to search with google. You can search with
+    more sites by putting the following in the file ~/.lookuprc (see
+    "CONFIGURATION FILE").
+
+      [sites]
+      bing = http://www.bing.com/search?q=%(query)
+
+    Assuming that's the only thing you put in the config file (to make sure
+    that the abbreviations don't clash), you'll be able to search with bing
+    <http://www.bing.com> with either one of the following commands:
+
+      lookup bing foobar
+      lookup bin foobar
+      lookup bi foobar
+      lookup b foobar
+
+OPTIONS
+  REQUIRED
+    SITE
+        The site name, which can be abbreviated as long as the name remains
+        unique.
+
+    QUERY
+        The query string. For convenience, the arguments do not have to be
+        quoted/protected from the shell since the rest of the arguments
+        (after SITE) are assumed to be the query string and eventually will
+        be joined with the space character. These two commands work exactly
+        the same:
+
+          lookup google 'foo bar baz'
+
+        vs
+
+          lookup google foo bar baz
+
+  OPTIONAL
+    -h, --help
+        Print short help message and exit.
+
+    -m, --man
+        Print the full documentation and exit. Make sure to read this
+        document if you want to add your own sites or aliases.
+
+    -v, --version
+        Print this program version and exit.
+
+    -c, --config-file FILE
+        Use a different configuration file. Default location is ~/.lookuprc.
+
+    -a, --abbrevs
+        List all sites with their valid abbreviations and exit.
+
+    -s, --sites
+        List all site names with their corresponding url and exit.
+
+    -w, --web-browser COMMAND
+        Specify a different command to run the web browser. By default this
+        program uses whatever command does the module Browser::Open return
+        to open the web browser. You can use this option to specify other
+        command to execute.
+
+        NOTE: if you're using cygwin, you currently must specify this option
+        (see "CAVEATS, BUGS AND TODOS").
+
+          lookup google foo -w 'cygstart'
+
+        Other example:
+
+          lookup google foo -w 'open -a Safari'
+
+        On OSX, the above command will make this program use the application
+        "Safari" (obviously it won't work on other platforms).
+
+CONFIGURATION FILE
+    You can manage user-defined sites and their aliases by putting the
+    information in the configuration file, by default located at ~/.lookuprc
+    (although you can change it with the option --config-file).
+
+    It uses the ubiquitous INI file syntax. Sites information should be put
+    under the heading called "[sites]" and aliases under the heading
+    "[alias]". Lines that are starting with the characters "#" or ";" are
+    ignored. Whitespace in either the key or the value is legal.
+
+  SITES
+    The section "[sites]" is where we defined our own sites. Each item
+    contains a pair of key and value, where the key is the name of the site,
+    and the value is the url. For example:
+
+      [sites]
+      metacpan     = https://metacpan.org/search?q=%(query)
+
+    This add a new site called "metacpan" which is associated with the url
+    "https://metacpan.org/search?q=%(query)". The string "%(query)" will be
+    replaced with the query string supplied to the option QUERY.
+
+  ALIASES
+    Aliases let us shorten the site name, where the key is the alias name
+    and the value is an already existing site name (this program will print
+    a warning message if you specify an alias that doesn't point to a valid
+    site).
+
+    Continuing from the previous example, we can shorten the name "metacpan"
+    into "m" by putting the following lines in the configuration file:
+
+      [alias]
+      m = metacpan
+
+    Now we can search for module called "Some::Module" on metacpan
+    <http://metacpan.org> by invoking the command:
+
+      lookup m Some::Module
+
+  EXAMPLE OF CONFIGURATION FILE
+    Here's an example of configuration file, feel free to use it as a
+    starting point.
+
+      [sites]
+
+      duckduckgo   = http://duckduckgo.com/?q=%(query)
+      emacswiki    = http://google.com/search?q=site:emacswiki.org %(query)
+      github       = https://github.com/search?q=%(query)
+      google lucky = http://google.com/search?btnI=1&q=%(query)
+      imdb         = http://www.imdb.com/find?q=%(query)
+      metacpan     = https://metacpan.org/search?q=%(query)
+      perldoc      = http://perldoc.perl.org/search.html?q=%(query)
+      search cpan  = http://search.cpan.org/search?query=%(query)&mode=all
+      wikipedia    = http://en.wikipedia.org/?search=%(query)
+      youtube      = http://www.youtube.com/results?q=%(query)
+
+      [alias]
+
+      ddg   = duckduckgo
+      g     = google
+      lucky = google lucky
+      wi    = wikipedia
+      y     = youtube
+
+EXTRAS
+  INTEGRATION WITH EMACS
+    See the file etc/lookup.el. Short
+    <screencast|http://i.minus.com/inRg3aL2wGGQ5.gif> demonstrating the
+    usage of lookup within emacs.
+
+CAVEATS, BUGS, AND TODOS
+    *   Opening web browser in cygwin does not work
+
+        Due to this bug
+        <https://rt.cpan.org/Public/Bug/Display.html?id=85972> in
+        Browser::Open.
+
+AUTHOR
+    Ahmad Syaltut <syaltut@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Ahmad Syaltut.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

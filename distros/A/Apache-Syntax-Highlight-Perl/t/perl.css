@@ -1,0 +1,26 @@
+body {font-size:10pt; color:#333366;}
+
+.Comment_Normal {color:#006699;font-style:italic;}
+.Comment_POD {color:#AAAAAA;font-style:italic;}
+.Directive {color:#339999;font-style:italic;}
+.Label {color:#993399;font-style:italic;}
+.Quote {color:#0000aa;}
+.String {color:#0000aa;}
+.Subroutine {color:#998800;}
+.Variable_Scalar {color:#008800;}
+.Variable_Array {color:#ff7700;}
+.Variable_Hash {color:#8800ff;}
+.Variable_Typeglob {color:#ff0033;}
+.Whitespace {}
+.Character {color:#880000;}
+.Keyword {color:#000000; font-weight:bold;}
+.Builtin_Function {color:#000000; font-weight:bold;}
+.Builtin_Operator {color:#000000; font-weight:bold;}
+.Operator {color:#000000;}
+.Bareword {color:#33AA33;}
+.Package {color:#990000;}
+.Number {color:#ff00ff;}
+.Symbol {color:#000000;}
+.CodeTerm {color:#AA0000;}
+.DATA {color:#AAAAAA;}
+.LineNumber {color:#CCCCCC;}

@@ -1,0 +1,3254 @@
+#!/usr/bin/perl
+#
+#  Author:
+#		Wojciech Baranski
+#  E-mail:
+#		wojciech_baranski@yahoo.com
+#		Wojciech.Baranski@informix.com
+#
+#  This program may be distributed under the GPL (GNU Public License).
+#  THIS SOFTWARE COMES WITH ABSOLUTELY NO WARRANTY! USE IT AT YOUR OWN RISK !
+#  I only gently ask that You notify me of changes You made, so I can improve
+#  it further. Thank You.
+#
+#
+#  mp3play is a frontend for mpg123 version 0.59r and above (having the control
+#  keys mode capability), so if You don't have it You must download it from
+#  http://mpg.123.org/ or this frontend won't be useful for You.
+#
+#
+#
+use POSIX;
+use Term::Cap;
+use Ioctl qw/TIOCGWINSZ TIOCSWINSZ/;
+$0=~s/^.*\///;					# remove path from program name
+$0=~s/$/: /;					# add ": " to the end of program
+						# name
+select(STDOUT);
+$|=1;						# make STDOUT unbuffered
+open(ERROR_STREAM,">&STDERR");			# define STDERR for default
+						# error output stream
+select(ERROR_STREAM);
+$|=1;						# make ERROR_STREAM unbuffered
+setpgrp(0,0);					# set process group
+$Width=80;					# terminal width
+$Height=25;					# terminal height
+$WindowSize='';
+ioctl(STDIN,&TIOCGWINSZ,$WindowSize);
+($Height,$Width,$XPixel,$YPixel)=unpack("S4",$WindowSize);
+print(ERROR_STREAM $0."Terminal is too small. Quit.\n"),MyExit(1) if(($Width<80)||($Height<25));
+$OldWindowSize=$WindowSize;
+$TermCap=Tgetent Term::Cap { OSPEED => 9600 };	# read termcap capabilities
+eval {$TermCap->Trequire(qw/cm cl/)};
+print(ERROR_STREAM $0.$@),MyExit(1) if($@);
+						# require "cm" and "cl"
+eval {$TermCap->Trequire(qw/vi/)};
+if(!$@)
+ {						# if "vi" supported then
+						# require "ve"
+  eval {$TermCap->Trequire(qw/vi ve/)};
+  print(ERROR_STREAM $0.$@),MyExit(1) if($@);
+ }
+$Terminal=POSIX::Termios->new();
+$Terminal->getattr(fileno(STDIN));		# get terminal attributes
+$OldTerminalSettings=$Terminal->getlflag();	# store terminal attributes
+$SIG{QUIT}=\&SignalHandler;			# set signal handling routine
+$SIG{STOP}=\&SignalHandler;
+$SIG{ABRT}=\&SignalHandler;
+$SIG{KILL}=\&SignalHandler;
+$SIG{HUP}=\&SignalHandler;
+$SIG{TERM}=\&SignalHandler;
+$SIG{INT}=\&SignalHandler;
+$SIG{TSTP}=\&SignalHandler;
+$SIG{WINCH}=\&WinCHSignalHandler;
+						# set used keys
+$TermcapEntry{"kd"}=$TermCap->{'_kd'} if($TermCap->{'_kd'} ne "");
+$TermcapEntry{"ku"}=$TermCap->{'_ku'} if($TermCap->{'_ku'} ne "");
+$TermcapEntry{"kN"}=$TermCap->{'_kN'} if($TermCap->{'_kN'} ne "");
+$TermcapEntry{"kP"}=$TermCap->{'_kP'} if($TermCap->{'_kP'} ne "");
+$TermcapEntry{"kH"}=$TermCap->{'_kH'} if($TermCap->{'_kH'} ne "");
+$TermcapEntry{"kh"}=$TermCap->{'_kh'} if($TermCap->{'_kh'} ne "");
+$TermcapEntry{"kl"}=$TermCap->{'_kl'} if($TermCap->{'_kl'} ne "");
+$TermcapEntry{"kr"}=$TermCap->{'_kr'} if($TermCap->{'_kr'} ne "");
+$TermcapEntry{"kD"}=$TermCap->{'_kD'} if($TermCap->{'_kD'} ne "");
+$TermcapEntry{"kI"}=$TermCap->{'_kI'} if($TermCap->{'_kI'} ne "");
+$TermcapEntryReadingLine{"kb"}=$TermCap->{'_kb'} if($TermCap->{'_kb'} ne "");
+$TermcapEntryReadingLine{"kD"}=$TermCap->{'_kD'} if($TermCap->{'_kD'} ne "");
+$TermcapEntryReadingLine{"bs"}=pack("C",8);	# ASCII "Ctrl-H"
+$OGON="\033(U";					# sequence to put terminal into
+						# PC keys mode
+$OGOFF="\033(B";				# sequence to put terminal out 
+						# of PC keys mode
+
+						# definition of varius special
+						# characters used for display.
+						# the second argument 0 or 1 is
+						# defines characters for 8-bit
+						# and 7-bit mode respectively.
+$Display{"hline",0}=$TermCap->{'_as'}."q".$TermCap->{'_ae'};
+$Display{"hline",1}="-";
+$Display{"ulcorner",0}=$TermCap->{'_as'}."l".$TermCap->{'_ae'};
+$Display{"ulcorner",1}="+";
+$Display{"urcorner",0}=$TermCap->{'_as'}."k".$TermCap->{'_ae'};
+$Display{"urcorner",1}="+";
+$Display{"llcorner",0}=$TermCap->{'_as'}."m".$TermCap->{'_ae'};
+$Display{"llcorner",1}="+";
+$Display{"lrcorner",0}=$TermCap->{'_as'}."j".$TermCap->{'_ae'};
+$Display{"lrcorner",1}="+";
+$Display{"vline",0}=$TermCap->{'_as'}."x".$TermCap->{'_ae'};
+$Display{"vline",1}="|";
+$Display{"ltitle",0}=$TermCap->{'_as'}."u".$TermCap->{'_ae'};
+$Display{"ltitle",1}="|";
+$Display{"rtitle",0}=$TermCap->{'_as'}."t".$TermCap->{'_ae'};
+$Display{"rtitle",1}="|";
+$Display{"stop",0}=$TermCap->{'_as'}."i".$TermCap->{'_ae'}." ";
+$Display{"stop",1}="[]";
+$Display{"pause",0}="||";
+$Display{"pause",1}="||";
+$Display{"play",0}=" ".$OGON."\020".$OGOFF;
+$Display{"play",1}=" >";
+$Display{"previous",0}="|".$OGON."\021".$OGOFF;
+$Display{"previous",1}="|<";
+$Display{"begin",0}=$OGON."\036\036".$OGOFF;
+$Display{"begin",1}="^^";
+$Display{"next",0}=$OGON."\020".$OGOFF."|";
+$Display{"next",1}=">|";
+$Display{"rewind",0}=$OGON."\021\021".$OGOFF;
+$Display{"rewind",1}="<<";
+$Display{"forward",0}=$OGON."\020\020".$OGOFF;
+$Display{"forward",1}=">>";
+$Display{"checked",0}=$TermCap->{'_as'}."\`".$TermCap->{'_ae'};
+$Display{"checked",1}="x";
+$Display{"vbar_bg",0}=$TermCap->{'_as'}."h".$TermCap->{'_ae'};
+$Display{"vbar_bg",1}="@";
+$Display{"vbar_fg",0}=$TermCap->{'_as'}."0".$TermCap->{'_ae'};
+$Display{"vbar_fg",1}=":";
+$Display{"hbar_bg",0}=$TermCap->{'_as'}."h".$TermCap->{'_ae'};
+$Display{"hbar_bg",1}="@";
+$Display{"hbar_fg",0}=$TermCap->{'_as'}."0".$TermCap->{'_ae'};
+$Display{"hbar_fg",1}=":";
+$Display{"current",0}=$TermCap->{'_as'}."\`".$TermCap->{'_ae'};
+$Display{"current",1}="*";
+$Display{"lselected",0}=$OGON."\020".$OGOFF;
+$Display{"lselected",1}=">";
+$Display{"rselected",0}=$OGON."\021".$OGOFF;
+$Display{"rselected",1}="<";
+$MusicT{pack("C","0")}="Blues";			# definitions of music type
+$MusicT{pack("C","1")}="Classic Rock";		# in MP3 tag
+$MusicT{pack("C","2")}="Country";
+$MusicT{pack("C","3")}="Dance";
+$MusicT{pack("C","4")}="Disco";
+$MusicT{pack("C","5")}="Funk";
+$MusicT{pack("C","6")}="Grunge";
+$MusicT{pack("C","7")}="Hip-Hop";
+$MusicT{pack("C","8")}="Jazz";
+$MusicT{pack("C","9")}="Metal";
+$MusicT{pack("C","10")}="New Age";
+$MusicT{pack("C","11")}="Oldies";
+$MusicT{pack("C","12")}="Other";
+$MusicT{pack("C","13")}="Pop";
+$MusicT{pack("C","14")}="R&B";
+$MusicT{pack("C","15")}="Rap";
+$MusicT{pack("C","16")}="Reggae";
+$MusicT{pack("C","17")}="Rock";
+$MusicT{pack("C","18")}="Techno";
+$MusicT{pack("C","19")}="Industrial";
+$MusicT{pack("C","20")}="Alternative";
+$MusicT{pack("C","21")}="Ska";
+$MusicT{pack("C","22")}="Death Metal";
+$MusicT{pack("C","23")}="Pranks";
+$MusicT{pack("C","24")}="Soundtrack";
+$MusicT{pack("C","25")}="Euro-Techno";
+$MusicT{pack("C","26")}="Ambient";
+$MusicT{pack("C","27")}="Trip-Hop";
+$MusicT{pack("C","28")}="Vocal";
+$MusicT{pack("C","29")}="Jazz+Funk";
+$MusicT{pack("C","30")}="Fusion";
+$MusicT{pack("C","31")}="Trance";
+$MusicT{pack("C","32")}="Classical";
+$MusicT{pack("C","33")}="Instrumental";
+$MusicT{pack("C","34")}="Acid";
+$MusicT{pack("C","35")}="House";
+$MusicT{pack("C","36")}="Game";
+$MusicT{pack("C","37")}="Sound Clip";
+$MusicT{pack("C","38")}="Gospel";
+$MusicT{pack("C","39")}="Noise";
+$MusicT{pack("C","40")}="Alternative Rock";
+$MusicT{pack("C","41")}="Bass";
+$MusicT{pack("C","42")}="Soul";
+$MusicT{pack("C","43")}="Punk";
+$MusicT{pack("C","44")}="Space";
+$MusicT{pack("C","45")}="Meditative";
+$MusicT{pack("C","46")}="Instrumental Pop";
+$MusicT{pack("C","47")}="Instrumental Rock";
+$MusicT{pack("C","48")}="Ethnic";
+$MusicT{pack("C","49")}="Gothic";
+$MusicT{pack("C","50")}="Darkwave";
+$MusicT{pack("C","51")}="Techno-Industrial";
+$MusicT{pack("C","52")}="Electronic";
+$MusicT{pack("C","53")}="Pop-Folk";
+$MusicT{pack("C","54")}="Eurodance";
+$MusicT{pack("C","55")}="Dream";
+$MusicT{pack("C","56")}="Southern Rock";
+$MusicT{pack("C","57")}="Comedy";
+$MusicT{pack("C","58")}="Cult";
+$MusicT{pack("C","59")}="Gangsta";
+$MusicT{pack("C","60")}="Top 40";
+$MusicT{pack("C","61")}="Christian Rap";
+$MusicT{pack("C","62")}="Pop/Funk";
+$MusicT{pack("C","63")}="Jungle";
+$MusicT{pack("C","64")}="Native US";
+$MusicT{pack("C","65")}="Cabaret";
+$MusicT{pack("C","66")}="New Wave";
+$MusicT{pack("C","67")}="Psychadelic";
+$MusicT{pack("C","68")}="Rave";
+$MusicT{pack("C","69")}="Showtunes";
+$MusicT{pack("C","70")}="Trailer";
+$MusicT{pack("C","71")}="Lo-Fi";
+$MusicT{pack("C","72")}="Tribal";
+$MusicT{pack("C","73")}="Acid Punk";
+$MusicT{pack("C","74")}="Acid Jazz";
+$MusicT{pack("C","75")}="Polka";
+$MusicT{pack("C","76")}="Retro";
+$MusicT{pack("C","77")}="Musical";
+$MusicT{pack("C","78")}="Rock & Roll";
+$MusicT{pack("C","79")}="Hard Rock";
+$MusicT{pack("C","80")}="Folk";
+$MusicT{pack("C","81")}="Folk-Rock";
+$MusicT{pack("C","82")}="National Folk";
+$MusicT{pack("C","83")}="Swing";
+$MusicT{pack("C","84")}="Fast Fusion";
+$MusicT{pack("C","85")}="Bebob";
+$MusicT{pack("C","86")}="Latin";
+$MusicT{pack("C","87")}="Revival";
+$MusicT{pack("C","88")}="Celtic";
+$MusicT{pack("C","89")}="Bluegrass";
+$MusicT{pack("C","90")}="Avantgarde";
+$MusicT{pack("C","91")}="Gothic Rock";
+$MusicT{pack("C","92")}="Progressive Rock";
+$MusicT{pack("C","93")}="Psychedelic Rock";
+$MusicT{pack("C","94")}="Symphonic Rock";
+$MusicT{pack("C","95")}="Slow Rock";
+$MusicT{pack("C","96")}="Big Band";
+$MusicT{pack("C","97")}="Chorus";
+$MusicT{pack("C","98")}="Easy Listening";
+$MusicT{pack("C","99")}="Acoustic";
+$MusicT{pack("C","100")}="Humour";
+$MusicT{pack("C","101")}="Speech";
+$MusicT{pack("C","102")}="Chanson";
+$MusicT{pack("C","103")}="Opera";
+$MusicT{pack("C","104")}="Chamber Music";
+$MusicT{pack("C","105")}="Sonata";
+$MusicT{pack("C","106")}="Symphony";
+$MusicT{pack("C","107")}="Booty Bass";
+$MusicT{pack("C","108")}="Primus";
+$MusicT{pack("C","109")}="Porn Groove";
+$MusicT{pack("C","110")}="Satire";
+$MusicT{pack("C","111")}="Slow Jam";
+$MusicT{pack("C","112")}="Club";
+$MusicT{pack("C","113")}="Tango";
+$MusicT{pack("C","114")}="Samba";
+$MusicT{pack("C","115")}="Folklore";
+$MusicT{pack("C","116")}="Ballad";
+$MusicT{pack("C","117")}="Power Ballad";
+$MusicT{pack("C","118")}="Rythmic Soul";
+$MusicT{pack("C","119")}="Freestyle";
+$MusicT{pack("C","120")}="Duet";
+$MusicT{pack("C","121")}="Punk Rock";
+$MusicT{pack("C","122")}="Drum Solo";
+$MusicT{pack("C","123")}="Acapella";
+$MusicT{pack("C","124")}="Euro-House";
+$MusicT{pack("C","125")}="Dance Hall";
+$MusicT{pack("C","126")}="Goa";
+$MusicT{pack("C","127")}="Drum & Bass";
+$MusicT{pack("C","128")}="Club-House";
+$MusicT{pack("C","129")}="Hardcore";
+$MusicT{pack("C","130")}="Terror";
+$MusicT{pack("C","131")}="Indie";
+$MusicT{pack("C","132")}="BritPop";
+$MusicT{pack("C","133")}="Negerpunk";
+$MusicT{pack("C","134")}="Polsk Punk";
+$MusicT{pack("C","135")}="Beat";
+$MusicT{pack("C","136")}="Christian Gangsta Rap";
+$MusicT{pack("C","137")}="Heavy Metal";
+$MusicT{pack("C","138")}="Black Metal";
+$MusicT{pack("C","139")}="Crossover";
+$MusicT{pack("C","140")}="Contemporary Christian";
+$MusicT{pack("C","141")}="Christian Rock";
+$MusicT{pack("C","142")}="Marengue";
+$MusicT{pack("C","143")}="Salsa";
+$MusicT{pack("C","144")}="Trash Metal";
+$MusicT{pack("C","145")}="Anime";
+$MusicT{pack("C","146")}="Jpop";
+$MusicT{pack("C","147")}="Synthpop";
+$MusicT{pack("C","148")}="Unknown";
+$MusicT{pack("C","149")}="Unknown";
+$MusicT{pack("C","150")}="Unknown";
+$MusicT{pack("C","151")}="Unknown";
+$MusicT{pack("C","152")}="Unknown";
+$MusicT{pack("C","153")}="Unknown";
+$MusicT{pack("C","154")}="Unknown";
+$MusicT{pack("C","155")}="Unknown";
+$MusicT{pack("C","156")}="Unknown";
+$MusicT{pack("C","157")}="Unknown";
+$MusicT{pack("C","158")}="Unknown";
+$MusicT{pack("C","159")}="Unknown";
+$MusicT{pack("C","160")}="Unknown";
+$MusicT{pack("C","161")}="Unknown";
+$MusicT{pack("C","162")}="Unknown";
+$MusicT{pack("C","163")}="Unknown";
+$MusicT{pack("C","164")}="Unknown";
+$MusicT{pack("C","165")}="Unknown";
+$MusicT{pack("C","166")}="Unknown";
+$MusicT{pack("C","167")}="Unknown";
+$MusicT{pack("C","168")}="Unknown";
+$MusicT{pack("C","169")}="Unknown";
+$MusicT{pack("C","170")}="Unknown";
+$MusicT{pack("C","171")}="Unknown";
+$MusicT{pack("C","172")}="Unknown";
+$MusicT{pack("C","173")}="Unknown";
+$MusicT{pack("C","174")}="Unknown";
+$MusicT{pack("C","175")}="Unknown";
+$MusicT{pack("C","176")}="Unknown";
+$MusicT{pack("C","177")}="Unknown";
+$MusicT{pack("C","178")}="Unknown";
+$MusicT{pack("C","179")}="Unknown";
+$MusicT{pack("C","180")}="Unknown";
+$MusicT{pack("C","181")}="Unknown";
+$MusicT{pack("C","182")}="Unknown";
+$MusicT{pack("C","183")}="Unknown";
+$MusicT{pack("C","184")}="Unknown";
+$MusicT{pack("C","185")}="Unknown";
+$MusicT{pack("C","186")}="Unknown";
+$MusicT{pack("C","187")}="Unknown";
+$MusicT{pack("C","188")}="Unknown";
+$MusicT{pack("C","189")}="Unknown";
+$MusicT{pack("C","190")}="Unknown";
+$MusicT{pack("C","191")}="Unknown";
+$MusicT{pack("C","192")}="Unknown";
+$MusicT{pack("C","193")}="Unknown";
+$MusicT{pack("C","194")}="Unknown";
+$MusicT{pack("C","195")}="Unknown";
+$MusicT{pack("C","196")}="Unknown";
+$MusicT{pack("C","197")}="Unknown";
+$MusicT{pack("C","198")}="Unknown";
+$MusicT{pack("C","199")}="Unknown";
+$MusicT{pack("C","200")}="Unknown";
+$MusicT{pack("C","201")}="Unknown";
+$MusicT{pack("C","202")}="Unknown";
+$MusicT{pack("C","203")}="Unknown";
+$MusicT{pack("C","204")}="Unknown";
+$MusicT{pack("C","205")}="Unknown";
+$MusicT{pack("C","206")}="Unknown";
+$MusicT{pack("C","207")}="Unknown";
+$MusicT{pack("C","208")}="Unknown";
+$MusicT{pack("C","209")}="Unknown";
+$MusicT{pack("C","210")}="Unknown";
+$MusicT{pack("C","211")}="Unknown";
+$MusicT{pack("C","212")}="Unknown";
+$MusicT{pack("C","213")}="Unknown";
+$MusicT{pack("C","214")}="Unknown";
+$MusicT{pack("C","215")}="Unknown";
+$MusicT{pack("C","216")}="Unknown";
+$MusicT{pack("C","217")}="Unknown";
+$MusicT{pack("C","218")}="Unknown";
+$MusicT{pack("C","219")}="Unknown";
+$MusicT{pack("C","220")}="Unknown";
+$MusicT{pack("C","221")}="Unknown";
+$MusicT{pack("C","222")}="Unknown";
+$MusicT{pack("C","223")}="Unknown";
+$MusicT{pack("C","224")}="Unknown";
+$MusicT{pack("C","225")}="Unknown";
+$MusicT{pack("C","226")}="Unknown";
+$MusicT{pack("C","227")}="Unknown";
+$MusicT{pack("C","228")}="Unknown";
+$MusicT{pack("C","229")}="Unknown";
+$MusicT{pack("C","230")}="Unknown";
+$MusicT{pack("C","231")}="Unknown";
+$MusicT{pack("C","232")}="Unknown";
+$MusicT{pack("C","233")}="Unknown";
+$MusicT{pack("C","234")}="Unknown";
+$MusicT{pack("C","235")}="Unknown";
+$MusicT{pack("C","236")}="Unknown";
+$MusicT{pack("C","237")}="Unknown";
+$MusicT{pack("C","238")}="Unknown";
+$MusicT{pack("C","239")}="Unknown";
+$MusicT{pack("C","240")}="Unknown";
+$MusicT{pack("C","241")}="Unknown";
+$MusicT{pack("C","242")}="Unknown";
+$MusicT{pack("C","243")}="Unknown";
+$MusicT{pack("C","244")}="Unknown";
+$MusicT{pack("C","245")}="Unknown";
+$MusicT{pack("C","246")}="Unknown";
+$MusicT{pack("C","247")}="Unknown";
+$MusicT{pack("C","248")}="Unknown";
+$MusicT{pack("C","249")}="Unknown";
+$MusicT{pack("C","250")}="Unknown";
+$MusicT{pack("C","251")}="Unknown";
+$MusicT{pack("C","252")}="Unknown";
+$MusicT{pack("C","253")}="Unknown";
+$MusicT{pack("C","254")}="Unknown";
+$MusicT{pack("C","255")}="Unknown";
+
+$MPG123="mpg123";				# command to run mpg123
+push @MPG123_OPTIONS,"--aggressive";		# try to get higher priority
+push @MPG123_OPTIONS,"-C";			# enable control keys
+$DontReadMP3InfoOnLoad=0;			# whether to read MP3 file info
+						# on startup or not. If this
+						# varaible is set to 0 then all
+						# MP3 info is read at the
+						# program startup, so it may
+						# take a while before any song
+						# will start playing.
+$MusicType=0;					# whether to display music type
+$Year=0;					# whether to display year
+$Directory=0;					# whether to display directory
+$Filename=0;					# whether to display filename
+$Title=1;					# whether to display title
+$Album=0;					# whether to display ablum
+$Artist=1;					# whether to display artist
+$Random=0;					# whether to play in random
+						# order
+$Loop=0;					# whether to loop playlist
+$LoopTrack=0;					# whether to loop current track
+$Numbers=1;					# whether to display track
+						# number
+$SortBy="";					# what to sort by
+$DescendingSort=0;				# whether to sort in descending
+						# order
+$CaseSensitive=0;				# whether sort is case sensitive
+$_7BitAsciiDisplay=0;				# whether to display using ASCII
+						# only characters
+$DisplaySequence="IATEDYU";
+$DisplayParameter{"I"}=\$Artist;
+$DisplayParameter{"A"}=\$Album;
+$DisplayParameter{"T"}=\$Title;
+$DisplayParameter{"E"}=\$Filename;
+$DisplayParameter{"D"}=\$Directory;
+$DisplayParameter{"Y"}=\$Year;
+$DisplayParameter{"U"}=\$MusicType;
+$ListWidth=$Width-2;				# play list area width
+$ListHeight=$Height-14;				# play list area height
+$TrackTextMaxLength=1;				# length of the longest text
+						# in play list
+$Help=0;					# whether to display help
+$LongHelp=0;					# whether to display long
+						# version of help
+$ProcessOptions=1;				# whether to process options or
+						# treat all arguments as
+						# filenames
+for($x=0;$x<=$#ARGV;$x++)
+ {						# read all arguments
+  $arg=$ARGV[$x];
+  if($ProcessOptions)
+   {						# decode options
+    $Loop=1,next if(($arg eq "--loop")||($arg eq "-l"));
+    $Random=1,next if(($arg eq "--random")||($arg eq "-r"));
+    $Artist=1,next if(($arg eq "--artist")||($arg eq "-i"));
+    $Artist=0,next if(($arg eq "--no-artist")||($arg eq "-ni"));
+    $Album=1,next if(($arg eq "--album")||($arg eq "-a"));
+    $Album=0,next if(($arg eq "--no-album")||($arg eq "-na"));
+    $Title=1,next if(($arg eq "--title")||($arg eq "-t"));
+    $Title=0,next if(($arg eq "--no-title")||($arg eq "-nt"));
+    $Filename=1,next if(($arg eq "--filename")||($arg eq "-e"));
+    $Filename=0,next if(($arg eq "--no-filename")||($arg eq "-ne"));
+    $Directory=1,next if(($arg eq "--directory")||($arg eq "-d"));
+    $Directory=0,next if(($arg eq "--no-directory")||($arg eq "-nd"));
+    $Year=1,next if(($arg eq "--year")||($arg eq "-y"));
+    $Year=0,next if(($arg eq "--no-year")||($arg eq "-ny"));
+    $MusicType=1,next if(($arg eq "--music-type")||($arg eq "-u"));
+    $MusicType=0,next if(($arg eq "--no-music-type")||($arg eq "-nu"));
+    $DontReadMP3InfoOnLoad=1,next if(($arg eq "--dont-read-mp3info-on-load")||($arg eq "-dri"));
+    $DontChangePriority=1, next if(($arg eq "--dont-change-priority")||($arg eq "-dp"));
+    $DontRingTheBell=1,next if(($arg eq "--dont-ring-bell")||($arg eq "-drb"));
+    if(($arg eq "--display-sequence")||($arg eq "-s"))
+     {						# display sequence must be
+     						# checked for errors and
+     						# duplicated characters
+      $x++;
+      $_=$ARGV[$x];
+      tr/[a-z]/[A-Z]/;				# uppercase all characters
+      s/[^IATEDYU]//g;				# remove wrong characters
+      while(s/(I[^I]*)I/$1/g){}			# remove duplicated characters
+      while(s/(A[^A]*)A/$1/g){}
+      while(s/(T[^T]*)T/$1/g){}
+      while(s/(E[^E]*)E/$1/g){}
+      while(s/(D[^D]*)D/$1/g){}
+      while(s/(Y[^Y]*)Y/$1/g){}
+      while(s/(U[^U]*)U/$1/g){}
+      if($_ eq "")
+       {
+        print ERROR_STREAM $0."Empty display sequence. Ignored.\n";
+       }
+      else
+       {
+        $DisplaySequence=$_;
+       }
+      next;
+     }
+    $Numbers=1,next if(($arg eq "--numbers")||($arg eq "-n"));
+    $Numbers=0,next if(($arg eq "--no-numbers")||($arg eq "-nn"));
+    $SortBy="artist",next if(($arg eq "--sort-by-artist")||($arg eq "-si"));
+    $SortBy="album",next if(($arg eq "--sort-by-album")||($arg eq "-sa"));
+    $SortBy="title",next if(($arg eq "--sort-by-title")||($arg eq "-st"));
+    $SortBy="filename",next if(($arg eq "--sort-by-filename")||($arg eq "-se"));
+    $SortBy="directory",next if(($arg eq "--sort-by-directory")||($arg eq "-sd"));
+    $SortBy="year",next if(($arg eq "--sort-by-year")||($arg eq "-sy"));
+    $SortBy="musictype",next if(($arg eq "--sort-by-music-type")||($arg eq "-su"));
+    $DescendingSort=1,next if(($arg eq "--descending-sort")||($arg eq "-ds"));
+    $SortBy="random",next if(($arg eq "--random-order")||($arg eq "-ro"));
+    $WrapSearch=1,next if(($arg eq "--wrap-search")||($arg eq "-ws"));
+    $_7BitAsciiDisplay=1,next if(($arg eq "--7-bit-ascii-display")||($arg eq "-7"));
+    $Help=1,next if(($arg eq "--help")||($arg eq "-h")||($arg eq "-?"));
+    $LongHelp=1,next if($arg eq "--long-help");
+    if(($arg eq "--mpg123")||($arg eq "-m"))
+     {
+      $x++;
+      if($ARGV[$x] eq "")
+       {
+        print ERROR_STREAM $0."Empty command for mpg123. Ignored.\n";
+       }
+      else
+       {
+        $MPG123=$ARGV[$x];
+       }
+      next;
+     }
+    if(($arg eq "--mpg123-option")||($arg eq "-mo"))
+     {
+      $x++;
+      if($ARGV[$x] eq "")
+       {
+        print ERROR_STREAM $0."Empty mpg123 option. Ignored.\n";
+       }
+      else
+       {
+        push @MPG123_OPTIONS,$ARGV[$x];
+       }
+      next;
+     }
+    $DebugMPG123=1,next if($arg eq "--debug-mpg123");
+    $ProcessOptions=0,next if($arg eq "--");
+   }
+  if($arg=~/^\@/)
+   {						# a playlist was given
+    $PlayListFile=$arg;
+    $PlayListFile=~s/^\@//;
+    push @PlayList,$PlayListFile;
+    next;
+   }
+  push @File,$arg;				# a file or directory was given
+ }
+if(($Help)||($#ARGV==-1))
+ {
+  print STDOUT <<END_HELP;
+Frontend for mpg123 - MPG layer decoder - version 0.59r and above.
+Version 0.1 (1999/Dec/20). Written and copyrights by Wojciech Baranski.
+E-mail: wojciech_baranski\@yahoo.com, Wojciech.Baranski\@informix.com
+
+mp3play may be distributed under the GPL (GNU Public License).
+THIS SOFTWARE COMES WITH ABSOLUTELY NO WARRANTY !!! USE IT AT YOUR OWN RISK !!!
+
+Usage: mp3play [ --help | -h | -? ]
+               [ --long-help ]
+               [ --7-bit-ascii-display | -7 ]
+               [ --loop | -l ]
+               [ --random | -r ]
+               [ --artist | -i ] [ --no-artist | -ni ]
+               [ --album | -a ] [ --no-album | -na ]
+               [ --title | -t ] [ --no-title | -nt ]
+               [ --filename | -e ] [ --no-filename | -ne ]
+               [ --directory | -d ] [ --no-directory | -nd ]
+               [ --year | -y ] [ --no-year | -ny ]
+               [ --music-type | -u ] [ --no-music-type | -nu ] 
+               [ --display-sequence | -s <SEQUENCE> ]
+               [ --numbers | -n ] [ --no-numbers | -nn ]
+               [ --sort-by-artist | -si ]
+               [ --sort-by-album | -sa ]
+               [ --sort-by-title | -st ]
+               [ --sort-by-filename | -se ]
+               [ --sort-by-directory | -sd ]
+               [ --sort-by-year | -sy ]
+               [ --sort-by-music-type | -su ]
+               [ --descending-sort | -ds ]
+               [ --random-order | -ro ]
+               [ --wrap-search | -ws ]
+               [ --dont-read-mp3info-on-load | -dri ]
+               [ --dont-change-priority, -dp]
+               [ --dont-ring-bell, -drb ]
+               [ --mpg123 | -m <MPG123> ]
+               [ --mpg123-option | -mo <OPTION> ]
+               [ --debug-mpg123 ]
+               [ -- ]
+               [ @<PLAYLIST> ... ]
+               [ <Directory> ... ]
+               [ <MP3file> ... ]
+For more information use the "--long-help" option.
+END_HELP
+  MyExit(0);
+ }
+if($LongHelp)
+ {
+  print STDOUT <<END_LONG_HELP;
+Frontend for mpg123 - MPG layer decoder - version 0.59r and above.
+Version 0.1 (1999/Dec/20). Written and copyrights by Wojciech Baranski.
+E-mail: wojciech_baranski\@yahoo.com, Wojciech.Baranski\@informix.com
+
+mp3play may be distributed under the GPL (GNU Public License).
+THIS SOFTWARE COMES WITH ABSOLUTELY NO WARRANTY !!! USE IT AT YOUR OWN RISK !!!
+
+Usage: mp3play [ --help | -h | -? ]
+               [ --long-help ]
+               [ --7-bit-ascii-display | -7 ]
+               [ --loop | -l ]
+               [ --random | -r ]
+               [ --artist | -i ] [ --no-artist | -ni ]
+               [ --album | -a ] [ --no-album | -na ]
+               [ --title | -t ] [ --no-title | -nt ]
+               [ --filename | -e ] [ --no-filename | -ne ]
+               [ --directory | -d ] [ --no-directory | -nd ]
+               [ --year | -y ] [ --no-year | -ny ]
+               [ --music-type | -u ] [ --no-music-type | -nu ] 
+               [ --display-sequence | -s <SEQUENCE> ]
+               [ --numbers | -n ] [ --no-numbers | -nn ]
+               [ --sort-by-artist | -si ]
+               [ --sort-by-album | -sa ]
+               [ --sort-by-title | -st ]
+               [ --sort-by-filename | -se ]
+               [ --sort-by-directory | -sd ]
+               [ --sort-by-year | -sy ]
+               [ --sort-by-music-type | -su ]
+               [ --descending-sort | -ds ]
+               [ --random-order | -ro ]
+               [ --wrap-search | -ws ]
+               [ --dont-read-mp3info-on-load | -dri ]
+               [ --dont-change-priority, -dp]
+               [ --dont-ring-bell, -drb ]
+               [ --mpg123 | -m <MPG123> ]
+               [ --mpg123-option | -mo <OPTION> ]
+               [ --debug-mpg123 ]
+               [ -- ]
+               [ @<PLAYLIST> ... ]
+               [ <Directory> ... ]
+               [ <MP3file> ... ]
+
+        Options:
+            --7-bit-ascii-display, -7          Use  only 7-bit  ascii characters
+                                               to substitute graphic characters.
+                                               You  should  use  them,  if  Your
+                                               terminal doesn't  display graphic
+                                               characters correctly.
+            --loop, -l                         Loop play list.
+            --random, -r                       Set random play.
+            --artist, -i                       Display track's artist.
+            --no-artist, -ni                   Don't display track's artist.
+            --album, -a                        Display tracks's album.
+            --no-album, -na                    Don't display tracks's album.
+            --title, -t                        Display track's title.
+            --no-title, -nt                    Don't display tracks's title.
+            --filename, -e                     Display track's file name.
+            --no-filename, -ne                 Don't display track's file name.
+            --directory, -d                    Display track's directory.
+            --no-directory, -nd                Don't display track's directory.
+            --year, -y                         Display track's year.
+            --no-year, -ny                     Don't display track's year.
+            --music-type, -u                   Display track's music type.
+            --no-music-type, -nu               Don't display track's music type.
+            --display-sequence, -s <SEQUENCE>  Set  display  sequence for  shown
+                                               above  display   parameters.  The
+                                               <SEQUENCE> is  a case insensitive
+                                               string,   containing   characters
+                                               from  the list  below. It defines
+                                               sequence of displayed information
+                                               in  the  play  list  window,  for
+                                               example  "AT" states,  that first
+                                               artist and then title information
+                                               is  displayed, if  displaying  of
+                                               this  information  is  turned on.
+                                               If displaying  of any information
+                                               is off  then track's  filename is
+                                               displayed. The <SEQUENCE> control
+                                               characters are:
+                                                I - artist
+                                                A - album
+                                                T - title
+                                                E - filename
+                                                D - directory
+                                                Y - year
+                                                U - music type
+                                              You  must  note, that  if  display
+                                              sequence  does   not   contain   a
+                                              character  from  the  list  above,
+                                              then this  information  will never
+                                              be  displayed, even  if displaying
+                                              of it is turned on.
+            --numbers, -n                     Display track's numbers.
+            --no-numbers, -nn                 Don't display track's numbers.
+            --sort-by-artist, -si             On  startup   sort  play  list  by
+                                              artist.  This  option  won't  work
+                                              if the --dont-read-mp3info-on-load
+                                              option is turned on.
+            --sort-by-album, -sa              On  startup   sort  play  list  by
+                                              album.  This   option  won't  work
+                                              if the --dont-read-mp3info-on-load
+                                              option is turned on.
+            --sort-by-title, -st              On  startup   sort  play  list  by
+                                              title.  This   option  won't  work
+                                              if the --dont-read-mp3info-on-load
+                                              option is turned on.
+            --sort-by-filename, -se           On  startup   sort  play  list  by
+                                              track's filename.
+            --sort-by-directory, -sd          On  startup   sort  play  list  by
+                                              track's directory.
+            --sort-by-year, -sy               On  startup   sort  play  list  by
+                                              year.  This   option  won't   work
+                                              if the --dont-read-mp3info-on-load
+                                              option is turned on.
+            --sort-by-music-type, -su         On  startup   sort  play  list  by
+                                              music type. This option won't work
+                                              if the --dont-read-mp3info-on-load
+                                              option is turned on.
+            --descending-sort, -ds            Set descending sort order.
+            --random-order, -ro               On startup randomize play list.
+            --wrap-search, -ws                Set  wrap   scan.  It  causes  the
+                                              search  to  continue  even  if the
+                                              top  or  bottom  of  play  list is
+                                              reached.
+            --dont-read-mp3info-on-load, -dri Don't read  MP3  inforamtion  from
+                                              file  on load. This  option delays
+                                              the  MP3 info  reading,  until the
+                                              first track starts playing, and it
+                                              is useful if You  have many tracks
+                                              to play, in which case it normally
+                                              takes some time  to read MP3 info,
+                                              so the  first track  doesn't start
+                                              playing  immediately.
+                                              You  should   note  that  if  this
+                                              option is on the  MP3 info is read
+                                              after the initial sort (--sort-XXX
+                                              options)  is  performed. It  means
+                                              that  no  MP3 information  (track,
+                                              album, artist, etc.) is present at
+                                              the time of initial sort.
+            --dont-change-priority, -dp       Tells   mp3play  not  to  decrease
+                                              its   priority.  Normally  mp3play
+                                              decreases  its  priority,  because
+                                              on  slower machines  (486 or maybe
+                                              even some  slower Pentiums) mpg123
+                                              doesn't get enough processor time,
+                                              occassionally  causing  playing to
+                                              interrupt for a short period. This
+                                              option  influences  the  speed  of
+                                              play   list   handling,   keyboard
+                                              reading, etc. on  a heavily loaded
+                                              system. This  option seems to have
+                                              no visual effect on fast machines.
+            --dont-ring-bell, -drb            Tells mp3play not to ring the bell
+                                              when   a  warning  is   displayed.
+                                              Normally  mp3play  rigs  the  bell
+                                              when a warning is displayed.
+            --mpg123, -m <MPG123>             Defines  path   and  program  name
+                                              that  will  be  used to run mpg123.
+                                              Default value is "mpg123".
+            --mpg123-option, -mo <OPTION>     Defines  additional options passed
+                                              to the mpg123. By default the "-C"
+                                              (enable  control  keys  mode)  and
+                                              "--aggressive" (try  to get higher
+                                              priority)  are  used.  You  cannot
+                                              delete these, You may only specify
+                                              additional  options,  for  example
+                                              when  you  want  to  downsample to
+                                              22 kHz, then You would specify the
+                                              "-2"   option.  These   additional
+                                              options  are  passed  in  the same
+                                              sequence to mpg123 as they appear,
+                                              so  if  You  must specify  "-x yy"
+                                              option  of  mpg123,  then  command
+                                              line for  mp3play would  look like
+                                              this:
+                                                   mp3play -mo -x -mo yy ...
+            --debug-mpg123                    Causes  all  mpg123  output  to be
+                                              redirected  to   stderr.  Normally
+                                              mpg123   output   is   suppressed.
+                                              If  music  doesn't  play  and  You
+                                              don't  know what  the cause may be
+                                              then  You   should  look   at  the
+                                              mpg123  output  to  see  if  there
+                                              is no problem with mpg123.
+            --                                Cuases  any  arguments  after this
+                                              one  to  be  interpreted  as file,
+                                              directory or playlist name.
+            <PLAYLIST>                        Is  the name  of  file  containing
+                                              a list of MP3 files to play.
+            <Directory>                       Is  the  name  of directory,  from
+                                              which all files with MP3 extension
+                                              (case insensitive) will be played.
+            <MP3file>                         Is a  name  of a  file, that  will
+                                              be played.
+
+        Keys:
+            Playing control:
+                7             Stop playing  track. If there  is no playing track
+                              then  current track is  moved to the  top  of play
+                              list.
+                8             Pause playing track.
+                9             Play current track.
+                4             Move to previous track. If random play is on, then
+                              previous means random track.
+                5             Play playing track again (from the beginning).
+                6             Move  to next  track. If  random play  is on, then
+                              next means random track.
+                1             Skip backward.
+                3             Skip forward.
+            Option control:
+                L             Toggle looping of the whole play list.
+                K             Toggle looping  of the current  track, so it plays
+                              all the time.
+                R             Toggle Random play.
+                W             Toggle wrap search, which means that if You search
+                              for a given pattern, then if top or bottom of play
+                              list is encountered, search  continues from bottom
+                              or top respectively.
+            Misc. control:
+                q Q           Quit.
+                /             Search forward for given pattern.
+                ?             Search backward for given pattern.
+                n             Search again for previously entered pattern in the
+                              same direction as before.
+                N             Search  again for  previously  entered  pattern in
+                              oposite direction as before.
+                ^L            Redraw screen.
+                Esc           Abort entering search pattern.
+            Display control:
+                M             Toggle displaying track numbers in play list.
+                I             Toggle artist display.
+                A             Toggle album display.
+                T             Toggle title display.
+                E             Toggle filename display.
+                D             Toggle directory display.
+                Y             Toggle year display.
+                U             Toggle music type display.
+                ^I            Change display sequence for artist.
+                ^A            Change display sequence for album.
+                ^T            Change display sequence for title.
+                ^E            Change display sequence for filename.
+                ^D            Change display sequence for directory.
+                ^Y            Change display sequence for year.
+                ^U            Change display sequence for music type.
+                i             Sort play list by artist.
+                a             Sort play list by album.
+                t             Sort play list by title.
+                e             Sort play list by filename.
+                d             Sort play list by directory.
+                y             Sort play list by year.
+                u             Sort play list by music type.
+                r             Randomize list (random order).
+                S             Toggle descending sort order.
+            Play list control:
+                ENTER         Play selected track.
+                c  C          Move selection to currently playing track.
+                j  DownArrow  Move selection one line down.
+                k  UpArrow    Move selection one line up.
+                ^F PageDown   Move selection one page down.
+                ^B PageUp     Move selection one page up.
+                g  Home       Move selection to the top of play list.
+                G  End        Move selection to the bottom of play list.
+                h  LeftArrow  Move play list window's contents one character
+                              left.
+                l  RightArrow Move play list window's contents one character
+                              right.
+                ^H            Move play list window's contents half screen
+                              left.
+                ^R            Move play list window's contents half screen
+                              right.
+                0             Move play list window's contents to the left
+                              margin.
+                \$             Move play list window's contents to the right
+                              margin.
+                -  Delete     Delete selected track from play list. Deleted
+                              track stops playing immediatelly.
+                +  Insert     Insert new  track, tracks  in a given directory or
+                              in a play list file to play list. Entering file or
+                              directory or play list name  is done with the same
+                              fashion  as on  command line. You are  prompted to
+                              to enter a file or directory name. If You  want to
+                              insert  tracks  from  a play list  file, You  must
+                              precede the filename  with the "@" character.  You
+                              can  use a TAB  key  while  entering  file name to
+                              expand  partially entered  file name (just like it
+                              is done in bash - Bourne Again Shell).
+                ^W            Save play  list to  a given file. You  may use TAB
+                              key to  expand  partial  file  name, as  described
+                              above.
+END_LONG_HELP
+  MyExit(0);
+ }
+if(!$DontChangePriority)
+ {
+  setpriority(PRIO_PROCESS,0,20);		# decrease priority. This is
+						# needed on slow machines, and
+						# has no visible effect on fast
+						# machines.
+ }
+if(!$_7BitAsciiDisplay)
+ {
+  eval {$TermCap->Trequire(qw/as ae/)};
+  print(ERROR_STREAM $0.$@),MyExit(1) if($@);
+						# require "as" and "ae"
+  eval {$TermCap->Trequire(qw/mh/)};
+  if(!$@)
+   {						# if "mh" supported then
+  						# require "me"
+    eval {$TermCap->Trequire(qw/mh me/)};
+    print(ERROR_STREAM $0.$@),MyExit(1) if($@);
+   }
+  eval {$TermCap->Trequire(qw/md/)};
+  if(!$@)
+   {						# if "md" supported then
+  						# require "me"
+    eval {$TermCap->Trequire(qw/md me/)};
+    print(ERROR_STREAM $0.$@),MyExit(1) if($@);
+   }
+  eval {$TermCap->Trequire(qw/mr/)};
+  if(!$@)
+   {						# if "mr" supported then
+						# require "me"
+    eval {$TermCap->Trequire(qw/mr me/)};
+    print(ERROR_STREAM $0.$@),MyExit(1) if($@);
+   }
+ }
+$HelpContents[ 0]=ReverseModeStr()."Misc. control".NormalModeStr().":         ".ReverseModeStr()."Option control".NormalModeStr().":                                          ";
+$HelpContents[ 1]="  ".BoldModeStr()."q".NormalModeStr()." ".BoldModeStr()."Q".NormalModeStr()."  quit              ".BoldModeStr()."L".NormalModeStr()."  loop play list         ".BoldModeStr()."W".NormalModeStr()."    wrap search              ";
+$HelpContents[ 2]="  ".BoldModeStr()."^L".NormalModeStr()."   redraw screen     ".BoldModeStr()."K".NormalModeStr()."  loop current track     ".BoldModeStr()."/".NormalModeStr()." ".BoldModeStr()."?".NormalModeStr()."  search forward/backward  ";
+$HelpContents[ 3]="  ".BoldModeStr()."Esc".NormalModeStr()."  abort pattern     ".BoldModeStr()."R".NormalModeStr()."  random play            ".BoldModeStr()."n".NormalModeStr()." ".BoldModeStr()."N".NormalModeStr()."  search again             ";
+$HelpContents[ 4]=ReverseModeStr()."Playing control".NormalModeStr().":                                                                ";
+$HelpContents[ 5]="  ".BoldModeStr()."7".NormalModeStr()."  stop       ".BoldModeStr()."8".NormalModeStr()."  pause                    ".BoldModeStr()."4".NormalModeStr()."  previous       ".BoldModeStr()."1".NormalModeStr()."  skip backward  ";
+$HelpContents[ 6]="  ".BoldModeStr()."9".NormalModeStr()."  play       ".BoldModeStr()."5".NormalModeStr()."  play current again       ".BoldModeStr()."6".NormalModeStr()."  next           ".BoldModeStr()."3".NormalModeStr()."  skip forward   "; 
+$HelpContents[ 7]=ReverseModeStr()."Display control".NormalModeStr().":                                                                ";
+$HelpContents[ 8]="  ".BoldModeStr()."M".NormalModeStr()."  show numbers          ".BoldModeStr()."S".NormalModeStr()."   descending sort order      ".BoldModeStr()."r".NormalModeStr()."  random order       ";
+$HelpContents[ 9]="  ".BoldModeStr()."I".NormalModeStr()."  artist display        ".BoldModeStr()."^I".NormalModeStr()."  sequence for artist        ".BoldModeStr()."i".NormalModeStr()."  sort by artist     ";
+$HelpContents[10]="  ".BoldModeStr()."A".NormalModeStr()."  album display         ".BoldModeStr()."^A".NormalModeStr()."  sequence for album         ".BoldModeStr()."a".NormalModeStr()."  sort by album      ";
+$HelpContents[11]="  ".BoldModeStr()."T".NormalModeStr()."  title display         ".BoldModeStr()."^T".NormalModeStr()."  sequence for title         ".BoldModeStr()."t".NormalModeStr()."  sort by title      ";
+$HelpContents[12]="  ".BoldModeStr()."E".NormalModeStr()."  filename display      ".BoldModeStr()."^E".NormalModeStr()."  sequence for filename      ".BoldModeStr()."e".NormalModeStr()."  sort by filename   ";
+$HelpContents[13]="  ".BoldModeStr()."D".NormalModeStr()."  directory display     ".BoldModeStr()."^D".NormalModeStr()."  sequence for directory     ".BoldModeStr()."d".NormalModeStr()."  sort by directory  ";
+$HelpContents[14]="  ".BoldModeStr()."Y".NormalModeStr()."  year display          ".BoldModeStr()."^Y".NormalModeStr()."  sequence for year          ".BoldModeStr()."y".NormalModeStr()."  sort by year       ";
+$HelpContents[15]="  ".BoldModeStr()."U".NormalModeStr()."  music type display    ".BoldModeStr()."^U".NormalModeStr()."  sequence for music type    ".BoldModeStr()."u".NormalModeStr()."  sort by music type ";
+$HelpContents[16]=ReverseModeStr()."Play list control".NormalModeStr().":                        ".BoldModeStr()."^W".NormalModeStr()."             save play list           ";
+$HelpContents[17]="  ".BoldModeStr()."ENTER".NormalModeStr()."          play selected track      ".BoldModeStr()."c".NormalModeStr()."  ".BoldModeStr()."C".NormalModeStr()."           go to current track    ";
+$HelpContents[18]="  ".BoldModeStr()."j".NormalModeStr()."  ".BoldModeStr()."DownArrow".NormalModeStr()."   move one line down       ".BoldModeStr()."k".NormalModeStr()."  ".BoldModeStr()."UpArrow".NormalModeStr()."     move one line up       ";
+$HelpContents[19]="  ".BoldModeStr()."^F".NormalModeStr()." ".BoldModeStr()."PageDown".NormalModeStr()."    move one page down       ".BoldModeStr()."^B".NormalModeStr()." ".BoldModeStr()."PageUp".NormalModeStr()."      move one page up       ";
+$HelpContents[20]="  ".BoldModeStr()."g".NormalModeStr()."  ".BoldModeStr()."Home".NormalModeStr()."        move to top              ".BoldModeStr()."G".NormalModeStr()."  ".BoldModeStr()."End".NormalModeStr()."         move to bottom         ";
+$HelpContents[21]="  ".BoldModeStr()."h".NormalModeStr()."  ".BoldModeStr()."LeftArrow".NormalModeStr()."   move one line left       ".BoldModeStr()."l".NormalModeStr()."  ".BoldModeStr()."RightArrow".NormalModeStr()."  move one line right    ";
+$HelpContents[22]="  ".BoldModeStr()."^H".NormalModeStr()."             move half screen left    ".BoldModeStr()."^R".NormalModeStr()."             move half screen right ";
+$HelpContents[23]="  ".BoldModeStr()."0".NormalModeStr()."              move to left margin      ".BoldModeStr()."\$".NormalModeStr()."              move to right margin   ";
+$HelpContents[24]="  ".BoldModeStr()."-".NormalModeStr()."  ".BoldModeStr()."Delete".NormalModeStr()."      delete track             ".BoldModeStr()."+".NormalModeStr()."  ".BoldModeStr()."Insert".NormalModeStr()."      add track/tracks       ";
+foreach $PlayListFile (@PlayList)
+ {						# read all files in playlist
+  ReadPlayList($PlayListFile);
+ }
+@PlayList=();					# remove playlists
+foreach $arg (@File)
+ {						# read given files
+  ReadFile($arg);
+ }
+@File=();					# remove given files
+if($#Track==-1)
+ {
+  print ERROR_STREAM $0."No files to play. Quit.\n";
+  MyExit(1);
+ }
+srand(time);					# set random seed
+$CurrentTrack=0;				# played track
+$CurrentTrack=NextTrack() if($Random);
+$SelectedTrack=$CurrentTrack;			# selected track in play list
+$StartHPos=0;					# first position in play list
+						# (horizontal)
+$StartVPos=$SelectedTrack;			# first position in play list
+						# (vertical)
+$StartVPos=$#Track-$ListHeight+1 if($StartVPos>$#Track-$ListHeight+1);
+						# position beyond playlist end
+$StartVPos=0 if($StartVPos<0);			# position beyond playlist begin
+$NumberWidth=length($#Track+1);			# track number width
+$MPG123_PID=0;					# PID of mpg123
+$Playing=1;					# whether playing
+$Exit=0;
+fcntl(STDIN,F_SETFL,O_NONBLOCK);		# set nonblocking mode on input
+if(opendir(DIRECTORY,"/dev"))
+ {						# set pseudo terminal for mpg123
+ 						# because it won't work without
+ 						# a terminal (i.e. it works, but
+ 						# not in control keys mode)
+  @devlist=readdir(DIRECTORY);
+  closedir(DIRECTORY);
+  $dev="";
+  foreach $x (@devlist)
+   {
+    if($x=~/^pty/)
+     {						# open master part of the pseudo
+     						# terminal and if it is free
+     						# use it
+      if(open(WRITE_MPG123,"> /dev/".$x))
+       {					# master opened
+        select(WRITE_MPG123);
+        $|=1;
+        $dev=$x;
+        $dev=~s/^p/t/;
+        last if(open(READ_MPG123,"/dev/".$dev));# open slave part of the pseudo
+        					# terminal and if it is free
+        					# use it and finish searching
+        					# for free pseudo terminal
+        close(WRITE_MPG123);			# slave could not be opened
+        $dev="";
+       }
+     }
+   }
+  if($dev eq "")
+   {						# could not open pseudo terminal
+    print ERROR_STREAM $0."Can't open pseudo terminal. Quit.\n";
+    MyExit(1);
+   }
+ }
+else
+ {
+  print ERROR_STREAM $0."Can't read \"/dev/\" directory. Quit.\n";
+  MyExit(1);
+ }
+SortTracks($SortBy);				# sort tracks
+HideCursor();
+$NewTerminalSettings=$OldTerminalSettings;
+$NewTerminalSettings&=~(ECHO|ICANON|ISIG);	# turn off echo, canonical mode
+						# and signal sending
+$Terminal->setlflag($NewTerminalSettings);
+$Terminal->setattr(fileno(STDIN),TCSANOW);	# set new terminal attributes
+Display("full");				# display everything
+foreach (@Track)
+ {						# create list of unread MP3
+ 						# info files
+  push @UnreadMP3Info,$_ if(!$MP3InfoRead{$_});
+ }
+close(ERROR_STREAM);
+open(ERROR_STREAM,">&STDOUT");			# define STDOUT up from now for
+						# default error output stream
+select(ERROR_STREAM);
+$|=1;						# make ERROR_STREAM unbuffered
+while(!$Exit)
+ {						# loop until user wants to quit
+  if($WinCHRefreshNeeded)
+   {						# refresh display if terminal
+  						# size has changed
+    $WinCHRefreshNeeded=0;
+    ioctl(STDIN,&TIOCGWINSZ,$WindowSize);
+    ($Height,$Width,$XPixel,$YPixel)=unpack("S4",$WindowSize);
+    if(($Width<80)||($Height<25))
+     {						# terminal is too small, try
+     						# to restore it to original
+     						# size
+      ClearScreen(),print(STDOUT $0."Terminal is too small. Quit.\n"),MyExit(1) if(ioctl(STDIN,&TIOCSWINSZ,$OldWindowSize));
+      $WindowSize=$OldWindowSize;
+      ($Height,$Width,$XPixel,$YPixel)=unpack("S4",$WindowSize);
+     }
+    $OldWindowSize=$WindowSize;
+    $ListWidth=$Width-2;				# play list area width
+    $ListHeight=$Height-14;			# play list area height
+    $ReadingLineStartPos=$ReadingLineCurrentPos-$Width+length($ReadingLinePrompt)+1 if($ReadingLineCurrentPos-$ReadingLineStartPos>=$Width-length($ReadingLinePrompt));
+    $ReadingLineStartPos=0 if($ReadingLineStartPos<0);
+    if($SelectedTrack>=$StartVPos+$ListHeight)
+     {
+      $StartVPos=$SelectedTrack-int($ListHeight/2);
+      $StartVPos=$#Track-$ListHeight+1 if($StartVPos>$#Track-$ListHeight+1);
+      $StartVPos=0 if($StartVPos<0);
+     }
+    $StartHPos=$TrackTextMaxLength-ListWidth() if($StartHPos>$TrackTextMaxLength-ListWidth());
+    $StartHPos=0 if($StartHPos<0);
+    Display("full");
+   }
+  if(($MPG123_PID)&&(waitpid($MPG123_PID,&WNOHANG)==$MPG123_PID))
+   {						# mpg123 is running and finished
+   						# playing
+    $MPG123_PID=0;
+    if($Playing)
+     {						# still playing
+      $CurrentTrack=NextTrack() if(!$LoopTrack);# get next track unless loop
+      						# current track
+      RunMPG123(),$PlayedTrack{$Track[$CurrentTrack]}=1 if($Playing);
+      Display("list");				# update play list
+      Display("status");			# update status
+     }
+   }
+  if(($Playing)&&(!$MPG123_PID))
+   {						# mpg123 is not running, so
+   						# execute it
+    RunMPG123();
+    $PlayedTrack{$Track[$CurrentTrack]}=1;
+    Display("list");				# update play list
+    Display("status");				# update status
+   }
+  if($#UnreadMP3Info!=-1)
+   {						# read one unread MP3 info
+    my $x;
+    my $MP3file;
+    $MP3file="";
+    for($x=0;$x<$ListHeight;$x++)
+     {						# check if all displayed tracks
+     						# have their info read
+      last if($x+$StartVPos>$#Track);		# beyond play list
+      $MP3file=$Track[$x+$StartVPos],last if(!$MP3InfoRead{$Track[$x+$StartVPos]});
+      						# found unread MP3 info
+     }
+    if($MP3file ne "")
+     {						# there is an unread MP3 info
+     						# of displayed track
+      ReadMP3Info($MP3file);
+      GenerateTrackText($x+$StartVPos);
+      Display("list-entry",$x);			# update play list
+     }
+    else
+     {						# no displayed but unread MP3
+     						# info, then check list
+      $MP3file=pop @UnreadMP3Info;
+      while($MP3InfoRead{$MP3file})
+       {					# get MP3 file until unread MP3i
+       						# info
+        $MP3file=pop @UnreadMP3Info;
+       }
+      if($MP3file ne "")
+       {					# read MP3 info if there is a
+      						# file to read MP3 info from
+        ReadMP3Info($MP3file);
+        for($x=0;$x<=$#Track;$x++)
+         {
+          GenerateTrackText($x),Display("slidebars"),last if($MP3file eq $Track[$x]);
+         }
+       }
+     }
+    if($#UnreadMP3Info==-1)
+     {						# finished reading mp3 info
+      Display("mp3info-read");
+      $DisplaySort=1;
+      $SortedBy="";				# enable any sort now, even
+      						# if already sorted
+     }
+   }
+  while(read(STDIN,$_,1)==1)
+   {						# get keys
+    $KeyboardInput.=$_;
+   }
+  $_=DecodeKey();				# get one key. Gets one
+  						# character or the name of
+  						# termcap entry
+  Display("sort"),$DisplaySort=0 if(($_ ne "")&&($_ ne "n")&&($_ ne "N")&&($DisplaySort));
+  if($DisplayingHelp)
+   {						# displaying help - wait for
+   						# "q" or "Q" to return to
+   						# normal operation
+    if(($_ eq "q")||($_ eq "Q")||(unpack("C",$_)==27))
+     {						# ASCII "q", ASCII "Q" or
+     						# ASCII "Esc" - quit help screen
+      $DisplayingHelp=0;
+      Display("full");
+     }
+    if(unpack("C",$_)==3)
+     {						# ASCII "Ctrl-C" - quit
+      $Exit=1;
+     }
+    if(unpack("C",$_)==12)
+     {						# ASCII "Ctrl-L" - redraw screen
+      Display("help");
+     }
+    next;
+   }
+  if($ReadingLine)
+   {
+    GotoXY(length($ReadingLinePrompt)+$ReadingLineCurrentPos-$ReadingLineStartPos,$Height-1);
+    if(($_ eq "\n")||($_ eq "\r"))
+     {
+      $ReadingLine=0;
+      HideCursor();
+     }
+    else
+     {
+      if(length($_)==1)
+       {					# an ASCII character is on
+       						# input
+       	if(/[\040-\176]/)
+       	 {					# an ascii character is on input
+       	 					# so add it to search pattern
+          $ReadLine=substr($ReadLine,0,$ReadingLineCurrentPos).$_.substr($ReadLine,$ReadingLineCurrentPos);
+          $ReadingLineCurrentPos++;
+          $ReadingLineStartPos=$ReadingLineCurrentPos-$Width+length($ReadingLinePrompt)+1 if($ReadingLineCurrentPos-$ReadingLineStartPos>=$Width-length($ReadingLinePrompt));
+          $ReadingLineStartPos=0 if($ReadingLineStartPos<0);
+          Display("reading-line");
+         }
+        elsif(unpack("C",$_)==12)
+         {					# ASCII "Ctrl-L" - redraw screen
+          Display("full");
+         }
+        elsif(unpack("C",$_)==3)
+         {					# ASCII "Ctrl-C" - quit
+          $Exit=1;
+         }
+        elsif(unpack("C",$_)==27)
+         {					# ASCII "Esc" - abort search
+         					# pattern
+          $ReadLine="";
+          $ReadingLine=0;
+          HideCursor();
+          Display("sort");
+         }
+        elsif(unpack("C",$_)==9)
+         {					# ASCII "Tab" - try to expand
+						# line to an existing file name
+          if($ReadingLineExpandToFileName)
+           {					# expanding is turned on
+            my $ReadLineStartPos=0;
+            if(substr($ReadLine,0,1) eq "@")
+             {					# we have a playlist
+              $ReadLineStartPos=1;
+             }
+            $ReadLineTemp=ExpandToFileName(substr($ReadLine,$ReadLineStartPos,$ReadingLineCurrentPos-$ReadLineStartPos));
+            $ReadLine=substr($ReadLine,0,$ReadLineStartPos).$ReadLineTemp.substr($ReadLine,$ReadingLineCurrentPos);
+            $ReadingLineCurrentPos=$ReadLineStartPos+length($ReadLineTemp);
+            $ReadingLineStartPos=$ReadingLineCurrentPos-$Width+length($ReadingLinePrompt)+1 if($ReadingLineCurrentPos-$ReadingLineStartPos>=$Width-length($ReadingLinePrompt));
+            $ReadingLineStartPos=0 if($ReadingLineStartPos<0);
+            Display("reading-line");
+           }
+         }
+       }
+      else
+       {
+        if(($_ eq "bs")||($_ eq "kb"))
+         {					# ASCII backspace key or
+						# termcap's backspace key
+          if($ReadingLineCurrentPos)
+           {
+            $ReadingLineCurrentPos--;
+            substr($ReadLine,$ReadingLineCurrentPos,1,"");
+            Display("reading-line");
+           }
+         }
+        if($_ eq "kD")
+         {					# termcap's delete character
+          Display("reading-line") if(substr($ReadLine,$ReadingLineCurrentPos,1,"") ne "");
+         }
+        if($_ eq "kl")
+         {					# termcap's move cursor left key
+          $ReadingLineCurrentPos--;
+          $ReadingLineCurrentPos=0 if($ReadingLineCurrentPos<0);
+          $ReadingLineStartPos=$ReadingLineCurrentPos if($ReadingLineStartPos>$ReadingLineCurrentPos);
+          Display("reading-line");
+         }
+        if($_ eq "kr")
+         {					# termcap's move cursor right
+         					# key
+          $ReadingLineCurrentPos++;
+          $ReadingLineCurrentPos=length($ReadLine) if($ReadingLineCurrentPos>length($ReadLine));
+          $ReadingLineStartPos=$ReadingLineCurrentPos-$Width+length($ReadingLinePrompt)+1 if($ReadingLineCurrentPos-$ReadingLineStartPos>=$Width-length($ReadingLinePrompt));
+          $ReadingLineStartPos=0 if($ReadingLineStartPos<0);
+          Display("reading-line");
+         }
+        if($_ eq "kh")
+         {					# termcap's move cursor home key
+          $ReadingLineStartPos=0;
+          $ReadingLineCurrentPos=0;
+          Display("reading-line");
+         }
+        if($_ eq "kH")
+         {					# termcap's move cursor hold
+         					# down key
+          $ReadingLineCurrentPos=length($ReadLine);
+          $ReadingLineStartPos=$ReadingLineCurrentPos-$Width+length($ReadingLinePrompt)+1;
+          $ReadingLineStartPos=0 if($ReadingLineStartPos<0);
+          Display("reading-line");
+         }
+       }
+     }
+    next;
+   }
+  if($ReadingSearchPattern)
+   {
+    $ReadingSearchPattern=0;
+    $SearchPattern=$ReadLine;
+    if($SearchPattern ne "")
+     {
+      Search($SearchDirection);
+     }
+    else
+     {
+      Display("sort");
+     }
+   }
+  if($AddingTrack)
+   {						# finished adding new tracks
+    $ReadingLineExpandToFileName=0;
+    if(($ReadLine ne "")&&(!$AddingTrackWaitingForAnyKey))
+     {						# really adding new tracks
+      my @TrackNew=@Track;
+      my $ProgramName=$0;
+      $0="";
+      @Track=();
+      GotoXY(0,$Height);
+      if(substr($ReadLine,0,1) eq "@")
+       {					# read given playlist
+        ReadPlayList(substr($ReadLine,1));
+       }
+      else
+       {					# read given file or files
+       						# in given directory
+        ReadFile($ReadLine);
+       }
+      $0=$ProgramName;
+      foreach (@Track)
+       {					# create list of unread MP3
+   						# info files
+        push @UnreadMP3Info,$_ if(!$MP3InfoRead{$_});
+       }
+      splice @TrackNew,$SelectedTrack,0,@Track;	# insert new files at current
+      						# position
+      @Track=@TrackNew;
+      $NumberWidth=length($#Track+1);		# track number width
+      if(!$ErrorAddingToPlayList)
+       {					# there were no errors while
+       						# adding new tracks to play list
+        $AddingTrack=0;
+       }
+      else
+       {					# error adding to play list
+        print STDOUT "PRESS ANY KEY TO CONTINUE";
+        $AddingTrackWaitingForAnyKey=1;
+        next;
+       }
+     }
+    elsif($AddingTrackWaitingForAnyKey)
+     {						# waiting for the user to press
+     						# any key
+      if($_ eq "")
+       {					# no key was pressed
+        next;
+       }
+      else
+       {					# a key was pressed
+        $AddingTrack=0;
+        $AddingTrackWaitingForAnyKey=0;
+	$_="";					# remove the pressed key
+       }
+     }
+    if(($ExpandDisplayed)||($ErrorAddingToPlayList))
+     {						# expand was displayed or there
+     						# were displayed errors, that
+     						# occurred while reading tracks,
+     						# then the screen must be
+     						# refreshed
+      Display("full");
+     }
+    else
+     {						# refresh of list and status
+     						# line is needed
+      Display("list-full");
+      Display("sort");
+     }
+    $ExpandDisplayed=0;
+   }
+  if($SavingPlayList)
+   {						# finished reading play list
+						# file name
+    $ReadingLineExpandToFileName=0;
+    if(($ReadLine ne "")&&(!$SavingPlayListAskYesNo))
+     {						# really adding new tracks
+      $SavedPlayList=$ReadLine;
+      $SavedPlayList=substr($SavedPlayList,1) if(substr($SavedPlayList,0,1) eq "@");
+      if($ExpandDisplayed)
+       {					# expand was displayed, screen
+     						# refresh is needed
+        Display("full");
+       }
+      else
+       {					# refresh of status line is
+						# needed
+        Display("sort");
+       }
+      $ExpandDisplayed=0;
+      if(-e $SavedPlayList)
+       {
+        GotoXY(0,$Height-1);
+        RingTheBell();
+        print STDOUT substr("Do You want to overwrite existing file: ".$SavedPlayList.(" " x $Width),0,$Width);
+        $SavingPlayListAskYesNo=1;
+        next;
+       }
+      else
+       {
+        SavePlayList($SavedPlayList);
+        $SavingPlayList=0;
+       }
+     }
+    elsif($SavingPlayListAskYesNo)
+     {
+      if(($_ eq "y")||($_ eq "Y"))
+       {
+        SavePlayList($SavedPlayList);
+        $SavingPlayList=0;
+        $SavingPlayListAskYesNo=0;
+       }
+      elsif(($_ eq "n")||($_ eq "N"))
+       {
+        $DisplaySort=1;
+        Display("save-playlist-cancelled");
+        $SavingPlayList=0;
+        $SavingPlayListAskYesNo=0;
+       }
+      next;
+     }
+    else
+     {
+      $SavingPlayList=0;			# saving cancelled
+     }
+   }
+  if($_ eq "7")
+   {						# ASCII "7" - Stop playing
+    $Playing=0;
+    $CurrentTrack=0 if(!$MPG123_PID);		# if stopped and stop pressed
+    						# then go to first track
+    KillMPG123();
+    Display("list");				# update play list
+    Display("status");				# update status
+    next;
+   }
+  if($_ eq "8")
+   {						# ASCII "8" - pause playing
+    if($MPG123_PID)
+     {						# mpg123 is running, then pause
+     						# playing
+      $Playing=1-$Playing;
+      print WRITE_MPG123 "s";			# in fact mpg123 stops playing
+     }
+    Display("status");				# update status
+    next;
+   }
+  if($_ eq "9")
+   {						# ASCII "9" - play
+    if(!$Playing)
+     {						# not playing, so play
+      $Playing=1;
+      if($MPG123_PID)
+       {					# mpg123 is running, so playing
+       						# was paused, then resume
+       						# playing
+        print WRITE_MPG123 "s";
+        Display("status");			# update status
+       }
+      else
+       {					# mpg123 not running, get next
+       						# track if playing in random
+       						# order
+        $CurrentTrack=NextTrack("keyb") if($Random);
+       }
+     }
+    next;
+   }
+  if($_ eq "4")
+   {						# ASCII "4" - previous track
+    $CurrentTrack=PreviousTrack("keyb");
+    KillMPG123();				# stop playing current track if
+    						# any
+    Display("status"),Display("list") if(!$Playing);
+    						# update status and play list
+    next;
+   }
+  if($_ eq "5")
+   {						# ASCII "5" - play track from
+   						# beginning
+    $Playing=1, print WRITE_MPG123 "b" if($MPG123_PID);
+    						# play track from beginning is
+    						# a track is playing
+    Display("status");				# update status
+    next;
+   }
+  if($_ eq "6")
+   {						# ASCII "6" - next track
+    $CurrentTrack=NextTrack("keyb");
+    KillMPG123();				# stop playing current track if
+    						# any
+    Display("status"),Display("list") if(!$Playing);
+    						# update status and play list
+    next;
+   }
+  if($_ eq "1")
+   {						# ASCII "1" - skip backward
+   						# (rewind)
+    print WRITE_MPG123 ";" if(($MPG123_PID)&&($Playing));
+    next;
+   }
+  if($_ eq "3")
+   {						# ASCII "3" - skip forward
+    print WRITE_MPG123 ":" if(($MPG123_PID)&&($Playing));
+    next;
+   }
+  if(($_ eq "q")||($_ eq "Q")||(unpack("C",$_)==3))
+   {						# ASCII "q" or ASCII "Q" or
+   						# ASCII "Ctrl-C" - quit
+    $Exit=1;
+    next;
+   }
+  if($_ eq "H")
+   {						# ASCII "H" - display help
+   						# screen
+    $DisplayingHelp=1;
+    Display("help");
+    next;
+   }
+  if($_ eq "L")
+   {						# ASCII "L" - loop play list
+    $Loop=1-$Loop;
+    Display("loop");				# update loop playlist status
+    next;
+   }
+  if($_ eq "K")
+   {						# ASCII "K" - loop track
+    $LoopTrack=1-$LoopTrack;
+    Display("looptrack");			# update loop track status
+    next;
+   }
+  if($_ eq "R")
+   {						# ASCII "R" - random play
+    $Random=1-$Random;
+    Display("random");				# update random play status
+    next;
+   }
+  if($_ eq "I")
+   {						# ASCII "I" - display artist
+    $Artist=1-$Artist;
+    if($DisplaySequence=~/I/)
+     {						# if there is a real change in
+     						# the display
+      GenerateTrackText();
+      Display("list-full");			# update play list
+     }
+    Display("artist");				# update display artist status
+    next;
+   }
+  if($_ eq "A")
+   {						# ASCII "A" - display album
+    $Album=1-$Album;
+    if($DisplaySequence=~/A/)
+     {						# if there is a real change in
+     						# the display
+      GenerateTrackText();
+      Display("list-full");			# update play list
+     }
+    Display("album");				# update display album status
+    next;
+   }
+  if($_ eq "T")
+   {						# ASCII "T" - display title
+    $Title=1-$Title;
+    if($DisplaySequence=~/T/)
+     {						# if there is a real change in
+     						# the display
+      GenerateTrackText();
+      Display("list-full");			# update play list
+     }
+    Display("title");				# update display title status
+    next;
+   }
+  if($_ eq "E")
+   {						# ASCII "E" - display filename
+    $Filename=1-$Filename;
+    if($DisplaySequence=~/E/)
+     {						# if there is a real change in
+     						# the display
+      GenerateTrackText();
+      Display("list-full");			# update play list
+     }
+    Display("filename");			# update display filename status
+    next;
+   }
+  if($_ eq "D")
+   {						# ASCII "D" - display directory
+    $Directory=1-$Directory;
+    if($DisplaySequence=~/D/)
+     {						# if there is a real change in
+     						# the display
+      GenerateTrackText();
+      Display("list-full");			# update play list
+     }
+    Display("directory");			# update display directory
+    						# status
+    next;
+   }
+  if($_ eq "Y")
+   {						# ASCII "Y" - display year
+    $Year=1-$Year;
+    if($DisplaySequence=~/Y/)
+     {						# if there is a real change in
+     						# the display
+      GenerateTrackText();
+      Display("list-full");			# update play list
+     }
+    Display("year");				# update display year
+    next;
+   }
+  if($_ eq "U")
+   {						# ASCII "U" - display music type
+    $MusicType=1-$MusicType;
+    if($DisplaySequence=~/U/)
+     {						# if there is a real change in
+     						# the display
+      GenerateTrackText();
+      Display("list-full");			# update play list
+     }
+    Display("musictype");			# update display music type
+    						# status
+    next;
+   }
+  if(($_ eq "c")||($_ eq "C"))
+   {						# ASCII "c" or ASCII "C" - go
+   						# to current track in the list
+    $SelectedTrack=$CurrentTrack;
+    if(($SelectedTrack<$StartVPos)||($SelectedTrack>=$StartVPos+$ListHeight))
+     {
+      $StartVPos=$SelectedTrack-int($ListHeight/2);
+      $StartVPos=$#Track-$ListHeight+1 if($StartVPos>$#Track-$ListHeight+1);
+      $StartVPos=0 if($StartVPos<0);
+     }
+    Display("list");				# update play list
+    next;
+   }
+  if(unpack("C",$_)==12)
+   {						# ASCII "Ctrl-L" - redraw screen
+    Display("full");				# display everything
+    next;
+   }
+  if(($_ eq "j")||($_ eq "kd"))
+   {						# ASCII "j" or termcap's cursor
+   						# down key - move selection one
+   						# line down
+    $SelectedTrack++;
+    $SelectedTrack=$#Track if($SelectedTrack>$#Track);
+    $StartVPos++ if($SelectedTrack>=$StartVPos+$ListHeight);
+    Display("list");				# update play list
+    next;
+   }
+  if(($_ eq "k")||($_ eq "ku"))
+   {						# ASCII "k" or termcap's cursor
+   						# up key - move selection one
+   						# line up
+    $SelectedTrack--;
+    $SelectedTrack=0 if($SelectedTrack<0);
+    $StartVPos-- if($SelectedTrack<$StartVPos);
+    Display("list");				# update play list
+    next;
+   }
+  if(($_ eq "g")||($_ eq "kh"))
+   {						# ASCII "g" or termcap's cursor
+   						# home key - move selection to
+   						# the top
+    $SelectedTrack=0;
+    $StartVPos=0;
+    Display("list");				# update play list
+    next;
+   }
+  if(($_ eq "G")||($_ eq "kH"))
+   {						# ASCII "G" or termcap's cursor
+   						# hold down key - move selection
+   						# to the bottom
+    $SelectedTrack=$#Track;
+    $StartVPos=$#Track-$ListHeight+1;
+    $StartVPos=0 if($StartVPos<0);
+    Display("list");				# update play list
+    next;
+   }
+  if(($_ eq "\n")||($_ eq "\r"))
+   {						# ASCII newline or ASCII
+   						# carriage return - play
+   						# selected track
+    $CurrentTrack=$SelectedTrack;
+    KillMPG123();				# stop playing current track if
+    						# any
+    $Playing=1;
+    next;
+   }
+  if(($_ eq "kN")||(unpack("C",$_)==6))
+   {						# ASCII "Ctrl-F" of termcap's
+   						# key for next page - move
+   						# selection one page down
+    $SelectedTrack=$StartVPos+$ListHeight-1;
+    $SelectedTrack=$#Track if($SelectedTrack>$#Track);
+    $StartVPos=$SelectedTrack;
+    $StartVPos=$#Track-$ListHeight+1 if($StartVPos>$#Track-$ListHeight+1);
+    $StartVPos=0 if($StartVPos<0);
+    Display("list");				# update play list
+    next;
+   }
+  if(($_ eq "kP")||(unpack("C",$_)==2))
+   {						# ASCII "Ctrl-B" or termcap's
+   						# key for previous page - move
+   						# selection one page up
+    $SelectedTrack=$StartVPos;
+    $StartVPos=$SelectedTrack-$ListHeight+1;
+    $StartVPos=0 if($StartVPos<0);
+    Display("list");				# update play list
+    next;
+   }
+  if(($_ eq "h")||($_ eq "kl"))
+   {						# ASCII "h" or termcap's cursor
+   						# left key - shift play list
+   						# window one character left
+    $StartHPos--;
+    $StartHPos=0 if($StartHPos<0);
+    Display("list");				# update play list
+    next;
+   }
+  if(($_ eq "l")||($_ eq "kr"))
+   {						# ASCII "l" or termcap's cursor
+   						# right key - shift play list
+   						# window one character right
+    $StartHPos++;
+    $StartHPos=$TrackTextMaxLength-ListWidth() if($StartHPos>$TrackTextMaxLength-ListWidth());
+    $StartHPos=0 if($StartHPos<0);
+    Display("list");				# update play list
+    next;
+   }
+  if(unpack("C",$_)==8)
+   {						# ASCII "Ctrl-H" - shift play
+   						# list window half window left
+    $StartHPos-=int(ListWidth()/2);
+    $StartHPos=0 if($StartHPos<0);
+    Display("list");				# update play list
+    next;
+   }
+  if(unpack("C",$_)==18)
+   {						# ASCII "Ctrl-R" - shift play
+   						# list window half window right
+    $StartHPos+=int(ListWidth()/2);
+    $StartHPos=$TrackTextMaxLength-ListWidth() if($StartHPos>$TrackTextMaxLength-ListWidth());
+    $StartHPos=0 if($StartHPos<0);
+    Display("list");				# update play list
+    next;
+   }
+  if($_ eq "0")
+   {						# ASCII "0" - shift play list
+   						# window to the left margin
+    $StartHPos=0;
+    Display("list");				# update play list
+    next;
+   }
+  if($_ eq "\$")
+   {						# ASCII "$" - shift play list
+   						# window to the right margin
+    $StartHPos=$TrackTextMaxLength-ListWidth();
+    $StartHPos=0 if($StartHPos<0);
+    Display("list");				# update play list
+    next;
+   }
+  if($_ eq "M")
+   {						# ASCII "M" - show numbers
+    $Numbers=1-$Numbers;
+    $StartHPos=$TrackTextMaxLength-ListWidth() if($StartHPos>$TrackTextMaxLength-ListWidth());
+    $StartHPos=0 if($StartHPos<0);
+    Display("numbers");				# update show numbers status
+    Display("list-full");			# update play list
+    next;
+   }
+  if(unpack("C",$_)==9)
+   {						# ASCII "Ctrl-I" - change
+   						# display sequence for artist
+    ChangeDisplaySequence("I");
+    next;
+   }
+  if(unpack("C",$_)==1)
+   {						# ASCII "Ctrl-A" - change
+   						# display sequence for album
+    ChangeDisplaySequence("A");
+    next;
+   }
+  if(unpack("C",$_)==20)
+   {						# ASCII "Ctrl-T" - change
+   						# display sequence for title
+    ChangeDisplaySequence("T");
+    next;
+   }
+  if(unpack("C",$_)==5)
+   {						# ASCII "Ctrl-E" - change
+   						# display sequence for filename
+    ChangeDisplaySequence("E");
+    next;
+   }
+  if(unpack("C",$_)==4)
+   {						# ASCII "Ctrl-D" - change
+   						# display sequence for directory
+    ChangeDisplaySequence("D");
+    next;
+   }
+  if(unpack("C",$_)==25)
+   {						# ASCII "Ctrl-Y" - change
+   						# display sequence for year
+    ChangeDisplaySequence("Y");
+    next;
+   }
+  if(unpack("C",$_)==21)
+   {						# ASCII "Ctrl-U" - change
+   						# display sequence for music
+   						# type
+    ChangeDisplaySequence("U");
+    next;
+   }
+  if($_ eq "i")
+   {						# ASCII "i" - sort by artist
+    SortTracks("artist");
+    next;
+   }
+  if($_ eq "a")
+   {						# ASCII "a" - sort by album
+    SortTracks("album");
+    next;
+   }
+  if($_ eq "t")
+   {						# ASCII "t" - sort by title
+    SortTracks("title");
+    next;
+   }
+  if($_ eq "e")
+   {						# ASCII "e" - sort by filename
+    SortTracks("filename");
+    next;
+   }
+  if($_ eq "d")
+   {						# ASCII "d" - sort by directory
+    SortTracks("directory");
+    next;
+   }
+  if($_ eq "y")
+   {						# ASCII "y" - sort by year
+    SortTracks("year");
+    next;
+   }
+  if($_ eq "u")
+   {						# ASCII "u" - sort by music type
+    SortTracks("musictype");
+    next;
+   }
+  if($_ eq "r")
+   {						# ASCII "r" - randomize play
+   						# list
+    SortTracks("random");
+    next;
+   }
+  if($_ eq "W")
+   {						# ASCII "W" - wrap search
+    $WrapSearch=1-$WrapSearch;
+    Display("wrapsearch");			# update wrap search status
+    next;
+   }
+  if($_ eq "S")
+   {						# ASCII "S" - sort order
+   						# (ascending or descending)
+    $DescendingSort=1-$DescendingSort;
+    Display("sorttype");			# update sort order status
+    next;
+   }
+  if($_ eq "V")
+   {						# ASCII "V" - sort case
+   						# (sensitive or insensitive)
+    $CaseSensitive=1-$CaseSensitive;
+    Display("case");				# update sort case status
+    next;
+   }
+  if(($_ eq "/")||($_ eq "?"))
+   {						# ASCII "/" or ASCII "?" -
+   						# search for given pattern
+    $SearchDirection="forward" if($_ eq "/");
+    $SearchDirection="backward" if($_ eq "?");
+    $ReadingLinePrompt="Search ".$SearchDirection." for: ";
+    $ReadingLine=1;
+    $ReadingSearchPattern=1;
+    $ReadingLineStartPos=0;
+    $ReadingLineCurrentPos=0;
+    $ReadLine="";
+    Display("reading-line");
+    ShowCursor();
+    next;
+   }
+  if(($_ eq "n")||($_ eq "N"))
+   {						# ASCII "n" or ASCII "N" -
+   						# search again for given pattern
+   						# (n - the same direction,
+   						#  N - the oposite direction)
+    Search($SearchDirection) if($_ eq "n");
+    if($_ eq "N")
+     {
+      if($SearchDirection eq "forward")
+       {
+        Search("backward");
+       }
+      else
+       {
+        Search("forward");
+       }
+     }
+    next;
+   }
+  if(($_ eq "-")||($_ eq "kD"))
+   {						# ASCII "-" or termcap's delete
+						# character - remove track from
+   						# play list
+    $TrackCount{$Track[$SelectedTrack]}--;
+    if($TrackCount{$Track[$SelectedTrack]}==0)
+     {
+      delete $Title{$Track[$SelectedTrack]};	# remove track's information
+      delete $Artist{$Track[$SelectedTrack]};
+      delete $Album{$Track[$SelectedTrack]};
+      delete $Year{$Track[$SelectedTrack]};
+      delete $Comment{$Track[$SelectedTrack]};
+      delete $TrackText{$Track[$SelectedTrack]};
+      delete $MP3InfoRead{$Track[$SelectedTrack]};
+     }
+    splice @Track,$SelectedTrack,1;		# remove selected track from
+						# play list
+    $NumberWidth=length($#Track+1);		# track number width
+    KillMPG123() if($SelectedTrack==$CurrentTrack);
+    						# stop playing removed track
+    $CurrentTrack-- if($SelectedTrack<$CurrentTrack);
+    						# removed track changes number
+    						# of current track
+    $SelectedTrack=$#Track if($SelectedTrack>$#Track);
+    $CurrentTrack=$#Track if($CurrentTrack>$#Track);
+    $StartVPos=$#Track-$ListHeight+1 if($StartVPos>$#Track-$ListHeight+1);
+    $StartVPos=0 if($StartVPos<0);
+    if($#Track!=-1)
+     {						# there are still tracks to play
+      Display("list-full");
+     }
+    else
+     {						# no tracks to play - quit
+      $Exit=1;
+     }
+   }
+  if(($_ eq "+")||($_ eq "kI"))
+   {						# ASCII "+" or termcap's insert
+						# character - add a single track
+						# or tracks in a directory or
+						# tracks in a playlist to play
+						# list at current position
+    $ReadingLinePrompt="Add to playlist: ";
+    $ReadingLine=1;
+    $AddingTrack=1;
+    $ReadingLineStartPos=0;
+    $ReadingLineCurrentPos=0;
+    $ReadLine="";
+    $ReadingLineExpandToFileName=1;
+    $ErrorAddingToPlayList=0;
+    Display("reading-line");
+    ShowCursor();
+    next;
+   }
+  if(unpack("C",$_)==23)
+   {						# ASCII "Ctrl-W" - save play
+						# list
+    $ReadingLinePrompt="Save playlist to: ";
+    $ReadingLine=1;
+    $SavingPlayList=1;
+    $ReadingLineStartPos=0;
+    $ReadingLineCurrentPos=0;
+    $ReadLine=$SavedPlayList;
+    $ReadingLineExpandToFileName=1;
+    Display("reading-line");
+    ShowCursor();
+    next;
+   }
+ }
+continue
+ {
+  select(undef,undef,undef,0.05) if(($#UnreadMP3Info==-1)&&($KeyboardInput eq ""));
+  						# sleep 50 miliseconds if there
+  						# are no unread MP3 infos and no
+  						# keyboard input is present
+ }
+ShowCursor();
+ClearScreen();
+MyExit(0);
+
+sub ReadDirectory
+{						# subroutine to read all MP3
+						# files from a directory
+ my $Entry;
+ my @DirectoryContents;
+ my $dev;
+ my $inode;
+ ($dev,$inode)=stat($_[0]);
+ if((!$Directory{$dev,$inode})&&(opendir(DIRECTORY,$_[0])))
+  {						# this directory has not been
+  						# searched yet and could be open
+  						# so read it
+   $Directory{$dev,$inode}=1;			# this directory is searched
+   $_[0].="/" if($_[0]=~/[^\/]$/);		# add "/" to the end of
+   						# directory if it hasn't one
+   @DirectoryContents=readdir(DIRECTORY);	# read directory contents
+   closedir(DIRECTORY);
+   foreach $Entry (@DirectoryContents)
+    {						# check every entry in this
+    						# directory
+     if(-d $_[0].$Entry)
+      {						# entry is a directory so go
+      						# recursive into it if it isn't
+      						# "." or ".."
+       ReadDirectory($_[0].$Entry) if(!(($Entry=~/^\.$/)||($Entry=~/^\.\.$/)));
+      }
+     else
+      {						# entry is a file
+       if($Entry=~/\.[mM][pP]3$/)
+        {					# file ends with ".mp3" (case
+        					# insensitive)
+         push @Track,$_[0].$Entry;
+         $TrackCount{$_[0].$Entry}++;
+         ReadMP3Info($_[0].$Entry) if(!$DontReadMP3InfoOnLoad);
+        }
+      }
+    }
+  }
+}
+
+sub ReadMP3Info
+{						# subroutine to read MP3 info
+						# from file
+ $MP3InfoRead{$_[0]}=1;				# MP3 info is read
+ if(open(MP3FILE,$_[0]))
+  {						# MP3 file opened
+   $MP3File=$_[0];
+   binmode(MP3FILE);				# binary mode is required
+   seek(MP3FILE,-128,2);			# seek to ID3 Tag
+   read(MP3FILE,$_,3);				# read tag identifier
+   tr/[a-z]/[A-Z]/;
+   if($_ eq "TAG")
+    {						# this MP3 file contains MP3
+    						# ID3 Tag info, so read it
+     read(MP3FILE,$_,30);
+     s/[\000-\037\200-\377]//g;
+     s/ *$//;
+     $Title{$MP3File}=$_;
+     read(MP3FILE,$_,30);
+     s/[\000-\037\200-\377]//g;
+     s/ *$//;
+     $Artist{$MP3File}=$_;
+     read(MP3FILE,$_,30);
+     s/[\000-\037\200-\377]//g;
+     s/ *$//;
+     $Album{$MP3File}=$_;
+     read(MP3FILE,$_,4);
+     s/[\000-\037\200-\377]//g;
+     s/ *$//;
+     $Year{$MP3File}=$_;
+     read(MP3FILE,$_,30);
+     s/[\000-\037\200-\377]//g;
+     s/ *$//;
+     $Comment{$MP3File}=$_;
+     read(MP3FILE,$_,1);
+     $MusicType{$MP3File}=$MusicT{$_};
+     seek(MP3FILE,-137,2);			# seek to Lyrics3 Tag
+     read(MP3FILE,$_,9);			# read tag identifier
+     seek(MP3FILE,-137,2);			# seek to Lyrics3 Tag
+     ReadLyrics3TagV100Info() if($_ eq "LYRICSEND");
+     seek(MP3FILE,-137,2);			# seek to Lyrics3 Tag
+     ReadLyrics3TagV200Info() if($_ eq "LYRICS200");
+    }
+   else
+    {
+     seek(MP3FILE,-9,2);			# seek to Lyrics3 Tag
+     read(MP3FILE,$_,9);			# read tag identifier
+     seek(MP3FILE,-9,2);
+     ReadLyrics3TagV100Info() if($_ eq "LYRICSEND");
+     seek(MP3FILE,-9,2);
+     ReadLyrics3TagV200Info() if($_ eq "LYRICS200");
+    }
+   close(MP3FILE);
+  }
+}
+
+sub ReadLyrics3TagV100Info
+{						# subroutine to read Lyrics3
+						# Tag version 1.00
+						# OPEN FILE IS IN HANDLE:
+						# 	MP3FILE
+						# MP3 FILE NAME IS IN VARIABLE:
+						# 	MP3File
+
+						# The Lyrics3 Tag contains
+						# the track's lyrics, so
+						# we don't need it. But in case
+						# this is really needed, You
+						# have to read 5100 bytes
+						# before current position and
+						# search for text "LYRICSBEGIN".
+						# The lyrics starts right after
+						# that string, and may contain
+						# time stams marked by [mm:ss]
+						# entries. Lyrics line
+						# delimiters are CR+LF and no
+						# null char is used.
+}
+
+sub ReadLyrics3TagV200Info
+{						# subroutine to read Lyrics3
+						# Tag version 2.00
+ my $TagSize;
+ my $ID;
+ my $IDSize;
+ my $IDData;
+ seek(MP3FILE,-6,1);
+ read(MP3FILE,$TagSize,6);			# read the Lyrics Tag size
+ seek(MP3FILE,-6,1);
+ seek(MP3FILE,-$TagSize,1);			# seek to the beginning of the
+ 						# Lyrics3 Tag
+ read(MP3FILE,$_,11);
+ if($_ eq "LYRICSBEGIN")
+  {						# the Lyrics3 Tag is in tact
+   $TagSize-=11;
+   while($TagSize>0)
+    {						# read data until the whole
+    						# tag is read
+     read(MP3FILE,$ID,3);
+     read(MP3FILE,$IDSize,5);
+     read(MP3FILE,$IDData,$IDSize);
+     $TagSize-=8+$IDSize;
+     $Album{$MP3File}=$IDData if($ID eq "EAL");	# extended album name
+     $Artist{$MP3File}=$IDData if($ID eq "EAR");# extended artist name
+     $Title{$MP3File}=$IDData if($ID eq "ETT");	# extended track title
+    }
+  }
+}
+
+sub RunMPG123
+{						# subroutine to run mpg123 to
+						# play current track
+ $MPG123_PID=fork;
+ if($MPG123_PID==0)
+  {						# we are in child process
+   setpgrp(0,0);				# set process group, so mpg123
+   						# doesn't kill parent process
+   						# by sending signal to the whole
+   						# process group
+   close(STDIN);
+   open(STDIN,"<&READ_MPG123");			# redirect STDIN to opened
+   						# pseudo terminal
+   close(STDOUT);
+   if($DebugMPG123)
+    {						# mpg123 debugging
+     open(STDOUT,">&STDERR");			# redirect STDOUT to STDERR 
+    }
+   else
+    {						# no mpg123 debugging
+     close(STDERR);
+    }
+   close(WRITE_MPG123);
+   exec($MPG123,@MPG123_OPTIONS,$Track[$CurrentTrack]);
+   						# run mpg123 in control keys
+   						# mode and with higher priority
+   print STDERR $0."Can't run \"$MPG123 @MPG123_OPTIONS\ $Track[$CurrentTrack]\".\n";
+   exit(1);
+  }
+}
+
+sub KillMPG123
+{						# subroutine to kill mpg123
+ if($MPG123_PID)
+  {
+   kill "KILL",$MPG123_PID;			# kill mpg123
+   while(waitpid($MPG123_PID,&WNOHANG)==0){}	# wait for termination of mpg123
+  }
+ $MPG123_PID=0;
+}
+
+sub MyExit
+{						# subroutine to cleanup before
+						# exit
+ KillMPG123();
+ close(WRITE_MPG123);
+ close(READ_MPG123);
+ eval {$Terminal->setlflag($OldTerminalSettings)};
+ eval {$Terminal->setattr(fileno(STDIN),TCSANOW)};
+ 						# restore old terminal settings
+ exit($_[0]);
+}
+
+sub NextTrack
+{						# subroutine to calculate next
+						# track. It optionally takes one
+						# argument which if equal "keyb"
+						# then playing does not stop if
+						# all tracks were played
+ my $Next;
+ my $x;
+ my $RandomToPlay;
+ my @Played;
+ if($Random)
+  {						# random order
+   @Played=keys(%PlayedTrack);
+   $RandomToPlay=$#Track-$#Played;		# number of tracks that waren't
+   						# played yet
+   if(!$RandomToPlay)
+    {						# every track was already played
+     $Playing=0 if((!$Loop)&&($_[0] ne "keyb"));# stop playing if not loop play
+     						# list or playing finished by
+     						# itself (no user interaction)
+     %PlayedTrack=();				# remove played tracks
+     @Played=keys(%PlayedTrack);
+     $RandomToPlay=$#Track-$#Played;
+    }
+   $x=int(rand($RandomToPlay));			# next unplayed track
+   $RandomToPlay--;
+   $x=$RandomToPlay if($x>$RandomToPlay);
+   for($Next=0;$Next<=$#Track;$Next++)
+    {						# search $x-th unplayed track
+     last if((!$x)&&(!$PlayedTrack{$Track[$Next]}));
+     $x-- if(!$PlayedTrack{$Track[$Next]});
+    }
+  }
+ else
+  {						# sequential order
+   $Next=$CurrentTrack+1;			# next track
+   if($Next>$#Track)
+    {						# beyond last track 
+     $Next=0;					# go to beginning
+     $Playing=0 if((!$Loop)&&($_[0] ne "keyb"));# stop playing if not loop play
+     						# list or playing finished by
+     						# itself (no user interaction)
+     %PlayedTrack=();
+    }
+  }
+ return $Next;
+}
+
+sub PreviousTrack
+{						# subroutine to calculate
+						# previous track. It optionally
+						# takes one argument which if
+						# equal "keyb" then playing does
+						# not stop if all tracks were
+						# played
+ my $Previous;
+ my $x;
+ my $RandomToPlay;
+ my @Played;
+ if($Random)
+  {						# random order
+   @Played=keys(%PlayedTrack);
+   $RandomToPlay=$#Track-$#Played;		# number of tracks that weren't
+   						# played yet
+   if(!$RandomToPlay)
+    {						# every track was already played
+     $Playing=0 if((!$Loop)&&($_[0] ne "keyb"));# stop playing if not loop play
+     						# list or playing finished by
+     						# itself (no user interaction)
+     %PlayedTrack=();				# remove played tracks
+     @Played=keys(%PlayedTrack);
+     $RandomToPlay=$#Track-$#Played;
+    }
+   $x=int(rand($RandomToPlay));			# next unplayed track
+   $RandomToPlay--;
+   $x=$RandomToPlay if($x>$RandomToPlay);
+   for($Previous=0;$Previous<=$#Track;$Previous++)
+    {						# search $x-th unplayed track
+     last if((!$x)&&(!$PlayedTrack{$Track[$Previous]}));
+     $x-- if(!$PlayedTrack{$Track[$Previous]});
+    }
+  }
+ else
+  {						# sequential order
+   $Previous=$CurrentTrack-1;			# next track
+   if($Previous<0)
+    {						# beyond first track
+     $Previous=$#Track;				# go to the last track
+     $Playing=0 if((!$Loop)&&($_[0] ne "keyb"));# stop playing if not loop play
+     						# list or playing finished by
+     						# itself (no user interaction)
+     %PlayedTrack=();
+    }
+  }
+ return $Previous;
+}
+
+sub SignalHandler
+{						# subroutine to handle signals
+ MyExit(1);
+}
+
+sub WinCHSignalHandler
+{						# subroutine to handle window
+						# change signal
+
+ $WinCHRefreshNeeded=1;
+}
+
+sub DecodeKey
+{						# subroutine to decode a key
+						# from the input stream
+ my $x;
+ my $y;
+ foreach $x (keys %TermcapEntry)
+  {						# check all termcap capabilities
+   if(index($KeyboardInput,$TermcapEntry{$x})==0)
+    {						# a termcap capability decected
+     substr($KeyboardInput,0,length($TermcapEntry{$x}),"");
+     return $x
+    }
+  }
+ if($ReadingLine)
+  {
+   foreach $x (keys %TermcapEntryReadingLine)
+    {						# check all termcap capabilities
+     if(index($KeyboardInput,$TermcapEntryReadingLine{$x})==0)
+      {						# a termcap capability decected
+       substr($KeyboardInput,0,length($TermcapEntryReadingLine{$x}),"");
+       return $x
+      }
+    }
+  }
+ return $& if($KeyboardInput=~s/^.//s);		# no termcap capability detected
+ 						# return first ASCII character
+ return "";
+}
+
+sub ChangeDisplaySequence
+{						# subroutine to change display
+						# sequence of a given argument
+ my $Char;
+ my $x;
+ $x=index($DisplaySequence,$_[0]);
+ if($x==-1)
+  {						# argument is in not the
+  						# DisplaySequence, so add it to
+  						# the end
+   $DisplaySequence.=$_[0];
+   GenerateTrackText(),Display("list-full") if(${$DisplayParameter{$_[0]}});
+   						# update play list if this
+   						# argument is displayed
+  }
+ else
+  {						# argument is in the
+  						# DisplaySequence, so change its
+  						# position
+   if($x)
+    {						# argument is in the middle, so
+    						# exchange it with the one
+    						# before
+     substr($DisplaySequence,$x,1,"_");
+     $Char=substr($DisplaySequence,$x-1,1,$_[0]);
+     substr($DisplaySequence,$x,1,$Char);
+     GenerateTrackText(),Display("list-full") if((${$DisplayParameter{$_[0]}})&&(${$DisplayParameter{$Char}}));
+     						# update play list if both
+     						# arguments are displayed
+    }
+   else
+    {						# argument is at the beginning,
+    						# so remove it from the
+    						# beginning and add it at the
+    						# end
+     substr($DisplaySequence,$x,1,"");
+     $DisplaySequence.=$_[0];
+     if(${$DisplayParameter{$_[0]}})
+      {						# if this argument is displayed
+      						# and any other arguments are
+      						# displayed, then update play
+      						# list
+       $Char=FALSE;
+       for($x=0;$x<length($DisplaySequence);$x++)
+        {
+         $Char||=(${$DisplayParameter{substr($DisplaySequence,$x,1)}}!=0);
+        }
+       GenerateTrackText(),Display("list-full") if($Char);
+      }
+    }
+  }
+ Display("sequence");				# update sequence display
+}
+
+sub GotoXY
+{						# subroutine to put cursor to
+						# the given location on the
+						# screen
+ print STDOUT $TermCap->Tgoto('cm',int($_[0]),int($_[1]));
+}
+
+sub ClearScreen
+{						# subroutine to clear the screen
+ print STDOUT $TermCap->{'_cl'};
+}
+
+sub Char
+{						# subroutine to return special
+						# characters depending on
+						# display type (7-bit ascii)
+ return $Display{$_[0],$_7BitAsciiDisplay};
+}
+
+sub HideCursor
+{						# subroutine to hide cursor
+ print STDOUT $TermCap->{'_vi'};
+}
+
+sub ShowCursor
+{						# subroutine to show cursor
+ print STDOUT $TermCap->{'_ve'};
+}
+
+sub NormalMode
+{						# subroutine to put terminal
+						# into normal mode
+ print STDOUT NormalModeStr() if(!$_7BitAsciiDisplay);
+}
+
+sub ReverseMode
+{						# subroutine to put terminal
+						# into reverse mode
+ print STDOUT ReverseModeStr() if(!$_7BitAsciiDisplay);
+}
+
+sub BoldMode
+{						# subroutine to put terminal
+						# into bold mode
+ print STDOUT BoldModeStr() if(!$_7BitAsciiDisplay);
+}
+
+sub HalfBrightMode
+{						# subroutine to put terminal
+						# into half bright mode
+ print STDOUT HalfBrightModeStr() if(!$_7BitAsciiDisplay);
+}
+
+sub NormalModeStr
+{						# subroutine that returns string
+						# putting terminal into normal
+						# mode
+ return "" if($_7BitAsciiDisplay);
+ return $TermCap->{'_me'};
+}
+
+sub ReverseModeStr
+{						# subroutine that returns string
+						# putting terminal into reverse
+						# mode
+ return "" if($_7BitAsciiDisplay);
+ return $TermCap->{'_mr'};
+}
+
+sub BoldModeStr
+{						# subroutine that returns string
+						# putting terminal into bold
+						# mode
+ return "" if($_7BitAsciiDisplay);
+ return $TermCap->{'_md'};
+}
+
+sub HalfBrightModeStr
+{						# subroutine that returns string
+						# putting terminal into half
+						# bright mode
+ return "" if($_7BitAsciiDisplay);
+ return $TermCap->{'_mh'};
+}
+
+sub Display
+{ 						# subroutine to display
+						# user interface. It takes one
+						# argument controlling which
+						# parts will be displayed.
+ my $x;
+ my $String;
+ if(!$DisplayingHelp)
+  {						# not displaying help, so
+  						# display other elements
+   HideCursor();
+   if($_[0] eq "full")
+    {						# display non changable part
+     ClearScreen();
+     GotoXY(int($Width/2)-34,0);
+     print STDOUT Char("ulcorner").(Char("hline") x 5).Char("ltitle")." Display ".Char("rtitle").(Char("hline") x 5).Char("urcorner")."  ".Char("ulcorner").(Char("hline") x 3).Char("ltitle")." NumPad ".Char("rtitle").(Char("hline") x 3).Char("urcorner")."  ".Char("ulcorner").(Char("hline") x 5).Char("ltitle")." Options ".Char("rtitle").(Char("hline") x 5).Char("urcorner");
+     GotoXY(int($Width/2)-34,1);
+     print STDOUT Char("vline")."  [ ] art".BoldModeStr()."I".NormalModeStr()."st         ".Char("vline")."  ".Char("vline")."   ".Char("stop")."  ".Char("pause")."  ".Char("play")."   ".Char("vline")."  ".Char("vline")."  [ ] ".BoldModeStr()."L".NormalModeStr()."oop playlist  ".Char("vline");
+     GotoXY(int($Width/2)-34,2);
+     print STDOUT Char("vline")."  [ ] ".BoldModeStr()."A".NormalModeStr()."lbum          ".Char("vline")."  ".Char("vline")."                ".Char("vline")."  ".Char("vline")."  [ ] loop trac".BoldModeStr()."K".NormalModeStr()."     ".Char("vline");
+     GotoXY(int($Width/2)-34,3);
+     print STDOUT Char("vline")."  [ ] ".BoldModeStr()."T".NormalModeStr()."itle          ".Char("vline")."  ".Char("vline")."   ".Char("previous")."  ".Char("begin")."  ".Char("next")."   ".Char("vline")."  ".Char("vline")."  [ ] ".BoldModeStr()."R".NormalModeStr()."andom play    ".Char("vline");
+     GotoXY(int($Width/2)-34,4);
+     print STDOUT Char("vline")."  [ ] fil".BoldModeStr()."E".NormalModeStr()."name       ".Char("vline")."  ".Char("vline")."                ".Char("vline")."  ".Char("vline")."  [ ] show nu".BoldModeStr()."M".NormalModeStr()."bers   ".Char("vline");
+     GotoXY(int($Width/2)-34,5);
+     print STDOUT Char("vline")."  [ ] ".BoldModeStr()."D".NormalModeStr()."irectory      ".Char("vline")."  ".Char("vline")."   ".Char("rewind")."      ".Char("forward")."   ".Char("vline")."  ".Char("vline")."  [ ] ".BoldModeStr()."W".NormalModeStr()."rap search    ".Char("vline");
+     GotoXY(int($Width/2)-34,6);
+     print STDOUT Char("vline")."  [ ] ".BoldModeStr()."Y".NormalModeStr()."ear           ".Char("vline")."  ".Char("llcorner").(Char("hline") x 16).Char("lrcorner")."  ".Char("vline")."  Sort options:      ".Char("vline");
+     GotoXY(int($Width/2)-34,7);
+     print STDOUT Char("vline")."  [ ] m".BoldModeStr()."U".NormalModeStr()."sic type     ".Char("vline")."  ".Char("ulcorner").(Char("hline") x 16).Char("urcorner")."  ".Char("vline")."  [ ] de".BoldModeStr()."S".NormalModeStr()."cending     ".Char("vline");
+     GotoXY(int($Width/2)-34,8);
+     print STDOUT Char("vline")."  Sequence:          ".Char("vline")."  ".Char("vline")."  ".BoldModeStr()."q".NormalModeStr()."UIT    ".BoldModeStr()."H".NormalModeStr()."elp  ".Char("vline")."  ".Char("vline")."  [ ] case sensiti".BoldModeStr()."V".NormalModeStr()."e ".Char("vline");
+     GotoXY(int($Width/2)-34,9);
+     print STDOUT Char("llcorner").(Char("hline") x 21).Char("lrcorner")."  ".Char("llcorner").(Char("hline") x 16).Char("lrcorner")."  ".Char("llcorner").(Char("hline") x 21).Char("lrcorner");
+     GotoXY(0,11);
+     print STDOUT Char("ulcorner").(Char("hline") x int(($Width-14)/2)).Char("ltitle")." PlayList ".Char("rtitle").(Char("hline") x ($Width-14-int(($Width-14)/2))).Char("urcorner");
+     for($x=0;$x<$ListHeight;$x++)
+      {
+       GotoXY(0,12+$x);
+       print STDOUT Char("vline");
+       GotoXY($Width-1,12+$x);
+       print STDOUT Char("vbar_bg");
+      }
+     GotoXY(0,$Height-2);
+     print STDOUT Char("llcorner").(Char("hbar_bg") x ($Width-2)).Char("lrcorner");
+    }
+   if((($_[0] eq "full")||($_[0] eq "sort"))&&(!$ReadingLine))
+    {						# display sort status
+     GotoXY(0,$Height-1);
+     print STDOUT "SortBy: ART".BoldModeStr()."i".NormalModeStr()."ST  ".BoldModeStr()."a".NormalModeStr()."LBUM  ".BoldModeStr()."t".NormalModeStr()."ITLE  FIL".BoldModeStr()."e".NormalModeStr()."NAME  ".BoldModeStr()."d".NormalModeStr()."IRECTORY  ".BoldModeStr()."y".NormalModeStr()."EAR  M".BoldModeStr()."u".NormalModeStr()."SICTYPE  ".BoldModeStr()."r".NormalModeStr()."ANDOM ORDER";
+    }
+   if(($_[0] eq "full")||($_[0] eq "status"))
+    {						# display status
+     GotoXY(1,10);
+     print STDOUT ReverseModeStr();
+     if($Playing)
+      {
+       print STDOUT "Playing";
+      }
+     elsif(!$MPG123_PID)
+      {
+       print STDOUT "Stopped";
+      }
+     else
+      {
+       print STDOUT "Paused ";
+      }
+     print STDOUT NormalModeStr();
+     GotoXY(12,10);
+     $String=substr($Track[$CurrentTrack],-($Width-19));
+     $String=~s/^.../.../ if(length($Track[$CurrentTrack])>$Width-18);
+     print STDOUT substr("File: ".$String.(" " x ($Width)),0,$Width-13);
+    }
+   if(($_[0] eq "full")||($_[0] eq "loop"))
+    {						# display loop play list status
+     GotoXY(int($Width/2)+15,1);
+     print STDOUT ($Loop ? Char("checked") : " ");
+    }
+   if(($_[0] eq "full")||($_[0] eq "looptrack"))
+    {						# display loop track status
+     GotoXY(int($Width/2)+15,2);
+     print STDOUT ($LoopTrack ? Char("checked") : " ");
+    }
+   if(($_[0] eq "full")||($_[0] eq "random"))
+    {						# display random play status
+     GotoXY(int($Width/2)+15,3);
+     print STDOUT ($Random ? Char("checked") : " ");
+    }
+   if(($_[0] eq "full")||($_[0] eq "artist"))
+    {						# display artist status
+     GotoXY(int($Width/2)-30,1);
+     print STDOUT ($Artist ? Char("checked") : " ");
+    }
+   if(($_[0] eq "full")||($_[0] eq "album"))
+    {						# display album status
+     GotoXY(int($Width/2)-30,2);
+     print STDOUT ($Album ? Char("checked") : " ");
+    }
+   if(($_[0] eq "full")||($_[0] eq "title"))
+    {						# display title status
+     GotoXY(int($Width/2)-30,3);
+     print STDOUT ($Title ? Char("checked") : " ");
+    }
+   if(($_[0] eq "full")||($_[0] eq "filename"))
+    {						# display filename status
+     GotoXY(int($Width/2)-30,4);
+     print STDOUT ($Filename ? Char("checked") : " ");
+    }
+   if(($_[0] eq "full")||($_[0] eq "directory"))
+    {						# display directory status
+     GotoXY(int($Width/2)-30,5);
+     print STDOUT ($Directory ? Char("checked") : " ");
+    }
+   if(($_[0] eq "full")||($_[0] eq "year"))
+    {						# display year status
+     GotoXY(int($Width/2)-30,6);
+     print STDOUT ($Year ? Char("checked") : " ");
+    }
+   if(($_[0] eq "full")||($_[0] eq "musictype"))
+    {						# display music type status
+     GotoXY(int($Width/2)-30,7);
+     print STDOUT ($MusicType ? Char("checked") : " ");
+    }
+   if(($_[0] eq "full")||($_[0] eq "sequence"))
+    {						# display DisplaySequence
+     GotoXY(int($Width/2)-21,8);
+     print STDOUT BoldModeStr().$DisplaySequence.NormalModeStr();
+    }
+   if(($_[0] eq "full")||($_[0] eq "numbers"))
+    {						# display show numbers status
+     GotoXY(int($Width/2)+15,4);
+     print STDOUT ($Numbers ? Char("checked") : " ");
+    }
+   if(($_[0] eq "full")||($_[0] eq "wrapsearch"))
+    {						# display sort type status
+     GotoXY(int($Width/2)+15,5);
+     print STDOUT ($WrapSearch ? Char("checked") : " ");
+    }
+   if(($_[0] eq "full")||($_[0] eq "sorttype"))
+    {						# display sort type status
+     GotoXY(int($Width/2)+15,7);
+     print STDOUT ($DescendingSort ? Char("checked") : " ");
+    }
+   if(($_[0] eq "full")||($_[0] eq "case"))
+    {						# display sort case status
+     GotoXY(int($Width/2)+15,8);
+     print STDOUT ($CaseSensitive ? Char("checked") : " ");
+    }
+   if($_[0] eq "list")
+    {						# display difference in list
+    						# from last display
+     if(($StartVPos==$OldStartVPos)&&($StartHPos==$OldStartHPos))
+      {						# no change of start positions
+      						# so check current track and
+      						# selected track
+       if($SelectedTrack!=$OldSelectedTrack)
+        {						# selected track has changed, so
+        						# display it
+         if(($OldSelectedTrack>=$StartVPos)&&($OldSelectedTrack<$StartVPos+$ListHeight))
+          {
+           GotoXY(1,12+$OldSelectedTrack-$StartVPos);
+           print STDOUT ListEntry($OldSelectedTrack);
+          }
+         GotoXY(1,12+$SelectedTrack-$StartVPos);
+         print STDOUT ListEntry($SelectedTrack);
+         $OldSelectedTrack=$SelectedTrack;
+        }
+       if($CurrentTrack!=$OldCurrentTrack)
+        {						# current track has changed, so
+        						# display it
+         if(($OldCurrentTrack>=$StartVPos)&&($OldCurrentTrack<$StartVPos+$ListHeight))
+          {					# old current track is within
+          					# play list window, so display
+          					# it
+           GotoXY(1,12+$OldCurrentTrack-$StartVPos);
+           print STDOUT ListEntry($OldCurrentTrack);
+          }
+         if(($CurrentTrack>=$StartVPos)&&($CurrentTrack<$StartVPos+$ListHeight))
+          {					# current track is within play
+          					# list window, so display it
+           GotoXY(1,12+$CurrentTrack-$StartVPos);
+           print STDOUT ListEntry($CurrentTrack);
+          }
+         $OldCurrentTrack=$CurrentTrack;
+        }
+      }
+     else
+      {						# starting positions have
+      						# changed, then display full
+      						# play list window
+       Display("list-full");
+      }
+    }
+   if($_[0] eq "list-entry")
+    {
+     GotoXY(1,12+$_[1]);
+     print STDOUT ListEntry($_[1]+$StartVPos);
+    }
+   if(($_[0] eq "full")||($_[0] eq "list-full"))
+    {						# display full play list window
+     for($x=0;$x<$ListHeight;$x++)
+      {						# display list entries
+       GotoXY(1,12+$x);
+       print STDOUT ListEntry($x+$StartVPos);
+      }
+     
+      						# store current display values
+     $OldStartVPos=$StartVPos;
+     $OldStartHPos=$StartHPos;
+     $OldSelectedTrack=$SelectedTrack;
+     $OldCurrentTrack=$CurrentTrack;
+    }
+   if(($_[0] eq "full")||($_[0] eq "list-full")||($_[0] eq "slidebars"))
+    {
+     my $StartVBar;
+     my $EndVBar;
+     my $VBarSize;
+     my $StartHBar;
+     my $EndHBar;
+     my $HBarSize;
+     						# calculate vertical slide bar
+     						# size and position
+     $VBarSize=int(($ListHeight/($#Track+1))*$ListHeight);
+     $VBarSize=$ListHeight-1 if($VBarSize>$ListHeight);
+     $StartVBar=int(($StartVPos/($#Track+1))*$ListHeight);
+     $StartVBar=1 if((!$StartVBar)&&($StartVPos));
+     $StartVBar=$ListHeight-1 if($StartVBar>=$ListHeight);
+     $EndVBar=$StartVBar+$VBarSize;
+     $EndVBar=$ListHeight-1, $StartVBar=$EndVBar-$VBarSize if($EndVBar>=$ListHeight);
+     $EndVBar=$ListHeight-2, $StartVBar=$EndVBar-$VBarSize if(($EndVBar==$ListHeight-1)&&($StartVPos<$#Track-$ListHeight+1));
+     $HBarSize=int((ListWidth()/$TrackTextMaxLength)*$ListWidth);
+     $HBarSize=$ListWidth-1 if($HBarSize>=$ListWidth);
+     $StartHBar=int(($StartHPos/$TrackTextMaxLength)*$ListWidth);
+     $StartHBar=1 if((!$StartHBar)&&($StartHPos));
+     $StartHBar=$ListWidth-1 if($StartHBar>=$ListWidth);
+     $EndHBar=$StartHBar+$HBarSize;
+     $EndHBar=$ListWidth-1, $StartHBar=$EndHBar-$HBarSize if($EndHBar>=$ListWidth);
+     $EndHBar=$ListWidth-2, $StartHBar=$EndHBar-$HBarSize if(($EndHBar==$ListWidth-1)&&($StartHPos<$TrackTextMaxLength-ListWidth()));
+     if(($OldStartVBar!=$StartVBar)||($OldEndVBar!=$EndVBar)||($_[0] eq "full"))
+      {
+       for($x=0;$x<$ListHeight;$x++)
+        {						# display vertical slide bar
+         GotoXY($Width-1,12+$x);
+         print STDOUT ((($x>=$StartVBar)&&($x<=$EndVBar)) ? Char("vbar_fg") : Char("vbar_bg"));
+        }
+       $OldStartVBar=$StartVBar;
+       $OldEndVBar=$EndVBar;
+      }
+     if(($OldStartHBar!=$StartHBar)||($OldEndHBar!=$EndHBar)||($_[0] eq "full"))
+      {
+       GotoXY(1,$Height-2);			# display horizontal slide bar
+       print STDOUT (Char("hbar_bg") x $StartHBar).(Char("hbar_fg") x ($HBarSize+1)).(Char("hbar_bg") x ($ListWidth-$EndHBar-1));
+       $OldStartHBar=$StartHBar;
+       $OldEndHBar=$EndHBar;
+      }
+    }
+   if($_[0] eq "mp3info-read")
+    {
+     GotoXY(0,$Height-1);
+     RingTheBell();
+     print STDOUT substr("MP3 info reading finished".(" " x $Width),0,$Width);
+    }
+   if($_[0] eq "already-sorted")
+    {
+     GotoXY(0,$Height-1);
+     RingTheBell();
+     print STDOUT substr("Play list already sorted".(" " x $Width),0,$Width);
+    }
+   if($_[0] eq "no-pattern")
+    {
+     GotoXY(0,$Height-1);
+     RingTheBell();
+     print STDOUT substr("No remembered search pattern".(" " x $Width),0,$Width);
+    }
+   if($_[0] eq "pattern-not-found")
+    {
+     GotoXY(0,$Height-1);
+     RingTheBell();
+     print STDOUT substr("Search pattern not found".(" " x $Width),0,$Width);
+    }
+   if($_[0] eq "forward-pattern-not-found")
+    {
+     GotoXY(0,$Height-1);
+     RingTheBell();
+     print STDOUT substr("Hit end of list without finding search pattern".(" " x $Width),0,$Width);
+    }
+   if($_[0] eq "backward-pattern-not-found")
+    {
+     GotoXY(0,$Height-1);
+     RingTheBell();
+     print STDOUT substr("Hit top of list without finding search pattern".(" " x $Width),0,$Width);
+    }
+   if($_[0] eq "search-pattern-error")
+    {
+     GotoXY(0,$Height-1);
+     RingTheBell();
+     print STDOUT substr("Error in search pattern".(" " x $Width),0,$Width);
+    }
+   if($_[0] eq "search-wrapped")
+    {
+     GotoXY(0,$Height-1);
+     print STDOUT substr("Search wrapped".(" " x $Width),0,$Width);
+    }
+   if($_[0] eq "save-playlist-cancelled")
+    {
+     GotoXY(0,$Height-1);
+     RingTheBell();
+     print STDOUT substr("Saving play list cancelled".(" " x $Width),0,$Width);
+    }
+   if($_[0] eq "save-playlist-error")
+    {
+     GotoXY(0,$Height-1);
+     RingTheBell();
+     print STDOUT substr("Error writing play list".(" " x $Width),0,$Width);
+    }
+   GotoXY(0,0) if($_[0] ne "reading-line");
+   if(($_[0] eq "reading-line")||(($_[0] eq "full")&&($ReadingLine)))
+    {
+     GotoXY(0,$Height-1);
+     print STDOUT substr($ReadingLinePrompt.substr($ReadLine,$ReadingLineStartPos).(" " x $Width),0,$Width);
+     GotoXY(length($ReadingLinePrompt)+$ReadingLineCurrentPos-$ReadingLineStartPos,$Height-1);
+    }
+   ShowCursor() if($ReadingLine);
+  }
+ else
+  {						# displaying help
+   if(($_[0] eq "help")||($_[0] eq "full"))
+    {
+     for($x=0;$x<$Height;$x++)
+      {
+       GotoXY(0,$x);
+       print STDOUT $HelpContents[$x].(" " x ($Width-80));
+      }
+    }
+  }
+}
+
+sub Case
+{						# subroutine returning string in
+						# right case, controlled by
+						# $CaseSensitive
+ return $_[0] if($CaseSensitive);
+ return uc($_[0]);
+}
+
+sub SortTracks
+{						# subroutine to sort tracks
+ my @NewTrack;
+ my $NewCurrentTrack;
+ my $NewSelectedTrack;
+ my $x;
+ return if($_[0] eq "");			# no sorting criterion
+ Display("already-sorted"),$DisplaySort=1,return if(($_[0] eq $SortedBy)&&($DescendingSort==$DescendingSorted)&&($CaseSensitive==$CaseSensitiveSorted));
+ 						# tracks are already sorted
+ @NewTrack=();
+ if(!$DescendingSort)
+  {						# ascending order
+   @NewTrack=sort {my $Result=(Case($Artist{$a}) cmp Case($Artist{$b})); return $Result if($Result); return (Case($TrackText{$a}) cmp Case($TrackText{$b}));} @Track if($_[0] eq "artist");
+   @NewTrack=sort {my $Result=(Case($Album{$a}) cmp Case($Album{$b})); return $Result if($Result); return (Case($TrackText{$a}) cmp Case($TrackText{$b}));} @Track if($_[0] eq "album");
+   @NewTrack=sort {my $Result=(Case($Title{$a}) cmp Case($Title{$b})); return $Result if($Result); return (Case($TrackText{$a}) cmp Case($TrackText{$b}));} @Track if($_[0] eq "title");
+   @NewTrack=sort {my $x; my $y; $x=$a; $y=$b; $x=~s/^.*\///; $y=~s/^.*\///; my $Result=(Case($x) cmp Case($y)); return $Result if($Result); return (Case($TrackText{$a}) cmp Case($TrackText{$b}));} @Track if($_[0] eq "filename");
+   @NewTrack=sort {my $Result=(Case($a) cmp Case($b)); return $Result if($Result); return (Case($TrackText{$a}) cmp Case($TrackText{$b}));} @Track if($_[0] eq "directory");
+   @NewTrack=sort {my $Result=(Case($Year{$a}) cmp Case($Year{$b})); return $Result if($Result); return (Case($TrackText{$a}) cmp Case($TrackText{$b}));} @Track if($_[0] eq "year");
+   @NewTrack=sort {my $Result=(Case($MusicType{$a}) cmp Case($MusicType{$b})); return $Result if($Result); return (Case($TrackText{$a}) cmp Case($TrackText{$b}));} @Track if($_[0] eq "musictype");
+  }
+ else
+  {						# descending order
+   @NewTrack=sort {my $Result=(Case($Artist{$b}) cmp Case($Artist{$a})); return $Result if($Result); return (Case($TrackText{$b}) cmp Case($TrackText{$a}));} @Track if($_[0] eq "artist");
+   @NewTrack=sort {my $Result=(Case($Album{$b}) cmp Case($Album{$a})); return $Result if($Result); return (Case($TrackText{$b}) cmp Case($TrackText{$a}));} @Track if($_[0] eq "album");
+   @NewTrack=sort {my $Result=(Case($Title{$b}) cmp Case($Title{$a})); return $Result if($Result); return (Case($TrackText{$b}) cmp Case($TrackText{$a}));} @Track if($_[0] eq "title");
+   @NewTrack=sort {my $x; my $y; $x=$a; $y=$b; $x=~s/^.*\///; $y=~s/^.*\///; my $Result=(Case($y) cmp Case($x)); return $Result if($Result); return (Case($TrackText{$b}) cmp Case($TrackText{$a}));} @Track if($_[0] eq "filename");
+   @NewTrack=sort {my $Result=(Case($b) cmp Case($a)); return $Result if($Result); return (Case($TrackText{$b}) cmp Case($TrackText{$a}));} @Track if($_[0] eq "directory");
+   @NewTrack=sort {my $Result=(Case($Year{$b}) cmp Case($Year{$a})); return $Result if($Result); return (Case($TrackText{$b}) cmp Case($TrackText{$a}));} @Track if($_[0] eq "year");
+   @NewTrack=sort {my $Result=(Case($MusicType{$b}) cmp Case($MusicType{$a})); return $Result if($Result); return (Case($TrackText{$b}) cmp Case($TrackText{$a}));} @Track if($_[0] eq "musictype");
+  }
+ if($_[0] eq "random")
+  {						# random order
+   my @TempTrack;
+   @TempTrack=@Track;
+   while($#TempTrack!=-1)
+    {						# get random track from those
+    						# that weren't taken yet
+     $x=int(rand($#TempTrack+1));
+     $x=$#TempTrack if($x>$#TempTrack);		# random track number
+     push @NewTrack,$TempTrack[$x];
+     splice @TempTrack,$x,1;			# remove taken track
+    }
+  }
+ return if($#NewTrack==-1);			# no sort was done
+ for($x=0;$x<=$#NewTrack;$x++)
+  {						# map current track and selected
+  						# track to their new values
+   $NewCurrentTrack=$x if($NewTrack[$x] eq $Track[$CurrentTrack]);
+   $NewSelectedTrack=$x if($NewTrack[$x] eq $Track[$SelectedTrack]);
+   last if(defined($NewSelectedTrack)&&defined($NewCurrentTrack));
+  }
+ 						# calculate new start position
+ 						# as it was before sort
+ $StartVPos=$NewSelectedTrack+$StartVPos-$SelectedTrack;
+ $StartVPos=$#NewTrack-$ListHeight+1 if($StartVPos>$#NewTrack-$ListHeight+1);
+ $StartVPos=0 if($StartVPos<0);
+ $SelectedTrack=$NewSelectedTrack;
+ $CurrentTrack=$NewCurrentTrack;
+ @Track=@NewTrack;
+ $SortedBy=$_[0];				# store sort criterion
+ $SortedBy="" if($_[0] eq "random");
+ $DescendingSorted=$DescendingSort;		# store sort type
+ $CaseSensitiveSorted=$CaseSensitive;		# store case status
+ Display("list-full");				# update play list
+}
+
+sub ListEntry
+{						# subroutine returning play list
+						# entry depending on current
+						# display controls
+ return (" " x ($ListWidth)) if($_[0]>$#Track);
+ my $x;
+ my $Entry;
+ $Entry="";
+ $Entry.=substr(($_[0]+1).(" " x ($NumberWidth)),0,$NumberWidth) if($Numbers);
+ $Entry.=($_[0]==$CurrentTrack ? Char("current") : " ");
+ $Entry.=($_[0]==$SelectedTrack ? Char("lselected") : " ");
+ $Entry.=($_[0]==$SelectedTrack ? ReverseModeStr() : "").substr(substr(TrackText($_[0]),$StartHPos).(" " x ($ListWidth)),0,ListWidth()).($_[0]==$SelectedTrack ? NormalModeStr() : "");
+ $Entry.=($_[0]==$SelectedTrack ? Char("rselected") : " ");
+ return $Entry;
+}
+
+sub TrackText
+{						# subroutine returning text
+						# that will be displayed for
+						# given track
+ GenerateTrackText($_[0]) if(!defined($TrackText{$Track[$_[0]]}));
+ return $TrackText{$Track[$_[0]]};
+}
+
+sub GenerateTrackText
+{						# subroutine to generate all
+						# track texts if no argument
+						# is passed, or the given
+						# argument
+ my $x;
+ my $y;
+ my $StartTrack;
+ my $EndTrack;
+ if(defined($_[0]))
+  {						# an argument is passed
+   $StartTrack=$_[0];
+   $EndTrack=$_[0];
+  }
+ else
+  {						# no argument passed
+   $StartTrack=0;
+   $EndTrack=$#Track;
+   $TrackTextMaxLength=1;
+  }
+ for($y=$StartTrack;$y<=$EndTrack;$y++)
+  {						# generate given track texts
+   my $TrackText;
+   my $TempText;
+   my $First;
+   my $SeparatorString;
+   $SeparatorString=" - ";
+   $TrackText="";
+   $First=1;
+   for($x=0;$x<length($DisplaySequence);$x++)
+    {						# look the display sequence
+     $TrackText.=(!$First ? $SeparatorString : "").($Artist{$Track[$y]} eq "" ? "no artist" : $Artist{$Track[$y]}),$First=0 if((substr($DisplaySequence,$x,1) eq "I")&&($Artist));
+     $TrackText.=(!$First ? $SeparatorString : "").($Album{$Track[$y]} eq "" ? "no album" : $Album{$Track[$y]}),$First=0 if((substr($DisplaySequence,$x,1) eq "A")&&($Album));
+     $TrackText.=(!$First ? $SeparatorString : "").($Title{$Track[$y]} eq "" ? "no title" : $Title{$Track[$y]}),$First=0 if((substr($DisplaySequence,$x,1) eq "T")&&($Title));
+     $TrackText.=(!$First ? $SeparatorString : "").($Year{$Track[$y]} eq "" ? "no year" : $Year{$Track[$y]}),$First=0 if((substr($DisplaySequence,$x,1) eq "Y")&&($Year));
+     $TrackText.=(!$First ? $SeparatorString : "").($MusicType{$Track[$y]} eq "" ? "no music type" : $MusicType{$Track[$y]}),$First=0 if((substr($DisplaySequence,$x,1) eq "U")&&($MusicType));
+     if((substr($DisplaySequence,$x,1) eq "E")&&($Filename))
+      {
+       $TempText=$Track[$y];
+       $TempText=~s/^.*\///;			# remove directory portion
+       $TrackText.=(!$First ? $SeparatorString : "").$TempText;
+       $First=0;
+      }
+     if((substr($DisplaySequence,$x,1) eq "D")&&($Directory))
+      {
+       $TempText=$Track[$y];
+       $TempText=~s/[^\/]*$//;			# remove filename portion
+       $TrackText.=(!$First ? $SeparatorString : "").($TempText eq "" ? "." : $TempText);
+       $First=0;
+      }
+    }
+   if($TrackText eq "")
+    {						# in nothing is displayed, then
+    						# display the filename
+     $TrackText=$Track[$y];
+     $TrackText=~s/^.*\///;
+    }
+   $TrackText{$Track[$y]}=$TrackText;
+   $TrackTextMaxLength=length($TrackText) if($TrackTextMaxLength<length($TrackText));
+  }
+ $TrackTextMaxLength=1 if(!$TrackTextMaxLength);
+ $StartHPos=$TrackTextMaxLength-ListWidth() if($StartHPos>$TrackTextMaxLength-ListWidth());
+ $StartHPos=0 if($StartHPos<0);
+}
+
+sub ListWidth
+{						# subroutine returning effective
+						# play list width
+ return $ListWidth-3-($Numbers ? $NumberWidth : 0);
+}
+
+sub Search
+{
+ my $x;
+ my $Result;
+ Display("no-pattern"),$DisplaySort=1,return if($SearchPattern eq "");
+ for($x=$SelectedTrack+($_[0] eq "backward" ? -1 : 1);($_[0] eq "backward" ? $x>=0 : $x<=$#Track);($_[0] eq "backward" ? $x-- : $x++))
+  {
+   if($CaseSensitive)
+    {
+     eval {$Result=(TrackText($x)=~/$SearchPattern/s)};
+    }
+   else
+    {
+     eval {$Result=(TrackText($x)=~/$SearchPattern/is)};
+    }
+   Display("search-pattern-error"),return if($@);
+   if($Result)
+    {
+     $SelectedTrack=$x;
+     if(($SelectedTrack<$StartVPos)||($SelectedTrack>=$StartVPos+$ListHeight))
+      {
+       $StartVPos=$SelectedTrack-int($ListHeight/2);
+       $StartVPos=$#Track-$ListHeight+1 if($StartVPos>$#Track-$ListHeight+1);
+       $StartVPos=0 if($StartVPos<0);
+      }
+     Display("list");				# update play list
+     Display("sort");				# display sorting status line
+     return;
+    }
+  }
+ if(!$WrapSearch)
+  {
+   if($_[0] eq "backward")
+    {
+     Display("backward-pattern-not-found");
+    }
+   else
+    {
+     Display("forward-pattern-not-found");
+    }
+  }
+ else
+  {
+   Display("search-wrapped");
+   $DisplaySort=1;
+   for($x=($_[0] eq "backward" ? $#Track : 0);($_[0] eq "backward" ? $x>$SelectedTrack : $x<$SelectedTrack);($_[0] eq "backward" ? $x-- : $x++))
+    {
+     if($CaseSensitive)
+      {
+       eval {$Result=(TrackText($x)=~/$SearchPattern/s)};
+      }
+     else
+      {
+       eval {$Result=(TrackText($x)=~/$SearchPattern/is)};
+      }
+     Display("search-pattern-error"),return if($@);
+     if($Result)
+      {
+       $SelectedTrack=$x;
+       if(($SelectedTrack<$StartVPos)||($SelectedTrack>=$StartVPos+$ListHeight))
+        {
+         $StartVPos=$SelectedTrack-int($ListHeight/2);
+         $StartVPos=$#Track-$ListHeight+1 if($StartVPos>$#Track-$ListHeight+1);
+         $StartVPos=0 if($StartVPos<0);
+        }
+       Display("list");				# update play list
+       return;
+      }
+    }
+   Display("pattern-not-found");
+  }
+ $DisplaySort=1;
+}
+
+sub RingTheBell
+{
+ print STDOUT $TermCap->{'_bl'} if(!$DontRingTheBell);
+}
+
+sub ExpandToFileName
+{						# subroutine to expand given
+						# parameter in $_[0] to a
+						# file name
+ my @ExpandPossibilities=();
+ my @FileList=();
+ my $Directory;
+ my $File;
+ my $Entry;
+ $Directory=$_[0];
+ $Directory=~s/(\/)[^\/]*$/$1/;			# get directory from which file
+ 						# name will be expanded
+ $Directory="" if(!($_[0]=~/\//));
+ $File=$_[0];
+ $File=~s/^.*\///;				# partial name of file to be
+ 						# expanded
+ if(opendir(DIRECTORY,($Directory eq "" ? "." : $Directory)))
+  {						# open given directory
+   @FileList=readdir(DIRECTORY);		# read its contents
+   closedir(DIRECTORY);
+   foreach $Entry (@FileList)
+    {
+     if(($Entry ne ".")&&($Entry ne "..")&&(substr($Entry,0,length($File)) eq $File))
+      {						# if entry in the directory
+      						# fits to given file name
+      						# then we shall remeber it
+       push @ExpandPossibilities,$Entry;
+      }
+    }
+  }
+ @ExpandPossibilities=sort @ExpandPossibilities;
+ 						# sort found files by name
+ if($#ExpandPossibilities==-1)
+  {						# if there are no expandable
+  						# file names, then do nothing
+   RingTheBell();
+  }
+ elsif($#ExpandPossibilities==0)
+  {						# it there is exactly one
+  						# expandable file name, then
+  						# expand it and return
+   $File=$ExpandPossibilities[0];
+   $File.="/" if(-d $Directory.$File);		# if it is directory, then
+   						# add a slash (/) at the and
+   						# of it
+  }
+ else
+  {						# if there are more than one
+  						# expandable file names, then
+  						# display them
+   my $x;
+   my $Shortest;
+   my $LongestLength;
+   my $OriginalFile=$File;
+   for($x=0;$x<=$#ExpandPossibilities;$x++)
+    {
+     $File=$ExpandPossibilities[$x],$Shortest=$x if(($x==0)||(length($File)>length($ExpandPossibilities[$x])));
+    						# find the shortest file name
+    						# among those, that fit
+     $LongestLength=length($ExpandPossibilities[$x]) if(($x==0)||(length($ExpandPossibilities[$x])>$LongestLength));
+     						# find the length of the
+     						# longest file name
+    }
+   $LongestLength+=2;				# the minimum length of a
+   						# displayed column will be
+   						# the longest length of a file
+   						# name plus two spaces
+   for($x=0;$x<=$#ExpandPossibilities;$x++)
+    {						# find the longest expandable
+    						# part among found file names
+     $Shortest=length($File);
+     while(substr($ExpandPossibilities[$x],0,$Shortest) ne substr($File,0,$Shortest))
+      {
+       $Shortest--;
+      }
+     $File=substr($File,0,$Shortest);		# the longest expandable part
+     						# of a file name
+    }
+   if($OriginalFile ne $File)
+    {						# found better expansion than
+    						# before
+     RingTheBell();
+    }
+   else
+    {						# file name couldn't be expanded
+    						# futher, so display a list
+    						# of matches
+     if($PreviousExpandParameter ne $_[0])
+      {						# procedure run for the first
+      						# time with this parameter
+       RingTheBell();
+      }
+     else
+      {						# procedure entered for the
+      						# next time with the same
+      						# parameters, so display
+      						# list without beeping
+       $Shortest=int($Width/$LongestLength);	# calculate how many columns
+   						# will fit on the screen
+       $Shortest=1 if($Shortest<1);		# there must be at least one
+   						# column
+       $x=0;
+       GotoXY($Width-1,$Height-1);
+       print STDOUT "\n";
+       foreach $Entry (@ExpandPossibilities)
+        {
+         $x=0, print STDOUT (" " x ($Width-int($Width/$Shortest)*$Shortest))."\n" if($x==$Shortest);
+       						# all columns were displayed
+      						# and a newline needed,
+      						# then print it
+         print STDOUT substr($Entry.(" " x (int($Width/$Shortest))),0,int($Width/$Shortest));
+     						# print file name in next
+     						# column
+         $x++;					# next column
+        }
+       print STDOUT (" " x ($Width-$x*int($Width/$Shortest)))."\n";
+   						# fill the next columns with
+   						# spaces
+       $ExpandDisplayed=1;			# expand was displayed
+      }
+     $PreviousExpandParameter=$_[0];
+    }
+  }
+ return $Directory.$File;
+}
+
+sub ReadPlayList
+{
+ my $PlayListFile=$_[0];
+ my $PlayListDirectory;
+ if(open(PLAYLIST,$PlayListFile))
+  {
+   $PlayListDirectory=$PlayListFile;
+   $PlayListDirectory=~s/\/[^\/]*$/\//;	# get playlist directory
+   $PlayListDirectory="" if(!($PlayListFile=~/\//));
+   						# empty directory if playlist is
+   						# in current directory
+   while(<PLAYLIST>)
+    {
+     chomp;					# remove newline
+     s/\r//;					# remove carrige return (DOS
+     						# playlist)
+     if((-e $_)&&(! -d $_))
+      {						# MP3 exists and is not a
+      						# directory
+       push @Track,$_;
+       $TrackCount{$_}++;
+       ReadMP3Info($_) if(!$DontReadMP3InfoOnLoad);
+      }
+     else
+      {						# MP3 file does not exist or is
+      						# a directory
+       $_=$PlayListDirectory.$_;		# try putting playlist directory
+       						# before filename in case play
+       						# list contains relative path
+       						# to MP3 file
+       if((-e $_)&&(! -d $_))
+        {					# MP3 exists and is not a
+        					# directory
+	 push @Track,$_;
+         $TrackCount{$_}++;
+	 ReadMP3Info($_) if(!$DontReadMP3InfoOnLoad);
+	}
+       else
+        {
+         $ErrorAddingToPlayList=1;
+	 print ERROR_STREAM $0."MP3 file \"".$_."\" does not exist.\n";
+	}
+      }
+    }
+   close(PLAYLIST);
+  }
+ else
+  {
+   $ErrorAddingToPlayList=1;
+   print ERROR_STREAM $0."Can't read playlist \"".$PlayListFile."\".\n";
+  }
+}
+
+sub ReadFile
+{
+ my $arg=$_[0];
+ if(-e $arg)
+  {						# file exists
+   if(-d $arg)
+    {						# it is a directory, so read
+    						# all mp3 files in it
+     %Directory=();
+     ReadDirectory($arg);
+    }
+   else
+    {						# it is a file
+     push @Track,$arg;
+     $TrackCount{$arg}++;
+     ReadMP3Info($arg) if(!$DontReadMP3InfoOnLoad);
+    }
+  }
+ else
+  {
+   $ErrorAddingToPlayList=1;
+   print ERROR_STREAM $0."MP3 file \"".$arg."\" does not exist.\n";
+  }
+}
+
+sub SavePlayList
+{
+ my $x;
+ if(open(PLAYLIST,">".$_[0]))
+  {
+   for($x=0;$x<=$#Track;$x++)
+    {
+     print PLAYLIST $Track[$x]."\n";
+    }
+   close(PLAYLIST);
+  }
+ else
+  {
+   $DisplaySort=1;
+   Display("save-playlist-error");
+  }
+}

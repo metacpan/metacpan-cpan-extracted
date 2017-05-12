@@ -1,0 +1,65 @@
+0.12    2017-03-01 (PERLANCAR)
+
+	- pp-dd: Add option --undump (and --eval).
+
+
+0.11    2017-02-28 (PERLANCAR)
+
+	- Add utilities: pp-yaml, pp-dd.
+
+
+0.10    2016-03-09 (PERLANCAR)
+
+	- Replace JSON -> JSON::MaybeXS, JSON::XS -> Cpanel::JSON::XS.
+
+
+0.09    2015-12-29 (PERLANCAR)
+
+	- pp-json: Use canonical().
+
+
+0.08    2015-04-14 (PERLANCAR)
+
+	- Add *ddc scripts (Data::Dump::Color), these output are nicer for
+	  debugging due to visual hints produced by Data::Dump::Color.
+
+
+0.07     2014-05-22 (SHARYANTO)
+
+         - [converter] Support Sereal and Storable formats (add sereal2*,
+           *2sereal, storable2*, *2storable scripts).
+
+
+0.06     2013-10-26 (SHARYANTO)
+
+         - Add --xs, --syck options to check-yaml to pick YAML implementation.
+
+         - Add --xs, --pp options to check-json to pick JSON implementation.
+
+
+0.05     2013-10-25 (SHARYANTO)
+
+         - Rename *php* scripts to *phpser* scripts, to reduce ambiguity.
+
+         - Add scripts for checking syntax: check-{json,phpser,yaml}.
+
+
+0.04     2013-10-15 (SHARYANTO)
+
+         - Use JSON option allow_nonref.
+
+
+0.03     2013-09-09 (SHARYANTO)
+
+         - No functional changes. Rebuild with MakeMaker instead of
+           Module::Build because the latter is deprecated from core in 5.19.
+
+
+0.02    2011-11-26 (SHARYANTO)
+
+        - Rename distribution from App-SerializeConvert to App-SerializeUtils.
+
+
+0.01    2011-11-26 (SHARYANTO)
+
+        - First release.

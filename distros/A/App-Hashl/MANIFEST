@@ -1,0 +1,16 @@
+bin/hashl
+Build.PL
+Changelog
+COPYING
+lib/App/Hashl.pm
+MANIFEST			This list of files
+README
+t/00-compile.t
+t/10-pod-coverage.t
+t/29-app-hashl.t
+t/in/1k
+t/in/1k-firsthalf
+t/in/4
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

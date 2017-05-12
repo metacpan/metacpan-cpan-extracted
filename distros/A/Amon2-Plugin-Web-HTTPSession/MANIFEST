@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Amon2/Plugin/Web/HTTPSession.pm
+minil.toml
+t/003_session.t
+t/00_compile.t
+META.yml
+MANIFEST

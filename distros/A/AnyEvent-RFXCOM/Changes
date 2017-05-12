@@ -1,0 +1,28 @@
+Revision history for Perl extension AnyEvent::RFXCOM.
+
+1.142240  2014-08-12 16:16:09+01:00 Europe/London
+        - Fix tests to work with latest Device::RFXCOM release.
+
+1.142231  2014-08-11 22:39:43+01:00 Europe/London
+        - Fix some CPAN tester test issues.
+
+1.111960  2011-07-15 23:02:03 Europe/London
+        - Fix some reference cycles to avoid memory leaks.
+        - Fix some Pod errors.
+
+1.110431  2011-02-12 21:21:13 Europe/London
+        - Fix dependencies.
+
+1.110430  2011-02-12 10:33:02 Europe/London
+        - Reduce perl version requirement to 5.8.
+
+1.103390  2010-12-05 22:27:34 Europe/London
+        - Refactor test functions.
+        - Simpler AnyEvent::Handle usage.
+        - Ack timeout handling fix.
+
+1.103270  2010-11-23 23:32:36 Europe/London
+        - Fix test after Device::RFXCOM change.
+
+1.103250  2010-11-21 12:56:36 Europe/London
+	- Initial CPAN release.

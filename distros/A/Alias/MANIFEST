@@ -1,0 +1,8 @@
+README
+Changes
+Todo
+Alias.pm
+Alias.xs
+MANIFEST
+Makefile.PL
+t/alias.t

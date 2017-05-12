@@ -1,0 +1,210 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+=head1 NAME
+
+serve_file - Plugin for serving raw files
+
+=head1 SYNOPSIS
+
+  Plugin aio/serve_file
+
+=head1 DESCRIPTION
+
+This plugin turns AxKit2 into a normal every-day httpd. Yay!
+
+Most httpds need to serve plain files. Things like favicon.ico and robots.txt
+that any sane web server would be lost without. So just load this plugin after
+all the others, and if your other plugins DECLINE to deliver the content, this
+kind little plugin will happily deliver your file without making any changes
+to it whatsoever. Ain't that nice?
+
+=head1 CONFIG
+
+None.
+
+=cut
+
+use AxKit2::Utils qw(http_date);
+
+sub register {
+    my $self = shift;
+    $self->register_hook('response' => 'hook_response1');
+    $self->register_hook('response' => 'hook_response2');
+}
+
+sub hook_response1 {
+    my ($self, $hd) = @_;
+    
+    my $ct = $hd->mime_type;
+    
+    # set default return value
+    $self->client->notes('serve_file_retcode', DECLINED);
+    
+    my $client = $self->client;
+    
+    if ($hd->request_method eq 'GET' || $hd->request_method eq 'HEAD') {
+        # and once we have it, start serving
+        $self->client->watch_read(0);
+        
+        my $file = $hd->filename;
+        $self->log(LOGINFO, "Serving file: $file");
+        
+        IO::AIO::aio_stat($file, sub {
+            #print "STAT returned\n";
+            if (!-e _) {
+                $client->notes('serve_file_retcode', NOT_FOUND);
+                return $client->finish_continuation;
+            }
+            
+            # we only serve files here...
+            if (!-f _) {
+                $client->notes('serve_file_retcode', BAD_REQUEST);
+                return $client->finish_continuation;
+            }
+            
+            my $mtime = http_date((stat(_))[9]);
+            my $ifmod = $client->headers_in->header('If-Modified-Since') || "";
+            
+            my $ifmod_len = 0;
+            if ($ifmod =~ s/; length=(\d+)//) {
+                $ifmod_len = $1;
+            }
+            
+            my $modified = $ifmod ? ($ifmod ne $mtime) : 1;
+            
+            my $size = -s _;
+            
+            $modified++ if $ifmod_len && $ifmod_len != $size;
+            
+            if (!$modified) {
+                $client->notes('serve_file_retcode', NOT_MODIFIED);
+                return $client->finish_continuation;
+            }
+            
+            $client->headers_out->header("Last-Modified", $mtime);
+            $client->headers_out->header("Content-Length", $size);
+            $client->headers_out->header("Content-Type", $ct);
+            
+            $client->send_http_headers;
+            
+            $client->notes('serve_file_retcode', OK);
+            
+            if ($hd->request_method eq 'HEAD') {
+                return $client->finish_continuation;
+            }
+            
+            IO::AIO::aio_open($file, 0, 0, sub {
+                #print "OPEN returned\n";
+                my $fh = shift;
+                
+                if ($client->{closed}) {
+                    return CORE::close($fh);
+                }
+                
+                if (!$fh) {
+                    $client->notes('serve_file_retcode', SERVER_ERROR);
+                    return $client->close('aio_open_failure');
+                }
+                
+                $client->notes('serve_file_bytes_remaining', $size);
+                
+                $client->watch_write(1);
+                
+                my $send_sub = sub {
+                    my $remaining = $client->notes('serve_file_bytes_remaining');
+                    # print "sending $remaining bytes...\n";
+                    if ($remaining <= 0) {
+                        CORE::close($fh);
+                        #$client->watch_write(0);
+                        return $client->finish_continuation;
+                    }
+                    # AIO version
+#                     IO::AIO::aio_sendfile($client->sock, $fh, 
+#                                          ($size - $remaining), $remaining,
+#                                          sub {
+#                                             my $sent = shift;
+#                                             return unless $sent >= 0;
+#                                             my $r = $client->notes('serve_file_bytes_remaining');
+#                                             $r -= $sent;
+#                                             $client->notes('serve_file_bytes_remaining', $r);
+#                                             $client->notes('serve_file_ready_for_more', 1);
+#                                          });
+#                     $client->notes('serve_file_ready_for_more', 0);
+
+                    # Old-school version
+                    my $bytes = $remaining;
+                    $bytes =  131_072 if $bytes > 131_072;
+                    
+                    my $buf;
+                    my $rd_len = read($fh, $buf, $bytes);
+                    if (!defined $rd_len || $rd_len != $bytes) {
+                        #print "read failed\n";
+                        CORE::close($fh);
+                        #$client->watch_write(0);
+                        return $client->finish_continuation;
+                    }
+                    
+                    #print "write $rd_len bytes\n";
+                    $client->write(\$buf);
+                    
+                    $remaining -= $rd_len;
+                    $client->notes('serve_file_bytes_remaining', $remaining);
+                    
+                    if ($remaining <= 0) {
+                        CORE::close($fh);
+                        $client->finish_continuation;
+                    }
+                };
+                
+                $client->notes('serve_file_ready_for_more', 1);
+                $client->notes('serve_file_send_sub', $send_sub);
+                
+                # call at least once - don't wait for the callback!
+                $send_sub->();
+            });
+            
+            return; # we're not done until aio_open is done...
+        });
+        
+        return CONTINUATION;
+    }
+            
+    return DECLINED;
+}
+
+sub hook_response2 {
+    my $self = shift;
+    $self->client->notes('serve_file_send_sub', undef);
+    return $self->client->notes('serve_file_retcode') || DECLINED;
+}
+
+sub hook_write_body_data {
+    my $self = shift;
+    return OK unless $self->client->notes('serve_file_ready_for_more');
+    my $sub = $self->client->notes('serve_file_send_sub');
+    return DONE unless $sub;
+    $sub->();
+    if ($self->client->notes('serve_file_bytes_remaining')) {
+        return OK;
+    }
+    else {
+        # close the circular reference...
+        $self->client->notes('serve_file_send_sub', undef);
+        return DONE;
+    }
+}

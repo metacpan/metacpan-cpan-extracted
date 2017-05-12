@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name: Attempt
+version: 1.01
+license: perl
+distribution_type: module
+requires:
+  Sub::Uplevel: 0.07
+recommends:
+  Attribute::Handlers: 0
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+conflicts: {}
+provides:
+  Attempt:
+    file: lib/Attempt.pm
+    version: 1.01
+  Attribute::Attempts:
+    file: lib/Attribute/Attempts.pm
+    version: 1.00
+  Sub::Attempts:
+    file: lib/Sub/Attempts.pm
+    version: 1.01
+generated_by: Module::Build version 0.19

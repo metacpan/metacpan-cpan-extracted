@@ -1,0 +1,48 @@
+---
+abstract: 'Migrations for small home projects'
+author:
+  - 'Viacheslav Tykhanovskyi, C<viacheslav.t@gmail.com>'
+build_requires:
+  DBD::SQLite: '0'
+  Test::Fatal: '0'
+  Test::More: '0.98'
+  Test::TempDir::Tiny: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-mimi
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::mimi:
+    file: lib/App/mimi.pm
+    version: '0.03'
+  App::mimi::db:
+    file: lib/App/mimi/db.pm
+recommends:
+  DBD::Pg: '0'
+  DBD::SQLite: '0'
+requires:
+  DBI: '0'
+  Docopt: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/vti/app-mimi/issues
+  homepage: https://github.com/vti/app-mimi
+  repository: git://github.com/vti/app-mimi.git
+version: '0.03'
+x_authority: cpan:VTI
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

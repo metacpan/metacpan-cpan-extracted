@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Amon2/Auth.pm
+lib/Amon2/Auth/Site/Facebook.pm
+lib/Amon2/Auth/Site/Github.pm
+lib/Amon2/Auth/Site/Twitter.pm
+lib/Amon2/Auth/Util.pm
+lib/Amon2/Plugin/Web/Auth.pm
+t/00_compile.t
+xt/02_perlcritic.t
+META.yml
+MANIFEST

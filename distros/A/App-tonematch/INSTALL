@@ -1,0 +1,25 @@
+This script uses the program *sox* (sound exchange)
+L<http://sox.sourceforge.net/> to play sounds in your
+earphones. Please verify that you have it installed in your system.
+
+Afterwards:
+
+Install the package automatically using
+
+$ cpanm App::tonematch
+
+Otherwise you can download the package and unpack it to any directory,
+change to it and give the commands:
+
+  $ perl Build.PL
+  $ ./Build
+  $ ./Build test
+  $ ./Build install
+
+Alternatively you may try
+
+  $ perl Makefile.PL
+  $ make
+  $ make test
+  $ make install
+

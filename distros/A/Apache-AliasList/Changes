@@ -1,0 +1,12 @@
+Revision history for Perl extension Apache::AliasList.
+
+0.08 - 06 March 2004
+  Fixed bug in regex, documentation update
+
+0.07 - 09 February 2004
+  Fixed bug which prevented DirectoryIndex directives from
+  being processed
+
+0.06 - 08 February 2004
+  First public release
+ 

@@ -1,0 +1,11 @@
+Revision history for AudioFile-Find
+
+0.03  2014-10-9 
+  - Trap YAML errors (fix for CPANTesters) 
+
+0.02  2014-10-5 
+  - Discover available plugins rather than hard-code
+
+0.01  2008-12-05
+  - First version, released on an unsuspecting world.
+

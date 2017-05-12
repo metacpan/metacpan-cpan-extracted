@@ -1,0 +1,27 @@
+%syntax-version=1.0.0
+%project=robobot
+%uri=https://robobot.automatomatromaton.com/
+
+base 2016-11-28T01:32:01Z Jon Sime <jonsime@gmail.com> # Base tables for networks, channels, nicks metadata.
+p-achievements-20161128144040 [base] 2016-11-28T14:40:41Z Jon Sime <jonsime@gmail.com> # Plugin: achievements base tables
+p-alarms-20161128153112 [base] 2016-11-28T15:31:13Z Jon Sime <jonsime@gmail.com> # Plugin: alarms base tables
+p-auth-20161128164909 [base] 2016-11-28T16:49:10Z Jon Sime <jonsime@gmail.com> # Plugin: auth/permissions base tables
+p-autoreply-20161128171050 [base] 2016-11-28T17:10:50Z Jon Sime <jonsime@gmail.com> # Plugin: autoreply base table
+p-channellink-20161128173743 [base] 2016-11-28T17:37:43Z Jon Sime <jonsime@gmail.com> # Plugin: ChannelLink base table
+p-factoids-20161128182038 [base] 2016-11-28T18:20:38Z Jon Sime <jonsime@gmail.com> # Plugin: factoids base table
+p-fakequotes-20161128183237 [base] 2016-11-28T18:32:37Z Jon Sime <jonsime@gmail.com> # Plugin: FakeQuote base tables
+p-github-20161128190436 [base] 2016-11-28T19:04:36Z Jon Sime <jonsime@gmail.com> # Plugin: Github watchers base tables
+p-variables-20161128195027 [base] 2016-11-28T19:50:27Z Jon Sime <jonsime@gmail.com> # Plugin: Variables base table
+p-karma-20161128200656 [base] 2016-11-28T20:06:57Z Jon Sime <jonsime@gmail.com> # Plugin: Karma base table
+p-location-20161128204426 [base] 2016-11-28T20:44:26Z Jon Sime <jonsime@gmail.com> # Plugin: Location base table
+p-logger-20161128205533 [base] 2016-11-28T20:55:33Z Jon Sime <jonsime@gmail.com> # Plugin: Logging base table
+p-macros-20161128210159 [base] 2016-11-28T21:01:59Z Jon Sime <jonsime@gmail.com> # Plugin: Macros base table
+p-madlibs-20161128211213 [base] 2016-11-28T21:12:14Z Jon Sime <jonsime@gmail.com> # Plugin: MadLibs base table
+p-markov-20161128212720 [base] 2016-11-28T21:27:20Z Jon Sime <jonsime@gmail.com> # Plugin: Markov chain generator base tables
+p-memos-20161128214110 [base] 2016-11-28T21:41:11Z Jon Sime <jonsime@gmail.com> # Plugin: Memos base table
+p-net-http-20161128214753 [base] 2016-11-28T21:47:54Z Jon Sime <jonsime@gmail.com> # Plugin: net/http logging table
+p-skills-20161128215019 [base] 2016-11-28T21:50:19Z Jon Sime <jonsime@gmail.com> # Plugin: Skills base tables
+p-thinge-20161128223332 [base] 2016-11-28T22:33:33Z Jon Sime <jonsime@gmail.com> # Plugin: Thinge base tables
+p-net-urls-20161128224203 [base] 2016-11-28T22:42:03Z Jon Sime <jonsime@gmail.com> # Plugin: net/urls title logging base table
+p-voting-20161128224521 [base] 2016-11-28T22:45:21Z Jon Sime <jonsime@gmail.com> # Plugin: Voting base tables
+p-skills-20161128231536 [p-skills-20161128215019] 2016-11-28T23:15:36Z Jon Sime <jonsime@gmail.com> # default selection of skill levels for Skills plugin

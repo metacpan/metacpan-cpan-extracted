@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use base qw(Daemon::Generic::While1);
+use boolean qw(true false);
+
+use App::OpenVZ::BCWatch;
+use Config::File qw(read_config_file);
+use Daemon::Generic;
+
+our $VERSION = '0.04'; # used by Daemon::Generic
+
+$| = true;
+
+my $watch;
+
+sub gd_preconfig
+{
+    my $self = shift;
+
+    if (!-e $self->{configfile}) {
+print <<EOT;
+$self->{configfile} does not exist, creating one with defaults.
+EOT
+        open(my $fh, '>', $self->{configfile})
+          or die "Cannot create $self->{configfile}: $!\n";
+        print {$fh} <<'EOT';
+mail[from] = root@localhost
+mail[to] = root@localhost
+mail[subject] = vzwatchd: NOTICE
+sleep = 60
+verbose = 0
+monitor_fields = failcnt
+_active = 0
+EOT
+        close($fh);
+        print <<EOT;
+Edit $self->{configfile} to suit your needs and then start $0 again.
+EOT
+        exit;
+    }
+    else {
+        my $cfg = read_config_file($self->{configfile});
+        if (exists $cfg->{_active} && $cfg->{_active} == false) {
+            die "You must edit your configuration first and set or delete the '_active' flag.\n";
+        }
+        if (exists $cfg->{monitor_fields}) {
+            $cfg->{monitor_fields} = [ split /\s+/, $cfg->{monitor_fields} ];
+        }
+        return %$cfg;
+    }
+}
+
+sub gd_postconfig
+{
+    my $self = shift;
+
+    $watch = App::OpenVZ::BCWatch->new(@_);
+}
+
+sub gd_run_body
+{
+    my $self = shift;
+
+    $watch->process;
+    $self->gd_sleep($watch->{Config}->{sleep});
+}
+
+sub gd_quit_event
+{
+    my $self = shift;
+
+    unlink $watch->{Config}->{data_file};
+}
+
+newdaemon(
+    configfile => '/etc/vzwatchd.conf',
+    pidfile    => '/var/run/vzwatchd.pid',
+);
+
+=head1 NAME
+
+vzwatchd - App::OpenVZ::BCWatch daemon
+
+=head1 SYNOPSIS
+
+Run C<vzwatchd> as root without arguments to obtain a list of commands.
+
+=head1 AUTHOR
+
+Steven Schubiger <schubiger@cpan.org>
+
+=head1 LICENSE
+
+This program is free software; you may redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<http://dev.perl.org/licenses/>
+
+=cut

@@ -1,0 +1,212 @@
+{
+   "abstract" : "A web-based contacts manager",
+   "author" : [
+      "Ron Savage <ron@savage.net.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Office-Contacts",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Pod" : "1.41",
+            "Test::Simple" : "0.94"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "3.63",
+            "CGI::Snapp" : "1.03",
+            "CGI::Snapp::Dispatch" : "1.02",
+            "Config::Tiny" : "2.12",
+            "DBI" : "1.611",
+            "DBIx::Admin::CreateTable" : "2.04",
+            "Data::Session" : "1.13",
+            "Data::UUID" : "1.203",
+            "Data::Verifier" : "0.31",
+            "DateTime" : "0.55",
+            "Digest::SHA" : "5.48",
+            "File::Copy" : "2.14",
+            "File::HomeDir" : "0.97",
+            "FindBin" : "1.49",
+            "HTML::Template" : "2.9",
+            "JSON::XS" : "2.29",
+            "Log::Handler::Output::DBI" : "0.12",
+            "Moose" : "2.0604",
+            "Moose::Role" : "2.0604",
+            "Path::Class" : "0.23",
+            "Perl6::Slurp" : "0.03",
+            "Sub::Exporter" : "0.982",
+            "namespace::autoclean" : "0.13",
+            "parent" : "0.218",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Office::Contacts" : {
+         "file" : "lib/App/Office/Contacts.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Base" : {
+         "file" : "lib/App/Office/Contacts/Base.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Controller" : {
+         "file" : "lib/App/Office/Contacts/Controller.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Controller::Exporter::Notes" : {
+         "file" : "lib/App/Office/Contacts/Controller/Exporter/Notes.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Controller::Exporter::Organization" : {
+         "file" : "lib/App/Office/Contacts/Controller/Exporter/Organization.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Controller::Exporter::Person" : {
+         "file" : "lib/App/Office/Contacts/Controller/Exporter/Person.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Controller::Exporter::Report" : {
+         "file" : "lib/App/Office/Contacts/Controller/Exporter/Report.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Controller::Exporter::Search" : {
+         "file" : "lib/App/Office/Contacts/Controller/Exporter/Search.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Controller::Initialize" : {
+         "file" : "lib/App/Office/Contacts/Controller/Initialize.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Controller::Notes" : {
+         "file" : "lib/App/Office/Contacts/Controller/Notes.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Controller::Organization" : {
+         "file" : "lib/App/Office/Contacts/Controller/Organization.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Controller::Person" : {
+         "file" : "lib/App/Office/Contacts/Controller/Person.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Controller::Report" : {
+         "file" : "lib/App/Office/Contacts/Controller/Report.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Controller::Search" : {
+         "file" : "lib/App/Office/Contacts/Controller/Search.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Database" : {
+         "file" : "lib/App/Office/Contacts/Database.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Database::Base" : {
+         "file" : "lib/App/Office/Contacts/Database/Base.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Database::EmailAddress" : {
+         "file" : "lib/App/Office/Contacts/Database/EmailAddress.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Database::Notes" : {
+         "file" : "lib/App/Office/Contacts/Database/Notes.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Database::Occupation" : {
+         "file" : "lib/App/Office/Contacts/Database/Occupation.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Database::Organization" : {
+         "file" : "lib/App/Office/Contacts/Database/Organization.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Database::Person" : {
+         "file" : "lib/App/Office/Contacts/Database/Person.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Database::PhoneNumber" : {
+         "file" : "lib/App/Office/Contacts/Database/PhoneNumber.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Database::Util" : {
+         "file" : "lib/App/Office/Contacts/Database/Util.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Util::Config" : {
+         "file" : "lib/App/Office/Contacts/Util/Config.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Util::Create" : {
+         "file" : "lib/App/Office/Contacts/Util/Create.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Util::Import" : {
+         "file" : "lib/App/Office/Contacts/Util/Import.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::Util::Validator" : {
+         "file" : "lib/App/Office/Contacts/Util/Validator.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::View" : {
+         "file" : "lib/App/Office/Contacts/View.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::View::Base" : {
+         "file" : "lib/App/Office/Contacts/View/Base.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::View::Notes" : {
+         "file" : "lib/App/Office/Contacts/View/Notes.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::View::Occupation" : {
+         "file" : "lib/App/Office/Contacts/View/Occupation.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::View::Organization" : {
+         "file" : "lib/App/Office/Contacts/View/Organization.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::View::Person" : {
+         "file" : "lib/App/Office/Contacts/View/Person.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::View::Report" : {
+         "file" : "lib/App/Office/Contacts/View/Report.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::View::Role::Report" : {
+         "file" : "lib/App/Office/Contacts/View/Role/Report.pm",
+         "version" : "2.01"
+      },
+      "App::Office::Contacts::View::Search" : {
+         "file" : "lib/App/Office/Contacts/View/Search.pm",
+         "version" : "2.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "2.01"
+}

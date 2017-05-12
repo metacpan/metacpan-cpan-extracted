@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="/favicon.ico">
+    <title>Aquarium Hive Command Center</title>
+    <link href="/rickshaw-1.5.0/rickshaw.min.css" rel="stylesheet">
+    <link href="/jquery-ui-1.11.1/jquery-ui.min.css" rel="stylesheet">
+    <link href="/metroui-2.0/min/iconFont.min.css" rel="stylesheet">
+    <link href="/metroui-2.0/min/metro-bootstrap.min.css" rel="stylesheet">
+    <link href="/metroui-2.0/min/metro-bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="/aqhive.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="/html5shiv.min.js"></script>
+      <script src="/respond-1.4.2.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body class="metro">
+    <div class="container">
+      <header>
+        <nav class="navigation-bar">
+          <nav class="navigation-bar-content">
+            <div class="element">
+                Aquarium Hive Control Center [<span id="aqname"></span>]
+            </div>
+            <div class="element place-right">
+              <span class="icon-cog" id="shapeshift-button"></span>
+            </div>
+          </nav>
+        </nav>
+      </header>
+      <div class="text-center padding-tb-10" id="loading">
+        <button class="bg-white large">
+          Loading...&nbsp;&nbsp;<img src="/ajax-loader.gif">
+        </button>
+      </div>
+      <div class="text-center padding-tb-10" id="restart">
+        <button class="bg-white large">
+          Restart...&nbsp;&nbsp;<img src="/ajax-loader.gif">
+        </button>
+      </div>
+      <div class="bg-white" id="current-app">
+      </div>
+      <div class="text-center padding-tb-10" id="backbutton">
+        <button class="bg-blue large">Back</button>
+      </div>
+      <div id="main-tile-container" class="tile-container">
+      </div>
+      <footer class="bg-blue">
+        <div class="bottom-menu-wrapper">
+          <ul class="horizontal-menu compact place-right">
+            <li><a id="shutdown" href="/shutdown">Restart</a></li>
+            <li><a href="#">Help</a></li>
+            <li><a href="#">Feedback</a></li>
+          </ul>
+          <ul class="horizontal-menu compact">
+            <li><a href="https://aquariumhive.com/">&copy; 2014 Aquarium Hive</a></li>
+          </ul>
+        </div>
+      </footer>
+    </div>
+    <script src="/jquery-1.11.1.min.js"></script>
+    <script src="/jquery-ui-1.11.1/jquery-ui.min.js"></script>
+    <script src="/jquery.ui.touch-punch.0.2.3.min.js"></script>
+    <script src="/d3-3.4.11/d3.min.js"></script>
+    <script src="/rickshaw-1.5.0/rickshaw.min.js"></script>
+    <script src="/socket.io-0.9.16.js"></script>
+    <script src="/moment-2.7.0.min.js"></script>
+    <script src="/metroui-2.0/min/metro.min.js"></script>
+    <script src="/jquery.shapeshift.2.0.min.js"></script>
+    <script src="/aqhive.js"></script>
+  </body>
+</html>

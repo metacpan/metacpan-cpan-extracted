@@ -1,0 +1,84 @@
+INTRODUCTION
+------------
+
+AutoDia is an open-source, auto-documentation and auto-diagramming 
+system allowing you to automatically generate Images, XML, HTML or Dia files.
+
+It has been written to make GNOME Dia and any Diagram Application that 
+can use similar XML more powerful. I hope to make Dia more popular than
+the commerical equivilents because of the ability to vastly extend it in
+this way. It is based on Object Oriented Perl and uses Template Toolkit, 
+GraphViz, and INLINE::Java. 
+
+AutoDia's design goals have been good Object Orientation such as
+plenty of abstraction, use of inheritance, extensability, robustness
+and elegance. Speed and security are not concerns as this application is
+designed to generate xml for documents in a batch processing manner, not
+an interactive manner, and is a single user application for use from the
+console.
+
+AutoDia has been previously known as autodial. The output file is still 
+called autodia.out.dia by default. The executable files are now called
+autodia.pl and autodia_java.pl, the only difference being an additional
+section near the start of the latter to enable INLINE::Java.
+
+STATUS
+------
+
+AutoDia currently works on most perl applications, it seems to work on
+CGI.pm, itself, various projects of my own and friends. If it doesn't work
+on something, please email aaron.trevena@gmail.com the error message and any extra
+information or fixes you have.
+
+AutoDia now supports any language that has a handler registered in
+AutoDia.pm. Currently this is a reasonable perl handler and a useful C++
+handler. Any language can be supported easily by creating a class that
+inherits from Handler, as Autodia::Handler::Perl does - the perl handler is
+a good example and best documented - the C++ and PHP handlers can also be helpful
+when writing a new handler.
+
+I feel that AutoDia does a reasonable job most of the time. There is very little
+chance of it damaging any files although generated output may crash applications
+if files are corrupted or contain errors.
+
+COPYRIGHT AND LICENSE
+---------------------
+
+AutoDia is Copyright (c) 2001 Aaron Trevena <aaron.trevena@gmail.com>
+Licensed under the GNU General Public License (GPL, see file COPYING).
+
+CONTACT
+-------
+
+email me at aaron.trevena@gmail.com, and put "[AutoDia]" in the subject line. 
+
+DOCUMENTATION
+-------------
+
+README   : this file.
+COPYING  : The GPL License allowing your use and distribution of this code
+INSTALL  : installation guide.
+UPGRADE  : instructions for upgrading older installations.
+CHANGES  : list of changes, new features and bugfixes.
+FIXES    : list of bugfixes (in stable releases only).
+FAQ      : questions and answers for admins.
+DEVELOP  : info for people who want to extend or customize AutoDia
+BUGS     : bugs and caveats not yet fixed
+
+CONTRIBUTING
+------------
+Want to contribute?
+
+- Find bugs and submit detailed bug reports 
+- Create/update translations
+- Create external handler modules
+
+To contribute to AutoDia mail me at the below address.
+
+--
+
+Aaron Trevena aaron.trevena@gmail.com
+Author and maintainer.
+
+
+

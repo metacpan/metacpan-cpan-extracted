@@ -1,0 +1,36 @@
+---
+abstract: 'Ane means big sister.'
+author:
+  - 'Tomohiro Nishimura <tomohiro68@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Ane
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::Ane:
+    file: lib/Acme/Ane.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Sixeight/Acme-Ane/issues
+  homepage: https://github.com/Sixeight/Acme-Ane
+  repository: git://github.com/Sixeight/Acme-Ane.git
+version: '0.01'

@@ -1,0 +1,11 @@
+bin/metacpan_notify.pl
+Changes
+lib/App/MetaCPAN/Gtk2/Notify.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

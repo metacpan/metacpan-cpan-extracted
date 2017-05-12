@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+#
+# example02 - example of converting bytes to hamming code, creating 
+#		bit errors, then retrieving the original data.
+#
+# 18-Oct-2003	Brendan Gregg	Created this.
+
+use Algorithm::Hamming::Perl  qw(hamming unhamming unhamming_err);
+
+$data = "Hi";
+
+
+### Hamming
+$hamcode = hamming("$data");
+
+print "input text: $data\n";
+print "input text (as binary)    : ",unpack("B*",$data),"\n";
+print "hamming code (as binary)  : ",unpack("B*",$hamcode),"\n";
+
+$binary = unpack("B*",$hamcode);
+$binary =~ s/1$/0/;			# flip last bit (error on byte 2)
+$binary =~ s/^010/011/;			# flip third bit (error on byte 1)
+$hamerr = pack("B*",$binary);
+
+
+### UnHamming
+($unham,$err) = unhamming_err($hamerr);
+print "hamming code (with errors): $binary\n";
+print "retrieved text (as binary): ",unpack("B*",$unham),"\n";
+print "retrieved text : $unham\n";
+print "bytes corrected: $err\n";

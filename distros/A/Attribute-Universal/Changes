@@ -1,0 +1,12 @@
+0.003 2016-01-25
+ - add more keywords to to_hash and add a test for to_hash
+ - add function collect_by_referent
+
+0.002 2015-10-16
+ - fix documentation
+ - new function to_hash
+
+0.001 2015-10-07
+ - Initial release
+
+0.000 0000-00-00

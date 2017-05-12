@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+name:         AI-PSO
+version:      0.86
+version_from: lib/AI/PSO.pm
+installdirs:  site
+requires:
+    Callback:                      0
+    Math::Random:                  0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

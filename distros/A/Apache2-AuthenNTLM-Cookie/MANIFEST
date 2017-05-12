@@ -1,0 +1,7 @@
+Build.PL
+Changes
+lib/Apache2/AuthenNTLM/Cookie.pm
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+

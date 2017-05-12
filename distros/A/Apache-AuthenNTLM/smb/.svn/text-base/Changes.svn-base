@@ -1,0 +1,60 @@
+Revision history for Perl extension Authen::Smb.
+
+0.1  Wed Mar 11 10:26:43 1998
+	- original version; Not particularly well documented, no fancy
+	  OO features.
+
+0.2  Thu Jul 30 20:46:00 1998
+	- no real changes, some minor documentation updates.  First CPAN
+	  release.
+
+0.3  Sun Aug  2 13:58:00 1998
+	- Removed the object files that accidentally got left in smbval/
+
+0.4  Thu Mar  4 16:20:00 1999
+	- Fixed the versioning in Smb.pm so that CPAN clients will download
+          the correct version.
+
+0.5  Thu Mar 11 19:45:00 1999
+	- Finally added Lupe Christoph's <lupe@alanya.m.isar.de> patches to
+          make builds less of a hassle.  .Fixed the versioning in Smb.pm so
+          that CPAN clients will download the correct version.  Thanks Lupe!
+	- Updated the MANIFEST
+
+0.6  Thu Mar 11 20:00:00 1999
+	- Updated the MANIFEST correctly. :-)
+	
+0.7  Mon Apr 19 19:22:13 1999
+        - Resolved some segfault problems on various platforms by reducing
+          the optimization during the smbval compile.
+	  
+0.8  Mon Apr 19 19:37:13 1999
+        - Shot another smbval bug.
+
+0.81  Sun Jun  6 10:2:09 1999
+	- Updated to the latest smbval library, hopefully resolving some
+	  segfaults and authentication problems for usernames and passwords
+	  with weird characters in them.
+	- Cleaned up Smb.xs
+	- Unreleased version
+
+0.9  Sun Jun  6 18:50:23 1999
+	- While toying around with smbval, discovered some buffer overflows
+	  in the library.  Worked around them in the perl portion of the
+	  module for now, but will get in touch with author to try and
+	  merge some patches to resolve the overflows in the library itself.
+	  Because of these overflows, it is _critical_ that anyone using
+	  Authen::Smb, including those using Apache::AuthenSmb, upgrade to
+	  0.9.  I have not spent a lot of time investigating the overflows,
+	  but I believe them to be exploitable.
+
+0.91 Mon Jun  7 08:03:47 1999
+	- Fixed a ridiculous thinko in Smb.pm (thansk Daniel Myers)
+
+
+0.92 Jan 4 2002
+    - Added functions for Apache::AuthenNTLM (Gerald Richter)
+
+0.93-0.96 Seg 3 2002
+    - updated smbval, fixed bugs in smbval VC count handling,
+      fixed bug in nonce passing

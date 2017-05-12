@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/cpang
+dist.ini
+lib/App/cpang.pm
+t/00-compile.t
+t/base.t
+t/release-pod-syntax.t

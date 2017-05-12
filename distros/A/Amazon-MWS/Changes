@@ -1,0 +1,126 @@
+Revision history for Amazon::MWS
+
+0.141 Mon Dec  5 13:30:14 2016 CET
+
+     [BUG FIXES]
+
+     * Handle hash references for address values (Marco Pessotto).
+
+     [DOCUMENTATION]
+
+     * Add documentation on Amazon error 18181 (Stefan Hornburg/Racke).
+
+0.140 Mon Nov  7 10:27:33 2016 CET
+
+     [ENHANCEMENTS]
+
+     * Add API methods provided by James Risner (GH #13, #14):
+
+       GetLowestPricedOffersForSKU
+       GetLowestPricedOffersForASIN
+       GetMyPriceForSKU
+       GetMyPriceForASIN
+       GetMyFeesEstimate
+
+     [BUG FIXES]
+
+     * Fix signature of API method GetServiceStatus (Stefan Hornburg/Racke).
+
+0.132 Sun Oct 23 09:01:46 2016 CEST
+
+     [ENHANCEMENTS]
+
+     * Add GetPrepInstructionsForASIN and GetPrepInstructionsForSKU
+       API methods provided by James Risner.
+
+0.131 Wed May 25 09:50:20 2016 CEST
+
+     [ENHANCEMENTS]
+
+     * Allow to limit the product upload steps (Marco Pessotto).
+     * Removed confirmed => 1 filters to get the orders waiting for shipping
+      (Marco Pessotto).
+     * Make _get_pending_jobs method of the uploader public
+       (Marco Pessotto).
+     * Allow additional parameters for resume method and keep the jobs
+	   in predictable order (Marco Pessotto).
+
+     [DOCUMENTATION]
+
+     * Add sections about uploading products, deleting products
+       and resuming uploads to the main documentation (Stefan Hornburg/Racke).
+     * Add note about image links to Product class documentation
+       (Stefan Hornburg/Racke).
+     * Add comment about usage of Amazon::MWS::Client to the documentation.
+       (Stefan Hornburg/Racke).
+
+0.130 Sat Apr  2 08:08:26 2016 CEST
+
+     [ENHANCEMENTS]
+
+     * Add method to retrieve skus with warnings (Marco Pessotto).
+     * Add color and size mismatches, also handle errors in German
+       (Marco Pessotto).
+
+     [BUG FIXES]
+
+     * Strip trailing slash from endpoint
+       (Marco Pessotto, jordanmhiller, GH #9).
+
+     [DOCUMENTATION]
+
+     * Add possible explanation for error code 8572 (Stefan Hornburg/Racke).
+
+0.120 Tue Mar 29 07:35:46 2016 CEST
+
+     [ENHANCEMENTS]
+
+     * Permit arguments to resume method in Uploader class
+       (Marco Pessotto).
+     * Do not perform checks on products if checked_products is set
+       (Marco Pessotto).
+     * Add get_products_with_mismatches method (Marco Pessotto).
+     * Improve separation into first and last name (Marco Pessotto).
+
+     [DOCUMENTATION]
+
+     * Add possible explanation for error code 8572 (Stefan Hornburg/Racke).
+
+0.116 Sat Dec 19 15:12:10 2015 CET
+
+     [ENHANCEMENTS]
+
+     * Return the shipping category level as shipping_method
+       (Marco Pessotto).
+
+0.115 Sat Nov  7 12:38:49 2015 CET
+
+     [ENHANCEMENTS]
+
+     * Add purge_old_jobs method (Marco Pessotto).
+
+     [BUG FIXES]
+
+     * Exclude MYMETA.* files from distribution
+       (Alexandr Ciornii, Stefan Hornburg, GH #7).
+
+0.114 Mon Oct  5 12:22:23 2015 CEST
+
+     [BUG FIXES]
+
+     * Prevent crash from empty ItemPrice or ShippingPrice caused by
+       cancelled items (Marco Pessotto).
+
+0.113 Wed Jul 22 09:31:32 2015 CEST
+
+     [BUG FIXES]
+
+     * Add prerequisite on namespace::clean (Stefan Hornburg, GH #6).
+
+     [ENHANCEMENTS]
+
+     * Add quiet accessor to Uploader (Marco Pessotto).
+
+0.112 Mon Jul 20 17:29:42 2015 CEST
+
+     * Initial release.

@@ -1,0 +1,39 @@
+Revision history for Perl extension AI::Gene::Sequence.
+
+0.21 Wed Jan 24 13:00:00 2001
+
+BUGFIXES: problem with Makefile.PL & nmake fixed
+
+0.20 Tue Jan 02 23:20:00 2001
+
+Changes   name changed to AI::Gene::*
+          speed warnings added to pod
+
+0.13 Sat Dec 30 23:00:00 2000
+
+Added:    mutate_reverse method added to both Sequence and Simple
+
+BUGFIXES: modified makefile to ensure sensible version of perl
+          removed eval in mutate method and _normalise
+
+0.12 Fri Dec 29 19:00:00 2000
+
+Added:    Genetics::Gene::Simple package added, with tests (tsimp.t)
+
+BUGFIXES: require 5.6.0 lines.
+          documentation made clearer.
+
+0.11 Thu Dec 28 21:00:00 2000
+
+Added:    Extensive test suite (tgene.t)
+          mutate_overwrite added
+
+BUGFIXES: Most methods have more gene length related sanity checking.
+          So long as positive integers are used as args, then there should
+          be no fatal errors through missing the end of substrings.
+          mutate when called with ref of probs only worked with keys
+          of generic probs hash, this is now fixed.
+
+0.10 Wed Dec 27 21:00:00 2000
+
+Initial public (but buggy) release.

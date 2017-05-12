@@ -1,0 +1,165 @@
+PerlPassEnv APACHE_SWIT_SERVER_URL
+LogLevel notice
+LogFormat "%a %t \"%r\" %>s %D \"%{Referer}i\" \"%{User-Agent}i\"" switlog
+CustomLog logs/access_log switlog
+KeepAlive off
+MaxClients 5
+StartServers 2
+MinSpareServers 3
+
+PerlPostConfigRequire @ServerRoot@/../blib/conf/startup.pl
+PerlSetEnv APACHE_SWIT_DB_NAME swit_test_db
+<Location /test>
+	PerlAccessHandler T::Session->access_handler
+	PerlSetVar SWITRootLocation /test
+</Location>
+
+<Location /test/basic_handler>
+  SetHandler perl-script
+  PerlResponseHandler T::Basic
+</Location>
+
+<Location /test/swit/r>
+  SetHandler perl-script
+  PerlHandler T::SWIT->swit_render_handler
+</Location>
+
+<Location /test/swit/u>
+  SetHandler perl-script
+  PerlHandler T::SWIT->swit_update_handler
+</Location>
+
+<Location /test/another/page/r>
+  SetHandler perl-script
+  PerlHandler T::SWIT->swit_render_handler
+</Location>
+
+<Location /test/another/page/u>
+  SetHandler perl-script
+  PerlHandler T::SWIT->swit_update_handler
+</Location>
+
+<Location /test/invalid/u>
+  SetHandler perl-script
+  PerlHandler T::Invalid->invalid_handler
+</Location>
+
+<Location /test/ht_error/r>
+  SetHandler perl-script
+  PerlSetVar SWITTemplate templates/ht_error.tt
+  PerlHandler T::HTError->swit_render_handler
+</Location>
+
+<Location /test/ht_error/u>
+  SetHandler perl-script
+  PerlHandler T::HTError->swit_update_handler
+</Location>
+
+
+<Location /test/inhe_page/r>
+  SetHandler perl-script
+  PerlSetVar SWITTemplate templates/htpage.tt
+  PerlHandler T::HTInherit->swit_render_handler
+</Location>
+
+<Location /test/safe/r>
+  SetHandler perl-script
+  PerlSetVar SWITTemplate templates/safe.tt
+  PerlHandler T::Safe->swit_render_handler
+</Location>
+
+<Location /test/safe/u>
+  SetHandler perl-script
+  PerlHandler T::Safe->swit_update_handler
+</Location>
+
+<Location /test/ht_page/r>
+  SetHandler perl-script
+  PerlSetVar SWITTemplate templates/htpage.tt
+  PerlHandler T::HTPage->swit_render_handler
+</Location>
+
+<Location /test/ht_page/u>
+  SetHandler perl-script
+  PerlHandler T::HTPage->swit_update_handler
+</Location>
+
+<Location /test/res/r>
+  SetHandler perl-script
+  PerlHandler T::Res->swit_render_handler
+</Location>
+
+<Location /test/sess_page/r>
+  SetHandler perl-script
+  PerlSetVar SWITTemplate templates/sess_page.tt
+  PerlHandler T::SessPage->swit_render_handler
+</Location>
+
+<Location /test/sess_page/u>
+  SetHandler perl-script
+  PerlHandler T::SessPage->swit_update_handler
+</Location>
+
+<Location /test/db_page/r>
+  SetHandler perl-script
+  PerlSetVar SWITTemplate templates/db_page.tt
+  PerlHandler T::DBPage->swit_render_handler
+</Location>
+
+<Location /test/db_page/u>
+  SetHandler perl-script
+  PerlHandler T::DBPage->swit_update_handler
+</Location>
+
+<Location /test/cthan>
+  SetHandler perl-script
+  PerlHandler T::SWIT->ct_handler
+</Location>
+
+<Location /test/upload/r>
+  SetHandler perl-script
+  PerlSetVar SWITTemplate templates/upload.tt
+  PerlHandler T::Upload->swit_render_handler
+</Location>
+
+<Location /test/upload/u>
+  SetHandler perl-script
+  PerlHandler T::Upload->swit_update_handler
+</Location>
+
+<Location /test/empty/r>
+  SetHandler perl-script
+  PerlSetVar SWITTemplate templates/empty_up.tt
+  PerlHandler T::Empty->swit_render_handler
+</Location>
+
+<Location /test/huge>
+  SetHandler perl-script
+  PerlSetVar SWITTemplate templates/2mb.tt
+  PerlHandler T::SWIT->swit_render_handler
+</Location>
+
+
+<Location /test/empty/u>
+  SetHandler perl-script
+  PerlHandler T::Empty->swit_update_handler
+</Location>
+
+<Location /test/redirect/r>
+  SetHandler perl-script
+  PerlHandler T::Redirect->swit_render_handler
+</Location>
+
+<Location /test/work/r>
+  SetHandler perl-script
+  PerlHandler T::WorkPage->swit_render_handler
+</Location>
+
+<Location /test/download/r>
+  SetHandler perl-script
+  PerlHandler Apache::SWIT::LargeObjectHandler->swit_render_handler
+</Location>
+
+
+Alias /test/www @ServerRoot@/public_html 
+PerlPostConfigRequire @ServerRoot@/conf/do_swit_startups.pl

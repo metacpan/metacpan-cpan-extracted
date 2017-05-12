@@ -1,0 +1,244 @@
+Revision history for Perl extension Authen::Captcha.
+
+2012-07-14 12:19  Lubomir Rintel
+
+	* Captcha.pm: Hardcode version, don't get it from CVS.  Advise to use
+	GD::SecurityImage.
+	* Makefile.PM: Point to Git for now
+	* Changes: updated changes - tagged as Rel-1_024
+
+2012-06-16 18:25  Lubomir Rintel
+
+	* Makefile.PL: 5.005 is not really supported
+
+2012-06-16 18:18  Paolo Rossi
+
+	* Captcha.pm: Broken locking lets images files build up
+
+2012-06-16 18:12  Lubomir Rintel
+
+	* Makefile.PL: Fix File::Spec requirement
+
+2012-06-16 18:09  Chris Dunlop
+
+	* Captcha.pm: Fix reading of codes database in taint mode
+
+2012-06-16 18:01  Ernesto Hernández-Novich
+
+	* Captcha.pm: Spelling fix
+
+2012-06-16 17:54  Lubomir Rintel
+
+	* Captcha.pm, Makefile.PL: Use Random tokens instead of MD5
+	checksums
+
+2003-12-17 23:47  jmiller
+
+	* Changes: updated changes - tagged as Rel-1_023
+
+2003-12-17 23:44  jmiller
+
+	* Captcha.pm, t/1.t: Added keep_failures option, to keep the
+	captcha around when the check failes one wants.  Added initial
+	untested sound file support (no distortion yet)
+
+2003-12-04 15:50  jmiller
+
+	* Changes: updated changes - tagged as Rel-1_022
+
+2003-12-04 15:46  jmiller
+
+	* Captcha.pm: removed item from TODO - fixing srand() portability
+
+2003-12-04 15:44  jmiller
+
+	* Captcha.pm: added data validation to expire(), width(), and
+	height() to verify set's use a possitive integer.  check_code() -
+	have it creating database file codes.txt if it doesn't exist (touch
+	it).
+
+2003-12-04 15:25  jmiller
+
+	* Captcha.pm, Makefile.PL, t/1.t: Portability update.  Modified
+	directory/file handling to use File::Spec for portable operations. 
+	Added warnings for when unlink's failed.  Made srand() in new() of
+	Captcha.pm more portable.
+
+2003-12-04 11:08  jmiller
+
+	* t/1.t: adjusted test t/1.t... it was writing captcha out to
+	/tmp/captcha_temp/etc, changed it to use t/captcha_temp/etc using
+	__FILE__ to figure out where the test is at.
+
+2003-12-04 00:45  jmiller
+
+	* Captcha.pm, Makefile.PL, t/1.t: Removed nasty hack to hardcode in
+	the lib/Authen/Captcha/images directory. Replaced with the solution
+	that lib/Net/Config.pm uses (thanks to Andrew Savige for helping me
+	out). The new solution uses __FILE__ to find the module's filename,
+	and regex's it into the path to the images directory.
+
+2003-12-03 22:12  jmiller
+
+	* Captcha.pm, examples/wwwtest.cgi, t/1.t: MAJOR INTERFACE CHANGE!
+	method names have changed. All two word method names have been
+	lowercased and split with an underscore for propper style and
+	consistency:	datafolder	=> data_folder	outputfolder	=>
+	output_folder	     imagesfolder    => images_folder	    
+	generateCode	=> generate_code	checkCode	=>
+	check_code Also, though less important, an audit of all variable
+	names in the module has been done in order to put them into the
+	correct naming conventions as well.
+
+2003-12-03 21:53  jmiller
+
+	* Captcha.pm: added TODO to docs
+
+2003-12-03 15:21  jmiller
+
+	* Captcha.pm, Makefile.PL: added PREREQ_PM's to the Makefile.PL,
+	fixed docs on requirements (GD doesn't have to be a 2.x release, I
+	have it working fine on a 1.41 GD)
+
+2003-12-02 21:19  jmiller
+
+	* Changes: updated changes - tagged as Rel-1_015
+
+2003-12-02 21:15  jmiller
+
+	* README: updated REAME w/ new documentation format
+
+2003-12-02 21:13  jmiller
+
+	* Captcha.pm: More documentation tweeks
+
+2003-12-02 20:18  sjackson
+
+	* Captcha.pm: Fixing a few right and left brases. Added Josh's name
+	to the Authors, due to the fact that he did all the leg work on
+	getting this up on CPAN.
+
+2003-12-02 19:32  jmiller
+
+	* Changes: updated changes
+
+2003-12-02 19:29  jmiller
+
+	* Captcha.pm, README: Re-ordered documentation. Made SYNOPSIS more
+	minimal.  Correctted new() documentation (you can pass in hash, not
+	a hash referance)
+
+2003-12-02 19:11  jmiller
+
+	* Captcha.pm: POD formatting update.
+
+2003-12-02 14:45  jmiller
+
+	* Captcha.pm: removed useless comment
+
+2003-12-02 14:44  jmiller
+
+	* MANIFEST: added examples to manifest
+
+2003-12-02 11:20  jmiller
+
+	* Changes: updated Changes file, and Tagged as release 1.010
+
+2003-12-02 14:38  jmiller
+
+	* examples/: README, wwwtest.cgi: added an example cgi script
+
+2003-12-02 13:57  jmiller
+
+	* README: replaced SRC_IMAGES with [lib install dir]/Authen/Captcha
+
+2003-12-02 13:57  jmiller
+
+	* Captcha.pm: fixed replacement definition for SRC_IMAGES in pod
+
+2003-12-02 12:15  jmiller
+
+	* Captcha.pm: Fixed file locking (they were all exclusive write
+	locks... modified ones where we were just reading to read locks)
+
+2003-12-02 12:10  jmiller
+
+	* Captcha.pm: moved srand(...seed....) to new()
+
+2003-12-02 11:46  jmiller
+
+	* Captcha.pm, Changes, README: added INSTALLATION to pod
+	documentation, dumped pod to README
+
+2003-12-02 11:19  jmiller
+
+	* Changes: updated changes
+
+2003-12-02 11:20  jmiller
+
+	* Changes: updated Changes file, and Tagged as release 1.006
+
+2003-12-02 01:17  jmiller
+
+	* MANIFEST: updated MANIFEST with all images
+
+2003-12-02 00:36  jmiller
+
+	* Captcha.pm, Changes, Makefile.PL, README, t/1.t: changed
+	namespace from Crypt::Captcha to Authen::Captcha after looking over
+	compete module list on CPAN... Authen now seems more appropriate.
+
+2003-12-01 21:23  jmiller
+
+	* Captcha.pm: updated documentation
+
+2003-12-01 20:52  jmiller
+
+	* Captcha/images/: 2.png, 3.png, 4.png, 5.png, 6.png, 7.png, 8.png,
+	9.png, Thumbs.db, a.png, b.png, background1.png, background2.png,
+	background3.png, background4.png, background5.png, c.png, d.png,
+	e.png, f.png, g.png, h.png, i.png, j.png, k.png, l.png, m.png,
+	n.png, o.png, p.png, q.png, r.png, s.png, t.png, u.png, v.png,
+	w.png, x.png, y.png, z.png: adding static image data
+
+2003-12-01 20:45  jmiller
+
+	* Makefile.PL, t/1.t: had to change the PM_FILTER, and the test to
+	hack around the imagesfolder stuff
+
+2003-12-01 20:23  jmiller
+
+	* Captcha.pm, t/1.t: fixed "use of uninitialized value" that was in
+	checkCode (last 4 lines... if $newdata was empty, it'd complain
+	when warnings were on).  Added tests for the new imagesfolder()
+	method
+
+2003-12-01 20:13  jmiller
+
+	* Captcha.pm, Makefile.PL, t/1.t: Changed a LOT... fixed lots of
+	bugs, changed imagesfolder to outputfolder, and added a new
+	imagesfolder that does something completely different.
+
+2003-12-01 11:02  jmiller
+
+	* Captcha.pm: updated Captcha.pm to have default values for:
+	expire, width, height
+
+2003-12-01 01:06  jmiller
+
+	* Captcha.pm, Changes, MANIFEST, Makefile.PL, README, license.txt,
+	t/1.t: adding in Captcha distribution
+
+2003-11-30 23:49  jmiller
+
+	* original version; created by h2xs 1.22 with options
+		-b 5.5.3 -XAn Authen::Captcha
+
+2003-11-15 07:11  jmiller
+
+	* branched off of "FirstProductions Human Test 1.0"
+		- http://www.firstproductions.com/cgi/human/
+		- it's a "perl library" that can be require'd into other scripts
+		  but was written with many globals with hardcoded configs
+		  and poor structure.
+

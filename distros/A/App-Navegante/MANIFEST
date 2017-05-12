@@ -1,0 +1,21 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/App/Navegante.yp
+lib/App/Navegante.pm
+lib/App/Navegante/CGI.pm
+bin/navegante
+examples/headers
+examples/htgraph
+examples/htspell
+examples/httag
+examples/README
+examples/reverse
+examples/wordcounter
+t/00-load.t
+t/01-objects.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

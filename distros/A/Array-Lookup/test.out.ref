@@ -1,0 +1,657 @@
+*** STDOUT ***
+Search for 'u' on @commands
+Result = 'use'
+Search for 'us' on @commands
+Result = 'use'
+Search for 'use' on @commands
+Result = 'use'
+Search for 'user' on @commands
+Result = '<undef>'
+Search for 'u' on %commands
+Result = 'use'
+Search for 'us' on %commands
+Result = 'use'
+Search for 'use' on %commands
+Result = 'use'
+Search for 'user' on %commands
+Result = '<undef>'
+Search for 's' on @commands
+Result = '<undef>'
+Search for 'se' on @commands
+Result = '<undef>'
+Search for 'ser' on @commands
+Result = 'server'
+Search for 'set' on @commands
+Result = 'set'
+Search for 'serv' on @commands
+Result = 'server'
+Search for 'serve' on @commands
+Result = 'server'
+Search for 'server' on @commands
+Result = 'server'
+Search for 'servers' on @commands
+Result = '<undef>'
+Search for 's' on %commands
+Result = '<undef>'
+Search for 'se' on %commands
+Result = '<undef>'
+Search for 'ser' on %commands
+Result = 'server'
+Search for 'set' on %commands
+Result = 'set'
+Search for 'serv' on %commands
+Result = 'server'
+Search for 'serve' on %commands
+Result = 'server'
+Search for 'server' on %commands
+Result = 'server'
+Search for 'servers' on %commands
+Result = '<undef>'
+Search for 'e' on @commands
+Result = 'exit'
+Search for 'e' on %commands
+Result = 'exit'
+Search for 'e' on @commands, notfound = 'errsub'
+Result = 'exit'
+Search for 'e' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'exit'
+Search for 'e' on %commands, notfound = 'errsub'
+Result = 'exit'
+Search for 'e' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'exit'
+Search for 'ex' on @commands
+Result = 'exit'
+Search for 'ex' on %commands
+Result = 'exit'
+Search for 'ex' on @commands, notfound = 'errsub'
+Result = 'exit'
+Search for 'ex' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'exit'
+Search for 'ex' on %commands, notfound = 'errsub'
+Result = 'exit'
+Search for 'ex' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'exit'
+Search for 'exi' on @commands
+Result = 'exit'
+Search for 'exi' on %commands
+Result = 'exit'
+Search for 'exi' on @commands, notfound = 'errsub'
+Result = 'exit'
+Search for 'exi' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'exit'
+Search for 'exi' on %commands, notfound = 'errsub'
+Result = 'exit'
+Search for 'exi' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'exit'
+Search for 'exit' on @commands
+Result = 'exit'
+Search for 'exit' on %commands
+Result = 'exit'
+Search for 'exit' on @commands, notfound = 'errsub'
+Result = 'exit'
+Search for 'exit' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'exit'
+Search for 'exit' on %commands, notfound = 'errsub'
+Result = 'exit'
+Search for 'exit' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'exit'
+Search for 'g' on @commands
+Result = 'get'
+Search for 'g' on %commands
+Result = 'get'
+Search for 'g' on @commands, notfound = 'errsub'
+Result = 'get'
+Search for 'g' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'get'
+Search for 'g' on %commands, notfound = 'errsub'
+Result = 'get'
+Search for 'g' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'get'
+Search for 'ge' on @commands
+Result = 'get'
+Search for 'ge' on %commands
+Result = 'get'
+Search for 'ge' on @commands, notfound = 'errsub'
+Result = 'get'
+Search for 'ge' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'get'
+Search for 'ge' on %commands, notfound = 'errsub'
+Result = 'get'
+Search for 'ge' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'get'
+Search for 'get' on @commands
+Result = 'get'
+Search for 'get' on %commands
+Result = 'get'
+Search for 'get' on @commands, notfound = 'errsub'
+Result = 'get'
+Search for 'get' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'get'
+Search for 'get' on %commands, notfound = 'errsub'
+Result = 'get'
+Search for 'get' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'get'
+Search for 'h' on @commands
+Result = 'help'
+Search for 'h' on %commands
+Result = 'help'
+Search for 'h' on @commands, notfound = 'errsub'
+Result = 'help'
+Search for 'h' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'help'
+Search for 'h' on %commands, notfound = 'errsub'
+Result = 'help'
+Search for 'h' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'help'
+Search for 'he' on @commands
+Result = 'help'
+Search for 'he' on %commands
+Result = 'help'
+Search for 'he' on @commands, notfound = 'errsub'
+Result = 'help'
+Search for 'he' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'help'
+Search for 'he' on %commands, notfound = 'errsub'
+Result = 'help'
+Search for 'he' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'help'
+Search for 'hel' on @commands
+Result = 'help'
+Search for 'hel' on %commands
+Result = 'help'
+Search for 'hel' on @commands, notfound = 'errsub'
+Result = 'help'
+Search for 'hel' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'help'
+Search for 'hel' on %commands, notfound = 'errsub'
+Result = 'help'
+Search for 'hel' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'help'
+Search for 'help' on @commands
+Result = 'help'
+Search for 'help' on %commands
+Result = 'help'
+Search for 'help' on @commands, notfound = 'errsub'
+Result = 'help'
+Search for 'help' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'help'
+Search for 'help' on %commands, notfound = 'errsub'
+Result = 'help'
+Search for 'help' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'help'
+Search for 'l' on @commands
+Result = 'list'
+Search for 'l' on %commands
+Result = 'list'
+Search for 'l' on @commands, notfound = 'errsub'
+Result = 'list'
+Search for 'l' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'list'
+Search for 'l' on %commands, notfound = 'errsub'
+Result = 'list'
+Search for 'l' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'list'
+Search for 'li' on @commands
+Result = 'list'
+Search for 'li' on %commands
+Result = 'list'
+Search for 'li' on @commands, notfound = 'errsub'
+Result = 'list'
+Search for 'li' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'list'
+Search for 'li' on %commands, notfound = 'errsub'
+Result = 'list'
+Search for 'li' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'list'
+Search for 'lis' on @commands
+Result = 'list'
+Search for 'lis' on %commands
+Result = 'list'
+Search for 'lis' on @commands, notfound = 'errsub'
+Result = 'list'
+Search for 'lis' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'list'
+Search for 'lis' on %commands, notfound = 'errsub'
+Result = 'list'
+Search for 'lis' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'list'
+Search for 'list' on @commands
+Result = 'list'
+Search for 'list' on %commands
+Result = 'list'
+Search for 'list' on @commands, notfound = 'errsub'
+Result = 'list'
+Search for 'list' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'list'
+Search for 'list' on %commands, notfound = 'errsub'
+Result = 'list'
+Search for 'list' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'list'
+Search for 'p' on @commands
+Result = 'put'
+Search for 'p' on %commands
+Result = 'put'
+Search for 'p' on @commands, notfound = 'errsub'
+Result = 'put'
+Search for 'p' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'put'
+Search for 'p' on %commands, notfound = 'errsub'
+Result = 'put'
+Search for 'p' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'put'
+Search for 'pu' on @commands
+Result = 'put'
+Search for 'pu' on %commands
+Result = 'put'
+Search for 'pu' on @commands, notfound = 'errsub'
+Result = 'put'
+Search for 'pu' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'put'
+Search for 'pu' on %commands, notfound = 'errsub'
+Result = 'put'
+Search for 'pu' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'put'
+Search for 'put' on @commands
+Result = 'put'
+Search for 'put' on %commands
+Result = 'put'
+Search for 'put' on @commands, notfound = 'errsub'
+Result = 'put'
+Search for 'put' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'put'
+Search for 'put' on %commands, notfound = 'errsub'
+Result = 'put'
+Search for 'put' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'put'
+Search for 'q' on @commands
+Result = 'quit'
+Search for 'q' on %commands
+Result = 'quit'
+Search for 'q' on @commands, notfound = 'errsub'
+Result = 'quit'
+Search for 'q' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'quit'
+Search for 'q' on %commands, notfound = 'errsub'
+Result = 'quit'
+Search for 'q' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'quit'
+Search for 'qu' on @commands
+Result = 'quit'
+Search for 'qu' on %commands
+Result = 'quit'
+Search for 'qu' on @commands, notfound = 'errsub'
+Result = 'quit'
+Search for 'qu' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'quit'
+Search for 'qu' on %commands, notfound = 'errsub'
+Result = 'quit'
+Search for 'qu' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'quit'
+Search for 'qui' on @commands
+Result = 'quit'
+Search for 'qui' on %commands
+Result = 'quit'
+Search for 'qui' on @commands, notfound = 'errsub'
+Result = 'quit'
+Search for 'qui' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'quit'
+Search for 'qui' on %commands, notfound = 'errsub'
+Result = 'quit'
+Search for 'qui' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'quit'
+Search for 'quit' on @commands
+Result = 'quit'
+Search for 'quit' on %commands
+Result = 'quit'
+Search for 'quit' on @commands, notfound = 'errsub'
+Result = 'quit'
+Search for 'quit' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'quit'
+Search for 'quit' on %commands, notfound = 'errsub'
+Result = 'quit'
+Search for 'quit' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'quit'
+Search for 's' on @commands
+Result = '<undef>'
+Search for 's' on %commands
+Result = '<undef>'
+Search for 's' on @commands, notfound = 'errsub'
+Result = '<undef>'
+Search for 's' on @commands, notfound = 'errsub', ambig = 'errsub'
+Key 's' is ambiguous
+Choose from: save, server, set
+Choices were: exit, get, help, list, put, quit, save, server, set, use, wait, write
+Result = '<undef>'
+Search for 's' on %commands, notfound = 'errsub'
+Result = '<undef>'
+Search for 's' on %commands, notfound = 'errsub', ambig = 'errsub'
+Key 's' is ambiguous
+Choose from: save, server, set
+Choices were: exit, get, help, list, put, quit, save, server, set, use, wait, write
+Result = '<undef>'
+Search for 'sa' on @commands
+Result = 'save'
+Search for 'sa' on %commands
+Result = 'save'
+Search for 'sa' on @commands, notfound = 'errsub'
+Result = 'save'
+Search for 'sa' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'save'
+Search for 'sa' on %commands, notfound = 'errsub'
+Result = 'save'
+Search for 'sa' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'save'
+Search for 'sav' on @commands
+Result = 'save'
+Search for 'sav' on %commands
+Result = 'save'
+Search for 'sav' on @commands, notfound = 'errsub'
+Result = 'save'
+Search for 'sav' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'save'
+Search for 'sav' on %commands, notfound = 'errsub'
+Result = 'save'
+Search for 'sav' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'save'
+Search for 'save' on @commands
+Result = 'save'
+Search for 'save' on %commands
+Result = 'save'
+Search for 'save' on @commands, notfound = 'errsub'
+Result = 'save'
+Search for 'save' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'save'
+Search for 'save' on %commands, notfound = 'errsub'
+Result = 'save'
+Search for 'save' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'save'
+Search for 's' on @commands
+Result = '<undef>'
+Search for 's' on %commands
+Result = '<undef>'
+Search for 's' on @commands, notfound = 'errsub'
+Result = '<undef>'
+Search for 's' on @commands, notfound = 'errsub', ambig = 'errsub'
+Key 's' is ambiguous
+Choose from: save, server, set
+Choices were: exit, get, help, list, put, quit, save, server, set, use, wait, write
+Result = '<undef>'
+Search for 's' on %commands, notfound = 'errsub'
+Result = '<undef>'
+Search for 's' on %commands, notfound = 'errsub', ambig = 'errsub'
+Key 's' is ambiguous
+Choose from: save, server, set
+Choices were: exit, get, help, list, put, quit, save, server, set, use, wait, write
+Result = '<undef>'
+Search for 'se' on @commands
+Result = '<undef>'
+Search for 'se' on %commands
+Result = '<undef>'
+Search for 'se' on @commands, notfound = 'errsub'
+Result = '<undef>'
+Search for 'se' on @commands, notfound = 'errsub', ambig = 'errsub'
+Key 'se' is ambiguous
+Choose from: server, set
+Choices were: exit, get, help, list, put, quit, save, server, set, use, wait, write
+Result = '<undef>'
+Search for 'se' on %commands, notfound = 'errsub'
+Result = '<undef>'
+Search for 'se' on %commands, notfound = 'errsub', ambig = 'errsub'
+Key 'se' is ambiguous
+Choose from: server, set
+Choices were: exit, get, help, list, put, quit, save, server, set, use, wait, write
+Result = '<undef>'
+Search for 'ser' on @commands
+Result = 'server'
+Search for 'ser' on %commands
+Result = 'server'
+Search for 'ser' on @commands, notfound = 'errsub'
+Result = 'server'
+Search for 'ser' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'server'
+Search for 'ser' on %commands, notfound = 'errsub'
+Result = 'server'
+Search for 'ser' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'server'
+Search for 'serv' on @commands
+Result = 'server'
+Search for 'serv' on %commands
+Result = 'server'
+Search for 'serv' on @commands, notfound = 'errsub'
+Result = 'server'
+Search for 'serv' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'server'
+Search for 'serv' on %commands, notfound = 'errsub'
+Result = 'server'
+Search for 'serv' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'server'
+Search for 'serve' on @commands
+Result = 'server'
+Search for 'serve' on %commands
+Result = 'server'
+Search for 'serve' on @commands, notfound = 'errsub'
+Result = 'server'
+Search for 'serve' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'server'
+Search for 'serve' on %commands, notfound = 'errsub'
+Result = 'server'
+Search for 'serve' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'server'
+Search for 'server' on @commands
+Result = 'server'
+Search for 'server' on %commands
+Result = 'server'
+Search for 'server' on @commands, notfound = 'errsub'
+Result = 'server'
+Search for 'server' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'server'
+Search for 'server' on %commands, notfound = 'errsub'
+Result = 'server'
+Search for 'server' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'server'
+Search for 's' on @commands
+Result = '<undef>'
+Search for 's' on %commands
+Result = '<undef>'
+Search for 's' on @commands, notfound = 'errsub'
+Result = '<undef>'
+Search for 's' on @commands, notfound = 'errsub', ambig = 'errsub'
+Key 's' is ambiguous
+Choose from: save, server, set
+Choices were: exit, get, help, list, put, quit, save, server, set, use, wait, write
+Result = '<undef>'
+Search for 's' on %commands, notfound = 'errsub'
+Result = '<undef>'
+Search for 's' on %commands, notfound = 'errsub', ambig = 'errsub'
+Key 's' is ambiguous
+Choose from: save, server, set
+Choices were: exit, get, help, list, put, quit, save, server, set, use, wait, write
+Result = '<undef>'
+Search for 'se' on @commands
+Result = '<undef>'
+Search for 'se' on %commands
+Result = '<undef>'
+Search for 'se' on @commands, notfound = 'errsub'
+Result = '<undef>'
+Search for 'se' on @commands, notfound = 'errsub', ambig = 'errsub'
+Key 'se' is ambiguous
+Choose from: server, set
+Choices were: exit, get, help, list, put, quit, save, server, set, use, wait, write
+Result = '<undef>'
+Search for 'se' on %commands, notfound = 'errsub'
+Result = '<undef>'
+Search for 'se' on %commands, notfound = 'errsub', ambig = 'errsub'
+Key 'se' is ambiguous
+Choose from: server, set
+Choices were: exit, get, help, list, put, quit, save, server, set, use, wait, write
+Result = '<undef>'
+Search for 'set' on @commands
+Result = 'set'
+Search for 'set' on %commands
+Result = 'set'
+Search for 'set' on @commands, notfound = 'errsub'
+Result = 'set'
+Search for 'set' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'set'
+Search for 'set' on %commands, notfound = 'errsub'
+Result = 'set'
+Search for 'set' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'set'
+Search for 'u' on @commands
+Result = 'use'
+Search for 'u' on %commands
+Result = 'use'
+Search for 'u' on @commands, notfound = 'errsub'
+Result = 'use'
+Search for 'u' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'use'
+Search for 'u' on %commands, notfound = 'errsub'
+Result = 'use'
+Search for 'u' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'use'
+Search for 'us' on @commands
+Result = 'use'
+Search for 'us' on %commands
+Result = 'use'
+Search for 'us' on @commands, notfound = 'errsub'
+Result = 'use'
+Search for 'us' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'use'
+Search for 'us' on %commands, notfound = 'errsub'
+Result = 'use'
+Search for 'us' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'use'
+Search for 'use' on @commands
+Result = 'use'
+Search for 'use' on %commands
+Result = 'use'
+Search for 'use' on @commands, notfound = 'errsub'
+Result = 'use'
+Search for 'use' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'use'
+Search for 'use' on %commands, notfound = 'errsub'
+Result = 'use'
+Search for 'use' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'use'
+Search for 'w' on @commands
+Result = '<undef>'
+Search for 'w' on %commands
+Result = '<undef>'
+Search for 'w' on @commands, notfound = 'errsub'
+Result = '<undef>'
+Search for 'w' on @commands, notfound = 'errsub', ambig = 'errsub'
+Key 'w' is ambiguous
+Choose from: wait, write
+Choices were: exit, get, help, list, put, quit, save, server, set, use, wait, write
+Result = '<undef>'
+Search for 'w' on %commands, notfound = 'errsub'
+Result = '<undef>'
+Search for 'w' on %commands, notfound = 'errsub', ambig = 'errsub'
+Key 'w' is ambiguous
+Choose from: wait, write
+Choices were: exit, get, help, list, put, quit, save, server, set, use, wait, write
+Result = '<undef>'
+Search for 'wa' on @commands
+Result = 'wait'
+Search for 'wa' on %commands
+Result = 'wait'
+Search for 'wa' on @commands, notfound = 'errsub'
+Result = 'wait'
+Search for 'wa' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'wait'
+Search for 'wa' on %commands, notfound = 'errsub'
+Result = 'wait'
+Search for 'wa' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'wait'
+Search for 'wai' on @commands
+Result = 'wait'
+Search for 'wai' on %commands
+Result = 'wait'
+Search for 'wai' on @commands, notfound = 'errsub'
+Result = 'wait'
+Search for 'wai' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'wait'
+Search for 'wai' on %commands, notfound = 'errsub'
+Result = 'wait'
+Search for 'wai' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'wait'
+Search for 'wait' on @commands
+Result = 'wait'
+Search for 'wait' on %commands
+Result = 'wait'
+Search for 'wait' on @commands, notfound = 'errsub'
+Result = 'wait'
+Search for 'wait' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'wait'
+Search for 'wait' on %commands, notfound = 'errsub'
+Result = 'wait'
+Search for 'wait' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'wait'
+Search for 'w' on @commands
+Result = '<undef>'
+Search for 'w' on %commands
+Result = '<undef>'
+Search for 'w' on @commands, notfound = 'errsub'
+Result = '<undef>'
+Search for 'w' on @commands, notfound = 'errsub', ambig = 'errsub'
+Key 'w' is ambiguous
+Choose from: wait, write
+Choices were: exit, get, help, list, put, quit, save, server, set, use, wait, write
+Result = '<undef>'
+Search for 'w' on %commands, notfound = 'errsub'
+Result = '<undef>'
+Search for 'w' on %commands, notfound = 'errsub', ambig = 'errsub'
+Key 'w' is ambiguous
+Choose from: wait, write
+Choices were: exit, get, help, list, put, quit, save, server, set, use, wait, write
+Result = '<undef>'
+Search for 'wr' on @commands
+Result = 'write'
+Search for 'wr' on %commands
+Result = 'write'
+Search for 'wr' on @commands, notfound = 'errsub'
+Result = 'write'
+Search for 'wr' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'write'
+Search for 'wr' on %commands, notfound = 'errsub'
+Result = 'write'
+Search for 'wr' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'write'
+Search for 'wri' on @commands
+Result = 'write'
+Search for 'wri' on %commands
+Result = 'write'
+Search for 'wri' on @commands, notfound = 'errsub'
+Result = 'write'
+Search for 'wri' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'write'
+Search for 'wri' on %commands, notfound = 'errsub'
+Result = 'write'
+Search for 'wri' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'write'
+Search for 'writ' on @commands
+Result = 'write'
+Search for 'writ' on %commands
+Result = 'write'
+Search for 'writ' on @commands, notfound = 'errsub'
+Result = 'write'
+Search for 'writ' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'write'
+Search for 'writ' on %commands, notfound = 'errsub'
+Result = 'write'
+Search for 'writ' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'write'
+Search for 'write' on @commands
+Result = 'write'
+Search for 'write' on %commands
+Result = 'write'
+Search for 'write' on @commands, notfound = 'errsub'
+Result = 'write'
+Search for 'write' on @commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'write'
+Search for 'write' on %commands, notfound = 'errsub'
+Result = 'write'
+Search for 'write' on %commands, notfound = 'errsub', ambig = 'errsub'
+Result = 'write'
+Found 793 words in an array of 794 words
+*** STDERR ***

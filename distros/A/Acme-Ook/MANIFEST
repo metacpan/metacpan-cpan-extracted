@@ -1,0 +1,19 @@
+ChangeLog		New and improved
+MANIFEST		This file
+Makefile.PL		Run me
+README			Did you?
+bin/ook			The Ook interpreter
+lib/Acme/Ook.pm		Acme::Ook module
+ook/bananas.ook		daiquiri, anyone?
+ook/cat.ook		reads in Ook, prints out Ook
+ook/coffee.ook		mmmmmh
+ook/fib.ook		prints the Fibonacci numbers
+ook/hello.ook		the obligatory Hello World! example
+ook/ok.ook		an okay example
+ook/pi.ook		prints the number Pi
+ook/prime.ook		prints prime numbers
+ook/rev.ook		reads in a file (from stdin) and prints it in reverse
+t/hello.t		test greeting
+t/ok.t			test okay
+
+META.yml                                 Module meta-data (added by MakeMaker)

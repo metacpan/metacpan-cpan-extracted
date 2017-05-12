@@ -1,0 +1,26 @@
+---
+abstract: 'represents a WMA/ASF audio file'
+author:
+  - 'Nathaniel Heinrichs <nheinric@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Audio-File-Wma
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Audio::File: 0
+  Audio::WMA: 0
+  perl: 5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

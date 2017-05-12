@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Acme-Math-Google.t
+lib/Acme/Math/Google.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,2 @@
+Global symbol "\$NG" requires explicit package name (\(did you forget[^\)]+\) )?at in/2\.d/ng\.pm line 5\.
+Compilation failed in require at -e line 1\.

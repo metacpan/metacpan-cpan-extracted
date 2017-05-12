@@ -1,0 +1,215 @@
+#------------------------------------------------------------------------------
+# RCS-Id: "@(#)$RCS-Id: pod/v2/afsperlcm.pod 2e2ca60 Tue Apr 15 13:04:20 2014 +0200 Norbert E Gruener$"
+#
+# © 2001-2014 Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<AFS::CM> - Module to administer the B<AFS Cache Manager>
+
+=head1 SYNOPSIS
+
+  use AFS::CM qw (
+                  checkconn checkservers checkvolumes
+                  cm_access flush flushcb flushvolume
+                  getcacheparms getcellstatus
+                  getcrypt getvolstats setcrypt
+                  setcachesize setcellstatus
+                 );
+
+  my $ok = flushvolume('.');
+  print "Return Code = $ok\n";
+
+  $ok = checkvolumes;
+  print "Return Code = $ok\n";
+
+  $ok = cm_access($path);
+  print "Return Code = $ok\n";
+
+ ($max, $inuse) = getcacheparms;
+  $ok = setcachesize(10000);
+
+  my $crypt_flg = getcrypt;
+  $ok = setcrypt('on');
+
+=head1 DESCRIPTION
+
+This module provides several functions to administer the B<AFS Cache
+Manager>. It is used to customize the cache size. You can force the
+update of cached data.  And you can determine if a client machine can
+run SETUID programs.  Any function required must by explicitly listed
+by the C<use> statement to be exported into the calling package.
+
+Some of these functions have the optional argument FOLLOW.  FOLLOW
+determines which file should be used should PATH be a symbolic link.  If
+FOLLOW be set to 1, then the symbolic link is followed to its target.
+If FOLLOW is set to 0, then the function applies to the symbolic link
+itself.  If not specified FOLLOW defaults to 1.
+
+=head1 COMPATIBILITY
+
+B<This release does NOT support any features and interfaces
+from version 1.>
+
+=head1 EXPORTS
+
+=head2 Standard Exports
+
+none
+
+=head2 Optional Exports
+
+The following functions will be exported into your namespace if you
+specifically ask that they be imported.
+
+=over 4
+
+=item B<$ok = checkconn;>
+
+Checks the status of all the callers tokens held by the Cache Manager.
+Returns success if the caller has tokens, and all those tokens are valid
+(i.e, not expired).
+
+=cut
+
+# does not work properly ???
+
+# =item B<$ok = checkservers(FAST [, CELL [, IP]]);>
+
+# Reports whether certain AFS server machines are accessible from the
+# local client machine.  If the FAST flag is set to 1, the Cache Manager
+# does not probe any machines, but instead reports the results of the most
+# recent previous probe.  If the CELL argument is included, only machines
+# that are marked inaccessible and belong to the specified CELL are
+# listed.  If IP (default 0) is set to 1 then IP addresses will be
+# returned instead of hostnames.
+
+=item B<$ok = checkvolumes;>
+
+Forces the Cache Manager to update volume-related information.
+
+=item B<$ok = cm_access(PATH [, PERMS [,FOLLOW]]);>
+
+Returns 1 if caller has access with the given permissions PERMS (default
+'read') to given PATH.
+
+=item B<$ok = flush(PATH [, FOLLOW]);>
+
+Forces the Cache Manager to discard PATH.
+
+=item B<$ok = flushcb(PATH [, FOLLOW]);>
+
+Forces the Cache Manager to flush only the callback for PATH.
+
+=item B<$ok = flushvolume(PATH [, FOLLOW]);>
+
+Forces the Cache Manager to discard all cached data from the volume
+containing PATH.
+
+=item B<($max, $inuse) = getcacheparms;>
+
+Returns the current size of the cache and the amount being used.
+
+=item B<$setuid = getcellstatus([CELL]);>
+
+Determines whether the local Cache Manager allows SETUID programs to run
+or not.  Returns 1 if SETUID programs are allowed for given CELL
+(default local).
+
+=item B<$crypt_flg = getcrypt;>
+
+Gets the Cache Manager encryption flag.  This function is supported only
+under OpenAFS.
+
+=item B<$volinfo = getvolstats(PATH [, FOLLOW]);>
+
+Returns information about the volume containing PATH.  The return
+value is a reference to a hash table containing the values from the C
+structure C<VolumeStatus>.  The hash values can be up to five minutes
+old, because the Cache Manager polls the File Server for partition
+information at that frequency.  The hash table has the following keys
+
+    Blessed         BlocksInUse     InService
+    MaxQuota        MinQuota        Motd
+    Name            NeedsSalvage    OffMsg
+    Online          ParentId        PartBlocksAvail
+    PartMaxBlocks   Type            Vid
+
+You can find an example how to print the entire content of the
+returned hash reference in the C<examples/v2/cm> directory.
+
+=item B<$ok = setcachesize(NUM);>
+
+Sets the size of the disk cache. NUM is size in 1K byte blocks
+
+=item B<$ok = setcellstatus(SETUID_ALLOWED [,CELL]);>
+
+Enables or disables the local Cache Manager to run SETUID programs for
+the given CELL (default local).
+
+=item B<$ok = setcrypt(FLAG);>
+
+Set the Cache Manager encryption flag to FLAG. Valid values are 'on' or
+'off'.  This function is supported only under OpenAFS.
+
+=back
+
+=head1 CURRENT AUTHOR
+
+Norbert E. Gruener E<lt>nog@MPA-Garching.MPG.deE<gt>
+
+=head1 AUTHOR EMERITUS
+
+Roland Schemers E<lt>schemers@slapshot.stanford.eduE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (c) 2001-2010 Norbert E. Gruener <nog@MPA-Garching.MPG.de>.
+ All rights reserved.
+
+ Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University.
+ All rights reserved.
+
+Most of the explanations in this document are taken from the original
+AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ File Server/Cache Manager Interface
+ Edward R. Zayas
+ Copyright (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ Copyright (c) IBM Corporation 2000.
+ All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=over 6
+
+=item The original module is covered by the following copyright:
+
+Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation,
+advertising materials, and other materials related to such
+distribution and use acknowledge that the software was developed
+by Stanford University.  The name of the University may not be used
+to endorse or promote products derived from this software without
+specific prior written permission.
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=back
+
+=head1 DOCUMENT VERSION
+
+Revision $Rev: 1059 $

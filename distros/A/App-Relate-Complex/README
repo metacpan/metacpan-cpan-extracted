@@ -1,0 +1,49 @@
+App-Relate-version 0.04
+=======================
+
+Implements the functionality for the L<relate_complex> script,
+which uses the system's "locate" database to find file names that
+match multiple search terms.
+
+This version uses the List::Filter modules to get some
+flexibility and persistance advantages.
+
+It tries to access the locate database through File::Locate::Harder
+in order to be relatively portable.
+
+Note, this code base was originally released as App::Relate (up to
+version 0.03) when it was renamed with the tag "complex" to distinguish
+it from a newer, simpler design.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ List::Filter
+ List::Filter::Storage
+ List::Filter::Transform
+ List::Filter::Internal
+ Module::List::Pluggable
+ File::Locate::Harder
+ Test::Trap
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007 by Joseph Brenner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

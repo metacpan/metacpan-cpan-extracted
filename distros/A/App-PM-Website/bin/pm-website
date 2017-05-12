@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+# PODNAME: pm-website
+# ABSTRACT: command line front end to App::PM::Website
+
+
+use warnings;
+use strict;
+use App::PM::Website;
+App::PM::Website->run();
+
+
+
+=pod
+
+=head1 NAME
+
+pm-website - command line front end to App::PM::Website
+
+=head1 VERSION
+
+version 0.131611
+
+=head1 SYNOPSIS
+
+See L<App::PM::Website> for documentation
+
+=head1 AUTHOR
+
+Andrew Grangaard <spazm@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Andrew Grangaard.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+__END__
+

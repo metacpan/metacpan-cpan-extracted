@@ -1,0 +1,60 @@
+{
+   "abstract" : "Alien package for libusb (libusb-1.0) which provides generic access to USB devices",
+   "author" : [
+      "Henrik Brix Andersen <brix@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140",
+   "keywords" : [
+      "libusb",
+      "libusb-1.0",
+      "USB"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-LibUSBx",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base" : "0.003",
+            "Archive::Tar" : "0",
+            "Carp" : "0",
+            "Config" : "0",
+            "Env" : "0",
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.003",
+            "File::ShareDir" : "1.00",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::LibUSBx" : {
+         "file" : "lib/Alien/LibUSBx.pm",
+         "version" : "0.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/henrikbrixandersen/Alien-LibUSBx"
+      }
+   },
+   "version" : "0.12",
+   "x_test_requires" : {
+      "Config" : "0",
+      "Test::More" : "0"
+   }
+}

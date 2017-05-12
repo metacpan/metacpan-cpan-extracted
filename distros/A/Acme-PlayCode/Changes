@@ -1,0 +1,40 @@
+Revision history for Acme-PlayCode
+
+0.12    2010.1.15
+        fix Build.PL (RT 53680)
+
+0.11	2008.11.3
+		fix a bug in Acme::PlayCode::Plugin::NumberPlus
+
+0.10    2008.10.31
+        add Acme::PlayCode::Plugin::NumberPlus
+
+0.09    2008.10.28
+        fix t/201-exchange_space_bug.t
+
+0.08    2008.10.28
+        fix HereDoc thing
+
+0.07    2008.10.28
+        fix PrintComma with 'print'
+        do with PPI::Token::HereDoc
+
+0.06    2008.10.28
+        fix DoubleToSingle with "skip all '\' because I don't know which is fine"
+
+0.05    2008.10.25
+        fix Acme::PlayCode::Plugin::Averything
+
+0.04    2008.10.25
+        pod fix
+
+0.03    2008.10.20
+        add Acme::PlayCode::Plugin::Averything
+
+0.02    2008.10.19
+        API changed
+        add Acme::PlayCode::Plugin::PrintComma
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

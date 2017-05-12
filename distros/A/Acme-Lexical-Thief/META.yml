@@ -1,0 +1,38 @@
+---
+abstract: 'steal lexical variables from your caller'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::6 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Lexical-Thief
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Acme::Lexical::Thief:
+    file: lib/Acme/Lexical/Thief.pm
+    version: '0.002'
+requires:
+  Keyword::Simple: '0'
+  PadWalker: '0'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Acme-Lexical-Thief/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Acme-Lexical-Thief
+  homepage: https://metacpan.org/release/Acme-Lexical-Thief
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-acme-lexical-thief.git
+version: '0.002'

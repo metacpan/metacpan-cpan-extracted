@@ -1,0 +1,61 @@
+Revision history for Perl application App::SourcePlot
+
+1.27 2017-04-21
+
+    - Updated the included JCMT pointing catalog.
+
+1.26 2016-10-21
+
+    - Updated the included JCMT pointing catalog.
+
+1.25 2015-12-09
+
+    - Updated the included JCMT pointing catalog.
+
+1.24 2015-11-24
+
+    - Updated the included JCMT pointing catalog.
+
+1.23 2014-09-12
+
+    - Updated the included JCMT pointing catalog.
+
+1.22 2014-03-05
+
+    - Updated the included JCMT pointing catalog.
+    - Bug fix for elevation vs. time plot wrapping around.
+
+1.21 2013-11-29
+    - Increase number of grid lines for elevation.
+
+1.20 2013-09-24
+    - Assume hours for RJ/RB RA coordinates without colons.
+
+1.19 2013-05-29
+    - Updated the included JCMT pointing catalog.
+    - New source window opens with blank fields.
+    - Bug fix for time as the y-axis.
+    - Used Config::IniFiles to handle the configuration file.
+    - Removed obsolete code.
+    - Added Galactic and Az/El coordinate choices.
+
+1.18 2012-07-09
+    - Moved application code to an App/SourcePlot.pm module.
+
+1.17 2012-07-06
+    - Updated to use Astro::Coords and Astro::Catalog.
+
+1.15 2004-07-15
+    - Updated Tk parameter names for Perl 5.8 and Tk 804.
+
+1.11 1999-10-28
+    - Y2K compliant.
+
+1.08 1999-08-12
+    - Draw RA-Dec box with Az-El vectors.
+
+1.03 1998-12-11
+    - Load settings from the .splotcfg file.
+
+1.00 1998-08-24
+    - Initial version.

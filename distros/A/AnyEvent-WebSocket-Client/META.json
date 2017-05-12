@@ -1,0 +1,97 @@
+{
+   "abstract" : "WebSocket client for AnyEvent",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "AnyEvent-WebSocket-Client",
+   "no_index" : {
+      "directory" : [
+         "example"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "EV" : "0",
+            "IO::Socket::SSL" : "0",
+            "Math::Random::Secure" : "0",
+            "Net::SSLeay" : "0",
+            "PerlX::Maybe::XS" : "0"
+         },
+         "requires" : {
+            "AnyEvent" : "0",
+            "Moo" : "2.0",
+            "PerlX::Maybe" : "0.003",
+            "Protocol::WebSocket" : "0.20",
+            "URI" : "1.53",
+            "URI::ws" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Devel::Cycle" : "0",
+            "EV" : "0",
+            "Mojolicious" : "3.0",
+            "Test::Memory::Cycle" : "0",
+            "Test::Warn" : "0"
+         },
+         "requires" : {
+            "Protocol::WebSocket" : "0.20",
+            "Test::More" : "0.94",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/AnyEvent-WebSocket-Client/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/AnyEvent::WebSocket::Client",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/AnyEvent-WebSocket-Client.git",
+         "web" : "https://github.com/plicease/AnyEvent-WebSocket-Client"
+      }
+   },
+   "version" : "0.38",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

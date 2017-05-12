@@ -1,0 +1,28 @@
+---
+abstract: 'Pure Perl implementation of the Apache::Table interface'
+author:
+  - 'David E. Wheeler <david@justatheory.com>'
+build_requires:
+  Module::Build: 0.2701
+  Test::More: 0.17
+configure_requires:
+  Module::Build: 0.2701
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Apache-FakeTable
+provides:
+  Apache::FakeTable:
+    file: lib/Apache/FakeTable.pm
+    version: 0.06
+recommends:
+  Test::Pod: 1.41
+resources:
+  bugtracker: http://github.com/theory/apache-faketable/issues/
+  homepage: http://search.cpan.org/dist/Apache-FakeTable/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/theory/apache-faketable/
+version: 0.06

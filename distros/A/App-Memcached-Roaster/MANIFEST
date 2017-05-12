@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/App/Memcached/Roaster.pm
+minil.toml
+script/memcached-roaster
+t/compile.t
+META.yml
+MANIFEST

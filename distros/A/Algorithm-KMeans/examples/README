@@ -1,0 +1,82 @@
+
+Examples directory:
+
+
+1)  For the most basic clustering (with fixed K):
+
+        cluster_and_visualize.pl
+
+    The more time you spend with this script, the more comfortable you will
+    become with the use of this module. The script file contains a large
+    comment block that talks about the SIX LOCATIONS in the script where
+    you have to make decisions about how to use the module.
+
+
+
+2)  For clustering with an unknown value for K:
+
+       find_best_K_and_cluster.pl
+
+    This script is about the `K=0' option in the constructor that causes
+    the module to search for the best K for your data.  Since this search
+    is virtually unbounded --- subject only the size of your data file ---
+    it may a long time to run this script on a large data file.  Hence the
+    next script.
+
+
+
+3)  If your datafile is too large, you may need to range limit the values of
+    K that are searched through
+
+       find_best_K_in_range_and_cluster.pl
+
+
+
+4)  If you also want to include data normalization (it may reduce the
+    performance of the clusterer in some cases):
+
+       cluster_after_data_normalization.pl
+
+
+
+5)  When you include the data normalization step and you would like to
+    visualize the data before and after normalization:
+
+       cluster_and_visualize_with_data_visualization.pl*
+
+
+
+6)  After you are done clustering, let's say you want to find the cluster 
+    membership of a new data element. To see how you can do that, see the
+    script
+
+       which_cluster_for_new_data.pl
+
+    As written, the script gives you two answers for which cluster the new
+    data element belongs to.  One of these is using the Euclidean metric to
+    calculate the distances between the new data element and the cluster
+    centers, and the other using the Mahalanobis metric.  If the clusters
+    are strongly elliptical in shape, you are likely to get better results
+    with the Mahalanobis metric.
+
+    To see that you can get two different answers using the two different
+    distance metrics mentioned above, run the which_cluster_for_new_data.pl
+    script on the data in the file mydatafile3.dat.  To make this run, note
+    that you have to comment out and uncomment the lines at FOUR different
+    locations in the script.
+
+
+=================================================================================
+
+
+Support scripts:
+
+
+7)  For generating the data for experiments with clustering
+
+       data_generator.pl
+
+
+8)  For cleaning up the examples directory
+
+       cleanup_directory.pl

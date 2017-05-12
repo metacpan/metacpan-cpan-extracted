@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+# -*- Mode: perl -*-
+# file: movie
+# Moviedb "movie" display
+
+use strict;
+use lib '..';
+use vars '$DB';
+use Ace 1.51;
+use Ace::Browser::AceSubs;
+
+use CGI 2.42 qw/:standard :html3 escape/;
+
+my $movie = GetAceObject();
+
+PrintTop($movie,'Movie');
+print_prompt();
+AceNotFound() unless $movie;
+print_report($movie);
+PrintBottom();
+
+exit 0;
+
+sub print_prompt {
+    print
+	start_form(),
+	p("Database ID",
+	  textfield(-name=>'name'),
+	  hidden(class=>'Movie'),
+	  ),
+        end_form;
+}
+
+sub print_report {
+  my $movie = shift;
+
+  print h2($movie->Title);
+  print p("Directed by ",map { ObjectLink($_,$_->Full_name) } $movie->Director);
+  print table(
+	      TR({-align=>'LEFT'},
+		 th('Released'),
+		 td($movie->Released)),
+	      TR({-align=>'LEFT'},
+		 th(em('Starring')),
+		 td(map { ObjectLink($_,$_->Full_name) } $movie->Cast)),
+	      TR({-align=>'LEFT'},
+		 th(em('Writer(s)')),
+		 td(map { ObjectLink($_,$_->Full_name) } $movie->Writer)),
+	      $movie->Based_on ?
+	      (TR({-align=>'LEFT'},
+		  th(em('Adapted from')),
+		  td(map { ObjectLink($_,$_->Title) } $movie->Based_on)))
+	      : '',
+	     );
+}

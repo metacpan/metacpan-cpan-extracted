@@ -1,0 +1,57 @@
+NAME
+    Algorithm::LatticePoints - Run code for each lattice points
+
+SYNOPSIS
+      use Algorithm::LatticePoints;
+        my $al = Algorithm::LatticePoints->new(
+            sub {
+                printf "[%s]\n", join( ", ", @_ );
+            }
+        );
+        $al->visit( [0,0,0,0], [9,9,9,9] );
+
+        # instead of 
+        for my $t (0..9){
+          for my $z (0..9){
+            for my $y (0..9){
+              for my $x (0..9){
+                print "[$x, $y, $z, $t]\n";
+              }
+            }
+          }
+        }
+
+DESCRIPTION
+    Lattice-point handling is a common chore. You do it for image
+    processing, 3-d processing, and more. Usually you do it via nested for
+    loops but it is boring and tedious. This module loops for you instead.
+
+  METHODS
+    new(\&coderef)
+      Pass a coderef which processes each lattice point.
+
+    visit([$s1,$s2...$sn],[$e1,$e2...$en])
+      Runs the code for each latice point between [$s1,$s2...$sn] and
+      [$e1,$e2...$en], inclusive.
+
+  EXPORT
+    None.
+
+PERFOMANCE
+    Compared to good old for loops, you will lose 20% performance for 10^3
+    lattice but only 4% for 10^4 lattice. The larger the lattice gets the
+    less the performance loss impacts.
+
+SEE ALSO
+    perlsyn
+
+AUTHOR
+    Dan Kogai, <dankogai@dan.co.jp>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by Dan Kogai
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

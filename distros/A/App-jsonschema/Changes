@@ -1,0 +1,22 @@
+Changelog for App-jsonschema
+
+0.03 2013-09-09T10:10:07
+ [André Santos <andrefs@cpan.org>]
+ - POD
+
+ - updated POD
+
+
+v0.01_01 2013-03-25T18:23:01
+ [André Santos <andrefs@cpan.org>]
+ - added more test cases (tests yet TODO)
+
+ - little improvement on documentation
+
+ - POD and cleaning for dzilla
+
+ - kickoff
+
+ - initial commit
+
+

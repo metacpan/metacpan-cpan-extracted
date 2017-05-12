@@ -1,0 +1,17 @@
+Build.PL
+Makefile.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Array/Splice.pm
+lib/Array/Splice.xs
+t/00-load.t
+t/error.t
+t/pod.t
+t/refcount.t
+t/tie.t
+t/boilerplate.t
+t/pod-coverage.t
+t/push.t
+t/splice.t

@@ -1,0 +1,34 @@
+AIS/client version 0.05
+=======================
+
+Authenticate a user of a HTTP web page using the kerberos-like AIS
+(Authenticated Identity Service)  protocol, using netscape cookies,
+defaulting to the pay2send.com public AIS server.
+
+A persistent per-session stash is provided in addition to the
+user's authenticated identity.
+
+This version has not been tested under mod_perl, but future
+versions will be.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+DirDB (but another persistence framework would work too.)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 David Nicol davidnico@cpan.org
+released under GNU public license (GPL)
+
+

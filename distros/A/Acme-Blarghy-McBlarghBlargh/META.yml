@@ -1,0 +1,21 @@
+---
+abstract: ~
+author:
+  - 'Devin Austin'
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Blarghy-McBlarghBlargh
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+  Net::Twitter: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.0022

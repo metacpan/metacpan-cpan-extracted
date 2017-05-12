@@ -1,0 +1,665 @@
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* style common to all pages in the site */
+
+/* for the fixed navbar make sure content stops short of page top*/
+body {
+  padding-top: 50px;
+}
+
+.navbar-inner .container {
+  background: url(../images/navbar_disco.png) no-repeat;
+}
+
+/* used for icons in sidebar search buttons */
+.nd_navbar-icon {
+  vertical-align: sub;
+  margin-top: 4px;
+  cursor: pointer;
+}
+
+/* careful align of navbar search button and menu */
+.nd_navbar-search-group {
+  margin-top: 0px !important;
+}
+.nd_navbar-search-icon {
+  color: #999;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.nd_navbar-search-caret {
+  padding-top: 10px !important;
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+}
+
+/* for the "logged in as..." text */
+.nd_navbar-text {
+  color: #666;
+  padding-top: 11px;
+}
+
+/* on both main content and sidebar, default is hidden */
+.tab-content {
+  overflow: visible;
+}
+
+/* ajax results should fill all available */
+.tab-content table {
+  width: 100%;
+}
+
+/* results table header should have a background, for floatThead */
+div.content > div.tab-content table.nd_floatinghead thead {
+  background-color: floralWhite;
+}
+
+/* jquery ui autocomplete scrollable */
+.ui-autocomplete {
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* fake looks for form submit buttons embedded in bootstrap dropdowns */
+.nd_btn-link {
+  display: block;
+  padding: 2px 20px;
+  clear: both;
+  font-weight: normal;
+  line-height: 18px;
+  color: #333333;
+  white-space: nowrap;
+  text-decoration: none;
+  margin-top: 0px !important;
+  width: 100%;
+  text-align: left;
+  margin-left: -1px;
+}
+
+.nd_btn-link:hover, .nd_btn-link:focus {
+  text-decoration: none;
+  color: #ffffff;
+  background-color: #0081c2;
+  background-repeat: repeat-x;
+  text-shadow: none;
+}
+
+/* to be added to qtip-bootstrap class */
+.nd_qtip-unconstrained {
+  min-width: none;
+  max-width: none;
+}
+
+.qtip-content {
+  padding-bottom: 0px;
+  line-height: 8px;
+}
+
+/* for where min-width is set but we don't want it */
+.nd_no-min-width {
+  min-width: 0px;
+}
+
+/* for when hidden modals interfere with mouse actions on higher elements */
+.nd_deep-horizon {
+  z-index: -1000;
+}
+
+/* for when we pinch h4 styling but don't want bold */
+.nd_unbolden {
+  font-weight: normal;
+}
+
+/* for System Information bar */
+.nd_sysinfo-heading {
+  background-color: #eeeeee;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* styles to adjust the hero box used for homepage + login */
+
+/* space between hero box and navbar */
+.nd_hero-row {
+  margin-top: 50px;
+}
+
+/* alter proportions of hero unit to make it "tighter" on content */
+.hero-unit {
+  padding: 30px 60px 40px 90px;
+}
+
+/* push user/pass/login form down+away from the Netdisco banner text */
+.nd_login-form {
+  margin-top: 15px;
+  margin-bottom: 0px;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* styles for device inventory */
+
+.nd_inventory-table-head {
+  text-align: center;
+  color: lightSlateGray;
+  margin-top: 6px;
+  margin-bottom: 3px;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* styles for links in results tables */
+
+/* make the whole cell become a hyperlink in results table */
+.nd_linkcell {
+  display: block;
+  padding: 0px;
+  height: 100%;
+}
+
+/* still a link, but styled like normal text */
+.nd_stealth-link {
+  text-decoration: none !important;
+  color: #404040;
+}
+
+/* nudge cell content to the right when port_control controls are enabled */
+.nd_editable-cell > .nd_this-port-only {
+  margin-left: 14px;
+  margin-right: 35px;
+}
+.nd_editable-cell > .nd_port-only-first {
+  margin-left: 5px;
+}
+
+.nd_editable-cell > .nd_editable-cell-content {
+  margin-right: 25px;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* styles to position table cell content */
+
+.table td {
+  vertical-align: baseline;
+}
+
+.table .nd_center-cell {
+  text-align: center;
+}
+
+td.nd_devport-icon i {
+  line-height: 18px;
+}
+
+/* undo nd_center-cell when in a modial dialog (which lives in table cell) */
+.table .nd_center-cell .modal-body {
+  text-align: left;
+}
+
+/* fix layout of form fields inside the (topology) table */
+td div.input-append {
+  margin-bottom: 0px;
+}
+
+/* admin buttons in the device details view */
+td > form.nd_inline-form {
+  margin-bottom: 2px;
+}
+
+/* fix layout of form fields inside the (pseudo devices) table */
+.nd_center-cell input {
+  margin-bottom: 0px;
+}
+
+/* with two forms inside one cell, make the submit buttons side-by-side */
+.nd_inline-form {
+  display: inline;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* styles for "tabs" and surrounding content */
+
+
+/* add a small bottom margin (gutter) below all pages */
+#nd_search-results {
+  margin-bottom: 10px;
+}
+
+/* for any label which we want to appear alongside tabs, floated to the right */
+#nd_device-name {
+  float: right;
+  margin-bottom: 0px;
+  margin-top: 9px;
+  font-weight: bold;
+  color: #6D5720;
+}
+
+/* reset to normal weight for the download as CSV icon */
+#nd_csv-download {
+  font-weight: normal;
+}
+
+#nd_csv-download:hover, #nd_sidebar-reset-link:hover {
+  text-decoration: none;
+}
+
+/* for the job control admin page play/pause links */
+#nd_countdown-refresh:hover, #nd_countdown-control:hover {
+  text-decoration: none;
+}
+
+/* when there's only one tab (report, task etc) change the text color */
+.nd_single-tab {
+  color: rgb(187,112,0) !important;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* style for port_control controls */
+
+/* edit icon in details tab is in the label (not content) cell so nudge to RHS*/
+.nd_device-details-edit {
+  float: right !important;
+  font-size: 14px;
+}
+
+/* port admin up/down control */
+.nd_edit-icon, .nd_hand-icon {
+  cursor: pointer;
+  float: right;
+  display: none;
+}
+
+.nd_hand-icon {
+  margin-right: 4px;
+}
+
+/* port admin log view */
+.nd_log-icon {
+  cursor: pointer;
+  color: black;
+  float: right;
+  padding-left: 10px;
+  margin-top: 2px;
+}
+.nd_log-icon:hover, .nd_log-icon:focus {
+  text-decoration: none;
+  color: black;
+}
+
+/* port power control */
+.nd_power-icon {
+  cursor: pointer;
+}
+
+/* the port power icon, whether it's on or off */
+.icon-off {
+  vertical-align: middle;
+  color: darkRed;
+}
+
+/* change color of icon from default of red (which is OK for power-off) */
+.nd_power-on {
+  color: darkGreen;
+}
+
+/* style of editable content in any table - yellow background */
+[contenteditable]:focus {
+  background: #FFFFD3 !important;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* styles for collapsing lists - sidebar or main table cell content */
+
+/* sidebar collapser is clickable and deep grey */
+.nd_collapser {
+  cursor: pointer;
+  color: #0088CC;
+}
+
+/* vlans collapser also clickable and deep grey but with no link styling */
+.nd_collapse-vlans {
+  cursor: pointer;
+  color: #0088CC;
+  text-decoration: none !important;
+}
+
+/* set default state of collapsible lists as collapsed (hidden) */
+.nd_collapse-pre-hidden {
+  display: none;
+}
+
+/* for the tagged vlans total when hiding the full list */
+.nd_vlan-total {
+  float: right;
+}
+
+/* little up/down chevron to the right of some collapsed list */
+.nd_arrow-up-down-right {
+  float: right;
+  margin-top: 1px;
+  margin-right: 1px;
+  color: #555;
+}
+
+/* little up arrow to the left of a label for collapsed list */
+.nd_arrow-up-down-left {
+  float: left;
+  margin-right: 6px;
+  color: #555;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* styles for sidebar placement and sizing */
+
+/* make the sidebar fixed on the screen */
+.container-fluid > .nd_sidebar {
+  position: absolute;
+  right: 20px;
+  width: 200px;
+  left: auto;
+}
+
+/* nudge content in the sidebar closer to the left */
+.nd_sidebar-form {
+  padding-left: 0px;
+  margin-top: -9px;
+  margin-bottom: 0px;
+}
+
+/* reduce padding at the bottom of the sidebar content */
+.container-fluid > .nd_sidebar > .well {
+  padding-bottom: 15px;
+}
+
+/* pull tab content away from the sidebar */
+.container-fluid > .content {
+  margin-right: 215px;
+  margin-left: 0px;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* styles for sidebar position controls (collapse, pin) */
+
+.nd_sidebar-pinned {
+  position: fixed !important;
+}
+
+.nd_sidebar-pin-clicked {
+  color: rgba(255,0,0,0.8) !important;
+}
+
+.nd_sidebar-pin {
+  float: left;
+  margin-top: 8px;
+  margin-left: -16px;
+  font-size: 15px;
+  color: #555;
+  cursor: pointer;
+}
+
+.nd_sidebar-reset {
+  float: left;
+  margin-top: 27px;
+  margin-left: -16px;
+  font-size: 15px;
+  color: #555;
+  cursor: pointer;
+}
+
+#nd_sidebar-toggle-img-in {
+  float: left;
+  margin-top: -10px;
+  margin-left: -16px;
+  font-size: 15px;
+  color: #555;
+  cursor: pointer;
+}
+
+#nd_sidebar-toggle-img-out {
+  position: fixed;
+  top: 60px;
+  right: 7px;
+  z-index: 1;
+  color: #555;
+  cursor: pointer;
+  display: none;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* style customization for many items which appear in the sidebar */
+
+/* text in the sidebar */
+.nd_sidebar-title {
+  margin-left: 10px;
+  margin-top: 6px;
+  margin-bottom: 12px;
+}
+
+/* Flabels in netmap sidebar (not in a collapser) */
+.nd_sidebar-label {
+  margin-left: 7px;
+}
+
+/* fixup for prepended checkbox in sidebar */
+.nd_searchcheckbox {
+  width: 121px;
+  padding-left: 8px;
+  cursor: pointer;
+}
+
+/* fixup for prepended partial port name checkbox in sidebar */
+.nd_port-partial-checkbox {
+  width: 84px;
+  padding: 0px 0px 0px 5px !important;
+  cursor: pointer;
+}
+
+.nd_port-partial-label {
+  padding: 0px !important;
+}
+
+.nd_port-partial {
+  margin-left: 5px !important;
+  margin-top: -5px;
+  margin-bottom: 5px !important;
+}
+
+/* fixup for prepended invert port name checkbox in sidebar */
+.nd_port-invert-checkbox {
+  width: 30px;
+  padding: 0px 0px 0px 5px !important;
+  cursor: pointer;
+}
+
+.nd_port-invert-label {
+  padding: 0px !important;
+  /* for some reason only .add-on:first-child gets these */
+  -webkit-border-radius: 4px 0 0 4px !important;
+  -moz-border-radius: 4px 0 0 4px !important;
+  border-radius: 4px 0 0 4px !important;
+}
+
+.nd_port-invert {
+  margin-left: 5px !important;
+  margin-top: -5px;
+  margin-bottom: 5px !important;
+}
+
+/* fixup for prepended checkbox in sidebar */
+.nd_sidebar .input-prepend {
+  margin-left: -2px;
+  margin-bottom: 0px;
+}
+
+/* for some reason bootstrap 2.1.0 displays add-on as block - no check supprt? */
+.nd_checkboxlabel {
+  display: inline;
+}
+
+/* placement of form field in sidebar */
+.nd_side-input {
+  margin-left: -3px;
+  width: 151px;
+}
+
+/* placement of form field in sidebar */
+.nd_side-select {
+  margin-left: -3px;
+  width: 165px;
+}
+
+/* nudge the port name/vlan filter over a little (as compared to nd_side-select) */
+#nd_port-query {
+  margin-left: 5px !important;
+  width: 152px;
+}
+.nd_sidebar-topinput {
+  margin-left: 5px !important;
+  width: 152px;
+}
+
+/* set the day/mon/year drop-down width */
+#nd_days-select {
+  margin-top: 4px;
+  width: 56px;
+}
+
+/* set the day/mon/year drop-down width */
+#nd_age-select {
+  margin-top: 4px;
+  width: 95px;
+}
+
+/* set the port state select width */
+#nd_port-state-select {
+  margin-left: -3px;
+  width: 158px;
+}
+
+/* set the MAC format drop-down width */
+#nd_mac-format {
+  margin-top: 4px;
+  width: 155px;
+}
+
+/* set the MAC format drop-down width */
+#nd_node-mac-format {
+  margin-left: -3px;
+  margin-bottom: 4px;
+  width: 165px;
+}
+
+/* sidebar submit button width and spacing */
+
+/* when the sidebar submit button DOES NOT HAVE a dropdown */
+.nd_sidebar button:not(.nd_sidebar-btn-drop):not(.nd_sidebar-btn-drop-drop) {
+  margin-top: 9px;
+  margin-left: -3px;
+  width: 165px;
+}
+
+/* FIXME when the sidebar submit button HAS a dropdown */
+.nd_sidebar-btn-drop {
+  width: 138px;
+}
+.nd_sidebar-btn-drop-drop {
+  height: 28px;
+  width: 28px;
+}
+
+/* little icon inside of search input fields */
+.nd_field-clear-icon, .nd_field-copy-icon {
+  position: absolute;
+  margin-left: 140px;
+  margin-top: 5px;
+  z-index: 1;
+  padding: 0px;
+  cursor: pointer;
+}
+
+/* little icon inside of search input fields */
+.nd_field-copy-icon {
+  color: #999;
+}
+
+/* little icon inside of search input fields */
+.nd_field-clear-icon {
+  background-color: #A9DBA9;
+  color: #3A87AD;
+}
+
+ /* same for the ports form, but the positioning is slightly different */
+#ports_form .nd_field-clear-icon {
+  margin-left: 149px;
+  margin-top: 5px;
+}
+
+/* change bg color for form fields which are being used in a search */
+form .clearfix.success select {
+  background-color: #A9DBA9;
+}
+form .clearfix.success input {
+  background-color: #A9DBA9;
+}
+
+/* bring sidebar items closer together */
+.nd_inputs-list label {
+  margin-bottom: 1px;
+}
+
+/* nudge content closer to the header labels in the sidebar */
+.nd_inputs-list li:first-child {
+  padding-top: 3px !important;
+}
+
+.nd_sidebar-legend {
+  margin-bottom: 9px;
+}
+
+.nd_netmap-sidebar {
+  margin-top: 7px;
+  margin-left: -9px;
+}
+
+.nd_netmap-sidebar-help {
+  margin-left: 32px;
+}
+
+.icons-ul {
+  margin-left: 22px;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* D3 SVG */
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node {
+  font: 10px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 1.5px;
+}
+
+.neighbor {
+  fill: none;
+  stroke: #aaa;
+  stroke-width: 2px;
+  display: none;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* dataTables */
+
+div.nd_datatables-pager {
+  float: left;
+  margin-left: 50px;
+}
+
+td.nd_nowrap {
+  white-space: nowrap;
+}

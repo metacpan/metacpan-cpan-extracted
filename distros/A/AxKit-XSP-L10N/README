@@ -1,0 +1,118 @@
+NAME
+    AxKit::XSP::L10N - String localization (L10N) taglib for AxKit
+
+SYNOPSIS
+    Add this taglib to AxKit in your http.conf or .htaccess:
+
+        AxAddXSPTaglib AxKit::XSP::L10N
+
+    and set your base L10N module path:
+
+        PerlSetVar  AxL10NBase  MyPackage::L10N
+
+    Add the namespace to your XSP file and use the tags:
+
+        <xsp:page
+             language="Perl"
+             xmlns:xsp="http://apache.org/xsp/core/v1"
+             xmlns:l10n="http://today.icantfocus.com/CPAN/AxKit/XSP/L10N"
+        >
+
+        <l10n:translate value="Please select a state from the list below"/>
+
+DESCRIPTION
+    This tag library provides an interface to localiize string values within
+    XSP pages using "Locale::Maketext".
+
+TAG HIERARCHY
+        <l10n:translate base="" lang="en|fr|..." value="" param="">
+            <l10n:base></l10n:base>
+            <l10n:lang></l10n:lang>
+            <l10n:value></l10n:value>
+            <l10n:param></l10n:param>
+        </l10n:translate>
+
+TAG REFERENCE
+  <l10n:translate>
+    Translates a given string value to the language of the users browser, or
+    to the language specified in the "lang" attribute.
+
+    The "translate" tag has three options:
+
+    base
+        If you need to use different sets of localization modules within the
+        same page or sets of pages and "AxL10NBase" is too strict, you can
+        specify the base module name to be loaded for each call to
+        translate:
+
+            PerlSetVar AxL10NBase MyModule::L10N;
+
+            <l10n:translate value="Submit" lang="en"/>
+                # uses MyModule::L10N::en
+
+            <l10n:translate base="OtherModule::L10N" lang="en"/>
+                # uses OtherModule::L10N::en
+
+        If no "base" or "AxL10NBase" are specified, or the given "base" or
+        "AxL10NBase" can't be loaded, the supplied "value" will be returned.
+
+    lang
+        This specifies the target language to localize the string to. It can
+        be specified as either an attribute, or as a child tag.
+
+            <l10n:translate lang="fr"></l10n:translate>
+
+        If no "lang" is supplied, "Locale::Maketext" will attempt to guess
+        the best language. Since this is running under AxKit/mod_perl, it
+        should find the language specified in the "Accept-Language" header
+        of the users browser.
+
+    value
+        This is the string to be localized. It can be specified as either an
+        attribute, or as a child tag.
+
+            <l10n:translate>English</l10n:translate>
+
+        Make sure to read the section on "AUTO LEXICONS" in
+        "Locale::Maketext" for more information on the various methods and
+        actions performed when no entry can be found for "value" or no
+        suitable language modules can be found.
+
+    param
+        These are values parameters to be used in "Locale::Maketext"s
+        "BRACKET NOTATION". This is similiar to using parametera in
+        "sprinf".
+
+            <l10n:translate>
+                <l10n:value>You have [_1] items marked in [_2] folders.</l10n:value>
+                <l10n:param>23</l10n:param>
+                <l10n:param>5</l10n:param>
+            </l10n:translate>
+
+        It can be specified as either an attribute, or as a child tag. Note,
+        when using "param" as an attribute, it can only be specified once.
+        If you need to pass more than one attribute, pass them in as child
+        tags instead.
+
+        See "Locale::Maketext" for more information on the use of
+        parameters.
+
+CONFIGURATION
+    The following configuration variables are available:
+
+  AxL10NBase
+    This sets the name of the base localization module to use. See
+    "Locale::Maketext" for more information how to construct the base
+    localization module and specific language module lexicons.
+
+        AxL10NBase  MyPackage::L10N
+
+SEE ALSO
+    Locale::Maketext
+
+AUTHOR
+        Christopher H. Laco
+        CPAN ID: CLACO
+        claco@chrislaco.com
+        http://today.icantfocus.com/blog/
+

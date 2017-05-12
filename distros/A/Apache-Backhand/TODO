@@ -1,0 +1,7 @@
+Stuff that may make it into future versions (patches welcome!)
+ . example replacement for backhand-handler
+ . examples of byPerl functions
+ . ability to pass arguments into byPerl functions (limited by the want23
+   prototype of BackhandFromSO, unfortunately...)
+ . serverstat items hostname and contact should be magically mirrored into
+   perl like all the others

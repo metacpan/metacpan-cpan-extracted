@@ -1,0 +1,76 @@
+Revision history for App-Termcast
+
+0.13  2014-09-16
+      - Use a less intrusive (and more easily parsable) escape sequence for
+        metadata. I believe terminals should just ignore this if it ends up
+        actually getting sent to the terminal instead of stripped out by the
+        termcast server, but let me know if this isn't the case.
+
+0.12  2012-03-15
+      - Handle disconnection better (make sure old connections are really
+        dropped, stop pegging cpu after reconnect)
+
+0.11  2012-03-07
+      - Add some more options to stream_ttyrec
+      - Convert to use Term::Filter
+
+0.10  2011-04-14
+      - Better handling of the terminal's raw mode, especially during
+        reconnections
+      - Ensure that the server actually accepts our password
+      - Send terminal geometry with hello
+      - Send terminal geometry metadata on the fly
+      - Make the test suite a bit more reliable
+
+0.09  2010-11-03
+      - More window resizing fixes
+
+0.08  2010-11-03
+      - Clean up a few more edge cases with disconnects and window resizing
+        (doy, jasonmay)
+      - Repeatedly attempt reconnects if they fail, rather than just giving up
+        after trying once
+
+0.07  2010-06-15
+      - Refactor the establishment message (the first line sent to the termcast
+        server) to its own attribute (jasonmay)
+
+      - Convert to more dzil stuff
+
+0.06  2010-04-19
+      - Fix reconnecting (was using wrong method name)
+
+0.05  2010-04-18
+      - Fix the default termcast server (how did that get changed?)
+
+0.04  2010-04-18
+      - Stop ending the session when there is an error while writing to the
+        termcast server
+
+      - Refactor the code a bit to allow sending arbitrary data to the termcast
+        server without requiring an interactive session
+
+      - Add a script to stream a ttyrec file to the termcast server
+
+      - The command for the run method to run is now required to be passed to
+        the run method, rather than figuring it out from ARGV directly
+
+0.03  2010-03-27
+      - Reconnect to the termcast server if the connection is interrupted
+
+0.02  2009-09-27
+      - Add new option --bell-on-watcher to send a bell to your terminal
+        whenever a watcher connects
+
+      - Stop dying when the terminal is resized
+
+      - Use Scope::Guard to better clean up ReadMode when we're done
+
+0.01  2009-07-11
+      - A few more bug fixes, and actual tests
+
+0.01_02  2009-07-10
+      - A few bug fixes
+
+0.01_01  2009-07-10
+      - Initial release

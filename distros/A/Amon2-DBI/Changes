@@ -1,0 +1,54 @@
+Revision history for Perl module Amon2::DBI
+
+0.33 2015-09-30T06:52:06Z
+
+    - testing fix
+
+0.32 2012-12-03
+
+    - Fixed transaction management bug introduced in 0.31.
+      The version is completely broken. DO NOT USE IT.
+
+0.31 2012-11-29
+
+    [BROKEN VERSION. DO NOT USE THIS VERSION.]
+    - fixed cicric reference
+
+0.30 2012-10-20
+
+    [INCOMPATBILE CHANGE]
+    - do not handle exception in Amon2::DBI, and use RaiseError.
+
+0.08 2011-11-08
+
+    - fixed charset in 05_mysql.t utf8 subtest(makamaka)
+
+0.07 2011-11-07
+
+    - added auto pg_enable_utf8 setting(makamaka)
+    - made dsn check case-insensitive(makamaka)
+
+0.06 2011-10-01
+
+    - [BUG FIX] fixed error handler on mysql
+
+0.05 2011-05-14
+
+    - specify the version number of depended moduels
+
+0.04 2011-04-05
+
+    - call $dbh->SUPER::connected().  (kazeburo)
+
+0.03 2011-02-28
+
+    - do not use '//' on 5.8 modules! orz.
+
+0.02 2011-02-26
+
+    - make DBD::SQLite as optional deps
+
+0.01 2011-02-26
+
+    - original version
+

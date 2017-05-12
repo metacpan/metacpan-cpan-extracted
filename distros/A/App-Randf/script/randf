@@ -1,0 +1,42 @@
+#!perl
+use strict;
+use warnings;
+use App::Randf;
+
+App::Randf->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+randf - random filter for STDIN
+
+=head1 SYNOPSIS
+
+    $ tail -f high_flow_log | randf 10
+
+=head2 CONFIGURATION
+
+C<randf> command will look for a configuration file before reading its command line parameters. This function depends on L<Config::CmdRC>.
+
+The configuration file is B<.randfrc> . And the location of a configuration file is B</etc> or B<$HOME> but if the C<CMDRC_DIR> environment variable is set, C<randf> will look for configuration file in that directory or B<current directory>.
+
+A sample configuration file might read:
+
+    per: 10
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<App::Randf>
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=cut

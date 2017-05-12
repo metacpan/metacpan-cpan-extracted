@@ -1,0 +1,51 @@
+{
+   "abstract" : "The errno theme",
+   "author" : [
+      "Philippe Bruhat (BooK) <book@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-MetaSyntactic-errno",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::MetaSyntactic" : "1.001",
+            "Test::More" : "0.94"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::MetaSyntactic" : "1.001",
+            "perl" : "5.006_002"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::MetaSyntactic::errno" : {
+         "file" : "lib/Acme/MetaSyntactic/errno.pm",
+         "version" : "1.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/book/Acme-MetaSyntactic-errno"
+      }
+   },
+   "version" : "1.003"
+}

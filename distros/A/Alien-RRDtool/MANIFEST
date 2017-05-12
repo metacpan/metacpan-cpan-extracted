@@ -1,0 +1,20 @@
+.shipit
+Build.PL
+Changes
+inc/MyBuilder.pm
+lib/Alien/RRDtool.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+patch/v1.4.7.patch
+README.pod
+rrdtool.tar.gz
+t/000_load.t
+t/001_basic.t
+xt/perlcritic.t
+xt/pod.t
+xt/podcoverage.t
+xt/podspell.t
+xt/podsynopsis.t

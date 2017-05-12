@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         AI-NaiveBayes1
+version:      2.006
+version_from: NaiveBayes1.pm
+installdirs:  site
+requires:
+    YAML:                          0.0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

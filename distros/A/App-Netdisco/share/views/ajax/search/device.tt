@@ -1,0 +1,71 @@
+<table id="ds-data-table" class="table table-striped table-bordered" width="100%" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Device</th>
+      <th>Contact</th>
+      <th>Location</th>
+      <th>System Name</th>
+      <th>Model</th>
+      <th>OS Version</th>
+      <th>Management IP</th>
+      <th>Serial</th>
+      <th>Last Discovered</th>
+    </tr>
+  </thead>
+</table>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  var table = $('#ds-data-table').dataTable({
+    "deferRender": true,
+    "data": [% results %],
+    "columns": [{
+        "data": 'ip',
+        "render": function(data, type, row, meta) {
+          return '<a href="[% uri_for('/device') %]?q=' + encodeURIComponent(data) + '">' + he.encode(row.dns || row.name || row.ip) + '</a>';
+        }
+      }, {
+        "data": 'contact',
+        "render": function(data, type, row, meta) {
+          return he.encode(data || '');
+        }
+      }, {
+        "data": 'location',
+        "render": function(data, type, row, meta) {
+          return he.encode(data || '');
+        }
+      }, {
+        "data": 'name',
+        "render": function(data, type, row, meta) {
+          return he.encode(data || '');
+        }
+      }, {
+        "data": 'model',
+        "render": function(data, type, row, meta) {
+          return he.encode(data || '');
+        }
+      }, {
+        "data": 'os_ver',
+        "render": function(data, type, row, meta) {
+          return he.encode(data || '');
+        }
+      }, {
+        "data": 'ip',
+        "render": function(data, type, row, meta) {
+          return he.encode(data || '');
+        }
+      }, {
+        "data": 'serial',
+        "render": function(data, type, row, meta) {
+          return he.encode(data || '');
+        }
+      }, {
+        "data": 'last_discover_stamp',
+        "render": function(data, type, row, meta) {
+          return he.encode(data || '');
+        }
+      }
+    ],
+[% INCLUDE 'ajax/datatabledefaults.tt' -%]
+  });
+});</script>

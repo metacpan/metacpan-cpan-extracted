@@ -1,0 +1,20 @@
+Apache2::AuthCookieDBI is a module that subclasses Apache2::AuthCookie and is
+designed to be directly used for authentication in a mod_perl server.
+
+It is a ticket-issuing system that looks up username/passwords in a DBI
+database using generic SQL and issues MD5-checksummed tickets valid for
+a configurable time period.  Incoming requests with tickets are
+checksummed and expire-time checked.
+
+Version 2.03 and later: mod_perl 1.999_22 and later. Apache::*
+replaced by Apache2::
+
+Latest distribution at: http://search.cpan.org/dist/Apache2-AuthCookieDBI
+Source code at:         https://github.com/matisse/Apache-AuthCookieDBI/
+ 
+Apache::AuthCookieDBI versions:
+Version 2.0 and later: mod_perl 1.99_XX
+Version 1.22 was the last version that works with mod_perl 1.x
+
+
+Maintainer: matisse@cpan.org

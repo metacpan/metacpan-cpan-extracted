@@ -1,0 +1,33 @@
+Acme::Steganography::Image::Png version 0.06
+============================================
+
+
+Acme::Steganography::Image::Png is extremely ineffective at hiding your
+secrets inside Png images.
+
+If you want real steganography, you're in the wrong place.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Imager
+  Class::Accessor
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005,2006 Nicholas Clark
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

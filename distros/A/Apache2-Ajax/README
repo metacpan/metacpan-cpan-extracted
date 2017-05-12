@@ -1,0 +1,32 @@
+This module is a mod_perl2 interface to CGI::Ajax,
+which provides a mechanism for using perl code
+asynchronously from javascript-enhanced HTML pages.
+See the documentation for Apache2::Ajax for details.
+
+As well as mod_perl2, the package requires CGI::Ajax, 
+as well as a CGI.pm-compatible
+CGI module for supplying param() and header() methods.
+If available, CGI::Apache2::Wrapper will be used,
+which is a minimal module that uses methods of mod_perl2
+and Apache2::Request to provide these methods; if this
+is not available, CGI.pm (version 2.93 or greater) will be used.
+
+Installation proceeds through the usual
+   perl Makefile.PL
+   $MAKE
+   $MAKE test
+   $MAKE install
+or, if Module::Build is available,
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+A ppm package for Win32 users of ActivePerl 8xx can be installed
+by adding http://theoryx5.uwinnipeg.ca/ppms/ to your list
+of repositories and then issuing the command
+   C:\> ppm install Apache2-Ajax
+
+This software is copyright 2007 by Randy Kobes
+<r.kobes@uwinnipeg.ca>. Use and
+redistribution are under the same terms as Perl itself;
+see http://www.perl.com/pub/a/language/misc/Artistic.html.

@@ -1,0 +1,147 @@
+DEVELOPMENT NOTES
+-----------------
+
+This file contains random development notes. You should have read or at least
+skimmed it when you intend to customize, port, extend or translate this
+Application.
+
+NB: This document is now out of date, but it is a starting point and should be updated soon.
+
+
+CONTENTS
+--------
+
+- ALWAYS RTFM
+- ADDING FUNCTIONALITY
+- WHY I DID IT THIS WAY
+- HOW IT WORKS (probably the interesting bit)
+- HOW TO ADD A HANDLER (even more interesting)
+- BENCHMARKS
+- BUGS
+
+
+ALWAYS RTFM BEFORE YOU DO ANYTHING.
+-----------------------------------
+
+The POD is there for all perl modules - use it. If its not in the POD or if the POD is unclear, email me - I plan to set up a mailing
+list soon.
+
+ADDING FUNCTIONALITY
+--------------------
+
+Did I say RTFM, well again, read the documentation before you do anything.
+
+Functionality should be added through extending the current model and/or adding abstraction, maintaining or increasing the
+componentisation. I have spent a long time ironing out the hacks and bugs and won't put any back in in a hurry.
+
+If you wish to add functionality then email me a patch, the source and an explaination, if you wish to request a feature also email
+me. I can be reached at aaron.trevena@gmail.com 
+
+
+WHY I DID IT THIS WAY
+---------------------
+
+I did it this way as a cruel joke on other programmers. No not really, even if it does seem that way.
+
+I started doing this project as an afternoons hack but I got interested in it, and I wanted to make it more elegant, in the end it
+became a full on project and I had to rewrite from scratch using OO, modules and plenty of abstraction. There is still a long way to
+go in this regard to make it totally componentised so that it can be integrated into a perl script and handle different types of
+input and output.
+
+
+HOW IT WORKS
+------------
+
+- The autodia.pl script gets a list of files to analyse from the user, uses File::Find or globbing to generate a list based on the
+langauge.
+
+- The autodial.pl script creates an empty Diagram object (using Diagram.pm)
+
+- The autodia.pl script loads the appropriate handler and passes it the filehandle of each file ( or in the case of DBI a DSN )
+
+- The handler parses each file in the list and creates a new Class object for each class or in perl package/script, or in c
+program/library. (using Autodia::Diagram::Class), this Class is added to the Autodia::Diagram object which holds all the objects and
+provides methods for accessing them.
+
+- As the file is parsed the handler populates the Class object from any functions/methods, attributes, and relationships it finds.
+These are added to the Class and in the case of superclasses and packages the Diagram object. (using Autodia::Diagram::Superclass,
+Autodia::Diagram::Component, etc)
+
+- After the files have been parsed redundancies are removed and the positions for each diagram entity (ie class, relationship,
+superclass) are calculated using a simple tree layout algorithm or passed through an external program such as dot or vcg dependant on
+command line options.
+
+- If using an external program or using a custom output function (in Autodia::Diagram where this is done) the objects are called to
+build a set of nodes for passing to an external application or transposing into some text to be output
+
+- If using a template the template is created and passed the Diagram object, the output file and the template file.
+
+- If using a template the template then makes calls to the Diagram Object it was passed, which provide lists of diagram entities
+which it uses to populate the template.
+
+
+HOW TO ADD A HANDLER
+--------------------
+
+To add a handler to AutoDia
+
+- open Autodia.pm and add the language name and handler name into the %handlers hash in the getHandlers function.
+
+- add patterns and regex's for finding appropriate files if not already present in the getPattern function.
+
+- examples and documentation in Autodia.pm, also check Autodia/Diagram.pm which is the core of the Application.
+
+- create a class that inherits from Autodia::Handler or Autodia::Handler::Perl. You will need to have a method called _parse that is
+passed the filehandle and does all the diagram and class population. you can add any subroutines you need to make _parse work.
+
+- the Handler superclass does most of the work along with the diagram classes. see the Autodia::Handler::Perl parser for example code
+as it is heavily commented and clearly laid out (well as much as possible)
+
+BENCHMARKS
+---------
+
+Some quick and dirty tests to give you an idea of how long stuff could
+take.
+
+Autodia pre 0.05 contains about 2000 lines of code in 7 files. 
+Autodia 0.05 and higher contains about 2500 to 3000 lines in 11 files.
+Autodia 1.7 (pre-release) contains a total of 5520 lines in 18 files excluding makefiles, etc
+
+version 1.0: (intel Celeron Mendocino 466mhz running linux 2.4.6)
+10 loops of autodial.pl took  9 wallclock secs ( 8.87 usr +  0.02 sys = 
+8.89 CPU) @  1.12/s (n=10)
+
+On a K2 450, running Linux 2.2.12. AutoDial analysed itself 10 times,
+
+version 0.09:
+10 loops of autodial.pl took 10 wallclock secs ( 9.20 usr +  0.24 sys =  
+9.44 CPU)
+
+version 0.08:
+10 loops of autodial.pl took 10 wallclock secs ( 9.00 usr +  0.21 sys =  
+9.21 CPU)
+
+version 0.06:
+10 loops of autodial.pl took 10 wallclock secs ( 9.32 usr +  0.23 sys =  
+9.55 CPU)
+
+version 0.05:
+10 loops of autodial.pl took 11 wallclock secs ( 9.68 usr +  0.27 sys =
+9.95 CPU)
+
+version 0.04:
+10 loops of autodial.pl took  9 wallclock secs ( 8.36 usr +  0.08 sys =
+8.44 CPU)
+
+version 0.02:
+10 loops of autodial.pl took  8 wallclock secs ( 7.09 usr +  0.13 sys =
+7.22 CPU)
+
+version 0.01:
+10 loops of autodial.pl took  6 wallclock secs ( 5.94 usr +  0.09 sys =
+6.03 CPU )
+
+######################################################################
+
+Please submit bug reports, code, examples, test code, etc to aaron.trevena@gmail.com , see
+http://www.aarontrevena.co.uk/opensource/autodia/ for details and news.

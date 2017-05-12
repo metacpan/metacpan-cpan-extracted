@@ -1,0 +1,51 @@
+---
+abstract: 'An apt-like Github utility.'
+author:
+  - 'c9s , C<< <cornelius.howl at gmail.com> >>'
+  - 'Cornelius <cornelius.howl@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-gh
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  IO::Socket::SSL: 0
+  XML::Atom: 0
+requires:
+  App::CLI: 0
+  Error: 0
+  File::Basename: 0
+  File::HomeDir: 0
+  File::Path: 0
+  File::Spec: 0
+  File::Temp: 0
+  HTML::Strip: 0
+  IO::Pager: 0
+  JSON::XS: 0
+  LWP::Protocol::https: 0
+  LWP::Simple: 0
+  Net::GitHub: 0
+  Scope::Guard: 0
+  Term::ANSIColor: 0
+  Term::ReadLine: 0
+  Text::Wrap: 0
+  Try::Tiny: 0
+  URI: 0
+resources:
+  bugtracker: http://github.com/c9s/App-gh/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/c9s/App-gh
+version: 0.64

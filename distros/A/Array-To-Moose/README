@@ -1,0 +1,42 @@
+Array-To-Moose version 0.0.9
+
+Array::To::Moose builds Moose objects from suitably-sorted 2-dimensional
+arrays of data, of the kind returned by routines like
+DBI::fetchall_arrayref(), i.e. (a reference to) an array containing
+references to an array for each row of data fetched.
+
+It is particularly useful in building nested Moose objects from SQL queries
+on tables which have nested one-to-many relationships with other tables.
+
+The Moose objects must first be defined by the user.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+  Moose
+  MooseX::StrictConstructor
+  Params::Validate
+  Carp
+  namespace::autoclean
+  Test::More
+  Data::Dumper
+
+TODO
+  (1) Smarten up type contstraint handling a la Moose::Util::TypeConstraints
+      Currently only handles 'Str', 'Int', etc.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012, Sam Brain <samb@stanford.edu>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,8 @@
+Changes
+examples/parallel.pl
+lib/Amazon/SQS/Simple/AnyEvent.pm
+Makefile.PL
+MANIFEST			This list of files
+t/00-basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

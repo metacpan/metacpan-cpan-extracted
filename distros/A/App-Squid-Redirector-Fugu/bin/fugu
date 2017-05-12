@@ -1,0 +1,524 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Carp qw/ croak /;
+use Config::Any;
+use DateTime;
+use DBI;
+use Getopt::Long;
+use Log::Handler;
+
+use App::Squid::Redirector::Fugu::BDB;
+use App::Squid::Redirector::Fugu::LDAP;
+use App::Squid::Redirector::Fugu::SQL;
+
+
+# global vars
+my $config_file;
+my $concurrency;
+my $config;
+my $local_time_zone = DateTime::TimeZone->new( name => 'local' );
+
+# Get options - param values
+GetOptions('config=s' => \$config_file, 'concurrency' => \$concurrency);
+
+# Parse config file
+if($config_file) { 
+    my $cfg = Config::Any->load_files({ files => [$config_file], force_plugins => ['Config::Any::JSON'] });
+    (undef, $config) = %{ $$cfg[0] };
+} else { croak('You should inform a config file: fugu --config /path/to/fugu.conf'); }
+
+# Logger
+$config->{logger} = Log::Handler->new();
+$config->{logger}->add( 
+	file => { 
+	    filename => $config->{'logdir'}.'/fugu.log', 
+	    die_on_errors => 1,
+	    message_layout => "[%L] - %T - %m",
+	    maxlevel => 7,
+	    minlevel => 0
+    }
+);
+
+# dbh
+if($config->{dbdsn}) {
+	$config->{dbh} = DBI->connect($config->{dbdsn}, $config->{dbuser}, $config->{dbpassword}, { AutoCommit => 0 }) or $config->{logger}->die("Can't connect to database: $DBI::errstr");
+}
+
+
+# No input buffering
+$| = 1;
+
+# SIG HUP
+$SIG{HUP} = sub { $config->{dbh}->disconnect(); exit(); };
+
+# load data to ram
+fugu_load_data($config);
+
+# open bdb connections
+fugu_open_bdb_conns($config);
+
+# disconnect dbh, all data already loaded
+$config->{dbh}->disconnect() if($config->{dbh});
+
+# Compile all the regexes
+my $RGX_NEGATIVE_ITEM = qr/^\s*\!/;
+my $RGX_COLON = qr/\:/;
+my $RGX_DASH = qr/\-/;
+my $RGX_SLASH = qr/\//;
+my $RGX_SPACE = qr/\s+/;
+my $RGX_URL_CONNECT_PORT = qr/\:\d+$/;
+my $RGX_URL_DOMAIN = qr/^([\w\d\.\-]+)/;
+my $RGX_URL_DOMAIN_LAST_PIECE = qr/\.{0,1}([\w\d\-]+?)$/;
+my $RGX_URL_FIRST_PIECE = qr/(\/[\w\d\-\.\_]*)/;
+my $RGX_URL_FULL = qr/^([\w\d\.\-\/]+)/;
+my $RGX_URL_PROTOCOL = qr/^\w+\:\/\//;
+
+# main loop
+while(my $squid_data = <>) {
+
+    my($channel, $url, $ip, $fqdn, $ident, $method, $kv, $https, $source, $access, $urlredir);
+    
+    # split squid params
+    my @params = split($RGX_SPACE, $squid_data);
+    
+    # channel is sent only if concurrency is enabled
+    if($concurrency) {
+        $channel = shift(@params);
+    }
+
+    # other params
+    $url = shift(@params);
+    $ip = shift(@params);
+    $ident = lc(shift(@params));
+    $method = shift(@params);
+    
+    # minimun required fields
+    next unless(defined($method));    
+    
+    # join key values
+    $kv = join(' ', @params);
+    
+	# remove protocol
+	$url =~ s/$RGX_URL_PROTOCOL//;
+	
+    # detach ip and fqdn
+    ($ip, $fqdn) = split($RGX_SLASH, $ip);
+    
+    # remove port and set https as true if it is a https request
+    if($method eq 'CONNECT') {
+        $url =~ s/$RGX_URL_CONNECT_PORT//;
+        $https = 1;
+    }
+
+    # not allowed is the default
+    my $allowed = 0;
+
+    # here we get source, by ident first, if not found, by ip
+    if($config->{cache}->{user}{$ident}) {
+        $source = $config->{cache}->{user}{$ident};
+    } elsif($config->{cache}->{ip}{$ip}) {
+        $source = $config->{cache}->{ip}{$ip};
+    }
+    
+    # here we get the reference to the array of access rules of the current source
+    # if there is an access rule for the current source
+    if($source && $config->{cache}->{access}->{$source}) {
+        $access = \$config->{cache}->{access}->{$source};
+    } 
+    # otherwise we use the default access rule, if it is defined
+    elsif($config->{cache}->{access}->{'default'}) {
+        $access = \$config->{cache}->{access}->{'default'};
+    }
+    
+    # iterate over rules of the current source
+    # we can have multiple rules of same source with different times
+    # if a rule match current time, others are rejected
+    if($access) {
+        foreach my $rule (@{ $$access }) {
+        
+            # url to redir
+            $urlredir = fugu_get_redirect_url($$rule, $https);
+        
+            # rule has time specified
+            if($$rule->{'time'}) {
+                # if current time is out, skip
+                next if(!fugu_check_time($config->{'time'}->{ $$rule->{'time'} }));
+            } 
+
+            # check pass rules
+            foreach my $pass (@{ $$rule->{'pass'} }) {
+                if($pass eq 'all') {
+                    $allowed = 1;
+                    last;
+                } elsif($pass eq 'none') {
+                    last;
+                } elsif($pass) {
+			        # if negative ( pass initiate with a !)
+			        if($pass =~ $RGX_NEGATIVE_ITEM) {
+			            my $tpass = $pass;
+			            $tpass =~ s/$RGX_NEGATIVE_ITEM//;
+			            # if found here is not allowed
+                        last if(fugu_find_in_dst($config, $tpass, $url));
+			        } else {
+			            # if found here is allowed
+                        if(fugu_find_in_dst($config, $pass, $url)) {
+                            $allowed = 1;
+                            last;
+                        }
+			        }                
+                }
+            }
+            last;
+        }
+    }
+
+    # response
+    # access allowed
+    if($allowed) {
+        print "\n";
+        next;
+    }
+
+    # Response
+    # if concurrency is enabled send channel ID
+    if($concurrency) {
+        print "$channel $urlredir $ip/$fqdn $ident $method $kv\n";
+    } else {
+        print "$urlredir $ip/$fqdn $ident $method $kv\n";
+    }
+
+}
+
+
+#fugu_check_time
+#
+#	Check if can access URL at this time
+#
+#	Params:
+#	$time: time object
+#
+#	return true if can access at this time
+#
+
+sub fugu_check_time {
+	my($time) = @_;
+
+	# if time match, $allow will set to 1
+	my $allow = 0;
+	
+	# index of the current weekday	
+	my $curwd = (localtime())[6];
+
+	# set char to identify week day
+	my @wdays = ( qw/s m t w h f a/ );
+
+	foreach my $item (@{ $time }) { 
+
+		my($setdays) = keys %{ $item }; 
+
+		# the current day is on week days list
+		if($setdays =~ /$wdays[$curwd]/) {
+			my($initial_time, $end_time) = split($RGX_DASH,  $item->{$setdays});
+			
+			my($initial_time_hour, $initial_time_minute) = split($RGX_COLON, $initial_time);
+			my($end_time_hour, $end_time_minute) = split($RGX_COLON, $end_time);
+
+			# get initial time, end time and current time
+			my $itime = DateTime->now( time_zone => $local_time_zone );
+			$itime->set_hour($initial_time_hour);
+			$itime->set_minute($initial_time_minute);
+
+			my $etime = DateTime->now( time_zone => $local_time_zone );
+			$etime->set_hour($end_time_hour);
+			$etime->set_minute($end_time_minute);
+
+			my $ctime = DateTime->now( time_zone => $local_time_zone ); 
+
+			# check if current time is inside
+			if((DateTime->compare($ctime, $itime) == 1) && (DateTime->compare($etime, $ctime) == 1)) {
+				$allow = 1; 
+				last;
+			}
+
+		}
+
+	}
+
+	return $allow;
+}
+
+
+# fugu_find_in_dst
+
+sub fugu_find_in_dst {
+    my($config, $name, $url) = @_;
+    
+    my $found = 0;
+    
+    # expression
+	foreach my $expression (@{ $config->{cache}->{expression}{$name} }) {
+		return 1 if($url =~ /$expression/);
+	}    
+    
+    # domain
+    # must exists a bdb connection
+    if($config->{dst}->{$name}->{domain_bdb}) {
+    
+        # get only the domain
+        # list context is required
+        my($domain) = $url =~ $RGX_URL_DOMAIN;
+
+	    my $domain_replace = $domain;
+	    my $domain_for_search = '';
+
+	    while(length($domain) > length($domain_for_search)) {
+	    
+	        # get each piece of the domain name, from right to left
+		    $domain_replace =~ s/$RGX_URL_DOMAIN_LAST_PIECE//;
+		    $domain_for_search = $1.$domain_for_search;
+
+		    # check domain on db
+		    $config->{dst}->{$name}->{domain_bdb}->db_get($domain_for_search, $found);
+		    return 1 if($found);
+		
+		    # after search, add dot to the domain
+		    $domain_for_search = '.'.$domain_for_search;
+
+	    }
+	}
+    
+    # url
+    # must exists a bdb connection
+    if($config->{dst}->{$name}->{url_bdb}) {
+
+		# if it does not have a slash, so it is only a domain, we will skip it
+		return 0 if($url !~ $RGX_SLASH);
+
+		my($url_full) = $url =~ $RGX_URL_FULL;
+
+		my $url_replace = $url_full;
+		
+		# it will get only the domain, and inside the loop we will get each uri piece, from left to right
+		my($url_for_search) = $url_full =~ $RGX_URL_DOMAIN;
+
+		while(length($url_full) > length($url_for_search)) {
+
+            # get each piece of the uri, from left to right
+			$url_replace =~ s/$RGX_URL_FIRST_PIECE//;
+			$url_for_search .= $1;
+
+			# check url on db
+	        $config->{dst}->{$name}->{url_bdb}->db_get($url_for_search, $found);
+	        return 1 if($found);
+
+		}
+    
+    }    
+    
+}
+
+
+# fugu_get_redirect_url
+
+sub fugu_get_redirect_url {
+    my($rule, $https) = @_;
+    
+    if($https) {
+        return ($rule->{redirect} && $rule->{redirect}->{https}) ? $rule->{redirect}->{https} : 'undefined:443';
+    } else {
+        return ($rule->{redirect} && $rule->{redirect}->{http}) ? $rule->{redirect}->{http} : 'http://undefined';
+    }
+    
+}
+
+
+# fugu_load_data
+
+sub fugu_load_data {
+    my($config) = @_;
+    
+    # create cache container
+    $config->{cache} = {};
+    
+	# Iterate over destinations
+	foreach my $item (keys $config->{dst}) {
+
+        my $dst = $config->{dst}->{$item};
+
+		# Expressions
+		# text file
+		if($dst->{expression_file}) {
+		    
+			# expression_file			
+			my $file = $config->{bdbdir}.'/'.$dst->{expression_file}; 
+
+			# save expressions on cache_expressions ( expression => [ dsts ] )
+			open(my $fh, '<', $file) or $config->{logger}->die("Getting expression list from $file: $!");
+			while(my $expression = <$fh>) {
+				chomp($expression);
+				push(@{ $config->{cache}->{expression}{$item} }, $expression);
+			}
+			close($fh);
+		}
+		# sql query
+		elsif($dst->{expression_sql}) {
+		    my $sql = App::Squid::Redirector::Fugu::SQL->new();
+		    $sql->set_logger($config->{logger});
+		    $sql->set_dbh($config->{dbh});
+		    $sql->run($dst->{expression_sql}, sub {
+		        my $sth = shift;
+	            while(my @row = $sth->fetchrow_array()) {
+	                push(@{ $config->{cache}->{expression}{$item} }, $row[0]);
+	            }		        
+		    });
+		}
+
+	}
+
+
+	# Iterate over sources
+	foreach my $item (keys $config->{src}) { 
+
+        my $src = $config->{src}->{$item};
+
+		# Getting users
+		# text file
+		if($src->{user_file}) {
+
+			my $file = $config->{bdbdir}.'/'.$src->{user_file}; 
+
+			# save users on cache_users ( users => src_name )
+			open(my $fh, '<', $file) or $config->{logger}->die("Getting user list from $file: $!");
+			while(my $user = <$fh>) {
+				chomp($user);
+				$config->{cache}{user}{$user} = $item;
+			}
+			close($fh);
+
+		}
+		# sql query
+		elsif($src->{user_sql}) {
+
+		    my $sql = App::Squid::Redirector::Fugu::SQL->new();
+		    $sql->set_logger($config->{logger});
+		    $sql->set_dbh($config->{dbh});
+		    $sql->run($src->{user_sql}, sub {
+		        my $sth = shift;
+	            while(my @row = $sth->fetchrow_array()) {
+		            $config->{cache}{user}{$row[0]} = $item;
+	            }		        
+		    });
+
+		}
+		# ldap search
+		# server, base and filter are required
+		# default attr will be sAMAccountName
+		elsif($config->{ldapserver} && $src->{user_ldap_base} && $src->{user_ldap_filter}) {
+		
+		    # default attr
+		    $src->{user_ldap_attr} = 'sAMAccountName' unless($src->{user_ldap_attr});
+		
+		    my $ldap = App::Squid::Redirector::Fugu::LDAP->new();
+		    $ldap->set_logger($config->{logger});
+		    $ldap->set_server($config->{ldapserver});
+		    $ldap->bind($config->{ldapdn}, $config->{ldappassword});
+		    $ldap->run(sub {
+			        my $mesg = shift;
+			        foreach my $entry ($mesg->entries) {
+			            my $user = lc($entry->get_value($src->{user_ldap_attr}));
+			            $config->{cache}{user}{$user} = $item;
+			        }		    
+		        }, 
+		        base => $src->{user_ldap_base},
+		        filter => $src->{user_ldap_filter},
+		        scope => $src->{user_ldap_scope},
+		        attr => $src->{user_ldap_attr}
+		    );
+		}
+		# Getting IPs
+		# text file 
+		elsif($src->{ip_file}) {
+			
+			my $file = $config->{bdbdir}.'/'.$src->{ip_file}; 
+
+			open(my $fh, '<', $file) or $config->{logger}->die("Getting ip list from $file: $!");
+			while(my $ip = <$fh>) {
+				chomp($ip);
+				$config->{cache}{ip}{$ip} = $item;
+			}
+			close($fh);
+		}
+		# sql query
+		elsif($src->{ip_sql}) {
+		    
+		    my $sql = App::Squid::Redirector::Fugu::SQL->new();
+		    $sql->set_logger($config->{logger});
+		    $sql->set_dbh($config->{dbh});
+		    $sql->run($src->{ip_sql}, sub {
+		        my $sth = shift;
+	            while(my @row = $sth->fetchrow_array()) {
+		            $config->{cache}{ip}{$row[0]} = $item;
+	            }		        
+		    });
+
+		}
+
+	}
+	
+	# Cache references to all access, if there is duplicate name, it will be saved on an array ref    
+    for(my $i = 0; $i < scalar(@{ $config->{'access'} }); $i++) {
+    
+        my $src = $config->{access}[$i]->{src};
+        
+        # first occurrence
+        if(!$config->{cache}{access}{$src}) {
+            $config->{cache}{access}{$src} = [ \$config->{access}[$i] ];
+        }
+        # more than one occorrunce
+        elsif(ref($config->{cache}{access}{$src}) eq 'ARRAY') {
+            push($config->{cache}{access}{$src}, \$config->{access}[$i]);
+        }
+        
+    }
+    
+}
+
+
+# fugu_open_bdb_conns
+#
+#    Open connections with berkeley db files, and keep file handles on global config hash
+#	@params	$config global config hash
+#	@params $config->{logger} Log::Handler instance
+#
+
+sub fugu_open_bdb_conns {
+    my($config) = @_;
+
+    my $bdb = App::Squid::Redirector::Fugu::BDB->new();
+    $bdb->set_logger($config->{logger});
+    $bdb->set_dir($config->{bdbdir});
+    
+	foreach my $item (keys $config->{dst}) {
+	
+	    my $dst = $config->{dst}->{$item};
+	
+		if($dst->{domain_file}) {
+			$dst->{domain_bdb} = $bdb->open($item.'-domain.db', 0);
+		} elsif($dst->{domain_sql}) {
+		    $dst->{domain_bdb} = $bdb->open($item.'-domain.db', 0);
+		}
+	
+		if($dst->{url_file}) {
+			$dst->{url_bdb} = $bdb->open($item.'-url.db', 0);
+		} elsif($dst->{url_sql}) {
+		    $dst->{url_bdb} = $bdb->open($item.'-url.db', 0);
+		}
+		
+	}    
+    
+}
+
+__END__

@@ -1,0 +1,72 @@
+ACME-QuoteDB
+
+ACME::QuoteDB − API implements CRUD for a Collection of Quotes
+(adages/proverbs/sayings/epigrams, etc)
+
+This module provides an easy to use programmitic interface to a data‐
+base (sqlite3 or mysql) of ’quotes’.  (any content really, that can fit
+into our "defined format")
+
+For simplicty you can think of it as a modern fancy perl version of
+fortune (with a management interface, remote database connection sup‐
+port, plus additional features and some not (yet) supported)
+
+Supported actions include: (CRUD)
+
+1 Create
+    * Adding quote(s)
+    * ’Batch’ Loading quotes from a file (stream, other database, etc)
+
+1 Read
+    * Displaying a single quote, random or based on some criteria
+    * Displaying multiple quotes, based on some criteria
+    * Displaying a specific number of quotes, based on some search criteria
+
+1 Update
+    * Update an existing quote
+
+1 Delete
+    * Remove an existing quote
+
+Current version, 0.1.0
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc ACME::QuoteDB
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=ACME-QuoteDB
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/ACME-QuoteDB
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/ACME-QuoteDB
+
+    Search CPAN
+        http://search.cpan.org/dist/ACME-QuoteDB/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 David Wright
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

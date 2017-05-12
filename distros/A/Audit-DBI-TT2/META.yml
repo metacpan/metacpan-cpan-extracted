@@ -1,0 +1,38 @@
+---
+abstract: 'A Template Toolkit plugin to display audit events recorded by Audit::DBI'
+author:
+  - 'Guillaume Aubert <aubertg@cpan.org>'
+build_requires:
+  DBD::SQLite: '0'
+  DBI: '0'
+  Scalar::Util: '0'
+  Test::Exception: '0'
+  Test::FailWarnings: '0'
+  Test::More: '0.94'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Audit-DBI-TT2
+provides:
+  Audit::DBI::TT2:
+    file: lib/Audit/DBI/TT2.pm
+    version: v2.3.0
+requires:
+  Audit::DBI: '1.008001'
+  Data::Dump: '0'
+  HTML::Entities: '0'
+  POSIX: '0'
+  Template::Plugin: '0'
+  Template::Stash: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/guillaumeaubert/Audit-DBI-TT2/issues
+  homepage: https://metacpan.org/release/Audit-DBI-TT2
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/guillaumeaubert/Audit-DBI-TT2
+version: v2.3.0

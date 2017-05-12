@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Acme-RFC4824
+version:             0.02
+abstract:            Internet Protocol over Semaphore Flag Signaling System (SFSS)
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Moose:                         0.18
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Alexander Klink <alech@cpan.org>

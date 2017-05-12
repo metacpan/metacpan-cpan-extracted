@@ -1,0 +1,31 @@
+#!/usr/local/bin/perl
+
+use v5.10.0;
+use blib;
+use strict;
+use warnings;
+
+use AFS::VOS;
+use Scalar::Util qw(looks_like_number);
+
+my ($vos, $server, $part, $volume, $force, $backup, $volid);
+
+die "Usage: $0 server partition volume [force [backup]]\n" if $#ARGV < 2;
+
+$server = shift;
+$part   = shift;
+$volume = shift;
+$force  = shift // 0;
+$backup = shift // 0;
+
+if (defined $force  and !looks_like_number($force))  { warn "$0: FORCE is not an INTEGER ...\n"; }
+else                                                 { $force = int($force); }
+if (defined $backup and !looks_like_number($backup)) { warn "$0: BACKUP is not an INTEGER ...\n"; }
+else                                                 { $backup = int($backup); }
+
+$vos = AFS::VOS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+$volid = $vos->zap($server, $part, $volume, $force, $backup);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { printf "Volume %u deleted\n", $volid; }

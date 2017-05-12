@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+author/Makefile
+author/gozaru.csv
+author/gozaru.xls
+cpanfile
+lib/Acme/Samurai.pm
+share/euc-jp.dic
+share/utf8.dic
+t/00_compile.t
+t/01_gozaru.t
+META.yml
+MANIFEST

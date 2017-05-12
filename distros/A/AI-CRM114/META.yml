@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                AI-CRM114
+version:             0.01
+abstract:            Wrapper for the statistical data classifier CRM114
+license:             perl
+author:              
+    - Bjoern Hoehrmann <bjoern@hoehrmann.de>
+generated_by:        ExtUtils::MakeMaker version 6.42_01
+distribution_type:   module
+requires:     
+    IPC::Run:                      0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

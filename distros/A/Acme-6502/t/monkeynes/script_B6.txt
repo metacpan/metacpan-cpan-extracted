@@ -1,0 +1,38 @@
+clear
+power on
+regs
+
+# Normal condition ------------
+memset 009a 55
+op a0 28
+op b6 72
+
+# Should be: IX=55, IY=28
+test ix = 55
+test iy = 28
+
+# Zero condition ------------
+power on
+
+memset 009a 00
+op a0 28
+op b6 72
+
+# Should be: IX=0, IY=28, Z=1
+test ix = 0
+test iy = 28
+test z = 1
+
+# Negative condition ------------
+power on
+
+memset 009a f2
+op a0 28
+op b6 72
+
+# Should be: IX=F2, IY=28, S=1
+test ix = f2
+test iy = 28
+test s = 1
+
+save verify_B6.txt

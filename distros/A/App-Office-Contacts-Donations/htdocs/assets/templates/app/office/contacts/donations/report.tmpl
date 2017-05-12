@@ -1,0 +1,38 @@
+<form name="report_form" id="report_form" action="" method="post" onSubmit="return report_onsubmit()">
+<table align="center">
+<tr>
+<td>Report type</td><td><tmpl_var name=reports></td><td></td>
+</tr>
+<tr>
+<td>Entity</td><td><tmpl_var name=report_entities></td><td></td>
+</tr>
+<tr>
+<td>Broadcast</td><td><tmpl_var name=broadcasts></td><td><input type="checkbox" name="ignore_broadcast" id="ignore_broadcast" value="1" />Ignore</td>
+</tr>
+<tr>
+<td>Communication type</td><td><tmpl_var name=communication_types></td><td><input type="checkbox" name="ignore_communication_type" id="ignore_communication_type" value="1" />Ignore</td>
+</tr>
+<tr>
+<td>Gender</td><td><tmpl_var name=genders></td><td><input type="checkbox" name="ignore_gender" id="ignore_gender" value="1" />Ignore</td>
+</tr>
+<tr>
+<td>Role</td><td><tmpl_var name=roles></td><td><input type="checkbox" name="ignore_role" id="ignore_role" value="1" />Ignore</td>
+</tr>
+<tr>
+<td>Donations</td><td>From .. To</td><td><input type="checkbox" name="ignore_date" id="ignore_date" value="1" />Ignore</td>
+</tr>
+<tr>
+<td></td><td><div id="from_calendar_div"></div></td><td><div id="to_calendar_div"></div></td>
+</tr>
+</table>
+<table align="center">
+<tr>
+<tr><td align="center" colspan="3"><div style="padding-top: 1em"></td></tr>
+<td align="center" colspan="3"><input type="submit" name="submit_report" id="submit_report" value="Generate report"</td>
+</tr>
+<tr><td align="center" colspan="3"><hr /></td></tr>
+<tr><td align="center" colspan="3"><div id="report_result"><tmpl_var name=result></div></td></tr>
+</table>
+<input type="hidden" name="date_range" id="date_range" value="" />
+<input type="hidden" name="sid" id="sid" value="<tmpl_var name=sid>" />
+</form>

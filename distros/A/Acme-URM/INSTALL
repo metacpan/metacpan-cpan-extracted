@@ -1,0 +1,15 @@
+Any extra modules required for use:
+Data::Dumper	- output in debug mode
+
+The minimum version of Perl required:
+?
+
+If only works on certain operating systems:
+Tested undef Linux but must work on any platform.
+
+Installation:
+$ perl Makefile.PL
+$ make
+$ make test
+$ make install
+

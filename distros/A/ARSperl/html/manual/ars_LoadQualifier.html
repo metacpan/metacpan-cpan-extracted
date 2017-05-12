@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_LoadQualifier(ctrl, schema, qualstring, displayTag)</CODE></H2>
+
+      Converts a qualifier string into a scalar qualifier record.<P>
+      The qualifier string may contain field IDs or field labels. Using field labels,
+      however, does reportedly not always work reliable, so it is strongly recommended
+      to use field IDs.<P>   
+      When mapping field labels, the server will refer to the view specified
+      in <code>displayTag</code>. If no view is specified, the server will use the
+      default admin view. It is NOT possible to use database names (returned as "fieldName"
+      by <a href="ars_GetField.html"><code>ars_GetField</code></a>) in a qualifier string.
+
+      <DL>
+         <DT><B>On success</B><DD>
+                Returns the qualifier record.
+         <DT><B>On failure</B><DD>
+                Returns <CODE>undef</CODE>.
+      </DL>
+
+      <P>Example:
+
+      <PRE>
+      ($q = ars_LoadQualifier($c, "User", "'101' = \"jmurphy\"")) ||
+	    die $ars_errstr;
+      </PRE>
+
+	or, to specify a particular view:
+
+      <PRE>
+      ($q = ars_LoadQualifier($c, "User", "'User name' = \"jmurphy\"", 
+				"PC-640")) ||
+	    die $ars_errstr;
+      </PRE>
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

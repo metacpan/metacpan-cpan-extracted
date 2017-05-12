@@ -1,0 +1,77 @@
+---
+abstract: 'Classify data with Analogical Modeling'
+author:
+  - 'Theron Stanford <shixilun@yahoo.com>, Nathan Glenn <garfieldnate@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::LongString: '0'
+  Test::More: '0.88'
+  Test::NoWarnings: '0'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-AM
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Algorithm::AM:
+    file: lib/Algorithm/AM.pm
+    version: '3.10'
+  Algorithm::AM::Batch:
+    file: lib/Algorithm/AM/Batch.pm
+    version: '3.10'
+  Algorithm::AM::BigInt:
+    file: lib/Algorithm/AM/BigInt.pm
+    version: '3.10'
+  Algorithm::AM::DataSet:
+    file: lib/Algorithm/AM/DataSet.pm
+    version: '3.10'
+  Algorithm::AM::DataSet::Item:
+    file: lib/Algorithm/AM/DataSet/Item.pm
+    version: '3.10'
+  Algorithm::AM::Result:
+    file: lib/Algorithm/AM/Result.pm
+    version: '3.10'
+requires:
+  Carp: '0'
+  Class::Tiny: '0'
+  Exporter::Easy: '0'
+  Getopt::Long: '2.13'
+  Import::Into: '0'
+  Log::Any: '0'
+  Path::Tiny: '0'
+  Pod::Usage: '0'
+  Text::Table: '0'
+  XSLoader: '0'
+  feature: '0'
+  integer: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/garfieldnate/Algorithm-AM/issues
+  homepage: https://github.com/garfieldnate/Algorithm-AM
+  repository: https://github.com/garfieldnate/Algorithm-AM.git
+version: '3.10'
+x_authority: cpan:NGLENN
+x_contributors:
+  - 'garfieldnate <garfieldnate@gmail.com>'
+  - 'Nathan Glenn <garfieldnate@gmail.com>'
+  - 'Nick Logan <nlogan@gmail.com>'

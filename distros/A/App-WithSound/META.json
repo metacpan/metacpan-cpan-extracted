@@ -1,0 +1,88 @@
+{
+   "abstract" : "Execute commands with sound",
+   "author" : [
+      "moznion  C<< <moznion@gmail.com> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-WithSound",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec::Functions" : "3.40",
+            "FindBin" : "0",
+            "Test::MockObject::Extends" : "1.20120301",
+            "Test::More" : "0.98",
+            "Test::Warn" : "0.24"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::Simple" : "4.58",
+            "File::Path::Expand" : "1.02",
+            "File::Which" : "0.05",
+            "IPC::Open3" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "App::WithSound" : {
+         "file" : "lib/App/WithSound.pm",
+         "version" : "v1.2.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/moznion/App--WithSound/issues"
+      },
+      "homepage" : "https://github.com/moznion/App--WithSound",
+      "repository" : {
+         "url" : "git://github.com/moznion/App--WithSound.git",
+         "web" : "https://github.com/moznion/App--WithSound"
+      }
+   },
+   "version" : "1.2.1",
+   "x_authority" : "cpan:MOZNION",
+   "x_contributors" : [
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Shinpei Maruyama <shinpeim@gmail.com>",
+      "papix <mail@papix.net>",
+      "moznion <moznion@gmail.com>"
+   ]
+}

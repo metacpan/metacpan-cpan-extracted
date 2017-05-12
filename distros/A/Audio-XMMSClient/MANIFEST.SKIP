@@ -1,0 +1,12 @@
+^xs/.*\.c$
+\.o$
+^_darcs
+\bblib
+^Makefile$
+\.bak$
+\.bs$
+^pm_to_blib$
+^Audio-XMMSClient-
+^\.git
+\.old$
+XMMSClient.*\.c

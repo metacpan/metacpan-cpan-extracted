@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $Id: xml2_test.xml 15 2011-09-13 06:58:46Z jo $ -->
+<data>
+  <title test="sax &amp; drags"
+      test-length="We want a tag that is longer tha 128 bytes"
+      test-additional="For this we need a bit more nonsense">This is the Cindy 
+  Test Page</title>
+  <!--#include virtual="/xml2/nothing.txt" --> 
+  <filter>
+    <first>1</first>
+    <!--#include virtual="/xml2/nothing.txt" --> 
+    <second>2</second>
+    <third>3</third>
+  </filter>
+</data>

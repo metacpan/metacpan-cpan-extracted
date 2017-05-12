@@ -1,0 +1,3 @@
+[%- FOR podver = podvers -%]
+[% podver.pause_id _ "\t" _ podver.path_from_author_dir _ "\t" _ podver.pod_path _ "\t" _ podver.note_count %]
+[% END -%]

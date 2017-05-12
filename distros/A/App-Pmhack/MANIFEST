@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/pmhack
+dist.ini
+lib/App/Pmhack.pm
+t/00-load.t
+t/01-basic.t
+t/lib/App/Pmhack/Test.pm

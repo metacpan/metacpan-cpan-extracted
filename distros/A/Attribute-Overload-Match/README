@@ -1,0 +1,98 @@
+NAME
+    Attribute::Overload::Match - argument-dependent handlers for overloaded
+    operators
+
+DESCRIPTION
+    The module is a wrapper for overload, that provides a simple syntax for
+    calling different operator handlers for different passed arguments. The
+    idea is a curious ( but probably not a very practical ) mix of
+    Attribute::Overload and Sub::PatMat .
+
+SYNOPSIS
+       use Attribute::Overload::Match;
+
+    Suppose we declare a class that overloads operations on integers:
+
+       sub new($)               { my $x = $_[0]; bless \$x, __PACKAGE__ }
+       sub val($)               { ${$_[0]} }
+       sub eq       : op(==)    { val(shift) == shift }
+       sub subtract : op(-)     { new val(shift) - shift }
+       sub mul      : op(*)     { new val(shift) * shift }
+       sub add      : op(+)     { new val(shift) + shift }
+       sub qq       : op("")    { val(shift) }
+       sub le       : op(<)     { val(shift) < shift }
+       ...
+
+    then we can change meaning of some operators with a touch of functional
+    style:
+
+       no warnings 'redefine';
+       sub fac      : op(!,1)   { new 1 }
+       sub fac      : op(!)     { !($_[0] - 1) * $_[0] }
+
+    or
+
+       sub fib      : op(~,<2)  { new 1 }
+       sub fib      : op(~)     { ~( $_[0] - 1) + ~($_[0] - 2) }
+
+    (if you don't like "no warnings 'redefine'", just use different sub
+    names for "fac" etc) thus
+
+       my $x = !new(10);
+       print "$x\n";
+       3628800    
+
+    and
+
+       my $x = ~new(10);
+       print "$x\n";
+       89
+
+SYNTAX
+    The only syntax available here is syntax that is passed to "op"
+    attributes, which is in general "sub mysub :
+    op(OPERATOR,CODE[,CODE[,CODE ...]])", where "OPERATOR" belongs to
+    strings defined in overload ( such as "+", "[]", "" etc), and "CODE"
+    strings are perl code, matching a parameter. However, for the sake of
+    readability, "CODE" can be also one of the following signatures:
+
+    Empty string
+        Parameter is never checked
+
+    String starting with a digit
+        Pataremeter must be defined and be equal ("==") to the value if the
+        string
+
+    Single-quoted string
+        Parameter must be defined and be equal ("eq") to the value if the
+        string
+
+    Non-quoted string beginning with a capital letter
+        The string defined as a class name. Parameter must be defined and be
+        an instance of the class (or its descendant).
+
+    "//"
+        Parameter must be defined.
+
+    One of "<,>,lt,gt,eq,==,ne,!=" followed by an expression
+        Parameter must be defined and return true when compared with the
+        expression using given comparison operator
+
+    Anything else
+        Anything else is passed directly to "eval" and is treated in a
+        boolean context thereafter.
+
+ACKNOWLEDGEMENTS
+    Thanks to Anton Berezin for ideas on Sub::PatMat . Thanks to H. Merijn
+    Brandt for "//".
+
+SEE ALSO
+    Attribute::Overload, Sub::PatMat, overload.
+
+COPYRIGHT
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Dmitry Karasik <dmitry@karasik.eu.org>
+

@@ -1,0 +1,14 @@
+ScoreBoardFile "@t_dir@/scoreboard.sb"
+
+ServerLimit 16
+StartServers 3
+MaxSpareServers 3
+MinSpareServers 1
+MaxClients 3
+
+ExtendedStatus On
+ServerName fritz
+
+<VirtualHost h2>
+ServerName hugo
+</VirtualHost>

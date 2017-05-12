@@ -1,0 +1,11 @@
+---
+contact_form:
+  first_name:
+    is_missing: Required
+  last_name:
+    is_missing: Required
+  email:
+    is_missing: Required
+    is_invalid: Invalid
+  message:
+    is_missing: Required

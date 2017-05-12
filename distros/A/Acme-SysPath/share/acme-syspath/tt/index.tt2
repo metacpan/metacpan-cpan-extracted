@@ -1,0 +1,7 @@
+[% INCLUDE _header.tt2 %]
+
+<h1>Welcome to my page.</h1>
+<p>For an idea that does not at first seem insane,
+there is no hope.</p>
+
+[% INCLUDE _footer.tt2 %]

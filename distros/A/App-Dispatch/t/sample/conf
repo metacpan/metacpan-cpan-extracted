@@ -1,0 +1,9 @@
+# test sample
+
+[test]
+    foo = /bin/foo  
+    bar = /bin/bar 
+    baz = /bin/baz
+    sample = t/sample.pl
+
+# extra comment

@@ -1,0 +1,26 @@
+2015-05-15  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.1.2:
+	* Build.PL
+	- fix dependency
+	* t/perlcritic.t
+	- check $ENV{TEST_CRITIC} whether to execute this test
+
+2008-03-25  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.1.1:
+	* Build.PL
+	- fix dependency
+
+2008-02-21  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.1.0:
+	* lib/Algorithm/VectorClocks.pm
+	- the method id() is changed as a class method
+	- the arguments of order_vector_clocks() is changed
+	* t/01.t
+	- fixed as changing VectorClocks.pm
+
+2008-02-09  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.0.1: created by Module::Starter

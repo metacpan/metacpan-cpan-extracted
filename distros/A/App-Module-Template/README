@@ -1,0 +1,21 @@
+App::Module::Template is Copyright (C) 2014, Trevor S. Cornpropst
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+SUPPORT AND DOCUMENTATION
+
+After install, you can find documentation for this module with the
+perldoc command.
+
+        perldoc App::Module::Template
+
+LICENSE INFORMATION
+
+This [library|program|code|module] is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0. For details, see the full text of the license in the file LICENSE.

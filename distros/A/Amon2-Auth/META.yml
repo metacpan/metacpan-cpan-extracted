@@ -1,0 +1,72 @@
+---
+abstract: 'Authentication module for Amon2'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amon2-Auth
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Amon2::Auth:
+    file: lib/Amon2/Auth.pm
+    version: '0.07'
+  Amon2::Auth::Site::Facebook:
+    file: lib/Amon2/Auth/Site/Facebook.pm
+  Amon2::Auth::Site::Github:
+    file: lib/Amon2/Auth/Site/Github.pm
+    version: '0.07'
+  Amon2::Auth::Site::Twitter:
+    file: lib/Amon2/Auth/Site/Twitter.pm
+  Amon2::Auth::Util:
+    file: lib/Amon2/Auth/Util.pm
+  Amon2::Plugin::Web::Auth:
+    file: lib/Amon2/Plugin/Web/Auth.pm
+    version: '0.07'
+requires:
+  Amon2: '3.03'
+  Hash::MultiValue: '0.1'
+  JSON: '2.53'
+  LWP: '6.00'
+  LWP::Protocol::https: '6.00'
+  LWP::UserAgent: '0'
+  Module::Build: '0'
+  Mouse: '0.97'
+  Net::Twitter::Lite: '0.12006'
+  Plack: '0.9984'
+  Plack::Util: '0'
+  URI: '0'
+  URI::Escape: '0'
+  URI::WithBase: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Amon2-Auth/issues
+  homepage: https://github.com/tokuhirom/Amon2-Auth
+  repository: git://github.com/tokuhirom/Amon2-Auth.git
+version: '0.07'
+x_contributors:
+  - 'Takumi Akiyama <t.akiym@gmail.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Kenta Kase <kesin1202000@gmail.com>'
+  - 'Wataru TOYA <watrty@gmail.com>'
+  - 'Tomoyuki Sato <bay@1101.com>'
+  - 'Kan Fushihara <kan.fushihara@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

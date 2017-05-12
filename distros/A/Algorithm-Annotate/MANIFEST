@@ -1,0 +1,5 @@
+MANIFEST
+Makefile.PL
+Annotate.pm
+t/1basic.t
+META.yml                                Module meta-data (added by MakeMaker)

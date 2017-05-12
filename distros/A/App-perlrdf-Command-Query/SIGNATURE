@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 16810bca05c84c39d0a0b4dc1e01780b5afbc5fa COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 2452fba33f56ef80911dc265862fb29b1d0ba4b0 Changes
+SHA1 7747560a35e4dbd17ebb22facb377c2c8a85b822 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 727fa737e1c1be2cdb9426f9fada70be9cdf376e MANIFEST
+SHA1 5c1a79bc72491e779a99631626a3772eab70beb7 META.json
+SHA1 240660660e3ca6d16a1d35059e698f7d7b682d34 META.yml
+SHA1 ce8407b9e6f681a27489ff20516f73fc81830072 Makefile.PL
+SHA1 9a15a6acca6a588b3e515c8f03e02b0a02934f8c README
+SHA1 c5234888572f5e2575ce78d0baf5b46be88638bb TODO
+SHA1 59d5be521d879e887625011f5c1673370d521452 dist.ini
+SHA1 135b7d92ef19dc7799c18f0f786b6a30a1db2d1b doap.ttl
+SHA1 2648103b43a61c7b72506d3567ae0df9beb20692 lib/App/perlrdf/Command/Query.pm
+SHA1 91ee914c344c13c78d90d3764ae71b03d752638b lib/App/perlrdf/Command/QueryParse.pm
+SHA1 d9e4c6a1bc458e13a56f3a998bbbda29f8d2a875 lib/App/perlrdf/Command/RDQL.pm
+SHA1 72d6190a004303566d96eb80d44dd861a14036ee lib/App/perlrdf/FileSpec/OutputBindings.pm
+SHA1 15b60c28b47e5d4d48090fca73c7c07ff6075bcc t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQVYlgACgkQzr+BKGoqfTmA/wCfcm/XvdcZA7FUjIluk1cMM9tc
+b0UAn1JTs+KBZ/yhz5KWYs9KG5fSO6nt
+=r+O2
+-----END PGP SIGNATURE-----

@@ -1,0 +1,92 @@
+0.22 2016-10-05T07:40:15+02:00
+ - Remove name for CHOROBA (pull request from E. Choroba :-)
+
+0.21 2016-09-26T22:09:00+02:00
+ - Add name for CHOROBA :-)
+ - Fix minimal Perl version check.
+ - Update copyright years.
+
+0.20 2015-12-21T12:44:11+01:00
+ - Add DOUGLISH CPAN account.
+
+0.19 2015-09-21T22:12:06+02:00
+ - Move author tests to xt/ directory.
+
+0.18 2015-08-25T00:53:50+02:00
+ - Add TYNOVSKY CPAN account.
+ - Update Module::Install to 1.16 version.
+
+0.17 2015-02-12T19:02:23+01:00
+ - Add MICHALS CPAN account.
+ - Add YENYA CPAN account.
+ - Add ZABA CPAN account.
+
+0.16 2015-02-11T08:12:48+01:00
+ - Add VASEKD CPAN account.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Update copyright years.
+
+0.15 2014-12-23T18:18:27+01:00
+ - Add JIRA CPAN account.
+ - Add name() method to SYNOPSIS section in doc.
+ - Sort modules in SYNOPSIS section in doc.
+ - Update README file.
+ - Update Module::Install to 1.14 version.
+
+0.14 2014-09-08T01:05:04+02:00
+ - Add KOLCON CPAN account.
+ - Add SEIDLJAN CPAN account.
+
+0.13 2014-09-06T04:23:03+02:00
+ - Add PSME CPAN account.
+ - Update examples/ directory.
+ - Update Module::Install to 1.12 version.
+
+0.12 2014-08-21T07:11:34+02:00
+ - Add DANIELR CPAN account.
+ - Fix LICENSE file.
+
+0.11 2014-08-07T18:20:21+02:00
+ - Add POPEL CPAN account.
+ - Add SMRZ CPAN account.
+ - Add STRAKA CPAN account.
+ - Add ZEMAN CPAN account.
+ - Fix RUR CPAN account.
+ - Update Module::Install to 1.10 version.
+
+0.10 2014-05-23T08:00:50+02:00
+ - Add CHOROBA CPAN account.
+ - Add 'readme_from' directive to Makefile.PL.
+ - Update Module::Install to 1.08 version.
+
+0.09 2013-11-03
+ - Update README file.
+
+0.08 2013-11-03
+ - Add PASKY CPAN account.
+ - Rewrite EXAMPLE2 in doc to use Data::Printer.
+
+0.07 2013-09-21
+ - Fix README.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.06 2013-07-10
+ - Add LICENSE.
+ - Add SIGNATURE.
+ - Add dependency for Perl (based on Acme::CPANAuthors dependency).
+
+0.05 2013-06-02
+ - Add Test::NoWarnings to tests.
+ - Add KLE CPAN account.
+
+0.04 2012-08-26
+ - Add PEK CPAN account.
+
+0.03 2012-08-07
+ - Add JSPICAK CPAN account.
+
+0.02 2012-08-06
+ - Add missing prereq. Perl module to Makefile.PL.
+
+0.01 2012-08-05
+ - First version.

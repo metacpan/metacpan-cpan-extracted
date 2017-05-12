@@ -1,0 +1,71 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long qw(:config posix_default no_ignore_case gnu_compat);
+use Config::CmdRC ( file => ['.my.cnf', '.bigqueryrc'], );
+use Pod::Usage;
+use App::BigQuery::Importer::MySQL;
+
+# check progs
+my $pathes = +{};
+my @progs = qw(mysql gsutil bq);
+for my $prog (@progs) {
+   my $path = `which $prog 2> /dev/null` or pod2usage(2);
+   chomp $path if $path;
+   $pathes->{$prog} = $path;
+}
+
+# check config
+defined RC->{'default.project_id'} or pod2usage(2);
+defined RC->{'client.user'} or pod2usage(2);
+defined RC->{'client.password'} or pod2usage(2);
+
+# get options
+my %opt;
+GetOptions(
+    \%opt,
+    qw(db_host=s src=s dst=s allow_text_type dryrun)
+) or pod2usage(2);
+
+my @required_options = qw(db_host src dst);
+pod2usage(2) if grep {!exists $opt{$_}} @required_options;
+
+my $app = App::BigQuery::Importer::MySQL->new({
+    dryrun          => $opt{dryrun},
+    src             => $opt{src},
+    dst             => $opt{dst},
+    allow_text_type => $opt{allow_text_type},
+    mysqlhost       => $opt{db_host},
+    mysqluser       => RC->{'client.user'},
+    mysqlpassword   => RC->{'client.password'},
+    project_id      => RC->{'default.project_id'},
+    progs           => $pathes,
+});
+$app->run;
+
+__END__
+
+=head1 NAME
+
+mysqlbq - cli tool for App::BigQuery::Importer::MySQL
+
+=head1 SYNOPSIS
+
+    mysqlbq - command description
+      Usage: command [options]
+      Options:
+        --db_host         MySQL Hostname or IP addr(ex: localhost)
+        --src             MySQL Schema and Table name(ex: schema_name.table_name)
+        --dst             BigQuery Dataset and Table name(ex: dataset_name.table_name)
+        --allow_text_type Import MySQL TEXT type columns to BigQuery as STRING type
+        --dryrun          dry run mode. not run the side-effects operation.(ex: gsutil mk/rm, bq load/rm)
+        -h(--help)  show this help
+      Requirement Programs: mysql cli and gcloud package
+      Requirement Files: this script needs ~/.my.cnf and ~/.bigqueryrc files
+        ~/.my.cnf:
+          [client]
+          user = user
+          password = pass
+        ~/.bigqueryrc:
+          project_id = pj_id
+          credential_file = /path/to/credential.json

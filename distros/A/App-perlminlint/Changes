@@ -1,0 +1,26 @@
+Revision history for App-perlminlint
+
+0.23   2016-04-20
+     - Add --dryrun(-n) and --verbose(-v) options
+     - [GH #4] per-directory config file (.perlminlint.yml)
+     - [GH #3] Allow passing -Idir, -Mmod, -ddebug
+     - [GH #2] Enable auto probing of `lib` directory by default.
+
+0.22   2015-11-03
+     - [RT #99917] [GH #1] Adapt changed error message in perl 5.21.x
+     - Add new .htyattrc.pl support. (Used only if YATT::Lite is installed).
+
+0.21   2014-08-12
+     - Now perlminlint is installed to bin/. (><)
+
+0.20   2014-07-08
+     - perlminlint now just ignores "-w" "-c" "-wc".
+       This might help existing tools which rely on "perl -wc".
+     - Emacs: perl-minlint-mode now supports tramp.
+     - Emacs: Initial flycheck integration.
+
+0.1_2  2014-05-27
+     - Just switched to Module::Build::Pluggable::CPANfile
+
+0.1    2014-05-18
+     - First version.

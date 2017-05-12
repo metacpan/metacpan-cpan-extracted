@@ -1,0 +1,177 @@
+---
+name: Alzabo
+version: 0.92
+author:
+  - 'Dave Rolsky, <autarch@urth.org>'
+abstract: A data modelling tool and RDBMS-OO mapper
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Factory::Util: 1.3
+  DBI: 1.21
+  Digest::MD5: 0
+  Exception::Class: 0.97
+  Params::Validate: 0.58
+  Scalar::Util: 1.01
+  Storable: 0.7
+  Test::Harness: 1.26
+  Test::Simple: 0.47
+  Tie::IxHash: 0
+  Time::HiRes: 0
+  perl: 5.006
+build_requires:
+  Pod::Man: 1.14
+recommends:
+  DBD::Pg: 1.13
+  DBD::mysql: 2.1017
+provides:
+  Alzabo:
+    file: lib/Alzabo.pm
+    version: 0.92
+  Alzabo::BackCompat:
+    file: lib/Alzabo/BackCompat.pm
+    version: 2
+  Alzabo::ChangeTracker:
+    file: lib/Alzabo/ChangeTracker.pm
+    version: 2
+  Alzabo::Column:
+    file: lib/Alzabo/Column.pm
+    version: 2
+  Alzabo::ColumnDefinition:
+    file: lib/Alzabo/ColumnDefinition.pm
+    version: 2
+  Alzabo::Create:
+    file: lib/Alzabo/Create.pm
+    version: 2
+  Alzabo::Create::Column:
+    file: lib/Alzabo/Create/Column.pm
+    version: 2
+  Alzabo::Create::ColumnDefinition:
+    file: lib/Alzabo/Create/ColumnDefinition.pm
+    version: 2
+  Alzabo::Create::ForeignKey:
+    file: lib/Alzabo/Create/ForeignKey.pm
+    version: 2
+  Alzabo::Create::Index:
+    file: lib/Alzabo/Create/Index.pm
+    version: 2
+  Alzabo::Create::Schema:
+    file: lib/Alzabo/Create/Schema.pm
+    version: 2
+  Alzabo::Create::Table:
+    file: lib/Alzabo/Create/Table.pm
+    version: 2
+  Alzabo::Debug:
+    file: lib/Alzabo/Debug.pm
+  Alzabo::Docs:
+    file: lib/Alzabo/MethodMaker.pm
+  Alzabo::DocumentationContainer:
+    file: lib/Alzabo/MethodMaker.pm
+  Alzabo::Driver:
+    file: lib/Alzabo/Driver.pm
+    version: 2
+  Alzabo::Driver::MySQL:
+    file: lib/Alzabo/Driver/MySQL.pm
+    version: 2
+  Alzabo::Driver::PostgreSQL:
+    file: lib/Alzabo/Driver/PostgreSQL.pm
+    version: 2
+  Alzabo::DriverStatement:
+    file: lib/Alzabo/Driver.pm
+    version: 0.1
+  Alzabo::Exception:
+    file: lib/Alzabo/Exceptions.pm
+  Alzabo::Exception::Driver:
+    file: lib/Alzabo/Exceptions.pm
+  Alzabo::Exceptions:
+    file: lib/Alzabo/Exceptions.pm
+    version: 2
+  Alzabo::ForeignKey:
+    file: lib/Alzabo/ForeignKey.pm
+    version: 2
+  Alzabo::Index:
+    file: lib/Alzabo/Index.pm
+    version: 2
+  Alzabo::MethodDocs:
+    file: lib/Alzabo/MethodMaker.pm
+  Alzabo::MethodMaker:
+    file: lib/Alzabo/MethodMaker.pm
+    version: 2
+  Alzabo::RDBMSRules:
+    file: lib/Alzabo/RDBMSRules.pm
+    version: 2
+  Alzabo::RDBMSRules::MySQL:
+    file: lib/Alzabo/RDBMSRules/MySQL.pm
+    version: 2
+  Alzabo::RDBMSRules::PostgreSQL:
+    file: lib/Alzabo/RDBMSRules/PostgreSQL.pm
+    version: 2
+  Alzabo::Runtime:
+    file: lib/Alzabo/Runtime.pm
+    version: 2
+  Alzabo::Runtime::Column:
+    file: lib/Alzabo/Runtime/Column.pm
+    version: 2
+  Alzabo::Runtime::ColumnDefinition:
+    file: lib/Alzabo/Runtime/ColumnDefinition.pm
+    version: 2
+  Alzabo::Runtime::Cursor:
+    file: lib/Alzabo/Runtime/Cursor.pm
+    version: 2
+  Alzabo::Runtime::ForeignKey:
+    file: lib/Alzabo/Runtime/ForeignKey.pm
+    version: 2
+  Alzabo::Runtime::Index:
+    file: lib/Alzabo/Runtime/Index.pm
+    version: 2
+  Alzabo::Runtime::InsertHandle:
+    file: lib/Alzabo/Runtime/InsertHandle.pm
+  Alzabo::Runtime::JoinCursor:
+    file: lib/Alzabo/Runtime/JoinCursor.pm
+    version: 2
+  Alzabo::Runtime::Row:
+    file: lib/Alzabo/Runtime/Row.pm
+    version: 2
+  Alzabo::Runtime::RowCursor:
+    file: lib/Alzabo/Runtime/RowCursor.pm
+    version: 2
+  Alzabo::Runtime::RowState::Deleted:
+    file: lib/Alzabo/Runtime/RowState/Deleted.pm
+  Alzabo::Runtime::RowState::InCache:
+    file: lib/Alzabo/Runtime/RowState/InCache.pm
+  Alzabo::Runtime::RowState::Live:
+    file: lib/Alzabo/Runtime/RowState/Live.pm
+  Alzabo::Runtime::RowState::Potential:
+    file: lib/Alzabo/Runtime/RowState/Potential.pm
+  Alzabo::Runtime::Schema:
+    file: lib/Alzabo/Runtime/Schema.pm
+    version: 2
+  Alzabo::Runtime::Table:
+    file: lib/Alzabo/Runtime/Table.pm
+    version: 2
+  Alzabo::Runtime::UniqueRowCache:
+    file: lib/Alzabo/Runtime/UniqueRowCache.pm
+  Alzabo::SQLMaker:
+    file: lib/Alzabo/SQLMaker.pm
+    version: 2
+  Alzabo::SQLMaker::Function:
+    file: lib/Alzabo/SQLMaker.pm
+  Alzabo::SQLMaker::MySQL:
+    file: lib/Alzabo/SQLMaker/MySQL.pm
+    version: 2
+  Alzabo::SQLMaker::PostgreSQL:
+    file: lib/Alzabo/SQLMaker/PostgreSQL.pm
+    version: 2
+  Alzabo::Schema:
+    file: lib/Alzabo/Schema.pm
+    version: 2
+  Alzabo::Table:
+    file: lib/Alzabo/Table.pm
+    version: 2
+  Alzabo::Utils:
+    file: lib/Alzabo/Utils.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

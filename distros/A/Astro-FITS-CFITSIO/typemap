@@ -1,0 +1,108 @@
+
+TYPEMAP
+LONGLONG         T_IV
+cmp *            T_COMPLEXP
+dblcmp *         T_DBLCOMPLEXP
+fitsfile *	 T_PTROBJ_fitsfile
+FitsFile *	 T_PTROBJ_FitsFile
+logical *        T_LOGICALP
+byte *           T_BYTEP
+signed char *    T_SCHARP
+unsigned short * T_USHORTP
+unsigned int *   T_UINTP
+unsigned long *  T_ULONGP
+short *          T_SHORTP
+int *            T_INTP
+long *           T_LONGP
+LONGLONG  *      T_LONGLONGP
+float *          T_FLOATP
+double *         T_DOUBLEP
+char **          T_STRINGP
+char *           T_STRING
+byte             T_BYTE
+signed char      T_SCHAR
+logical          T_LOGICAL
+float            T_FLOAT
+OFF_T            T_OFF_T
+
+INPUT
+T_STRINGP
+	$var = ($type)packND($arg,TSTRING)
+T_COMPLEXP
+	$var = ($type)packND($arg,TCOMPLEX)
+T_DBLCOMPLEXP
+	$var = ($type)packND($arg,TDBLCOMPLEX)
+T_LOGICALP
+	$var = ($type)packND($arg,TLOGICAL)
+T_BYTEP
+	$var = ($type)packND($arg,TBYTE)
+T_SCHARP
+	$var = ($type)packND($arg,TSBYTE)
+T_USHORTP
+	$var = ($type)packND($arg,TUSHORT)
+T_SHORTP
+	$var = ($type)packND($arg,TSHORT)
+T_UINTP
+	$var = ($type)packND($arg,TUINT)
+T_ULONGP
+	$var = ($type)packND($arg,TULONG)
+T_INTP
+	$var = ($type)packND($arg,TINT)
+T_LONGP
+	$var = ($type)packND($arg,TLONG)
+T_LONGLONGP
+	$var = ($type)packND($arg,TLONGLONG)
+T_FLOATP
+	$var = ($type)packND($arg,TFLOAT)
+T_DOUBLEP
+	$var = ($type)packND($arg,TDOUBLE)
+T_BYTE
+	$var = ($type)SvIV($arg)
+T_SCHAR
+	$var = ($type)SvIV($arg)
+T_OFF_T
+	$var = ($type)SvUV($arg)
+T_LOGICAL
+	$var = ($type)SvIV($arg)
+T_FLOAT
+	$var = ($type)SvNV($arg)
+T_STRING
+	{
+		if ($arg == &PL_sv_undef)
+			$var = ($type)NULL;
+		else
+			$var = ($type)SvPV($arg,PL_na);
+	}
+
+T_PTROBJ_fitsfile
+	if (sv_derived_from($arg, \"fitsfilePtr\")) {
+	    $var = fitsfileSV($arg);
+        }
+        else
+            croak(\"$var is not of type fitsfilePtr\");
+
+T_PTROBJ_FitsFile
+	if (sv_derived_from($arg, \"fitsfilePtr\")) {
+            $var = FitsFileSV($arg);
+        }
+        else
+            croak(\"$var is not of type fitsfilePtr\");
+
+OUTPUT
+T_BYTE
+	sv_setiv($arg, (IV) $var);
+T_SCHAR
+	sv_setiv($arg, (IV) $var);
+T_OFF_T
+	sv_setuv($arg, (UV) $var);
+T_LOGICAL
+	sv_setiv($arg, (IV) $var);
+T_FLOAT
+	sv_setnv($arg, (double) $var);
+T_STRING
+	if ($var != NULL)
+		sv_setpv((SV *)$arg, $var);
+
+T_PTROBJ_FitsFile
+	if ($var != NULL)
+	        sv_setref_pv($arg, \"fitsfilePtr\", (void*)$var);

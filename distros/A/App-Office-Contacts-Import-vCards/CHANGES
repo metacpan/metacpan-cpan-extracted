@@ -1,0 +1,80 @@
+Revision history for Perl extension App::Office::Contacts::Import::vCards.
+
+1.12  Fri Jun 25 11:15:00 2010
+	- Change all JSON::XS->new->encode(...) to JSON::XS->new->utf8->encode(...).
+
+1.11  Wed May 19  11:11:00 2010
+	- Update comments re starman usage in donations.psgi.
+	- Chop mailing list stuff from support.
+	- Update version numbers in Build.PL and Makefile.PL.
+
+1.10  Tue Apr 20  9:16:00 2010
+	- Change SQLite attribute from unicode to sqlite_unicode.
+	- Change the default database driver from Postgres to SQLite,
+		to make installation easier (by not requiring DBD::Pg).
+		If using another database server, you'll need to edit the 2 lines
+		in .htoffice.donations.conf which refer to SQLite.
+
+1.09  Fri Apr 16  8:52:00 2010
+	- Rework cookies and POST validation, to allow Contacts, Donations and
+		Import::vCards to run in parallel.
+	- But for the moment use the disabled code in App::Office::Contacts.
+
+1.08  Thu Apr 15 14:40:00 2010
+	- Add script_name to calling parameter list of App::Office::Contacts::Import::vCards::View
+		after changes to App::Office::Contacts::View.
+
+1.07  Wed Apr  7  8:51:00 2010
+	- Update pre-reqs for Test::Pod to 1.41 to avoid Test::Pod's dithering
+		about a POD construct I used: L<text|scheme:...>, which makes a test fail.
+		See comments for V 1.40 and 1.41 at:
+		http://cpansearch.perl.org/src/DWHEELER/Test-Pod-1.42/Changes
+	- Update pre-reqs from Test::More V 0 to Test::Simple 0.94.
+
+1.06  Tue Mar 30 12:45:00 2010
+	- Set pre-reqs version of App::Office::Contacts to 1.06.
+		This is in Build.PL and Makefile.PL.
+
+1.05  Tue Mar  2  9:28:00 2010
+	- In cgiapp_prerun():
+		o Only accept CGI params if the request method is 'POST'.
+		o Ensure pseudo-random number among params matches cookie.
+	- Change 'use base' to 'use parent'.
+	- Remove form_action from config file. See sub script_name.
+	- Replace references to FCGI with Plack. This includes no longer
+		shipping FCGI-specific files and patches to Apache's httpd.conf.
+	- Ship httpd/cgi-bin/office/contacts.psgi.
+
+1.04  Sun Feb 21 12:54:17 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+	- Replace personal doc root with /var/www.
+	- Use namespace::autoclean with Moose.
+
+1.03  Fri Feb  5 17:27:00 2010
+	- Remove personal use lib from CGI scripts.
+	- Change .../cgi/... to .../app/... in dirs and config file.
+	- Add css_url to .htoffice.import.vcards.conf
+	- Rename Initialize.about to build_about_html to match App::O::C.
+	- Add setting css_url to Initialize.display.
+
+1.02  Fri Jan 29 09:52:00 2010
+	- Change namespace from CGI::Office::* to App::Office::* after discussion with Matt Trout
+
+1.01  Thu Jan  7 15:39:00 2010
+	- Add MANIFEST and MYMETA.yml
+	- Change call from SUPER::cgiapp to global_prerun to match other CGI-Office-* modules
+
+1.00  Thu Dec 31 10:48:00 2009
+	- Rename from Local::Contacts.
+	- Remove Apache-specific code.
+	- Split into N controllers, using CGI::Application::Dispatch.
+	- Split into separate distros:
+		o App::Office::Contacts
+		o App::Office::Contacts::Donations
+		o App::Office::Contacts::Export::StickyLabels
+		o App::Office::Contacts::Import::vCards
+		o App::Office::Contacts::Sites
+
+0.99  Thu Mar 06 11:30:45 2008
+	  - Original version.

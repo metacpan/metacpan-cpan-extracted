@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ServiceReports>
+  <Schema Value="1.0"/>
+  <ServiceReport Host="Host Name ..." Service="Service Name ..." Environment="LOCAL" Date="2005/11/04" Time="17:27:30" Epochtime="1131121650" Status="1" StatusMessage="StatusMessage 2" PerfData="PerfData=99ms;0;;;">    <![CDATA[ErrorDetails 2]]>
+    <![CDATA[ErrorDetails 2]]>
+  </ServiceReport>
+</ServiceReports>

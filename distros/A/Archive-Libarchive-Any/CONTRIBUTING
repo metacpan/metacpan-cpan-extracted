@@ -1,0 +1,28 @@
+First of all, thanks for taking the time to try and make this project 
+better!  Secondly this is an optional document, if you have a small fix, 
+just submit as a pull request in GitHub, or send me a patch against the 
+latest released version on the GitHub issue tracker here:
+
+ https://github.com/plicease/Archive-Libarchive-Any/issues?state=open
+
+I will most likely be able to shoehorn it into the idiosyncrasies of 
+this project.
+
+That being said, if you want to save me time, and speed the process, 
+please do use dzil to help create and test your patch.
+
+ - I use Dist::Zilla, and to correctly run the release tests you need to 
+   install Dist::Zilla, plus the plugins that I am using, which may ake 
+   a while if you aren't already using it.
+
+ - This distribution is pure-perl so you can run all of the functional 
+   tests using prove -l, no Dist::Zilla required.
+
+ - This distribution shares most of its tests and some of its 
+   documentation with Archive::Libarchive::XS.
+
+ - Some generated content is intended to be checked back into the
+   repository, which is probably a confusing and bad thing long term.
+
+I hope to refactor some of this in the future so that it is easier for 
+contributors.

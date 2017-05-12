@@ -1,0 +1,20 @@
+<div id='status'>
+<h4 class='text-center'>AV Status</h4>
+<accordion close-others='false'>
+  <accordion-group ng-repeat="(station_id,station_details) in status_list" is-open="true">
+    <accordion-heading>
+    <i class="icon-{{station_details.icon}} icon-{{station_details.colour}}"></i>
+    <b>{{station_details.nickname}} ({{station_details.ip}})</b>
+    </accordion-heading>
+    <ul class='unstyled'>
+      <li ng-repeat="(proc_id,proc_details) in station_details.status" style='line-height: 1.7em'>
+        <span tooltip-html-unsafe='{{proc_details.tooltip}}' tooltip-append-to-body='true' tooltip-placement='right'>
+          <i class="icon-{{proc_details.icon}} icon-{{proc_details.colour}}"></i>
+          {{proc_details.label}}
+        </span>
+        <button class='btn btn-mini pull-right' ng-click='resetProc(proc_id)'><i class="icon-repeat icon-red"></i> reset</button>
+      </li>
+    </ul>
+  </accordion-group>
+</accordion>
+</div>

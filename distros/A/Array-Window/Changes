@@ -1,0 +1,28 @@
+Revision history for Perl extension Array-Window
+
+1.02 Thu  5 Jun 2008
+	- No functional changes
+	- Upgrading to Module::Install 0.75
+
+1.01 Thu 28 Jun 2007
+	- No functional changes
+	- Upgrading to Module::Install 0.65
+
+1.00 Tue  5 Jun 2006
+	- Removed use of UNIVERSAL::isa
+	- Upgraded to Module::Install 0.62
+
+0.4  Sat Mar 13 2004
+	- Added the ->human_* methods
+
+0.3  Thu Mar 11 2004
+	- Added the source_length method
+	- Added more flexible creation options, using source_length
+	- Added ->first and ->last methods, to get the first and last windows
+
+0.2  Wed Dec  3 2003
+	- Converted the test to use File::Spec, so it should be ok on Win32
+	- Did some non-functional cleaning of the code and POD
+
+0.1  Thu Dec 06 16:50:23 2002
+	- original version

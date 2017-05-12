@@ -1,0 +1,77 @@
+Authen::SASL::XS - XS code to glue Perl SASL to Cyrus SASL
+
+1. Build Authen::SASL::XS
+
+First of all you need Authen::SASL installed at least in version 2.06 (with
+server patch or higher).
+
+Then run the Makefile.PL:
+
+If you want to link it with SASL v1 library:
+
+# perl Makefile.PL LIBS="-lsasl"
+
+if your SASL library is located in another path:
+
+# perl Makefile.PL INC=-I/opt/products/sasl/1.5.28/include \
+? LIBS="-L/opt/products/sasl/1.5.28/lib -lsasl"
+
+If you want to link it with SASL v2 library:
+
+# perl Makefile.PL LIBS="-lsasl2" DEFINE="-DSASL2"
+
+if your SASL library is located in another path:
+
+# perl Makefile.PL INC=-I/opt/products/sasl/2.1.15/include \
+? LIBS="-L/opt/products/sasl/2.1.15/lib -lsasl2" DEFINE="-DSASL2"
+
+(Make sure that you set --with-plugin-dir correct when compiling
+Cyrus SASL or that you point the enviroment variable SASL_PATH to
+the correct plugin directory before starting make test or your
+application)
+
+After successful Makefile creation run
+
+# make
+# make test
+# make install
+
+(for a successful make test you have to have installed the PLAIN mechanism)
+
+And everything is installed.
+
+If you want to test gssapi functionality, copy the gssapiskel.pl to gssapi.t
+and edit the file correctly. Don't forget the create keytabfiles. Then
+rerun make test and see what happens.
+
+2. Use Authen::SASL::XS with GSSAPI for LDAP
+
+If you are able to use the ldap* tools with GSSAPI and now you want to use Perl
+for this LDAP work, then you need Authen::SASL::XS 1.00 or later. Please try
+this script before reporting any bugs or problems:
+
+#!/usr/bin/perl -w
+use Net::LDAP;
+use Authen::SASL;
+
+my $slavesasl = Authen::SASL->new(mechanism=>'GSSAPI'
+    'user' => " ",  # empty callback, so Net::LDAP don't overrides it
+);
+
+my $ldap = Net::LDAP->new('server', version=>3, async=>1) || die "$@";
+
+my $mesg = $ldap->bind("", sasl=>$slavesasl, async=>1);
+
+$mesg->code && die $mesg->error;
+
+$mesg = $ldap->search(async=>1,filter=>"(objectClass=*)",base=>"dc=workgroup");
+
+@entries = $mesg->entries;
+
+foreach $entry (@entries) {
+	     $entry->dump;
+}
+
+##
+If you discover any problem please report the error message, your SASL version and
+your LDAP version to me.

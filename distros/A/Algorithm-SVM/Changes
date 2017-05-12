@@ -1,0 +1,49 @@
+Revision history for Perl extension Algorithm::SVM.
+
+0.01  Thu Jun 27 11:16:17 2002
+	- original version; created by h2xs 1.21 with options
+		-n Algorithm::SVM svm.h
+
+0.02  Mon Sep 23 13:12:51 EDT 2002
+	- compilation errors on Mac OS X fixed, other bug fixes
+          and code cleanups.
+
+0.05  Tue Nov 26 10:46:46 PST 2002
+	- fixed build error for perl-5.8.0 with ithreads.  Thanks
+          to Mike Castle for this report and patch.
+
+0.06  Tue Jan 14 16:59:50 PST 2003
+        - fixed a build error for gcc version 3.x
+
+0.07  Tue Jun  3 14:46:26 PDT 2003
+	- added a cygwin target to Makefile.PL - Algorithm::SVM
+	  should now compile under Windows.
+	- Algorithm::SVM now has a new maintainer.  As of version
+	  0.07, all inquiries, patches and comments should be
+	  sent to Matthew Laird <matt@brinkman.mbb.sfu.ca>
+
+0.08  Mon May 17 15:09:21 PDT 2004
+	- Upgraded libsvm to 2.6, added new bindings for most
+	  added functionality
+
+0.09  Mon Oct 25 12:05:00 PDT 2004
+	- Fixed an uninitialized variable for probability.
+
+0.10  Mon Nov 16 10:43:00 PDT 2004
+	- Added Solaris support, unfortunately not in an
+          automated fashion.  If anyone can suggest improvements...
+          I'm very open to suggestions.
+
+0.12  Sun Jan 15 11:39:00 GMT+1 2006
+  - Updated libsvm to 2.81 (i.e. added half a dozen lines of code)
+  - added many testcases in test.pl
+  - SVM: Added binding for predict_values, improved memory usage
+  - DataSet: changed to use sparse format internally
+             internal format similar to what libsvm uses
+             added asArray function, improved memory usage
+  - All changes (except libsvm update which slightly changes the
+    learned models) are completely transparent to the user. No
+    changes in programs depending on this should be necessary.
+
+0.13  Tue Jan 22 13:38:00 PDT 2008
+	- Updated the underlaying libsvm version to 2.85

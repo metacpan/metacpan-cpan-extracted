@@ -1,0 +1,22 @@
+\bCVS\b
+# Database files used by my Amethyst
+^karma$
+^markov$
+^statement$
+^factpack$
+^statement\.2002-12-00$
+^statement\.factpacks$
+# My amethyst script file
+^amethyst.pl$
+# My statement dump file.
+^stdump$
+# Random build files
+^Makefile\.old$
+^MANIFEST\.bak$
+# A private version of Algorithm::MarkovChain
+^Algorithm
+# Build files
+.*\.tar\.gz$
+^blib
+# vi swapfiles
+.*\.swp$

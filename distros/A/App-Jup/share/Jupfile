@@ -1,0 +1,12 @@
+# -*- mode: perl -*-
+# Example Jupfile for deploying custom-app, mysql
+
+set 'name'       => 'super app';
+set 'maintainer' => 'Adam Stokes <adamjs@cpan.org>';
+set 'workdir'    => cwd;
+set 'destdir'    => '/srv/app';
+
+link {
+    mysql => {'max-connections' => 5},
+    nginx => {'app_path'        => get 'destdir'}
+};

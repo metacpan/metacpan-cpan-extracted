@@ -1,0 +1,18 @@
+#!/usr/bin/env perl 
+
+use strict; use warnings;
+
+use lib 'lib';
+use AnsibleModule;
+
+my $module=AnsibleModule->new(argument_spec=>{hello => {required => 1, aliases=>['bye']}, yay => { default => 'yes' }});
+my $params=$module->params;
+$params->{msg}='arg_test';
+
+$module->exit_json($params);
+
+=head1
+
+#<<INCLUDE_ANSIBLE_MODULE_COMMON>>
+
+=cut

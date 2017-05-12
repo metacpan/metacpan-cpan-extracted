@@ -1,0 +1,18 @@
+0.006 2016-04-17 13:27:17-0500
+  - fix previous release; changes are the same
+
+0.005 2016-04-17 13:13:27-0500
+  - Added a minimum version version for Alien::Base `configure_requires`.
+    Thanks to Graham Ollis (PLICEASE++)!
+
+0.004 2015-01-24 14:38:31-0600
+  - add ExtUtils::Depends support
+
+0.003 2014-09-14 21:38:28-0500
+  - fix testing: floating point equality
+ 
+0.002 2014-09-14 17:31:48-0500 
+  - make sure Inline::C test is run
+
+0.001 2014-09-14 17:09:43-0500
+  - initial release

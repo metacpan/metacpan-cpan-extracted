@@ -1,0 +1,25 @@
+This is a simple module to demonstrate the use of delivery of WML with mod_perl.
+It was written to accompany an article in the Perl Journal #20.
+
+After enabling WML for Apache with:
+
+    addtype text/vnd.wap.wml                wml
+    addtype text/vnd.wap.wmlscript          wmls
+    addtype application/vnd.wap.wmlc        wmlc
+    addtype application/vnd.wap.wmlscriptc  wmlsc
+    addtype image/vnd.wap.wbmp              wbmp
+
+You need to have mod_perl and Mail::Cclient 1.1 installed.
+
+You can install this module with 'perl Makefile.PL', 'make', 'make install', 
+and set up a Location handler for the module within httpd.conf:
+
+    PerlModule Apache::WAP::MailPeek
+    <Location /wmlmail>
+        SetHandler perl-script
+        PerlHandler Apache::WAP::MailPeek
+    </Location>
+
+The included file 'login.wml' can be copied to your htdocs/ directory and used 
+to login to the mail.
+

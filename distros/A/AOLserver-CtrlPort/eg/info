@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+############################################################
+# info -- send info commands to AOLserver
+# Mike Schilli <m@perlmeister.com>, 2004
+############################################################
+
+use strict;
+use warnings;
+
+use AOLserver::CtrlPort;
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($DEBUG);
+
+my $c = AOLserver::CtrlPort->new(
+    Host => 'localhost',
+    Port => '3334',
+);
+
+my $out = $c->send_cmds("info tclversion\ninfo tclversion");
+print "out=$out";

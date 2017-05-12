@@ -1,0 +1,69 @@
+{
+   "abstract" : "Convert texts like which a cat is talking in Japanese",
+   "author" : [
+      "azumakuniyuki <perl.org [at] azumakuniyuki.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.3",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Nyaa",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "2.42",
+            "Module::Load" : "0.18",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Nyaa" : {
+         "file" : "lib/Acme/Nyaa.pm",
+         "version" : "v0.0.10"
+      },
+      "Acme::Nyaa::Ja" : {
+         "file" : "lib/Acme/Nyaa/Ja.pm"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.0.10",
+   "x_contributors" : [
+      "azumakuniyuki <azumakuniyuki@gmail.com>"
+   ]
+}

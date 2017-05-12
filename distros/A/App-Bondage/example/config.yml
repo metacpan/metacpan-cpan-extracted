@@ -1,0 +1,24 @@
+listen_port: 16667
+password: "secret"
+
+networks:
+  freenode:
+    server_host: "irc.freenode.net"
+#    nickname: "ircnick"
+#    username: "ircuser"
+#    realname: "ircreal"
+
+#    channels:
+#      "#chan1" : ""
+#      "#chan2" : "mypassword"
+#      "#chan3" : ""
+
+  ircnet:
+    server_host: "us.ircnet.org"
+#    nickname: "ircnick"
+#    username: "ircuser"
+#    realname: "ircreal"
+    
+#    channels:
+#      "#chan1" : ""
+

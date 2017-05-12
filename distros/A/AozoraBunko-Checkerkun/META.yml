@@ -1,0 +1,43 @@
+---
+abstract: 青空文庫の工作員のための文字チェッカー（作：結城浩）をライブラリ化したもの
+author:
+  - 'pawa <pawa@pawafuru.com>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AozoraBunko-Checkerkun
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  AozoraBunko::Checkerkun:
+    file: lib/AozoraBunko/Checkerkun.pm
+    version: '0.12'
+requires:
+  Carp: '0'
+  Encode: '0'
+  File::ShareDir: '0'
+  Lingua::JA::Halfwidth::Katakana: '0'
+  YAML::Tiny: '1.69'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/pawa-/AozoraBunko-Checkerkun/issues
+  homepage: https://github.com/pawa-/AozoraBunko-Checkerkun
+  repository: git://github.com/pawa-/AozoraBunko-Checkerkun.git
+version: '0.12'
+x_authority: cpan:PAWAPAWA

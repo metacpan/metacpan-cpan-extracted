@@ -1,0 +1,64 @@
+{
+   "abstract" : "Taco Perl module",
+   "author" : [
+      "Graham Bell <graham.s.bell@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-Taco",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DateTime" : "0",
+            "IO::String" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Taco" : {
+         "file" : "lib/Alien/Taco.pm",
+         "version" : "0.001"
+      },
+      "Alien::Taco::Object" : {
+         "file" : "lib/Alien/Taco/Object.pm",
+         "version" : "0.001"
+      },
+      "Alien::Taco::Server" : {
+         "file" : "lib/Alien/Taco/Server.pm",
+         "version" : "0.001"
+      },
+      "Alien::Taco::Transport" : {
+         "file" : "lib/Alien/Taco/Transport.pm",
+         "version" : "0.001"
+      },
+      "Alien::Taco::Util" : {
+         "file" : "lib/Alien/Taco/Util.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ]
+   },
+   "version" : "0.001"
+}

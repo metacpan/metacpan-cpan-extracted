@@ -1,0 +1,301 @@
+
+=encoding utf-8
+
+=head1 NAME
+
+Acme::Perl::VM::JA - Pure PerlによるPerl5仮想マシンの実装(AVPM)
+
+=head1 SYNOPSIS
+
+    use Acme::Perl::VM;
+
+    run_block{
+        print "Hello, APVM world!\n";
+    };
+
+
+=head1 DESCRIPTION
+
+C<Amce::Perl::VM>(APVM)はPure Perlで実装されたPerl5の仮想マシンです。
+
+Perlディストリビューションにはコンパイルされた構文木にアクセスするためのモジュールが用意されており，B<B - The Perl Compiler>と呼ばれています。
+APVMはこのBモジュールを利用して構文木を解釈・実行するモジュールです。
+
+この文書では，Perl5の仮想マシンについて概説しつつ，APVMとPerl5実装との対応について解説します。
+
+=head2 The Perl5 Virtual Machine
+
+Perl5の仮想マシンはスタックマシンであり，組み込み演算子やサブルーチンなどの手続きの引数と戻り値を，スタックを通じてやり取りします。
+
+この仮想マシンのマシンコードはopcodeと呼ばれ，これがコンパイルされたPerlプログラムの最小単位となります。opcodeはさらにデータと手続きからなるオブジェクトとして表現され，その手続きはppcode(PUSH/POP code)と呼ばれる関数として実現されます。
+
+opcodeオブジェクトは他のopcodeオブジェクトへのリンクを持つ木構造を成しており，このopcodeの木を構文木と呼びます。したがって，Perlプログラムを実行するというのは，opcodeを実行しつつ，この木構造をたどって行く過程ということになります。
+
+ここでは以下のPerlコードを例にとり，プログラムの実行を追っていきます：
+
+    print(10 + 20);
+
+まず，このコードをコンパイルすると，以下のような構文木が生成されます：
+
+    nextstate     # ステートメントの始まり
+    print         # 引数リストを印字
+      pushmark    # 可変長引数のためのマーク
+      add         # 加算演算
+        const(10) # 定数[10]
+        const(20) # 定数[20]
+
+構文木は子ノードから実行されるので，この構文木を解釈すると以下の順になります。
+
+    nextstate
+    pushmark
+    const(10)
+    const(20)
+    add
+    print
+
+それぞれのopcodeは必要に応じてスタックから引数をポップし，戻り値をプッシュします。opcodeの実行とスタックの中身を同時に表すと以下のようになります。
+
+    nextstate ()
+    pushmark  ()       # mark = -1 (MARKについては後のセクションで解説)
+    const(10) (10)     # スタックに値をPUSH
+    const(20) (10, 20) # スタックに値をPUSH
+    add       (30)     # 値を2つPOPし，演算結果をPUSH
+    print     (1)      # mark+1からTOPまでを印字し，結果(真)をPUSH
+
+これが構文木を解釈する基本的な流れです。プログラムの分岐やサブルーチンの呼び出しなどがあると更に複雑になりますが，一連の流れは同じです。
+
+以下のセクションでは，仮想マシンの実装の中で特に重要なコンポーネントについて説明します。
+
+=head2 The Perl Stack (PL_stack_base)
+
+Perlプログラムの手続きと戻り値のために使われるスタックです。
+このスタックは組み込み関数とサブルーチンの両方で使われます。
+
+現在のperl5の実装では，このスタックはCの配列で表現され，必要に応じてC<realloc()>で拡張されます。スタックの先頭はスタックポインタ(C<PL_stack_sp>)として参照できるのですが，ppcode内ではこのグローバルなスタックポインタを一旦ローカルにコピーします(C<dSP>)。C<PUSHs>/C<POPs>/C<TOPs>などのマクロはこのローカルコピーを参照します。そしてスタックポインタを使った操作が終わったところでC<PUTBACK>マクロによりローカルスタックポインタをグローバルスタックポインタ変数に戻します。なお，C<SPAGAIN>マクロはローカルスタックポインタ変数をグローバルスタックポインタで再初期化するマクロで，スタックを操作する可能性のあるPerl API(C<call_sv()>など)を呼び出した後に使用します。
+
+APVMではこれはPerlの配列で表現され，スタックポインタは配列の最後の添え字です。
+ローカルコピーは作りません。
+
+AVPMとの対応：
+    perl            APVM
+
+    PL_stack_base   @PL_stack
+    PL_stack_sp     $#PL_stack
+    dSP             (nothing)
+    SP              $#PL_stack
+    TOPs            TOP
+    PUSHs(sv)       PUSH($sv)
+    POPs            POP
+    SPAGAIN         (nothing)
+    PUTBACK         (nothing)
+    EXTEND(SP, n)   (nothing)
+
+See also F<pp.h>.
+
+=head2 The Perl Stack Marker (PL_markstack)
+
+可変長引数を扱うためのスタックのマーカーです。
+
+二項演算子などは引数の数が固定ですが，C<print>のように引数の数が可変長である組み込み関数もあります。可変長引数を扱うためには，引数スタック中で引数が始まる位置を保存する必要があります。また，このマーカーは入れ子になる可能性があるので，このマーカーそれ自体もスタックに保存します。
+
+可変長引数の開始を宣言するためには，C<PUSHMARK(SP)>マクロを使います。
+また，C<dMARK>マクロによりスタックから値をポップし，C<MARK>マクロを使えるようにします。
+
+APVMとの対応：
+    perl            APVM
+
+    PUSHMARK(SP)    PUSHMARK($#PL_stack)
+    TOPMARK         TOPMARK
+    POPMARK         POPMARK
+    dMARK           my $mark = POPMARK
+    MARK++          $mark++
+    *MARK           $PL_stack[$mark]
+
+    dORIGMARK       my $origmark = $mark
+    SP = ORIGMARK   $#PL_stack = $origmark
+
+See also F<pp.h>.
+
+=head2 The Opcode Family
+
+Perlプログラムの最小単位である，手続きとデータを持ったオブジェクトです。
+opcodeクラス群はCの構造体の先頭メンバをいくつか共有する構造体群として表現されます。
+
+opcodeオブジェクトの持つ手続きは対応するppcodeであり，C<op_ppaddr>メンバで参照します。データはPerlの値やCの値，または他のopcodeへのリンクです。
+
+各opcodeオブジェクトは名前と外部出力用の説明を持ち，それぞれC<OP_NAME(op)>，C<OP_DESC(op)>マクロで得ることができます。
+
+See also F<op.h>, F<cop.h>, F<opcode.h> and F<opcode.pl>.
+
+=head2 The PPcodes
+
+opcodeが持つ手続きで，実際に行う処理を実装した関数です。
+
+たとえば，OP_CONSTに対応するppcodeは以下のようになっています：
+
+  /* in pp_hot.c (5.8.8) */
+  PP(pp_const)
+  {
+    dSP;
+    XPUSHs(cSVOP_sv);
+    RETURN;
+  }
+
+マクロをいくつか展開すると以下のようになります。
+
+  PP(pp_const)
+  {
+      dSP;
+      EXTEND(SP, 1);
+      PUSHs(cSVOPx_sv(PL_op));
+      PUTBACK;
+      return PL_op->next;
+  }
+
+一つひとつを順に追うと以下のようになります。
+
+=over 4
+
+=item C<dSP>
+
+ローカルスタックポインタ変数(SP)を宣言し，グローバルスタックポインタの値で初期化します。
+
+=item C<EXTEND(SP, 1)>
+
+スタックポインタに値を1つプッシュすることを宣言します。このとき，必要に応じてスタックは拡張されます。
+
+=item C<cSVOPx_sv(PL_op)>
+
+現在実行中のopcodeのsvフィールドを参照します。
+
+=item C<PUSH(sv)>
+
+スタックポインタを通じて引数スタックに値を1つプッシュします。
+
+=item C<PUTBACK>
+
+ローカルスタックポインタをグローバルスタックポインタ変数に戻します。
+
+=item C<< return PL_op->op_next >>
+
+次に実行するopcodeを返します。
+
+OP_CONSTであれば可能性のあるプログラムの経路は常に一つですが，OP_COND_EXPRのような制御を担うopcodeであればC<< PL_op->next >>以外のopcodeを返すことがあります。
+
+=back
+
+ppcodeはopcodeオブジェクトのC<op_ppaddr>メンバを通じて取得・変更することができます。このC<op_ppaddr>をC<PL_check>というコンパイル時フックテーブルを通じて変更し，プログラムの挙動を変える手法がB<PL_check hack>として知られています。たとえば，C<autobox>はこのC<PL_check>ハックを用いてプリミティブ値に対するメソッド呼び出しを実現しています。
+
+See also F<pp.c>, F<pp_hot.c>, F<pp_ctl.c>, F<pp_sys.c>, F<pp_sort.c> and F<pp_pack.c>.
+
+=head2 The interpreter loop (PL_runops)
+
+構文木を解釈・実行するループの実装です。
+
+デフォルトでは，F<run.c>にあるC<Perl_runops_standard()>が用いられます。
+これは，perl 5.8.8では以下のようになっています：
+
+    int
+    Perl_runops_standard(pTHX)
+    {
+      while ((PL_op = CALL_FPTR(PL_op->op_ppaddr)(aTHX))) {
+        PERL_ASYNC_CHECK();
+      }
+
+      TAINT_NOT;
+      return 0;
+    }
+
+C<PL_op>は現在実行中のopcodeオブジェクトが入っているグローバル変数(またはTLS変数)です。C<op_ppaddr>はopcodeに対応したppcodeが入っており，ppcodeは次に実行するopcodeを返すことになっています。
+
+C<PERL_ASYNC_CHECK()>は単にセーフシグナルの処理なので実行には関係ありません。したがって，インタプリタループの実体は一行しかありません。
+
+ところで，このようなopcodeの多態性を利用した実行ループと対極にあるのが，switch文やifの連鎖による分岐を利用した実行ループです。Perl4の実行ループはそのような実装でしたし，Perl5の実装の中にもswitchによる実行ループも存在します。たとえば，F<scope.c>にあるC<leave_scope()>はまさに巨大なswitch文を利用した実行ループでスコープの後処理を行っています。
+
+インタプリタループについては，APVMのC<runops_standard()>でも実装はほぼ同じです。
+
+See also F<run.c>.
+
+=head2 Other components
+
+この他にもいくつか重要なコンポーネントがあります。
+
+=over 4
+
+=item *
+
+The Scratchpads (PL_comppad and PL_curpad)
+
+=item *
+
+The Save Stack (PL_savestack)
+
+=item *
+
+The Temporary Value Stack (PL_tmps)
+
+=item *
+
+The Context and Block Stack (PL_cxstack)
+
+=item *
+
+The Stack Information (PL_curstackinfo)
+
+=back
+
+なお，この文書ではPerlの値の実装であるSV構造体群については解説しません。
+SV構造体群のAPIについてはL<perlapi>を，その実装についてはF<sv.[hc]>, F<av.[hc]>, F<hv.[hc]>, F<gv.[hc]>を参照してください。
+
+=head1 DEBUGGING
+
+=head2 Opcode Tracing
+
+perlをC<-DDEBUGGING>コンパイルオプションを指定してビルドすると，プログラムの実行をopcodeレベルでトレースできるようになります。C<perl>コマンドにC<-Dt>またはC<-Dts>を渡して実行してみてください。
+
+APVMにもopcodeトレース機能があります。環境変数C<APVM_DEBUG>にC<trace>を指定すると，opcodeトレースを行います。また，C<stack>を指定すると，opcodeトレースと同時に引数スタックの中身も報告します。
+
+Perlの標準モジュールC<B::Concise>でも構文木を出力することができます。このときC<-exec>オプションを渡すと，実行順にopcodeを並べて出力します。ただし，C<B::Concise>では静的な解析しかできません。
+
+CPANにあるC<Devel::Optrace>はAPVMのopcodeトレース機能を標準Perl VMで使えるようにしたモジュールです。このモジュールはC<-DDEBUGGING>が指定されていないperlでも利用できます。
+
+=head1 NOTES
+
+このモジュールは2009年4月22日に東京で開催されたB<Shibuya.pm テクニカルトーク#11>で発表されました。
+
+=head1 AUTHOR
+
+Goro Fuji (gfx) E<lt>gfuji(at)cpan.orgE<gt>.
+
+=head1 SEE ALSO
+
+L<perlapi>.
+
+L<perlhack>.
+
+F<pp.h> for PUSH/POP macros.
+
+F<pp.c>, F<pp_ctl.c>, and F<pp_hot.c> for ppcodes.
+
+F<op.h> for opcodes.
+
+F<cop.h> for COP and context blocks.
+
+F<scope.h> and F<scope.c> for scope stacks.
+
+F<pad.h> and F<pad.c> for pad variables.
+
+F<run.c> for runops.
+
+L<B::Concise>.
+
+L<Devel::Optrace>.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2009, Goro Fuji (gfx). Some rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

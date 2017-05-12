@@ -1,0 +1,10 @@
+Algorithm::Accounting provide simple aggregation method to make log
+accounting easier. It accepts data in rows, each rows can have many
+fields, and each field is a scalar or a list(arrayref).
+
+Besides accounting to single field, Algorithm::Accounting provide
+the ability to account groups of field. So one can see the
+co-relation of their data.
+
+Cheers,
+Kang-min "Gugod" Liu

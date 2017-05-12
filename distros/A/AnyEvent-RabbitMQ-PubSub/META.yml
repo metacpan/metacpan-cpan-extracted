@@ -1,0 +1,48 @@
+---
+abstract: 'Publish and consume RabbitMQ messages.'
+author:
+  - 'Miroslav Tynovsky <tynovsky@avast.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-RabbitMQ-PubSub
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  AnyEvent::RabbitMQ::PubSub:
+    file: lib/AnyEvent/RabbitMQ/PubSub.pm
+    version: v3.1.2
+  AnyEvent::RabbitMQ::PubSub::Consumer:
+    file: lib/AnyEvent/RabbitMQ/PubSub/Consumer.pm
+  AnyEvent::RabbitMQ::PubSub::Publisher:
+    file: lib/AnyEvent/RabbitMQ/PubSub/Publisher.pm
+requires:
+  AnyEvent: '0'
+  AnyEvent::RabbitMQ: '0'
+  Moose: '0'
+  Promises: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/tynovsky/AnyEvent-RabbitMQ-PubSub/issues
+  homepage: https://github.com/tynovsky/AnyEvent-RabbitMQ-PubSub
+  repository: git://github.com/tynovsky/AnyEvent-RabbitMQ-PubSub.git
+version: 3.1.2
+x_authority: cpan:TYNOVSKY
+x_contributors:
+  - 'tynovsky <tynovsky@seznam.cz>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

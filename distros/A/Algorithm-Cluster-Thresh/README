@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Algorithm-Cluster-Thresh,
+version 0.05:
+
+  Adds thresholding to hierarchical clustering of Algorithm::Cluster
+
+This software is copyright (c) 2011 by Chad A. Davis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,24 @@
+0.06      2017-02-20 03:00:12+00:00 UTC
+    - switch to dzil
+
+0.06 Wed Jun 1 2016 Binary.com <binary@cpan.org>
+    - new option --no-warn to suppress warnings from App::Base::Daemon and App::Base::Daemon::Supervisor
+
+0.05 Fri May 6 2016 Binary.com <binary@cpan.org>
+    - removed logger object (Log4perl), using warn/die instead
+    - removed Carp carp/croak/confess,  using warn/die instead
+
+0.04 Fri Oct 31 2014 Binary.com <binary@cpan.org>
+    - unimport Moose::Role in the end
+
+0.03 Fri Oct 31 2014 Binary.com <binary@cpan.org>
+    - refactor options method to only contain parameters to create
+      options instead of option objects
+
+0.02 Mon Oct 27 2014 Binary.com <binary@cpan.org>
+    - updated documentation
+    - prevent module from building on perl before 5.10 and on Windows
+
+0.01 Thu Oct 16 2014 Binary.com <binary@cpan.org>
+    - First version, released on an unsuspecting world.
+

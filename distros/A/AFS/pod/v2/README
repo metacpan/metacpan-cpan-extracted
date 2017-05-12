@@ -1,0 +1,31 @@
+
+This is the README file for the POD documentation of the Perl
+extension module AFS (Version 2.6.4) 
+
+
+POD DOCUMENTATION
+    The included POD documentation in this directory is the unique and
+    up to date documentation source for the AFS module bundle.  It can
+    be used by the 'perldoc' program, and may be used to generate HTML
+    documentation usable by WWW browsers, and documentation in several
+    other formats.
+
+
+GENERATING HTML DOCUMENTATION
+    If you have some WWW browser available, it might be worthwhile to
+    build HTML docs.  Unfortunately the perl Makefile.PL
+    infrastructure won't do this for you automatically.  You have to
+    generate it explicitly.  'cd' into the top directory and 'make'
+    the HTML documentation.  This is the sequence of commands to build
+    the docs:
+
+        cd AFS-2.6.4
+        perl Makefile.PL  ;#(if you have not submitted already)
+        make html
+
+    After this you can start your browser with the file 
+
+            AFS-2.6.4/lib/AFS.html
+
+    and go ahead with reading docs.
+

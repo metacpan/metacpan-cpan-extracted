@@ -1,0 +1,11 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Acme-Enc
+version:      v0.0.1
+version_from: Enc.pm
+installdirs:  site
+requires:
+    Crypt::OpenPGP:                0
+    version:                       0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

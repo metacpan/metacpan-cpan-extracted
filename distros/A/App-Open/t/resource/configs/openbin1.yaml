@@ -1,0 +1,3 @@
+backend:
+    "YAML":
+        - "t/resource/backends/yaml/openbin.yaml"

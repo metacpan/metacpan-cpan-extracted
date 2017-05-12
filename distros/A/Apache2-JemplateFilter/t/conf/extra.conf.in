@@ -1,0 +1,7 @@
+PerlSwitches -w
+
+Alias / @DocumentRoot@/
+<Location /jmpl/>
+  PerlOutputFilterHandler Apache2::JemplateFilter
+</Location>
+

@@ -1,0 +1,2827 @@
+<!--
+emphasis
+
+filename
+computeroutput
+constant
+literal
+replaceable
+varname
+
+informalexample
+programlisting
+-->
+
+<chapter><?dbhtml filename="reference.html"?>
+<chapterinfo>
+<releaseinfo role="meta">
+$Id: reference.xml,v 1.68 2004/04/06 09:18:30 borisz Exp $
+</releaseinfo>
+</chapterinfo>
+<title>Reference</title>
+ <sect1>
+  <title>Configuration Options</title>
+  <sect2>
+   <title>Global Attributes</title>
+   <para>
+    These settings are global in the sense that they apply over all servers, views, and pages.
+    They are attributes of the &lt;GLOBAL&gt; tag in <filename>Config/Config.xml</filename>.
+   </para>
+   <variablelist>
+    <varlistentry id="config.global.cache_dir">
+     <term>cache_dir</term>
+     <listitem>
+      <para>
+       Specifies the directory where the PageKit Template cache files are stored.
+       Defaults to <filename>View/pkit_cache</filename>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.cookies_not_set_page">
+     <term>cookies_not_set_page</term>
+     <listitem>
+      <para>
+This is the page that gets displayed if the user attempts to log in,
+but their cookies are not enabled.  Defaults to <literal><link linkend="config.global.login_page">login_page</link></literal>.
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry id="config.global.default_errorstr">
+     <term>default_errorstr</term>
+     <listitem>
+      <para>
+        Default errorstr, that PageKit use for <link linkend="pkit.errorstr">PKIT_ERRORSTR</link>,
+	<link linkend="model.api.pkit_set_errorspan">pkit_set_errorspan</link> and the obsolete
+	<link linkend="model.api.pkit_set_errorfont">pkit_set_errorfont</link>.
+      </para>
+      <para>
+	Defaults to <emphasis>#ff0000</emphasis>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.default_input_charset">
+     <term>default_input_charset</term>
+     <listitem>
+      <para>
+        Default charset that PageKit Templates and Model output are encoded in.
+	Defaults to
+       <emphasis>ISO-8859-1</emphasis>.  PageKit uses this to convert the
+        PageKit templates and output from <link linkend="model.api.output_convert">output_convert</link> to UTF-8.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.default_output_charset">
+     <term>default_output_charset</term>
+     <listitem>
+      <para>
+        Default charset that PageKit templates compiled to.
+	Defaults to
+       <emphasis>ISO-8859-1</emphasis>.  This should be the charset that
+       supports your <link linkend="config.global.default_input_charset">default_input_charset</link> and has good support among the client's browsers.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.default_lang">
+     <term>default_lang</term>
+     <listitem>
+      <para>
+       Default language outputed when no language is specified
+       or request language is not available.  Defaults to
+       <emphasis>en</emphasis>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.default_page">
+     <term>default_page</term>
+     <listitem>
+      <para>
+       Default page user gets when no page is specified.  Defaults to
+       <emphasis>index</emphasis>.
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry id="config.global.errorspan_begin_tag">
+     <term>errorspan_begin_tag</term>
+     <listitem>
+      <para>
+       Specifies the start tag for &lt;PKIT_ERRORSPAN ... &gt; and &lt;PKIT_ERRORFONT ... &gt;.
+       Defaults to <emphasis>&lt;font color="&lt;PKIT_ERRORCOLOR&gt;"&gt;</emphasis>.
+       <informalexample>
+       <programlisting>
+	errorspan_begin_tag = "&amp;lt;span class=error&amp;gt;"
+        errorspan_end_tag = "&amp;lt;/span&amp;gt;"
+       </programlisting>
+      </informalexample>
+      </para>
+      <para>
+      See also <literal><link linkend="config.global.errorspan_end_tag">errorspan_end_tag</link></literal>.
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry id="config.global.errorspan_end_tag">
+     <term>errorspan_end_tag</term>
+     <listitem>
+      <para>
+       Specifies the end tag for &lt;PKIT_ERRORSPAN ... &gt; and &lt;PKIT_ERRORFONT ... &gt;.
+       Defaults to <emphasis>&lt;/font&gt;</emphasis>.
+      </para>
+      <para>
+      See also <literal><link linkend="config.global.errorspan_begin_tag">errorspan_begin_tag</link></literal>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.fop_command">
+     <term>fop_command</term>
+     <listitem>
+      <para>
+       Command line that should be used to run Apache XML FOP to generate
+       PDF output.  PageKit will append FO file and PDF file arguments at end.
+      </para>
+      <informalexample>
+       <programlisting>
+        # some example fop command lines
+	fop_command = "/usr/java/jdk1.3.0_02/bin/java -cp /usr/local/javaclass/fop org.apache.fop.apps.CommandLine"
+	fop_command = "/usr/java/jdk1.3.0_02/bin/java -cp /usr/local/javaclass/fop org.apache.fop.apps.CommandLine"
+	fop_command = "/usr/java/jdk1.3.0_02/bin/java -cp /usr/local/javaclass/fop org.apache.fop.apps.Fop"
+	fop_command = "/usr/lib/java/bin/java -classpath /opt/fop-0.20.3/lib/xerces-1.2.3.jar:/opt/fop-0.20.3/lib/xalanj1compat.jar:/opt/fop-0.20.3/lib/xalan-2.0.0.jar:/opt/fop-0.20.3/lib/xalan-1.2.2.jar:/opt/fop-0.20.3/lib/stylebook.jar:/opt/fop-0.20.3/lib/logkit-1.0b4.jar:/opt/fop-0.20.3/lib/buildtools.jar:/opt/fop-0.20.3/lib/bsf.jar:/opt/fop-0.20.3/lib/batik.jar:/opt/fop-0.20.3/lib/avalon-framework-4.0.jar:/opt/fop-0.20.3/lib/ant.jar:/opt/fop-0.20.3/lib/ant-1.3-optional.jar:/opt/fop-0.20.3/build/fop.jar: org.apache.fop.apps.Fop"
+        
+        # disable fop_command from Apache::PageKit 1.14 on 
+        fop_command = ""
+        # or remove the fop_command line option from Config.xml at all.
+
+       </programlisting>
+      </informalexample>
+      <para>
+       Can be overriden by specifying the server <link linkend="config.server.fop_command">fop_command</link> configuration option.
+      </para>
+      <para>
+       As of version 1.13 of Apache::PageKit a error is issued, if no global <link linkend="config.global.fop_command">fop_command</link> or server <link linkend="config.server.fop_command">fop_command</link> is found in the Config.xml and a 'application/pdf' is requested.
+       
+       Form Apache::PageKit 1.14 on, no error message is issued and no special action is taken.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.gzip_output">
+     <term>gzip_output</term>
+     <listitem>
+      <para>
+       If set to <emphasis>all</emphasis>, output is gzipped dynamic and static content for browsers that send a
+       <literal>Accept-Encoding</literal> header containing <literal>gzip</literal>.  If set to <emphasis>static</emphasis>, output is gzipped for
+static pages only.
+       Defaults to
+       <emphasis>none</emphasis>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.login_page">
+     <term>login_page</term>
+     <listitem>
+      <para>
+       Page that gets displayed when user attempts to log in.  Defaults to
+       <emphasis>login</emphasis>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.logout_kills_session">
+   <term>logout_kills_session</term>
+   <listitem>
+   <para>
+    When pkit_logout is called it normally resets just the pkit_id cookie.
+    With logout_kills_session enabled (set to yes), pkit_logout will also
+    reset pkit_session_id and forcing a new pkit_session_id cookie to be
+    set with a new session_id.
+
+       Defaults to <emphasis>yes</emphasis>.
+   </para>
+   </listitem>
+  </varlistentry>
+    <varlistentry id="config.global.model_base_class">
+     <term>model_base_class</term>
+     <listitem>
+      <para>
+Specifies the <link linkend="model.base">base Model class</link>
+that typically contains code
+that used across entire the web application, including methods for
+authentication and connecting to the database.
+      </para>
+      <para>
+If you have multiple PageKit applications running on the same mod_perl
+server, then you'll need to specify a unique <literal>model_base_class</literal>
+for each application.
+      </para>
+      <para>
+Defaults to <literal>MyPageKit::Common</literal>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.model_dispatch_prefix">
+     <term>model_dispatch_prefix</term>
+     <listitem>
+      <para>
+This prefixeds the <link linkend="model.dispatch">Derived Model Classes</link>.  Defaults to MyPageKit::MyModel.
+      </para>
+      <para>
+Methods in this class take an derived Apache::PageKit::Model object as their only argument.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.not_found_page">
+     <term>not_found_page</term>
+     <listitem>
+      <para>
+Error page when page cannot be found.  Defaults to <literal><link linkend="config.global.default_page">default_page</link></literal>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.page_session">
+     <term>page_session</term>
+     <listitem>
+      <para>
+      Sets the default for all non static pages.
+If set to <emphasis>yes</emphasis>, every non static page gets a unique session.
+Defaults to <emphasis>no</emphasis>. This value is overridden with
+<literal><link linkend="config.page.page_session">page_session</link></literal>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.page_session_class">
+     <term>page_session_class</term>
+     <listitem>
+      <para>
+      Name for the Module, that is used to create the page_session objects.
+      Defaults to <emphasis>Apache::SessionX</emphasis>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.post_max">
+     <term>post_max</term>
+     <listitem>
+      <para>
+Maximum size of file uploads, in bytes.  Defaults to 100,000,000 (100 MB).
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.upload_tmp_dir">
+     <term>upload_tmp_dir</term>
+     <listitem>
+      <para>
+Temporary directory for file uploads. Defaults to whatever libapreq finds usefull. 
+This options is only usefull if you use libapreq &gt;= 1.0. The temporary directory
+usually needs to reside on the same filesystem as the location supplied to the 
+upload object's <programlisting>link</programlisting> method. See the Apache::Request 
+documentation for further information.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.protect_static">
+     <term>protect_static</term>
+     <listitem>
+      <para>
+      If set to <emphasis>yes</emphasis> static files can also be protected with the
+      require_login attribute in the SECTION or PAGE tags.
+      Set this option to <emphasis>no</emphasis> to be compatible to PageKit &lt; 1.09.
+      Defaults to <emphasis>yes</emphasis>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.recent_login_timeout">
+     <term>recent_login_timeout</term>
+     <listitem>
+      <para>
+Seconds that user's session has to be inactive before a user is asked
+to verify a password on pages with the <literal><link linkend="config.page.require_login">require_login</link></literal> attribute
+set to <emphasis>recent</emphasis>. Defaults to 3600 (1 hour).
+      </para>
+     </listitem>
+    </varlistentry>
+   <varlistentry id="config.global.relaxed_parser">
+    <term>relaxed_parser</term>
+    <listitem>
+     <para>
+       If set to yes, this option allows template tags to be placed inside
+HTML comments. It also permits spaces and newlines within the tag itself.
+This option may be useful to HTML authors who would like to validate their
+templates' HTML syntax prior to processing, or who use DTD-aware editing
+tools.
+
+      Defaults to <emphasis>no</emphasis>.
+      <informalexample>
+       <programlisting>
+        relaxed_parser = "yes"
+
+        # these tags are all allowed if relaxed_parser is enabled:
+        &lt;MODEL_VAR NAME="x"&gt;
+        &lt; MODEL_VAR NAME = 'x' &gt;
+        &lt; MODEL_LOOP NAME = x &gt;
+        &lt; PKIT_COMPONENT NAME = x /&gt;
+        &lt;!-- MODEL_VAR NAME="x" --&gt;
+        &lt;!--   CONTENT_VAR   NAME   =    "x"   /--&gt;
+       </programlisting>
+      </informalexample>
+     </para>
+    </listitem>
+   </varlistentry>
+    <varlistentry id="config.global.request_param_in_tmpl">
+     <term>request_param_in_tmpl</term>
+     <listitem>
+      <para>
+If set to yes, then <literal><link linkend="model.var">&lt;MODEL_VAR&gt;</link></literal> tags in template automatically get filled in
+with corresponding request parameters across all pages.  Can be overriden
+by the corresponding <link linkend="config.page.request_param_in_tmpl">page attribute</link>.  Defaults to <emphasis>no</emphasis>.
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry id="config.global.request_class">
+     <term>request_class</term>
+     <listitem>
+      <para>
+      Name for the Module, that is used to create the request class objects.
+      Defaults to <emphasis>Apache::Request::PageKit</emphasis>. Which is a 
+      subclass of Apache::Request. A own subclass is usefull, if you like to
+      change the data container for your requstparameter or modify them on
+      init() or new(). 
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry id="config.global.session_class">
+     <term>session_class</term>
+     <listitem>
+      <para>
+      Name for the Module, that is used to create the session objects.
+      Defaults to <emphasis>Apache::SessionX</emphasis>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.global.session_expires">
+     <term>session_expires</term>
+     <listitem>
+      <para>
+       Sets the expire time for the cookie that stores the session id on
+       the user's computer.  If it is not set, then the expire time on the
+       cookie will not be set, and the cookie will expire when the user closes
+       their browser.
+       <informalexample>
+        <programlisting>
+         session_expires = "+3h"
+        </programlisting>
+       </informalexample>
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry id="config.global.template_class">
+     <term>template_class</term>
+     <listitem>
+      <para>
+      Name for the Module, that is used to create the template objects.
+      Defaults to <emphasis>HTML::Template</emphasis>.
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry id="config.global.uri_prefix">
+     <term>uri_prefix</term>
+     <listitem>
+      <para>
+       Prefix of URI that should be trimmed before dispatching to the Model code.
+      </para>
+      <para>
+       See also <link linkend="model.api.pkit_fixup_uri">pkit_fixup_uri</link>
+       in the Model API.
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry id="config.global.use_locale">
+     <term>use_locale</term>
+     <listitem>
+      <para>
+       If set to <emphasis>yes</emphasis> pkit translates the original message to the language
+       of the client if possible. If <link linkend="config.server.reload">reload</link>
+       is set to <emphasis>yes</emphasis>, the translationtables are reloaded on every usage else only on first usage.
+      </para>
+      <para>
+       Defaults to <emphasis>no</emphasis>.
+       See also <link linkend="model.api.pkit_gettext">pkit_gettext</link> and
+        <link linkend="model.api.pkit_gettext_message">pkit_gettext_message</link>
+       in the Model API.
+      </para>
+     </listitem>
+    </varlistentry>
+
+
+    <varlistentry id="config.global.use_recent_login_timeout">
+     <term>use_recent_login_timeout</term>
+     <listitem>
+      <para>
+       If set to <emphasis>no</emphasis>, PageKit does not note, when a user requested a page. 
+       As a result, <link linkend="config.page.require_login">require_login</link> can not
+       check recent anymore. But you get a speedup for Sites, that do not use this future.
+      </para>
+      <para>
+       Defaults to <emphasis>yes</emphasis>.
+       See also <link linkend="config.global.recent_login_timeout">recent_login_timeout</link>.
+      </para>
+     </listitem>
+    </varlistentry>
+
+
+    <varlistentry id="config.global.verify_page">
+     <term>verify_page</term>
+     <listitem>
+      <para>
+       Verify password form.  Defaults to <literal><link linkend="config.global.login_page">login_page</link></literal>.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+
+  <sect2>
+   <title>Section Attributes</title>
+   <para>
+   These options are global across each server and all Views. They are in the
+    &lt;SECTIONS&gt; tag of <filename>Config/Config.xml</filename>.
+   </para>
+   <para>
+   All Page attributes are valid. &lt;SECTION&gt; Tags with the longest matching part of the id attribute
+   provide the defaults for pages without the attribute in question.
+
+   &lt;PAGE&gt; attributes written in the &lt;PAGE&gt; tag have the highest priority. If nothing is found the
+   &lt;SECTION&gt; Tags are scanned for a default. The closest match wins and the search is over.
+   See the line with /xyz in the example bellow, if we request /xyz/abc, the search ends at
+   the line with id='/xyz' and the page does not require a login!
+
+   </para>
+      <informalexample>
+       <programlisting>
+        &lt;SECTIONS&gt;
+        &lt;SECTION id='/' require_login='yes'/&gt;
+        &lt;SECTION id='/xyz' request_param_in_tmpl='yes'/&gt;
+        &lt;SECTION id='/free' require_login='no'/&gt;
+        &lt;/SECTIONS&gt;
+       </programlisting>
+      </informalexample>
+
+   <variablelist>
+    <varlistentry id="config.section.id">
+     <term>id</term>
+     <listitem>
+      <para>
+        This is part of the uri path to the page where the defaults take place. '/' Means the whole site.
+        This attribute is needed in every &lt;SECTION&gt; tag.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+
+
+
+  <sect2>
+   <title>Server Attributes</title>
+   <para>
+    These options are global over all pages, but are local to each server configuration
+    (e.g. production, staging, development). They are located in the &lt;SERVERS&gt; tag of
+    <filename>Config/Config.xml</filename>.
+   </para>
+   <variablelist>
+    <varlistentry id="config.server.can_edit">
+     <term>can_edit</term>
+     <listitem>
+      <para>
+If set to <emphasis>yes</emphasis>, enables <link linkend="features.editing">on-line editing tools</link>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.server.cookie_domain">
+     <term>cookie_domain</term>
+     <listitem>
+      <para>
+       Domain for that cookies are issued.  Note that you must have
+       at least two periods in the cookie domain.
+      </para>
+      <para>
+       If not set then cookie issued for the current domain name.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.server.cookie_postfix">
+     <term>cookie_postfix</term>
+     <listitem>
+      <para>
+The content of <literal><link linkend="config.server.cookie_postfix">cookie_postfix</link></literal> is appended to <literal>pkit_id</literal>
+and <literal>pkit_session_id</literal>. With this option it is possible to force different names for your cookies.
+Usefull if for some reason your cookies overwrite eachother.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.server.fop_command">
+     <term>fop_command</term>
+     <listitem>
+      <para>
+       Command line that should be used to run Apache XML FOP to generate
+       PDF output.  PageKit will append FO file and PDF file arguments at end.
+      </para>
+      <informalexample>
+       <programlisting>
+        # some example fop command lines
+	fop_command = "/usr/java/jdk1.3.0_02/bin/java -cp /usr/local/javaclass/fop org.apache.fop.apps.CommandLine"
+	fop_command = "/usr/java/jdk1.3.0_02/bin/java -cp /usr/local/javaclass/fop org.apache.fop.apps.CommandLine"
+	fop_command = "/usr/java/jdk1.3.0_02/bin/java -cp /usr/local/javaclass/fop org.apache.fop.apps.Fop"
+	fop_command = "/usr/lib/java/bin/java -classpath /opt/fop-0.20.3/lib/xerces-1.2.3.jar:/opt/fop-0.20.3/lib/xalanj1compat.jar:/opt/fop-0.20.3/lib/xalan-2.0.0.jar:/opt/fop-0.20.3/lib/xalan-1.2.2.jar:/opt/fop-0.20.3/lib/stylebook.jar:/opt/fop-0.20.3/lib/logkit-1.0b4.jar:/opt/fop-0.20.3/lib/buildtools.jar:/opt/fop-0.20.3/lib/bsf.jar:/opt/fop-0.20.3/lib/batik.jar:/opt/fop-0.20.3/lib/avalon-framework-4.0.jar:/opt/fop-0.20.3/lib/ant.jar:/opt/fop-0.20.3/lib/ant-1.3-optional.jar:/opt/fop-0.20.3/build/fop.jar: org.apache.fop.apps.Fop"
+       </programlisting>
+      </informalexample>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.server.html_clean_level">
+     <term>html_clean_level</term>
+     <listitem>
+      <para>
+       Sets optimization level for <ulink url="http://kobesearch.cpan.org/search?dist=HTML-Clean">HTML::Clean</ulink>.  If set to 0, disables use of
+<ulink url="http://kobesearch.cpan.org/search?dist=HTML-Clean">HTML::Clean</ulink>.  Levels range from 1 to 9.
+Level 1 includes only simple fast optimizations.  Level 9 includes all
+optimizations.  Defaults to <emphasis>0</emphasis>. A good choice for production is 3. Higher Levels might end up in wrong pages.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.server.reload">
+     <term>reload</term>
+     <listitem>
+      <para>
+If set to <emphasis>yes</emphasis>, check for new view, content and config xml files
+on each request.  Should be set to <emphasis>no</emphasis> on production servers.
+Default is <emphasis>no</emphasis>.
+      </para>
+      <para>
+      If you change this from <emphasis>no</emphasis> to <emphasis>yes</emphasis> it is
+      certainly that the server must be restarted to notice the change.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+  <sect2>
+   <title>User Attributes</title>
+   <para>
+    These options are like the &lt;GLOBAL&gt; tag. With the difference, that you can store any information here that you like.
+    The are located in the &lt;USER&gt; tag of <filename>Config/Config.xml</filename>.
+   </para>
+   <para>
+   You can retrieve this information with the
+   <link linkend="model.api.pkit_get_config_attr">pkit_get_config_attr</link> function.
+   </para>
+  </sect2>
+  <sect2>
+   <title>View Attributes</title>
+   <para>
+    These options are local to each view, but are global across servers and pages.  Currently only the output media can be set, but there are plans to have a <literal>parent_view</literal>, so that there can be multiple levels of
+derived views.
+   </para>
+   <variablelist>
+    <varlistentry id="config.view.content_type">
+     <term>content_type</term>
+     <listitem>
+      <para>
+Sets the content type of the output sent to the client.  
+Content types are strings like "text/plain", "text/html" or "application/xml".
+This corresponds to the "Content-Type" header in the HTTP protocol. 
+The following content types have default views and/or special handing
+associated with them:
+      </para>
+      <informaltable frame="all">
+       <tgroup cols="4">
+        <tbody>
+         <row rowsep="1" role="attrheader">
+	  <entry role="th"><para><emphasis role="bold">content_type</emphasis></para></entry>
+	  <entry role="th"><para><emphasis role="bold">Description</emphasis></para></entry>
+	  <entry role="th"><para><emphasis role="bold">Default Views</emphasis></para></entry>
+	  <entry role="th"><para><emphasis role="bold">Special Handing</emphasis></para></entry>
+	 </row>
+         <row>
+	  <entry>text/html</entry>
+	  <entry>
+ 	   HTML output.  This is for traditional screen browsers such as
+           Netscape and Internet Explorer.
+          </entry>
+	  <entry>This is the default content_type for all views except for
+             those listed below</entry>
+	  <entry>PageKit translates sets the charset in the Content-Type headers and translates the output according
+             to the <literal>Accept-Charset</literal> header.</entry>
+         </row>
+         <row>
+	  <entry>application/pdf</entry>
+	  <entry>
+	   PDF Output, for display in Acrobat Reader.  Uses Apache XML FOP
+          </entry>
+	  <entry>pdf</entry>
+	  <entry>PageKit uses Apache XML FOP to generate the PDF, if
+            <link linkend="config.global.fop_command">fop_command</link>
+            is set.</entry>
+         </row>
+         <row>
+	  <entry>text/vnd.wap.wml</entry>
+	  <entry>
+ 	   WML output.  This is for WAP handhelds such as Palmpilots
+	   and cellphones.
+          </entry>
+	  <entry>wml</entry>
+	  <entry><emphasis>None</emphasis></entry>
+         </row>
+         <row>
+	  <entry>application/xml</entry>
+	  <entry>
+	   XML output, for Internet Explorer 5.0 and above.
+          </entry>
+	  <entry>xml</entry>
+	  <entry><emphasis>None</emphasis></entry>
+         </row>
+        </tbody>
+       </tgroup>
+      </informaltable>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+  <sect2>
+   <title>Page Attributes</title>
+   <para>
+    These options are local to each page on the site, but are global across each server and all views.
+    The are located in the &lt;PAGES&gt; tag of <filename>Config/Config.xml</filename>.
+   </para>
+    <varlistentry id="config.page.browser_cache">
+     <term>browser_cache</term>
+     <listitem>
+      <para>
+If set to <emphasis>no</emphasis>, sends an Expires = -1 header to disable client-side
+caching on the browser.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.page.content_type">
+     <term>content_type</term>
+     <listitem>
+      <para>
+Sets the content type for output.  Overrides the View
+<link linkend="config.view.content_type">content_type</link>
+configuration option.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.page.fill_in_form">
+     <term>fill_in_form</term>
+     <listitem>
+      <para>
+When set to <emphasis>yes</emphasis>, automatically fills in HTML forms using
+<ulink url="http://kobesearch.cpan.org/search?dist=HTML-FillInForm">HTML::FillInForm</ulink>
+with values from the
+request parameters when it detects a <literal>&lt;form&gt;</literal> tag.  Default is <emphasis>yes</emphasis>.
+      </para>
+     </listitem>
+    </varlistentry>
+   <variablelist>
+    <varlistentry id="config.page.id">
+     <term>id</term>
+     <listitem>
+      <para>
+Page ID for this page.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.page.page_session">
+     <term>page_session</term>
+     <listitem>
+      <para>
+If set to <emphasis>yes</emphasis>, this page gets a unique session.
+Defaults to <emphasis>no</emphasis>.
+This value overriddes whatever you have requested in
+<literal><link linkend="config.global.page_session">page_session</link></literal>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.page.request_param_in_tmpl">
+     <term>request_param_in_tmpl</term>
+     <listitem>
+      <para>
+If set to yes, then <literal><link linkend="model.var">&lt;MODEL_VAR&gt;</link></literal> tags in template automatically get filled in
+with corresponding request parameters.
+Defaults to the value set
+by the global <link linkend="config.global.request_param_in_tmpl">request_param_in_tmpl</link> attribute, or if that is not set, then
+it defaults to <emphasis>no</emphasis>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.page.require_login">
+     <term>require_login</term>
+     <listitem>
+      <para>
+If set to <emphasis>yes</emphasis>, page requires a login.  If set to <emphasis>recent</emphasis>, page
+requires a login and that the user has been active in the last
+<literal><link linkend="config.global.recent_login_timeout">recent_login_timeout</link></literal> seconds.  
+The <emphasis>recent</emphasis> can only be used, if 
+<link linkend="config.global.use_recent_login_timeout">use_recent_login_timeout</link> is set to <emphasis>yes</emphasis>.
+<link linkend="config.page.require_login">require_login</link> defaults to <emphasis>no</emphasis>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.page.uri_match">
+     <term>uri_match</term>
+     <listitem>
+      <para>
+Value should be a regular expression.
+Servers requests whose URL (after the host name) match the regular expression.
+For example, <literal>^member\/\d*$</literal> matches <literal>http://yourdomain.tld/member/4444</literal>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry id="config.page.use_template">
+     <term>use_template</term>
+     <listitem>
+      <para>
+If set to <emphasis>yes</emphasis>, uses <ulink url="http://kobesearch.cpan.org/search?dist=HTML-Template">HTML::Template</ulink> files.  If set to <emphasis>no</emphasis> page code
+is responsible for sending output.  Default is <emphasis>yes</emphasis>.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+ </sect1>
+ <sect1>
+  <title>Model API</title>
+  <sect2 id="model.api.extensions">
+   <title>PageKit Extensions</title>
+   <para>
+    These methods should be defined in your base module as defined by model_base_class
+    in <filename>Config/Config.xml</filename>.
+   </para>
+   <refentry id="model.api.pkit_dbi_connect">
+    <refnamediv>
+     <refname>pkit_dbi_connect</refname>
+     <refpurpose>
+      Should generate and return DBI database handler, <varname>$dbh</varname>,
+      which can be accessed by rest of Model using the
+      <literal><link linkend="model.api.dbh">dbh</link></literal> method.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+      sub pkit_dbi_connect {
+       return DBI->connect("DBI:mysql:db","user","passwd");
+      }
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+      This method will probably be replaced when request-based sessions
+      are implemented.
+     </para>
+    </refsect1>
+   </refentry>
+      <refentry id="model.api.pkit_on_error">
+    <refnamediv>
+     <refname>pkit_on_error</refname>
+     <refpurpose>
+      Can be used to catch any fatal error condition.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+
+  ## inside your Common.pm, maybe also in your Modelclass to overwrite the one in Common.pm
+
+  sub pkit_on_error {
+    my ( $model, $err ) = @_;
+    my $page_id = $model->pkit_get_page_id;
+
+    if ( $err =~ /DBI/ ) {
+      # prevent endless loop if the error happened on our errorpage.
+      return $err if ( $page_id =~ /db_error_page$/ );
+      $model->pkit_redirect('db_error_page');
+      return;
+    }
+
+    $model->pkit_message( $err );
+    my $default_page = $model->pkit_get_default_page;
+    return $err if ( $page_id =~ /^$default_page$/ );
+    $model->pkit_redirect($default_page);
+    return;
+  }
+
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+
+pkit_on_error main purpose is to catch errors for some reason. Maybe you can not
+ get a database connection or your page can not be delivered in a special
+ charset or anywhere inside your modelcode an uncatched die "for unknown
+ reason"; is executed.
+</para>
+<para>
+If nowhere else in your code this error is handled, pkit_on_error is called
+ with the error message as second parameter and model as the first. This is
+ your chance to deliver a working page. At best with pkit_redirect or pkit_send.
+</para>
+<para>
+If an error happened inside pkit_on_error it is passed thru Apache and you get the internal server
+ error as before. pkit_on_error returns the error_msg that is logged. So you
+ can change the messsage if you like. If the returned error_msg is '' or undef
+ nothing is logged and pkit assumes, that the error is repaired. If you like
+ to log anyway add a warn $error_msg"; inside your pkit_on_error routine.
+</para>
+<para>
+Also pkit_on_error is no replacement for Apache::ErrorReport. pkit_on_error
+ is more a runtime error catcher for most cases. A::E reports errors more
+ clear with stacktrace and so on. Both can happy live together.
+</para>
+<para>
+Another advantage is that you need only pkit_on_error to catch the error even
+ if your application has millions of cases where it could fail. There is no
+ need to catch them all.
+</para>
+<para>
+If pkit_on_error is not defined in your modelclass or Common.pm, it is not used.
+</para>
+<para>
+pkit_on_error catch only fatal errors (die) NOT warnings.
+</para>
+<para>
+If your code likes to throw an error let it die.
+     </para>
+    </refsect1>
+   </refentry>
+
+   <refentry id="model.api.pkit_session_setup">
+    <refnamediv>
+     <refname>pkit_session_setup</refname>
+     <refpurpose>
+      Returns Session setup arguments.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  # here a MySQL example:
+  sub pkit_session_setup {
+    my $model = shift;
+    my $dbh = $model->dbh;
+    return {
+	session_lock_class => 'MySQL',
+	session_store_class => 'MySQL',
+	session_args => {
+			Handle => $dbh,
+			LockHandle => $dbh,
+			},
+	};
+  }
+
+  # this one is if you prefer PostgreSQL
+  sub pkit_session_setup {
+    my $model = shift;
+    my $dbh = $model->dbh;
+
+    my %session_setup = (
+  	session_store_class => 'Postgres',
+  	session_lock_class => 'Null',
+  	session_serialize_class => 'Base64',
+  	session_args => {
+  			 Handle => $dbh,
+                           IDLength => 32,
+                           Commit => 0,
+                          }
+    );
+    return \%session_setup;
+  }
+
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+      Method must return a hash reference using <ulink url="http://kobesearch.cpan.org/search?dist=Apache-SessionX">Apache::SessionX</ulink> session
+      setup arguments.  This hash reference should contain the following key/value pairs:
+     </para>
+     <variablelist>
+      <varlistentry>
+       <term>session_store_class</term>
+       <listitem>
+        The object store class that should be used for
+         Apache::SessionX session handling.
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>session_lock_class</term>
+       <listitem>
+        The lock manager class that should be used for
+        Apache::PageKit::Session session handling.
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>session_args</term>
+       <listitem>
+        Reference to an hash containing options for the
+        <literal>session_lock_class</literal> and <literal>session_store_class</literal>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_auth_credential">
+    <refnamediv>
+     <refname>pkit_auth_credential</refname>
+     <refpurpose>
+      Verifies login credentials and returns session key
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  sub pkit_auth_credential {
+    my ($model) = @_;
+
+    # in this example, login and passwd are the names of the credential fields
+    my $login = $model->input('login');
+    my $passwd = $model->input('passwd');
+
+    # create a session key
+    # your code here.........
+
+    return $ses_key;
+  }
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Verifies the user-supplied credentials and return a session key.  The
+session key is a string that is stored on the user's computer using cookies.
+Often you'll use the user ID and a MD5 hash of a a secret key, user ID, password.
+     </para>
+     <para>
+Note that the string returned should not contain any commas, spaces, or semi-colons.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_auth_session_key">
+    <refnamediv>
+     <refname>pkit_auth_session_key</refname>
+     <refpurpose>Verifies a session key and returns the user ID and session ID
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  sub pkit_auth_session_key {
+    my ($model, $ses_key) = @_;
+
+    # check whether $ses_key is valid, if so return user id in $user_id
+    # your code here.........
+
+    return $ok ? ($user_id, $session_id) : undef;
+  }
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Verifies the session key (previously generated by <link linkend="model.api.pkit_auth_credential">auth_credential</link>)
+and returns the user ID, and session ID.
+     </para>
+     <para>
+The returned user ID will be fed to <literal>$r-&gt;connection-&gt;user</literal>.
+     </para>
+     <para>
+The returned session ID will used to retreive the session from the database.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_common_code">
+    <refnamediv>
+     <refname>pkit_common_code</refname>
+     <refpurpose>
+      Code common across site.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  sub pkit_common_code {
+    my $model = shift;
+
+    # code that should be executed for every page on your site here...
+  }
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Code that gets called before the page and component code for every page on
+the site.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_post_common_code">
+    <refnamediv>
+     <refname>pkit_post_common_code</refname>
+     <refpurpose>
+      Code common across site, executed after rest of code.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  sub pkit_post_common_code {
+    my $model = shift;
+
+    # code that should be executed for every page on your site here...
+  }
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Code that gets called after the page and component code is executed.
+Note that this is experimental and may change in future releases.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_cleanup_code">
+    <refmeta>
+     <refentrytitle>pkit_cleanup_code</refentrytitle>
+    </refmeta>
+    <refnamediv>
+     <refname>pkit_cleanup_code</refname>
+     <refpurpose>
+      Cleanup code at the end of request.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+sub pkit_cleanup_code {
+  my $model = shift;
+  my $dbh = $model->dbh;
+  $dbh->disconnect;
+}
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+One use for this is to cleanup any database handlers:
+     </para>
+     <para>
+Although a better solution is to use <ulink url="http://kobesearch.cpan.org/search?dist=Apache-DBI">Apache::DBI</ulink>.
+     </para>
+     <para>
+     Please note, that the <literal>session</literal> and
+     <literal>page_session</literal> references are already deleted here.
+     You can not use <literal>$model->session</literal> and
+     <literal>$model->page_session</literal> inside the hook.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_fixup_uri">
+    <refnamediv>
+     <refname>pkit_fixup_uri</refname>
+     <refpurpose>
+      filter uri for conversion into page IDs
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  sub pkit_fixup_uri {
+    my ($model, $uri) = @_;
+
+    $uri =~ s!^/pagekit!!;
+    return $uri;
+  }
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Pre-processes the URI so that it will match the page_id's used by PageKit
+to dispatch the model code and find the template and content files.
+     </para>
+     <para>
+In the example listed above, the request for <literal>http://yourwebsite/pagekit/myclass/mypage</literal> would
+get dispatched to the mypage method of the myclass class, and the <filename>View/Default/myclass/mypage.tmpl</filename> template and/or the <filename>Content/myclass/mypage.xml</filename> XML file.
+     </para>
+     <para>
+     Note: that no session and page_session data is available in this function for reading or writing.
+     </para>
+     <para>
+See also <link linkend="config.global.uri_prefix">uri_prefix</link>.
+     </para>
+    </refsect1>
+   </refentry>
+
+   <refentry id="model.api.pkit_get_config_attr">
+    <refnamediv>
+     <refname>pkit_get_config_attr</refname>
+     <refpurpose>
+      Returns the value of the attr you ask for.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+$hash_ref = $model->pkit_get_config_attr('GLOBAL');
+$default_page = $model->pkit_get_config_attr( GLOBAL => 'default_page');
+
+$hash_ref = $model->pkit_get_config_attr('SERVER');
+$id = $model->pkit_get_config_attr('SERVER', 'id');
+
+$all_pages_hash_ref = $model->pkit_get_config_attr('PAGES');
+$hash_ref = $model->pkit_get_config_attr('PAGE', 'restricted');
+$require_login = $model->pkit_get_config_attr('PAGE', 'restricted', 'require_login');
+
+$all_views_hash_ref = $model->pkit_get_config_attr('VIEWS');
+$hash_ref = $model->pkit_get_config_attr('VIEW', 'pdf');
+$media    = $model->pkit_get_config_attr('VIEW', 'pdf', 'media');
+
+$hash_ref = $model->pkit_get_config_attr('USER');
+$location = $model->pkit_get_config_attr('USER', 'location');
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+     The first argument is the sectionname in your <filename>Config/Config.xml</filename>
+     this can be one of GLOBAL|SERVER|PAGES|PAGE|VIEWS|VIEW|USER. If no more arguments are given, you get
+     a hashref with all tags as keys and all attrs as values for the section in question back.
+     For the sections PAGE and VIEW you get a href back which values are a href to the subsections.
+     If you call to with two params, the second parameter is the name of the key you ask for.
+     The three parameter form is only allowed for pages and views, where the second argument is the
+     page or view and the third is the name of the key you are interested in.
+     If nothing is found, undef is returned. Otherwise the attr you ask for or a hashref.
+
+     Note, that the value you get is the value in the Config.xml this is not ever
+     the same as the value pagekit is working with. Ie: if you ask for pkit_get_config_attr( GLOBAL => 'default_page' );
+     you might get undef but PageKit uses 'index' as this is the default.
+     </para>
+    </refsect1>
+   </refentry>
+
+   <refentry id="model.api.pkit_get_default_page">
+    <refnamediv>
+     <refname>pkit_get_default_page</refname>
+     <refpurpose>
+      Returns "index" page when no page_id is specified.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  sub pkit_get_default_page {
+    my ($model) = @_;
+
+    if($model->pnotes('user_id')){
+      # user is logged in, go to account page
+      return 'myaccount';
+    } else {
+      # user not logged in, go to main page
+      return 'index';
+    }
+  }
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+If no page is specified, then this subroutine will return the page_id
+of the page that should be displayed.  You only have to provide this
+routine if you wish to override the default method, which simply
+returns the <link linkend="config.global.default_page">default_page</link> attribute as listed in the <filename>Config/Config.xml</filename> file.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_merge_sessions">
+    <refnamediv>
+     <refname>pkit_merge_sessions</refname>
+     <refpurpose>
+      Merges current session with session associated with
+      login when user first logs in.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+      # This is the default merge method, included in Apache::PageKit::Model
+      # and called unless you over-ride the method in your Model class
+      sub pkit_merge_sessions {
+        my ($model, $old_session, $new_session) = @_;
+        while(my ($k, $v) = each %$old_session){
+          next if $k eq '_session_id';
+          $new_session->{$k} = $v unless exists $new_session->{$k};
+        }
+      }
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+      As of PageKit 1.05, sessions are associated with logins.  If a user logs in,
+      PageKit retreives the session associated with that login.  This method
+      can be used to specify how the data from the current session is merged
+      with the data from the retreived session.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_output_filter">
+    <refnamediv>
+     <refname>pkit_output_filter</refname>
+     <refpurpose>
+      Filters output generated by PageKit
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  sub pkit_output_filter {
+    my ($model, $output_ref) = @_;
+    if($model->apr->parsed_uri->scheme eq 'https'){
+      $$output_ref =~ s(http://images.yourdomain.com/)(https://images.yourdomain.com/)g;
+    }
+  }
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Filters the output from the PageKit handler.  Should only use when necessary,
+a better option is to modify the templates directly.
+     </para>
+     <para>
+In the example above we filter the image links to that they point to the secure site if we
+are on a secure page (the only good use of <literal>pkit_output_filter</literal> that I know of)
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_startup">
+    <refnamediv>
+     <refname>pkit_startup</refname>
+     <refpurpose>
+      Class method called at server startup.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+sub pkit_startup {
+  my ($class, $pkit_root, $server, $config) = @_;
+  my $pic_cache_dir = $config->get_global_attr('my_picture_cache') || '';
+  my $unlink_sub = sub {
+    -f &amp;&amp; unlink;
+  };
+  File::Find::find(sub { -f &amp;&amp; unlink }, $pic_cache_dir);
+}
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Called at server startup with PageKit root, server, and configuration
+object passed as parameters.  Note that the configuration API may change.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_default">
+    <refnamediv>
+     <refname>pkit_default</refname>
+     <refpurpose>
+      Default class method
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+sub pkit_default {
+ # class default code here ...
+}
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Class method called for every page in the same class which has page code
+and/or content. It is called after <literal>pkit_common_code</literal> and before page code.
+     </para>
+     <para>
+NOTE: currently this is the only pkit_* method which can exist outside Common.pm
+     </para>
+    </refsect1>
+   </refentry>
+  </sect2>
+  <sect2 id="model.api.api">
+   <title>PageKit API</title>
+   <para>
+    Theese methods are available to the user as Apache::PageKit::Model API.
+   </para>
+   <refentry id="model.api.input">
+    <refnamediv>
+     <refname>input</refname>
+     <refpurpose>
+      Get request parameters
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  # get single parameter
+  my $value = $model->input($key);
+
+  # get all parameters
+  my @keys = $model->input;
+
+  # set pkit_view request parameter
+  $model->input(pkit_view => "printable");
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Gets requested parameter from the Apache request object,
+if called without any parameters, gets all available input parameters:
+     </para>
+    </refsect1>
+   </refentry>
+      <refentry id="model.api.pkit_send">
+    <refnamediv>
+     <refname>pkit_send</refname>
+     <refpurpose>
+      Can be used to send data to the client.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+
+        #
+        # for a filename, the media_type will be found by the <literal>MIME::Types</literal> module.
+        #
+	my $status_code = $model->pkit_send($filename);
+
+        my $status_code = $model->pkit_send(\$data, 'image/png');
+
+        # $data_ref is not zipped by the pkit_send methode, it sends
+        # it only with this encoding header.
+	my $status_code = $model->pkit_send($data_ref, 'html/text', 'gzip');
+
+        my $status_code = $model->pkit_send($fh);
+
+        $model->pkit_status_code($status_code);
+
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+      Can be used to send data to the client. From a scalar_ref a filename or
+      a reference to a filehandle.
+
+      If the first argument is a filename, and the second argument media_type is not set,
+      the module <literal>MIME::Types</literal>
+      try to find the media_type for us depending on the suffix.
+
+      If this fails or the optional second argument media_type is not set, the default
+      <literal>application/octet-stream</literal> is used.
+
+      If the request was only a head request, only a header is send back to the client.
+
+      The optional third argument if the content_encoding (ie: gzip|x-gzip|compress|x-compress) it is only used if the
+      media_type is html/text.
+     </para>
+    </refsect1>
+   </refentry>
+   
+   <refentry id="model.api.pkit_component_params_hashref">
+    <refnamediv>
+     <refname>pkit_component_params_hashref</refname>
+     <refpurpose>
+      Get access to the component parameters.
+    </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis><![CDATA[
+
+     <PKIT_COMPONENT NAME="xxx" headline="title" datasrc="select * from a_table">
+     <PKIT_COMPONENT NAME="xxx" headline="another_title" datasrc="select * from another_table">
+     <PKIT_COMPONENT NAME="xxx" headline="title" datasrc="select * from a_table">
+
+  sub xxx {
+    my $model = shift;
+    my $fields = $model->pkit_component_params_hashref;
+    my $select_statement = $fields->{DATASRC};
+    ...
+  }
+]]>
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+      This method return a hashref that contain the component parameters (or undef if the calling routine is not a component).
+      All keys are uppercase and the NAME of the component is not present in the hash. If the same component is used twice or more,
+      the component code is called only once.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_input_hashref">
+    <refnamediv>
+     <refname>pkit_input_hashref</refname>
+     <refpurpose>
+      Gets all request paramaters.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+      $params = $model->pkit_input_hashref;
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+This method fetches all of the parameters from the Apache request object,
+returning a reference to a hash containing the parameters as keys, and
+the parameters' values as values.  Note a multivalued parameters
+is returned as a reference to an array.
+     </para>
+     <para>
+Note, that the values in this hash are <emphasis role="bold">readonly</emphasis>. 
+To modify something use $model-><literal>input</literal>( key => $value );.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.fillinform">
+    <refnamediv>
+     <refname>fillinform</refname>
+     <refpurpose>
+      Fills in HTML Forms
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  $model->fillinform(email => $email);
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Used with <ulink uri="http://kobesearch.cpan.org/search?dist=HTML-FillInForm">HTML::FillInForm</ulink> to fill in HTML forms.  Useful for example
+when you want to fill an edit form with data from the database.
+     </para>
+    </refsect1>
+   </refentry>
+   
+   <refentry id="model.api.ignore_fillinform_fields">
+    <refnamediv>
+     <refname>ignore_fillinform_fields</refname>
+     <refpurpose>
+      Fills in HTML Forms
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  $model->ignore_fillinform_fields( qw/email name/ );
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+     All fields named in this call are NOT changed by fillinform.
+    </para>
+    </refsect1>
+   </refentry>
+
+   <refentry id="model.api.pnotes">
+    <refnamediv>
+     <refname>pnotes</refname>
+     <refpurpose>
+      Pass values from one method/handler to another
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+sub pkit_auth_credential {
+  # ...
+  $model->pnotes(user_id => $user_id);
+  # ...
+}
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Wrapper to mod_perl's <literal>pnotes</literal> method, used to pass values from
+one handler to another.
+     </para>
+     <para>
+In the example above the <literal>user_id</literal> is set when the user
+gets authenticated.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.output_convert">
+    <refnamediv>
+     <refname>output_convert</refname>
+     <refpurpose>
+      Outputs data for display, converting charset.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+      $model->output_convert(output => {foo => $utf8_text},
+			     input_charset => 'UTF-8');
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+      This is a wrapper to the <link linkend="model.api.output">output</link>
+      method.  It converts the output from the character set specified by
+      the charset argument to <link linkend="config.global.default_output_charset">default_output_charset</link>.  If the character set is not specified, then
+      <link linkend="config.global.default_input_charset">default_input_charset</link> is used.
+     </para>
+    </refsect1>
+    <refsect1>
+     <title>Examples</title>
+     <informalexample>
+      <programlisting>
+      # converts from UTF-8
+      $model->output_convert(output => { key => $utf8_text },
+			     charset => 'UTF-8');
+      # converts from default_input_charset
+      $model->output_convert(key => $text)
+      </programlisting>
+     </informalexample>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.output">
+    <refnamediv>
+     <refname>output</refname>
+     <refpurpose>
+      Outputs data for display.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+      $model->output(NAME => "John Doe");
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+      This is similar to the <ulink uri="http://kobesearch.cpan.org/search?dist=HTML-Template">HTML::Template</ulink> <literal>param</literal> method.  It is
+      used to set the <link linkend="model.tags">model tags</link> in the
+      PageKit templates..
+     </para>
+    </refsect1>
+    <refsect1>
+     <title>Examples</title>
+     <informalexample>
+      <programlisting>
+  # set multiple paramaters
+  $model->output(firstname => $firstname,
+               lastname => $lastname);
+
+  # set multiple paramaters with hash ref
+  $model->output({firstname => $firstname,
+               lastname => $lastname});
+
+  # sets &lt;MODEL_LOOP NAME="foo"&gt;
+  #       &lt;MODEL_VAR NAME="bar"/&gt;
+  #       &lt;MODEL_VAR NAME="baz"/&gt;
+  #      &lt;/MODEL_LOOP&gt;
+  $model->output(foo => [
+			 {bar => $bar1, baz => $baz1},
+			 {bar => $bar2, baz => $baz2},
+			]);
+      </programlisting>
+     </informalexample>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_query">
+    <refmeta>
+     <refentrytitle>pkit_query</refentrytitle>
+    </refmeta>
+    <refnamediv>
+     <refname>pkit_query</refname>
+     <refpurpose>
+      Wrapper to HTML::Template::query
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+      my $type = $model->pkit_query(name => 'foo');
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+ Basically a wrapper to the <literal>query</literal> method HTML::Template.
+ Queries the template for the current page_id.  Useful when you have
+ multiple views and want to make sure that you need to hit a database.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.apr">
+    <refnamediv>
+     <refname>apr</refname>
+     <refpurpose>
+Returns Apache::Request object
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  my $apr = $model->apr;
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Returns <ulink uri="http://kobesearch.cpan.org/search?dist=Apache-Request">Apache::Request</ulink>.
+     </para>
+    </refsect1>
+   </refentry>
+      <refentry id="model.api.pkit_status_code">
+    <refnamediv>
+     <refname>pkit_status_code</refname>
+     <refpurpose>
+Get or set the status code for you page.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  # get status code
+  my $status_code = $model->pkit_status_code;
+
+  # set status code
+  $model->pkit_status_code(DONE);
+  $model->pkit_status_code(NOT_FOUND);
+  $model->pkit_status_code(OK);
+
+  # return old status code
+  return $model->pkit_status_code(OK);
+
+  # remove previously set returncode
+  $model->pkit_status_code(undef);
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+     Set or get the status code for your page. If you set a status code the execution
+     of your model code ends after the peace of code that sets the status code.
+     Even if you set the status code to OK. The status code is passed back to the webserver.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.dbh">
+    <refnamediv>
+     <refname>dbh</refname>
+     <refpurpose>
+      Returns database handle
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  my $dbh = $model->dbh;
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Returns a database handle, as specified by the <link linkend="model.api.pkit_dbi_connect">pkit_dbi_connect</link> method.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.session">
+    <refnamediv>
+     <refname>session</refname>
+     <refpurpose>
+      Gets session object
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  my $session = $model->session;
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Returns a hash tied to <ulink url="http://kobesearch.cpan.org/search?dist=Apache-SessionX">Apache::SessionX</ulink>
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.page_session">
+    <refnamediv>
+     <refname>page_session</refname>
+     <refpurpose>
+      Gets page session object
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  my $page_session = $model->page_session;
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Returns a hash tied to <ulink url="http://kobesearch.cpan.org/search?dist=Apache-SessionX">Apache::SessionX</ulink>
+If this was requested in <filename>Config/Config.xml</filename> otherwise undef.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_message">
+    <refnamediv>
+     <refname>pkit_message</refname>
+     <refpurpose>
+      Adds message to PKIT_MESSAGES tag
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+      # regular message
+      $model->pkit_message("Your listing has been deleted.");
+      # error message
+      $model->pkit_message("You did not fill out the required fields.",
+               is_error => 1);
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Adds a message to be displayed to the user.
+The message can displayed using the <link linkend="pkit.messages">&lt;PKIT_MESSAGES&gt;</link> tag.
+     </para>
+     <para>
+To add an error message, set <literal>is_error</literal> to a true value.
+     </para>
+     <para>
+Note that the message is passed along in the URI if you perform a
+redirect using the <link linkend="model.api.pkit_redirect">pkit_redirect</link> method.
+     </para>
+    </refsect1>
+   </refentry>
+
+   <refentry id="model.api.pkit_gettext_message">
+    <refnamediv>
+     <refname>pkit_gettext_message</refname>
+     <refpurpose>
+      Adds translated message to PKIT_MESSAGES tag
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+      # regular message
+      $model->pkit_gettext_message("Your listing has been deleted.");
+      # error message
+      $model->pkit_gettext_message("You did not fill out the required fields.",
+               is_error => 1);
+      # pkit_gettext_message is a shortcut for
+      $model->pkit_message($model->pkit_gettext('the message'), ...);
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Adds a translated message to be displayed to the user.
+The message can displayed using the <link linkend="pkit.messages">&lt;PKIT_MESSAGES&gt;</link> tag.
+     </para>
+     <para>
+To add an error message, set <literal>is_error</literal> to a true value.
+     </para>
+     <para>
+Note that the message is passed along in the URI if you perform a
+redirect using the <link linkend="model.api.pkit_redirect">pkit_redirect</link> method.
+See also <link linkend="model.api.pkit_gettext">pkit_gettext</link> and
+<link linkend="model.api.pkit_message">pkit_message</link>.
+     </para>
+    </refsect1>
+   </refentry>
+
+      <refentry id="model.api.pkit_gettext">
+    <refnamediv>
+     <refname>pkit_gettext</refname>
+     <refpurpose>
+      Translates the text to the clients language if possible else return the messages as it was before.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+      $model->pkit_gettext('You have successfully logged out.');
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+     Translates the text to the clients language, if a .mo file in that language is found.
+     See also <link linkend="model.api.pkit_gettext_message">pkit_gettext_message</link>.
+     </para>
+    </refsect1>
+   </refentry>
+
+   <refentry id="model.api.pkit_internal_execute_redirect">
+    <refnamediv>
+     <refname>pkit_internal_execute_redirect</refname>
+     <refpurpose>
+      Internal redirection to another page inside the PageKit application.
+      Also execute the code for the new destination page.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+      $model->pkit_internal_execute_redirect('myotherpage');
+      return;
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Resets the page_id. This is usually used "redirect" to different template inside your application and execute the modelcode for the new page.
+     </para>
+     <para>
+
+From PageKit v1.12 on pkit_internal_redirect handle full url's and strip them.
+Parameters at the end of request are removed.
+This is usefull if you get the url from a pkit_done like parameter.
+
+See also <link linkend="model.api.pkit_redirect">pkit_redirect</link> and
+<link linkend="model.api.pkit_internal_redirect">pkit_internal_redirect</link>
+     </para>
+    </refsect1>
+   </refentry>
+
+
+
+   <refentry id="model.api.pkit_internal_redirect">
+    <refnamediv>
+     <refname>pkit_internal_redirect</refname>
+     <refpurpose>
+      Internal redirection to another page inside the PageKit application
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+      $model->pkit_internal_redirect('myaccount');
+      return;
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Resets the page_id. This is usually used "redirect" to different template.
+     </para>
+     <para>
+Note that you should perform a <link linkend="model.api.pkit_redirect">pkit_redirect</link>
+for <emphasis role="bold">POST</emphasis> requests.
+From PageKit v1.12 on pkit_internal_redirect handle full url's and strip them.
+Parameters at the end of request are removed.
+This is usefull if you get the url from a pkit_done like parameter.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_redirect">
+    <refnamediv>
+     <refname>pkit_redirect</refname>
+     <refpurpose>
+      Redirect to another URL.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+      $model->pkit_redirect("http://www.pagekit.org/");
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+It is strongly recommend that you use this method on pages where a
+query that changes the state of the application is executed.  Typically
+these are POST queries that update the database.
+     </para>
+     <para>
+Note that this passes along the messages set my <link linkend="model.api.pkit_message">pkit_message</link> if applicable.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_set_errorfont">
+    <refnamediv>
+     <refname>pkit_set_errorfont</refname>
+     <refpurpose>
+      Sets PKIT_ERRORSPAN tags
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+      $model->pkit_set_errorfont('state');
+
+      # possible since version 1.08
+      $model->pkit_set_errorfont( 'state', '#00ff00' );
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+     Superfluous since PageKit 1.08 please use <link linkend="model.api.pkit_set_errorspan">pkit_set_errorspan</link>.
+     </para>
+     <para>
+      Sets the corresponding <link linkend="pkit.errorspan">PKIT_ERRORSPAN</link> tag in the template.  Useful
+for implementing your own custom constraints. Since version 1.08 it is possible to select the errorstr. This
+is done with the second parameter. The color must be a string thar starts with a # followed by exactly six hexdigits.
+If you do not specify the errorstr, the string is taken from the
+<literal><link linkend="config.global.default_errorstr">default_errorstr</link></literal>.
+See also <link linkend="pkit.errorstr">PKIT_ERRORSTR</link>.
+     </para>
+    </refsect1>
+   </refentry>
+
+   <refentry id="model.api.pkit_set_errorspan">
+    <refnamediv>
+     <refname>pkit_set_errorspan</refname>
+     <refpurpose>
+      Sets PKIT_ERRORSPAN tags
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+      $model->pkit_set_errorspan('state');
+
+      # possible since version 1.08
+      $model->pkit_set_errorspan( 'state', '#00ff00' );
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+      Sets the corresponding <link linkend="pkit.errorspan">PKIT_ERRORSPAN</link> tag in the template.  Useful
+for implementing your own custom constraints. Since version 1.08 it is possible to select the errorstr. This
+is done with the second parameter. The color must be a string thar starts with a # followed by exactly six hexdigits.
+If you do not specify the errorstr, the string is taken from the
+<literal><link linkend="config.global.default_errorstr">default_errorstr</link></literal>.
+See also <link linkend="pkit.errorstr">PKIT_ERRORSTR</link>.
+     </para>
+    </refsect1>
+
+   </refentry>
+   <refentry id="model.api.pkit_validate_input">
+    <refnamediv>
+     <refname>pkit_validate_input</refname>
+     <refpurpose>
+      Validates input from an HTML form.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis><![CDATA[
+  # very simple validation, just check to see if name field was filled out
+  my $input_profile = {required => [ qw ( name ) ]};
+  # validate user input
+  unless($model->pkit_validate_input($input_profile)){
+    # user must have not filled out name field, 
+    # i.e. $apr->param('name') = $model->input('name') is
+    # not set, so go back to original form
+    # if you used a <PKIT_ERRORFONT NAME="name"> tag, then it will be set to
+    # red
+    $model->pkit_internal_redirect('orig_form');
+    return;
+  }
+]]>
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Takes an hash reference containing a <ulink url="http://kobesearch.cpan.org/search?dist=Data-FormValidator">Data::FormValidator</ulink> input profile
+and returns true if the request parameters are valid.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_get_orig_uri">
+    <refnamediv>
+     <refname>pkit_get_orig_uri</refname>
+     <refpurpose>
+      Gets the original URI requested.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  my $orig_uri = $model->pkit_get_orig_uri;
+     </synopsis>
+    </refsynopsisdiv>
+   </refentry>
+   <refentry id="model.api.pkit_get_page_id">
+    <refnamediv>
+     <refname>pkit_get_page_id</refname>
+     <refpurpose>
+      Gets the page ID.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  my $page_id = $model->pkit_get_page_id;
+     </synopsis>
+    </refsynopsisdiv>
+   </refentry>
+   <refentry id="model.api.pkit_get_server_id">
+    <refnamediv>
+     <refname>pkit_get_server_id</refname>
+     <refpurpose>
+      Gets server ID.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  my $server_id = $model->pkit_get_server_id;
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Gets the server_id for the server, as specified by the
+<literal>PKIT_SERVER</literal> directive in the <filename>httpd.conf</filename> file.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_get_session_id">
+    <refnamediv>
+     <refname>pkit_get_session_id</refname>
+     <refpurpose>
+Gets the session id
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  # the following two line are equivalent, with one difference, if the session does
+  # not exist already then the second line creates a new session. The first line
+  # does not.
+  my $session_id = $model->pkit_get_session_id;
+  my $session_id = $model->session->{_session_id};
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Gets the session id if you have set up session management using
+<link linkend="model.api.pkit_get_session_id">pkit_session_setup</link>.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_get_page_session_id">
+    <refnamediv>
+     <refname>pkit_get_page_session_id</refname>
+     <refpurpose>
+Gets the page session id or undef in case this page has no page_session requested.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+   my $page_session_id = $model->pkit_get_page_session_id;
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Gets the page session id if you have set up session management using
+<link linkend="model.api.pkit_get_session_id">pkit_session_setup</link>
+and this page want a page_session see: <link linkend="config.global.page_session">page_session</link>
+ and <link linkend="config.page.page_session">page_session</link>.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_lang">
+    <refnamediv>
+     <refname>pkit_lang</refname>
+     <refpurpose>
+      Gets Language preference of user
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+      my $pkit_lang = $model->pkit_lang;
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+      Gets the language preference of the user, as set by <literal>Accept-Language</literal> incoming HTTP header
+      or by the <literal><link linkend="request.pkit_lang">pkit_lang</link></literal>
+     request parameter.
+     </para>
+     <para>
+      Can be used for selecting which content should be retreived from the database.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_root">
+    <refnamediv>
+     <refname>pkit_root</refname>
+     <refpurpose>
+      Gets PageKit root directory
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  my $pkit_root = $model->pkit_root;
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Gets the PageKit root directory, as defined by <literal>PKIT_ROOT</literal> in your
+<filename>httpd.conf</filename> file.
+     </para>
+    </refsect1>
+   </refentry>
+   <refentry id="model.api.pkit_user">
+    <refnamediv>
+     <refname>pkit_user</refname>
+     <refpurpose>
+      Gets user ID of authenticated user.
+     </refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+     <synopsis>
+  my $pkit_user = $model->pkit_user;
+     </synopsis>
+    </refsynopsisdiv>
+    <refsect1>
+     <title>Description</title>
+     <para>
+Gets the user_id from <literal>$apr-&gt;connection-&gt;user</literal>, set with the return
+value of <link linkend="model.api.pkit_auth_session_key">pkit_auth_session_key</link>.
+     </para>
+    </refsect1>
+   </refentry>
+  </sect2>
+ </sect1>
+ <sect1>
+   <title>PageKit Template Tags</title>
+   <para>PageKit Templates are templates that contain <ulink url="http://kobesearch.cpan.org/search?dist=HTML-Template">HTML::Template</ulink>-esque
+    tags.  They are either stored as files in the View directory or generated
+    from <acronym>XSLT</acronym> transformations.  There are three main classes of tags,
+    <acronym>XML</acronym> content tags, Model tags, and PageKit tags.
+   </para>
+   <sect2 id="content.tags">
+    <title>XML content tags</title>
+    <para>Content tags use XPath queries to retreive data from XML Content
+      files.  The <ulink url="http://kobesearch.cpan.org/search?dist=XML-LibXML">XML::LibXML</ulink>
+      and <ulink url="http://kobesearch.cpan.org/search?dist=HTML-Template-XPath">HTML::Template::XPath</ulink>
+      modules are used behind
+      the scenes.</para>
+    <refentry id="content.var">
+     <refnamediv>
+      <refname>CONTENT_VAR</refname>
+      <refpurpose>Extract a node from an XML file using XPath.</refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       &lt;CONTENT_VAR NAME="document('site.xml')//title"/&gt;
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+      Uses the XPath query specified in the NAME to
+      extract content from the XML file specified by the document function.
+      Note that the document function is relative with respect to the
+      page_id of the enclosing page.
+      If document is omitted, then defaults to the content file that
+      corresponds to the page_id of the enclosing page.
+      </para>
+     </refsect1>
+    </refentry>
+    <refentry id="content.loop">
+     <refnamediv>
+      <refname>CONTENT_LOOP</refname>
+      <refpurpose>Extract a set of nodes from an XML file using XPath.</refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       &lt;CONTENT_LOOP NAME="document('site.xml')//name"&gt;
+         &lt;CONTENT_VAR NAME="surname"/&gt;
+         &lt;CONTENT_VAR NAME="firstname"/&gt;
+       &lt;/CONTENT_LOOP&gt;
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+      Uses the XPath query specified in the NAME to
+      extract content from the XML file specified by the document function.
+      If document is omitted, then defaults to the content file that
+      corresponds to the URI being view.
+      </para>
+     </refsect1>
+    </refentry>
+    <refentry id="content.if">
+     <refnamediv>
+      <refname>CONTENT_IF, CONTENT_UNLESS, CONTENT_ELSE</refname>
+      <refpurpose>
+       Displays enclosed section if content sets value to true/false.
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       &lt;CONTENT_IF NAME="foo"&gt;
+        Text to be included if foo is included in Content and is true
+       &lt;CONTENT_ELSE&gt;
+        Text to be included if foo not inclued in Content or is false
+       &lt;/CONTENT_IF&gt;
+
+       &lt;CONTENT_UNLESS NAME="bar"&gt;
+        Text to be included if bar is included in Content and is true
+       &lt;/CONTENT_UNLESS&gt;
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+       If the XPath query in the name attribute returns a true value, then the text
+       enclosed by the CONTENT_IF tag will be included in the template.
+      </para>
+      <para>
+      Please note: if you ask for loop_context_vars like (__first__, __odd__, __inner__ or __last__)
+      that they must be written in lowercase!.
+      </para>
+     </refsect1>
+    </refentry>
+   </sect2>
+   <sect2 id="model.tags">
+    <title>Model tags</title>
+    <para>Model tags refer to data set by the output method of the model classes.
+      They correspond to the HTML::Template.  The PageKit pre-processor simply
+      replaces MODEL with TMPL before running the template through HTML::Template.
+    </para>
+    <refentry id="model.var">
+     <refnamediv>
+      <refname>MODEL_VAR</refname>
+      <refpurpose>
+       Filled in with scalar value set from Model's output method
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       &lt;MODEL_VAR NAME="foo"&gt;
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+        This tag is very simple.  It is replaced by the corresponding value set
+        in the Model by the output method.  You may also use ESCAPE="HTML" and ESCAPE="URL"
+        to escape HTML, and URLs respectively.
+      </para>
+     </refsect1>
+    </refentry>
+    <refentry id="model.loop">
+     <refnamediv>
+      <refname>MODEL_LOOP</refname>
+      <refpurpose>Filled in with array reference of hash references set from Model's output method.</refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       &lt;MODEL_LOOP NAME="foo"&gt;
+         &lt;MODEL_VAR NAME="bar"/&gt;
+         &lt;MODEL_VAR NAME="baz"/&gt;
+       &lt;/MODEL_LOOP&gt;
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+        This tag used for displaying a "table" of data.  The data is set from
+	the model using the output method, and is a reference to an array
+	of hash references.  Using the table analogy, the hash references are
+	the rows, the keys of the 
+	hash references are the column headers, the hash values are the data.
+      </para>
+     </refsect1>
+    </refentry>
+    <refentry id="model.if">
+     <refnamediv>
+      <refname>MODEL_IF, MODEL_UNLESS, MODEL_ELSE</refname>
+      <refpurpose>
+       Displays enclosed section if model sets value to true/false.
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       &lt;MODEL_IF NAME="foo"&gt;
+        Text to be included if foo is true
+       &lt;MODEL_ELSE&gt;
+        Text to be included if foo is false
+       &lt;/MODEL_IF&gt;
+
+       &lt;MODEL_UNLESS NAME="bar"&gt;
+        Text to be included if bar is false
+       &lt;/MODEL_UNLESS&gt;
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+       If the parameter in the name attribute is set to true by the
+       <literal>output</literal> method of the Model, then the text
+       enclosed by the MODEL_IF tag will be included in the template.
+      </para>
+     </refsect1>
+    </refentry>
+   </sect2>
+   <sect2 id="pagekit.tags">
+    <title>PageKit tags</title>
+    <para>
+      PageKit tags refer to data that is set by the PageKit controller.  These correspond
+      to functionality or utility functions that are common across different web applications.
+    </para>
+        <refentry id="pkit.comment">
+     <refnamediv>
+      <refname>PKIT_COMMENT</refname>
+      <refpurpose>
+       Write comments inside your templates. The comments are stripped out of your source. Before it is delivered.
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       <![CDATA[
+         <PKIT_COMMENT>This is a comment!</PKIT_COMMENT>
+       ]]>
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+       The &lt;PKIT_COMMENT&gt; tag is used to comment the block between
+       &lt;PKIT_COMMENT&gt; and &lt;/PKIT_COMMENT&gt;.
+       This is done in a ballanced manner, so it is possible to have nested blocks of comments.
+       </para>
+      <para>
+       If you have more opening tags than closing ones, the spare opening tags are seen as text in the comment, as long as they are surrounded by any close tag.
+      </para>
+      <para>
+      Close tags are closed as soon as possible, so if your source contains more close tags than open tags, spare close tags are in your delivered source. &lt;/PKIT_COMMENT&gt; is available as of Apache::PageKit 1.13.
+      </para>
+     </refsect1>
+    </refentry>
+    <refentry id="pkit.component">
+     <refnamediv>
+      <refname>PKIT_COMPONENT</refname>
+      <refpurpose>
+       Include templates and associate model code.
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       &lt;PKIT_COMPONENT NAME="html_header"&gt;
+
+       &lt;PKIT_COMPONENT NAME="top_10" loop=top_10_cd headline="CD charts" &gt;
+       &lt;PKIT_COMPONENT NAME="top_10" loop=top_10_maxi headline="Maxi charts" &gt;
+
+       &lt;PKIT_COMPONENT NAME="newsbox" news=&apos;&lt;MODEL_VAR NAME="joke"&gt;&apos; &gt;
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+       This has two functions.  The first works like Server Side Includes, including
+       another PageKit Template that is in the View directory or is generated from
+       the corresponding XML file using XSLT.
+      </para>
+      <para>
+       The second is to associate a method from the Model the page.  This is used to
+       fill in any MODEL_VAR and MODEL_LOOP tags in the included PageKit Template.
+      </para>
+      <para>
+       The 2. 3. and 4. example define also some macros. These macros are also available for
+       XSLT with the &lt;xsl:param name="..."&gt; tag.
+       See <literal><link linkend="pkit.macro">PKIT_MACRO</link></literal>
+      </para>
+     </refsect1>
+    </refentry>
+
+    <refentry id="pkit.errorstr">
+     <refnamediv>
+      <refname>PKIT_ERRORSTR</refname>
+      <refpurpose>
+       Named field for your errorstr.
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       <![CDATA[<PKIT_ERRORSTR>
+       <font color="<PKIT_ERRORSTR>">bla</font>
+       ]]>
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+       This tag is replaced by the string that you define with <literal><link linkend="config.global.default_errorstr">default_errorstr</link></literal>.
+       If it is not defined the default is <emphasis>#ff0000</emphasis>.
+      </para>
+      <para>
+      See also <literal><link linkend="pkit.messages">PKIT_MESSAGES</link></literal> for a example.
+      </para>
+     </refsect1>
+    </refentry>
+
+    <refentry id="pkit.macro">
+     <refnamediv>
+      <refname>PKIT_MACRO</refname>
+      <refpurpose>
+       Placeholder for components.
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       &lt;MODEL_VAR NAME="&lt;PKIT_MACRO NAME=headline&gt;"&gt;
+       &lt;MODEL_LOOP NAME="&lt;PKIT_MACRO NAME=loop&gt;"&gt;
+         &lt;MODEL_VAR NAME="title"/&gt;
+       &lt;/MODEL_LOOP&gt;
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+       A <literal>PKIT_MACRO</literal> is replaced with the value of the key
+       in <literal><link linkend="pkit.component">PKIT_COMPONENT</link></literal>
+       that match the name of the macro.
+      </para>
+      <para>
+       This tag is only valid inside a template that is loaded with <literal><link linkend="pkit.component">PKIT_COMPONENT</link></literal>
+      </para>
+     </refsect1>
+    </refentry>
+    <refentry id="pkit.errorfont">
+     <refnamediv>
+      <refname>PKIT_ERRORFONT</refname>
+      <refpurpose>
+       Highlights Invalid Fields
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       <![CDATA[<PKIT_ERRORFONT NAME="lastname"> Last Name </PKIT_ERRORFONT> <input name="lastname"> ]]>
+       <![CDATA[<PKIT_ERRORFONT> new for PageKit 1.10 </PKIT_ERRORFONT> ]]>
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+      PKIT_ERRORFONT is the outdated alias for <link linkend="pkit.errorspan">PKIT_ERRORSPAN</link>
+      </para>
+      <para>
+       This tag highlights fields in red that Model reported as being filled in incorrectly.
+       Or, since version 1.10 of pkit it is possible to suppress the NAME attribute.
+       Then the field is always colored or whatever you want.
+      </para>
+     </refsect1>
+    </refentry>
+    <refentry id="pkit.errorspan">
+     <refnamediv>
+      <refname>PKIT_ERRORSPAN</refname>
+      <refpurpose>
+       Highlights Invalid Fields
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       <![CDATA[<PKIT_ERRORSPAN NAME="lastname"> Last Name </PKIT_ERRORSPAN> <input name="lastname"> ]]>
+       <![CDATA[<PKIT_ERRORSPAN> new for PageKit 1.10 </PKIT_ERRORSPAN> ]]>
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+       This tag highlights fields in red that Model reported as being filled in incorrectly.
+       Or, since version 1.10 of pkit it is possible to suppress the NAME attribute.
+       Then the field is always colored or whatever you want.
+      </para>
+     </refsect1>
+    </refentry>
+
+    <refentry id="pkit.have_messages">
+     <refnamediv>
+      <refname>PKIT_HAVE_MESSAGES</refname>
+      <refpurpose>
+       Include the block between &lt;PKIT_HAVE_MESSAGES&gt; and &lt;/PKIT_HAVE_MESSAGES&gt; only,
+       if one or more messages are avail.
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       <![CDATA[<PKIT_HAVE_MESSAGES>
+                   Here are some messages for you: <p>
+                  <PKIT_MESSAGES>
+                  <PKIT_IS_ERROR><font color="<PKIT_ERRORSTR>"></PKIT_IS_ERROR>
+                  <PKIT_MESSAGE>
+                  <PKIT_IS_ERROR></font></PKIT_IS_ERROR>
+	          <p>
+         </PKIT_MESSAGES>
+        </PKIT_HAVE_MESSAGES>]]>
+
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+        Include the block between &lt;PKIT_HAVE_MESSAGES&gt; and &lt;/PKIT_HAVE_MESSAGES&gt; only,
+        if one or more messages are avail.
+      </para>
+     </refsect1>
+    </refentry>
+    <refentry id="pkit.have_not_messages">
+     <refnamediv>
+      <refname>PKIT_HAVE_NOT_MESSAGES</refname>
+      <refpurpose>
+       Include the block between &lt;PKIT_HAVE_NOT_MESSAGES&gt; and &lt;/PKIT_HAVE_NOT_MESSAGES&gt; only,
+       if no messages are avail.
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       <![CDATA[<PKIT_HAVE_NOT_MESSAGES>
+                   No messages for you! <p>
+        </PKIT_HAVE_NOT_MESSAGES>]]>
+
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+        Include the block between &lt;PKIT_HAVE_NOT_MESSAGES&gt; and &lt;/PKIT_HAVE_NOT_MESSAGES&gt; only,
+        if no messages are avail.
+      </para>
+     </refsect1>
+    </refentry>
+
+    <refentry id="pkit.hostname">
+     <refnamediv>
+      <refname>PKIT_HOSTNAME</refname>
+      <refpurpose>
+       Fills in the hostname in the URL.
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       &lt;PKIT_HOSTNAME&gt;
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>DESCRIPTION</title>
+      <para>
+       Returns the hostname in the URL of the page being served. Particulary useful when you have production and development
+       servers and you need to link to a secure page.
+      </para>
+      <para>
+       Note that if you are running a proxy server in front of the PageKit server, you probably want to use mod_proxy_add_uri.c.
+       PageKit will extract the hostname from the frontend server using the X-Original-URI header that mod_proxy_add_uri sets.
+      </para>
+     </refsect1>
+    </refentry>
+    <refentry id="pkit.messages">
+     <refnamediv>
+      <refname>PKIT_MESSAGES</refname>
+      <refpurpose>
+       Display messages passed to pkit_message method.
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       <![CDATA[<PKIT_MESSAGES>
+                <PKIT_IS_ERROR><font color="<PKIT_ERRORSTR>"></PKIT_IS_ERROR>
+                <PKIT_MESSAGE>
+                <PKIT_IS_ERROR></font></PKIT_IS_ERROR>
+	        <p>
+       </PKIT_MESSAGES>]]>
+
+      </synopsis>
+      <synopsis>
+       <![CDATA[<PKIT_MESSAGES>
+         <PKIT_IS_ERROR><font color="<PKIT_ERRORSTR>"><PKIT_MESSAGE></font></PKIT_IS_ERROR>
+       </PKIT_MESSAGES>
+
+       <PKIT_MESSAGES>
+         <PKIT_NOT_ERROR><font color="<PKIT_ERRORSTR>"><PKIT_MESSAGE></font></PKIT_NOT_ERROR>
+       </PKIT_MESSAGES>]]>
+
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+	Displays messages passed to pkit_message method in the Model code.
+      </para>
+     </refsect1>
+    </refentry>
+    <refentry id="pkit.selfurl">
+     <refnamediv>
+      <refname>PKIT_SELFURL</refname>
+      <refpurpose>
+       URL of current page.
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       &lt;PKIT_SELFURL exclude="foo bar"&gt;
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+       The URL of the current page, including CGI parameters, but excluding those listed in the exclude attribute.  Appends a '&amp;' or '?' at the end to allow additionial parameters. 
+      </para>
+      <para>
+       Note that if you are running a proxy server in front of the PageKit server, you probably want to use <ulink url="http://tjmather.com/mod_proxy_add_uri.c">mod_proxy_add_uri.c</ulink>.
+       PageKit will take the URL from the frontend server using the
+       X-Original-URI header that mod_proxy_add_uri sets.
+      </para>
+     </refsect1>
+    </refentry>
+    <refentry id="pkit.view">
+     <refnamediv>
+      <refname>PKIT_VIEW</refname>
+      <refpurpose>
+       Wraps a section of text to be displayed for a view.
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       &lt;PKIT_VIEW NAME="print"&gt;This is text display for the printable view&lt;/PKIT_VIEW&gt;
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+       Displays the enclosed text if the <link linkend="request.pkit_view">pkit_view</link>
+       request parameter is set to NAME attribute.
+      </para>
+     </refsect1>
+    </refentry>
+    <refentry id="pkit.else">
+     <refnamediv>
+      <refname>PKIT_ELSE</refname>
+      <refpurpose>
+       Can be used to add a else part to PKIT_... tags.
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+       &lt;PKIT_VIEW NAME="print"&gt;This is text display for the printable view&lt;PKIT_ELSE&gt;And this text if hte view is NOT printable&lt;/PKIT_VIEW&gt;
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+            Can be used to add a else part to <link linkend="pkit.view">PKIT_VIEW</link>,
+       <link linkend="pkit.have_messages">PKIT_HAVE_MESSAGES</link>,
+       <link linkend="pkit.have_not_messages">PKIT_HAVE_NOT_MESSAGES</link>,
+       <link linkend="pkit.is_error">PKIT_IS_ERROR</link> or
+       <link linkend="pkit.not_error">PKIT_NOT_ERROR</link>.
+      </para>
+     </refsect1>
+    </refentry>
+    
+       <refentry id="pkit.is_error">
+     <refnamediv>
+      <refname>PKIT_IS_ERROR</refname>
+      <refpurpose>
+       Used to display messages only if it is a errormessage.
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+
+    <![CDATA[<PKIT_HAVE_MESSAGES>
+          Here are some error messages for you: <p>
+         <PKIT_MESSAGES>
+         <PKIT_IS_ERROR>
+           <PKIT_MESSAGE>
+         </PKIT_IS_ERROR>
+     </PKIT_MESSAGES>
+     </p>
+       </PKIT_HAVE_MESSAGES>
+]]>
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+       Used to display messages only if it is a errormessage. Or display errors and warnings in different places.
+
+      </para>
+     </refsect1>
+    </refentry>
+
+          <refentry id="pkit.not_error">
+     <refnamediv>
+      <refname>PKIT_NOT_ERROR</refname>
+      <refpurpose>
+       Used to display messages only if it is a NOT a errormessage.
+      </refpurpose>
+     </refnamediv>
+     <refsynopsisdiv>
+      <synopsis>
+
+    <![CDATA[
+       
+       <PKIT_HAVE_MESSAGES>
+          Here are some warnings messages for you: <p>
+         <PKIT_MESSAGES>
+         <PKIT_NOT_ERROR>
+           <PKIT_MESSAGE>
+         </PKIT_NOT_ERROR>
+     </PKIT_MESSAGES>
+     </p>
+       </PKIT_HAVE_MESSAGES>
+
+       <PKIT_HAVE_MESSAGES>
+          Here are some error messages for you: <p>
+         <PKIT_MESSAGES>
+         <PKIT_IS_ERROR>
+           <PKIT_MESSAGE>
+         </PKIT_IS_ERROR>
+     </PKIT_MESSAGES>
+     </p>
+       </PKIT_HAVE_MESSAGES>
+]]>
+      </synopsis>
+     </refsynopsisdiv>
+     <refsect1>
+      <title>Description</title>
+      <para>
+       Used to display messages only if it is NOT a errormessage. Or display errors and warnings in different places.
+
+      </para>
+     </refsect1>
+    </refentry>
+
+   </sect2>
+ </sect1>
+ <sect1>
+  <title>Request parameters</title>
+  <para>
+   These are parameters that are specified in <emphasis role="bold">GET</emphasis> requests and <emphasis role="bold">POST</emphasis> requests where Content-type is one of
+   <constant>application/x-www-form-urlencoded</constant> or <constant>multipart/form-data</constant>.
+  </para>
+  <variablelist>
+   <varlistentry id="request.pkit_done">
+    <term>pkit_done</term>
+    <listitem>
+     <para>
+      The page to return to after the user has finished logging in or creating a new account.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry id="request.pkit_lang">
+    <term>pkit_lang</term>
+    <listitem>
+     <para>
+      Sets the user's preferred language, using a <ulink url="http://www.oasis-open.org/cover/iso639a.html">ISO 639</ulink> identifier.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry id="request.pkit_login_page">
+    <term>pkit_login_page</term>
+    <listitem>
+     <para>
+      This parameter is used to specify the page that user attempted to login from.
+      If the login fails, this page is redisplayed.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry id="request.pkit_login">
+    <term>pkit_login</term>
+    <listitem>
+     <para>
+      If this is set to true, then an attempt to log in is made.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry id="request.pkit_logout">
+    <term>pkit_logout</term>
+    <listitem>
+     <para>
+      If this is set to true, logs user out.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry id="request.pkit_remember">
+    <term>pkit_remember</term>
+    <listitem>
+     <para>
+      If set to true upon login, will save user's cookie so that they are still logged
+      in next time they restart their browser.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry id="request.pkit_view">
+    <term>pkit_view</term>
+    <listitem>
+     <para>
+      Used to implement multiple views/co-branding.  For example, if set to print,
+      will search for templates in the <filename>View/print</filename> directory before using
+      templates in the <filename>View/Default</filename> directory, and sets the
+      <literal><link linkend="pkit.view">&lt;PKIT_VIEW NAME="print"&gt;</link></literal> tag in the view to true.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </sect1>
+</chapter>

@@ -1,0 +1,55 @@
+*** Shareable.pm	Thu Jan  1 06:42:22 1998
+--- Shareable.pm.new	Thu Jan  1 06:42:44 1998
+***************
+*** 10,16 ****
+  	    @ISA @EXPORT_OK
+  	    %EXPORT_TAGS %Shm_Info
+  	    $Package $Debug
+! 	    );
+  use subs qw(IPC_CREAT IPC_EXCL IPC_RMID IPC_STAT IPC_PRIVATE
+  	    SHM_BUFSIZ SHM_HEADSIZE SHM_FOOTSIZE
+  	    SHM_VERSSEM SHM_RLOCKSEM SHM_WLOCKSEM
+--- 10,16 ----
+  	    @ISA @EXPORT_OK
+  	    %EXPORT_TAGS %Shm_Info
+  	    $Package $Debug
+! 	    $MAXVER);
+  use subs qw(IPC_CREAT IPC_EXCL IPC_RMID IPC_STAT IPC_PRIVATE
+  	    SHM_BUFSIZ SHM_HEADSIZE SHM_FOOTSIZE
+  	    SHM_VERSSEM SHM_RLOCKSEM SHM_WLOCKSEM
+***************
+*** 31,36 ****
+--- 31,37 ----
+  $VERSION = '0.28';
+  $Package = 'IPC::Shareable';
+  $Debug = ($Debug or undef);
++ $MAXVER  = 32767;
+  
+  # --- The Autoload method as created by h2xs
+  sub AUTOLOAD {
+***************
+*** 236,245 ****
+      debug "$Package\:\:STORE: previous version number was $version";
+  
+      # --- Increment it
+!     $opstring = pack('sss', SHM_VERSSEM, 1, 0);
+!     semop($semid, $opstring) or
+! 	croak "$Package\:\:STORE: semop returned false";
+! 	
+      # --- Diagnostic
+      $version = semctl($semid, 0, GETVAL, $arg) or
+  	croak "$Package\:\:STORE: semop returned false";
+--- 237,249 ----
+      debug "$Package\:\:STORE: previous version number was $version";
+  
+      # --- Increment it
+!     if ($version >= $MAXVER) { # semop will fail if we roll over
+!       semctl($semid, 0, SETVAL, 1); 
+!     } else {
+!       $opstring = pack('sss', SHM_VERSSEM, 1, 0);
+!       semop($semid, $opstring) or
+!           croak "$Package\:\:STORE: semop returned false: $!";
+!     }
+      # --- Diagnostic
+      $version = semctl($semid, 0, GETVAL, $arg) or
+  	croak "$Package\:\:STORE: semop returned false";

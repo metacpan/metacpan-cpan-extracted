@@ -1,0 +1,29 @@
+NAME
+    Alien::Sodium - Install and make available libsodium library
+
+VERSION
+    version 1.0.8.0
+
+SYNOPSIS
+        use Alien::Sodium;
+
+        my $cflags = Alien::Sodium->cflags;
+        my $libs = Alien::Sodium->libs;
+
+DESCRIPTION
+    Alien::Sodium installs the C library "libsodium" version 1.0.8 released
+    on December 25, 2015.
+
+SEE ALSO
+    *   libsodium <https://github.com/jedisct1/libsodium>
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2015 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

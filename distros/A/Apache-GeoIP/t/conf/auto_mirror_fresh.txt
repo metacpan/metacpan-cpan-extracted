@@ -1,0 +1,6 @@
+ftp://ftp.infoscience.co.jp/pub/net/apache/dist	jp  2
+ftp://ftp.lab.kdd.co.jp/infosystems/apache/dist	jp  5
+ftp://ftp.meisei-u.ac.jp/pub/www/apache/dist	jp  6
+ftp://ring.asahi-net.or.jp/archives/net/apache/dist	jp   1
+ftp://sunsite.tus.ac.jp/pub/archives/www/apache	jp   0
+http://sunsite.tus.ac.jp	jp  4

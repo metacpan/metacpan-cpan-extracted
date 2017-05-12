@@ -1,0 +1,98 @@
+AltaVista SDK Linguistics support package
+Copyright (c)2000 AltaVista Company
+All Rights Reserved.
+
+This software is furnished under a license and may be used and copied
+only  in  accordance  with  the  terms  of such  license and with the
+inclusion of the above copyright notice. This software or  any  other
+copies thereof may not be provided or otherwise made available to any
+other person. No title to and ownership of  the  software  is  hereby
+transferred.
+
+The information in this software is subject to change without  notice
+and  should  not be  construed as a commitment  by AltaVista Company.
+
+Readme for SDKLinguistics
+
+NAME
+    AltaVista::SDKLinguistics - Perl extension for AltaVista Search 
+    Software Development Kit
+
+SYNOPSIS
+    use AltaVista::SDKLinguistics;
+
+    avsl_thesaurus_init(config)
+
+	avsl_thesaurus_get(hdl, word, language, separator = ' ')
+
+	avsl_thesaurus_close(hdl)
+
+	avsl_phrase_init(config)
+	
+	avsl_phrase_get(hdl, word, language, separator = ':')
+	
+	avsl_phrase_close(hdl)
+	
+	avsl_stem_init(package, tags)
+	
+	avsl_stem_get(hdl, word, language, separator = ' ')
+	
+	avsl_stem_close(hdl)
+	
+	avsl_spell_init(config)
+	
+	avsl_spellcheck_get(hdl, word, language, separator = ' ')
+	
+	avsl_spellcorrection_get(hdl, word, language, separator = ' ')
+	
+	avsl_spell_close(hdl)
+
+
+DESCRIPTION
+    This set of extensions provides wrappers for most of the C functionalities in
+    the AltaVista Search Software Developer's Kit's Linguistics functionalities.
+
+PREREQUISITES
+    Perl 5.004, AltaVista SearchSDK Library 
+
+INSTALLATION - Windows System
+    To install this module, copy avs.h and avs30.lib from your 
+    AltaVista SearchSDK source hierarchy into this directory. Then 
+    type the following commands:
+    
+        perl Makefile.PL
+        nmake
+        nmake test
+        nmake install
+
+    This will install the module into the Perl library directory.
+
+INSTALLATION - UNIX/Linux/Solaris System
+
+    To install this module, copy avs.h and libavs30.a from your 
+    AltaVista SearchSDK source hierarchy into this directory.  Then 
+    type the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+AUTHOR
+	AltaVista Search <avse-support@av.com>
+
+    Copyright (c)2000 AltaVista Company
+    All Rights Reserved.
+
+    This software is furnished under a license and may be used and copied
+    only  in  accordance  with  the  terms  of such  license and with the
+    inclusion of the above copyright notice. This software or  any  other
+    copies thereof may not be provided or otherwise made available to any
+    other person. No title to and ownership of  the  software  is  hereby
+    transferred.
+
+    The information in this software is subject to change without  notice
+    and  should  not be  construed as a commitment  by AltaVista Company.
+
+SEE ALSO
+    perl, AltaVista Search SDK documentation.

@@ -1,0 +1,35 @@
+[% PROCESS header.html title='Edit Preferences'%]
+[% PROCESS login_form.html %]
+[% PROCESS form.html %]
+
+[% 
+    styles = ['side', 'inline'];
+    chk = 'checked="checked"';
+%]
+<h2>Edit Preferences</h2>
+
+<form method="post" id="prefs" class="float">
+    <input type="hidden" name="mode" value="save_prefs">
+    <label for="js">JavaScript</label>
+    <input type="checkbox" class="checkbox" id="js" name="js" [% chk IF prefs('js') %] value="1"><br>
+
+    <label for="style">Style</label>
+    <select id="style" name="style" class="text">
+        [% FOR type = styles %]
+        <option [% 'selected="selected"' IF type == prefs('style') %]>[% type %]</option>
+        [% END %]
+    </select><br>
+
+    <label for="tol" class="text">Uncertainty threshold</label>
+    
+    <select id="tol" name="tol" class="text">
+        [% FOR val = [50,60,70,80,90,100] %]
+        <option [% 'selected="selected"' IF val == prefs('tol') %]>[% val %]</option>
+        [% END %]
+    </select> %<br>
+
+    <input type="submit" class="text"><br>
+
+</form>
+
+[% PROCESS footer.html %]

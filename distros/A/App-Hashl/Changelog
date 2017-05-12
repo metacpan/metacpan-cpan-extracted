@@ -1,0 +1,30 @@
+hashl 1.01 - Sun Jan 08 2017
+
+    * You can now use -s 0 / --read-size=0 to hash entire files
+    * New option: -e <file> / --extra-db=<file>
+    * New option: -x / --one-file-system
+    * New command: "hashl ls" lists files using an ls-style output format
+    * Fix find-new and find-known output so it can be piped to other commands
+    * New dependencies: DateTime and List::MoreUtils
+
+hashl 1.00 - Wed Nov 02 2011
+
+    * Add "hashl list <regex>" to filter listed files by name
+    * Do not fail when encountering zero-length files
+
+hashl 0.2 - Mon May 23 2011
+
+    * The internal representation of ignored hashes was changed
+    * hashl update no longer re-adds ignored (but existing) files
+    * hashl update tries to save its state when being interrupted
+      (sigint/sigterm)
+    * add hashl -f update - update db, unignore and add any ignored files in
+      the scanned directory
+
+hashl 0.1 - Fri May 06 2011
+
+    * Initial release
+    * Create/Update hash database
+    * Find/Copy files not in database
+    * Ignore files (will be marked as known, but can be removed from the file
+      system)

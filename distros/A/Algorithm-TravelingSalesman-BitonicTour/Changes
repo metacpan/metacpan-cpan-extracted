@@ -1,0 +1,23 @@
+Revision history for Algorithm::TravelingSalesman::BitonicTour
+
+0.05 Mon Jul 14 15:53:01 CDT 2008
+   * fixed module dependencies
+
+0.04 Mon Jul 14 10:44:36 CDT 2008
+   * refactored for clarity
+   * improved test coverage
+
+0.03  Thu May 15 16:49:54 CDT 2008
+   * improved method documentation
+   * added further input checking plus tests
+   * fixed bug in example code
+
+0.02  Thu May 15 14:28:59 CDT 2008
+   * added path calculation
+   * 100% test coverage
+   * fixed problem documentation
+
+0.01  Thu Feb 21 09:15:57 CST 2008
+   * initial release
+   * basic functionality--can calculate optimal path lengths
+

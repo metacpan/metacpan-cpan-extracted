@@ -1,0 +1,53 @@
+#!/usr/bin/perl -w
+use strict;
+
+use vars qw($opt_h $opt_s $opt_e $opt_v $opt_t);
+use Getopt::Std;
+getopts('hs:ve:t:');
+
+use Astro::IRAF::CL;
+
+&usage() if $opt_h || !defined $opt_e;
+
+my $iraf = Astro::IRAF::CL->new(iraf_start => $opt_s,
+				debug => $opt_v);
+
+my @results = $iraf->exec(command => $opt_e,
+			  timeout => $opt_t);
+
+foreach my $line (@results){
+  print STDOUT $line . "\n";
+}
+
+exit;
+
+sub usage{
+
+  open(PAGER,"|more");
+  print PAGER <<'EOT';
+
+mycl is a perl interface to the IRAF cl environment. Basically, it
+starts up a new CL interpreter session, to do this it uses Expect.
+You may need to tell it where your login.cl file and uparm directory
+are as CL will not start correctly without it. It goes without saying
+that you will need IRAF installed and access to the Expect, IO-Tty and
+IO-Stty perl modules to make this work.
+
+Command line options are:
+
+ -h This help page.
+
+ -s location of login.cl & uparm directory
+ -e command
+ -t possible time out for the command
+ -v verbose output
+
+See the perldoc for Astro::IRAF::CL for more details on the
+configuration options available at startup.
+
+EOT
+  ;
+  close(PAGER);
+  exit;
+}
+

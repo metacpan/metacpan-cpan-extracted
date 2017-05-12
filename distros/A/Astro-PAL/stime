@@ -1,0 +1,205 @@
+#!/local/bin/perl
+
+=head1 NAME
+
+stime - print current time information to standard out
+
+=head1 SYNOPSIS
+
+  stime
+
+  stime UKIRT
+
+  stime -epoch 837459706 JCMT
+
+  stime -h
+
+=head1 DESCRIPTION
+
+This program prints current local time, UTC, Julian date,
+modified Julian date, current equinox and year day to standard output.
+Additionally, local sidereal time for the specified telescope is
+also displayed.
+
+=head1 ARGUMENTS
+
+The optional argument can be used to specify the details for a
+particular telescope. This affects the local sidereal time
+calculation. The default is for the LST of Mauna Kea to be listed
+(specifically the James Clerk Maxwell Telescope). The sidereal time
+does not reflect the longitude of the computer used to run the
+command.
+
+The format of this string is identical to that required by
+C<palObs> routine in the C<Astro::PAL> package.
+
+=head1 OPTIONS
+
+The following command line options are supported:
+
+=over 4
+
+=item B<-epoch>
+
+Override the time for which the LST will be calculated. By default
+will use the current time/date. This epoch should be supplied in
+seconds in the Unix epoch (essentially the argument to the perl
+localtime/gmtime functions).
+
+=item B<-help>
+
+Simple help message.
+
+=item B<-man>
+
+This manual page.
+
+=back
+
+=head1 OUTPUT
+
+Example output of this program is:
+
+ At local date and time		Fri Mar 24 14:50:31 2000
+ The UT date and time was:	Sat Mar 25 00:50:31 2000
+ Julian date:			2451628.54
+ Modified Julian date:		51628.04
+ Equinox for today is 		2000.23
+ Local Day number (UT): 	84 (85)
+ For telescope JCMT
+ The local sidereal time was	2 39 46.16
+
+=head1 SEE ALSO
+
+L<Astro::PAL>
+
+=head1 REVISION
+
+$Id$
+
+=head1 COPYRIGHT
+
+Copyright (C) 1996-2000,2004 Particle Physics and Astronomy Research Council.
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+=head1 AUTHORS
+
+Tim Jenness, Remo Tilanus
+
+=cut
+
+
+#  History:
+#    15 Jul 1996 (timj)
+#       Write first version in C
+#       Replacement for stime on the VMS machines.
+#       Output of VAX was:
+#
+#         at local time             9 41 46.00
+#         local sidereal time was   4 55 36.46
+#         Universal Time           19 41 46.00
+#         Julian date               2450280.32
+#         equinox for today            1996.54
+#         day number                    197
+#
+#      For Unix epoch 837459706 seconds. This version of stime
+#      gives LST of 4 55 35.67 [within a second of the Vax version]
+#
+#    14 Feb 2000 (rpt)
+#       Port to perl using Astro::PAL
+#    $Log$
+#    Revision 1.2  2004/02/04 00:42:08  timj
+#    + Lots of tidying up
+#    + Now uses ut2lst_tel rather than lstnow_tel
+#    + Now have -h and -man options
+#    + Add -epoch option for overriding calculated date
+#    + Add GPL
+#
+#    Revision 1.1  2000/03/29 03:28:48  timj
+#    First version
+#
+
+use strict;
+use Astro::PAL;
+
+# Read command line options
+use Getopt::Long;
+use Pod::Usage;
+
+my ($help, $man, $epoch);
+my $status = GetOptions("epoch=s" => \$epoch,
+                        "help"    => \$help,
+                        "man"     => \$man,
+                       );
+
+pod2usage(1)  if ($help);
+pod2usage(-verbose => 2)  if ($man);
+
+
+# Read telescope name from standard in (default to JCMT)
+my $tel = 'JCMT';
+$tel = shift(@ARGV) if @ARGV;
+
+# Day and Month names
+my @weekday = ("Sun", "Mon", "Tue", "Wed", "Thu" , "Fri", "Sat");
+my @month   = ("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+
+# Get the current DATE and TIME.
+# Use time variable to get for use in gmtime as well.
+# Can be overridden from the command line using -epoch
+my $time = (defined $epoch ? $epoch : time());
+
+
+my ($ss, $mm, $hr, $md, $mo, $yr, $wd, $yd, $isdst) = localtime($time);
+$yr += 1900;
+
+# Get UT date and time
+my ($us, $um, $uh, $umd, $umo, $uyr, $uwd, $uyd, $isdst) = gmtime($time);
+$uyr += 1900;
+
+# Get Local Sidereal Time and Modified Julia date: LST and MJD
+# Using the actual UT time from above [not current]
+my ($lst, $mjd) = Astro::PAL::ut2lst_tel($uyr,($umo+1),$umd,$uh,$um,$us,$tel);
+# Convert LST to HMS from radians
+my $np = 2;
+my ($sign, @hms) = Astro::PAL::palDr2tf($np, $lst);
+
+
+# print out Local time
+printf "At local date and time\t\t%3s %3s %2.2d %2.2d:%2.2d:%2.2d %4.4d\n",
+      $weekday[$wd], $month[$mo], $md, $hr, $mm, $ss, $yr;
+
+# Print out UT time
+printf "The UT date and time was:\t%3s %3s %2.2d %2.2d:%2.2d:%2.2d %4.4d\n",
+      $weekday[$uwd], $month[$umo], $umd, $uh, $um, $us, $uyr;
+
+# Print out Julian date
+printf "Julian date:\t\t\t%10.2f\n", $mjd + 2_400_000.5;
+printf "Modified Julian date:\t\t%8.2f\n", $mjd;
+
+# Get equinox of today from MJD
+my $equinox = Astro::PAL::palEpj($mjd);
+printf "Equinox for today is \t\t%7.2f\n", $equinox;
+
+# Print Local and UT day number
+printf "Local Day number (UT): \t\t%d (%d)\n", $yd+1, $uyd+1;
+
+# Print out LST
+print "For telescope $tel\n";
+printf "The local sidereal time was\t%02d %02d %02d.%0".$np."d\n",
+      $hms[0], $hms[1], $hms[2], $hms[3];
+

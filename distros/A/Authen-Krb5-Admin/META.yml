@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name: Authen-Krb5-Admin
+abstract: Perl extension for MIT Kerberos 5 admin interface
+version: 0.17
+author:
+  - Stephen Quinney <squinney@inf.ed.ac.uk>
+license: bsd
+distribution_type: module
+requires:
+  Authen::Krb5: 1.2
+build_requires:
+  Test: 0
+meta-spec:
+  version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html

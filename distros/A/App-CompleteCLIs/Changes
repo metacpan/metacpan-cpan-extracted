@@ -1,0 +1,78 @@
+Revision history for App-CompleteCLIs
+
+0.12    2017-01-01 (PERLANCAR)
+
+	- Add CLI script: complete-riap-url-clientless.
+
+
+0.11    2016-12-31 (PERLANCAR)
+
+	- Add utilities: complete-regexp-pattern-{module,pattern},
+          complete-service-{name,port}.
+
+
+0.10    2016-10-19 (PERLANCAR)
+
+	- Add utilities: complete-perl-builtin-function,
+          complete-perl-builtin-symbol, complete-perl-version,
+          complete-known-mac, complete-env-elem, complete-path-env-elem.
+
+
+0.09    2016-10-18 (PERLANCAR)
+
+	- Add utility: complete-known-host.
+
+
+0.08    2016-10-15 (PERLANCAR)
+
+	- Add utility: complete-manpage-section.
+
+
+0.07    2016-10-15 (PERLANCAR)
+
+        - Add utility: complete-locale.
+
+
+0.06    2015-09-18 (PERLANCAR)
+
+        - Adjust to Complete::Util 0.36 being split to
+          Complete::{Env,File,Program}.
+
+        - Add complete-{float,int} from Complete::Number & complete-tz from
+          Complete::TZ/
+
+
+0.05    2015-09-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Remove prereq: Complete because it is not directly used.
+
+
+0.04    2015-08-19 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] [Bugfix] Complete is a runtime requires, not just spec.
+
+
+0.03    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.02    2014-12-31 (PERLANCAR)
+
+	- Add workaround for Complete::Util scripts which didn't work
+	  before with error 'ERROR 500: No metadata for ...'.
+
+	- Add CLIs from Complete::{Dist,Dist::Zilla,Pod::Weaver}.
+
+
+0.01    2014-12-27 (PERLANCAR)
+
+        - First release.

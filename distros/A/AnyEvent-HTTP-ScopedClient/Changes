@@ -1,0 +1,15 @@
+go to https://github.com/aanoaa/AnyEvent-HTTP-ScopedClient/issues for the roadmap and known issues.
+
+v0.0.5    Sun Jun 23 22:03:40 2013 KST
+    - prevent 'newline' at 'Authorization' header
+
+v0.0.4    Thu May 30 11:13:44 2013 KST
+    - uri_escape_utf8(request_body)
+
+0.0.3    Fri Nov 30 10:04:43 2012 KST
+    - depend `Host` req header to `AnyEvent::HTTP`
+
+0.0.2    Thu Oct 11 10:59:18 2012 KST
+    - support editing multiple header at once
+    - enhancement test
+    - tidied all source code

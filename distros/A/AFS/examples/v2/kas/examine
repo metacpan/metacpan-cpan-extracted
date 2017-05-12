@@ -1,0 +1,82 @@
+#!/usr/local/bin/perl
+
+use blib;
+
+use POSIX qw(strftime);
+
+use AFS::KAS;
+use AFS::KTC_PRINCIPAL;
+use AFS::KTC_TOKEN;
+use AFS::KTC_EKEY;
+use AFS qw(raise_exception);
+
+die "Usage: user admin cell\n" if ($#ARGV != 2);
+
+my $now = time();
+raise_exception(1);
+
+my $usr  = shift;
+my $adm  = shift;
+my $cell = shift;  #  'notebook';
+
+my $princ  = AFS::KTC_PRINCIPAL->new($adm, '', $cell);
+my $string = AFS::KTC_EKEY->UserReadPassword('Password:');
+my $key    = AFS::KTC_EKEY->StringToKey($string, $cell);
+my $token  = AFS::KTC_TOKEN->GetAdminToken($princ, $key, 300);
+my $kas    = AFS::KAS->AuthServerConn($token, &AFS::KA_MAINTENANCE_SERVICE, $cell);
+my $user   = AFS::KTC_PRINCIPAL->new($usr);
+my $entry  = $kas->getentry($user->name, $user->instance);
+
+print "\nUser data for ", $user->name, $user->instance, "\n";
+
+if ($$entry{'keyCheckSum'} == 0) {
+    print "\t key version is $$entry{'key_version'} ";
+}
+else {
+    print "\t key ($$entry{'key_version'}) cksum is $$entry{'keyCheckSum'}, ";
+}
+
+my $cpw_time = $$entry{'change_password_time'};
+chomp(my $cpw_date = strftime('%a %b %d %T %Y', localtime($cpw_time)));
+print " last cpw: $cpw_date\n";
+
+if (! $$entry{'misc_auth_bytes'}) {
+    print "\t password will never expire.\n";
+    print "\t An unlimited number of unsuccessful authentications is permitted.\n";
+}
+else {
+    my $packed    = $$entry{'misc_auth_bytes'};
+    my $pwexpire  = (($packed >> 24) & 0xff);
+    my $is_locked = (($packed >> 16) & 0xff);
+    my $nfail     = (($packed >>  8) & 0xff);
+    my $locktime  = (($packed >>  0) & 0xff);
+
+    if (! $pwexpire) { print "\t password will never expire.\n"; }
+    else             { print "\t password will expire: $pwexpire\n"; }
+
+    if (! $nfail) { print "\t An unlimited number of unsuccessful authentications is permitted.\n"; }
+    else          { print "\t $nfail consecutive unsuccessful authentications are permitted.\n";
+                    if (! $locktime) { print "\t The lock time for this user is not limited.\n"; }
+                    else             { print "\t The lock time for this user is $locktime minutes.  !!! umrechnen !!!\n"; }
+                    if (! $is_locked) { print "\t IS_LOCKED: muss noch gecheckt werden !!!\n"; }
+                    else              { print "\t IS_LOCKED: uss noch gecheckt werden !!!\n"; }
+                }
+}
+
+my $exp_date = $$entry{'user_expiration'};
+if ($$entry{'user_expiration'} < 0)       { print "\t entry never expires."; }
+elsif ($$entry{'user_expiration'} < $now) { print "\t DISABLED entry at $exp_date."; }
+else                                      { print "\t entry expires on $exp_date."; }
+
+my $ticket_lifetime = $$entry{'max_ticket_lifetime'} / 3600;
+print " Max ticket lifetime $ticket_lifetime hours.\n";
+
+my $last_mod = $$entry{'modification_time'};
+chomp(my $last_mod_date = strftime('%a %b %d %T %Y', localtime($last_mod)));
+print "\t last mod on $last_mod_date by $$entry{'modification_user'}\n";
+
+if ($$entry{'passwd_reuse'}) {
+    my $reused = $$entry{'passwd_reuse'} - 0x12340000;
+    if (! $reused) { print "\t permit password reuse \n"; }
+    else           { print "\t don't permit password reuse \n"; }
+}

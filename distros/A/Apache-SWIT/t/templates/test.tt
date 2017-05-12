@@ -1,0 +1,11 @@
+<html>
+<body>
+<form action="u">
+hello [% hello %]
+<input type="text" name="file" />
+<input type="submit" name="but" value="Push" />
+<a href="r">This</a>
+[% request %]
+</form>
+</body>
+</html>

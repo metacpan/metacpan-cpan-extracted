@@ -1,0 +1,39 @@
+Revision history for mod_perl2 module Apache2::AuthCAS
+
+Release 0.1
+===========
+0.1  Wed Mar 21 13:00:00 2007
+    - initial version based on release 0.4 of Apache::CAS by David Castro
+
+Release 0.2
+===========
+0.2  Wed Nov 21 10:00:00 2007
+    - Added mod_perl2 as a dependency for the build
+    - Added VERSION variable to the module
+    - Implemented David Westlund's patch for CPAN bug #30548,
+        "GET value for service not escaped"
+    - Corrected an error code returned from proxy_receptor() 
+        and simplified the function slightly
+    - Corrected CPAN bug #30356,
+        "Error when GET parameter without value is sent to a page"
+
+Release 0.3
+===========
+0.3  Wed Apr 09 00:45:00 2008
+    - Added support for CAS 3.1 single sign out
+        patch submitted by Enrico Cavalli
+    - Added support for SSL-only cookies per RFC 2109
+        patch submitted by David Lowry
+    - Updated database schema examples to accomodate recommended field sizes
+        and support the single sign out patch.
+
+Release 0.4
+===========
+0.4  Fri Jan 02 13:07:00 2009
+    - Fixed CPAN bug #38295
+        Removed the reliance on Apache2::Request and thus the need for libapreq2
+    - Fixed CPAN bug #33631
+        Removed unneeded hook specifiers on "use mod_perl2" line.
+    - Added DBI::errstr to log messages resulting from database errors.
+    - Added a configuration option, CASSessionCleanupThreshold.
+        See the manpage.

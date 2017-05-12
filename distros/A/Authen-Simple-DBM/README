@@ -1,0 +1,89 @@
+NAME
+    Authen::Simple::DBM - Simple DBM authentication
+
+SYNOPSIS
+        use Authen::Simple::DBM;
+    
+        my $dbm = Authen::Simple::DBM->new(
+            path => '/var/db/www/passwd'
+        );
+    
+        if ( $dbm->authenticate( $username, $password ) ) {
+            # successfull authentication
+        }
+    
+        # or as a mod_perl Authen handler
+
+        PerlModule Authen::Simple::Apache
+        PerlModule Authen::Simple::DBM
+
+        PerlSetVar AuthenSimpleDBM_path "/var/db/www/passwd"
+
+        <Location /protected>
+          PerlAuthenHandler Authen::Simple::DBM
+          AuthType          Basic
+          AuthName          "Protected Area"
+          Require           valid-user
+        </Location>
+
+DESCRIPTION
+    DBM authentication.
+
+METHODS
+    * new
+        This method takes a hash of parameters. The following options are
+        valid:
+
+        * path  Path to DBM file. Usually specified without trailing ".db",
+                ".pag" or ".dir" suffix. Required.
+
+                    path => '/var/db/www/passwd'
+
+        * type  DBM type. Valid options are: "DB", "GDBM", "NDBM" and
+                "SDBM". Defaults to "SDBM".
+
+                    type => 'NDBM'
+
+                * CDB       Constant Database
+
+                * DB        Berkeley DB
+
+                * GDBM      GNU Database Mandager
+
+                * NDBM      New Database Mandager. "path" should be
+                            specified without a trailing ".db" suffix.
+
+                * SDBM      Substitute Database Mandager. Comes with both
+                            with perl and Apache. "path" should be specified
+                            without a trailing ".pag" or ".dir" suffix.
+
+        * log   Any object that supports "debug", "info", "error" and
+                "warn".
+
+                    log => Log::Log4perl->get_logger('Authen::Simple::DBM')
+
+    * authenticate( $username, $password )
+        Returns true on success and false on failure.
+
+SEE ALSO
+    Authen::Simple.
+
+    Authen::Simple::Password.
+
+    htdbm(1)
+
+    dbmmanage(1)
+
+    <http://www.unixpapa.com/incnote/dbm.html> - Overview of various DBM's.
+
+    <http://cr.yp.to/cdb.html> - CDB
+
+    AnyDBM_File - Compares different DBM's
+
+AUTHOR
+    Christian Hansen "ch@ngmedia.com"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

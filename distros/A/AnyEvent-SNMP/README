@@ -1,0 +1,130 @@
+NAME
+    AnyEvent::SNMP - adaptor to integrate Net::SNMP into AnyEvent.
+
+SYNOPSIS
+     use AnyEvent::SNMP;
+     use Net::SNMP;
+
+     # just use Net::SNMP and AnyEvent as you like:
+
+     # use a condvar to transfer results, this is
+     # just an example, you can use a naked callback as well.
+     my $cv = AnyEvent->condvar;
+
+     # ... start non-blocking snmp request(s)...
+     Net::SNMP->session (-hostname => "127.0.0.1",
+                         -community => "public",
+                         -nonblocking => 1)
+              ->get_request (-callback => sub { $cv->send (@_) });
+
+     # ... do something else until the result is required
+     my @result = $cv->wait;
+
+DESCRIPTION
+    This module implements an alternative "event dispatcher" for Net::SNMP,
+    using AnyEvent as a backend. This integrates Net::SNMP into AnyEvent.
+    That means you can make non-blocking Net::SNMP calls and as long as
+    other parts of your program also use AnyEvent (or some event loop
+    supported by AnyEvent), they will run in parallel.
+
+    Also, the Net::SNMP scheduler is very inefficient with respect to both
+    CPU and memory usage. Most AnyEvent backends (including the pure-perl
+    backend) fare much better than the Net::SNMP dispatcher.
+
+    Another major added fetaure of this module over Net::SNMP is automatic
+    rate-adjustments: Net::SNMP is so slow that firing a few thousand
+    requests can cause many timeouts simply because Net::SNMP cannot process
+    the replies in time. This module automatically adapts the send rate to
+    avoid false timeouts caused by slow reply processing.
+
+    A potential disadvantage of this module is that replacing the dispatcher
+    is not at all a documented thing to do, so future changes in Net::SNP
+    might break this module (or the many similar ones).
+
+    This module does not export anything and does not require you to do
+    anything special apart from loading it *before doing any non-blocking
+    requests with Net::SNMP*. It is recommended but not required to load
+    this module before "Net::SNMP".
+
+GLOBAL VARIABLES
+    $AnyEvent::SNMP::MAX_OUTSTANDING (default: 50, dynamic)
+    AnyEvent::SNMP::set_max_outstanding $new_value
+        Use this package variable to restrict the number of outstanding SNMP
+        requests at any point in time.
+
+        Net::SNMP is very fast at creating and sending SNMP requests, but
+        much slower at parsing (big, bulk) responses. This makes it easy to
+        request a lot of data that can take many seconds to parse.
+
+        In the best case, this can lead to unnecessary delays (and even
+        time-outs, as the data has been received but not yet processed) and
+        in the worst case, this can lead to packet loss, when the receive
+        queue overflows and the kernel can no longer accept new packets.
+
+        To avoid this, you can (and should) limit the number of outstanding
+        requests to a number low enough so that parsing time doesn't
+        introduce noticable delays.
+
+        Unfortunately, this number depends not only on processing speed and
+        load of the machine running Net::SNMP, but also on the network
+        latency and the speed of your SNMP agents.
+
+        AnyEvent::SNMP tries to dynamically adjust this number upwards and
+        downwards.
+
+        Increasing $MAX_OUTSTANDING will not automatically use the extra
+        request slots. To increase $MAX_OUTSTANDING and make
+        "AnyEvent::SNMP" make use of the extra paralellity, call
+        "AnyEvent::SNMP::set_max_outstanding" with the new value, e.g.:
+
+           AnyEvent::SNMP::set_max_outstanding 500;
+
+        Although due to the dynamic adjustment, this might have little
+        lasting effect.
+
+        Note that you can use Net::SNMP::XS to speed up parsing of responses
+        considerably.
+
+    $AnyEvent::SNMP::MIN_RECVQUEUE (default: 8)
+    $AnyEvent::SNMP::MAX_RECVQUEUE (default: 64)
+        These values specify the minimum and maximum receive queue length
+        (in units of one response packet).
+
+        When AnyEvent::SNMP handles $MAX_RECVQUEUE or more packets per
+        iteration it will reduce $MAX_OUTSTANDING. If it handles less than
+        $MIN_RECVQUEUE, it increases $MAX_OUTSTANDING.
+
+        This has the result of adjusting the number of outstanding requests
+        so that the recv queue is between the minimum and maximu, usually.
+
+        This algorithm works reasonably well as long as the responses,
+        response latencies and processing times are the same size per packet
+        on average.
+
+COMPATIBILITY
+    This module may be used as a drop in replacement for the
+    Net::SNMP::Dispatcher in existing programs. You can still call
+    "snmp_dispatcher" to start the event-loop, but then you loose the
+    benefit of mixing Net::SNMP events with other events.
+
+       use AnyEvent::SNMP;
+       use Net::SNMP;
+
+       # just use Net::SNMP as before
+
+       # ... start non-blocking snmp request(s)...
+       Net::SNMP->session (
+             -hostname    => "127.0.0.1",
+             -community   => "public",
+             -nonblocking => 1,
+          )->get_request (-callback => sub { ... });
+
+       snmp_dispatcher;
+
+SEE ALSO
+    AnyEvent, Net::SNMP, Net::SNMP::XS, Net::SNMP::EV.
+
+AUTHOR
+     Marc Lehmann <schmorp@schmorp.de>
+     http://home.schmorp.de/
+

@@ -1,0 +1,56 @@
+tests !!!
+Content-Encoding with q=  header.
+
+From: 	Michael.Schroepl@telekurs.de
+To: 	mod_gzip@lists.over.net
+Date: Mon, 21 Oct 2002 16:17:23 +0200
+
+But what if the browser is sending this one:
+
+     Accept-Encoding: deflate;q=1, gzip;q=0, identity;q=0.5, *;q=0.1
+
+     This would mean: "I prefer deflated content; I would rather take
+     uncompressed content than something I don't know anything about;
+     but I definitely cannot handle gzipped content."
+
+     The HTTP definitions says:
+     "If a parameter has a quality value of 0, then content with this parameter
+     is 'not acceptable' for the client."
+     
+TE header compatibility for HTTP/1.1 see rfc2616 14.39
+Serve the Lost Connection.
+test.pl <=> Apache::Test
+Local Cache Control features for NN and MSIE
+
+I'm not sure that Dynamic control over the
+ - pageLifeTime
+ - minChunkSize
+ - minChunkSizeSource
+ - minChunkSizePP
+ - etc.
+via notes() is much better, than dynamic setup of appropriate conf variables...
+
+===========================================================================
+
+02/20/02
+========
+From: 	gs-lists-mod_gzip@gluelogic.com
+To: 	mod_gzip@lists.over.net
+
+Microsoft has a tendency to IGNORE the HTTP headers and to "detect" the
+document type itself.  e.g. I could send a MIME type of image/gif, but
+if the content is HTML, some versions of IE will display it as HTML
+rather than trying to decode it as GIF.  This might seem like a good thing
+to you, but it was the cause of a large security hole some months ago.
+
+Along with the Microsoft detection "feature", Microsoft tends to read the
+HTTP META tags in the document (not the headers), and sometimes actually
+listens to them.
+
+Therefore, defensive programming and web publishing suggests that you should
+duplicate important header tags such as Vary in the HTTP header AND in the
+HTML document <head> section.
+
+-Glenn
+===========================================================================
+

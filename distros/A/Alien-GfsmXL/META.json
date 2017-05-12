@@ -1,0 +1,52 @@
+{
+   "abstract" : "install the libgfsmxl C library on your system",
+   "author" : [
+      "Bryan Jurish <moocow@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-GfsmXL",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0.027",
+            "Alien::Gfsm" : "0.001",
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.027",
+            "File::ShareDir" : "1.00",
+            "Gfsm" : "0.0405",
+            "perl" : "v5.8.9"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Text::ParseWords" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::GfsmXL" : {
+         "file" : "lib/Alien/GfsmXL.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.004"
+}

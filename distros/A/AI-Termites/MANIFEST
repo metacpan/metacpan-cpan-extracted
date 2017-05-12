@@ -1,0 +1,12 @@
+Changes
+lib/AI/Termites.pm
+lib/AI/Termites/LoginquitasPostulo.pm
+lib/AI/Termites/NemusNidor.pm
+lib/AI/Termites/PeractioBaro.pm
+lib/AI/Termites/VicinusOccurro.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+samples/termites.pl
+t/AI-Termites.t
+META.yml                                 Module meta-data (added by MakeMaker)

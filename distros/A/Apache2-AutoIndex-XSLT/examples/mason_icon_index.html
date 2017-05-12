@@ -1,0 +1,7 @@
+%# for i in `ls *.ico|sed 's/\.ico$//'`;do convert $i.ico $i.png;done
+
+% use File::Basename qw(dirname basename);
+% for (glob(sprintf('"%s/*.png"',dirname($r->filename)))) { $_ = basename($_);
+	<a href="<% $_ |u %>"><img src="<% $_ |u %>" alt="<% $_ |h %>" border="0" /></a>
+% }
+

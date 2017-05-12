@@ -1,0 +1,9 @@
+---
+files:
+  lib/Parse/CPAN/Meta.pm: lib/Parse/CPAN/Meta.pm
+  Changes: lib/Parse/CPAN/Meta/Changes
+  t/lib/Parse/CPAN/Meta/Test.pm: t/lib/Parse/CPAN/Meta/Test.pm
+dirs-flat:
+  t/: lib/Parse/CPAN/Meta/t
+  t/data/: lib/Parse/CPAN/Meta/t/data
+

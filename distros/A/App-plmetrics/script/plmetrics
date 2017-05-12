@@ -1,0 +1,69 @@
+#!perl
+use strict;
+use warnings;
+use Docopt;
+use App::plmetrics;
+
+my $opt = docopt(
+    argv    => scalar(@ARGV) ? \@ARGV : ['--help' => 1],
+    version => $App::plmetrics::VERSION
+);
+my $plm = App::plmetrics->new($opt)->run;
+
+__END__
+
+=head1 NAME
+
+plmetrics - show the Perl metrics
+
+=head1 SYNOPSIS
+
+    plmetrics [--module=<module> | --file=<file> | --dir=<dir> | --git=<git_repos> | --tar=<tar_url>] [--result=<result>] [--sort]
+
+    OPTIONS:
+
+        --module     local module name
+        --file       local file path
+        --dir        local directory path
+        --git        git repository
+        --tar        URL of tar.gz
+
+        --sort       sort result table
+        --result     kind of result(module*|methods|cc|lines|files) *default
+
+        --version    show the version
+        -h --help    show this help
+
+=head2 EXAMPLE
+
+    $ plmetrics --module Some::Module
+    $ plmetrics --file ./path/to/lib/Some/Module.pm
+    $ plmetrics --dir ./path/to/lib
+    $ plmetrics --git git://example.com/Some-Module.git
+    $ plmetrics --tar http://example.com/Some-Module-0.01.tar.gz
+
+    $ plmetrics --module Some::Module --result methods --sort
+
+
+=head1 WARNINGS
+
+If you use C<--git> or C<--tar> option, you may have to install some modules manually. These are NOT installed with C<App::plmetrics>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+
+=head1 SEE ALSO
+
+L<Perl::Metrics::Lite>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=cut

@@ -1,0 +1,11 @@
+DESCRIPTION
+
+    This distribution contains module lists that are imported from Ben
+    Bullock's (CPANID:BKB) website posts located at
+    https://www.lemoda.net/. This distribution is created to improve the
+    "mentions cloud".
+
+append:SEE ALSO
+
+    App::lcpan and lcpan, particularly the related-mods subcommand.
+

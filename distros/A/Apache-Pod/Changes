@@ -1,0 +1,44 @@
+Revision history for Apache::Pod
+
+NEXT    Fri Sep 16 22:46:06 CDT 2005
+        [FEATURES]
+        * Added LINKBASE configuration variable to define base of the
+          URLs created by L<> links.  Thanks Pete Krawczyk.
+
+        [FIXES]
+        * URI-encodes the links in Apache::Pod::HTML.  Thanks to Chris
+          Eade.
+
+0.20    Sat Sep 10 13:57:11 CDT 2005
+        [FEATURES]
+        * Added INDEX and GZIP options.  Thanks to Kjetil Skotheim.
+
+        [FIXES]
+        * Uses C<< $r->print >> instead of bare C<print> to generate
+          output.  This is more portable.  Thanks to Kate Yoak.
+        * Added a dependency on Apache::Constants.
+
+0.10    May 10, 2004
+        [FEATURES]
+        * Pod links link to the filename.  Thereform, L<foo.pod> links
+        to foo.pod, instead of "TODO".  This is only until Sean does
+        his magic in Pod::Simple::HTML so this fudgery isn't needed.
+
+        [FIXES]
+        * Handlers now properly return OK.
+
+        [INTERNALS]
+        * Now overriding Pod::Simple::HTML.
+        * Added pod.t and pod-coverage.t
+        * Changed the handling of the CSS as a __DATA__ section.
+
+0.03    September 9, 2003
+        * Added stylesheet handling, including replicating the
+          search.cpan.org stylesheet as a default.  Thanks very much to
+          Grant McLean for the patch.
+
+0.02    September 29, 2002
+        * Seems to find modules correctly, a la perldoc.
+
+0.01    September 26, 2002
+        * First version

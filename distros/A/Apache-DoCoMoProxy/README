@@ -1,0 +1,31 @@
+NAME
+    Apache::DoCoMoProxy - NTT DoCoMo HTTP gateway clone for mod_proxy
+
+SYNOPSIS
+      # in httpd.conf
+      PerlAuthenHandler Apache::DoCoMoProxy
+
+DESCRIPTION
+    NTT DoCoMo i-mode terminals use original http gateway.
+    Apache::DoCoMoProxy emulates it. GET or POST uid=NULLGWDOCOMO parameter
+    changes terminal id.
+
+    At first time of proxy request, basic auth required. Input terminal id
+    and user agent(comma separate). password anyone.
+
+     ex.)
+     
+     account: AZ0826YK,DoCoMo/1.0/N503i/c30
+     password: (none)
+
+AUTHOR
+    Hiroyuki Kobayashi <kobayasi@piano.gs>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    This module comes WITHOUT ANY WARRANTY.
+
+SEE ALSO
+    the Apache::ProxyPassThru manpage
+

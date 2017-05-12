@@ -1,0 +1,10 @@
+* Make sure that procedural recursion can happen (by adding a stack for
+every function invocation ?)
+
+* Test that the line numbers are preserved (Try dieing and seeing what the
+line number is)
+
+* Document the internals in the POD.
+
+* Make sure it works for goto's inside main().
+

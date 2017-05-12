@@ -1,0 +1,55 @@
+    AIX::ODM - A Perl module for retrieving IBM AIX ODM information
+
+SYNOPSIS
+
+      use AIX::ODM;
+  
+      my %odm = odm_dump('C|P');
+      while ( ($ndx1, $lev2) = each %odm ) {
+        while ( ($ndx2, $val) = each %$lev2 ) {
+            print "odm{${ndx1}}{${ndx2}} = ${odm{${ndx1}}{${ndx2}}}\n";
+        }
+      }
+
+      my %dev = odm_classes('C|P');
+      foreach ${devname} ( keys %dev ) {
+        print "dev{${devname}} = ${dev{${devname}}}\n";
+      }
+
+      my %attribs = odm_attributes(${dev{'devname'}};
+      foreach ${attrname} ( keys %attribs ) {
+        print "attribs{${attrname}} = ${attribs{${attrname}}}\n";
+      }
+
+      my ${devclass} = odm_class('C|P',${dev{'devname'});
+      my ${devsubcl} = odm_subclass('C|P',${dev{'devname'});
+
+  
+DESCRIPTION
+
+    This module provides a Perl interface for accessing ODM information
+    about an RS/6000 / pSeries machine running the AIX operating system.
+    It makes available several functions, which return hashes of values
+    containing device information and their attributes.
+
+    The syntax examples shown above as 'C|P' should be read as
+    "C" OR "P", meaning the argument should consist of a single
+    quoted letter "C" or "P", but NOT both.
+
+VERSION
+    1.0.2 (released 2004-09-15)
+
+BUGS
+    No bugs are known at this time.
+
+TO-DO
+
+AUTHOR
+      Dana French
+      <mailto:dfrench@mtxia.com>
+      <http://www.mtxia.com>
+  
+COPYRIGHT/LICENSE
+    Copyright (c) 2004, Dana French. This module is free software. It
+    may be used, redistributed, and/or modified under the terms of the Perl
+    Artistic License.

@@ -1,0 +1,13 @@
+.releaserc
+Changes
+lib/Acme/Study/Perl.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+SIGNATURE			Public-key signature (added by MakeMaker)
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/studyperl.t

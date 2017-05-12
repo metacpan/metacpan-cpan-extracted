@@ -1,0 +1,17 @@
+</head>
+
+<body id="home">
+
+<div id="header">
+	<h1>Mowyw Example</h1>
+	<p>Lore Impsum</p>
+</div>
+<div id="nav-page">
+<h2>Quick access</h2>
+<ul>
+<li><a href="#nav-main">Site navigation</a></li>
+<li><a href="#nav-secondary">Recent articles</a></li>
+</ul>
+</div>
+
+<div id="content-main">

@@ -1,0 +1,10 @@
+[&icon http://search.cpan.org/s/img/cpanrdf.jpg]
+
+This is some sample [Apache::TinyCP http://search.cpan.org/dist/Apache-TinyCP/] content using the default [Text::KwikiFormatish http://search.cpan.org/dist/Text-KwikiFormatish/] formatter. Wizzow!
+
+=== Lists
+
+* apples
+* oranges
+** pears
+*** bananas

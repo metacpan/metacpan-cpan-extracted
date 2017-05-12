@@ -1,0 +1,41 @@
+---
+abstract: 'Parses @ARGV for accessing JSON via C<< <> >>'
+author:
+  - 'motemen <motemen@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ARGV-JSON
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  ARGV::JSON:
+    file: lib/ARGV/JSON.pm
+    version: 0.01
+requires:
+  JSON: 0
+  Tie::Handle: 0
+  parent: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/motemen/perl5-ARGV-JSON/issues
+  homepage: https://github.com/motemen/perl5-ARGV-JSON
+  repository: git://github.com/motemen/perl5-ARGV-JSON.git
+version: 0.01

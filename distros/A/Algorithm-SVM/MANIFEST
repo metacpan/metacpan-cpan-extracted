@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+SVM.xs
+TODO
+bindings.cpp
+bindings.h
+lib/Algorithm/SVM.pm
+lib/Algorithm/SVM/DataSet.pm
+sample.model
+libsvm.cpp
+libsvm.h
+test.pl
+typemap

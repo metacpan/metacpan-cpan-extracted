@@ -1,0 +1,9 @@
+########################################
+Revision history for AOLserver::CtrlPort
+########################################
+
+0.02 (01/25/2005)
+    (ms) Makefile.PL prerequisite changed from undef to '0'.
+
+0.01 (07/14/2004)
+    (ms) Where it all began.

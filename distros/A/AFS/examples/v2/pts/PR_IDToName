@@ -1,0 +1,20 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::PTS;
+
+my @ids = (28053, 1, 105, 32000, 32766);
+
+my $pts = AFS::PTS->new();
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+my @names = $pts->PR_IDToName(\@ids);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else {
+    foreach my $name (@names) {
+        print "name = $name\n";
+    }
+}

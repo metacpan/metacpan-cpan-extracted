@@ -1,0 +1,49 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Format: 1.8
+Date: Tue, 17 Mar 2009 19:01:58 +0100
+Source: dhelp
+Binary: dhelp
+Architecture: source all
+Version: 0.6.15
+Distribution: unstable
+Urgency: low
+Maintainer: Esteban Manchado Velázquez <zoso@debian.org>
+Changed-By: Esteban Manchado Velázquez <zoso@debian.org>
+Description: 
+ dhelp      - online help system
+Closes: 471558 491971 496682 502557
+Changes: 
+ dhelp (0.6.15) unstable; urgency=low
+ .
+   * Don't depend on libdb4.2-ruby1.8 (transitional package) (Closes: #496682).
+     Thanks Thomas Viehmann and Scott Kitterman.
+   * Capitalise all sections properly (Closes: #502557).
+   * Fix encoding issues. Assume UTF-8 locale though (Closes: #491971).
+   * Change WordThreshold to 50000. It's better for low memory machines, and
+     both dwww and man2html are using that setting (Closes: #471558). Thanks
+     Stellan Klebom.
+   * Fix issues flagged by lintian: Depend on ${misc:Depends} (because of
+     debhelper), call dhelp_parse without using absolute paths and bump
+     Standards-Version to 3.8.1.
+Checksums-Sha1: 
+ 70e75f88d2898665a4cd2a3c65b2cbeeaf0814c9 788 dhelp_0.6.15.dsc
+ 66fb7f04bfdad5dbe395a4e350c9358a592f078f 48346 dhelp_0.6.15.tar.gz
+ 0f73c28b22ac165d12846a79385221425a1c3f98 40786 dhelp_0.6.15_all.deb
+Checksums-Sha256: 
+ 026d12c16c8a5dc2d89477f33519e6ff30ac494b37978aa3ecdc978d80bcdd10 788 dhelp_0.6.15.dsc
+ 986bc90abdf60533d66dc1b74321b1a616ccf383f987a197d79ae6e981eea593 48346 dhelp_0.6.15.tar.gz
+ 982a545f0caae453c49da235e9485a58998d03d331b826a0ef3de8411eced3c6 40786 dhelp_0.6.15_all.deb
+Files: 
+ 4e0dd32ac5bbffff3ee6380b23911d31 788 doc optional dhelp_0.6.15.dsc
+ 600ba3888587a6f4854d4807405d5828 48346 doc optional dhelp_0.6.15.tar.gz
+ aa52bda2450bc3be4b0096a576a359c0 40786 doc optional dhelp_0.6.15_all.deb
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iD8DBQFJv/KEhYgK5b1UDsERAs8ZAJ9QeoqQlRafMb/xsMlYorayy/eh5QCcCLu7
+X1kOgVFVbFntNdkMKwqMbQs=
+=Gx2y
+-----END PGP SIGNATURE-----

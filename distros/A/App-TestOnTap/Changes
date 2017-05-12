@@ -1,0 +1,88 @@
+Revision history for App-TestOnTap
+
+0.031	2017-04-18
+
+	A recent Test::More fix changed a behavior (empty output line removed). 
+	
+	Test and dependency updated.    
+
+0.030	2017-04-11
+
+	When using 'suiteroots' as URL:s to zip files, use LWP::UserAgent and disable host check for https
+
+0.029	2017-04-01
+
+	Non-backwards compatible rewrite of the execmap
+	
+	No longer deals with just 'file extensions', but instead actual
+	Grep::Query expressions. This makes it possible to be very fine-grained
+	in how individual tests are run. In particular, using --no-harness and
+	--execmap from the commandline makes it easy to run a single test with a
+	debugger.
+	    
+
+0.028	2017-03-23
+
+	Implementation of --no-harness feature
+
+0.027	2017-03-22
+
+	Implementation of --no-harness feature
+
+0.026	2017-03-13
+
+	Another try to get rid of the Config::Std DEMOLISH weirdness
+
+0.025	2017-03-02
+
+	Try another tack for Config::Std issue
+
+0.024	2017-03-01
+
+	Added the testinfo.json file to the result.
+
+0.023	2017-02-13
+
+	Fixes for a packed binary: Encode::* modules should be included. Setting TESTONTAP_PERL5LIB will set PERL5LIB when tests are run.
+
+0.022	2017-02-13
+
+	rewrite the dispenser algo
+0.021	2017-02-12
+
+	Add ability for @file expansion to do ${envvar} expansion during reading
+	Add order strategy for tests
+
+0.020	2017-02-07
+
+	Allow 'variant' when doing pp
+0.019	2017-02-07
+
+	Add missin dep on LWP::Simple
+0.018	2017-02-07
+
+	Communicate the suite root to the suite
+	Track the tap handles issued so they can be closed during a bailout or other sudden death.
+0.017	2017-02-07
+
+	Allow fetching suite zip from URL, add some minor things to
+	the metadata written from a test
+0.016	2017-02-03
+
+	Add a sample suite
+0.015	2017-02-01
+
+	Attempt to address some minor Kwalitee issues
+0.014	2017-02-01
+
+	Support for simple argv expansion using @filename entries
+0.013	2017-01-31
+
+	* Accepts --include as an alternative to --skip, in order to make it most
+	natural to express a query.
+	* Now accepts a zip archive instead of a suite directory, and will unpack
+	before running.
+
+0.00x   20161229-?
+		Betas
+

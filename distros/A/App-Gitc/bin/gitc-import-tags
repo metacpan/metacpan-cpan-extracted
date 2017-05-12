@@ -1,0 +1,129 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-import-tags
+# ABSTRACT: Import changeset tags
+our $VERSION = '0.60'; # VERSION
+
+use File::Temp qw( tempfile );
+use App::Gitc::Util qw(
+    archived_tags
+    git_dir
+    open_packed_refs
+);
+
+# this script copies tags from the tag_archive table in the gitc database
+# into .git/packed-refs in the local repository.  it's conceptually the
+# inverse of gitc archive-tags.  All tags are left in the tag_archive
+# table.  They're not deleted.
+
+my ( $tags_fh, $new_tags_fh, $new_tags_filename )
+    = open_packed_refs('gitc-import-tags');
+exit if not $tags_fh;  # no refs to process
+
+my $archived_tags = archived_tags();
+
+# some convenient closures over the above variables
+my $next_archived = sub { shift @$archived_tags };    # [ $sha1, $ref ]
+my $next_packed = sub {
+    my $ref_line = <$tags_fh>;
+    return if not defined $ref_line;
+    chomp $ref_line;
+    my ( $sha1, $ref ) = split / /, $ref_line, 2;
+    return [ $sha1, $ref ];
+};
+my $pack = sub {
+    my ( $sha1, $ref ) = @{ shift @_ };
+    print $new_tags_fh "$sha1 $ref\n";
+    return;
+};
+
+# provide some progress output
+my $n = 0;
+my $imported = sub {
+    $n++;
+    if ( $n && $n % 1000 == 0 ) {
+        print STDERR "Imported $n tags\r";
+    }
+};
+
+my $P = $next_packed->();
+my $A = $next_archived->();
+
+while ( $P and $A ) {
+    if ( $P->[1] eq $A->[1] ) {
+        $pack->($P);    # copy it to the new pack file
+        $P = $next_packed->();
+        $A = $next_archived->();
+    }
+    elsif ( $P->[1] lt $A->[1] ) {
+        $pack->($P);
+        $P = $next_packed->();
+    }
+    elsif ( $P->[1] gt $A->[1] ) { # just to be explicit
+        $pack->($A);
+        $A = $next_archived->();
+        $imported->();
+    }
+    else {
+        die "What in tarnation is going on here?";
+    }
+}
+while ($P) {    # copy all remaining packed refs
+    $pack->($P);
+    $P = $next_packed->();
+}
+while ($A) {    # copy all remaining archived tags
+    $pack->($A);
+    $A = $next_archived->();
+    $imported->();
+}
+print STDERR "Imported $n tags\n" if $n;
+
+close $new_tags_fh;
+rename $new_tags_filename, git_dir() . '/packed-refs';
+
+exit;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-import-tags - Import changeset tags
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

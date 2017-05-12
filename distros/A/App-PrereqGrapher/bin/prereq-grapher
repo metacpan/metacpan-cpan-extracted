@@ -1,0 +1,150 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use App::PrereqGrapher;
+
+my $app = App::PrereqGrapher->new_with_options;
+
+$app->generate_graph(@ARGV);
+
+exit 0;
+
+=head1 NAME
+
+prereq-grapher - generate dependency graph for perl module or source
+
+=head1 SYNOPSIS
+
+ prereq-grapher [options] Foo::Bar .. Foo::Baz
+
+ Options:
+   -o <file>    The file to write the graph into
+   -d <int>     Stop recursing at the specified depth
+   -t <seconds> Timeout for when generating SVG or HTML output
+   -nc          Don't include core modules in dependency graph
+   -nrc         Show core modules, but not their dependencies
+   -dot         Generate graph in dot format (used by GraphViz)
+   -svg         Generate graph as Scalable Vector Graphics
+   -html        Generate graph as HTML
+   -gml         Generate graph as GraphML
+   -vcg         Generate graph in VCG format
+   -verbose     Display verbose messages as we run
+   -h --help    This help
+
+=head1 DESCRIPTION
+
+B<prereq-grapher> parses perl source and looks for prerequisites,
+such as modules that are C<use>'d or C<require>'d.
+All of those modules are then parsed in turn,
+looking for I<their> dependencies.
+
+Once all files have been parsed, B<prereq-grapher> will write out
+the dependency graph in one of the five formats supported.
+
+The simplest way to run B<prereq-grapher> is just giving a module name:
+
+  % prereq-grapher Module::Path
+  6 modules processed. Graph written to dependencies.dot
+
+By default B<prereq-grapher> generates the dependency graph in C<dot> format,
+and writes it to a file called C<dependencies.dot>.
+You can explicitly specify the output format and filename:
+
+  % prereq-grapher -svg -o class-inspector-path.svg Class::Inspector
+  9 modules processed. Graph written to class-inspector.svg
+
+If the complete dependency graph is very large,
+it can be hard to get your head around it.
+In this case you could start off generating the first few levels of dependencies,
+using the B<-depth> (or B<-d>) option:
+
+  % prereq-grapher App::PrereqGrapher
+  305 modules processed. Graph written to dependencies.dot
+
+  % prereq-grapher -depth 2 App::PrereqGrapher
+  10 modules processed. Graph written to dependencies.dot
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-o> E<lt>fileE<gt> | B<-output-file> E<lt>fileE<gt>
+
+The name of the file that the dependency graph should be written to.
+If not specified, B<prereq-grapher> will write the graph in a file
+called C<dependencies>, and the extension will indicate the format
+(dot, svg, html, gml, or vcg).
+
+=item B<-d N> | B<-depth N>
+
+Generate the dependency graph to a depth of no more than N links.
+
+=item B<-r T> | B<-timeout T>
+
+Specifies the timeout that should be passed to Graph::Easy when
+generating the output graph. Mainly relevant for SVG and HTML formats.
+
+=item B<-nc> | B<-no-core>
+
+Don't include any core dependencies in the generated dependency graph.
+
+=item B<-nrc> | B<-no-recurse-core>
+
+Include core modules in the output, but don't include any of their dependencies.
+
+=item B<-dot>
+
+Generate the dependency graph in the Dot format supported by the GraphViz tools.
+
+=item B<-svg>
+
+Generate the dependency graph as Scalable Vector Graphics.
+
+=item B<-html>
+
+Generate the dependency graph as an HTML file with embedded CSS.
+Note: I haven't got this to work yet, but it's one of the output formats
+supported by L<Graph::Easy>.
+
+=item B<-v> | B<-verbose>
+
+Display verbose messages as the script runs.
+If a module is use'd or require'd, but not installed locally,
+then by default it will be silently ignored.
+In verbose mode you'll hear about all such modules.
+
+=back
+
+=head1 SEE ALSO
+
+For the B<dot> format, see L<http://www.graphviz.org>.
+There are graphical tools for viewing direct graphs, or you can use the C<dot>
+program on the command-line to generate an image, postscript, or many other things besides.
+
+For SVG, you could look at the L<W3C page on SVG|http://www.w3.org/Graphics/SVG/>,
+but probably more useful is the
+L<Wikipedia page on SVG|http://en.wikipedia.org/wiki/Scalable_Vector_Graphics>.
+
+For GraphML (the B<gml> export format),
+see <the GraphML home page|http://graphml.graphdrawing.org>.
+
+I haven't been able to get the HTML version to work for any dependency graph I've tried.
+
+For VCG, see L<The VCG home page|http://rw4.cs.uni-sb.de/~sander/html/gsvcg1.html>.
+
+The functionality for B<prereq-grapher> is provided by L<App::PrereqGrapher>,
+which in turn builds on L<Perl::PrereqScanner> and L<Graph::Easy>.
+
+=head1 AUTHOR
+
+Neil Bowers E<lt>neilb@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Neil Bowers.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

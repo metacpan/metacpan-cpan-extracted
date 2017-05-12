@@ -1,0 +1,27 @@
+---
+abstract: 'The errno theme'
+author:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+build_requires:
+  Test::MetaSyntactic: 1.001
+  Test::More: 0.94
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-MetaSyntactic-errno
+provides:
+  Acme::MetaSyntactic::errno:
+    file: lib/Acme/MetaSyntactic/errno.pm
+    version: 1.003
+requires:
+  Acme::MetaSyntactic: 1.001
+  perl: 5.006_002
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/book/Acme-MetaSyntactic-errno
+version: 1.003

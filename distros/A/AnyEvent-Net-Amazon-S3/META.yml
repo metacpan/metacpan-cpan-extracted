@@ -1,0 +1,38 @@
+---
+abstract: 'Use the Amazon S3 - Simple Storage Service'
+author:
+  - 'Yasutaka ATARASHI <yakex@cpan.org>'
+build_requires:
+  Digest::MD5::File: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  LWP::Simple: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Net-Amazon-S3
+requires:
+  AnyEvent: '0'
+  AnyEvent::HTTP::LWP::UserAgent: '0.10'
+  AnyEvent::HTTP::LWP::UserAgent::Determined: '0'
+  Data::Stream::Bulk::AnyEvent: '0'
+  Module::AnyEvent::Helper: '0'
+  Net::Amazon::S3: '0.60'
+  filtered: '0'
+  parent: '0'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/yak1ex/AnyEvent-Net-Amazon-S3
+  repository: https://github.com/yak1ex/AnyEvent-Net-Amazon-S3.git
+version: v0.04.0.80

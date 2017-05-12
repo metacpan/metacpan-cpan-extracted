@@ -1,0 +1,85 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [
+		doap-deps:on "Acme::MetaSyntactic 1.000"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Acme::MetaSyntactic::haddock 0"^^doap-deps:CpanId;
+	], [ doap-deps:on "Moo 1.002000"^^doap-deps:CpanId ], [ doap-deps:on "PPI 1.215"^^doap-deps:CpanId ], [
+		doap-deps:on "Perl::Critic::Utils 1.118"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Types::Standard 0.001"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "namespace::sweep 0.006"^^doap-deps:CpanId;
+	], [ doap-deps:on "Type::Utils 0.001"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Acme-PPIx-MetaSyntactic>;
+	doap:created         "2013-05-15"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Acme-PPIx-MetaSyntactic>;
+	doap:homepage        <https://metacpan.org/release/Acme-PPIx-MetaSyntactic>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Acme-PPIx-MetaSyntactic";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/v_0-003>;
+	doap:repository      [
+		a doap:HgRepository;
+		doap:browse <https://bitbucket.org/tobyink/p5-acme-ppix-metasyntactic>;
+	];
+	doap:shortdesc       "rename functions and variables in a PPI::Document using Acme::MetaSyntactic".
+
+<http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Acme-PPIx-MetaSyntactic-0.001"^^xsd:string;
+	dc:issued            "2013-05-15"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-PPIx-MetaSyntactic-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Acme-PPIx-MetaSyntactic-0.002"^^xsd:string;
+	dc:issued            "2013-05-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add missing dependency on Acme::MetaSyntactic::haddock.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-PPIx-MetaSyntactic-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Acme-PPIx-MetaSyntactic-0.003"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-PPIx-MetaSyntactic-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

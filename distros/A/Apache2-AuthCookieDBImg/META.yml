@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache2-AuthCookieDBImg
+version:      2.2
+version_from: lib/Apache2/AuthCookieDBImg.pm
+installdirs:  site
+requires:
+    Apache2::AuthCookie:           0
+    Apache2::Const:                0
+    Apache2::ServerUtil:           0
+    Apache::DBI:                   0
+    Date::Calc:                    0
+    Digest::MD5:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

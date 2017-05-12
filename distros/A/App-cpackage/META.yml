@@ -1,0 +1,28 @@
+---
+abstract: 'Create installation packages from CPAN modules'
+author:
+  - 'Jon Allen (JJ) <jj@jonallen.info>'
+  - 'Jon Allen (JJ) <jj@jonallen.info>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-cpackage
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  App::cpanminus: 1.5002
+  Capture::Tiny: 0
+  perl: 5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.01

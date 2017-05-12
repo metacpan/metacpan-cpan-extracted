@@ -1,0 +1,59 @@
+{
+   "abstract" : "Download and install the electron GUI framework",
+   "author" : [
+      "Doug Hoyte <doug@hcsw.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-Electron",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Path" : "0",
+            "File::Spec::Functions" : "0",
+            "IO::File" : "0",
+            "IO::Uncompress::Unzip" : "0",
+            "Module::Build" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Electron" : {
+         "file" : "lib/Alien/Electron.pm",
+         "version" : "0.103"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hoytech/Alien-Electron/issues"
+      },
+      "homepage" : "https://github.com/hoytech/Alien-Electron",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/hoytech/Alien-Electron.git"
+      }
+   },
+   "version" : "0.103",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

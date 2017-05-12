@@ -1,0 +1,1288 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>App::Basis::ConvertText2</title>
+        <meta name="Created" content="2014-05-12" />
+        <meta name="Author" content="Kevin Mulholland" />
+        <meta name="Copyright" content="Kevin Mulholland (c) 2014" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <style type="text/css">
+            @media print {
+                @page {
+                    size: A4  Portrait ;
+                    margin: 60pt 30pt 40pt 30pt ;
+                    @top {
+                    margin: 0pt 0pt 0pt 0pt ;
+                        content: url(/tmp/kmulholland/cache/ct2/501584ba8fd79327876915821268382f.png) ;
+                    }
+                    @bottom-right { content: counter(page) " / " counter(pages) ;}
+                    @bottom-left {content: "Created with ct2";}
+                    @bottom { content: "Kevin Mulholland (c) 2014";}
+                }
+                /* remove some header stuff from front page */
+                @page:first {
+                    @top {content: normal; }
+                    @bottom-right { content: normal; ;}
+                    @bottom { content: normal; ;}
+                    @bottom-left { content: normal; ;}
+                }
+                div.footer { display: none;}
+                a {text-decoration:none ; color: teal; font-weight: bold;}
+            }
+
+            /* setup for web */
+            @media screen {
+                #toc a {
+                    text-decoration: none ;
+                    font-weight: normal;
+                    color: teal;
+                }
+
+            }
+            /* things to do with numbering headings*/
+            h1 {
+                display: none;
+            }
+            h2, h3 {
+                color: teal;
+            }
+            h4, h5, h6 {
+                font-weight: normal;
+            }
+
+            body {font-family: sans-serif;}
+            /* tables*/
+            table { page-break-inside: avoid ;}/*
+
+            /* all normal tables will be styled this way */
+            table
+            {
+                margin: 5px;
+                text-align: left;
+                border-collapse: collapse;
+            }
+            table tr { vertical-align:top;}
+            table th
+            {
+            /*    padding: 8px 2px;*/
+                font-weight: bold;
+                border-bottom: 2px solid black;
+                border-right: 30px solid #fff;
+                border-left: 30px solid #fff;
+            }
+            table td
+            {
+                padding: 0px 10px 0px 10px;
+                border-right: 30px solid #fff;
+                border-left: 30px solid #fff;
+                vertical-align:top;
+            }
+
+            /* all boxed tables will be styled this way */
+            table.box
+            {
+                margin: 5px;
+                text-align: left;
+                border-collapse: collapse;
+            }
+            table.box tr { vertical-align:top;}
+            table.box th
+            {
+                padding: 0px 10px 0px 10px;
+                background-color: #ccc;
+                font-weight: bold;
+                text-align: center;
+                border: 1px solid black;
+            }
+            table.box td
+            {
+                padding: 0px 10px 0px 10px;
+                border: 1px solid black;
+            }
+
+            table.footer { font-size: 10px; width: 100%;}
+            table.footer td.commercial {
+                font-weight: bold;
+                font-size: 12px;
+                text-align: center;
+            }
+
+            table.coverpage {
+                width: 90%;
+                margin-left: auto;
+                margin-right: auto;
+                border-collapse: collapse;
+                border-spacing: 0px;
+                margin-bottom: 300px;
+            }
+            table.coverpage td {
+                border: 1px silver solid;
+                padding-left:10px;
+                padding-right:10px;
+            }
+            p.coverpage {
+                width:88%;
+                margin-left: auto;
+                margin-right: auto;
+                text-align: center;
+                font-size: 12px ;
+            }
+            div.coverpage {
+                text-align: center;
+                width: 280px;
+                margin-left: auto;
+                margin-right: auto;
+                text-align: center;
+                padding-top: 50px;
+                padding-bottom: 80px;
+            }
+            div.coverpage img {
+                display: block;
+            }
+
+            .frontpage { page-break-after: always;}
+
+            /* toc */
+            #toc {
+              padding: 0.4em;
+              page-break-after: always;
+            }
+            #toc p {
+                color: teal;
+                font-weight: bold;
+                font-size: 24px;
+            }
+            #toc h3 {
+              text-align: center
+            }
+            #toc ul {
+/*              columns: 1;*/
+            }
+            #toc ul, #toc li {
+              list-style: none;
+              margin: 0;
+              padding: 0;
+              padding-left: 10px ;
+            }
+            #toc a::after {
+              content: leader('.') target-counter(attr(href), page);
+              font-style: normal;
+            }
+            #toc a {
+                text-decoration: none ;
+                font-weight: normal;
+                color: black;
+            }
+
+
+            /* source code highlighting for pandoc */
+            table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+                margin: 0; padding: 0; vertical-align: baseline; border: none;
+            }
+            table.sourceCode { width: 100%; line-height: 100%; }
+            td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+            td.sourceCode { padding-left: 5px; }
+            code > span.kw { color: #007020; font-weight: bold; }
+            code > span.dt { color: #902000; }
+            code > span.dv { color: #40a070; }
+            code > span.bn { color: #40a070; }
+            code > span.fl { color: #40a070; }
+            code > span.ch { color: #4070a0; }
+            code > span.st { color: #4070a0; }
+            code > span.co { color: #60a0b0; font-style: italic; }
+            code > span.ot { color: #007020; }
+            code > span.al { color: #ff0000; font-weight: bold; }
+            code > span.fu { color: #06287e; }
+            code > span.er { color: #ff0000; font-weight: bold; }
+
+            /* add the footnotes section if needed */
+            section.footnotes:before {
+                content: "Footnotes";
+            }
+        </style>
+
+    </head>
+    <body>
+      <div class="frontpage">
+          <div class='coverpage'>
+              <img src="/tmp/kmulholland/cache/ct2/bd027b5281397f731f95ac53fc0e0544.png" width="280" height="280" alt="coverpage Logo" />
+          </div>
+          <table class="coverpage">
+              <tr><td>Title</td><td>App::Basis::ConvertText2</td></tr>
+              <tr><td>Author </td><td>Kevin Mulholland</td></tr>
+              <tr><td>Last Updated</td><td>2014-05-12</td></tr>
+              <tr><td>Version</td><td>5</td></tr>
+          </table>
+
+      </div>
+      <div id='toc' >
+          <p>Contents</p>
+<ul>
+  <li><a href='#1_document_header_and_variables'>1 Document header and variables</a></li>
+  <li><a href='#2_table_of_contents'>2 Table of contents</a></li>
+  <li><a href='#3_fenced_code-blocks'>3 Fenced code-blocks</a></li>
+  <li><a href='#4_buffering_data_for_later_use'>4 Buffering data for later use</a></li>
+  <li><a href='#5_sparklines'>5 Sparklines</a></li>
+  <li><a href='#6_charts'>6 Charts</a></li>
+  <li><a href='#6.1_pie_chart'>&nbsp;&nbsp;&nbsp;6.1 Pie chart</a></li>
+  <li><a href='#6.2_bar_chart'>&nbsp;&nbsp;&nbsp;6.2 Bar chart</a></li>
+  <li><a href='#6.3_mixed_chart'>&nbsp;&nbsp;&nbsp;6.3 Mixed chart</a></li>
+  <li><a href='#7_message_sequence_charts_-_mscgen'>7 Message Sequence Charts - mscgen</a></li>
+  <li><a href='#8_diagrams_through_ascii_art_-_ditaa'>8 DIagrams Through Ascii Art - ditaa</a></li>
+  <li><a href='#9_uml_diagrams'>9 UML Diagrams</a></li>
+  <li><a href='#10_graphviz'>10 Graphviz</a></li>
+  <li><a href='#11_venn_diagram'>11 Venn diagram</a></li>
+  <li><a href='#12_barcodes'>12 Barcodes</a></li>
+  <li><a href='#12.1_code39'>&nbsp;&nbsp;&nbsp;12.1 Code39</a></li>
+  <li><a href='#12.2_ean8'>&nbsp;&nbsp;&nbsp;12.2 EAN8</a></li>
+  <li><a href='#12.3_ean13'>&nbsp;&nbsp;&nbsp;12.3 EAN13</a></li>
+  <li><a href='#12.4_coop2of5'>&nbsp;&nbsp;&nbsp;12.4 COOP2of5</a></li>
+  <li><a href='#12.5_iata2of5'>&nbsp;&nbsp;&nbsp;12.5 IATA2of5</a></li>
+  <li><a href='#12.6_industrial2of5'>&nbsp;&nbsp;&nbsp;12.6 Industrial2of5</a></li>
+  <li><a href='#12.7_itf'>&nbsp;&nbsp;&nbsp;12.7 ITF</a></li>
+  <li><a href='#12.8_matrix2of5'>&nbsp;&nbsp;&nbsp;12.8 Matrix2of5</a></li>
+  <li><a href='#12.9_nw7'>&nbsp;&nbsp;&nbsp;12.9 NW7</a></li>
+  <li><a href='#12.10_qr_code'>&nbsp;&nbsp;&nbsp;12.10 QR code</a></li>
+  <li><a href='#13_yaml_convert_to_json'>13 YAML convert to JSON</a></li>
+  <li><a href='#14_table'>14 Table</a></li>
+  <li><a href='#15_links'>15 Links</a></li>
+  <li><a href='#16_version_table'>16 Version table</a></li>
+  <li><a href='#17_start_a_new_page_-_page'>17 Start a new page - page</a></li>
+  <li><a href='#18_gle_/_glx'>18 Gle / glx</a></li>
+  <li><a href='#19_gnuplot'>19 Gnuplot</a></li>
+  <li><a href='#20_gotchas_about_variables'>20 Gotchas about variables</a></li>
+  <li><a href='#21_using_ct2_script_to_process_files'>21 Using ct2 script to process files</a></li>
+</ul>
+
+      </div>
+
+      <div class='content'>
+        <p>This document may not be easily readable in this form, try <a href="docs/README.pdf">pdf</a> or <a href="docs/README.html">HTML</a> as alternatives. These have been generated from this file and the software provided by this distribution.</p>
+<p>This is a perl module and a script that makes use of App::Basis::ConvertText2</p>
+<p>This is a wrapper for <a href="http://johnmacfarlane.net/pandoc">pandoc</a> implementing extra fenced code-blocks to allow the creation of charts and graphs etc. Documents may be created a variety of formats. If you want to create nice PDFs then it can use <a href="http://www.princexml.com">PrinceXML</a> to generate great looking PDFs or you can use <a href="http://wkhtmltopdf.org/">wkhtmltopdf</a> to create PDFs that are almost as good, the default is to use pandoc which, for me, does not work as well.</p>
+<p>HTML templates can also be used to control the layout of your documents.</p>
+<p>The fenced code block handlers are implemented as plugins and it is a simple process to add new ones.</p>
+<p>There are plugins to handle</p>
+<ul>
+<li>ditaa</li>
+<li>mscgen</li>
+<li>graphviz</li>
+<li>uml</li>
+<li>gnuplot</li>
+<li>gle</li>
+<li>sparklines</li>
+<li>charts</li>
+<li>barcodes and qrcodes</li>
+<li>and many others</li>
+</ul>
+<p>As a perl module you can obtain it from https://metacpan.org/pod/App::Basis::ConvertText2 or install</p>
+<pre><code>cpanm App::Basis::ConvertText2</code></pre>
+<p>Alternatively it is available from</p>
+<p>You will then be able to use the <a href="#using-ct2-script-to-process-files">ct2</a> script to process files</p>
+<h2 id="document-header-and-variables"><a name='1_document_header_and_variables'>1 Document header and variables</a></h2>
+<p>If you are just creating simple things, then you do not need a document header, but to make full use of the templating system, having header information is vital.</p>
+<p><strong>Example</strong></p>
+<pre><code>title: App::Basis::ConvertText2
+format: pdf
+date: 2014-05-12
+author: Kevin Mulholland
+keywords: perl, readme
+template: coverpage
+version: 5</code></pre>
+<p>As you can see, we use a series of key value pairs separated with a colon. The keys may be anything you like, except for the following which have special significance.</p>
+<ul>
+<li><em>format</em> shows what output format we should default to.</li>
+<li><em>template</em> shows which template we should use</li>
+</ul>
+<p>The keys may be used as variables in your document or in the template, by upper-casing and prefixing and postfixing percent symbols ‘%’</p>
+<p><strong>Example</strong></p>
+<pre><code>version as a variable %VERSION%</code></pre>
+<p>If you want to display the name of a variable without it being interpreted, prefix it with an underscore ’_’, this underscore will be removed in the final document.</p>
+<p><strong>Example</strong></p>
+<pre><code>%TITLE%</code></pre>
+<p><strong>Output</strong></p>
+<p>App::Basis::ConvertText2</p>
+<h2 id="table-of-contents"><a name='2_table_of_contents'>2 Table of contents</a></h2>
+<p>As documents are processed, all the HTML headers (H1..H4) are collected together to make a table of contents. This can be used either in your template or document using the TOC variable.</p>
+<p><strong>Example</strong></p>
+<pre><code>%TOC% will show</code></pre>
+<p><p>Contents</p>
+<ul>
+  <li><a href='#1_document_header_and_variables'>1 Document header and variables</a></li>
+  <li><a href='#2_table_of_contents'>2 Table of contents</a></li>
+  <li><a href='#3_fenced_code-blocks'>3 Fenced code-blocks</a></li>
+  <li><a href='#4_buffering_data_for_later_use'>4 Buffering data for later use</a></li>
+  <li><a href='#5_sparklines'>5 Sparklines</a></li>
+  <li><a href='#6_charts'>6 Charts</a></li>
+  <li><a href='#6.1_pie_chart'>&nbsp;&nbsp;&nbsp;6.1 Pie chart</a></li>
+  <li><a href='#6.2_bar_chart'>&nbsp;&nbsp;&nbsp;6.2 Bar chart</a></li>
+  <li><a href='#6.3_mixed_chart'>&nbsp;&nbsp;&nbsp;6.3 Mixed chart</a></li>
+  <li><a href='#7_message_sequence_charts_-_mscgen'>7 Message Sequence Charts - mscgen</a></li>
+  <li><a href='#8_diagrams_through_ascii_art_-_ditaa'>8 DIagrams Through Ascii Art - ditaa</a></li>
+  <li><a href='#9_uml_diagrams'>9 UML Diagrams</a></li>
+  <li><a href='#10_graphviz'>10 Graphviz</a></li>
+  <li><a href='#11_venn_diagram'>11 Venn diagram</a></li>
+  <li><a href='#12_barcodes'>12 Barcodes</a></li>
+  <li><a href='#12.1_code39'>&nbsp;&nbsp;&nbsp;12.1 Code39</a></li>
+  <li><a href='#12.2_ean8'>&nbsp;&nbsp;&nbsp;12.2 EAN8</a></li>
+  <li><a href='#12.3_ean13'>&nbsp;&nbsp;&nbsp;12.3 EAN13</a></li>
+  <li><a href='#12.4_coop2of5'>&nbsp;&nbsp;&nbsp;12.4 COOP2of5</a></li>
+  <li><a href='#12.5_iata2of5'>&nbsp;&nbsp;&nbsp;12.5 IATA2of5</a></li>
+  <li><a href='#12.6_industrial2of5'>&nbsp;&nbsp;&nbsp;12.6 Industrial2of5</a></li>
+  <li><a href='#12.7_itf'>&nbsp;&nbsp;&nbsp;12.7 ITF</a></li>
+  <li><a href='#12.8_matrix2of5'>&nbsp;&nbsp;&nbsp;12.8 Matrix2of5</a></li>
+  <li><a href='#12.9_nw7'>&nbsp;&nbsp;&nbsp;12.9 NW7</a></li>
+  <li><a href='#12.10_qr_code'>&nbsp;&nbsp;&nbsp;12.10 QR code</a></li>
+  <li><a href='#13_yaml_convert_to_json'>13 YAML convert to JSON</a></li>
+  <li><a href='#14_table'>14 Table</a></li>
+  <li><a href='#15_links'>15 Links</a></li>
+  <li><a href='#16_version_table'>16 Version table</a></li>
+  <li><a href='#17_start_a_new_page_-_page'>17 Start a new page - page</a></li>
+  <li><a href='#18_gle_/_glx'>18 Gle / glx</a></li>
+  <li><a href='#19_gnuplot'>19 Gnuplot</a></li>
+  <li><a href='#20_gotchas_about_variables'>20 Gotchas about variables</a></li>
+  <li><a href='#21_using_ct2_script_to_process_files'>21 Using ct2 script to process files</a></li>
+</ul>
+</p>
+<p>Note that if using a TOC, then the HTML headers are changed to have a number prefixed to them, this helps ensure that all the TOC references are unique.</p>
+<h2 id="fenced-code-blocks"><a name='3_fenced_code-blocks'>3 Fenced code-blocks</a></h2>
+<p>A fenced code-block is a way of showing that some text needs to be handled differently. Often this is used to allow markdown systems (and <a href="http://johnmacfarlane.net/pandoc">pandoc</a> is no exception) to highlight program code.</p>
+<p>code-blocks take the form</p>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.tag argument1=&#39;fred&#39; arg2=3}
+contents ...
+~~~~</code></pre>
+<p>code-blocks <strong>ALWAYS</strong> start at the start of a line without any preceding whitespace. The ‘top’ line of the code-block can wrap onto subsequent lines, this line is considered complete when the final ‘}’ is seen. There should be only whitespace after the closing ‘}’ symbol before the next line.</p>
+<p>We use this construct to create our own handlers to generate HTML or markdown.</p>
+<p>Note that only code-blocks described in this documentation have special handlers and can make use of extra features such as buffering.</p>
+<h2 id="buffering-data-for-later-use"><a name='4_buffering_data_for_later_use'>4 Buffering data for later use</a></h2>
+<p>Sometimes you may either want to repeatedly use the same information or may want to use the output from one of the fenced code-blocks .</p>
+<p>To store data we use the <strong>to_buffer</strong> argument to any code-block.</p>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.buffer to_buffer=&#39;spark_data&#39;}
+1,4,5,20,4,5,3,1
+~~~~</code></pre>
+<p>If the code-block would normally produce some output that we do not want displayed at the current location then we would need to use the <strong>no_output</strong> argument.</p>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.sparkline title=&#39;green sparkline&#39; scheme=&#39;green&#39;
+    from_buffer=&#39;spark_data&#39; to_buffer=&#39;greenspark&#39; no_output=1}
+~~~~</code></pre>
+<p>We can also have the content of a code-block replaced with content from a buffer by using the <strong>from_buffer</strong> argument. This is also displayed in the example above.</p>
+<p>To use the contents (or output of a buffered code-block) we wrap the name of the buffer once again with percent ‘%’ symbols, once again we force upper case.</p>
+<p><strong>Example</strong></p>
+<pre><code>%SPARK_DATA% has content 1,4,5,20,4,5,3,1
+%GREENSPARK% has a generated image <img src='/tmp/kmulholland/cache/ct2/1f38c66e765de08fb292e4e410263519.png' alt='green sparkline' height='20' width='80' /></code></pre>
+<p>Buffering also allows us to add content into markdown constructs like bullets.</p>
+<p><strong>Example</strong></p>
+<pre><code>* %SPARK_DATA%
+* %GREENSPARK%</code></pre>
+<p><strong>Output</strong></p>
+<ul>
+<li>1,4,5,20,4,5,3,1</li>
+<li><img src='/tmp/kmulholland/cache/ct2/1f38c66e765de08fb292e4e410263519.png' alt='green sparkline' height='20' width='80' /></li>
+</ul>
+<h2 id="sparklines"><a name='5_sparklines'>5 Sparklines</a></h2>
+<p>Sparklines are simple horizontal charts to give an indication of things, sometimes they are barcharts but we have nice smooth lines.</p>
+<p>The only valid contents of the code-block is a single line of comma separated numbers.</p>
+<p>The full set of optional arguments is</p>
+<ul>
+<li>title
+<ul>
+<li>used as the generated images ‘alt’ argument</li>
+</ul></li>
+<li>bgcolor
+<ul>
+<li>background color in hex (123456) or transparent</li>
+</ul></li>
+<li>line
+<ul>
+<li>color or the line, in hex (abcdef)</li>
+</ul></li>
+<li>color
+<ul>
+<li>area under the line, in hex (abcdef)</li>
+</ul></li>
+<li>scheme
+<ul>
+<li>color scheme, only things in red blue green orange mono are valid</li>
+</ul></li>
+<li>size
+<ul>
+<li>size of image, default 80x20, widthxheight</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.buffer to_buffer=&#39;spark_data&#39;}
+1,4,5,20,4,5,3,1
+~~~~
+
+here is a standard sparkline
+
+~~~~{.sparkline title=&#39;basic sparkline&#39; }
+1,4,5,20,4,5,3,1
+~~~~
+
+or we can draw the sparkline using buffered data
+
+~~~~{.sparkline title=&#39;blue sparkline&#39; scheme=&#39;blue&#39; from_buffer=&#39;spark_data&#39;}
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p>here is a standard sparkline</p>
+<p><img src='/tmp/kmulholland/cache/ct2/c9a9b4c7e6f8cb1089d82d00ff3eb216.png' alt='basic sparkline' height='20' width='80' /></p>
+<p>or we can draw the sparkline using buffered data</p>
+<p><img src='/tmp/kmulholland/cache/ct2/fd3d73d870204418c0dd327f7477c09a.png' alt='blue sparkline' height='20' width='80' /></p>
+<h2 id="charts"><a name='6_charts'>6 Charts</a></h2>
+<p>Displaying charts is very important when creating reports, so we have a simple <strong>chart</strong> code-block.</p>
+<p>The various arguments to the code-block are shown in the examples below, hopefully they are self explanatory.</p>
+<p>We will buffer some data to start</p>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.buffer to=&#39;chart_data&#39;}
+apples,bananas,cake,cabbage,edam,fromage,tomatoes,chips
+1,2,3,5,11,22,33,55
+1,2,3,5,11,22,33,55
+1,2,3,5,11,22,33,55
+1,2,3,5,11,22,33,55
+~~~~</code></pre>
+<p>The content comprises a number of lines of comma separated data items. The first line of the content is the legends, the subsequent lines are numbers relating to each of these legends.</p>
+<h3 id="pie-chart"><a name='6.1_pie_chart'>6.1 Pie chart</a></h3>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.chart format=&#39;pie&#39; title=&#39;chart1&#39; from_buffer=&#39;chart_data&#39;
+    size=&#39;400x400&#39; xaxis=&#39;things xways&#39; yaxis=&#39;Vertical things&#39;
+    legends=&#39;a,b,c,d,e,f,g,h&#39; }
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/b82cab1f86108fdab6afbe84d1869d6a.png' alt='chart1' height='400' width='400' /></p>
+<h3 id="bar-chart"><a name='6.2_bar_chart'>6.2 Bar chart</a></h3>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.chart format=&#39;bars&#39; title=&#39;chart1&#39; from_buffer=&#39;chart_data&#39;
+    size=&#39;600x400&#39; xaxis=&#39;things ways&#39; yaxis=&#39;Vertical things&#39;
+    legends=&#39;a,b,c,d,e,f,g,h&#39; }
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/511c5b56e040bea36912d2b0987f5d1d.png' alt='chart1' height='400' width='600' /></p>
+<h3 id="mixed-chart"><a name='6.3_mixed_chart'>6.3 Mixed chart</a></h3>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.chart format=&#39;mixed&#39; title=&#39;chart1&#39; from_buffer=&#39;chart_data&#39;
+  size=&#39;600x400&#39; xaxis=&#39;things xways&#39; axis=&#39;Vertical things&#39;
+  legends=&#39;a,b,c,d,e,f,g,h&#39; types=&#39;lines linepoints lines bars&#39; }
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/a1903dfe13a20e39b9e880ff1ee06b0c.png' alt='chart1' height='400' width='600' /></p>
+<h2 id="message-sequence-charts---mscgen"><a name='7_message_sequence_charts_-_mscgen'>7 Message Sequence Charts - mscgen</a></h2>
+<p>Software (or process) engineers often want to be able to show the sequence in which a number of events take place. We use the <a href="http://www.mcternan.me.uk/mscgen/">msc</a> program for this. This program needs to be installed onto your system to allow this to work</p>
+<p>The content for this code-block is EXACTLY the same that you would use as input to <a href="http://www.mcternan.me.uk/mscgen/">msc</a></p>
+<p>There are only optional 2 arguments</p>
+<ul>
+<li>title
+<ul>
+<li>used as the generated images ‘alt’ argument</li>
+</ul></li>
+<li>size
+<ul>
+<li>size of image, widthxheight</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.mscgen  title=&quot;mscgen1&quot; size=&quot;600x400}
+# MSC for some fictional process
+msc {
+  a,b,c;
+
+  a-&gt;b [ label = &quot;ab()&quot; ] ;
+  b-&gt;c [ label = &quot;bc(TRUE)&quot;];
+  c=&gt;c [ label = &quot;process(1)&quot; ];
+  c=&gt;c [ label = &quot;process(2)&quot; ];
+  ...;
+  c=&gt;c [ label = &quot;process(n)&quot; ];
+  c=&gt;c [ label = &quot;process(END)&quot; ];
+  a&lt;&lt;=c [ label = &quot;callback()&quot;];
+  ---  [ label = &quot;If more to run&quot;, ID=&quot;*&quot; ];
+  a-&gt;a [ label = &quot;next()&quot;];
+  a-&gt;c [ label = &quot;ac1()\nac2()&quot;];
+  b&lt;-c [ label = &quot;cb(TRUE)&quot;];
+  b-&gt;b [ label = &quot;stalled(...)&quot;];
+  a&lt;-b [ label = &quot;ab() = FALSE&quot;];
+}
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/160e2de7aa8dc2a0f02f2117a1cafd4a.png' alt='mscgen1' height='448' width='600' /></p>
+<h2 id="diagrams-through-ascii-art---ditaa"><a name='8_diagrams_through_ascii_art_-_ditaa'>8 DIagrams Through Ascii Art - ditaa</a></h2>
+<p>This is a special system to turn ASCII art into pretty pictures, nice to render diagrams. You do need to make sure that you are using a proper monospaced font with your editor otherwise things will go awry with spaces. See <a href="http://ditaa.sourceforge.net">ditaa</a> for reference.</p>
+<p>The content for this code-block must be the same that you would use to with the <a href="http://ditaa.sourceforge.net">ditaa</a> software</p>
+<ul>
+<li>title
+<ul>
+<li>used as the generated images ‘alt’ argument</li>
+</ul></li>
+<li>size
+<ul>
+<li>size of image, default 80x20, widthxheight</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.ditaa }
+Full example
++--------+   +-------+    +-------+
+|        | --+ ditaa +--&gt; |       |
+|  Text  |   +-------+    |diagram|
+|Document|   |!magic!|    |       |
+|     {d}|   |       |    |       |
++---+----+   +-------+    +-------+
+    :                         ^
+    |       Lots of work      |
+    \-------------------------+
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/8ac235932524c7f7b6592ea295b3ad95.png' height='196' width='390' /></p>
+<h2 id="uml-diagrams"><a name='9_uml_diagrams'>9 UML Diagrams</a></h2>
+<p>Software engineers love to draw diagrams, <a href="http://plantuml.sourceforge.net">PlantUML</a> is a java component to make this simple.</p>
+<p>You will need to have a script on your system called ‘uml’ that calls java with the component.</p>
+<p>Here is mine, it is also available in the scripts directory in the</p>
+<pre class="shell"><code>#!/bin/bash
+# run plantuml
+# moodfarm@cpan.org
+
+# we assume that the plantuml.jar file is in the same directory as this executable
+EXEC_DIR=`dirname $0`
+PLANTUML=&quot;$EXEC_DIR/plantuml.jar&quot;
+
+INPUT=$1
+OUPUT=$2
+function show_usage  {
+    arg=$1
+    err=$2
+    if [ &quot;$err&quot; == &quot;&quot; ] ; then
+        err=1
+    fi
+      &quot;Create a UML diagram from an input text file
+(see http://plantuml.sourceforge.net/ for reference)
+    usage: $0 inputfile outputfile.png
+&quot;
+    if [ &quot;$arg&quot; != &quot;&quot; ] ; then
+        echo &quot;$arg
+&quot;
+    fi
+    exit $err
+}
+if [ &quot;$INPUT&quot; == &quot;-help&quot; ] ; then
+    show_usage &quot;&quot; 0
+fi
+if [ ! -f &quot;$INPUT&quot; ] ; then
+    show_usage &quot;ERROR: Could not find input file $1&quot;
+fi
+if [ &quot;$OUPUT&quot; == &quot;&quot; ] ; then
+    show_usage &quot;ERROR: No output file specified&quot;
+fi
+# we use the pipe option to control output into the file we want
+cat &quot;$INPUT&quot; | java -jar $PLANTUML -nbthread auto -pipe &gt;$OUPUT
+# exit 0
+</code></pre>
+<p>The content for this code-block must be the same that you would use to with the <a href="http://plantuml.sourceforge.net">PlantUML</a> software</p>
+<p>The arguments allowed are</p>
+<ul>
+<li>title
+<ul>
+<li>used as the generated images ‘alt’ argument</li>
+</ul></li>
+<li>size
+<ul>
+<li>size of image, default 80x20, widthxheight</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.uml }
+&#39; this is a comment on one line
+/&#39; this is a
+multi-line
+comment&#39;/
+Alice -&gt; Bob: Authentication Request
+Bob --&gt; Alice: Authentication Response
+
+Alice -&gt; Bob: Another authentication Request
+Alice &lt;-- Bob: another authentication Response
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/e476fbf3e854e012b058fae4ac3a6fdf.png' height='207' width='294' /></p>
+<p><a href="http://plantuml.sourceforge.net">PlantUML</a> can also create simple application interfaces <a href="http://plantuml.sourceforge.net/salt.html">See Salt</a></p>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.uml }
+@startuml
+salt
+{
+  Just plain text
+  [This is my button]
+  ()  Unchecked radio
+  (X) Checked radio
+  []  Unchecked box
+  [X] Checked box
+  &quot;Enter text here   &quot;
+  ^This is a droplist^
+
+  {T
+   + World
+   ++ America
+   +++ Canada
+   +++ **USA**
+   ++++ __New York__
+   ++++ Boston
+   +++ Mexico
+   ++ Europe
+   +++ Italy
+   +++ Germany
+   ++++ Berlin
+   ++ Africa
+  }
+}
+@enduml
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/311e4ee5750d33a093ab106219647946.png' height='318' width='168' /></p>
+<h2 id="graphviz"><a name='10_graphviz'>10 Graphviz</a></h2>
+<p><a href="http://graphviz.org">graphviz</a> allows you to draw connected graphs using text descriptions.</p>
+<p>The content for this code-block must be the same that you would use to with the <a href="http://graphviz.org">graphviz</a> software</p>
+<p>The arguments allowed are</p>
+<ul>
+<li>title
+<ul>
+<li>used as the generated images ‘alt’ argument</li>
+</ul></li>
+<li>size
+<ul>
+<li>size of image, default 80x20, widthxheight</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.graphviz  title=&quot;graphviz1&quot; size=&#39;600x600&#39;}
+digraph G {
+
+  subgraph cluster_0 {
+    style=filled;
+    color=lightgrey;
+    node [style=filled,color=white];
+    a0 -&gt; a1 -&gt; a2 -&gt; a3;
+    label = &quot;process #1&quot;;
+  }
+
+  subgraph cluster_1 {
+    node [style=filled];
+    b0 -&gt; b1 -&gt; b2 -&gt; b3;
+    label = &quot;process #2&quot;;
+    color=blue
+  }
+  start -&gt; a0;
+  start -&gt; b0;
+  a1 -&gt; b3;
+  b2 -&gt; a3;
+  a3 -&gt; a0;
+  a3 -&gt; end;
+  b3 -&gt; end;
+
+  start [shape=Mdiamond];
+  end [shape=Msquare];
+}
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/d25c89fc3008d30afc6dc3fd38178ab2.png' alt='graphviz1' height='600' width='306' /></p>
+<h2 id="venn-diagram"><a name='11_venn_diagram'>11 Venn diagram</a></h2>
+<p>Creating venn diagrams may sometimes be useful, though to be honest this implementation is not great, if I could find a better way to do this then I would!</p>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.venn  title=&quot;sample venn diagram&quot;
+    legends=&quot;team1 team2 team3&quot; scheme=&quot;rgb&quot; explain=&#39;1&#39;}
+abel edward momo albert jack julien chris
+edward isabel antonio delta albert kevin jake
+gerald jake kevin lucia john edward
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/9e0b98ce7e0ea5829245653fa0eade79.png' alt='sample venn diagram' height='400' width='400' /></p>
+<ul>
+<li>only in team1 : julien momo abel chris jack
+<ul>
+<li>only in team2 : delta isabel antonio</li>
+<li>team1 and team2 share : albert</li>
+</ul></li>
+<li>only in team3 : gerald john lucia
+<ul>
+<li>team1 and team3 share :</li>
+<li>team2 and team3 share : jake kevin</li>
+<li>team1, team2 and team3 share : edward</li>
+</ul></li>
+</ul>
+<h2 id="barcodes"><a name='12_barcodes'>12 Barcodes</a></h2>
+<p>Sometimes having barcodes in your document may be useful, certainly qrcodes are popular.</p>
+<p>The code-block only allows a single line of content. Some of the barcode types need content of a specific length, warnings will be generated if the length is incorrect.</p>
+<p>The arguments allowed are</p>
+<ul>
+<li>title
+<ul>
+<li>used as the generated images ‘alt’ argument</li>
+</ul></li>
+<li>height
+<ul>
+<li>height of image</li>
+</ul></li>
+<li>notext
+<ul>
+<li>flag to show we do not want the content text printed underneath the barcode.</li>
+</ul></li>
+<li>version
+<ul>
+<li>version of qrcode, defaults to ‘2’</li>
+</ul></li>
+<li>pixels
+<ul>
+<li>number of pixels that is a ‘bit’ in a qrcode, defaults to ‘2’</li>
+</ul></li>
+</ul>
+<h3 id="code39"><a name='12.1_code39'>12.1 Code39</a></h3>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.barcode type=&#39;code39&#39;}
+123456789
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/0e7f2287c82ea14554939a0691e8aae1.png' height='50' width='144' /></p>
+<h3 id="ean8"><a name='12.2_ean8'>12.2 EAN8</a></h3>
+<p>Only allows 8 characters</p>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.barcode type=&#39;ean8&#39;}
+12345678
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/3d239d23db81d6fdf1b987b40073e6d4.png' height='50' width='67' /></p>
+<h3 id="ean13"><a name='12.3_ean13'>12.3 EAN13</a></h3>
+<p>Only allows 13 characters</p>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.barcode type=&#39;EAN13&#39;}
+1234567890123
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/6d0725ec5ea574ae42925b13a6611b62.png' height='50' width='102' /></p>
+<h3 id="coop2of5"><a name='12.4_coop2of5'>12.4 COOP2of5</a></h3>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.barcode type=&#39;COOP2of5&#39;}
+12345678
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/bfaae0b47182da4c5db23aeeaf6b6f9e.png' height='50' width='95' /></p>
+<h3 id="iata2of5"><a name='12.5_iata2of5'>12.5 IATA2of5</a></h3>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.barcode type=&#39;IATA2of5&#39;}
+12345678
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/b4c349edced8f61bc28705a1b82081cf.png' height='50' width='121' /></p>
+<h3 id="industrial2of5"><a name='12.6_industrial2of5'>12.6 Industrial2of5</a></h3>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.barcode type=&#39;Industrial2of5&#39;}
+12345678
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/477d9962aab1e41cd81388a1b53aa4ce.png' height='50' width='131' /></p>
+<h3 id="itf"><a name='12.7_itf'>12.7 ITF</a></h3>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.barcode type=&#39;ITF&#39;}
+12345678
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/f5b80a3d645e49a0e04361a84f309d7a.png' height='50' width='81' /></p>
+<h3 id="matrix2of5"><a name='12.8_matrix2of5'>12.8 Matrix2of5</a></h3>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.barcode type=&#39;Matrix2of5&#39;}
+12345678
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/f7be15398790609e8c8f8b58b45f0a46.png' height='50' width='95' /></p>
+<h3 id="nw7"><a name='12.9_nw7'>12.9 NW7</a></h3>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.barcode type=&#39;NW7&#39;}
+12345678
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/ed9acf0286931ddd8fe783f5b170902a.png' height='50' width='96' /></p>
+<h3 id="qr-code"><a name='12.10_qr_code'>12.10 QR code</a></h3>
+<p>As qrcodes are now quite so prevalent, they have their own code-block type.</p>
+<p>We can do qr codes, just put in anything you like, this is a URL for bbc news</p>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.qrcode }
+http://news.bbc.co.uk
+~~~~
+
+To change the size of the barcode
+
+~~~~{.qrcode height=&#39;80&#39;}
+http://news.bbc.co.uk
+~~~~
+
+To use version 1
+
+Version 1 only allows 15 characters
+
+~~~~{.qrcode height=60 version=1}
+smaller text..
+~~~~
+
+To change pixel size
+
+~~~~{.qrcode pixels=5}
+smaller text..
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/48521737e058cdceb967824b8191d7bf.png' height='66' width='66' /></p>
+<p>To change the size of the barcode</p>
+<p><img src='/tmp/kmulholland/cache/ct2/cbe37a7a8e523a70d94c177d093ac447.png' height='80' width='80' /></p>
+<p>To use version 1</p>
+<p>Version 1 only allows 15 characters</p>
+<p><img src='/tmp/kmulholland/cache/ct2/506a46d9e4aa4fe5a177bf267a667290.png' height='60' width='60' /></p>
+<p>To change pixel size</p>
+<p><img src='/tmp/kmulholland/cache/ct2/ad6751a601e410d24d4154552d9dba0e.png' height='165' width='165' /></p>
+<h2 id="yaml-convert-to-json"><a name='13_yaml_convert_to_json'>13 YAML convert to JSON</a></h2>
+<p>Software engineers often use <a href="https://en.wikipedia.org/wiki/Json">JSON</a> to transfer data between systems, this often is not nice to create for documentation. <a href="https://en.wikipedia.org/wiki/Yaml">YAML</a> which is a superset of <a href="https://en.wikipedia.org/wiki/Json">JSON</a> is much cleaner so we have a</p>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.yamlasjson }
+list:
+  - array: [1,2,3,7]
+    channel: BBC3
+    date: 2013-10-20
+    time: 20:30
+  - array: [1,2,3,9]
+    channel: BBC4
+    date: 2013-11-20
+    time: 21:00
+
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<pre class="sourceCode json"><code class="sourceCode json"><span class="fu">{</span>
+   <span class="dt">&quot;list&quot;</span> <span class="fu">:</span> <span class="ot">[</span>
+      <span class="fu">{</span>
+         <span class="dt">&quot;array&quot;</span> <span class="fu">:</span> <span class="ot">[</span>
+            <span class="st">&quot;1&quot;</span><span class="ot">,</span>
+            <span class="st">&quot;2&quot;</span><span class="ot">,</span>
+            <span class="st">&quot;3&quot;</span><span class="ot">,</span>
+            <span class="st">&quot;7&quot;</span>
+         <span class="ot">]</span><span class="fu">,</span>
+         <span class="dt">&quot;channel&quot;</span> <span class="fu">:</span> <span class="st">&quot;BBC3&quot;</span><span class="fu">,</span>
+         <span class="dt">&quot;date&quot;</span> <span class="fu">:</span> <span class="st">&quot;2013-10-20&quot;</span><span class="fu">,</span>
+         <span class="dt">&quot;time&quot;</span> <span class="fu">:</span> <span class="st">&quot;20:30&quot;</span>
+      <span class="fu">}</span><span class="ot">,</span>
+      <span class="fu">{</span>
+         <span class="dt">&quot;array&quot;</span> <span class="fu">:</span> <span class="ot">[</span>
+            <span class="st">&quot;1&quot;</span><span class="ot">,</span>
+            <span class="st">&quot;2&quot;</span><span class="ot">,</span>
+            <span class="st">&quot;3&quot;</span><span class="ot">,</span>
+            <span class="st">&quot;9&quot;</span>
+         <span class="ot">]</span><span class="fu">,</span>
+         <span class="dt">&quot;date&quot;</span> <span class="fu">:</span> <span class="st">&quot;2013-11-20&quot;</span><span class="fu">,</span>
+         <span class="dt">&quot;time&quot;</span> <span class="fu">:</span> <span class="st">&quot;21:00&quot;</span><span class="fu">,</span>
+         <span class="dt">&quot;channel&quot;</span> <span class="fu">:</span> <span class="st">&quot;BBC4&quot;</span>
+      <span class="fu">}</span>
+   <span class="ot">]</span>
+<span class="fu">}</span></code></pre>
+<h2 id="table"><a name='14_table'>14 Table</a></h2>
+<p>Create a simple table using CSV style data</p>
+<ul>
+<li>class
+<ul>
+<li>HTML/CSS class name</li>
+</ul></li>
+<li>id
+<ul>
+<li>HTML/CSS class</li>
+</ul></li>
+<li>width
+<ul>
+<li>width of the table</li>
+</ul></li>
+<li>style
+<ul>
+<li>style the table if not doing anything else</li>
+</ul></li>
+<li>legends
+<ul>
+<li>csv of headings for table, these correspond to the data sets</li>
+</ul></li>
+<li>separator
+<ul>
+<li>what should be used to separate cells, defaults to ‘,’</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.table separator=&#39;,&#39; width=&#39;100%&#39; legends=1
+    from_buffer=&#39;chart_data&#39;}
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<table width='100%' >
+<tr><th>
+apples
+</th><th>
+bananas
+</th><th>
+cake
+</th><th>
+cabbage
+</th><th>
+edam
+</th><th>
+fromage
+</th><th>
+tomatoes
+</th><th>
+chips
+</th></tr>
+<tr><td>
+1
+</td><td>
+2
+</td><td>
+3
+</td><td>
+5
+</td><td>
+11
+</td><td>
+22
+</td><td>
+33
+</td><td>
+55
+</td></tr>
+<tr><td>
+1
+</td><td>
+2
+</td><td>
+3
+</td><td>
+5
+</td><td>
+11
+</td><td>
+22
+</td><td>
+33
+</td><td>
+55
+</td></tr>
+<tr><td>
+1
+</td><td>
+2
+</td><td>
+3
+</td><td>
+5
+</td><td>
+11
+</td><td>
+22
+</td><td>
+33
+</td><td>
+55
+</td></tr>
+<tr><td>
+1
+</td><td>
+2
+</td><td>
+3
+</td><td>
+5
+</td><td>
+11
+</td><td>
+22
+</td><td>
+33
+</td><td>
+55
+</td></tr>
+</table>
+
+
+<h2 id="links"><a name='15_links'>15 Links</a></h2>
+<p>With one code-block we can create a list of links</p>
+<p>The code-block contents comprises a number of lines with a reference and a URL. The reference comes first, then a ‘|’ to separate it from the URL.</p>
+<p>The reference may then be used elsewhere in your document if you enclose it with square ([]) brackets</p>
+<p>There is only one argument</p>
+<ul>
+<li>class
+<ul>
+<li>CSS class to style the list</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.links class=&#39;weblinks&#39; }
+pandoc      | http://johnmacfarlane.net/pandoc
+PrinceXML   | http://www.princexml.com
+markdown    | http://daringfireball.net/projects/markdown
+msc         | http://www.mcternan.me.uk/mscgen/
+ditaa       | http://ditaa.sourceforge.net
+PlantUML    | http://plantuml.sourceforge.net
+See Salt    | http://plantuml.sourceforge.net/salt.html
+graphviz    | http://graphviz.org
+JSON        | https://en.wikipedia.org/wiki/Json
+YAML        | https://en.wikipedia.org/wiki/Yaml
+wkhtmltopdf | http://wkhtmltopdf.org/
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<ul class='weblinks'>
+<li>
+<a href='http://ditaa.sourceforge.net'>ditaa</a>
+<ul><li>
+http://ditaa.sourceforge.net
+</li></ul></li>
+<li>
+<a href='http://graphviz.org'>graphviz</a>
+<ul><li>
+http://graphviz.org
+</li></ul></li>
+<li>
+<a href='https://en.wikipedia.org/wiki/Json'>JSON</a>
+<ul><li>
+https://en.wikipedia.org/wiki/Json
+</li></ul></li>
+<li>
+<a href='http://daringfireball.net/projects/markdown'>markdown</a>
+<ul><li>
+http://daringfireball.net/projects/markdown
+</li></ul></li>
+<li>
+<a href='http://www.mcternan.me.uk/mscgen/'>msc</a>
+<ul><li>
+http://www.mcternan.me.uk/mscgen/
+</li></ul></li>
+<li>
+<a href='http://johnmacfarlane.net/pandoc'>pandoc</a>
+<ul><li>
+http://johnmacfarlane.net/pandoc
+</li></ul></li>
+<li>
+<a href='http://plantuml.sourceforge.net'>PlantUML</a>
+<ul><li>
+http://plantuml.sourceforge.net
+</li></ul></li>
+<li>
+<a href='http://www.princexml.com'>PrinceXML</a>
+<ul><li>
+http://www.princexml.com
+</li></ul></li>
+<li>
+<a href='http://plantuml.sourceforge.net/salt.html'>See Salt</a>
+<ul><li>
+http://plantuml.sourceforge.net/salt.html
+</li></ul></li>
+<li>
+<a href='http://wkhtmltopdf.org/'>wkhtmltopdf</a>
+<ul><li>
+http://wkhtmltopdf.org/
+</li></ul></li>
+<li>
+<a href='https://en.wikipedia.org/wiki/Yaml'>YAML</a>
+<ul><li>
+https://en.wikipedia.org/wiki/Yaml
+</li></ul></li>
+</ul>
+
+
+
+<h2 id="version-table"><a name='16_version_table'>16 Version table</a></h2>
+<p>Documents often need revision history. I use this code-block to create a nice table of this history.</p>
+<p>The content for this code-block comprises a number of sections, each section then makes a row in the generated table.</p>
+<pre><code>version YYYY-MM-DD
+   change text
+   more changes</code></pre>
+<p>The version may be any string, YYYY-MM-DD shows the date the change took place. Alternate date formats is DD-MM-YYYY and ‘/’ may also be used as a field separator.</p>
+<ul>
+<li>class
+<ul>
+<li>HTML/CSS class name</li>
+</ul></li>
+<li>id
+<ul>
+<li>HTML/CSS class</li>
+</ul></li>
+<li>width
+<ul>
+<li>width of the table</li>
+</ul></li>
+<li>style
+<ul>
+<li>style the table if not doing anything else</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.version class=&#39;versiontable&#39; width=&#39;100%&#39;}
+0.1 2014-04-12
+  * removed ConvertFile.pm
+  * using Path::Tiny rather than other things
+  * changed to use pandoc fences
+    ~~~~{.tag} rather than xml format &lt;tag&gt;
+0.006 2014-04-10
+  * first release to github
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<table class='versiontable' width='100%' >
+<tr><th>
+Version
+</th><th>
+Date
+</th><th>
+Changes
+</th></tr>
+<tr><td valign='top'>
+0.1
+</td><td valign='top'>
+2014-04-12
+</td><td valign='top'>  
+<ul>
+<li>removed ConvertFile.pm</li>
+<li>using Path::Tiny rather than other things</li>
+<li>changed to use pandoc fences ~<sub>~</sub>{.tag} rather than xml format <tag>
+</td></tr>
+<tr><td valign='top'>
+0.006
+</td><td valign='top'>
+2014-04-10
+</td><td valign='top'>  
+<ul>
+<li>first release to github
+</td></tr>
+</table>
+
+</li>
+</ul></li>
+</ul>
+<h2 id="start-a-new-page---page"><a name='17_start_a_new_page_-_page'>17 Start a new page - page</a></h2>
+<p>Nice and simple, starts a new page</p>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.page}
+~~~~</code></pre>
+<h2 id="gle-glx"><a name='18_gle_/_glx'>18 Gle / glx</a></h2>
+<p>This is a complex graph/chart drawing package available from http://glx.sourceforge.net/</p>
+<p>The full set of optional arguments is</p>
+<ul>
+<li>title
+<ul>
+<li>used as the generated images ‘alt’ argument</li>
+</ul></li>
+<li>size
+<ul>
+<li>size of image, default 720x540, widthxheight, size is approximate</li>
+</ul></li>
+<li>transparent
+<ul>
+<li>flag to use a transparent background</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.gle}
+
+set font texcmr hei 0.5 just tc
+
+begin letz
+   data &quot;saddle.z&quot;
+   z = 3/2*(cos(3/5*(y-1))+5/4)/(1+(((x-4)/3)^2))
+   x from 0 to 20 step 0.5
+   y from 0 to 20 step 0.5
+end letz
+
+amove pagewidth()/2 pageheight()-0.1
+write &quot;Saddle Plot (3D)&quot;
+
+begin object saddle
+   begin surface
+      size 10 9
+      data &quot;saddle.z&quot;
+      xtitle &quot;X-axis&quot; hei 0.35 dist 0.7
+      ytitle &quot;Y-axis&quot; hei 0.35 dist 0.7
+      ztitle &quot;Z-axis&quot; hei 0.35 dist 0.9
+      top color blue
+      zaxis ticklen 0.1 min 0 hei 0.25
+      xaxis hei 0.25 dticks 4 nolast nofirst
+      yaxis hei 0.25 dticks 4
+   end surface
+end object
+
+amove pagewidth()/2 0.2
+draw &quot;saddle.bc&quot;
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/e555247121c65a85dc45fb78ec7da0f2.png' height='521' width='731' /></p>
+<h2 id="gnuplot"><a name='19_gnuplot'>19 Gnuplot</a></h2>
+<p>This is the granddaddy of charting/plotting programs, available from http://gnuplot.sourceforge.net/.</p>
+<p>The full set of optional arguments is</p>
+<ul>
+<li>title
+<ul>
+<li>used as the generated images ‘alt’ argument</li>
+</ul></li>
+<li>size
+<ul>
+<li>size of image, default 720x540, widthxheight</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>~~~~{.gnuplot}
+# $Id: surface1.dem,v 1.11 2004/09/17 05:01:12 sfeam Exp $
+#
+set samples 21
+set isosample 11
+set xlabel &quot;X axis&quot; offset -3,-2
+set ylabel &quot;Y axis&quot; offset 3,-2
+set zlabel &quot;Z axis&quot; offset -5
+set title &quot;3D gnuplot demo&quot;
+set label 1 &quot;This is the surface boundary&quot; at -10,-5,150 center
+set arrow 1 from -10,-5,120 to -10,0,0 nohead
+set arrow 2 from -10,-5,120 to 10,0,0 nohead
+set arrow 3 from -10,-5,120 to 0,10,0 nohead
+set arrow 4 from -10,-5,120 to 0,-10,0 nohead
+set xrange [-10:10]
+set yrange [-10:10]
+splot x*y
+~~~~</code></pre>
+<p><strong>Output</strong></p>
+<p><img src='/tmp/kmulholland/cache/ct2/4363ae9c4a5380986dcf88637132dc55.png' height='512' width='720' /></p>
+<h2 id="gotchas-about-variables"><a name='20_gotchas_about_variables'>20 Gotchas about variables</a></h2>
+<ul>
+<li>Variables used within the content area of a code-block will be evaluated before processing that block, if a variable has not yet been defined or saved to a buffer then it will only be evaluated at the end of document processing, so output may not be as expected.</li>
+<li>Variables used in markdown tables may not do what you expect if the variable is multi-line.</li>
+</ul>
+<h2 id="using-ct2-script-to-process-files"><a name='21_using_ct2_script_to_process_files'>21 Using ct2 script to process files</a></h2>
+<p>Included in the distribution is a script to make use of all of the above code-blocks to alter <a href="http://daringfireball.net/projects/markdown">markdown</a> into nicely formatted documents.</p>
+<p>Here is the help</p>
+<pre><code>$ ct2 --help
+
+Syntax: ct2 [options] filename
+
+About:  Convert my modified markdown text files into other formats, by
+default will create HTML in same directory as the input file, will only
+process .md files.
+If there is no output option used the output will be to file of same name
+as the input filename but  with an extension (if provided) from the
+document, use format: keyword (pdf html doc).
+
+[options]
+    -h, -?, --help        Show help
+    -c, --clean           Clean up the cache before use
+    -e, --embed           Embed images into HTML, do not use this if
+        converting to doc/odt
+    -o, --output          Filename to store the output as, extension will
+        control conversion
+    -p, --prince          Convert to PDF using princexml, can handle
+        embedded images
+    -s, --template        name of template to use
+    -v, --verbose         verbose mode
+    -w, --wkhtmltopdf     Convert to PDF using wkhtmltopdf, can handle
+        embedded images</code></pre>
+<p>If you are creating HTML documents to send out in emails or share in other ways, and use locally referenced images, then it is best to make use of the <strong>–embed</strong> option to pack these images into the HTML file.</p>
+<p>If you are using <a href="http://www.princexml.com">PrinceXML</a> remember that it is only free for non-commercial use, it also adds a purple <strong>P</strong> to the top right of the first page of your document.</p>
+
+      </div>
+      <div class='footer'>
+          <table class='footer' width='100%'>
+              <tr><td colspan='2' class='commercial' align='center'>27escape</td></tr>
+              <tr><td>Kevin Mulholland (c) 2014</td><td align='right'>2014-05-12</td></tr>
+          </table>
+      </div>
+    </body>
+</html>

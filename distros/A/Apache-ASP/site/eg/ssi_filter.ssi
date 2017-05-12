@@ -1,0 +1,44 @@
+#!/usr/bin/perl /usr/bin/asp-perl
+
+<% $Response->{Buffer} = 1; %>
+
+<!--#include file="header.inc"-->
+<%
+if(! $ENV{MOD_PERL}) {
+  print "<B>WARNING:</B> Apache::SSI filtering doesn't work under normal CGI <hr>";
+}
+%>
+
+<% 
+unless($Request->QueryString('virtual') || $Request->QueryString('redirect')) {
+  $Response->Redirect("$demo->{file}?redirect=1");
+}
+
+if($Request->QueryString('virtual')) { 	
+        # If virtual include of self, print a little, then exit ...			
+        $Response->Clear();
+        %> <hr size=1> SSI Virtual Include <hr size=1> <%
+	$Response->End();
+} 
+%>
+<!-- 
+	File includes are handled directly by Apache::ASP, the rest are done
+	by filtering through Apache::SSI.
+-->	
+
+This is a demo of using SSI directives, via Apache::Filter and 
+Apache::SSI.  You must have a modperl version of at least 1.16 installed
+with the PERL_STACKED_HANDLERS configuration option turned on when 
+compiling.
+
+We will now do an ssi virtual include.  I had to be careful
+after doing a recursive include.  Ouch!
+<table width=100%><tr><td>
+	<!--#include virtual="<%="$demo->{file}?virtual=1"%>" -->
+</td></tr></table>
+	
+<u> Other SSI Directives </u><br>
+ssi fsize: <!--#fsize--> <br>
+ssi flastmod: <!--#flastmod--> <br>
+<p>
+<!--#include file="footer.inc"-->

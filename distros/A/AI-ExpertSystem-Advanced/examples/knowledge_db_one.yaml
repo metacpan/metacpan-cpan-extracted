@@ -1,0 +1,56 @@
+rules:
+    -
+        causes:
+            - 
+                name: K
+            - 
+                name: L
+        goals:
+            -
+                name: J
+    -
+        causes:
+            -
+                name: F
+            -
+                name: J
+        goals:
+            -
+                name: M
+    -
+        causes:
+            -
+                name: F
+        goals:
+            -
+                name: I
+    -
+        causes:
+            -
+                name: L
+            -
+                name: I
+        goals:
+            -
+                name: N
+    -
+        causes:
+            -
+                name: N
+        goals:
+            -
+                name: G
+    -
+        causes:
+            -
+                name: M
+        goals:
+            -
+                name: G
+    -
+        causes:
+            -
+                name: G
+        goals:
+            -
+                name: H

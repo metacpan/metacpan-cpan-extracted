@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 bc69e85019b46609f07403520038f1f13f8c5883 Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 397b6d57b41c90606cbec47294d49eb659f96345 MANIFEST
+SHA1 9f8d5c4b04b7732a1338fcadde849067484696c2 META.json
+SHA1 8be32b0a1d30868aa4ecf3762bac373d931088ab META.yml
+SHA1 4f3751bdaca67adc64d44a9d9a98ef3c0782aac2 Makefile.PL
+SHA1 9703e1def02bf50b77caacff2ebfafde3633a7de README
+SHA1 b8263aebd0dd57cd30b950e75080c724ad73ff02 atonal-util
+SHA1 d26fe77423781f3b203ab7ff6e49b0f98b395cbd canonical
+SHA1 f0e999a263cc1bea6468fabeb1ce74b3024305e2 capture-stderr
+SHA1 e4c984d639bdc65e8faa3fc619c5227d52de37fa harmonic-fit
+SHA1 911bd8e7ee23a5b3d1a492d872e535b9b7ee72cb lib/App/MusicTools.pm
+SHA1 abc44a99dd8a6acef28f38b35df12de934118f76 ly-fu
+SHA1 ea6629d0000c21300fc81a8acc64fd0b09776ef6 scalemogrifier
+SHA1 98ac636c969d1c44f3c53c24ad2497bfffcd62db t/atonal-util.t
+SHA1 60b5bd815bc7ce700df33caec529713541fc03c5 t/canonical.t
+SHA1 22d3aaf2f9aa9984dc66f55fc398be10a59c340e t/harmonic-fit.t
+SHA1 d65ae7ae0a01562fd19938c8300a6245e1d68005 t/ly-fu.t
+SHA1 9e6e8302c6371ed788b40cd7ecff1eaed834b22f t/pod-coverage.t
+SHA1 6c20761b6a8f5ab2e199ce47aa25b1413ca0115e t/pod.t
+SHA1 a84765041e4b647e4e790a57649c7894bfd667a9 t/rules
+SHA1 1c1126716650835e68ef1b0656fe19f57925d5cb t/scalemogrifier.t
+SHA1 862a5a0cfa15bd155343e1543ff7ffc9e7efb907 t/varionator.t
+SHA1 0da6e4fea381572dda39fb8d328c96b32b65ca57 t/vov.t
+SHA1 0d41df0a0cc5dd209524f23d70d86c92d43e5c0a varionator
+SHA1 b1f87b8160a26558a5c0b16b75dfb5ab61523a71 vov
+SHA1 99b0a2aa50aa6d004e73bc5c9d013d00c7c6b745 zsh-compdef/_atonal-util
+SHA1 13ebbe980acbccd0b08bbf97a7a8c553dc70d49d zsh-compdef/_canonical
+SHA1 b97159cfd727af322cd305c20b424f52ebcbf1a2 zsh-compdef/_ly-fu
+SHA1 f93e1dc4b663620463f1d854c28be14f554130a5 zsh-compdef/_scalemogrifier
+SHA1 71c8d79189fcfcf01347e2bea0b73336102a4258 zsh-compdef/_vov
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWl8OsAAoJEDTEVWqwTuCU4G4IALBVj/4B4HTlC3jv1MhePD1g
+Z8bsXNJv0Jd+7/0YONAVyRKqYYvp69t+RswNICiPSMawh01OeJIz1FbUEPOVFVT5
+AV0013xsKuBuamAHn6uw/QDydS+FtH0WX98tuBQgTMKZme/qTfaMjpCbpBnMJpgX
+3YE6VSMysL9uS63hm6VLPLKChIhoofz6Ng8jhmewtZkYIho5I+SwFDwFBmMq4eky
+MN+cb1SX9LLpFwm1grBIdZ4mRuoA5+u+5cBt4dXkkquXSbooW4Os2Dp3EsN2JKY2
+DU+wj0Ayt8yHG0N4E8WfrhQ8Wb0lwLuiPjpUOUTEdQogbVF7XxumUI8a/4DUfiI=
+=nRO6
+-----END PGP SIGNATURE-----

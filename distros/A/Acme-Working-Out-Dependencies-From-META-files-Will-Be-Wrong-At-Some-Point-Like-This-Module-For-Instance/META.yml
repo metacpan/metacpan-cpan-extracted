@@ -1,0 +1,15 @@
+---
+abstract: 'Because there is nothing like being right'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Working-Out-Dependencies-From-META-files-Will-Be-Wrong-At-Some-Point-Like-This-Module-For-Instance
+version: 9.99

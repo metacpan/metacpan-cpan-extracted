@@ -1,0 +1,9 @@
+Array::RefElem
+
+This module give direct access to the internal perl routines that let
+you store reference to things in arrays and hashes.
+
+Copyright 2000 Gisle Aas <gisle@aas.no>
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

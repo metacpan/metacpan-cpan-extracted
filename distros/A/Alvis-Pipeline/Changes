@@ -1,0 +1,81 @@
+$Id: Changes,v 1.18 2006/08/31 16:14:10 mike Exp $
+
+Revision history for Perl extension Alvis::Pipeline.
+
+0.11  Thu Aug 31 17:13:28 BST 2006
+	- Again, no significant changes to the library, but a major
+	  reworking of the error-handing in alvis-zsink.pl, this time
+	  based on recent fixes in the ZOOM-C part of YAZ.  The
+	  resulting behaviour is the same, but much more robust,
+	  including in the special and nasty case of sending a larger
+	  APDU than the server wants to see.
+	- The alvis-zsink.pl script now requires ZOOM-Perl version
+	  1.11, which in turn needs YAZ 2.1.27.
+
+0.10  Mon Aug 14 19:01:55 BST 2006
+	- No significant changes to the library, but a major reworking
+	  of the error-handing in zsink.pl:
+	  * Unrecoverable errors now cause the zsink to be closed down
+	    neatly, so that the spooling child process doesn't hang
+	    around getting in the way when we try to re-start.
+	  * ZOOM errors pertaining to a particular operation
+	    (i.e. nine times out of ten, it's Zebra refusing to add a
+	    wrongly-formatted record) are logged, but the zsink
+	    continues to operate.
+	  * The CONNECTION_LOST error, which occurs most often when
+	    Zebra gets bored with inactivity and closes the socket,
+	    causes an attempt to re-forge the connection.  This will
+	    succeed immediately in the timeout case, and all will be
+	    well, as the master Zebra will still be there and will
+	    fork a new worker.  This will of course not succeed if
+	    Zebra has been shut down completely -- but nor it should.
+
+0.09  Tue Jul 11 11:38:32 BST 2006
+	- Add two additional programs to the "bin" directory:
+	  alvis-pipeline-put-documents.pl -- similar to the existing
+		alvis-pipeline-put.pl, but instead of generating a
+		sequence of documents, feeds nominated files down the
+		pipeline.
+	  alvis-zsink.pl -- acts as a sink on the end of a pipeline,
+		feeding the received documents to a Z39.50 server such
+		as Zebra.
+
+0.08  Mon Jul  3 12:22:11 BST 2006
+	- Fix documentation of Alvis::Pipeline::Read->read(), which in
+	  fact returns a string containing the XML document rather
+	  than a DOM tree as previously claimed.
+	- Fix sample code accordingly.
+	- Add documentation of the pipeline protocol, to facilitate
+	  the development of indepedent implementations in other
+	  languages.
+
+0.07  Tue Nov 22 15:05:30 GMT 2005
+	- Add notes to the documentation about record identity and
+	  indentifier.
+
+0.06  Mon Oct 24 15:25:32 BST 2005
+	- Both Read and Write pipes are now Unicode-clean, along with
+	  the the temporary files spooled by the background reader.
+	- New test-script t/2-unicode.t.
+
+0.05  Mon Oct 10 15:18:29 BST 2005
+	- Remove a test from t/0-creation.t that required a listening
+	  server on localhost port 80 -- too many people inexplicably
+	  do not run web servers :-)
+
+0.04  Mon Oct  3 14:14:43 BST 2005
+	- Total rewrite, not using OAI.  Much simpler and more reliable.
+	- Better debugging output.
+	- Better documentation.
+
+0.03  Fri Sep 16 17:22:37 BST 2005
+	- Fixes to documentation (dependencies listed in "README")
+	- Added "INSTALL.Debian" file (Marc).
+
+0.02  Fri Jun 17 19:30:13 BST 2005
+	- First public release.
+
+0.01  Wed May 18 14:23:38 BST 2005
+	- original version; created by h2xs 1.23 with options
+		-X Alvis::Pipeline
+

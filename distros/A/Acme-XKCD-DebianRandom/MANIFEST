@@ -1,0 +1,13 @@
+Changes
+lib/Acme/XKCD/DebianRandom.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/01-compile.t
+t/02-correctnumber.t
+t/03-customdiceroll.t
+t/04-stresstest.t
+t/05-customdice-stresstest.t

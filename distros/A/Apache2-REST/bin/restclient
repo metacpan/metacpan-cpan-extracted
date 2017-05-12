@@ -1,0 +1,77 @@
+#! /usr/bin/perl 
+use warnings ;
+use strict ;
+
+use REST::Client ;
+use Getopt::Std;
+use HTTP::Status;
+
+## Command line tool for REST::Client
+
+sub usage{
+    print 'usage: restclient -r <resource URL> [ -m <http method> ] [ -p <http paramstring> ] [ -h <http headers(param syntax)> ]'."\n\n";
+    exit(0) ;
+}
+
+our( $opt_r , $opt_m ,  $opt_p , $opt_h ) ;
+getopts('r:m:p:h:') ;
+unless( $opt_r ){
+    print "Missing resource ( -r )\n";
+    usage() ;
+}
+
+unless( $opt_m ){
+    print STDERR "WARN: no -m given. Assuming GET\n\n" ;
+    $opt_m = 'GET' ;
+}
+
+unless( defined $opt_p ){
+    my @pFrags = () ;
+    print "NO -p GIVEN. Let us build params interactively\n" ;
+    print "Please enter lines like 'param=value'. End with EOF (Ctrl-D)\n" ;
+    while( my $line = <> ){
+        chomp($line) ;
+        push @pFrags , $line ;
+    }
+    $opt_p = join('&' , @pFrags) ;
+}
+
+# Build URL
+my $url = $opt_r ;
+if ( $opt_m eq 'GET' ){
+    $url .= '?'.$opt_p ;
+}
+
+my $urlMeth = { 'GET' => 1 , 'DELETE' => 1 };
+
+my $client = REST::Client->new();
+if ($opt_h){
+    my @heads = split('&' , $opt_h);
+    foreach my $head ( @heads ){
+        my ( $n , $v ) = split('=' , $head );
+        $client->addHeader($n, $v);
+    }
+    
+}
+
+
+if( $urlMeth->{$opt_m}) {
+    $client->$opt_m($url);
+}else{
+    $client->$opt_m($url , $opt_p) ;
+}
+
+## OK print all about response
+print "---- RESPONSE ----\n" ;
+my $rCode = $client->responseCode() ;
+print "* Code: *\n".$rCode.' ('.HTTP::Status::status_message($rCode).')'."\n\n" ;
+print "* Headers: *\n";
+my @headers = $client->{'_res'}->header_field_names() ;
+foreach my $header (sort @headers ){
+    print $header.':'.$client->responseHeader($header)."\n" ;
+}
+print "\n" ;
+
+print "* Content *:\n" ;
+print $client->responseContent()."\n----------------\n" ;
+

@@ -1,0 +1,6 @@
+\..*\.sw.$
+\.bak$
+^\.git/
+^Makefile$
+MYMETA.json
+MYMETA.yml

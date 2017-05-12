@@ -1,0 +1,57 @@
+NAME
+    Authen::SASL::Authd - Client authentication via Cyrus saslauthd or
+    Dovecot authentication daemon.
+
+SYNOPSIS
+        use Authen::SASL::Authd qw(auth_cyrus auth_dovecot);
+
+        # authenticate user against Cyrus saslauthd
+        auth_cyrus('login', 'passwd') or die "saslauthd: FAIL";
+
+        # authenticate user against Dovecot authentication daemon
+        auth_dovecot('login', 'passwd') or die "dovecot-auth: FAIL";
+
+        # check user existence
+        my %user_attr = user_dovecot('login', timeout => 3) or die "dovecot-auth: NO SUCH USER";
+        print "user home: $user_attr{home}\n";
+
+DESCRIPTION
+    The "Authen::SASL::Authd" package implements LOGIN authentication
+    protocol used by Cyrus saslauthd and PLAIN authentication protocol
+    supported by Dovecot authentication daemon. It can be used to process
+    authentication requests against configured SASL mechanism implemented by
+    Cyrus or Dovecot SASL libraries. It can also be used to check if a
+    particular user exists according to the Dovecot authentication daemon.
+
+METHODS
+    auth_cyrus( 'LOGIN', 'PASSWD', [ service_name => 'SERVICE_NAME', ] [
+    timeout => 'TIMEOUT (sec)', ] [ socket => '/SOCK/FILE/NAME', ] )
+    Check supplied user name and password against Cyrus saslauthd. Return
+    true if authentication succeeded. Die in case of a likely configuration
+    problem.
+
+    auth_dovecot( 'LOGIN', 'PASSWD', [ service_name => 'SERVICE_NAME', ] [
+    timeout => 'TIMEOUT (sec)', ] [ socket => '/SOCK/FILE/NAME', ] )
+    Check supplied user name and password against Dovecot authentication
+    daemon. Return true if authentication succeeded. Die in case of a likely
+    configuration problem.
+
+    user_dovecot( 'LOGIN', [ service_name => 'SERVICE_NAME', ] [ timeout =>
+    'TIMEOUT (sec)', ] [ socket => '/SOCK/FILE/NAME', ] )
+    Check if supplied user name exists according to the Dovecot
+    authentication daemon. Return a reference to the hashtable (or the
+    hashtable in list context) with optional user attributes if the user
+    exists, undef (or empty list in list context) otherwise. The hashtable
+    can contain such attributes as 'home', 'gid', 'uid', etc defined by the
+    Dovecot SASL implementation. Die in case of a likely configuration
+    problem.
+
+AUTHOR
+    Alex Protasenko http://www.bkmks.com/
+
+COPYRIGHT and LICENSE
+    Copyright 2007 by Alex Protasenko.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

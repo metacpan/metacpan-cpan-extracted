@@ -1,0 +1,28 @@
+---
+name: PermsFromDB
+
+
+Model::RBAC:
+  schema_class: Schema::RBAC
+  connect_info:
+    dsn: dbi:SQLite:t/db/permsfromdb.db
+
+#Model::RBAC:
+#  schema_class: Schema::RBAC
+#  connect_info:
+#    dsn: dbi:mysql:database=rbac;host=localhost
+#    user: root
+#    password: root
+
+Authorization::RBAC:
+  debug: 0
+  backend:
+    name: DBIx
+
+  model: Model::RBAC
+  typeobj:
+    Page:
+      field_unique: id
+      field_parent: parent
+    Tag:
+      field_unique: name

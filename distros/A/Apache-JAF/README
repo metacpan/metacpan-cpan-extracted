@@ -1,0 +1,310 @@
+NAME
+    Apache::JAF -- mod_perl and Template-Toolkit web applications framework
+
+SYNOPSIS
+    controller -- a mod_perl module that drives your application
+         package Apache::JAF::MyJAF;
+         use strict;
+         use JAF::MyJAF; # optional
+         # loading mini-handlers & templates during compilation time
+         use Apache::JAF (
+           handlers => '/examples/site/modules/Apache/JAF/MyJAF/pages/', # 'auto' if you want to use suggested file structure
+           templates => '/examples/site/templates/'                      # the same comment
+         );
+         our @ISA = qw(Apache::JAF);
+
+         # determine handler to call 
+         sub setup_handler {
+           my ($self) = @_;
+           # the page handler for each URI of sample site is 'do_index'
+           # you should swap left and right ||-parts for real application
+           my $handler = 'index' || shift @{$self->{uri}};
+           return $handler;
+         }
+
+         sub site_handler {
+           my ($self) = @_;
+           # common stuff before handler is called
+           $self->{m} = JAF::MyJAF->new(); # create modeller -- if needed
+           $self->SUPER::site_handler();
+           # common stuff after handler is called
+           return $self->{status}
+         }
+         1;
+
+    page handler -- controller's method that makes one (or more) pages
+         sub do_index {
+           my ($self) = @_;
+           # page handler must fill $self->{res} hash that process with template
+           $self->{res}{test} = __PACKAGE__ . 'test';
+           # and return Apache constant according it's logic
+           return OK;
+         }
+
+    modeller -- a module that encapsulates application business-logic
+         package JAF::MyJAF;
+         use strict;
+         use DBI;
+         use base qw( JAF );
+
+         sub new {
+           my ($class, $self) = @_;
+           $self->{dbh} = DBI->connect(...);
+           return bless $self, $class;
+         }
+         1;
+
+    Apache configuration (httpd.conf)
+          DocumentRoot /examples/site/data
+          <Location />
+            <Perl>
+              use lib qw(/examples/site/modules);
+              use Apache::JAF::MyJAF;
+            </Perl>
+            SetHandler perl-script
+            PerlHandler Apache::JAF::MyJAF
+            PerlSetVar Apache_JAF_Templates /examples/site/templates
+            # optional or can be specified in Apache::JAF descendant (default value is used in example)
+            PerlSetVar Apache_JAF_Modules /examples/site/modules/Apache/JAF/MyJAF/pages
+            # optional or can be specified in Apache::JAF descendant (default value is used in example)
+            PerlSetVar Apache_JAF_Compiled /tmp
+          </Location>
+
+DESCRIPTION
+  Introduction
+    Apache::JAF is designed for creation web applications based on MVC
+    (Model-View-Controller) concept.
+
+    *   *Modeller* is JAF descendant
+
+    *   *Controller* is Apache::JAF descendant
+
+    *   and the *Viewer* is set of the templates using Template-Toolkit
+        markup syntax
+
+    This separation hardly simplifies the dynamic development of sites by
+    designers and programmers. Each programmer works on own part of the
+    project writing separate controller's parts. Designers have to work only
+    on visual performance of templates.
+
+  Suggested file structure
+    Suggested site's on-disk structure is:
+
+      site
+       |
+       +-- data
+       |
+       +-- modules
+       |
+       +-- templates
+
+    *data*
+        document_root of site. All static files (e.g. JavaScripts, pictures,
+        CSSs etc) must be placed here
+
+    *modules*
+        Storage place for site modules -- must be in @INC's
+
+    *templates*
+        The place of your site's templates. Framework is designed to
+        reproduce site's structure in this folder. It's just like
+        document_root for static site.
+
+  Request processing pipeline
+    The "Apache::JAF::handler" intercepts every request for specified
+    location, and process it's own way:
+
+    1   If requested file exists then nothing happens. The handle declines
+        request with "DECLINE".
+
+    2   Otherwise the instance of Apache::JAF's descendant is created and
+        "setup_handler" method is called. You must override this method and
+        return determined handler's name. Usually it's the first part of URI
+        or just "index". Also handlers from "Apache_JAF_Modules" folder is
+        loaded into package's namespace if "$self->{debug_level}" > 0 or
+        handlers were not loaded during module compilation.
+
+    3   Then goes "site_handler" calling. If you have common tasks for each
+        handler you can override it. "site_handler" calls your own handler.
+        It's name is returned by "setup_handler". Usually this
+        "mini-handler" is *very* simple. It have to be implemented as
+        package method with "do_*<handler name>*" name. You have to fill
+        "$self->{res}" hash with result and return Apache constant according
+        to handler's logic ("OK", "NOT_FOUND", "FORBIDDEN" and so on). The
+        sample is shown in "SYNOPSIS".
+
+    4   If the previous step fulfills correctly, and "$self->{type}"
+        property is "text/*" then result of processing template returns to
+        client. If type of result is not like text, one more method is
+        needed to implement: "on_send_*<handeler name>*_data". It must
+        return binary data to client. This way you may create handlers for
+        dynamic generation of images, M$ Excel workbooks and any other type
+        of data.
+
+  Apache::JAF methods
+    setup_handler
+        This method you must override in your Apache::JAF descendant. You
+        must return handler's name (that will be called as *do_<handler
+        name>* method later) from it depending on URI requested by user. You
+        may set site-wide properties such as *debug_level*, *header* or
+        *footer*, templates and includes extensions and so on. If handler
+        name depends on application logic implemented in modeller then you
+        have to create modeller in this method and store it in *m* property
+        for later use. The primary *setup_handler* is shown in "SYNOPSIS".
+
+    site_handler
+        You can override this method to provide common tasks for each of
+        your page-handlers. For example you may create instance of modeller
+        class, provide some custom authorization/authentication or sessions
+        handling and so on. You must call "$self>SUPER::site_handler" and
+        return "$self->{status}" from it.
+
+  Apache::JAF properties
+    r   Current "Apache::Request" object.
+
+    filter
+        Using "Apache::Filter" flag.
+
+    uri Reference to the array of current URI (splitted by slash). Usually
+        you need to modify it in "setup_handler" method to determine page's
+        handler name. Remained array will be passed to the page-handler
+        method as a list of parameters.
+
+    res Hash reference that holds page-handler results.
+
+    expand_path
+        Boolean flag for complex-name-handlers changes '_' to '/' in
+        handler's name. It provides real-like document tree in the templates
+        folder.
+
+    debug_level
+        Look at Apache_JAF_Debug in "CONFIGURATION" section.
+
+    status
+        Default handler status is "NOT_FOUND".
+
+    type
+        Default content-type is "text/html". You can call
+        "$self->download_type()" for set unexisting MIME-type to force
+        browser download content instead of viewing it.
+
+    template_ext, include_ext
+        Default template extension is ".html". Default include template
+        extension is ".inc".
+
+    default_include
+        Site-wide include template. Default value is... "default".
+
+    header, footer
+        Site-wide pre- and post-include templates. Defalut values are
+        "header" and "footer". *Note:*You must undef this properies if you
+        want create page-template without it. For example for page in pop-up
+        window ("disable_header", "disable_footer", and
+        "disable_header_footer" methods).
+
+    templates
+        Path to the templates folder. You may have different sets of
+        templates for different views of results generated by your
+        page-handlers.
+
+    handler
+        Result of "setup_handler" method is stored here for later use.
+
+    *other properites*
+        For internal use only.
+
+  Implementing handlers
+    Page handlers are simple. Their methods are with "do_<handler name>"
+    name. You have to analyse given parameters, fill out "$self->{res}" hash
+    with handler results that will be processed with template and return one
+    of "Apache::Constants". Usually it's "OK", but may be "NOT_FOUND" if
+    parameters passed to handlers are invalid for some reason.
+
+    Look into examples/* folder in the distribution package for some
+    guidelines.
+
+  Templates structure and syntax
+    Template for a specific handler consists of:
+
+    1 default.inc
+        Common "[% BLOCK %]"s for all site templates. Processed before
+        header and main tamplate.
+
+    2 header.inc
+        Header template. Processed before main handler's template.
+
+    3 *<handler name>*.html
+        Main handler's template.
+
+    4 footer.inc
+        Footer template. Processed after main handler's template.
+
+    Default names and extensions are shown. All of them are configurable in
+    processing handler methods. For example you have to disable processing
+    header and footer for handler that produces not "text/*" content.
+
+    Templates syntax is described at
+    <http://www.template-toolkit.org/docs/plain/Manual/>.
+
+CONFIGURATION
+    Apache_JAF_Prefix
+        Number of URI parts (between slashes) or path that must be removed
+        from request URI. Useful for implementing dynamic part of almost
+        static site. It simplifies names of page handlers.
+
+    Apache_JAF_Templates
+        Path to templates folder. Several paths may be separated by
+        semicolon. *Win32 note*: This separator works too. Don't get
+        confused with full paths with drive letters.
+
+    Apache_JAF_Modules
+        Path to page handlers folder. By default it's controller location
+        plus "/pages".
+
+    Apache_JAF_Compiled
+        Path to compiled templates folder. Default is "/tmp". Saving
+        compiled templates on disk dramatically improves overall site
+        performance.
+
+    Apache_JAF_Debug
+        Application's debug level. The amount of debug info written to the
+        Apache error_log. Ranges from 0 to 10.
+
+         0: critical errors only
+         1: request processing line
+         2: client request
+         3: response headers
+         4: template variables
+         5-8: not used (for future enchancements)
+         9: loading additional handlers
+         10: processed template
+
+        Also this setting affecting page-handlers loading. If debug level is
+        0 -- handlers are loaded only on server-start. Else handlers loaded
+        on every request. That simplifies development process but increases
+        request processing time. So it's not good to set debug level greater
+        than 0 in production environment.
+
+        *Note:* This setting is overrided by setting "$self->{debug_level}".
+
+SEE ALSO
+    *   mod_perl -- Perl and Apache integration project
+        (<http://perl.apache.org>)
+
+    *   Template-Toolkit -- template processing system
+        (<http://www.tt2.org>)
+
+    *   examples/* -- sample site driven by Apache::JAF
+
+    *   <http://jaf.webzavod.ru> -- Apache::JAF companion website
+
+AUTHOR
+    Greg "Grishace" Belenky <greg@webzavod.ru>
+
+COPYRIGHT
+     Copyright (C) 2001-2003 Greg Belenky
+     Copyright (C) 2002-2003 WebZavod (http://www.webzavod.ru) programming team
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

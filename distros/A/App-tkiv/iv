@@ -1,0 +1,1434 @@
+#!/pro/bin/perl
+
+use strict;
+use warnings;
+
+unless ($^O eq "MSWin32") {   # to_background
+    my $pid = fork;
+    if ($pid < 0) {
+	warn "Unable to run in the background, cannot fork: $!\n";
+	exit $?;
+	}
+    $pid and exit 0;
+    } # to_background
+
+our $VERSION = eval q{use App::tkiv; $App::tkiv::VERSION};
+
+my %Option = (
+    thumbsize		=> 80,		# in pixels
+    thumbrows		=> 5,
+    thumbposition	=> "se",
+    thumbrefresh	=> 1,
+    thumbsorting	=> "default",
+    thumbsortorder	=> "ascending",
+    imageposition	=> "nw",
+    imagedir		=> ".",
+    slideshowdelay	=> 1500,	# in milliseconds
+    slideposition	=> "c",
+    slidefull		=> 0,
+    slidecover		=> 0,
+    maxx		=> 9999,
+    maxy		=> 9999,
+#   smallfont		=> "-misc-fixed-medium-r-normal--7-70-75-75-c-50-iso10646-1",
+    smallfont		=> "{Liberation Mono} 8",
+    selectionfont	=> "{Liberation Sans} 5",
+    selectioncolor	=> "Yellow",
+    confirmdelete	=> 1,
+    removetarget	=> 0,
+    imagefull		=> 0,
+    decoration		=> 1,
+    showexifinfo	=> 0,
+    exifinfocolor	=> "Blue",
+    scrollspeed		=> 3,
+    titledirs		=> 0,
+    titleindex		=> 0,
+    lastfirstnext	=> 0,
+    dirtreestartpos	=> 0.,
+
+    keys_quit		=> [qw( Key-q Escape		)],
+    keys_quit_all	=> [qw( Shift-q Control-q	)],
+    keys_options	=> [qw( Key-o			)],
+    keys_firstnext	=> [qw( Key-v			)],
+    keys_firstprev	=> [qw( asciicircum		)],
+    keys_firstpic	=> [qw( Key-0 Key-1  Key-a	)],
+    keys_prevpic	=> [qw( Left  Up     BackSpace	)],
+    keys_nextpic	=> [qw( Right Down   space	)],
+    keys_lastpic	=> [qw( Key-9 Key-z		)],
+    keys_firstminimize	=> [qw( Alt-1 exclam Control-1	)],
+    keys_fullscreen	=> [qw( Key-f F11		)],
+    keys_fitwidth	=> [qw( Key-b			)],
+    keys_fitheight	=> [qw( Key-h			)],
+    keys_origsize	=> [qw( Key-o			)],
+    keys_full_rc	=> [qw( Key-F			)],
+    keys_full_toggle	=> [qw( Control-f		)],
+    keys_rotleft	=> [qw( Key-l			)],
+    keys_rotexifl	=> [qw( Key-L			)],
+    keys_rotright	=> [qw( Key-r			)],
+    keys_rotexifr	=> [qw( Key-R			)],
+    keys_zoomin		=> [qw( plus			)],
+    keys_zoomout	=> [qw( minus			)],
+    keys_delete		=> [qw( Delete			)],
+    keys_slideshow	=> [qw( Key-w Key-s		)],
+    keys_exif		=> [qw( Key-i			)],
+    keys_exifinfo	=> [qw( Shift-I			)],
+    keys_decoration	=> [qw( Key-d			)],
+    keys_focusthumbs	=> [qw( Key-t			)],
+
+    keys_scroll_up	=> [qw( Alt-Up    Control-Up	)],
+    keys_scroll_down	=> [qw( Alt-Down  Control-Down	)],
+    keys_scroll_left	=> [qw( Alt-Left  Control-Left	)],
+    keys_scroll_right	=> [qw( Alt-Right Control-Right	)],
+
+    keys_imgpos_nw	=> [qw( Alt-u			)],
+    keys_imgpos_n	=> [qw( Alt-i			)],
+    keys_imgpos_ne	=> [qw( Alt-o			)],
+    keys_imgpos_e	=> [qw( Alt-l			)],
+    keys_imgpos_se	=> [qw( Alt-period		)],
+    keys_imgpos_s	=> [qw( Alt-comma		)],
+    keys_imgpos_sw	=> [qw( Alt-m			)],
+    keys_imgpos_w	=> [qw( Alt-j			)],
+    keys_imgpos_c	=> [qw( Alt-k			)],
+
+    keys_crop		=> [qw( Control-y		)],
+    );
+
+sub usage
+{
+    my ($show_opt) = (@_, 0);
+    warn "usage: iv.pl [-f] [option=value ...] [dir]\n";
+    if ($show_opt) {
+	foreach my $o (sort keys %Option) {
+	    my $v = $o =~ m/^keys_/
+		? "(".(join" ",@{$Option{$o}}).")"
+		: $Option{$o};
+	    my $alt = {
+		imageposition  => "\t\t(nw n ne e se s sw w c)",
+		slideposition  => "\t\t(nw n ne e se s sw w c)",
+		thumbposition  => "\t\t(nw n ne e se s sw w c)",
+		thumbsorting   => "\t(default caseless date size random)",
+		thumbsortorder => "\t(ascending descending)",
+		}->{$o} || "";
+	    printf STDERR "  %-15s %s%s\n", $o, $v, $alt;
+	    }
+	}
+    exit 0;
+    } # usage
+
+# TODO: * save/load from .ivrc buttons on option window
+#	* Slideshow behaviour: location, dir depth, cycling
+#	  randomness, slide lists, full screen background (no decoration)
+#	* Slideshow play list
+#	* Slideshow loop control
+#	* Image manipulation
+#	  - Crop
+#	  - Save, save as
+#	* Titles and decoration behaviour
+#	  - adjust height/width of screen-fit images to decoration
+#	    I just cannot get $iv->overrideredirect (1) to work as I want
+#	* Hide dirs above dt root
+#	  - Allow a set of dirs from the command line
+#	* use Tk::Animation for animated gif's
+#	* Menu's ?
+#	* Auto-sense image load time for slideshows
+#	* Move onward to App::tkiv (with iv => tkiv link)
+
+# Filter out the irfanview options that I don't support
+@ARGV = grep { !m{^/(hide|thumbs?)(=\d+)?$} } @ARGV;
+@ARGV == 1 and $ARGV[0] =~ m/^-[h?]$/         and usage (0);
+@ARGV == 1 and $ARGV[0] =~ m/^-+(help|info)$/ and usage (1);
+
+use Getopt::Long qw(:config bundling nopermute passthrough);
+my $opt_f = 0;	# Start with full-screen pics
+my $opt_v = 0;	# Verbosity / debug
+my $opt_s = 0;	# Start slideshow immediately
+my $opt_1 = 0;	# On startup, select first image and minimize thumbnail view
+GetOptions (
+    "v:1" => \$opt_v,
+    "f"   => \$opt_f,
+    "s"   => \$opt_s,
+    "1"   => \$opt_1,
+    ) or usage (0);
+
+use Cwd qw( realpath );
+use Tk;
+use Tk::JPEG;
+use Tk::PNG;
+eval "use Tk::TIFF;";
+use Tk::Bitmap;
+use Tk::Pixmap;
+use Tk::Photo;
+use Tk::Pane;
+use Tk::DirTree;
+use Tk::Dialog;
+use Tk::Balloon;
+use Tk::BrowseEntry;
+use Tk::Animation;
+use File::Temp qw( tempdir tempfile );
+use File::Copy;
+#use Data::Peek;
+
+			# Time to fetch image dimensions for 3500 images
+our $exiftool = 0;	# 26.5
+our $iinftool = 0;	#  4.5
+our $imsztool = 0;	#  0.2
+our $exiftran = 0;
+eval {
+    require Image::ExifTool;
+    Image::ExifTool->import ("ImageInfo");
+    $exiftool = Image::ExifTool->new ();
+    };
+eval {
+    require Image::Size;
+    Image::Size->import ("imgsize");
+    $imsztool = exists &imgsize;
+    };
+eval {
+    require Image::Info;
+    Image::Info->import ("image_info", "dim");
+    $iinftool = exists &image_info;
+    };
+-x "/usr/bin/exiftran" and $exiftran = 1;
+
+my $tmp = tempdir (CLEANUP => 1);
+my $pic = @ARGV && -f $ARGV[-1] && $ARGV[-1] =~ s{/([^/]+)$}{} ? $1 : "";
+   $pic and $opt_1 = 0;
+
+{   my @opt;
+    my @ivrc_dirs = ("/etc", $ENV{HOME});
+    if (@ARGV && -d $ARGV[-1]) {
+	push @ivrc_dirs, $ARGV[-1], $ARGV[-1];
+	$ivrc_dirs[-1] =~ s{/[^/]+/?$}{};
+	}
+    foreach my $dir (@ivrc_dirs) {
+	-d $dir or next;
+	foreach my $rcf ("iv.rc", ".ivrc") {
+	    open my $of, "<", "$dir/.ivrc" or next;
+	    $opt_v and warn "Reading $dir/.ivrc\n";
+	    while (<$of>) {
+		m/^[#!]/		and next;
+		s/\s+$//;
+		m/^\S+\s*=\s*\S/	or  next;
+		push @opt, $_;
+		}
+	    close $of;
+	    }
+	}
+    foreach my $opt (split m/[:;]/ => $ENV{IVRC} || "") {
+	$opt =~ s{^[-/]?(\S+\s*=\s*\S.*)}{$1} or next;
+	push @opt, $opt;
+	}
+    while (@ARGV && $ARGV[0] =~ s{^[-/]?(\S+\s*=\s*\S.*)}{$1}) {
+	push @opt, shift @ARGV;
+	}
+    for (@opt) {
+	m/^(\S+)\s*=\s*(\S.*)/	or next;
+	my ($opt, $val) = (lc $1, $2);
+	$opt =~ m/^keys_/ and $val = [ split m/\s+/, $val ];
+	$Option{$opt} = $val;
+	}
+    }
+foreach my $k (grep m/^keys_/ => keys %Option) {
+    s/^<?(.*?)>?$/<$1>/ for @{$Option{$k}};
+    }
+$opt_f ||= $Option{imagefull};
+
+my $dir = @ARGV ? shift @ARGV : $Option{imagedir};
+-d $dir or die "$dir is not a (valid) dir\n";
+my $tpx = $Option{thumbsize};	# Max edge size for thumbs
+my $tnx = $Option{thumbrows};	# Max nr of tn's horizontal
+
+my $def_sls = $Option{slideshowdelay}; # 1.5 sec / pic
+
+# Main Window
+my $mw = Tk::MainWindow->new (-title => "iv");
+
+# Screen dimensions
+my ($cx, $cy) = ($mw->screenwidth, $mw->screenheight);
+eval { # Use both methods, as the WM might return bogus values after having
+       # been resized e.g. for beamer output
+    require X11::Protocol;
+    my $x11 = X11::Protocol->new ();
+    my $screen = ($ENV{DISPLAY}||":0.0") =~ m/\.(\d+)$/ ? $1 : 0;
+    $x11->choose_screen ($screen); # Root window
+    my ($xx, $xy) = ( $x11->{width_in_pixels}, $x11->{height_in_pixels} );
+    $xx > $cx and $cx = $xx;
+    $xy > $cy and $cy = $xy;
+    };
+$Option{real_cx} = $cx;
+$cx > $Option{maxx} and $cx = $Option{maxx};
+$cy > $Option{maxy} and $cy = $Option{maxy};
+$cy -= 52; # Toolbar and Window decoration
+
+# Globals
+my ($idir, @tn, $ti, $ni);	# ImageDir, ThumbNails, ThumbIndex, NumberOfImages
+my ($tr, $or, $fr, $zs);	# ThumbsRead, OrigRead, FullRead, ZoomState
+
+# The thumbnail browser
+my ($dt, $tn, $tg, $ow);	# DirTree, ThumbNails, ThumbnailGrid, OptionWindow
+my ($sls, $f11) = (0);		# SlideShow, Image callback
+
+# The image browser
+my ($vs, $iv, $bg) = (0);	# Viewer state: original (0) or full screen (1)
+my ($tp, $ip, $sp) = @Option{qw( thumbposition imageposition slideposition )};
+
+# Default pack option
+my @dpo =  qw( -expand 1 -fill both );
+
+# Positioning
+my (@loc, %loc) = qw( nw n ne e se s sw w c );
+{   my $rb = -(($Option{real_cx} >= $Option{maxx} ? ($Option{real_cx} - $Option{maxx}) : 0) + 2);
+    @loc{@loc} = (
+	"+2+2", "+X+2", "$rb+2", "$rb+Y", "$rb-2",
+	"+X-2", "+2-2", "+2+Y",  "+X+Y",  "+X+Y",
+	);
+    }
+
+# Selections and tools
+my %selection; reset_selection ();
+
+sub reset_selection
+{
+    %selection = ( Sx => -1, Sy => -1, Ex => -1, Ey => -1 );
+    } # reset_selection
+
+sub loc
+{
+    my $loc = $loc{shift @_};
+    my ($ww, $wh) = map { int $_ } (@_, 0, 0);
+    if ($loc =~ m/[XY]/) {
+	my ($x, $y) = map {
+	    my $c = int ($_ / 2);
+	    $c < 2 ? 2 : $c;
+	    } ($cx - $ww - 15, $cy - $wh);
+	$loc =~ s/X/$x/;
+	$loc =~ s/Y/$y/;
+	}
+    $loc;
+    } # loc
+
+sub bind_wheel
+{
+    my ($w, $sw, $u) = @_;
+
+    $w->bind ($_, sub { $sw->yview (scroll => -$u, "units") }) for "<4>", @{$Option{keys_scroll_up}};
+    $w->bind ($_, sub { $sw->yview (scroll =>  $u, "units") }) for "<5>", @{$Option{keys_scroll_down}};
+    $w->bind ($_, sub { $sw->xview (scroll => -$u, "units") }) for "<6>", @{$Option{keys_scroll_left}},  "<Alt-Button-4>", "<Control-Button-4>", "<Shift-Button-4>";
+    $w->bind ($_, sub { $sw->xview (scroll =>  $u, "units") }) for "<7>", @{$Option{keys_scroll_right}}, "<Alt-Button-5>", "<Control-Button-5>", "<Shift-Button-5>";
+    } # bind_wheel
+
+my $pxyid = 10000;
+
+sub Tk::PhotoXY
+{
+    my ($w, $f, $x, $y, $r, $p) = (@_, 0);
+    $f && $x && $y or return;
+    my ($cfh, $cfn) = tempfile ("iv#$$-XXXXXX", DIR => $tmp);
+    my ($rx, $ry) = $r == 90 || $r == 270 ? ($y, $x) : ($x, $y);
+    my $geo = "${rx}x${ry}";
+    my @rot = $r ? ("-rotate", $r) : ();
+    system "convert", "-size", $geo, "-resize", "$geo+0+0", @rot, $f, "$cfn.jpg";
+    # convert generates multiple files for animated images
+    my @cfn = glob "${cfn}*jpg*";
+    if (@cfn) {
+	eval { $p = $w->Photo (-file => $cfn[0]) };
+	unlink @cfn;
+	}
+    $p;
+    } # PhotoXY
+
+my @rm_cfn;
+END { -f $_ && unlink $_ for @rm_cfn; }
+
+# Cropping version
+sub Tk::PhotoXYXY
+{
+    my ($w, $f, $x, $y, $X, $Y, $p) = (@_, 0);
+    $f && $x && $y or return;
+    my ($cfh, $cfn) = tempfile ("iv#$$-XXXXXX", DIR => $tmp);
+    my ($dx, $dy) = ($X - $x, $Y - $y);
+    my $geo = "${dx}x$dy+$x+$y";
+    my $q = $f =~ m/'/ ? '"' : "'";
+    system qq{convert -crop $geo $q$f$q $cfn.jpg};
+    # convert generates multiple files for animated images
+    my @cfn = glob "${cfn}*jpg*";
+    if (@cfn) {
+	eval { $p = $w->Photo (-file => $cfn[0]) };
+	my $_fn = shift @cfn;
+	$selection{file} = $_fn;
+	push @rm_cfn, $_fn;
+	@cfn and unlink @cfn;
+	}
+    $p;
+    } # PhotoXYXY
+
+sub show_exifinfo
+{
+    my $w  = shift or return;
+    $w->delete ("exifinfo");
+    $Option{showexifinfo} or return;
+    my $ei = shift or return;
+    my $dto = $ei->{DateTimeOriginal} // "";
+    my $iso = $ei->{ISO} ? "ISO $ei->{ISO}" : "";
+    my $spd = $ei->{ShutterSpeed} // $ei->{exposureTime} // "";
+    my $ape = $ei->{Aperture} // $ei->{FNumber};
+       $ape = $ape ? "F$ape" : "";
+    my $fln = $ei->{FocalLengthIn35mmFormat} // $ei->{FocalLength} // "";
+    $w->createText (5, 5,
+	-anchor => "nw",
+	-fill   => $Option{exifinfocolor},
+	-font   => $Option{smallfont},
+	-text   => join ("\x{00b7}", grep m/\S/, $dto, $iso, $ape, $spd, $fln),
+	-tags   => "exifinfo",
+	);
+    if ($dto) {
+	my $awb =  $ei->{WhiteBalance} // "";
+	my $fls = ($ei->{Flash} // $ei->{FlashFired} // "") =~
+			m/^(yes|true|on|fired|1)\b/i ? "With flash" : "No flash";
+	my $pgm =  $ei->{ExposureProgram} // 
+		   $ei->{ShootingMode} //
+		   $ei->{SceneMode} // "";
+	my $sct =  $ei->{SceneType} // "";
+	$w->createText (5, 20,
+	    -anchor => "nw",
+	    -fill   => $Option{exifinfocolor},
+	    -font   => $Option{smallfont},
+	    -text   => join ("\x{00b7}", grep m/\S/, $awb, $fls, $pgm, $sct),
+	    -tags   => "exifinfo",
+	    );
+	$w->createText (5, 35,
+	    -anchor => "nw",
+	    -fill   => $Option{exifinfocolor},
+	    -font   => $Option{smallfont},
+	    -text   => join ("\x{00b7}" =>
+		map { join " " => map { ucfirst lc $_ } split m/\s+/ => $_ }
+		grep m/\S/, map { $ei->{$_} // "" }
+		"Make",			# Nikon
+		"Model",		# Coolpix S9700
+		"DeviceType",		# Cell Phone
+		"FileSource",		# Digital Camera
+		),
+	    -tags   => "exifinfo",
+	    );
+	}
+    } # show_exifinfo
+
+sub show_exif
+{
+    my $exif = shift or return;
+    my $tl = $mw->Toplevel (-title => "Image EXIF info");
+    $ow = $tl->Scrolled ("Frame",
+	-scrollbars => "osoe",
+	-width      => 650,
+	-height     => int ($cy * .65))->pack (-expand => 1, -fill => "both");
+    $ow->Subwidget ("${_}scrollbar")->configure (-width => 6) for qw( x y );
+    my @exif = sort { lc $a cmp lc $b } keys %$exif;
+    my $half = int (@exif / 2);
+
+    foreach my $row (0 .. ($half - 1)) {
+	$ow->Label (
+	    -text   => $exif[$row],
+	    -anchor => "w",
+	    -fg     => "DarkGreen",
+	    -font   => $Option{smallfont},
+	    )->grid (-row => $row, -column => 0, -sticky => "news");
+	$ow->Label (
+	    -text   => $exif->{$exif[$row]},
+	    -anchor => "w",
+	    -fg     => "DarkBlue",
+	    -font   => $Option{smallfont},
+	    )->grid (-row => $row, -column => 1, -sticky => "news");
+	$row + $half > $#exif and last;
+	$ow->Label (
+	    -text   => $exif[$row + $half],
+	    -anchor => "w",
+	    -fg     => "DarkGreen",
+	    -font   => $Option{smallfont},
+	    )->grid (-row => $row, -column => 2, -sticky => "news");
+	$ow->Label (
+	    -text   => $exif->{$exif[$row + $half]},
+	    -anchor => "w",
+	    -fg     => "DarkBlue",
+	    -font   => $Option{smallfont},
+	    )->grid (-row => $row, -column => 3, -sticky => "news");
+	$row++;
+	}
+    # Destroy
+    foreach my $W ($ow, $tl) {
+	$W->bind ($_, sub {
+	    if (Exists ($ow)) { $ow->destroy; $ow = undef; }
+	    if (Exists ($tl)) { $tl->destroy; $tl = undef; }
+	    }) for @{$Option{keys_quit}};
+	$W->bind ($_, \&exit) for @{$Option{keys_quit_all}};
+	}
+    } # show_exif
+
+sub options
+{
+    my $tl = $mw->Toplevel (-title => "IV options");
+    $ow = $tl->Frame ()->grid (-sticky => "nsew");
+    $ow->gridRowconfigure    (0, -weight => 1); # allow expansion in both ...
+    $ow->gridColumnconfigure (0, -weight => 1); # ... X and Y dimensions
+    my $row = 0;
+    for ([ "Thumb columns",		\$tnx ],
+	 [ "Thumb size",		\$tpx ],
+	 [ "Thumb sort method",		\$Option{thumbsorting},   qw( default caseless date size random )],
+	 [ "Thumb sort order",		\$Option{thumbsortorder}, qw( ascending descending )],
+	 [ "Image position",		\$ip, @loc ],
+	 [ "Remove symlink target",	\$Option{removetarget} ],
+	 [ "Slideshow",			\$sls ],
+	 [ "Slideshow delay",		\$def_sls  ],
+	 [ "Slideshow position",	\$sp, @loc ],
+	 [ "Slideshow img size",	\$Option{slidefull},  qw( 0 1 ) ],
+	 [ "Slideshow full screen",	\$Option{slidecover}, qw( 0 1 ) ],
+	 ) {
+	my ($label, $var, @val) = @$_;
+	$ow->Label (
+	    -text         => $label,
+	    -anchor       => "w",
+	    -fg           => "DarkGreen",
+	    )->grid (-row => $row, -column => 0, -sticky => "news");
+	if (@val) {
+	    my $cmd = sub { 1; };
+	    my $be = $ow->BrowseEntry (
+		-width              => 12,
+		-borderwidth        =>  1,
+		-highlightthickness =>  1,
+		-listwidth          => 40,
+		-variable           => $var,
+		-browsecmd          => $cmd,
+		)->grid (-row => $row, -column => 1, -sticky => "news");
+	    $be->insert ("end", $_) for @val;
+	    }
+	else {
+	    $ow->Entry (
+		-textvariable => $var,
+		-width        => 12,
+		)->grid (-row => $row, -column => 1, -sticky => "news");
+	    }
+	$row++;
+	}
+    $ow->Button (-text => "OK",    -fg => "DarkGreen",
+	-command => sub { $ow->destroy;
+			  $ow = undef;
+			  $tl->destroy;
+			  dtcmd ($idir);
+			  },
+	)->grid (-row => $row, -column => 0, -sticky => "news");
+    $ow->Button (-text => "Apply", -fg => "DarkGreen",
+	-command => sub { dtcmd ($idir); },
+	)->grid (-row => $row, -column => 1, -sticky => "news");
+    } # options
+
+my %tsort = (
+   # [ Name, seq, size, mtime, lc name ]
+
+    # 1. numeric part of image name, 2. image name
+    default	=> sub { $a->[1] <=> $b->[1] || $a->[0] cmp $b->[0] },
+
+    # 2. size
+    size	=> sub { $a->[2] <=> $b->[2] },
+
+    # 3. date
+    date	=> sub { $a->[3] <=> $b->[3] },
+
+    # 4. caseless image name
+    caseless	=> sub { $a->[4] cmp $b->[4] },
+
+    # 5. random
+    random	=> sub { $a->[5] <=> $b->[5] },
+    );
+my $refreshing = "";
+
+sub dtcmd
+{
+    # trigger $tn to show thumbnails of all pics in current dir
+    # Expansion also invokes this callback
+    @_ == 1                or return;
+    $idir = $_[0]	   or return ($refreshing = "");
+    my $Idir = realpath $idir;
+    #warn "dtcmd (idir = $idir ($Idir))\n";
+    $refreshing eq $Idir  and return;
+    $refreshing = $Idir;
+
+    # Clean up previous pics
+    $iv && Exists ($iv) and $iv->destroy;
+    $bg && Exists ($bg) and $bg->destroy;
+    for (@tn) {
+	$_ && ref $_ && $_->{wdgt} && Exists ($_->{wdgt}) and
+	    $_->{wdgt}->destroy ();
+	}
+    # New dir, reset globals
+    ($tr, $or, $fr, $ti, $vs, $sls, $zs, $f11, @tn) = (0, 0, 0, -1, $opt_f, 0);
+
+    (my $ttl = $Idir) =~ s{^$ENV{HOME}}{~};
+	$ttl =~ s{^~/\.wine/fake_windows/}{:};
+    utf8::upgrade ($ttl);
+    $mw->title ($ttl);
+
+    my $tb = $tg->Balloon (
+	-state      => "balloon",
+	-initwait   => 1200,		# 1.2 ms
+	-foreground => "Blue4",
+	-background => "LightYellow2",
+	);
+
+    # Gather all pics in this folder
+    opendir IDIR, $Idir;
+    my @img = map  { $_->[0] }
+	      sort { $tsort{$Option{thumbsorting}}->() }
+	      map  { my $seq = m/(\d+)/ ? $1 : 0;
+	             [ $_, $seq, (stat "$Idir/$_")[7,9], lc $_, rand 1 ] }
+	      grep { my $if = "$Idir/$_";
+		     # Sanity check. Minimal image size 100
+		     my $s = -s $if;
+		     # Skip MacOS working copies
+		     $if =~ s{/\._([^/]+)$}{/$1} && -s $if and $s = 0;
+		     $s and $s > 100;
+		     }
+	      # convert can't deal with .ico files (yet)
+	      # Tk can deal with Tiff/NEF as of 804.027_501 with Tk::TIFF
+	      grep m/\.(jpe?g|gif|x[pb]m|png|bmp|tiff?|nef)$/i => readdir IDIR;
+    closedir IDIR;
+    $Option{thumbsortorder} =~ m/^(?:desc|reverse)/ and @img = reverse @img;
+
+#my $t0 = [ gettimeofday ];
+    my $earlyopennextdir = $Option{lastfirstnext} || $opt_1;
+    if ($earlyopennextdir && opendir my $dh, "..") {
+	my @dir = readdir $dh;
+	@dir > 100 and $earlyopennextdir = 0; # too slow
+	}
+
+    $ni = @img;
+    $opt_v and warn "$ni images in $idir\n";
+    foreach my $img (@img) {
+	my $nt = @tn;
+
+	my $pf = "$Idir/$img";
+	my $ps = -s $pf or next;
+
+	$opt_v and warn "Read $pf ($ps) ...\n";
+	# Read it
+	my ($exif, $angl, $x, $y, $o) = ({}, 0, 0, 0);
+	if ($exiftool) {
+	    $exif = ImageInfo ($pf);
+	    #DDumper $exif;
+	    if (ref $exif and exists $exif->{ImageWidth}) {
+		($x, $y) = ($exif->{ImageWidth}, $exif->{ImageHeight});
+		my $ori = $exif->{Orientation} || "Horizontal";
+		delete $exif->{$_} for qw( ThumbnailImage PreviewImage DataDump );
+		$ori =~ m/\b(-?\d+)\b/ and $angl = $1;
+		$angl < 0 and $angl += 360;
+		$exif->{Animated} = 0;
+		if ($exif->{FileType} eq "GIF" && $iinftool) {
+		    my $info = image_info ($pf);
+		    $exif->{Animated} = $info->{Delay} || 0;
+		    }
+		}
+	    }
+	if ($x == 0 and $imsztool) {
+	    my ($w, $h) = imgsize ($pf);
+	    $w and ($x, $y) = ($w, $h);
+	    }
+	if ($x == 0 and $iinftool) {
+	    my (@info) = image_info ($pf);
+	    @info && ref $info[0] eq "HASH" && exists $info[0]{width} and
+		($x, $y) = ($info[0]{width}, $info[0]{height});
+	    }
+	if ($x == 0) {
+	    my $q = $pf =~ m/'/ ? '"' : "'";
+	    my ($w, $h) = `identify -format "%w,%h" -quiet $q$pf$q` =~ m/([0-9]+)/g;
+	    $w and ($x, $y) = ($w, $h);
+	    }
+	$x && $y or next;
+	$opt_v > 4 and warn "Size: $x x $y\n";
+
+	# Full screen
+	my ($fx, $fy) = ($cx / $x, $cy / $y);
+	my $ff = $fx < $fy ? $fx : $fy;
+	my ($fX, $fY) = map { int } ($ff * $x, $ff * $y);
+
+	# Thumbnail
+	my ($rx, $ry) = $angl == 90 || $angl == 270 ? ($y, $x) : ($x, $y);
+	my $tf = $tpx / ($ry > $rx ? $ry : $rx);
+	my ($tX, $tY) = map { int } ($tf * $rx, $tf * $ry);
+
+	my $t;
+	unless ($t = $tn->PhotoXY ($pf, $tX, $tY, $angl)) {
+	    warn "$pf: Cannot read\n";
+	    next;
+	    }
+	$tr++;
+
+	my $w = $tg->Label (-image => $t)->grid (
+	    -row    => int ($nt / $tnx),
+	    -column => $nt % $tnx,
+	    -sticky => "news",
+	    );
+
+	my $titl = $img;
+	if (my $nd = $Option{titledirs}) {
+	    (my $d = $idir) =~ s{/?$}{/};
+	    while ($d =~ s{([^/]+/)$}{} && $nd--) {
+		substr $titl, 0, 0, $1;
+		}
+	    }
+	utf8::upgrade ($titl);
+	push @tn, {
+	    wdgt => $w,		# Widget
+	    angl => $angl,	# rotation angle
+	    phys => {		# Physical location and size
+		file => $pf,
+		dir  => $idir,
+		titl => $titl,
+		size => $ps,
+		},
+	    orig => {		# Original picture
+		phot => $o,
+		wdth => $x,
+		hght => $y,
+		},
+	    thmb => {		# Thumbnail
+		phot => $t,
+		wdth => $tX,
+		hght => $tY,
+		},
+	    full => {		# Full screen
+		phot => undef,
+		wdth => $fX,
+		hght => $fY,
+		},
+	    exif => $exif,
+	    };
+
+       # $f11->($w [, $vs [, $ti [, $trigger]]]);
+       $f11 = sub {
+	    my $self = @_ && ref $_[0] ? shift (@_) : undef;
+	    my $fs   = @_ ? shift (@_) : ($vs ^= 1, $vs);
+	    @_ and $ti  = shift @_;
+	    my $trg = @_ ? shift @_ : "";
+
+	    my $old_iv = $iv; # Destroy prev pic after displaying new
+	    reset_selection ();
+
+	    my $aid;			# last stacked After ID
+	    my $pr   = $tn[$ti];
+	    my $size = $fs eq "1" ? "full" : $fs =~ m/^\d\d+$/ ? $fs : "orig";
+	    for ($pr->{$size}{phot}) {
+		defined and last;
+
+		if ($size eq "orig" && !$pr->{angl}) {
+		    if (exists $pr->{exif}{Animated} && $pr->{exif}{Animated}) {
+			$pr->{$size}{phot} = $tn->Animation (-file => $pr->{phys}{file});
+			}
+		    else {
+			$pr->{$size}{phot} = $tn->Photo (-file => $pr->{phys}{file});
+			}
+		    $or++;
+		    last;
+		    }
+
+		if ($size =~ m/^\d\d+$/) {
+		    @{$pr->{$size}}{qw( wdth hght )} =
+			map { int ($size * $_ / 100) } @{$pr->{orig}}{qw( wdth hght )};
+		    }
+
+		$pr->{$size}{phot} = $tn->PhotoXY ($pr->{phys}{file},
+		    @{$pr->{$size}}{qw( wdth hght )}, $pr->{angl} || 0);
+		$fr++;
+		}
+
+	    # contemplate on integrating this into the main image canvas
+	    if ($Option{slidecover} && !$bg) {
+		$bg = $mw->Toplevel (-bg => "Black");
+		$bg->geometry ("${cx}x${cy}+0+0");
+#		$bg->overrideredirect (1);
+		$bg->update;
+		}
+
+	    my $ttl = $pr->{phys}{titl};
+	    $Option{titleindex} and $ttl .= " ".($ti + 1)."/$ni";
+	    $iv = $mw->Toplevel (-title => $ttl);
+	    $iv->geometry (loc ($sls ? $sp : $ip, $pr->{$size}{wdth}, $pr->{$size}{hght}));
+	    my $fp = $iv->Canvas (
+		-width  => $pr->{$size}{wdth},
+		-height => $pr->{$size}{hght},
+
+		# left, top, right, bottom
+		-scrollregion => [ 0, 0, $pr->{$size}{wdth}, $pr->{$size}{hght} ],
+		xscrollincrement => $Option{scrollspeed},
+		yscrollincrement => $Option{scrollspeed},
+		)->pack (@dpo);
+	    $fp->createImage (0, 0, -anchor => "nw",
+		-image => $pr->{$size}{phot});
+	    show_exifinfo ($fp, $pr->{exif});
+
+	    # Check if this will always work ...
+	    $fp->CanvasBind ($_, sub { $fp->yview (scroll => -5, "units") })
+		for "<4>",            @{$Option{keys_scroll_up}};
+	    $fp->CanvasBind ($_, sub { $fp->yview (scroll =>  5, "units") })
+		for "<5>",            @{$Option{keys_scroll_down}};
+	    $fp->CanvasBind ($_, sub { $fp->xview (scroll => -5, "units") })
+		for "<Alt-Button-4>", @{$Option{keys_scroll_left}};
+	    $fp->CanvasBind ($_, sub { $fp->xview (scroll =>  5, "units") })
+		for "<Alt-Button-5>", @{$Option{keys_scroll_right}};
+
+	    $fp->CanvasBind ("<ButtonPress-1>", sub {
+		my $e = $fp->XEvent or return;
+		my %ev = map { ( "S$_" => $e->$_ ) } "x", "y";
+		my $action = 0;	# new
+		if ($selection{Sx} >= 0) {
+		    # I already have a selection, check to see if it
+		    # is being resized
+		    abs ($ev{Sx} - $selection{Sx}) < 3 and $action |= 001;
+		    abs ($ev{Sy} - $selection{Sy}) < 3 and $action |= 002;
+		    abs ($ev{Sx} - $selection{Ex}) < 3 and $action |= 010;
+		    abs ($ev{Sy} - $selection{Ey}) < 3 and $action |= 020;
+		    }
+		$action or %selection = (%ev, Ex => $ev{Sx}, Ey => $ev{Sy});
+		$fp->CanvasBind ("<Motion>", sub {
+		    my $m = $fp->XEvent or return;
+		    my ($mx, $my) = ($m->x, $m->y);
+		    $fp->delete ("selection");
+		    $action ==  0 and @selection{"Ex", "Ey"} = ($mx, $my);
+		    $action & 001 and $selection{"Sx"} = $mx;
+		    $action & 002 and $selection{"Sy"} = $my;
+		    $action & 010 and $selection{"Ex"} = $mx;
+		    $action & 020 and $selection{"Ey"} = $my;
+		    my @x = sort { $a <=> $b } @selection{qw( Sx Ex )};
+		    my @y = sort { $a <=> $b } @selection{qw( Sy Ey )};
+		    my @s = ($x[1] - $x[0] + 1, $y[1] - $y[0] + 1);
+		    $fp->createRectangle ($x[0], $y[0], $x[1], $y[1],
+			-outline => $Option{selectioncolor},
+			-tags    => "selection");
+		    $fp->createText ($x[0] + 2, $y[0] + 2,
+			-anchor  => "nw",
+			-fill    => $Option{selectioncolor},
+			-font    => $Option{selectionfont},
+			-text    => "$s[0]x$s[1]",
+			-tags    => "selection",
+			);
+		    });
+		});
+
+	    $fp->CanvasBind ("<ButtonRelease-1>", sub {
+		if (exists $selection{Sx} and
+		      abs ($selection{Sx} - $selection{Ex}) < 5 ||
+		      abs ($selection{Sy} - $selection{Ey}) < 5) {
+		    $fp->delete ("selection");
+		    reset_selection ();
+		    }
+		$fp->CanvasBind ("<Motion>", sub {});
+		});
+
+	    # indicate this pic in the thumbview
+	    $tn[$_]{wdgt}->configure (-bg => "Gray") for 0 .. $#tn;
+	      $pr->{wdgt}->configure (-bg => "Black");
+
+	    $fp->update;
+	    ref $pr->{$size}{phot} eq "Tk::Animation" and
+		$pr->{$size}{phot}->start_animation ();#$pr->{exif}{Animated});
+	    #$iv->focusForce;
+
+	    $old_iv && Exists ($old_iv) and $old_iv->destroy;
+
+	    my ($_pic, $_next_pic, $_next_firstnext, $_next_firstprev, $quit);
+	    $_pic = sub {
+		@tn or return;
+		$ti = shift;
+		$sls and $aid = $mw->after ($sls, $_next_pic);
+		$f11->($vs);
+		}; # next_pic
+
+	    $_next_pic = sub {
+		if ($aid) {
+		    $aid->cancel;
+		    $aid = undef;
+		    }
+		$ti == $#tn
+		    ? $Option{lastfirstnext}
+			? $_next_firstnext->()
+			: $_pic->(0)
+		    : $_pic->($ti + 1);
+		}; # next_pic
+
+	    $_next_firstnext = sub {
+		$quit->();
+		$opt_1 = 2;
+		dirnext ();
+		};
+
+	    $_next_firstprev = sub {
+		$quit->();
+		$opt_1 = 2;
+		dirprev ();
+		};
+
+	    # Destroy
+	    $quit = sub {
+		$sls = 0;
+		$zs  = undef;
+		if ($aid) {
+		    $aid->cancel;
+		    $aid = undef;
+		    }
+		Exists ($fp) and $fp->destroy; $fp = undef;
+		Exists ($iv) and $iv->destroy; $iv = undef;
+		Exists ($bg) and $bg->destroy; $bg = undef;
+		$mw->update;
+		#$mw->grab;
+		#$mw->focusForce;
+		#$dt->focusForce;
+		}; # sub_quit
+
+	    my $_rotate = sub {
+		$sls = 0;
+		for (keys %$pr) {
+		    $_ eq "thmb" and next;
+		    my $p = $pr->{$_};
+		    ref $p eq "HASH" && exists $p->{phot} and undef $pr->{$_}{phot};
+		    }
+		$pr->{angl} = ($pr->{angl} + $_[0]) % 360;
+		$f11->($fs);
+		}; # rotate
+
+	    my $_zoom = sub {
+		$sls = 0;
+		$fs eq "full" || $fs eq "1" and return;	# No zoom from Full-screen
+		$fs eq "orig" || $fs eq "0" and $fs = 100;
+		$fs ||= 100;
+		my $zf = int ($_[0] * $fs);
+		# with 20% increase steps:
+		for (qw( 2 3 4 5 7 9 11 14 17 21 26 32 39 47 57 69 83 100 120
+		     144 172 206 247 296 355 426 511 613 735 882 1058 1269 1522
+		     1826 2191 2629 3154 3784 4540 5448 6537 7844 9412 )) {
+		    $zf <= ($_ * 1.12) and return $f11->($_);
+		    }
+		$f11->(11300);	# Max enlargement
+		}; # zoom
+
+	    foreach my $W ($fp, $iv) {
+		$W && Exists ($W) or next;
+
+		# Toggle Full-Screen
+		$W->bind ($_, $f11) for @{$Option{keys_fullscreen}};
+		$W->bind ($_, sub {
+		    $Option{imagefull} ^= 1;
+		    $f11->($opt_f = $Option{imagefull});
+		    }) for @{$Option{keys_full_toggle}};
+
+		# Go Full-Screen and store
+		$W->bind ($_, sub {
+		    $Option{imagefull} = 1;
+		    if (open my $ivrc, ">>", "$Idir/.ivrc") {
+			print $ivrc "ImageFull\t= 1\n";
+			close $ivrc;
+			}
+		    $f11->($vs = 1);
+		    }) for @{$Option{keys_full_rc}};
+
+		# First pic
+		$W->bind ($_, sub {
+		    $sls = 0;
+		    $_pic->(0);
+		    }) for @{$Option{keys_firstpic}};
+
+		# First pic and minimize thumbnails
+		$W->bind ($_, sub {
+		    $sls = 0;
+		    $_pic->(0);
+		    $mw->iconify;
+		    $iv->deiconify;
+		    $iv->raise;
+		    $iv->focusForce;
+		    }) for @{$Option{keys_firstminimize}};
+
+		# Restore and focus thumbnail window
+		$W->bind ($_, sub {
+		    $mw->deiconify;
+		    $mw->raise;
+		    $mw->focusForce;
+		    }) for @{$Option{keys_focusthumbs}};
+
+		# Next pic
+		$W->bind ($_, sub {
+		    $sls = 0;
+		    $_next_pic->();
+		    }) for @{$Option{keys_nextpic}};
+
+		# First pic of next set
+		$W->bind ($_, sub {
+		    $sls = 0;
+		    $_next_firstnext->();
+		    }) for @{$Option{keys_firstnext}};
+
+		# First pic of prev set
+		$W->bind ($_, sub {
+		    $sls = 0;
+		    $_next_firstprev->();
+		    }) for @{$Option{keys_firstprev}};
+
+		# Prev pic
+		$W->bind ($_, sub {
+		    $sls = 0;
+		    $_pic->($ti == 0 ? $#tn : $ti - 1);
+		    }) for @{$Option{keys_prevpic}};
+
+		# Last pic
+		$W->bind ($_, sub {
+		    $sls = 0;
+		    $_pic->($#tn);
+		    }) for @{$Option{keys_lastpic}};
+
+		$W->bind ($_, $quit)	for @{$Option{keys_quit}};
+		$W->bind ($_, \&exit)	for @{$Option{keys_quit_all}};
+
+		# Rotate right
+		$W->bind ($_, sub {
+		    $_rotate->(90);
+		    }) for @{$Option{keys_rotright}};
+
+		# Rotate left
+		$W->bind ($_, sub {
+		    $_rotate->(-90);
+		    }) for @{$Option{keys_rotleft}};
+
+		if ($exiftool) {
+		    my $ExifOrient = sub {
+			my ($file, $ori) = @_;
+			my $ro = "Rotate $ori CW";
+			my $et = Image::ExifTool->new ();
+			my $e = $et->ImageInfo ($file) or die;
+			(my $conv = $file) =~ s/\b(pict|hpim|dsc[_fn])(\d+)/conv$1/i;
+			$conv eq $file and $conv =~ s/(.*\.)/$1_conv/;
+			$et->SetNewValue ("Orientation" => $ro);
+			$et->SetNewValue ("Rotation"    => "Horizontal");
+			if ($et->WriteInfo ($file, $conv)) {
+			    -s $conv or die "ExifTool::WriteInfo failed!";
+			    if ($exiftran) {
+				(my $etf = $conv) =~ s/conv/conv_et$$/;
+				system "exiftran", "-a", "-o", $etf, $conv;
+				if (-s $etf) {
+				    unlink $conv, $file;
+				    move $etf, $file;
+				    return 0;
+				    }
+				warn "exiftran failed (again)\n";
+				}
+			    unlink $file;
+			    move $conv, $file;
+			    return $ori;
+			    }
+
+			my $wrn = $et->GetValue ("Error");
+			my $err = $et->GetValue ("Warning");
+			my $msg = "Cannot write converted file $conv:\n";
+			$err and $msg .= "   $err\n";
+			$wrn and $msg .= "   $wrn\n";
+			warn $msg;
+			return 0;
+			}; # ExifOrient
+
+ 		    # Rotate right
+		    $W->bind ($_, sub {
+			Exists ($fp) and $fp->destroy; $fp = undef;
+			Exists ($iv) and $iv->destroy; $iv = undef;
+			Exists ($bg) and $bg->destroy; $bg = undef;
+			$_rotate->($ExifOrient->($pr->{phys}{file}, 90));
+			}) for @{$Option{keys_rotexifr}};
+
+		    # Rotate left
+		    $W->bind ($_, sub {
+			Exists ($fp) and $fp->destroy; $fp = undef;
+			Exists ($iv) and $iv->destroy; $iv = undef;
+			Exists ($bg) and $bg->destroy; $bg = undef;
+			$_rotate->($ExifOrient->($pr->{phys}{file}, 270));
+			}) for @{$Option{keys_rotexifl}};
+		    }
+
+		# Zoom in
+		$W->bind ($_, sub {
+		    $_zoom->(1.2);
+		    }) for @{$Option{keys_zoomin}};
+
+		# Zoom out
+		$W->bind ($_, sub {
+		    $_zoom->(0.8);
+		    }) for @{$Option{keys_zoomout}};
+
+		# Set image position
+		foreach my $pos (@loc) {
+		    my $key = "keys_imgpos_$pos";
+		    exists $Option{$key} or next;
+		    $W->bind ($_, sub {
+			$ip = $pos;
+			$f11->($fs);
+			}) for @{$Option{$key}};
+		    }
+
+		# Original size & options
+		if ($W == $iv) {
+		    $W->bind ($_, sub {
+			$sls = 0;
+			$f11->($fs = "orig");
+			}) for @{$Option{keys_origsize}};
+		    }
+
+		# Fit width
+		$W->bind ($_, sub {
+		    $f11->(int (100 * $cx / $pr->{orig}{wdth}));
+		    }) for @{$Option{keys_fitwidth}};
+
+		# Fit height
+		$W->bind ($_, sub {
+		    $f11->(int (100 * $cy / $pr->{orig}{hght}));
+		    }) for @{$Option{keys_fitheight}};
+
+		# Crop image to selection box
+		$W->bind ($_, sub {
+		    #warn "Crop at $fs (@{[%selection]})\n";
+		    # $fs = orig / 0
+		    #       full / 1
+		    #       10 .. 11300 (%)
+		    $fs eq "orig" || $fs eq "0" or return; # Not yet supported
+		    $selection{Sx} >=0 && $selection{Ex} >= 0 or return;
+		    my ($sx, $ex) = sort { $a <=> $b } @selection{qw( Sx Ex )};
+		    my ($sy, $ey) = sort { $a <=> $b } @selection{qw( Sy Ey )};
+		    $sls = 0;
+		    for (keys %$pr) {	# Clean up resized images
+			$_ eq "thmb" and next;
+			my $p = $pr->{$_};
+			ref $p eq "HASH" && exists $p->{phot} or next;
+			undef  $pr->{$_}{phot};
+			delete $pr->{$_};
+			}
+		    $pr->{angl} = 0;
+		    if (my $ph = $tn->PhotoXYXY ($pr->{phys}{file}, $sx, $sy, $ex, $ey)) {
+			my ($cut_w, $cut_h) = ($ex - $sx + 1, $ey - $sy + 1);
+			$pr->{phys_org}{file} = $pr->{phys}{file};
+			$pr->{phys} = {
+			    file => $selection{file},
+			    dir  => $tmp,
+			    size => -s $selection{file},
+			    titl => "Cropped ". $pr->{phys}{titl},
+			    };
+			$pr->{orig} = {
+			    hght => $cut_h,
+			    wdth => $cut_w,
+			    phot => $ph,
+			    };
+			my ($cut_fx, $cut_fy) = ($cx / $cut_w, $cy / $cut_h);
+			my $cut_ff = $cut_fx < $cut_fy ? $cut_fx : $cut_fy;
+			my ($cut_fX, $cut_fY) = map { int } ($cut_ff * $cut_w, $cut_ff * $cut_h);
+			$pr->{full} = {
+			    phot => undef,
+			    wdth => $cut_fX,
+			    hght => $cut_fY,
+			    };
+			$f11->("orig");
+			}
+		    else {
+			-f $selection{file} and unlink $selection{file};
+			reset_selection ();
+			}
+		    }) for @{$Option{keys_crop}};
+
+		# Delete Image
+		$W->bind ($_, sub {
+		    $sls and return;	# No delete during slide show
+		    @tn && $ti >= 0 && $ti <= $#tn or return;
+		    my $file = $pr->{phys}{file};
+		    if ($Option{confirmdelete}) {
+			my $d = $w->Dialog (
+			    -title   => "Confirm delete",
+			    -text    => "Do you want to remove $file?",
+			    -bitmap  => "question",
+			    -buttons => [qw( Yes No )],
+			    -default_button => "No",
+			    );
+			$d->Show (-global) eq "Yes" or return;
+			}
+		    -l $file && $Option{removetarget} and unlink readlink $file;
+		    unlink $file;
+		    $quit->();
+		    if ($Option{thumbrefresh} || $ti == $#tn) {
+			$tn[-1]{wdgt}->destroy;
+			foreach my $i (reverse (($ti + 1) .. $#tn)) {
+			    my $upd_w = $tn[$i]->{wdgt} = $tn[$i - 1]{wdgt};
+			    $upd_w->configure (-image => $tn[$i]{thmb}{phot});
+			    $upd_w->update;
+			    }
+			$ni--;
+			$tr--;
+			$tn[$ti]{orig}{phot} and $or--;
+			$tn[$ti]{full}{phot} and $fr--;
+			splice @tn, $ti, 1;
+			$ti > $#tn and $ti--;
+			}
+		    else {
+			$ti++;
+			}
+		    if (@tn) {
+			$f11->($vs);
+			}
+		    else {
+			$Option{removetarget} and rmdir $Idir;
+			$refreshing = "";
+			-d $idir ? dtcmd ($idir) : dirup ();
+			}
+		    }) for @{$Option{keys_delete}};
+
+		# Options
+		if ($W == $fp) {
+		    $W->bind ($_, \&options)   for @{$Option{keys_options}};
+		    }
+
+		# Start Slideshow
+		$W->bind ($_, sub {
+		    $sls = $def_sls;
+		    $aid = $iv->after ($sls, $_next_pic);
+		    }) for @{$Option{keys_slideshow}};
+
+		$W->bind ($_, sub {
+		    $sls and return;	# No exif during slide show
+		    @tn && $ti >= 0 && $ti <= $#tn or return;
+		    show_exif ($pr->{exif});
+		    }) for @{$Option{keys_exif}};
+
+		$W->bind ($_, sub {
+		    $sls and return;	# Not during slide show
+		    @tn && $ti >= 0 && $ti <= $#tn or return;
+		    $Option{showexifinfo} ^= 1;
+		    show_exifinfo ($fp, $pr->{exif});
+		    }) for @{$Option{keys_exifinfo}};
+
+		$W->bind ($_, sub {
+#		    $iv->overrideredirect ($Option{decoration});
+#		    $iv->update;
+		    $Option{decoration} ^= 1;
+		    }) for @{$Option{keys_decoration}};
+		}
+
+#	    unless ($Option{decoration}) {
+#		$_->overrideredirect (1) for $iv, $iv->parent;
+#		}
+
+	    if ($trg eq "show") {
+		$trg = "";
+		$sls == $def_sls and return; # Already running
+		warn "Let the show begin! ...\n";
+		$sls = $def_sls;
+		return $_pic->($ti);
+		}
+	    };
+
+	if ($opt_s) {
+	    $opt_s = 0;
+	    $f11->($Option{slidefull}, $ti, "show");
+	    }
+
+	my $ci = $#tn;
+	# Bind actions for this thumb
+	$w->Tk::bind ("<1>", sub {
+	    $ti = $ci;
+	    $f11->($vs);
+	    }); # Show pic for thumb
+	# Attach the info
+	my $bmsg = join "\n",
+	    "$pf - $ps bytes",
+	    "O ($x x $y), F ($fX x $fY)";
+	$tb->attach ($w,
+	    -balloonposition => "mouse",
+	    -postcommand     => sub {
+		my $self = shift;
+		join ",", $self->rootx - 20, $self->rooty - 60;
+		},
+	    -balloonmsg      => $bmsg,
+	    -msg => {
+		Background   => $bmsg,
+		tick         => $bmsg,
+		});
+
+	# Show pic if on command line
+	if ($pic and $img eq $pic) {
+	    undef $pic;
+	    $ti = $ci;
+	    $f11->($vs);
+	    }
+
+	# Display the thumbnail
+	$w->update;
+
+	if ($opt_1 && $tr == 1) {
+	    my $action = $opt_1;
+	    $opt_1 = 0;
+	    $ti = 0;
+	    $f11->($vs);
+	    $action == 1 and $mw->iconify;
+	    $iv->deiconify;
+	    $iv->raise;
+	    $iv->focusForce;
+	    }
+	}
+
+    $refreshing = "";
+    $earlyopennextdir and openupdir ();
+    }; # dtcmd
+
+# Still need to find out how to (optionally) hide everything that
+# leads to $dir, making $dir to appear as tree root
+my $df = $mw->Frame ()->pack (-side => "left", @dpo);
+$dt = $df->Scrolled ("DirTree",
+    -scrollbars => "osoe",
+
+    -width      => 18,
+
+    -directory	=> $dir,
+    -browsecmd  => sub {
+	$dt->xview (moveto => .60);
+	#warn "dtcmd (@_) from scrolled, coming from $idir!\n";
+	dtcmd (@_);
+	},
+
+    # Tk::Hlist options
+    -drawbranch => 1,
+    )->pack (-side => "top", @dpo);
+$dt->Subwidget ("${_}scrollbar")->configure (-width => 6) for qw( x y );
+$dt = $dt->Subwidget ("scrolled");
+bind_wheel ($dt, $dt, 10);
+# I want <Left> to close a folder expand, and <Right> to expand it
+# I also want the focus to follow keyboard actions
+$dt->autosetmode;
+
+sub dirup
+{
+    (my $up = $idir) =~ s:/[^/]+$:: or return;
+    $dt->close ($idir);
+    $dt->setmode ($idir, "close");
+    $dt->close ($idir);
+
+    $dt->chdir ($up);
+    $dt->open  ($up);
+    $dt->setmode ($up, "open");
+    $dt->open  ($up);
+    $dt->xview (moveto => .60);
+    dtcmd ($up);
+    } # dirup
+
+sub openupdir
+{
+    (my $up = $idir) =~ s:/[^/]+$:: or return;
+
+    $dt->chdir ($up);
+    $dt->open  ($up);
+    $dt->chdir ($idir);
+    return ($dt->child_entries ($up, 1), $idir);
+    } # openupdir
+
+sub dirnext
+{
+    (my $up = $idir) =~ s:/[^/]+$:: or return;
+
+    my @dir = openupdir ();
+
+    shift @dir while $dir[0] ne $idir;
+    @dir > 1 && $dir[0] ne $dir[1] or return;
+
+    $dt->close ($idir);
+    $dt->chdir ($up);
+    $dt->open  ($up);
+    $dt->chdir ($up = $dir[1]);
+    $dt->open  ($up);
+    $dt->xview (moveto => .60);
+    dtcmd ($up);
+    } # dirnext
+
+sub dirprev
+{
+    (my $up = $idir) =~ s:/[^/]+$:: or return;
+
+    my @dir = reverse openupdir ();
+    push @dir, shift @dir;
+
+    shift @dir while $dir[0] ne $idir;
+    @dir > 1 && $dir[0] ne $dir[1] or return;
+
+    $dt->close ($idir);
+    $dt->chdir ($up);
+    $dt->open  ($up);
+    $dt->chdir ($up = $dir[1]);
+    $dt->open  ($up);
+    $dt->xview (moveto => .60);
+    dtcmd ($up);
+    } # dirprev
+
+$dt->bind ($_, sub {
+    (my $up = $idir) =~ s:/[^/]+$:: or return;
+    $dt->open  ($up);
+    $dt->chdir ($idir);
+    $dt->open  ($idir);
+    $dt->xview (moveto => .60);
+    dtcmd ($idir);
+    }) for qw( <greater> );
+
+my @fs  = (-font => $Option{smallfont});
+my @fsv = (@fs, -foreground => "Maroon");
+my @fst = (@fs, -foreground => "Navy");
+$df->Label (-textvariable => \$ti, @fsv)->pack (-side => "left");
+$df->Label (-text         => "#",  @fst)->pack (-side => "left");
+$df->Label (-textvariable => \$ni, @fsv)->pack (-side => "left");
+$df->Label (-text         => "T",  @fst)->pack (-side => "left");
+$df->Label (-textvariable => \$tr, @fsv)->pack (-side => "left");
+$df->Label (-text         => "O",  @fst)->pack (-side => "left");
+$df->Label (-textvariable => \$or, @fsv)->pack (-side => "left");
+$df->Label (-text         => "F",  @fst)->pack (-side => "left");
+$df->Label (-textvariable => \$fr, @fsv)->pack (-side => "left");
+$df->Label (-text         => "¤",  @fst)->pack (-side => "left");
+$df->Label (-textvariable => \$zs, @fsv)->pack (-side => "left");
+$df->Label (-text         => "*",  @fst)->pack (-side => "left");
+$df->Label (-textvariable => \$Option{decoration},
+                                   @fsv)->pack (-side => "left");
+
+$tn = $mw->Scrolled ("Frame",
+    -width      => $tnx * $tpx + 45,
+    -height     => .65 * $cy,
+
+    -scrollbars => "osoe",
+    )->pack (-anchor => "nw", -side => "right", -expand => 0, -fill => "both");
+$tn->Subwidget ("${_}scrollbar")->configure (-width => 6) for qw( x y );
+$tg = $tn->Subwidget ("scrolled");
+bind_wheel ($mw, $tn, 10);
+$tg->gridRowconfigure    (0, -weight => 1); # allow expansion in both ...
+$tg->gridColumnconfigure (0, -weight => 1); # ... X and Y dimensions
+
+$mw->geometry (loc ($tp, 200 + $tnx * $tpx + 45, .65 * $cy));
+
+foreach my $W ($df, $dt, $tn, $tg, $mw) {	# not $mw, would cause double starts
+    $W->bind ($_ => \&exit) for @{$Option{keys_quit}}, @{$Option{keys_quit_all}};
+    # First pic
+    $W->bind ($_, sub {
+	$f11 or return;
+	$ti = 0;
+	$f11->($vs);
+	}) for @{$Option{keys_firstpic}};
+    # Last pic
+    $W->bind ($_, sub {
+	$f11 or return;
+	$ti = $#tn;
+	$f11->($vs);
+	}) for @{$Option{keys_lastpic}};
+    # Start Slideshow
+    $W->bind ($_, sub {
+	$f11 or return;
+	$ti < 0 and $ti = 0;
+	$f11->($Option{slidefull}, $ti, "show");
+	}) for @{$Option{keys_slideshow}};
+    }
+$mw->bind ($_, \&options) for @{$Option{keys_options}};
+
+dtcmd ($dir);
+$dt->update;
+$dt->yview (moveto => $Option{dirtreestartpos});
+
+#$dt->focusForce;
+
+MainLoop;

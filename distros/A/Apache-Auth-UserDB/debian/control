@@ -1,0 +1,18 @@
+Source: apache-auth-userdb-perl
+Section: perl
+Priority: optional
+Maintainer: Julian Mehnle <julian@mehnle.net>
+Build-Depends: debhelper (>= 5)
+Build-Depends-Indep: perl (>= 5.6), libmodule-build-perl, libversion-perl
+Standards-Version: 3.7.2
+
+Package: libapache-auth-userdb-perl
+Architecture: all
+Depends: perl (>= 5.6), libdigest-md5-perl, ${misc:Depends}
+Description: Manipulation of Apache user authentication databases
+ Using the Apache::Auth::UserDB::* modules, you can read, manipulate, and write
+ Apache user authentication databases.  Both basic and digest authentication
+ databases are supported.
+ .
+ The following database types are currently supported:
+   * File: htpasswd/htdigest-style text files.

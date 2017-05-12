@@ -1,0 +1,62 @@
+=encoding utf8
+
+
+This is Perl module B<App::Randf>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/App-Randf"><img src="https://secure.travis-ci.org/bayashi/App-Randf.png?_t=1440937201"/></a> <a href="https://coveralls.io/r/bayashi/App-Randf"><img src="https://coveralls.io/repos/bayashi/App-Randf/badge.png?_t=1440937201&branch=master"/></a> <a href="http://cpants.cpanauthors.org/dist/App-Randf"><img src="http://cpa
+nts.cpanauthors.org/dist/App-Randf.png"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+App::Randf installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan App::Randf
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+=head2 Downloading the standalone executable
+
+You can also copy the standalone executable to whatever location you'd like.
+
+    % cd ~/bin
+    % curl -o randf -L http://bit.ly/app-randf
+    % chmod +x randf
+
+NOTE: edit shebang if you don't have /usr/bin/env
+
+
+=head1 DOCUMENTATION
+
+App::Randf documentation is available as in POD. So you can do:
+
+    % perldoc App::Randf
+
+
+=head1 REPOSITORY
+
+App::Randf is hosted on github
+L<http://github.com/bayashi/App-Randf>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

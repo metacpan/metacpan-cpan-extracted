@@ -1,0 +1,14 @@
+Changes
+examples/game_ai.pl
+examples/logical_or.pl
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+Simple.xs
+lib/AI/NeuralNet/Simple.pm
+t/10nn_simple.t
+t/20nn_multi.t
+t/30nn_storable.t
+t/pod-coverage.t
+t/pod.t

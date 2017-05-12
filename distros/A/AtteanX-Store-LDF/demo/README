@@ -1,0 +1,9 @@
+To create an LDF server change the test.json file to set up a correct path to a Turtle file,
+then run:
+
+ $ ./boot.sh
+
+A LDF endpoint should now be available at http://localhost:8000/fragments
+
+ $ curl -H "Accept: text/turtle" http://localhost:8000/fragments
+

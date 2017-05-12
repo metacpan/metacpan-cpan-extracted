@@ -1,0 +1,12 @@
+Changes
+DonMartin.pm
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+eg/freq.orig
+eg/freq.out
+eg/freq.pl
+eg/hello.pl
+t/01-basic.t

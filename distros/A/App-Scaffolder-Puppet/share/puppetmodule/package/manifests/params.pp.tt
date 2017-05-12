@@ -1,0 +1,8 @@
+#
+# = Class: [% name %]::params
+#
+# Parameter class for [% name %].
+#
+class [% name %]::params {
+    $package = '[% package %]'
+}

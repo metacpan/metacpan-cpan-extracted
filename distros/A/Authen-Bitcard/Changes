@@ -1,0 +1,18 @@
+0.87 - September 14, 2009
+  - Add Class::ErrorHandler to the prereqs list
+  - Update documentation
+
+0.86 - July 4th 2006
+  - Add the Changes file to the distribution
+  - register_url method
+  - bump version to 4
+  - prepare to support "unconfirmed users"
+  - Use ExtUtils::MakeMaker instead of Module::Build
+
+0.85 - July 21th 2005
+  - New API, works with http://www.bitcard.org/
+
+0.50 - July 3rd 2004
+  - Initial release
+
+

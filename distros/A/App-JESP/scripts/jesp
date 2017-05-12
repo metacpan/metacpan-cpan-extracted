@@ -1,0 +1,13 @@
+#! /usr/bin/env perl -w
+
+#-*- mode: Perl -*-
+# vim: set syntax=perl:
+use strict;
+use warnings;
+
+use App::JESP::Cmd;
+
+my $app = App::JESP::Cmd->new();
+
+$app->run();
+

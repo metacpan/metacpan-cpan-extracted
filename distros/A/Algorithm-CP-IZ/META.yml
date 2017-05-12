@@ -1,0 +1,23 @@
+---
+abstract: 'Perl interface for iZ-C library'
+author:
+  - 'Toshimitsu FUJIWARA <tttfjw at gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: 'artistic_2'
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-CP-IZ
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  UNIVERSAL: '0'
+version: '0.02'
+

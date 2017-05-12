@@ -1,0 +1,142 @@
+#!/usr/bin/perl
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Cwd;
+use Getopt::Long;
+use File::Spec::Functions qw(splitdir catfile);
+
+use App::Followme;
+use App::Followme::Initialize qw(initialize);
+
+my ($init, $help);
+GetOptions('init|i' => \$init, 'help|h' => \$help);
+
+my $filename = shift @ARGV;
+my $config = configuration_file();
+my $quick_update = set_quick_update($filename);
+my $directory = set_directory($filename);
+
+if ($help) {
+    show_help();
+
+} elsif ($init) {
+    initialize($directory);
+
+} else {
+    my $app = App::Followme->new(configuration_file => $config,
+                                 quick_update => $quick_update);
+    $app->run($directory);
+}
+
+#----------------------------------------------------------------------
+# Construct configuration file name
+
+sub configuration_file {
+    my @path = splitdir($0);
+    my $basename = pop(@path);
+    $basename .= '.cfg';
+
+    return $basename;
+}
+
+#----------------------------------------------------------------------
+# Change directory to filename or directory containing filename if passed
+
+sub set_directory {
+    my ($filename) = @_;
+
+    if (defined $filename) {
+        if (-d $filename) {
+            chdir($filename);
+
+        } else {
+            my @path = splitdir($filename);
+            pop(@path);
+            chdir(catfile(@path)) if @path;
+        }
+    }
+
+    my $directory = getcwd();
+    return $directory;
+}
+
+#----------------------------------------------------------------------
+# Set quick update mode
+
+sub set_quick_update {
+    my ($filename) = @_;
+
+    my $quick_update = defined $filename && ! -d $filename;
+    return $quick_update;
+}
+
+#----------------------------------------------------------------------
+# Print the help file
+
+sub show_help {
+    print <<'EOQ';
+
+Usage: followme [file or directory]
+
+Update a static website after changes. Constant portions of each page are
+updated to match, text files are converted to html, and indexes are created
+for new files in the archive.
+
+The script is run on the directory or file passed as its argument. If no
+argument is given, it is run on the current directory.
+
+If a file is passed, the script is run on the directory the file is in. In
+addition, the script is run in quick mode, meaning that only the directory
+the file is in is checked for changes. Otherwise not only that directory, but
+all directories below it are checked.
+
+Options:
+
+-h --help    print this help
+-i --init    copy default templates and configurations to directory
+
+EOQ
+    return;
+}
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+followme - Simple static website creation and maintenance
+
+=head1 SYNOPSIS
+
+followme [file or directory]
+
+=head1 DESCRIPTION
+
+Updates a static website after changes. Constant portions of each page are
+updated to match, text files are converted to html, and indexes are created
+for files in the archive.
+
+The script is run on the directory or file passed as its argument. If no
+argument is given, it is run on the current directory.
+
+If a file is passed, the script is run on the directory the file is in. In
+addition, the script is run in quick mode, meaning that only the directory
+the file is in is checked for changes. Otherwise not only that directory, but
+all directories below it are checked.
+
+head1 LICENSE
+
+Copyright (C) Bernie Simon.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Bernie Simon E<lt>bernie.simon@gmail.comE<gt>
+
+=cut

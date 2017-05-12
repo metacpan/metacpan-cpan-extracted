@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 4967761a84f5fd66ea23320ca6207da4361f324c COPYRIGHT
+SHA1 8d2ed0c279dc95b1353fd193fe9efc2c382e146f CREDITS
+SHA1 4514728e7071048d1d13a129a26f061ab583cb47 Changes
+SHA1 47ba667141cf2fb1220a49047c729b82ae052793 INSTALL
+SHA1 07979035d1028ff22101063841c8b256374467b9 LICENSE
+SHA1 5f7b6eb31bf64289c7dbfd805aec57af8c1976d0 MANIFEST
+SHA1 a23796865c622a21e752615457bfa1d17313f64b META.json
+SHA1 484a5b51d09c99b664f4a92e713fcfbf02a445ea META.yml
+SHA1 dc9d260ef4426e98b2e3b284843c75d9d694999b Makefile.PL
+SHA1 530e716834b1fd0c12aa99adf2b7b611c3782c87 README
+SHA1 31420711b842141d6972b97014bd73ace8262f1e dist.ini
+SHA1 1740d7f1804bb7f333bf5d6ec5e8c40444675e36 doap.ttl
+SHA1 cd3956bd2f8f0247bd3d1ae96f493f3f01a7f00a lib/AtteanX/Model/SPARQL.pm
+SHA1 84e99d4c655c4eacd867c31c702e7d5ea03d19e3 lib/AtteanX/Plan/SPARQLBGP.pm
+SHA1 8f77df18114d6efe0749f2ec361e9ec877b31e2e lib/AtteanX/Query/AccessPlan/SingleQuadBGP.pm
+SHA1 4a1ba9731baf007dd757cf58fb17a8dc7201ebaa lib/AtteanX/Store/SPARQL.pm
+SHA1 6c1eb457f1880d437a07ea529a57133b083f1f4c lib/Test/Attean/Store/SPARQL/Role/CreateStore.pm
+SHA1 0c83368eaa7c8f997c9f02a0bfc8db54da426639 t/plan.t
+SHA1 7cf7dbdab72ee6fa1eef5d9d9fa847a727f95192 t/triplestore.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIVAwUBVzeiC3++6N86nkqlAQiXKw//SyEqjyd/uUeZJSlOKnuxLj/4xwj2d1sr
+WNSvqtVCA+bhjJKU+knktNAcwzC88hZp3EArBn9GmwDzmWrk3suWYhMYH6bWwEIN
+eDB+bw07grKL1zWtCEunrnwzb1ArWV1PtuJOtJQmZNl3++acmn8mQgD0hp84FVw3
+1SilsoPylX3zFUrB1dgwEemqMsqjA/TcGF0Qqno4rnBtakfqZ3Ur4A4/CdeHwUzj
+BbxIKWDp+JXnFKjcuYaK3m8mYx8/vIWhVSYUV3XmYFwdVzAdx0s2iAAZdw9veWT3
+S1ypb3lidfAmxaXAyxcsG26LWctRvGwWIflk2WR5dn7icmKAuN5XPWOp0rS+AXNh
+4EGu6jIOsA/VKuRMfcdlDDZtcVDTvu4/Ds0izjiBEhCUZDLdoF1vFTY2DWnOI4Fh
+pWGNXMf8SVI9gk/PWGdKi5j5DLlh2vBk+WpaCVVStswuBlgGu/geFI/k/dYqPo/U
+8kxNrjWGFTSOPehL6B9x0kwHa/zBQYJEmjS3u0uyFCy80h3xjl5AViyllL7ukKEI
+xBtP/hJ/k7dd6WJmebYFtsypoLSie38jUOB8LJmzimOc8P5wavEXC7QPTOS96cEB
+myBGNmY4p8JMiOiV7w6AEEKgGzkTgEMrEX0nM0fzn2xywGKLVe5OOHDMZBQb3BDZ
+Q0wdTtWa0i4=
+=Z30b
+-----END PGP SIGNATURE-----

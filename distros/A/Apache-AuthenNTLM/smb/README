@@ -1,0 +1,4 @@
+This is a slightly modified version of Authen::Smb for use with Apache::AuthenNTLM
+
+Authen::Smb allows you to authenticate users against an NT server.  See
+Smb.pm POD documentation for details.

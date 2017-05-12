@@ -1,0 +1,29 @@
+                                -=[Multiplayer Socialcalc]=-
+
+  >> See https://github.com/audreyt/socialcalc/wiki for an upcoming book chapter on this project! <<
+
+                                .oO( Setup Instructions )Oo.
+
+0. Install JSON, Fliggy, Protocol::WebSocket and Try::Tiny:
+
+    sudo cpan
+    cpan> notest install JSON Fliggy Protocol::WebSocket Try::Tiny
+
+1. Then check out this project and run the stand-alone server:
+
+    git clone git://github.com/audreyt/socialcalc.git
+
+    cd socialcalc
+    perl multiserver.pl
+
+2. Open port 9999 in multiple browsers with WebSocket support.
+
+3. See red triangles representing peer cursors.
+   Type in a browser, appears in all others!
+
+Browsers currently tested:
+    Native WebSocket: Safari 5, Chrome 5, Firefox 4 beta1.
+    Flash emulation: Firefox 3, Opera 10.
+
+Share & Enjoy!
+Audrey

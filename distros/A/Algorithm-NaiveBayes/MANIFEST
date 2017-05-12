@@ -1,0 +1,14 @@
+Build.PL
+Changes
+INSTALL
+lib/Algorithm/NaiveBayes.pm
+lib/Algorithm/NaiveBayes/Model/Discrete.pm
+lib/Algorithm/NaiveBayes/Model/Frequency.pm
+lib/Algorithm/NaiveBayes/Model/Gaussian.pm
+lib/Algorithm/NaiveBayes/Util.pm
+Makefile.PL
+MANIFEST
+META.yml
+t/01-basic.t
+t/02-discrete.t
+t/03-state.t

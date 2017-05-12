@@ -1,0 +1,78 @@
+Changes
+=======
+
+0.00012 - May 28 2015
+    - Fixed an integer underflow by completely redoing the binary
+      search -- this code was stolen from whatever ketama code
+      I stole the algorithm from, and so it used to exist for the
+      longest time... and so, in order to not break already hashed
+      data that probably exists in the wild, the old binary search
+      is left in tact.
+      You can change the search mechanism by passing "use_hashfunc"
+      parameter to the constructor
+
+0.00011 - Feb 18 2015
+    - The library now properly handles hashing binary data. Previously
+      it would expect NULL-terminated strings.
+
+    - Fixed a bug with the code segfaulting on some keys, e.g. the
+      pack "H*" versions of 161c6d14dae73a874ac0aa0017fb8340 and
+      37292b669dd8f7c952cf79ca0dc6c5d7
+
+      This was discovered "in the wild" in a system that deals with
+      billions of keys, htese keys just so happened to trigger a
+      segfault in the library due to how the binary search works.
+
+0.00010 - Mar 1 2013
+    - No code change. Just a re-release of 0.00009
+
+0.00009 - Oct 20 2012
+    - No code change
+    - Upgrade to Module::Install 1.06
+      (see http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04)
+
+0.00008 - May 15 2012
+    * Add hash_with_hashnum(), label_from_hashnum(). This allows clients to
+      cache the hashed values -- thus avoiding the need to recompute the
+      MD5 hash. However, you should make sure you know what you're doing
+      before using these (Steffen Mueller)
+      (https://github.com/lestrrat/Algorithm-ConsistentHash-Ketama/pull/1)
+
+0.00007 - Jun 3 2010
+    * How about actually using ppport.h?
+
+0.00006 - May 18 2010
+    * Fix cloning problems under threads 
+
+0.00005 - May 09 2010
+    * Remove superfulous code from constructor
+
+0.00004 - May 09 2010
+    * Fix memory leak
+
+0.00003 - May 08 2010
+    * Add bunch of thread safety changes
+
+0.00002 - May 03 2010
+    * Upload previous changes as 0.00002
+    * Add author tests
+    * Hide some XS methods
+    * Add more for Bucket.pm
+
+0.00001_03 - May 03 2010
+    * Allocate temporary variable continuum on heap instead of on stack
+    * Attempt to include math.h explicitly
+
+0.00001_02 - May 03 2010
+    * In search of a mysterious failure from cpantesters
+    * Tweak tests
+    * Updated Test::More dep
+
+0.00001_01 - May 02 2010
+    * Fix doc typos
+    * Apply some XS tweaks
+    * Add test_requires clause
+    * Add missing Changes file
+
+0.00001 - Apr 28 2010
+    * Initial release

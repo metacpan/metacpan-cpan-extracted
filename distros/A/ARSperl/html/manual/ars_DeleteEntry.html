@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_DeleteEntry(ctrl,schema,entry_id)</CODE></H2>
+
+      This function deletes the entry (row) in the schema matching 
+      <CODE>entry_id</CODE>.  <P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns 1.
+          <DT><B>On failure</B><DD>
+              Returns 0.
+      </DL>
+
+      <P>Example:
+
+      <PRE>
+      ars_DeleteEntry(ctrl,"Schema01",$entry_id) ||
+	die $ars_errstr;
+      </PRE>
+
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

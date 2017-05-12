@@ -1,0 +1,29 @@
+NAME
+    Acme::Licence - easily apply a licence to your code
+
+SYNOPSIS
+
+    use Acme::Licence; # and that's it!
+
+INSTALLATION
+
+    Do the usual:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DESCRIPTION
+
+    All code you release to the outside world needs to have a licence.
+    Acme::Licence makes it easy to apply a licence to your own code,
+    and just as importantly, to let the users know what the licence is.
+
+AUTHOR
+    David Cantrell (david@cantrell.org.uk)
+
+COPYRIGHT and LICENCE
+    Copyright (c) 2002, David Cantrell. This module is free software.
+    It may be used, redistributed and/or modified under the terms of
+    the LGPL.  This means - approximately - that the module itself is
+    GPLed but that it does not necessarily "infect" code that uses it.

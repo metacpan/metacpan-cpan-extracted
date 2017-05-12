@@ -1,0 +1,11 @@
+TIPS
+
+    To see background pattern, disable minor ticking by using -m ''.
+
+    To disable numbering, set number format to an empty string: -f '' or
+    --number-every 0.
+
+SEE ALSO
+
+    hr (App::hr)
+

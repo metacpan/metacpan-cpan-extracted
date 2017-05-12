@@ -1,0 +1,77 @@
+#!perl
+
+use strict;
+use warnings;
+use Getopt::Long qw/GetOptions :config bundling/;
+use Pod::Usage qw/pod2usage/;
+
+use App::Monitor::Simple qw/run/;
+
+my $opt = +{};
+
+GetOptions(
+    'i|interval=s'  => \$opt->{interval},
+    'r|retry=s'     => \$opt->{retry},
+    'q|quiet'       => \$opt->{quiet},
+    'h|help'        => \$opt->{help},
+);
+
+$opt->{command} = $ARGV[0];
+
+pod2usage(
+    -verbose => 2,
+    -noperldoc => 1,
+) if $opt->{help} || !$opt->{command};
+
+delete $opt->{help};
+delete $opt->{interval} unless $opt->{interval};
+delete $opt->{retry}    unless $opt->{retry};
+delete $opt->{quiet}    unless $opt->{quiet};
+
+my $ret = run($opt);
+exit $ret;
+
+__END__
+
+=head1 NAME
+
+monitor-simple - Simple monitoring tool.
+
+=head1 DESCRIPTION
+
+This module provides a simple monitoring.
+
+=head1 USAGE
+
+monitor-simple [options] 'command'
+
+=head2 Example
+
+=over 4
+
+=item monitor-simple 'curl http://hogehoge.co.jp/'
+
+=item monitor-simple -r 5 -i 10 -q 'ping -c 1 fugafuga.co.jp'
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item -i,--interval
+
+Number of interval seconds. (default: 5)
+
+=item -r,--retry
+
+Number of retry count. (default: 0)
+
+=item -q,--quiet
+
+suppress stdout / stderror messages. (dafailt: 0)
+
+=back
+
+=cut
+

@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Acme-Metification
+version:             1.01
+abstract:            Give Perl the power of Metaprogramming!
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Filter::Simple:                0.78
+    Test::More:                    0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Steffen Mueller <metification-module@steffen-mueller.net>

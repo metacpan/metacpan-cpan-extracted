@@ -1,0 +1,12 @@
+
+severity = 4
+
+[Bangs::ProhibitFlagComments]
+severity=5
+
+[Miscellanea::RequireRcsKeywords]
+severity=5
+keywords = Id URL
+
+[-Subroutines::RequireArgUnpacking]
+

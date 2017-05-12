@@ -1,0 +1,41 @@
+---
+abstract: 'CLI tool providing common manipulation on LDAP servers'
+author:
+  - 'shelling <navyblueshellingford@gmail.com>'
+  - 'shelling <navyblueshellingford@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-LDAP
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Authen::SASL: 0
+  Crypt::Password: 0.28
+  Date::Calc: 0
+  IO::String: 0
+  Modern::Perl: 0
+  Moose: 0
+  MooseX::Getopt: 0
+  MooseX::Singleton: 0
+  Namespace::Dispatch: 0.05
+  Net::LDAP: 0
+  Sub::Delete: 0
+  Term::Prompt: 0
+  Term::ReadPassword: 0
+  perl: 5.10.0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: http://github.com/shelling/app-ldap
+version: 0.1.2

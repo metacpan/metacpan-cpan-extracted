@@ -1,0 +1,97 @@
+package [% project_title %]::Base;
+
+use strict;
+use warnings;
+
+our $VERSION = [% project_version || '0.01' %];
+
+#----------------------------------------------------------------------------+
+# _new(\%controller)
+#
+# General object constructor.
+
+sub _new {
+    my $class = shift;
+    return bless({}, $class);
+}
+
+#----------------------------------------------------------------------------+
+# _global(\%controller)
+#
+# Add plugin global objects to the controller stash.
+
+sub _global {
+    my ($self, $c) = @_;
+
+[%- USE dir = Directory("$source/plugin/base") -%]
+
+[%- FOREACH file = dir.files %]
+[%  PROCESS "$source/plugin/base/$file.name" %]
+[%- END -%]
+
+    return $c;
+}
+
+#----------------------------------------------------------------------------+
+# _error( \%controller, $title, $value )
+#
+# Output a template based error message.
+
+sub _error {
+    my ($self, $c, $title, $value) = @_;
+
+    $c->request->content_type('text/html');
+
+    $c->template->process(
+        'error.tt',
+        {
+            title  => $title,
+            output => ( $c->config->{debug} == 1 ) ? $value : undef,
+        }
+      )
+      or die $c->template->error();
+
+    exit;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+[% project_title %]::Base
+
+=head1 SYNOPSIS
+
+  use [% project_title %]::Base;
+
+=head1 DESCRIPTION
+
+Common methods to be inherited by all classes.
+
+=head1 OBJECT METHODS
+
+=head2 _new
+
+General object constructor.
+
+  [% project_title %]::Base->_new;
+
+=head2 _global
+
+Add plugin global objects to the controller stash.
+
+  $self->_global(\%controller)
+
+=head2 _error
+
+Output a template based error messages.
+
+  $self->_error( \%controller, $title, $value )
+
+=head1 AUTHOR
+
+[% project_author || 'Your Name Here' %], E<lt>[% project_email || 'alias@domain.com' FILTER lower %]E<gt>
+
+=cut

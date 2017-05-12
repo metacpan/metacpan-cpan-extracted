@@ -1,0 +1,80 @@
+TODO:
+-----
+
+*documentation
+	architecture and relations between the script
+	output examples
+
+*input
+	make 'ordered' available fro the requirement module
+	
+* validation
+	check the category definition => can't start with /
+	invalid type, etc.. errors should display the invalid entry and the valid possibilities
+	check_requirement_format should check use case format too
+	
+* data manipulation
+	a requirement can add a sub category to its parent categories (??? nkh)
+	create_new_requirement should handle use case creation too
+
+* reporting
+	new dhtml renderer
+	requirement structure display displays the number of requirements in that catecory
+	
+	--show_requirement_field  field#1 (already possible through filter defined in file)
+	--show_requirement_field  field#2 (already possible through filter defined in file)
+	
+	requirement defining a category and that are sub requirements to a requirement in the same category are displayed once
+	
+	SRS generator generates a lookup table from section to requirement name
+	
+	generate graphs
+
+*Interface to user
+	Open the requirement in an editor when clicked in the  html document
+	copy, to the clipboard, the full category path
+	
+#-----------------------------------------------------------------------------------------------------------------------------
+
+DONE:	
+-----
+Scripts:
+	merge display_requirements_sorted_by_abstraction_level.pl and
+		display_requirements_sorted_by_abstraction_level_and_top_level_category.pl
+	
+	make generate_srs.pl a generic flat document generator
+	
+	merge generate_dhtml_requirements_structure.pl and
+		display_requirements_category_structure_breakdown_and_inheritance.pl
+
+*documentation
+	inline documentation
+
+*input
+	handle multiple source directories
+	convert all requirements to Linux line ending
+
+* validation
+	What happends if a requirement doesn't load properly
+		=> stop immediately
+
+	spell check requirement name and content
+	spell check categories
+	check that name == file name
+	check that the categories are defined in the master category definition
+
+* data manipulation
+	merge and compare master categories with existing requirements categories
+	check that requirements are not cyclic
+	inherit category from parent
+
+* reporting
+	generate flat html
+	report statistics if they are asked for on the command line
+	--show_requirement_type
+	--show_elements_of_type requirement --show_elements_of_type use_case
+
+*Interface to user
+
+
+

@@ -1,0 +1,26 @@
+# local prefix	<tab>	global number replacement
+"00"	  	""
+"0262"    	"262262"
+"0692"   	"262692"
+"0590"		"590590"
+"0690"		"590690"
+"0594"		"594594"
+"0694"		"594694"
+"0596"		"596596"
+"0696"		"596696"
+"0"		"33"
+
+# !!!HACK!!! Stuff that matches regex is replaced and re-evaluated !!!HACK!!!
+
+# <prefixe_dom> not followed by <prefixe_dom> or <mobile_dom>
+# should be turned into <prefixe_dom><prefixe_dom>
+"262262"	"262(?!262|692)"
+"590590"	"590(?!590|690)"
+"594594"	"594(?!594|694)"
+"596596"	"596(?!596|696)"
+
+# 33<prefixe_dom><mobile_dom> is really just <prefixe_dom><mobile_dom>
+"262692" 	"33262692.*?"
+"590690" 	"33590690.*?"
+"594694" 	"33594694.*?"
+"596696" 	"33596696.*?"

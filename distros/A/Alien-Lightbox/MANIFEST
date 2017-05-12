@@ -1,0 +1,15 @@
+Build.PL
+Makefile.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README.txt
+lightbox2.03.3.zip
+bin/lightbox-install
+inc/MY/Build.pm
+lib/Alien/Lightbox.pm
+t/01-loads.t
+t/02-install.t
+t/pod.t
+t/pod-coverage.t

@@ -1,0 +1,453 @@
+h1 { font-size: 16px; }
+h2 { font-size: 14px; }
+body { margin: 0px 12px 8px 4px; font-family: sans-serif; font-size: 12px; }
+code {
+	padding: 5px;
+	background-color: #eee;
+	border: 1px dashed #555;
+	display: block;
+	margin: 10px;
+	}
+table {
+	border-collapse: collapse;
+	border-spacing: 0px;
+	caption-side: top;
+	width: 100%;
+	margin: 0px 4px 4px 4px;
+	}
+.calendar, .calendar_full {
+	clear: both;
+	}
+.calendar_full table {
+	width: 100%;
+	}
+.calendar table {
+	width: 780px;
+	}
+.calendar_full td {
+	width: 14%;
+	}
+.calendar td {
+	width: 100px;
+	height: 100px;
+	}
+.calendar_today {
+	border: 2px solid #000;
+	}
+.calendar_blank {
+	background-color: #eee;
+	}
+.calendar_day {
+	color: #555;
+	font-weight: bold;
+	}
+.calendar_entry {
+	width: 100%;
+	padding: 2px;
+	background-color: #ddd;
+	}
+table.stable {
+	margin: 0px 0px 0px 0px;
+	border: 0px;
+	}
+table.stable td, table.stable th {
+	border: 0px;
+	vertical-align: top;
+	}
+table.stable th {
+	background-color: #eee;
+	text-align: right;
+	}
+pre {
+	white-space: -moz-pre-wrap !important;
+	}
+caption {
+	border-radius: 0px 12px 0px 0px;
+	-moz-border-radius: 0px 12px 0px 0px;
+	-webkit-border-top-right-radius: 12px;
+	border: 1px solid #bbb;
+	font-size: 16px;
+	text-align: left;
+	white-space: nowrap;
+	padding: 4px 4px 4px 4px;
+	margin-left: -1px;
+	background-color:#bbb;
+	font-weight: bold;
+	text-transform: capitalize;
+	color: #000;
+	}
+
+div.autotrim {
+	display: none;
+	border:1px solid #888;
+	margin:0;
+	padding:0;
+	}
+
+div.autotrim ul {
+	list-style-type:none;
+	margin:0;
+	padding:0;
+	}
+div.autotrim ul li.selected { background-color: #ff0; }
+div.autotrim ul li {
+	list-style-type:none;
+	display:block;
+	margin:0;
+	padding:2px;
+	cursor:pointer;
+}
+
+div.autocomplete {
+	position:absolute;
+	width:250px;
+	background-color:white;
+	border:1px solid #888;
+	margin:0;
+	padding:0;
+	}
+
+div.autocomplete ul {
+	list-style-type:none;
+	margin:0;
+	padding:0;
+	}
+div.autocomplete ul li.selected { background-color: #ff0; }
+div.autocomplete ul li {
+	list-style-type:none;
+	display:block;
+	margin:0;
+	padding:2px;
+	cursor:pointer;
+}
+
+tbody th {
+	width: 1px;
+	white-space: nowrap;
+	}
+th {
+	font-weight: bold;
+	text-transform: capitalize;
+	text-align: left;
+	background-color: #ddd;
+	border: 1px solid #aaa;
+	}
+th.i, td.i, {
+	text-align: left;
+	}
+th.i, td.i, th.n, td.n {
+	width: 1px;
+	white-space: nowrap;
+	}
+.gl-dr {
+	border-right: 1px solid #aaa;
+	padding: 2px;
+	text-align: right;
+	}
+.gl-cr {
+	padding: 2px;
+	text-align: left;
+	}
+table.gl td.gld {
+	width: 70px;
+	border: 0px solid white;
+	text-align: right;
+	padding: 0px;
+	}
+
+th.n, td.n {
+	text-align: right;
+	}
+th.sn, td.sn {
+	white-space: nowrap;
+	}
+th.s, td.s {
+	width: 100%;
+	}
+th.shead {
+	font-weight: normal;
+	text-align: center;
+	white-space: nowrap;
+	background-color: #eee;
+	border: 1px solid #aaa;
+	}
+.captionlink {
+	float: right;
+	font-size: 12px;
+	padding-right: 10px;
+	}
+tbody.scroll td {
+	border: 0px solid #fff;
+	}
+tbody.scroll td:last-child {
+	padding-right: 20px;
+	}
+td {
+	border: 1px solid #aaa;
+	}
+td, th {
+	padding: 2px 12px 2px 2px;
+	}
+td {
+	vertical-align: top;
+	}
+li {
+	padding: 2px;
+	}
+#menu {
+	font-size: 14px;
+	}
+#menu_bottom {
+/*	border-bottom: 1px solid black;
+	padding-top: 4px; */
+	margin-bottom: 8px;
+	clear: both;
+	}
+#menu_actions, #buckets {
+	float: left;
+	}
+#menu_actions ul, #action ul, #buckets ul { 
+	display: inline;
+	}
+#menu_actions li {
+	border-radius: 0px 0px 10px 10px;
+	-moz-border-radius: 0px 0px 10px 10px;
+	-webkit-border-bottom-right-radius: 10px;
+	-webkit-border-bottom-left-radius: 10px;
+	border: 1px solid #aaa;
+	background-color:#eee;
+	float: left; 
+	padding: 6px 10px 0 10px; 
+	list-style: none; 
+	margin-right: 2px;
+	}
+#buckets li {
+	border: 1px solid #aaa;
+	background-color:#eee;
+	float: left; 
+	padding: 6px 10px 2px 10px; 
+	list-style: none; 
+	margin-right: 2px;
+	}
+#buckets li.titlebucket {
+	text-transform: capitalize;
+	background-color: #fff;
+	}
+#buckets li.currentbucket {
+	background-color: #ff0;
+	}
+#action li {
+	float: left; 
+	padding: 0 10px 0 0; 
+	list-style: none; 
+	}
+#menu_user_loc {
+	float: right;
+	padding-top: 8px;
+	}
+#action_bottom {
+	border-bottom: 1px solid #000;
+	padding-bottom: 4px;
+	margin-bottom: 8px; 
+	}
+#bucket_top {
+	border-bottom: 1px solid #000;
+	padding-top: 4px;
+	margin-top; 8px; 
+	}
+#bucket_bottom {
+	clear: both;
+	padding-bottom: 4px;
+	margin-bottom: 8px; 
+	}
+.login {
+	margin: 15px auto 15px auto; 
+	padding: 10px; 
+	text-align: center; 
+	border: 1px solid #ddd; 
+	width: 400px;
+	}
+.floatleft {
+	float: left;
+	margin-right: 10px;
+	}
+
+.greyout {
+	color: #aaa;
+	}
+
+.notify {
+	background: green;
+	color: white;
+	padding: 5px;
+	}
+
+.warning {
+	background: #FFA500;
+	color: black;
+	font-weight: bold;
+	padding: 5px;
+	}
+
+.alert {
+	background: red;
+	color: white;
+	padding: 5px;
+	}
+
+.noaccess {
+	background: yellow; 
+	color: black;
+	font-weight: bold;
+	padding: 5px;
+	}
+
+.notify a, .alert a { color: white; }
+
+.redtext, .redtext a {
+	color: #F00;
+	}
+
+.nextaction { 
+	color: #F00; 
+	font-weight: bold;
+	}
+
+.action:before, .nextaction:before { content: "["; }
+.action:after, .nextaction:after { content: "]"; }
+
+.calendar_date_select {
+  color:white;
+  border:#777 1px solid;
+  display:block;
+  width:195px;
+  z-index: 1000;
+}
+/* this is a fun ie6 hack to get drop downs to stay behind the popup window.  This should always be just underneath .calendar_date_select */
+iframe.ie6_blocker {
+  position: absolute;
+  z-index: 999;
+}
+
+.calendar_date_select thead th {
+  font-weight:bold;
+  background-color: #aaa;
+  border-top:1px solid #777;
+  border-bottom:1px solid #777;
+  color: white !important;
+}
+
+.calendar_date_select .cds_buttons {
+  text-align:center;
+  padding:5px 0px;
+  background-color: #555;
+}
+
+.calendar_date_select .cds_footer {
+  background-color: black;
+  padding:3px;
+  font-size:12px;
+  text-align:center;
+}
+
+.calendar_date_select table {
+  margin: 0px;
+  padding: 0px;
+}
+
+
+.calendar_date_select .cds_header {
+  background-color: #ccc;
+  border-bottom: 2px solid #aaa;
+  text-align:center;
+}
+
+.calendar_date_select .cds_header span {
+  font-size:15px;
+  color: black;
+  font-weight: bold;
+}
+
+.calendar_date_select select { font-size:11px;}
+
+.calendar_date_select .cds_header a:hover {
+  color: white;
+}
+.calendar_date_select .cds_header a {
+  width:22px;
+  height:20px;
+  text-decoration: none;
+  font-size:14px;
+  color:black !important;
+}
+
+.calendar_date_select .cds_header a.prev {
+  float:left;
+}
+.calendar_date_select .cds_header a.next {
+  float:right;
+}
+
+.calendar_date_select .cds_header a.close {
+  float:right;
+  display:none;
+}
+
+.calendar_date_select .cds_header select.month {
+  width:90px;
+}
+
+.calendar_date_select .cds_header select.year {
+  width:61px;
+}
+.calendar_date_select .cds_buttons a {
+  color: white;
+  font-size: 9px;
+}
+
+.calendar_date_select td {
+  font-size:12px;
+  width: 24px;
+  height: 21px;
+  text-align:center;
+  vertical-align: middle;
+  background-color: #fff;
+}
+.calendar_date_select td.weekend {
+  background-color: #eee;
+  border-left:1px solid #ddd;
+  border-right:1px solid #ddd;
+}
+
+.calendar_date_select td div {
+  color: #000;
+}
+.calendar_date_select td div.other {
+  color: #ccc;
+}
+.calendar_date_select td.selected div {
+  color:white;
+}
+
+.calendar_date_select tbody td {
+  border-bottom: 1px solid #ddd;
+}
+.calendar_date_select td.selected {
+  background-color:#777;
+}
+
+.calendar_date_select td:hover {
+  background-color:#ccc;
+}
+
+.calendar_date_select td.today {
+  border: 1px dashed #999;
+}
+
+.calendar_date_select td.disabled div {
+  color: #e6e6e6;
+}
+
+.fieldWithErrors .calendar_date_select {
+  border: 2px solid red;
+}

@@ -1,0 +1,37 @@
+Revision history for Perl extension AI::NeuralNet::Kohonen.
+
+0.142	08 August 2006 14:56
+	Forgot to include the .dat test file in previous version
+	Can't find it now. Updated tests to cope :(
+
+0.141	Fri May 05 20:19:00 2006 
+	Repacked 
+
+0.14	Fri May 05 20:19:00 2006 
+	Updated SYNOPSIS from ::Visual code, and a minor bug:
+	thanks to diligent eye of Przemek Blaskiewicz
+	
+0.132  Web Apr 17 11:40:00 2003
+	Some minor interface changes.
+	Created *::Input class
+
+0.0131 Thu Mar 20 11:55:00 2003
+	Added epoch_start callback.
+
+0.013 Mon Mar 17 14:49:00 2003
+	Added 'neighbour_factor' field
+	Method 'load_file' becomes 'load_input', as we may allow
+	the loading of map fiels too.
+
+0.012 Fri Mar 14 11:49:00 2003
+	Added some support for loading and saving in SOM_PAK file
+	format; gaussian smoothing of the map.
+
+0.011 Thu Mar 13 14:00:01 2003
+	Had forgotten to make the find_bmu method public.
+	Allowed for rectangular maps rather than just square.
+
+0.01  Thu Mar 13 12:32:00 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n AI::NeuralNet::Kohonen
+

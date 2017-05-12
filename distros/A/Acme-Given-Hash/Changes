@@ -1,0 +1,8 @@
+v0.001 
+  - make it work
+v0.002
+  - forgot to enfore 5.10 as a min 
+v0.03
+  - updated docs and test to show how to do a default
+v0.05
+  - update to turn off warnings for smartmatch in 5.18

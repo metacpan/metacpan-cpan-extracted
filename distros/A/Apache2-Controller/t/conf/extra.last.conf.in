@@ -1,0 +1,95 @@
+# this file will be Include-d by @ServerRoot@/httpd.conf
+
+# @ServerRoot@ = t directory
+
+# where Apache2::Controller and the test application libs can be found
+PerlSwitches -I@ServerRoot@/lib
+
+PerlLoadModule Apache2::Request
+PerlLoadModule Apache2::RequestRec
+PerlLoadModule Apache2::RequestUtil
+PerlLoadModule Apache2::Cookie
+PerlLoadModule Apache2::RequestIO
+PerlLoadModule Apache2::Module
+
+PerlLoadModule Apache2::Controller::Directives
+#PerlLoadModule Apache2::Controller::X
+A2C_Render_Template_Path @ServerRoot@/templates/primary
+
+# preload the module
+<Location '/simple'>
+    SetHandler modperl
+    A2C_Dispatch_Map @ServerRoot@/conf/dispatch/simple.yaml
+    PerlInitHandler Apache2::Controller::Dispatch::Simple
+</Location>
+
+PerlLoadModule TestApp::Render::Dispatch
+<Location '/render'>
+    SetHandler modperl
+    PerlInitHandler TestApp::Render::Dispatch
+</Location>
+
+<Location '/render/multipath'>
+    A2C_Render_Template_Path @ServerRoot@/templates/primary @ServerRoot@/templates/secondary
+</Location>
+
+PerlLoadModule TestApp::Session::Session
+<Location '/session'>
+    SetHandler modperl
+    PerlInitHandler TestApp::Session::Dispatch
+
+    # in theory my testapp get_options should detect system-appropriate tempdirs
+    A2C_Session_Cookie_Opts     name    testapp_sessid
+    PerlHeaderParserHandler     TestApp::Session::Session
+</Location>
+
+# pre-load the connector to generate temporary database
+PerlLoadModule TestApp::DBI::Connector
+<Location '/dbi_connector'>
+    # i cannot use the directives for setup, because i have to get a tempfile.
+    # so i use a subclass
+
+    SetHandler              modperl
+    PerlInitHandler         TestApp::DBI::Dispatch
+    PerlHeaderParserHandler TestApp::DBI::Connector
+</Location>
+
+# in the openid urls we use a different session id name to make
+# sure it's stored independently.  we set the path common
+# between them explicitly to share the session between locations.
+
+
+PerlLoadModule Apache2::Controller::Auth::OpenID
+PerlLoadModule TestApp::OpenID::Dispatch::Unprotected
+PerlLoadModule TestApp::OpenID::Dispatch::Protected
+
+<Location '/openid/unprotected'>
+    SetHandler                  modperl
+    PerlInitHandler             TestApp::OpenID::Dispatch::Unprotected
+
+    PerlHeaderParserHandler     TestApp::DBI::Connector
+    A2C_Session_Cookie_Opts     name    testapp_openid_sessid
+    A2C_Session_Cookie_Opts     path    /openid
+    PerlHeaderParserHandler     TestApp::Session::Session
+</Location>
+
+<Location '/openid/protected'>
+    SetHandler                  modperl
+    PerlInitHandler             TestApp::OpenID::Dispatch::Protected
+
+    PerlHeaderParserHandler     TestApp::DBI::Connector
+    A2C_Session_Cookie_Opts     name    testapp_openid_sessid
+    A2C_Session_Cookie_Opts     path    /openid
+    PerlHeaderParserHandler     TestApp::Session::Session
+
+    # it turns out to be too weird to get LWPx::ParanoidAgent to work
+    # so for our purposes we just use a regular LWP::UserAgent
+    A2C_Auth_OpenID_LWP_Class   LWP::UserAgent
+    A2C_Auth_OpenID_LWP_Opts    timeout 5
+
+    # generate a server-wide constant random string for consumer secret?
+    A2C_Auth_OpenID_Consumer_Secret
+
+    PerlHeaderParserHandler     Apache2::Controller::Auth::OpenID
+</Location>
+

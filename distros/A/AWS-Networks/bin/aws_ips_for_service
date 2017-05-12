@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+use AWS::Networks;
+use Net::CIDR::Set;
+
+my $service = $ARGV[0] or die "Usage $0 AMAZON|CLOUDFRONT|...|ROUTE53\n";
+
+my $nets = AWS::Networks->new;
+
+my $cidrs = $nets->by_service(uc($service))->cidrs;
+
+my $set = Net::CIDR::Set->new(@$cidrs);
+
+my $count = 0;
+my $iter = $set->iterate_cidr;
+while ( my $cidr = $iter->() ) {
+  my ($net, $bits) = split /\//, $cidr;
+  if ($bits == 32) {
+    $count += 1;
+  } elsif ($bits == 31) {
+    $count += 2;
+  } else {
+    $count += (( 2 ** (32 - $bits) ) - 2);
+  }
+}
+
+print "AWS has $count IP Addresses\n";

@@ -1,0 +1,35 @@
+=pod
+
+=head1 NAME
+
+App::CPANtoRPM - a library used by the cpantorpm tool
+
+=head1 SYNOPSIS
+
+This module contains routines used for the cpantorpm tool.  It is not
+intended to be used directly.
+
+=head1 DESCRIPTION
+
+The cpantorpm tool is a script to take a package from CPAN and turn it
+into an RPM.  Please refer to the documentation for cpantorpm for more
+information.
+
+=head1 SEE ALSO
+
+L<cpantorpm> - a tool to turn CPAN pacakges into RPMs
+
+=head1 KNOWN PROBLEMS
+
+None at this point.
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut

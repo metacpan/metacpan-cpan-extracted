@@ -1,0 +1,17 @@
+Revision history for Perl extension Acme::Evil.
+
+0.003001 2017-04-15T00:15+03:00
+ - Bump MIN_PERL_VERSION to 5.10.1
+ - Fix tests when @INC has no '.' (RT #121030)
+
+0.003 2017-04-01T20:04+03:00
+ - Implement :lax and :intermediate modes
+ - Write more tests (test coverage now 100%)
+ - Document caveats and known bugs.
+
+0.002 2016-06-11T19:51+01:00
+ - Add no evil ':disable'
+ - Remove dummy package Acme::Evil
+
+0.001 2016-06-01T00:33+01:00
+ - Initial release

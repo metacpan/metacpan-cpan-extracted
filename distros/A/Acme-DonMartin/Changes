@@ -1,0 +1,48 @@
+Revision history for Perl extension Acme::DonMartin.
+
+0.09 2006-11-03 10:53:07 UTC
+    - Managed to fuck up the previous distribution with a blib/
+      directory. No functional changes.
+
+0.08 2006-11-02 16:08:27 UTC
+    - Clarified the licensing of the module
+    - Moved the module into subversion.
+
+0.07 2006-07-10 08:38:39 UTC
+    - Added license information.
+    - Rewrite the source file on the first pass, instead of
+      printing it to STDOUT (to be more conformant with
+      Acme Best Practices).
+    - Fixed cross-platform line-endings bug (a program with
+      Unix line-endings wouldn't work on Windows -- and no
+      doubt vice versa). Credit goes to Georg Moritz for
+      spotting this bug.
+    - The test suite now uses Test::Cmd and Test::File::Contents
+      which should improve portability.
+    - Minor improvements to code readability, deployed a
+      superiour variable naming convention.
+
+0.06 Mon Sep 26 14:48:27 2005 UTC
+    - Use Config.pm to figure out which perl executable to
+      employ for certain tests.
+
+0.05 Sun Sep 25 16:27:53 2005 UTC
+    - Kwalitee whoring release. Changed qq{ ... } to "..."
+      to use Test::Pod and Test::Pod::Coverage. No change
+      in functionality.
+
+0.04 Tue Sep 13 14:46:31 2005 UTC
+    - Eval'ed the use of Test::Pod incorrectly. Bug spotted
+      by Adriano Ferreira.
+
+0.03 Sun Sep 11 10:02:48 2005 UTC
+    - Added POD coverage tests
+
+0.02 Sat Apr 9 10:49:04 2005 UTC
+    - Now runs under 'use strict' (hey, one more Kwalitee
+      point is better than nothing).
+    - Made the source code more readable.
+
+0.01 Fri Apr 8 18:04:47 2005 UTC
+    - First release
+

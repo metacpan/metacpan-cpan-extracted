@@ -1,0 +1,81 @@
+Install normally with cpan ...
+
+The Plog installing will create the following configuration files in '/home/you/.plog'.
+
+home/you/.plog/
+|-- config.pl
+`-- configuration_template
+    |-- config.pl
+    |-- elements
+    |   |-- feed-icon-28x28.png
+    |   |-- mini_plog.png
+    |   |-- plog_4.png
+    |   `-- sco.css
+    |-- entry_template.pod
+    |-- frame.html
+    `-- update_blog.pl
+
+
+Here is how I would create a blog about plog:
+
+The example is for my box, replace with your home directory and server directory as necessary
+
+	Create the blog elements for my perl blog (the default tries to remotely look like search.cpan.org and uses its css)
+	$> cp -R /home/nadim/.plog/configuration_template/ /home/nadim/.plog/plog
+	
+	Create a git repository to contain our blog entries:
+	$> cd /home/nadim/.plog/plog
+	$> mkdir blog_entries
+	$> cd blog_entries
+	$> git init
+
+
+	Set the plog blog config
+	$> vi /home/nadim/.plog/plog/config.pl
+		-set 'entry_directory' to /home/nadim/.plog/plog/blog_entries
+		-set 'page' to http://khemir.net/http_share/plog/plog.html 
+		-set 'destination_directory' to /home/nadim/Desktop/http_share/plog
+			(a link to a directory on my web server)
+
+The plog blog is now created on configured. I now set the plog config and make the plog blog my default blog:
+
+	Edit Plog global configuration file
+	$> vi /home/nadim/.plog/config.pl
+		-set 'plog_root_directory' /home/nadim/.plog/
+		-set 'default_blog' to plog
+	
+	
+Create a blog entry:
+	$> pwd
+	/home/nadim/.plog/plog/blog_entries
+	
+	$> cp ../entry_template.pod first_entry.pod
+	$> git add .
+	$> vi first_entry.pod
+	$> git commit -a -m 'ADDED: first entry'
+	
+	
+Now generate a blog. Note that generating a blog and publishing it is different. Generating a blog
+entails creating all the necessary files. Publishing it means make it accessible to other parties, most
+often ona web site. Plog normally creates a temporary directory to generate all the files in. The directory
+is normally erased after we publish the blog. since we are not going to publish the blog, we give the 
+--temporary_directory option to plog so it creates the necessary files in that directory and does not remove 
+the files automatically.
+
+	$> plog generate --temporary_directory tmp
+	
+	$ tree tmp
+	tmp
+	|-- feed-icon-28x28.png
+	|-- mini_plog.png
+	|-- plog.html
+	|-- plog_4.png
+	|-- rss.xml
+	`-- sco.css
+
+You can look at your blog with your web browser:
+	$> firefox tmp/plog.html
+	
+
+Of course this is tedious so I wrote a script that does all that for me. the script, plog_starter.pl, is installed when you
+install plog. copy it and modify it to suit your needs. it runs under 2 seconds, well below our one and a half minute limit.

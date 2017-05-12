@@ -1,0 +1,84 @@
+-----BEGIN RSA PRIVATE KEY-----
+MIICXgIBAAKBgQDz51DBncOM1SfsLQkcVkm2b7wUVUXU4y6jIfxmm8SSAU89Tt2j
+jhZTqwKLcBRUvJdO/L70VFbSL/+GGF1r5ZsZdvFNcHYl0ox+F6Q8lStyQQrTYUq3
+H1prk13aWxr0evRkBXR6WR1+Oh6y3LPg54BBUV2u3zFPlNNAFCFjgZReGwIDAQAB
+AoGBAIqIkC3o1fFgANT8n3gg6q1cuY8y//7zKsItw5bkUro7VC6WZP1I7xWGxGM+
+vc2DcM3EcRGF9epcqN4ZaLaoK3cnY/vx+ifYAaLIEtsz+Dc34HBz01gXpeHjW+1i
+6TDaed2sMOljGa4IA/HG9B2mBQIVAJCroEpgNNTcyCcrJX2BAkEA+iFiUD41lPMD
+9YfAX99YIrkhcqlJu4JTFZ7g6MJRe5ICV6GVqA1nOb8S1ai+HrDH0t88NFEDjTeI
+gPHX/WOAswJBAPmghliuKQEt5a6k6G/sWSsyHL+QWD4PfQ5ZWbyTXs4Do5qv6xno
+FXMEnNEHsW6eAzDmZLgS7XMsp8YLCmu7EPkCQBEEsna5NNYUjsFm4hzjylBafj8Z
+641ZeaOv8qeDiR26OnSR5ufPOaXBLVviJkVaS846KBN7K52xGJWFXue7nGcCQQCj
+mxMSQis7y6ISoaB54pTam8B9yRQcsLgM1IDc+FWVfosW0h+rXhHYzXgeBAXFcyiy
+Pv5aKoWYC/d19DyDORq5AkEAtJlBFjkbICmFvenojc5wDMWDfBF6DAQQGKgv4xeG
+NYO1TY1BiMV6pMmYFAcFXKhMb2zd96KYLlW0foazIT92vA==
+-----END RSA PRIVATE KEY-----
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 485 (0x1e5)
+        Signature Algorithm: md5WithRSAEncryption
+        Issuer: C=DE, ST=Baden-Wuertemberg, L=Gaiberg, O=Foertsch Consulting, OU=CA, CN=Foertsch Consulting CA/emailAddress=torsten.foertsch@gmx.net
+        Validity
+            Not Before: Oct 25 13:37:29 2004 GMT
+            Not After : Oct 20 13:37:29 2024 GMT
+        Subject: C=DE, ST=Baden-Wuertemberg, L=Gaiberg, O=Foertsch Consulting, CN=localhost/emailAddress=torsten.foertsch@gmx.net
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+            RSA Public Key: (1024 bit)
+                Modulus (1024 bit):
+                    00:f3:e7:50:c1:9d:c3:8c:d5:27:ec:2d:09:1c:56:
+                    49:b6:6f:bc:14:55:45:d4:e3:2e:a3:21:fc:66:9b:
+                    c4:92:01:4f:3d:4e:dd:a3:8e:16:53:ab:02:8b:70:
+                    14:54:bc:97:4e:fc:be:f4:54:56:d2:2f:ff:86:18:
+                    5d:6b:e5:9b:19:76:f1:4d:70:76:25:d2:8c:7e:17:
+                    a4:3c:95:2b:72:41:0a:d3:61:4a:b7:1f:5a:6b:93:
+                    5d:da:5b:1a:f4:7a:f4:64:05:74:7a:59:1d:7e:3a:
+                    1e:b2:dc:b3:e0:e7:80:41:51:5d:ae:df:31:4f:94:
+                    d3:40:14:21:63:81:94:5e:1b
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                Mail to torsten.foertsch@gmx.net
+            X509v3 Subject Key Identifier: 
+                93:A5:EA:1E:7E:8A:C2:C6:D2:1B:D3:5C:0C:07:D6:CF:73:B0:EA:B0
+            X509v3 Authority Key Identifier: 
+                keyid:4A:3A:1F:65:22:A1:67:11:A7:7E:22:E7:D4:0D:D0:11:4A:4F:6D:82
+                DirName:/C=DE/ST=Baden-Wuertemberg/L=Gaiberg/O=Foertsch Consulting/OU=CA/CN=Foertsch Consulting CA/emailAddress=torsten.foertsch@gmx.net
+                serial:00
+
+    Signature Algorithm: md5WithRSAEncryption
+        0c:62:63:d3:a1:a9:f3:10:e0:d5:bd:e1:fe:7a:53:e0:6c:ed:
+        6a:b0:4f:02:84:e2:ef:bf:16:25:ae:b4:c5:09:74:1e:0c:c0:
+        50:85:59:09:b9:9b:c4:bd:74:31:2b:1a:4a:e1:c5:8c:56:69:
+        00:09:59:3e:74:ca:3b:f7:07:f5:3a:8b:ca:09:77:b8:b1:49:
+        a3:13:7d:14:00:16:be:f8:4b:02:aa:37:c9:a5:24:bd:72:ce:
+        14:8b:b8:24:3b:70:c8:c2:f1:2a:0c:b0:c7:34:85:f3:b3:fe:
+        b8:a5:f2:f7:b6:5d:a7:23:4b:8a:14:9b:85:a7:cd:b9:74:00:
+        e8:2c
+-----BEGIN CERTIFICATE-----
+MIIEADCCA2mgAwIBAgICAeUwDQYJKoZIhvcNAQEEBQAwgbAxCzAJBgNVBAYTAkRF
+MRowGAYDVQQIExFCYWRlbi1XdWVydGVtYmVyZzEQMA4GA1UEBxMHR2FpYmVyZzEc
+MBoGA1UEChMTRm9lcnRzY2ggQ29uc3VsdGluZzELMAkGA1UECxMCQ0ExHzAdBgNV
+BAMTFkZvZXJ0c2NoIENvbnN1bHRpbmcgQ0ExJzAlBgkqhkiG9w0BCQEWGHRvcnN0
+ZW4uZm9lcnRzY2hAZ214Lm5ldDAeFw0wNDEwMjUxMzM3MjlaFw0yNDEwMjAxMzM3
+MjlaMIGWMQswCQYDVQQGEwJERTEaMBgGA1UECBMRQmFkZW4tV3VlcnRlbWJlcmcx
+EDAOBgNVBAcTB0dhaWJlcmcxHDAaBgNVBAoTE0ZvZXJ0c2NoIENvbnN1bHRpbmcx
+EjAQBgNVBAMTCWxvY2FsaG9zdDEnMCUGCSqGSIb3DQEJARYYdG9yc3Rlbi5mb2Vy
+dHNjaEBnbXgubmV0MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDz51DBncOM
+1SfsLQkcVkm2b7wUVUXU4y6jIfxmm8SSAU89Tt2jjhZTqwKLcBRUvJdO/L70VFbS
+L/+GGF1r5ZsZdvFNcHYl0ox+F6Q8lStyQQrTYUq3H1prk13aWxr0evRkBXR6WR1+
+Oh6y3LPg54BBUV2u3zFPlNNAFCFjgZReGwIDAQABo4IBPzCCATswCQYDVR0TBAIw
+ADAvBglghkgBhvhCAQ0EIhYgTWFpbCB0byB0b3JzdGVuLmZvZXJ0c2NoQGdteC5u
+ZXQwHQYDVR0OBBYEFJOl6h5+isLG0hvTXAwH1s9zsOqwMIHdBgNVHSMEgdUwgdKA
+FEo6H2UioWcRp34i59QN0BFKT22CoYG2pIGzMIGwMQswCQYDVQQGEwJERTEaMBgG
+A1UECBMRQmFkZW4tV3VlcnRlbWJlcmcxEDAOBgNVBAcTB0dhaWJlcmcxHDAaBgNV
+BAoTE0ZvZXJ0c2NoIENvbnN1bHRpbmcxCzAJBgNVBAsTAkNBMR8wHQYDVQQDExZG
+b2VydHNjaCBDb25zdWx0aW5nIENBMScwJQYJKoZIhvcNAQkBFhh0b3JzdGVuLmZv
+ZXJ0c2NoQGdteC5uZXSCAQAwDQYJKoZIhvcNAQEEBQADgYEADGJj06Gp8xDg1b3h
+/npT4GztarBPAoTi778WJa60xQl0HgzAUIVZCbmbxL10MSsaSuHFjFZpAAlZPnTK
+O/cH9TqLygl3uLFJoxN9FAAWvvhLAqo3yaUkvXLOFIu4JDtwyMLxKgywxzSF87P+
+uKXy97ZdpyNLihSbhafNuXQA6Cw=
+-----END CERTIFICATE-----

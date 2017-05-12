@@ -1,0 +1,14 @@
+Source: libanyevent-aggressiveidle-perl
+Section: perl
+Homepage: http://search.cpan.org/~unera/AnyEvent-AggressiveIdle/
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+VCS-Browser: http://git.uvw.ru/?p=anyevent-aggressiveidle;a=summary
+Build-Depends: debhelper (>= 7), cdbs, libanyevent-perl
+
+Package: libanyevent-aggressiveidle-perl
+Depends: ${perl:Depends}, ${misc:Depends}, libanyevent-perl
+Architecture: all
+Description: Aggressive idle processes for AnyEvent.
+ The package contains the function that allows You to start idle
+ AnyEvent processes that can be even done on overloaded system 
+ (as opposed to built-in AnyEvent::idle).

@@ -1,0 +1,24 @@
+[Changes for 0.04 - 2008-10-24]
+
+No functional changes.
+
+* Minor doc and code tidying up.
+
+[Changes for 0.03 - 2008-10-24]
+
+* This version no longer clobbers Algorithm::Diff's symble table,
+  so we can meaningfully run benchmarks comparing them two.
+* Added benchmark docs.
+* Added a note saying that only "LCDidx" and "compact_diff" are faster.
+
+[Changes for 0.02 - 2008-10-23]
+
+No functional changes.
+
+* Removed the unused empty module: Algorithm::Diff::XS::LCS.
+* Added README and Changes.
+* Minor POD tweaks.
+
+[Changes for 0.01 - 2008-10-22]
+
+* Initial CPAN release.

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<error>
+   <authentification>
+      <message>It appears as though you do not have permission to view the log file ...</message>
+         <description>
+            <line1>If you believe this is an error, check the HTTP server authentication requirements for accessing this site</line1>
+            <line2>and check the authorization options in your configuration file.</line2>
+         </description>
+   </authentification>
+   <dbConnection>
+      <message>Database-Error</message>
+      <description>
+	     <line1>Can't connect to database!</line1>
+	     <line2>Check your configuration!</line2>
+      </description> 
+   </dbConnection>
+   <dbTable>
+      <message>Database-Error</message>
+      <description>
+	     <line1>Can't connect to table!</line1>
+	     <line2>Check your configuration!</line2>
+      </description> 
+   </dbTable>
+   <dbHandleTrap>
+      <message>Database-Error</message>
+      <description>
+	     <line1>Can't update or delete from table!</line1>
+	     <line2>Check your configuration!</line2>
+      </description> 
+   </dbHandleTrap>
+   <dbReadTrap>
+      <message>Database-Error</message>
+      <description>
+	     <line1>Can't select from table!</line1>
+	     <line2>Check your configuration!</line2>
+      </description> 
+   </dbReadTrap>
+   <dbReadCategory>
+      <message>Database-Error</message>
+      <description>
+	     <line1>Can't select category from table!</line1>
+	     <line2>Check your configuration!</line2>
+      </description> 
+   </dbReadCategory>
+</error>

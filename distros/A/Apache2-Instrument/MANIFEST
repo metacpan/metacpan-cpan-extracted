@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+t/01pod.t
+t/conf/modperl_extra.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+t/response/TestInstrument/basic.pm
+t/response/TestInstrument/dbi.pm
+t/response/TestInstrument/memory.pm
+t/response/TestInstrument/procview.pm
+t/response/TestInstrument/strace.pm
+t/response/TestInstrument/time.pm
+lib/Apache2/Instrument/DBI.pm
+lib/Apache2/Instrument/Memory.pm
+lib/Apache2/Instrument/Strace.pm
+lib/Apache2/Instrument/Procview.pm
+lib/Apache2/Instrument/Time.pm
+lib/Apache2/Instrument.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,57 @@
+App-CatalystStarter-Bloated version 0.0.1
+
+Provides catalyst-fatstart.pl. It creates a new catalyst application
+for you using previously installed catalyst.pl.
+
+In addition to that it also sets up commonly used components such as:
+
+* A TT view with wrapper
+* A JSON view
+* A Model with an (optionally tested working) db connection
+* Sets up a cached template from http://www.initializr.com as the wrapper.
+
+It tries to be as helpful as possible, running interactively and
+offering meaningful tab completions.
+
+Future Enhancements:
+
+* Take DBIx::Class::Schema::Config into account when looking up
+  credentials
+
+* Do on the fly downloads from www.initializr.com
+
+Much of the functionality deserves its own namespace and will get
+forked off in the future. Most likely the following:
+
+* A dsn parser
+* initializr.com related
+* pgpass parsing
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+Several, see Makefile.PL and Build.PL
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014, Torbjørn Lindahl
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

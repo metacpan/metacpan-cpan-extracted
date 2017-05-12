@@ -1,0 +1,14 @@
+Revision history for Authen-HTTP-Signature
+
+0.03    2015-10-22
+        Bring implementation up to IETF spec - Thanks Pierre Vigier!
+	Fix Base64 padding bug - Thanks Pierre Vigier!
+	Eliminate for/when construction
+
+0.02    2012-01-17
+        Documentation updates
+        Fix parameter handling on verify()
+
+0.01    2012-01-17
+        First version
+

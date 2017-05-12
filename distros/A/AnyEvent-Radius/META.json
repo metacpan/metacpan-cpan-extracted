@@ -1,0 +1,47 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Sergey Leschenko <sergle.ua at gmail.com>",
+      "PortaOne <perl-radius at portaone.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-Radius",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::Handle::UDP" : "0",
+            "Class::Accessor::Fast" : "0",
+            "Data::Radius" : "0",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.2",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

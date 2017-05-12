@@ -1,0 +1,280 @@
+#!/usr/bin/env perl
+
+use strict ;
+use warnings ;
+
+use App::Term::Jump ;
+
+App::Term::Jump::run(@ARGV) ;
+
+=head1 NAME 
+
+  jump  
+
+=head1 DESCRIPTION
+
+A utility to navigate your filesystem. It can ither be used directly on the 
+command line or integrated with Bash.
+
+=head1 SYNOPSIS
+
+  $> j --add path [weight]
+
+  $> j --remove path
+
+  $> j --search path_part [path_part] ...
+
+  $> j --show_database
+
+=head1 OPTIONS
+
+  --search		search for the best match in the database
+  --file=glob		match only directories that contain a file matching the shell regexp
+
+  -a|add		add path to database, weight is adjusted if the path exists
+			curent path if none is given
+
+  -r|remove		remove path from database,  current path if none is given
+  -remove_all		remove all paths from database
+
+  -s|show_database	show database entries
+  -show_config_files	show configuration files
+
+  --complete		return completion path, used by bash complete
+
+  -v|version		show version information and exit
+  -h|help		show this help
+
+  -ignore_path		paths matching will not be be included
+  -q|quote		double quote results
+  -ignore_case		do a case insensitive search
+  -no_direct_path	ignore directories directly under cwd
+  -no_sub_cwd		ignore directories and sub directories under cwd
+  -no_sub_db		ignore directories under the database entries
+
+=head1 FILES
+
+  ~/.jump_database      default database
+  ~/.jump_config	optional configuration file, a Perl hash format
+
+=head1 CONFIGURATION FILE FORMAT
+
+	{
+	ignore_path => [string, qr], # paths listed will not match
+	black_listed_directories => [string, qr], # paths matching are not added to db
+
+	quote => 0		# doubl quote results
+	ignore_case => 0, 	# case insensitive search and completion
+
+	no_direct_path => 0, 	# ignore directories directly under cwd
+	no_sub_cwd => 0, 	# ignore directories and sub directories under cwd
+	no_sub_db => 0, 	# ignore directories under the database entries
+	} ;
+
+=head1 ENVIRONMENT
+
+  APP_TERM_JUMP_DB	name of the database file
+  APP_TERM_JUMP_CONFIG	name of the configuration file
+
+=head1 COMMANDS
+
+=head2 Adding directories
+
+  $> j --add path [weight]
+
+path is added to the directory with optional weight. If no weight is given,
+a default weight is assigned. If the entry already exist, the weight is
+added to the existing entry. 
+
+Only directories can be added to the database.
+
+Paths matching entries in config I<black_listed_directories> are silently 
+ignored
+
+=head2 Removing entries
+
+  $> j --remove_all
+
+The database is emptied
+
+  $> j --remove  path
+
+The the pat is removed from the database
+
+=head2 Increasing and reseting weight
+
+=head3 Increasing weight
+
+  $> j --add path weight
+
+=head3 Resetting weight
+
+  $> j --remove --add path weight
+
+=head2 Show the database contents
+
+  $> j --show_database
+
+=head2 Displa the database file name and the configuration file name
+
+  $> j --show_configuration_files
+
+=head1 MATCHING
+
+  $> j --search  path_part [path_part] ...
+
+path_part is matched in a case sensitie fashion; set $config->{ignore_case} in
+the configuration file for matching in a case insensitive fashion.
+
+Given this directory structure, the database entries and cwd being I</>
+
+
+  /
+   A
+
+   path_part
+     path_part2
+       A (w:10)
+       B_directory (w:10)
+       C (w:10)
+         F
+
+   path_part3
+     B (w:1)
+     B_directory (w:20)
+     C (w:10)
+       E
+       F
+
+   subdir
+     E
+
+Paths are matched in this order:
+
+=over 2
+
+=item * existing full path
+
+Setting configuration I<no_direct_path> disables this matching
+
+=item * match directory under the current working directory
+
+this allow Jump to mimic I<cd>'s behavior and jump to directories within the current "project". 
+
+  $> jump --search A
+
+will return /A even though /path_part/path_part2/A is a database entry with weight:10 
+ 
+Setting configuration I<no_direct_path> disables this matching
+
+=item * full match last directory of database entry
+
+  $> jump --search B 
+
+will return /path_part/path_part3/B, which has weigh:1 even though /path_part/path_part3/B_directory is a database entry with weight:10 
+ 
+=item *  partial match last directory of database entry
+
+  $> jump --search B_dir
+
+will return /path_part/path_part3/B_directory which is heavier than /path_part/path_part2/B_directory  
+ 
+=item * equivalent matches return the first entry in alphabetical order
+ 
+  $> jump --search C
+
+will return /path_part/path_part2/C which sorts before /path_part/path_part3/C  
+ 
+=item * match part of a db entry
+
+  $> jump --search path 
+
+will return  /path_part/path_part3/C which is the entry containing I<path> and has the heaviest weight 
+ 
+=item * match sub directory of cwd
+
+  $> jump --search E
+
+will return /subdir/E  
+
+Seting configuration I<no_sub_cwd> disables this matching
+ 
+=item * match sub directory of a db entry
+
+  $> jump --search F
+
+will return  /path_part/path_part3/C/F. /path_part/path_part2/F is not under a database entry 
+
+Setting configuration I<no_sub_db> disables this matching
+
+=back
+
+=head2 Matching with multiple path parts
+
+  $> jump --search C
+
+Matches 2 entries but will return /path_part/path_part2/C which sorts before /path_part/path_part3/C, you can
+give multiple matches on the command line
+   
+  $> jump --search 3 C
+ 
+will return /path_part/path_part3/C
+
+=head2 Not matching everything
+
+When I<Jump> searches under the current working directory or in directories under database entries, thousands of
+matches can be returned. Option B<--ignore_path> disables the scanning of the given paths.
+
+=head1 Bash INTEGRATION and --complete
+
+  $> j --complete path_part [path_part] ...
+
+will return a list of matches that an be used to integrate with the I<cd> command. Read jump_bash_integration.sh in the distribution
+
+=head2 Matching files
+
+the I<--file> option let you specify a file regex which will be use by I<Jump> to further refine your search. Once all
+the matching possible matching directories are found, each directory is checked for files matching the regexp.
+
+=head1 EXIT CODE
+
+  0 in case of success, which may or may not return any match
+
+  not 0 in case of error
+
+=head1 BUGS AND LIMITATIONS
+
+None so far.
+
+Please report bugs on Github or CPAN
+
+=head1 AUTHOR
+
+        Nadim ibn hamouda el Khemir
+        CPAN ID: NKH
+        mailto: nadim@cpan.org
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright Nadim Khemir 2015.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of either:
+
+=over 4
+
+=item * the GNU General Public License as published by the Free
+Software Foundation; either version 1, or (at your option) any
+later version, or
+
+=item * the Artistic License version 2.0.
+
+=back
+
+=head1 SEE ALSO
+
+  autojump
+
+=cut
+
+

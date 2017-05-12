@@ -1,0 +1,37 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::VLDB;
+
+my ($vldb, $host, $nores, $prtuid);
+
+die "Usage: $0 [host [noresolv [printuuid]]]\n" if $#ARGV > 2;
+
+$host   = shift;
+$nores  = shift;
+$prtuid = shift;
+
+$host   = '' unless $host;
+$nores  = 0  unless $nores;
+$prtuid = 0  unless $prtuid;
+
+$vldb = AFS::VLDB->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+#host=NULL, uuid=NULL, noresolve=0, printuuid=0
+my @list = $vldb->listaddrs($host, '', $nores, $prtuid);
+#my @list = $vldb->listaddrs; ???
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+if (defined $list[0]) {
+    my $i = 1;
+    foreach my $srv (@list) {
+        print "Server $i:\n";
+        $i++;
+        foreach (keys %$srv) {
+            print "\tKey: $_, Value: $srv->{$_}\n";
+        }
+    }
+}

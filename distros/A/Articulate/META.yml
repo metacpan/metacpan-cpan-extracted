@@ -1,0 +1,46 @@
+---
+abstract: 'Lightweight Perl CMS Framework'
+author:
+  - 'Daniel Perrett <perrettdl@googlemail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Articulate
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Inspector: '0'
+  DBD::SQLite: '1.46'
+  DBIx::Class: '0.082'
+  Data::DPath: '0.5'
+  DateTime: '1.18'
+  Digest::SHA: '0'
+  Exporter::Declare: '0.113'
+  File::Path: '0'
+  Hash::Merge: '0.2'
+  IO::All: '0'
+  JSON: '0'
+  Module::Load: '0'
+  Moo: '1.004'
+  MooX::Singleton: '0'
+  SQL::Translator: '0.11018'
+  Test::More: '0.98'
+  Text::Markdown: '0'
+  Throwable: '0.200012'
+  Try::Tiny: '0'
+  YAML: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: http://github.com/pdl/Articulate/issues
+  homepage: http://github.com/pdl/Articulate
+  repository: http://github.com/pdl/Articulate
+version: '0.005'

@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Acme/CPAN/Testers/FAIL.pm
+t/00-compile.t
+t/01-flail.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

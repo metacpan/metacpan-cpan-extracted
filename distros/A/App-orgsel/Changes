@@ -1,0 +1,40 @@
+Revision history for App-orgsel
+
+0.006   2016-09-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention CSel::Examples.
+
+
+0.005   2016-09-01 (PERLANCAR)
+
+	- [Bugfix] Don't skip root node if it's the only result.
+
+
+0.004   2016-08-30 (PERLANCAR)
+
+	- Adjust to App::CSelUtils 0.04.
+
+
+0.003   2016-08-27 (PERLANCAR)
+
+        - No functional changes.
+
+        - [doc] Mention {json,yaml,dd}sel.
+
+
+0.002   2016-05-28 (PERLANCAR)
+
+	- Support multiple actions on matching nodes (--action, --print,
+	  --print-method, --count).
+
+	- [doc] Mention htmlsel.
+
+	- [doc] Tweak summary.
+
+
+0.001   2016-04-01 (PERLANCAR)
+
+        - First release, split from App-OrgUtils and script renamed from
+          select-org-elements to orgsel.

@@ -1,0 +1,25 @@
+Revision history for Audio-Ofa-Util
+
+0.01    2008-12-20
+        First version, released on an unsuspecting world.
+
+0.02    2008-12-20
+        Removed debugging output
+
+0.02_01 2008-12-21
+        Don't compare the whole fingerprint in base.t, only the beginning seems
+        to be portable.
+
+0.02_02 2008-12-22
+        * Minor changes to the pkg-config code in Build.PL
+        * Add configure_requires for ExtUtils::PkgConfig -- I hope that all
+          testers support it yet; maybe I will have to find some PREREQ_FATAL
+          tricks to make them install dependencies and then run Build.PL again.
+
+1.00    2010-03-08
+        * Add Module::Build to configure_requires
+        * Bumped the version number to 1.00 because the binding seems to work
+          well.
+
+1.01   2010-03-08
+        * Fix pod error

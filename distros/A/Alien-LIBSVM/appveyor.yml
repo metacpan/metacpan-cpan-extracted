@@ -1,0 +1,25 @@
+version: build-{build}
+
+clone_depth: 50
+
+environment:
+  PERL_CPANM_OPT: "--notest --force --skip-satisfied"
+
+platform:
+  - x86
+  - x64
+
+install:
+  - "cpan App::cpanminus"
+  - "cpanm Dist::Zilla"
+  - "dzil authordeps | cpanm"
+  - "dzil listdeps --author | cpanm"
+
+before_build:
+  - "dzil build"
+
+build_script:
+  - "dzil listdeps | cpanm"
+
+test_script:
+  - "dzil test --release"

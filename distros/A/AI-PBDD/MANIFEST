@@ -1,0 +1,11 @@
+Changes
+common.h
+lib/AI/PBDD.pm
+licences/license.JBDD
+Makefile.PL
+MANIFEST
+README
+t/PBDD.t
+XS.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

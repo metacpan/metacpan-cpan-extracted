@@ -1,0 +1,13 @@
+Revision history for Perl extension OPIE.
+
+0.01  Sun Feb  6 11:00:14 2000
+	- original version; created by h2xs 1.19
+
+0.75  Sun Feb 6
+	- added opie_verify
+	- added opie_challenge
+
+1.00  Thu Apr 12 17:26:45 CDT 2001
+	- renamed to Authen::OPIE for CPAN
+	- added a README with additional compilation documentation
+	- changed the revision (no bug reports in over a year)

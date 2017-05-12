@@ -1,0 +1,63 @@
+This module is exhaustively documented inline in the standard POD
+format. Part of that is excerpted here as a brief summary:
+
+This module presents an OO approach to command lines, allowing you
+to instantiate an 'argv object' and run it, e.g.:
+
+    my $ls = Argv->new(qw(ls -l));
+    my $rc = $ls->system;	# or $ls->exec or $ls->qx
+
+Which raises the immediate question - what value does this mumbo-jumbo
+add over Perl's native support such as:
+
+    my $rc = system(qw(ls -l));
+
+The answer comes in a few parts:
+
+STRUCTURE
+
+First, by recognizing the underlying properties of an arg vector. Every
+argv begins with a program name which is followed by (potentially)
+options and operands. The object factors its raw argv into these three
+groups, and provides accessor methods which allow operations on each
+group independently. Or the object can be created with the categories
+preset, e.g.
+
+    my $ls = Argv->new('cat', [qw(-n -u)], '/etc/passwd');
+
+as any or all of the categories may be provided as an array ref.
+
+OPTION SETS
+
+Second, the module encapsulates and extends C<Getopt::Long> to allow
+parsing of the argv's options into different I<option sets>. This is
+useful in the case of wrapper programs which may, for instance, need to
+parse out one set of flags which direct the behavior of the wrapper
+itself, parse a different set and pass them to program X, then another
+for program Y, then exec program Z with the remainder.  Doing this kind
+of thing on a basic @ARGV using indexing and C<splice()> is do-able but
+leads to spaghetti-ish code and lots of off-by-one errors.  Like most
+modules, this one exists to hide the spaghetti.
+
+EXTRA FEATURES
+
+The I<execution methods> C<system, exec, and qx> extend their Perl
+builtin analogues in a few ways.  These are described fully in the POD
+but generally are in the area of UNIX/Win32 portability. For instance,
+they can automatically convert / pathnames to \ on Windows platforms
+before exec-ing them, correctly quote command lines that will be
+exposed to Windows shell-like parsing in cases where such exposure
+wouldn't occur on a Unix platform, cause exec() to behave synchronously
+on Windows as it does on Unix, etc.
+
+Since many users may be interested only in these Unix/Windows portability
+aids and may not care about having an OO approach to factoring argv's
+into option sets, the 'system' and 'exec' methods are also made
+available as regular functions which (if imported) override the
+builtins. Thus users may find that adding
+
+    use Argv qw(system exec qv);
+
+to an existing UNIX-based script enhances its portability to Windows
+(since it's impossible to override the C<qx()> builtin, it's exported
+as C<qv()>).

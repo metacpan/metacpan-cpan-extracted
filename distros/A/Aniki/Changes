@@ -1,0 +1,179 @@
+Revision history for Perl extension Aniki
+
+1.03 2017-03-29T11:24:39Z
+
+   - [EXPERIMENTAL] x_static_install=1 (no feature changes)
+
+1.02 2017-02-10T06:14:56Z
+
+   - added lt/gt alias option for lower/upper (watanabe-yoichi)
+
+1.01 2016-12-10T07:07:27Z
+
+   - added lower/upper option for Aniki::Plugin::Pager
+   - added no_offset option for Aniki::Plugin::SQLPager
+
+1.00 2016-05-24T05:10:36Z
+
+   - no execute any query if empty values is passed to insert_multi
+
+0.94 2016-05-16T09:22:14Z
+
+   - fixed circular reference problem
+
+0.93 2016-04-09T03:22:49Z
+
+   - set empty value if not found reletad rows for preformance
+   - [EXPERIMENTAL] allows extra where condition with prefetch
+
+0.92 2016-03-02T03:29:01Z
+
+   - follow the null values in relationship
+
+0.91 2016-02-23T06:24:26Z
+
+   - support `trace_query` option
+
+0.90 2016-02-23T02:11:26Z
+
+   - follow unique indices for `has_many`
+
+0.89 2016-02-21T03:17:18Z
+
+   - fixed pod syntax
+
+0.88 2016-02-19T08:42:25Z
+
+   - [BUGFIX] fixed `last_insert_id` on MySQL. (`DBIx::Handler#dbh` send a ping to mysql. But, It removes `$dbh->{mysql_insertid}`.)
+
+0.87 2016-02-02T01:33:39Z
+
+   - Allow to enable `suppress_(row|result)_objects` on select_by_sql and select_named.
+
+0.86 2016-01-26T02:39:43Z
+
+   - Split Aniki::Plugin::PagerInjector
+   - Added Aniki::Plugin::SQLPager
+
+0.85 2015-12-10T10:31:33Z
+
+   - Fixed no disconnect if caught not a connect error at retring in Aniki::Handler::RoundRobin
+
+0.84 2015-12-08T02:22:09Z
+
+   - Fixed generated class name by install-aniki
+
+0.83 2015-10-28T03:20:40Z
+
+   - Follow `0` and NULL in default value on insert_and_emulate_row method.
+
+0.82 2015-10-27T15:38:40Z
+
+   - Use Test::Requires for checking the modules installed (syohex)
+
+0.81 2015-10-27T03:20:57Z
+
+   - switch to old style package declation syntax for some old static code analyzers
+
+0.08 2015-10-26T12:39:36Z
+
+   - Split handler class from main class.
+   - Added WeightedRoundRobin plugin.
+
+0.07 2015-10-13T07:59:29Z
+
+   - Fixed broken suppress_row_objects option of select method.
+
+0.06 2015-10-13T00:39:45Z
+
+   - A little refactor. (no feature changes)
+
+0.05 2015-10-12T18:17:51Z
+
+   - Renamed some methods/classes
+   - Performance improvements
+   - Support custom result class
+   - Added insert_and_emulate_row method
+   - Use prepare_cached as default
+   - Unsupport fields case for consistency
+   - Added skeleton generator
+
+0.04_03 2015-09-29T00:59:39Z
+
+    - Keep inflated rows to keep relay cache
+
+0.04_02 2015-09-28T08:26:21Z
+
+    - Plugin::SelectJoined is broken when outer joined.
+
+0.04_01 2015-09-28T07:00:10Z
+
+    - Added Plugin::SelectJoined (inspired by Teng::Plugin::SearchJoined)
+    - Support to select specified columns by table
+
+0.03_01 2015-09-22T04:58:09Z
+
+    - Support automatic pre-cache the inverse relational rows
+
+0.02_09 2015-09-19T05:23:54Z
+
+    - Support the canonicalize of the `SELECT` SQL statement
+    - Support deep prefetch
+
+0.02_08 2015-07-28T03:42:15Z
+
+    - Fixed Aniki::Row#can. (It's broken when it's called as instance method.)
+
+0.02_07 2015-07-28T02:40:43Z
+
+    - Change pluralize logic. (now pluralize last word only. SEE ALSO: https://github.com/karupanerura/Aniki/commit/13998800dc48fbed7ca1ca3bae64935c4aad78f5)
+
+0.02_06 2015-07-27T04:45:03Z
+
+    - Added API `new_row_from_hashref` and `new_collection_from_arrayref`.
+
+0.02_05 2015-07-24T03:32:03Z
+
+    - Aniki::Row#can now returns AUTOLOADed methods.
+
+0.02_04 2015-05-28T02:16:47Z
+
+    - Fixed bulk_insert. (filterd value is not used.)
+    - Improve error message when specified not defined column.
+
+0.02_03 2015-05-22T11:06:35Z
+
+    - Added testing for `Aniki::Plugin::Count`.
+    - Something fixes.
+
+0.02_02 2015-05-01T09:44:45Z
+
+    - Added testing for `Aniki::Plugin::Pager`.
+    - Something fixes.
+
+0.02_01 2015-04-20T23:43:26Z
+
+    - Use strict query builder mode by default.
+    - Added support a named placeholder.
+    - Added support to declaring relationship.
+    - Added `count` to Collection.
+    - Added `is_new` flag to Row class.
+    - Added `refetch` method to Row class.
+    - Added shortcut to `txn_manger`.
+    - Added plugin for paging.
+    - Added plugin for `SELECT COUNT(...)`.
+    - Added some tests.
+
+0.01_03 2015-02-09T00:14:31Z
+
+    - Fixed guessing relationship name algorithm. (when defined multiple foreign key.)
+
+0.01_02 2015-02-02T09:51:41Z
+
+    - Fixed guessing relationship name algorithm.
+    - Fixed dependencies
+
+0.01_01 2015-01-22T10:30:31Z
+
+    - original version
+

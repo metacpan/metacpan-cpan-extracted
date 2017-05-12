@@ -1,0 +1,19 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'dontpanic';
+
+plugin 'Probe::CommandLine' => (
+  command   => 'dontpanic',
+  secondary => 1,
+);
+
+share {
+
+  plugin Download => (
+    url     => 'https://perl5-alien.github.io/page/dontpanic.html',
+    version => qr/([0-9\.]+)\.tar\.gz$/,
+  );
+  plugin Extract => 'tar.gz';
+  plugin 'Build::Autoconf' => ();
+
+};

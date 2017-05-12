@@ -1,0 +1,138 @@
+Astro::Aladin module
+--------------------  
+
+What is it?
+-----------
+
+The module is an object orientated interface into the resources provided
+by the CDS Aladin project
+
+What is CDS Aladin?
+-------------------
+
+Aladin is an interactive software sky atlas allowing the user to visualize 
+digitized images of any part of the sky, to superimpose entries from 
+astronomical catalogues or databases, and to interactively access related 
+data and information from the Simbad database and the VizieR service and 
+other archives for all known objects in the field. The driving motivation 
+behind Aladin is the desire to provide a visual summary of the multi-wavelength
+sky. It is particularly useful for multi-spectral cross-identifications of
+astronomical sources, observation preparation and quality control of new 
+data sets (by comparison with standard catalogues covering the same region 
+of sky). Aladin is developed and maintained by the Centre de Donnees
+astronomiques de Strasbourg (CDS). The Aladin project manager is Francois
+Bonnarel <bonnarel@astro.u-strasbg.fr>
+
+See http://aladin.u-strasbg.fr/aladin.gml for more information about the
+Aladin Project.
+
+How are we accessing the resources?
+-----------------------------------
+
+The CDS Aladin Java Tool is driven in script mode using an anonymous pipe
+from the low level module Astro::Aladin::LowLevel. High level access to
+data is provided by the Astro::Aladin module itself. It's not advisable
+to use the low level module directly unles you're sure you know what
+your doing.
+
+What is the Aladin Java Tool?
+-----------------------------
+
+The Aladin java tool is the user interface of the CDS Aladin Project. It 
+allows the user to query images, catalogues, data, to manipulate the images 
+by zooming or modifying the dynamics, to access the full records of any 
+sources, to add symbols, vectors, etc.
+
+Aladin interface has been developed and is maintained by Pierre Fernique
+<fernique@astro.u-strasbg.fr> (CDS).
+
+Why do it?
+----------
+
+Or rather, why do it this way? The Aladin project gives you access
+to a whole bunch of different surveys and catalogues, but unfortunately 
+the Aladin Application is shipped as a JAR file, without source. 
+
+I needed to access these resources quickly from Perl, so the easiest,
+way seemed to be to drive the Aladin application in script mode using
+its command line interface.
+
+This is not an optimal solution, its not even a sub-optimal solution,
+it's a kludgy hack. On the other hand it does seem to work, and the
+worst of it is heavily disgused by the high level convience routines
+in Astro::Aladin.
+
+If I'd had the source code I would have wrapped the Java source using
+Inline::Java which would have been alot neater. Better yet if I'd
+had the API for the  backend databases I could have written a Perl
+native implementation (although this would have taken alot longer).
+
+Unfortunately we're currently stuck with the kludge.
+
+Requirements
+------------
+
+The module need a locally installed version of the CDS Aladin Java 
+Standalone application. Aladin works on Windows, MacOS, MacOS X, AIX,
+Solaris, Linus, HP-uX and virtually any other platform that has
+a JDK available.
+
+See http://aladin.u-strasbg.fr/java/Aladin_Web_Installers/install.htm
+for download details.
+
+After installation you should set the ALADIN_JAR environment varible
+to point to the Aladin.jar file. This will be picked up by the module
+and used to locate your Aladin installation.
+
+You should also set the ALADIN_MEM variable, which defaults to "128m"
+which gives 128Mb of memory to the JVM. For large catalogue retrivals,
+with radii in excess of 15 to 20 arcminutes, this should be significantly
+increased.
+
+Provides
+--------
+
+The package provides the following classes
+
+    Astro::Aladin
+    Astro::Aladin::LowLevel
+
+further information can be found in the POD included in Aladin.pm
+
+Where can I get it?
+-------------------
+
+The package is availabe from CPAN <http://www.cpan.org/> and from
+the eSTAR Project at http://www.estar.org.uk/
+
+Installation
+------------
+
+Installation is automated using the ExtUtils::MakeMaker library
+
+     % perl Makefile.PL
+     % make
+     % make test
+     % make install
+
+Authors
+-------
+
+The module was written by Alasdair Allan <aa@astro.ex.ac.uk>, of the 
+University of Exeter Astrophysics Group (http://www.astro.ex.ac.uk/) 
+as part of his work for the eSTAR project.
+
+License
+-------
+This package is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA

@@ -1,0 +1,406 @@
+#!perl
+
+our $DATE = '2016-12-27'; # DATE
+our $VERSION = '0.20'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+use Perinci::CmdLine::Classic;
+
+my $cmd = Perinci::CmdLine::Classic->new(
+    url => '/File/Trash/Undoable/',
+    subcommands => {
+        trash         => {
+            url  => '/File/Trash/Undoable/trash_files',
+        },
+        list_contents => {
+            url  => '/File/Trash/Undoable/list_trash_contents',
+            undo => 0,
+        },
+        empty         => {
+            url  => '/File/Trash/Undoable/empty_trash',
+            pass_cmdline_object => 1,
+            undo => 0,
+        },
+    },
+    default_subcommand => 'trash',
+    undo => 1,
+);
+
+delete $cmd->common_opts->{list};
+
+$cmd->common_opts->{empty} = {
+    getopt  => 'empty',
+    handler => sub {
+        my ($go, $val, $r) = @_;
+        $r->{subcommand_name} = 'empty';
+        $r->{subcommand_name_from} = '--cmd'; # XXX not exactly accurate
+        $r->{skip_parse_subcommand_argv} = 1;
+    },
+};
+
+$cmd->common_opts->{list_contents} = {
+    getopt  => 'list-contents',
+    handler => sub {
+        my ($go, $val, $r) = @_;
+        $r->{subcommand_name} = 'list_contents';
+        $r->{subcommand_name_from} = '--cmd'; # XXX not exactly accurate
+        $r->{skip_parse_subcommand_argv} = 1;
+    },
+};
+
+$cmd->run;
+
+1;
+# ABSTRACT: Trash files, with undo/redo capability
+# PODNAME: trash-u
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+trash-u - Trash files, with undo/redo capability
+
+=head1 VERSION
+
+This document describes version 0.20 of trash-u (from Perl distribution App-trash-u), released on 2016-12-27.
+
+=head1 SYNOPSIS
+
+ # trash some files, but in simulation mode, not really trashing the files
+ % VERBOSE=1 trash-u --dry-run *.bak
+
+ # trash some files, for real
+ % trash-u *.bak
+
+ # list trash contents
+ % trash-u --list-contents
+
+ # trash some more files
+ % trash-u * .tmp
+
+ # oops, made a mistake; no worry, let's undo; now previous trashing is reversed
+ % trash-u --undo
+
+ # undo again; now the *.bak files are also restored
+ % trash-u --undo
+
+ # redo; now the *.bak files are trashed again
+ % trash-u --redo
+
+ # show history
+ % trash-u --history
+
+ # forget history; past actions can no longer be undone/redone
+ % trash-u --clear-history
+
+ # empty trash; this action is not undoable (the point is to reclaim space)
+ % trash-u --empty
+
+ # display help for more options
+ % trash-u --help
+
+=head1 DESCRIPTION
+
+This command-line program is an interface to L<File::Trash::Undoable>, which in
+turn uses L<File::Trash::FreeDesktop>.
+
+Features: undo/redo, dry run mode, per-filesystem trash dir.
+
+This program is relatively new and have not yet been tested extensively. Use
+with caution.
+
+=head1 USING AS rm REPLACEMENT
+
+B<trash-u> can be used as B<rm> replacement (a.k.a. alias) with some caveats:
+
+=over 4
+
+=item * trash-u deletes directories by default
+
+That is, it behaves as if -R rm option is in effect.
+
+=item * Some rm options exist but do not have any effect (noop)
+
+=item * Some rm options are still missing/unknown
+
+This include: C<-i>/C<-I>/C<--interactive>, C<--one-file-system>,
+C<--no-preserve-root>.
+
+=back
+
+=head1 SUBCOMMANDS
+
+=head2 B<empty>
+
+Empty trash.
+
+=head2 B<list_contents>
+
+List contents of trash directory.
+
+=head2 B<trash>
+
+Trash files (with undo support).
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--clear-history>
+
+Clear actions history.
+
+=item B<--cmd>=I<s>
+
+Select subcommand.
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--empty>
+
+=item B<--format-options>=I<s>
+
+Pass options to formatter.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--history>
+
+List actions history.
+
+=item B<--json>
+
+Equivalent to --format=json-pretty.
+
+=item B<--list-contents>
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--redo>
+
+Redo previous undone action.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--undo>
+
+Undo previous action.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand trash
+
+=over
+
+=item B<--files-json>=I<s>
+
+Files/dirs to delete (JSON-encoded).
+
+See C<--files>.
+
+=item B<--files-yaml>=I<s>
+
+Files/dirs to delete (YAML-encoded).
+
+See C<--files>.
+
+=item B<--files>=I<s@>*
+
+Files/dirs to delete.
+
+Files must exist.
+
+
+Can be specified multiple times.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C trash-u trash-u
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete trash-u 'p/*/`trash-u`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/trash-u.conf>, F<~/trash-u.conf>, or F</etc/trash-u.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ format (see --format)
+ format_options (see --format-options)
+ naked_res (see --naked-res)
+
+=head2 Configuration for subcommand 'empty'
+
+
+=head2 Configuration for subcommand 'list_contents'
+
+
+=head2 Configuration for subcommand 'trash'
+
+ files (see --files)
+
+=head1 ENVIRONMENT
+
+=head2 PROG_OPT => str
+
+Specify additional command-line options
+
+=head1 FILES
+
+~/.config/trash-u.conf
+
+~/trash-u.conf
+
+/etc/trash-u.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-trash-u>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-trash-u>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-trash-u>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<File::Trash::Undoable>
+
+L<File::Trash::FreeDesktop>
+
+B<trash-cli>
+
+B<gvfs-trash>
+
+B<rmv>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

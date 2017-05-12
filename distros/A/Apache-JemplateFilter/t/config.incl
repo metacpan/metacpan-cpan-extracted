@@ -1,0 +1,7 @@
+PerlModule Apache::Filter
+
+<Location /docs/tmpl/>
+    SetHandler perl-script
+    PerlSetVar      Filter ON
+    PerlHandler     Apache::JemplateFilter
+</Location>

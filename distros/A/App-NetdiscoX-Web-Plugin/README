@@ -1,0 +1,47 @@
+App-NetdiscoX-Web-Plugin-JackReport version 0.01
+==============================================
+
+DESCRIPTION
+
+This is a plugin for the App::Netdisco network management application.
+It adds a report to the Reports menu under Port, Jack Search. This 
+provides a full datatable of the jack search database.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+CONFIGURATION
+
+# in your ~/environments/deployment.yml file
+
+ extra_web_plugins:
+   - X::JackReport
+
+ plugin_jackreport:
+   database_host: 'database.host.tld'
+   driver: 'Driver_type(Oracle,Pg)'
+   database: 'dbname'
+   username: 'userid'
+   password: 'passwd'
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  App::Netdisco
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by F. Reenders
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+

@@ -1,0 +1,16 @@
+--- src/msw/mslu.cpp	2010-01-07 22:38:40.000000000 +0100
++++ src/msw/mslu.cpp	2010-01-07 22:39:45.000000000 +0100
+@@ -61,9 +61,12 @@
+ #include <io.h>
+ #include <sys/stat.h>
+ 
+-#ifdef __VISUALC__
++#if defined(__VISUALC__) || defined(__MINGW64_VERSION_MAJOR)
+     #include <direct.h>
+ #endif
++#if defined(__MINGW64_VERSION_MAJOR)
++    #define stati64 _stati64
++#endif
+ 
+ // Undef redirection macros defined in wx/msw/wrapwin.h:
+ #undef DrawStateW

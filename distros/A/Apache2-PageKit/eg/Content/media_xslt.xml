@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="simple_page.xsl"?>
+<page>
+ <header>Media Test -</header>
+ <body>
+  <para>
+   Process Number:
+  </para>
+  <para>
+   <MODEL_VAR NAME="process_number"/>
+  </para>
+ </body>
+</page>

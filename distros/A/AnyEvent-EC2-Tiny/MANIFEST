@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/AnyEvent/EC2/Tiny.pm
+t/00-compile.t
+t/basic.t
+t/http_error.t
+t/release-pod-syntax.t

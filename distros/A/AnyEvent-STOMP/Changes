@@ -1,0 +1,43 @@
+Revision history for AnyEvent-STOMP:
+
+0.7     Mon Jan 13 09:56:22 EST 2014
+        - Ownership taken over by Fulko Hew.
+        - Added a backwards compatible 'content-length' option.  It facilitates
+          indirect control over ActiveMQ/JMS text/byte message control. See:
+          'Working with JMS Text/Bytes Messages and Stomp' in
+          http://activemq.apache.org/stomp.html
+        - Since empty headers are now feasible, it now handles sending messages
+          with no headers.
+        - BUGFIX: The DESTROY() function was not being invoked when objects
+          went out of scope because its handle->fh contained a reference
+          to the original object (causing a circular reference).  A new
+          mandatory destroy() method now exists to facilitate a proper
+          cleanup avoiding the related memory leak.
+
+0.6     Sat Apr 16 11:36:03 PDT 2011
+        - BUGFIX: Only unregister connect callback in error handler 
+          if one was specified.  (Thanks to Dexter Tad-y for the fix.)
+
+0.5     Thu Nov 11 16:55:38 PST 2010
+        - Added support for 'prepare' and 'connect' events (same as
+          on_prepare and on_connect callbacks in AnyEvent::Handle).
+
+0.4     Thu Nov 11 14:40:00 PST 2010
+        - Fixed a memory leak in the I/O error callback.
+        - Fixed auto-acknowledge mode (only acknowledge messages having a 
+          'message-id' header).
+
+0.3     Wed Nov 10 22:33:57 PST 2010
+        - Set SO_KEEPALIVE on the server connection socket.
+
+0.2     Sat Oct 30 12:14:31 PDT 2010
+        - Fixed auto-acknowledge mode (in prior releases, server never needed
+          acknowledgment regardless of the setting).
+        - Added manual acknowledgment mode.
+
+0.11    Sun Oct 24 18:18:37 PDT 2010
+        - Skipped Pod::Coverage test.
+
+0.1     Sat Oct 23 22:56:58 PDT 2010
+        - Initial release.
+

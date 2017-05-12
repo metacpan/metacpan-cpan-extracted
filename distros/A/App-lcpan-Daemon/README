@@ -1,0 +1,11 @@
+SYNOPSIS
+
+    See lcpand-simple script for the Riap::Simple server.
+
+    See www/lcpand.psgi in this distribution's share files for the PSGI
+    application.
+
+SEE ALSO
+
+    App::lcpan
+

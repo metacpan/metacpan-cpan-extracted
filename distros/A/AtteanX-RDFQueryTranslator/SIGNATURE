@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 aa92ed83e44d6a83588fda9a7dccc6bf7da18433 .travis.yml
+SHA1 71770de24f0f378021187b680960f3b438f498d4 Changes
+SHA1 349e3c3f8e1bb1bd4d3335b2ffe8e5e3539b020b LICENSE
+SHA1 a1707533e4f6705c6f29d15b7fc234a19bb52dfc MANIFEST
+SHA1 c23c26f08e4d9af27585825fee2471e7851a4c4d META.yml
+SHA1 a0324f7a3ea1218ac1bdda7d9d7aaf945bbf37ff Makefile.PL
+SHA1 cb7aa0042b22080a8b308f7bccbd3e50f4fd711c README.md
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 470809a1dbe03e197e74dde79c6af40b5f7f9b26 inc/Module/Install/DOAPChangeSets.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 48ef9e70f4dbc04220d1c5425bd81d11fabc14c1 lib/AtteanX/RDFQueryTranslator.pm
+SHA1 df46ebf7f16dbe59926b34aabd4e808435000995 meta/changes.ttl
+SHA1 756e39ce576b69e29e7b641f05ee29c3d513d292 t/00.load.t
+SHA1 da934929fbac51079addc95135fcf573c823e24b t/translate.t
+SHA1 61bf86179ce63f1148d1fb8c7a4c57bee395f7fc xt/pod-coverage.t
+SHA1 6387af7a5fde0747be5bc9ad2ec15ca9759bd95a xt/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAlcoLlUACgkQhPK6VMqoyC2cNQCfYYA/pFqSuN8YyZgoz2xjDNJR
+qR8An3/Cner/rttxyKKTglNx1k/DT4ys
+=beLo
+-----END PGP SIGNATURE-----

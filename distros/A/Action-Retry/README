@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Action-Retry,
+version 0.24:
+
+  Module to try to perform an action, with various ways of retrying and sleeping between retries.
+
+This software is copyright (c) 2013 by Damien "dams" Krotkine.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

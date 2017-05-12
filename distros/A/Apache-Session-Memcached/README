@@ -1,0 +1,45 @@
+Apache-Session-Memcached version 0.03
+=====================================
+
+Apache::Session::Memcached stores persistent data using memcached (memory cache
+daemon) for Apache::Session storage
+
+See:
+ 
+	perldoc Apache::Session::Memcached
+	perldoc Apache::Session::Memcached::Store
+
+for module documentation and use
+
+CHANGES FROM PREVIOUS VERSION
+
+	! Fixed 'remove' session method with 'delete' Cache::Memcached call
+	+ Added delete calls in tests
+	
+See 'Changes' file in this distribution for complete history revision
+
+INSTALLATION
+
+To install this module type the following:
+
+   %> perl Makefile.PL
+   %> make
+   %> make test
+   %> make install
+
+Note: for live tests, you must run at least a memcached daemon and you could
+need to edit t/CONFIG file, in order to set correct parameters used for
+testing. 
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+- Apache::Session >= 1.54
+- Cache::Memcached >= 1.14
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001-2004 Enrico Sorcinelli. All rights reserved.
+This program is free software; you can redistribute it 
+and/or modify it under the same terms as Perl itself. 

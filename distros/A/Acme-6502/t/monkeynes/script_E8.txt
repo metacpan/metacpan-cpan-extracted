@@ -1,0 +1,47 @@
+clear
+power on
+regs
+
+op a2 55
+
+# IX should now be set to 55
+test ix = 55
+
+op e8
+
+# IX should now be set to 56
+test ix = 56
+
+# Wrap and Zero case --------------
+power on
+
+op a2 ff
+
+# IX should now be set to ff
+test ix = ff
+
+op e8
+
+# Should be: IX=0, Z=1
+test ix = 0
+test z = 1
+
+# Negative case --------------------
+power on
+
+op a2 ef
+
+# Clear S with ACC
+op a9 01
+
+# Should be: IX=EF, S=0
+test ix = ef
+test s = 0
+
+op e8
+
+# Should be: IX=F0, S=1
+test ix = F0
+test s = 1
+
+save verify_E8.txt

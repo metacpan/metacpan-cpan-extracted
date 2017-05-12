@@ -1,0 +1,130 @@
+cpanm (App::cpanminus) 1.7014 on perl 5.020001 built for darwin-2level
+Work directory is /Users/garu/.cpanm/work/1461406336.34435
+You have make /usr/bin/make
+You have LWP 6.13
+You have /usr/bin/tar: bsdtar 2.8.3 - libarchive 2.8.3
+You have /usr/bin/unzip
+--> Working on .
+Entering /Users/garu/Projects/perl/dists/Acme-CPANAuthors-Brazilian
+Configuring /Users/garu/Projects/perl/dists/Acme-CPANAuthors-Brazilian
+Running Makefile.PL
+Warning: prerequisite Acme::CPANAuthors 0.26 not found. We have 0.25.
+Generating a Unix-style Makefile
+Writing Makefile for Acme::CPANAuthors::Brazilian
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Acme::CPANAuthors 0.26 ... No (0.25 < 0.26)
+Checking if you have Test::More 0.47 ... Yes (1.001014)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+==> Found dependencies: Acme::CPANAuthors
+Searching Acme::CPANAuthors on cpanmetadb ...
+--> Working on Acme::CPANAuthors
+Fetching http://www.cpan.org/authors/id/I/IS/ISHIGAKI/Acme-CPANAuthors-0.26.tar.gz
+-> OK
+Unpacking Acme-CPANAuthors-0.26.tar.gz
+Entering Acme-CPANAuthors-0.26
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker::CPANfile 0.07 ... No (0.06 < 0.07)
+==> Found dependencies: ExtUtils::MakeMaker::CPANfile
+Searching ExtUtils::MakeMaker::CPANfile on cpanmetadb ...
+--> Working on ExtUtils::MakeMaker::CPANfile
+Fetching http://www.cpan.org/authors/id/I/IS/ISHIGAKI/ExtUtils-MakeMaker-CPANfile-0.07.tar.gz
+-> OK
+Unpacking ExtUtils-MakeMaker-CPANfile-0.07.tar.gz
+Entering ExtUtils-MakeMaker-CPANfile-0.07
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Configuring ExtUtils-MakeMaker-CPANfile-0.07
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for ExtUtils::MakeMaker::CPANfile
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Module::CPANfile 0 ... Yes (1.1000)
+Checking if you have File::Path 0 ... Yes (2.09)
+Checking if you have version 0.76 ... Yes (0.9909)
+Checking if you have Cwd 0 ... Yes (3.48)
+Checking if you have ExtUtils::MakeMaker 6.17 ... Yes (7.04)
+Checking if you have Test::More 0.88 ... Yes (1.001014)
+Building and testing ExtUtils-MakeMaker-CPANfile-0.07
+cp lib/ExtUtils/MakeMaker/CPANfile.pm blib/lib/ExtUtils/MakeMaker/CPANfile.pm
+Manifying 1 pod document
+PERL_DL_NONLAZY=1 "/Users/garu/.plenv/versions/5.20.1/bin/perl5.20.1" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/00_compile.t .. ok
+t/01_basic.t .... ok
+All tests successful.
+Files=2, Tests=5,  1 wallclock secs ( 0.03 usr  0.01 sys +  0.28 cusr  0.04 csys =  0.36 CPU)
+Result: PASS
+Manifying 1 pod document
+Installing /Users/garu/.plenv/versions/5.20.1/lib/perl5/site_perl/5.20.1/ExtUtils/MakeMaker/CPANfile.pm
+Installing /Users/garu/.plenv/versions/5.20.1/man/man3/ExtUtils::MakeMaker::CPANfile.3
+Appending installation info to /Users/garu/.plenv/versions/5.20.1/lib/perl5/5.20.1/darwin-2level/perllocal.pod
+-> OK
+Successfully installed ExtUtils-MakeMaker-CPANfile-0.07 (upgraded from 0.06)
+Installing /Users/garu/.plenv/versions/5.20.1/lib/perl5/site_perl/5.20.1/darwin-2level/.meta/ExtUtils-MakeMaker-CPANfile-0.07/install.json
+Installing /Users/garu/.plenv/versions/5.20.1/lib/perl5/site_perl/5.20.1/darwin-2level/.meta/ExtUtils-MakeMaker-CPANfile-0.07/MYMETA.json
+Configuring Acme-CPANAuthors-0.26
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Acme::CPANAuthors
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have JSON::PP 0 ... Yes (2.27300)
+Checking if you have Carp 0 ... Yes (1.36)
+Checking if you have IO::Uncompress::Gunzip 2.008 ... Yes (2.066)
+Checking if you have Class::Accessor::Fast 0 ... Yes (0.34)
+Checking if you have File::Spec 0 ... Yes (3.48)
+Checking if you have Test::Deep 0 ... Yes (0.113)
+Checking if you have Exporter 0 ... Yes (5.72)
+Checking if you have Try::Tiny 0 ... Yes (0.22)
+Checking if you have CPAN::DistnameInfo 0 ... Yes (0.12)
+Checking if you have HTTP::Tiny 0 ... Yes (0.050)
+Checking if you have Module::Find 0 ... Yes (0.12)
+Checking if you have Test::UseAllModules 0.15 ... Yes (0.17)
+Checking if you have IO::File 0 ... Yes (1.16)
+Checking if you have version 0.74 ... Yes (0.9909)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.04)
+Checking if you have Test::More 0.88 ... Yes (1.001014)
+Building and testing Acme-CPANAuthors-0.26
+cp lib/Acme/CPANAuthors/Utils/CPANIndex.pm blib/lib/Acme/CPANAuthors/Utils/CPANIndex.pm
+cp lib/Acme/CPANAuthors/Factory.pm blib/lib/Acme/CPANAuthors/Factory.pm
+cp lib/Acme/CPANAuthors/Utils.pm blib/lib/Acme/CPANAuthors/Utils.pm
+cp lib/Acme/CPANAuthors/Utils/Authors.pm blib/lib/Acme/CPANAuthors/Utils/Authors.pm
+cp lib/Acme/CPANAuthors/Utils/Packages.pm blib/lib/Acme/CPANAuthors/Utils/Packages.pm
+cp lib/Acme/CPANAuthors/Utils/Kwalitee.pm blib/lib/Acme/CPANAuthors/Utils/Kwalitee.pm
+cp lib/Acme/CPANAuthors/Register.pm blib/lib/Acme/CPANAuthors/Register.pm
+cp lib/Acme/CPANAuthors.pm blib/lib/Acme/CPANAuthors.pm
+Manifying 8 pod documents
+PERL_DL_NONLAZY=1 "/Users/garu/.plenv/versions/5.20.1/bin/perl5.20.1" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/00_load.t ............ ok
+t/01_basic.t ........... ok
+t/02_standalone.t ...... ok
+t/03_extra.t ........... skipped: this test requires Gravatar::URL
+t/04_lookfor.t ......... ok
+t/05_kwalitee.t ........ ok
+t/06_parse_mailrc.t .... ok
+t/07_parse_packages.t .. ok
+t/08_inline_package.t .. ok
+t/09_factory.t ......... ok
+t/99_pod.t ............. skipped: set TEST_POD to enable this test
+t/99_podcoverage.t ..... skipped: set TEST_POD to enable this test
+All tests successful.
+Files=12, Tests=94, 11 wallclock secs ( 0.06 usr  0.02 sys +  0.60 cusr  0.08 csys =  0.76 CPU)
+Result: PASS
+Manifying 8 pod documents
+Installing /Users/garu/.plenv/versions/5.20.1/lib/perl5/site_perl/5.20.1/Acme/CPANAuthors.pm
+Installing /Users/garu/.plenv/versions/5.20.1/man/man3/Acme::CPANAuthors.3
+Appending installation info to /Users/garu/.plenv/versions/5.20.1/lib/perl5/5.20.1/darwin-2level/perllocal.pod
+-> OK
+Successfully installed Acme-CPANAuthors-0.26 (upgraded from 0.25)
+Installing /Users/garu/.plenv/versions/5.20.1/lib/perl5/site_perl/5.20.1/darwin-2level/.meta/Acme-CPANAuthors-0.26/install.json
+Installing /Users/garu/.plenv/versions/5.20.1/lib/perl5/site_perl/5.20.1/darwin-2level/.meta/Acme-CPANAuthors-0.26/MYMETA.json
+<== Installed dependencies for .. Finishing.
+2 distributions installed

@@ -1,0 +1,17 @@
+<& /index.comp, title => 'john.sec.acme.com', content => $content &>
+<%init>
+my $content = <<'ENDCONTENT';
+<b>Congratulations!</b> you are now authenticated.<p>
+
+<ul>
+<li> throbac - Roman numeral calculator
+</ul>
+<pre>
+#!/usr/bin/perl -pimdclxviz
+@r=$^I=~/./g;$f=5e3;%v=map{$_=>$f/=($i++%2)?2:5}@r;sub a{local($s,$t);@l=split
+//,pop;while($l=pop(@l)){$s+=$v{$l};$s-=2*$v{$l}if($v{$l}<$t);$t=$v{$l};}$s}
+s/([a-z]+)/ a('$1')/g;$_=join('',reverse map{pop(@r);(($_+1)%5)?(($_>4)?$r[
+-2]:'').pop(@r)x($_%5) : pop(@r).$r[($_==4)?-1:-2]}reverse split//,eval)."\n";
+</pre>
+ENDCONTENT
+</%init>

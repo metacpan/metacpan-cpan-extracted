@@ -1,0 +1,28 @@
+NAME
+    Acme::Plack::Middleware::Acme::Werewolf - Plack middleware of
+    Acme::Apache::Werewolf
+
+SYNOPSIS
+      my $app = sub { ... };
+      builder {
+          enable "Acme::Werewolf", moonlength => 4;
+          $app;
+      };
+
+DESCRIPTION
+    Plack middleware implementation of Acme::Apache::Werewolf which keeps
+    werewolves out of your web site during the full moon.
+
+    See to Plack::Middleware::Acme::Werewolf.
+
+AUTHOR
+    Makamaka Hannyaharamitu, <makamaka[at]cpan.org>
+
+    The author of Acme::Apache::Werewolf is Rich Bowen.
+
+COPYRIGHT AND LICENSE
+    Copyright 2012 by Makamaka Hannyaharamitu
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

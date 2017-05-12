@@ -1,0 +1,8 @@
+1.04	Saturday 3d October, 2003
+	inspired by Matt LeBlanc we now hold onto the previous &strict::import
+	and put it back during cool::is to allow lexical declarations of faith
+
+1.03	Saturday 3rd October, 2003
+	maintenance release for 5.8.1.
+	5.8.1's strict.pm is stricter about what strictures it will honour
+	so now gay::is nobbles that too

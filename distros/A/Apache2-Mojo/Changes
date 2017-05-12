@@ -1,0 +1,15 @@
+0.004 2009-02-17
+  - added remote address (needs Mojo 0.9002)
+  - fixed FIRSTKEY-bug
+  - fixed Content-Type
+  - workaround mod_perl-2.0.3-bug
+
+0.003 2008-12-13
+  - fixed outgoing headers (Steve Comrie)
+
+0.002 2008-12-05
+  - fixed scheme (http/https)
+  - use get_body_chunk() instead of body() (Sebastian Riedel)
+
+0.001 2008-11-14
+  - first version

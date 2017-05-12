@@ -1,0 +1,11 @@
+expr = token
+
+token = ((("+" / "*" / "/") SP pair / minus) / number)
+
+minus = "-" SP pair
+
+pair = token SP token
+
+number = 1*DIGIT
+
+noop = "noop" CRLF

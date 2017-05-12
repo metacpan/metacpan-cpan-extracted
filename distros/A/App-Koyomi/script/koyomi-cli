@@ -1,0 +1,95 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.010_001;
+use Pod::Usage;
+
+use version; our $VERSION = 'v0.6.0';
+
+use App::Koyomi::CLI;
+
+my ($method, $props, $args) = App::Koyomi::CLI->parse_args(@ARGV);
+
+pod2usage() unless $method;
+pod2usage(-verbose => 1) if $method eq 'help';
+pod2usage(-verbose => 2) if $method eq 'man';
+
+App::Koyomi::CLI->new(%$props)->$method(%$args);
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+B<koyomi-cli> - Koyomi CLI for job's CRUD
+
+=head1 SYNOPSIS
+
+    # Add one Job
+    koyomi-cli add [OPTION] [-e <PATH of EDITOR>]
+
+    # List Jobs
+    koyomi-cli list [OPTION]
+
+    # Modify one Job
+    koyomi-cli modify -id <job_id> [OPTION] [-e <PATH of EDITOR>]
+
+    # Delete one Job
+    koyomi-cli delete -id <job_id> [OPTION]
+
+    # Show help and manual
+    koyomi-cli help
+    koyomi-cli man
+
+=head1 DESCRIPTION
+
+CommandLine Interface for CRUD of jobs.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--config|-c Str>
+
+Config file path.
+Can be specified with all CRUD sub-commands.
+
+=item B<--job-id|-id Int>
+
+Job ID.
+Must be specified with I<modify> and I<delete> sub-commands.
+
+=item B<--editor|-e Str>
+
+Path to executable file as text editor.
+Can be specified with I<add> and I<modify> sub-commands.
+Default is "vi".
+
+=item B<--debug|-d>
+
+Enable debug logging.
+Can be specified with all CRUD sub-commands.
+
+=back
+
+=head1 SEE ALSO
+
+L<App::Koyomi>,
+L<App::Koyomi::CLI>
+
+=head1 AUTHORS
+
+YASUTAKE Kiyoshi E<lt>yasutake.kiyoshi@gmail.comE<gt>
+
+=head1 LICENSE
+
+Copyright (C) 2015 YASUTAKE Kiyoshi.
+
+This application is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.  That means either (a) the GNU General Public
+License or (b) the Artistic License.
+
+=cut
+

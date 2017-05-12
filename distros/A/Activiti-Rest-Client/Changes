@@ -1,0 +1,18 @@
+0.1253 2015-09-28
+   - support for jobs
+0.1252 2015-07-14
+   - add charset 'UTF-8' to default header Accept
+0.1251 2015-04-30
+   - Activiti::Rest::Response: odd number of values in anonymous hash, due to the method content_type returning multiple values
+0.125  2015-04-27
+   - change in activiti-rest 5.17: error response use 'exception' instead of 'errorMessage'
+   - send signal to execution
+0.124	 2014-12-05
+	 - add support for retrieval of historic variable instances
+0.123    2014-11-13
+	 - add support for retrieval of one task variable
+0.122	 2014-10-16
+	 - Extend Activiti::Rest::Error
+	 - Bug in Activiti::Rest::Error : response content only used in Activiti::Rest::Error::InternalServerError, rest uses response message
+0.121    2014-10-08
+	 - add default header "Accept: application/json" to ensure that Activiti always returns json (in newer version XML can be returned)

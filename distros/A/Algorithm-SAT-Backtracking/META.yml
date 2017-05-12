@@ -1,0 +1,54 @@
+---
+abstract: 'A simple Backtracking SAT solver written in pure Perl'
+author:
+  - 'mudler <mudler@dark-lab.net>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.1, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-SAT-Backtracking
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Algorithm::SAT::Backtracking:
+    file: lib/Algorithm/SAT/Backtracking.pm
+    version: '0.13'
+  Algorithm::SAT::Backtracking::DPLL:
+    file: lib/Algorithm/SAT/Backtracking/DPLL.pm
+    version: '0.13'
+  Algorithm::SAT::Backtracking::DPLLProb:
+    file: lib/Algorithm/SAT/Backtracking/DPLLProb.pm
+    version: '0.13'
+  Algorithm::SAT::Backtracking::Ordered:
+    file: lib/Algorithm/SAT/Backtracking/Ordered.pm
+    version: '0.13'
+  Algorithm::SAT::Backtracking::Ordered::DPLL:
+    file: lib/Algorithm/SAT/Backtracking/Ordered/DPLL.pm
+    version: '0.13'
+  Algorithm::SAT::Expression:
+    file: lib/Algorithm/SAT/Expression.pm
+    version: '0.13'
+requires:
+  Hash::Ordered: '0'
+  List::Util: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/mudler/Algorithm-Sat-Backtracking/issues
+  homepage: https://github.com/mudler/Algorithm-Sat-Backtracking
+  repository: git://github.com/mudler/Algorithm-Sat-Backtracking.git
+version: '0.13'
+x_authority: cpan:MUDLER

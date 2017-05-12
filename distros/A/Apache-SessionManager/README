@@ -1,0 +1,59 @@
+Description
+-----------
+This is version 1.03 of Apache::SessionManager
+
+This package is an HTTP session manager.
+Apache::SessionManager is a mod_perl module that helps 
+session management of a web application. This simple module is a 
+wrapper around Apache::Session persistence framework for session data.
+It creates a session object and makes it available to all other handlers 
+transparenlty by putting it in pnotes. 
+
+See perldoc Apache::SessionManager for module documentation and use
+See perldoc Apache::SessionManager::cookpod for more info about module use
+
+Changes from previous version
+-----------------------------
+
+	* Adopted dotted-quad/mask syntax (eg "192.168.0.0/16") when setting 
+	  SessionManagerIPExclude IP exclusion list
+	+ Added remote IP in debug messages
+	+ Added new cookpod section: "Apache::SessionManager WITH CGI::Builder"
+	! Substituted each STDERR prints with $r->log_error mod_perl API calls
+	! Bug fix: SessionManagerHeaderExclude skips check when header or its value
+	  is undefined
+	! Tested also with latest Apache/mod_perl release (2.0.52/1.99_17)
+	
+See 'Changes' file for complete history revisions.
+
+Installation
+------------
+In order to install and use this package you will need Perl version
+5.005 or better.  Installation as usual:
+ 
+   % perl Makefile.PL
+   % make
+   % make test
+   % su
+     Password: *******
+   % make install
+
+Prerequisites
+-------------
+- mod_perl (of course) >= 1.24 with the appropriate call-back hooks (PERL_TRANS=1,
+  PERL_HEADER_PARSER=1)
+- Apache::Session >= 0.53 is required
+     (http://www.cpan.org/modules/by-module/Apache/Apache-Session-x.yy.tar.gz)
+- Apache::Request >= 0.33 (libapreq) is preferred but not required. If not
+     present CGI::Cookie will be used instead.
+     (http://www.cpan.org/modules/by-module/Apache/libapreq-x.yy.tar.gz)
+  
+Copyright (C) 2001-2004 Enrico Sorcinelli. All rights reserved.
+This program is free software; you can redistribute it 
+and/or modify it under the same terms as Perl itself. 
+
+Author: Enrico Sorcinelli <enrico@sorcinelli.it>
+
+Part of Makefile.PL contains Perl (cool!) code of Joshua Chamas
+Apache-ASP Makefile.PL installation script
+

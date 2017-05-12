@@ -1,0 +1,35 @@
+# CHECKSUMS file written on Wed Feb 13 03:44:01 2008 GMT by CPAN::Checksums (v1.064)
+$cksum = {
+  'Bogus-Fail-0.01.tar.gz' => {
+    'md5' => 'e5967bcb6cb23987db704607fda283b3',
+    'md5-ungz' => 'e8c5a6e36636aec8b19b115020026f13',
+    'mtime' => '2008-01-27',
+    'sha256' => '65656eb60eda4c6d994beb6165737609d6b442a846a2c32010b1b96165c24164',
+    'sha256-ungz' => '209e5e8642a10db943ee2d5e2068f7b5fc07fc7a2fb126baefdc1b67a7af5852',
+    'size' => 965
+  },
+  'Bogus-PL-Fail-0.01.tar.gz' => {
+    'md5' => 'a60f2751456efa0e787e9d2b143d1ccc',
+    'md5-ungz' => '70580f04a8db2ee4b2fd50614cb38f19',
+    'mtime' => '2008-01-27',
+    'sha256' => '5341aeb3d594e70b57972f0763de429b77fc8da0743b0beecb35823cfe0c1fb2',
+    'sha256-ungz' => 'd6c691d4ed0f2229f0cc79b8478f1ff8803eb9b90bfcc78002f3e390e596b27e',
+    'size' => 1007
+  },
+  'Bogus-Pass-0.01.tar.gz' => {
+    'md5' => '6a208561a1c455dfce11ca7a446f4eb9',
+    'md5-ungz' => 'ef5b052ce8d8ffc29107a99d0e79016c',
+    'mtime' => '2008-01-27',
+    'sha256' => '8eb6b1b2bb42b660273ecbc3169504afa8e61cda805fca56fea73afd2d374b94',
+    'sha256-ungz' => '896bd2840aef8beecdb6e24a1806b92de93ccfbe5ab21cc6380731b747a1ccc9',
+    'size' => 962
+  },
+  'Bundle-Fake-1.00.tar.gz' => {
+    'md5' => '2685146a32c45b6c0fee2dd8807cad68',
+    'md5-ungz' => 'ca55cef7ab32536681f5056124570b9c',
+    'mtime' => '2008-02-13',
+    'sha256' => '85be1998dfb2ed4d650c7eac8e8b13980ad5ee4aee5175983acd87a9f38520ab',
+    'sha256-ungz' => '443bc422247ca8a23ad4bd620e5c12a95c70d7e036a90e9b8449090b9e28331b',
+    'size' => 997
+  }
+};

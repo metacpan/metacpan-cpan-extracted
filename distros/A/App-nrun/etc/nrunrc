@@ -1,0 +1,139 @@
+---
+##
+# an example configuration file for nrun (YAML syntax)
+
+# mode ssh options
+ssh_copy: >
+    /usr/bin/scp
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey 
+    -o StrictHostKeyChecking=no 
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL 
+    SOURCE HOSTNAME:TARGET 
+
+ssh_rcopy: >
+    /usr/bin/scp
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey 
+    -o StrictHostKeyChecking=no 
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL 
+    HOSTNAME:SOURCE TARGET 
+
+ssh_exec: >
+    /usr/bin/ssh
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL
+    HOSTNAME COMMAND ARGUMENTS
+
+ssh_delete: >
+    /usr/bin/ssh
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL
+    HOSTNAME rm -f "FILE"
+
+# mode rsh options
+rsh_copy: >
+    /usr/bin/rcp SOURCE root@HOSTNAME:TARGET
+
+rsh_rcopy: >
+    /usr/bin/rcp root@HOSTNAME:SOURCE TARGET 
+
+rsh_exec: >
+    /usr/bin/rsh -l root HOSTNAME COMMAND ARGUMENTS
+
+rsh_delete: >
+    /usr/bin/rsh -l root HOSTNAME rm -f "FILE"
+
+# mode nsh options
+nsh_copy: >
+    ncp SOURCE - //HOSTNAME/TARGET
+
+nsh_rcopy: >
+    ncp //HOSTNAME/SOURCE - TARGET
+
+nsh_exec: >
+    nexec -n HOSTNAME COMMAND ARGUMENTS
+
+nsh_delete: >
+    nexec -n HOSTNAME rm -f "FILE"
+
+nsh_check: >
+    agentinfo HOSTNAME
+
+# mode local options
+local_exec: >
+    TARGET_HOST=HOSTNAME COMMAND ARGUMENTS
+
+# mode generic options [an example that resembles mode ssh]
+generic_copy: >
+    /usr/bin/scp
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey 
+    -o StrictHostKeyChecking=no 
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL 
+    SOURCE HOSTNAME:TARGET 
+
+generic_rcopy: >
+    /usr/bin/scp
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey 
+    -o StrictHostKeyChecking=no 
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL 
+    HOSTNAME:SOURCE TARGET 
+
+generic_exec: >
+    /usr/bin/ssh
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL
+    HOSTNAME COMMAND ARGUMENTS
+
+generic_delete: >
+    /usr/bin/ssh
+    -o User=root
+    -o PreferredAuthentications=hostbased,publickey
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=FATAL
+    HOSTNAME rm -f "FILE"
+
+# additional commandline options
+nrun:
+    arg_mode: ssh
+    arg_check: ping,ns
+    arg_filter: sync
+    arg_logger: result,output,raw
+    arg_parallel: 5
+    arg_timeout: 60
+
+ncopy:
+    arg_mode: ssh
+    arg_check: ping,ns
+    arg_filter: result
+    arg_logger: result,output,raw
+    arg_parallel: 5
+    arg_timeout: 60
+
+# alias definitions
+alias:
+    production:
+        - host1
+        - host2
+    development:
+        - host3
+        - host4
+    all:
+        - production
+        - development

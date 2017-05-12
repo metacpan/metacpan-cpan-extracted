@@ -1,0 +1,177 @@
+NAME
+    Attribute::TieClasses - Attribute wrappers for CPAN Tie classes
+
+VERSION
+    version 1.101700
+
+SYNOPSIS
+      use Attribute::TieClasses;
+      my $k : Timeout(EXPIRES => '+2s');
+      # loads in Tie::Scalar::Timeout and tie()s $k with those options
+
+DESCRIPTION
+    Damian Conway's wonderful "Attribute::Handlers" module provides an easy
+    way to use attributes for "tie()"ing variables. In effect, the code in
+    the synopsis is simply
+
+        use Attribute::Handlers
+            autotie => { Timeout => 'Tie::Scalar::Timeout' };
+
+    Still, going one step further, it might be useful to have centrally
+    defined attributes corresponding to commonly used Tie classes found on
+    CPAN.
+
+    Simply "use()"ing this module doesn't bring in all those potential Tie
+    classes; they are only loaded when an attribute is actually used.
+
+    The following attributes are defined:
+
+      Attribute name(s)  Variable ref  Class the variable is tied to
+      =================  ============  =============================
+      Alias              HASH          Tie::AliasHash
+      Aliased            HASH          Tie::AliasHash
+      Cache              HASH          Tie::Cache
+      CharArray          ARRAY         Tie::CharArray
+      Counter            SCALAR        Tie::Counter
+      Cycle              SCALAR        Tie::Cycle
+      DBI                HASH          Tie::DBI
+      Decay              SCALAR        Tie::Scalar::Decay
+      Defaults           HASH          Tie::HashDefaults
+      Dict               HASH          Tie::TieDict
+      Dir                HASH          Tie::Dir
+      DirHandle          HASH          Tie::DirHandle
+      Discovery          HASH          Tie::Discovery
+      Dx                 HASH          Tie::DxHash
+      Encrypted          HASH          Tie::EncryptedHash
+      FileLRU            HASH          Tie::FileLRUCache
+      Fixed              HASH          Tie::SubstrHash
+      FlipFlop           SCALAR        Tie::FlipFlop
+      IPAddrKeyed        HASH          Tie::NetAddr::IP
+      Insensitive        HASH          Tie::CPHash
+      Ix                 HASH          Tie::IxHash
+      LDAP               HASH          Tie::LDAP
+      LRU                HASH          Tie::Cache::LRU
+      ListKeyed          HASH          Tie::ListKeyedHash
+      Math               HASH          Tie::Math
+      Mmap               ARRAY         Tie::MmapArray
+      NumRange           SCALAR        Tie::NumRange
+      NumRangeWrap       SCALAR        Tie::NumRangeWrap (in Tie::NumRange)
+      Offset             ARRAY         Tie::OffsetArray
+      Ordered            HASH          Tie::LLHash
+      PackedInt          ARRAY         Tie::IntegerArray
+      PerFH              SCALAR        Tie::PerFH
+      Persistent         HASH          Tie::Persistent
+      RDBM               HASH          Tie::RDBM
+      Range              HASH          Tie::RangeHash
+      RangeKeyed         HASH          Tie::RangeHash
+      Rank               HASH          Tie::Hash::Rank
+      Ranked             HASH          Tie::Hash::Rank
+      Ref                HASH          Tie::RefHash
+      Regexp             HASH          Tie::RegexpHash
+      RegexpKeyed        HASH          Tie::RegexpHash
+      Secure             HASH          Tie::SecureHash
+      Sentient           HASH          Tie::SentientHash
+      Shadow             HASH          Tie::ShadowHash
+      Shadowed           HASH          Tie::ShadowHash
+      Sort               HASH          Tie::SortHash
+      Sorted             HASH          Tie::SortHash
+      Strict             HASH          Tie::StrictHash
+      Substr             HASH          Tie::SubstrHash
+      TextDir            HASH          Tie::TextDir
+      Timeout            SCALAR        Tie::Scalar::Timeout
+      Toggle             SCALAR        Tie::Toggle
+      Transact           HASH          Tie::TransactHash
+      TwoLevel           HASH          Tie::TwoLevelHash
+      Vec                ARRAY         Tie::VecArray
+      Vector             ARRAY         Tie::VecArray
+      WarnGlobal         SCALAR        Tie::WarnGlobal::Scalar
+
+    I haven't had occasion to test all of these attributes; they were taken
+    from the module descriptions on CPAN. For some modules where the name
+    didn't ideally translate into an attribute name (e.g.,
+    "Tie::NetAddr::IP"), I have taken some artistic liberty to create an
+    attribute name. Some tie classes require the use of the return value
+    from "tie()" and are as such not directly usable by this mechanism,
+    AFAIK.
+
+    No censoring has been done as far as possible; there are several
+    attributes that accomplish more or less the same thing. TIMTOWTDI.
+
+    If you want any attribute added or renamed or find any mistakes or
+    omissions, please contact me at <marcel@codewerk.com>.
+
+FUNCTIONS
+  make_handler
+    Generates and evaluates the attribute handler code. It takes the name of
+    the attribute to generate, the type of the variable it applies to -
+    scalar, array, hash, general variable -, the name of the package that
+    implements the "tie()", and the filename where that package lives in.
+
+    It calls one of the "make_tie_*()" functions that provides part of the
+    code to generate depending on the tied variable type.
+
+  make_tie_array
+    Returns the code line for the tie of a scalar variable that is needed by
+    "make_handler()".
+
+  make_tie_hash
+    Returns the code line for the tie of an array variable that is needed by
+    "make_handler()".
+
+  make_tie_scalar
+    Returns the code line for the tie of a hash variable that is needed by
+    "make_handler()".
+
+  make_tie_var
+    Is more flexible than the other "make_tie_*()" functions in that it
+    checks the type of the variable that the attribute is being applied to.
+
+EXAMPLES
+        # Tie::Scalar::Timeout
+        my $m : Timeout(NUM_USES => 3, VALUE => 456, POLICY => 777);
+        print "$m\n" for 1..5;
+
+        # Tie::Hash::Rank
+        my %scores : Ranked;
+        %scores = (
+            Adams   => 78,
+            Davies  => 35,
+            Edwards => 84,
+            Thomas  => 47
+        );
+        print "$_: $scores{$_}\n" for qw(Adams Davies Edwards Thomas);
+
+        # Tie::FlipFlop;
+        my $ff : FlipFlop(qw/Red Green/);
+        print "$ff\n" for 1..5;
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Attribute-TieClasses/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Attribute-TieClasses/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2001 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

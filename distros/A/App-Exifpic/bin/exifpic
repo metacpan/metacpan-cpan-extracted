@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use App::Exifpic;
+
+# PODNAME: exifpic
+our $VERSION = '0.02'; # VERSION
+# ABSTRACT: Extract embedded jpegs from RAW camera files.
+
+exit App::Exifpic->run(@ARGV);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+exifpic - Extract embedded jpegs from RAW camera files.
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+    # Extract embedded jpegs from all .CR2 files in the current dir
+
+    $ exifpic *.CR2
+
+=head1 DESCRIPTION
+
+This is a super-simple program to extract embedded (full-size) jpegs
+from RAW camera files.  EXIF headers are copied to the new file, which
+will always have the same name as the old file, but with a .jpg extension.
+
+The code will use as many cores as you have available, and assumes you're
+running a threaded perl.
+
+The code will always scale pictures so the longest side is 2048px or less.
+A patch to allow users to select sizes would be great. :)
+
+=head1 BUGS
+
+Plenty! The code assumes you have a F</proc/cpuinfo> so it can count
+cores. It's only been tested on Canon .CR2 files. There are probably
+more.
+
+Patches are I<super-welcome>.  You can find the code repo at
+L<https://github.com/pfenwick/app-exifpic> .
+
+=head1 AUTHOR
+
+Paul Fenwick <pjf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Paul Fenwick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

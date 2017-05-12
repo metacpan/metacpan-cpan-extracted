@@ -1,0 +1,22 @@
+beep-1.2.2/beep.1.gz
+beep-1.2.2/beep.c
+beep-1.2.2/CHANGELOG
+beep-1.2.2/COPYING
+beep-1.2.2/CREDITS
+beep-1.2.2/INSTALL
+beep-1.2.2/Makefile
+beep-1.2.2/README
+Beep.pm
+Changes
+lib/Audio/Beep/BSD/beep.pm
+lib/Audio/Beep/Linux/beep.pm
+lib/Audio/Beep/Linux/PP.pm
+lib/Audio/Beep/Win32/API.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+music/scales
+music/wtk1
+pods/jp/Beep.pod
+README
+t/1.t

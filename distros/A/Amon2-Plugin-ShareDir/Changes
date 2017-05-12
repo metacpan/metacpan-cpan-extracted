@@ -1,0 +1,26 @@
+Revision history for Perl extension Amon2::Plugin::ShareDir
+
+v0.0.7 2014-08-30T09:43:05Z
+
+    - fixed meta.json format
+
+v0.0.6 2013-08-14T01:56:26Z
+
+    - re-packaging
+      (tokuhirom)
+
+v0.0.5 2013-04-03T05:53:46Z
+
+    - Win32 test fix again
+
+0.0.3 2013-04-02T06:22:35Z
+
+    - Fixed dependencies
+    - Win32 test case fix
+
+0.0.2 2013-03-14T17:51:18
+
+    - fixed docs
+
+0.0.1 2013-03-14T17:10:39
+    - original version

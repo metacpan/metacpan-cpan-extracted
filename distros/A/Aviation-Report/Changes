@@ -1,0 +1,7 @@
+Revision history for Perl extension Aviation::Report.
+
+1.01  Wed Oct  7 12:18:55 1998
+	- original version; created by h2xs 1.18
+
+1.02  Thu Oct  14 20:00:00 1998
+	- embed metar codes as DATA in Report.pm

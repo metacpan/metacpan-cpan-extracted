@@ -1,0 +1,7 @@
+=head1 INSTALLATION
+
+    sudo cpan AtomMQ
+
+=head1 DOCUMENTATION
+
+see L<AtomMQ>

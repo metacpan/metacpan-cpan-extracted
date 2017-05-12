@@ -1,0 +1,23 @@
+# $Id: typemap,v 1.2 1999/07/28 01:59:26 daniel Exp $
+
+BOOL						T_IV
+CHAR *						T_PV
+SWORD						T_IV
+SLONG						T_IV
+SBYTE 						T_CHAR
+SBYTE *						T_PV
+SWORD						T_IV
+UWORD						T_UV
+ULONG						T_UV
+UBYTE						T_U_CHAR
+
+SAMPLE *					T_PTROBJ
+
+MikMod_player_t					T_PTR
+MODULE *					T_PTROBJ
+
+MikMod_handler_t				T_PTROBJ
+struct SAMPLOAD *				T_PTROBJ
+MREADER *					T_PTROBJ
+struct MLOADER *				T_PTROBJ
+struct MDRIVER *				T_PTROBJ

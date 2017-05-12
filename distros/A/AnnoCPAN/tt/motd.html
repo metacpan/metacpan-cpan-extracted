@@ -1,0 +1,51 @@
+[% PROCESS header.html title="Tips" %]
+[% PROCESS login_form.html %]
+[% PROCESS form.html %]
+
+<h2>Tip of the day archive</h2>
+
+<div class="motd">
+<h3>POD Indexing Project</h3>
+<div class="motd_body">
+This is another project for improving Perl documentation, by making it more
+accessible and searchable. We need volunteers; please take a look at 
+<a href="http://pod-indexing.annocpan.org/">http://pod-indexing.annocpan.org/</a>.
+</div>
+</div>
+
+<div class="motd">
+<h3>AnnoCPAN@Home</h3>
+<div class="motd_body">
+Would you like to see AnnoCPAN annotations when you read documentation locally
+using <a href="[% root_uri_rel %]/dist/perl/pod/perldoc.pod?latest=1">perldoc</a>? 
+Now you can, if you install [% link_dist_name('AnnoCPAN-Perldoc') %]. This 
+provides an [% link_perldoc_name('annopod') %] command, which is a drop-in
+replacement for <code>perldoc</code> that inserts annotations from a local 
+database.
+</div>
+</div>
+
+<div class="motd">
+<h3>Now you can write your notes in POD!</h3>
+<div class="motd_body">
+Well, on a subset of it, at least. You can use formatting sequences such as 
+L&lt;&gt; (link),
+B&lt;&gt; (bold),
+I&lt;&gt; (italic),
+C&lt;&gt; (code),
+etc, and verbatim paragraphs (lines that start with a space). What you can't 
+use are the pod commands, such as =item, =head1, etc. For more information
+about the POD format, see [% link_perldoc_name('perlpod') %].
+</div>
+</div>
+
+<div class="motd"><h3>Are you a module author?</h3> 
+<div class="motd_body">
+You can
+get an RSS feed of all the notes attached to your modules at
+<code>http://annocpan.org/~<em>YOUR_PAUSE_ID</em>/recent.rss</code> !
+</div>
+</div>
+
+
+[% PROCESS footer.html %]

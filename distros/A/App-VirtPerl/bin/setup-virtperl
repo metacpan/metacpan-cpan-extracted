@@ -1,0 +1,168 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+my $app = __PACKAGE__->new();
+$app->run();
+
+=head1 NAME
+
+setup-virtperl - bootstrap a virtperl installation.
+
+=head1 VERSION
+
+version 0.1
+
+=head1 SYNOPSIS
+
+    $ setup-virtperl
+    $ echo 'source ~/.virtperl/virtperl.sh' >> ~/.profile
+
+
+=head1 DESCRIPTION
+
+This script creates the directory and shell glue needed for L<virtperl>.  You
+should only have to run it once to get a virtperl instance up and going.
+
+If you wish to have virtperl exist in a location other than C<~/.virtperl> you
+can set the PERL_VIRTPERL_ROOT environment variable before calling this script:
+
+    PERL_VIRTPERL_ROOT=$HOME/perlstuff/virtperl setup-virtperl
+
+=cut
+
+sub new {
+    my ($class, $arg) = @_;
+    
+    my $self = bless {
+        root => $ENV{PERL_VIRTPERL_ROOT} || "$ENV{HOME}/.virtperl"
+    };
+    
+    return $self;
+}
+
+sub run {
+    my ($self) = @_;
+    
+    $self->mkdir($self->{root});
+    my $shell_script = "export PERL_VIRTPERL_ROOT=$self->{root}\n" . <<'END';
+
+export PERL_VIRTPERL_CURRENT_ENV=''
+ORIG_PS1=$PS1
+
+function virtperl () {
+    case "$1" in
+        use)
+            _virtperl_use $2
+            ;;
+        off)
+            _virtperl_off $2
+            ;;
+        *)
+            _virtperl_tool $@
+            ;;
+    esac
+}
+
+function _virtperl_use() {
+    if [ "x$1" == "x" ]; then
+        echo "Usage: virtperl use <env name>";
+        return 1;
+    fi
+    
+    local DIR="$PERL_VIRTPERL_ROOT/$1";
+    if [ ! -d $DIR ]; then
+        echo "$1 is not a virtual perl env.  You can create it with virtperl create $1"
+    else 
+        export PERL5OPT="-MApp::VirtPerl::Setup ${PERL5OPT#-MApp::VirtPerl::Setup }"
+        export PATH=$PERL_VIRTPERL_ROOT/$1/bin:${PATH#$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV/bin:}
+        export PERL_CPANM_OPT="-L$PERL_VIRTPERL_ROOT/$1 ${PERL_CPANM_OPT#-L$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV }"
+        export PS1="($1)${PS1#\($PERL_VIRTPERL_CURRENT_ENV)}"
+        export PERL_VIRTPERL_CURRENT_ENV=$1
+    fi
+}
+
+function _virtperl_off() {
+    export PERL5OPT=${PERL5OPT#-MApp::VirtPerl::Setup}
+    export PATH=${PATH#$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV/bin:}
+    export PERL_CPANM_OPT=${PERL_CPANM_OPT#-L$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV }
+    unset  PERL_VIRTPERL_CURRENT_ENV
+    export PS1=$ORIG_PS1
+}
+
+function _current_envs() {
+    ls -d $PERL_VIRTPERL_ROOT/*/ | xargs basename
+}
+
+function _complete_virtperl() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local prev=${COMP_WORDS[COMP_CWORD-1]}
+    
+    case "$prev" in
+        use|rm|remove)
+            COMPREPLY=($(compgen -W "$(_current_envs)" -- $cur));
+            ;;
+        virtperl)
+            COMPREPLY=($(compgen -W "create new use list mkcpanfile rm remove off" -- $cur));
+            ;;
+    esac
+    
+    return 0
+}
+
+complete -F _complete_virtperl virtperl
+
+END
+
+    $self->write_file("$self->{root}/virtperl.sh", $shell_script);
+
+    print <<END;
+You should include $self->{root}/virtperl.sh in your shell to finish setting up
+virtperl:
+
+    . $self->{root}/virtperl.sh
+    
+
+END
+}
+
+
+
+sub mkdir {
+    my ($self, $dir) = @_;
+    CORE::mkdir($dir) || do {
+        die "Couldn't mkdir $dir: $!\n" unless $! =~ m/exists/;
+    };
+}
+
+sub write_file {
+    my ($self, $file, $body) = @_;
+    
+    open(my $fh, '>', $file) || die "Couldn't open $file for writing: $!\n";
+    print $fh $body;
+    close($fh) || die "Couldn't close $file: $!\n";
+}
+
+=head1 AUTHORS
+
+    Chris Reinhardt
+    crein@cpan.org
+
+=head1 COPYRIGHT
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=head1 SEE ALSO
+
+L<virtperl>, L<App::VirtPerl>, virtualenv, perl(1)
+
+=cut
+
+
+1;
+__END__

@@ -1,0 +1,43 @@
+---
+abstract: 'a client library for App::Notifier::Service'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  blib: '1.01'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Notifier-Client
+provides:
+  App::Notifier::Client:
+    file: lib/App/Notifier/Client.pm
+    version: '0.0300'
+  App::Notifier::Client::Notifier_App:
+    file: lib/App/Notifier/Client/Notifier_App.pm
+    version: '0.0300'
+requires:
+  Getopt::Long: '2.36'
+  JSON::MaybeXS: '0'
+  LWP::UserAgent: '0'
+  Pod::Usage: '0'
+  URI: '0'
+  YAML::XS: '0'
+  perl: '5.012'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Notifier-Client
+  repository: ssh://hg@bitbucket.org/shlomif/app-notifier
+version: '0.0300'

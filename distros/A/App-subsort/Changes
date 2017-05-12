@@ -1,0 +1,15 @@
+Revision history for App-subsort
+
+0.03    2016-12-16 (PERLANCAR)
+
+	- Add alias: sortsub.
+
+
+0.02    2016-12-16 (PERLANCAR)
+
+	- [ux] Add tab completion for routine.
+
+
+0.01    2015-10-07 (PERLANCAR)
+
+        - First release.

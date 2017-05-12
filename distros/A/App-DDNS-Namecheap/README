@@ -1,0 +1,40 @@
+NAME
+    App::DDNS::Namecheap - Dynamic DNS update utility for Namecheap
+    registered domains
+
+VERSION
+    version 0.014
+
+SYNOPSIS
+        my $domain =  App::DDNS::Namecheap->new(
+                          domain   => 'mysite.org',
+                          password => 'abcdefghijklmnopqrstuvwxyz012345',
+                          hosts    => [ "@", "www", "*" ],
+                          ip       => '127.0.0.1',    #optional -- defaults to external ip
+        );
+
+        $domain->update();
+
+DESCRIPTION
+    This module provides a method for setting the address records of your
+    Namecheap hosted domains.
+
+METHODS
+    update
+        Updates Namecheap A records using the attributes listed above. The
+        optional ip attribute can be set statically; otherwise the ip where
+        the script is running will be used.
+
+AUTHOR
+    David Watson <dwatson@cpan.org>
+
+SEE ALSO
+    scripts/ in the distribution
+
+COPYRIGHT AND LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

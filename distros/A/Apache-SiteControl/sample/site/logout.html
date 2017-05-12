@@ -1,0 +1,22 @@
+<HTML>
+   <HEAD>
+      <TITLE>LOGOUT</TITLE>
+   </HEAD>
+   <BODY bgcolor="white">
+% if($success) {
+      <P>You have been logged out.</P>
+% } else {
+      <P>Attempt to log out failed. You were not logged in.</P>
+% }
+   </BODY>
+</HTML>
+
+<%init>
+my $user = Apache::SiteControl->getCurrentUser($r);
+my $success = 0;
+
+if(defined($user) && $user->isa("Apache::SiteControl::User")) {
+   $user->logout($r);
+   $success = 1;
+}
+</%init>

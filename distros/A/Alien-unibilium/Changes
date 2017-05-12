@@ -1,0 +1,60 @@
+Revision history for Alien-unibilium
+
+0.12    2016/12/05 00:16:49
+        [CHANGES]
+         * Updates to latest inc/Alien/make/Module/Build.pm:
+            + alien_requires logic (though not used here)
+            + don't get upset by lack of GNU make + libtool if we're not
+              actually going to use them to build bundled source
+         * Updated for unibilium v1.2.0
+
+0.12    2015/05/29 18:55:18
+        [CHANGES]
+         * No need to declare dependency on ExtUtils::PkgConfig when it is no
+           longer used
+         * Updated for unibilium v1.1.4
+
+0.11    2014/01/04 22:12:06
+        [CHANGES]
+         * Allow wrapping of existing system library or installing bundled one
+
+0.10    CHANGES:
+         * Repack upstream tarball after removing GNUmakefile that should not
+           have appeared
+
+0.09    CHANGES:
+         * Updated for unibilium v1.1.0
+         * Bugfix to LIBTOOL argument passing to make
+
+0.08    CHANGES:
+         * Try to detect GNU make and GNU libtool by probing, rather than
+           hardcoding what is the likely command on each OS type.
+
+0.07    CHANGES:
+         * A better implementation of the three 'check' style veersion testing
+           ExtUtils::PkgConfig methods
+
+0.06    BUGFIXES:
+         * Fixes for cygwin:
+            + GNU make is just called "make"
+            + Close written .pc file before trying to rename() it
+
+0.05    BUGFIXES:
+         * Don't hardcode libdir into .pm file, discover it by @INC search
+         * Rewrite file paths in .pc file relative to libdir - should allow
+           for relocatable installs that work both from blib/ and real
+           installation location
+
+0.04    BUGFIXES:
+         * Bake real installation libdir into built .pm file rather than
+           build-time blib/ dir
+
+0.03    CHANGES:
+         * Updated for unibilium v1.0.1
+
+0.02    CHANGES:
+         * GNU libtool is called 'glibtool' on Darwin
+         * Build dependencies need to be listed as configure_requires
+
+0.01    First version, released on an unsuspecting world.
+

@@ -1,0 +1,44 @@
+Revision history for App-ListSoftwareLicenses
+
+0.07    2015-09-15 (PERLANCAR)
+
+	- [ux] Change -V to -l (mnemonic: ls -l).
+
+
+0.06    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.05    2015-07-15 (PERLANCAR)
+
+	- Adjust to Perinci::Sub::Gen::AccessTable 0.46.
+
+
+0.04    2015-02-04 (PERLANCAR)
+
+	- Ignore failure in instantiating modules like
+	  Software::License::CCpack (which is just a main/placeholder
+	  module for the Software-License-CCpack distribution of collection
+	  of CC licenses) [RT#101885, Thanks Slaven].
+
+
+0.03     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.02    2014-06-29 (SHARYANTO)
+
+        - Include license text data (in field 'text').
+
+
+0.01    2014-06-29 (SHARYANTO)
+
+        - First release.

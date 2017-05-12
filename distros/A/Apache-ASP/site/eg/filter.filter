@@ -1,0 +1,35 @@
+
+<% $Response->Include('header.inc'); %>
+
+This file uses Apache::ASP both as a source and destination
+filter with Apache::Filter.  By doing so it processes this
+file <b><%= basename($0) %></b> first, and then it processes the output from
+the first Apache::ASP script, compiling that output as
+an ASP script itself.
+<p>
+This is probably not how this would be used normally, you
+would usually chain some filter aware modules together like:
+<pre>
+       SetHandler perl-script
+       PerlHandler SomeFilter Apache::ASP Apache::SSI
+       PerlSetVar Global .
+       PerlSetVar Filter On
+</pre>
+
+<p>
+
+So we are about to print this code:
+<% my $code = "<\% print '<b>Code Output: '.time().'</b>'; %\>"; %>
+<%= $Server->HTMLEncode($code) %>
+
+<p>
+And here should be the executed version of it:
+<p>
+<% print $code; %>
+<p>
+
+This last code bit would get executed when the first script output 
+gets processed by the second Apache::ASP destination filter.
+
+<% $Response->Include('footer.inc'); %>
+

@@ -1,0 +1,24 @@
+clear
+power on
+regs
+
+op a9 55
+
+# ACC should now show $55
+test acc = 55
+
+op a9 00
+
+# ACC should be 0 and Z should be 1
+test acc = 0
+test z = 1
+
+op a9 f2
+
+# ACC should be f2 and S should be 1
+test acc = f2
+test s = 1
+
+regs
+
+save verify_A9.txt

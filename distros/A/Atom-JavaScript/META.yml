@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Atom-JavaScript
+version:      0.5
+version_from: lib/XML/Atom/Feed/JavaScript.pm
+installdirs:  site
+requires:
+    DateTime:                      0
+    XML::Atom:                     0.08
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

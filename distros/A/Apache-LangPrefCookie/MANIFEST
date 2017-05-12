@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/compiles.t
+t/requests.t
+t/pod.t
+t/TEST.PL
+t/conf/extra.conf.in
+t/conf/startup.pl.in
+t/htdocs/langprefcookie/index.html.de
+t/htdocs/langprefcookie/index.html.en
+t/htdocs/langprefcookie/index.html.html
+t/htdocs/langprefcookie/index.html.it
+t/htdocs/langprefcookie/switch.html
+t/htdocs/langprefcookie/foo/index.html.de
+t/htdocs/langprefcookie/foo/index.html.en
+t/htdocs/langprefcookie/foo/index.html.html
+t/htdocs/langprefcookie/foo/index.html.it
+lib/Apache/LangPrefCookie.pm
+META.yml                                 Module meta-data (added by MakeMaker)

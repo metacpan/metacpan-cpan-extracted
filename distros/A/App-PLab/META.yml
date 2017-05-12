@@ -1,0 +1,24 @@
+---
+abstract: Internal PLab image processing tools
+author:
+  - 'Dmitry Karasik <dk@plab.ku.dk>, Anton Berezin <tobez@plab.ku.dk>, Vadim Belman <voland@plab.ku.dk>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-PLab
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Prima: 0
+  Prima::IPA: 0
+  XML::Parser: 0
+version: 1.03

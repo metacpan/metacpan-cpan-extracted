@@ -1,0 +1,29 @@
+---
+abstract: 'Limit event processing to count/time ratio.'
+author:
+  - 'Andrey Kostenko <andrey@kostenko.name>'
+build_requires:
+  Cache::FastMmap: 0
+  File::Temp: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Algorithm-FloodControl
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor::Fast: 0
+  Module::Install: 0.77
+  Module::Load: 0
+  Params::Validate: 0
+  perl: 5.8.0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.990000

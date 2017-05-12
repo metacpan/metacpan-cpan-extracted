@@ -1,0 +1,39 @@
+App-Web-VPKBuilder version 0.001
+================================
+
+App::Web::VPKBuilder is a simple web service for building Source
+engine game VPK packages. It presents a list of mods sorted into
+(sub)categories. The user can choose a mod from each category and will
+get a VPK containing all of the selected packages.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* Data::Diver
+* File::Slurp
+* HTML::Tree
+* Hash::Merge
+* List::MoreUtils
+* Plack
+* Sort::ByExample
+* YAML
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014-2015 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

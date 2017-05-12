@@ -1,0 +1,15 @@
+Changes
+lib/Async/Chain.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/boilerplate.t
+t/chain.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+ex/exp1.pl
+ex/exp2.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

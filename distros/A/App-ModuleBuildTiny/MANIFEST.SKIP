@@ -1,0 +1,13 @@
+blib/
+_build_params
+\.git/
+\.gitignore
+.*\.swp
+.*~
+.*\.tar\.gz
+MYMETA\..*
+MANIFEST.bak
+^Build$
+App-ModuleBuildTiny-*
+nytprof*
+metamerge.*

@@ -1,0 +1,53 @@
+{
+   "abstract" : "Perl interface to Starlink PAL positional astronomy library",
+   "author" : [
+      "Tim Jenness E<gt>tjenness@cpan.orgE<lt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Astro-PAL",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Test::More" : "0",
+            "Test::Number::Delta" : "1"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3604"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Astro::PAL" : {
+         "file" : "lib/Astro/PAL.pm",
+         "version" : "1.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/timj/perl-Astro-PAL/tree/master",
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ],
+      "repository" : {
+         "url" : "git://github.com/timj/perl-Astro-PAL.git"
+      }
+   },
+   "version" : "1.07"
+}

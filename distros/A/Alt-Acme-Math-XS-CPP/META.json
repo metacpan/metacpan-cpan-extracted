@@ -1,0 +1,49 @@
+{
+   "abstract" : "Math is HARD (faster!)",
+   "author" : [
+      "Ingy döt Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alt-Acme-Math-XS-CPP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "inc",
+         "lib/Acme"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Inline::CPP" : "0.69",
+            "Inline::Module" : "0.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.0.5"
+}

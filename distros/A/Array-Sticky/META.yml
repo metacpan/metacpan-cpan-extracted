@@ -1,0 +1,25 @@
+---
+abstract: 'Make elements of an array stick where they are'
+author:
+  - 'Belden Lyman <belden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Array-Sticky
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: https://github.com/belden/perl-array-sticky/issues
+  homepage: https://github.com/belden/perl-array-sticky
+  repository: git://github.com/belden/perl-array-sticky.git
+version: 0.01

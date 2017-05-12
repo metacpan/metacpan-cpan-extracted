@@ -1,0 +1,5 @@
+# Basic UTF-7 decoding
+POST /utf7 HTTP/1.0
+Content-Type: application/x-www-form-urlencoded
+
+string=Cha%2bAO4-ne

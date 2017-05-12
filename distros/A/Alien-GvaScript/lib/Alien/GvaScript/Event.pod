@@ -1,0 +1,168 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+Alien::GvaScript::Event - application-specific events
+
+=head1 SYNOPSIS
+
+  MyConstructor = function (...) {...};
+  
+  MyContructor.prototype = {
+   
+    fireEvent = GvaScript.fireEvent, // copy into the target object
+  
+    someMethod: function(...) {
+      ...
+      this.fireEvent(eventName, target1, target2, ...);
+      // OR ...
+      this.fireEvent({type: eventName,
+                      prop1: value1,
+                      ...            }, target1, target2, ...);
+    }
+  };
+
+
+=head1 DESCRIPTION
+
+Extension of the HTML event model with specific events. 
+Various C<GvaScript> controllers use this to manage interactions
+between the DOM elements and the controller. Client code
+can register a an event handler either within the 
+HTML code, or through Javascript.
+
+
+Events have names specific to the controller
+(for example C<choiceList> uses events C<Highlight> and C<Ping>;
+C<treeNavigator> uses events C<Close>, C<Open>, C<BeforeLoadContent>, etc.).
+
+
+=head1 METHODS
+
+=head2 fireEvent (first syntax)
+
+If a class needs to fire specific events, it must 
+I<copy> the C<GvaScript.fireEvent> method into its own
+methods (so that "this" is properly bound to an instance
+of that class).
+
+The first argument to C<fireEvent> is usually an event name. This 
+can be any string, without the C<on> prefix :
+
+  this.fireEvent("Ping", this.htmlElement, otherElement1, ...);
+
+The method will inspect all HTML elements supplied in 
+the argument list, trying to find an C<onPing> handler.
+If none is found, the method also tries to find 
+an C<onPing> property within the calling object (C<this>).
+
+If an event handler is found, that handler is called
+with an C<event> argument as described below; 
+the return value of the handler becomes the 
+return value of C<fireEvent>. If not handler is found,
+C<fireEvent> returns C<null>.
+
+=head2 fireEvent (second syntax)
+
+For more sophisticated needs, the first argument
+to C<fireEvent> can be an object with several 
+properties. In that case, all properties will be copied
+into the generated event structure. The C<type> property
+should contain the event name, in order to be compatible
+with the first syntax. So for example 
+
+  this.fireEvent({type  : "Ping",
+                  prop1 : "value1",
+                  prop2 : "value2"}, this.htmlElement, otherElement1, ...);
+
+will generate "Ping" events with all default properties described
+below, plus the properties C<prop1> and C<prop2>.
+
+
+
+=head1 REGISTERING AN EVENT HANDLER
+
+  <div onEventName="doSomethingWith(this)">
+    <span onEventName="doSomethingMoreSpecificWith(this, controller)">
+    <span onEventName="doYetAnotherThing">
+  </div>
+
+  myController.onEventName = function(event){...};
+
+There are three ways to register a handler:
+
+=over
+
+=item javascript statement in an HTML attribute
+
+This works as for ordinary HTML DOM events. The javascript statement 
+will be evaluated in a context where the following variables are
+defined:
+
+=over
+
+=item this
+
+The object that registered the event handler.
+
+=item target
+
+The HTML element that first received the event.
+
+=item currentTarget
+
+The object that registered the event handler (equivalent to C<this>).
+
+=item controller
+
+The GvaScript controller object that generated the event.
+
+=item event
+
+A structure containing various information about the generated event,
+described below.
+
+=back
+
+=item name of a javascript function inside an HTML attribute
+
+The given function will be called with a single C<event> argument.
+
+=item property assigned from Javascript
+
+This works exactly like the previous case : the event handling
+function receives a single C<event> argument.
+
+=back
+
+
+
+=head2 Event structure
+
+The C<event> object passed to event handlers contains the
+following properties :
+
+
+=over
+
+=item type
+
+name of the triggered event (i.e. "Ping", "Highlight", etc.)
+
+=item target
+
+The HTML element that first received the event.
+
+=item srcElement
+
+Synonym for C<target>.
+
+=item currentTarget
+
+The object that registered the event handler.
+
+=item controller
+
+The GvaScript controller object that generated the event.
+
+=back

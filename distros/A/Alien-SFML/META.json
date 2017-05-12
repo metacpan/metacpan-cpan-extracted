@@ -1,0 +1,45 @@
+{
+   "abstract" : "Build and install SFML 2.0 (RC)",
+   "author" : [
+      "Jake Bott <jake.anq@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-SFML",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base" : 0,
+            "Alien::CMake" : 0,
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : 0,
+            "File::ShareDir" : "1.00",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::SFML" : {
+         "file" : "lib/Alien/SFML.pm",
+         "version" : "0.0101"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.0101"
+}

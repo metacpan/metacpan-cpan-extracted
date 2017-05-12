@@ -1,0 +1,82 @@
+0.20 2016-06-04T07:14:11Z
+    - graduated SuzukiKanon
+0.19 2015-12-31T15:20:42Z
+    - updated SayashiRiho.pm along with her graduation from Morning Musume on Dec 31th 2015.
+
+0.18 2014-11-26T12:58:30Z
+    - updated MichishigeSayumi.pm along with her graduation from Morning Musume on Nov 26th 2014.
+
+0.17 2014-10-06T12:16:25Z
+    - added HagaAkane.pm MakinoMaria.pm NonakaMiki.pm OgataHaruna.pm who joined into Morning Musume as 12 class.
+
+0.16 2013-10-01T15:06:17Z
+
+  Revision history for Perl extension Acme::MorningMusume
+
+0.16  Tue Oct 02 2013
+    - updated the data of Kudoh Haruka and Oda Sakura
+      (Thanks to catatsuy)
+    - removed old dependencies that hadn't work
+
+0.15  Mon May 27 2013
+    - updated ReinaTanaka.pm along with her graduation from Morning Musume on May 21 2013
+      (Thanks to catatsuy)
+
+0.14  Sat Jan 5 2012
+    - updated along with current members.
+      (Thanks to catatsuy)
+
+0.13  Tue Aug 23 2011
+    - updated EriKamei.pm, LiChun.pm, and QianLin.pm for their graduation from Morning Musume at Dec 15 2010.
+    - added KanonSuzuki.pm, ErinaIkuta.pm, KanonSuzuki.pm, and MizukiFukumura.pm who joined into Morning Musume on Jan
+
+0.12  Tue Dec 8 2009
+    - updated KusumiKoharu.pm for her graduation from Morning Musume at Dec 6 2009..
+
+0.11  Fri Jun 1 2007
+    - updated FujimotoMiki.pm because she resigned Morning Musume Jun 1 2007 to take responsibility for her scandal.
+
+0.10  Mon May 7 2007
+    - updated along with that Hitomi Yoshizawa graduated from Morning Musume on May 6 2007.
+
+0.09  Sat Apr 7 2007
+    - added LiChun.pm and QianLin.pm who joined into Morning Musume as foreign students on Mar 15 2007
+    - fixed Acme::MorningMusume::Base.pm which made an error by mistake
+
+0.08  Tue Jan 16 2007
+    - added MitsuiAika.pm who joined into Morning Musume on Dec 10 2006
+      (Thanks to Jonathan Rockway #24387)
+    - changed license to MIT license from Perl license
+    - removed an inappropriate nickname from KusumiKoharu.pm
+
+0.07  Mon Aug 28 2006
+    - updated OgawaMakoto.pm for her graduation on Aug 27 2006
+
+0.06  Sat Jul 29 2006
+    - updated KonnoAsami.pm for her graduation
+
+0.05  Sat Sep 4 2005
+    - fixed a bug not to load KusumiKoharu.pm.
+      (Thanks to nipotan <http://blog.livedoor.jp/nipotan/>)
+    - added a new feature enables to retrieve the members at some time.
+      (Thanks to klm <http://okowa.org/>)
+    - added the graduate_date property to IshikawaRika.pm with her retiring Morning Musume.
+    - added more info to KusumiKoharu.pm.
+    - added some tests.
+
+0.04  Sun May 1 2005
+    - added KusumiKoharu.pm with her joining Morning Musume. But her detailed profile isn't known yet, I'll update KusumiKoharu.pm accordingly.
+
+0.03  Sat Apr 3 2005
+    - fixed a fatal bug: making a mistake in spelling of Kaori Iida's nick
+    - added the graduate_date property to YaguchiMari.pm with her retiring Morning Musume.
+
+0.02  Sat Apr 5 2005
+    - fixed a fatal bug: making some mistakes in spelling of member's name
+    - fixed some erros on documentation
+    - added/removed some accessors of Acme/MorningMusume/Base.pm:
+        * added  : name_ja, name_en, first_name_ja, family_name_ja, first_name_en, family_name_en
+        * removed: first_name, family_name, pronunciation
+
+0.01  Sat Apr 3 2005
+    - initial release

@@ -1,0 +1,52 @@
+=encoding utf8
+
+
+This is Perl module B<App::contenttype>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/App-contenttype"><img src="https://secure.travis-ci.org/bayashi/App-contenttype.png"/></a> <a href="https://coveralls.io/r/bayashi/App-contenttype"><img src="https://coveralls.io/repos/bayashi/App-contenttype/badge.png?branch=master"/></a> <a href="http://cpants.cpanauthors.org/dist/App-contenttype"><img src="http://cpa
+nts.cpanauthors.org/dist/App-contenttype.png"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+App::contenttype installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan App::contenttype
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+App::contenttype documentation is available as in POD. So you can do:
+
+    % perldoc App::contenttype
+
+
+=head1 REPOSITORY
+
+App::contenttype is hosted on github
+L<http://github.com/bayashi/App-contenttype>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

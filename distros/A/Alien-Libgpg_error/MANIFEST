@@ -1,0 +1,11 @@
+Build.PL
+Changes
+helpers/fix-makefile.pl
+lib/Alien/Libgpg_error.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod.t
+META.yml
+META.json

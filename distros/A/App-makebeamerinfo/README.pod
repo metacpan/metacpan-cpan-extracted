@@ -1,0 +1,56 @@
+=head1 makebeamerinfo
+
+Creates .info file for use with Impressive and LaTeX Beamer
+
+=head1 DESCRIPTION
+
+L<Impressive|http://impressive.sourceforge.net/> is a pdf viewer that aids in viewing presentations made in L<LaTeX Beamer|http://latex-beamer.sourceforge.net/>. Impressive uses a F<.info> control file to specify the transitions used between pages. While this file isn't necessary, the Beamer-based presentation can be presented in a much more consistant style when the F<.info> file is tuned to the individual presentation. C<makebeamerinfo> is designed to create this file based on an auxiliary file (F<.nav>) that Beamer creates in parallel with the presentation. It also does not require any configuration or tags in the presentation source.
+
+
+=head1 DOCUMENTATION
+
+Users looking for usage information should look at L<makebeamerinfo>. For subclassing information (not stable yet) one might look at L<App::makebeamerinfo>.
+
+=head1 INSTALLATION
+
+L<App::makebeamerinfo> can be installed from L<CPAN> using the standard C<cpan> client (or better yet L<cpanm>).
+
+For Ubuntu users, Liviu Andronic manages an Ubuntu (Debian) PPA. See more at:
+
+=over 
+
+=item L<https://launchpad.net/~landronimirc/+archive/impressive>
+
+=item L<https://launchpad.net/~landronimirc/+archive/impressive-svn>
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+Impressive: L<http://impressive.sourceforge.net/>
+
+=item *
+
+LaTeX Beamer: L<http://latex-beamer.sourceforge.net/>
+
+=back
+
+=head1 SOURCE REPOSITORY
+
+L<http://github.com/jberger/MakeBeamerInfo>
+
+=head1 AUTHOR
+
+Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2013 by Joel Berger
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

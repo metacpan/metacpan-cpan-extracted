@@ -1,0 +1,11 @@
+^blib/
+^t/(logs|output)/
+^\.status$
+~$
+^Makefile(\.old)?$
+^pm_to_blib$
+^t/access\.cnf$
+^t/httpd\.cnf$
+^t/srm\.cnf$
+^t/htusers$
+^lib/Apache/Roaming/LiPrefs/Config.pm$

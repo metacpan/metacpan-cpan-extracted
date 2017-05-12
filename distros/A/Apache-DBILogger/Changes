@@ -1,0 +1,61 @@
+Revision history for Apache::DBILogger
+
+0.93  Thu Oct  8 1998 ask
+	- [webstat] Moved webstat.pl to webstat_mail.pl
+	- [webstat] Correct address in From: header
+	- [webstat] Added webstat_resolver.pl - a little script to resolve
+	            logrows without 'remotehost'
+	- [webstat] Now also lists the top 20 domains visiting the site
+	- [webstat] .. and other minor changes
+
+0.92  Wed Jul 29 1998 ask
+	- Added moverows.pl, webstat.pl and webstat.conf to the bin/
+	  directory.
+	- Fixed some flaws in the table defination in the pod section.
+	  (thanks to Lupe Christoph)
+	- Now sets $r to shift->last. This should stop the problems with
+	  a wrong contenttype being logged.
+	- Gets the usertrack cookie from $r->notes.
+
+0.91  Sat Jun 20 1998 ask
+	- If the 'Apache' cookie is set (from mod_usertrack) then 
+	  log it to the 'usertrack' field.
+
+0.90  Fri Jun 19 1998 ask
+	- Updated documentation, fixing pod errors and more
+	- More testing done (hence the upgrade in the version number)
+
+0.85  Fri Jun 19 1998 ask
+	- DBILogger_table option. Defaults to 'requests'
+	- Updated documentation about requests_insert
+
+0.84  Tue Jun  9 1998 ask
+	- Optimized the reconnect some
+	- Disabled the reconnect thingy
+	- Added logging of contenttype
+	- Added TRAPS section to documentation
+
+0.83  Tue May 26 1998 ask
+	- Retry and not just reconnect on connection loss
+
+0.82  Sat May 23 1998 ask
+	- Oops, 'warn' should be $r->log_error
+
+0.81  Tue May 19 1998 ask
+	- Adding '' and not NULL as referer if none is found
+	- Added a little reconnect function (trying to get rid of these
+	  annoying Lost connection messages).
+
+0.80  Sun May  5 1998 ask
+	- Changed dbh->do to ->prepare, ->execute to beable to log more
+	  errors.
+
+0.20  Sun Mar 22 1998 ask
+	- Updated documentation
+	- Added error handling in the connect stage. (Wow, 'safe'
+	  programming ...)
+	- More testing	
+
+0.01  Thu Mar 12 1998 ask
+	- original version
+

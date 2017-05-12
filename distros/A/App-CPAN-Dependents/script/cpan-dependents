@@ -1,0 +1,131 @@
+#!perl
+
+use strict;
+use warnings;
+use App::CPAN::Dependents 'find_all_dependents';
+use Getopt::Long::Modern;
+
+our $VERSION = '1.000';
+
+my $usage_msg = "Usage: $0 [options] <distribution|module>";
+
+my ($module, $dist, $count, $debug, $recommends, $suggests, $develop);
+
+GetOptions(
+	'module|M'        => \$module,
+	'dist|D'          => \$dist,
+	'count|c'         => \$count,
+	'debug|d'         => \$debug,
+	'with-recommends' => \$recommends,
+	'with-suggests'   => \$suggests,
+	'with-develop'    => \$develop,
+) or die "$usage_msg\n";
+
+my $subject = shift;
+die "$usage_msg\n" unless defined $subject;
+
+my %options = (recommends => $recommends, suggests => $suggests,
+	develop => $develop, debug => $debug);
+my $dependents;
+if ($module) {
+	$dependents = find_all_dependents(module => $subject, %options);
+} elsif ($dist) {
+	$dependents = find_all_dependents(dist => $subject, %options);
+} else {
+	eval { $dependents = find_all_dependents(module => $subject, %options); 1 }
+		or $dependents = find_all_dependents(dist => $subject, %options);
+}
+
+if ($count) {
+	print scalar @$dependents, "\n";
+} else {
+	print "$_\n" for @$dependents;
+}
+
+=head1 NAME
+
+cpan-dependents - Recursively find all reverse dependencies for a distribution
+or module
+
+=head1 SYNOPSIS
+
+  # List dependent distributions for module JSON::Tiny
+  $ cpan-dependents JSON::Tiny
+  
+  # Output count of distributions dependent on module JSON::Tiny
+  $ cpan-dependents -c JSON::Tiny
+  
+  # List dependent distributions for distribution JSON-Tiny
+  $ cpan-dependents -D JSON-Tiny
+  
+  # List dependent distributions for distribution JSON-Tiny,
+  # including "recommends" dependencies
+  $ cpan-dependents --with-recommends JSON-Tiny
+
+=head1 DESCRIPTION
+
+Command-line script to list or count the dependent distributions for a
+particular CPAN distribution or module, using L<App::CPAN::Dependents>. The
+first non-option argument is used as the target module or distribution.
+Dependent distributions will be output line by line when complete, or the total
+number of distributions will be output with the C<--count> option.
+
+If neither C<--module> nor C<--dist> are specified as options, the target will
+be tried first as a module, then as a distribution if unsuccessful.
+
+This script uses the MetaCPAN API, and must perform several requests
+recursively, so it may take a long time (sometimes minutes) to complete. If the
+script encounters HTTP errors (including when querying a nonexistent module or
+distribution) or is unable to connect, it will die.
+
+This script will only find distributions that explicitly list prerequisites in
+metadata; C<dynamic_config> will not be used. Also, it assumes distributions
+are "well-behaved" and thus declare all provided modules in the C<provides>
+metadata, and only modules which they are authorized to provide. Any
+distributions that do not follow this behavior may lead to incorrect results.
+
+=head1 OPTIONS
+
+=head2 -M, --module
+
+Interpret target as module name.
+
+=head2 -D, --dist
+
+Interpret target as distribution name.
+
+=head2 -c, --count
+
+Display total count of dependent distributions instead of the list of
+distribution names.
+
+=head2 --with-recommends
+
+Include C<recommends> prerequisites when finding dependents.
+
+=head2 --with-suggests
+
+Include C<suggests> prerequisites when finding dependents.
+
+=head2 --with-develop
+
+Include C<develop> phase prerequisites when finding dependents.
+
+=head2 -d, --debug
+
+Print debugging output to STDERR as it is retrieved.
+
+=head1 AUTHOR
+
+Dan Book, C<dbook@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2015, Dan Book.
+
+This library is free software; you may redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=head1 SEE ALSO
+
+L<App::CPAN::Dependents>, L<CPAN::Meta::Spec>

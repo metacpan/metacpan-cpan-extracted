@@ -1,0 +1,98 @@
+# This package is distributed under GNU public license.
+# See file COPYING for details.
+
+Apache::AuthChecker - mod_perl based authentication module used to prevent
+brute force attacks via HTTP authorization. It remembers IP addresses of any
+user trying to authenticate for certain period of time. If user
+runs out limit of failed attempts to authenticate - all his authentication
+requests will be redirected to some URI (like this: /you_are_blocked.html).
+
+Requirements: 
+
+ 1. Apache 1.3.x (2.x) with mod_perl 1.2x (2.x) enabled 
+ 2. IPC::Shareable perl module version 0.60 by BSUGARS. Probably it
+    should work with other versions, but I did not test.
+
+Installation:
+
+ -from the directory where this file is located, type:
+     perl Makefile.PL
+     make && make test && make install
+                                  
+!!! For RedHat users !!! 
+1. You need httpd-devel rpm package installed.
+2. If 'make' fails, try to type: 
+export LANG=en_US
+and restart installation process FROM BEGINNING.
+There is a known bug in RedHat distributions.
+
+
+Apache configuration process:
+
+ 1. Add directives to httpd.conf below directives LoadModule and AddModule:
+    <IfDefine MODPERL2>
+#	PerlModule Apache2	#Uncomment this line if you use mod_perl2 earlier than 2.0.2
+        PerlLoadModule Apache::AuthChecker
+    </IfDefine>
+    <IfDefine !MODPERL2>
+        PerlModule Apache::AuthChecker
+    </IfDefine>
+    PerlAuthCheckerMaxUsers 1450           
+    PerlSecondsToExpire     3600           
+
+ Note: parameter PerlAuthCheckerMaxUsers affects amount of shared memory 
+  allocated. Rule to estimate: every IP record eats 45 bytes. It means if you 
+  set 1000 users - 45Kbytes of shared memory will be allocated. Default
+  setting is 64KByte which gives us about 1450 records.
+  Exact value depends on PerlSecondsToExpire parameter.
+  !!! It does not store ALL logins info, ONLY FAILED ONES BY IP.
+      I see no need to make it big.
+  Max limit depends on your OS settings.
+  
+ PerlSecondsToExpire - how long will we store data about authentication 
+  failures.
+   
+
+ 2. Use .htaccess or <Directory> or <Location> mechanisms with the 
+  following directives (default values):
+
+    AuthName "My secret area"
+    PerlAuthenHandler Apache::AuthChecker
+    PerlSetVar      AuthUserFile /path/to/my/.htpasswd
+    PerlSetVar      MaxFailedAttempts 10
+    PerlSetVar      RedirectURI /
+    require valid-user
+    
+ Example. 
+    Your old .htaccess file looks like:
+    
+    AuthName "My secret area"
+    AuthType Basic
+    AuthUserFile /path/to/my/.htpasswd
+    require valid-user
+        
+    The new one:
+    
+    AuthName "My secret area"
+    #AuthType Basic
+    PerlAuthenHandler Apache::AuthChecker
+    PerlSetVar    AuthUserFile /path/to/my/.htpasswd
+    require valid-user
+                
+
+ Parameters:
+
+ AuthUserFile       - path to your passwords htpasswd-made file (REQUIRED).
+ MaxFailedAttempts  - Maximum attempts we give user to mistype password 
+                      (OPTIONAL, default - 8).
+ RedirectURI        - URI (not URL!) to redirect attacker then he runs out 
+                      attempts limit ((OPTIONAL, default - /). 
+                      For example: /you_are_blocked.html
+
+
+
+Andre Yelistratov 
+ E-mail: andre@sundale.net
+ ICQ: 9138065
+
+  

@@ -1,0 +1,25 @@
+GatewayRoot /debian/
+GatewayTimeout 120
+
+# versioned files (presumably always up-to-date)
+<LocationMatch "\.(deb|dsc|(diff|orig\.tar)\.gz)$">
+Site ftp://ftp.jimpick.com/pub/mirrors/debian-non-US/
+Site ftp://non-us.debian.org/debian-non-US/
+</LocationMatch>
+
+# some directories
+<LocationMatch "^dists$|/$">
+Site ftp://non-us.debian.org/debian-non-US/
+Site ftp://ftp.jimpick.com/pub/mirrors/debian-non-US/
+</LocationMatch>
+
+# default
+<LocationMatch ".*">
+Site ftp://non-us.debian.org/debian-non-US/
+Site ftp://ftp.jimpick.com/pub/mirrors/debian-non-US/
+</LocationMatch>
+
+# servers with broken clocks	     upstream^2 upstream
+# ClockBroken scheme://host:port	  TZ	  TZ
+#ClockBroken ftp://non-us.debian.org	CET1MEST CET1MEST
+ClockBroken ftp://ftp.jimpick.com	CET1MEST PST8PDT

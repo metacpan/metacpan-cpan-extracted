@@ -1,0 +1,11 @@
+Many things, including:
+* More security testing
+* Improve caching support for Apache::PAR::Static - create ability to cache on server startup
+* Implement RegistryLoader
+* Implement a HTML::Template::PAR, others
+* Redesign tests to generate par files, move contents to tmp directory if necessary
+* Support for author signatures in PAR files
+* Support for loading PAR files from network
+* PAR's within PAR's (like EAR files for Java)
+* Ability to specify UNPACKLIST to list files to unpack
+* New features...

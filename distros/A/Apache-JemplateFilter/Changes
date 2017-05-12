@@ -1,0 +1,10 @@
+Revision history for Apache-JemplateFilter
+
+0.02    Thu Apr 17 17:46:27 JST 2008
+        Use ExtUtils::MakeMaker::prompt() in t/lib/Apache/test.pm
+        (Thanks to IMACAT)
+
+0.01    Mon May  1 00:18:07 JST 2006
+        First version.
+
+

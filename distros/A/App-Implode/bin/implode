@@ -1,0 +1,159 @@
+#!/usr/bin/env perl
+package App::implode::cli;
+use strict;
+use warnings;
+use Archive::Tar;
+use Cwd 'abs_path';
+use Carton ();
+use Carton::Builder;
+use Carton::Environment;
+use Carton::Mirror;
+use File::Basename 'basename';
+use File::Find ();
+use File::Path ();
+use File::Spec::Functions qw( catdir catfile );
+use File::Temp 'tempdir';
+use IO::Compress::Bzip2;
+
+our $PATH = abs_path(__FILE__);
+
+sub DESTROY {
+  my $self = shift;
+  return chdir $self->[0] if UNIVERSAL::isa($self, 'ARRAY');
+  File::Path::remove_tree($self->{tmpdir}) if $self->{cleanup} and $self->{tmpdir};
+}
+
+sub mirror { shift->{mirror} ||= Carton::Mirror->new($ENV{PERL_CARTON_MIRROR} || $Carton::Mirror::DefaultMirror) }
+sub tmpdir { shift->{tmpdir} //= tempdir(CLEANUP => $ENV{IMPLODE_NO_CLEANUP} ? 0 : 1) }
+sub verbose { shift->{verbose} //= $ENV{APP_IMPLODE_VERBOSE} ? 0 : -t STDOUT }
+
+sub bundle {
+  my $self     = shift;
+  my $script   = $self->slurp($self->{script});
+  my $exploder = $self->code('exploder');
+  my $id       = basename $self->{out};
+
+  $exploder =~ s!^sub.*\@_;!BEGIN{my \$id='$id';!s;
+  $exploder =~ s!^\s+!!mg;
+  $exploder =~ s!\n!!g;
+
+  open my $OUT, '>', $self->{out} or die "Could not write $self->{out}: $!\n";
+  warn sprintf "Generating $self->{out} with embedded bzip archive...\n" if $self->verbose;
+  print $OUT $script =~ s/^(#!.+?[\r\n]+)//m ? $1 : "#!/usr/bin/perl\n";
+  print $OUT $exploder, "\n", $script, "\n__END__\n";
+  $self->tarball->write(IO::Compress::Bzip2->new($OUT), COMPRESS_GZIP);
+  close $OUT;
+  chmod 0755, $self->{out};
+  warn sprintf "$self->{out} is generated.\n" if $self->verbose;
+}
+
+sub chdir {
+  my $self = shift;
+  my $guard = bless [abs_path], ref($self);
+  chdir $_[0] or die "chdir $_[0]: $!";
+  $guard;
+}
+
+sub code {
+  my ($self, $name) = @_;
+  open my $SELF, '<', $PATH or die "Read $PATH: $!";
+  return join '', grep { /^sub $name/ .. /^\}/ } <$SELF>;
+}
+
+sub deps {
+  my $self    = shift;
+  my $env     = Carton::Environment->build('cpanfile', $self->tmpdir);
+  my $builder = Carton::Builder->new(mirror => $self->mirror, cpanfile => $env->cpanfile);
+
+  $self->dir_is_empty($self->tmpdir) or die "Cannot build $self->{script}: @{[$env->install_path]} already exists.\n";
+  $self->{cleanup} = 1;
+  $builder->install($env->install_path);
+}
+
+sub dir_is_empty {
+  my ($self, $dir) = @_;
+  opendir(my $DH, $dir) or return 1;
+  not scalar grep {/\w/} readdir $DH;
+}
+
+sub exploder {
+  my ($self, $id) = @_;
+  require Archive::Tar;
+  require File::Path;
+  require File::Spec;
+  require IO::Uncompress::Bunzip2;
+  sub App::implode::temp::DESTROY { File::Path::remove_tree(${$_[0]}) }
+  $App::implode::explodedir
+    = bless \($ENV{APP_EXPLODE_DIR} || File::Spec->catdir(File::Spec->tmpdir, "app-implode-$id")), 'App::implode::temp';
+  warn "[App::implode] cd $$App::implode::explodedir; tar -xfz $0\n" if $ENV{APP_EXPLODE_VERBOSE};
+  my $tar = Archive::Tar->new;
+  $tar->read(
+    IO::Uncompress::Bunzip2->new(
+      do {
+        open my $FH, '<', $0;
+        my $m = 0;
+        \join '', grep { $m++ if /^__END__\r?\n/ || $m; $m > 1; } <$FH>;
+        }
+    )
+  );
+  $tar->setcwd($$App::implode::explodedir);
+  $tar->extract or die "[App::implode] tar -xfz $0 failed: @{[$tar->error]}";
+  unshift @INC, File::Spec->catdir($$App::implode::explodedir, 'lib', 'perl5');
+  $ENV{PATH} = join ':', grep {defined} File::Spec->catdir($$App::implode::explodedir, 'bin'), $ENV{PATH};
+  $ENV{PERL5LIB} = join ':', @INC;
+}
+
+sub slurp {
+  my ($self, $file) = @_;
+  open my $FH, '<', $file or die "Could not read $file: $!\n";
+  local $/;
+  readline $FH;
+}
+
+sub tarball {
+  my $self  = shift;
+  my $chdir = $self->chdir($self->tmpdir);
+  my $chmod = sub { -f and chmod 0600 | (0777 & (stat _)[2]), $_ };
+  my $files = sub { @_ > 1 and File::Find::find({no_chdir => 1, wanted => shift}, @_) };
+  my $tar   = Archive::Tar->new;
+
+  $files->(
+    sub {
+      return unless $chmod->();
+      warn sprintf "Add @{[catfile $self->{tmpdir}, $_]}\n" if $self->verbose;
+      $tar->add_files($_);
+    },
+    grep {-d} qw( bin lib )
+  );
+
+  undef $chdir;
+  $files->(
+    sub {
+      return unless $chmod->() and s!lib!lib/perl5!;
+      warn sprintf "Add $_\n" if $self->verbose;
+      $tar->add_data($_, $self->slurp($File::Find::name));
+    },
+    grep {-d} qw( lib )
+  );
+
+  return $tar;
+}
+
+sub run {
+  my $self = shift;
+
+  $self->{script} = shift or die "Usage: implode myapp.pl [path/to/outfile.pl]\n\n";
+  $self->{out} = shift || basename $self->{script};
+  -r $self->{script} or die "Cannot read '$self->{script}'.\n";
+  -e $self->{out} and die "Outfile '$self->{out}' already exists.\n";
+
+  warn sprintf "Building application in %s\n", $self->tmpdir if $self->verbose;
+  $self->deps;
+  $self->bundle;
+
+  return 0;
+}
+
+exit((bless {})->run(@ARGV)) unless defined wantarray;
+no warnings;
+'App::implode::cli';

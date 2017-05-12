@@ -1,0 +1,2 @@
+PerlModule Apache2::ShowStatus
+PerlInitHandler Apache2::ShowStatus

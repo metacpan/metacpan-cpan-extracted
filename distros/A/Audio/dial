@@ -1,0 +1,62 @@
+#!/usr/local/bin/perl -w
+use Audio::Data;
+use Audio::Play;
+use IO::File;
+use Getopt::Std;
+my %opt = ( r => 8000, a => 1 );
+getopts('f:ar:',\%opt);
+
+my %freq = ( 1 => [697,1209],
+             2 => [697,1336],
+             3 => [697,1477],
+             4 => [770,1209],
+             5 => [770,1336],
+             6 => [770,1477],
+             7 => [852,1209],
+             8 => [852,1336],
+             9 => [852,1477],
+             '*' => [941,1209],
+             '0' => [941,1336],
+             '#' => [941,1477]
+	   );  
+
+
+my $rate = $opt{r};
+
+warn "rate = ${rate}Hz\n";
+
+my $sil = Audio::Data->new(rate => $rate, silence => 0.1);
+
+$| = 1;
+
+my $au = Audio::Data->new(rate => $rate);
+
+foreach (@ARGV)
+ {
+  foreach $digit (split(//,$_))
+   {
+    next unless exists $freq{$digit};
+    my ($l,$h) = @{$freq{$digit}};
+    print "$digit";
+    my $lo = Audio::Data->new(rate => $rate);     
+    my $hi = Audio::Data->new(rate => $rate); 
+    $lo->tone($l,0.125,0.4);
+    $hi->tone($h,0.125,0.4);
+    $au .= ($lo+$hi);   
+    $au->silence(0.05); 
+   }
+  print "\n";
+ }
+
+if ($opt{f})
+ {
+  open(my $fh,">",$opt{f}) || die "Cannot open $opt{f}:$!";
+  $au->Save($fh);
+  close($fh);   
+ }
+
+if ($opt{a})
+ {
+  my $svr = Audio::Play->new;
+  $svr->play($au);
+ }

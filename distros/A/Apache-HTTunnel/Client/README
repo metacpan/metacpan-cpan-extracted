@@ -1,0 +1,45 @@
+HTTunnel-Client
+===============
+
+HTTunnel::Client is the client class for communicating with an Apache::HTTunnel
+server. It provides a simple interface for reading and writing to the remote 
+socket.
+
+Also included is the httunnel daemon which can be used to easily create HTTP 
+tunnels.
+
+
+INSTALLATION
+
+- To install this module type the following:
+
+     % perl Makefile.PL
+     % make
+     % make test
+     % make install
+
+     Note 1: The test suite will require the URL to an Apache::HTTunnel server 
+             to run. You will prompted for it during the installation. This 
+             server must allow tunnels to localhost:80. That Apache server 
+             must also return an HTTP 200 code for a "GET / HTTP/1.0" request. 
+             Generally if the server has index.html file in the document root 
+             it will be ok.
+
+ 
+DEPENDENCIES
+
+This module requires:
+
+- An Apache web server configured with Apache::HTTunnel
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Patrick LeBoutillier <patl@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

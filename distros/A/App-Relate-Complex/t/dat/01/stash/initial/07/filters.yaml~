@@ -1,0 +1,7 @@
+---
+bleach:
+  description: gets rid of unsightly blemishes
+  method: skip_any
+  modifiers: x
+  terms:
+    - '^.*$'

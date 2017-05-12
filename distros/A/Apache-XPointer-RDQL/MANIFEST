@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Apache/XPointer/RDQL.pm
+lib/Apache/XPointer/RDQL/Parser.pm
+lib/Apache/XPointer/RDQL/RDFStore.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load-rdql.t
+t/01-load-rdql-rdfstore.t

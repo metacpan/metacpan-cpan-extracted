@@ -1,0 +1,255 @@
+=head1 NAME
+
+Array::Each::Tutorial - POD giving various examples how to use
+Array::Each.
+
+=head1 VERSION
+
+This document refers to version 0.02 of Array::Each.
+
+=head1 SYNOPSIS
+
+ man Array::Each
+ man Array::Each::Tutorial
+
+or
+
+ perldoc Array::Each
+ perldoc Array::Each::Tutorial
+
+=head1 DESCRIPTION
+
+=head2 Overview
+
+This tutorial contains only POD, so don't do this:
+
+ use Array::Each::Tutorial;  # don't do this
+
+Rather, simply read the POD (as you are doing).  But first, please
+read the docs for Array::Each, because the whole scoop is there.
+
+This tutorial is intended to augment those docs with examples
+showing situations where you might want to use Array::Each instead
+of other techniques.
+
+=head1 EXAMPLES
+
+=head2 Parallel Arrays vs. Using a Hash
+
+First of all, use a hash.  It's almost always the best solution if
+you want to associate a "key" with a "value".  And there are modules
+available that will let you do wonderful things with hashes, like
+keeping the keys sorted or keeping them in the order they were
+added.
+
+So given a hash, you might at some point want to do this:
+
+ my %h = ( a=>1, b=>2, c=>3, d=>4, e=>5 );
+ while( my( $k, $v ) = each %h ) {
+     # ... do something with $k and $v ...
+ }
+
+On the other hand, if parallel arrays better implement your algorithm,
+then you may find you want to do something like this:
+
+ my @k = qw( a b c d e );
+ my @v = qw( 1 2 3 4 5 );
+ for my $i ( 0 .. $#k ) {
+     my( $k, $v ) = ( $k[$i], $v[$i] );
+     # ... do something with $k and $v (and maybe $i) ...
+ }
+
+Using Array::Each, you could do the same thing this way:
+
+ use Array::Each;
+ my @k = qw( a b c d e );
+ my @v = qw( 1 2 3 4 5 );
+ my $obj = Array::Each->new( \@k, \@v );
+ while( my( $k, $v, $i ) = $obj->each ) {
+     # ... do something with $k and $v (and maybe $i) ...
+ }
+
+If you don't need C<$i> at all, you can leave it out, e.g.,
+
+ while( my( $k, $v ) = $obj->each ) {
+     # ... do something with $k and $v ...
+ }
+
+If you have more than two parallel arrays, include them all in the
+call to new() and add as many "capture" variables as you need,
+e.g.,
+
+ my @k = qw( a b c d e );
+ my @v = qw( 1 2 3 4 5 );
+ my @p = qw( - + ~ = : );
+ my $obj = Array::Each->new( \@k, \@v, \@p );
+ while( my( $k, $v, $p, $i ) = $obj->each ) {
+     # ... do something with $k, $v, and $p (and maybe $i) ...
+ }
+
+=head2 One Array vs. Using a Hash
+
+If you find that you can solve your problem with one array that
+holds pairs of data (or triplets, or quadruplets ...), you could
+do the following.  Note that we're passing the B<< set=> >>, and
+B<< group=> >> named parameters to new().
+
+ # pairs
+ my @a = ( a=>1, b=>2, c=>3, d=>4, e=>5 );
+ my $hash_like = Array::Each->new( set=>[\@a], group=>2 );
+ while( my( $k, $v, $i ) = $hash_like->each ) {
+     # ... do something with $k and $v ...
+     # note that $i is successively, 0, 2, 4, 6, 8
+     # (but see count below)
+ }
+
+ # triplets
+ my @a = ( a=>1,'-', b=>2,'+', c=>3,'~', d=>4,'=', e=>5,':' );
+ my $tre = Array::Each->new( set=>[\@a], group=>3 );
+ while( my( $k, $v, $p, $i ) = $tre->each ) {
+     # ... do something with $k, $v, and $p ...
+     # note that $i is successively, 0, 3, 6, 9, 12
+     # (but see count below)
+ }
+
+=head2 Groups of Elements from an Array
+
+Of course, you don't have to have a "hash-like" situation to want
+to iterate over multiple elements.  For example, if you want to
+list elements five at a time, following are two options using
+splice:
+
+ # destructive    
+ my @n = ( 1..100 );
+ while( my @a = splice( @n, 0, 5 ) ) {
+     # ... do something with @a ...
+ }
+
+ # non-destructive    
+ my @n = ( 1..100 );
+ my @n2 = @n;  # sacrificial copy
+ while( my @a = splice( @n2, 0, 5 ) ) {
+     # ... do something with @a ...
+ }
+
+With Array::Each (also non-destructive):
+
+ my @n = ( 1..100 );
+ my $obj = Array::Each->new( set=>[\@n], group=>5 );
+ while( my @a = $obj->each ) {
+     my $i = pop @a;  # because each returns index, too
+     # ... do something with @a ...
+ }
+
+Benchmarks show this to be considerably slower than using splice.
+However, if making a sacrificial copy is untenable, e.g., if you
+have a very large and/or tied array, then Array::Each may fit the
+bill better.
+
+=head1 SOME ATTRIBUTE COMBINATIONS
+
+This section shows how some attribute combinations will affect what
+each() returns.
+
+=head2 Iterator and Rewind
+
+Setting C<iterator> will determine the starting point of the very
+next iteration.  Setting C<rewind> will determine where the rewind()
+method (and internal rewind operations) will rewind to.  Setting
+them both to the same value will cause successive iterations to
+start at the same place as the first one.
+
+In the following hypothetical situation, the first array element
+has a special meaning, while the remaining ones are meaningful
+pairs.  So we want to skip the first element when we print out the
+pairs by setting both C<iterator> and C<rewind> to 1.
+
+ my @a = ( [d=>4], a=>1, b=>2, c=>3, d=>4 );
+ my $obj = Array::Each->new( set=>[\@a],
+     iterator=>1, rewind=>1, group=>2 );
+ # iterator affects where this starts
+ while( my( $k, $v ) = $obj->each ) {
+     print "$k => $v\n";
+ }
+ push @a, @{$a[0]} = ( e=>5 );
+ # rewind affects where this starts
+ while( my( $k, $v ) = $obj->each ) {
+     print "$k => $v\n";
+ }
+
+=head2 Group and Undef
+
+By default the C<bound> attribute is true.  This means that iterations
+will stop when the end of the shortest (or only) array is reached.
+
+However, if C<group> is set greater than 1, and the size of the
+shortest array is not a multiple of the C<group> value, then the
+last iteration will "go beyond" the end of the shortest array.
+When this happens, each() will return the value of the C<undef>
+attribute for the "missing" array elements.
+
+By default, the C<undef> attribute is undefined.  So each() will
+return perl's undef for "missing" or "non-existent" array elements.
+If this is acceptable, there is no need to set the C<undef> attribute.
+If not acceptable, setting C<undef> lets you specify what you want.
+
+The following example shows how you might generate a 3-column HTML
+table from the contents of an array.  Note, C<count> is being set,
+so each() will return a line count instead of the (in this case
+useless) array index.
+
+ my @a = ( 'a' .. 'm' );
+ my $obj = Array::Each->new( set=>[\@a],
+    group=>3, undef=>'&nbsp;', count=>1 );
+ print qq{<table border="1">\n};
+ while( my @row = $obj->each ) {
+     printf "<tr> <td>%d.</td> ", pop @row;
+     print map( "<td>$_</td> ", @row ), "</tr>\n";
+ }
+ print "</table>\n";
+
+=head2 Bound and Undef
+
+As stated above, C<bound> is true by default.  If you set it to 0
+(false), the iterations are no longer bound by the size of the
+shortest array.  Instead they are bound by the size of the largest
+array (but see C<stop> to change that).
+
+So if you have more than one array, and they are not the same size,
+each() will return the value of C<undef> for the "missing" array
+elements.  If the default value (perl's undef) is not acceptable,
+setting C<undef> lets you choose what you want.
+
+The following example shows how you might create a text table giving
+the sums of elements of three arrays.  Because the arrays are
+different sizes, C<bound> is set to 0.  Because we want to add
+"missing" elements to the totals, C<undef> is set to 0.  Again,
+C<count> is set to give us a line count.
+
+ my @a = ( [ 1..5 ], [ 1..8 ], [ 7..18 ], );
+ my $cols = @a;
+ my $fmt = " %4d." .   " %5d" x $cols . "\n";
+ my $div = ' 'x6   . ' -----' x $cols . "\n";
+ my $tot = ' 'x6   .   " %5d" x $cols . "\n";
+ my @totals;
+ my $obj = Array::Each->new( set=>[@a],
+     bound=>0, undef=>0, count=>1 );
+ while( my @row = $obj->each ) {
+     my $count = pop @row;
+     printf $fmt, $count, @row;
+     @totals = map { $totals[$_] += $row[$_] } ( 0 .. $#row )
+ }
+ print $div;
+ printf $tot, @totals;
+
+=head1 AUTHOR
+
+Brad Baxter, bbaxter@cpan.org
+
+=head1 COPYRIGHT
+
+Copyright (c) 2003-2004, Brad Baxter, All rights reserved.  This
+module is free software.  It may be used, redistributed and/or
+modified under the same terms as Perl itself.
+
+ __________

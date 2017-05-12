@@ -1,0 +1,16 @@
+Revision history for Perl extension AnyEvent::AggressiveIdle.
+
+0.01  Sat Feb 19 12:50:25 2011
+	- original version; created by h2xs 1.23 with options
+		-X -n AnyEvent::AggressiveIdle
+
+0.02  Sat Feb 19 21:42:00 MSK 2011
+        - AnyEvent::Impl::EV works properly.
+        - Add AnyEvent in Depends
+
+0.03  Sun Feb 20 12:09:52 MSK 2011
+        - use pipe instead file. Thanks for Marc Lehmann's review.
+
+0.04  Tue Mar  1 12:26:24 MSK 2011
+        - Add a guard into idle callback: You can do something continuous
+          inside the callback.

@@ -1,0 +1,9 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Acme-Rant
+version:      0.1
+version_from: lib/Acme/Rant.pm
+installdirs:  site
+requires:
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.10_03

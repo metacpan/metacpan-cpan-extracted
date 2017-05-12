@@ -1,0 +1,11 @@
+Revision history for Acme-RFC4824
+
+0.02    2007/04/25
+        - Corrected ASCII art that is incorrect in the RFC (see
+          http://lists.mur.at/pipermail/ip-sfs/2007-April/000052.html)
+        - fixed IPv6 support
+        - added example scripts and documentation for them
+
+0.01    2007/04/06
+        - First version, does not support fragmenting, checksums or
+          gzipped frames (yet).

@@ -1,0 +1,90 @@
+Revision history for AM-Algorithm
+
+3.10      2016-06-05 21:03:55+09:00 Asia/Tokyo
+    Fixed bad typos in citation names
+    Improved analogize documentation (#50)
+    Changed percentage printing format (#56)
+3.09      2015-08-28 20:29:15+09:00 Asia/Tokyo
+    removed random_outcome (addition was misguided)
+    updated documentation
+    added data file comment functionality
+3.08      2015-06-07 20:39:47+09:00 Asia/Tokyo
+    fixed regression in XS (GH #42)
+    added include_nulls, include_given, and linear flags to analogize.pl
+3.07      2015-06-03 21:01:25+09:00 Asia/Tokyo
+    Add detailed gang printing option to analogize
+    Fix incorrect gang handling
+    Fix for printing gangs with false values as feature names
+3.06      2015-05-31 20:43:59+09:00 Asia/Tokyo
+    Added analogize for command line classification
+    Fixed POD inaccuracies
+3.05      2014-10-19 20:53:02+09:00 Asia/Tokyo
+    XS efficiency improvements, and tweaks in an attempt to comply with C89 and fix ActiveState builds.
+3.04      2014-10-11 22:24:48+09:00 Asia/Tokyo
+    Add random_outcome method, and improve documentation.
+3.03      2014-09-23 21:22:31+09:00 Asia/Tokyo (TRIAL RELEASE)
+    Update to API of Test::Class 1.00000
+3.02      2014-05-17 16:06:25 Asia/Seoul
+    test_in_data in Result changed to test_in_train
+    'vars' in gang_effects return structure changed to 'features'
+3.01      2014-05-15 21:18:29 Asia/Seoul
+    Gang and analogical set structures changed to contain Item objects
+    Unique id field added to Item
+    analogical set structure changed to index on Item id for easy searching
+3.00      2014-05-14 12:02:05 Asia/Seoul
+    Stopped printing to amcpresults and terminal
+    Switched to Log::Any
+    Removed format variables and used Text::Table for reports
+    Added Algorithm::AM::Result module
+    Removed separate support for "short" and "long" outcomes
+    Replaced Project with DataSet and Item
+        - resulted in complete reorganization of everything
+    Updated/rewrote all documentation
+2.45      2014-02-11 21:27:02 America/Los_Angeles
+    Fixed gang/grandtotal calculation bugs
+    removed debug print statements!
+2.44      2014-02-11 16:13:54 America/Los_Angeles
+    Fix gangcount updating (bad loop bound)
+2.43      2014-02-11 12:22:57 America/Los_Angeles
+    reverse 2.42 (think I was wrong)
+    More debug printing
+    don't pass ref to keys (experimental feature)
+2.42      2014-02-10 21:32:23 America/Los_Angeles
+    More debug printing
+    fix uninitialized array element
+2.41      2014-02-10 12:37:57 America/Los_Angeles
+    More debug printing
+    Fixed big-int bug introduced in 2.40
+2.40      2014-02-09 18:37:58 America/Los_Angeles
+    More debug printing
+2.39      2014-02-08 21:32:43 America/Los_Angeles
+    Added lots of print statements for trial release; need more info!
+2.38      2014-02-07 20:27:29 America/Los_Angeles
+    changed back C99 datatypes until further testing
+2.37      2014-02-07 18:52:07 America/Los_Angeles
+    removed non-existent dependency that prevented installation
+2.36      2014-02-07 16:24:26 America/Los_Angeles
+    remove given/when (which trigger 'experimental' warnings)
+    better handling of project files
+    line directives added to ginormous eval statement
+    add methods to Project for adding data and test items
+    use C99 datatypes in AM.xs to ensure correct bit sizes
+2.35      2013-12-05 19:50:27 America/Los_Angeles
+    created Algorithm::AM::Project to handle all data file processing
+        - also checks size of data vectors!
+        - has lots of accessors and new error checking, including problems with number of variables!
+    caller's autoflush setting is no longer clobbered
+    lots more refactoring
+    removed use of 'given' and 'when', which are experimental and caused warnings and therefore failed tests
+2.34      2013-09-03 22:39:22 America/Los_Angeles
+    Considerable refactoring of how arguments and variables are handled
+        - use object or data hash instead of automatic importing
+        - most of them renamed, and possible values have changed
+    - new tests for errors and warnings
+
+2.33      2013-06-03 22:22:10 America/Los_Angeles
+    Changed chomp mechanism so Windows files can be used in testing on *nix
+2.32      2013-05-30 14:37:09 America/Los_Angeles
+    Fixed package declarations in POD files, which prevented listing on metacpan
+2.31      2013-05-15 15:22:32 America/Los_Angeles
+	First CPAN release.

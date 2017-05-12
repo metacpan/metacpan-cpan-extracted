@@ -1,0 +1,6 @@
+Version 2009102802
++ Mention prereqs in Makefile.PL
++ POD tests
+
+Version 2009102801
+First release

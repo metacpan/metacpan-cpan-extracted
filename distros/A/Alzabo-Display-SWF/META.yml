@@ -1,0 +1,37 @@
+--- #YAML:1.0
+name: Alzabo-Display-SWF
+version: 0.01
+license: perl
+distribution_type: module
+requires:
+  Alzabo: 0.72
+  GraphViz: 1.6
+  SWF: 0.01
+  YAML: 0
+  perl: 5.6.1
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Alzabo::Display::SWF:
+    file: lib/Alzabo/Display/SWF.pm
+    version: 0.01
+  Alzabo::Display::SWF::Column:
+    file: lib/Alzabo/Display/SWF/Column.pm
+    version: 0.01
+  Alzabo::Display::SWF::Key:
+    file: lib/Alzabo/Display/SWF/Key.pm
+    version: 0.01
+  Alzabo::Display::SWF::Schema:
+    file: lib/Alzabo/Display/SWF/Schema.pm
+    version: 0.01
+  Alzabo::Display::SWF::Table:
+    file: lib/Alzabo/Display/SWF/Table.pm
+    version: 0.01
+  Alzabo::Display::SWF::Text:
+    file: lib/Alzabo/Display/SWF/Text.pm
+    version: 0.01
+  Alzabo::Display::SWF::Util:
+    file: lib/Alzabo/Display/SWF/Util.pm
+    version: 0.01
+generated_by: Module::Build version 0.20

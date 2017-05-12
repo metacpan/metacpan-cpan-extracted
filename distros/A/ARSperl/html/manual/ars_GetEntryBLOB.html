@@ -1,0 +1,59 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - ars_GetEntryBLOB</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_GetEntryBLOB(ctrl,schema,entry_id,field_id,locType,locFile)</CODE></H2>
+
+       This function retrieves an attachment from the specified schema
+    entry. The field ID specified should be an attachment field type. The
+    <code>locType</code> parameter can be used to specify whether you want
+    the attachment returned incore (ARS::AR_LOC_BUFFER) or written to a file
+    (ARS::AR_LOC_FILENAME). If you choose to write it to a file, you must
+    specify the <CODE>locFile</CODE> parameter. <P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+	        returns 1 if locType == AR_LOC_FILENAME <BR>
+	        returns a scalar buffer if locType == AR_LOC_BUFFER <BR>
+          <DT><B>On failure</B><DD>
+              Returns <CODE>undef</CODE>.
+      </DL>
+
+      <P>Example:
+
+      <PRE>
+  ars_GetEntryBLOB($c, "00-Test", "000000000000001",
+		   $fid, 
+		   ARS::AR_LOC_FILENAME,
+		   "/tmp/attachtest") || 
+		     die ("GetEntryBLOB: $ars_errstr");
+
+  my $a = ars_GetEntryBLOB($c, "00-Test", "000000000000001",
+			   $fid, 
+			   ARS::AR_LOC_BUFFER);
+
+  die "GetEntryBLOB: $ars_errstr" if(!defined($a));
+  print "blob size = ".length($a)."\n";
+  open(FD, "&gt;/tmp/attachtest2") || die "open: $!";
+  print FD $a;
+  close(FD);
+      </PRE>
+
+<P>
+
+A subsequent comparison of the two files <CODE>/tmp/attachtest</code>
+and <code>/tmp/attachtest2</code> should show that they are identical.
+
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of
+	Contents </A>
+<p>
+<address>
+Last changes to this page 9th March 1999 by jeff murphy <BR>
+&#169; J.C.Murphy, J.W.Murphy 1997 arsperl@arsperl.org
+</address>
+</BODY>
+</HTML>

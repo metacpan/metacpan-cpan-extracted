@@ -1,0 +1,25 @@
+Revision history for Perl extension Acme-MadokaMagica
+
+0.07 2017-03-16T11:12:20Z
+    - add a limit 100 line for soul gem
+
+0.06 2017-03-11T01:00:18Z
+    - use methods
+
+0.05 2017-03-04T07:00:40Z
+    -   modofy class name
+
+0.04 2017-03-04T06:03:01Z
+    - delete line arg
+
+0.03 2017-03-04T05:52:14Z
+    - fix hashref
+
+0.02 2017-03-04T05:27:39Z
+    - add cpanfile
+
+
+0.01 2017-03-04T05:14:38Z
+
+    - original version
+

@@ -1,0 +1,14 @@
+PerlSwitches -I@ServerRoot@/../blib/lib
+PerlLoadModule Apache::UploadMeter
+
+<Location /perl/upload>
+    SetHandler perl-script
+    PerlResponseHandler  Apache::UploadMeter::r_handler
+</Location>
+
+<UploadMeter dummy_meter>
+    UploadHandler /perl/upload
+    UploadMeter   /perl/meter
+    UploadForm    /form.html
+</UploadMeter>
+

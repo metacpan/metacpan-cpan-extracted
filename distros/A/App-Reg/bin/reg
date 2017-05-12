@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use App::Reg;
+use Getopt::Long;
+use Pod::Usage;
+use Encode;
+
+pod2usage 2 unless GetOptions
+    'help'     => \my $help,
+    'version'  => \my $version,
+    'global'   => \my $global,
+    'no-color' => \my $no_color,
+    'ascii'    => \my $ascii,
+;
+
+pod2usage 1 if $help;
+
+if ($version) {
+    print "$0 version $App::Reg::VERSION\nrunning under Perl $^V\n";
+    exit 1;
+}
+
+pod2usage 2 if @ARGV < 2;
+
+@ARGV = map { decode 'UTF-8', $_ } @ARGV unless $ascii;
+
+my ($str, $regex) = @ARGV;
+
+reg $str, $regex, global => $global, color => !$no_color;
+
+=head1 NAME
+
+reg - re 'debug' wrapper
+
+=head1 SYNOPSIS
+
+  reg [options] [string] [regex]
+
+  Options:
+    -ascii           use ASCII encoding for matching
+    -global          multiple matches
+    -help            brief help message
+    -no-color        disables ansi sequences
+    -version         show version of reg
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-ascii>
+
+Uses ASCII encoding for matching. In particular it means that the data
+given to this utility is threated as binary data and C<\d> only matches
+C<[0-9]>.
+
+=item B<-global>
+
+Assume multiple matches, just like if C</g> modifier in list context
+was used on RegExp.
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-no-color>
+
+Disables ANSI sequences and enforces the text-only representation of
+RegEx debugger. Useful when pasting the output of RegEx debugger.
+
+=item B<-version>
+
+Shows current reg version.
+
+=back
+
+=head1 DESCRIPTION
+
+B<This program> tries to match regex to string and shows Perl regular
+expression debugger output.
+
+=head1 AUTHOR
+
+Konrad Borowski <glitchmr@myopera.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Konrad Borowski.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

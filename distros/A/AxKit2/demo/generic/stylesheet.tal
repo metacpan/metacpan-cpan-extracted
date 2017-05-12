@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<html
+    xmlns:tal="http://xml.zope.org/namespaces/tal">
+    <head>
+        <title tal:content="/demo/title">TITLE</title>
+    </head>
+    <body>
+        <h1>TAL was here as well!</h1>
+        <ul>
+            <li tal:repeat="u /demo/p">
+                <span tal:replace="$u">last</span>
+            </li>
+        </ul>
+    </body>
+</html>

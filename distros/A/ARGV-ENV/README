@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution ARGV-ENV,
+version 1.00:
+
+  Parse an environment variable and unshift into @ARGV
+
+This software is copyright (c) 2011 by Olivier Mengué.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

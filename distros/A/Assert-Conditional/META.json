@@ -1,0 +1,58 @@
+{
+   "abstract" : "conditionally compile assertions",
+   "author" : [
+      "Tom Christiansen <tchrist@perl.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Assert-Conditional",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "Pod::Coverage" : "0.18",
+            "Test::CheckManifest" : "0.9",
+            "Test::Exception" : "0.38",
+            "Test::More" : "1.001014",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attribute::Handlers" : "0",
+            "Exporter" : "5.54",
+            "Exporter::ConditionalSubs" : "1.01",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "Tie::Hash" : "0",
+            "Unicode::Collate" : "0",
+            "Unicode::Normalize" : "0",
+            "parent" : "0",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.003"
+}

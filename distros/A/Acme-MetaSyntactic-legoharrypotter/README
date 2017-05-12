@@ -1,0 +1,24 @@
+NAME
+    Acme::MetaSyntactic::legoharrypotter - LEGO Harry Potter theme
+
+VERSION
+    version 0.02
+
+DESCRIPTION
+    Characters from the LEGO Harry Potter games years 1-4 and 5-7 as gleaned
+    from the <http://www.gamefaqs.com/> walkthroughs.
+
+    *Expelliarmus!*
+
+SEE ALSO
+    Acme::MetaSyntactic, Acme::MetaSyntactic::List.
+
+AUTHOR
+    Chris Williams
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

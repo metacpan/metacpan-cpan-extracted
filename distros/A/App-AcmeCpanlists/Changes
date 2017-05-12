@@ -1,0 +1,57 @@
+Revision history for App-AcmeCpanlists
+
+0.09    2016-11-19 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak Abstract.
+
+
+0.08    2016-11-17 (PERLANCAR)
+
+	- Add subcommand: ls-entry-lists.
+
+
+0.07    2016-11-17 (PERLANCAR)
+
+	- Add subcommand: ls-entries-all.
+
+	- [Bugfix] When query matches list name exactly but also matches
+	  the prefix of other lists, don't regard that as a multiple match.
+
+
+0.06    2016-02-20 (PERLANCAR)
+
+	- Recurse when listing Acme::CPANLists::* modules.
+
+
+0.05    2015-10-29 (PERLANCAR)
+
+	- Add subcommand: ls-entries.
+
+
+0.04    2015-10-23 (PERLANCAR)
+
+        - Add subcommand: view.
+
+        - [ux] get/view: Allow substring & case-insensitive matching.
+
+        - [ux] get/view: Activate summary/ID completion.
+
+
+0.03    2015-10-22 (PERLANCAR)
+
+	- ls: Add --mentions-author & --mentions-module, add result column
+	  mentioned_authors_or_modules.
+
+
+0.02    2015-10-22 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix examples.
+
+
+0.01    2015-10-22 (PERLANCAR)
+
+        - First release.

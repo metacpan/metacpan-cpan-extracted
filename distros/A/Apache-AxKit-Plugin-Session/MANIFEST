@@ -1,0 +1,14 @@
+lib/Apache/AxKit/Plugin/Session.pm
+lib/AxKit/XSP/Auth.pm
+lib/AxKit/XSP/Global.pm
+lib/AxKit/XSP/Session.pm
+Changes
+MANIFEST
+Makefile.PL
+README
+clean-sessions.pl
+session-cleanup.sh
+test.pl
+logon.xsp
+logoff.xsp
+META.yml                                 Module meta-data (added by MakeMaker)

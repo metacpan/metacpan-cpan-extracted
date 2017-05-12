@@ -1,0 +1,69 @@
+#!/usr/bin/perl
+
+use warnings;
+use Curses;
+use lib "./lib/Acme/Curses";
+use Marquee;
+
+initscr;
+halfdelay(1);
+noecho;
+
+$scr1 = subwin(9,COLS,0,0);
+$scr2 = subwin(9,COLS,9,0);
+$cli = subwin(3,80,18,0);
+
+addstr(21,0,"'/1 TEXT' or '/2 TEXT' to set top/bottom marquee texts");
+addstr(22,0,"'/f1 FONT' or '/f2 FONT' to set top/bottom marquee fonts");
+addstr(23,0,"/q to quit");
+box($cli,ACS_VLINE,ACS_HLINE);
+refresh();
+
+$m1 = Acme::Curses::Marquee->new( window => $scr1,
+                                  height => 9,
+                                  width  => COLS );
+
+$m2 = Acme::Curses::Marquee->new( window => $scr2,
+                                  height => 9,
+                                  width  => COLS );
+
+while (1) {
+    $ch = getch;
+    newchar() if ($ch ne '-1');
+    $m1->scroll if $m1->is_active;;
+    $m2->scroll if $m2->is_active;;
+}
+
+sub newchar {
+    if ($ch eq "\n") {
+        dispatch();
+        addstr($cli, 1, 1, (' ' x 78));
+        move($cli,1,1);
+        refresh($cli);
+        $string = '';
+        return;
+    }
+
+    $string .= $ch;
+    addstr($cli, 1, 1, $string);
+    refresh($cli);
+}
+
+sub dispatch {
+    if ($string eq '/q') {
+        endwin;
+        exit;
+    } elsif ($string =~ /^\/1 /) {
+        $string =~ s|^/1 ||;
+        $m1->text($string);
+    } elsif ($string =~ /^\/2 /) {
+        $string =~ s|^/2 ||;
+        $m2->text($string);
+    } elsif ($string =~ /^\/f1 /) {
+        $string =~ s|^/f1 ||;
+        $m1->font($string);
+    } elsif ($string =~ /^\/f2 /) {
+        $string =~ s|^/f2 ||;
+        $m2->font($string);
+    }
+}

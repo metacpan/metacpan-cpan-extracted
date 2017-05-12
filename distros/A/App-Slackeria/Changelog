@@ -1,0 +1,30 @@
+slackeria 0.12 - Thu Jul 14 2011
+
+    * Note that we actually need perl >= 5.10.1 (for the parent pragma)
+
+    [slackeria]
+    * Argument validation, add -h/--help option
+
+    [App::Slackeria]
+    * Rename App::Slackeria::Plugin to App::Slackeria::PluginLoader
+    * Rename App::Slackeria::Plugin::Base to App::Slackeria::Plugin
+    * Move template to separate file, adds dependency File::ShareDir
+    * Because of that, we now need Module::Build >= 0.36
+
+    [App::Slackeria::Plugin::Debian]
+    * Switch from whohas to custom parser using LWP::Simple and XML::LibXML
+    * Now checks version in Debian Sid by default
+    * Add 'distribution' configuration parameter to select which Debian
+      distribution (wheezy, sid, etc.) to check
+    * Add 'href' configuration parameter
+
+slackeria 0.11 - Sat Jul 02 2011
+
+    * Fix dependency list and make recommends dependencies for now
+    * Switch to perl version schema (x.yy[_zz])
+
+slackeria 0.1 - Wed Jun 08 2011
+
+    * Initial release
+    * HTML output via HTML::Template
+    * Available plugins include: cpan, freshmeat, github and various distros

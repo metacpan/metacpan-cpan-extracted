@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Apache-FastForward.t
+lib/Apache/FastForward.pm
+lib/Apache/FastForward/Spreadsheet.pm
+examples/basic/Demo.pm
+examples/basic/README
+examples/basic/books.csv
+examples/basic/FF-Spreadsheet_demo--v1.ods
+examples/ebay/eBay.pm
+examples/ebay/FF4eBay-tmpl--v4.csv
+examples/ebay/FF4eBay--v4.ods
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,34 @@
+NAME
+    App::financeta
+
+SYNOPSIS
+    App::financeta is an application that does Technical Analysis for stocks.
+
+VERSION
+    0.10
+
+DESCRIPTION
+
+    The documentation is detailed at http://vikasnkumar.github.io/financeta/
+
+    The github repository is at https://github.com/vikasnkumar/financeta.git
+
+SEE ALSO
+    PDL::Finance::TA
+        This module will be used to add technical analysis to the charts.
+
+    App::financeta::gui
+        This module just manages everything under the hood.
+
+    financeta
+        The commandline script that calls `App::financeta'.
+
+COPYRIGHT
+    Copyright (C) 2013-2014. Vikas N Kumar <vikas@cpan.org>. All Rights
+    Reserved.
+
+LICENSE
+    This is free software. You can redistribute it or modify it under the
+    terms of GNU General Public License version 3. Refer LICENSE file in the
+    top level source directory for more information.
+

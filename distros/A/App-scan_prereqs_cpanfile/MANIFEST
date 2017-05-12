@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/App/scan_prereqs_cpanfile.pm
+minil.toml
+script/scan-prereqs-cpanfile
+t/00_compile.t
+META.yml
+MANIFEST

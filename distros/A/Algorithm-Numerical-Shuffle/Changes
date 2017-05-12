@@ -1,0 +1,22 @@
+Version 2009110301
+- Modernized Makefile.PL.
+- Added POD tests.
+----
+Version 2009040301
+- Moved to git and github.
+- Update License.
+----
+Revision 1.4  2000/03/08 05:57:40  abigail
+Fixed bug that prevented in situ shuffling.
+Changed the wording of the license once again. (MIT/X style)
+----
+Revision 1.3  1999/03/01 20:54:06  abigail
+Changed package name to Algorithm::*
+Changed license.
+----
+Revision 1.2  1998/09/09 20:48:12  abigail
+- Make shuffle() work with empty lists.
+- Changed license to Artistic only.
+----
+Revision 1.1  1998/04/23 17:58:07  abigail
+Initial revision

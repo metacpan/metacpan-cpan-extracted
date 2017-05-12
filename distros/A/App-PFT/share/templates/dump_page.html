@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <meta http-equiv="content-type" content="text/html; charset=[% site.encoding %]">
+  <title>[% site.title %] :: [% content.title %] dump page</title>
+</head>
+
+<ul>
+    <li><code>site.title</code>: [% site.title %]</li>
+    <li><code>site.root</code>: [% site.root %]</li>
+    <li><code>content</code><ul>
+        <li><code>content.title</code>: [% content.title %]</li>
+        <li><code>content.html</code>: (see bottom of this page)
+        <li><code>content.date</code>: 
+            [% IF content.date %]
+            <ul>
+                <li><code>content.date.y</code>: [% content.date.y %]</li>
+                <li><code>content.date.m</code>: [% content.date.m %]</li>
+                <li><code>content.date.d</code>: [% content.date.d %]</li>
+                <li><code>content.date('/')</code>: [% content.date('/') %]<li>
+            </ul>
+            [% END %]
+        </li>
+        <li><code>content.tags</code>:
+            [% IF content.tags %]
+            <ul>
+                [% FOREACH p = content.tags %]
+                <li>
+                    <code>content.tags.[% loop.index %].href</code>: <a href="[% p.href %]">[% p.href %]</a>
+                </li>
+                <li>
+                    <code>content.tags.[% loop.index %].slug</code>: [% p.slug %]</li>
+                </li>
+                [% END %]
+            </ul>
+            [% END %]
+        </li>
+        <li><code>content.is_home</code>
+            [% content.is_home %]
+        </li>
+    </ul></li>
+
+    <li><code>links</code><ul>
+        <li><code>links.parent</code>:<ul>
+            <li><code>links.parent.href</code>: 
+                <a href="[% links.parent.href %]">[% links.parent.href %]</a>
+            </li>
+            <li><code>links.parent.slug</code>: [% links.parent.slug %]</li>
+        </ul></li>
+
+        <li><code>links.prev</code>:<ul>
+            <li><code>links.prev.href</code>: 
+                <a href="[% links.prev.href %]">[% links.prev.href %]</a>
+            </li>
+            <li><code>links.prev.slug</code>: [% links.prev.slug %]</li>
+        </ul></li>
+
+        <li><code>links.next</code>:<ul>
+            <li><code>links.next.href</code>: 
+                <a href="[% links.next.href %]">[% links.next.href %]</a>
+            </li>
+            <li><code>links.next.slug</code>: [% links.next.slug %]</li>
+        </ul></li>
+
+        <li><code>links.pages</code>:
+            [% IF links.pages %]
+            <ul>
+                [% FOREACH p = links.pages %]
+                <li>
+                    <code>links.pages.[% loop.index %].href</code>: <a href="[% p.href %]">[% p.href %]</a>
+                </li>
+                <li>
+                    <code>links.pages.[% loop.index %].slug</code>: [% p.slug %]</li>
+                </li>
+                <li>
+                    <code>links.pages.[% loop.index %].is_self</code>: [% p.is_self %]</li>
+                </li>
+                [% END %]
+            </ul>
+            [% END %]
+        </li>
+
+        <li><code>links.backlog(5)</code>:
+            [% IF links.backlog %]
+            <ul>
+                [% FOREACH p = links.backlog(5) %]
+                <li>
+                    <code>links.backlog(5).[% loop.index %].href</code>: <a href="[% p.href %]">[% p.href %]</a>
+                </li>
+                <li>
+                    <code>links.backlog(5).[% loop.index %].slug</code>: [% p.slug %]</li>
+                </li>
+                [% END %]
+            </ul>
+            [% END %]
+        </li>
+
+        <li><code>links.months_backlog(5)</code>:
+            [% IF links.months_backlog %]
+            <ul>
+                [% FOREACH p = links.months_backlog(5) %]
+                <li>
+                    <code>links.months_backlog(5).[% loop.index %].href</code>:<a href="[% p.href %]">[% p.href %]</a>
+                </li>
+                <li>
+                    <code>links.months_backlog(5).[% loop.index %].slug</code>: [% p.slug %]</li>
+                </li>
+                [% END %]
+            </ul>
+            [% END %]
+        </li>
+
+        <li><code>links.tags</code>:
+            [% IF links.tags %]
+            <ul>
+                [% FOREACH p = links.tags %]
+                <li>
+                    <code>links.tags.[% loop.index %].href</code>: <a href="[% p.href %]">[% p.href %]</a>
+                </li>
+                <li>
+                    <code>links.tags.[% loop.index %].slug</code>: [% p.slug %]</li>
+                </li>
+                [% END %]
+            </ul>
+            [% END %]
+        </li>
+
+        <li><code>links.children</code>:
+            [% IF links.children %]
+            <ul>
+                [% FOREACH p = links.children %]
+                <li>
+                    <code>links.children.[% loop.index %].href</code>: <a href="[% p.href %]">[% p.href %]</a>
+                </li>
+                <li>
+                    <code>links.children.[% loop.index %].slug</code>: [% p.slug %]</li>
+                </li>
+                [% END %]
+            </ul>
+            [% END %]
+        </li>
+
+    </li>
+
+</ul>
+
+[% content.html %]
+
+</html>

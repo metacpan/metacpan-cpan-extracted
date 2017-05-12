@@ -1,0 +1,52 @@
+{
+   "abstract" : "HOLY 'SHIT HERE COME'S AN 'S",
+   "author" : [
+      "Dagfin Ilmari Mann'såker <ilmari@ilmari.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.018",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Holy-Shit-Here-Come-s-An-S",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.018"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Holy::Shit::Here::Come::s::An::S" : {
+         "file" : "lib/Acme/Holy/Shit/Here/Come/s/An/S.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ilmari/Acme-Holy-Shit-Here-Come-s-An-S/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ilmari/Acme-Holy-Shit-Here-Come-s-An-S.git",
+         "web" : "https://github.com/ilmari/Acme-Holy-Shit-Here-Come-s-An-S/"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

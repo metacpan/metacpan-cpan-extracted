@@ -1,0 +1,69 @@
+Acme::URL
+
+Bareword URL performing HTTP request hocus pocus!
+
+
+VERSION
+
+    Acme::URL   0.01
+    
+
+SYNOPSIS
+
+    use Modern::Perl;
+    use JSON qw(decode_json);
+    use Acme::URL;
+
+    # print the json
+    say http://twitter.com/statuses/show/6592721580.json;
+
+    # => "He nose the truth."
+    say decode_json( http://twitter.com/statuses/show/6592721580.json )->{text};
+
+
+DESCRIPTION
+
+See:  http://transfixedbutnotdead.com/2009/12/16/url-develdeclare-and-no-strings-attached/
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Acme::URL
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-URL
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Acme-URL
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Acme-URL
+
+    Search CPAN
+        http://search.cpan.org/dist/Acme-URL/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Barry Walsh (Draegtun Systems Ltd)
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,44 @@
+[% USE date ( format = '%l o\'clock %p on %A, %e %B, %Y' locale = 'en_GB') %]
+<article
+  itemscope="itemscope"
+  itemtype="http://schema.org/Article"
+>
+<header>
+  <h1
+    class="article-title"
+    itemprop="name"
+  >
+    [% article.schema.core.title | html %]
+  </h1>
+  [% IF article.schema.actions %]
+    <nav>
+      <ul class="nav nav-pills">
+        [% FOREACH nav_link IN article.schema.action %]
+          <li role="presentation"><a href="[% nav_link.href | html %]">[% nav_link.text | html %]</a></li>
+        [% END %]
+      </ul>
+    </nav>
+  [% END %]
+</header>
+<section
+  class="article-summary"
+  itemprop="description"
+>
+  [% article.content %]
+</section>
+[%- FOREACH section in article.components.sections -%]
+<section>
+  [% section.content %]
+</section>
+[%- END -%]
+<footer class="small text-muted">
+  <div class="article-meta-created">
+    Written at about <time itemprop="dateModified">[% date.format(article.schema.core.dateCreated) | html %]</time>
+  </div>
+  [%- IF article.schema.core.dateCreated != article.schema.core.dateUpdated  -%]
+  <div class="article-meta-updated">
+    Revised at approximately <time itemprop="dateModified">[% date.format(article.schema.core.dateUpdated, '%a %d %b %y', 'en_GB') | html %]</time>
+  </div>
+  [%- END -%]
+</footer>
+</article>

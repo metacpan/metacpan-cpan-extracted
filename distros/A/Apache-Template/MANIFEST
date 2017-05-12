@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Template.xs
+test.pl
+lib/Apache/Template.pm
+lib/Template/Service/Apache.pm

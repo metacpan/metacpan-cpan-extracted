@@ -1,0 +1,27 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Demo of a .po file\n"
+"PO-Revision-Date: 1975-01-30 00:00 +0000\n"
+"Last-Translator: Thomas Thurman <marnanel@cpan.org>\n"
+"Language-Team: test <test@example.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "This will not be affected"
+msgstr "because it has a translation"
+
+msgid "This will be affected, because it's empty"
+msgstr ""
+
+#, fuzzy
+msgid "This will be affected"
+msgstr "because it's marked fuzzy"
+
+#, fuzzy
+#: src/test.c:177
+msgid ""
+"This will be affected both because it's fuzzy, and "
+"also because it's empty"
+msgstr ""
+

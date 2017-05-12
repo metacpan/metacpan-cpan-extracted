@@ -1,0 +1,18 @@
+---
+abstract: 'Translates from English to Ali G'
+author:
+  - 'Naveed Massjouni <naveedm9@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-AliG
+resources:
+  bugtracker: http://github.com/ironcamel/Acme-AliG/issues
+  repository: git://github.com/ironcamel/Acme-AliG.git
+version: 0.0102

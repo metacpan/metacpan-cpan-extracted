@@ -1,0 +1,6 @@
+
+# This is the bar policy
+
+my $foo;
+
+die "No global thing" unless length($global_thing);

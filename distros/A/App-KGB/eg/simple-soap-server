@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+use utf8;
+use strict;
+use warnings;
+
+use POE;
+BEGIN {
+    package POE::Component::Server::SOAP;
+    use constant DEBUG=>2;
+}
+use POE::Component::Server::SOAP;
+
+my $my_name = 'Test';
+
+POE::Component::Server::SOAP->new(
+    ALIAS   => "$my_name-SOAP",
+    ADDRESS => '127.0.0.1',
+    PORT    => 12700,
+    HOSTNAME => 'localhost',
+);
+
+POE::Session->create(
+    inline_states => {
+        _start          => \&setup_service,
+        _stop           => \&shutdown_service,
+        soap_commit     => \&do_commit,
+    },
+#    options=>{trace=>1,debug=>1},
+);
+
+POE::Kernel->run;
+exit 0;
+
+sub setup_service {
+    my $kernel = $_[KERNEL];
+
+    $kernel->alias_set($my_name) == 0
+    	or die "Can't register alias Test\n";
+    $kernel->post("$my_name-SOAP" => 'ADDMETHOD',
+        $my_name => 'soap_commit',
+        $my_name => 'commit',
+    );
+
+    undef;
+}
+sub shutdown_service {
+    my $kernel = $_[KERNEL];
+    my $session = $_[SESSION]->ID();
+    warn "_stop \@session $session\n";
+    $kernel->post(SOAP => 'DELSERVICE', $my_name);
+}
+sub do_commit {
+    my $kernel = $_[KERNEL];
+    my $response = $_[ARG0];
+    $response->content('OK');
+    $kernel->post($_[SENDER] => 'DONE', $response );
+    return;
+    $kernel->post($_[SENDER], 'FAULT', $response, $SOAP::Constants::FAULT_CLIENT, 'Bad request', 'commit not implemented');
+    return 1;
+}

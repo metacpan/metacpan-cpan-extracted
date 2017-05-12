@@ -1,0 +1,11 @@
+name: email
+method: POST
+fields:
+    reason:
+        label: Reason
+        type:  textarea
+        cols:  40
+        rows:  5
+        required: 1
+submit: Save
+stylesheet: 1

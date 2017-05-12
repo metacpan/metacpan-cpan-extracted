@@ -1,0 +1,32 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: padre-plugin-acmeplaycode\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-11 19:53+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Breno G. de Oliveira <garu@cpan.org>\n"
+"Language-Team: Brazilian Portuguese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/AcmePlayCode.pm:19
+msgid "Averything"
+msgstr "Averything"
+
+#: lib/Padre/Plugin/AcmePlayCode.pm:20
+msgid "DoubleToSingle"
+msgstr "DoubleToSingle"
+
+#: lib/Padre/Plugin/AcmePlayCode.pm:21
+msgid "ExchangeCondition"
+msgstr "ExchangeCondition"
+
+#: lib/Padre/Plugin/AcmePlayCode.pm:22
+msgid "NumberPlus"
+msgstr "NumberPlus"
+
+#: lib/Padre/Plugin/AcmePlayCode.pm:23
+msgid "PrintComma"
+msgstr "PrintComma"
+

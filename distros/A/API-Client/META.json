@@ -1,0 +1,50 @@
+{
+   "abstract" : "General-Purpose API Client Abstraction",
+   "author" : [
+      "Al Newkirk <anewkirk@ana.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "API-Client",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Object" : "0.55",
+            "Mojolicious" : "6.08",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "perl" : "v5.14.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/alnewkirk/API-Client/issues"
+      },
+      "homepage" : "http://metacpan.org/release/API-Client/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/alnewkirk/API-Client.git",
+         "web" : "https://github.com/alnewkirk/API-Client"
+      }
+   },
+   "version" : "0.04",
+   "x_authority" : "cpan:AWNCORP"
+}
+

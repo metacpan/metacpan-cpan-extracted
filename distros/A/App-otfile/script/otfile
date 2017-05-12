@@ -1,0 +1,219 @@
+#!/usr/bin/env perl
+
+use 5.0101;
+use warnings;
+use strict;
+use autodie;
+
+use Pod::Usage;
+use Getopt::Long;
+use File::Basename;
+use IO::Socket::INET;
+
+my $port           = 1234;
+my $auto_port      = 0;
+my $serve_multiple = 0;
+my $serve_self     = 0;
+
+GetOptions(
+    'auto'     => \$auto_port,
+    'port=i'   => \$port,
+    'multiple' => \$serve_multiple,
+    'self'     => \$serve_self,
+    'help'     => sub { pod2usage(1) } ) or pod2usage(2);
+
+unshift @ARGV, __FILE__ if $serve_self;
+my $file = shift or do { warn "Must provide file to serve\n"; pod2usage(2) };
+die "Unable to read '$file'\n" unless -r $file;
+
+# try loading some optional dependencies
+my %opt_depend;
+
+# we try for Mac::Pasteboard first for pre 0.06 people that have it
+# but don't have Clipboard installed
+
+eval { require Mac::Pasteboard; $opt_depend{pasteboard} = 1 };
+eval { require Clipboard;       $opt_depend{clipboard}  = 1 }
+    unless $opt_depend{pasteboard};
+eval { require File::MMagic;      $opt_depend{mmagic}     = 1 };
+eval { require UUID::Tiny;        $opt_depend{uuid}       = 1 };
+eval { require URI::Escape;       $opt_depend{uri_escape} = 1 };
+eval { require Term::ProgressBar; $opt_depend{progress}   = 1 };
+
+my $type     = get_file_type($file);
+my $size     = -s $file;
+my $filename = fileparse($file);
+my $uuid     = gen_uniq_string();
+my $ip       = get_local_ip();
+my $path     = "/$uuid/" . check_escape($filename);
+
+my $server;
+while ( !$server ) {
+    $server = IO::Socket::INET->new(
+        Listen    => 5,
+        LocalAddr => $ip,
+        LocalPort => $port,
+        Proto     => 'tcp'
+    );
+    last if $server;
+    if ( !$auto_port || $! ne 'Address already in use' ) {
+        die "Couldn't open socket for listening: $!\n";
+    }
+    $port++;
+}
+
+my $url = "http://$ip:$port$path";
+
+say "Serving '$file' as '$filename', size $size, type $type";
+
+if ( $opt_depend{pasteboard} ) {
+    Mac::Pasteboard::pbcopy($url);
+    say "$url copied to clipboard.";
+}
+elsif ( $opt_depend{clipboard} ) {
+    Clipboard->import;    # finds OS driver
+    Clipboard->copy($url);
+    say "$url copied to clipboard.";
+}
+else {
+    say $url;
+}
+
+while ( my $client = $server->accept() ) {
+    say 'I: Connect from ' . $client->peerhost;
+    my $requested_path;
+    LINE: while ( my $line = <$client> ) {
+        last if $line =~ m/^\s*$/;
+        $requested_path = $1 if $line =~ /^GET (\S+) /;
+    }
+    if ( $path ne $requested_path ) {
+        say "E: Invalid request for $requested_path";
+        say $client "HTTP/1.0 403 Forbidden FOAD.\n\n";
+        close $client;
+        next;
+    }
+    open my $fh, "<", $file;
+
+    say $client "HTTP/1.0 200 OK";
+    say $client "Pragma: no-cache";
+    say $client "Content-type: $type";
+    say $client "Content-length: $size";
+    say $client "Content-disposition: inline; filename=\"$filename\"";
+    say $client "";
+
+    my $p;
+    if ( $opt_depend{progress} ) {
+        $p = Term::ProgressBar->new(
+            {   name       => $filename,
+                count      => $size,
+                ETA        => "linear",
+                term_width => 40,
+            } );
+        $p->minor(0);
+    }
+    else {
+        say "Serving file.";
+    }
+
+    my $total = 0;
+    while ( my $len = sysread $fh, my $buf, 4096 ) {
+        print $client $buf;
+        $total += $len;
+        $p->update($total) if $opt_depend{progress};
+    }
+    $p->update($size) if $opt_depend{progress};
+    say "\nDone.";
+
+    close $fh;
+    $client->close;
+    $server->shutdown(2) unless $serve_multiple;
+    $server->close unless $serve_multiple;
+}
+
+# From Net::Address::IP::Local
+sub get_local_ip {
+    my $socket = IO::Socket::INET->new(
+        Proto    => 'udp',
+        PeerAddr => '198.41.0.4',    # a.root-servers.net
+        PeerPort => '53',            # DNS
+    );
+    my $local_ip_address = $socket->sockhost;
+    return $local_ip_address;
+}
+
+sub get_file_type {
+    my $path = shift;
+    return 'application/data' unless $opt_depend{mmagic};
+    my $type = File::MMagic->new->checktype_filename($file);
+    $type =~ s/;.*$//;
+    return $type;
+}
+
+sub gen_uniq_string {
+    return UUID::Tiny::create_UUID_as_string() if $opt_depend{uuid};
+    my @chars = ( qw(
+            A B D E F G H K M N P Q R S T U V W X Y Z
+            a b d e f g h k m n p q r s t u v w x y z
+            2 3 4 5 6 7 8 9
+    ) );
+    my $string;
+    $string .= $chars[ int rand( scalar @chars ) ] for 1 .. 30;
+    return $string;
+}
+
+sub check_escape {
+    my $string = shift;
+    return URI::Escape::uri_escape($string) if $opt_depend{uri_escape};
+    die "You don't have URI::Escape and '$string' contains unsafe characters\n."
+        if $string
+        =~ m/[^A-Za-z0-9\-\._~]/;    # RFC3986 unsafe chars from URI::Escape
+    return $string;
+}
+__END__
+=head1 NAME
+
+otfile - Serve a single file, once, via HTTP over the local network.
+
+=head1 SYNOPSIS
+
+$ otfile [-a -p 1234] <file to serve>
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--auto> or B<-a>
+
+Auto port selection.  Increments specified port until successful.
+
+=item B<--port=N> or B<-p N>
+
+Use specified port, defaults to 1234.
+
+=item B<--multiple> or B<-m>
+
+Don't exit after serving the file the first time. For serving a file to multiple
+people. Requires, CTL+C to exit.
+
+=item B<--self> or B<-s>
+
+Serve a copy of the otfile script.
+
+=item B<--help> or B<-h>
+
+This help information.
+
+=back
+
+=head1 AUTHOR
+
+Mike Greb E<lt>michael@thegrebs.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2013- Mike Greb
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

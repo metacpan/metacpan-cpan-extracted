@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/AnyEvent/Multilog.pm
+t/00load.t
+t/basic.t
+t/leftovers.t
+t/lib/multilog.pm
+t/release-pod-syntax.t
+t/rotate.t
+xt/stress.t

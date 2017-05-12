@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Apache/DebugLog/Config.pm
+lib/Apache/DebugLog.pm
+lib/Apache2/DebugLog.pm
+t/conf/extra.last.conf.in
+t/response/Does_It_Work.pm
+t/00-load.t
+t/pod.t
+t/TEST.PL
+t/pod-coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,21 @@
+
+0.006 2013.03.17 09:51:10 GMT
+    - Added 'use utf8' to App::Git::Spark
+
+0.005 2013.03.17 09:03:19 GMT
+    - git-vspark
+    - POD: new install instructions
+    - POD: introduce git-vspark
+    - Switch from homan's git implementation to Term::Spark
+
+0.004 2013.02.11 20:01:19 SGT
+    - POD: better install instructions
+
+0.003 2013.02.11 19:04:17 SGT
+    - POD
+
+0.002 2013.02.11 06:44:21 SGT
+    - Added some POD
+
+0.001 2013.02.10 18:09:08 SGT
+    - First release

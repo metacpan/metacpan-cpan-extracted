@@ -1,0 +1,10 @@
+#############################################################
+################### Load Perl Modules Now ###################
+#############################################################
+PerlModule Apache::XPP
+PerlModule Apache::XPP::PreParse
+PerlModule Apache::XPP::Cache
+PerlModule Apache::XPP::Cache::Store
+PerlModule Apache::XPP::Cache::Store::File
+PerlModule Apache::XPP::Cache::Expiry
+PerlModule Apache::XPP::Cache::Expiry::Duration

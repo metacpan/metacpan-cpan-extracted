@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+bin/exec-if-env
+bin/exec-if-not-env
+dist.ini
+lib/App/ExecIf.pm
+t/00-compile.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/release-rinci.t
+weaver.ini

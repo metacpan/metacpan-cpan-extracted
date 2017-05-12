@@ -1,0 +1,29 @@
+--- SDL_image-1.2.11/configure	2012-01-06 05:12:29.000000000 +0100
++++ SDL_image-1.2.11/configure	2012-01-06 10:06:05.000000000 +0100
+@@ -13875,7 +13875,7 @@
+   echo $ECHO_N "(cached) $ECHO_C" >&6
+ else
+   ac_check_lib_save_LIBS=$LIBS
+-LIBS="-lpng -lz $LIBS"
++LIBS="$LIBPNG_LIBS -lz $LIBS"
+ cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */
+ _ACEOF
+@@ -14072,7 +14072,7 @@
+   echo $ECHO_N "(cached) $ECHO_C" >&6
+ else
+   ac_check_lib_save_LIBS=$LIBS
+-LIBS="-lpng -lz $LIBS"
++LIBS="$LIBPNG_LIBS -lz $LIBS"
+ cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */
+ _ACEOF
+@@ -15008,7 +15008,7 @@
+ _ACEOF
+ 
+     else
+-        IMG_LIBS="-lpng -lz $IMG_LIBS"
++        IMG_LIBS="$LIBPNG_LIBS -lz $IMG_LIBS"
+     fi
+ fi
+ 

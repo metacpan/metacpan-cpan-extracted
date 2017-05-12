@@ -1,0 +1,15 @@
+---
+name: AutoCurry
+version: 0.1003
+author:
+  - Tom Moertel (tom@moertel.com)
+abstract: automatically create currying variants of functions
+license: perl
+requires:
+  Carp: 0
+  Test::More: 0
+provides:
+  AutoCurry:
+    file: lib/AutoCurry.pm
+    version: 0.1003
+generated_by: Module::Build version 0.2608

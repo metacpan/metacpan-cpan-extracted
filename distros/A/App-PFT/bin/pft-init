@@ -1,0 +1,211 @@
+#!/usr/bin/perl
+#
+# Copyright 2014-2016 - Giovanni Simoni
+#
+# This file is part of PFT.
+#
+# PFT is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# PFT is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with PFT.  If not, see <http://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+pft init - Initialize a PFT Site
+
+=head1 SYNOPSYS
+
+pft init [<configuration options>]
+
+=head1 DESCRIPTION
+
+This command initializes a I<PFT site> in the current directory. It
+generates a configuration file named C<pft.yaml> and it creates the
+following filesystem structure documented in the main C<pft> manual page.
+
+A sensible configuration skeleton is provided by default, and can be
+modified by editing the C<pft.yaml> configuration file.
+
+=cut
+# NOTE: Documentation continues with auto-generated options from PFT::Conf
+# at the end of this file (from `=head1 CONFIGURATION OPTIONS` on).
+#
+# Generate again if needed with:
+#
+#   perl -CO -MPFT::Conf=pod_autogen -wE 'say pod_autogen'
+#
+
+use strict;
+use warnings;
+use utf8;
+use v5.16;
+use feature 'say';
+
+use PFT::Conf;
+use PFT::Tree;
+use PFT::Header;
+
+use Encode;
+use Encode::Locale;
+
+use File::Spec;
+use File::Copy;
+use File::ShareDir;
+use File::Basename qw/basename/;
+
+use Cwd;
+
+use Getopt::Long;
+Getopt::Long::Configure qw/bundling/;
+
+use Pod::Usage;
+use App::PFT;
+
+my %opts = (home => 1);
+GetOptions(
+    PFT::Conf::wire_getopt(\my %conf_opts),
+
+    'help|h!' => sub {
+        pod2usage
+            -exitval => 0,
+            -verbose => 2,
+            -input => App::PFT::help_of 'init',
+    },
+) or exit 1;
+
+if (my $root = PFT::Conf::locate) {
+    say STDERR 'Configuration exists: ', $root;
+    exit 1;
+}
+
+my $conf = PFT::Conf->new_getopt(\%conf_opts);
+$conf->save_to(my $root = Cwd::cwd);
+my $tree = PFT::Tree->new($root, {create => 1});
+
+my $home = $tree->content->new_entry(PFT::Header->new(
+    title => $conf->{site}{home},
+    author => $conf->{site}{author},
+));
+$home->open('a') unless $home->exists;
+
+my $glob = File::Spec->catdir(
+    File::ShareDir::module_dir('App::PFT'),
+    'templates',
+    '*',
+);
+
+foreach (glob encode(locale_fs => $glob)) {
+    my $outfn = File::Spec->catfile(
+        encode(locale_fs => $tree->dir_templates),
+        basename($_)
+    );
+
+    open my $in, '< :encoding(UTF-8)', $_ or do {
+        say STDERR 'Cannot open ', decode(locale_fs => $_), ": $!";
+        exit 1;
+    };
+
+    open my $out, '> :encoding(locale_fs)', $outfn or do {
+        say STDERR 'Cannot open ', decode(locale_fs => $outfn), ": $!";
+        exit 1;
+    };
+
+    print $out (<$in>);
+
+    close $in;
+    close $out;
+};
+
+=head1 CONFIGURATION OPTIONS
+
+=over
+
+=item --publish-host
+
+Remote host where to publish
+
+Defaults to C<example.org>
+
+=item --publish-method
+
+Method used for publishing
+
+Defaults to C<rsync+ssh>
+
+=item --publish-path
+
+Directory on publishing host
+
+Defaults to C</home/dacav/public_html>
+
+=item --publish-port
+
+Port for connection on publishing host
+
+Defaults to C<22>
+
+=item --publish-user
+
+User login on publishing host
+
+Defaults to C<dacav>
+
+=item --site-author
+
+Default author of entries
+
+Defaults to C<dacav>
+
+=item --site-encoding
+
+Charset of the generated web pages
+
+Defaults to C<UTF-8>
+
+=item --site-home
+
+First page, where index.html redirects the browsers
+
+Defaults to C<Welcome>
+
+=item --site-template
+
+Default template for compilation, can be overriden by single entries
+
+Defaults to C<default.html>
+
+=item --site-title
+
+Title of the website
+
+Defaults to C<My PFT website>
+
+=item --site-url
+
+Base url for the website
+
+Defaults to C<http://example.org>
+
+=item --system-browser
+
+Browser to be invoked by C<pft show>. You may specify an executable, or a shell command where "%s" gets replaced with the file name
+
+Defaults to C<firefox %s>
+
+=item --system-editor
+
+Editor to be invoked by C<pft edit>. You may specify an executable, or a shell command where "%s" gets replaced with the file name
+
+Defaults to C<vim %s>
+
+=back

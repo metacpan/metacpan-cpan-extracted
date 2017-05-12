@@ -1,0 +1,15 @@
+---
+name: Authen-Simple-SMB
+version: 0.1
+author:
+  - Christian Hansen C<ch@ngmedia.com>
+abstract: Simple SMB authentication
+license: perl
+requires:
+  Authen::Simple: 0
+  Authen::Smb: 0
+provides:
+  Authen::Simple::SMB:
+    file: lib/Authen/Simple/SMB.pm
+    version: 0.1
+generated_by: Module::Build version 0.2611

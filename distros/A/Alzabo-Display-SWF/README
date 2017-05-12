@@ -1,0 +1,36 @@
+This package contains a tool for visualizing Alzabo database schemas
+with shockwave-flash (SWF) movies.
+
+In addition to the Alzabo and the GraphViz module - available from CPAN -
+it depends on the Ming library - available at http://ming.sourceforge.net/ -
+which includes the SWF Module (In 'Perl Graphics Programming' you find
+a good introduction to the Ming library, which is available online at
+http://www.oreilly.com/catalog/perlgp/chapter/ch09.pdf). 
+
+To install the Module, execute the following commands:
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+The ./etc folder contains a configuration sample my_conf.yml and
+an example script create.pl which receives the name of
+an Alzabo schema and generates the corresponding SWF movie
+together with an HTML Page that embeddes this movie. To view
+the movie you have to get the Flash Player plugin for
+your browser from http://www.macromedia.com/. 
+
+Additionally the ./etc folder contains several FDB files, which contain
+the fonts used for the default configuration and the one in my_conf.yml
+
+AUTHOR
+
+Stefan Baumann <s.baumann@uptime.at>
+
+COPYRIGHT
+
+Copyright (c) 2003 Stefan Baumann for Uptime Systemlösungen GmbH.
+All rights reserved.  This program is free software; you can redistribute 
+it and/or modify it under the same terms as Perl itself.
+

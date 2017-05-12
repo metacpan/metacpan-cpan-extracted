@@ -1,0 +1,73 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS qw (constant);
+
+my $value;
+
+$value = constant('PRIDEXIST'); # value = 267265
+print "Value constant = $value \n";
+
+$value = &AFS::PRIDEXIST;       # value = 267265, preferred method
+print "Value function = $value \n";
+
+$value = constant('VBUSY'); # value = 110
+print "Value constant = $value \n";
+
+$value = &AFS::VBUSY;       # value = 110, preferred method
+print "Value function = $value \n";
+
+# print "AFS::PRSUCCESS  = ",&AFS::PRSUCCESS ,"\n";
+# print "AFS::PR_MAXNAMELEN  = ",&AFS::PR_MAXNAMELEN ,"\n";
+# print "AFS::PR_MAXGROUPS  = ",&AFS::PR_MAXGROUPS ,"\n";
+# print "AFS::PR_MAXLIST  = ",&AFS::PR_MAXLIST ,"\n";
+# print "AFS::PRSIZE  = ",&AFS::PRSIZE ,"\n";
+# print "AFS::COSIZE  = ",&AFS::COSIZE ,"\n";
+# print "AFS::PR_SF_ALLBITS  = ",&AFS::PR_SF_ALLBITS ,"\n";
+# print "AFS::PR_SF_NGROUPS  = ",&AFS::PR_SF_NGROUPS ,"\n";
+# print "AFS::PR_SF_NUSERS   = ",&AFS::PR_SF_NUSERS  ,"\n";
+# print "AFS::PR_LOWEST_OPCODE   = ",&AFS::PR_LOWEST_OPCODE  ,"\n";
+# print "AFS::PR_HIGHEST_OPCODE  = ",&AFS::PR_HIGHEST_OPCODE ,"\n";
+# print "AFS::PR_NUMBER_OPCODES  = ",&AFS::PR_NUMBER_OPCODES ,"\n";
+# print "AFS::PREXIST  = ",&AFS::PREXIST ,"\n";
+# print "AFS::PRIDEXIST  = ",&AFS::PRIDEXIST ,"\n";
+# print "AFS::PRNOIDS  = ",&AFS::PRNOIDS ,"\n";
+# print "AFS::PRDBFAIL  = ",&AFS::PRDBFAIL ,"\n";
+# print "AFS::PRNOENT  = ",&AFS::PRNOENT ,"\n";
+# print "AFS::PRPERM  = ",&AFS::PRPERM ,"\n";
+# print "AFS::PRNOTGROUP  = ",&AFS::PRNOTGROUP ,"\n";
+# print "AFS::PRNOTUSER  = ",&AFS::PRNOTUSER ,"\n";
+# print "AFS::PRBADNAM  = ",&AFS::PRBADNAM ,"\n";
+# print "AFS::PRBADARG  = ",&AFS::PRBADARG ,"\n";
+# print "AFS::PRNOMORE  = ",&AFS::PRNOMORE ,"\n";
+# print "AFS::PRDBBAD  = ",&AFS::PRDBBAD ,"\n";
+# print "AFS::PRGROUPEMPTY  = ",&AFS::PRGROUPEMPTY ,"\n";
+# print "AFS::PRINCONSISTENT  = ",&AFS::PRINCONSISTENT ,"\n";
+# print "AFS::PRDBADDR  = ",&AFS::PRDBADDR ,"\n";
+# print "AFS::PRTOOMANY  = ",&AFS::PRTOOMANY ,"\n";
+# print "AFS::PRBADID  = ",&AFS::PRBADID ,"\n";
+# print "AFS::SYSADMINID  = ",&AFS::SYSADMINID ,"\n";
+# print "AFS::SYSBACKUPID  = ",&AFS::SYSBACKUPID ,"\n";
+# print "AFS::ANYUSERID  = ",&AFS::ANYUSERID ,"\n";
+# print "AFS::AUTHUSERID  = ",&AFS::AUTHUSERID ,"\n";
+# print "AFS::ANONYMOUSID  = ",&AFS::ANONYMOUSID ,"\n";
+# print "AFS::PRDBVERSION  = ",&AFS::PRDBVERSION ,"\n";
+
+# print "AFS::PRSFS_READ = ",&AFS::PRSFS_READ,"\n";
+# print "AFS::PRSFS_WRITE = ",&AFS::PRSFS_WRITE,"\n";
+# print "AFS::PRSFS_INSERT = ",&AFS::PRSFS_INSERT,"\n";
+# print "AFS::PRSFS_LOOKUP = ",&AFS::PRSFS_LOOKUP,"\n";
+# print "AFS::PRSFS_DELETE = ",&AFS::PRSFS_DELETE,"\n";
+# print "AFS::PRSFS_LOCK = ",&AFS::PRSFS_LOCK,"\n";
+# print "AFS::PRSFS_ADMINISTER = ",&AFS::PRSFS_ADMINISTER,"\n";
+# print "AFS::PRSFS_USR0 = ",&AFS::PRSFS_USR0,"\n";
+# print "AFS::PRSFS_USR1 = ",&AFS::PRSFS_USR1,"\n";
+# print "AFS::PRSFS_USR2 = ",&AFS::PRSFS_USR2,"\n";
+# print "AFS::PRSFS_USR3 = ",&AFS::PRSFS_USR3,"\n";
+# print "AFS::PRSFS_USR4 = ",&AFS::PRSFS_USR4,"\n";
+# print "AFS::PRSFS_USR5 = ",&AFS::PRSFS_USR5,"\n";
+# print "AFS::PRSFS_USR6 = ",&AFS::PRSFS_USR6,"\n";
+# print "AFS::PRSFS_USR7 = ",&AFS::PRSFS_USR7,"\n";

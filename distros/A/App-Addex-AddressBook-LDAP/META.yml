@@ -1,0 +1,26 @@
+---
+abstract: 'LDAP address book for App::Addex'
+author:
+  - 'Maximilian Gass <mxey@ghosthacking.net>'
+build_requires:
+  English: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Addex-AddressBook-LDAP
+requires:
+  App::Addex::AddressBook: 0
+  App::Addex::Entry: 0
+  App::Addex::Entry::EmailAddress: 0
+  Carp: 0
+  Modern::Perl: 0
+  Net::LDAP: 0
+  URI: 0
+  parent: 0
+version: 0.001

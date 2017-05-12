@@ -1,0 +1,3 @@
+App::HTTP_Proxy_IMP
+implements an HTTP proxy, which can inspect, modify or block content using
+plugins implementing the Net::IMP interface.

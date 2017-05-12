@@ -1,0 +1,265 @@
+#!perl
+
+our $DATE = '2017-02-07'; # DATE
+our $VERSION = '0.006'; # VERSION
+
+use strict;
+use warnings;
+
+use File::Path qw(make_path);
+use File::Spec;
+use Getopt::Long;
+
+sub process_path {
+    my $path = shift;
+    my $path_ends_in_slash = $path =~ s{/+\z}{} ? 1:0;
+    my $abs_path = File::Spec->rel2abs($path);
+    my (undef, undef, $path_leaf) = File::Spec->splitpath($abs_path);
+    return ($abs_path, $path_leaf, $path_ends_in_slash);
+}
+
+sub find_newest_mtime {
+    my $path = shift;
+
+    my @st = lstat($path) or return (0, $path);
+    my $is_dir = (-d _);
+    my $mtime = $st[9];
+    if ($is_dir) {
+        opendir my($dh), $path
+            or die "rsync-new2old: Can't opendir $path: $!\n";
+        my @entries = grep { $_ ne '.' && $_ ne '..' } readdir($dh);
+        my @res = map { [find_newest_mtime("$path/$_")] } @entries;
+        my $max_path = $path;
+        my $max_mtime = $mtime;
+        for my $r (@res) {
+            if ($r->[0] > $max_mtime) {
+                $max_mtime = $r->[0];
+                $max_path = $r->[1];
+            }
+        }
+        return ($max_mtime, $max_path);
+    }
+    ($mtime, $path);
+}
+
+my %Opts = (create_target_if_not_exists => 0);
+
+Getopt::Long::Configure('bundling', 'pass_through', 'no_auto_abbrev', 'permute');
+GetOptions(
+    'help|h|?' => sub {
+        print <<'_';
+Usage: rsync-new2old [options] <source> <target>
+
+Options:
+  --help, -h, -?  Show this message and exit.
+  --version       Show program version and exit.
+  --create-target-if-not-exists
+                  Create target if not exists.
+
+All the other options will be passed to rsync.
+
+See manpage for more detailed documentation.
+_
+        exit 0;
+    },
+    'version' => sub {
+        no warnings 'once';
+        print "rsync-new2old version ", ($main::VERSION || "dev"),
+            ($main::DATE ? " ($main::DATE)" : ""), "\n";
+        exit 0;
+    },
+    'create-target-if-not-exists' => \$Opts{create_target_if_not_exists},
+);
+
+my ($source, $target);
+for (@ARGV) {
+    if (/\A-/) {
+        next;
+    } elsif (!defined($source)) {
+        $source = $_;
+    } elsif (!defined($target)) {
+        $target = $_;
+    } else {
+        last;
+    }
+}
+#use DD; dd {source=>$source, target=>$target, opts=>\%Opts};
+die "rsync-new2old: Please specify both source and target\n"
+    unless defined $source && defined $target;
+
+die "rsync-new2old: Can't find source '$source', must already exist and a local path\n"
+    unless -e $source;
+my ($abs_source, $source_leaf, $source_ends_in_slash) = process_path($source);
+my ($abs_target, $target_leaf, $target_ends_in_slash) = process_path($target);
+my $real_target = $source_ends_in_slash ? $target : "$abs_target/$source_leaf";
+if ($Opts{create_target_if_not_exists}) {
+    unless (-e $real_target) {
+        if (-d $source) {
+            make_path($real_target) or die "rsync-new2old: Can't make_path '$real_target': $!\n";
+        } else {
+            open my $fh, ">", $real_target or die "rsync-new2old: Can't create file '$real_target': $!\n";
+            close $fh;
+        }
+        utime 0, 0, $real_target or die "rsync-new2old: Can't set mtime of '$real_target': $!\n";
+    }
+} else {
+    die "rsync-new2old: Can't find target '$real_target', must already exist and a local path\n"
+        unless -e $real_target;
+}
+
+my ($newest_mtime_source, $newest_path_source) = find_newest_mtime($source);
+my ($newest_mtime_target, $newest_path_target) = find_newest_mtime($real_target);
+
+if ($newest_mtime_target > $newest_mtime_source) {
+    warn sprintf("rsync-new2old: Aborting rsync from '%s' to '%s' ".
+                     "because newest file/subdir in source ('%s', mtime %s) is older than ".
+                         "newest file/subdir in target ('%s', mtime %s)\n",
+                 $source, $real_target,
+                 $newest_path_source, scalar(localtime $newest_mtime_source),
+                 $newest_path_target, scalar(localtime $newest_mtime_target),
+             );
+    exit 2;
+}
+
+exec {"rsync"} "rsync", @ARGV;
+
+# ABSTRACT: Rsync wrapper to make sure we sync new data to old, not otherwise
+# PODNAME: rsync-new2old
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rsync-new2old - Rsync wrapper to make sure we sync new data to old, not otherwise
+
+=head1 VERSION
+
+This document describes version 0.006 of rsync-new2old (from Perl distribution App-rsync-new2old), released on 2017-02-07.
+
+=head1 SYNOPSIS
+
+Use like you would use B<rsync>:
+
+ % rsync-new2old -avz [other options...] <source> <target>
+
+=head1 DESCRIPTION
+
+Rsync is a fast and versatile directory mirroring tool. I often use it to
+synchronize my large media/software directory from one computer to another.
+However, sometimes I add/delete stuffs from this directory on one computer (say
+B) instead of on another (A). Then I forget and synchronize the media directory
+from A to B instead of B to A. The changes in B are then lost.
+
+This tool, B<rsync-new2old>, is a simple rsync wrapper that will first check
+that the newest modification filestamp (mtime) of file/subdirectory in source
+directory is not older than the newest mtime of file/subdirectory in target
+directory. If that check passes, it runs rsync. If not, it aborts.
+
+Illustration:
+
+ source/
+   dir1/          -> mtime: 2016-12-15T00:00:00
+     file1        -> mtime: 2016-12-15T00:00:00
+     file2        -> mtime: 2016-12-16T01:00:00
+
+ target/          -> mtime: 2016-12-05T00:00:00
+   dir1/          -> mtime: 2016-12-06T00:00:00
+     file2        -> mtime: 2016-12-06T00:00:00
+
+The newest mtime in C<source> is C<2016-12-16T01:00:00> (the mtime of C<file2>),
+while the newest mtime of C<target> is C<2016-12-06T00:00:00> (the mtime of
+C<file2> or C<dir1>). B<rsync-new2old> will allow synchronizing from C<source>
+to C<target>.
+
+Caveats: Note that C<source> and C<target> must be local filesystem paths, so
+this wrapper cannot be used if one of source/target is a remote path. Also, this
+script currently doesn't regard rsync --exclude options. Please consider the
+alternatives mentioned in the See Also section.
+
+=head1 OPTIONS
+
+=head2 --help, -h, -?
+
+=head2 --version
+
+=head2 --create-target-if-not-exists
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-rsync-new2old>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-rsync-new2old>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-rsync-new2old>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+Other one-way mirroring tools:
+
+=over
+
+=item * B<rsync>
+
+=item * ZFS send and receive, L<https://docs.oracle.com/cd/E18752_01/html/819-5461/gbchx.html>
+
+Filesystems like ZFS also record changes to filesystems and can propagate them
+to another filesystem efficiently. If you are synchronizing between two ZFS
+filesystems (even across network), this approach offers great performance (e.g.
+detect renames and can propgate this change quickly instead of rsync which must
+delete files with old names + re-copy the same files with new names) and 2-way
+mirroring capability.
+
+=back
+
+A safer solution when you want to synchronize two directories while maintaining
+changes from both directories is to use 2-way mirroring solutions. Below are
+some:
+
+=over
+
+=item * B<unison>, L<https://www.cis.upenn.edu/~bcpierce/unison>
+
+A two-way mirroring tool which also uses the rsync algorithm to transfer data.
+It works by first recording the state of a directory (all the mtimes,
+permissions, etc of its files). Then, when you want to synchronize this
+directory, it will calculate the changes between the current state and the
+previous, then negotiate it with the changes in the target directory. It can
+propagate files added/deleted from either directory, and can detect files that
+are changed in both directory (a conflict). It does not merge conflicts.
+
+I found rsync faster when transferring large directories, so I usually just use
+rsync.
+
+=item * Version control tools, like B<git>, B<mercurial>, etc
+
+These tools can propagate changes from either direction including merging
+conflicts (changes to the same file). Many however are not designed to store
+large binaries so using these tools to synchronize large binaries can result in
+inefficient disk storage or slow performance.
+
+=back
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

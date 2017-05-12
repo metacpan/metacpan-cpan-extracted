@@ -1,0 +1,7 @@
+# Revision history for Perl extension Acme::Takahashi::Method.
+#
+# $Id: Changes,v 0.1 2005/08/28 16:29:27 dankogai Exp dankogai $
+#
+$Revision: 0.1 $ $Date: 2005/08/28 16:29:27 $
++ *
+  First Release.

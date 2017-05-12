@@ -1,0 +1,181 @@
+#!/opt/perl/bin/perl
+use strict;
+use utf8;
+use AnyEvent;
+use AnyEvent::XMPP::Client;
+use AnyEvent::XMPP::Ext::Disco;
+use AnyEvent::XMPP::Ext::DataForm;
+use Storable;
+use XML::DOM::XPath;
+use EVQ;
+
+our $datafile = "room_data.stor";
+our $data = {};
+
+eval { $data = retrieve $datafile };
+sub sync_data { store $data, $datafile }
+
+# MAIN START
+my $conferences = retrieve 'conferences.stor';
+if ($ARGV[0] eq 'stat') {
+   my @srv = keys %$conferences;
+   my %conf;
+   for (map { my $s = pop @$_; my $a = $_; map { $s . ":" . $_ } @$a } map { [$_, keys %{$conferences->{$_}}] } keys %$conferences) {
+      $conf{$_} = 1;
+   }
+   print "servers with conferences: " . scalar (@srv) . "\n";
+   print "conferences             : " . scalar (join ",\n", keys %conf) . "\n";
+   exit;
+}
+my $cl = AnyEvent::XMPP::Client->new ();
+my $d  = AnyEvent::XMPP::Ext::Disco->new;
+$cl->add_extension ($d);
+$cl->add_account ('net_xmpp2@jabber.org/test2', 'test');
+
+sub disco_info {
+   my ($con, $jid, $cb) = @_;
+
+   EVQ::push_request ("di_$jid", sub {
+      my $ID = shift;
+      $d->request_info ($con, $jid, undef, sub {
+         my ($d, $i, $e) = @_;
+         if ($e) {
+            print "error on disco info on $jid: " . $e->string . "\n";
+         } else {
+            $cb->($i);
+         }
+         EVQ::finreq ($ID)
+      });
+   });
+}
+
+sub disco_items {
+   my ($con, $jid, $cb) = @_;
+
+   EVQ::push_request ("dit_$jid", sub {
+      my $ID = shift;
+      $d->request_items ($con, $jid, undef, sub {
+         my ($d, $i, $e) = @_;
+         if ($e) {
+            print "error on disco items on $jid: " . $e->string . "\n";
+         } else {
+            $cb->($i);
+         }
+         EVQ::finreq ($ID)
+      });
+   });
+}
+
+sub fetch_room_occupants {
+   my ($con, $jid, $cb) = @_;
+
+   EVQ::push_request ("fro_$jid", sub {
+      my $ID = shift;
+      $d->request_info ($con, $jid, undef, sub {
+         my ($d, $i, $e) = @_;
+         if ($e) {
+            print "error on disco info to $jid for room occupants: " . $e->string . "\n";
+         } else {
+            my (@q) = $i->xml_node ()->find_all ([qw/data_form x/]);
+            if (@q) {
+               my $df = AnyEvent::XMPP::Ext::DataForm->new;
+               $df->from_node (@q);
+               if (my $f = $df->get_field ('muc#roominfo_occupants')) {
+                  $cb->($jid, $f->{values}->[0]);
+                  EVQ::finreq ($ID);
+                  return;
+               }
+            }
+            $cb->($jid);
+         }
+         EVQ::finreq ($ID);
+      });
+   });
+}
+
+sub disco_conference {
+   my ($con, $jid, $cb) = @_;
+
+   EVQ::push_request ("dc_$jid", sub {
+      my $ID = shift;
+      disco_items ($con, $jid, sub {
+         my ($items) = @_;
+         for my $i ($items->items) {
+            my $room_name = $i->{name};
+            fetch_room_occupants ($con, $i->{jid}, sub {
+               my ($room_jid, $cnt) = @_;
+               unless (defined $cnt) {
+                  if ($room_name =~ /\((\d+)\)\s*$/) {
+                     $cnt = $1;
+                  }
+               }
+               $cb->($jid, $room_jid, $room_name, $cnt);
+            });
+         }
+         EVQ::finreq ($ID);
+      });
+   });
+}
+
+my $con;
+my $A = AnyEvent->condvar;
+
+$cl->reg_cb (
+   error => sub {
+      my ($cl, $acc, $err) = @_;
+      print "ERROR: " . $err->string . "\n";
+      1
+   },
+   iq_result_cb_exception => sub {
+      my ($cl, $acc, $ex) = @_;
+      print "EXCEPTION: $ex\n";
+      1
+   },
+   session_ready => sub {
+      my ($cl, $acc) = @_;
+      print "session ready, requesting items for $ARGV[0]\n";
+      my $c = $acc->connection ();
+      $c->set_default_iq_timeout (30);
+      $con = $c;
+      $A->broadcast;
+      0
+   },
+   message => sub {
+      my ($cl, $acc, $msg) = @_;
+      print "message from: " . $msg->from . ": " . $msg->any_body . "\n";
+      1
+   }
+);
+
+$cl->start;
+
+$A->wait;
+
+print "EVQ start\n";
+EVQ::start ();
+
+my $t;
+sub mkti { $t = AnyEvent->timer (after => 10, cb => sub { sync_data (); mkti (); }) }
+mkti;
+
+for my $SERVER (keys %{$conferences}) {
+   my $conf = $conferences->{$SERVER};
+   for my $cj (keys %$conf) {
+      disco_conference ($con, $cj, sub {
+         my ($cjid, $rjid, $rname, $rocc) = @_;
+         my $prev = $data->{$cjid}->{$rjid};
+         if ($prev) {
+            if ($prev->[3] < $rocc) {
+               $data->{$cjid}->{$rjid} = [$cjid, $rjid, $rname, $rocc];
+            }
+         } else {
+            $data->{$cjid}->{$rjid} = [$cjid, $rjid, $rname, $rocc];
+         }
+         printf "\t*** %-30s: %-50s: %3d\n",
+             $cjid, $rjid, $rocc;
+      });
+   }
+}
+
+
+EVQ::wait ();

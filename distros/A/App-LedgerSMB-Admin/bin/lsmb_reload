@@ -1,0 +1,126 @@
+#!/usr/bin/perl
+
+use App::LedgerSMB::Admin;
+use App::LedgerSMB::Admin::Database;
+
+use Getopt::Long;
+
+my $helpmsg = qq|
+lsmb_reload: Reload a LedgerSMB Database
+
+   lsmb_reload [options]
+
+The following options are supported:
+
+   --all                    Reload All Databases
+   --help                   Print this message and exit
+   --host hostname          Database Host
+   --path13 /example/path   Path to LedgerSMB 1.3 installation
+   --path14 /example/path2  Path to LedgerSMB 1.4 installation
+   --path15 /example/path2  Path to LedgerSMB 1.5 installation
+   --port 5432              Database Poart
+   --dbname database        Reload the specified db, overridden by --all
+   --username postgres      Database Superuser to Log In As
+   --prompt-password        Prompt for Password (can use PGPASSWORD instead)
+|;
+
+my ($all, $help, $host, $port, $path13, $path14, $dbname, 
+    $username, $promptpasswd);
+
+GetOptions('all'               => \$all,
+           'help'              => \$help,
+           'host=s'            => \$host,
+           'port=s'            => \$port,
+           'username=s'        => \$username, 
+           'prompt-password'   => \$promptpasswd,
+           'path13=s'          => \$path13,
+           'path14=s'          => \$path14,
+           'path15=s'          => \$path15,
+           'dbname=s'          => \$dbname
+);
+
+if ($help){
+   print $helpmsg;
+   exit 0;
+}
+
+my $passwd;
+if ($promptpasswd){
+   print "Password: ";
+   $passwd = <>;
+}
+
+$username ||= 'postgres';
+
+## validate paths and set up versions
+
+my $lsmbversions = {};
+
+my $line;
+if ($path13) {
+   open(LSMB, '<', "$path13/LedgerSMB.pm") or die 'Bad LedgerSMB 1.3 path';
+   ($line) = grep {$_ =~ /^\s*our\s+\$VERSION/} <LSMB>;
+   $line =~ /(\d+\.\d+\.\d+)/;
+   $lsmbversion->{1.3} = $1;
+   App::LedgerSMB::Admin->add_paths('1.3' => $path13);
+   close LSMB;
+}
+
+if ($path14) {
+   open(LSMB, '<', "$path14/LedgerSMB.pm") or die 'Bad LedgerSMB 1.4 path';
+   ($line) = grep {$_ =~ /^\s*our\s+\$VERSION/} <LSMB>;
+   App::LedgerSMB::Admin->add_paths('1.4' => $path14);
+   $line =~ /(\d+\.\d+\.\d+)/;
+   $lsmbversion->{1.4} = $1;
+   warn $lsmbversion->{1.4};
+   close LSMB;
+}
+
+if ($path15) {
+   open(LSMB, '<', "$path15/lib/LedgerSMB.pm") or die 'Bad LedgerSMB 1.5 path';
+   ($line) = grep {$_ =~ /^\s*our\s+\$VERSION/} <LSMB>;
+   App::LedgerSMB::Admin->add_paths('1.5' => $path15);
+   $line =~ /(\d+\.\d+\.\d+)/;
+   $lsmbversion->{1.5} = $1;
+   warn $lsmbversion->{1.5};
+   close LSMB;
+}
+## set up db connection
+
+my $db = App::LedgerSMB::Admin::Database->new(
+   host     => $host,
+   port     => $port,
+   username => $username,
+   password => $password,
+   dbname   => $dbname,
+);
+
+## do the actual work
+
+if ($all){
+  for my $dbhame ($db->list_dbs){
+     my $working_db = $db->new($db->export, dbname => $dbname);
+     do_reload($working_db) if eval { $working_db->major_version };
+  }
+} elsif ($dbname){
+  do_reload($db);
+} else {
+  print STDERR "No database provided.  Use --all or --dbname\n";
+  print $helpmsg;
+  exit 1;
+}
+
+sub do_reload {
+    my $db = shift;
+    my $ver = $db->major_version;
+    die 'Unsupported version: ' . $ver unless $lsmbversion->{$ver};
+    $db->reload;
+    $db->process_changes if $ver > 1.4;
+    my $dbh = $db->connect({AutoCommit => 1});
+    $dbh->prepare(
+      "UPDATE defaults SET value = ? WHERE setting_key = 'version'"
+    )->execute($lsmbversion->{$ver});
+}
+
+exit 0;
+1;

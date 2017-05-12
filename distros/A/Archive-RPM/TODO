@@ -1,0 +1,2 @@
+* better access to rpm header info; e.g. an actual file manifest rather than
+  one derived from the exploded archive

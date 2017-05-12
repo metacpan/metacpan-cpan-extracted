@@ -1,0 +1,41 @@
+---
+abstract: 'A Pod editor written with wxPerl'
+author:
+  - 'Renee Baecker <module@renee-baecker.de>'
+build_requires:
+  Data::Dumper: 2.121
+  Exporter: 5.58
+  File::Basename 2.74
+  File::Spec 0.87
+  Test::More: 0
+  Wx: 0.87
+  Wx::Perl::PodEditor: 0.02
+  YAML::Tiny: 0
+generated_by: 'h2xs version 1.23'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+name: Wx-Perl-PodEditor
+provides:
+  App::Wx::PodEditor:
+    file: /lib/App/Wx/PodEditor.pm
+    version: 0.01
+  App::Wx::PodEditor::Frame:
+    file: /lib/App/Wx/PodEditor/Frame.pm
+    version: 0.01
+  App::Wx::PodEditor::Actions:
+    file: /lib/App/Wx/PodEditor/Actions.pm
+    version: 0.01
+  App::Wx::PodEditor::Actions::Edit:
+    file: /lib/App/Wx/PodEditor/Actions/Edit.pm
+    version: 0.01
+  App::Wx::PodEditor::Actions::File:
+    file: /lib/App/Wx/PodEditor/Actions/File.pm
+    version: 0.01
+  App::Wx::PodEditor::Actions::Format:
+    file: /lib/App/Wx/PodEditor/Actions/Format.pm
+    version: 0.01
+resources:
+  license: http://dev.perl.org/licenses
+version: 0.01

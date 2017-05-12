@@ -1,0 +1,190 @@
+#
+# ParseConstituents.yp
+# 
+#  used to generate Alvis::NLPPlatform::ParseConstituents.pm
+#
+#  Use: yapp -m 'Alvis::NLPPlatform::ParseConstituents' -o lib/Alvis/NLPPlatform/ParseConstituents.pm lib/Alvis/NLPPlatform/ParseConstituents.yp
+#
+# Parse::Yapp input grammar for parsing the constituents of bioLG
+#
+#
+#
+%{
+    use Alvis::NLPPlatform;
+    use Data::Dumper;
+    use warnings;
+
+
+    our $VERSION=$Alvis::NLPPlatform::VERSION;
+
+    my $doc_hash;
+    my $decal_phrase_idx;
+
+    my $debug_mode=0;
+    my $lconst = 0;
+    my $nconst;
+
+    my @tab_nconst;
+#     my @tab_type;
+#     my @tab_string;
+    my $tab_type_ref;
+    my $tab_string_ref;
+
+    my $lastword="";
+
+    my $word_id_np_ref;
+
+    my $word_count;
+
+%}
+%%
+
+input: #empty
+       | input line { push(@{$_[1]},$_[2]); $_[1] }
+;
+
+line:     '\n' { $_[1] }  
+        | constituent '\n' 
+	|  error '\nline: ' { $_[0]->YYErrok }
+;
+
+constituent: open constituent_content close 
+	   |  error '\nconstituents: ' { $_[0]->YYErrok }
+
+;
+
+constituent_content: chunk {$_[1];}
+                   | constituent
+                   | constituent_content constituent_content
+	   |  error '\nconstituent_content: ' { $_[0]->YYErrok }
+;
+
+
+open: OPEN {
+	    # open constituent
+	    if($lconst>0){
+		push @{$$tab_string_ref[$tab_nconst[$lconst]]} , "phrase" . ($decal_phrase_idx+$$nconst+1) ;
+	    }
+	    $lconst++;
+	    $$nconst++;
+	    $tab_nconst[$lconst]=$$nconst;
+
+	    # get type
+	    $$tab_type_ref[$tab_nconst[$lconst]]=$_[1];
+
+	    print STDERR "*** DEBUG *** Opened constituent $$nconst with type ".$_[1]."\n" unless ($debug_mode==0);
+
+	}
+	|  error '\nopen: ' { $_[0]->YYErrok }
+;
+
+close: CLOSE {
+	    # check type
+    print STDERR $_[1] unless ($debug_mode==0);
+	    if($_[1] ne $$tab_type_ref[$tab_nconst[$lconst]]){
+		print STDERR "Error found at level $lconst: types don't match!\n";
+		exit 0;
+	    }
+	    # remove ending space
+#	    $$tab_string_ref[$tab_nconst[$lconst]] =~ s/\s+$//sgo;
+	    # close constituent
+	    print STDERR "*** DEBUG *** Closing constituent $tab_nconst[$lconst]\n" unless ($debug_mode==0);
+	    $lconst--;
+	}
+        |  error '\nclose: ' { $_[0]->YYErrok }
+;
+
+chunk: word chunk | word 
+	   |  error '\nchunk: ' { $_[0]->YYErrok }
+;
+
+word: WORD {
+	    print STDERR "*** DEBUG *** Found string '".$_[1] . "'\n" unless ($debug_mode==0);
+	    if((defined $$tab_string_ref[$tab_nconst[$lconst]])
+                &&(scalar(@{$$tab_string_ref[$tab_nconst[$lconst]]}) != 0)){
+		print STDERR "*** DEBUG *** Appended to previously found string\n" unless ($debug_mode==0);
+#		$$tab_string_ref[$tab_nconst[$lconst]].=$_[0]->text;
+		if(($_[1] eq $lastword) || ($_[1]=~/^\./)){
+		}else{
+		    push @{$$tab_string_ref[$tab_nconst[$lconst]]}, "word" . $$word_id_np_ref ;
+		    $$word_id_np_ref++;
+		    $lastword=$_[1];
+		}
+	    }else{
+#		$$tab_string_ref[$tab_nconst[$lconst]]=$_[0]->text;
+		if(!(($_[1] eq $lastword)||($_[1] =~ /^\./))){
+		    $lastword=$_[1];
+		    my @tmp;
+		    push @tmp, "word" . $$word_id_np_ref;
+		    $$tab_string_ref[$tab_nconst[$lconst]]=\@tmp;
+		    $$word_id_np_ref++;
+		}else{
+		}
+	    }
+	}
+	|  error '\nword: ' { $_[0]->YYErrok }
+;
+
+%%
+
+
+
+sub _Error {
+        exists $_[0]->YYData->{ERRMSG}
+    and do {
+        print $_[0]->YYData->{ERRMSG};
+        delete $_[0]->YYData->{ERRMSG};
+        return;
+    };
+#    print "Syntax error...\n";
+}
+
+sub _Lexer {
+    my($parser)=shift;
+
+
+    $doc_hash = $parser->YYData->{DOC_HASH} or  return('',undef);
+    $decal_phrase_idx = $parser->YYData->{DECAL_PHRASE_IDX} or  return('',undef);
+    $word_id_np_ref = $parser->YYData->{WORD_ID_NP_REF} or  return('',undef);
+
+    $tab_type_ref = $parser->YYData->{TAB_TYPE_REF};
+    $tab_string_ref = $parser->YYData->{TAB_STRING_REF};
+
+    # $lconst = $parser->YYData->{LCONST_REF};
+    $nconst = $parser->YYData->{NCONST_REF};
+
+    $word_count=$$word_id_np_ref;
+
+#     $parser->YYData->{INPUT}
+#     or $parser->YYData->{INPUT} = "[PP of [NP two transcription factors factors NP] PP]\n"
+#     or  return('',undef);
+#      $parser->YYData->{INPUT} = $parser->YYData->{CONSTITUENT_STRING};
+#  or  return('',undef);
+
+#     chomp $parser->YYData->{INPUT};
+#     chop $parser->YYData->{INPUT};
+#     print STDERR $parser->YYData->{INPUT};
+#     print STDERR ";;\n";
+
+#     print STDERR "==>";
+#     print STDERR $parser->YYData->{CONSTITUENT_STRING};
+#     print STDERR "\n";
+
+#      print STDERR "$lconst : $$nconst\n";
+
+    $parser->YYData->{CONSTITUENT_STRING}=~s/^[ \t]*#.*//;
+    $parser->YYData->{CONSTITUENT_STRING}=~s/^[ \t]*//;
+    my $open = '\[([A-Z]+)';
+    my $close = '([A-Z]+)\]';
+    my $word = '([^\s\]\[]+)';
+
+    for ($parser->YYData->{CONSTITUENT_STRING}) {
+        s/^$open// and return ('OPEN', $1);
+        s/^$close// and return ('CLOSE', $1);
+	s/^$word// and return('WORD', $1);
+        s/^(.)//s  and return($1,$1);
+	
+    }
+
+}
+

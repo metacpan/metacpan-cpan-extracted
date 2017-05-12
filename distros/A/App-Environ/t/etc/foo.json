@@ -1,0 +1,5 @@
+{ "foo": {
+    "param1": "foo:value1",
+    "param2": "foo:value2"
+  }
+}

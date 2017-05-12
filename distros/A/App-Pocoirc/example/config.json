@@ -1,0 +1,33 @@
+{
+   "local_plugins":[
+      [
+         "BotTraffic"
+      ]
+   ],
+   "nick":"foobar1234",
+   "networks":{
+      "freenode":{
+         "local_plugins":[
+            [
+               "AutoJoin",
+               {
+                  "Channels":[
+                     "#foodsfdsf"
+                  ]
+               }
+            ]
+         ],
+         "server":"irc.freenode.net"
+      },
+      "magnet":{
+         "nick":"hlagherf32fr",
+         "server":"irc.perl.org"
+      }
+   },
+   "global_plugins":[
+      [
+         "CTCP"
+      ]
+   ],
+   "username":"foobar"
+}

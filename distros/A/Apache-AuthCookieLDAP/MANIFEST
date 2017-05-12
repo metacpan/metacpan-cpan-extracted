@@ -1,0 +1,10 @@
+AuthCookieLDAP.pm
+Changes
+MANIFEST
+README
+LICENSE
+Makefile.PL
+test.pl
+eg/html/login.html
+eg/html/login-failed.html
+eg/public-pl/login.pl

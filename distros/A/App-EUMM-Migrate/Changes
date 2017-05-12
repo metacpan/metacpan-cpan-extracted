@@ -1,0 +1,12 @@
+Revision history for App-EUMM-Migrate
+
+0.11    2015-04-12
+        "dist" should be ignored
+
+0.10    2011-05-10
+        use Perl::Meta
+        Write "auto_configure_requires=>0"
+
+0.02    2009-12-29
+        First version.
+

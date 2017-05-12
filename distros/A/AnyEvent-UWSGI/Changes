@@ -1,0 +1,9 @@
+Revision history for Perl extension AnyEvent::UWSGI.
+
+0.02  Thu Aug 11 18:17:00 2016
+    - fix HTTP headers parse
+
+0.01  Wed Aug 10 14:36:32 2016
+	- original version; created by h2xs 1.23 with options
+		-AXn AnyEvent::UWSGI
+

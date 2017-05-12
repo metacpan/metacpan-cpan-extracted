@@ -1,0 +1,8 @@
+<& /index.comp, title => 'stu.transacme.com', content => $content &>
+<%init>
+my $content = <<'ENDCONTENT';
+<ul>
+<li> <a href="/protected">Here</a> is a protected resource.
+</ul>
+ENDCONTENT
+</%init>

@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache2::ScoreBoardFile.
+
+0.01  Tue Sep  7 13:32:41 2010
+	- original version; created by h2xs 1.23 with options
+		-A -n Apache2::ScoreBoardFile
+

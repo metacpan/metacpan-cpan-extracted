@@ -1,0 +1,8 @@
+
+Almost ready for first real release!
+* moved the la.pm.org specific pieces out of the repo and distro
+* adds init command to create a default config file
+* adds examples files for:
+  * template/index.tt,
+  * .netrc,
+  * config/pm-website.yaml

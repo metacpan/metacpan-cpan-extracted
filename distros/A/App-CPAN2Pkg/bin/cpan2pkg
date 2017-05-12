@@ -1,0 +1,105 @@
+#!/usr/bin/perl
+#
+# This file is part of App-CPAN2Pkg
+#
+# This software is copyright (c) 2009 by Jerome Quelin.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
+use 5.012;
+use strict;
+use warnings;
+
+package cpan2pkg;
+# ABSTRACT: generating native linux packages from cpan
+$cpan2pkg::VERSION = '3.004';
+# for testing purposes
+use Find::Lib '../lib';
+use Getopt::Long::Descriptive;
+
+my ($opt, $usage) = describe_options(
+    '%c %o <module...>',
+    [ "ui" => hidden => { one_of => [
+        [ "gui|G"  => "graphical interface" ],
+        [ "term|T" => "terminal interface" ],
+    ] } ],
+    [],
+    [ 'help',   "print usage message and exit"                 ],
+);
+print($usage->text), exit if $opt->help;
+$opt->{ui} //= $ENV{DISPLAY} ? "gui" : "term";
+
+# force tk loop for poe if we run the gui
+eval "use Tk" if $opt->{ui} eq "gui";
+
+require App::CPAN2Pkg;
+App::CPAN2Pkg->run( $opt, @ARGV );
+exit;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+cpan2pkg - generating native linux packages from cpan
+
+=head1 VERSION
+
+version 3.004
+
+=head1 SYNOPSIS
+
+    $ cpan2pkg -G
+    $ cpan2pkg Module::Foo Module::Bar ...
+    $ cpan2pkg --help
+
+=head1 DESCRIPTION
+
+=head2 Purpose of the program
+
+This script is a glue application around cpan2dist, interacting with
+your upstream distribution. When calling this script, it will:
+
+=over 4
+
+=item *
+
+check whether it's alrady packaged by your vendor, and install from it
+if that's the case.
+
+=item *
+
+otherwise, build a native package with cpan2dist - this implies that
+there is a working C<CPANPLUS::Dist> backend for your OS.
+
+=item *
+
+once built, import the module in upstream repository.
+
+=item *
+
+then submit module to upstream buildsystem.
+
+=back
+
+And this, while dealing with dependencies, all the way long, repeating
+steps over and over as needed.
+
+Read L<this blog entry|http://jquelin.blogspot.com/2009/01/cpan-modules-native-linux-packages.html>
+for this module rationale.
+
+=head1 AUTHOR
+
+Jerome Quelin <jquelin@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2009 by Jerome Quelin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

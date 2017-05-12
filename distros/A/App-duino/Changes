@@ -1,0 +1,57 @@
+Revision history for App-duino
+
+0.10      2013-05-17 18:28:30 Europe/Rome
+
+ - Use picocom, instead of the built-in terminal, if installed
+
+0.09      2013-05-10 16:57:29 Europe/Rome
+
+ - Also remove .build if empty on "duino clean"
+ - General documentation improvements
+ - Add --fuses option to the upload command
+ - Add --uploader option to the upload command
+
+0.08      2013-04-26 22:08:26 Europe/Rome
+
+ - Support direct *.hex file upload
+ - Rename --dir option to --root (incompatible change)
+ - Support using different hardware types (e.g. not-officially-supported MCUs)
+ - Do not die when a board config variable is not found (this caused "duino
+   build" to fail on pretty much every Arduino except Leonardo/Micro)
+
+0.07      2013-04-20 19:04:09 Europe/Rome
+
+ - Improve output
+
+0.06      2013-03-27 13:07:54 Europe/Rome
+
+ - Improve documentation (no functional changes)
+ - Improve output during build
+ - Check 'make' return value after build
+
+0.05      2013-03-26 14:29:41 Europe/Rome
+
+ - Improve documentation (no functional changes)
+ - Fix 'models' and 'upload' commands
+
+0.04      2013-03-26 14:03:54 Europe/Rome
+
+ - Add 'models' command to list supported Arduino models
+ - Add 'com' command to open a serial terminal to the Arduino (work in progress)
+
+0.03      2013-03-26 11:34:53 Europe/Rome
+
+ - Improve documentation (no functional changes)
+ - Search files in sub-directories too on build
+ - Allow builds of different sketches in the same build directory
+ - Support build and upload of a single user-specified sketch
+ - Improve error messages
+
+0.02      2013-03-25 00:07:03 Europe/Rome
+
+ - Make the duino.ini file optional (as it should have been from the start)
+ - Various documentation improvements (no functional changes)
+
+0.01      2013-03-24 23:20:24 Europe/Rome
+
+ - Initial version

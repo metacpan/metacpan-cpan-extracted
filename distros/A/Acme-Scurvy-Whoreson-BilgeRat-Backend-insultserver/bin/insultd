@@ -1,0 +1,46 @@
+#!perl -w
+
+use strict;
+use Acme::Scurvy::Whoreson::BilgeRat;
+
+my $insultgenerator = Acme::Scurvy::Whoreson::BilgeRat->new( language => 'insultserver' );
+
+die "Urk, Couldn't load the Insult generator\n" unless $insultgenerator;
+
+print $insultgenerator; # prints an insult
+
+=head1 NAME
+
+insultd - A random insult server, for self-flagellating maniacs
+
+=head1 USAGE
+
+Stick an entry in inetd that calls this program when anybody connects to a certain port.
+
+Traditionally that port is 1695.
+
+=head1 BUGS
+
+Doesn't implement the logging or stats command line options.
+
+Doesn't let you specify other config files.
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+based on code by 
+
+James Garnett <garnett@colorado.edu>
+
+=head1 COPYRIGHT
+
+Copyright 2005, Simon Wistow
+
+Distributed under the same terms as Perl itself.
+
+=cut
+
+
+
+

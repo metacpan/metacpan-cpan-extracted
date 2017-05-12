@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+use lib qw (. .. ./lib);
+use Config::Mini;
+use warnings;
+use strict;
+
+@ARGV || die "Usage: $0 <config_file>";
+Config::Mini::parse_file (@ARGV);
+
+our $Comparer = Config::Mini::instantiate ('comparer');
+
+$| = 1;
+print STDERR "Writing all_rates.csv...\n";
+open FP, ">all_rates.csv" or die "Cannot write-open all_rates.csv";
+print FP "prefix,label,provider,currency,rate,connection_fee,first_increment,increment\n";
+for (Config::Mini::select ('^import:')) { write_rates ( $_ ) }
+close FP;
+
+sub write_rates
+{
+    my $obj      = shift;
+    my $provider = $obj->provider();
+
+    print STDERR "Fetching $provider & normalizing rates...\n";
+    my $rates  = $obj->rates();
+
+    for ( keys %{$rates} )
+    {
+        my $rate_o = $rates->{$_};
+        $Comparer->normalize ( $rate_o );
+        
+        my $prefix          = $rate_o->prefix();
+        my $label           = $rate_o->label();
+        my $provider        = $rate_o->provider();
+        my $connection_fee  = $rate_o->connection_fee();
+        my $first_increment = $rate_o->first_increment();
+        my $increment       = $rate_o->increment();
+        my $rate            = $rate_o->rate();
+        my $currency        = $rate_o->currency();
+
+        print FP "$prefix,$label,$provider,$currency,$rate,$connection_fee,$first_increment,$increment\n";
+    }
+}
+
+
+1;
+
+
+__END__

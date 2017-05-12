@@ -1,0 +1,42 @@
+---
+abstract: 'GC-related analysises'
+author:
+  - 'Qiang Wang <wang-q@outlook.com>'
+build_requires:
+  Test::More: '0.88'
+  Test::Number::Delta: '1.06'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.7, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AlignDB-GC
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  AlignDB::GC:
+    file: lib/AlignDB/GC.pm
+    version: v1.1.0
+requires:
+  AlignDB::IntSpan: '0'
+  List::Util: '0'
+  Moose: '0'
+  YAML::Syck: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/wang-q/AlignDB-GC/issues
+  homepage: https://github.com/wang-q/AlignDB-GC
+  repository: git://github.com/wang-q/AlignDB-GC.git
+version: 1.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

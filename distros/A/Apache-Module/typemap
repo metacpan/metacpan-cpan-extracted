@@ -1,0 +1,9 @@
+TYPEMAP
+Apache			T_PTROBJ
+Apache::Module		T_PTROBJ
+Apache::Handler		T_PTROBJ
+Apache::Command		T_PTROBJ
+Apache::Server		T_PTROBJ
+const char *		T_PV
+
+

@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+META.yml
+lib/HTTunnel/Client.pm
+lib/HTTunnel/Client.pod
+lib/HTTunnel/Client.java
+httunnel
+httunnel.pod
+httunnel.sysv
+httunnel.conf
+t/HTTunnel-Client.t

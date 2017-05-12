@@ -1,0 +1,214 @@
+#!/usr/bin/perl -w
+use utf8;
+use File::Basename;
+use Data::Printer;
+use Data::Dumper;
+use Parallel::Iterator qw( iterate );
+use Env qw/PWD/;
+use JSON::XS;
+use HTML::Strip;
+use AI::MicroStructure::Util;
+use WWW::Wikipedia;
+use LWP::UserAgent;
+use HTML::SimpleLinkExtor;
+use URI::Escape qw( uri_unescape );
+our $e = HTML::SimpleLinkExtor->new;
+
+binmode STDOUT, ':utf8';
+binmode STDERR, ':utf8';
+
+
+my $state  = AI::MicroStructure::Util::config();
+
+my @CWD    = $state->{cwd};
+our $config = $state->{cfg};
+
+
+die("require a argument") unless($ARGV[0]);
+
+our $doc ={};
+our @links;
+our $linkdata = {};
+our $result;
+our $odir = "";
+
+    
+my $url = $ARGV[0];
+my @inx;
+my @test;
+my $search="";
+
+my $TOP="wikipedia";
+my $carry = {count=>0,max=>0};
+
+
+sub nicefy { return reverse sort {length($a) <=> length($b)}@_ }
+sub quantify {my	 $base = {}; map{$base->{$_} = $base->{$_}?$base->{$_}+1:1}@_;  return $base; }#return reverse sort {length($a) <=> length($b)}@_ }
+
+
+sub list_iter {
+           my @ar = @_;
+           my $pos = 0;
+           return sub {
+               return if $pos >= @ar;
+               my @r = ( $pos, $ar[$pos] );  # Note: returns ( index, value )
+               $pos++;
+               return @r;
+           };
+       }
+
+sub down_iter {
+           my @ar = @_;
+           my $pos = 0;
+           return sub {
+               return if $pos >= @ar;
+               my @r = ( $pos, $ar[$pos] );  # Note: returns ( index, value )
+               $pos++;
+               return @r;
+           };
+       }
+
+
+sub checkIsThere {
+
+return 0;
+}
+
+sub URLDecode {
+my $theURL = $_[0];
+$theURL =~ tr/+/ /;
+$theURL =~ s/%([a-fA-F0-9]{2,2})/chr(hex($1))/eg;
+$theURL =~ s/<!--(.|\n)*-->//g;
+return $theURL;
+}
+
+sub URLEncode {
+my $theURL = $_[0];
+$theURL =~ s/([\W])/"%" . uc(sprintf("%2.2x",ord($1)))/eg;
+return $theURL;
+}
+
+sub smartdecode {
+use URI::Escape qw( uri_unescape );
+use utf8;
+my $x = my $y = uri_unescape($_[0]);
+return $x if utf8::decode($x);
+return $y;
+}
+
+sub imgTranslate {
+
+my ($idx,$url) = @_;
+
+print $idx;
+print $url;
+if($url){
+
+
+my $ua = LWP::UserAgent->new;
+
+
+$response  = $ua->get(sprintf("%s%s",$config->{wikipedia}, ucfirst($url)));
+
+
+  $e->parse($response->decoded_content);
+
+  return $e->links;
+}
+}
+
+
+
+sub call  {
+
+my ($idx,$url) = @_;
+
+my $ua = LWP::UserAgent->new;
+
+
+my $content ;
+my $response ="";
+my @book = ();
+
+
+      $response  = $ua->get(sprintf("%s%s",$config->{wikipedia}, ucfirst($url)));
+
+      my $doc={};
+      my $linkdata={};
+
+
+
+
+      my $wiki = WWW::Wikipedia->new();
+      my $hs = HTML::Strip->new();
+
+      my $result = $wiki->search(ucfirst $url);
+      if (defined($result) && $result->text() ) {
+
+      my $clean_text = $hs->parse($result->text() );
+      $hs->eof;
+
+      require HTML::SimpleLinkExtor;
+      no warnings 'utf8';
+      my $e = HTML::SimpleLinkExtor->new();
+      $e->parse($response->decoded_content);
+
+
+      my @all_links = $e->links;
+      my @tags= map{$_=lc($_); $_=~s/\)|\/wiki\///g; $_=~s/ /_/g; $_=[split("_\\(",$_)] }grep {/([(].+?[)]|$url)/}@all_links ;# $result->related();
+      my @audio = grep{/^(\/\/|upload|http).*.(mp3|wave|ogg|OGG|WAVE|MP3)$/}@all_links;
+      my @pdf = grep{/^(\/\/|upload|http).*.(pdf|PDF)$/}@all_links;
+      my @book = grep{/books.google/i}@all_links;
+         foreach(@tags){
+            if($_->[1] && $_->[1]!~/\W/){
+              $doc->{tags}->{$_->[1]}->{$_->[0]} = $doc->{tags}->{$_->[1]}->{$_->[0]} ? $doc->{tags}->{$_->[1]}->{$_->[0]} +1:1;
+            }
+         }
+
+          $doc->{image}=[map{$_="http:$_"; }grep{/[1-9][0-9][0-9]px/}$e->img];
+          $doc->{cat}=[grep{/^.*.(Kategory|Category)+?/}@all_links];
+          $doc->{cat}=[sort grep{!/(category|wikipedia|article|page|List.*.of)/i}map{$a=$_; $a =~ s/^.*.://g; $_=$a;}@{$doc->{cat}}];
+          $doc->{list}=[grep{/List.*.of_/}@all_links];
+          $doc->{list}=[sort map{$a=$_; $a=~ s/^.*.List/List/g; $_=$a;}@{$doc->{list}}];
+          
+      
+          $doc->{book}= [@book] unless(!@book);
+          $doc->{pdf}= [@pdf] unless(!@pdf);
+          $doc->{audio}= [@audio] unless(!@audio);
+          $doc->{related} = quantify $result->related();
+          $doc->{links} = [sort grep{/http/}@all_links];
+          
+        
+
+
+         
+        #eval '$couchdb->store("$url" ,$doc)' or warn "error: $@\n";
+
+      # createJsonFile($url,$doc);
+    p $doc;
+
+    return $doc;
+
+}
+
+
+}
+
+
+
+our @out = ();
+foreach my $urlx (@ARGV) {
+
+
+if($urlx) { $result->{$urlx} = call(0,$urlx); }
+
+
+
+
+}
+
+
+
+1;
+
+__DATA__

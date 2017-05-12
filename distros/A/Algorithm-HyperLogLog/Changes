@@ -1,0 +1,58 @@
+Revision history for Algorithm::HyperLogLog
+
+0.23 2014-05-12T16:58:51Z
+    - Add new method 'Algorithm::HyperLogLog::merge()'
+        (dgryski)
+
+0.22 2013-06-25T22:54:20Z
+    - Fixed broken test
+
+0.21 2013-06-25T17:42:09Z
+    - Fixed '--pureperl-only' option support
+
+0.20 2013-06-23T09:09:42Z
+    - Change dependency
+    - Switch aurhoring tool to Minilla
+
+0.19    Mon Jun 17 22:30:00 2013
+    - Change MurmurHash3 implementation for PP
+
+0.18    Sun Jun 16 23:50:00 2013
+    - Update dependency
+    - Change document format
+
+0.17    Fri Jun 14 02:02:00 2013
+    - Fixed warning in perl-5.18
+
+0.16    Sat May 11 16:05:00 2013
+    - Fixed broken test
+
+0.15    Sat May 11 15:47:00 2013
+    - Support multi arguments for add()
+    - Support '--pureperl-only' option for Build.PL
+
+0.14    Sat Apr 14 03:30:00 2013
+    - Change required perl version
+    - Add $VERSION to Algorithm/HyperLogLog/PP.pm
+
+0.11    Fri Apr 05 01:40:00 2013
+    - XSLoader is loaded when runtime
+
+0.10    Wed Apr 03 22:15:00 2013
+    - [enhancement] register dump/restore feature
+    - [bugfix] hash calculation error in big endian environment
+
+0.05    Wed Mar 27 23:30:00 2013
+    - Fixed: integer overflow in 32bit environment
+
+0.04    Sat Mar 23 01:50:00 2013
+    - Fixed: unportable tests 
+
+0.03    Thu Mar 21 03:15:00 2013
+    - Remove unnecessary code in XS
+
+0.02    Wed Mar 20 16:10:00 2013
+    - Improve Windows(MSVC) support
+
+0.01    Tue Mar 19 04:00:45 2013
+    - Initial release

@@ -1,0 +1,22 @@
+// Copyright (c) 2009 AdCopy
+// Author: Jeff Weisberg
+// Created: 2009-Sep-10 13:18 (EDT)
+// Function: protocol authentication
+//
+// $Id$
+
+message ACPAuth {
+        required string         algorithm       = 1;
+        // NYI
+}
+
+message ACPEncrypt {
+
+        required string         algorithm       = 1;
+        required fixed64        seqno           = 2;
+        required string         nonce           = 3;
+        required string         hmac            = 4;
+        required int32          length          = 5;
+
+        required bytes          ciphertext      = 50;
+}

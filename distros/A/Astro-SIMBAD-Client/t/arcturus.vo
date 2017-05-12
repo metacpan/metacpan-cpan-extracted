@@ -1,0 +1,18 @@
+votable myvo {
+id(NAME|1)
+otype
+ra(d)
+dec(d)
+plx_value
+pmra
+pmdec
+rv_value
+z_value
+sp_type
+flux(B)
+flux(V)
+idlist
+}
+votable open myvo
+query id arcturus
+votable close

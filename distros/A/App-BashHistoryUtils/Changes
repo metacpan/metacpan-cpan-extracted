@@ -1,0 +1,37 @@
+0.06    2017-03-21 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to remove unneeded dependency on Perl::osnames.
+
+
+0.05    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+
+0.04    2015-11-09 (PERLANCAR)
+
+	- delete: Backup original bash history file & force user to specify
+	  --inplace first for safety.
+
+	- [security] Do not use a predictable name for temporary file.
+
+
+0.03    2015-11-07 (PERLANCAR)
+
+	- Add --strip-timestamp option.
+
+	- grep-bash-history-entries: Require pattern argument.
+
+
+0.02    2015-11-05 (PERLANCAR)
+
+	- Add utility: each-bash-history-entry.
+
+
+0.01    2015-11-04 (PERLANCAR)
+
+        - First release.

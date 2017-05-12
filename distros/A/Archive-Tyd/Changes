@@ -1,0 +1,14 @@
+Revision history for Perl extension Archive::Tyd.
+
+0.02  Fri May 19 22:30:00 2006
+	- Fixed some major bugs. In 0.01 version, reading an archive Tyd file and then
+		re-archiving it from the files in-memory, would for some reason corrupt the file.
+		This has been repaired.
+	- Carriage Returns are now filtered in and out correctly.
+	- Included Tydra--a Perl/Tk interface to Tyd Archive Viewing.
+
+0.01  Sat Dec 31 14:24:01 2005
+	- Initial release
+	- original version; created by h2xs 1.23 with options
+		-X -n Archive::Tyd
+

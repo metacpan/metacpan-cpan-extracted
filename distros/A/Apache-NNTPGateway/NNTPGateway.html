@@ -1,0 +1,310 @@
+<HTML>
+<HEAD>
+<TITLE>Apache::NNTPGateway</TITLE>
+</HEAD>
+<BODY BGCOLOR="#fffff8" TEXT="#000000">
+<UL>
+<LI><A HREF="#NAME">NAME</A></LI>
+<LI><A HREF="#SYNOPSIS">SYNOPSIS</A></LI>
+<LI><A HREF="#DESCRIPTION">DESCRIPTION</A></LI>
+<UL>
+<LI><A HREF="#ACTIONS">ACTIONS</A></LI>
+</UL>
+<LI><A HREF="#CONFIGURATION">CONFIGURATION </A></LI>
+<UL>
+<LI><A HREF="#Directives">Directives</A></LI>
+</UL>
+<LI><A HREF="#SECURITY">SECURITY</A></LI>
+<LI><A HREF="#BUGS">BUGS</A></LI>
+<LI><A HREF="#Changes">Changes</A></LI>
+</UL>
+<HR>
+<H1><A NAME="NAME">NAME</A></H1>
+
+<P><B>Apache::NNTPGateway</B> - A NNTP interface (Usenet newsgroups) for
+mod_perl enabled Apache web server.</P><H1><A NAME="SYNOPSIS">SYNOPSIS</A></H1>
+
+<PRE> You must be using mod_perl, see http://perl.apache.org/ for details.</PRE>
+
+<PRE> For the correct work your apache configuration would contain apache
+ directives look like these:</PRE>
+
+<PRE> In httpd.conf (or any other apache configuration file):</PRE>
+
+<PRE> &lt;Location &quot;/path/to/newsgroup&quot;&gt;
+    SetHandler		perl-script
+    PerlHandler		Apache::NNTPGateway
+    PerlSetVar		NTTPGatewayNewsGroup &quot;newsgroup&quot;
+    PerlSetVar		NTTPGateway... (see L&lt;CONFIGURATION&gt; Directives)
+ &lt;/Location&gt;</PRE>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+
+ <PRE> This   module implements   a  per  group interface  to   NNTP  (Usenet)
+ News-Groups, it allow users to  list, read, post, followup  ... articles in a
+ given   newsgroup/newsserver  depending  of   configuration. This   is  not a
+ replacement  for a real  powerful newsreader client but  just pretend to be a
+ simple, useful mapping of some news articles into a web space.</PRE>
+
+<H2><A NAME="ACTIONS">ACTIONS</A></H2>
+
+<PRE> Here is the list of all actions that can be performed on the current newsgroup.</PRE>
+<DL><DT><A NAME="list">list</A></DT>
+<DD>
+
+<PRE>  List articles, all articles from the current newsgroup or only unread
+  articles if the user/client allready did a B&lt;catchup&gt;.</PRE>
+</DD>
+<DT><A NAME="catchup">catchup</A></DT>
+<DD>
+
+<PRE>  Mark all current articles as read. This use a Cookie.</PRE>
+</DD>
+<DT><A NAME="last">last</A></DT>
+<DD>
+
+<PRE>  Read the last article available from the newsserver.</PRE>
+</DD>
+<DT><A NAME="read">read</A></DT>
+<DD>
+
+<PRE>  Read article by ID.</PRE>
+</DD>
+<DT><A NAME="followup">followup</A></DT>
+<DD>
+
+<PRE>  Post a followup to an article.</PRE>
+</DD>
+<DT><A NAME="post">post</A></DT>
+<DD>
+
+<PRE>  Post an new article to the current newsgroup.</PRE>
+</DD>
+</DL>
+<H1><A NAME="CONFIGURATION">CONFIGURATION </A></H1>
+
+<PRE>  Except some very few optional adjustements in the module source
+  itself all configuration is done with B&lt;PerlSetVar&gt; directives in
+  Apache configurations files.</PRE>
+<H2><A NAME="Directives">Directives</A></H2>
+
+<PRE> All following features of this PerlHandler, will be set in the apache
+ configuration files. For this you can use PerlSetVar apache
+ directive.</PRE>
+<DL><DT><A NAME="NNTPGatewayNewsGroup">NNTPGatewayNewsGroup </A></DT>
+<DD>
+
+<PRE> (string, B&lt;mandatory&gt;)</PRE>
+
+<PRE> The newsgroup used for the current NNTPGateway location. Not setting
+ this will make NNTPGateway fail.</PRE>
+</DD>
+<DT><A NAME="NNTPGatewayStop">NNTPGatewayStop </A></DT>
+<DD>
+
+<PRE> (boolean, I&lt;optional&gt;)</PRE>
+
+<PRE> Tell to completely disable NNTPGateway, useful for temporary maintainance.</PRE>
+</DD>
+<DT><A NAME="NNTPGatewayDefaultAction">NNTPGatewayDefaultAction</A></DT>
+<DD>
+
+<PRE> (ACTION name, I&lt;optional&gt;) Default value: B&lt;last&gt;</PRE>
+
+<PRE> Default action used when nothing specified. (see L&lt;ACTIONS&gt;).</PRE>
+</DD>
+<DT><A NAME="NNTPGatewayNewsServer">NNTPGatewayNewsServer</A></DT>
+<DD>
+
+<PRE> (string, I&lt;optional&gt;)</PRE>
+
+<PRE>  When using correctly configured perl modules B&lt;Net::Domain&gt;,
+  B&lt;Net::Config&gt; on a correctly configured system this should not be
+  changed, in theory NNTPGateway could be able to handle multiples
+  news server but this is greatly nor recommended (see L&lt;BUGS&gt;) unless
+  you really know what you are doing.</PRE>
+</DD>
+<DT><A NAME="NNTPGatewayOrganization">NNTPGatewayOrganization</A></DT>
+<DD>
+
+<PRE>  (string, B&lt;recommended&gt;) Default value: B&lt;The Disoganized Corp&gt;</PRE>
+
+<PRE>  Set the Organization header when posting articles.</PRE>
+</DD>
+<DT><A NAME="NNTPGatewayTitle">NNTPGatewayTitle</A></DT>
+<DD>
+
+<PRE>  (string, I&lt;optional&gt;)
+  
+  Title displayed in NNTPGateway pages.</PRE>
+</DD>
+<DT><A NAME="NNTPGatewayStyleSheet">NNTPGatewayStyleSheet</A></DT>
+<DD>
+
+<PRE>  (string, I&lt;optional&gt;)</PRE>
+
+<PRE>  Set the style sheet used in NNTPGateway pages, or none. There are
+  some few classes in the generated HTML, check the source to use them
+  in your style sheet.</PRE>
+</DD>
+<DT><A NAME="NNTPGatewayAnonymousPostAllowed">NNTPGatewayAnonymousPostAllowed</A></DT>
+<DD>
+
+<PRE>  (boolean, I&lt;optional&gt;) Default value: B&lt;off&gt;</PRE>
+
+<PRE>  Allow anonymous posting in the current group.</PRE>
+</DD>
+<DT><A NAME="NNTPGatewayAnonymousPosters">NNTPGatewayAnonymousPosters</A></DT>
+<DD>
+
+<PRE>  (list, I&lt;optional&gt;) Default value: B&lt;anonymous=Anonymous&gt;</PRE>
+
+<PRE>  A list of pair email=Name that could be used for anonymous
+  posts. I'm B&lt;Absolutely&gt; not responsible for any abuse of this
+  feature, this is up to the webmaster to control it's usage.
+ 
+  Ex: 
+  C&lt;PerlSetVar NNTPGatewayAnonymousPosters &quot;anon=The Unknown Soldier,president=The Big Boss&quot;&gt; </PRE>
+</DD>
+<DT><A NAME="NNTPGatewayNonLocalPostOk">NNTPGatewayNonLocalPostOk</A></DT>
+<DD>
+
+<PRE>  (boolean, I&lt;optional&gt;) Default value: B&lt;off&gt;</PRE>
+
+<PRE>  Allow user who do not have local (to the same web server machine -
+  checked with getpwnam) login account to post articles, in B&lt;non&gt;
+  anonymous post mode the users should have been identified themselves
+  anyway (with identd or server auth).</PRE>
+</DD>
+<DT><A NAME="NNTPGatewayUsersNamesCaseInsensitive">NNTPGatewayUsersNamesCaseInsensitive</A></DT>
+<DD>
+
+<PRE>  (boolean, I&lt;optional&gt;) Default value: B&lt;off&gt;</PRE>
+
+<PRE>  Check users names in a case insensitive manner.</PRE>
+</DD>
+<DT><A NAME="NNTPGatewayDisabledActions">NNTPGatewayDisabledActions</A></DT>
+<DD>
+
+<PRE>  (ACTIONS list, I&lt;optional&gt;) Default value: B&lt;none&gt; </PRE>
+
+<PRE>  List of L&lt;ACTIONS&gt; that are B&lt;not&gt; allowed to be performed by users for
+  the current config. (see L&lt;ACTIONS&gt;).</PRE>
+</DD>
+<DT><A NAME="NNTPGatewayTemplatesDir">NNTPGatewayTemplatesDir</A></DT>
+<DD>
+
+<PRE>  (string, L&lt;optional&gt;) Default value: B&lt;lib/templates/NNTPGateway/&gt;
+  
+  ServerRoot relative Directory where to find HTML templates files (not yet Implemented). 
+ 
+=item NNTPGatewayDebug </PRE>
+
+<PRE>  (boolean, I&lt;optional&gt;) Default value: B&lt;off&gt;
+  
+  Set this to debug NNTPGateway. </PRE>
+</DD>
+</DL>
+<H1><A NAME="SECURITY">SECURITY</A></H1>
+
+<PRE>  If you B&lt;allow&gt; Anonymous posting absolutely no security checks are
+  performed unless you protect access to the Location this handler is
+  located on, but that is not the job of this module.</PRE>
+
+<PRE>  If you B&lt;deny&gt; Anonymous posting, the handler will check
+  B&lt;remote_ident&gt; (via Identd) or B&lt;remote_user&gt; and will check if
+  they are valid username by checking C&lt;getpwnam()&gt; (a list of some
+  generic usernames such as: root, anonymous ... are not considered as
+  valid too, even if they are), if directive
+  B&lt;NNTPGatewayNonLocalPostOk&gt; had not been set, if they are not they
+  are rejected, if they are they could post and the From header will
+  be set to that username. That is the only security check the handler
+  will do, it is up to other apaches modules to correctly protect the
+  Location and set valid usernames (enable identd or loggin via
+  AuthNIS or anything else).</PRE>
+
+<PRE>  Furthermore the webmaster could disable the use of some actions such
+  as post, followup ...</PRE>
+<H1><A NAME="BUGS">BUGS</A></H1>
+
+<PRE> The connection to the nntp server is handled in a global variable so
+ that the connection is common to all requests in the current apache
+ child process. Due to that, when the module is used with 2 differents
+ configs (in 2 &lt;Location xxx&gt;) setting 2 differents newsservers and
+ that 2 requests are made in the same child with these 2 configs (or
+ more) ... the second request could re-use a NNTP connection (open
+ during the 1st request) already open to the B&lt;first&gt; server. I do not
+ want to make the nntp object a local variable, because the connection
+ is a long process ... But anyway, I have some few ideas of how to
+ solve the problem, but as I am lazy and my configuration do not have
+ this problem I am waiting for pressure from eventual module users
+ ...;-)</PRE>
+<H1><A NAME="Changes">Changes</A></H1>
+<DT><A NAME="v0.9">v0.9</A></DT>
+<DD>
+
+<PRE> * Article id or subject added to title in read.
+ * More CSS classes everywhere... read the sources.</PRE>
+</DD>
+<DT><A NAME="v0.8">v0.8</A></DT>
+<DD>
+
+<PRE> * Cookie domain better handled for catchup.
+ * NNTPGatewayNewsGroupTest removed. Set up a new Location and set
+   NNTPGatewayNewsGroup to the test group and NNTPGatewayDebug on to
+   acheive the same fonctionnality.
+ * Some more directives to control users checking
+   (NNTPGatewayUsersNamesCaseInsensitive, NNTPGatewayNonLocalPostOk).
+ * Some handling of Cache-Control.
+ * Made this module ready for my first CPAN contribution ;-)
+ ** Cleaning source code.
+ ** Cleaning Documentation.
+ ** CPAN Enabled distrib (Makefile.PL, .tar.gz dist, README file, CPAN
+    ID ...).</PRE>
+</DD>
+<DT><A NAME="v0.7">v0.7</A></DT>
+<DD>
+
+<PRE> * The configuration directive B&lt;NNTPGatewayCatchupCookieName&gt; do not exists anymore.
+ * Disconnections to news server start to be better handled.
+ 
+=item v0.6</PRE>
+
+<PRE> First public release</PRE>
+<H1><A NAME="TODO">TODO</A></H1>
+<DL><DT><A NAME="*%20%0a%20%0a%20Safe%20sharing%20of%20the%20NNTP%20global.">* 
+ 
+ Safe sharing of the NNTP global.</A></DT>
+<DD>
+</DD>
+<LI>
+<PRE> Using an HTML Template system (maybe HTML::Template) instead of hard coded html.</PRE>
+</LI>
+<LI>
+<PRE> Improving the LANG selection stuff (maybe adding a new configuration directive?)</PRE>
+</LI>
+<LI>
+<PRE> Improving the C&lt;check_user()&gt; stuff for more security.</PRE>
+</LI>
+<LI>
+<PRE> more stuff ...</PRE>
+</LI>
+</DL>
+<H1><A NAME="SEE%20ALSO">SEE ALSO</A></H1>
+
+<PRE> perl(1), mod_perl(3), Apache(3), Net::NNTP(3), Net::Domain(3),
+ Net::Config(3), rfc9771, getpwnam(3)</PRE>
+<H1><A NAME="COPYRIGHT">COPYRIGHT</A></H1>
+
+<PRE> The application and accompanying modules are Copyright CENA Toulouse.
+ It is free software and can be used, copied and redistributed at the
+ same terms as perl itself.</PRE>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+
+<PRE> heddy Boubaker &lt;boubaker@cpan.org&gt;</PRE>
+
+<PRE> Home page:
+ http://www.tls.cena.fr/~boubaker/WWW/Apache-NNTPGateway.shtml</PRE>
+</DD>
+
+</BODY>
+</HTML>

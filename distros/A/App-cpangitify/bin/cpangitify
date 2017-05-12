@@ -1,0 +1,165 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.010001;
+use App::cpangitify;
+
+# PODNAME: cpangitify
+# ABSTRACT: Convert cpan distribution from BackPAN to a git repository
+our $VERSION = '0.12'; # VERSION
+
+
+exit App::cpangitify->main(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpangitify - Convert cpan distribution from BackPAN to a git repository
+
+=head1 VERSION
+
+version 0.12
+
+=head1 SYNOPSIS
+
+ % cpangitify Foo::Bar
+
+=head1 DESCRIPTION
+
+This script fetches all known revisions of a distribution from CPAN/BackPAN
+and creates a git repository with one revision and one tag for each version
+of the distribution.
+
+The idea is to create a starting point for a git work flow when adopting a
+CPAN module for which you don't have access to the original repository.
+It is of course better to import from Subversion or to clone an existing
+git repository, but that may not be an option.
+
+If the distribution you are migrating changed names during its history,
+simply specify each name it had on the command line.  Be sure to specify
+the current name first (this will be used when creating a directory name
+for the repository).  For example L<Mojolicious::Plugin::TtRenderer> was
+once called L<MojoX::Renderer::TT>, so you would get both names in the
+history like this:
+
+ % cpangitify Mojolicious::Plugin::TtRenderer MojoX::Renderer::TT
+
+=head1 OPTIONS
+
+=head2 --resume
+
+Resume the import from CPAN.  Note that any local changes will be overwritten
+by the CPAN upstream (your modifications will remain in the repository history).
+
+=head2 --output | -o I<directory>
+
+Creat the new repository in the given directory.
+
+=head2 --skip I<version>
+
+Skip the given versions.  Can be specified multiple times and can
+be provided as a comma separated list.
+
+=head2 --trace
+
+Print each git command before it is executed.
+
+=head2 --backpan_index_url
+
+The URL to use for the BackPAN index
+
+=head2 --backpan_url
+
+The URL to use for BackPAN
+
+=head2 --metacpan_url
+
+The URL to use for metacpan.
+
+=head2 --help | -h
+
+Print out help and exit.
+
+=head2 --version
+
+Print out version and exit.
+
+=head1 CAVEATS
+
+Each commit belongs to the CPAN author who submitted the corresponding release,
+therefore C<git blame> may not be that useful for the imported portion of
+your new repository history.
+
+The commits are ordered by date, so where there are interleaving of releases
+that belong to development and production branches this simple minded script
+will probably do the wrong thing.
+
+Patches are welcome.
+
+=head1 SEE ALSO
+
+Here are some similar projects:
+
+=over 4
+
+=item
+
+L<Git::CPAN::Patch>
+
+Comes with a C<git cpan import> which does something similar.  With this 
+incantation I was able to get a repository for L<YAML> (including history,
+but without authors and without the correct dates):
+
+ % mkdir YAML
+ % git init .
+ % git cpan import --backpan YAML
+ % git merge remotes/cpan/master
+
+One advantage here over C<cpangitify> is that you should then later be able to 
+import/merge future CPAN releases into yours.  L<Git::CPAN::Patch> also has a bunch of 
+other useful tools for creating and submitting patches and may be worth 
+checking out.
+
+If you do an internet search for this sort of thing you may see references
+to C<git-backpan-init>, but this does not appear to be part of the
+L<Git::CPAN::Patch> anymore (I believe C<git-import> with the C<--backpan>
+option is the equivalent).
+
+In general C<cpangitify> is a one trick poney (though good at that one thing),
+and L<Git::CPAN::Patch> is a Batman's utility belt with documentation that 
+(for me at least) is pretty impenetrable.
+
+=item
+
+L<gitpan|https://github.com/gitpan>
+
+Doesn't appear to have been updated in a number of years.
+
+=item
+
+L<ggoosen's cpan2git|https://github.com/ggoossen/cpan2git>
+
+=back
+
+The reason I am not using the latter two is that they are designed to 
+mirror the whole of CPAN/BackPAN, but I'm mostly just interested in one 
+or two distributions here and there.
+
+=head1 AUTHOR
+
+Graham Ollis <plicease@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Graham Ollis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

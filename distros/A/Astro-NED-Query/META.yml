@@ -1,0 +1,31 @@
+---
+abstract: 'base class for NED queries'
+author:
+  - 'Diab Jerius, <djerius@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Astro-NED-Query
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor::Class: 0.17
+  HTML::LinkExtor: 1.31
+  HTML::Parser: 0
+  HTML::TableParser: 0.32
+  Regexp::Common: 0
+  WWW::Mechanize: 1.22
+  perl: 5.6.0
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.31

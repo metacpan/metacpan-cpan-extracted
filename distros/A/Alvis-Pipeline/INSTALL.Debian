@@ -1,0 +1,44 @@
+$Id: INSTALL.Debian,v 1.2 2005/09/19 12:09:05 mike Exp $
+
+### Much of what is in this file is incorrect, since release 0.04
+which does not use OAI.  I leave it to Marc the Debian Guru to fix
+this.
+
+
+DEBIAN INSTALLATION
+
+You need to install the following debian perl modules:
+
+   libwww-perl libxml-sax-writer-perl 
+
+You need to package and install the CPAN HTTP::OAI module
+before building and installling the libalvis-pipeline-perl*.deb package
+
+   dh-make-perl .
+   dpkg-buildpackage -rfakeroot
+   sudo dpkg -i libhttp-oai-perl_3.08-1_all.deb 
+
+
+On debian systems, you can issue the following commands when standing in 
+the source dir of Alvis::Pipeline
+
+   dh-make-perl .
+   dpkg-buildpackage -rfakeroot
+   sudo dpkg -i libalvis-pipeline-perl*.deb
+
+In case that the test target fails, try uncommenting the line      
+
+  $(MAKE) test
+
+in debian/rules and proceed with dpkg-buildpackage -rfakeroot
+
+Check sucessfull installation by issuing 
+
+perl  -MAlvis::Pipeline
+
+
+
+WITHOUT INSTALLATION
+If you do not wish to install globally, you can run the stuff using the command
+
+perl -x install/dir MAlvis::Pipeline alvis-pipeline-put.pl 12344 spool1

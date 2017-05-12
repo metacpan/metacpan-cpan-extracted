@@ -1,0 +1,96 @@
+1.00 - Wed Sep 23 19:50:00 CDT 2009
+
+  * Initial release as Authen::SASL::XS
+  * Fix return value for WRITE (Authen::SASL::XS::Security)
+  * Avoid exceeding SASL buffer size (Authen::SASL::XS::Security)
+  * Use Devel::CheckLib during build to find sasl libraries
+
+History of updates to Authen::SASL::Cyrus
+
+0.13-server
+
+Russ Allbery: the 0.12-server distribution of this module has a typemap that
+ends up casting the pointer return from server_new and client_new through an
+int.  This looks like it's causing pointer truncation and various problems on
+some 64-bit platforms (particularly Debian alpha and Debian ia64).
+
+There is a simpler fix than the patch below (just replacing int with long will
+work on most platforms, probably), but reading through the perlxs man page,
+there's apparently a specific way in which one is supposed to handle module
+data T_PTROBJ_SPECIAL.  I went ahead and implemented that, which also improves
+error reporting a bit.  After applying the following patch, the resulting C
+code no longer casts through an int (it casts through an IV instead, but that's
+sufficient on all Unix platforms at least).
+
+typedef for struct authensasl to Authen_SASL_Cyrus.
+
+0.12-server
+merged some of the changes from Authen::SASL::Cyrus 0.12
+changed version named in order to distinguish from the Authen::SASL::Cyrus by Mark Adamson.
+
+0.11
+added setpass and checkpass methods
+added setpass callback
+applied a patch by Graham Barr (found with google) for enabling GSSAPI
+authentication (fix a problem in Security.pm)
+added a check for undef return values when using sub-callbacks (Thanks
+to Quanah Gibson-Mount for discovering this one)
+
+0.10
+Added the iplocalport and ipremote port to *_new methods, after filling
+in the appropriate string (see doc) ASC is able to manage KERBEROS_V4
+on the server side
+solved bug in property handling (strlen(NULL) after received NULL
+as data from a sasl_getprop)
+
+0.09
+Added callback documenation
+Perl-Callback types (PVMG, PV, PVIV) handling extended
+
+0.08-desy-internal
+Almost complete rewrite of Perlcallbacks from Cyrus.xs.
+SASL-Server functionality added, so servers written in Perl can use
+SASL as Authentication Layer. Synchronize callbacks between Cyrus SASL
+v1 and v2.
+Many changes in the internal handling of sasl variables.
+Documentation inside the XS-file, do motivate myself to write docs
+
+0.07
+Memcpy fix provided by Maurice Massar
+
+0.06
+Added SASL V2 support patch provided by Leif Johansson.
+
+0.05
+Added the SASL_CB_PASS callback. This callback, unfortunately, does
+not put the caller's "context" as the first parameter to the callback
+function. This means that the PerlCallback() function has to be able
+to determine if the _perlcontext is the first parameter or the second.
+Added a magic number as the first field of the _perlcontext struct
+to help PerlCallback() decide which parameter is the perl context.
+
+0.04
+Added a method "securesocket" that takes a file handle and returns a
+new file handle that is tied to the Security subclass added in 0.03.
+In this way, a client program can take the object returned from
+client_new() and call the securesocket() method on it, passing in the
+client's file handle, without ever having to know about the Security
+subclass.  Also added a "tiehandle" method which will take the same
+file handle as "securesocket", and tie it directly to the Security
+subclass. The difference being "securesocket" returns a new file handle,
+and "tiehandle" ties the handle passed in.
+
+0.03
+Added encryption layer. Cyrus.xs now has encode() and decode()
+methods. Added a "Security" subclass that can be used to tie a
+filehandle to perform encryption on write() and decryption on read().
+The new() method ties a passed in glob to the class.
+
+0.02
+Encryption layer not ready yet, so changed the "secflag" param in the
+call to sasl_client_new() from 1 to 0.  Otherwise, the server will
+start expecting encrypted requests and sending encrypted responses
+after the authentication, and the client cannot encrypt/decrypt.
+
+0.01
+Initial release

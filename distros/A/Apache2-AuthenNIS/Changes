@@ -1,0 +1,26 @@
+Revision history for Apache2-AuthenNIS.
+
+0.15    Apr 10 2008
+        Updated Build.PL to only recommend mod_perl2.
+        Updated Changes file to contain actual history :)
+
+0.14    Mar 28 2008
+        First version, forked from Apache::AuthenNIS 0.13.
+        Changed to Build.PL.
+
+Revision history for Apache-AuthenNIS.
+
+0.13    Apr 19  21:41 2004
+        Fixed missed call to check for status.
+
+0.12    Apr 19  18:41 2004
+        Added parameter AllowAlternateAuth to allow for
+        authentication to fall back from AuthenNIS.
+
+0.11    Aug 01  18:41 2003
+        Ported to work with both versions of mod_perl.
+        Changed Makefile.PL to use ExtUtils::AutoInstall.
+        Added test.pl for make test.
+ 
+0.10    Oct 25  18:41 1998
+        First Beta Release.

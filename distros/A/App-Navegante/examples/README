@@ -1,0 +1,16 @@
+This is a list of simple examples illustrating how to build applications
+with Navegante:
+
+reverse - reverse content being browsed
+
+htspell - spell checking utility
+ * illustrate feedback and livefeedback options
+
+wordcounter - count words in page
+ * ilustrate livefeedback and quit options
+
+To build this applications just run, for example:
+
+  $ navegante examples/reverse
+
+and copy the created 'reverse' CGI to your webserver.

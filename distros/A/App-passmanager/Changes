@@ -1,0 +1,12 @@
+1.113580  2011-12-24 15:36:16 Europe/London
+
+  * Disable mouse support
+  * Remove storage of App::passmanager obj as userdata
+
+1.113382  2011-12-04 15:33:01 Europe/London
+
+  * Change of package name
+
+1.113380  2011-12-04 12:27:26 Europe/London
+
+  * First release on an unsuspecting world.

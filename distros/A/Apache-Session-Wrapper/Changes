@@ -1,0 +1,209 @@
+0.34    2010-05-20
+
+- Rerelease 0.33_01 as 0.34
+
+0.33_01   2009-12-31
+
+- Fix user defined options handling and fix default of optional options.
+  See http://rt.cpan.org/Public/Bug/Display.html?id=49561.
+- Trap possibly clobbered $@.
+- New maintainer.
+
+0.33   2006-09-26
+
+- When setting up tests with Apache::Test, if the user has apache2 we
+  need to make sure that they have the mod_apreq2.so library
+  available. If they don't, the live tests will be skipped. Based on a
+  patch from Derek Price. RT #21552.
+
+0.32   2006-09-18
+
+- Work around a (maybe) bug in Apache2::Cookie. Set -value to undef to
+  in Apach2::Cookie->new causes it to return undef, rather than a
+  cookie with no value. This meant that delete_session() caused an
+  "attempt to call method of undefined value" error. Reported by Derek
+  Price. RT #20992.
+
+
+0.31   2006-07-11
+
+- Exactly 0.30 but now the Build.PL creates a "traditional"
+  Makefile.PL. This fixes the problem that the generated "passthrough"
+  Makefile.PL was requiring Apache::TestMB, because it's available on
+  my system.
+
+
+0.30   2006-07-10
+
+- Exactly like 0.29 but does not declare a "build_requires" dependency
+  on Apache::TestMB. Declaring this dependency causes CPAN.pm (and
+  probably CPANPLUS) to try and install Apache::Test, which may not
+  always install cleanly. If you do have it already installed, then it
+  will be used to run the live tests.
+
+
+0.29   2006-06-09
+
+- When not running under mod_perl, Apache::Session::Wrapper simply did
+  not even try to load CGI::Cookie to generate cookies. Patch by Derek
+  Poon.
+
+- When running under mod_perl 1 without Apache::Request, an exception
+  was generated when trying to send a cookie.
+
+- Apache::Session::Wrapper now only checks for err_headers_out and
+  headers_out on the header_object, since this works for both mod_perl
+  1 and 2, as well as Mason's FakeApache object.
+
+- As of version CGI.pm 3.16, CGI::Cookie has a bake() method, but now
+  Apache::Session::Wrapper explicitly will not call it, because if
+  you're not running under mod_perl, it ends up calling print() to
+  send the cookie header when it is called, which may not be what a
+  user of this module wants. Patch by Derek Poon.
+
+
+0.28   2006-05-23
+
+- Allow a session_id parameter to the constructor, to force the use of
+  a particular existing session.
+
+- Fixed a bug where failing to create a new session was ignored if
+  allow_invalid_id was true.
+
+- Detect very weird case where tying to tie to Apache::Session
+  succeeds but the tied hash has no _session_id key. This now throws
+  an exception.
+
+- Fixed bug when the header_object ->can('header_out') but this method
+  does not return an object, as with HTML::Mason::FakeApache. Reported
+  by Hans Dieter.
+
+- The logic to load an appropriate cookie class if the class was
+  already loaded and an exception had previously been thrown by an
+  unrelated class.
+
+- Added a way to register session subclass via RegisterClass() and
+  RegisterFlexClass(), to allow people to use any session subclass
+  they want without needing explicit support in
+  Apache::Session::Wrapper.
+
+
+0.27   not released
+
+- This was a version used internally at Socialtext, but never
+  released.
+
+
+0.26   2005-09-20
+
+- Finally should work properly under both mp1 and mp2.  Patches and
+  tests by Daisuke Maki.
+
+- No longer depends on Apache::Cookie or Apache2::Cookie, but it will
+  use them if it can instead of CGI::Cookie.
+
+
+0.25   2005-08-14
+
+- Silenced a warning that could occur when using session length
+  cookies under mod_perl.
+
+
+0.24   2005-08-01
+
+- Optional parameters for store modules were not handled properly when
+  using Flex as the session class.  Added some tests.  Reported by
+  Gavin Carr.
+
+
+0.23   2005-07-26
+
+- If two sets of valid parameters for a class shared a parameter, an
+  error would be thrown if you used the second set, even if it was
+  complete.  Reported by Victor Felix.
+
+
+0.22   2005-07-18
+
+- Another fix for mod_perl2, this one from Jonas.
+
+
+0.21   2005-06-20
+
+- The fix for mod_perl2 caused a new cookie to be sent for each
+  request under mod_perl 1.  I love it!
+
+
+0.20   2005-06-08
+
+- Fix to make getting cookies work under mod_perl2.  Reported by
+  Baldvin Kovacs.
+
+
+0.19   2005-02-15
+
+- Add support for Apache::RequestRec as header_object by checking
+  header_object for err_headers_out and headers_out methods.
+
+
+0.18   2004-06-30
+
+- Made the password & lock_password parameters default to undef.
+
+
+0.17   2004-04-23
+
+- Fix a bug in checking parameters which could occur when the "commit"
+  parameter for Postgres, Oracle, or Sybcase was passed.  This caused
+  a fatal error when creating the wrapper object.  Patch by Max Baker.
+
+
+0.16   2004-04-08
+
+- No code changes, just include Class::Container in the dependencies.
+  Reported via CPAN testers.
+
+
+0.15 2004-04-06
+
+- No code changes, just added the SIGNATURE file to the manifest so
+  that signature checks don't fail.
+
+
+0.14   2004-04-03
+
+- Fix a bug which causes the constructor to complain that some
+  required parameters were missing when in fact the required
+  parameters had been given.  Reported by Jim Mozley.
+
+
+0.13   2004-03-19
+
+- Allow the cookie expiration to be set to "session", which is
+  equivalent to undef, and causes the cookie to expire when the
+  browser is closed.  Requested by Herald (RT #5615) for
+  MasonX::Request::WithApacheSession.
+
+- Remove some incorrect default values for some parameters, which were
+  being set to undef when they shouldn't be.
+
+
+0.12   2004-02-26
+
+- Document that constructor can throw an exception.
+
+- Document that session method accepts a session_id parameter.
+
+
+0.11   2004-02-26
+
+- Change default cookie name to "Apache-Session-Wrapper-cookie".
+
+- Add subclassing docs.
+
+
+0.10   2004-02-26
+
+- First release
+
+

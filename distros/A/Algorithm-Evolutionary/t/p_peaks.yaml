@@ -1,0 +1,17 @@
+---
+length: 64
+pop_size: 512
+mutation:
+  rate: 0.1
+  priority: 2
+crossover:
+  points: 2
+  priority: 3
+fitness:
+  class: P_Peaks
+  params: 
+    - 100
+    - 64
+max_generations: 500
+max_fitness: 1
+selection_rate: 0.2

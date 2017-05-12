@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use 5.010;
+use App::Fotagger::Stats;
+use Data::Dumper;
+my $app = App::Fotagger::Stats->new_with_options;
+my $stats=$app->get_stats;
+if ($app->verbose) {
+    $app->dump($stats);
+}
+else {
+    $app->report($stats);
+}
+
+__END__
+
+=head1 NAME
+
+fotagger_delete - delete fotos tagged with TO_DELETE
+
+=head1 SYNOPSIS
+
+  fotagger_delete --dir /some/dir
+
+=head1 DESCRIPTION
+
+Delete (yes, really delete!) all fotos tagged with C<TO_DELETE>.
+
+=head2 OPTIONS
+
+=head3 --dir
+
+Root dir containing images. Please note that all subdirs will be 
+searched, and all tagged images in there will be deleted.
+
+=head3 --ask
+
+Prompt before deleting an image
+
+=head3 --dry_run
+
+Don't do anything
+
+=head3 --verbose
+
+Report which files have been deleted
+
+=head1 AUTHOR
+
+Thomas Klausner E<lt>domm {at} cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+App::Fotagger::Deleter
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

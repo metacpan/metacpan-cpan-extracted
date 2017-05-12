@@ -1,0 +1,31 @@
+<& /form.comp,
+	title => 'Login', 
+	action => $action,
+	inputs => $inputs,
+	message => "$welcome<p>\n$message{$msg}",
+	submit => 'Login'
+&>
+
+<%init>
+my $welcome = "Welcome, user '$uid'.";
+my $pta = 'Please try again.';
+my $sorry = 'Please contact the system administrator.';
+my $err = '<font color="red" size=5>An Error Occurred.</font><p>';
+my $noerr = '<font color="#000000" size=5>Logging in.</font><p>';
+my %message = (
+	empty => "$err One or more required fields contained no data.  $pta",
+	unknown => "$err Unknown user.  $pta",
+	again => "$err The supplied PIN code was incorrect.  $pta",
+	disabled => "$err Your account has been temporarily disabled. $sorry"
+);
+my $inputs = [
+	{name => 'pin', prompt => 'Your PIN Code:', type => 'password'}
+];
+my $action = "https://john.sec.acme.com/authen?url=$url";
+</%init>
+
+<%args>
+$uid => undef
+$msg => undef
+$url => undef
+</%args>

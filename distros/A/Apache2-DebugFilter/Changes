@@ -1,0 +1,20 @@
+Revision history for Perl extension Apache::DebugFilter.
+
+0.02
+- Account for API rename post mp2 RC5
+Philip M. Gollucci <pgollucci@p6m7g8.com>
+
+- Maintainership handed over to 
+Philip M. Gollucci <pgollucci@p6m7g8.com>
+
+0.01_02 - Sun Jan  2 18:27:17 EST 2005
+
+- fix the manpage's title
+
+0.01_01 - Sun Jan  2 18:15:20 EST 2005
+
+- bring the module and tests up-to-date with mp-1.99_15
+
+- added the snoop filters
+
+- abstracted the bb_dump() function

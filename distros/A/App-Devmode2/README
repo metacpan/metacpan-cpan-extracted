@@ -1,0 +1,47 @@
+App-Devmode2
+
+A tmux session management helper.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::Devmode2
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Devmode2
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-Devmode2
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-Devmode2
+
+    Search CPAN
+        http://search.cpan.org/dist/App-Devmode2/
+
+    Source Code
+        git://github.com/ivanwills/App-Devmode2.git
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

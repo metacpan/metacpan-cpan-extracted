@@ -1,0 +1,97 @@
+#!perl
+
+# Note: This script is a CLI interface to Riap function /App/adr2org/adr2org
+# and generated automatically using Dist::Zilla::Plugin::Rinci::ScriptFromFunc version 0.01
+
+our $DATE = '2014-10-15'; # DATE
+our $VERSION = '0.04'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any -prefer_lite=>1;
+
+Perinci::CmdLine::Any->new(url => "/App/adr2org/adr2org")->run;
+
+# ABSTRACT: Convert Opera bookmarks (bookmarks.adr) to Org document
+# PODNAME: adr2org
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+adr2org - Convert Opera bookmarks (bookmarks.adr) to Org document
+
+=head1 VERSION
+
+This document describes version 0.04 of adr2org (from Perl distribution App-adr2org), released on 2014-10-15.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % adr2org
+
+Examples:
+
+ TODO
+
+To see all options:
+
+ % adr2org --help
+
+=head1 DESCRIPTION
+
+I want to keep my Opera browser bookmarks file (C<~/.opera/bookmarks.adr>) under
+git repository, so I can synchronize them between computers. There are a few
+annoyances though: 1) When Opera saves bookmarks file, it remove symlinks, so
+after I have to re-symlink the file to my git repo; 2) The ID field changes
+sporadically, creating unnecessarily large diff and merge conflicts.
+
+This program (and its counterpart C<convert-org-to-opera-bookmarks>) is an
+alternative to keeping Opera bookmarks file under git. You convert to .org file,
+put the .org file under git, and convert back to .adr. The advantage is that the
+ID field is removed so the diff is smaller and conflict reduced. Also, you can
+more conveniently edit using Emacs/other Org editor.
+
+Another alternative to this program is to use the Opera Link service from Opera
+to synchronize your bookmarks (and a few other stuffs) between devices. But note
+that Opera has closed some of its services in the past.
+
+=head1 OPTIONS
+
+ TODO
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-adr2org>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-adr2org>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-adr2org>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

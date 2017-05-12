@@ -1,0 +1,6 @@
+Revision history for Perl extension PBDD.
+
+0.01  Wed Oct  5 17:14:59 2011
+	- original version; created by h2xs 1.23 with options
+		-AX PBDD
+

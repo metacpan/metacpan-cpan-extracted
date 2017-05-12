@@ -1,0 +1,59 @@
+Revision history for Acme-CPANAuthors-Acme-CPANAuthors-Authors
+
+v1.0.0 | Saturday, June 1 2013
+
+  - Karen Etheridge (ETHER++) for A::C::Nonhuman
+  - Сергей Романов (SROMANOV++) for A::C::Belarusian
+  - gray (GRAY) for A::C::GitHub
+  - Jeen Lee (JEEN) for A::C::Korean
+  - Jose Luis Martinez Torres (JLMARTIN) for A::C::Catalonian
+  - Kaare Rasmussen (KAARE) for A::C::Danish
+  - Robert Bohne (RBO) for A::C::German
+  - Salvador Fandiño García for (SALVA) for A::C::Spanish
+  - Shantanu Bhadoria (SHANTANU) for A::C::India
+  - Michal Špaček (SKIM) for A::C::Czech
+  - Magnus Woldrich (WOLDRICH) for A::C::Swedish
+
+v0.1257908582 | Wednesday, Nov 11 03:03:02 2009 GMT
+
+  - Barbie (BARBIE) for A::C::British
+  - Steven Haryanto (SHARYANTO) for A::C::Indonesian
+
+v0.1256760525 | Wednesday, Oct 28 16:08:45 2009 ET
+
+  - Abigail (ABIGAIL) for A::C::Dutch
+
+v0.1253301444 | Friday, Sep 18 15:17:24 2009 ET
+
+  - أحمد محمد زواوي - Ahmad M. Zawawi (AZAWAWI) for A::C::Arabic
+  - Florian Ragwitz (FLORA) for A::C::German
+  - Mons Anderson (MONS) for A::C::AnyEvent
+
+v0.1243261776 | Monday, May 25 10:29:36 2009 ET
+
+  - Chris Williams (BINGOS) for A::C::POE
+
+v0.1240065387 | Saturday, April 18th 2009, 10:36:27 ET
+
+  - Burak Gürsoy (BURAK) for A::C::Turkish
+  - Issue tracker and repo now on github
+
+v0.1239933158 | Thursday, April 16th 2009, 21:52:38 ET
+
+  - Luis Azevedo (BRACETA) for A::C::Portuguese
+  - Last commit before moving to github (unless I get distracted and forget)
+
+v0.1234907192 | Tuesday February 17th 2009, 16:46:32 ET
+
+  - Vincent Pit (VPIT) for A::C::You're_using
+    + Nice use of the old perl4 separator
+
+v0.1234567890 | Friday, February 13th 2009, 23:31:30 UTC
+
+  - ACACA exists!
+  - 15 authors
+  - Released at UNIX epoch 1234567890 ...give or take.
+
+_ -.-. .... .- -. --. . ... _________________________________________
+For more information, sift through the commit logs:
+    http://github.com/sanko/acme-cpanauthors-acme-cpanauthors-authors/commits/master

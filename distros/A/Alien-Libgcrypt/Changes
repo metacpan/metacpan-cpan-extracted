@@ -1,0 +1,9 @@
+Revision history for Alien-Libgcrypt
+
+0.02  2016-1-10
+        - Pass information from Alien::Libgpg_error to confiugre script
+        - Force FTP passive mode
+
+0.01  2016-1-10
+        First version, released on an unsuspecting world.
+

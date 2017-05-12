@@ -1,0 +1,624 @@
+Revision history for Acme-MetaSyntactic-Themes
+
+1.049 2016-03-21 BOOK
+    [THEME UPDATES]
+    - donmartin
+    - linux
+    - pm_groups
+    - pokemon
+    - pornstars
+    - wales_towns
+
+1.048 2015-10-19 BOOK
+    [THEME UPDATES]
+    - linux
+    - nobel_prize
+    - pm_groups
+    - pornstars
+    - services
+    - wales_towns
+
+1.047 2015-08-10 BOOK
+    [THEME UPDATES]
+    - icao
+    - linux
+    - pm_groups
+    - pornstars
+    - tld
+    - tour_de_france
+
+1.046 2015-06-08 BOOK
+    [THEME UPDATES]
+    - debian
+    - discworld
+    - good_omens
+    - icao
+    - linux
+    - pm_groups
+    - pornstars
+    - robin
+    - services
+    - tld
+
+1.045 2015-02-02 BOOK
+    [THEME UPDATES]
+    - invasions
+    - linux
+    - metro
+    - pm_groups
+    - pokemon
+    - pornstars
+    - tld
+    - wales_towns
+    [PACKAGING]
+    - switch to Dist::Zilla for maintaining the distribution
+
+1.044 2015-01-05 BOOK
+    [THEME UPDATES]
+    - linux
+    - pm_groups
+    - pornstars
+    - tld
+    - wales_towns
+
+1.043 2014-10-13 BOOK
+    [THEME UPDATES]
+    - linux
+    - nobel_prize
+    - pornstars
+    - services
+    - tld
+    - yapc
+
+1.042 2014-09-15 BOOK
+    [THEME UPDATES]
+    - linux
+    - oulipo
+    - pornstars
+    - tld
+
+1.041 2014-08-18 BOOK
+    [THEME UPDATES]
+    - linux
+    - metro
+    - pm_groups
+    - pornstars
+    - services
+    - tld
+    - tokipona
+
+1.040 2014-06-16 BOOK
+    [THEME UPDATES]
+    - linux
+    - pm_groups
+    - pokemon
+    - pornstars
+
+1.039 2014-04-07 BOOK
+    [THEME UPDATES]
+    - ben_and_jerry
+    - dilbert
+    - linux
+    - pm_groups
+    - pokemon
+    - pornstars
+    - wales_towns
+
+1.038 2013-12-09 BOOK
+    [THEME UPDATES]
+    - ben_and_jerry
+    - dwarves
+    - iata
+    - icao
+    - linux
+    - nobel_prize
+    - pm_groups
+    - pokemon
+    - pornstars
+    - wales_towns
+
+1.037 2013-10-14 BOOK
+    [THEME UPDATES]
+    - donmartin
+    - evangelion
+    - linux
+    - nobel_prize
+    - pm_groups
+    - pornstars
+    - wales_towns
+
+1.036 2013-09-16 BOOK
+    [THEME UPDATES]
+    - ben_and_jerry
+    - linux
+    - olympics
+    - pm_groups
+    - pornstars
+
+1.035 2013-07-29 BOOK
+    [THEME UPDATES]
+    - linux
+    - pm_groups
+    - regions
+    - tour_de_france
+    - yapc
+
+1.034 2013-07-22 BOOK
+    [THEME UPDATES]
+    - ben_and_jerry
+    - currency
+    - linux
+    - pm_groups
+    - pornstars
+    - tour_de_france
+    - wales_towns
+
+1.033 2013-06-17 BOOK
+    [THEME UPDATES]
+    - debian
+    - dilbert
+    - linux
+    - pm_groups
+    - pornstars
+    - wales_towns
+
+1.032 2013-06-03 BOOK
+    [THEME UPDATES]
+    - ben_and_jerry
+    - linux
+    - haddock
+    - pm_groups
+    - pornstars
+
+1.031 2013-03-25 BOOK
+    [THEME UPDATES]
+    - ben_and_jerry
+    - linux
+    - pause_id
+    - pm_groups
+    - pornstars
+
+1.030 2013-02-18 BOOK
+    [THEME UPDATES]
+    - ben_and_jerry
+    - linux
+    - octothorpe
+    - pause_id
+    - pm_groups
+    - pornstars
+
+1.029 2013-01-14 BOOK
+    [THEME UPDATES]
+    - currency
+    - dilbert
+    - linux
+    - pause_id
+    - pm_groups
+    - pornstars
+
+1.028 2012-11-19 BOOK
+    [NEW THEME 2012/11/19]
+    - counting_to_one
+    [THEME UPDATES]
+    - linux
+    - pm_groups
+    - pornstars
+
+1.027 2012-11-12 BOOK
+    [NEW THEME 2012/11/12]
+    - care_bears
+    [THEME UPDATES]
+    - ben_and_jerry
+    - pause_id
+
+1.026 2012-11-05 BOOK
+    [NEW THEME 2012/11/05]
+    - renault
+    [THEME UPDATES]
+    - pause_id
+
+1.025 2012-10-29 BOOK
+    [NEW THEME 2012/10/29]
+    - fawlty_towers
+    [THEME UPDATES]
+    - currency
+    - linux
+    - pause_id
+    - pm_groups
+    - tour_de_france
+
+1.024 2012-10-22 BOOK
+    [NEW THEME 2012/10/22]
+    - regions
+    [THEME UPDATES]
+    - linux
+    - pause_id
+    - pm_groups
+    - pornstars
+
+1.023 2012-10-15 BOOK
+    [NEW THEME 2012/10/15]
+    - nobel_prize
+    [THEME UPDATES]
+    - magma
+
+1.022 2012-10-08 BOOK
+    [NEW THEME 2012/10/08]
+    - bible
+    [THEME UPDATES]
+    - oulipo
+
+1.021 2012-10-01 BOOK
+    [NEW THEME 2012/10/01]
+    - asterix
+    [THEME UPDATES]
+    - ben_and_jerry
+    - linux
+    - pause_id
+    - pornstars
+
+1.020 2012-09-24 BOOK
+    [NEW THEME 2012/09/24]
+    - doctor_who
+
+1.019 2012-09-17 BOOK
+    [NEW THEME 2012/09/17]
+    - screw_drives
+
+1.018 2012-09-10 BOOK
+    [NEW THEME 2012/09/10]
+    - bottles
+    [THEME UPDATES]
+    - currency
+    - dilbert
+    - linux
+    - pause_id
+    - pm_groups
+    - pornstars
+
+1.017 2012-09-03 BOOK
+    [NEW THEME 2012/09/03]
+    - evangelion
+
+1.016 2012-08-27 BOOK
+    [NEW THEME 2012/08/27]
+    - wales_towns
+    [THEME UPDATES]
+    - linux
+    - pause_id
+    - pm_groups
+    - pornstars
+    - tld
+    - yapc
+
+1.015 2012-08-20 BOOK
+    [NEW THEME 2012/08/20]
+    - tokipona
+    [THEME UPDATES]
+    - ben_and_jerry
+
+1.014 2012-08-13 BOOK
+    [NEW THEME 2012/08/13]
+    - ben_and_jerry
+
+1.013 2012-08-06 BOOK
+    [NEW THEME 2012/08/06]
+    - lucky_luke
+    [THEME UPDATES]
+    - metro
+
+1.012 2012-07-30 BOOK
+    [NEW THEME 2012/07/30]
+    - mars
+    [THEME UPDATES]
+    - tld
+
+1.011 2012-07-23 BOOK
+    [NEW THEME 2012/07/23]
+    - smurfs
+    [THEME UPDATES]
+    - linux
+    - pause_id
+    - pokemon
+    - pornstars
+
+1.010 2012-07-16 BOOK
+    [NEW THEME 2012/07/16]
+    - calvin
+
+1.009 2012-07-09 BOOK
+    [NEW THEME 2012/07/09]
+    - icao
+
+1.008 2012-07-02 BOOK
+    [NEW THEME 2012/07/02]
+    - iata
+    [THEME UPDATES]
+    All themes received a new "CHANGES" section that documents
+    the history of each theme.
+    - abba
+    - afke
+    - alice
+    - alphabet
+    - amber
+    - antlers
+    - barbapapa
+    - barbarella
+    - batman
+    - booze
+    - browser
+    - buffy
+    - camelidae
+    - chess
+    - colors
+    - colours
+    - constellations
+    - contrade
+    - counting_rhyme
+    - crypto
+    - currency
+    - dancers
+    - debian
+    - dilbert
+    - discworld
+    - donmartin
+    - dwarves
+    - elements
+    - fabeltjeskrant
+    - facecards
+    - flintstones
+    - french_presidents
+    - garbage
+    - garfield
+    - gems
+    - good_omens
+    - groo
+    - haddock
+    - hhgg
+    - invasions
+    - jabberwocky
+    - jamesbond
+    - jerkcity
+    - linux
+    - loremipsum
+    - lotr
+    - magic8ball
+    - magicroundabout
+    - magma
+    - metro
+    - monty_spam
+    - muses
+    - nis
+    - norse_mythology
+    - octothorpe
+    - olympics
+    - opcodes
+    - oulipo
+    - pantagruel
+    - pasta
+    - pause_id
+    - peanuts
+    - pgpfone
+    - phonetic
+    - pie
+    - planets
+    - pm_groups
+    - pokemon
+    - pooh
+    - pop2
+    - pop3
+    - pornstars
+    - pumpkings
+    - punctuation
+    - pynchon
+    - python
+    - quantum
+    - reindeer
+    - robin
+    - roman
+    - scooby_doo
+    - services
+    - shadok
+    - simpsons
+    - sins
+    - smtp
+    - space_missions
+    - sql
+    - stars
+    - state_flowers
+    - summerwine
+    - swords
+    - tarot
+    - teletubbies
+    - thunderbirds
+    - tld
+    - tmnt
+    - tour_de_france
+    - trigan
+    - unicode
+    - userfriendly
+    - us_presidents
+    - vcs
+    - viclones
+    - weekdays
+    - yapc
+    - zodiac
+
+1.007 2012-06-25 BOOK
+    [NEW THEME 2012/06/25]
+    - camelidae
+    [THEME UPDATES]
+    - linux
+    - pause_id
+    - pm_groups
+    - pornstars
+
+1.006 2012-06-18 BOOK
+    [NEW THEME 2012/06/18]
+    - alice
+
+1.005 2012-06-11 BOOK
+    [NEW THEME 2012/06/11]
+    - tarot
+
+1.004 2012-06-04 BOOK
+    [NEW THEME 2012/06/04]
+    - fabeltjeskrant
+    [THEME UPDATES]
+    - colours
+    - donmartin
+    - elements
+
+1.003 2012-05-28 BOOK
+    [NEW THEME 2012/05/28]
+    - afke
+    [THEME UPDATES]
+    - linux
+    - pause_id
+    - pm_groups
+    - pornstars
+
+1.002 2012-05-21 BOOK
+    [NEW THEME 2012/05/21]
+    - reindeer
+    [THEME UPDATES]
+    - colours
+    - muses
+    - tmnt
+
+1.001 2012-05-14 BOOK
+    [NEW THEME 2012/05/14]
+    - muses
+    [THEME UPDATES]
+    - browser
+    - colours
+    - counting_rhyme
+    - discworld
+    - donmartin
+    - dwarves
+    - elements
+    - garbage
+    - groo
+    - haddock
+    - loremipsum
+    - magicroundabout
+    - metro
+    - norse_mythology
+    - olympics
+    - oulipo
+    - pantagruel
+    - pokemon
+    - pornstars
+    - quantum
+    - summerwine
+    - teletubbies
+    - tour_de_france
+    - unicode
+    - vcs
+    - yapc
+
+1.000 2012-05-07 BOOK
+    [NEW THEMES 2012/05/07]
+    - abba
+    - french_presidents
+    - zodiac
+    [THEME UPDATES]
+    All themes but foo (the default) and any were moved out
+    from distribution Acme-MetaSyntactic, and updated:
+    - alphabet
+    - amber
+    - antlers
+    - barbapapa
+    - barbarella
+    - batman
+    - booze
+    - browser
+    - buffy
+    - chess
+    - colors
+    - colours
+    - constellations
+    - contrade
+    - counting_rhyme
+    - crypto
+    - currency
+    - dancers
+    - debian
+    - dilbert
+    - discworld
+    - donmartin
+    - dwarves
+    - elements
+    - facecards
+    - flintstones
+    - garbage
+    - garfield
+    - gems
+    - good_omens
+    - groo
+    - haddock
+    - hhgg
+    - invasions
+    - jabberwocky
+    - jamesbond
+    - jerkcity
+    - linux
+    - loremipsum
+    - lotr
+    - magic8ball
+    - magicroundabout
+    - magma
+    - metro
+    - monty_spam
+    - nis
+    - norse_mythology
+    - octothorpe
+    - olympics
+    - opcodes
+    - oulipo
+    - pantagruel
+    - pasta
+    - pause_id
+    - peanuts
+    - pgpfone
+    - phonetic
+    - pie
+    - planets
+    - pm_groups
+    - pokemon
+    - pooh
+    - pop2
+    - pop3
+    - pornstars
+    - pumpkings
+    - punctuation
+    - pynchon
+    - python
+    - quantum
+    - robin
+    - roman
+    - scooby_doo
+    - services
+    - shadok
+    - simpsons
+    - sins
+    - smtp
+    - space_missions
+    - sql
+    - stars
+    - state_flowers
+    - summerwine
+    - swords
+    - teletubbies
+    - thunderbirds
+    - tld
+    - tmnt
+    - tour_de_france
+    - trigan
+    - unicode
+    - userfriendly
+    - us_presidents
+    - vcs
+    - viclones
+    - weekdays
+    - yapc

@@ -1,0 +1,12 @@
+
+What the heck is this?  Any risk of injecting code to be evaluated 
+by breaking the connection?  Need to de-taint the value being evaluated
+to use.  Or is this a bug in mod_perl and not my lib at all?
+
+[Thu Aug 09 20:05:38 2012] [error] lookup of 'Apache2::Controller::Log::DetectAbortedConnection::' failed
+[Thu Aug 09 20:05:38 2012] [error] lookup of 'Apache2::Controller::Log::DetectAbortedConnection::' failed
+[Thu Aug 09 20:05:38 2012] [error] [client 10.62.20.90] Can't locate Apache2/Controller/Log/DetectAbortedConnection/.pm in @INC (@INC contains: ...) at (eval 1349) line 2.\n, referer: http://...
+[Thu Aug 09 20:05:38 2012] [error] [client 10.62.20.90] Can't locate Apache2/Controller/Log/DetectAbortedConnection/.pm in @INC (@INC contains: ...) at (eval 1349) line 2.\n, referer: http://...
+[Thu Aug 09 20:05:39 2012] [error] lookup of 'Apache2::Controller::Log::\xa0\xe1\xc1\xf3\xfa\x7f::' failed
+[Thu Aug 09 20:05:39 2012] [error] [client 10.62.20.90] Unrecognized character \\xA0; marked by <-- HERE after ler::Log::<-- HERE near column 35 at (eval 1349) line 1.\n, referer: http://...
+

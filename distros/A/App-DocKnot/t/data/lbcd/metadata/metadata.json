@@ -1,0 +1,53 @@
+{
+    "name": "lbcd",
+    "version": "3.4.2",
+    "synopsis": "responder for load balancing",
+    "maintainer": "Russ Allbery <eagle@eyrie.org>",
+    "orphaned": true,
+    "copyrights": [
+        {
+            "holder": "The Board of Trustees of the Leland Stanford Junior University",
+            "years": "1993-1994, 1996-1998, 2000, 2003-2009, 2012-2013",
+        },
+    ],
+    "license": "Expat",
+    "build": {
+        "lancaster": true,
+        "autotools": true,
+        "automake": "1.11",
+        "autoconf": "2.64",
+        "type": "Autoconf"
+    },
+    "packaging": {
+        "debian": "lbcd",
+    },
+    "support": {
+        "email": "eagle@eyrie.org",
+        "listname": "lbnamed-users",
+        "listurl": "https://mailman.stanford.edu/mailman/listinfo/lbnamed-users",
+        "web": "https://www.eyrie.org/~eagle/software/lbcd/",
+    },
+    "vcs": {
+        "type": "Git",
+        "url": "https://git.eyrie.org/git/system/lbcd.git",
+        "browse": "https://git.eyrie.org/?p=system/lbcd.git",
+        "github": "rra/lbcd",
+    },
+    "distribution": {
+        "section": "system",
+        "tarname": "lbcd",
+        "version": "lbcd",
+    },
+    "docs": {
+        "user": [
+            {
+                "name": "lbcd",
+                "title": "lbcd manual page",
+            },
+            {
+                "name": "lbcdclient",
+                "title": "lbcdclient manual page",
+            },
+        ],
+    },
+}

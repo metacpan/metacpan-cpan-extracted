@@ -1,0 +1,482 @@
+==================================================
+Changes from 2014-04-14 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.35 at 2015-04-14 14:58:28 +0000
+-----------------------------------------
+
+  Change: 09f5f3360f685a71f9f2a4fb7e8f2e2d6e6cc6db
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-04-14 10:58:01 +0000
+
+    Properly limit retries on 500 errors. 
+
+-----------------------------------------
+version 0.34 at 2015-02-02 06:09:46 +0000
+-----------------------------------------
+
+  Change: f69ea6a1fca4e9d38304d8c9ebc4ea2850b11774
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-02-02 01:09:46 +0000
+
+    Add some missing parameters to update_item to support new API.
+
+    Add ConditionExpression, ExpressionAttributeValues,
+    ExpressionAttributeNames and UpdateExpression to update_item(). 
+
+-----------------------------------------
+version 0.33 at 2015-01-22 04:59:01 +0000
+-----------------------------------------
+
+  Change: 5955881181606900fea42a8c49bf015824330c2d
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-01-21 23:59:01 +0000
+
+    Fix for scan and query results, incomplete results were being
+    returned. 
+
+-----------------------------------------
+version 0.32 at 2015-01-15 17:55:50 +0000
+-----------------------------------------
+
+  Change: 361b0a90eaeb394b0ca8c70af7803fa074de9ac2
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-01-15 12:55:50 +0000
+
+    Fix a syntax error with latest Mojo fixes 
+
+  Change: 212cf167232e61bee212480d856e26205019b7e2
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2015-01-15 12:53:19 +0000
+
+    Merge pull request #6 from kablamo/mojo-error-handling
+
+    Improve error handling when using Mojo::UserAgent 
+
+  Change: e8532f3c912f4895fa00b8069346208a1c837b22
+  Author: Eric Johnson <eric.git@iijo.org>
+  Date : 2015-01-15 11:07:28 +0000
+
+    Improve error handling when using Mojo::UserAgent 
+
+-----------------------------------------
+version 0.31 at 2015-01-07 00:48:40 +0000
+-----------------------------------------
+
+  Change: 3637a9693974a647915f3faab0e7780c8b7daa2e
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-01-06 19:48:40 +0000
+
+    Fix a bug in the patch to use JSON::MaybeXS found by tests. 
+
+  Change: 06e16a2a3490d11901a79855cd8a0d8dbf3a7591
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-01-06 19:39:20 +0000
+
+    Merge branch 'master' of github.com:rustyconover/Amazon-DynamoDB 
+
+  Change: 9f5db9e072f6114470178929649a8f52e24c5f53
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-01-06 19:24:07 +0000
+
+    Correct LastEvaluatedKey logic 
+
+  Change: 15df92f386df4fe96e6318f3df512a96b6cd86fb
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2015-01-06 19:23:39 +0000
+
+    Merge pull request #5 from karenetheridge/topic/json_maybexs
+
+    Swap out JSON::XS for JSON::MaybeXS 
+
+  Change: 6b1dbca1170b86156c7177682b6874a03997df84
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2015-01-06 16:10:48 +0000
+
+    Swap out JSON::XS for JSON::MaybeXS, to allow the user to choose
+    between backends 
+
+-----------------------------------------
+version 0.30 at 2015-01-04 04:46:30 +0000
+-----------------------------------------
+
+  Change: e53e7938868f4571188eff688bcd96d53a32b587
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-01-03 23:46:30 +0000
+
+    Fix bug in limit calculation 
+
+  Change: 49f294e83fa2011d817f446e537edfea9f7e30de
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-01-03 23:30:53 +0000
+
+    Fixup some tests regarding Limit and ResultLimit 
+
+  Change: 940faef664fcb60966482ca43ab72f6fbc3240ff
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-01-03 23:26:54 +0000
+
+    Fix handling of limit for query and scan. Remove ResultLimit option. 
+
+-----------------------------------------
+version 0.29 at 2014-12-21 21:54:19 +0000
+-----------------------------------------
+
+  Change: 6aa726f87b78143f9d70cb428d3f39c7bf43eb9a
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-12-21 16:54:19 +0000
+
+    Add support for FilterExpression, ExpressionAttributeNames and
+    ExpressionAttributeValues to query and scan. 
+
+-----------------------------------------
+version 0.28 at 2014-12-16 02:02:54 +0000
+-----------------------------------------
+
+  Change: 97c336c2cf2917e73eda35dc899faa3f7ee38f3a
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-12-15 21:02:54 +0000
+
+    Add support for ExpressionAttributeValues and ConditionExpression to
+    put_item method. 
+
+-----------------------------------------
+version 0.27 at 2014-10-18 04:59:46 +0000
+-----------------------------------------
+
+  Change: 22928c255282d7a2bc7717fe72bbb4bc9c9e41d3
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-18 00:59:46 +0000
+
+    Remove code that implements AWS signature version 4, rely on
+    AWS::Signature4. 
+
+-----------------------------------------
+version 0.25 at 2014-10-15 01:55:15 +0000
+-----------------------------------------
+
+  Change: ca2bc6a4898c067e584da931660f05ac8809ddba
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-14 21:55:15 +0000
+
+    Include the needed security token in the authorization signature when
+    using IAM roles. 
+
+-----------------------------------------
+version 0.24 at 2014-10-15 00:55:58 +0000
+-----------------------------------------
+
+  Change: 0bc85b03ad06c7a28f9bf0a86c09fd122751b10a
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-14 20:55:58 +0000
+
+    Add support for using credentials from IAM roles. 
+
+-----------------------------------------
+version 0.23 at 2014-10-10 22:00:40 +0000
+-----------------------------------------
+
+  Change: 358f942b22afe717bd963eda2d8ba14fd362ad60
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-10 18:00:40 +0000
+
+    Release 0.22 
+
+  Change: f1dc853b73a54fceea75aa6fbe914263bc8a356c
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-10 17:59:40 +0000
+
+    Decode binary and binary set values completely, don't leave them as
+    references. 
+
+  Change: 78a7012b64192f8083faa6634898a992309f4853
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-08-28 12:17:43 +0000
+
+    Fix a typo in a coercion.
+
+    Release 0.21 
+
+  Change: 75bcbbeea3f769a3b21e38a03b3cd042aec3a1a3
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-08-27 11:25:20 +0000
+
+    Allow some Net::Async::HTTP options to be respected. 
+
+  Change: a50110545ab923039c3279b78b50209fff51fa21
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-07-05 01:01:54 +0000
+
+    Fix error handling with IO::Async implementation.
+
+    Release 0.19 
+
+  Change: fe47bb5a50fcfb0c7ea9d0aa9094f9e3a7b810fe
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-07-04 09:05:12 +0000
+
+    Fix a bug in regards to the expected type definition.
+
+    Version 0.18 
+
+  Change: 0f74634ebe42f87ba86a382fcbd83c8db4fa077c
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-07-02 17:40:13 +0000
+
+    Bump to version 0.17.
+
+    Fix a typo in the API version default. 
+
+  Change: 47010e9100d5266a0c3d672d536956a34cefca75
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-07-01 15:19:17 +0000
+
+    Version 0.16
+
+    Fix compatibility with Type::Tiny 0.044.
+
+    Add checks around Expected so you can't use both Value and Exists and
+    AttributeValueList and ComparisionOperator at the same time. 
+
+  Change: ca65aaf0104221d8a3babfe9eb8e47c8527de93f
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-06-29 21:21:50 +0000
+
+    Version 0.15
+
+    Add type restraints for parameter checking from Type::Tiny and using
+    Kavorka. A few bugs were found with this additional checking. Edit
+    the appropriate test cases to terminate on the first failure.
+
+    Require a callback now for ->scan() and ->query() rather than it
+    being optional. This is now because of Kavorka's limitation on
+    optional positional parameters being followed by named parameters. 
+
+  Change: 9f4ba26a757fc6038bdace47a71cc2c0e62a3dc9
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-06-22 14:47:31 +0000
+
+    Bump to version 0.14
+
+    Fix utf8 encode/decode for requests. 
+
+  Change: 52be9b45c66952e5959617a5b30ad5a7e6ce4965
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-05-23 18:15:13 +0000
+
+    Bump to version 0.13 
+
+  Change: b2d2a527ea141b12e5b6663af506d80c5a508303
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-05-23 18:14:48 +0000
+
+    Don't try to decode JSON responses of 500 errors. 
+
+  Change: 1eeeb2c3e291b7ad5ada134e30b1383765b92cc6
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-05-15 18:40:03 +0000
+
+    Bump to version 0.12
+
+    Remove use of File::Slurp, Closes #2. 
+
+  Change: e8d62ef4aef5570bb66eeb396d33db8aaed88fd9
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-05-12 11:45:18 +0000
+
+    Don't include keys that are the empty string which throw validation
+    errors.
+
+    Add a bit more type checking
+
+    Bump to version 0.11 
+
+  Change: a7a840ac4e7a83c213a5db83189846ba5a08d942
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-30 09:32:58 +0000
+
+    Bump to version 0.10 
+
+  Change: e485765f3657707f1403a901fdc2b0ab0a29cdf4
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-30 09:31:38 +0000
+
+    Add support for AttributeValueList in Expected parameter processing.
+
+    Add test cases to exercise the code.
+
+    Centralize encoding of AttributeValueList to one function. 
+
+  Change: c3c767a1162fb15a1931fec9cb2ce84a2a7287bf
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-29 10:10:13 +0000
+
+    Some Podweaver cleanup bump version to 0.09 
+
+  Change: 456c6bf247b5702618c9be4e6ae81a50341136bb
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-29 10:03:02 +0000
+
+    Add ResultLimit to batch_get_item 
+
+  Change: e21346166db35410cc965f541af739fd19843e6c
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-28 09:15:11 +0000
+
+    Remove defined defaults when they match Amazon's default. 
+
+  Change: f692e4a5499d03711a7ca606a4881d86d8f1c49b
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-25 23:20:13 +0000
+
+    More POD fixes 
+
+  Change: 65a1eff2c8ec82bc7c1aa680012f2c9982c0fcb6
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-25 23:19:16 +0000
+
+    Add README.pod and change dist.ini to generate it. 
+
+  Change: f8b4a113620c5ead625cb30d63667e12b221998b
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-25 23:15:31 +0000
+
+    Add support for ConditionalOperator and QueryFilter to query().
+
+    Add ConditionalOperator to put_item, update_item, delete_item. 
+
+  Change: 3fbfa7a2e510b57f208a0efb47104780970e16cf
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-24 12:01:07 +0000
+
+    Fix some test data to match DynamoDB output. 
+
+  Change: 96f23b0ca1ebc3ce4b24d5de1ccdc67153916f78
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-24 10:53:21 +0000
+
+    Bump version 
+
+  Change: f7950f9e505f12743b3e383822fd27b29e5714cc
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-24 09:33:08 +0000
+
+    Don't encode undefined values part of PutRequests in
+    batch_write_item. This matches the behavior of put_item. 
+
+  Change: f9569f2a976276cf0c89077a213e009762d59083
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-24 09:32:11 +0000
+
+    Set a timeout of 90 seconds for DynamoDB to reply, should normally be
+    much faster than this.
+
+    Also set the keep_alive maximum socket count to a number larger than
+    one, and use a proper User Agent identifier. 
+
+  Change: 2e469174ffcb20545040d3cd46e368447b3c8679
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-22 17:12:45 +0000
+
+    Fix problem with versions being included, cut 0.07 
+
+  Change: b6d32ed2be5038e63e87ce82ec2b0456a1c59f52
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-22 17:00:43 +0000
+
+    Add ResultLimit for query and scan.
+
+    ResultLimit limits the number of items returned from either query or
+    scan. DynamoDB may return more than your limit but the callback will
+    only be processed N times.
+
+    Add test case for ResultLimit. 
+
+  Change: 7135ec7f9c138a7a3243e99003e2f5c01f555966
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-22 16:42:30 +0000
+
+    Remove hardcoded version in module.
+
+    Some POD documentation fixes.
+
+    Cleanup Dist::Zilla setup. 
+
+  Change: a75f9e760059f4191661af89ebeddb080dbd88c4
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-22 16:28:40 +0000
+
+    Cleanup Dist::Zilla config.
+
+    Add changes from git commit log. 
+
+  Change: d331103d1da3f72576f291a6f39a3816b1e3fc7a
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-16 20:46:12 +0000
+
+    Add changes 
+
+  Change: 1e66c804b731d10a6cb3f0d7b4c19eadbf5bbd4d
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-16 20:41:08 +0000
+
+    Fix tests and batch_write_item to use Key or Item depending on Put or
+    Delete requests. 
+
+  Change: 523107ee4ae50cc228aefc5e8e02fb4188326014
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-16 19:57:02 +0000
+
+    Fix a bug with batch_write_item and encoding the keys of delete and
+    put requests. 
+
+  Change: 351a5284aa98ba97aaa53b8a6ca7a871d31df601
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-16 18:27:05 +0000
+
+    Fix a bug with exists flag, don't interpret it into true or false.
+
+    Don't send undefined values as part of items. 
+
+  Change: b93c88244d07a20bafcd9ab7ea39ba827f55bfca
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-16 17:24:02 +0000
+
+    Add changes and bump version 
+
+  Change: ef45141fe851544ac2a7eb654dbc7885577064af
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-16 10:02:58 +0000
+
+    Fix a misinterpretation of the Limit parameter for scans and queries.
+
+    Cleanup some documentation in the POD. 
+
+  Change: d588e40a6fe66a7eaf759b2e2f4b45565af386a7
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-14 19:20:11 +0000
+
+    Remove unnecessary use 
+
+  Change: c2bbcab5fe538a19ae1907090d36baa9e3fcc9ee
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-14 19:17:58 +0000
+
+    Some changes for github bugtracker, some typo fixes. 
+
+  Change: 747a15784b80d69e08870a11881a29ae2d96acec
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-14 19:10:42 +0000
+
+    Add changes and tell Dist::Zilla about GitHub. 
+
+  Change: 912744be4f3f476840dcd0e1397c3d8ba0227cc5
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-14 18:55:13 +0000
+
+    Initial import of code. 
+
+================
+End of releases.
+================

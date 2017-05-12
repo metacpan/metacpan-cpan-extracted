@@ -1,0 +1,860 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentCollection  xmlns="http://alvis.info/enriched/" version="1.1">
+<documentRecord id="A4AFC8E9BD3073A4EFADEB400B80D54A" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1146649940912</modifiedDate>
+        <httpServer>Apache/1.3.34 (Unix) mod_fastcgi/2.4.2 mod_auth_passthrough/1.8 mod_log_bytes/1.2 mod_bwlimited/1.4 PHP/4.4.2 FrontPage/5.0.2.2635 mod_ssl/2.8.25 OpenSSL/0.9.7i</httpServer>
+        <urls>
+          <url>http://www.searchenginejournal.com/?p=3363</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>Yahoo’s YPN Says No to MySpace Traffic If you use MySpace profiles, blogs, comments, and mailings to spam or influence the teenie boppers over at MySpace to clickover to your website and that MySpace traffic is a major source of your visitors - beware! Yahoo Publisher Network wants little to do with serving their advertising to this demographic. Darren Rowse of Problogger.net writes that YPN’s quality control team is cutting loose the MySpace traffic dependent websites from their contextual advertising network : This morning I’ve had an email from a very disgruntled YPN publisher who has received a phone call from YPN saying that their account has been terminated because they have used MySpace to send traffic to their ‘legitimate’ website which has YPN. The thrust of the reason given to them for the termination was that the traffic being sent was not of a ‘high enough quality’. Jen Slegg has a copy of the terminiation letter from Yahoo Publisher Network: Hello {Publisher Name}, I have attempted to reach you personally to discuss this matter but the phone number we have is invalid. As part of our efforts to ensure high-quality traffic for advertisers on the Yahoo! Publisher Network, we continuously monitor publisher attributes such as: 1. Sources of their traffic, including its geographical distribution. 2. Suspicious click activity. 3. Advertiser conversion rates. 4. Overall quality of leads generated on your site. Unfortunately, due to poor traffic quality, we will be terminating your Yahoo! Publisher Network account ID as of end of day, Monday, May 1, 2006. In accordance with Sections 6(a) and 6(b) of the Yahoo! Publisher Network terms and conditions, we will not include clicks from non-U.S. users or otherwise invalid clicks in your payment. We have refunded amounts generated from the non-U.S. users and otherwise invalid clicks to our advertisers and will pay any remaining amount owed to you in accord with the Terms and Conditions. Yahoo Publisher Network has terminated sites from their program in the past due to low quality traffic and low conversions via International visitors and click fraud, but Jen says this is a first for either Yahoo or Google AdSense to let a publisher go due to the quality of the sites which refer the bulk of that publisher’s traffic: It has long been known that source of traffic can result in an AdSense suspension, but this is the first time it has been known that either AdSense or YPN has been targeting not only a single specific source of traffic, but also one that is somewhat legitimized as being a true site… as opposed to the “get 20,000 visitors to your site for only $19.99″ variety that is usually targeted for being poor quality. However, this definitely opens up questions about what other sites that YPN will target next? For those of you who actually use MySpace, the poor quality of their enormous amounts of web traffic is a major reason for their monetization problems. MySpace only receives an average $0.10 CPM (cost per thousand impressions) in advertising revenue and as you’ll notice, most of their advertisers are screen savers, fart buttons and borderline porn video downloads which install AdWare and Spyware programs on the computers of children. It’s a bit of a tough blow to publishers of MySpace oriented sites like MySpace skins, MySpace tutorials or MySpace hacks; but as a Yahoo Search Marketing advertiser and member of the Yahoo Publisher Network, I for one am quite happy to see that Yahoo is standing by their strict quality guidelines, which will keep cost-per-click prices up for publishers while leading to better ROI for advertisers.</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Yahoo’s YPN Says No to MySpace Traffic</meta>
+        <meta name="dc:type">text/html; charset=utf-8</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>Jen Slegg</anchorText>
+            <location>http://www.jensense.com/archives/2006/05/myspacecom_and.html</location>
+          </link>
+          <link type="a">
+            <anchorText>Problogger.net</anchorText>
+            <location>http://www.problogger.net/archives/2006/05/03/yahoo-publisher-network-terminates-more-publisher-accounts/</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+      <semantic_unit><named_entity><form>Yahoo</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Yahoo Search Marketing</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Yahoo Publisher Network</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google AdSense</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="A62EEF2D8BE45A8D097087B515598C68" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1148355445154</modifiedDate>
+        <httpServer>Apache/1.3.34 (Unix) DAV/1.0.3 mod_auth_passthrough/1.8 mod_log_bytes/1.2 mod_bwlimited/1.4 PHP/4.4.1 FrontPage/5.0.2.2635 mod_ssl/2.8.25 OpenSSL/0.9.7a</httpServer>
+        <urls>
+          <url>http://battellemedia.com/archives/002584.php</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>Two items of very related interest today: 1. Wired News Releases Full Text of AT&amp;T NSA Document (Slashdot). 2. Gonzales Says Publishing Leaks Is A Crime (Also Slashdot) Thank God for outlets like Wired. And best of luck.</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Wired News: Will the US Sue?</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>Gonzales Says Publishing Leaks Is A Crime</anchorText>
+            <location>http://yro.slashdot.org/article.pl?sid=06/05/22/1039257&amp;from=rss</location>
+          </link>
+          <link type="a">
+            <anchorText>Wired News Releases Full Text of AT&amp;T NSA Document</anchorText>
+            <location>http://yro.slashdot.org/article.pl?sid=06/05/22/132206</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="FF2C88E89A1DDFE4F8CD4845EEC285E3" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1142938329956</modifiedDate>
+        <httpServer>Apache</httpServer>
+        <urls>
+          <url>http://searchenginewatch.com/searchday/article.php/3592876</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>At long last, Google has launched its ownGoogle Finance service. For years, those seeking specialty financial information via Google have been sent to competitors such as Yahoo and MSN. Now Google's providing financial information directly to its own users. I'm doing an abbreviated rundown on the launch for two reasons. First, it wasn't actually live when I talked with Google about it yesterday, so it's difficult to review what you can't actually poke at. Second, myhouse move this week has left me without broadband at the moment, so doing much online is difficult. Suffice to say, either Chris Sherman and I will come back to the service to do a nice compare and contrast to what's out there already, especially given that there's plenty of stiff competition. But here are some highlights on what sounds especially different: Stock Charts With News Events: Pull up a stock chart, and Google says it will plot major news events on the chart. So did the stock suddenly jump skyward or plunge down? Seeing the related news events right on the chart may give you a better idea why. Interactive Stock Chart Timetables: Decide you want to see one month view, then change your mind and want to see data over two years? A slider will allow you to change Google's stock charts on the fly, without having to reload the page. Interactive charts require Flash. Flash-challenged? Don't worry. More traditional static chart options are offered. Aside from charts, Google will be offering news and blog search results related to companies listed in the finance area. Offering news results isn't unique, of course. Yahoo Finance among other services have long allowed you to get back news related to particular companies. However, if you prefer that news to come fromGoogle News, now you've got it. Plus, Google will tap into its Google Blog Search results to give you opinions and coverage from outside the mainstream media. It's not just public companies that will be covered. Google says that it has assembled profiles and information about private companies as well, through a combination of working with partners and its own crawling of the web. Google Finance will initially cover only companies in North America, but Google said it plans to expand "very quickly" to other countries and regions of the world in the future, though there's no exact rollout schedule. "Google is definitely an international company, and we want to make sure we are addressing the needs of all our users," said Katie Jacobs Stanton, a senior product manager at Google who is overseeing the Google Finance project. Google is also releasing targeted discussion groups for various companies, based on its Google Groups service. Financial discussion areas are notorious for those who try to pump stocks up or down with over-the-top posts, depending on their particular stake. To combat this, Google has hired moderators to help ensure community guidelines are complied with. Eventually, the company hopes volunteers will take over this task. "It's a real pain point out there [noise on stock forums]. It's unfortunate. There's a lot of great opportunity for users to connect to each other. Whatever we can do to eliminate the noise is good," Stanton said. In addition to the above features, much of what you'd expect from a financial search service is also to be offered, from links to US Securities and Exchange Commissions filings to senior executive biographies. How do people access Google Finance? Obviously, you can visit the area directly at http://finance.google.com. However, many will also encounter the new service via the way Google has already shown stock and financial-related information for years, in aOneBox display at the top of search results. Many are familiar with how a search for a company ticker symbol on Google has long brought back a stock chart above the regular web search results. In addition, clicking on that chart took you to either Yahoo Finance, Fool.com, MSN MoneyCentral or ClearStation in a frame. Tabs above the frame let you switch between services. The OneBox display of financial info will remain, but now the information will come from Google itself, by default. Don't like that default choice? Then you'll still have other options, namely Yahoo Finance, MSN Finance, CNN Finance, Reuters and MarketWatch. Google said the alternative choices were selected based on popularity data from Nielsen NetRatings and from the aggregated visitation data of Google Toolbar users. "Even though they are competitors, we really wanted to do the right thing by the users and give them other choices," Stanton said. Will the new Google offering "win" against the more established players by pulling away visitors? That remains to be seen. But it's a win just for Google to have its own offering, even if the service doesn't nab searchers away from far more mature services such as Yahoo Finance. Finance areas are a staple of portals, one of the first features they all introduced to help attract and keep searchers. After all, if you've established a portfolio with a service, you're less likely to depart to someone new. Google is allowing people to save a portfolio, a further extension of the stock tracking it alreadyintroduced for its personal home page service back in May. So this move definitely gives Google another portal feature to notch on its belt buckle -- and a feature that may help keep searchers sticking with it (though at the moment, there's no import portfolio feature to better ensure this). But Google Finance is not just a sticky portal feature. Many searches are financial in nature. Offering a finance area is actually firmly within Google's core mission of organizing the world's information. In fact, not having offered some type of financial search was something I wrote in article for SEWmembers as being a big gap back in 2004: Now as Google's competitors are fighting to win users in the currentsearch wars, Google Groups 2, like Gmail and Blogger before it, seems a way for Google to strike back at the portal features that some (see Forrester and Moreover) mistakenly assumed it would be weak on or missed buying. What's next? I'm betting some type of financial type of service similar toYahoo Finance. Letting people set up stock portfolios and linking these to information was one of the earliest sticky portal features around. It's a big gap at Google, in the way that the service once had a biggap in term news search. Google has since filled that news gap, with its 2002 enhancements making it a more compelling place for newshounds to start their day -- and perhaps pulling some of those people away fromYahoo News. Similarly, a financial service makes competitive sense. It also fits in with Google's mission. In addition, once the company goes public, it might want to offer this if only to avoid the embarrassment of employees seeking financial updates elsewhere such as at Yahoo or MSN. Currently, both are key providers of data that Google's largely unknownstock quote service uses. In short, those coming to Google and looking for financial information should expect to find it provided by Google itself. That's finally arrived and will help make Google a stronger service for it. Even if some continue to go to competiting services, Google still wins in that it will no longer lose everyone to those competitors. Some will find Google Finance, like it and keep coming back for more.</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Google Launches Google Finance</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>
+wrote</anchorText>
+            <location>http://searchenginewatch.com/_subscribers/articles/article.php/3353401</location>
+          </link>
+          <link type="a">
+            <anchorText>Google Groups</anchorText>
+            <location>http://groups.google.com/</location>
+          </link>
+          <link type="a">
+            <anchorText>
+  Forrester</anchorText>
+            <location>http://searchenginewatch.com/_subscribers/updates/article.php/3326461#forrester</location>
+          </link>
+          <link type="a">
+            <anchorText>
+  enhancements</anchorText>
+            <location>http://searchenginewatch.com/searchday/article.php/2160891</location>
+          </link>
+          <link type="a">
+            <anchorText>gap</anchorText>
+            <location>http://searchenginewatch.com/sereport/article.php/2164171</location>
+          </link>
+          <link type="a">
+            <anchorText>members</anchorText>
+            <location>http://searchenginewatch.com/benefits/article.php</location>
+          </link>
+          <link type="a">
+            <anchorText>search 
+  wars</anchorText>
+            <location>http://searchenginewatch.com/searchday/article.php/3347181</location>
+          </link>
+          <link type="a">
+            <anchorText>house move</anchorText>
+            <location>http://blog.searchenginewatch.com/blog/060320-184234</location>
+          </link>
+          <link type="a">
+            <anchorText>OneBox</anchorText>
+            <location>http://www.google.com/help/interpret.html#H</location>
+          </link>
+          <link type="a">
+            <anchorText>Google Finance</anchorText>
+            <location>http://finance.google.com/</location>
+          </link>
+          <link type="a">
+            <anchorText>http://finance.google.com</anchorText>
+            <location>http://finance.google.com</location>
+          </link>
+          <link type="a">
+            <anchorText>introduced</anchorText>
+            <location>http://searchenginewatch.com/searchday/article.php/3506541</location>
+          </link>
+          <link type="a">
+            <anchorText>
+  Moreover</anchorText>
+            <location>http://searchenginewatch.com/_subscribers/articles/article.php/3104461</location>
+          </link>
+          <link type="a">
+            <anchorText>Yahoo News</anchorText>
+            <location>http://news.yahoo.com/</location>
+          </link>
+          <link type="a">
+            <anchorText>stock quote service</anchorText>
+            <location>http://www.google.com/help/features.html#stock</location>
+          </link>
+          <link type="a">
+            <anchorText>Google Blog 
+Search</anchorText>
+            <location>http://blogsearch.google.com/</location>
+          </link>
+          <link type="a">
+            <anchorText>Yahoo Finance</anchorText>
+            <location>http://finance.yahoo.com/</location>
+          </link>
+          <link type="a">
+            <anchorText>Google News</anchorText>
+            <location>http://news.google.com/</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+      <semantic_unit><named_entity><form>Chris Sherman</form><named_entity_type>person</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Yahoo</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>NetRatings</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Moreover</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>MSN</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Blogger</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google Finance</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google Toolbar</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Gmail</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>MSN</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Yahoo News</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Yahoo Finance</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google Blog</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>MSN MoneyCentral</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Flash</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>way Google</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google Blog Search</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google News</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="48FFC0A03C2756C583F6D80C9E527393" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1142422246164</modifiedDate>
+        <httpServer>Apache/1.3.33 (Unix)</httpServer>
+        <urls>
+          <url>http://blog.outer-court.com/archive/2006-03-15-n42.html</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>Google releases their desktop search tool in an updated version today. Among some bugfixes, there’s a new Quick Search box. Hit Ctrl twice to make it appear in the middle of your desktop, and then search for anything – your computer, the web, your emails – with live results as you type. Note you might need to restart your PC after installation... happened here. [Thanks Brinke Guthrie and Wang Y.]</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Google Desktop's Quick Search Box</meta>
+        <meta name="dc:date">Wed, 15 Mar 2006 11:20:57 GMT</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>Quick Search box</anchorText>
+            <location>http://desktop.google.com/features.html#quicksearch</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+      <semantic_unit><named_entity><form>Brin</form><named_entity_type>person</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google Desktop</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="18C9FD35812DFC4D4CCF0FD6AC1646BC" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1149133052555</modifiedDate>
+        <httpServer>Apache/1.3.33 (Unix)</httpServer>
+        <urls>
+          <url>http://blog.outer-court.com/archive/2006-05-30-n12.html</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>Some bloggers are complaining that Google didn’t have a Memorial day logo yesterday. Memorial Day “commemorates U.S. men and women who have died in military service,”Wikipedia explains. From a comment at Newsbusters by Warner Todd Huston: Obviously what we have with Google now is that they have let their ’power” get to their heads. Instead of being the information service they started out to be, they have decided that they should mold content to teach all us idiots on da web who r too stoopid to kno what it good and what is bad! Like the Mainstream Media they have gone from mere reporters, mere chroniclers to activists with the elimination of conservative sites and now deciding not to celebrate our armed forces as the fruits of their turn. Others think it’s good the way it is– quote Lew Rockwell: [Google] ignored Memorial Day this year and in years past. Well done Google. War in any of its aspects is never something to genuflect before or honor. It is the systematic killing and domination of other human beings who, by the very nature of war, have not been found guilty of a crime beyond being born on one patch of ground and not another. Stop honoring troops who occupy foreign lands by force of arms, who create global instability, and hide behind vicious concepts like patriotism and the need ’to spread ’democracy’. Usually Google prefers to go along with happy, not sad or commemorative events, which is more in-tune with the colorful Google logo. Personally I don’t think the absence of any particular logo should get anyone upset – it’s pretty much Google’s decision. [Thanks NoStaplesPlease.]</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Complaints Due to Lack of Google Memorial Day Logo</meta>
+        <meta name="dc:date">Thu, 01 Jun 2006 02:44:56 GMT</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>it’s good the way it is</anchorText>
+            <location>http://blog.lewrockwell.com/lewrw/archives/010666.html</location>
+          </link>
+          <link type="a">
+            <anchorText>Wikipedia</anchorText>
+            <location>http://en.wikipedia.org/wiki/Memorial_Day</location>
+          </link>
+          <link type="a">
+            <anchorText>a comment at Newsbusters</anchorText>
+            <location>http://newsbusters.org/node/5580</location>
+          </link>
+          <link type="a">
+            <anchorText>Some bloggers</anchorText>
+            <location>http://technorati.com/search/google%20memorial</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Wikipedia</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="0770964CAC923ACCDC189E0EA4208AE0" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1141993156883</modifiedDate>
+        <httpServer>Apache/1.3.34 (Unix) DAV/1.0.3 mod_auth_passthrough/1.8 mod_log_bytes/1.2 mod_bwlimited/1.4 PHP/4.4.1 FrontPage/5.0.2.2635 mod_ssl/2.8.25 OpenSSL/0.9.7a</httpServer>
+        <urls>
+          <url>http://battellemedia.com/archives/002391.php</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>From a Reuters story: Sen. Ron Wyden on Thursday proposed legislation aimed at preventing high-speed Internet service providers from charging content companies extra so consumers have faster access to their Web sites or receive special treatment. The Oregon Democrat said he was pushing the legislation to ensure smaller start-ups trying to do business on the Internet would not be outgunned by bigger companies. Further thoughts at IPDemocracy: Would Wyden’s legislation prohibit a content provider from paying extra to the broadband provider for improved delivery? Wyden couldn’t easily answer these kinds of questions, but simply said that he opposes a world in which non-transparent deals inject latency into access web sites (where one site with a “sweetheart deal” might take five seconds to appear but another site with no such deal might take five minutes to appear). Wyden seemed to say as long as the sweetheart deals are transparent, his legislation would not bar such relationships. “The heart and soul of this legislation are the transparency provisions – you get all those deals out there in the open.” As much as I wish to be black and white on this issue, I sense there is much gray here. Fortunately an old hand from the telco/provisioning world just joined FM, and I'll be talking to him about it in the coming days to get smarter....</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Net Neutrality Bill Unveiled</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>IPDemocracy</anchorText>
+            <location>http://www.ipdemocracy.com/archives/2006/03/02/index.php#001213</location>
+          </link>
+          <link type="a">
+            <anchorText>just joined FM</anchorText>
+            <location>http://fmpub.net/archives/2006/03/were_growingmee.php</location>
+          </link>
+          <link type="a">
+            <anchorText>Reuters story</anchorText>
+            <location>http://today.reuters.com/news/articleinvesting.aspx?type=governmentFilingsNews&amp;storyid=URI:urn:newsml:reuters.com:20060302:MTFH08897_2006-03-02_22-55-27_N02376259:1</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="35D3C71D8D04A7A782CD2E8CBF17220C" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1144681935588</modifiedDate>
+        <httpServer>Apache/1.3.28 (Unix) mod_gzip/1.3.26.1a PHP/4.3.10 mod_ssl/2.8.15 OpenSSL/0.9.7c</httpServer>
+        <urls>
+          <url>http://www.seroundtable.com/archives/003633.html</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>A featured Search Engine Watch Forum thread named SEO &amp; Newspapers discusses a recent NYTimes article named This Boring Headline Is Written for Google. The first paragraph of the article somes it up; Journalists over the years have assumed they were writing their headlines and articles for two audiences — fickle readers and nitpicking editors. Today, there is a third important arbiter of their work: the software programs that scour the Web, analyzing and ranking online news articles on behalf of Internet search engines like Google, Yahoo and MSN. Danny Sullivan explains the difference between browsing news and searching for news. This is an important distinction and I think Danny gets it right; When I'm reading a newspaper, a catchy, funny headline might be what I need to pull me into a story. And I do love a good headline. But if I'm keyword searching for news, I know what I'm after. Your catchy headline isn't what pulls me in. Your headline using the terms I searched for is what will do it. I personally do not know how to write a "catchy headline" that is not direct and too the point (i.e. keyword specific so that searches can find it). Do folks like us now need to worry about being outranked by the larger publishers? Not only do they have popularity on their side, they now know how to "SEO" an headline. Forum discussion at Search Engine Watch Forums.</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">New York Times Changes Web Only Headlines To Be Search Engine Friendly</meta>
+        <meta name="dc:date">Mon, 10 Apr 2006 13:37:11 GMT</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>Search Engine Watch Forums</anchorText>
+            <location>http://forums.searchenginewatch.com/showthread.php?threadid=11001</location>
+          </link>
+          <link type="a">
+            <anchorText>SEO &amp; Newspapers</anchorText>
+            <location>http://forums.searchenginewatch.com/showthread.php?threadid=11001</location>
+          </link>
+          <link type="a">
+            <anchorText>explains</anchorText>
+            <location>http://blog.searchenginewatch.com/blog/060410-090051</location>
+          </link>
+          <link type="a">
+            <anchorText>This Boring Headline Is Written for Google</anchorText>
+            <location>http://www.nytimes.com/2006/04/09/weekinreview/09lohr.html?ex=1302235200&amp;en=86fd20f27aa1d645&amp;ei=5090&amp;partner=rssuserland&amp;emc=rss</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+      <semantic_unit><named_entity><form>Danny Sullivan</form><named_entity_type>person</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Yahoo</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>NYTimes</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>MSN</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>MSN</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="B4158BE3ACF2447B8B2FF1AFFB5361A0" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1147168350172</modifiedDate>
+        <httpServer>Apache</httpServer>
+        <urls>
+          <url>http://searchenginewatch.com/searchday/article.php/3603301</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>Paying attention to web metrics is an increasingly important aspect of search marketing, with methodologies, processes and tools that can dramatically lift marketing and business performance. A special report from the Search Engine Strategies conference, February 27 - March 2, 2006, New York, NY. Web metrics seems to increase in complexity every day. Gathering and organizing data from online advertising, search marketing initiatives, affiliates, ecommerce transactions, Web (site) analytics and even offline marketing campaigns is not a simple process. Key Performance Indicators (KPIs) "A key performance indicator is a response to the overwhelming volume of data Web analytics applications produce," said Eric Peterson, Vice President of Strategic Services in the Visual Sciences division of WebSideStory. "KPIs are designed to translate voluminous web data into easily digested metrics that are meaningful to the entire business, presented in the context of change over time with emphasis on indicators that fall outside of expected ranges." According to Peterson, KPIs should not be owned by the IT department but rather the business folks. "Things such as conversion rates, etc.—you need to understand your business in order to understand the data," he said. "Use worksheets to list KPIs, how they are performing in one time frame vs. another. [You] need to put these into context versus where you were yesterday, last week, or last year." Effective KPIs should include the following: Definition—summarize relationships among meaningfully compared data. Also, clearly define which KPIs are provided to the end user, adding a glossary or annotation, if necessary Expectation—establish targets for improvement. Set expectations by providing context of change over time Presentation—highlight changes (literally) for easy identification. Each KPI should show a percent change and drive Action—Direct additional study and ID areas of the Web site that need work "The core of good KPIs," said Peterson, " is that they always drive action." Measuring and organizing KPIs According to Neil Mason of Applied Insights, two ways to deal with the plentitude of metrics is to have a strategy (what to measure) and a plan (how to measure). "When thinking about conversion rates and KPIs, think about the customer," he said. "Different people come to your Web site for different reasons. Site owners should match categories and products with audience segments and goals." Mason's firm organizes the different types of Web site visits into "customer journey" framework which includes audience segments (demographics), user intent, and category/product organization. "Companies need to develop a strategic understanding of site usage," he said. Some of the key questions to ask when developing the "customer journey" framework include: Who visits the site? Why do they visit the site? How are they using the site? What do they do? Site visitor activity is carefully monitored on a number of levels. A visitor profile might consist of categories and products viewed, search usage, depth of visit (i.e. page views per visitor), order/transaction activity, and user intent. Combined with entry and exit survey data, user-behavior patterns emerge. "Different visitors may be visiting the same section of a site in different modes," Mason added. "I may be searching for a specific piece of content having come from a search engine or I may have got there by browsing. The point is to understand what mode is likely to be predominant in that bit of content and designing accordingly. When is one mode of data integration (hard or soft) more appropriate to use?" After important data is gathered and organized, Web site owners should adjust their Web site content and marketing campaigns accordingly. "Also focus on customer life cycle management," said Mason. Jason Burby, Director of Web Analytics/Business Intelligence at ZAAZ, looks at three types of core data about user behavior: Attitudinal data (what do my customers think) Behavioral data (what are my customers doing) Competitive data (how do we compare with others in our industry) "Create scorecards to measure organization, Web site, site section, Web team/agency, and individual performance related to business goals," said Burby. "Share this scorecard throughout the organization. People should be held accountable—bonuses and sales can be based on KPIs." "Scorecards are customized to the individual company, site, and audience," he continued. "It is typical to have a number of different scorecards, depending upon audience and focus. Often, an executive scorecard that simply reports on the performance of the top five to eight KPIs. Different stakeholders can get scorecards based on their specific focus—all rolling up to a specific, overall site KPI." "KPIs should be presented in the following quantity: only 3-4 for senior executives, 6-8 for next level down, 10-15 for analysts, etc.," added Peterson. "For example, a senior strategist might be presented with only two main KPIs—average email response time, and percentage of low and high satisfaction customers." "Think about KPIs hierarchically," he concluded, "and use simple enough data to drive action." Shari Thurow is the Marketing Director at Grantastic Designs, Inc. and the author of the book Search Engine Visibility.</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Multichannel Metrics: Managing the Sea of Data</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText> Grantastic Designs, Inc.</anchorText>
+            <location>http://www.grantasticdesigns.com/</location>
+          </link>
+          <link type="a">
+            <anchorText>Search Engine Visibility</anchorText>
+            <location>http://www.searchenginesbook.com</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+      <semantic_unit><named_entity><form>Eric Peterson</form><named_entity_type>person</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Shari Thurow</form><named_entity_type>person</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Pete</form><named_entity_type>person</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>WebSideStory</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Visual Sciences</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="6373E6ED154F42639933FA99BCE915DB" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1149760377185</modifiedDate>
+        <httpServer>Apache/2.0</httpServer>
+        <urls>
+          <url>http://google.weblogsinc.com/2006/06/06/google-getting-sued-in-france-by-book-publisher/</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>Google is getting sued again from another book publisher. What else is new? These book publishers do not like Google to use excerpts from their books without permission. Even though they might be making additional sales from individuals that may have never ever heard of them if it wasn't for Google making this information available. The publisher is accusing Google of counterfeiting and breach of rights by digitizing about 100 books it published. The lawsuit targets Google France as well as Google Inc. Supposedly, the suit is requesting a penalty of 100,000 euros ($160,000 US dollars) for each of Google's infractions. Thus totaling over $1.6 Million $16 Million US dollars. UPDATE:Big thanks to Alexander for pointing out my decimal error up there!</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Google getting sued in France by book publisher</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>Alexander</anchorText>
+            <location>http://www.mobileread.com</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+      <semantic_unit><named_entity><form>Google Inc</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google France</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="F4CB2ADCF31D43697F2ED6B9412A4E8D" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1145958751520</modifiedDate>
+        <httpServer>Apache/2.0</httpServer>
+        <urls>
+          <url>http://google.weblogsinc.com/2006/04/22/google-stock-up-8/</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>Google's stock rose 6% in after hours trading on Friday. According to the NY Times, Google's profit rose 60% in the first quarter. Google has responded by saying that the market share increase might be in relation to increased uses of Google Video, Google Earth, and Google Maps. Visits to these sites, have in turn increased visitors to the Google Search. Google's current stock price sits at $437.10, up 22.10.</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Google Stock up 8%</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>stock price</anchorText>
+            <location>http://finance.google.com/finance?q=goog&amp;btnG=Search</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google Earth</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google Maps</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google Search</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google Video</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="7F0D97BDACC9D73DA79364ADF93A9080" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1144768340466</modifiedDate>
+        <httpServer>Apache/1.3.28 (Unix) mod_gzip/1.3.26.1a PHP/4.3.10 mod_ssl/2.8.15 OpenSSL/0.9.7c</httpServer>
+        <urls>
+          <url>http://www.seroundtable.com/archives/003639.html</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>There is a DigitalPoint Forum thread named that discusses a neat PageRank tool at http://www.webmastereyes.com/. The PageRank tool is different from others, in that it will enable you to plug in a URL and it will then place graphical PR bars on all the links you have on that page. For example, I plugged in my corporate site's sitemap and it told me the PR values of all my pages on my site (since all my pages are listed in my sitemap. On the right hand side, is an image of how they plotted my PR values over my left hand side navigation. Back to the PageRank debate. I do not believe it is worth much in terms of ranking. Google does claim that PR affects your crawl frequency. And when everything else is equal, you have to assume PageRank makes the difference. But when is everything else equal in our world? Forum discussion at DigitalPoint Forums.</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">New Google PageRank Tool Plots PR Values Overlays On Page</meta>
+        <meta name="dc:date">Tue, 11 Apr 2006 12:40:49 GMT</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>http://www.webmastereyes.com/</anchorText>
+            <location>http://www.webmastereyes.com/</location>
+          </link>
+          <link type="a">
+            <anchorText>thread</anchorText>
+            <location>http://forums.digitalpoint.com/showthread.php?t=74054</location>
+          </link>
+          <link type="a">
+            <anchorText>DigitalPoint Forums</anchorText>
+            <location>http://forums.digitalpoint.com/showthread.php?t=74054</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Digital</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google PageRank</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="E25E5DBF90E6C6A3CDF200F61F6A20E6" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1150315246240</modifiedDate>
+        <httpServer>Apache/1.3.36 (Unix) mod_fastcgi/2.4.2 mod_auth_passthrough/1.8 mod_log_bytes/1.2 mod_bwlimited/1.4 PHP/4.4.2 FrontPage/5.0.2.2635.SR1.2 mod_ssl/2.8.27 OpenSSL/0.9.7a</httpServer>
+        <urls>
+          <url>http://www.searchenginejournal.com/?p=3530</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>RSS - Things That Make You Go Hmmm Why doesn’t the new Yahoo Spark Blog publish an RSS feed? Of any kind? Not even an “add to my Yahoo” button? Why can’t I subscribe to the Technorati Hot Tags widget that’s (supposedly) updated hourly? How come eBay has RSS feeds enabled on the Announcement Board, the eBay Discussion Boards, or listings from specific eBay Stores, but I can’t subscribe to searches in YouTube (thereby denying me the pleasure of getting my daily fix of Cute Kitty vids)?</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">RSS - Things That Make You Go Hmmm</meta>
+        <meta name="dc:type">text/html; charset=utf-8</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>Technorati Hot Tags</anchorText>
+            <location>http://www.technorati.com/tags/</location>
+          </link>
+          <link type="a">
+            <anchorText>eBay</anchorText>
+            <location>http://www2.ebay.com/aw/core/200603200913002.html</location>
+          </link>
+          <link type="a">
+            <anchorText>Yahoo Spark Blog</anchorText>
+            <location>http://dir.yahoo.com/thespark/240/peek-through-the-pinhole</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+      <semantic_unit><named_entity><form>Yahoo</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Technorati</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="070E7EB628CC943FBF90E7C6A703D9B2" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1149606759016</modifiedDate>
+        <httpServer>Apache/1.3.28 (Unix) mod_gzip/1.3.26.1a PHP/4.3.10 mod_ssl/2.8.15 OpenSSL/0.9.7c</httpServer>
+        <urls>
+          <url>http://www.seroundtable.com/archives/003894.html</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>Any SEO/M will tell you their job description sucks because in the process of describing exactly what they do, they nearly always watch the listener's eyes glaze over, waiting for a topic that may make better sense. Same thing with user centered design/usability industry folks. That glazed eyes thing is often followed up with, "Did you say you wanted another beer?" There really are productive reasons to incorporate SEO/M (search engine optimization and marketing) and user centered design techniques into web design. Two, well, three discussions at Cre8asiteforums, are focused on how to inject logic and practicality into web design, and why. Two of them are human-computer oriented, for when you're ready to commune with the reasons why people do things, in addition to how. It's about meeting their needs. Of course, understanding them is no piece of cake, which is why there are so many ongoing studies. Some of these studies involve how people search and use search engines, since this is how they find most web sites they'd like to use. Some thought provoking discussions on web design and programming that meet human requirements: Features don't matter anymore, Welcome to the Age of User Experience "What does matter is the way we can use the "thing". How the features don't get in our face and the "thing" just lets us do what at the most basic level we want to do." Contextual Usability? "One thing relates to another, and understanding relationships helps us build usablility into navigation strategies." Should links still be underlined and blue?. The responses are all over the place. Cre8tive choice fights a strong battle. The tie-in to SEO/M? There are many, but one strong one is landing pages. Large financial investments are made into the design of landing pages for search engines for use in marketing and conversions. Persuasive design is determined to figure out what people need and want, but that's not all. Web user environment matters too. Cultures, gender, and age matter too. Links on a landing page have assignments, much like an army of soldiers. Don't let anyone tell you that you have a silly little job.</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Officer Usability and General SEO</meta>
+        <meta name="dc:date">Mon, 05 Jun 2006 11:52:34 GMT</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>Should links still be underlined and blue?</anchorText>
+            <location>http://www.cre8asiteforums.com/forums/index.php?s=&amp;showtopic=36893&amp;view=findpost&amp;p=181570</location>
+          </link>
+          <link type="a">
+            <anchorText>Contextual Usability?</anchorText>
+            <location>http://www.cre8asiteforums.com/forums/index.php?s=&amp;showtopic=37336&amp;view=findpost&amp;p=183860</location>
+          </link>
+          <link type="a">
+            <anchorText>Features don't matter anymore, Welcome to the Age of User Experience</anchorText>
+            <location>http://www.cre8asiteforums.com/forums/index.php?s=&amp;showtopic=37237&amp;view=findpost&amp;p=183418</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="C5E3217E0849D4E0F5C78C132B7E826D" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1146772829195</modifiedDate>
+        <httpServer>Apache/1.3.28 (Unix) mod_gzip/1.3.26.1a PHP/4.3.10 mod_ssl/2.8.15 OpenSSL/0.9.7c</httpServer>
+        <urls>
+          <url>http://www.seroundtable.com/archives/003764.html</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>Yesterday, I posted at SEW blog Ask.com Second TV Blitz Stars Chief Scientist Guru, Apostolos Gerasoulis. I have now spotted the commercials that you can view for yourself at http://about.ask.com/docs/about/televisionads.shtml. Yes, Apostolos Gerasoulis, is one of the founders of Teoma, the search engine behind Ask.com. And yes, he is the one staring in the TV commercial. Do you think he did a good job of bring across the message? I am not sure... Here it is in text: RIMS This ad shows Apostolos Gerasoulis in action talking about how he loves "a tight ride." He explains how Ask.com understands the difference between "tight" cars and "phat" cars.LIBRARIANS This ad features Apostolos Gerasoulis among the bookshelves at Rutgers University, standing in the very spot where he came up with the idea for ExpertRank, our unique relevancy technology. Here he talks about how librarians prefer Ask.com, and the ongoing search for knowledge. Share your thoughts at Search Engine Roundtable Forums.</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Ask.com's New TV Commercials Sport Apostolos Gerasoulis, Ask.com's Technology Founder</meta>
+        <meta name="dc:date">Thu, 04 May 2006 19:35:39 GMT</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>http://about.ask.com/docs/about/televisionads.shtml</anchorText>
+            <location>http://about.ask.com/docs/about/televisionads.shtml</location>
+          </link>
+          <link type="a">
+            <anchorText>Ask.com Second TV Blitz Stars Chief Scientist Guru, Apostolos Gerasoulis</anchorText>
+            <location>http://blog.searchenginewatch.com/blog/060503-084529</location>
+          </link>
+          <link type="a">
+            <anchorText>Search Engine Roundtable Forums</anchorText>
+            <location>http://forums.seroundtable.com/showthread.php?t=699</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+      <semantic_unit><named_entity><form>Apostolos Gerasoulis</form><named_entity_type>person</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Teoma</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Rutgers University</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Scient</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="F3F560D7ED8DE899CD17D9302AADE8EF" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1147377627223</modifiedDate>
+        <httpServer>Apache/1.3.28 (Unix) mod_gzip/1.3.26.1a PHP/4.3.10 mod_ssl/2.8.15 OpenSSL/0.9.7c</httpServer>
+        <urls>
+          <url>http://www.seroundtable.com/archives/003799.html</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>This morning I described what is Google Co-op, but I also promised I would try to implement an example for this site. Well, we have implemented phase one of Google Co-op subscription links for this site. You can subscribe to the coop and then when you perform searches that are an exact match to one of the SER Categories, you should see the subscriber links results (if you are signed into your Google account) while searching. It will ask you to login, if you are not, and then confirm your subscription. Soon after, if you search on any of our SER Categories by name you should see a result that looks like; If you like, you can preview the results by clicking here and scrolling down the page to the bottom, where it says "Preview these queries." Click on an example query and you will see what it will look like. So, what do you say, subscribe to us and test it out. Then searches like Google AdSense or Link Building will finally become relevant at Google. :)</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Dynamic Implementation of Google Co-op for Search Engine Roundtable</meta>
+        <meta name="dc:date">Thu, 11 May 2006 19:35:25 GMT</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>subscribe</anchorText>
+            <location>http://www.google.com/coop/trust/add?user=015090516856763095929&amp;continue=http://www.google.com/coop/profile?user=015090516856763095929&amp;sig=Y_aOf96WG5HGmgVEImc3p144xnXGY=</location>
+          </link>
+          <link type="a">
+            <location>http://www.google.com/coop/trust/add?user=015090516856763095929&amp;continue=http://www.google.com/coop/profile?user=015090516856763095929&amp;sig=Y_aOf96WG5HGmgVEImc3p144xnXGY=</location>
+          </link>
+          <link type="a">
+            <anchorText>Google AdSense</anchorText>
+            <location>http://www.google.com/search?q=Google+AdSense</location>
+          </link>
+          <link type="a">
+            <anchorText>SER Categories</anchorText>
+            <location>http://www.seroundtable.com/archives.html#category</location>
+          </link>
+          <link type="a">
+            <anchorText>what is Google Co-op</anchorText>
+            <location>http://www.seroundtable.com/archives/003796.html</location>
+          </link>
+          <link type="a">
+            <anchorText>by clicking here</anchorText>
+            <location>http://www.google.com/coop/profile?user=015090516856763095929</location>
+          </link>
+          <link type="a">
+            <anchorText>Link Building</anchorText>
+            <location>http://www.google.com/search?q=Link+Building</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google AdSense</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="57E3FF55199853DF2777EF6B8DC24516" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1149969689989</modifiedDate>
+        <httpServer>Apache</httpServer>
+        <urls>
+          <url>http://searchenginewatch.com/searchday/article.php/3612406</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>Links to the week's topics from search engine forums across the web. What Top 5 Skills Would You Study to Become a Better SEO? Search Engine Watch Forums "What skills would you put on your Matrix 'must have' list for your career path or becoming a better SEM/SEO?" Google Browser Sync For FireFox Webmaster World "Google Browser Sync for Firefox is an extension that continuously synchronizes your browser settings; including bookmarks, history, persistent cookies, and saved passwords; across your computers." Google Office Continued: Spreadsheet Application Launched Cre8asite Forums "Email, note taking, calendaring, word processing (Writely) and now spreadsheet. Google Office doesn't launch, it simply evolves, arrives, arises." Google Goes to Congress to Block IAPs Charging for Faster Data Webmaster World "Google Inc. co-founder Sergey Brin worked the halls of Congress Tuesday, asking members including Republican Sen. John McCain to block Internet access providers from charging Web sites more to deliver data faster to consumers." Brin Says Google Compromised Principles Webmaster World "Google Inc. co-founder Sergey Brin acknowledged Tuesday the dominant Internet company has compromised its principles by accommodating Chinese censorship demands. He said Google is wrestling to make the deal work before deciding whether to reverse course." Separate Page for PPC? WebProWorld Forum "We don't have an ecommerce site because we actually have to talk to people to complete a transaction. It has been hard to know if a PPC made the trade or a call because of our rankings." Does Citing Sources Help Rankings? V7N Forum "Some sites cite their sources at the end of the article which is great for users because it lessens possibility of rumor / myth. I also remember hearing about something similar to PR [PageRank] but "TR" as in Trust Rank from Google. I don't know if this is real, but could citing your sources help your rankings on individual articles?" Cache Problems Growing for Directories? Search Engine Watch Forums "Is Google's love affair with quality directories over since the Big Daddy update?" Is Reciprocal Linking Dead High Rankings Forum "Reciprocal linking isn't dead, merely the poster child for stupid linking if it's all you do." June 2006: Start of the Traditional Summer Slump Webmaster World "I was researching through past threads relevant to Summer and it seemed there are numerous instances of webmasters complaining of a Summer Slump. While it doesn't affect publishers across the board, it appears that there is a Summer Slump phenomenon. Should you be prepared? Let's discuss what you might be doing today to protect your revenue tomorrow." Search Engine Forums Spotlight courtesy Search Engine Guide.</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Search Engine Forums Spotlight</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>June 2006: Start of the Traditional Summer Slump</anchorText>
+            <location>http://www.webmasterworld.com/forum89/14428.htm</location>
+          </link>
+          <link type="a">
+            <anchorText>Google Goes to Congress to Block IAPs Charging for Faster Data</anchorText>
+            <location>http://www.webmasterworld.com/forum86/4531.htm</location>
+          </link>
+          <link type="a">
+            <anchorText>Search Engine Guide</anchorText>
+            <location>http://www.searchengineguide.com/</location>
+          </link>
+          <link type="a">
+            <anchorText>Does Citing Sources Help Rankings?</anchorText>
+            <location>http://www.v7n.com/forums/google-forum/31501-does-citing-sources-help-rankings.html</location>
+          </link>
+          <link type="a">
+            <anchorText>Cache Problems Growing for Directories?</anchorText>
+            <location>http://forums.searchenginewatch.com/showthread.php?threadid=11916</location>
+          </link>
+          <link type="a">
+            <anchorText>What Top 5 Skills Would You Study to Become a Better SEO?</anchorText>
+            <location>http://forums.searchenginewatch.com/showthread.php?t=11945</location>
+          </link>
+          <link type="a">
+            <anchorText>Google Office Continued: Spreadsheet Application Launched</anchorText>
+            <location>http://www.cre8asiteforums.com/forums/index.php?showtopic=37455</location>
+          </link>
+          <link type="a">
+            <anchorText>Separate Page for PPC?</anchorText>
+            <location>http://www.webproworld.com/viewtopic.php?t=64119</location>
+          </link>
+          <link type="a">
+            <anchorText>Brin Says Google Compromised Principles</anchorText>
+            <location>http://www.webmasterworld.com/forum86/4529.htm</location>
+          </link>
+          <link type="a">
+            <anchorText>Is Reciprocal Linking Dead</anchorText>
+            <location>http://www.highrankings.com/forum/index.php?showtopic=22885</location>
+          </link>
+          <link type="a">
+            <anchorText>Google Browser Sync For FireFox</anchorText>
+            <location>http://www.webmasterworld.com/forum30/34677.htm</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+      <semantic_unit><named_entity><form>John McCain</form><named_entity_type>person</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Sergey Brin</form><named_entity_type>person</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Brin</form><named_entity_type>person</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google Inc</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Reciprocal</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google Office</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Firefox</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google Browser</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="3DAB2F05CBCFBD7765C7E71C63E6FFE8" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1145563212583</modifiedDate>
+        <httpServer>Apache/2.0</httpServer>
+        <urls>
+          <url>http://google.weblogsinc.com/2006/04/20/google-has-been-testing-google-base-in-search-results/</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>Google is always hard at work fine tuning and trying out new search strategies. Apparantly Google is now hard at work integrating Google Base car searches into the organic results says Jason Dowdell. He recently came across a car search field while looking up the term "ford escape". Jason has guessed that this integration effort was to increase the amount of users to the Google Base system, and monetize it further. This monetization will pit them right into eBays alley. Google Base has been found to be integrating into the Google Organic Search results every once and a while for different terms, trying to draw traffic into the place where you can submit anything.</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Google has been Testing Google Base in Search Results</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>Google Base</anchorText>
+            <location>http://base.google.com/</location>
+          </link>
+          <link type="a">
+            <anchorText>ford escape</anchorText>
+            <location>http://www.marketingshift.com/images/google-car-search.jpg</location>
+          </link>
+          <link type="a">
+            <anchorText>Jason Dowdell</anchorText>
+            <location>http://www.marketingshift.com/2006/04/google-base-car-search-introduced-in.cfm</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+      <semantic_unit><named_entity><form>Jason Dowdell</form><named_entity_type>person</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>2</form><named_entity_type>person</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Organic</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google Base</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+<documentRecord id="21CED09C683CE568F678E5A8E1683717" xmlns="http://alvis.info/enriched/">
+    <acquisition>
+      <acquisitionData>
+        <modifiedDate>1147533167955</modifiedDate>
+        <httpServer>Apache/2.0</httpServer>
+        <urls>
+          <url>http://sem.weblogsinc.com/2006/05/13/google-trends-for-search-marketing/</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>Google Trends is a hot new tool that uses the Google Zeitgeist to help users find facts and trends that are related to all of Google's usage around the world. Google Trends allows users to watch the collective interests of all of Google's users to gain an insight into the topics people search. The Google Trends system analyzes a section of the Google searches, and calculates how many searches have been done for specific terms. It calculates this against the total number of searches done on Google over a period of time. Best of all, Google displays a graph with results, and search volume. This is a pretty powerful search marketing tool that you can use for research and tracking purposes on keyword combinations.</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">Google Trends for Search Marketing</meta>
+        <meta name="dc:type">text/html</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>Google Trends</anchorText>
+            <location>http://www.google.com/trends</location>
+          </link>
+        </outlinks>
+      </links>
+    </acquisition>
+  <linguisticAnalysis>
+    <semantic_unit_level>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>11</form><named_entity_type>comp</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>10</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>Google Zeitgeist</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+      <semantic_unit><named_entity><form>1</form><named_entity_type>soft</named_entity_type></named_entity></semantic_unit>
+    </semantic_unit_level>
+  </linguisticAnalysis>
+
+  </documentRecord>
+</documentCollection>

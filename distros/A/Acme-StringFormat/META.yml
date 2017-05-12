@@ -1,0 +1,23 @@
+---
+abstract: 'Smart interface to sprintf()'
+author:
+  - 'Goro Fuji <gfuji(at)cpan.org>.'
+build_requires:
+  Test::Exception: 0.27
+  Test::Warn: 0.11
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-StringFormat
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.01
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

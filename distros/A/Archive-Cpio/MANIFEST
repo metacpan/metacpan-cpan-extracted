@@ -1,0 +1,14 @@
+bin/cpio-filter
+Changes
+lib/Archive/Cpio.pm
+lib/Archive/Cpio/Common.pm
+lib/Archive/Cpio/File.pm
+lib/Archive/Cpio/FileHandle_with_pushback.pm
+lib/Archive/Cpio/NewAscii.pm
+lib/Archive/Cpio/ODC.pm
+lib/Archive/Cpio/OldBinary.pm
+Makefile.PL
+MANIFEST			This list of files
+t/00basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

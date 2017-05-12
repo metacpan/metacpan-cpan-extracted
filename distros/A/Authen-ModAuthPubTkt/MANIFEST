@@ -1,0 +1,28 @@
+Changes
+ignore.txt
+lib/Authen/ModAuthPubTkt.pm
+Makefile.PL
+MANIFEST
+README
+t/test_keys/rsa.priv.pem
+t/test_keys/rsa.priv2.pem
+t/test_keys/rsa.pub.pem
+t/test_keys/rsa.pub_bad.pem
+t/test_keys/dsa.priv.pem
+t/test_keys/dsa.pub.pem
+t/00-load.t
+t/boilerplate.t
+t/01-generate-rsa.t
+t/02-generate-dsa.t
+t/03-verify-rsa.t
+t/04-verify-dsa.t
+t/05-wrong-rsa-key-file.t
+t/06-bad-rsa-key-file.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+eg/mod_auth_pubtkt.pl
+eg/generate_rsa_keys.sh
+eg/generate_dsa_keys.sh
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,31 @@
+---
+abstract: 'Build Moose objects from a data array'
+author:
+  - 'Sam Brain <samb@stanford.edu>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Array-To-Moose
+provides:
+  Array::To::Moose:
+    file: lib/Array/To/Moose.pm
+    version: v0.0.9
+requires:
+  Array::GroupBy: 0
+  Carp: 0
+  Data::Dumper: 0
+  Moose: 0
+  MooseX::StrictConstructor: 0
+  Params::Validate::Array: 0
+  Test::More: 0
+  namespace::autoclean: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.9

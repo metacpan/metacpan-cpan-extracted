@@ -1,0 +1,37 @@
+Installation Instructions
+----------------------------------
+
+* Install from CPAN
+
+cpanm AnyMongo
+
+
+* Install/Build snapshot code from git repository
+
+AnyMongo build tool is powered by Dist::Zilla and some of its plugins.
+If you want to build from github, you must have installed follow modules:
+
+- Dist::Zilla
+- Dist::Zilla::Plugin::PodWeaver
+- Dist::Zilla::Plugin::ReadmeFromPod
+- Dist::Zilla::Plugin::CopyReadmeFromBuild
+- Dist::Zilla::Plugin::MakeMaker::Awesome
+- Dist::Zilla::Plugin::Git
+
+If you have cpanm, you can quick install above moudles by run 'prepare_dzil_buildtools.sh' script.
+
+* No cpanm ? Run the following command and it will install itself for you:
+
+curl -L http://cpanmin.us | perl - --self-upgrade
+
+
+After install the depended modules, you can build/test with Dist::Zilla:
+
+# build
+dzil build
+
+# test
+dzil test
+
+# install
+dzil install

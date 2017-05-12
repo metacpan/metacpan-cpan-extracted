@@ -1,0 +1,37 @@
+NAME
+
+Apache::FormatLog
+
+SYNOPSIS
+
+use Apache::FormatLog;
+$lf = Apache::FormatLog->new($r);
+$logdata = $lf->getLogData();
+$logline = $lf->toString();
+
+
+DESCRIPTION
+
+Apache::FormatLog is the base interface module for creating FormatLogs from mod_perl.
+There are currently two extensions available: Apache::FormatLog::Common,
+and Apache::FormatLog::Combined. The default distribution comes with these two modules.
+
+ABOUT
+
+The Apache::LogFormat module uses it's own function for date formatting.
+This is done because existing modules for extensive date formatting are quite heavy 
+to use on a high load platform like apache can be. 
+Especially the algorithm for calculating and formatting the time zone offset deserved
+my special attention.
+
+
+AUTHOR
+
+Leendert Bottelberghs <lbottel@cpan.org>
+
+COPYRIGHT
+
+Copyright (c) 2005, Leendert Bottelberghs.  All rights reserved.
+
+This module is free software.  It may be used, redistributed
+and/or modified under the same terms as Perl itself.

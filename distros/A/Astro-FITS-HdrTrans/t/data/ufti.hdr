@@ -1,0 +1,155 @@
+
+                                 Identification:
+TELESCOP= 'UKIRT             ' / Telescope name
+INSTRUME= 'UFTI              ' / Instrument
+ORIGIN  = 'UFTI data Acquisition' / Organization creating the file
+DHSVER  = 'UKDHS 1999 June 18' / Data handling version
+DATE    = '2005-02-15'         / Date (UTC) when file was created
+OBSERVER= 'nobody  '           / Observers present
+USERID  = 'nobody  '           / Userid logged in as
+OBSREF  = '00      '           / PATT or other reference
+PROJECT = 'U/05A/20'           / Time-allocation code
+MSBID   = '4d3ea04867c8eb1b8bdb9e2621e75854' / Id min.-schedulable block
+
+                                 eStar headers:
+RMTAGENT= 'none    '           / Name of remote agent
+AGENTID = 'none    '           / Unique identifier for remote agent
+
+OBJECT  = '1602-174'           / Object name from telescope
+
+                                 Data Reduction:
+RECIPE  = 'JITTER_SELF_FLAT'   / Data reduction recipe to be used
+OBSNUM  =                  103 / Observation number
+GRPNUM  =                   59 / The number of the group applied to all members
+GRPMEM  =                    T / Group membership
+STANDARD=                    F / Is the target a standard star observation
+NOFFSETS=                   10 / Number of offset positions in a pattern
+OBSTYPE = 'OBJECT  '           / Type of observation
+
+                                 Astrometric and time information:
+DATE-OBS= '2005-02-15T15:14:01Z' / Date and time (UTC) of start of observation
+DATE-END= '2005-02-15T15:15:08Z' / Date and time (UTC) of end   of observation
+EQUINOX =             2000.000 /  Equinox of object position
+CTYPE1  = 'Detector Columns'   / Label for axis 1
+CRPIX1  =                0.500 / Pixel of reference point axis 1
+CRVAL1  =                0.000 / Co-ordinate value of axis 1
+CDELT1  =            0.0908500 / Co-ordinate increment along axis 1
+CUNIT1  = 'arcsec  '           / Units for axis 1
+CTYPE2  = 'Detector Rows'      / Label for axis 2
+CRPIX2  =                0.500 / Pixel of reference point axis 2
+CRVAL2  =                0.000 / Co-ordinate value of axis 2
+CDELT2  =            0.0908500 / Co-ordinate increment along axis 2
+CUNIT2  = 'arcsec  '           / Units for axis 2
+CROTA2  =                0.827 / [deg] Angle DEC axis wrt axis 2 ccw
+RABASE  =           16.0839888 / [h] RA base position
+DECBASE =          -17.5698611 / [deg] DEC base position
+TRAOFF  =                0.000 / [arcsec] RA telescope offset
+TDECOFF =              -12.000 / [arcsec] DEC telescope offset
+AMSTART =                1.378 / Airmass at start of observation
+AMEND   =                1.375 / Airmass at end of observation
+
+                                 Instrument aperture:
+APER_X  =               -6.980 / [arcsec] Aperture X axis coordinate
+APER_Y  =                0.500 / [arcsec] Aperture Y axis coordinate
+
+ISU2PORT= 'West    '           / ISU2 port name
+ISU2POFF=                  -10 / ISU2 port offset
+ISU2TOFF=                  -40 / ISU2 tilt offset
+GUIDFFOC=               -0.569 / Fast guider CCD fine focus
+
+IZ5     =             1275.000 / Astigmatism: IZ5
+HZ5SH   =             -890.000 / Astigmatism: HZ5SH
+HZ5CH   =              110.000 / Astigmatism: HZ5CH
+HZ5SD   =            -1530.000 / Astigmatism: HZ5SD
+HZ5CD   =                0.000 / Astigmatism: HZ5CD
+IZ6     =            -1462.000 / Astigmatism: IZ6
+HZ6SH   =             -846.000 / Astigmatism: HZ6SH
+HZ6CH   =              200.000 / Astigmatism: HZ6CH
+HZ6SD   =              165.000 / Astigmatism: HZ6SD
+HZ6CD   =              930.000 / Astigmatism: HZ6CD
+Z7      =             -739.000 / Coma: Z7
+Z8      =             1063.000 / Coma: Z8
+WEBEAM  =             -739.000 / Topend: W-E beam
+NSBEAM  =               45.000 / Topend: N-S beam
+IZ9     =             -358.000 / Trefoil: IZ9
+HZ9SH   =              125.000 / Trefoil: HZ9SH
+HZ9CH   =                0.000 / Trefoil: HZ9CH
+HZ9SD   =               90.000 / Trefoil: HZ9SD
+HZ9CD   =                0.000 / Trefoil: HZ9CD
+IZ10    =              285.000 / Trefoil: IZ10
+HZ10SH  =              114.000 / Trefoil: HZ10SH
+HZ10CH  =                0.000 / Trefoil: HZ10CH
+HZ10SD  =             -117.000 / Trefoil: HZ10SD
+HZ10CD  =                0.000 / Trefoil: HZ10CD
+Z11     =              300.000 / Spherical: Z11
+AAMP    =             2190.349 / Astigmatism: amplitude
+APHI    =               -1.479 / Astigmatism: angle
+TAMP    =              514.421 / Trefoil: Amplitude
+TPHI    =               49.173 / Trefoil: angle
+AGFREQ  =              100.000 / Autoguider: Frequency
+FGMODE  = 'Fast Guider'        / Fast guider mode
+
+UTSTART =               15.243 / [h] Start time of observation
+UTEND   =               15.261 / [h] End time of observation
+
+                                 Environment:
+AIRTEMP =              -65.546 / [degC] Air temperature
+BARPRESS=              614.042 / Ambient pressure
+DEWPOINT=              -75.584 / [degC] Dewpoint
+DOMETEMP=               -1.574 / [degC] Dome temperature
+HUMIDITY=               23.001 / Relative Humidity
+MIRR_NE =               -0.830 / [degC] Mirror temperature NE
+MIRR_NW =               -0.504 / [degC] Mirror temperature NW
+MIRR_SE =               -1.483 / [degC] Mirror temperature SE
+MIRR_SW =               -1.103 / [degC] Mirror temperature SW
+MIRRBTNW=                1.728 / [degC] Mirror bottom temp. SW
+MIRRTPNW=                0.336 / [degC] Mirror top temp. SW
+SECONDAR=               -2.702 / [degC] Temperature of secondary
+TOPAIRNW=               -1.010 / [degC] Top air NW
+TRUSSENE=               -0.258 / [degC] Truss leg ENE
+TRUSSWSW=               -2.149 / [degC] Truss leg WSW
+WIND_DIR=              342.323 / [deg] Wind direction, azimuth
+WIND_SPD=               24.634 / [km/s] Wind speed
+CSOTAU  =                0.047 / Tau at 225 GHz from CSO
+TAUDATE = '2005-02-15T15:00'   / Time and date of Tau reading
+TAUSRC  = 'CSO225GHZ'          / Source of opacity data
+
+
+                                 Instrument configuration:
+EXP_TIME=               60.000 / [s] Integration time per exposure
+INT_TIME=               60.000 / [s] Total exposure time for integration
+NEXP    =                    1 / Number of exposures in integration
+MODE    = 'NDSTARE '           / Readout mode - stare | NDstare
+SPD_GAIN= 'Normal  '           / Readout speed (normal | fast) or high gain
+GAIN    =                5.454 / [e/ADU] Detector gain
+FILTER  = 'K98     '           / Combined filter name
+FILTER1 = 'K98     '           / Filter in wheel 1
+FILTER2 = 'Open    '           / Filter in wheel 2
+WPLANGLE=                0.000 / [deg] IRPOL waveplate angle
+FP_X    =                    0 / Fabry Perot X
+FP_Y    =                    0 / Fabry Perot Y
+FP_Z    =                    0 / Fabry Perot Z
+DETECTOR= 'Hawaii 1'           / Detector array used
+DROWS   =                 1024 / [pixel] Number of detectors in a row
+DCOLUMNS=                 1024 / [pixel] Number of detectors in a column
+RDOUT_X1=                    1 / Start column of array readout
+RDOUT_X2=                 1024 / End   column of array readout
+RDOUT_Y1=                    1 / Start row    of array readout
+RDOUT_Y2=                 1024 / End   row    of array readout
+
+                                 Engineering:
+USPPIXEL=                3.666 / [us/pixel] Read rate
+BLACKLEV=                 1000 / [adu] Blacklevel
+DCS_GAIN=                   12 / integral gain value
+DCSSPEED=                   21 / DCS integration time
+
+V1      =              -10.900 / [V] -15 V supply
+V2      =               -9.400 / [V] -9 V supply
+V3      =               -5.200 / [V] -5 V supply
+V4      =               23.400 / [V] +30 V supply
+V5      =               12.300 / [V] +15 V supply
+V6      =                9.300 / [V] +9 V supply
+V7      =                5.100 / [V] +5 V supply
+V8      =                5.000 / [V] Digital
+V13     =               -0.100 / [V] Analog in
+V15     =             -273.000 / Temperature sensor on motherboard

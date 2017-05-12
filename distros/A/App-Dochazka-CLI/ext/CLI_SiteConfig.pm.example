@@ -1,0 +1,51 @@
+#
+# CLI_SiteConfig.pm
+#
+# App::Dochazka::CLI configuration parameters that employees (users)
+# might need to change the default values of.
+#
+# The first argument to "set()" is the name of the configuration parameter, and
+# the second argument is its value. The values shown below are the defaults.
+#
+# To keep the default value, do nothing.
+#
+# To override a default, uncomment the "set" call and change the value. 
+#
+
+# DOCHAZKA_REST_LOGIN_NICK
+#     nick to use when we authenticate ourselves to the App::Dochazka::REST server
+#     when this is set to '' or undef, App::Dochazka::CLI will prompt for it
+#set( 'DOCHAZKA_REST_LOGIN_NICK', undef );
+
+# DOCHAZKA_REST_LOGIN_NICK
+#     password to use when we authenticate ourselves to the App::Dochazka::REST server
+#     when this is set to '' or undef, App::Dochazka::CLI will prompt for a password
+#     WARNING: PUTTING YOUR PASSWORD HERE MAY BE CONVENIENT, BUT IS PROBABLY UNSAFE
+#set( 'DOCHAZKA_REST_LOGIN_PASSWORD', undef );
+
+# MREST_CLI_COOKIE_JAR
+#     default location of the cookie jar
+#set( 'MREST_CLI_COOKIE_JAR', "$ENV{HOME}/.cookies.txt" );
+
+# DOCHAZKA_CLI_LOG_FILE
+#     default location of the log file
+#set( 'DOCHAZKA_CLI_LOG_FILE', "$ENV{HOME}/.dochazka-cli.log" );
+
+# MREST_CLI_SUPPRESSED_HEADERS
+#     list of headers to be suppressed in the output
+#set ('MREST_CLI_SUPPRESSED_HEADERS', [ qw( 
+#    accept content-type content-length cache-control pragma expires
+#    server Client-Response-Num Client-Peer Client-Date Set-Cookie Date
+#    Vary Client-SSL-Cert-Subject Client-SSL-Cipher
+#    Client-SSL-Socket-Class Client-SSL-Cert-Issuer Connection
+#    Strict-Transport-Security
+#) ] );
+
+
+# -----------------------------------
+# DO NOT EDIT ANYTHING BELOW THIS LINE
+# -----------------------------------
+use strict;
+use warnings;
+
+1;

@@ -1,0 +1,5 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/Authen/SASL/Authd.pm
+META.yml                                 Module meta-data (added by MakeMaker)

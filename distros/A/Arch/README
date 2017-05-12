@@ -1,0 +1,25 @@
+Welcome to Arch-Perl 0.5.2.
+
+The arch-perl project aims to create Perl library for GNU Arch.
+http://migo.sixbit.org/software/arch-perl/
+
+A pragmatic high-level interface is built around tla or baz
+(that is a fork of tla, before it was obsoleted in favour of bzr).
+
+This functionality was initially developed for ArchZoom project,
+and was highly enhanced to serve AXP and ArchWay projects as well.
+
+Feel free to participate in creating the best possible design.
+
+arch-perl is tested with perl-5.00503, perl-5.6.x, perl-5.8.x and perl-5.10.x.
+arch-perl is tested with tla-1.1, tla-1.2, tla-1.3, tla-1.3.1, tla-1.3.3.
+arch-perl is tested with baz-1.1, baz-1.2, baz-1.3, baz-1.3.2, baz-1.4.2.
+Use environment variable ARCH_BACKEND to set path to tla or baz.
+
+-- 
+Mikhael Goikhman <migo@homemail.com>
+
+Commands to obtain the latest development code:
+
+% tla register-archive http://arch.wox.org/migo@homemail.com--Perl-GPL/
+% tla get migo@homemail.com--Perl-GPL/arch-perl--devel--0

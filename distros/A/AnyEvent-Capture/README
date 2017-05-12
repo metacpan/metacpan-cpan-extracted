@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution AnyEvent-Capture,
+version 0.1.1:
+
+  Call asynchronous APIs synchronously
+
+This software is copyright (c) 2012 by Rebecca Turner.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+INSTALL
+lib/App/OpenVZ/BCWatch.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+scripts/vzwatchd
+t/00-load.t
+t/basic.t
+t/data/user_beancounters
+t/pod-coverage.t
+t/pod.t

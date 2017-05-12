@@ -1,0 +1,67 @@
+{
+   "abstract" : "Creates .info file for use with Impressive and LaTeX Beamer",
+   "author" : [
+      "Joel A. Berger <joel.a.berger@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-makebeamerinfo",
+   "no_index" : {
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Tk" : "0"
+         },
+         "requires" : {
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "App::makebeamerinfo" : {
+         "file" : "lib/App/makebeamerinfo.pm",
+         "version" : "2.002"
+      },
+      "App::makebeamerinfo::CLI" : {
+         "file" : "lib/App/makebeamerinfo/CLI.pm",
+         "version" : 0
+      },
+      "App::makebeamerinfo::GUI" : {
+         "file" : "lib/App/makebeamerinfo/GUI.pm",
+         "version" : 0
+      },
+      "App::makebeamerinfo::Transitions" : {
+         "file" : "lib/App/makebeamerinfo/Transitions.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/MakeBeamerInfo/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/MakeBeamerInfo"
+      }
+   },
+   "version" : "2.002"
+}

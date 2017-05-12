@@ -1,0 +1,6 @@
+Revision history for Perl extension Acme::MyFirstModule::RAYMONDJM.
+
+0.01  Thu Aug 14 19:41:46 2014
+	- original version; created by h2xs 1.23 with options
+		-AXn Acme::MyFirstModule::RAYMONDJM
+

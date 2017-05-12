@@ -1,0 +1,42 @@
+{
+   "abstract" : "The final module in Intermediate Perl!",
+   "author" : [
+      "Alex Deas <alex@toothball.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-ADEAS-Utils",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::ADEAS::Utils" : {
+         "file" : "lib/Acme/ADEAS/Utils.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ]
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

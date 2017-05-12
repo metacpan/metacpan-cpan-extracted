@@ -1,0 +1,477 @@
+html <!--> => <Comment> The comment tag includes the actual comment text. Any instance of --> ends the comment. Whitespace may be included between the -- and the > but not between the <! and the first --.
+example <!--> => <!-- comment text --> 
+html &lt; => <Escape Sequences> Escape sequences are used to enter characters such as <, >, &, and " into HTML documents.
+html <Escape Sequences> => Examples: &lt  &gt  &amp  &quot  &nbsp  &reg  &copy  &ensp  &emsp  &endash  &emdash 
+html <A> => <Anchor> The anchor tag defines either a link or an anchor in a document. The anchor tag must contain either a NAME attribute or an HREF attribute, or both.
+example <A> => <A NAME="anchor-name"> & <A HREF="#anchor-name">link-text</A> & <A HREF="url">link-text</A> & <A HREF="url#anchor-name">link-text </A>
+html <ABBREV> => <Abbreviation> The abbreviation tag defines an abbreviation. It is typically displayed just like normal text, but is used by automatic indexers.
+example <ABBREV> => <ABBREV> text </ABBREV>
+html <ACRONYM> => <Acronym> The acronym tag defines an acronym. It is typically displayed just like normal text, but is used by automatic indexers.
+example <ACRONYM> => <ACRONYM> text </ACRONYM>
+html <ADDRESS> => <Address> The address tag defines text that gives an address or other contact information. It is typically displayed in italics, slightly indented, and is used by automatic indexers. See also: <ADDRESS NOWRAP>
+example <ADDRESS> => <ADDRESS> text </ADDRESS>  <ADDRESS NOWRAP> text </ADDRESS>
+html <ADDRESS NOWRAP> => The NOWRAP attribute stops the browser from wrapping except where <BR>'s are.
+html <APPLET> => The Java applet tag runs a Java applet referred to by a URL. applet-content consists of optional PARAM tags, ordinary text & markup to be displayed by browsers that cannot run Java applets, and a TEXTFLOW tag if no ordinary text and markup is included
+example <APPLET> => <APPLET attributes> applet-content </APPLET>
+html <APPLET attributes> => Use the syntax: <APPLET "name of attribute"> for details of each of the various attributes.
+html <APPLET CODEBASE> => What "base" should be used when resolving source relative URLs. <APPLET CODEBASE="base"> 
+html <APPLET CODE> => The URL of the applet to be run. <APPLET CODE="code">
+html <APPLET NAME> => The name of the applet, or Identifies an applet to other applets within the HTML page. <APPLET NAME="applet name"> & <APPLET NAME=name> 
+html <APPLET ALIGN> => Here "alignment" should be one of LEFT, RIGHT, TOP, MIDDLE, or BOTTOM. <APPLET ALIGN="alignment">
+html <APPLET ALT> => Here "text" is the text to be displayed by a browser that does not support applets. <APPLET ALT="text">
+html <APPLET HEIGHT> => The height of the applet display area in pixels. <APPLET HEIGHT=number>
+html <APPLET WIDTH> => The width of the applet display area in pixels. <APPLET WIDTH=number>
+html <APPLET HSPACE> => The space, in pixels, to leave to the left and right of the applet display area. <APPLET HSPACE=number>
+html <APPLET VSPACE> => The space, in pixels, to leave above and below the applet display area. <APPLET VSPACE=number>
+html <APPLET DOWNLOAD> => This specifies the order in which they are downloaded. <APPLET DOWNLOAD=number>
+html <APPLET TITLE> => Specifies an advisory title string. <APPLET TITLE=text>
+html <AREA> => <Area> The area tag, valid only within a MAP, defines areas that act as hotspots within an image.
+example <AREA> => <AREA SHAPE="shape" ALT="text" CO-ORDS="co-ords" HREF="URL"> & <AREA SHAPE="shape" ALT="text" CO-ORDS="co-ords" HREF="URL" TARGET="target window name"> & <AREA SHAPE="shape" ALT="text" CO-ORDS="co-ords" NOHREF>
+html <AU> => <Author> The author tag defines text that names the author of a document. It is typically displayed just like normal text, but is used by automatic indexers.
+example <AU> => <AU> text </AU>
+html <AUTHOR> => The author tag defines text that names the author of a document. It is typically displayed just like normal text, but is used by automatic indexers.
+example <AUTHOR> => <AUTHOR> text </AUTHOR>
+html <B> => <Bold> The bold tag defines text that should be shown in boldface. It can be nested with other idiomatic or typographic tags but some browsers will respect only the innermost tag.
+example <B> => <B> text </B>
+html <BANNER> => <Banner> The banner element defines an image or block of text that does not scroll with the document and is displayed at the top of the screen as the user scrolls through the document.
+example <BANNER> => <BANNER attributes </BANNER> Details of the attributes are not yet available -- use a BANNER attribute in the <LINK> section of the <HEAD> 
+html <BASE> => <Base> The base tag, which is valid only in the HEAD section, defines the base address of an HTML document, which is used to determine the full address of relative URL's that appear in the document.
+example <BASE> => <BASE HREF="base address"> & <BASE TARGET="default target">
+html <BASEFONT> => <Base Font> The base font tag defines the base that relative FONT changes are based on. (Default is 3.)
+example <BASEFONT> => <BASEFONT SIZE=number>
+html <BGSOUND> => <Background Sound> The background sound tag identifies a .wav, .au, or.mid resource that will be played when the page is opened.
+example <BGSOUND> => <BGSOUND SRC="URL"> & <BGSOUND SRC="URL"LOOP=n>
+html <BGSOUND LOOP> => The optional LOOP attribute will cause the resource to be played n times.
+example <BGSOUND LOOP> => <BGSOUND SRC="URL"LOOP=n> LOOP="INFINITE" will cause the resource to be played continuously as long as the page is open.
+html <BIG> => <Big Text> The big text tag defines text that should be displayed in a larger font than usual.
+example <BIG> => <BIG> text </BIG>
+html <BLINK> => The blink tag highlights the text by having it blink on and off.
+example <BLINK> => <BLINK> text </BLINK>
+html <BLOCKQUOTE> => <BQ> The block quote tag defines text that is quoted from elsewhere. Many browsers (including Netscape) display it in an indented block surrounded by blank lines.
+example <BLOCKQUOTE> => <BLOCKQUOTE> text </BLOCKQUOTE>  & <BQ> text </BQ> & <BQ CLEAR = attributes> text </BQ> & <BQ NOWRAP> text </BQ>
+html <BQ CLEAR> => In HTML 3.0, the CLEAR attribute is used to position a quote after a graphic: it can be LEFT, RIGHT, or ALL and specifies which margin should be clear. <BQ CLEAR = attributes> text </BQ>
+html <BQ NOWRAP> => The NOWRAP attribute stops the browser from wrapping except at a BR tag. <BQ NOWRAP> text </BQ> 
+html <BQ> => See: html <BLOCKQUOTE>
+html <BODY> => <Body> The body tag introduces the body of the document. It should appear after the head section and occupy the remainder of the document.
+example <BODY> => <BODY> document-body </BODY> & See also: <BODY attributes>
+html <BODY attributes> => the syntax use to retrive factoids on the attributes of the <BODY> tag, example: <BODY BACKGROUND>
+html <BODY BACKGROUND> => The BACKGROUND attribute specifies an image file to use as the background for the page. <BODY BACKGROUND="URL"> document-body </BODY>
+html <BODY BGCOLOR> => The BGCOLOR attribute specify the colours to be used for the background. <BODY BGCOLOR="#rrggbb"> document-body </BODY> & <BODY BGCOLOR="colorname"> document-body </BODY>
+html <BODY TEXT> => The TEXT attribute specify the colours to be used for the text. <BODY TEXT="#rrggbb"> document-body </BODY> & <BODY TEXT="colorname"> document-body </BODY>
+html <BODY LINK> => The LINK attribute specify the colours to be used for the LINK. (An link is active for the moment the user clicks on it, & changes colour to confirm it has been clicked.) See: example <BODY LINK>
+example <BODY LINK> => <BODY LINK="#rrggbb"> document-body </BODY> & <BODY LINK="colorname"> document-body </BODY>
+html <BODY ALINK> => The ALINK attribute specify the colours to be used for the ALINK. (An link is active for the moment the user clicks on it, & changes colour to confirm it has been clicked.) See: example <BODY ALINK>
+example <BODY ALINK> => <BODY ALINK="#rrggbb"> document-body </BODY> & <BODY ALINK="colorname"> document-body </BODY>
+html <BODY VLINK> => The VLINK attribute specify the colours to be used for the VLINK. (An link is active for the moment the user clicks on it, & changes colour to confirm it has been clicked.) See: example <BODY VLINK>
+example <BODY VLINK> => <BODY VLINK="#rrggbb"> document-body </BODY> & <BODY VLINK="colorname"> document-body </BODY>
+html <BODY LEFTMARGIN> => The LEFTMARGIN attribute set the margin at the left of the document, in pixels. <BODY LEFTMARGIN=margin> document-body </BODY>
+html <BODY TOPMARGIN> => The TOPMARGIN attributes set the margin at the top of the document, in pixels. <BODY TOPMARGIN=margin> document-body </BODY>
+html <BODY BGPROPERTieS> => The BGPROPERTIES attribute causes the background image (set with the BACKGROUND attribute) to remain fixed as the document scrolls: a watermark effect. See: example <BODY BGPROPERTieS>
+example <BODY BGPROPERTieS> => <BODY BGPROPERTieS="FIXED"> document-body</BODY>
+html <BR> => <Line Break> The line break tag breaks the current line of text. It's not necessary inside a PRE element. There is no </BR> tag.
+example <BR> => <BR> & <BR CLEAR> & <BR CLEAR="type">
+html <BR CLEAR> => CLEAR attribute type can be LEFT to break until there is nothing to the left, RIGHT for the right side, all for break until both sides are clear & NONE for a normal break.
+html <CAPTION> => <Caption> The caption tag defines the caption of a figure or table. It is valid only within FIG or TABLE tags.
+example <CAPTION> => <CAPTION> text </CAPTION> & <CAPTION ALIGN=alignment> text </CAPTION> & <CAPTION VALIGN=vertical-alignment> text </CAPTION>
+html <CAPTION ALIGN> => The ALIGN attribute arranges for the caption to be at the TOP or BOTTOM of the table or figure. See: <CAPTION ALIGN> 2
+html <CAPTION ALIGN> 2 => The ALIGN attribute sets the alignment of the caption within the table or figure border. It can be LEFT, RIGHT, or CENTER.
+example <CAPTION ALIGN> => <CAPTION ALIGN=alignment> text </CAPTION>
+html <CAPTION VALIGN> => The VALIGN attribute arranges for the caption to be at the TOP or BOTTOM of the table or figure.
+example <CAPTION VALIGN> => <CAPTION VALIGN=vertical-alignment> text </CAPTION>
+html <CENTER> => <Center> The center tag defines text that should be centered. Example: <CENTER> text</CENTER>
+html <CITE> => <Citation> The citation tag defines text that cites a book or other work - most browsers will display it in italics. It can be nested with other idiomatic/typographic tags but some browsers will respect only the innermost tag
+example <CITE> => <CITE> text </CITE>
+html <CODE> => The code tag defines text that should be shown in a fixed width font. It can be nested with other idiomatic or typographic tags but some browsers will respect only the innermost tag. See: <CODE> 2
+html <CODE> 2 => Many browsers use the same font for the KBD, SAMP, TT & CODE tags. For many lines of fixed width text, with the line breaks and other whitespace specified by the page author, use the <PRE> tag.
+example <CODE> => <CODE> text </CODE>
+html <COL> => <Table Column> The <COL> tag sets the properties of one table column at a time. Do not use this tag with a COLGROUP element.
+example <COL> => <COL> content </COL> & <COL ALIGN=alignment> content </COL> & <COL SPAN=number> content </COL>
+html <COL ALIGN> => The ALIGN attribute specifies the text alignment in the cells within the colums. The values for "alignment" are LEFT, MIDDLE & RIGHT and the default is MIDDLE.
+example <COL ALIGN> => <COL ALIGN=alignment> content </COL>
+example <COL SPAN> => <COL SPAN=number> content </COL>
+html <COLGROUP> => <Table Column Group> The COLGROUP tag sets the properties of one or more table columns. ( Attributes = SPAN, WIDTH, HALIGN, VALIGN & ALIGN )
+example <COLGROUP> => A few examples: <COLGROUP> column data </COLGROUP> & <COLGROUP ALIGN="align"> column data </COLGROUP> & <COLGROUP WIDTH="width"> column data </COLGROUP>
+example <COLGROUP ALIGN> => <COLGROUP ALIGN="align"> column data </COLGROUP>
+html <COLGROUP HALIGN> => The HALIGN attribute specifies the horizontal alignment of text in the cells for the column group. The values: LEFT, RIGHT and CENTER (the default.)
+example <COLGROUP HALIGN> => <COLGROUP HALIGN="halign"> column data </COLGROUP>
+html <COLGROUP VALIGN> => The VALIGN attribute sets the vertical alignment for the column. The values are TOP, MIDDLE (the default,) and BOTTOM.
+example <COLGROUP VALIGN> => <COLGROUP VALIGN="valign"> column data </COLGROUP>
+html <COLGROUP WIDTH> => The WIDTH attribute specifies the width of each column in the column group.
+example <COLGROUP WIDTH> => <COLGROUP WIDTH="width"> column data </COLGROUP>
+html <COLGROUP SPAN> => The SPAN attribute sets the number of consecutive columns for the group.
+example <COLGROUP SPAN> => <COLGROUP SPAN="number"> column data </COLGROUP>
+html <CREDIT> => <Credit> The credit tag defines text that credits a figure or quote. It is valid only within FIG or BQ tags. Example: <CREDIT> text </CREDIT>
+html <DEL> => <Deleted Text> The deleted text tag marks text that has been deleted, for example in a group authoring situation or a legal document. Example: <DEL> list entries </DEL>
+html <DFN> => <Definition> The definition tag defines text that defines a term -- many browsers will display it in italics, though others will ignore it.
+example <DFN> => It can be nested with other idiomatic or typographic tags but some browsers will respect only the innermost tag. <DFN> text </DFN>
+html <DIR> => <Directory List> The directory list tag introduces a directory list, which is made up of List Item (LI) tags and does not include bullets or numbers before them. See: <DIR> 2, 3 & 4
+html <DIR> 2 => The items should be short so that they can be arranged into columns. For a bulleted list use UL.
+html <DIR> 3 => For a numbered list use OL. For a list without bullets or numbers that is not arranged into columns use MENU.
+html <DIR> 4 => In HTML 3.0, the same effect can be achieved with <UL PLAIN WRAP=HORIZ>. The DIR tag will probably be obsolete some day, so use UL.
+example <DIR> => <DIR> list entries </DIR> & <DIR COMPACT> list entries </DIR>
+html <DIR COMPACT> => The COMPACT attribute instructs the browser to reduce the space occupied by the list.
+example <DIR COMPACT> => <DIR COMPACT> list entries </DIR>
+html <DIV> => <Division> The division tag is used to divide a document up into different sections, such as chapters, sections, abstract, and appendix.
+example <DIV> => <DIV ALIGN=align> & <DIV CLASS=class> & <DIV CLASS=class NOWRAP> & <DIV =clear> & <DIV =lang>
+html <DIV ALIGN> => The ALIGN attribute can be one of LEFT, RIGHT, or CENTER. Example: <DIV ALIGN=align>
+html <DIV CLASS> => The CLASS attribute that specifies what section this is. Example: <DIV CLASS=class>
+html <DIV NOWRAP> => NOWRAP attribute stops the browser from wrapping except where <BR>'s are included in the document. Example: <DIV CLASS=class NOWRAP>
+html <DIV =lang> => Indicates the ISO standard language. Enter the standard abbreviation to indicate the language of the element. ( LANG=iso )   
+html <DL> => The definition list tag introduces a definition list or glossary, which is made up of term (DT) and definition (DD) items. The </DT> and </DD> tags are optional. See: <DL> 2
+html <DL> 2 => Typically the definitions are indented under each term, with no blank lines around them. A list heading (LH) may be included before the first definition term.
+example <DL> => <DL> list entries </DL> & <DL COMPACT> list entries </DL> & <DT> term & <DD> definition
+html <DL COMPACT> => If COMPACT was specified (and the terms are short) the terms and definitions are on the same line. Do not use multiple DD elements for the same DT -- instead use BR within the DD.
+example <DL COMPACT> => <DL COMPACT> list entries </DL>
+html <DT> => <Definition Term> See: <DL>
+html <DD> => <Definition Definition> Do not use multiple DD elements for the same DT -- instead use BR within the DD. See: <DL>
+html <EM> => <Emphasized> The emphasized tag defines text that should be emphasized -- most browsers will display it in italics. See: <EM> 2
+html <EM> 2 => It can be nested with other idiomatic or typographic tags but some browsers will respect only the innermost tag.
+example <EM> => <EM> text </EM>
+html <EMBED> => The embed element is used to embed a plugin into a document. The OBJECT tag can also be used to embed objects. See also: <EMBED attributes>
+html <EMBED attributes> => SCR, HEIGHT, WIDTH, UNITS, NAME, OPTIONAL PARAMETER & PALETTE
+example <EMBED> => <EMBED attributes> alternate HTML </EMBED>
+html <EMBED SCR> => ( SRC="URL" ) "URL" identifies the location of the object to be embedded.
+html <EMBED HEIGHT> => ( HEIGHT=number ) This specifies the height of the object, according to the UNITS attribute.
+html <EMBED WIDTH> => ( WIDTH=number ) This specifies the width of the object, according to the UNITS attribute.
+html <EMBED UNITS> => ( UNITS=units ) Here units is one of pixels, meaning the width and height are measured in pixels, or en, meaning the width and height are measured in en spaces.
+html <EMBED NAME> => ( NAME=text ) This indicates the name used by other objects or elements to refer to this object.
+html <EMBED OPTIONAL PARAMETER> => ("OPTIONAL PARAMETER"=value) This specifies any parameters that are specific to the object. Put the name of the parameter in place of "OPTIONAL PARAMETER".
+html <EMBED PALETTE> => ( PALETTE=#rgb|#rgb ) Sets the foreground or background color. The first colour is the foreground.
+html <FIG> => <Figure> The figure element is an improvement over the inline image used in HTML 2.0 for a variety of reasons. See: <FIG> 2, 3, & 4
+html <FIG> 2 => The text used to describe the figure for non-graphical browsers can contain markup tags & a separate credit and caption will be displayed by both graphical and non-graphical browsers
+html <FIG> 3 => It also makes imagemaps much easier to code & independent of the server. (See the OBJECT and MAP tags for an alternate to this tag)
+html <FIG> 4 => At the moment it isn't clear whether the built-in image maps of FIG or the client-side image maps of IMG with a USEMAP attribute will emerge as the long term alternative to server side image maps.
+example <FIG> => <FIG attributes> figure-content </FIG>
+html <FIG attributes> => The attributes for the <FIG> tag: SRC, ALIGN, HEIGHT, WIDTH, UNITS, NOFLOW & IMAGEMAP
+html <FIG SRC> => ( SRC="URL" ) "URL" identifies the image source, typically a GIF or JPEG file.
+html <FIG ALIGN> => (ALIGN="alignment") "alignment" should be one of TOP, MIDDLE, or BOTTOM. This causes the top, middle, or bottom of the image to be aligned with the text on the line containing the IMG tag. See: <FIG ALIGN> 2
+html <FIG ALIGN> 2 => For Netscape: "alignment" should be one of LEFT, RIGHT, TOP, TEXTTOP, MIDDLE, ABSMIDDLE, BASELINE, BOTTOM, or ABSBOTTOM.
+html <FIG HEIGHT> => ( HEIGHT=number ) This specifies the height of the image, according to the UNITS attribute.
+html <FIG WIDTH> => ( WIDTH=number ) This specifies the width of the image, according to the UNITS attribute.
+html <FIG UNITS> => (UNITS=units ) Here units is one of pixels, meaning the width and height are measured in pixels, or en, meaning the width and height are measured in en spaces. See:<FIG> 2
+html <FIG UNITS> 2 => These units are not used for the shape co-ordinates of any anchor tags in the figure.
+html <FIG NOFLOW> => Stops text from flowing around the figure.
+html <FIG IMAGEMAP> => ( IMAGEMAP="URL" ) Points to a script that handles clicks and drags.
+html <SHAPE attribute> => One of: Defualt, Circle ( x, y, r ), Rect ( x, y, w, h ) & Polygon ( x1, y1, x2, y2, ... )
+html <FN> => <Footnote> The footnote tag defines a footnote, ideally displayed in a pop-up window. The text that refers to this footnote does so with a standard anchor tag using anchor-name.
+example <FN> => <FN ID=anchor-name> text </FN>
+html <FONT> => The font tag defines text with a smaller or larger font than usual. The normal font size corresponds to 3; smaller values of number will produce a smaller font, and larger values of number will produce a larger font. See: <FONT> 2
+html <FONT> 2 => If number has a sign (for example +1), the font will be changed relative to the BASEFONT.
+example <FONT> => <FONT SIZE=number> & <FONT COLOR="#RRGGBB"> & <FONT COLOR="colorname"> & <FONT FACE="facename1, facename2...">
+html <FONT COLOR> => The COLOR attribute allows you to change the colour of the text.
+example <FONT COLOR> => <FONT COLOR="#RRGGBB"> & <FONT COLOR="colorname">
+html <FONT FACE> => The FACE attribute specifies the face to be used, such as Arial or Courier. If multiple names are specified, the first one listed that is installed on the client machine is used.
+example <FONT FACE> => <FONT FACE="facename1, facename2...">
+html <FORM> => The form tag introduces a form, which is made up of INPUT elements, described in the sections that follow. See: <FORM> 2
+html <FORM> 2 => A form may be inside structural HTML tags & may also contain structural tags. Using tables and other elements a form can take on various shapes and looks.
+example <FORM> => <FORM ACTION=action base> form tags </FORM> & <FORM METHOD=method> form tags </FORM> & <FORM ENCTYPE=media type> form tags </FORM>
+html <FORM ACTION> => The ACTION attribute defaults to the document's base address.
+example <FORM ACTION> => <FORM ACTION=action base> form tags </FORM> & <FORM ACTION=action base TARGET="target window name"> form tags </FORM>
+html <FORM METHOD> => The METHOD attribute can be GET or POST. GET specifies a query form, used to get data from a server. See: <FORM METHOD> 2
+html <FORM METHOD> 2 => POST specifies a form that gives information to the server and perhaps causes a database to be updated or a message to be sent.
+example <FORM METHOD> => <FORM METHOD=method> form tags </FORM>
+html <FORM ENCTYPE> => See: example <FORM ENCTYPE>
+example <FORM ENCTYPE> => <FORM ENCTYPE=media type> form tags </FORM>
+html <FORM SCRIPT> => The SCRIPT attribute points to a script to be run. The browser must be able to run the type of script that is specified.
+example <FORM SCRIPT> => <FORM SCRIPT=URL> form tags </FORM>
+html <FRAME> => The frame tag appears inside the FRAMESET tag and specifies one frame in the frameset.
+example <FRAME> => <FRAME attributes>
+html <FRAME attributes> => One or all of these: SRC, NAME, MARGINWIDTH, MARGINHEIGHT, SCROLLING, NORESIZE, FRAMEBORDER, FRAMESPACING & ALIGN
+html <FRAME SRC> => (SRC="URL") The URL of the source document to be displayed in this frame. If the frame does not specify a source it will be displayed as blank space.
+html <FRAME NAME> => (NAME="window name") Here "window name" is the name associated with this frame. It can be used by the TARGET attribute in the A, BASE, AREA, and FORM tags to target this frame.
+html <FRAME MARGINWIDTH> => ( MARGINWIDTH=number ) Here number is the left and right margin thickness in pixels.
+html <FRAME MARGINHEIGHT> => ( MARGINHEIGHT=number ) Here number is the top and bottom margin thickness in pixels.
+html <FRAME SCROLLING> => (SCROLLING=type) Here type is one of yes, no or auto. It specifies if the frame is to have a scroll bar: auto (the default) means the browser will decide.
+html <FRAME NORESIZE> => Stops the user from resizing the frame..
+html <FRAME FRAMEBORDER> => (FRAMEBORDER=yes/no) Specifies if the border should be displayed.
+html <FRAME FRAMESPACING> => (FRAMESPACING=number) Here number is the spacing between frames in pixels.
+html <FRAME ALIGN> => (ALIGN = "alignment") One of: LEFT, RIGHT, TOP, TEXTTOP, MIDDLE, ABSMIDDLE, BASELINE, BOTTOM, or ABSBOTTOM.
+html <FRAMESET> => The FRAMESET tag replaces the BODY tag in a document and is used to split the documents window into a set of smaller frames. See: html <FRAMESET> 2
+html <FRAMESET> 2 => FRAMESET tags can be nested to create more complicated frame layouts. NOFRAME tags can also be placed in a frameset.
+example <FRAMESET> => <FRAMESET attributes> frame tags </FRAMESET>
+html <FRAMESET attributes> => The attributes for the tag <FRAMESET> are: ROWS & COLS
+html <FRAMESET ROWS> => (ROWS="row heights") Here "row heights" specifies a list of values for the rows, each one can be specified as a percentage, a pixel value or as "*". See: html <FRAMESET ROWS> 2
+html <FRAMESET ROWS> 2 => The frameset will be split vertically into frames based on these values. Rows with "*"'s in them will have any remaining space split between them.
+html <FRAMESET COLS> => (COLS="column widths") Here "column widths" specifies a list of values for the columns. The width of each column can be specified as a percentage, a pixel value or as "*". See: html <FRAMESET COLS> 2
+html <FRAMESET COLS> 2 => The frameset will be split into frames based on these values. Columns with a width of "*" will split the space that is not assigned to other columns.
+html <H1> => The heading 1 tag defines a level 1 heading. It is typically shown in a very large bold font with several blank lines around it, and is used by automatic indexers to describe a page.
+example <H1> => <H1> text </H1> & <H1 ALIGN=alignment > text </H1> & <H1 SRC="URL" > text </H1> & <H1 DINGBAT="entity-name" > text </H1>
+html <H1 attributes> => The attributes for the HTML tag <H1> are: ALIGN, SRC, DINGBAT, NOWRAP & CLEAR
+html <H1 ALIGN> => The alignment attribute can be LEFT, RIGHT, or CENTER -- it defines the placement of the header on the screen. <H1 ALIGN=alignment > text </H1>
+html <H1 SRC> => The SRC attribute identifies a graphic image to be embedded before the header text. <H1 SRC="URL" > text </H1>
+html <H1 DINGBAT> => The DINGBAT attribute identifies an iconic entity to be embedded. <H1 DINGBAT="entity-name" > text </H1>
+html <H1 NOWRAP> => The NOWRAP attribute prevents the browser from breaking long header lines; use a <BR> to break those lines yourself. <H1 NOWRAP> text </H1>
+html <H1 CLEAR> => The clear attribute is used to position a header after a graphic: it can be LEFT, RIGHT, or ALL & specifies which margin should be clear. <H1 CLEAR=clear > text </H1>
+html <H2> => The heading 2 tag defines a level 2 heading. It is typically shown in a large bold font with several blank lines around it. See: <H1 attributes>
+example <H2> => <H2> text </H2>
+html <H3> => The heading 3 tag defines a level 3 heading. It is typically shown in a large italic font, slightly indented, with blank lines around it. See: <H1 attributes>
+example <H3> => <H3> text </H3>
+html <H4> => The heading 4 tag defines a level 4 heading. It is typically shown in a bold font, indented more than an level 3 heading, with blank lines around it. See: <H1 attributes>
+example <H4> => <H4> text </H4>
+html <H5> => The heading 5 tag defines a level 5 heading. It is typically shown in an italic font, indented the same as a level 4 heading, with a blank line above it. See: <H1 attributes>
+example <H5> => <H5> text </H5>
+html <H6> => The heading 6 tag defines a level 6 heading. It is typically shown in a normal font, indented more than a level 5 heading, with a blank line above it. See: <H1 attributes>
+example <H6> => <H6> text </H6>
+html <HEAD> => The head tag introduces text that describes an HTML document. Most documents have only a TITLE tag in the head section.
+example <HEAD> => <HEAD> head-section </HEAD>
+html <HR> => <Horizontal Rule> The horizontal rule tag causes a horizontal line to be drawn across the screen. There is no </HR> tag.
+html <HTML> => The HTML tag defines an HTML document. The <HTML> tag should be the first in the entire document, and the </HTML> tag should be the last.
+example <HTML> => <HTML> entire-document </HTML>
+html <I> => <Italic> The italic tag defines text that should be shown in italics. It can be nested with other idiomatic or typographic tags but some browsers will respect only the innermost tag
+example <I> => <I> text </I> 
+html <IFRAME> => <Frame - Floating> The IFRAME tag defines a floating frame, and the end tag is required.
+example <iframe> => <IFRAME attributes> frame data <IFRAME>
+html <IFRAME attributes> => ALIGN, FRAMEBORDER, HEIGHT, MARGINHEIGHT, MARGINWIDTH, NAME, SCROLLING, SRC and WIDTH 
+html <IFRAME ALIGN> => (ALIGN=left|center|top|bottom) This sets the alignment of the frame or of the surrounding text. The default is LEFT
+html <IFRAME FRAMEBORDER> => (FRAMEBORDER=1|0) Renders a 3-D edge border around the frame. 1 (default) inserts a border. 0 displays no border
+html <IFRAME HEIGHT> => (HEIGHT=height) Controls the height (in pixels) of the floating frame
+html <IFRAME MARGINHEIGHT> => (MARGINHEIGHT=height) Controls the margin height for the frame, in pixels
+html <IFRAME MARGINWIDTH> => (MARGINWIDTH=width) Controls the margin width for the frame, in pixels
+html <IFRAME NAME> => (NAME=name) Provides a target name for the frame
+html <IFRAME SCROLLING> => (SCROLLING=yes|no) Creates a scrolling frame
+html <IFRAME SRC> => (SRC=address) Displays the source file for the frame
+html <IFRAME WIDTH> => (WIDTH=width) Controls the width of the floating frame, in pixels
+html <IMG> => <Inline Image> The inline image tag displays an image referred to by a URL. It must contain at least an SRC attribute
+html <IMG attributes> => ALIGN, ALT, BORDER, CONTROLS, DYNSRC, HEIGHT, HSPACE, ISMAP, LOOP, LOWSRC,  START, SRC, UNITS, USEMAP, WIDTH, and VSPACE
+html <IMG ALIGN> => (ALIGN="alignment") Here "alignment" should be one of TOP, MIDDLE, or BOTTOM. This causes the top, middle, or bottom of the image to be aligned with the text on the line containing the IMG tag."alignment" should be one of LEFT, RIGHT, TOP, TEXTTOP, MIDDLE, ABSMIDDLE, BASELINE, BOTTOM, or ABSBOTTOM.  
+html <IMG ALT> => (ALT="text") Here "text" is the text to be displayed by a browser that does not display images, such as Lynx, or to be used when image display is suppressed. 
+html <IMG BORDER> => (BORDER=number) Here number is the border thickness in pixels. (Do not use BORDER=0 for images that are links.) 
+html <IMG CONTROLS> => If present, and an AVI resource is being played, displays controls under the resource. 
+html <IMG DYNSRC> => (DYNSRC="url") Specifies an AVI resource to be played, or a VRML world. Always include a still image as well with the SRC attribute, for use by browsers that do not display inline video or VRML.
+html <IMG HEIGHT> => (HEIGHT=number) This specifies the height of the image, according to the UNITS attribute. 
+html <IMG HSPACE> => (HSPACE=number) Here number is the space, in pixels, to leave to the left and right of the image.  
+html <IMG ISMAP> => (ISMAP="url") This attribute indicates that this image is a server side image map. 
+html <IMG LOOP> => (LOOP=number) The optional LOOP attribute will cause the resource to be played number times. LOOP="INFINITE" will cause the resource to be played continuously as long as the page is open. 
+html <IMG LOWSRC> => (LOWSRC="url") Specifies an image to be displayed while the SRC image is being loaded. This alternate image should take much less time to download then the SRC image: it should be lower resolution, black and white, etc. 
+html <IMG START> => (START="start option") The START attribute specifies when the browser should start to play the resource specified with the DYNSRC attribute. START=FILEOPEN instructs the browser to play the resource only when the file is opened. START=MOUSEOVER instructs the browser to play the resource each time the user moves the mouse cursor over it. START=FILEOPEN,MOUSEOVER does both. 
+html <IMG SRC> => (SRC="URL") Here "URL" identifies the image source, typically a GIF or JPEG file. 
+html <IMG UNITS> => (UNITS=units) Here units is one of pixels, meaning the width and height are measured in pixels, or en, meaning the width and height are measured in en spaces.
+html <IMG USEMAP> => (USEMAP="url") This attribute overrides the ISMAP attribute, if present, and if the browser supports client-side image maps. It uses the MAP element found at url to translate clicks. 
+html <IMG WIDTH> => (WIDTH=number) This specifies the width of the image, according to the UNITS attribute. 
+html <IMG VSPACE> => (VSPACE=number) Here number is the space, in pixels, to leave above and below the image. 
+html <INPUT> => To be filled in at a later date <Form Input>
+html <INS> => (Inserted Text) The inserted text tag marks text that has been inserted, for example in a group authoring situation or a legal document.
+example <INS> => <INS> text </INS>
+html <ISINDEX> => (Is Index) The isindex tag, which is only valid in a HEAD section, declares that the current HTML document is a searchable index. The user will be prompted for keywords to search for. A new URL will be formed by taking the base address of the current document and adding a '?' character to it, followed by the keywords separated by '+' characters. The URL attribute overrides the base address. The prompt attribute changes the prompt from the default one supplied by the browser.
+example <ISINDEX> => <ISINDEX HREF=URL> & <ISINDEX PROMPT=prompt> 
+html <KBD> => <Keyboard> The keyboard tag defines text that should be shown in a fixed width font. It can be nested with other idiomatic or typographic tags but some browsers will respect only the innermost tag. Many browsers use the same font for the KBD, SAMP, TT and CODE tags. For many lines of fixed width text, with the line breaks and other whitespace specified by the page author, use the PRE tag.
+example <KBD> => <KBD> text </KBD>
+html <LANG> => <Language> The language tag is used to alter the language used for a block of text.
+example <lang> => <LANG> text </LANG>
+html <LH> => <List Heading> The list heading tag defines the heading for an ordered, unordered, or definition list. Other tags may be embedded in a list heading. It must come before any List Item (LI) or Definition Term (DT) tags in the list.
+example <lh> => <LH> text </LH>
+html <LI> => <List Item> The list item tag defines one entry in an ordered, unordered, menu, or directory list. Other tags may be embedded in a list item.
+html <LI attributes => SRC, DINGBAT, SKIP, TYPE, and VALUE
+html <LI SRC> => The SRC attribute uses the image specified by the URL as the bullet for this item. <LI SRC=URL> text </LI>
+html <LI DINGBAT> => The DINGBAT attribute identifies an iconic entity for the bullet. <LI DINGBAT="entity-name"> text </LI>
+html <LI SKIP> => The SKIP attribute is used with ordered lists to skip forward in the count. <LI SKIP=number> text </LI>
+html <LI TYPE> => The TYPE attribute changes the bullet or numbering style for this item. type has the same values as it would in the OL or UL tag. <LI TYPE=type> text </LI>
+html <LI VALUE> => The VALUE attribute resets the sequence number to number. <LI VALUE=number> text </LI>
+html <LINK> => The link tag appears within the HEAD section of a document. It has all the same attributes as the anchor tag. The main 3 attributes used are REL, REV and HREF.
+html <LINK attributes> => REL, REV, TITLE and HREF
+html <LINK REV> => The REV attribute specifies a reverse relationship <LINK REV=relationship HREF="URL"> & <LINK REV=relationship HREF="URL" TITLE="title">
+html <LINK TITLE> => The TITLE attribute specifies an advisory title string. <LINK REV=relationship HREF="URL" TITLE="title">
+html <LINK HREF> => the HREF attribute specifies the URL of the link.
+html <LINK REL> => REL attribute specifies the relationship between this document and the link. - See also: html <LINK REV=relationship> - <LINK REL=relationship HREF="URL">
+html <LINK REV=relationship> => Toolbar relationships: REL=Home, REL=ToC, REL=Index, REL=Glossary, REL=Copyright, REL=Up, REL=Next, REL=Previous, REL=Help and REL=Bookmark (Other relationships: REL=Banner & REL=StyleSheet) 
+html <LINK REL=Home> => Link points to home or top page in hierarchy.
+html <LINK REV=ToC> => Link points to a table of contents.
+html <LINK REV=Index> => Link points to an index for the current page.
+html <LINK REV=Glossary> => Link points to a glossary.
+html <LINK REV=Copyright> => Link points to a page with copyright information for the current page.
+html <LINK REV=Up> => Link points to the pages parent in the hierarchy.
+html <LINK REV=Next> => Link points to the next page in a series of pages.
+html <LINK REV=Previous> => Link points to the previous page in a series of pages.
+html <LINK REV=Help> => Link points to information that may further explain the page to the user.
+html <LINK REV=Bookmark> => Link points to a particular location within a long document. The TITLE attribute is used to label the bookmark.
+html <LINK REV=Banner> => This use achieves the effect that the BANNER tag will eventually provide.
+html <LINK REV=StyleSheet> => Link points to a style sheet that will be used to render the current document.
+html <LISTING> => <Listing> The listing tag introduces a program listing. Because of the way this tag handles embedded tags, it should no longer be used. PRE is a better choice.
+example <LISTING> => <LISTING> text </LISTING>
+html <MAP> => <Map> The map tag defines a client side image map It gives a name to a collection of AREA tags that are superimposed over an inline image to connect user clicks with URLs.
+example <MAP> => <MAP NAME="name"> area tags </MAP>
+html <MARQUEE> => <Marquee> The marquee tag defines a moving piece of text, like a movie marquee.
+example <MARQUEE> => <MARQUEE> text </MARQUEE> and See: html <MARQUEE attributes> 
+html <MARQUEE attributes> => ALIGN, BEHAVIOR, BGCOLOR, DIRECTION, HEIGHT, HSPACE, LOOP, SCROLLAMOUNT, SCROLLDELAY, WIDTH, VSPACE, and WIDTH
+html <MARQUEE ALIGN> => The ALIGN attribute works like the ALIGN attribute in the IMG tag, setting the location of the surrounding text. "align" can be TOP, BOTTOM, or MIDDLE.
+example <MARQUEE ALIGN> => <MARQUEE ALIGN="align"> text </MARQUEE> 
+html <MARQUEE BEHAVIOR> => The BEHAVIOR attribute defines the way the text moves. SCROLL means that the text slides into the marquee box and out again, then repeats. SLIDE means that the text slides into the marquee box, stops when it is all in, then repeats. ALTERNATE means that the text bounces back and forth within the marquee box.
+example <MARQUEE BEHAVIOR> => <MARQUEE BEHAVIOR="behavior"> text </MARQUEE>
+html <MARQUEE BGCOLOR> => The BGCOLOR attribute specifies the colour to be used for the background. rrggbb is a six digit hexadecimal number with the first two digits specifying the red value, the middle two the green value, and the last two the blue value. Colour names can be used for the BGCOLOR attribute. Valid colours are: Aqua, Black, Blue, Fuchsia, Gray, Green, Lime, Maroon, Navy, Olive, Purple, Red, Silver, Teal,Yellow, and White.
+example <MARQUEE BGCOLOR> => <MARQUEE BGCOLOR="#rrggbb"> text </MARQUEE> & <MARQUEE BGCOLOR="colorname"> text </MARQUEE>
+html <MARQUEE DIRECTION> => The DIRECTION attribute is LEFT or RIGHT and specifies the direction in which the text should move.
+example <MARQUEE DIRECTION> => <MARQUEE DIRECTION="direction"> text </MARQUEE>
+html <MARQUEE HEIGHT> => The HEIGHT and WIDTH attributes size the marquee box. If n is an absolute number, it is taken to mean pixels; if n is followed by a % sign it is taken to mean a percentage of the width or height (as appropriate) of the screen.
+example <MARQUEE HEIGHT> => <MARQUEE HEIGHT=n> text </MARQUEE> & <MARQUEE HEIGHT=n%> text </MARQUEE>
+html <MARQUEE HSPACE> => The HSPACE and VSPACE attributes specify a margin to the left and right, or above and below, the marquee box, in pixels. 
+example <MARQUEE HSPACE> => <MARQUEE HSPACE=n> text </MARQUEE>
+html <MARQUEE LOOP> => The LOOP attribute will cause the marquee to scroll n times. LOOP="INFINITE" will cause the marquee to scroll as long as the page is open.
+example <MARQUEE LOOP> => <MARQUEE LOOP=n> text </MARQUEE>
+html <MARQUEE SCROLLAMOUNT> => The SCROLLAMOUNT attribute specifies, the amount, in pixels, to move the scrolling text by each time it is drawn.
+example <MARQUEE SCROLLAMOUNT> => <MARQUEE SCROLLAMOUNT=n> text </MARQUEE>
+html <MARQUEE SCROLLDELAY> => The SCROLLDELAY attribute specifies the delay, in milliseconds, between drawings.
+example <MARQUEE SCROLLDELAY> => <MARQUEE SCROLLDELAY=n> text </MARQUEE>
+html <MARQUEE VSPACE> => The HSPACE and VSPACE attributes specify a margin to the left and right, or above and below, the marquee box, in pixels.
+example <MARQUEE VSPACE> => <MARQUEE VSPACE=n> text </MARQUEE>
+html <MARQUEE WIDTH> => The HEIGHT and WIDTH attributes size the marquee box. If n is an absolute number, it is taken to mean pixels; if n is followed by a % sign it is taken to mean a percentage of the width or height (as appropriate) of the screen.
+example <MARQUEE WIDTH> => <MARQUEE WIDTH=n%> text </MARQUEE>
+html <MATH> => The math tag introduces a description of an equation or formula. math-content is not yet fully defined.
+example <MATH> => <MATH> math-content </MATH>
+html <MENU> => <Menu List> The menu list tag introduces a menu list, which is made up of List Item (LI) tags and does not include bullets or numbers before them. For a bulleted list use UL. For a numbered list use OL. For a list without bullets or numbers made up of short items that can be arranged into columns use DIR. The COMPACT attribute instructs the browser to reduce the space occupied by the list.
+example <MENU> => <MENU> list entries </MENU> & <MENU COMPACT> list entries </MENU> **In HTML 3.0, the same effect can be achieved with <UL PLAIN>. The MENU tag will probably be obsolete some day, so use UL.
+html <META> => <META [...]> The meta tag, which is only valid in a HEAD section, declares HTTP meta name/value pairs that are associated with the HTML document. These are used to extend the HTTP header information returned by the HTTP server. The support of the meta information is HTTP server specific. If a name attribute is not specified the HTTP-EQUIV attribute is used as the name. This tag can also be used to trigger client side behaviour.
+html <MULTICOL> => <Multi Column Text> This tag is a container, used to split the display into columns without using frames or tables. The attributes of this tag are: COLS, GUTTER, and WIDTH
+html <MULTICOL COLS> => (COLS="number") The COLS attribute is mandatory and controls how many columns the display will be split into.
+html <MULTICOL GUTTER> => (GUTTER="pixels") The GUTTER attribute controls the pixels of space between columns. It defaults to a value of 10.
+html <MULTICOL WIDTH> => (WIDTH="number") The WIDTH attribute controls the width of an individual column. 
+html <NOBR> => <No Break> The no break tag defines a block of text which will have no line breaks except those explicitly requested with BR or suggested with WOBR.
+example <NOBR> => <NOBR> text </NOBR>
+html <NOFRAMES> => <No Frames> The NOFRAMES tag specifies HTML that can be used by browsers that do not support frames. Everything between the start and end tag is ignored by browsers that understand frames.
+example <NOFRAMES> => <NOFRAMES> alternate HTML </NOFRAMES>
+html <NOTE> => <Note> The note tag defines text that forms a note. Many browsers display it in an indented block surrounded by blank lines with a graphic. The CLASS attribute specifies the type of note, such as a warning, caution, or note. The graphic used will be based on the CLASS. The SRC attribute can be used to override the graphic that would be used by default.
+example <NOTE> => <NOTE> text </NOTE>  <NOTE CLASS=class> text </NOTE>  <NOTE SRC=URL> text </NOTE>
+html <OL> => <Ordered List> The ordered list tag introduces an ordered (numbered) list, which is made up of List Item (LI) tags.
+example <OL> => <OL> list entries </OL> and See also: html <OL attributes>
+html <OL attributes> => COMPACT, SEQNUM, CONTINUE, START, and TYPE
+html <OL COMPACT> => The COMPACT attribute instructs the browser to reduce the space occupied by the list.
+example <OL COMPACT> => <OL COMPACT> list entries </OL>
+html <OL SEQNUM> => The SEQNUM attribute allows the first list item to be number instead of the default 1.
+example <OL SEQNUM> => <OL SEQNUM=number> list entries </OL>
+html <OL CONTINUE> => The CONTINUE attribute continues the numbering from the previous ordered list.
+example <OL CONTINUE> => <OL CONTINUE> list entries </OL>
+html <OL START> => The START attribute allows the first list item to be number instead of the default 1.
+example <OL START> => <OL START=number> list entries </OL>
+html <OL TYPE> => The TYPE attribute governs the way items are numbered.
+example <OL TYPE> => <OL TYPE=type> list entries </OL>
+html <OVERLAY> => <Overlay> Valid only within a figure (FIG), the overlay element speeds up image rendering by drawing small changes over a base figure.
+html <OVERLAY attributes> => The attributes are: SRC, X, Y, HEIGHT, WIDTH, UNITS, and IMAGEMAP
+html <OVERLAY SRC> => (SRC="URL") Here "URL" identifies the image source, typically a GIF or JPEG file.
+html <OVERLAY X> => (X=number) This specifies the offset to the right within the base image from the top left corner, according to the UNITS attribute.
+html <OVERLAY Y> => (Y=number) This specifies the offset to the bottom within the base image from the top left corner, according to the UNITS attribute.
+html <OVERLAY HEIGHT> => (HEIGHT=number) This specifies the height of the image, according to the UNITS attribute.
+html <OVERLAY WIDTH> => (WIDTH=number) This specifies the width of the image, according to the UNITS attribute.
+html <OVERLAY UNITS> => (UNITS=units) Here units is one of pixels, meaning the width and height are measured in pixels, or en, meaning the width and height are measured in en spaces. 
+html <OVERLAY IMAGEMAP> => (IMAGEMAP="URL") Points to a script that handles clicks and drags.
+html <P> => <Paragraph> The paragraph tag starts a new paragraph, equivalent to two BR tags. The </P> tag is optional if the tag is only to insert space between two paragraphs, but vital when attributes (for example, ALIGN="center") are to apply to the whole paragraph. The ALIGN attribute can be one of LEFT, RIGHT, or CENTER. The NOWRAP attribute will make it so lines are only broken at the <BR> tag.
+example <P> => <P> text  <P> text </P>  <P ALIGN=alignment> text  <P NOWRAP> text
+html <PARAM> => <Parameters> This tag, valid only within an APPLET element, passes parameters to the applet, which gets them with the getParameter() method.
+example <PARAM> => <PARAM NAME="name" VALUE="value">
+html <PERSON> => <Person> The person tag is used around names of people mentioned in a document. It is typically displayed just like normal text, but is used by automatic indexers
+example <PERSON> => <PERSON> text </PERSON>
+html <PLAINTEXT> => <Plain Text> The plain text tag defines text that should be shown in a fixed width font with the line breaks and other whitespace specified by the page author. There is no need to use <BR> tags to indicate line breaks -- line breaks in the source will be displayed by the browser. In addition multiple spaces will be displayed as multiple spaces. HTML tags are not rendered..
+example <PLAINTEXT> => <PLAINTEXT> text </PLAINTEXT> 
+html <PRE> => The preformatted text tag defines text that should be shown in a fixed width font with the line breaks and other whitespace specified by the page author. There is no need to use <BR> tags to indicate line breaks -- line breaks in the source will be displayed by the browser. In addition multiple spaces will be displayed as multiple spaces. Typically used for several lines of program code or for poetry. The width attribute specifies the maximum number of characters per line. 
+example <PRE> => <PRE> text </PRE>  <PRE WIDTH=width> text </PRE>
+html <Q> => <Quote> The quote tag defines text that should be displayed as a short quote. For English language documents this means the text will be surrounded with double quote (") symbols. Quotes nested within quotes will typically be displayed surround by single quote (') symbols.
+example <Q> => <Q> text </Q>
+html <RANGE> => The range tag, which is valid only in the HEAD section, defines a range within the document. The FROM and UNTIL attributes refer to ID's of tags within the document. The SPOT tag can be used to specify a location in the document where there is no other tag.
+example <RANGE> => <RANGE FROM="from id" UNTIL="until id">
+html <SAMP> => The sample tag defines text that should be shown as literal characters in a fixed width font. It can be nested with other idiomatic or typographic tags but some browsers will respect only the innermost tag. Many browsers use the same font for the KBD, SAMP, TT and CODE tags. For many lines of fixed width text, with the line breaks and other whitespace specified by the page author, use the PRE tag.
+example <SAMP> => <SAMP> text </SAMP>
+html <SCRIPT> => The script tag identifies script code. This can be code to be executed at this point of the document or may contain functions for use later in the document. The statements are usually but not required to be enclosed in the comment tag, so that browsers that do not support scripting do not render the code as text. Functions used by the document are usually defined in the HEAD tag so that they are loaded and available before the user could do anything that might call them.
+example <SCRIPT> => <SCRIPT LANGUAGE="language"><!-- script statements --></SCRIPT>
+html <SELECT> => To be filled in at a later date <Form Select>
+html <SMALL> => <Small Text> The small text tag defines text that should be displayed in a smaller font than usual.
+example <SMALL> => <SMALL> text </SMALL>
+html <SPACER> => <White Space> The SPACER tag creates an area of white space within the document. ( See: html <SPACER attributes> ) 
+html <SPACER attributes> => The attributes for this tag are: TYPE, SIZE, WIDTH, HEIGHT, and ALIGN
+html <SPACER TYPE> => (TYPE=type) The TYPE attribute has three possible values: horizontal (the default,) vertical, and block.
+html <SPACER SIZE> => (SIZE=pixels) The SIZE attribute only applies when the spacer has a type of horizontal or vertical. Then this attribute controls the absolute width or height in pixels of the spacing added.
+html <SPACER WIDTH> => (WIDTH=pixels) The WIDTH attribute only applies when the spacer is of type block. Then this attribute controls the absolute width in pixels of the spacing rectangle added.
+html <SPACER HEIGHT> => (HEIGHT=pixels) The HEIGHT attribute only applies when the spacer is of type block. Then this attribute controls the absolute height in pixels of the spacing rectangle added.
+html <SPACER ALIGN> => (ALIGN=alignment) The ALIGN attribute only applies when the spacer is of type block. Then this attribute controls the alignment of the spacing rectangle in exactly the same way it would control the alignment of an IMG tag. "alignment" should be one of LEFT, RIGHT, TOP, TEXTTOP, MIDDLE, ABSMIDDLE, BASELINE, BOTTOM, or ABSBOTTOM.
+html <SPOT> => The spot tag can be used to specify a location in the document where there is no tag.
+example <SPOT> => <SPOT ID="id">
+html <STRIKE> => The strikethrough tag defines text that should be shown with a horizontal line through it. It can be nested with other idiomatic or typographic tags but some browsers will respect only the innermost tag. 
+example <STRIKE> => <STRIKE> text </STRIKE>
+html <STRONG> => The strong tag defines text that should be strongly emphasized -- most browsers will display it in boldface. It can be nested with other idiomatic or typographic tags but some browsers will respect only the innermost tag.
+example <STRONG> => <STRONG> text </STRONG>
+html <SUB> => The subscript tag defines text that should be displayed in a smaller font than usual, lower on the line than usual. <Subscript>
+example <SUB> => <SUB> text </SUB>
+html <SUP> => The superscript tag defines text that should be displayed in a smaller font than usual, higher on the line than usual. <Superscript>
+example <SUP> => <SUP> text </SUP>
+html <TAB> => The horizontal tab tag is used to set or jump to a horizontal tab. The INDENT attribute specifies the amount in en spaces to set this indent to. The align attribute can be one of LEFT, RIGHT, CENTER, or DECIMAL and will position the following text to the tab accordingly. The dp sets the tab to the position that the next character is found The default character is "."
+example <TAB> => <TAB INDENT=number>  <TAB TO=tab id ALIGN=align>  <TAB DP=character>
+html <TABLE> => A table consists of an optional caption (CAPTION) and one or more rows (TR.) ( See also: html <TABLE attributes> )
+example <TABLE> => <TABLE attributes> table-content </TABLE>
+html <TABLE attributes> => The attributes are: ALIGN, WIDTH, BORDER, CELLPADDING, BGCOLOR, BORDERCOLOR, BORDERCOLORLIGHT, BORDERCOLORDARK, VALIGN, CLEAR, NOFLOW, COLSPEC, UNITS, DP, and NOWRAP
+html <TABLE ALIGN> => (ALIGN="alignment") This causes the table to be aligned in one of a variety of ways on the page. Here "alignment" should be one of, LEFT: To the left text margin, CENTER: In the centre of the page (Turns on NOFLOW.) RIGHT: To the right text margin, BLEEDRIGHT: To the rightmost edge of the window, BLEEDLEFT: To the leftmost edge of the window, JUSTIFY: To both text margins (The table size is adjusted. Turns on NOFLOW.) *Note that this does not affect the alignment of the table entries*
+html <TABLE WIDTH> => (WIDTH=number) The UNITS attribute is used to translate number.
+html <TABLE BORDER> => (BORDER) This attribute causes the table to be drawn with a border. (BORDER=number) This attribute draws the table with a border number pixels thick.
+html <TABLE CELLPADDING> => (CELLPADDING=number) This separates the cell borders and the text with a padding of number pixels.
+html <TABLE CELLSPACING> => (CELLSPACING=number) This separates cells with a gutter of number pixels.
+html <TABLE BGCOLOR> => (BGCOLOR="#rrggbb" -or- BGCOLOR="colorname") This attribute sets the background colour for the entire table. 
+html <TABLE BORDERCOLOR> => (BORDERCOLOR="#rrggbb" -or- BORDERCOLOR="colorname") This attribute sets the border colour for the entire table.
+html <TABLE BORDERCOLORLIGHT> => (BORDERCOLORLIGHT="#rrggbb" -or- BORDERCOLORLIGHT="colorname") This attribute sets the border highlight colour for the entire table.
+html <TABLE BORDERCOLORDARK> => (BORDERCOLORDARK="#rrggbb" -or- BORDERCOLORDARK="colorname") This attribute sets the border shadow colour for the entire table.
+html <TABLE VALIGN> => (VALIGN="valign") This attribute sets the vertical alignment for the entire table. "valign"is TOP or BOTTOM.
+html <TABLE CLEAR> => (CLEAR=clear) Here "clear" should be one of LEFT, RIGHT, or ALL and specifies which margin should be clear.
+html <TABLE NOFLOW> => (NOFLOW) This attribute prevents text flow around the table and is equivalent to setting the CLEAR attribute on the element after the table.
+html <TABLE COLSPEC> => (COLSPEC=colspec) Here colspec is a list of column alignments and widths, separated by spaces. There should be one entry for each column in the table, and each should be an optional capital letter for alignment (one of L (left,) R (right,) C (centre,) J (justify,) or D (decimal)) followed immediately by a number describing the width.
+html <TABLE UNITS> => (UNITS=units) This makes sense only if the COLSPEC or WIDTH attributes are being used and specifies the units to be used for the column or table widths. units should be one of, en: widths are in en spaces, proportional to font size, relative: column widths are percentage of entire table width, table width is percentage of entire window width, pixels: widths are in pixels
+html <TABLE DP> => (DP="character") Here "character" is the character (the default is ".") to be used in aligning for decimal point alignment. 
+html <TABLE NOWRAP> => (NOWRAP) This attribute prevents word wrap within table entries.
+html <TBODY> => The TBODY tag is used to group together a number of rows within a table, for assigning ID or STYLE values. (CLASS=type) This attribute indicates the class that the element belongs too. (ID=value) This attribute specifies a unique value for the element over the docuement. (STYLE=css1 properties) This attribute specifies the style information.
+example <TBODY> => <TBODY> table body </TBODY>
+html <TD> => <Table Data> Valid only in a TR, the table data tag defines a table cell. ( See also: html <TD attributes> )
+html <TD attributes> => The attributes for this tag are: COLSPAN, ROWSPAN, NOWRAP, ALIGN, VALIGN, BGCOLOR, BORDERCOLOR, BORDERCOLORLIGHT, and BORDERCOLORDARK 
+html <TD COLSPAN> => (COLSPAN="number") the number of columns this cell occupies.
+html <TD ROWSPAN> => (ROWSPAN="number") the number of rows this cell occupies.
+html <TD NOWRAP> => (NOWRAP) This attribute prevents word wrap within the cell.
+html <TD ALIGN> => (ALIGN="align") governs the alignment of the text within the table cell. "align" can be LEFT, RIGHT or CENTER.
+html <TD VALIGN> => (VALIGN="align") governs the alignment of the text within the table cell. "align" can be TOP, MIDDLE, BOTTOM, or BASELINE.
+html <TD BGCOLOR> => (BGCOLOR="#rrggbb" -or- BGCOLOR="colorname") This attribute sets the background colour for the table cell.
+html <TD BORDERCOLOR> => (BORDERCOLOR="#rrggbb" -or- BORDERCOLOR="colorname") This attribute sets the border colour for the table cell.
+html <TD BORDERCOLORLIGHT> => (BORDERCOLORLIGHT="#rrggbb" -or- BORDERCOLORLIGHT="colorname") This attribute sets the border highlight colour for the table cell. 
+html <TD BORDERCOLORDARK> => (BORDERCOLORDARK="#rrggbb" -or- BORDERCOLORDARK="colorname") This attribute sets the border shadow colour for the table cell.
+html <TEXTAREA> => The text area tag specifies a multiple line text area field within the form that contains it. The NAME attribute is a required field and is used to identify the data for the field. The COLS attribute specifies the width in characters of the text area. The ROWS attribute specifies the number of lines the text area contains. The content is used as an initial value for the field. The field can be scrolled beyond the COLS and ROWS size to allow for larger amounts of text to be entered. (See: html <TEXTAREA> 2)
+html <TEXTAREA> 2 => The wrap attribute can have values of OFF, SOFT and HARD. The 3.0 specification adds three new attributes: DISABLED, ERROR, and ALIGN. The DISABLED attribute shows the field but will not allow the user to modify it. The ERROR attribute is used to supply an error message for the field. The ALIGN attribute is used to position the field and can be one of TOP, BOTTOM, MIDDLE, LEFT or RIGHT
+example <TEXTAREA> => <TEXTAREA NAME=name COLS=# columns ROWS=# rows> content </TEXTAREA>   <TEXTAREA NAME=name COLS=# columns ROWS=# rows WRAP=type> content </TEXTAREA>
+html <TEXTFLOW> => <Java Applet Textflow> if an APPLET element has no ordinary text and markup in its applet-content, and contains only PARAM tags, comments, and whitespace, you should add a TEXTFLOW tag. This tag will be ignored by Web browsers but will keep SGML parsers happy.
+html <TFOOT> => Defines the table footer. The footer tag is used to group all footers. (CLASS=type) This attribute indicates the class that the element belongs too. (ID=value) This attribute specifies a unique value for the element over the document. (STYLE=css1 properties) This attribute specifies style the information
+html <TH> => Valid only in a TR, the table header tag defines a header cell. <Table Header> (See also: html <TH attributes>) 
+html <TH attributes> => The attributes for this tag are: COLSPAN, ROWSPAN, NOWRAP, ALIGN, VALIGN, BGCOLOR, BORDERCOLOR, BORDERCOLORLIGHT, and BORDERCOLORDARK
+html <TH COLSPAN> => (COLSPAN="number") the number of columns this header occupies.
+html <TH ROWSPAN> => (ROWSPAN="number") the number of rows this header occupies.
+html <TH NOWRAP> => (NOWRAP) This attribute prevents word wrap within the cell.
+html <TH ALIGN> => (ALIGN="align") governs the alignment of the text within the table cell. "align" can be LEFT, RIGHT or CENTER. Table Header cells default to centred.
+html <TH VALIGN> => (VALIGN="align") governs the alignment of the text within the table cell. "align" can be TOP, MIDDLE, BOTTOM, or BASELINE.
+html <TH BGCOLOR> => (BGCOLOR="#rrggbb" -or- BGCOLOR="colorname") This attribute sets the background colour for the header cell.
+html <TH BORDERCOLOR> => (BORDERCOLOR="#rrggbb" -or- BORDERCOLOR="colorname") his attribute sets the border colour for the header cell.
+html <TH BORDERCOLORLIGHT> => (BORDERCOLORLIGHT="#rrggbb" -or- BORDERCOLORLIGHT="colorname") This attribute sets the border highlight colour for the header cell.
+html <TH BORDERCOLORDARK> => (BORDERCOLORDARK="#rrggbb" -or- BORDERCOLORDARK="colorname") This attribute sets the border shadow colour for the header cell.
+html <THEAD> => The THEAD tag defines the table heading. The THEAD tag is used to group all headers together. <Table Head> ( See also: html <THEAD attributes> )
+html <THEAD attributes> => The attributes for this tag are: ALIGN, CLASS, ID, STYLE, and VALIGN
+html <THEAD ALIGN> => (ALIGN=left, center, right, justify) Specifies the alignment of text in the heading, the default is center.
+html <THEAD CLASS> => (CLASS=type) This attribute indicates the class that the element belongs too.
+html <THEAD ID> => (ID=value) This attribute specifies a unique value for the element over the document.
+html <THEAD STYLE> => (STYLE=css1 properties) This attribute specifies style the information
+html <THEAD VALIGN> => (VALIGN=middle/top/bottom) This attribute specifies the verticle alignment of text in the heading. The default is middle. 
+html <TITLE> => The title tag, which is only valid in a HEAD section, defines the title of an HTML document. A title should be chosen that makes sense with no context; for example Introduction is a poor title since it contains no indication of the subject matter it discusses. Netscape displays document titles in the application's title bar and in bookmark lists.
+example <TITLE> => <TITLE> title-text </TITLE>
+html <TR> => Valid only in a TABLE, the table row tag defines a row of cells that are defined with TH and TD tags. <Table Row> ( See also: html <TR attributes> )
+html <TR attributes> => The attributes for this tag are: ALIGN, VALIGN, BGCOLOR, BORDERCOLOR, BORDERCOLORLIGHT, BORDERCOLORDARK, and CLASS
+html <TR ALIGN> => (ALIGN="align") governs the alignment of the text within the table cell. "align" can be LEFT, RIGHT or CENTER.
+html <TR VALIGN> => (VALIGN="align") governs the alignment of the text within the table cell. "align" can be TOP, MIDDLE, BOTTOM, or BASELINE.
+html <TR BGCOLOR> => (BGCOLOR="#rrggbb" -or- BGCOLOR="colorname") This attribute sets the background colour for the table row.
+html <TR BORDERCOLOR> => (BORDERCOLOR="#rrggbb" -or- BORDERCOLOR="colorname") This attribute sets the border colour for the table row.
+html <TR BORDERCOLORLIGHT> => (BORDERCOLORLIGHT="#rrggbb" -or- BORDERCOLORLIGHT="colorname") This attribute sets the border highlight colour for the table row.
+html <TR BORDERCOLORDARK> => (BORDERCOLORDARK="#rrggbb" -or- BORDERCOLORDARK="colorname") This attribute sets the border shadow colour for the table row.
+html <TR CLASS> => (CLASS="class") class is one of Header, Body, or Footer and allows the browser to arrange for header or footer rows to be displayed as the user scrolls through the document.
+html <TT> => The teletype tag defines text that should be shown in a fixed width font. It can be nested with other idiomatic or typographic tags but some browsers will respect only the innermost tag. Many browsers use the same font for the KBD, SAMP, TT and CODE tags. For many lines of fixed width text, with the line breaks and other whitespace specified by the page author, use the PRE tag.
+example <TT> => <TT> text </TT>
+html <U> => The underlined tag defines text that should be shown with a line underneath it. It can be nested with other idiomatic or typographic tags but some browsers will respect only the innermost tag. Many browsers, including some versions of Netscape, do not support this tag.
+example <U> => <U> text </U>
+html <UL> => The unordered list tag introduces an unordered (bulleted) list, which is made up of List Item (LI) tags. <UL> list entries </UL> 
+html <UL attributes> => The attributes for this tag are: COMPACT, SRC, DINGBAT, PLAIN, WRAP, and TYPE
+html <UL COMPACT> => The COMPACT attribute instructs the browser to reduce the space occupied by the list. For a numbered list use OL. For a list without bullets or numbers use MENU. For a list without bullets or numbers made up of short items that can be arranged into columns use DIR. <UL COMPACT> list entries </UL>
+html <UL SRC> => The SRC attribute identifies a graphic image to be used as a bullet. <UL SRC="URL" > list entries </UL>
+html <UL DINGBAT> => the DINGBAT attribute identifies an iconic entity for the bullet. UL DINGBAT="entity-name" > list entries </UL>
+html <UL PLAIN> => The PLAIN attribute specifies not to use a bullet on each item. <UL PLAIN>
+html <UL WRAP> => The WRAP attribute is either VERT or HORIZ, and indicates multiple columns of data. VERT indicates that the data is to go down the page and then wrap to the next column, and HORIZ indicates that the data is to wrap across each row. <UL WRAP=type>
+html <UL TYPE> => The TYPE attribute specifies the bullet type; type can be DISC, CIRCLE, or SQUARE. <UL TYPE=type > list entries </UL>
+html <VAR> => The variable tag defines text that represents a variable-- most browsers will display it in italics. It can be nested with other idiomatic or typographic tags but some browsers will respect only the innermost tag.
+example <VAR> => <VAR> text </VAR>
+html <WBR> => The word break tag identifies a place where a word can be broken, or where a line can be broken within a NOBR block.
+html <XMP> => The example tag introduces example text. Because of the way this tag handles embedded tags, it should no longer be used. PRE or SAMP are better choices.
+example <XMP> => <XMP> text </XMP>

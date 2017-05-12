@@ -1,0 +1,139 @@
+NAME
+    AnyEvent::Handle::Throttle - AnyEvent::Handle subclass with user-defined
+    up/down bandwidth cap
+
+Synopsis
+        use AnyEvent;
+        use AnyEvent::Handle::Throttle;
+        my $condvar = AnyEvent->condvar;
+        my $handle;
+        $handle = AnyEvent::Handle::Throttle->new(
+            upload_limit   => 2,  # Very...
+            download_limit => 50, # ...slow
+            connect  => ['google.com', 'http'],
+            on_error => sub {
+                warn "error $_[2]\n";
+                $_[0]->destroy;
+                $condvar->send;
+            },
+            on_eof => sub {
+                $handle->destroy;
+                warn "done.\n";
+                $condvar->send;
+            }
+        );
+        $handle->push_write("GET / HTTP/1.0\015\012\015\012");
+        $handle->push_read(
+            line => "\015\012\015\012",
+            sub {
+                my ($handle, $line) = @_;
+                print "HEADER\n$line\n\nBODY\n";
+                $handle->on_read(sub { print $_[0]->rbuf; $_[0]->rbuf = ''; });
+            }
+        );
+        $condvar->recv;
+
+Description
+    This class adds a (nearly too) simple throughput limiter to
+    AnyEvent::Handle.
+
+Methods
+    In addition to AnyEvent::Handle's base methods, this subclass supports
+    the following...
+
+    $handle = AnyEvent::Handle::Throttle->new( key => value, ... )
+        In addition to the arguments handled by "AnyEvent::Handle->new( ...
+        )", this constructor supports these arguments (all as "key => value"
+        pairs).
+
+        upload_limit => <bytes>
+            This is the maximum amount of data (in bytes) written to the
+            filehandle per period. If "upload_limit" is not specified, the
+            upload rate is not limited.
+
+            Note that this value can/will override "read_size".
+
+        download_limit => <bytes>
+            This is the maximum amount of data (in bytes) read from the
+            filehandle per period. If "download_limit" is not specified, the
+            upload rate is not limited.
+
+    $handle->upload_limit( $bytes )
+        Sets/returns the current upload rate in bytes per period.
+
+    $handle->download_limit( $bytes )
+        Sets/returns the current download rate in bytes per period.
+
+    $bytes = $handle->upload_speed( )
+        Returns the amount of data written during the previous period.
+
+    $bytes = $handle->download_speed( )
+        Returns the amount of data read during the previous period.
+
+    If you're using AnyEvent::Handle::Throttle to limit bandwidth and
+    realize you'd rather set flat limits on the total bandwidth instead of
+    per-handle, try these methods:
+
+    AnyEvent::Handle::Throttle->global_upload_limit( $bytes )
+        Sets/returns the current global upload rate in bytes per period.
+
+    AnyEvent::Handle::Throttle->global_download_limit( $bytes )
+        Sets/returns the current global download rate in bytes per period.
+
+    $bytes = $handle->global_upload_speed( )
+        Returns the amount of data written through all
+        AnyEvent::Handle::Throttle objects during the previous period.
+
+    $bytes = $handle->global_download_speed( )
+        Returns the amount of data read through all
+        AnyEvent::Handle::Throttle objects during the previous period.
+
+    $bytes = $handle->download_total( )
+        Returns the total amount of data read through the
+        AnyEvent::Handle::Throttle object.
+
+    $bytes = $handle->upload_total( )
+        Returns the total amount of data written through the
+        AnyEvent::Handle::Throttle object.
+
+    $bytes = $handle->global_download_total( )
+        Returns the total amount of data read through all
+        AnyEvent::Handle::Throttle objects so far.
+
+    $bytes = $handle->global_upload_total( )
+        Returns the total amount of data sent through all
+        AnyEvent::Handle::Throttle objects so far.
+
+Notes
+    *   The current default period is 1 second.
+
+    *   On destruction, all remaining data is sent ASAP, ignoring the user
+        defined upload limit. This may change in the future.
+
+Bugs
+    I'm sure this module is just burting with 'em. When you stumble upon
+    one, please report it via the Issue Tracker
+    <http://github.com/sanko/anyevent-handle-throttle/issues>.
+
+Author
+    Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/
+
+    CPAN ID: SANKO
+
+License and Legal
+    Copyright (C) 2010 by Sanko Robinson <sanko@cpan.org>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of The Artistic License 2.0
+    <http://www.perlfoundation.org/artistic_license_2_0>. See the LICENSE
+    file included with this distribution or notes on the Artistic License
+    2.0 <http://www.perlfoundation.org/artistic_2_0_notes> for
+    clarification.
+
+    When separated from the distribution, all original POD documentation is
+    covered by the Creative Commons Attribution-Share Alike 3.0 License
+    <http://creativecommons.org/licenses/by-sa/3.0/us/legalcode>. See the
+    clarification of the CCA-SA3.0
+    <http://creativecommons.org/licenses/by-sa/3.0/us/>.
+
+$Id: README bc1ea36 2010-08-25 18:16:33Z sanko@cpan.org $

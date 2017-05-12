@@ -1,0 +1,6 @@
+$Id: /local/CPAN/Apache-AxKit-Language-XSP-ObjectTaglib/Todo 1497 2005-03-05T17:05:21.898763Z claco  $
+TODO list for Perl module Apache::AxKit::Language::XSP::ObjectTaglib
+
+    - Add %attr param passing options to targets
+    - Add auto create option for main parent loop tags
+    - Make start and end attributes for type=special optional

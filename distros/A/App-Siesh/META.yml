@@ -1,0 +1,49 @@
+---
+abstract: 'interactive sieve shell'
+author:
+  - 'Mario Domgoergen <dom@math.uni-bonn.de>'
+build_requires:
+  IO::String: 0
+  Test::More: 0
+  Test::Output: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Siesh
+provides:
+  App::Siesh:
+    file: lib/App/Siesh.pm
+    version: 0.21
+  App::Siesh::Batch:
+    file: lib/App/Siesh/Batch.pm
+    version: 0
+  Net::ManageSieve::Siesh:
+    file: lib/Net/ManageSieve/Siesh.pm
+    version: 0
+recommends:
+  Authen::SASL: 0
+requires:
+  Config::Find: 0
+  Config::Tiny: 0
+  File::Temp: 0
+  Getopt::Long: 0
+  IO::File: 0
+  IO::Handle: 0
+  IO::Interactive: 0
+  IO::Prompt: 0
+  IO::Socket::SSL: 0
+  IPC::System::Simple: 0
+  Net::ManageSieve: 0.08
+  Pod::Usage: 0
+  Term::ShellUI: 0
+  autodie: 0
+  parent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/mdom/app-siesh
+version: 0.21

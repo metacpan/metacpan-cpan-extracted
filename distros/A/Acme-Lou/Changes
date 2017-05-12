@@ -1,0 +1,17 @@
+Revision history for Acme-Lou
+
+0.04 2016-09-11T09:18:02Z
+        - re packaging
+        - HTML input/output, format options are obsoleted.
+
+0.03  2007-02-01
+        - use Text::MeCab instead of MeCab.pm
+        - add "format" option.
+        - More lou-ish (dic, word class)
+        - More tests
+
+0.02  2007-01-27
+        - Add HTML effect option. Upload to CPAN.
+
+0.01  2007-01-23
+        - Initial release.

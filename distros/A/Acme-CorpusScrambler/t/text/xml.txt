@@ -1,0 +1,21 @@
+甲骨文(Oracle)宣佈推出Oracle Database 11g，為Oracle Database的最新版本。Oracle Database 11g可以幫助企業管理企業資訊。新版資料庫增強了Oracle Database的資料庫叢集(clustering)、資料中心自動化和工作量管理功能。甲骨文客戶可以在低成本伺服器和儲存設備組成的網格上，滿足交易處理、資料倉儲和內容管理應用。
+
+即時應用測試套件(Real Application Testing)減少變更所需時間、降低有關風險和成本，Oracle Database 11g具有自助式管理功能和自動化功能，可幫助企業滿足服務層級協議的要求。例如對需要定期升級資料庫和作業系統並改變硬體和系統的企業來說，Oracle Database 11g的Oracle即時應用測試(Oracle Real Application Testing)套件使Oracle Database 11g能夠幫助企業以可控制和具經濟效益的方法，迅速測試並管理IT環境變化的資料庫。
+
+Oracle Database 11g的Oracle Data Guard套件可幫助客戶利用備用資料庫，以提升生產環境的效能，並保護生產環境免受系統故障和大面積災難的影響。Oracle Data Guard套件可以同時讀取和復原單個備用資料庫，因此Oracle Data Guard套件可用於對生產資料庫的報告、備份、測試和「滾動」升級(rolling upgrades)。透過將工作量從生產系統卸載到備用系統，Oracle Data Guard套件還有助於提升生產系統的效能，並組成一個更經濟的災難復原解決方案。
+
+Oracle Database 11g具備資料分割(data partitioning)和壓縮功能，可實現資訊生命週期管理和儲存管理。很多原來需要手工完成的資料分割工作在Oracle Database 11g中都實現了自動化，Oracle Database 11g還擴展了既有的範圍、散列和列表劃分功能，增加了間隔、索引和虛擬欄劃分功能。另外Oracle Database 11g還具有一套完整的複合分割選項，可以實現以業務規則為導向的儲存管理。
+
+Oracle Database 11g以資料壓縮功能為基礎，可在交易處理、資料倉儲和內容管理環境中實現先進的結構化和非結構化資料壓縮。採用Oracle Database 11g中的壓縮功能，所有資料都可以實現2×至3×或更高的壓縮比。Oracle Database 11g具有Oracle Total Recall功能，可幫助管理員查詢在過去某些時刻指定表格中的數據。管理員可以用這種簡單實用的方法給資料增加時間維度，以追蹤資料變化、實施稽核並滿足法規要求。
+
+在保護資料庫應用免受計畫停機和意外當機影響方面。Oracle Database 11g新的可用性功能包括︰Oracle閃回交易(Oracle Flashback Transaction)，可以撤銷錯誤交易以及任何相關交易；並行備份和回復功能，可改善非常大資料庫的備份和儲存效能；「熱修補」(hot patching)功能，不必關閉資料庫就可以進行資料庫修補。另外一種新的顧問軟體──資料復原顧問(Data Recovery Advisor)，可自動偵測問題、決定復原計畫並處理多重故障情況，縮短資料回復所需的停機時間。
+
+Oracle Database 11g具有在資料庫中儲存大型物件(LOBs)的新功能，這些物件包括影像、大型純文字物件或一些進階的資料類型，如XML、醫學成象資料和三度空間物件。Oracle快速檔案(Oracle Fast Files)套件使得資料庫應用的效能完全可與檔案系統的校能匹敵。透過儲存更廣泛的企業資訊並檢索這些資訊，企業可以對自己的業務了解得更深入，並更快地對業務做出調整以適應市場變化。
+
+在Oracle Database 11g中，XML DB的性能獲得了提升，XML DB是Oracle Database的一個套件，可幫助客戶以本機模式儲存和操控XML資料。Oracle Database 11g增加了對二元(binary) XML資料的支持，現在客戶可以選擇適合自己特定應用及效能需求的XML儲存選項。XML DB還可以透過支援XQuery、JSR-170、SQL/XML等業界標準界面來操控XML資料。
+
+Oracle Database 11g進一步增強了Oracle Database的安全性。這個新版資料庫增強了Oracle透明資料加密功能(Oracle Transparent Data Encryption)，將這種功能擴展到了欄位加密之外。Oracle Database 11g具有表空間加密功能，可用來加密整個表、索引和所儲存的其他資料。儲存在資料庫中的大型物件也可以加密。OLAP cubes現在可以在資料庫中如同實體化視域(materialized views)那樣使用，因此開發人員可以用業界標準SQL實現資料查詢。新的連續查詢通知(Continuous Query Notification)套件在資料庫資料發生重要變化時，會立即通知應用軟體。
+
+Oracle Database 11g增加了查詢結果快取(Query Result Caches)等新功能。透過快取和重復使用經常調用的資料庫查詢以及資料庫和應用層的功能，查詢結果快取功能改善了應用的效能和可擴充性。資料庫駐留連接匯集(Database Resident Connection Pooling)功能透過為非多線程應用(non-multi-threaded applications)提供連接匯集，提升了Web系統的可擴充性。
+
+Oracle Database 11g提供多種開發工具供開發人員選擇，它提供的簡化應用開發流程可以充分利用Oracle Database 11g的關鍵功能，這些關鍵功能包括︰客戶端快取(Client Side Caching)、提升應用速度的二元XML(binary XML)、XML處理以及文件儲存和檢索。另外，Oracle Database 11g還具有新的Java即時編譯器，無需第三方編譯器就可以更快地執行資料庫Java程式；為開發

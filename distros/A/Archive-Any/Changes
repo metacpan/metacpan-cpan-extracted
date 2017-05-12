@@ -1,0 +1,75 @@
+0.0945 2016-05-02 18:56:57 America/Toronto
+    - Use 'base' rather than @ISA in Zip.pm
+
+0.0944 2016-04-01 18:30:02 America/Toronto
+    - Use warnings in more modules (Jenish G)
+
+0.0943 2016-04-01 18:28:03 America/Toronto
+    - Use 'base' rather than @ISA (@real-dam and Jenish G)
+
+0.0942 2015-01-28 17:07:43 America/Toronto
+    - Replaces contents of archives in test folder with random noise in order
+      to avoid any licensing issues. (Philippe Bruhat (BooK))
+
+0.0941 2013-11-06 21:38:55 America/Toronto
+    - Fixes version number in lib/Archive/Any.pm
+    - Previous release had broken permissions.
+
+0.0940 2013-10-18 01:35:34 America/Toronto
+    - Adds x-bzip2 as per PERLER's patch in RT#67738.
+    - Converts dist to Dist::Zilla
+
+0.931 2008-04-23
+    - Resisted the urge to make large sweeping changes.  Fixed a problem with
+      the tests and called it good.
+
+0.93  2008-04-23
+    - DESTROY ALL TABS! [schwern]
+    - The example for Plugin->can_handle showed the wrong return value.
+      [schwern]
+
+0.92  2006-08-26
+    - Added pod tests and a README for kwalitee.  Not exactly a critical
+      update!
+
+0.91  2006-08-14
+    - type() is there now.  I'm not in the business of breaking other
+      people's scripts.
+    - Fixed several issues with the pod.
+    - type() is going AWAY AWAY AWAY - use mime_type instead.  It
+      actually has useful information.
+    - Added a test for the backwardsness.
+
+0.09  2006-08-13
+    - Complete rework of the module.
+    - Supports simple plugins for adding support for archive formats.
+
+0.06  2003-10-29
+    - Updating to Archive::Zip 1.07 which fixes extractTree().
+    * Forgot to include *.tar in the "what is a tarball" logic!
+      [Thanks Kevin Pease]
+    - Minor doc improvements.
+
+0.05  2003-10-20
+    * Archive::Any->new($file, $type) wasn't working (thanks to Simon Wistow
+      for catching this).
+
+0.04  2003-10-20
+    * Removing unzip binary hack around Archive::Zip->extractMember bug.
+    - Working around new extractTree() bug which can cause directories to
+      be unzipped with permissions set to 0000.
+    - Fixing is_impolite() and is_naughty() so they return true or false
+      instead of the scalar result of a grep.
+    - Failing gracefully should Archive::Tar/Zip->new() fail.
+    * Fixing list_archive() and extract_archive() misuse so we work with
+      modern Archive::Tar.
+    - Class::Virtually::Abstract now has a version # on CPAN.
+    * is_naughty() would screw up if the first file in the archive wasn't
+      a lone directory
+
+0.03  2001-09-03
+    * It is now safe to chdir() after creating an Archive::Any object
+
+0.01  2001-08-26
+    * First working version
+    * Archive::Zip is broken.  Using unzip binary to extract.

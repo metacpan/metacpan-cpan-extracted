@@ -1,0 +1,20 @@
+Changes
+FANN.xs
+morefann.c
+morefann.h
+accessors.xsh
+constants.h
+typemap
+genaccessors
+genconstants
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/AI-FANN.t
+t/pods.t
+lib/AI/FANN.pm
+samples/ox.pl
+samples/add.pl
+samples/xor.pl
+META.yml                                 Module meta-data (added by MakeMaker)

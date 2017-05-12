@@ -1,0 +1,59 @@
+Audio/Daemon version 0.99 Beta
+========================
+
+Audio::Daemon is divided into two parts, the client and server.
+
+The Client (Audio::Daemon::Client) remains the same across the 
+board no matter what server you are communicating with, with a 
+few exceptions noted in the pods.
+
+The Server currently can be configured to be MPG123, Xmms or an Icecast
+(libshout) stream.  Neither the Client nor the Servers need to be run as
+root and I strongly advise against it.
+
+Audio::Daemon::MPG132:
+  Requires Audio::Play::MPG123 an optionally Audio::Mixer for volume
+  control.  It automatically spawns mpg123 in the background so there
+  is no need to prestart it.
+
+Audio::Daemon::Xmms:
+  Requires the Xmms and MP3::Info perl module and xmms installed.  I'd 
+  suggest getting the latest version of the Xmms perl module.  It uses 
+  the volume and random feature built into xmms and if it doesn't find 
+  an xmms running it will try to spawn its own copy.  Bear in mind that 
+  xmms MUST HAVE an X display to export to, and that xmms must be 
+  running as the same user Audio::Daemon::Xmms is.
+
+Audio::Daemon::Shout:
+  This wasn't easy to do.  It requires MP3::Info and libshout to be
+  installed (http://developer.icecast.org/libshout/) as well as a 
+  functioning icecast server.  The timing here is pretty critical
+  so I recomend being careful not to be polling the server too much.
+  Be sure to read the icecast docs as I'm still confused on how I 
+  got this part to work.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test   # (currently not testing)
+   make install
+
+DEPENDENCIES
+
+Audio::Play::MPG123
+Audio::Mixer
+Xmms
+MP3::Info
+libshout
+IO::Socket
+IO::Select
+
+COPYRIGHT AND LICENCE
+
+GPL license
+audio-daemon.sourceforge.net
+feedback, criticism or quesitons welcome
+jayj@cpan.org

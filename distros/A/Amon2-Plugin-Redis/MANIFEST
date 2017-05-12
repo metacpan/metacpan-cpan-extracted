@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Amon2/Plugin/Redis.pm
+minil.toml
+t/00_compile.t
+t/redis.t
+META.yml
+MANIFEST

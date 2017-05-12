@@ -1,0 +1,26 @@
+---
+abstract: 'Command line tool to encrypt and encrypt integer using Integer::Tiny'
+author:
+  - 'faraco <skelic3@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-TinyID
+requires:
+  Getopt::Long: v2.49.1
+  Integer::Tiny: '0.3'
+  Scalar::Util: '1.47'
+  Test::More: '1.302075'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/faraco/App-TinyID/issues
+  homepage: https://github.com/faraco/App-TinyID
+  repository: https://github.com/faraco/App-TinyID.git
+version: 0.1.1
+x_serialization_backend: 'YAML::Tiny version 1.69'

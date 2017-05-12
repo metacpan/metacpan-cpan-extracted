@@ -1,0 +1,7 @@
+rra-c-util is my collection of portability functions, utility functions,
+Autoconf macros, and related shared C infrastructure, akin to gnulib but
+without any GPL-covered code and additional support for Kerberos and PAM
+development.  It serves as a common repository of code and infrastructure
+used across multiple projects so that files have a canonical latest
+version.  It's not intended for installation as a regular package;
+instead, other packages are expected to copy files from here as needed.

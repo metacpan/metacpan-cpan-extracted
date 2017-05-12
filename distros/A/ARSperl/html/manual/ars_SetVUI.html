@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual - ars_SetVUI</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_SetVUI(ctrl, schema, vuiId, vuiHash)</CODE></H2>
+
+      This function modifies an existing VUI. You must first
+      populate the <CODE>vuiHash</CODE> before calling this routine.
+      <P><CODE>schema</CODE> is the name of the schema containing the VUI.
+      <P><CODE>vuiId</CODE> is the numeric VUI id.
+      <P><CODE>vuiHash</CODE> is a partially assigned
+      <A HREF="ds_getvui_hash.html">VUI Attributes</a> hash. 
+
+      <P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns 1
+          <DT><B>On failure</B><DD>
+              Returns 0
+      </DL>
+
+      <P>Example:
+
+      <P><BLOCKQUOTE>
+      <I> This example changes the owner of the view "TEST:View". 
+      </I></BLOCKQUOTE>
+
+      <PRE>
+      ($v = ars_GetVUI($c,"Schema",$vuiId)) ||
+	    die $ars_errstr;
+      ars_SetVUI( $c, "Schema", $vuiId, {owner => "admin2"} ) || die $ars_errstr;
+      </PRE>
+
+<P>
+<I>This function was introduced in version 1.90 of ARSperl</I>
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

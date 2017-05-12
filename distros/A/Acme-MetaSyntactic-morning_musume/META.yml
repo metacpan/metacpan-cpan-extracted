@@ -1,0 +1,27 @@
+---
+abstract: unknown
+author:
+  - 'Laurent Boivin (elbeho) <elbeho@cpan.org>'
+build_requires:
+  Test::MetaSyntactic: 1.001
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-MetaSyntactic-morning_musume
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Acme::MetaSyntactic: 1.007
+  Acme::MorningMusume: 0.13
+  perl: 5.006002
+resources:
+  repository: http://github.com/elbeho/Acme-MetaSyntactic-morning_musume/
+version: 1.002

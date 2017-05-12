@@ -1,0 +1,6 @@
+% title 'Goodbye';
+
+%= p q{That's all folks}
+%= overlay '2-' => begin
+  %= p '.center' => '(why are you still staring?)'
+% end

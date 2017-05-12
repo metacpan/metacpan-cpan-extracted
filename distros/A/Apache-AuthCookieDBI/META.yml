@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache-AuthCookieDBI
+version:      2.1
+version_from: AuthCookieDBI.pm
+installdirs:  site
+requires:
+    Apache:                        0
+    Apache::AuthCookie:            0
+    Apache::Constants:             0
+    Apache::DBI:                   0
+    Date::Calc:                    0
+    DBI:                           0
+    Digest::MD5:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

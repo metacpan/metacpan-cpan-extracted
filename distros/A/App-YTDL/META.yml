@@ -1,0 +1,52 @@
+---
+abstract: unknown
+author:
+  - 'Kuerbis <cuer2s@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-YTDL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '0'
+  Encode::Locale: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::HomeDir: '0'
+  File::Path: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  File::Touch: '0'
+  File::Which: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  IPC::System::Simple: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  List::MoreUtils: '0'
+  Mojo::DOM: '0'
+  Pod::Usage: '0'
+  Term::ANSIScreen: '0'
+  Term::Choose: '1.504'
+  Term::Choose::LineFold: '1.504'
+  Term::Choose::Util: '0.051'
+  Term::Form: '0'
+  Text::Unidecode: '0'
+  Time::HiRes: '0'
+  Time::Local: '0'
+  perl: '5.010000'
+resources:
+  repository: https://github.com/kuerbis/App-YTDL.git
+version: '0.254'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

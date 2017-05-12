@@ -1,0 +1,10 @@
+MYMETA.yml
+MANIFEST.bak
+Makefile.old
+META.yml
+Makefile
+inc
+MANIFEST
+blib
+pm_to_blib
+App-TailRabbit-*

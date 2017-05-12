@@ -1,0 +1,61 @@
+{
+   "abstract" : "Monitor the OpenVZ user_beancounters file",
+   "author" : [
+      "Steven Schubiger <schubiger@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-OpenVZ-BCWatch",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04"
+         },
+         "requires" : {
+            "Carp" : 0,
+            "Config::File" : 0,
+            "Daemon::Generic" : 0,
+            "File::Basename" : 0,
+            "File::HomeDir" : 0,
+            "File::Spec" : 0,
+            "File::Temp" : 0,
+            "FindBin" : 0,
+            "Mail::Sendmail" : 0,
+            "Storable" : 0,
+            "Sys::Hostname" : 0,
+            "boolean" : 0
+         }
+      }
+   },
+   "provides" : {
+      "App::OpenVZ::BCWatch" : {
+         "file" : "lib/App/OpenVZ/BCWatch.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.04"
+}

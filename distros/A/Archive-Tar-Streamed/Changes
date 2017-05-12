@@ -1,0 +1,13 @@
+Revision history for Perl module Archive::Tar::Streamed
+
+0.03 Sun Jan 02 2005
+	- Fixed another bug. next method was skipping the first file in 
+	  every directory. Added test case t/11_dirs_and_files.t.
+
+0.02 Sat Jan 01 2005
+	- Fix bug with trailing 0 blocks. Added t/10_tar_of_a_tar.t which
+	  tests for this.
+
+0.01 Wed Dec 29 2004
+	- original version; created by ExtUtils::ModuleMaker 0.32
+

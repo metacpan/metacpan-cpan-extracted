@@ -1,0 +1,11 @@
+2008-03-24  Diab Jerius  <djerius@cfa.harvard.edu>
+
+	Tag 0.01
+
+2008-03-24 16:30 -0400  djerius  <djerius@cfa.harvard.edu>  (74d21fc614ab [tip])
+
+	* Changes, MANIFEST.SKIP, Makefile.PL, README, data/table.fits,
+	lib/Astro/XSPEC/TableModel.pm, t/00-load.t, t/perlcritic.t, t/pod-
+	coverage.t, t/pod.t, t/write.t:
+	initial import
+

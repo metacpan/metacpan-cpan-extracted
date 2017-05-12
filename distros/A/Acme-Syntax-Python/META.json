@@ -1,0 +1,41 @@
+{
+   "abstract" : "Python like Syntax Module",
+   "author" : [
+      "Madison Koenig"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131490",
+   "license" : [
+      "restricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Syntax-Python",
+   "no_index" : {},
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Filter::Util::Call" : "0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}
+

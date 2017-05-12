@@ -1,0 +1,9 @@
+Revision history for AmbientOrb-Serial
+
+0.02    2006-06-21
+        Disconnecting from port when object leaves scope
+        Fixed unit tests so they connect to /dev/ttys0 on unix OS
+
+0.01    2006-06-15
+        First version of AmbientOrb serial interface.
+

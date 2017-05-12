@@ -1,0 +1,8 @@
+Revision history for App-cpackage
+
+1.01    22 Dec 2011
+        Support CPAN modules with nested path names
+        (e.g. AUTHOR/directory/file-0.00.tar.gz)
+
+1.00    12 Nov 2011
+        Initial release for London Perl Workshop lightning talk

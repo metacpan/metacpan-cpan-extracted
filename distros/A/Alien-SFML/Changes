@@ -1,0 +1,6 @@
+Revision history for Perl extension Alien::SFML.
+
+0.01  Sat Mar 16 17:06:03 2013
+	- original version; created by h2xs 1.23 with options
+		-X -n Alien::SFML
+

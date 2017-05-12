@@ -1,0 +1,11 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+examples/net.pl
+lib/Any/Daemon.pm
+lib/Any/Daemon.pod
+scripts/generic-startstop
+t/01use.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

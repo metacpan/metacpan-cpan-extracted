@@ -1,0 +1,212 @@
+@charset "UTF-8";
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+html {
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+q, blockquote {
+  quotes: none;
+}
+q:before, q:after, blockquote:before, blockquote:after {
+  content: "";
+  content: none;
+}
+
+a img {
+  border: none;
+}
+
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {
+  display: block;
+}
+
+body {
+  padding: 20px 0;
+  font-family: "Lucida Grande",Lucida,Verdana,sans-serif;
+  line-height: 1.4em;
+  font-size: 15.5px;
+  -webkit-font-smoothing: antialiased;
+}
+
+#wrapper {
+  color: #303030;
+  width: 840px;
+  margin: 20px auto 40px;
+}
+
+.page {
+  -webkit-column-count: 2;
+  -moz-column-count: 2;
+  -ms-column-count: 2;
+  -o-column-count: 2;
+  column-count: 2;
+  -webkit-column-gap: 40px;
+  -moz-column-gap: 40px;
+  -ms-column-gap: 40px;
+  -o-column-gap: 40px;
+  column-gap: 40px;
+}
+.page img {
+  max-width: 380px;
+  margin-left: -15px;
+  padding: 3px;
+  border: 2px solid #ccc;
+}
+
+.page-number {
+  margin: 30px 0 40px;
+  font-size: 18px;
+  text-align: center;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #bbb;
+}
+.page-number span {
+  padding: 10px 20px;
+  -webkit-border-radius: 4px 4px;
+  -moz-border-radius: 4px / 4px;
+  border-radius: 4px / 4px;
+  background-color: #eee;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #333;
+  font-weight: bold;
+  margin: 1em 0 1em 2px;
+  line-height: 1.4;
+}
+
+h1 {
+  margin-top: 0;
+  font-size: 2.0em;
+}
+
+h2 {
+  font-size: 1.7em;
+}
+
+h3 {
+  font-size: 1.5em;
+}
+
+h3 {
+  font-size: 1.3em;
+}
+
+h4 {
+  font-size: 1.1em;
+}
+
+p {
+  font-family: "游明朝体", "Yu Mincho", YuMincho, "ヒラギノ明朝 Pro", "Hiragino Mincho Pro", "ＭＳ Ｐ明朝", "MS PMincho", serif;
+  margin: 1em 0;
+  line-height: 1.8em;
+  text-indent: 15px;
+}
+
+ol, ul {
+  list-style-position: outside;
+  list-style-type: disc;
+  margin-left: 20px;
+  padding: 0;
+}
+
+li {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+hr {
+  border: 0;
+  border-bottom: 1px solid #ddd;
+  margin: 30px 0;
+}
+
+blockquote {
+  font-style: italic;
+  text-decoration: underline;
+}
+
+strong, b {
+  font-family: "游ゴシック体", "Yu Gothic", YuGothic, "ヒラギノ角ゴ Pro", "Hiragino Kaku Gothic Pro", "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+  font-weight: bold;
+}
+
+pre {
+  background-color: #ddd;
+  padding: 10px;
+  border: 1px solid #999;
+  overflow: auto;
+  margin: 20px 0;
+}
+pre code {
+  font-size: 12px;
+  line-height: 1;
+  font-family: "Monaco", monospace;
+}
+
+code {
+  font-size: 14px;
+  font-family: "Monaco", monospace;
+}
+
+table {
+  font-size: 12px;
+  border: #333 1px solid;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+table th {
+  background-color: #666;
+  border: #ccc 1px dotted;
+  color: #fff;
+  vertical-align: top;
+  text-align: left;
+  padding: 10px;
+}
+table td {
+  background-color: #eee;
+  border: #ccc 1px dotted;
+  vertical-align: top;
+  text-align: left;
+  padding: 10px;
+}
+
+#footer {
+  font-style: italic;
+  text-align: center;
+}

@@ -1,0 +1,45 @@
+---
+abstract: 'bulk rename - a fork of rename.'
+author:
+  - 'Stirling Westrup <swestrup@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-FileTools-BulkRename
+requires:
+  Carp: 0
+  Clipboard: 0
+  Config::IniFiles: 0
+  Contextual::Return: 0
+  Data::Dump: 0
+  Data::Dumper: 0
+  Encode: 0
+  Exporter: 0
+  File::Slurp: 0
+  FindBin: 0
+  Getopt::Long: 0
+  IO::File: 0
+  IO::Interactive: 0
+  Lingua::EN::Titlecase: 0
+  List::Util: 0
+  Pod::Text::Termcap: 0
+  Pod::Usage: 0
+  Scalar::Util: 0
+  Text::Autoformat: 0
+  Text::ParseWords: 0
+  enum: 0
+  feature: 0
+  open: 0
+  perl: 5.010
+  strict: 0
+  subs: 0
+  utf8: 0
+  warnings: 0
+version: 0.07

@@ -1,0 +1,8 @@
+Changes
+ARTISTIC
+GPL
+MANIFEST
+Makefile.PL
+FakeCookie.pm
+t/a_cookie.t
+META.yml                                 Module meta-data (added by MakeMaker)

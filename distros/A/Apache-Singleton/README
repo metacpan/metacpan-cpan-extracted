@@ -1,0 +1,24 @@
+Apache::Singleton is Copyright (C) 2009, Michael Schout.
+
+WHAT IS THIS?
+
+Apache::Singleton works the same as Class::Singleton, but with various object
+lifetime (scope) under mod_perl or mod_perl2. See the Class::Singleton manpage
+first.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other CPAN modules:
+
+    Test::More 0.32 or later
+    mod_perl or mod_perl2
+

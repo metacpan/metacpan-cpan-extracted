@@ -1,0 +1,5 @@
+MANIFEST
+Makefile.PL
+README
+lib/Algorithm/Points/MinimumDistance.pm
+t/01_minimum_distance.t

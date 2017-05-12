@@ -1,0 +1,11 @@
+Revision history for Perl extension Acme::YAPC::Asia::2012::LTthon::Hakushu
+
+0.03 2012-09-28 12:37:50
+    - fix prerequisites modules
+
+0.02 2012-09-28 12:36:13
+    - add hakushu() function
+
+0.01 2012-09-28 12:25:49
+    - original version; created by dim
+      at Fri Sep 28 12:18:42 2012.

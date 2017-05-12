@@ -1,0 +1,144 @@
+Frequently Asked Questions
+  Why did you write Logmonster?
+    Typical Scenario: A web server serves a domain. We write a simple script
+    to restart apache each night and pipe the logs off to our analyzer. Or
+    use newsyslog to do the same. It works fine.
+
+    ISP/Hosting Scenario: Each server hosts many domains. We may have load
+    balanced servers (multiple machines) serving each domain. A tool like
+    logmonster is necessary to:
+
+    1. collect all the log files from each server
+    2. split the logs based on the virtual host(s)
+    3. sort them into cronological order
+    4. feed logs into analyzer
+    5. do something with the raw logs (compress, drop into vhost dir, etc)
+
+  Why should I use cronolog?
+    Read the Apache docs (<http://httpd.apache.org/docs/2.0/logs.html>) and
+    all the caveats required to rotate logs, including restarting the server
+    at the right time. Factor that into using several servers in different
+    time zones and you will find it much more reliable to use cronolog. I
+    have used cronolog for years and never had an issue.
+
+  Why not use one file per vhost so you don't have to split them?
+    I tried that. I ended up with lots of open file descriptors (one per
+    vhost). That doesn't scale well. One must still collect the files from
+    multiple servers and sort them. Why not begin with them all in one
+    place?
+
+  What is the recommended way to implement logmonster?
+    *   Adjust CustomLog and add the %v to it as show above.
+
+    *   If you aren't already using cronolog, start. Wait a day.
+
+    *   Test by running "logmonster -i day -n"
+
+    It will tell you what it is doing and everything should look reasonable.
+    Correct anything you do not like (creating $statsdir for domains that
+    should have it, etc) and then create a cron entry running "logmonster.pl
+    -d" anytime after midnight. Read the output from logmonster in your
+    mailbox for the next week. When you're confident everything is great,
+    adjust crontab and add a "-q" to it so it stops emailing you (unless
+    there's errors).
+
+  How do I process my logs hourly?
+    *   Set cronolog to "%Y/%m/%d/%H"
+
+    *   run logmonster with -i hour
+
+    *   adjust the cron entry to run every hour.
+
+    If you use webalizer, get acquainted with webalizer -p and its limits.
+
+  Can you explain how to use the -b stuff?
+    Imagine you shut your server down at 0:55 last night to do some system
+    maintenance. You brought it back up at at 1:05 (10 minutes later) but
+    your cron job that runs logmonster at 1:00am did not run. The solution
+    is to run logmonster manually.
+
+    Now, suppose you made an err that caused logmonster to not run for the
+    last week. You return from vacation and notice the errors in your
+    mailbox, because that is where you configured cron stuff to go, right?
+    Now you set about to fix the problem.
+
+    The way to process old logs with logmonster is to use the -b option. In
+    our example, we would run "logmonster -i day -b7". Logmonster will
+    confirm the date with you and then dutifully process the logs from 7
+    days ago. Then run again with "-d -b6", etc until you are current.
+
+  What assumptions do logmonster.pl make?
+    1. You use cronolog
+    2. You have enough memory to fit your largest zones log file into RAM
+    3. You have the following Perl modules installed
+        Most systems have all but Compress::Zlib installed
+
+        *   FileHandle
+
+        *   POSIX
+
+        *   Date::Format
+
+        *   File::Copy
+
+        *   File::Path
+
+        *   Date::Parse
+
+        *   Compress::Zlib
+
+    4. Your logs are set up properly. See "INSTALL"
+    5. The time on your web servers is synchronized (think NTP)
+    6. You use webalizer, http-analyze, or AWstats for log processing
+
+  Cronolog and selinux are not playing nicely
+    I just finished installing cronolog on a selinux system (CentOS) with
+    the sestatus set to enforcing. There were problems getting the
+    permissions correct so that cronolog would be allowed to create files
+    and dirs. I added this to solve the problem.
+
+    CentOS and RHEL4 and other RH clones use the file:
+    /etc/selinux/targeted/contexts/files/file_contexts to store context info
+    for files and dirs. In the above file add the location that you want
+    logs to be written in if different than the standard /var/log/httpd like
+    so:
+
+    "/var/log/apache(/.*)? system_u:object_r:httpd_log_t"
+
+    This line would allow cronolog to create and write files in the new
+    location. Hope this saves someone else the trouble. Another way to do
+    this would be to use the command line chcon facility like so:
+
+    "chcon -R -h -t httpd_log_t /var/log/apache"
+
+    I have not rebooted my server or tested to see that on a system reset
+    the chcon settings survive but I doubt it.
+
+    I hope this info saves someone else the trouble of looking it up and
+    diagnosing a problem. -- Lewis Bergman
+
+  How do my logs need to be set up?
+    The default version of Apache's ELF format is quite good. However, on a
+    system with many virtual hosts, determing which vhost a particular entry
+    is for can be difficult. I wrote a parser that was about 98% effective.
+    However, there is a better way.
+
+    Web servers support the addition of a %v option in the LogFormat
+    declaration. It appends the virtualhost that the hit was served for.
+    This is 100% effective and a bulletproof way to detemine which vhost a
+    log entry was served for. We recommend a slightly modified version of
+    Apache's Extended Log Format.
+
+      LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %v" combined
+      CustomLog "| /usr/local/sbin/cronolog /var/log/apache/%Y/%m/%d/access.log" combined
+      ErrorLog "| /usr/local/sbin/cronolog /var/log/apache/%Y/%m/%d/error.log"
+
+    The LogFormat line is identical to its heir in except for the %v at the
+    end. That little %v tells Apache to append the canonical servername
+    (vhost) to each log entry.
+
+    The CustomLog line pipes our logs to cronolog, which is set to store
+    each days logs in a date named directory. In this example, todays logs
+    are stored on /var/log/apache/2006/10/01/access.log. This makes it very
+    easy to grab an interval worth of logs to process.
+

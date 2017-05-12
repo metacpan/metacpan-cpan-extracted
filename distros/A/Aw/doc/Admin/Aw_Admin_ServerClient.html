@@ -1,0 +1,59 @@
+<html>
+<head>
+  <title>Aw::Admin::ServerClient</title>
+</head>
+<body bgcolor="#f0f0f0" link="#cc0000" vlink="brown">
+
+<h1><u>Aw::Admin::ServerClient</u></h1>
+
+<table width="90%" border=1 bgcolor="#cccc99">
+<tr bgcolor="#bfbfbf"><th>Method</th><th>Arguments</th><th>Return</th><th>Throws<br>Exception</th></tr>
+<tr align="center"><th align="left"><a name="new"></a>new</th><td>( broker_host [, Aw::ConnectionDescriptor] )</td><td>Aw::Admin::ServerClient</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="createBroker"></a>createBroker</th><td>( broker_name, description, is_default )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getActiveSSLConfig"></a>getActiveSSLConfig</th><td>( )</td><td>% of {certificate_file,<br>distinguished_name,<br>issure_distinguished_name}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getActivePort"></a>getActivePort</th><td>( )</td><td>Number</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getActiveProcessInfo"></a>getActiveProcessInfo</th><td>( )</td><td>% of {executable_name, data_directory}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getAdminACL"></a>getAdminACL</th><td>( )</td><td>Aw::Admin::AccessControlList</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getBrokers"></a>getBrokers</th><td>( )</td><td>@ of % of {territory_name,<br>broker_host,<br>broker_name,<br>description}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getDefaultBrokerName"></a>getDefaultBrokerName</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getDescription"></a>getDescription</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getDNsFromCertFile"></a>getDNsFromCertFile</th><td>( certificate_file, password )</td><td>@ of Strings</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getHostName"></a>getHostName</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getLicense"></a>getLicense</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getLogConfig"></a>getLogConfig</th><td>( )</td><td>Aw::Admin::LogConfig</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getLogEntries"></a>getLogEntries</th><td>( first_entry, locale )</td><td>@ of % of {time_stamp,<br>entry_type,<br>entry_msg_id,<br>entry_msg_text}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getLogStatus"></a>getLogStatus</th><td>( )</td><td>% of {first_entry, last_entry, num_entries}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getProcessRunStatus"></a>getProcessRunStatus</th><td>( )</td><td>Number</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getRootDNsFromCertFile"></a>getRootDNsFromCertFile</th><td>( certificate_file, password )</td><td>@ of Strings</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getSavedSSLConfig"></a>getSavedSSLConfig</th><td>( )</td><td>% of {certificate_file,<br>distinguished_name,<br>issure_distinguished_name}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getSSLStatus"></a>getSSLStatus</th><td>( )</td><td>% of {status,level,error_string}</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getStats"></a>getStats</th><td>( )</td><td>Aw::Event</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getUsageStats"></a>getUsageStats</th><td>( )</td><td>Aw::Event</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getVersion"></a>getVersion</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getVersionNumber"></a>getVersionNumber</th><td>( )</td><td>Number</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="pruneLog"></a>pruneLog</th><td>( Aw::Date )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="registerCallbackForSubId"></a>registerConnectionCallback</th><td>( method, client_data )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setAdminACL"></a>setAdminACL</th><td>( Aw::Admin::AccessControlList )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setDefaultBrokerName"></a>setDefaultBrokerName</th><td>( broker_name )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setDescription"></a>setDescription</th><td>( description )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setLicense"></a>setLicense</th><td>( license )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setLogConfig"></a>setLogConfig</th><td>( log_config )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setSSLConfig"></a>setSSLConfig</th><td>( \%new_config )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="startProcess"></a>startProcess</th><td>( broker_host )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="stopProcess"></a>stopProcess</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="toString"></a>toString</th><td>( )</td><td>String</td><td>NO</td></tr>
+
+<tr bgcolor="#bfbfbf" align="left"><th colspan=4>Inherited Methods</th></tr>
+<tr align="center"><th align="left"><a name="err"></a>err</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="errmsg"></a>errmsg</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="error"></a>error</th><td>( )</td><td>Aw::Error</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="hello"></a>hello</th><td>( )<br><div align="left">Returns the string "hello".  Useful for debugging.</div></td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getWarn"></a>getWarn</th><td>( )<br><div align="left">Returns current warn <b><code>level</code></b>.</div></th><td>Number</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setWarn"></a>setWarn</th><td>( level )<br><div align="left">Sets new warn <b><code>level</code></b>.<dir>0 : No warnings (quiet mode)<br>1 : Terse (uses awErrorToString)<br>2 : Verbose (uses awErrorToCompleteString)</dir>The Aw extensions must be compiled with AWXS_WARNS defined.</div></th><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="warn"></a>warn</th><td>( [string] )<br><div align="left">Warn message is <b><code>string</code></b> if passed, otherwise current err is converted to string.</div></th><td>void</td><td>YES</td></tr>
+</table>
+
+<p><hr size=3 noshade>
+
+</body>
+</html>

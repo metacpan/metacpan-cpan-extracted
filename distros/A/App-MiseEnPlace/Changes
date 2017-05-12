@@ -1,0 +1,30 @@
+Changes file for App-MiseEnPlace
+
+0.160     2015-04-14 21:21:17-07:00 America/Los_Angeles
+
+ * No changes from last dev release.
+
+0.15_02   2015-04-13 21:06:26-07:00 America/Los_Angeles
+
+ * Dep on specific Moo & MooX::HandlesVia versions
+
+0.15_01   2015-04-12 22:54:49-07:00 America/Los_Angeles
+
+ * Update copyright.
+ * Get rid of smartmatch bits.
+
+0.15      2013-10-06 10:44:23 America/New_York
+
+ * Fix README.mkdn / dist.ini stuff
+ * Fix shebang; silence given/when warnings
+ * Tweak POD
+ * README file
+ * Minor tweaks & cleanups.
+ * Add Changes file.
+ * the IO::Page thing work on 256color terms
+ * remove use of on_bright_yellow
+ * whitespace
+ * use Array traits for array-based attrs
+
+OLDER:
+  * Hadn't been maintaining Changes file. Bad coder, no cookie.

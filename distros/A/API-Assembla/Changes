@@ -1,0 +1,7 @@
+Revision history for Perl extension API::Assembla
+
+0.03
+  - Fix tests, which are useless unless you are me.
+
+0.01
+  - First release

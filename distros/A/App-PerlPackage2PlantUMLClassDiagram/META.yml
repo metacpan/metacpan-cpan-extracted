@@ -1,0 +1,45 @@
+---
+abstract: "Generate Plant UML's class diagraom from Perl packages."
+author:
+  - 'This library is free software; you can redistribute it and/or modify'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-PerlPackage2PlantUMLClassDiagram
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::PerlPackage2PlantUMLClassDiagram:
+    file: lib/App/PerlPackage2PlantUMLClassDiagram.pm
+    version: '0.02'
+  App::PerlPackage2PlantUMLClassDiagram::Package:
+    file: lib/App/PerlPackage2PlantUMLClassDiagram/Package.pm
+  App::PerlPackage2PlantUMLClassDiagram::Repository:
+    file: lib/App/PerlPackage2PlantUMLClassDiagram/Repository.pm
+requires:
+  PPI: '0'
+  Text::MicroTemplate::DataSection: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/hitode909/App-PerlPackage2PlantUMLClassDiagram/issues
+  homepage: https://github.com/hitode909/App-PerlPackage2PlantUMLClassDiagram
+  repository: git://github.com/hitode909/App-PerlPackage2PlantUMLClassDiagram.git
+version: '0.02'
+x_authority: cpan:HITODE
+x_contributors:
+  - 'hitode909 <hitode909@gmail.com>'

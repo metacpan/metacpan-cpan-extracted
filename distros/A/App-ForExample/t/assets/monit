@@ -1,0 +1,23 @@
+# Monit control file
+
+set daemon 120
+#set alert alice+hostname.monit@example.com
+set logfile /home/rob/monit/log
+set pidfile /home/rob/monit/pid
+set statefile /home/rob/monit/state
+
+set httpd port 2822 and # This port needs to be unique on a system
+    use address localhost
+    allow localhost
+
+# Put this file in /home/rob/monit/monitrc
+# Use this alias to control your monit daemon:
+#
+# alias 'my-monit'='monit -vc /home/rob/monit/monitrc'
+#
+#   my-monit
+#   my-monit start all
+#   my-monit quit
+#   my-monit validate
+#   ...
+#

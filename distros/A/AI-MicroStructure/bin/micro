@@ -1,0 +1,283 @@
+#!/usr/bin/perl -X
+
+use strict;
+use warnings;
+use Digest::MD5 qw(md5_hex);
+use AI::MicroStructure::Util;
+use Getopt::Long;
+use AI::MicroStructure;
+use Data::Printer;
+use Data::Dumper;
+use JSON::XS;
+use Try::Tiny;
+use Cache::Memcached::Fast;
+my %conf = ( );
+our $keys = {};
+GetOptions( \%conf, "whitespace|ws!", "version","structures", "help", "remote","new",
+                    "init", "export", "import",
+                    "check", "category=s", "sources" ,"drop");
+
+our ($new, $write,$drop,$all,$verbose) =(0,0,0,0,0);
+our $kkey = sprintf "%s",join("_",@ARGV);
+our $argkey = md5_hex($kkey);
+our $memd  = "";
+sub check {
+
+}
+
+
+sub init {
+
+  $memd = new Cache::Memcached::Fast({
+     servers => [ { address => 'localhost:11211', weight => 2.5 }],
+     namespace => 'my:',
+     connect_timeout => 0.2,
+     io_timeout => 0.1,
+     close_on_error => 1,
+     compress_threshold => 100_000,
+     compress_ratio => 0.9,
+     max_failures => 1,
+     max_size => 512 * 1024,
+  });
+
+  if(!$#ARGV){
+    push @ARGV,"any";
+   }
+ 
+
+
+if($kkey =~ /debug/){
+  my $NORMAL=`tput sgr0`;
+  my $REVERSE=`tput smso`;
+  print "$REVERSE $_ $NORMAL " for @ARGV;
+  print "\n";
+}else{
+}
+
+   if(defined(my $ret = $memd->get($argkey)) && ($kkey !~ m/(any|structures)/i) &&  @ARGV){
+
+   print "$ret\n";
+
+   exit;
+   #die($ret);
+  }else{
+
+  }
+
+
+}
+init();
+if( grep{/\ball\b/} @ARGV ){ $all = 1; cleanArgs("all");  };
+
+
+our $main = AI::MicroStructure->new();
+
+
+# check if this is an active memory or initialize it
+if($conf{"init"}) {
+    if (-e  ".micro") {
+        print STDERR "this is already an active memory!\n";
+    } else {
+        print `git init && touch .micro && echo .pmc > .gitignore && echo '*~' >> .gitignore && echo '*swp' >> .gitignore && echo .micro >> .gitignore && git add -f .micro .gitignore && git commit -m 'active memory born'`;
+    }
+    exit;
+} else {
+    if (!-e ".micro" && !-e $ENV{HOME}."/.micro") {
+        print STDERR "this directory is not an active memory!\n";
+        exit;
+    }
+}
+
+my $state = AI::MicroStructure::Util::load_config(); my @CWD=$state->{cwd}; my $config=$state->{cfg};
+our $structdir = "structures";
+our $absstructdir = "$CWD[0]/$structdir";
+
+
+
+if ($conf{"export"}) {
+    my $cwd = $CWD[0];
+    my $hash = $main->fitnes();
+    my $url = sprintf("%s/%s/_all_docs", $config->{couchdb}, $config->{db});
+    print `cd $cwd && mkdir -p relations && wget -O relations/any.json $url && git add relations/any.json $structdir/*.pm && git commit -m 'active memory release' && git tag $hash`; # FIXME check for errors FIXME also that we commit per structure and/or per relation
+
+    exit;
+}
+
+my (@remote, @local);
+# real processing starts here
+$\ = $/;
+my $sep = $conf{whitespace} ? ' ' : $\;
+
+my $j = $main->structures();
+
+
+if($j == 0 || $j eq "any"){
+
+print $main->help;
+exit(0);
+}
+
+sub is_integer {
+   defined $_[0] && $_[0] =~ /^[+-]?\d+$/;
+}
+
+
+sub cleanArgs{
+    my ($key) = @_;
+    my @tmp=();
+    foreach(@ARGV){
+    push @tmp,$_ unless($_=~/$key/);}
+
+    @ARGV=@tmp;
+}
+
+
+
+my $structure;
+
+if(defined($ARGV[0]) && $ARGV[0] =~ m/structures/){
+
+
+
+    @local = grep{!/any/}AI::MicroStructure->new()->structures();
+
+    if(defined($ARGV[1]) && is_integer($ARGV[1])){
+      my $index = rand $#local;
+         $index = $index-$ARGV[1];
+                  $index = $index?$index:0;
+      @local = @local[$index+1..$index+$ARGV[1]];
+
+    }
+
+    my $val = sprintf "%s",join $sep, @local, @remote;
+    $memd->set($argkey,$val);
+    print "$val";
+     exit;
+}
+
+if(defined($ARGV[0]) && $ARGV[0] =~ m/structures/){
+
+
+
+    @local = grep{!/any/}AI::MicroStructure->new()->structures();
+
+    if(defined($ARGV[1]) && is_integer($ARGV[1])){
+      my $index = rand $#local;
+         $index = $index-$ARGV[1];
+                  $index = $index?$index:0;
+      @local = @local[$index+1..$index+$ARGV[1]];
+
+    }
+
+    my $val = sprintf "%s", join $sep, @local, @remote;
+    $memd->set($argkey,$val);
+
+    print "$val";
+    exit;
+
+}
+
+if($conf{"new"} and $ARGV[0] !~/structures/  and $ARGV[0] =~ m{^([^/]+)/(.*)}s) {
+    $structure          = $1;
+    $conf{category} = $2;
+
+    my $meta = AI::MicroStructure->new( $structure, category => "new" );
+    $memd->set($argkey,$meta);
+     p $meta;
+    exit;
+}
+
+
+
+if(!$conf{"drop"} && !$conf{"write"}and $ARGV[0] !~/structures/){
+
+
+
+# find out the structure name
+$structure = shift || $AI::MicroStructure::structure;
+
+if (!length $conf{category} && $structure =~ m{^([^/]+)/(.*)}s) {
+    $structure          = $1;
+    $conf{category} = $2;
+}
+
+
+AI::MicroStructure->new( $structure, category => "new" )
+ unless AI::MicroStructure->has_structure( $structure );
+
+# my $module = "AI::MicroStructure::$structure";
+my $module = "$absstructdir/$structure.pm";
+
+if(!-f $module){
+`touch $module`;
+`micro $structure new verbose`;
+}
+
+# load the remote structure if needed
+if ( $conf{remote} || $conf{check} || $conf{sources}) {
+    eval "require '$module';";
+    die "structure '$structure' is not updatable!\n"
+        unless $module->has_remotelist();
+}
+
+# informative options
+print STDERR
+"meta, a simple front-end to AI::MicroStructure version $AI::MicroStructure::VERSION\n"
+  if $conf{version};
+print STDERR $main->help if $conf{help};
+
+print map "$_\n", AI::MicroStructure->structures if $conf{structures};
+
+if ( $conf{sources} ) {
+    my @sources = $module->sources( $conf{category} );
+
+
+    my $var = map "$_\n", @sources;
+
+    $memd->set($argkey,$var);
+    print $var;
+    exit;
+
+}
+exit if $conf{structures} || $conf{version} || $conf{help} || $conf{sources};
+
+
+my $meta = AI::MicroStructure->new( $structure, category => $conf{category} );
+
+@remote = $module->remote_list( $conf{category} )
+    if $conf{remote} || $conf{check};
+if ( !$conf{remote} ) {
+    my $count = shift;
+    $count = 1 unless defined $count;
+    $count = 0 if $conf{check};
+
+    if($all){
+    @local = $meta->name(0,scalar "");
+    }else{
+    @local = $meta->name($count);
+    }
+}
+if ( $conf{check} ) {
+    my %seen;
+    $seen{$_}++ for @remote;
+    $seen{$_}-- for @local;
+    foreach my $key ( sort keys %seen ) {
+        next unless $seen{$key};
+        print $seen{$key} > 0 ? "+ $key" : "- $key";
+    }
+}
+else {
+    my $val = sprintf "%s" ,join $sep, @local, @remote;
+    $memd->set($argkey,$val);
+    print "$val";
+    exit;
+}
+
+}
+
+END{
+   # print Dumper  [$structure,\@ARGV,%conf,$argkey];
+}
+
+
+1;

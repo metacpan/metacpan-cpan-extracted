@@ -1,0 +1,46 @@
+NAME
+    Acme::Magic8Ball - ask the Magic 8 Ball a question
+
+SYNOPSIS
+        use Acme::Magic8Ball qw(ask);
+        my $reply = ask("Is this module any use whatsoever?");
+
+    ... you can also pass in your own list of answers ...
+
+        my $reply = ask("What should the next bit be?", 0, 1); # reply will always be 0 or 1
+
+    ... or make answers consistent ...
+
+        use Acme::Magic8Ball qw(ask :consistent);
+        for (0..1000) {
+            my $reply = ask("Is this module any use whatsoever?"); # reply will always be the same
+        }
+
+DESCRIPTION
+    This is an almost utterly pointless module. But I needed it. So there.
+
+METHODS
+  ask <question> [answers]
+    Ask and ye shall receive!
+
+    If you don't pass in an array of answers it will use the traditional
+    ones.
+
+AUTHOR
+    Simon Wistow <simon@thegestalt.org>
+
+COPYING
+    Copyright 2005, Simon Wistow
+
+    Distributed under the same terms as Perl itself.
+
+DEVELOPMENT
+    You can get the latest version from
+
+    https://github.com/simonwistow/Acme-Magic8Ball
+
+SEE ALSO
+    The 8 Ball FAQ - http://8ball.ofb.net/faq.html
+
+    Mattel (who own the 8 Ball) - http://www.mattel.com
+

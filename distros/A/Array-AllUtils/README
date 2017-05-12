@@ -1,0 +1,27 @@
+SYNOPSIS
+
+     use Array::AllUtils qw(first);
+    
+     my @ary = (1..20);
+    
+     $elem = first { defined and $_ % 2 } $ary;
+
+DESCRIPTION
+
+    PURELY EXPERIMENTAL AND CURRENTLY INCOMPLETE.
+
+    This module provides functions like those provided by List::Util and
+    List::MoreUtils but the list is passed as arrayref, to avoid the cost
+    of argument copying which can be significant when the size of the list
+    is large. See an illustration in Bencher::Scenario::PERLANCAR::In.
+
+FUNCTIONS
+
+ first
+
+ firstidx
+
+SEE ALSO
+
+    List::Util, List::MoreUtils, List::AllUtils
+

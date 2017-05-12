@@ -1,0 +1,39 @@
+---
+abstract: 'Record running time and print standard messages'
+author:
+  - 'Qiang Wang <wang-q@outlook.com>'
+build_requires:
+  Test::More: '0.88'
+  Test::Output: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AlignDB-Stopwatch
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Data::UUID: '0'
+  File::Spec: '0'
+  Moose: '0'
+  Time::Duration: '0'
+  YAML::Syck: '1.29'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/wang-q/AlignDB-Stopwatch/issues
+  homepage: https://github.com/wang-q/AlignDB-Stopwatch
+  repository: https://github.com/wang-q/AlignDB-Stopwatch.git
+version: 1.1.0
+x_contributors:
+  - 'wangq <wangqiang1997@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

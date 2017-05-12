@@ -1,0 +1,18 @@
+Revision history for Tie-Formatted
+
+0.04  Sun Aug 23 14:35:52 PDT 2009
+	- Fixed doc errors reported by Frank Wiegand (frank.wiegand@gmail.com).
+        - added license
+        - Fixed META.yml formatting
+
+0.03  Thu Mar 12 22:05:57 PDT 2009
+	- Changed name to Acme::Tie::Formatted because, let's face it,
+	  this is kind of a silly module.
+
+0.02  Tue Feb  7 12:22:19 PST 2006
+	- Credit where credit is due added to the documentation.
+	- Fixed MANIFEST to include all the tests.
+
+0.01  Tue Feb  7 10:51:42 2006
+	- Initial release.
+

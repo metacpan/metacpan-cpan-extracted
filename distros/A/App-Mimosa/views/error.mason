@@ -1,0 +1,7 @@
+<%args>
+    $error
+</%args>
+<div id="content">
+<h1>Error!</h1>
+<% $error %>
+</div>

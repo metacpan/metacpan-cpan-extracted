@@ -1,0 +1,29 @@
+#!/usr/local/bin/perl -w
+use strict;
+use Log::Log4perl qw(:easy);
+
+     # Program:
+use App::Daemon qw( daemonize );
+daemonize();
+
+my $pid = fork();
+
+if( !defined $pid ) {
+    die "fork failed";
+} 
+
+if( $pid ) {
+    # parent
+    
+} else {
+    # child
+    INFO "child exits";
+    die "Aiieeeeeh";
+}
+
+waitpid $pid, 0;
+INFO "parent waitpid done";
+  
+INFO "parent sleep";
+sleep(100);
+INFO "parent exiting";

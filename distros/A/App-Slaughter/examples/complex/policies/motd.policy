@@ -1,0 +1,23 @@
+#
+#  Setup /etc/motd for the local system.
+#
+#  Here we rely upon the magic behaviour that a request for fetching
+# the file source "foo" will first request:
+#
+#   foo.fqdn
+# then
+#   foo.hostname
+# then
+#   foo
+#
+#
+
+FetchFile(
+           Source => "/etc/motd",
+             Dest => "/etc/motd",
+            Owner => "root",
+            Group => "root",
+            Mode  => "755",
+           Expand => "false",
+         ) ;
+

@@ -1,0 +1,6 @@
+Changes	                    - revision history
+MANIFEST                    - this file
+Makefile.PL                 - "perl Makefile.PL" to get things started
+README                      - read this first
+lib/Apache/ReverseProxy.pm  - the main module
+t/none.t                    - test script (empty for now)

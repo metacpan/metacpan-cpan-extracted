@@ -1,0 +1,76 @@
+#!/usr/bin/env perl
+
+# PODNAME: get_pauseid_distributions
+
+use strict;
+use warnings FATAL => 'all';
+use feature 'say';
+use utf8;
+use open qw(:std :utf8);
+
+use MetaCPAN::Client;
+
+sub main {
+
+    my $pause_id = $ARGV[0];
+
+    if (not defined $pause_id) {
+        say "You should run it as `$0 PAUSEID`";
+        exit 1;
+    }
+
+    my $mc = MetaCPAN::Client->new();
+    my $data = $mc->release({
+        all => [
+            { author => $pause_id },
+            { status => 'latest' },
+        ]
+    });
+
+    say 'namespace,name,source';
+
+    while (my $element = $data->next) {
+        my $url = $element->{data}->{resources}->{repository}->{url};
+
+        my $module = $element->{data}->{distribution};
+        $module =~ s/-/::/g;
+
+        if (defined $url) {
+            say 'perl,'
+                . $module . ','
+                . $url
+                ;
+        } else {
+            warn "WARNING: no info about repostitory url for $module\n";
+        }
+    }
+
+}
+main();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+get_pauseid_distributions
+
+=head1 VERSION
+
+version 1.0.5
+
+=head1 AUTHOR
+
+Ivan Bessarabov <ivan@bessarabov.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Ivan Bessarabov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

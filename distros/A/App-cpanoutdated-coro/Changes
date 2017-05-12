@@ -1,0 +1,27 @@
+Revision history for Perl extension App-cpanoutdated-coro
+
+0.06 2015-06-26T13:15:49Z
+    - tune performance
+    - fix pod's typo
+
+0.05 2015-06-21T04:09:37Z
+    - fix pod
+
+0.04 2015-06-20T08:06:12Z
+    - refactor code without Coro(against perl 5.22)
+
+0.03 2014-09-13T08:42:58Z
+
+	- fix new-line to LF
+
+0.02 2014-09-07T11:18:33Z
+
+	- fix bad shebang line in cpan-outdated-coro
+	- fix pre-filtering mismatch on specific OS(e.g. Win32, Cygwin)
+	- fix too many dependencies missing in cpanfile
+	- fix pod's typo
+
+0.01 2014-09-05T16:23:00Z
+
+    - original version
+

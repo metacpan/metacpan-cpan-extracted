@@ -1,0 +1,118 @@
+{
+   "abstract" : "Build and use the stable 1.3.3 branch of the Fast Light Toolkit",
+   "author" : [
+      "Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-FLTK",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Archive::Extract" : "0",
+            "File::Copy" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::ShareDir" : "0",
+            "File::Slurp" : "0",
+            "File::Spec::Functions" : "0",
+            "File::pushd" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON::PP" : "2"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Archive::Extract" : "0",
+            "CPAN::Meta" : "0",
+            "Devel::CheckBin" : "0",
+            "Exporter" : "5.57",
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::Config" : "0.003",
+            "ExtUtils::Helpers" : "0.020",
+            "ExtUtils::Install" : "0",
+            "ExtUtils::InstallPaths" : "0.002",
+            "ExtUtils::ParseXS" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::ShareDir" : "0",
+            "File::Slurp" : "0",
+            "File::Spec::Functions" : "0",
+            "File::pushd" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON::PP" : "0",
+            "Module::Build::Tiny" : "0.035",
+            "Pod::Man" : "0",
+            "TAP::Harness" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "0",
+            "File::Slurp" : "0",
+            "File::Spec::Functions" : "0",
+            "JSON::PP" : "2",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::ShareDir" : "0",
+            "File::Slurp" : "0",
+            "File::Spec::Functions" : "0",
+            "JSON::PP" : "2",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::FLTK" : {
+         "file" : "lib/Alien/FLTK.pm",
+         "version" : "v1.3.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sanko/alien-fltk/issues"
+      },
+      "homepage" : "https://github.com/sanko/alien-fltk",
+      "repository" : {
+         "url" : "git://github.com/sanko/alien-fltk.git",
+         "web" : "https://github.com/sanko/alien-fltk"
+      }
+   },
+   "version" : "v1.3.3",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,19 @@
+Revision history for AlignDB-DeltaG
+
+1.1.0 2017-01-10T20:03:53Z
+    - Release to CPAN
+    - Improve test coverage
+    - Improve docs
+    - Travis CI
+
+1.0.1 2016-12-16T00:22:54Z
+    - Switch to Minilla
+
+1.0.0  2016-01-15 15:55:41 CST
+    - Switch to Dist::Milla
+
+0.05   Thu Nov 27 17:55:36 2008
+    - Switch to Dist::Zilla
+
+0.01   Tue Jan  8 03:54:56 2008
+    - Initial release.

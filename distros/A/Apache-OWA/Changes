@@ -1,0 +1,37 @@
+Revision history for Perl extension Apache::OWA.
+0.7
+- Improved error handling
+- Support for multi-value variables and PL/SQL Tables.
+- Changed format of DAD-string, since Apache::DBI seemed
+  to get a bit confused with the old one.
+- DEBUG option added.
+- Updated documentation a little.
+
+0.6
+- Dynamic passing of cgi enironment variables to Oracle.
+
+0.5 (1999-09-27)
+- Support for owa_util.point and ICX_OWA_PARMS.ARRAY added by
+  Gunnar Hellekson, <g.hellekson@trilux.com> and 
+  Erich Morisse <e.morisse@trilux.com>
+  of Trilux Internet Group, Ltd.
+
+0.4
+- Invented SCHEMA configuration directive.
+- Cleaned up the code a bit.
+- Added benchmarks to documentation.
+- Added code to show some "/perl-status" information.
+
+0.3
+- Merged Apache::OWA and Apache::OWA::AUTH into one module
+- Eliminated use of CGI.pm.
+- updated documentation
+- created Makefile.PL and stuff.
+
+0.2
+- changed name
+- minimize use of CGI.pm
+- fixed bug where header would be inserted several times
+
+0.1
+- created

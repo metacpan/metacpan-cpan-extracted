@@ -1,0 +1,8 @@
+Revision history for Perl extension Apache-Log-Parser
+
+0.02 2013-11-11T08:08:04Z
+   - remove invalid mymeta files
+   - use HTTP request method on grouping in bin/analyze_apache_logs
+
+0.01 2013-11-08T07:44:00Z
+   - original version

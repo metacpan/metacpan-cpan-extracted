@@ -1,0 +1,5 @@
+# This is the location where file-based sessions are stored
+PerlSetVar SessionDir @ServerRoot@/session
+
+# Get the apreq config for ModPerl2.
+Include conf/apreq2.conf

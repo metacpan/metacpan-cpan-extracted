@@ -1,0 +1,35 @@
+NAME
+    AnyEvent::RPC - Abstract framework for Asyncronous RPC clients
+
+SYNOPSIS
+        use AnyEvent::RPC;
+
+        my $rpc = AnyEvent::RPC->new(
+        host => 'your.api.host',
+        port => 8080,
+        base => '/api/rest/',
+
+        type => 'REST', # or type => '+AnyEvent::RPC::Enc::REST',
+        )
+
+        $rpc->req(  # will be called as GET http://your.api.host:8080/api/rest/method/path/args?query=param
+        call  => [ method => qw(path args)],
+        query => { query => 'param' },
+        cb    => sub { # ( response, code, error )
+            if (my $response = shift) {
+            # 
+            } else {
+            my ($code,$err) = @_;
+            }
+        },
+        );
+
+AUTHOR
+    Mons Anderson, "<mons@cpan.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Mons Anderson, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

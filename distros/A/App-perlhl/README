@@ -1,0 +1,63 @@
+NAME
+    App::perlhl - application class for syntax highlighting Perl source code
+
+VERSION
+    version 0.007
+
+SYNOPSIS
+        use App::perlhl;
+        App::perlhl->new({})->run({}, \@ARGV);
+
+DESCRIPTION
+    App::perlhl is the application class backing perlhl.
+
+METHODS
+  new
+    This instantiates a new App::perlhl object. It takes a hashref of
+    options:
+
+    *   html
+
+        If true, the output will be an HTML fragment suitable for publishing
+        as part of a web page. NOTE: In the future, this might output a
+        whole valid document.
+
+    The default is to output ANSI colour codes suitable for printing to any
+    reasonable shell or terminal (which probably means you have the one
+    that'll break -- well it works on mine, so neener neener).
+
+  run
+    Unsurprisingly, this runs the application. The method takes a hashref of
+    options, and an arrayref of filenames to highlight. If there are no
+    filenames, defaults to "STDIN".
+
+  Options
+    *   version
+
+        If present, the application will print version data and exit.
+
+AVAILABILITY
+    The project homepage is <http://metacpan.org/release/App-perlhl/>.
+
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see <https://metacpan.org/module/App::perlhl/>.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/doherty/App-perlhl> and may be cloned from
+    <git://github.com/doherty/App-perlhl.git>
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at <https://github.com/doherty/App-perlhl/issues>.
+
+AUTHOR
+    Mike Doherty <doherty@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Mike Doherty.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,29 @@
+AI/NeuralNet/Simple version 0.01
+================================
+
+This is a simple backprop neural net simply for experimentation purposes.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Inline::C
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Curtis "Ovid" Poe <eop_divo_sitruc@yahoo.com>
+
+Reverse "eop_divo_sitruc" to send me email.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

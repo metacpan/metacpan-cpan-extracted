@@ -1,0 +1,132 @@
+=head1 Name
+
+sqitch-deploy - Deploy changes to a database
+
+=head1 Synopsis
+
+  sqitch [options] deploy [<database>]
+  sqitch [options] deploy [<database>] <change>
+  sqitch [options] deploy [<database>] --to-change <change>
+
+=head1 Description
+
+Deploy changes to the database. Changes will begin from the current deployment
+state. They will run to the latest change, unless a change is specified,
+either via C<--to> or with no option flag, in which case changes will be
+deployed up-to and including that change.
+
+If the database it up-to-date or already deployed to the specified change, no
+changes will be made. If the change appears earlier in the plan than the
+currently-deployed state, an error will be returned, along with a suggestion
+to instead use L<sqitch-revert>.
+
+The C<< <database> >> parameter specifies the database to which to connect,
+and may also be specified as the C<--target> option. It can be target name,
+a URI, an engine name, or plan file path.
+
+=head1 Options
+
+=over
+
+=item C<-t>
+
+=item C<--target>
+
+The target database to which to connect. This option can be either a URI or
+the name of a target in the configuration.
+
+=item C<--to-change>
+
+=item C<--change>
+
+=item C<--to>
+
+Specify the deployment change. Defaults to the last point in the plan. See
+L<sqitchchanges> for the various ways in which changes can be specified.
+
+=item C<--mode>
+
+Specify the reversion mode to use in case of deploy or verify failure.
+Possible values are:
+
+=over
+
+=item C<all>
+
+In the event of failure, revert all deployed changes, back to the point at
+which deployment started. This is the default.
+
+=item C<tag>
+
+In the event of failure, revert all deployed changes to the last
+successfully-applied tag. If no tags were applied during this deployment, all
+changes will be reverted to the point at which deployment began.
+
+=item C<change>
+
+In the event of deploy failure, no changes will be reverted; for a verify
+failure, only the failed change will be reverted.
+
+=back
+
+Note that Sqitch assumes that each change is atomic. Therefore, when a deploy
+script fails, it assumes there is nothing to revert. If a verify script fails,
+it will of course run the revert script for the failed change.
+
+=item C<--verify>
+
+Verify each change by running its verify script, if there is one. If a verify
+test fails, the deploy will be considered to have failed and the appropriate
+reversion will be carried out, depending on the value of C<--mode>.
+
+=item C<--no-verify>
+
+Don't verify each change. This is the default.
+
+=item C<-s>
+
+=item C<--set>
+
+Set a variable name and value for use by the database engine client, if it
+supports variables. The format must be C<name=value>, e.g.,
+C<--set defuser='Homer Simpson'>. Overrides any values loaded from the
+C<deploy.variables> configuration.
+
+=item C<--log-only>
+
+Log the changes as if they were deployed, but without actually running the
+deploy scripts. Useful for an existing database that is being converted to
+Sqitch, and you need to log changes as deployed because they have been
+deployed by other means in the past.
+
+=back
+
+=head1 Configuration Variables
+
+=over
+
+=item C<deploy.mode>
+
+Deploy mode. The supported values are the same as for the C<--mode> option.
+
+=item C<deploy.verify>
+
+Boolean indicating whether or not to verify each change.
+
+=item C<[deploy.variables]>
+
+A section defining database client variables. Useful if your database engine
+supports variables in scripts, such as PostgreSQL's
+L<C<psql> variables|http://www.postgresql.org/docs/current/static/app-psql.html#APP-PSQL-INTERPOLATION>,
+Vertica's
+L<C<vsql> variables|http://my.vertica.com/docs/7.1.x/HTML/index.htm#Authoring/ConnectingToHPVertica/vsql/Variables.htm>
+MySQL's
+L<user variables|http://dev.mysql.com/doc/refman/5.6/en/user-variables.html>,
+and SQL*Plus's
+L<C<DEFINE> variables|http://docs.oracle.com/cd/B19306_01/server.102/b14357/ch12017.htm>.
+
+=back
+
+=head1 Sqitch
+
+Part of the L<sqitch> suite.

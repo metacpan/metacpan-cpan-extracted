@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Acme/SDUM/Renew.pm
+lib/sdum_renew
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

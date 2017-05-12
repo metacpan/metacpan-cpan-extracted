@@ -1,0 +1,125 @@
+NAME
+    Audio::Play::MPG123 - a frontend to mpg123 version 0.59r and beyond.
+
+SYNOPSIS
+      use Audio::Play::MPG123;
+  
+      $player = new Audio::Play::MPG123;
+      $player->load("kult.mp3");
+      print $player->artist,"\n";
+      $player->poll(1) until $player->state == 0;
+
+      $player->load("http://x.y.z/kult.mp3");
+
+      # see also mpg123sh from the tarball
+
+DESCRIPTION
+    This is a frontend to the mpg123 player. It works by starting an
+    external mpg123 process with the "-R" option and feeding commands to it.
+
+    While the standard mpg123 player can be used to play back mp3's using
+    this module you will encounter random deadlocks, due to bugs in its
+    communication code. Also, many features (like "statfreq") only work with
+    the included copy of mpg123, so better use that one before deciding that
+    this module is broken.
+
+    (In case you wonder, the mpg123 author is not interested in including
+    these fixes and enhancements into mpg123).
+
+  METHODS
+    Most methods can be either BLOCKING (they wait until they get an answer,
+    which usually takes half a mpeg frame of playing time), NONBLOCKING (the
+    functions return as soon as they send their message, which is usallly
+    instant) or CACHING (the method returns some cached data which only gets
+    refreshed by an asynchronous STAT event or an explicit call to "state").
+
+    new [parameter => value, ...]
+        This creates a new player object and also starts the mpg123 process.
+        New supports the following parameters:
+
+           mpg123args      an arrayreg with additional arguments for the mpg123 process
+
+    load(<path or url>) [BLOCKING]
+        Immediately loads the specified file (or url, http:// and file:///
+        forms supported) and starts playing it. If you really want to play a
+        file with a name starting with "file://" or "http://" then consider
+        prefixing all your paths with "file:///". Returns a true status when
+        the song could be started, false otherwise.
+
+    stat [BLOCKING]
+        This can be used to poll the player for it's current state (playing
+        mode, frame position &c). As every other function that requires
+        communication with mpg123, it might take up to one frame delay until
+        the answer returns. Using "statfreq" and infrequent calls to "poll"
+        is often a better strategy.
+
+    pause [BLOCKING]
+        Pauses or unpauses the song. "state" (or "paused") can be used to
+        find out about the current mode.
+
+    paused [CACHING]
+        Returns the opposite of "state", i.e. zero when something is playing
+        and non-zero when the player is stopped or paused.
+
+    jump [BLOCKING]
+        Jumps to the specified frame of the song. If the number is prefixed
+        with "+" or "-", the jump is relative, otherweise it is absolute.
+
+    stop [BLOCKING]
+        Stops the currently playing song and unloads it.
+
+    statfreq(rate) [NONBLOCKING]
+        Sets the rate at which automatic frame updates are sent by mpg123. 0
+        turns it off, everything else is the average number of frames
+        between updates. This can be a floating pount value, i.e.
+
+         $player->statfreq(0.5/$player->tpf);
+
+        will set two updates per second (one every half a second).
+
+    state [CACHING]
+        Returns the current state of the player:
+
+         0  stopped, not playing anything
+         1  paused, song loaded but not playing
+         2  playing, song loaded and playing
+
+    poll(<wait>) [BLOCKING or NONBLOCKING]
+        Parses all outstanding events and status information. If "wait" is
+        zero it will only parse as many messages as are currently in the
+        queue, if it is one it will wait until at least one event occured.
+
+        This can be used to wait for the end of a song, for example. This
+        function should be called regularly, since mpg123 will stop playing
+        when it can't write out events because the perl program is no longer
+        listening...
+
+    title artist album year comment genre url type layer samplerate mode
+    mode_extension bpf frame channels copyrighted error_protected title
+    artist album year comment genre emphasis bitrate extension [CACHING]
+        These accessor functions return information about the loaded song.
+        Information about the "artist", "album", "year", "comment" or
+        "genre" might not be available and will be returned as "undef".
+
+        The accessor function "frame" returns a reference to an array
+        containing the frames played, frames left, seconds played, and
+        seconds left in this order. Seconds are returned as floating point
+        numbers.
+
+    tpf [CACHING]
+        Returns the "time per frame", i.e. the time in seconds for one
+        frame. Useful with the "jump"-method:
+
+         $player->jump (60/$player->tpf);
+
+        Jumps to second 60.
+
+    IN  Returns the input filehandle from the mpg123 player. This can be
+        used for selects() or poll().
+
+AUTHOR
+    Marc Lehmann <schmorp@schmorp.de>.
+
+SEE ALSO
+    perl(1).
+

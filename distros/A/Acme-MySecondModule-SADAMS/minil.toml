@@ -1,0 +1,4 @@
+name = "Acme-MySecondModule-SADAMS"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

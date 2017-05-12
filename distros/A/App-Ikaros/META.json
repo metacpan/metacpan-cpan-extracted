@@ -1,0 +1,141 @@
+{
+   "abstract" : "distributed testing framework for jenkins",
+   "author" : [
+      "Masaaki Goshima (goccy) <goccy54@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.6.5",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Ikaros",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "App::ForkProve" : "0",
+            "App::Prove" : "0",
+            "Capture::Tiny" : "0",
+            "Class::Accessor::Fast" : "0",
+            "Coro" : "0",
+            "Devel::Cover" : "0",
+            "ExtUtils::MakeMaker" : "6.36",
+            "IPC::Run" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Net::OpenSSH" : "0",
+            "POSIX" : "0",
+            "TAP::Harness::JUnit" : "0",
+            "XML::Simple" : "0",
+            "YAML::XS" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::MockObject" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Ikaros" : {
+         "file" : "lib/App/Ikaros.pm",
+         "version" : "0.02"
+      },
+      "App::Ikaros::Builder" : {
+         "file" : "lib/App/Ikaros/Builder.pm"
+      },
+      "App::Ikaros::Config" : {
+         "file" : "lib/App/Ikaros/Config.pm"
+      },
+      "App::Ikaros::Config::Loader" : {
+         "file" : "lib/App/Ikaros/Config/Loader.pm"
+      },
+      "App::Ikaros::Config::Loader::Engine::DSL" : {
+         "file" : "lib/App/Ikaros/Config/Loader/Engine/DSL.pm"
+      },
+      "App::Ikaros::Config::Loader::Engine::YAML" : {
+         "file" : "lib/App/Ikaros/Config/Loader/Engine/YAML.pm"
+      },
+      "App::Ikaros::DSL" : {
+         "file" : "lib/App/Ikaros/DSL.pm"
+      },
+      "App::Ikaros::Helper" : {
+         "file" : "lib/App/Ikaros/Helper.pm"
+      },
+      "App::Ikaros::IO" : {
+         "file" : "lib/App/Ikaros/IO.pm"
+      },
+      "App::Ikaros::Installer" : {
+         "file" : "lib/App/Ikaros/Installer.pm"
+      },
+      "App::Ikaros::LandingPoint" : {
+         "file" : "lib/App/Ikaros/LandingPoint.pm"
+      },
+      "App::Ikaros::Logger" : {
+         "file" : "lib/App/Ikaros/Logger.pm"
+      },
+      "App::Ikaros::PathMaker" : {
+         "file" : "lib/App/Ikaros/PathMaker.pm"
+      },
+      "App::Ikaros::Planner" : {
+         "file" : "lib/App/Ikaros/Planner.pm"
+      },
+      "App::Ikaros::Profiler" : {
+         "file" : "lib/App/Ikaros/Profiler.pm"
+      },
+      "App::Ikaros::Reporter" : {
+         "file" : "lib/App/Ikaros/Reporter.pm"
+      },
+      "App::Ikaros::Util" : {
+         "file" : "lib/App/Ikaros/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/goccy/p5-App-Ikaros/issues"
+      },
+      "homepage" : "https://github.com/goccy/p5-App-Ikaros",
+      "repository" : {
+         "url" : "https://github.com/goccy/p5-App-Ikaros.git",
+         "web" : "https://github.com/goccy/p5-App-Ikaros"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "MasaakiGoshima <masaaki.goshima@mixi.co.jp>"
+   ]
+}

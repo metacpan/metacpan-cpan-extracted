@@ -1,0 +1,14 @@
+
+{
+  'db_connect' => [
+                    'DBI:mysql:database=aprojo;host=127.0.0.1;port=3306',
+                    'aprojo',
+                    'db_user_secret',
+                    {
+                      PrintError => 1, AutoCommit => 1, RaiseError => 1, mysql_enable_utf8 => 1,
+                    }
+                  ],
+  'db_schema' => 'AproJo::DB::Schema',
+  'secret' => 'app_secret'
+}
+

@@ -1,0 +1,47 @@
+#!/bin/bash
+# run plantuml
+# moodfarm@cpan.org
+
+# we assume that the plantuml.jar file is in the same directory as this executable
+EXEC_DIR=`dirname $0`
+PLANTUML="$EXEC_DIR/plantuml.jar"
+
+INPUT=$1
+OUPUT=$2
+
+function show_usage  {
+    arg=$1
+    err=$2
+
+    if [ "$err" == "" ] ; then
+        err=1
+    fi
+
+    echo "Create a UML diagram from an input text file (see http://plantuml.sourceforge.net/ for reference)
+
+    usage: $0 inputfile outputfile.png
+"
+    if [ "$arg" != "" ] ; then
+        echo "$arg
+"
+    fi
+    exit $err
+}
+
+
+if [ "$INPUT" == "-help" ] ; then
+    show_usage "" 0
+fi
+
+if [ ! -f "$INPUT" ] ; then
+    show_usage "ERROR: Could not find input file $1"
+fi
+
+if [ "$OUPUT" == "" ] ; then
+    show_usage "ERROR: No output file specified"
+fi
+
+# we use the pipe option to control output into the file we want
+
+cat "$INPUT" | java -jar $PLANTUML -nbthread auto -pipe >$OUPUT
+# exit 0 

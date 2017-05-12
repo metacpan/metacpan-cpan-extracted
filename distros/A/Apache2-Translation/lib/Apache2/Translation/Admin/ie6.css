@@ -1,0 +1,29 @@
+div#progress {
+  position: absolute;
+  right: auto; bottom: auto;
+  left: expression( ( -8 - progress.offsetWidth
+                      + ( document.documentElement.clientWidth
+                          ? document.documentElement.clientWidth
+                          : document.body.clientWidth )
+                      + ( ignoreMe2 = document.documentElement.scrollLeft
+                                      ? document.documentElement.scrollLeft
+                                      : document.body.scrollLeft ) ) + 'px' );
+  top: expression( ( 8 + ( ignoreMe = document.documentElement.scrollTop
+                                      ? document.documentElement.scrollTop
+                                      : document.body.scrollTop ) ) + 'px' );
+}
+
+div#menucontainer {
+  position: absolute;
+  right: auto; bottom: auto;
+  left: expression( ( -8 - menucontainer.offsetWidth
+                      + ( document.documentElement.clientWidth
+                          ? document.documentElement.clientWidth
+                          : document.body.clientWidth )
+                      + ( ignoreMe2 = document.documentElement.scrollLeft
+                                      ? document.documentElement.scrollLeft
+                                      : document.body.scrollLeft ) ) + 'px' );
+  top: expression( ( 8 + ( ignoreMe = document.documentElement.scrollTop
+                                      ? document.documentElement.scrollTop
+                                      : document.body.scrollTop ) ) + 'px' );
+}

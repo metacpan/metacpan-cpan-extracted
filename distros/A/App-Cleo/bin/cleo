@@ -1,0 +1,117 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use App::Cleo;
+
+our $VERSION = 0.003;
+
+#-----------------------------------------------------------------------------
+
+die 'Usage: cleo COMMAND_FILE' if not @ARGV;
+my $cleo = App::Cleo->new;
+$cleo->run(shift);
+exit;
+
+#-----------------------------------------------------------------------------
+
+=pod
+
+=head1 NAME
+
+cleo - Play back shell commands for live demonstrations
+
+=head1 SYNOPSIS
+
+    cleo COMMAND_FILE
+
+=head1 DESCRIPTION
+
+C<cleo> is a utility for playing back pre-recorded shell commands in a live
+demonstration.  C<cleo> displays the commands as if you had actually typed
+them and then executes them interactively.
+
+There is probably an easy way to do this with C<expect> or a similar tool.
+But I couldn't figure it out, so I built this.  Your mileage may vary.
+
+=head1 PLAYBACK
+
+C<cleo> always pauses and waits for a keypress before displaying a command and
+before executing it.  Pressing any key besides those listed below will advance
+the playback:
+
+  Key                       Action
+  ------------------------------------------------------------------
+  s                         skip the current command
+  r                         redo the current command
+  p                         redo the previous command
+  q                         quit playback
+
+=head1 COMMANDS
+
+C<cleo> reads commands from a file.  Each line is treated as one command.
+Blank lines and those starting with C<#> will be ignored.  The commands
+themselves can be anything that you would type into an interactive shell.
+You can also add a few special tokens that C<cleo> recognizes:
+
+=over 4
+
+=item C<!!!>
+
+Commands starting with C<!!!> (three exclamation points) are not displayed and
+will be executed immediately. This is useful for running setup commands at the
+beginning of your demonstration.
+
+=item C<%%%>
+
+Within a command, C<%%%> (three percent signs) will cause C<cleo> to pause and
+wait for a keypress before displaying the rest of the command.  This is useful
+if you want to stop in the middle of a command to give some explanation.
+
+=back
+
+Otherwise, C<cleo> displays and executes the commands verbatim.  Note that
+some interactive commands like C<vim> are picky about STDOUT and STDIN.  To
+make them work properly with C<cleo>, you may need to force them to attach
+to the terminal like this:
+
+    (exec < /dev/tty vim)
+
+=head1 EXAMPLE
+
+I use this for giving demonstrations of L<pinto>, such as the one seen at
+L<https://www.youtube.com/watch?v=H-JkFXm8Xgk> (the live demonstration part
+starts around 10:47).
+
+The command file that I use for that presentation is included inside this
+distribution at F<examples/pinto.demo>.  This file is for illustration only,
+so don't expect it to actually work for you.
+
+=head1 LIMITATIONS
+
+C<cleo> only works on Unix-like platforms.  It may work on Windows if you use
+Cygwin.  Personally, I have only used C<cleo> on Mac OS X.
+
+=head1 TODO
+
+=over 4
+
+=item Jump to arbitrary command number
+
+=item Support backspacing in recorded command
+
+=item Support multi-line recorded commands
+
+=item Write unit tests
+
+=back
+
+=head1 AUTHOR
+
+Jeffrey Ryan Thalhammer <thaljef@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2014, Imaginative Software Systems
+
+=cut

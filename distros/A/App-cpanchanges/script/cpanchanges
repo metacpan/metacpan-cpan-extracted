@@ -1,0 +1,111 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+our $VERSION = '20130522.0';
+
+use Getopt::Long;
+use LWP::UserAgent;
+use URI::Escape qw/uri_escape/;
+use JSON        qw/decode_json/;
+use File::Temp  qw//;
+
+my %opt;
+GetOptions(
+    \%opt,
+    'distribution|d',
+    'help|h',
+    'version',
+);
+
+if ($opt{help}) {
+    print usage();
+} elsif ($opt{version}) {
+    print "cpanchanges/$VERSION\n";
+} else {
+    my $name = shift or die usage();
+    my $changes = changes($name);
+    my $text = "# Changes for $changes->{author}/$changes->{release}\n\n"
+             . $changes->{content} . "\n";
+
+    my $head  = join "\n", grep defined, (split /\n/, $changes->{content})[0..8];
+    my $pod   = $head =~ /^=(pod|head|encoding|over|begin|for)/m;
+
+    my $external = $pod        ? ($ENV{CPANCHANGES_PERLDOC} || "perldoc") :
+                   $ENV{PAGER} ? $ENV{PAGER}                              :
+                                 undef                                    ;
+
+    if ($external and -t *STDOUT) {
+        my $tmp = File::Temp->new;
+        print { $tmp } $text;
+        system(qq[$external "@{[$tmp->filename]}"]) == 0
+            or die "Couldn't run `$external`: $!\n";
+    } else {
+        print $text;
+    }
+}
+exit;
+
+sub usage {
+    <<"."
+usage: cpanchanges Moose
+       cpanchanges LWP::UserAgent
+       cpanchanges --distribution libwww-perl
+
+  --distribution, -d    Lookup by distribution, not module, name
+  --help                Show this help
+  --version             Show version
+
+The change log text is displayed using the command in the PAGER environment
+variable, if available.   If the output is not going to a terminal or PAGER
+isn't defined, PAGER is not used.
+
+If the change log format is detected as POD, the `perldoc` command will be used
+to display it.  You can change the command used by setting CPANCHANGES_PERLDOC.
+No special handling of POD happens when output is not to a terminal.
+
+.
+}
+
+sub changes {
+    my $name = shift;
+    my @release;
+
+    if ($opt{distribution}) {
+        # The API will lookup the latest release from the distribution name for us.
+        @release = $name;
+    } else {
+        my $module = request( module => $name )
+            or die "Unable to find module '$name'\n";
+
+        @release = @$module{"author", "release"};
+    }
+
+    my $changes = request( changes => @release )
+        or die "Unable to find changes for ", join("/", @release), "\n";
+
+    return $changes;
+}
+
+sub request {
+    my $url = "http://api.metacpan.org/v0/"
+            . join "/", map uri_escape($_), @_;
+
+    my $ua = LWP::UserAgent->new(
+        agent => "cpanchanges/$VERSION",
+    );
+    my $response = $ua->get($url);
+
+    if (!$response->is_success) {
+        warn "Request '$url' failed: ", $response->status_line, "\n"
+            unless $response->code == 404;
+        return;
+    }
+
+    my $result = eval { decode_json($response->decoded_content) };
+    if ($@ or not $result) {
+        warn "Error decoding response: $@\n";
+        return;
+    }
+    return $result;
+}

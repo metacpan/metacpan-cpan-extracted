@@ -1,0 +1,5 @@
+---
+version: 0.04
+changes:
+- Improve the Kwalitee of this module.
+

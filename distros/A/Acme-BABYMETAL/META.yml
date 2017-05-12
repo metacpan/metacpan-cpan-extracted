@@ -1,0 +1,54 @@
+---
+abstract: 'All about Japanese metal idol unit "BABYMETAL"'
+author:
+  - 'Hondallica <hondallica@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-BABYMETAL
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::BABYMETAL:
+    file: lib/Acme/BABYMETAL.pm
+    version: '0.03'
+  Acme::BABYMETAL::Base:
+    file: lib/Acme/BABYMETAL/Base.pm
+    version: '0.03'
+  Acme::BABYMETAL::MOAMETAL:
+    file: lib/Acme/BABYMETAL/MOAMETAL.pm
+    version: '0.03'
+  Acme::BABYMETAL::SU_METAL:
+    file: lib/Acme/BABYMETAL/SU_METAL.pm
+    version: '0.03'
+  Acme::BABYMETAL::YUIMETAL:
+    file: lib/Acme/BABYMETAL/YUIMETAL.pm
+    version: '0.03'
+requires:
+  Class::Accessor: '0'
+  DateTime: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/hondallica/p5-Acme-BABYMETAL/issues
+  homepage: https://github.com/hondallica/p5-Acme-BABYMETAL
+  repository: git://github.com/hondallica/p5-Acme-BABYMETAL.git
+version: '0.03'
+x_authority: cpan:HONDALLIC
+x_contributors:
+  - 'Ben Bullock <benkasminbullock@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

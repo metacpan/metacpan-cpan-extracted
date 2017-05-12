@@ -1,0 +1,31 @@
+Revision history for Perl extension Acme::use::strict::with::pride.
+
+0.04  Tue Jul 26 22:05:24 BST 2005
+	Dave's magnificent variable names in "use of uninitialized..." patch
+	means that on 5.9.2 and later the error message differs. So adjust the
+	test's regexp to cope with both variants.
+
+0.03  Wed Sep 24 20:54:40 BST 2003
+	Turn this file the other way up, so recent changes are at the top
+	It seems that Test::Harness now turns on warnings everywhere
+	(not just pre 5.8.0)
+	I guess I assumed that it was 5.6.x because I'd upgraded T::H on
+	my 5.6.1 install.
+	Anyway, bad modules can now be bad, and all the tests pass.
+        
+0.02  Mon Oct 14 22:10:26 BST 2002
+	Inspiration on the way home from work - use a "# line " directive to
+	force the line numbers in the files, rather than messy $SIG{__WARN__}
+	and $SIG{__DIE__} handlers to launder the error messages later.
+	About an hour and a bit later, having discovered that coderef INC
+	filters (if not all filters - check this carefully) can't return
+	multiple lines in the same string, finally get the bugger working.
+	Also add a test to check that we can actually load the modules without
+	warnings or errors before using Acme::use::strict::with::pride
+	Break the tiehandle out into a new package GagMe;
+	(Well, it seemed to be an accurate description of what it is doing to
+	 STDERR)
+
+0.01  Sat Oct 12 17:55:41 2002
+	- original version; created by h2xs 1.22 with options
+		-b 5.6.0 -X -n Acme::use::strict::with::pride

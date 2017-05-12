@@ -1,0 +1,18 @@
+# $Id: /local/CPAN/AxKit-XSP-L10N/t/conf/extra.conf.in 1396 2005-03-25T03:58:41.995755Z claco  $
+<IfModule mod_perl.c>
+	<IfDefine AXKIT>
+		PerlModule		AxKit
+		AxNoCache		On
+		AxLogDeclines	On
+		AxDebugLevel	10
+		AxStackTrace	On
+		AxAddProcessor	application/x-xsp .
+		AxAddXSPTaglib	AxKit::XSP::L10N
+
+		PerlSetVar	AxL10NBase	AxKit::XSP::L10N::Demo
+
+		<Files *.xsp>
+			SetHandler	AxKit
+		</Files>
+	</IfDefine>
+</IfModule>

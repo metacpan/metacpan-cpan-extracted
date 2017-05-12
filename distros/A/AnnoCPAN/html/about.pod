@@ -1,0 +1,171 @@
+
+=head1 NAME
+
+AnnoCPAN - Annotated CPAN documentation
+
+=head1 SYNOPSIS
+
+    AnnoCPAN is a web interface for the documentation of all the
+    modules on CPAN, where users can add annotations on the margin of
+    specific paragraphs throughout the POD.
+
+    This is a work in progress. Some of the ideas given here may well
+    change over time.
+
+=head1 DESCRIPTION
+
+=head2 Background
+
+Let's start by listing some of the resources at the disposal of the Perl
+community.
+
+=over
+
+=item 
+
+CPAN is a wonderful archive and distribution system for Perl modules.
+
+=item *
+
+search.cpan.org is a very nice web interface for searching and browsing the
+CPAN modules and their documentation.
+
+=item *
+
+rt.cpan.org is a bug tracking system for CPAN modules, but it is not used by
+all module authors.
+
+=item *
+
+cpanratings.perl.org allows users to give public feedback and opinions about
+the modules.
+
+=item *
+
+Sites such as perlmonks.org and the newsgroups allow people to learn and 
+discuss various issues with Perl and Perl modules.
+
+=item *
+
+Some modules have websites, mailing lists, or some sort of discussion forum
+where people can discuss issues about the specific module.
+
+=item *
+
+CPAN::Forum (which didn't exist when I started working on AnnoCPAN) is a
+discussion forum where the threads are classified by CPAN module.
+
+=back
+
+=head2 Where does AnnoCPAN fit in?
+
+When I started working on this project, there were many modules on CPAN that
+don't have mailing lists or other discussion places. Scattered discussions
+could happen in various places, or some users could post general comments on
+cpanratings.perl.org. However, there was no central place where users could help
+each other by commenting on specific features, uses, gotchas, etc. for all Perl
+modules. A limitation of sites such as CPANRatings (and to a certain degree
+other sites that host reviews) is that the comments appear out of the context
+of the module's documentation, so they are necessarily general unless the
+comment's author decides to write a long review to establish context. AnnoCPAN
+intends to fill this gap by allowing users to add public annotations on the
+margin of the documentation of every module on CPAN.
+
+The idea is not new, of course; MySQL and PHP already have something similar.
+One difference is that notes in AnnoCPAN belong to specific paragraphs instead
+of chapters, and they are shown on the margin (or between paragraphs, depending
+on the style sheet) instead of at the bottom of the page.
+
+=head2 How does it work?
+
+The AnnoCPAN site has the documentation for all the CPAN modules, and a 
+database of "notes" that can be added through the web interface. When
+a user views a module's documentation, the POD is shown as HTML together 
+with the notes. This allows users to write very short notes that fill gaps
+in the documentation; for example, it might be sufficient to say "warning:
+this method returns different things in scalar and in list context and the POD
+doesn't mention it!".
+
+The plan is to make the note database available for download under an open
+license so that other CPAN sites can choose to show the notes. It  might also
+be possible to create a program to patch the local pods in a user's machine so 
+that the notes appear on perldoc! (Clearly labeled as notes, of course).
+
+=head2 The problem with versions
+
+A note is identified by the distribution, module, and paragraph number. But
+what happens when a new version of the module comes out? The notes will also
+have to take the version number of the distribution into account. But, is it
+viable to show old notes with the POD of the new version? And where? Paragraph 
+numbers can change.
+
+In most cases, the documentation for the new version of a module is very
+similar to the last one. If it is a bugfix release, there might not be any
+changes at all; otherwise functions are typically added but not removed. In
+cases such as this, it would be a good idea to transfer the old notes to the
+new version. The paragraph to which the note was originally attached can be
+compared to the paragraphs in the new version and, if one is similar enough
+(preferably identical), the note is transferred.
+
+If the system can't figure out where to put the old note, the author or a
+moderator can move it to a place in the new version if the note still applies.
+Hopefully some of the good notes will become obsolete once the author of the
+module decides to update the documentation to address the issues mentioned in
+the note.
+
+Users are able to edit, move, and delete their own notes. Moderators are be
+able to move or delete any note. 
+
+=head1 CURRENT STATUS
+
+This test version already has essentially all the documentation found on CPAN,
+except for occasional difficulties with the non-trivial problem of unpacking and
+identifying the relevant content in distributions which were packed in many
+different ways.
+
+The current features include:
+
+=over
+
+=item *
+
+Search by module name, distribution, and author.
+
+=item *
+
+Show the POD as HTML, together with the notes
+
+=item *
+
+Allow anyone to add notes 
+
+=item *
+
+List the most recent notes on the front page.
+
+=item *
+
+Authentication
+
+=item *
+
+Delete, move or edit notes (only the note's author can do this)
+
+=item *
+
+Handle versions; automatic updates
+
+=item *
+
+Generate RSS feeds or emails
+
+=back
+
+=head1 AUTHOR
+
+Ivan Tubert-Brohman E<lt>itub@cpan.orgE<gt>
+
+Comments and suggestions welcome.
+
+=cut
+

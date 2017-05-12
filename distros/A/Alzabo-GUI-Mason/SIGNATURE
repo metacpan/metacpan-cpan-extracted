@@ -1,0 +1,80 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 eba2b1ab1b5271c392a76c77954e6cd5db2c7d48 Build.PL
+SHA1 edfa956f20c057999fdff7c1dfa03d97a26a05aa Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 7f1c3a23f6d73811b6938e1c4f93a463052feb29 MANIFEST
+SHA1 a2f00e5d2f648250c0c6c5511db5cd6d28283cc3 MANIFEST.SKIP
+SHA1 d9fc33650abb7f777bfb3c0cdb09319bb774e79f META.yml
+SHA1 1c3b245e8b8966b346d731f7e3a758f79fd2a77b Makefile.PL
+SHA1 884538e1ae5b294ace5ed946b678d3eb2df4bb06 README
+SHA1 6951f772986034ba086d62bca9954450adae1b50 inc/Alzabo/GUI/Mason/Build.pm
+SHA1 baf2cde1cb60821012481ce61ffdc425d5c42445 inc/Alzabo/GUI/Mason/Config.pm.tmpl
+SHA1 a485d7604ff29ea0ea979a6ad3a938bb0fb4e97f lib/Alzabo/GUI/Mason.pm
+SHA1 3cf891156b89daa5cb0e7f485bb34f9b96363002 mason/add_column.mhtml
+SHA1 0f89fd887ab3f9248c88fe760e32ebe76e4480c2 mason/add_index_1.mhtml
+SHA1 93692ef68e479ee86d79808d03bc8a2870f749ba mason/add_index_2.mhtml
+SHA1 af6010e4cbdc7d418f5595a5c8c6b7f8c7e9e498 mason/add_relationship.mhtml
+SHA1 4b2fbe5c40d398e2f8f275c552eff34701fdec5e mason/add_relationship_2.mhtml
+SHA1 5ad621aec0a5fc8d43c6564b6e20091317a1cd7e mason/add_table.mhtml
+SHA1 d89afb8c9b4ca67e93ef3fcbe249f15a36acc212 mason/alzabo.css
+SHA1 9d4a24c745c27099c7ebb54612961e24ecdc14a2 mason/autohandler
+SHA1 117c083f8fde8cf11f46a1b1ac95988e2e4ec8f6 mason/change_column.mhtml
+SHA1 61b56c2478793e4584c81849d3dc3ef9d86771ff mason/change_column_name.mhtml
+SHA1 9c51de2f3615e08fcdd0e4714aacaf0683457ab6 mason/change_schema_instantiation.mhtml
+SHA1 c0bcbc757f20311eeba61e72462015d612b6cf1a mason/change_schema_name.mhtml
+SHA1 67b0ff751763b8402f1f916489c273bb3fd19325 mason/change_table_attributes.mhtml
+SHA1 6fc21a42b565615f85570cf22404f7421244b824 mason/change_table_comment.mhtml
+SHA1 70e19eddfa3a195e34c2aabb3e6db447bbe4c5bb mason/change_table_name.mhtml
+SHA1 d3d0606c1d5e776ae6e329fe9c1ca4f99c81f443 mason/cube_logo.jpg
+SHA1 5c60e3ccca219cea330c77f61560997352d068c0 mason/delete_column.mhtml
+SHA1 0e6e4e5f2f45fc3b6c06e323ece2cfeef2fd871c mason/delete_foreign_key.mhtml
+SHA1 5a57bb43601da789dd0a42b1113495afc801a3da mason/delete_index.mhtml
+SHA1 a44832b05818542b49b4b618f8e9da4da7aef7d2 mason/delete_schema.mhtml
+SHA1 b3b3c01da384394d1bd34aedbb3220a5cd4650dd mason/delete_schema_confirm.mhtml
+SHA1 2f53b6c9ee76ee170f2145136b2c5d731db2eab6 mason/delete_table.mhtml
+SHA1 e006c48ddad586ccbbb0df057f1d7ccab2b29b2c mason/draw_graph.mhtml
+SHA1 f7efc118ad9d3cf52cd084d563916ed704b7ad09 mason/exception
+SHA1 8eff7355470d744b539f8558aeca8b5c67069b91 mason/execute_sql.mhtml
+SHA1 923c3e4ee11361872d152a79659d9673fad81e8a mason/execute_sync_sql.mhtml
+SHA1 b1f06e8e51adbcb37f846bee3c8584b14612cb5b mason/handle_rules_exception
+SHA1 8fbf8e982363d1049ec8a807e8f8dbdb8229f963 mason/href
+SHA1 024f14d545630f1f3f59a6821da251be00159924 mason/hyena.jpg
+SHA1 026298644c566c3b363f56f4573ca6dfcb253f4f mason/index.mhtml
+SHA1 db710d1fd4dafe3d46a432a6637570345702dbd1 mason/login_form.mas
+SHA1 8395adfffb249eeb351c48f9c48d9b7d6ab23f56 mason/move_column.mhtml
+SHA1 e3e208a9644af8b7285f36cfec85ce7edc81de81 mason/move_table.mhtml
+SHA1 56f87a82bc9e9bc54c7788286d8f72b380aba12d mason/new_schema.mhtml
+SHA1 f7e20c5ced8103574427769151d9ac4fa7c8efdb mason/reverse_engineer.mhtml
+SHA1 e4fff2490d3dc4ccca2fd54cde49884c18d1a9bc mason/schema_menubar
+SHA1 67689cf6d8e212912f2f6dec3a853f23cf888071 mason/syshandler
+SHA1 410734cf531bdb81f19c4ad59e39bcbddc417f7b mason/table_menubar
+SHA1 d1c20d720f93887b0ad7e69d0a7392552b2f6ba4 mason/url
+SHA1 b8c93fcd4b44768728881a7a6ee4439fe4091696 mason/view_column.mhtml
+SHA1 791ceaff05923b8af00fb508ca342ffbd427a23d mason/view_graph.mhtml
+SHA1 23057ec29c704508ea2c3473ac7ba2c1b6da3525 mason/view_schema.mhtml
+SHA1 b55932dc5cd88920710bb0adb8a3081fa0f33f75 mason/view_schema_sql.mhtml
+SHA1 82b8f8af2b9c83b711a5a2d7aa02087268f86753 mason/view_sync_sql.mhtml
+SHA1 584354dbe5914d0f6d108eb88808346a8a5df103 mason/view_table.mhtml
+SHA1 b5dfa8e3fcaf26cc143e44ad51ea17ce93f2fbb5 mason/view_table_other.mhtml
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFG4swJ3Or3ZzQuifMRAoSEAKCuPCpen4LD/n2pdjTI+pcRD+wEdACfajxh
+u74Y/d3KbZ60algs4Uqbq/4=
+=Qb93
+-----END PGP SIGNATURE-----

@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache::Precompress.
+
+0.01  Thu Feb  6 17:54:50 2003
+	- original version; created by h2xs 1.21 with options
+		-XA -n Apache::Precompress
+

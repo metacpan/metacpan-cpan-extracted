@@ -1,0 +1,24 @@
+---
+abstract: 'Perform XSLT transparently between XML::LibXSLT and Win32::MinXSLT '
+author:
+  - 'Klaus Eichner <klaus03@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-SList-XSLT
+requires:
+  Win32::MinXSLT: '0'
+  XML::LibXSLT: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/klaus03/Acme-SList-XSLT
+  repository: https://github.com/klaus03/Acme-SList-XSLT.git
+version: '0.04'

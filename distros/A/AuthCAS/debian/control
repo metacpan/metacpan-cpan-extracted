@@ -1,0 +1,20 @@
+Source: libauthcas-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 4.0.2), libmodule-build-perl
+Build-Depends-Indep: perl (>= 5.8.0-7)
+Maintainer: Lionel Porcheron <lionel.porcheron@anyware-tech.com>
+Standards-Version: 3.6.1
+
+Package: libauthcas-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, 
+Description:  Client library for CAS 2.0
+ CAS is Yale University's web authentication system, heavily inspired by Kerberos.
+ Release 2.0 of CAS provides "proxied credential" feature that allows authentication
+ tickets to be carried by intermediate applications (Portals for instance), they are
+ called proxy.
+ .
+ This AuthCAS Perl module provides required subroutines to validate and retrieve CAS tickets.
+ .
+ http://sourcesup.cru.fr/perlcas/

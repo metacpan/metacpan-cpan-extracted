@@ -1,0 +1,107 @@
+{
+  "system": {
+    "post_processors": [
+    ],
+    "libs": [
+      "@ServerRoot@/lib"
+    ],
+    "load_modules": [
+    ],
+    "env_vars": {
+    },
+    "settings": {
+    }
+  },
+  "errors": {
+    "error_handler":    "ASP4::ErrorHandler",
+    "mail_errors_to":   "you@your-server.com",
+    "mail_errors_from": "root@localhost",
+    "smtp_server":      "localhost"
+  },
+  "web": {
+    "application_name": "ASP4xRoutes",
+    "application_root": "@ServerRoot@",
+    "www_root":         "@ServerRoot@/htdocs",
+    "handler_root":     "@ServerRoot@/handlers",
+    "page_cache_root":  "/tmp/PAGE_CACHE",
+    "handler_resolver": "ASP4::HandlerResolver",
+    "handler_runner":   "ASP4::HandlerRunner",
+    "filter_resolver":  "ASP4::FilterResolver",
+    "request_filters": [
+      {
+        "uri_match":  ".*",
+        "class":      "ASP4x::Router"
+      }
+    ],
+    "disable_persistence": [
+      {
+        "uri_match": "/.*",
+        "disable_session": true
+      }
+    ],
+    "routes": [
+      {
+        "include_routes": "@ServerRoot@/conf/routes.json"
+      },
+      {
+        "name":   "CreatePage",
+        "path":   "/main/:type/create",
+        "target": "/pages/create.asp",
+        "method": "GET"
+      },
+      {
+        "name":   "Create",
+        "path":   "/main/:type/create",
+        "target": [ "/handlers/dev.[:type:].create", "/handlers/dev.create" ],
+        "method": "POST"
+      },
+      {
+        "name":   "View",
+        "path":   "/main/:type/{id:\\d+}",
+        "target": "/pages/view.asp",
+        "method": "*"
+      },
+      {
+        "name":   "EditPage",
+        "path":   "/main/:type/{id:\\d+}/edit",
+        "target": "/pages/edit.asp",
+        "method": "GET"
+      },
+      {
+        "name":   "Edit",
+        "path":   "/main/:type/{id:\\d+}/edit",
+        "target": "/handlers/dev.edit",
+        "method": "POST"
+      },
+      {
+        "name":     "List",
+        "path":     "/main/:type/list/{page:\\d*}",
+        "target":   "/pages/list.asp",
+        "method":   "*",
+        "defaults": { "page": 1 }
+      },
+      {
+        "name":   "Delete",
+        "path":   "/main/:type/{id:\\d+}/delete",
+        "target": "/handlers/dev.delete",
+        "method": "POST"
+      }
+    ]
+  },
+  "data_connections": {
+    "session": {
+      "manager":          "ASP4::SessionStateManager::NonPersisted",
+      "cookie_name":      "session-id",
+      "cookie_domain":    "*",
+      "session_timeout":  30,
+      "dsn":              "",
+      "username":         "",
+      "password":         ""
+    },
+    "main": {
+      "dsn":              "",
+      "username":         "",
+      "password":         ""
+    }
+  }
+}

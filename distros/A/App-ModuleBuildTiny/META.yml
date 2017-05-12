@@ -1,0 +1,45 @@
+---
+abstract: 'A standalone authoring tool for Module::Build::Tiny'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.019, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-ModuleBuildTiny
+provides:
+  App::ModuleBuildTiny:
+    file: lib/App/ModuleBuildTiny.pm
+    version: '0.019'
+requires:
+  Archive::Tar: '0'
+  CPAN::Meta: '0'
+  CPAN::Meta::Merge: '0'
+  CPAN::Meta::Prereqs::Filter: '0'
+  Data::Section::Simple: '0'
+  Encode: '0'
+  Exporter: '5.57'
+  File::Path: '0'
+  File::Slurper: '0'
+  File::Temp: '0'
+  Getopt::Long: '2.36'
+  JSON::PP: '0'
+  Module::CPANfile: '0'
+  Module::Metadata: '1.000009'
+  Module::Runtime: '0'
+  Parse::CPAN::Meta: '0'
+  Software::LicenseUtils: '0'
+  Text::Template: '0'
+  perl: '5.010'
+resources:
+  IRC: irc://irc.perl.org/#toolchain
+  bugtracker: https://github.com/Leont/app-modulebuildtiny/issues
+  repository: https://github.com/Leont/app-modulebuildtiny.git
+version: '0.019'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

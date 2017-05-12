@@ -1,0 +1,37 @@
+Acme::Metification
+==================
+
+This module gives you some meta-programming abilites within Perl.
+It uses source filters to do evil things with your source.
+
+Not intended for use in production code.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   rm lib/Acme/Metification.pm
+   #make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Test::More (0.44 or higher)
+   Filter::Simple (0.78 or higher)
+
+Note that it may well work with older versions of these modules,
+but I cannot guarantee that it will because I only tested it with
+the versions listed.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002-2006 Steffen Mueller, all rights reserved.
+
+Author can be reached at <smueller@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

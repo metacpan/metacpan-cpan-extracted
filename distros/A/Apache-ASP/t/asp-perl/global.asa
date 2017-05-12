@@ -1,0 +1,7 @@
+sub Script_OnStart {
+    print "1..2\n";
+    if($main::ASP_CONF_MARK) {
+	print "ok\n";
+    }
+}
+

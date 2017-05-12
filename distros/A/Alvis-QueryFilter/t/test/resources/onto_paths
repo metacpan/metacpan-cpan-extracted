@@ -1,0 +1,29 @@
+node_0	
+node_10	Cell Location
+node_11	Cell Cycle
+node_12	Cell Cycle/Sporulation
+node_13	Environement Conditions/Stress Factor
+node_14	Environement Conditions
+node_15	Non-Genic Dependence
+node_16	Phenotype
+node_17	Gene Function
+node_18	Protein Property
+node_19	Protein/Enzyme
+node_20	Transcription Factor
+node_21	Regulatory Agent
+node_22	Gene Expression
+node_23	Gene Expression/Transcription Result
+node_24	DNA/Transcription Regulation Region/Transcription Activation Region
+node_25	DNA/Transcription Regulation Region
+node_26	DNA/Transcription Regulation Region/Transcription Termination Region
+node_27	Genetic Code
+node_28	Transcription Phase
+node_29	Species
+node_30	Protein Structure
+node_31	Protein Modification
+node_32	DNA
+node_33	Protein
+node_34	Sequence Analysis
+node_35	DNA Organization
+node_36	Experimental Method
+node_37	Mutation

@@ -1,0 +1,4 @@
+name = "Amon2-Plugin-Redis"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

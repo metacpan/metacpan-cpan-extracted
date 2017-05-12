@@ -1,0 +1,125 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# PODNAME: installdeps
+# ABSTRACT: A tiny script to install dependent modules
+our $VERSION = 'v0.0.3'; # VERSION
+
+use App::installdeps;
+
+App::installdeps->run(@ARGV);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+installdeps - A tiny script to install dependent modules
+
+=head1 VERSION
+
+version v0.0.3
+
+=head1 SYNOPSIS
+
+installdeps C<-h>
+
+installdeps [C<-n>] [C<-i E<lt>commandE<gt>>] [C<-x E<lt>regexE<gt>>] [C<-r>] [C<-u>] [C<-R>] C<E<lt>files_or_dirsE<gt>>...
+
+  # show POD help
+  installdeps -h
+
+  # dry-run (only shows target modules)
+  # multiple files can be specified
+  installdeps -n *.pl
+
+  # specify install command
+  # defaults to cpanm
+  # the command following module names is invoked like
+  # cpanm -f Foo::Bar Zot Qux
+  installdeps -i 'cpanm -f' *.pl
+
+  # can specify directories
+  # exclude optional modules (-r), include installed modules (-u),
+  # recursive check (-R) and disable default exclusion filter (-X)
+  # additionally, exclude Acme::*. NOTE that // is not necessary.
+  installdeps -ruRX -x ^Acme:: lib t
+
+=head1 DESCRIPTION
+
+This is a tiny script to install dependent modules.
+If you upload your scripts or modules to PAUSE, you can install dependent modules by cpanm/cpan/cpanp.
+However, it is almost impossible and meaningless to upload all your daily-use scripts.
+
+This script scans sources to detect dependent modules and install them.
+Without options, modules not yet installed and no matter whether it is used in eval context or not are considered.
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<-h>
+
+Shot this POD help
+
+=item C<-n>
+
+Dry run (Do not install modules actually).
+
+=item C<-i E<lt>commandE<gt>>
+
+Specify install command. Defaults to C<cpanm>.
+
+=item C<-x E<lt>regexE<gt>>
+
+Specify regex for exclusion. If module names match to this regex, they are excluded from install targets. Recursive check by C<-R> is not done for excluded modules, either.
+
+=item C<-r>
+
+Exclude optional modules, which are used in eval context.
+
+=item C<-u>
+
+Include modules installed already.
+
+=item C<-R>
+
+Recursive dependency check for existing modules.
+
+=item C<-X>
+
+Disable default exclusion filter /\$/. To specify C<-x> does NOT imply this option.
+
+=back
+
+=for getopt 'h'
+
+=for getopt 'n'
+
+=for getopt 'i:'
+
+=for getopt 'x:'
+
+=for getopt 'r'
+
+=for getopt 'u'
+
+=for getopt 'R'
+
+=for getopt 'X'
+
+=head1 AUTHOR
+
+Yasutaka ATARASHI <yakex@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Yasutaka ATARASHI.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

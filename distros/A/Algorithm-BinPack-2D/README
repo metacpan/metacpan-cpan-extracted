@@ -1,0 +1,66 @@
+NAME
+    Algorithm::BinPack::2D - efficiently pack items into rectangles
+
+SYNOPSIS
+    `Algorithm::BinPack::2D' efficiently packs items into bins. The bins are
+    given a maximum width and height, and items are packed in with as little
+    empty space as possible. An example use would be backing up small images
+    to concatenated images, while minimizing the number of images required.
+
+        my $bp = Algorithm::BinPack::2D->new(binwidth => 512, binheight => 512);
+
+        $bp->add_item(label => "one.png",   width =>  30, height =>  10);
+        $bp->add_item(label => "two.png",   width => 200, height =>  40);
+        $bp->add_item(label => "three.png", width =>  30, height => 300);
+        $bp->add_item(label => "four.png",  width => 400, height => 100);
+
+        for ($bp->pack_bins) {
+            print "Bin width: ", $_->{width}, " x ", $_->{height}, "\n";
+            print "     Item: ", $_->{label}, "\n" for @{ $_->{items} };
+        }
+    =cut
+
+METHODS
+    new     Creates a new `Algorithm::BinPack::2D' object. The maximum bin
+            width and height is specified as a named argument 'binwidth' and
+            'binheight', and is required.
+
+                my $bp = Algorithm::BinPack::2D->new(binwidth => 512, binheight => 512);
+
+    add_item
+            Adds an item to be packed into a bin. Required named arguments
+            are 'label', 'width' and 'height', but any others can be
+            specified, and will be saved.
+
+                $bp->add_item(label => 'one',  width => 1, height => 1);
+
+    pack_bins
+            Packs the items into bins. This method tries to leave as little
+            empty space in each bin as possible. It returns a list of
+            hashrefs with the key 'width' containing the total bin width,
+            'height' containing the total bin height, and 'items' containing
+            an arrayref holding the items in the bin. Each item is in turn a
+            hashref containing the keys 'label', 'x', 'y', 'width' and
+            'height'.
+
+                for my $bin ($bp->pack_bins) {
+                    print "Bin width: ", $bin->{width}, " x ", $bin->{height}, "\n";
+
+                    for my $item (@{ $bin->{items} }) {
+                        printf "  %-6s %-20s\n", $_, $item->{$_} for keys %{ $item };
+                        print  "  ---\n";
+                    }
+                }
+
+SEE ALSO
+    `Algorithm::BinPack'
+
+AUTHOR
+    Tasuku SUENAGA a.k.a. gunyarakun <tasuku-s-cpan ATAT titech.ac>
+
+LICENSE
+    Copyright (C) Tasuku SUENAGA a.k.a. gunyarakun
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. =cut
+

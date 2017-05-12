@@ -1,0 +1,95 @@
+# Note this file was used for Apache 1.3.0
+# Please see the readme, for what exactly the config variables do.
+
+PerlSetVar Global  .		
+PerlSetVar GlobalPackage Apache::ASP::Demo
+PerlSetVar StateDir  /tmp/asp_demo
+PerlSetVar StatINC 0
+PerlSetVar StatINCMatch 0
+PerlSetVar Clean 0
+PerlSetVar DynamicIncludes 1
+PerlSetVar FileUploadMax 50000
+PerlSetVar FileUploadTemp 1
+PerlSetVar SessionQueryParse 0
+PerlSetVar SessionQuery 1
+#PerlSetVar Debug 2
+PerlSetVar Debug -3
+PerlSetVar StateCache 0
+PerlSetVar SessionCount 1
+PerlSetVar TimeHiRes 1
+PerlSetVar CompressGzip 0
+PerlSetVar UseStrict 1
+#PerlSetVar CacheDB DB_File
+PerlSetVar CacheDB MLDBM::Sync::SDBM_File
+
+# .asp files for Session state enabled
+<Files ~ (\.asp)>
+	SetHandler perl-script
+	PerlHandler Apache::ASP
+	PerlSetVar CookiePath  /	
+	PerlSetVar SessionTimeout  5
+	PerlSetVar RegisterIncludes 1
+	PerlSetVar XMLSubsMatch my:\w+
+	PerlSetVar AllowApplicationState 1
+	PerlSetVar AllowSessionState 1
+#	PerlSetVar StateSerializer Storable
+#	PerlSetVar StateDB DB_File
+#	PerlSetVar StatScripts 0
+</Files>
+
+# .htm files for the ASP parsing, but not the $Session object
+# NoState turns off $Session & $Application
+<Files ~ (\.htm)>
+	SetHandler perl-script
+	PerlHandler Apache::ASP
+	PerlSetVar NoState 1 
+	PerlSetVar BufferingOn 1
+	PerlSetVar NoCache 1
+	PerlSetVar DebugBufferLength 250
+</Files>
+
+<Files ~ (\.xml)>
+	SetHandler perl-script
+	PerlHandler Apache::ASP
+	PerlSetVar NoState 1 
+	PerlSetVar XSLT template.xsl
+	PerlSetVar XSLTCache 1
+</Files>
+
+<Files ~ (\.inc|\.htaccess)>
+	ForceType text/plain
+</Files>
+
+# .ssi for full ssi support, with Apache::Filter
+<Files ~ (\.ssi)>
+	SetHandler perl-script
+	PerlHandler Apache::ASP Apache::SSI
+	PerlSetVar Global .
+	PerlSetVar Filter On
+</Files>
+
+<Files ~ (\filter.filter)>
+       SetHandler perl-script
+       PerlHandler Apache::ASP Apache::ASP
+       PerlSetVar Global .
+       PerlSetVar Filter On
+</Files>
+
+<Files ~ (session_query_parse.asp$)>
+	SetHandler perl-script
+	PerlHandler Apache::ASP
+	PerlSetVar CookiePath  /	
+	PerlSetVar SessionTimeout  1
+	PerlSetVar SessionQueryParseMatch ^http://localhost
+</Files>
+
+<Files ~ (xml_subs_strict\.asp)>
+	SetHandler perl-script
+	PerlHandler Apache::ASP
+	PerlSetVar CookiePath  /	
+	PerlSetVar SessionTimeout  5
+	PerlSetVar RegisterIncludes 1
+	PerlSetVar XMLSubsMatch my:\w+
+	PerlSetVar XMLSubsStrict 1
+</Files>
+

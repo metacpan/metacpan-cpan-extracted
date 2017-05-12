@@ -1,0 +1,27 @@
+---
+abstract: 'Compiler and linker wrapper for Alien'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::Suite: '0.000060'
+  Test::Exec: '0'
+  Test::More: '0.94'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Base-Wrapper
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/plicease/Alien-Base-Wrapper/issues
+  homepage: https://metacpan.org/pod/Alien::Base::Wrapper
+  repository: git://github.com/plicease/Alien-Base-Wrapper.git
+version: '0.04'
+x_serialization_backend: 'YAML::Tiny version 1.70'

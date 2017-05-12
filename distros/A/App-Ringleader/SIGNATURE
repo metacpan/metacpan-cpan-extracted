@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9a9f5c24882519e61ea377612ac5ce301b886338 AUTHOR_PLEDGE
+SHA1 f3a4bc11afd6afbe9bc7361eae57d7fe721070c2 Build.PL
+SHA1 590554beb5b669db3844dada8f01a482f754a059 CONTRIBUTORS
+SHA1 f6857694bbdcede6ea73fa8a7dc53fb0ebc9a968 Changes
+SHA1 43d840efd203b0b91e4c15d11c541954214c0d3f INSTALL
+SHA1 73f01167fe93f49e71989d82937f26f2b9bb52f2 LICENSE
+SHA1 fcaa736841f9bad10746a4113b5e0b3f50547a18 MANIFEST
+SHA1 4d173c846b04b0181db8c5d63840bd7ab0d654a7 META.json
+SHA1 7f786bdecf74af8b964ae9d5424cb3db3f1b2657 META.yml
+SHA1 77e3607d6ac001e6e676cbcfecd50885b1c3a0f9 README
+SHA1 2c07d9bb89b95a7466d06bd44a9d9843246a451d README.mkdn
+SHA1 82c3a3f7d37127ce87d4aead2b20a4e2a4eed832 bin/ringleader
+SHA1 bd07bf835721966ea29f1275519948480ce234b8 contrib/ringleader.yml
+SHA1 bb9755c80ce06814598a9fd9c8fbe55be5d530ab lib/App/Ringleader.pm
+SHA1 37c9c915f188d9b7af7350ff18aea892da77d3f2 t/00-compile.t
+SHA1 1c31b65ebb7ee327f98f76e479369ca27ac789ef t/000-report-versions-tiny.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlPvp9AACgkQ34Hwf+GwC4xUxACggUpkqTN5BgMe//LBh1nXX59k
+wMgAoOnG3cxGbtUjAMKS24nLTWjV4kqd
+=YL2g
+-----END PGP SIGNATURE-----

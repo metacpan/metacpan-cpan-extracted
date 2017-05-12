@@ -1,0 +1,39 @@
+AIX-Perfstat version 0.04.1
+=========================
+
+INTRODUCTION
+
+	AIX::Perfstat implements a wrapper for the following function:
+
+	perfstat_cpu_total()
+	perfstat_cpu()
+	perfstat_disk_total()
+	perfstat_disk()
+	perfstat_memory_total()
+	perfstat_netinterface_total()
+	perfstat_netinterface()
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	libperfstat.so - Available from AIX install media as bos.perf.libperfstat.bff 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Richard Holden
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

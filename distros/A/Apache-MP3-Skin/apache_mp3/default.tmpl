@@ -1,0 +1,318 @@
+
+
+<html>
+<head>
+<title><TMPL_VAR NAME=HOME_LABEL></title>
+</head>
+<body bgcolor=333333 marginwidth=0 marginheight=0 leftmargin=0 rightmargin=0 topmargin=0>
+
+
+
+<!-- Top Tabs-->
+
+<table cellpadding=0 cellspacing=0 border=0 width=100% bgcolor=white>
+  <tr><td colspan=2>&nbsp;</td></tr>
+  <tr>
+    <td align=left>
+    <table cellpadding=3 cellspacing=0 border=0>
+      <tr>
+        <td>&nbsp;</td>
+        <TMPL_UNLESS NAME="IS_HOME">
+        <td bgcolor=cccccc>&nbsp;<a href="<TMPL_VAR NAME=HOME_PATH><TMPL_IF NAME=PARAM_plopen>?plopen=1</TMPL_IF>"><b><font color=black size=2 face=arial><TMPL_VAR NAME=HOME_LABEL></font></b></a>&nbsp;</td>
+        <TMPL_ELSE>
+        <td bgcolor=333333>&nbsp;<b><font color=white size=2 face=arial><TMPL_VAR NAME=HOME_LABEL></font></b>&nbsp;</td>              
+        </TMPL_UNLESS>
+      </tr>
+    </table>
+    </td>    
+    <td align=right>
+    <table cellpadding=3 cellspacing=0 border=0>
+      <tr>
+        <TMPL_UNLESS NAME=IS_HOME>
+        <TMPL_LOOP NAME=HOME_DIRS>
+        <TMPL_IF NAME=IS_DIR_THIS_DIR>
+        <td align=center width=1 bgcolor=333333>&nbsp;<b><font color=white size=2 face=arial><TMPL_VAR NAME=THIS_DIR></font></b>&nbsp;</td>
+        <TMPL_ELSE>
+        <TMPL_IF NAME=IS_DIR_INSIDE_THIS_DIR>
+        <td align=center width=1 bgcolor=333333>&nbsp;<b><font color=white size=2 face=arial><TMPL_VAR NAME=THIS_DIR></font></b>&nbsp;</td>
+        <TMPL_ELSE>
+        <td align=center width=1 bgcolor=cccccc>&nbsp;<a href="<TMPL_VAR NAME=THIS_URL><TMPL_IF NAME=PARAM_plopen>?plopen=1</TMPL_IF>"><b><font color=black size=2 face=arial><TMPL_VAR NAME=THIS_DIR></font></b></a>&nbsp;</td>
+        </TMPL_IF>
+        </TMPL_IF>
+        <td>&nbsp;</td>
+        </TMPL_LOOP>
+        <TMPL_ELSE>
+        <TMPL_LOOP NAME=HOME_DIRS>
+          <td align=center width=1 bgcolor=cccccc>&nbsp;<a href="<TMPL_VAR NAME=THIS_URL><TMPL_IF NAME=PARAM_plopen>?plopen=1</TMPL_IF>"><b><font color=black size=2 face=arial><TMPL_VAR NAME=THIS_DIR></font></b></a>&nbsp;</td>
+          <td>&nbsp;</td>
+        </TMPL_LOOP> 
+        </TMPL_UNLESS>
+      </tr>
+    </table>
+    </td>
+  </tr>
+</table>
+
+
+<!-- End Top Tabs -->
+
+<center>   
+<br><br>
+<TMPL_IF NAME=IS_HOME>
+
+<!-- Start Home Splash Page -->
+<table width=770 cellpadding=0 cellspacing=0 border=0 height=70%>
+    <tr><td align=center valign=middle>
+        <table cellpadding=2 border=0 cellspacing=0 bgcolor=999966 width=60% height=60%>
+        <tr><td>
+            <table cellpadding=20 border=0 cellspacing=0 bgcolor=ffffcc width=100% height=100%>
+                <tr><td align=center>
+                <font size=6 face=arial color=663300><b><TMPL_VAR NAME=HOME_LABEL></b></font>
+                <br><br><font color=663300 size=4 face=arial>
+                <TMPL_LOOP NAME=DIRS>
+                <a href="<TMPL_VAR NAME=THIS_URL><TMPL_IF NAME=PARAM_plopen>?plopen=1</TMPL_IF>" style="color:663300;"><b><TMPL_VAR NAME=THIS_DIR></b></a><br><br>
+                </TMPL_LOOP>
+                </font>
+                </td></tr>
+                <tr><td align=center>
+                <font style="font-size:9pt" color=333333 face=arial>
+                Find this skin and others at <a href="http://www.apachemp3.com" style="color:black;" onmouseover="this.style.background='cccccc';" onmouseout="this.style.background='';">apachemp3.com</a>.<br>
+                Apache::MP3 was written by <a href="http://stein.cshl.org/" style="color:black;" onmouseover="this.style.background='cccccc';" onmouseout="this.style.background='';">Lincoln D. Stein</a>.<br>
+                Apache::MP3::Skin was written by <a href="mailto: rgraff@apachemp3.com" style="color:black;" onmouseover="this.style.background='cccccc';" onmouseout="this.style.background='';">Robert Graff</a> at <a href="http://www.workingdemo.com" style="color:black;" onmouseover="this.style.background='cccccc';" onmouseout="this.style.background='';">WorkingDemo.com</a><br>
+				Reports bugs with Apache::MP3::Skin or this skin to our <a href="http://www.apachemp3.com/bugs.html" style="color:black;" onmouseover="this.style.background='cccccc';" onmouseout="this.style.background='';">bugtracker</a></td>
+                </font>
+                </td></tr>
+            </table>
+        </td></tr>
+        </table>
+    </td></tr>
+</table>
+<!-- End Home Splash Page -->
+
+
+<TMPL_ELSE>
+
+        
+<!-- Begin Non-Home Page -->     
+<table width=770 cellpadding=2 cellspacing=0 border=0 bgcolor=999966>
+	<tr><td>
+	<table width=768 cellpadding=0 cellspacing=0 border=0 bgcolor=ffffcc>
+		<tr><td align=center>
+		<!-- Begin Table with Breadcrumb Trail and Album Cover-->
+			<table cellpadding=0 cellspacing=14 border=0 width=100%>
+				<tr>
+					<td>
+					    <font face=arial size=3 color=663300><b>
+						<TMPL_LOOP NAME=PATH_FORWARD>
+						<ul style="list-style-type: none; ">
+						<li><TMPL_UNLESS NAME=__FIRST__><img src="<TMPL_VAR NAME=BASE_DIR>/default/down_and_right_arrow.gif">
+						</TMPL_UNLESS>
+						<TMPL_UNLESS NAME=__LAST__>
+							<a href="<TMPL_VAR NAME=THIS_URL><TMPL_IF NAME=PARAM_plopen>?plopen=1</TMPL_IF>" style="color:663300; text-decoration:none;" onmouseover="this.style.textDecoration='underline';" onmouseout="this.style.textDecoration='none';"><TMPL_VAR NAME=THIS_DIR></a>
+						<TMPL_ELSE>
+							<TMPL_VAR NAME=THIS_DIR>
+						</TMPL_UNLESS>
+						
+			        	</TMPL_LOOP>
+						<TMPL_LOOP NAME=PATH_FORWARD>
+						</ul>
+			        	</TMPL_LOOP>
+						</b></font>
+					</td>
+					<TMPL_IF NAME=COVER>
+					<td align=right>
+					<img src="<TMPL_VAR NAME=COVER>" width=100 height=100>
+					</td>
+					</TMPL_IF>
+				</tr>
+			</table>
+		<!-- End Table with Breadcrumb Trail and Album Cover-->
+
+				<TMPL_IF NAME=CONTAINS_PLAYLIST>
+		<!-- Start the Playlist Table -->
+			<table width=746 cellpadding=1 cellspacing=0 border=0 bgcolor=663300>
+				<tr><td>
+					<table width=744 cellpadding=0 cellspacing=0 border=0>
+					<tr>
+						<td align=center valign=middle>
+							<TMPL_IF NAME=PARAM_plopen>
+								<a href="<TMPL_VAR NAME=URL>?plopen=0"><img src="<TMPL_VAR NAME=BASE_DIR>/default/minus.gif" width=24 height=24 hspace=2 vspace=2 border=0></a>
+							<TMPL_ELSE>
+								<a href="<TMPL_VAR NAME=URL>?plopen=1"><img src="<TMPL_VAR NAME=BASE_DIR>/default/plus.gif" width=24 height=24 hspace=2 vspace=2 border=0></a>
+							</TMPL_IF>
+						</td>
+						<td colspan=4>
+						<table cellpadding=4 border=0 cellspacing=0 width=100%>
+						<tr><td>
+							<font style="font-family:arial; color:white;font-size:12pt; font-weight:bold;">
+							&nbsp;&nbsp;Your Playlist Contains <TMPL_VAR NAME=CONTAINS_PLAYLIST> Song(s)
+							</font>
+						</td>
+						<td align=right>
+							<TMPL_IF NAME=ALLOW_STREAM>
+							<input type="button" value=" Play Playlist " STYLE="background:#cccc99; color:663300; font-size:8pt; cursor:hand; font-weight: bold;" onclick="location = '<TMPL_VAR NAME=PLAY_ALL_PLAYLIST_URL>';">&nbsp;&nbsp;
+							</TMPL_IF>
+							<input type="button" value=" Clear Playlist " STYLE="background:#cccc99; color:663300; font-size:8pt; cursor:hand;" onclick="location = '<TMPL_VAR NAME=CLEAR_ALL_PLAYLIST_URL>';">&nbsp;&nbsp;
+
+						</td>
+						</tr>
+						</table>
+						</td>
+					</tr>
+					<TMPL_IF NAME=PARAM_plopen>
+   					<TMPL_LOOP NAME=PLAYLIST>
+   					<TMPL_IF NAME=__ODD__><tr bgcolor=ffffcc><TMPL_ELSE><tr bgcolor=cccc99></TMPL_IF>
+  						<td width=28 align=center><TMPL_VAR NAME=CHECKBOX></td>
+  						<td width=300><font style="font-family:tohoma,verdana,arial;font-size:9pt;">&nbsp;<TMPL_VAR NAME=TITLE></font></td>
+  						<td width=274><font style="font-family:tohoma,verdana,arial;font-size:9pt;">&nbsp;<TMPL_VAR NAME=ARTIST> &mdash; <TMPL_VAR NAME=ALBUM></font></td>
+  						<td width=67><font style="font-family:tohoma,verdana,arial;font-size:9pt;">&nbsp;<TMPL_VAR NAME=DURATION></font></td>
+  						<td width=75 align=right><a href="<TMPL_VAR NAME=REMOVE_FROM_PLAYLIST_URL>"><img src="<TMPL_VAR NAME=BASE_DIR>/default/delete.gif" width=18 height=18 border=0 vspace=1 hspace=1 alt="Remove"></a>
+							<TMPL_IF NAME=ALLOW_DOWNLOAD>
+							<a href="<TMPL_VAR NAME=FETCH_URL>"><img src="<TMPL_VAR NAME=BASE_DIR>/default/save.gif" width=18 height=18 border=0 alt="Download" vspace=1 hspace=1></a>
+							</TMPL_IF>
+							<TMPL_IF NAME=ALLOW_STREAM>
+							<a href="<TMPL_VAR NAME=PLAY_URL>"><img src="<TMPL_VAR NAME=BASE_DIR>/default/play.gif" width=18 height=18 border=0 alt="Play" vspace=1 hspace=1></a>
+							</TMPL_IF>
+						</td>
+					</tr>
+  					</TMPL_LOOP>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan=4>
+						<table cellpadding=4 border=0 cellspacing=0>
+						<tr><td>
+							<TMPL_IF NAME=ALLOW_STREAM>	
+							&nbsp;&nbsp;<input type="button" value=" Play Playlist " STYLE="background:#cccc99; color:663300; font-size:8pt; cursor:hand; font-weight: bold;" onclick="location = '<TMPL_VAR NAME=PLAY_ALL_PLAYLIST_URL>';">
+							&nbsp;&nbsp;<input tye="button" value=" Play Checked " STYLE="background:#cccc99; color:663300; font-size:8pt; cursor:hand;" onclick="<TMPL_VAR NAME=PLAY_SELECTED_SCRIPT>">
+							</TMPL_IF>
+							&nbsp;&nbsp;<input type="button" value=" Clear Playlist " STYLE="background:#cccc99; color:663300; font-size:8pt; cursor:hand;" onclick="location = '<TMPL_VAR NAME=CLEAR_ALL_PLAYLIST_URL>';">
+							&nbsp;&nbsp;<input type="button" value=" Clear Checked " STYLE="background:#cccc99; color:663300; font-size:8pt; cursor:hand;" onclick="<TMPL_VAR NAME=CLEAR_SELECTED_PLAYLIST_SCRIPT>">
+						</td></tr>
+						</table>
+						</td>
+					</tr>
+					</TMPL_IF>
+					<tr>
+						<td><img src="<TMPL_VAR NAME=BASE_DIR>/default/pixel.gif" width=28 height=1></td>
+						<td><img src="<TMPL_VAR NAME=BASE_DIR>/default/pixel.gif" width=300 height=1></td>
+						<td><img src="<TMPL_VAR NAME=BASE_DIR>/default/pixel.gif" width=274 height=1></td>
+						<td><img src="<TMPL_VAR NAME=BASE_DIR>/default/pixel.gif" width=67 height=1></td>
+						<td><img src="<TMPL_VAR NAME=BASE_DIR>/default/pixel.gif" width=75 height=1></td>
+					</tr>
+					</table>
+				</td></tr>
+			</table>
+		<!-- End the Playlist Table -->
+		<br>
+		</TMPL_IF>
+
+		
+		<!-- Start the Folder and File List Table -->
+			<table width=746 cellpadding=1 cellspacing=0 border=0 bgcolor=663300>
+				<tr><td>
+					<table width=744 cellpadding=0 cellspacing=0 border=0>
+						<tr>
+						<td>&nbsp;</td>
+						<td colspan=5>
+						<table cellpadding=4 border=0 cellspacing=0>
+						<tr><td>
+							&nbsp;&nbsp;
+							<TMPL_IF NAME=CONTAINS_MP3S>
+								<TMPL_IF NAME=ALLOW_STREAM>
+									<input type="button" value="   Play All   " STYLE="background:#cccc99; color:663300; font-size:8pt; cursor:hand; font-weight: bold;" onclick="<TMPL_VAR NAME=PLAY_ALL_SCRIPT>">&nbsp;&nbsp;
+									<input type="button" value="Play Checked" STYLE="background:#cccc99; color:663300; font-size:8pt; cursor:hand;" onclick="<TMPL_VAR NAME=PLAY_ALL_SCRIPT>">&nbsp;&nbsp;
+								</TMPL_IF>
+									<input type="button" value="   Save All   " STYLE="background:#cccc99; color:663300; font-size:8pt; cursor:hand;" onclick="<TMPL_VAR NAME=ADD_TO_PLAYLIST_ALL_SCRIPT>">&nbsp;&nbsp;
+									<input type="button" value="Save Checked" STYLE="background:#cccc99; color:663300; font-size:8pt; cursor:hand;" onclick="<TMPL_VAR NAME=PLAY_ALL_SCRIPT>">&nbsp;&nbsp;
+							</TMPL_IF>
+						</td></tr>
+						</table>
+						</td>
+					</tr>
+   					<TMPL_LOOP NAME=DIRS_AND_MP3S>
+   					<TMPL_IF NAME=__ODD__><tr bgcolor=ffffcc><TMPL_ELSE><tr bgcolor=cccc99></TMPL_IF>
+				    <TMPL_IF NAME=IS_DIR>
+  						<td width=28 align=center><a href="<TMPL_VAR NAME=THIS_URL><TMPL_IF NAME=PARAM_plopen>?plopen=1</TMPL_IF>">
+  							<TMPL_IF NAME=COVER>
+								<img src="<TMPL_VAR NAME=COVER>" width=20 height=20 border=0 hspace=1 vspace=1>
+							<TMPL_ELSE>
+								<img src=<TMPL_VAR NAME=BASE_DIR>/default/folder.gif width=20 height=18 border=0 hspace=2 vspace=2>
+							</TMPL_IF>
+						</a></td>
+  						<td width=641 colspan=4><font style="font-family: arial;font-size:9pt;"><a href="<TMPL_VAR NAME=THIS_URL><TMPL_IF NAME=PARAM_plopen>?plopen=1</TMPL_IF>" style="text-decoration:none;"><TMPL_VAR NAME=THIS_DIR></a></font></td>
+  						<td width=75 align=rigth><img src=<TMPL_VAR NAME=BASE_DIR>/default/pixel.gif width=18 height=18 border=0 vspace=2 hspace=2>&nbsp;
+							<TMPL_IF NAME=ALLOW_STREAM>
+								<a href="<TMPL_VAR NAME=PLAY_ALL_THIS_DIR_RECURSIVE_URL>"><img src=<TMPL_VAR NAME=BASE_DIR>/default/play.gif width=18 height=18 border=0 alt="Play" vspace=2 hspace=2></a>
+							</TMPL_IF>
+						</td>
+					<TMPL_ELSE>
+  						<td width=28 align=center><TMPL_VAR NAME=CHECKBOX></td>
+  						<td width=290><font style="font-family: arial;font-size:9pt;">&nbsp;<TMPL_VAR NAME=TITLE></font></td>
+  						<td width=30 align=center><font style="font-family: arial;font-size:9pt;">&nbsp;<TMPL_VAR NAME=TRACK></font></td>
+  						<td width=255><font style="font-family: arial;font-size:9pt;">&nbsp;<TMPL_VAR NAME=ARTIST> &mdash; <TMPL_VAR NAME=ALBUM></font></td>
+  						<td width=67><font style="font-family: arial;font-size:9pt;">&nbsp;<TMPL_VAR NAME=DURATION></font></td>
+  						<td width=75 align=right>
+							<a href="<TMPL_VAR NAME=ADD_TO_PLAYLIST_URL><TMPL_IF NAME=PARAM_plopen>?plopen=1</TMPL_IF>"><img src=<TMPL_VAR NAME=BASE_DIR>/default/cart.gif width=18 height=18 border=0 vspace=1 hspace=1 alt="Save"></a>
+							<TMPL_IF NAME=ALLOW_DOWNLOAD>
+								<a href="<TMPL_VAR NAME=FETCH_URL>"><img src="<TMPL_VAR NAME=BASE_DIR>/default/save.gif" width=18 height=18 border=0 alt="Download" vspace=1 hspace=1></a>
+							</TMPL_IF>
+							<TMPL_IF NAME=ALLOW_STREAM>
+								<a href="<TMPL_VAR NAME=PLAY_URL>"><img src="<TMPL_VAR NAME=BASE_DIR>/default/play.gif" width=18 height=18 border=0 alt="Play Contents" vspace=1 hspace=1></a>
+							</TMPL_IF>
+						</td>
+  					</TMPL_IF>
+					</tr>
+  					</TMPL_LOOP>
+					<TMPL_IF NAME=IS_LONG_PAGE>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan=5>
+						<table cellpadding=4 border=0 cellspacing=0>
+						<tr><td>
+							&nbsp;&nbsp;
+							<TMPL_IF NAME=CONTAINS_MP3S>
+								<TMPL_IF NAME=ALLOW_STREAM>
+									<input type="button" value="   Play All   " STYLE="background:#cccc99; color:663300; font-size:8pt; cursor:hand; font-weight: bold;" onclick="<TMPL_VAR NAME=PLAY_ALL_SCRIPT>">&nbsp;&nbsp;
+									<input type="button" value="Play Checked" STYLE="background:#cccc99; color:663300; font-size:8pt; cursor:hand;" onclick="<TMPL_VAR NAME=PLAY_ALL_SCRIPT>">&nbsp;&nbsp;
+								</TMPL_IF>
+									<input type="button" value="   Save All   " STYLE="background:#cccc99; color:663300; font-size:8pt; cursor:hand;" onclick="<TMPL_VAR NAME=ADD_TO_PLAYLIST_ALL_SCRIPT>">&nbsp;&nbsp;
+									<input type="button" value="Save Checked" STYLE="background:#cccc99; color:663300; font-size:8pt; cursor:hand;" onclick="<TMPL_VAR NAME=PLAY_ALL_SCRIPT>">&nbsp;&nbsp;
+							</TMPL_IF>
+						</td></tr>
+						</table>
+						</td>
+					</tr>
+					</TMPL_IF>
+					<tr>
+						<td><img src="<TMPL_VAR NAME=BASE_DIR>/default/pixel.gif" width=28 height=1></td>
+						<td><img src="<TMPL_VAR NAME=BASE_DIR>/default/pixel.gif" width=290 height=1></td>
+						<td><img src="<TMPL_VAR NAME=BASE_DIR>/default/pixel.gif" width=30 height=1></td>
+						<td><img src="<TMPL_VAR NAME=BASE_DIR>/default/pixel.gif" width=255 height=1></td>
+						<td><img src="<TMPL_VAR NAME=BASE_DIR>/default/pixel.gif" width=67 height=1></td>
+						<td><img src="<TMPL_VAR NAME=BASE_DIR>/default/pixel.gif" width=75 height=1></td>
+					</tr>
+					</table>
+				</td></tr>
+			</table>
+		<!-- End the Folder and File List Table -->
+		
+		<TMPL_IF NAME=STREAM_TIMEOUT>
+			<font face=arial size=2 color=red><b>DEMO MODE:</b> Playing files is limited to <TMPL_VAR NAME=STREAM_TIMEOUT> seconds.</font>
+		</TMPL_IF>
+		
+		
+		<br>
+		</td></tr>
+	</table>
+	</td></tr>
+</table>
+
+
+</TMPL_IF>
+
+
+</center>
+
+</body> 
+</html> 
+

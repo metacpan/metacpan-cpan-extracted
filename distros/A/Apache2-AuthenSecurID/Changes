@@ -1,0 +1,30 @@
+# $Id: Changes,v 1.5 2007/12/08 03:23:43 atobey Exp $
+
+Revision history for Perl extension Apache::AuthenSecurID.
+
+
+0.01  Tue Nov 5 14:11:38 2000
+	- original version; created by db
+0.02  Fri Jan 5 18:09:10 2001
+	- changes to use cookies 
+0.03  Mon Jun 18 21:32:55 2001
+	- major overhaul 
+	- created single threaded ace auth server 
+	- create Auth handler instead of using basic auth 
+	- started using blowfish 
+	- better documentation 
+0.04  Mon Jul 31 16:05:00 2002
+	- fixed typo in docs
+	- added PerlModule in httpd.conf in docs
+	- fixed small scope bug
+	- changes colors so they are no longer awful
+0.05  Fri Dec 07 18:55:00 2007 <tobert@gmail.com>
+    - ported to mod_perl2
+    - renamed to Apache2::AuthenSecurID
+    - perltidy
+    - updated most HTML to use something closer to XHTML
+    - made ace_initd configured via command line rather than file
+        - modifies its own name to hide the secret from ps
+    - added daemonizing code to ace_initd
+    - added --listen option to ace_initd
+

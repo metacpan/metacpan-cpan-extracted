@@ -1,0 +1,24 @@
+Revision history for perl module App::perldolicious
+
+0.010 2013-09-03
+	- fix buggy tests
+0.009 2013-08-30
+	- add tests
+	- remove dependency to LWP::Simple (replaced with Mojo::UserAgent)
+0.008 2013-08-28
+	- properly log to log file when the config item quiet is set to true
+0.007 2013-08-28
+	- add configuration item auto_download which practically
+	  deprecates the previous config item auto_delete
+0.006 2013-08-27
+	- add configuration item auto_delete
+0.005 2013-08-21
+	- use Module::Path to find modules location
+0.003 2013-08-20
+	- We don't use IPC::System::Simple anymore (doesn't work on Windows)
+0.002 2013-08-17
+	- use IPC::System::Simple::capturex to capture the output of cpandoc
+	- switch to Module::Build
+	- add LICENSE
+0.001 2013-08-08
+	- initial commit

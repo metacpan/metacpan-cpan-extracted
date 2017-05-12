@@ -1,0 +1,5 @@
+---
+files:
+  lib/constant.pm: lib/constant.pm
+  t/constant.t: lib/constant.t
+

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/App-Difio-dotCloud.t
+lib/App/Difio/dotCloud.pm
+lib/App/Difio/dotCloud/Parser.pm
+META.yml                                 Module meta-data (added by MakeMaker)

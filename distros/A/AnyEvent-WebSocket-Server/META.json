@@ -1,0 +1,75 @@
+{
+   "abstract" : "WebSocket server for AnyEvent",
+   "author" : [
+      "Toshio Ito <toshioito@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-WebSocket-Server",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "inc"
+      ],
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Build::Prereqs::FromCPANfile" : "0.02"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Net::SSLeay" : "0"
+         },
+         "requires" : {
+            "AnyEvent::Handle" : "0",
+            "AnyEvent::WebSocket::Client" : "0.37",
+            "Carp" : "0",
+            "Protocol::WebSocket::Handshake::Server" : "0",
+            "Try::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::Handle" : "0",
+            "AnyEvent::Socket" : "0",
+            "AnyEvent::WebSocket::Client" : "0.37",
+            "Protocol::WebSocket::Frame" : "0",
+            "Protocol::WebSocket::Handshake::Client" : "0",
+            "Scalar::Util" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::More" : "0",
+            "Test::Requires" : "0",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/debug-ito/AnyEvent-WebSocket-Server/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/debug-ito/AnyEvent-WebSocket-Server.git",
+         "web" : "https://github.com/debug-ito/AnyEvent-WebSocket-Server"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

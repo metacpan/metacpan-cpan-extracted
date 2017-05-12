@@ -1,0 +1,78 @@
+Revision history for App-lcpan-Call
+
+0.11    2016-10-09 (PERLANCAR)
+
+	- check_lcpan(): Return result from 'lcpan stats-last-index-time' to be
+          more useful.
+
+
+0.10    2016-10-09 (PERLANCAR)
+
+	- Extract lcpan mirror checking functionality to check_lcpan().
+
+
+0.09    2016-10-01 (PERLANCAR)
+
+	- Update to Data::Sah 0.76+ (duration by default already coerced to
+	  float(secs)).
+
+	- [doc] Add POD section ENVIRONMENT.
+
+
+0.08    2016-02-16 (PERLANCAR)
+
+	- Use lcpan stats-last-index-time subcommand (new in lcpan 0.74)
+	  for faster way to check mirror's last index time.
+
+
+0.07    2016-02-14 (PERLANCAR)
+
+	- [Incompatible change] don't return naked result because it's not
+	  flexible.
+
+	- Nicer number formatting in error message about lcpan index being
+	  too old.
+
+	- Use %g instead of %f for nicer output.
+
+
+0.06    2016-01-05 (PERLANCAR)
+
+	- Allow configuring maximum index age via argument (max_age) or env
+	  LCPAN_MAX_AGE before defaulting to 14 days.
+
+
+0.05    2015-12-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [build] Re-build with updated Perinci::To::POD (0.70) which fixes
+          rendering of modules' POD with regard to result_naked=1/args_as !=
+          'hash'.
+
+
+0.04    2015-10-20 (PERLANCAR)
+
+	- Fix/tweak Rinci metadata: add result_naked=>1. UPDATE 2016-02-14: this
+          has been reversed in 0.07 because it's not very flexible. Sometimes we
+          want to get the error code/status.
+
+
+0.03    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.02    2015-05-19 (PERLANCAR)
+
+	- [ux] Relax index freshness requirement from 5 days to 14 days. UPDATE
+          2016-01-05: this is now configurable via env variable LCPAN_MAX_AGE.
+
+
+0.01    2015-05-15 (PERLANCAR)
+
+        - First version.

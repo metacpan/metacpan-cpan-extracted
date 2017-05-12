@@ -1,0 +1,3 @@
+TYPEMAP
+int32			T_IV
+uint32			T_IV

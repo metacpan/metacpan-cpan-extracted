@@ -1,0 +1,39 @@
+
+=head1 ManCen manual
+
+The ManCen application is used to track cell centroids. The data gathered calculated then by
+d2ras application.
+
+The main actions are bound to the left mouse button. The actions sets and removes centroids,
+which are marked as green ( by default) small circles. These data are stored in .cen files.
+
+The program is capable of showing neigbour centroids, which are marked as red ( by default) crosses.
+Settings that regulate this behaviour are found in "Edit/Preferences/General". 
+The box "Display neighbour .cen" shows neighbour centroids ( if available).
+The box "look .cen forward" toggles the lookup direction, forward or backward.
+
+=head2 Calculations
+
+ManCen simplifies the tracking of centroids through the series, trying to guess how do
+centroids move. When it saves the centroids positions, it confronts neighbour centroids and current ones.
+If the number of centroids not match, or if it fails to correspond the points, it warns the user 
+about possible problems.
+
+=head2 Productivity tips
+
+To remove more than one cell at once, press Shift+right mouse button and drag. The points covered
+by veil rectangle will be removed.
+
+Space keyboard shortcut toggles same feature as "Edit/Preferences/General/Display neighbour .cen" box.
+
+The arrow into the right corner of the toolbar shows the direction of the lookup.
+
+The digits left to the arrow (X:Y) there shows number of centriods in current image ( A) and on the neighbour one ( B).
+
+Keyboard shortcut 'x' performs same task as left mouse button on the working area.
+
+To delete point through the series, right click on the centroid and choose "Delete point to the series end".
+
+Cursor shape could be altered using "Edit/Preferences/Appearance/Default cursor shape" box.
+
+

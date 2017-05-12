@@ -1,0 +1,65 @@
+2005-05-09	Christian Gilmore <cag@us.ibm.com>
+
+	o  Fixed bug that errantly placed a period where there should have
+	   been a comma. Bug reported and fix provided by Andrew Young.
+	o  Made release 1.11.
+	
+2004-12-01	Christian Gilmore <cag@us.ibm.com>
+	
+	o  Now handle LDAP v2 and v3 character escaping methods within
+	   distinguished names to better support nested group searches.
+	o  Made release 1.10.
+	
+2003-06-18	Christian Gilmore <cag@us.ibm.com>
+	
+	o  Added placement of REMOTE_GROUP into request headers to assist
+	   downstream handlers.
+	o  Updated documentation to describe REMOTE_GROUP insertion into
+	   both the request headers and an environment variable.	
+	o  Made release 1.00.
+	
+2003-02-03      Christian Gilmore <cag@us.ibm.com>
+
+	o  Added functionality for authorization levels inAGroup,
+	   inManyGroups, and inAllGroups.
+	o  Removed deprecated variable names.
+	o  Now use Text::ParseWords from standard perl distribution
+	   instead of CPAN-provided String::ParseWords.
+	o  Made release 0.70.
+	
+2001-07-12      Christian Gilmore <cgilmore@tivoli.com>
+
+        o  Removed test for mod_perl-1.26 or higher.
+        o  Cleaned up documentation.
+        o  Made release 0.61.
+
+2001-05-27	Christian Gilmore <cgilmore@tivoli.com>
+
+        o  Deprecated generic variable naming in favor of
+           module specific to reduce potential conflict with
+           other auth modules: 
+	      GroupAttrType   -> AuthzGroupAttrType
+	      GroupAttrValue  -> AuthzGroupAttrValue
+	      LDAPServer      -> AuthzLDAPServer
+	      LDAPPort        -> AuthzLDAPPort
+	      MemberAttrType  -> AuthzMemberAttrType
+	      MemberAttrValue -> AuthzMemberAttrValue
+	      NestedGroups    -> AuthzNestedGroups
+	      UidAttrType     -> AuthzUidAttrType
+	   Original variable names are still accepted but will be removed
+ 	   on the next major release. This change allows for user
+	   information to be hosted on one LDAP while group information is
+	   hosted on another.
+	o  Made release 0.60.
+	
+2001-01-08	Christian Gilmore <cgilmore@tivoli.com>
+
+	o  Fixed bug regarding nested groups whose membership was by dn.
+	o  Better handled of pre-1.26 set_handlers bugs.
+	o  Made release 0.51.
+	
+2000-09-26	Christian Gilmore <cgilmore@tivoli.com>
+
+	o  Made first public release 0.50.
+
+$Id: ChangeLog,v 1.9 2005/05/09 16:36:06 cgilmore Exp $

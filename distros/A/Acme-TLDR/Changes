@@ -1,0 +1,17 @@
+Changelog for Acme-TLDR
+
+0.004 2014-07-07T15:27:02
+ - Use both Module::CoreList & ExtUtils::Installed as modules source
+   (Stanislaw Pusep)
+
+0.003 2014-06-28T16:38:00
+ - Dist::Zilla maintenance (Stanislaw Pusep)
+ - Fixed issue #1 (Stanislaw Pusep)
+ - drop PWP::Encoding dependency (Sergey Romanov)
+
+0.002 2013-01-17T14:55:34
+ - oops! Dist::Zilla should not depend on shortened stuff (Stanislaw Pusep)
+
+0.001 2013-01-17T13:35:00
+ - INIT (Stanislaw Pusep)
+

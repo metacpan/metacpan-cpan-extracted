@@ -1,0 +1,103 @@
+---
+abstract: 'distributed testing framework for jenkins'
+author:
+  - 'Masaaki Goshima (goccy) <goccy54@gmail.com>'
+build_requires:
+  AnyEvent: 0
+  App::ForkProve: 0
+  App::Prove: 0
+  Capture::Tiny: 0
+  Class::Accessor::Fast: 0
+  Coro: 0
+  Devel::Cover: 0
+  ExtUtils::MakeMaker: 6.36
+  IPC::Run: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  Net::OpenSSH: 0
+  POSIX: 0
+  TAP::Harness::JUnit: 0
+  Test::MockObject: 0
+  XML::Simple: 0
+  YAML::XS: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.5, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Ikaros
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  App::Ikaros:
+    file: lib/App/Ikaros.pm
+    version: 0.02
+  App::Ikaros::Builder:
+    file: lib/App/Ikaros/Builder.pm
+    version: 0
+  App::Ikaros::Config:
+    file: lib/App/Ikaros/Config.pm
+    version: 0
+  App::Ikaros::Config::Loader:
+    file: lib/App/Ikaros/Config/Loader.pm
+    version: 0
+  App::Ikaros::Config::Loader::Engine::DSL:
+    file: lib/App/Ikaros/Config/Loader/Engine/DSL.pm
+    version: 0
+  App::Ikaros::Config::Loader::Engine::YAML:
+    file: lib/App/Ikaros/Config/Loader/Engine/YAML.pm
+    version: 0
+  App::Ikaros::DSL:
+    file: lib/App/Ikaros/DSL.pm
+    version: 0
+  App::Ikaros::Helper:
+    file: lib/App/Ikaros/Helper.pm
+    version: 0
+  App::Ikaros::IO:
+    file: lib/App/Ikaros/IO.pm
+    version: 0
+  App::Ikaros::Installer:
+    file: lib/App/Ikaros/Installer.pm
+    version: 0
+  App::Ikaros::LandingPoint:
+    file: lib/App/Ikaros/LandingPoint.pm
+    version: 0
+  App::Ikaros::Logger:
+    file: lib/App/Ikaros/Logger.pm
+    version: 0
+  App::Ikaros::PathMaker:
+    file: lib/App/Ikaros/PathMaker.pm
+    version: 0
+  App::Ikaros::Planner:
+    file: lib/App/Ikaros/Planner.pm
+    version: 0
+  App::Ikaros::Profiler:
+    file: lib/App/Ikaros/Profiler.pm
+    version: 0
+  App::Ikaros::Reporter:
+    file: lib/App/Ikaros/Reporter.pm
+    version: 0
+  App::Ikaros::Util:
+    file: lib/App/Ikaros/Util.pm
+    version: 0
+requires:
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/goccy/p5-App-Ikaros/issues
+  homepage: https://github.com/goccy/p5-App-Ikaros
+  repository: https://github.com/goccy/p5-App-Ikaros.git
+version: 0.02
+x_contributors:
+  - 'MasaakiGoshima <masaaki.goshima@mixi.co.jp>'

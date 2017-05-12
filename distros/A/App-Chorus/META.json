@@ -1,0 +1,86 @@
+{
+   "abstract" : "Markdown-based slidedeck server app",
+   "author" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Chorus",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "0",
+            "File::ShareDir::Tarball" : "0",
+            "Getopt::Long" : "0",
+            "HTML::Entities" : "0",
+            "Moose" : "0",
+            "Path::Tiny" : "0",
+            "Plack::Loader" : "0",
+            "Text::Markdown" : "0",
+            "Web::Query" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "App::Chorus" : {
+         "file" : "lib/App/Chorus.pm",
+         "version" : "v1.1.0"
+      },
+      "App::Chorus::Slidedeck" : {
+         "file" : "lib/App/Chorus/Slidedeck.pm",
+         "version" : "v1.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/chorus/issues"
+      },
+      "homepage" : "https://github.com/yanick/chorus",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/chorus.git",
+         "web" : "https://github.com/yanick/chorus"
+      }
+   },
+   "version" : "1.1.0",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Drew Taylor <drew@drewtaylor.com>",
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ]
+}
+

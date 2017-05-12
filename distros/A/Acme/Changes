@@ -1,0 +1,42 @@
+1.11111111111 Sat Aug 16 10:03:08 PDT 2014
+ - Perfected Acme
+ - Added test
+ - Meta 0.0.2
+
+1.1111111111 Fri Aug 15 19:15:18 PDT 2014
+ - Perfected Acme
+ - Added t/000-compile-modules.t
+ - Support ever growing VERSION
+
+1.111111111 Sun Aug  3 21:10:23 PDT 2014
+ - Perfected Acme
+ - Fixed Meta and added Contributing file.
+
+1.11111111 Wed Jul  2 16:06:33 PDT 2014
+ - Perfected Acme
+ - Split 'package UNIVERSAL' for pause. ether++
+
+1.1111111 Wed Jul  2 14:39:48 PDT 2014
+ - Perfected Acme
+ - Zilla::Dist (A-Z!)
+
+1.111111 Fri Jan 21 00:33:52 EST 2011
+ - Perfected Acme once more
+ - https://rt.cpan.org/Ticket/Display.html?id=61851
+
+1.11111 Wed Jan 18 15:04:45 PST 2006
+ - Perfected Acme
+
+1.1111 Sat Mar 26 22:40:47 PST 2005
+ - Perfected Acme
+
+1.111 Wed Mar 24 05:05:26 PST 2004
+ - Acme is teh_shiznit
+ - Export Spiffy acme()
+
+1.11 Sun Mar 21 04:04:25 PST 2004
+ - Acme Becomes One With The UNIVERSAL.
+
+1.00 Sun Mar 21 02:36:07 PST 2004
+ - Initial release.
+

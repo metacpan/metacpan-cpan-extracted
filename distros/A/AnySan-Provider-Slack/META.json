@@ -1,0 +1,79 @@
+{
+   "abstract" : "AnySan provider for Slack",
+   "author" : [
+      "Ichinose Shogo <shogo82148@gmail.com >"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnySan-Provider-Slack",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::HTTP" : "0",
+            "AnyEvent::SlackRTM" : "0",
+            "AnySan" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "AnySan::Provider::Slack" : {
+         "file" : "lib/AnySan/Provider/Slack.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shogo82148/p5-AnySan-Provider-Slack/issues"
+      },
+      "homepage" : "https://github.com/shogo82148/p5-AnySan-Provider-Slack",
+      "repository" : {
+         "url" : "git://github.com/shogo82148/p5-AnySan-Provider-Slack.git",
+         "web" : "https://github.com/shogo82148/p5-AnySan-Provider-Slack"
+      }
+   },
+   "version" : "0.04",
+   "x_authority" : "cpan:SHOGO",
+   "x_contributors" : [
+      "Ichinose Shogo <shogo82148@gmail.com>"
+   ]
+}

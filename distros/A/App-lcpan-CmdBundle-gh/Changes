@@ -1,0 +1,15 @@
+0.003   2017-01-23 (PERLANCAR)
+
+	- [ux] Accept module_or_dist instead of just dist.
+
+
+0.002   2017-01-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Use Pod::Weaver plugin PWP:App::lcpan.
+
+
+0.001   2017-01-19 (PERLANCAR)
+
+        - First release.

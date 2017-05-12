@@ -1,0 +1,20 @@
+Revision history for Perl extension .
+
+0.05  2008/08/19
+	- bugfix for Authen::Quiz.
+	- Authen::Quiz::FW module is added.
+	- Authen::Quiz::JS module is added.
+	- Authen::Quiz::Memcached module is added.
+
+0.04  2008/08/18
+	- bugfix for Authen::Quiz.
+
+0.03  2008/08/18
+	- bugfix for Authen::Quiz.
+
+0.02  2008/08/18
+	- fixed for Authen::Quiz.
+
+0.01  Sat Aug 16 23:00:52 2008
+	- original version; created by Egg::Helper::Build::Module v3.02
+	   with module name Authen::Quiz

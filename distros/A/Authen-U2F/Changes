@@ -1,0 +1,5 @@
+0.002     2016-06-27 22:42:56+10:00 Australia/Melbourne
+ - Version dep on MIME::Base64 for url methods
+
+0.001     2016-06-20 11:40:20-04:00 America/New_York
+ - First release

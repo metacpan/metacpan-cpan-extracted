@@ -1,0 +1,15 @@
+\.AppleDouble/.*
+CVS/.*
+\.cvsignore
+\.bak$
+\.sw[a-z]$
+\.tar$
+\.tgz$
+\.tar\.gz$
+^mess/
+^tmp/
+^Tblib/
+^Makefile$
+^Makefile\.[a-z]+$
+^pm_to_blib$
+~$

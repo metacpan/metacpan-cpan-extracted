@@ -1,0 +1,7 @@
+# type		name	segments
+transcript	T1	1000 1100    1500 2000	 3000 3500
+transcript	myb5	1200 1250    1900 2000	 2900 3100
+transcript	mmm9	3200 3150    2900 2800	 2200 1900 1855 1800
+primers		D10Mit23     1050 1100
+
+

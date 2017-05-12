@@ -1,0 +1,22 @@
+From caff15a7196f8428ea2dce8d2d81b61a1ede3b26 Mon Sep 17 00:00:00 2001
+From: Zakariyya Mughal <zaki.mughal@gmail.com>
+Date: Fri, 18 Apr 2014 21:18:06 -0500
+Subject: [PATCH] fix pkg-config
+
+---
+ lept.pc.in | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lept.pc.in b/lept.pc.in
+index 8044ba8..c1b9492 100644
+--- a/lept.pc.in
++++ b/lept.pc.in
+@@ -1,3 +1,5 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
+ libdir=@libdir@
+ includedir=@includedir@/leptonica
+ 
+-- 
+1.9.1
+

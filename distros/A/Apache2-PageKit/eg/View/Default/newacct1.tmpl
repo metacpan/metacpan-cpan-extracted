@@ -1,0 +1,20 @@
+<PKIT_COMPONENT NAME="/top">
+<PKIT_COMPONENT NAME="/demo_desc">
+Please enter the information for your new account below:
+<form method="post" action="newacct2">
+<PKIT_ERRORSPAN NAME="email">Email:</PKIT_ERRORSPAN><br>
+<input type="text" name="email">
+<p>
+<PKIT_ERRORSPAN NAME="login">Login:</PKIT_ERRORSPAN><br>
+<input type="text" name="login">
+<p>
+<PKIT_ERRORSPAN NAME="passwd1">Password:</PKIT_ERRORSPAN><br>
+<input type="password" name="passwd1">
+<p>
+<PKIT_ERRORSPAN NAME="passwd2">Password (verify):</PKIT_ERRORSPAN><br>
+<input type="password" name="passwd2">
+<input type="hidden" name="pkit_done" value="http://<PKIT_HOSTNAME>/">
+<p>
+<input type="submit" name="submit" value="Submit">
+</form>
+<PKIT_COMPONENT NAME="/bottom">

@@ -1,0 +1,108 @@
+   10   10:
+	     naive:  0 wallclock secs ( 0.05 usr +  0.00 sys =  0.05 CPU)
+	    tarjan:  0 wallclock secs ( 0.11 usr +  0.00 sys =  0.11 CPU)
+   10   50:
+	     naive:  0 wallclock secs ( 0.27 usr +  0.00 sys =  0.27 CPU)
+	    tarjan:  1 wallclock secs ( 0.21 usr +  0.00 sys =  0.21 CPU)
+   10  100:
+	     naive:  1 wallclock secs ( 0.50 usr +  0.00 sys =  0.50 CPU)
+	    tarjan:  0 wallclock secs ( 0.31 usr +  0.00 sys =  0.31 CPU)
+   10  500:
+	     naive:  3 wallclock secs ( 2.48 usr +  0.00 sys =  2.48 CPU)
+	    tarjan:  1 wallclock secs ( 1.43 usr +  0.00 sys =  1.43 CPU)
+   10 1000:
+	     naive:  4 wallclock secs ( 4.79 usr +  0.00 sys =  4.79 CPU)
+	    tarjan:  3 wallclock secs ( 2.45 usr +  0.00 sys =  2.45 CPU)
+   10 2000:
+	     naive: 10 wallclock secs ( 9.54 usr +  0.00 sys =  9.54 CPU)
+	    tarjan:  5 wallclock secs ( 4.81 usr +  0.00 sys =  4.81 CPU)
+   50   10:
+	     naive:  1 wallclock secs ( 0.25 usr +  0.00 sys =  0.25 CPU)
+	    tarjan:  0 wallclock secs ( 0.42 usr +  0.00 sys =  0.42 CPU)
+   50   50:
+	     naive:  1 wallclock secs ( 1.25 usr +  0.00 sys =  1.25 CPU)
+	    tarjan:  0 wallclock secs ( 0.50 usr +  0.01 sys =  0.51 CPU)
+   50  100:
+	     naive:  3 wallclock secs ( 2.53 usr +  0.00 sys =  2.53 CPU)
+	    tarjan:  1 wallclock secs ( 0.65 usr +  0.00 sys =  0.65 CPU)
+   50  500:
+	     naive: 13 wallclock secs (12.56 usr +  0.00 sys = 12.56 CPU)
+	    tarjan:  1 wallclock secs ( 1.63 usr +  0.00 sys =  1.63 CPU)
+   50 1000:
+	     naive: 25 wallclock secs (25.12 usr +  0.00 sys = 25.12 CPU)
+	    tarjan:  3 wallclock secs ( 2.86 usr +  0.00 sys =  2.86 CPU)
+   50 2000:
+	     naive: 51 wallclock secs (50.21 usr +  0.00 sys = 50.21 CPU)
+	    tarjan:  5 wallclock secs ( 5.35 usr +  0.00 sys =  5.35 CPU)
+  100   10:
+	     naive:  0 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU)
+	    tarjan:  1 wallclock secs ( 0.88 usr +  0.01 sys =  0.89 CPU)
+  100   50:
+	     naive:  3 wallclock secs ( 2.56 usr +  0.00 sys =  2.56 CPU)
+	    tarjan:  1 wallclock secs ( 0.90 usr +  0.00 sys =  0.90 CPU)
+  100  100:
+	     naive:  5 wallclock secs ( 5.13 usr +  0.00 sys =  5.13 CPU)
+	    tarjan:  1 wallclock secs ( 1.03 usr +  0.00 sys =  1.03 CPU)
+  100  500:
+	     naive: 26 wallclock secs (25.55 usr +  0.00 sys = 25.55 CPU)
+	    tarjan:  2 wallclock secs ( 2.03 usr +  0.00 sys =  2.03 CPU)
+  100 1000:
+	     naive: 51 wallclock secs (50.95 usr +  0.00 sys = 50.95 CPU)
+	    tarjan:  3 wallclock secs ( 3.30 usr +  0.00 sys =  3.30 CPU)
+  100 2000:
+	     naive: 103 wallclock secs (101.95 usr +  0.00 sys = 101.95 CPU)
+	    tarjan:  6 wallclock secs ( 5.79 usr +  0.01 sys =  5.80 CPU)
+  200   10:
+	     naive:  1 wallclock secs ( 1.04 usr +  0.00 sys =  1.04 CPU)
+	    tarjan:  1 wallclock secs ( 1.59 usr +  0.00 sys =  1.59 CPU)
+  200   50:
+	     naive:  5 wallclock secs ( 5.24 usr +  0.00 sys =  5.24 CPU)
+	    tarjan:  2 wallclock secs ( 1.68 usr +  0.01 sys =  1.69 CPU)
+  200  100:
+	     naive: 11 wallclock secs (10.46 usr +  0.00 sys = 10.46 CPU)
+	    tarjan:  2 wallclock secs ( 1.82 usr +  0.00 sys =  1.82 CPU)
+  200  500:
+	     naive: 52 wallclock secs (52.06 usr +  0.00 sys = 52.06 CPU)
+	    tarjan:  3 wallclock secs ( 2.86 usr +  0.00 sys =  2.86 CPU)
+  200 1000:
+	     naive: 106 wallclock secs (105.19 usr +  0.00 sys = 105.19 CPU)
+	    tarjan:  4 wallclock secs ( 4.16 usr +  0.01 sys =  4.17 CPU)
+  200 2000:
+	     naive: 211 wallclock secs (210.01 usr +  0.00 sys = 210.01 CPU)
+	    tarjan:  7 wallclock secs ( 6.69 usr +  0.01 sys =  6.70 CPU)
+  300   10:
+	     naive:  1 wallclock secs ( 1.63 usr +  0.00 sys =  1.63 CPU)
+	    tarjan:  3 wallclock secs ( 2.38 usr +  0.01 sys =  2.39 CPU)
+  300   50:
+	     naive:  8 wallclock secs ( 8.12 usr +  0.00 sys =  8.12 CPU)
+	    tarjan:  3 wallclock secs ( 2.44 usr +  0.00 sys =  2.44 CPU)
+  300  100:
+	     naive: 16 wallclock secs (16.21 usr +  0.00 sys = 16.21 CPU)
+	    tarjan:  3 wallclock secs ( 2.56 usr +  0.01 sys =  2.57 CPU)
+  300  500:
+	     naive: 82 wallclock secs (80.88 usr +  0.00 sys = 80.88 CPU)
+	    tarjan:  3 wallclock secs ( 3.58 usr +  0.00 sys =  3.58 CPU)
+  300 1000:
+	     naive: 163 wallclock secs (161.48 usr +  0.00 sys = 161.48 CPU)
+	    tarjan:  5 wallclock secs ( 4.84 usr +  0.01 sys =  4.85 CPU)
+  300 2000:
+	     naive: 329 wallclock secs (325.44 usr +  0.00 sys = 325.44 CPU)
+	    tarjan:  8 wallclock secs ( 7.30 usr +  0.00 sys =  7.30 CPU)
+  400   10:
+	     naive:  2 wallclock secs ( 2.19 usr +  0.00 sys =  2.19 CPU)
+	    tarjan:  3 wallclock secs ( 3.16 usr +  0.00 sys =  3.16 CPU)
+  400   50:
+	     naive: 12 wallclock secs (11.16 usr +  0.00 sys = 11.16 CPU)
+	    tarjan:  3 wallclock secs ( 3.25 usr +  0.01 sys =  3.26 CPU)
+  400  100:
+	     naive: 22 wallclock secs (22.02 usr +  0.00 sys = 22.02 CPU)
+	    tarjan:  3 wallclock secs ( 3.37 usr +  0.02 sys =  3.39 CPU)
+  400  500:
+	     naive: 112 wallclock secs (111.04 usr +  0.00 sys = 111.04 CPU)
+	    tarjan:  5 wallclock secs ( 4.45 usr +  0.01 sys =  4.46 CPU)
+  400 1000:
+	     naive: 223 wallclock secs (221.14 usr +  0.00 sys = 221.14 CPU)
+	    tarjan:  6 wallclock secs ( 5.76 usr +  0.02 sys =  5.78 CPU)
+  400 2000:
+	     naive: 449 wallclock secs (444.12 usr +  0.00 sys = 444.12 CPU)
+	    tarjan:  8 wallclock secs ( 8.38 usr +  0.00 sys =  8.38 CPU)

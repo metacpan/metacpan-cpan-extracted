@@ -1,0 +1,43 @@
+==================================================
+Changes from 2014-01-27 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.05 at 2014-10-20 16:50:02 +0000
+-----------------------------------------
+
+  Change: 2c158bae356cdf19fa958e993fba4a90edd7b44f
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-20 12:50:02 +0000
+
+    Fix missing true value at end of module 
+
+-----------------------------------------
+version 0.02 at 2014-10-19 02:57:42 +0000
+-----------------------------------------
+
+  Change: 2d72dff08b69679ba54ec629ad8cc881775defb8
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-18 22:57:42 +0000
+
+    Changes for github in dist.ini 
+
+-----------------------------------------
+version 0.01 at 2014-10-19 02:55:14 +0000
+-----------------------------------------
+
+  Change: b56b5c9407d7a036d341357c96c576b813d90bf2
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-18 22:55:14 +0000
+
+    first commit 
+
+  Change: 8be26f46ef770971c17a353f6ea9054a2b854322
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-18 22:54:01 +0000
+
+    first commit 
+
+================
+End of releases.
+================

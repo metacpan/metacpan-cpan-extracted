@@ -1,0 +1,43 @@
+{
+   "abstract" : "crawler test using Jungle",
+   "author" : [
+      "Hernan Lopes"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.58, CPAN::Meta::Converter version 2.110930001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Jungle-CrawlerExample",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Jungle" : 0,
+            "Moose" : "0.44",
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01"
+}

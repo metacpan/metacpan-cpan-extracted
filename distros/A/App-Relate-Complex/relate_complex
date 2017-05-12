@@ -1,0 +1,330 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+relate_complex - relates multiple search terms, quickly returning a list
+         of files that match all of them.
+
+=head1 SYNOPSIS
+
+   relate_complex [options] [term1 [ term2 [ term3 ... ]]]
+
+   An example:
+
+      relate_complex bozotech lib report data
+
+   Would match:
+
+      /usr/lib/bozotech/data/report
+      /usr/lib/reports/bozotech/data
+      /usr/local/lib/bozotech/report/data
+
+   Another example:
+
+      relate_complex bin ^ppp home -bak -old
+
+   Would match:
+
+     /home/doom/bin/pppon
+     /home/doom/bin/pppoff
+
+   But not:
+
+     /home/doom/bin/pppon.bak
+     /home/doom/old/bin/pppoff
+     /home/doom/bin/debug_ppp
+
+=cut
+
+our $VERSION = 0.09;
+
+use warnings;
+use strict;
+$|=1;
+use Data::Dumper;
+
+use File::Basename qw(fileparse basename dirname);
+
+use Env qw(HOME);
+
+use App::Relate::Complex;
+
+use Pod::Usage;
+use Getopt::Std;
+$Getopt::Std::STANDARD_HELP_VERSION = 1;  # irritating, no?
+my %opt = ();
+my $prog = basename($0);
+getopts("adch?miLf:D:V", \%opt) or pod2usage(2);
+
+# print usage on request
+pod2usage(1)              if $opt{h} or $opt{'?'};
+pod2usage(-verbose => 2)  if $opt{m};
+
+if ( (@ARGV == 0) and (not ( $opt{L} ))) {
+  pod2usage("$prog: no search terms given.");
+}
+
+# unpack %opt, apply defaults
+my $DEBUG            = $opt{d} || 0;
+
+if ($opt{V}) {
+  print "$prog: version $VERSION\n";
+  exit;
+}
+
+my $modifiers = '';
+if ($opt{i}) {
+  $modifiers = 'i';
+}
+
+my $rh = App::Relate::Complex->new(
+           {  locatedb               => $opt{D},
+              modifiers              => $modifiers,
+              save_filters_when_used => 1,
+            } );
+$rh->debugging(1) if $DEBUG;
+
+my $method_opts =
+     {
+      no_default_filters => $opt{a},
+      add_filters        => $opt{F},
+      regexp             => $opt{r},
+     };
+
+my @terms = @ARGV;
+my $result = ();
+
+if ( $opt{L} ) { # just list filter names
+  $result = $rh->list_filters( \@terms, $method_opts );
+} else { # do the usual relate (a filtered locate)
+  $result = $rh->relate_complex( \@terms, $method_opts );
+}
+
+# print output to STDOUT
+foreach my $item (@{ $result }) {
+  print $item, "\n";
+}
+
+__END__
+
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item a
+
+Show "all" items, suppresses the default filter pattern (':skipdull').
+Still uses additional filters specified with -F.
+
+=item F
+
+One or more named filters to apply to the output in addition
+to the default.  To enter more than one, separate them with spaces
+and put the string in single-quotes, e.g. -F 'filter1 filter2 filter3'
+
+=item L
+
+List the names of the available filters.
+
+=item r
+
+Indicates that the first term is also a regular expression, albeit a POSIX one.
+
+=back
+
+=head1 DESCRIPTION
+
+The mnemonic is that B<relate_complex> makes the file system a little
+more relational and a little less hierarchical.
+
+Essentially this script is the equivalent of
+
+      locate primary_term | egrep term2 | egrep term3 [....| termN]
+
+Though by default relate_complex also automatically screens out
+some "uninteresting" files (emacs backups, CVS/RCS
+repositories, etc.).
+
+An important performance hint: you can speed up relate_complex
+tremendously by using a relatively unique first term.
+For example, if you're on a unix box, you don't want to
+start with something like "lib" which is going to match a
+huge number of files in the locate database. You'll find
+that "relate_complex gdk lib" is much faster than "relate_complex lib
+gdk".
+
+Further: the first term should be a simple string (unless
+you've used the "-r" option), but all the following terms can
+be perl regexps.  (This inelegant state of affairs is the
+result of working as a wrapper around the locate system; the
+first term is fed to it directly, then the output is filtered
+using perl pattern matches.)
+
+Note that while you can use a regexp in the first position with
+the -r option, but it has to be a POSIX regexp, not a perl one.
+
+A negative match feature can be used on the secondary terms: a
+term with a leading '-' will filter out lines that match it.
+Example:
+
+   relate_complex my_site index -htm$
+
+will screen out files ending in "htm" (but not "html").
+
+This script has the extremely useful feature of automatically
+omitting uninteresting files, but it's guaranteed that you'll
+be confused by this some day, so don't say I didn't warn you.
+As of this writing, by default files are ignored that match
+these patterns:
+
+      '~$';      # emacs backups
+      '/\#';     # emacs autosaves
+      ',v$';     # cvs/rcs repository files
+      '/CVS$'
+      '/CVS/'
+      '/RCS$'
+      '\.elc$';  # compiled elisp
+
+This default filter is named ":skipdull", and can be modified by
+editing your personal copy of it in ~/.list-filter/filters.yaml.
+
+A few command line arguments exist to modify this filtering
+behavior:
+
+     -a: returns "all" matches, overriding the default filter.
+
+      -F <filename>: The "add_filters" option let's you supply a
+         list of named filter.
+
+      You I<can> use "-F" in conjunction with "-a": the "-a" suppresses
+      the default filter and the "-F" replaces them with your own.
+
+=head2 dwim upcarets
+
+The use of a leading "^" achor in a pattern is allowed, but is
+silently transformed into a boundary match "\b".  Otherwise "^"
+wouldn't be very useful (consider that with full paths *all*
+listings match "^/") So instead we DWIM and turn "^" into a
+beginning-of-name match.  An embedded or trailing "^" is left
+alone.  Ditto for a "^" in front of a slash: if you ask for
+'^/home/bin', maybe that's really what you want (as opposed to,
+say '/tmp/backup/home/bin').
+
+=head2 alternate filters
+
+You can always determine which filters are available with the
+"-L" option:
+
+   relate_complex -L
+
+By convention, the filters defined in the List::Filter::Library::*
+modules are named with a leading colon.
+
+You can apply any of these filters using the -F option:
+
+  relate_complex -F:jpeg site www images
+
+(Note that this should match the common variant extensions, ".jpeg",
+".jpg", ".JPG", and so on.)
+
+If you'd like to try your hand at defining your own filters you
+should look at the file:
+
+  ~/.list-filters/filters.yaml
+
+Which, if you are familar with L<YAML>, you will probably
+recognize as a hashref of hashrefs keyed by name, where the
+heart of the matter is the aref of patterns called "terms".
+If you're not familiar with YAML: make your edits carefully,
+and watch it, because it's whitespace sensitive.
+
+When you choose a name for a new filter, remember that only the
+"standard" filters should be named with a leading colon.
+
+A feature of the system is that after any filter is invoked by the
+"relate_complex" command, a copy of it written to your personal
+"filters.yaml" file.  These copies then take precedence over the
+original definitions: this allows you to modify them for your
+particular needs.  The default ":skipdull" filter is a likely
+candidate for this treatment, because different files will be
+considered "dull" by different people.  (Consider that a ".o" file
+is boring to a C programmer, but might be critically important to
+a sysadmin.)
+
+=head1 DISCUSSION
+
+=head2 There's More Than One Way to Relate
+
+I've tried a number of alternate approaches to writing relate_complex...
+
+Notably:
+
+(1) Automatically generating all possible permutations to build
+an alternation pattern that gets fed to locate with the -r
+option (this turns out to be grossly slow).
+
+(2) An efficiency hack where terms are sorted by length to
+find a good one to use as the primary_term to hand to
+locate... but you need to screen out any regexp terms when
+you do that, and the overall behavior becomes too hard to
+remember (it's eaisier to just say "the first term is
+different, deal with that").
+
+=head2 Relate Isn't Really
+
+I like this slogan as a mnemonic: "relate makes the file
+system a little more relational", though really this is an
+abuse of the term "relational".
+
+The point though, is that using "relate_complex" is something like
+doing a database query where you specify certain constraints in
+any order and get all records that match them. But if you can't
+relate, that's okay.
+
+(Just be glad I don't think of it as "feeling your way
+around".)
+
+Anyway, I'm of the opinion that there's more to life than
+hierarchies; our filesystems are ripe for revolution (insert
+olfactory humor), and I suggest keeping an eye on ReiserFS
+(try a web search on "namespace unification" and "Hans Reiser").
+And by the way: (1) he has not been convicted as of yet, and
+(2) there are other programmer's at NameSys continuing the work.
+
+But perhaps this is beyond the scope of this documentation...
+
+=head1 SEE ALSO
+
+L<App::Relate>
+L<relate>
+
+L<List::Filter>
+L<List::Filter::FileSystem::FileSystem>
+L<List::Filter::FileSystem::FileExtensions>
+
+=head1 AUTHOR
+
+Joseph Brenner, E<lt>doom@kzsu.stanford.eduE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 by Joseph Brenner
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 BUGS
+
+None reported... yet.
+
+=cut

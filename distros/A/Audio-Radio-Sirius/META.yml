@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Audio-Radio-Sirius
+version: 0.03
+author:
+  - Jamie Tatum <jtatum@gmail.com>
+abstract: Control a Sirius satellite radio tuner
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

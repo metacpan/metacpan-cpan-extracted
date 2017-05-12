@@ -1,0 +1,7 @@
+Revision history for Perl extension Acme::Pinoko
+
+0.02    Wed, 16 Jan 2013 16:17:36 +0900
+        - Added conversion rules
+
+0.01    Tue, 15 Jan 2013 03:14:33 +0900
+        - original version

@@ -1,0 +1,71 @@
+NAME
+    Acme::Text::Rhombus - Draw a rhombus with letters
+
+SYNOPSIS
+     use Acme::Text::Rhombus qw(rhombus);
+
+     print rhombus(
+         lines   =>       15,
+         letter  =>      'c',
+         case    =>  'upper',
+         fillup  =>      '+',
+     );
+
+     __OUTPUT__
+     +++++++C+++++++
+     ++++++DDD++++++
+     +++++EEEEE+++++
+     ++++FFFFFFF++++
+     +++GGGGGGGGG+++
+     ++HHHHHHHHHHH++
+     +IIIIIIIIIIIII+
+     JJJJJJJJJJJJJJJ
+     +KKKKKKKKKKKKK+
+     ++LLLLLLLLLLL++
+     +++MMMMMMMMM+++
+     ++++NNNNNNN++++
+     +++++OOOOO+++++
+     ++++++PPP++++++
+     +++++++Q+++++++
+
+FUNCTIONS
+  rhombus
+
+    Draws a rhombus with letters and returns it as a string.
+
+    If no option value is supplied or if it is invalid, then a default will
+    be silently assumed (omitting all options will return a rhombus of 25
+    lines).
+
+    Given that the specified number of lines is even, it will be incremented
+    to satisfy the requirement of being an odd number.
+
+    Options:
+
+    * `lines'
+        Number of lines to be printed. Defaults to 25.
+
+    * `letter'
+        Letter to start with. Defaults to `a'.
+
+    * `case'
+        Lower/upper case of the letters within the rhombus. Defaults to
+        `upper'.
+
+    * `fillup'
+        The fillup character. Defaults to `+'.
+
+EXPORT
+  Functions
+
+    `rhombus()' is exportable.
+
+AUTHOR
+    Steven Schubiger <schubiger@cpan.org>
+
+LICENSE
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://dev.perl.org/licenses/
+

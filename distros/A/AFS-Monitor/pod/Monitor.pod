@@ -1,0 +1,134 @@
+#------------------------------------------------------------------------------
+# afsperldebug.pod
+#
+# Copyright © 2004-2006 Alf Wachsmann <alfw@slac.stanford.edu> and
+#                  Elizabeth Cassell <e_a_c@mailsnare.net>
+#
+# $Revision: 1.2 $ $Date: 2006/07/05 22:25:10 $ $Author: alfw $
+#
+# This library is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<AFS::Monitor> - Perl interface to AFS monitoring and debugging tools
+
+=head1 DESCRIPTION
+
+=over
+
+=item B<afsmonitor>
+
+Gathers statistics about specified File Server and Cache Manager operations.
+There are 271 available File Server statistics and 571 available Cache Manager
+statistics, listed in L<afsmon_stats(1)>.
+See L<afsmonitor(1)>
+
+=item B<cmdebug>
+
+Reports status of cache manager and cache entries on a particular AFS
+client machine. See L<cmdebug(1)>
+
+=item B<rxdebug>
+
+Provides debugging trace of Rx activity for a specified server or client
+machine. See L<rxdebug(1)>
+
+=item B<scout>
+
+Gathers statistics from the File Server processes running on the specified
+machines. See L<scout(1)>
+
+=item B<udebug>
+
+Reports the status of the Ubik process associated with a database server
+process. See L<udebug(1)>
+
+=item B<xstat_cm_test>
+
+Gathers the specified data collections associated with the specified Cache
+Manager. See L<xstat_cm_test(1)>
+
+=item B<xstat_fs_test>
+
+Gathers the specified data collections associated with the specified File
+Server process. See L<xstat_fs_test(1)>
+
+=back
+
+=head1 COMPATIBILITY
+
+The configurations that this package has been tested on are listed below:
+
+  OS              @sys            Perl            	OpenAFS
+  -----------------------------------------------------------------------------
+  FC5             amd64_linux26   v5.8.8			1.4.2-beta1
+  RHEL4-64        amd64_linux26   v5.8.5			1.4.1
+  RHEL4-32        no machine
+  RHEL3-32        i386linux24     v5.8.0, v5.8.8, v5.6.0	1.4.1, 1.2.10
+  RHEL3-64        no machine
+  SLES9           ia64_linux26    v5.8.3			1.4.1
+
+  Solaris 5.8     sun4x_58        v5.8.8, v5.6.0, 5.005_03	1.4.1, 1.2.10
+  Solaris 5.9     sun4x_59        v5.8.8, v5.6.0		1.4.1, 1.2.10
+  Solaris 5.10    sun4x_510       v5.8.8, v5.6.0		1.4.1, 1.2.10
+
+  Mac OS X 10.3   ppc_darwin_70   v5.8.1-RC3			1.4.1
+  Mac OS x 10.4   ppc_darwin_80   v5.8.6			1.4.1
+
+
+Perl 5.6.0 or newer. No problems were found with threaded Perl.
+AFS system libraries and header files from B<OpenAFS 1.2.x> or newer.
+It is not know whether version 0.3.0 of this module works with
+B<IBM/Transarc AFS> because I don't have this version available any more.
+
+
+=head1 PREREQUISITES
+
+This package does not depend on any other Perl modules.
+
+=head1 KNOWN BUGS
+
+This package depends on the corresponding OpenAFS libraries.
+These underlying libraries still don't work properly on or with
+64bit Linux systems. The problem manifests itself in statistic
+values beeing zero instead of the real value.
+This problem will go away once the OpenAFS libraries are fixed.
+
+=head1 AUTHORS
+
+The code and documentation for this class were contributed by Stanford
+Linear Accelerator Center, a department of Stanford University.
+This documentation was written by
+
+=over
+
+=item Elizabeth Cassell <e_a_c@mailsnare.net> and
+
+=item Alf Wachsmann <alfw@slac.stanford.edu>
+
+=back
+
+=head1 COPYRIGHT AND DISCLAIMER
+
+ Copyright 2004-2006
+		Alf Wachsmann <alfw@slac.stanford.edu> and
+                Elizabeth Cassell <e_a_c@mailsnare.net>
+ All rights reserved.
+
+ Most of the explanations in this document are taken from the original
+ AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ Volume Server/Volume Location Server Interface
+ Edward R. Zayas
+ (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ (c) IBM Corporation 2000.
+ All rights reserved.
+
+ This library is free software; you can redistribute it and/or modify it
+ under the same terms as Perl itself.

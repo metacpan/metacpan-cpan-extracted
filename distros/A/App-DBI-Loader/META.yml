@@ -1,0 +1,28 @@
+---
+abstract: 'A tiny script to load CSV/TSV contents into a database table via DBI'
+author:
+  - 'Yasutaka ATARASHI <yakex@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-DBI-Loader
+requires:
+  DBI: 0
+  Getopt::Config::FromPod: 0
+  String::Unescape: 0
+  perl: 5.006
+resources:
+  homepage: https://github.com/yak1ex/App-DBI-Loader
+  repository: https://github.com/yak1ex/App-DBI-Loader.git
+version: v0.0.2

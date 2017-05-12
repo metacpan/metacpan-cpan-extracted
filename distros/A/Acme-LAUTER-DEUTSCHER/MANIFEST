@@ -1,0 +1,14 @@
+.releaserc
+Changes
+lib/Acme/LAUTER/DEUTSCHER.pm
+lib/PerlIO/via/LAUTER_DEUTSCHER.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+SIGNATURE
+t/0-signature.t
+t/DECKUNG-VON-POD.t
+t/KOMPILIEREN.t
+t/NETZ/FUNKTIONALITAT.t
+t/POD-KORREKTHEIT.t

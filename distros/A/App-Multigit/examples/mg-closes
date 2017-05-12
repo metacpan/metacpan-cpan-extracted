@@ -1,0 +1,129 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.014;
+
+# We'll be using more options than the defaults in App::Multigit::Script.
+use Getopt::Long qw(:config gnu_getopt);
+use App::Multigit qw(mg_each);
+use App::Multigit::Script;
+
+# We'll also be triggering Futures to be completed.
+use Future;
+use curry;
+
+# %options is provided by App::Multigit::Script, so we can add to the ones we
+# already collated by simply adding it to the hash and using GetOptions again.
+%options = (
+    %options,
+    'repos-only' => 0
+);
+
+# In this case we could have omitted adding repos-only to the %options hash
+# entirely, but this exemplifies how to set defaults as well.
+GetOptions(
+    \%options,
+    'repos-only'
+);
+
+# For each repository...
+my $future = mg_each(sub {
+    my $repo = shift;
+
+    # ... get a log of everything ...
+    $repo->run([ qw(git log --all --pretty=oneline) ])
+        # ... then show the results!
+        ->then(show_results($repo))
+    ;
+});
+
+# This hash is influenced by the Futures returned later, in show_results.
+# The Futures that complete with nothing contribute nothing to this hash.
+# We are careful to make sure our Futures complete with even-sized lists,
+# because we're cognisant of the fact they'll end up here.
+my %done = $future->get;
+
+for my $dir (keys %done) {
+    chomp $done{$dir};
+    if ($done{$dir}) {
+        say for "$dir:", $done{$dir};
+    }
+    else {
+        say $dir;
+    }
+}
+
+# show_results returns a closure. The closure accepts a C<%data> hash,
+# documented in L<App::Multigit::Repo|App::Multigit::Repo/run>. The subref is
+# run by Future for each individual repository, when the first command
+# completes.
+sub show_results {
+    my $repo = shift;
+    return sub {
+        my (%data) = @_;
+        my $dir = $repo->config->{dir};
+
+        my @commits = parse_log($data{stdout});
+
+        # No commits that match - complete an empty Future.
+        if (! @commits) {
+            return Future->done;
+        }
+
+        if ($repos_only) {
+            # We complete a Future with a 2-piece list with no value for the
+            # list of commits.  This ensures nothing is printed later. We could
+            # have put this test further up, where the for loop iterates over
+            # the results.
+            return Future->done($dir => undef);
+        }
+        else {
+            # We concatenate the commits that matched the filter, and complete a
+            # future with a 2-piece list mapping the directory to the list.
+            # Later, the list will be printed by the for loop above.
+            local $" = "\n";
+            return Future->done(
+                $dir => "@commits"
+            );
+        }
+    }
+}
+
+# We search the list of commits based on certain criteria. We have bugzillas for
+# internal stuff and trackers for external stuff, so we find one or the other
+# this way. We return the list of commits by grabbing their SHAs out of the log.
+sub parse_log {
+    my $log = shift;
+    my $bz_re = qr/\b(bugzilla|bug|bz)\s*\Q$ARGV[0]/i;
+    my $tracker_re = qr/\btracker\s*\Q$ARGV[0]/i;
+
+    my @commits = map { /([[:xdigit:]]+)/ } grep { /$bz_re/ or /$tracker_re/ } split /\n/, $log;
+}
+
+=head1 SYNOPSIS
+
+    mg closes [--repos-only] ID
+
+Searches the repositories for commits that mention ID.
+
+Commits are recognised as either bugs or trackers with the given ID by
+checking their commit messages for certain strings:
+    BZ $id
+    Bug $id
+    Bugzilla $id
+
+    Tracker $id
+
+For each repository with matching commits, the commit hashes are listed.
+
+Repositories with no matching commits are not reported at all.
+
+=head1 OPTIONS
+
+=over
+
+=item --repos-only
+
+Prevents reporting of the commits, and just outputs matching repositories.
+
+=back

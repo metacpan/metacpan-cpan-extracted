@@ -1,0 +1,46 @@
+Apache::Profiler is Copyright (C) 2009, Michael Schout.
+
+WHAT IS THIS?
+
+Apache::Profiler is a mod_perl init (and cleanup) handler to profile time
+taken to process one request. Profiled data is reported to the Apache Log
+file. It’d be useful to profile some heavy application taking a long time to
+proceed.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If perl Makefile.PL fails because it cannot find apxs, you can specify the path
+to it via the -apxs parameter:
+
+    perl Makefile.PL -apxs /path/to/apxs
+
+
+DEPENDENCIES
+
+This module requires these other CPAN modules:
+
+    Test::More 0.32 or later
+    Apache::Test 1.26 or later
+    Time::HiRes
+    mod_perl or mod_perl2
+
+COPYRIGHT AND LICENCE
+
+   Copyright (C) 2009 Michael Schout.
+
+   This program is free software; you can redistribute it and/or modify it
+   under the terms of either:
+
+   *   the GNU General Public License as published by the Free Software
+       Foundation; either version 1, or (at your option) any later
+       version, or
+
+   *   the Artistic License version 2.0.

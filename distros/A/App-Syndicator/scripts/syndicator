@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use App::Syndicator;
+use IO::All;
+binmode STDOUT, ":utf8";
+
+if (grep { /^-?-init$/ } @ARGV) {
+    my $BASE = "$ENV{HOME}/.syndicator"; 
+    mkdir "$BASE";
+
+    io("$BASE/main.db") < ""
+    unless -f "$BASE/main.db";
+
+    my $config_template = '{
+        "sources": [
+            "http://blogs.perl.org/atom.xml"
+        ]
+    }';
+
+    io("$BASE/config.json") < $config_template
+    unless -f "$BASE/config.json";
+
+    print "Done!\n";
+    exit;
+}
+
+App::Syndicator->new_with_options->run;

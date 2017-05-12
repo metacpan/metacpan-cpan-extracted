@@ -1,0 +1,16 @@
+TYPEMAP
+
+Apporo*      T_APPORO
+
+INPUT
+T_APPORO
+    if( SvROK($arg) ) {
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    } else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+T_APPORO
+    sv_setref_pv( $arg, CLASS, (void*)$var );

@@ -1,0 +1,21 @@
+<Perl >
+   use lib "@ServerRoot@/tlib";
+   use t::dbh;
+   use Apache2::ServerRec ();
+   use Apache2::ServerUtil ();
+   
+   my $notes = do("@ServerRoot@/../_build/notes");
+   my $server = Apache2::ServerUtil->server;
+   
+   $server->add_config([qq{PerlSetEnv AUS_DB_DSN "$notes->{DBI_DSN}"}])
+       if($notes->{DBI_DSN});
+
+   $server->add_config([qq{PerlSetEnv AUS_DB_USER "$notes->{DBI_USER}"}])
+       if($notes->{DBI_USER});
+
+   $server->add_config([qq{PerlSetEnv AUS_DB_PASS "$notes->{DBI_PASS}"}])
+       if($notes->{DBI_PASS});
+   
+</Perl>
+
+Include @ServerRoot@/../examples/CGI/httpd.conf

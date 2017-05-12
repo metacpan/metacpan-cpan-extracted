@@ -1,0 +1,19 @@
+lib/Alien/LibXML.pm
+
+t/00-use.t
+t/01-compiler.t
+t/tree1.c
+t/tree1.xml
+
+doap.ttl
+
+README
+Changes
+examples/synopsis.pl
+
+Build.PL
+MANIFEST			This list of files
+MANIFEST.SKIP                   That list of files
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,9 @@
+Revision history for App-Stash
+
+0.02    Sat, 20 Nov 2010 19:08:07 +0100
+    - #63179 added missing dependency on Class::Accessor::Chained::Fast to Build.PL
+    - updated MANIFEST
+
+0.01    15 Oct 2009
+    - First version, released on an unsuspecting world.
+

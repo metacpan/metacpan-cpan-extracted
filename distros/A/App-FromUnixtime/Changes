@@ -1,0 +1,68 @@
+Revision history for Perl extension App::FromUnixtime
+
+0.17    Sat Feb 28 11:08:39 JST 2015
+        - add one line doc about --replace option
+
+0.16    Sun Feb 15 21:34:12 JST 2015
+        - remove the script(packed from_unixtime) from tar.gz
+
+0.15    Sun Feb 15 20:56:01 JST 2015
+        - add --replace option
+        - add the script for the standalone executable to whatever location you'd like
+
+0.14    Mon Feb  2 08:28:58 JST 2015
+        - add test for finding out no use vars
+
+0.13    Wed Jan 28 22:28:25 JST 2015
+        - fix wrong test
+
+0.12    Mon Jan 26 04:32:59 JST 2015
+        - add LICENSE file
+        - add ignore cache parameters for badges in README.pod
+
+0.11    Sun Jan 11 11:40:24 JST 2015
+        - add column conditions to replace
+        - fix regexp: to support the numberd column like 'foo_date2'
+        - add '--min-time' option
+        - fix dependency
+
+0.10    Sun Jan  4 20:09:09 JST 2015
+        - also export 'from_unixtime' function for one liner (thanks to tokuhirom)
+        - add '--no-re' option
+        - rename internal function: _from_unixtime -> _replace_unixtime
+        - fix pod
+
+0.09    Sat Jan  3 21:38:27 JST 2015
+        - add tests
+
+0.08    Sat Jan  3 19:49:17 JST 2015
+        - refactor
+        - enable to replace unixtime args like `from_unixtime 1419702037`
+        - enhance POD
+
+0.07    Fri Jan  2 17:07:35 JST 2015
+        - only replace after keyword
+        - enable to replace only unixtime
+        - remove eval
+
+0.06    Mon Dec 29 21:21:59 JST 2014
+        - enhance POD
+
+0.05    Mon Dec 29 16:17:03 JST 2014
+        - add pod for --re option
+
+0.04    Mon Dec 29 15:49:52 JST 2014
+        - add re option
+        - refactor for metrics
+
+0.03    Sun Dec 28 21:16:57 JST 2014
+        - fix dependency
+
+0.02    Sun Dec 28 19:16:11 JST 2014
+        - use custom configuration file: .from_unixtimerc
+        - add new options: --start-bracket, --end-bracket
+        - add regexp pattarn for column: '_time'
+        - enhanced tests
+
+0.01    Sun Dec 28 12:13:57 JST 2014
+        - original version

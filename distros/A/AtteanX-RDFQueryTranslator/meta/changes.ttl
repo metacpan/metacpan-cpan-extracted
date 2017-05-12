@@ -1,0 +1,42 @@
+# -*-n3-*-
+
+@prefix :			<http://usefulinc.com/ns/doap#> .
+@prefix dc:			<http://purl.org/dc/terms/> .
+@prefix dcs:		<http://ontologi.es/doap-changeset#> .
+@prefix foaf:		<http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:		<http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms:	<http://purl.org/dc/terms/> .
+@prefix doap:		<http://usefulinc.com/ns/doap#> .
+@prefix my:			<http://purl.org/NET/cpan-uri/dist/AtteanX-RDFQueryTranslator/> .
+
+<>
+	dc:title			"Changes for AtteanX::RDFQueryTranslator" ;
+	dc:subject			my:project ;
+	dc:creator			my:developer ;
+	dc:description		"Changes for AtteanX::RDFQueryTranslator" ;
+	.
+
+my:project
+	a 						:Project ;
+	:name					"AtteanX::RDFQueryTranslator" ;
+	:shortdesc				"Translate RDF::Query objects to Attean::API::Algebra objects." ;
+	:programming-language	"Perl" ;
+	:created				"2014-09-27"^^xsd:date ;
+	:maintainer				my:developer ;
+	:homepage				<http://search.cpan.org/dist/AtteanX::RDFQueryTranslator/> ;
+	:bug-database			<https://github.com/kasei/atteanx-rdfquerytranslator/issues> ;
+	doap:download-page		<http://search.cpan.org/dist/AtteanX-RDFQueryTranslator/> ;
+	doap:download-mirror	<http://kasei.us/code/files/> ;
+	:release				my:v_0-100 ;
+	.
+
+my:v_0-100
+	a					:Version ;
+	dc:issued			"2016-05-02"^^xsd:date ;
+	:revision			"0.001" ;
+	dcs:changeset [
+		dcs:item
+			[ a dcs:Addition ; rdfs:label "Initial release (forked from the Attean package)." ]
+	]
+	.

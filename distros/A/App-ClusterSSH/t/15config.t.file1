@@ -1,0 +1,7 @@
+screen_reserve_top    = 100
+    screen_reserve_bottom = 160
+
+        screen_reserve_left   = 100
+
+            screen_reserve_right  = 100
+

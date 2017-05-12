@@ -1,0 +1,62 @@
+# bash completion support for git-gerrit.  Your bash must source
+# /usr/share/bash-completion/completions/git before sourcing this.
+
+_git_gerrit ()
+{
+	__git_has_doubledash && return
+
+	local subcommands="new push query my show checkout co upstream up cherry-pick cp reviewer review abandon restore revert submit web config version"
+	local subcommand="$(__git_find_on_cmdline "$subcommands")"
+	if [ -z "$subcommand" ]; then
+	    __gitcomp "$subcommands"
+	fi
+
+        gopts='--debug --help'
+
+	case "$subcommand" in
+            new)
+                __gitcomp "$gopts --update"
+                ;;
+            push)
+                __gitcomp "$gopts --keep --force --rebase --norebase --draft --submit --base --topic --reviewer --cc"
+                ;;
+            query)
+                __gitcomp "$gopts --limit --verbose"
+                ;;
+            my)
+                __gitcomp "$gopts --limit --verbose changes drafts watched starred"
+                ;;
+            show)
+                __gitcomp "$gopts"
+                ;;
+            checkout|co)
+                __gitcomp "$gopts"
+                ;;
+            upstream|up)
+                __gitcomp "$gopts --keep"
+                ;;
+            cherry-pick|cp)
+                __git_cherry_pick
+                ;;
+            reviewer)
+                __gitcomp "$gopts --add --confirm --delete"
+                ;;
+            review|abandon)
+                __gitcomp "$gopts --message --keep"
+                ;;
+            restore|revert)
+                __gitcomp "$gopts --message"
+                ;;
+            submit)
+                __gitcomp "$gopts --no-wait-for-merge --keep"
+                ;;
+            web)
+                __git_web__browse
+                ;;
+            config|version)
+                __gitcomp "$gopts"
+                ;;
+	    *)
+                ;;
+	esac
+}

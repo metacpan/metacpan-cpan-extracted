@@ -1,0 +1,26 @@
+name: item_add
+method: post
+fields:
+    title:
+        type:  text
+        size:  40
+        required: 1
+    year:
+        type:  text
+        size:  40
+    img:
+        label: Image
+        type:  text
+        size:  40
+    genre:
+        type:  select
+        required: 1
+        multiple: 1
+    plot:
+        label: Description
+        type:  textarea
+        cols:  60
+        rows:  5  
+    	
+submit: Save
+stylesheet: 1

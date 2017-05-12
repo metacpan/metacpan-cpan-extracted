@@ -1,0 +1,33 @@
+#!/usr/local/bin/perl
+
+use v5.10.0;
+use blib;
+use strict;
+use warnings;
+
+use AFS::BOS;
+use Scalar::Util qw(looks_like_number);
+
+my ($general, $newbinary, $time, $server, $cellname, $bos);
+
+die "Usage: $0 general newbinary time server [cell]\n" if $#ARGV < 3;
+
+$general   = shift;
+$newbinary = shift;
+$time      = shift;
+$server    = shift;
+$cellname  = shift // '';
+
+if (defined $general and !looks_like_number($general)) { warn "$0: GENERAL is not an INTEGER ...\n"; }
+else                                                   { $general = int($general); }
+if (defined $newbinary and !looks_like_number($newbinary)) { warn "$0: NEWBINARY is not an INTEGER ...\n"; }
+else                                                       { $newbinary = int($newbinary); }
+
+if ($cellname) { $bos = AFS::BOS->new($server, 0, 0, $cellname); }
+else           { $bos = AFS::BOS->new($server); }
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+my $ok = $bos->setrestart($time, $general, $newbinary);
+print "Error Code: $AFS::CODE\n" if ($AFS::CODE);
+
+$bos->DESTROY;

@@ -1,0 +1,49 @@
+# === General Settings
+
+#time_zone = "Asia/Tokyo"
+#debug_mode = true
+
+[log]
+#debug   = true
+console = true
+file    = true
+# file_path = /path/to/log
+
+# === Job Scheduling Settings
+
+[worker]
+interval_minutes = 1
+# Must be shorter than interval_minutes
+minimum_interval_seconds = 30
+
+[schedule]
+update_interval_seconds = 120
+
+[job]
+# Must be shorter than worker.minimum_interval_seconds
+lock_ttl_seconds = 25
+
+# === Data Source Settings
+
+[datasource.module]
+job       = "Teng"
+semaphore = "Teng"
+#semaphore = "None"
+
+[datasource.connector]
+dsn      = "dbi:mysql:database=koyomi;host=127.0.0.1;port=3306"
+#dsn      = "dbi:SQLite:tmp/koyomi.sqlite"
+user     = "root"
+password = ""
+
+# Can override for each entity
+#[datasource.connector.job]
+#[datasource.connector.semaphore]
+
+# === Debug Parameters
+
+[debug]
+#now = "2015-05-23T00:00"
+
+[debug.worker]
+sleep_seconds = 5

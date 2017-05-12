@@ -1,0 +1,61 @@
+* split kgb-bot into manageable modules
+* start a real test bot for automated tests
+  - this is now possible via eg/start-test-bot-[12] and 'TEST_KGB_BOT_RUNNING=1
+    make test'
+    even if useful for local testing the results aren't verified via t/*.t
+* write tests for CVS client
+
+* watch file broken; depending on the UA, alioth replies with
+  "406 Not Acceptable"
+
+* admin/sync -- needs a plan
+  Plan A
+  ======
+  - we need a system which would allow individual instances' admins to update
+    some central configuration store, which is both encrypted and signed.
+  - that central store could be fetched by the bots regularly, the signature
+    verified, and then the changes applied.
+  - the central storage could be on alioth, but the signing should be done
+    remotely somehow (who wants to upload her secret hey to alioth? :))
+    there could be a tool that automates the signing process (download from
+    alioth, start $EDITOR or add config from command line, sign, upload)
+  - the bots need to be given a keyring with trusted keys, whose signatures
+    they recognise
+
+  Pros:
+   - powerful
+   - possible addition/modification and removal of project
+   - full encryption end-to-end
+  Cons:
+   - GPG integration in the bot
+   - complex configuraion retrieval
+   - changes need time to propagate
+   - non-trivial creation of changes
+
+  Plan B
+  ======
+  - bots recognize a new message for adding projects
+    the message is accompanied with a hash over its contents, the timestamp of
+    the sender, and a shared secret (uses the current json protocol
+    implementation, but with another secret)
+  - any of the admins wanting to add project would run a tool which connects
+    with all the bots sending them the signed message
+
+  Pros:
+   - relatively simple
+   - instant update
+  Cons:
+   - no encryption
+   - only addition of projects (can be addressed by creating another message
+     for project deletion, and assuming that messages for existing projects
+     replace their configuration)
+
+  Plan C
+  ======
+  - do nothing. We managed somehow to maintain the service by hand, only with
+    kgb-add-project
+
+  Pros:
+   - requires no effort
+  Cons:
+   - requires small effort (×3) every now and then

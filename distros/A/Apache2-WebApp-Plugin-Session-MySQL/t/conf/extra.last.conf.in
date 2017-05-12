@@ -1,0 +1,12 @@
+PerlRequire @ServerRoot@/conf/startup.pl
+
+<Perl>
+    use Apache2::WebApp;
+    $Apache2::WebApp = Apache2::WebApp->new;
+</Perl>
+
+<Location /app>
+    SetHandler perl-script
+    PerlHandler $Apache2::WebApp->handler
+    SetEnv WEBAPP_CONF @ServerRoot@/conf/webapp
+</Location>

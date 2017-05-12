@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+examples/show_approximations.pl
+lib/Acme/Colour/Fuzzy.pm
+t/001_load.t
+t/zzy_pod_coverage.t
+t/zzz_pod.t

@@ -1,0 +1,23 @@
+1.170590 -- Tue Feb 28 16:36:00 CST 2017
+  * Fixes for watch_only [Adriano Ferreira]
+
+1.142520 -- Tue Sep 09 16:07:10 CDT 2014
+  * call stats_job to get info for particular job [Michael Ellery]
+  * Adding "args" method for fetching job data. [Nigel Gregoire]
+  * Unit test updates. [Nigel Gregoire]
+
+1.123530 -- Tue Dec 18 16:03:02 CST 2012
+  * Don't deadlock in watch_only [James Stanley]
+  * - add kick-job method for kicking a specific job [Scott Wiersdorf]
+
+1.121460 -- Thu May 24 20:14:25 CDT 2012
+  * Fix Used and watched tubes to track correctly after use [Matt Grimm]
+
+1.110490 -- Fri Feb 18 13:50:41 CST 2011
+  * Fix watch_only to use list_watched_tubes, not list_tubes
+
+1.100790 -- Sat Mar 20 09:34:50 CDT 2010
+  Fixed dependency on YAML.pm
+
+1.100750 -- Tue Mar 16 14:31:42 CDT 2010
+  Initial version

@@ -1,0 +1,160 @@
+AxKit/App/TABOO version 0.5
+===========================
+
+INTRODUCTION
+
+AxKit::App::TABOO is a object oriented approach to creating a
+publishing system on the top of AxKit, the XML Application Server. 
+The two O's thus stands for Object Oriented, AB for AxKit-Based. 
+I don't know what the T stands for yet, suggestions are welcome! 
+
+It is a fundamental design choice with TABOO that all data is to be
+abstracted to objects. I noticed while looking at other people's code,
+that though it was a lot of interesting code, it would be rather hard
+to integrate all the interesting parts into a coherent whole.
+Furthermore, everybody has their own way of storing data, and
+scattered files or different databases didn't seem right to me.
+
+With TABOO, everything that interacts with AxKit just interacts with
+the Data objects. That means, if you don't want to store things in the
+PostgreSQL database my Data objects use, you could always subclass it,
+rewrite the classes or whatever. You would mostly just have to rewrite
+the load method. It is also the Data object's job to create XML of its
+own data.
+
+The intention is to write Data objects for every kind of thing you
+might want to do. From the start, there will be Slashdot-type stories
+of varying length, with comments. These are ever-changing in the sense
+that people can come in an add comments at any time. The other thing
+we start out with is more static and longer articles.
+
+It is the intention, however, that TABOO should be a framework where
+one can add a Wiki, a webshop (which is a work now in progress, some
+code was in earlier distros but has been removed now), etc. The
+AxKit::App::TABOO::User class will then be reused and probably
+subclassed with e.g. a Customer class (now being done), but the
+datasource will be the same.
+
+TABOO makes extensive use of Providers. That is mostly because I like
+the abstraction and direct control of URIs that Providers provide. It
+makes it easy to create a framework where URIs are sensible and should
+be easy to maintain for foreseeable future. Also, there is no markup
+in the code, that's also rather important to make it maintainable.
+
+For the stuff that goes into the database, OTOH, XSP is used, and
+several taglibs are used.
+
+J. Shirley has now provided some more cascading stylesheets, and they
+have been extended by the main developer, so there is a style for
+pretty much everything now.
+
+
+0.1 was the first beta release. It is pretty much a useable framework
+for posting news-stories. It consists mainly of News and NewsList
+providers that constructs objects, instruct them to load their data
+based on the URI, get them to write their own XML, and pass this to
+some XSLT stylesheets, which makes some presentable XHTML. There are
+also several XSP taglibs, and quite a lot of XSP pages and XSL
+Transformations are now included in the distribution. There is also
+some user-management code, including authentication and authorization,
+to allow adding new users and editing the information of existing
+users.
+
+TABOO can run on different virtual hosts and operate on different
+databases. 
+
+It uses TinyMCE http://tinymce.moxiecode.com/ to allow WYSIWYG entered
+text in textfields. This results in an incompatible change to older
+versions, and the data needs to be converted. A script is included,
+look inside to see how to use it.
+
+
+I'm following the mantra "release early", and have made everything
+I've done available from the start. Several fine folks have poked at
+it, and I love that, feel free to poke some more! 
+
+
+INSTALLATION
+
+To install this module use CPAN or CPANPLUS tools or type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+There are various things that should be done to the get the rest
+running, such as copying over the htdocs and creating the database,
+see inline docs for details.
+
+DEPENDENCIES
+
+You will need at least Perl 5.7.3 to use TABOO. This is due to
+Unicode-issues that is not well supported in earlier releases.
+
+This module requires these other modules and libraries:
+- AxKit, of course!
+- DBI
+- DBD::Pg. You need at least 1.32. Earlier versions has problems with 
+  SQL3 Arrays, but it may be possible to get away with it.  
+- Encode, 2.09 is needed.
+- Time::Piece
+- Class::Data::Inheritable
+- AxKit::XSP::QueryParam
+- Text::Unaccent and IDNA::Punycode is used to ensure proper names.
+- Session for the object oriented approach to Apache Sessions
+- Crypt::GeneratePassword for generating passwords to send to users.
+- AxKit::XSP::Sendmail to send e-mail to new users.
+- MIME::Types.
+- Apache::AxKit::Plugin::AddXSLParams::Request for virtual hosts, but
+  it is easy to remove this dependency if one wishes.
+- Apache::AxKit::Plugin::Param::Expr.
+- Data::Dumper lists out debugging information, but can be removed. 
+- AxKit will bring along XML::LibXML, and while you could use any
+  LibXSLT module supported by AxKit, I recommend XML::LibXSLT, and to
+  ease installation, I made it a prerequisite.  
+- Net::Akismet may be used, but is not strictly required. 
+  See http://akismet.com/ 
+- You'd most certainly want a few Formatters, the
+  Apache::AxKit::Provider::File::Formatter and the OpenOffice
+  Provider, but they are not set as prerequisites.
+
+You will need TinyMCE, http://tinymce.moxiecode.com/ which should be
+unpacked and Aliased so that the jscripts directory is just after the
+root.
+
+You will also need some XML libraries, for example libxml2 and
+libxslt. You will probably have gotten these along with AxKit. TABOO
+should be able to use any AxKit uses, with the exception that it makes
+use of some self-defined EXSLT, so you'll need a library that supports
+that.
+
+Additionally, you may experience that the installation hangs on
+wanting DB_File. I believe this is a bug in some other package, but I
+haven't nailed it down yet. Just install DB_File and you'll be fine.
+
+SUBVERSION REPOSITORY 
+
+TABOO is currently maintained in a Subversion repository. The trunk
+can be checked out anonymously using e.g.:
+
+  svn checkout http://svn.kjernsmo.net/TABOO/trunk TABOO  
+
+It is also available using svn+ssh for committers.
+
+
+SUPPORT
+
+There is a list taboo-dev@kjernsmo.net you can subscribe to at 
+http://lists.kjernsmo.net/mailman/listinfo/taboo-dev
+
+Beware that TABOO is in development, so it is not yet software that
+you just install and use. For those who likes the design goals, and
+likes to continue development along these lines, I think they will
+find it so usable it is worth an install.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003-2006 Kjetil Kjernsmo. This program is free
+software; you can redistribute it and/or modify it under the same
+terms as Perl itself.

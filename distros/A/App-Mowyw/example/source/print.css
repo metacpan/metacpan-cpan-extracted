@@ -1,0 +1,17 @@
+* {
+	float: none;
+	border: none;
+	background: #fff;
+}
+
+h2 {
+	font-weight: normal;
+}
+
+body {
+	font: medium/1.8em "Trebuchet MS", Verdana, Helvetica, sans-serif;
+}
+
+#nav-page, #nav-main, #nav-secondary {
+	display: none;
+}

@@ -1,0 +1,20 @@
+---
+abstract: 'Update a github repository (description, homepage, etc.) from the commandline'
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+generated_by: 'Dist::Zilla version 2.101170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-GitHub-update
+recommends: {}
+requires:
+  Config::Identity: 0
+  Getopt::Long: 0
+  LWP::UserAgent: 0
+version: 0.0011

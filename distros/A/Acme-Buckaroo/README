@@ -1,0 +1,154 @@
+Acme/Buckaroo version 1.01
+==========================
+
+WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING:
+WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING:
+WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING:
+WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING:
+
+    -------------------------------------------------------------------
+    USING THIS MODULE CHANGES THE SOURCE FILE IT IS IN !!!!!
+    IF YOU DO A 'USE BUCKAROO.PM;' THE REST OF THE FILE AFTER THIS WILL
+    BE CHANGED FOREVER IN A WAY YOU MAY NOT LIKE.
+    -------------------------------------------------------------------
+    USE THIS MODULE ONLY IN A TEST FILE THAT YOU CAN THROW AWAY !!!
+    USE THIS MODULE ONLY IN A TEST FILE THAT YOU CAN THROW AWAY !!!
+    -------------------------------------------------------------------
+
+
+WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING:
+WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING:
+WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING:
+WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING: WARNING:
+
+DESCRIPTION
+
+    Acme::Buckaroo - Buckaroo Banzai Characters Infest Your Code!
+
+
+    The first time you run this program, the entire text of the program
+    after the 'use Acme::Buckaroo;' is converted (character by character)
+    into characters from the movie "Buckaroo Banzai Across the Eigth
+    Dimension" (and some other phrases, too).
+
+    The program will work (or not!) exactly as it did before it was
+    converted, but the code will be a somewhat endearing tribute to a
+    movie, instead of a clean, complete, clearly commented set of lines
+    of Perl code.
+
+    if you want to convert your program BACK into Perl, you must edit the
+    Acme::Buckaroo.pm module and turn on debugging (change the
+    line, "my $debugmode = 0;" to the line, "my $debugmode = 1;" and then
+    run the script again.  As it executes, it will translate the program
+    back.  Capture the output of this and you have your program back.
+
+    Acme::Buckaroo came about because the modules Acme::Buffy, Acme::Morse,
+    Acme::Pony, and Acme::Bleach were somewhat cryptically written.  This
+    author believes that CODE SHOULD BE SIMPLE and CLEAR to read and
+    understand.  Code that isn't clear is far less value.  And, since these
+    modules are for learning or FUN anyway, I might as well start here.
+
+    As someone who has taught beginners to use Perl, I've seen the problems
+    caused by using Perl idioms where typing a few more characters can make
+    maintenance possible and even quite easy.
+
+
+SYNOPSIS
+
+    Before Buckaroo-ing:
+
+        use Acme::Buckaroo;
+        print "Watch 'Buckaroo Banzai Across the 8th Dimension' Today!";
+
+    After Bucaroo-ing:
+
+        use Acme::Buckaroo;
+        Buckaroo Banzai Across The Eigth Dimension Buckaroo Banzai Across The Eigth Dimension
+        Bari Dreiband-Burman    General Catburd George Stokes   Frank James Sparks
+        Gary Hellerstein        Glenn Campbell  Buckaroo Banzai Penny Priddy
+        Damon Hines     New Jersey      Glenn Campbell  Doreen A. Dixon
+        Francine Lembi  Buckaroo Banzai Girl Named John Scooter Lindley
+        Gordon Ecker Jr.        Doreen A. Dixon Fred J. Koenekamp       New Jersey
+        George Stokes   Gary Hymes      Gary Hymes      Buckaroo Banzai
+        Scooter Lindley New Jersey      Gary Hellerstein        Grovers Mills
+        New Jersey      Frank James Sparks      Buckaroo Banzai Sandra Banzai
+        Doreen A. Dixon George Stokes   Gary Hymes      Gerald Peterson
+        Gerald Peterson Buckaroo Banzai Glenn Campbell  Francine Lembi
+        Edward Morey    Buckaroo Banzai Perfect Tommy   Glenn Campbell
+        Francine Lembi  Buckaroo Banzai Smolensk USSR   Frank James Sparks
+        Gary Daigler    Edward Morey    Gary Hellerstein        Gerald Peterson
+        Frank James Sparks      Gary Hymes      Gary Hellerstein        Girl Named John
+        Buckaroo Banzai Colette Emanuel Gary Hymes      Eddie Marks
+        New Jersey      Gregory Jein    Defense Sec. McKinley   Penny Priddy
+        Planet 10       Bari Dreiband-Burman
+
+INSTALLATION
+
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+DEPENDENCIES
+
+    This module requires NO other modules or libraries.
+    If you go into the source of Buckaroo.pm and look, you'll see
+    there is a debug mode.  If you turn this on, you'll be able to
+    watch it as it works.  However, debug mode requires the module
+    Data::Dumper, a fantastically useful module that you should
+    have by default in Perl installations > 5.6.
+
+
+DEDICATION
+
+    I'd like to dedicate this module to Mr. Damian Conway, who has bettered
+    Perl and the lives of those in the Perl-using community by vast amounts,
+    and continues to do good work.  Someday I'd like to buy him a beer.
+
+    The book, by the way, is "Object Oriented Perl", by Damian Conway
+    and Randall L. Schwartz, published by Manning Publications Company;
+    ISBN: 1884777791; (August 1999).
+
+    Also thanks to Jesse who reported a bug in this documentation
+    and introduced me to the CPAN bug tracking database, available
+    to everyone to report bugs in CPAN modules or scripts.  The address
+    for this is http://rt.cpan.org. If you know of a bug in a CPAN module,
+    report it there!
+
+EXPORT
+
+    None by default.
+
+SEE ALSO
+
+    Acme::Buffy, Acme::Morse, Acme::Pony, Acme::Bleach, and L<perl>.
+
+DIAGNOSTICS
+
+    Cannot Buckaroo '%s'
+
+        Acme::Buckaroo could not modify the source file.
+        Are the file permissions set?
+
+    Cannot Buckaroo again on '%s'
+
+        Acme::Buckaroo couldn't read the source file for
+        whatever reason. Ooops.
+
+
+AUTHOR
+
+Kevin J. Rice, http://www.JustAnyone.com, E<lt>KevinRice@cpan.orgE<gt>
+
+COPYRIGHT AND LICENCE
+
+    Copyright (c) 2002, Kevin J. Rice.  All Rights Reserved. This module is
+    free software. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License.
+
+    (see http://www.perl.com/perl/misc/Artistic.html for details)
+
+    Kindly request:  Please reference this author (Kevin J. Rice) when
+    you refer to this module.

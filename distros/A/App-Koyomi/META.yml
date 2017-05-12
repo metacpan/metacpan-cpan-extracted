@@ -1,0 +1,108 @@
+---
+abstract: 'A simple distributed job scheduler'
+author:
+  - 'YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>'
+build_requires:
+  TAP::Harness: '3.34'
+  Test::Base: '0.88'
+  Test::More: '1.001009'
+configure_requires:
+  Module::Build: '0.42'
+  Module::CPANfile: '0.9010'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Koyomi
+provides:
+  App::Koyomi:
+    file: lib/App/Koyomi.pm
+    version: v0.6.0
+  App::Koyomi::CLI:
+    file: lib/App/Koyomi/CLI.pm
+    version: v0.6.0
+  App::Koyomi::Config:
+    file: lib/App/Koyomi/Config.pm
+    version: v0.6.0
+  App::Koyomi::Context:
+    file: lib/App/Koyomi/Context.pm
+    version: v0.6.0
+  App::Koyomi::DataSource::Job:
+    file: lib/App/Koyomi/DataSource/Job.pm
+    version: v0.6.0
+  App::Koyomi::DataSource::Job::Teng:
+    file: lib/App/Koyomi/DataSource/Job/Teng.pm
+    version: v0.6.0
+  App::Koyomi::DataSource::Job::Teng::Data:
+    file: lib/App/Koyomi/DataSource/Job/Teng/Data.pm
+    version: v0.6.0
+  App::Koyomi::DataSource::Job::Teng::JobTime:
+    file: lib/App/Koyomi/DataSource/Job/Teng/JobTime.pm
+    version: v0.6.0
+  App::Koyomi::DataSource::Job::Teng::Object:
+    file: lib/App/Koyomi/DataSource/Job/Teng/Object.pm
+    version: v0.6.0
+  App::Koyomi::DataSource::Job::Teng::Schema:
+    file: lib/App/Koyomi/DataSource/Job/Teng/Schema.pm
+    version: v0.6.0
+  App::Koyomi::DataSource::Semaphore:
+    file: lib/App/Koyomi/DataSource/Semaphore.pm
+    version: v0.6.0
+  App::Koyomi::DataSource::Semaphore::None:
+    file: lib/App/Koyomi/DataSource/Semaphore/None.pm
+    version: v0.6.0
+  App::Koyomi::DataSource::Semaphore::Teng:
+    file: lib/App/Koyomi/DataSource/Semaphore/Teng.pm
+    version: v0.6.0
+  App::Koyomi::DataSource::Semaphore::Teng::Data:
+    file: lib/App/Koyomi/DataSource/Semaphore/Teng/Data.pm
+    version: v0.6.0
+  App::Koyomi::DataSource::Semaphore::Teng::Object:
+    file: lib/App/Koyomi/DataSource/Semaphore/Teng/Object.pm
+    version: v0.6.0
+  App::Koyomi::DataSource::Semaphore::Teng::Schema:
+    file: lib/App/Koyomi/DataSource/Semaphore/Teng/Schema.pm
+    version: v0.6.0
+  App::Koyomi::Job:
+    file: lib/App/Koyomi/Job.pm
+    version: v0.6.0
+  App::Koyomi::JobTime::Formatter:
+    file: lib/App/Koyomi/JobTime/Formatter.pm
+    version: v0.6.0
+  App::Koyomi::JobTime::Object:
+    file: lib/App/Koyomi/JobTime/Object.pm
+    version: v0.6.0
+  App::Koyomi::Logger:
+    file: lib/App/Koyomi/Logger.pm
+    version: v0.6.0
+  App::Koyomi::Schedule:
+    file: lib/App/Koyomi/Schedule.pm
+    version: v0.6.0
+  App::Koyomi::Semaphore:
+    file: lib/App/Koyomi/Semaphore.pm
+    version: v0.6.0
+  App::Koyomi::Worker:
+    file: lib/App/Koyomi/Worker.pm
+    version: v0.6.0
+requires:
+  Class::Accessor::Lite: '0.08'
+  DBD::SQLite: '1.46'
+  DateTime: '1.18'
+  DateTime::Format::MySQL: '0.05'
+  DateTime::TimeZone: '1.88'
+  IO::Prompt::Tiny: '0.003'
+  Log::Minimal: '0.19'
+  Module::Load: '0.32'
+  Perl6::Slurp: '0.051005'
+  Proc::Wait3: '0.04'
+  Smart::Args: '0.12'
+  TOML: '0.96'
+  Teng: '0.28'
+  Text::ASCIITable: '0.20'
+  Text::Diff: '1.41'
+  YAML::XS: '0.54'
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.6.0

@@ -1,0 +1,6 @@
+Revision history for Perl extension AnyEvent::Semaphore.
+
+0.01  Wed Apr 17 16:47:46 2013
+	- original version; created by h2xs 1.23 with options
+		-AXn AnyEvent::Semaphore
+

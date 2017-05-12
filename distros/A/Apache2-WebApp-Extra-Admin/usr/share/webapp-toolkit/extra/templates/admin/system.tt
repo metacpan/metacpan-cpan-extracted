@@ -1,0 +1,127 @@
+[%#
+   Apache2::WebApp::Toolkit - Admin Control Panel (system.tt)
+   Copyright (C) 2010 Marc S. Brooks <mbrooks@cpan.org>
+
+   Licensed under the terms of the BSD License
+   http://www.opensource.org/licenses/bsd-license.php
+-%]
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Main</title>
+
+	<meta http-equiv="pragma" content="no-cache" />
+
+	<script type="text/javascript" src="/extras/admin/js/disable.js"></script>
+
+	<style type="text/css">
+		@import url( /extras/admin/css/base.css );
+		@import url( /extras/admin/css/content.css );
+		@import url( /extras/admin/css/results.css );
+	</style>
+</head>
+<body>
+
+<noscript>
+	<h2>
+		To use this admin you must have a JavaScript-enabled browser
+	</h2>
+</noscript>
+
+
+<!-- page begin -->
+
+<div id="page">
+	<div class="back">
+		<a href="javascript:window.history.go(-1)" title="Back">
+			Back
+		</a>
+	</div>
+
+	<h2 class="title">
+		System Info
+	</h2>
+</div>
+
+<!-- page end -->
+
+
+<div id="split">
+	<hr></hr>
+</div>
+
+
+<!-- info begin -->
+
+<div id="info">
+	<p class="text">
+		Use the information below to troubleshoot problems when reporting issues to technical support.
+	</p>
+</div>
+
+<!-- info begin -->
+
+
+<!-- navtop begin -->
+
+<div id="navtop">
+
+
+	<!-- options begin -->
+
+	<div class="options">
+		<a href="mailto:[% project_email %]" title="Report an Issue">
+			Report an Issue
+		</a>
+	</div>
+
+	<!-- options end -->
+
+
+</div>
+
+<!-- navtop end -->
+
+
+<div id="shadow">
+
+
+<!-- table begin -->
+
+<table id="table">
+	<tr>
+		<td class="off">
+			Variable
+		</td>
+		<td class="off">
+			Returned Value
+		</td>
+	</tr>
+
+<!-- loop begin -->
+
+[% FOREACH key = data.keys %]
+	<tr>
+		<td class="left info">
+			[% key %]
+		</td>
+		<td class="right info">
+			[% data.$key %]
+		</td>
+	</tr>
+[% END %]
+
+<!-- loop end -->
+
+</table>
+
+<!-- table end -->
+
+
+</div>
+
+</body>
+</html>

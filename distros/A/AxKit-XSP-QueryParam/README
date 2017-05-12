@@ -1,0 +1,20 @@
+AxKit::XSP::QueryParam is an XSP Taglib that allows for advanced
+parameter manipulation, through XSP.  Getting, setting, removing,
+enumerating a list of parameters, and so forth, can all be easily
+accomplished using this module.
+
+This is intended as a replacement for the AxKit::XSP::Param taglib.
+
+QUICK START:
+
+1) Install.
+perl Makefile.PL && make && make test && make install
+
+2) Add the following to your httpd.conf:
+
+  AxAddXSPTaglib AxKit::XSP::QueryParam
+
+3) Add the QueryParam namespace to your XSP pages
+
+  xmlns:param="http://www.axkit.org/2002/XSP/QueryParam"
+

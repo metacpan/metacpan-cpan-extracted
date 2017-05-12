@@ -1,0 +1,55 @@
+<html>
+<head>
+<title>my diary...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<table><tr><td bgcolor="#FFCCCC">
+<h1>This is a minimal template</h1>
+It's easy to choose another template or make one of your own
+</td></tr></table>
+
+<!-- This is how to make links to the next and previous
+     entries date-wise -->
+[ <a href="<!--tmpl_var name="prev"-->">Previous</a> ] 
+[ <a href="<!--tmpl_var name="next"-->">Next</a> ] 
+[ <a href="older.html">Older</a> ]
+<p>
+
+<!-- a nice heading -->
+
+<b><!--tmpl_var name="short_name"--></b> - <!--tmpl_var name="date"--> (<!--tmpl_var name="wc"--> words)
+
+<!-- the entry itself -->
+
+<p><!--tmpl_var name="entry"-->
+
+
+<!-- comments only appear if there are any. If you don't
+     want comments to show up, leave this section out -->
+
+<tmpl_if comments>
+<hr>
+<p><b>comments that people have left:</b></p>
+<p>
+<tmpl_loop comments>
+<b><tmpl_var who></b> (<tmpl_var date>): <tmpl_var entry><p>
+</tmpl_loop>
+
+</tmpl_if>
+
+
+<!-- a little form for adding a comment -->
+<hr>
+<p><b>Add a comment:</b> (it will be posted here, and anyone could read it)</p>
+<form action="post-comment" method="post">
+<table>
+<tr><td><p>Name:</p></td><td><input name="name"></td>
+<tr><td><p>Entry:</p></td>
+<td><textarea name="comment" rows=5 cols=30></textarea></td></tr>
+<tr><td>&nbsp;</td><td><input type="submit" value="post"></td></tr>
+<input type="hidden" name="filename" value="<tmpl_var filename>">
+</table>
+</form>
+
+</body>
+</html>

@@ -1,0 +1,16 @@
+Revision history for Perl extension Authen::DigestMD5.
+
+0.04  8 Nov 2003
+	- replace OpenLDAP for OnLDAP on docs sample
+
+0.03  8 Nov 2003
+	- require only perl 5.6.0. Suggested by John Jetmore
+
+0.02  28 Oct 2003
+	- corrected some problems on _split and _quote
+	- digest-md5-auth.pl added to MANIFEST
+
+0.01  Fri Oct 24 13:24:53 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n Authen::DigestMD5
+

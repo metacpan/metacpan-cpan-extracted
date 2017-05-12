@@ -1,0 +1,83 @@
+{
+   "abstract" : "watch the file updates",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.3",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-watcher",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Linux::Inotify2" : "0"
+         },
+         "requires" : {
+            "Filesys::Notify::Simple" : "0",
+            "perl" : "5.008008"
+         }
+      }
+   },
+   "provides" : {
+      "App::watcher" : {
+         "file" : "lib/App/watcher.pm",
+         "version" : "0.11"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/App-watcher/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/App-watcher",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/App-watcher.git",
+         "web" : "https://github.com/tokuhirom/App-watcher"
+      }
+   },
+   "version" : "0.11",
+   "x_contributors" : [
+      "issm <issmxx@gmail.com>",
+      "Neil Bowers <neil@bowers.com>",
+      "Yuuki Furuyama <addsict@gmail.com>",
+      "wenjun.yan <wenjun.yan@linecorp.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ]
+}

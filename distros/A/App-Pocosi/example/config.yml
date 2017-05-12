@@ -1,0 +1,51 @@
+class:    POE::Component::Server::IRC
+#log_file: /my/log.file
+#pid_file: /my/pid.file
+#lib:      /my/modules
+flood:    false
+auth:     true
+
+config:
+  servername: myserver.com
+  motd:
+    - "Welcome to this great server"
+    - ""
+    - "Enjoy your stay"
+
+plugins:
+  - [OperServ]
+
+listeners:
+  - bindaddr: "127.0.0.1"
+    port:     10023
+
+denials:
+  - ["12.34.56.0/24", "I don't like this IP block"]
+
+exemptions:
+  - "12.34.56.78"
+
+operators:
+  - username: jack
+    password: foo
+    ipmask:   ["127.0.0.1", "1.2.3.4", "192.168.1.0/24"]
+  - username: locke
+    password: bar
+    ipmask:   "10.0.0.*"
+
+auths:
+  - mask:     "*@example.com"
+    password: hlagh
+    spoof:    jacob
+    no_tilde: true
+
+peers:
+  - name:     otherserver.com
+    rpass:    hlaghpass
+    pass:     hlaghpass
+    type:     r
+    raddress: "127.0.0.1"
+    rport:    12345
+    auto:     true
+
+# vim: sw=2

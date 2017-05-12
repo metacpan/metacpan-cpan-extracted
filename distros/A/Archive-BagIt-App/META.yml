@@ -1,0 +1,40 @@
+---
+abstract: 'The MooseX::App that bagit.pl runs'
+author:
+  - 'Rob Schmidt <rjeschmi@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.022, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Archive-BagIt-App
+no_index:
+  directory:
+    - corpus
+    - inc
+    - examples
+requires:
+  Archive::BagIt: '0'
+  Archive::BagIt::Fast: '0'
+  Digest::MD5: '0'
+  File::Find: '0'
+  Moose: '0'
+  MooseX::App: '0'
+  MooseX::App::Command: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/rjeschmi/Archive-BagIt-App/issues
+  repository: git://github.com/rjeschmi/Archive-BagIt-App.git
+version: '0.049'

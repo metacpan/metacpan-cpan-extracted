@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use opts;
+
+use App::Donburi::Server;
+
+opts my $conf => { isa => 'Str', default => 'config.yaml', comment => 'config file' };
+
+if ( -e $conf ) {
+    App::Donburi::Server::run($conf);
+} else {
+    open my $fh, '>config.yaml';
+    print $fh <<EOS;
+---
+irc:
+  server: "irc.freenode.net"
+  port: 6667
+  nick: "donburi"
+  encoding: "utf-8"
+
+http:
+  server: "127.0.0.1"
+  port: 8080
+
+store: "./channel.yaml"
+EOS
+    print "donburi need 'config.yaml'. I write config.yaml sample at ./config.yaml . please edit it\n";
+}
+

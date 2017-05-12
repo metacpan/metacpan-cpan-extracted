@@ -1,0 +1,675 @@
+=head1 NAME
+
+ASNMTAP::Asnmtap is an object-oriented Base Class to build modules that provides a nice object oriented interface for ASNMTAP.
+
+=head1 SYNOPSIS
+
+ use ASNMTAP::Asnmtap;
+
+ my $objectAsnmtap = ASNMTAP::Asnmtap->new (
+   _programName        => 'test-asnmtap.pl',
+   _programDescription => "Test ASNMTAP::Asnmtap",
+   _programVersion     => '3.002.003',
+   _programUsagePrefix => '[--commandLineOption]',
+   _programHelpPrefix  => "--commandLineOption ...",
+   _programGetOptions  => ['commandLineOption=s'],
+   _timeout            => 30,
+   _debug              => 1);
+
+ my $verbose = $objectAsnmtap->getOptionsArgv ('verbose');
+ print "getOptionsArgv: verbose = $verbose\n" if (defined $verbose);
+
+ my $dumpData = $objectAsnmtap->getOptionsArgv ('dumpData');
+ $objectAsnmtap->dumpData () if (defined $dumpData);
+
+ my $commandLineOption = $objectAsnmtap->getOptionsArgv ('commandLineOption');
+ print "getOptionsArgv : commandLineOption = $commandLineOption\n" if (defined $commandLineOption);
+
+=head1 DESCRIPTION
+
+Once Upon a Time in Belgium there was an ape called ...
+
+=head1 OVERVIEW OF CLASSES AND PACKAGES
+
+=head2 OVERVIEW OF CLASSES
+
+=over 4
+
+=item ASNMTAP::Asnmtap 
+
+Is an object-oriented Base Class to build modules that provides a nice object oriented interface for ASNMTAP.
+
+=over 4
+
+=item ENVIRONMENT
+
+=over 4
+
+=item PERL5LIB
+
+A colon-separated list of directories in which to look for Perl library files before looking in the standard library and the current directory.
+
+=item ASNMTAP_PERL5LIB
+
+A colon-separated list of directories in which to look for Perl library files before looking in the standard library and the current directory.
+
+=back
+
+=back
+
+=item ASNMTAP::Asnmtap::Applications
+
+Is a Perl module that provides a nice object oriented interface for ASNMTAP Applications
+
+Subclass of ASNMTAP::Asnmtap
+
+=item ASNMTAP::Asnmtap::Applications::CGI
+
+Is a Perl module that provides a nice object oriented interface for ASNMTAP CGI Applications
+
+Subclass of ASNMTAP::Asnmtap::Applications
+
+=item ASNMTAP::Asnmtap::Applications::Collector
+
+Is a Perl module that provides a nice object oriented interface for ASNMTAP Collector Applications
+
+Subclass of ASNMTAP::Asnmtap::Applications
+
+=item ASNMTAP::Asnmtap::Applications::Display
+
+Is a Perl module that provides a nice object oriented interface for ASNMTAP Display Applications
+
+Subclass of ASNMTAP::Asnmtap::Applications
+
+=item ASNMTAP::Asnmtap::Plugins
+
+This module that provides a nice object oriented interface for building ASNMTAP (http://asnmtap.citap.be) compatible plugins.
+
+Subclass of ASNMTAP::Asnmtap
+
+=item ASNMTAP::Asnmtap::Plugins::Nagios
+
+This module that provides a nice object oriented interface for building Nagios (http://www.nagios.org) compatible plugins.
+
+Subclass of ASNMTAP::Asnmtap::Plugins
+
+=back
+
+=head2 PACKAGES
+
+=over 4
+
+=item ASNMTAP::Time
+
+Is a Perl module that provides date and time functions used by ASNMTAP and ASNMTAP-based applications and plugins.
+
+=item ASNMTAP::Asnmtap::Plugins::IO
+
+Is a Perl module that provides IO functions used by ASNMTAP-based plugins.
+
+=item ASNMTAP::Asnmtap::Plugins::Mail
+
+Is a Perl module that provides Mail functions used by ASNMTAP-based plugins.
+
+=item ASNMTAP::Asnmtap::Plugins::Modem
+
+Is a Perl module that provides Modem functions used by ASNMTAP-based plugins.
+
+=item ASNMTAP::Asnmtap::Plugins::SOAP
+
+Is a Perl module that provides SOAP functions used by ASNMTAP-based plugins.
+
+=item ASNMTAP::Asnmtap::Plugins::WebTransact
+
+Is an object-oriented class for generating ASNMTAP-based plugins of Web Transactions.
+
+=item ASNMTAP::Asnmtap::Plugins::XML
+
+Is a Perl module that provides XML functions used by ASNMTAP-based plugins.
+
+=back
+
+=head1 OVERVIEW OF CONSTANTS
+
+ $APPLICATION       Application Monitoring
+ $BUSINESS          CITAP
+ $DEPARTMENT        Development
+ $COPYRIGHT         2003-2011
+ $SENDEMAILTO       alex.peeters@citap.be
+ $TYPEMONITORING    central # central or distributed
+ $RUNCMDONDEMAND    localhost # localhost or probe
+
+ $CAPTUREOUTPUT     1 # 1 -> capture_exec($system_action) or 0 -> system ($system_action)
+
+ $PREFIXPATH        /opt/asnmtap-3.001.xxx
+ $APPLICATIONPATH   $PREFIXPATH/applications
+ $PLUGINPATH        $PREFIXPATH/plugins
+ $LOGPATH           $PREFIXPATH/log
+ $PIDPATH           $PREFIXPATH/pid
+
+ $CHATCOMMAND       /usr/sbin/chat
+ $DIFFCOMMAND       /usr/bin/diff
+ $KILLALLCOMMAND    /usr/bin/killall
+ $PERLCOMMAND       /usr/bin/perl
+ $PPPDCOMMAND       /usr/sbin/pppd
+ $ROUTECOMMAND      /sbin/route
+ $RSYNCCOMMAND      /usr/bin/rsync
+ $SCPCOMMAND        /usr/bin/scp
+ $SSHCOMMAND        /usr/bin/ssh
+
+ %ERRORS            'OK'          => '0'
+                    'WARNING'     => '1'
+                    'CRITICAL'    => '2'
+                    'UNKNOWN'     => '3'
+                    'DEPENDENT'   => '4'
+                    'OFFLINE'     => '5'
+                    'NO TEST'     => '6'
+                    'NO DATA'     => '7'
+                    'IN PROGRESS' => '8'
+                    'TRENDLINE'   => '9'
+
+ %STATE             '0' => 'OK'
+                    '1' => 'WARNING'
+                    '2' => 'CRITICAL'
+                    '3' => 'UNKNOWN'
+                    '4' => 'DEPENDENT'
+                    '5' => 'OFFLINE'
+                    '6' => 'NO TEST'
+                    '7' => 'NO DATA'
+                    '8' => 'IN PROGRESS'
+                    '9' => 'TRENDLINE'
+
+ %TYPE              'REPLACE'       => '0'
+                    'APPEND'        => '1'
+                    'INSERT'        => '2'
+                    'COMMA_REPLACE' => '3' # <- reserved !!!
+                    'COMMA_APPEND'  => '4'
+                    'COMMA_INSERT'  => '5'
+
+=head1 CONFIG
+
+You can change the values for the CONSTANTS by use of an config file 'Asnmtap.cnf'.
+
+The default location for the config file is into the root for ASNMTAP-based applications and plugins '/opt/asnmtap'.
+
+With the environment variable ASNMTAP_PATH you can change the default location for ASNMTAP-based applications and plugins.
+
+=head2 Example Asnmtap.cnf
+
+ # SET ENVIRONMENT VARIABLES - - - - - - - - - - - - - - - - - - - - -
+ <ENV>
+     PATH               /usr/bin:/bin:/usr/sbin:/sbin
+     BASH_ENV
+     ENV
+ </ENV>
+
+ <SET>
+     PERL5LIB			/opt/asnmtap/cpan-shared/lib/perl5
+     MANPATH			/opt/asnmtap/cpan-shared/share/man
+     LD_LIBRARY_PATH	/opt/asnmtap/ssl/lib
+ </SET>
+
+ # Common variables  - - - - - - - - - - - - - - - - - - - - - - - - -
+ <COMMON>
+     APPLICATION        Application Monitoring
+     BUSINESS           CITAP
+     DEPARTMENT         Development
+     COPYRIGHT          2003-2011
+     SENDEMAILTO        alex.peeters@citap.be
+     TYPEMONITORING     central
+     RUNCMDONDEMAND     probe
+ </COMMON>
+
+ <COMMAND>
+     CHAT               /usr/sbin/chat
+     DIFF               /usr/bin/diff
+     KILLALL            /usr/bin/killall
+     PPPD               /usr/sbin/pppd
+     PERL               /usr/bin/perl
+     ROUTE              /sbin/route
+     RSYNC              /usr/bin/rsync
+     SCP                /usr/bin/scp
+     SSH                /usr/bin/ssh
+ </COMMAND>
+
+ <IO>
+     CAPTUREOUTPUT      1
+ </IO>
+
+ # -------------------------------------------------------------------
+ # DON'T TOUCH BELOW HERE UNLESS YOU KNOW WHAT YOU ARE DOING!
+ # -------------------------------------------------------------------
+
+ <SUBDIR>
+     APPLICATIONS       applications
+     PLUGINS            plugins
+     LOG                log
+     PID                pid
+     RUN                run
+ </SUBDIR>
+
+ # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item _programName
+
+required, scalar, the program name, default: 'NOT DEFINED'
+
+=item _programDescription
+
+required, scalar, the program description, default: 'NOT DEFINED'
+
+=item _programVersion
+
+required, scalar, the program version, default: '0.000.000'
+
+=item _programUsagePrefix
+
+optional, scalar, the program usage prefix, default: undef
+
+=item _programHelpPrefix
+
+optional, scalar, the program help prefix, default: undef
+
+=item _programUsageSuffix
+
+scalar, the program predifined usage suffix
+
+ [-v|--verbose <LEVEL>]
+ [-V|--version]
+ [-h|--help]
+ [--usage]
+ [--dumpData]
+
+=item _programHelpSuffix
+
+scalar, the program predifined help suffix
+
+ -v, --verbose=<LEVEL>
+    0: single line, minimal output.
+    1: single line, additional information
+    2: multi line, configuration debug output
+    3: lots of detail for plugin problem diagnosis
+ -V, --version
+    Report version
+ -h, --help
+    Display the help message
+ --usage
+    Display the short usage statement
+ --dumpData
+    Display the stringified data structures from the current object
+
+=item _programGetOptions
+
+array, the program command line option specifier defines the name of the predefined and optionally options
+
+predifined: 'verbose|v:i', 'vervion|V', 'help|h', 'usage', 'dumpData'
+
+=item _getOptionsArgv
+
+scalar, the program command line entered options returned values (the equivalent of the assignment)
+
+=item _getOptionsValues
+
+there are no get options values defined for ASNMTAP::Asnmtap
+
+=item _getOptionsType
+
+there are no get options types defined for ASNMTAP::Asnmtap
+
+=item _debug
+
+set object debuging on or off
+
+scalar, 0 set 'debug off' (default) and 1 set 'debug on'
+
+=back
+
+=head1 METHODS
+
+=head2 Object accessor methods
+
+=over 4
+
+=item programName()
+
+=over 4
+
+=item Arguments (optional)
+
+scalar, program name
+
+=item Function
+
+Set and/or get the program name
+
+=back
+
+=item programDescription()
+
+=over 4
+
+=item Arguments (optional)
+
+scalar, program description
+
+=item Function
+
+Set and/or get the program description
+
+=back
+
+=item programVersion()
+
+=over 4
+
+=item Arguments (optional)
+
+scalar, program version
+
+=item Function
+
+Set and/or get the program version
+
+=back
+
+=item getOptionsArgv()
+
+=over 4
+
+=item  Arguments
+
+item: scalar, get option argv
+
+=item Function
+
+Get the get options argv for item
+
+=item Return
+
+returned the get option argv value or undef when item doesn't exist
+
+=item Example
+
+ my $objectAsnmtap = ASNMTAP::Asnmtap->new (
+   ...
+   _programUsagePrefix => '[--dumpData] [--commandLineOption]',
+   _programHelpPrefix  => "--dumpData ...
+ --commandLineOption ...",
+   _programGetOptions => ['dumpData', 'commandLineOption=s'],
+   ...
+ );
+
+ my $dumpData = $objectAsnmtap->getOptionsArgv('dumpData');
+
+ my $commandLineOption = $objectAsnmtap->getOptionsArgv('commandLineOption');
+
+=back
+
+=item getOptionsValue()
+
+=over 4
+
+=item Arguments
+
+item: scalar, get option value
+
+=item Function
+
+Get the option value for item
+
+=item Return
+
+returned the get option value or undef when item doesn't exist
+
+=back
+
+=item getOptionsType()
+
+=over 4
+
+=item Arguments
+
+item: scalar, get option type
+
+=item Function
+
+Get the option type for item
+
+=over 4
+
+=item Supported items for ASNMTAP::Asnmtap are
+
+status, asnmtapEnv, onDemand, logging, debugfile and debug
+
+=item Supported items for ASNMTAP::Asnmtap::Plugins are
+
+timeout, trendline, environment, proxy, host, url, port, community, username, password, filename, interval, loglevel, year, quarter, month, warning and critical
+
+=item Supported items for ASNMTAP::Asnmtap::Plugins::Nagios are
+
+ostype and metric
+
+=back
+
+=item Return
+
+returned the get option type (':' or '=') or undef when item doesn't exist
+
+=back
+
+=item debug()
+
+=over 4
+
+=item Arguments (optional)
+
+scalar, 0 = debug off and 1 = debug on
+
+=item Function
+
+Set and/or get package ASNMTAP::Asnmtap debug value
+
+=back
+
+=back
+
+=head2 Class accessor methods
+
+=over 4
+
+=item dumpData()
+
+=over 4
+
+=item Arguments (optional)
+
+debug, scalar
+
+=item Function
+
+Stringified the data structures from the current object when _debug => 1 or argument debug = 1
+
+=back
+
+=back
+
+=head2 Utility methods
+
+=over 4
+
+=item printRevision()
+
+=over 4
+
+=item Arguments (optional)
+
+exit: scalar, 1
+
+=item Function
+
+Print revision function when command arguments are -V or --version
+
+=item Return
+
+exit 'UNKNOWN' when exit argument exists for ASNPTAP::Plugins and inherits, otherwise exit 0
+
+=back
+
+=item printUsage()
+
+=over 4
+
+=item Arguments (optional)
+
+usage: scalar, description
+
+=item Function
+
+Print usage function
+
+=item Return
+
+exit 'UNKNOWN' when usage argument exists for ASNPTAP::Plugins and inherits, otherwise exit 0
+
+=back
+
+=item printHelp()
+
+=over 4
+
+=item Arguments (none)
+
+=item Function
+
+Print help function when command arguments are -h or --help
+
+=item Return
+
+exit 'UNKNOWN' for ASNPTAP::Plugins and inherits, otherwise exit 0
+
+=back
+
+=item call_system()
+
+=over 4
+
+=item Arguments
+
+command, scalar
+
+=item Function
+
+system call for command
+
+=item Return
+
+returns success, stdout and stderr
+
+=back
+
+=back
+
+=head1 EXPORT
+
+=head2 TAGS
+
+=over 4
+
+=item *
+
+ALL
+
+  $APPLICATION $BUSINESS $DEPARTMENT $COPYRIGHT $SENDEMAILTO $TYPEMONITORING $RUNCMDONDEMAND
+  $CAPTUREOUTPUT
+  $PREFIXPATH $APPLICATIONPATH $PLUGINPATH $LOGPATH $PIDPATH $PERL5LIB $MANPATH $LD_LIBRARY_PATH
+  $CHATCOMMAND $DIFFCOMMAND $KILLALLCOMMAND $PERLCOMMAND $PPPDCOMMAND $ROUTECOMMAND $RSYNCCOMMAND $SCPCOMMAND $SSHCOMMAND
+  %ERRORS %STATE %TYPE
+
+=item *
+
+ASNMTAP
+
+  $APPLICATION $BUSINESS $DEPARTMENT $COPYRIGHT $SENDEMAILTO $TYPEMONITORING $RUNCMDONDEMAND
+  $CAPTUREOUTPUT
+  $PREFIXPATH $LOGPATH $PIDPATH $PERL5LIB $MANPATH $LD_LIBRARY_PATH
+  %ERRORS %STATE %TYPE
+
+=item *
+
+COMMANDS
+
+  $CHATCOMMAND $DIFFCOMMAND $KILLALLCOMMAND $PERLCOMMAND $PPPDCOMMAND $ROUTECOMMAND $RSYNCCOMMAND $SCPCOMMAND $SSHCOMMAND
+
+=item *
+
+APPLICATIONS
+
+  $APPLICATIONPATH
+
+=item *
+
+PLUGINS
+
+  $PLUGINPATH
+
+=back
+
+=head1 AUTHOR
+
+Alex Peeters [alex.peeters@citap.be]
+
+=head1 SEE ALSO
+
+ASNMTAP::Time
+
+ASNMTAP::Asnmtap::Applications, ASNMTAP::Asnmtap::Applications::CGI, ASNMTAP::Asnmtap::Applications::Collector, ASNMTAP::Asnmtap::Applications::Display
+
+ASNMTAP::Asnmtap::Plugins, ASNMTAP::Asnmtap::Plugins::Nagios
+
+ASNMTAP::Asnmtap::Plugins::IO, ASNMTAP::Asnmtap::Plugins::Mail, ASNMTAP::Asnmtap::Plugins::Modem, ASNMTAP::Asnmtap::Plugins::SOAP, ASNMTAP::Asnmtap::Plugins::WebTransact, ASNMTAP::Asnmtap::Plugins::XML
+
+=head1 DEPENDENCIES
+
+  Carp
+  Config::General
+  Data::Dumper 
+  Dumpvalue
+  Getopt::Long
+  IO::CaptureOutput
+  Test::Pod::Coverage
+  Test::Simple
+  Time::Local
+
+=head1 COPYRIGHT NOTICE
+
+(c) Copyright 2000-2011 by Alex Peeters [alex.peeters@citap.be],
+                        All Rights Reserved.
+
+ASNMTAP is based on 'Process System daemons v1.60.17-01', Alex Peeters [alex.peeters@citap.be]
+
+ Purpose: CronTab (CT, sysdCT),
+          Disk Filesystem monitoring (DF, sysdDF),
+          Intrusion Detection for FW-1 (ID, sysdID)
+          Process System daemons (PS, sysdPS),
+          Reachability of Remote Hosts on a network (RH, sysdRH),
+          Rotate Logfiles (system activity files) (RL),
+          Remote Socket monitoring (RS, sysdRS),
+          System Activity monitoring (SA, sysdSA).
+
+'Process System daemons' is based on 'sysdaemon 1.60' written by Trans-Euro I.T Ltd
+
+=head1 LICENSE
+
+This ASNMTAP CPAN library and Plugin templates are free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+The other parts of ASNMTAP may be used and modified free of charge by anyone so long as this copyright notice and the comments above remain intact. By using this code you agree to indemnify Alex Peeters from any liability that might arise from it's use.
+
+Selling the code for this program without prior written consent is expressly forbidden. In other words, please ask first before you try and make money off of my program.
+
+Obtain permission before redistributing this software over the Internet or in any other medium. In all cases copyright and header must remain intact.
+
+=cut

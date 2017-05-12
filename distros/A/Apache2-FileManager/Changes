@@ -1,0 +1,95 @@
+Revision history for Perl extension Apache::FileManager.
+
+0.01  Thu Jun 20 07:17:25 2002  Philip Collins
+  - original version; created by h2xs 1.20 with options
+  -AX -n Apache::FileManager
+
+0.02  Fri Jun 21 10:30:55 2002  Philip Collins
+  - made javacript control cut / copy buffer so module user does not 
+    need to call the constructor before sending the header anymore.
+  - added rsync functionality
+  - checked for null filenames with javascript in rename and mkdir actions
+  - updated documentation
+
+0.03  Fri Jun 21 11:00:11 2002  Philip Collins
+  - added prerequisite modules to 'PREREQ_PM' in Makefile.PL.
+
+0.04  Fri Jun 21 04:30:00 2002 Philip Collins
+  - let user upload filenames with dashes in them.
+  - show javascript not enabled warning message
+  - show cookies not enabled warning message 
+  - alert user when trying to copy, or cut 0 selected files.
+  - got rid of stringify & destringify functions as well as
+    MIME::Base64 and Storable libs since they aren't used anymore.
+  - added confirm dialog to 'go live!' button.
+  - bold faced path location to make it more noticable.
+  
+0.05  Tues Jun 25 08:00:00 2002 Philip Collins
+  - fixed javascript checkbox array bug occuring when only 0 or 1 files 
+    were in a single directory.
+  - copy/cut buffer now is erased after pasting files.
+  - show alert when nothing to paste.
+
+0.06  Fri Jun 28 08:05:20 Philip Collins
+  - Add perl module prerequisite documentation (request from Hardy)
+  - Add prerequisite Apache::File in use statment and makefile.
+  
+0.07  Fri Jun 28 14:25:20 Philip Collins
+  - abstracted OO interface see included pod doc for more information.
+
+0.08 Monday July 8 18:12:30 Philip Collins
+  - Fixed DOCUMENT_ROOT view file bug.
+
+0.09 Monday July 8 18:30:30 Philip Collins
+  - Made rsync button show only when rsync is configured
+
+0.10 Tuesday July 9 14:10:24 Philip Collins
+  - disabled warnings
+  - forced oo call to handler in Apache::FileManager 
+
+0.11 Wed July 10 12:20:21 Philip Collins
+  - Added a 'Are you sure' confirm box to delete button.
+
+0.12 Wed July 10 14:32:21 Hardy Merrill
+  - display file "type" next to filename. (similar to ls -F)
+  - Updated delete confirm box message.
+  - added go to previous directory (..) control
+
+0.13 Thur July 11 14:32:21 Philip Collins
+  - updated the documentation
+
+0.14 Thur July 11 17:15:10 Philip Collins
+  - updated look of application
+  - added the beginnings of the help section
+  - used CSS tags to to hovering underline
+  - enlarged the file upload path boxes to 40 (Hardy)
+
+0.15 Friday July 12 20:50:02 Philip Collins
+  - changed `go live!` to `synchronize`
+  - email File::NCopy author to fix empty directory copy
+  - fixed cut count so it can be > 1
+  - Added Help Section
+
+0.16 Philip Collins
+  - Added close button to upload window
+  - cleaned up the documentation a bit
+
+0.17 Philip Collins 
+  - added return declined stmt if we see nossi param
+
+0.18 Tue Nov 19 15:00 Philip Collins 
+  - fixed extract to report error when trying to extract invalid archives
+  - Apache::Util::escape_html on all files names
+  - added ability to mass select and deselect shown files
+  - added ability to edit and preview edited files
+  - added error message for rename and edit operation when selected filed != 1
+  - fixed bad error after canceling a rename file dialog then refreshing
+  - print error dialog when trying to create blank directory name
+  - added time to date stamp
+
+0.19 Philip Collins
+  - prevented file edit screen from opening when cancel is clicked when creating new filenames
+  - fixed up documentation
+
+0.20 David Aguilar
+  - Updated to Apache2/mod_perl2

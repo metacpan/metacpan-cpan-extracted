@@ -1,0 +1,40 @@
+Model:
+category | P(category)       
+---+---
+play=no  | 0.357142857142 
+play=yes | 0.642857142857 
+---+---
+
+category | humidity | P( humidity | category )                                
+---+---+---
+play=no  | real     | Gaussian(mean=86.2,stddev=9.731392500562)             
+---+---+---
+play=yes | real     | Gaussian(mean=79.111111111111,stddev=10.215728613814) 
+---+---+---
+
+category | outlook  | P( outlook | category ) 
+---+---+---
+play=no  | rainy    | 0.4                     
+play=no  | sunny    | 0.6                     
+---+---+---
+play=yes | overcast | 0.444444444444       
+play=yes | rainy    | 0.333333333333       
+play=yes | sunny    | 0.222222222222       
+---+---+---
+
+category | temperature | P( temperature | category )                 
+---+---+---
+play=no  | real        | Gaussian(mean=74.6,stddev=7.893034904268) 
+---+---+---
+play=yes | real        | Gaussian(mean=73,stddev=6.164414002968)   
+---+---+---
+
+category | windy | P( windy | category ) 
+---+---+---
+play=no  | FALSE | 0.4                   
+play=no  | TRUE  | 0.6                   
+---+---+---
+play=yes | FALSE | 0.666666666666     
+play=yes | TRUE  | 0.333333333333     
+---+---+---
+

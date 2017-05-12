@@ -1,0 +1,32 @@
+Revision history for App-Jawk
+This file is created manually to describe changes to App::Jawk.
+
+See ChangeLog for detailed record of individual changes from the source control system.
+0.10    2012-12-17
+        Remove MYMETA.yml and MYMETA.json from source dzil code.
+        Use more automated dzil tests.
+0.09    2012-12-17
+        Move perldocs from Jawk.pm to bin/jawk
+0.08    2012-12-16
+        Fix version in bin/jawk and lib/App/Jawk.pm
+0.06    2012-12-16
+        Complete pod moved from bin/jawk to lib/App/Jawk.pm
+0.05    2012-12-16
+        Documentation changes.
+        Move to using Dist::Zilla for builds and releases.
+0.04    2011-04-19
+        Rewrote how we handle ranges and negative indexes.
+        Rewrote how we handle inverted fields.  
+        Optimized how we convert field numbers to text.
+        Documentation and comment changes.
+        Test t/jawk.t added.
+0.03    2011-04-16
+        Corrections to t/00-load.t
+        Newline mode removed.
+        Not released.  
+0.02    2011-04-13
+        Actually install the script from bin/jawk.
+        Removed lib/App/Jawk.pm
+0.01    2011-04-13
+        First version, released on an unsuspecting world.
+

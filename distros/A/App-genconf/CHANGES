@@ -1,0 +1,103 @@
+==================================================
+Changes from 2012-11-07 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.006 at 2013-11-07 06:09:38 +0000
+------------------------------------------
+
+  Change: 68187ad4f2ffc06884a60291cd3f2393d76955ac
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-07 00:09:22 +0000
+
+    Idiot 
+
+  Change: e3d38511d96c18bdfae8bdd897d5bc316f54b62f
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-07 00:04:19 +0000
+
+    Use File::Find to get templates
+
+    Update formatting, update POD 
+
+  Change: 1699835bebbd39c87551cca219dd6568cb9fa645
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-06 22:27:27 +0000
+
+    Clean up POD, add Try::Tiny 
+
+  Change: 64b4ffaace7bff091bf07bd38519dc247c79dad2
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-06 21:20:57 +0000
+
+    Idiot 
+
+------------------------------------------
+version 0.005 at 2013-11-06 16:13:29 +0000
+------------------------------------------
+
+  Change: 32517f67ce7d9f8b65550e6a463ecf3289b29079
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-06 10:13:29 +0000
+
+    Update POD, no funtional changes 
+
+  Change: 37381e78dacad1c068dc97f153fdd423d981db71
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-06 00:44:42 +0000
+
+    Add file output to app 
+
+  Change: 14cf8e6995f4d715ef5ab0f708e54031055945c2
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-06 00:44:26 +0000
+
+    Remove test file 
+
+------------------------------------------
+version 0.004 at 2013-11-06 06:01:36 +0000
+------------------------------------------
+
+  Change: a20c3f3ad82cb51459b4874b62303e05c9575ef3
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-06 00:01:36 +0000
+
+    Add file/dir argument 
+
+------------------------------------------
+version 0.003 at 2013-11-06 05:17:23 +0000
+------------------------------------------
+
+  Change: 15b4e043bc95d9a0c97a522ef3a57ef77c3d4340
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-05 23:17:23 +0000
+
+    Add new gitignore with build dir 
+
+  Change: 4b3d0b9eeda4b614df2ddb24a96dcc5b947ba44f
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-05 23:14:55 +0000
+
+    Fix app name in dist.ini 
+
+  Change: c26250c15745b7526264678eef03e6ea87af0d76
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-05 23:14:39 +0000
+
+    Add POD to genconf module 
+
+  Change: 61a8b1d5d6befdcd33e7abce61e8bde19b9c6f27
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-05 23:14:15 +0000
+
+    Add PODNAME directive to genconf script 
+
+  Change: 736c32222f5919981ca680d5b47dbc64045d0096
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-05 22:42:19 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

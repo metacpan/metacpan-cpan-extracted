@@ -1,0 +1,43 @@
+NAME
+    tlsme - TLS/SSL proxy
+
+SYNOPSIS
+    tlsme [options]
+
+    Options:
+
+        --help            brief help message
+
+        --listen          listen on (default 0.0.0.0:443)
+        --backend         backend address or path to unix socket (default 127.0.0.1:8080)
+
+        --backlog         backlog size (default 128)
+
+        --cert_file       path to certificate file (may contain a private key too)
+        --key_file        path to private key file
+        --cert_password   certificate password (promts unless value provided)
+
+        --method          protocol parser to use ("SSLv2" | "SSLv3" | "TLSv1" | "any")
+        --cipher_list     list of ciphers to use ("AES:ALL:!aNULL:!eNULL:+RC4:@STRENGTH")
+
+        --protocol        underlying protocol ("raw" | "http")
+
+        --user            drop privileges to user (ID or name)
+        --group           drop privileges to group (ID)
+
+        --log_file        path to log file
+        --debug           debug mode
+
+        --daemonize       daemonize (--log_file is required)
+        --pid_file        PID file
+
+    When option "cert_file" is omitted default testing certificate is used.
+
+DESCRIPTION
+    TLS/SSL proxy in front of the application creates a transparent
+    encryption tunnel.
+
+HEADERS
+    When using "http" protocol HTTP headers "X-Forwarded-For" and
+    "X-Forwarded-Proto" are added to the requests with corresponding values.
+

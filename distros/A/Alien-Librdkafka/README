@@ -1,0 +1,24 @@
+NAME
+
+Alien::Librdkafka
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2016, 2017 Pavel Shaydo
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+For librdkafka license and copyright check L<https://github.com/edenhill/librdkafka>

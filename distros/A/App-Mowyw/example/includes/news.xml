@@ -1,0 +1,14 @@
+<root>
+    <news>
+        <date>2008-04-10</date>
+        <headline>Mowyw now comes with data sources</headline>
+        <msg>Mowyw now has data sources and iterators, which make it easy to
+        get data out of XML, YAML and (presumably) SQL.</msg>
+    </news>
+    <news>
+        <date>2008-04-01</date>
+        <headline>Get Mowyw[TM] now - cheaper than ever!</headline>
+        <msg>The Mowyw[TM] Professional[R] packages is now available for only
+        USD 250. Send me an email for details!</msg>
+    </news>
+</root>

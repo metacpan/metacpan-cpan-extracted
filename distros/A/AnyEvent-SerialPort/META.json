@@ -1,0 +1,62 @@
+{
+   "abstract" : "AnyEvent::Handle subclass for serial ports",
+   "author" : [
+      "Mark Hindess <soft-cpan@temporalanomaly.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-SerialPort",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::Handle" : "0",
+            "Carp" : "0",
+            "Device::SerialPort" : "0",
+            "Fcntl" : "0",
+            "Symbol" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/beanz/anyevent-serialport-perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/beanz/anyevent-serialport-perl.git",
+         "web" : "https://github.com/beanz/anyevent-serialport-perl"
+      }
+   },
+   "version" : "1.130171"
+}
+

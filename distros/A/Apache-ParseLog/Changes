@@ -1,0 +1,12 @@
+Revision history for Perl extension Apache::ParseLog.
+
+1.02  Sat Oct 17 02:05:23 CDT 1998
+   - Fixed the bug of querystring data collection
+	 (reported by Robert Duarte <Robert.Duarte@East.Sun.COM>)
+
+1.01  Thu Oct  1 01:31:43 CDT 1998
+   - getCustomLog(<standard_traditional_agent_log>) regex fix
+
+1.00  Fri Sep 25 09:14:32 CDT 1998
+   - The original version, initial release
+

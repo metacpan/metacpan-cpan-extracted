@@ -1,0 +1,18 @@
+<h1>[% c.app.title %]</h1>
+
+Available datasources :
+
+
+[%# TODO: use a Tree Navigator %]
+
+<table>
+
+[% FOREACH source IN data.keys.sort %]
+<tr>
+  <td><a href="[% base %][% source %]/schema/tablegroups">[% source %]</a></td>
+  <td><em>[% data.$source.descr %]</em></td>
+</tr>
+
+[% END; # FOREACH source IN data.keys.sort %]
+
+</table>

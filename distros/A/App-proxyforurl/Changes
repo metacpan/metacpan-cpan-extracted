@@ -1,0 +1,21 @@
+Revision history for perl distribution App-proxyforurl
+
+0.06 2016-12-11T09:53:45+0100
+ - Fix dnsDomainIs() should not use a regex matcher #2
+
+0.05 2016-11-13T18:02:19+0100
+ - Fix dnsDomainIs() for domains containing dot "." #1
+
+0.04 2016-04-17T11:34:41+0200
+ - Fix dnsDomainIs() test
+
+0.03 2015-08-10T15:47:47+0200
+ - Fix isPlainHostName() test
+
+0.02 2015-08-09T18:30:45+0200
+ - Fix link to demo
+ - More padding between form fields
+ - Bigger editor
+
+0.01 2015-08-09T18:10:51+0200
+ - Add script/proxyforurl

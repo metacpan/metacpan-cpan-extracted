@@ -1,0 +1,81 @@
+body {
+  font-family: "Helvetica Neue", "Nimbus Sans L", "Liberation Sans", "Arial", sans-serif;
+  color: #404040;
+}
+
+/* Make the structure of articles obvious  */
+
+article {
+  padding: 0 1em;
+  margin: 0 -1em;
+}
+
+article header,
+article footer,
+article section {
+  padding: 1em;
+  margin: 1em -1em;
+  background-color: #ffffff;
+  background: rgba(255,255,255,0.5);
+}
+
+article header {
+  color: #f8f8f8;
+  color: rgba(255,255,255,0.75);
+  background-color: #202020;
+  background: rgba(0,0,0,0.75);
+  padding: 1em;
+  margin: 1em -1em;
+}
+
+article footer {
+  color: #808080;
+  padding: 1em;
+  margin: 1em -1em;
+  background-color: #ffffff;
+  background: rgba(255,255,255,0.5);
+}
+
+article footer>*{
+  font-size: 0.8em;
+}
+
+article h1 {
+  /* Tasteful use of TNR */
+  font-family: "Times", "Nimbus Roman No9 L", "Times New Roman", serif;
+  font-weight: normal;
+  letter-spacing: 0.05em;
+  margin: 0;
+  padding: 0;
+}
+
+header + .article-summary,
+.article-summary + footer {
+  margin-top: -1em;
+}
+
+/* Make the background slightly more interesting */
+
+body {
+  background-color: #f4f4f4;
+  font-size: 1.2em;
+}
+
+.page-flow {
+  max-width: 60em;
+  margin: 1em auto;
+}
+
+.page-flow:before {
+  content: "articulate articulate articulate articulate articulate articulate";
+  position: fixed;
+  z-index:-1;
+  top: -400px;
+  left: -100px;
+  font-size: 780px;
+  line-height: 500px;
+  text-shadow: 40px 40px #e0e0e0;
+  color: #fff;
+  font-family: "Times", "Nimbus Roman No9 L", "Times New Roman", serif;
+  font-style: italic;
+}

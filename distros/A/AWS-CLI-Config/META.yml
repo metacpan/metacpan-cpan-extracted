@@ -1,0 +1,45 @@
+---
+abstract: 'Interface to access AWS CLI configs and credentials'
+author:
+  - 'YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AWS-CLI-Config
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  AWS::CLI::Config:
+    file: lib/AWS/CLI/Config.pm
+    version: '0.02'
+  AWS::CLI::Config::Profile:
+    file: lib/AWS/CLI/Config.pm
+requires:
+  Config::Tiny: '0'
+  Object::Tiny: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/key-amb/perl5-AWS-CLI-Config/issues
+  homepage: https://github.com/key-amb/perl5-AWS-CLI-Config
+  repository: git://github.com/key-amb/perl5-AWS-CLI-Config.git
+version: '0.02'
+x_authority: cpan:KEYAMB
+x_contributors:
+  - 'José Joaquín Atria <jjatria@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

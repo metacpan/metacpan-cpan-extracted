@@ -1,0 +1,481 @@
+Revision history for Perl module Alien::Base.
+
+0.041 2017-04-02 18:00:52 -0400
+  - Fix some minor metadata
+  - Require Alien-Base-ModuleBuild 0.040 to ensure the separated
+    version.
+
+0.040 2017-03-29 01:30:46 -0400
+  - Spin off Alien::Base::ModuleBuild into the separate distribution
+    Alien-Base-ModuleBuild
+  - Alien::Base::ModuleBuild is a prerequisite, but will be removed
+    on October 1, 2017, so you need to update your Build.PL so that
+    Alien::Base::ModuleBuild is a configure requires.
+
+0.038 2017-03-06 00:16:18 -0500
+  - Production release identical to 0.035_01 release
+
+0.037_02 2017-03-05 03:20:00 -0500
+  - Additional fixex for t/yy-system_installed.t
+
+0.037_01 2017-03-03 05:29:54 +1100
+  - cflags and cflags_static were flipped in 0.035_01 is now fixed
+    (should fix gh#183)
+
+0.036 2017-02-27 03:28:36 -0500
+  - Production release identical to 0.035_01 release
+
+0.035_01 2017-02-15 04:41:31 -0500
+  - Add support for Alien::Build (plicease #181)
+
+0.034 2017-02-15 04:30:35 -0500
+  - Fixed regression introduced in 0.032 which broke repos as array
+    reference
+
+0.032 2017-02-09 13:36:07 -0500
+  - Automatically add SSL modules as prereqs if we can tell with 
+    certainity that we will need to use HTTP::Tiny with SSL (plicease 
+    gh#178)
+  - Add environment override of repository settings (gh#180 nshp++)
+
+0.031 2017-01-28 08:11:06 -0500
+  - Production release identical to 0.030_02 release
+
+0.030_02 2017-01-25 06:25:26 -0500
+  - Added a version method to Alien::Base.
+  - Improved diagnostic when no files can be found on an attempted share install
+  - A number of documentation improvements, as well as several new FAQs
+  - Tests were failing on OpenBSD to do idiosyncratic pkg-config on that
+    platform.  There is now a work around in the test for these idiosyncrasies.
+
+0.030_01 Wed Nov 23, 2016
+  - Fix test suite to handle it when . is not in @INC
+
+0.030  Mon Oct 31, 2016
+  - Production release identical to 0.029_01 release
+
+0.029_01  Fri Oct 21, 2016
+  - Fixed example in documentation for ExtUtil::MakeMaker
+  - Fixed bug in test suite with where multiple users installing
+    AB could cause failures
+  - Added interface for overriding config.site variables
+    see alien_extra_site_config
+
+0.029  Thu Jun 16, 2016
+  - Production release identical to 0.028_01 release
+  - This is the "Happy Captain Picard Day" Release.
+
+0.028_01  Tue Jun 14, 2016
+  - Fixed bug where a colon (:) and equal sign (=) can confuse pkg-config
+    parser (dakkar++ gh#165)
+
+0.028  Mon Mar 14, 2016
+  - Production release identical to 0.027_03 release
+
+0.027_03  Wed Mar 9, 2016
+  - Updated documentation to recommend the use of Alien::Base::ModuleBuild
+    as a configure_requires.  PLEASE UPDATE YOUR Build.PL FILES!
+  - Fixed bug where missing trailing slash when used with exact_filename
+    would cause a failure (plicease gh#161, gh162)
+  - Documentation fix in FAQ (plicease gh#159,gh#160)
+  - Added compatability for Alien::Builder (plicease gh#158, see also gh#157)
+
+0.027_02  Sat Feb 27, 2016
+  - Fix bug where default ffi_name was incorrectly computed
+
+0.027_01  Fri Feb 19, 2016
+  - Deprecate %p
+  - Require Alien::CMake 0.07 as a minimum when used as alien_bin_requires
+    for Alien::Base compatability
+
+0.027  Thu Feb 4, 2016
+  - Production release identical to 0.026_02 release
+
+0.026_02  Mon Feb 1, 2016
+  - Fix test bug introduced in 0.026_01 where t/builder.t
+    would fail on Windows if Alien::MSYS was not installed.
+
+0.026_01  Mon Feb 1, 2016
+  - Added alien_env property to Alien::Base::ModuleBuild
+  - require HTTP::Tiny 0.044 for correct calculation of
+    relative URLs on may websites.
+
+0.026  Fri Jan 22, 2016
+  - For http, use base URL from index request when downloading
+    files (plicease gh#150, gh#151)
+
+0.025  Wed Jan 20, 2016
+  - Production release identical to 0.024_02 release
+
+0.024_02  Mon Jan 18, 2016
+  - Silenced warnings that can happen when multiple .pc files are included
+    with a package (salva++ gh#148)
+  - Fixed bug where verbose diagnostic could cause false positives
+    and false negatives for system libraries (salva++ gh#147, plicease gh#149)
+
+0.024_01  Tue Jan 12, 2016
+  - Use URI internally for improved support for GitHub as a source
+    (among others) (salva++ gh#144)
+
+0.024  Thu Jan 7, 2015
+  - Production release identical to 0.023_01 release
+
+0.023_01  Sat Jan 2, 2015
+  - Fixed a usually harmless but frequently annoying isssue where the
+    alien_install_commands were executed on every invocation of './Build',
+    './Build test', and './Build install' instead of just once as is
+    needed.  (plicease gh#141)
+  - Archive extraction can now be overridden with the alien_extract_archive
+    method in Alien::Base::ModuleBuild. (salva++ gh#142)
+  - Fixed bug with windows where using \ instead of / broke relocatable
+    installs.  (plicease gh#139)
+  - Promoted _env_do_system a public method named alien_do_system
+    (salva++ gh#143)
+
+0.023  Mon Sep 14, 2015
+  - Fixed typo in FAQ
+  - Updated FAQ Alien::gmake example to require Alien::gmake 0.11
+  - Otherwise a production release identical to the 0.22_01 release
+
+0.022_01  Fri Jul 31, 2015
+  - Add support for ALIEN_INSTALL_TYPE environment variable
+
+0.022  Mon Jul 20, 2015
+  - Correction for the section "How do I specify a minumum or exact version
+    requirement for packages that use pkg-config?" in the FAQ.
+
+0.021_01  Wed Jul 15, 2015
+  - Added a default %{pkg_config} helper
+  - Fixed bug introduced in 0.016_01 where using --destdir or $ENV{DESTDIR}
+    would break the "./Build install" command.
+
+0.021  Wed Jul 15, 2015
+  - Fixed bug where upgrading to 0.020 could break Alien modules installed
+    before the upgrade.  You do not need to re-install your Alien modules,
+    just upgrade to Alien::Base 0.021.
+
+0.020  Mon Jul 13, 2015
+  - Production release identical to 0.019_02 release
+
+0.019_02  Wed Jul 8, 2015
+  - Fixed bug where alien_provides_* options were not being honored when the
+    system provided the library (plicease gh#131)
+
+0.019_01  Mon Jul  6, 2015
+  - Improved documentation: added a FAQ at Alien::Base::FAQ
+  - Added helpers for source code builds see 
+    Alien::Base#alien_helper
+    and
+    Alien::Base::ModuleBuild::API#alien_helper
+    for details
+
+0.019  Fri Jun  5, 2015
+  - Production release identical to 0.018_02 release
+
+0.018_02  Wed Jun  3, 2015
+  - Fix test suite for Cygwin
+
+0.018_01  Tue May 26, 2015
+  - Added alien_arch option for non-homogeneous environments with shared @INC
+    (for example AFS) (plicease gh#119)
+
+0.018  Tue May 26, 2015
+  - alien_stage_install is now on by default
+    (first production release for this to be the case)
+
+0.017  Fri Apr 24, 2015
+  - Identical to 0.016_02 release, except alien_stage_install is
+    OFF by default (it was turned on for dev release 0.016_01,
+    and will be turned back on or after May 25).
+
+0.016_02  Fri Apr 24, 2015
+  - Fix bug where ConfigData.pm was not updated after install to blib
+    (plicease gh#121)
+
+0.016_01  Tue Apr 22, 2015
+  - alien_stage_install is now on by default
+
+0.016  Tue Apr 22, 2015
+  - Production release identical to 0.015_03 release
+
+0.015_03  Mon Apr 20, 2015
+  - Fixed bug related to absolute URL (polettix++ gh#116)
+
+0.015_02  Fri Apr 17, 2015
+  - On OS X use install_name_tool to more reliably relocate dynamic libraries
+    on that platform (plicease gh#115)
+
+0.015_01  Fri Apr 17, 2015
+  - Add alien_stage_install option for Alien::Base::ModuleBuild
+    see Alien::Base::ModuleBuild::API for details (plicease gh#114)
+  - alien_stage_install is default for PPM builds
+
+0.015  Tue Mar 17, 2015
+  - Production release identical to 0.014_01 release
+
+0.014_01  Fri Mar 13, 2015
+  - Generate config.site for autoconfigure source installs (plicease gh#113)
+
+0.014  Feb 25, 2015
+  - Production release identical to 0.012_01 release
+
+0.012_01  Feb 24, 2015
+  - Prefer and require PkgConfig.pm over pkg-config on 64 solaris
+    If pkg-config is used it will likely be giving flags for 32 bit libs
+    (plicease gh#110)
+  - Allow for relocation of Alien-Base based dists.
+    (plicease gh#111)
+
+0.012  Feb 22, 2015
+  - Fix bug introduced in 0.011 where bin_dir dies when install_type=system
+
+0.011  Feb 22, 2015
+  - Production release identical to 0.010_01 release
+
+0.010_01  Feb 21, 2015
+  - When installed from source (install_type=share) if the share directory is
+    missing it is now a fatal exception.  (plicease gh#108)
+
+0.010  Feb 17, 2015
+  - Production release identical to 0.009_04 release
+
+0.009_04  Feb 16, 2015
+  - Test fix for Microsoft Visual C++
+
+0.009_03  Feb 15, 2015
+  - Improved FFI support
+
+0.009_02  Feb 4, 2015
+  - Added diagnostics for Alien authors to help in diagnosing common configuration problems.
+
+0.009_01  Jan 27, 2015
+  - Added './Build alien_fakebuild' command which shows you what would be executed without actually doing it (plicease gh#102)
+
+0.009  Jan 27, 2015
+  - Production release identical to 0.008_01 release
+
+0.008_01  Jan 26, 2015
+  - Allow multiple argument system calls for alien_build_commands and alien_install_commands (plicease gh#103)
+
+0.008  Jan 16, 2015
+  - Production release identical to 0.007_01 release
+
+0.007_01  Jan 12, 2015
+  - Add support for https repositories (zmughal++ gh#98)
+
+0.007  Jan 8, 2015
+  - Production release identical to 0.006_03 release
+
+0.006_03  Jan 8, 2015
+  - (optional) inline tests now require Acme::Alien::DontPanic 0.010
+    older versions do not do a link test, and we want that type of failure reported there, not here
+
+0.006_02  Jan 7, 2015
+  - alien_bin_requires only become build_requires if Alien::Base::ModuleBuild determines
+    a source build is necessary (plicease gh#96)
+  - On MSWin32, Alien::MSYS is only injected a prereq if Alien::Base::ModuleBuild determines
+    a source build is necessary and autoconf is detected (plicease gh#96)
+
+0.006_01  Nov 14, 2014
+  - Add support for Alien::Base dynamic_libs method for system installs
+    (previously only share install was supported)
+    This adds FFI::CheckLib as a prereq.
+
+0.006  Oct 14, 2014
+  - Production release identical to 0.005_07 release
+
+0.005_07  Oct 13, 2014
+  - commands are printed as they are executed for easier debugging (plicease gh#91)
+  - c_compiler_required repository option (default on)
+
+0.005_06  Sep 30, 2014
+  - ExtUtils::Depends integration (plicease gh#85, gh#87)
+  - added alien_check_built_version method to Alien::Base::ModuleBuild (plicease gh#83, gh#89)
+
+0.005_05  Sep 29, 2014
+  - fix regression in test on MSWin32 introduced in 0.005_04
+
+0.005_04  Sep 28, 2014
+  - added alien_bin_requires property to Alien::Base::ModuleBuild (plicease gh#84, gh#88)
+  - added alien_msys property to Alien::Base::ModuleBuild (plicease gh#86)
+
+0.005_03  Sep 23, 2014
+  - Inline tests requires Inline 0.56 (skip elsewise)
+  - Document Inline 0.56 or better required for Inline integration
+
+0.005_02  Sep 23, 2014
+  - silence Archive::Extract deprecation warning
+    (we explicitly specify it as a prereq)
+  - remove accidental undeclared dependency on YAML introduced in 0.005_01
+  - fixed test failures introduced in 0.005_01
+
+0.005_01  Sep 22, 2014
+  - fixes with static library detection when pkg-config is not available (plicease gh#79, gh#75)
+  - support for Inline 'with' (plicease gh#71, gh#77, gh#78)
+  - fix prereqs for Text::ParseWords and PkgConfig (plicease gh#73, gh#70)
+
+0.005  Sep 11, 2014
+  - improved documentation coverage
+
+0.004_05  Sep 09, 2014
+  - additional use / instead of \ on MSWin32 (plicease gh#68)
+
+0.004_04  Sep 09, 2014
+  - fixed test error introduced in 0.004_03 expressed on cygwin (plicease gh#67)
+
+0.004_03  Sep 09, 2014
+  - added support for destdir (plicease gh#65, gh#39)
+  - no longer attempt to dl_load static libraries, which aside from being
+    wrong was triggering a dialog warning in windows (plicease gh#64)
+  - use / instead of \ on MSWin32 (plicease gh#64)
+
+0.004_02  Sep 04, 2014
+  - fixed MSWin32 specific bug introduced in 0.004_01 (plicease gh#59)
+  - use pure perl PkgConfig as an alternative to pkg-config if the latter
+    is not provided by operating system (plicease gh#61)
+  - support SHA-1/256 sum checks for downloads (vikasnkumar++ gh#33, gh#60)
+
+0.004_01  Sep 04, 2014
+  - Libraries in the share directory are preferred over the system library
+    if that is what was used during install of the Alien module (plicease++ gh#22)
+  - Better handling of paths on Windows (zmughal++ gh#41)
+  - Fix test failure when pkg-config is not available (mohawk2++ gh#44)
+  - Support for autotools on Windows (MSWin32, but not cygwin) (plicease++ gh#46)
+  - Alien::MSYS will be injected as a build_requires on Windows if autotools is detected
+  - "%c" can now be used as a platform independent way of running autotool based
+    "configure" script
+  - The new default for build uses "%c" instead of "%pconfigure"
+  - Added property alien_isolate_dynamic which allows an Alien author to
+    avoid using dynamic libraries when building XS modules (plicease gh#51)
+  - Added dynamic_libs which returns a list of dynamic libraries (.dll, .so or
+    .dylib depending on platform) which can be used for FFI modules (see FFI::Raw)
+    (plicease gh#51)
+  - Added support for LWP as an alternative to HTTP::Tiny (preaction++ gh#24)
+  - Added support for content-disposition HTTP header to determine correct filename
+    and determine format from that (rsimoes++ gh#27)
+  - By default run autotools style configure scripts with --with-pic and add
+    alien_autoconf_with_pic property to allow disabling that (plicease gh#47)
+
+0.004  Mar 5, 2014
+  - Added version token to the interpolator (MidLifeXis++)
+  - Fixed broken test (MidLifeXis++)
+
+0.003  Mar 3, 2013
+	- Added 'blib scheme' detection logic
+		- Improves Mac/CPANtesters compatibility
+		- Controlled by ALIEN_BLIB env var
+	- ACTION_alien is now ACTION_alien_code
+	- Added ACTION_alien_install
+	- Fix manual .pc file bug
+	- Unbuffer STDOUT during ACTION_alien_*
+
+0.002  Jan 27, 2013
+	- Added exact_filename key (giatorta++)
+	- Various bugfixes
+
+0.001_003  Nov 29, 2012
+	- Improved pkg-config handling
+	- Added support for pkg-config key ${pcfiledir}
+	- Note: released from "experimental" branch
+
+0.001_002  Nov 5, 2012
+	- Fixed some false positives in library detection
+	- Initialize temporary directories later
+	- Note: released from "experimental" branch
+
+0.001_001  Nov 4, 2012
+	- Improved library detection
+	- Library files are added to packlist
+	- Note: released from "packlist" branch
+
+0.001  Oct 9, 2012
+	- First Beta release!
+	- Documentation updated
+	- Better autogeneration of pkgconfig information (run4flat++)
+
+0.000_022  Oct 8, 2012
+	- Major refactoring
+		- separate alien_{x}_commands where x = build, test, install
+		- removed mac specific code
+		- no longer test provisioning (it never worked anyway)
+		- directly allow library to install to final share_dir destination
+	- Moved Alien::DontPanic and Ford::Prefect to CPAN under Acme:: namespaces
+
+0.000_021  Jul 25, 2012
+	- Some fixes for Mac, not sure its working yet
+
+0.000_020  Jun 22, 2012
+	- Windows now passes the test suite (another cleanup error trapped)
+	- Begin overloading copy_if_modified for relocalizing dylibs on mac 
+            (this is not working yet, this release is for windows testers)
+
+0.000_019  Jun 21, 2012
+	- REALLY return to EU::LibBuilder (sorry for the noise)
+
+0.000_018  Jun 21, 2012
+	- return to EU::LibBuilder
+
+0.000_017  May 6, 2012
+	- typo **faceplant**
+
+0.000_016  May 6, 2012
+	- remove dependence on EU::LibBuilder (Mac Bundle)
+	- t/zz-example.t shouldn't die on failure to cleanup
+	- Capture::Tiny needs some min version, using newest but perhaps less is ok
+
+0.000_015  May 2, 2012
+	- interpolation %x is current Perl interpreter ($^X)
+	- platform specific bugfixes
+
+0.000_014  May 1, 2012
+	- bugfix on dontpanic build chain (t/zz-example.t)
+
+0.000_013  Apr 30, 2012
+	- libdontpanic build chain should be more x-plat. Uses EU::LibBuilder
+
+0.000_012  Apr 29, 2012
+	- Simplified capture mechanism, this should prevent warnings from being suppressed
+	- Check the return status of alien_build, die if necessary
+
+0.000_011  Apr 25, 2012
+	- I'm starting to believe the bug is in the dontpanic library build chain
+	- Die on more warnings in that build chain. This won't fix anything,
+		but may show where the true problem lies
+
+0.000_010  Apr 24, 2012
+	- Prevent build process from cwd-ing from underneath us (hopefully)
+
+0.000_009  Apr 24, 2012
+	- Note: Released from 'dlopen' branch
+	- Uses new dynamic loading mechanism via DynaLoader
+
+0.000_008  Apr 11, 2012
+	- Prevent do_system from changing wd globally
+
+0.000_007  Apr 4, 2012
+	- Don't rebuild library on repeated M::B::dispatch
+	- More bugfixes
+
+0.000_006  Apr 3, 2012
+	- Yet anther bugfix(?) release 
+
+0.000_005  Apr 2, 2012
+	- Bugfix: A::B::PkgConfig _manual key shouldn't emit undef values
+
+0.000_004  Apr 2, 2012
+	- Don't mangle LD_RUN_PATH if system installed
+	- Bugfix related to dreaded '"Can't call method "keyword" on an undefined value' error
+	- Made t/yy-system_installed.t smarter on picking a library for testing
+
+0.000_003  Mar 18, 2012
+	- Require safer File::chdir
+	- Fixed "Bad File Descriptor" bug calling pkg-config
+
+0.000_002  Mar 18, 2012
+	- More documentation
+	- Smarter in handling user-provided pkg-config data
+	- Generates pkg-config data from file structure if not defined
+
+0.000_001  Mar 15, 2012
+	- Initial pre-alpha release, mostly to see CPANtesters results
+

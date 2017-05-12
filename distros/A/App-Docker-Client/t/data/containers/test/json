@@ -1,0 +1,177 @@
+ {
+        "Id": "a1dbb1a58c0dd76a463b1ec1e505071563f3a7c72d1a22627b6f31334ae6412f",
+        "Created": "2017-01-29T10:23:02.905533411Z",
+        "Path": "sh",
+        "Args": [
+            "-c",
+            "perl Makefile.PL \u0026\u0026 make test RELEASE_TESTING=1"
+        ],
+        "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2017-01-29T10:23:03.398423209Z",
+            "FinishedAt": "2017-01-29T10:23:04.9973486Z"
+        },
+        "Image": "sha256:c179044a571271aa6d98f435ae66d804082ead7776a8d7b861ef7b7a5b98cddd",
+        "ResolvConfPath": "/var/lib/docker/containers/a1dbb1a58c0dd76a463b1ec1e505071563f3a7c72d1a22627b6f31334ae6412f/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/a1dbb1a58c0dd76a463b1ec1e505071563f3a7c72d1a22627b6f31334ae6412f/hostname",
+        "HostsPath": "/var/lib/docker/containers/a1dbb1a58c0dd76a463b1ec1e505071563f3a7c72d1a22627b6f31334ae6412f/hosts",
+        "LogPath": "/var/lib/docker/containers/a1dbb1a58c0dd76a463b1ec1e505071563f3a7c72d1a22627b6f31334ae6412f/a1dbb1a58c0dd76a463b1ec1e505071563f3a7c72d1a22627b6f31334ae6412f-json.log",
+        "Name": "/Test",
+        "RestartCount": 0,
+        "Driver": "aufs",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "/home/user/App-Docker-Client:/app"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "default",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DiskQuota": 0,
+            "KernelMemory": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": -1,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0
+        },
+        "GraphDriver": {
+            "Name": "aufs",
+            "Data": null
+        },
+        "Mounts": [
+            {
+                "Source": "/home/user/App-Docker-Client",
+                "Destination": "/app",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "a1dbb1a58c0d",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Cmd": [
+                "sh",
+                "-c",
+                "perl Makefile.PL \u0026\u0026 make test RELEASE_TESTING=1"
+            ],
+            "Image": "mziescha/app-docker-client",
+            "Volumes": null,
+            "WorkingDir": "/app",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {}
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "3bfd0d9a5ef4fe23ebb993e42f58465a1a96cec0727bbc8eff24030e3ee55057",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": null,
+            "SandboxKey": "/var/run/docker/netns/3bfd0d9a5ef4",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "3dfc659fad8ea083c979121a2af148f530cbaee59749125ef39d9569683c5083",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": ""
+                }
+            }
+        }
+    }

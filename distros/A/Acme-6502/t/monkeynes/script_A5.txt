@@ -1,0 +1,33 @@
+clear
+power on
+regs
+
+# Normal condition ------------
+
+memset 0072 55
+op a5 72
+
+# Should be: ACC=55
+test acc = 55
+
+# Zero condition ------------
+power on
+
+memset 0072 00
+op a5 72
+
+# Should be: ACC=0, Z=1
+test acc = 0
+test z = 1
+
+# Negative condition ------------
+power on
+
+memset 0072 f2
+op a5 72
+
+# Should be: ACC=F2, S=1
+test acc = f2
+test s = 1
+
+save verify_A5.txt

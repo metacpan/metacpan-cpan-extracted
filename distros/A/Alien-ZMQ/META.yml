@@ -1,0 +1,29 @@
+---
+abstract: 'find and install libzmq, the core zeromq library'
+author:
+  - 'Charles McGarvey <ccm@cpan.org>'
+build_requires:
+  Module::Build: 0.40
+  Test::More: 0
+configure_requires:
+  Archive::Tar: 1.00
+  ExtUtils::CBuilder: 0.280205
+  IPC::Run: 0
+  LWP::Simple: 0
+  Module::Build: 0.40
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-ZMQ
+requires:
+  String::ShellQuote: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/chazmcgarvey/p5-Alien-ZMQ/issues
+  homepage: http://search.cpan.org/~ccm/Alien-ZMQ/
+  repository: git://github.com/chazmcgarvey/p5-Alien-ZMQ.git
+version: 0.06

@@ -1,0 +1,38 @@
+Revision history for App-Math-Trainer
+
+0.005	2014-11-11
+    - fix "Possible precedence issue with control flow operator"
+      (5.20 related)
+    - move from Module::Build to ExtUtils::MakeMaker
+
+0.004	2014-02-24
+    - fix a lot of issues reported by niederrhein.pm
+    - improve documentation
+    - refactoring for cleaner solution writing
+    - add exercise for comparing vulgar fractions
+    - add missing required modules
+    - add support for polynoms and power mathematics
+    - rename option --amount to --quantity
+    - introduce Math::Complex support
+    - add experimental chart support with recent LaTeX::Driver and
+      full working xelatex
+
+0.003	2014-01-15
+    - redesign of guessing exercise values
+    - introduce unit exercises
+    - reduce default amount of exercises
+    - add exercises for unit, power rules, natural & roman numbers
+
+0.002	2013-11-29
+    - convert from App::Cmd to MooX::Cmd and MooX::Options
+    - move to GitHub
+    - format Changes as per CPAN::Changes::Spec
+    - modifying default for range being open to [0:
+    - clean up repository
+    - improve solutions
+
+0.001_002	2010-11-28
+    - Fixing LaTeX a bit to generate nicer results
+
+0.001_001	2010-10-31
+    - First version, released on an unsuspecting world.

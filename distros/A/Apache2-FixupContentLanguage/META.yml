@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache2-FixupContentLanguage
+version:      0.01
+version_from: lib/Apache2/FixupContentLanguage.pm
+installdirs:  site
+requires:
+    Apache2::DebugLog:             0.03
+    Apache::Test:                  1.24
+    mod_perl2:                     1.999023
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

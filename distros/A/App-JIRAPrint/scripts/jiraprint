@@ -1,0 +1,176 @@
+#! /usr/bin/env perl
+
+#-*- mode: Perl -*-
+
+use lib 'lib';
+
+use strict;
+use warnings;
+
+use Log::Any qw/$log/;
+use Log::Any::Adapter;
+
+Log::Any::Adapter->set('Stderr', log_level => 'info' );
+
+use App::JIRAPrint;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my ($sprint, $project, $url, $username);
+
+my $verbose;
+my $help;
+my $output;
+
+GetOptions(
+    "sprint=s" => \$sprint,
+    "project=s" => \$project,
+    "url=s" => \$url,
+    "username=s" => \$username,
+    "verbose" => \$verbose,
+    "help" => \$help,
+    "output=s" => \$output,
+);
+
+if( $verbose ){
+    Log::Any::Adapter->set('Stderr' , log_level => 'trace' );
+}
+
+if( $help ){
+    Pod::Usage::pod2usage( -input => __FILE__ , -verbose => 2,
+                           -message => 'Generating help'
+                       );
+}
+
+unless( $sprint ){
+    $log->error("Missing --sprint options. Run jiraprint --help for more details");
+    exit(1);
+}
+
+
+my $j = App::JIRAPrint->new({
+    sprint => $sprint,
+    ( $project ? ( project => $project ) : () ),
+    ( $username ? ( username => $username ) : () ),
+    ( $url ? ( url => $url ) : () )
+});
+
+# Force config loading
+eval{
+    $j->config();
+};
+if( my $err = $@ ){
+    $log->error("Error in arguments or configuration: ".$err);
+    $log->error("Please run jiraprint --help");
+    exit(1);
+}
+
+unless( $output ){
+
+    binmode STDOUT, ':utf8';
+    print $j->process_template();
+}else{
+    open OUTPUT , '>' , $output;
+    binmode OUTPUT , ':utf8';
+    print OUTPUT $j->process_template();
+    close OUTPUT;
+    $log->info("XeTeX file written to $output. Now run xelatex $output to generate your PDF.");
+}
+
+__END__
+
+=head1 NAME
+
+jiraprint - Generate printable XeTeX code to print JIRA tickets on Postits
+
+=head1 INSTALLATION
+
+This is a standard Perl package. Install on system perl:
+
+  sudo cpan -i App::JIRAPrint
+
+Or in your cpanminus favorite destination:
+
+  cpanm App::JIRAPrint
+
+=head1 DEPENDENCY
+
+To process the generated LaTeX code into a usable PDF, you'll have
+to have a full TeXLive (or MacTeX) distribution on your machine.
+
+See L<https://www.tug.org/texlive/> Or  L<https://tug.org/mactex/>
+
+=head1 SYNOPSIS
+
+  jiraprint --project PROJ --sprint 52 --output proj-52.tex
+
+Then:
+
+  xelatex proj-52.tex
+
+You can also pipe directly from this to xelatex if you're lazy:
+
+ jiraprint --project PROJ --sprint 52 | xelatex
+
+This will create a pdf named 'texput.pdf'
+
+Note that the 'project' option is optional and can live in the configuration file.
+
+=head1 CONFIGURATION
+
+This script relies on configuration files and on command line options for its configuration.
+
+This will attempt to load three configuration files: C<$PWD/.jiraprint.conf> , C<$HOME/.jiraprint.conf> and C</etc/jiraprint.conf>.
+
+Each configuration files in in Perl format and can contain the following keys:
+
+  {
+    url => 'https://yourjira.domain.net/',
+    username => 'jirausername',
+    password => 'jirapassword',
+    project => 'PROJ',
+  }
+
+
+url, username and password have to be defined in config files.
+
+project can be specified in a config file, but overriden by the command line switch C<--project>
+
+Note that each level (going from /etc/, to $HOME, to $PWD) will override the precedent level.
+
+This allows you to define properties (like project) at project, user or global level. A typical setup is to define your project specific stuff
+in your project directory, your personnal login details in your C<$HOME/.jiraprint.conf> and the organisation wide URL at machine level (in /etc/jiraprint.conf).
+
+
+=head1 OPTIONS
+
+=over
+
+=item --project (-p) PROJ
+
+The name of the jira project. Typically a 4 letter uppercase identifier. Like C<PROJ> for instance.
+
+Mandatory in the config file(s) or in the command line.
+
+=item --sprint (-s) 52
+
+The number of the sprint to print tickets from. Mandatory in the command line.
+
+=item --url
+
+The root URL  of your jira project. For instance: C<https://company.atlassian.net/>. Mandatory in the config file(s) or on the command line.
+
+=item --username
+
+The username to connect as to pull the tickets. Mandatory in the config file(s) or on the command line.
+
+=back
+
+=head1 ABOUT
+
+Copyright Jerome Eteve 2015- jerome dot eteve at a well known email provider with a name that starts with 'g'.
+
+=for HTML <a href="https://travis-ci.org/jeteve/App-JIRAPrint"><img src="https://travis-ci.org/jeteve/App-JIRAPrint.svg?branch=master"></a>
+
+=cut

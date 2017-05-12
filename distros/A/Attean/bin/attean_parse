@@ -1,0 +1,179 @@
+#!/usr/bin/env perl
+
+use v5.14;
+use autodie;
+use strict;
+use warnings;
+use Getopt::Long;
+use Scalar::Util qw(blessed);
+use Time::HiRes qw(gettimeofday tv_interval);
+use Attean;
+use Try::Tiny;
+use open ':std', ':encoding(utf8)';
+
+unless (@ARGV) {
+	print <<"END";
+Usage: $0 -list
+       $0 -i IN_FORMAT [-o OUT_FORMAT] FILENAME
+
+END
+	exit;
+}
+
+my $verbose		= 0;
+my $pull		= 0;
+my $push		= 0;
+my $list		= 0;
+my $block_size	= 25;
+my $short		= 0;
+my %namespaces;
+my $in_format	= 'GUESS';
+my $out_format	= 'STRING';
+my $result	= GetOptions ("short" => \$short, "list" => \$list, "verbose" => \$verbose, "block=i" => \$block_size, "pull" => \$pull, "push" => \$push, "in=s" => \$in_format, "out=s" => \$out_format, "define=s" => \%namespaces, "D=s" => \%namespaces);
+
+if ($list) {
+	say "Parsers:";
+	say sprintf("- %s", s/^.*://r) for (sort Attean->list_parsers);
+	say "\nSerializers:";
+	say sprintf("- %s", s/^.*://r) for (sort Attean->list_serializers);
+	say '';
+	exit;
+}
+
+my $mapper	= $short ? Attean::TermMap->short_blank_map : undef;
+my $bmapper	= $short ? $mapper->binding_mapper : undef;
+
+unless (@ARGV) { push(@ARGV, '-') }
+
+while (defined(my $file = shift)) {
+	my $in	= $in_format;
+	my $out	= $out_format;
+	my $fh;
+	my $base;
+	if ($file eq '-') {
+		$fh		= \*STDIN;
+		$base	= Attean::IRI->new('file:///dev/stdin');
+	} else {
+		open( $fh, '<:encoding(UTF-8)', $file ) or die $!;
+		$base	= Attean::IRI->new('file://' . File::Spec->rel2abs($file));
+	}
+
+	my $out_io		= \*STDOUT;
+	$|				= 1;
+	my $parser;
+	my $map			= URI::NamespaceMap->new( \%namespaces );
+	if ($in eq 'GUESS') {
+		my $class	= Attean->get_parser( filename => $file ) // 'AtteanX::Parser::NTriples';
+		$parser		= $class->new( base => $base, namespaces => $map );
+	} else {
+		$parser		= Attean->get_parser($in)->new(namespaces => $map);
+	}
+	if ($out eq 'STRING') {
+		parse_to_string($parser, $fh);
+	} else {
+		my $sclass		= Attean->get_serializer($out) || die "*** No serializer found for format $out\n";
+		my $serializer	= $sclass->new(namespaces => $map);
+
+		try {
+			if ($pull) {
+				warn "# Pull parsing\n" if ($verbose);
+				pull_transcode($parser, $serializer, $fh, $out_io);
+			} elsif ($push) {
+				warn "# Push parsing\n" if ($verbose);
+				push_transcode($parser, $serializer, $fh, $out_io);
+			} elsif ($parser->does('Attean::API::PullParser')) {
+				warn "# Pull parsing\n" if ($verbose);
+				pull_transcode($parser, $serializer, $fh, $out_io);
+			} elsif ($parser->does('Attean::API::PushParser')) {
+				warn "# Push parsing\n" if ($verbose);
+				push_transcode($parser, $serializer, $fh, $out_io);
+			}
+		} catch {
+			my $e	= $_;
+			if (blessed($e) and $e->isa('Error::TypeTiny::Assertion')) {
+				my $type	= $e->type;
+				my $value	= $e->value;
+				my $class	= ref($value);
+				$class		=~ s/^.*:://;
+				if ($type->isa('Type::Tiny::Role')) {
+					my $role	= ($type->role =~ s/^.*:://r);
+					die "*** Cannot serialize a $class as a $role\n";
+				}
+				die "*** Failed to serialize a $class with parser $sclass\n";
+			}
+			die "$e\n";
+		};
+	}
+}
+
+sub fix_iter {
+	my $iter	= shift;
+	if ($bmapper) {
+		$iter	= $iter->map($bmapper);
+	}
+	return $iter;
+}
+
+sub parse_to_string {
+	my $parser		= shift;
+	my $fh			= shift;
+	my $iter		= fix_iter($parser->parse_iter_from_io($fh));
+	while (my $item = $iter->next) {
+		say $item->as_string;
+	}
+}
+
+sub pull_transcode {
+	my $parser		= shift;
+	my $serializer	= shift;
+	my $fh			= shift;
+	my $out_io		= shift;
+	warn "Pull parser\n" if ($verbose);
+	my $iter		= fix_iter($parser->parse_iter_from_io($fh));
+	$serializer->serialize_iter_to_io($out_io, $iter);
+}
+
+sub push_transcode {
+	my $parser		= shift;
+	my $serializer	= shift;
+	my $fh			= shift;
+	my $out_io		= shift;
+	warn "Push parser\n" if ($verbose);
+	if ($serializer->does('Attean::API::AppendableSerializer')) {
+		my $count	= 0;
+		my $start	= [gettimeofday];
+		my @queue;
+		my $handler	= sub {
+			my $triple	= shift;
+			if ($mapper) {
+				$triple	= $triple->apply_map($mapper);
+			}
+			$count++;
+			print STDERR "\r" if ($verbose);
+			
+			push(@queue, $triple);
+			if (scalar(@queue) > 1000) {
+				$serializer->serialize_list_to_io($out_io, @queue);
+				@queue	= ();
+			}
+			
+			if ($verbose and $count % $block_size == 0) {
+				my $elapsed	= tv_interval($start);
+				my $tps		= $count / $elapsed;
+				print STDERR sprintf("%6d (%9.1f T/s)", $count, $tps);
+			}
+		};
+		$parser->handler($handler);
+		$parser->parse_cb_from_io($fh);
+
+		# finish
+		$serializer->serialize_list_to_io($out_io, @queue);
+		my $elapsed	= tv_interval($start);
+		my $tps		= $count / $elapsed;
+		if ($verbose) {
+			print STDERR sprintf("\r%6d (%9.1f T/s)\n", $count, $tps);
+		}
+	} else {
+		pull_transcode($parser, $serializer, $fh, $out_io);
+	}
+}

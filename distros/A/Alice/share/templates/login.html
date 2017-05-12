@@ -1,0 +1,62 @@
+? my ($app, $dest, $error) = @_;
+<html>
+  <head>
+    <title>Use Alice Login</title>
+    <link rel="shortcut icon" href="<?= $app->static_url("favicon.ico") ?>">
+    <style type="text/css">
+      body {
+        text-align: center;
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 12px;
+        background: #eee;
+      }
+      form {
+        display: block;
+        width: 150px;
+        margin: 0 auto;
+        text-align: left;
+        background: #fff;
+        border: 8px solid #ccc;
+        padding: 20px;
+      }
+      input, label {
+        display: block;
+        width: 150px;
+      }
+      input {
+        margin-bottom: 15px;
+      }
+      input[type="submit"] {
+        font-size: 16px;
+        margin-bottom: 0;
+        margin-top: 30px;
+      }
+      .error {
+        color: #d00b0b;
+        display: block;
+        margin-top: 15px;
+      }
+    </style>
+    <link rel="apple-touch-icon" href="<?= $app->static_url("image/alice.png") ?>" />
+    <link rel="apple-touch-startup-image" href="<?= $app->static_url("image/alice.png") ?>" />
+    <meta name="viewport" content="width=device-width; initial-scale=1; maximum-scale=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+  </head>
+  <body>
+    <form action="/login" method="post">
+      <input type="hidden" name="dest" value="<?= $dest || "/" ?>" />
+
+      <label for="username">User Name:</label>
+      <input type="text" name="username" value="" id="username" />
+      
+      <label for="password">Password:</label>
+      <input type="password" name="password" value="" id="password" />
+      
+      <input type="submit" value="Log in" />
+      <? if ($error) { ?>
+      <span class="error"><?= $error ?></span>
+      <? } ?>
+    </form>
+  </body>
+</html>

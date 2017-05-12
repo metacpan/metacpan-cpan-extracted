@@ -1,0 +1,84 @@
+Revision history for Perl module AnyEvent::STOMP::Client.
+
+0.39  2014-02-12
+      - Made connect method of AnyEvent::STOMP::Client not die.
+      - Implemented on_error callback in AnyEvent::STOMP::Client::All.
+
+0.38  2014-01-15
+      - Implemented check for TLS context files in AnyEvent::STOMP::Client.
+      - Improved logging in AnyEvent::STOMP::Client::All.
+
+0.37  2014-01-03
+      - Implemented on_error in AnyEvent::STOMP::Client::Any.
+
+0.36  2013-11-29
+      - Implemented on_error in AnyEvent::STOMP::Client::Any.
+
+0.35  2013-11-27
+      - Backoff bugfix in AnyEvent::STOMP::Client::Any.
+
+0.34  2013-11-19
+      - Fixes in connection handling.
+      - AnyEvent::STOMP::Client: Added method on_transport_disconnected.
+      - AnyEvent::STOMP::Client::Any: Added method get_current_id.
+      - AnyEvent::STOMP::Client::All: Implemented send method.
+
+0.33  2013-11-11
+      - Fixed backoff mechanism in AnyEvent::STOMP::Client::All.
+      - Integrated Log::Any into AnyEvent::STOMP::Client::All.
+
+0.32  2013-11-07
+      - Fixes in Changes and Makefile.PL (reported by Neil Bowers).
+      - Connection handling improvements.
+      - Upgrade to AnyEvent version 7.05.
+
+0.31  2013-10-24
+      - Bugfixes and safety improvements.
+      - Added debug log messages.
+
+0.3   2013-10-18
+      - Integrated AnyEvent::STOMP::Client::All.
+      - Integrated AnyEvent::STOMP::Client::Any.
+      - Various bugfixes in connection handling.
+
+0.25a 2013-08-16
+      - Bugfixes in send_heartbeat method.
+
+0.25  2013-08-16
+      - Various bugfixes in connection handling.
+
+0.24  2013-05-31
+      - Fixed internal event handling and prevent outwards propagation.
+
+0.23  2013-05-28
+      - Bug and documentation fix for on_message subroutine.
+      - Various other bugfixes.
+
+0.22  2013-05-23
+      - Hotfix in connect subroutine to allow SSL/TLS connections.
+
+0.21  2013-05-22
+      - New callback on_connect_error.
+      - Various bugfixes.
+
+0.2   2013-05-20
+      - New callbacks on_send, on_ack, on_nack, on_connection_lost.
+      - Get/set subroutine for connection timeout margin added.
+      - New constructor subroutine, more subtle connection handling.
+
+0.11  2013-05-17
+      - Hotfixed too strict destination header checking.
+
+0.1   2013-05-14
+      - Fully implemented STOMP 1.2.
+      - Added SSL/TLS support.
+      - Documentation written.
+
+0.02  2013-05-06
+      - Improved STOMP MESSAGE parsing.
+      - Improved event and callback functionality.
+      - STOMP Heartbeating added.
+      - Ack, nack, subscribe and unsubscribe functions implemented.
+
+0.01  2013-05-03
+      - initial rudimentary version.

@@ -1,0 +1,106 @@
+1.004     2011-02-13 22:39:28 America/Toronto
+
+          Integrate version 1.01 of libjio
+
+          Convert package to Dist::Zilla
+
+          No longer generate passthrough Makefile.PL
+
+1.003     2009-10-04
+
+          Integrate version 1.00 of libjio
+
+          Builder.pm: minor changes
+          o Move File::Spec portability code into _chdir_or_die; call it
+            with a list containing the path to traverse
+          o Remove requirement for Config; we use notes to determine $(MAKE)
+
+          Changed my mail address to jawnsy@cpan.org
+
+1.002     2009-08-18
+
+          Updated test sequence
+
+          Remove modules available in core since Perl 5.6 from requires
+
+          Added ignore expressions for libjio's build-flags
+          and libjio.so.0.90 (the symlink)
+
+          Override clean action to clean libjio files
+
+1.001     2009-08-17
+
+          Integrate version 0.90 of libjio
+
+          Remove generated files from the repository
+
+          Update MANIFEST.SKIP's paths so that libjio's Makefile
+          isn't skipped
+
+          Move the version test inside the SKIP block -- doesn't
+          make sense to run it if it's not installed; this should
+          fix the CPAN Testers errors (thanks hobbs@freenode #perl)
+
+          Use a simple string version, per David Golden's article:
+          http://www.dagolden.com/index.php/369/version-numbers-should-be-boring/
+
+          No longer use Perl::Critic to test
+
+1.0.4     2009-07-26
+
+          Fix core tests to correct regression in version 1.0.3
+
+1.0.3     2009-07-25
+
+          Changed the method of probing @PATH for gmake, now we don't
+          need to execute which
+
+          Added information about Test Coverage
+
+          Added some commands so that the void context paths are touched
+          (increases coverage a bit)
+
+          Update documentation
+
+          Overhaul test scripts, remove author tests from Recommends
+          (Alias' journal #5375)
+
+          Update LICENSE and README (no longer generate a readme, just
+          use a simple one)
+
+1.0.2     2009-07-01
+
+          New upstream release: libjio 0.51 (release 2009-06-30)
+
+          Better detection with ENV{MAKE} (uses gmake if on BSD)
+
+          There are no Ruby bindings, so remove that from the Build.PL
+          prompt asking if they should be installed
+
+1.0.1     2009-06-18
+
+          No longer enforce "one dot only" in filenames. This breaks
+          compatibility with OpenVMS.
+
+          Updated perlcriticrc with new preferences, removed "no critic"
+          stuff for those in Alien/Libjio.pm
+
+          Added limitation warnings
+
+          Use a safer ENV{PATH}
+
+          Don't do ExtUtils::Liblist twice in t/02core.t
+
+          Revert dependency on version.pm to 0.74
+
+          Try to find 'make' using ENV{MAKE}
+
+          Update README
+
+          Add t/00build.t to make sure build completes properly
+
+          Changed abstract
+
+1.0       2009-06-09
+
+          Initial release

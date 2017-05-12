@@ -1,0 +1,4 @@
+use Acme::MetaSyntactic;
+my $h = Acme::MetaSyntactic->new( 'test_ams_locale' );
+print $h->name;
+

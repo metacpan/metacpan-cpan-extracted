@@ -1,0 +1,398 @@
+NAME
+
+    AnyEvent::Net::Curl::Queued - Moo wrapper for queued downloads via
+    Net::Curl & AnyEvent
+
+VERSION
+
+    version 0.047
+
+SYNOPSIS
+
+        #!/usr/bin/env perl
+    
+        package CrawlApache;
+        use feature qw(say);
+        use strict;
+        use utf8;
+        use warnings qw(all);
+    
+        use HTML::LinkExtor;
+        use Moo;
+    
+        extends 'AnyEvent::Net::Curl::Queued::Easy';
+    
+        after finish => sub {
+            my ($self, $result) = @_;
+    
+            say $result . "\t" . $self->final_url;
+    
+            if (
+                not $self->has_error
+                and $self->getinfo('content_type') =~ m{^text/html}
+            ) {
+                my @links;
+    
+                HTML::LinkExtor->new(sub {
+                    my ($tag, %links) = @_;
+                    push @links,
+                        grep { $_->scheme eq 'http' and $_->host eq 'localhost' }
+                        values %links;
+                }, $self->final_url)->parse(${$self->data});
+    
+                for my $link (@links) {
+                    $self->queue->prepend(sub {
+                        CrawlApache->new($link);
+                    });
+                }
+            }
+        };
+    
+        1;
+    
+        package main;
+        use strict;
+        use utf8;
+        use warnings qw(all);
+    
+        use AnyEvent::Net::Curl::Queued;
+    
+        my $q = AnyEvent::Net::Curl::Queued->new;
+        $q->append(sub {
+            CrawlApache->new('http://localhost/manual/')
+        });
+        $q->wait;
+
+WARNING: GONE MOO!
+
+    This module isn't using Any::Moose anymore due to the announced
+    deprecation status of that module. The switch to the Moo is known to
+    break modules that do extend 'AnyEvent::Net::Curl::Queued::Easy' /
+    extend 'YADA::Worker'! To keep the compatibility, make sure that you
+    are using MooseX::NonMoose:
+
+        package YourSubclassingModule;
+        use Moose;
+        use MooseX::NonMoose;
+        extends 'AnyEvent::Net::Curl::Queued::Easy';
+        ...
+
+    Or MouseX::NonMoose:
+
+        package YourSubclassingModule;
+        use Mouse;
+        use MouseX::NonMoose;
+        extends 'AnyEvent::Net::Curl::Queued::Easy';
+        ...
+
+    Or the Any::Moose equivalent:
+
+        package YourSubclassingModule;
+        use Any::Moose;
+        use Any::Moose qw(X::NonMoose);
+        extends 'AnyEvent::Net::Curl::Queued::Easy';
+        ...
+
+    However, the recommended approach is to switch your subclassing module
+    to Moo altogether (you can use MooX::late to smoothen the transition):
+
+        package YourSubclassingModule;
+        use Moo;
+        use MooX::late;
+        extends 'AnyEvent::Net::Curl::Queued::Easy';
+        ...
+
+DESCRIPTION
+
+    AnyEvent::Net::Curl::Queued (a.k.a. YADA, Yet Another Download
+    Accelerator) is an efficient and flexible batch downloader with a
+    straight-forward interface capable of:
+
+      * create a queue;
+
+      * append/prepend URLs;
+
+      * wait for downloads to end (retry on errors).
+
+    Download init/finish/error handling is defined through Moose's method
+    modifiers.
+
+ MOTIVATION
+
+    I am very unhappy with the performance of LWP. It's almost perfect for
+    properly handling HTTP headers, cookies & stuff, but it comes at the
+    cost of speed. While this doesn't matter when you make single
+    downloads, batch downloading becomes a real pain.
+
+    When I download large batch of documents, I don't care about cookies or
+    headers, only content and proper redirection matters. And, as it is
+    clearly an I/O bottleneck operation, I want to make as many parallel
+    requests as possible.
+
+    So, this is what CPAN offers to fulfill my needs:
+
+      * Net::Curl: Perl interface to the all-mighty libcurl
+      <http://curl.haxx.se/libcurl/>, is well-documented (opposite to
+      WWW::Curl);
+
+      * AnyEvent: the DBI of event loops. Net::Curl also provides a nice
+      and well-documented example of AnyEvent usage (03-multi-event.pl).
+
+    AnyEvent::Net::Curl::Queued is a glue module to wrap it all together.
+    It offers no callbacks and (almost) no default handlers. It's up to you
+    to extend the base class AnyEvent::Net::Curl::Queued::Easy so it will
+    actually download something and store it somewhere.
+
+ ALTERNATIVES
+
+    As there's more than one way to do it, I'll list the alternatives which
+    can be used to implement batch downloads:
+
+      * WWW::Mechanize: no (builtin) parallelism, no (builtin) queueing.
+      Slow, but very powerful for site traversal;
+
+      * LWP::UserAgent: no parallelism, no queueing. WWW::Mechanize is
+      built on top of LWP, by the way;
+
+      * LWP::Protocol::Net::Curl: drop-in replacement for LWP::UserAgent,
+      WWW::Mechanize and their derivatives to use Net::Curl as a backend;
+
+      * LWP::Curl: LWP::UserAgent-alike interface for WWW::Curl. Not a
+      drop-in, no parallelism, no queueing. Fast and simple to use;
+
+      * HTTP::Tiny: no parallelism, no queueing. Fast and part of CORE
+      since Perl v5.13.9;
+
+      * HTTP::Lite: no parallelism, no queueing. Also fast;
+
+      * Furl: no parallelism, no queueing. Very fast, despite being
+      pure-Perl;
+
+      * Mojo::UserAgent: capable of non-blocking parallel requests, no
+      queueing;
+
+      * AnyEvent::Curl::Multi: queued parallel downloads via WWW::Curl.
+      Queues are non-lazy, thus large ones can use many RAM;
+
+      * Parallel::Downloader: queued parallel downloads via AnyEvent::HTTP.
+      Very fast and is pure-Perl (compiling event driver is optional). No
+      queue modification possible while batch is being processed.
+
+ BENCHMARK
+
+    (see also: CPAN modules for making HTTP requests
+    <http://neilb.org/reviews/http-requesters.html>)
+
+    Obviously, every download agent is (or, ideally, should be) I/O bound.
+    However, it is not uncommon for large concurrent batch downloads to hog
+    the processor cycles before consuming the full network bandwidth. The
+    proposed benchmark measures the request rate of several concurrent
+    download agents, trying hard to make all of them CPU bound (by removing
+    the I/O constraint). On practice, this benchmark results mean that
+    download agents with lower request rate are less appropriate for
+    parallelized batch downloads. On the other hand, download agents with
+    higher request rate are more likely to reach the full capacity of a
+    network link while still leaving spare resources for data
+    parsing/filtering.
+
+    The script eg/benchmark.pl compares AnyEvent::Net::Curl::Queued (A.K.A.
+    YADA) against several other download agents. Only
+    AnyEvent::Net::Curl::Queued itself, AnyEvent::Curl::Multi,
+    Parallel::Downloader, Mojo::UserAgent and lftp <http://lftp.yar.ru/>
+    support concurrent downloads natively; thus, Parallel::ForkManager is
+    used to reproduce the same behaviour for the remaining agents, while
+    taskset <http://linux.die.net/man/1/taskset> avoids the skew on
+    multiprocessor systems.
+
+    The download target is a copy of the Apache documentation
+    <http://httpd.apache.org/docs/2.2/> on a local Apache server. The test
+    platform configuration:
+
+      * Intel® Core™ i7-2600 CPU @ 3.40GHz with 8 GB RAM;
+
+      * Ubuntu 11.10 (64-bit);
+
+      * Perl v5.16.2 (installed via perlbrew);
+
+      * libcurl/7.28.0 (without AsynchDNS, which slows down
+      curl_easy_init()
+      <http://curl.haxx.se/libcurl/c/curl_easy_init.html>).
+
+    The script eg/benchmark.pl uses Benchmark::Forking and Class::Load to
+    keep UA modules isolated and loaded only once.
+
+        $ taskset 1 perl benchmark.pl --count 100 --parallel 8 --repeat 10
+    
+                                  Request rate WWW::M LWP::UA L::P::N::C Mojo::UA HTTP::L HTTP::T lftp P::D AE::C::M YADA Furl curl wget LWP::C
+        WWW::Mechanize v1.72             534/s     --    -32%       -61%     -63%    -80%    -82% -83% -84%     -85% -86% -94% -95% -97%   -97%
+        LWP::UserAgent v6.04             782/s    46%      --       -42%     -46%    -71%    -73% -75% -76%     -77% -79% -92% -93% -95%   -95%
+        LWP::Protocol::Net::Curl v0.011 1360/s   154%     74%         --      -6%    -50%    -53% -57% -59%     -61% -64% -86% -88% -91%   -91%
+        Mojo::UserAgent v3.82           1450/s   171%     85%         7%       --    -46%    -50% -54% -56%     -58% -62% -85% -87% -91%   -91%
+        HTTP::Lite v2.4                 2700/s   405%    245%        98%      86%      --     -7% -14% -18%     -22% -29% -71% -76% -82%   -83%
+        HTTP::Tiny v0.025               2910/s   445%    272%       114%     101%      8%      --  -7% -11%     -16% -23% -69% -74% -81%   -81%
+        lftp v4.3.1                     3140/s   488%    302%       131%     117%     17%      8%   --  -4%      -9% -17% -67% -72% -80%   -80%
+        Parallel::Downloader v0.121560  3280/s   514%    319%       141%     127%     22%     13%   4%   --      -5% -13% -65% -70% -79%   -79%
+        AnyEvent::Curl::Multi v1.1      3460/s   548%    342%       155%     139%     28%     19%  10%   5%       --  -9% -63% -69% -77%   -78%
+        YADA v0.038                     3790/s   610%    385%       179%     162%     41%     30%  21%  16%      10%   -- -60% -66% -75%   -76%
+        Furl v2.01                      9420/s  1663%   1104%       593%     550%    249%    223% 200% 187%     172% 148%   -- -15% -39%   -40%
+        curl v7.28.0                   11100/s  1977%   1318%       716%     666%    311%    281% 253% 238%     221% 193%  18%   -- -28%   -29%
+        wget v1.12                     15400/s  2777%   1864%      1031%     961%    470%    428% 389% 368%     344% 305%  63%  39%   --    -1%
+        LWP::Curl v0.12                15600/s  2818%   1892%      1047%     976%    478%    435% 396% 375%     350% 311%  65%  40%   1%     --
+    
+        (output formatted to show module versions at row labels and keep column labels abbreviated)
+
+ATTRIBUTES
+
+ allow_dups
+
+    Allow duplicate requests (default: false). By default, requests to the
+    same URL (more precisely, requests with the same signature are issued
+    only once. To seed POST parameters, you must extend the
+    AnyEvent::Net::Curl::Queued::Easy class. Setting allow_dups to true
+    value disables request checks.
+
+ common_opts
+
+    "opts" in AnyEvent::Net::Curl::Queued::Easy attribute common to all
+    workers initialized under the same queue. You may define User-Agent
+    string here.
+
+ http_response
+
+    Encapsulate the response with HTTP::Response (only when the scheme is
+    HTTP/HTTPS); a global version of "http_response" in
+    AnyEvent::Net::Curl::Queued::Easy. Default: disabled.
+
+ completed
+
+    Count completed requests.
+
+ cv
+
+    AnyEvent condition variable. Initialized automatically, unless you
+    specify your own. Also reset automatically after "wait", so keep your
+    own reference if you really need it!
+
+ max
+
+    Maximum number of parallel connections (default: 4; minimum value: 1).
+
+ multi
+
+    Net::Curl::Multi instance.
+
+ queue
+
+    ArrayRef to the queue. Has the following helper methods:
+
+ queue_push
+
+    Append item at the end of the queue.
+
+ queue_unshift
+
+    Prepend item at the top of the queue.
+
+ dequeue
+
+    Shift item from the top of the queue.
+
+ count
+
+    Number of items in queue.
+
+ share
+
+    Net::Curl::Share instance.
+
+ stats
+
+    AnyEvent::Net::Curl::Queued::Stats instance.
+
+ timeout
+
+    Timeout (default: 60 seconds).
+
+ unique
+
+    Signature cache.
+
+ watchdog
+
+    The last resort against the non-deterministic chaos of evil lurking
+    sockets.
+
+METHODS
+
+ inc_completed
+
+    Increment the "completed" counter.
+
+ start()
+
+    Populate empty request slots with workers from the queue.
+
+ empty()
+
+    Check if there are active requests or requests in queue.
+
+ add($worker)
+
+    Activate a worker.
+
+ append($worker)
+
+    Put the worker (instance of AnyEvent::Net::Curl::Queued::Easy) at the
+    end of the queue. For lazy initialization, wrap the worker in a sub {
+    ... }, the same way you do with the Moo default => sub { ... }:
+
+        $queue->append(sub {
+            AnyEvent::Net::Curl::Queued::Easy->new({ initial_url => 'http://.../' })
+        });
+
+ prepend($worker)
+
+    Put the worker (instance of AnyEvent::Net::Curl::Queued::Easy) at the
+    beginning of the queue. For lazy initialization, wrap the worker in a
+    sub { ... }, the same way you do with the Moo default => sub { ... }:
+
+        $queue->prepend(sub {
+            AnyEvent::Net::Curl::Queued::Easy->new({ initial_url => 'http://.../' })
+        });
+
+ wait()
+
+    Process queue.
+
+CAVEAT
+
+      * Many sources suggest to compile libcurl <http://curl.haxx.se/> with
+      c-ares <http://c-ares.haxx.se/> support. This only improves
+      performance if you are supposed to do many DNS resolutions (e.g.
+      access many hosts). If you are fetching many documents from a single
+      server, c-ares initialization will actually slow down the whole
+      process!
+
+SEE ALSO
+
+      * AnyEvent
+
+      * Moo
+
+      * Net::Curl
+
+      * WWW::Curl
+
+      * AnyEvent::Curl::Multi
+
+AUTHOR
+
+    Stanislaw Pusep <stas@sysd.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Stanislaw Pusep.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

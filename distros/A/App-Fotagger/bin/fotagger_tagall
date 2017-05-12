@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use 5.010;
+use App::Fotagger::TagAll;
+use Data::Dumper;
+my $app = App::Fotagger::TagAll->new_with_options;
+my $stats=$app->tag_all;
+
+__END__
+
+=head1 NAME
+
+fotagger_tagall - tag all fotos with some tags
+
+=head1 SYNOPSIS
+
+  fotagger_tagall --dir /some/dir --tag foo --tag bar
+
+=head1 DESCRIPTION
+
+Add some tags to all selected images.
+
+=head2 OPTIONS
+
+=head3 --dir
+
+Root dir containing images. Please note that all subdirs will be 
+searched, and all tagged images in there will be deleted.
+
+=head3 --tag
+
+The tag to be added. This options can be added several times to add 
+several tags in one run. Alternativly, you can pass in one string of 
+comma-seperated tags
+
+=head1 AUTHOR
+
+Thomas Klausner E<lt>domm {at} cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+App::Fotagger::Deleter
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

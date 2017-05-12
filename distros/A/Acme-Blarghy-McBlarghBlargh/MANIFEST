@@ -1,0 +1,24 @@
+Acme-Blarghy-McBlarghBlargh-0.002.tar.gz
+Acme-Blarghy-McBlarghBlargh.tar.gz
+blarghymcblarghblargh.pl
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Scripts.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Acme/Blarghy/McBlarghBlargh.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+script/blarghymcblarghblargh.pl
+t/blargh.t
+TODO
+v

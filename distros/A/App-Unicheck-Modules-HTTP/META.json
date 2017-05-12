@@ -1,0 +1,57 @@
+{
+   "abstract" : "App::Unicheck module to check web urls.",
+   "author" : [
+      "Matthias Krull <<m.krull@uninets.eu>>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Unicheck-Modules-HTTP",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "Mojo::UserAgent" : "0",
+            "Moo" : "0",
+            "perl" : "v5.10.1"
+         }
+      }
+   },
+   "provides" : {
+      "App::Unicheck::Modules::HTTP" : {
+         "file" : "lib/App/Unicheck/Modules/HTTP.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/uninets/App-Unicheck-Modules-HTTP"
+      }
+   },
+   "version" : "0.03"
+}

@@ -1,0 +1,50 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual - ars_SetField</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_SetField(ctrl, schema, fieldId, fieldHash)</CODE></H2>
+
+      This function modifies an existing field. You must first
+      populate the <CODE>fieldHash</CODE> before calling this routine.
+      <P><CODE>schema</CODE> is the name of the schema containing the field.
+      <P><CODE>fieldId</CODE> is the numeric id of the field.
+      <P><CODE>fieldHash</CODE> is a partially assigned 
+      <A HREF="ds_field_hash.html">Field Attributes</a> hash. 
+
+      <P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns 1
+          <DT><B>On failure</B><DD>
+              Returns 0
+      </DL>
+
+      <P>Example:
+
+      <P><BLOCKQUOTE>
+      <I> This example increases the content length of a character field. It also specifies
+      write permission for group 505 and read permission for group 506.
+      </I></BLOCKQUOTE>
+
+      <PRE>
+      ($fd = ars_GetField($c, "Schema", $fieldId )) ||
+	    die $ars_errstr;
+	
+      $fd->{limit}{maxLength} += 30;
+
+      ars_SetField( $c, "Schema", $fieldId, {
+        permissions => { 505 => "change", 506 => "view" },
+        limit       => $fd->{limit},
+      } ) || die $ars_errstr;
+      </PRE>
+
+<P>
+<I>This function was introduced in version 1.90 of ARSperl</I>
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

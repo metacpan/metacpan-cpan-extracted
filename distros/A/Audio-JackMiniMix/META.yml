@@ -1,0 +1,17 @@
+---
+name: Audio-JackMiniMix
+version: 0.02
+author:
+  - Nicholas J. Humfrey <njh@aelius.com>
+abstract: Talk to JACK Mini Mixer using OSC
+license: gpl
+requires:
+  Net::LibLO: 0.03
+  Test: 1.00
+build_requires:
+  Module::Build: 0.20
+provides:
+  Audio::JackMiniMix:
+    file: lib/Audio/JackMiniMix.pm
+    version: 0.02
+generated_by: Module::Build version 0.2611

@@ -1,0 +1,16 @@
+README
+MANIFEST
+Makefile.PL
+GPL
+ChangeLog
+SIMBAD.pm
+Query/Query.pm
+Query/Makefile.PL
+Result/Result.pm
+Result/Makefile.PL
+Result/Object/Object.pm
+Result/Object/Makefile.PL
+t/query.t
+t/result.t
+t/object.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,29 @@
+From user1@example.com Sat Dec 31 10:01:02 2016
+Envelope-to: MGV@cpan.org
+Date: Sat, 31 Dec 2016 10:00:00 2016
+From: User 1 <user1@example.com> (Comment)
+Message-ID: <mail1@example.com>
+To: MGV@cpan.org
+Subject: Test email
+
+This is a test email.
+
+From user1@example.com Sat Dec 31 9:12:34 2016
+Envelope-to: MGV@cpan.org
+Date: Sat, 31 Dec 2016 9:00:00 2016
+From: user1@example.com
+Message-ID: <mail2@example.com>
+To: MGV@cpan.org
+Subject: Older test email
+
+This is a test email, sent an hour before the one above.
+
+From user2@example.com Sat Dec 31 12:35:00 2016
+Envelope-to: MGV@cpan.org
+Date: Sat, 31 Dec 2016 12:34:56 2016
+From: user2@example.com
+Message-ID: <mail3@example.com>
+To: MGV@cpan.org
+Subject: Hello
+
+Hi MGV!

@@ -1,0 +1,68 @@
+NAME
+    App::SmokeBox::Mini::Plugin::IRC - IRC plugin for minismokebox
+
+VERSION
+    version 0.12
+
+SYNOPSIS
+      # example minismokebox configuration file
+
+      [IRC]
+
+      server = my.irc.server
+      nick = mysmoker
+
+DESCRIPTION
+    App::SmokeBox::Mini::Plugin::IRC is an IRC plugin for
+    App::SmokeBox::Mini and minismokebox that announces on IRC channels when
+    smoke jobs finish and when minismokebox itself finishes.
+
+    Configuration is handled by a section in the minismokebox configuration
+    file.
+
+    When minismokebox starts a bot will join configured channels and start
+    announcing completed smoke jobs. When the smoke run finishes the bot
+    will announce statistics relating to the smoke run and then terminate.
+
+CONFIGURATION
+    This plugin uses an "[IRC]" section within the minismokebox
+    configuration file.
+
+    The only mandatory required parameter is "server".
+
+    "server"
+        Specify the name or IP address of an ircd to connect to. Mandatory.
+
+    "nick"
+        The nickname to use. Defaults to $^O plus $$.
+
+    "port"
+        The ircd port to connect to. Defaults to 6667.
+
+    "ircname"
+        Some cute comment or something.
+
+    "username"
+        Your client's username.
+
+    "password"
+        The password that is required if your ircd is restricted.
+
+    "channels"
+        A comma-separated list of IRC channels to join, default is
+        "#smokebox"
+
+SEE ALSO
+    minismokebox
+
+    App::SmokeBox::Mini::Plugin
+
+AUTHOR
+    Chris Williams
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

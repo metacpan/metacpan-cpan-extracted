@@ -1,0 +1,62 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0515, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-HDF4",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.402",
+            "IO::All" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.402",
+            "IO::All" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::HDF4" : {
+         "file" : "lib/Alien/HDF4.pm.PL",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/Alien-HDF4",
+         "web" : "https://github.com/PDLPorters/Alien-HDF4"
+      }
+   },
+   "version" : "0.03"
+}
+

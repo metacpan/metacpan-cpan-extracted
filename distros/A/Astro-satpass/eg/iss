@@ -1,0 +1,82 @@
+#!/usr/local/bin/perl
+
+# This script uses Astro::SpaceTrack to download orbital data for the
+# International Space Station (and the Space Shuttle if available) and
+# predict visibility for the next week from a pre-programmed location.
+
+use strict;
+use warnings;
+
+#	In addition to Astro::Coord::ECI and friends, we need:
+#	Astro::SpaceTrack
+#	POSIX (which should be standard)
+
+use Astro::Coord::ECI;
+use Astro::Coord::ECI::TLE;
+use Astro::Coord::ECI::TLE::Set;
+use Astro::Coord::ECI::Utils qw(deg2rad rad2deg SECSPERDAY);
+use Astro::SpaceTrack;
+use POSIX qw{strftime};
+
+use constant TIMFMT => '%d %b %H:%M:%S';
+
+
+#	Create an object to represent the observing station. We use
+#	data in degrees north and east, and height above sea level in
+#	meters. But the object wants radians and kilometers, so we
+#	convert.
+
+my $sta = Astro::Coord::ECI->new (
+    name => '80 Wellington Street, Ottawa Ontario',
+)->geodetic (
+    deg2rad (45.42338),		# Latitude north
+    deg2rad (-75.697786),	# Longitude east
+    82/1000,			# Height above sea level
+);
+
+#	Fetch manned spaceflight data. The result of the fetch is a
+#	HTTP::Response object.
+
+my $st = Astro::SpaceTrack->new (direct => 1);
+my $tle = $st->spaceflight ('-all', '-effective');
+$tle->is_success or die <<eod;
+Error - Failed to retrieve manned spaceflight data.
+        @{[$tle->status_line]}
+eod
+
+#	Parse the manned spaceflight data to get Astro::Coord::ECI::TLE
+#	objects (or, more likely, Astro::Coord::ECI::TLE::Set, since we
+#	explicitly requested all available data).
+
+my @bodies = Astro::Coord::ECI::TLE::Set->aggregate(
+    Astro::Coord::ECI::TLE->parse( { station => $sta }, $tle->content ) );
+
+#	For each of the bodies retrieved
+
+my $start = time ();
+my $end = $start + 7 * SECSPERDAY;
+foreach my $tle (@bodies) {
+    my @passes = $tle->pass( $start, $end );
+    next unless @passes;
+    print <<"EOD";
+
+@{[$tle->get ('id')]}  @{[$tle->get ('name')]}
+
+Date/Time        Elevation    Azimuth      Range Illum Event
+EOD
+
+    foreach my $pass (@passes) {
+	print "\n";
+	foreach my $event (@{$pass->{events}}) {
+	    printf "%s  %9.1f  %9.1f  %9.1f  %-4s  %-4s\n",
+		strftime (TIMFMT, localtime $event->{time}),
+		rad2deg ($event->{elevation}),
+		rad2deg ($event->{azimuth}),
+		$event->{range},
+		ucfirst ($event->{illumination}),
+		ucfirst ($event->{event});
+	}
+    }
+}
+
+# ex: set textwidth=72 :

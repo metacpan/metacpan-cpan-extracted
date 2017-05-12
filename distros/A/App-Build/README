@@ -1,0 +1,59 @@
+######################################################################
+## File: $Id: README,v 1.3 2004/09/02 21:09:00 spadkins Exp $
+######################################################################
+
+1. What is the App-Build distribution?
+
+App::Build is a module which extends Module::Build.
+It is used to install whole applications rather than merely
+perl modules.
+
+2. What are the features?
+
+FEATURES OF App::Build
+
+ o determines PREFIX for installed application (install_base)
+ o extra_dirs - install other directories full of files to PREFIX
+    o don't install RCS and CVS files
+    o fix shebang line selectively
+ o write .packlist
+ o add a configure() hook which can be overridden in a subclass of App::Build
+
+ASSUMPTIONS OF App::Build
+
+ o PREFIX/htdocs is for static, web-viewable files (html, images, css, js)
+ o PREFIX/cgi-bin is for CGI programs
+
+CORRECTIONS OF MISFEATURES IN Module::Build and CPAN
+
+ o unset PREFIX variable if supplied so no warning occurs (Module::Build)
+ o alias PREFIX to install_base rather than complain about it (Module::Build)
+ o install bin/* to $PREFIX/bin rather than $PREFIX/scripts
+ o handle "perl Build.PL Build" (CPAN.pm)
+
+FUTURE FEATURES OF App::Build
+
+ o write /usr/local/lib/perl5/<version>/<arch>/perllocal.pod
+ o download/unpack perl applications not on CPAN
+ o do better job at detecting DocumentDir rather than PREFIX/htdocs
+ o do better job at detecting ScriptDir rather than PREFIX/cgi-bin
+ o pure perl support for downloading external source archives (not on CPAN)
+ o pure perl support for unpacking external source archives
+
+3. How do I install it?
+
+To install this module, cd to the directory that contains this README
+file and type the following (as usual).
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+Alternatively, you may install in an alternate place by typing:
+
+   perl Build.PL install_base=/home/joe
+   ./Build
+   ./Build test
+   ./Build install
+

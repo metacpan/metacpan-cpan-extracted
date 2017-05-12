@@ -1,0 +1,245 @@
+html { font-size: 100%; }
+body { font: 0.75em Verdana,Arial,Helvetica,sans-serif; background-color: #f5f5f5; color: #333; }
+h1 {color: #4e5b82; letter-spacing: 2px; font-variant: small-caps;}
+h2 {color: #a00;}
+h3 {color: navy;}
+
+/* LOG BLOCK */
+
+#logs {
+  height:100px;
+  padding: 0.3em;
+  margin: 0.2em 0 2em;
+  background-color: #E0EFE2;
+  overflow-y:auto;
+  border:1px solid green;
+  font:8pt 'courier new';
+}
+#logs .msg { border-bottom: 1px solid #c3dfc7; }
+#logs .msg em { color: #a8cfad; }
+
+
+/* AUTOCOMPLETER */
+
+input.inputComplete {
+  background-repeat :no-repeat;
+  background-position:right center;
+  background-image:url(images/search-small.png);
+}
+
+.AC_dropdown { 
+  position: absolute;
+  background-color:#ecf2ff;
+  border: 1px solid #183E6C;
+  padding: 3px;
+  padding-right: 25px; /* so that scrollbars don't hide the content */
+  color: #183E6C;
+  overflow-y: auto; 
+}
+
+.AC_highlight { 
+  background-color: #183E6C;
+  color: #ecf2ff;
+}
+
+.AC_message { 
+  width: auto;
+  background-color: #ff9;
+  padding : 4px;
+  color: black;
+  border: 1px black solid;
+}
+
+.AC_action { 
+  width: auto;
+  color: #f24;
+}
+
+.AC_input { 
+  background-position: right;
+  background-repeat: no-repeat;
+  background-image: url(autocomplete.gif);
+}
+
+.AC_loading { 
+  background-position: right;
+  background-repeat: no-repeat;
+  background-image: url(ajax_loading_small.gif);
+}
+
+
+/* TREE NAVIGATOR */
+
+.TN_node { 
+  display : block;
+}
+
+/* node content is 15px more on the right than the node itself */
+.TN_content {  
+  display : block;
+  margin: 0;
+  margin-left: 15px;
+}
+
+/* labels are clickable */
+.TN_label {
+  display: -moz-inline-box;
+  cursor: pointer;
+}
+
+
+/* buttons in front of each node label */
+.TN_button { 
+  background-image: url(minus.gif);
+  background-repeat : no-repeat;
+  background-position : center left;
+  width: 15px;
+  padding-right: 15px;
+  cursor: pointer;
+ }
+
+
+/* how to highlight the current selected node */
+.TN_selected {
+  background-color: yellow;
+}
+
+
+/* class to implement pseudo-hover on node labels */
+.TN_mouse { 
+  text-decoration: underline;
+}
+
+/* when a node is closed, the button icon becomes a 'plus', and 
+   the content is hidden */
+.TN_closed .TN_button {
+  background-image: url(plus.gif);
+}
+
+.TN_closed .TN_content {
+  display : none;
+}
+
+/* leaf nodes have a single icon 'dot' */
+.TN_leaf .TN_button { 
+  background-image: url(dot.gif);
+  cursor: default;
+}
+
+/* showall : the content of closed nodes is nevertheless visible 
+             (useful for printing) */
+.TN_showall .TN_closed .TN_content {
+  display: block;
+}
+
+.TN_showall {
+  border-left: 5px dotted gray;
+}
+
+
+/* CHOICE LIST */
+
+.CL_highlight, .hilite td { 
+  background-color: #183E6C !important;
+  color: #ecf2ff !important;
+}
+
+
+/* CUSTOM BUTTONS */
+.flash {background-color:red !important;}
+.flash .btn {color:red !important}
+
+.gva-actionsbar {background-color:#E8E8E8;border:1px solid #8c8c8c;border-width:1px 0px;height:25px;padding:4px 0 1px;}
+.gva-btn-container {display:inline;}
+.gva-btn-container .btn {margin:0 3px;font-size:12px;cursor:pointer;}
+.gva-btn-container .btn {
+    font-family:verdana,geneva,lucida,'lucida grande',arial,helvetica,sans-serif;
+    background:none;
+    border:none;
+    cursor:pointer;
+    padding:1px 2px;
+    color:#000;
+    background-color:transparent !important;
+}
+.gva-btn-container .btn {float:left;}
+.gva-btn-container.btn-focus .btn {color:#aa0000;}
+.gva-btn-container span {display:block;float:left;height:21px;}
+.gva-btn-container span.left {background:transparent url(btn_sprite.gif) no-repeat scroll 0 0;padding:0 1px 0 2px;margin-left:4px;}
+.gva-btn-container span.center {background:transparent url(btn_sprite.gif) repeat-x scroll 0 -42px;padding:0 2px}
+.gva-btn-container span.right {background:transparent url(btn_sprite.gif) no-repeat scroll 0 -21px;padding:0 1px 0 2px;}
+.gva-btn-container.btn-hover span.left {background-position:0 -63px;}
+.gva-btn-container.btn-hover span.center {background-position:0 -105px;}
+.gva-btn-container.btn-hover span.right {background-position:0 -84px;}
+.gva-btn-container.btn-focus span.left {background-position:0 -63px;}
+.gva-btn-container.btn-focus span.center {background-position:0 -126px;}
+.gva-btn-container.btn-focus span.right {background-position:0 -84px;}
+
+/* GRID */
+table {padding:0;margin: 0;border-collapse:collapse;}
+#grid_container {border: 1px solid #a3bad9; border-width: 0 1px;}
+.gva-loading {
+    background:url(images/formulaire/ajax_loading.gif) no-repeat center center;
+    position:absolute;
+    width:30px;height:30px;
+    top:50%;left:50%;
+}
+
+/* grid toolbar */
+.gva-grid-toolbar {
+  background:#C5CCE8 url(images/paginator/glass-bg-n.gif) repeat-x scroll left top;
+  border:1px solid #A3BAD9;
+  width: 100%;
+  height:28px;
+}
+.gva-grid-actionsbar {float:left;margin-top:4px;}
+.gva-paginatorbar {float:right;width:250px;margin-top:7px;}
+.gva-paginatorbar div {width:16px;height:16px;cursor:pointer;float:right;}
+.gva-paginatorbar div.first {background:url(images/paginator/page-first.gif) no-repeat top center;}
+.gva-paginatorbar div.last {background:url(images/paginator/page-last.gif) no-repeat top center;}
+.gva-paginatorbar div.back {background:url(images/paginator/page-prev.gif) no-repeat top center;}
+.gva-paginatorbar div.forward {background:url(images/paginator/page-next.gif) no-repeat top center;}
+.gva-paginatorbar div.inactive {cursor:default;opacity:0.25;filter:alpha(opacity=25);}
+.gva-paginatorbar div.text {text-align:center;width:140px;color:#4b34c5;font-size:10pt;}
+.gva-paginatorbar span.gva-btn-container {display:block;margin-right:4px;}
+
+/* grid table */
+.gva-grid {width:100%;font-size:12px}
+.gva-grid th.grid-header {
+  text-align:center;
+  padding:2px;
+  color: navy;
+  background-color: #D0D6ED;
+  border:1px solid #6F82A5;
+}
+.gva-grid td {color: navy;}
+.gva-grid .grid-marker {
+    width:15px;
+    background-color: #D0D6ED;
+    border:1px solid #6F82A5;
+}
+.gva-grid tr.liste_highlight td.grid-marker {
+    background: #D0D6ED url(images/paginator/selector.gif) no-repeat center center;
+}
+.gva-grid tr.liste_highlight td.grid-cell {background-color: #6F82A5 !important;color:#f5f5f5 !important;}
+.gva-grid td.grid-cell {padding:2px !important;border:1px solid #e8e8e8;}
+.gva-grid td.grid-cell.index_1 {background-color:#EFEFEF;}
+.gva-grid td.grid-cell.center {text-align:center;float:none;}
+.gva-grid td.grid-cell.right {text-align:right;float:none;}
+.gva-grid td.grid-cell.red {color:#a00;}
+
+
+.icon-add {
+    display:inline-table;
+    width:16px;
+    height:16px;
+    cursor:pointer;
+    background: transparent url(add.png) no-repeat left center;
+}
+.icon-delete {
+    display:inline-table;
+    float: right;
+    width:16px;
+    height:16px;
+    cursor:pointer;
+    background: transparent url(delete.png) no-repeat left center;
+}  

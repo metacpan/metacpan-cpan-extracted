@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+#
+# This file is part of Audio-MPD
+#
+# This software is copyright (c) 2007 by Jerome Quelin.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
+use 5.010;
+use strict;
+use warnings;
+
+# PODNAME: mpd-rate;
+# ABSTRACT: rate your songs for mpd-dynamic
+
+use Audio::MPD;
+use DB_File;
+use Encode;
+use Getopt::Euclid qw{ :minimal_keys };
+
+# fetch current song
+my $playing = Audio::MPD->new->current;
+unless (defined $playing)
+{
+    die "Cannot rate current song, as no song currently is playing!";
+}
+my $song = encode( 'utf-8', $playing->file );
+
+# open ratings file
+my %ratings;
+tie %ratings, 'DB_File', $ARGV{ratings}, O_RDWR|O_CREAT, oct(666), $DB_HASH
+    or die "$ARGV{ratings}: $!";
+
+# update rating or print it
+if ( defined $ARGV{rating} ) { $ratings{$song} = $ARGV{rating}; }
+else { say exists $ratings{$song} ? $ratings{$song} : 0; }
+
+untie %ratings;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+mpd-rate; - rate your songs for mpd-dynamic
+
+=head1 VERSION
+
+version 2.004
+
+=head1 DESCRIPTION
+
+This program allows you to rate your songs, to allow mpd-dynamic to use ratings.
+
+=head1 USAGE
+
+    mpd-rate [options]
+
+=head1 OPTIONS
+
+You can customize the usage of mpd-dynamic with the following options:
+
+=over 4
+
+=item -r[atings] <ratings>
+
+The path of a db file with the ratings per song. The keys are the song path
+(relative to MPD root), and the value is an integer (the rating). Default to
+C<~/.mpd/ratings.db>.
+
+=for Euclid: ratings.type:     writable
+    ratings.default:  "$ENV{HOME}/.mpd/ratings.db"
+
+=item <rating>
+
+The rating you want to apply to the current song. If not supplied, will
+print its current rating.
+
+=for Euclid: rating.type:    integer
+
+=item --version
+
+=item --usage
+
+=item --help
+
+=item --man
+
+Print the usual program information
+
+=back
+
+=head1 AUTHOR
+
+Jerome Quelin
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2007 by Jerome Quelin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

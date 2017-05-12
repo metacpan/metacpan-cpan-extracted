@@ -1,0 +1,36 @@
+---
+abstract: 'An SQL statement generator.'
+author:
+  - 'Qiang Wang <wang-q@outlook.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AlignDB-SQL
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Moose: '0'
+  MooseX::Storage: '0'
+  YAML: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/wang-q/AlignDB-SQL/issues
+  homepage: https://github.com/wang-q/AlignDB-SQL
+  repository: https://github.com/wang-q/AlignDB-SQL.git
+version: 1.0.2
+x_contributors:
+  - 'wangq <wangqiang1997@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

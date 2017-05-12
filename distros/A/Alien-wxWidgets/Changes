@@ -1,0 +1,336 @@
+Revision history for Perl extension Alien::wxWidgets.
+0.69  Tue Apr 18 2017 
+    - added build dependency on LWP::Protocol::https - it is always
+    - necessary due to sourceforge redirect to https
+
+0.68  Sat Apr 8 2017
+    - RT:120887 - patch from Jim Keenan for '.' no longer in@INC
+    - RT:94367  - allow ENV setting for wx-config
+    - Fix current OSX builds
+
+0.67  Tue Mar 10 2015
+    - pause indexing fix
+    
+0.66  Tue Mar 10 2015
+    - add support for wxWidgets 3.0.1 and 3.0.2
+    - make default wxWidgets 3.0.2
+    - graphics context included now default on Win32
+    - build on MacOSX - xcode 5.x/6.x
+
+0.65  Mon Mar 31 2014
+    - Update default to wxWidgets 3.0.0
+    - build on MacOSX Mavericks with Xcode 4.6.3
+    - install builtins on wxMSW (used by some wxWidgets extensions)
+
+0.64  Sat Apr 13 2013
+    - Build IPC on Windows
+
+0.63  Fri Oct 26 2012
+    - Patches for wxGTK build fixing dir dialog issues
+
+0.62  Tue Oct 2 2012
+    - Fix patching on MSWin when buildpaths have spaces.
+    - Allow addition of user patch - --wxWidgets-userpatch
+    - Expand README.txt
+    - Another Mac OS X SDK change
+
+0.61  Fri Sep 21 2012
+    - change default debug level for wxWidgets >= 2.9 to 1 ( was 0)
+    - fix several incorrect wxWidgets version checks 
+
+0.60  Fri Aug 24 2012
+    - allow building 2.9.4
+    - correct SDKs for Mountain Lion
+    - fixes for XCode 4.4
+
+0.59  Tue May 01 2012
+    - Version sub modules to keep meta info users happy
+
+0.58  Thu Apr 12 2012
+    - WXWIN / WXDIR MSWin32 fix.
+
+0.57  Tue Mar 27 2012
+    - fix for osx-cocoa overlay drawing in 2.9.x
+    - Return --with-osx_cocoa . --with-mac on better basis.
+    - several fixes for default macosx builds
+
+0.56  Fri Mar 16 2012
+    - add propgrid ribbon webview library names
+
+0.55  Tue Feb 28 2012
+    - Correctly interpret boolean option = 1 as 'yes' 
+      ( Thanks to Robert Olsen )  
+    - Fix for msw builds where Perl defines -D_USE_32BIT_TIME_T 
+      ( Thanks to Bjoern Hoehrmann )
+    - Fix for Xcode 4.3 on OSX Lion
+    - Allow build 2.9.3 wxWidgets (default for 64 bit Mac)
+
+0.54  Wed Nov 09 08:00:00 BST 2011
+    - Remove force of static binding for mingw libgcc & libstdc++
+    - For mingw, properly detect the gcc shared lib dependencies
+      to install
+0.53  Thu Oct 13 08:00:00 BST 2011 
+    - SDK fix for 2.8.x on Mac OSX Lion
+    - 2.9.2 default for 64bit MacOSX
+    - 2.9.2 build changes for msw supporting mingw/gcc >= 4.5.2
+    - 2003 Platform SDK build fixed for 2.8.12
+
+0.52  Thu May 05 08:00:00 BST 2011
+    - release 0.51_01 as 0.52
+
+0.51_01 Thu Apr 21 22:28:51 BST 2011
+    - 64 bit mingw printing fix
+    - 2.9.1 default for 64bit MacOSX
+    - 2.8.12 general default
+
+0.51  Tue Mar 30 22:28:51 CEST 2010
+    - Build fix for Perl 5.12.
+
+0.50_02  Sun Mar 21 10:33:00 CET 2010
+    - Fixed 64 bit compilation when using the MinGW-w64 compiler.
+
+0.50_01  Fri Feb 26 17:08:21 CET 2010
+    - Added wxWidgets-extraflags build option.
+    - Exit with an error message under Cygwin.
+    - Use the system version of Archive::Extract and File::Fetch
+      if newer than the bundled version.
+
+0.50  Sun Jan 10 16:16:44 CET 2010
+    - When compiling on Windows with MSVC 9, make the generated
+      wxWidgets DLL load correctly by adding a manifest to them
+      (suggested by IKEGAMI).
+    - Add a missing file to the distribution.
+
+0.49  Sat Jan  9 10:39:02 CET 2010
+    - Support GCC 4 and 64 bit GCC builds on Windows (patch by KMX).
+    - Fix monolithic build handling for wxWidgets' 2.8.x.
+
+0.48  Fri Dec 25 18:23:56 CET 2009
+    - Fix the compiler check for Visual C++.
+
+0.47  Sat Dec  5 16:16:05 CET 2009
+    - Released 0.46_01 as 0.47.
+
+0.46_01  Tue Nov 24 20:34:25 CET 2009
+    - Do not give a warning when installed using WiX
+      (patch by Curtis Jewell).
+    - Tentative patch to correctly detect wxWidgets under OpenBSD,
+      based on RT ticket 41678.
+    - Under Solaris, use GNU Make to build wxWidgets, and fail if it
+      is not present or can't be detected.
+    - Detect wxWidgets versions that have been installed using
+      Alien::wxWidgets itself and avoid needlessly recompiling/reinstalling
+      it.
+
+0.46  Sun Nov  8 16:25:02 CET 2009
+    - Allow choosing the wxWidgets version to build (defaults to
+      the latest stable release when building from the CPAN shell).
+    - Add a build configuration for wxWidgets 2.9.0.
+    - On Snow Leopard, build wxCocoa when building wxWidgets 2.9.0
+      with a 64 bit Perl.
+    - On Windows, enable the 'portable' option by default (finds the
+      wxWidgets libraries relative to the Alien::wxWidgets installation
+      directory).
+
+0.45  Wed Oct 14 22:54:35 CEST 2009
+    - On Snow Leopard, abort wxWidgets build if Perl is 64 bit.
+    - On Snow Leopard, force wxWidgets build to be 32 bit.
+
+0.44  Sun Aug  9 12:56:05 CEST 2009
+    - Rename all command line options to avoid clashing with
+      Module::Build options.
+
+0.43  Sun May 10 09:46:05 CEST 2009
+    - Fix building under recent FreeBSD versions (patch by Cezary Morga).
+    - Correctly handle monolithic build on wxWidgets' 2.9.x.
+    - Support Cocoa builds for wxWidgets 2.9.x.
+    - Fix building wxWidgets when the build path contains spaces.
+    - Patch and build wxWidgets 2.8.10.
+
+0.42  Sat Nov  8 00:51:18 CET 2008
+    - Add an option for building with Unicode support in interactive
+      configuration (defaults to yes).
+    - Use ExtUtils::CBuilder to try to detect non-working
+      (or non-installed) compilers.
+
+0.41  Mon Oct 27 22:22:25 CET 2008
+    - Rewrite show_configurations to display a pretty-printed version of
+      the available wxWidgets builds.
+    - When load() fails to find a compatible configuration, display a
+      the selection criteria and a list of available configurations.
+
+0.40  Wed Oct 15 20:23:15 CEST 2008
+    - Always use Archive::Extract to extract the wxWidgets archive
+      since it now handles .bz2 files correctly on all platforms.
+    - Add a manifest to the bundled patch.exe to avoid triggering
+      an UAC prompt under Windows Vista.
+
+0.39  Mon Sep  8 20:56:44 CEST 2008
+    - Add missing file to MANIFEST.
+
+0.38  Sun Aug 24 11:17:37 CEST 2008
+    - Patch and build wxWidgets 2.8.8.
+    - When running with AUTOMATED_TESTING try to detect GTK+2
+      presence and abort early if it can't be found.
+
+0.37  Sun Jun 29 21:40:16 CEST 2008
+    - Always use binary programs to extract archives, unless
+      under Win32.
+
+0.36  Mon May 19 22:35:46 CEST 2008
+    - Renamed 0.35_01 to 0.36.
+
+0.35_01  Mon May 12 23:43:02 CEST 2008
+    - Handle --install_base correctly when building wxWidgets
+      during Alien::wxWidgets build.
+
+0.35  Thu May  1 16:25:04 CEST 2008
+    - Correctly handle monolithic build on Win32. (patch by Mark Dootson)
+    - Add mk_portable (Win32-only) build option to create a self-contained
+      wxWidgets+Alien::wxWidgets installation even when not building
+      wxWidgets together with Alien::wxWidgets. (patch by Mark Dootson)
+
+0.34  Sun Apr 13 12:40:08 CEST 2008
+    - Correctly detect GCC 4.3. (patch by Roberto C. Sánchez)
+
+0.33  Sat Jan 19 17:35:57 CET 2008
+    - Patch and build wxWidgets 2.8.7.
+
+0.32  Thu Aug 16 00:11:40 CEST 2007
+    - Patch and build wxWidgets 2.8.4.
+    - Correctly handle flags for wxWidgets Universal Mac builds.
+    - Allow building a monolithic wxWidgets.
+    - Allow building Mac Universal binaries for wxWidgets.
+    - Updated bundled Archive::Extract to the latest version.
+
+0.31  Sat Mar 24 17:25:25 CET 2007
+    - Patch and build wxWidgets 2.8.3.
+    - Automatically link in C++ runtime for MSVC 7.0 and above.
+
+0.30  Sun Mar 18 16:47:23 CET 2007
+    - Fetch and build wxWidgets 2.8.2.
+
+0.29  Fri Mar 16 20:11:31 CET 2007
+    - Must require Perl 5.006, not 5.6.
+
+0.28  Sat Mar 10 21:41:32 CET 2007
+    - Release 0.27_51 as the new stable version.
+
+0.27_51  Sun Feb 25 22:54:07 CET 2007
+    - Fetch and build wxWidgets 2.8.1.
+
+0.27_50  Sun Feb 25 22:39:43 CET 2007
+    - Fetch and build wxWidgets 2.8.0.
+    - Update bundled modules to the latest version.
+
+0.27  Tue Dec 19 23:04:41 CET 2006
+    - Support monolithic wxWidgets builds.
+
+0.26  Sat Dec 16 19:42:57 CET 2006
+    - Improve error reporting for missing libraries.
+
+0.25  Sun Nov  5 18:39:22 CET 2006
+    - Add aui and richtest to the wxWidgets libraries
+      searched with wx-config.
+
+0.24  Fri Oct 20 21:27:57 CEST 2006
+    - Add an option for disabling OpenGL support when building
+      wxWidgets.
+
+0.23  Thu Oct 19 21:41:16 CEST 2006
+    - Use a smart default for the "Do you want to build
+          wxWidgets?" question.
+
+0.22  Tue Oct  3 20:30:48 CEST 2006
+    - Fixed a bug in detecting an installed wxWidgets in /usr/lib64 in
+      x86_64 systems. (patch by Jose Pedro Oliveira)
+    - When fetching wxWidgets, print the download URL.
+
+0.21  Sun Aug 27 17:17:56 CEST 2006
+    - Check that the build environment is sane under Win32.
+
+0.20  Tue Aug 15 17:45:12 CEST 2006
+    - Bundle and use the patch implementation from GNU under Windows;
+      the PPT implementation is way too fragile.
+
+0.19  Sun Jul 16 15:46:11 CEST 2006
+    - Fixes for when the compiler user for building is not in
+      the PATH when installing.
+
+0.18  Sun Jul  9 12:31:44 CEST 2006
+    - Restored compatibility with wxWidgets 2.4 where it uses
+      configure/wx-config.
+
+0.17  Fri Jul  7 22:14:13 CEST 2006
+    - Do not test POD for bundled libraries.
+
+0.16  Wed Jul  5 21:58:33 CEST 2006
+        - Fixed extraction error when using Archive::Extract.
+
+0.15  Wed Jul  5 20:26:32 CEST 2006
+    - Bundled missing Archive::Extract.
+
+0.14  Sun Jun 25 13:00:37 CEST 2006
+    - Make the wxWidgets archive type configurable when building
+      wxWidgets, defaulting to .tar.gz instead of .tar.bz2.
+
+0.13  Sun Jun 18 17:52:44 CEST 2006
+    - Removed (unused) Module::Install from inc.
+
+0.12  Mon Jun  5 21:59:58 CEST 2006
+    - Work with old versions of Test::Pod.
+    - Added a 'passthrough' Makefile.PL.
+    - Take GCC ABI compatibility into account when comparing
+      compiler versions.
+    - Clearly signal that we need bzip2 to extract wxWidgets.
+
+0.11  Thu May 25 22:27:05 CEST 2006
+    - Bundle and use the patch implementation from PPT.
+    - Rediffed all the patches against wxWidgets 2.6.3.
+
+0.10  Sun May 21 19:19:39 CEST 2006
+    - Prefer $CXX to $CC if both are set.
+    - Download and build wxWidgets 2.6.3.
+
+0.09  Tue May  2 21:27:03 CEST 2006
+    - Use mingw32-make as an alternative to make
+      under Win32/MinGW.
+
+0.08  Sun Apr 30 12:33:01 CEST 2006
+    - Fix the build process with CPANPLUS.
+
+0.07  Mon Apr 24 23:16:30 CEST 2006
+    - Fix the download URL for wxWidgets 2.6.2.
+    - Fix the build process under Windows.
+
+0.06  Sun Apr 23 14:35:47 CEST 2006
+    - Cache the absolute path of the wx-config used, and always
+      use it during the build even if PATH changes.
+
+0.05  Fri Apr 21 22:40:38 CEST 2006
+    - Work around a Module::Build handling of @INC when
+      building from CPAN.
+
+0.04  Sun Apr 16 17:01:07 CEST 2006
+    - Optionally build wxWidgets from sources.
+    - Allow some actions (like 'dist') to be executed without
+      an installed wxWidgets.
+    - Detect when some wxWidgets contrib libraries are not built
+      on wx-config platforms.
+    - Check for a recent 'nmake' for Win32+MSVC+Bakefile.
+
+0.03  Wed Aug 17 20:57:49 CEST 2005
+    - Allow multiple configurations to be installed at the
+      same time.
+
+0.02  Wed Aug 17 00:53:40 CEST 2005
+    - Added support for wxWidgets 2.4.x.
+    - Fixed option handling.
+    - Small corrections to the existing code.
+    - Added documentation.
+
+0.01  Tue Aug 16 00:00:12 CEST 2005
+    - First release. Only supports detecting
+      an already-installed wxWidgets. Works for
+      wxWidgets 2.5.x/2.6.x under Mac OS X, Windows,
+      Linux (and probably other Unices).

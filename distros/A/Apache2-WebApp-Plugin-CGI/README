@@ -1,0 +1,67 @@
+NAME
+    Apache2::WebApp::Plugin::CGI - Plugin providing common CGI methods
+
+SYNOPSIS
+      my $obj = $c->plugin('CGI')->method( ... );     # Apache2::WebApp::Plugin::CGI->method()
+
+        or
+
+      $c->plugin('CGI')->method( ... );
+
+DESCRIPTION
+    Common methods for dealing with HTTP requests.
+
+PREREQUISITES
+    This package is part of a larger distribution and was NOT intended to be
+    used directly. In order for this plugin to work properly, the following
+    packages must be installed:
+
+      Apache2::WebApp
+      Params::Validate
+
+INSTALLATION
+    From source:
+
+      $ tar xfz Apache2-WebApp-Plugin-CGI-0.X.X.tar.gz
+      $ perl MakeFile.PL PREFIX=~/path/to/custom/dir LIB=~/path/to/custom/lib
+      $ make
+      $ make test
+      $ make install
+
+    Perl one liner using CPAN.pm:
+
+      $ perl -MCPAN -e 'install Apache2::WebApp::Plugin::CGI'
+
+    Use of CPAN.pm in interactive mode:
+
+      $ perl -MCPAN -e shell
+      cpan> install Apache2::WebApp::Plugin::CGI
+      cpan> quit
+
+    Just like the manual installation of Perl modules, the user may need
+    root access during this process to insure write permission is allowed
+    within the installation directory.
+
+OBJECT METHODS
+  params
+    Get the request paramters; return name/value parameters as a hash.
+
+      my %param = $c->plugin('CGI')->params(\%controller);
+
+  redirect
+    Redirect an HTTP request to a target URI or URL.
+
+      $c->plugin('CGI')->redirect( \%controller, $target );
+
+SEE ALSO
+    Apache2::WebApp, Apache2::WebApp::Plugin, Apache2::Request
+
+AUTHOR
+    Marc S. Brooks, <mbrooks@cpan.org> - <http://mbrooks.info>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://dev.perl.org/licenses/artistic.html>
+

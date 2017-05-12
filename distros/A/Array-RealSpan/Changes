@@ -1,0 +1,9 @@
+Revision history for Array-RealSpan:
+
+0.0101 2016-01-16 00:58:50
+    - Enhanced eg/ancient.
+    - Added "object label" tests.
+    - Improved documentation.
+
+2016-01-16 14:43
+    - Minted by Dist::Zilla.

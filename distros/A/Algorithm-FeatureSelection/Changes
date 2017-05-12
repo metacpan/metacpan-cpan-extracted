@@ -1,0 +1,7 @@
+Revision history for Perl extension Algorithm::FeatureSelection
+
+0.02    2012/06/13
+        - add information_gain_ratio() method.
+
+0.01    2012/06/11
+        - original version

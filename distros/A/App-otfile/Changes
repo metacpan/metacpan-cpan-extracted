@@ -1,0 +1,25 @@
+Revision history for App-otfile
+
+0.06  2014-06-10 22:38:38 EDT
+        - Add Clipboard.pm for clipboard access, adding support for
+          Windows and Linux.
+        - --self or -s to serve a copy of itself
+        - minor rephrasing of some help text
+        - INTERNAL cleanup Term::ProgressBar terminal width setting
+
+0.05  2013-09-26 19:51:19 EDT
+        - -m to serve a file multiple times, doesn't exit until ctrl+c
+
+0.04  2013-09-12 05:17:05 EDT
+        - Add author, copyright, & license sections to otfile.pm
+
+0.03  2013-09-09 02:19:39 EDT
+        - CPANified
+
+0.02 2013-09-09 01:25:48 EDT
+        - --help or -h for help
+        - --port or -p to specify port to use
+        - --auto or -a to auto-pick available port
+
+0.01 2013-09-06 17:04:24 EDT
+        - Initial release

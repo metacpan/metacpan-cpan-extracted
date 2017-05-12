@@ -1,0 +1,65 @@
+Revision history for Perl extension AnyEvent::Stomper.
+
+0.34 Mon Apr 10 17:10:00 MSK 2017
+  - Improved reliability. If the "receipt" header not specified, the callback
+    "on_receipt" is guaranteed called after the command was successfully
+    written to the socket, even if the "autocork" parameter is on.
+
+0.32 Wed Mar 22 17:22:49 MSK 2017
+  - Now the client tracks all received messages and outgoing ACKs/NACKs, and do
+    not sent unexpected ACKs/NACKs to the STOMP server.
+  - Improved support of different version of STOMP protocol.
+  - ack() and nack() methods now required "message" parameter.
+  - README.pod replaced by README.md.
+
+0.30 Thu Feb 16 12:48:26 MSK 2017
+  - Fix in Changes file.
+
+0.28 Thu Feb 16 12:30:15 MSK 2017
+  - Added README.pod file instead of README file.
+
+0.26 Sat Jan 28 16:39:10 MSK 2017
+  - Removed useless method "get_node".
+  - Light refactoring.
+
+0.24 Thu Jan 26 23:01:07 MSK 2017
+  - Fixed synopsis in POD for AnyEvent::Stomper::Cluster.
+
+0.22 Thu Jan 26 18:29:17 MSK 2017
+  - Fixes in POD.
+
+0.20 Thu Jan 26 18:04:42 MSK 2017
+  - Fixed call templates of several methods in POD.
+
+0.18 Thu Jan 26 17:46:15 MSK 2017
+  - Fix in POD.
+
+0.16 Thu Jan 26 17:19:05 MSK 2017
+  - The logic of working with cluster completely rewritten. Added
+    AnyEvent::Stomper::Cluster instead AnyEvent::Stomper::Pool.
+  - Added constructor parameters "default_headers" and "command_headers".
+  - POD improved.
+  - Light refactoring.
+
+0.14 Thu Dec 29 15:16:45 MSK 2016
+  - Weakened one more circular reference.
+
+0.12 Wed Dec 14 17:03:50 MSK 2016
+  - Light changes in POD.
+
+0.10 Tue Dec 13 14:40:05 MSK 2016
+  - The "on_receipt" and "on_message" callbacks now must be specified without
+    hash reference. Backward compatible was broken.
+
+0.08 Wed Nov 16 11:33:55 MSK 2016
+  - Fixed incorrect example in POD.
+
+0.06 Tue Nov 15 17:03:20 MSK 2016
+  - Fixes in POD.
+
+0.04 Tue Nov 15 15:02:45 MSK 2016
+  - Renamed parameter "heart_beat" to "heartbeat".
+  - Improved POD.
+
+0.02 Tue Nov 15 12:33:20 MSK 2016
+	- Initial release.

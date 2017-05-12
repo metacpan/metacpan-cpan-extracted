@@ -1,0 +1,115 @@
+#!/usr/bin/perl  -T -w
+
+use strict ;
+use warnings ;
+use Carp ;
+use English qw( -no_match_vars ) ;
+
+=head1 NAME 
+
+record_textcast - records a terminal session
+
+=head1 USAGE
+
+  $> textcast_record [-options] [directory_containing_textcast_data]
+
+=head1 OPTIONS
+
+=over 2
+
+=item  'h|help'      display help
+
+=item  'rows'        number of rows in the terminal
+
+=item  'columns'     number of columns in the terminal
+
+=back
+
+=head1 EXIT STATUS
+
+=over 2
+
+=item 0 No errors found
+
+=item 1 Textcast directory already exists
+
+=item 2 Textcast directory too long
+
+=item 3 Invalid directory name, only [[:alnum:]\/_-] accepted 
+
+=item other errors exit with status != 0 (eg: file system related exceptions)
+
+=back
+
+=head1 AUTHOR
+
+	Nadim ibn hamouda el Khemir
+	CPAN ID: NKH
+	mailto: nkh@cpan.org
+
+=head1 SEE ALSO
+
+play_textcast (1) , script (1), screen (1).
+
+=cut
+
+our $VERSION = '0.02' ;
+
+#---------------------------------------------------------------------------------------------------------
+
+delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};   # Make %ENV safer
+$ENV{PATH} = '/usr/bin/:/bin/' ;
+
+#---------------------------------------------------------------------------------------------------------
+
+use Getopt::Long ;
+use App::Textcast 'record_textcast' ;
+
+#---------------------------------------------------------------------------------------------------------------
+
+my ($compress, $columns, $rows) = get_options() ;
+
+record_textcast
+	(
+	COMMAND => 'bash',
+	OUTPUT_DIRECTORY => shift @ARGV,
+	COMPRESS => $compress,
+	COLUMNS => $columns,
+	ROWS => $rows,
+	) ;
+
+#---------------------------------------------------------------------------------------------------------
+
+sub get_options
+{
+my ($compress, $columns, $rows) ;
+
+unless
+	(
+	GetOptions
+		(
+		'h|help' => \&display_help,
+		'c|compress' => \$compress,
+		'rows=i' => \$rows,
+		'columns=i' => \$columns,
+		)
+	)
+	{
+	croak "Error: Invalid option!\n" ;
+	}
+
+return ($compress, $columns, $rows) ;
+}
+
+#---------------------------------------------------------------------------------------------------------
+
+sub display_help
+{ 
+my ($this_script) = ($PROGRAM_NAME =~m/(.*)/sxm ) ;
+
+print {*STDERR} `perldoc $this_script`  or croak 'Can\'t display help!' ; ## no critic (InputOutput::ProhibitBacktickOperators)
+exit(1) ;
+}
+
+#---------------------------------------------------------------------------------------------------------
+

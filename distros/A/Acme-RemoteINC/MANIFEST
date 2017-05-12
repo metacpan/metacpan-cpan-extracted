@@ -1,0 +1,11 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Acme/RemoteINC.pm
+t/test1.t
+t/pod.t
+t/pod_coverage.t
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

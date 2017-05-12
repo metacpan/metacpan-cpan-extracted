@@ -1,0 +1,8 @@
+Revision history for Acme-Magic-Pony
+
+0.01    Thu Oct  2 2008
+        Just a baby Magic Pony
+
+0.02    Fri Oct 24 2008
+        Require CPAN 1.93 per RT bug 40192
+        Fix magic pony message per RT bug 40180

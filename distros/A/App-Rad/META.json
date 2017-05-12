@@ -1,0 +1,47 @@
+{
+   "abstract" : "Rapid (and easy!) creation of command line applications",
+   "author" : [
+      "Breno G. de Oliveira <garu at cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6501, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Rad",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attribute::Handlers" : "0",
+            "B::Deparse" : "0",
+            "Carp" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "2.36",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.05"
+}

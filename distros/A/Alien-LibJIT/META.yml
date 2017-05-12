@@ -1,0 +1,19 @@
+---
+abstract: 'your very own libjit for nefarious Perl purposes'
+author:
+  - 'Mattia Barbon <mattia@barbon.org>'
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-LibJIT
+requires:
+  File::ShareDir: 0
+version: 0.03

@@ -1,0 +1,18 @@
+Some ideas that may or may not be implemented...
+
+ . Input & output file streams (possibly using Audio::Data)
+ 
+ . Unify *Plugin::Perl *Plugin::XS and *Network to use the same
+   same basic interface and possibly share more code. 
+   
+   Idea: maybe need something like: Plugin::Static for plugins
+   with fixed ports, and Plugin::Dynamic for flexible plugin-like
+   object such as networks.
+   
+ . Move Audio::LADSPA::LibraryLoader code to Audio::LADSPA module
+ 
+ . Clean up interface to library loading
+ 
+ . Clarify docs on library loading
+  
+  

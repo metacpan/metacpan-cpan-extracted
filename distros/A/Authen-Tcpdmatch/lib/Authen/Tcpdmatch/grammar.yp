@@ -1,0 +1,55 @@
+# Copyright (c) 2003 Ioannis Tambouras <ioannis@earthlink.net> .
+# All rights reserved.
+
+
+%start S
+%expect 15
+
+%{
+no strict 'refs'; use NetAddr::IP;
+our  ( $found, $e, $side, $remote, $service, $OK_remote, $OK_service)  ;        
+sub found     { $OK_service && $OK_remote  or  undef                                 }
+sub register  { ${"OK_$side"} = !$e}                                             
+sub tally     { register    if  ($_[0]||'') eq ${"$side"}                        }
+sub dot_host  { (my $ip = $_[0]) =~ s!\.!\\\.!g;  register if $remote =~ /$ip$/  }
+sub ip_dot    { (my $ip = $_[0]) =~ s!\.!\\\.!g;  register if $remote =~ /^$ip/  }
+sub ALL       { register                                                         }
+sub LOCAL     { register    if $remote !~ /\./                                   }
+sub maskit    { my $r = new NetAddr::IP $remote  or return;
+                register   if (NetAddr::IP->new(shift)||return)  ->contains($r)  }
+sub printOK   { print "OK_service=$OK_service, OK_remote=$OK_remote " }
+
+
+%}
+%start   S
+
+%%
+init:   { $service = $_[0]->{USER}{service}; $remote = $_[0]->{USER}{remote} ; $found=0}
+;  
+
+S:  init  line   { $found||undef }
+;
+
+sside: { $side   = 'service', $e=0 ;  $OK_remote = $OK_service =  undef } ;
+rside: { $side   = 'remote' , $e=0  } ;
+
+line:   | line   EOL
+        | line   COMMENT             EOL
+	| line   sside list   COLON  rside list    
+	{ $found =  1 if found() }
+        | COMMENT 
+;
+
+list:  | list  term
+       | list  EXCEPT {$e^=1}  list
+;
+
+term:   WORD      { tally     $_[1] }
+      | ALL       { ALL             }
+      | LOCAL     { LOCAL           }
+      | MASK      { maskit    $_[1] }
+      | DOT_HOST  { dot_host  $_[1] }
+      | IP_DOT    { ip_dot    $_[1] }
+;
+
+%%

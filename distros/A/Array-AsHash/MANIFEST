@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Array/AsHash.pm
+lib/Array/AsHash/Iterator.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/10-hash.t
+t/20-array.t
+t/30-strict.t
+t/lib/Bar.pm
+t/lib/Foo.pm
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,828 @@
+A:link            { text-decoration: none; 
+                    color: #0000FF;
+                  }
+A:visited         { text-decoration: none; 
+                    color: #AA0088;
+                  }
+A:hover           { text-decoration: underline; 
+                  }
+A.banner          { color  : #FFFFFF;
+                    font-size : small;
+                    text-decoration : none;
+                  }
+A.bblue           { color: #FFFFFF;
+                    background-color: #9999FF;
+                    font-size : small;
+                    text-align: center;
+                  }
+A.bred            { color: #FFFFFF;
+                    background-color: #FF6666;
+                    font-size : small;
+                    text-align: center;
+                  }
+BODY              { background-color: white; 
+                    font-family: sans-serif;
+                  }
+H1                { color: #3366FF; 
+                    font-family: sans-serif; 
+                  }
+H2                { color: #3366FF; 
+                    font-family: sans-serif; 
+                  }
+H3                { color: #3366FF; 
+                    font-family: sans-serif; 
+                  }
+H4                { color: #3366FF; 
+                    font-family: sans-serif; 
+                  }
+INPUT             { background-color: white; }
+OL                { font-family: sans-serif; }
+UL                { font-family: sans-serif; }
+LI                { font-family: sans-serif; 
+                    list-style: url(/images/reddot.jpg) outside;
+                  }
+DL                { font-family: sans-serif; }
+DT                { font-family: sans-serif; }
+DD                { font-family: sans-serif; }
+
+LI.new            { font-family: sans-serif; 
+                    list-style: url(/icons/new.gif)     outside;
+                  }
+P                 { font-family: sans-serif; }
+PRE.peptide       { font-size: small; }
+PRE.dna           { font-size: small; 
+                    font-family: monospace;
+                  }
+SELECT            { background-color: white; }
+TABLE             { padding: 0;
+                    spacing: 2;
+                    width: 100%;
+                  }
+TD                { font-family: sans-serif; }
+TH                { font-family: sans-serif; 
+                    padding: 0; 
+                  }
+.abstract         { background-color: #FFEEEE; }
+.acetree          { font-size: 10pt; }
+.banner           { font-size: x-large;
+                    align: center;
+                    background-color: blue;
+                    color: yellow;
+                    padding: 3px 200px;
+                  }
+.data             { font-size: small; }
+.databody         { background-color: #CCFFFF; }
+.databodysmall    { background-color: #EEFFFF; }
+.datatitle        { background-color: #93CBF4; }
+.description      { font-style: italic; }
+.error            { color: red; }
+.exon             { background-color: #00FFFF;
+                    color: #000000;
+                  }
+.exonalt          { background-color: #EEEE99; 
+                    color: #000000;
+                  }
+.exonm            { /* font-weight: bold; */
+	            background-color: #00FFFF; 
+                    color: #000000;
+                  }
+.flankm           { background-color: #FFFFFF; 
+                    color: #888888;
+                  }
+.match            { background-color: #FFFF77;
+                    color: #FF00;
+                  }
+.gene             { font-style: italic; }
+.highlight        { background-color: #f5deb3; }
+.intron           { background-color: #FFFFFF; 
+                    color: #000000;
+                  }
+.intronm          { background-color: #FFFFFF; 
+                    color: #000000;
+                  }
+.mism             { color: #000000;
+                    background-color: #FF9999;
+                  }
+.note             { color: red; }
+.phenotype        { font-style: italic;
+                    margin-left: 2em;
+                  }
+.pre              { font-family: monospace; }
+.resultsbody      { background-color: #CCFFFF; }
+.resultsbodyalt   { background-color: #EEFFFF; }
+.resultstitle     { background-color: #93cbf4; }
+.search           { font-size: small; }
+.searchbody       { background-color: #FFFFCC; }
+.searchbodyalt    { background-color: #CCFFFF; }
+.searchtitle      { background-color: #FFFF99; }
+.searchbanner     { background-color: #93cbf4;
+                    color: white;
+                    font-style: bold;
+                  }
+.small            { font-size: small; }
+.smalldescription { font-style: italic;
+                    font-size: small;
+                  }
+.technicalinfo    { background-color: #FFFFFF; }
+.toggle           { color: #3366FF; }
+.tRNAs            { background-color: white;
+                    color: black;
+                    curatedexon: slateblue;
+                    fontcolor: slateblue;
+                    bump: -1;
+                    height: 3;
+                  }
+.transcriptf      { background-color: white;
+                    color: black;
+                    curatedexon: slateblue;
+                    fontcolor: slateblue;
+                    bump: -1;
+                    height: 10;
+                  }
+.transcriptr      { background-color: white;
+                    curatedexon: dodgerblue;
+                    fontcolor: dodgerblue;
+                    color: black;
+                    bump: +1;
+                    height: 10;
+                  }
+.BLAT             { background-color: greenyellow;
+                    color: black;
+                    bump: +1;
+                    height: 4;
+                    connectgroups: 1;
+                    connector: black;
+                    key: 'ESTs\ aligned\ by\ BLAT';
+                  }
+.EST_GENOME       { background-color: limegreen;
+                    color: black;
+                    bump: +1;
+                    height: 4;
+                    stranded: 1;
+                    connectgroups: 1;
+                    connector: black;
+                    key: 'ESTs\ aligned\ by\ EST_GENOME';
+                  }
+.RNAi             { background-color: goldenrod;
+                    color: black;
+                    height: 4;
+                    bump: +1;
+                    key: 'RNAi\ experiments';
+                  }
+.Worm-Transcriptome-Project-Genes { background-color: yellow;
+                    color: black;
+                    height: 4;
+                    bump: +1;
+                    key: 'Worm\ Transcriptome\ Project\ genes';
+                  }
+.Oligos           { background-color: violet;
+                    color: black;
+                    connect: 1;
+                    connect_color: cyan;
+                    connector: violet;
+                    bump: -1;
+                    key: 'oligos';
+                  }
+.PolyA-sites      { background-color: violet;
+                    color: blue;
+                    bump: -1;
+                    key: 'polyA sites';
+                  }
+.Primers          { background-color: violet;
+                    color: black;
+                    connect: 1;
+                    connector: violet;
+                    connect_color: gray;
+                    bump: -1;
+                    key: 'oligos';
+                  }
+.HMMer            { background-color: red;
+                    color: black;
+                    connect: 1;
+	            height: 4;
+                    connector: black;
+	            label: 1;
+                    bump: -1;
+                    key: 'motifs';
+                  }
+.Briggsae         { background-color: tomato;
+                    color: black;
+                    height: 4;
+                    bump: +1;
+                    key: 'C.\ briggsae\ similarity';
+                  }
+.Prosite          { background-color: bisque;
+                    color: black;
+                    height: 4;
+                    bump: +1;
+                    key: 'prosite';
+                  }
+.Misc_feature     { background-color: bisque;
+                    color: black;
+                    height: 4;
+                    bump: +1;
+                    key: 'Miscellaneous';
+                  }
+.Clone            { color: black;
+                    height: 7;
+                    bump: +1;
+                    key: 'YACs\ &\ Cosmids';
+                  }
+
+/* this is all das stuff */
+default.default {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  bump: +1;
+  height: 6;
+  color: wheat;
+}
+Sequence.default {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  bump: +1;
+  height: 6;
+  color: black;
+  background-color: gray;
+}
+ALLELE.default {
+  glyph: ANCHORED_ARROW;
+  das: 1;
+  label: 1;
+  bump: +1;
+  height: 3;
+  color: black;
+  background-color: tomato;
+}
+translation.default {
+  glyph: GENERIC;
+  das: 1;
+  height: 5;
+  bump: +1;
+  point: 2;
+  color: blue;
+}
+translated.default {
+  glyph: GENERIC;
+  das: 1;
+  height: 5;
+  label: 1;
+  bump: +1;
+  height: 6;
+  color: blue;
+}
+translated.stopsite {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  height: 5;
+  color: black;
+}
+translated.ATG {
+  glyph: CROSS;
+  das: 1;
+  label: 1;
+  height: 2;
+  color: green;
+}
+translated.CDS {
+  glyph: ARROW;
+  das: 1;
+  label: 1;
+  height: 6;
+  color: cyan;
+}
+Predicted_gene.default {
+  glyph: TRANSCRIPT;
+  das: 1;
+  label: 1;
+  bump: +1;
+  height: 10;
+  color: dodgerblue;
+  background-color: dodgerblue;
+}
+transcription.default {
+  glyph: TRANSCRIPT;
+  das: 1;
+  label: 1;
+  bump: +1;
+  height: 10;
+  color: black;
+  background-color: wheat;
+}
+transcription.transcript {
+  glyph: TRANSCRIPT;
+  das: 1;
+  label: 1;
+  bump: +1;
+  height: 10;
+  background-color: dodgerblue;
+  color: black;
+  linewidth: 1;
+}
+transcription.curated {
+  glyph: TRANSCRIPT;
+  das: 1;
+  label: 1;
+  height: 10;
+  color: black;
+  background-color: wheat;
+}
+transcription.exon {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  height: 10;
+  background-color: dodgerblue;
+  color: dodgerblue;
+  linewidth: 1;
+}
+transcription.intron {
+  glyph: CONNECTOR;
+  das: 1;
+  label: 1;
+  height: 10;
+  color: blue;
+}
+transcription.tRNA {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  height: 5;
+  color: red;
+  color: red;
+  linewidth: 1;
+}
+transcription.mRNA {
+  glyph: TOOMANY;
+  das: 1;
+  label: 1;
+  height: 5;
+  color: magenta;
+  color: black;
+  linewidth: 1;
+}
+transcription.snRNA {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  height: 5;
+  color: green;
+  color: blue;
+  linewidth: 1;
+}
+transcription.polyA {
+  glyph: ARROW;
+  das: 1;
+  label: 1;
+  height: 2;
+  color: green;
+  parallel: yes;
+  northeast: no;
+}
+transcription.splice5 {
+  glyph: ARROW;
+  das: 1;
+  label: 1;
+  color: green;
+  height: 2;
+  parallel: yes;
+  northeast: yes;
+  southwest: no;
+}
+transcription.splice3 {
+  glyph: ARROW;
+  das: 1;
+  label: 1;
+  color: green;
+  height: 2;
+  parallel: yes;
+  northeast: yes;
+  southwest: no;
+}
+variation.default {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  bump: +1;
+  height: 2;
+  color: gray;
+}
+variation.insertion {
+  glyph: ARROW;
+  das: 1;
+  label: 1;
+  color: yellow;
+  height: 5;
+  parallel: no;
+  northeast: no;
+}
+variation.deletion {
+  glyph: ARROW;
+  das: 1;
+  label: 1;
+  color: yellow;
+  height: 5;
+  parallel: no;
+  southwest: no;
+}
+variation.substitution {
+  glyph: ARROW;
+  das: 1;
+  label: 1;
+  color: cyan;
+  height: 5;
+  parallel: no;
+  northeast: yes;
+  southwest: no;
+}
+structural.default {
+  glyph: ANCHORED_ARROW;
+  das: 1;
+  bump: +1;
+  label: 1;
+  height: 4;
+  linewidth: 1;
+  color: red;
+}
+structural.Link {
+  glyph: ANCHORED_ARROW;
+  das: 1;
+  bump: +1;
+  height: 4;
+  linewidth: 2;
+  color: black;
+}
+structural.GenePair_STS {
+  glyph: PRIMERS;
+  das: 1;
+  bump: +1;
+  height: 4;
+  linewidth: 1;
+  color: violet;
+  connect: 1;
+  connector: violet;
+}
+structural.PCR_product {
+  glyph: PRIMERS;
+  das: 1;
+  label: 1;
+  height: 50;
+  color: #33ff33;
+}
+structural.Genomic_canonical {
+  glyph: ANCHORED_ARROW;
+  das: 1;
+  label: 1;
+  bump: +1;
+  height: 3;
+  color: black;
+}
+structural.clone {
+  glyph: GENERIC;
+  das: 1;
+  height: 5;
+  color: #33ff33;
+}
+structural.assembly_tag {
+  glyph: GENERIC;
+  das: 1;
+  point: 2;
+  color: red;
+}
+structural.Clone_left_end {
+  glyph: GENERIC;
+  das: 1;
+  point: 2;
+  color: red;
+}
+structural.Clone_right_end {
+  glyph: GENERIC;
+  das: 1;
+  point: 2;
+  color: red;
+}
+structural.primer_left {
+  glyph: TEXT;
+  das: 1;
+  label: 1;
+  font: helvetica;
+  fontsize: 8;
+  string: l;
+  color: purple;
+}
+structural.primer_right {
+  glyph: TEXT;
+  das: 1;
+  label: 1;
+  font: helvetica;
+  fontsize: 8;
+  string: r;
+  color: purple;
+}
+structural.oligo {
+  glyph: GENERIC;
+  das: 1;
+  bump: +1;
+  height: 3;
+  color: #669900;
+  background-color: white;
+}
+structural.SNP {
+  glyph: TRIANGLE;
+  point: 1;
+  das: 1;
+  label: 1;
+  height: 2;
+  color: green;
+}
+Homol_data.default {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  label: 1;
+  height: 3;
+  color: black;
+  background-color: red;
+}
+Homol_data.NN {
+  glyph: TOOMANY;
+  das: 1;
+  label: 1;
+  height: 50;
+  color: #666666;
+  linewidth: 1;
+}
+Homol_data.NP {
+  glyph: SEGMENTS;
+  das: 1;
+  label: 1;
+  height: 50;
+  color: #666666;
+  linewidth: 1;
+}
+Homol_data.PN {
+  glyph: SEGMENTS;
+  das: 1;
+  label: 1;
+  height: 2;
+  color: #666666;
+  linewidth: 1;
+}
+Homol_data.PP {
+  glyph: SEGMENTS;
+  das: 1;
+  label: 1;
+  height: 50;
+  color: #666666;
+  linewidth: 1;
+}
+similarity.default {
+  glyph: SEGMENTS;
+  das: 1;
+  label: 1;
+  bump: +1;
+  height: 5;
+  background-color: limegreen;
+  color: black;
+}
+similarity.BLAT_EST_GENOME {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: greenyellow;
+  fillcolor: red;
+}
+similarity.BLASTN {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: lawngreen;
+}
+similarity.BLASTN_EST_briggsae {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: thistle;
+}
+similarity.BLASTN_EST_elegans {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: springgreen;
+}
+similarity.BLASTN_TC1 {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: lime;
+}
+similarity.BLASTN_briggsae_cosmid {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: orchid;
+}
+similarity.BLASTN_eleg_brig {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: limegreen;
+}
+similarity.BLASTN_elegans_cosmid {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: darkgreen;
+}
+similarity.BLASTX {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: red;
+}
+similarity.BLASTX_wormpep {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: darkred;
+}
+similarity.BLASTP {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: yellow;
+}
+similarity.TBLASTN {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: cyan;
+}
+similarity.TBLASTX {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: royalblue;
+}
+similarity.TBLASTX_briggsae {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: violet;
+}
+similarity.TBLASTX_EST_elegans {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: dodgerblue;
+}
+similarity.TBLASTX_EST {
+  glyph: SEGMENTS;
+  das: 1;
+  bump: +1;
+  height: 5;
+  background-color: darkgray;
+  color: dodgerblue;
+}
+repeat.default {
+  glyph: GENERIC;
+  das: 1;
+  bump: +1;
+  height: 3;
+  background-color: #ffe4c4;
+  color: #8b7d6b;
+}
+repeat.microsatellite {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  height: 50;
+  color: #6699cc;
+}
+repeat.inverted_repeat {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  height: 50;
+  color: #6699cc;
+}
+repeat.tandem_repeat {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  height: 5;
+  color: #6699cc;
+}
+repeat.transposable_element {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  height: 5;
+  color: #6699cc;
+}
+repeat.LINE {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  height: 5;
+  color: #6699cc;
+}
+experimental.default {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  bump: +1;
+  height: 5;
+  color: black;
+  background-color: #b8860b;
+}
+experimental.cDNA_for_RNAi {
+  glyph: SPAN;
+  das: 1;
+  label: 1;
+  bump: +1;
+  height: 4;
+  color: black;
+  background-color: limegreen;
+}
+experimental.knockout {
+  glyph: TRIANGLE;
+  point: 1;
+  das: 1;
+  label: 1;
+  color: red;
+}
+experimental.expression_tag {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  color: cyan;
+}
+experimental.microarrayed {
+  glyph: TRIANGLE;
+  das: 1;
+  color: yellow;
+}
+experimental.RNAi {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  bump: +1;
+  height: 4;
+  background-color: goldenrod;
+  color: black;
+}
+experimental.transgenic {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  color: blue;
+}
+experimental.mutant {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  color: violet;
+}
+partial_gene.default {
+  glyph: GENERIC;
+  das: 1;
+  label: 1;
+  background-color: yellow;
+  color: orange;
+  height: 5;
+  bump: +1;
+}

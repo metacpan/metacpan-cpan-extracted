@@ -1,0 +1,29 @@
+Acme-Tanasinn
+
+∵h∵∵REA∵∵∵∵is∵∵∵∵∵ to∵∵∵∵∵∵∵uce∵∵∵∵∵∵∵∵∵le∵∵∵∵∵∵∵∵∵∵de∵∵∵∵∵∵∵∵∵∵∵∵s ∵∵∵∵∵∵∵∵∵∵∵∵∵
+∵∵w ∵∵∵i∵∵∵∵ll∵∵∵∵∵mo∵∵∵∵∵∵∵ny∵∵∵∵∵∵∵∵∵∵e∵∵∵∵∵∵∵∵∵∵∵∵∵ m∵∵∵∵∵∵∵∵∵∵∵∵∵∵∵∵
+∵∵∵m∵∵∵∵C ∵∵∵∵∵l∵∵∵∵∵∵∵∵in∵∵∵∵∵∵∵∵∵ib∵∵∵∵∵∵∵∵∵∵∵∵an∵∵∵∵∵∵∵∵∵∵∵∵∵∵∵tio∵∵∵∵∵∵∵∵∵∵∵∵∵∵∵∵∵∵
+∵ha∵∵∵ho∵∵∵∵∵e p∵∵∵∵∵∵d∵∵∵∵∵∵∵∵the∵∵∵∵∵∵∵∵∵∵ ∵∵∵∵∵∵∵∵∵∵∵∵∵
+∵
+∵ ∵∵∵∵ME∵∵∵∵∵∵is ∵∵∵∵∵∵∵∵ fo∵∵∵∵∵∵∵∵∵∵∵l∵∵∵∵∵∵∵∵∵∵∵∵∵ ex∵∵∵∵∵∵∵∵∵∵∵∵∵∵∵M∵∵∵∵∵∵∵∵∵∵∵∵∵∵∵∵
+∵i∵∵∵∵rom∵∵∵∵∵∵ule∵∵∵∵∵∵∵b∵∵∵∵∵∵∵∵∵∵ha∵∵∵∵∵∵∵∵∵∵∵ows∵∵∵∵∵∵∵∵∵∵∵∵i∵∵∵∵∵∵∵∵∵∵∵∵∵∵∵
+∵∵n ∵∵∵ i∵∵∵∵∵g∵∵∵∵∵∵id∵∵∵∵∵∵∵∵e∵∵∵∵∵∵∵∵∵∵use∵∵∵∵∵∵∵∵∵∵∵∵∵lly∵∵∵∵∵∵∵∵∵∵∵∵∵∵∵
+∵∵ ∵∵∵∵∵d∵∵∵∵∵∵∵∵n i∵∵∵∵∵∵∵∵∵∵ h∵∵∵∵∵∵∵∵∵∵∵ pe∵∵∵∵∵∵∵∵∵∵∵∵∵∵e ∵∵∵∵∵∵∵∵∵∵∵∵∵∵∵
+∵∵∵ix∵∵∵∵∵∵ t∵∵∵∵∵∵∵∵e a∵∵∵∵∵∵∵∵∵do∵∵∵∵∵∵∵∵∵∵∵
+
+
+INSTALLATION
+∵∵∵ins∵∵∵∵∵th∵∵∵∵∵∵u∵∵∵∵∵∵∵∵t∵∵∵∵∵∵∵∵∵∵ng ∵∵∵∵∵∵∵∵∵∵∵∵∵:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+LICENSE AND COPYRIGHT
+       Copyright 2009 The Elitist Superstructure.
+
+       This program is free software; you may use this software under the
+       terms of Perl itself, providing you do not affiliate as "Affiliation"
+       carries a connotation that some find unpleasant.

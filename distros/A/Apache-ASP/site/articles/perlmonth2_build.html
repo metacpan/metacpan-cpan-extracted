@@ -1,0 +1,518 @@
+
+<html>
+<head><title>Apache::ASP Site Building</title></head>
+<bgcolor=white>
+<h2>Apache::ASP Site Building</h2>
+<h3>By: Joshua Chamas</h3>
+<i>published originally in PerlMonth.com in 1999</i>
+<p>
+
+Last month,
+I gave a rough introduction of <a href=http://www.apache-asp.org/>Apache::ASP</a>, 
+and why you might want to use it to build your web site.  
+Now I get to show you Apache::ASP in action.
+
+<h3>Requirements</h3>
+First, we must decide what our site will do, or 
+state its requirements.  As a trivial site,
+we are going do build something my.*.com style, which 
+holds a user's favorite links, a MyBookmarks site
+if you will.  
+<p>
+This site will require a user to login
+with a chosen user name for security, 
+and view, add, and delete their internet bookmarks.  
+The deletion will leave the deleted bookmark data in the form to allow
+easy modification and recreation of that bookmark.
+<p>
+The user will also be able to logout, and the system
+will auto-logout their account automatically after 
+15 minutes, so that if it is a public terminal, another user using the 
+same browser later will not be able modify the 
+first user's bookmarks. 
+<p>
+
+<h3>Specification</h3>
+Often times, there is a specification round that we
+must do to pick our web application environment and 
+hardware, as well as supported client software, but this is a no 
+brainer here.  We are choosing Apache::ASP because of its built 
+in <tt>$Session</tt> which make user logins easy, and its built 
+in event <tt>Session_OnEnd</tt> which will automatically destroy 
+the contents of <tt>$Session</tt> every <tt>SessionTimeout</tt>, which 
+defaults to 20 minutes.
+<p>
+Also, because our web application has more than one page, we 
+will make use of the same headers and footers for each
+page, using the includes <tt>&lt;!--#include file=src.inc--&gt;</tt>
+functionality to modularize the html.
+
+<h3>Design</h3>
+Before we start coding, let's take a minute to diagram
+what pages and actions our MyBookmarks web application 
+needs to have.  We have 2 pages, the intro, and the 
+actual bookmarks page, where we get to view, add, and 
+delete the bookmark entries.  We have the user login to 
+the bookmarks, and logout, securing access for the user's 
+eyes only.
+<p>
+<center><img src=flow.gif border=0></center>
+<p>
+You might also design the objects, methods, and functions
+that will be used for the site, but this site is so 
+simple, that we are going to jump into implementation.
+
+<h3>Implementation</h3>
+We start by configuring <tt>.htaccess</tt> file 
+of a directory in apache to allow Apache::ASP
+to run <tt>.asp</tt> files, and testing the configuration
+with a <tt>dummy.asp</tt> file.
+
+
+	<p>
+	<center>
+	<table border=0 cellspacing=0 width=90% >
+	<tr bgcolor=gray><td><font color=white><b># .htaccess</b></td></tr>
+	<tr bgcolor=#c0c0c0><td><pre>
+<tt>DirectoryIndex index.asp
+&lt;Files ~ \.asp$&gt;
+	SetHandler perl-script
+	PerlHandler Apache::ASP
+	PerlSetVar Global .
+	PerlSetVar GlobalPackage My::Bookmarks
+	PerlSetVar StateDir /tmp/asp_apps_bookmarks
+	PerlSetVar Debug 2
+	PerlSetVar SessionTimeout 15
+	PerlSetVar StatScripts 1
+	PerlSetVar AllowApplicationState 1
+	PerlSetVar AllowSessionState 1
+&lt;/Files&gt;</tt></pre></td></tr>
+	</table>
+	</center>
+	<p>
+	
+
+	<p>
+	<center>
+	<table border=0 cellspacing=0 width=90% >
+	<tr bgcolor=gray><td><font color=white><b># dummy.asp</b></td></tr>
+	<tr bgcolor=#c0c0c0><td><pre>
+<tt>INTRO &lt;%=$Session%&gt;</tt></pre></td></tr>
+	</table>
+	</center>
+	<p>
+	
+
+If the index.asp works on your server, and just prints
+<tt>INTRO Apache::ASP::Session=HASH(0x??????)</tt>, 
+then we know Apache::ASP is working and $Sessions are 
+enabled.
+
+<hr size=1>
+
+Next, we set up the <tt>global.asa</tt> with globals and 
+libraries that need to be initialized for the web 
+application, and define the relevant event handlers.  
+We also set up per request globals, like the document's 
+title, which is something that we can do in 
+<tt>Script_OnStart</tt>.  Finally, we use
+the <tt>Script_OnStart</tt> and <tt>Script_OnEnd</tt>
+events to automatically include the header and footer
+for each script in our web application, and initialize
+relevant globals used by the scripts.
+<p>
+Notice that each script can process its own <tt>Logout</tt>
+request, which was a decision made after the design
+because it seemed good to make the first script, <tt>index.asp</tt>,
+<tt>$Session</tt> aware.
+
+	<p>
+	<center>
+	<table border=0 cellspacing=0 width=90% >
+	<tr bgcolor=gray><td><font color=white><b># global.asa</b></td></tr>
+	<tr bgcolor=#c0c0c0><td><pre>
+<tt>use File::Basename;
+use DBI;
+use DBD::CSV;
+
+use vars qw( $DarkColor $Name %Titles $FontBase $Db $Title $Basename $Form $Query );
+
+$DarkColor = &#39;#0000aa&#39;;
+$Name = &quot;MyBookmarks&quot;;
+%Titles = (
+	   &#39;index.asp&#39; =&gt; &#39;Introduction&#39;,
+	   &#39;bookmarks.asp&#39; =&gt; &#39;Viewer&#39;
+	  );
+$FontBase = &#39;face=verdana,arial&#39;;
+
+$Db = DBI-&gt;connect(&quot;DBI:CSV:f_dir=&quot;.Apache-&gt;dir_config(&#39;StateDir&#39;), &#39;&#39;, &#39;&#39;, 
+		   { RaiseError =&gt; 1 })
+  or die &quot;Cannot connect: &quot; . $DBI::errstr;
+
+# setup bookmark database if first time
+unless(eval { $Db-&gt;do(&quot;select bookmark_id,username,title,url from bookmarks&quot;) }) {
+    eval { $Db-&gt;do(&quot;drop table bookmarks&quot;); };
+    $Db-&gt;do(&lt;&lt;CREATE) || die(&quot;can&#39;t create table $DBI::errstr&quot;);
+    create table bookmarks (
+			    bookmark_id varchar(15),
+			    username varchar(30),
+			    title varchar(60),
+			    url varchar(120)
+			   )
+CREATE
+  ;
+}
+
+$Db-&gt;do(&quot;select * from bookmarks&quot;)
+  || die(&quot;can&#39;t do select against bookmarks: $DBI::errstr&quot;);
+
+sub Script_OnStart {
+    $Basename = basename($0);
+    $Title = $Name.&#39; / &#39;.$Titles{$Basename};
+    $Response-&gt;Include(&#39;header.inc&#39;);
+    $Form = $Request-&gt;Form();
+    $Query = $Request-&gt;QueryString();
+    $Response-&gt;Expires(0);
+
+    # a user may logout from any script, destroy session, and go
+    # to login / intro page
+    if($Form-&gt;{logout}) {
+	$Session-&gt;Abandon();
+	$Response-&gt;Redirect(&quot;index.asp?abandon=&quot;.
+			    ++$Application-&gt;{abandon});
+    }
+}
+
+sub Script_OnEnd {
+    $Response-&gt;Include(&#39;footer.inc&#39;);
+}
+
+sub Application_OnStart {
+    # use max_bookmark_id as a pseudo sequence
+    $Application-&gt;Lock();
+    my $sth = $Db-&gt;prepare_cached
+      (&quot;select bookmark_id from bookmarks order by bookmark_id desc&quot;);
+    $sth-&gt;execute();
+    $Application-&gt;{max_bookmark_id} = $sth-&gt;fetchrow_array();
+    $Application-&gt;UnLock();
+}</tt></pre></td></tr>
+	</table>
+	</center>
+	<p>
+	
+
+<hr size=1>
+
+Next we set up the headers and footers for each page.
+One problem with <tt>HTML</tt> is that it requires you to specify
+the unique titles of the document before the standard
+body style for your site, so we cheated this and
+created the per page titles already in the <tt>Script_OnStart</tt>
+of the <tt>global.asa</tt>.
+
+
+	<p>
+	<center>
+	<table border=0 cellspacing=0 width=90% >
+	<tr bgcolor=gray><td><font color=white><b># header.inc</b></td></tr>
+	<tr bgcolor=#c0c0c0><td><pre>
+<tt>&lt;html&gt;
+&lt;head&gt;&lt;title&gt;&lt;%=$Title%&gt;&lt;/title&gt;&lt;/head&gt;
+&lt;body bgcolor=white link=purple alink=yellow vlink=gray&gt;
+
+&lt;form src=&lt;%=$Basename%&gt; method=POST&gt;
+&lt;table border=0 width=100% cellpadding=5 cellspacing=0&gt;
+&lt;tr bgcolor=&lt;%= $DarkColor %&gt;&gt;
+	&lt;td&gt;
+	&lt;b&gt;&lt;font &lt;%=$FontBase%&gt; size=+1 color=yellow&gt;
+		&lt;%=$Title%&gt;
+		&lt;% if($Session-&gt;{user}) { %&gt;
+		  for &lt;%= $Session-&gt;{user} %&gt;
+		&lt;% } %&gt;
+	&lt;/font&gt;&lt;/b&gt;
+	&lt;/td&gt;
+	&lt;td align=right&gt;
+	&lt;font &lt;%=$FontBase%&gt;&gt;
+	&lt;% if($Session-&gt;{&#39;user&#39;}) { %&gt;
+		&lt;input type=submit name=logout value=Logout&gt;
+	&lt;% } else { %&gt;
+		&amp;nbsp;
+	&lt;% } %&gt;
+	&lt;/font&gt;
+	&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/form&gt;
+&lt;/table&gt;
+
+&lt;table border=0 cellpadding=5 width=100% &gt;&lt;tr&gt;&lt;td valign=top&gt;
+&lt;font &lt;%=$FontBase%&gt; size=+0&gt;</tt></pre></td></tr>
+	</table>
+	</center>
+	<p>
+	
+
+	<p>
+	<center>
+	<table border=0 cellspacing=0 width=90% >
+	<tr bgcolor=gray><td><font color=white><b># footer.inc</b></td></tr>
+	<tr bgcolor=#c0c0c0><td><pre>
+<tt>&lt;/font&gt;
+&lt;/table&gt;
+
+&lt;table border=0 width=100% cellpadding=5&gt;
+&lt;tr&gt;
+	&lt;td bgcolor=yellow align=center&gt;
+	&lt;font &lt;%=$FontBase%&gt; size=-1 color=&lt;%= $DarkColor %&gt;&gt;
+	&lt;b&gt;
+		My-NotExists-Bookmarks 
+		Cool Technologies Etc., ???, &amp;copy; &lt;%= (localtime())[5] + 1900 %&gt;
+	&lt;/b&gt;
+	&lt;/font&gt;
+	&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt;</tt></pre></td></tr>
+	</table>
+	</center>
+	<p>
+	
+
+<hr size=1>
+
+Doing the intro page should now be fairly easy.  We
+will handle the login at the intro page, and redirect
+to the viewer upon success.  We keep the login
+processing perl code at the top so we don't print
+out any <tt>HTML</tt> before the redirect is handled.
+
+
+	<p>
+	<center>
+	<table border=0 cellspacing=0 width=90% >
+	<tr bgcolor=gray><td><font color=white><b># index.asp</b></td></tr>
+	<tr bgcolor=#c0c0c0><td><pre>
+<tt>&lt;%
+# process user login
+my $error;
+my $user = $Form-&gt;{&#39;user&#39;};
+if(defined $user) {
+	$user =~ /^\w+$/ or $error = 
+		&quot;Your username must made of only letter and numbers&quot;;
+	length($user) &gt; 3 or $error = 
+		&quot;Your username much be at least 4 character long&quot;;
+	
+	unless($error) {
+		$Session-&gt;{user} = $user;
+		$Response-&gt;Redirect(&#39;bookmarks.asp&#39;);
+	}
+}
+$user ||= $Session-&gt;{user};
+%&gt;
+Hello, and welcome to the MyBookmarks Apache::ASP demo application.
+To begin your bookmark experience, please login now:
+
+&lt;center&gt;
+&lt;% if($error) { %&gt;
+	&lt;p&gt;&lt;b&gt;&lt;font color=red size=-1&gt;* &lt;%=$error%&gt;&lt;/font&gt;&lt;/b&gt;
+&lt;% } %&gt;
+&lt;form src=&lt;%=$Basename%&gt; method=POST&gt;
+&lt;input type=text name=user value=&quot;&lt;%=$Server-&gt;HTMLEncode($user)%&gt;&quot;&gt;
+&lt;input type=submit value=Login&gt;
+&lt;/form&gt;
+&lt;/center&gt;
+
+This demo makes use of the Apache::ASP objects, especially
+&lt;tt&gt;$Session&lt;/tt&gt; and &lt;tt&gt;$Response&lt;/tt&gt;, modularizes html 
+via SSI file includes, and uses the &lt;tt&gt;Script_OnStart&lt;/tt&gt;
+and  &lt;tt&gt;Script_OnEnd&lt;/tt&gt; event hooks to 
+simplify common tasks done for each script in this web
+application.</tt></pre></td></tr>
+	</table>
+	</center>
+	<p>
+	
+
+<hr size=1>
+
+The final script for the site is the <tt>bookmarks.asp</tt>
+script, which is the most complex of the bunch.  This
+script is in charge of viewing, adding, and deleting 
+the user bookmarks.  In order to do the bookmark 
+modifications, the script processes its own form input.
+
+
+	<p>
+	<center>
+	<table border=0 cellspacing=0 width=90% >
+	<tr bgcolor=gray><td><font color=white><b># bookmarks.asp</b></td></tr>
+	<tr bgcolor=#c0c0c0><td><pre>
+<tt>&lt;%
+# only a logged in user may view the bookmarks
+$Session-&gt;{&#39;user&#39;} || $Response-&gt;Redirect(&#39;index.asp&#39;);
+
+my $error;
+if($Form-&gt;{submit} =~ /create/i) {
+	unless($Form-&gt;{new_url}) {
+		$error = &quot;The Url must be &quot;.
+			&quot;filled in to create a new bookmark&quot;;
+		goto ERROR;
+	}
+
+	my $sth = $Db-&gt;prepare_cached(
+		&quot;select url from bookmarks where username=? and url=?&quot;
+		);
+	$sth-&gt;execute($Session-&gt;{&#39;user&#39;}, $Form-&gt;{new_url});
+	if($sth-&gt;fetchrow_array) {
+		$error = &quot;You already have $Form-&gt;{new_url} &quot;.
+			&quot;for a bookmark&quot;;
+		goto ERROR;
+	} else {
+		$sth = $Db-&gt;prepare_cached(&lt;&lt;SQL);
+insert into bookmarks (bookmark_id, username, url, title)
+values (?,?,?,?)
+SQL
+	;
+		$Application-&gt;Lock();
+		$sth-&gt;execute(
+			++$Application-&gt;{max_bookmark_id}, 
+			$Session-&gt;{&#39;user&#39;}, 
+			$Form-&gt;{new_url}, 
+			$Form-&gt;{new_title}
+			);
+		$Application-&gt;UnLock();
+	}
+}
+
+if($Query-&gt;{delete}) {
+	my $sth = $Db-&gt;prepare_cached(&lt;&lt;SQL);
+
+select * from bookmarks 
+where bookmark_id = ?
+and username = ?
+
+SQL
+	;
+	$sth-&gt;execute($Query-&gt;{delete}, $Session-&gt;{user});
+	if(my $data = $sth-&gt;fetchrow_hashref) {
+		my $sth = $Db-&gt;prepare_cached(&lt;&lt;SQL);
+
+delete from bookmarks 
+where bookmark_id = ? 
+and username = ?
+
+SQL
+	;
+		$sth-&gt;execute($Query-&gt;{delete}, $Session-&gt;{user});
+		$Form-&gt;{new_url} = $data-&gt;{&#39;url&#39;};
+		$Form-&gt;{new_title} = $data-&gt;{&#39;title&#39;};
+	}
+}
+
+# get all the bookmarks
+ERROR:
+my $sth = $Db-&gt;prepare_cached(
+			&quot;select * from bookmarks where username=? &quot;.
+			&quot;order by bookmark_id&quot;
+			);
+$sth-&gt;execute($Session-&gt;{&#39;user&#39;});
+my @bookmarks;
+while(my $bookmark = $sth-&gt;fetchrow_hashref()) {
+	push(@bookmarks, $bookmark);
+}
+%&gt;
+
+&lt;% if(@bookmarks) { %&gt;
+	Welcome to your bookmarks!
+&lt;% } else { %&gt;
+	You don&#39;t have any bookmarks.  Please feel free to 
+	add some using the below form.
+&lt;% } %&gt;
+
+&lt;center&gt;
+&lt;% if($error) { %&gt;
+	&lt;p&gt;&lt;b&gt;&lt;font color=red size=-1&gt;* &lt;%=$error%&gt;&lt;/font&gt;&lt;/b&gt;
+&lt;% } %&gt;
+&lt;form src=&lt;%=$Basename%&gt; method=POST&gt;
+&lt;table border=0&gt;
+	&lt;% for (&#39;new_url&#39;, &#39;new_title&#39;) { 
+		my $name = $_;
+		my $title = join(&#39; &#39;, 
+			map { ucfirst $_ } split(/_/, $name));
+		%&gt;
+		&lt;tr&gt;
+		&lt;td&gt;&lt;b&gt;&lt;%=$title%&gt;:&lt;/b&gt;&lt;/td&gt;
+		&lt;td&gt;&lt;input type=text name=&lt;%=$name%&gt; 
+			value=&quot;&lt;%=$Form-&gt;{$name}%&gt;&quot; 
+			size=40 maxlength=120&gt;
+		&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;% } %&gt;
+	&lt;tr&gt;
+	&lt;td&gt;&amp;nbsp;&lt;/td&gt;
+	&lt;td&gt;
+		&lt;font &lt;%=$FontBase%&gt;&gt;
+		&lt;input type=submit name=submit 
+			value=&quot;Create Bookmark&quot;&gt;&lt;/td&gt;&lt;/tr&gt;
+		&lt;/font&gt;
+	&lt;/td&gt;
+&lt;/form&gt;
+&lt;/table&gt;
+
+&lt;% if(@bookmarks) { 
+	my $half_index = int((@bookmarks+1)/2);
+	%&gt;
+	&lt;p&gt;
+	&lt;table border=0 width=80% bgcolor=&lt;%= $DarkColor %&gt; cellspacing=0&gt;
+	&lt;tr&gt;&lt;td align=center&gt;
+
+	&lt;table border=0 width=100% cellspacing=1 cellpadding=3&gt;
+	&lt;tr bgcolor=&lt;%= $DarkColor %&gt;&gt;&lt;td align=center colspan=4&gt;
+		&lt;font color=yellow&gt;&lt;b&gt;Bookmarks&lt;/b&gt;&lt;/font&gt;
+	&lt;/td&gt;&lt;/tr&gt;
+	&lt;% for(my $i=0; $i&lt;$half_index; $i++) { %&gt;
+		&lt;tr&gt;
+		&lt;% for($i, $i+$half_index) { 
+			my $data = ($_ &lt; @bookmarks) ? 
+				$bookmarks[$_] : undef;
+			$data-&gt;{title} ||= $data-&gt;{&#39;url&#39;};
+			my $text = $data-&gt;{bookmark_id} ? 
+				&quot;&lt;a href=$data-&gt;{&#39;url&#39;}
+					&gt;$data-&gt;{&#39;title&#39;}&lt;/a&gt;&quot; 
+					: &quot;&amp;nbsp;&quot;;
+			%&gt; 
+			&lt;td bgcolor=#c0c0c0 width=30 align=center&gt;
+			&lt;% if($data-&gt;{bookmark_id}) { %&gt;
+				&lt;font size=-1&gt;&lt;tt&gt;
+				&lt;a href=&lt;%=
+				&quot;$Basename?delete=$data-&gt;{bookmark_id}&quot;
+				%&gt;&gt;[DEL]&lt;/a&gt;
+				&lt;/tt&gt;&lt;/font&gt;
+			&lt;% } else { %&gt;
+			  &amp;nbsp;
+			&lt;% } %&gt;
+			&lt;/td&gt;
+			&lt;td bgcolor=white&gt;&lt;%= $text || &#39;&amp;nbsp;&#39;%&gt;&lt;/td&gt; 
+		&lt;% } %&gt;
+		&lt;/tr&gt;
+	&lt;% } %&gt;
+	&lt;/table&gt;	
+	
+	&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+	&lt;br&gt;
+&lt;% } %&gt;
+
+&lt;/center&gt;</tt></pre></td></tr>
+	</table>
+	</center>
+	<p>
+	
+<hr size=1>
+
+That's it :)  If you would like you may 
+view the <a href=http://www.apache-asp.org/apps/bookmarks/>
+MyBookmarks web application online</a>.
+Next month, we will tune the MyBookmarks web application
+for maximum throughput, and minimum RAM usage.
+<br>
+<br>

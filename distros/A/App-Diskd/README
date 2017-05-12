@@ -1,0 +1,46 @@
+App-Diskd version 0.01
+======================
+
+An example POE-based, peer-to-peer disk finder/announcer
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  POE
+  POE::Session
+  POE::Wheel::Run
+  POE::Wheel::SocketFactory
+  POE::Filter::Line
+  POE::Wheel::ReadWrite
+  POE::Wheel::ReadLine
+  Sys::Hostname
+  Net::Nslookup
+  YAML::XS
+  IO::Socket::Multicast
+  Socket
+
+DOCUMENTATION
+
+  Before installation, use perldoc ./lib/App/Diskd.pm
+
+  After installation, use perldoc App::Diskd
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Declan Malone
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

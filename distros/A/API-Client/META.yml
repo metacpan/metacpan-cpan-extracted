@@ -1,0 +1,25 @@
+---
+abstract: 'General-Purpose API Client Abstraction'
+author:
+  - 'Al Newkirk <anewkirk@ana.io>'
+build_requires:
+  perl: v5.14.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: API-Client
+requires:
+  Data::Object: '0.55'
+  Mojolicious: '6.08'
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/alnewkirk/API-Client/issues
+  homepage: http://metacpan.org/release/API-Client/
+  repository: git://github.com/alnewkirk/API-Client.git
+version: '0.04'
+x_authority: cpan:AWNCORP

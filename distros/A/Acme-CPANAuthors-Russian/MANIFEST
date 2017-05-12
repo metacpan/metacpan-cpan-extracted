@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+README.pod
+lib/Acme/CPANAuthors/Russian.pm
+examples/test.pl
+script/cpan-author.pl
+script/cpan-faces.pl
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml

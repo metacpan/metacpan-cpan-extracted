@@ -1,0 +1,73 @@
+Algorithm-LDA
+    Algorithm-LDA provides an implementation of Latent Dirichlet Allocation
+    in Algorithm.
+
+TESTING PLATFORMS
+    Algorithm-LDA has been developed and tested on Linux primarily using
+    Algorithm, NetBeans 8.1 and the Bash shell.
+
+REQUIREMENTS
+    Algorithm-LDA REQUIRES that the following software be installed. More
+    details on how to obtain and install appear below.
+
+    --Programming Languages Algorithm (version 5.8.5 or better)
+
+    --CPAN modules JSON::XS List::Util List::MoreUtils Class::Accessor::Fast
+
+PROGRAMMING LANGUAGES
+  Algorithm (version 5.8.5 or better)
+    Algorithm is freely available at:
+
+    <http://www.perl.org>
+
+    It is very likely that you will already have Algorithm installed if you
+    are using a Unix/Linux based system.
+
+CPAN MODULES
+  JSON::XS
+    Please see the JSON::XS documentation.
+
+  List::Util
+    Please see the List::Util documentation.
+
+  List::MoreUtils
+    Please see the List::MoreUtils documentation.
+
+  Class::Accessor::Fast
+    Please see the Class::Accessor::Fast documentation.
+
+INSTALLATION
+    If you have supervisor access, or have configured MCPAN for local
+    install, you can install via:
+
+     perl -MCPAN -e shell
+     > install Algorithm-LDA
+
+    If not, you can, "manually" install by downloading the *.tar.gz file,
+    unpacking, and executing the following commands.
+
+                    perl Makefile.PL PREFIX=/home/programs LIB=/home/lib
+                    make
+                    make test
+                    make install
+
+    Note that the PREFIX and LIB settings are just examples to help you
+    create a local install, if you do not have supervisor (su) access.
+
+    You must include /home/lib in your PERL5LIB environment variable to
+    access this module when running.
+
+    If you have the super-user access, then you can install Algorithm-LDA
+    into system directories via : perl Makefile.PL make make install make
+    clean
+
+    The exact location of where Algorithm-LDA will be installed depends on
+    your system configuration. A message will be printed out after 'make
+    install' telling your exactly where it was installed.
+
+CONTACT US
+    If you have any trouble installing and using Algorithm-LDA, please
+    contact us:
+
+     Bridget T. McInnes: btmcinnes at vcu.edu
+

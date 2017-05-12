@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+our $VERSION = '1.20151002'; # VERSION
+
+use strict;
+use warnings;
+
+use App::OATH;
+use Getopt::Long;
+
+my $add;
+my $file;
+my $help;
+my $init;
+my $list;
+my $newpass;
+my $search;
+
+if ( ! GetOptions(
+    'add=s'    => \$add,
+    'file=s'   => \$file,
+    'help'     => \$help,
+    'init'     => \$init,
+    'list'     => \$list,
+    'newpass'  => \$newpass,
+    'search=s' => \$search,
+) ) {
+    $help = 1;
+}
+
+my $app = App::OATH->new();
+
+if ( $help ) {
+    $app->usage();
+    exit 0;
+}
+
+$app->set_search( $search )   if $search;
+$app->set_filename( $file )   if $file;
+$app->init()                  if $init;
+
+$app->get_lock() || die 'File is already locked';
+
+if ( $newpass ) {
+    $app->set_newpass( $newpass );
+    if ( $add ) {
+        $app->add_entry( $add );
+    }
+    else {
+        $app->encrypt_data();
+        $app->save_data();
+    }
+}
+elsif ( $add ) {
+    $app->add_entry( $add );
+}
+elsif ( $list ) {
+    $app->list_keys();
+}
+else {
+    $app->display_codes();
+}
+
+$app->drop_lock();
+
+exit 0;
+

@@ -1,0 +1,88 @@
+Alien-LibUSBx
+
+Alien::LibUSBx is a perl Alien package for libusb (libusb-1.0) which
+provides generic access to USB devices
+
+On installation, Alien::LibUSBx will try to detect whether or not
+libusb-1.0 is already available on the system. If not, the libusb-1.0
+library from libusbx.org will be installed.
+
+Alien::LibUSBx is a simple extension to Alien::Base, please see
+Alien::Base::Authoring for API reference.
+
+
+SUPPORTED PLATFORMS
+
+Alien::LibUSBx has been successfully tested on the following
+platforms:
+
+    Apple OS X (10.8.x)
+    FreeBSD (using the native FreeBSD implementation of libusb-1.0)
+    Linux
+
+Please report any further test results, successful as well as
+failures, so the above list can be kept up-to-date.
+
+
+DEPENDENCIES
+
+    pkg-config (for detecting a system provided libusb-1.0)
+    Module::Build
+    Alien::Base
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    perl Build
+    perl Build test
+    perl Build install
+
+If needed, the CFLAGS and LIBS for a system-provided libusb-1.0 can be
+overridden using the following environment variables prior to
+installation of Alien::LibUSBx:
+
+    ALIEN_LIBUSBX_CFLAGS
+    ALIEN_LIBUSBX_LIBS
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Alien::LibUSBx
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-LibUSBx
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Alien-LibUSBx
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Alien-LibUSBx
+
+    Search CPAN
+        http://search.cpan.org/dist/Alien-LibUSBx/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright 2013 Henrik Brix Andersen.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of either:
+
+    a) the GNU General Public License as published by the Free
+    Software Foundation; either version 1, or (at your option) any
+    later version, or
+
+    b) the "Artistic License" which comes with this Kit.
+
+The libusb-1.0 library from libusbx.org, which may be installed by
+Alien::LibUSBx, is released under version 2.1 of the GNU Lesser
+General Public License (LGPL).

@@ -1,0 +1,110 @@
+#!/opt/bin/perl
+
+use AnyEvent;
+use AnyEvent::Socket;
+use AnyEvent::ReadLine::Gnu;
+
+@ARGV >= 1
+   or die "Usage: $0 host:port (e.g. 127.0.0.1:8888 or unix/:/tmp/aedebug)\n";
+
+my ($host, $service) = parse_hostport $ARGV[0], $ARGV[1]
+   or die "$ARGV[0]: unable to parse destination address and port\n";
+
+my ($fh, $peerhost, $peerport) = do {
+      tcp_connect $host, $service, my $cv = AE::cv;
+      $cv->recv
+   }
+   or die "$host:$service $!\n";
+
+my ($ww, $wbuf);
+
+print "Connected to $peerhost:$peerport.\nEscape character is '^]'.\n";
+
+my $rl = new AnyEvent::ReadLine::Gnu on_line => sub {
+   $wbuf .= "$_[0]\x0a";
+   $ww ||= AE::io $fh, 1, sub {
+      my $len = syswrite $fh, $wbuf;
+
+      if (defined $len) {
+         substr $wbuf, 0, $len, "";
+         undef $ww unless length $wbuf;
+      } else {
+         undef $ww; # on errors, simply stop writing
+      }
+   };
+};
+
+my $quit = AE::cv;
+
+my ($rw, $rbuf, $tw);
+
+$rw = AE::io $fh, 0, sub {
+   my $len = sysread $fh, $rbuf, 1024, length $rbuf;
+
+   if ($len > 0) {
+      if ($rbuf =~ /\x0a$/) {
+         undef $tw;
+         $rl->hide;
+         print $rbuf;
+         $rl->show;
+         $rbuf = "";
+      } else {
+         $tw ||= AE::timer 0.2, 0, sub {
+            undef $tw;
+            $rl->hide;
+            print $rbuf;
+            print "...\n";
+            $rl->show;
+            $rbuf = "...";
+         };
+      }
+   } elsif (defined $len) {
+      print "$rbuf\nEOF received, exiting.\n";
+      exit 0;
+   } else {
+      # we assume we never get EAGAIN, sorry
+      print "$rbuf\nERROR: $!\n";
+      exit 1;
+   }
+};
+
+#$rl->set_signals;
+$rl->unbind_key (9);
+
+$rl->add_defun (telnet_escape => sub {
+   print "$rbuf\nEscape detected, exiting.\n";
+   exit 0;
+}, 0x1d);
+
+$| = 1;
+
+$quit->recv;
+
+__END__
+
+=head1 NAME
+
+   rltelnet - connect to a socket with readline frontend
+
+=head1 SYNOPSIS
+
+   rltelnet www.nethype,de:80
+   rltelnet www.google.com 80
+   rltelnet unix/ /path/to/socket
+
+=head1 DESCRIPTION
+
+This program connects to a socket using AnyEvent::Socket::tcp_connect, prints
+everything it receives from the socket and offers a readline editing interface
+to send lines to the socket.
+
+This is very remotely what telnet does when used on a non-telnet socket,
+except that it uses readline and supports more types of socketsd (e.g.
+unix domain sockets).
+
+=head1 AUTHOR, CONTACT, SUPPORT
+
+ Marc Lehmann <schmorp@schmorp.de>
+ http://software.schmorp.de/pkg/AnyEvent-ReadLine-Gnu.html
+
+=cut

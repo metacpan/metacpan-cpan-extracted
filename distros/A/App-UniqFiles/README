@@ -1,0 +1,9 @@
+SYNOPSIS
+
+     # See uniq-files script
+
+NOTES
+
+    Warning: cannot properly handle symlinks or special files (socket,
+    pipe, device), so don't feed them.
+

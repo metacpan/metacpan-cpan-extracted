@@ -1,0 +1,24 @@
+Revision history for Acme-Gosub
+
+0.1.6   2015-06-19
+        - Update old E-mail address.
+        - Remove \t from the distribution.
+
+0.1.5   2014-01-25
+        - Add a minimal version of perl.
+            - Kwalitee.
+        - Add t/style-trailing-space.t
+            - Remove trailing space.
+        - Add t/cpan-changes.t
+            - Check for CPAN changes validity.
+
+0.1.4   2009-07-01
+        - Enhanced Build.PL : dist_author, keywords and resources.
+
+0.1.3   2008-03-14
+        - Added the examples/japh.pl file.
+        - Added the Build.PL for kwalitee and better maintenance.
+            - Makefile.PL is now generated from it.
+        - Added t/pod-coverage.t and added full POD coverage
+          to lib/Acme/Gosub.pm
+        - Aded a TODO file.

@@ -1,0 +1,456 @@
+# NAME
+
+API::Facebook - Facebook.com API Client
+
+# VERSION
+
+version 0.04
+
+# SYNOPSIS
+
+    use API::Facebook;
+
+    my $facebook = API::Facebook->new(
+        access_token => 'ACCESS_TOKEN',
+        identifier   => 'IDENTIFIER',
+    );
+
+    $facebook->debug(1);
+    $facebook->fatal(1);
+
+    my $feed = $facebook->me('feed');
+    my $results = $feed->fetch;
+
+    # after some introspection
+
+    $feed->update( ... );
+
+# DESCRIPTION
+
+This distribution provides an object-oriented thin-client library for
+interacting with the Facebook ([http://facebook.com](http://facebook.com)) API. For usage and
+documentation information visit [https://developers.facebook.com/docs/graph-api](https://developers.facebook.com/docs/graph-api).
+API::Facebook is derived from [API::Client](https://metacpan.org/pod/API::Client) and inherits all of it's
+functionality. Please read the documentation for API::Client for more usage
+information.
+
+# ATTRIBUTES
+
+## access\_token
+
+    $facebook->access_token;
+    $facebook->access_token('ACCESS_TOKEN');
+
+The access\_token attribute should be set to an API access token associated with
+your account.
+
+## identifier
+
+    $facebook->identifier;
+    $facebook->identifier('IDENTIFIER');
+
+The identifier attribute should be set to a string that identifies your app.
+
+## debug
+
+    $facebook->debug;
+    $facebook->debug(1);
+
+The debug attribute if true prints HTTP requests and responses to standard out.
+
+## fatal
+
+    $facebook->fatal;
+    $facebook->fatal(1);
+
+The fatal attribute if true promotes 4xx and 5xx server response codes to
+exceptions, a [API::Client::Exception](https://metacpan.org/pod/API::Client::Exception) object.
+
+## retries
+
+    $facebook->retries;
+    $facebook->retries(10);
+
+The retries attribute determines how many times an HTTP request should be
+retried if a 4xx or 5xx response is received. This attribute defaults to 1.
+
+## timeout
+
+    $facebook->timeout;
+    $facebook->timeout(5);
+
+The timeout attribute determines how long an HTTP connection should be kept
+alive. This attribute defaults to 10.
+
+## url
+
+    $facebook->url;
+    $facebook->url(Mojo::URL->new('https://graph.facebook.com'));
+
+The url attribute set the base/pre-configured URL object that will be used in
+all HTTP requests. This attribute expects a [Mojo::URL](https://metacpan.org/pod/Mojo::URL) object.
+
+## user\_agent
+
+    $facebook->user_agent;
+    $facebook->user_agent(Mojo::UserAgent->new);
+
+The user\_agent attribute set the pre-configured UserAgent object that will be
+used in all HTTP requests. This attribute expects a [Mojo::UserAgent](https://metacpan.org/pod/Mojo::UserAgent) object.
+
+# METHODS
+
+## action
+
+    my $result = $facebook->action($verb, %args);
+
+    # e.g.
+
+    $facebook->action('head', %args);    # HEAD request
+    $facebook->action('options', %args); # OPTIONS request
+    $facebook->action('patch', %args);   # PATCH request
+
+The action method issues a request to the API resource represented by the
+object. The first parameter will be used as the HTTP request method. The
+arguments, expected to be a list of key/value pairs, will be included in the
+request if the key is either `data` or `query`.
+
+## create
+
+    my $results = $facebook->create(%args);
+
+    # or
+
+    $facebook->POST(%args);
+
+The create method issues a `POST` request to the API resource represented by
+the object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+## delete
+
+    my $results = $facebook->delete(%args);
+
+    # or
+
+    $facebook->DELETE(%args);
+
+The delete method issues a `DELETE` request to the API resource represented by
+the object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+## fetch
+
+    my $results = $facebook->fetch(%args);
+
+    # or
+
+    $facebook->GET(%args);
+
+The fetch method issues a `GET` request to the API resource represented by the
+object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+## update
+
+    my $results = $facebook->update(%args);
+
+    # or
+
+    $facebook->PUT(%args);
+
+The update method issues a `PUT` request to the API resource represented by
+the object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+# RESOURCES
+
+## achievement
+
+    $facebook->resource(param('achievement'));
+
+The achievement resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/achievement](https://developers.facebook.com/docs/graph-api/reference/achievement).
+
+## achievement\_type
+
+    $facebook->resource(param('achievement_type'));
+
+The achievement\_type resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/achievement\_type](https://developers.facebook.com/docs/graph-api/reference/achievement_type).
+
+## ad\_campaign
+
+    $facebook->resource(param('ad-campaign'));
+
+The ad\_campaign resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/marketing-api/reference/ad-campaign](https://developers.facebook.com/docs/marketing-api/reference/ad-campaign).
+
+## ad\_campaign\_group
+
+    $facebook->resource(param('ad-campaign-group'));
+
+The ad\_campaign\_group resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group](https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group).
+
+## ad\_image
+
+    $facebook->resource(param('ad-image'));
+
+The ad\_image resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/marketing-api/reference/ad-image](https://developers.facebook.com/docs/marketing-api/reference/ad-image).
+
+## ad\_label
+
+    $facebook->resource(param('ad-label'));
+
+The ad\_label resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/marketing-api/reference/ad-label](https://developers.facebook.com/docs/marketing-api/reference/ad-label).
+
+## app\_request
+
+    $facebook->resource(param('app-request'));
+
+The app\_request resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/app-request](https://developers.facebook.com/docs/graph-api/reference/app-request).
+
+## application
+
+    $facebook->resource(param('application'));
+
+The application resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/application](https://developers.facebook.com/docs/graph-api/reference/application).
+
+## application\_context
+
+    $facebook->resource(param('application-context'));
+
+The application\_context resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/application-context](https://developers.facebook.com/docs/graph-api/reference/application-context).
+
+## friend\_list
+
+    $facebook->resource(param('friend-list'));
+
+The friend\_list resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/friend-list](https://developers.facebook.com/docs/graph-api/reference/friend-list).
+
+## hashtag
+
+    $facebook->resource(param('hashtag'));
+
+The hashtag resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/hashtag](https://developers.facebook.com/docs/graph-api/reference/hashtag).
+
+## life\_event
+
+    $facebook->resource(param('life-event'));
+
+The life\_event resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/life-event](https://developers.facebook.com/docs/graph-api/reference/life-event).
+
+## mailing\_address
+
+    $facebook->resource(param('mailing-address'));
+
+The mailing\_address resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/mailing-address](https://developers.facebook.com/docs/graph-api/reference/mailing-address).
+
+## offsite\_pixel
+
+    $facebook->resource(param('offsite-pixel'));
+
+The offsite\_pixel resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/offsite-pixel](https://developers.facebook.com/docs/graph-api/reference/offsite-pixel).
+
+## open\_graph\_context
+
+    $facebook->resource(param('open-graph-context'));
+
+The open\_graph\_context resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/open-graph-context](https://developers.facebook.com/docs/graph-api/reference/open-graph-context).
+
+## page
+
+    $facebook->resource(param('page'));
+
+The page resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/page](https://developers.facebook.com/docs/graph-api/reference/page).
+
+## photo
+
+    $facebook->resource(param('photo'));
+
+The photo resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/photo](https://developers.facebook.com/docs/graph-api/reference/photo).
+
+## place\_tag
+
+    $facebook->resource(param('place-tag'));
+
+The place\_tag resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/place-tag](https://developers.facebook.com/docs/graph-api/reference/place-tag).
+
+## product\_catalog
+
+    $facebook->resource(param('product-catalog'));
+
+The product\_catalog resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/marketing-api/reference/product-catalog](https://developers.facebook.com/docs/marketing-api/reference/product-catalog).
+
+## product\_feed
+
+    $facebook->resource(param('product-feed'));
+
+The product\_feed resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/product-feed](https://developers.facebook.com/docs/graph-api/reference/product-feed).
+
+## product\_feed\_upload
+
+    $facebook->resource(param('product-feed-upload'));
+
+The product\_feed\_upload resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/product-feed-upload](https://developers.facebook.com/docs/graph-api/reference/product-feed-upload).
+
+## product\_feed\_upload\_error
+
+    $facebook->resource(param('product-feed-upload-error'));
+
+The product\_feed\_upload\_error resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/product-feed-upload-error](https://developers.facebook.com/docs/graph-api/reference/product-feed-upload-error).
+
+## product\_group
+
+    $facebook->resource(param('product-group'));
+
+The product\_group resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/product-group](https://developers.facebook.com/docs/graph-api/reference/product-group).
+
+## product\_item
+
+    $facebook->resource(param('product-item'));
+
+The product\_item resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/product-item](https://developers.facebook.com/docs/graph-api/reference/product-item).
+
+## product\_set
+
+    $facebook->resource(param('product-set'));
+
+The product\_set resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/product-set](https://developers.facebook.com/docs/graph-api/reference/product-set).
+
+## promotion\_info
+
+    $facebook->resource(param('promotion-info'));
+
+The promotion\_info resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/promotion-info](https://developers.facebook.com/docs/graph-api/reference/promotion-info).
+
+## user
+
+    $facebook->resource(param('user'));
+
+The user resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/user](https://developers.facebook.com/docs/graph-api/reference/user).
+
+## user\_context
+
+    $facebook->resource(param('user-context'));
+
+The user\_context resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/user-context](https://developers.facebook.com/docs/graph-api/reference/user-context).
+
+## video
+
+    $facebook->resource(param('video'));
+
+The video resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/video](https://developers.facebook.com/docs/graph-api/reference/video).
+
+## video\_broadcast
+
+    $facebook->resource(param('video-broadcast'));
+
+The video\_broadcast resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/video-broadcast](https://developers.facebook.com/docs/graph-api/reference/video-broadcast).
+
+## video\_list
+
+    $facebook->resource(param('video-list'));
+
+The video\_list resource returns a new instance representative of the API
+resource requested. This method accepts a list of path segments which will be
+used in the HTTP request. The following documentation can be used to find more
+information. [https://developers.facebook.com/docs/graph-api/reference/video-list](https://developers.facebook.com/docs/graph-api/reference/video-list).
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,14 @@
+--- jpeg-8b/jmorecfg.h	Fri Nov 20 09:01:24 2009
++++ jpeg-8b/jmorecfg.h	Fri Mar 19 01:22:26 2010
+@@ -233,7 +233,11 @@
+  */
+ 
+ #ifndef HAVE_BOOLEAN
++#ifndef _BASETSD_H_		/* MSWin: mingw-w64.sf.net compiler defines it in basetsd.h */
++#ifndef _BASETSD_H		/* MSWin: mingw.org compiler defines it in basetsd.h */
+ typedef int boolean;
++#endif
++#endif
+ #endif
+ #ifndef FALSE			/* in case these macros already exist */
+ #define FALSE	0		/* values of boolean */

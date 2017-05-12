@@ -1,0 +1,130 @@
+/*
+* jQuery Mobile v1.4.5
+* http://jquerymobile.com
+*
+* Copyright 2010, 2014 jQuery Foundation, Inc. and other contributors
+* Released under the MIT license.
+* http://jquery.org/license
+*
+*/
+
+/* Globals */
+
+/* Font
+-----------------------------------------------------------------------------------------------------------*/
+
+html {
+	font-size: 100%;
+}
+
+/* Corner rounding
+-----------------------------------------------------------------------------------------------------------*/
+/* Class ui-btn-corner-all deprecated in 1.4 */
+
+.ui-corner-all {
+	-webkit-border-radius: 				.3125em /*{global-radii-blocks}*/;
+	border-radius: 						.3125em /*{global-radii-blocks}*/;
+}
+/* Buttons */
+.ui-btn-corner-all,
+.ui-btn.ui-corner-all,
+/* Slider track */
+.ui-slider-track.ui-corner-all,
+/* Flipswitch */
+.ui-flipswitch.ui-corner-all,
+/* Count bubble */
+.ui-li-count {
+	-webkit-border-radius: 				.3125em /*{global-radii-buttons}*/;
+	border-radius: 						.3125em /*{global-radii-buttons}*/;
+}
+/* Icon-only buttons */
+.ui-btn-icon-notext.ui-btn-corner-all,
+.ui-btn-icon-notext.ui-corner-all {
+	-webkit-border-radius: 1em;
+	border-radius: 1em;
+}
+/* Radius clip workaround for cleaning up corner trapping */
+.ui-btn-corner-all,
+.ui-corner-all {
+	-webkit-background-clip: padding;
+	background-clip: padding-box;
+}
+
+
+/* Bar: Toolbars, dividers, slider track */
+.ui-bar-a,
+.ui-page-theme-a .ui-bar-inherit,
+html .ui-bar-a .ui-bar-inherit,
+html .ui-body-a .ui-bar-inherit,
+html body .ui-group-theme-a .ui-bar-inherit {
+	background-color: 			#e9e9e9 /*{a-bar-background-color}*/;
+	border-color:	 		#ddd /*{a-bar-border}*/;
+	color: 					#333 /*{a-bar-color}*/;
+	font-weight: bold;
+}
+
+/* Button up */
+.ui-page-theme-a .ui-btn,
+html .ui-bar-a .ui-btn,
+html .ui-body-a .ui-btn,
+html body .ui-group-theme-a .ui-btn,
+html head + body .ui-btn.ui-btn-a,
+/* Button visited */
+.ui-page-theme-a .ui-btn:visited,
+html .ui-bar-a .ui-btn:visited,
+html .ui-body-a .ui-btn:visited,
+html body .ui-group-theme-a .ui-btn:visited,
+html head + body .ui-btn.ui-btn-a:visited {
+	background-color: 			#f6f6f6 /*{a-bup-background-color}*/;
+	border-color:	 		#ddd /*{a-bup-border}*/;
+	color: 					#333 /*{a-bup-color}*/;
+}
+/* Button hover */
+.ui-page-theme-a .ui-btn:hover,
+html .ui-bar-a .ui-btn:hover,
+html .ui-body-a .ui-btn:hover,
+html body .ui-group-theme-a .ui-btn:hover,
+html head + body .ui-btn.ui-btn-a:hover {
+	background-color: 			#ededed /*{a-bhover-background-color}*/;
+	border-color:	 		#ddd /*{a-bhover-border}*/;
+	color: 					#333 /*{a-bhover-color}*/;
+}
+/* Button down */
+.ui-page-theme-a .ui-btn:active,
+html .ui-bar-a .ui-btn:active,
+html .ui-body-a .ui-btn:active,
+html body .ui-group-theme-a .ui-btn:active,
+html head + body .ui-btn.ui-btn-a:active {
+	background-color: 			#e8e8e8 /*{a-bdown-background-color}*/;
+	border-color:	 		#ddd /*{a-bdown-border}*/;
+	color: 					#333 /*{a-bdown-color}*/;
+}
+
+/* Active button */
+.ui-page-theme-a .ui-btn.ui-btn-active,
+html .ui-bar-a .ui-btn.ui-btn-active,
+html .ui-body-a .ui-btn.ui-btn-active,
+html body .ui-group-theme-a .ui-btn.ui-btn-active,
+html head + body .ui-btn.ui-btn-a.ui-btn-active,
+/* Active checkbox icon */
+.ui-page-theme-a .ui-checkbox-on:after,
+html .ui-bar-a .ui-checkbox-on:after,
+html .ui-body-a .ui-checkbox-on:after,
+html body .ui-group-theme-a .ui-checkbox-on:after,
+.ui-btn.ui-checkbox-on.ui-btn-a:after,
+/* Active flipswitch background */
+.ui-page-theme-a .ui-flipswitch-active,
+html .ui-bar-a .ui-flipswitch-active,
+html .ui-body-a .ui-flipswitch-active,
+html body .ui-group-theme-a .ui-flipswitch-active,
+html body .ui-flipswitch.ui-bar-a.ui-flipswitch-active,
+/* Active slider track */
+.ui-page-theme-a .ui-slider-track .ui-btn-active,
+html .ui-bar-a .ui-slider-track .ui-btn-active,
+html .ui-body-a .ui-slider-track .ui-btn-active,
+html body .ui-group-theme-a .ui-slider-track .ui-btn-active,
+html body div.ui-slider-track.ui-body-a .ui-btn-active {
+	background-color: 		green /*{a-active-background-color}*/;
+	border-color:	 		green /*{a-active-border}*/;
+	color: 					black /*{a-active-color}*/;
+}

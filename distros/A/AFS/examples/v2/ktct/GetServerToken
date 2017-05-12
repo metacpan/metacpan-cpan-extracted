@@ -1,0 +1,39 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use Time::localtime;
+use AFS::KTC_TOKEN;
+use AFS::KTC_PRINCIPAL;
+use AFS::KTC_EKEY;
+use AFS::Cell qw(localcell);
+use AFS::Utils qw(setpag);
+
+die "Usage: user\n" if ($#ARGV != 0);
+
+setpag;
+
+my $user = AFS::KTC_PRINCIPAL->new(shift);
+$user->cell(localcell) if ($user->cell eq'');
+
+my $key  = AFS::KTC_EKEY->ReadPassword('Password:');
+my $ok   = AFS::KTC_TOKEN->GetAuthToken($user, $key, 600);
+
+my $service = AFS::KTC_PRINCIPAL->new("afs","",$user->cell);
+my $token = AFS::KTC_TOKEN->GetServerToken($service, 600);
+
+print "\nCurrent tokens after GetServerToken:\n";
+my $index = 0;
+while ($service = AFS::KTC_PRINCIPAL->ListTokens($index)) {
+    print "ID: $index service = ", $service->principal, "\n";
+    ($token, my $client) = AFS::KTC_TOKEN->GetToken($service);
+    print "  client    = ", $client->principal, "\n";
+    print "  StartTime = ", ctime($token->startTime), "\n";
+    print "  EndTime   = ", ctime($token->endTime), "\n";
+    print "  Kvno      = ", $token->kvno, "\n";
+    print "  TicketLen = ", $token->ticketLen, "\n";
+}
+print "--- END tokens ---\n";
+

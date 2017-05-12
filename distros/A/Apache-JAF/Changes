@@ -1,0 +1,69 @@
+Revision history for Perl extension Apache::JAF.
+
+0.21 Wed Feb 25 13:12 2004
+        - fixed bug with invalid templates for handlers, that subsitutes it's own templates
+        (Andrew Kuznecov <mcdemon@magenta-technology.ru>)
+
+0.20 Tue Feb 10 17:44 2004
+        - error reporting improvements during handlers loading phase
+
+0.19 Tue Feb 10 13:48 2004
+        - algorithm of loading mini-handlers has been changed
+        - added keyword 'auto' to Apache::JAF import paramaters for using suggested dirs
+
+0.18 Mon Feb 09 15:07 2004
+        - fixed bug in loading JAF descendant modules
+
+0.17 Tue Jan 13 17:09 2003
+	- fixed bug, when request with protocol string in uri-params produce 500 SERVER_ERROR.
+          For now Apache::JAF simple ignore m{\w+://} params.
+
+0.16 Tue Jan 13 12:16 2003
+	- used missed modules
+
+0.15 Wed Dec 24 16:44 2003
+        - fixed bug with autoloading additional modules
+
+0.14 Wed Dec 10 12:54 2003
+        - new mini-handlers, templates, and JAF::DBI descendants preloading code
+        - some additional utility methods for Apache::JAF
+
+0.11-0.13 
+        - development versions
+
+0.08 Tue Jun 24 12:35 2003
+	- added some methods to simplify 'download' handlers
+	- POD changes
+
+0.07 Fri Jun 13 14:39 2003
+        - PerlTransHandler (highly experimental)
+        - the last part of URI can end with .html to hide 
+          dynamic nature of your site. But "extension" will be deleted
+          during construction of $self->{uri}
+	- bugfix in compile-time handlers loading
+        - POD changes
+        - JAF::DBI::Pg updated
+        - JAF::DBI::Oracle added
+
+0.06 Tue May 6 15:50 2003
+	- bugfix to Makefile.PL
+
+0.05 Mon Mar 31 13:39:22 2003
+        - removed some debug code
+        - POD changes
+
+0.04 Fri Mar 28 13:02 2003
+        - loading page mini-handlers at compile-time
+        - POD changes
+
+0.03 Mon Mar 24 15:47 2003
+        - initial POD draft
+
+0.02  Mon Mar 24 12:35 2003
+        - some optimizations in methods calling pipeline
+        - new configuration directive Apache_JAF_Debug
+          to set debug_level property from Apache conf
+
+0.01  Thu Mar 20 13:20 2003
+	- original version; created by h2xs 1.21 with options
+		-AXn JAF

@@ -1,0 +1,48 @@
+{
+   "abstract" : "A custom sorted queue",
+   "author" : [
+      "Dan Burke <dburke@addictmud.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Array-Queue-Priority",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Array::Queue" : "0",
+            "Moose" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::Spec" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/dwburke/perl-Array-Queue-Priority",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dwburke/perl-Array-Queue-Priority.git",
+         "web" : "https://github.com/dwburke/perl-Array-Queue-Priority"
+      }
+   },
+   "version" : "0.1.2"
+}
+

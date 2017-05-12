@@ -1,0 +1,23 @@
+lib/Algorithm/Genetic/Diploid.pm
+lib/Algorithm/Genetic/Diploid/Base.pm
+lib/Algorithm/Genetic/Diploid/Chromosome.pm
+lib/Algorithm/Genetic/Diploid/Experiment.pm
+lib/Algorithm/Genetic/Diploid/Factory.pm
+lib/Algorithm/Genetic/Diploid/Gene.pm
+lib/Algorithm/Genetic/Diploid/Individual.pm
+lib/Algorithm/Genetic/Diploid/Logger.pm
+lib/Algorithm/Genetic/Diploid/Population.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README.md
+t/00-load.t
+t/perl-critic.t
+t/perlcriticrc
+t/pod-coverage.t
+t/pod.t
+t/run.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,8 @@
+---
+dirs-recursive:
+  .: ext/Digest-MD5
+exclude-regexes:
+  - '^(?:\.?/)?META.yml$'
+  - '^(?:\.?/)?MANIFEST$'
+  - '^(?:\.?/)?rfc1321\.txt$'
+

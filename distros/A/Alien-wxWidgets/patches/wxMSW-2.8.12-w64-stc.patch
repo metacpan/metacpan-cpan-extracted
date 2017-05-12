@@ -1,0 +1,15 @@
+Index: contrib/src/stc/scintilla/include/Scintilla.h
+===================================================================
+--- contrib/src/stc/scintilla/include/Scintilla.h	(revisione 63679)
++++ contrib/src/stc/scintilla/include/Scintilla.h	(copia locale)
+@@ -28,6 +28,9 @@
+ #if defined(_MSC_VER) && _MSC_VER >= 1300
+ #include <BaseTsd.h>
+ #endif
++#if defined(__MINGW32__)
++#include <windows.h>
++#endif
+ #ifdef MAXULONG_PTR
+ typedef ULONG_PTR uptr_t;
+ typedef LONG_PTR sptr_t;
+

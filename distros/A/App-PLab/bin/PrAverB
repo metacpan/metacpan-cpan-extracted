@@ -1,0 +1,1114 @@
+#!perl -w
+
+package MorphometryI;
+use strict;
+use warnings;
+use Prima;
+use Prima::Application name => "PrAverB";
+use App::PLab::ImageApp;
+use Prima::IPA qw/Point/;
+
+# $ImageApp::testing = 1;
+$::application-> icon( App::PLab::ImageAppGlyphs::icon( bga::drawprocesses));
+
+package tran;
+
+use constant init   => 4;
+use constant move   => 5;
+use constant size   => 6;
+use constant skew   => 7;
+use constant rotate => 8;
+
+package Figure;
+use vars qw(@ISA);
+
+sub new
+{
+   my $class = shift;
+   my $self = {};
+   bless( $self, $class);
+   $self-> {rect} = [@_];
+   $self-> {bounds} = [ $self-> rect2boundary( @{$self-> {rect}})];
+   $self-> {state} = 0;
+   $self-> {threshold} = 0;
+   $self-> {rectLike} =
+      ( scalar @_ == 8) &&
+      ( $_[0] == $_[2]) &&
+      ( $_[6] == $_[4]) &&
+      ( $_[1] == $_[7]) &&
+      ( $_[5] == $_[3]);
+   return $self;
+}
+
+sub destroy
+{
+   my $me = $_[0];
+   my $w = $_[0]->{owner};
+   $w-> {selectedRect} = undef if $w-> {selectedRect} && $_[0] == $w-> {selectedRect};
+   my $i = 0;
+   for ( @{$w->{rects}}) {
+      last if $_ == $me;
+      $i++
+   };
+   splice( @{$w->{rects}}, $i, 1) if $i <= scalar @{$w->{rects}};
+   $me-> {IV}-> repaint;
+}
+
+sub rect2boundary
+{
+   my ( $self, @r) = @_;
+   my @b;
+   $b[0] = $b[2] = $r[0];
+   my $i;
+   for ( $i = 2; $i < scalar @r; $i += 2) {
+      $b[0] = $r[$i] if $b[0] > $r[$i];
+      $b[2] = $r[$i] if $b[2] < $r[$i];
+   }
+   $b[1] = $b[3] = $r[1];
+   for ( $i = 1; $i < scalar @r; $i+=2) {
+      $b[1] = $r[$i] if $b[1] > $r[$i];
+      $b[3] = $r[$i] if $b[3] < $r[$i];
+   }
+   return @b;
+}
+
+
+sub get_screen_bounds
+{
+   my @b = $_[0]-> {IV}-> point2screen( @{$_[0]-> {bounds}});
+   $b[0]-=5;
+   $b[1]-=5;
+   $b[2]+=5;
+   $b[3]+=5;
+   return @b;
+}
+
+
+sub on_mousedown
+{
+   my ( $me, $w, $self, $btn, $mod, $x, $y, $ax, $ay) = @_;
+   my @r = $me-> get_screen_bounds;
+
+   if ( $x >= $r[0] && $x < $r[2] && $y >= $r[1] && $y < $r[3]) {
+      $me-> {lastStateSelected} = $me-> selected;
+      $me-> select;
+      if ( $btn == mb::Right) {
+         $w-> FigurePopup-> popup( $w-> pointerPos);
+         $w-> iv_cancelmode( $self);
+         return 1;
+      }
+
+      return 0 if  $btn != mb::Left;
+
+      $self-> {savePointer} = $self-> pointer;
+      my $part = $me-> xy2part( $x, $y);
+      if ( $part eq q(client)) {
+         $me-> open_transaction( tran::move, $x, $y, $ax, $ay);
+         $self-> pointer( cr::Move);
+         $w-> sb_text("Drag region");
+      } elsif ( $part =~ /^Size/) {
+         $part =~ s/^Size//;
+         if ( $me->{state} == 0) {
+            my ( $xa, $ya) = ( 0,0);
+            if    ( $part eq q(S))   { ( $xa, $ya) = ( 0,-1); }
+            elsif ( $part eq q(N))   { ( $xa, $ya) = ( 0, 1); }
+            elsif ( $part eq q(W))   { ( $xa, $ya) = (-1, 0); }
+            elsif ( $part eq q(E))   { ( $xa, $ya) = ( 1, 0); }
+            elsif ( $part eq q(SW)) { ( $xa, $ya) = (-1,-1); }
+            elsif ( $part eq q(NE)) { ( $xa, $ya) = ( 1, 1); }
+            elsif ( $part eq q(NW)) { ( $xa, $ya) = (-1, 1); }
+            elsif ( $part eq q(SE)) { ( $xa, $ya) = ( 1,-1); }
+            $self-> {dirData} = [$xa, $ya];
+            $me-> open_transaction( tran::size, $x, $y, $ax, $ay);
+            $w-> sb_text("Scale region");
+            $self-> {oldRect} = [ @{$self-> { xorData}}];
+         } else {
+            my ( $xa, $ya) = ( 0,0);
+            if    ( $part eq q(S))   { ( $xa, $ya) = ( 0,-1); }
+            elsif ( $part eq q(N))   { ( $xa, $ya) = ( 0, 1); }
+            elsif ( $part eq q(W))   { ( $xa, $ya) = (-1, 0); }
+            elsif ( $part eq q(E))   { ( $xa, $ya) = ( 1, 0); }
+            if ( $xa != 0 || $ya != 0) {
+               $self-> {dirData} = [$xa, $ya];
+               $me-> open_transaction( tran::skew, $x, $y, $ax, $ay);
+               $w-> sb_text("Skew region");
+               return 1;
+            }
+            my @r =  $self-> point2screen( @{$me-> {bounds}});
+            my @cn = (($r[2] + $r[0] + 1)/2, ($r[3] + $r[1] + 1)/2);
+            $self-> {anchor}  = atan2( $y - $cn[1], $x - $cn[0]);
+            $self-> {dirData} = [@cn];
+            $me-> open_transaction( tran::rotate, $x, $y, $ax, $ay);
+            $self-> {oldRect} = [ @{$self-> { xorData}}];
+            $w-> sb_text("Rotate region");
+         }
+      }
+      return 1;
+   }
+   return 0;
+}
+
+
+sub xy2part
+{
+   my ( $me, $x, $y) = @_;
+   my @r = $me-> get_screen_bounds;
+   $_ -= $r[0] for ( $r[2], $x);
+   $_ -= $r[1] for ( $r[3], $y);
+   my @size = @r[2,3];
+   return q(client) if $x < 0 || $x >= $size[0] || $y < 0 || $y >= $size[1];
+   my $minDim = $size[0] > $size[1] ? $size[1] : $size[0];
+   my $bw   = ($minDim < 12) ? (($minDim < 7)  ? 1 : 3) : 5;
+   my $bwx  = ($minDim < 26) ? (($minDim < 14) ? 1 : 7) : $bw + 8;
+   if (  $me->{state} == 0) {
+      if ( $x < $bw) {
+         return q(SizeSW) if $y < $bwx;
+         return q(SizeNW) if $y >= $size[1] - $bwx;
+         return q(SizeW);
+      } elsif ( $x >= $size[0] - $bw) {
+         return q(SizeSE) if $y < $bwx;
+         return q(SizeNE) if $y >= $size[1] - $bwx;
+         return q(SizeE);
+      } elsif (( $y < $bw) or ( $y >= $size[1] - $bw)) {
+         return ( $y < $bw) ? q(SizeSW) : q(SizeNW) if $x < $bwx;
+         return ( $y < $bw) ? q(SizeSE) : q(SizeNE) if $x >= $size[0] - $bwx;
+         return $y < $bw ? 'SizeS' : 'SizeN';
+      }
+   } else {
+      if ( $x < $bw) {
+         return q(SizeNW) if $y < $bwx;
+         return q(SizeSW) if $y >= $size[1] - $bwx;
+         return q(SizeS);
+      } elsif ( $x >= $size[0] - $bw) {
+         return q(SizeNE) if $y < $bwx;
+         return q(SizeSE) if $y >= $size[1] - $bwx;
+         return q(SizeN);
+      } elsif (( $y < $bw) or ( $y >= $size[1] - $bw)) {
+         return ( $y < $bw) ? q(SizeNW) : q(SizeSW) if $x < $bwx;
+         return ( $y < $bw) ? q(SizeNE) : q(SizeSE) if $x >= $size[0] - $bwx;
+         return $x < $bw ? 'SizeW' : 'SizeE';
+      }
+   }
+   return q(client);
+}
+
+sub on_mousemove
+{
+   my ( $me, $w, $self, $mod, $x, $y) = @_;
+   unless ( $self-> {transaction}) {
+      my $part = $me-> xy2part( $x, $y);
+      $self-> pointer( $part =~ /^Size/ ? &{$cr::{$part}} : cr::Arrow);
+      return 1;
+   }
+
+   $w-> IV_xorrect( $self);
+   $w-> IV_xorpoly( $self) unless $me->{rectLike};
+   my @r = @{$self-> {xorData}};
+   my @o = @{$self->{screenPoints}};
+   if ( $self-> {transaction} == tran::move) {
+      $r[$_] += $x - $o[0] for (0,2,4,6);
+      $r[$_] += $y - $o[1] for (1,3,5,7);
+   } elsif ( $self-> {transaction} == tran::size) {
+      my ( $xa, $ya) = @{$self->{dirData}};
+      @r = @{$self-> {oldRect}};
+      my @min = [1,1];
+      my @rc = $self-> point2screen( @{$me->{bounds}});
+      my @szold = ( $rc[2] - $rc[0] + 1, $rc[3] - $rc[1] + 1);
+      if ( $xa > 0) {
+         my $sznew = $x - $r[0] + 1;
+         $r[$_] = ( $r[$_] - $rc[ 0]) / $szold[0] * $sznew + $rc[ 0] for (0,2,4,6);
+      } elsif ( $xa < 0) {
+         my $sznew = $r[4] - $x + 1;
+         $r[$_] = $rc[2] - (( $rc[2] - $r[$_]) / $szold[0] * $sznew) for (0,2,4,6);
+      }
+      if ( $ya > 0) {
+         my $sznew = $y - $r[1] + 1;
+         $r[$_] = ( $r[$_] - $rc[ 1]) / $szold[1] * $sznew + $rc[ 1] for (1,3,5,7);
+      } elsif ( $ya < 0) {
+         my $sznew = $r[3] - $y + 1;
+         $r[$_] = $rc[3] - (( $rc[3] - $r[$_]) / $szold[1] * $sznew) for (1,3,5,7);
+      }
+   } elsif ( $self-> {transaction} == tran::skew) {
+      my ( $xa, $ya) = @{$self->{dirData}};
+      if ( $ya != 0) {
+         my @ads = ( $ya < 0) ? (1,3) : (5,7);
+         $r[$_] += $y - $o[1] for @ads;
+      }
+      if ( $xa != 0) {
+         my @ads = ( $xa < 0) ? (0,6) : (2,4);
+         $r[$_] += $x - $o[0] for @ads;
+      }
+   } elsif ( $self-> {transaction} == tran::rotate) {
+      my @cn = @{$self-> {dirData}};
+      my @rc = $self-> point2screen( @{$me-> {bounds}}[0,1,0,3,2,3,2,1]);
+      my $angle = atan2( $y - $cn[1], $x - $cn[0]);
+      $angle -= $self->{anchor};
+      my ( $s, $c)  = ( sin( $angle), cos( $angle));
+      for (1,3,5,7) {
+         $r[$_] = ( $rc[$_] - $cn[1]) * $c + ( $rc[$_-1] - $cn[0]) * $s + $cn[1];
+      }
+      for (0,2,4,6) {
+         $r[$_] = ( $rc[$_] - $cn[0]) * $c - ( $rc[$_+1] - $cn[1]) * $s + $cn[0];
+      }
+   }
+   @{$self-> {xorData}} = @r;
+   @{$self->{screenPoints}} = ( $x, $y);
+   @{$self-> {xorPolyData}} = $self-> point2screen(
+       $me-> get_prepoints( $x, $y, $self-> screen2point( $x, $y))
+   );
+   $w-> IV_xorrect( $self);
+   $w-> IV_xorpoly( $self) unless $me->{rectLike};
+   return 1;
+}
+
+sub get_prepoints
+{
+   my ($me, $x, $y, $ax, $ay) = @_;
+   my ( $w, $self) = ( $me->{owner}, $me-> {IV});
+   my $i;
+   my @r = @{$me->{rect}};
+   if ( $self-> {transaction} == tran::move) {
+      my @o = @{$self->{points}};
+      for ( $i = 0; $i < scalar @r; $i+=2) { $r[$i] += $ax - $o[0]};
+      for ( $i = 1; $i < scalar @r; $i+=2) { $r[$i] += $ay - $o[1]};
+   } elsif ( $self-> {transaction} == tran::size) {
+      my @oldrc = @{$me-> {bounds}};
+      my @newrc = $self-> screen2point( @{$self->{xorData}});
+      my @scale  = map { ( $newrc[4 + $_] - $newrc[$_]) / ( $oldrc[2 + $_] - $oldrc[$_])} ( 0, 1);
+      for ($i=0;$i< scalar @r; $i+=2){ $r[$i] = ($r[$i] - $oldrc[0]) * $scale[0] + $newrc[0] };
+      for ($i=1;$i< scalar @r; $i+=2){ $r[$i] = ($r[$i] - $oldrc[1]) * $scale[1] + $newrc[1] };
+   } elsif ( $self-> {transaction} == tran::skew) {
+       my ( $xa, $ya) = @{$self->{dirData}};
+       my @o = @{$self->{points}};
+       my @oldrc = @{$me-> {bounds}};
+       if ( $ya != 0) {
+          for ($i=1;$i< scalar @r; $i+=2) {
+             my $d = ( $ya > 0) ? ( $r[$i-1] - $oldrc[0]) : ( $oldrc[2] - $r[$i-1]);
+             $r[$i] += $d * ( $ay - $o[1]) / ( $oldrc[2] - $oldrc[0]);
+          }
+       }
+       if ( $xa != 0) {
+          for ($i=0;$i< scalar @r; $i+=2) {
+             my $d = ( $xa > 0) ? ( $r[$i+1] - $oldrc[1]) : ( $oldrc[3] - $r[$i+1]);
+             $r[$i] += $d * ( $ax - $o[0]) / ( $oldrc[3] - $oldrc[1]);
+          }
+       }
+   } elsif ( $self-> {transaction} == tran::rotate) {
+       my @rc  = @{$me-> {rect}};
+       my @bn  = @{$me-> {bounds}};
+       my @cn  = @{$self-> {dirData}};
+       my @cni = (( $bn[2] + $bn[0]) / 2, ( $bn[3] + $bn[1]) / 2);
+       my $angle = atan2( $y - $cn[1], $x - $cn[0]) - $self->{anchor};
+       my ( $s, $c)  = ( sin( $angle), cos( $angle));
+       for ($i=1;$i< scalar @r; $i+=2) {
+          $r[$i] = ( $rc[$i] - $cni[1]) * $c + ( $rc[$i-1] - $cni[0]) * $s + $cni[1];
+       }
+       for ($i=0;$i< scalar @r; $i+=2) {
+          $r[$i] = ( $rc[$i] - $cni[0]) * $c - ( $rc[$i+1] - $cni[1]) * $s + $cni[0];
+       }
+   }
+   return @r;
+}
+
+sub on_mouseup
+{
+   my ( $me, $w, $self, $btn, $mod, $x, $y, $ax, $ay) = @_;
+   if ( $btn == mb::Left) {
+      my @r = $me-> get_prepoints( $x, $y, $ax, $ay);
+      @{$me-> {rect}} = @r;
+      @{$me-> {bounds}} = $me-> rect2boundary( @r);
+      $w-> win_figrenumber;
+      $me-> close_transaction();
+      $me->{rectLike} = 0;
+      if ( scalar @r == 8) {
+         if ( $r[0] == $r[2]) {
+            $me->{rectLike} = 1 if
+               ( $r[1] == $r[7]) &&
+               ( $r[3] == $r[5]) &&
+               ( $r[4] == $r[6]);
+         } elsif ( $r[0] == $r[6]) {
+            $me->{rectLike} = 1 if
+               ( $r[1] == $r[3]) &&
+               ( $r[7] == $r[5]) &&
+               ( $r[4] == $r[2]);
+         }
+      }
+   }
+   return 1;
+}
+
+
+sub on_mouseclick
+{
+   my ( $me, $w, $self, $btn, $mod, $x, $y, $ax, $ay, $dbl) = @_;
+   my @r = $me-> get_screen_bounds;
+   return unless $x >= $r[0] && $x < $r[2] && $y >= $r[1] && $y < $r[3];
+   unless ( $dbl) {
+      if ( $me-> {lastStateSelected}) {
+         $me-> {state} = $me-> {state} ? 0 : 1;
+         $me-> repaint;
+         return 1;
+      }
+   } elsif ( $btn == mb::Left) {
+      $me-> {state} = $me-> {state} ? 0 : 1;
+      $me-> repaint;
+      $w-> fig_propdialog( $me);
+      return 1;
+   }
+   return 0;
+}
+
+
+sub selected
+{
+   return 0 unless $_[0]-> {owner}->{selectedRect};
+   return $_[0] == $_[0]-> {owner}->{selectedRect};
+}
+
+sub select
+{
+   return if $_[0]-> selected;
+   $_[0]-> {owner}->{selectedRect} = $_[0];
+   $_[0]-> {IV}-> repaint;
+   $_[0]-> {IV}-> update_view;
+}
+
+sub open_transaction
+{
+   my ( $w, $iv) = ( $_[0]->{owner}, $_[0]-> {IV});
+   my ( $me, $mode, $x, $y, $ax, $ay) = @_;
+   $w-> iv_entermode( $iv, $mode);
+   my @r = @{$_[0]-> {bounds}};
+   $me-> repaint;
+   $iv-> update_view;
+   $iv-> {xorData} = [ $iv-> point2screen( @r[0,1,0,3,2,3,2,1])];
+   $iv-> {xorPolyData} = [ $iv-> point2screen( @{$_[0]-> {rect}})];
+   $w-> IV_xorrect( $iv);
+   $w-> IV_xorpoly( $iv) unless $me->{rectLike};
+   $iv-> {screenPoints} = [ $x, $y];
+   $iv-> {points} = [ $ax, $ay];
+}
+
+sub close_transaction
+{
+   my ( $w, $iv) = ( $_[0]->{owner}, $_[0]-> {IV});
+   $iv-> pointer( $iv-> {savePointer});
+   $iv-> {transaction} = undef;
+   $iv-> capture(0);
+   $w-> IV_xorpoly( $iv) unless $_[0]->{rectLike};
+   $w-> IV_xorrect( $iv);
+   $iv-> repaint;
+   $w-> modified( 1);
+}
+
+sub repaint
+{
+   $_[0]-> {IV}-> invalidate_rect( $_[0]-> get_screen_bounds);
+}
+
+sub on_paint
+{
+   my ( $me, $w, $iv, $canvas) = @_;
+   my @r = $iv-> point2screen( @{$_-> {rect}});
+   push @r, @r[0,1];
+   $canvas-> polyline(\@r);
+   if ( defined $me->{number}) {
+      $canvas-> text_out( $me->{number}, $iv-> point2screen( $me->{bounds}->[0], $me->{bounds}->[1]));
+   }
+   if ( $w-> {selectedRect} && $me == $w-> {selectedRect} && !$iv->{transaction}) {
+      my $c = $canvas-> color;
+      my $pc = $w->{ini}->{Color_Selection} + 0;
+      $pc = ~($pc) & 0xFFFFFF;
+      $canvas-> color( $pc);
+      $canvas-> rop( rop::XorPut);
+      @r = $me-> get_screen_bounds;
+      my $hw = $r[0]+($r[2]-$r[0])/2;
+      my $hh = $r[1]+($r[3]-$r[1])/2;
+      if ( $me->{state} == 0) {
+         $canvas-> bar( $r[0],$r[1],$r[0]+4,$r[1]+4);
+         $canvas-> bar( $hw-2,$r[1],$hw+2,$r[1]+4);
+         $canvas-> bar( $r[2]-5,$r[1],$r[2]-1,$r[1]+4);
+         $canvas-> bar( $r[0],$r[3]-5,$r[0]+4,$r[3]-1);
+         $canvas-> bar( $hw-2,$r[3]-5,$hw+2,$r[3]-1);
+         $canvas-> bar( $r[2]-5,$r[3]-5,$r[2]-1,$r[3]-1);
+         $canvas-> bar( $r[0],$hh-2,$r[0]+4,$hh+2);
+         $canvas-> bar( $r[2]-5,$hh-2,$r[2]-1,$hh+2);
+      } else {
+         $canvas-> arc( $r[0]+16, $r[1]+16, 8, 8, 180, 270);
+         $canvas-> arc( $r[0]+16, $r[3]-16, 8, 8, 90, 180);
+         $canvas-> arc( $r[2]-16, $r[3]-16, 8, 8, 0, 90);
+         $canvas-> arc( $r[2]-16, $r[1]+16, 8, 8, 270, 360);
+         $canvas-> line( $r[0]+2, $hh - 5, $r[0]+2, $hh + 5);
+         $canvas-> line( $hw - 5, $r[1]+2, $hw + 5, $r[1]+2);
+         $canvas-> line( $r[2]-2, $hh - 5, $r[2]-2, $hh + 5);
+         $canvas-> line( $hw - 5, $r[3]-2, $hw + 5, $r[3]-2);
+      }
+      $r[0] += 3;
+      $r[1] += 3;
+      $r[2] -= 3;
+      $r[3] -= 3;
+      $canvas-> rectangle( @r);
+      $canvas-> rop( rop::CopyPut);
+      $canvas-> color( $c);
+   }
+}
+
+sub compare_to
+{
+   my @d  = map {
+      my $g = $_[0]-> {bounds}-> [$_] - $_[1]-> {bounds}->[$_];
+      $g = 0 if abs($g) < 8; # XXX
+      $g;
+   } 0,1;
+   return ($d[1] != 0) ? -$d[1] : $d[0];
+}
+
+package AveWindow;
+use vars qw(@ISA);
+@ISA = qw(App::PLab::ImageAppWindow);
+
+sub win_inidefaults
+{
+   my $w = $_[0];
+   return (
+      $w-> SUPER::win_inidefaults,
+      PropShowMode    => '1',
+   );
+}
+
+
+sub on_create
+{
+   my $self = $_[0];
+   my $w    = $_[0];
+   $self-> SUPER::on_create;
+   $self-> {dataExt} = 'pab';
+   $w-> {selectedRect} = undef;
+   $w-> {rects} = [];
+
+   $w-> insert( Popup =>
+      autoPopup => 0,
+      selected => 0,
+      name => 'FigurePopup',
+      items => [
+         ['~Duplicate' => 'Ctrl+D' => kb::NoKey => q(win_figdup)],
+         ['De~lete' => 'Del' => kb::NoKey => q(win_figdelete)],
+         ['~Properties' => sub { $w-> fig_propdialog( $w-> {selectedRect})}],
+      ],
+   );
+
+   my %btn_profile = (
+      glyphs      => 2,
+      text        => "",
+      selectable  => 0,
+      transparent => 1,
+      flat        => 1,
+      size        => [ 36, 36],
+      borderWidth => 1,
+   );
+
+   $w-> ToolBar-> insert(
+      [ SpeedButton =>
+         origin    => [ 114, 1],
+         image     => App::PLab::ButtonGlyphs::icon( bg::floppy),
+         hint      => 'Save file',
+         enabled   => 0,
+         name      => "FileSave",
+         onClick   => sub { $w-> win_saveframe; },
+         %btn_profile,
+      ],
+      [ SpeedButton =>
+         origin    => [ 150, 1],
+         image     => App::PLab::ButtonGlyphs::icon( bg::print),
+         hint      => 'Print',
+         enabled   => 0,
+         name      => "FilePrint",
+         onClick   => sub { $w-> win_printframe(0); },
+         %btn_profile,
+      ],
+   );
+}
+
+
+sub win_closeframe
+{
+   my $w = $_[0];
+   $w-> SUPER::win_closeframe;
+   $w-> fig_clear();
+}
+
+sub win_newextras
+{
+   my $w = $_[0];
+   $w-> SUPER::win_newextras;
+
+   my $pabname = $w-> win_extname( $w->{file});
+   if ( open F, "< $pabname") {
+      $_ = <F>;
+      return unless /Average\sbrightness\sdata/;
+      return unless /extinfo/;
+      my $i;
+      LOOP: while (<F>) {
+         my $comments;
+         chomp;
+         if ( /\#(.*)/) {
+            $comments = $1;
+            # print "got comments:$comments\n";
+            s/\#.*//;
+         }
+         next unless length $_;
+         my @dp = split(' ', $_);
+         # print "got data:@dp\n";
+         next unless $dp[0] =~ /^\d+$/;
+         next unless defined $comments;
+         @dp = split(' ', $comments);
+         # print "got split comments:@dp\n";
+         for ( @dp) {
+            next LOOP unless /^[\d\.]+$/;
+         }
+         # print "@dp:ok!\n";
+         $i++;
+         my $threshold = shift @dp;
+         next if $threshold < 0 || $threshold > 255;
+         my $fig = $w-> fig_add( @dp);
+         $fig-> {number} = $i;
+         $fig-> {threshold} = $threshold;
+      }
+      close F;
+   }
+}
+
+
+sub win_printframe
+{
+   my ( $w, $usedlg) = @_;
+   if ( $usedlg) {
+      my $d = $w-> {printerDialog};
+      $w-> {printerDialog} = $d = Prima::PrintSetupDialog-> create( owner => $w) unless $d;
+      $w-> iv_cancelmode( $w-> IV);
+      return unless $d-> execute;
+   }
+   my $p = $::application-> get_printer;
+   $p-> font-> size( 9);
+   if ( !$p-> begin_doc) {
+      Prima::MsgBox::message_box( $w->name, "Error starting print document", mb::Ok|mb::Error);
+      return;
+   }
+   my $ww = Prima::Window-> create(
+      borderIcons => 0,
+      borderStyle => bs::None,
+      size        => [300, 100],
+      centered    => 1,
+   );
+   $ww-> insert( Label =>
+      x_centered  => 1,
+      text        => 'Printing...',
+      font        => {size => 18},
+      height      => $ww-> height,
+      bottom      => 0,
+      valignment  => ta::Center,
+   );
+   $ww-> bring_to_front;
+   $ww-> update_view;
+
+   my @sz = $p-> size;
+   my $i = $w-> IV-> image;
+   my @isz = $i-> size;
+   my ( $x, $y) = ( $sz[0] / $isz[0], $sz[1] / $isz[1]);
+   my $z = $x < $y ? $x : $y;
+   $p-> stretch_image( 0, 0, $isz[0] * $z, $isz[1] * $z, $i);
+   my $fh = $p-> font-> height;
+
+   for ( @{$w-> {rects}}) {
+      my @rc = @{$_->{rect}};
+      $_ *= $z for @rc;
+      push @rc, @rc[0,1];
+      $p-> color( cl::White);
+      $p-> fillpoly( \@rc);
+      $p-> color( cl::Black);
+      $p-> polyline( \@rc);
+      @rc = @{$_->{bounds}};
+      $_ *= $z for @rc;
+      $p-> text_out( $_-> {number},
+         ( $rc[2] + $rc[0] - $p-> get_text_width( $_->{number})) / 2,
+         ( $rc[3] + $rc[1] - $fh) / 2
+      );
+   }
+
+   $p-> end_doc;
+   $ww-> destroy;
+}
+
+
+sub win_saveframe
+{
+   my $w = $_[0];
+   my $i;
+   my $f = $w-> {file};
+   my $sr = scalar @{$w-> {rects}};
+   my $lt = scalar localtime;
+   my $pabname = $w-> win_extname( $f);
+   if ( open F, "> $pabname") {
+      print F <<SD;
+# Average brightness data for $f, $sr points, extinfo
+# $lt
+#
+# N    AveB         SumB          Area          # ignore this altogether
+#
+SD
+
+      for ( sort { $a-> compare_to( $b) } @{$w-> {rects}}) {
+         $i++;
+         my ( $i1, $imask, $i2) = $w-> fig_getspots( $_);
+         my $t    = $_-> {threshold};
+         my $mask = Prima::IPA::Point::threshold( $i2, minvalue => $t, maxvalue => 255);
+         my $a2   = Prima::IPA::Point::mask( $mask, mismatch => $i2);
+         my $area  = $mask-> sum / 255;
+         my $sum2 = $a2-> sum;
+         my $ave  = $area ? $sum2 / $area : 0;
+         printf F "%-3d %-14.8g %-14.8g %-14.8g", $i, $ave, $sum2, $area;
+         print F "# $t @{$_->{rect}}\n";
+      }
+      close F;
+      $w-> modified( 0);
+   } else {
+      return 0 if Prima::MsgBox::message_box( $::application-> name,
+         "Error saving file $pabname. Ignore changes?", mb::YesNo|mb::Warning) == mb::No;
+   }
+   return 1;
+}
+
+sub win_figrenumber
+{
+   my $w = $_[0];
+   my $i = 0;
+   my $needRepaint = 0;
+   for ( sort { $a-> compare_to( $b) } @{$w-> {rects}}) {
+      $i++;
+      $needRepaint = 1 if !$needRepaint && defined $_-> {number} && $_-> {number} != $i;
+      $_-> {number} = $i;
+   }
+   return $needRepaint;
+}
+
+sub win_figdelete
+{
+   my ( $w) = @_;
+   return unless $w->{selectedRect};
+   $w->{selectedRect}-> destroy;
+   $w-> modified( 1);
+   $w-> {rects}->[-1]-> select if @{$w-> {rects}};
+   $w-> pointer( cr::Default);
+}
+
+sub win_figdup
+{
+   my ( $w) = @_;
+   return unless $w->{selectedRect};
+   my @rc = @{$w->{selectedRect}->{rect}};
+   my $x = $w-> fig_add( map { $_ += 20} @rc);
+   $w-> modified( 1);
+   $x-> select;
+}
+
+
+sub win_figclear
+{
+   my ( $w) = @_;
+   $w-> fig_clear;
+   $w-> IV-> repaint;
+   $w-> pointer( cr::Default);
+   $w-> modified( 1);
+}
+
+sub win_framechanged
+{
+   my $w = $_[0];
+   $w-> SUPER::win_framechanged;
+   $w-> menu-> FilePrint-> enabled( defined $w-> {file});
+   $w-> menu-> FileSave-> enabled( defined $w-> {file});
+   $w-> ToolBar-> FilePrint-> enabled( defined $w-> {file});
+   $w-> ToolBar-> FileSave-> enabled( defined $w-> {file});
+}
+
+# FIG
+
+sub fig_clear
+{
+   $_[0]-> {selectedRect} = undef;
+   $_[0]-> {rects} = [];
+}
+
+sub fig_add
+{
+   my $w = shift;
+   my $obj = new Figure @_;
+   push @{$w-> {rects}}, $obj;
+   $obj->{index} = scalar(@{$w-> {rects}}) - 1;
+   $obj->{owner} = $w;
+   $obj->{IV}    = $w-> IV;
+   return $obj;
+}
+
+sub fig_propdialog
+{
+   my $i2 = undef if 0;
+   my ($w, $me) = @_;
+   my $d = $w-> {figPropDlg};
+   my ($i1,$imask);
+   ( $i1, $imask, $i2) = $w-> fig_getspots( $me);
+   unless ( $d) {
+       my $selpoint = sub {
+          my ( $d, $item) = @_;
+          $d-> menu-> checked( $w->{ini}->{PropShowMode}, 0);
+          $d-> menu-> checked( $item, 1);
+          $w->{ini}->{PropShowMode} = $item;
+          $d-> Threshold-> notify(q(Change)); # force changes
+       };
+
+       $d = Prima::Dialog-> create(
+          size => [ 400, 320],
+          text => 'Spot properties',
+          owner => $w,
+          menuItems => [
+             ['~Options' => [
+                ['1' => '~Positive' => 'Ctrl+P' => '^P' =>$selpoint],
+                ['2' => '~Negative' => 'Ctrl+N' => '^N' =>$selpoint],
+                ['3' => '~Mask'     => 'Ctrl+M' => '^M' =>$selpoint],
+             ]],
+          ],
+          %App::PLab::ImageAppWindow::dlgProfile,
+       );
+       $d-> menu-> check( $w->{ini}->{PropShowMode});
+       $d-> insert( Button =>
+          origin => [ 10, 10],
+          size   => [ 56, 36],
+          default => 1,
+          text    => '~Ok',
+          modalResult => mb::OK,
+       );
+       $d-> insert( Label =>
+          origin => [ 85, 10],
+          size   => [ 305, 36],
+          name   => 'Text',
+          wordWrap => 1,
+       );
+
+       my @t;
+       my $i;
+       for ( $i = 0; $i <= 250; $i += 50) {
+          push ( @t, { value => $i, height => 6, text => $i });
+          if ( $i < 250) {
+             my @d = map {{ value => $i + 10 * $_, height => 3 }} 1..4;
+             push ( @t, @d);
+          }
+       }
+
+       $d-> insert( Slider =>
+          origin => [ 10, 56],
+          size   => [ 380, 52],
+          name   => 'Threshold',
+          min    => 0,
+          max    => 255,
+          vertical => 0,
+          increment => 50,
+          ticks     => \@t,
+          selectable => 1,
+          onPostMessage => sub {
+             my $self = $_[0];
+             my $v    = $self-> value;
+             my $mask = Prima::IPA::Point::threshold(
+                      $i2, minvalue => $v, maxvalue => 255
+             );
+             my $a2 = Prima::IPA::Point::mask( $mask, mismatch => $i2);
+             my $area  = $mask-> sum / 255;
+             my $sum2 = $a2-> sum;
+             my $ave  = int(($area ? $sum2 / $area : 0) * 1000) / 1000;
+             $d-> Text-> text( "$v Area: $area, sum: $sum2, avebr: $ave");
+             $d-> Text-> update_view;
+             my $mode = $w->{ini}->{PropShowMode};
+             if ( $mode == 2) {
+                $a2-> resample( 0, 255, 255, 0);
+             } elsif ( $mode == 3) {
+                $a2 = $mask;
+             }
+             $d-> Preview-> image( $a2);
+             $d-> Preview-> update_view;
+          },
+          onChange => sub {
+             $_[0]-> post_message(0,0);
+             $_[0]-> update_view;
+          },
+       );
+       $d-> insert( ImageViewer =>
+          origin  => [ 60, 122],
+          size    => [ 280, 192],
+          vScroll => 0,
+          hScroll => 0,
+          quality => 0,
+          name    => 'Preview',
+          alignment   => ta::Center,
+          valignment  => ta::Middle,
+       );
+       $w-> {figPropDlg} = $d;
+   }
+
+   my @b   = @{$me-> {bounds}};
+   my @szA = ( $b[2] - $b[0] + 1, $b[3] - $b[1] + 1);
+   my $pv  = $d-> Preview;
+   my @szB = $pv-> size;
+   my ( $x, $y) = ( $szB[0] / $szA[0], $szB[1] / $szA[1]);
+
+   $pv-> image( $i2);
+   $pv-> zoom( $x < $y ? $x : $y);
+   $d-> centered(1);
+   $d-> Threshold-> value( $me-> {threshold});
+   $d-> Threshold-> notify(q(PostMessage)); # force changes
+   $w-> iv_cancelmode( $w-> IV);
+   if ( $d-> execute == mb::OK) {
+      $me-> {threshold} = $d-> Threshold-> value;
+   }
+   $pv-> image( undef);
+}
+
+sub fig_getspots
+{
+   my ($w, $me) = @_;
+   my @b   = @{$me-> {bounds}};
+   my @szA = ( $b[2] - $b[0] + 1, $b[3] - $b[1] + 1);
+   my $i1  = $w-> IV-> image-> extract( @b[0,1], @szA);
+   $i1-> type( im::Byte);
+   my $imask = Prima::Image-> create(
+      width  => $szA[0],
+      height => $szA[1],
+      type   => im::BW,
+   );
+   $imask-> begin_paint;
+   $imask-> backColor( cl::Black);
+   $imask-> clear;
+   $imask-> color( cl::White);
+   $imask-> translate( -$b[0], -$b[1]);
+   my @p = @{$me-> {rect}};
+   $imask-> fillpoly( [@p, @p[0,1]]);
+   $imask-> end_paint;
+   $imask-> type( im::Byte);
+   my $i2 = Prima::IPA::Point::mask( $imask, mismatch => $i1);
+   return $i1, $imask, $i2;
+}
+
+sub IV_xorrect
+{
+   my ( $w, $self) = @_;
+   my @r = @{$self->{xorData}};
+   my $pc = $w->{ini}->{Color_Selection} + 0;
+   $pc = ~($pc) & 0xFFFFFF;
+   $self-> begin_paint;
+   $self-> set(
+      linePattern => lp::Dash,
+      color       => $pc,
+      rop         => rop::XorPut,
+   );
+   $self-> polyline( [ @r, @r[0,1]] );
+   $self-> end_paint;
+}
+
+sub IV_xorpoly
+{
+   my ( $w, $self) = @_;
+   my $pc = $w-> backColor;
+   my @r = @{$self->{xorPolyData}};
+   $self-> begin_paint;
+   $self-> set(
+      linePattern => lp::Dash,
+      color       => $pc,
+      rop         => rop::XorPut,
+   );
+   $self-> polyline( [ @r, @r[0,1]] );
+   $self-> end_paint;
+}
+
+
+sub IV_MouseDown
+{
+   my ( $w, $self, $btn, $mod, $x, $y) = @_;
+
+   if ( !$self->{transaction})
+   {
+      my ( $ax, $ay) = $self-> screen2point( $x, $y);
+      for ( @{$w-> {rects}}) {
+         if ( $_-> on_mousedown( $w, $self, $btn, $mod, $x, $y, $ax, $ay)) {
+            $self-> clear_event;
+            return;
+         }
+      }
+
+      if ( $btn == mb::Left) {
+         $self-> {transaction} = tran::init;
+         $w-> iv_cancelmagnify( $self);
+         $self-> capture( 1);
+         $self-> {anchor} = [ $x, $y];
+         $self-> {xorData} = [ $x, $y, $x, $y, $x, $y, $x, $y];
+         $w-> IV_xorrect( $self);
+         $self-> clear_event;
+         $w-> sb_text( "Draw a region");
+         return;
+      }
+   }
+
+   $w-> SUPER::IV_MouseDown( $self, $btn, $mod, $x, $y);
+   return unless $self-> eventFlag;
+
+   $self-> clear_event;
+}
+
+
+sub IV_MouseClick
+{
+   my ( $w, $self, $btn, $mod, $x, $y, $dbl) = @_;
+
+   return if $self->{transaction};
+   my ( $ax, $ay) = $self-> screen2point( $x, $y);
+   for ( @{$w-> {rects}}) {
+      if ( $_-> on_mouseclick( $w, $self, $btn, $mod, $x, $y, $ax, $ay, $dbl)) {
+         $self-> clear_event;
+         return;
+      }
+   }
+}
+
+
+sub IV_MouseUp
+{
+   my ( $w, $self, $btn, $mod, $x, $y) = @_;
+
+   return unless $self->{transaction};
+   $w-> SUPER::IV_MouseUp( $self, $btn, $mod, $x, $y);
+   return unless $self-> eventFlag;
+
+
+   if ( $self->{transaction} == tran::init && $btn == mb::Left) {
+      $self-> {transaction} = undef;
+      $self-> capture( 0);
+      $w-> IV_xorrect( $self);
+      $self-> clear_event;
+      if ( $self-> {anchor}->[0] != $x && $self-> {anchor}->[1] != $y) {
+         my $ix = $w-> fig_add( $self-> screen2point( @{$self-> {xorData}}));
+         $self-> {xorData} = [(-1)x4];
+         $w-> {selectedRect} = $ix;
+      } else {
+         $w-> {selectedRect} = undef;
+      }
+      $self-> repaint;
+      return;
+   }
+
+   if ( $w-> {selectedRect} && $self-> {transaction})
+   {
+      my ( $ax, $ay) = $self-> screen2point( $x, $y);
+      if ( $w-> {selectedRect}-> on_mouseup( $w, $self, $btn, $mod, $x, $y, $ax, $ay)) {
+         $self-> clear_event;
+         return;
+      }
+   }
+}
+
+sub IV_MouseMove
+{
+   my ( $w, $self, $mod, $x, $y) = @_;
+
+   $w-> SUPER::IV_MouseMove( $self, $mod, $x, $y);
+   return unless $self-> eventFlag;
+
+   if ( $self->{transaction} && $self->{transaction} == tran::init) {
+      $w-> IV_xorrect( $self);
+      $self-> {xorData}-> [3] = $y;
+      $self-> {xorData}-> [4] = $x;
+      $self-> {xorData}-> [5] = $y;
+      $self-> {xorData}-> [6] = $x;
+      $w-> IV_xorrect( $self);
+      $self-> clear_event;
+      return;
+   }
+
+   if ( $w-> {selectedRect} && $w-> {selectedRect}-> on_mousemove( $w, $self, $mod, $x, $y)) {
+      $self-> clear_event;
+      return;
+   }
+}
+
+sub IV_Paint
+{
+   my ( $w, $self, $canvas) = @_;
+   $self-> on_paint( $canvas);
+   my $r = $w-> {rects};
+   my $z = $self-> zoom;
+   $canvas-> color( $w-> {ini}->{Color_AreaBorder});
+   $canvas-> translate(0,0);
+   for ( @$r) {
+      $_-> on_paint( $w, $self, $canvas);
+   }
+}
+
+# OPT
+
+sub opt_colors
+{
+   return {
+     'Selection'  => [ cl::Gray, 'Selection'],
+     'AreaBorder' => [ cl::Cyan, 'Area border'],
+   };
+}
+
+sub opt_keys
+{
+   return {
+      %{$_[0]-> SUPER::opt_keys()},
+      FileSave       => [ kb::F2,              'Save frame layout'],
+      FilePrint      => [ '^P',                'Print current frame layout'],
+      EditDuplicate  => [ '^D',                'Duplicate selected rectange'], 
+      EditDelete     => [ kb::Delete       ,   'Delete selected rectange'], 
+      EditDeleteAll  => [ kb::NoKey        ,   'Delete all rectanges'], 
+   },
+}
+
+
+# OPT_END
+
+
+package Run;
+
+my $wfile = App::PLab::ImageAppWindow::winmenu_file();
+splice( @{$$wfile[1]}, 8, 0,
+   [],
+   ['-FileSave'  => "~Save"     => q(win_saveframe)],
+   ['-FilePrint' => "~Print..." => sub { $_[0]-> win_printframe(1); }],
+);
+
+
+my $wedt = App::PLab::ImageAppWindow::winmenu_edit();
+splice( @{$$wedt[2]}, 0, 0,
+   [ EditDuplicate => "~Duplicate"    => q(win_figdup)],
+   [ EditDelete    => "De~lete"       => q(win_figdelete)],
+   [ EditDeleteAll => "Delete ~all"   => q(win_figclear), ],
+   [],
+);
+
+my $w = AveWindow-> create(
+   menuItems => [
+      $wfile,
+      $wedt,
+      App::PLab::ImageAppWindow::winmenu_view(),
+   ],
+);
+
+
+$w-> IV-> delegations(['Paint', 'MouseClick']);
+$w-> sb_text("Started OK");
+$w-> visible(1);
+$w-> select;
+
+$w-> win_extwarn;
+
+
+run Prima;
+

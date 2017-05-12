@@ -1,0 +1,41 @@
+2003-06-23	Christian Gilmore <cag@us.ibm.com>
+
+	o  Changed expired password response to FORBIDDEN.
+	o  Made release 1.00.
+
+2002-03-07	Christian Gilmore <cgilmore@tivoli.com>
+	o  Added password expiration handling.
+	o  Removed generic variable names used exclusively
+	   in releases prior to 0.60.
+	o  Updated README to include mention of new features.
+	o  Made release 0.90.
+	
+2001-07-12	Christian Gilmore <cgilmore@tivoli.com>
+
+	o  Removed test for mod_perl-1.26 or higher.
+	o  Cleaned up documentation
+	o  Made release 0.61
+	
+2001-05-27	Christian Gilmore <cgilmore@tivoli.com>
+
+	o  Deprecated generic variable naming in favor of
+	   module specific to reduce potential conflict with
+	   other auth modules: 
+	      LDAPServer  -> AuthenLDAPServer
+	      LDAPPort    -> AuthenLDAPPort
+	      UidAttrType -> AuthenUidAttrType
+           Original variable names are still accepted but will
+	   be removed on the next major release.
+	o  Made release 0.60.
+	
+2001-01-08	Christian Gilmore <cgilmore@tivoli.com>
+
+	o  Added handling of blank userid input
+        o  Better handling of pre-1.26 set_handlers bugs
+	o  Made release 0.52.
+
+2000-09-26	Christian Gilmore <cgilmore@tivoli.com>
+
+	o  Made first public releases 0.50 and 0.51.
+
+$Id: ChangeLog,v 1.8 2003/06/23 18:38:59 cgilmore Exp $

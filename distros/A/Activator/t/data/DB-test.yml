@@ -1,0 +1,33 @@
+'Activator::Registry':
+  'Activator::DB':
+# for testing config file Log4perl setup
+#    log4perl:
+#      'log4perl.logger.Activator.DB' : 'WARN, Screen'
+#      'log4perl.appender.Screen' : 'Log::Log4perl::Appender::Screen'
+#      'log4perl.appender.Screen.layout' : 'Log::Log4perl::Layout::PatternLayout'
+#      'log4perl.appender.Screen.layout.ConversionPattern' : 'YAML %d{yyyy-mm-dd HH:mm:ss.SSS} [%p] %m (%M %L)%n'
+    default:
+      connection: test1_mysql
+      config:
+        debug: 0
+        debug_connection: 0
+        debug_attr: 0
+          
+    connections:
+      test1_mysql:
+        user: act_db_test_user
+        pass: act_db_test_pass
+        dsn: 'DBI:mysql:act_db_test1:localhost'
+      test2_mysql:
+        user: act_db_test_user
+        pass: act_db_test_pass
+        dsn: 'DBI:mysql:act_db_test2:localhost'
+      test1_pg:
+        user: act_db_test_user
+        pass: act_db_test_pass
+        dsn: 'DBI:Pg:database=act_db_test1'
+      test2_pg:
+        user: act_db_test_user
+        pass: act_db_test_pass
+        dsn: 'DBI:Pg:database=act_db_test2'
+

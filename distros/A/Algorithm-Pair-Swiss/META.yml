@@ -1,0 +1,21 @@
+---
+name: Algorithm-Pair-Swiss
+version: 0.14
+author:
+  - 'Gilion Goudsmit, E<lt>ggoudsmit@shebang.nlE<gt>'
+abstract: Generate unique pairings for tournaments
+license: perl
+requires:
+  perl: 5.6.0
+build_requires:
+  Test::More: 0
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Algorithm::Pair::Swiss:
+    file: lib/Algorithm/Pair/Swiss.pm
+    version: 0.14
+resources:
+  license: http://dev.perl.org/licenses/

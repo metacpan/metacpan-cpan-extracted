@@ -1,0 +1,10 @@
+0.002   2017-02-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Add dzil plugin DZP:Acme::MetaSyntactic.
+
+
+0.001   2016-06-05 (PERLANCAR)
+
+        - First release.

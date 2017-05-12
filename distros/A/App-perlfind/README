@@ -1,0 +1,69 @@
+NAME
+
+    App::perlfind - A more knowledgeable perldoc
+
+SYNOPSIS
+
+        # perlfind UNIVERSAL::isa
+        # (runs `perldoc perlobj`)
+    
+        # Include features of cpandoc and perldoc:
+    
+        # perlfind File::Find
+        # perlfind -m Acme::BadExample | grep system
+        # vim `perlfind -l Web::Scraper`
+        # perlfind -q FAQ Keyword
+
+DESCRIPTION
+
+    perlfind is like cpandoc and therefore also like perldoc except it
+    knows about more things. Try these:
+
+        perlfind xor
+        perlfind foreach
+        perlfind isa
+        perlfind AUTOLOAD
+        perlfind TIEARRAY
+        perlfind INPUT_RECORD_SEPARATOR
+        perlfind '$^F'
+        perlfind '\Q'
+        perlfind PERL5OPT
+        perlfind :mmap
+        perlfind __WARN__
+        perlfind __PACKAGE__
+        perlfind head4
+        perlfind UNITCHECK
+
+    If perlfind doesn't know about a search term, it will delegate the
+    search to Pod::Cpandoc and ultimately Pod::Perldoc.
+
+FUNCTIONS
+
+ find_matches
+
+    Takes a word and returns the matches for that word. It's in a separate
+    function to separate logic from presentation so other programs can use
+    this module as well.
+
+AUTHORS
+
+    The following persons are the authors of all the files provided in this
+    distribution unless explicitly noted otherwise.
+
+    Marcel Gruenauer <marcel@cpan.org>, http://perlservices.at
+
+    Lars Dieckow <daxim@cpan.org>
+
+    Leo Lapworth <LLAP@cuckoo.org>
+
+COPYRIGHT AND LICENSE
+
+    The following copyright notice applies to all the files provided in
+    this distribution, including binary files, unless explicitly noted
+    otherwise.
+
+    This software is copyright (c) 2011-2015 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

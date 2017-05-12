@@ -1,0 +1,49 @@
+---
+abstract: 'Compile a log format string to perl-code '
+author:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Test::MockTime: '0'
+  Test::More: '0.98'
+  Test::Requires: '0'
+  Try::Tiny: '0.12'
+  URI::Escape: '1.60'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache-LogFormat-Compiler
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Apache::LogFormat::Compiler:
+    file: lib/Apache/LogFormat/Compiler.pm
+    version: '0.35'
+requires:
+  POSIX: '0'
+  POSIX::strftime::Compiler: '0.30'
+  Time::Local: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kazeburo/Apache-LogFormat-Compiler/issues
+  homepage: https://github.com/kazeburo/Apache-LogFormat-Compiler
+  repository: git://github.com/kazeburo/Apache-LogFormat-Compiler.git
+version: '0.35'
+x_contributors:
+  - 'Florian Schlichting <fsfs@debian.org>'
+  - 'Piotr Roszatycki <piotr.roszatycki@gmail.com>'
+  - 'Asato Wakisaka <asato.wakisaka@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

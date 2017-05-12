@@ -1,0 +1,47 @@
+{
+   "abstract" : "Access to Assembla API via Perl.",
+   "author" : [
+      "Cory G Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "API-Assembla",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime::Format::ISO8601" : 0,
+            "LWP::Protocol::https" : 0,
+            "LWP::UserAgent" : 0,
+            "Moose" : 0,
+            "URI" : 0,
+            "XML::XPath" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gphat/api-assembla"
+      }
+   },
+   "version" : "0.03"
+}
+

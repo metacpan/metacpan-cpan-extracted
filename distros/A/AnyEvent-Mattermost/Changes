@@ -1,0 +1,7 @@
+Revision history for AnyEvent-Mattermost
+
+0.002     2016-11-17
+  - Support both display and short names on channels for message sending.
+
+0.001     2016-11-17
+  - Initial release.

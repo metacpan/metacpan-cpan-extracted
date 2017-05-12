@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Acme::EnclosedChar>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Acme-EnclosedChar"><img src="https://secure.travis-ci.org/bayashi/Acme-EnclosedChar.png?_t=1428140179"/></a> <a href="https://coveralls.io/r/bayashi/Acme-EnclosedChar"><img src="https://coveralls.io/repos/bayashi/Acme-EnclosedChar/badge.png?_t=1428140179&branch=master"/></a> <a href="http://cpants.cpanauthors.org/dist/Acme-EnclosedChar"><img src="http://cpants.cpanauthors.org/dist/Acme-EnclosedChar.png?_t=1428140179"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Acme::EnclosedChar installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Acme::EnclosedChar
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Acme::EnclosedChar documentation is available as in POD. So you can do:
+
+    % perldoc Acme::EnclosedChar
+
+
+=head1 REPOSITORY
+
+Acme::EnclosedChar is hosted on github
+L<http://github.com/bayashi/Acme-EnclosedChar>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

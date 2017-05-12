@@ -1,0 +1,27 @@
+---
+abstract: 'declare and retrieve named attributes about CODE'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::More: '0.88'
+  Test::NoWarnings: '0'
+configure_requires:
+  Module::Build: '0'
+  Module::Build::Compat: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Attribute-Storage
+provides:
+  Attribute::Storage:
+    file: lib/Attribute/Storage.pm
+    version: '0.09'
+requires:
+  XSLoader: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.09'

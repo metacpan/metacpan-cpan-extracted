@@ -1,0 +1,25 @@
+---
+abstract: 'Find installed LibVLC'
+author:
+  - 'Alexey Sokolov <alexey@alexeysokolov.co.cc>'
+build_requires:
+  Module::Build: 0.20
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.20
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-VideoLAN-LibVLC
+provides:
+  Alien::VideoLAN::LibVLC:
+    file: lib/Alien/VideoLAN/LibVLC.pm
+    version: 0.04
+requires:
+  ExtUtils::PkgConfig: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

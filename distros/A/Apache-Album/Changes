@@ -1,0 +1,36 @@
+Revision history for mod_perl module Apache::Album.
+0.96  Sun Mar 21 13:41:00 2010
+	- Updated to work with Apache2
+0.95  Tue Sep 25 21:52:00 2001
+        - Added Slide Show and previous/next links
+        - Moved all thumbnails and sm/med/lg files to a totally
+          seperate directory.  This should help with permission
+          problems.
+0.94  Sat Jun 10 16:01:00 2000
+        - Fixed bug where not all small/med/large pictures were being
+          created.
+	- Removed <H3> tags from the title of the page when a full sized 
+	  picture is displayed.
+0.93  Wed Apr 05 23:16:00 2000
+	- Moved generation of small/med/large pictures to a cleanup
+	  handler, makes the initial loading of a page much faster!
+	- Added ?all_full_images=sm|med|lg|full which puts all the full
+	  sized images on a single page. (Eats up bandwidth + memory so
+	  be careful!)
+	- Fixed parsing of .htaccess file + made recursive .htaccess of
+	  previous directories accessible
+	- Untaint user passed directory name so Album can be used with taint
+	  turned on
+	- Added NumberOfColumns setting if someone wants to specify that
+	  instead of the approx browser width
+0.92  Wed Dec 01 23:16:00 1999
+        - Added Sm Med Lg tags if AllowFinalResize is set, this creates smaller
+          versions of the pictures, for people with small screens and/or small
+          bandwidth
+        - Added ReverseDirs/ReversePics which if set reverses the sort order
+          of directories/pictures
+        - Added EditMode which if set allows the end user to create new albums
+          and upload pictures
+0.01  Mon Sep 14 13:19:21 1998
+	- original version; created by h2xs 1.18
+

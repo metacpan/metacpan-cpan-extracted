@@ -1,0 +1,13 @@
+SYNOPSIS
+
+     % perl -MAcme::MetaSyntactic=seinfeld -le 'print metaname'
+     elaine
+    
+     % meta seinfeld 2
+     kramer
+     newman
+
+SEE ALSO
+
+    Acme::MetaSyntactic
+

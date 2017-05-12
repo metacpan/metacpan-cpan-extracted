@@ -1,0 +1,28 @@
+Revision history for App-cpangrep
+
+0.07  2014-10-25 12:33:38 PDT
+    - Output through a pager by default
+
+0.06  2014-01-29 21:18:54 PST
+    - Guard against a grep.cpan.me api bug returning truncated snippets.  This
+      manifested as substr() out of bounds errors.
+
+0.05  2013-12-07 15:58:57 PST
+        - "Showing first N." should count matches in each file instead of files
+
+0.04  2013-07-19 16:01:40 PDT
+        - HTTP::Tiny → LWP::UserAgent for better proxy support (socks, https)
+        - Module::Build::Tiny → ExtUtils::MakeMaker for fewer build-time deps
+
+0.03  2013-05-01 21:45:54 PDT
+        - Smart color support
+        - Optionally use a different server
+        - Display line numbers if available from the server
+        - Colorize the truncated result notes so they don't blend into match snippets
+        - List files mode with -l
+
+0.02  2013-04-28 16:14:12 PDT
+        - Fix script installation issue
+
+0.01  2013-04-28 10:26:01 PDT
+        - Initial release

@@ -1,0 +1,12 @@
+Banner.xs
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+mk_README.sh
+t/Apache2-Banner.t
+lib/Apache2/Banner.pm
+t/conf/extra.last.conf.in
+t/TEST.PL
+META.yml                                 Module meta-data (added by MakeMaker)

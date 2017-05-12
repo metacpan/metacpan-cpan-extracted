@@ -1,0 +1,292 @@
+
+<html>
+<head><title>Introduction to Apache::ASP</title></head>
+
+<body bgcolor=white>
+
+<h2>Introduction to Apache::ASP</h2>
+
+<h3>By: Joshua Chamas</h3>
+
+<i>published in PerlMonth.com in 1999</i>
+<p>
+
+I was first drawn to Active Server Pages (ASP) as a web development
+platform a couple years ago when researching how to best develop the 
+<font size=-1><a href=http://www.nodeworks.com>NODEWORKS</a></font> web site.  I needed 
+something maintainable, powerful, fast, portable, and of course perl.
+<p>
+Microsoft had developed the ASP standard as the end all to web
+application development, which promised to be maintainable, powerful,
+and fast.  But support for perl under PerlScript was shoddy, VBScript, 
+ASP's native tongue, seemed a pathetic alternative, and an NT/IIS solution lacks a certain 
+portability.  Thus I was led to developing <a href=http://www.apache-asp.org>Apache::ASP</a>, 
+which runs under Doug MacEachern's <a href=http://perl.apache.org>mod_perl</a> 
+for <a href=http://www.apache.org>Apache</a>.
+
+<h3>Maintainable</h3>
+
+I had been doing CGI style web applications for a couple of years already, 
+and had never been quite satisfied with the CGI programming, 
+growing less so as the HTML I was working with became increasingly more 
+complex than the CGI it was embedded in.  The idea of embedding the scripting 
+within the flow of the HTML seemed like a more natural fit over time.
+This natural flow speaks to the heart of <b>maintainability</b>,
+where another developer can pick up your code and get a feel for
+it on the first read.
+<p>
+Check out the difference in how it feels to embed the HTML
+in the scripting, versus embedding the scripting in the HTML.
+A reasonably complex table, which is structurally HTML heavy,
+only touches the tip of the iceberg:
+<p>
+<table border=2 bgcolor=blue>
+<tr><td>
+        <table border=4 bgcolor=white>
+        
+            <tr><td>SOME</td></tr>
+            
+            <tr><td>DATA</td></tr>
+             
+                </table><td><table border=4 bgcolor=white>
+                
+            <tr><td>TO</td></tr>
+            
+            <tr><td>LOOP</td></tr>
+             
+                </table><td><table border=4 bgcolor=white>
+                
+            <tr><td>OVER</td></tr>
+            
+            <tr><td>:)</td></tr>
+            
+        </table>
+</td></tr>
+</table>
+<p>
+Coding this table in CGI, you might get:
+<pre>
+<hr width=90% size=1>
+use CGI qw/:standard *table/;
+my(@data) = (&#39;Some&#39;, &#39;Data&#39;, &#39;To&#39;, &#39;Loop&#39;, &#39;Over&#39;, &#39;:)&#39;);
+print 
+  header,
+  start_html(&#39;Example&#39;),
+  start_table({-border=&gt;2, -bgcolor=&gt;&#39;blue&#39;}),
+  Tr,td,
+  start_table({-border=&gt;4, -bgcolor=&gt;&#39;white&#39;})
+  ;
+
+# pretend we are reading from database cursor, so code
+# would be written like so
+my($data, $count);
+while(@data) { 
+    if($data and $count++ % 2) {
+	print end_table,td,start_table({-border=&gt;4, -bgcolor=&gt;&#39;white&#39;});
+    }
+    $data = shift @data;
+    print Tr({align=&gt;CENTER},
+	     [td([uc($data).&quot;\n&quot;])]
+	    )
+      ;
+}
+
+print 
+  end_table,
+  end_table,
+  end_html
+  ;
+
+<hr width=90% size=1>
+</pre>
+When designing the above table ASP style, a much more 
+natural flow to the script takes form, wherein the developer 
+can literally see the table in table layout of the page:
+<pre>
+<hr width=90% size=1>
+&lt;% my(@data) = (&#39;Some&#39;, &#39;Data&#39;, &#39;To&#39;, &#39;Loop&#39;, &#39;Over&#39;, &#39;:)&#39;); %&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;Example&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;table border=2 bgcolor=blue&gt;
+&lt;tr&gt;&lt;td&gt;
+	&lt;table border=4 bgcolor=white&gt;
+	&lt;%
+	my($data, $count);
+	while(@data) { 
+	    if($data and $count++ % 2) {
+		%&gt; 
+		&lt;/table&gt;&lt;td&gt;&lt;table border=4 bgcolor=white&gt;
+		&lt;% 
+	    } 
+	    $data = shift @data;
+	    %&gt;
+	    &lt;tr&gt;&lt;td&gt;&lt;%=uc $data%&gt;&lt;/td&gt;&lt;/tr&gt;
+	    &lt;%
+	}
+	%&gt;
+	&lt;/table&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+<hr width=90% size=1>
+</pre>
+<p>
+Doesn't the HTML-centric ASP read better?  You'll see that
+this becomes more true as the html of your site becomes increasingly
+complex.
+<p>
+There are other aspects to <b>maintainability</b>, like who will
+be taking over your code in 2 years. With perl CGI, you can
+assume that any perl developer that you work with is going 
+to be able to get through the mess you've made.  But so too
+with ASP, because of the marketing muscle that Microsoft put
+behind its brainchild, you can expect to get plenty of ASP 
+experience in the workforce, with a huge peer learning environment.
+<p>
+So far, this may sound religious to some, as project design and 
+maintainability take on some very fuzzy and personal characteristics, with many 
+varying perspectives, but it should be at the forefront of one's mind
+when beginning any software project. This leads me to the graphics designer 
+you may end up working with, who doesn't know that the dynamic web site you 
+are building really falls under software development ;) ... 
+<p>
+Because ASP is scripting embedded in HTML, you can give the graphics 
+designer a few easy function calls to embed, and s/he can take the 
+rest from there, using her/his favorite GUI tools to craft the web site 
+beautifully.  Notice that you significantly increased the number of 
+people that can work on your site by using an embedded scripting web 
+application environment like ASP, versus going with a pure 
+scripted CGI solution.
+<p>
+Another feature furthering maintainability is ASP's built-in support
+for Server Side Includes (SSI), which allows the developer to 
+segment common parts of the site into <b>modular</b> include files.  Thus is becomes
+easy to decompose a basic site template like:
+<pre>
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;Company Name&gt;&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;!-- main body of page here --&gt;
+Copyright / Disclaimer
+&lt;/body&gt;&lt;/html&gt;
+
+</pre>
+
+and separate a common header and footer that can be reused 
+across every script:
+
+<pre>
+[header.inc]
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;Company Name&gt;&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+
+[footer.inc]
+Copyright / Disclaimer
+&lt;/body&gt;&lt;/html&gt;
+
+[sample.asp]
+&lt;!--#include file=header.inc--&gt;
+&lt;!-- main body of page here --&gt;
+&lt;!--#include file=footer.inc--&gt;
+
+</pre>
+<h3>Powerful</h3>
+
+When developing a web site under ASP, one has access to a complete 
+set of objects and events, my favorite being $Session, which was one of ASP's
+key selling points for me.  $Session is ASP's answer to the problem of HTTP being a 
+stateless protocol.  By using temporary session cookies, each web user 
+has a unique $Session in which you may store data, and that follows them from
+script to script. Because the data storage
+for $Session is handled on the server, you do not have to worry about
+size limits of cookies as an alternate mechanism of storing user session data.
+<p>
+There are some very useful events as well.  Let's say that you are
+using <tt>$Session->{login}</tt> to control a user account login and logout.  Because
+$Session automatically times out every SessionTimeout, if a user
+walks away from her/his computer for SessionTimeout minutes, the
+<tt>$Session->{login}</tt> is destroyed along with the rest of the data stored in 
+$Session, and the next person that uses the computer will find themselves
+automatically logged out from the account.  This is a huge security win if 
+you maintain a set of accounts at your web site that hold sensitive information like
+credit card numbers.
+<p>
+Here is a basic listing of the built-in <a href=http://www.apache-asp.org/objects.html>objects</a> 
+available to the developer within every <a href=http://www.apache-asp.org>Apache::ASP</a>
+script:
+<pre>
+	Object		-	Function
+	------			--------
+	$Session	-	session state
+	$Response	-	output
+	$Request	-	input
+	$Application	-	application state
+	$Server		-	OLE support + misc.
+</pre>
+
+You might be looking at the $Application object as saying "huh, what's that?".
+Simply, $Application allows you to share data between various ASP scripts
+and users.  Metaphorically it represents your web site as an application,
+and $Application is initialized when the first user $Session is created,
+and destroyed when the last user $Session is destroyed.
+<p>
+Events are triggered when these objects are created and destroyed.
+In addition to data initialization and destruction, these events allow
+the developer to define, in the global.asa, subroutines to be executed 
+at these event times, providing hooks enabling the web site
+to function easily as a dynamic software application.  The 
+<a href=http://www.apache-asp.org/events.html>events</a>
+are as follows:
+<pre>
+	Action			Event
+	------			------
+        Script_OnStart *	Beginning of Script execution
+        Script_OnEnd *		End of Script execution
+	Application_OnStart	Beginning of Application
+	Application_OnEnd	End of Application
+	Session_OnStart		Beginning of user Session.
+	Session_OnEnd		End of user Session.
+
+  * These are API extensions that are not portable, but were
+    added because they are incredibly useful
+</pre>
+<p>
+<h3>Fast</h3>
+Execution speed is always important when picking your web application
+environment ... shoot for the stars and design with the fastest
+from the beginning, saving yourself a massive redesign later when 
+your site becomes a success.  One of the motivations for not using PerlScript 
+under IIS, a couple years ago, was that it was painfully slow, but has since been 
+much improved.  
+
+The <a href=http://perl.apache.org>mod_perl</a> project boasts a 20 times
+speedup in CGIs handled by Apache::Registry, and it 
+handles perl ASP scripts just as well under Apache::ASP, with
+some performance lost because of all the objects initialization and 
+events execution that ASP handles.  
+<p>
+The startup overhead on simple scripts is significantly more
+when moving from CGI to ASP under mod_perl for Apache, at least 20%,  
+as shown in my previous 
+<a href=http://www.perlmonth.com/perlmonth/issue4/benchmarks.html>Hello 
+World - Web Application Benchmarks</a> article, but this startup overhead
+will become relatively less important as your scripts get longer, and 
+a base rate of 75 Apache::ASP requests per second on a PII 300 Solaris 
+x86 is nothing to scoff at!
+<p>
+In order to justify using ASP over CGI despite the performance hit, 
+just remember how much more <b>maintainable</b> and <b>powerful</b> ASP is.  The general
+consensus is that developer time is much more valuable than 
+computer time so save the former where possible!
+
+<h3>Next Month</h3>
+In this article I tried to convey a sense of how and why you might
+use <a href=http://www.apache-asp.org/>Apache::ASP</a> to build
+your web site.  Next month we will build a simple web site using
+some of the powerful and modular features ASP has to offer.
+</body>
+</html>

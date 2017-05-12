@@ -1,0 +1,54 @@
+Array-PseudoScalar
+
+Sometimes lists of values need to be alternatively treated as arrays
+or as scalars (joined by a separator character), depending on the
+context.  This is often the case for example with parameters of an
+HTTP query, or with "varray" columns in a database.  Code dealing with
+such data is usually full of calls to L<join> or L<split>.
+
+The present module provides a uniform interface for treating the same
+data both as an arrayref and as a scalar, implicitly joined on some
+separator: usual array and string operations are both available.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Array::PseudoScalar
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Array-PseudoScalar
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Array-PseudoScalar
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Array-PseudoScalar
+
+    Search CPAN
+        http://search.cpan.org/dist/Array-PseudoScalar/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Laurent Dami
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,8 @@
+Revision history for Perl extension Acme::Albed
+-
+0.03    Wed Jan 27 01:09:00 2010
+        - Through out-put if input-type is KANJI
+0.02    Mon Dec 14 09:42:00 2009
+        - Fix fictionary data
+0.01    Fri Dec 11 00:03:56 2009
+        - original version

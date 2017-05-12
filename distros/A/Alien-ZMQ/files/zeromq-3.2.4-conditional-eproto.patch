@@ -1,0 +1,15 @@
+This patch is for platforms which don't define EPROTO.
+--- a/src/err.hpp
++++ b/src/err.hpp
+@@ -44,6 +44,11 @@
+ #include <netdb.h>
+ #endif
+ 
++// EPROTO is not used by OpenBSD and maybe other platforms.
++#ifndef EPROTO
++#define EPROTO 0
++#endif
++
+ namespace zmq
+ {
+     const char *errno_to_string (int errno_);

@@ -1,0 +1,97 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+package
+  notifo::cmdline;
+use App::Notifo;
+# ABSTRACT: send notification via notifo.com service
+App::Notifo->new->run;
+
+
+
+=pod
+
+=head1 NAME
+
+notifo::cmdline - send notification via notifo.com service
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+    notifo --api-key KEY --user USER your notication goes here
+    
+    or
+    
+    notifo --api-key KEY --user USER < notification.txt
+    
+    or
+    
+    other_cmd | notifo --api-key KEY --user USER
+
+=head1 DESCRIPTION
+
+The C<notifo> command line tool allows you to send a notification to the
+L<notifo.com service|http://notifo.com/>.
+
+If you don't want to keep using C<--api-key> and C<--user>, you can
+create a configuration file with those settings. The file should be at
+C<$HOME/.notifo.rc>, and it should be something like this:
+
+    api_key: your_api_key_here
+    user: your_api_user
+
+See L<Protocol::Notifo/"CONFIGURATION FILE"> for all the details.
+
+=head1 OPTIONS
+
+The following options are available:
+
+=over 4
+
+=item --user or -u
+
+Specify the notifo.com API user to use.
+
+=item --api-key or -k
+
+Specifies the notifo.com API key to use.
+
+=item --to or -t
+
+The destination user (only used with Service keys).
+
+=item --title or -T
+
+The title for this notification.
+
+=item --url, --uri or -u
+
+The URL for this notification. Certain clients allow you to click the
+notification and jump to this URL.
+
+=item --label or -l
+
+The application sending this notification.
+
+=back
+
+=head1 AUTHOR
+
+Pedro Melo <melo@simplicidade.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2010 by Pedro Melo.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0
+
+=cut
+
+
+__END__
+

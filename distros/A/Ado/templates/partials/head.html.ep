@@ -1,0 +1,17 @@
+% #standart generic header for all pages
+% state $description = $self->{stash}{description} || $self->description;
+% state $keywords = $self->{stash}{keywords} || $self->keywords;
+% state $base_url = url_for('/')->base;
+    <meta charset="utf-8" />
+    <base href="<%= $base_url %>" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content="<%= $self->generator %>" />
+    <meta name="description" content="<%= $description %>" />
+    <meta name="keywords" content="<%= $keywords %>" />
+    <title><%= title %></title>
+    <link rel="icon" href="<%=$base_url%>/favicon.png" type="image/png" />
+    %== head_css
+    <link href="css/ado.css" rel='stylesheet' type='text/css' />
+    <link href='//fonts.googleapis.com/css?family=Ubuntu&amp;subset=latin,cyrillic' rel='stylesheet' type='text/css' />
+    %== head_javascript

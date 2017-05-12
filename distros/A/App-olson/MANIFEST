@@ -1,0 +1,16 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/olson
+lib/App/olson.pm
+t/attr.t
+t/load.t
+t/pod_cvg.t
+t/pod_syn.t
+t/version.t
+SIGNATURE    Added here by Module::Build

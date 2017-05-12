@@ -1,0 +1,46 @@
+Acme-BOPE
+
+This Acme module lets you program the way the BOPE (brazilian police's special operations squad) policemen talk in the movie "Tropa de Elite". Since its intended audience have to understand portuguese in order to enjoy the module, the rest of the documentation is all in pt_BR. Have fun! Oh, also, this is not to be taken seriously, nor does it expresses the opinion of any of the involved people, nor is oficially linked to the movie.>
+
+Esse módulo foi feito como uma brincadeira em relação ao filme "Tropa de Elite", e não deve ser levado à sério. Nada do que está escrito aqui expressa a opinião dos autores ou qualquer outro envolvido direta ou indiretamente com o mesmo, e não há qualquer tipo de ligação oficial com o filme. Divirtam-se!>
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Acme::BOPE
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-BOPE
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Acme-BOPE
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Acme-BOPE
+
+    Search CPAN
+        http://search.cpan.org/dist/Acme-BOPE
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Breno G. de Oliveira
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

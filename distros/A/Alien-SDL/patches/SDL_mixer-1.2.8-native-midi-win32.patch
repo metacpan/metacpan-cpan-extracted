@@ -1,0 +1,11 @@
+--- SDL_mixer-1.2.10/native_midi/native_midi_win32.c	2007-07-01 21:03:49.000000000 -0500
++++ SDL_mixer-1.2.10/native_midi/native_midi_win32.c	2008-12-23 14:56:23.615500000 -0600
+@@ -23,7 +23,7 @@
+ 
+ /* everything below is currently one very big bad hack ;) Proff */
+ 
+-#if __WIN32__
++#if __WIN32__ || defined(__CYGWIN__)
+ #define WIN32_LEAN_AND_MEAN
+ #include <windows.h>
+ #include <windowsx.h>

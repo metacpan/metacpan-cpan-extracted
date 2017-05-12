@@ -1,0 +1,6 @@
+Installation Instructions:
+
+perl Makefile.PL
+make all test
+make install (might need to be done as root, see your sysadmin)
+

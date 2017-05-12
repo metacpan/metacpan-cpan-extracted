@@ -1,0 +1,18 @@
+Revision history for Perl module App-mvr
+
+0.005     2013-11-12
+  - Be less verbose by default
+  - Handle Path::Tiny 0.034's new exception class
+
+0.004     2013-05-17
+  - Touch the destination when the files are duplicates
+
+0.003     2013-04-19
+  - Actually implement the --version option
+
+0.002     2013-04-19
+  - Better abstracts
+  - Fit synopsis in an 80-col terminal
+
+0.001     2013-04-18
+  - Initial release

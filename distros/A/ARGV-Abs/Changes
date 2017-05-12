@@ -1,0 +1,12 @@
+Revision history for ARGV::Abs.
+
+1.01    2011-11-14    DOLMEN (Olivier Mengué)
+	Humans can ignore this release.
+	Fix t/91-pod-coverage.t, only to raise Kwalitee.
+
+1.00    2011-11-04    DOLMEN (Olivier Mengué)
+	Add an example: examples/01.pl.
+	Add tests (only to raise Kwalitee and rank in the CPANTS game)
+
+0.01    2011-09-04    DOLMEN (Olivier Mengué)
+	Initial release. No tests yet.

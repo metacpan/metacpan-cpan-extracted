@@ -1,0 +1,13 @@
+Revision history for Perl extension Apache::LangURI.
+
+0.01  Mon Jan 13 13:23:25 2003
+	- original version; created by h2xs 1.22 with options
+		-b 5.6.0 -X Apache::LangURI
+
+0.15 Thu Jul  8 12:17:31 PDT 2004
+  - several modifications to behavior, removed DOCUMENT_FOLLOWS 
+    (which broke Apache::compat)
+  - added IgnorePathRegex directive
+
+0.16 Tue Aug 24 11:59:58 PDT 2004
+  - implemented full native compatibility for Apache 2.0

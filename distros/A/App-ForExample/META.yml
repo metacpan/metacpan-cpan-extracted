@@ -1,0 +1,33 @@
+---
+abstract: 'A guide through Catalyst, Apache, lighttpd, nginx, monit, ..., configuration hell'
+author:
+  - 'Robert Krimen <rkrimen@cpan.org>'
+build_requires:
+  Directory::Scratch: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::Most: 0
+  Test::Output: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.87'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-ForExample
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Carp: 0
+  Getopt::Chain: 0.014
+  Moose: 0.76
+  Path::Class: 0
+  Template: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/robertkrimen/App-ForExample/tree/master
+version: 0.024

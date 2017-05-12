@@ -1,0 +1,36 @@
+#!/opt/perl/bin/perl
+use IO::Socket::INET;
+use AnyEvent::Socket;
+use AnyEvent::Handle;
+
+my $cv = AnyEvent->condvar;
+
+my $hdl;
+
+my $watchobj = AnyEvent::Socket::tcp_connect ("www.google.com", 80, sub {
+   my ($sock) = @_;
+
+   unless ($sock) {
+      warn "couldn't connect: $!";
+      return;
+   }
+
+   $hdl =
+      AnyEvent::Handle->new (
+         fh => $sock,
+         on_eof => sub { print "received eof\n"; undef $hdl }
+      );
+
+   $hdl->push_write ("GET / HTTP/1.0\015\012\015\012");
+
+   $hdl->push_read (line => sub {
+      my ($hdl, $line) = @_;
+      print "Yay, got line: $line\n";
+      $cv->broadcast;
+   });
+
+}, sub {
+   10 # the timeout
+});
+
+$cv->wait;

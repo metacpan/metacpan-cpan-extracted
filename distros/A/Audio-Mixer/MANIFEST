@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+Mix.c
+Mix.h
+Mixer.pm
+Mixer.xs
+test.pl
+volume.pl
+README

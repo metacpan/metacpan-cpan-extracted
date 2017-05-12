@@ -1,0 +1,40 @@
+Revision history for App-Software-License
+
+0.11      2016-10-21 06:17:43Z
+          - warnings are only checked for in tests under AUTHOR_TESTING, so as
+            to not prevent installation when warnings occur in prerequisites.
+
+0.10      2016-08-16 01:37:13Z
+          - no changes since 0.09
+
+0.09      2016-03-13 03:09:20Z (TRIAL RELEASE)
+          - bump Moo prereq for allowing of non-ref default values
+
+0.08      2016-03-07 02:02:07Z (TRIAL RELEASE)
+          - use the configfile extension as a hint for the format to use
+          - fix tests to depend on a format extractor that requires fewer
+            dependencies
+
+0.07      2016-02-18 19:02:56Z (TRIAL RELEASE)
+          - add prereq on Config::General, needed for Config::Any to parse .conf files
+
+0.06      2016-02-17 03:04:25Z (TRIAL RELEASE)
+          - attempt to cope with some Config modules that return undef values
+          - add some debugging info to track down some test failures
+
+0.05      2016-02-16 03:42:44Z
+          - Converted to Moo (RT#108006)
+
+0.04      2015-07-15 00:49:53Z
+          - remove dependency on MooseX::Types
+
+0.03      2015-06-26 02:50:24Z
+          - fix handling of --year option (RT#82924)
+          - no longer warns when .software_license.conf doesn't exist
+
+0.02      2014-01-25 18:17:18Z
+          - removed use of deprecated Class::MOP::load_class (RT#92459,
+            rwstauner)
+
+0.01      2009-02-07 02:27:15Z
+          - Initial release.

@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+mk_README.sh
+README
+ScoreBoardFile.xs
+typemap
+optperl-Apache2-ScoreBoardFile.spec
+t/001.t
+t/TEST.PL
+t/conf/extra.conf.in
+lib/Apache2/ScoreBoardFile.pm
+META.yml                                 Module meta-data (added by MakeMaker)

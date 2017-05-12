@@ -1,0 +1,11 @@
+Revision history for Perl extension Apache::Blog.
+
+0.03  Fri Jun 28 09:15:28 2002
+	- Change to PREREQ_PM to add Apache::Request
+
+0.02  Thu Jun 20 15:34:22 2002
+	- First version released into the wild
+
+0.01  Wed Jun 19 22:10:24 2002
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,57 @@
+#!perl
+
+# DATE
+# VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Benchmark::Command;
+use FindBin '$Bin';
+
+my $py_mimic;
+{
+    require File::Slurper;
+    require File::Which;
+    for (File::Which::which('mimic')) {
+        my $content = File::Slurper::read_text($_);
+        if ($content =~ /__main__/) {
+            $py_mimic = $_;
+            last;
+        }
+    }
+    die "Can't find python's mimic" unless $py_mimic;
+}
+
+Benchmark::Command::run(
+    undef,
+    {
+        'perl   (--help)' => [$^X, "$Bin/../bin/mimic", "--help"],
+        'python (--help)' => [$py_mimic, "--help"],
+
+        'perl   (mimic 25% 1kl)' => sub {
+            open my($fh), "| $^X $Bin/../bin/mimic -m 25" or die $!;
+            for (1..10_000) {
+                print $fh "the quick brown fox jumps over the lazy dog\n";
+            }
+            close $fh or die $!;
+        },
+
+        'python (mimic 25% 1kl)' => sub {
+            open my($fh), "| $py_mimic -m 25" or die $!;
+            for (1..10_000) {
+                print $fh "the quick brown fox jumps over the lazy dog\n";
+            }
+            close $fh or die $!;
+        },
+    },
+    {
+        quiet => 1,
+    },
+);
+
+# ABSTRACT: Benchmark python's mimic vs perl's
+# PODNAME:
+
+=head1 DESCRIPTION

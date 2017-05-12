@@ -1,0 +1,6 @@
+TODO list for Perl module AAC::Pvoice
+
+- More testing
+- AAC::Pvoice::Input needs to be rewritten into smaller chunks for
+  each device
+

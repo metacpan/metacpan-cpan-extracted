@@ -1,0 +1,22 @@
+Revision history for Perl extension AI::Pathfinding::SMAstar.
+
+0.01  Tue Feb 23 12:06:47 2010
+	- original version; created by h2xs 1.23 with options
+		-XAn AI::Pathfinding::SMAstar
+
+0.02  Fri Feb 25 11:17:01 2010
+	- updated pod documentation
+
+0.03  Sun Feb 28 12:26:58 2010
+	- updated pod documentation
+
+0.04  Tue Mar  2 13:17:53 2010
+      	- updated error handling in add_start_state method
+	- perldoc edits 
+
+0.05  Thu Mar  4 11:06:10 2010
+      	- fixed an issue where search did not terminate when max_cost
+	  is reached.
+
+0.06  Thu Mar  4 11:06:10 2010
+      	- fixed an issue with successor iterator in Path class.

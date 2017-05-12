@@ -1,0 +1,67 @@
+{
+   "abstract" : "because Modern::Perl is too old",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.015, CPAN::Meta::Converter version 2.120921",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Futuristic-Perl",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Futuristic::Perl" : {
+         "file" : "lib/Acme/Futuristic/Perl.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Acme-Futuristic-Perl/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Acme-Futuristic-Perl"
+      },
+      "homepage" : "https://metacpan.org/release/Acme-Futuristic-Perl",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-acme-futuristic-perl.git",
+         "web" : "https://github.com/tobyink/p5-acme-futuristic-perl"
+      }
+   },
+   "version" : "0.001"
+}

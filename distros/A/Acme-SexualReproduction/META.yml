@@ -1,0 +1,25 @@
+---
+abstract: 'beacuse fork() is for unicellular ones.'
+author:
+  - 'Ivan Krylov <krylov.r00t@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4004, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-SexualReproduction
+provides:
+  Acme::SexualReproduction:
+    file: lib/Acme/SexualReproduction.pm
+    version: 0.01
+requires:
+  IPC::Shareable: 0
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

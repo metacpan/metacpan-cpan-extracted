@@ -1,0 +1,57 @@
+---
+abstract: 'An automatic caching framework for Perl.'
+author:
+  - 'Nigel A Rantor <wiggly@wiggly.org>'
+  - 'Rajit B Singh <rajit.b.singh@gmail.com>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Autocache
+provides:
+  Autocache:
+    file: lib/Autocache.pm
+    version: 0.004
+  Autocache::Config:
+    file: lib/Autocache/Config.pm
+  Autocache::Config::Node:
+    file: lib/Autocache/Config/Node.pm
+  Autocache::Logger:
+    file: lib/Autocache/Logger.pm
+  Autocache::Logger::Null:
+    file: lib/Autocache/Logger.pm
+  Autocache::Record:
+    file: lib/Autocache/Record.pm
+  Autocache::Request:
+    file: lib/Autocache/Request.pm
+  Autocache::Strategy:
+    file: lib/Autocache/Strategy.pm
+  Autocache::Strategy::CostBased:
+    file: lib/Autocache/Strategy/CostBased.pm
+  Autocache::Strategy::Eviction::FIFO:
+    file: lib/Autocache/Strategy/Eviction/FIFO.pm
+  Autocache::Strategy::Eviction::LRU:
+    file: lib/Autocache/Strategy/Eviction/LRU.pm
+  Autocache::Strategy::Eviction::LRU::Entry:
+    file: lib/Autocache/Strategy/Eviction/LRU/Entry.pm
+  Autocache::Strategy::Refresh:
+    file: lib/Autocache/Strategy/Refresh.pm
+  Autocache::Strategy::Statistics:
+    file: lib/Autocache/Strategy/Statistics.pm
+  Autocache::Strategy::Store::Memcached:
+    file: lib/Autocache/Strategy/Store/Memcached.pm
+  Autocache::Strategy::Store::Memory:
+    file: lib/Autocache/Strategy/Store/Memory.pm
+  Autocache::WorkQueue:
+    file: lib/Autocache/WorkQueue.pm
+requires:
+  Any::Moose: 0
+  Test::More: 0
+  Time::HiRes: 0
+  perl: v5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.004

@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+# ABSTRACT: example script to read from an RFXCOM receiver
+# PODNAME: rfxcom-anyevent-rx
+
+
+use warnings;
+use strict;
+use AnyEvent::RFXCOM::RX;
+
+$|=1; # don't buffer output
+
+my $device = shift or die "Usage: $0 [device] [key=value] ...\n";
+
+AnyEvent::RFXCOM::RX->new(device => $device,
+                          callback => sub { print $_[0]->summary, "\n" },
+                          map { split /=/ } @ARGV);
+
+AnyEvent->condvar->recv;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rfxcom-anyevent-rx - example script to read from an RFXCOM receiver
+
+=head1 VERSION
+
+version 1.142240
+
+=head1 SYNOPSIS
+
+  # read from USB tty device
+  rfxcom-anyevent-rx /dev/ttyUSB0
+
+  # read from USB device with nicer name see Device::RFXCOM::RX(3)
+  rfxcom-anyevent-rx /dev/rfxcom-rx
+
+  # read from network/wireless device
+  rfxcom-anyevent-rx 10.0.0.1:10001
+
+=head1 DESCRIPTION
+
+This script is an example of the usage of the L<AnyEvent::RFXCOM::RX>
+API.  It simply initializes the receiver and writes a summary of the
+received RF messages to stdout.  The keys and values given on the
+command line become the parameter hash for the L<AnyEvent::RFXCOM::RX>
+constructor and are documented in that module.
+
+=head1 THANKS
+
+Special thanks to RFXCOM, L<http://www.rfxcom.com/>, for their
+excellent documentation and for giving me permission to use it to help
+me write this code.  I own a number of their products and highly
+recommend them.
+
+=head1 SEE ALSO
+
+L<AnyEvent::RFXCOM::RX>
+
+RFXCOM website: http://www.rfxcom.com/
+
+=head1 AUTHOR
+
+Mark Hindess <soft-cpan@temporalanomaly.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Mark Hindess.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

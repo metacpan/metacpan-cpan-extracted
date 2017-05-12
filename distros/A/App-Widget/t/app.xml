@@ -1,0 +1,34 @@
+
+<conf>
+  <Standard>
+    <Log-Dispatch logdir="/var/app"/>
+  </Standard>
+  <Authen passwd="/etc/passwd" seed="303292"/>
+  <Session>
+    <default>
+      <sessionClass>App::Session::CGI</sessionClass>
+    </default>
+  </Session>
+  <Repository>
+    <default>
+      <repositoryClass>App::Repository::DBI</repositoryClass>
+      <dbidriver>mysql</dbidriver>
+      <dbname>test</dbname>
+      <dbuser>dbuser</dbuser>
+      <dbpass>dbuser7</dbpass>
+    </default>
+    <test>
+      <repositoryClass>App::Repository::DBI</repositoryClass>
+      <dbidriver>mysql</dbidriver>
+      <dbname>test</dbname>
+      <dbuser>dbuser</dbuser>
+      <dbpass>dbuser7</dbpass>
+    </test>
+  </Repository>
+  <SharedResourceSet>
+    <default>
+      <sharedResourceSetClass>App::SharedResourceSet::IPCLocker</sharedResourceSetClass>
+    </default>
+  </SharedResourceSet>
+</conf>
+

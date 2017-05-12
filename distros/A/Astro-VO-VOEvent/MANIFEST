@@ -1,0 +1,19 @@
+README
+MANIFEST
+Makefile.PL
+GPL
+ChangeLog
+VOEvent.pm
+t/1_ref.t
+t/2_simple.t
+t/2_stc.t
+t/3_id.t
+t/3_role.t
+t/3_version.t
+t/4_caltech.t
+t/4_parse.t
+t/4_raptor.t
+t/4_stc.t
+t/5_swift.t
+t/5_test.t
+META.yml                                 Module meta-data (added by MakeMaker)

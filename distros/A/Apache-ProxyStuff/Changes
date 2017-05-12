@@ -1,0 +1,27 @@
+Revision history for Perl extension Apache::ProxyStuff.
+
+0.10  Sat Oct 21 01:09:00 2000
+  - ProxyStuff now adds a </BODY> tag when the document does not contain one which should result 
+	  in all pages receiving a footer even if they are not syntacticly correct
+
+0.09  Wed Oct 18 23:36:00 2000
+  - Fixed a bug that added an additional <HEAD> tag when adding <META> tags
+  - ProxyStuff now adds a <BODY> tag when the document does not contain one which
+    should result in all pages receiving a header even if they are not syntacticly correct
+
+0.08  Thr Oct 12 11:39:00 2000
+  - Fixed 'itme' typo in Pod text for MetaDescription (spotted by Christian Gilmore)
+
+0.07  Wed Oct 11 18:08:00 2000
+  - Added MetaDescription param to add meta tag to <HEAD> section
+  - Added MetaContent param to add meta tag to <HEAD> section
+  - Now handles text seperately from other tags in order to work with new versions of HTML::TokeParser
+
+0.06  Tue Aug 19 23:36:00 2000
+  - Set REMOTE_ADDR, REMOTE_HOST and REMOTE_USER for header and footer requests
+  - Added REAL_URI and ORIG_URI headers for header and footer requests
+  
+
+0.05  Mon Apr 03 14:35:26 2000
+	- First public release
+

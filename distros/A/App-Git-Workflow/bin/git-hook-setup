@@ -1,0 +1,263 @@
+#!/usr/bin/perl
+
+# Created on: 2011-04-13 16:09:48
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use File::Spec::Functions;
+
+our $VERSION = 1.0.1;
+my ($name) = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+my %option = (
+    base    => '/home',
+);
+
+if ( !@ARGV ) {
+    pod2usage( -verbose => 1 );
+}
+
+main();
+exit 0;
+
+sub main {
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'global|g',
+        'template|t=s',
+        'base|b=s',
+        'verbose|v+',
+        'man',
+        'help',
+        'version!',
+    ) or pod2usage(2);
+
+    if ( $option{'version'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+
+    # do stuff here
+    my $hooks = hooks();
+
+    if ( $option{global} ) {
+        $option{template} ||= '/usr/share/git-core/templates/hooks';
+
+        # create path if missing? TODO Does this work with git-bash?
+        if ( !-d $option{template} ) {
+            my @parts = splitdir($option{template});
+            my $path = shift @parts;
+
+            while (my $part = shift @parts) {
+                my $subdir = catdir($path, $part);
+                if ( !-d $subdir ) {
+                    mkdir $subdir or die "Can't create path $subdir! (trying to make $option{template})\n";
+                }
+                $path = $subdir;
+            }
+        }
+
+        # write the hook to the global template directory
+        write_hooks($option{template}, $hooks);
+    }
+
+    write_hooks(".git/hooks", $hooks);
+
+    return;
+}
+
+sub hooks {
+    local $/ = undef;
+    my $hook_data = <DATA>;
+    my @data = split /^__([^_]+)__$/xms, $hook_data;
+    shift @data;
+
+    return { @data };
+}
+
+sub write_hooks {
+    my ($dir, $hooks) = @_;
+
+    for my $hook (keys %{ $hooks } ) {
+        my $file = catfile($dir, $hook);
+        my $backup = catfile($dir, "$hook~");
+        my $count = 1;
+        while (-e $backup) {
+            $backup = catfile($dir, "$hook$count~");
+            $count++;
+        }
+        system 'cp', $file, $backup;
+
+        my $fh = $file->openw;
+        print {$fh} $hooks->{$hook};
+        close $fh;
+        chmod 0755, $file;
+    }
+}
+
+=head1 NAME
+
+git-hook-setup - Copies hooks into their proper location
+
+=head1 VERSION
+
+This documentation refers to git-hook-setup version 1.0.1.
+
+=head1 SYNOPSIS
+
+   git-hook-setup [local]
+   git-hook-setup global
+   git-hook-setup find [path]
+
+ SUB-COMMANDS:
+  local             Install git hooks into local git repository
+  global            Install git hooks into global git hook template directory
+  find              Install git hooks into any git directory found under path
+                     path - path to search (default is curent directory)
+
+ OPTIONS:
+
+  -v --verbose      Show more detailed option
+     --version      Prints the version information
+     --help         Prints this help information
+     --man          Prints the full documentation for git-hook-setup
+
+=head1 DESCRIPTION
+
+Install the git-hooks provided by the git-hooks package
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2014 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut
+
+__DATA__
+__pre-commit__
+#!/bin/sh
+
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+    against=HEAD
+else
+    # Initial commit: diff against an empty tree object
+    against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+fi
+
+# If you want to allow non-ascii filenames set this variable to true.
+allownonascii=$(git config hooks.allownonascii)
+
+# Cross platform projects tend to avoid non-ascii filenames; prevent
+# them from being added to the repository. We exploit the fact that the
+# printable range starts at the space character and ends with tilde.
+if [ "$allownonascii" != "true" ] &&
+    # Note that the use of brackets around a tr range is ok here, (it's
+    # even required, for portability to Solaris 10's /usr/bin/tr), since
+    # the square bracket bytes happen to fall in the designated range.
+    test "$(git diff --cached --name-only --diff-filter=A -z $against |
+      LC_ALL=C tr -d '[ -~]\0')"
+then
+    echo "Error: Attempt to add a non-ascii file name."
+    echo
+    echo "This can cause problems if you want to work"
+    echo "with people on other platforms."
+    echo
+    echo "To be portable it is advisable to rename the file ..."
+    echo
+    echo "If you know what you are doing you can disable this"
+    echo "check using:"
+    echo
+    echo "  git config hooks.allownonascii true"
+    echo
+    exit 1
+fi
+
+if [ `which check-files` ]; then
+    exec check-files `git diff --cached --name-only $against`
+fi
+
+#if -n test "$(bin/test-files.pl `git diff --cached --name-only`)"
+#then
+#    echo "Errors in files to be commited."
+#    echo "Please fix before trying to commit again."
+#    exit 1
+#fi
+
+#exec git diff-index --check --cached $against --
+
+__commit-msg__
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $issue  = qr/^ [[] [A-Z][A-Z0-9]+ - \d+ .* [\]]/xms;
+my $merge  = qr/^ Merge /xms;
+my $revert = qr/^ Revert /xms;
+my $regen  = qr/^ Regen /xms;
+my $pom    = qr/^ POM /xms;
+my $good   = qr/ $issue | $merge | $revert | $regen | $pom /xms;
+
+open my $fh, "<", $ARGV[0] or die "Can't read commit message!: $!\n";
+my $msg = do { local $/; <$fh> };
+
+if ( $msg !~ /$good/xms ) {
+    warn <<"MESSAGE";
+Bad message! '$ARGV[0]'
+Messages should be:
+    [JIRA-NNN]
+    Merge ...
+    Revert ...
+    Regen ...
+    POM ...
+MESSAGE
+    exit 1;
+}
+
+exit 0;

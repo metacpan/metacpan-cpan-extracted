@@ -1,0 +1,23 @@
+Changes
+lib/App/local/lib/Win32Helper.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+script/llw32helper.pl
+t/000_load.t
+t/001_script.t
+xt/800_perlcritic.t
+xt/801_pod.t
+xt/803_minimumversion.t
+xt/804_manifest.t
+xt/805_meta.t
+xt/806_portability.t
+xt/807_version.t
+xt/808_changes.t
+xt/809_fixme.t
+xt/810_common_mistakes.t
+xt/settings/perlcritic.txt
+xt/settings/perltidy.txt
+META.json                                Module JSON meta-data (added by MakeMaker)

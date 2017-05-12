@@ -1,0 +1,89 @@
+{
+   "abstract" : "manage application specific environments",
+   "author" : [
+      "Diab Jerius, <djerius@cpan.org>"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "Module::Install version 1.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Env",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Module::Install" : "0",
+            "Module::Install::AuthorRequires" : "0",
+            "Module::Install::AuthorTests" : "0",
+            "Module::Install::AutoLicense" : "0",
+            "Module::Install::CPANfile" : "0",
+            "Module::Install::ReadmeFromPod" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0",
+            "Test::NoBreakpoints" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.09",
+            "File::Basename" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "2.24",
+            "IPC::System::Simple" : "0",
+            "Module::Find" : "0",
+            "Params::Validate" : "0",
+            "Pod::Usage" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "v5.8.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Env::Path" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env"
+      },
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.html"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/djerius/app-env"
+      }
+   },
+   "version" : "0.33",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

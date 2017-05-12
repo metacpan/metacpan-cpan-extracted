@@ -1,0 +1,97 @@
+{
+   "abstract" : "Sets up an interface to passing Template Toolkit templates",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-TemplateCMD",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Date" : "1.001",
+            "Clone" : "0.17",
+            "File::ShareDir" : "1.03",
+            "JSON" : "0",
+            "List::MoreUtils" : "0",
+            "Path::Tiny" : "0",
+            "Readonly" : "0",
+            "Template" : "2.14",
+            "Template::Provider" : "2.94",
+            "YAML" : "0",
+            "perl" : "5.008",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::TemplateCMD" : {
+         "file" : "lib/App/TemplateCMD.pm",
+         "version" : "v0.6.7"
+      },
+      "App::TemplateCMD::Command" : {
+         "file" : "lib/App/TemplateCMD/Command.pm",
+         "version" : "v0.6.7"
+      },
+      "App::TemplateCMD::Command::Build" : {
+         "file" : "lib/App/TemplateCMD/Command/Build.pm",
+         "version" : "v0.6.7"
+      },
+      "App::TemplateCMD::Command::Cat" : {
+         "file" : "lib/App/TemplateCMD/Command/Cat.pm",
+         "version" : "v0.6.7"
+      },
+      "App::TemplateCMD::Command::Conf" : {
+         "file" : "lib/App/TemplateCMD/Command/Conf.pm",
+         "version" : "v0.6.7"
+      },
+      "App::TemplateCMD::Command::Describe" : {
+         "file" : "lib/App/TemplateCMD/Command/Describe.pm",
+         "version" : "v0.6.7"
+      },
+      "App::TemplateCMD::Command::Help" : {
+         "file" : "lib/App/TemplateCMD/Command/Help.pm",
+         "version" : "v0.6.7"
+      },
+      "App::TemplateCMD::Command::List" : {
+         "file" : "lib/App/TemplateCMD/Command/List.pm",
+         "version" : "v0.6.7"
+      },
+      "App::TemplateCMD::Command::Print" : {
+         "file" : "lib/App/TemplateCMD/Command/Print.pm",
+         "version" : "v0.6.7"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-TemplateCMD"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/ivanwills/App-TemplateCMD"
+      }
+   },
+   "version" : "v0.6.7",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

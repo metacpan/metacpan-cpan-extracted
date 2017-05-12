@@ -1,0 +1,112 @@
+$Id: generic_reg_auth_scheme.txt,v 1.2 2000/06/21 22:37:32 jacob Exp $
+30 March 2000
+matisse
+
+DRAFT DRAFT DRAFT
+
+Generic Auth/Reg Feature List
+
+Must be installable and configurable by someone with only basic Perl and
+Apache skills. E.g. only slightly more involved than setting up BasicAuth
+and writing a simple CGI program.
+
+Jacob>  This could be accomplished by making a little script to install
+        the necessary CGI scripts and stuff.
+
+Configuration features:
+In global section of virtualhost:
+	PerlModule Apache::AuthCookieDBI
+	PerlSetVar AuthNamePath /
+
+	# this login script must use another cookie to set the destination
+	# and we probably need to hack authcookie to look at the cookie
+	# too.  the action should be /LOGIN.  the alternative is to always
+	# make the login scripts look at the cookie if they don't get it in
+	# the hidden field, which is probably right.
+	PerlSetVar AuthNameLoginScript /cgi-bin/ACD/login
+
+	# don't know if this is worth implementing, need to re-authenticate
+	# and regenerate the token with every hit (or maybe we can just trust
+	# the previous one and just update the expire time and rebuild
+	# the MD5 checksum; probably requires hacks to AuthCookie either way).
+	PerlSetVar AuthNameCookieExpirePolicy [ renew | time-to-live ]
+
+	# or we could do it on the server side by updating a last-visit
+	# table with every hit (ouch).  if we don't have this we use the time
+	# in the cookie'd info, if we do have this we use that ticket as a key
+	# into this database to see when their last hit was.
+	PerlSetVar AuthNameDBI_SessionTable tablename
+	# do we need more stuff on the field names and blah blah?
+
+	# this determines how long the cookie is good for (ie how long
+	# after the MD5'd date in the cookie (or the last entry in the session
+	# database if we use one) we still take it)
+ 	PerlSetVar AuthNameDBI_SessionLifetime [ forever | time-to-live ]
+	# time-to-live is formatted as a time delta:
+	# 01-00-00-00-00 - 1 day.
+	# 00-01-00-00-00 - 1 hour.
+	# 00-00-15-00-00 - 15 minute
+
+	# this is probably set by AuthCookie somewhere.
+	PerlSetVar AuthNameCookieName name-of-cookie
+
+	# this is the key we use in the MD5'd checksum.  root should change
+	# this every day because it has to be nobody-readable and is therefore
+	# not all that secure.
+	PerlSetVar AuthNameDBI_SecretKeyfile /path/to/secret/key
+
+In <Directory> or <Location> sections (server config or .htaccess):
+	AuthType Apache::AuthCookieDBI
+	# set this to whatever, but the PerlSetVar's must match it.
+	AuthName AuthName
+	PerlAuthenHandler Apache::AuthCookieDBI->authenticate
+	PerlAuthzHandler Apache::AuthCookieDBI->authorize
+	Require [ valid-user, user username, group groupname ]
+
+	# you must set this.
+	PerlSetVar AuthNameDBI_DSN databasename
+
+	# all these are optional.
+	PerlSetVar AuthNameDBI_User username # default undef
+	PerlSetVar AuthNameDBI_Password password # default undef
+	PerlSetVar AuthNameDBI_UsersTable tablename # default 'users'
+	PerlSetVar AuthNameDBI_UserField fieldname # default 'user'
+	PerlSetVar AuthNameDBI_PasswordField fieldname # default 'password'
+	PerlSetVar AuthNameDBI_CryptType [ none, crypt, MD5 ] # default 'none'
+	PerlSetVar AuthNameDBI_GroupsTable tablename # default 'groups'
+	PerlSetVar AuthNameDBI_GroupField fieldname # default 'group'
+	PerlSetVar AuthNameDBI_GroupUserField fieldname # default 'user'
+
+	# dunno what this is.
+	DefaultTarget  partial or full URL
+
+You also need this to get people to log in (although I'm not exactly sure
+why; I guess it's so that login() gets called, but why can't we check for
+credentials and log them in at the same point that we redirect them off to
+the login form?):
+
+	<Location /LOGIN>
+		AuthType Apache::AuthCookieDBI
+		AuthName AuthName
+		SetHandler perl-script
+		PerlHandler Apache::AuthCookieDBI->login
+	</Location>
+
+Save TARGET Check requirements Send page that is appropriate.
+Possibly clear TARGET.
+
+Group Table
++---------------------+
+| group    | username |
++---------------------+
+| group_1  | matisse  |
+| group_1  | jacob    |
+| group_2  | matisse  |
+| group_1  | simon    |
+| group_3  | jacob    |
+| group_2  | simon    |
++---------------------+
+
+matisse is in group_1,group_2
+jacob   is in group_1,group_3
+simon   is in group_1,group_2

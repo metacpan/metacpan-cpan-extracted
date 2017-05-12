@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use YAML qw( Dump );
+
+use AudioFile::Find;
+
+my $dir = shift @ARGV;
+
+print "scanning $dir...\n";
+my $finder = AudioFile::Find->new( $dir );
+
+my %criteria = @ARGV;
+print "criteria: ", Dump(\%criteria), "\n";
+
+my %result = $finder->search( %criteria );
+
+while ( my ($file, $info) = each %result )
+{
+	print "> $file\n";
+	for (qw( title album artist genre ))
+	{
+		print "$_ -> ". $info->$_. "\n";
+	}
+	print "\n";
+}

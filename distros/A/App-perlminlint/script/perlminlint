@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+use strict;
+use warnings FATAL => qw/all/;
+
+use File::Spec;
+use File::Basename;
+use FindBin;
+BEGIN {
+  # To allow using plugins from PERL5LIB.
+  my $script = File::Spec->rel2abs($0);
+
+  my @lib = ("$script.lib"
+	     , dirname($script)."/lib"
+	     , "$FindBin::Bin/../lib"
+	     , "$FindBin::RealBin/../lib");
+
+  require lib;
+  import lib grep {-d} @lib;
+}
+
+use App::perlminlint;
+
+App::perlminlint->run(\@ARGV);

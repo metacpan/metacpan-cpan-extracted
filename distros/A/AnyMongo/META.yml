@@ -1,0 +1,26 @@
+---
+abstract: 'Asynchronous non-blocking MongoDB driver for AnyEvent applications'
+author:
+  - 'Pan Fan(nightsailer) <nightsailer at gmail.com>'
+  - 'Kristina Chodorow <kristina at 10gen.com>'
+build_requires:
+  Test::Deep: 0.106
+  Test::More: 0.9
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102221, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyMongo
+requires:
+  Any::Moose: 0
+  AnyEvent: 0
+  Carp: 0
+  Tie::IxHash: 0
+  boolean: 0
+  namespace::autoclean: 0
+  parent: 0
+version: 0.03

@@ -1,0 +1,26 @@
+---
+abstract: 'Client library for JA-SIG CAS 2.0 authentication server'
+author:
+  - 'Olivier Salaun <os AT cru.fr>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AuthCAS
+provides:
+  AuthCAS:
+    file: lib/AuthCAS.pm
+    version: '1.7'
+requires:
+  IO::Socket::SSL: '0'
+  LWP::UserAgent: '0'
+resources:
+  homepage: https://sourcesup.renater.fr/projects/perlcas/
+  repository: https://subversion.renater.fr/perlcas/
+version: '1.7'

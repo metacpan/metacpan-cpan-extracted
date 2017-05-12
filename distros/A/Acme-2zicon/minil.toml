@@ -1,0 +1,6 @@
+name = "Acme-2zicon"
+# badges = ["travis"]
+authority="cpan:CATATSUY"
+
+module_maker="ModuleBuildTiny"
+

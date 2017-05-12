@@ -1,0 +1,228 @@
+#!perl
+
+package
+    genpass;
+# ABSTRACT: Quickly and easily create secure passwords
+
+use strict;
+use warnings;
+
+use App::Genpass;
+
+my $app       = App::Genpass->new_with_options;
+my @passwords = $app->generate();
+
+print map { "$_\n" } @passwords;
+
+exit 0;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+genpass - Quickly and easily create secure passwords
+
+=head1 VERSION
+
+version 2.401
+
+=head1 SYNOPSIS
+
+genpass [-rlnsv] [long options...]
+
+ Options:
+          --configfile      configuration file to read (YAML, JSON, INI, etc.)
+    -r    --readable        create readable passwords
+    -l    --length          password length
+    -n    --number          how many passwords to create
+    -s    --special         use special characters (clashes with readable opt)
+    -v    --verify          verify types of characters
+          --lowercase       what lowercase characters to use
+          --uppercase       what uppercase characters to use
+          --numerical       what numerical characters to use
+          --specials        what characters are considered special
+          --unreadable      what characters are considered unreadable
+          --usage           brief usage output
+          --help            what you're currently reading
+
+=head1 DESCRIPTION
+
+B<genpass> creates passwords in a fast and comfortable maner. The idea is to be
+able to do plenty without necessarily needing to.
+
+The way B<genpass> works is by compiling a list of known characters by types
+(numerical, lowercase, uppercase, etc.) and a list of unreadable characters -
+which are basically characters that can be confused with each other (0, O, I, l,
+1 and so on). It generates a random by possible characters, excluding the
+non-readable ones, if any exist.
+
+B<genpass> allows you to pick which characters it will use to create the
+passwords via the longer options for I<lowercase>, I<uppercase>,
+I<numerical>, I<specials> and I<unreadable>.
+
+Also, any boolean option (readable, special) can be negated using "no", such as
+I<genpass --nospecial> which negates I<genpass --special>.
+
+B<genpass> also supports configuration files, so you don't have to remember all
+your favorite options and insert them each time. First it tries to read a
+C<.genpass.yaml> in your home folder (works with Linux, BSD, MacOS, Windows and
+anything L<File::HomeDir> supports) and if that doesn't exist (or is simply
+unreadable), it looks for a global Unix-style conf named C</etc/genpass.yaml>.
+
+You will read below how you can specifically ask to read a completely different
+file instead of the default ones mentioned above.
+
+Read below for more options and examples.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--configfile>
+
+B<genpass> can work with most configuration formats, such as YAML, JSON, INI
+(Apache) and so on. You can configure any part of B<genpass> and ask B<genpass>
+to read a configuration file as such:
+
+    genpass --configfile ~/.genpass.yaml
+
+Or a global one as such:
+
+    genpass --configfile /etc/genpass.json
+
+Default: I<YourHomeFolder/.genpass.yaml>, then I</etc/genpass.yaml>.
+
+=item B<-r | --readable>
+
+A flag to decide whether passwords should be readable. The purpose of
+readability is to create passwords you can give to users or read to someone -
+both of which aren't necessarily good practices, but commonly used.
+
+Readable passwords do not contain the additional type of special characters,
+which is something to consider. Sometimes it doesn't matter as much (such as a
+Windows user on a local LAN machine that has no critical data or access
+anywhere.
+
+    genpass --readable
+
+Since I<readable> is on by default, you can negate this if you want by using
+the I<noreadable> option:
+
+    genpass --noreadable
+
+This will turn on the special and possibly unreadable characters option.
+
+Please view I<unreadable> below for more details.
+
+Default: on.
+
+=item B<-l | --length>
+
+The length of the password.
+
+    # create a 50 character long password
+    genpass --length 50
+
+    # create a 7 character long password
+    genpass -l 7
+
+If your configuration requires a certain variety of characters but you've asked
+for a shorter password (one which cannot contain that variety), B<genpass> will
+complain and try to explain what the problem is.
+
+    $ genpass -l 2
+    You wanted a longer password that the variety of characters you've selected.
+    You requested 3 types of characters but only have 2 length.
+
+Default: 10.
+
+=item B<-n | --number>
+
+How many passwords to create.
+
+    # generate 30 passwords
+    genpass -n 30
+
+Default: 1.
+
+=item B<-s | --special>
+
+Indicates whether to use special characters or not. This basically means symbols
+such as period, exclamation mark, percentage sign, etc.
+
+    genpass --special
+
+You can negate this flag by doing:
+
+    genpass --nospecial
+
+Default: no.
+
+=item B<-v | --verify>
+
+Whether to verify that the variety of characters you requested is included.
+
+Disabling this gains you speed if you create a rather large number of passwords
+that have a rather large number of characters. Then you don't need to worry as
+much about having that variety since probability says you probably will.
+
+You can negate this using:
+
+    genpass --noverify
+
+Best to keep it on though.
+
+Default: yes.
+
+=item B<--lowercase>
+
+Which characters are considered lowercase?
+
+=item B<--uppercase>
+
+Which characters are considered uppercase?
+
+=item B<--numerical>
+
+Which characters are considered numerical?
+
+=item B<--specials>
+
+Which characters are considered special ones?
+
+=item B<--unreadable>
+
+Which characters are considered unreadable?
+
+This includes a short list of characters that are easily confused and the above
+sequences are stripped of such characters.
+
+=back
+
+=head1 EXAMPLES
+
+    # create a 10 character length password
+    genpass -l 10
+
+    # create 30 passwords using all possible characters
+    genpass -n 30 --noreadable
+
+    # create 5 new passwords of length of 30, long options
+    genpass --number 5 --length 30
+
+=head1 AUTHOR
+
+Sawyer X <xsawyerx@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Sawyer X.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

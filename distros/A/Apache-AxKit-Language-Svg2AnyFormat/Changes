@@ -1,0 +1,22 @@
+Revision history for Perl extension Apache-AxKit-Language-Svg2AnyFormat.
+
+0.06    - fixed bug when running in pipeline open of tempfile failed (Mark Charter)
+        - fixed bug with character encoding and toString by using toFile() now => preformance improvement (Mark Charter)
+
+0.05    
+        - fixed bug when trying to use Image::LibRSVG, always Image::Magick
+          has been used
+
+0.04    - fixed documentation issues
+        - fixed versioning issues (not upgrading version to 0.03)
+
+0.03	- fixed bug of creating of not cleaning up temp-files 
+	- completly refactored Svg2AnyFormat.pm
+	- switched from rsvg commandline support to Image::LibRSVG
+	- added tiff format	
+
+0.02	- added support for librsvg (at the moment only command line)
+	- added support for eps format
+
+0.01 
+	- initial release

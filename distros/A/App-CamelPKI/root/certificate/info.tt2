@@ -1,0 +1,30 @@
+[% META title = 'Certificate\'s Information' -%]
+<table>
+<tr>
+	<td>Serial</td>
+	<td>[% cert.serial %]<td>
+</tr><tr>
+	<td>Satus</td>
+	<td>[% cert.status %]</td>
+</tr><tr>
+	<td>Subject DN</td>
+	<td>[% cert.subject %]</td>
+</tr><tr>
+	<td>Subject Key Id</td>
+	<td>[% cert.subject_key_id %]</td>
+</tr><tr>
+	<td>Issuer DN</td>
+	<td>[% cert.issuer %]</td>
+</tr><tr>
+	<td>Not Before</td>
+	<td>[% cert.not_before %]</td>
+<tr></tr>
+</tr><tr>
+	<td>Not After</td>
+	<td>[% cert.not_after %]</td>
+<tr></tr>
+</tr><tr>
+	<td>Public Key</td>
+	<td>[% cert.public_key %]</td>
+<tr></tr>
+</table>

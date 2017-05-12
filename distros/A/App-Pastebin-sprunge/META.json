@@ -1,0 +1,84 @@
+{
+   "abstract" : "application for pasting to and reading from sprunge.us",
+   "author" : [
+      "Mike Doherty <doherty@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Pastebin-sprunge",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "inc",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
+            "WWW::Pastebin::Sprunge::Create" : "0.010",
+            "WWW::Pastebin::Sprunge::Retrieve" : "0.010",
+            "perl" : "v5.10.1",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IO::Socket::INET" : "0",
+            "IPC::Open3" : "0",
+            "Test::Is" : "0",
+            "Test::More" : "0.82",
+            "Test::Output" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/doherty/App-Pastebin-sprunge/issues"
+      },
+      "homepage" : "http://metacpan.org/release/App-Pastebin-sprunge/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/doherty/App-Pastebin-sprunge.git",
+         "web" : "https://github.com/doherty/App-Pastebin-sprunge"
+      }
+   },
+   "version" : "0.012"
+}
+

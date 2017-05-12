@@ -1,0 +1,95 @@
+NAME
+    Apache2::Layout - mod_perl 2.0 html layout engine
+
+SYNOPSIS
+    httpd.conf:
+
+      PerlModule Apache2::Layout
+
+      Alias /layout /usr/local/apache2/htdocs
+      <Location /layout>
+        PerlOutputFilterHandler Apache2::Layout
+
+        PerlSetVar LayoutFooter /footer.html
+        PerlSetVar LayoutHeader /header.html
+        PerlSetVar LayoutCSS /head.html
+      </Location>
+
+DESCRIPTION
+    Apache2::Layout is a filter module that can be used to inject HTML
+    layout into HTML documents. Very handy when trying to apply
+    customizations to existing HTML content without needing to change them.
+
+    Only documents with a content type of "text/html" are affected - all
+    others are passed through unaltered.
+
+OPTIONS
+    LayoutComments
+        Inserts HTML comments in the output, marking where inserted content
+        begins and ends
+
+          PerlSetVar LayoutComments On
+
+        LayoutComments has no default.
+
+    LayoutDebug
+        Logs debugging information about the processing. Combined with
+        LayoutComments, will insert a debug summary as an HTML comment at
+        the end of the filtered document.
+
+          PerlSetVar LayoutDebug On
+
+        LayoutDebug has no default.
+
+    LayoutCSS
+        Specifies a url to insert right before the end of the HTML <head>
+        element, typically used to inject stylesheets into the document.
+
+          PerlSetVar LayoutCSS /css/style.css
+
+        LayoutCSS has no default.
+
+    LayoutHeader
+        Specifies a url to insert right after the beginning of the HTML
+        <body> element, typically used to inject the begging of a content
+        wrapper into the document.
+
+          PerlSetVar LayoutHeader /templates/header.html
+
+        LayoutHeader has no default.
+
+    LayoutFooter
+        Specifies a url to insert right before the end of the HTML <body>
+        element, typically used to inject the end of a content wrapper into
+        the document.
+
+          PerlSetVar LayoutHeader /templates/footer.html
+
+        LayoutFooter has no default.
+
+API
+  handler
+    This is the one and only user-visible function, it's the main filter
+    handler.
+
+      PerlOutputFilterHandler Apache2::Layout
+
+NOTES
+    This is alpha software, and as such has not been tested on multiple
+    platforms or environments.
+
+SEE ALSO
+    perl(1), mod_perl(3), Apache(3), mod_layout
+
+AUTHOR
+    Philippe M. Chiasson <gozer@ectoplasm.org>
+
+REPOSITORY
+    http://svn.ectoplasm.org/projects/perl/Apache2-Layout/trunk/
+
+COPYRIGHT
+    Copyright (c) 2007, Philippe M. Chiasson All rights reserved.
+
+    This module is free software. It may be used, redistributed and/or
+    modified under the same terms as Perl itself.
+

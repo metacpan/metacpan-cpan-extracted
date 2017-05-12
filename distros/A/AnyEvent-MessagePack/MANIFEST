@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/AnyEvent/MessagePack.pm
+t/00_compile.t
+t/01_handle.t
+t/01_handle_error.t
+t/04_devided_packed.t
+t/05_RT74518-read_state.t
+xt/02_perlcritic.t
+META.yml
+MANIFEST

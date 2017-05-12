@@ -1,0 +1,38 @@
+---
+abstract: 'Perl bindings for AntTweakBar'
+author:
+  - 'DMOL, dmol@cpan.org'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
+configure_requires:
+  Alien::AntTweakBar: '0.02'
+  Alien::SDL: '1.44'
+  Devel::CheckLib: '1.01'
+  Module::Build: '0.42'
+  perl: '5.008'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AntTweakBar
+provides:
+  AntTweakBar:
+    file: lib/AntTweakBar.pm
+    version: '0.05'
+  AntTweakBar::Type:
+    file: lib/AntTweakBar/Type.pm
+requires:
+  Alien::AntTweakBar: '0.02'
+  Alien::SDL: '1.444'
+  Carp: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/PerlGameDev/AntTweakBar/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/PerlGameDev/AntTweakBar
+version: '0.05'

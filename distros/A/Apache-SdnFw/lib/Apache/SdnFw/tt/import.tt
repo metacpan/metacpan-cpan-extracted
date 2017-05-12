@@ -1,0 +1,15 @@
+<form method="POST" action="[% s.ubase %]/[% s.object %]/import" enctype="multipart/form-data">
+[% IF s.subof_key %]<input type="hidden" name="[% s.subof_key %]" value="[% s.subof_id %]">[% END %]
+<div class="floatleft">
+<table>
+	<caption>Import [% s.object %]s</caption>
+	<tbody>
+	<tr>
+		<th>File to Import</th>
+		<td><input type="file" name="file"></td>
+	</tr>
+	</tbody>
+</table>
+<input type="submit" value="Upload File">
+</div>
+</form>

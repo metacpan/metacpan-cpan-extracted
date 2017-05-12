@@ -1,0 +1,13 @@
+#
+# Revision history for Perl extension Apache::StrReplace.
+#
+0.03  Wed Apr 25 06:45:23 JST 2007
+        - debug make test error.
+
+0.02  Wed Jul 11 12:03:17 JST 2007
+        - support StrReplaceContentType option.
+
+0.01  Tue Jul 10 23:00:00 JST 2007
+	- original version; created by h2xs 1.23 with options
+		-Xan Apache::StrReplace
+

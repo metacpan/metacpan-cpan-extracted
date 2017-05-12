@@ -1,0 +1,5 @@
+bin/program
+Build.PL
+lib/MyBar.pm
+lib/MyPod.pm
+MANIFEST			This list of files

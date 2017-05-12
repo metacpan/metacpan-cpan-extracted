@@ -1,0 +1,23 @@
+Revision history for Perl extension APNS-Agent
+
+0.06 2014-03-17T08:40:31Z
+    - add uri for monitor
+    - fix bug when parsing payload (macopy++)
+
+0.05 2014-03-02T12:03:24Z
+    - fix error handling on send
+
+0.04 2014-03-01T13:08:19Z
+    - refactor message queuing way
+
+0.03 2014-03-01T12:47:11Z
+    - add `send_interval` option
+
+0.02 2014-01-12T04:26:12Z
+
+    - fix test case
+
+0.01 2014-01-04T06:04:48Z
+
+    - original version
+

@@ -1,0 +1,35 @@
+---
+abstract: 'A Fuzzy Engine, PDL aware'
+author:
+  - 'Juergen Mueck <jmueck@cpan.org>'
+build_requires:
+  Carp: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  Scalar::Util: 0
+  Test::More: 0
+  Test::Most: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AI-FuzzyEngine
+provides:
+  AI::FuzzyEngine:
+    file: lib/AI/FuzzyEngine.pm
+    version: v0.2.2
+  AI::FuzzyEngine::Set:
+    file: lib/AI/FuzzyEngine/Set.pm
+    version: v0.2.2
+  AI::FuzzyEngine::Variable:
+    file: lib/AI/FuzzyEngine/Variable.pm
+    version: v0.2.2
+requires:
+  perl: 5.008009
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.2.2

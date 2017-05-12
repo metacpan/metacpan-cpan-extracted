@@ -1,0 +1,33 @@
+Revision history for App-MakeEPUB
+
+0.3.1 Mon Apr  1 09:11:37 CEST 2013
+	- repaired some character set issues in the POD
+
+0.3.0 Sat Mar 30 16:24:12 CET 2013
+	- automatically sort html files for toc.ncf and spine if option
+	  --spine was not given
+	- change the pattern for level 2 navigation in toc.ncf with option
+	  --level2
+
+0.2.0 Sun Mar 17 18:55:21 CET 2013
+	- use HTML::TreeBuilder to look for items for the table of contents
+	- option -tocdepth in bin/make-epub to allow table of contents with to
+	  levels
+	- added example how to generate EPUBs from RFCs
+
+0.1.1 Fri Mar  8 10:34:08 CET 2013
+	- option to change the name of the output file
+
+0.1.0 Fri Mar  8 10:09:31 CET 2013
+	- generates complete EPUB file 
+	- does not clutter the original dir
+
+0.0.3 Thu Mar  7 08:21:08 CET 2013
+	Generates META-INF/container.xml if necessary.
+
+0.0.2 Wed Mar  6 22:58:15 CET 2013
+	First version using App::MakeEPUB
+
+0.0.1  Wed Jan  2 07:51:28 2013
+       Initial release.
+

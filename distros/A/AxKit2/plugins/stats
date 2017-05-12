@@ -1,0 +1,151 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+=head1 NAME
+
+stats - Default statistics plugin for the console.
+
+=head1 SYNOPSIS
+
+  ConsolePort 18000
+  Plugin stats
+
+Then:
+
+  $ telnet localhost 18000
+  > stats
+
+=head1 DESCRIPTION
+
+This module provides statistics on the server since it was last restarted.
+
+The following stats are provided:
+
+=over 4
+
+=item Uptime
+
+=item Total requests
+
+(this really counts responses - it doesn't count when the client disconnects
+before a response can be made)
+
+=item Total OK requests
+
+=item Errors
+
+=item Delivery Rate (i.e. reqs/sec)
+
+=back
+
+Note that this module isn't 'free' - it does have a minor effect on the time
+it takes to process a request.
+
+=head1 CONFIG
+
+No config.
+
+=cut
+
+use Time::HiRes qw(time);
+
+our $START_TIME = time;
+our $REQS = 0;
+our $REQS_OK = 0;
+our $ERRS = 0;
+
+sub get_stats {
+    my $class = shift;
+    my $uptime = $class->uptime;
+    my ($rate, $unit) = $class->delivery_rate;
+    return sprintf("           Uptime: %s\n".
+                   "   Total Requests: % 10d\n".
+                   "      OK Requests: % 10d\n".
+                   "           Errors: % 10d\n".
+                   "    Delivery Rate: %0.2f reqs/%s\n\n",
+                   $uptime, $REQS, $REQS_OK, $ERRS, $rate, $unit);
+}
+
+sub hook_error {
+    my $self = shift;
+    $ERRS++;
+    return DECLINED;
+}
+
+sub hook_response_sent {
+    my $self = shift;
+    my $code = shift;
+    
+    $REQS++;
+    if ($code == 200) {
+        $REQS_OK++;
+    }
+    return DECLINED;
+}
+
+sub uptime {
+    my $ut = (time() - $START_TIME);
+    if ($ut > 120) {
+        my $mins = $ut / 60;
+        my $secs = $ut % 60;
+        if ($mins < 60) {
+            $ut = sprintf("%dm %0.2fs", $mins, $secs);
+        }
+        else {
+            my $hours = $mins / 60;
+            $mins = $mins % 60;
+            if ($hours < 24) {
+                $ut = sprintf("%dh %dm %0.2fs", $hours, $mins, $secs);
+            }
+            else {
+                my $days = $hours / 24;
+                $hours = $hours % 24;
+                $ut = sprintf("%dd %dh %dm %0.2fs", $days, $hours, $mins, $secs)
+;
+            }
+        }
+    }
+    else {
+        $ut = sprintf("%0.2fs", $ut);
+    }
+    
+    return $ut;
+}
+
+sub delivery_rate {
+    my $class = shift;
+    my $unit = 'sec';
+    my $per_sec = ($REQS / (time() - $START_TIME));
+    if ($per_sec > 1) {
+        return ($per_sec, $unit);
+    }
+    $unit = 'min';
+    my $per_min = $per_sec * 60;
+    if ($per_min > 1) {
+        return ($per_min, $unit);
+    }
+    $unit = 'hour';
+    my $per_hour = $per_min * 60;
+    if ($per_hour > 1) {
+        return ($per_hour, $unit);
+    }
+    $unit = 'day';
+    my $per_day = $per_hour * 24;
+    return ($per_day, $unit);
+}
+
+

@@ -1,0 +1,18 @@
+Revision history for App-ColorNamer
+
+0.0104  2014-01-23
+        - Switched away from deprecated Class::Data::Accessor
+        - Switched to dzil
+        - Moved author tests to xt/
+
+0.0103  2013-11-01
+        - Minor fixes to comply with the spec and Kwalitee tests
+        - Fixed "qw() as parentheses deprecated" warning
+        - Removed garbage leftover code from examples/namer.pl
+
+0.0102  2010-12-27
+        - Fixed broken tests
+
+0.0101  2010-12-27
+        - First version, released on an unsuspecting world.
+

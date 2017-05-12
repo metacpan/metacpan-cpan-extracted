@@ -1,0 +1,41 @@
+Revision history for Audio-Extract-PCM
+
+0.01    2008-12-20
+        First version, released on an unsuspecting world.
+
+0.02    2008-12-20
+        Remove accidentally included sine.wav (need only sine.wav.gz)
+        Return the pcm data as a reference.
+
+0.02_01 2008-12-21     
+        Warn for sox warnings.
+        Check for sox program in Build.PL
+        extract.t: Create sine.wav in base directory, not in t/, because of
+            permission problems.
+
+0.02_02 2008-12-21
+        Don't use IO::CaptureOutput in Build.PL, backticks will suffice here (we
+        need it anyway to run the module, but Build.PL is better kept simple.)
+
+0.03    2009-01-07
+        * Included an example script: any_to_pcm.pl
+        * Add Module::Build to configure_requires and build_requires
+
+0.03_01 2009-01-14
+        * Remove sine.wav after testing (don't waste disk space if you keep the
+          source directory lingering around)
+        * Report sox version in test suite (want to get more info from
+          reporters)
+
+0.03_02 2009-01-15
+        * Use -1/-2/-4/-8 rather than -b/-w/-l/-d in newer sox versions.
+        * Removed -T from 00-load.t.  For the record, this module isn't taint-safe.
+          Really, how am I supposed to portably run "sox" without depending on
+          PATH?  Imho, taint mode is a ridiculous concept.
+
+0.03_03 2009-01-16
+        * Ignore capitalization in the test suite while checking for sox errors
+          (seems to have changed in newer soxes)
+
+0.04    2009-01-16
+        * Identical to 0.03_03

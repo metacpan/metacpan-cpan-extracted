@@ -1,0 +1,57 @@
+NAME
+    Acme::Mobile::Therbligs - count keystrokes to write mobile text
+    messages
+
+SYNOPSIS
+      use Acme::Mobile::Therbligs;
+
+      $thurbs = count_therbligs("See u l8r");
+
+      # $thurbs == 23
+  
+DESCRIPTION
+    This module counts the number of *therbligs* used to write mobile text
+    messages. A therblig is unit used to measure the number of actions (in
+    this case keypresses or pauses) for people who like to optimize
+    industrial processes.
+
+    So you can use this module to determine useless facts such as that it
+    takes as many keypresses to write "later" or "great" as it does "l8r"
+    and "gr8".
+
+    See the module POD for more details.
+
+REVISION HISTORY
+    The following changes have been made since v0.03:
+
+    0.04  Wed Jan  5 2005
+	- renamed to Acme::Mobile::Therbligs
+
+    See the Changes file included with the distribution for a more
+    comprehensive history.
+
+AUTHOR
+    Robert Rothenberg <rrwo at cpan.org>
+
+    current Maintainer: Rene Schickbauer <rene.schickbauer at gmail.com>
+
+REPORTING BUGS
+    We don't know of any major bugs, but that doesn't mean there aren't any.
+    Please the CPAN bugtracker or mail Rene Schickbauer directly.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004-2005 by Robert Rothenberg. All Rights Reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.3 or, at
+    your option, any later version of Perl 5 you may have available.
+
+    Now maintained by Rene Schickbauer, so i guess everything after version 0.02
+    is (C) 2010 Rene Schickbauer
+
+    Now maintained by Rene Schickbauer, so i guess everything after version 0.02
+    is (C) 2010 Rene Schickbauer
+
+SEE ALSO
+    This module is similar to Device::KeyStroke::Mobile.
+

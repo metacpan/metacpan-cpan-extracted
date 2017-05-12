@@ -1,0 +1,533 @@
+# carton snapshot format: version 1.0
+DISTRIBUTIONS
+  Class-Accessor-Lite-0.06
+    pathname: K/KA/KAZUHO/Class-Accessor-Lite-0.06.tar.gz
+    provides:
+      Class::Accessor::Lite 0.06
+    requirements:
+      ExtUtils::MakeMaker 6.42
+  Class-Method-Modifiers-2.11
+    pathname: E/ET/ETHER/Class-Method-Modifiers-2.11.tar.gz
+    provides:
+      Class::Method::Modifiers 2.11
+    requirements:
+      B 0
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      base 0
+      strict 0
+      warnings 0
+  Clone-0.37
+    pathname: G/GA/GARU/Clone-0.37.tar.gz
+    provides:
+      Clone 0.37
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0
+  Config-CmdRC-0.07
+    pathname: B/BA/BAYASHI/Config-CmdRC-0.07.tar.gz
+    provides:
+      Config::CmdRC 0.07
+    requirements:
+      Config::Simple 4.58
+      File::Spec 0
+      Hash::Merge 0
+      Module::Build 0.40
+      Module::Build::Pluggable 0
+      Module::Build::Pluggable::CPANfile 0.05
+      Test::More 0.88
+      YAML 0
+      perl 5.008005
+  Config-Simple-4.58
+    pathname: S/SH/SHERZODR/Config-Simple-4.58.tar.gz
+    provides:
+      Config::Simple 4.58
+    requirements:
+      ExtUtils::MakeMaker 0
+  DBD-mysql-4.028
+    pathname: C/CA/CAPTTOFU/DBD-mysql-4.028.tar.gz
+    provides:
+      Bundle::DBD::mysql 4.027
+      DBD::mysql 4.028
+      DBD::mysql::GetInfo undef
+      DBD::mysql::db 4.028
+      DBD::mysql::dr 4.028
+      DBD::mysql::st 4.028
+    requirements:
+      DBI 1.08
+      Data::Dumper 0
+      Test::Deep 0
+      Test::More 0
+      perl 5.008001
+  DBI-1.632
+    pathname: T/TI/TIMB/DBI-1.632.tar.gz
+    provides:
+      Bundle::DBI 12.008696
+      DBD::DBM 0.08
+      DBD::DBM::Statement 0.08
+      DBD::DBM::Table 0.08
+      DBD::DBM::db 0.08
+      DBD::DBM::dr 0.08
+      DBD::DBM::st 0.08
+      DBD::ExampleP 12.014311
+      DBD::ExampleP::db 12.014311
+      DBD::ExampleP::dr 12.014311
+      DBD::ExampleP::st 12.014311
+      DBD::File 0.43
+      DBD::File::DataSource::File 0.43
+      DBD::File::DataSource::Stream 0.43
+      DBD::File::Statement 0.43
+      DBD::File::Table 0.43
+      DBD::File::TableSource::FileSystem 0.43
+      DBD::File::db 0.43
+      DBD::File::dr 0.43
+      DBD::File::st 0.43
+      DBD::Gofer 0.015327
+      DBD::Gofer::Policy::Base 0.010088
+      DBD::Gofer::Policy::classic 0.010088
+      DBD::Gofer::Policy::pedantic 0.010088
+      DBD::Gofer::Policy::rush 0.010088
+      DBD::Gofer::Transport::Base 0.014121
+      DBD::Gofer::Transport::corostream undef
+      DBD::Gofer::Transport::null 0.010088
+      DBD::Gofer::Transport::pipeone 0.010088
+      DBD::Gofer::Transport::stream 0.014599
+      DBD::Gofer::db 0.015327
+      DBD::Gofer::dr 0.015327
+      DBD::Gofer::st 0.015327
+      DBD::NullP 12.014715
+      DBD::NullP::db 12.014715
+      DBD::NullP::dr 12.014715
+      DBD::NullP::st 12.014715
+      DBD::Proxy 0.2004
+      DBD::Proxy::RPC::PlClient 0.2004
+      DBD::Proxy::db 0.2004
+      DBD::Proxy::dr 0.2004
+      DBD::Proxy::st 0.2004
+      DBD::Sponge 12.010003
+      DBD::Sponge::db 12.010003
+      DBD::Sponge::dr 12.010003
+      DBD::Sponge::st 12.010003
+      DBDI 12.015129
+      DBI 1.632
+      DBI::Const::GetInfo::ANSI 2.008697
+      DBI::Const::GetInfo::ODBC 2.011374
+      DBI::Const::GetInfoReturn 2.008697
+      DBI::Const::GetInfoType 2.008697
+      DBI::DBD 12.015129
+      DBI::DBD::Metadata 2.014214
+      DBI::DBD::SqlEngine 0.06
+      DBI::DBD::SqlEngine::DataSource 0.06
+      DBI::DBD::SqlEngine::Statement 0.06
+      DBI::DBD::SqlEngine::Table 0.06
+      DBI::DBD::SqlEngine::TableSource 0.06
+      DBI::DBD::SqlEngine::TieMeta 0.06
+      DBI::DBD::SqlEngine::TieTables 0.06
+      DBI::DBD::SqlEngine::db 0.06
+      DBI::DBD::SqlEngine::dr 0.06
+      DBI::DBD::SqlEngine::st 0.06
+      DBI::FAQ 1.014935
+      DBI::Gofer::Execute 0.014283
+      DBI::Gofer::Request 0.012537
+      DBI::Gofer::Response 0.011566
+      DBI::Gofer::Serializer::Base 0.009950
+      DBI::Gofer::Serializer::DataDumper 0.009950
+      DBI::Gofer::Serializer::Storable 0.015586
+      DBI::Gofer::Transport::Base 0.012537
+      DBI::Gofer::Transport::pipeone 0.012537
+      DBI::Gofer::Transport::stream 0.012537
+      DBI::Profile 2.015065
+      DBI::ProfileData 2.010008
+      DBI::ProfileDumper 2.015325
+      DBI::ProfileDumper::Apache 2.014121
+      DBI::ProfileSubs 0.009396
+      DBI::ProxyServer 0.3005
+      DBI::ProxyServer::db 0.3005
+      DBI::ProxyServer::dr 0.3005
+      DBI::ProxyServer::st 0.3005
+      DBI::SQL::Nano 1.015544
+      DBI::SQL::Nano::Statement_ 1.015544
+      DBI::SQL::Nano::Table_ 1.015544
+      DBI::Util::CacheMemory 0.010315
+      DBI::Util::_accessor 0.009479
+      DBI::common 1.632
+    requirements:
+      ExtUtils::MakeMaker 6.48
+      Test::Simple 0.90
+      perl 5.008
+  Data-OptList-0.109
+    pathname: R/RJ/RJBS/Data-OptList-0.109.tar.gz
+    provides:
+      Data::OptList 0.109
+    requirements:
+      ExtUtils::MakeMaker 6.30
+      List::Util 0
+      Params::Util 0
+      Sub::Install 0.921
+      strict 0
+      warnings 0
+  ExtUtils-Config-0.008
+    pathname: L/LE/LEONT/ExtUtils-Config-0.008.tar.gz
+    provides:
+      ExtUtils::Config 0.008
+    requirements:
+      Data::Dumper 0
+      ExtUtils::MakeMaker 6.30
+      strict 0
+      warnings 0
+  ExtUtils-Helpers-0.022
+    pathname: L/LE/LEONT/ExtUtils-Helpers-0.022.tar.gz
+    provides:
+      ExtUtils::Helpers 0.022
+      ExtUtils::Helpers::Unix 0.022
+      ExtUtils::Helpers::VMS 0.022
+      ExtUtils::Helpers::Windows 0.022
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 6.30
+      File::Basename 0
+      File::Copy 0
+      File::Spec::Functions 0
+      Module::Load 0
+      Text::ParseWords 3.24
+      strict 0
+      warnings 0
+  ExtUtils-InstallPaths-0.010
+    pathname: L/LE/LEONT/ExtUtils-InstallPaths-0.010.tar.gz
+    provides:
+      ExtUtils::InstallPaths 0.010
+    requirements:
+      Carp 0
+      ExtUtils::Config 0.002
+      ExtUtils::MakeMaker 6.30
+      File::Spec 0
+      strict 0
+      warnings 0
+  File-Copy-Recursive-0.38
+    pathname: D/DM/DMUEY/File-Copy-Recursive-0.38.tar.gz
+    provides:
+      File::Copy::Recursive 0.38
+    requirements:
+      ExtUtils::MakeMaker 0
+      File::Copy 0
+      File::Spec 0
+  Hash-Merge-0.200
+    pathname: R/RE/REHSACK/Hash-Merge-0.200.tar.gz
+    provides:
+      Hash::Merge 0.200
+    requirements:
+      Clone 0
+      ExtUtils::MakeMaker 0
+      perl 5.008001
+  Module-Build-Pluggable-0.10
+    pathname: T/TO/TOKUHIROM/Module-Build-Pluggable-0.10.tar.gz
+    provides:
+      Module::Build::Pluggable 0.10
+      Module::Build::Pluggable::Base undef
+      Module::Build::Pluggable::GithubMeta undef
+      Module::Build::Pluggable::Repository 0.10
+      Module::Build::Pluggable::Util undef
+      Test::Module::Build::Pluggable undef
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      Class::Accessor::Lite 0
+      Class::Method::Modifiers 0
+      Data::OptList 0
+      File::Basename 0
+      File::Path 0
+      File::Temp 0
+      Module::Build 0.38
+      Module::Load 0
+      Test::SharedFork 0
+      parent 0
+      perl 5.008001
+  Module-Build-Pluggable-CPANfile-0.05
+    pathname: K/KA/KAZEBURO/Module-Build-Pluggable-CPANfile-0.05.tar.gz
+    provides:
+      Module::Build::Pluggable::CPANfile 0.05
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      ExtUtils::CBuilder 0
+      List::Util 1.14
+      Module::Build 0.38
+      Module::Build::Pluggable 0.05
+      Module::CPANfile 0.9010
+      parent 0
+      perl 5.008005
+      version 0.99
+  Module-Build-Tiny-0.039
+    pathname: L/LE/LEONT/Module-Build-Tiny-0.039.tar.gz
+    provides:
+      Module::Build::Tiny 0.039
+    requirements:
+      CPAN::Meta 0
+      DynaLoader 0
+      Exporter 5.57
+      ExtUtils::CBuilder 0
+      ExtUtils::Config 0.003
+      ExtUtils::Helpers 0.020
+      ExtUtils::Install 0
+      ExtUtils::InstallPaths 0.002
+      ExtUtils::ParseXS 0
+      File::Basename 0
+      File::Find 0
+      File::Path 0
+      File::Spec::Functions 0
+      Getopt::Long 2.36
+      JSON::PP 2
+      Pod::Man 0
+      TAP::Harness::Env 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Module-CPANfile-1.1000
+    pathname: M/MI/MIYAGAWA/Module-CPANfile-1.1000.tar.gz
+    provides:
+      Module::CPANfile 1.1000
+      Module::CPANfile::Environment undef
+      Module::CPANfile::Prereq undef
+      Module::CPANfile::Prereqs undef
+      Module::CPANfile::Requirement undef
+    requirements:
+      CPAN::Meta 2.12091
+      CPAN::Meta::Prereqs 2.12091
+      ExtUtils::MakeMaker 0
+      parent 0
+  Params-Util-1.07
+    pathname: A/AD/ADAMK/Params-Util-1.07.tar.gz
+    provides:
+      Params::Util 1.07
+    requirements:
+      ExtUtils::CBuilder 0.27
+      ExtUtils::MakeMaker 6.52
+      File::Spec 0.80
+      Scalar::Util 1.18
+      Test::More 0.42
+      perl 5.00503
+  Sub-Install-0.928
+    pathname: R/RJ/RJBS/Sub-Install-0.928.tar.gz
+    provides:
+      Sub::Install 0.928
+    requirements:
+      B 0
+      Carp 0
+      ExtUtils::MakeMaker 6.30
+      Scalar::Util 0
+      strict 0
+      warnings 0
+  Test-Deep-0.113
+    pathname: R/RJ/RJBS/Test-Deep-0.113.tar.gz
+    provides:
+      Test::Deep 0.113
+      Test::Deep::All undef
+      Test::Deep::Any undef
+      Test::Deep::Array undef
+      Test::Deep::ArrayEach undef
+      Test::Deep::ArrayElementsOnly undef
+      Test::Deep::ArrayLength undef
+      Test::Deep::ArrayLengthOnly undef
+      Test::Deep::Blessed undef
+      Test::Deep::Boolean undef
+      Test::Deep::Cache undef
+      Test::Deep::Cache::Simple undef
+      Test::Deep::Class undef
+      Test::Deep::Cmp undef
+      Test::Deep::Code undef
+      Test::Deep::Hash undef
+      Test::Deep::HashEach undef
+      Test::Deep::HashElements undef
+      Test::Deep::HashKeys undef
+      Test::Deep::HashKeysOnly undef
+      Test::Deep::Ignore undef
+      Test::Deep::Isa undef
+      Test::Deep::ListMethods undef
+      Test::Deep::MM undef
+      Test::Deep::Methods undef
+      Test::Deep::NoTest undef
+      Test::Deep::Number undef
+      Test::Deep::Obj undef
+      Test::Deep::Ref undef
+      Test::Deep::RefType undef
+      Test::Deep::Regexp undef
+      Test::Deep::RegexpMatches undef
+      Test::Deep::RegexpRef undef
+      Test::Deep::RegexpRefOnly undef
+      Test::Deep::RegexpVersion undef
+      Test::Deep::ScalarRef undef
+      Test::Deep::ScalarRefOnly undef
+      Test::Deep::Set undef
+      Test::Deep::Shallow undef
+      Test::Deep::Stack undef
+      Test::Deep::String undef
+      Test::Deep::SubHash undef
+      Test::Deep::SubHashElements undef
+      Test::Deep::SubHashKeys undef
+      Test::Deep::SubHashKeysOnly undef
+      Test::Deep::SuperHash undef
+      Test::Deep::SuperHashElements undef
+      Test::Deep::SuperHashKeys undef
+      Test::Deep::SuperHashKeysOnly undef
+    requirements:
+      ExtUtils::MakeMaker 0
+      List::Util 1.09
+      Scalar::Util 1.09
+      Test::More 0
+      Test::NoWarnings 0.02
+      Test::Tester 0.04
+  Test-Fatal-0.014
+    pathname: R/RJ/RJBS/Test-Fatal-0.014.tar.gz
+    provides:
+      Test::Fatal 0.014
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      Test::Builder 0
+      Try::Tiny 0.07
+      strict 0
+      warnings 0
+  Test-Harness-3.34
+    pathname: L/LE/LEONT/Test-Harness-3.34.tar.gz
+    provides:
+      App::Prove 3.34
+      App::Prove::State 3.34
+      App::Prove::State::Result 3.34
+      App::Prove::State::Result::Test 3.34
+      Harness::Hook undef
+      TAP::Base 3.34
+      TAP::Formatter::Base 3.34
+      TAP::Formatter::Color 3.34
+      TAP::Formatter::Console 3.34
+      TAP::Formatter::Console::ParallelSession 3.34
+      TAP::Formatter::Console::Session 3.34
+      TAP::Formatter::File 3.34
+      TAP::Formatter::File::Session 3.34
+      TAP::Formatter::Session 3.34
+      TAP::Harness 3.34
+      TAP::Harness::Env 3.34
+      TAP::Object 3.34
+      TAP::Parser 3.34
+      TAP::Parser::Aggregator 3.34
+      TAP::Parser::Grammar 3.34
+      TAP::Parser::Iterator 3.34
+      TAP::Parser::Iterator::Array 3.34
+      TAP::Parser::Iterator::Process 3.34
+      TAP::Parser::Iterator::Stream 3.34
+      TAP::Parser::IteratorFactory 3.34
+      TAP::Parser::Multiplexer 3.34
+      TAP::Parser::Result 3.34
+      TAP::Parser::Result::Bailout 3.34
+      TAP::Parser::Result::Comment 3.34
+      TAP::Parser::Result::Plan 3.34
+      TAP::Parser::Result::Pragma 3.34
+      TAP::Parser::Result::Test 3.34
+      TAP::Parser::Result::Unknown 3.34
+      TAP::Parser::Result::Version 3.34
+      TAP::Parser::Result::YAML 3.34
+      TAP::Parser::ResultFactory 3.34
+      TAP::Parser::Scheduler 3.34
+      TAP::Parser::Scheduler::Job 3.34
+      TAP::Parser::Scheduler::Spinner 3.34
+      TAP::Parser::Source 3.34
+      TAP::Parser::SourceHandler 3.34
+      TAP::Parser::SourceHandler::Executable 3.34
+      TAP::Parser::SourceHandler::File 3.34
+      TAP::Parser::SourceHandler::Handle 3.34
+      TAP::Parser::SourceHandler::Perl 3.34
+      TAP::Parser::SourceHandler::RawTAP 3.34
+      TAP::Parser::YAMLish::Reader 3.34
+      TAP::Parser::YAMLish::Writer 3.34
+      Test::Harness 3.34
+    requirements:
+      ExtUtils::MakeMaker 0
+  Test-NoWarnings-1.04
+    pathname: A/AD/ADAMK/Test-NoWarnings-1.04.tar.gz
+    provides:
+      Test::NoWarnings 1.04
+      Test::NoWarnings::Warning 1.04
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::Builder 0.86
+      Test::More 0.47
+      Test::Tester 0.107
+      perl 5.006
+  Test-SharedFork-0.29
+    pathname: E/EX/EXODIST/Test-SharedFork-0.29.tar.gz
+    provides:
+      Test::SharedFork 0.29
+      Test::SharedFork::Array undef
+      Test::SharedFork::Scalar undef
+      Test::SharedFork::Store undef
+    requirements:
+      ExtUtils::MakeMaker 6.64
+      File::Temp 0
+      Test::Builder 0.32
+      Test::Builder::Module 0
+      Test::More 0.88
+      perl 5.008_001
+  Test-Tester-0.109
+    pathname: F/FD/FDALY/Test-Tester-0.109.tar.gz
+    provides:
+      Test::Tester 0.109
+      Test::Tester::Capture undef
+      Test::Tester::CaptureRunner undef
+      Test::Tester::Delegate undef
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::Builder 0
+  Test-mysqld-0.17
+    pathname: K/KA/KAZUHO/Test-mysqld-0.17.tar.gz
+    provides:
+      Test::mysqld 0.17
+    requirements:
+      Class::Accessor::Lite 0
+      DBD::mysql 0
+      DBI 0
+      ExtUtils::MakeMaker 6.42
+      File::Copy::Recursive 0
+      Test::SharedFork 0.06
+      perl 5.008
+  Try-Tiny-0.24
+    pathname: E/ET/ETHER/Try-Tiny-0.24.tar.gz
+    provides:
+      Try::Tiny 0.24
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      constant 0
+      perl 5.006
+      strict 0
+      warnings 0
+  YAML-1.15
+    pathname: I/IN/INGY/YAML-1.15.tar.gz
+    provides:
+      YAML 1.15
+      YAML::Any 1.15
+      YAML::Dumper undef
+      YAML::Dumper::Base undef
+      YAML::Error undef
+      YAML::Loader undef
+      YAML::Loader::Base undef
+      YAML::Marshall undef
+      YAML::Mo 0.88
+      YAML::Node undef
+      YAML::Tag undef
+      YAML::Type::blessed undef
+      YAML::Type::code undef
+      YAML::Type::glob undef
+      YAML::Type::ref undef
+      YAML::Type::regexp undef
+      YAML::Type::undef undef
+      YAML::Types undef
+      YAML::Warning undef
+      yaml_mapping undef
+      yaml_scalar undef
+      yaml_sequence undef
+    requirements:
+      ExtUtils::MakeMaker 0
+      perl 5.008001

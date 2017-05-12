@@ -1,0 +1,39 @@
+# NAME
+
+Acme::Xyzzy - Nothing happens.
+
+# VERSION
+
+version 0.001
+
+# SYNOPSIS
+
+        use Acme::Xyzzy;
+
+        xyzzy;
+
+# DESCRIPTION
+
+Nothing happens.
+
+## Methods
+
+- `xyzzy()`
+
+    Nothing happens.
+
+# SEE ALSO
+
+[https://en.wikipedia.org/wiki/Xyzzy\_%28computing%29](https://en.wikipedia.org/wiki/Xyzzy_%28computing%29)
+
+# AUTHOR
+
+William Woodruff <william@tuffbizz.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by William Woodruff.
+
+This is free software, licensed under:
+
+    The MIT (X11) License

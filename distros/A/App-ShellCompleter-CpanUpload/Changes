@@ -1,0 +1,31 @@
+Revision history for App-ShellCompleter-CpanUpload
+
+0.05    2015-09-27 (PERLANCAR)
+
+        - No functional changes.
+
+        - Rebuild with updated Getopt::Long::Patch::DumpAndExit to fix dumping
+          of coderefs [CT].
+
+
+0.04    2015-09-17 (PERLANCAR)
+
+	- Adjust to Complete::Util 0.36 (complete_file() split to
+	  Complete-File).
+
+
+0.03    2015-01-02 (PERLANCAR)
+
+	- Complete arg with dir|archive only.
+
+
+0.02    2015-01-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Forgot to decline in completion routine.
+
+
+0.01    2015-01-02 (PERLANCAR)
+
+        - First release.

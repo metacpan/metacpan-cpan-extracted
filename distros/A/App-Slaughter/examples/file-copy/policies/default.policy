@@ -1,0 +1,26 @@
+#
+# This policy causes a remote file to be copied from the slaughter-server
+# and installed upon the local system.
+#
+# The file is installed upon the local system if either:
+#
+#  1.  It is missing on the local system.
+#
+#  or
+#
+#  2.  The file is present on the local system but the file contents do
+#     not match those available remotely
+#
+#
+
+
+if ( FetchFile( Source => "/etc/motd",
+                Dest   => "/etc/motd",
+                Owner  => "root",
+                Expand => "true",
+                Group  => "root",
+                Mode   => "644" ) )
+{
+    LogMessage( Message => "The local file /etc/motd was updated.",
+                Severity => "FetchFile" );
+}

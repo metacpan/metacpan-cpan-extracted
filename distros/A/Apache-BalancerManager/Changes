@@ -1,0 +1,10 @@
+Revision history for Apache-BalancerManager
+
+0.001002  2013-01-04 09:45:07 CST6CDT
+ - Fix missing deps
+
+0.001001  2013-01-03 13:25:14 CST6CDT
+ - And of course, fix stupid deal breaker bug
+
+0.001000  2013-01-02 13:44:03 CST6CDT
+ - Hurray new module!

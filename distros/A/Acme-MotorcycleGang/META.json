@@ -1,0 +1,71 @@
+{
+   "abstract" : "Translate Japanese MotorcycleGang Language",
+   "author" : [
+      "yuichi tsunoda  C<< <yuichi.tsunoda@gmail.com> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-MotorcycleGang",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::MotorcycleGang" : {
+         "file" : "lib/Acme/MotorcycleGang.pm",
+         "version" : "v0.0.5"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aceproject/Acme-MotorcycleGang/issues"
+      },
+      "homepage" : "https://github.com/aceproject/Acme-MotorcycleGang",
+      "repository" : {
+         "url" : "git://github.com/aceproject/Acme-MotorcycleGang.git",
+         "web" : "https://github.com/aceproject/Acme-MotorcycleGang"
+      }
+   },
+   "version" : "0.0.5",
+   "x_contributors" : [
+      "yuichi.tsunoda <yuichi.tsunoda@gmail.com>"
+   ]
+}

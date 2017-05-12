@@ -1,0 +1,54 @@
+{
+   "abstract" : "Alternate Math::Prime::FastSieve using Inline::Module",
+   "author" : [
+      "David Oswald <davido [@at] cpan [d.o.t] org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alt-Math-Prime-FastSieve-Inline",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.04",
+            "Test::More" : "1.001009"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.04"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Inline::CPP" : "0.69",
+            "Inline::Module" : "0.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Alt::Math::Prime::FastSieve::Inline" : {
+         "file" : "lib/Alt/Math/Prime/FastSieve/Inline.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.09"
+}

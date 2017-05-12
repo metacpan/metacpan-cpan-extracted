@@ -1,0 +1,35 @@
+#!/www/perl-5.6.1/bin/perl -Tw
+# Simple authentication with password sent by file.
+
+# ------ pragmas
+use strict;
+
+# ------ define variables
+my $passfile = "";		# password file
+my $password = "";		# password for $username from $passfile
+my $username = "";		# username to authenticate with
+
+# ------ get username and password
+if (scalar(@ARGV) < 2) {
+    die "usage: file-auth username passwordfile\n";
+}
+$ARGV[0]  =~ m#([^`']+)#;
+$username = $1;
+$ARGV[1]  =~ m#([^`']+)#;
+$passfile = $1;
+open(IFH, $passfile)
+ || die "FAILURE: can't open password file '$passfile' because: $!\n";
+$password = <IFH>;
+chomp($password);
+close(IFH)
+ || die "FAILURE: can't close password file '$passfile' because: $!\n";
+if (!defined($password) || $password =~ m/^\s*$/) {
+    die "FAILURE: missing or empty password\n";
+}
+
+# ------ verify username/password
+if ($username eq "fred" && $password eq "Scooby-Do!2002") {
+    print "OK: File login succeeded.\n";
+} else {
+    print "FAILURE: bad username or password.\n";
+}

@@ -1,0 +1,201 @@
+NAME
+    App::Virtualenv - Perl virtual environment
+
+VERSION
+    version 2.06
+
+ABSTRACT
+    Perl virtual environment
+
+            #!/bin/sh
+            perl -MApp::Virtualenv -erun -- environment_path
+
+    See also: virtualenv.pl
+    <https://metacpan.org/pod/distribution/App-Virtualenv/lib/App/Virtualenv
+    /virtualenv.pl>
+
+DESCRIPTION
+    App::Virtualenv is a Perl package to create isolated Perl virtual
+    environments, like Python virtual environment.
+
+  Functions
+   sh(@args)
+    runs shell program defined in SHELL environment variable, otherwise
+    /bin/sh
+
+    @args: *arguments of shell program*
+
+    return value: *exit code of shell program*
+
+   perl(@args)
+    runs Perl interpreter
+
+    @args: *arguments of Perl interpreter*
+
+    return value: *exit code of Perl interpreter*
+
+   activate($virtualenvPath)
+    activates Perl virtual environment
+
+    $virtualenvPath: *virtual environment path*
+
+    return value: *virtual environment path if success, otherwise undef*
+
+   deactivate($nondestructive)
+    deactivates Perl virtual environment
+
+    $nondestructive: *leaves envionment variables as it is, unless there are
+    old envionment variables*
+
+    return value: *always 1*
+
+   create($virtualenvPath, $empty)
+    creates Perl virtual environment
+
+    $virtualenvPath: *new virtual environment path*
+
+    $empty: *create empty virtual environment*
+
+    return value: *virtual environment path if success, otherwise undef*
+
+   findVirtualenvPath($virtualenvPath)
+    finds Perl virtual environment path by $virtualenvPath argument or
+    activated virtual environment or running script or PERL5LIB environment
+    variable
+
+    $virtualenvPath: *virtual environment path*
+
+    return value: *best matching virtual environment path*
+
+   activate2($virtualenvPath, $inform)
+    activates Perl virtual environment by findVirtualenvPath function
+
+    $virtualenvPath: *virtual environment path*
+
+    $inform: *informs activated virtual environment path to STDERR if new
+    activated path differs old one*
+
+    return value: *activated best matching virtual environment path if
+    success, otherwise undef*
+
+   getInc($virtualenvPath)
+    gets array ref of include paths given virtual environment path or
+    sitelib paths
+
+    $virtualenvPath: *virtual environment path*
+
+    return value: *array ref of paths*
+
+   list(%params)
+    lists packages or modules or files by given %params
+
+    %params: *parameters of function*
+
+        one: *output is one-column, by default 0*
+
+        detail: *prints additional detail by given value: module or file. by
+        default undef*
+
+    return value: *always 1*
+
+   main(@argv)
+    App::Virtualenv main function to run on command-line
+
+    See also: virtualenv.pl
+    <https://metacpan.org/pod/distribution/App-Virtualenv/lib/App/Virtualenv
+    /virtualenv.pl>
+
+    @argv: *command-line arguments*
+
+    return value: *exit code of program*
+
+   run
+    runs App::Virtualenv by main function with command-line arguments by
+    @ARGV
+
+    return value: *function doesn't return, exits with main function return
+    code*
+
+PREVIOUS VERSION
+    Previous version of App::Virtualenv has include PiV(Perl in Virtual
+    environment) to list/install/uninstall modules using CPANPLUS API. Aimed
+    with PiV making a package manager like Python pip. But Perl has various
+    powerful package tools mainly CPAN and cpanminus, CPANPLUS and etc. And
+    also building a great package manager requires huge community support.
+    So, PiV is deprecated in version 2.xx.
+
+    You should uninstall previous version before upgrading from v1.xx: cpanm
+    -U App::Virtualenv; cpanm -i App::Virtualenv;
+
+    See also: App::Virtualenv 1.13
+    <https://metacpan.org/release/ORKUN/App-Virtualenv-1.13>
+
+  Deprecated Modules
+    *   App::Virtualenv::Piv
+
+    *   App::Virtualenv::Module
+
+    *   App::Virtualenv::Utils
+
+INSTALLATION
+    To install this module type the following
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+    from CPAN
+
+            cpan -i App::Virtualenv
+
+    You should uninstall previous version before upgrading from v1.xx: cpanm
+    -U App::Virtualenv; cpanm -i App::Virtualenv;
+
+DEPENDENCIES
+    This module requires these other modules and libraries:
+
+    *   local::lib
+
+    *   ExtUtils::Installed
+
+    *   CPAN
+
+    *   Cwd
+
+    *   Lazy::Utils
+
+REPOSITORY
+    GitHub <https://github.com/orkunkaraduman/perl5-virtualenv>
+
+    CPAN <https://metacpan.org/release/App-Virtualenv>
+
+SEE ALSO
+    *   App::Virtualenv 1.13
+        <https://metacpan.org/release/ORKUN/App-Virtualenv-1.13>
+
+    *   CPAN <https://metacpan.org/pod/CPAN>
+
+    *   App::cpanminus <https://metacpan.org/pod/App::cpanminus>
+
+    *   CPANPLUS <https://metacpan.org/pod/CPANPLUS>
+
+AUTHOR
+    Orkun Karaduman <orkunkaraduman@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2017 Orkun Karaduman <orkunkaraduman@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program. If not, see <http://www.gnu.org/licenses/>.
+

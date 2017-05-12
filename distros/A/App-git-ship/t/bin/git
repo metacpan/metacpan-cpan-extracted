@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+use strict;
+@ARGV = ('_') unless @ARGV;
+if ($ARGV[0] eq '_') {
+  exit 0;
+}
+elsif ($ARGV[0] eq 'push') {
+  print "[t::bin::git::ignore] git @ARGV\n";
+}
+else {
+  exec $ENV{GIT_REAL_BIN} => @ARGV;
+  die $!;
+}

@@ -1,0 +1,55 @@
+.blue_centered
+{
+	background-color: #6293cd;
+	color: #ffffff;
+	font-weight: bold;
+	text-align: center;
+}
+
+.bordered
+{
+	border-style: solid;
+	border-width: 1px;
+}
+
+.centered
+{
+	text-align: center;
+}
+
+.donations_text
+{
+	background-color: #afeeee;
+	border-style: solid;
+	border-width: 1px;
+}
+
+.error
+{
+	color: red;
+	font-weight: bold;
+}
+
+.hidden_div
+{
+	background-color: #6293cd;
+	border-style: solid;
+	border-width: 1px;
+	display: none;
+	text-align: center;
+}
+
+.site_text
+{
+	background-color: #afeeee;
+	border-style: solid;
+	border-width: 1px;
+}
+
+.white_centered
+{
+	background-color: #ffffff;
+	color: #6293cd;
+	font-weight: bold;
+}
+

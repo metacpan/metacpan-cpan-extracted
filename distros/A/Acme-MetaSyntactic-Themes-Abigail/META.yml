@@ -1,0 +1,46 @@
+---
+abstract: Abstract
+author:
+  - 'Abigail <cpan@abigail.be>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::MetaSyntactic: 1
+  Test::More: 0.88
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  Test::MetaSyntactic: 1
+  Test::More: 0.88
+  strict: 0
+  warnings: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+keywords: []
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-MetaSyntactic-Themes-Abigail
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Lingua::EN::Numbers: 0
+requires:
+  Acme::MetaSyntactic: 1
+  Acme::MetaSyntactic::List: 1
+  Acme::MetaSyntactic::Locale: 1
+  Acme::MetaSyntactic::MultiList: 1
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/Abigail/Acme-MetaSyntactic-Themes-Abigail.git
+version: 2013073101
+x_test_requires:
+  Test::MetaSyntactic: 1
+  Test::More: 0.88
+  strict: 0
+  warnings: 0

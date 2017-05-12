@@ -1,0 +1,24 @@
+=head1 NAME
+
+App::Framework::CoreModules - Module list for installed Core modules 
+
+=head1 DESCRIPTION
+
+The following list shows the available Core modules:
+
+=over 4
+
+=item * L<App::Framework::Core::Script>  v1.002
+
+App::Framework command line script personality
+
+
+
+=back
+
+=head1 AUTHOR
+
+Steve Price, C<< <sdprice at cpan.org> >>
+
+=cut
+

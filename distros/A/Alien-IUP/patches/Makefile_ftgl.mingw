@@ -1,0 +1,121 @@
+#PLEASE NOTE: this Makefile was designed to be compatible with GNU make and dmake
+
+CC       = gcc
+AR       = ar
+ARFLAGS  = csr
+PERL     = perl
+
+CP     = $(PERL) -MExtUtils::Command -e cp --
+RM_F   = $(PERL) -MExtUtils::Command -e rm_f --
+MKPATH = $(PERL) -MExtUtils::Command -e mkpath --
+
+### GLOBAL PART ###
+
+BUILDBITS= 32
+BUILDNICK= mingw
+
+PREFIX   = ../../_output_
+INCDIR   = $(PREFIX)/include
+LIBDIR   = $(PREFIX)/lib
+
+CF_ALL   = -DTEC_UNAME=gcc4 -DTEC_SYSNAME=Win$(BUILDBITS) -DTEC_LITTLEENDIAN -DTEC_$(BUILDBITS) -DWIN32 -DNDEBUG -I"$(INCDIR)"
+LF_ALL   = -L../lib/$(BUILDNICK) -L"$(LIBDIR)"
+
+VER_OBJ      = version.o
+VER_RC       = version.rc
+
+BUILD_DIRS   = ../obj/$(BUILDNICK)/cd_ftgl ../lib/$(BUILDNICK)
+
+ALL_OBJS     = $(OBJS_cd_ftgl)
+
+STATIC_LIBS  = $(SLIB_cd_ftgl)
+
+DYNAMIC_LIBS = $(DLIB_cd_ftgl) $(ILIB_cd_ftgl)
+
+ALL_LIBS     = $(STATIC_LIBS) $(DYNAMIC_LIBS)
+
+.PHONY: install-all install-static install-dynamic all all-static all-dynamic clean build-dirs
+
+all: all-static all-dynamic
+
+
+### START OF cd_ftgl ###
+CF_cd_ftgl   = -c  -Wall -O2 -I../include -I. -I../../freetype/include   -DFTGL_LIBRARY $(CF_cd_ftgl_EXTRA)
+LF_cd_ftgl   = -lfreetype6 -lzlib1 -lglaux -lglu32 -lopengl32 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_cd_ftgl_EXTRA)
+SLIB_cd_ftgl = ../lib/$(BUILDNICK)/libftgl.a
+DLIB_cd_ftgl = ../lib/$(BUILDNICK)/libftgl.dll.a
+ILIB_cd_ftgl = ../lib/$(BUILDNICK)/ftgl_alien_.dll
+OBJS_cd_ftgl = ../obj/$(BUILDNICK)/cd_ftgl/FTBuffer.o ../obj/$(BUILDNICK)/cd_ftgl/FTCharmap.o ../obj/$(BUILDNICK)/cd_ftgl/FTContour.o ../obj/$(BUILDNICK)/cd_ftgl/FTFace.o ../obj/$(BUILDNICK)/cd_ftgl/FTGlyphContainer.o ../obj/$(BUILDNICK)/cd_ftgl/FTLibrary.o ../obj/$(BUILDNICK)/cd_ftgl/FTPoint.o ../obj/$(BUILDNICK)/cd_ftgl/FTSize.o ../obj/$(BUILDNICK)/cd_ftgl/FTVectoriser.o ../obj/$(BUILDNICK)/cd_ftgl/FTGlyph.o ../obj/$(BUILDNICK)/cd_ftgl/FTGlyphGlue.o ../obj/$(BUILDNICK)/cd_ftgl/FTBitmapGlyph.o ../obj/$(BUILDNICK)/cd_ftgl/FTBufferGlyph.o ../obj/$(BUILDNICK)/cd_ftgl/FTExtrudeGlyph.o ../obj/$(BUILDNICK)/cd_ftgl/FTOutlineGlyph.o ../obj/$(BUILDNICK)/cd_ftgl/FTPixmapGlyph.o ../obj/$(BUILDNICK)/cd_ftgl/FTPolygonGlyph.o ../obj/$(BUILDNICK)/cd_ftgl/FTTextureGlyph.o ../obj/$(BUILDNICK)/cd_ftgl/FTFont.o ../obj/$(BUILDNICK)/cd_ftgl/FTFontGlue.o ../obj/$(BUILDNICK)/cd_ftgl/FTBitmapFont.o ../obj/$(BUILDNICK)/cd_ftgl/FTBufferFont.o ../obj/$(BUILDNICK)/cd_ftgl/FTExtrudeFont.o ../obj/$(BUILDNICK)/cd_ftgl/FTOutlineFont.o ../obj/$(BUILDNICK)/cd_ftgl/FTPixmapFont.o ../obj/$(BUILDNICK)/cd_ftgl/FTPolygonFont.o ../obj/$(BUILDNICK)/cd_ftgl/FTTextureFont.o ../obj/$(BUILDNICK)/cd_ftgl/FTLayout.o ../obj/$(BUILDNICK)/cd_ftgl/FTLayoutGlue.o ../obj/$(BUILDNICK)/cd_ftgl/FTSimpleLayout.o
+
+../obj/$(BUILDNICK)/cd_ftgl/FTBuffer.o : ./FTBuffer.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTCharmap.o : ./FTCharmap.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTContour.o : ./FTContour.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTFace.o : ./FTFace.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTGlyphContainer.o : ./FTGlyphContainer.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTLibrary.o : ./FTLibrary.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTPoint.o : ./FTPoint.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTSize.o : ./FTSize.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTVectoriser.o : ./FTVectoriser.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTGlyph.o : ./FTGlyph/FTGlyph.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTGlyphGlue.o : ./FTGlyph/FTGlyphGlue.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTBitmapGlyph.o : ./FTGlyph/FTBitmapGlyph.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTBufferGlyph.o : ./FTGlyph/FTBufferGlyph.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTExtrudeGlyph.o : ./FTGlyph/FTExtrudeGlyph.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTOutlineGlyph.o : ./FTGlyph/FTOutlineGlyph.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTPixmapGlyph.o : ./FTGlyph/FTPixmapGlyph.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTPolygonGlyph.o : ./FTGlyph/FTPolygonGlyph.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTTextureGlyph.o : ./FTGlyph/FTTextureGlyph.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTFont.o : ./FTFont/FTFont.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTFontGlue.o : ./FTFont/FTFontGlue.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTBitmapFont.o : ./FTFont/FTBitmapFont.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTBufferFont.o : ./FTFont/FTBufferFont.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTExtrudeFont.o : ./FTFont/FTExtrudeFont.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTOutlineFont.o : ./FTFont/FTOutlineFont.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTPixmapFont.o : ./FTFont/FTPixmapFont.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTPolygonFont.o : ./FTFont/FTPolygonFont.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTTextureFont.o : ./FTFont/FTTextureFont.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTLayout.o : ./FTLayout/FTLayout.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTLayoutGlue.o : ./FTLayout/FTLayoutGlue.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+../obj/$(BUILDNICK)/cd_ftgl/FTSimpleLayout.o : ./FTLayout/FTSimpleLayout.cpp ; g++ $(CF_ALL) $(CF_cd_ftgl) $^ -o $@
+
+$(SLIB_cd_ftgl): $(OBJS_cd_ftgl)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_cd_ftgl) $(DLIB_cd_ftgl) : $(OBJS_cd_ftgl)
+	g++ -s -shared -o $(ILIB_cd_ftgl) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_cd_ftgl) $(LF_cd_ftgl) $(LF_ALL)
+	-strip $(ILIB_cd_ftgl)
+
+cd_ftgl-static: build-dirs $(SLIB_cd_ftgl)
+cd_ftgl-dynamic: build-dirs $(ILIB_cd_ftgl) $(DLIB_cd_ftgl)
+
+### compile RC
+
+$(VER_OBJ) : $(VER_RC) ; windres --define GCC_WINDRES $^ -o $@
+
+all: build-dirs $(STATIC_LIBS) $(DYNAMIC_LIBS)
+all-static: build-dirs $(STATIC_LIBS)
+all-dynamic: build-dirs $(DYNAMIC_LIBS)
+
+install-all:
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) ../lib/$(BUILDNICK)/* "$(LIBDIR)"
+	$(CP) ../include/*.h "$(INCDIR)"
+
+install-static: all-static
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) $(STATIC_LIBS) "$(LIBDIR)"
+	$(CP) ../include/*.h "$(INCDIR)"
+
+install-dynamic: all-dynamic
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) $(DYNAMIC_LIBS) "$(LIBDIR)"
+	$(CP) ../include/*.h "$(INCDIR)"
+
+build-dirs:
+	$(MKPATH) $(BUILD_DIRS)
+
+clean:
+	$(RM_F) $(ALL_OBJS) $(ALL_LIBS) $(VER_OBJ)

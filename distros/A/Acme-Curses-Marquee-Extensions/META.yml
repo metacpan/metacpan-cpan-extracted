@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Acme-Curses-Marquee-Extensions
+version:      0.04
+version_from: lib/Acme/Curses/Marquee/Extensions.pm
+installdirs:  site
+requires:
+    Acme::Curses::Marquee:         
+    Curses:                        
+    Every:                         
+    Term::ANSIColor:               
+    Text::FIGlet:                  2
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

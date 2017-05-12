@@ -1,0 +1,4 @@
+steps = FindVersion, ChangeVersion, CheckChangeLog, DistTest, Commit, Tag, MakeDist, UploadCPAN
+
+CheckChangeLog.files = Changes
+

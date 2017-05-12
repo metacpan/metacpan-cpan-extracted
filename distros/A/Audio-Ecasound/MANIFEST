@@ -1,0 +1,14 @@
+Changes
+Ecasound.pm
+Ecasound.xs
+eg/iam_int.pl
+eg/oo_int.pl
+eg/raw_int.pl
+eg/simple_int.pl
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/ecasound.t
+t/pod.t
+typemap

@@ -1,0 +1,6 @@
+To: [% email %]
+Subject: A fruit for you
+
+Hi [% name %],
+Would you like a [% fruit %]
+

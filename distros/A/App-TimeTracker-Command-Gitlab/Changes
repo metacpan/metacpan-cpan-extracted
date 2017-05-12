@@ -1,0 +1,14 @@
+Revision history for App::TimeTracker::Command::Gitlab
+
+1.002   2016-10-28T21:37:25+0200
+    - sane error message if the issue cannot be found
+
+
+1.001   2016-10-19T10:53:00+0200
+    - fix type of project_id
+    - use public github repo
+
+
+1.000   2016-10-19T09:40:00+0200
+    - initial commit & first version
+

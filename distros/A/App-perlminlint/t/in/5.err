@@ -1,0 +1,2 @@
+Can't locate Foo\.pm in \@INC(?: \([^\)]+\))+ at in/5\.d/foo.pl line 6\.
+BEGIN failed--compilation aborted at in/5\.d/foo\.pl line 6\.

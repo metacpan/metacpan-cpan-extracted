@@ -1,0 +1,142 @@
+0.93  Thu May 30 13:19:46 CEST 2013
+        - Allow easy recompilation of source packages in all
+          relevant distribution/architecture combinations
+        - Add access key for the "Synchronise" option
+
+0.92  Fri Apr 20 16:26:19 CEST 2012
+        - Add missing dependencies: TheSchwartz and Proc::Daemon
+        - Small improvements in error messages and instructions
+
+0.91  Mon Jan 30 10:07:19 CEST 2011
+        - Add an RSS feed for the latest packages added to the repo
+        - Fix approval queue RSS feed
+        - Fix public URL sessions
+
+0.90  Mon Sep  5 16:59:31 CEST 2011
+        - Use TheSchwartz for the compilation queue
+        - Add a daemon (arepa-job-daemon) to process that queue
+          constantly in the background
+        - Support an external authentication mechanism (if you wish
+          to integrate with Apache authentication, LDAP or whatever)
+        - Support the notion of administrators, that can modify stuff
+          (approve packages, add keys, requeue compilation failures,
+          etc)
+        - Fix the repository view action for packages with dots in
+          their names
+        - Minor improvements
+
+0.89  Tue Jul  5 12:22:35 CEST 2011
+        - Another compatibility fix for sbuild 0.60.8
+
+0.88  Mon Jul  4 16:46:33 CEST 2011
+        - Make it compatible with sbuild 0.60.8... and incompatible with
+          anything older, I imagine.
+        - Fix non-ASCII characters in compilation logs
+        - Fix "arepa queue xxx.dsc <distroname>"
+        - Add a simple option to show a source package in the repo
+
+0.87  Tue Mar  1 13:53:57 CET 2011
+        - Don't require the sqlite3 utility to run the tests, just
+          DBD::SQLite
+        - One more compatibility fix for Mojolicious 1.0 (login was
+          apparently broken)
+
+0.86  Fri Feb 25 14:26:06 CET 2011
+        - Compatibility with Mojolicious 1.0
+        - Support unsigned repositories, to make the functional tests
+          easier to execute
+
+0.85  Thu Jan 20 10:35:46 CET 2011
+        - Compatibility with sbuild 0.60 (ie. Debian Squeeze)
+        - Add workaround multi-arch packages (not proper support, but they'll
+          sort of work), as in packages having more than one value in
+          Architecture (like "amd64 i386", not like "any"; the latter has
+          always worked)
+        - Fix some problem with incoming packages that are themselves binNMUs
+          or otherwise have "funny" revision numbers
+        - Undo stupid hack for old versions of reprepro that interchanged the
+          priority and section fields
+        - Give sane defaults for comments, section and priority for incoming
+          packages
+        - Add a command to request compilation of source packages in a given
+          distribution and architecture
+        - Fix some nasty problem when creating new builders (when passing a
+          trailing backslash in the builder path, that builder would not be
+          able to compile any package, and give really strange errors)
+        - A lot of refactoring and internal improvements
+
+0.81  Fri Aug 20 14:26:09 CEST 2010
+        - Fix MANIFEST file and other minor packaging bugs
+
+0.80  Fri Aug 20 14:05:34 CEST 2010
+        - Rewrote the whole web UI in Mojolicious instead of CGI::Application
+        - Encode packager name correctly
+        - Add information about the remote repository synchronization status
+          (see web_ui:check_remote_repo configuration key)
+        - Add a button to easily synchronize the remote repository
+        - When approving all packages, honour the comments, priority and
+          section for each package
+        - Add an option to see (and import) uploader GPG keys on the web UI
+        - Add createdistribution command to arepa-admin
+        - Improve the installation instructions considerably
+        - Minor improvements in administration tasks
+        - Deprecate web_ui:cgi_base_url, not needed anymore
+        - Add a new configuration key, web_ui:public_url, which will be used
+          for the RSS feeds and other "public URL" needs
+        - Make the Arepa::BuilderFarm tests more reliable, they should always
+          pass now on CPANTS
+
+0.76  Tue Jul 13 11:27:33 CEST 2010
+        - Make App::Repository tests depend on an environment variable
+          $REPREPRO4PATH (ie. be nice to CPANTS)
+        - Small fixes in the web UI (remove extra quote, set explicit charset,
+          show a message when the compilation queue is empty, improve the
+          build log page a bit)
+        - Allow creating builders of specific architectures (useful when you
+          are running amd64 and want a builder for i386)
+        - Fix RSS link (doh!)
+
+0.75  Wed Jun  2 13:42:56 CEST 2010
+        - It turns out it wasn't completely fixed, oh well
+        - Add missing dependency YAML::Syck to Makefile.PL
+        - Escape the source package comment
+        - Add a simple RSS feed for incoming packages
+
+0.74  Thu Mar 18 14:56:41 CET 2010
+        - More fixes for the 0.71 bug, hopefully this time it's completely
+          fixed
+
+0.73  Thu Mar 18 13:39:35 CET 2010
+        - Fix stupid bug introduced in 0.71 ("Support incoming ...") that
+          would do horrible things when having any binNMUs configured
+
+0.72  Thu Mar 18 11:28:50 CET 2010
+        - Implement an "uninit" command in arepa-admin
+        - Make both init and uninit receive an optional list of builders to
+          init/uninit (as opposed to init/uninit all of them)
+        - Don't use the -n option in sudo, as it's only supported from 1.7.0
+        - Remove the silly signing script, as it's not needed if sudo is
+          configured properly
+        - Add/improve documentation everywhere, add legal information
+
+0.71  Wed Mar 17 14:01:36 CET 2010
+        - Store passwords as MD5-hashes in the users file
+        - Add support for rejecting incoming packages
+        - Support incoming source packages with a distribution that is not a
+          reprepro distribution Suite or Codename (still, that distribution
+          will have to be mentioned in some builder)
+        - Added introductory documentation, improved a bit the help/error
+          messages on the command-line tools
+
+0.70  Mon Mar 15 14:04:43 CET 2010
+        - Order failed compilations by finished date, not requested date
+        - Add the ability to add comments to source packages
+        - Add a repository view showing all the available packages
+        - Add a repository signing script and make sure the repository is
+          signed every time there are changes (new source/binary packages)
+
+0.65  Wed Feb 17 13:33:38 CET 2010
+        - Show since when a package has been compiling in the "Builder status"
+        - Add the --delete option to the rsync calls
+        - Fix binNMU calculations so binNMUs are correctly detected
+        - Fix "Latest xxx" listing order

@@ -1,0 +1,47 @@
+{
+   "abstract" : "Lots of more or less useful subs lumped together and exported into your namespace",
+   "author" : [
+      "Kjetil Skotheim <kjetilskotheim@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Tools",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0.01",
+            "Compress::Zlib" : "0.01",
+            "MIME::Base64" : "0.01",
+            "Test::More" : "0.01",
+            "Time::HiRes" : "0.01",
+            "perl" : "5.006002"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.21",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

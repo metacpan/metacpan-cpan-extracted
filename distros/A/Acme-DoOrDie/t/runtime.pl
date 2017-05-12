@@ -1,0 +1,2 @@
+die("explicit die");
+

@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Audio-Digest-MP3
+version:             0.1
+abstract:            Get a message digest for the audio stream out of an MP3 file (skipping ID3 tags)
+license:             ~
+author:              
+    - Bart Lateur <bartl@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.4401
+distribution_type:   module
+requires:     
+    Digest:                        0
+    Digest::MD5:                   0
+    MPEG::Audio::Frame:            0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,8 @@
+Add:
+
+ arrayref option for delay to specify multiple values
+ callback option for delay to specify changing values
+ itterator option for delay
+
+Ability to return constants to say "And don't wait anymore"
+

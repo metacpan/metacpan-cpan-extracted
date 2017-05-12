@@ -1,0 +1,8 @@
+action_lock Modkey-z
+action_ssh Modkey-x
+terminal_here +Modkey-backslash
+goto_regex Modkey-i[/Irssi/], Modkey-w[/(?i)chrom(ium|e)/]
+action_screenshot Mod1-Modkey-s
+# You can make ~/.wmii-hg/custom executable and then you get an action which
+# you can bind keys to.
+action_custom Modkey-n

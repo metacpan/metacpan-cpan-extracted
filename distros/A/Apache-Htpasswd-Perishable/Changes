@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache::Htpasswd::Perishable.
+
+0.01  Tue Jan  8 13:04:48 2002
+	- original version; created by h2xs 1.21 with options
+		-Xan Apache::Htpasswd::Perishable
+

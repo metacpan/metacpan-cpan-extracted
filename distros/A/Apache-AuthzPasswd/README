@@ -1,0 +1,95 @@
+NAME
+     Apache::AuthzPasswd - mod_perl /etc/group Group
+     Authorization module
+
+SYNOPSIS
+         <Directory /foo/bar>
+         # This is the standard authentication stuff
+         AuthName "Foo Bar Authentication"
+         AuthType Basic
+
+         # The following is needed when you will authenticate
+         # via /etc/passwd as well as authorize via /etc/group.
+         # Apache::AuthenPasswd is a separate module.
+         PerlAuthenHandler Apache::AuthenPasswd
+
+         # Standard require stuff, users, groups and
+         # "valid-user" all work OK
+         require user username1 username2 ...
+         require group groupname1 groupname2 ...
+         require valid-user
+
+         PerlAuthzHandler Apache::AuthzPasswd
+
+         </Directory>
+
+         These directives can also be used in the <Location> directive or in
+         an .htaccess file.
+
+
+DESCRIPTION
+     For starters, this module could just as well be named
+     Apache::AuthzGroup, since it has nothing to do with
+     /etc/passwd, but rather works with /etc/group.  However, I
+     prefer this name in order to maintain the association with
+     Apache::AuthenPasswd, since chances are they will be used
+     together.
+
+     (SPEEVES NOTE:  This module does not seem to work without 
+     some sort of Authentication module used in conjunction with 
+     it...  I haven't looked extensively, but my testing always 
+     failed with a:
+
+     couldn't check user.  No user file?
+
+     error in the apache logs when I didn't have a module working 
+     at the authentication level.)
+
+     This perl module is designed to work with mod_perl and the
+     Apache::AuthenPasswd module by Demetrios E. Paneras
+     (dep@media.mit.edu).  It is a direct adaptation (i.e. I
+     modified the code) of Michael Parker's
+     (parker@austx.tandem.com) Apache::AuthenSmb module (which
+     also included an authorization routine).
+
+     The module calls getgrnam using each of the require group
+     elements as keys, until a match with the (already
+     authenticated) user is found.
+
+     For completeness, the module also handles require user and
+     require valid-user directives.
+
+     PerlSetVar SetRemoteGroup
+
+     This allows us to modify the REMOTE_GROUP CGI env variable.
+     When set to "yes" it sets REMOTE_GROUP to the group of the 
+     authorized user.  Defaults to "no".
+
+     Apache::AuthenPasswd vs. Apache::AuthzPasswd
+
+     I've taken "authentication" to be meaningful only in terms
+     of a user and password combination, not group membership.
+     This means that you can use Apache::AuthenPasswd with the
+     require user and require valid-user directives.  In the
+     /etc/passwd and /etc/group context I consider require group
+     to be an "authorization" concern.  I.e., group authorization
+     consists of establishing whether the already authenticated
+     user is a member of one of the indicated groups in the
+     require group directive.  This process may be handled by
+     Apache::AuthzPasswd.  Admittedly, AuthzPasswd is a misnomer,
+     but I wanted to keep AuthenPasswd and AuthzPasswd related,
+     if only by name.
+
+     I welcome any feedback on this module, esp. code
+     improvements, given that it was written hastily, to say the
+     least.
+
+AUTHOR
+     Demetrios E. Paneras <dep@media.mit.edu>
+
+COPYRIGHT
+     Copyright (c) 1998 Demetrios E. Paneras, MIT Media
+     Laboratory.
+
+     This library is free software; you can redistribute it
+     and/or modify it under the same terms as Perl itself.

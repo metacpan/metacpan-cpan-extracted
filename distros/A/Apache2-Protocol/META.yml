@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache2-Protocol
+version:      0.1
+version_from: lib/Apache2/Protocol.pm
+installdirs:  site
+requires:
+    Apache2::Const:                
+    Apache2::TieBucketBrigade:     
+    Class::Accessor:               
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,32 @@
+raps2 - "Right, another password store" take two
+------------------------------------------------
+
+* <http://finalrewind.org/projects/raps2>
+
+Dependencies
+------------
+
+ * perl version 5.10 or newer
+ * Config::Tiny
+ * Crypt::CBC
+ * Crypt::Eksblowfish
+ * File::BaseDir
+ * File::Path
+ * File::Slurp
+
+Installation
+------------
+
+$ perl Build.PL
+$ perl Build
+$ sudo perl Build install
+
+You can then run 'man raps2' for more information.
+
+Testing
+-------
+
+$ perl Build test
+
+Note that this will require the Test::More, Test::Fatal, Test::Compile and
+Test::Pod modules.

@@ -1,0 +1,1518 @@
+# -----------------------------------------------------------------------
+# © Copyright 2003-2011 by Alex Peeters [alex.peeters@citap.be]
+# -----------------------------------------------------------------------
+
+# General - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Author       : Alex Peeters [alex.peeters@citap.be]
+Latest update: dd month 2011
+Version      : 3.002.003
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# general - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+TODO:                          - TODO ALL   -  Log::Dispatch, Log::Dispatch::FileRotate depend on Date::Manip depend on perl 5.10
+                               -               , 'Log::Dispatch' => '2.26'
+                               -               , 'Log::Dispatch::FileRotate' => '1.19'
+                               -               , 'Log::Log4perl::Layout::XMLLayout' => 'x.x'
+
+Version 3.002.003, 2011/xx/yy, by Alex Peeters
+                               ASNMTAP
+                               - Nagios.pm
+                                 BUGFIX: convert_from_KB_to_metric for GB
+                                 BUGFIX: DESTROY created new reference to dead object 'ASNMTAP::Asnmtap::Plugins::Nagios' during global destruction.
+                               - WebTransact.pm
+                                 UPDATE: added Content_Type: 'multipart/form-data' for qs-fixed
+                               - change code to use 'perfdata'
+                               - UPDATE: asnmtap-3.002.003_mysql-v5.0.x-trigger-events.sql
+                               - UPDATE: asnmtap-3.002.003_mysql-v5.0.x-trigger-eventsUpdate.sql
+                               - runCmdOnDemand.pl & WebTransact.pm
+                                 - replace <BODY onload="..."> with <BODY>
+                               - SOAP.pm
+                                 NEW: encodingStyle
+																 NEW: error 'Missing SOAP Envelope or Body'
+                                 UPDATE: soapaction
+                               - create_ASNMTAP_weblogic_configuration_for_SNMP.pl
+                                 UPDATE: added status to e-mail subject
+                               - NEW: supportRequest template (applications/custom/supportRequest.pm-orig) integrated into comments.pl
+                               - NEW: integration for SDE (applications/custom/sde-supportRequest.pm-orig) into comments.pl
+                               - NEW: check_xml-monitoring-1.2.pl
+                               - UPDATE: coments.pl with integration for applications/custom/supportRequest.pm
+                               ASNMTAP::Asnmtap::Applications
+                               - Applications.cnf
+                                 <COMMON>
+                                 ...
+                                 #  <PERFPARSE>
+                                 #    ...
+                                 #    VERSION         20                     # '19' or '20'
+                                 #    CONFIG          perfparse20.cfg        # 'perfparse.cfg' or 'perfparse20.cfg'
+                                 #  </PERFPARSE>
+                                 </COMMON>
+
+Version 3.002.002, 2010/09/22, by Alex Peeters
+                               ASNMTAP
+                               - UPDATE asnmtap-3.002.002_mysql-v5.0.x-trigger-events.sql
+                               - optimalisatie DBI connection problems
+                               - NEW /cgi-bin/moderator/comments.pl
+                                 Set multiple comments by drag and drop list
+                               Database schema v3.002.002
+                               - UPDATE /applications/tools/mysql/asnmtap-3.002.002_mysql-v5.0.x.sql
+                               - UPDATE /applications/tools/mysql/asnmtap-3.002.002-distributed_mysql-v5.0.x.sql
+                                 - ALTER TABLE `events` ADD COLUMN `perfdata` text AFTER `statusMessage`;
+                                 - ALTER TABLE `eventsDisplayData` ADD COLUMN `perfdata` text AFTER `statusMessage`;
+                                 - ALTER TABLE `views` ADD COLUMN `timeperiodID` INT(11) NOT NULL DEFAULT '1' AFTER `displayGroupID`;
+                                 - ALTER TABLE `views` ADD INDEX `timeperiodID` (`timeperiodID`);
+                                 - ALTER TABLE `views` ADD INDEX `views_ibfk_4` (`catalogID`, `timeperiodID`);
+                                 - ALTER TABLE `views` ADD CONSTRAINT `views_ibfk_4` FOREIGN KEY (`catalogID`,`timeperiodID`) REFERENCES `timeperiods` (`catalogID`,`timeperiodID`);
+                               Help Plugin docs
+                               - update new help plugin doc file type 'http(s)://'
+                               SNMPTraps-Frontend for Nagios & ASNMTAP
+                               - UPDATE class.mysqlDB.php: replace 'INSERT INTO' with 'REPLACE INTO'
+                               XML plugin templates
+                               - UPDATE new command line option 'uKey'
+                               ASNMTAP::Asnmtap::Applications::CSV VARIABLES
+                               - UPDATE our @EVENTS = ('catalogID', 'id', 'uKey', 'replicationStatus', 'test', 'title', 'status', 'startDate', 'startTime', 'endDate', 'endTime', 'duration', 'statusMessage', 'perfdata', 'step', 'timeslot', 'instability', 'persistent', 'downtime', 'filename');
+                               views.pl
+                               - added 'Incident Monitoring Window'
+
+Version 3.002.001, 2010/07/28, by Alex Peeters
+                               ASNMTAP
+                               - NEW 'filter-option' to search
+                               - UPDATE cpan module SOAP::Lite to 0.710.08 (reported problems with 0.710.09 and later)
+                               - UPDATE cpan module WSRF::Lite to 0.8.2.7
+                               - UPDATE /applications/tools/mysql/asnmtap-3.002.001-database-schema.png
+                               - UPDATE create_ASNMTAP_jUnit_configuration_for_jUnit.pl
+                               - NEW autoinstall.sh
+                               - UPDATE Applications.cfg
+                                 - NEW 'EVENTSDISPLAYDATA    eventsDisplayData' between <TABLES>...</TABLES>
+                               - NEW module ASNMTAP::PseudoHash for making perl 5.10 compatibility
+                                     replace 'use fields' with 'use ASNMTAP::PseudoHash'
+                                     replace 'fields::phash' with 'ASNMTAP::PseudoHash'
+                               - UPDATE comments.pl -> html code optimalisation
+                               - UPDATE display.pl -> debug: toggleDiv(), pop-up: overlib() & pop-down: nd()
+                                 - NEW $trigger, to speedup the display generation: fase I
+                               - UPDATE trendlineCorrectionReports.pl -> faster SQL queries
+                               - UPDATE TABLE `displayDaemons` for MySQL'
+                                 - ALTER TABLE `displayDaemons` ADD COLUMN `trigger` char(1) NOT NULL default 'F' AFTER `loop`;
+                               - UPDATE TABLE `eventsChangesLogData` for MySQL'
+                                 - ALTER TABLE `eventsChangesLogData` ADD COLUMN `posTimeslot` INT(11) NOT NULL default '9' AFTER prevTimeslot;
+                               - NEW TABLE `eventsDisplayData` for MySQL'
+                                 - CREATE TABLE `eventsDisplayData` (
+                                 -   `catalogID` varchar(5) NOT NULL default 'CID',
+                                 -   `posTimeslot` int(11) NOT NULL DEFAULT '0',
+                                 -   `uKey` varchar(11) NOT NULL default '',
+                                 -   `replicationStatus` ENUM('I','U','R') NOT NULL DEFAULT 'I',
+                                 -   `test` varchar(512) NOT NULL default '',
+                                 -   `title` varchar(75) NOT NULL default '',
+                                 -   `status` varchar(9) NOT NULL default '',
+                                 -   `startDate` date NOT NULL default '0000-00-00',
+                                 -   `startTime` time NOT NULL default '00:00:00',
+                                 -   `endDate` date NOT NULL default '0000-00-00',
+                                 -   `endTime` time NOT NULL default '00:00:00',
+                                 -   `duration` time NOT NULL default '00:00:00',
+                                 -   `statusMessage` varchar(1024) NOT NULL default '',
+                                 -   `step` smallint(6) NOT NULL default '0',
+                                 -   `timeslot` varchar(10) NOT NULL default '',
+                                 -   `instability` tinyint(1) NOT NULL default '9',
+                                 -   `persistent` tinyint(1) NOT NULL default '9',
+                                 -   `downtime` tinyint(1) NOT NULL default '9',
+                                 -   `filename` varchar(254) default '',
+                                 -   PRIMARY KEY (`catalogID`,`uKey`,`posTimeslot`),
+                                 -   KEY `catalogID` (`catalogID`),
+                                 -   KEY `uKey` (`uKey`),
+                                 -   KEY `posTimeslot` (`posTimeslot`),
+                                 -   KEY `replicationStatus` (`replicationStatus`),
+                                 -   KEY `eventsDisplayData_ibfk_1` (`catalogID`,`uKey`),
+                                 -   CONSTRAINT `eventsDisplayData_ibfk_1` FOREIGN KEY (`catalogID`,`uKey`) REFERENCES `plugins` (`catalogID`,`uKey`)
+                                 - ) ENGINE=InnoDB;
+                               - NEW TRIGGER `eventsDisplayData` for MySQL: asnmtap-3.002.001_mysql-v5.0.x-trigger-eventsDisplayData.sql
+
+Version 3.001.003, 2010/03/10, by Alex Peeters
+                               - NEW applications/log4perl.cnf
+                               - NEW CPAN module DBD::CSV & Text::CSV added to Makefile.PL
+                               - NEW CPAN module Log::Dispatch, Log::Dispatch::FileRotate, Log::Log4perl & DBIx::Log4perl added to Makefile.PL
+                                 - tar -P -cvzf cpan-20100211.tgz /opt/monitoring/bin /opt/monitoring/lib /opt/monitoring/man
+                               - NEW applications/log4perl.cnf config file for Log::Log4perl
+                               - NEW integration for Cartography (applications/custom/cartography.pm-orig) into display.pl
+                               ASNMTAP::Asnmtap::Plugins::Nagios
+                               - NEW check_pargs.pl
+                               ASNMTAP::Asnmtap::Pluggins::WebTransact.pm
+                                 - NEW option for check () keepAlive = [01]
+                               ASNMTAP::Asnmtap::Applications::CGI.pm & archiver.pl
+                               - DEPRECATED $SERVERMYSQLVERSION = '4.x'
+                                 - Applications.cnf
+                                   #<DATABASE_ACCOUNT>
+                                   #  <SERVER>
+                                   #    VERSION         5.0.x                  # '5.0.x' or '5.1.x'
+                                   #    ...
+                                   #  </SERVER>
+                               - Applications.pm
+                                 - init_email_report()
+                                   - ADDED select((select($EMAILREPORT), $| = 1)[0]); # autoflush
+                               - archive.pl
+                                 - NEW function CSV_import_from_table
+                               - collector.pl
+                                 - NEW function CSV_prepare_table
+                                 - NEW function CSV_insert_into_table
+                                 - NEW function CSV_cleanup_table
+                                 - NEW TIMING OUT SLOW PLUGIN
+                                 - NEW ERROR NOT DEFINED - contact server administrators
+                                 - PLUGIN '$msgCommand.pl' doesn't exist - contact administrators
+                               - archive.pl collector.pl, importDataThroughCatalog.pl, generateReports.pl & holidayBundleSetDowntimes.pl
+                                 - NEW function LOG_init_log4perl
+                               - collector.pl & importDataThroughCatalog.pl
+                                 - NEW functions DBI_connect, DBI_do and DBI_execute
+                               - display.pl
+                                 - ADDED CLOSECLICK & STICKY to force users to click on "Close" to close sticky popups
+                               - RSYNC
+                                 TODO --exclude=*-status.txt
+
+Version 3.001.002, 2010/01/05, by Alex Peeters
+                               - NEW record_navigation_bar_alpha
+                                 - change all record id > 0 for the 'auto_increment'
+								                   '1' into this example, verify first and if needed replace '1' with correct value
+						                		   at 'displayGroups, holidaysBundle, reports & timeperiods'
+                                   holidaysBundle:
+                                   ---------------
+                                   ALTER TABLE `plugins`          CHANGE COLUMN `holidayBundleID` `holidayBundleID` int(11) default '1'
+                                   SET FOREIGN_KEY_CHECKS=0
+                                   UPDATE  `holidaysBundle`       SET `holidayBundleID` = '1'      where `holidayBundleID` = '0'
+                                   UPDATE  `plugins`              SET `holidayBundleID` = '1'      where `holidayBundleID` = '0'
+                                   SET FOREIGN_KEY_CHECKS=1
+                                   displayGroups:
+                                   --------------
+                                   ALTER TABLE `views`            CHANGE COLUMN `displayGroupID`  `displayGroupID` int(11) NOT NULL default '1'
+                                   UPDATE  `views`                SET `displayGroupID` = '1'       where `displayGroupID` = '0'
+                                   UPDATE  `displayGroups`        SET `displayGroupID` = '1'       where `displayGroupID` = '0'
+                                 - create new index
+                                   ALTER TABLE `catalog`          ADD INDEX `catalogName` (`catalogName`)
+                                   ALTER TABLE `collectorDaemons` ADD INDEX `collectorDaemon` (`collectorDaemon`)
+                                   ALTER TABLE `countries`        ADD INDEX `countryName` (`countryName`)
+                                   ALTER TABLE `displayDaemons`   ADD INDEX `displayDaemon` (`displayDaemon`)
+                                   ALTER TABLE `displayGroups`    ADD INDEX `groupTitle` (`groupTitle`)
+                                   ALTER TABLE `holidays`         ADD INDEX `holiday` (`holiday`)
+                                   ALTER TABLE `holidaysBundle`   ADD INDEX `holidayBundleName` (`holidayBundleName`)
+                                   ALTER TABLE `language`         ADD INDEX `languageName` (`languageName`)
+                                   ALTER TABLE `pagedirs`         ADD INDEX `pagedir` (`pagedir`)
+                                   ALTER TABLE `reports`          ADD INDEX `reportTitle` (`reportTitle`)
+                                   ALTER TABLE `resultsdir`       ADD INDEX `groupName` (`groupName`)
+                                   ALTER TABLE `servers`          ADD INDEX `serverTitle` (`serverTitle`)
+                                   ALTER TABLE `timeperiods`      ADD INDEX `timeperiodName` (`timeperiodName`)
+                                   ALTER TABLE `users`            ADD INDEX `remoteUser` (`remoteUser`)
+                               - NEW importDataThroughCatalog.sh and importDataThroughCatalog.pl
+                                   ALTER TABLE `displayGroups`  DROP INDEX `displayGroupID`,  ADD INDEX `displayGroupID` (`displayGroupID`)
+                                   ALTER TABLE `holidaysBundle` DROP INDEX `holidayBundleID`, ADD INDEX `holidayBundleID` (`holidayBundleID`)
+                                   ALTER TABLE `reports`        DROP INDEX `id`,              ADD INDEX `id` (`id`)
+                                   ALTER TABLE `timeperiods`    DROP INDEX `timeperiodID`,    ADD INDEX `timeperiodID` (`timeperiodID`)
+                               - NEW asnmtap-importDataThroughCatalog.sh and root-importDataThroughCatalog.sh
+                               - NEW integration for SDE (applications/custom/sde.pm-orig) into display.pl
+                               - NEW catalog.pl
+                               - UPDATE rsync 3.06 compatible
+                               - UPDATE autogenerated rsync *.conf with --exclude *.sql
+                               - UPDATE autogenerated 'Collector Start/Stop scripts' optimalisation
+                               - UPDATE runStatusOnDemand.pl with follow up for importDataThroughCatalog.pid
+                               - UPDATE optimalisation display.pl regarding encode html entities for the 'statusMessage'
+                               - UPDATE archive.pl, check_SNMPTT_probe.pl, check_snmptt_traps.pl, check_jUnit.pl & snmptt_traps_remove_pending_and_duplicated.pl
+							                     'INSERT INTO' with 'REPLACE INTO' before 'DELETE'
+
+Version 3.001.001, 2009/10/23, by Alex Peeters
+                               - UPDATE /applications/tools/mysql/asnmtap-3.001.001-database-schema.png
+                               - UPDATE TABLE `events` for MySQL
+                                 - MySQL 4.x
+                                   - SELECT CONCAT('alter table ', TABLE_SCHEMA , '.', table_name, ' MODIFY `test` varchar(254) NOT NULL default \'\';') FROM INFORMATION_SCHEMA.tables WHERE ENGINE = 'MYISAM' AND table_type='BASE TABLE' AND table_name regexp 'events_';
+                                     - TO GENERATE THE NEXT CODE FOR ALL YEARS
+                                       - ALTER TABLE `events_yyyy_01` MODIFY `test` varchar(254) NOT NULL default '';
+                                         ...
+                                       - ALTER TABLE `events_yyyy_12` MODIFY `test` varchar(254) NOT NULL default '';
+                                 - MySQL 5.0.x
+                                   - SELECT CONCAT('alter table ', TABLE_SCHEMA , '.', table_name, ' MODIFY `test` varchar(512) NOT NULL default \'\';') FROM INFORMATION_SCHEMA.tables WHERE ENGINE = 'MYISAM' AND table_type='BASE TABLE' AND table_name regexp 'events_';
+                                     - TO GENERATE THE NEXT CODE FOR ALL YEARS
+                                       - ALTER TABLE `events_yyyy_01` MODIFY `test` varchar(512) NOT NULL default '';
+                                         ...
+                                       - ALTER TABLE `events_yyyy_12` MODIFY `test` varchar(512) NOT NULL default '';
+                                 - MySQL 4.x & MySQL 5.0.x
+                                   - DROP TABLE `events_yyyy`;
+                                   - CREATE TABLE IF NOT EXISTS `events_yyyy` LIKE `events_yyyy_01`;
+                                   - ALTER TABLE `events_yyyy` ENGINE=MERGE UNION=(`events_yyyy_01`, `events_yyyy_02`, `events_yyyy_03`, `events_yyyy_04`, `events_yyyy_05`, `events_yyyy_06`, `events_yyyy_07`, `events_yyyy_08`, `events_yyyy_09`, `events_yyyy_10`, `events_yyyy_11`, `events_yyyy_12`) INSERT_METHOD=LAST;
+
+                                   - DROP TABLE `events_yyyy_Q1`;
+                                   - CREATE TABLE IF NOT EXISTS `events_yyyy_Q1` LIKE `events_yyyy_01`;
+                                   - ALTER TABLE `events_yyyy_Q1` ENGINE=MERGE UNION=(`events_yyyy_01`, `events_yyyy_02`, `events_yyyy_03`) INSERT_METHOD=LAST;
+
+                                   - DROP TABLE `events_yyyy_Q2`;
+                                   - CREATE TABLE IF NOT EXISTS `events_yyyy_Q2` LIKE `events_yyyy_04`;
+                                   - ALTER TABLE `events_yyyy_Q2` ENGINE=MERGE UNION=(`events_yyyy_04`, `events_yyyy_05`, `events_yyyy_06`) INSERT_METHOD=LAST;
+
+                                   - DROP TABLE `events_yyyy_Q3`;
+                                   - CREATE TABLE IF NOT EXISTS `events_yyyy_Q3` LIKE `events_yyyy_07`;
+                                   - ALTER TABLE `events_yyyy_Q3` ENGINE=MERGE UNION=(`events_yyyy_07`, `events_yyyy_08`, `events_yyyy_09`) INSERT_METHOD=LAST;
+
+                                   - DROP TABLE `events_yyyy_Q4`;
+                                   - CREATE TABLE IF NOT EXISTS `events_yyyy_Q4` LIKE `events_yyyy_10`;
+                                   - ALTER TABLE `events_yyyy_Q4` ENGINE=MERGE UNION=(`events_yyyy_10`, `events_yyyy_11`, `events_yyyy_12`) INSERT_METHOD=LAST;
+                               - UPDATE generateConfig.pl for the autogeneration from: asnmtap-collector.sh
+                                 - when there are servers configurated in failover
+                                   - onto the active server: only the file 'Display-<pagedir>.sh' and 'Collector-<deamon>.sh' are included
+                                   - onto both servers: are both files 'CollectorCT-<deamon>.sh' included when <deamon> eq <hostname>
+                               - UPDATE generateConfig.pl for the autogeneration from: rsync-wrapper-failover-<hostname>.sh & rsync-mirror-failover-<admin collector>.sh
+
+Version 3.001.000, 2009/10/03, by Alex Peeters
+                               - ASNMTAP: CATALOG databaseschema implementation
+                                 # `catalogID` =~ 'CID', aanpassen AUB
+                                 - UPDATE /applications/Applications.cfg
+                                   #<DATABASE>
+                                   ...
+                                   #    CATALOGID        CID
+                                   #</DATABASE>
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.001.000.sql
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.001.000_mysql-v5.0.x.sql
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.001.000-distributed.sql
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.001.000-distributed_mysql-v5.0.x.sql
+                                   - insert into `holidaysBundle` (`holidayBundleID`,`holidayBundleName`,`holidayID`,`countryID`,`activated`) values (0,'ASNMTAP','/0-0-0-0-00/','BE',0);
+                                   - manualy update holidayBundleID to '?' for holidayBundleName = 'ASNMTAP' and holidayID = '/0-0-0-0-00/' !
+                                     where '?' is a not used holidayBundleID <> '0'
+
+                                   - NEW TABLE `catalog` for MySQL'
+                                     CREATE TABLE `catalog` (
+                                       `catalogID` varchar(5) NOT NULL default 'CID',
+                                       `catalogName` varchar(64) NOT NULL default '',
+                                       `catalogType` ENUM('central','federated','probe','distributed') NOT NULL DEFAULT 'probe',
+                                       `databaseFQDN` varchar(64) NOT NULL default 'localhost',
+                                       `databasePort` varchar(4) NOT NULL default '3306',
+                                       `lastEventsID` int(11) NOT NULL default '0',
+                                       `lastCommentsID` int(11) NOT NULL default '0',
+                                       `activated` tinyint(1) NOT NULL default '0',
+                                       PRIMARY KEY (`catalogID`)
+                                     ) ENGINE=InnoDB;
+
+                                     - insert into `catalog` (`catalogID`,`catalogName`,`catalogType`,`databaseFQDN`,`databasePort`,`lastEventsID`,`lastCommentsID`,`activated`) values ('CID','Central System Enterprise','central','localhost','3306',0,0,1);
+
+                                   - UPDATE TABLE `servers` for MySQL'
+                                     - ALTER TABLE `servers` ADD COLUMN `typeActiveServer` char(1) NOT NULL DEFAULT 'M' AFTER `typeMonitoring`;
+
+                                   # ------------------------------------
+                                   - ALTER TABLE `collectorDaemons` DROP FOREIGN KEY `collectorDaemons_ibfk_2`;
+                                   - ALTER TABLE `comments` DROP FOREIGN KEY `comments_ibfk_1`;
+                                   - ALTER TABLE `comments` DROP FOREIGN KEY `comments_ibfk_2`;
+                                   - ALTER TABLE `crontabs` DROP FOREIGN KEY `crontabs_ibfk_1`;
+                                   - ALTER TABLE `crontabs` DROP FOREIGN KEY `crontabs_ibfk_2`;
+                                   - ALTER TABLE `displayDaemons` DROP FOREIGN KEY `displayDaemons_ibfk_1`;
+                                   - ALTER TABLE `displayDaemons` DROP FOREIGN KEY `displayDaemons_ibfk_2`;
+                                   - ALTER TABLE `holidays` DROP FOREIGN KEY `holidays_ibfk_1`;
+                                   - ALTER TABLE `holidaysBundle` DROP FOREIGN KEY `holidaysBundle_ibfk_1`;
+                                   - ALTER TABLE `plugins` DROP FOREIGN KEY `plugins_ibfk_1`;
+                                   - ALTER TABLE `reports` DROP FOREIGN KEY `reports_ibfk_1`;
+                                   - ALTER TABLE `reports` DROP FOREIGN KEY `reports_ibfk_2`;
+                                   - ALTER TABLE `users` DROP FOREIGN KEY `users_ibfk_1`;
+                                   - ALTER TABLE `views` DROP FOREIGN KEY `views_ibfk_1`;
+                                   - ALTER TABLE `views` DROP FOREIGN KEY `views_ibfk_2`;
+                                   - ALTER TABLE `views` DROP FOREIGN KEY `views_ibfk_3`;
+
+                                   # ------------------------------------
+
+                                   - ALTER TABLE `collectorDaemons` DROP PRIMARY KEY;
+	                                 - ALTER TABLE `collectorDaemons` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `collectorDaemons` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `collectorDaemons` ADD PRIMARY KEY (`catalogID`,`collectorDaemon`);
+
+                                   - ALTER TABLE `comments` ADD UNIQUE KEY `id` (`id`);
+                                   - ALTER TABLE `comments` DROP PRIMARY KEY;
+                                   - ALTER TABLE `comments` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `comments` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `comments` ADD PRIMARY KEY (`catalogID`,`id`);
+                                   - ALTER TABLE `comments` ADD COLUMN `replicationStatus` ENUM('I','U','R') NOT NULL DEFAULT 'I' AFTER `uKey`;
+                                   - ALTER TABLE `comments` ADD INDEX `replicationStatus` (`replicationStatus`);
+
+                                   - ALTER TABLE `comments_yyyy` ADD UNIQUE KEY `id` (`id`);
+                                   - ALTER TABLE `comments_yyyy` DROP PRIMARY KEY;
+                                   - ALTER TABLE `comments_yyyy` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `comments_yyyy` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `comments_yyyy` ADD PRIMARY KEY (`catalogID`,`id`);
+                                   - ALTER TABLE `comments_yyyy` ADD COLUMN `replicationStatus` ENUM('I','U','R') NOT NULL DEFAULT 'I' AFTER `uKey`;
+                                   - ALTER TABLE `comments_yyyy` ADD INDEX `replicationStatus` (`replicationStatus`);
+
+                                   - ALTER TABLE `crontabs` DROP PRIMARY KEY;
+                                   - ALTER TABLE `crontabs` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `crontabs` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `crontabs` ADD PRIMARY KEY (`catalogID`,`lineNumber`,`uKey`);
+
+                                   - ALTER TABLE `displayDaemons` DROP PRIMARY KEY;
+                                   - ALTER TABLE `displayDaemons` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `displayDaemons` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `displayDaemons` ADD PRIMARY KEY (`catalogID`,`displayDaemon`);
+                                   - ALTER TABLE `displayDaemons` DROP KEY `pagedir`;
+                                   - ALTER TABLE `displayDaemons` ADD UNIQUE KEY `pagedir` (`catalogID`,`pagedir`);
+
+                                   - ALTER TABLE `displayGroups` ADD UNIQUE KEY `displayGroupID` (`displayGroupID`);
+                                   - ALTER TABLE `displayGroups` DROP PRIMARY KEY;
+                                   - ALTER TABLE `displayGroups` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `displayGroups` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `displayGroups` ADD PRIMARY KEY (`catalogID`,`displayGroupID`);
+
+                                   - ALTER TABLE `eventsChangesLogData` DROP PRIMARY KEY;
+                                   - ALTER TABLE `eventsChangesLogData` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `eventsChangesLogData` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `eventsChangesLogData` ADD INDEX `uKey` (`uKey`);
+                                   - ALTER TABLE `eventsChangesLogData` ADD PRIMARY KEY (`catalogID`,`uKey`);
+                                   - ALTER TABLE `eventsChangesLogData` ADD COLUMN `replicationStatus` ENUM('I','U','R') NOT NULL DEFAULT 'I' AFTER `uKey`;
+                                   - ALTER TABLE `eventsChangesLogData` ADD INDEX `replicationStatus` (`replicationStatus`);
+
+                                   - ALTER TABLE `holidays` DROP PRIMARY KEY;
+                                   - ALTER TABLE `holidays` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `holidays` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `holidays` ADD PRIMARY KEY (`catalogID`,`holidayID`);
+
+                                   - ALTER TABLE `holidaysBundle` ADD UNIQUE KEY `holidayBundleID` (`holidayBundleID`);
+                                   - ALTER TABLE `holidaysBundle` DROP PRIMARY KEY;
+                                   - ALTER TABLE `holidaysBundle` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `holidaysBundle` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `holidaysBundle` ADD PRIMARY KEY (`catalogID`,`holidayBundleID`);
+
+                                   - ALTER TABLE `pagedirs` DROP PRIMARY KEY;
+                                   - ALTER TABLE `pagedirs` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `pagedirs` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `pagedirs` ADD PRIMARY KEY (`catalogID`,`pagedir`);
+
+                                   - ALTER TABLE `plugins` DROP PRIMARY KEY;
+                                   - ALTER TABLE `plugins` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `plugins` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `plugins` ADD INDEX `uKey` (`uKey`);
+                                   - ALTER TABLE `plugins` ADD PRIMARY KEY (`catalogID`,`uKey`);
+
+                                   - ALTER TABLE `reports` ADD UNIQUE KEY `id` (`id`);
+                                   - ALTER TABLE `reports` DROP PRIMARY KEY;
+                                   - ALTER TABLE `reports` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `reports` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `reports` ADD PRIMARY KEY (`catalogID`,`id`);
+
+                                   - ALTER TABLE `reports_perfdata` DROP PRIMARY KEY;
+                                   - ALTER TABLE `reports_perfdata` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `reports_perfdata` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `reports_perfdata` ADD PRIMARY KEY (`catalogID`,`uKey`,`metric_id`);
+
+                                   - ALTER TABLE `resultsdir` DROP PRIMARY KEY;
+                                   - ALTER TABLE `resultsdir` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `resultsdir` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `resultsdir` ADD PRIMARY KEY (`catalogID`,`resultsdir`);
+
+                                   - ALTER TABLE `servers` DROP PRIMARY KEY;
+                                   - ALTER TABLE `servers` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `servers` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `servers` ADD PRIMARY KEY (`catalogID`,`serverID`);
+
+                                   - ALTER TABLE `timeperiods` ADD UNIQUE KEY `timeperiodID` (`timeperiodID`);
+                                   - ALTER TABLE `timeperiods` DROP PRIMARY KEY;
+                                   - ALTER TABLE `timeperiods` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `timeperiods` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `timeperiods` ADD PRIMARY KEY (`catalogID`,`timeperiodID`);
+
+                                   - ALTER TABLE `users` DROP PRIMARY KEY;
+                                   - ALTER TABLE `users` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `users` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `users` ADD PRIMARY KEY (`catalogID`,`remoteUser`);
+
+                                   - ALTER TABLE `views` DROP PRIMARY KEY;
+                                   - ALTER TABLE `views` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `views` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `views` ADD PRIMARY KEY (`catalogID`,`uKey`,`displayDaemon`);
+
+                                   # ------------------------------------
+
+                                   - ALTER TABLE `collectorDaemons` ADD CONSTRAINT `collectorDaemons_ibfk_1` FOREIGN KEY (`catalogID`,`serverID`) REFERENCES `servers` (`catalogID`,`serverID`);
+                                   - ALTER TABLE `comments` ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`catalogID`,`uKey`) REFERENCES `plugins` (`catalogID`,`uKey`);
+                                   - ALTER TABLE `comments` ADD CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`catalogID`,`remoteUser`) REFERENCES `users` (`catalogID`,`remoteUser`);
+                                   - ALTER TABLE `crontabs` ADD CONSTRAINT `crontabs_ibfk_1` FOREIGN KEY (`catalogID`,`collectorDaemon`) REFERENCES `collectorDaemons` (`catalogID`,`collectorDaemon`);
+                                   - ALTER TABLE `crontabs` ADD CONSTRAINT `crontabs_ibfk_2` FOREIGN KEY (`catalogID`,`uKey`) REFERENCES `plugins` (`catalogID`,`uKey`);
+                                   - ALTER TABLE `displayDaemons` ADD CONSTRAINT `displayDaemons_ibfk_1` FOREIGN KEY (`catalogID`,`pagedir`) REFERENCES `pagedirs` (`catalogID`,`pagedir`);
+                                   - ALTER TABLE `displayDaemons` ADD CONSTRAINT `displayDaemons_ibfk_2` FOREIGN KEY (`catalogID`,`serverID`) REFERENCES `servers` (`catalogID`,`serverID`);
+                                   - ALTER TABLE `eventsChangesLogData` ADD INDEX `eventsChangesLogData_ibfk_1` (`catalogID`,`uKey`);
+                                   - ALTER TABLE `eventsChangesLogData` ADD CONSTRAINT `eventsChangesLogData_ibfk_1` FOREIGN KEY (`catalogID`,`uKey`) REFERENCES `plugins` (`catalogID`,`uKey`);
+                                   - ALTER TABLE `holidays` ADD CONSTRAINT `holidays_ibfk_1` FOREIGN KEY (`countryID`) REFERENCES `countries` (`countryID`);
+                                   - ALTER TABLE `holidaysBundle` ADD CONSTRAINT `holidaysBundle_ibfk_1` FOREIGN KEY (`countryID`) REFERENCES `countries` (`countryID`);
+                                   - ALTER TABLE `plugins` ADD CONSTRAINT `plugins_ibfk_1` FOREIGN KEY (`catalogID`,`resultsdir`) REFERENCES `resultsdir` (`catalogID`,`resultsdir`);
+                                   - ALTER TABLE `plugins` ADD INDEX `plugins_ibfk_2` (`catalogID`,`holidayBundleID`);
+                                   - ALTER TABLE `plugins` ADD CONSTRAINT `plugins_ibfk_2` FOREIGN KEY (`catalogID`,`holidayBundleID`) REFERENCES `holidaysBundle` (`catalogID`,`holidayBundleID`);
+                                   - ALTER TABLE `reports` ADD CONSTRAINT `reports_ibfk_1` FOREIGN KEY (`catalogID`,`uKey`) REFERENCES `plugins` (`catalogID`,`uKey`);
+                                   - ALTER TABLE `reports` ADD CONSTRAINT `reports_ibfk_2` FOREIGN KEY (`catalogID`,`timeperiodID`) REFERENCES `timeperiods` (`catalogID`,`timeperiodID`);
+                                   - ALTER TABLE `reports_perfdata` ADD CONSTRAINT `reports_perfdata_ibfk_1` FOREIGN KEY (`catalogID`,`uKey`) REFERENCES `plugins` (`catalogID`,`uKey`);
+                                   - ALTER TABLE `titles` ADD CONSTRAINT `titles_ibfk_1` FOREIGN KEY (`keyLanguage`) REFERENCES `language` (`keyLanguage`);
+                                   - ALTER TABLE `users` ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`keyLanguage`) REFERENCES `language` (`keyLanguage`);
+                                   - ALTER TABLE `views` ADD CONSTRAINT `views_ibfk_1` FOREIGN KEY (`catalogID`,`displayDaemon`) REFERENCES `displayDaemons` (`catalogID`,`displayDaemon`);
+                                   - ALTER TABLE `views` ADD CONSTRAINT `views_ibfk_2` FOREIGN KEY (`catalogID`,`displayGroupID`) REFERENCES `displayGroups` (`catalogID`,`displayGroupID`);
+                                   - ALTER TABLE `views` ADD CONSTRAINT `views_ibfk_3` FOREIGN KEY (`catalogID`,`uKey`) REFERENCES `plugins` (`catalogID`,`uKey`);
+
+                                   # ------------------------------------
+                                   # START HIGH IMPACT !
+                                   # ------------------------------------
+
+                                   - ALTER TABLE `events` ADD UNIQUE KEY `id` (`id`);
+                                   - ALTER TABLE `events` DROP PRIMARY KEY;
+                                   - ALTER TABLE `events` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                   - ALTER TABLE `events` ADD INDEX `catalogID` (`catalogID`);
+                                   - ALTER TABLE `events` ADD PRIMARY KEY (`catalogID`,`id`);
+                                   - ALTER TABLE `events` ADD COLUMN `replicationStatus` ENUM('I','U','R') NOT NULL DEFAULT 'I' AFTER `uKey`;
+                                   - ALTER TABLE `events` ADD INDEX `replicationStatus` (`replicationStatus`);
+                                   - ALTER TABLE `events` ADD INDEX `events_ibfk_1` (`catalogID`,`uKey`);
+                                   - ALTER TABLE `events` ADD CONSTRAINT `events_ibfk_2` FOREIGN KEY (`catalogID`,`uKey`) REFERENCES `plugins` (`catalogID`,`uKey`);
+
+                                   # ------------------------------------
+                                   # END HIGH IMPACT !
+                                   # ------------------------------------
+
+                                   - SELECT CONCAT('alter table ', TABLE_SCHEMA , '.', table_name, ' ADD UNIQUE INDEX `id` (`id`), DROP PRIMARY KEY, ADD COLUMN `catalogID` varchar(5) NOT NULL default \'CID\' FIRST, ADD INDEX `catalogID` (`catalogID`), ADD PRIMARY KEY (`catalogID`,`id`), ADD COLUMN `replicationStatus` ENUM(\'I\',\'U\',\'R\') NOT NULL DEFAULT \'I\' AFTER `uKey`, ADD INDEX `replicationStatus` (`replicationStatus`), ADD INDEX `events_ibfk_1` (`catalogID`,`uKey`);') FROM INFORMATION_SCHEMA.tables WHERE ENGINE = 'MYISAM' AND table_type='BASE TABLE' AND table_name regexp 'events_';
+                                     - TO GENERATE THE NEXT CODE FOR ALL YEARS
+                                       - ALTER TABLE `events_yyyy_01` ADD UNIQUE INDEX `id` (`id`);
+                                       - ALTER TABLE `events_yyyy_01` DROP PRIMARY KEY;
+                                       - ALTER TABLE `events_yyyy_01` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                       - ALTER TABLE `events_yyyy_01` ADD INDEX `catalogID` (`catalogID`);
+                                       - ALTER TABLE `events_yyyy_01` ADD COLUMN `replicationStatus` ENUM('I','U','R') NOT NULL DEFAULT 'I' AFTER `uKey`;
+                                       - ALTER TABLE `events_yyyy_01` ADD INDEX `replicationStatus` (`replicationStatus`);
+                                       - ALTER TABLE `events_yyyy_01` ADD PRIMARY KEY (`catalogID`,`id`);
+                                       - ALTER TABLE `events_yyyy_01` ADD INDEX `events_ibfk_1` (`catalogID`,`uKey`);
+                                         ...
+                                       - ALTER TABLE `events_yyyy_12` ADD UNIQUE INDEX `id` (`id`);
+                                       - ALTER TABLE `events_yyyy_12` DROP PRIMARY KEY;
+                                       - ALTER TABLE `events_yyyy_12` ADD COLUMN `catalogID` varchar(5) NOT NULL default 'CID' FIRST;
+                                       - ALTER TABLE `events_yyyy_12` ADD INDEX `catalogID` (`catalogID`);
+                                       - ALTER TABLE `events_yyyy_12` ADD COLUMN `replicationStatus` ENUM('I','U','R') NOT NULL DEFAULT 'I' AFTER `uKey`;
+                                       - ALTER TABLE `events_yyyy_12` ADD INDEX `replicationStatus` (`replicationStatus`);
+                                       - ALTER TABLE `events_yyyy_12` ADD PRIMARY KEY (`catalogID`,`id`);
+                                       - ALTER TABLE `events_yyyy_12` ADD INDEX `events_ibfk_1` (`catalogID`,`uKey`);
+
+                                   - DROP TABLE `events_yyyy`;
+                                   - CREATE TABLE IF NOT EXISTS `events_yyyy` LIKE `events_yyyy_01`;
+                                   - ALTER TABLE `events_yyyy` ENGINE=MERGE UNION=(`events_yyyy_01`, `events_yyyy_02`, `events_yyyy_03`, `events_yyyy_04`, `events_yyyy_05`, `events_yyyy_06`, `events_yyyy_07`, `events_yyyy_08`, `events_yyyy_09`, `events_yyyy_10`, `events_yyyy_11`, `events_yyyy_12`) INSERT_METHOD=LAST;
+
+                                   - DROP TABLE `events_yyyy_Q1`;
+                                   - CREATE TABLE IF NOT EXISTS `events_yyyy_Q1` LIKE `events_yyyy_01`;
+                                   - ALTER TABLE `events_yyyy_Q1` ENGINE=MERGE UNION=(`events_yyyy_01`, `events_yyyy_02`, `events_yyyy_03`) INSERT_METHOD=LAST;
+
+                                   - DROP TABLE `events_yyyy_Q2`;
+                                   - CREATE TABLE IF NOT EXISTS `events_yyyy_Q2` LIKE `events_yyyy_04`;
+                                   - ALTER TABLE `events_yyyy_Q2` ENGINE=MERGE UNION=(`events_yyyy_04`, `events_yyyy_05`, `events_yyyy_06`) INSERT_METHOD=LAST;
+
+                                   - DROP TABLE `events_yyyy_Q3`;
+                                   - CREATE TABLE IF NOT EXISTS `events_yyyy_Q3` LIKE `events_yyyy_07`;
+                                   - ALTER TABLE `events_yyyy_Q3` ENGINE=MERGE UNION=(`events_yyyy_07`, `events_yyyy_08`, `events_yyyy_09`) INSERT_METHOD=LAST;
+
+                                   - DROP TABLE `events_yyyy_Q4`;
+                                   - CREATE TABLE IF NOT EXISTS `events_yyyy_Q4` LIKE `events_yyyy_10`;
+                                   - ALTER TABLE `events_yyyy_Q4` ENGINE=MERGE UNION=(`events_yyyy_10`, `events_yyyy_11`, `events_yyyy_12`) INSERT_METHOD=LAST;
+
+                                   # ------------------------------------
+
+                                   ArchiveCT, CollectorCT-* & DisplayCT-*
+                                   - replace '<uniqueKey>' with '[<catalogID>_]<uniqueKey>'
+
+								   Implemented catalogID to all *.pl & *.pm files
+
+                                   Plugin templates
+                                   - NEW WebTransact XML Monitoring plugin template for testing the 'Application Monitor' for Monitoring-1.2.xml
+                                     - check_template-mail-xml-fingerprint-xml-monitoring-1.2.pl
+                                     - check_template-WebTransact-XML-Monitoring-1.2.pl
+                                     - /dtd/Fingerprint-1.0-and-monitoring-1.2-xml-validator.html
+                                     - /dtd/Monitoring-1.2.dtd
+                                     - /xml/Monitoring-1.2.xml
+                                     - /xml/Monitoring-1.2-doNotValidate.xml
+                                     - /xml/Monitoring-1.2-errorParsing.xml
+
+Version 3.000.021, 2009/xx/yy, by Alex Peeters
+                               - ASNMTAP
+                                 - NEW /cgi-bin/moderator/downtimes.pl
+                                   Set downtimes by uploading of a uKey file
+                                 - NEW /plugins/templates/check_template-cluster.pl
+                                   - UPDATE applications/tools/mysql/asnmtap-3.000.021.sql
+                                   - UPDATE applications/tools/mysql/asnmtap-3.000.021_mysql-v5.0.x.sql
+                                   - UPDATE applications/tools/mysql/asnmtap-3.000.021-distributed.sql
+                                   - UPDATE applications/tools/mysql/asnmtap-3.000.021-distributed_mysql-v5.0.x.sql
+
+Version 3.000.020, 2009/04/19, by Alex Peeters
+                               - ASNMTAP
+	  	                         - UPDATE /plugins/templates/snmptt/
+								   - NEW check_SNMPTT_oracle.pl
+                                   - NEW snmptt-oracle.conf
+                                 - NEW %ICONSUNSTABLE = ('OK'=>'green-unstable.gif','WARNING'=>'yellow-unstable.gif','CRITICAL'=>'red-unstable.gif','UNKNOWN'=>'clear-unstable.gif','DEPENDENT'=>'','OFFLINE'=>'blue-unstable.gif','NO DATA'=>'purple-unstable.gif','IN PROGRESS'=>'running.gif','NO TEST'=>'notest-unstable.gif','TRENDLINE'=>'orange-unstable.gif');
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.000.020.sql
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.000.020_mysql-v5.0.x.sql
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.000.020-distributed.sql
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.000.020-distributed_mysql-v5.0.x.sql
+                                   - NEW TABLE `eventsChangesLogData` for MySQL'
+                                     CREATE TABLE `eventsChangesLogData` (
+                                       `uKey` varchar(11) NOT NULL default '',
+                                       `lastStatus` varchar(9) NOT NULL default '',
+                                       `lastTimeslot` varchar(10) NOT NULL default '',
+                                       `prevStatus` varchar(9) NOT NULL default '',
+                                       `prevTimeslot` varchar(10) NOT NULL default '',
+                                       PRIMARY KEY  (`uKey`)
+                                     ) ENGINE=InnoDB;
+                               - UPDATE create_weblogic_configuration_database_with_SNMP-3.000.020.SQL
+                               - UPDATE create_weblogic_configuration_database_with_SNMP-3.000.020_mysql-v5.0.x.SQL
+                                   - NEW TABLE `QUEUES` for MySQL'
+                                     CREATE TABLE `QUEUES` (
+                                       `QUEUE_NAME` varchar(64) NOT NULL default '',
+                                       `QUEUE_OID` varchar(254) default NULL,
+                                       `ENV` varchar(4) default NULL,
+                                       `ACTIVATED` tinyint(1) unsigned default '1',
+                                       `CURRENT_TIMESTAMP` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+                                       `VIRTUAL_CLUSTER_ID` int(11) unsigned NOT NULL default '0',
+                                       `UKEY` varchar(11) default NULL,
+                                       PRIMARY KEY  (`QUEUE_OID`,`QUEUE_NAME`),
+                                       KEY `VIRTUAL_CLUSTER_ID` (`VIRTUAL_CLUSTER_ID`),
+                                       KEY `QUEUE_NAME` (`QUEUE_NAME`),
+                                       KEY `UKEY` (`UKEY`)
+                                     ) ENGINE=MyISAM
+                               - UPDATE /applications/Applications.cfg
+                                 #<TABLES>
+                                 ...
+                                 #    EVENTSCHANGESLOGDATA eventsChangesLogData
+                                 ...
+                                 #  <UNSTABLE>
+                                 #    OK              green-unstable.gif
+                                 #    WARNING         yellow-unstable.gif
+                                 #    CRITICAL        red-unstable.gif
+                                 #    UNKNOWN         clear-unstable.gif
+                                 #    DEPENDENT       
+                                 #    OFFLINE         blue-unstable.gif
+                                 #    NO_DATA         purple-unstable.gif
+                                 #    IN_PROGRESS     running.gif
+                                 #    NO_TEST         notest-unstable.gif
+                                 #    TRENDLINE       orange-unstable.gif
+                                 #  </UNSTABLE>
+                               - UPDATE Applications.pm, CGI.PM, Collector.pm & Display.pm
+                                 - NEW $SERVERTABLEVENTSCHNGSLGDT -> ´eventsChangesLogData´
+                               - NEW WebTransact XML Monitoring plugin template for testing the 'Application Monitor' for Monitoring-1.1.xml
+                                 - check_template-WebTransact-XML-Monitoring-1.1.pl
+                               - NEW common variable RUNCMDONDEMAND to Asnmtap.cnf
+                                 # RUNCMDONDEMAND  localhost # localhost or probe
+
+Version 3.000.019, 2009/01/03, by Alex Peeters with contributions from Yves Van den Hove.
+                               - ASNMTAP
+                                 UPDATE '#!/bin/env perl' with '#!/usr/bin/env perl'
+                                 replace '[a-z|A-Z|0-9|-]' with '[a-zA-Z0-9-]'
+                               - plugins/templates
+                                 NEW /dtd/Monitoring-1.1.dtd
+                                 NEW /dtd/Fingerprint-1.0-and-monitoring-1.0-xml-validator.html
+                                 NEW /dtd/Fingerprint-1.0-and-monitoring-1.1-xml-validator.html
+                                 NEW /xml/Monitoring-1.1.xml
+                                 NEW /xml/Monitoring-1.1-doNotValidate.xml
+                                 NEW /xml/Monitoring-1.1-errorParsing.xml
+                               - /cgi-bin/runCmdOnDemand.pl
+                                 On Demand test now launched on the same probe as the collector that runs the test
+                               - check_MySQL-database-replication.pl
+                                 - Added Slave IO detection
+                               - /plugins/junit, making weblogic 10 compatible
+                                 - UPDATE check_jUnit.pl
+                                 - UPDATE create_ASNMTAP_jUnit_configuration_for_jUnit.pl
+                                 - UPDATE create_ASNMTAP_jUnit_configuration_for_jUnit-3.000.019_mysql.SQL
+                                 - UPDATE create_ASNMTAP_jUnit_configuration_for_jUnit-3.000.019_mysql-v5.0.x.SQL
+                                 - UPDATE TABLE `BASE_SERVICES` for 'MySQL'
+                                   - ALTER TABLE `BASE_SERVICES` CHANGE COLUMN `STATUS` `STATUS` enum('ASNMTAP','NEW','MAINTENANCE','EOL') NOT NULL default 'NEW';
+                                 - UPDATE TABLE `SERVER` for 'MySQL'
+                                   - ALTER TABLE `SERVER` ADD COLUMN `WEBLOGIC_VERSION` enum('8','10') default '10' AFTER `ENV`;
+                               - /plugins/snmptt
+                                 - UPDATE snmptt-3.000.019.sql
+                                 - UPDATE snmptt-3.000.019-v5.0.x.sql
+                                 - UPDATE TABLE `snmptt` for MySQL'
+                                   - ALTER TABLE `snmptt` ADD COLUMN `archivetime` timestamp(14) NOT NULL AFTER `uniqueProblem`;
+                                 - UPDATE TABLE `snmptt_unknown` for MySQL'
+                                   - ALTER TABLE `snmptt_unknown` ADD COLUMN `archivetime` timestamp(14) NOT NULL AFTER `trapread`;
+                                 - UPDATE TABLE `snmptt_unknown_archive` for MySQL'
+                                   - ALTER TABLE `snmptt_unknown_archive` ADD COLUMN `archivetime` timestamp(14) NOT NULL AFTER `trapread`;
+                                 - UPDATE TABLE `snmptt_archive` for MySQL'
+                                   - ALTER TABLE `snmptt_archive` ADD COLUMN `archivetime` timestamp(14) NOT NULL AFTER `uniqueProblem`;
+                               - added comment type 'masterASNMTAP_PATH' & 'slaveASNMTAP_PATH' to servers.pl
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.000.019.sql
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.000.019_mysql-v5.0.x.sql
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.000.019-distributed.sql
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.000.019-distributed_mysql-v5.0.x.sql
+                                 - UPDATE TABLE `servers` for MySQL'
+                                   - ALTER TABLE `servers` ADD COLUMN `masterASNMTAP_PATH` varchar(64) NOT NULL default '/opt/asnmtap' AFTER `masterFQDN`, ADD COLUMN `slaveASNMTAP_PATH` varchar(64) NOT NULL default '/opt/asnmtap' AFTER `slaveFQDN`;
+                                   - ALTER TABLE `servers` ADD COLUMN `masterSSH_PATH` varchar(64) NOT NULL default '/usr/bin' AFTER `masterASNMTAP_PATH`, ADD COLUMN `slaveSSH_PATH` varchar(64) NOT NULL default '/usr/bin' AFTER `slaveASNMTAP_PATH`;
+                                   - ALTER TABLE `servers` ADD COLUMN `masterRSYNC_PATH` varchar(64) NOT NULL default '/usr/local/bin' AFTER `masterASNMTAP_PATH`, ADD COLUMN `slaveRSYNC_PATH` varchar(64) NOT NULL default '/usr/local/bin' AFTER `slaveASNMTAP_PATH`;
+                               - added comment type 'instability' to archiver.pl, display.pl, collector.pl, comments.pl & detailedStatisticsReportGenerationAndCompareResponsetimeTrends.pl
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.000.019.sql
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.000.019_mysql-v5.0.x.sql
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.000.019-distributed.sql
+                                 - UPDATE /applications/tools/mysql/asnmtap-3.000.019-distributed_mysql-v5.0.x.sql
+                                 - UPDATE TABLE `events`, `events_yyyy_mm` & `events_Qx`  for MySQL'
+                                   - ALTER TABLE `events` ADD COLUMN `instability` tinyint(1) NOT NULL default '9' AFTER `timeslot`;
+                                   - ALTER TABLE `events_2008_01` ADD COLUMN `instability` tinyint(1) NOT NULL default '9' AFTER `timeslot`;
+                                     ...
+                                   - ALTER TABLE `events_2008_12` ADD COLUMN `instability` tinyint(1) NOT NULL default '9' AFTER `timeslot`;
+
+                                   - DROP TABLE `events_2008`;
+                                   - CREATE TABLE IF NOT EXISTS `events_2008` LIKE `events_2008_01`;
+                                   - ALTER TABLE `events_2008` ENGINE=MERGE UNION=(`events_2008_01`, `events_2008_02`, `events_2008_03`, `events_2008_04`, `events_2008_05`, `events_2008_06`, `events_2008_07`, `events_2008_08`, `events_2008_09`, `events_2008_10`, `events_2008_11`, `events_2008_12`) INSERT_METHOD=LAST;
+
+                                   - DROP TABLE `events_2008_Q1`;
+                                   - CREATE TABLE IF NOT EXISTS `events_2008_Q1` LIKE `events_2008_01`;
+                                   - ALTER TABLE `events_2008_Q1` ENGINE=MERGE UNION=(`events_2008_01`, `events_2008_02`, `events_2008_03`) INSERT_METHOD=LAST;
+
+                                   - DROP TABLE `events_2008_Q2`;
+                                   - CREATE TABLE IF NOT EXISTS `events_2008_Q2` LIKE `events_2008_04`;
+                                   - ALTER TABLE `events_2008_Q2` ENGINE=MERGE UNION=(`events_2008_04`, `events_2008_05`, `events_2008_06`) INSERT_METHOD=LAST;
+
+                                   - DROP TABLE `events_2008_Q3`;
+                                   - CREATE TABLE IF NOT EXISTS `events_2008_Q3` LIKE `events_2008_07`;
+                                   - ALTER TABLE `events_2008_Q3` ENGINE=MERGE UNION=(`events_2008_07`, `events_2008_08`, `events_2008_09`) INSERT_METHOD=LAST;
+
+                                   - DROP TABLE `events_2008_Q4`;
+                                   - CREATE TABLE IF NOT EXISTS `events_2008_Q4` LIKE `events_2008_10`;
+                                   - ALTER TABLE `events_2008_Q4` ENGINE=MERGE UNION=(`events_2008_10`, `events_2008_11`, `events_2008_12`) INSERT_METHOD=LAST;
+
+                                   - ALTER TABLE `comments` ADD COLUMN `instability` tinyint(1) NOT NULL default '0' AFTER `remoteUser`; 
+                                   - ALTER TABLE `comments_2008` ADD COLUMN `instability` tinyint(1) NOT NULL default '0' AFTER `remoteUser`; 
+                               - SNMPTT making Weblogic 10 compatible: 
+							     - /plugins/snmptt/
+                                   - FIX create_ASNMTAP_weblogic_configuration_for_SNMP.pl: my $pluginTest = 'check_SNMPTT_weblogic.pl';
+                                   - UPDATE create_ASNMTAP_weblogic_configuration_for_SNMP.pl
+                                   - UPDATE create_NCPL_weblogic_configuration_for_SNMP.pl
+                                   - UPDATE create_weblogic_configuration_database_with_SNMP.pl
+                                   - UPDATE create_weblogic_configuration_for_SNMPTT.pl
+							     - /plugins/templates/snmptt/
+                                   - UPDATE check_SNMPTT_weblogic.pl
+                                   - UPDATE snmptt-bea-weblogic.conf
+                                 - UPDATE create_weblogic_configuration_database_with_SNMP-3.000.019.SQL
+                                   - PRIMARY KEY + `trapMBeanType_MATCH`
+                                 - UPDATE create_weblogic_configuration_database_with_SNMP-3.000.019_mysql-v5.0.x.SQL
+                                   - PRIMARY KEY + `trapMBeanType_MATCH`
+
+Version 3.000.018, 2008/07/07, by Alex Peeters.
+                               - security update
+
+Version 3.000.017, 2008/06/09, by Alex Peeters with contributions from Yves Van den Hove.
+                               Makefile.PL
+                               - version update Bundle::DBI:                   1.604
+                               - version update CGI:                           3.37
+                               - version update CGI::Session:                  4.30
+                               - version update CPAN:                          1.9205
+                               - version update CPANPLUS:                      0.84
+                               - version update Compress::Zlib:                2.010
+                               - version update Config::General:               2.38
+                               - version update Crypt::OpenSSL::X509:          0.6
+                               - version update Crypt::SSLeay:                 0.57
+                               - version update Cwd:                           3.2701
+                               - version update DateTime:                      0.42
+                               - version update DateTime::Format::Epoch:       0.11
+                               - version update Email::Simple:                 2.003
+                               - version update Getopt::Long:                  2.37
+                               - version update HTTP::Daemon::SSL:             1.04
+                               - version update IO::CaptureOutput:             1.0801
+                               - version update IO::Socket::SSL:               1.13
+                               - version added  IO::String                     1.08
+                               - version update Mail::POP3Client:              2.18
+                               - version update Net::IMAP::Simple:             1.17
+                               - version update Net::SSLeay:                   1.32
+                               - version update Proc::ProcessTable:            0.42
+                               - version update SOAP::Lite:                    0.710.05
+                               - version update Test::Builder::Tester:         1.13
+                               - version update Test::Simple:                  0.80
+                               - version update URI:                           1.36
+                               - version update XML::LibXML:                   1.66
+                               - version update XML::Parser:                   2.36
+                               - version update XML::Simple:                   2.18
+                               ASNMTAP::Asnmtap
+                               - Making Solaris 10 zone compatible
+                               - UPDATE: all *.t test files
+                               - UPDATE: replace '/cgi-bin' with '/asnmtap/cgi-bin'
+                               - UPDATE: added <COMMAND> variable DIFF to Asnmtap.cnf
+                               - UPDATE: replace '$Rsync ...' with '$Rsync --rsync-path=$RsyncPath ...'
+                               - UPDATE: rsync --exclude=*-KnownError --exclude=*.tmp
+                               ASNMTAP::Asnmtap::Applications
+                               - Applications.cnf
+                                 <COMMON>
+                                 ...
+                                 #  <AWSTATS>
+                                 #    ENABLED         1                      # '0' or '1'
+                                 #  </AWSTATS>
+                               - archiver.pl: making MySQL 5.0.51 compatible
+                               - display.pl: 
+                                 - NEW 'Minimal Condenced View', index-mcv.html
+                                 - FIX for 1727568 Bij wisselen omgeving op dezelfde pagina blijven.
+                               ASNMTAP::Asnmtap::Applications::CGI
+                               - htmlToPdf.pl: FIX for 1768193 PDF issues with Adobe Acrobat 8
+                               - reports.pl: replace `reportTitle='` with `reportTitle="'`
+                               ASNMTAP::Asnmtap::Plugins
+                               - check_jUnit.pl
+                                 - UPDATE: xml layout optimalisation
+                               - check_memory-free.pl
+                                 - UPDATE: making Blastwave compatible
+                               ASNMTAP::Asnmtap::Plugins::Mail.pm
+                               - FIX regarding MIME-Encoding '7bit' into MIME-tools-5.425
+                               ASNMTAP::Asnmtap::Plugins::Nagios
+                               - NEW check_nagiosv3-comments-cleanup.pl
+                               ASNMTAP::Asnmtap::Plugins::Webtransact.pm
+                               - NEW triesTiming & triesCodes
+             ATTENTION   -->   asnmtap-3.000.017.sql, asnmtap-3.000.017-distributed.sql, 
+                               asnmtap-3.000.017_mysql-v5.0.x.sql & asnmtap-3.000.017-distributed_mysql-v5.0.x.sql
+                               - add `reportTitle` varchar(100) NOT NULL default '' to table reports
+                               apache config
+                               - UPDATE: replace 'ScriptAlias /cgi-bin/ ...' with 'ScriptAlias /asnmtap/cgi-bin/ ...'
+
+Version 3.000.016, 2008/02/13, by Alex Peeters with contributions from Yves Van den Hove.
+                               ASNMTAP
+                               - UPDATE fixRights.sh
+                               - UPDATE '#!/usr/bin perl' or '#!/usr/local/bin/perl' with '#!/bin/env perl'
+                                 to use the perl version found by the environment variable PATH
+                                 http://www.cyberciti.biz/tips/finding-bash-perl-python-portably-using-env.html
+                               ASNMTAP::Applications
+                               - archive.pl
+                                 - FIXED (1863109) createCommentsAndEventsArchiveTables at the end of the year
+                               - holidayBundleSetDowntimes.pl  
+                                 - NEW (1725445) Groeperen Mails
+                               ASNMTAP::Asnmtap::Applications.pod
+                               - FIXED MySQL GRANT configuration part
+                               ASNMTAP::Asnmtap::Applications::CGI
+                               - /applications/htmlroot/snmptraps/include/classes/class.mysqlDB.php
+                                 - UPDATE class.mysqlDB.php
+                               - generateConfig.pl
+                                 - FIX (1822759) A first time config generate/install doesn't say what actions need to be done on a server
+                               - reports.pl
+                                 - FIX (1827421) Added reportTitle
+                               ASNMTAP::Asnmtap::Plugins
+                               - /plugins/nagios/check_network_interface_traffic.pl
+                                 - UPDATE making Solaris 10 compatible
+		                       - /plugins/jUnit/
+                                 - UPDATE create_ASNMTAP_jUnit_configuration_for_jUnit.pl
+		                       - /plugins/snmptt/
+                                 - UPDATE check_snmptt_traps.pl
+                                 - NEW check_snmptt_traps.plN
+		                       - /plugins/templates/
+                                 - UPDATE check_template-WebTransact.pl
+		                       - /plugins/templates/jUnit/
+                                 - NEW create_ASNMTAP_jUnit_configuration_for_jUnit-3.000.016_mysql.SQL
+                                 - NEW create_ASNMTAP_jUnit_configuration_for_jUnit-3.000.016_mysql-v5.0.x.SQL
+		                       - /plugins/templates/snmptt/
+                                 - NEW check_SNMPTT_probe.pl
+                                 - UPDATE check_SNMPTT_weblogic.pl
+                                 - NEW snmptt-3.000.016-v5.0.x.sql
+                                 - UPDATE TABLE `snmmptt` for MySQL' version 5.x
+                                   - ALTER TABLE `snmptt` CHANGE COLUMN `formatline` `formatline` varchar(1024) default NULL;
+                                   - ALTER TABLE `snmptt_archive` CHANGE COLUMN `formatline` `formatline` varchar(1024) default NULL;
+                                   - ALTER TABLE `snmptt_unknown` CHANGE COLUMN `formatline` `formatline` varchar(1024) default NULL;
+                                   - ALTER TABLE `snmptt_unknown_archive` CHANGE COLUMN `formatline` `formatline` varchar(1024) default NULL;
+                                 - UPDATE TABLE `wls_snmptt_CONFIG`
+                                   - ALTER TABLE `wls_snmptt_CONFIG` CHANGE COLUMN `trapMBeanType` `trapMBeanType` varchar(128) NOT NULL default '';
+                                   - ALTER TABLE `wls_snmptt_CONFIG` CHANGE COLUMN `trapAttributeName` `trapAttributeName` varchar(128) NOT NULL default '';
+                                   - ALTER TABLE `wls_snmptt_CONFIG` CHANGE COLUMN `trapMonitorType` `trapMonitorType` varchar(128) NOT NULL default '';
+                                   - ALTER TABLE `wls_snmptt_CONFIG` ADD COLUMN `trapLogSeverity` varchar(128) NOT NULL default '' AFTER `trapMonitorType_MATCH`, ADD COLUMN `trapLogSeverity_MATCH` char(2) default NULL AFTER `trapLogSeverity`, ADD COLUMN `trapLogMessage` varchar(128) NOT NULL default '' AFTER `trapLogSeverity_MATCH`, ADD COLUMN `trapLogMessage_MATCH` char(3) default NULL AFTER `trapLogMessage`;
+                                   - ALTER TABLE `wls_snmptt_CONFIG` DROP PRIMARY KEY, ADD PRIMARY KEY  (`trapMBeanType`,`trapAttributeName`,`trapMonitorType`, `trapLogSeverity`, `trapLogMessage`, `event_name`,`category`,`sources_list`,`mode`);
+                                 - UPDATE snmptt-bea-weblogic.conf
+                                 - UPDATE create_weblogic_configuration_database_with_SNMP-3.000.016.SQL
+                                 - UPDATE create_weblogic_configuration_database_with_SNMP-3.000.016_mysql-v5.0.x.SQL
+                               ASNMTAP::Asnmtap::Plugins::Mail.pm
+                               - FIX regarding MIME-Encoding 'quoted-printable' into MIME-tools-5.425
+                               ASNMTAP::Asnmtap::Plugins::Nagios
+                               - NEW Makefile.PL Net::Ifconfig::Wrapper
+                               ASNMTAP::Asnmtap::Plugins::WebTransact
+                               - UPDATE POD with 'Qs_var => [..., submain => RET_SUBMAIN, title1 => RET_TITLE1]'
+
+
+Version 3.000.015, 2007/10/21, by Alex Peeters with contributions from Yves Van den Hove.
+                               Makefile.PL
+                               - version update CPAN 1.9102
+                               - version update CGI 3.29
+                               - version update Compress::Zlib 2.004
+                               - version update Config::General 2.33
+                               - version update Crypt::OpenSSL::RSA 0.25
+                               - version update Crypt::OpenSSL::X509 0.5
+                               - version update Crypt::SSLeay 0.56
+                               - version update Cwd 3.25
+                               - version update Bundle::DBD::mysql 4.005
+                               - version update IO::Socket::SSL 1.07
+                               - version update NetAddr::IP 4.007
+                               - version update WSRF::Lite 0.8.2.2
+                               - version update XML::LibXML 1.63
+                               ASNMTAP CPAN module perl 5.8.0, 5.8.5 and 5.8.6 compatible
+                               - Making perl 5.8.8 compatible
+                               ASNMTAP::Asnmtap
+                               - NEW environment variable ASNMTAP_PATH used into the bash scripts
+                               - NEW making MySQL 5.0.x compatible
+                                 - NEW asnmtap-3.000.015_mysql-v5.0.x.sql
+                                 - NEW applications/tools/mysql/asnmtap-3.000.015-distributed_mysql-v5.0.x.sql
+                                 - FIX OnDemand versus Display with 254 character limitation for MySQL >= v5.0.3 and yyyymmdd-test-ukey.sql-LOAD-DATA-FAILED
+                                   Values in VARCHAR columns are variable-length strings.
+                                   The length can be specified as a value from 0 to 255 before MySQL 5.0.3, and 0 to 65,535 in 5.0.3 and later versions.
+                                   TEXT A string with a maximum length of 65535 characters, from a variable length types that store large amounts of data.
+                                   Is similar to a larger version of VARCHAR. These types can store a large piece of data information, but is also processed much slower.
+                                   - OnDemand
+                                     CRITICAL - WebService ... (Production): 500 read timeout - 200 OK - getVersion (...:9108): 4.20063.13 - 200 OK - ping (...:9110): OK - 200 OK - monitorControls (...:9110): OK - 200 OK - getVersion (...:9110): 4.20063.13 - ...: WARNING|'ping (...:8080)'=172ms;;;; 'monitorControls (...:8080)'=29682ms;;;; 'getVersion (...:8080)'=25ms;;;; 'ping (...:9108)'=25ms;;;; 'monitorControls (...:9108)'=30022ms;;;; 'getVersion (...:9108)'=24ms;;;; 'ping (...:9110)'=24ms;;;; 'monitorControls (...:9110)'=18898ms;;;; 'getVersion (...:9110)'=23ms;;;; Status=2;1;2;0;3 Compilation=1523ms;;;0; Trendline=79.039s;;;; Execution=80579ms;;;0; 
+                                   - Display: afkapping op 254 characters
+                                     CRITICAL - WebService ... (Production): 500 read timeout - 200 OK - getVersion (...:9108): 4.20063.13 - 200 OK - ping (...:9110): OK - 200 OK - monitorControls (...:9110): OK - 200 OK - getVersion (...:9110): 4.20063.13 - ...
+                                   - v4.x   : `statusMessage` varchar(254) NOT NULL default '',
+                                   - v5.0.x : `statusMessage` varchar(1024) NOT NULL default '',
+                                               alter table events_yyyy_mm change statusMessage statusMessage varchar(1024);
+                               - IMPROVED perfparse_crontab.sh
+                               - NEW perfparse_crontab_failed.sh (Yves Van den Hove)
+                               - NEW perfparse_debug.sh by (Yves Van den Hove)
+                               ASNMTAP::Asnmtap::Applications
+                               - Applications.cnf
+                                 <COMMON>
+                                 ...
+                                 #  <CHARTDIRECTOR>
+                                 #    LIB             /opt/ChartDirector/lib/.
+                                 #  </CHARTDIRECTOR>
+                                 ...
+                                 replace
+                                 #  <HTMLTOPD>
+                                 #  </HTMLTOPD>
+                                 with
+                                 #  <HTMLTOPDF>
+                                 #  </HTMLTOPDF>
+                                 </COMMON>
+                                 add                                 
+                                 <COMMON>
+                                 ...
+                                 #  <PERFPARSE>
+                                 #    BIN             /opt/asnmtap/perfparse/bin
+                                 #    ETC             /opt/asnmtap/perfparse/etc
+                                 #    LIB             /opt/asnmtap/perfparse/lib
+                                 #    SHARE           /opt/asnmtap/perfparse/share
+                                 #    CGI             /cgi-bin/perfparse.cgi
+                                 #    ENABLED         0                      # '0' or '1'
+                                 #    DATABASE        ~ <DATABASE_ACCOUNT><READWRITE><DATABASE>
+                                 #    HOST            ~ <DATABASE_ACCOUNT><READWRITE><HOST>
+                                 #    PORT            ~ <DATABASE_ACCOUNT><READWRITE><PORT>
+                                 #    USERNAME        ~ <DATABASE_ACCOUNT><READWRITE><USERNAME>
+                                 #    PASSWORD        ~ <DATABASE_ACCOUNT><READWRITE><PASSWORD>
+                                 #  </PERFPARSE>
+                                 </COMMON>
+                                 ...
+                                 replace
+                                 #<TABLES>
+                                 ...
+                                 #    REPORTS          reports
+                                 ...
+                                 #</TABLES>
+                                 with
+                                 #<TABLES>
+                                 ...
+                                 #    REPORTS          reports
+                                 #    REPORTSPERFDATA  reports_perfdata
+                                 ...
+                                 #</TABLES>
+                                - NEW $SERVERTABLREPORTSPRFDT into CGI.pm
+                                - NEW $CHARTDIRECTORLIB and $SERVERTABLREPORTSPRFDT into Applications.pm
+                                - NEW $PERFPARSEBIN $PERFPARSEETC $PERFPARSELIB $PERFPARSESHARE $PERFPARSECGI $PERFPARSEENABLED into CGI.pm & Applications.pm
+                               ASNMTAP::Asnmtap::Applications::Collector
+                               - NEW $CHARTDIRECTORLIB into collector.pl
+                               ASNMTAP::Asnmtap::Applications::CGI
+                               - NEW $CHARTDIRECTORLIB into generateChart.pl , generateCollectorCrontabSchedulingReport.pl, generateCollectorDaemonSchedulingReport.pl & generatePluginCrontabSchedulingReport.pl
+                               ASNMTAP::Asnmtap::Plugins
+                               - NEW check_template-SNMPTT.pl
+                               ASNMTAP::Asnmtap::Plugins::Nagios
+                               - NEW check_network_interface_traffic.pl
+                               display.pl
+                               - IMPROVED Status Message Error Displaying
+                               /bin/generateReports.pl
+                               - ADD show comments
+                               /sbin/purge_table.pl
+                               - FIX regarding: Can't create emailReport
+                               - FIX snmptt-3.000.015.sql: Cannot dbh->do: DELETE FROM `snmptt_unknown_archive` WHERE archivetime < "1161727200"
+                               /detailedStatisticsReportGenerationAndCompareResponsetimeTrends.pl
+                               - ADD show comments
+                               - ADD short description
+                               - FIX Use of uninitialized value in concatenation (.) or string at line 333
+                               /moderator/collectorDaemonSchedulingReports.pl
+                               - FIX Use of uninitialized value in split at line 79.
+                               /moderator/plugins.pl
+                               - NEW Plugins (to edit short description, trendline, holiday bundle and uploading plugindoc)
+                               /moderator/trendlineCorrectionReports.pl
+                               - FIX Use of uninitialized value in split at line 93.
+                               - FIX Possible precedence problem on bitwise & operator at line 117.
+                               - FIX switch startdate with enddate
+                               /admin/reports.pl
+                               - ADD show comments
+                               - NEW Select 'Reports Perfdata'
+                               /admin/reports_perfdata.pl
+                               - NEW Reports Perfdata (to define the 'Performance Times' that are used by the automatically generated Reports)
+                               /sadmin/crontabs.pl
+                               - FIX 'select SQL_NO_CACHE count(id) from crontabs' with 'select SQL_NO_CACHE count(lineNumber) from crontabs'
+                               /sadmin/plugins.pl
+                               - ADD short desription
+                               - FIX $notActivated = ($Cactivated) ? '' : ' not'; with $notActivated = ($CTactivated) ? '' : ' not';
+                               integration with jUnit
+		                       - NEW /plugins/jUnit/
+                                 - NEW check_jUnit.pl
+                                 - NEW create_ASNMTAP_jUnit_configuration_for_jUnit.pl
+                               integration with SNMPTT
+                               - NEW /plugins/snmptt/
+                                 - NEW check_SNMPTT_weblogic.pl
+                                 - NEW create_ASNMTAP_weblogic_configuration_for_SNMP.pl
+                                 - NEW create_weblogic_configuration_for_SNMPTT.pl
+                                 - FIX snmptt_traps_remove_pending_and_duplicated.pl
+		                       - NEW /plugins/templates/snmptt/
+                                 - UPDATE create_weblogic_configuration_database_with_SNMP-3.000.015.SQL
+                                 - NEW create_weblogic_configuration_database_with_SNMP-3.000.015_mysql-v5.0.x.SQL
+                                 - NEW snmptt-bea-weblogic.conf
+                                 - NEW snmptt-3.000.015.sql
+                                 - NEW snmptt.ini
+                               integration with NagTrap
+                               - NEW /applications/htmlroot/snmptraps
+                               table plugins
+                               - ADD `shortDesription` text,
+                               table reports
+                               - ADD `showComments` tinyint(1) NOT NULL default '0',
+                               - ADD `showPerfdata` tinyint(1) NOT NULL default '0',
+                               table reports_perfdata
+                               - NEW table reports_perfdata
+
+
+Version 3.000.014, 2007/06/10, Makefile.PL
+                               - version update CPAN 1.9101
+                               - version update CPANPLUS 0.78
+                               - version update Config::General 2.32
+                               - version update DateTime 0.37
+                               - version update Email::Simple 1.999
+                               - version update ExtUtils::MakeMaker 6.32
+                               - version update IO::Socket::SSL 1.040
+                               - version update Net::LDAP 0.34
+                               - version update Time::HiRes 1.9705
+                               - version update WSRF::Lite 0.8.2.1
+                               MANIFEST
+                               - NEW check_template-WebTransact-XML-Monitoring.pl
+                               - NEW check_template-WebTransact-XML-Monitoring.t
+                               - NEW check_template-WebTransact-with-client-authorization.pl
+                               - NEW check_template-WebTransact-with-client-authorization.t
+                               README
+                               - updated INSTALLATION procedure
+                               Applications.cnf
+                                 #<DATABASE_ACCOUNT>
+                                 #  <SERVER>
+                                 #    VERSION         4.x                    # '4.x' or '5.0.x'
+                                 #    MERGE           0                      # '0' or '1'
+                                 #  </SERVER>
+                               ASNMTAP::Asnmtap::*
+                               - optimalisation for MySQL queries
+                               ASNMTAP::Asnmtap::Applications.pm & display.pl
+                               - FIX sound sanity .innerHTML bug with FireFox
+                               - UPDATE sound default set to 'off' when FireFox, otherwise default set to 'on'
+                               - UPDATE $TcommentData =~ s/[\n\r]+(Updated|Edited|Closed) by: (?:.+), (?:.+) \((?:.+)\) on (\d{4}-\d\d-\d\d) (\d\d:\d\d:\d\d)/\n\r$1 on $2 $3/g;
+                               ASNMTAP::Asnmtap::Applications::CGI.pm & archiver.pl
+                               - NEW $SERVERMYSQLVERSION = '4.x            # '4.x' or '5.0.x'
+                               - NEW $SERVERMYSQLMERGE   = '0'               # '0' or '1'
+                               - UPDATE create_sql_query_events_from_range_year_month with MERGE when $SERVERMYSQLMERGE = 1 for much faster year and quarter statistics
+                               ASNMTAP::Asnmtap::Plugins
+                               - NEW create_NCPL_weblogic_configuration_for_SNMP.pl
+                               - NEW create_weblogic_configuration_database_with_SNMP.pl
+                               - NEW create_weblogic_configuration_database_with_SNMP.SQL
+                               ASNMTAP::Asnmtap::Plugins::Mail.pm
+                               - FIX regarding MIME-Encoding '7bit' and code optimalisation
+                               - NEW MIME-Encoding: '8bit', 'binhex', 'binary', 'x-gzip64', 'x-uu' & 'x-uuencode'
+                               - overview MIME-Encoding: '7bit', '8bit', 'quoted-printable', 'base64', 'binhex', 'binary', 'x-gzip64', 'x-uu' & 'x-uuencode'
+                               ASNMTAP::Asnmtap::Plugins::Nagios
+                               - NEW check_network_interface_status.pl
+                               - NEW snmptt_traps_remove_pending_and_duplicated.pl
+                               ASNMTAP::Asnmtap::SOAP.pm
+                               - NEW added basic authentication and credentials
+                               - NEW added soapaction and readable
+                               ASNMTAP::Asnmtap::Plugins::WebTransact.pm
+                               - NEW Inherited LWP user agent object: $objectWebTransact->ua = LWP::UserAgent->new;
+                               check_template-WebTransact-XML-Monitoring.pl & check_template-WebTransact-XML-Monitoring.t
+                               - NEW WebTransact plugin template for XML Monitoring
+                               check_template-WebTransact-with-client-authorization.pl & check_template-WebTransact-with-client-authorization.t
+                               - NEW WebTransact plugin template with client authorization
+                               detailedStatisticsReportGenerationAndCompareResponsetimeTrends.pl
+                               - add corresponding comments to the report
+                               generateReports.pl & getArchivedReport.pl
+                               - add support for timeperiod
+
+
+Version 3.000.013, 2007/02/25, ASNMTAP
+                               - add BEGIN { if ( $ENV{ASNMTAP_PERL5LIB} ) { eval 'use lib ( "$ENV{ASNMTAP_PERL5LIB}" )'; } }
+                               - FIX replace <script language="JavaScript..."> with <script language="JavaScript..." type="text/javascript">
+                               - UPDATE Mozilla/5.0 compatible
+                               - UPDATE CSE HTML Validator version 1.2.3 compatible
+                               - UPDATE CSS Level 2.1 compatible
+                               - UPDATE MySQL 5.0.x compatible
+                               Makefile.PL
+                               - version update Bundle::DBD::mysql 4.001
+                               - version update CGI::Session 4.20
+                               - version update Compress::Zlib 2.003
+                               - version update Crypt::OpenSSL::X509 0.4
+                               - version update Crypt::SSLeay 0.53
+                               - version update Cwd 3.24
+                               - version update DateTime 0.36
+                               - version update Email::Simple 1.996
+                               - NEW ExtUtils::Autoconf 0.02
+                               - version update Getopt::Long 2.36
+                               - version update IO::Socket::SSL 1.02
+                               - version update Net::IMAP::Simple 1.16
+                               - version update Time::HiRes 1.9704
+                               - version update Time::Local 1.17
+                               - version update WSRF::Lite 0.8.1
+                               - version update XML::LibXML 1.62
+                               MANIFEST
+                               - NEW applications/sbin/bash_stop_root.sh
+                               - UPDATE move plugins/check_file-counter.pl to plugins/templates/check_file-counter.pl
+                               - UPDATE move plugins/check_sendAndReceiveMail.pl to plugins/templates/check_sendAndReceiveMail.pl
+             ATTENTION   -->   asnmtap-3.000.013.sql
+                               - NEW table `timeperiods`
+                               asnmtap-3.000.013-distributed.sql
+                               - NEW example for distributed monitoring
+                               - add `timeperiodID` int(11) NOT NULL default '1' at table reports
+                               - add KEY `timeperiodID` (`timeperiodID`), at table reports
+                               - add CONSTRAINT `reports_ibfk_2` FOREIGN KEY (`timeperiodID`) REFERENCES `timeperiods` (`timeperiodID`) at table reports
+                               - UPDATE replace 'KEY `pagedir` (`pagedir`),' with 'UNIQUE KEY `pagedir` (`pagedir`),' at table displayDaemons
+                               comments.pl
+                               - FIX regarding 'Please re-enter entry date/time: Date/Time are into the future!'
+                               - FIX regarding 'Please re-enter solved date/time: Date/Time are into the future!'
+                               crontab verify disable email when ...
+                               - By default cron jobs sends a email to the user account executing the cronjob.
+                                 Because this is not needed we put the following command At the end of the cron job line.
+                                 '> /dev/null (default)' or '> /dev/null 2>&1'
+                               detailedStatisticsReportGenerationAndCompareResponsetimeTrends.pl, generateChart.pl & htmlToPdf.pl
+                               - add my $timeperiodID = (defined $cgi->param('timeperiodID')) ? $cgi->param('timeperiodID') : 'none';
+                               display.pl
+                               - add -c, --creationTime=<YYYY-MM-DD HH:MM:SS>, YYYY-MM-DD HH:MM:SS: year, month, day, hours, minutes and seconds to use instead of the current time when --loop = F
+                               - add sort results by status, group, comments and then by time
+                               - FIX <\\/embed> added
+                               - FIX stop caching sound during refresh when sound off
+                               - FIX when downtime into the future, problem with the 'Condended View'
+                               - UPDATE replace '$TcommentData =~ s/<br><br>/<br>/g;' with '$TcommentData =~ s/(?:<br>)+/<br>/g;'
+                               display.pl and plugins.pl
+                               - FIX interval/step must be greather then 0!
+                               getArchivedDisplays.pl
+                               - NEW Archived Displays
+                               generateConfig.pl
+                               - FIX all SQL select statements regarding *.activated = 1 and add when needed
+                               - added print text to fix rights regarding chmod 755 for new CollectorCT-.*sh or DisplayCT-.*sh script
+                               - added edit, delete, duplicate and maintenance button for 'Plugin' and 'Help Plugin Filename'
+                               holidayBundleSetDowntimes.pl
+                               - FIX Global symbol "$SERVERTABLENVIRONMENT" requires explicit package name at ./holidayBundleSetDowntimes.pl line 152.
+                               plugins.pl
+                               - making it possible to edit 'Help Plugin Filename' manual or by uploading and to clear with '<NIHIL>'
+                               runStatusOnDemand.pl
+                               - UPDATE doRequestedActions: added -o 'StrictHostKeyChecking=no' -o 'UserKnownHostsFile=$WWWKEYPATH/.ssh/known_hosts'
+                               rsync-wrapper-*.sh
+                               - UPDATE advanced debug information
+                               - UPDATE making rsync version 2.6.7
+                               /applications/bin/
+                               - UPDATE generateCollectorDaemonSchedulingReports.sh
+                               - UPDATE generateReports.sh
+                               - UPDATE holidayBundleSetDowntimes.sh
+                               /applications/sbin/
+                               - NEW bash_stop_root.sh
+                               - UPDATE perfparse_crontab.sh
+                               /plugins/templates/
+                               - UPDATE check_MySQL-database-replication.pl
+                               ASNMTAP::Asnmtap
+                               - replace '#!/usr/bin perl' with '#!/usr/local/bin/perl'
+                               ASNMTAP::Asnmtap::Applications
+                               - FIX <\\/embed> added
+                               - FIX verify empty cgisess file at get_session_param () used by archive.pl
+                               - added Birthday, Firework, Halloween, Snowflake, Valentine, ... for view '/asnmtap/nav/index' or '/asnmtap/nav/test'
+                                 NEW applications/htmlroot/JSFX_Browser.js
+                                 NEW applications/htmlroot/JSFX_Falling.js
+                                 NEW applications/htmlroot/JSFX_Fireworks.js
+                                 NEW applications/htmlroot/JSFX_Fireworks2.js
+                                 NEW applications/htmlroot/JSFX_Halloween.js
+                                 NEW applications/htmlroot/JSFX_Layer.js
+                               ASNMTAP::Asnmtap::Applications::CGI
+                               - NEW timeperiods.pl
+                               ASNMTAP::Asnmtap::Plugins and ASNMTAP::Asnmtap::Plugins::WebTransact
+                               - FIX debug information must be into the debug file '*.html' or '*.html-KnownError' but never into both
+                               - added info regarding keep_alive and SSL session resume
+                               - added do not proxy requests to the given domains. Calling no_proxy without any domains clears the list of domains.
+                               ASNMTAP::Asnmtap::Plugins::Nagios
+                               - NEW check_fs-stat.pl
+                               ASNMTAP::Asnmtap::Plugins::SOAP
+                               - add TYPE_ERROR_RETURN
+                               ASNMTAP::Asnmtap::Plugins::WebTransact & runCmdOnDemand.pl
+                               - ADDED remove password from Basic Authentication URL before putting into database!
+
+
+Version 3.000.012, 2006/12/20, Central and Distributed support
+                               - added common variable TYPEMONITORING to Asnmtap.cnf
+                               fixRights.sh
+                               - updated: script om rechten (chmod en chown) te zetten
+                               Makefile.PL
+                               - version update CPAN 1.8802 & CPANPLUS 0.076
+                               - version update ExtUtils::MakeMaker 6.31
+                               - version update Module::AutoInstall 1.03
+                               - version update Bundle::DBI 1.53
+                               - version update CGI 3.25
+                               - version update Compress::Zlib 2.003
+                               - version update Config::General 2.31
+                               - version update Config::General::Interpolated 2.07
+                               - version update Crypt::OpenSSL::RSA 0.24
+                               - version update Cwd 3.23
+                               - version update Data::Dumper 2.121
+                               - version update DateTime 0.35
+                               - version update DateTime::Format::W3CDTF 0.04
+                               - version update Device::Modem 1.47
+                               - version update Digest::MD5 2.36
+                               - version update Email::Simple 1.995
+                               - version update Getopt::Long 2.35
+                               - version update IO 1.23
+                               - NEW IO::Socket::SSL 1.01
+                               - version update MIME::Tools 5.420
+                               - version update NetAddr::IP 4.004
+                               - version update Net::FTP 2.75
+                               - version update Net::Ifconfig::Wrapper 0.09
+                               - NEW Net::SSLeay 1.30
+                               - version update Proc::ProcessTable 0.41
+                               - version update Sys::Hostname::Long 1.4
+                               - NEW Test::Pod::Coverage 1.08
+                               - version update Test::Simple 0.47
+                               - version update Time::HiRes 1.94
+                               - version update Time::Local 1.13
+                               - version update XML::LibXML 1.61
+                               - version update XML::Simple 2.16
+                               - install 'ASNMTAP' with make install
+                                 PM - This hash will contain a list of all ASNMTAP files
+                               MANIFEST.SKIP
+                               - A file full of regular expressions to exclude when using 'make manifest' to generate the MANIFEST.
+                               - used by 'make manifest' to build the file MANIFEST
+                               - also used by 'make skipcheck' & 'make distcheck'
+                               Shared PERL & SSL support
+                               - added environment variable PERL5LIB, MANPATH & LD_LIBRARY_PATH to Asnmtap.cnf
+                               Windows Internet Explorer 7.0
+                               - tested and did look OK
+                               ASNMTAP::Asnmtap
+                               - replace `::VERSION = 3.000.xxx` with `::VERSION = do { my @r = (q$Revision: 3.000.012$ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };`
+                               - replace `my $version = '3.000.xxx'` with `my $VERSION = do { my @r = (q$Revision: 3.000.012$ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };`
+                               ASNMTAP::Asnmtap::Applications
+                               - NEW purge_table.pl
+                               - add Environment after the Plugin Titles
+                               - add our %ENVIRONMENT = ('P'=>'Production', 'S'=>'Simulation', 'A'=>'Acceptation', 'T'=>'Test', 'D'=>'Development', 'L'=>'Local');
+                               - used into display.pl, comments.pl, contact.pl, getHelpPlugin.pl, info.pl, perfparse.pl, runCmdOnDemand.pl & users.pl
+                               - Applications.pod updated regarding 'perl Makefile.PL INSTALL_BASE=/opt/asnmtap/cpan-shared'
+                               ASNMTAP::Asnmtap::Plugins
+                               - FIX replace: _programGetOptions  => [..., 'password|passwd|p=s', ...],
+                                     with   : _programGetOptions  => [..., 'password|p|passwd=s', ...],
+                               - FIX replace: push ( @{ $_[0]->{_programGetOptions} }, 'status|S:s', 'asnmtapEnv|A:s', 'onDemand|O:s', 'logging|L:s', 'debugfile|dumphttp|httpdump|D:s', 'debug|d:s' );
+                                     with   : push ( @{ $_[0]->{_programGetOptions} }, 'status|S:s', 'asnmtapEnv|A:s', 'onDemand|O:s', 'logging|L:s', 'debugfile|D|dumphttp|httpdump:s', 'debug|d:s' );
+                               - check_memory-top.pl, now also Solaris 10 compatible
+                               - FIX '<environment>PROD</environment>' into check_template-mail-xml.pl & check_template-mail-xml-fingerprint-xml.pl
+                               - replaced 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; ASNMTAP; U;' with 'Mozilla/4.7 (compatible; ASNMTAP; U;'
+                               - NEW $ENV{HTTPS_VERSION} for v2, v3 and v23
+                               ASNMTAP::Asnmtap::Plugins::Nagios
+                               - NEW check_nagios-comments-cleanup.pl
+                               - NEW EPN (Embedded Perl Nagios) compatible
+                               ASNMTAP::Asnmtap::Plugins::NPTest
+                               - upgrade van version NPTest v1.11 to v1.13
+                               - replace NPTest->testCmd with ASNMTAP::Asnmtap::Plugins::NPTest->testCmd
+                               ASNMTAP::Asnmtap::Plugins::SOAP
+                               - add $SOAP::Constants::PATCH_HTTP_KEEPALIVE
+                               - add ws-security through WSRF::Lite
+                               ASNMTAP::Asnmtap::Plugins::WebTransact
+                               - based on 'Nagios::WebTransact' v0.14.1 & v0.16 from Stanley Hopcroft [Stanley.Hopcroft@IPAustralia.Gov.AU]
+             ATTENTION   -->   asnmtap-3.000.012.sql
+                               - NEW table `environment`
+                               - add `userPassword` varchar(15) NOT NULL default '' at table reports
+                               - remove `reportTitle` varchar(100) NOT NULL default '' from table reports
+                               - add `downtimeScheduling` tinyint(1) NOT NULL default '1' and `generatedReports` tinyint(1) NOT NULL default '0' at table users
+                               FIX Popup Calendar
+                               - replace document.forms[0].endDate with document.forms[1].endDate
+                               collector.pl
+                               - add automatically the environment at the end off the title
+                               collector.pl & display.pl
+                               - update atime and mtime from the PID file every timeslot
+                               - email message for started, stopped & reloaded
+                               collectorCrontabSchedulingReports.pl & collectorDaemonSchedulingReports.pl
+                               - show only the Plugins regarding correspondending server
+                               comments.pl & holidayBundleSetDowntimes.pl
+                               - Sending email for: Downtime Scheduling
+                               detailedStatisticsReportGenerationAndCompareResponsetimeTrends.pl
+                               - Problem details: link to the correspondending 'Debug Report' when 'Format Output' equals 'HTML'
+                               detailedStatisticsReportGenerationAndCompareResponsetimeTrends.pl, generateChart.pl & trendlineCorrectionReports.pl
+                               - replace round(avg(duration), 2) with round(avg(time_to_sec(duration)), 2) because of wrong averages
+                               display.pl
+                               - possibility for sound on/off
+                               - onderdrukking ledige groepen in full view
+                               - vermelden op welke probe een test wordt uitgevoerd
+                               - onderdrukken niet persistent downtimes in condenced view
+                               - mask password for '--dnPass=', used by check_template-ldap.pl
+                               - environment icons, exclaim popup window for plugins and comments
+                               - 'In Progress'-animated icon replaced with 'In Progress'-static icon for faster display!
+                               - de debugrapporten onderaan de view enkel aanklikbaar maken als de file via rsync al aanwezig is op het moment van de display generatie, ter voorkoming van 404 errors.
+                               - add console messages: 'No Monitored Applications', 'All Monitored Applications are OK', '..., probably collector/config problems!' & , '..., probably database problems!'
+                               displayDaemons.pl
+                               - add 'ServerID' into general view
+                               detailedStatisticsReportGenerationAndCompareResponsetimeTrends.pl
+                               - add a checkbox, to choose output destination: HTML/PDF 
+                               getArchivedReport.pl & getArchivedResults.pl
+                               - YYYY/MM/DD notatie met voorloopnullen voor maand en dag
+                               generateConfig.pl
+                               - check for 'help plugin filenames' without plugin reference
+                               - check for plugins without or with missing 'help plugin filename'
+                               - looking after existing plugins that are not defined into the database plugins
+                               - verify that the defined plugins into the table plugins, exists and are executable
+                               - generate automatic the Rsync Mirror Distributed & Failover Scripts / Collector Daemon
+                               generateReports.pl
+             ATTENTION   -->   - tested with HTMLDOC v1.8.27 and added --user-password password support
+                               - een plugin die disabled is waarvoor een rapport gevraagd wordt niet uitvoeren
+                               - specify F for --daysAfter means that the specified date will be used as the reportdate
+                               generateReports.pl & generateCollectorDaemonSchedulingReports.pl
+                               - ... already generated / will be generated
+                               - ... generated / generation failed
+                               generatedReports.pl, plugins & reports.pl
+                               - remove 'reportTitle'
+                               get_ArchivedReport.pl & get_ArchivedResults.pl
+                               - replace 'Week #' with 'Week # from monday off week until sunday off week'
+                               plugins.pl
+                               - upload for Help Plugin Filename (PDF)
+                               - controle op '{}' bij ingeven van de value voor het veld 'Title:'
+                               pluginCrontabSchedulingReports.pl
+                               - show only the Plugins regarding correspondending server
+                               removeModulePerl.pl
+                               - NEW
+                               rsync-mirror-*.sh
+                               - replace: rsync -e "ssh -i $KeyRsync" -a $Delete $AdditionalParams $Source $Target
+                                 with: ssh=<sshpath>; $Rsync -e "$ssh -i $KeyRsync" -a $Delete $AdditionalParams $Source $Target
+                               runCmdOnDemand.pl
+                               - mask password for '--dnPass=', used by check_template-ldap.pl
+                               runStatusOnDemand.pl
+                               - FIX 'Command: not found.' must be 'No Display|Collector daemons defined'
+                               trendlineCorrectionReports.pl
+                               - show only the Plugins regarding correspondending server and order by Title
+                               user.pl
+                               - Sending email for: Downtime Scheduling & Generated Reports
+
+
+Version 3.000.011, 2006/09/16, ASNMTAP::Asnmtap::Applications
+                               - add `environment` char(1) NOT NULL default 'L' to TABLE `plugins`
+                               display.pl, plugins.pl & generateConfig.pl
+                               - add environment
+                               collector.pl
+                               - add $perfParseMethode
+                               - NEW perfparse_asnmtap_pulp_command.pl
+                               - NEW perfparse_crontab.sh
+                               generateConfig.pl
+                               - FIX added activated = 1 to all sql queries
+                               Makefile.pl
+                               - update SOAP::Lite to version 0.69
+                               - update MIME::Base64 to version 3.07
+                               ASNMTAP::Asnmtap::Plugins::SOAP
+                               - FIX replaced 'defined $som->fault' with 'defined $som and defined $som->fault'
+                               ASNMTAP::Asnmtap::Plugins::Nagios
+                               - NEW check_iowait.pl
+                               - NEW check_snmptt_traps.pl
+
+
+Version 3.000.010, 2006/07/15, Trendline Correction Reports (for the Collector)
+                               - add /cgi-bin/moderator/trendlineCorrectionReports.pl
+                               Application.pod
+                               - using CPAN with a non-root account for ASNMTAP
+                               - install procedure updated for Linux and Solaris
+                               - perl cpan module version and install procedure updates
+                               archiver.pl
+                               - FIX regarding debug mode and wrong use of EMAILREPORT
+                               comments.pl
+                               - add $givenNameLoggedOn & $familyNameLoggedOn to email message
+                               display.pl
+                               - make openPngImage firefox size compatible
+                               fixRights.sh
+                               - add ASNMTAPUSER=asnmtap
+                               generateCollectorCrontabSchedulingReport.pl & generateCollectorDaemonSchedulingReport.pl
+                               - FIX when ! defined $numberOfLabels
+                               generateConfig.pl
+                               - FIX removed '/etc' from 'servername:/asnmtap-3.000.xxx/applications/master/etc/CollectorCT-...sh reload'
+                               holidayBundleSetDowntimes.pl
+                               - add Administrator to email message
+                               Makefile.PL
+                               - add Proc::ProcessTable to CGI perl prerequisites list
+                               plugins.pl
+                               - add fields percentage and tolerance
+
+							   ASNMTAP::Asnmtap::Plugins
+                               - replaced 'Mozilla/5.0 (compatible; MSIE 6.0;' with 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1;'
+
+                                 De XP-versie als                     'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
+                                 De plusversie kan worden herkend als 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)'
+
+                               asnmtap-3.000.010.sql
+                                 CREATE TABLE `plugins` (
+                                   ...
+                                   `trendline` smallint(6) NOT NULL default '0',
+                                 + `percentage` tinyint(1) NOT NULL default '25',
+                                 + `tolerance` tinyint(1) NOT NULL default '5',
+                                   `step` smallint(6) NOT NULL default '0',
+                                   ...
+
+
+Version 3.000.009, 2006/06/01, ASNMTAP::Asnmtap::Plugins::WebTransact
+                               - RFC 1738 optimalisations
+                               - add '500 SSL negotiation failed'
+                               - add Perfdata_Label => 'IMAGE URL' to _download_images()
+                               ASNMTAP::Asnmtap::Applications
+                               - email SUBJECT changed to Display/Collector for the 'Application Monitoring'@HOSTNAME: ...
+                               NPTest, v1.11
+                               - Will die if signal received from a testCmd
+                               archiver.pl
+                               - FIX First day current week epoch date
+                               command.pl
+                               - FIX regarding date.utc() - The month (0=Jan - 11=Dec)
+                                 - replaced 'suspentionDate.substring(5, 7);' with 'suspentionDate.substring(5, 7) - 1;'
+                               generateCollectorDaemonSchedulingReports.pl
+                               - NEW, generating automatically Collector Daemon Scheduling PDF Reports
+                               - http://asnmtap.citap.be/results/_ASNMTAP/reports/yyyymmdd-collectorDaemonSchedulingReports.pl-_ASNMTAP-FQDN-Daily.pdf
+                               database asnmtap, table plugins and crontab
+                               - `arguments` from varchar(100) to varchar(254)
+                               - `argumentsOndemand` from varchar(100) to varchar(254)
+
+
+Version 3.000.008, 2006/05/01, ASNMTAP::Asnmtap::Plugins::Mail
+                               - add 7bit mime decoding
+                               ASNMTAP::Asnmtap::Plugins::WebTransact
+                               - making W3C XHTML compatible
+                               - add gzip decompression
+                               - add Keep-Alive support for HTTP/1.1
+                               - add protocol
+                               - indent_level depricated
+                               generateChart.pl
+                               - FIX missing title chart
+                               - FIX missing mkdir etc for distributed systems
+                               runCmdOnDemand.pl
+                               - making W3C XHTML compatible
+
+
+Version 3.000.007, 2006/04/09, FIX for Applications.cnf
+                               ASNMTAP::Asnmtap::Plugins::WebTransact
+                               - FIX for _download_images
+                               ASNMTAP::Asnmtap::Plugins::WebTransact
+                               - add IMAP4 support                             
+
+
+Version 3.000.006, 2006/03/18, ASNMTAP CPAN module ASNMTAP::Asnmtap::Plugins::IO
+                               ASNMTAP CPAN module ASNMTAP::Asnmtap::Applications
+                               ASNMTAP CPAN module ASNMTAP::Asnmtap::Applications::CGI
+                               ASNMTAP CPAN module ASNMTAP::Asnmtap::Applications::Display
+                               ASNMTAP CPAN module ASNMTAP::Asnmtap::Applications::Collector
+
+ASNMTAP::Asnmtap::Plugins::Mail
+- Mail::POP3Client instead of Net::POP3
+  replace $pop3->delete with $pop3->Delete in your mail scripts!!!
+- MIME::Tools
+
+Asnmtap plugins added:
+- check_file-counter.pl
+- check_template-mail.pl
+- check_template-mail-fingerprint-xml.pl
+- check_template-mail-xml-fingerprint-xml.pl
+- check_template-mail-xml-fingerprint-xml-monitoring.pl
+- check_template-mail-xml.pl
+- check_sendAndReceiveMail.pl
+
+Nagios plugins added:
+- check_memory-free.pl
+- check_memory-top.pl
+- check_nagios-comments-cleanup.pl
+- check_snmptt_traps.pl
+- check_swap.pl
+- check_swap-allocated.pl
+
+Getopt::Long::Configure ('bundling', 'pass_through')
+- 'pass_through' added
+
+Tested on:
+- Cygwin
+- Solaris 2.8-2.9
+- Freebsd 6.1
+- Linux 2.4.21-37.EL (Centos 3.x)
+- Linux 2.6.9-22.0.2.EL (Centos 4.x)
+
+
+Version 3.000.005, 2006/02/26
+
+- check_MySQL-database-replication.pl (MySQL database replication)
+  - Bit::Vector 6.3
+  - Date::Calc 5.4
+  - Bundle::DBI
+  - Bundle::DBD::mysql
+
+- ASNMTAP::Time
+  - Date::Calc instead of unix data command
+
+- Making ASNMTAP CPAN module perl 5.8.0, 5.8.5 and 5.8.6 compatible
+
+  For perl versions before 5.8.5, then you must change into Asnmtap.cnf from 'CAPTUREOUTPUT 1' to 'CAPTUREOUTPUT 0' !!!
+
+- ASNMTAP::Asnmtap::getOptionsType() added
+
+- ASNMTAP CPAN module ASNMTAP::Asnmtap::Plugins::Modem added
+
+  All    : IO::Handle 1.20
+           Device::Modem 1.43
+
+  Linux or some kind of unix machine:
+           Device::SerialPort 1.002
+           Net::Ifconfig::Wrapper 0.05
+
+  Windows: Win32::SerialPort 0.19
+           Win32::API 0.41
+           Win32::RASE 1.01
+
+
+Version 3.000.004, 2006/02/12, ASNMTAP CPAN module ASNMTAP::Asnmtap::Plugins::Mail added
+
+Making ASNMTAP CPAN module perl 5.8.5 and 5.8.6 compatible
+
+Tested on:
+- Cygwin
+- Solaris 5.9
+- Linux 2.4.21-37.EL (Centos 3.x)
+- Linux 2.6.9-22.0.2.EL (Centos 4.x)
+
+Makefile.PL
+- many dependencies checks added
+
+
+Version 3.000.003, 2006/02/03, ASNMTAP CPAN module
+
+This ASNMTAP CPAN library and Plugin templates are free software; you can 
+redistribute it and/or modify it under the same terms as Perl itself.
+
+The other parts of ASNMTAP may be used and modified free of charge by anyone
+so long as this copyright notice and the comments above remain intact. By 
+using this code you agree to indemnify Alex Peeters from any liability that 
+might arise from it's use.
+
+Selling the code for this program without prior written consent is expressly 
+forbidden. In other words, please ask first before you try and make money off 
+of my program.
+
+Obtain permission before redistributing this software over the Internet or
+in any other medium. In all cases copyright and header must remain intact.
+
+
+Version 3.000.002, 2006/01/08, we actually started a total rewrite into Object Oriented Perl: ASNMTAP Package Object Oriented Perl
+
+package ASNMTAP::Asnmtap
+package ASNMTAP::Asnmtap::Time
+
+package ASNMTAP::Asnmtap::Plugins
+package ASNMTAP::Asnmtap::Plugins::Mail
+package ASNMTAP::Asnmtap::Plugins::Modem
+package ASNMTAP::Asnmtap::Plugins::Nagios
+package ASNMTAP::Asnmtap::Plugins::SOAP
+package ASNMTAP::Asnmtap::Plugins::WebTransact
+package ASNMTAP::Asnmtap::Plugins::XML
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Version 3.000.001, 2006/01/01, we actually started a total rewrite of v2.002.000: ASNMTAP Package
+
+package ASNMTAP::Asnmtap
+package ASNMTAP::Asnmtap::Time
+
+package ASNMTAP::Asnmtap::Applications
+package ASNMTAP::Asnmtap::Applications::CGI
+package ASNMTAP::Asnmtap::Applications::Display
+package ASNMTAP::Asnmtap::Applications::Collector
+
+package ASNMTAP::Asnmtap::Plugins
+package ASNMTAP::Asnmtap::Plugins::Nagios
+package ASNMTAP::Asnmtap::Plugins::WebTransact
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Version 2.000.000 - 2.002.000, 2004/12/29 - 2005/12/31
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Version 1.xxx.xxx, 2003/08/16 - 2004/12/10
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

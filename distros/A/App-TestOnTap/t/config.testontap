@@ -1,0 +1,10 @@
+# this file is here to make it possible to run testontap itself on 
+# on this suite
+#
+id = 11b95bbe-e494-11e6-83e0-fa17184ebad7
+skip = regexp{^(lib|misc|tsuites)/}
+parallelizable = regexp(.*)
+
+[EXECMAP]
+match1 = regexp(\.t$)
+cmd1 = perl

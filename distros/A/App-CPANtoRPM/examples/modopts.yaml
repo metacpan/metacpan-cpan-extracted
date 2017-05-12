@@ -1,0 +1,17 @@
+---
+
+#cpantorpm:
+#  - --add-require perl(ExtUtils::MakeMaker)
+#  - --add-require perl(Module::Build)
+#  - --add-require rpm-build
+
+ExtUtils::MakeMaker:
+  - --add-require perl(ExtUtils::Install)
+  - --add-require perl(ExtUtils::Manifest)
+  - --add-require perl(ExtUtils::Command)
+
+IPC::Run:
+  - --rem-provide perl(IPC::Run::Win32Helper)
+  - --rem-provide perl(IPC::Run::Win32IO)
+  - --rem-provide perl(IPC::Run::Win32Pump)
+

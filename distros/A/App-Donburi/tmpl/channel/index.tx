@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+
+<head>
+
+    <title>Donburi</title>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <style>
+      table { 
+        border: solid 1px #a83;
+        border-collapse: collapse;
+      }
+      th {
+        padding: 5px;
+        border: solid 1px #a83;
+        background-color: #fd9;
+        font-weight: normal;
+      }
+      td {
+        padding: 5px;
+        border: solid 1px #a83;
+      }
+    </style>
+
+</head>
+
+<body>
+    <h1>Donburi</h1>
+
+    <div>channel list</div>
+
+    <form method="POST" action="/channel/add">
+    <table>
+    <tr>
+      <th>channel</th>
+      <th>&nbsp;</th>
+    </tr>
+: for $channels -> $channel {
+    <tr>
+          <td><: $channel :></td>
+          <td><a href="/channel/delete?channel=<: $channel | uri :>">delete</a></td>
+    </tr>
+: } 
+    <tr>
+         <td><input type="text" name="channel"></td>
+         <td><input type="submit" value="add"></td>
+    </tr>
+    </table>
+    </form>
+
+    <div><a href="/">return top</a></div>
+</body>
+
+</html>

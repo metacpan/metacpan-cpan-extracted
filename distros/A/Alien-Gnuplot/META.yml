@@ -1,0 +1,29 @@
+---
+abstract: 'Find and verify functionality of the gnuplot executable.'
+author:
+  - 'Craig DeForest <craig@deforest.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-Gnuplot
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Spec: 0
+  File::Temp: 0
+  HTTP::Tiny: 0
+  POSIX: 0
+  Time::HiRes: 0
+resources:
+  homepage: http://github.com/drzowie/Alien-Gnuplot
+  repository: git://github.com/drzowie/Alien-Gnuplot.git
+version: 1.033

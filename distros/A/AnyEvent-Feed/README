@@ -1,0 +1,195 @@
+NAME
+    AnyEvent::Feed - Receiving RSS/Atom Feed reader with XML::Feed
+
+VERSION
+    Version 0.3
+
+SYNOPSIS
+       use AnyEvent;
+       use AnyEvent::Feed;
+
+       my $feed_reader =
+          AnyEvent::Feed->new (
+             url   => 'http://example.com/atom.xml',
+          );
+
+       $feed_reader->fetch (sub {
+          my ($feed_reader, $new_entries, $feed, $error) = @_;
+
+          if (defined $error) {
+             warn "ERROR: $error\n";
+             return;
+          }
+
+          # $feed is the XML::Feed object belonging to that fetch.
+
+          for (@$new_entries) {
+             my ($hash, $entry) = @$_;
+             # $hash a unique hash describing the $entry
+             # $entry is the XML::Feed::Entry object of the new entries
+             # since the last fetch.
+          }
+       });
+
+       # Or:
+
+       my $feed_reader =
+          AnyEvent::Feed->new (
+             url      => 'http://example.com/atom.xml',
+             interval => $seconds,
+
+             on_fetch => sub {
+                my ($feed_reader, $new_entries, $feed, $error) = @_;
+
+                if (defined $error) {
+                   warn "ERROR: $error\n";
+                   return;
+                }
+
+                # see above
+             }
+          );
+
+DESCRIPTION
+    This module implements some glue between AnyEvent::HTTP and XML::Feed.
+    It can fetch a RSS/Atom feed on a regular interval as well as on
+    customized times. It also keeps track of already fetched entries so that
+    you will only get the new entries.
+
+METHODS
+    $feed_reader = AnyEvent::Feed->new (url => $url, %args)
+        This is the constructor for a new feed reader for the RSS/Atom feed
+        reachable by the URL $url. %args may contain additional key/value
+        pairs:
+
+        interval => $seconds
+            If this is set you also have to specify the "on_fetch" callback
+            (see below). It will try to fetch the $url every $seconds
+            seconds and call the callback given by "on_fetch" with the
+            result.
+
+        headers => $http_hdrs
+            Additional HTTP headers for each GET request can be passed in
+            the $http_hdrs hash reference, just like you would pass it to
+            the "headers" argument of the "http_get" request of
+            AnyEvent::HTTP.
+
+        username => $http_user
+        password => $http_pass
+            These are the HTTP username and password that will be used for
+            Basic HTTP Authentication with the HTTP server when fetching the
+            feed. This is mostly sugar for you so you don't have to encode
+            them yourself and pass them to the "headers" argument above.
+
+        on_fetch => $cb->($feed_reader, $new_entries, $feed_obj, $error)
+            This callback is called if the "interval" parameter is given
+            (see above) with the same arguments as the callback given to the
+            "fetch" method (see below).
+
+        entry_ages => $hash
+            This will set the hash which keeps track of seen and old
+            entries. See also the documentation of the "entry_ages" method
+            below. The default will be an empty hash reference.
+
+        max_entry_age => $count
+            This will set the maximum number of times an entry is kept in
+            the "entry_ages" hash after it has not been seen in the feed
+            anymore. The default value is 2 which means that an entry hash
+            is removed from the "entry_ages" hash after it has not been seen
+            in the feed for 2 fetches.
+
+    $feed_reader->url
+        Just returns the url that this feed reader is fetching from.
+
+    $feed_reader->entry_ages ($new_entry_ages)
+    my $entry_ages = $feed_reader->entry_ages
+        This will set the age hash which will keep track of already seen
+        entries. The keys of the hash will be the calculated hashes of the
+        entries and the values will be a counter of how often they have NOT
+        been seen anymore (kind of an age counter). After each fetch this
+        hash is updated and seen entries get a value of 0.
+
+    $feed_reader->fetch ($cb->($feed_reader, $new_entries, $feed_obj,
+    $error))
+        This will initiate a HTTP GET on the URL passed to "new" and call
+        $cb when done.
+
+        $feed_reader is the feed reader object itself. $new_entries is an
+        array reference containing the new entries. A new entry in that
+        array is another array containing a calculated hash over the
+        contents of the new entry, and the XML::Feed::Entry object of that
+        entry. $feed_obj is the XML::Feed feed object used to parse the
+        fetched feed and contains all entries (and not just the 'new' ones).
+
+        What a 'new' entry is, is decided by a map of hashes as described in
+        the "entry_ages" method's documentation above.
+
+AUTHOR
+    Robin Redeker, "<elmex@ta-sa.org>"
+
+SEE ALSO
+    XML::Feed
+
+    AnyEvent::HTTP
+
+    AnyEvent
+
+BUGS
+  Known Bugs
+    There is actually a known bug with encodings of contents of Atom feeds.
+    XML::Atom by default gives you UTF-8 encoded data. You have to set this
+    global variable to be able to use the XML::Feed::Entry interface without
+    knowledge of the underlying feed type:
+
+       $XML::Atom::ForceUnicode = 1;
+
+    I've re-reported this bug against XML::Feed, as I think it should take
+    care of this. XML::Atom should probably just fix it's Unicode interface,
+    but it seems to be a bit deserted w.r.t. fixing the bugs in the tracker.
+
+  Contact
+    Please report any bugs or feature requests to "bug-anyevent-feed at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=AnyEvent-Feed>. I will
+    be notified and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc AnyEvent::Feed
+
+    You can also look for information at:
+
+    *   IRC: AnyEvent::Feed IRC Channel
+
+        See the same channel as the AnyEvent::XMPP module:
+
+          IRC Network: http://freenode.net/
+          Server     : chat.freenode.net
+          Channel    : #ae_xmpp
+
+          Feel free to join and ask questions!
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/AnyEvent-Feed>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/AnyEvent-Feed>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=AnyEvent-Feed>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/AnyEvent-Feed>
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Robin Redeker, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

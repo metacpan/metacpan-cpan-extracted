@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e01a2ac643b28c7aa7d0d07a8185899a6aa32b13 Changes
+SHA1 96da61eea928700509e1a616e036564035244a72 INSTALL
+SHA1 7895b6323a97d46368eed8d0386db448d7e7dea0 Instance/Instance.pm
+SHA1 98866c7c1b5c1bf6fd38b762ccb6bf6b053045df Instance/Instance.xs
+SHA1 998f560a410f706d948b4bc373a99a00bea4f9ac Instance/Makefile.PL
+SHA1 fe6397abc886b83d6f61f8efc9fd5d41a5d73ec6 Instance/t/01-basic.t
+SHA1 2398adf915f9ac9383783ff279394f78138b805d Instance/t/02-leaktest.t
+SHA1 57eae1c6196bbd84c32eb08e1b9db3b2d4e394b0 Instance/typemap
+SHA1 b33df3650303ca968f350ac6a976f34f41762851 LICENSE
+SHA1 7d2f601dbd1f9ae98ef59cacd828f7ce2675cd9c MANIFEST
+SHA1 fc7255a5efe2c3b3cbc1bbb8f099e62f51cc9d5b META.yml
+SHA1 f3f560a3566adacd46cab640a59fba80a910092c Makefile.PL
+SHA1 812540cf2be2d26d622a363c9ea6fb76c3983995 README
+SHA1 b5b9aafd9c2d8e21e669506b46a5e1f0387d0bcc dist.ini
+SHA1 73ad1b764e8b3ca6cc3a204a4260e53f14cbc6a0 eg/example.pl
+SHA1 d28b3d5fbbe669456f9f1c73d198d0be1dfaa872 lib/AI/DecisionTree.pm
+SHA1 cc1fbcb2131905c9474ac2d38abac368dd1a5d20 t/01-simple.t
+SHA1 8dd1b0848cd98888419bdbace9453dbc978275b0 t/02-noisy.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.17 (Darwin)
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAk9RkA8ACgkQgrvMBLfvlHbNtACguTPtO7QjaxVhZRkjke41/bDo
+FOEAnRf+Q755AUZJDa9FFaQrGP8gMez6
+=a/hQ
+-----END PGP SIGNATURE-----

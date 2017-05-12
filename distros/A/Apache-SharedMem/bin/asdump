@@ -1,0 +1,94 @@
+#!/usr/bin/perl -w
+
+BEGIN
+{
+    use strict;
+    use Apache::SharedMem qw(:lock :status);
+    use Getopt::Long;
+    use IPC::SysV;
+}
+
+{
+    my($rootkey, $docroot, $uid, $user);
+
+    GetOptions
+    (
+        'rootkey=i'     => \$rootkey,
+        'uid=i'         => \$uid,
+        'user=s'        => \$user,
+        'docroot=s'     => \$docroot,
+        'help!'         => \&syntax,
+    ) || syntax();
+
+    unless(defined $rootkey)
+    {
+        if(!defined $docroot)
+        {
+            syntax();
+        }
+        elsif(!-d $docroot)
+        {
+            syntax("$docroot: no such directory");
+        }
+
+        if(defined $user)
+        {
+            $uid = getpwnam($user) || syntax("invalid user: $user");
+        }
+
+        if(!defined $uid)
+        {
+            $uid = $<;
+        }
+
+        $rootkey=IPC::SysV::ftok($docroot, $uid);
+    }
+    my $share = new Apache::SharedMem((defined $rootkey ? (rootkey=>$rootkey) : ()), debug=>0, readonly=>1)
+      || syntax('unexpected error');
+      
+    my $dump_map = $share->dump_map || syntax("can't read root key: $rootkey");
+    printf("Root: %s\n", $dump_map);
+
+    foreach my $ns ($share->namespaces)
+    {
+        printf("Name: %s\n", $ns);
+        printf("Dump: %s\n", $share->dump($ns));
+    }
+}
+
+sub syntax
+{
+    print(STDERR (@_ ? "@_\n" : ''), "syntax: asdump <--rootkey=xxxxxxx | --docroot=/path/to/doc/root/ [--uid]>\n");
+    exit 1;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+asdump - Apache::SharedMem data dumper
+
+=head1 DESCRIPTION
+
+Dump the contents of a root map and all its namespaces. root map's key can be found in
+your apache logs when you turn Apache::SharedMem in debug mode.
+
+=head1 USAGE
+
+asdump <--rootkey=xxxxx | --docroot=/path/to/document/root/ [--uid]>
+
+rootkey: Specify a rootkey, default is based on you actual working directory and UID.
+         see L<Apache::SharedMem> for more details.
+
+If you don't know the rootkey value, you can give some info to asdump to find the rootkey:
+
+docroot: DOCUMENT_ROOT of Apache server, if you are using mod_perl, this should be the value
+of PROJECT_DOCUMENT_ROOT in your httpd.conf.
+
+uid|user: numeric uid or user of Apache server, if not specified, take your actual UID.
+
+=head1 AUTHOR
+
+Olivier Poitrey E<lt>F<rs@rhapsodyk.net>E<gt>

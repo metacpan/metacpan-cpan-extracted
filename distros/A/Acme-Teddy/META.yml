@@ -1,0 +1,25 @@
+---
+abstract: 'Chewy target for your pitbull testing module'
+author:
+  - 'Xiong Changnian <xiong@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+keywords:
+  - test
+  - testing
+  - dummy
+  - target
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Teddy
+provides:
+  Acme::Teddy:
+    file: lib/Acme/Teddy.pm
+    version: 1.002003
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: http://github.com/Xiong/acme-teddy
+version: 1.002003

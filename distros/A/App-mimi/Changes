@@ -1,0 +1,15 @@
+Revision history for Perl extension App-mimi
+
+0.03 2017-01-27T18:48:42Z
+
+    - require DBD::SQLite in tests
+
+0.02 2017-01-22T15:36:57Z
+
+    - fatpack version
+    - check command and Pg support
+
+0.01 2014-12-18T17:43:14Z
+
+    - original version
+

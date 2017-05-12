@@ -1,0 +1,97 @@
+AI::MegaHAL version 0.08
+===========================
+
+TABLE OF CONTENTS
+-----------------
+
+1) DESCRIPTION
+2) INSTALLATION
+3) DEPENDENCIES
+4) BUGS
+5) AUTHOR INFORMATION
+6) ACKNOWLEDGEMENTS
+7) TESTING
+
+
+1) DESCRIPTION
+--------------
+
+AI::MegaHAL is a Perl package written by Cory Spencer, and provides bindings
+to the MegaHAL conversation simulator, which was originally written by Jason
+Hutchens.
+
+AI::MegaHAL is based on the 9.1.0 release of MegaHAL with some modifications.
+
+MegaHAL project (stalled):
+  http://megahal.alioth.debian.org/
+  (previous:
+   http://www.sourceforge.net/projects/megahal/
+   http://megahal.sourceforge.net/
+  )
+
+
+To read about the latest features, see the Changes file.
+
+The author invites feedback on AI::MegaHAL. If you find a bug, please send the
+information described in the BUGS section below.
+
+
+2) INSTALLATION
+---------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+3) DEPENDENCIES
+---------------
+
+AI::MegaHAL does not require any additional packages or libraries to be
+installed.
+
+
+4) BUGS
+-------
+
+If you find a bug, please report it to the author along with the
+following information:
+
+    * version of Perl (output of 'perl -V' is best)
+    * version of AI::MegaHAL
+    * operating system type and version
+    * exact text of error message or description of problem
+    * example model files/data being classified
+
+If we don't have access to a system similar to yours, you may be asked
+to insert some debugging lines and report back on the results.  The more help
+and information you can provide, the better.
+
+5) AUTHOR INFORMATION
+---------------------
+
+The Perl AI::MegaHAL module was written by Cory Spencer <cspencer[at]sprocket.org>
+Now maintained by Alexandr Ciornii <alexchorny[at]gmail.com>
+
+Any questions related to the underlying MegaHAL C interface should be directed
+to the current maintainers of the package.  Contact addresses are provided on
+the MegaHAL SourceForge homepage at:
+
+  http://www.sourceforge.net/projects/megahal/
+
+
+6) ACKNOWLEDGEMENTS
+-------------------
+
+Thanks go to the dot com with whom I was a former employee of at the time this
+module was written.  Without the long hours spent in a confined office space,
+I would have never undertaken this project to help maintain my sanity.
+
+7) TESTING
+-------------------
+
+This module was tested on MSVC, Mingw, FreeBSD 5.4, RedHat Linux.
+See http://cpantesters.perl.org/show/AI-MegaHAL.html for more.

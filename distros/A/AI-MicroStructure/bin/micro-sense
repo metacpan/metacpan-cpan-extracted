@@ -1,0 +1,153 @@
+#!/usr/bin/perl -X
+use strict;
+use AnyDBM_File;
+use Fcntl;
+use Data::Dumper;
+use JSON;
+use AI::MicroStructure::WordBlacklist;
+
+
+my @set;
+my $data = {};
+my %structure;
+my $fresh=1;
+my $wn;
+my $debug = 0;
+my $words = 1;
+my $count = 0;
+
+if( grep{/\bdebug\b/} @ARGV ){$debug = 1; cleanArgs("debug"); };
+if( grep{/\bwords\b/} @ARGV ){$words = 1; cleanArgs("words"); };
+
+
+sub cleanArgs{
+    my ($key) = @_;
+    my @tmp=();
+    foreach(@ARGV){
+    push @tmp,$_ unless($_=~/$key/);}
+
+    @ARGV=@tmp;
+}
+
+# convert to lower case, translate ' ' to '_' and eliminate any
+# syntactic marker
+sub lower#
+{
+    my $word = shift;
+    $word =~ tr/A-Z /a-z_/;
+    $word =~ s/\(.*\)$//;
+    return $word;
+}
+
+# translate ' ' to '_'
+sub underscore#
+{
+    $_[0] =~ tr/ /_/;
+    return $_[0];
+}
+
+# Eliminate any syntactic marker
+sub delMarker#
+{
+    $_[0] =~ s/\(.*\)$//;
+    return $_[0];
+}
+
+
+sub trim
+{
+  my $string = shift;
+  $string =  "" unless  $string;
+  $string =~ s/^\s+//;
+  $string =~ s/\s+$//;
+  $string =~ s/\t//;
+  $string =~ s/^\s//;
+  return $string;
+}
+
+$structure{"x",1} = "\nData: Hello, my name is Data!\nThank you for reactivating me !";
+$structure{"x",2} = "\nData: My post-hypnotic positron inducer  signals all systems within normal parameters!\n";
+$structure{"x",3} = "\nData: Please think of an category and I will try to get some structures to it - press enter when ready\n";
+
+sub forms
+{
+    my ($string) = shift;
+    # The query string (word, pos and sense #)
+    my ($word, $pos, $sense) = $string =~ /^([^\#]+)(?:\#([^\#]+)(?:\#(\d+))?)?$/;
+
+    return $string;
+}
+
+
+sub intro {
+
+ return sort grep{/^\nData: /} %structure;
+}
+
+my @s=AI::MicroStructure::WordBlacklist::getStopWordsSmall();
+my $search = "(".join("|",@s).")";
+$search =~ s/\'/\\'/g;
+my $line = "";
+my @xset;
+$line = $ARGV[0];
+
+#while($count++ < 2) {
+
+  if($count==1 && !$line){
+
+    print intro();
+    next;
+
+  }
+
+   chomp($line = <STDIN>) unless($line);
+
+   @set=();
+   $wn = `wn $line -over -hypen -hypon -synsn -smemn -membn -subsn -meron -holon -derin -domnn -famln -coorn -hmern -grepn`;
+
+ # print forms($wn);
+#   die;
+
+
+
+   foreach(split("\n",$wn)){
+    if($_ =~ /^([0-9].*?)[.](.*?)$/){
+      my($sense,$text)=($1,$2);
+      my @set = map{$_=~s/"|'|`//g; trim($_)}grep{/[a-z|A-Z]/}split("\\(|--|\\)|; \"",$text);
+      push @{$data->{'senses'}->{$sense}->{"basics"}},@set;
+
+
+
+    }
+  }
+
+
+  #last if $line =~ /quit/;
+
+  #next if $line =~ /^[a-z|A-Z]/i;
+
+
+ # redo;
+#}
+
+#//map{$_=map{ trim($_)}split("=>",$_)unless($_=~/Coordinate Terms/)}
+#print Dumper [split("sense",`wn $line  -coorn`)];
+push @{$data->{'search'}},grep{/[a-z|A-Z]/}split("\n|,",lc `micro-wnet $line words`) unless(!$words);
+#push @{$data->{'coordinate'}},map{$_=trim($_); @_=grep(/[A-Z]|[0-9]|[a-z]/,map{$_=trim($_)}split("\n|=>",$_))}split(/Sense/,`wn $line -coorn`) unless(!$words);
+#shift @{$data->{'coordinate'}} &&  shift @{$data->{'search'}} for(0..1);
+#@{$data->{'search'}};
+END{
+
+ $data = {"rows"=>$data,"senses"=>[sort keys %{$data->{'senses'}}]};
+
+
+   my $utf8_encoded_json_text = encode_json($data);
+
+  if($debug == 1) {
+    print Dumper $data,$wn;
+  }
+
+
+  print $utf8_encoded_json_text;
+
+}

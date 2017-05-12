@@ -1,0 +1,10 @@
+Revision history for Perl extension Array::Slice
+
+0.01  Wed Apr 11 14:00:02 2007
+	- original version
+
+0.02  Thu Apr 12 10:40:48 CEST 2007
+	- mildly hacked version
+
+0.03  Mon Apr 16 09:32:07 CEST 2007
+	- added threaded stuff

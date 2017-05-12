@@ -1,0 +1,32 @@
+Revision history for Agent-TCLI
+
+0.032	Thu May  3 13:51:13 EST 2007
+	- Bug fixes to support inter Agent communications during tests
+	- Fixes to support Testee get_param and get_responses
+	- Changed Control to load commands from XML for easier maintenance
+	- Added defaul commands for Control manipulation
+
+0.031	Mon Apr 30 07:53:27 EST 2007
+	- Corrected version decimal place error in Transport directory too!
+
+0.030	Mon Apr 30 07:22:52 EST 2007
+	- Corrected version decimal place error.
+
+0.003	Mon Apr 30 01:49:10 EST 2007
+	- Added working Agent script to bin
+	- Fixed up the POD docs a bunch.
+	- Added more support for running external commands
+	- Removed some cruft
+	- Fixed lots of little bugs
+	- Moved Testee, which breaks tests in dependent distributions
+	- Cleaned up version numbers and Id fields
+	- Removed dependency on PoCo::SimpleLog for Package::Tail
+	- Fixed bug in Package::Base with scalar defaults
+	- Fixed the way required Parameters work in Commands
+	- Made Control's Session heap refer to the Control.
+		Enabling easier access in commands through $sender->get_heap
+
+0.002	Mon Apr  2 18:48:44 EST 2007
+		First CPAN release
+
+

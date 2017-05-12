@@ -1,0 +1,88 @@
+NAME
+    AnyEvent::DBus - adapt Net::DBus to AnyEvent
+
+SYNOPSIS
+       use AnyEvent::DBus;
+
+       # now use the Net::DBus API, preferably the non-blocking variants:
+
+       use Net::DBus::Annotation qw(:call);
+
+       $bus->get_object (...)
+           ->Method (dbus_call_async, $arg1, ...)
+           ->set_notify (sub {
+              my @data = $_[0]->get_result
+              ...
+           });
+
+       $bus->get_connection->send (...);
+
+DESCRIPTION
+    This module is an AnyEvent user, you need to make sure that you use and
+    run a supported event loop.
+
+    Loading this module will install the necessary magic to seamlessly
+    integrate Net::DBus into AnyEvent. It does this by quite brutally
+    hacking Net::DBus::Reactor so that all dbus connections created after
+    loading this module will automatically be managed by this module.
+
+    Note that a) a lot inside Net::DBus is still blocking b) if you call a
+    method that blocks, you again block your process (basically anything but
+    calls to the Net::DBus::Binding::Connection objects block, but see
+    Net::DBus::Annoation, specifically dbus_call_async) c) the underlying
+    libdbus is often blocking itself, even with infinite timeouts and d)
+    this module only implements the minimum API required to make Net::DBus
+    work - Net::DBus unfortunately has no nice hooking API.
+
+    However, unlike Net::DBus::Reactor, this module should be fully
+    non-blocking as long as you only use non-blocking APIs
+    (Net::DBus::Reactor blocks on writes). It should also be faster, but
+    Net::DBus is such a morass so unneeded method calls that speed won't
+    matter much...
+
+  EXAMPLE
+    Here is a simple example. Both work with AnyEvent::DBus and do the same
+    thing, but only the second is actually non-blocking.
+
+    Example 1: list registered named, blocking version.
+
+       use AnyEvent::DBus;
+
+       my $conn = Net::DBus->find;
+       my $bus  = $conn->get_bus_object;
+
+       for my $name (@{ $bus->ListNames }) {
+          print "  $name\n";
+       }
+
+    Example 1: list registered named, somewhat non-blocking version.
+
+       use AnyEvent;
+       use AnyEvent::DBus;
+       use Net::DBus::Annotation qw(:call);
+
+       my $conn = Net::DBus->find; # always blocks :/
+       my $bus  = $conn->get_bus_object;
+
+       my $quit = AE::cv;
+
+       # the trick here is to prepend dbus_call_async to any method
+       # arguments and then to call the set_notify method on the
+       # returned Net::DBus::AsyncReply object
+
+       $bus->ListNames (dbus_call_async)->set_notify (sub {
+          for my $name (@{ $_[0]->get_result }) {
+             print "  $name\n";
+          }
+          $quit->send;
+       });
+
+       $quit->recv;
+
+SEE ALSO
+    AnyEvent, Net::DBus.
+
+AUTHOR
+     Marc Lehmann <schmorp@schmorp.de>
+     http://home.schmorp.de/
+

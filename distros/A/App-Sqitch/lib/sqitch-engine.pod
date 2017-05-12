@@ -1,0 +1,253 @@
+=head1 Name
+
+sqitch-engine - Manage database engine configuration
+
+=head1 Synopsis
+
+  sqitch engine
+  sqitch engine [-v | --verbose]
+  sqitch engine add <name> [engine-options]
+  sqitch engine alter <name> [engine-options]
+  sqitch engine remove <name>
+  sqitch engine show <name>
+  sqitch engine update-config
+
+=head1 Description
+
+Manage the database engines you deploy to. The list of supported engines
+includes:
+
+=over
+
+=item * C<firebird>
+
+=item * C<mysql>
+
+=item * C<oracle>
+
+=item * C<pg>
+
+=item * C<sqlite>
+
+=item * C<vertica>
+
+=back
+
+Each engine may have a number of properties:
+
+=over
+
+=item C<target>
+
+The name or URI of the database target. Note that if the value is a URI, the
+engine in the URI must match the engine being added or altered. The default is
+C<db:$engine>. See L<sqitch-target> for details on target configuration.
+
+=item C<registry>
+
+The name of the registry schema or database. The default is C<sqitch>.
+
+=item C<client>
+
+The command-line client to use. If not specified, each engine looks in the OS
+Path for an appropriate client.
+
+=item C<top_dir>
+
+The path to the top directory for the engine. This directory generally
+contains the plan file and subdirectories for deploy, revert, and verify
+scripts, as well as reworked instances of those scripts. The default is F<.>,
+the current directory.
+
+=item C<plan_file>
+
+The plan file to use for this engine. The default is C<$top_dir/sqitch.plan>.
+
+=item C<deploy_dir>
+
+The path to the deploy directory for the engine. This directory contains all
+of the deploy scripts referenced by changes in the C<plan_file>. The default
+is C<$top_dir/deploy>.
+
+=item C<revert_dir>
+
+The path to the revert directory for the engine. This directory contains all
+of the revert scripts referenced by changes in the C<plan_file>. The default
+is C<$top_dir/revert>.
+
+=item C<verify_dir>
+
+The path to the verify directory for the engine. This directory contains all
+of the verify scripts referenced by changes in the C<plan_file>. The default
+is C<$top_dir/verify>.
+
+=item C<reworked_dir>
+
+The path to the reworked directory for the engine. This directory contains all
+subdirectories for all reworked scripts referenced by changes in the
+C<plan_file>. The default is C<$top_dir>.
+
+=item C<reworked_deploy_dir>
+
+The path to the reworked deploy directory for the engine. This directory
+contains all of the reworked deploy scripts referenced by changes in the
+C<plan_file>. The default is C<$reworked_dir/deploy>.
+
+=item C<reworked_revert_dir>
+
+The path to the reworked revert directory for the engine. This directory
+contains all of the reworked revert scripts referenced by changes in the
+C<plan_file>. The default is C<$reworked_dir/revert>.
+
+=item C<reworked_verify_dir>
+
+The path to the reworked verify directory for the engine. This directory
+contains all of the reworked verify scripts referenced by changes in the
+C<plan_file>. The default is C<$reworked_dir/verify>.
+
+=item C<extension>
+
+The file name extension to append to change names to create script file names.
+The default is C<sql>.
+
+=back
+
+Each of these overrides the corresponding core configuration -- for example,
+the C<core.target>, C<core.plan_file>, C<core.registry>, and C<core.client>
+L<config|sqitch-config> options.
+
+=head1 Options
+
+=over
+
+=item List Option
+
+=over
+
+=item C<-v>
+
+=item C<--verbose>
+
+  sqitch engine --verbose
+
+Be more verbose when listing engines.
+
+=back
+
+=item Add and Alter Options
+
+=over
+
+=item C<--top-dir>
+
+  sqitch engine add pg --top-dir sql
+
+Specifies the top directory to use for the engine. Typically contains the
+deployment plan file and the change script directories.
+
+=item C<--plan-file>
+
+  sqitch engine add pg --plan-file my.plan
+
+Specifies the path to the deployment plan file. Defaults to
+C<$top_dir/sqitch.plan>.
+
+=item C<--extension>
+
+  sqitch engine add pg --extension ddl
+
+Specifies the file name extension to use for change script file names.
+Defaults to C<sql>.
+
+=item C<--dir>
+
+  sqitch engine add pg --dir deploy=dep --dir revert=rev --dir verify=tst
+
+Sets the path to a script directory. May be specified multiple times.
+Supported keys are:
+
+=over
+
+=item * C<deploy>
+
+=item * C<revert>
+
+=item * C<verify>
+
+=item * C<reworked>
+
+=item * C<reworked_deploy>
+
+=item * C<reworked_revert>
+
+=item * C<reworked_verify>
+
+=back
+
+=item C<--target>
+
+  sqitch engine add pg --target db:pg:widgets
+
+Specifies the name or L<URI|https://github.com/theory/uri-db/> of the target
+database for the engine.
+
+=item C<--registry>
+
+  sqitch engine add pg --registry meta
+  
+Specifies the name of the database object where Sqitch's state and history
+data is stored. Typically a schema name (as in PostgreSQL and Oracle) or a
+database name (as in SQLite and MySQL). Defaults to C<sqitch>.
+
+=item C<--client>
+
+  sqitch engine add pg --client /usr/local/pgsql/bin/psql
+
+Specifies the path to the command-line client for the engine. Defaults to a
+client in the current path named appropriately for the engine.
+
+=back
+
+=back
+
+=head1 Actions
+
+With no arguments, shows a list of existing engines. Several actions are
+available to perform operations on the engines.
+
+=head2 C<add>
+
+Add an engine named C<< <name> >> for the database at C<< <uri> >>. The
+C<--set> option specifies engine-specific properties. A new plan file and
+new script script directories will be created if they don't already exist.
+
+=head2 C<alter>
+
+Alter an engine named C<< <name> >>. The C<--set> option specifies
+engine-specific properties to set. New script script directories will be
+created if they don't already exist.
+
+=head2 C<remove>, C<rm>
+
+Remove the engine named C<< <name> >> from the configuration. The plan file
+and script directories will not be affected.
+
+=head2 C<show>
+
+Gives some information about the engine C<< <name> >>, including the
+associated properties. Specify multiple engine names to see information for
+each.
+
+=head2 C<update-config>
+
+Update the configuration from a configuration file that predates the addition
+of the C<engine> command to Sqitch.
+
+=head1 Configuration Variables
+
+The engines are stored in the configuration file, but the command itself
+currently relies on no configuration variables.
+
+=head1 Sqitch
+
+Part of the L<sqitch> suite.

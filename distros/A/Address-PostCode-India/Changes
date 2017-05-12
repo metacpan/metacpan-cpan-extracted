@@ -1,0 +1,32 @@
+Revision history for Address-PostCode-India
+
+0.08  2015-03-21T03:25:00+01:00
+      - Upgraded to use Address::PostCode::UserAgent 0.05.
+
+0.07  2015-03-17T18:25:00+01:00
+      - Added $AUTHORITY meta information.
+
+0.06  2015-03-17T18:10:00+01:00
+      - Added LICENSE file.
+      - Upgraded to use Address::PostCode::UserAgent 0.04.
+      - Tidied up pod document in general.
+
+0.05  2015-01-16T14:39:25+01:00
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.04  2014-11-01T13:29:15+01:00
+      - Added the source of API to the pod document.
+
+0.03  2014-10-30T19:42:00+01:00
+      - Updated pod document related to the method details().
+
+0.02  2014-10-29T20:22:14+01:00
+      - Checking pin code to be exactly 6 digits.
+      - Added unit test for 6 digits pin code.
+      - Fixed the method details() to return the object of type Address::PostCode::India::Place.
+      - Fixed typo in pod for method details().
+
+0.01  2014-10-29T17:34:10+01:00
+      - First version, released.

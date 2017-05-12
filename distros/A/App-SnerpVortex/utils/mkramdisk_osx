@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+
+my $megabytes = 1024;                       # Desired size of ramdisk.
+my $blocks    = $megabytes * 2048;          # 512 bytes per block.
+my $vol_name  = "snerp-vortex-workspace";   # /Volumes/... mount point.
+
+# Create ramdisk device.
+
+my $disk_device = `/usr/bin/hdid -nomount ram://$blocks`;
+$disk_device =~ s/\s+//g if defined $disk_device;
+die "hdid failed: $!" unless $disk_device =~ /^\/dev\/disk\d+$/;
+
+# Create a filesystem on the device, and mount it.
+
+system(
+	"/usr/sbin/diskutil", "eraseVolume", "Case-sensitive HFS+",
+	$vol_name, $disk_device
+) and die(
+	"diskutil eraseVolume failed: $!\n",
+	"to eject the hdid device: hdiutil eject $disk_device\n",
+);
+
+print "To eject later: diskutil eject /Volumes/$vol_name\n";

@@ -1,0 +1,350 @@
+---
+abstract: 'Aspose.Cells Cloud SDK for Perl'
+author:
+  - 'Farooq Sheikh <support@aspose.com>'
+build_requires:
+  Test::More: '0.10'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AsposeCellsCloud-CellsApi
+provides:
+  AsposeCellsCloud::ApiClient:
+    file: lib/AsposeCellsCloud/ApiClient.pm
+  AsposeCellsCloud::CellsApi:
+    file: lib/AsposeCellsCloud/CellsApi.pm
+    version: '1.01'
+  AsposeCellsCloud::Configuration:
+    file: lib/AsposeCellsCloud/Configuration.pm
+  AsposeCellsCloud::Object::Area:
+    file: lib/AsposeCellsCloud/Object/Area.pm
+  AsposeCellsCloud::Object::AutoFilter:
+    file: lib/AsposeCellsCloud/Object/AutoFilter.pm
+  AsposeCellsCloud::Object::AutoFitterOptions:
+    file: lib/AsposeCellsCloud/Object/AutoFitterOptions.pm
+  AsposeCellsCloud::Object::AutoShape:
+    file: lib/AsposeCellsCloud/Object/AutoShape.pm
+  AsposeCellsCloud::Object::AutoShapeResponse:
+    file: lib/AsposeCellsCloud/Object/AutoShapeResponse.pm
+  AsposeCellsCloud::Object::AutoShapes:
+    file: lib/AsposeCellsCloud/Object/AutoShapes.pm
+  AsposeCellsCloud::Object::AutoShapesResponse:
+    file: lib/AsposeCellsCloud/Object/AutoShapesResponse.pm
+  AsposeCellsCloud::Object::BarcodeResponseList:
+    file: lib/AsposeCellsCloud/Object/BarcodeResponseList.pm
+  AsposeCellsCloud::Object::BaseObject:
+    file: lib/AsposeCellsCloud/Object/BaseObject.pm
+  AsposeCellsCloud::Object::Border:
+    file: lib/AsposeCellsCloud/Object/Border.pm
+  AsposeCellsCloud::Object::Cell:
+    file: lib/AsposeCellsCloud/Object/Cell.pm
+  AsposeCellsCloud::Object::CellArea:
+    file: lib/AsposeCellsCloud/Object/CellArea.pm
+  AsposeCellsCloud::Object::CellResponse:
+    file: lib/AsposeCellsCloud/Object/CellResponse.pm
+  AsposeCellsCloud::Object::Cells:
+    file: lib/AsposeCellsCloud/Object/Cells.pm
+  AsposeCellsCloud::Object::CellsColor:
+    file: lib/AsposeCellsCloud/Object/CellsColor.pm
+  AsposeCellsCloud::Object::CellsDocumentProperties:
+    file: lib/AsposeCellsCloud/Object/CellsDocumentProperties.pm
+  AsposeCellsCloud::Object::CellsDocumentPropertiesResponse:
+    file: lib/AsposeCellsCloud/Object/CellsDocumentPropertiesResponse.pm
+  AsposeCellsCloud::Object::CellsDocumentProperty:
+    file: lib/AsposeCellsCloud/Object/CellsDocumentProperty.pm
+  AsposeCellsCloud::Object::CellsDocumentPropertyResponse:
+    file: lib/AsposeCellsCloud/Object/CellsDocumentPropertyResponse.pm
+  AsposeCellsCloud::Object::CellsResponse:
+    file: lib/AsposeCellsCloud/Object/CellsResponse.pm
+  AsposeCellsCloud::Object::Chart:
+    file: lib/AsposeCellsCloud/Object/Chart.pm
+  AsposeCellsCloud::Object::ChartArea:
+    file: lib/AsposeCellsCloud/Object/ChartArea.pm
+  AsposeCellsCloud::Object::ChartAreaResponse:
+    file: lib/AsposeCellsCloud/Object/ChartAreaResponse.pm
+  AsposeCellsCloud::Object::ChartResponse:
+    file: lib/AsposeCellsCloud/Object/ChartResponse.pm
+  AsposeCellsCloud::Object::Charts:
+    file: lib/AsposeCellsCloud/Object/Charts.pm
+  AsposeCellsCloud::Object::ChartsResponse:
+    file: lib/AsposeCellsCloud/Object/ChartsResponse.pm
+  AsposeCellsCloud::Object::Color:
+    file: lib/AsposeCellsCloud/Object/Color.pm
+  AsposeCellsCloud::Object::ColorFilter:
+    file: lib/AsposeCellsCloud/Object/ColorFilter.pm
+  AsposeCellsCloud::Object::Column:
+    file: lib/AsposeCellsCloud/Object/Column.pm
+  AsposeCellsCloud::Object::ColumnResponse:
+    file: lib/AsposeCellsCloud/Object/ColumnResponse.pm
+  AsposeCellsCloud::Object::Columns:
+    file: lib/AsposeCellsCloud/Object/Columns.pm
+  AsposeCellsCloud::Object::ColumnsResponse:
+    file: lib/AsposeCellsCloud/Object/ColumnsResponse.pm
+  AsposeCellsCloud::Object::Comment:
+    file: lib/AsposeCellsCloud/Object/Comment.pm
+  AsposeCellsCloud::Object::CommentResponse:
+    file: lib/AsposeCellsCloud/Object/CommentResponse.pm
+  AsposeCellsCloud::Object::Comments:
+    file: lib/AsposeCellsCloud/Object/Comments.pm
+  AsposeCellsCloud::Object::CommentsResponse:
+    file: lib/AsposeCellsCloud/Object/CommentsResponse.pm
+  AsposeCellsCloud::Object::ContentMessage:
+    file: lib/AsposeCellsCloud/Object/ContentMessage.pm
+  AsposeCellsCloud::Object::CreatePivotTableRequest:
+    file: lib/AsposeCellsCloud/Object/CreatePivotTableRequest.pm
+  AsposeCellsCloud::Object::CustomFilter:
+    file: lib/AsposeCellsCloud/Object/CustomFilter.pm
+  AsposeCellsCloud::Object::DataSorter:
+    file: lib/AsposeCellsCloud/Object/DataSorter.pm
+  AsposeCellsCloud::Object::DateTimeGroupItem:
+    file: lib/AsposeCellsCloud/Object/DateTimeGroupItem.pm
+  AsposeCellsCloud::Object::DynamicFilter:
+    file: lib/AsposeCellsCloud/Object/DynamicFilter.pm
+  AsposeCellsCloud::Object::FillFormat:
+    file: lib/AsposeCellsCloud/Object/FillFormat.pm
+  AsposeCellsCloud::Object::FillFormatResponse:
+    file: lib/AsposeCellsCloud/Object/FillFormatResponse.pm
+  AsposeCellsCloud::Object::FilterColumn:
+    file: lib/AsposeCellsCloud/Object/FilterColumn.pm
+  AsposeCellsCloud::Object::Font:
+    file: lib/AsposeCellsCloud/Object/Font.pm
+  AsposeCellsCloud::Object::GradientFill:
+    file: lib/AsposeCellsCloud/Object/GradientFill.pm
+  AsposeCellsCloud::Object::GradientFillStop:
+    file: lib/AsposeCellsCloud/Object/GradientFillStop.pm
+  AsposeCellsCloud::Object::HttpStatusCode:
+    file: lib/AsposeCellsCloud/Object/HttpStatusCode.pm
+  AsposeCellsCloud::Object::Hyperlink:
+    file: lib/AsposeCellsCloud/Object/Hyperlink.pm
+  AsposeCellsCloud::Object::HyperlinkResponse:
+    file: lib/AsposeCellsCloud/Object/HyperlinkResponse.pm
+  AsposeCellsCloud::Object::Hyperlinks:
+    file: lib/AsposeCellsCloud/Object/Hyperlinks.pm
+  AsposeCellsCloud::Object::HyperlinksResponse:
+    file: lib/AsposeCellsCloud/Object/HyperlinksResponse.pm
+  AsposeCellsCloud::Object::IconFilter:
+    file: lib/AsposeCellsCloud/Object/IconFilter.pm
+  AsposeCellsCloud::Object::ImportOption:
+    file: lib/AsposeCellsCloud/Object/ImportOption.pm
+  AsposeCellsCloud::Object::Legend:
+    file: lib/AsposeCellsCloud/Object/Legend.pm
+  AsposeCellsCloud::Object::LegendResponse:
+    file: lib/AsposeCellsCloud/Object/LegendResponse.pm
+  AsposeCellsCloud::Object::Line:
+    file: lib/AsposeCellsCloud/Object/Line.pm
+  AsposeCellsCloud::Object::LineNumberRestartMode:
+    file: lib/AsposeCellsCloud/Object/LineNumberRestartMode.pm
+  AsposeCellsCloud::Object::LineResponse:
+    file: lib/AsposeCellsCloud/Object/LineResponse.pm
+  AsposeCellsCloud::Object::Link:
+    file: lib/AsposeCellsCloud/Object/Link.pm
+  AsposeCellsCloud::Object::LinkElement:
+    file: lib/AsposeCellsCloud/Object/LinkElement.pm
+  AsposeCellsCloud::Object::MergedCell:
+    file: lib/AsposeCellsCloud/Object/MergedCell.pm
+  AsposeCellsCloud::Object::MergedCellResponse:
+    file: lib/AsposeCellsCloud/Object/MergedCellResponse.pm
+  AsposeCellsCloud::Object::MergedCells:
+    file: lib/AsposeCellsCloud/Object/MergedCells.pm
+  AsposeCellsCloud::Object::MergedCellsResponse:
+    file: lib/AsposeCellsCloud/Object/MergedCellsResponse.pm
+  AsposeCellsCloud::Object::MultipleFilters:
+    file: lib/AsposeCellsCloud/Object/MultipleFilters.pm
+  AsposeCellsCloud::Object::Name:
+    file: lib/AsposeCellsCloud/Object/Name.pm
+  AsposeCellsCloud::Object::NameResponse:
+    file: lib/AsposeCellsCloud/Object/NameResponse.pm
+  AsposeCellsCloud::Object::Names:
+    file: lib/AsposeCellsCloud/Object/Names.pm
+  AsposeCellsCloud::Object::NamesResponse:
+    file: lib/AsposeCellsCloud/Object/NamesResponse.pm
+  AsposeCellsCloud::Object::NumberStyle:
+    file: lib/AsposeCellsCloud/Object/NumberStyle.pm
+  AsposeCellsCloud::Object::OleObject:
+    file: lib/AsposeCellsCloud/Object/OleObject.pm
+  AsposeCellsCloud::Object::OleObjectResponse:
+    file: lib/AsposeCellsCloud/Object/OleObjectResponse.pm
+  AsposeCellsCloud::Object::OleObjects:
+    file: lib/AsposeCellsCloud/Object/OleObjects.pm
+  AsposeCellsCloud::Object::OleObjectsResponse:
+    file: lib/AsposeCellsCloud/Object/OleObjectsResponse.pm
+  AsposeCellsCloud::Object::Orientation:
+    file: lib/AsposeCellsCloud/Object/Orientation.pm
+  AsposeCellsCloud::Object::PageBorderAppliesTo:
+    file: lib/AsposeCellsCloud/Object/PageBorderAppliesTo.pm
+  AsposeCellsCloud::Object::PageBorderDistanceFrom:
+    file: lib/AsposeCellsCloud/Object/PageBorderDistanceFrom.pm
+  AsposeCellsCloud::Object::PageVerticalAlignment:
+    file: lib/AsposeCellsCloud/Object/PageVerticalAlignment.pm
+  AsposeCellsCloud::Object::PaperSize:
+    file: lib/AsposeCellsCloud/Object/PaperSize.pm
+  AsposeCellsCloud::Object::PasswordRequest:
+    file: lib/AsposeCellsCloud/Object/PasswordRequest.pm
+  AsposeCellsCloud::Object::PatternFill:
+    file: lib/AsposeCellsCloud/Object/PatternFill.pm
+  AsposeCellsCloud::Object::PicFormatOption:
+    file: lib/AsposeCellsCloud/Object/PicFormatOption.pm
+  AsposeCellsCloud::Object::Picture:
+    file: lib/AsposeCellsCloud/Object/Picture.pm
+  AsposeCellsCloud::Object::PictureResponse:
+    file: lib/AsposeCellsCloud/Object/PictureResponse.pm
+  AsposeCellsCloud::Object::Pictures:
+    file: lib/AsposeCellsCloud/Object/Pictures.pm
+  AsposeCellsCloud::Object::PicturesResponse:
+    file: lib/AsposeCellsCloud/Object/PicturesResponse.pm
+  AsposeCellsCloud::Object::PivotField:
+    file: lib/AsposeCellsCloud/Object/PivotField.pm
+  AsposeCellsCloud::Object::PivotFieldResponse:
+    file: lib/AsposeCellsCloud/Object/PivotFieldResponse.pm
+  AsposeCellsCloud::Object::PivotFilter:
+    file: lib/AsposeCellsCloud/Object/PivotFilter.pm
+  AsposeCellsCloud::Object::PivotItem:
+    file: lib/AsposeCellsCloud/Object/PivotItem.pm
+  AsposeCellsCloud::Object::PivotTable:
+    file: lib/AsposeCellsCloud/Object/PivotTable.pm
+  AsposeCellsCloud::Object::PivotTableFieldRequest:
+    file: lib/AsposeCellsCloud/Object/PivotTableFieldRequest.pm
+  AsposeCellsCloud::Object::PivotTableResponse:
+    file: lib/AsposeCellsCloud/Object/PivotTableResponse.pm
+  AsposeCellsCloud::Object::PivotTables:
+    file: lib/AsposeCellsCloud/Object/PivotTables.pm
+  AsposeCellsCloud::Object::PivotTablesResponse:
+    file: lib/AsposeCellsCloud/Object/PivotTablesResponse.pm
+  AsposeCellsCloud::Object::ProtectSheetParameter:
+    file: lib/AsposeCellsCloud/Object/ProtectSheetParameter.pm
+  AsposeCellsCloud::Object::ReportType:
+    file: lib/AsposeCellsCloud/Object/ReportType.pm
+  AsposeCellsCloud::Object::ResponseMessage:
+    file: lib/AsposeCellsCloud/Object/ResponseMessage.pm
+  AsposeCellsCloud::Object::Row:
+    file: lib/AsposeCellsCloud/Object/Row.pm
+  AsposeCellsCloud::Object::RowResponse:
+    file: lib/AsposeCellsCloud/Object/RowResponse.pm
+  AsposeCellsCloud::Object::Rows:
+    file: lib/AsposeCellsCloud/Object/Rows.pm
+  AsposeCellsCloud::Object::RowsResponse:
+    file: lib/AsposeCellsCloud/Object/RowsResponse.pm
+  AsposeCellsCloud::Object::SaaSposeResponse:
+    file: lib/AsposeCellsCloud/Object/SaaSposeResponse.pm
+  AsposeCellsCloud::Object::SaveOptions:
+    file: lib/AsposeCellsCloud/Object/SaveOptions.pm
+  AsposeCellsCloud::Object::SaveResponse:
+    file: lib/AsposeCellsCloud/Object/SaveResponse.pm
+  AsposeCellsCloud::Object::SaveResult:
+    file: lib/AsposeCellsCloud/Object/SaveResult.pm
+  AsposeCellsCloud::Object::SectionStart:
+    file: lib/AsposeCellsCloud/Object/SectionStart.pm
+  AsposeCellsCloud::Object::SingleValue:
+    file: lib/AsposeCellsCloud/Object/SingleValue.pm
+  AsposeCellsCloud::Object::SingleValueResponse:
+    file: lib/AsposeCellsCloud/Object/SingleValueResponse.pm
+  AsposeCellsCloud::Object::SolidFill:
+    file: lib/AsposeCellsCloud/Object/SolidFill.pm
+  AsposeCellsCloud::Object::SortKey:
+    file: lib/AsposeCellsCloud/Object/SortKey.pm
+  AsposeCellsCloud::Object::SplitResult:
+    file: lib/AsposeCellsCloud/Object/SplitResult.pm
+  AsposeCellsCloud::Object::SplitResultDocument:
+    file: lib/AsposeCellsCloud/Object/SplitResultDocument.pm
+  AsposeCellsCloud::Object::SplitResultResponse:
+    file: lib/AsposeCellsCloud/Object/SplitResultResponse.pm
+  AsposeCellsCloud::Object::String:
+    file: lib/AsposeCellsCloud/Object/String.pm
+  AsposeCellsCloud::Object::Style:
+    file: lib/AsposeCellsCloud/Object/Style.pm
+  AsposeCellsCloud::Object::StyleIdentifier:
+    file: lib/AsposeCellsCloud/Object/StyleIdentifier.pm
+  AsposeCellsCloud::Object::StyleResponse:
+    file: lib/AsposeCellsCloud/Object/StyleResponse.pm
+  AsposeCellsCloud::Object::TextEffect:
+    file: lib/AsposeCellsCloud/Object/TextEffect.pm
+  AsposeCellsCloud::Object::TextItem:
+    file: lib/AsposeCellsCloud/Object/TextItem.pm
+  AsposeCellsCloud::Object::TextItems:
+    file: lib/AsposeCellsCloud/Object/TextItems.pm
+  AsposeCellsCloud::Object::TextItemsResponse:
+    file: lib/AsposeCellsCloud/Object/TextItemsResponse.pm
+  AsposeCellsCloud::Object::TextureFill:
+    file: lib/AsposeCellsCloud/Object/TextureFill.pm
+  AsposeCellsCloud::Object::ThemeColor:
+    file: lib/AsposeCellsCloud/Object/ThemeColor.pm
+  AsposeCellsCloud::Object::TilePicOption:
+    file: lib/AsposeCellsCloud/Object/TilePicOption.pm
+  AsposeCellsCloud::Object::Title:
+    file: lib/AsposeCellsCloud/Object/Title.pm
+  AsposeCellsCloud::Object::TitleResponse:
+    file: lib/AsposeCellsCloud/Object/TitleResponse.pm
+  AsposeCellsCloud::Object::Top10Filter:
+    file: lib/AsposeCellsCloud/Object/Top10Filter.pm
+  AsposeCellsCloud::Object::Underline:
+    file: lib/AsposeCellsCloud/Object/Underline.pm
+  AsposeCellsCloud::Object::Validation:
+    file: lib/AsposeCellsCloud/Object/Validation.pm
+  AsposeCellsCloud::Object::ValidationResponse:
+    file: lib/AsposeCellsCloud/Object/ValidationResponse.pm
+  AsposeCellsCloud::Object::Validations:
+    file: lib/AsposeCellsCloud/Object/Validations.pm
+  AsposeCellsCloud::Object::ValidationsResponse:
+    file: lib/AsposeCellsCloud/Object/ValidationsResponse.pm
+  AsposeCellsCloud::Object::ValueType:
+    file: lib/AsposeCellsCloud/Object/ValueType.pm
+  AsposeCellsCloud::Object::Workbook:
+    file: lib/AsposeCellsCloud/Object/Workbook.pm
+  AsposeCellsCloud::Object::WorkbookEncryptionRequest:
+    file: lib/AsposeCellsCloud/Object/WorkbookEncryptionRequest.pm
+  AsposeCellsCloud::Object::WorkbookProtectionRequest:
+    file: lib/AsposeCellsCloud/Object/WorkbookProtectionRequest.pm
+  AsposeCellsCloud::Object::WorkbookReplaceResponse:
+    file: lib/AsposeCellsCloud/Object/WorkbookReplaceResponse.pm
+  AsposeCellsCloud::Object::WorkbookResponse:
+    file: lib/AsposeCellsCloud/Object/WorkbookResponse.pm
+  AsposeCellsCloud::Object::WorkbookSettings:
+    file: lib/AsposeCellsCloud/Object/WorkbookSettings.pm
+  AsposeCellsCloud::Object::WorkbookSettingsResponse:
+    file: lib/AsposeCellsCloud/Object/WorkbookSettingsResponse.pm
+  AsposeCellsCloud::Object::Worksheet:
+    file: lib/AsposeCellsCloud/Object/Worksheet.pm
+  AsposeCellsCloud::Object::WorksheetMovingRequest:
+    file: lib/AsposeCellsCloud/Object/WorksheetMovingRequest.pm
+  AsposeCellsCloud::Object::WorksheetReplaceResponse:
+    file: lib/AsposeCellsCloud/Object/WorksheetReplaceResponse.pm
+  AsposeCellsCloud::Object::WorksheetResponse:
+    file: lib/AsposeCellsCloud/Object/WorksheetResponse.pm
+  AsposeCellsCloud::Object::Worksheets:
+    file: lib/AsposeCellsCloud/Object/Worksheets.pm
+  AsposeCellsCloud::Object::WorksheetsResponse:
+    file: lib/AsposeCellsCloud/Object/WorksheetsResponse.pm
+requires:
+  AsposeStorageCloud::StorageApi: '0'
+  Carp: '0'
+  Data::Dumper: '0'
+  Date::Parse: '0'
+  DateTime: '0'
+  Digest::HMAC_SHA1: '0'
+  Exporter: '0'
+  File::Slurp: '0'
+  HTTP::Headers: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Response: '0'
+  HTTP::Status: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Log::Any: '0'
+  MIME::Base64: '0'
+  Module::Runtime: '0'
+  Scalar::Util: '0'
+  Test::Exception: '0'
+  URI::Escape: '0'
+  URI::Query: '0'
+  perl: v5.6.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: '1.01'

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution AnyEvent-Retry,
+version 0.03:
+
+  try something until it works
+
+This software is copyright (c) 2010 by Jonathan Rockway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

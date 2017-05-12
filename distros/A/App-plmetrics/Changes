@@ -1,0 +1,23 @@
+Revision history for Perl extension App::plmetrics
+
+0.06    Sun Jun 16 20:54:18 JST 2013
+        - new option: --reault files
+        - some refactors
+        - some fixes
+
+0.05    Sun Jun 16 00:33:50 JST 2013
+        - added the test for command executing
+
+0.04    Sat Jun 15 23:42:48 JST 2013
+        - fixed depnedency
+
+0.03    Sat Jun 15 21:24:49 JST 2013
+        - tiny fix for a message
+        - fixed pod
+        - test enhancements
+
+0.02    Sat Jun 15 14:07:54 JST 2013
+        - fixed bug
+
+0.01    Sat Jun 15 12:59:42 JST 2013
+        - original version

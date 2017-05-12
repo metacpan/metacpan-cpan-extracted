@@ -1,0 +1,25 @@
+NAME
+    Alien::Gfsm - install the libgfsm C library on your system
+
+SYNOPSIS
+       use 5.010;
+       use strict;
+       use Alien::Gfsm;
+   
+       my $alien = Alien::Gfsm->new;
+       say $alien->libs;
+       say $alien->cflags;
+
+DESCRIPTION
+    Ensures that the libgfsm C library is installed on your system.
+
+AUTHOR
+    Bryan Jurish <moocow@cpan.org>.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2016 by Bryan Jurish
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.14.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

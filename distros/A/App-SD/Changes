@@ -1,0 +1,86 @@
+0.75
+
+The "this is getting ridiculous" release.
+
+User-visible highlights (not all commits are listed here):
+ * fix hiveminder logins when setting username/password via URL (spang)
+ * bump dependencies to fix bitrot (spang, obra, franck)
+ * foreign replicas now have better username/password prompting (spang)
+ * clean up hiveminder sync messages (spang)
+ * fix cloning from hiveminder (spang)
+ * progress bar cleanups on clone/pull (spang)
+ * publish --html works again (sunnavy, spang)
+ * new server default port that clashes less with other HTTP servers (spang)
+ * misc mac fixes (obra, sunnavy)
+ * make -h more discoverable (spang)
+ * new 'help commands' page (spang)
+ * 'help browser' and 'help clone' now point to sync help (obra, spang)
+ * mention --as and --local in clone usage messages (spang)
+ * add some SD-specific bash completion rules (jibsheet)
+
+0.74
+
+User-visible highlights for this release (not all commits are listed here):
+ * Make tests clean up after themselves - Alex Vandiver
+ * friendlier error message if user tries to sync with RT without RT::Client::REST - Christine Spang
+ * Check for http:// in RT URL regex since RT::Client::REST expects it - Christine Spang
+ * Report back errors on login failure in RT sync - Christine Spang
+ * Three minor tweaks for Moose compatibility - Christine Spang
+ * Shipwright packaging - Jesse Vincent
+ * UNIVERSAL::require is neither a dependency of prophet nor required - Jesse Vincent
+ * Update SD to use the new database_bonjour_name API provided by prophet - Jesse Vincent
+ * Make hyperlinks in SD relative - Jesse Vincent
+ * RT servers can run on https:// servers - Kevin Falcone
+ * redmine test: do require test inside BEGIN block - Sam Vilain
+ * Redmine test improvements - franck cuny
+ * if there is a trailing slash at the end of the URI, the github api will fail to fetch the data  - franck cuny
+ * fix: lighthouse->open_states_list auto deref - sunnavy
+ * add query string support and increase performance for gcode sync - sunnavy
+
+Thanks to the following people who contributed to this release:
+Alex Vandiver, Christine Spang, Jesse Vincent, Kevin Falcone, Sam Vilain,
+franck cuny, and sunnavy.
+
+0.73
+
+ * updates to the shipwright packager - Jesse Vincent
+ * fix an uninitialized value warning  in bin/sd - sunnavy
+ * Document using x509 client certificates with trac. - Nelson Elhage
+ * Document new alias behavior in 'help aliases' - Nelson Elhage
+ * add feature lighthouse to Makefile.PL - sunnavy
+ * fix quoted args in darcs-sd - Christine Spang
+ * update lighthouse replica: use auth; versions and attachments can return arra
+y - sunnavy
+
+0.72
+
+ * Initial cut of a lighthouse sync - attachment support for lighthouse, but push only has skeleton: waiting for their api updates - sunnavy
+ * Add --version / -V - Christine Spang
+ * Now we can push attachments to trac! And we _test_ them - Jesse Vincent
+ * made "sd help attach" work - Jesse Vincent
+ * Fix push of comments to trac - Jesse Vincent
+
+
+0.71
+
+* Fix a broken regexp in manifest.skip which stopped SD on CPAN from having a pretty webui - thanks to Nelson Elhage
+* Added documentation about proper clone command to use with a local sd server - Pedro Melo
+* GitHub UI improvements and related updates for prompt_for_login API change - Christine Spang
+* In the Redmine tests, we weren't doing all of our test skips in the BEGIN {} block. Marcus Ramberg caught this
+* All help references for summary format should be 'ticket.summary-format' - Christine Spang
+* bugfix: be able to delete props that aren't in common_ticket_props from the  - Christine Spang
+editor - Christine Spang
+* Fix a help typo pointed out by Gerfried Fuchs - Christine Spang
+* Further fixes/clarifications for search help. - Christine Spang
+
+
+
+0.70 - 2009-08-26
+
+* Workaround for occasionally broken Ruby date formatting libraries in github replicas
+* Minor testing and formatting change
+
+0.69_01 - 2009-08-21
+
+* Initial release
+  - dev release to do CPAN smoking before official release

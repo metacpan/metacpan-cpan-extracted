@@ -1,0 +1,5 @@
+- test with recursive roles
+- Defining a super admin
+- Use cache
+- Add 'private' operation
+- Add constraints on permissions ( Time, Geo, ...)

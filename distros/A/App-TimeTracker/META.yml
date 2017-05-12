@@ -1,0 +1,68 @@
+---
+abstract: 'time tracking for impatient and lazy command line lovers'
+author:
+  - 'Thomas Klausner <domm@cpan.org>'
+build_requires:
+  File::Copy::Recursive: '0'
+  File::Temp: '0'
+  IO::Capture::Stdout: '0'
+  Module::Build: '0.28'
+  Module::Pluggable: '0'
+  Test::File: '0'
+  Test::MockTime: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  Test::Trap: '0'
+  lib: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-TimeTracker
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  DateTime: '0'
+  DateTime::Format::Duration: '0'
+  DateTime::Format::ISO8601: '0'
+  Digest::SHA: '0'
+  Encode: '0'
+  Exporter: '0'
+  File::Copy: '0'
+  File::Find::Rule: '0'
+  File::HomeDir: '0'
+  Git::Repository: '0'
+  Hash::Merge: '0'
+  JSON::XS: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Getopt: '0'
+  MooseX::Storage: '0'
+  MooseX::Storage::Format::JSONpm: '0'
+  MooseX::Types::Path::Class: '0'
+  Path::Class: '0'
+  Path::Class::Iterator: '0'
+  RT::Client::REST: '0'
+  RT::Client::REST::Ticket: '0'
+  Scalar::Util: '0'
+  Term::ANSIColor: '0'
+  Text::Table: '0'
+  Try::Tiny: '0'
+  URI::Escape: '0'
+  Unicode::Normalize: '0'
+  User::pwent: '0'
+  namespace::autoclean: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: http://timetracker.plix.at
+  repository: git://github.com/domm/App-TimeTracker.git
+version: '2.024'

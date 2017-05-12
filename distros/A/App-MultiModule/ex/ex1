@@ -1,0 +1,19 @@
+#!/bin/sh
+
+cat << 'EOF' > test.conf
+{   Example1 => { outstr => 'howdy' },
+    Router => {
+        routes => [
+            {   match => {
+                    source => 'Example1'
+                },
+                forwards => [
+                    {   qname => 'Example2' }
+                ]
+            }
+        ]
+    }
+}
+EOF
+
+bin/MultiModule -p MultiModuleTest:: -c test.conf

@@ -1,0 +1,5 @@
+requires 'perl', '5.012000';
+
+requires 'Try::Tiny';
+
+on 'configure' => sub { requires 'Test::More' };

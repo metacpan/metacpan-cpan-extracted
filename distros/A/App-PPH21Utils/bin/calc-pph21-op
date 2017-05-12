@@ -1,0 +1,256 @@
+#!perl
+
+# Note: This script is a CLI  for Riap function /Business/Tax/ID/PPH21/calc_pph21_op
+# and generated automatically using Perinci::CmdLine::Gen version 0.28
+
+our $DATE = '2016-01-18'; # DATE
+our $DIST = 'App-PPH21Utils'; # DIST
+our $VERSION = '0.02'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => "/Business/Tax/ID/PPH21/calc_pph21_op",
+    program_name => "calc-pph21-op",
+)->run;
+
+# ABSTRACT: Calculate PPh 21 for individuals ("OP", "orang pribadi")
+# PODNAME: calc-pph21-op
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+calc-pph21-op - Calculate PPh 21 for individuals ("OP", "orang pribadi")
+
+=head1 VERSION
+
+This document describes version 0.02 of calc-pph21-op (from Perl distribution App-PPH21Utils), released on 2016-01-18.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % calc-pph21-op [options] <year>
+
+Examples:
+
+Someone who earns below PTKP:
+
+ % calc-pph21-op 2015 --net-income 30000000 --tp-status TK/0
+ 0
+
+ % calc-pph21-op 2015 --net-income 300000000 --tp-status K/2
+ 33750000
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--net-income>=I<f>*
+
+Yearly net income.
+
+=item B<--tp-status>=I<s>*
+
+Taxypayer status.
+
+Valid values:
+
+ ["TK/0","TK/1","TK/2","TK/3","K/0","K/1","K/2","K/3"]
+
+Taypayer status reflects his/her marital status and affect the amount of
+his/her non-taxable income.
+
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=item B<--year>=I<i>*
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C calc-pph21-op calc-pph21-op
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete calc-pph21-op 'p/*/`calc-pph21-op`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at C<~/.config/calc-pph21-op.conf>, C<~/calc-pph21-op.conf> or C</etc/calc-pph21-op.conf> (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features. 
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+List of available configuration parameters:
+
+ format (see --format)
+ naked_res (see --naked-res)
+ net_income (see --net-income)
+ tp_status (see --tp-status)
+ year (see --year)
+
+=head1 ENVIRONMENT
+
+=head2 CALC_PPH21_OP_OPT => str
+
+Specify additional command-line options
+
+=head1 FILES
+
+~/.config/calc-pph21-op.conf
+
+~/calc-pph21-op.conf
+
+/etc/calc-pph21-op.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-PPH21Utils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-PPH21Utils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PPH21Utils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

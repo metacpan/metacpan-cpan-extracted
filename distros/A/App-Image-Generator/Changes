@@ -1,0 +1,8 @@
+0.02 2016-04-04T15:20:27+02:00
+ - Add LICENSE file.
+ - Add support for jpg suffix.
+ - Fix image type (JPG vs jpg suffix).
+ - Update copyright years.
+
+0.01 2015-11-12T16:02:38+01:00
+ - First version.

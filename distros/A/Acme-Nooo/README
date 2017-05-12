@@ -1,0 +1,24 @@
+Acme-Nooo version 0.01
+======================
+
+Tired of ``object-fetishist'' modules that force you to create a
+handle object when a simple procedural interface would have been
+sufficient? Acme::Nooo will import functions into the current
+namespace to de-objectify abominable interfaces.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Sean O'Rourke
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, at the time at which this
+version was released.

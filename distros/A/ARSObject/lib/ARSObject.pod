@@ -1,0 +1,1905 @@
+=head1 NAME
+
+ARSObject - high level interface above ARS module
+
+=head1 SYNOPSIS
+
+  use ARSObject;
+  my $s =ARSObject->new(-srv =>'ip address',-usr => 'username',-pswd =>'******'
+		,-storable => 0
+		,-schema =>['BMC.CORE:BMC_ComputerSystem','BMC.CORE:BMC_ApplicationSystem']
+		,-metaid =>{
+		'1' => 'RequestId'
+		,'6' => 'ModifiedDate'
+		,'179' => 'InstanceId'
+		,'1000000001' => {fieldName=>'Company'}
+		,'200000020' => 'Name'
+		});
+  $s->connect();
+  my $hac ={};
+  $s->query(-from=>'BMC.CORE:BMC_ComputerSystem'
+			,-where=>"('DatasetId'=\"BMC.ASSET\")"
+				." AND ('Company'=\"$company\")"
+			,-fields=>['Name', 'ModifiedDate', 'RequestId', 'InstanceId', 'ShortDescription', 'InstanceId', 'DatasetId', 'TokenId', 'OwnerName', 'OwnerContact', 'TagNumber', 'Description', 'HostName', 'Domain', 'Workgroup', 'CMDBRowLevelSecurity', 'Company', 'Region', 'AssetLifecycleStatus']
+			,-order=>['Name']
+			,-for=>sub{$hac->{$_[3]->{Name}} =$_[3];
+				}
+		);
+  print $s->dsdump($hac);
+
+
+=head1 DESCRIPTION
+
+This module is intended for capable scripts above L<ARS|ARS> module
+(L<../../ARSPerl/index.html>).
+
+It caches metadata alike L<Remedy::ARSTools|Remedy/ARSTools>,
+but uses L<Data::Dumper|Data/Dumper> or L<Storable|Storable> module.
+And metadata model is directly given from ARS::ars_GetFieldTable()/ARS::ars_GetField(),
+unlike L<ARSOOForm|ARSOOForm> and L<Remedy::ARSTools|Remedy/ARSTools>.
+And additional description level (C<-metadn>/C<-metaid>) added to unify field names
+and extend conversion capabilities of field values.
+
+Field names and values are translated (C<-strFields>/C<strIn>/C<strOut>)
+as possible.
+
+C<query>() method supports iterator sub{} and uses ARS::ars_GetListEntry(), 
+ARS::ars_GetListEntryWithFields(), ARS::ars_GetEntry() calls
+as appropriate with parameters given.
+
+C<entry>(), C<entryIns>(), C<entryUpd>(), C<entryDel>() methods 
+are usual to manipulate records.
+
+C<entryNew>() method may be used to form new record hash with default values for C<entryIns>().
+
+C<entryDif>() method may be used to minimise data for C<entryUpd>().
+
+C<AUTOLOAD>() method is to call 'ARS::ars_XXX' functions as methods.
+
+Special processing added for 'HPD:Help Desk' ITSM Suite form.
+
+C<Variable files> may be used to cache any data.
+
+Misc C<Utility Methods> intended for strings, dates, data structures.
+
+C<Utility Objects> added to simplify and unify access to 
+L<DBI|DBI>, L<CGI|CGI>, L<Net::SMTP|Net/SMTP> modules.
+
+
+
+=back
+
+
+=head1 CLASSIFICATION
+
+=over
+
+
+=item Creation and Configuration
+
+C<new>, C<set>, C<Slots>
+
+
+=item Error Processing and Echo
+
+C<-die>, C<-warn>, C<-echo>, C<-cpcon>/C<cpcon>;
+C<ars_errstr>, C<dbierrstr>
+
+
+=item Connection
+
+C<connect>(C<-srv> => server, C<-usr> => name, C<-pswd> => password, C<-lang> => language);
+C<-ctrl>
+
+C<dbiconnect>(C<-dbiconnect>); C<-dbi>
+
+
+=item Metadata
+
+C<connect>; C<arsmeta>, C<arsmetamin>; C<schema>,...; C<lsflds>;
+C<-schema>, C<-meta>/C<-meta-min>/C<-meta-sql>, C<-metax>, C<-metadn>, C<-metaid>, C<-schgen>, C<-schfdo>, C<-strFields>;
+C<Variable files>
+
+
+
+=item Variable files
+
+C<-vfbase>, C<-storable>;
+C<vfname>, C<vfload>, C<vfstore>, C<vfclear>, C<vfdata>, C<vfhash>, C<vfdistinct>
+
+
+=item ARS methods
+
+C<connect>, C<query>, C<entry>, C<entryNew>, C<entryIns>, C<entryUpd>, C<entryDel>, C<entryBLOB>, C<AUTOLOAD>;
+
+C<-strFields>, C<strIn>, C<strOut>;
+
+C<arsquot>;
+
+C<-maxRetrieve>
+
+
+
+=item Utility Methods
+
+C<strquot>, C<strquot2>, C<arsquot>;
+
+C<cptran>, C<cpcon>;
+
+C<strtime>, C<timestr>, C<timeadd>;
+
+C<dsquot>, C<dsquot1>;
+
+C<dsdump>, C<dsparse>, C<dscmp>, C<dsmerge>, C<dsunique>;
+
+C<fopen>, C<fload>, C<fstore>, C<fdirls>;
+
+C<soon>
+
+
+
+=item Utility Objects
+
+C<dbi>, C<-dbi>, C<dbiconnect>, C<-dbiconnect>;
+C<dbiquery>, C<dbido>; C<dbierrstr>
+
+C<cgi>, C<-cgi>, C<cgiconnect>;
+C<cgipar>, C<cgiesc>, C<cgitfrm>, C<cgitext>, C<cgistring>, C<cgiselect>, C<cgiddlb>
+
+C<smtp>, C<-smtp>, C<smtpconnect>, C<-smtphost>; C<smtpsend>
+
+
+
+=item SQL Data Store Methods
+
+C<arsmetasql>, C<sqlname>, C<dbidsmetasync>, C<dbidsrpl>, C<dbidsquery>;
+
+C<-meta-sql>; C<-sqlschema>;
+
+C<-sqlname>, C<-sqlntbl>, C<-sqlncol>, C<-sqlninc>
+
+
+
+=item CGI Form Presenter
+
+C<-fpl> => [-formdb=>'...',-record=>'...', {action field},.. {view/edit field},.., {button field},..}]
+
+C<-fphc> => {'cgi field name' => {field definition},..}
+
+C<-fphd> => {'db field name' => {field definition},..}
+
+C<cfprun>, C<cfpaction>, C<cfpv>, C<cfpvv>, C<cfpvl>, C<cfpvp>
+
+* action field: C<-name>.., C<-preact> || C<-action>, C<-widget>=>undef, C<-used>=>condition sub{}
+
+* key field: C<-name>.., C<-key>=>1, C<-readonly>=>1
+
+* text: C<-widget>=>'html'
+
+* edit field: C<-name>..,
+
+* computed: C<-name>.., C<-computed>=>sub{}
+
+* readonly: C<-name>.., C<-readonly>=>1
+
+* do not store: C<-name>.., C<-entryIns>=>0, C<-entryUpd>=>0, C<-vfstore>=>0
+
+* list&refresh: C<-name>.., C<-onchange>=>1, C<-labels>, C<-values>
+
+* optional button field: C<-name>.., C<-action>=>1, C<-used>=>condition
+
+
+
+=item CGI Form Presenter - Field Definitions
+
+(for each field inside C<CGI Form Presenter - Fields>)
+
+C<-name>, C<-namecgi>, C<-namedb>, C<-metadb> => 'field name'
+
+C<-namelbl>, C<-namecmt> => 'text for user'
+
+C<-namehtml> => sub{} -> 'html for user'
+
+C<-formdb> => 'name', C<-record> => 'name' || 'nameRowNumber'
+
+C<-used>, C<-unused> => boolean || 'field name' || ['field',...] || condition sub{}
+
+C<-entryIns>, C<-entryUpd>, C<-vfstore> => !exists ||false
+
+C<-preact> || C<-action> => 'action name' || action sub{} -> success
+
+C<-vfname> => 'name', C<-vfrenew>, C<-vfedit>, C<-vftran> => boolean
+
+C<-key> => boolean
+
+C<-master> => 'field name'
+
+C<-computed>, C<-value> => value || ['field from'] || sub{} -> value
+
+C<-undef> => value
+
+C<-values> => [value,..] || sub{}, C<-labels> => {value => label,..} || sub{}; C<-lbtran>, C<-lbadd> => boolean
+
+C<-reset> => 'field name' || ['field',...] || condition sub{}
+
+C<-change> => {set field values}
+
+C<-error>, C<-warn> => sub{} -> 'text'
+
+C<-widget> => {definitions for cgi field in the C<Utility Objects>} || html || sub{}->html
+Field definitions may be used also:
+C<-action> => 1;
+C<-labels>, C<-values>;
+C<-disabled>, C<-readonly>, C<-hidden>, C<-onchange> => boolean.
+
+C<-widget0> => html above C<-widget> || sub{} -> html
+
+C<-widget1> => html below C<-widget> || sub{} -> html
+
+
+=back
+
+
+=head1 SLOTS
+
+=over
+
+=item Slots
+
+
+=item -action
+
+	=> not exists 
+	|| sub{}({self}, action, '-action'
+		, {key field}, $_= key value, key pv
+		, {field db name=>value,..}, prev return)
+		-> success || {field db name => value}
+	|| 'entryIns' || 'entryUpd' || 'entryDel' || 'entrySave'
+	|| 1
+
+(C<CGI Form Presenter - Field Definitions>)
+Action to execute after the form performance,
+should be at the top of the form, before C<-key> fields.
+May be several actions with the same C<-namecgi>.
+1 - action button, it should to be at the bottom of the form.
+For 'entrySave' action, 'entryUpd' is used when non-empty key value,
+'entryDel' otherwise with non-empty previous key value.
+
+See also C<-preact>.
+
+
+=item -cgi
+
+	=> undef || CGI object
+
+(C<Utility Objects>)
+L<CGI|CGI> utility object.
+See also C<cgi> method.
+
+
+
+=item -change
+
+	=> not exists
+	|| {field name => value || sub{}({self}, {field}, $_ =value),..}
+	|| {value=>{field name => value,..},..}
+
+(C<CGI Form Presenter - Field Definitions>)
+Change field values when this field changed.
+This may be defined also as C<-values> or C<-labels>.
+
+
+
+=item -computed
+
+	=> not exists || value || [field name] || sub{}({self},{field}) -> value
+
+(C<CGI Form Presenter - Field Definitions>)
+Computed field value evaluator.
+See also C<-value>.
+
+
+=item -cpcon
+
+	=> undef || sub{}(self, arg,...) -> translated
+
+(C<Error Processing and Echo>)
+Translation sub{} for error messages and C<-echo> printout.
+I.e. sub{$_[0]->C<cptran>('ansi'=>'oem',@_[1..$#_])}
+
+
+=item -ctrl
+
+	=> undef || ARS control struct
+
+(C<Connection>)
+ARS control struct from ARS::ars_Login()
+
+
+
+=item -dbi
+
+	=> undef || DBI object
+
+=item -dbiconnect
+
+	=> undef || connection string || [connect args]
+
+(C<Utility Objects>)
+L<DBI|DBI> utility object and connect specification to create it.
+See also C<dbi> and C<dbiconnect> methods.
+
+
+
+=item -die
+
+	=> undef || sub{}
+
+	=> set(-die => 'Carp' || 'CGI::Carp' || 'CGI::Carp qw(fatalsToBrowser warningsToBrowser)' || 'CGI::Die')
+
+(C<Error Processing and Echo>)
+Error die sub{}.
+The most C<Methods> dies when error.
+Call C<set>(C<-die> => 'Carp') to use L<Carp|Carp> module.
+Call C<set>(C<-die> => 'CGI::Carp fatalsToBrowser') to use L<CGI::Carp|CGI/Carp> module.
+
+See also C<-diemsg>, C<-warn>, C<-cpcon>
+
+
+=item -diemsg
+
+	=> undef || sub{}(string)
+
+Message for C<-die>, alike L<CGI::Carp|CGI/Carp>::set_message()
+
+
+
+=item -echo
+
+	=> 0 | 1
+
+(C<Error Processing and Echo>)
+Echo printout switch.
+Temporarilly may be used as an argument for specific methods.
+alike C<query> and C<entryIns>.
+
+
+
+=item -entryNo
+
+	=> entryIns()
+
+(C<ARS methods>)
+The logical number of the entry inserted by C<entryIns>().
+
+
+
+=item -error
+
+	=> not exists
+	|| sub{}({self}, {field}, $_ =field value, previous value) -> 'error text'
+	|| 'error text for empty field'
+
+(C<CGI Form Presenter - Field Definitions>)
+Field value error evaluator
+See also C<-warn>.
+
+
+
+=item -fpl
+
+	=> [-formdb=>'...',-record=>'...'
+	, {action field},.. {view/edit field},.., {button field},..}]
+
+=item -fphc
+
+	=> {'cgi field name' => {field definition},..}
+
+=item -fphd
+
+	=> {'db field name' => {field definition},..}
+
+(C<CGI Form Presenter>)
+Definitions of fields:
+list of field in order to be evaluated,
+field definitions by cgi names,
+field definitions by ARS names.
+
+
+
+=item -formdb
+
+	=> 'db form name'
+
+(C<CGI Form Presenter - Field Definitions>)
+db form name, may be defined as a 
+special C<-fpl> entry before field definitions.
+
+
+=item -key
+
+	=> => not exists || boolean
+
+(C<CGI Form Presenter - Field Definitions>)
+Key database field?
+
+
+=item -labels
+
+	=> not exists || {value=>label,..} || {value=>{{-label=>label, field=>value,..},..}
+	|| sub{}({self},{field},$_=value) -> {value=>label,..}
+
+(C<CGI Form Presenter - Field Definitions>)
+Labels for the drop-down list box field.
+If no C<-values>, this will be generated automatically.
+Special {-name=>name, field=>value,..} form is to define C<-change>.
+See also C<-values>.
+
+
+
+=item -lbtran
+
+=item -lbadd
+
+	=> not exists || true || false (default)
+
+(C<CGI Form Presenter - Field Definitions>)
+Translate list box value with C<-labels> if needed?
+Add field value to C<-values> if not listed?
+
+
+
+=item -lang
+
+	=> '' || 'ARS language' || 'en_US' || 'ru_RU'...
+
+(C<Connection>)
+ARS language to use for session, i.e. 'en_US'
+
+
+
+=item -master
+
+	=> not exists || 'master field name'
+
+(C<CGI Form Presenter - Field Definitions>)
+Name of the field containg value for this field.
+
+
+
+=item -metadb
+
+	=> not exists || 'ARS field name'
+
+(C<CGI Form Presenter - Field Definitions>)
+ARS field name to be used for field metadata:
+C<-name>, C<-namelbl>, C<-labels>, C<-value>, etc.
+
+
+
+=item -name
+
+	=> not exists || 'common field name'
+
+=item -namecgi
+
+	=> not exists || 'cgi field name'
+
+=item -namedb
+
+	=> not exists || 'ARS field name'
+
+=item -namelbl
+
+	=> not exists || 'field label'
+
+=item -namecmt
+
+	=> not exists || 'comment text'
+
+=item -namehtml
+
+	=> not exists || sub{}(self, {field}, 'widget html') -> 'label html'
+
+(C<CGI Form Presenter - Field Definitions>)
+Field names, label, comment text.
+If C<-name> exists, it's value may be used as C<-namedb>,
+and escaped value may be used as C<-namecgi>.
+
+
+=item -maxRetrieve
+
+	=> 0 || number of rows
+
+(C<ARS methods>)
+Max number of rows to retrieve from ARS server with C<query> method.
+
+
+=item -meta
+
+	=> {...}
+
+(C<Metadata>)
+Forms metadata from ARS server:
+
+{formName}->{-fields}->{fieldName}=>{}, 
+
+{formName}->{-fldids}->{fieldId}=>{}.
+
+Futher data model is directly given from ARS::ars_GetFieldTable()/ARS::ars_GetField()
+excluding C<-metax>.
+
+Additional parameters may be:
+'fieldLbl' => label, 'fieldLblc' => label cmt
+
+
+=item -metaid
+
+	=> {fieldId => {fieldName=>'name',FieldId=>id, strIn|strOut=>sub{}},...}
+
+=item -metadn
+
+	=> {fieldName => {fieldName=>'name',FieldId=>id, strIn|strOut=>sub{}},...}
+
+(C<Metadata>)
+Commonly used fields with common names and value translation.
+Data translation sub{}s may be specified as
+
+'strOut'|'strIn' => sub(self,form,{field},$_=value){} -> translated value.
+
+This sub{}s may use C<strOut>() and C<strIn> methods.
+
+
+=item -metax 
+
+	=> ['displayInstanceList','permissions']
+
+(C<Metadata>)
+Field parameters to exclude from C<-meta> to decrease memory usage.
+
+
+=item -meta-min
+
+(C<Metadata>)
+
+Used by C<arsmetamin> internally.
+
+
+=item -meta-sql
+
+	=> undef || {SQL Data Store metadata}
+
+(C<Metadata>, C<SQL Data Store Methods>, C<Variable files>)
+SQL Data Store metadata loaded or refreshed by C<arsmetasql>()/C<sqlname>():
+
+{tableName}->{-cols}->{sqlName}=>{fieldName, sqlName,...}
+
+{tableName}->{-fields}->{fieldName}=>sqlName
+
+{tableName}->{-ids}->{fieldId}=>sqlName
+
+{-forms}->{formName}->{tableName}
+
+
+=item -preact
+
+	=> not exists
+	|| sub{}({self}, action, '-preact'
+		, {key field}, $_= key value, key pv
+		, {field db name=>value,..})
+		-> success || {field db name => value}
+	|| 'vfentry' || 'vfhash' || 'entry' || 'entryNew'
+
+(C<CGI Form Presenter - Field Definitions>)
+Action to execute before the form performance,
+should be at the top of the form, before C<-key> fields.
+May be several actions with the same C<-namecgi>.
+Alternative key field name may be passed as L<CGI|CGI>->param(action-name).
+See alco C<-action>.
+
+
+=item -pswd
+
+	=> undef || ''
+
+(C<Connection>)
+ARS password string to login with
+
+
+=item -record 
+
+	=> 'record name' || 'nameRowNumber'
+
+(C<CGI Form Presenter - Field Definitions>)
+Record name, if several records in screen, 
+may be defined as a special C<-fpl> entry after C<-formdb> entry.
+Record name may be followed by row number.
+
+
+=item -reset
+
+	=> not exists || 'field name' || ['field name',..] || sub{}({self}, {field})
+
+(C<CGI Form Presenter - Field Definitions>)
+Condition to reset field value.
+If C<-values> and field value unfound, it will be reset also.
+
+
+=item -schema
+
+	=> undef || [form name, form name...]
+
+(C<Metadata>)
+ARS forms or schemas to use.
+Metadata will be loaded to C<-meta> and may be cached with C<vfname>(C<-meta>)
+if C<-schgen>.
+
+
+=item -schfdo
+
+	=> 0 || 1
+
+(C<Metadata>)
+Include display only fields (AR_FIELD_OPTION_DISPLAY) into schema.
+
+
+
+=item C<-schgen> 
+
+	=> 1 || 0 
+	|| 2 || 3 || [schema,...]
+
+(C<Metadata>)
+Cache metadata from ARS server using C<vfname>(C<-meta>)?
+Or each session get metadata from ARS server.
+
+	0 - get metadata from server, do not use cache file.
+	1 - generate cache file if not exists, else load this file.
+	2 - renew schema definitions using timestamps.
+	3 - renew schema always.
+	[schema,...] - list of schemas to renew.
+
+
+=item -smtp
+
+	=> undef || Net::SMTP object
+
+=item -smtphost
+
+	=> undef || SMTP host name
+
+
+(C<Utility Objects>)
+L<Net::SMTP|Net/SMTP> utility object and connect specification to create it.
+See also C<smtp> and C<smtpconnect> methods.
+
+
+=item -sqlname
+
+	=> undef || sub{}(self, ARS name) -> SQL name
+
+(C<SQL Data Store Methods>)
+sub{} to escape ARS name to the SQL name, 
+may be used instead of C<-sqlntbl> and C<-sqlncol>.
+See also C<-sqlninc>.
+See 'sub sqlnesc' in the source code as an example.
+
+
+=item -sqlncol
+
+	=> undef || sub{}(self, ARS field name) -> SQL col name
+
+(C<SQL Data Store Methods>)
+sub{} to escape ARS field name to the SQL column name, see also C<-sqlntbl>, C<-sqlninc>.
+See 'sub sqlnesc' in the source code as an example.
+
+
+=item -sqlninc
+
+	=> undef || sub{}(self, SQL name) -> SQL name incremented
+
+(C<SQL Data Store Methods>)
+sub{} to increment SQL name, used after C<-sqlname>/C<-sqlntbl>/C<-sqlncol>
+when the same SQL name already exists.
+See 'sub sqlninc' in the source code as an example.
+
+
+=item -sqlntbl
+
+	=> undef || sub{}(self, ARS form name) -> SQL table name
+
+
+(C<SQL Data Store Methods>)
+sub{} to escape ARS form name to the SQL table name, see also C<-sqlncol>, C<-sqlninc>.
+See 'sub sqlnesc' in the source code as an example.
+
+
+=item -sqlschema
+
+	=> undef || SQL schema name
+
+(C<SQL Data Store Methods>)
+SQL schema name for C<dbidsmetasync>(), C<dbidsrpl>(), C<dbidsquery>().
+
+
+=item -storable
+
+=item -meta-storable
+
+=item <-vfname>-storable
+
+	=> 1 || 0
+
+(C<Variable files>)
+Use L<Storable|Storable> module for variable files, metadata file, or another particular file?
+Or L<Data::Dumper|Data/Dumper> will be used.
+See also C<vstore>().
+
+
+
+=item -srv
+
+	=> undef || 'ARS server name'
+
+(C<Connection>)
+ARS server name to connect
+
+
+=item -strFields
+
+	=> 1 || 0 || 2
+
+(C<ARS methods>)
+Translate ARS field values using metadata and conversion sub{}s.
+1 - using 'enumLimits' and C<strtime>/C<timestr>('yyyy-mm-dd hh:mm:ss'), 
+2 - using at first localisation metadata for enum fields ('fieldLbvl').
+
+
+
+=item -undef
+
+	=> not exists || value 
+
+(C<CGI Form Presenter - Field Definitions>)
+Field value to be treated as undef or null for database.
+See also C<-value>.
+
+
+
+=item -used
+
+	=> not exists == 1 || boolean || 'field name' || ['field name',..] 
+	|| sub{}({self}, {field})
+
+=item -unused
+
+	=> not exists == 0 || boolean || 'field name' || ['field name',..]
+	|| sub{}({self}, {field})
+
+(C<CGI Form Presenter - Field Definitions>)
+Condition to use or unuse field in the screen and actions.
+
+
+=item -usr
+
+	=> undef || 'ARS user name'
+
+(C<Connection>)
+ARS user name to login under
+
+
+
+=item -value
+
+	=> not exists || value || [field name] || sub{}({self},{field}) -> value
+
+(C<CGI Form Presenter - Field Definitions>)
+Default field value or field value evaluator.
+See also C<-computed>.
+
+
+
+=item -values
+
+	=> not exists || [value,..] || [{-name=>name, field=>value,..},..]
+	|| sub{}({self},{field},$_=value) -> [value,..]
+
+(C<CGI Form Presenter - Field Definitions>)
+Values for the drop-down list box field
+Special {-name=>name, field=>value,..} form is to define C<-change>.
+See also C<-labels>.
+
+
+
+=item -vfbase
+
+	=> 'script file path name-' || 'base file path name' || 'directory path/'
+
+(C<Variable files>)
+Variable files base path name, used by C<vfstore>(), C<vfload>(), C<vfname>().
+Default is formed from script file name without extensions and with '-' added.
+
+
+=item -vfname 
+
+	=> not exists || '-slotName'
+
+=item -vfrenew
+
+	=> not exists || boolean
+
+=item -vfedit
+
+	=> not exists || boolean
+
+=item -vftran
+
+	=> not exists || boolean
+
+(C<CGI Form Presenter - Field Definitions>)
+Short name of the C<Variable File>
+to read record from with C<-action>=>'vfentry' or C<-action>=>'vfhash';
+or to renew or update after C<-action>=>'entryIns' || 'entryUpd' || 'entryDel'
+May be used with C<-action> or C<-key> field.
+
+C<-vfrenew> - renew variable file after 'entryIns' || 'entryUpd' || 'entryDel'
+
+C<-vfedit> - update variable file after 'entryIns' || 'entryUpd' || 'entryDel'
+
+C<-vftran> - translate value with C<-labels> for variable file
+
+
+=item -warn
+
+	=> undef
+
+(C<Error Processing and Echo>)
+Error warn sub{}.
+Call C<set>(C<-die> => 'Carp') to use L<Carp|Carp> module,
+or C<set>(C<-die> => 'CGI::Carp') to use L<CGI::Carp|CGI/Carp> module.
+See also C<-cpcon>.
+
+
+=item -warn
+
+	=> not exists
+	|| sub{}({self}, {field}, $_ =field value, previous value) -> 'warning text'
+	|| 'warning text for empty field'
+
+(C<CGI Form Presenter - Field Definitions>)
+Field value warning evaluator.
+See also C<-error>.
+
+
+
+=item -warnmsg
+
+	=> undef || sub{}(string)
+
+Message for C<-warn>, alike C<-diemsg>.
+
+
+
+=item -widget
+
+	=> not exists || undef == skip || 'html'
+	|| sub{}({self}, {field}, value, previous value) -> html
+	|| {option=>value,..}
+
+(C<CGI Form Presenter - Field Definitions>)
+Definition of html field to display (C<Utility Objects>):
+
+	not exists - use default widget,
+	undef - field not included in form,
+	'html' - html to display,
+		hidden field with previous value added if '-namecgi'
+	sub{} -> html to display,...
+	{option=>value,..} - parameters for 'cgi...' or 'CGI' field
+
+Field definitions may be used also to generate default widget:
+C<-action> => 1;
+C<-labels>, C<-values>;
+C<-disabled>, C<-readonly>, C<-hidden>, C<-onchange> => boolean.
+
+
+
+=item -widget0
+
+=item -widget1
+
+	=> not exists || 'html'
+	|| sub{}({self}, {field}, value, previous value) -> html
+
+(C<CGI Form Presenter - Field Definitions>)
+html to display above and below C<-widget>
+
+
+
+=back
+
+
+
+=head1 METHODS
+
+=over
+
+=item Methods
+
+
+
+=item ars_errstr () -> $ARS::ars_errstr
+
+(C<Error Processing and Echo>)
+Last ARS error.
+
+
+=item arsmeta (-param => value,...)
+
+(C<Metadata>)
+Load/refresh ARS metadata (C<vfload>/C<vfstore>(C<-meta>), C<-metadn>, C<-metaid>).
+Called from C<connect>.
+May be called without C<connect> if metadata file exists.
+See also C<arsmetamin>.
+
+
+=item arsmetamin (-param => value,...)
+
+(C<Metadata>)
+Refresh minimal ARS metadata set (C<vfstore>(C<-meta-min>)) after C<connect>/C<arsmeta> call.
+Load minimal ARS metadata instead of or after C<connect>/C<arsmeta> call.
+Loading of minimal metadata set is faster then loading all metadata with C<arsmeta>.
+Minimal metadata set includes explicit 'enumLimits' and 'time' fields.
+
+Synopsis: Refreshing C<-meta-min>:
+
+	$s->set(-schgen =>3);
+	$s->connect();
+	$s->arsmetamin();
+
+
+=item arsmetasql (-param => value,...)
+
+(C<Metadata>, C<SQL Data Store Methods>)
+
+Load SQL Data Store metadata or refresh this from ARS metadata after C<connect>/C<arsmeta> call.
+The SQL Data Store is intended for data replicated from ARS using C<dbidsrpl>() calls.
+Database table and column names are escaped ARS form and field names.
+Metadata is stored in C<-meta-sql> variable file.
+
+Synopsis: Refreshing C<-meta-sql>:
+
+	$s->set(-schgen =>3);
+	$s->connect();
+	$s->dbi();
+	$s->arsmetasql();
+	$s->dbidsmetasync();
+
+See also C<sqlname>(), C<dbidsmetasync>(), C<dbidsrpl>(), C<dbidsquery>()
+
+
+=item arsquot (string) -> escaped and quoted for ARS
+
+Quote and escape string for ARS.
+See also C<strquot>/C<strquot2>
+
+
+
+=item AUTOLOAD ()
+
+(C<ARS methods>)
+Use object->arsXXX() syntax for ARS:ars_XXX(ctrl,...) calls.
+
+
+
+=item cfpaction ({action} || 'action', '-preact'||'-action', {key field}) -> success
+
+(C<CGI Form Presenter>)
+Action evaluator, called from C<cfprun>(),
+may be called from C<-action> or C<-preact> sub{}.
+
+
+=item cfpl ('field name' || {field definition}) -> [possible field values]
+
+(C<CGI Form Presenter>)
+List of C<-values> of the field, may be used in sub{}s executed by C<cfprun>.
+
+
+=item cfpp ('field name' || {field definition}) -> previous field value
+
+(C<CGI Form Presenter>)
+Previous value of the field, may be used in sub{}s executed by C<cfprun>.
+
+
+=item cfprun (? msg sub{}(self, 'label', 'comment'), ? form row sub{}(self, {field}, 'html'), ? 'form start html', ? 'form end html') -> success
+
+(C<CGI Form Presenter>)
+Evaluate C<-fpl> and present html form with actions.
+The order of the fields is important, it is preferred to refer from
+the field definition to previous fields, not to subsequent.
+
+
+=item cfpv ('field name' || {field definition}) -> current field value
+
+(C<CGI Form Presenter>)
+Current value of the field, may be used in sub{}s executed by C<cfprun>.
+
+
+=item cfpvv ('field name' || {field definition}) -> current or default field value
+
+(C<CGI Form Presenter>)
+Current or default value of the field, may be used in sub{}s executed by C<cfprun>.
+
+
+
+=item C<cgi> () -> CGI object
+
+=item C<cgi> (CGI->new args) -> CGI object
+
+(C<Utility Objects>)
+Access to L<CGI|CGI> object in C<-cgi>.
+It will be automatically created with C<cgiconnect>() if not exists.
+
+
+
+=item cgiconnect (CGI args) -> CGI object
+
+(C<Utility Objects>)
+Connect to L<CGI|CGI>.
+
+
+
+=item cgiddlb (-name=>name, ?-title=>comment, ?-values=>[values], ?-labels=>{value=>display,..}, ?-default=>value, ?-override=>bool,...) -> drop-down list box HTML
+
+(C<Utility Objects>)
+Generate drop-down list box HTML using L<CGI|CGI> widgets.
+This is alike C<cgiselect>, but more complex.
+
+ -strict=> - disable text editing, allow only to choose value from list
+
+
+
+=item cgiesc (string) -> escaped string
+
+(C<Utility Objects>)
+Escape string to HTML using L<CGI|CGI>->escapeHTML(@_)
+
+
+
+=item cgitfrm (?-table=>{table attrs}, ?-tr=>{tr attrs}, ?-td=>{...}, ?-th=>{...}, [cell value,...],...) -> HTML
+
+(C<Utility Objects>)
+Generate simple HTML form in table layout using L<CGI|CGI>->start_form(),
+L<CGI|CGI>->table(), L<CGI|CGI>->end_form().
+'th' tag will be used for simple strings as usual labels, 'td' tag - for strings started with HTML tags.
+
+
+
+=item cgipar() -> parameters
+
+=item cgipar(name) -> value
+
+=item cgipar(name, value)
+
+(C<Utility Objects>)
+Get or set L<CGI|CGI> parameter - L<CGI|CGI>->param(@_)
+
+
+
+=item cgiselect (-name=>name, ?-title=>comment, ?-values=>[values], ?-labels=>{value=>display,..}, ?-default=>value, ?-override=>bool,...) -> selection HTML field
+
+(C<Utility Objects>)
+Generate selection field HTML using L<CGI|CGI>->popup_menu(@_)
+
+ -onchange=>1 - reload form when value changed
+
+
+
+=item cgistring (-name=>name, ?-title=>comment, ?-default=>value, ?-override=>bool, ?-size=>number, ?-maxlength=>number,...) -> text HTML field
+
+(C<Utility Objects>)
+Generate text field HTML using L<CGI|CGI>->textfield(@_)
+
+
+
+=item cgitext(-name=>name, ?-title=>comment, ?-default=>value, ?-override=>bool, ?-rows=>number, ?-columns=>number,...) -> textarea HTML field
+
+(C<Utility Objects>)
+Generate HTML textarea field using L<CGI|CGI>->textarea(@_)
+
+
+
+=item connect (-param => value,...) -> connected
+
+
+(C<Connection>)
+Connect to ARS server with ARS::ars_Login()
+or verify existed connection with ARS::ars_VerifyUser().
+Load metadata (C<vfload>/C<vfstore>(C<-meta>), C<-metadn>, C<-metaid>).
+
+
+
+=item cpcon (string,...) -> translated string,...
+
+(C<Error Processing and Echo>)
+Translate strings to console codepage using C<-cptran>.
+
+
+
+=item cptran (fromCP, toCP, string,...) -> translated string,...
+
+(C<Utility Methods>)
+Translate strings between codepages using L<Encode|Encode>.
+
+
+
+=item dbi() -> DBI object
+
+(C<Utility Objects>)
+Access to L<DBI|DBI> object. C<dbiconnect> will be used if empty C<-dbi>.
+
+
+=item dbiconnect (?-dbiconnect=> connection string || [DBI->connect args]) -> DBI object
+
+(C<Utility Objects>)
+Connect to L<DBI|DBI> database using C<-dbiconnect>.
+
+
+=item dbido (dbi do args, , ?-echo=>1) -> dbi do result
+
+
+(C<Utility Objects>)
+Execute L<DBI|DBI> 'do' using C<dbi>.
+Use -echo=>1 to output command to STDOUT.
+
+
+
+=item dbidsmetasync (-echo => 0 || 1)
+
+(C<Metadata>, C<SQL Data Store Methods>)
+
+Sync SQL Data Store schema with metadata generated by C<arsmetasql>().
+Uses C<dbi>(), C<-meta-sql>, C<-sqlschema>.
+Calls C<dbido>('CREATE TABLE...') and C<dbido>('ALTER TABLE...').
+
+
+
+=item dbidsrpl (-param => value)
+
+(C<SQL Data Store Methods>)
+
+Replicate ARS data to the SQL Data Store.
+Uses C<dbi>(), C<-meta-sql>, C<-sqlschema>.
+Parameters:
+
+-echo => undef || 0 || 1
+
+-form => ARS form name
+
+-fields => undef || '*' || fields to replicate, alike C<query>(-fields)
+
+-query => undef || ARS query string
+
+-filter => undef || filter sub{}(self, {args}, {-meta-sql}->{tableName}, {ARS record}, {Data Store record}) -> allow
+
+-lim_rf => undef || max number of records read from ARS, C<query>(-limit).
+The number of the records fetched really may be incremented by counting timestamps duplicated.
+Without timestamps, additional queries will be invoked when '-lim_rf' records fetched.
+
+-lim_or => undef || max number of 'OR keyField=keyValue' pairs
+
+-pk => undef || primary key ARS field name, default is obtained from C<-meta-sql>
+
+-timestamp => undef || 0 || 'Modified Date' timestamp ARS field name, default is obtained from C<-meta-sql>
+
+-ckpush => undef || 1 || 0 - insert, update, delete ARS records according to '_arsobject_insert', '_arsobject_update', '_arsobject_delete' column values.
+
+-ckdel => undef || 0 || 1 - check records deleted from ARS and replicate deletions to the Data Store,
+this is expensive and slow, so default if off.
+
+-ckupd => undef || 1 || 0 - check and replicate updates from ARS to the Data Store,
+based on timestamps of records if availeble
+
+-unused => undef || SQL where clause part to delete unused records from Data Store table. "ARS field name"s and "ARS form name"s may be used.
+
+-sleep => undef || seconds to L<perlfunc::sleep|perlfunc> between calls to ARS.
+
+
+
+=item dbidsquery (-param => value) -> ({fieldName => fieldValue,...},...)
+
+(C<SQL Data Store Methods>)
+
+Query data from SQL Data Store.
+Uses C<dbi>(), C<-meta-sql>, C<-sqlschema>.
+Any C<dbi>() method may be used for SQL Data Store, 
+but C<dbidsquery> understands "ARS form name"s and "ARS field name"s
+in addition to "sql table name"s and "sql column name"s.
+Records are returned as hash refs with ARS field names available,
+otherwise SQL column names.
+Parameters:
+
+-echo => undef || 0 || 1
+
+-form => ARS form name
+
+-fields => undef || '*' || 'SQL SELECT clause' || [fieldName ||fieldId ||colName,...].
+Empty value requests all fields, '*' - all fields or columns.
+
+-query => undef || SQL WHERE clause
+
+-filter => undef || filter sub{}(self, {fieldName => fieldValue,...}) -> allow
+
+-order => [fieldName||fieldId => 1||2,... colName||colNumber => 'asc'||'desc',...] || 'SQL ORDER BY clause'
+
+-undefs => undef || 1 || 0 - include undefined values to records returned
+
+"ARS form name", "ARS field name", "ARS form name"."ARS field name" may be used
+in '-fields' and '-query'.
+
+
+=item dbierrstr () -> dbi->errstr
+
+(C<Error Processing and Echo>)
+Last L<DBI|DBI> error, <dbi>->errstr
+
+
+
+=item dbiquery (dbi query args, ?-echo=>1) -> dbi cursor object
+
+(C<Utility Objects>)
+Query L<DBI|DBI> database using C<dbi>, 'prepare', 'execute'.
+Use -echo=>1 to output command to STDOUT.
+
+
+
+=item dscmp (data1, data2) -> cmp
+
+(C<Utility Methods>)
+Compare two data structures alike L<cmp|perlop>.
+
+
+
+=item dsdump (data structure) -> dump string
+
+(C<Utility Methods>)
+Stringify any data structure using L<Data::Dumper|Data/Dumper>.
+This string may be loaded back with C<dsparse>().
+
+
+
+=item dsmerge (array ref,...) -> [merged array]
+
+=item dsmerge (hash ref,...) -> {merged hash}
+
+(C<Utility Methods>)
+Sequentally assign elements of data structures given to result data structure.
+
+
+
+=item dsparse (perl string) -> data structure
+
+(C<Utility Methods>)
+Convert C<dsdump>ed string to data structure.
+
+
+
+=item dsquot (data structure) -> stringified
+
+=item dsquot1 (data structure) -> stringified, defined elements only
+
+(C<Utility Methods>)
+Quote (stringify) any data structure to human readable form.
+
+
+
+=item dsunique (item,...) -> (unique items)
+
+(C<Utility Methods>)
+Find unique items in the list given.
+
+
+
+=item entry (-form=>name, -id=>entryId,...) -> {entry}
+
+(C<ARS methods>)
+Get record from ARS using ARS::ars_GetEntry().
+
+Parameters:
+
+-form | -from | -schema => schema or form name
+
+-id => entryId
+
+-fields => [internalId | fieldName,...]
+
+-for => {} # steady hash to store each entry fetched
+
+-echo=>1 # output command to STDOUT
+
+
+
+=item entryBLOB (-form=>form, -id=>entryId, -field=>fieldId|fieldName) -> data
+
+=item entryBLOB (..., -set=>data) -> id
+
+=item entryBLOB (..., -file=>path, ?-set=>1) -> id
+
+
+(C<ARS methods>)
+Retrieve BLOB field using ARS::ars_GetEntryBLOB()
+or update BLOB field using C<entryUpd>().
+Parameters:
+
+-form | -schema | -from | -into  => schema or form name
+
+-id=>entryId
+
+-echo=>1 # output command to STDOUT
+
+-field=>fieldId | fieldName
+
+-file=>path, -set=>boolean # when using file for BLOB field data
+
+-set=>data # when updating BLOB field from scalar data
+
+
+
+=item entryDel (-form=>form, -id=>entryId, ?-echo=>1) -> id
+
+(C<ARS methods>)
+Delete record into ARS using ARS::ars_DeleteEntry().
+Parameters:
+
+-form | -into | -schema => schema or form name
+
+-id=>entryId
+
+-echo=>1 # output command to STDOUT
+
+
+
+=item entryDif ({old field => value,...}, {new field => value,...}, ?exclude empty) -> {values to update} | undef
+
+(C<ARS methods>)
+Distinguish the difference between two hashes of field => value.
+Returns undef when no difference.
+
+
+
+=item entryIns (-form=>form, ?-echo=>1, field => value,...) -> id | self
+
+(C<ARS methods>)
+Insert new record into ARS using ARS::ars_CreateEntry().
+Field names are translated to ids using C<-metadn>/C<-meta>.
+Field values are translated with C<strIn> when C<-strFields>.
+
+Specially for 'HPD:Help Desk': 'Incident Number' value will be generated if it is 1.
+
+Parameters:
+
+-form | -into | -schema => schema or form name
+
+-echo=>1 # output command to STDOUT
+
+field === internalId | fieldName
+
+
+
+=item entryNew (-form=>form, field=>value,...) -> {field=>value,...}
+
+(C<ARS methods>)
+Form field => value hash for a new ARS record using values given and default values in C<-meta>.
+This may be not needed, C<entryIns> may be sufficient.
+Field names are translated to ids using C<-metadn>/C<-meta>.
+Field values are translated with C<strOut> when C<-strFields>.
+
+Specially for 'HPD:Help Desk': 'Incident Number' value will be generated if it is 1.
+
+
+
+
+=item entryUpd (-form=>form, -id=>entryId, ?-echo=>1, field=>value,...) -> id
+
+(C<ARS methods>)
+Update record into ARS using ARS::ars_SetEntry().
+Field names are translated to ids using C<-metadn>/C<-meta>.
+Field values are translated with C<strIn> when C<-strFields>.
+Parameters:
+
+-form | -into | -schema => schema or form name
+
+-id=>entryId
+
+-echo=>1 # output command to STDOUT
+
+field === internalId | fieldName
+
+
+
+=item fdirls (?-opt, path, ? filter sub{}(self, path, $_ =entry)) -> (entry,...)
+
+=item fdirls (..., []) -> [entry,...]
+
+(C<Utility Methods>)
+List directory contents.
+
+
+
+=item fload (?-opt, filename) -> content
+
+(C<Utility Methods>)
+Load data from file.
+Options: '-b' - L<binmode|perlfunc>.
+See also C<fstore>.
+
+
+
+=item fopen (?-opt, filename) -> IO::File object
+
+(C<Utility Methods>)
+Open file with L<IO::File|IO/File> object.
+Options: '-b' - L<binmode|perlfunc>.
+See also C<fload>, C<fstore>.
+
+
+
+=item fstore (?-opt, filename, string,...) -> success
+
+(C<Utility Methods>)
+Store strings to file.
+Options: '-b' - L<binmode|perlfunc>.
+Filename may be started with '>>' to add data to file.
+See also C<fload>.
+
+
+
+
+=item lsflds (additional field properties) -> list of field descriptions
+
+(C<Metadata>)
+List field descriptions from C<-meta>.
+May be useful when scripting.
+Or set C<-storable> => 0 and view C<vfname>(C<-meta>) file.
+
+
+
+=item new (param => value,...) -> ARSObject
+
+(C<Creation and Configuration>)
+Create ARSObject.
+
+
+
+=item query (-form => schema name, -where => condition,...) -> list of records
+
+=item query (..., -for => sub(self, form, id|string, ?{record}){die "last\n", die "next\n"}) -> self
+
+(C<ARS methods>)
+Query records from ARS.
+
+Field names are translated to ids using C<-metadn>/C<-meta>.
+
+Result set values are translated with C<strOut> when C<-strFields>.
+
+Values in the query condition should be converted to ARS representation explicitly:
+strings should be quoted with C<arsquot>(), dates - converted with C<timestr>().
+
+Field names or ids in the query condition should be enclosed in ' single quotes.
+
+Parameters:
+
+-form | -from | -schema => schema or form name
+
+-fields =>undef
+# if '-fields' parameter omited, list of record IDs will be returned as a result set.
+
+-fields => [{fieldId=>1, columnWidth=>number, separator=>"\t"} | {fieldName=>name, width=>number} | {field=>name|id, width=>number},...]
+# result set is strings up to 128 bytes, ARS::ars_GetListEntry() used.
+
+-fields => [fieldId | fieldName,...]
+# result set is hash refs for each record, ARS::ars_GetListEntryWithFields() used.
+
+-fields => '*' | '*-$' | 1, -xfields=>sub{}(self, field) || [fieldName| fieldId,...]
+# result set is hash refs for each record, ARS::ars_GetListEntryWithFields() used.
+# use '*-$' to excude currency and attachment fields.
+# use '*-f' to excude attachment fields.
+
+-fetch => '*' | 1 | [fieldId|fieldName,...]
+# result set is hash refs for each record, ars_GetEntry() used for each row, this is slow.
+
+-where | -query => search condition string
+# Syntax:
+'fieldId' || 'fieldName' - fields;
+"string value" - strings;
+digits - numeric value, number of seconds as date value;
+strIn(form, fieldName, value) - to encode value for '-where'
+
+-order | -sort => [fieldId | fieldName => (1||2) | ('asc'|'desc'),...]
+# sort order, 1 - asc, 2 - desc
+
+-first ||-start => firstRetrieve # ARS::ars_GetListEntry() parameter
+
+-limit ||-max => maxRetrieve # ARS::ars_GetListEntry() parameter
+
+-for ||-foreach => sub(self, form, id|string, ?{record}){die "last\n", die "next\n"} -> self
+# iterator sub{} for each row
+
+-echo => 1
+# output query and details to STDOUT
+
+
+
+=item schema () -> {schemaName => {metadata},...}
+
+=item schema (schema name) -> {schema metadata} || undef
+
+=item schfld (schema) -> {fieldName=>{field metadata},...}
+
+=item schfld (schema, field name | meta) -> {field metadata} || undef
+
+=item schid (schema, field '-metaid' | id) -> {fieldName=>'name', FieldId=>id}
+
+=item schdn (schema, field '-metadn' | name) -> {fieldName=>'name', FieldId=>id}
+
+=item schvals (schema, field name | id | meta) -> [itemNumber,...] || undef
+
+=item schlbls (schema, field name | id | meta) -> {itemNumber => itemName,...} || undef
+
+=item schlblsl (schema, field name | id | meta) -> {itemNumber => localised itemName,...} || undef
+
+(C<Metadata>)
+Access to ARS metadata loaded by C<connect>, C<arsmeta>, C<arsmetamin>.
+
+ 
+
+=item set (param => value,...) -> self
+
+=item set (param) -> value
+
+(C<Creation and Configuration>)
+Configure ARSObject.
+
+
+
+=item smtp() -> Net::SMTP object
+
+(C<Utility Objects>)
+Access to L<Net::SMTP|Net/SMTP> object. 
+C<smtpconnect> will be used if empty C<-smtp>.
+
+
+
+=item smtpconnect (?-smtphost=> name) -> Net::SMTP object
+
+(C<Utility Objects>)
+Connect to L<Net::SMTP|Net/SMTP> host using C<-smtphost>.
+
+
+
+=item smtpsend (-from || -sender => name, -to || -recipient => [name,...], -data => smtp data || (-subject => string, -text || -html => text)) -> Net::SMTP::dataend
+
+(C<Utility Objects>)
+Send L<Net::SMTP|Net/SMTP> e-mail using C<smtp>.
+
+
+
+=item soon (minutes number || sub{}, logfile ||'', run command || [command line] || sub{}, soon command || [command line] || [])
+
+=item soon (minutes number || sub{}, logfile ||'', run command || [command line] || sub{})
+
+=item soon (minutes number || sub{}, logfile ||'', '', soon command || [command line])
+
+Execute the script periodically, run command immediately, soon command after delay specified.
+Log file name may be full file name, else C<vfname>(file name) will be used.
+If run command is empty, soon command will be scheduled.
+If soon command is empty, sleep(minutes*60) will be used, otherwise 'at' MSWin32 scheduling command.
+If !defined(minutes), soon command will be deleted from schedule and run command will be executed once.
+
+
+
+=item sqlname (formName, ?fieldName, ?forceMetaUpd) -> sql name
+
+(C<Metadata>, C<SQL Data Store Methods>)
+
+Get SQL Data Store table or column name converted from ARS form and field name.
+Used by C<arsmetasql>().
+Uses C<-sqlname>, C<-sqlntbl>, C<-sqlncol>, C<-sqlninc> settings.
+
+
+
+=item strIn (schema, fieldId | fieldName | field metadata, value) -> converted
+
+(C<ARS methods>)
+Convert value for ARS internal field value representation.
+Called automatically when C<-strFields>. 
+Should be called explicitly from C<strIn> sub{} in C<-metadn>/C<-metaid>.
+May need to be called explicitly forming C<query> condition.
+See also C<strOut>, C<-strFields>.
+
+
+
+=item strOut (schema, fieldId | fieldName | field metadata, fieldValue) -> converted
+
+(C<ARS methods>)
+Convert ARS field value for external representation.
+Called automatically when C<-strFields>. 
+Should be called explicitly from C<strOut> sub{} in C<-metadn>/C<-metaid>
+and when parsing strings result from C<query>.
+See also C<strIn>, C<-strFields>.
+
+
+
+=item strquot (string) -> escaped and quoted with ''
+
+=item strquot2 (string) -> escaped and quoted with ""
+
+(C<Utility Methods>)
+Quote and escape string.
+See also C<arsquot>
+
+
+
+=item strtime (?mask, L<time|perlfunc> ||L<localtime|perlfunc> ||L<gmtime|perlfunc>) -> stringified
+
+(C<Utility Methods>)
+Stringify time value by mask.
+Default mask is 'yyyy-mm-dd hh:mm:ss' (ISO).
+L<POSIX::strftime|POSIX> uses different mask agreement.
+See also C<timestr>.
+
+
+=item timeadd (seconds, add years, ?months, ?days, ?hours, ?minutes, ?seconds) -> seconds incremented
+
+(C<Utility Methods>)
+Add values given to time given. Calculation via L<POSIX::mktime|POSIX>.
+
+
+
+=item timestr (?mask, stringified time) -> seconds
+
+(C<Utility Methods>)
+Convert stringified with C<strtime> time string to seconds form 
+with L<POSIX::mktime|POSIX>
+
+
+
+=item vfclear (-slotName) -> true
+
+(C<Variable files>)
+Clear data loaded from variables file by C<vfload>(-slotName).
+Reset data buffers of C<vfdata>() and C<vfhash>().
+
+
+
+=item vfdata (-slotName) -> data structure
+
+=item vfdata (-slotName, index) -> numbered element of data array
+
+=item vfdata (-slotName, filter sub{}(self, -slot, index, $_=elem)) -> [record,...]
+
+(C<Variable files>)
+Access to data of variables file.
+Automatically C<fload>s it.
+Data structure will be treated as an array ref when index or filter argument used.
+
+
+
+=item vfdistinct (-slotName, keyName) -> [value,...]
+
+=item vfdistinct (-slotName, keyName, filter sub{}(self, -slot, keyName, keyValue, $_=elem)) -> [value,...]
+
+(C<Variable files>)
+Distinct values from C<vfdata>,
+alike [sort keys %{C<vfhash>(-slotName, keyName)}].
+Each element of C<vfdata>(-slotName) should be a hash with 'keyName' element.
+
+
+
+=item vfhash (-slotName, keyName) -> {keyName=>{key => value},...}
+
+=item vfhash (-slotName, keyName, keyValue) -> {key => value}
+
+=item vfhash (-slotName, keyName, keyValue, key) -> value || undef if !ref(keyValue)
+
+=item vfhash (-slotName, keyName, filter sub{}(self, -slot, keyName, keyValue, $_=elem)) -> {keyName=>{key => value},...}
+
+(C<Variable files>)
+Direct access to C<vfdata> using key name and value.
+Each element of C<vfdata>(-slotName) array should be a hash with 'keyName' element.
+C<vfdata> array will be automatically cached into hash "-slotName/keyName".
+
+
+
+=item vfload (partial file name || -slotName) -> data structure
+
+=item vfload (-slotName, ?create, ?renew ||renew period seconds) -> data structure
+
+(C<Variable files>)
+Load data structure from variables file using C<fload> and C<-storable>/C<dsparse>.
+File absent may be created. 
+File existed may be renewed immediatelly or if it is older then renew period.
+
+If '-slotName' specified, this slot will contain loaded data structure.
+
+If '-slotName-calc' => sub{}(self, -slotName) specified, file will not be used at all, 
+data will be calculated on demand.
+
+If '-slotName-load' => sub{}(self, -slotName) specified, it will be used to fill unexisted file.
+
+
+
+=item vfname (partial name || -slotName) -> full var file path name in the filesystem
+
+(C<Variable files>)
+Convert partial file name to full, based on C<-vfbase>, for variables file.
+Leading '-' will be excluded.
+
+
+
+=item vfrenew (-slotName, ?renew period seconds) -> vfstore()/vfload()
+
+(C<Variable files>)
+Renew variables file using C<vfstore>() inside C<vfload>() with '-slotName-load' sub{}.
+If no period or when period ==1 file will be renewed immediatelly.
+Else file will be renewed only if it is older then period.
+
+
+
+=item vfstore (partial file name, data structure) -> success
+
+=item vfstore (-slotName) -> success
+
+(C<Variable files>)
+Store data to variables file using C<-storable>/C<dsdump> and C<fstore>.
+
+If '-slotName' specified, this slot should contain data structure to be stored.
+
+If '-slotName-storable' => switch specified, it will be used instead of C<-storable>.
+
+
+
+
+=back
+
+
+=head1 VERSION
+
+=over
+
+=head2 2013-02-05
+
+Publishing 0.57 version
+
+
+=head2 2012-05-16
+
+Publishing 0.56 version
+
+
+=head2 2012-04-24
+
+Added field localisation metadata, see source code for 'fieldLbll' and 'fieldLbvl'.
+
+Updated C<lsflds>().
+
+Added C<schlblsl>().
+
+Added C<-strFields> => 2 - translate ARS enum field values using at first
+localisation metadata ('fieldLbvl').
+
+Extended C<arsmetamin>() data with 'time' fields.
+
+Added C<-metadb> to C<CGI Form Presenter - Field Definitions>.
+
+
+
+=head2 2012-03-23
+
+New C<SQL Data Store Methods>
+
+
+=head2 2011-10-26
+
+New C<entryBLOB>
+
+
+=head2 2011-09-27
+
+Publishing 0.55 version
+
+
+=head2 2011-01-06
+
+New C<arsmeta>, C<arsmetamin>.
+Documented C<schema>.
+
+
+=head2 2011-01-26
+
+C<CGI Form Presenter> added.
+
+
+=head2 2010-11-22
+
+Publishing 0.54 version, with several enhancements and corrections.
+
+New C<-diemsg>, C<-warnmsg>, C<fdirls>().
+
+C<vfload> - increased performance of loading text file,
+implemented text/binary format autodetection.
+
+
+=head2 2010-10-09
+
+Publishing 0.53 version, with several enhancements and corrections.
+
+
+
+=head2 2010-08-25
+
+C<strOut>() method may return original enum value when cannot translate it.
+
+C<vfstore>()/C<vfload>() extended with '-slotName-storable' switch.
+
+
+=head2 2010-08-20
+
+C<query>(...,-fields=>'*',...) syntax added.
+
+
+=head2 2010-07-01
+
+Publishing 0.52 version, with several enhancements and corrections.
+
+
+
+=head2 2010-06-08
+
+Publishing 0.51 version, with several changes, enhancements and corrections.
+
+
+
+=head2 2010-04-17
+
+Publishing 0.50 version.
+I have two prototype scripts using this module.
+
+
+=head2 2010-03-30
+
+Documentation file written
+
+
+=head2 2010-03-24
+
+Detached
+
+
+=head2 2010-03-02
+
+Started inside a script
+
+
+=back
+
+
+
+=head1 LICENSE
+
+This is free software; 
+you can use redistribute it and/or modify it 
+under the same terms as Perl itself.
+
+
+
+=head1 AUTHOR
+
+Andrew V Makarow <makarow at mail.com>,
+for Bank of Russia in Archangel
+
+
+
+
+=cut
+
+

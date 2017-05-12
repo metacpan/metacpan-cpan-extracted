@@ -1,0 +1,37 @@
+---
+abstract: 'Application to merge various datasets info an overview of who followed CPR training (cardiopulmonary resuscitation, the use of rescue breathing and chest compressions to help a person whose breathing and heartbeat have stopped)'
+author:
+  - 'Lieven Hollevoet <hollie@cpan.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+  Test::Warn: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-CPRReporter
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Getopt::Long: 0
+  Moose: 0
+  Pod::Usage: 0
+  Spreadsheet::XLSX: 0
+  Text::Fuzzy::PP: 0
+  Text::Iconv: 0
+  Text::ResusciAnneparser: 0
+  autodie: 0
+  lib: 0
+  namespace::autoclean: 0
+  perl: 5.012
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/hollie/app-cprreporter-perl/issues
+  repository: git://github.com/hollie/app-cprreporter-perl.git
+version: 0.03

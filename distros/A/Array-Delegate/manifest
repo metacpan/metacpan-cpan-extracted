@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Array-Delegate.t
+lib/Array/Delegate.pm
+META.yml                                 Module meta-data (added by MakeMaker)

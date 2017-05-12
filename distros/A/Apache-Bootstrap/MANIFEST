@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Apache/Bootstrap.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+LICENSE
+META.yml                                 Module meta-data (added by MakeMaker)

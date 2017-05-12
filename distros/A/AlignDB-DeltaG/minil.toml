@@ -1,0 +1,2 @@
+name = "AlignDB-DeltaG"
+badges = ['travis', 'codecov', 'metacpan']

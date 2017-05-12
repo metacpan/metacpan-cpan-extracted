@@ -1,0 +1,42 @@
+{
+   "abstract" : "a fluent numeric interface",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Numbers",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::EN::Words2Nums" : 0,
+            "Test::More" : "0.62"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Numbers" : {
+         "file" : "lib/Acme/Numbers.pm",
+         "version" : "1.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.2"
+}

@@ -1,0 +1,24 @@
+---
+abstract: 'Perl distribution for static ExtJS 3.x sources'
+author:
+  - 'Sencha Inc.'
+  - 'Henry Van Styn <vanstyn@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  File::ShareDir::Install: 0.06
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-Web-ExtJS-V3
+requires:
+  Alien::Web: 1.0
+  parent: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://github.com/vanstyn/Alien-Web-ExtJS-V3.git
+version: 3.4.11

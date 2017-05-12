@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual - ars_CreateSchema</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_CreateSchema(ctrl, schemaHash)</CODE></H2>
+
+      This function creates a new schema. You must first
+      populate the <CODE>schemaHash</CODE> before calling this routine.
+      <P><CODE>schemaHash</CODE> is an 
+      <A HREF="ds_schema.html">Schema Attributes</a> hash. 
+
+      <P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns 1
+          <DT><B>On failure</B><DD>
+              Returns 0
+      </DL>
+
+      <P>Example:
+
+      <P><BLOCKQUOTE>
+      <I> This example copies an existing schema to a new 
+          schema. I.e. it simply re-saves the active link under
+          a new name. </I></BLOCKQUOTE>
+
+      <PRE>
+      ($s = ars_GetSchema($c, "F-foobar")) ||
+	    die $ars_errstr;
+      $s->{name} = "Copy of ".$s->{name};
+      ars_CreateSchema( $c, $s ) || die $ars_errstr;
+      </PRE>
+
+<B>Notes</B>: Hash keys <CODE>helpText, owner</CODE> and 
+<CODE>changeDiary</CODE> are optional when calling this routine.
+<P>
+<I>This function was introduced in version 1.90 of ARSperl</I>
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

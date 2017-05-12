@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+use App::PipeFilter::JsonPath;
+exit App::PipeFilter::JsonPath->new_with_options()->run();
+
+__END__
+
+=pod
+
+=head1 NAME
+
+jsonpath - use JSON::Path to cut out selected portions of JSON objects
+
+=head1 VERSION
+
+version 0.005
+
+=head1 SYNOPSIS
+
+  jsonpath [--verbose] -o json_path_1 [-o json_path_2 ...] [file ...]
+
+=head1 DESCRIPTION
+
+jsonpath(1) cuts out selected portions of each JSON record and writes
+them to standard output.  Fields are selected using JSON::Path
+expressions, which are a Perl-centric variant of JSONPath.  Multiple
+fields may be specified, one per -o flag.
+
+Output fields are named col#, where the # is the numeric position of
+the corresponding JSON::Path expression on the command line.  The
+first column is col0.  jmap(1) may be used to give each output field a
+more useful name.
+
+=head1 SEE ALSO
+
+JSONPath documentation: L<http://goessner.net/articles/JsonPath/>
+
+You may read this utility's implementation in its entirety at
+
+  perldoc -m jsonpath
+
+L<App::PipeFilter::JsonPath> implements this utility, including the
+behavior of the -o flag.
+
+L<App::PipeFilter> has top-level documentation including a table of
+contents for all the libraries and binaries included in the project.
+
+=head1 BUGS
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PipeFilter>
+
+=head1 REPOSITORY
+
+L<https://github.com/rcaputo/app-pipefilter>
+
+=head1 COPYRIGHT AND LICENSE
+
+jsonpath
+is Copyright 2011 by Rocco Caputo.
+All rights are reserved.
+jsonpath
+is released under the same terms as Perl itself.
+
+=cut
+
+# vim: ts=2 sw=2 expandtab

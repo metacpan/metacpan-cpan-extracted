@@ -1,0 +1,116 @@
+#!/usr/bin/perl -T -w
+
+use strict ;
+use warnings ;
+use Carp ;
+use English qw( -no_match_vars ) ;
+
+=head1 NAME 
+
+textcast_play - play a textcast recorded by textcast_record
+
+=head1 USAGE
+
+ $> textcast_play [-options] directory_containing_textcast_data
+
+=head1 OPTIONS
+
+=over 2
+
+=item  'h|help'      display help
+
+=item  's|status'    display textcast status
+
+=back
+
+=head1 EXIT STATUS
+
+=over 2
+
+=item 0 No errors found
+
+=item 1 Interrupted by user
+
+=item 2 Invalid entries in the index or no index
+
+=item 3 terminal too small for text cast
+
+=item other errors exit with status != 0
+
+=back
+
+=head1 AUTHOR
+
+	Nadim ibn hamouda el Khemir
+	CPAN ID: NKH
+	mailto: nkh@cpan.org
+
+=cut
+
+our $VERSION = '0.02' ;
+
+#---------------------------------------------------------------------------------------------------------
+
+delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};   # Make %ENV safer
+$ENV{PATH} = '/usr/bin/:/bin/' ;
+
+#---------------------------------------------------------------------------------------------------------
+
+use Getopt::Long ;
+use App::Textcast 'play_textcast' ;
+
+#---------------------------------------------------------------------------------------------------------
+
+my ($overlay_directory, $display_status, $force_display_status, $start_paused) ;
+unless
+	(
+	GetOptions
+		(
+		'h|help' => \&display_help,
+		
+		'o|overlay_directory=s' => \$overlay_directory,
+		's|status' => \$display_status,
+		'f|force_status' => \$force_display_status,
+		'start_paused' => \$start_paused,
+		)
+	)
+	{
+	croak "Invalid command!\n" ;
+	}
+
+my $input_directory = shift @ARGV ;
+croak 'Error: Expected path to the directory containing the textcast as argument!' unless defined $input_directory ;
+
+if($input_directory =~ /([[:alnum:]\/_-]+)/sxm)
+	{
+	$input_directory = $1 ;
+	}
+else
+        {
+        croak 'Error: Invalid path! Path can only contain alphanumerics and path separator.'
+        }
+
+$input_directory =~ s/\/$//sxm unless $input_directory eq q{/} ;
+
+play_textcast
+	(
+	TEXTCAST_DIRECTORY => $input_directory,
+	OVERLAY_DIRECTORY => $overlay_directory,
+	DISPLAY_STATUS => $display_status,
+	FORCE_DISPLAY_STATUS => $force_display_status,
+	START_PAUSED => $start_paused,
+	) ; 
+
+#---------------------------------------------------------------------------------------------------------
+
+sub display_help
+{
+my ($this_script) = ($PROGRAM_NAME =~m/(.*)/sxm ) ;
+
+print {*STDERR} `perldoc $this_script`  or croak 'Error: Can\'t display help!' ; ## no critic (InputOutput::ProhibitBacktickOperators)
+exit(1) ;
+}
+
+#---------------------------------------------------------------------------------------------------------
+
+

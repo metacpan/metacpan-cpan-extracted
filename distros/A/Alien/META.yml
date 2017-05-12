@@ -1,0 +1,27 @@
+---
+abstract: 'External libraries wrapped up for your viewing pleasure!'
+author:
+  - 'Arthur Bergman <abergman@fotango.com>'
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien
+requires:
+  perl: '5.006'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/plicease/Alien/issues
+  homepage: https://metacpan.org/pod/Alien
+  repository: git://github.com/plicease/Alien.git
+version: '0.94'
+x_serialization_backend: 'YAML::Tiny version 1.70'

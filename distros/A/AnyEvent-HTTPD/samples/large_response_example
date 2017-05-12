@@ -1,0 +1,107 @@
+#!/opt/perl/bin/perl
+use common::sense;
+use AnyEvent;
+use AnyEvent::HTTPD;
+use AnyEvent::AIO;
+use IO::AIO;
+
+my $cvar = AnyEvent->condvar;
+
+my $httpd = AnyEvent::HTTPD->new (port => 19090);
+
+my $SEND_FILE = defined $ARGV[0] ? $ARGV[0] : 'bshttp.png';
+my $mime = `file -i $SEND_FILE`;
+$mime =~ s/^(.*?): //;
+$mime =~ s/\r?\n$//;
+
+print "going to send $SEND_FILE: $mime\n";
+
+sub send_file {
+   my ($req) = @_;
+
+   my $fh;
+   my $last_pos = 0;
+
+   print "going to open $SEND_FILE...\n";
+
+   # use IO::AIO to async open the file
+   aio_open $SEND_FILE, O_RDONLY, 0, sub {
+      $fh = shift;
+
+      unless ($fh) {
+         warn "couldn't open $SEND_FILE: $!\n";
+         $data_cb->(); # stop sending data...
+         return;
+      }
+
+      my $size = -s $fh;
+
+      print "opened $SEND_FILE, $size bytes big!\n";
+
+      # make a reader callback, that will be called
+      # whenever a chunk of data was written out to the kernel
+      my $get_chunk_cb = sub {
+         my ($data_cb) = @_;
+
+         if ($data_cb) {
+            print "get next chunk, $last_pos of $size!\n";
+         } else {
+            print "sent last chunk, no more required!\n";
+         }
+
+         return unless $data_cb; # in case the connection went away...
+
+         my $chunk = '';
+
+         # use IO::AIO again, to async read from disk
+         # you decide what chunks you want to send btw.
+         # here we send 4096 bytes on each chunk read.
+         aio_read $fh, $last_pos, 4096, $chunk, 0, sub {
+            if ($_[0] > 0) {
+               $last_pos += $_[0];
+               print "read $_[0] bytes, sending them...\n";
+               $data_cb->($chunk); # when we got another chunk, push it
+                                   # over the http connection;
+               $chunk = '';
+
+               # and here we just return, and wait for the next call to
+               # $get_chunk_cb when the data is in the kernel.
+
+            } else {
+               $data_cb->(); # stop sending data (in case of error or EOF)
+               return;
+            }
+         };
+      };
+
+      $req->respond (
+         [
+            200, 'ok', {
+               'Content-Type'   => $mime,
+ #              'Content-Length' => $size
+            },
+            $get_chunk_cb
+         ]
+      );
+   };
+}
+
+$httpd->reg_cb (
+   '' => sub {
+      my ($httpd, $req) = @_;
+      $req->respond ({ content => ['text/html', <<'CONT']});
+         <html><body><h1>Large Download Example!</h1>
+         <a href="/test">download file</a>
+         </body></html>
+CONT
+   },
+   '/test' => sub {
+      my ($httpd, $req) = @_;
+      $httpd->stop_request;
+
+      print "sending file ...\n";
+      send_file ($req);
+   },
+);
+
+$cvar->wait;

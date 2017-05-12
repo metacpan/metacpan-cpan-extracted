@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Astro-Flux
+version:      0.01
+version_from: Flux.pm
+installdirs:  site
+requires:
+    Astro::WaveBand:               0
+    DateTime:                      0
+    Misc::Quality:                 0
+    Number::Uncertainty:           0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

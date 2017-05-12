@@ -1,0 +1,241 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=[% site.encoding %]">
+        <title>[% site.title %]: [% content.title %]</title>
+        <style type="text/css">
+            [%
+                IF site.theme == 'dark'
+                    color.bg = '#292727'
+                    color.fg = '#e9e9e9'
+                    color.h = '#bdcce6'
+                    color.prebg = '#4a4a4a'
+                ELSE
+                    color.bg = 'white'
+                    color.fg = '#252525'
+                    color.h = '#616161'
+                    color.prebg = '#e7e7e7'
+                END
+            %]
+
+            body {
+                margin: 0 auto 0;
+                background-color : [% color.bg %];
+                color : [% color.fg %];
+                font-family : serif;
+                max-width : 50em;
+                padding : 1em;
+            }
+
+            div#header {
+                padding-top : 8em;
+            }
+
+            h1,h2,h3,h4,h5 {
+                font-family : sans-serif;
+                color : [% color.h %];
+            }
+
+            div#all_pages h3 {
+                display : inline;
+            }
+
+            div#header h1 {
+                font-family : sans-serif;
+                font-size : 3.2em;
+                padding-bottom : 0.5em;
+                border-bottom : 1px solid cornflowerblue;
+                text-align : right;
+                width : 100%;
+            }
+
+            div#content {
+                min-height : 10em;
+                padding-bottom : 1em;
+                border-bottom : 1px solid cornflowerblue;
+            }
+
+            div#content div#info h4  {
+                display : inline;
+                font-style : italic;
+                font-family : serif;
+            }
+
+            div.nav {
+                float : right;
+                padding-top: 0;
+                padding-right : 0;
+                padding-left : 2em;
+                overflow-wrap: break-word;
+                width : 35%;
+            }
+
+            div#nav_top {
+                padding-bottom : 1em;
+            }
+
+            a {
+                color : cornflowerblue;
+            }
+
+            a:hover {
+                color : cornflowerblue;
+            }
+
+            a:visited {
+                color : cornflowerblue;
+            }
+
+            h3#tags_list a {
+                white-space : nowrap;
+            }
+
+            div#content div#text pre {
+                overflow : auto;
+                background-color : [% color.prebg %];
+                padding : 1em;
+                border-left : 0.4em solid cornflowerblue;
+            }
+
+            div#content div#text blockquote {
+                font-style : italic;
+                text-color : green;
+                font-family : serif;
+            }
+
+            div#content div#text {
+                margin-bottom : 2em;
+            }
+
+            div#content div#text img {
+                max-width : 100%;
+            }
+
+        </style>
+    </head>
+
+    <body>
+        <div id="header">
+            <h1>[% site.title %]</h1>
+        </div>
+        <div id="all_pages">
+            [% FOREACH p = links.pages %]
+                [% IF loop.first %]
+                <h3>Pages:
+                [% END %]
+                [% IF p.is_self %]
+                    [% p.slug %]
+                [% ELSE %]
+                    <a href="[% p.href %]">[% p.slug %]</a>
+                [% END %]
+                [% IF loop.last %]
+                </h3>
+                [% END %]
+            [% END %]
+        </div>
+
+        <div id="content">
+
+            <div class="nav" id="nav_top">
+                [% IF links.parent %]
+                <h3>Up:
+                    <a href="[% links.parent.href %]">[% links.parent.slug %]</a>
+                </h3>
+                [% END %]
+                [% IF links.prev %]
+                <h3>Prev:
+                    <a href="[% links.prev.href %]">[% links.prev.slug %]</a>
+                </h3>
+                [% END %]
+                [% IF links.next %]
+                <h3>Next:
+                    <a href="[% links.next.href %]">[% links.next.slug %]</a>
+                </h3>
+                [% END %]
+
+                [% FOREACH t = content.tags %]
+                    [% IF loop.first %]
+                    <h3 class="tags_list">Tags:</h3>
+                    <ul>
+                    [% END %]
+                        <li>
+                            <a class="tag" href="[% t.href %]">[% t.slug %]</a>
+                        </li>
+                    [% IF loop.last %]
+                    </ul>
+                    [% END %]
+                [% END %]
+            </div>
+
+            <div id="info">
+                <h1 id="title">
+                    [% content.title %]
+                </h1>
+
+                <div id="subinfo">
+                    <h4 id="author">
+                        [% IF content.author %]
+                            [% content.author %]
+                        [% ELSIF NOT content.is_virtual %]
+                            Anonymous
+                        [% END %]
+                    </h4>
+                    [% IF content.date AND NOT content.is_virtual %]-
+                    <h4 id="date">
+                        [% content.date.y %]/[% content.date.m %]/[% content.date.d %]
+                    </h4>
+                    [% END %]
+                </div>
+            </div>
+
+            <div id="text">
+                [% content.html %]
+            </div>
+
+            [% IF content.is_home %]
+            <div id="menu">
+                [% IF links.backlog %]
+                <h1>Latest News</h2>
+                <ul>
+                    [% FOREACH p = links.backlog(5) %]
+                    <li>
+                        [% p.date(' / ') %]:
+                        <a href="[% p.href %]">[% p.slug %]</a>
+                    </li>
+                    [% END %]
+                </ul>
+                [% END %]
+            </div>
+            [% END %]
+        </div>
+
+        [% IF links.children %]
+        <div id="children">
+            <ul>
+                [% FOREACH l = links.children %]
+                <li>
+                    [% IF l.date %]
+                    [% l.date.y %] / [% l.date.m %] / [% l.date.d %]:
+                    [% END %]
+                    <a href="[% l.href %]">[% l.slug %]</a>
+                </li>
+                [% END %]
+            </ul>
+        </id>
+        [% ELSE %]
+        <div id="all_tags">
+            [% FOREACH t = links.tags %]
+                [% IF loop.first %]
+                <h3 class="tags_list">All Tags:
+                [% END %]
+                <a class="tag" href="[% t.href %]"><span>[% t.slug %]</span></a>
+                [% IF NOT loop.last %]|[% ELSE %]
+                </h3>
+                [% END %]
+            [% END %]
+        </div>
+        [% END %]
+
+    </body>
+</html>
+

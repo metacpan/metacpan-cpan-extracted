@@ -1,0 +1,97 @@
+Revision history for Perl extension App-perlfind
+
+2.07  2015-05-21 18:22:58 CEST
+	- added back VERSION numbers to all .pm files so the PAUSE indexer doesn't
+	  complain
+
+2.06  2015-05-21 17:48:21 CEST
+	- changed to Dist::Milla-style
+	- added rudimentary version-specific mappings for __PACKAGE__, __FILE__
+	  and __LINE__, which used to be in perldata
+	- fixed finding %SIG things
+
+2.05  2012-09-01 19:39:33 Europe/Vienna
+    - fixed App::perlfind::Plugin::Perlvar docs
+    - UseModule plugin: don't try to use() it if it doesn't look like a package
+      name
+
+2.04  2012-09-01 12:32:15 Europe/Vienna
+    - built-in functions can again be found without '-f' (thanks Steven
+      Haryanto for the bug report)
+    - added heuristic for when the search term contains '::': assume it's a
+      module if the final symbol starts with an uppercase character, assume
+      it's a fully-qualified function otherwise (thanks RWSTAUNER for the bug
+      report)
+    - __FILE__, __LINE__ and __PACKAGE__ are found in perlfunc, but __DATA__
+      and __END__ are found in perldata
+    - __DIE__ and __WARN__ are found in perlvar under '%SIG'
+    - can find file test functions like -r, -w, -x etc.
+    - searching for predefined variables now works with and without the sigil
+      as long as the variable is either a number, the topicalizer or has at
+      least two word characters. So 'INPUT_RECORD_SEPARATOR',
+      '$INPUT_RECORD_SEPARATOR', 'RS', '$RS' and '$/' all find the same thing.
+
+2.03  2012-03-04 10:34:21 Europe/Vienna
+    - complete rewrite; perlfind now based on Pod::Cpandoc and this
+      Pod::Perldoc and inherits all of their features. Especially command-line
+      switches work like for perldoc.
+
+2.02  2012-03-03 17:02:54 Europe/Vienna
+    - show --help if no search term is given
+
+2.01  2012-03-03 16:17:22 Europe/Vienna
+    - renamed to "perlfind" after discussion with perl hackers; added a
+      deprecation notice to bin/perlzonji
+
+2.00  2012-01-29 21:24:15 Europe/Vienna
+    - bump version number to keep indexer happy
+
+1.20  2012-01-29 17:36:14 Europe/Vienna
+    - converted to Makefile.PL style
+    - added special casing and quoting escape sequences found in
+      perlop (\Q, \E etc.)
+
+1.111500  2011-05-30 14:06:18 Europe/Vienna
+    - Add UNITCHECK - and also move BEGIN CHECK INIT END to perlmod as docs are
+      clearer there (thanks ranguard)
+
+1.111470  2011-05-27 18:14:50 Europe/Vienna
+    - extract find_matches() so it can be accessed directly (thanks
+      ranguard)
+
+1.101610  2010-06-10 21:50:18 Europe/Vienna
+    - applied perltidy
+    - added dry-run tests
+
+1.101420  2010-05-22 22:02:43 Europe/Vienna
+    - make --man and --help work again now that the docs are in the module
+
+1.101000  2010-04-10 17:23:20 Europe/Vienna
+    - added many variables from perlvar
+    - made the application pluggable with Module::Pluggable and Class::Trigger
+
+1.100770  2010-03-18 21:52:17 Europe/Vienna
+    - removed weaver.ini since that's handled in Dist::Zilla's [@MARCEL] now
+    - exposed %found_in as a package global
+    - removed Class::MethodMaker definitions
+    - added Moose definitions
+    - removed duplicates
+    - added dedup test
+
+1.100710  2010-03-12 00:48:03 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+    - moved the code to App::perlzonji; bin/perlzonji is just a thin wrapper
+    - documented the subroutines
+
+0.04  Thu 2010.02.18 20:59:44 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - added environment variables (perlrun) and PerlIO layer names
+     - explained the word "zonji"
+
+0.03  Fri 2010.02.12 11:36:44 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - added --perldoc-command, --debug and other common options (daxim)
+
+0.02  Mon 2010.02.08 14:54:26 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - added docs to bin/perlzonji
+
+0.01  Mon 2010.02.08 13:24:15 UTC (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

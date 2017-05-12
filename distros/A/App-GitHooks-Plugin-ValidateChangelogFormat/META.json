@@ -1,0 +1,64 @@
+{
+   "abstract" : "Validate the format of changelog files.",
+   "author" : [
+      "Guillaume Aubert <aubertg@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-GitHooks-Plugin-ValidateChangelogFormat",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "App::GitHooks::Test" : "0",
+            "Capture::Tiny" : "0",
+            "Test::Exception" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0",
+            "Test::Requires::Git" : "1.005",
+            "Test::Type" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::GitHooks::Constants" : "0",
+            "App::GitHooks::Plugin" : "0",
+            "CPAN::Changes" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.01",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::GitHooks::Plugin::ValidateChangelogFormat" : {
+         "file" : "lib/App/GitHooks/Plugin/ValidateChangelogFormat.pm",
+         "version" : "v1.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/guillaumeaubert/App-GitHooks-Plugin-ValidateChangelogFormat/issues"
+      },
+      "homepage" : "https://metacpan.org/release/App-GitHooks-Plugin-ValidateChangelogFormat",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/guillaumeaubert/App-GitHooks-Plugin-ValidateChangelogFormat"
+      }
+   },
+   "version" : "v1.1.0"
+}

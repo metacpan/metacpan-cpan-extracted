@@ -1,0 +1,15 @@
+
+use vars qw($t);
+use lib qw(.);
+use T;
+
+sub Script_OnStart {
+    $t = T->new;
+    $t->ok;
+    $Response->End;
+    $t->not_ok;
+}
+
+sub Script_OnEnd {
+    $t->done;
+}

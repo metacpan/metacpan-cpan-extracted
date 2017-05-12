@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+use lib './lib';
+use strict;
+use Astroboy;
+use Getopt::Std::Strict 'a:hdv';
+
+$opt_a and $Astroboy::ABS_PATH = $opt_a;
+
+
+my $astro = Astroboy->new;
+
+$opt_a and $Astroboy::ABS_MUSIC = $opt_a;
+
+printf "Astroboy\nABS MUSIC: %s\nTOTAL ARTISTS: %s\n", $astro->abs_music, $astro->artists_count ;
+
+
+
+

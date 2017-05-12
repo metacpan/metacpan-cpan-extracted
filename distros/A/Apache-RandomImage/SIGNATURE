@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 68f7f8243bc7878db17afc551f5c326beabcdcce .cvsignore
+SHA1 6f4bf82ee9739d46bbbfe99f3d49947a297d7fba .project
+SHA1 88090094a7edc396f9d055160b3e2a4ce042f751 Build.PL
+SHA1 1d7cb6f089d204557fd7984b46581debad4cef51 Changes
+SHA1 e9438e38e210483731581f6ce208cad7fe1690af MANIFEST
+SHA1 7393ff05ee1d253bf2a2ee4e827c72c5c9edc5a9 META.yml
+SHA1 5272d3692456dcf154ea924cf7ddd9b5c2b09654 Makefile.PL
+SHA1 817476dc9c5c0091f274d500ed01ce3522a32a20 README
+SHA1 bd81b4c43d9212a7281463435ff441657b6c38b5 examples/random-image.conf
+SHA1 ee57d1e00dda5c5df2e942350c4e87c291cceecc lib/Apache/RandomImage.pm
+SHA1 570684881712db45cbd494eba62e146261d5323c t/00-load.t
+SHA1 41533fbd463e42d2ecf1e119eca910c16809d13e t/distribution.t
+SHA1 7ef941e0b8c4465f84dbd8215a1b72cf17019030 t/perlcritic.t
+SHA1 763194737b5310910fb731b851f6f709e8ff8c6c t/perlcriticrc
+SHA1 c26c5d4531effe5859ca35271645bfec5db7ff5c t/perltidy.conf
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 214e164271d24f30a9ccd281544c7ec7f7bce94e t/pod-spell.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+SHA1 4aeb184c9bed26ab6c3be1ebdb8470c0cb353b1f t/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAknNTt4ACgkQeM3QI14qZoiaFwCgmLF7Jv3Q/Z1L0fmKz9AWQpCz
+JroAoIgjnizex/eycoBa6Y3UARj0Kide
+=9HRr
+-----END PGP SIGNATURE-----

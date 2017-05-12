@@ -1,0 +1,151 @@
+#!/usr/bin/perl
+use MP3::Tag;
+use strict;
+use vars qw(@FILES @ALBUM_DIRS @TRASH $ABS_MUSIC $VERSION);
+use Astroboy;
+use Getopt::Std::Strict 'a:tehdv';
+use LEOCHARRE::Dir ':all';
+$VERSION = sprintf "%d.%02d", q$Revision: 1.7 $ =~ /(\d+)/g;
+
+INIT {
+   $opt_h and print usage() and exit;
+   $opt_v and print $VERSION and exit;
+}
+
+
+my $astro = Astroboy->new;
+
+$opt_a and $Astroboy::ABS_MUSIC = $opt_a;
+
+my $abs_music =  $astro->abs_music;
+
+debug("MUSIC : $abs_music");
+
+
+@ARGV and scalar @ARGV or die("missing arguments\n");
+
+for ( @ARGV){
+   my $abs = Cwd::abs_path($_) or next;
+
+   if (-f $abs ){
+      do_file($abs);
+   }
+   elsif( -d $abs ){     
+   
+      do_dir($abs);
+   }
+}
+
+exit;
+
+
+
+
+sub do_dir {
+   my $abs = shift;
+   -d $abs or return;
+
+   my $a = $astro->dir($abs) or warn("Not album dir $abs\n") and return;
+  
+
+   $opt_t and $a->empty_trash;
+
+   my $newloc = $a->refile or warn("cant refile $abs, ".$a->errstr) and return;
+   debug("refiled to $newloc");
+
+   return 1;
+
+}
+
+
+
+
+
+
+
+sub do_file {
+   my $abs = shift;
+   
+
+   my $f = $astro->file($abs) or return;
+   $f->is_mp3 or return;
+   
+   if ($opt_e){
+      $f->refile_overrite(1);
+   }
+   
+   my $movedto = $f->refile or warn("Could not process $abs") and return;
+
+   print STDERR "'$movedto'\n";
+   
+}
+
+
+
+sub usage {
+   qq{astroboy [OPTION]... FILE... DIR... 
+Organize mp3 files on filesystem by id3 tag.
+
+   -a path     abs path to base music, ~/music is default
+   -t          trim, delete jpegs, par2s, m3us from dir, if dir
+   -e          delete argument if already exists in target
+               caveat: not testing for size or bitrate yet
+   -n          don't do it, just show what would happen
+   -d          debug
+   -h          help
+   -v          version
+
+Try 'man astroboy' for more information.
+}
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+astroboy - organize mp3 files on filesystem by id3 tag
+
+=head1 OPTIONS
+   
+   -a path     abs path to base music, ~/music is default
+   -t          trim, delete jpegs, par2s, m3us from dir, if dir
+   -e          delete argument if already exists in target
+               caveat: not testing for size or bitrate yet
+   -n          don't do it, just show what would happen
+   -d          debug
+   -h          help
+   -v          version
+
+=head1 USAGE
+
+   astroboy [OPTION]... FILE... DIR...
+
+Where FILE is an mp3 file.
+Where DIR is a directory holding mp3s, representing one album.
+
+=head2 Example Usage
+
+Move an mp3 into the music hierarchy.
+
+   astroboy './04-song of this- release.mp3'
+
+Just see where it would go..
+
+   astroboy -n './04-song of this- release.mp3'
+   
+
+
+=head1 SEE ALSO
+
+L<Astroboy>
+
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=cut
+
+

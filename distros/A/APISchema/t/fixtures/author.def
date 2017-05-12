@@ -1,0 +1,11 @@
+resource author => {
+    type => 'object',
+    description => '著者',
+    properties => {
+        author_name  => {
+            type => 'string',
+            description => '著者',
+            example => '著者',
+        },
+    },
+};

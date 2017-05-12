@@ -1,0 +1,15 @@
+0.0103  2014-07-14      Piotr Roszatycki <dexter@cpan.org>
+
+* Support AnyEvent::IO::IOAIO (the default on Fedora systems).
+
+0.0102  2013-12-24      Piotr Roszatycki <dexter@cpan.org>
+
+* Compatibility with systems with lame /etc/services.
+
+0.0101  2013-12-17      Piotr Roszatycki <dexter@cpan.org>
+
+* Compatibility with non-IPv6 systems.
+
+0.0100  2013-12-09      Piotr Roszatycki <dexter@cpan.org>
+
+* First CPAN release.

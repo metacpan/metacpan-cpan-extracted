@@ -1,0 +1,4 @@
+severity = 5
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = xt/.perltidyrc

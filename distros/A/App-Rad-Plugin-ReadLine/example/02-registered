@@ -1,0 +1,19 @@
+#! /usr/bin/perl
+use warnings; use strict;                           # boring
+use lib qw[ lib ];                                  # boring
+use App::Rad::Plugin::ReadLine::Demo qw[ demo ];    # boring
+use App::Rad qw[ ReadLine ];
+App::Rad->run();
+sub setup {
+    my $c = shift;
+    $c->register_commands(
+        'serious', 'business'
+        ,'demo' # boring other commands here 
+    );
+    $c->shell_options( 'interactive' );    # all args optional, with sensible defaults
+}
+
+sub serious  :Help('Important functionality - not to be joked about') {};
+sub business :Help('You gotta do what you gotta do.') {};
+# boring
+

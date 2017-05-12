@@ -1,0 +1,23 @@
+Revision history for App-Smolder-Report
+
+0.04    2008/09/22
+
+        - Add support for --quiet (Pedro Melo)
+        - Fix: --dry-run was not being initialized correctly (Pedro Melo)
+        - Fix: smolder_report script was not properly installed (Pedro Melo)
+       
+0.03    2008/09/22
+
+        - Skip POD coverage for now, we haven't written it yet (Pedro Melo)
+        - Stop using Test::Most and use the Test modules (::Deep and ::Exception) (Pedro Melo)
+
+
+0.02    2008/09/21
+
+        - First CPAN Release
+
+
+0.01    2008/09/21
+
+        - First version.
+

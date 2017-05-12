@@ -1,0 +1,9 @@
+<div id="header">
+  <span class="appname">[% c.app.name %]</span>
+  <a href="[% base %]home">home</a>
+  / 
+  <a href="[% base %][% c.datasource.name %]/schema/tablegroups">
+     [%~ c.datasource.name ~%]
+  </a>
+  [% IF c.app.readonly %] - READONLY[% END %]
+</div>

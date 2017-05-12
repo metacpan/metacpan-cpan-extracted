@@ -1,0 +1,11 @@
+Revision history for Apache2-Instrument
+
+0.03 2014-01-24
+    - Makefile.PL fix, thanks to Steven L. for the spot
+
+0.02 2014-01-14
+    - code cleanup and docs
+    - Add Apache2::Instrument::Procview
+
+0.01 2006-10-12
+    - initial release

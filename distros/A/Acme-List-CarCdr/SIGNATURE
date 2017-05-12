@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.78.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 252d49da88e21c676e01b654c0b002cba46b6d20 Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 1bedf6238b5a687a4e92ea3c10f303c588688544 MANIFEST
+SHA1 de774b261149b10bf021b07e946c416e0628e0b0 META.json
+SHA1 63da5360b14377a1237adf9a0cd90c73dabfdaee META.yml
+SHA1 a17e29eea821206ccffe9f34498b1c601f9c7b49 Makefile.PL
+SHA1 a805f317616cd582ef6aa0d4195b274cf63e86d8 README
+SHA1 e10dbf361559c400bce65a04e6d5b73b1e5be9a4 lib/Acme/List/CarCdr.pm
+SHA1 8eb944ffe993a29ff001bd1071fe916f6079786d t/00-load.t
+SHA1 9b57bcb685264e98bbac1d00ec961b291778adf6 t/carcdr.t
+SHA1 68d1f0d2edc20457cd520a6351b3833748d9a476 t/pod-coverage.t
+SHA1 0423928c7ad72f3981f98464eb8ab58736116b0a t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJVj0YMAAoJEDTEVWqwTuCUE2IH/3ki3SIxhDlPq250URGVSj2R
+gXqn0EBgOyL3ON9iPsfi4UCAIDtgeGvKViu5gByaeX0n3N6kt+5e9pvrsObl3tl0
+JsTOpqKJQWAz8hTuER/Xd2aw+itYvcz8AhdY+VegQCl3I5MDcAi1lBy44xO165Wb
+qo9bnWMc+yoP0CEBKKfQX3JJcD8zcJmaH19aLFD88vYIOkJTBnp0KKor0umda2l4
+ex680/CY1CWKcSRVdEsZO1JlaSe4E+t+n+kFJn7O8VLSk9AOlEGO6xkLk2I1e6A4
+CtF83WuaR1sPNmPkWHXy4sw3boyQSw5HVESTfn0H7LcuuUu2Aib5AISiKQX7NTk=
+=sWLs
+-----END PGP SIGNATURE-----

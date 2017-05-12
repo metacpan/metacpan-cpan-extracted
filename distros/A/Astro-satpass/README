@@ -1,0 +1,72 @@
+Astro-satpass is Copyright (C) 2005-2017 by Thomas R. Wyant, III
+
+DESCRIPTION
+
+This package contains classes needed to predict satellite visibility,
+and a demonstration application (satpass) that makes use of these
+classes. The classes themselves are:
+
+Astro::Coord::ECI - superclass (coordinate transforms)
+Astro::Coord::ECI::Moon - Predict location of the Moon.
+Astro::Coord::ECI::Star - Predict location of a star.
+Astro::Coord::ECI::Sun - Predict location of the Sun.
+Astro::Coord::ECI::TLE - Predict location of a satellite.
+Astro::Coord::ECI::TLE::Iridium - Subclass of TLE, with the ability
+    to predict flares.
+Astro::Coord::ECI::TLE::Set - Aggregation of TLEs, with ability
+    to use the correct TLE depending on time.
+Astro::Coord::ECI::Utils - Constants and utility subroutines.
+
+INSTALLATION
+
+Most Perl users will want to install using their favorite of either
+'cpan' or 'cpanp'. For either of these, installing Astro::Coord::ECI
+gets you everything. ActivePerl users will want to use ActiveState's
+'ppi', and install Astro-satpass.
+
+If for some reason neither of these works for you, you can download the
+distribution and expand it using something like
+
+    tar -xzf Astro-satpass-9.999.tar.gz
+
+Users of MSWin32 (and perhaps other operating systems) may need to
+convert the line endings in the expanded files from Unix to their native
+system before proceeding.
+
+Then, issue one of the following two incantations:
+
+    perl Makefile.PL
+    make
+    make test
+    sudo make install
+
+or
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    sudo ./Build install
+
+You should substitute the appropriate program name for 'make', eg nmake
+(typically) under MSWin32, or mms or mmk under VMS. See
+ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe for a copy of
+nmake for MSWin32 if you need it.
+
+Unix users may want to use 'su' rather than 'sudo' for the install.
+Non-unix users may need to be logged in to an administrative or
+otherwise privileged accout, and turn on privileges (if applicable) for
+the install.
+
+Of course, since it's pure Perl, you can just expand the kit and drop
+the .pm files into the Astro/Coord/ECI directory (creating it if
+necessary) in the appropriate place in your @INC directories.
+
+LICENSING INFORMATION
+
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

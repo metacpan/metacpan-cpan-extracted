@@ -1,0 +1,13 @@
+use Test::More tests => 4;
+BEGIN { use_ok('Acme::Lingua::NIGERIAN') };
+
+DEAR SIR,
+
+I AM THE SON OF LATE PRESIDENT ONE-OR-THE-OTHER OF NIGERIA.
+
+OK ( TRANSFER_DISCREETLY SWISS_BANK_ACCOUNT "H!!!ELLO N!!!IGERIA!\n" );
+
+OK ( US$17 MILLION eq "0" );
+
+OK ( US$17 MILLION + 25 == 25 );
+

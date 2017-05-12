@@ -1,0 +1,154 @@
+{
+   "abstract" : "ArangoDB client for Perl",
+   "author" : [
+      "Hideaki Ohno<hide.o.j55@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "keywords" : [
+      "arngodb",
+      "database"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ArangoDB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "eg"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "App::Prove" : 0,
+            "File::Temp" : 0,
+            "Test::Deep" : 0,
+            "Test::Fatal" : 0,
+            "Test::Mock::Guard" : 0,
+            "Test::More" : "0.98",
+            "Test::TCP" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Data::Clone" : 0
+         },
+         "requires" : {
+            "Carp" : 0,
+            "Class::Accessor::Lite" : "0.05",
+            "Data::Util" : "0.59",
+            "Furl::HTTP" : "0.42",
+            "JSON" : "2.53",
+            "List::MoreUtils" : 0,
+            "MIME::Base64" : 0,
+            "Scalar::Util" : "1.19",
+            "parent" : 0,
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "ArangoDB" : {
+         "file" : "lib/ArangoDB.pm",
+         "version" : "0.08"
+      },
+      "ArangoDB::AbstractDocument" : {
+         "file" : "lib/ArangoDB/AbstractDocument.pm",
+         "version" : 0
+      },
+      "ArangoDB::BindVars" : {
+         "file" : "lib/ArangoDB/BindVars.pm",
+         "version" : 0
+      },
+      "ArangoDB::ClientException" : {
+         "file" : "lib/ArangoDB/ClientException.pm",
+         "version" : 0
+      },
+      "ArangoDB::Collection" : {
+         "file" : "lib/ArangoDB/Collection.pm",
+         "version" : 0
+      },
+      "ArangoDB::ConnectOptions" : {
+         "file" : "lib/ArangoDB/ConnectOptions.pm",
+         "version" : 0
+      },
+      "ArangoDB::Connection" : {
+         "file" : "lib/ArangoDB/Connection.pm",
+         "version" : 0
+      },
+      "ArangoDB::Constants" : {
+         "file" : "lib/ArangoDB/Constants.pm",
+         "version" : 0
+      },
+      "ArangoDB::Cursor" : {
+         "file" : "lib/ArangoDB/Cursor.pm",
+         "version" : 0
+      },
+      "ArangoDB::Document" : {
+         "file" : "lib/ArangoDB/Document.pm",
+         "version" : 0
+      },
+      "ArangoDB::Edge" : {
+         "file" : "lib/ArangoDB/Edge.pm",
+         "version" : 0
+      },
+      "ArangoDB::Index" : {
+         "file" : "lib/ArangoDB/Index.pm",
+         "version" : 0
+      },
+      "ArangoDB::Index::CapConstraint" : {
+         "file" : "lib/ArangoDB/Index/CapConstraint.pm",
+         "version" : 0
+      },
+      "ArangoDB::Index::Geo" : {
+         "file" : "lib/ArangoDB/Index/Geo.pm",
+         "version" : 0
+      },
+      "ArangoDB::Index::Hash" : {
+         "file" : "lib/ArangoDB/Index/Hash.pm",
+         "version" : 0
+      },
+      "ArangoDB::Index::Primary" : {
+         "file" : "lib/ArangoDB/Index/Primary.pm",
+         "version" : 0
+      },
+      "ArangoDB::Index::SkipList" : {
+         "file" : "lib/ArangoDB/Index/SkipList.pm",
+         "version" : 0
+      },
+      "ArangoDB::ServerException" : {
+         "file" : "lib/ArangoDB/ServerException.pm",
+         "version" : 0
+      },
+      "ArangoDB::Statement" : {
+         "file" : "lib/ArangoDB/Statement.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hideo55/p5-ArangoDB/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/hideo55/p5-ArangoDB.git"
+      }
+   },
+   "version" : "0.08"
+}

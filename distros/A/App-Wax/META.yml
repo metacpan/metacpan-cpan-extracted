@@ -1,0 +1,45 @@
+---
+abstract: 'webify your CLI'
+author:
+  - 'chocolateboy <chocolate@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Differences: '0.64'
+  Test::Fatal: '0.014'
+  Test::TinyMocker: '0.03'
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Wax
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  Sereal: '3.015'
+requires:
+  Digest::SHA: 0
+  File::BaseDir: '0.07'
+  File::Slurp: '9999.19'
+  HTTP::Message: '6.11'
+  IPC::System::Simple: '1.25'
+  LWP: '6.15'
+  MIME::Types: '2.13'
+  Method::Signatures::Simple: '1.07'
+  Mouse: v2.4.5
+  Parallel::parallel_map: '0.02'
+  Try::Tiny: '0.27'
+  URI: '1.71'
+  perl: 5.8.8
+resources:
+  bugtracker: https://github.com/chocolateboy/App-Wax/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/chocolateboy/App-Wax
+version: 1.1.0

@@ -1,0 +1,244 @@
+#!/usr/bin/perl -w
+
+use 5.006;
+use strict;
+
+=head1 NAME
+
+scrobbler-helper - submit a track to AudioScrobbler
+
+=head1 SYNOPSIS
+
+ scrobbler-helper [-nv] [-e encoding] [-f configfile] -P progname
+   -V progver title artist album year comment genre length
+
+=head1 DESCRIPTION
+
+The B<scrobbler-helper> utility uses the C<Audio::Scrobbler> module to
+submit a single track's information to Last.fm's AudioScrobbler -
+http://www.audioscrobbler.com/.  It requires the program (plug-in) name
+and version to be specified on the command line, and also requires all
+seven track attributes, although some of them may be omitted by supplying
+empty strings.
+
+The following command-line options are recognized:
+
+=over 4
+
+=item -e encoding
+
+Specify the character encoding of the track info, if it is neither UTF-8
+nor the one specified via B<default_encoding> in the configuration file.
+
+=item -f configfile
+
+Specify a different configuration file, not ~/.scrobbler-helper.conf.
+
+=item -n
+
+Do not actually perform the handshake and submission
+(sets the C<Audio::Scrobbler> B<"fake"> option).
+
+=item -P progname
+
+Specify the name of the AudioScrobbler plug-in submitting the data.
+This option is B<mandatory>!
+
+=item -v
+
+Verbose operation - display diagnostic messages to the standard output
+(sets the C<Audio::Scrobbler> B<"verbose"> option).
+
+=item -V progver
+
+Specify the version of the AudioScrobbler plug-in submitting the data.
+This option is B<mandatory>!
+
+=back
+
+Besides the command line, the B<scrobbler-helper> utility also retrieves
+information from a per-user configuration file, usually
+~/.scrobbler-helper.conf; it is a INI-style file, which must contain a
+secion named B<"global">.  The following variables are recognized, with
+B<username> and B<password> being mandatory:
+
+=over 4
+
+=item * default_encoding
+
+The encoding to assume for the track info, if none is supplied with
+the B<-e> command-line option.  If neither B<-e> is given on the command
+line nor B<default_encoding> specified in the configuration file, the
+B<scrobbler-helper> utility assumes UTF-8.
+
+=item * fix_track_name
+
+A boolean flag specifying whether to do some trivial fixes on the song
+name before submitting it.  Currently, this only removes a "DD. "
+sequence at the start of the name, where 'D' is a digit.
+
+The values C<on>, C<true>, C<yes>, and C<1> are considered to be true.
+
+=item * password
+
+The password for the AudioScrobbler account.
+
+=item * username
+
+The username for the AudioScrobbler account.
+
+=back
+
+  [global]
+  username=jrandomlistener
+  password=mylittlesecret
+  # Optional (the default is UTF-8)
+  default_encoding=windows-1251
+  # Optional (the default is "no")
+  fix_track_name=yes
+
+=cut
+
+use Config::IniFiles;
+use Encode;
+use Getopt::Std;
+
+use Audio::Scrobbler;
+
+sub is_true($);
+
+my %infovars = (
+	'cmdopts'	=> [ qw/P V/ ],
+	'cmdline'	=> [ qw/title artist album year comment genre length/ ],
+	'global'	=> [ qw/username password/ ],
+	'global_nc'	=> [ qw/default_encoding fix_track_name/ ],
+);
+my $verbose = 0;
+
+MAIN:
+{
+	my %info;
+	my (%opts, %cfg) = ();
+	my ($configfname) = "$ENV{HOME}/.scrobbler-helper.conf";
+	my ($scrob);
+
+	getopts('nve:f:P:V:', \%opts) or die "Parsing options: $!\n";
+	$configfname = $opts{'f'} if $opts{'f'};
+	$verbose = 1 if $opts{'v'};
+	$info{'verbose'} = $verbose;
+	$info{'fake'} = 1 if $opts{'n'};
+
+	@info{qw/progname progver encoding/} = @opts{@{$infovars{'cmdopts'}}};
+	if (!($info{'progname'} && $info{'progver'})) {
+		die "Must specify program name (-P) and version (-V)!\n";
+	}
+
+	if (@ARGV != @{$infovars{'cmdline'}}) {
+		die 'Need '.@{$infovars{'cmdline'}}.' args: '.
+		    join(', ', @{$infovars{'cmdline'}}).".\n";
+	}
+	@info{@{$infovars{'cmdline'}}} = @ARGV;
+	map { s/^\s+//; s/\s+$//; } @info{@{$infovars{'cmdline'}}};
+
+	if (!tie %cfg, 'Config::IniFiles',
+	    (-file => $configfname, -allowcontinue => 1)) {
+		my $err = join "\n", "Could not read $configfname: $!",
+		    @Config::IniFiles::errors;
+		die "$err\n";
+	}
+
+	@info{@{$infovars{'global'}}, @{$infovars{'global_nc'}}} =
+	    @{$cfg{'global'}}{@{$infovars{'global'}},
+	    @{$infovars{'global_nc'}}};
+	for (@{$infovars{'global'}}) {
+		die 'Missing variables in the config file, need at least '.
+		    join(', ', @{$infovars{'global'}}).".\n"
+		    unless defined($info{$_});
+	}
+	
+	# Recode the track info into UTF-8
+	if (defined($info{'default_encoding'}) &&
+	    (!defined($info{'encoding'}) || $info{'encoding'} eq '')) {
+		$info{'encoding'} = $info{'default_encoding'};
+	}
+	if (defined($info{'encoding'}) && $info{'encoding'} !~ /^utf-?8$/i) {
+		print "RDBG recoding track info from $info{encoding} to UTF8\n"
+		    if $verbose;
+		foreach (@{$infovars{'cmdline'}}) {
+			$info{$_} = decode($info{'encoding'}, $info{$_});
+		}
+	}
+
+	# Fix up the track name if requested
+	if (defined($info{'fix_track_name'}) &&
+	    is_true($info{'fix_track_name'})) {
+		$info{'title'} =~ s/^\d\d?\. //;
+		print "RDBG fixed up the track name to $info{title}\n"
+		    if $verbose;
+	}
+
+	# Rock'n'roll!
+	$scrob = new Audio::Scrobbler('cfg' => \%info) or
+	    die "Could not create an Audio::Scrobbler object\n";
+	$scrob->handshake() or
+	    die "Scrobbler: ".$scrob->err()."\n";
+	print "RDBG handshake successful, it seems\n" if $verbose;
+	$scrob->submit(\%info) or
+	    die "Scrobbler submit: ".$scrob->err()."\n";
+	print "RDBG submision successful, it seems\n" if $verbose;
+}
+
+sub is_true($)
+{
+	my $s = lc $_[0];
+
+	return ($s eq '1' || $s eq 'on' || $s =~ /^[ty]/);
+}
+
+=head1 TODO
+
+=over 4
+
+=item *
+
+Command-line options, so people don't have to submit everything...
+
+=item *
+
+Storing and caching of unsuccessful submissions for later retrying.
+
+=back
+
+=head1 SEE ALSO
+
+B<Audio::Scrobbler>
+
+=over 4
+
+=item * http://www.last.fm/
+
+=item * http://www.audioscrobbler.com/
+
+=item * http://www.audioscrobbler.net/
+
+=back
+
+The home site of the C<Audio::Scrobbler> module is
+http://devel.ringlet.net/audio/Audio-Scrobbler/
+
+=head1 AUTHOR
+
+Peter Pentchev, E<lt>roam@ringlet.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005, 2006 by Peter Pentchev.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+$Id: scrobbler-helper 88 2006-01-02 09:16:32Z roam $
+
+=cut
+

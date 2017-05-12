@@ -1,0 +1,133 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::duino;
+
+=head1 NAME
+
+duino - Command-line toolkit for working with Arduino boards
+
+=head1 VERSION
+
+version 0.10
+
+=cut
+
+=head1 SYNOPSIS
+
+ duino COMMAND [OPTIONS]
+
+=over
+
+=item List the supported Arduino models:
+
+   $ duino models
+
+=item Build a sketch:
+
+   $ duino build --board uno
+
+=item Upload the sketch to the Arduino:
+
+   $ duino upload --board uno --port /dev/ttyACM0
+
+=item Build and upload a given sketch file:
+
+   $ duino build --board uno some_sketch.ino
+   $ duino upload --board uno --port /dev/ttyACM0 some_sketch.ino
+
+=item Upload a previously built hex file:
+
+   $ duino upload --board uno some_file.hex
+
+=item Communicate with the Arduino:
+
+   $ duino com --port /dev/ttyACM0
+
+=item Clean the build directory:
+
+   $ duino clean --board uno
+
+=back
+
+=head1 DESCRIPTION
+
+B<duino> is a command-line toolkit for working with Arduino boards that can
+replace the Arduino IDE. It can be either used directly on the command-line or
+integrated into third-party IDEs. With duino you can quickly build and upload
+sketches to a variety of Arduino boards, and communicate with them using the
+built-in serial monitor.
+
+To work it needs the Arduino software environment that can be found on the
+L<Arduino website|http://arduino.cc/en/Main/Software>, or in most package
+repositories (e.g. the C<arduino-core> package on Debian/Ubuntu).
+
+=cut
+
+App::duino -> run;
+
+=head1 COMMANDS
+
+=over 4
+
+=item L<models|App::duino::Command::models>
+
+List all known Arduino models.
+
+=item L<build|App::duino::Command::build>
+
+Build an Arduino sketch.
+
+=item L<upload|App::duino::Command::upload>
+
+Upload a sketch to an Arduino.
+
+=item L<clean|App::duino::Command::clean>
+
+Clean the build directory.
+
+=item L<com|App::duino::Command::com>
+
+Open a serial monitor to an Arduino
+
+=back
+
+=head1 CONFIGURATION
+
+Per-project configurations can be specified in the C<duino.ini> file under the
+project directory. Valid configurations are:
+
+=over 4
+
+=item B<board>
+
+The Arduino board model.
+
+=item B<libs>
+
+A list of non-core libraries needed by the project.
+
+=back
+
+Example:
+
+    board = leonardo
+    libs  = Wire Wire/utility SPI SD SD/utility
+
+=head1 AUTHOR
+
+Alessandro Ghedini <alexbio@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2013 Alessandro Ghedini.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

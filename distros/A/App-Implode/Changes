@@ -1,0 +1,13 @@
+Changelog for App::Implode
+
+0.03     Sun Nov 16 14:09:18 2014
+       * Fix tests: Require higher version of perl and skip bundle.t
+
+0.02     Sat Nov 15 12:34:58 2014
+       * Will also include files from ./lib
+       * Use fixed directory in /tmp
+       * Add support for custom APP_EXPLODE_DIR
+
+0.01     Fri Nov 14 19:50:11 2014
+       * Can bundle requirements into a single executable
+

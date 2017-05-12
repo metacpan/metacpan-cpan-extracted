@@ -1,0 +1,29 @@
+Taking an interval as input, this module will construct the smallest
+set of prefixes, such that all numbers in the interval will match
+exactly one of the prefixes, and no prefix will match a number not
+in the interval.
+
+This type of conversion is particularly useful when working with
+telephony switching equipment, which usually determines call routing
+based on number prefixes rather than ranges.
+
+See the POD for further documentation.
+
+Install the usual way:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or, if you've got Module::Build installed:
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+Copyright (c) 2003 Lars Thegler. All rights reserved.
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

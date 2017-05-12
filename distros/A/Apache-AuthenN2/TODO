@@ -1,0 +1,6 @@
+o Add nt group authentication when it is available in
+  Authen::Authen-Smb.
+
+o Consult nis+ groups table (and /etc/groups?) to see if user is in
+  additional groups besides the one specified in the password record
+  (thanks to Joseph Sonnier for suggestion).

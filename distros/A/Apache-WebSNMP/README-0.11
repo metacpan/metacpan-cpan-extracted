@@ -1,0 +1,42 @@
+
+Welcome!
+
+WebSNMP is a perl module for Apache Web Servers that allows
+a web developer to easily insert snmp functionality into web
+pages with simple html tags.  Please use
+	perldoc Apache::WebSNMP 
+for a detailed description.
+
+PLEASE NOTE:  This module REQUIRES the perl SNMP module, which
+can be downloaded from :
+www.cpan.org
+
+To install the module, simply do the usual:
+
+perl Makefile.PL
+make
+make install
+
+After this, you must add the following entry to your httpd.conf
+file:
+
+<Location /directory_name>
+        SetHandler perl-script
+        PerlHandler Apache::WebSNMP
+</Location>
+
+where "directory_name" is the location in your DocumentRoot
+where you wish to put all of your snmp web documents.  Then 
+simply restart your web server and you are ready to go!
+
+Please direct any questions, comments, and suggesttions to:
+websnmp@ecomm.savantnet.com
+
+Thanks for trying WebSNMP!
+
+
+
+Copyright (c) 2000 Chris Rigby. All rights reserved. This program is 
+free software; you can redistribute it and/or modify it under the 
+same terms as Perl itself. 
+

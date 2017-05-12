@@ -1,0 +1,32 @@
+Revision history for App::TimeTracker::Command::Trello
+
+1.005   2016-06-05T21:41:25+0200
+    - add listname_as_tag to store a card's list name
+      as a tag (Thomas Klausner)
+
+
+1.004   2016-06-03T19:03:36+0200
+    - update docs & copyright year (Thomas Klausner)
+
+
+1.003   2016-06-02T16:24:41+0200
+    - extract card id from full card url (Thomas Klausner)
+    - bugfix: update the previous card with time-worked when starting a new task (Thomas Klausner)
+    - use shortLink to identify trello cards (Thomas Klausner)
+    - move cards to top of list (Thomas Klausner)
+
+
+1.002   2014-05-28T23:15:52+0200
+    - fixed _trello_just_the_name so we now have proper branch names
+    - properly load trello id from prev task so stop works without
+      specifiying --trello $ID
+
+
+1.001   2014-05-27T15:58:00+0200
+    - depend on A:TT 2.020
+    - fixed setup of token if we have an invalid token
+
+
+1.000   2014-05-20T12:40:26+0200
+    - initial commit & first version
+

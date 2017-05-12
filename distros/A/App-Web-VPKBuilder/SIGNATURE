@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 078f7c1d4bce15797c00625206110089756c5aca Changes
+SHA1 ec20b673110c16fc30c9bdf40ffd7ffc676e8240 MANIFEST
+SHA1 dfe0f3a84ee4405ec4a39fceba82e95a043cda20 META.json
+SHA1 ba9c93dbffdc4220bdb9eca681af6bb47c04ee97 META.yml
+SHA1 4c8e3681df2cad4c653528c3062e7fc962d03de3 Makefile.PL
+SHA1 b711dcd119fd916efe615ff0849440a84599b19a README
+SHA1 92a295e6d9eb9cf043fc5c02ac62f450dde20879 app.psgi
+SHA1 fdf045b2aa9c53c36d6a20e5344af71727b1d805 cfg/options.yml
+SHA1 e6337834b5552fb5d1c7e745ecf5ad68fe589cb4 index.html
+SHA1 03afb039ffdd20cc607b7d780d71e637cf72c844 lib/App/Web/VPKBuilder.pm
+SHA1 bb670f3dc1b2a7ce253b108830ef5f52e2a9e7b1 static/index.css
+SHA1 1e959cae88b462941c876fb32c78f484b526956b t/App-Web-VPKBuilder.t
+SHA1 fa4cca04d35b71b2c9a4d04e5977efb3868f88aa t/perlcritic.t
+SHA1 e4e0fd9a5add27aea8ea4b88c780bba779e973f6 t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJWUMhcAAoJEMoENb5ewbNij7sP/RTA0xuBni/a7DZK/pBYKYxG
+YUJwUGozXW0EjUPitmwjKk+Ca7+EAcWz9CAUb/YZs3tTtaLaqzdJZ5YsHpqnByvs
+9JHmplAdGDpcUlO4cnteRf9pgn+ao9xS52niFPKQVKaxnxwIb2UdVpLuBKKy8RsY
+zMy8uOLalLeaUMplgf4kZugPrUCP1cevbBJWEwcq8CMZS8H4KUJmlWG8bldc/jSD
+XOgTSTf2OH9nTLyPsw0qpvi28HMvf1tNCgxzuVzy3yW3+78Ily59ofnqtj+kE2cC
+uC7+Zw37oCWpU4cVi3MbaI01v1fbXVdojpHsPLG2H73ac/373dwI1yksqUjCUMEK
+ly7NtD2F0s+dM4omftJkaouTFu+R2BmYx58RXm1z3uAZ8uS8GzyeN5K6E8sx/Wab
+f0UrNMbRudEMhrVwx9Jb9vOb/NCd/drW4Wm47IFYtYbKqtUWMc1JBjuNR+HEY40B
+lTrhOD+pafnMqSu/pBeUX6cbH7N3rEc7MpEqr7O8DQ7auLm2HYi18xKu1wSWTMJz
+fqTAGA1KsjXBYNKIUINqVbenofq3IoRAEBPl1RtUX2aPiLwKPYQOOzv9h/CQosZ4
+8QkTHjucDAto5Sao5I3ntVdOiOXECPUOUk3KW/3IfKWKuDtgTSAM+icztZ7wwg2D
+94jqK7M9G9ZLQb8yEYbN
+=TMwL
+-----END PGP SIGNATURE-----

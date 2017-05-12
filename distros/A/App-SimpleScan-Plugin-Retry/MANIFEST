@@ -1,0 +1,18 @@
+Changes
+lib/App/SimpleScan/Plugin/Retry.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00.load.t
+t/01pragma.t
+t/02multi.t
+t/03cmdline.t
+t/04pragmarun.t
+t/05cmdrun.t
+t/multi.in
+t/neither.in
+t/pod-coverage.t
+t/pod.t
+t/retryonrun.in
+t/testretry.in

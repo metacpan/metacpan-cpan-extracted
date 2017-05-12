@@ -1,0 +1,242 @@
+Revision history for App-gh
+
+0.66
+    - Replace JSON::XS with JSON
+
+0.64
+    - Fix the `clone` command.
+
+0.63
+    - Fix and update the `update` command.
+
+0.62
+    - Fix search command.
+
+0.61
+    - Fix `clone` command.
+    - Fix `all` command.
+    - Update documenation for setup and installation.
+    - Refactor git command functions
+    - Use Term::ANSIColor
+
+0.60
+    - Support Net::GitHub::V3
+    - Fix authentication for Core API
+    - Fix import command 
+    - Still a lot of things to be fixed.
+
+0.57
+    - bug fixes
+
+0.56
+    - Add page command to create gh-pages branch.
+
+0.553
+    - Improve pullreq send command. Add base argument.
+
+0.552
+    - let IO::Pager be in requires.
+    - Add -l option to search.
+    - Add IO::Pager for Pull request command (list and show)
+    - Improvements for recent command printing.
+    - Improvements for help messages.
+
+0.53
+    - Improvements for issue printing layout.
+    - Improvements for pull request show command printing.
+
+0.521
+    - Fix error printing
+
+0.52
+    - Improve pullrequest list layout, better printing.
+
+0.51
+    - Fix double list query.
+
+0.50
+    - Improve API error message printint
+    - Refactor command "all" conditions
+    - Preventing API rate exceed
+    - Add --skip-forks option
+    - Issue command from @mattn.
+    - Documentation update.
+
+0.49
+    - Update pods for pull request command. @mattn++
+
+0.48
+    - Merge pull request from @mattn++, added pull request commands.
+
+0.47
+    - Merge pull request #22 from zakame/master. API request fixes, @zakame++.
+
+0.46
+    - Update fix & refactoring from @tyru++.
+
+0.45
+    - gh list command default to current github user id.
+
+0.44
+    - Remove Error::Simple from Makefile.PL, Add Error.pm instead.
+    - Automatically adding --ssh option for owner's repos (gfx)
+    - Clean up dependencies; JSON is no longer required (gfx)
+
+0.43
+    - Thanks to @garu++, patches:
+
+       From @garu:
+       > This patch does 3 things:
+       > * Improves documentation on how to let "gh" see your authentication data;
+
+       > * Fixes an "uninitialized" warning in App::gh::Utils::print_list(),
+       > while also showing a (nicer, I think) "[no description available]"
+       > message instead, quite similar to what github does on the web;
+
+       > * Patches App::gh::API::request() to allow users without
+       > authentication information in their .gitconfig to use "gh". This was
+       > probably working before, but I think github updated the API and, if
+       > you try to fetch data by posting the request with empty login/token
+       > values, github returns 401 Forbidden instead of assuming anonymous.
+       > With this patch, "gh" works for most commands even when the user
+       > doesn't have a .gitconfig file.
+
+       > I hope this helps!
+
+       > (That said, I think you should really consider Net::GitHub for proper
+       > Github API handling. For instance, the documents in develop.github.com
+       > are pretty strict regarding what should be a GET request and what
+       > should be POST, while the simplistic approach in App::gh uses POST for
+       > everything. If github decides to enforce that API, App::gh will break.
+       > Also, some (most?) of the functionality in the TODO file is already
+       > implemented there, e.g. the issues tracker)
+
+0.42
+    - Fix Git.pm test.
+
+0.41
+    - Bundle Git.pm package file into App::gh::Git
+
+0.4
+    - Added --prefix option for "all" command.
+
+0.31-TRIAL
+    - Testing RTHOMPSON's improvents to gh import
+
+0.30
+    - support --bare option for 'all' command.
+    - fix the bug of 'clone' -k option.
+
+0.29
+    - update makefile for gh recent.
+
+0.28
+
+    - Add setup command.
+
+0.272
+
+    - Fix info command.
+
+0.271
+
+    - fix drop command.
+
+0.27
+
+    - new Import command for importing repository to github.
+
+0.261
+
+    - api class doc update
+
+0.26
+
+    - Added info command.
+    - Refactor api,config stuff.
+
+
+0.256
+
+    Update help messages
+
+0.255
+
+    Add Commit command to provide a shipit-like step.
+
+0.254
+
+    Add simple bash completion support.
+
+0.253
+
+    Add --id option to network
+
+0.252
+
+    Remove IO::Pager from dependency.
+
+0.251
+
+    Update document.
+    Remove Exporter::Lite from dependency
+
+0.25
+    Add --branch , --merge option to pull command.
+
+    Update documentation.
+
+0.24
+
+    Pull command should:
+        add fork remote
+        fetch fork remote
+        merge it fi --merge option is given.
+
+    show networks if arg is not given.
+
+0.236
+
+    XML::Feed is optional dependency.
+
+0.235
+
+    Provide more command help message and fixed App::CLI.
+
+0.018
+
+    Change the pull command behavior
+
+    - Merge from fork repository if --merge option is specified.
+    - Create a branch from fork/master (default branch master) for fork.
+    - Checkout the branch fork/master (default branch master).
+    - Pull changes from fork repository to the branch
+
+
+0.017   Mon 04 Oct 2010 01:08:19 PM CST
+        * Add push command.
+
+0.0167  Mon 04 Oct 2010 02:57:20 AM CST
+        * Add new command: `gh update` to update current repository
+
+0.0166  ค้ 10/ 3 13:40:33 2010
+        * show available commands
+
+0.0165  ม๙ 10/ 2 21:19:28 2010
+        * provide a --skip-exists | -s option for command `all`.
+
+            git all c9s -s --into .
+
+          this will clone new repositories only.
+
+        * Understand link to github in fork command (CHORNY)
+
+
+0.0164  ม๙ 10/ 2 21:11:39 2010
+        * add new command `recent`.
+        * update repository with `git pull --rebase --all`
+
+0.0167  Sat 16 Oct 2010 11:47:28 AM JST
+        * add upload command
+        * --cpan option for upload command to use CPAN::Uploader
+

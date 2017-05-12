@@ -1,0 +1,36 @@
+---
+abstract: 'building, finding and using wxWidgets binaries'
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+build_requires:
+  ExtUtils::CBuilder: '0.24'
+  File::Spec: '1.50'
+  LWP::Protocol::https: '0'
+  Module::Build: '0.28'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4222, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-wxWidgets
+provides:
+  Alien::wxWidgets:
+    file: lib/Alien/wxWidgets.pm
+    version: '0.69'
+  Alien::wxWidgets::Utility:
+    file: lib/Alien/wxWidgets/Utility.pm
+    version: '0.59'
+requires:
+  Module::Pluggable: '2.6'
+  perl: '5.006'
+resources:
+  MailingList: http://lists.perl.org/list/wxperl-users.html
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-wxWidgets
+  homepage: http://www.wxperl.it/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.code.sf.net/p/wxperl/code/Alien-wxWidgets
+version: '0.69'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

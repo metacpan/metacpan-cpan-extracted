@@ -1,0 +1,77 @@
+{
+   "abstract" : "A Lazy Façade to simplify your code/life",
+   "author" : [
+      "Daniel Muey <http://drmuey.com/cpan_contact.pl>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Kit",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::Spork" : "0",
+            "Capture::Tiny" : "0",
+            "Class::Unload" : "0.08",
+            "Cwd" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "File::Path::Tiny" : "0.7",
+            "File::ShareDir" : "0",
+            "File::Slurp" : "9999.19",
+            "File::Spec" : "0",
+            "File::Temp" : "0.2304",
+            "FindBin" : "0",
+            "HTTP::Tiny" : "0",
+            "IO::Interactive::Tiny" : "0",
+            "IPC::Open3::Utils" : "0",
+            "Import::Into" : "0",
+            "JSON::Syck" : "1.27",
+            "Locale::Maketext::Utils" : "0",
+            "Locale::Maketext::Utils::Mock" : "0",
+            "Log::Dispatch" : "0",
+            "Log::Dispatch::Config" : "0",
+            "MIME::Types" : "0",
+            "Module::Want" : "0.6",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Net::Detect" : "0",
+            "Path::Iter" : "0",
+            "Role::Multiton" : "0",
+            "Role::Tiny" : "0",
+            "String::UnicodeUTF8" : "0.21",
+            "Test::Detect" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Try::Tiny" : "0",
+            "Unix::Whereis" : "0",
+            "Web::Detect" : "0",
+            "YAML::Syck" : "1.27"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.62"
+}

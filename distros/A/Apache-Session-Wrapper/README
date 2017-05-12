@@ -1,0 +1,12 @@
+This module provides a simple wrapper for Apache::Session that manages
+the session id for you.  See the module documentation for details.
+
+INSTALLATION
+
+To install this module type the following in the distribution
+directory:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install

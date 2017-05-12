@@ -1,0 +1,5 @@
+0.02 Released 2012/10/07
+  * Fix a bug where a timed out cookie could cause an internal server error if 
+  you removed the cookie forcibly from the database
+
+0.01 Released 2012/09/26

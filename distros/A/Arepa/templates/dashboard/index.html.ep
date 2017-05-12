@@ -1,0 +1,176 @@
+<div id="sidebar">
+  <h1>Compilation queue</h1>
+
+  <div id="compilation-queue-list">
+    <% if (scalar(@$compilation_queue) > 0) { %>
+        <% foreach my $comp (@$compilation_queue) { %>
+          <div class="compilation-queue-line">
+            <span class="package-name"><%= $comp->{package}->{name} %>_<%= $comp->{package}->{full_version} %><% if ($comp->{builder}) { %> <span class="builder-info">(claimed by <span class="builder-name"><%= $comp->{builder} %></span>)</span><% } %></span>
+            <span class="compilation-props">
+              (<span class="compilation-prop">arch: <span class="compilation-prop-value"><%= $comp->{package}->{architecture} %></span></span>;
+              <span class="compilation-prop">distro: <span class="compilation-prop-value"><%= $comp->{distribution} %></span></span>;
+              <span class="compilation-prop">requested: <span class="compilation-prop-value date"><%= $comp->{compilation_requested_at} %></span></span>)
+            </span>
+          </div>
+        <% } %>
+    <% }
+       else { %>
+      No packages waiting to be compiled
+    <% } %>
+  </div>
+
+  <h1>Latest packages (<a accesskey="r" title="Repository" href="<%= url_for('generic', controller => 'repository') %>">all</a>)</h1>
+
+  <div id="compilation-queue-list">
+    <% foreach my $comp (@$latest_compilations) { %>
+      <div class="compilation-queue-line">
+        <span class="package-name"><%= $comp->{package}->{name} %>_<%= $comp->{package}->{full_version} %></span>
+        <span class="compilation-props">
+          (<span class="compilation-prop">arch: <span class="compilation-prop-value"><%= $comp->{package}->{architecture} %></span></span>;
+          <span class="compilation-prop">distro: <span class="compilation-prop-value"><%= $comp->{distribution} %></span></span>;
+          <span class="compilation-prop">builder: <span class="compilation-prop-value"><%= $comp->{builder} %></span></span>;
+          <span class="compilation-prop">compiled: <span class="compilation-prop-value date"><%= $comp->{compilation_completed_at} %></span></span>)
+        </span>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<div id="main">
+<h1>Packages pending approval</h1>
+
+<% if (scalar(@$packages) == 0) { %>
+No packages pending in <tt><%= $config->get_key('upload_queue:path') %></tt>
+<% }
+   else { %>
+<div id="incoming-package-list">
+<% my $package_count = 0; %>
+<form method="post" action="<%= url_for('generic', controller => 'incoming', action => 'process') %>">
+<% foreach my $package (@$packages) { %>
+    <% $package_count += 1; %>
+        <div class="incoming-package">
+            <span class="incoming-package-name urgency-<%= $package->urgency %>"><%= $package->name %></span>
+            <span class="incoming-package-version"><%= $package->version %></span>
+            <div class="incoming-package-info">
+                <span class="incoming-package-attr compilation-props compilation-prop">
+                    Binary packages:
+                    <span class="compilation-prop-value"><%= join(", ", $package->binary_packages) %></span>
+                </span>
+
+                <span class="incoming-package-attr compilation-props compilation-prop">
+                    Maintainer:
+                    <span class="compilation-prop-value"><%= $package->maintainer %> <% if ($package->maintainer ne $package->changed_by) { %>(<em>But changed by <%= $package->changed_by %></em>)<% } %></span>
+                </span>
+
+                <span class="incoming-package-attr compilation-props compilation-prop">
+                    Distribution:
+                    <span class="compilation-prop-value"><%= $package->distribution %></span>
+                </span>
+
+                <span class="incoming-package-attr compilation-props compilation-prop">
+                    Signed by:
+                    <span class="compilation-prop-value"><% if ($package->signature_id) { %><%= $package->signature_id %><% } else { %>[not signed]<% } %> (<% if ($package->correct_signature == 1) { %><span class="valid-signature">Valid signature</span><% } else { %><span class="invalid-signature">Not valid signature</span><% } %>)</span>
+                </span>
+
+                <% if ($is_user_admin) { %>
+                <span class="incoming-package-attr compilation-props compilation-prop">
+                    Comments:
+                    <span class="compilation-prop-value"><input type="text" size="60" name="comments-<%= $package_count %>" value="<%= $source_package_info->{$package->source}->{comments} %>" /></span>
+                </span>
+                <% } %>
+            </div>
+
+            <input type="hidden" name="package-<%= $package_count %>" value="<%= $package->path %>" />
+            <input type="hidden" name="component-<%= $package_count %>" value="main" />
+            <% if ($is_user_admin) { %>
+            <span class="compilation-props">
+                <input name="approve-<%= $package_count %>" type="submit" value="Approve" />
+                for priority
+                    <%= select_tag("priority-$package_count", [qw(extra optional standard important required)], $source_package_info->{$package->source}->{priority} || 'optional') %>
+                and section
+                    <%= select_tag("section-$package_count", [qw(admin cli-mono comm database devel debug doc editors electronics embedded fonts games gnome graphics gnu-r gnustep hamradio haskell httpd interpreters java kde kernel libs libdevel lisp localization mail math misc net news ocaml oldlibs otherosfs perl php python ruby science shells sound tex text utils vcs video web x11 xfce zope)], $source_package_info->{$package->source}->{section}) %>
+            </span>
+            <span class="compilation-props">
+                <input name="reject-<%= $package_count %>" type="submit" value="Reject" onclick="return confirm('Are you sure?')" />
+            </span>
+            <% } %>
+        </div>
+<% } %>
+<% foreach my $unreadable_package (@$unreadable_packages) { %>
+    <div class="incoming-unreadable-package">
+        <%= $unreadable_package %> [UNREADABLE]
+    </div>
+<% } %>
+</div>
+
+        <input type="hidden" name="rm" value="process_pending" />
+        <% if ($is_user_admin) { %>
+        <div class="option-buttons">
+            <input name="approve_all" type="submit" value="Approve all" />
+        </div>
+        <% } %>
+    </form>
+<% } %>
+
+
+
+
+
+<h1>Builder status</h1>
+
+<div id="builder-status-list">
+<% if (scalar @$builders == 0) { %>
+<span class="warning">You haven't defined any builders yet? Go create some with:</span>
+<pre>
+arepa-admin createbuilder &lt;builder-dir&gt; &lt;mirror&gt; &lt;distribution&gt;
+</pre>
+E.g.:
+<pre>
+arepa-admin createbuilder /var/chroot/mybuilder ftp://ftp.se.debian.org/debian squeeze
+</pre>
+<% } else { %>
+<% foreach my $builder (@$builders) { %>
+  <div class="builder-line">
+    <span class="builder-status"><% if ($builder->{status} eq 'compiling') { %>Compiling <%= $builder->{package}->{name} %>_<%= $builder->{package}->{full_version} %><br/>since <%= $builder->{since} %><% } else { %>Idle<% } %></span>
+    <span class="builder-name"><%= $builder->{name} %></span>
+    <span class="builder-props">
+      <span class="builder-prop">arch: <span class="builder-prop-value"><%= $builder->{architecture} %></span></span>
+      <span class="builder-prop">distro: <span class="builder-prop-value"><%= $builder->{distribution} %></span></span>
+    </span>
+  </div>
+<% } %>
+<% } %>
+</div>
+
+
+
+
+
+<h1>Latest compilation failures</h1>
+
+<div id="compilation-failure-list">
+<% if (scalar @$failed_compilations == 0) { %>
+<span class="warning">No failed compilations yet.</span>
+<% }
+   else { %>
+<% foreach my $compilation (@$failed_compilations) { %>
+  <div class="failed-compilation-line">
+    <div class="compilation-options">
+      <a href="<%= url_for('generic_id', controller => 'queue', action => 'build_log', id => $compilation->{id}) %>">[See build log]</a>
+      <% if ($is_user_admin) { %>
+      -
+      <a href="<%= url_for('generic_id', controller => 'queue', action => 'requeue', id => $compilation->{id}) %>">[Requeue]</a>
+      <% } %>
+    </div>
+    <span class="package-name"><%= $compilation->{package}->{name} %>_<%= $compilation->{package}->{full_version} %></span>
+    on
+    <span class="builder-name"><%= $compilation->{builder} %></span>
+    <span class="compilation-props">
+      <span class="compilation-prop">requested: <span class="compilation-prop-value date"><%= $compilation->{compilation_requested_at} %></span></span>
+      <span class="compilation-prop">started: <span class="compilation-prop-value date"><%= $compilation->{compilation_started_at} %></span></span>
+      <span class="compilation-prop">finished: <span class="compilation-prop-value date"><%= $compilation->{compilation_completed_at} %></span></span>
+    </span>
+  </div>
+<% } %>
+<% } %>
+</div>

@@ -1,0 +1,540 @@
+
+
+<html>
+<head>
+<title>Apache::ASP::Install</title>
+
+
+
+<style type="text/css">
+<!--
+      td {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      font {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      .title {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 16px}
+
+
+
+
+-->
+</style>
+
+
+</head>
+<body bgcolor=black link=#063678 alink=#ff5599 vlink=#993399
+marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
+
+
+
+
+<center>
+<table border=0 cellpadding=0 width=99% cellspacing=8>
+<tr><td align=center>
+
+<table border=0 cellpadding=3 width=100% cellspacing=0>
+<tr bgcolor=#063678>
+<td>
+	<table border=0 cellpadding=1 cellspacing=0 width=100%>
+	<tr>
+	<td><img border=0 src=asptitlelogo.gif alt="Apache::ASP" width=267 height=44 ></td>	
+	
+		<td align=right></td>
+	
+	</tr>
+	</table>
+</td>
+</tr>
+<tr>
+  <td bgcolor=#005196 align=center>
+    <b>
+    <font color=#ffffff>&lt;% Web Applications with Apache &amp; mod_perl %&gt;</font>  
+    </b>
+  </td>
+</tr>
+</table>
+
+
+<table border=0 cellpadding=10 cellspacing=0 width=100% bgcolor=#005196>
+<tr>
+<td valign=top width=120 bgcolor=#005196>
+    
+        <table cellpadding=5 cellspacing=0 border=1 bgcolor=white><tr><td>
+
+	<table border=0 cellpadding=0 cellspacing=0 width=105 bgcolor=white>
+	
+	
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="index.html" style="text-decoration:none"><font color=#063678>INTRO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>%</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><font color=#993399>INSTALL</font></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="config.html" style="text-decoration:none"><font color=#063678>CONFIG</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="syntax.html" style="text-decoration:none"><font color=#063678>SYNTAX</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="events.html" style="text-decoration:none"><font color=#063678>EVENTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="objects.html" style="text-decoration:none"><font color=#063678>OBJECTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="ssi.html" style="text-decoration:none"><font color=#063678>SSI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sessions.html" style="text-decoration:none"><font color=#063678>SESSIONS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="xml.html" style="text-decoration:none"><font color=#063678>XML/XSLT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="cgi.html" style="text-decoration:none"><font color=#063678>CGI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="perlscript.html" style="text-decoration:none"><font color=#063678>PERLSCRIPT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="style.html" style="text-decoration:none"><font color=#063678>STYLE GUIDE</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="faq.html" style="text-decoration:none"><font color=#063678>FAQ</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="tuning.html" style="text-decoration:none"><font color=#063678>TUNING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="kudos.html" style="text-decoration:none"><font color=#063678>CREDITS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="support.html" style="text-decoration:none"><font color=#063678>SUPPORT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sites.html" style="text-decoration:none"><font color=#063678>SITES USING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="testimonials.html" style="text-decoration:none"><font color=#063678>TESTIMONIALS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="resources.html" style="text-decoration:none"><font color=#063678>RESOURCES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="todo.html" style="text-decoration:none"><font color=#063678>TODO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="changes.html" style="text-decoration:none"><font color=#063678>CHANGES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="license.html" style="text-decoration:none"><font color=#063678>LICENSE</font></a></nobr></b></font></td>		
+
+		</tr>
+		<tr><td colspan=2><hr size=1></td></tr>
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="eg/index.html" style="text-decoration:none"><font color=#063678>EXAMPLES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+	</table>
+
+	</td></tr>
+	</table>
+
+		<br>
+		<center>
+		<a href=http://www.apache-asp.org/><img src="powered_by_apache_asp.jpg" width="88" height="31" alt="Powered by Apache::ASP" border="0"></a>
+		<br>
+		<a href=http://perl.apache.org><img src="powered_by_modperl.gif" width="88" height="31" alt="Powered by ModPerl and Apache" border="0"></a>
+		<br>
+		<a href=http://www.perl.com><img src="rectangle_power_perl.gif" width="88" height="31" alt="Powered by Perl" border="0"></a>
+		</center>
+
+</center>
+
+</td>
+
+
+
+<td valign=top bgcolor=white>
+<font size=+0 face=verdana,arial>
+
+<font face=verdana><font class=title size=+1 color=#555555><b>INSTALL</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>The installation process for Apache::ASP is geared towards those
+with experience with Perl, Apache, and unix systems.  For those
+without this experience, please understand that the learning curve 
+can be significant.  But what you have at the end will be a web site
+running on superior open source software.
+<font face="courier new" size=3><pre>
+</pre></font>If installing onto a Windows operating system, please see the section
+titled Win32 Install.</font>
+
+	<hr size=1>
+	<table width=100% border=0 cellpadding=1 cellspacing=3>
+	<tr>
+	<td valign=top><font face="lucida console" size=-1>
+	
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Need%20Help>Need Help</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#WinME%20%2F%2098%20%2Fce25d199>WinME / 98 / 95 flock() workaround</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Download%20and86dfc858>Download and CPAN Install</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Linux%20DSO%20Di0714bb20>Linux DSO Distributions</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Regular%20Perlc8e4234f>Regular Perl Module Install</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Build%20Apache0292e216>Build Apache and mod_perl</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Win32%20%2F%20Wind784e394f>Win32 / Windows Install</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Quick%20Start>Quick Start</a>
+			</font>
+			</td>
+							
+		</tr>
+			
+	</table>
+	<hr size=1>
+	<p>
+
+	<p>
+	<a name=Need%20Help></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Need Help</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Often, installing the <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a> part of the Apache server
+can be the hardest part.  If this is the case for you, 
+check out the <a href=faq.html><font size=-1 face=verdana><b>FAQ</b></font></a> and SUPPORT sections for further help,
+as well as the &quot;Build Apache&quot; notes in this section.
+<font face="courier new" size=3><pre>
+</pre></font>Please also see the mod_perl guide at <a href=http://perl.apache.org/guide>http://perl.apache.org/guide</a>
+which one ought to give a good read before undertaking
+a mod_perl project.</font>
+	
+	<p>
+	<a name=Download%20and86dfc858></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Download and CPAN Install</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>You may download the latest Apache::ASP from your nearest CPAN,
+and also:
+<font face="courier new" size=3><pre>
+  <a href=http://cpan.org/modules/by-module/Apache/>http://cpan.org/modules/by-module/Apache/</a>
+  <a href=ftp://ftp.duke.edu/pub/perl/modules/by-module/Apache/>ftp://ftp.duke.edu/pub/perl/modules/by-module/Apache/</a>
+</pre></font>As a Perl developer, you should make yourself familiar with 
+the CPAN.pm module, and how it may be used to install
+Apache::ASP, and other related modules.  The easiest way
+to install Apache::ASP for the first time from Perl is to 
+fire up the CPAN shell like:
+<font face="courier new" size=3><pre>
+ shell prompt&gt; perl -MCPAN -e shell
+  ... configure CPAN ...
+  ... then upgrade to latest CPAN ...
+ cpan&gt; install CPAN
+  ...
+ cpan&gt; install Bundle::Apache::ASP
+</pre></font>Installing the Apache::ASP bundle will automatically install
+all the modules Apache::ASP is dependent on as well as
+Apache::ASP itself.  If you have trouble installing the bundle,
+then try installing the necessary modules one at a time:
+<font face="courier new" size=3><pre>
+ cpan&gt; install MLDBM
+ cpan&gt; install MLDBM::Sync
+ cpan&gt; install Digest::MD5  *** may not be needed for perl 5.8+ ***
+ cpan&gt; install Apache::ASP
+</pre></font>For extra/optional functionality in Apache::ASP 2.31 or greater, like
+support for FormFill, XSLT, or <a href=ssi.html><font size=-1 face=verdana><b>SSI</b></font></a>, you can install this bundle via CPAN:
+<font face="courier new" size=3><pre>
+  cpan&gt; install Bundle::Apache::ASP::Extra
+</pre></font>
+	
+	<p>
+	<a name=Regular%20Perlc8e4234f></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Regular Perl Module Install</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>If not doing the CPAN install, download Apache::ASP and install it using 
+the make or nmake commands as shown below.  Otherwise, just 
+copy ASP.pm to $PERLLIB/site/Apache
+<font face="courier new" size=3><pre>
+  &gt; perl Makefile.PL
+  &gt; make 
+  &gt; make test
+  &gt; make install
+
+  * use nmake for win32
+</pre></font>Please note that you must first have the Apache Web Server
+&amp; <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a> installed before using this module in a web server
+environment.  The offline mode for building static html at
+./cgi/asp may be used with just perl.</font>
+	
+	<p>
+	<a name=Win32%20%2F%20Wind784e394f></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Win32 / Windows Install</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>If you are on a Win32 platform, like WinNT or Windows 2000, 
+you can download the win32 binaries linked to from:
+<font face="courier new" size=3><pre>
+  <a href=http://perl.apache.org/distributions.html>http://perl.apache.org/distributions.html</a>  
+</pre></font>From here, I would recommend the <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a> binary installation at:
+<font face="courier new" size=3><pre>
+  <a href=ftp://theoryx5.uwinnipeg.ca/pub/other/>ftp://theoryx5.uwinnipeg.ca/pub/other/</a>
+</pre></font>and install the latest perl-win32-bin-*.exe file.
+<font face="courier new" size=3><pre>
+</pre></font>Randy Kobes has graciously provided these, which include
+compiled versions perl, mod_perl, apache, mod_ssl,
+as well as all the modules required by Apache::ASP
+and Apache::ASP itself.
+<font face="courier new" size=3><pre>
+</pre></font>You may also try the more recent Perl-5.8-win32-bin.exe
+distribution which is built on Apache 2.  This should be
+treated as BETA release software until mod_perl 2.x is 
+released as stable. Some notes from Randy Kobes about 
+getting this release to work are here:
+<font face="courier new" size=3><pre>
+  After installing this distribution, in Apache2\conf\perl.conf
+  (pulled in via Apache2\conf\httpd.conf) there&#39;s directives that
+  have Apache::ASP handle files placed under the Apache2\asp\
+  directory. There should be a sample Apache::ASP script there,
+  printenv.html, accessed as <a href=http://127.0.0.1/asp/printenv.html>http://127.0.0.1/asp/printenv.html</a>
+  which, if working, will print out your environment variables.
+</pre></font>
+	
+	<p>
+	<a name=WinME%20%2F%2098%20%2Fce25d199></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>WinME / 98 / 95 flock() workaround</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>For those on desktop Windows operation systems, Apache::ASP v2.25 and
+later needs a special work around for the lack of flock() support
+on these systems.  Please add this to your Apache httpd.conf to
+fix this problem after <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a> is installed:
+<font face="courier new" size=3><pre>
+  &lt;Perl&gt;
+   *CORE::GLOBAL::flock = sub { 1 };
+  &lt;/Perl&gt;
+  PerlModule  Apache::ASP
+</pre></font>Please be sure to add this configuration before Apache::ASP is loaded
+via PerlModule, or a PerlRequire statement.</font>
+	
+	<p>
+	<a name=Linux%20DSO%20Di0714bb20></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Linux DSO Distributions</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>If you have a linux distribution, like a RedHat Linux server,
+with an RPM style Apache + <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a>, seriously consider building 
+a static version of the httpd server yourself, not DSO.  
+DSO is marked as experimental for mod_perl, and often does 
+not work, resulting in &quot;no request object&quot; error messages,
+and other oddities, and are terrible to debug, because of
+the strange kinds of things that can go wrong.</font>
+	
+	<p>
+	<a name=Build%20Apache0292e216></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Build Apache and mod_perl</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>For a quick build of apache, there is a script in the distribution at
+./make_httpd/build_httpds.sh that can compile a statically linked
+Apache with mod_ssl and <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a>.  Just drop the sources into the 
+make_httpd directory, configure the environments as appropriate,
+and execute the script like this: 
+<font face="courier new" size=3><pre>
+ make_httpd&gt; ./build_httpds.sh
+</pre></font>You might also find helpful a couple items:
+<font face="courier new" size=3><pre>
+  <a href="http://perl.apache.org/guide/install.html">Stas&#39;s mod_perl guide install section</a>
+
+  <a href="http://www.apachetoolbox.com/">Apache Toolbox</a>
+</pre></font>People have been using Apache Toolbox to automate their 
+complex builds with great success.</font>
+	
+	<p>
+	<a name=Quick%20Start></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Quick Start</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Once you have successfully built the Apache Web Server with <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a>,
+copy the ./site/eg/ directory from the Apache::ASP installation 
+to your Apache document tree and try it out!  You must put &quot;AllowOverride All&quot;
+in your httpd.conf &lt;Directory&gt; config section to let the .htaccess file in the 
+./site/eg installation directory do its work.  If you want a starter
+config file for Apache::ASP, just look at the .htaccess file in the 
+./site/eg/ directory.
+<font face="courier new" size=3><pre>
+</pre></font>So, you might add this to your Apache httpd.conf file just to get 
+the scripts in ./site/eg working, where $DOCUMENT_ROOT represents
+the DocumentRoot config for your apache server:
+<font face="courier new" size=3><pre>
+  &lt;Directory $DOCUMENT_ROOT/asp/eg &gt;
+    Options FollowSymLinks
+    AllowOverride All
+  &lt;/Directory&gt;
+</pre></font>To copy the entire site, including the examples, you might
+do a raw directory copy as in:
+<font face="courier new" size=3><pre>
+  shell&gt; cp -rpd ./site $DOCUMENT_ROOT/asp
+</pre></font>So you could then reference the Apache::ASP docs at /asp/ at your site,
+and the examples at /asp/eg/ .
+<font face="courier new" size=3><pre>
+</pre></font>This is not a good production configuration, because it is insecure
+with the FollowSymLinks, and tells Apache to look for .htaccess 
+which is bad for performance but it should be handy for getting 
+started with development.
+<font face="courier new" size=3><pre>
+</pre></font>You will know that Apache::ASP is working normally if you 
+can run the scripts in ./site/eg/ without any errors.  Common
+problems can be found in the <a href=faq.html><font size=-1 face=verdana><b>FAQ</b></font></a> section.</font>
+	
+
+</font>
+</td>
+
+<td bgcolor=white valign=top>
+&nbsp;
+</td>
+
+</tr>
+<tr bgcolor=#063678>
+	<td colspan=3 align=center width=80%>
+	<font face=verdana color=white size=-1>
+	Copyright &copy; 1998-2008,
+	<a href=http://www.chamas.com><font color=white>Chamas Enterprises Inc.</font></a>
+	</font>
+	</td>
+</tr>
+</table>
+
+</td></tr>
+</table>
+</center>
+
+</body>
+</html>

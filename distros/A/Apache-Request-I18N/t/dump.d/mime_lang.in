@@ -1,0 +1,13 @@
+# RFC 2184 language tags
+#
+# (This test is currently skipped)
+
+POST /latin1 HTTP/1.0
+Content-Type: multipart/form-data; boundary="FOO FOO"
+
+--FOO FOO
+Content-Disposition: form-data; name="=?ISO-8859-1*fr?Q?Fr=E9d=E9ric?="
+
+Brière
+--FOO FOO--
+

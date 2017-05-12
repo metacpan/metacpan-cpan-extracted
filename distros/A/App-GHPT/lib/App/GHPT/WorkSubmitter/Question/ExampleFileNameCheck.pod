@@ -1,0 +1,129 @@
+# PODNAME: App::GHPT::WorkSubmitter::Question::ExampleFileNameCheck
+
+# ABSTRACT: An example supplemental question for pull requests
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+App::GHPT::WorkSubmitter::Question::ExampleFileNameCheck - An example supplemental question for pull requests
+
+=head1 VERSION
+
+version 1.000002
+
+=head1 SYNOPSIS
+
+    package App::GHPT::WorkSubmitter::Question::ExampleFileNameCheck;
+
+    use App::GHPT::Wrapper::OurMoose;
+
+    use List::Gather qw( gather take );
+
+    with('App::GHPT::WorkSubmitter::Role::Question');
+
+    sub ask ($self) {
+
+        # must return an array of text to insert in the pull request description
+        return gather {
+            for my $file (
+                'should/not/be/changed',
+                'do/not/touch',
+                'abandon/hope/all/who/edit/this/file',
+                'badfile',
+                ) {
+                next unless $self->changed_files->file_exists($file);
+
+                # if our class had consumed the
+                # App::GHPT::WorkSubmitter::Role::FileInspector role we could
+                # use $self->file_contents( $file ) to see what was in the file
+                # staged for commit in the staging area (opposed to the what's in
+                # the working directory which may be different) but that's slow, so
+                # we're not doing that in this example
+
+                # ask the question, provide the default answers which the user
+                # can select from, or the last option which is "Launch Editor"
+                # so they can give an arbitary answer
+                take $self->ask_question(
+                    <<"ENDOFQUESTION",
+    file $file really should not be changed unless you've got
+    a really really really good reason.
+
+    What's your reason?
+    ENDOFQUESTION
+                    q{No good reason, but PHB told me to do this so here we are},
+                    q{I have my reasons, but I can't tell them to you},
+                );
+            }
+        };
+    }
+
+    __PACKAGE__->meta->make_immutable;
+
+    1;
+
+=head1 DESCRIPTION
+
+If you create one or more modules under the
+L<App::GHPT::WorkSubmitter::Question> namespace, these modules will be loaded
+and used to (maybe) ask additional questions as part of creating a pull
+request.
+
+This is useful if you want to automate prompting for various potential
+issues. For example, you might look for database migrations and ask the person
+submitting the pull request about things like table locking, whether the
+existing code will work with the changed schema, etc.
+
+=head1 API
+
+To make a question work, you must follow a certain API:
+
+=over 4
+
+=item *
+
+Consume the L<App::GHPT::WorkSubmitter::Role::Question> role.
+
+=item *
+
+Implement the C<ask> method required by this role. This method will be called
+with no arguments. Internally, it is expected to call C<< $self->ask_question(
+$question, @responses ) >>. The first argument is the question to ask, like
+"Have you tested this migration on the staging environment to make sure it
+does not degrade REST API performance?". The remaining arguments are potential
+responses. These responses will be offered to the person running the C<GHPT>
+tool.
+
+=back
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<https://github.com/maxmind/App-GHPT/issues>.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Mark Fowler <mark@twoshortplanks.com>
+
+=item *
+
+Dave Rolsky <autarch@urth.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by MaxMind, Inc.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

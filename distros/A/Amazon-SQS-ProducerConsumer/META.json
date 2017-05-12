@@ -1,0 +1,60 @@
+{
+   "abstract" : "Perl interface to the Amazon Simple Queue Service (SQS) environment",
+   "author" : [
+      "Nic Wolff <nic@angel.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amazon-SQS-ProducerConsumer",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::HMAC_SHA1" : "0",
+            "JSON::XS" : "0",
+            "LWP::UserAgent" : "0",
+            "MIME::Base64" : "0",
+            "URI::Escape" : "0",
+            "XML::Simple" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Amazon::SQS::Consumer" : {
+         "file" : "lib/Amazon/SQS/Consumer.pm",
+         "version" : 0
+      },
+      "Amazon::SQS::Producer" : {
+         "file" : "lib/Amazon/SQS/Producer.pm",
+         "version" : 0
+      },
+      "Amazon::SQS::ProducerConsumer::Base" : {
+         "file" : "lib/Amazon/SQS/ProducerConsumer/Base.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.04"
+}

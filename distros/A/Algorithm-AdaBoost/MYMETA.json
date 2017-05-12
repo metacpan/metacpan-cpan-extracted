@@ -1,0 +1,52 @@
+{
+   "abstract" : "AdaBoost learning algorithm",
+   "author" : [
+      "Koichi SATOH <sekia@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Algorithm-AdaBoost",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Smart::Args" : "0.10",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/sekia/Algorithm-AdaBoost.git"
+      }
+   },
+   "version" : "0.01"
+}

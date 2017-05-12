@@ -1,0 +1,39 @@
+---
+abstract: 'Random data generator for Memcached'
+author:
+  - 'YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Memcached-Roaster
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Memcached::Roaster:
+    file: lib/App/Memcached/Roaster.pm
+    version: v0.2.2
+requires:
+  Cache::Memcached::Fast: '0.23'
+  Class::Accessor::Lite: '0.08'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/key-amb/perl5-App-Memcached-Roaster/issues
+  homepage: https://github.com/key-amb/perl5-App-Memcached-Roaster
+  repository: git://github.com/key-amb/perl5-App-Memcached-Roaster.git
+version: v0.2.2
+x_authority: cpan:KEYAMB

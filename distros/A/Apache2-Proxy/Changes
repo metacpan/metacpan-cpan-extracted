@@ -1,0 +1,9 @@
+Revision history for Perl extension Apache2::Proxy.
+
+0.04  April 10 2012
+    - released to github and cpan
+
+0.01  Sat Feb 19 21:16:00 2011
+	- original version; created by h2xs 1.23 with options
+		-X Apache2::Proxy
+

@@ -1,0 +1,45 @@
+---
+abstract: 'Get, Build and Use PNG libraries'
+author:
+  - 'Tobias Leich <FROGGS@cpan.org>'
+build_requires:
+  Archive::Extract: 0
+  Archive::Tar: 0
+  Archive::Zip: 0
+  Digest::SHA: 0
+  ExtUtils::CBuilder: 0
+  File::Fetch: 0
+  File::Find: 0
+  File::Path: 2.07
+  File::ShareDir: 0
+  File::Spec: 0
+  File::Temp: 0
+  Module::Build: 0.36
+configure_requires:
+  Archive::Extract: 0
+  Digest::SHA: 0
+  File::Fetch: 0
+  File::Find: 0
+  File::Path: 2.07
+  File::Spec: 0
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-PNG
+provides:
+  Alien::PNG:
+    file: lib/Alien/PNG.pm
+    version: 0.1
+requires:
+  ExtUtils::CBuilder: 0
+  File::ShareDir: 1.00
+  File::Spec: 0
+  File::Temp: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-PNG
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/FROGGS/Alien_PNG
+version: 0.1

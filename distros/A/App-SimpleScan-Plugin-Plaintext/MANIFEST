@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/App/SimpleScan/Plugin/Plaintext.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00.load.t
+t/01options.t
+t/plaintextbad.in
+t/plaintextmiss.in
+t/plaintextoff.in
+t/plaintexton.in
+t/pod-coverage.t
+t/pod.t

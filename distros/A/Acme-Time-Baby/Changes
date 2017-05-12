@@ -1,0 +1,103 @@
+Version 2010090301 Fri Sep  3 19:34:22 CEST 2010
++ Remove use of $[ - this is deprecated.
+
+Version 2010020101 Mon Feb  1 23:04:22 CET 2010
++ Croation language, thanks to Slaven Rezic.
+
+Version 2009122001
++ Remove Kwalitee tests
+
+Version 2009110901
++ Added POD Coverage & Kwalitee tests
+
+Version 2009081201
++ Added POD test.
+
+Version 2009081201
++ Fool the idiotic CPAN testers running development versions of perl that
+  have been outdated for several Christmasses.
+
+Version 2009040901
++ Modernized Makefile.PL
++ POD fixes.
++ MANIFEST fixes.
+
+Version 2009040201
++ Put module under /lib.
++ Moved to git (and github).
++ Doc changes.
+
+Revision 2.106  2004/11/01 23:39:27  abigail
++ Added Swiss German (de_ch). (Gerry Weirich)
++ 20177 tests in 15 files.
+
+Revision 2.105  2003/11/24 21:27:01  abigail
++ And documented it.
+
+Revision 2.104  2003/11/24 21:24:24  abigail
++ Added Cebuano (Arjan de Mol)
+
+Revision 2.103  2003/02/25 10:54:06  abigail
++ Another German patch (Philip Newton)
+
+Revision 2.102  2003/02/23 22:26:17  abigail
++ Pointed to website.
+
+Revision 2.101  2003/02/23 22:22:16  abigail
++ Patch for German (Philip Newton)
+
+Revision 2.100  2003/02/13 13:01:34  abigail
++ Upped version to 2.100, to make really sure CPAN updates older
+  versions of the module.
++ Added Spanish. (Nick Tonkin)
++ 17295 tests in 13 files.
+
+Revision 1.12  2002/12/13 16:26:03  abigail
++ Nothing really, just generating a new version.
++ Bloody CPAN/PAUSE doesn't think 1.11 is larger than 1.7.
+
+Revision 1.11  2002/09/09 19:29:01  abigail
++ Brazilian Portuguese added (Flavio S. Glock)
+
+Revision 1.10  2002/08/20 14:40:26  abigail
++ Documented new language (Swedish).
++ Fixed email address.
+
+Revision 1.9  2002/08/20 14:34:52  abigail
++ Fixed the German:
+     - capitalized the numbers
+     - fixed the gender of the numbers.
+  (Torsten Hofmann and Andre Bonhote)
++Added support for Swedish (cpan #718)
+
+Revision 1.8  2002/08/20 13:58:08  abigail
++ Moved from RCS to CVS.
+
+Revision 1.7  2002/05/15 11:37:39  abigail
++ Fixed regex extracting version number from RCS Revision line. (Tim Heaney)
+
+Revision 1.6  2002/05/13 23:06:23  abigail
++ Added support for the following languages:
+    - German (de)    (Tim Heaney)
+    - French (fr)    (Tim Heaney)
+    - Norwegian (no) (Peter J. Acklam)
+    - Italian (it)   (Andrea Spinelli)
+
+Revision 1.5  2002/04/26 16:10:49  abigail
++ Added INSTALLATION topic to the POD, so we can do
+  pod2text Baby.pm > README
+
+Revision 1.4  2002/04/26 12:28:56  abigail
++ Added support for 'Swedish chef' and 'Warez' languages.
+
+Revision 1.3  2002/04/25 23:35:24  abigail
++ Added a check to see whether at least 12 numbers have been passed.
+
+Revision 1.2  2002/04/25 23:32:06  abigail
++ Get rid of Exporter.
++ Support for Dutch.
++ Customizable format and numbers.
++ PODdified.
+
+Revision 1.1  2002/04/25 22:14:39  abigail
++ Initial revision

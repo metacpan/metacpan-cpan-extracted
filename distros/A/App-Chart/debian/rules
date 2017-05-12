@@ -1,0 +1,65 @@
+#!/usr/bin/make -f
+
+# Copyright 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2017 Kevin Ryde
+
+# This file is part of Chart.
+#
+# Chart is free software; you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 3, or (at your option) any later version.
+#
+# Chart is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Chart.  If not, see <http://www.gnu.org/licenses/>.
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/perl-makemaker.mk
+
+# instead of makemaker default "chart.1p"
+DEB_MAKEMAKER_USER_FLAGS = MAN1EXT=1
+
+# chart.info, not installed by Makefile.PL yet
+DEB_INSTALL_INFO_chart = doc/chart.info*
+build/chart::
+	$(MAKE) info
+# png files for info not known to dh_installinfo
+install/chart::
+	mkdir -p debian/chart/usr/share/info
+	cd debian/chart/usr/share/info && ln -s ../perl5/App/Chart/doc/*.png .
+# debhelper 7.4.13 does this automatically, when ready to depend on that
+# DEB_COMPRESS_EXCLUDE = .png
+
+# chart.bash completion moved to /usr/share/bash-completion/completions and
+# linked back
+install/chart::
+	mkdir -p debian/chart/usr/share/bash-completion/completions
+	mv debian/chart/usr/share/perl5/App/Chart/chart.bash \
+	   debian/chart/usr/share/bash-completion/completions/chart
+DEB_DH_LINK_chart += usr/share/bash-completion/completions/chart \
+	             usr/share/perl5/App/Chart/chart.bash
+
+# chart.omf, not installed by Makefile.PL yet
+# /usr/share/cdbs/1/class/gnome.mk sets up dh_scrollkeeper, but it also
+# loads autotools.mk which does evil stuff with config.status
+install/chart::
+	mkdir -p debian/chart/usr/share/omf/chart
+	cp doc/chart.omf debian/chart/usr/share/omf/chart
+
+# chartprog.el, not installed by Makefile.PL yet
+install/chart::
+	mkdir -p debian/chart/usr/share/emacs/site-lisp/chart
+	cp emacs/chartprog.el emacs/chartprog-loaddefs.el \
+	   debian/chart/usr/share/emacs/site-lisp/chart
+
+# chart.desktop installed under /usr/share/perl5/App/Chart for now,
+# link it to the right place.  Probably need desktop-file-utils 0.15-2 for
+# its automatic trigger on .desktop files, but no need to "Depends:" that.
+DEB_DH_LINK_chart += \
+  usr/share/perl5/App/Chart/chart.desktop \
+  usr/share/applications/chart.desktop
+
+DEB_INSTALL_EXAMPLES_chart = examples/* emacs/example.ses

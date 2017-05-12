@@ -1,0 +1,47 @@
+Revision history for AnyEvent::DBI
+
+2.3  Tue Apr  2 02:59:12 CEST 2013
+	- fix begin_work, commit and rollback, that were broken due
+          to a precedence problem (analyzed by Jerry Lundström).
+        - slightly improve tests.
+
+2.2  Thu May 17 04:13:27 CEST 2012
+	- timeouts didn't trigger (Adam Rosenstein).
+        - do not leave zombie processes (Adam Rosenstein).
+
+2.1  Sat Oct 30 22:22:05 CEST 2010
+	- no longer kill -9 the child, just kill -TERM and close the connection,
+          to avoid database corruption - this also works around a perl bug
+          (global destruction).
+	- convert to the faster AE API - major speedup.
+        - use common::sense.
+
+2.0  Mon Jun 29 10:18:58 CEST 2009
+	- INCOMPATIBLE CHANGE: callbacks now are passed the $dbh
+          as first argument, always.
+        - INCOMPATIBLE CHANGE: really pass rv as third argument to exec
+          callbacks, as documented but not implemented for 1.1.
+        - thanks to viacheslav.t for testing.
+	- major patch by Adam Rosenstein:
+        - add an on_connect callback (for reliable failure notification)
+        - add timeouts to connect and exec.
+        - reaps server processes if you undef your AE::DBI handle and keep
+          running.
+        - option to start the server via exec, otherwise try to emulate
+          close-on-exec behavior.
+        - add the begin_work/commit/rollback methods required to actually use
+          transactions.
+        - add accessors for database handle attibutes such as AutoCommit,
+          RaiseError, etc.
+        - add support for the func() method to interact directly with a driver.
+        - add more/real tests.
+
+1.1  Sat Dec 20 22:28:11 CET 2008
+	- INCOMPATIBLE CHANGE: pass result value in place of %extra
+          to callbacks.
+	- do not call fetchrow_arrayref on non-select statements.
+        - do not die on non-fatal errors, unless there is no error callback
+          (reported by Adam Rosenstein).
+
+1.0  Mon Jun  9 16:27:36 CEST 2008
+	- original version, an AnyEvent::HTTP clone.

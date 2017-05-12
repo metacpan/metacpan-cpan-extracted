@@ -1,0 +1,8 @@
+[databases]
+foo = dbname=test
+bar = dbname=test15
+
+[dbgroups]
+foobar = foo
+foobar = bar
+

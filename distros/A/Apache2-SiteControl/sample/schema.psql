@@ -1,0 +1,26 @@
+BEGIN;
+
+CREATE TABLE actions (
+   action VARCHAR NOT NULL,
+   description VARCHAR NOT NULL,
+   PRIMARY KEY(action)
+);
+
+CREATE TABLE groups (
+   groupid SERIAL PRIMARY KEY NOT NULL,
+   groupname TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE users (
+   userid SERIAL NOT NULL PRIMARY KEY,
+   TEXT NOT NULL,
+   disabled BOOLEAN NOT NULL DEFAULT FALSE,
+   PRIMARY KEY(ID)
+);
+
+CREATE TABLE permissions (
+   
+);
+   
+ 
+

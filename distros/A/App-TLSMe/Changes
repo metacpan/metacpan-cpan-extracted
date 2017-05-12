@@ -1,0 +1,41 @@
+Revision history for perl module App::TLSMe
+
+0.11 2013-10-02
+
+ - Validate protocol name
+ - Splitted protocol specific connections
+ - Added more live tests
+ - Using handle connect instead of tcp_connect
+ - Added cipher_list option
+ - Added backlog option
+ - Added daemonize option
+ - Added password protected certificates handling
+ - Added log file
+ - Simplified connections pool
+ - Drop privileges
+
+0.10 2012-03-07
+
+ - Fixed private file setting (reported by James D Bearden)
+ - Fixed method setting
+ - Updated credits section
+ - Improved test suite
+
+0.009004 2012-01-12
+
+ - Mostly distribution improvements
+
+0.009003 2012-01-08
+
+ - Test improvement
+
+0.009002 2012-01-05
+
+ - Better handles closing
+ - Added 'method' option (as in AnyEvent::TLS "SSLv2" | "SSLv3" | "TLSv1" | "any")
+ - Added 501 Not Implemented error (when http is used instead of https for example)
+ - Added 502 Bad Gateway error (when connection to backend is refused)
+
+0.009001 2011-05-13
+
+ - Initial release

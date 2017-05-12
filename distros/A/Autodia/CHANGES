@@ -1,0 +1,281 @@
+Changes to AutoDia
+------------------
+
+version 2.14 25/05/2011
+ - fix test dependancy on HTML::Mason (again, properly this time)
+
+version 2.13 23/05/2011
+ - fix test dependancy on HTML::Mason
+
+version 2.12 23/05/2011
+- improvements to pod template - filenames now replace non-word char with underscore, added params to subs
+- process method in Handler superclass now returns no of files processed
+- experimental (non working) SQL-Translator handler
+- fix to Python Handler
+- bug fix for PHP handler (reported by Elijah Insua)
+- new ASP Handler Dalton Mackie (Gnavicks)
+- fix to duplicate class definitions/mentions in many handlers
+- fix for lowerclass package names in perl
+- added Mason handler provided by Peter Franke
+
+version 2.10  25/08/2009
+- fixed handling of DBIC components
+- fix to C++ handler from Renato Golin (www.systemcall.org)
+
+version 2.09 24/06/2009
+- added template and backslash support to C++ handler (patch provided by Patrick Wiggins)
+- added support for Params::Validate in Perl Handler
+- added methods to allow get/set operations in class objects after adding them
+- added better support for PHP5 classes (patch provided by Jurrien / Norm )
+- added Realization relation (patches provided by David Bike)
+- added support for Class::Accessor and Class::Data::Inheritable in Perl handler
+- added Moose support, fixed handling of subrefs in Perl Handler
+
+version 2.08 01/07/2008
+- fixed skiplist - moved to handlers from diagram
+- added concentration option to graphviz digraphs
+- removed Java support
+
+version 2.07 20/05/2008
+- default output now autodia.out.dia (workaround for bug in Dia 0.96)
+- added new Relation relationship
+- several fixes to DBI handler
+- added undirected option for GraphViz
+
+version 2.06 16/04/2008
+- added support for DBIx::Class to perl handler
+- added basic perl test template
+- applied fix for undefined array when graphing layout
+
+version 2.05 1/11/2007
+- set default output path for TT to .
+- added templates for mysql ddl and perl pod
+- added new object_from_id method to Diagram class
+- added support for simple Object::InsideOut syntax
+- fixed file naming for -F argument
+
+version 2.04 29/8/2007
+- escapes nasty badness in perl attribute names found in code
+- replaces dynamic parts of method or attribute names in perl code with _xxxx
+- added pod.t and pod_coverage.t
+- fixed pod errors
+- fixed old email and website addresses
+- added csharp mode written by Sean Dague
+- added -s skiplist argument to ignore packages matching patterns
+
+version 2.03 27/04/2006
+- basic Class::DBI support in perl handler
+- updated Umbrello
+- updated PHP to handle PHP 5
+- perl parsing improvments
+- improvements to Diagram.pm in Dia / Umbrello to filter non-xml-safe stuff, and use Kind field in Dia
+
+version 2.02 09/05/2005
+- no_deps is now deprecated : use -K instead
+- improvements to DBI handler
+  - now guesses foreign keys a bit better
+  - added support for datatypes
+- new option -k to skip superclasses
+- new option -K to skip dependancies
+- improvements and fixes to SQL Handler 
+  - now supports current (4.1.x) MySQL dumps
+  - now supports SQL Server SQL Dumps (when stripped of non-ascii crap)
+  - foreign key support improved
+  - datatypes improved
+- umbrello output fixed
+- minor fix to C++ Handling in Dia and Umbrello
+- additional templates directory with MySQL DDL template
+
+
+version 2.01 13/10/2004
+- improved perl handler support for 'fields' and 'base' pragma
+- applied Chris Karakas' fixes to Diagram module, PHP and Perl handlers
+
+version 2.00 14/07/2004
+- added umbrello output (experimental - doesn't seem to work)
+- fixed Perl Handler to cope with perl scripts as well as modules [bug reported via debian]
+- small tweak to Perl Handler to stop it complaining about uninitiated values at line 375
+- fixed python handler so inheritance works properly
+- fixed C++ handler to handle namespaces in types
+- fixed C++ handler to cope with inheriting from public foo or foo
+- fixed SQL handler to handle linebreaks in table declarations
+- fixed Umbrello Handler to cope with <= 1.1 and now >= 1.2.0 or style files
+- fix to Diagram module to ensure binary files are output in BINMODE for when on win32
+- added SpringGraph output (very experimental, only works for basic diagrams, sometimes)
+- slight improvement to dia layout algorithm
+
+version 1.99 19/03/2004
+- rebadged 1.12 to meet version number requirements on cpan
+
+version 1.12 17/03/2004
+- fixes to SQL handler to support more types and match better
+- fixed autodia.pl to allow -i and -d at the same time
+- skipcvs option now also skips RCS dirs
+- fix to C++ handler to cope with comments like /* .. */ on single line
+- fixes to Torque handler
+- added umbrello input handler (experimental)
+- synchronised autodia_java.pl with autodia.pl
+
+version 1.11 23/12/2003
+- added experimental support for Class::Tangram
+
+version 1.10 22/12/2003
+- fixed object attributes bug in Perl Handler
+- fixed bug in Diagram class that caused crash
+
+version 1.9 10/12/2003
+- added support for 'use public' and 'use private' in Perl Handler (experimental)
+- fixed bug in DBI handler (thanks to the two people who pointed out the schoolboy error)
+- added check for empty diagrams ( handy, should also fix some errors)
+- fixed bug in Perl Handler where use base splits package names too enthusiasticly
+- fixed bug in Perl Handler, can now parse modules like XML:Xerces (go on try it!)
+- fixed several small bugs in Diagram class
+
+version 1.8 29/08/2003
+- added -C 'skip CVS directory(s)' option
+- added -F 'single file per diagram' option
+- added support for filenames containing spaces in -i option
+- fix in Autodia.pm wildcard/regex's provided by Daping Wang <dapingwang@lucent.com>
+- fix in SQL handler provided by Brian Koehmstedt <bpk@hungry.com>
+- fix in C++ handler that stops "public foo" class being created in place of "foo"
+- another 'use base' fix in Perl handler
+- fix to new layout that stops infinite loops (hopefully)
+
+version 1.7 13/07/2003
+- added Torque handler
+- added Python handler (experimental)
+- applied small perl handler patch from Scott Lanning
+- small improvement to perl handler to improve support for 'use base'
+- applied php handler patch from <INSERT NICE BLOKES NAME HERE>
+- fixed documentation for php handler
+- new Dia layout algorithm based on directed graphs (huge improvement)
+- fix to DBI handler to improve support for oracle and postgres
+
+version 1.6 30/03/2003
+- fixed SQL handler
+- improved test suite
+
+version 1.5 28/03/2003
+- fixes to DBI handler 
+- added SQL handler
+- fixes to c++ handler
+- fixes to Perl handler
+- added dia handler
+- added new options for hiding/showing attributes/methods
+- added new option to hide private/hidden attributes/methods
+- tidied up code and distribution
+
+version 1.4 12/02/2003
+- Added better support for GraphViz and output in png, jpg and dot
+- added experimental support for VCG
+- some small improvements to C++ and perl handlers
+- added experimental dbi handler
+- escaped amphersans that broke dia xml
+- added support for ' use fields qw( fielda fieldb ) ' in perl handler
+
+version 1.3 24/12/2002
+- Patch from Johan Van den Brande to handle use base in perl handler
+- Patch from Pascal to make php handler compile
+- Many fixes to C++ and PHP handlers
+- Added support for argument handling to C++ and PHP
+- Added support for gif output via GraphViz
+- renamed executable scripts to solve problems on Mac and Windows
+- updated POD, much still needs to be done
+- changed executable behaviour so that when run without arguments
+   now returns help information
+- much code housekeeping
+
+version 1.2 26/06/2002
+- AJT updated some of the documentation, but much still needs to be
+updated.
+- Simon Wistow made Autodia into a proper, CPAN installable Perl module
+- Made the Java parser work and fail gracefully from recoverable problems.
+- Cleared up vaious warnings.
+- Embedded the default template in Diagram.pm
+
+version 1.1 - unreleased
+- Lars Clausen fixed problems with the Java Parser
+
+version 1.0 6/07/2001
+- Ekkehard Goerlach has fixed a great deal of the C++ parser
+- Some small fixes to the Handler and Diagram objects
+- New HTML templates
+- New Feature - Classes can be alphabetically sorted for text/html output
+- More robust error checking
+
+version 0.09 : 31/05/2001
+- Added command line option to output to STDOUT
+- Added command line option to make silent/quiet (no output to STOUT except with above)
+- Small amount of code tidying
+
+version 0.08 : 26/05/2001
+- fixed bug reported by P Sharpe, causing autodia to crash when no
+superclasses were found - somehow managed to avoid being spotted in 0.07
+
+Version 0.07 : 21/05/2001
+- Added T Payne's patch to fix bug in Diagram.pm when -t argument used
+- Improved Perl parser based on suggestion from E Goerlard.
+- Added -D command line option (ignore/skip dependanies)
+- Added more error checking in layout/export part of Diagram.pm
+- Improved auto-layout.
+
+Version 0.06 : 17/05/2001
+- fixed unchecked return values in Diagram.pm when Inheritances() or
+Dependancies is called that caused a crash when no inheritances or
+dependancies were found at the layout stage.
+- did some tidying of code to make more consistent and clear.
+- fixed HandlerCpp to handle simple C++. Extracts most simple class info succesfully.
+= autodia is now well into beta with support for perl and simple c++ through the
+included handlers.
+
+Version 0.05 : 08/05/2001
+- rewrite of parsing logic to use handlers **important**
+  * all parsing is done by a parser class based on the Parser superclass
+  * language options and handlers are matched using autodia.pm 
+- increased error checking.
+- some small bug fixes.
+- first beta release of autodia - **new name**
+= autodia is now functionally complete it supports multiple languages and behaviours
+through the multiple handlers - currently an intermediate perl handler and a simple c++
+handler. Handlers are easily written, inheriting and overloading the generic handler
+class provided.
+
+Version 0.04 : 24/4/2001
+- further rewrite of the command line interface **important**
+- added functionality to find simple object attributes
+- rewrite of how relationships work
+- added functionality to place relations near their child
+- rewrite of layout code
+= now accepts directories and can recurse through them and layout is now
+improved for clarity.
+
+Version 0.03 : 18/4/2001
+- fixed some parsing problems, now parses files better
+- fixed a dereferencing problem
+- rewrote the command line interface **important**
+= now handles complex and simple perl modules and scripts better
+
+Version 0.02 : 17/4/2001
+- fixed problem occuring where no superclasses existed, now checks for
+existance of superclasses, classes, etc before trying to print 
+- Checks for duplicate classes and ignores them instead of overwriting
+existsing ones.
+- removed a load of un-necessary code
+- made the layout a little more space efficient (still needs some serious
+work though).
+- fixed text inside components
+= now handles CGI.pm fairly well, and lays out itself rather well.
+
+Version 0.01b : 12/4/2001
+- fixed problems in template.xml, no longer crashes dia
+- rewrote duplication and supercession code almost from scratch
+- fixed numerous silly mistakes involving referencing and arrays of references
+= now loads in dia and correctly handles inheritance
+
+Version 0.01a : 10/4/2001
+- fixed mistake in template.xml (should now parse cleanly in dia)
+- fixed command line options (now accepts -h for help and -o for output
+file)
+- added POD to autodial script
+- created FAQ
+

@@ -1,0 +1,66 @@
+NAME
+
+    App::BoolFindGrep - find and grep files using boolean expressions.
+
+VERSION
+
+    version 0.06
+
+SYNOPSIS
+
+DESCRIPTION
+
+METHODS
+
+ found_files
+
+    Array reference with files found by App::BoolFindGrep::Find module and
+    processed with App::BoolFindGrep::Bool if file_expr option was given.
+
+ greped_files
+
+    Array reference with files found by App::BoolFindGrep::Grep module and
+    processed with App::BoolFindGrep::Bool.
+
+ process
+
+    Does the work.
+
+OPTIONS
+
+ERRORS
+
+DIAGNOSTICS
+
+EXAMPLES
+
+ENVIRONMENT
+
+FILES
+
+CAVEATS
+
+BUGS
+
+RESTRICTIONS
+
+NOTES
+
+AUTHOR
+
+    Ronaldo Ferreira de Lima aka jimmy <jimmy at gmail>.
+
+HISTORY
+
+SEE ALSO
+
+      * bool <http://www.gnu.org/software/bool/>
+
+      * find <http://www.gnu.org/software/findutils/>
+
+      * grep <http://www.gnu.org/software/grep/>
+
+      * ack <https://metacpan.org/release/ack>
+
+      * bfg - module's command line interface.
+

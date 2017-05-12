@@ -1,0 +1,8 @@
+avs_sample.pl
+Readme
+Manifest
+Makefile.PL
+PerlSDK.pm
+PerlSDK.xs
+test.pl
+typemap

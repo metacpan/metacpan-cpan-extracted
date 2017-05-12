@@ -1,0 +1,99 @@
+#------------------------------------------------------------------------------
+# cmdebug.pod
+#
+# Copyright © 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+#                  Elizabeth Cassell <e_a_c@mailsnare.net>
+#
+# This library is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<cmdebug> - Reports status of cache manager and cache entries on a particular AFS client machine.
+
+=head1 SYNOPSIS
+
+  use AFS::Monitor qw(cmdebug);
+
+  my ($locks, $cache_entries) =
+      cmdebug(server => "hostName",
+              port   => 7001,
+              long   => 1
+             );
+
+=head1 DESCRIPTION
+
+The B<cmdebug> function can be used to examine the status of the
+cache manager and cache entries on a particular AFS client machine.
+This function is useful when you suspect that the cache manager is
+hung, or is performing poorly.
+
+=head1 OPTIONS
+
+=over
+
+=item B<server>
+
+Names the client machine to examine.
+
+=item B<port>
+
+This switch is only useful with port 7001 since that is the
+callback port.
+
+=item B<long>
+
+This switch will display the status of all of the cache entries
+on the AFS client when there are no problems.
+
+=back
+
+As a first step in diagnosing a problem, run B<cmdebug> without the
+B<long> switch. A machine running in a normal state (i.e. not
+experiencing any problems), may display some locks set, but these
+locks should not be continually set over multiple B<cmdebug>s. If the
+functions returns with no output, it simply means there is nothing
+to report.
+
+=head1 OUTPUT
+
+The return values are references to two arrays.
+Each entry in the first array represents the status of the cache manager's data
+structures. Each entry in the second array represents an individual cache entry.
+
+=head1 AUTHORS
+
+The code and documentation for this class were contributed by Stanford
+Linear Accelerator Center, a department of Stanford University.  This
+documentation was written by
+
+=over
+
+=item Elizabeth Cassell <e_a_c@mailsnare.net> and
+
+=item Alf Wachsmann <alfw@slac.stanford.edu>
+
+=back
+
+=head1 COPYRIGHT AND DISCLAIMER
+
+ Copyright 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+                Elizabeth Cassell <e_a_c@mailsnare.net>
+ All rights reserved.
+
+ Most of the explanations in this document are taken from the original
+ AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ Volume Server/Volume Location Server Interface
+ Edward R. Zayas
+ (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ (c) IBM Corporation 2000.
+ All rights reserved.
+
+ This library is free software; you can redistribute it and/or modify it
+ under the same terms as Perl itself.

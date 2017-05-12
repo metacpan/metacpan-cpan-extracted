@@ -1,0 +1,59 @@
+App-Eduard version 0.001002
+===========================
+
+Eduard is Ceata's reimplementation of the Edward reply bot referenced in https://emailselfdefense.fsf.org/.
+
+It takes mail messages, checks them for PGP signatures and encryption, then replies appropriately.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+USAGE
+
+Typical usage of Eduard is as follows:
+
+1. Create a new GPG homedir
+   $ mkdir /srv/eduard
+2. Create a suitable gpg.conf
+   $ cat > /srv/eduard/gpg.conf <<END
+   no-greeting
+   keyserver hkp://keys.gnupg.net
+   auto-key-locate keyserver
+   keyserver-options auto-key-retrieve
+   END
+3. Generate a new key
+   $ gpg --homedir /srv/eduard --gen-key
+4. Add an entry to /etc/aliases
+   $ echo 'eduard: |/path/to/eduard --keydir=/srv/eduard --key=KEYID --from=eduard@hostname.tld' >> /etc/aliases
+   For multiple language support, add multiple entries to /etc/aliases of the form:
+   $ echo 'eduard-lang: |/path/to/eduard --keydir=/srv/eduard --key=KEYID --from=eduard@hostname.tld --tmpl=lang' >>/etc/aliases
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ * Email::Sender
+ * File::Slurp
+ * File::Share
+ * File::ShareDir::Install
+ * MIME-Tools
+ * Mail::GnuPG
+ * PerlX::Maybe
+ * Template-Toolkit
+ * Try::Tiny
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Fundația Ceata
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

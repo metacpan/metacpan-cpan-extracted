@@ -1,0 +1,29 @@
+#!/bin/bash
+
+IFS=$'\n'
+
+q=$1
+dir=$2
+
+if [ ! $MICRO_LANG ]
+ then
+  MICRO_LANG=en
+fi
+
+
+if [ ! $q ]
+ then
+  q="ufo"
+fi
+
+
+if [ ! $dir ]
+ then
+  dir="/home/santex/data-hub/stock/KnowledgeInterDisciplinary/"
+fi
+
+j=$(for i in `egrep -rli  "$q" | grep List_of_`; do
+echo $i;
+#echo $i | xargs -0 json-printer \-f | egrep "^\".*.$" | egrep -v ":|http|wiki|index|\/|Externallinks|References|Seealso|Listof|#|[1-9][0-9][0-9][0-9]" | tr -d "\",";
+done);
+echo "$j"| egrep -i "^$q|_$q"

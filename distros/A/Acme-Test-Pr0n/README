@@ -1,0 +1,41 @@
+
+NAME
+       Acme::Test::Pr0n - Perl extension for wasting your time
+
+SYNOPSIS
+         use Test::More tests => 3;
+         use Acme::Test::Pr0n;
+
+         my $filename = '/any/old/text/file.txt';
+
+         my $pr0n_test = Acme::Test::Pr0n->new({
+             'filename' => $filename,
+         });
+
+         ok($pr0n_test->pr0n() > 5,
+                    'The string pr0n is hidden in the file more than 5 times');
+
+         ok($pr0n_test->XXX() > 4,
+                    'The string XXX is hidden in the file more than 4 times');
+
+         ok($pr0n_test->XXX('i') > 4,
+                    'The string XXX is hidden in the file more than 4 times
+                     without beinge case sensative');
+
+
+DESCRIPTION
+       This test object has bveen inspired by Schwern and
+       advanced testing, a conversation on IRC and a reference to
+       Schwern and pr0n.  Having written it I realise it's not
+       very pr0n specific but I'm sure it will be abused prop-
+       perly.
+
+       Any thing can be tested for, just make up the method name
+       and pass in a 'i' if you want it case insensative.
+
+EXPORTED
+
+       None by default.
+
+AUTHOR
+       Leo Lapworth <lt>llap@cuckoo.org<gt>

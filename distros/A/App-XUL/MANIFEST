@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/App-XUL.t
+t/TestApp/makeapp.pl
+lib/App/XUL.pm
+lib/App/XUL/Object.pm
+lib/App/XUL/XML.pm
+misc/AppXUL.js
+misc/Appicon.icns
+misc/server.pl
+META.yml                                 Module meta-data (added by MakeMaker)

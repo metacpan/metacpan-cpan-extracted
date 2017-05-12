@@ -1,0 +1,47 @@
+---
+abstract: 'An application to handle management of various software repositories This module is purely to designed to be used with the accompanying script bin/nrepo Please look at its pod for instantiating of this Module'
+author:
+  - 'Brendan Beveridge <brendan@nodeintegration.com.au>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Nrepo
+requires:
+  Carp: '0'
+  Config::General: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  Digest::SHA: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  HTTP::Tiny: '0'
+  IO::Zlib: '0'
+  Log::Dispatch: '0'
+  Module::Path: '0'
+  Module::Pluggable::Object: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Params::Validate: '0'
+  Pod::Usage: '0'
+  Time::HiRes: '0'
+  XML::LibXML: '0'
+  XML::Twig: '0'
+  namespace::clean: '0'
+  strict: '0'
+  strictures: '2'
+  warnings: '0'
+resources:
+  homepage: http://www.nodeintegration.com.au
+  repository: https://github.com/nodeintegration/nrepo.git
+version: '0.1'

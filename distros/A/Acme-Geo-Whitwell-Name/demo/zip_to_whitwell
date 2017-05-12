@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+$|++;
+use WWW::Mechanize;
+use Acme::Geo::Whitwell::Name qw(to_whitwell);
+while(1) {
+  print "Enter zip code, or carriage return to exit ";
+  my $zipcode = <STDIN>;
+  chomp $zipcode;
+  last unless $zipcode;
+  if ($zipcode !~ /\d{5}/) {
+    print "That doesn't look like a zip code. Try again.\n";
+    next;
+  }
+  my $agent = WWW::Mechanize->new;
+  $agent->get("http://geocoder.us/service/csv/geocode?zip=$zipcode");
+  my @values = split /,\s+/, $agent->content;
+  if (@values) {
+    my @names = to_whitwell(@values[0..1]);
+    print "Zip code $zipcode is $values[2], $values[3]: '$names[0]' or '$names[1]'\n";
+    print "Waiting 15 seconds for geocoder.us\n";
+    sleep(15);
+  }
+  else {
+    print "Can't find anything for zip '$zipcode'. Try another.\n";
+    next;
+  }
+}
+

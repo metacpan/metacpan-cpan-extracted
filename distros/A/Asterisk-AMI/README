@@ -1,0 +1,50 @@
+Asterisk::AMI is Copyright (C) 2011 by Ryan Bullock (rrb3942@gmail.com)
+
+Asterisk::AMI
+================
+
+DESCRIPTION
+
+This module provides an interface to the Asterisk Manager Interface. It's goal is to provide a flexible, powerful, and
+reliable way to interact with Asterisk upon which other applications may be built. It utilizes AnyEvent and therefore can
+integrate very easily into event-based applications, but still provides blocking functions for use with standard scripting.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	AnyEvent version 5.0 or higher
+	AnyEvent::Handle
+	AnyEvent::Socket
+	Digest::MD5
+	Scalar::Util
+        Carp
+	version
+	parent
+
+Note on SSL Support:
+
+For SSL support you will also need the module that AnyEvent::Handle uses for SSL support, which is not a required dependency.
+Currently that module is 'Net::SSLeay' (AnyEvent:Handle version 5.251) but it may change in the future.
+
+Note on SSL Support for CentOS/Redhat:
+
+If the version of Net:SSLeay included in CentOS/Redhat does not work try installing an updated version from CPAN.
+
+LICENSE
+
+This module is free software.  You can redistribute it and/or
+modify it under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

@@ -1,0 +1,15 @@
+1.00 :: Tue Jul 29 10:06:32 PDT 2003
+    - removed AuthenDecline
+    - It's about time I released this.
+
+0.02 :: Wed Jan 22 15:09:56 PST 2003
+    - removed the @INC manipulation in handler,
+      and ask that @INC be set up properly beforehand
+      (preferably in the httpd.conf).
+    - changed the name to Apache::AuthenMT (used to be AuthMT)
+    - added Apache::AuthenDecline as a way to
+      disable PerlAuthenHandlers
+
+0.01 :: Sat Jan 18 09:47:40 UTC 2003
+    - first draft
+

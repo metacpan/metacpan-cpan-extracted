@@ -1,0 +1,18 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Alvis/QueryFilter.pm
+lib/Alvis/Treetagger.pm
+bin/run_QF.pl
+t/001_load.t
+t/QueryFilter.t
+t/test/alvis.cnf
+t/test/resources/NEs
+t/test/resources/onto_nodes
+t/test/resources/onto_paths
+t/test/resources/terms
+t/test/resources/types
+META.yml                                 Module meta-data (added by MakeMaker)

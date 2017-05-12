@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lang>
+   <header>
+      <infoBox>
+         <currentTrapLog>Current Trap Log</currentTrapLog>
+         <lastUpdate>Last Update</lastUpdate>
+         <loggedInAs>Logged in as</loggedInAs>
+      </infoBox>
+      <filter>
+         <displayFilters>Display Filters</displayFilters>
+         <host>Host</host>
+         <trapOID>TrapOID</trapOID>
+         <severityLevel>Severity Level</severityLevel>
+         <category>Category</category>
+         <reset>Reset all</reset>
+      </filter>
+      <navBox>
+         <logFileNav>
+	        <line1>Log File</line1>
+		    <line2> Navigation</line2>
+	     </logFileNav>
+         <to>to</to>
+      </navBox>
+      <dbInfo>
+         <database>Database</database>
+         <table>Table</table>
+      </dbInfo>
+      <optBox>
+         <severityDetail>Severity detail level for entries</severityDetail>
+         <category>Select category</category>
+         <option>
+	        <valueAll>All entries</valueAll>
+	     </option>
+	     <olderEntriesFirst>Older Entries First</olderEntriesFirst>
+	     <updateButton>Update</updateButton>
+      </optBox>
+   </header>
+   <main>
+      <trapTableHeader>
+         <option></option>
+         <traptime>Traptime</traptime>
+         <trapoid>TrapOID</trapoid>
+         <host>Host</host>
+         <category>Category</category>
+         <severity>Serverity</severity>
+         <message>Message</message>
+      </trapTableHeader>
+      <trapTableEntry>
+         <optionRead>Mark as read</optionRead>
+         <optionDelete>Delete this trap</optionDelete>
+      </trapTableEntry>
+   </main>
+</lang>

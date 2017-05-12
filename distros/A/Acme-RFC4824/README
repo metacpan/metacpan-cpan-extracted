@@ -1,0 +1,62 @@
+Acme-RFC4824
+
+Acme::RFC4824 is a module that tries to help you with the implementation
+of RFC 4824 - IP over Semaphore Flag Signaling System.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SIGNALING
+
+If you don't care about the module's details and just want to use it
+for routing IP over SFSS, you can use the scripts in the example
+directory (note that you need Net::Pcap for them):
+
+# ipsfss_receive.pl <interface> [filter]
+Receives packets from an interface and shows you what to signal. So
+say you want to signal all packets to 10.23.23.23 arriving on en0, just
+use
+# ipsfss_receive.pl en0 "ip and dst 10.23.23.23"
+
+# ipsfss_send.pl <interface> <source MAC> <destination MAC>
+If you receive signals from someone, you can use ipsfss_send.pl to
+convert those frames into IP packets. Say you accept frames for 
+01:23:45:67:89:0a and your MAC is 00:11:22:33:44:55:66, you can run it
+as 
+# ipsfss_send.pl en0 00:11:22:33:44:55:66 01:23:45:67:89:0a
+
+Please note that both example programs assume an interface which
+either is or looks like Ethernet.
+
+UPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Acme::RFC4824
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Acme-RFC4824
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-RFC4824
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Acme-RFC4824
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Acme-RFC4824
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Alexander Klink
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

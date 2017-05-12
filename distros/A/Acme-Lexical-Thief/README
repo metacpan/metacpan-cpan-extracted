@@ -1,0 +1,121 @@
+NAME
+    Acme::Lexical::Thief - steal lexical variables from your caller
+
+SYNOPSIS
+       use 5.012;
+       use strict;
+       use warnings;
+       use Acme::Lexical::Thief;
+   
+       sub greet {
+          my $name = shift;
+          greet_verbally();
+       }
+   
+       sub greet_verbally {
+          steal $name;  # caller variable
+          say "Hello $name";
+       }
+
+DESCRIPTION
+    This package allows you access to your caller's lexical variables, without
+    them knowing! Full read/write access. This is generally a pretty bad idea,
+    hence the Acme namespace.
+
+    You can steal scalars, arrays and hashes:
+
+       steal $car, @treasures, %stash;
+
+    Parentheses can surround the list of variables to steal:
+
+       steal ($car, @treasures, %stash);
+
+    Generally everything should "just work" as you expect it to. Except when
+    it does not.
+
+    Technically speaking, your stolen $car is a package-scoped (`our`)
+    variable which is lexically aliased (`local *car`) to the caller's
+    variable of the same name. Because `steal` is parsed at compile-time, you
+    don't need to (and indeed should not!) pre-declare your stolen variables.
+
+       sub greet_verbally {
+          my $name;   # don't do this!
+          steal $name;
+          say "Hello $name";
+       }
+
+    By default, this module steals from your *immediate* caller. You can
+    thieve higher up the call stack using:
+
+       steal 0 ($car);  # caller's $car
+       steal 1 @boats;  # caller's caller's @boats
+       steal 2 %stash;  # caller's caller's caller's @stash
+
+    You cannot indicate the level you wish to steal from using a variable; it
+    must be a literal integer in your source code. (It can be in decimal,
+    octal, hexadecimal or binary notation.) The integer must immediately
+    follow the `steal` keyword, and not be followed by a comma.
+
+    The `steal` keyword cannot be used in an expression; it must be a
+    standalone statement.
+
+       steal $foo;
+       if (defined $foo) { ... } # ok
+   
+       if (steal $foo) { ... }   # not this!
+   
+       # this works...
+       if (do { steal $foo; defined $foo })
+       {
+          # ... but $foo won't exist in this block!
+          ...
+       }
+
+    If you attempt to steal a variable which does not exist, then a run-time
+    exception will be thrown.
+
+WHY YOU SHOULD NOT USE THIS MODULE
+    When people declare lexical (`my`) variables within a sub, they (quite
+    reasonably) expect these to stay local to the sub. If they rename those
+    variables, change them (say replacing a hashref with a hash), drop them or
+    whatever, then they don't expect code outside the sub to pay much
+    attention.
+
+    Peeking at your caller's lexicals breaks those expectations.
+
+    Peeking at your caller's lexicals leaks an abstraction.
+
+    Peeking at your caller's lexicals can cause spooky action at a distance.
+
+    Every time you peek at your caller's lexicals, a fairy dies.
+
+    Just think about that for a minute, won't you?
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Acme-Lexical-Thief>.
+
+SEE ALSO
+    PadWalker - a slightly more sane alternative to peeking at your caller's
+    lexicals.
+
+    Data::Alias - a slightly more sane way of creating lexical aliases.
+
+    This package was initially published on PerlMonks as `Acme::Asplode`
+    <http://www.perlmonks.org/?node_id=1008814>, but I prefer the current
+    name.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

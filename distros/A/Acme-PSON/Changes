@@ -1,0 +1,18 @@
+Revision history for Acme-PSON
+
+0.05    2008-06-01/22:09
+        - replace Exporter 'import'  to Exporter::Lite
+
+0.04    2008-05-27/22:21
+        - move spelling.t boilerplate.t pod-coverage.t pod.t  to ./xt dir
+
+0.03    2008-04-06/15:26
+        - add spelling.t
+
+0.02    2008-04-06/10:18
+        - FIX typo
+        - using Module::Install
+
+0.01    2007-05-19/13:12
+        First version, released on an unsuspecting world.
+

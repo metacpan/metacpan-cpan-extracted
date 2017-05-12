@@ -1,0 +1,157 @@
+Revision history for Perl extension App::Followme
+
+1.92 2016-09-18T00:10:22Z
+    - Fixes to pass tests on Wndows and BSD
+
+1.91 2016-09-02T19:08:15Z
+    - Added required Perl Modules to cpanfile
+    - Fixes for PodData
+
+1.90 2016-08-29T00:26:28Z
+    - First beta release for version 2. Code entirely rewritten.
+
+1.16 2015-09-10T00:35:31Z
+    - New initial website
+    - make photo resize optional in gallery
+    - added breadcrumb urls
+    - added class UploadLocal
+
+1.15 2015-06-08T23:01:40Z
+    - made Test::Requires a requirement
+
+1.14 2015-06-06T10:47:19Z
+    - revised tests to use Test::Requires
+
+1.13 2015-06-04T23:12:11Z
+    - make other modules optional
+
+1.12 2015-05-25T00:22:22Z
+    - updated code to generate initial website
+    - added CreateGallery module to create photo galleries
+    - added EditSections module to edit section tags on website
+    - added bundle.pl script to modify initial website
+
+1.11 2014-12-08T00:04:05Z
+    - modified UploadSite: cd to top directory before run
+    - modified UploadSite: fix checksum computation
+
+1.10 2014-05-05T15:26:10Z
+    - updated template handling code to match Template::Twostep
+    - change get_template to use current version of file to be rendered
+
+1.09 2014-04-21T23:40:09Z
+    - Fixed typos
+    - added each command to Template
+
+1.07 2014-04-11T23:06:54Z
+    - Updated documentation
+    - Changed tests for better error reporting
+
+1.06 2014-04-05T22:24:20Z
+    - Bug fix, moved check for file existence in is_newer
+    - Separated news index creation into its own method, create_news_indexes
+
+1.05 2014-04-03T23:29:36Z
+    - Rewrote is_newer, deleted index_is_newer
+    - Added newlines to end of lines in parse_section
+
+1.04 2014-03-30T22:42:16Z
+    - Revised and corrected documentation
+    - Rewrote object creation code
+    - Changed calling sequence to most_recent_file
+    - Moved match_file out of visit
+    - Replaced EveryFile with ConfiguredObject
+    - Renamed HandleSite to Module
+    - Revised code in index_is_newer
+
+1.03 2014-03-08T23:46:39Z
+    - Check for undefined names in same_file, return false if found
+    - Fixed bug in get_excluded_directories, wrong parameter used
+    - Removed the Mock package
+    - New module to replace Mock, CreateSitemap
+    - Simplify templates produced by --init flag
+
+1.02 2014-03-07T00:02:15Z
+    - Rewrote UpdateFtp and modified UpdateSite
+
+1.01 2014-03-04T00:32:07Z
+    - Add a config file for current directory to list of config files
+
+1.00 2014-03-03T02:27:05Z
+    - Fixed typo in update_folder run_after vs run_before
+
+0.99 2014-03-02T23:26:27Z
+    - Bug fix in calculating topmost configuration parameters
+
+0.98 2014-03-02T00:52:26Z
+    - Added UploadSite module and UploadFtp and UploadNone submodules
+    - Changed configuration parameter module to run_before and run_after
+
+0.97 2014-02-04T00:00:20Z
+    - Replaced templating code and reorganized classes
+
+0.96 2014-01-17T00:13:48Z
+    - Get title from body and create summary in App::Followme::CreateNews
+
+0.95 2014-01-01T14:31:16Z
+    - Changes to make filename handling OS independent
+
+0.94 2013-12-26T00:54:19Z
+    - Text files are now converted to html by Markdown
+    - Compute title from header where possible, compute summary
+    - Fixed some OS dependencies
+
+0.93 2013-12-22T19:54:25Z
+    - Rewritten as a set of classes derived from App::Followme::Everyfile
+
+0.92 2013-11-07T23:55:46Z
+    - Replaced rm -rf with rmtree for os independence
+
+0.91 2013-11-01T23:02:43Z
+    - Rewrote build_url
+
+0.90 2013-10-28T22:22:09Z
+    - Rewritten
+
+0.89 2013-09-17T23:33:43Z
+    - Fixed error in template creation in site_update
+
+0.88 2013-09-14T16:05:58Z
+    - Moved modification date reset into update_site, where it needs to be
+
+0.87 2013-09-13T23:54:08Z
+    - Set modification date of existing file back to previous valye
+
+0.86 2013-09-12T23:53:41Z
+    - Fixed code assuming directory separator is slash
+
+0.85 2013-09-10T23:30:29Z
+    - Better OS Independent tests
+
+0.84 2013-09-08T19:20:54Z
+    - Fix for bug in all_indexes: abs2rel called with undef argument
+
+0.83 2013-09-08T00:15:00Z
+    - OS independent filename handling
+
+0.82 2013-09-05T22:16:59Z
+    - Added make_relative and absolute_url config option
+
+0.81 2013-09-02T22:26:59Z
+    - Do not delete leading digits from title if title is all digits
+
+0.80 2013-08-29T22:50:14Z
+    - Increased sleep times between creating files for tests
+
+0.79 2013-08-26T22:16:58Z
+    - Removed compile test
+
+0.78 2013-08-17T20:28:34Z
+    - Changed begin/end comments to section/endsection
+
+0.77 2013-08-17T15:19:16Z
+    - fixed time zone depndent test
+    - added new blocks to templates
+
+0.76 2013-08-16T22:23:24Z
+    - feature complete release

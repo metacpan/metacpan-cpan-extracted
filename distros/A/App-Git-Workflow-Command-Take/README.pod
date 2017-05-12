@@ -1,0 +1,55 @@
+=begin html
+
+<a href="https://travis-ci.org/ivanwills/App-Git-Workflow-Command-Take?branch=master"><img src="https://travis-ci.org/ivanwills/App-Git-Workflow-Command-Take.png?branch=master" alt="App-Git-Workflow-Command-Take"></a>
+<a href="https://coveralls.io/r/ivanwills/App-Git-Workflow-Command-Take?branch=master"><img src="https://coveralls.io/repos/ivanwills/App-Git-Workflow-Command-Take/badge.svg?branch=master" alt="Coverage Status" /></a>
+
+=head1 App::Git::Workflow::Command::Take
+
+The package installes the C<git-take> command which helps resolve git conflicts
+by taking only the convlicted areas of a merge conflict. This is unlike
+git-checkout which takes all of one side of the conflict.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::Git::Workflow::Command::Take
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Git-Workflow-Command-Take
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-Git-Workflow-Command-Take
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-Git-Workflow-Command-Take
+
+    Search CPAN
+        http://search.cpan.org/dist/App-Git-Workflow-Command-Take/
+
+    Source Code
+        git://github.com/ivanwills/App-Git-Workflow-Command-Take.git
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

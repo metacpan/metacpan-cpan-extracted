@@ -1,0 +1,69 @@
+{
+   "abstract" : "pack your dependencies onto your script file",
+   "author" : [
+      "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.2, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-FatPacker",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "1.01",
+            "Cwd" : "0",
+            "File::Copy" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Spec::Unix" : "0",
+            "Getopt::Long" : "0",
+            "perl" : "5.008000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.82"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-App-FatPacker-Metadata@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-FatPacker"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.shadowcat.co.uk/p5sagit/App-FatPacker.git",
+         "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/App-FatPacker.git"
+      }
+   },
+   "version" : "0.010007",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

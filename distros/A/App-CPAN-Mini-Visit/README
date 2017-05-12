@@ -1,0 +1,54 @@
+NAME
+    App::CPAN::Mini::Visit - explore each distribution in a minicpan
+    repository
+
+VERSION
+    version 0.008
+
+SYNOPSIS
+        #!/usr/bin/perl
+        use App::CPAN::Mini::Visit;
+        exit App::CPAN::Mini::Visit->run;
+
+DESCRIPTION
+    This module contains the guts of the visitcpan program. See
+    documentation of that program for details on features and command line
+    options.
+
+USAGE
+  "run"
+        exit App::CPAN::Mini::Visit->run();
+
+    Executes the program, processing command line arguments and traversing a
+    minicpan repository. Returns an exit code.
+
+SEE ALSO
+    *   CPAN::Mini
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/App-CPAN-Mini-Visit/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/App-CPAN-Mini-Visit>
+
+      git clone https://github.com/dagolden/App-CPAN-Mini-Visit.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTOR
+    Ricardo Signes <rjbs@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

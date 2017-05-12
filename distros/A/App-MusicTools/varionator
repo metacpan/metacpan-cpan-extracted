@@ -1,0 +1,149 @@
+#!perl
+
+# Generate all possible variations on input material. Use () to denote material
+# that varies in that position. Shell quoting may be necessary to prevent the
+# shell from doing things with the (). This script is distributed with the
+# App::MusicTools perl module.
+#
+#   varionator 'c (d f) (g e b) c'
+#   echo 'c (d f) (g e b) c' | varionator -
+
+use strict;
+use warnings;
+
+my $possible = possibilities();
+my $sets     = permutations($possible);
+for my $sr (@$sets) {
+  print join( ' ', @$sr ), "\n";
+}
+
+exit 0;
+
+########################################################################
+#
+# SUBROUTINES
+
+{
+  my @iterators;
+
+  # figure out all permutations, return as ref to array of array refs
+  sub permutations {
+    my ($possibles) = @_;
+    @iterators = ();
+
+    my @permutations;
+    my $more_todo = 1;
+    while ($more_todo) {
+      ( $more_todo, my @sequence ) = permute($possibles);
+      push @permutations, \@sequence;
+    }
+    return \@permutations;
+  }
+
+  # build next variation, update counter states
+  sub permute {
+    my ($possibles) = @_;
+    my @sequence;
+    for my $i ( 0 .. $#$possibles ) {
+      if ( ref $possibles->[$i] eq 'ARRAY' ) {
+        $iterators[$i] = 0 if !defined $iterators[$i];
+        push @sequence, $possibles->[$i][ $iterators[$i] ];
+      } else {
+        push @sequence, $possibles->[$i];
+      }
+    }
+
+    # increment variation iterators, reset all subsequent as necessary
+    my $more_todo = 0;
+    for my $i ( reverse 0 .. $#iterators ) {
+      next if !defined $iterators[$i];
+      if ( $iterators[$i] < $#{ $possibles->[$i] } ) {
+        $iterators[$i]++;
+        $more_todo = 1;
+        for my $j ( $i + 1 .. $#iterators ) {
+          $iterators[$j] = 0 if defined $iterators[$j];
+        }
+        last;
+      }
+    }
+    return $more_todo, @sequence;
+  }
+}
+
+# Parse what was passed from command line or standard input
+sub possibilities {
+  my $argstr;
+  my @possibles;
+
+  if ( @ARGV == 1 and $ARGV[0] eq '-' ) {
+    $argstr = do { local $/; readline *STDIN };
+  } else {
+    $argstr = "@ARGV";
+  }
+
+  my @pp = \@possibles;
+  # `perldoc perlop` lex-like scanner: whitespace delimits elements, (
+  # starts an alternative block, ) ends one, anything else is data.
+LOOP: {
+    if ( $argstr =~ m#\G([^()\s]+)\s*#gc ) {
+      push @{ $pp[-1] }, $1;
+      redo LOOP;
+    }
+    if ( $argstr =~ m#\G[(]\s*#gc ) {
+      # avoid nesting (would only pointlessly complicate the permute code)
+      pop @pp unless @pp == 1;
+
+      push @{ $pp[-1] }, [];
+      push @pp, $pp[-1]->[-1];
+      redo LOOP;
+    }
+    if ( $argstr =~ m#\G[)]\s*#gc ) {
+      pop @pp unless @pp == 1;
+      redo LOOP;
+    }
+  }
+  # flatten needless refs to single-element lists
+  for my $p (@possibles) {
+    if ( ref $p eq 'ARRAY' and @$p == 1 ) {
+      $p = $p->[0];
+    }
+  }
+
+  return \@possibles;
+}
+
+__END__
+
+=head1 NAME
+
+varionator - generate variations on specified input
+
+=head1 SYNOPSIS
+
+  $ varionator 'c (d f) (g e b) c'
+  $ echo 'c (d f) (g e b) c' | varionator -
+
+=head1 DESCRIPTION
+
+Generates variations. Alternatives should be enclosed in parentheses,
+and will probably need quoting to protect them from the shell.
+
+=head1 BUGS
+
+If the bug is in the latest version, send a report to the author.
+Patches that fix problems or add new features are welcome.
+
+L<http://github.com/thrig/App-MusicTools>
+
+=head1 AUTHOR
+
+Jeremy Mates
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012-2013,2015 by Jeremy Mates
+
+This module is free software; you can redistribute it and/or modify it
+under the Artistic License (2.0).
+
+=cut

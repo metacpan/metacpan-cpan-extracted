@@ -1,0 +1,18 @@
+const char *		T_PV
+AV_SPECIAL *		T_AVREF_SPECIAL
+###############################################################################
+INPUT
+T_AVREF_SPECIAL
+	if (SvTYPE($arg)==SVt_PVLV && SvRMAGICAL($arg) && mg_find($arg,'p'))
+		mg_get($arg);
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV)
+		$var = (AV*)SvRV($arg);
+	else
+		Perl_croak(aTHX_ \"%s: %s is not a magical array reference\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\")
+###############################################################################
+OUTPUT
+T_AVREF_SPECIAL
+	$arg = newRV((SV*)$var);
+

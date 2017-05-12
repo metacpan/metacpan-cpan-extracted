@@ -1,0 +1,13 @@
+diff -ru Acd/src/minizip/minizip.c Bcd/src/minizip/minizip.c
+--- Acd/src/minizip/minizip.c	2016-06-25 04:11:16.000000000 +0200
++++ Bcd/src/minizip/minizip.c	2016-07-09 16:01:32.032166000 +0200
+@@ -22,7 +22,9 @@
+ 
+ #ifdef WIN32
+ # include <windows.h>
++#ifndef __CYGWIN__
+ # include <direct.h>
++#endif
+ # include <io.h>
+ #else
+ # include <unistd.h>

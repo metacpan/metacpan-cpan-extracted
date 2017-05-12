@@ -1,0 +1,9 @@
+0.101   2015-03-18
+  * If installed, use wget to download thrust.zip instead of LWP.
+    This supports download resuming, has a nice progress meter,
+    and hopefully bypasses a LWP certificate chain bug
+  * Added JP to authors: he helped a ton with the OS X support
+  * Not supported yet notice for windows
+
+0.100   2014-12-19
+  * Initial CPAN release

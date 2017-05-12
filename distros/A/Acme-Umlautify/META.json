@@ -1,0 +1,60 @@
+{
+   "abstract" : "Ädd ümläüts tö ëvërÿthïng",
+   "author" : [
+      "Phil Pollard <bennie@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.9, CPAN::Meta::Converter version 2.140630",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Umlautify",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Simple" : "0",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Umlautify" : {
+         "file" : "lib/Acme/Umlautify.pm",
+         "version" : "1.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Acme-Umlautify"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bennie/perl-Acme-Umlautify.git",
+         "web" : "http://github.com/bennie/perl-Acme-Umlautify"
+      }
+   },
+   "version" : "1.07"
+}

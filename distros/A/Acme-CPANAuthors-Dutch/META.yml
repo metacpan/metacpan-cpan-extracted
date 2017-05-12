@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               Acme-CPANAuthors-Dutch
+version:            2009102802
+abstract:           Cheese heads and pot smokers.
+author:
+    - Abigail <cpan@abigail.be>
+license:            mit
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Acme::CPANAuthors:    0
+    ExtUtils::MakeMaker:  0
+    strict:               0
+    Test::More:           0
+    warnings:             0
+requires:
+    Acme::CPANAuthors::Register:  0
+    perl:                 5.006
+    strict:               0
+    warnings:             0
+resources:
+    repository:  git://github.com/Abigail/Acme--CPANAuthors--Dutch.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+keywords:  []

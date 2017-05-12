@@ -1,0 +1,25 @@
+---
+abstract: 'interface to read and modify Trac password files'
+author:
+  - 'Kazuhiro Nishikawa <kazuhiro.nishikawa@gmail.com>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Authen-Htpasswd-Trac
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Authen::Htpasswd: 0
+  DBD::SQLite: 0
+  DBI: 0
+  SQL::Abstract: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.00004

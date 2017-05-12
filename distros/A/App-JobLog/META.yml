@@ -1,0 +1,59 @@
+---
+abstract: 'log what you do'
+author:
+  - 'David F. Houghton <dfhoughton@gmail.com>'
+build_requires:
+  App::Cmd::Tester: '0'
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Path: '2.06'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  POSIX: '0'
+  String::Random: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  autodie: '0'
+  blib: '1.01'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-JobLog
+no_index:
+  file:
+    - t/make_log.pl
+requires:
+  App::Cmd::Setup: '0'
+  Carp: '0'
+  Class::Autouse: '0'
+  Config::Tiny: '0'
+  DateTime: '0.66'
+  DateTime::TimeZone: '1.30'
+  Exporter: '0'
+  File::HomeDir: '0'
+  File::Path: '2.06'
+  File::ReadBackwards: '0'
+  FileHandle: '0'
+  IO::All: '0'
+  Modern::Perl: '0'
+  Module::Build: '0.3601'
+  Term::ReadKey: '2.30'
+  Text::Wrap: '0'
+  Text::WrapI18N: '0'
+  autouse: '0'
+  base: '0'
+  constant: '0'
+  if: '0'
+  overload: '0'
+  parent: '0'
+version: '1.042'

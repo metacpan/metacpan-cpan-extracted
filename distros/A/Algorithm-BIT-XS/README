@@ -1,0 +1,29 @@
+Algorithm-BIT-XS version 0.001
+==============================
+
+A binary indexed tree is a data structure similar to an array of integers.
+The two main operations are updating an element and calculating a
+prefix sum, both of which run in time logarithmic in the size of the tree.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+No modules outside Perl core are needed.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

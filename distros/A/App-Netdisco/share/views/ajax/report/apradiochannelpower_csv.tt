@@ -1,0 +1,15 @@
+[% USE CSV -%]
+[% CSV.dump([ 'Device' 'Model' 'Device Location' 'Port' ' Port Name'
+              'Port Description' 'Channel' 'Tx Power mW' 'Tx Power dBm' ]) %]
+
+[% FOREACH row IN results %]
+  [% mydlist = [] %]
+  [% mydevice = row.dns || row.device_name || row.ip %]
+  [% mydlist.push(mydevice) %]
+  [% FOREACH col IN [ row.model row.location row.port row.name row.descr 
+                      row.channel row.power row.power2 ] %]
+    [% mydlist.push(col) %]
+  [% END %]
+  [% CSV.dump(mydlist) %]
+
+[%END%]

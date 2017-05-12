@@ -1,0 +1,40 @@
+AnyEvent::CacheDNS
+==================
+*******************************************************************************
+This CPAN package provides a simple DNS resolver that caches the results for a
+faster retrieval for subsequent calls.
+
+This is module is very basic and has no policies for clearing our invalidating
+the DNS cache. Patches and suggestions are welcome.
+
+INSTALLATION
+
+To install this module type the following:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+PROJECT
+
+The project is now hosted on github (http://github.com/potyl/perl-AnyEvent-CacheDNS/)
+which provides the latest source code and a simple bug tracking.
+
+Even tough github provides a download facility, the project's source code
+bundles will always be published through CPAN. It's easier this way for the
+project and after all this is a Perl project!
+
+BUGS
+
+Please when possible try to submit the bugs through the github issue tracker
+(http://github.com/potyl/perl-AnyEvent-CacheDNS/issues) otherwise simply create a
+ticket through RT.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Emmanuel Rodriguez
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

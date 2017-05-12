@@ -1,0 +1,15 @@
+---
+name: Authen-Simple-HTTP
+version: 0.2
+author:
+  - 'Christian Hansen C<ch@ngmedia.com>'
+abstract: Simple HTTP authentication
+license: perl
+requires:
+  Authen::Simple: 0
+  LWP::UserAgent: 0
+provides:
+  Authen::Simple::HTTP:
+    file: lib/Authen/Simple/HTTP.pm
+    version: 0.2
+generated_by: Module::Build version 0.2611

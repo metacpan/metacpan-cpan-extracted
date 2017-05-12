@@ -1,0 +1,35 @@
+<PKIT_COMPONENT NAME="/top">
+<h1>PageKit Examples</h1>
+
+This site contains pages that illustrate some PageKit features.
+It is a good starting point for building your own web site.
+<ul>
+ <li><a href="newacct1?pkit_done=http://<PKIT_HOSTNAME>/">New Account Page</a>
+ <li><a href="login1?pkit_done=http://<PKIT_HOSTNAME>/">Login Page</a>
+ <li><a href="customize">Customizable Site Colors stored in Session</a>
+ <li><a href="language">Language Localization</a>
+ <li>Different Media outputs
+ <ul>
+  <li>Using provided PageKit Templates
+  <ul>
+   <li><a href="media">HTML</a>
+   <li><a href="media?pkit_view=xml">XML</a>
+   <li><a href="media?pkit_view=wml">WML</a>
+   <li><a href="media?pkit_view=pdf">PDF</a> (uses Apache XML FOP)
+  </ul>
+  <li>Using PageKit Templates generated using XSLT
+  <ul>
+   <li><a href="media_xslt">HTML</a>
+   <li><a href="media_xslt?pkit_view=xml">XML</a>
+   <li><a href="media_xslt?pkit_view=wml">WML</a>
+   <li><a href="media_xslt?pkit_view=pdf">PDF</a> (uses Apache XML FOP)
+  </ul>
+ </ul>
+ <li><a href="form_validation">Form Validation</a> (also demonstrates sticky HTML forms)
+ <li><a href="content_loop">HTML::Template::XPath</a> (CONTENT_LOOP, CONTENT_VAR, etc)
+ <li><a href="charset">Charset Translation</a>
+ <li><a href="restricted">Page that requires login</a>
+</ul>
+You are currenting running the <MODEL_VAR NAME="pkit_server_id"> server.
+Your session ID is <MODEL_VAR NAME="session_id">.
+<PKIT_COMPONENT NAME="/bottom">

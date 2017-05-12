@@ -1,0 +1,47 @@
+# PODNAME: Archive::Libarchive::XS::Constant
+# ABSTRACT: Constants reference for libarchive perl bindings
+# VERSION
+
+=head1 SYNOPSIS
+
+ use Archive::Libarchive::XS qw( :const );
+
+=head1 DESCRIPTION
+
+This document contains a list of all constants provided by the libarchive perl
+bindings.  Depending on the version of libarchive that you are using, some
+constants may not be available.  You can detect this at run time by using the
+can method on the L<Archive::Libarchive::XS> package, like so:
+
+ if(Archive::Libarchive::XS->can('ARCHIVE_OK'))
+ {
+   ...
+ }
+
+If provided by your libarchive library, these constants will be available and
+exportable from L<Archive::Libarchive::XS> (you may import all available
+constants using the C<:const> export tag).
+
+=head1 CONSTANTS
+
+=over 4
+
+% foreach my $constant (@$constants) {
+=item <%= $constant %>
+
+% }
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Archive::Libarchive::XS>
+
+=item L<Archive::Libarchive::XS::Callback>
+
+=item L<Archive::Libarchive::XS::Function>
+
+=back
+
+=cut

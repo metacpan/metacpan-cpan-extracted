@@ -1,0 +1,14 @@
+Revision history for Perl extension App::CLI::Plugin::Net::SMTP
+
+1.3  Mon Sep 19 10:45:52 JST 2011
+       - change dependencies module Class::Accessor::Grouped (before Class::Data::Accessor)
+1.2  Sat Mon Jan  4 01:42:57 JST 2010
+       - mini fix
+1.1  nothing
+       - nothing
+1.0  Sat Dec 12 23:30:13 2009
+       - it's new
+0.2  Mon Nov 30 03:00:00 2009
+       - add new method(smtp_open)
+0.1  Sun Oct 25 23:00:09 2009
+       - original version

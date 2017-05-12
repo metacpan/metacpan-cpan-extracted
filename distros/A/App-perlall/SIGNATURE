@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 14f1a419b024a2f0028656f7fbafa9a4e7f2c0ed .perlall
+SHA1 a4dac410e1f638fab9159e362ce570f52a8cb3ba Changes
+SHA1 f9a303bd5a40f5485cd5dbbc925e3a4ce4b028d5 INSTALL
+SHA1 012fe1ce01fb53ea10dfac7145ee7217b8b3ae85 LICENSE
+SHA1 35a5c11cea4b9f35d409ce95a7f921e0f71afc19 MANIFEST
+SHA1 9f82afd16fafbe8263ac7c58f12e8476bde731e7 META.json
+SHA1 841855ff19ca1acf458e4a9ba48e8c04f11e734d META.yml
+SHA1 cdb4770535f45a11a9b6584de7c3141cb9211261 Makefile.PL
+SHA1 c5f7fa8121e5949e0af2de73cd559a3586b8fca5 README
+SHA1 fc062c56309e099c792055db5e80dd0dc83948ed lib/App/perlall.pm
+SHA1 e2a5f9464fc2bde07e9a3646113cd72cccd11926 lib/Devel/PatchPerl/Plugin/Asan.pm
+SHA1 2e4c7b7601c0aba54182aa805ae351c07ca51713 lib/Devel/PatchPerl/Plugin/Compiler.pm
+SHA1 b35a83e395949946008801c8ecb09453adfe664a lib/Devel/PatchPerl/Plugin/General.pm
+SHA1 28f5f6d947bc96954450579439fbcda8a1efd726 perlall.ppt
+SHA1 5548d91cfff2b294741507c0c3607d8bb39a0982 perlall.txt
+SHA1 fbe92a2753e5288040952c4db49dcda47d4157c2 script/perlall
+SHA1 d90d4c1194ca8fd04915b2a2180078b57f945007 t/00-compile.t
+SHA1 1bffbbb6335975580195dbf0949f108808050f21 t/01-build.t
+SHA1 f31e2ebf44e7ffc20066d7415f6a80172ee3c511 t/01-linked.t
+SHA1 2c53d3c4ece0f4efefa7f4fb41b72e239a8b9a83 t/01-options.t
+SHA1 200e3665ea03435632cdbe0c9e8cb4dca74302d3 t/02-init.t
+SHA1 1dafec967f50f4001302446a04e48509ff68de4c t/03-do.t
+SHA1 bcf4aaf1304a8c8eb717daaff5d056bd69b84dec t/04-make.t
+SHA1 a6e1722e63f4051ad3a15e16e0d940d070b82664 t/05-maketest.t
+SHA1 cd8fefff3f9d6a46743793ccf471f91aedb7683e t/06-makeinstall.t
+SHA1 e09d3448467d28d246fda81d0d2daf29d27b4ed4 t/07-help.t
+SHA1 bce5c6553353702031ecbfe3d3823e630ef595e9 t/08-version.t
+SHA1 7b8fce3eab9aadb9a6b86178246fb31da070f1d5 t/release-pod-coverage.t
+SHA1 a140e259b4b7e888f2cc0ad72c718507f96d2db2 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlddWhQACgkQmm2SYo/9yUK7uQCfVP+Xlu7HqRQ4i8tXt6Fp53YN
+o4QAnRL8TLmO+yYP9GD4fyHQtlsPnEZt
+=VIQB
+-----END PGP SIGNATURE-----

@@ -1,0 +1,37 @@
+#!/usr/local/bin/perl
+
+use v5.10.0;
+use blib;
+use strict;
+use warnings;
+
+use AFS::VOS;
+use Scalar::Util qw(looks_like_number);
+
+my ($vos, $server, $part, $volume, $dfile, $id, $inter, $ovwrt, $offln, $ronly, $ok);
+
+die "Usage: $0 server partition volume [ dumpfile [ id [inter [overwrite [offline [ readonly]]]]]]\n" if $#ARGV < 2;
+
+$server = shift;
+$part   = shift;
+$volume = shift;
+$dfile  = shift // '';
+$id     = shift // '';
+$inter  = shift // 0;
+$ovwrt  = shift // '';
+$offln  = shift // 0;
+$ronly  = shift // 0;
+
+if (defined $inter and !looks_like_number($inter)) { warn "$0: INTER is not an INTEGER ...\n"; }
+else                                               { $inter = int($inter); }
+if (defined $offln and !looks_like_number($offln)) { warn "$0: OFFLN is not an INTEGER ...\n"; }
+else                                               { $offln = int($offln); }
+if (defined $ronly and !looks_like_number($ronly)) { warn "$0: RONLY is not an INTEGER ...\n"; }
+else                                               { $ronly = int($ronly); }
+
+$vos = AFS::VOS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+$ok = $vos->restore($server, $part, $volume, $dfile, $id, $inter, $ovwrt, $offln, $ronly);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { printf "Restored volume $volume on $server /vicep$part \n"; }

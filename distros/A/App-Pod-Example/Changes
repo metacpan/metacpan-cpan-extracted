@@ -1,0 +1,81 @@
+0.16 2015-10-15T13:57:30+02:00
+ - Fix App::Pod::Example NAME section in doc.
+ - Remove .travis.yml from distribution.
+
+0.15 2015-09-28T03:01:27+02:00
+ - Fix script name in doc.
+ - Fix test requires.
+ - Improve documentation of script.
+ - Move author tests to xt/ directory.
+ - Remove trailing whitespace.
+ - Rewrite README file to doc from script.
+ - Rewrite code from script to library.
+ - Sort modules in test.
+ - Update Module::Install to 1.16 version.
+ - Update LICENSE AND COPYRIGHT section in doc.
+ - Update copyright years.
+
+0.14 2014-08-25T23:00:43+02:00
+ - Fix arguments on Windows. Arguments cannot be in '', but only in "".
+
+0.13 2014-08-24T04:32:49+02:00
+ - Fix arguments with spaces.
+
+0.12 2014-08-01T10:25:58+02:00
+ - Add arguments for run mode.
+ - Fix LICENSE file.
+ - Fix run() doc.
+ - Update Module::Install to 1.10 version.
+
+0.11 2013-11-15
+ - Fix test dependencies (IO::CaptureOutput).
+
+0.10 2013-11-14
+ - Update prereq Error::Pure to 0.15 version.
+
+0.09 2013-11-13
+ - Add 'readme_from' directive to Makefile.PL.
+ - Add minimal Perl version.
+ - Rename pod_example to pod-example.
+ - Rewrite running of example from eval() to system() on temporary file.
+
+0.08 2013-11-06
+ - Fix dependency for Test::Output. Test::Output qw(1.01) is bad.
+ - Move back problematic test.
+
+0.07 2013-09-29
+ - Add LICENSE.
+ - Add SIGNATURE file.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.06 2013-05-06
+ - Add version to pod_example script.
+ - Comment problematic test.
+ - Improve man page.
+
+0.05 2013-04-28
+ - Add Test::NoWarnings to tests.
+ - Add Test::Warn for one test.
+ - Fix help (add -e option to possible arguments).
+ - Improve help to 80 chars per line.
+
+0.04 2012-11-12
+ - Fix rigth word to right.
+ - Improve cover testing.
+
+0.03 2012-08-24
+ - Fix length of #-----... to 80 chars.
+ - Add enumerating of lines.
+
+0.02 2012-07-16
+ - Add doc for pod_example script.
+ - Fix git repository.
+ - Fix help indent in pod_example script.
+ - Remove "(3pm)" from pod doc.
+ - Rewrite 03-pod.t to better version for Perl 5.6.
+ - Rewrite to new version of build system.
+ - Add examples/ directory.
+ - Fix Makefile.PL to META 1.4.
+
+0.01 2011-07-15
+ - First version.

@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/App/Addex/AddressBook/LDAP.pm
+perlcritic.rc
+t/author-critic.t
+t/compile.t
+t/release-pod-syntax.t

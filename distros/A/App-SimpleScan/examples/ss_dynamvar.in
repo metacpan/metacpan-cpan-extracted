@@ -1,0 +1,6 @@
+# Dynamically generate variables
+%%release production staging beta
+%%intl ca uk au
+%%<intl>_<release> <intl>.<release>.search.yahoo.com
+# Shows all intls
+http://<<intl>_staging> /Yahoo!/ Y brand on <<intl>_staging>

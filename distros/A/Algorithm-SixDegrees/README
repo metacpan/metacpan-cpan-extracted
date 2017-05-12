@@ -1,0 +1,36 @@
+WHAT IS THIS?
+
+Algorithm::SixDegrees is an implementation of a simple algorithm
+to find a link between interconnected elements in a known set.
+
+Another way of explaining this would be that this module, given
+a list of all actors and movies, could help determine an answer
+for the game Six Degrees of Kevin Bacon.
+
+REQUIREMENTS
+
+I have developed this module for use with Perl 5.6.1 and above.
+Other than that, it has no external dependencies.
+
+SAMPLES
+
+There are some samples in the F<samples/> directory; they will
+require some preparation work to be usable.  Check the scripts
+before running them for all the details.  These do have other
+dependencies that you will have to satisfy before execution.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 Pete Krawczyk
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

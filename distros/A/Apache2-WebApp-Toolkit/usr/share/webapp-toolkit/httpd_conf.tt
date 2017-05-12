@@ -1,0 +1,51 @@
+PidFile [% apache_doc_root %]/tmp/httpd.pid
+
+Listen *:[% port || 8080 %]
+
+# Prerequisites (mod_perl 2 && Apache2::Request)
+<ifModule !perl_module>
+    LoadModule perl_module modules/mod_perl.so
+</ifModule>
+
+<ifModule !apreq_module>
+    LoadModule apreq_module modules/mod_apreq2.so
+</ifModule>
+
+# If mod_rewrite is supported
+[% UNLESS rewrite_uri %]#[% END %]<ifModule !rewrite_module>
+[% UNLESS rewrite_uri %]#[% END %]    LoadModule rewrite_module modules/mod_rewrite.so
+[% UNLESS rewrite_uri %]#[% END %]</ifModule>
+
+# Shorten the URI using mod_rewrite
+[% UNLESS rewrite_uri %]#[% END %]RewriteEngine on
+[% UNLESS rewrite_uri %]#[% END %]RewriteRule   ^/app/example(.*)   /app$1   [R]
+
+# Add the following to your <VirtualHost>
+DocumentRoot [% apache_doc_root %]/htdocs
+
+[% UNLESS apache_domain %]#[% END %]ServerName  [% apache_domain %]
+
+CustomLog [% apache_doc_root %]/logs/access_log combined
+ErrorLog  [% apache_doc_root %]/logs/error_log
+
+# Enable webapp handler
+PerlRequire [% apache_doc_root %]/bin/startup.pl
+
+<Perl>
+    use Apache2::WebApp;
+    $Apache2::WebApp = Apache2::WebApp->new;
+</Perl>
+
+<Location /app>
+    SetHandler perl-script
+    PerlHandler $Apache2::WebApp->handler
+    SetEnv WEBAPP_CONF [% apache_doc_root %]/conf/webapp.conf
+</Location>
+
+# Un-comment to restrict user access
+#<Location /app>
+#    AuthType Basic
+#    AuthName "[% project_title %]"
+#    AuthUserFile [% apache_doc_root %]/conf/htpasswd
+#    Require valid-user
+#</Location>

@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+require App::ErrorCalculator;
+use Getopt::Long;
+my $usage = <<"HERE";
+Usage: $0 -v | -h
+
+Runs an instance of errorcalculator without parameters.
+-h or --help shows this short help. -v or --version shows the
+program's version.
+
+The full manual can be read as a man page or perldoc page:
+
+  man App::ErrorCalculator
+  perldoc App::ErrorCalculator
+
+HERE
+
+=head1 NAME
+
+errorcalculator - Calculate with automatic Gaussian Error Propagation
+
+=head1 DESCRIPTION
+
+Runs an instance of errorcalculator without parameters.
+-h or --help shows this short help. -v or --version shows the
+program's version.
+
+The full manual can be read as a man page or perldoc page:
+
+  man App::ErrorCalculator
+  perldoc App::ErrorCalculator
+
+=cut
+
+
+GetOptions(
+	'h|help' => sub {
+		print $usage;
+		exit(1);
+	},
+	'v|version' => sub {
+		print "This is errorcalculator version $App::ErrorCalculator::VERSION.\n";
+		exit(1);
+	}
+);
+
+
+App::ErrorCalculator->run;
+

@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+
+use Archive::Cpio;
+use Getopt::Long;
+
+=head1 NAME
+
+cpio-filter - transform a cpio archive
+
+=head1 SYNOPSIS
+
+    cpio-filter [--exclude <PATTERN>] [--in-place] [<cpio file>]
+
+=head1 DESCRIPTION
+
+Transform a cpio archive on the fly. Reads on stdin and output on stderr
+
+=head1 AUTHOR
+
+Pascal Rigaux <pixel@mandriva.com>
+
+=cut
+
+my %options = (
+    'exclude=s' => \ (my $exclude), 
+    'in-place|i' => \ (my $in_place),
+);
+
+sub usage {
+    die "usage: cpio-filter [--exclude <PATTERN>] [--in-place] [<cpio file>]\n";
+}
+
+GetOptions(%options) or usage();
+@ARGV <= 1 or usage();
+
+if ($in_place) {
+    @ARGV or die "you can't use --in-place without giving a cpio file\n";
+}
+
+my ($file) = @ARGV;
+
+sub exclude {
+    my ($e) = @_;
+    $exclude && $e->name =~ m!(^|/)${exclude}($|/)!;
+}
+
+my $cpio = Archive::Cpio->new;
+if ($in_place) {
+    $cpio->read($file);
+    $cpio->remove(map { exclude($_) ? $_->name : () } $cpio->get_files);
+    $cpio->write($file);
+} else {
+    my $IN;
+    if ($file) {
+	open($IN, '<', $file) or die "can't open $file: $!\n";
+    } else {
+	$IN = \*STDIN;
+    }
+
+    $cpio->read_with_handler($IN, sub {
+        my ($e) = @_;
+	$cpio->write_one(\*STDOUT, $e) if !exclude($e);
+    });
+    $cpio->write_trailer(\*STDOUT);
+}

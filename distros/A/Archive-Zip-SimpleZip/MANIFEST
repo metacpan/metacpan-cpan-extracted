@@ -1,0 +1,16 @@
+Changes
+lib/Archive/Zip/SimpleZip.pm
+Makefile.PL
+MANIFEST
+private/MakeUtil.pm
+README
+t/000prereq.t
+t/001main.t
+t/111const-deflate.t
+t/999pod.t
+t/compress/CompTestUtils.pm
+t/Test/Builder.pm
+t/Test/More.pm
+t/Test/Simple.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

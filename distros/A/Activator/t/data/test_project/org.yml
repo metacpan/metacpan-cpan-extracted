@@ -1,0 +1,4 @@
+default:
+  name: set by org.yml
+  company: set by org.yml
+  project_home: set by org.yml

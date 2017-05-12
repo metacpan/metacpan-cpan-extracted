@@ -1,0 +1,30 @@
+AudioFile/Info version
+======================
+
+AudioFile::Info is a module for extracting information from audio files.
+Currently it works with both MP3 and Ogg Vorbis files.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+The final stage will probably need to be carried out with superuser
+permissions.
+
+DEPENDENCIES
+
+You will need at least one of the AudioFile::Info plugin modules
+in order to do anything interesting with this module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-7 Magum Solutions Ltd, All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

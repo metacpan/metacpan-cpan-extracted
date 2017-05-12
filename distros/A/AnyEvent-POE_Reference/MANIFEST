@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/AnyEvent-POE_Reference.t
+t/POE.t
+t/errors.t
+lib/AnyEvent/POE_Reference.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,27 @@
+This file contains changes in OPTIONAL dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.004001
+
+0.004000 2016-10-08T05:23:17Z
+ [Added / configure suggests]
+ - JSON::PP 2.27300
+
+0.003000 2015-06-27T04:31:29Z
+ [Added / test recommends]
+ - DBD::SQLite
+
+0.002000 2015-03-08T09:13:15Z
+ [Added / configure recommends]
+ - ExtUtils::MakeMaker 7.00
+
+ [Added / runtime recommends]
+ - Moose 2.000
+
+ [Added / test recommends]
+ - CPAN::Meta 2.120900
+ - ExtUtils::MakeMaker 7.00
+ - Test::More 0.99
+
+0.001002 2013-04-07T22:12:52Z
+
+0.001001 2013-02-15T16:09:39Z

@@ -1,0 +1,56 @@
+{
+   "abstract" : "Async client to talk to beanstalkd server",
+   "author" : [
+      "Graham Barr"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "AnyEvent-Beanstalk",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Class::Accessor::Fast" : "0",
+            "YAML" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/AnyEvent-Beanstalk/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gbarr/AnyEvent-Beanstalk.git",
+         "web" : "http://github.com/gbarr/AnyEvent-Beanstalk"
+      }
+   },
+   "version" : "1.170590",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+}
+

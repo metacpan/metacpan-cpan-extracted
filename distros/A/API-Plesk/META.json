@@ -1,0 +1,118 @@
+{
+   "abstract" : "OO interface to the Plesk XML API (http://www.parallels.com/en/products/plesk/).",
+   "author" : [
+      "Ivan Sokolov <ivsokolov@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "API-Plesk",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::LongString" : "0",
+            "Test::More" : "0",
+            "URI" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "HTTP::Request" : "0",
+            "LWP::UserAgent" : "0",
+            "Module::Build" : "0",
+            "XML::Fast" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "API::Plesk" : {
+         "file" : "lib/API/Plesk.pm",
+         "version" : "2.03"
+      },
+      "API::Plesk::Component" : {
+         "file" : "lib/API/Plesk/Component.pm",
+         "version" : 0
+      },
+      "API::Plesk::Customer" : {
+         "file" : "lib/API/Plesk/Customer.pm",
+         "version" : 0
+      },
+      "API::Plesk::DNS" : {
+         "file" : "lib/API/Plesk/DNS.pm",
+         "version" : 0
+      },
+      "API::Plesk::Database" : {
+         "file" : "lib/API/Plesk/Database.pm",
+         "version" : 0
+      },
+      "API::Plesk::FTPUser" : {
+         "file" : "lib/API/Plesk/FTPUser.pm",
+         "version" : 0
+      },
+      "API::Plesk::Mail" : {
+         "file" : "lib/API/Plesk/Mail.pm",
+         "version" : 0
+      },
+      "API::Plesk::Mock" : {
+         "file" : "lib/API/Plesk/Mock.pm",
+         "version" : 0
+      },
+      "API::Plesk::Response" : {
+         "file" : "lib/API/Plesk/Response.pm",
+         "version" : 0
+      },
+      "API::Plesk::ServicePlan" : {
+         "file" : "lib/API/Plesk/ServicePlan.pm",
+         "version" : 0
+      },
+      "API::Plesk::ServicePlanAddon" : {
+         "file" : "lib/API/Plesk/ServicePlanAddon.pm",
+         "version" : 0
+      },
+      "API::Plesk::Site" : {
+         "file" : "lib/API/Plesk/Site.pm",
+         "version" : 0
+      },
+      "API::Plesk::SiteAlias" : {
+         "file" : "lib/API/Plesk/SiteAlias.pm",
+         "version" : 0
+      },
+      "API::Plesk::SiteBuilder" : {
+         "file" : "lib/API/Plesk/SiteBuilder.pm",
+         "version" : 0
+      },
+      "API::Plesk::User" : {
+         "file" : "lib/API/Plesk/User.pm",
+         "version" : 0
+      },
+      "API::Plesk::WebUser" : {
+         "file" : "lib/API/Plesk/WebUser.pm",
+         "version" : 0
+      },
+      "API::Plesk::Webspace" : {
+         "file" : "lib/API/Plesk/Webspace.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "2.03"
+}

@@ -1,0 +1,25 @@
+Angle-Omega
+
+Angle::Omega -A perl module to calculate omega angles for the input Protein Data Bank (PDB) file.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+AUTHOR
+
+Shankar M, < msinfopl@gmail.com >
+
+LICENSE AND COPYRIGHT
+
+Copyright 2011 Shankar M.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+

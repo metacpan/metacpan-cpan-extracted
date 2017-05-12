@@ -1,0 +1,56 @@
+Algorithm::TicketClusterer is a perl5 module for retrieving
+Excel-stored tickets that are most similar to a new ticket.
+Tickets are commonly used in software services industry and
+customer support businesses to record requests for service,
+product complaints, user feedback, and so on.
+
+Identifying old tickets similar to a new ticket is made
+challenging by the fact that folks who submit tickets often
+write them quickly and informally.  The informal style of
+writing means that different people may use different
+colloquial terms to describe the same thing. And the
+quickness associated with their submission causes the
+tickets to frequently contain spelling and other errors such
+as conjoined words, fragmentation of long words, and so on.
+This module is an attempt at dealing with these challenges.
+That different people may use different words for the same
+thing is dealt with by using WordNet to expand the tickets
+with synonyms in order to ground the tickets in a common
+vocabulary.
+
+This module requires the following three modules:
+
+    Spreadsheet::ParseExcel                                                             
+    Spreadsheet::XLSX                                                                   
+    WordNet::QueryData                                                                  
+
+the first for extracting information from the old-style
+Excel sheets that are commonly used for storing tickets, the
+second for extracting the same information from the
+new-style Excel sheets, and the third for interfacing with
+WordNet for extracting the synonyms and antonyms for the
+words in the tickets.
+
+For installation, do the usual
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+if you have root access.  If not, 
+
+    perl Makefile.PL prefix=/some/other/directory/
+    make
+    make test
+    make install
+
+Contact:
+
+Avinash Kak  
+
+email: kak@purdue.edu
+
+Please place the string "TicketClusterer" in the subject
+line if you wish to write to the author.  Any feedback
+regarding this module would be highly appreciated.

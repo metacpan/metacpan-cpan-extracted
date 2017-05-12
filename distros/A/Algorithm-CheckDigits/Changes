@@ -1,0 +1,261 @@
+Revision history for Perl extension CheckDigits.
+
+v1.3.2 Mo 16. Mai 15:02:03 CEST 2016
+	- fix version strings
+
+1.3.1 Mo 16. Mai 03:19:57 CEST 2016
+	- fix Bug #114347
+	- fix version numbers
+	- require Perl version in Build.PL
+
+1.3.0 Sun May 12 10:28:21 CEST 2013
+	- Changed description of modules to more meaningful text (at least I
+	  hope so).
+	- Added plugin interface with examples in t/PluginLib*.pm and
+	  t/plugin*.t.
+
+1.2.1 Sun Mar  3 22:51:45 CET 2013
+	- changed list items in POD from 0, 1, ... to S<0>, S<1>, ...
+	  according to a thread on the perl5 porters list
+	  (www.nntp.perl.org/group/perl.perl5.porters/2013/02/msg199355.html)
+
+	  David Wheeler: "Lists must start with 1. When it saw the 0, it
+	  assumed it was a definition list, so the numbers after that
+	  don't look right."
+
+1.2.0 Fr 8. Jun 11:19:25 CEST 2012
+	- reworked Algorithm::CheckDigits::MXX_001.pm, added ABA routing
+	  numbers
+
+1.1.2 Fr 8. Jun 09:22:35 CEST 2012
+	- added '=encoding iso-8859-1' to M11_004.pm, M11_006.pm,
+	  MBase_002.pm, MXX_003.pm, MXX_006.pm. This should prevent
+	  failures in the processing of the POD that contain non-ASCII
+	  characters.
+	- corrected search and replacement lists in M10_011.pm
+
+1.1.1 Do 3. Mar 10:16:59 CET 2011
+	- Reworked Algorithm::CheckDigits::M10_008 (sedol) to cop with
+	  alphanumerical SEDOL codes that are in use since March 2004.
+	- There was also a flaw in the computation of the checksum that
+	  provided 10 instead of 0.
+	- This closes bug number #66340 on CPAN.
+
+1.1.0 Fr 12. Nov 19:10:39 CET 2010
+	- reworked Algorithm::CheckDigits::M10_001, added CUSIP
+	- moved scripts/checkdigits.pl to bin/checkdigits.pl
+	- added cgi-bin/checkdigits.cgi
+
+1.0.0 Mo 13. Sep 21:27:23 CEST 2010
+	- reworked Algorithm::CheckDigits::MXX_001
+
+0.90.0 Fr 10. Sep 15:52:51 CEST 2010
+	- added scripts/checkdigits.pl as sample script
+
+0.53  Fr 20. Nov 11:46:08 CET 2009
+	- cleaned up documentation
+	  (thanks to Romuald Żyłła for pointing me to more errors)
+	- added $VERSION into all modules to close #36482 at
+	  rt.cpan.org
+
+0.52  Mi 11. Nov 10:31:18 CET 2009
+       - added link to english description for ustid_pl
+
+0.51  Mi 11. Nov 10:01:36 CET 2009
+       - corrected documentation for ustid_pl/vatnr_pl
+	 (thanks to Romuald Żyłła for pointing me to the error)
+       - reworked algorithm and documentation for esr5_ch according to
+         http://www.sic.ch/de/dl_tkicch_dta.pdf
+	 (thanks to Romuald Żyłła for pointing me to the error)
+
+0.50  Fr 6. Jun 21:45:04 CEST 2008
+       - put $VERSION back into CheckDigits.pm
+
+0.49  Fr 16. Mai 22:54:43 CEST 2008
+       - CheckDigits/MXX_002.pm computes checkdigits for CAS registration
+         numbers with ten digits.
+
+0.48  Di 9. Okt 01:07:02 CEST 2007
+	- keep VERSION in Makefile.PL
+
+0.47  Di 9. Okt 00:45:07 CEST 2007
+	- provide Version in file VERSION
+	- Makefile.PL: indicate minimum perl version
+	  (thanks to Slaven Rezic)
+
+0.46  Mo 8. Okt 23:46:32 CEST 2007
+	- CheckDigits/M11_017.pm computes EC-No (EINECS, ELINCS) check digits.
+
+0.45  So 7. Okt 12:00:25 CEST 2007
+	- CheckDigits.pm: CheckDigits() dies on unknown algorithm/method
+	- CheckDigits.pm: IMEI and IMEISV are recognized (M10_001.pm)
+	  (Petri Oksanen made me aware that this wasn't so before)
+	- CheckDigits/M10_001.pm recognizes that with IMEISV only the 14 most
+	  significant digits are taken for the computation of the checkdigit
+	- reformatted CheckDigits.pm, CheckDigits/M10_001.pm
+
+0.44  Mo Dez 11 00:46:30 CET 2006
+	- Method 97-002 (IBAN): allow min. 2, max. 30 digits/letters for BBAN
+
+0.43  So Dez 10 23:35:31 CET 2006
+	- Method 97-002 (IBAN): allowed for more letters than just the country
+	  code and eliminated Math::BigInt (Thanks to Detlef Pilzecker).
+
+0.42  Fr Dez  1 22:02:57 CET 2006
+	- Method 10-004: added code to handle ISBN-13 (mainly check whether
+	  first three digits are 978 or 979 and cope with hyphens)
+	- CheckDigits.pm: Invocation as CheckDigits('isbn13') returns an
+	  Algorithm::CheckDigits::M10_004 object.
+	- added tests for isbn13
+
+0.41  Do Jun 29 00:34:04 CEST 2006
+	- added t/pod-coverage.t
+	- added missing documentation
+
+0.40  Mi Jun 28 23:31:00 CEST 2006
+	- fixed code examples in POD according to
+	  http://annocpan.org/~MAMAWE/Algorithm-CheckDigits-0.39/CheckDigits/MXX_002.pm
+	- CheckDigits.pm: POD: corrected ABSTRACT
+	- added t/pod.t to check for POD errors
+	- fixed POD according to t/pod.t
+	- Clarified POD for Algorithm/CheckDigits/MXX_006.pm
+
+0.39  Sun, 12 Mar 2006 17:50:13 +0100
+	- Added Verhoeff scheme (Method XX-006) taking some code from
+	  Algorithm::Verhoeff.
+	- Refined POD for CheckDigits.pm
+
+0.38  Wed, 26 Jan 2005 22:48:10 +0100
+	- Refined Method M11-011 (now accepts full vatrn)
+	- provided basic tests for above change
+
+0.37  Wed, 14 Jul 2004 20:38:31 +0200
+	- Method 10-001: Added Support for ISIN
+	- Method XX-004 (ustid_at) implemented
+	- Method XX-005 (esr9_ch) implemented
+
+0.36  Tue, 13 Jul 2004 23:45:02 +0200
+	- Method XX-003 (dem) implemented
+	- Method XX-002 (cas) implemented
+
+0.35  Sun, 11 Jul 2004 18:59:35 +0200
+	- Method XX-001 (pa_de) implemented
+
+0.34a Fri, 09 Jul 2004 23:57:37 +0200
+	- Method 97-002 (iban) implemented
+
+0.34  Wed, 14 Jun 2004 22:04:38 +0200
+	- Method 97-001 (ustid_be) implemented
+
+0.33  Wed, 09 Jun 2004 22:04:38 +0200
+	- Method 23-002 (ustid_ie) implemented
+	- Method 43-001 (code_39) implemented
+	- Method 89-001 (ustid_lu) implemented
+
+0.32  Fri, 14 May 2004 17:22:15 +0200
+	- Aaron W. West made me aware of a fault in MBase_001.pm (the
+	  code providing UPC check digits) and sent me a fix
+	- added test routine for that failure
+
+0.31  Tue, 11 May 2004 00:26:56 +0200
+	- Method 23-001 (dni_es) implemented
+	- Renamed methods 001..010
+
+0.30  Mon, 10 May 2004 01:00:14 +0200
+	- Method 16-001 (isan) implemented
+	- Renamed methods 011, 012, 013, 014, 015
+
+0.29  Wed, 05 May 2004 23:00:26 +0200
+	- Method 11-013 (vatrn_gr), 11-015 (esr5_ch) implemented
+	- Renamed methods 016,017,018,019
+	- Changed man pages (synopsis) for some methods
+
+0.27  Wed, 28 Apr 2004 23:22:41 +0200
+	- Method 11-012 implemented
+	- Man page in CheckDigits.pm changed
+	- Packages changed from CheckDigits... to Algorithm::CheckDigits...
+
+0.26  Sun, 25 Apr 2004 22:43:39 +0200
+	- Method 11-011 implemented
+	- Man page in CheckDigits.pm changed
+
+0.25  Mon, 19 Apr 2004 22:54:56 +0200
+	- Method 11-016 implemented
+	- Method 11-010 implemented
+
+0.23  Sun, 18 Apr 2004 23:09:58 +0200
+	- Method 11-009 implemented
+
+0.22  Sat, 17 Apr 2004 21:35:35 +0200
+	- Method 11-008 implemented
+
+0.21  Thu, 15 Apr 2004 23:09:40 +0200
+	- Method 11-007 implemented
+	- documented algorithm from Method M019 in the man page
+
+0.20  Mon, 12 Apr 2004 23:28:05 +0200
+	- added tests with invalid data
+	- Method Base-003 implemented
+
+0.19  Thu, 26 Feb 2004 00:27:47 +0100
+	- took all test cases from www.pruefziffernberechnung.de into
+	  t/valid.data and inserted plan(... todo => ...) into
+	  t/valid.t
+	- Method 019 implemented (algorithm not documented in man
+	  page!)
+
+0.18  Thu, 25 Dec 2003 18:17:56 +0100
+	- Method 018 implemented
+
+0.17  Fri, 28 Nov 2003 21:00:18 +0100
+	- Method 017 implemented
+	- all tests for valid checkdigits into one testscript
+	  (valid.t) using one datafile (valid.data)
+
+0.16  Die Nov 11 23:15:27 CET 2003
+	- Method 016 implemented
+	- Typo in POD of M013.pm corrected
+
+0.15  Mon Nov 10 23:23:10 CET 2003
+	- Method 015 implemented
+	- Typo in POD of M014.pm corrected
+
+0.14  Fre Okt 24 23:53:28 CEST 2003
+	- Method 014 implemented
+
+0.13  Son Okt 19 23:25:09 CEST 2003
+	- Method 013 implemented
+
+0.12  Die Okt  7 22:43:36 CEST 2003
+	- Method 012 implemented
+
+0.11  Mon Okt  6 22:21:12 CEST 2003
+	- Method 011 implemented
+	- Typo in POD of M010.pm corrected
+
+0.10  Sam Sep 27 14:03:11 CEST 2003
+	- Method 010 implemented
+
+0.09  Fre Sep 26 18:49:22 CEST 2003
+	- Method 009 implemented
+
+0.08  Don Sep 25 21:41:26 CEST 2003
+	- Method 008 implemented
+
+0.07  Mit Sep 24 22:06:44 CEST 2003
+	- Method 006, 007 implemented
+
+0.05  Son Sep 21 15:17:46 CEST 2003
+	- Method 004, 005 implemented inclusive test routines and data
+	- cleaned up code and doc for all methods so far
+
+0.04  Sam Sep 20 23:54:09 CEST 2003
+	- Method 002, 003 implemented inclusive test routines and data
+
+0.03  Fre Sep 19 23:15:04 CEST 2003
+	- Method 001 implemented inclusive test routines and data
+
+0.01  Tue Sep 16 23:03:45 2003
+	- original version; created by h2xs 1.21 with options
+		-A -X CheckDigits
+

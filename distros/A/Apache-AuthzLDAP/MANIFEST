@@ -1,0 +1,10 @@
+# $Id: MANIFEST,v 1.2 2004/12/01 21:46:32 cgilmore Exp $
+
+ChangeLog			History of this package
+INSTALL				Instructions for installing this package
+MANIFEST			This file
+Makefile.PL			Makefile generator
+AuthzLDAP.pm			The LDAP authorization module
+README				Get you started with this package
+SUPPORT				Links to support for this package
+META.yml			Module meta-data (added by MakeMaker)

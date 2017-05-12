@@ -1,0 +1,298 @@
+#!/usr/bin/perl
+
+# PODNAME: stopwatch
+
+
+use strict;
+use warnings FATAL => 'all';
+
+use Carp;
+use POSIX qw(floor);
+use Pod::Usage;
+
+my $true = 1;
+my $false = '';
+
+sub clear {
+    # '01:02:12' is 8 symbols
+    my $char_count = 8;
+
+    print "\r" x $char_count;
+    return '';
+}
+
+sub print_seconds {
+    my ($seconds) = @_;
+
+    my ($h, $m, $s) = get_h_m_s($seconds);
+
+    printf("%02d:%02d:%02d", $h, $m, $s);
+
+    return '';
+}
+
+sub get_h_m_s {
+    my ($seconds) = @_;
+
+    my $h = floor($seconds / (60*60));
+    croak 'Number is too big' if $h > 99;
+
+    my $m = floor( ($seconds - $h*60*60) / 60 );
+    my $s = $seconds - $h*60*60 - $m*60;
+
+    return $h, $m, $s;
+}
+
+
+sub get_seconds_from_string {
+    my ($string) = @_;
+
+    if ($string =~ /^([1-9][0-9]*)\s*s$/i) {
+        return $1;
+    } elsif ($string =~ /^([1-9][0-9]*)\s*m$/i) {
+        return $1 * 60;
+    } else {
+        $string = '' if not defined $string;
+        croak "Can't parse string '$string'";
+    }
+}
+
+sub parse_argv {
+    my (@argv) = @_;
+
+    # options that can't be used with other options
+    if (@argv == 0) {
+        return {
+            error => 0,
+            actions => [],
+        };
+    } elsif (grep {$_ eq '--help' or $_ eq '-h'} @argv) {
+
+        if (@argv == 1) {
+            return {
+                error => 0,
+                actions => ['help'],
+            };
+        } else {
+            return  {
+                error => 1,
+                error_actions => ['help_cant_be_used_with_other_options'],
+            };
+        }
+
+    }
+
+    # options that can be used with other options
+    my @actions;
+    my %result;
+
+    my @run_options;
+
+    my @original_argv = @argv;
+    @argv = ();
+
+    my $run_position;
+    my $run_got_all_options;
+    my $run_time;
+    my $run_cmd;
+
+    # --run
+    for (my $i = 0; $i < @original_argv; $i++) {
+        if ($original_argv[$i] eq '--run') {
+            $run_position = $i;
+            $run_got_all_options = $false;
+        }
+
+        if (defined($run_position)) {
+            if ($run_position == $i) {
+                # do nothing
+            } elsif ($run_position + 1 == $i) {
+                $run_time = $original_argv[$i];
+            } elsif ($run_position + 2 == $i) {
+                $run_cmd = $original_argv[$i];
+                push @run_options, {
+                    time => $run_time,
+                    cmd => $run_cmd,
+                };
+                $run_got_all_options = $true;
+            } else {
+                $run_position = undef;
+            }
+        }
+
+        if (not defined $run_position) {
+            push @argv, $original_argv[$i];
+        }
+    }
+
+    if ((defined $run_got_all_options) and (not $run_got_all_options)) {
+        return {
+            error => 1,
+            error_actions => ['incorrect_run_usage'],
+        };
+    }
+
+    if (@run_options) {
+        push @actions, 'run';
+        $result{run_options} = \@run_options;
+    }
+
+    if (not @argv) {
+        # we parsed all the options
+        return {
+            error => 0,
+            actions => \@actions,
+            %result,
+        }
+    } else {
+        # some options are left
+        return {
+            error => 1,
+            error_actions => ['unknown_option'],
+            error_options => \@argv,
+        };
+    }
+
+}
+
+sub print_help {
+    pod2usage();
+}
+
+sub main {
+
+    my $options = parse_argv(@ARGV);
+
+    my %second2cmd;
+
+    if (not $options->{error}) {
+        if (grep { $_ eq 'help'} @{$options->{actions}}) {
+            print_help();
+            exit 0;
+        }
+
+        if (grep { $_ eq 'run'} @{$options->{actions}}) {
+            foreach my $run_option (@{$options->{run_options}}) {
+                my $s;
+
+                eval {
+                    $s = get_seconds_from_string($run_option->{time});
+                };
+                if ($@) {
+                    print "Error. `--run` option '$run_option->{time}' is incorrect.\n";
+                    exit 1;
+                }
+                $second2cmd{$s} = $run_option->{cmd};
+            }
+        }
+
+    } else {
+        if (grep { $_ eq 'help_cant_be_used_with_other_options'} @{$options->{error_actions}}) {
+            print "Error. Help can't be used with other options.\n";
+            exit 1;
+        } elsif (grep { $_ eq 'incorrect_run_usage'} @{$options->{error_actions}}) {
+            print "Error. `--run` should be used with 2 parameters.\n";
+            exit 1;
+        } elsif (grep { $_ eq 'unknown_option'} @{$options->{error_actions}}) {
+            my $postfix = @{$options->{error_options}} > 1 ? 's' : '';
+            print "Error. Got unknown option$postfix: '"
+                . (join "', '", @{$options->{error_options}})
+                . "'.\n"
+                ;
+            exit 1;
+        }
+    }
+
+    # unbuffer STDOUT
+    $|++;
+
+    my $seconds = 0;
+
+    while ($true) {
+
+        clear();
+        print_seconds($seconds);
+        if ($second2cmd{$seconds}) {
+            `$second2cmd{$seconds} 2> /dev/null &`;
+        }
+
+        sleep 1;
+        $seconds++;
+
+    }
+
+}
+main() if not caller;
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+stopwatch
+
+=head1 VERSION
+
+version 1.2.0
+
+=head1 SYNOPSIS
+
+stopwatch [options]
+
+ Options:
+
+      --run time cmd    Execute `cmd` at specified time
+      --help            Show this message
+
+=head2 Basic usage
+
+Most simple usage is just to run `stopwatch` without any options. The script
+will start counting seconds and it will output the passed time:
+
+    04:12:54
+
+To stop script use ctrl+c
+
+=head2 Timer feature
+
+You can use this script as a timer. The script can execute command at desired
+time. Here is an example:
+
+    stopwatch --run 10m "terminal-notifier -message '10 min passed'"
+
+This command will start counting seconds but when in 10 minutes after start
+it will execute the command.
+
+The `--run` options must get 2 parameters. First one is the time ('10m', '5s')
+and the second one is the command that should be run at that time. You can
+specify several `--run` options at once.
+
+=head2 Source code
+
+Project url: L<https://github.com/bessarabov/App-Stopwatch>
+
+=begin comment get_seconds_from_string
+
+    get_seconds_from_string( '3s' ); # 3
+    get_seconds_from_string( '20m' ); # 1200
+
+
+=end comment
+
+=head1 AUTHOR
+
+Ivan Bessarabov <ivan@bessarabov.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Ivan Bessarabov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

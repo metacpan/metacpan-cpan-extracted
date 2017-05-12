@@ -1,0 +1,22 @@
+---
+abstract: 'Commandline app for base64 stuff'
+author:
+  - 'Glenn Fowler <cebjyre@cpan.org>'
+build_requires:
+  Test::Cmd: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Base64
+requires:
+  App::Cmd::Setup: 0
+  MIME::Base64: 0
+  strict: 0
+  warnings: 0
+version: v0.1.0

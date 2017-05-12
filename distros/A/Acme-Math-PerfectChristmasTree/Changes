@@ -1,0 +1,8 @@
+Revision history for Acme-Math-PerfectChristmasTree
+
+0.02  Sat Dec 22 20:12:05 JST 2012
+       Fixed cause of failure to pass the test.
+
+0.01  Wed Dec 19 17:33:47 JST 2012
+       Initial release.
+

@@ -1,0 +1,89 @@
+0.805   2017-02-13
+  * New parameter to Server constructor: name. This will be used
+    to set the process name via $0 so you can see which process is
+    which in the ps(1) output.
+
+0.804   2017-02-12
+  * Bugfix for hung worker timeout not destroying object quickly
+
+0.803   2017-02-12
+  * Bugfix for timeout errors thrown by checkout with Log::Defer
+    objects installed.
+
+0.802   2015-10-23
+  * Stop using AnyEvent::Strict in the tests. It creates an
+    AE timer at compile time, therefore initializing the event
+    loop before we've had a chance to fork our server.
+  * Before forking in fork_task_server, assert that the AE
+    loop hasn't been initialized.
+
+0.801   2014-02-15
+  * Bugfix: Fix memory leak of client objects.
+  * Change: Make hung worker timeout actually terminate the
+    worker to free up resources immediately.
+
+0.800   2014-02-15
+  * Backwards-incompatible change: When multiple requests are
+    queued up on a checkout, if one of the requests throws an
+    error all the pending requests are removed from the queue.
+    This makes a non-nested sequence of method-calls on a
+    checkout less dangerous and more like the synchronous code
+    it is mimicing.
+  * Removed vestigal parts of an undocumented feature that was
+    broken several releases ago: In non-void context, methods
+    on a checkout used to return a guard that when destroyed
+    would cancel the remote method call. Instead, now you should
+    use the throw_fatal_error method on the checkout. The checkout
+    will then throw errors every time it is accessed and should
+    be discarded.
+  * Documented max_checkouts feature for coping with memory leaks
+  * Major documentation updates
+
+0.750   2013-04-08
+  * Backwards-incompatible change: The behaviour enabled by the
+    undocumented client option added in the previous release,
+    refork_after_error, is now the default behaviour. Instead
+    there is a new option called dont_refork_after_error to get
+    back the original behaviour.
+  * If log_defer_object is passed in when creating a checkout,
+    operations on this checkout are recorded as Log::Defer
+    timer events
+  * Major documentation updates, including working SYNOPSIS
+
+0.720   2013-03-14
+  * Integration with Log::Defer so workers can log stuff and
+    it shows up in the client logs
+  * Complete the implementation of worker error recovery
+  * Remove undocumented "sk" protocol feature
+  * Big test-suite refactor/improvements
+  * Lots more/better docs, including for error handling/logging
+
+0.700   2013-02-27
+  * 2 tests were missing from manifest
+  * License and github meta info
+  * Diagnostics and timeout bump in test to debug some
+    cpan-tester environments
+  * Remove MYMETA files from distribution
+  * Bugfix: Worker was using default JSON::XS settings instead
+    of utf-8 mode
+  * Add unicode test
+  * Document error handling with Callback::Frame
+  * Remove scary "the api might change" warning. I think we're
+    pretty much stable now
+  * Misc doc edits
+
+0.602   2012-12-13
+  * Exceptions in setup callback are now propagated to client
+  * Minor doc updates (more coming)
+
+0.601   2012-10-31
+  * Bugfix in surge test
+
+0.600   2012-10-09
+  * Switch version number format
+  * Fix missing dependencies
+  * New tests
+  * Allow checkouts to be aborted at any time by clients
+
+0.5.1   2012-06-18
+  * Initial release

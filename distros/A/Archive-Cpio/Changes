@@ -1,0 +1,35 @@
+0.10 Sun Nov  1 16:36:59 CET 2015
+     - new feature: create an archive from scratch (Adrien Mahieux)
+
+0.09 Mon May 30 14:05:02 CEST 2011
+     - fix cpio-filter --in-place --exclude (thanks to blino)
+       (regression introduced in 2007)
+
+0.08 Thu Jan 27 09:50:42 CET 2011
+     - fix ->remove on Archive::Cpio (rt.cpan.org #64852) (thanks to Frits/vwf and Corion)
+
+0.07 Wed Dec 19 11:45:45 CET 2007
+     - allow ->read($filehandle) and ->write($filehandle) (rt.cpan.org #31686)
+     - fix ->size on Archive::Cpio::File (rt.cpan.org #31684) (thanks to teek)
+
+0.06 Tue Apr 25 00:00:00 CET 2007
+     - handle ODC (octal) format (Mike Sliczniak)
+
+0.05 Thu Mar 15 18:34:12 CET 2007
+     - add ->add_data, ->get_file
+     - rename ->list into ->get_files
+
+0.04 Thu Mar 15 16:27:12 CET 2007
+     - bug fix release
+     - fix using STDIN which can't seek back
+
+0.03 Thu Mar 15 11:51:16 CET 2007
+     - switch to an OO API to handle different archive formats
+     - handle old binary format (only little-endian for now)
+     - add option --in-place to cpio-filter
+
+0.02 Wed Feb 28 17:10:49 CET 2007
+     - fix padding at end of generated cpio
+
+0.01 Wed Feb 28 17:10:49 CET 2007
+     - initial release

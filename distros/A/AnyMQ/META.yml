@@ -1,0 +1,35 @@
+---
+abstract: 'Non-blocking message queue system based on AnyEvent'
+author:
+  - 'Tatsuhiko Miyagawa'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyMQ
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  MooseX::Traits: 0
+requires:
+  Any::Moose: 0
+  AnyEvent: 0
+  MooseX::Traits: 0
+  MouseX::NativeTraits: 0
+  MouseX::Traits: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/clkao/AnyMQ.git
+version: 0.35

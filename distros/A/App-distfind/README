@@ -1,0 +1,140 @@
+NAME
+    App::distfind - Find Perl module distributions within a directory
+    hierarchy
+
+VERSION
+    version 1.101400
+
+SYNOPSIS
+        $ distfind
+        path/to/My-Dist path/to/My-Other-Dist
+
+        $ distfind --dir foo --dir bar --prune deprecated --line
+        foo/some/path/My-Dist
+        foo/some/other/path/My-Other-Dist
+        bar/yet/another/path/My-Shiny
+
+        $ distfind --dir baz --print-roots
+        baz
+
+        $ distfind --print-path Foo-Bar --prefix "ls -al "
+        ls -al path/to/Foo-Bar
+
+    To be able to run programs from within your development directories
+    without having to install the distributions, add this to your ".bashrc":
+
+        for i in $(distfind)
+        do
+            if [ -d $i/bin ]; then
+                PATH=$i/bin:$PATH
+            fi
+        done
+
+DESCRIPTION
+    "distfind" can find Perl module distributions in a directory hierarchy.
+    A Perl distribution in this sense is defined as a directory that
+    contains a "Makefile.PL", "Build.PL" or "dist.ini" file.
+
+FUNCTIONS
+  run
+    The main function, which is called by the "distfind" program.
+
+  normalize_dirs
+    This function takes a reference to an array of directory specifications.
+    It then normalizes them by splitting them along colon or semicolon
+    characters and filters out duplicates. Tilde characters will be expanded
+    to $ENV{HOME}. The returning list is returned as an array reference.
+
+  find_dists
+    Traverses the given directories, looks for Perl module distributions,
+    and returns a list of paths to those distribution directories. See
+    "--prune" for directories that will be pruned. Also if a Perl module
+    distribution directory is found, it is then pruned because we assume
+    that it won't recursively contain another Perl module distribution.
+
+OPTIONS
+    Options can be shortened according to "Case and abbreviations" in
+    Getopt::Long.
+
+    "--dir"
+        This option takes a string argument and can be given several times.
+        Specifies a directory that should be searched for Perl module
+        distributions. If no directories are specified, the value of
+        $ENV{PROJROOT} is added by default.
+
+    "--prune"
+        This option takes a string argument and can be given several times.
+        If a directory with this name is encountered, it will be pruned.
+
+        By default, the following directories are pruned: ".svn", ".git",
+        "blib" and "skel".
+
+    "--print-roots"
+        This option causes the directories that would be searched to be
+        printed, without actually searching them. The "--join" option is
+        used, if given. See "--dir" on how this could be different from the
+        options you gave at the command-line.
+
+    "--print-path"
+        This option takes a string argument and can be given several times.
+        It has the effect of restricting what will be printed to the given
+        distribution names. For example:
+
+            $ distfind --print-path Foo-Bar --print-path Baz
+
+        will only print paths to those distributions:
+
+            path/to/Foo-Bar path/to/Baz
+
+    "--prefix"
+        This option takes a string argument. If given, every distribution
+        path will be prefixed with this string as it is printed.
+
+    "--suffix"
+        This option takes a string argument. If given, every distribution
+        path will be suffixed with this string as it is printed.
+
+    "--join"
+        This option takes a string argument. When printing distribution
+        paths, they will be separated by this string. It defaults to a
+        single space character.
+
+    "--line"
+        Print each distribution path on a line of its own. It overrides the
+        "--join" option.
+
+    "--help"
+        Prints a brief help message and exits.
+
+    "--man"
+        Prints the manual page and exits.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=App-distfind>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see <http://search.cpan.org/dist/App-distfind/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/App-distfind/>. Instead of sending patches,
+    please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

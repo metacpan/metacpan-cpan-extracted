@@ -1,0 +1,121 @@
+[
+    { name => 'Invalid raw POST', method => 'POST',
+      cgi_url => 'http://localhost/cgi-bin/router1.cgi',
+      plack_url => 'http://localhost:8529/router',
+      plack_input => [ router_path => '/router', debug => 1, ],
+      input_content => raw_post('http://localhost/router',
+                                '{"something":"invalid":"here"}'),
+      http_status => 200, content_type => qr|^application/json\b|,
+      expected_content => 
+        q|{"action":null,"message":"ExtDirect error decoding POST data: |.
+        q|            ', or } expected while parsing object/hash,|.
+        q|             at character offset 22 (before \":\"here\"}\")'",|.
+        q| "method":null, "tid": null, "type":"exception",|.
+        q| "where":"RPC::ExtDirect::Deserialize->decode_post"}|,
+    },
+    {
+        name => 'Valid raw POST, single request', method => 'POST',
+        cgi_url  => 'http://localhost/cgi-bin/router1.cgi',
+        plack_url => 'http://localhost:8529/router',
+        plack_input => [ router_path => '/router', debug => 1, ],
+        input_content => raw_post('http://localhost/router',
+                                  '{"type":"rpc","tid":1,"action":"Foo",'.
+                                  ' "method":"foo_foo","data":["bar"]}'),
+        http_status => 200, content_type => qr|^application/json\b|,
+        expected_content
+            => q|{"action":"Foo","method":"foo_foo",|.
+               q|"result":"foo! 'bar'","tid":1,"type":"rpc"}|,
+    },
+    {
+        name => 'Valid raw POST, multiple requests', method => 'POST',
+        cgi_url  => 'http://localhost/cgi-bin/router1.cgi',
+        plack_url => 'http://localhost:8529/router',
+        plack_input => [ router_path => '/router', debug => 1, ],
+        input_content =>
+            raw_post('http://localhost/router',
+                     q|[{"tid":1,"action":"Qux","method":"foo_foo",|.
+                     q|  "data":["foo"],"type":"rpc"},|.
+                     q| {"tid":2,"action":"Qux","method":"foo_bar",|.
+                     q|  "data":["bar1","bar2"],"type":"rpc"},|.
+                     q| {"tid":3,"action":"Qux","method":"foo_baz",|.
+                     q|  "data":{"foo":"baz1","bar":"baz2",|.
+                     q|  "baz":"baz3"},"type":"rpc"}]|), 
+        http_status => 200, content_type => qr|^application/json\b|,
+        expected_content
+            => q|[{"action":"Qux","method":"foo_foo",|.
+               q|"result":"foo! 'foo'","tid":1,"type":"rpc"},|.
+               q|{"action":"Qux","method":"foo_bar",|.
+               q|"result":["foo! bar!","bar1","bar2"],"tid":2,"type":"rpc"},|.
+               q|{"action":"Qux","method":"foo_baz",|.
+               q|"result":{"bar":"baz2","baz":"baz3","foo":"baz1",|.
+               q|"msg":"foo! bar! baz!"},"tid":3,"type":"rpc"}]|,
+    },
+    {
+        name => 'Form request, no uploads', method => 'POST',
+        cgi_url  => 'http://localhost/cgi-bin/router1.cgi',
+        plack_url => 'http://localhost:8529/router',
+        plack_input => [ router_path => '/router', debug => 1, ],
+        input_content =>
+            form_post('http://localhost/router',
+                      action => '/router.cgi', method => 'POST',
+                      extAction => 'Bar', extMethod => 'bar_baz',
+                      extTID => 123, field1 => 'foo', field2 => 'bar',
+                      extType => 'rpc'),
+        http_status => 200, content_type => qr|^application/json\b|,
+        expected_content =>
+                  q|{"action":"Bar","method":"bar_baz",|.
+                  q|"result":{"field1":"foo","field2":"bar"},|.
+                  q|"tid":123,"type":"rpc"}|,
+    },
+    {
+        name => 'Form request, one upload', method => 'POST',
+        cgi_url  => 'http://localhost/cgi-bin/router2.cgi',
+        plack_url => 'http://localhost:8529/router', upload => 1,
+        plack_input => [ router_path => '/router', debug => 1, ],
+        input_content =>
+            form_upload('http://localhost/router',
+                        ['qux.txt'],
+                        action => '/router.cgi', method => 'POST',
+                        extAction => 'JuiceBar', extMethod => 'bar_baz',
+                        extTID => 7, extType => 'rpc', foo_field => 'foo',
+                        bar_field => 'bar', extUpload => 'true',),
+        http_status => 200, content_type => qr|^text/html\b|,
+        expected_content =>
+                  q|<html><body><textarea>|.
+                  q|{"action":"JuiceBar","method":"bar_baz",|.
+                  q|"result":{"bar_field":"bar",|.
+                  q|"foo_field":"foo",|.
+                  q|"upload_response":"The following files were |.
+                  q|processed:\n|.
+                  q|qux.txt application/octet-stream 29 ok\n"|.
+                  q|},"tid":7,|.
+                  q|"type":"rpc"}|.
+                  q|</textarea></body></html>|,
+    },
+    {
+        name => 'Form request, multiple uploads', method => 'POST',
+        cgi_url  => 'http://localhost/cgi-bin/router2.cgi',
+        plack_url => 'http://localhost:8529/router',
+        plack_input => [ router_path => '/router', debug => 1, ],
+        input_content =>
+            form_upload('http://localhost/router',
+                        ['foo.jpg', 'bar.png', 'script.js'],
+                        action => '/router.cgi', method => 'POST',
+                        extAction => 'JuiceBar', extMethod => 'bar_baz',
+                        extTID => 8, field => 'value', extUpload => 'true',
+                        extType => 'rpc'),
+        http_status => 200, content_type => qr|^text/html\b|,
+        expected_content =>
+                  q|<html><body><textarea>|.
+                  q|{"action":"JuiceBar","method":"bar_baz",|.
+                  q|"result":{|.
+                  q|"field":"value",|.
+                  q|"upload_response":"The following files were |.
+                  q|processed:\n|.
+                  q|foo.jpg application/octet-stream 16157 ok\n|.
+                  q|bar.png application/octet-stream 20691 ok\n|.
+                  q|script.js application/octet-stream 78 ok\n"|.
+                  q|},"tid":8,"type":"rpc"}|.
+                  q|</textarea></body></html>|,
+    },
+]

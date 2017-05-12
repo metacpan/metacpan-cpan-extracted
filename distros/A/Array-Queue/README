@@ -1,0 +1,88 @@
+NAME
+
+    Array::Queue - A simple fifo queue
+
+VERSION
+
+    version 0.1.2
+
+SYNOPSIS
+
+        my $queue = Array::Queue->new;
+        $ar->add({ id => 20 });
+        $ar->add({ id => 18 });
+        $ar->add({ id => 22 });
+    
+        while ($node = $queue->first) {
+            # do things with node
+            $queue->remove;
+        }
+
+DESCRIPTION
+
+    Array::Queue is a fairly simple First-In / First-Out queue build with
+    Moose.
+
+    Any data structure can be added to the queue and retrieved in the order
+    it was added.
+
+    Originally part of Array::Queue::Priority until I decided to break them
+    into two classes, the one dependant on the other.
+
+METHODS
+
+ add
+
+        $ar->add( 99 );
+
+    You can add any type of item to the queue.
+
+ remove
+
+        $ar->remove;
+
+    Remove the oldest item on the queue.
+
+    Returns value removed.
+
+ first
+
+        $ar->first;
+
+    Returns the first / oldest item in the queue.
+
+    Leaves the item in the queue.
+
+ queue
+
+        $ar->queue;
+
+    Reference directly the array used to store the queued items.
+
+ size
+
+        $ar->size;
+
+    How many elements are in the queue.
+
+ empty
+
+        $ar->empty;
+
+    Boolean, is queue empty?
+
+AUTHOR
+
+    Dan Burke dburke at addictmud.org
+
+BUGS
+
+    If you encounter any bugs, or have feature requests, please create an
+    issue on github. https://github.com/dwburke/perl-Array-Queue/issues
+
+    Pull requests also welcome.
+
+LICENSE AND COPYRIGHT
+
+    http://www.perlfoundation.org/artistic_license_2_0
+

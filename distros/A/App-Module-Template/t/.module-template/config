@@ -1,0 +1,30 @@
+author           = Default Author
+email            = author@example.com
+support_email    = support@example.com
+min_perl_version = 5.016
+eumm_version     = 6.63
+license_type     = artistic_2
+license_body     =<<END_OF_LICENSE
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+END_OF_LICENSE
+
+<template_toolkit>
+  PRE_CHOMP = 0
+  POST_CHOMP = 0
+  ENCODING = utf8
+  ABSOLUTE = 1
+  RELATIVE = 1
+</template_toolkit>

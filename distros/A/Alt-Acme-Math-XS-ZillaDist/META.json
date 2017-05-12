@@ -1,0 +1,56 @@
+{
+   "abstract" : "Math is HARD (faster)",
+   "author" : [
+      "Ingy döt Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alt-Acme-Math-XS-ZillaDist",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt",
+         "example",
+         "lib/Acme"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ingydotnet/acme-math-xs-pm/issues"
+      },
+      "homepage" : "https://github.com/ingydotnet/acme-math-xs-pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ingydotnet/acme-math-xs-pm.git",
+         "web" : "https://github.com/ingydotnet/acme-math-xs-pm"
+      }
+   },
+   "version" : "0.0.5"
+}
+

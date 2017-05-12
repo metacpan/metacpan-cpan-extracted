@@ -1,0 +1,10 @@
+PerlOptions +GlobalRequest
+PerlSetEnv UPLOADPROGRESS_SHARE_FILE '@ServerRoot@/logs/cache_file'
+
+PerlModule                 Apache2::UploadProgress
+PerlPostReadRequestHandler Apache2::UploadProgress
+<Location /progress>
+    SetHandler modperl
+    PerlResponseHandler Apache2::UploadProgress->progress
+</Location>
+

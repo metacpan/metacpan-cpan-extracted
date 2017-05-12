@@ -1,0 +1,13 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::Utils qw (setpag);
+
+my $ok = setpag;
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "ok = $ok\n"; }
+
+system "tokens";

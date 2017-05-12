@@ -1,0 +1,77 @@
+Revision history for Perl extension App::MusicExpo.
+
+1.002001 2016-10-29T00:25+01:00
+ - Fix t/musicexpo-cache.t for systems with MP4::Info (RT #118534)
+
+1.002 2016-10-22T18:40+01:00
+ - Make all tag parsing libraries optional ("recommends" in META.json)
+ - Don't die when fed unrecognised files (ignore them instead)
+ - Mark as stable
+
+1.001_001 2016-08-20T10:38-04:00
+ - Implement opus using Audio::Opusfile
+ - Next stable version should make all tag parsing libraries optional
+
+1.001_000 2016-07-22T23:39-04:00
+ - Implement opus badly (by calling opusinfo)
+ - Next version should use libopusinfo
+
+1.000 2016-05-21T18:40+01:00
+ - Make perlcritic happy and add perlcritic test
+ - Mark as stable
+
+0.006 2015-08-02T01:05+03:00
+ - Use fragments for music player to allow linking
+ - Fix caching
+ - Work with raw bytes instead of UTF-8
+ - Replace MP3::Tag with MP3::Info
+ - Simplify code and tests
+
+0.005 2015-04-02T22:51+03:00
+ - Add a javascript player
+ - Add example CSS
+ - Drop JSON
+ - Drop taint mode
+ - Update the default template
+
+0.004 2014-10-25T15:20+03:00
+ - Add MP4 support
+ - Use tags from all versions of a file, not just from the first one
+
+0.003003 2014-09-07T00:56+03:00
+ - Switch to JSON::MaybeXS
+ - Handle UTF-8 correctly
+
+0.003002 2014-08-17T02:05+03:00
+ - CPAN Day cleanup release
+ - Improve musicexpo POD
+ - Set POD encoding to utf-8
+ - Reindent and refactor Makefile.PL
+ - Update README
+ - Update copyright years
+
+0.003001 2014-01-02T12:33:11
+ - Make empty.ogg longer (RT #91794 and #43693)
+ - Add SIGN => 1 to Makefile.PL
+ - Add repository and dynamic_config: 0 to META
+ - Convert changelog to CPAN::Changes format
+
+0.003 2013-09-03
+ - Support OGG Vorbis
+ - Group files with same basename
+ - URL-escape filenames
+
+0.002 2013-08-18T10:41:44+03:00
+ - Depend on less modules
+ - Move default format inside the module
+ - Do not cache by default
+ - Change musicexpo's command-line arguments
+ - Depend on a newer MP3::Tag
+ - Write more tests
+
+0.001001 2013-06-18
+ - Add EXE_FILES, MIN_PERL_VERSION
+ - Depend on DB_File
+
+0.001 2013-06-17
+ - Initial release

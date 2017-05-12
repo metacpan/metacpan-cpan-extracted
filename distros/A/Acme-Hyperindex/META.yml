@@ -1,0 +1,12 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Acme-Hyperindex
+version:      0.12
+version_from: lib/Acme/Hyperindex.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    Filter::Simple:                0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

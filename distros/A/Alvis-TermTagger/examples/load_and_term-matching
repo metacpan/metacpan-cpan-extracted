@@ -1,0 +1,17 @@
+#!/usr/bin/perl -w
+
+
+use strict;
+use warnings;
+
+require Alvis::TermTagger;
+
+my $corpus = "corpus";
+my $termlist = "term+lem+semtaglist";
+my $selected_term_list = "selected-terms";
+
+Alvis::TermTagger::termtagging($corpus, $termlist, $selected_term_list);
+
+
+warn "List of the selected terms in $selected_term_list\n";
+

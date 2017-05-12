@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ENTITY AUTHOR  "Alex Peeters">
+<!ENTITY PURPOSE "2009/09/29, DTD schema v1.2 for Monitoring by XML">
+
+<!ELEMENT MonitoringXML (Monitoring)>
+<!ELEMENT Monitoring (Schema, Results+)>
+<!ELEMENT Schema EMPTY>
+<!ATTLIST Schema
+	Value CDATA #FIXED "1.2"
+>
+<!ELEMENT Results (Details, ErrorDetail?, ErrorStack?, SubResults*, Extension?)>
+<!ELEMENT Details (#PCDATA)>
+<!ATTLIST Details
+	Host CDATA #REQUIRED
+	Service CDATA #REQUIRED
+	Environment (PROD | TEST | ACC | DEV | SIM | LOCAL) #REQUIRED
+	Date CDATA #REQUIRED
+	Time CDATA #REQUIRED
+	Epochtime CDATA #REQUIRED
+	Status (0 | 1 | 2 | 3 | 4) #REQUIRED
+	StatusMessage CDATA #REQUIRED
+	PerfData CDATA #IMPLIED
+>
+<!ELEMENT ErrorDetail (#PCDATA)>
+<!ELEMENT ErrorStack (#PCDATA)>
+<!ELEMENT SubResults (SubDetails, SubErrorDetail?, SubErrorStack?)>
+<!ELEMENT SubDetails (#PCDATA)>
+<!ATTLIST SubDetails
+	Host CDATA #REQUIRED
+	Service CDATA #REQUIRED
+	Environment (PROD | TEST | ACC | DEV | SIM | LOCAL) #REQUIRED
+	Date CDATA #REQUIRED
+	Time CDATA #REQUIRED
+	Epochtime CDATA #REQUIRED
+	Status (0 | 1 | 2 | 3 | 4) #REQUIRED
+	StatusMessage CDATA #REQUIRED
+	PerfData CDATA #IMPLIED
+>
+<!ELEMENT SubErrorDetail (#PCDATA)>
+<!ELEMENT SubErrorStack (#PCDATA)>
+<!ELEMENT Extension (Element+)>
+<!ELEMENT Element (#PCDATA)>
+<!ATTLIST Element
+	eName CDATA #REQUIRED
+	eDescription CDATA #REQUIRED
+	eType (INTEGER | FLOAT | STRING | ARRAY | HASH | XML | BLOB) #REQUIRED
+	eFormat CDATA #IMPLIED
+	eValue CDATA #REQUIRED
+	ePerfData CDATA #IMPLIED
+>
+<!ELEMENT eName (#PCDATA)>
+<!ELEMENT eDescription (#PCDATA)>
+<!ELEMENT eType (#PCDATA)>
+<!ELEMENT eValue (#PCDATA)>
+<!ELEMENT ePerfData (#PCDATA)>

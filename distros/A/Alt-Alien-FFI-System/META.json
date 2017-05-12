@@ -1,0 +1,75 @@
+{
+   "abstract" : "Simplified alternative to Alien::FFI that uses system libffi",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alt-Alien-FFI-System",
+   "no_index" : {
+      "file" : [
+         "lib/Alien/FFI.pm"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IPC::Cmd" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Suite" : "0.000060",
+            "Test::Alien" : "0",
+            "Test::More" : "0.94",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Alt-Alien-FFI-System/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Alt::Alien::FFI::System",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Alt-Alien-FFI-System.git",
+         "web" : "https://github.com/plicease/Alt-Alien-FFI-System"
+      }
+   },
+   "version" : "0.16",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+}
+

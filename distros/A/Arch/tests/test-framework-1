@@ -1,0 +1,62 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Test::Framework methods.
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More;
+use Arch::Util qw(is_tla_functional);
+
+plan skip_all => "No functional arch backend" unless is_tla_functional;
+plan tests => 17;
+
+use_ok("Arch::Test::Framework");
+
+my $arch_user = 'Arch Test';
+my $arch_uid  = 'arch-test@my.place';
+my $arch_id = "$arch_user <$arch_uid>";
+
+my $fw = Arch::Test::Framework->new(userid => $arch_id);
+
+isa_ok($fw, 'Arch::Test::Framework', 'environment');
+
+my $home = $fw->home_dir;
+my $len  = length $home;
+
+ok(-d $home,                'environment home exists');
+ok(-d "$home/.arch-params", 'environment has arch-params');
+
+isnt($home, $ENV{HOME},     'environment home is not user home');
+
+is($fw->arch_uid,                  $arch_uid, 'arch uid correctly set');
+is($fw->run_tla('my-id', '--uid'), $fw->arch_uid, 'arch uid correctly set');
+
+my $local_uid = `tla my-id --uid`;
+chomp $local_uid;
+
+isnt($local_uid, $fw->arch_uid, 'correctly uses new home directory');
+
+ok(-d $fw->library_dir,                       'library dir exists');
+is(substr($fw->library_dir, 0, $len),  $home, 'library dir is in home');
+ok(-d $fw->archives_dir,                      'archives dir exists');
+is(substr($fw->archives_dir, 0, $len), $home, 'archives dir is in home');
+ok(-d $fw->trees_dir,                         'trees dir exists');
+is(substr($fw->trees_dir, 0, $len),    $home, 'trees dir is in home');
+
+my $ar1 = $fw->make_archive;
+
+isa_ok(
+	$ar1,
+	'Arch::Test::Archive',
+	'make_archive creates Arch::Test::Archive'
+);
+
+isnt(
+	$fw->run_tla('whereis-archive', $ar1->name),
+	'',
+	'make_archive registers archive'
+);
+
+my $ar2 = $fw->make_archive;
+isnt($ar1->name, $ar2->name, 'make_archive generates unique archive names');

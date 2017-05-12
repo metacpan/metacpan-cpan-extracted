@@ -1,0 +1,91 @@
+Audio::DSP - Perl interface to *NIX digital audio device
+
+Version 0.02
+
+Description
+
+    Audio::DSP is built around the OSS (Open Sound System) API and allows
+    perl to interface with a digital audio device. The Audio::DSP object
+    stores I/O parameters and also supplies temporary storage for raw
+    audio data.
+
+Requirements
+
+    In order to use Audio::DSP, you'll need to have the necessary OSS 
+    drivers/includes installed. OSS is available for many popular Unices,
+    and a GPLed version (with which this extention was developed and 
+    tested) is distributed with with the Linux kernel. See "See Also"
+    below for relevant URLs.
+
+Download
+
+    The latest version may be downloaded from the Audio::DSP homepage:
+        http://www.pdamusic.com/computer/audio-dsp.html
+
+Installation
+
+    The usual.
+
+    perl Makefile.PL
+    make
+    make test (optional)
+    make install
+
+    NOTE: If for some reason the tests fail, it may be because the options
+    specified in the tests are not compatible with your soundcard. I've
+    used "lowest common denominator" settings (8 bit unsigned, 8 kHz 
+    mono), but they may not be so "common" to your soundcard. :-) In which
+    case (if you know what you're doing) you may modify or simply skip the
+    tests and do what you will...
+
+To Do / Suggestion for Data Manipulation Extentions
+
+    In keeping with purpose, I have not included any methods for data
+    manipulation in the Audio::DSP extension (the Audio::DSP object
+    provides storage for raw audio data read from the device, but that is
+    all). It would, however, be nice to implement a suite of modules for
+    the purpose of data manipulation (converting the data to common audio
+    file formats, filtering, etc.). I would suggest a sort of shared
+    "audio data object," to be passed between classes, containing the raw 
+    audio data as well as a few necessary paramters. A hash reference
+    looking something like:
+
+        {
+            data     => 'gobbledegook',
+            format   => 16,
+            rate     => 44100,
+            channels => 2,
+        }
+
+    would probably suffice. Let me know if this is something on which
+    you'd be interested in collaborating.
+
+Author
+
+    Seth David Johnson
+    seth@pdamusic.com
+
+Copyright
+
+    Copyright (c) 1999-2000 Seth David Johnson. All Rights Reserved. This
+    program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.
+
+See Also
+
+    Open Sound System homepage
+        http://www.opensound.com/
+
+    Open Sound System - Audio programming
+        http://www.opensound.com/pguide/audio.html
+
+    A GPLed version of OSS distributed with the Linux kernel was used in
+    the development of Audio::DSP. See "The Linux Sound Subsystem":
+
+        http://www.linux.org.uk/OSS/
+
+    For those curious, the Advanced Linux Sound Architecture (ALSA) API
+    should remain compatible with the OSS API on which this extension is
+    built. ALSA homepage:
+
+        http://www.alsa-project.org/

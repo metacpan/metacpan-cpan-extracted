@@ -1,0 +1,31 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/App-Nopaste-Service-Linode/",
+      "repository" : "http://github.com/avar/app-nopaste-service-linode",
+      "bugtracker" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-Nopaste-Service-Linode",
+      "license" : "http://dev.perl.org/licenses/",
+      "Ratings" : "http://cpanratings.perl.org/d/App-Nopaste-Service-Linode"
+   },
+   "no_index" : {},
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "0.06",
+   "name" : "App-Nopaste-Service-Linode",
+   "author" : [
+      "\u00c3\u0086var Arnfj\u00c3\u00b6r\u00c3\u00b0 Bjarmason <avar@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "requires" : {
+      "App::Nopaste::Service::AnyPastebin" : "0.02",
+      "App::Nopaste" : "0.19"
+   },
+   "abstract" : "L<App::Nopaste> interface to L<http://p.linode.com>",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

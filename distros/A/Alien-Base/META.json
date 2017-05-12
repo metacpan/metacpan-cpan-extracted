@@ -1,0 +1,68 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Joel A. Berger <joel.a.berger@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-Base",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "corpus",
+         "maint"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.17",
+            "FFI::CheckLib" : "0.11",
+            "File::ShareDir" : "0",
+            "JSON::PP" : "0",
+            "Text::ParseWords" : "3.26",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::chdir" : "0.1005",
+            "Test2::Suite" : "0.000060",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/Perl5-Alien/Alien-Base/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Alien::Base",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/Perl5-Alien/Alien-Base.git",
+         "web" : "http://github.com/Perl5-Alien/Alien-Base"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native",
+      "x_MailingList" : "https://groups.google.com/forum/#!forum/perl5-alien"
+   },
+   "version" : "0.041",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

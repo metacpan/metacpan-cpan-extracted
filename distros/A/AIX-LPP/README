@@ -1,0 +1,78 @@
+AIX::LPP Version 0.5 alpha
+=========================
+
+DISCLAIMER & COPYRIGHT
+----------------------
+
+Copyright (c) 2002 Chuck Ritter
+
+You may distribute under the terms of either the GNU General Public License
+or the Artistic License, as specified in the Perl README file, with the
+exception that it cannot be placed on a CD-ROM or similar media for commercial
+distribution without the prior approval of the author.
+
+This code is provided with no warranty of any kind, and is used entirely at
+your own risk.
+
+This code was written by the author as a private individual, and is in no way
+endorsed or warrantied by IBM.
+
+WHAT IS IT?
+-----------
+This set of modules provides AIX-specific functionality, related to obtaining
+and manipulating configuration information from the Operating System and LPP
+packages.
+
+The following module is provided:
+AIX::LPP::lpp_name
+Parses and writes lpp_name package configuration files.
+(a future enhancement will add content validation)
+
+The following module is under development:
+AIX::LPP.pm
+Provide an abstration layer to related AIX::LPP components, and read
+and report *installed* package information.
+
+Other modules are under consideration.
+
+PREREQUISITES
+-------------
+1.  Perl 5.005_62 or later (earlier versions untested)
+2.  AIX 4.3 (AIX 5L is untested)
+
+INSTALLATION
+------------
+1.  Check you have all the prequisites installed and working.
+2.  Run 'perl Makefile.PL && make test'
+3.  If successful, run 'make install'
+
+HOW TO USE
+----------
+
+    use AIX::LPP::lpp_name;
+
+    $x = lpp_name->new();
+    $x->lpp(NAME => 'test.lpp',TYPE => 'I',PLATFORM => 'R',FORMAT => '4');
+    $x->fileset('test.lpp.rte', VRMF => '1.0.0.0',DISK => '01',BOSBOOT => 'N',
+         CONTENT => 'I', LANG => 'en_US', DESCRIPTION => 'test.lpp description',
+         COMMENTS => '');
+    my @reqs = [ ['*prereq','bos.rte','4.3.3.0'] ];
+    $x->requisites('test.lpp.rte', \@reqs);
+    my %sizes = { '/usr' => '5', '/etc' => '1' };
+    $x->sizeinfo('test.lpp.rte', \%sizes);
+    $x->write(\*out_fh);
+
+    or
+
+    $x = lpp_name->read(\*in_fh);
+    my %lppdata = $x->lpp();
+    my %fsdata = $x->fileset('test.lpp.rte');
+    my $req_ref = $x->requisites('test.lpp.rte');
+    my $size_ref = $x->sizeinfo('test.lpp.rte');
+
+    Read the installp manpage and the IBM LPP package format documentation
+    for more detail. The use maintained lppbuild package is also a good
+    source of documentation.
+
+
+Support questions and suggestions can be directed to critter@aixadm.org

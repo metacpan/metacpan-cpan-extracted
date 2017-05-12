@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               AI-Termites
+version:            0.02
+abstract:           Artificial termites simulation
+author:
+    - Salvador Fandino <sfandino@yahoo.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Math::nSphere:        0.01
+    Math::Vector::Real:   0.06
+    Math::Vector::Real::kdTree:  0.03
+    Math::Vector::Real::MultiNormalMixture:  0.01
+    Math::Vector::Real::Random:  0.02
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

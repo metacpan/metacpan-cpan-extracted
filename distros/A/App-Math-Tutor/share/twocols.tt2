@@ -1,0 +1,106 @@
+[%- MACRO Content BLOCK -%]
+\documentclass[a4paper,10pt,final]{article}
+\usepackage{a4wide}
+\usepackage[a4paper,tmargin=1cm,lmargin=2.5cm,rmargin=1cm,includehead,includefoot,headheight=1cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{layouts} % for layout analyse
+
+%\usepackage[math]{cellspace}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{eurosym}
+
+% for multipage tables (xtab or longtable
+\usepackage{xtab}
+\usepackage{longtable}
+\usepackage{lscape}
+
+% for publication quality tables (Meyrin theme, the default)
+\usepackage{booktabs}
+% for the NYC theme
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{xcolor}
+
+\usepackage[tableposition=top]{caption}
+
+%\usepackage{german}   % for ß etc
+\usepackage{nextpage}
+\usepackage{url}
+\usepackage{helvet}
+\usepackage{hyperref}
+\usepackage{textcomp}
+\usepackage{fancybox}
+\usepackage{fancyhdr}  % \[lcr](head|foot)
+\setlength{\headheight}{71pt}
+\pagestyle{fancy}
+
+\rfoot{Jens Rehsack <rehsack@cpan.org>}
+\lfoot{App::Math::Tutor}
+
+\setcounter{secnumdepth}{4}
+\usepackage{natbib}
+
+[% usepkgs = [];
+   FOREACH pkg IN exercises.usepackages ;
+     usepkg = "\\usepackage{${pkg}}";
+     usepkgs.push( usepkg );
+   END;
+   usepkgs.join("\n");
+%]
+[% exercises.headeritems.join("\n"); -%]
+
+\begin{document}
+
+%\addtolength\cellspacetoplimit{5pt}
+%\addtolength\cellspacebottomlimit{5pt}
+
+\renewcommand{\baselinestretch}{1.5}
+
+\small\normalsize
+
+\section{[% exercises.section %]}
+
+[% Latex.table( caption = exercises.caption,
+		label = exercises.label,
+		header = exercises.header,
+		left = 1,
+		data = exercises.challenges,
+		type = 'longtable',
+		coldef = 'p{8cm}|p{8cm}',
+#		eor = '\\\\[0.8em]',
+ 		fontsize = 'footnotesize',
+	      )
+-%]
+
+\newpage
+
+\section{Solution: [% exercises.section %]}
+
+[% Latex.table( caption = "Solution $exercises.caption",
+		label = "solution$exercises.label",
+		header = exercises.header,
+		left = 1,
+		data = exercises.solutions,
+		type = 'longtable',
+		coldef = 'p{8cm}|p{8cm}',
+#		eor = '\\\\[0.8em]',
+ 		fontsize = 'footnotesize',
+	      )
+-%]
+
+\end{document}
+[%- END -%]
+[%- UNLESS output.defined('format') -%]
+[%-   output.format = "pdf" -%]
+[%- END -%]
+[% USE Latex -%]
+[% IF output.format == "tex" -%]
+[%   Content() %]
+[% ELSE %]
+[%   FILTER latex(format="${output.format}") -%]
+[%     Content() %]
+[%   END -%]
+[% END -%]

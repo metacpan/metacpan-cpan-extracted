@@ -1,0 +1,31 @@
+NAME
+    App::podify - Add POD to your modules
+
+VERSION
+    0.03
+
+SYNOPSIS
+      # Print processed module to STDOUT
+      $ podify lib/My/Module.pm
+
+      # Replace module
+      $ podify -i lib/My/Module.pm
+
+      # Process all files in the lib/ directory
+      $ podify -i lib/
+
+      # Process all files in the lib/ directory recursively
+      $ podify -r -i lib/
+
+DESCRIPTION
+    App::podify is an application which can help you document your module.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014, Jan Henning Thorsen
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+

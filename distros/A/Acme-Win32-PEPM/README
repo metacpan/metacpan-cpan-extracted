@@ -1,0 +1,28 @@
+Acme-Win32-PEPM version 0.01
+==================
+
+A unique packager for Win32 to turn your XS .dll+.pm into being simultaneously
+a .pm and .dll on disk, without any temp files created.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  File::Slurp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Daniel Dragan <bulkdd@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.21.6 or,
+at your option, any later version of Perl 5 you may have available.

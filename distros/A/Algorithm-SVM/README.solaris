@@ -1,0 +1,38 @@
+We have been alerted to some differences in how different Perl releases
+build modules under Solaris depending if one uses the Sun distribution
+or builds it from source using GNU gcc.
+
+For this reason we've created some instructions that seem to work for
+both cases, if you experience any problems please email us and let us
+know the source of your perl distribution.   
+
+Installation of the Algorithm::SVM module is then as follows:
+
+   perl Makefile.PL.solaris
+
+You will then need to edit the resulting Makefile, search for the
+word 'static' and find the sections titled "MakeMaker static section"
+and "MakeMaker static_lib section." 
+
+Comment out the lines which under each of these sections should look
+something like: 
+# --- MakeMaker static section:
+
+## $(INST_PM) has been moved to the all: target.
+## It remains here for awhile to allow for old usage: "make static"
+#static :: Makefile $(INST_STATIC) $(INST_PM)
+static :: Makefile $(INST_STATIC)
+        @$(NOOP)
+
+# --- MakeMaker static_lib section:
+
+$(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)/.exists
+        $(RM_RF) $@
+        $(FULL_AR) $(AR_STATIC_ARGS) $@ $(OBJECT) && $(RANLIB) $@
+        $(CHMOD) $(PERM_RWX) $@
+        @echo "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)/extralibs.ld
+
+Then continue with: 
+   make
+   make test
+   make install

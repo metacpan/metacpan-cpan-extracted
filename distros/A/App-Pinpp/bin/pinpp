@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+use 5.010;
+use strict;
+use warnings;
+use App::Pinpp;
+
+# PODNAME: pinpp
+# ABSTRACT: Pinpoint pre-processor
+our $VERSION = '0.03'; # VERSION: Thanks for filling this in, Dist::Zilla! <3
+
+# We're just a wrapper around our library.
+# Exit with whatever status code it tells us to use.
+exit ( App::Pinpp->run(@ARGV) );
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pinpp - Pinpoint pre-processor
+
+=head1 VERSION
+
+version 0.03
+
+=head1 SYNOPSIS
+
+    $ pinpp mytalk.pinpp > mytalk.pin
+
+=head1 DESCRIPTION
+
+This is a pre-processor for pinpoint, a presentation tool that uses text-based files as input.
+It will read a file, process any special directives (see below) inside it, and write the output
+on stdout.
+
+=head2 SYNTAX
+
+=head3 @include 
+
+    @include <autonomous-vehicles.pin>
+
+One of the main uses for C<pinpp> is to allow various topic arcs to be included in a larger
+one. By default, the C<topics/> directory will be searched for these files, but this can be
+modified by passing an argument to the C<-I> switch.
+
+=head3 code blocks
+
+Any slide for which all lines are indented (or blank) and which does not have any existing styles
+applied to it will be formatted as a code block, forcing the text to be left-aligned and the
+font to be monospaced.
+
+=head2 EXAMPLES
+
+https://github.com/pjf/future-is-awesome is an example talk using pinpoint and pinpp.
+
+=head1 AUTHOR
+
+Paul Fenwick <pjf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Paul Fenwick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,82 @@
+0.11    2017-01-09 (PERLANCAR)
+
+	- [Bugfix] Forgot to set result when parsing with DTF:Alami.
+
+	- Replace code to check for installed module from using
+	  Module::Path::More to using Module::Installed::Tiny (works with
+	  fatpacked/datapacked scripts).
+
+
+0.10    2016-07-10 (PERLANCAR)
+
+        - parse-date, parse-duration: Add option --all-modules (-a) to parse
+          dates/durations with all installed modules.
+
+
+0.09    2016-06-29 (PERLANCAR)
+
+	- Add utility: parse-date-using-df-flexible.
+
+	- Show error message from DateTime::Format::Natural on parsing
+	  failure.
+
+	- Mention dateparse.
+
+	- Add more examples.
+
+
+0.08    2016-06-29 (PERLANCAR)
+
+	- Add examples.
+
+	- Add utility: parse-duration-using-df-natural.
+
+
+0.07    2016-06-29 (PERLANCAR)
+
+	- [Removed] Remove parse-duration-using-df-duration because parsing
+          duration with DateTime::Format::Duration requires predefining format
+          string.
+
+        - Add utilities parse-duration-using-df-alami-{en,id}.
+
+        - [Bugfix] Typo caused parsing date with DateTime::Format::Natural
+          always considered failed.
+
+
+0.06    2016-06-28 (PERLANCAR)
+
+	- parse-date-using-df-alami-*: Show matched pattern.
+
+
+0.05    2016-06-19 (PERLANCAR)
+
+	- Add CLIs: parse-date-using-df-alami-{en,id}.
+
+	- Update Rinci metadata (coerce_from -> coerce_rules,
+	  Data::Sah::Coerce 0.011).
+
+
+0.04    2016-05-20 (PERLANCAR)
+
+	- Add scripts: dateconv, durconv.
+
+
+0.03    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+
+0.02    2015-09-23 (PERLANCAR)
+
+	- [dist] Autogenerate scripts.
+
+	- Add two convenient CLI scripts: parse-date-using-df-natural,
+          parse-duration-using-df-duration.
+
+
+0.01    2015-09-23 (PERLANCAR)
+
+        - First release.

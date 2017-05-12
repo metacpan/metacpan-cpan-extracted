@@ -1,0 +1,6 @@
+improve the parsing routine to handle multiple filesets per package
+add validation()
+add defaults() ?
+add object classes for handling other package data: post_i, odmadd,
+	copywrite, etc.
+add methods to store/query *installed* package info

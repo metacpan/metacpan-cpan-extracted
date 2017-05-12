@@ -1,0 +1,46 @@
+Aspose.BarCode Cloud SDK for Perl
+================================
+
+This repository contains Aspose.BarCode Cloud SDK for Perl source code. This SDK allows you to work with Aspose.BarCode Cloud REST APIs in your perl applications quickly and easily. 
+
+How to use the SDK?
+===================
+
+The complete source code is available in this repository folder. For more details, please visit our documentation website (http://www.aspose.com/docs/display/barcodecloud/How+to+Setup+Aspose.BarCode+Cloud+SDK+for+Perl).
+
+Quick SDK Tutorial
+==================
+
+use lib 'lib';
+use strict;
+use warnings;
+use File::Slurp; # From CPAN
+
+use AsposeBarCodeCloud::BarcodeApi;
+use AsposeBarCodeCloud::ApiClient;
+use AsposeBarCodeCloud::Configuration;
+
+$AsposeBarCodeCloud::Configuration::app_sid = 'XXX';
+$AsposeBarCodeCloud::Configuration::api_key = 'XXX';
+
+$AsposeBarCodeCloud::Configuration::debug = 1;
+
+#Instantiate Aspose.BarCode API SDK
+my $barcodeApi = AsposeBarCodeCloud::BarcodeApi->new();
+
+my $data_path = '../data/';
+
+#set input file name
+my $name = 'sample-barcode';
+my $text = 'Aspose.BarCode for Cloud';
+my $type = 'datamatrix';
+my $format = 'png';
+
+#invoke Aspose.BarCode Cloud SDK API to create barcode and save image to a stream           
+my $response = $barcodeApi->GetBarcodeGenerate(text => $text, type => $type, format => $format);
+
+if($response->{'Status'} eq 'OK'){
+	#download generated barcode from api response 
+	my $output_file = 'C:/temp/'. $name . '.' . $format;	
+	write_file($output_file, { binmode => ":raw" }, $response->{'Content'});
+}

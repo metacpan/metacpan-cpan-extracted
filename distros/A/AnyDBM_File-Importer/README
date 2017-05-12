@@ -1,0 +1,16 @@
+AnyDBM_File::Importer - Import DBM package symbols when using AnyDBM_File
+
+AnyDBM_File::Importer can be used to import the likes of $DB_BTREE, R_DUP,
+and other symbols from *DB*_File DBMs. It is required to use the Berkeley
+DB API emulation provided in SQLite_File.
+
+Thanks for downloading!
+
+To install, simply: 
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+EOT

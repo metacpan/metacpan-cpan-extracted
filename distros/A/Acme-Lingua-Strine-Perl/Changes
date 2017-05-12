@@ -1,0 +1,21 @@
+Revision history for Perl extension Acme::Lingua::Strine::Perl.
+
+
+0.54  Fri Feb 07 10:30:16 2003
+	- Damian's name has been spelt wrong all this time :(
+
+
+0.52  Tue Oct 30 14:25:08 2001
+       - whoops, no prerequisites
+
+0.51  Sat Aug 04 13:45:10 2001
+	- *cough* name changed to Strine on instructions from
+          some irate Aussies 
+
+0.5   Fri Aug 03 11:53:08 2001
+	- finally uploaded to CPAN
+ 
+0.01  Tue Jul 24 03:41:48 2001
+	- original version; created by h2xs 1.20 with options
+		-X Acme::Lingua::Strian::Perl
+

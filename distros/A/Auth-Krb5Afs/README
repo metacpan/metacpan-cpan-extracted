@@ -1,0 +1,60 @@
+NAME
+    Auth::Krb5Afs - get Krb5 and OpenAFS tokens
+
+SYNOPSIS
+     use Auth::Krb5Afs;
+     my ($err, $pwent) = Auth::Krb5Afs->authenticate($user, $pass);
+
+DESCRIPTION
+    invokes kinit and aklog to get Kerberos 5 and OpenAFS tickets
+
+METHODS
+    $auth = Auth::Krb5Afs->new();
+        Create a new instance. You could also use
+        Auth::Krb5Afs->authenticate() without an instance variable.
+
+    ($err, $pwent) = $auth->authenticate($user, $pass);
+        invokes "kinit" and "aklog" to get krb5 and afs tokens. By default,
+        the krb5 ticket is good for 20 minutes, renewable up to 10 hours.
+
+        If successful, sets the USER, HOME, and SHELL environment variables,
+        the current uid and gid, and chdirs to HOME.
+
+        In an array context, returns an array ref to the result from
+        getpwuid($afs_uid).
+
+        In a scalar context, returns error strings in a hash like
+        $err->{pass} = "unknown user or wrong password";
+
+TESTING
+    The bin/authkrb5afs program behaves like one of courier's authlib
+    modules. It reads password etc from file descriptor 3, then invokes the
+    rest of its command line as the user.
+
+     printf 'imap\nlogin\ntest_user\ntest_pass\n' | 
+     KRB5CCNAME=/tmp/t$RANDOM.krb5cc authkrb5afs klist 3<&1
+
+AUTHOR
+     Noel Burton-Krahn <noel@bkbox.com>
+     Dec 14, 2002
+
+SEE ALSO
+    kinit(1), alog(1), authlib(7), Apache::AuthKrb5Afs(3)
+
+COPYRIGHT
+    Copyright (C) 2003 Noel Burton-Krahn <noel@bkbox.com>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+

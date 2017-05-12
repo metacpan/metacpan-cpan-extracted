@@ -1,0 +1,45 @@
+Astro::WaveBand
+===============
+
+This module provides transparent conversion of astronomical filter
+names to wavelength and frequency and vice versa.  For example it
+knows the wavelengths of the J, H and K near-infrared filters or the
+filter names of the SCUBA submm camera.
+
+This software is still in alpha release. It's been used in my
+applications but there may be some future API tweaks required as more
+telescopes/instruments are included.
+
+Requirements
+------------
+
+No other modules are required.
+Requires Perl 5.6.0 or newer.
+
+Limitations
+-----------
+
+Currently the instrument specific knowledge only covers instruments
+at the UKIRT and JCMT telescopes. Please send more instrument details.
+
+Building
+--------
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+Author
+------
+
+This module was written by Tim Jenness <t.jenness@jach.hawaii.edu> and
+Brad Cavanagh of the Joint Astronomy Centre. Some static functions added
+by Alasdair Allan <aa@astro.ex.ac.uk> to support his work on the eSTAR
+Project. Tim Lister added support for Las Cumbres telescopes.
+
+Copyright 2007,2008,2010,2012-2014 Science and Technology Facilties Council.
+Copyright (C) 2001-2007 Particle Physics and Astronomy Research Council.
+All Rights Reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+

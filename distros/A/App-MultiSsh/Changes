@@ -1,0 +1,127 @@
+Revision history for App-MultiSsh
+
+0.19   2016-03-06
+        Updating for release of version 0.19
+        Fixed spelling (Ivan Wills)
+        Fixed manifest (Ivan Wills)
+        Fixed extra bracket (Ivan Wills)
+        VTide config (Ivan Wills)
+        Removing unsupported perl version from travis (Ivan Wills)
+        Fixing options (Ivan Wills)
+        Made verbose a little better (Ivan Wills)
+        Updated date (Ivan Wills)
+        Added TODO file (Ivan Wills)
+
+0.18   2015-11-21
+        Updating for release of version 0.18
+        Adds default size to tmux panes to avoid errors with too many hosts (Mark Grimes)
+
+0.17   2015-10-14
+        Updating for release of version 0.17
+        Removed interleaving from todo (Ivan Wills)
+        Added colouring host prefix (Ivan Wills)
+        Removed old exec (Ivan Wills)
+        Added new dependency (Ivan Wills)
+        Added prefixing interleaved lines with the host it's from (Ivan Wills)
+        Added a list of things todo (Ivan Wills)
+
+0.16   2015-10-11
+        Updating for release of version 0.16
+        Fixed clusterssh command support (Ivan Wills)
+        Added more diagnostics of missing cssh/tmux (Ivan Wills)
+        Fixed documentation and workings (Ivan Wills)
+        Fixed tests (Ivan Wills)
+        Added default synchronize panes option (Ivan Wills)
+
+0.15   2015-10-04
+        Updating for release of version 0.15
+        Improving how mscp works so it can use groups (Ivan Wills)
+
+0.14   2015-09-27
+        Updating for release of version 0.14
+        Added documentation (Ivan Wills)
+        Added documentation about --groups (Ivan Wills)
+        New dependency added (Ivan Wills)
+        Added option to specify a list of groups from the config file (Ivan Wills)
+        Added 2 new functions config (which gets config from ~/.mssh) and get_groups which returns a list of hosts from a list of groups (Ivan Wills)
+        Fixed description of mscp (Ivan Wills)
+        More documentation (Ivan Wills)
+        Fixed version number (Ivan Wills)
+
+0.13   2015-09-11
+        Updating for release of version 0.13
+        Upped the mnimum perl version to match features used (Ivan Wills)
+        Fixed warning about uninitialised (Ivan Wills)
+        Implemented --fork (Ivan Wills)
+        Cleaned up help (Ivan Wills)
+
+0.12   2015-08-15
+        Updating for release of version 0.12
+        Removed creation of makefile (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.11   2015-06-01
+        Updating for release of version 0.11
+        Switched from Test::NoWarnings to Test::Warnings (Ivan Wills)
+        Switched from Test::NoWarnings to Test::Warnings (Ivan Wills)
+        Fixed load test (Ivan Wills)
+        Fixed LICENSE (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+        Fixed boilerplate test (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Fixed POD, added build/coverage badges (Ivan Wills)
+        Coverted README to POD (Ivan Wills)
+        New command for sending file(s) to multiple servers (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+        Fixed whitespace (Ivan Wills)
+        Fixed issue with getopt long syntax (Ivan Wills)
+
+0.10   2015-01-03
+        Updating for release of version 0.10
+        Changed dependency of Path::Class to Path::Tiny, stopped shelling out to which (Ivan Wills)
+        Updated LICENSE details (Ivan Wills)
+        Improving tmux support and documentation (Ivan Wills)
+        Fixed test work with synch rules (Ivan Wills)
+        Added synchronising pages only when a command is being run (Ivan Wills)
+        Fixed not running with --tmux option (Ivan Wills)
+        Added missing command documentation (Ivan Wills)
+        Cleaned up test (Ivan Wills)
+        Deleted file as "^B :setw synchronize-panes" does the trick (Ivan Wills)
+        Control script for tmux (Ivan Wills)
+        Got tmux working (Ivan Wills)
+        Created test to build layout (Ivan Wills)
+        Working on tmux layout (Ivan Wills)
+        Updating for release of version 0.04 (Ivan Wills)
+        Added missing documentation (Ivan Wills)
+        Updated missing dependencies (Ivan Wills)
+
+0.04   2014-09-15
+        Added missing documentation (Ivan Wills)
+        Updated missing dependencies (Ivan Wills)
+
+0.03   2014-09-14
+        Changed test to use the tests version of perl (Ivan Wills)
+
+0.02   2014-09-14
+        Updated manifest (Ivan Wills)
+        Updated tests (Ivan Wills)
+        Moved more functionality to the lib for better testing (Ivan Wills)
+        Removed functions moved to lib (Ivan Wills)
+        Moving some methods to lib and testing (Ivan Wills)
+        Updated changelog (Ivan Wills)
+
+0.01    2014-09-04
+        Fixed boilerplate
+        Fixed bad variable
+        Corrected license
+        Added missing file
+        Fixed spelling test
+        Other files
+        Removed unused/unneeded dependencies
+        Updated manifest
+        Added full boilerplate testing
+        Fixed to test test module and command
+        Got compiling
+        Initial commit

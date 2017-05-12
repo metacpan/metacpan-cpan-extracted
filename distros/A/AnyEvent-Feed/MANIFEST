@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+t/00-load.t
+lib/AnyEvent/Feed.pm
+samples/gmail_unread_feed
+samples/simple_reader
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module meta-data (added by MakeMaker)

@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+bin/sudden-death
+cpanfile
+lib/Acme/SuddenlyDeath.pm
+t/00_compile.t
+t/01_translate.t
+t/02_translate_single.t
+xt/perlcritic.t
+META.yml
+MANIFEST

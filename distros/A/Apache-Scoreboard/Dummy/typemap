@@ -1,0 +1,5 @@
+Apache::Scoreboard	T_PTROBJ
+Apache::ServerScore	T_PTROBJ
+Apache::ParentScore	T_PTROBJ
+pid_t	T_IV
+float	T_FLOAT

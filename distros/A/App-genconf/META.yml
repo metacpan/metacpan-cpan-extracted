@@ -1,0 +1,24 @@
+---
+abstract: "The world's simplest config file generator"
+author:
+  - 'Matt Finkel <fffinkel@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-genconf
+requires:
+  File::Find: 1.23
+  Getopt::Long: 2.42
+  Path::Class: 0
+  Template: 2.25
+  Try::Tiny: 0.18
+  strict: 0
+  warnings: 0
+version: 0.006
+x_authority: cpan:FFFINKEL

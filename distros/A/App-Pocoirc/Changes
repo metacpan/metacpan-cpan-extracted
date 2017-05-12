@@ -1,0 +1,241 @@
+Revision history for App-Pocoirc
+
+0.47  Tue Nov 27 20:31:02 GMT 2012
+    - When failing to load two classes, only show the error for the existent
+      class if the other one doesn't exist.
+    - Require latest Class::Load so that errors from class loading won't
+      mention Class::Load.
+    - Remove POE::Kernel::USE_SIGCHLD override. POE enables it by default on
+      recent Perls these days.
+
+0.46  Sat Jul 30 00:12:21 GMT 2011
+    - Show the server hostname in the "Connecting to IRC" status message
+    - Strip the unhelpful "at FOO line BAR" suffix from eval errors in the
+      console UI
+    - Test isa() after creating components and plugins
+    - Fix issues with --interactive
+
+0.45  Wed May 25 06:30:38 GMT 2011
+    - Replaced the IO wrapping code in ReadLine.pm with IO::WrapOutput
+    - Depend on Term::Cap and Term::ReadKey, which are needed by
+      POE::Wheel::ReadLine
+
+0.44  Sun May 22 16:12:13 GMT 2011
+    - Don't hang under --interactive if an exception is raised on startup
+
+0.43  Thu May 19 15:40:10 GMT 2011
+    - Fix the interactive help message, it implied that commas weren't
+      needed in lists
+    - ReadLine.pm: Only restore stdio when we have been unregistered from
+      all IRC components
+    - The network name in the ReadLine UI wasn't getting updated when
+      running without a configuration file
+
+0.42  Thu Apr 28 22:45:16 GMT 2011
+    - Fix the same exec() problem as in the previous release, this time under
+      --daemonize, because we were closing STDOUT/STDERR before redirecting
+      them, which is not good.
+
+0.41  Thu Apr 28 21:32:16 GMT 2011
+    - Log it if we fail to log in due to a bad nickname
+    - Decode any IRC strings before printing them under --trace
+    - Enabling 'verbose' in --interactive after startup wasn't working
+    - Fix output encoding in a few spots
+    - POE::Wheel::Run with an exec()'d child was failing under --interactive
+
+0.40  Wed Apr 27 05:50:35 GMT 2011
+    - Oops. Didn't avoid custom stringification everywhere. Fixed.
+    - Allow command-line option bundling, e.g. -itv instead of -i -t -v
+
+0.39  Wed Apr 27 03:32:46 GMT 2011
+    - Fix missing name for numeric 001 under --trace. Also depend on
+      IRC::Utils 0.07 for even more numeric names.
+    - Avoid custom stringifications when dumping objects with --trace
+
+0.38  Tue Apr 26 22:03:37 GMT 2011
+    - Replace status callbacks with irc_plugin_status events
+    - Send an irc_network event when the network name changes
+    - Enabling tracing in --interactive after startup wasn't working
+
+0.37  Mon Apr 25 23:59:48 GMT 2011
+    - Preserve symlinks in all supplied filenames
+    - When using --trace, print the name (e.g. ERR_NICKNAMEINUSE) of every
+      numberic event
+    - Rename -i/--ircname to -r/--realname
+    - Quit messages were not getting delivered to IRC servers. Fixed.
+    - Add -i/--interactive which allows the user to call methods from
+      the command line. Depend on POE 1.310 and POE::Component::IRC 6.61
+      for related bugfixes, as well as Data::Dump for dumping return
+      values of method calls.
+
+0.36  Sat Apr 2 01:36:16 GMT 2011
+    - Fix -V/--version, it was always returning "dev-git"
+
+0.35  Sat Apr 2 00:22:39 GMT 2011
+    - Allow using a short name (e.g. Qnet::State) with --class
+    - Fix error in documentation about the default component class
+
+0.34  Fri Dec 3 06:51:23 GMT 2010
+    - Convert library directories (--lib) into absolute paths, so they'll still
+      work after daemonization (which implies chdir()ing)
+    - Use Class::Load instead of C<eval "require $class">. Safer on Perl <5.10.
+
+0.33  Wed Nov 3 02:06:44 GMT 2010
+    - Rely on POE::Component::IRC 6.50's shutdown code instead of handling it
+      ourselves
+    - Include irc_raw_out events in verbose output
+
+0.32  Sun Oct 31 17:47:21 GMT 2010
+    - Redirect STDOUT/STDERR to the log file (if any) when daemonized
+    - Allow log_file and pid_file to be relative paths when daemonizing
+
+0.31  Wed Oct 20 00:35:29 GMT 2010
+    - When using --trace, don't put quotes around stringified references
+      to objects
+    - Print a usage message when unrecognized non-options are passed
+    - Improve the output of --trace by recursively dumping hashes/arrays
+    - Call bsd_glob() on filenames before opening them, so we understand
+      paths like '~/log_file'
+    - Allow .yaml as an extension, not just .yml
+
+0.30  Mon Oct 18 21:03:18 GMT 2010
+    - Only load Module::Pluggable when we need it (for --list-plugins)
+    - Only load Pod::Usage when we need it (with an invalid option)
+    - Delay the loading of App::Pocoirc until we need it
+    - Add the -F/--pid-file option to the usage message
+    - Use a comma instead of a colon to separate the channel name and
+      password with the --join option, since commas are not allowed in
+      channel names, whereas some networks allow colons.
+
+0.29  Sun Oct 3 19:53:28 GMT 2010
+    - Document the 'class' config file option
+    - Allow the 'lib' config option to be a string or an array of strings
+    - Show event arguments with --trace
+
+0.28  Sun Oct 3 15:29:41 GMT 2010
+    - After daemonizing, notify the POE kernel that we have forked
+
+0.27  Wed Sep 29 22:36:29 GMT 2010
+    - Updated Pocoirc.pm's Pod to reflect some recent changes
+
+0.26  Wed Sep 29 05:22:25 UTC 2010
+    - Fix a problem with using the Status plugin on multiple networks
+
+0.25  Wed Sep 29 05:03:27 UTC 2010
+    - In the config, keep networks in a hash, not an array
+    - Log which IRC class we're using (e.g. State)
+    - Pass the network name and a status callback when registering plugins
+
+0.24  Tue Sep 28 08:50:10 GMT 2010
+    - Sort the plugin list emitted by -L
+    - Use -a (add plugin) instead of -U for --plugin, and -A for --arg
+
+0.23  Mon Sep 27 19:57:02 GMT 2010
+    - Format the verbose output like other debugging output
+    - Don't raise an exception when someone parts without a part message
+    - Convert to utf8 and strip all colors/formatting from IRC messages
+      before they end up in the status log
+    - Log it if we can't log into an IRC server due to the nick being in use
+    - Move -L/--plugin option to -U/--plugin
+    - Add -L/--list-plugins to list all available pocoirc plugins
+    - Add -F/--pid-file for keeping a pid file
+
+0.22  Mon Sep 27 09:30:56 GMT 2010
+    - Remove some erroneous docs from the App::Pocoirc::Status Pod.
+
+0.21  Mon Sep 27 03:46:03 GMT 2010
+    - Make --no-color actually work (and use -b for the short option)
+
+0.20  Sun Sep 26 03:49:11 GMT 2010
+    - Depend on POE::Component::Client::DNS and use the same resolver object
+      for all IRC components
+
+0.19  Sun Sep 26 02:54:11 GMT 2010
+    - On shutdown, wait up to 5 seconds for IRC servers to disconnect after
+      we quit
+    - On shutdown, forcefully disconnect from servers to which we are
+      connected but not logged in
+    - Don't log more than one "Exiting" message after shutdown is initiated
+    - Fixed a small error in the usage message
+    - Tabulate the log messages a bit for easier reading
+
+0.18  Sat Sep 25 21:31:33 GMT 2010
+    - Add -t/--trace option to trace events
+    - Fix compilation test for the pocoirc script
+    - Move -P/--plugin to -L/--plugin
+    - Move -p/--password to -P/--password
+    - Add -p/--port to specify the server port
+    - Log our process id on startup
+
+0.17  Sat Sep 25 09:42:36 UTC 2010
+    - Move -p/--plugin to -P/--plugin
+    - Add -p/--password for specifying a server password
+    - Add -N/--nspassword to specify a NickServ password
+    - Add -a/--arg to specify arbitrary arguments to POE::Component::IRC
+    - Log when we identify with NickServ
+
+0.16  Sat Sep 4 02:18:19 UTC 2010
+    - Add a -j/--join option to join channels with the AutoJoin plugin
+
+0.15  Tue Aug 17 22:33:32 GMT 2010
+    - Terminate gracefully when we get SIGTERM
+    - Make all warnings fatal
+
+0.14  Mon Aug 2 07:46:04 GMT 2010
+    - Enable USE_SIGCHLD in POE for instant child process reaping. Might make
+      a difference with bots that use a lot of fork()ing plugins.
+    - Fix a bug which caused -V/--version to not print the version
+    - Color plugin errors red like other errors
+
+0.13  Mon Jul 26 03:54:30 GMT 2010
+    - Shutdown properly when connected to a server which we've failed to log
+      into. Depend on POE::Component::IRC 6.36 for this.
+    - Allow a default server again
+    - Fix an error which was causing some plugins to fail to load
+
+0.12  Sat Jul 24 21:34:01 GMT 2010
+    - Exit after --version
+    - Only daemonize after we've done more sanity checks
+
+0.11  Sat Jul 24 21:11:25 GMT 2010
+    - Shut down disconnected IRC components properly
+    - Rename "-c" option to "-f" and make "-c" validate the config file
+
+0.10  Mon Jun 28 21:39:05 GMT 2010
+    - Print compilation errors if we fail to load a plugin
+
+0.09  Mon Jun 28 21:24:31 GMT 2010
+    - Color exceptions red when using terminal colors
+    - Make sure we exit on exception when using multiple components
+
+0.08  Mon Jun 28 20:00:32 GMT 2010
+    - Fix problem with terminal color codes working across newlines
+
+0.07  Mon Jun 28 19:55:27 GMT 2010
+    - Use terminal colors for status messages, to easily differentiate it
+      from other output
+
+0.06  Sun Jun 27 08:34:55 GMT 2010
+    - Don't print raw protocol lines simply because some plugin happens to
+      enable raw events in POE::Component::IRC
+    - Install INT signal handler after we load POE::Component::IRC, not
+      before. Avoids an issue with Net::DNS (or a dependency of it) clearing
+      $SIG{INT} on Perl 5.13.2
+
+0.05  Sat Jun 26 06:08:47 GMT 2010
+    - Shut down if we catch an exception in our code
+
+0.04  Sat Jun 26 05:48:13 GMT 2010
+    - Don't require server to be specified in a network hash if a default
+      one is specified
+
+0.03  Sat Jun 26 04:44:32 GMT 2010
+    - Only parse plugin options when not using a config file
+    - Set our process name to 'pocoirc'
+
+0.02  Fri Jun 25 20:26:42 GMT 2010
+    - Support JSON config files too, not just YAML
+    - Add some example output to the documentation
+
+0.01  Fri Jun 25 19:47:14 GMT 2010
+    - Initial release

@@ -1,0 +1,13 @@
+AMaMP.xs
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Audio-AMaMP.t
+lib/Audio/AMaMP.pm
+typemap
+amamp_binding/amamp_binding.c
+amamp_binding/amamp_binding.h
+amamp_binding/Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

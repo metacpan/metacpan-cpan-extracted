@@ -1,0 +1,24 @@
+0.150460  2015-02-15 16:13:40CST-0600 America/Chicago
+
+    * Bufix: EAGAIN errors on non-blocking reads were not handled correctly.
+
+0.142540  2014-09-11 11:02:34-05:00 America/Chicago
+
+    * Bugfix: Errors in rule sets choked when trying to call croak instead of
+      croaking with a nice error describing the problem.
+    * Bugfix: Optional matches can leave indexes in @- and @+ as undef, which
+      caused colorist to spew ugly warnings. This should no longer occur.
+
+0.141760  2014-06-25 20:45:27UTC+0000 UTC
+
+    * Bugfix: "Fixes" a problem with colorist.t hanging on Win32. The fix is
+      that it detects that the system is MSWin32 and dies. I have made no effort
+      to make this work on Win32.
+
+0.141740  2014-06-23 14:44:14-05:00 America/Chicago
+
+    * Bugfix: Fixes installation failure with some versions of Readonly.
+
+0.141730  2014-06-22 15:36:00-05:00 America/Chicago
+
+    * Initial release.

@@ -1,0 +1,30 @@
+Revision history for App-DDFlare
+
+0.08    
+        Allow output redirection
+        Add long arguments
+	Made config file an argument
+	Add --help and --version
+
+0.07    6/4/14
+        Lower depenency versions
+
+0.06    7/11/13
+	Output version correctly with ddflare --version
+
+0.05    6/11/13
+        Make into a proper module
+
+0.04    6/11/13
+        Tidy up a bit
+	Add package declaration so metacpan picks this up
+
+0.03    6/11/13
+        Split into App::DDFlare
+
+0.02    30/10/13
+        Added -v switch
+
+0.01    30/10/13
+        Part of DDFlare
+

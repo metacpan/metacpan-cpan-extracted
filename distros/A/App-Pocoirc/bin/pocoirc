@@ -1,0 +1,254 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long qw(:config autohelp no_ignore_case bundling);
+
+my %args;
+my $success = GetOptions(
+    # program options
+    'c|check'        => \$args{check_cfg},
+    'f|config=s'     => \$args{cfg_file},
+    'v|verbose'      => \$args{verbose},
+    't|trace'        => \$args{trace},
+    'd|daemonize'    => \$args{daemonize},
+    'b|no-color'     => \$args{no_color},
+    'L|list-plugins' => \$args{list_plugins},
+    'i|interactive'  => \$args{interactive},
+
+    # global config options
+    'I|lib=s@'       => \$args{lib},
+    'l|log-file=s'   => \$args{log_file},
+    'F|pid-file=s'   => \$args{pid_file},
+
+    # network-specific config options
+    '6|ipv6'         => \$args{ipv6},
+    'S|ssl'          => \$args{ssl},
+    'C|class=s'      => \$args{class},
+    's|server=s'     => \$args{server},
+    'p|port=s'       => \$args{port},
+    'P|password=s'   => \$args{password},
+    'n|nick=s'       => \$args{nick},
+    'u|username=s'   => \$args{username},
+    'r|realname=s'   => \$args{ircname},
+    'j|join=s@'      => \$args{chan_specs},
+    'N|nspassword=s' => \$args{nspassword},
+    'a|plugin=s@'    => \$args{plugin_specs},
+    'A|arg=s@'       => \$args{args},
+
+    'V|version'      => sub {
+        require App::Pocoirc;
+        no strict 'vars';
+        my $version = defined $App::Pocoirc::VERSION
+            ? $App::Pocoirc::VERSION
+            : 'dev-git';
+        print "Version $version\n";
+        exit;
+    },
+);
+
+if (!$success || @ARGV) {
+    warn "Unrecognized arguments: @ARGV\n" if @ARGV;
+    require Pod::Usage;
+    Pod::Usage::pod2usage();
+}
+
+my $procname = 'pocoirc';
+$0 = $procname;
+if ($] < 5.013000 && $^O eq 'linux') {
+    local $@;
+    eval {
+        require Sys::Prctl;
+        Sys::Prctl::prctl_name($procname);
+    };
+}
+
+my $config;
+if (defined $args{cfg_file}) {
+    if ($args{cfg_file} =~ /\.ya?ml$/i) {
+        require YAML::XS;
+        YAML::XS->import('LoadFile');
+
+        eval { $config = LoadFile($args{cfg_file}) };
+
+        if ($@) {
+            chomp $@;
+            die "Failed to read YAML data from $args{cfg_file}: $@\n"
+        }
+        if (ref $config ne 'HASH') {
+            die "YAML data in $args{cfg_file} should be a hash\n";
+        }
+    }
+    elsif ($args{cfg_file} =~ /\.json$/i) {
+        require JSON::XS;
+        JSON::XS->import('decode_json');
+
+        open my $fh, '<', $args{cfg_file} or die "Can't open $args{cfg_file}: $!\n";
+        my $json = do { local $/; <$fh> };
+
+        eval { $config = decode_json($json) };
+        if ($@) {
+            chomp $@;
+            die "Failed to read JSON data from $args{cfg_file}: $@\n"
+        }
+        if (ref $config ne 'HASH') {
+            die "JSON data in $args{cfg_file} be a hash\n";
+        }
+    }
+    else {
+        die "Config file format not supported, it must be YAML or JSON\n";
+    }
+}
+else {
+    my @plugins;
+    if ($args{plugin_specs} && @{ $args{plugin_specs} }) {
+        require JSON::XS;
+        JSON::XS->import('decode_json');
+
+        for my $plugspec (@{ $args{plugin_specs} }) {
+            my ($class, $json) = $plugspec =~ /^([:A-Za-z0-9]+)\s*(.+)?/;
+            die "Missing plugin class for option --plugin\n" if !defined $class;
+
+            my $plug_args;
+            if (defined $json) {
+                eval { $plug_args = decode_json($json) };
+                if ($@) {
+                    chomp $@;
+                    die "Invalid JSON argument for plugin $class: $@\n"
+                }
+                if (ref $plug_args ne 'HASH') {
+                    die "JSON argument for plugin $class should be a hash\n";
+                }
+            }
+
+            push @plugins, [$class, $plug_args];
+        }
+    }
+
+    # process -j options
+    if ($args{chan_specs}) {
+        my %chans;
+        for my $chanspec (@{ $args{chan_specs} }) {
+            my ($chan, $pass) = split /,/, $chanspec, 2;
+            $chans{$chan} = $pass;
+        }
+        push @plugins, ['AutoJoin', { Channels => \%chans }];
+    }
+
+    # process -N option
+    if (defined $args{nspassword}) {
+        push @plugins, ['NickServID', { Password => $args{nspassword}} ],
+    }
+
+    # process -a options
+    my %direct_args;
+    if ($args{args}) {
+        for my $arg (@{ $args{args} }) {
+            my ($key, $val) = split /:/, $arg, 2;
+            if (!defined $key || !defined $val) {
+                die "Invalid argument to -a or --arg: $arg\n";
+            }
+            $direct_args{$key} = $val;
+        }
+    }
+
+    $config = {
+        (map { defined $args{$_} ? ($_ => $args{$_}) : () } qw(lib log_file pid_file)),
+        networks => {
+            default => {
+                local_plugins => \@plugins,
+                %direct_args,
+                (map {
+                    defined $args{$_} ? ($_ => $args{$_}) : ()
+                } qw(class server port password nick username ircname ipv6 ssl)),
+            }
+        },
+    };
+}
+
+require App::Pocoirc;
+App::Pocoirc->new(
+    cfg       => $config,
+    cfg_file  => $args{cfg_file},
+    (map {
+        defined $args{$_} ? ($_ => $args{$_}) : ()
+    } qw(check_cfg daemonize verbose trace no_color list_plugins interactive))
+)->run();
+
+=encoding utf8
+
+=head1 NAME
+
+pocoirc - A command line tool for launching L<POE::Component::IRC|POE::Component::IRC> clients
+
+=head1 SYNOPSIS
+
+B<pocoirc> <options>
+
+ Options:
+   -c, --check                  Check if config is valid and code compiles
+   -f FOO, --config FOO         Use config file FOO
+   -d, --daemonize              Run in the background
+   -v, --verbose                Show IRC protocol messages
+   -t, --trace                  Show all IRC events
+   -L, --list-plugins           List available plugins
+   -b, --no-color               Don't use terminal colors
+   -i, --interactive            Interactive mode (type 'help' for help)
+   -V, --version                Print version
+   -h, --help                   Print this usage message
+
+ When not using a config file, you can use these:
+   -s FOO, --server FOO         Connect to server FOO
+   -p FOO, --port FOO           Connect to port FOO
+   -P FOO, --password FOO       Use server password FOO
+   -n FOO, --nickname FOO       Use nickname FOO
+   -u FOO, --username FOO       Use username FOO
+   -r FOO, --realname FOO       Use realname FOO
+   -j FOO, --join FOO           Join channel FOO (see below)
+   -N FOO, --nspassword FOO     NickServ password (see below)
+   -a FOO, --plugin FOO         Add plugin FOO (see below)
+   -6, --ipv6,                  Use IPv6
+   -S, --ssl,                   Use SSL
+   -A FOO:BAR, --arg FOO:BAR    Arbitrary argument to POE::Component::IRC
+   -C FOO, --class FOO          Component class, e.g. State or Qnet::State
+   -I FOO, --lib FOO            A Perl library directory to include
+   -l FOO, --log-file FOO       Write status messages to this log file
+   -F FOO, --pid-file FOO       Use this file as a pid file
+
+When you specify a pid file with B<-F>, pocoirc will refuse to run if the pid
+file already exists.
+
+Arguments to the B<-j> option can be a channel name (e.g. '#foo') or a channel
+name and a password separated by a comma (e.g. '#foo,bar'). If you specify
+any channels, an L<AutoJoin|POE::Component::IRC::Plugin::AutoJoin> plugin with
+these parameters will be added to your IRC component.
+
+When you use the B<-N> option, a
+L<NickServID|POE::Component::IRC::Plugin::NickServID> plugin will be added
+for you with the supplied password.
+
+Arguments to the B<-a> option should consist of the class name (the
+"POE::Component::IRC::Plugin::" prefix can be omitted if it applies), zero
+or more whitespace, and optionally a JSON hash of arguments to the plugin's
+constructor:
+
+ -a AutoJoin
+ -a 'AutoJoin{"ReJoinOnKick":0}'
+ -a 'AutoJoin{"ReJoinOnKick":0,"Channels":["#foo","#bar"]}'
+ -a 'AutoJoin {"ReJoinOnKick": 0, "Channels": ["#foo", "#bar"]}'
+
+For documentation of the configuration file, do "perldoc
+L<App::Pocoirc|App::Pocoirc>".
+
+=head1 AUTHOR
+
+Hinrik E<Ouml>rn SigurE<eth>sson, hinrik.sig@gmail.com
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 Hinrik E<Ouml>rn SigurE<eth>sson
+
+This program is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

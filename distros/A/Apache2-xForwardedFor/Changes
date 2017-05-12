@@ -1,0 +1,4 @@
+0.04
+	moved debugging to constants set by envelope variables
+0.02
+	added feigned support for X-Forwarded-Server by turning xForwardedForAlternateHeaderValue into an array

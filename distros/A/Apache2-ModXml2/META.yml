@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Apache2-ModXml2
+version:            0.01
+abstract:           makes mod_xml2 funtionality available to perl modules
+author:
+    - Joachim Zobel <jz-2011@heute-morgen.de>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    XML::LibXML:  1.89
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

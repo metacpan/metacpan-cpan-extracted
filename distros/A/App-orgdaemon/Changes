@@ -1,0 +1,29 @@
+Revision history for org-daemon.
+
+1.04	2017-05-06
+	- find_dates_in_org_file provides seek position
+
+1.03	2017-03-19
+	- support for timeless dates (new options:
+	  --early-warning-timeless, --include-timeless, --time-fallback)
+	- move button: toggles between right and left arrow
+	- more tests
+
+1.02	2016-06-13
+	- new option --emacsclient-cmd
+	- new option --move-button
+	- keyboard shortcuts Ctrl-e and Ctrl-m
+	- improved parsing for better display in overview listbox
+	- workaround for Xquartz iconification problem
+	- fix: encoding detection
+	- more tests (for find_dates_in_org_file, with Time::Fake on travis)
+
+1.01	2016-03-09
+	- overview window implemented with Tk::HList
+	- old Tk::Listbox implementation still available with
+	  --overview-widget=listbox option
+
+1.00	2016-03-05
+	- first public CPAN release --- before it was available
+	  in the https://github.com/eserte/srezic-misc/ repository
+	  as scripts/org-daemon

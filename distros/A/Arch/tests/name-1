@@ -1,0 +1,44 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Name methods.
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More tests => 21;
+use_ok("Arch::Name");
+
+my $tree_version = 'migo@homemail.com--Perl-GPL/arch-perl--devel--0';
+my @tree_version_items = split('--(?!P)|/', $tree_version);
+my $tree_version_nan = join('--', @tree_version_items[1 .. 3]);
+
+my $name = Arch::Name->new($tree_version);
+isa_ok($name, 'Arch::Name',                 "create object");
+is($tree_version, $name->to_string,         "to_string");
+is($tree_version, $name->fqn,               "fqn");
+is($tree_version_nan, $name->to_nonarch_string, "to_nonarch_string");
+is($tree_version_nan, $name->nan,           "nan");
+my @array = $name->to_array;
+ok(eq_array(\@array, \@tree_version_items), "to_array");
+ok(eq_array([ $name->get ], \@array),       "get");
+my %hash = $name->to_hash;
+ok(eq_set([ values %hash ], \@tree_version_items), "to_hash");
+is($name->archive,  $tree_version_items[0], "archive");
+is($name->category, $tree_version_items[1], "category");
+is($name->branch,   $tree_version_items[2], "branch");
+is($name->version,  $tree_version_items[3], "version");
+is($name->revision, $tree_version_items[4], "revision");
+
+my ($archive, $category, $branch, $version, $revision);
+$version = $name->clone;
+isa_ok($version, "Arch::Name",              "clone");
+is($version->to_string, $tree_version,      "clone to_string");
+$branch = $version->parent;
+$archive = $version->parent(3);
+is($archive->error, undef,                  "error");
+ok($branch->fqn =~ $archive->fqn . "/.+--", "parents");
+ok(eq_hash(scalar $branch->parent(2)->to_hash, { $archive->to_hash }), "hash");
+is($branch->level, 3,                       "level num");
+is($branch->level(1), "branch",             "level name");

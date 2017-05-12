@@ -1,0 +1,467 @@
+#!/usr/bin/env perl
+# -*- mode: perl -*- # cperl-mode doesn't recognize the DATA section  -_-
+
+use Mojolicious::Lite;
+use 5.010;
+
+use File::Path ();
+use File::Spec::Functions qw(catfile);
+use File::Temp       ();
+use File::Which      ();
+use IO::Zlib         ();
+use Mojo::UserAgent  ();
+use Module::CoreList ();
+use Module::Path     ();
+use Mojo::JSON       ();
+use Scalar::Util     ();
+use Storable         ();
+
+our $VERSION = '0.011';
+$VERSION = eval $VERSION;
+
+sub get_modules {
+    my $cpan_package_file = shift;
+    die "$cpan_package_file doesn't exist" unless -f $cpan_package_file;
+
+    my $fh = IO::Zlib->new($cpan_package_file, 'r')
+      or die "Could not open '$cpan_package_file': $!";
+
+    my $modules;
+    while (<$fh>) {
+        my @columns = split /\s+/;
+        next unless @columns == 3;
+        my $module = $columns[0];
+        push @$modules, $module;
+    }
+
+    return $modules;
+}
+
+sub write_modules {
+    my ($modules_cache_file, $cpan_package_file) = @_;
+
+    my $modules = get_modules($cpan_package_file);
+    Storable::nstore($modules, $modules_cache_file);
+}
+
+sub compile_pattern {
+    my ($pattern, $p) = @_;
+    die "No pattern specified\n" unless $pattern;
+
+    local $@;
+    eval { $pattern = $p->{ignore_case} ? qr{$pattern}i : qr{$pattern}; };
+    die "Invalid regular expression\n" if $@;
+
+    return $pattern;
+}
+
+sub read_json_config {
+    my $config_file = shift;
+
+    open my $fh, '<', $config_file
+      or die "Could not open '$config_file': $!";
+
+    local $/;
+    my $bytes = <$fh>;
+
+    close $fh or die "Could not close '$config_file': $!";
+    return Mojo::JSON->new()->decode($bytes);
+}
+
+helper setup_modules_file => sub {
+    my $cache_file = app->config('modules_cache_file');
+    my $limit      = app->config('auto_download');
+
+    die "Configuration auto_download: $limit doesn't look like number\n"
+      unless Scalar::Util::looks_like_number($limit);
+
+    # file does not exist or file exists but it's older than the
+    # specified limit (in days)
+    if (not -f $cache_file
+        or -f $cache_file and -M $cache_file > $limit)
+    {
+
+        if (-f $cache_file) {
+            app->log->info("Deleting cache file $cache_file");
+            unlink $cache_file or die $!;
+        }
+
+        my $url = 'http://www.cpan.org/modules/02packages.details.txt.gz';
+
+        my $tempfile          = File::Temp->new;
+        my $download_location = $tempfile->filename;
+
+        app->log->info("Downloading $url to $download_location");
+        Mojo::UserAgent->new->get($url)
+          ->res->content->asset->move_to($download_location);
+
+        app->log->info("Caching modules to $cache_file");
+        write_modules($cache_file, $download_location);
+
+    }
+};
+
+helper setup_log => sub {
+    my ($self, $confdir) = @_;
+    my $logfile = catfile($confdir, 'server.log');
+    my $limit = 2_000_000;    # 2MB
+    if (-f $logfile and -s $logfile > $limit) {
+        unlink $logfile or die "Could not delete '$logfile'";
+        app->log->info("Deleting $logfile");
+    }
+
+    app->log->path($logfile) if app->config('quiet');
+};
+
+helper initialize => sub {
+    # for some reason cpandoc is not installed on some machines, even though
+    # Pod::Cpandoc is already listed as a prereq in Build.PL
+    die "cpandoc is not installed on your system\n"
+      unless File::Which::which('cpandoc');
+
+    my $confdir = $ENV{PERLDOLICIOUS_HOME}
+      || catfile($ENV{HOME}, '.perldolicious');
+
+    unless (-d $confdir) {
+        File::Path::make_path($confdir)
+          or die "Could not create directory $confdir";
+    }
+
+    my $confile = catfile($confdir, 'config.json');
+    my $conf = {
+        modules_cache_file => catfile($confdir, 'modules.storable'),
+        auto_download      => 14,               # 2 weeks
+        quiet              => 0
+    };
+
+    if (-f $confile) {
+        my $user_conf = read_json_config($confile) || {};
+        %$conf = (%$conf, %$user_conf);    # merge config
+    }
+
+    app->config($_ => $conf->{$_}) for keys %$conf;
+
+    app->setup_log($confdir);
+    app->setup_modules_file;
+
+    app->log->info('*** STARTING A NEW SESSION ***');
+    app->log->info("Config dir: $confdir");
+    app->log->info("Loaded config file: $confile") if -f $confile;
+    app->log->info('Loaded cache file: ' . app->config('modules_cache_file'));
+};
+
+helper find_modules => sub {
+    my ($self, $pattern, $p) = @_;
+
+    $pattern = compile_pattern($pattern, $p);
+    my $modules_cache_file = app->config('modules_cache_file');
+
+    state $modules = Storable::retrieve($modules_cache_file);
+    return [grep { /$pattern/ } @$modules];
+};
+
+helper perldoc => sub {
+    my ($self, $module, $p) = @_;
+    my $args = $p->{source} ? '-m' : '-t';
+    chomp(my $doc = `cpandoc $args $module`);
+    return $doc;
+};
+
+get '/' => sub {
+    my $self = shift;
+
+    $self->render(
+        template   => 'index',
+        action_url => $self->url_for('/results'),
+    );
+};
+
+post '/results' => sub {
+    my $self = shift;
+    my ($pattern, $ignore_case) =
+      ($self->param('pattern'), $self->param('ignoreCase'));
+
+    my $modules;
+
+    local $@;
+
+    eval {
+        $modules =
+          $self->find_modules($pattern, {ignore_case => $ignore_case});
+    };
+
+    if ($@) {
+        $self->render_exception($@);
+    }
+    elsif (@$modules) {
+        $self->render(
+            pattern => $pattern,
+            modules => $modules,
+            matches => scalar(@$modules),
+        );
+    }
+    else {
+        $self->render_exception("Could not find modules that match $pattern");
+    }
+};
+
+get '/doc/:module' => sub {
+    my $self   = shift;
+    my $module = $self->param('module');
+
+    (my $distname = $module) =~ s{::}{-}g;
+    my $release_date = Module::CoreList->first_release($module);
+
+    my @known_temp_dirs = (qr{/var/folders}, qr{/tmp/}, qr{Local\\Temp});
+    my $location = Module::Path::module_path($module);
+
+    $location = undef if $location and grep { /$location/ } @known_temp_dirs;
+
+    $self->render(
+        template        => "doc",
+        module          => $module,
+        distname        => $distname,
+        doc             => $self->perldoc($module),
+        location        => $location,
+        release_date    => $release_date,
+        source_code_url => $self->url_for("/doc/$module/source"),
+    );
+};
+
+get '/doc/:module/source' => sub {
+    my $self   = shift;
+    my $module = $self->param('module');
+    $self->render(
+        module      => $module,
+        template    => 'source',
+        source_code => $self->perldoc($module, {source => 1}),
+    );
+};
+
+app->mode('production');
+app->initialize;
+app->defaults(layout => 'index');
+app->start;
+
+__DATA__
+
+@@ css/main.css
+
+body {
+  font-family: calibri, sans-serif
+}
+
+@@ layouts/index.html.ep
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title><%= title %> - <%= ucfirst(app->moniker) %></title>
+    <link rel="stylesheet" href="<%= url_for( '/css/main.css' ) %>" />
+  </head>
+  <body>
+    <%= content %>
+  </body>
+</html>
+
+@@ exception.production.html.ep
+
+% title 'Error';
+
+<blink style="color: red"><%= $exception->message %></blink>
+
+@@ index.html.ep
+
+% title "Search modules";
+<p>Search modules (regexp)</p>
+<form action="<%= $action_url %>" method="POST">
+  <input type="text" name="pattern" />
+  <input type="submit" value="Search" />
+  <p>Options</p>
+  Ignore case:
+    <input type="checkbox" name="ignoreCase" checked />
+</form>
+
+@@ results.html.ep
+
+% title "Search results for $pattern";
+<p>Found <%= $matches %> matches for <code><%= $pattern %></code></p>
+<ul>
+% for my $module (@$modules) {
+  <li>
+    <a href="<%= url_for ( '/doc/' . $module ) %>">
+      <%= $module %>
+    </a>
+  </li>
+% }
+</ul>
+
+@@ doc.html.ep
+% title "$module";
+<p>See the
+  <a href="<%= $source_code_url %>">
+    source code
+  </a>
+</p>
+
+% if ($location) {
+
+<p>
+  <code><%= $module %></code>
+  is installed in
+  <code><%= $location %></code>
+</p>
+
+% } else {
+
+<!-- redundant? -->
+<p><code><%= $module %></code> is not installed on your system.</p>
+
+% }
+
+% if ($release_date) {
+
+<p>
+  <%= $module %>
+  was first released with perl
+  <code>
+     <%= $release_date %>
+  </code>
+</p>
+
+% } else {
+
+<p><%= $module %> was not in core (or so <code>Module::CoreList</code> thinks).</p>
+
+% }
+
+<p>Related pages</p>
+<ul>
+  <li>
+    <a href="https://metacpan.org/module/<%= $module %>">
+      metacpan
+    </a>
+  </li>
+  <li>
+    <a href="http://cpanratings.perl.org/dist/<%= $distname %>">
+        cpanratings
+    </a>
+  </li>
+</ul>
+<pre>
+<%= $doc %>
+</pre>
+
+@@ source.html.ep
+% title "Source: $module";
+<pre>
+<%= $source_code %>
+</pre>
+
+__END__
+
+=pod
+
+=head1 NAME
+
+perldolicious - Mojolicious::Lite webapp that lets you search (with regexp) and display CPAN modules documentation
+
+=head1 VERSION
+
+Version 0.011.
+
+=head1 SYNOPSIS
+
+  perldolicious daemon
+  # now point your web browser to the address http://localhost:3000/
+
+  # or use a different port
+  perldolicious daemon -l http://localhost:8000
+
+  # or use the Mojolicious' builtin webserver morbo (assuming
+  # perldolicious is installed in /usr/local/bin)
+  morbo /usr/local/bin/perldolicious
+
+=head1 DESCRIPTION
+
+=head2 FEATURES
+
+=over
+
+=item * Search CPAN modules with regular expressions.
+
+=item * Modules that you wish to see its documentation don't have to
+be installed on your system. Since B<perldolicious> uses
+L<Pod::Cpandoc> under the hood.
+
+=item * Pretty fast, since it stores the modules list cache in
+L<Storable> format.
+
+=item * Gradient-free, no-nonsense webpage. Although it'll cheerfully
+blink when necessary (it's all about priorities).
+
+=back
+
+=head1 CONFIGURATIONS
+
+You can configure the behavior of B<perldolicious> by writing
+configuration file, stored at F<~/.perldolicious/config.json> (written
+in JSON format). Here are the recognized options:
+
+=over
+
+=item * B<modules_cache_file>. Specify different location to store the
+modules list cache file. Defaults to
+F<~/.perldolicious/modules.storable>.
+
+=item * B<auto_download>. Delete C<modules_cache_file> and generate a
+new one by downloading the cpan package file
+F<02packages.details.txt.gz> if it's older than the specified number
+(in days). Default is set to 14 (two weeks).
+
+=item * B<quiet>. Send the server log to the file
+F<~/.perldolicious/server.log> instead of to C<STDERR>. Default:
+false.
+
+=back
+
+Example:
+
+  $ cat ~/.perldolicious/config.json
+  {
+      "quiet": 1,
+      "auto_download": 5,
+      "modules_cache_file": "/Users/Syaltut/.modules"
+  }
+
+=head1 LIMITATIONS
+
+=over
+
+=item * No pagination - which means you shouldn't use patterns like
+C<.*> if you don't want your browser to eat up all of your computer's
+memory.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Mojolicious>
+
+=item * L<Pod::Cpandoc>
+
+=back
+
+=head1 AUTHOR
+
+Ahmad Syaltut <syaltut@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Ahmad Syaltut.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

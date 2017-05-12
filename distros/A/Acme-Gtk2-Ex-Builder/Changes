@@ -1,0 +1,35 @@
+Revision history for Acme-Gtk2-Ex-Builder
+
+0.008     2011-01-05 03:00:12 Asia/Seoul
+    - Support setting property of widget: add 'prop' API
+    - Update the documents
+    - Add examples
+        - Gtk2::Window
+        - Gtk2::Calendar
+
+0.007     2011-01-04 11:26:27 Asia/Seoul
+    - Remove needless 'require' statement
+    - Support prebuilt widget variable
+
+0.006     2011-01-03 11:52:50 Asia/Seoul
+    - signal_connect: Allow additional data for callback
+
+0.005     2011-01-03 02:02:47 Asia/Seoul
+    - API changed due to name conflict with Moose
+        - 'with' -> 'contain'
+        - 'meta' -> 'info'
+
+0.004     2011-01-03 01:19:43 Asia/Seoul
+    - API changed due to name conflict with Moose
+        - 'has'    -> 'widget'
+        - 'widget' -> 'find'
+
+0.003     2011-01-02 15:22:50 Asia/Seoul
+    - Add omitted version number
+    - Set encoding for document
+
+0.002     2011-01-02 05:10:43 Asia/Seoul
+    - Update the documents
+
+0.001     2011-01-02 04:44:52 Asia/Seoul
+    - First release

@@ -1,0 +1,776 @@
+#!perl
+
+our $DATE = '2017-04-24'; # DATE
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+use App::wp::xmlrpc;
+
+my $subcommands = {};
+for my $meth (keys %App::wp::xmlrpc::API_Methods) {
+    (my $funcname = $meth) =~ s/\W+/_/g;
+    $subcommands->{$meth} = { url => "/App/wp/xmlrpc/$funcname" };
+}
+
+Perinci::CmdLine::Any->new(
+    url => '/App/wp/xmlrpc/',
+    subcommands => $subcommands,
+)->run;
+
+# ABSTRACT: A thin layer of CLI over WordPress XML-RPC API
+# PODNAME: wp-xmlrpc
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+wp-xmlrpc - A thin layer of CLI over WordPress XML-RPC API
+
+=head1 VERSION
+
+This document describes version 0.003 of wp-xmlrpc (from Perl distribution App-wp-xmlrpc), released on 2017-04-24.
+
+=head1 SYNOPSIS
+
+In C<~/wp-xmlrpc.conf>, put your API credentials:
+
+ proxy=https://YOURBLOGNAME.wordpress.com/xmlrpc.php
+ username=YOURUSERNAME
+ password=YOURPASSWORD
+
+Then:
+
+ % wp-xmlrpc wp.getPost 13
+
+You can also put multiple credentials in the config file via profiles:
+
+ [profile=blog1]
+ proxy=https://BLOG1NAME.wordpress.com/xmlrpc.php
+ username=YOURUSERNAME
+ password=YOURPASSWORD
+
+ [profile=blog2]
+ proxy=https://BLOG2NAME.wordpress.com/xmlrpc.php
+ username=YOURUSERNAME
+ password=YOURPASSWORD
+
+then:
+
+ % wp-xmlrpc --config-profile blog1 wp.getPost 13
+
+Some of the functions:
+
+ % wp-xmlrpc wp.getPosts ;# list all posts
+
+ % wp-xmlrpc wp.newPost '{"post_content":"This is a test blog post"}' ;# by default will create an untitled blog post with status=draft
+ % wp-xmlrpc wp.newPost '{"post_content":"This is a test blog post", "post_status":"publish", "post_title":"Some title"}' ;# set title & status
+
+ % wp-xmlrpc wp.editPost 13 '{"status":"draft"}'
+
+ % wp-xmlrpc wp.deletePost 13
+
+
+ % wp-xmlrpc wp.getTaxonomies
+
+ % wp-xmlrpc wp.getTaxonomy category
+ % wp-xmlrpc wp.getTaxonomy post_tag
+ % wp-xmlrpc wp.getTaxonomy post_format
+ % wp-xmlrpc wp.getTaxonomy mentions
+
+ % wp-xmlrpc wp.getTerms category ;# get terms (i.e. in this case list of categories)
+ % wp-xmlrpc wp.getTerm category 2342 ;# get a specific category by ID
+ % wp-xmlrpc wp.getTerm tag 423 ;# get a specific tag by ID
+
+ % wp-xmlrpc wp.newTerm '{"taxonomy":"tag", "name":"tag3"}' ;# create a new tag
+ % wp-xmlrpc wp.newTerm '{"taxonomy":"category", "name":"cat2", "description":"Second category", "parent":2342}' ;# create a new category, with description and parent ID
+
+ % wp-xmlrpc wp.editTerm 2345 '{"description":"New description"}' ;# create a category's description
+
+ % wp-xmlrpc wp.deleteTerm 2345
+
+
+ % wp-xmlrpc wp.getComments ;# list comments
+ % wp-xmlrpc wp.getCommentCount 13 ;# get number of comments for a post
+ % wp-xmlrpc wp.getComment 9983 ;# get a comment by ID
+
+
+ % wp-xmlrpc wp.getOptions ;# get all options
+ % wp-xmlrpc wp.getOptions '["blog_title","blog_tagline"]' ;# get specified options only
+ % wp-xmlrpc wp.setOptions '{"blog_title":"New title", "blog_tagline":"New tagline"}'
+
+
+ % wp-xmlrpc wp.getProfile
+ % wp-xmlrpc wp.editProfile '{"bio":"Blah blah blah"}'
+
+=head1 DESCRIPTION
+
+This script is a thin layer of CLI over WordPress XML-RPC API, mainly for
+testing/debugging. Each CLI subcommand is for calling API method of the same
+name. If an argument starts with C<{> it will be assumed as a JSON-encoded hash
+and will be decoded. If an argument starts with C<[> it will be assumed as a
+JSON-encoded array and will be decoded.
+
+=head1 SUBCOMMANDS
+
+=head2 B<wp.deleteComment>
+
+=head2 B<wp.deletePost>
+
+=head2 B<wp.deleteTerm>
+
+=head2 B<wp.editComment>
+
+=head2 B<wp.editPost>
+
+=head2 B<wp.editProfile>
+
+=head2 B<wp.editTerm>
+
+=head2 B<wp.getAuthors>
+
+=head2 B<wp.getComment>
+
+=head2 B<wp.getCommentCount>
+
+=head2 B<wp.getCommentStatusList>
+
+=head2 B<wp.getComments>
+
+=head2 B<wp.getMediaItem>
+
+=head2 B<wp.getMediaLibrary>
+
+=head2 B<wp.getOptions>
+
+=head2 B<wp.getPost>
+
+=head2 B<wp.getPostFormats>
+
+=head2 B<wp.getPostStatusList>
+
+=head2 B<wp.getPostType>
+
+=head2 B<wp.getPostTypes>
+
+=head2 B<wp.getPosts>
+
+=head2 B<wp.getProfile>
+
+=head2 B<wp.getTaxonomies>
+
+=head2 B<wp.getTaxonomy>
+
+=head2 B<wp.getTerm>
+
+=head2 B<wp.getTerms>
+
+=head2 B<wp.getUser>
+
+=head2 B<wp.getUsers>
+
+=head2 B<wp.getUsersBlogs>
+
+=head2 B<wp.newComment>
+
+=head2 B<wp.newPost>
+
+=head2 B<wp.newTerm>
+
+=head2 B<wp.setOptions>
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--blog-id>=I<i>
+
+Default value:
+
+ 1
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--password>=I<s>*, B<-p>
+
+=item B<--proxy>=I<s>*
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--username>=I<s>*, B<-u>
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand wp.deleteComment
+
+=over
+
+=item B<--comment-id>=I<i>*
+
+=back
+
+=head2 Options for subcommand wp.deletePost
+
+=over
+
+=item B<--post-id>=I<i>*
+
+=back
+
+=head2 Options for subcommand wp.deleteTerm
+
+=over
+
+=item B<--term-id>=I<i>*
+
+=back
+
+=head2 Options for subcommand wp.editComment
+
+=over
+
+=item B<--comment-id>=I<i>*
+
+=item B<--comment>=I<s>*
+
+=back
+
+=head2 Options for subcommand wp.editPost
+
+=over
+
+=item B<--content>=I<s>*
+
+=back
+
+=head2 Options for subcommand wp.editProfile
+
+=over
+
+=item B<--content>=I<s>*
+
+=back
+
+=head2 Options for subcommand wp.editTerm
+
+=over
+
+=item B<--content>=I<s>*
+
+=item B<--term-id>=I<i>*
+
+=back
+
+=head2 Options for subcommand wp.getComment
+
+=over
+
+=item B<--comment-id>=I<i>*
+
+=back
+
+=head2 Options for subcommand wp.getCommentCount
+
+=over
+
+=item B<--post-id>=I<i>*
+
+=back
+
+=head2 Options for subcommand wp.getComments
+
+=over
+
+=item B<--filter>=I<s>
+
+=back
+
+=head2 Options for subcommand wp.getMediaItem
+
+=over
+
+=item B<--attachment-id>=I<i>*
+
+=back
+
+=head2 Options for subcommand wp.getMediaLibrary
+
+=over
+
+=item B<--filter>=I<s>
+
+=back
+
+=head2 Options for subcommand wp.getOptions
+
+=over
+
+=item B<--options>=I<s>
+
+=back
+
+=head2 Options for subcommand wp.getPost
+
+=over
+
+=item B<--fields>=I<s>
+
+=item B<--post-id>=I<i>*
+
+=back
+
+=head2 Options for subcommand wp.getPostFormats
+
+=over
+
+=item B<--filter>=I<s>
+
+=back
+
+=head2 Options for subcommand wp.getPostType
+
+=over
+
+=item B<--fields>=I<s>
+
+=item B<--post-type-name>=I<s>*
+
+=back
+
+=head2 Options for subcommand wp.getPostTypes
+
+=over
+
+=item B<--fields>=I<s>
+
+=item B<--filter>=I<s>
+
+=back
+
+=head2 Options for subcommand wp.getPosts
+
+=over
+
+=item B<--filter>=I<s>
+
+=back
+
+=head2 Options for subcommand wp.getProfile
+
+=over
+
+=item B<--fields>=I<s>
+
+=back
+
+=head2 Options for subcommand wp.getTaxonomy
+
+=over
+
+=item B<--taxonomy>=I<s>*
+
+=back
+
+=head2 Options for subcommand wp.getTerm
+
+=over
+
+=item B<--taxonomy>=I<s>*
+
+=item B<--term-id>=I<i>*
+
+=back
+
+=head2 Options for subcommand wp.getTerms
+
+=over
+
+=item B<--taxonomy>=I<s>*
+
+=back
+
+=head2 Options for subcommand wp.getUser
+
+=over
+
+=item B<--fields>=I<s>
+
+=item B<--user-id>=I<i>*
+
+=back
+
+=head2 Options for subcommand wp.getUsers
+
+=over
+
+=item B<--fields>=I<s>
+
+=back
+
+=head2 Options for subcommand wp.getUsersBlogs
+
+=over
+
+=item B<--isAdmin*>
+
+=item B<--xmlrpc>=I<s>*
+
+=back
+
+=head2 Options for subcommand wp.newComment
+
+=over
+
+=item B<--comment>=I<s>*
+
+=item B<--post-id>=I<i>*
+
+=back
+
+=head2 Options for subcommand wp.newPost
+
+=over
+
+=item B<--content>=I<s>*
+
+=back
+
+=head2 Options for subcommand wp.newTerm
+
+=over
+
+=item B<--content>=I<s>*
+
+=back
+
+=head2 Options for subcommand wp.setOptions
+
+=over
+
+=item B<--options>=I<s>*
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C wp-xmlrpc wp-xmlrpc
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using L<shcompgen>) at installation time,
+so you can immediately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete wp-xmlrpc 'p/*/`wp-xmlrpc`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/wp-xmlrpc.conf>, F<~/wp-xmlrpc.conf>, or F</etc/wp-xmlrpc.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ blog_id (see --blog-id)
+ format (see --format)
+ naked_res (see --naked-res)
+ password (see --password)
+ proxy (see --proxy)
+ username (see --username)
+
+=head2 Configuration for subcommand 'wp.deleteComment'
+
+ comment_id (see --comment-id)
+
+=head2 Configuration for subcommand 'wp.deletePost'
+
+ post_id (see --post-id)
+
+=head2 Configuration for subcommand 'wp.deleteTerm'
+
+ term_id (see --term-id)
+
+=head2 Configuration for subcommand 'wp.editComment'
+
+ comment (see --comment)
+ comment_id (see --comment-id)
+
+=head2 Configuration for subcommand 'wp.editPost'
+
+ content (see --content)
+
+=head2 Configuration for subcommand 'wp.editProfile'
+
+ content (see --content)
+
+=head2 Configuration for subcommand 'wp.editTerm'
+
+ content (see --content)
+ term_id (see --term-id)
+
+=head2 Configuration for subcommand 'wp.getAuthors'
+
+
+=head2 Configuration for subcommand 'wp.getComment'
+
+ comment_id (see --comment-id)
+
+=head2 Configuration for subcommand 'wp.getCommentCount'
+
+ post_id (see --post-id)
+
+=head2 Configuration for subcommand 'wp.getCommentStatusList'
+
+
+=head2 Configuration for subcommand 'wp.getComments'
+
+ filter (see --filter)
+
+=head2 Configuration for subcommand 'wp.getMediaItem'
+
+ attachment_id (see --attachment-id)
+
+=head2 Configuration for subcommand 'wp.getMediaLibrary'
+
+ filter (see --filter)
+
+=head2 Configuration for subcommand 'wp.getOptions'
+
+ options (see --options)
+
+=head2 Configuration for subcommand 'wp.getPost'
+
+ fields (see --fields)
+ post_id (see --post-id)
+
+=head2 Configuration for subcommand 'wp.getPostFormats'
+
+ filter (see --filter)
+
+=head2 Configuration for subcommand 'wp.getPostStatusList'
+
+
+=head2 Configuration for subcommand 'wp.getPostType'
+
+ fields (see --fields)
+ post_type_name (see --post-type-name)
+
+=head2 Configuration for subcommand 'wp.getPostTypes'
+
+ fields (see --fields)
+ filter (see --filter)
+
+=head2 Configuration for subcommand 'wp.getPosts'
+
+ filter (see --filter)
+
+=head2 Configuration for subcommand 'wp.getProfile'
+
+ fields (see --fields)
+
+=head2 Configuration for subcommand 'wp.getTaxonomies'
+
+
+=head2 Configuration for subcommand 'wp.getTaxonomy'
+
+ taxonomy (see --taxonomy)
+
+=head2 Configuration for subcommand 'wp.getTerm'
+
+ taxonomy (see --taxonomy)
+ term_id (see --term-id)
+
+=head2 Configuration for subcommand 'wp.getTerms'
+
+ taxonomy (see --taxonomy)
+
+=head2 Configuration for subcommand 'wp.getUser'
+
+ fields (see --fields)
+ user_id (see --user-id)
+
+=head2 Configuration for subcommand 'wp.getUsers'
+
+ fields (see --fields)
+
+=head2 Configuration for subcommand 'wp.getUsersBlogs'
+
+ isAdmin (see --isAdmin)
+ xmlrpc (see --xmlrpc)
+
+=head2 Configuration for subcommand 'wp.newComment'
+
+ comment (see --comment)
+ post_id (see --post-id)
+
+=head2 Configuration for subcommand 'wp.newPost'
+
+ content (see --content)
+
+=head2 Configuration for subcommand 'wp.newTerm'
+
+ content (see --content)
+
+=head2 Configuration for subcommand 'wp.setOptions'
+
+ options (see --options)
+
+=head1 ENVIRONMENT
+
+=head2 WP_XMLRPC_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/wp-xmlrpc.conf>
+
+F<~/wp-xmlrpc.conf>
+
+F</etc/wp-xmlrpc.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-wp-xmlrpc>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-wp-xmlrpc>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-wp-xmlrpc>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+API reference: L<https://codex.wordpress.org/XML-RPC_WordPress_API>
+
+L<wordpress-info>, L<wordpress-upload-media>, L<wordpress-upload-post> from
+the L<WordPress::CLI> distribution.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

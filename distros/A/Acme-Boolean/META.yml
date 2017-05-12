@@ -1,0 +1,20 @@
+---
+abstract: 'There is more then one way to be true.'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Boolean
+requires:
+  boolean: '0.20'
+resources:
+  homepage: https://github.com/gugod/acme-boolean
+  repository: https://github.com/gugod/acme-boolean.git
+version: '0.4'

@@ -1,0 +1,113 @@
+Revision history for App-jenkins-cli
+
+0.008   2017-05-07
+        Updating for release of version 0.008
+        Added missing new dependency (Ivan Wills)
+        Better spacing (Ivan Wills)
+        Cleaned up outpus more (Ivan Wills)
+        Setting minimum Perl version to 5.10 (Ivan Wills)
+        Made indentation more consistant (Ivan Wills)
+        Getting the duration in ls -v (Ivan Wills)
+        Fixed Build images (Ivan Wills)
+
+0.007   2017-04-30
+        Updating for release of version 0.007
+        Added missing requirement (Ivan Wills)
+        Making it possible to also filter my recipient (Ivan Wills)
+        Fixed bad error message (Ivan Wills)
+
+0.006   2017-04-02
+        Updating for release of version 0.006
+        Updated POD (Ivan Wills)
+        Fixed sorting (Ivan Wills)
+        Fixed job listings (Ivan Wills)
+        Fixed pod (Ivan Wills)
+        Changed config to allow multiple jobs (Ivan Wills)
+        Using stored opt rather than passed opt (Ivan Wills)
+        Fixed warning when no color attribute is set (Ivan Wills)
+        Adding long version so build "colour" is show for grepping (Ivan Wills)
+        Fixing issue with builds that have not yet ever been run (Ivan Wills)
+        Configured api calls so that they are much faster (Ivan Wills)
+        Fixing starting jobs (Ivan Wills)
+        Better sorting of jenkins job with respect to numerical numbers (Ivan Wills)
+        Adding better formatting (Ivan Wills)
+        Trying to do auto complete correctly (Ivan Wills)
+
+0.005   2017-02-05
+        Updating for release of version 0.005
+        Sorting jobs (Ivan Wills)
+        Split out list to own mehtod (Ivan Wills)
+        Added missing watch help info (Ivan Wills)
+        Fixed version number (Ivan Wills)
+        Adding watch command (Ivan Wills)
+
+0.004   2017-01-08
+        Updating for release of version 0.004
+        Fixed version (Ivan Wills)
+        Updated LICENSE date (Ivan Wills)
+        Added file missing from manifest (Ivan Wills)
+        Example script (Ivan Wills)
+        Added verbose to list options (Ivan Wills)
+        Chagned to show url rather than just the name (Ivan Wills)
+        Fixed error messages (Ivan Wills)
+        Added missing delete documentation (Ivan Wills)
+        Added travice config (Ivan Wills)
+
+0.003   2016-10-02
+        Updating for release of version 0.003
+        Fixed POD (Ivan Wills)
+        Further factoring (Ivan Wills)
+        Factored out itterating over jenkins jobs (Ivan Wills)
+        Added missing job creation body (Ivan Wills)
+
+0.002   2016-08-14
+        Updating for release of version 0.002
+        Fixed POD (Ivan Wills)
+        Fixed URL (Ivan Wills)
+        Added more documentation about how to use jenkins-cli for github (Ivan Wills)
+        Added documentation about configuration file (Ivan Wills)
+        Fixing documentation (Ivan Wills)
+        Added missing implementation for job creation (Ivan Wills)
+        Fixed missing POD for methods (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+        Added files missing from the manifest (Ivan Wills)
+        Adding in enable/disable actions (Ivan Wills)
+        Adding dist files (Ivan Wills)
+        Refactored out XSLT actions so I can reuse the code (Ivan Wills)
+        Docs (Ivan Wills)
+        Added missing dependencies (Ivan Wills)
+        Added example config to change (Ivan Wills)
+        Added a change command to perform transformations to job configs (Ivan Wills)
+        Implementing job status output (Ivan Wills)
+        Sending colours to object (Ivan Wills)
+        Moved colour handling to be part of object (Ivan Wills)
+
+0.001   2016-05-20
+        Fixed version number (Ivan Wills)
+        Added catching missing last build timestamp (Ivan Wills)
+        Changed delete to allow the deleting of more than one build at time (Ivan Wills)
+        Added --verbose option to show date of last build when listing (Ivan Wills)
+        Fixed --verbose (Ivan Wills)
+        More commands (Ivan Wills)
+        Tagging for future CPAN release (Ivan Wills)
+        Added ALSO SEE section (Ivan Wills)
+        Added erroring when required params are missing (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Updated the version (Ivan Wills)
+        Added missing dependencies (Ivan Wills)
+        Added missing pod (Ivan Wills)
+        Added queue command/method (Ivan Wills)
+        Added missing documentation (Ivan Wills)
+        Enabled new commands (Ivan Wills)
+        Renamed config to status and added config (Ivan Wills)
+        Added deleting getting a jobs config (Ivan Wills)
+        Added documentation for actions (Ivan Wills)
+        Making sure that jobs are only triggered when able to (Ivan Wills)
+        Getting return codes working (Ivan Wills)
+        Fixed colours (and made configurable) (Ivan Wills)
+        More fixes to get build ready (Ivan Wills)
+        Fixed renamed lib (Ivan Wills)
+        New script to run the jenkins cli (Ivan Wills)
+        Minor fixes (Ivan Wills)
+        Renamed to be CPAN compatible (Ivan Wills)
+        Initial commit (Ivan Wills)

@@ -1,0 +1,23 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "TFA Grape Candy",
+            "percentage" : "6.15"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Grape Juice",
+            "percentage" : "6.15"
+         }
+      ],
+      "target_pg" : "40",
+      "base_nic_per_ml" : 100,
+      "base_nic_type" : "PG",
+      "target_quantity" : "50",
+      "target_nic_per_ml" : "6",
+      "target_vg" : 60,
+      "notes" : []
+   }
+}

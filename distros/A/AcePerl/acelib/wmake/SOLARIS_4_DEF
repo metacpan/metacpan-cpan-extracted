@@ -1,0 +1,30 @@
+#  $Id: SOLARIS_4_DEF,v 1.1 2002/11/14 20:00:06 lstein Exp $
+
+#################################################################
+############### acedb: R.Durbin and J.Thierry-Mieg ##############
+#################################################################
+
+#################################################################
+########## Machine dependant compiler modification ##############
+########### for the Solaris OS                 ##################
+#################################################################
+########### This file is included by wmake/truemake #############
+######  Edit this file to adapt the ACeDB to a new machine ######
+#####   following the explanations given in wmake/truemake  #####
+#################################################################
+
+NAME = SOLARIS
+COMPILER = gcc -g -DNO_LEFT_CASTING -O2 -Wall -I/usr/openwin/include -DACEDB4
+LINKER = gcc -g
+
+# -DWCS causes a problem, class versus Xlib.h
+LIBS = -lm -lsocket -lnsl
+RANLIB_NEEDED = false
+AR_OPTIONS = ru
+RPCGEN_FLAGS = -b -I -K -1
+
+LEX_LIBS = -ll -lw
+#################################################################
+#################################################################
+
+ 

@@ -1,0 +1,145 @@
+NAME
+       Async::Chain - The right way to convert nested callback in plain struct
+       or just the syntax sugar for guy who do not like deep indent.
+
+VERSION
+       Version 0.05
+
+SYNOPSIS
+       Every subroutine in the chain receive callable object as first argument
+       followed by arguments of object call. You can break chain in every sub,
+       just do not call $next.
+
+       You can skip some subroutins using "skip" or "jump" method.
+
+           use Async::Chain;
+
+           # with chain call
+
+           chain
+               sub {
+                   my next = shift;
+                   AnyEvent::HTTP::http_get('http://perldoc.perl.org/', $next);
+               },
+               sub {
+                   my next = shift;
+                   return $next->jump('log')->(0, "not a 200 response");
+                   ...
+                   $db->async_insert(..., cb => $next);
+               },
+               sub {
+                   my next = shift;
+                   ...
+                   $next->($status, $message);
+               },
+               log => sub {
+                   my next = shift;
+                   my ($status, $message) = @_;
+                   ...
+                   log(...);
+               };
+
+RATIONALE
+       A asynchronous code often have deep nested callbacks, therefore it is
+       tangled and hard to change. This module help to converta a code like
+       following to some more readable form. Also, with "chain" you can easily
+       skip some unneeded steps in this thread. For example jump to log step
+       after the first failed query in the chain.
+
+       without chain:
+
+           sub f {
+               ...
+               some_anync_call @args, cb => sub {
+                   ...
+                   some_other_anync_call @args, cb => sub {
+                   ...
+                       ...
+                           ...
+                               yet_another_anync_call @args, cb => sub {
+                                   ...
+                               }
+                   }
+               }
+           }
+
+       using chain:
+
+           chain
+               sub {
+                   my next = shift;
+                   ...
+                   some_anync_call @args, cb => sub { $next->(@arg) }
+               },
+               sub {
+                   my next = shift;
+                   ...
+                   some_other_anync_call @args, cb => sub { $next->(@arg) }
+               },
+               sub {
+                   my next = shift;
+                   ...
+               },
+               ...
+               sub {
+                   ...
+                   yet_another_anync_call @args, cb => sub { $next->(@arg) }
+               },
+               sub {
+                   ...
+               };
+
+       If you don't need to skip or hitch links, you can use 'kseq' function
+       from CPS module, that slightly faster.
+
+SUBROUTINES/METHODS
+   new
+       The Asyn::Chain object constructor. Arguments are list of subroutine
+       optionaly leaded by mark.
+
+   chain
+       Only one exported subroutine. Create and call Anync::Chain object.
+       Return empty list.
+
+   skip
+       Skip one or more subroutine. Skipe one if no argument given. Return
+       Anync::Chain object.
+
+   jump
+       Skip subroutines for first entry of named mark. Return Anync::Chain object.
+
+   hitch
+       Move named link to beginning of the chain. When link with given name not
+       exists or first in chain, method has no effect. Return Anync::Chain object.
+
+AUTHOR
+       Anton Reznikov, "<anton.n.reznikov at gmail.com>"
+
+BUGS
+       Please report any bugs or feature requests, or through GitHub web
+       interface at <https://github.com/17e/Async-Chain>.
+
+SUPPORT
+       You can find documentation for this module with the perldoc command.
+
+           perldoc Async::Chain
+
+ACKNOWLEDGEMENTS
+           Mons Anderson - The original idia of chain and it first implementation.
+
+LICENSE AND COPYRIGHT
+       Copyright 2014 Anton Reznikov.
+
+       This program is free software; you can redistribute it and/or modify it
+       under the terms of the GNU General Public License as published by the
+       Free Software Foundation; version 2 dated June, 1991 or at your option
+       any later version.
+
+       This program is distributed in the hope that it will be useful, but
+       WITHOUT ANY WARRANTY; without even the implied warranty of
+       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+       Public License for more details.
+
+       A copy of the GNU General Public License is available in the source tree;
+       if not, write to the Free Software Foundation, Inc., 51 Franklin Street,
+       Fifth Floor, Boston, MA 02110-1301  USA

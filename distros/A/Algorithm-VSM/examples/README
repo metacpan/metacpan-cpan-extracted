@@ -1,0 +1,153 @@
+
+
+(1)  To become familiar with this module, first run the script:
+
+            retrieve_with_VSM.pl
+
+     This script carries out basic VSM-based model construction and
+     retrieval.
+
+     When you run the above script, you will be asking the module to
+     retrieve the Java files in the 'corpus' directory that match the
+     un-commented query shown at the top of the script.  Try running the
+     script with one of the other queries by uncommenting the appropriate
+     query line.
+
+
+(2)  To run the above script in an infinite loop for multiple retrievals
+     in an interactive mode, run the following script:
+
+            continuously_running_VSM_retrieval_engine.pl
+
+
+(3)  To create a disk-based VSM model (which is stored in disk-based hash
+     tables) and to retrieve information, run the script
+
+            retrieve_with_VSM_and_also_create_disk_based_model.pl
+
+
+(4)  The script in Item (3) mentioned above deposits the calculated VSM
+     model in disk-based hashtables.  To retrieve from these disk-based
+     files, run the script
+
+            retrieve_with_disk_based_VSM.pl
+
+     Try running this script with different queries. 
+
+     If you wish to clear out the db files that were created in Item (3)
+     above, you can call
+
+            clean_db_files.pl
+
+
+(5)  For basic LSA-based model construction and retrieval, run the script:
+
+            retrieve_with_LSA.pl
+
+     As with the previous script, you will be asking the module to retrieve
+     the Java files in the 'corpus' directory that match the un-commented
+     query shown at the top of the script.  Try running the script with one
+     of the other queries by uncommenting the appropriate query line.
+
+
+(6)  The disk-based model that is saved away by the script in Item 3 above
+     can also be used for a faster calculation of the LSA model and
+     retrieval from the model thus created.  For this you'd need to call:
+
+            retrieve_with_disk_based_LSA.pl
+
+     Note that if you previously executed the script 
+
+            clean_db_files.pl
+
+     you will have to run again the script 
+
+            retrieve_with_VSM_and_also_create_disk_based_model.pl
+
+     to re-create the disk-based db files.
+
+     Try running the `retrieve_with_disk_based_LSA.pl' script with
+     different queries.
+
+
+(7)  For your first experiments with measuring the accuracy of retrieval  
+     performance, execute the script
+
+             calculate_precision_and_recall_for_VSM.pl
+   
+     This script first tries to estimate the relevancies of the corpus
+     files to each of the queries in the file 'test_queries.txt'.  The
+     module calculates the two measures Precision@rank and Recall@rank.
+     The area under the Precision vs. Recall curve for each query is the
+     accuracy of retrieval for that query.  Averaging of this result over
+     all the queries yields the more global metric MAP (Mean Average
+     Precision).
+     
+     As mentioned elsewhere in the module documentation, estimating
+     relevancies in the manner carried out by the module is not safe.  
+     Relevancies are supposed to be supplied by humans.  All that a computer 
+     can do to estimate relevancies is to count the number of query words in a
+     document.  But, measuring relevancies in this manner creates a circular
+     dependency between the retrieval algorithm and the estimated
+     relevancy.
+
+
+(8)  Do the same as in the previous item, but this time for LSA, by
+     executing the script
+
+            calculate_precision_and_recall_for_LSA.pl
+
+
+(9)  As mentioned above in the note for the script in item (5), measuring
+     retrieval accuracy requires human-supplied relevancy judgments.
+     Assuming that such judgments are made available to the module through
+     the file named through the constructor parameter 'relevancy_file', you
+     can run the script
+
+        calculate_precision_and_recall_from_file_based_relevancies_for_VSM.pl
+
+     for the case of VSM.  This script will print out the average
+     precisions for the different test queries and calculate the MAP metric
+     of retrieval accuracy.
+
+
+(10) To do the same as above but for the case of LSA, run the script
+
+
+        calculate_precision_and_recall_from_file_based_relevancies_for_LSA.pl
+
+
+(11) To carry out significance testing for comparing two different retrieval
+     algorithms (VSM or LSA with different values for some of the
+     constructor parameters), run the script
+
+             significance_testing.pl  randomization
+    
+     or 
+
+
+             significance_testing.pl  t-test
+
+     As currently set up, the case-study incorporated in the script
+     significance_testing.pl is for two different versions of the LSA
+     algorithm with two different thresholds for the important parameter
+     lsa_svd_threshold.  Note that the command-line argument determines
+     which type of significance test will be carried out, the one based on
+     randomization or the one based on student-t.
+
+
+(12) If you want to calculate a similarity matrix for all the documents
+     in your corpus, execute the script
+
+             calculate_similarity_matrix_for_all_docs.pl
+
+     or the script
+
+             calculate_similarity_matrix_for_all_normalized_docs.pl
+
+     The former calculates the similarity between each pair of documents
+     using the regular document vectors.  On the other hand, the latter
+     script uses the normalized document vectors.  As currently written,
+     these scripts work on the files in the 'minicorpus' subdirectory.
+     Since this mini-corpus contains only eight files, you can actually
+     print out the 8x8 matrix of numbers.

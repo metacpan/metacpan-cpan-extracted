@@ -1,0 +1,32 @@
+0.09 - Mon Sep 17 2012
+	- use 2 API requests at max to get Changelog
+
+0.08 - Thu Jun 21 2012
+	- utilize CPAN::Changes to parse Changelog to show changes between 
+	installed and latest version
+
+0.07 - Mon Feb 27 2012
+	- utilize ExtUtils::MM to do the actual work (instead of eval "use Module")
+	- use version module for proper versions comparisons
+	- removed $AUTHORITY handling as it seems to be useless
+
+0.06 - Fri Dec 23 2011
+	- added MetaCPAN API querying to get latest version available
+
+0.05 - Wed Oct 5 2011
+	- added shortcut to get perl version
+
+0.04 - Sat Jun 4 2011
+	- moved all logic from script to module
+	- enabled script to process more than one module at one run
+	- utilize Module::CoreList when available
+
+0.03 - Mon Nov 11 2010
+	- more precise messages
+
+0.02 - Fri Jul 9 2010
+	- --help (-h) option added
+	- print $AUTHORITY if defined
+
+0.01 - Thu Jul 8 2010
+	- first release

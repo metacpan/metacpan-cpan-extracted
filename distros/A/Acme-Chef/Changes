@@ -1,0 +1,35 @@
+Revision history for Perl extension Language::Chef.
+
+1.02  Mon, 07 Nov 2016 22:01:47 GMT
+        - allow Liquefy
+        - add ingredients TO a bowl, not INTO a bowl
+
+1.01  Tue May 13 11:33:23 2008
+        - s/refridgerator/refrigerator/g, oops!
+
+1.00  Thu Oct 06 20:11:07 2005
+	- Distribution upgrade to reflect the latest developments in module
+	  testing and building.
+
+0.05  Wed Mar 26 12:49:51 2003
+	- Switched namespaces to Acme::Chef as suggested
+	  on the modules list
+	- Minor bugfixes
+
+0.04  Fri Jan 31 13:03:11 2003
+	- Fixed bugs that I reintroduced in 0.03.
+	- Regained *nix.
+
+0.03  Fri Jan 31 00:45:26 2003
+	- Implemented the specification changes from Jan 26.
+	- Added appropriate test file and example.
+	- Amended documentation.
+
+0.02  Wed Dec 25 15:25:12 2002
+	- Now compiles on *nix
+
+0.01  Fri Dec 20 14:08:38 2002
+	- original version as released to CPAN
+
+
+

@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="NULL" type="application/x-xsp"?>
+<?xml-stylesheet href="/transforms/articles/insert-values-edit.xsl" type="text/xsl"?>
+<?xml-stylesheet href="/transforms/articles/xhtml/submit.xsl" type="text/xsl"?>
+<xsp:page
+  xmlns:xsp="http://www.apache.org/1999/XSP/Core"  
+  xmlns:art="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Article" 
+  xmlns:ct="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Control"
+  xmlns:cust="http://www.kjetil.kjernsmo.net/software/TABOO/NS/CustomGrammar"
+  xmlns:user="http://www.kjetil.kjernsmo.net/software/TABOO/NS/User"
+  xmlns:cat="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Category"
+  xmlns:lang="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Language"
+  xmlns:i18n="http://www.kjetil.kjernsmo.net/software/TABOO/NS/I18N"
+  xmlns:val="http://www.kjetil.kjernsmo.net/software/TABOO/NS/FormValues"
+  xmlns:session="http://www.axkit.org/2002/XSP/BasicSession"
+  xmlns:param="http://www.axkit.org/2002/XSP/QueryParam">
+  <cust:submit>    
+    <cust:title><i18n:insert>submit-article</i18n:insert></cust:title>
+    <param:if-exists name="submitted">
+      <art:store-required redirect="/articles/edit"/>
+    </param:if-exists>
+    <ct:control name="title" type="text" element="input" size="40" maxlength="254">
+      <ct:title><i18n:insert>article-title</i18n:insert></ct:title>
+      <ct:descr><i18n:insert>article-descr</i18n:insert></ct:descr>
+      <ct:value><val:insert name="title"/></ct:value>
+    </ct:control>
+    <ct:control element="input" type="text" name="authorid" size="8" maxlength="8">
+      <ct:title><i18n:insert>authorid</i18n:insert></ct:title>
+      <ct:descr><i18n:insert>authorid-descr</i18n:insert></ct:descr>
+      <ct:value>
+	<param:unless-exists name="previewed">
+	  <session:get-attribute name="credential_0"/>
+	</param:unless-exists>
+	<param:if-exists name="previewed">
+	  <val:insert name="authorid"/>
+	</param:if-exists>
+      </ct:value>
+    </ct:control>
+    <ct:control name="description" type="text" element="input" size="80" maxlength="254">
+      <ct:title><i18n:insert>article-description</i18n:insert></ct:title>
+      <ct:descr><i18n:insert>article-description-descr</i18n:insert></ct:descr>
+      <ct:value><val:insert name="description"/></ct:value>
+    </ct:control>
+
+    <ct:control name="code">
+      <ct:title><i18n:insert>language</i18n:insert></ct:title>
+      <ct:descr><i18n:insert>language-descr</i18n:insert></ct:descr>
+      <lang:get-languages/>
+      <ct:value><val:insert name="code"/></ct:value>
+    </ct:control>
+    <ct:control name="primcat">
+      <ct:title><i18n:insert>primcat</i18n:insert></ct:title>
+      <ct:descr><i18n:insert>primcat-descr</i18n:insert></ct:descr>
+      <cat:get-categories type="categ"/>
+      <ct:value><val:insert name="primcat"/></ct:value>
+    </ct:control>
+    <ct:control name="upfile" type="file" element="input">
+      <ct:title><i18n:insert>article-file-upload</i18n:insert></ct:title>
+      <ct:descr><i18n:insert>article-file-upload-descr</i18n:insert></ct:descr>
+      <ct:value><val:insert name="upfile"/></ct:value>
+    </ct:control>
+    <ct:control name="filename" type="text" element="input" maxlength="30">
+      <ct:title><i18n:insert>article-filename</i18n:insert></ct:title>
+      <ct:descr><i18n:insert>article-filename-descr</i18n:insert></ct:descr>
+      <ct:value><val:insert name="filename"/></ct:value>
+    </ct:control>
+    <ct:control name="text" element="textarea" rows="22" cols="60">
+      <ct:title><i18n:insert>article-textstring</i18n:insert></ct:title>
+      <ct:descr>
+	<i18n:insert>article-textstring-descr</i18n:insert>
+      </ct:descr>
+      <ct:value><val:insert name="text"/></ct:value>
+    </ct:control>
+    <user:is-authorized authlevel="6">
+      <user:true>
+	<ct:control element="input" type="checkbox" name="editorok">
+	  <ct:title><i18n:insert>editorok</i18n:insert></ct:title>
+	  <ct:descr><i18n:insert>editorok-descr</i18n:insert></ct:descr>
+	  <ct:value><val:insert name="editorok"/></ct:value>
+	</ct:control>
+      </user:true>
+    </user:is-authorized>
+    <ct:control element="input" type="submit" name="submitted"> 
+      <ct:value><i18n:insert>send</i18n:insert></ct:value>
+    </ct:control>
+    
+  </cust:submit>
+
+</xsp:page>

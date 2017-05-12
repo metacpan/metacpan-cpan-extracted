@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Carp;
+use Getopt::Long qw/GetOptions/;
+#TODO: parse arguments and set up options
+my %options = ();
+GetOptions(\%options,
+    "debug", "version", "help") or
+    croak "Error in commandline arguments";
+#WTF: when use is used the @ARGV is swallowed
+eval { require App::financeta; } or croak "Unable to load App::financeta";
+App::financeta->print_warning;
+App::financeta->run(%options);
+
+__END__
+#### COPYRIGHT: 2014. Vikas N Kumar. All Rights Reserved
+#### AUTHOR: Vikas N Kumar <vikas@cpan.org>
+#### DATE: 15th Aug 2014
+
+=head1 NAME
+
+financeta
+
+=head1 SYNOPSIS
+
+financeta is a commandline application that invokes L<App::financeta> and starts
+a GUI for technical analysis of stocks.
+
+=head1 VERSION
+
+0.10
+
+=head1 OPTIONS
+
+B<TODO>
+
+=head1 SEE ALSO
+
+=over
+
+=item L<App::financeta::gui>
+
+This is the GUI internal details being used by C<App::financeta>.
+
+=item L<App::financeta>
+
+This module just runs the application that calls C<App::financeta::gui>.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2013-2014. Vikas N Kumar <vikas@cpan.org>. All Rights Reserved.
+
+=head1 LICENSE
+
+This is free software. You can redistribute it or modify it under the terms of
+GNU General Public License version 3. Refer LICENSE file in the top level source directory for more
+information.

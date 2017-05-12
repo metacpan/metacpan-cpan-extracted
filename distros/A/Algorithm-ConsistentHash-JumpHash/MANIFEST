@@ -1,0 +1,11 @@
+Changes
+fix_inline.h
+JumpHash.xs
+lib/Algorithm/ConsistentHash/JumpHash.pm
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+t/01_basic.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

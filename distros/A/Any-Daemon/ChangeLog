@@ -1,0 +1,57 @@
+
+version history of Any::Daemon
+
+version 0.94: Mon Mar 10 16:12:13 CET 2014
+
+	Improvements:
+	- changed documentation style.
+	- re-seed the pseudo number generator per process (see perldoc -f srand)
+
+version 0.93: Sun Jan  5 17:31:48 CET 2014
+
+	Changes:
+	- move to Log::Report 1.0, only light form required.
+
+	Fixes:
+	- catch daemon errors with try not eval, to keep Log::Report::Message
+	  exceptions alive for dispatchers in the main script.
+	- ownership of workdir to runtime user.
+
+version 0.92: Tue Oct 15 12:22:13 CEST 2013
+
+	Fixes:
+	- do not complain at close when there is no $pidfn
+
+version 0.91: Fri Oct  4 09:04:02 CEST 2013
+	Fixes:
+	- one dispatcher is enough!
+
+version 0.90: Tue Jul  9 17:39:01 CEST 2013
+	- create workdir first at run(), so its dir can be used by the
+	  other parameters.
+	- new method workdir()
+
+version 0.14: Fri May  3 10:21:16 CEST 2013
+	- drop Unix::SavedIDs because it got broken in 5.16
+
+version 0.13: Mon Feb  6 11:15:55 CET 2012
+	- use Unix::SaveIDs to set the user, because you want the
+	  saved-uid to be changed as well. [Andrew Beverley]
+	- fix: start of more than one child was broken: loop line
+	  misteriously lost from the source. Fixed by [Andrew Beverley]
+
+version 0.12: Mon Apr 18 13:55:23 CEST 2011
+	- panic when the child dies with run-time program errors.
+	- added example
+
+version 0.11: Mon Mar 21 16:46:45 CET 2011
+	- use $EUID and $EGID to change user/group, not setuid/setgid
+	- change EUID only after changing EGID
+	- create workdir after changing ids
+	- create pidfile before changing ids
+	- added generic start-stop script to distribution
+	- fix when uid==0 and gid==0
+
+version 0.10: Wed Jan 26 16:22:26 CET 2011
+	- initial released version, based on various own implementations
+	  in active duty.

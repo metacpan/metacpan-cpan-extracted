@@ -1,0 +1,2327 @@
+reference 0 EmptySubclass=HASH with 6 keys
+reference 0 EmptySubclass=HASH key 'current_node'
+  reference 1-0 Apache::ConfigParser::Directive=HASH with 10 keys
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'attributes'
+    reference 1-1-0 HASH with 0 keys
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'daughters'
+    reference 1-1-1 ARRAY with 75 elements
+    reference 1-1-1 ARRAY index 0
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-1-0 HASH with 0 keys
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-1-1 ARRAY with 0 elements
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '27'
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'env_module libexec/mod_env.so'
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-1-2 ARRAY with 2 elements
+        reference 1-1-2-1-2 ARRAY index 0
+           'env_module'
+        reference 1-1-2-1-2 ARRAY index 1
+           'libexec/mod_env.so'
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'value'
+         'env_module mod_env.so'
+      reference 1-1-2-0 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-1-3 ARRAY with 2 elements
+        reference 1-1-2-1-3 ARRAY index 0
+           'env_module'
+        reference 1-1-2-1-3 ARRAY index 1
+           'mod_env.so'
+    reference 1-1-1 ARRAY index 1
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-2-0 HASH with 0 keys
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-2-1 ARRAY with 0 elements
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '28'
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'config_log_module libexec/mod_log_config.so'
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-2-2 ARRAY with 2 elements
+        reference 1-1-2-2-2 ARRAY index 0
+           'config_log_module'
+        reference 1-1-2-2-2 ARRAY index 1
+           'libexec/mod_log_config.so'
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'value'
+         'config_log_module mod_log_config.so'
+      reference 1-1-2-1 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-2-3 ARRAY with 2 elements
+        reference 1-1-2-2-3 ARRAY index 0
+           'config_log_module'
+        reference 1-1-2-2-3 ARRAY index 1
+           'mod_log_config.so'
+    reference 1-1-1 ARRAY index 2
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-3-0 HASH with 0 keys
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-3-1 ARRAY with 0 elements
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '29'
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mime_module libexec/mod_mime.so'
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-3-2 ARRAY with 2 elements
+        reference 1-1-2-3-2 ARRAY index 0
+           'mime_module'
+        reference 1-1-2-3-2 ARRAY index 1
+           'libexec/mod_mime.so'
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'value'
+         'mime_module mod_mime.so'
+      reference 1-1-2-2 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-3-3 ARRAY with 2 elements
+        reference 1-1-2-3-3 ARRAY index 0
+           'mime_module'
+        reference 1-1-2-3-3 ARRAY index 1
+           'mod_mime.so'
+    reference 1-1-1 ARRAY index 3
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-4-0 HASH with 0 keys
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-4-1 ARRAY with 0 elements
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '30'
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'negotiation_module libexec/mod_negotiation.so'
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-4-2 ARRAY with 2 elements
+        reference 1-1-2-4-2 ARRAY index 0
+           'negotiation_module'
+        reference 1-1-2-4-2 ARRAY index 1
+           'libexec/mod_negotiation.so'
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'value'
+         'negotiation_module mod_negotiation.so'
+      reference 1-1-2-3 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-4-3 ARRAY with 2 elements
+        reference 1-1-2-4-3 ARRAY index 0
+           'negotiation_module'
+        reference 1-1-2-4-3 ARRAY index 1
+           'mod_negotiation.so'
+    reference 1-1-1 ARRAY index 4
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-5-0 HASH with 0 keys
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-5-1 ARRAY with 0 elements
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '31'
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'includes_module libexec/mod_include.so'
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-5-2 ARRAY with 2 elements
+        reference 1-1-2-5-2 ARRAY index 0
+           'includes_module'
+        reference 1-1-2-5-2 ARRAY index 1
+           'libexec/mod_include.so'
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'value'
+         'includes_module mod_include.so'
+      reference 1-1-2-4 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-5-3 ARRAY with 2 elements
+        reference 1-1-2-5-3 ARRAY index 0
+           'includes_module'
+        reference 1-1-2-5-3 ARRAY index 1
+           'mod_include.so'
+    reference 1-1-1 ARRAY index 5
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-6-0 HASH with 0 keys
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-6-1 ARRAY with 0 elements
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '32'
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'autoindex_module libexec/mod_autoindex.so'
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-6-2 ARRAY with 2 elements
+        reference 1-1-2-6-2 ARRAY index 0
+           'autoindex_module'
+        reference 1-1-2-6-2 ARRAY index 1
+           'libexec/mod_autoindex.so'
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'value'
+         'autoindex_module mod_autoindex.so'
+      reference 1-1-2-5 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-6-3 ARRAY with 2 elements
+        reference 1-1-2-6-3 ARRAY index 0
+           'autoindex_module'
+        reference 1-1-2-6-3 ARRAY index 1
+           'mod_autoindex.so'
+    reference 1-1-1 ARRAY index 6
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-7-0 HASH with 0 keys
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-7-1 ARRAY with 0 elements
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '33'
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'dir_module libexec/mod_dir.so'
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-7-2 ARRAY with 2 elements
+        reference 1-1-2-7-2 ARRAY index 0
+           'dir_module'
+        reference 1-1-2-7-2 ARRAY index 1
+           'libexec/mod_dir.so'
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'value'
+         'dir_module mod_dir.so'
+      reference 1-1-2-6 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-7-3 ARRAY with 2 elements
+        reference 1-1-2-7-3 ARRAY index 0
+           'dir_module'
+        reference 1-1-2-7-3 ARRAY index 1
+           'mod_dir.so'
+    reference 1-1-1 ARRAY index 7
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-8-0 HASH with 0 keys
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-8-1 ARRAY with 0 elements
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '34'
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'cgi_module libexec/mod_cgi.so'
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-8-2 ARRAY with 2 elements
+        reference 1-1-2-8-2 ARRAY index 0
+           'cgi_module'
+        reference 1-1-2-8-2 ARRAY index 1
+           'libexec/mod_cgi.so'
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'value'
+         'cgi_module mod_cgi.so'
+      reference 1-1-2-7 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-8-3 ARRAY with 2 elements
+        reference 1-1-2-8-3 ARRAY index 0
+           'cgi_module'
+        reference 1-1-2-8-3 ARRAY index 1
+           'mod_cgi.so'
+    reference 1-1-1 ARRAY index 8
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-9-0 HASH with 0 keys
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-9-1 ARRAY with 0 elements
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '35'
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'asis_module libexec/mod_asis.so'
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-9-2 ARRAY with 2 elements
+        reference 1-1-2-9-2 ARRAY index 0
+           'asis_module'
+        reference 1-1-2-9-2 ARRAY index 1
+           'libexec/mod_asis.so'
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'value'
+         'asis_module mod_asis.so'
+      reference 1-1-2-8 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-9-3 ARRAY with 2 elements
+        reference 1-1-2-9-3 ARRAY index 0
+           'asis_module'
+        reference 1-1-2-9-3 ARRAY index 1
+           'mod_asis.so'
+    reference 1-1-1 ARRAY index 9
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-10-0 HASH with 0 keys
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-10-1 ARRAY with 0 elements
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '36'
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'imap_module libexec/mod_imap.so'
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-10-2 ARRAY with 2 elements
+        reference 1-1-2-10-2 ARRAY index 0
+           'imap_module'
+        reference 1-1-2-10-2 ARRAY index 1
+           'libexec/mod_imap.so'
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'value'
+         'imap_module mod_imap.so'
+      reference 1-1-2-9 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-10-3 ARRAY with 2 elements
+        reference 1-1-2-10-3 ARRAY index 0
+           'imap_module'
+        reference 1-1-2-10-3 ARRAY index 1
+           'mod_imap.so'
+    reference 1-1-1 ARRAY index 10
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-11-0 HASH with 0 keys
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-11-1 ARRAY with 0 elements
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '37'
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'action_module libexec/mod_actions.so'
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-11-2 ARRAY with 2 elements
+        reference 1-1-2-11-2 ARRAY index 0
+           'action_module'
+        reference 1-1-2-11-2 ARRAY index 1
+           'libexec/mod_actions.so'
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'value'
+         'action_module mod_actions.so'
+      reference 1-1-2-10 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-11-3 ARRAY with 2 elements
+        reference 1-1-2-11-3 ARRAY index 0
+           'action_module'
+        reference 1-1-2-11-3 ARRAY index 1
+           'mod_actions.so'
+    reference 1-1-1 ARRAY index 11
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-12-0 HASH with 0 keys
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-12-1 ARRAY with 0 elements
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '38'
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'userdir_module libexec/mod_userdir.so'
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-12-2 ARRAY with 2 elements
+        reference 1-1-2-12-2 ARRAY index 0
+           'userdir_module'
+        reference 1-1-2-12-2 ARRAY index 1
+           'libexec/mod_userdir.so'
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'value'
+         'userdir_module mod_userdir.so'
+      reference 1-1-2-11 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-12-3 ARRAY with 2 elements
+        reference 1-1-2-12-3 ARRAY index 0
+           'userdir_module'
+        reference 1-1-2-12-3 ARRAY index 1
+           'mod_userdir.so'
+    reference 1-1-1 ARRAY index 12
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-13-0 HASH with 0 keys
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-13-1 ARRAY with 0 elements
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '39'
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'alias_module libexec/mod_alias.so'
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-13-2 ARRAY with 2 elements
+        reference 1-1-2-13-2 ARRAY index 0
+           'alias_module'
+        reference 1-1-2-13-2 ARRAY index 1
+           'libexec/mod_alias.so'
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'value'
+         'alias_module mod_alias.so'
+      reference 1-1-2-12 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-13-3 ARRAY with 2 elements
+        reference 1-1-2-13-3 ARRAY index 0
+           'alias_module'
+        reference 1-1-2-13-3 ARRAY index 1
+           'mod_alias.so'
+    reference 1-1-1 ARRAY index 13
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-14-0 HASH with 0 keys
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-14-1 ARRAY with 0 elements
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '40'
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'access_module libexec/mod_access.so'
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-14-2 ARRAY with 2 elements
+        reference 1-1-2-14-2 ARRAY index 0
+           'access_module'
+        reference 1-1-2-14-2 ARRAY index 1
+           'libexec/mod_access.so'
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'value'
+         'access_module mod_access.so'
+      reference 1-1-2-13 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-14-3 ARRAY with 2 elements
+        reference 1-1-2-14-3 ARRAY index 0
+           'access_module'
+        reference 1-1-2-14-3 ARRAY index 1
+           'mod_access.so'
+    reference 1-1-1 ARRAY index 14
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-15-0 HASH with 0 keys
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-15-1 ARRAY with 0 elements
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '41'
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'auth_module libexec/mod_auth.so'
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-15-2 ARRAY with 2 elements
+        reference 1-1-2-15-2 ARRAY index 0
+           'auth_module'
+        reference 1-1-2-15-2 ARRAY index 1
+           'libexec/mod_auth.so'
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'value'
+         'auth_module mod_auth.so'
+      reference 1-1-2-14 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-15-3 ARRAY with 2 elements
+        reference 1-1-2-15-3 ARRAY index 0
+           'auth_module'
+        reference 1-1-2-15-3 ARRAY index 1
+           'mod_auth.so'
+    reference 1-1-1 ARRAY index 15
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-16-0 HASH with 0 keys
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-16-1 ARRAY with 0 elements
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '42'
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'setenvif_module libexec/mod_setenvif.so'
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-16-2 ARRAY with 2 elements
+        reference 1-1-2-16-2 ARRAY index 0
+           'setenvif_module'
+        reference 1-1-2-16-2 ARRAY index 1
+           'libexec/mod_setenvif.so'
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'value'
+         'setenvif_module mod_setenvif.so'
+      reference 1-1-2-15 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-16-3 ARRAY with 2 elements
+        reference 1-1-2-16-3 ARRAY index 0
+           'setenvif_module'
+        reference 1-1-2-16-3 ARRAY index 1
+           'mod_setenvif.so'
+    reference 1-1-1 ARRAY index 16
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-17-0 HASH with 0 keys
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-17-1 ARRAY with 0 elements
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '43'
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'jserv_module libexec/mod_jserv.so'
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-17-2 ARRAY with 2 elements
+        reference 1-1-2-17-2 ARRAY index 0
+           'jserv_module'
+        reference 1-1-2-17-2 ARRAY index 1
+           'libexec/mod_jserv.so'
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'value'
+         'jserv_module mod_jserv.so'
+      reference 1-1-2-16 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-17-3 ARRAY with 2 elements
+        reference 1-1-2-17-3 ARRAY index 0
+           'jserv_module'
+        reference 1-1-2-17-3 ARRAY index 1
+           'mod_jserv.so'
+    reference 1-1-1 ARRAY index 17
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-18-0 HASH with 0 keys
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-18-1 ARRAY with 0 elements
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '47'
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'name'
+         'clearmodulelist'
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         UNDEFINED
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+         UNDEFINED
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'value'
+         UNDEFINED
+      reference 1-1-2-17 Apache::ConfigParser::Directive=HASH key 'value_array'
+         UNDEFINED
+    reference 1-1-1 ARRAY index 18
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-19-0 HASH with 0 keys
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-19-1 ARRAY with 0 elements
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '48'
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_env.c'
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-19-2 ARRAY with 1 elements
+        reference 1-1-2-19-2 ARRAY index 0
+           'mod_env.c'
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_env.c'
+      reference 1-1-2-18 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-19-3 ARRAY with 1 elements
+        reference 1-1-2-19-3 ARRAY index 0
+           'mod_env.c'
+    reference 1-1-1 ARRAY index 19
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-20-0 HASH with 0 keys
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-20-1 ARRAY with 0 elements
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '49'
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_log_config.c'
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-20-2 ARRAY with 1 elements
+        reference 1-1-2-20-2 ARRAY index 0
+           'mod_log_config.c'
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_log_config.c'
+      reference 1-1-2-19 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-20-3 ARRAY with 1 elements
+        reference 1-1-2-20-3 ARRAY index 0
+           'mod_log_config.c'
+    reference 1-1-1 ARRAY index 20
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-21-0 HASH with 0 keys
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-21-1 ARRAY with 0 elements
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '50'
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_mime.c'
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-21-2 ARRAY with 1 elements
+        reference 1-1-2-21-2 ARRAY index 0
+           'mod_mime.c'
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_mime.c'
+      reference 1-1-2-20 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-21-3 ARRAY with 1 elements
+        reference 1-1-2-21-3 ARRAY index 0
+           'mod_mime.c'
+    reference 1-1-1 ARRAY index 21
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-22-0 HASH with 0 keys
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-22-1 ARRAY with 0 elements
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '51'
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_negotiation.c'
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-22-2 ARRAY with 1 elements
+        reference 1-1-2-22-2 ARRAY index 0
+           'mod_negotiation.c'
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_negotiation.c'
+      reference 1-1-2-21 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-22-3 ARRAY with 1 elements
+        reference 1-1-2-22-3 ARRAY index 0
+           'mod_negotiation.c'
+    reference 1-1-1 ARRAY index 22
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-23-0 HASH with 0 keys
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-23-1 ARRAY with 0 elements
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '52'
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_include.c'
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-23-2 ARRAY with 1 elements
+        reference 1-1-2-23-2 ARRAY index 0
+           'mod_include.c'
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_include.c'
+      reference 1-1-2-22 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-23-3 ARRAY with 1 elements
+        reference 1-1-2-23-3 ARRAY index 0
+           'mod_include.c'
+    reference 1-1-1 ARRAY index 23
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-24-0 HASH with 0 keys
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-24-1 ARRAY with 0 elements
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '53'
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_autoindex.c'
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-24-2 ARRAY with 1 elements
+        reference 1-1-2-24-2 ARRAY index 0
+           'mod_autoindex.c'
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_autoindex.c'
+      reference 1-1-2-23 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-24-3 ARRAY with 1 elements
+        reference 1-1-2-24-3 ARRAY index 0
+           'mod_autoindex.c'
+    reference 1-1-1 ARRAY index 24
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-25-0 HASH with 0 keys
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-25-1 ARRAY with 0 elements
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '54'
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_dir.c'
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-25-2 ARRAY with 1 elements
+        reference 1-1-2-25-2 ARRAY index 0
+           'mod_dir.c'
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_dir.c'
+      reference 1-1-2-24 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-25-3 ARRAY with 1 elements
+        reference 1-1-2-25-3 ARRAY index 0
+           'mod_dir.c'
+    reference 1-1-1 ARRAY index 25
+      reference 1-1-2-25 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-25 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-26-0 HASH with 0 keys
+      reference 1-1-2-25 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-26-1 ARRAY with 0 elements
+      reference 1-1-2-25 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-25 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '55'
+      reference 1-1-2-25 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-25 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-25 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_cgi.c'
+      reference 1-1-2-25 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-26-2 ARRAY with 1 elements
+        reference 1-1-2-26-2 ARRAY index 0
+           'mod_cgi.c'
+      reference 1-1-2-25 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_cgi.c'
+      reference 1-1-2-25 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-26-3 ARRAY with 1 elements
+        reference 1-1-2-26-3 ARRAY index 0
+           'mod_cgi.c'
+    reference 1-1-1 ARRAY index 26
+      reference 1-1-2-26 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-26 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-27-0 HASH with 0 keys
+      reference 1-1-2-26 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-27-1 ARRAY with 0 elements
+      reference 1-1-2-26 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-26 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '56'
+      reference 1-1-2-26 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-26 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-26 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_asis.c'
+      reference 1-1-2-26 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-27-2 ARRAY with 1 elements
+        reference 1-1-2-27-2 ARRAY index 0
+           'mod_asis.c'
+      reference 1-1-2-26 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_asis.c'
+      reference 1-1-2-26 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-27-3 ARRAY with 1 elements
+        reference 1-1-2-27-3 ARRAY index 0
+           'mod_asis.c'
+    reference 1-1-1 ARRAY index 27
+      reference 1-1-2-27 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-27 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-28-0 HASH with 0 keys
+      reference 1-1-2-27 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-28-1 ARRAY with 0 elements
+      reference 1-1-2-27 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-27 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '57'
+      reference 1-1-2-27 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-27 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-27 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_imap.c'
+      reference 1-1-2-27 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-28-2 ARRAY with 1 elements
+        reference 1-1-2-28-2 ARRAY index 0
+           'mod_imap.c'
+      reference 1-1-2-27 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_imap.c'
+      reference 1-1-2-27 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-28-3 ARRAY with 1 elements
+        reference 1-1-2-28-3 ARRAY index 0
+           'mod_imap.c'
+    reference 1-1-1 ARRAY index 28
+      reference 1-1-2-28 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-28 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-29-0 HASH with 0 keys
+      reference 1-1-2-28 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-29-1 ARRAY with 0 elements
+      reference 1-1-2-28 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-28 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '58'
+      reference 1-1-2-28 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-28 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-28 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_actions.c'
+      reference 1-1-2-28 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-29-2 ARRAY with 1 elements
+        reference 1-1-2-29-2 ARRAY index 0
+           'mod_actions.c'
+      reference 1-1-2-28 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_actions.c'
+      reference 1-1-2-28 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-29-3 ARRAY with 1 elements
+        reference 1-1-2-29-3 ARRAY index 0
+           'mod_actions.c'
+    reference 1-1-1 ARRAY index 29
+      reference 1-1-2-29 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-29 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-30-0 HASH with 0 keys
+      reference 1-1-2-29 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-30-1 ARRAY with 0 elements
+      reference 1-1-2-29 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-29 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '59'
+      reference 1-1-2-29 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-29 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-29 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_userdir.c'
+      reference 1-1-2-29 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-30-2 ARRAY with 1 elements
+        reference 1-1-2-30-2 ARRAY index 0
+           'mod_userdir.c'
+      reference 1-1-2-29 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_userdir.c'
+      reference 1-1-2-29 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-30-3 ARRAY with 1 elements
+        reference 1-1-2-30-3 ARRAY index 0
+           'mod_userdir.c'
+    reference 1-1-1 ARRAY index 30
+      reference 1-1-2-30 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-30 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-31-0 HASH with 0 keys
+      reference 1-1-2-30 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-31-1 ARRAY with 0 elements
+      reference 1-1-2-30 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-30 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '60'
+      reference 1-1-2-30 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-30 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-30 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_alias.c'
+      reference 1-1-2-30 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-31-2 ARRAY with 1 elements
+        reference 1-1-2-31-2 ARRAY index 0
+           'mod_alias.c'
+      reference 1-1-2-30 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_alias.c'
+      reference 1-1-2-30 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-31-3 ARRAY with 1 elements
+        reference 1-1-2-31-3 ARRAY index 0
+           'mod_alias.c'
+    reference 1-1-1 ARRAY index 31
+      reference 1-1-2-31 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-31 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-32-0 HASH with 0 keys
+      reference 1-1-2-31 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-32-1 ARRAY with 0 elements
+      reference 1-1-2-31 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-31 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '61'
+      reference 1-1-2-31 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-31 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-31 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_access.c'
+      reference 1-1-2-31 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-32-2 ARRAY with 1 elements
+        reference 1-1-2-32-2 ARRAY index 0
+           'mod_access.c'
+      reference 1-1-2-31 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_access.c'
+      reference 1-1-2-31 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-32-3 ARRAY with 1 elements
+        reference 1-1-2-32-3 ARRAY index 0
+           'mod_access.c'
+    reference 1-1-1 ARRAY index 32
+      reference 1-1-2-32 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-32 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-33-0 HASH with 0 keys
+      reference 1-1-2-32 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-33-1 ARRAY with 0 elements
+      reference 1-1-2-32 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-32 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '62'
+      reference 1-1-2-32 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-32 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-32 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_auth.c'
+      reference 1-1-2-32 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-33-2 ARRAY with 1 elements
+        reference 1-1-2-33-2 ARRAY index 0
+           'mod_auth.c'
+      reference 1-1-2-32 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_auth.c'
+      reference 1-1-2-32 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-33-3 ARRAY with 1 elements
+        reference 1-1-2-33-3 ARRAY index 0
+           'mod_auth.c'
+    reference 1-1-1 ARRAY index 33
+      reference 1-1-2-33 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-33 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-34-0 HASH with 0 keys
+      reference 1-1-2-33 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-34-1 ARRAY with 0 elements
+      reference 1-1-2-33 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-33 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '63'
+      reference 1-1-2-33 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-33 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-33 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_so.c'
+      reference 1-1-2-33 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-34-2 ARRAY with 1 elements
+        reference 1-1-2-34-2 ARRAY index 0
+           'mod_so.c'
+      reference 1-1-2-33 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_so.c'
+      reference 1-1-2-33 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-34-3 ARRAY with 1 elements
+        reference 1-1-2-34-3 ARRAY index 0
+           'mod_so.c'
+    reference 1-1-1 ARRAY index 34
+      reference 1-1-2-34 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-34 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-35-0 HASH with 0 keys
+      reference 1-1-2-34 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-35-1 ARRAY with 0 elements
+      reference 1-1-2-34 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-34 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '64'
+      reference 1-1-2-34 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-34 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-34 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_setenvif.c'
+      reference 1-1-2-34 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-35-2 ARRAY with 1 elements
+        reference 1-1-2-35-2 ARRAY index 0
+           'mod_setenvif.c'
+      reference 1-1-2-34 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_setenvif.c'
+      reference 1-1-2-34 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-35-3 ARRAY with 1 elements
+        reference 1-1-2-35-3 ARRAY index 0
+           'mod_setenvif.c'
+    reference 1-1-1 ARRAY index 35
+      reference 1-1-2-35 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-35 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-36-0 HASH with 0 keys
+      reference 1-1-2-35 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-36-1 ARRAY with 0 elements
+      reference 1-1-2-35 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-35 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '65'
+      reference 1-1-2-35 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-35 Apache::ConfigParser::Directive=HASH key 'name'
+         'addmodule'
+      reference 1-1-2-35 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'mod_jserv.c'
+      reference 1-1-2-35 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-36-2 ARRAY with 1 elements
+        reference 1-1-2-36-2 ARRAY index 0
+           'mod_jserv.c'
+      reference 1-1-2-35 Apache::ConfigParser::Directive=HASH key 'value'
+         'mod_jserv.c'
+      reference 1-1-2-35 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-36-3 ARRAY with 1 elements
+        reference 1-1-2-36-3 ARRAY index 0
+           'mod_jserv.c'
+    reference 1-1-1 ARRAY index 36
+      reference 1-1-2-36 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-36 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-37-0 HASH with 0 keys
+      reference 1-1-2-36 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-37-1 ARRAY with 0 elements
+      reference 1-1-2-36 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-36 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '69'
+      reference 1-1-2-36 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-36 Apache::ConfigParser::Directive=HASH key 'name'
+         'servertype'
+      reference 1-1-2-36 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'standalone'
+      reference 1-1-2-36 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-37-2 ARRAY with 1 elements
+        reference 1-1-2-37-2 ARRAY index 0
+           'standalone'
+      reference 1-1-2-36 Apache::ConfigParser::Directive=HASH key 'value'
+         'standalone'
+      reference 1-1-2-36 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-37-3 ARRAY with 1 elements
+        reference 1-1-2-37-3 ARRAY index 0
+           'standalone'
+    reference 1-1-1 ARRAY index 37
+      reference 1-1-2-37 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-37 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-38-0 HASH with 0 keys
+      reference 1-1-2-37 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-38-1 ARRAY with 0 elements
+      reference 1-1-2-37 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-37 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '76'
+      reference 1-1-2-37 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-37 Apache::ConfigParser::Directive=HASH key 'name'
+         'port'
+      reference 1-1-2-37 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '80'
+      reference 1-1-2-37 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-38-2 ARRAY with 1 elements
+        reference 1-1-2-38-2 ARRAY index 0
+           '80'
+      reference 1-1-2-37 Apache::ConfigParser::Directive=HASH key 'value'
+         '80'
+      reference 1-1-2-37 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-38-3 ARRAY with 1 elements
+        reference 1-1-2-38-3 ARRAY index 0
+           '80'
+    reference 1-1-1 ARRAY index 38
+      reference 1-1-2-38 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-38 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-39-0 HASH with 0 keys
+      reference 1-1-2-38 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-39-1 ARRAY with 0 elements
+      reference 1-1-2-38 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-38 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '83'
+      reference 1-1-2-38 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-38 Apache::ConfigParser::Directive=HASH key 'name'
+         'hostnamelookups'
+      reference 1-1-2-38 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'off'
+      reference 1-1-2-38 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-39-2 ARRAY with 1 elements
+        reference 1-1-2-39-2 ARRAY index 0
+           'off'
+      reference 1-1-2-38 Apache::ConfigParser::Directive=HASH key 'value'
+         'off'
+      reference 1-1-2-38 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-39-3 ARRAY with 1 elements
+        reference 1-1-2-39-3 ARRAY index 0
+           'off'
+    reference 1-1-1 ARRAY index 39
+      reference 1-1-2-39 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-39 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-40-0 HASH with 0 keys
+      reference 1-1-2-39 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-40-1 ARRAY with 0 elements
+      reference 1-1-2-39 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-39 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '96'
+      reference 1-1-2-39 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-39 Apache::ConfigParser::Directive=HASH key 'name'
+         'user'
+      reference 1-1-2-39 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'nobody'
+      reference 1-1-2-39 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-40-2 ARRAY with 1 elements
+        reference 1-1-2-40-2 ARRAY index 0
+           'nobody'
+      reference 1-1-2-39 Apache::ConfigParser::Directive=HASH key 'value'
+         'nobody'
+      reference 1-1-2-39 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-40-3 ARRAY with 1 elements
+        reference 1-1-2-40-3 ARRAY index 0
+           'nobody'
+    reference 1-1-1 ARRAY index 40
+      reference 1-1-2-40 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-40 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-41-0 HASH with 0 keys
+      reference 1-1-2-40 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-41-1 ARRAY with 0 elements
+      reference 1-1-2-40 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-40 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '97'
+      reference 1-1-2-40 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-40 Apache::ConfigParser::Directive=HASH key 'name'
+         'group'
+      reference 1-1-2-40 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'nogroup'
+      reference 1-1-2-40 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-41-2 ARRAY with 1 elements
+        reference 1-1-2-41-2 ARRAY index 0
+           'nogroup'
+      reference 1-1-2-40 Apache::ConfigParser::Directive=HASH key 'value'
+         'nogroup'
+      reference 1-1-2-40 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-41-3 ARRAY with 1 elements
+        reference 1-1-2-41-3 ARRAY index 0
+           'nogroup'
+    reference 1-1-1 ARRAY index 41
+      reference 1-1-2-41 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-41 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-42-0 HASH with 0 keys
+      reference 1-1-2-41 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-42-1 ARRAY with 0 elements
+      reference 1-1-2-41 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-41 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '102'
+      reference 1-1-2-41 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-41 Apache::ConfigParser::Directive=HASH key 'name'
+         'serveradmin'
+      reference 1-1-2-41 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'root@jaguar'
+      reference 1-1-2-41 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-42-2 ARRAY with 1 elements
+        reference 1-1-2-42-2 ARRAY index 0
+           'root@jaguar'
+      reference 1-1-2-41 Apache::ConfigParser::Directive=HASH key 'value'
+         'root@jaguar'
+      reference 1-1-2-41 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-42-3 ARRAY with 1 elements
+        reference 1-1-2-42-3 ARRAY index 0
+           'root@jaguar'
+    reference 1-1-1 ARRAY index 42
+      reference 1-1-2-42 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-42 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-43-0 HASH with 0 keys
+      reference 1-1-2-42 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-43-1 ARRAY with 0 elements
+      reference 1-1-2-42 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-42 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '110'
+      reference 1-1-2-42 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-42 Apache::ConfigParser::Directive=HASH key 'name'
+         'serverroot'
+      reference 1-1-2-42 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '/usr/local/apache'
+      reference 1-1-2-42 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-43-2 ARRAY with 1 elements
+        reference 1-1-2-43-2 ARRAY index 0
+           '/usr/local/apache'
+      reference 1-1-2-42 Apache::ConfigParser::Directive=HASH key 'value'
+         '/usr/local/apache'
+      reference 1-1-2-42 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-43-3 ARRAY with 1 elements
+        reference 1-1-2-43-3 ARRAY index 0
+           '/usr/local/apache'
+    reference 1-1-1 ARRAY index 43
+      reference 1-1-2-43 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-43 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-44-0 HASH with 0 keys
+      reference 1-1-2-43 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-44-1 ARRAY with 0 elements
+      reference 1-1-2-43 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-43 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '122'
+      reference 1-1-2-43 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-43 Apache::ConfigParser::Directive=HASH key 'name'
+         'errorlog'
+      reference 1-1-2-43 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '/usr/local/apache/var/log/error_log'
+      reference 1-1-2-43 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-44-2 ARRAY with 1 elements
+        reference 1-1-2-44-2 ARRAY index 0
+           '/usr/local/apache/var/log/error_log'
+      reference 1-1-2-43 Apache::ConfigParser::Directive=HASH key 'value'
+         'error_log'
+      reference 1-1-2-43 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-44-3 ARRAY with 1 elements
+        reference 1-1-2-44-3 ARRAY index 0
+           'error_log'
+    reference 1-1-1 ARRAY index 44
+      reference 1-1-2-44 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-44 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-45-0 HASH with 0 keys
+      reference 1-1-2-44 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-45-1 ARRAY with 0 elements
+      reference 1-1-2-44 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-44 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '128'
+      reference 1-1-2-44 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-44 Apache::ConfigParser::Directive=HASH key 'name'
+         'loglevel'
+      reference 1-1-2-44 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'warn'
+      reference 1-1-2-44 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-45-2 ARRAY with 1 elements
+        reference 1-1-2-45-2 ARRAY index 0
+           'warn'
+      reference 1-1-2-44 Apache::ConfigParser::Directive=HASH key 'value'
+         'warn'
+      reference 1-1-2-44 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-45-3 ARRAY with 1 elements
+        reference 1-1-2-45-3 ARRAY index 0
+           'warn'
+    reference 1-1-1 ARRAY index 45
+      reference 1-1-2-45 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-45 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-46-0 HASH with 0 keys
+      reference 1-1-2-45 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-46-1 ARRAY with 0 elements
+      reference 1-1-2-45 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-45 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '133'
+      reference 1-1-2-45 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-45 Apache::ConfigParser::Directive=HASH key 'name'
+         'logformat'
+      reference 1-1-2-45 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined'
+      reference 1-1-2-45 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-46-2 ARRAY with 2 elements
+        reference 1-1-2-46-2 ARRAY index 0
+           '%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-Agent}i"'
+        reference 1-1-2-46-2 ARRAY index 1
+           'combined'
+      reference 1-1-2-45 Apache::ConfigParser::Directive=HASH key 'value'
+         '"%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined'
+      reference 1-1-2-45 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-46-3 ARRAY with 2 elements
+        reference 1-1-2-46-3 ARRAY index 0
+           '%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-Agent}i"'
+        reference 1-1-2-46-3 ARRAY index 1
+           'combined'
+    reference 1-1-1 ARRAY index 46
+      reference 1-1-2-46 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-46 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-47-0 HASH with 0 keys
+      reference 1-1-2-46 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-47-1 ARRAY with 0 elements
+      reference 1-1-2-46 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-46 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '134'
+      reference 1-1-2-46 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-46 Apache::ConfigParser::Directive=HASH key 'name'
+         'logformat'
+      reference 1-1-2-46 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"%h %l %u %t \"%r\" %>s %b" common'
+      reference 1-1-2-46 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-47-2 ARRAY with 2 elements
+        reference 1-1-2-47-2 ARRAY index 0
+           '%h %l %u %t "%r" %>s %b'
+        reference 1-1-2-47-2 ARRAY index 1
+           'common'
+      reference 1-1-2-46 Apache::ConfigParser::Directive=HASH key 'value'
+         '"%h %l %u %t \"%r\" %>s %b" common'
+      reference 1-1-2-46 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-47-3 ARRAY with 2 elements
+        reference 1-1-2-47-3 ARRAY index 0
+           '%h %l %u %t "%r" %>s %b'
+        reference 1-1-2-47-3 ARRAY index 1
+           'common'
+    reference 1-1-1 ARRAY index 47
+      reference 1-1-2-47 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-47 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-48-0 HASH with 0 keys
+      reference 1-1-2-47 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-48-1 ARRAY with 0 elements
+      reference 1-1-2-47 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-47 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '135'
+      reference 1-1-2-47 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-47 Apache::ConfigParser::Directive=HASH key 'name'
+         'logformat'
+      reference 1-1-2-47 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"%{Referer}i -> %U" referer'
+      reference 1-1-2-47 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-48-2 ARRAY with 2 elements
+        reference 1-1-2-48-2 ARRAY index 0
+           '%{Referer}i -> %U'
+        reference 1-1-2-48-2 ARRAY index 1
+           'referer'
+      reference 1-1-2-47 Apache::ConfigParser::Directive=HASH key 'value'
+         '"%{Referer}i -> %U" referer'
+      reference 1-1-2-47 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-48-3 ARRAY with 2 elements
+        reference 1-1-2-48-3 ARRAY index 0
+           '%{Referer}i -> %U'
+        reference 1-1-2-48-3 ARRAY index 1
+           'referer'
+    reference 1-1-1 ARRAY index 48
+      reference 1-1-2-48 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-48 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-49-0 HASH with 0 keys
+      reference 1-1-2-48 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-49-1 ARRAY with 0 elements
+      reference 1-1-2-48 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-48 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '136'
+      reference 1-1-2-48 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-48 Apache::ConfigParser::Directive=HASH key 'name'
+         'logformat'
+      reference 1-1-2-48 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '"%{User-agent}i" agent'
+      reference 1-1-2-48 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-49-2 ARRAY with 2 elements
+        reference 1-1-2-49-2 ARRAY index 0
+           '%{User-agent}i'
+        reference 1-1-2-49-2 ARRAY index 1
+           'agent'
+      reference 1-1-2-48 Apache::ConfigParser::Directive=HASH key 'value'
+         '%{User-agent}i agent'
+      reference 1-1-2-48 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-49-3 ARRAY with 2 elements
+        reference 1-1-2-49-3 ARRAY index 0
+           '%{User-agent}i'
+        reference 1-1-2-49-3 ARRAY index 1
+           'agent'
+    reference 1-1-1 ARRAY index 49
+      reference 1-1-2-49 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-49 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-50-0 HASH with 0 keys
+      reference 1-1-2-49 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-50-1 ARRAY with 0 elements
+      reference 1-1-2-49 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-49 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '141'
+      reference 1-1-2-49 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-49 Apache::ConfigParser::Directive=HASH key 'name'
+         'customlog'
+      reference 1-1-2-49 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '/usr/local/apache/var/log/access_log common'
+      reference 1-1-2-49 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-50-2 ARRAY with 2 elements
+        reference 1-1-2-50-2 ARRAY index 0
+           '/usr/local/apache/var/log/access_log'
+        reference 1-1-2-50-2 ARRAY index 1
+           'common'
+      reference 1-1-2-49 Apache::ConfigParser::Directive=HASH key 'value'
+         'access_log common'
+      reference 1-1-2-49 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-50-3 ARRAY with 2 elements
+        reference 1-1-2-50-3 ARRAY index 0
+           'access_log'
+        reference 1-1-2-50-3 ARRAY index 1
+           'common'
+    reference 1-1-1 ARRAY index 50
+      reference 1-1-2-50 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-50 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-51-0 HASH with 0 keys
+      reference 1-1-2-50 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-51-1 ARRAY with 0 elements
+      reference 1-1-2-50 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-50 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '155'
+      reference 1-1-2-50 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-50 Apache::ConfigParser::Directive=HASH key 'name'
+         'pidfile'
+      reference 1-1-2-50 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '/usr/local/apache/var/run/httpd.pid'
+      reference 1-1-2-50 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-51-2 ARRAY with 1 elements
+        reference 1-1-2-51-2 ARRAY index 0
+           '/usr/local/apache/var/run/httpd.pid'
+      reference 1-1-2-50 Apache::ConfigParser::Directive=HASH key 'value'
+         'httpd.pid'
+      reference 1-1-2-50 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-51-3 ARRAY with 1 elements
+        reference 1-1-2-51-3 ARRAY index 0
+           'httpd.pid'
+    reference 1-1-1 ARRAY index 51
+      reference 1-1-2-51 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-51 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-52-0 HASH with 0 keys
+      reference 1-1-2-51 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-52-1 ARRAY with 0 elements
+      reference 1-1-2-51 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-51 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '162'
+      reference 1-1-2-51 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-51 Apache::ConfigParser::Directive=HASH key 'name'
+         'scoreboardfile'
+      reference 1-1-2-51 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '/usr/local/apache/var/run/httpd.scoreboard'
+      reference 1-1-2-51 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-52-2 ARRAY with 1 elements
+        reference 1-1-2-52-2 ARRAY index 0
+           '/usr/local/apache/var/run/httpd.scoreboard'
+      reference 1-1-2-51 Apache::ConfigParser::Directive=HASH key 'value'
+         'httpd.scoreboard'
+      reference 1-1-2-51 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-52-3 ARRAY with 1 elements
+        reference 1-1-2-52-3 ARRAY index 0
+           'httpd.scoreboard'
+    reference 1-1-1 ARRAY index 52
+      reference 1-1-2-52 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-52 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-53-0 HASH with 0 keys
+      reference 1-1-2-52 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-53-1 ARRAY with 0 elements
+      reference 1-1-2-52 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-52 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '182'
+      reference 1-1-2-52 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-52 Apache::ConfigParser::Directive=HASH key 'name'
+         'servername'
+      reference 1-1-2-52 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'myhost'
+      reference 1-1-2-52 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-53-2 ARRAY with 1 elements
+        reference 1-1-2-53-2 ARRAY index 0
+           'myhost'
+      reference 1-1-2-52 Apache::ConfigParser::Directive=HASH key 'value'
+         'myhost'
+      reference 1-1-2-52 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-53-3 ARRAY with 1 elements
+        reference 1-1-2-53-3 ARRAY index 0
+           'myhost'
+    reference 1-1-1 ARRAY index 53
+      reference 1-1-2-53 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-53 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-54-0 HASH with 0 keys
+      reference 1-1-2-53 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-54-1 ARRAY with 0 elements
+      reference 1-1-2-53 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-53 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '190'
+      reference 1-1-2-53 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-53 Apache::ConfigParser::Directive=HASH key 'name'
+         'usecanonicalname'
+      reference 1-1-2-53 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'on'
+      reference 1-1-2-53 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-54-2 ARRAY with 1 elements
+        reference 1-1-2-54-2 ARRAY index 0
+           'on'
+      reference 1-1-2-53 Apache::ConfigParser::Directive=HASH key 'value'
+         'on'
+      reference 1-1-2-53 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-54-3 ARRAY with 1 elements
+        reference 1-1-2-54-3 ARRAY index 0
+           'on'
+    reference 1-1-1 ARRAY index 54
+      reference 1-1-2-54 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-54 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-55-0 HASH with 0 keys
+      reference 1-1-2-54 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-55-1 ARRAY with 0 elements
+      reference 1-1-2-54 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-54 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '202'
+      reference 1-1-2-54 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-54 Apache::ConfigParser::Directive=HASH key 'name'
+         'timeout'
+      reference 1-1-2-54 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '300'
+      reference 1-1-2-54 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-55-2 ARRAY with 1 elements
+        reference 1-1-2-55-2 ARRAY index 0
+           '300'
+      reference 1-1-2-54 Apache::ConfigParser::Directive=HASH key 'value'
+         '300'
+      reference 1-1-2-54 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-55-3 ARRAY with 1 elements
+        reference 1-1-2-55-3 ARRAY index 0
+           '300'
+    reference 1-1-1 ARRAY index 55
+      reference 1-1-2-55 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-55 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-56-0 HASH with 0 keys
+      reference 1-1-2-55 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-56-1 ARRAY with 0 elements
+      reference 1-1-2-55 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-55 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '207'
+      reference 1-1-2-55 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-55 Apache::ConfigParser::Directive=HASH key 'name'
+         'keepalive'
+      reference 1-1-2-55 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'On'
+      reference 1-1-2-55 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-56-2 ARRAY with 1 elements
+        reference 1-1-2-56-2 ARRAY index 0
+           'On'
+      reference 1-1-2-55 Apache::ConfigParser::Directive=HASH key 'value'
+         'On'
+      reference 1-1-2-55 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-56-3 ARRAY with 1 elements
+        reference 1-1-2-56-3 ARRAY index 0
+           'On'
+    reference 1-1-1 ARRAY index 56
+      reference 1-1-2-56 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-56 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-57-0 HASH with 0 keys
+      reference 1-1-2-56 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-57-1 ARRAY with 0 elements
+      reference 1-1-2-56 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-56 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '213'
+      reference 1-1-2-56 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-56 Apache::ConfigParser::Directive=HASH key 'name'
+         'maxkeepaliverequests'
+      reference 1-1-2-56 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '100'
+      reference 1-1-2-56 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-57-2 ARRAY with 1 elements
+        reference 1-1-2-57-2 ARRAY index 0
+           '100'
+      reference 1-1-2-56 Apache::ConfigParser::Directive=HASH key 'value'
+         '100'
+      reference 1-1-2-56 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-57-3 ARRAY with 1 elements
+        reference 1-1-2-57-3 ARRAY index 0
+           '100'
+    reference 1-1-1 ARRAY index 57
+      reference 1-1-2-57 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-57 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-58-0 HASH with 0 keys
+      reference 1-1-2-57 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-58-1 ARRAY with 0 elements
+      reference 1-1-2-57 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-57 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '217'
+      reference 1-1-2-57 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-57 Apache::ConfigParser::Directive=HASH key 'name'
+         'keepalivetimeout'
+      reference 1-1-2-57 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '15'
+      reference 1-1-2-57 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-58-2 ARRAY with 1 elements
+        reference 1-1-2-58-2 ARRAY index 0
+           '15'
+      reference 1-1-2-57 Apache::ConfigParser::Directive=HASH key 'value'
+         '15'
+      reference 1-1-2-57 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-58-3 ARRAY with 1 elements
+        reference 1-1-2-58-3 ARRAY index 0
+           '15'
+    reference 1-1-1 ARRAY index 58
+      reference 1-1-2-58 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-58 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-59-0 HASH with 0 keys
+      reference 1-1-2-58 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-59-1 ARRAY with 0 elements
+      reference 1-1-2-58 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-58 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '231'
+      reference 1-1-2-58 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-58 Apache::ConfigParser::Directive=HASH key 'name'
+         'minspareservers'
+      reference 1-1-2-58 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '5'
+      reference 1-1-2-58 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-59-2 ARRAY with 1 elements
+        reference 1-1-2-59-2 ARRAY index 0
+           '5'
+      reference 1-1-2-58 Apache::ConfigParser::Directive=HASH key 'value'
+         '5'
+      reference 1-1-2-58 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-59-3 ARRAY with 1 elements
+        reference 1-1-2-59-3 ARRAY index 0
+           '5'
+    reference 1-1-1 ARRAY index 59
+      reference 1-1-2-59 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-59 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-60-0 HASH with 0 keys
+      reference 1-1-2-59 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-60-1 ARRAY with 0 elements
+      reference 1-1-2-59 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-59 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '232'
+      reference 1-1-2-59 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-59 Apache::ConfigParser::Directive=HASH key 'name'
+         'maxspareservers'
+      reference 1-1-2-59 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '10'
+      reference 1-1-2-59 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-60-2 ARRAY with 1 elements
+        reference 1-1-2-60-2 ARRAY index 0
+           '10'
+      reference 1-1-2-59 Apache::ConfigParser::Directive=HASH key 'value'
+         '10'
+      reference 1-1-2-59 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-60-3 ARRAY with 1 elements
+        reference 1-1-2-60-3 ARRAY index 0
+           '10'
+    reference 1-1-1 ARRAY index 60
+      reference 1-1-2-60 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-60 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-61-0 HASH with 0 keys
+      reference 1-1-2-60 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-61-1 ARRAY with 0 elements
+      reference 1-1-2-60 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-60 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '236'
+      reference 1-1-2-60 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-60 Apache::ConfigParser::Directive=HASH key 'name'
+         'startservers'
+      reference 1-1-2-60 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '5'
+      reference 1-1-2-60 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-61-2 ARRAY with 1 elements
+        reference 1-1-2-61-2 ARRAY index 0
+           '5'
+      reference 1-1-2-60 Apache::ConfigParser::Directive=HASH key 'value'
+         '5'
+      reference 1-1-2-60 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-61-3 ARRAY with 1 elements
+        reference 1-1-2-61-3 ARRAY index 0
+           '5'
+    reference 1-1-1 ARRAY index 61
+      reference 1-1-2-61 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-61 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-62-0 HASH with 0 keys
+      reference 1-1-2-61 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-62-1 ARRAY with 0 elements
+      reference 1-1-2-61 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-61 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '244'
+      reference 1-1-2-61 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-61 Apache::ConfigParser::Directive=HASH key 'name'
+         'maxclients'
+      reference 1-1-2-61 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '150'
+      reference 1-1-2-61 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-62-2 ARRAY with 1 elements
+        reference 1-1-2-62-2 ARRAY index 0
+           '150'
+      reference 1-1-2-61 Apache::ConfigParser::Directive=HASH key 'value'
+         '150'
+      reference 1-1-2-61 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-62-3 ARRAY with 1 elements
+        reference 1-1-2-62-3 ARRAY index 0
+           '150'
+    reference 1-1-1 ARRAY index 62
+      reference 1-1-2-62 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-62 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-63-0 HASH with 0 keys
+      reference 1-1-2-62 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-63-1 ARRAY with 0 elements
+      reference 1-1-2-62 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-62 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '253'
+      reference 1-1-2-62 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-62 Apache::ConfigParser::Directive=HASH key 'name'
+         'maxrequestsperchild'
+      reference 1-1-2-62 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '30'
+      reference 1-1-2-62 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-63-2 ARRAY with 1 elements
+        reference 1-1-2-63-2 ARRAY index 0
+           '30'
+      reference 1-1-2-62 Apache::ConfigParser::Directive=HASH key 'value'
+         '30'
+      reference 1-1-2-62 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-63-3 ARRAY with 1 elements
+        reference 1-1-2-63-3 ARRAY index 0
+           '30'
+    reference 1-1-1 ARRAY index 63
+      reference 1-1-2-63 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-63 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-64-0 HASH with 0 keys
+      reference 1-1-2-63 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-64-1 ARRAY with 5 elements
+        reference 1-1-2-64-1 ARRAY index 0
+          reference 1-1-2-64-2-0 Apache::ConfigParser::Directive=HASH with 10 keys
+          reference 1-1-2-64-2-0 Apache::ConfigParser::Directive=HASH key 'attributes'
+            reference 1-1-2-64-2-1-0 HASH with 0 keys
+          reference 1-1-2-64-2-0 Apache::ConfigParser::Directive=HASH key 'daughters'
+            reference 1-1-2-64-2-1-1 ARRAY with 0 elements
+          reference 1-1-2-64-2-0 Apache::ConfigParser::Directive=HASH key 'filename'
+             'httpd05.conf'
+          reference 1-1-2-64-2-0 Apache::ConfigParser::Directive=HASH key 'line_number'
+             '285'
+          reference 1-1-2-64-2-0 Apache::ConfigParser::Directive=HASH key 'mother'
+             SEEN reference 1-1-2-63 Apache::ConfigParser::Directive=HASH
+          reference 1-1-2-64-2-0 Apache::ConfigParser::Directive=HASH key 'name'
+             'serveradmin'
+          reference 1-1-2-64-2-0 Apache::ConfigParser::Directive=HASH key 'orig_value'
+             'webmaster@host.some_domain.com'
+          reference 1-1-2-64-2-0 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+            reference 1-1-2-64-2-1-2 ARRAY with 1 elements
+            reference 1-1-2-64-2-1-2 ARRAY index 0
+               'webmaster@host.some_domain.com'
+          reference 1-1-2-64-2-0 Apache::ConfigParser::Directive=HASH key 'value'
+             'webmaster@host.some_domain.com'
+          reference 1-1-2-64-2-0 Apache::ConfigParser::Directive=HASH key 'value_array'
+            reference 1-1-2-64-2-1-3 ARRAY with 1 elements
+            reference 1-1-2-64-2-1-3 ARRAY index 0
+               'webmaster@host.some_domain.com'
+        reference 1-1-2-64-1 ARRAY index 1
+          reference 1-1-2-64-2-1 Apache::ConfigParser::Directive=HASH with 10 keys
+          reference 1-1-2-64-2-1 Apache::ConfigParser::Directive=HASH key 'attributes'
+            reference 1-1-2-64-2-2-0 HASH with 0 keys
+          reference 1-1-2-64-2-1 Apache::ConfigParser::Directive=HASH key 'daughters'
+            reference 1-1-2-64-2-2-1 ARRAY with 0 elements
+          reference 1-1-2-64-2-1 Apache::ConfigParser::Directive=HASH key 'filename'
+             'httpd05.conf'
+          reference 1-1-2-64-2-1 Apache::ConfigParser::Directive=HASH key 'line_number'
+             '286'
+          reference 1-1-2-64-2-1 Apache::ConfigParser::Directive=HASH key 'mother'
+             SEEN reference 1-1-2-63 Apache::ConfigParser::Directive=HASH
+          reference 1-1-2-64-2-1 Apache::ConfigParser::Directive=HASH key 'name'
+             'documentroot'
+          reference 1-1-2-64-2-1 Apache::ConfigParser::Directive=HASH key 'orig_value'
+             '/www/docs/host.some_domain.com'
+          reference 1-1-2-64-2-1 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+            reference 1-1-2-64-2-2-2 ARRAY with 1 elements
+            reference 1-1-2-64-2-2-2 ARRAY index 0
+               '/www/docs/host.some_domain.com'
+          reference 1-1-2-64-2-1 Apache::ConfigParser::Directive=HASH key 'value'
+             '/www/docs/host.some_domain.com'
+          reference 1-1-2-64-2-1 Apache::ConfigParser::Directive=HASH key 'value_array'
+            reference 1-1-2-64-2-2-3 ARRAY with 1 elements
+            reference 1-1-2-64-2-2-3 ARRAY index 0
+               '/www/docs/host.some_domain.com'
+        reference 1-1-2-64-1 ARRAY index 2
+          reference 1-1-2-64-2-2 Apache::ConfigParser::Directive=HASH with 10 keys
+          reference 1-1-2-64-2-2 Apache::ConfigParser::Directive=HASH key 'attributes'
+            reference 1-1-2-64-2-3-0 HASH with 0 keys
+          reference 1-1-2-64-2-2 Apache::ConfigParser::Directive=HASH key 'daughters'
+            reference 1-1-2-64-2-3-1 ARRAY with 0 elements
+          reference 1-1-2-64-2-2 Apache::ConfigParser::Directive=HASH key 'filename'
+             'httpd05.conf'
+          reference 1-1-2-64-2-2 Apache::ConfigParser::Directive=HASH key 'line_number'
+             '287'
+          reference 1-1-2-64-2-2 Apache::ConfigParser::Directive=HASH key 'mother'
+             SEEN reference 1-1-2-63 Apache::ConfigParser::Directive=HASH
+          reference 1-1-2-64-2-2 Apache::ConfigParser::Directive=HASH key 'name'
+             'servername'
+          reference 1-1-2-64-2-2 Apache::ConfigParser::Directive=HASH key 'orig_value'
+             'host.some_domain.com'
+          reference 1-1-2-64-2-2 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+            reference 1-1-2-64-2-3-2 ARRAY with 1 elements
+            reference 1-1-2-64-2-3-2 ARRAY index 0
+               'host.some_domain.com'
+          reference 1-1-2-64-2-2 Apache::ConfigParser::Directive=HASH key 'value'
+             'host.some_domain.com'
+          reference 1-1-2-64-2-2 Apache::ConfigParser::Directive=HASH key 'value_array'
+            reference 1-1-2-64-2-3-3 ARRAY with 1 elements
+            reference 1-1-2-64-2-3-3 ARRAY index 0
+               'host.some_domain.com'
+        reference 1-1-2-64-1 ARRAY index 3
+          reference 1-1-2-64-2-3 Apache::ConfigParser::Directive=HASH with 10 keys
+          reference 1-1-2-64-2-3 Apache::ConfigParser::Directive=HASH key 'attributes'
+            reference 1-1-2-64-2-4-0 HASH with 0 keys
+          reference 1-1-2-64-2-3 Apache::ConfigParser::Directive=HASH key 'daughters'
+            reference 1-1-2-64-2-4-1 ARRAY with 0 elements
+          reference 1-1-2-64-2-3 Apache::ConfigParser::Directive=HASH key 'filename'
+             'httpd05.conf'
+          reference 1-1-2-64-2-3 Apache::ConfigParser::Directive=HASH key 'line_number'
+             '288'
+          reference 1-1-2-64-2-3 Apache::ConfigParser::Directive=HASH key 'mother'
+             SEEN reference 1-1-2-63 Apache::ConfigParser::Directive=HASH
+          reference 1-1-2-64-2-3 Apache::ConfigParser::Directive=HASH key 'name'
+             'errorlog'
+          reference 1-1-2-64-2-3 Apache::ConfigParser::Directive=HASH key 'orig_value'
+             'logs/host.some_domain.com-error_log'
+          reference 1-1-2-64-2-3 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+            reference 1-1-2-64-2-4-2 ARRAY with 1 elements
+            reference 1-1-2-64-2-4-2 ARRAY index 0
+               'logs/host.some_domain.com-error_log'
+          reference 1-1-2-64-2-3 Apache::ConfigParser::Directive=HASH key 'value'
+             'host.some_domain.com-error_log'
+          reference 1-1-2-64-2-3 Apache::ConfigParser::Directive=HASH key 'value_array'
+            reference 1-1-2-64-2-4-3 ARRAY with 1 elements
+            reference 1-1-2-64-2-4-3 ARRAY index 0
+               'host.some_domain.com-error_log'
+        reference 1-1-2-64-1 ARRAY index 4
+          reference 1-1-2-64-2-4 Apache::ConfigParser::Directive=HASH with 10 keys
+          reference 1-1-2-64-2-4 Apache::ConfigParser::Directive=HASH key 'attributes'
+            reference 1-1-2-64-2-5-0 HASH with 0 keys
+          reference 1-1-2-64-2-4 Apache::ConfigParser::Directive=HASH key 'daughters'
+            reference 1-1-2-64-2-5-1 ARRAY with 0 elements
+          reference 1-1-2-64-2-4 Apache::ConfigParser::Directive=HASH key 'filename'
+             'httpd05.conf'
+          reference 1-1-2-64-2-4 Apache::ConfigParser::Directive=HASH key 'line_number'
+             '289'
+          reference 1-1-2-64-2-4 Apache::ConfigParser::Directive=HASH key 'mother'
+             SEEN reference 1-1-2-63 Apache::ConfigParser::Directive=HASH
+          reference 1-1-2-64-2-4 Apache::ConfigParser::Directive=HASH key 'name'
+             'transferlog'
+          reference 1-1-2-64-2-4 Apache::ConfigParser::Directive=HASH key 'orig_value'
+             'logs/host.some_domain.com-access_log'
+          reference 1-1-2-64-2-4 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+            reference 1-1-2-64-2-5-2 ARRAY with 1 elements
+            reference 1-1-2-64-2-5-2 ARRAY index 0
+               'logs/host.some_domain.com-access_log'
+          reference 1-1-2-64-2-4 Apache::ConfigParser::Directive=HASH key 'value'
+             'host.some_domain.com-access_log'
+          reference 1-1-2-64-2-4 Apache::ConfigParser::Directive=HASH key 'value_array'
+            reference 1-1-2-64-2-5-3 ARRAY with 1 elements
+            reference 1-1-2-64-2-5-3 ARRAY index 0
+               'host.some_domain.com-access_log'
+      reference 1-1-2-63 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-63 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '284'
+      reference 1-1-2-63 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-63 Apache::ConfigParser::Directive=HASH key 'name'
+         'virtualhost'
+      reference 1-1-2-63 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'host.some_domain.com'
+      reference 1-1-2-63 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-64-2 ARRAY with 1 elements
+        reference 1-1-2-64-2 ARRAY index 0
+           'host.some_domain.com'
+      reference 1-1-2-63 Apache::ConfigParser::Directive=HASH key 'value'
+         'host.some_domain.com'
+      reference 1-1-2-63 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-64-3 ARRAY with 1 elements
+        reference 1-1-2-64-3 ARRAY index 0
+           'host.some_domain.com'
+    reference 1-1-1 ARRAY index 64
+      reference 1-1-2-64 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-64 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-65-0 HASH with 0 keys
+      reference 1-1-2-64 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-65-1 ARRAY with 0 elements
+      reference 1-1-2-64 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05.conf'
+      reference 1-1-2-64 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '293'
+      reference 1-1-2-64 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-64 Apache::ConfigParser::Directive=HASH key 'name'
+         'include'
+      reference 1-1-2-64 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '/usr/local/jserv/conf/httpd05_jserv.conf'
+      reference 1-1-2-64 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-65-2 ARRAY with 1 elements
+        reference 1-1-2-65-2 ARRAY index 0
+           '/usr/local/jserv/conf/httpd05_jserv.conf'
+      reference 1-1-2-64 Apache::ConfigParser::Directive=HASH key 'value'
+         'httpd05_jserv.conf'
+      reference 1-1-2-64 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-65-3 ARRAY with 1 elements
+        reference 1-1-2-65-3 ARRAY index 0
+           'httpd05_jserv.conf'
+    reference 1-1-1 ARRAY index 65
+      reference 1-1-2-65 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-65 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-66-0 HASH with 0 keys
+      reference 1-1-2-65 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-66-1 ARRAY with 0 elements
+      reference 1-1-2-65 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05_jserv.conf'
+      reference 1-1-2-65 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '7'
+      reference 1-1-2-65 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-65 Apache::ConfigParser::Directive=HASH key 'name'
+         'loadmodule'
+      reference 1-1-2-65 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'jserv_module libexec/mod_jserv.so'
+      reference 1-1-2-65 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-66-2 ARRAY with 2 elements
+        reference 1-1-2-66-2 ARRAY index 0
+           'jserv_module'
+        reference 1-1-2-66-2 ARRAY index 1
+           'libexec/mod_jserv.so'
+      reference 1-1-2-65 Apache::ConfigParser::Directive=HASH key 'value'
+         'jserv_module mod_jserv.so'
+      reference 1-1-2-65 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-66-3 ARRAY with 2 elements
+        reference 1-1-2-66-3 ARRAY index 0
+           'jserv_module'
+        reference 1-1-2-66-3 ARRAY index 1
+           'mod_jserv.so'
+    reference 1-1-1 ARRAY index 66
+      reference 1-1-2-66 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-66 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-67-0 HASH with 0 keys
+      reference 1-1-2-66 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-67-1 ARRAY with 0 elements
+      reference 1-1-2-66 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05_jserv.conf'
+      reference 1-1-2-66 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '12'
+      reference 1-1-2-66 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-66 Apache::ConfigParser::Directive=HASH key 'name'
+         'apjservmanual'
+      reference 1-1-2-66 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'off'
+      reference 1-1-2-66 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-67-2 ARRAY with 1 elements
+        reference 1-1-2-67-2 ARRAY index 0
+           'off'
+      reference 1-1-2-66 Apache::ConfigParser::Directive=HASH key 'value'
+         'off'
+      reference 1-1-2-66 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-67-3 ARRAY with 1 elements
+        reference 1-1-2-67-3 ARRAY index 0
+           'off'
+    reference 1-1-1 ARRAY index 67
+      reference 1-1-2-67 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-67 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-68-0 HASH with 0 keys
+      reference 1-1-2-67 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-68-1 ARRAY with 0 elements
+      reference 1-1-2-67 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05_jserv.conf'
+      reference 1-1-2-67 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '18'
+      reference 1-1-2-67 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-67 Apache::ConfigParser::Directive=HASH key 'name'
+         'apjservproperties'
+      reference 1-1-2-67 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '/usr/local/jserv/conf/jserv.properties'
+      reference 1-1-2-67 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-68-2 ARRAY with 1 elements
+        reference 1-1-2-68-2 ARRAY index 0
+           '/usr/local/jserv/conf/jserv.properties'
+      reference 1-1-2-67 Apache::ConfigParser::Directive=HASH key 'value'
+         '/usr/local/jserv/conf/jserv.properties'
+      reference 1-1-2-67 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-68-3 ARRAY with 1 elements
+        reference 1-1-2-68-3 ARRAY index 0
+           '/usr/local/jserv/conf/jserv.properties'
+    reference 1-1-1 ARRAY index 68
+      reference 1-1-2-68 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-68 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-69-0 HASH with 0 keys
+      reference 1-1-2-68 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-69-1 ARRAY with 0 elements
+      reference 1-1-2-68 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05_jserv.conf'
+      reference 1-1-2-68 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '25'
+      reference 1-1-2-68 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-68 Apache::ConfigParser::Directive=HASH key 'name'
+         'apjservlogfile'
+      reference 1-1-2-68 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '/usr/local/jserv/conf/jserv.log'
+      reference 1-1-2-68 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-69-2 ARRAY with 1 elements
+        reference 1-1-2-69-2 ARRAY index 0
+           '/usr/local/jserv/conf/jserv.log'
+      reference 1-1-2-68 Apache::ConfigParser::Directive=HASH key 'value'
+         '/usr/local/jserv/conf/jserv.log'
+      reference 1-1-2-68 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-69-3 ARRAY with 1 elements
+        reference 1-1-2-69-3 ARRAY index 0
+           '/usr/local/jserv/conf/jserv.log'
+    reference 1-1-1 ARRAY index 69
+      reference 1-1-2-69 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-69 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-70-0 HASH with 0 keys
+      reference 1-1-2-69 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-70-1 ARRAY with 0 elements
+      reference 1-1-2-69 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05_jserv.conf'
+      reference 1-1-2-69 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '31'
+      reference 1-1-2-69 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-69 Apache::ConfigParser::Directive=HASH key 'name'
+         'apjservdefaultprotocol'
+      reference 1-1-2-69 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'ajpv11'
+      reference 1-1-2-69 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-70-2 ARRAY with 1 elements
+        reference 1-1-2-70-2 ARRAY index 0
+           'ajpv11'
+      reference 1-1-2-69 Apache::ConfigParser::Directive=HASH key 'value'
+         'ajpv11'
+      reference 1-1-2-69 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-70-3 ARRAY with 1 elements
+        reference 1-1-2-70-3 ARRAY index 0
+           'ajpv11'
+    reference 1-1-1 ARRAY index 70
+      reference 1-1-2-70 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-70 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-71-0 HASH with 0 keys
+      reference 1-1-2-70 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-71-1 ARRAY with 0 elements
+      reference 1-1-2-70 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05_jserv.conf'
+      reference 1-1-2-70 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '41'
+      reference 1-1-2-70 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-70 Apache::ConfigParser::Directive=HASH key 'name'
+         'apjservdefaultport'
+      reference 1-1-2-70 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '8007'
+      reference 1-1-2-70 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-71-2 ARRAY with 1 elements
+        reference 1-1-2-71-2 ARRAY index 0
+           '8007'
+      reference 1-1-2-70 Apache::ConfigParser::Directive=HASH key 'value'
+         '8007'
+      reference 1-1-2-70 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-71-3 ARRAY with 1 elements
+        reference 1-1-2-71-3 ARRAY index 0
+           '8007'
+    reference 1-1-1 ARRAY index 71
+      reference 1-1-2-71 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-71 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-72-0 HASH with 0 keys
+      reference 1-1-2-71 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-72-1 ARRAY with 0 elements
+      reference 1-1-2-71 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05_jserv.conf'
+      reference 1-1-2-71 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '55'
+      reference 1-1-2-71 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-71 Apache::ConfigParser::Directive=HASH key 'name'
+         'apjservsecretkey'
+      reference 1-1-2-71 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'DISABLED'
+      reference 1-1-2-71 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-72-2 ARRAY with 1 elements
+        reference 1-1-2-72-2 ARRAY index 0
+           'DISABLED'
+      reference 1-1-2-71 Apache::ConfigParser::Directive=HASH key 'value'
+         'DISABLED'
+      reference 1-1-2-71 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-72-3 ARRAY with 1 elements
+        reference 1-1-2-72-3 ARRAY index 0
+           'DISABLED'
+    reference 1-1-1 ARRAY index 72
+      reference 1-1-2-72 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-72 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-73-0 HASH with 0 keys
+      reference 1-1-2-72 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-73-1 ARRAY with 0 elements
+      reference 1-1-2-72 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05_jserv.conf'
+      reference 1-1-2-72 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '79'
+      reference 1-1-2-72 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-72 Apache::ConfigParser::Directive=HASH key 'name'
+         'apjservmount'
+      reference 1-1-2-72 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '/jinfonet /jinfonet'
+      reference 1-1-2-72 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-73-2 ARRAY with 2 elements
+        reference 1-1-2-73-2 ARRAY index 0
+           '/jinfonet'
+        reference 1-1-2-73-2 ARRAY index 1
+           '/jinfonet'
+      reference 1-1-2-72 Apache::ConfigParser::Directive=HASH key 'value'
+         '/jinfonet /jinfonet'
+      reference 1-1-2-72 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-73-3 ARRAY with 2 elements
+        reference 1-1-2-73-3 ARRAY index 0
+           '/jinfonet'
+        reference 1-1-2-73-3 ARRAY index 1
+           '/jinfonet'
+    reference 1-1-1 ARRAY index 73
+      reference 1-1-2-73 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-73 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-74-0 HASH with 0 keys
+      reference 1-1-2-73 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-74-1 ARRAY with 0 elements
+      reference 1-1-2-73 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05_jserv.conf'
+      reference 1-1-2-73 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '85'
+      reference 1-1-2-73 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-73 Apache::ConfigParser::Directive=HASH key 'name'
+         'apjservmountcopy'
+      reference 1-1-2-73 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         'on'
+      reference 1-1-2-73 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-74-2 ARRAY with 1 elements
+        reference 1-1-2-74-2 ARRAY index 0
+           'on'
+      reference 1-1-2-73 Apache::ConfigParser::Directive=HASH key 'value'
+         'on'
+      reference 1-1-2-73 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-74-3 ARRAY with 1 elements
+        reference 1-1-2-74-3 ARRAY index 0
+           'on'
+    reference 1-1-1 ARRAY index 74
+      reference 1-1-2-74 Apache::ConfigParser::Directive=HASH with 10 keys
+      reference 1-1-2-74 Apache::ConfigParser::Directive=HASH key 'attributes'
+        reference 1-1-2-75-0 HASH with 0 keys
+      reference 1-1-2-74 Apache::ConfigParser::Directive=HASH key 'daughters'
+        reference 1-1-2-75-1 ARRAY with 4 elements
+        reference 1-1-2-75-1 ARRAY index 0
+          reference 1-1-2-75-2-0 Apache::ConfigParser::Directive=HASH with 10 keys
+          reference 1-1-2-75-2-0 Apache::ConfigParser::Directive=HASH key 'attributes'
+            reference 1-1-2-75-2-1-0 HASH with 0 keys
+          reference 1-1-2-75-2-0 Apache::ConfigParser::Directive=HASH key 'daughters'
+            reference 1-1-2-75-2-1-1 ARRAY with 0 elements
+          reference 1-1-2-75-2-0 Apache::ConfigParser::Directive=HASH key 'filename'
+             'httpd05_jserv.conf'
+          reference 1-1-2-75-2-0 Apache::ConfigParser::Directive=HASH key 'line_number'
+             '101'
+          reference 1-1-2-75-2-0 Apache::ConfigParser::Directive=HASH key 'mother'
+             SEEN reference 1-1-2-74 Apache::ConfigParser::Directive=HASH
+          reference 1-1-2-75-2-0 Apache::ConfigParser::Directive=HASH key 'name'
+             'sethandler'
+          reference 1-1-2-75-2-0 Apache::ConfigParser::Directive=HASH key 'orig_value'
+             'jserv-status'
+          reference 1-1-2-75-2-0 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+            reference 1-1-2-75-2-1-2 ARRAY with 1 elements
+            reference 1-1-2-75-2-1-2 ARRAY index 0
+               'jserv-status'
+          reference 1-1-2-75-2-0 Apache::ConfigParser::Directive=HASH key 'value'
+             'jserv-status'
+          reference 1-1-2-75-2-0 Apache::ConfigParser::Directive=HASH key 'value_array'
+            reference 1-1-2-75-2-1-3 ARRAY with 1 elements
+            reference 1-1-2-75-2-1-3 ARRAY index 0
+               'jserv-status'
+        reference 1-1-2-75-1 ARRAY index 1
+          reference 1-1-2-75-2-1 Apache::ConfigParser::Directive=HASH with 10 keys
+          reference 1-1-2-75-2-1 Apache::ConfigParser::Directive=HASH key 'attributes'
+            reference 1-1-2-75-2-2-0 HASH with 0 keys
+          reference 1-1-2-75-2-1 Apache::ConfigParser::Directive=HASH key 'daughters'
+            reference 1-1-2-75-2-2-1 ARRAY with 0 elements
+          reference 1-1-2-75-2-1 Apache::ConfigParser::Directive=HASH key 'filename'
+             'httpd05_jserv.conf'
+          reference 1-1-2-75-2-1 Apache::ConfigParser::Directive=HASH key 'line_number'
+             '103'
+          reference 1-1-2-75-2-1 Apache::ConfigParser::Directive=HASH key 'mother'
+             SEEN reference 1-1-2-74 Apache::ConfigParser::Directive=HASH
+          reference 1-1-2-75-2-1 Apache::ConfigParser::Directive=HASH key 'name'
+             'order'
+          reference 1-1-2-75-2-1 Apache::ConfigParser::Directive=HASH key 'orig_value'
+             'deny,allow'
+          reference 1-1-2-75-2-1 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+            reference 1-1-2-75-2-2-2 ARRAY with 1 elements
+            reference 1-1-2-75-2-2-2 ARRAY index 0
+               'deny,allow'
+          reference 1-1-2-75-2-1 Apache::ConfigParser::Directive=HASH key 'value'
+             'deny,allow'
+          reference 1-1-2-75-2-1 Apache::ConfigParser::Directive=HASH key 'value_array'
+            reference 1-1-2-75-2-2-3 ARRAY with 1 elements
+            reference 1-1-2-75-2-2-3 ARRAY index 0
+               'deny,allow'
+        reference 1-1-2-75-1 ARRAY index 2
+          reference 1-1-2-75-2-2 Apache::ConfigParser::Directive=HASH with 10 keys
+          reference 1-1-2-75-2-2 Apache::ConfigParser::Directive=HASH key 'attributes'
+            reference 1-1-2-75-2-3-0 HASH with 0 keys
+          reference 1-1-2-75-2-2 Apache::ConfigParser::Directive=HASH key 'daughters'
+            reference 1-1-2-75-2-3-1 ARRAY with 0 elements
+          reference 1-1-2-75-2-2 Apache::ConfigParser::Directive=HASH key 'filename'
+             'httpd05_jserv.conf'
+          reference 1-1-2-75-2-2 Apache::ConfigParser::Directive=HASH key 'line_number'
+             '104'
+          reference 1-1-2-75-2-2 Apache::ConfigParser::Directive=HASH key 'mother'
+             SEEN reference 1-1-2-74 Apache::ConfigParser::Directive=HASH
+          reference 1-1-2-75-2-2 Apache::ConfigParser::Directive=HASH key 'name'
+             'deny'
+          reference 1-1-2-75-2-2 Apache::ConfigParser::Directive=HASH key 'orig_value'
+             'from all'
+          reference 1-1-2-75-2-2 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+            reference 1-1-2-75-2-3-2 ARRAY with 2 elements
+            reference 1-1-2-75-2-3-2 ARRAY index 0
+               'from'
+            reference 1-1-2-75-2-3-2 ARRAY index 1
+               'all'
+          reference 1-1-2-75-2-2 Apache::ConfigParser::Directive=HASH key 'value'
+             'from all'
+          reference 1-1-2-75-2-2 Apache::ConfigParser::Directive=HASH key 'value_array'
+            reference 1-1-2-75-2-3-3 ARRAY with 2 elements
+            reference 1-1-2-75-2-3-3 ARRAY index 0
+               'from'
+            reference 1-1-2-75-2-3-3 ARRAY index 1
+               'all'
+        reference 1-1-2-75-1 ARRAY index 3
+          reference 1-1-2-75-2-3 Apache::ConfigParser::Directive=HASH with 10 keys
+          reference 1-1-2-75-2-3 Apache::ConfigParser::Directive=HASH key 'attributes'
+            reference 1-1-2-75-2-4-0 HASH with 0 keys
+          reference 1-1-2-75-2-3 Apache::ConfigParser::Directive=HASH key 'daughters'
+            reference 1-1-2-75-2-4-1 ARRAY with 0 elements
+          reference 1-1-2-75-2-3 Apache::ConfigParser::Directive=HASH key 'filename'
+             'httpd05_jserv.conf'
+          reference 1-1-2-75-2-3 Apache::ConfigParser::Directive=HASH key 'line_number'
+             '105'
+          reference 1-1-2-75-2-3 Apache::ConfigParser::Directive=HASH key 'mother'
+             SEEN reference 1-1-2-74 Apache::ConfigParser::Directive=HASH
+          reference 1-1-2-75-2-3 Apache::ConfigParser::Directive=HASH key 'name'
+             'allow'
+          reference 1-1-2-75-2-3 Apache::ConfigParser::Directive=HASH key 'orig_value'
+             'from localhost 127.0.0.1 myhost'
+          reference 1-1-2-75-2-3 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+            reference 1-1-2-75-2-4-2 ARRAY with 4 elements
+            reference 1-1-2-75-2-4-2 ARRAY index 0
+               'from'
+            reference 1-1-2-75-2-4-2 ARRAY index 1
+               'localhost'
+            reference 1-1-2-75-2-4-2 ARRAY index 2
+               '127.0.0.1'
+            reference 1-1-2-75-2-4-2 ARRAY index 3
+               'myhost'
+          reference 1-1-2-75-2-3 Apache::ConfigParser::Directive=HASH key 'value'
+             'from localhost 127.0.0.1 myhost'
+          reference 1-1-2-75-2-3 Apache::ConfigParser::Directive=HASH key 'value_array'
+            reference 1-1-2-75-2-4-3 ARRAY with 4 elements
+            reference 1-1-2-75-2-4-3 ARRAY index 0
+               'from'
+            reference 1-1-2-75-2-4-3 ARRAY index 1
+               'localhost'
+            reference 1-1-2-75-2-4-3 ARRAY index 2
+               '127.0.0.1'
+            reference 1-1-2-75-2-4-3 ARRAY index 3
+               'myhost'
+      reference 1-1-2-74 Apache::ConfigParser::Directive=HASH key 'filename'
+         'httpd05_jserv.conf'
+      reference 1-1-2-74 Apache::ConfigParser::Directive=HASH key 'line_number'
+         '100'
+      reference 1-1-2-74 Apache::ConfigParser::Directive=HASH key 'mother'
+         SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+      reference 1-1-2-74 Apache::ConfigParser::Directive=HASH key 'name'
+         'location'
+      reference 1-1-2-74 Apache::ConfigParser::Directive=HASH key 'orig_value'
+         '/jserv/'
+      reference 1-1-2-74 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+        reference 1-1-2-75-2 ARRAY with 1 elements
+        reference 1-1-2-75-2 ARRAY index 0
+           '/jserv/'
+      reference 1-1-2-74 Apache::ConfigParser::Directive=HASH key 'value'
+         '/jserv/'
+      reference 1-1-2-74 Apache::ConfigParser::Directive=HASH key 'value_array'
+        reference 1-1-2-75-3 ARRAY with 1 elements
+        reference 1-1-2-75-3 ARRAY index 0
+           '/jserv/'
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'filename'
+     ''
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'line_number'
+     '-1'
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'mother'
+     UNDEFINED
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'name'
+     'root'
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'orig_value'
+     ''
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'orig_value_array'
+    reference 1-1-2 ARRAY with 0 elements
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'value'
+     ''
+  reference 1-0 Apache::ConfigParser::Directive=HASH key 'value_array'
+    reference 1-1-3 ARRAY with 0 elements
+reference 0 EmptySubclass=HASH key 'errstr'
+   ''
+reference 0 EmptySubclass=HASH key 'post_transform_path_sub'
+  reference 1-1 ARRAY with 1 elements
+  reference 1-1 ARRAY index 0
+    reference 1-2-0 CODE
+reference 0 EmptySubclass=HASH key 'pre_transform_path_sub'
+   ''
+reference 0 EmptySubclass=HASH key 'root'
+   SEEN reference 1-0 Apache::ConfigParser::Directive=HASH
+reference 0 EmptySubclass=HASH key 'server_root'
+   '/usr/local/apache'

@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual - ars_CreateActiveLink</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_CreateActiveLink(ctrl, activeLinkHash)</CODE></H2>
+
+      This function creates an new active link. You must first
+      populate the <CODE>activeLinkHash</CODE> before calling this routine.
+      <P><CODE>activeLinkHash</CODE> is an 
+      <A HREF="ds_al.html">Active Link Attributes</a> hash. 
+
+      <P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns 1
+          <DT><B>On failure</B><DD>
+              Returns 0
+      </DL>
+
+      <P>Example:
+
+      <P><BLOCKQUOTE>
+      <I> This example copies an existing active link to a new 
+          active link. I.e. it simply re-saves the active link under
+          a new name. </I></BLOCKQUOTE>
+
+      <PRE>
+      ($al = ars_GetActiveLink($c, "AL-foobar")) ||
+	    die $ars_errstr;
+      $al->{name} = "Copy of ".$al->{name};
+      ars_CreateActiveLink($c, $al) || die $ars_errstr;
+      </PRE>
+
+<B>Notes</B>: Hash keys <CODE>helpText, owner</CODE> and 
+<CODE>changeDiary</CODE> are optional when calling this routine.
+<P>
+<I>This function was introduced in version 1.50 of ARSperl</I>
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

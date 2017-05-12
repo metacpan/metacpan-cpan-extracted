@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Audio-GtkGramofile.t
+GtkGramofile/GUI.pm
+GtkGramofile/Logic.pm
+GtkGramofile/Settings.pm
+GtkGramofile/Signals.pm
+GtkGramofile.pm
+gtkgramo
+META.yml                                 Module meta-data (added by MakeMaker)

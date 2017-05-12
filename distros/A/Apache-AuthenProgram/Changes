@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache::AuthenProgram.
+
+0.90  Mon Oct  7 10:07:00 2002
+        - Prepared for CPAN upload.
+      Thu Sep 26 07:18:00 2002
+        - Adapted from from Apache::AuthenSmb module.

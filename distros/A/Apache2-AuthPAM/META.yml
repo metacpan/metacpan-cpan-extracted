@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Apache2-AuthPAM
+version:             0.01
+abstract:            Authenticate apache request using PAM services
+license:             ~
+author:              
+    - Tim Bunce
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Apache2::Const:                0.13
+    Authen::PAM:                   0.13
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

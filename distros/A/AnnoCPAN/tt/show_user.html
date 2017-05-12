@@ -1,0 +1,11 @@
+[% PROCESS header.html title="User info for " _ a_user.username  %]
+[% PROCESS login_form.html %]
+[% PROCESS form.html %]
+
+<h2>User Info for <em>[% a_user.username %]</em></h2>
+
+<h3>Notes by [% a_user.username %]</h3>
+
+[% PROCESS note_table.html notes=a_user.notes %]
+
+[% PROCESS footer.html %]

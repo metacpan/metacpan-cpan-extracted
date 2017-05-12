@@ -1,0 +1,30 @@
+Changes
+lib/Archive/Probe.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/deep_nest_all_test.t
+t/deep_nest_tar_test.t
+t/directory_test.t
+t/extract_flat_test.t
+t/extract_nested_test.t
+t/java_archive_test.t
+t/meta_char_in_filename_test.t
+t/search_archive_itself_test.t
+t/TestBase.pm
+t/testdata/tc1/dir1/a.tgz
+t/testdata/tc1/dir2/readme.txt
+t/testdata/tc1/rar_w_dir.rar
+t/testdata/tc1/rar_wo_dir.rar
+t/testdata/tc1/webapp.zip
+t/testdata/tc2/a.rar
+t/testdata/tc3/a.rar
+t/testdata/tc4/a.rar
+t/testdata/tc4/b.zip
+t/testdata/tc4/d.zip
+t/testdata/tc5/a.tar
+t/testdata/tc6/a.zip
+t/testdata/tc6/c.zip
+t/testdata/tc7/oro.jar
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

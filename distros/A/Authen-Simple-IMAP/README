@@ -1,0 +1,128 @@
+NAME
+    Authen::Simple::IMAP - Simple IMAP and IMAPS authentication
+
+SYNOPSIS
+        use Authen::Simple::IMAP;
+
+        my $imap = Authen::Simple::IMAP->new(
+            host => 'imap.example.com',
+            protocol => 'IMAPS',
+        );
+
+        if ( $imap->authenticate( $username, $password ) ) {
+               # successful authentication
+        }
+
+         # or as a mod_perl Authen handler
+
+         PerlModule Authen::Simple::Apache
+         PerlModule Authen::Simple::IMAP
+
+        PerlSetVar AuthenSimplePAM_host     "imap.example.com"
+        PerlSetVar AuthenSimplePAM_protocol "IMAPS"
+
+         <Location /protected>
+             PerlAuthenHandler Authen::Simple::IMAP
+             AuthType          Basic
+             AuthName          "Protected Area"
+             Require           valid-user
+        </Location>
+
+DESCRIPTION
+    Authenticate against IMAP or IMAPS services.
+
+    Requires Net::IMAP::Simple for IMAP and Net::IMAP::Simple::SSL for
+    IMAPS. These modules are loaded when the object is created, not at
+    compile time.
+
+METHODS
+    * new
+        This method takes a hash of parameters. The following options are
+        valid:
+
+        * host  The hostname of the IMAP server
+
+        * protocol
+                Either 'IMAP' or 'IMAPS'. Any other value causes an
+                exception. Selecting 'IMAPS' will cause an exception if
+                Net::IMAP::Simple::SSL is not installed.
+
+        * log   Any object that supports "debug", "info", "error" and
+                "warn".
+
+                        log => Log::Log4perl->get_logger('Authen::Simple::PAM')
+
+        * escape_slash
+                In some environments, a password containing a slash will
+                fail unless the slash is escaped. Set escape_slash to true
+                to escape slashes in passwords, or false to leave them
+                unescaped. This is true by default.
+
+        * imap  Any object that supports "login" and "errstr" methods. The
+                obvious choice being a Net::IMAP::Simple object, but if you
+                want to use something else, here's how you can do it. This
+                is how I use a mock imap object for the unit tests.
+
+    * authenticate( $username, $password )
+        Returns true on success and false on failure.
+
+DEPENDENCIES
+    Net::IMAP::Simple is required, and Net::IMAP::Simple::SSL is required
+    for IMAPS. Net::IMAP::Simple::Plus adds some patches to the otherwise
+    abandoned and broken Net::IMAP::Simple, so I recommend it.
+
+BUGS AND LIMITATIONS
+    *   I've never tried this in mod_perl, so including the mod_perl example
+        in the synopsis is pure hubris on my part.
+
+    *   The unit tests are pretty sparse. They don't include any tests
+        against real IMAP servers. They just do a successful and failed
+        password against a mock imap server object.
+
+    *   This module uses Net::IMAP::Simple, which is broken and abandoned. I
+        should either use something else or implement the IMAP stuff myself.
+        I wound up wrapping the Net::IMAP::Simple stuff in an alarm+eval
+        block to get it to behave.
+
+SEE ALSO
+    Authen::Simple
+    Authen::Simple::Adapter
+    Net::IMAP::Simple
+    Net::IMAP::Simple::SSL
+CREDITS
+    *   I pretty much ripped the best parts of this doc out of Christian
+        Hansen's Authen::Simple::PAM and replaced "pam" with "imap" in a few
+        places. The lousy parts are my own.
+
+AUTHOR
+    Dylan Martin `<dmartin@sccd.ctc.edu>'
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2009, Dylan Martin `<dmartin@sccd.ctc.edu>' and Seattle
+    Central Community College.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

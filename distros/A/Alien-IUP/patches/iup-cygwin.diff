@@ -1,0 +1,15 @@
+diff -ru iup/src/win/iupwindows_main.c iup.patched/src/win/iupwindows_main.c
+--- iup/src/win/iupwindows_main.c	2011-08-17 23:40:58.000000000 +0200
++++ iup.patched/src/win/iupwindows_main.c	2011-08-19 13:54:45.186511300 +0200
+@@ -51,6 +51,11 @@
+     extern char** _argv;
+     return IupMain(_argc, _argv);
+   }              
++#elif __CYGWIN__
++  {
++    /* unfortunately no __argc, __argv on cygwin */
++    return main(0, NULL);
++  }
+ #else
+   {                        
+     /* this seems to work for all the compilers we tested, except Watcom compilers */

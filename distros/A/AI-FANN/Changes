@@ -1,0 +1,43 @@
+Revision history for Perl extension AI::FANN.
+
+0.10 Mar 10, 2009
+    - syntax error in Makefile.PL (bug report by Michael Stevens)
+    - backport OpenBSD patch for Makefile.PL
+
+0.09 Oct 16, 2008
+    - AI::FANN::TrainData->new_from_file was nos working (bug reported
+      by Renata Camargo)
+    - constructors were not reporting errors via exceptions as
+      documented
+    - compiler warnings cleaned
+
+0.08 Jul 5, 2007
+    - use doubles instead of floats on accessors
+    - MSE is a float (bug and patch by Alex Lang)
+    - add support for FANN_SIN_SYMMETRIC, FANN_COS_SYMMETRIC,
+      FANN_SIN and FANN_COS constants.
+
+0.07 Nov 22, 2006
+    - move to FANN 2.1
+
+0.06 Sep 18, 2006
+    - add support for FANN_LIB and FANN_INCLUDE to MAkefile.PL
+
+0.05 May 4, 2006
+    - ppport.h regenerated with latest version of Devel::PPPort to
+      make it work on perls older than 5.8.8 (bug reported by bodyn).
+
+0.04 May 1, 2006
+    - corrected bug on accessor generators with indexes
+    - better accessor generation using default arguments XS feature
+
+0.03 Apr 14, 2006
+    - improved docs.
+
+0.02 Apr 14, 2006
+    - improved docs.
+
+0.01 Apr 7, 2006
+    - original version; created by h2xs 1.23 with options
+        -An AI::FANN /usr/local/include/fann.h
+

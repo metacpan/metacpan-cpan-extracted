@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:         Apache2::Autocomplete
+version:      0.12
+version_from: lib/Apache2/Autocomplete.pm
+license:      perl
+abstract:     Autocomplete service backend via mod_perl
+installdirs:  site
+authored_by:
+    - Randy Kobes <r.kobes@uwinnipeg.ca>
+requires:
+    JavaScript::Autocomplete::Backend:    0
+    Apache2::RequestRec:  0
+provides:
+  Apache2::Autocomplete:
+    file: lib/Apache2/Autocomplete.pm
+    version: 0.12
+distribution_type: module
+no_index:
+    file:
+         - t/response/TestAutocomplete/basic.pm
+         - t/response/TestAutocomplete/names.pm
+         - t/response/TestAutocomplete/names_header.pm
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+generated_by:        ExtUtils::MakeMaker version 6.3101

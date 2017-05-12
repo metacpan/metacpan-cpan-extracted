@@ -1,0 +1,422 @@
+#!perl
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Acme::CPANAuthors::Utils qw( cpan_authors );
+use Acme::CPANAuthors::Japanese;
+use Lingua::JA::Romaji::Valid;
+use Time::Piece;
+use Getopt::Long qw/:config gnu_compat/;
+
+GetOptions(\my %opts, qw/update module exception/);
+
+my $validator  = Lingua::JA::Romaji::Valid->new('liberal');
+my %known      = Acme::CPANAuthors::Japanese->authors;
+my %exceptions = _exceptions();
+
+my @authors;
+foreach my $author ( cpan_authors->authors ) {
+  my $email = $author->email;
+  my $name  = lc $author->name or next;
+  my $id    = $author->pauseid;
+
+  next if $known{$id};
+  next if $exceptions{$id};
+  next unless $validator->as_fullname( $name )
+           || $validator->as_name( $name );
+#  next unless $email and $email =~ /(\.(com|org|net|jp)|CENSORED)$/i;
+
+  push @authors, $author;
+}
+
+print "num of candidates: " , (scalar @authors), "\n";
+
+foreach my $author ( sort { $a->pauseid cmp $b->pauseid } @authors ) {
+  my $id   = $author->pauseid;
+  my $name = $author->name;
+  my $mail = $author->email;
+  print qq{    $id => '$name', # ($mail)\n};
+  $exceptions{$id} = $known{$id} = [$name, $mail];
+}
+
+if ($opts{exception}) {
+  my $file = __FILE__;
+  open my $in, '<', $file or die $!;
+  open my $out, '>', "$file.tmp" or die $!;
+  my $flag;
+  while(<$in>) {
+    if (/^sub _exceptions/) {
+      print $out $_;
+      $flag = 1;
+      next;
+    }
+    if ($flag && /^\)\}/) {
+      for my $id (sort keys %exceptions) {
+        if (ref $exceptions{$id}) {
+          print $out "    $id => '$exceptions{$id}[0]', # $exceptions{$id}[1]\n";
+        } else {
+          print $out "    $id => '$exceptions{$id}',\n";
+        }
+      }
+      $flag = 0;
+    }
+    if ($flag) {
+        my ($id, $name, $comment) = /^\s+(\w+)\s*=>\s*'(.+?)',(?:\s*#\s*(.+))?$/;
+        if ($id && $name && $comment) {
+            $exceptions{$id} = [$name, $comment];
+        }
+        next;
+    }
+    print $out $_;
+  }
+  close $in;
+  close $out;
+  rename "$file.tmp" => $file or die $!;
+}
+
+if ($opts{update}) {
+  my $file = "$FindBin::Bin/../lib/Acme/CPANAuthors/Japanese.pm";
+  open my $in, '<', $file or die $!;
+  open my $out, '>', "$file.tmp" or die $!;
+  my $flag;
+  while(<$in>) {
+    if (/our \$VERSION = /) {
+      my $ymd = substr(Time::Piece->new->strftime('%Y%m%d'), 2);
+      print $out "our \$VERSION = '0.$ymd';\n";
+      next;
+    }
+
+    if (/^use Acme::CPANAuthors::Register/) {
+      print $out $_;
+      for my $id (sort keys %known) {
+        if (ref $known{$id}) {
+          printf $out "    %-9s => '%s', # (%s)\n", $id, $known{$id}[0], $known{$id}[1];
+        } else {
+          printf $out "    %-9s => '%s',\n", $id, $known{$id};
+        }
+      }
+      $flag = 1;
+      next;
+    }
+    if ($flag && /^\)/) {
+      $flag = 0;
+    }
+    print $out $_ unless $flag;
+  }
+  close $in;
+  close $out;
+  rename "$file.tmp" => $file;
+}
+
+# these authors have names which can be readable as Japanese
+
+sub _exceptions {(
+    AANARI => 'Ali Anari',
+    AARONJJ => 'Aaron Johnson',
+    ABATIE => 'Alan Batie',
+    ADEO => 'Adekunle Olonoh',
+    ADITYA => 'Aditya Wasudeo',
+    AESOP => 'AA',
+    AKISSANE => 'Aidan Kissane',
+    ALANC => 'Alan Champion',
+    AMBROSEUS => 'Eugene Samonenko',
+    ANAK => 'Mario Rossano',
+    ANARION => 'Anarion',
+    ANBU => 'Anbalagan Pugaleesan',
+    ANDOT => 'MA Bingyao',
+    ANEI => 'Ailin Nemui',
+    ANNADURAI => 'Anna Durai',
+    ANTIPASTA => 'Joe Papperello',
+    ANTRO => 'Antonio Rosella',
+    ARACKHAEN => 'Sami Lehtimaki',
+    AREGGIORI => 'areggiori',
+    BARTENDER => 'Maroun',
+    BEANS => 'Ben',
+    BEN => 'Ben Laurie',
+    BENBETA => 'Ben Beta',
+    BENH => 'Benjamin Hare',
+    BEPPU => 'John Beppu',
+    BERETTA => 'Joshua Moore',
+    BIJUA => 'Biju A',
+    BINOJOHN => 'Bino John',
+    BINWIND => 'Bin Hu',
+    BIOJETONE => 'mecha',
+    BKOLERA => 'Ben Kolera',
+    BLX => 'lorenzo bellotti',
+    BOLILA => 'Joao Bolila',
+    BOMBUP => 'no name',
+    BOXZOU => 'Bo Zou',
+    BSAGO => 'Benjamin Sago',
+    BUGONI => 'Piero Bugoni',
+    BUNTAR => 'ben',
+    CGLEE => 'Chae Lee',
+    CHAROITEL => 'Charoite Lee',
+    CHAROVARK => 'Charoite Lee',
+    CHUNZI => 'chunzi',
+    COMPASS => 'Pan Luo',
+    CORNO => 'Ian Hansen',
+    CSELT => 'Emma Tonkin',
+    CYLFHX => 'yalin chai',
+    DALEAMON => 'Dale Amon',
+    DANMOORE => 'Dan Moore',
+    DAREOLA => 'Domingo Areola',
+    DBEUSEE => 'Don Beusee',
+    DEBAJYOTI => 'Debajyoti Dutta',
+    DEEPAN => 'deepan',
+    DELANO => 'Delano',
+    DEROBINS => 'Dana Robinson',
+    DEVIS => 'Roman Musin',
+    DGMDAN => 'Dan Madere',
+    DHH => 'Dai Haihu', # ???
+    DKOGAN => 'Dima Kogan',
+    DMLOND => 'Darin London',
+    DOCG => 'Jason Leane',
+    DRPENGUIN => 'Leo Chan',
+    EAU => 'Eugene Au',
+    EBASSI => 'Emmanuele Bassi',
+    EGA => 'Eugene Gagarin',
+    ELCAMLOST => 'Ilya Rassadin',
+    ELEONORA => 'Eleonora',
+    EMAZEP => 'Emanuele Zeppieri',
+    EMIL => 'Etienne Millon',
+    ETILEM => 'Etienne LEMEE',
+    ETLTCHFIG => 'Leon Panokarren',
+    EUGENEK => 'Eugene Kuzin',
+    FINNPERL => 'IIKONE',
+    FNEVER => 'Tan Hao ',
+    FOOSBAR => 'Bao Son',
+    FREEHAHA => 'John Sun',
+    FUKAI => 'Fu Kai ',
+    GAGGINO => 'Paolo Gaggia',
+    GBAROSIO => 'Guido Barosio',
+    GGALLONE => 'Giuseppe Gallone',
+    GIPPOLITI => 'Giuliano Ippoliti',
+    GIULIENK => 'Giulio Motta',
+    GOSHAN => 'goshan Chio',
+    GROUSSE => 'Guillaume Rousse',
+    GRUBER => 'Anton Berezin',
+    GTORIKIAN => 'Garen Torikian',
+    GTRONICS => 'Gian Rondanelli',
+    GUGO => 'Gugo Kaluga',
+    GUILTYD => 'Ben Moon',
+    GUISEA => 'Aaron Guise',
+    GUOJIAN => 'GuojianLee',
+    HAGANK => 'Ken Hagan',
+    HANS => 'Jan Bieron',
+    HAQ => 'ben',
+    HARRISON => 'HARRISON PAGE',
+    HAVOX => 'Joe Mora',
+    HAYOBAAN => 'Hayo Baan',
+    HDANAK => 'Hike Danakian',
+    HEDALIAN => 'Ruben Llorente',
+    HEJKI => 'Heikki Mehtanen',
+    HELEI => 'He Lei',
+    HESSU => 'Heikki Hannikainen',
+    HITSU => 'hitsubunnu',
+    HJANSEN => 'Heiko Jansen',
+    HMLATAPIE => 'Hugo Latapie',
+    HOUZUO => 'Houzuo Guo',
+    HUGOCHIEN => 'Hugo Chien',
+    HUJINPU => 'Jinpu Hu',
+    IBUDAI => 'Ioana Budai',
+    ICIBIN => 'Bin Shu ',
+    IDO => 'Ido Rosen',
+    IKALLEN => 'Ian Kallen',
+    IKEGAMI => 'ikegami', # Eric Brine
+    ILYALIT => 'Ilya Lityuga',
+    IMAGO => 'Polina Shubina',
+    INSANEART => 'Joe Mason',
+    ISILLITOE => 'Ian Sillitoe',
+    ISLUE => 'Hu Hailin',
+    ITEGEBO => 'Ian Tegebo',
+    IWADE => 'Iain Wade',
+    JACM => 'Jose Machado',
+    JAE => 'Jae Gangemi',
+    JASONPOPE => 'Jason Pope',
+    JBJOHNS => 'Jason Johnson',
+    JBURATI => 'Johan Burati',
+    JGOULAH => 'John Goulah',
+    JHHTOPERL => 'Huihui Jin',
+    JHUNI => 'Joon Hee',
+    JIMBOX => 'Jimi Mikusi',
+    JINZE => 'Jinze Li',
+    JINZELI => 'Jinze Li',
+    JJFUMERO => 'Juan Jose',
+    JKOBIE => 'John Obie',
+    JMEHNLE => 'Julian Mehnle',
+    JMINIERI => 'Joe Minieri',
+    JMONGAN => 'John Mongan',
+    JMOORE => 'Jason Moore',
+    JNOLAN => 'John Nolan',
+    JOHANNA => 'Johanna Amann',
+    JOHNGH => 'John Harrison',
+    JOHNH => 'John Heidemann',
+    JOHNHARRI => 'John Harrison',
+    JOHNMA => 'johnjianma',
+    JOLANDE => 'Joshua Lande',
+    JOLOK => 'joshua lokken',
+    JON => 'Jon A',
+    JONALLEN => 'Jon Allen',
+    JONI => 'Joni Salonen',
+    JOSHKUO => 'Joshua Kuo',
+    JREAGAN => 'Joe Reagan',
+    JRENNIE => 'Jason Rennie',
+    JSET => 'Eugene Kulesha',
+    JSIME => 'Jon Sime',
+    KAILI => 'Kai Li',
+    KAKE => 'Kake',
+    KAL => 'Kalle Raisanen',
+    KAN => 'Kan Liu',
+    KANGU => 'kangu',
+    KENWU => 'lilo',
+    KICHIKU => 'Kichiku Sun', # ???
+    KOKEKATSU => 'koke katsu', # ???
+    KUUSE => 'Johan Kuuse',
+    KYU => 'kyu',
+    LAYE => 'Lei Sun',
+    LBECCHI => 'Lorenzo Becchi',
+    LEAKIN => 'Lee Eakin',
+    LECSTOR => 'Jason Galea',
+    LEEDO => 'leedo',
+    LEEJA => 'Jason Lee',
+    LEEJO => 'Lee Johnson',
+    LEIRA => 'Linda Julien',
+    LEKUIN => 'ben lekuin',
+    LEOCHARRE => 'Leo Charre',
+    LEOHUA => 'leo hua',
+    LIMAONE => 'LIMAONE',
+    LITCHIE => 'Chaoji Li',
+    LIUL => 'liu logen',
+    LMASARA => 'Luigino Masarati',
+    LODIN => 'Johan Lodin',
+    LSEBE => 'Lian Sebe',
+    LUN => 'Lun Li', # CENSORED
+    LUPUS => 'Paolo Molaro',
+    LUX => 'Luigi Iotti',
+    LYMANRB => 'Li Ruibo',
+    LYUAN => 'Yuan Liu',
+    MADCODER => 'Benjamin Ullian',
+    MADWOLF => 'Massimiliano Pala',
+    MALOHIN => 'Malohin',
+    MANNI => 'Manni Heumann',
+    MANNO => 'Mario Manno',
+    MARIO => 'Mario Minati',
+    MASAHJI => 'masahji',
+    MASONLI => 'Mason Li',
+    MELLON => 'Dario Meloni',
+    MGAMMON => 'Mike Gammon',
+    MHM => 'Mike Moran',
+    MHOOLEHAN => 'Mike Hoolehan',
+    MISHOO => 'Mihai Bazon',
+    MITTI => 'Aaron Mitti',
+    MLRU => 'Mario Russo',
+    MMACHADO => 'Mike Machado',
+    MOON => 'Moon Lee',
+    MOUNS => 'N Mouniee',
+    MPLATTU => 'Matti Lattu',
+    MRSLX => 'ollie',
+    MVR => 'Ramana Mokkapati',
+    NANDU => 'Nandu Shah',
+    NAPOLEONU => 'Chao Nie',
+    NETKEN => 'Ken Liu',
+    NHARALE => 'Nitin Harale',
+    NOAH => 'Noah Robin',
+    OLIVERLUO => 'Yao Luo',
+    OOTEMACHI => 'oote machi', # ???
+    OPIATE => 'Shane Allen',
+    ORANGE => 'JuZi',
+    ORION => 'Orion Montoya',
+    PALI => 'Pali',
+    PANYU => 'PAN YU',
+    PAOLO => 'paolo',
+    PASSOS => 'Simon Liu',
+    PAUAMMA => 'Pau Amma',
+    PAWA => 'pawa',
+    PINE => 'Pine Mizune',
+    PTOP => 'LONELI',
+    RA => 'Roman Kosenko',
+    RACHANA => 'KAMALAKANNAN',
+    RANN => 'Ran Ningyu',
+    RELEQUEST => 'Ben Hutton',
+    RFP => 'Rui Patinha',
+    RIJA => 'Rija Menage',
+    RNAIMA => 'Reza Naima',
+    ROBHLE => 'Robera Haile',
+    RPIKKARA => 'Raino Pikkarainen',
+    RSARAN => 'Rogerio Saran',
+    RUBINJ => 'Joshua Rubin',
+    SAMPO => 'Sampo Kellomaki',
+    SANJOGA => 'Sanjoga Sahu',
+    SANKO => 'Sanko Robinson',
+    SAPAPO => 'Sami Poikonen',
+    SASIKALA => 'sasi',
+    SATRAC => 'John Monteiro',
+    SDAGUE => 'Sean Dague',
+    SEEBERG => 'Yuanhao Li',
+    SEGAN => 'Sean Egan',
+    SENDU => 'Sendu Bala',
+    SHANHE => 'Shan He',
+    SHARAN => 'Sharanabasu',
+    SHIKIN => 'Iurii Shikin',
+    SIDIBE => 'Samba SIDIBE',
+    SIERRA => 'Mike Sierra',
+    SIMOTRONE => 'Simone Tampieri',
+    SKYLOADER => 'jaemin choi',
+    SMAPDY => 'Sean Heaton',
+    SMSO => 'Shimin Shuai',
+    SNOOPYBBT => 'Emanuele Santoro',
+    SODASODA => 'Ilya Soda',
+    SPOT => 'Jussi Kinnula',
+    SUJAI => 'SujaiSojan',
+    SUNGO => 'sungo',
+    SYAMAL => 'Syamala Tadigadapa',
+    SYXANASH => 'Simone',
+    TALINA => 'TALINA',
+    TANTALOR => 'John Tantalo',
+    TAO => 'TAO',
+    THOC => 'Ben',
+    THUNDERA => 'Mauro Ribeiro',
+    TIMELLO => 'Tiago Mello',
+    TMAEK => 'Tommi Maekitalo',
+    TTG => 'John',
+    USEOPENID => 'Alan Batie',
+    VEDGE => 'Julien Nadeau',
+    WAHYUDI => 'Wahyudi',
+    WAIDER => 'Ronan Waide',
+    WARRENHUA => 'Warren',
+    YKAR => 'Yuri Karaban',
+    YULESHOW => 'Wanshu Shao',
+    ZANDY => 'John Chain',
+    ZEMAN => 'Dan Zeman',
+    ZIALI => 'Ali Zia',
+    ZITSEN => 'Linhe Huo',
+    ZIYA => 'Ziya Suzen',
+)}
+
+__END__
+
+=head1 NAME
+
+unregistered_japanese_authors - try to find unregistered Japanese CPAN authors
+
+=head1 SYNOPSIS
+
+ > unregistered_japanese_authors
+
+=head1 DESCRIPTION
+
+You can use this to find Pause IDs whose real name looks like Japanese.
+
+=head1 AUTHOR
+
+Kenichi Ishigaki, E<lt>ishigaki at cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 by Kenichi Ishigaki.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

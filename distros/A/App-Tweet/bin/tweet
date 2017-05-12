@@ -1,0 +1,77 @@
+#!/opt/local/bin/perl
+
+use warnings;
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use App::Tweet;
+
+App::Tweet->run( handle_arguments() );
+
+sub handle_arguments {
+    my %opts;
+    GetOptions( \%opts, qw(help man reconfigure username=s password=s) )
+      or pod2usage( -verbose => 0 );
+    pod2usage( -verbose => 1 ) if $opts{help};
+    pod2usage( -verbose => 2 ) if $opts{man};
+
+    if ( $opts{reconfigure} ) {
+        App::Tweet->reconfigure;
+        exit;
+    }
+
+    $opts{message} = "@ARGV";
+    pod2usage( -verbose => 1 ) unless $opts{message};
+
+    return (
+        map { ( $_ =>  ( $opts{$_} || qw{} ) ) }
+          grep { exists $opts{$_} } qw( message username password )
+    );
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+App::Tweet
+
+=head1 SYNOPSIS
+
+  tweet i am doing something really cool
+
+=head1 DESCRIPTION
+
+Tweet's to twitter.com from the command line.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --help
+
+displays help page
+
+=item --man
+
+displays man page
+
+=item --reconfigure
+
+force new user and password to be prompted for
+
+=item --username=s 
+
+username from the command line instead of a config file
+
+=item --password=s
+
+password from the command line instead of a config file
+
+=back
+
+=cut
+

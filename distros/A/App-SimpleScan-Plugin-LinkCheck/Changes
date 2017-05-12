@@ -1,0 +1,23 @@
+Revision history for App-SimpleScan-Plugin-LinkCheck
+1.03  Mon Sep 11 15:31:24 PDT 2006
+	- add snapshot hack: call the snapshot filter for
+	  tests we stack. WIll replace this with something better later.
+
+1.02  Wed Aug  2 13:29:18 PDT 2006
+	- remove @accent from tests
+
+1.01  Mon Apr 10 09:55:41 PDT 2006
+	- failed upload; trying again
+
+1.00  Mon Mar 20 12:10:30 PST 2006
+	- Now 1.0 interface conformant
+	- per_test changed to filter; now get proper
+	  output in all cases
+	- snapshot special-casing removed; no longer needed
+
+0.02  Wed Feb  8 11:09:16 PST 2006
+	- Get forget_link and forget_all_links working.
+
+0.01  Wed Feb  1 16:26:00 2006
+	- Initial release.
+

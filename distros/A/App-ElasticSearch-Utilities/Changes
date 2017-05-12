@@ -1,0 +1,744 @@
+==================================================
+Changes from 2015-03-24 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 5.3 at 2017-03-23 01:50:14 +0000
+----------------------------------------
+
+  Change: 3becaead7ab98d420511e67ac55724eb19c3bd76
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2017-03-22 18:49:52 +0000
+
+    Version 5.3 Docs 
+
+  Change: 2fb6c954347fbbd3a5c8dc372effe8e84116b908
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2017-03-22 18:48:01 +0000
+
+    ElasticSearch 5.2.x support and enhancements
+
+    * Elasticsearch no longer supports aliased keys in the index.
+
+    Removed the uniqueness parsing for the last section of the key name. ES
+
+    v2.x and on requires the keys be fully qualified.
+
+    * es-search.pl subaggs output adjusted
+
+    Prior version injected the sub aggregations before the values, this now
+
+    append the sub aggregations to the listed output in a more readable
+
+    manner.
+
+    * Allow aggregations to be wrapped and use it to provide date_histogram
+
+    wrappers for es-search.pl
+
+    es-search.pl now supports --interval to wrap aggregations in a
+
+    date_histogram's so you can better understand what is happening with
+
+    your data.
+
+    * es_master() and --master-only added, documentation clean up. 
+
+----------------------------------------
+version 5.2 at 2016-12-29 22:44:10 +0000
+----------------------------------------
+
+  Change: f9be6c93da4bb0d734440c5f5ccabef81888adc2
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-12-29 14:44:10 +0000
+
+    Fixes for 5.x
+
+    * <index>/_status deprecated since 1.2, make rewrite to _stats the
+
+    default * <index>/_stats no longer supports all parameter, it's the default
+
+    since 1.x * Replace the last call to <index>/_status in my tools with
+    <index>/stats 
+
+----------------------------------------
+version 5.1 at 2016-11-16 02:30:42 +0000
+----------------------------------------
+
+  Change: f20cbf1927d19c4aeac2c1bebf792cd77e4f7986
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-11-15 18:30:42 +0000
+
+    Added perl 5.24 testing to travis and bumped version numbers. 
+
+  Change: df93facfcc57614bc9ed011a6dadea4a0510f832
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-11-15 18:26:35 +0000
+
+    Improvements to the UI and the compatibility layer
+
+    * es-search.pl now supports sub aggregations using the --with parameter *
+    Fix a bug in the handling of es_indices with ES 2.x clusters. * Remove the
+    warning from the App::ElasticSearch::Utilities::HTTPRequest
+
+    object as I can see this moving out of this module soon. *
+    App::ElasticSearch::Utilities::Connection handles JSON error documents *
+    Fix case sensitivity bug in the --top option of es-search.pl 
+
+----------------------------------------
+version 5.0 at 2016-08-19 03:50:24 +0000
+----------------------------------------
+
+  Change: a8d6911a4ae7238dd564d4235a35c52528adb19a
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-18 20:50:24 +0000
+
+    Documentation re-generated for 5.0 release. 
+
+  Change: 94a5189553fb6c070f2156b4e1fd173745cbb81e
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-18 18:03:47 +0000
+
+    VersionHacks now works on x.0 releases.
+
+    Previous releases failed to compare the string of the version because Perl
+    was helpfully casting '5.0' to '5' as the key in the vhacks hashes. This is
+    now solved by assembling a version string. 
+
+  Change: 3c58599fc9972fdaefeb9b14e62a15d711a68a03
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-18 17:49:59 +0000
+
+    es-graphite-dynamic.pl collector compatibility.
+
+    Allow this to be called from diamond or collectd as a script collector with
+    prefix overrides. 
+
+  Change: 6437ab2119af9051d1ab14eff40ef90c4bb0442f
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-18 17:23:21 +0000
+
+    Preparing for 5.0 release.
+
+    Added es_pass_exec() feature to allow for storing passwords in keychains or
+    password vaults instead of the command line or a plaintext file.
+
+    Extensive documentation updates to cover everything the module does and how
+    the arguments work with examples where required. 
+
+  Change: fd13349f01f6312272b0a78a90141ce057d29715
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-18 13:38:00 +0000
+
+    Hook basic auth and protocol into App::ElasticSearch::Utilities.
+
+    The basic auth handler uses the monkey patching tweak by redefining
+    LWP::UserAgent::get_basic_credentials() to call the
+    App::ElasticSearch::Utilities::es_basic_auth() function. This makes the
+    whole code base cleaner as we don't have to bother with authentication
+    **unless** the server requires it.
+
+    Authentication is resolved by looking at the username/password specified by
+    --http-username and --http-password, then by the YAML config files
+    (/etc/es-utils.yaml, ~/.es-utils.yaml), then using the netrc files, then as
+    a last ditch, prompting the user for the password on the CLI.
+
+    If CLI::Helpers v1.1 or greater is installed, the password prompts will
+    disable echo and not perform ReadLine magic.
+
+    HTPS is supported via the --proto option. Strict host verification is the
+    default. Dear lord, please stop with the setting host verify 'false'. This
+    is why we can't have nice things. I'm not supporting that option at this
+    time, or ever. Fix your certificates, TYVM. 
+
+  Change: f54615b587f3ce92eef515814c043e838bace5c4
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-18 10:44:52 +0000
+
+    Fix insanity with determining the version number with a string eval(). 
+
+  Change: ee3cbbe270018c532f566483e4684c3637150957
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-18 10:33:59 +0000
+
+    Merge branch 'feature/use_lwp' into pre5.0 
+
+  Change: db7cb5b5327162f53cb640cee36d6eb0e7583685
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-17 20:26:49 +0000
+
+    Docs updated for the --with element in es-search.pl 
+
+  Change: 6c14ac9a079e5fc9d5e11ce98dfd58925226282f
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-17 20:25:00 +0000
+
+    Added --with <agg>:<field>:<size> to es-search.pl
+
+    Sub-aggregations using --with are now supported to help make more sense out
+    of the data from --top. 
+
+  Change: bad8827e666ede37f828d066496446abffcbf106
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-17 20:01:35 +0000
+
+    Starting the Basic Auth pass through bits. 
+
+  Change: 10ed9d4341b44f51c9875e6f83b5761654ef5d8a
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-17 17:03:59 +0000
+
+    App::ElasticSearch::Utilities::HTTPRequest added.
+
+    There are a few places where a standard HTTP::Request object, or even an
+    HTTP::Request::JSON objects will barf on the payloads that we need to send
+    to Elasticsearch. A::ES::U::HTTPRequest subclasses HTTP::Request and
+    overrides the new() and content() methods.
+
+    * new() - Adds the Accept: application/json header.
+
+    * content() - Handle how perl datastructures are encoded in the body.
+
+    * HASH: Hashes are JSON encoded
+
+    * ARRAY: Array elements are encoded as json and then those are
+
+    joined together with "\n" (think the /_bulk API)
+
+    * Non-reference Scalars: passed as is, you know what you're doing.
+
+    * Everything else: discarded, generates a warning
+
+    The '_cat' API passes JSON back when you tell it you can read that, so
+    updated the es_indices() function to handle the JSON resulting from the
+    _cat call using the new A::ES::U::HTTPRequest object. 
+
+  Change: 3cf2c13f87a911b88c02297ecbf280f456e61bf3
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-03 17:26:08 +0000
+
+    Working version of the toolkit using LWP::UserAgent instead of
+    Hijk/Elastijk 
+
+  Change: 176290d6ed44dba88db43eb5a3541fd981fca602
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-07-31 22:31:41 +0000
+
+    Use the App::ElasticSearch::Utilities::Connection object instead of
+    Hijk/Elastijk. Start migration to Ref::Util 
+
+  Change: d5a78e1db33abe3d83ca86e1b178f1fdd5b519eb
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-07-31 22:30:07 +0000
+
+    Connection class to abstract the HTTP bits from this module. 
+
+  Change: 2eea122cf0732ac98c6f50ae67377ad0d538592a
+  Author: Daniel Ostermeier <daniel.ostermeier@gmail.com>
+  Date : 2016-06-20 10:52:55 +0000
+
+
+  Change: e0b4d0e7fdf03cabab9f5b78406b1726c994a69a
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-05-04 15:21:12 +0000
+
+    Handle nested objects in the --show option. 
+
+  Change: 6049eeb58495a2aa7dfcaffae876a2ae6e478958
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-04-07 14:20:28 +0000
+
+    Version Numbers Updated 
+
+----------------------------------------
+version 4.7 at 2016-04-07 21:18:28 +0000
+----------------------------------------
+
+  Change: d0b56b67bed7fc2716d20ba5d5ed4e173d094998
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-04-07 14:18:28 +0000
+
+    Updated mailmap 
+
+  Change: 25d120f1b42ff24ad1273b902b2e3794a2144912
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-04-07 14:16:12 +0000
+
+    Fix logic for field hunting in the es_index_fields() routine.
+
+    This now returns all the fields and any unique aliases reliably. 
+
+  Change: 8c08c833958b3c4f99ed5d870defe48d0f4176da
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-04-07 12:43:57 +0000
+
+    Add the ability to skip either add or remove step of alias management. 
+
+  Change: f846dca1c844b2ca6313be422621548a9eef3a8f
+  Author: Daniel Ostermeier <dostermeier@ml815921.corpad.adbkng.com>
+  Date : 2016-04-07 14:36:34 +0000
+
+    Don't die when no hits are returned 
+
+  Change: 5b27011ba8797dc908f4dd703c31ffa9045553d3
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-04-04 11:10:59 +0000
+
+    Version Bump for 4.6 Release. 
+
+  Change: 11a69078d4ae7f6a09ee89dcdd5222498f213e13
+  Author: Kang-min Liu <gugod@gugod.org>
+  Date : 2016-03-23 16:01:52 +0000
+
+    fix es-copy-index.pl when `--mapping` is not given.
+
+    When `--mapping` is not given, the process to retrieve current index
+    mapping was wrong and retrive a blank hash instead. So this was broken:
+
+    es-copy-index --from es-01 --to es-02 --source log.20160323
+
+    This commit does an additional query for mapping when `--mapping` is not
+    given. 
+
+----------------------------------------
+version 4.6 at 2016-04-04 18:06:24 +0000
+----------------------------------------
+
+  Change: c6874602274828fbb242777a2438b9516f9f6a82
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-04-04 11:06:24 +0000
+
+    Use DateTime for tests for accurately representing the index name. 
+
+  Change: 6beb23d8c76f19310d6352c7b3e10a5f19bafa60
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-04-04 11:06:00 +0000
+
+    Fix calls to timelocal with gmtime to handle weird date bug with localtime
+    reporting fewer days than expected. 
+
+  Change: a0b12324f6b57b45442e4110ebfa7828813ab652
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-03-05 21:34:36 +0000
+
+    Version 4.5 docs. 
+
+----------------------------------------
+version 4.5 at 2016-03-06 05:32:34 +0000
+----------------------------------------
+
+  Change: 52d2a4e79167971c83048b7ceb479f1e29836f0d
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-03-05 21:32:34 +0000
+
+    Better field resolution for es_index_fields()
+
+    Fields lookup should now be accurate Minor UI Improvements to es-search.pl
+    and es-copy-index.pl 
+
+  Change: b40ab9ae068fe1cadbe1bf0e96e7422ede0ed941
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-26 23:15:57 +0000
+
+    Documentation updates for 4.4 
+
+----------------------------------------
+version 4.4 at 2016-02-27 07:12:47 +0000
+----------------------------------------
+
+  Change: 4a832f92659ebc575d2de0948dbb01b8e349138b
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-26 23:12:47 +0000
+
+    Bug fixes in es-copy-index.pl
+
+    Found some bugs around error handling as I convinced it throw errors. These
+    have been fixed and it should be ready fo general use. 
+
+  Change: eb446d391c937da9c29917db8b1cf39e2c2eada9
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-26 23:00:28 +0000
+
+    Use fake_home for compiles to catch problems not apparent with my RC files. 
+
+  Change: 764878a671d8ae548c2bbb0cdb83b0c7d28ae6b4
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-26 23:00:28 +0000
+
+    Testing for index name methods.
+
+    Added tests for expected results when parsing certain index names. This
+    flushed out a bug in the handling of index names already. 
+
+  Change: c6db63a4555205e1649f11c9226124117420626b
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-26 22:43:19 +0000
+
+    Corrected es_index_bases() to match expected behavior
+
+    Subtle bug in calculating the bases for each index was flushed out during
+    creation of tests. Bases are free words, combined with '-'s maintaining
+    order in the index name, but without regard for offset.
+
+    For example: type-dcid-2016.02.26-tags has the following bases:
+
+    type
+
+    type-dcid
+
+    type-dcid-tags
+
+    dcid
+
+    dcid-tags
+
+    tags
+
+    This behaviour is now correct. 
+
+  Change: a798f5c3aa8f29dcba51964174e79ae99770802e
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-26 21:58:53 +0000
+
+    es-search.pl updated to use more flexible methods
+
+    Several underlying functions were dramatically enhanced, so es-search.pl is
+    now making full use of them.
+
+    Important changes:
+
+    es-search.pl --bases
+
+    This command now uses a call to es_indices(_all => 1), so all
+
+    available index bases will be displayed. Additionally, using
+
+    --verbose it's possible to see the age-ranges of the indexes in the
+
+    output so calls to the --base <base> --days <days> will do what you
+
+    expect.
+
+    es-search.pl --base <base> --fields
+
+    This command now uses the enhanced es_index_fields() function which
+
+    has support for full path key names.
+
+    General
+
+    Because of the enhancements to es_index_fields(), every search,
+
+    aggregate, and display check for key names is more accurate. If you
+
+    have been annoyed with '--top requires a valid key' errors in the
+
+    pat, this patch fixes most of those issues. 
+
+  Change: 198070c98534a5ef868d63fdb9b57cc4120d7577
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-26 21:56:04 +0000
+
+    es_index_fields(index-name) dramatically improved.
+
+    Previous versions of the module broken down with nested fields. This change
+    adds support for full path key lookups and magic around handling weirdness
+    is the document structure. All keys are now accessible via their full path
+    names and any unique leaf key is still available by it's unique name. 
+
+  Change: 618afcf75d5d36002846c765bb6eecfb2e0f36c0
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-26 21:52:34 +0000
+
+    es_index_bases(index-name) returns bases
+
+    Converted es_indices() to use _cat API. Added es_index_bases(index-name) to
+    return a list of base tags that the index passed matches. The logic is much
+    more consistent and less prone to error.
+
+    es_index_days_old() can now returns undef if it can't figure out an index
+    age instead of -1. This is due to timezones. There are cases where an index
+    can have a negative age. 
+
+  Change: 1cf798a0033ce7d62e3e60d79bf4805762d19ffe
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-26 21:49:46 +0000
+
+    Add support for _cat API with es_request()
+
+    Elastijk does not support responses from ElasticSearch that do not pass a
+    JSON decode. To allow _cat API calls through the es_request(), I am using
+    Hijk directly from this module and encapsulating the _cat API responses in
+    an ARRAY reference. 
+
+  Change: 239b115a53c97fd43bbf743c5ebc8ed835f2b12c
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-26 21:46:56 +0000
+
+    Fix uninitialized errors in es-copy-index.pl
+
+    Replaced several places in the es-copy-index.pl where $OPT{to} was
+    referenced with $HOST{to}, which is always defined. 
+
+  Change: 7d36f5af7fa1a27b2fb7663c5400eac133b1d9aa
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-26 21:45:44 +0000
+
+    Long overdue, disable bloom filters.
+
+    es-daily-index-maintenance.pl now manages the the: index.codec.bloom.load
+    setting and will set it to false for indexes older than 1 day. 
+
+----------------------------------------
+version 4.3 at 2016-02-27 00:50:57 +0000
+----------------------------------------
+
+  Change: fdd6b0f48cbb0fe376b99ff1b6331f63cc5970b7
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-26 16:50:57 +0000
+
+    Fix typos in es-copy-index.pl 
+
+  Change: 6b475f713ab9dab705d50f915bd11bf5ce86f5df
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-23 11:36:39 +0000
+
+    Ignore generated Changes file. 
+
+----------------------------------------
+version 4.2 at 2016-02-23 03:50:22 +0000
+----------------------------------------
+
+  Change: 6026b686c0dd3f49e51fdaf59df2c0d425fc15f0
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-22 19:50:22 +0000
+
+    Fix bug not handling undefined values from clone_merge. 
+
+  Change: 5aa28edbdbcf378a342624b7b5aff691d25cdad2
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-22 19:44:09 +0000
+
+    Fix es-nodes.pl when viewing tribed nodes. 
+
+  Change: b7157d2a40dbddc6eaab4def1d7e577e8a783afb
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-20 22:59:26 +0000
+
+    Customized the Support POD Section. 
+
+  Change: 5dc11f625b534fd42c102cc0e76ba5e128509611
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-20 21:52:47 +0000
+
+    Changes generation is now using Git. 
+
+  Change: 3b83ad99bd1409a64897f66cc033de2d7c5d96ba
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-20 21:32:43 +0000
+
+    GitHub allows downloading of releases, no reason to stash these in the
+    repository. 
+
+----------------------------------------
+version 4.1 at 2016-02-21 05:28:15 +0000
+----------------------------------------
+
+  Change: 8001843554a4818fb4235078e01ef6d3c3bd854e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-20 21:28:15 +0000
+
+    Version Hack for _optimize/_forcemerge 
+
+  Change: 24a765fc0bb945ccb82af408a77acdd39ab82c60
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-20 21:19:34 +0000
+
+    Allow changes to the CopyIndexes.mkdn file 
+
+  Change: 68ab17e0b2cbcf29308385f5c2ae4b51e7eabf86
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-20 21:17:00 +0000
+
+    Testing for ::QueryString parsing. 
+
+  Change: f892f3286ce9ba37703d4c36d20f3e4c2bb35489
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-20 14:04:09 +0000
+
+    Generated contributors file. 
+
+  Change: 02b35e658796399844e00f321c170354ee6fe18e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-20 14:01:48 +0000
+
+    Contributors is now generated with Pod::Weaver 
+
+  Change: 9c56685c71715dde217107bf1247d35d887bf244
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-20 14:01:37 +0000
+
+    Mail map for contributors. 
+
+  Change: e08ec62703e4811fefda2722842de6196e21cd4b
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-20 14:01:19 +0000
+
+    Pull contributors from git. 
+
+  Change: ae9b3f892d5a8e8074289c184e72406a3ffcb6d3
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-20 00:31:39 +0000
+
+    Major overhaul of the CLI query string parsing
+
+    + App::ElasticSearch::Utilities::QueryString adds dynamic parsing to the
+
+    query string and makes it pluggable + App::ElasticSearch::Utilities::Query
+    represents a query object and
+
+    provides short cuts and safety nets for some common queries +
+    es-copy-index.pl on steroids. Can now slice, dice, and make french
+
+    fries in 30 different cuts. Now uses the ::QueryString framework. +
+    es-search.pl uses the ::QueryString framework. +
+    examples/parse-query-string.pl show how the framework would parse
+
+    a given query string. + Massive documentation overhaul and update. 
+
+  Change: c90bf5fb8d1bf4edfcc18e0b3107cc42fbd3cd32
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-19 20:51:42 +0000
+
+    Migrate globals to config merging. 
+
+  Change: 0152d7b9d0f379bd80b5362782ba4ca909100526
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-11 11:37:04 +0000
+
+    Provide a :config export 
+
+  Change: c644518c1d8bef2f752f1784a0eca9dd983b6310
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-11 11:37:04 +0000
+
+    If we can't determine the ES version, exit immediately. 
+
+  Change: a4f64b5cf12dca767d3ec4741b712ec0767b98d3
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-11 19:33:22 +0000
+
+    Fix markdown generation errors. 
+
+  Change: 490ca9eaf40787209a9d659f634de2da3ab398db
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-01 18:33:57 +0000
+
+    Add a block-size option fot es-copy-index.pl Handle stray AND|OR|NOT in
+    query string. 
+
+----------------------------------------
+version 4.0 at 2016-01-27 23:37:44 +0000
+----------------------------------------
+
+  Change: 30f4436209b9bdbd2e7f5f18f5bcbff416341a06
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-01-27 15:37:44 +0000
+
+    es-search.pl: Remove relying on @fields hierarchy. 
+
+  Change: 2bab7219bf5638e1e4f238d1b6db4e177c291b03
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-01-27 15:12:05 +0000
+
+    Drop support for pre-1.0 ElasticSearch Migrate es-search.pl to using only
+    aggregations 
+
+  Change: cd8e263d6d8a2be637477e3da4c81961e20da960
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-01-27 14:07:24 +0000
+
+    Add version hacks to map for newer versions of ES. Remove all deprecated
+    _cluster API. 
+
+  Change: ab6847b22840e51f576469c01bfdf7d90b155a4f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2015-10-29 23:10:13 +0000
+
+    Adding authordeps in the dist.ini 
+
+  Change: 831c1cd779a01f503026eaaba750e419765b1480
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2015-10-29 23:01:39 +0000
+
+    Adding TravisCI to the project. 
+
+  Change: c9856b116258d8e989d8d7354808f1871e205115
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2015-05-21 15:58:25 +0000
+
+    Fix typo in documentation 
+
+----------------------------------------
+version 3.9 at 2015-05-20 09:12:30 +0000
+----------------------------------------
+
+  Change: 8b60c110e35726485f1cf22f72540e431af30e98
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2015-05-20 11:12:30 +0000
+
+    Version 3.9 packaging 
+
+  Change: af9afd74b666677f7182b97709ebaf208be2b9cc
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2015-05-20 10:41:55 +0000
+
+    App::ElasticSearch::Utilities * Now allows --no-noop so you can set noop in
+    a global es-utils.yaml config to make changes to indexes require --no-noop.
+    * Exporting es_globals($key) which gives access to the values in the config
+    files to the the scripts. This can include additional variables not called
+    in the App::ElasticSearch::Utilities module itself, but needed for it's
+    other scripts, e.g., es-search.pl's --timestamp parameter. * Allow
+    date-separator and base to be set in es-utils.yaml. * Index date patterns
+    updated to allow for 'base_YYYYMMDD'
+
+    scripts/es-search.pl * --timestamp option for indexes where @timestamp
+    isn't the field you want used as the date field. 
+
+----------------------------------------
+version 3.8 at 2015-05-04 10:13:01 +0000
+----------------------------------------
+
+  Change: f6f34a85da0b3414f0aa1a252015989f2d54aa3a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2015-05-04 12:13:01 +0000
+
+    Preparation for the 3.8 release. 
+
+  Change: 38f30d5aaf1da4a7e18b6aae42d77d0aceeea164
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2015-05-04 12:01:00 +0000
+
+    Make es-copy-index.pl executable. 
+
+  Change: 6161f7f479e5556651d5ac67a551aff33419f6ab
+  Author: Kang-min Liu <kangmin.liu@booking.com>
+  Date : 2015-05-01 12:32:45 +0000
+
+    reimplement es-copy-index.pl with Elastijk. 
+
+  Change: df72bf56be14b4f7b47c8ecd3819f4b4a564cc8b
+  Author: Kang-min Liu <gugod@gugod.org>
+  Date : 2015-05-01 11:48:40 +0000
+
+    remove an non-existing function from the export list. 
+
+  Change: 53498cd83b606561a729ded73ebb16c2d23ab3ee
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2015-03-23 12:52:11 +0000
+
+    Replace File::Slurp with File::Slurp::Tiny 
+
+=================================================
+Plus 46 releases after 2015-03-24 00:00:00 +0000.
+=================================================

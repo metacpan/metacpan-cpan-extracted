@@ -1,0 +1,233 @@
+#
+# $Id: Base.pod,v 10.1 2004/11/18 13:27:44 wpm Exp $
+#
+# (c) 2003-2004 Morgan Stanley and Co.
+# See ..../src/LICENSE for terms of distribution.
+#
+
+=head1 NAME
+
+AFS::Command::Base -- Base OO Class for AFS::Command::* API
+
+=head1 SYNOPSIS
+
+This module is B<NOT> used directly by applications, but indirectly by
+the various command wrapper classes:
+
+    use AFS::Command::VOS;
+    use AFS::Command::BOS;
+    use AFS::Command::PTS;
+    use AFS::Command::FS;
+
+All of these classes inherit from this base class, and the inherited
+methods are documented here.
+
+=head1 DESCRIPTION
+
+The AFS::Command suite provides an programmatic API to several of the
+key AFS command line utilities, namely: vos, bos, pts and fs.  This
+module is <NOT> a replacement for the AFS::* modules, which are an XS
+interface to the lower level AFS C programming APIs.
+
+This module attempts to fill a huge void in the APIs available for
+developing AFS systems management applications in perl.  Norbert
+Gruener's AFS module implements wrapper classes for the various C
+programming APIs available for AFS, however most of the systems
+management for AFS is implemented in the command line utilities
+themselves, not in any of the C libraries.  Far too much of the logic
+in vos, by far the most important utility, is in the application
+itself, not the underlying libraries.  This makes it very difficult
+for an XS-only approach to support the vos functionality.
+
+These classes take an entirely different approach, since they are
+simply wrappers around the command line executables themselves, and
+implemented entirely in pure perl (no XS code at all).  This has some
+advantages and disadvantages, of course.  The primary advantage is
+that we are not forced to re-implement the complex logic in the vos
+command using the low level primitive C API calls.  The primary
+disadvantage is that we are tightly coupled with the format of the
+text output of each of these commands, but this is a problem space
+that perl excels in.
+
+This document covers general programming with the API, and the details
+of the specific wrapper classes are documented separately
+(eg. AFS::Command::VOS).
+
+=head1 CLASS METHODS
+
+=head2 new
+
+All of the AFS::Command subclasses use this inherited method as an
+object constructor.  In its simplest usage, it can be called with no
+arguments, but there are several which control global behavior of the
+commands, simplifying subsequent coding a bit.
+
+=over
+
+=item command
+
+This key has the pathname to the command to be used for execution.  By
+default, this is the simple command name "vos", "bos", etc, and the
+command will simply be found in your $PATH by exec().
+
+If you want to run a specific version of vos not found in the $PATH,
+then for example:
+
+   my $vos = AFS::Command::VOS->new
+     (
+      command		=> "/ms/dist/openafs/PROJ/core/1.2.9/bin/vos",
+     );
+
+If the path given is invalid, then expect the API to implode on itself
+when it can't be found, or it isn't an AFS vos command.
+
+=item localauth, noauth, encrypt
+
+All of these arguments correspond to command line arguments common
+across the entire command line suite.  Typically, if an application
+uses this flag once, it will be using it for B<all> subsequent calls as
+well.  Therefore, the state of these flags can be set globally by
+setting them when creating the command object.
+
+    my $vos = AFS::Command::VOS->new
+      (
+       localauth	=> 1,
+       encrypt		=> 1,
+      );
+
+NOTE: The encrypt option is only available in more recent versions of
+AFS, and may be unsupported by the underlying commands.
+
+XXX: What should the default behavior be?  Croak or carp? we can
+figure out dynamically if the command supports it, and have the
+constructor fail, or we can be lazy and let the first command fail.
+
+=item quiet
+
+The default behavior for the common -verbose flag is inverted.  By
+default, all commands are run with the -verbose flag, in order to
+capture maximum diagnostics when an error occurs.  Normally, the
+chatty output is all trapped by the API anyway, so there is no
+application visible noise, just more verbose errors.
+
+There should be no need to disable verbosity, but for completeness,
+specifying 'quiet' will turn off the default verbose output.
+
+=item timestamps
+
+If this argument is given, then the output collected from the commands
+will be prepended with the date formatted using Date::Format with:
+
+    %Y/%m/%d %H:%M:%S
+
+This is primarily useful for debugging and timing of commands such as
+vos release, which can be very time consuming.  Since we enable
+-verbose by default, this option will let us determine the relative
+time required for each step in these complex operations.
+
+This only applies to commands that return simple return values, eg:
+release, restore, etc.  Commands that return complex structures of
+objects, such as listvldb, listvol, etc will not be affected.
+
+=back
+
+=head2 setCarp
+
+This class method configures the carp and/or croak subroutines used
+throughout the API.  By default, the obviously sensible thing is done:
+the carp an croak subroutines exported by the Carp module are used.
+These normally print output to stderr, and this method provides a
+mechanism for trapping these errors and redirecting them elsewhere.
+
+For example, stderr in a system daemon may be entirely ignored, and
+syslog may be a more appropriate destination.  In this case, the
+setCarp method may be used to configure this, globally, for the entire
+API.
+
+    AFS::Command->setCarp
+      (
+
+       carp => sub {
+	   my ($lines) = @_;
+	   foreach my $line ( split(/\n+/,$lines) ) {
+	       syslog('warning',$line);
+	   }
+       },
+
+       croak => sub {
+	   my ($lines) = @_;
+	   foreach my $line ( split(/\n+/,$lines) ) {
+	       syslog('error',$line);
+	   }
+	   die $lines; # If we're dying, whine at stderr, too.
+       },
+
+      );
+
+This method takes a list of key/value pairs, with only two supported
+keys (anything else will be quietly ignored): carp an croak.  The
+values are CODE references (anonymous subroutines, or references to
+existing subroutines).  The carp CODE should not be fatal, however the
+croak CODE should.  The API calls the croak method in very few places,
+but when it does, it assumes that call will be fatal, so if you
+provide a croak subroutine that doesn't die, the results will be
+unpredictable, and unsupportable.
+
+This method returns true of false, depending on whether or not the
+carp and/or croak subroutines were properly configured.  If the values
+are not CODE references, then this method will itself croak.
+
+=head1 INSTANCE METHODS
+
+=head2 errors
+
+This method takes no arguments, and it returns a string, containing the
+unparsed errors from the last command method invoked.  This string is
+reset with each subsequent command method invocation.  The string is
+normally the output written to stderr by the process, but in the case
+of unparsed boolean commands, it contains both the stdout as well as
+the stderr output.
+
+    my $result = $vos->examine
+      (
+       id		=> $volname,
+       cell		=> $cell,
+      );
+    unless ( $result ) {
+        die "Unable to examine volname '$volname' in cell '$cell':" .
+	  $vos->errors();
+    }
+
+=head2 supportsOperation
+
+This class method allows the developer to test whether or not any
+given operation is supported by the underlying command line utility.
+For example, the "vos changeloc" operation is not supported in older
+release of vos.
+
+    unless ( $vos->supportsOperation('changeloc') {
+	die "Unable to continue -- 'vos changeloc' is unsupported.\n";
+    }
+
+The return value is simply true or false.
+
+=head2 supportsArgument
+
+Similar to supportsOperation, supportsArgument will test whether or
+not a given argument is a support command line argument for the
+specified operation.  For example, the -encrypt argument is only
+supported in more recent versions of vos, so that support can be
+tested for easily.
+
+    unless ( $vos->supportsArgument('listvldb','encrypt') ) {
+	warn "Encryption is not support by your version of vos.\n";
+    }
+
+The return value is simply true or false.
+
+=head1 SEE ALSO
+
+AFS::Command::VOS(1), AFS::Command::BOS(1), AFS::Command::PTS(1),
+AFS::Command::FS(1), AFS::Command::Base(1), AFS::Command(1)
+
+=cut

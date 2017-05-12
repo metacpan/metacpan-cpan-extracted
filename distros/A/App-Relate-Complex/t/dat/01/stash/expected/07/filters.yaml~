@@ -1,0 +1,16 @@
+---
+:jpeg:
+  description: 'Find jpegs, for all common extensions.'
+  method: find_any
+  modifiers: x
+  terms:
+    - \.jpeg$
+    - \.JPEG$
+    - \.jpg$
+    - \.JPG$
+bleach:
+  description: gets rid of unsightly blemishes
+  method: skip_any
+  modifiers: x
+  terms:
+    - '^.*$'

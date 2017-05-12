@@ -1,0 +1,12 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/mw2git
+dist.ini
+lib/App/MediaWiki2Git.pm
+t/author-critic.t
+t/release-has-version.t
+t/release-pod-syntax.t

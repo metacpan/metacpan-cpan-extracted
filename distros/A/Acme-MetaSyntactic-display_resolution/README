@@ -1,0 +1,21 @@
+SYNOPSIS
+
+     % perl -MAcme::MetaSyntactic=display_resolution -le 'print metaname'
+     qhd
+    
+     % meta display_resolution 2
+     fhd
+     wxga
+
+DESCRIPTION
+
+    This theme includes display resolution names retrieved from
+    Display::Resolution. Only names that start with letters and contain
+    solely letters/numbers are included. The names are lowercased.
+
+SEE ALSO
+
+    Acme::MetaSyntactic
+
+    Display::Resolution
+

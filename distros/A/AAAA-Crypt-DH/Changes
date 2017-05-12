@@ -1,0 +1,13 @@
+Changelog for AAAA::Crypt::DH
+=============================
+
+0.06  Thu Mar 30 14:18:59 BST 2017
+  - Handle perls without dot in @INC
+
+0.04  Tue Oct  5 10:23:57 BST 2010
+  - version bump to include latest
+    Devel::CheckLib which should
+    detect libraries betterer.
+
+0.02  Mon Jan 18 16:11:34 GMT 2010
+  - Initial CPAN release

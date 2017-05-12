@@ -1,0 +1,28 @@
+
+To install the module and man pages in the standard areas, 
+give the sequence of commands
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+If you want to install the module in your own private space, use
+
+  perl Makefile.PL PREFIX=/my/private/perllib \
+       INSTALLMAN1DIR=/my/private/perllib/man/man1 \
+       INSTALLMAN3DIR=/my/private/perllib/man/man3      
+  make
+  make test
+  make install
+
+Any libraries installed in such non-standard places may then
+need to have the appropriate path to them specified in the script.
+
+Note that `make test` simply tests whether the module loads OK.
+
+Documentation on the use of the module can be found by running
+  perldoc RandomLocation.pm
+before installation, or
+  man Apache::RandomLocation
+after installation.

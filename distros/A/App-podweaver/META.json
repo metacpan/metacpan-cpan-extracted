@@ -1,0 +1,77 @@
+{
+   "abstract" : "Run Pod::Weaver on the files within a distribution.",
+   "author" : [
+      "Sam Graham <libapp-podweaver-perl@illusori.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-podweaver",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Copy" : 0,
+            "File::Spec" : 0,
+            "File::Temp" : "0.18",
+            "Pod::Elemental::Selectors" : 0,
+            "Pod::Elemental::Transformer::Nester" : 0,
+            "Software::License::Perl_5" : 0,
+            "Test::Command" : "0.08",
+            "Test::Differences" : 0,
+            "Test::MockObject" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Pod::Weaver::PluginBundle::ReplaceBoilerplate" : 0
+         },
+         "requires" : {
+            "CPAN::Meta" : 0,
+            "Config::Tiny" : 0,
+            "File::Find::Rule" : 0,
+            "File::Find::Rule::Perl" : 0,
+            "File::Find::Rule::VCS" : 0,
+            "File::HomeDir" : 0,
+            "File::Slurp" : 0,
+            "IO::File" : 0,
+            "Log::Any" : 0,
+            "Log::Any::Adapter" : 0,
+            "Log::Any::Adapter::Dispatch" : 0,
+            "Module::Metadata" : "1",
+            "PPI::Document" : 0,
+            "Pod::Elemental" : 0,
+            "Pod::Elemental::Transformer::Pod5" : 0,
+            "Pod::Weaver" : "3.101632",
+            "Try::Tiny" : 0
+         }
+      }
+   },
+   "provides" : {
+      "App::podweaver" : {
+         "file" : "lib/App/podweaver.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/illusori/Perl-App-podweaver"
+      }
+   },
+   "version" : "1.00"
+}

@@ -1,0 +1,275 @@
+#!/usr/bin/perl -w
+
+# No documentation yet except for what is in the $USAGE message
+# and comments below.
+#
+# Uses:
+#       take standard linkbag format and eliminate redirects;
+#       ignores fragments too
+
+use strict;
+use POSIX;
+use HTML::Entities;
+use Alvis::URLs;
+use Getopt::Long;
+use Pod::Usage;
+
+# encoding pragmas follow any includes like "use"
+use encoding 'utf8';
+use open ':utf8';
+binmode STDOUT, ":utf8";
+binmode STDIN, ":utf8";
+
+my $usezip = "";
+my $init = 0;
+
+#  both hash tables only store URLs cleaned with StandardURL()
+#  single redirect for a URL
+my %redirect = ();
+#  space delimited set of entries with same target
+my %direct = ();
+
+sub updateMaps() {
+  my $inu = shift();
+  my $outu = shift();
+  my $direct_add = "";
+  #  no duplicates
+  if ( defined($redirect{$inu}) &&
+       $redirect{$inu} ne $outu ) {
+    print STDERR "Previous definition '$inu'->'" . $redirect{$inu}
+      . "' for line:\n   $_\n";
+    # exit(1);
+  }
+  #  anything redirecting to this source must also be
+  #  redirected
+  if ( defined($direct{$inu}) ) {
+    $direct_add = $direct{$inu};
+    undef($direct{$inu});
+  }
+  #  check for a redirect of the redirect
+  if ( defined($redirect{$outu}) ) {
+    #print STDERR "Redirect target '$outu' already redirected '$redirect{$outu}'\n";
+    my $reoutu = $redirect{$outu};
+    $redirect{$inu} = $reoutu;
+    if ( $direct_add ) {
+      #print STDERR "Redirect source '$inu' already redirected too '$direct_add'\n";
+      foreach my $l ( split(/ /, $direct_add) ) {
+	$redirect{$l} = $reoutu;
+      }
+      $direct_add = $inu . " " . $direct_add;
+    } else {
+      $direct_add = $inu;
+    } 
+    $direct{$reoutu} = $direct{$reoutu} . " " . $direct_add;
+  } else {
+    #  $outu terminates things
+    $redirect{$inu} = $outu;
+    if ( $direct_add ) {
+      # print STDERR "Redirect source '$inu' already redirected too '$direct_add'\n";
+      $direct{$outu} = $inu . " " . $direct_add;
+      foreach my $l ( split(/ /, $direct_add) ) {
+	$redirect{$l} = $outu;
+      }
+    } else {
+      $direct{$outu} = $inu;
+    }
+  }
+}
+
+
+#  check options
+
+
+#  check options
+
+GetOptions(
+     'man'       => sub {pod2usage(-exitstatus => 0, -verbose => 2)},
+      'init'    => \$init,
+      'gzip'    => sub { $usezip = "zcat"; },
+      'bzip2'    => sub { $usezip = "bzcat"; },
+      'noclean' => \$Alvis::URLs::noclean,
+      'nocase' => \$Alvis::URLs::nocase,
+      'h|help'       => sub {pod2usage(1)}
+);
+
+pod2usage(-message => "ERROR: need input file and stem")
+      if ( $#ARGV != 1 );
+
+my $file = shift();
+my $stem = shift();
+
+if ( $init ) {
+  unlink("$stem.redirect");
+}
+
+#  first pass gets redirects into hash table,
+#  and eliminates any paths
+
+# set this if redirects used
+my $somedir = 0;
+
+#  first from the stored file
+if ( open(I,"<$stem.redirect") ) {
+  print STDERR "Initialising with redirects from $stem.redirect\n";
+  while (($_=<I>) ) {
+    chomp(); 
+    if ( /^R ([^ ]+) ([^ ]+)$/ ) {
+      &updateMaps($1,$2);
+    } else {
+      print STDERR "Bad line in '$stem.redirect': $_\n"; 
+    } 
+  } 
+  close(I);
+  $somedir = 1;
+}
+
+print STDERR "Scanning $file for redirects\n";
+# then from the update file
+open(REDIR,">>$stem.redirect") or die "Cannot open '$stem.redirect': $!";
+if ( $usezip ) {
+  open(I,"$usezip $file |") or die $!;
+} else {
+  open(I,"<$file") or die $!;
+}
+while (($_=<I>) ) {
+  chomp(); 
+  if ( /^R ([^ ]+) ([^ ]+)$/ ) {
+    #  only deal with canonical URLs
+    my $inu = &Alvis::URLs::StandardURL($1);
+    my $outu = &Alvis::URLs::StandardURL($2);
+    print REDIR "R $inu $outu\n";
+    &updateMaps($inu,$outu);
+    $somedir = 1;
+  }
+}
+close(I);
+close(REDIR);
+if ( ! $somedir ) {
+  unlink("$stem.redirect");
+}
+
+print STDERR "Processing links in $file\n";
+if ( $usezip ) {
+  open(I,"$usezip $file |") or die $!;
+} else {
+  open(I,"<$file") or die $!;
+}
+while (($_=<I>) ) {
+  chomp();
+  if ( /^D ([^ ]*) (.*)/ ) {
+    my $notfin = 1;
+    my $parent_url = &Alvis::URLs::StandardURL($1);  
+    print STDOUT "D $parent_url $2\n";
+    while ( $notfin && ($_=<I>) ) {
+      #  process all associated links
+      chomp();
+      if ( ($_ eq "EOL") || ($_ eq "EOD") ) {
+	$notfin = 0;
+	print STDOUT "$_\n";
+      } elsif ( /^([^ ]+) (.*)$/ ) {  
+	my $left = $2;  
+	my $link = $1;  
+	my $link_clean = &Alvis::URLs::StandardURL($link);  
+	if (  $link_clean eq "" || 
+	      $link_clean eq $parent_url ) {
+	  #  self link
+	  ;
+	} elsif ( defined($redirect{$link_clean}) ) {
+	  print STDOUT $redirect{$link_clean}, " $left\n";
+	  # print STDERR "Replacing $link ($link_clean) by $redirect{$link_clean}\n";
+	} else {
+	  print STDOUT "$link_clean $left\n";
+	}
+      } else {
+	print STDERR "Confusing link for $parent_url: $_\n";
+	print STDOUT "$_\n";
+      }
+    }
+  } elsif ( ! /^R ([^ ]+) ([^ ]+)/ ) {
+    print STDOUT "$_\n";
+  }
+}
+close(I);
+
+exit 0;
+
+__END__
+
+=head1 NAME
+    
+linkRedir -- rocess out the redirects and normalise links in a link file.
+
+=head1 SYNOPSIS
+
+linkRedir [--nocase|--noclean|--gzip|--bzip2] LINK-FILE STEM
+
+  Options:
+
+    LINK-FILE           Filename for input link file usually created by XSL
+    STEM                stem for output file, several extensions read and made
+    --bzip2             pipe input through 
+I<bzip2>(1)
+    --gzip              pipe input through 
+I<gzip>(1)
+    --init              empty the 
+F<STEM.redirect> file at startup
+    --nocase            ignore case of URLs
+    --noclean           don't use built-in URL cleaning
+    -h, --help          display help message and exit.
+    --man               print man page and exit.
+
+=head1 DESCRIPTION
+
+Input file of links, link text and redirects.  Process out
+the redirects and normalise links, taking two passes.
+This is intended as a preprocessor for 
+I<linkTables>(1), and the input format is found there.
+
+First pass reads in previously assembled
+redirects from 
+F<STEM.redirect> and then 
+filter any more from LINK-FILE.
+The second pass reads the links
+from LINK-FILE and processes out the redirects.
+Output processed links to STDOUT and saves all redirects 
+in 
+F<STEM.redirect>.  Both output files are appended to so
+can be applied repeatedly to incrementally build up the result
+files from a series of batches, though redirects read in a later
+batch will not be applied to earlier batches.
+Normalises output URIs using URI->canonical.
+Assumes input URIs have no embedded spaces, they must be encoded.
+
+=head1 SEE ALSO
+
+I<linkBags>(1), 
+I<linkMpca>(1), 
+I<linkTables>(1),
+I<URI>(3).
+
+=head1 AUTHOR
+
+Wray Buntine
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2006 Wray Buntine
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+=cut
+
+

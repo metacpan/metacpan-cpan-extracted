@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    %= stylesheet '/bootstrap.min.css'
+    %= stylesheet '/bootstrap-theme.min.css' if config->{bootstrap_theme}
+    %= stylesheet '/mojoslides.css'
+    %= app->ppi_css if config->{ppi}
+    % if (my $files = config->{extra_css}) {
+      % $files = [ $files ] unless ref $files;
+      % foreach my $file (@$files) {
+        %= stylesheet $file
+      % }
+    % }
+    </head>
+  <body>
+
+  <!-- wrap non-footer contents -->
+    <div id="wrap">
+      <div class="container">
+        % if (my $header = config->{header_template} ) {
+          %= include $header
+        % }
+        <div id="main">
+          %= content
+        </div>
+      </div>
+    </div>
+
+    <!-- footer -->
+    <div id="footer" class="container">
+      % if (my $footer = config->{footer_template}) {
+        %= include $footer
+      % }
+    </div>
+
+    %= javascript '/jquery.min.js'
+    %= javascript '/mousetrap.min.js'
+    %= javascript '/mojoslides.js'
+    %= javascript begin
+    bindMousetrap(
+      "<%= url_for slide => { slide => prev_slide } %>",
+      "<%= url_for slide => { slide => next_slide } %>"
+    );
+    % end
+    
+    % if (my $files = config->{extra_js}) {
+      % $files = [ $files ] unless ref $files;
+      % foreach my $file (@$files) {
+        %= javascript $file
+      % }
+    % }
+  </body>
+</html>

@@ -1,0 +1,29 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '6.64'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Authen-Radius
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dumper: '1'
+  Data::HexDump: '0.02'
+  Digest::MD5: '2.2'
+  IO: '1.12'
+  Net::IP: '1.26'
+  perl: v5.10.0
+version: '0.26'

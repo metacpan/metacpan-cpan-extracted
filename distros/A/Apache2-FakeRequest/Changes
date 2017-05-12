@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache2::FakeRequest.
+
+0.01  Wed Apr  7 13:29:22 2010
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Apache2::FakeRequest
+

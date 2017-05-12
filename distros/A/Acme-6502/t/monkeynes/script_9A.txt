@@ -1,0 +1,16 @@
+clear
+power on
+regs
+
+op a2 55
+
+# IX should now show $55
+test ix = 55
+
+op 9a
+
+# SP and IX should now show $55
+test sp = 55
+test ix = 55
+
+save verify_9A.txt

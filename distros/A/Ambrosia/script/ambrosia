@@ -1,0 +1,217 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use warnings;
+
+################################################################################
+#   INIT
+################################################################################
+our $VERSION = 0.010;
+
+our $dispatcher;
+our $action;
+use Data::Dumper;
+
+our $dist_dir;
+our $share_dir;
+BEGIN
+{
+    use File::ShareDir 'dist_dir';
+    eval
+    {
+        $dist_dir = dist_dir('Ambrosia');
+        $share_dir = $dist_dir;
+    };
+    if ($@)
+    {
+        use FindBin;
+        if ( -d "$FindBin::Bin/../lib/perl5" )
+        {
+            $dist_dir = $FindBin::Bin . '/../lib/perl5';
+            $share_dir = $dist_dir . '/share/Ambrosia';
+        }
+        else
+        {
+            $dist_dir = $FindBin::Bin . '/../lib';
+            $share_dir = $FindBin::Bin . '/../share';
+        }
+    }
+}
+
+use lib $dist_dir;
+use lib $share_dir;
+
+BEGIN
+{
+    use XML::LibXML;
+
+    use Ambrosia::core::Nil;
+    use Ambrosia::Config;
+    use Ambrosia::Context;
+    use Ambrosia::DataProvider;
+
+    use Cwd;
+    my $cwd = cwd();
+
+    my %optionsConfig = (
+        engine_name => 'Options',
+        engine_params => {
+                options_spec => [
+                    'ambrosia %o',
+                    [ 'data|d=s',         'the path to xml' ],
+                    [ 'config_path|c=s',  'the path to config' ],
+                    [ 'install_path|p=s', 'the path where project building' ],
+                    [ 'action|a=s',       "what to do:\n\t\configure - create config;\n\t\tdb2xml - make xml from data base structure;\n\t\txml2app - make schema of application" ],
+                    [ 'help',             'print usage message and exit' ],
+                ]
+            }
+    );
+
+    instance Ambrosia::Context(%optionsConfig);
+
+    my $config_path = Context->param('config_path') || $cwd . '/ambrosia.conf';
+    if (-f $config_path )
+    {
+        instance Ambrosia::Config(AmbrosiaBuilder => $config_path);
+        Ambrosia::Config::assign('AmbrosiaBuilder');
+        instance Ambrosia::DataProvider(AmbrosiaBuilder => config()->data_source);
+        Ambrosia::DataProvider::assign('AmbrosiaBuilder');
+    }
+    else
+    {
+        $action = 'configure';
+        instance Ambrosia::DataProvider(AmbrosiaBuilder => new Ambrosia::core::Nil);
+        Ambrosia::DataProvider::assign('AmbrosiaBuilder');
+    }
+
+    use Ambrosia::Logger;
+    #instance Ambrosia::Logger('AmbrosiaBuilder', DEBUG => 1, INFO_EX => 1, INFO => 1, -prefix => 'abuilder_', -dir => config->logger_path);
+    instance Ambrosia::Logger('AmbrosiaBuilder');
+    Ambrosia::Logger::assign('AmbrosiaBuilder');
+
+    use Ambrosia::Dispatcher;
+    use Ambrosia::View::XSLT;
+    use Ambrosia::BaseManager;
+
+    my $MANAGERS = {
+            db2xml => {
+                manager => 'Managers::buildXml',
+                template => '/Templates/db2xml.xsl'
+            },
+            xml2app => {
+                manager => 'Managers::buildApp',
+            },
+            configure => {
+                manager => 'Managers::buildConfig',
+            },
+        };
+    controller(__managers => $MANAGERS);
+
+    $dispatcher = Ambrosia::Dispatcher
+        ->new()
+        ->on_error(sub {
+                storage->foreach('cancel_transaction');
+                die "@_";
+            })
+        ->on_complete(sub {
+                if ( my $mng = $MANAGERS->{$action || Context->action} )
+                {
+                    if ( $mng->{template} )
+                    {
+                        my $xml = new Ambrosia::View::XSLT(charset => 'UTF-8', rootName => config()->ID)
+                            ->render( $share_dir . $mng->{template}, Context->data);
+
+                        my $doc = XML::LibXML->load_xml(string => $xml);
+                        my $xmlschema = XML::LibXML::Schema->new( location => $share_dir . '/XSD/AmbrosiaDL.xsd' );
+                        if ( eval { $xmlschema->validate( $doc ); 1; } )
+                        {
+                            if ( open(my $fh, '>', config()->ID . '.xml') )
+                            {
+                                print $fh $xml;
+                                close $fh;
+                            }
+                            else
+                            {
+                                print STDERR "ERROR:$!\n";
+                            }
+                        }
+                        else
+                        {
+                            print STDERR "ERROR:$@\n";#-----------------\n$xml";
+                        }
+                    }
+                    print (Context->repository->get('Message') || "Done.\n");
+                }
+                else
+                {
+                    error($action || Context->action ? 'Unknown manager.' : 'Action not defined.');
+                }
+                storage->foreach('save_transaction');
+            });
+}
+
+#CatalogueDB
+sub run
+{
+    eval
+    {
+        Context->start_session();
+        Context->repository->set(SHARE_DIR => $share_dir);
+        print(Context->handler()->usage()->text()), exit if Context->param('help');
+        $dispatcher->run($action || Context->action);
+        Context->finish_session();
+    };
+
+    if ($@)
+    {
+        error($@);
+    }
+}
+
+sub error
+{
+    my $msg = shift;
+    logger->error($msg);
+}
+
+run();
+
+__END__
+
+=head1 NAME
+
+ambrosia - the script to create project skeleton that implements CRUD.
+
+=head1 VERSION
+
+version 0.010
+
+=head1 SYNOPSIS
+
+
+=head1 DESCRIPTION
+
+C<ambrosia> is the script to create project skeleton that implements CRUD.
+
+=head1 CONSTRUCTOR
+
+=head1 THREADS
+
+Not tested.
+
+=head1 BUGS
+
+Please report bugs relevant to C<Ambrosia> to <knm[at]cpan.org>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010-2012 Nickolay Kuritsyn. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Nikolay Kuritsyn (knm[at]cpan.org)
+
+=cut

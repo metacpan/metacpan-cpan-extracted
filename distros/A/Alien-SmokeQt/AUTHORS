@@ -1,0 +1,6 @@
+DCOP C Bindings: - DCOP protocol and C++ implementation by
+                    Matthias Ettrich <ettrich@kde.org>
+                    Preston Brown <pbrown@kde.org>
+                    Waldo Bastian <bastian@kde.org>
+                 - C bindings by Simon Hausmann <simon@kde.org>
+                   port to GtkObject by Lars Knoll <knoll@kde.org>

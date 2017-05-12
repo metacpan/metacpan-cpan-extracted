@@ -1,0 +1,38 @@
+2003-08-27  Tim Naylor <timn@astro.ex.ac.uk>
+        
+        * Modified  fortran subroutines for 2MASS use
+
+2002-03-30  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Added ability to set all file path names
+        
+2002-03-29  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Fixed filehandle bug in fortran code
+
+2002-01-25  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Bug fixes to Fortran source code
+
+2001-12-12  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Inital release version.
+        
+        * Corlate.pm: Added minimum necessary functionality
+        
+        * t/corlate.t: Checks info.dat file in $ESTAR_DATA to see if
+          the correct contents have been generated.
+
+        * Wrapper/Makefile.PL: Changed to link using f95, undocumented
+          feature in ExtUtils::F77
+          
+        * Wrapper/Wrapper.xs: Modified PACKAGE line to put the corlate()
+          function in the right namespace.  
+          
+        * t/wrapper.t: Modified so that it can actually find the catalog
+          files, does a check on the info.dat file to see if the correct
+          contents have been generated.  
+          
+2001-12-06  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Original version

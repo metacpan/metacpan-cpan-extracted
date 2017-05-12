@@ -1,0 +1,76 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 aeefd131e622d62da30b0656680366ec572ca069 COPYRIGHT
+SHA1 72a26e3b20049f4e4a3eecf241512219a6b64909 CREDITS
+SHA1 4c39f838a96e957ce9eb86c80b50bab50614e653 Changes
+SHA1 937d452c5c4069f4cda9ffaf45a33f1eb5f060e8 LICENSE
+SHA1 731d1cad6c75cdac18484393918698b4c8f4c7a7 MANIFEST
+SHA1 ee7d7544b49a748e4a75b93ae931c8347746c3f7 META.ttl
+SHA1 25773c7dd1814ec295ed29b756e9d56ed02ddec5 META.yml
+SHA1 b9d5dd0b476253d37384aed42664179605286153 Makefile.PL
+SHA1 beafe1421335b158e7076e468cf063219809d34f README
+SHA1 009d243230abb7b04a8dcfe8a88f30dc2aaf586b TODO
+SHA1 31dca4ef9fb443b79cbd4b2917b6c0d2bb3dc9f8 articles/ask-introduction.pod
+SHA1 31c2070c405dc8911098038c71e41b125ec565c2 examples/address-book-app.pl
+SHA1 3a0ae2789a1f3c2829b02ca924eeaa26e586f1aa examples/extending.pl
+SHA1 e2268b9ab153b5777707ca963e5d54f37aef8746 examples/multiple-choice.pl
+SHA1 2b6d1151493db3e2762cde3fa1e9627c41c73db9 examples/synopsis.pl
+SHA1 06c410f05488c1612ed66b06d3a86b2580581e4a inc/Module/AutoInstall.pm
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 61ab1dd37e33ddbe155907ce51df8a3e56ac8bbf inc/Module/Install/AutoInstall.pm
+SHA1 c04f94f91fa97b9f8cfb5a36071098ab0e6c78e3 inc/Module/Install/AutoManifest.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 9e4cc10c7f138a3f2c60d9ee1f34261f0d8c5aae inc/Module/Install/Contributors.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 66d3d335a03492583a3be121a7d888f63f08412c inc/Module/Install/Include.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 41f76ff6b39368a65da86377e43b34bacc2fb0eb inc/Module/Install/TrustMetaYml.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 5a2f84a7a82eee0d1e5ed3628fe503a608efc10f inc/Module/Package/Dist/RDF.pm
+SHA1 feb933cefe2e3762e8322bd6071a2499f3440da1 inc/YAML/Tiny.pm
+SHA1 ddcc80268e5f6874777cae72004e934527d5ec49 lib/Ask.pm
+SHA1 220a18449fff41f6ee35eb7484e27d3bb12bde70 lib/Ask/API.pm
+SHA1 1495764b3344f154e9da4be497b2f5acc72a8378 lib/Ask/Callback.pm
+SHA1 06aefdc350eaa2c22410d47bc42f54e321ac2cf4 lib/Ask/Fallback.pm
+SHA1 3e4e89bf205768c2001ea5e70a6ec085deaef2c7 lib/Ask/Functions.pm
+SHA1 816673e376d14e5419b81cd5724eb858fb72e2dd lib/Ask/Gtk.pm
+SHA1 6e2c684e4f8f55bdbbdb3c0ca94f2d2d3d37af39 lib/Ask/STDIO.pm
+SHA1 c40e967ebad1e7fdfb5d7cc5ab5eb7d2bbb445ad lib/Ask/Tk.pm
+SHA1 fd24393133841e4fd97cd508839664b950149eab lib/Ask/Wx.pm
+SHA1 11befc7a63202c283d4ce5e50d0b47b4977e0247 lib/Ask/Zenity.pm
+SHA1 9d2f2f9b7ed98fce734b5333f511ca86af2c9de9 lib/AskX/AutoLang.pm
+SHA1 6284daa0df31d0691af5ee481b8ce2a8a9bd9c1d meta/changes.pret
+SHA1 f6d72334fa61682d522b648f6e485c562fc1d075 meta/doap.pret
+SHA1 eef0641244db6f8d80fcfea857966bd9de170eee meta/makefile.pret
+SHA1 ad046bc2149bb9ad1f7999998972fe9013837974 meta/people.pret
+SHA1 51271dc551037b488c63b1018629425494f257db t/01basic.t
+SHA1 0598324dbeed0baa1431cc80227560d2955cfab2 t/02callbacks.t
+SHA1 2081a2ab034bd4028b8f3064713e2c60c6e357df t/03extending.t
+SHA1 81db62992be62b7acba959a811dea86e3ce6a32d t/04i18n.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlHAc3UACgkQzr+BKGoqfTmkfgCglIuewwRfKM3un1kpqX+NyIDj
+KwYAnRsDTyp23DBE1MFWPgnvgr8QhAkn
+=7zEh
+-----END PGP SIGNATURE-----

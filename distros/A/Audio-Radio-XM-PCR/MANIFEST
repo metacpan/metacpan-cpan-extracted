@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Audio-Radio-XM-PCR.t
+lib/Audio/Radio/XM/PCR.pm
+META.yml                                 Module meta-data (added by MakeMaker)

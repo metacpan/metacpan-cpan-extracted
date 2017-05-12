@@ -1,0 +1,30 @@
+---
+abstract: 'File following task for App::MultiModule'
+author:
+  - 'Dana M. Diederich <dana@realms.org>'
+build_requires:
+  Test::More: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-MultiModule-Tasks-MongoDB
+requires:
+  App::MultiModule::Task: 0
+  Data::Dumper: 0
+  Message::MongoDB: 0
+  Storable: 0
+  parent: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dana/App-MultiModule-Tasks-MongoDB/issues
+  homepage: https://github.com/dana/App-MultiModule-Tasks-MongoDB
+  repository: https://github.com/dana/App-MultiModule-Tasks-MongoDB.git
+version: 1.142810

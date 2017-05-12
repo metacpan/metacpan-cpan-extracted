@@ -1,0 +1,25 @@
+NAME
+    Alien::LibANN - Wrapper for installing libANN v1.1.2
+
+DESCRIPTION
+    Alien::LibANN is a wrapper to install libANN library. Modules that
+    depend on libANN can depend on Alien::LibANN and use the CPAN shell
+    to install it for you.
+
+    Win32 is currently not supported, please help supporting it if you're
+    interested.
+
+AUTHOR
+    Stephan Conrad <conrad@stephanconrad.de>
+
+COPYRIGHT AND LICENSE
+    Copyright 2010 by Stephan Conrad
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    * Alien
+
+ANN - Approximate Nearest Neighbor Library
+    More info can be found here: http://www.cs.umd.edu/~mount/ANN/

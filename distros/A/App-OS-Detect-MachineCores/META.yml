@@ -1,0 +1,31 @@
+---
+abstract: 'Executable for App::OS::Detect::MachineCores'
+author:
+  - 'Daniel B. <dbr@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.142690'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-OS-Detect-MachineCores
+provides:
+  App::OS::Detect::MachineCores:
+    file: lib/App/OS/Detect/MachineCores.pm
+    version: v1.2.3
+requires:
+  Carp: '0'
+  FindBin: '0'
+  IPC::Open2: '0'
+  Moo: '0'
+  MooX::Options: '0'
+  POSIX: '0'
+  lib: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+version: 1.2.3

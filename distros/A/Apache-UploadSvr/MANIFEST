@@ -1,0 +1,17 @@
+MANIFEST
+Makefile.PL
+README
+lib/Apache/UploadSvr.pm
+lib/Apache/UploadSvr/Dictionary.data
+lib/Apache/UploadSvr/Dictionary.pm
+lib/Apache/UploadSvr/Directory.pm
+lib/Apache/UploadSvr/User.pm
+perl-conf-1998/k01.html
+perl-conf-1998/k02.html
+perl-conf-1998/k03.html
+perl-conf-1998/k04.html
+perl-conf-1998/k05.html
+perl-conf-1998/k06.html
+perl-conf-1998/k07.html
+perl-conf-1998/leftarrow.png
+perl-conf-1998/rightarrow.png

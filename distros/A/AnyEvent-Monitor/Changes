@@ -1,0 +1,13 @@
+Revision history for Perl extension AnyEvent::Monitor
+
+0.32 Sat Dec 25 19:52:26 CST 2010
+        - Use Any::Moose
+
+0.31 Mon Oct 11 09:30:37 CST 2010
+        - Really fix dependencies.  
+
+0.30 Sun Oct 10 11:48:30 CST 2010
+        - Fix dependencies.  
+
+0.29 Sat Oct  9 21:28:01 CST 2010
+        - original version

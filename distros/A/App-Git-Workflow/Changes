@@ -1,0 +1,620 @@
+Revision history for git-workflow-tools
+
+1.0.1   2016-06-26
+        Updating for release of version 1.0.1
+        Added colouring of found branch matches (Ivan Wills)
+        Added colouring of found matches (Ivan Wills)
+        Updated config (Ivan Wills)
+        Added new task (Ivan Wills)
+
+1.0   2016-03-01
+        Updating for release of version 1.0
+        Updated license (Ivan Wills)
+        Stopped supporting perl 5.8! (Ivan Wills)
+        VTide and editor configs (Ivan Wills)
+        Fixed date dependance of test data (Ivan Wills)
+
+0.99   2015-09-21
+        Updating for release of version 0.99
+        Making it possible to only look at remote branches (Ivan Wills)
+        Fixed issue with undefined --runs (Ivan Wills)
+
+0.98   2015-08-24
+        Updating for release of version 0.98
+        Added extra dependency (Ivan Wills)
+        Removed creation of makefile (Ivan Wills)
+        Removed unused parameter (Ivan Wills)
+        Added more character that should be removed from branch names (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.97   2015-06-29
+        Updating for release of version 0.97
+        Merge pull request #7 from zackse/master (Ivan Wills)
+        apply doc updates to script in bin/ (Evan Zacks)
+        minor documentation updates (Evan Zacks)
+        git-recent pod: fix short argument names (Evan Zacks)
+
+0.96013   2015-06-22
+        Updating for release of version 0.96013
+        Added missing documentation of cmd line parameters (Ivan Wills)
+        Removed documentation about unimplemented format (Ivan Wills)
+        Got data outputting correctly for multiple periods (Ivan Wills)
+
+0.96012   2015-06-19
+        Updating for release of version 0.96012
+        Fixed issue with latest perl (Ivan Wills)
+
+0.96011   2015-06-18
+        Updating for release of version 0.96011
+        Added ability to specify outputting multiple periods (Ivan Wills)
+        Fixed test to match changed param name (Ivan Wills)
+        Added ability to limit dates by until (Ivan Wills)
+        Fixed tests (Ivan Wills)
+        Working on detailed stats (Ivan Wills)
+
+0.96009   2015-06-12
+        Updating for release of version 0.96009
+        Fixed tests (Ivan Wills)
+        Added missing docs (Ivan Wills)
+        Added showing commit counts (Ivan Wills)
+        Added showing commit counts (Ivan Wills)
+        Added different formatting options (Ivan Wills)
+
+0.96008   2015-05-22
+        Updating for release of version 0.96008
+        Added missing mock data (Ivan Wills)
+        Added note to keep track of where things are (Ivan Wills)
+        Added pipe (|) to special escaped characters (Ivan Wills)
+        Added cpan tag (Ivan Wills)
+        Udated the documentation (Ivan Wills)
+        Added the ability to limit the maximum number of runs (Ivan Wills)
+        Updated manifest with renamed readme (Ivan Wills)
+        Added missing documentation (Ivan Wills)
+        Updated errors to be more helpful (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+        Added : as a character to replace (Ivan Wills)
+        Worked on documentation (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Converted README into a POD file and added build and coverage badges (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+
+0.96007   2015-02-15
+        Updating for release of version 0.96007
+        Fixed saying switched to branch twice (Ivan Wills)
+        Added more things to do (Ivan Wills)
+
+0.96006   2015-02-08
+        Updating for release of version 0.96006
+        Added more things to do (Ivan Wills)
+        Fixed up the way the caller is determined and change printing help to STDOUT rather than STDERR (Ivan Wills)
+        Changed the way the test works so it's less sensitive to Pod::Usage missing (Ivan Wills)
+        More TODO things (Ivan Wills)
+        Added TODO file (Ivan Wills)
+
+0.96005   2015-02-02
+        Updating for release of version 0.96005
+        Added missing POD (Ivan Wills)
+        Added early death for bad data and more detailed info on bad data (Ivan Wills)
+        Fixed mock data adding (Ivan Wills)
+        Fixed data setup (Ivan Wills)
+        Fixed mock data (Ivan Wills)
+        Fixed tests with hardcoded time too far in the past, fixed call to pod2usage (Ivan Wills)
+        Fixed watch test (Ivan Wills)
+        Finished converting to more descriptive mocking (Ivan Wills)
+        Fixed up-to-date tests (Ivan Wills)
+        Changing mocks to be hashes to confirm the correct data is being used (Ivan Wills)
+        added only fetching some times (Ivan Wills)
+        Fixed not returning true from pod2usage (Ivan Wills)
+        Fixing fatpacked files so that they can work with git bash (Ivan Wills)
+        Added catching errors so watch can continue if upstream server is down (Ivan Wills)
+        Added exiting tests on first failure (Ivan Wills)
+        Added some performance optomisations (Ivan Wills)
+        Removed unnessesary quotes and SHA from format (Ivan Wills)
+        More formatting (Ivan Wills)
+        Fixed formatting of text output (Ivan Wills)
+
+0.96004   2015-01-22
+        Updating for release of version 0.96004
+        Added missing doc (Ivan Wills)
+        Added -v documentation (Ivan Wills)
+        Fixed test to match new --version (Ivan Wills)
+        Added grep -v negation option (Ivan Wills)
+        Finished conversion of --VERSION to --version (Ivan Wills)
+
+0.96003   2015-01-17
+        Updating for release of version 0.96003
+        Changed test as freebsd seems to not always return a new line (Ivan Wills)
+        Fixed code (Ivan Wills)
+        Added bad-branches (Ivan Wills)
+
+0.96002   2015-01-14
+        Updating for release of version 0.96002
+        Added protection against bad (invalid xml) pom files (Ivan Wills)
+        Licence updated (Ivan Wills)
+        Added eg to spell ignores (Ivan Wills)
+        Added missing POD documentation (Ivan Wills)
+        Added recommended dependency (Ivan Wills)
+        Fixed incorrectly named method and missing $self (Ivan Wills)
+        Fixed the test (not sure what the issue was) (Ivan Wills)
+        Fixing some of the broken logic (Ivan Wills)
+        Improved on the verbose action to use Term::Spinner if available (Ivan Wills)
+        Restructured so that branch-clean can support sub commands (Ivan Wills)
+        Added jira.url config documentation (Ivan Wills)
+
+0.96001   2014-12-14
+        Updating for release of version 0.96001
+        Fixed generated files (Ivan Wills)
+        Added clarification in --pull's description (Ivan Wills)
+        Added note about --pull not working the way I expect (Ivan Wills)
+        Removed testing files form distribution (Ivan Wills)
+        Moved pull to appropriate position (Ivan Wills)
+        Implemented "run" method (Ivan Wills)
+        Adding testing helper scripts (Ivan Wills)
+
+0.96   2014-11-28
+        Updating for release of version 0.96 (Ivan Wills)
+        Added options to control "release" and updated docs (Ivan Wills)
+        Added more tests to achieve 100% coverage of git-files (Ivan Wills)
+        Changed test to be a little less verbose (Ivan Wills)
+        Added some more documentation (Ivan Wills)
+
+0.95   2014-11-21
+        Updating for release of version 0.95 (Ivan Wills)
+        Improved coverage of git branch-clean (Ivan Wills)
+        Improved coverage (Ivan Wills)
+        Removed runner and replaced with simple system call (Ivan Wills)
+        Added ability to list all and remote branches (Ivan Wills)
+
+0.94   2014-11-19
+        Updating for release of version 0.94 (Ivan Wills)
+        More tests to get better coverage (Ivan Wills)
+        Added missing docs (Ivan Wills)
+
+0.93   2014-11-19
+        Updating for release of version 0.93 (Ivan Wills)
+        Changed to show info about branches, fixed tests to match (Ivan Wills)
+
+0.92   2014-11-18
+        Updating for release of version 0.92 (Ivan Wills)
+        Changed tests to using Test::Warnings (Ivan Wills)
+        Added new file (Ivan Wills)
+        Added better documentation (Ivan Wills)
+        Added recent files to load and boilerplate tests (Ivan Wills)
+        Got code coverage of "recent" to 100% (Ivan Wills)
+        Got better output going (Ivan Wills)
+        Added new files (Ivan Wills)
+        Fixed --day, --week and --month options (Ivan Wills)
+        Added branch info to output (Ivan Wills)
+        Implemented a default test (but it's still TODO) (Ivan Wills)
+        Added the ability to mark a test as TODO (Ivan Wills)
+        Basic implementation working (Ivan Wills)
+        New script to show recent changes (Ivan Wills)
+
+0.91   2014-11-03
+        Updating for release of version 0.91 (Ivan Wills)
+        Added escaped character at the end of the line to stop future edits removing final spaces (Ivan Wills)
+        Fixed needed whitespace (Ivan Wills)
+        Remember lists are 0 based! (Ivan Wills)
+        Added skipping test on windows as "echo" toggles or sets the echo state (Ivan Wills)
+        Added protection against DESTROY calling AUTOLOAD (Ivan Wills)
+
+0.13   2014-11-01
+        Changed regex to work with older Perl versions (Ivan Wills)
+        Changed regex to work with older Perl versions (Ivan Wills)
+        Added limiting array size to make perl 5.21.3+ happy (Ivan Wills)
+
+0.12   2014-11-01
+        Fixed direct running of git command, changed tests to add missing mock data (Ivan Wills)
+
+0.11   2014-10-31
+        #1 Updated bug tracker url (Ivan Wills)
+        Fixed test mock data order (Ivan Wills)
+        Fixed test mock data order (Ivan Wills)
+        fixed order change of mock due to lib order changes (Ivan Wills)
+        Reorganised calls so that require/use tests pass (Ivan Wills)
+        Updating for release of version 0.9 (Ivan Wills)
+        fixed boilerplate (Ivan Wills)
+        Added default tests for new files (Ivan Wills)
+        Added extra spelling skip words (Ivan Wills)
+        Revert "Added missing modules" (Ivan Wills)
+
+0.9   2014-10-29
+        fixed boilerplate (Ivan Wills)
+        Added default tests for new files (Ivan Wills)
+        Added extra spelling skip words (Ivan Wills)
+        Revert "Added missing modules" (Ivan Wills)
+        Added missing modules (Ivan Wills)
+        Added documentation command_ok (Ivan Wills)
+        Removed moved file names (Ivan Wills)
+        Added new mock and test libs (Ivan Wills)
+        Moved tests to being part of main app so others can use it (Ivan Wills)
+
+0.8   2014-10-20
+        Fixed committers to be informative when an unknown period is passed, test changed to match (Ivan Wills)
+        Fixed watche's pull issue (Ivan Wills)
+        Fixed adding ".git" to the repository as Git.pm seems to not want it (Ivan Wills)
+        Added some debugging helper code (Ivan Wills)
+        Added check for non existant row (Ivan Wills)
+        Updating for release of version 0.7 (Ivan Wills)
+        Fixed renamed build object (Ivan Wills)
+        Fixed various tests (Ivan Wills)
+
+0.7   2014-09-28
+        Got better code coverage removed poorly thought out code (Ivan Wills)
+        Changed to calculate localtime rather than hard code it (Ivan Wills)
+        Cleaned arguments (Ivan Wills)
+        Fixed docs (Ivan Wills)
+        Removed extra --test (Ivan Wills)
+        Added calculating localtime (Ivan Wills)
+        Fixed removal of white space (Ivan Wills)
+        Fixed test names (Ivan Wills)
+        Added test for non-unique POM version (Ivan Wills)
+        Converted git-pom (Ivan Wills)
+        Changed the order of mock set up (Ivan Wills)
+        Added missing modules (Ivan Wills)
+        More tests (Ivan Wills)
+        Removed timer code (Ivan Wills)
+        Added JSON out put test (Ivan Wills)
+        Switched to usign explain, added pre-processing STDOUT option and added ability to skip a test if a module isn't installed (Ivan Wills)
+        Fixed remaining runner uses (Ivan Wills)
+        More tests (Ivan Wills)
+        Converted git-up-to-date (Ivan Wills)
+        Got coverage to 99.3% (Ivan Wills)
+        Fixed bad remote definition (Ivan Wills)
+        Converted git-watch (Ivan Wills)
+        Converted git-feature (Ivan Wills)
+        Added test for thrown errors (Ivan Wills)
+        Changed order of run commands for clarity (Ivan Wills)
+        Converted git-files (Ivan Wills)
+        Added more information when errors occur (Ivan Wills)
+        Fixed checking wrong variable for STDERR test, cleaned up output (Ivan Wills)
+        Fixed bad execption catching (Ivan Wills)
+        Forgot to update this (Ivan Wills)
+        Moved reset of tests to test lib (Ivan Wills)
+        Converted committers to new test lib, extened test lib to cope with non-regexp STDOUT AND STDERR tests (Ivan Wills)
+        Converted to new test lib (Ivan Wills)
+        Added check that set data is all used (Ivan Wills)
+        Split test logic to own module (Ivan Wills)
+        Converted branch-clean (Ivan Wills)
+        Added test for multiple branches (Ivan Wills)
+        Changed the test data to be clearer, added new test with inputs (Ivan Wills)
+        Greatly expanded tests (Ivan Wills)
+        changed get_options to return true if all went ok false otherwise (Ivan Wills)
+        Converted jira (Ivan Wills)
+        Converted committers (Ivan Wills)
+        Converted branch-grep (Ivan Wills)
+        Added tests for git-tag-grep (Ivan Wills)
+        Made use repository and removed unnessesary code (Ivan Wills)
+        Made git-tag-grep a module (Ivan Wills)
+        Got test working and 100% coverage (Ivan Wills)
+        Got 100% coverate of Command.pm (Ivan Wills)
+        Got at test going (Ivan Wills)
+        New helper for moving scripts to modules (Ivan Wills)
+        First command test (Ivan Wills)
+        Making code work better as a lib (Ivan Wills)
+        Started moving scripts to modules so that they can be tested (Ivan Wills)
+        Cleaned up logic so branches are only got when needed (much faster) (Ivan Wills)
+        Added excludion of branch capabilities (Ivan Wills)
+        Fixed test (Ivan Wills)
+        Fixed issue with not caching correctly (Ivan Wills)
+        Completed rename (Ivan Wills)
+        Changing module name (Ivan Wills)
+        Changed cmd line param (Ivan Wills)
+
+0.6   2014-09-14
+        Fixed test to use correct perl version (Ivan Wills)
+
+0.5   2014-09-14
+        Updated missing dependencies (Ivan Wills)
+        Fixed up test data (Ivan Wills)
+        Cleaned up (Ivan Wills)
+        Improving coverage by using autodie (Ivan Wills)
+        testing getting current (Ivan Wills)
+        Simplified new (Ivan Wills)
+        Removed odd command (Ivan Wills)
+        Added more tests (Ivan Wills)
+        Cleaned up unnessesary logic (Ivan Wills)
+        Added more tests (Ivan Wills)
+        Adding more tests (Ivan Wills)
+        Changed to match mock change (Ivan Wills)
+        Cleaned up interface (Ivan Wills)
+        Fixed logic (Ivan Wills)
+        Cleaned up default action selection (Ivan Wills)
+        Fixed loading wrong object (Ivan Wills)
+        Fixed warning (Ivan Wills)
+        Converted all scripts to use new Object versions (Ivan Wills)
+        Fixed tests to use object version (Ivan Wills)
+        Converted POM to being an object (Ivan Wills)
+        Fixed POD (somewhat) (Ivan Wills)
+        Changed from a library of functions to a class with methods (Ivan Wills)
+        Updating for release of version 0.4 (Ivan Wills)
+
+0.4   2014-09-12
+        Extended test to include old excluded branches (Ivan Wills)
+        Fixed eval using do now (Ivan Wills)
+        Finally got local watching working (Ivan Wills)
+        Fixed using version module (Ivan Wills)
+        Changed for local branch to doing a pull rather than a fetch before checking (Ivan Wills)
+        Updated (Ivan Wills)
+        Removed unused modules (Ivan Wills)
+        Added missing module test (Ivan Wills)
+        Added group-git tag (Ivan Wills)
+        Added test of get_pom_versions (Ivan Wills)
+        Fixed config option to be valid (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        More tests (Ivan Wills)
+        Moving more code to G::W::Repository (Ivan Wills)
+        Added recording mode to help with testing (Ivan Wills)
+        Mock so that real git repository isn't needed during testing (Ivan Wills)
+        Added more POM tests (Ivan Wills)
+        Started writing tests for modules (Ivan Wills)
+        Fixed missed method name change (Ivan Wills)
+        Added back boilerplate test and fixed boilerplate (Ivan Wills)
+        Cleaned up documentation (Ivan Wills)
+        Added missing documentation (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+        Added new files (Ivan Wills)
+        Upated skipped files (Ivan Wills)
+        Added showing the time with --verbose (Ivan Wills)
+        Fixed typo (Ivan Wills)
+        Renamed sha_from_show to commit_details to be more descriptive and updated every where using it match the updated interface (Ivan Wills)
+        Added getting email addresses along with names (Ivan Wills)
+        Fixed quotes around the name (Ivan Wills)
+        Added showing committers (Ivan Wills)
+        Added getting information about the committer of a committish (Ivan Wills)
+        Added help doc for --max (Ivan Wills)
+        Added showing all changes up to --max back in history (Ivan Wills)
+        Updated the documentation (Ivan Wills)
+        Added initial state (Ivan Wills)
+        Implemented grepping for files and branches (Ivan Wills)
+        Cleaned up "show" to be better, added setting environment variables for "do" (Ivan Wills)
+        Made watch show more useful (Ivan Wills)
+        Changed to make all extra sha_from_show optional (Ivan Wills)
+        Fixed autoload to get the correct value for $called (Ivan Wills)
+        Started implementing creating branches from JIRA ID and summary (Ivan Wills)
+        Starting to use G::W::Repository (Ivan Wills)
+        Changed to use G::W::Repository (Ivan Wills)
+        Added protection for not loaded object (Ivan Wills)
+        Fixed dependency of perl 5.14 (Ivan Wills)
+        Added documentation about using JIRA to get summaries (Ivan Wills)
+        Fixed getting the correct jira title (Ivan Wills)
+        Added logic to create a new branch from jira (Ivan Wills)
+        Fixed not recognising update-me sub-command (Ivan Wills)
+        Added skipping merges by default (Ivan Wills)
+        Added grep options to the exec and sorted outputs (Ivan Wills)
+        Work todo (Ivan Wills)
+        New script to help watch for changes in a git repository (Ivan Wills)
+        Added undeclared dependency Git (Ivan Wills)
+        Added missing dependency (Ivan Wills)
+        Trying to get correct travis.yml (Ivan Wills)
+        Trying to get correct travis.yml (Ivan Wills)
+        Starting to use G::W::Repository (Ivan Wills)
+        Cleaned up dependencies, added saving built repository (Ivan Wills)
+        New abstraction for git using Git.pm (Ivan Wills)
+        Added travis config (Ivan Wills)
+        Removed unused dependency (Ivan Wills)
+        Changed to get version from module (Ivan Wills)
+        Updating for next release (Ivan Wills)
+        Added new files to be tested (Ivan Wills)
+        Added missing function documentation (Ivan Wills)
+        Implemented actually deleting the branches as well as creating tag messages when tagging (Ivan Wills)
+        Updated the MANIFEST (Ivan Wills)
+        Added more grep options (Ivan Wills)
+
+0.3   2014-08-13
+        Added new files to be tested (Ivan Wills)
+        Added missing function documentation (Ivan Wills)
+        Implemented actually deleting the branches as well as creating tag messages when tagging (Ivan Wills)
+        Updated the MANIFEST (Ivan Wills)
+        Added more grep options (Ivan Wills)
+        Cleaned up suggestion for no found branch message (Ivan Wills)
+        Added tagging of the branches (Ivan Wills)
+        Added skipping deleting young branches (Ivan Wills)
+        Added doing too old check (Ivan Wills)
+        Added not saving settings if $file not set (Ivan Wills)
+        Started implementing (Ivan Wills)
+        New script to clean up old branches (Ivan Wills)
+        Added dieing if not POM versions found (Ivan Wills)
+        Added more logic to help with getting POM versions (Ivan Wills)
+        Changed settings to use one file per repo (Ivan Wills)
+        Added timer to find what git commands take time (Ivan Wills)
+        Added the ability to set MAX_AGE via git config (Ivan Wills)
+        Added more optomisations (Ivan Wills)
+        Changed to use repo URL as the settings key and added dieing if the settings were created by a newer version (Ivan Wills)
+        Added optomisation to not find branches that own a sha (Ivan Wills)
+        Added storing found branch settings so they don't need to be looked up again (Ivan Wills)
+        Added "settings" to store state of things and spew function (Ivan Wills)
+        Changed to getting the versions implicitly (Ivan Wills)
+        Renamed methods to do_.* and moved getting versions to where it's used only (Ivan Wills)
+        Added importing release (Ivan Wills)
+        Added release sub-command (Ivan Wills)
+        Fixed spelling and POD coverage (Ivan Wills)
+        More documentation (Ivan Wills)
+        More documentation (Ivan Wills)
+        Adding more documentation (Ivan Wills)
+        More documentation improvements (Ivan Wills)
+        Added setting the upstream branch name (Ivan Wills)
+        Started using the runner everyehere to clean up code (Ivan Wills)
+        Added new runner function to simplify executing external programs (Ivan Wills)
+        Fixed help text (Ivan Wills)
+        Added missing parameter documentation (Ivan Wills)
+        Added ability update pom version when creating new branch (Ivan Wills)
+        Refactored some common pom actions into own module (Ivan Wills)
+        Added new helper to get the current release (Ivan Wills)
+        Fixed issue with random text infront of numbers (Ivan Wills)
+        Added defaulting to fetching first (Ivan Wills)
+        Added updating pom version with next (Ivan Wills)
+        Updated version (Ivan Wills)
+        Updated version (Ivan Wills)
+        Fixed VERSION option (Ivan Wills)
+        made the usage info clearer (Ivan Wills)
+        Fixed tracking origin/master when not careful (Ivan Wills)
+        Fixed typo (Ivan Wills)
+        Removed unused option (Ivan Wills)
+        Fixed changed argument description (Ivan Wills)
+        Working on documentation (Ivan Wills)
+        Added "local" sub-command to show any other branch with changes to files that have been also changed in the current branch (Ivan Wills)
+        Added new method to find the current branch (Ivan Wills)
+        Factered out getting current releases (Ivan Wills)
+        Now showing changed files (Ivan Wills)
+        New script to do stuff with files (Ivan Wills)
+        Added word boundry to limit to exactly the requested jira (Ivan Wills)
+        Made the regex broader for finding jiras (Ivan Wills)
+        Added whos sub-command to tell which branches use the pom version number (Ivan Wills)
+        Added list option to show any found branches (Ivan Wills)
+        Added option to quiet messages (Ivan Wills)
+        Added changes for first release (Ivan Wills)
+        Updated version numbers (Ivan Wills)
+        Updated dependencies (Ivan Wills)
+        Fixed module stuff (Ivan Wills)
+        Added missing scripts to test (Ivan Wills)
+        Fixed spelling issues (Ivan Wills)
+        Fixed manafest (Ivan Wills)
+        Lots of POD cleaning/work (Ivan Wills)
+        Fixed documentation to match new names (Ivan Wills)
+        Renamed files (Ivan Wills)
+        Udated manafest (Ivan Wills)
+        Added helper script to create fatpacked file (Ivan Wills)
+        Added numerical sorting option (Ivan Wills)
+        Fixed calling of format method (Ivan Wills)
+        Shorthand scripts (Ivan Wills)
+        Added push option to imediatly push the branch (Ivan Wills)
+        Improved documentation (Ivan Wills)
+        New script to show stats on committers (Ivan Wills)
+        Refactored actions to methods, added update-me sub-command (Ivan Wills)
+        installation helper script (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Fixed question not being displayed before answer request (Ivan Wills)
+        Starting to add logic for handling case where there are multiple branches for a jira (Ivan Wills)
+        Added "current" sub-command to show current branch or tag (Ivan Wills)
+        Graham's updates (Ivan Wills)
+        Added new hook setup capabilities (Ivan Wills)
+        Added XML::Tiny missing dependency (Ivan Wills)
+        Fixed counts of age (Ivan Wills)
+        Changed how branch age is recorded for HTML (Ivan Wills)
+        Changed html output to being only a fragment (Ivan Wills)
+        Changed sha_from_show to show all branch statuses (Ivan Wills)
+        Added missing scripts to compile test (Ivan Wills)
+        No longer importing pod2usage (Ivan Wills)
+        Removed imported functions (Ivan Wills)
+        Added calculating the next unused version number (Ivan Wills)
+        New script to check that versions in POM files are unique (Ivan Wills)
+        Changed from exporting to using explicitly methods (Ivan Wills)
+        LICENCE update (Ivan Wills)
+        Made detailedsage clearer (Ivan Wills)
+        t sMerge branch 'master' of github.com:ivanwills/git-workflow-tools (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/git-workflow-tools (Ivan Wills)
+        New script for undoing changed build objects in a git repository (with the use of a config file) (Ivan Wills)
+        Added Makefile.PL for windows use (Ivan Wills)
+        Fixed error (Ivan Wills)
+        Changed the ami sub-command to am-i, to make it clear what it is saying (Ivan Wills)
+        Added --fix to ami sub-command to merge in the release branch or tag (Ivan Wills)
+        Changed git-feature to work the same as git-up-to-date (which added --local to match git-feture) (Ivan Wills)
+        Improved documentation and added getting --max-history from git config (Ivan Wills)
+        Removed Path::Class dependency (Ivan Wills)
+        Minor tweeks to get ami sub-command working (Ivan Wills)
+        moved environment options to git config, added ami sub command (and made previous functionality part of show) (Ivan Wills)
+        Moved match_commits function here (Ivan Wills)
+        Made much more configurable (Ivan Wills)
+        Added exporting config (Ivan Wills)
+        Started to implement getting configs from git (Ivan Wills)
+        Removed unnessesary used of FinBin (Ivan Wills)
+        Started using the tags and branches methods (Ivan Wills)
+        Added sorting and tags functions (Ivan Wills)
+        Helper lib (Ivan Wills)
+        Fixed regexp (Ivan Wills)
+        Cleaned up POD (Ivan Wills)
+        Added testing bin/* files (Ivan Wills)
+        Cleaned up dependencies so only perl 5.6 is required (Ivan Wills)
+        Fixed build files (Ivan Wills)
+        Removed bad lib file name (Ivan Wills)
+        New git tools (Ivan Wills)
+
+0.2     2014-07-31
+        Fixed VERSION option (Ivan Wills)
+        made the usage info clearer (Ivan Wills)
+        Fixed tracking origin/master when not careful (Ivan Wills)
+        Fixed typo (Ivan Wills)
+        Removed unused option (Ivan Wills)
+        Fixed changed argument description (Ivan Wills)
+        Working on documentation (Ivan Wills)
+        Added "local" sub-command to show any other branch with changes to files that have been also changed in the current branch (Ivan Wills)
+        Added new method to find the current branch (Ivan Wills)
+        Factered out getting current releases (Ivan Wills)
+        Now showing changed files (Ivan Wills)
+        New script to do stuff with files (Ivan Wills)
+        Added word boundry to limit to exactly the requested jira (Ivan Wills)
+        Made the regex broader for finding jiras (Ivan Wills)
+        Added whos sub-command to tell which branches use the pom version number (Ivan Wills)
+        Added list option to show any found branches (Ivan Wills)
+        Added option to quiet messages (Ivan Wills)
+        Added changes for first release (Ivan Wills)
+
+0.1     2014-07-22
+        Updated version numbers
+        Updated dependencies
+        Fixed module stuff
+        Added missing scripts to test
+        Fixed spelling issues
+        Fixed manafest
+        Lots of POD cleaning/work
+        Fixed documentation to match new names
+        Renamed files
+        Udated manafest
+        Added helper script to create fatpacked file
+        Added numerical sorting option
+        Fixed calling of format method
+        Shorthand scripts
+        Added push option to imediatly push the branch
+        Improved documentation
+        New script to show stats on committers
+        Refactored actions to methods, added update-me sub-command
+        installation helper script
+        Updated manifest
+        Fixed question not being displayed before answer request
+        Starting to add logic for handling case where there are multiple branches for a jira
+        Added "current" sub-command to show current branch or tag
+        Graham's updates
+        Added new hook setup capabilities
+        Added XML::Tiny missing dependency
+        Fixed counts of age
+        Changed how branch age is recorded for HTML
+        Changed html output to being only a fragment
+        Changed sha_from_show to show all branch statuses
+        Added missing scripts to compile test
+        No longer importing pod2usage
+        Removed imported functions
+        Added calculating the next unused version number
+        New script to check that versions in POM files are unique
+        Changed from exporting to using explicitly methods
+        LICENCE update
+        Made detailedsage clearer
+        t sMerge branch 'master' of github.com:ivanwills/git-workflow-tools
+        Merge branch 'master' of github.com:ivanwills/git-workflow-tools
+        New script for undoing changed build objects in a git repository (with the use of a config file)
+        Added Makefile.PL for windows use
+        Fixed error
+        Changed the ami sub-command to am-i, to make it clear what it is saying
+        Added --fix to ami sub-command to merge in the release branch or tag
+        Changed git-feature to work the same as git-up-to-date (which added --local to match git-feture)
+        Improved documentation and added getting --max-history from git config
+        Removed Path::Class dependency
+        Minor tweeks to get ami sub-command working
+        moved environment options to git config, added ami sub command (and made previous functionality part of show)
+        Moved match_commits function here
+        Made much more configurable
+        Added exporting config
+        Started to implement getting configs from git
+        Removed unnessesary used of FinBin
+        Started using the tags and branches methods
+        Added sorting and tags functions
+        Helper lib
+        Fixed regexp
+        Cleaned up POD
+        Added testing bin/* files
+        Cleaned up dependencies so only perl 5.6 is required
+        Fixed build files
+        Removed bad lib file name
+        New git tools
+        Initial commit
+

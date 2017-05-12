@@ -1,0 +1,77 @@
+{
+   "abstract" : "This Module makes a text vertically.",
+   "author" : [
+      "Kazuhiro Homma <kazuph@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.3",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Tategaki",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Array::Transpose::Ragged" : "0",
+            "Encode::Locale" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Base::Less" : "0.09",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Tategaki" : {
+         "file" : "lib/Acme/Tategaki.pm",
+         "version" : "0.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kazuph/Acme-Tategaki/issues"
+      },
+      "homepage" : "https://github.com/kazuph/Acme-Tategaki",
+      "repository" : {
+         "url" : "git://github.com/kazuph/Acme-Tategaki.git",
+         "web" : "https://github.com/kazuph/Acme-Tategaki"
+      }
+   },
+   "version" : "0.12",
+   "x_contributors" : [
+      "Ryo Okamoto <ryo@aquahill.net>",
+      "Kazuhiro Homma <kazu.homma@gmail.com>"
+   ]
+}

@@ -1,0 +1,30 @@
+Revision history for AnyEvent-Curl-Multi:
+
+1.1     Fri Mar 25 14:58:08 PDT 2011
+	- Added ipresolve attribute to new() method (so you can connect only to
+	  IPv4 or v6 addresses as you so choose).
+	- Simplified curl perform loop.
+	- Fixed bug where specific requests with no-redirects weren't handled
+	  correctly if client was configured to follow redirects.
+
+1.0     Thu Mar 17 23:22:05 PDT 2011
+        - condvars are now associated with requests.
+
+0.04    Sat Feb 19 16:03:05 PST 2011
+	- Fixed bug that was causing us to check response readiness
+          much too frequently.  Thanks to Jay Janssen for the report.
+
+0.03    Sat Oct 30 13:32:45 PDT 2010
+	- Makefile.PL now emits a warning if the local libcurl doesn't support
+	  subsecond timeouts.
+        - new() and request() methods croak if subsecond timeouts are specified
+          but libcurl doesn't support them.
+
+0.02    Fri Oct 29 00:07:03 PDT 2010
+        - No longer uses filehandles for receiving data 
+          (and requires WWW::Curl 4.14)
+        - Added recommendations to have libcurl built with c-ares
+
+0.01    Sun Oct 24 17:00:32 PDT 2010
+        Initial release.
+

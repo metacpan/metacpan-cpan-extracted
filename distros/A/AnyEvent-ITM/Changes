@@ -1,0 +1,46 @@
+==================================================
+Changes from 1741-05-24 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2015-03-08 03:27:47 +0000
+------------------------------------------
+
+  Change: 3bdac75a969168f0292d63f51051bcafe63834a8
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-08 04:27:40 +0000
+
+    Fixed rights 
+
+  Change: 6f49af89fe5917e499d73992aade2a5a55b6465a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-08 04:27:30 +0000
+
+    Now colored 
+
+------------------------------------------
+version 0.001 at 2015-03-07 16:59:08 +0000
+------------------------------------------
+
+  Change: f7fc35732195ead6ad4af751a27254113ce26406
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-07 17:59:08 +0000
+
+    Fixed rights 
+
+  Change: fb5468fd55a3be5cb4894f208cbc40cb5cc18b0a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-07 17:55:34 +0000
+
+    Added simple reader, added tests, finished implementation, added
+    travis.yml 
+
+  Change: 1f3472cc5a8a8901e253cf8ede9fc2be7018a007
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-06 21:58:37 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

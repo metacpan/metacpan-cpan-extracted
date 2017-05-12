@@ -1,0 +1,32 @@
+AnnoCPAN::Perldoc::SyncDB - Download the AnnoCPAN database
+
+
+LICENSE
+
+Copyright 2005 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+ABOUT CLOTHO
+
+"CAM" stands for Clotho Advanced Media Inc. (www.clotho.com) which
+developed this module.  Contact us at info@clotho.com.
+
+
+INSTALLATION
+
+Install via one of the following:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+

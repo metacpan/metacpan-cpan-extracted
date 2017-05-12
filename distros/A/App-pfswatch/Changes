@@ -1,0 +1,30 @@
+Revision history for Perl extension App::fswatch
+
+0.08 2013-09-19T06:24:57Z
+    - Switches to minilla.
+    - Uses Filesys::Notify::Simple@0.12
+    - Adds use warnings.
+
+0.07    Sun Nov 13 21:57 2011
+        - add pipe option.
+        - remove Regexp::Assemble.
+
+0.06    Sun Jul  3 11:01 2011
+        - fix build_requires in Makefile.PL
+
+0.05    Sat Jul  2 12:12 2011
+        - remove xt
+        - set bugtracer
+
+0.04    Thu Jun 30 18:43 2011
+        - --exec option is changed
+        - add -q option
+
+0.03    Wed Jun 29 22:35 2011
+        - rename to pfswatch
+
+0.02    Wed Jun 29 14:39 2011
+        - ignore vim's swap files and dotfiles
+
+0.01    Tue Jun 28 14:17 2011
+        - original version

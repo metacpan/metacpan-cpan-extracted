@@ -1,0 +1,131 @@
+
+@font-face {
+  font-family: 'DIN 1451 Std Mittelschrift';
+  src: url('/webfonts/din_1451_std_mittelschrift.eot');
+  src:
+    url('/webfonts/din_1451_std_mittelschrift.eot?#iefix') format('embedded-opentype'),
+    url('/webfonts/din_1451_std_mittelschrift.svg#DIN 1451 Std Mittelschrift') format('svg'),
+    url('/webfonts/din_1451_std_mittelschrift.woff') format('woff'),
+    url('/webfonts/din_1451_std_mittelschrift.ttf') format('truetype');
+  font-weight: normal; font-style: normal;
+}
+
+html {
+  /*
+
+    Background Image taken from Flickr
+    https://www.flickr.com/photos/twiga_269/4056653510/in/photolist-4jWgUF-9KepUc-7Z3c73-66nm9a-7btpKU-6X2Uh2-Trffu-7PAniV-iv3Zby-5ht3bH-9k2xzV-hRwQva-9buNe5-bMjz3t-4jWhwD-5fLDAe-8K5EeD-yjuw9-9oTHbH-3g9rsC/
+
+  */
+  background: url(/background.jpg)
+    no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.tile-container {
+  position: relative;
+  width: 100%;
+}
+
+.tile-container > div {
+  height: 120px;
+  position: absolute;
+  width: 120px;
+}
+
+.tile-container div[data-ss-colspan="2"] { width: 250px; }
+.tile-container div[data-ss-colspan="3"] { width: 380px; }
+.tile-container div[data-ss-colspan="4"] { width: 510px; }
+
+.tile-container div[data-ss-rowspan="2"] { height: 250px; }
+.tile-container div[data-ss-rowspan="3"] { height: 380px; }
+.tile-container div[data-ss-rowspan="4"] { height: 510px; }
+
+.ui-draggable-handle:hover {
+  outline: 3px solid #999;
+}
+
+.ui-draggable-handle span.title {
+  position: absolute;
+  bottom:0;
+  padding:0.5em
+}
+
+#current-app {
+  width: 100%;
+  margin-top: 10px;
+}
+
+#backbutton {
+  width: 100%;
+}
+
+.padding-tb-10 {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+footer a {
+  color:white !important
+}
+
+.tile-container > div {
+  text-align:center;
+  display: table;
+}
+
+.tile-container > div:not(.pwm-tile) > div,
+.tile-container > div > h1{
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.tile-container > div div {
+  width:100%
+}
+
+.tile-container > div a {
+  display:block !important;
+  width:50% !important;
+  height:30px;
+  background : black !important;
+}
+
+.tile-container > div a:hover {
+  color:black !important;
+  background : #ccc !important;
+}
+
+.metro div, .metro span, .metro p {
+  font-family: 'DIN 1451 Std Mittelschrift';
+}
+
+.fattext {
+    font-size: 1.6em !important; /*With font-size 200%, some of the text is WAY TO BIG :)*/
+}
+
+.pwm-tile a + a + div{
+    padding-top:32px !important
+}
+.pwm-tile a:first-child{
+    position:absolute;
+    top:0px;
+    left:0px
+}
+.pwm-tile a + a{
+    position:absolute;
+    right:0px
+}
+.pwm-tile div + a{
+    position:absolute;
+    bottom:0px;
+    left:0px
+}
+.pwm-tile div + a + a{
+    position:absolute;
+    bottom:0px;
+    right:0px
+}

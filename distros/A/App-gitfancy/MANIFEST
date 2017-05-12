@@ -1,0 +1,13 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/git-fancy
+dist.ini
+lib/App/gitfancy.pm
+t/00-load.t
+t/release-pod-syntax.t
+weaver.ini

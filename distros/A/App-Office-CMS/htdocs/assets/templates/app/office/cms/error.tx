@@ -1,0 +1,6 @@
+<table align="center">
+<tr><td><span class="error">Validation errors:</span></td></tr>
+: for $data -> $item {
+<tr><td><: $item.td :></td></tr>
+: }
+</table>

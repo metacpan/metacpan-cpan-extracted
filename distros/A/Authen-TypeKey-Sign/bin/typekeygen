@@ -1,0 +1,104 @@
+#!/usr/bin/perl -w
+# Copyright (c) 2004 Timothy Appnel (cpan@timaoutloud.org)
+# http://www.timaoutloud.org/
+# This code is released under the Artistic License.
+
+use strict;
+
+use vars qw( $VERSION );
+$VERSION = '0.1';
+
+use Getopt::Long 2.33
+  qw(:config no_ignore_case bundling auto_help auto_version);
+use Pod::Usage;
+use Crypt::DSA;
+use Fcntl;
+
+my %a = ();
+$a{verbose} = 1;
+$a{'keys'}  = './TYPEKEYS';
+$a{regkey}  = './regkey.txt';
+
+GetOptions(\%a, 'overwrite|o', 'verbose|v', 'keys:s', 'regkey:s', 'seed:s',
+           'quiet|q' => sub { $a{verbose} = 0 });
+
+my $dsa = Crypt::DSA->new;
+my $key = $dsa->keygen(Size => 512, Verbosity => $a{verbose}, Seed => $a{seed});
+my $keys;
+my $regkey;
+map {
+    $keys .= "$_=" . $key->$_ . "\n";
+    $regkey .= "$_=" . $key->$_ . "\n" unless ($_ eq 'priv_key');
+} qw(p g q pub_key priv_key);
+&write($a{'keys'}, $keys);
+&write($a{regkey}, $regkey);
+print "Key generation complete.\n";
+
+sub write {
+    my ($file, $data, $per) = @_;
+    die $file
+      . ' already exists. Use the --overwrite option to generate a new key file.'
+      if (!$a{overwrite} && -e $file);
+    unlink $file if (-e $file);
+    open(FH, ">>$file")
+      or die "Opening local file '", $file, "' failed: $!";
+    print FH $data;
+    close FH;
+}
+
+__END__
+
+=begin
+
+=head1 NAME
+
+typekeygen - Key generator utility for use with Authen::Typekey modules
+
+=head1 SYNOPSIS
+
+  typekeygen [-ovq --keys path/to/ouput/keys/file 
+                --regkey path/to/output/public_keys/file --seed int]
+                
+  --overwrite | o    Overwrite key files if they exist.
+  --keys             Fulle path and file name to output DSA keys to. This
+                     file contains the private key. (Careful!) Default 
+                     is ./TYPEKEY 
+  --regkey           Full path and file name to write regkeys. Default
+                     is ./regkeys.txt
+  --seed             Key generation seed. A random one is generated if 
+                     not specified.
+                        
+   RUN MODES
+  --quiet | q        Minimal screen output.
+  --verbose | v      Verbose screen output. (Default)
+  --help | -?        Help. (This screen)
+
+=head1 DESCRIPTION
+
+typekeygen is a command-line script for generating the DSA keys
+required by the TypeKey authentication services. The script will insert 
+the keys appropriate keys into a two text files -- one private and one 
+public.
+
+=head1 DEPENDENCIES
+
+ Getopt::Long 2.33+
+ Pod::Usage;
+ Crypt::DSA;
+
+=head1 SEE ALSO
+
+http://www.movabletype.org/docs/tk-apps.html
+
+http://www.typekey.com/
+ 
+L<Authen::TypeKey>, L<Authen::TypeKey::Sign>, L<Apache::AuthTypeKey>
+
+=head1 AUTHOR & COPYRIGHT
+
+Please see the L<Authen::TypeKey::Sign> manpage for author, copyright, and 
+license information.
+
+=cut
+
+=end

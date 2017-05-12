@@ -1,0 +1,29 @@
+CFITSIO.pm
+CFITSIO.xs
+ChangeLog
+INSTALL
+MANIFEST
+Makefile.PL
+NOTES
+README
+test.pl
+typemap
+util.c
+util.h
+examples/INDEX
+examples/bintable.fits.gz
+examples/bintable_read.pl
+examples/image_read.pl
+examples/image_read_pdl.pl
+examples/m51.fits.gz
+examples/check_status.pl
+examples/match_datatype.pl
+testprog/testprog.pl
+testprog/testprog.tpt
+testprog/testprog_OO.pl
+testprog/testprog_longnames.pl
+testprog/testprog_pdl.pl
+testprog/runtests
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

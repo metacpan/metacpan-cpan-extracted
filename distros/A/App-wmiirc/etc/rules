@@ -1,0 +1,13 @@
+# Apps with system tray icons like to their main windows
+# Give them permission.
+/^Pidgin:/ allow=+activate
+
+# MPlayer and VLC don't float by default, but should.
+/MPlayer|VLC/ floating=on
+
+# ROX puts all of its windows in the same group, so they open
+# with the same tags.  Disable grouping for ROX Filer.
+/^ROX-Filer:/ group=0
+
+# Chrome looks best without titlebars IMO, also allow activation.
+/Google Chrome|Chromium/ titleless=on allow=+activate

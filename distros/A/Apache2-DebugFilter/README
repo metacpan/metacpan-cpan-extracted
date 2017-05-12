@@ -1,0 +1,114 @@
+NAME
+    Apache2::DebugFilter - Debug mod_perl and native Apache2 filters
+
+Synopsis
+      # httpd.conf
+      # ----------
+      PerlModule Apache2::DebugFilter
+      # Connection snooping (everything)
+      PerlInputFilterHandler  Apache2::DebugFilter::snoop_connection
+      PerlOutputFilterHandler Apache2::DebugFilter::snoop_connection
+  
+      # HTTP Request snooping (only HTTP request body)
+      <Location /foo>
+          PerlInputFilterHandler  Apache2::DebugFilter::snoop_request
+          PerlOutputFilterHandler Apache2::DebugFilter::snoop_request
+      </Location>
+
+      # in handlers
+      #------------
+      use Apache2::DebugFilter;
+      # convert bb to an array of bucket_type => data pairs
+      my $ra_data = Apache2::DebugFilter::bb_dump($bb);
+      while (my($btype, $data) = splice @data, 0, 2) {
+          print "$btype => $data\n";
+      }
+
+      # dump pretty formatted bb's content to a filehandle of your choice
+      bb_dump($bb, \*STDERR);
+
+Filter Handlers
+  "snoop_connection()"
+    The "snoop_connection()" filter handler snoops on request and response
+    data flow. For example if the HTTP protocol request is filtered it'll
+    show both the headers and the body of the request and response.
+
+    Notice that in order to see request's input body, the response handler
+    must consume it.
+
+    The same handler is used for input and output filtering. It internally
+    figures out what kind of stream it's working on.
+
+    To configure the input snooper, add to the top level server or virtual
+    host configuration in httpd.conf:
+
+      PerlInputFilterHandler  Apache2::DebugFilter::snoop_connection
+
+    To snoop on response output, add:
+
+      PerlOutputFilterHandler Apache2::DebugFilter::snoop_connection
+
+    Both can be configured at the same time.
+
+    If you want to snoop on what an output filter MyApache2::Filter::output
+    does, put the snooper filter after it:
+
+      PerlOutputFilterHandler MyApache2::Filter::output
+      PerlOutputFilterHandler Apache2::DebugFilter::snoop_connection
+
+    On the contrary, to snoop on what an input filter
+    MyApache2::Filter::input does, put the snooper filter before it:
+
+      PerlInputFilterHandler Apache2::DebugFilter::snoop_connection
+      PerlInputFilterHandler MyApache2::Filter::input
+
+    This is because "snoop_connection" is going to be invoked first and
+    immediately call "MyApache2::Filter::input" the input filter for data.
+    Only when the latter returns, "snoop_connection" will do its work.
+
+  "snoop_request()"
+    The "snoop_request()" filter handler snoops only on HTTP request and
+    response bodies. Otherwise it's similar to "snoop_connection()". Only
+    normally it's configured for a specific "<Location>". For example:
+
+      <Location /foo>
+          PerlInputFilterHandler  Apache2::DebugFilter::snoop_request
+          PerlOutputFilterHandler Apache2::DebugFilter::snoop_request
+      </Location>
+
+Functions
+  "bb_dump()"
+      my $ra_data = Apache2::DebugFilter::bb_dump($bb);
+
+    If only a bucket brigade $bb is passed, "bb_dump" will convert bb to an
+    array of bucket_type => data pairs, and return a reference to it. This
+    later can be used as in the following example:
+
+      while (my($btype, $data) = splice @$ra_data, 0, 2) {
+          print "$btype => $data\n";
+      }
+
+    If the second argument (expected to be an open filehandle) is passed, as
+    in:
+
+      Apache2::DebugFilter::bb_dump($bb, \*STDERR);
+
+    "bb_dump" will print pretty formatted bb's content to that filehandle.
+
+Author
+    Philip M. Gollucci <pgollucci@p6m7g8.com>
+
+    Previously developed by Stas Bekman.
+
+See Also
+    http://perl.apache.org/docs/2.0/user/handlers/filters.html#All_in_One_Fi
+    lter
+
+    http://perl.apache.org/docs/2.0/
+
+    perl.
+
+Copyright
+    The "Apache2::DebugFilter" module is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
+

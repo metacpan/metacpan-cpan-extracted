@@ -1,0 +1,18 @@
+=== required ticket metadata (changes here will not be saved) ===
+
+qr/id: \d+ \($ticket_uuid\)/
+qr/created: \d{4}-\d{2}-\d{2}.+/
+qr/creator: $ENV{USER}/
+qr/original_replica: $replica_uuid/
+
+=== edit ticket details below ===
+
+summary: summary changed
+status: new
+milestone: alpha
+owner: 
+due: 2050-01-25 23:11:42
+qr/reporter: $ENV{PROPHET_EMAIL}/
+component: core
+
+=== add new ticket comment below ===

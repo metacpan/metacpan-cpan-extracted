@@ -1,0 +1,441 @@
+#!perl
+
+our $DATE = '2016-12-28'; # DATE
+our $VERSION = '0.14'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+no warnings 'once';
+
+use App::IODUtils;
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+$SPEC{insert_iod_key} = {
+    v => 1.1,
+    summary => 'Insert a key to IOD configuration file',
+    args_rels => {
+        'choose_one&' => [
+            [qw/add ignore replace/],
+            [qw/top linum/],
+        ],
+    },
+    args => {
+        %App::IODUtils::common_args,
+        %App::IODUtils::inplace_arg,
+        section => {
+            schema  => 'str*',
+            req     => 1,
+            pos     => 1,
+        },
+        key => {
+            schema  => 'str*',
+            req     => 1,
+            pos     => 2,
+        },
+        value => {
+            summary => '(Raw) value',
+            schema  => 'str*',
+            req     => 1,
+            pos     => 3,
+        },
+        create_section => {
+            summary => 'When section does not exist, create it first',
+            schema => [bool => is=>1],
+        },
+        add => {
+            summary => 'When key already exists, add',
+            schema => [bool => is=>1],
+        },
+        ignore => {
+            summary => 'When key already exists, do nothing',
+            schema => [bool => is=>1],
+        },
+        replace => {
+            summary => 'When key already exists, delete previous key(s) first',
+            schema => [bool => is=>1],
+        },
+        top => {
+            summary => 'Add to the beginning of section instead of end',
+            schema => [bool => is=>1],
+        },
+        linum => {
+            summary => 'Put key line at a specific line number '.
+                '(line number starts from 1)',
+            schema => ['int*' => min=>1],
+        },
+    },
+};
+sub insert_iod_key {
+    my %args = @_;
+    App::IODUtils::_check_inplace(\%args);
+
+    my $parser = App::IODUtils::_get_parser(\%args);
+
+    my $doc = $parser->read_string($args{iod});
+
+    $doc->insert_key(
+        {
+            create_section => $args{create_section},
+            add     => $args{add},
+            ignore  => $args{ignore},
+            replace => $args{replace},
+            top     => $args{top},
+            linum   => $args{linum},
+        },
+        $args{section}, $args{key}, $args{value},
+    );
+
+    App::IODUtils::_return_mod_result(\%args, $doc);
+}
+
+Perinci::CmdLine::Any->new(
+    url => '/main/insert_iod_key',
+)->run;
+
+# ABSTRACT: Insert a key to IOD configuration file
+# PODNAME: insert-iod-key
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+insert-iod-key - Insert a key to IOD configuration file
+
+=head1 VERSION
+
+This document describes version 0.14 of insert-iod-key (from Perl distribution App-IODUtils), released on 2016-12-28.
+
+=head1 SYNOPSIS
+
+Basic usage:
+
+ % insert-iod-key /path/to/file.iod section key value
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--add>
+
+When key already exists, add.
+
+=item B<--create-section>
+
+When section does not exist, create it first.
+
+=item B<--ignore>
+
+When key already exists, do nothing.
+
+=item B<--inplace>
+
+Modify file in-place.
+
+Note that this can only be done if you specify an actual file and not STDIN.
+Otherwise, an error will be thrown.
+
+
+=item B<--key>=I<s>*
+
+=item B<--linum>=I<i>
+
+Put key line at a specific line number (line number starts from 1).
+
+=item B<--replace>
+
+When key already exists, delete previous key(s) first.
+
+=item B<--section>=I<s>*
+
+=item B<--top>
+
+Add to the beginning of section instead of end.
+
+=item B<--value>=I<s>*
+
+(Raw) value.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Parser options
+
+=over
+
+=item B<--allow-directive>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--allow-directives-json>=I<s>
+
+See C<--allow-directive>.
+
+=item B<--allow-encoding>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--allow-encodings-json>=I<s>
+
+See C<--allow-encoding>.
+
+=item B<--default-section>=I<s>
+
+Default value:
+
+ "GLOBAL"
+
+=item B<--disable-brace>
+
+=item B<--disable-bracket>
+
+=item B<--disable-encoding>
+
+=item B<--disable-quoting>
+
+=item B<--disallow-bang-only>
+
+=item B<--disallow-directive>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--disallow-directives-json>=I<s>
+
+See C<--disallow-directive>.
+
+=item B<--disallow-duplicate-key>
+
+=item B<--disallow-encoding>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--disallow-encodings-json>=I<s>
+
+See C<--disallow-encoding>.
+
+=item B<--enable-expr>, B<-e>
+
+=item B<--ignore-unknown-directive>
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--iod>=I<s>*
+
+IOD file.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C insert-iod-key insert-iod-key
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete insert-iod-key 'p/*/`insert-iod-key`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/insert-iod-key.conf>, F<~/insert-iod-key.conf>, or F</etc/insert-iod-key.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ add (see --add)
+ allow_bang_only (see --disallow-bang-only)
+ allow_directives (see --allow-directive)
+ allow_duplicate_key (see --disallow-duplicate-key)
+ allow_encodings (see --allow-encoding)
+ create_section (see --create-section)
+ default_section (see --default-section)
+ disallow_directives (see --disallow-directive)
+ disallow_encodings (see --disallow-encoding)
+ enable_brace (see --disable-brace)
+ enable_bracket (see --disable-bracket)
+ enable_encoding (see --disable-encoding)
+ enable_expr (see --enable-expr)
+ enable_quoting (see --disable-quoting)
+ format (see --format)
+ ignore (see --ignore)
+ ignore_unknown_directive (see --ignore-unknown-directive)
+ inplace (see --inplace)
+ iod (see --iod)
+ key (see --key)
+ linum (see --linum)
+ naked_res (see --naked-res)
+ replace (see --replace)
+ section (see --section)
+ top (see --top)
+ value (see --value)
+
+=head1 ENVIRONMENT
+
+=head2 INSERT_IOD_KEY_OPT => str
+
+Specify additional command-line options
+
+=head1 FILES
+
+~/.config/insert-iod-key.conf
+
+~/insert-iod-key.conf
+
+/etc/insert-iod-key.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-IODUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-IODUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IODUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

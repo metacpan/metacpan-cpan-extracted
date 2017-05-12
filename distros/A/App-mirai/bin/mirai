@@ -1,0 +1,4 @@
+#!/usr/bin/env perl
+use App::mirai;
+App::mirai->new_from_argv(@AGV)->run;
+

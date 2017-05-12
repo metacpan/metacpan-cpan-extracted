@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Alien-Gearman
+version:            0.01004
+abstract:           Wrapper for installing libgearman v0.12
+author:
+    - Johannes Plunien <plu@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    Alien::Libevent:  0.01004
+    Archive::Tar:     0
+    File::Spec:       0
+    IO::Zlib:         0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:  {}
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

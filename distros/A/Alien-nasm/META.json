@@ -1,0 +1,83 @@
+{
+   "abstract" : "Find or build nasm, the netwide assembler",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-nasm",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "0.19",
+            "Alien::Build::MM" : "0.19",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "0.19",
+            "Alien::Build::MM" : "0.19",
+            "Capture::Tiny" : "0",
+            "ExtUtils::MakeMaker" : "6.52",
+            "IPC::Cmd" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.036",
+            "Capture::Tiny" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test2::Suite" : "0.000060",
+            "Test::Alien" : "0.11",
+            "Test::More" : "0.94",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Alien-nasm/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Alien::nasm",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Alien-nasm.git",
+         "web" : "https://github.com/plicease/Alien-nasm"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.18",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+}
+

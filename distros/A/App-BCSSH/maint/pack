@@ -1,0 +1,155 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use File::Temp ();
+use File::Find;
+use File::Path;
+use File::Basename;
+use File::Copy;
+use Module::CoreList;
+use Config;
+use autodie qw(:all);
+use Pod::Strip;
+use JSON;
+use version ();
+
+my ($in_file) = @ARGV;
+$in_file && -f $in_file or die "Input file must be specified!";
+my $mymeta = decode_json(do { open my $fh, '<', 'MYMETA.json'; local $/; +<$fh> });
+
+$ENV{PERL_STRICTURES_EXTRA} = 0;
+# never pack these
+my @exclude = qw(
+    ^Sub::Name$
+    ^JSON::XS
+    ^Class::XSAccessor
+    ^Variable::Magic$
+    ^Package::Stash::XS$
+    ^IO::Tty
+    ^IO::Pty$
+);
+# these have optional XS components
+my @dual = qw(
+    List::MoreUtils
+    Params::Util
+);
+# only include traced files, not entire dist
+my @traceonly = qw(
+    Pod::Simple
+    Pod::Perldoc
+);
+
+my ($exclude) = map { qr{$_} } join '|', map { "^$_(?:\$|::)" } @exclude;
+
+my @modules;
+find({no_chdir => 1, wanted => sub {
+    -f or return;
+    s/\.pm$// or return;
+    s{^lib/}{};
+    s{/}{::}g;
+    push @modules, $_;
+}}, 'lib');
+
+{
+    local $ENV{PERL5LIB} = "lib:" . ($ENV{PERL5LIB}||'');
+    system 'fatpack', 'trace', (map { "--use=$_" } @modules), $in_file;
+}
+my @trace_in = do {
+    open my $fh, '<', 'fatpacker.trace';
+    <$fh>;
+};
+chomp @trace_in;
+
+my $prereqs = $mymeta->{prereqs}{runtime}{requires};
+my $perl_version = version->parse($prereqs->{perl})->numify;
+warn $perl_version;
+my @trace_extras;
+my @trace;
+for my $file (@trace_in) {
+    my $mod = $file;
+    $mod =~ s/\.pm$//;
+    $mod =~ s{/}{::}g;
+
+    next
+        if $mod =~ $exclude;
+    next
+        if grep { $mod eq $_ } @modules;
+
+    if (my $first_release = Module::CoreList->first_release($mod)) {
+        if ($first_release <= $perl_version && !Module::CoreList->removed_from($mod)) {
+            my $version = eval($Module::CoreList::version{$perl_version}{$mod} || 0);
+            my $required = eval($prereqs->{$mod} || 0);
+            if ($required <= $version) {
+                next;
+            }
+        }
+    }
+
+    if (grep { $mod =~ /^$_(::|$)/ } @traceonly) {
+        push @trace_extras, $file;
+    }
+    else {
+        push @trace, $file;
+    }
+}
+
+my @packlists = `fatpack packlists-for @trace`;
+chomp @packlists;
+
+rmtree('fatlib');
+system 'fatpack', 'tree', @packlists;
+for my $mod (@dual) {
+    (my $path = $mod) =~ s{::}{/}g;
+    rmtree("fatlib/$Config{archname}/auto/$path");
+}
+find({no_chdir => 1, wanted => sub {
+    -f or return;
+    unlink $_ if /\.pod$/;
+}}, 'fatlib');
+for my $file (@trace_extras) {
+    my ($full_file) = grep { -f } map { "$_/$file" } @INC;
+    my $dest = "fatlib/$file";
+    mkpath(dirname($dest));
+    copy $full_file, $dest;
+}
+
+find({no_chdir => 1, wanted => sub {
+    -f or return;
+    /\.pm$/ or return;
+    my $file = $_;
+    open my $fh, '>', "$file.strip";
+    my $strip = Pod::Strip->new;
+    $strip->output_fh($fh);
+    $strip->parse_file($file);
+    close $fh;
+    rename "$file.strip", $file;
+}}, 'fatlib');
+
+my $content = "#!/usr/bin/env perl\n";
+$content .= `fatpack file`;
+my $pack_hack = <<'END_HACK';
+sub _fatpacker::modules {
+    my @mods = sort keys %fatpacked;
+    for (@mods) {
+        s/\.pm$//;
+        s{/}{::}g;
+    }
+    return @mods;
+}
+END_HACK
+$content =~ s{(my \%fatpacked;)}{$1\n$pack_hack};
+my $script = do {
+    open my $fh, '<', $in_file;
+    local $/;
+    <$fh>
+};
+$script =~ s/^#!.*\n//;
+$content .= $script;
+
+unless ($ENV{FATPACK_NO_CLEANUP}) {
+    rmtree('fatlib');
+    unlink 'fatpacker.trace';
+}
+
+print $content;
+

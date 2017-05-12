@@ -1,0 +1,38 @@
+clear
+power on
+regs
+
+# Base test --------------------
+memset 00be 72
+
+op a9 55
+op 05 be
+
+# Should be:  ACC=77
+test acc = 77
+
+# Negative test --------------------
+power on
+
+memset 00be aa
+
+op a9 55
+op 05 be
+
+# Should be:  ACC=FF, S=1
+test acc = ff
+test s = 1
+
+# Zero test ----------------
+power on
+
+memset 00be 00
+
+op a9 00
+op 05 be
+
+# Should be:  ACC=0, Z=1
+test acc = 0
+test z = 1
+
+save verify_05.txt

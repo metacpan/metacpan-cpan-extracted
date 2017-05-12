@@ -1,0 +1,73 @@
+{
+   "abstract" : "The Slaughter System Administration Utility.",
+   "author" : [
+      "Steve Kemp <steve@steve.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Slaughter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Test::Exception" : "0",
+            "Test::File::Contents" : "0",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Script" : "0",
+            "Test::Strict" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "LWP::UserAgent" : "0",
+            "Mojo::UserAgent" : "0",
+            "POSIX" : "0",
+            "Pod::Usage" : "0",
+            "Text::Template" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skx/slaughter/issues"
+      },
+      "homepage" : "https://github.com/skx/slaughter/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/skx/slaughter.git"
+      },
+      "x_GitMirror" : "http://git.steve.org.uk/skx/slaughter"
+   },
+   "version" : "v3.0.6"
+}

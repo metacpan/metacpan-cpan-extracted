@@ -1,0 +1,71 @@
+Version 2.02 - Jul 9, 2014 - John Bazik <jbazik@cpan.org>
+
+	* Handle GNU format symbol tables (closes #5).
+	* Added "symbols" option.
+	* Fixed missing padding on GNU format extended names data section.
+	* Added a test for all of this.
+
+Version 2.01 - Jun 18, 2014 - John Bazik <jbazik@cpan.org>
+
+	* Rewritten, many new methods, support for bsd and gnu ar formats.
+
+Version 1.17 - Mar 14, 2014 - John Bazik <jbazik@cpan.org>
+
+	* Fixed MANIFEST goof.  Doh!
+ 
+Version 1.16 - Mar 14, 2014 - John Bazik <jbazik@cpan.org>
+
+	* Set size to zero, not the empty string, in the case of empty
+	  member files (thanks to Michael J. Mestnik).
+
+Version 1.15 - May 14, 2013 - John Bazik <jbazik@cpan.org>
+
+	* Use binmode for portability.  Closes RT #81310 (thanks to
+	  Stanislav Meduna).
+
+Version 1.14 - October 14, 2009 - John Bazik <jbazik@cpan.org>
+
+	* Fix list_files to return a list in list context, to match doc.
+
+	* Fixed improper use of /m modifier in anchored match.
+
+	* Pad odd-size archives to an even number of bytes.
+	  Closes RT #18383 (thanks to David Dick).
+
+	* Fixed broken file perms (decimal mode stored as octal string).
+	  Closes RT #49987 (thanks to Stephen Gran - debian bug #523515).
+
+	* Added tests for padding and permission fixes.  Dropped
+	  unnecessary BEGIN clauses from some tests.
+
+Version 1.13b - May 7th, 2003
+
+Fixes to the Makefile.PL file. Ar.pm wasn't being put into /blib
+Style fix to a line with non-standard unless parenthesis
+
+
+Version 1.13 - April 30th, 2003
+
+Removed unneeded exports. Thanks to pudge for the pointer.
+
+
+Version 1.12 - April 14th, 2003
+
+Found podchecker. CPAN HTML documentation should work right now.
+
+
+Version 1.11 - April 10th, 2003
+
+Trying to get the HTML POD documentation to come out correctly
+
+
+Version 1.1 - April 10th, 2003
+
+Documentation cleanups
+Added a C<remove()> function
+
+
+Version 1.0 - April 7th, 2003
+
+This is the initial public release for CPAN, so everything is new.
+

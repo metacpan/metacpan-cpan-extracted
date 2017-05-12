@@ -1,0 +1,26 @@
+
+Apache::Scoreboard 2 REMOTE_SCOREBOARD_TYPE is available in global_score, 
+should probably use that instead of the hardwired value
+
+---
+
+scripts under examples/ need to be updated to 2.0
+
+---
+
+lib/Apache/ScoreboardGraph.pm needs to be ported
+
+---
+
+modperl's xs/typemap while includes the conversions for certain types
+it doesn't include the typemap declaration, so XS extensions have to
+add things like:
+
+Apache::RequestRec	        T_APACHEOBJ
+APR::Pool                       T_PTROBJ
+
+to the local typemap file. Would be nice if mod_perl had these
+declared already in its typemap.
+
+---
+

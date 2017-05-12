@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name: Algorithm-GenerateSequence
+version: 0.02
+license: perl
+distribution_type: module
+requires: {}
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  Algorithm::GenerateSequence:
+    file: lib/Algorithm/GenerateSequence.pm
+    version: 0.02
+generated_by: Module::Build version 0.20

@@ -1,0 +1,17 @@
+Build.PL
+Changes
+inc/disable-dx.patch
+inc/Makefile
+inc/Makefile.mingw
+inc/malloc_stdlib_h.patch
+inc/My/Builder.pm
+inc/My/Builder/Unix.pm
+inc/My/Builder/Windows.pm
+inc/pkg-config-generate.pl
+lib/Alien/AntTweakBar.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/00-load.t

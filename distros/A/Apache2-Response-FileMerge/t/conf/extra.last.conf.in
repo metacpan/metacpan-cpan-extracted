@@ -1,0 +1,14 @@
+# see t/conf/extra.conf.in for details about this
+# file
+
+# the difference between t/conf/extra.conf.in and
+# t/conf/extra.last.conf.in is that the latter is
+# executed after modperl_startup.pl, which is 
+# where @INC gets set.  because PerlModule runs
+# during config parse for mod_perl 1.0, @INC
+# needs to be adjusted before we call PerlModule
+# otherwise our lib/Apache/Handler.pm won't be found
+#
+# make sense?
+
+# mod_perl 1.0 sample configuration

@@ -1,0 +1,227 @@
+#!/usr/bin/perl
+
+################################################################################
+# Convert audiofiles from one format to another (ogg, mp3 or wav)              #
+#                                                                              #
+# Copyright (C) 2006 Michael Hooreman <michael_AT_mijoweb_DOT_net>             #
+################################################################################
+
+#$Id: audioconv,v 1.4 2006-10-28 10:24:21 michael Exp $
+
+=head1 NAME
+
+audioconv - Conversion beteen misc audio file formats
+
+=head1 SYNOPSIS
+
+ audioconv [--help] --in mp3|ogg|wav --out mp3|ogg|wav file1 [file2 [...]]
+   --in : input format, one of mp3, ogg or wav (case insensitive)
+   --out: output format, one of mp3, ogg or wav (case insensitive)
+
+ in and out formats must be differents
+
+ example:
+   audioconv --in mp3 --out ogg test.mp3
+
+=head1 DESCRIPTION
+
+C<audioconv> Provides miscellaneous tools to convert audio files between
+Ogg Vorbis, MPEG III and Wav files.
+
+=head2 PROGRAMS USED
+
+To do the conversions, this program uses the following linux programs:
+
+=over
+
+=item *
+
+mpg321, tested with version 0.2.10
+
+=item *
+
+oggdec, tested with version 1.0.1
+
+=back
+
+=cut
+
+=head1 SEE ALSO
+
+L<Audio::ConvTools>
+
+=head1 AUTHOR
+
+Michael Hooreman C<< <mhooreman at skynet.be> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-audioconv-tools at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Audio::ConvTools>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Audio::ConvTools
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Audio-ConvTools>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Audio-ConvTools>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Audio-ConvTools>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Audio-ConvTools>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Michael Hooreman, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+use strict;
+use warnings;
+
+BEGIN {
+	use FindBin;
+	use lib "$FindBin::Bin/../lib/"; #usefull if running in the package (developpement)
+}
+
+use Getopt::Long;
+use Pod::Usage;
+use File::Temp;
+use Audio::ConvTools qw/:DEFAULT :Log :Tmp/;
+
+my $VERSION = Audio::ConvTools::getVersion();
+
+my @listFiles;
+my $converter;
+
+sub parseCmdline()
+{
+	my $helpOpt;
+	my $inFmt;
+	my $outFmt;
+
+	#reading the options
+	GetOptions(
+		"help"    => \$helpOpt,
+		"in:s"    => \$inFmt,
+		"out:s"   => \$outFmt
+	) or pod2usage(1);
+	$helpOpt and pod2usage(0);
+
+	#lowercase and check formats
+	foreach (\$inFmt, \$outFmt) { $$_ = lc($$_) unless defined $$_ };
+	($inFmt ne $outFmt) or pod2usage(1);
+	(allowedFormat($inFmt) and allowedFormat($outFmt)) or pod2usage(1);
+
+	#the @ARGV was shifted for each option
+	$#ARGV>=0 or pod2usage(1);
+	@listFiles = @ARGV;
+
+	#setting the conversion sub
+	SWITCH: {
+		($inFmt eq "mp3" and $outFmt eq "ogg") and do {
+			$converter = \&mp32ogg;
+			last SWITCH;
+		};
+		($inFmt eq "ogg" and $outFmt eq "mp3") and do{
+			$converter = \&ogg2mp3;
+			last SWITCH;
+		};
+		($inFmt eq "mp3" and $outFmt eq "wav") and do{
+			$converter = \&mp32wav;
+			last SWITCH;
+		};
+		($inFmt eq "ogg" and $outFmt eq "wav") and do{
+			$converter = \&ogg2wav;
+			last SWITCH;
+		};
+		($inFmt eq "wav" and $outFmt eq "ogg") and do{
+			$converter = \&wav2ogg;
+			last SWITCH;
+		};
+		($inFmt eq "wav" and $outFmt eq "mp3") and do{
+			$converter = \&wav2mp3;
+			last SWITCH;
+		};
+		die("Assertion error: we don't have to come here!");
+	};
+}
+
+sub allowedFormat($)
+{
+	my $fmt = shift;
+	return 0 unless defined $fmt;
+	return 1 if $fmt eq "ogg";
+	return 1 if $fmt eq "mp3";
+	return 1 if $fmt eq "wav";
+	return 0;
+}
+
+sub runConversions()
+{
+	logMsg("Beginnning of the conversions");
+	foreach my $f (@listFiles) {
+		my $st;
+		logMsg("Converting $f");
+		if (&$converter($f)) {
+			logMsg("Conversion of $f done");
+		} else {
+			errMsg("Problem while converting $f");
+		}
+	}
+	logMsg("End of the conversions");
+}
+
+sub showCopyrights()
+{
+	print "audioconv $VERSION - Conversion beteen misc audio file formats$/";
+	print $/;
+	print "Copyright (C) 2006 Michael Hooreman <michael_AT_mijoweb_DOT_net>$/";
+	print "Licensed under the terms of the GNU General Public Licence$/";
+	print $/;
+}
+
+showCopyrights();
+parseCmdline();
+runConversions();
+
+__END__
+
+#$Log: audioconv,v $
+#Revision 1.4  2006-10-28 10:24:21  michael
+#Updated my email address.
+#Changed to version 0.08
+#
+#Revision 1.3  2006-08-18 12:50:12  mhoo
+#module is now Audio::ConvTool
+#switched to version 0.06
+#
+#Revision 1.2  2006/08/18 12:28:28  mhoo
+#AudioConvTools becomes Audio::ConvTools
+#switched to v0.4
+#
+#Revision 1.1.1.2  2006/08/18 11:46:28  mhoo
+#Version 0.9 Ready for CPAN
+#
+

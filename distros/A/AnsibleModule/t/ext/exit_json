@@ -1,0 +1,9 @@
+#!/usr/bin/env perl 
+
+use strict; use warnings;
+use lib 'lib';
+use AnsibleModule;
+
+my $module=AnsibleModule->new();
+
+$module->exit_json({msg=>"exit_json"});

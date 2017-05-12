@@ -1,0 +1,49 @@
+Alvis-TermTagger version 0.5
+================================
+
+This is a module to tag terms in a corpus. Corpus is one sentence per
+line. Characters, both from corpus and term list, are UTF-8 encoded.
+
+Contains this :
+
+    TermTagger.pl
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or if you don't have the "make" program:
+
+   perl Build.PL
+   Build
+   Build test
+   Build install
+
+ It requires Mdoule::Build version 0.28 (at least)
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Getopt::Long
+ Pod::Usage
+ Test::More
+
+FILE FORMAT AND CONFIGURATION
+
+See the documentation in the module (man Alvis::TermTagger)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2008 by Thierry Hamon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

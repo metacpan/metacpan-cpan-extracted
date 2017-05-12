@@ -1,0 +1,34 @@
+Apache2-Protocol-ESMTP version 0.01
+===================================
+
+Apache2 ESMTP protocol base class. Out of the box this module can
+carry on and SMTP conversation. However, it's up to you to make it
+do anything interesting.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Apache2::Protocol
+Apache2::ServerUtil
+mod_perl 2.x
+Apache 2.x
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by MailChannels Corporation.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

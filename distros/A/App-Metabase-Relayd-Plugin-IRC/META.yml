@@ -1,0 +1,28 @@
+---
+abstract: 'IRC plugin for metabase-relayd'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '6.42'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '6.42'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Metabase-Relayd-Plugin-IRC
+requires:
+  App::Metabase::Relayd: '0.12'
+  POE: '1.287'
+  POE::Component::IRC: '6.16'
+  perl: v5.6.0
+resources:
+  homepage: https://github.com/bingos/app-metabase-relayd-plugin-irc
+  repository: https://github.com/bingos/app-metabase-relayd-plugin-irc.git
+version: '0.08'

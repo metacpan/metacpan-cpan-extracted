@@ -1,0 +1,12 @@
+Revision history for Perl extension AnyEvent::Mac::Pasteboard.
+
+0.03  Fri Mar 11 22:03:00 2016
+    - Fixed bug that touching undefined variable
+	    when pbpaste returns no content.
+
+0.02  Sun Jul 21 04:17:00 2015
+	- Fixed bug that pasteboard contains plural lines
+
+0.01  Thu Aug 22 20:50:57 2013
+	- original version; created by h2xs 1.23 with options
+		-AX -n AnyEvent::Mac::Pasteboard

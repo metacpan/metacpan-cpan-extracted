@@ -1,0 +1,102 @@
+COMMENT   '        '           / -- Telescope specific parameters --
+TELESCOP= 'JCMT    '           / Name of telescope
+ORIGIN  = 'SMURF SCUBA-2 simulator'/ Origin of file
+OBSGEO-X=    -5464579.28822341 / x,y,z triplet for JCMT
+OBSGEO-Y=    -2493001.95030442 / relative to centre of the Earth
+OBSGEO-Z=     2150648.82371559 / [m]
+ALT-OBS =               4111.0 / [m] Height of observatory above sea level
+LAT-OBS =     19.8228083335029 / [deg] Latitude of observatory
+LONG-OBS=             -155.477 / [deg] East longitude of observatory
+ETAL    =                  1.0 / Telescope efficiency
+COMMENT   '        '           / -- Observation & date parameters --
+OBSID   = 'SCUBA-2_1_20060917T120000'/ Unique observation ID
+OBSIDSS = 'SCUBA-2_1_20060917T120000_850'/ Unique observation/wavelength ID
+OBJECT  = 'SMURF   '           / Object Name
+STANDARD=                    F / True if source is a calibrator
+OBSNUM  =                    1 / Observation Number
+NSUBSCAN=                    1 / Sub-scan Number
+OBSEND  =                    F / True if frame is last in current observation
+UTDATE  = '20060917'           / UT date as a string in yyyymmdd format
+DATE-OBS= '2006-09-17T12:00:00.000'/ Date and time (UTC) of start of sub-scan
+DATE-END= '2006-09-17T12:00:00.000'/ Date and time (UTC) of end of sub-scan
+DUT1    =                  0.0 / [d] UT1 - UTC correction
+INSTAP  = 's8d     '           / Instrument aperture
+INSTAP_X=                104.4 / [arcsec] X focal plane offset
+INSTAP_Y=                127.6 / [arcsec] Y focal plane offset
+AMSTART =       1.427457829887 / Air mass at start
+AMEND   =     1.42828901582138 / Air mass at end
+AZSTART =     236.376236474852 / [deg] Azimuth at sub-scan start
+AZEND   =     236.411732934957 / [deg] Azimuth at sub-scan end
+ELSTART =     44.4708332367275 / [deg] Elevation at sub-scan start
+ELEND   =     44.4381096780782 / [deg] Elevation at sub-scan end
+LSTSTART= '01:23:13.3808'      / LST at start of sub-scan
+LSTEND  = '01:23:23.4032'      / LST at end of sub-scan
+COMMENT   '        '           / -- Environment parameters --
+ATSTART =                  5.0 / [deg C] Ambient temperature at start
+ATEND   =                  5.0 / [deg C] Ambient temperature at end
+WVMTAUST=                 0.05 / WVM tau at start
+WVMTAUEN=                 0.05 / WVM tau at end
+SEEINGST=                  0.0 / Seeing at start
+SEEINGEN=                  1.0 / Seeing at end
+COMMENT   '        '           / -- OMP & ORAC-DR parameters --
+PROJECT = 'M08AC00 '           / The proposal ID for the PROJECT
+RECIPE  = '        '           / The ORAC-DR recipe
+DRGROUP = '        '           / Name of group to combine current observation wi
+MSBID   = '        '           / ID of min schedulable block
+MSBTID  = '        '           / Translation ID of MSB
+SURVEY  = '        '           / Survey Name
+COMMENT   '        '           / -- SCUBA-2 specific parameters --
+INSTRUME= 'SCUBA-2 '           / Instrument name - SCUBA-2
+SUBARRAY= 's8a     '           / subarray name
+SHUTTER = '        '           / Shutter position for dark frames
+FILTER  = '850     '           / filter used
+WAVELEN =              0.00085 / [m] Wavelength
+COMMENT   '        '           / -- Mapping parameters --
+SAM_MODE= 'STARE   '           / Sample mode: STARE, DREAM or SCAN
+SW_MODE = 'NONE    '           / Switch mode: CHOP, PSSW, FREQ, or NONE
+OBS_TYPE= 'FOCUS   '           / Observation type -  Science, Pointing or Focus
+JIGL_CNT=                    0 / Number of points in DREAM pattern
+JIGL_NAM= '        '           / Name containing DREAM jiggle offsets
+JIGL_PA =                  0.0 / Number of points in DREAM pattern
+JIGL_CRD= '        '           / Coord frame of jiggle pattern
+JIG_SCAL=                  0.0 / [arcsec] SMU jiggle pattern scale factor
+DRMWGHTS= '        '           / Name of DREAM weights file
+MAP_HGHT=                650.0 / [arcsec] Map height
+MAP_PA  =                  0.0 / [deg] Map PA
+MAP_WDTH=                650.0 / [arcsec] Map width
+LOCL_CRD= '        '           / Local offset coordinate system
+MAP_X   =                  0.0 / [arcsec] Map X offset
+MAP_Y   =                  0.0 / [arcsec] Map Y offset
+SCAN_CRD= '        '           / Scan coordinate system
+SCAN_VEL=                  0.0 / [arcsec/s] Requested scanning rate
+SCAN_DY =                  0.0 / [arcsec] Sample spacing perpendicular to scan
+SCAN_PA =                  0.0 / [deg] Scan PA relative to N in SCAN_CRD system
+SCAN_PAT= '        '           / Scanning pattern
+COMMENT   '        '           / -- JOS parameters --
+STEPTIME=                0.005 / [s] Time interval between samples
+FOCAXIS = 'Z       '           / Focus axis to move (X, Y, Z)
+NFOCSTEP=                    7 / Number of focal position steps
+FOCPOSN =                 -3.0 / [mm] Absolute position of the SMU
+FOCSTEP =                  1.0 / [mm] Distance between focus steps
+COMMENT   '        '           / -- Integration time-related parameters --
+INT_TIME=                  0.0 / [s] Time spent integrating on source
+EXP_TIME=                  1.0 / [s] Mean integration time per output pixel
+N_SUB   =                   10 / Number of sub-scans written to file
+COMMENT   '        '           / -- SMU-specific parameters --
+ALIGN_DX=                  0.0 / SMU tables X axis alignment offset
+ALIGN_DY=                  0.0 / SMU tables Y axis alignment offset
+FOCUS_DZ=                  0.0 / SMU tables Z axis focus offset
+DAZ     =                  0.0 / SMU azimuth pointing offset
+DEL     =                  0.0 / SMU elevation pointing offset
+UAZ     =                  0.0 / User azimuth pointing offset
+UEL     =                  0.0 / User elevation pointing offset
+COMMENT   '        '           / -- Miscellaneous --
+OCSCFG  = 'config.xml' / Name of OCS Configuration XML file defining the observa
+SIMULATE=                    T / True if data produced by simulator
+SIM_SMU =                    T / True if SMU data are simulated
+SIM_RTS =                    T / True if RTS data are simulated
+SIM_TCS =                    T / True if TCS data are simulated
+STATUS  = 'NORMAL  '           / Status at obs. end - NORMAL or ABORT
+POL_CONN=                    F / True if polarimeter is in the beam
+FTS_CONN=                    F / True if FTS is used
+MEANWVM =   0.0541955890962054 / Mean zenith tau at 225 GHz from WVM

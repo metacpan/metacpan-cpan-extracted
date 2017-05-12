@@ -1,0 +1,23 @@
+Revision history for Perl module AnyEvent::Processor
+
+0.005 2015-10-13
+
+  - Force using Glib event loop
+
+0.004 2014-10-28
+
+  - Some doc more
+
+0.004 2014-08-01
+
+  - Improve documentation for Debian package
+
+0.003 2012-03-28
+
+  - Add dependencies which were missing and were causing some CPAN test failing
+
+0.002 2012-02-20
+
+ - Initial release
+ - Doc
+

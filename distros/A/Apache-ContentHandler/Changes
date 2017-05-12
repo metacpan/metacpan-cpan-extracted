@@ -1,0 +1,33 @@
+Revision history for Perl extension Apache::ContentHandler.
+
+1.3.2 - 2001-03-01:
+
+	Finished POD documentation.
+
+1.3.1 - 2001-02-28:
+
+	Cleanup. Released to sourceforge and freshmeat.
+
+1.3.0 - 2001-02-01:
+
+	Added args sub. Cleanup.
+
+1.2.0 - 2000-11-09:
+
+	Added CGI vs mod_perl functionality.
+
+1.1.0 - 2000-05-28:
+
+	Moved POD to end of file.
+	Added basic DB connectivity.
+	Added some error reporting stuff.
+
+1.0.1 - 2000-05-27:
+
+	Made work method more robust (no more server errors).
+
+
+1.0.0 - 2000-05-07:
+
+	original version; created by h2xs 1.19
+

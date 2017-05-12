@@ -1,0 +1,10 @@
+Revision history for Perl extension AnyEvent::SIP.
+
+0.002   09.04.13
+        * Adding default non-compatible mode which doesn't use
+          AnyEvent::AggressiveIdle which was way too aggressive.
+          (still one test fails :/)
+
+0.001   27.03.13
+        * It works. Yay!
+

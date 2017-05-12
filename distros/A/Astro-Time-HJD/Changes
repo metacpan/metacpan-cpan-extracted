@@ -1,0 +1,12 @@
+Revision history for Perl extension Astro::Time::HJD.
+
+0.01  Thu Jul  4 21:13:46 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n Astro::Time::HJD
+
+0.01  Thu Jul 12
+	- Implement Michael Koppelman's suggestions:
+		- Modify POD SYNOPSIS to make usage more intuitive
+		- Implement returning of correction only or array of 3 based on
+		  wantarray
+		- add test for single scalar returning correction only

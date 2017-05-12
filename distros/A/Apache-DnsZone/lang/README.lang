@@ -1,0 +1,11 @@
+If you want to contribute language files to DnsZone there are a few guidelines to follow:
+
+You need to use en.lang to create your language file from. Filename style is <lang>.lang, where lang is iso two letter codes for language like: en for English, de for German.
+
+Make sure to translate every field.
+
+Thanks for contributing to DnsZone.
+
+
+
+

@@ -1,0 +1,17 @@
+Revision history for Alien-Gearman
+
+0.01004  Sun Feb 21 2010
+         - Include new gearman version 0.12
+
+0.01003  Tue Jan 05 2010
+         - Fix broken behaviour when answering
+           'really install?' with 'no' # BinGOs++
+
+0.01002  Sun Jan 03 2010
+         - Added test
+
+0.01001  Wed Dec 30 2009
+         - Fix typo in Makefile.PL
+
+0.01000  Wed Dec 30 2009
+         - Initial release.

@@ -1,0 +1,49 @@
+---
+abstract: 'Verify and sanity check your installation verses cpanm meta files'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-cpanm-meta-checker
+provides:
+  App::cpanm::meta::checker:
+    file: lib/App/cpanm/meta/checker.pm
+    version: '0.001002'
+  App::cpanm::meta::checker::State:
+    file: lib/App/cpanm/meta/checker/State.pm
+    version: '0.001002'
+  App::cpanm::meta::checker::State::Duplicates:
+    file: lib/App/cpanm/meta/checker/State/Duplicates.pm
+    version: '0.001002'
+  App::cpanm::meta::checker::State::Duplicates::Dist:
+    file: lib/App/cpanm/meta/checker/State/Duplicates/Dist.pm
+    version: '0.001002'
+recommends:
+  Path::Tiny: '0.058'
+requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Check: '0'
+  Carp: '0'
+  Getopt::Long: '0'
+  Moo: '1.000008'
+  Path::Tiny: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/App-cpanm-meta-checker/issues
+  homepage: https://github.com/kentnl/App-cpanm-meta-checker
+  repository: https://github.com/kentnl/App-cpanm-meta-checker.git
+version: '0.001002'

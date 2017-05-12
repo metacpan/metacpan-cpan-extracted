@@ -1,0 +1,5 @@
+#!/usr/bin/env perl
+
+use App::MechaCPAN;
+
+exit App::MechaCPAN::main(@ARGV);

@@ -1,0 +1,179 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Archive::Rgssad;
+use Archive::Rgss3a;
+use File::Basename;
+use File::Path 'mkpath';
+use Getopt::Long;
+
+our $VERSION = '0.11';
+
+my $help = 0;
+my $list = 0;
+my $dest = '.';
+my $type = 0;
+
+my $result = GetOptions(
+  'help'   => \$help,
+  'list'   => \$list,
+  'dest:s' => \$dest,
+  'type:i' => \$type);
+my $file = shift;
+
+sub usage {
+  print STDERR <<USAGE;
+Usage: $0 [-h] [-l] [-d exdir] archive [file(s) ...]
+Extract files from RGSS archive
+
+  -h, --help    show this usage
+  -l, --list    list all entries
+  -d, --dest    extract files to the specified directory
+  -t, --type=0  automatically detect archive type
+      --type=1  treat archive as .rgssad or .rgss2a (rgssad v1)
+      --type=3  treat archive as .rgss3a (rgssad v3)
+USAGE
+}
+
+if ($help) {
+  usage;
+  exit 0;
+} elsif (!$result || !defined($file)) {
+  usage;
+  exit 9;
+} elsif (! -e $file) {
+  print STDERR "File '$file' doesn't exist.\n";
+  exit 1;
+} elsif (! -f $file || ! -r $file) {
+  print STDERR "Cannot open '$file' to read.\n";
+  exit 1;
+}
+
+my %files = ();
+$files{$_} = 1 for (@ARGV);
+
+my $rgssad = undef;
+
+if ($type == 0) {
+  open FH, '<', $file;
+  read FH, $_, 8;
+  close FH;
+  if (substr($_, 0, 7) ne "RGSSAD\0") {
+    print STDERR "'$file' is not a valid rgssad archive\n";
+    exit 2;
+  } else {
+    $type = ord substr($_, 7, 1);
+  }
+}
+
+if ($type == 1) {
+  $rgssad = Archive::Rgssad->new($file);
+} elsif ($type == 3) {
+  $rgssad = Archive::Rgss3a->new($file);
+} else {
+  print STDERR "Cannot handle rgssad v$type format\n";
+  exit 2;
+}
+
+for my $entry ($rgssad->entries) {
+  my $path = $entry->path;
+  $path =~ s|\\|/|g;
+  $path = "$dest/$path";
+  next if @ARGV > 0 && !exists($files{$path});
+  print STDOUT $path, "\n";
+  if (!$list) {
+    mkpath(dirname($path));
+    open FH, '>', $path;
+    binmode FH;
+    print FH $entry->data;
+    close FH;
+  }
+}
+
+__END__
+
+=head1 NAME
+
+rgssad - extract files from RGSS archive
+
+=head1 SYNOPSIS
+
+B<rgssad> [B<-h>] [B<-l>] [B<-d> I<exdir>] I<archive> [I<file(s)> ...]
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h>, B<--help>
+
+Print usage and exit.
+
+=item B<-l>, B<--list>
+
+Do not extract the entries to files, just list the paths of entries.
+
+=item B<-d> I<extdir>, B<--dest>=I<extdir>
+
+Extract files to the specified directory.
+
+=item B<-t> I<version>, B<--type>=I<version>
+
+Use I<type> to determine archive type or version. If version is 1, force
+the script to treat archive as .rgssad or .rgss2a (rgssad v1). If version
+is 3, force the script to treat archive as .rgss3a (rgssad v3). Otherwise,
+the script will automatically detect archive type according to the version
+number in archive header.
+
+=back
+
+=head1 EXAMPLES
+
+To list all entries of I<Game.rgssad>, try
+
+    rgssad -l Game.rgssad
+
+To extract all entries from I<Game.rgss2a> to directory I<resources>, try
+
+    rgssad Game.rgss2a -d resources
+
+To extract I<Data\Scripts.rvdata2> from I<Game.rgss3a> to current directory, try
+
+    rgssad Game.rgss3a ./Data/Scripts.rvdata2
+
+=head1 SEE ALSO
+
+Archive::Rgssad and Archive::Rgss3a
+
+=head1 AUTHOR
+
+Zejun Wu, C<< <watashi at watashi.ws> >>
+
+=head1 SUPPORT
+
+You can find documentation for this script with the man command.
+
+    man rgssad
+
+
+You can also look for information at:
+
+=over 4
+
+=item * GitHub
+
+L<https://github.com/watashi/perl-archive-rgssad>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 Zejun Wu.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut

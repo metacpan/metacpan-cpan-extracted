@@ -1,0 +1,57 @@
+NAME
+    Apache::RewritingProxy - proxy that works by rewriting requested
+    documents with no client proxy config needed.
+
+SYNOPSIS
+    # Configuration in httpd.conf
+
+    <Location /foo> SetHandler perl-script PerlHandler
+    Apache::RewritingProxy Options ExecCGI PerlSendHeader On
+    </Location>
+
+    requests to /foo/http://domain.dom/ will return the resource
+    located at http://domain.dom with all links pointing to
+    /foo/http://otherlink.dom
+
+DESCRIPTION
+    This module allows proxying of web sites without any
+    configuration changes on the client's part. The client is simply
+    pointed to a URL using this module and it fetches the resource
+    and rewrites all links to continue using this proxy.
+
+INSTALLATION
+    perl Makefile.PL; make; make install;
+
+REQUIREMENTS
+    You need the following modules installed for this module to
+    work:
+
+      LWP::UserAgent
+      HTML::TokeParser
+      URI::URL
+      Of course, mod_perl and Apache would also help greatly.
+
+TODO
+    Make cookies work
+
+    Fix occasional query string munging for redirected requests
+
+    Add caching or incorporate some other caching mechanism
+
+    Enable this module to at least print scripts that occur within
+    comments
+
+    Add an external script to enable this to be called as a cgi or a
+    mod_perl module (for testing)
+
+SEE ALSO
+    mod_perl(3), Apache(3), LWP::UserAgent(3)
+
+AUTHOR
+    Apache::RewritingProxy by Ken Hagan <ken.hagan@louisville.edu>
+
+COPYRIGHT
+    The Apache::RewritingProxy module is free software; you can
+    redistribute it and/or modify it under the same terms as Perl
+    itself.
+

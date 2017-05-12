@@ -1,0 +1,25 @@
+NAME
+    Acme::MetaSyntactic::legopiratesofthecaribbean - LEGO Pirates of the
+    Caribbean theme
+
+VERSION
+    version 0.02
+
+DESCRIPTION
+    Characters from the LEGO Pirates of the Caribbean video game as gleaned
+    from the <http://www.gamefaqs.com/> walkthroughs.
+
+    *Me hearties yo ho!*
+
+SEE ALSO
+    Acme::MetaSyntactic, Acme::MetaSyntactic::List.
+
+AUTHOR
+    Chris Williams
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

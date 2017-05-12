@@ -1,0 +1,72 @@
+{
+   "abstract" : "Calclate ehoh",
+   "author" : [
+      "SHIRAKATA Kentaro <argrath@ub32.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.3",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Ehoh",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Ehoh" : {
+         "file" : "lib/Acme/Ehoh.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/argrath/Acme-Ehoh/issues"
+      },
+      "homepage" : "https://github.com/argrath/Acme-Ehoh",
+      "repository" : {
+         "url" : "https://github.com/argrath/Acme-Ehoh.git",
+         "web" : "https://github.com/argrath/Acme-Ehoh"
+      }
+   },
+   "version" : "0.01"
+}

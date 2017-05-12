@@ -1,0 +1,11 @@
+#
+#
+# This is the simplest possible policy, it includes no others, and merely
+# contains perl-code that is executed upon each managed client on every
+# run
+#
+#
+
+
+
+print "I am running via Slaughter.\n";

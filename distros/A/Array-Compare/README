@@ -1,0 +1,72 @@
+
+Array::Compare
+--------------
+
+NAME
+
+  Array::Compare
+
+DESCRIPTION
+
+WHAT IS Array::Compare?
+
+  Array::Compare is a Perl module which allows you to compare two arrays.
+
+  It has a number of features which allow you to control the way that the
+  arrays are compared:
+
+  * white space in array elements can be significant or ignored.
+  * particular columns in the arrays can be ignored.
+
+  Additionally you can get a simple true/false return value or the number
+  of columns which differ or an array containing the indexes of the
+  differing columns.
+
+HOW DO I INSTALL IT?
+
+  Array::Compare uses the standard Perl module architecture and can
+  therefore by installed using the standard Perl method which, in brief,
+  goes something like this:
+
+    gzip -cd Array-Compare-X.XX.tar.gz | tar xvf -
+    cd Array-Compare-X.XX
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+  Where X.XX is the version number of the module which you are installing.
+
+  If this doesn't work for you then creating a directory called Array
+  somewhere in your Perl library path (@INC) and copying the Compare.pm
+  file into this directory should also do the trick.
+
+WHERE IS THE DOCUMENTATION?
+
+  All of the documentation is currently in POD format in the Compare.pm
+  file. If you install the module using the standard method you should	be
+  able to read it by typing
+
+    perldoc Array::Compare
+
+  at a comand prompt.
+
+LATEST VERSION
+
+  The latest version of this module will always be available from CPAN.
+
+COPYRIGHT
+
+  Copyright (C) 2003-7, Magnum Solutions Ltd.  All Rights Reserved.
+
+  This module is free software; you can redistribute it and/or modify it
+  under the same terms as Perl itself.
+
+ANYTHING ELSE?
+
+  If you have any further questions, please contact the author.
+
+AUTHOR
+
+  Dave Cross <dave@mag-sol.com>
+

@@ -1,0 +1,26 @@
+---
+abstract: 'Show differences of a file as a HTML table'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-Diff-HTMLTable
+requires:
+  Algorithm::Diff: '1.1902'
+  Carp: '1.29'
+  HTML::Entities: '3.69'
+  Test::LongString: '0.16'
+  Time::Piece: '1.20'
+  perl: '5.010'
+resources:
+  bugtracker: http://github.com/reneeb/Algorithm-Diff-HTMLTable/issues
+  homepage: http://github.com/reneeb/Algorithm-Diff-HTMLTable
+  repository: git://github.com/reneeb/Algorithm-Diff-HTMLTable.git
+version: '0.04'

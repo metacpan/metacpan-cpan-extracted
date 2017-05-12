@@ -1,0 +1,14 @@
+Revision history for Perl extension App-mookview
+
+0.03 2014-01-14T00:32:47Z
+
+    - show title with length of markdown text
+
+0.02 2014-01-13T10:51:36Z
+
+    - fixed text length
+
+0.01 2014-01-13T10:11:15Z
+
+    - original version
+

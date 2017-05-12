@@ -1,0 +1,45 @@
+{
+   "abstract" : "The great new Acme::GILLIGAN::Utils!",
+   "author" : [
+      "Paul Cantalupo <pcantalupo@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-GILLIGAN-Utils",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::GILLIGAN::Utils" : {
+         "file" : "lib/Acme/GILLIGAN/Utils.pm",
+         "version" : "0.02"
+      },
+      "Tie::Cycle" : {
+         "file" : "lib/Tie/Cycle.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "0.02"
+}

@@ -1,0 +1,43 @@
+---
+abstract: 'Solve sets of Boolean terms with the Quine-McCluskey algorithm'
+author:
+  - 'Darren Kulp <darren@kulp.ch>'
+  - 'John M. Gamble <jgamble@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - boolean
+  - boolean-algebra
+  - quine-mccluskey
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-QuineMcCluskey
+provides:
+  Algorithm::QuineMcCluskey:
+    file: lib/Algorithm/QuineMcCluskey.pm
+    version: '0.16'
+  Algorithm::QuineMcCluskey::Format:
+    file: lib/Algorithm/QuineMcCluskey/Format.pm
+    version: '0.16'
+  Algorithm::QuineMcCluskey::Util:
+    file: lib/Algorithm/QuineMcCluskey/Util.pm
+    version: '0.16'
+requires:
+  Carp: '0'
+  List::Compare::Functional: '0.53'
+  List::MoreUtils: '0.401'
+  Moose: '2.16'
+  Tie::Cycle: '1.19'
+  namespace::autoclean: '0.16'
+  perl: v5.10.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jgamble/Algorithm-QuineMcCluskey
+version: '0.16'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

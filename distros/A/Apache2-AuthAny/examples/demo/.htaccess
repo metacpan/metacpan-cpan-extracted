@@ -1,0 +1,4 @@
+AuthAnyGateURL /demo-gate/gate.php
+AuthAnyBasicAuthUserFile /etc/authany/htpasswd
+# seconds
+AuthAnyTimeout 600

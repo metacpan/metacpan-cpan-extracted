@@ -1,0 +1,14 @@
+- 0.05
+    - If using system install the unit test should check that correctly
+
+- 0.04
+    - Using Unicorn Engine release version 1.0
+
+- 0.03
+    - Fixing test failures on FreeBSD
+
+- 0.02
+    - Add a README for PAUSE
+
+- 0.01
+     - Initial commit with a working version

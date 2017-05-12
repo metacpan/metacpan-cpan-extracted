@@ -1,0 +1,742 @@
+Revision history for Perl extension Apache::PageKit.
+
+	For more details on migration, see migration/README
+1.18
+ 	- Allow testsuit to catch up with Changes in Apache::Test.
+ 		POST's can be redirected on the fly. 
+		Otherwise the tests 05, 06 and 07 fail.
+		( Boris Zentner )
+
+1.17
+	- Fix: a new typo in Makefile.PL
+		-+binmode $template_fh, ':encoding($default_input_charset)';
+		++binmode $template_fh, ":encoding($default_input_charset)";
+		( Boris Zentner )
+1.16
+        ! The param method returns a empty list in list context if 
+                the param was not defined. Older PageKits returned undef
+                ( Boris Zentner )
+        - Fix: add missing : in binmode $fh, ":encoding(...)";
+                ( Boris Zentner )
+        - Fix: typo in scripts/pkit_rename_app.pl ( Boris Zentner )
+1.15
+	- Add: request_class parameter just for the case, that you like 
+		another class or subclass do what Apache::Request do for you.
+		Defaults to Apache::Request::PageKit ( Boris Zentner )
+	- Fix: conversion error if the tmpl file's encoding is != utf8 and no
+		content_var's are used. affects only perl < 5.8.0
+		( Boris Zentner )
+	- Add: Basic testsuite ( Boris Zentner )
+	- Remove setup_eg.pl this file is obsolete ( Boris Zentner )
+	- Fix: Fresh created session cookie headers are wrongly not send
+        for pkit_redirect pages this is fixed now. ( Boris Zentner ) 
+	- Add: Experimental support for Template Toolkit. Enabled with
+		template_class = "Template" in your Config.xml
+		( Boris Zentner)
+	- Fix: with pkit_admin=on and perl 5.8.x the input data is 
+                converted to your default_input_charset.
+                ( Boris Zentner, Sean Lee )
+	- Send Content-Length header for static files. ( Boris Zentner )
+	- Fix: eg/dbfile needs rw permission even for nobody or nouser
+		if apache is started as root. 
+		( Boris Zentner, Shawn Poulson )
+1.14
+ 	- Fix: parse for xsl-params again in the xsl files. This was 
+ 		broken in 1.13. ( Ben Ausden )
+	- Fix: add use Apache::PageKit::Model to eg/Model/MyPageKit/Common.pm
+		since it is possible that the application class is loaded
+		before Apache::PageKit ( Boris Zentner )
+	- the eg site use DBD::SQLite now. This obsoletes
+		DBD::CSV, SQL::Statement and Text::CSV_XS.
+		( Boris Zentner )
+	- fop_command can be disabled with fop_command = ""
+		( Boris Zentner, Shimon Rura )
+	- Remove Apache->request calls from Apache::PageKit::Edit
+		just to make apache 2 changes smaller ( Boris Zentner )
+	- Fix: Parse Accept-Charsets more pettier ( Boris Zentner )
+	! If the client browser has no accept charset header or no good one,
+		deliver in the default_output_charset and set the charset
+		in the content_type header. ( Erik Günther )
+	- Fix uri_prefix in conjunction with can_edit
+		( Boris Zentner, Erik Günther ) 
+1.13
+	- Add scripts/pkit_rename_app.pl it helps to start new applications
+                fast ( Boris Zentner )
+	- Add <PKIT_COMMENT> and </PKIT_COMMENT> tags. ( Boris Zentner )
+	- Fix filetest for upload_tmp_dir ( Boris Zentner )
+	- Fix locale support. One message was twice in the .po files.
+		( Boris Zentner )
+	- Fix Encoding of Apache::PageKit::Edit. Use HTML::Entities
+		and encode only '<>&"' ( Boris Zentner )	
+	- Fix encoding of Apache::ErrorReport stacktrace
+		( Boris Zentner, Paul Flinders )
+1.12
+	- PageKit now install the right version for the installed perl.
+		This requires the patch command if you use perl 5.8.x.
+		( Boris Zentner )
+	- Replace Apache::test with Apache::Test ( Boris Zentner )
+	- Workaround segfault in XML::LibXML2 in context with findnodes
+		( Boris Zentner )
+	- Add large comments in front of custom response headers for MSIE.
+		( Boris Zentner )
+	- Send full response messages if no data is send to the user.
+		This fix display problems on some browsers.
+		( Boris Zentner, Rob Starkey )
+	- Send headers even if we process a SubRequest
+		( Boris Zentner, Anton Permyakov )
+	- Some case changes in the eg site, to get it working
+		case-sensitive. ( Boris Zentner )
+	- All PageKit vars in the output object like pkit_user, pkit_done
+		and so on are in lowercase now. This is usefull if we use
+		another templating engine where case matters.
+		( Boris Zentner )
+	- Add docs for pkit_internal_execute_redirect
+		( Boris Zentner )
+	- pkit_internal_redirect and pkit_internal_execute_redirect
+		handle page_id's with parameters (Boris Zentner)
+	- Fix: Cache handling on the client side more restrictive
+		(Boris Zentner)
+	- Fixed bug in params_as_string when value is 0 ( TJ Mather )
+	- Improved error message when template not found
+		and XML::LibXSLT not installed ( TJ Mather )
+	- Fix: Expansion of multivalued parameters for HTML::Template
+		( Paul G. Weiss )
+	- FIX: Typo in HAVE_NOT_MESSAGES close tag.
+		( Boris Zentner )
+	- Add new option upload_tmp_dir
+		see Apache::Request TEMP_DIR ( Ben Ausden )
+	- Large speedup for all static pages ( Boris Zentner )
+	- Add docs for the ignore_fillinform_fields methode
+		(Boris Zentner)
+	- Fix: remove again 0xa0 chars from FAQ.pod
+		(Boris Zentner)
+1.11
+	- Fix early delivery of static pages (Paul G. Weiss)
+	- Add Apache::PageKit::FAQ (Boris Zentner)
+	- Fix: Search attributes for a page in the sections
+        	even if the page has some other attributes
+		(Glenn Morgan)
+	- Fix: Add missing # to the colors in eg/Common.pm
+		(Boris Zentner)
+	- Fix expansion of unused pkit_macro tags to ''
+		(Boris Zentner)
+	- Fix pkit_get_session_id to work even without a real
+		session (Boris Zentner, Russell D. Weiss)
+	- Add page attribute use_sessions defaults to 'yes'
+		(Boris Zentner, Russell D. Weiss)
+	- Fix PKIT_SELFURL and handling of empty parameters
+		(Bill Karwin)
+	- Fix PKIT_MACRO expansion for nested templates.
+		(Boris Zentner, Russell D. Weiss)
+	- setup_eg.pl is now os indpendent (Boris Zentner)
+	- Add docs for <PKIT_ELSE>, <PKIT_IS_ERROR>, <PKIT_NOT_ERROR> and
+		pkit_component_params_hashref (Boris Zentner)
+	- Fix pkit_validate_input to work with Data::FormValidator >= 1.11
+		(Paul G. Weiss, Boris Zentner)
+1.10
+ 	- Add a note to the docs, that some pages can not be protected
+		(Boris Zentner, Rob Starkey)
+	- Fix some links in the eg site to work in a different
+		location (Boris Zentner)
+	- Do not deliver a page direct if the client forget to add a '/'
+		instead redirect to the right place. This is done to get
+		relative links right. (Boris Zentner)
+	- Prepare PageKit for W32 (Boris Zentner)
+	- Avoid changing apr->filename and apr->path_info
+		(Boris Zentner)
+	- Fix warning, when the clients browser did not send a 
+		User-Agent header. (Boris Zentner)
+	- Fix for startup when passed parameter should override
+		PKIT_ROOT and PKIT_SERVER settings (TJ Mather)
+	- Workaround another UTF conversion bug in perl 5.6.1
+		(Boris Zentner, Gabriel Burca)
+	- Fix docs for PKIT_HAVE_MESSAGES and PKIT_HAVE_NOT_MESSAGES
+		(Boris Zentner)
+	- Fix: pkit_edit translate & to &amp; since <textarea> holds
+		#PCDATA, but we want it raw. (Boris Zentner)
+	- Fix warning, when pkit_auth_session_key is called with a session
+		without a user_id or the database can not provide a login
+		or passwd. (Boris Zentner)
+	- Fix: do NOT cache the page, that force us to login (Boris Zentner)
+	- Fix warning, when a pkit_macro tag is used without the same
+		parameter in the pkit_component tag (Boris Zentner)
+	- Fix pkit_input_hashref for the case where you request the hash,
+		change something and request the hash again. In error
+		you get the old value(s) back. (Glenn Morgan)
+	- Fix call pkit_on_error before the session data is saved. 
+		So you can rollback the changes, even if your session
+		data is in the same db with your application.
+		(Boris Zentner)
+	- Fix replace <PKIT_ERRORSTR> even inside pkit_message 
+		strings. (Boris Zentner)
+	- Use parameters for Apache::PageKit->startup if we can not
+		find PKIT_ROOT and or PKIT_SERVER for 
+		mod_perl >= 1.06 (Boris Zentner)
+	- Add patch to use <PKIT_ERRORSPAN> and <PKIT_ERRORFONT>
+		without a name attribute. (Boris Zentner)
+	- Add: component subs are called with component-parameters.
+		See pkit_component_params_hashref
+		(Boris Zentner)
+	! Component code is called inorder from top to the bottom
+		(Boris Zentner)
+	- Fix: bug, where path relative components are not listed 
+		as an edit component. (Boris Zentner, Gabriel Burca)
+	- Fix: A errormessage is fixed, that report file is out of
+		the root_dir even if the file is not found.
+		(Boris Zentner, Gabriel Burca)
+	- Add new server option cookie_postfix. To name cookies just for the
+                case, that multiple pkit applications run  in the same
+                apache server. (Boris Zentner, David Raimbault)
+	- Fix: write the session data and destroy the db connection
+		even if an error transpires (Boris Zentner)
+	- Fix: defer delivery of static pages if parameters are attached to
+		the URI. This allows to login/logout even with a static
+		default page (Boris Zentner)
+	- Fix iconv conversion: it is perfect legal to convert an empty
+		string '' to another charset (Boris Zentner)
+	- Add new tags <PKIT_HAVE_MESSAGES> and <PKIT_HAVE_NOT_MESSAGES>
+		(Boris Zentner, Sebastian Feuerstack)
+1.09
+	- Fix: case where something.xml was added to the mtimes hash even
+		if it does not exists (only if all your content came from
+		another file via xpath document() function) this result in a 
+		slowdown for the page unless reload="no" (Boris Zentner)
+	- Fix: die with the error from the fop command.
+        	So the errors show up in your browser or log (Boris Zentner)
+	- Fix content_encoding header. If unsure, play save and send
+        	the page NOT gzipped (Boris Zentner)
+	- Fix fop example pages (John Robinson)
+	- Add new global option protect_static (Boris Zentner)
+	- Remove some mystery chars (0xA0) (Boris Zentner)
+	- Add new hook pkit_on_error to catch and maybe repair fatal errors
+		(Boris Zentner)
+	! Simplified and more robust startup (Boris Zentner)
+	- Clear missing server section on reload (Boris Zentner)
+	- Die if a conversion from one charset to another is not possible.
+		Maybe a char is not part of the target charset.
+		(Boris Zentner, Gabriel Burca)
+	! Add protection of static pages with the require_login config
+		attribute. (Boris Zentner)
+	- Fix two cases where a filehandle can be used even if open failed
+		(Boris Zentner)
+	- Fix uri_prefix so that the url did not grow anymore (Boris Zentner)
+	- Remove unused modules Data::Dumper and Carp from View.pm (Boris Zentner)
+	- Fix to deliver static pages unzipped if desired (Anton Permyakov)
+	- Fix case where wrong cached file is used for xsl files with
+		reload="no" and first called without parameters in the
+		URL (Boris Zentner, Ben Ausden)
+1.08
+	- Added on-line editing tools
+	- Add Postgres support (Chris Hamilton)
+        - Add support for page based sessions (Boris Zentner)
+        - Add support for localized messages of pkit (Boris Zentner)
+        - Add fr message catalog (David Raimbault)
+        - Add pt message catalog (Leonardo T. de Carvalho)
+        - Add de message catalog (Boris Zentner)
+        ! Change default for html_clean_level to 0 (Boris Zentner)
+        - Add <PKIT_NOT_ERROR> directive to seperate errors
+		from messages (David Christian)
+        ! Catch up with new interface in XML::LibXML 1.31 (Anton Berezin)
+        - Fix eg/View/(xml|wml|pdf)/simple_page.xsl (Boris Zentner)
+        - Add pkit_get_config_attr function to get config options from your
+		Config.xml (Boris Zentner, Leonardo T. de Carvalho)
+	- Add new <USER> section in Config/Config.xml where your own
+		config data takes place (Boris Zentner)
+	- Add a optional second argument for pkit_set_errorfont (Boris Zentner)
+	- Add new global config option default_errorstr (Boris Zentner)
+        - Add new pkit tag <PKIT_ERRORSTR> (Boris Zentner)
+        - Fix _load_component to die if we can not read the
+        	component file (Anton Permyakov)
+        - Add new function pkit_set_errorspan. It replaced pkit_set_errorfont
+		which is obsolete and should not be used anymore. (Boris Zentner)
+	- Add new pkit tag <PKIT_ERRORSPAN> as replacement for
+        	<PKIT_ERRORFONT> (Boris Zentner)
+ 	- Add new global config option 'errorspan_begin_tag' and
+        	'errorspan_end_tag' (Boris Zentner)
+	- Add new tags SECTIONS and SECTION for use in Config/Config.xml
+        	they allow to set defaults for groups of pages
+                (Boris Zentner, Ben Ausden)
+        - Fix view tag attribute 'output_media' to the documented
+        	'content_type'. Also test the page tag attribute
+                'content_type' first. (Boris Zentner)
+        - Do not use autovivification for file and dirhandles, to be
+        	compatible with perl 5.005 (Boris Zentner)
+        - Remove unused attrs from Config.xml View tags (Boris Zentner)
+        - Add global config options session_class and page_session_class
+        	both defaults to Apache::SessionX (Boris Zentner)
+        - Remove XML::Parser and prefer XML::LibXML (Boris Zentner)
+        - Replace Apache::PageKit::Session with Apache::SessionX (Boris Zentner)
+	- Fix: clear all global config attrs before (re)parsing the
+		config (Boris Zentner)
+        - Fix case where the DBI connection is terminated in pkit_cleanup_code
+        	before the session is written back (Anton Berezin)
+        - Remove usage of XML::XPath and XML::Parser in flavor of XML::LibXML
+        	this change involves also XML::XPathTemplate (Boris Zentner)
+        - Fix: add used Content files to the mtimes hash. (Boris Zentner)
+        - Add new global option template_class, to choose the module to process
+		our tempaltes. Must be HTML::Template compatible
+                for now. (Boris Zentner)
+	- Add and document new method $model->pkit_send used to send data or files
+        	to the client (Boris Zentner)
+
+1.07
+	- Fixed language localisation (Boris Zentner)
+        - More Warnings fixed (Boris Zentner)
+        - Add new parser, it is faster as before and the new option
+		relaxed_parser = "yes" enables a more relaxed but slower parser
+                if you like (Boris Zentner, Ben Ausden, Daniel Gardner)
+        - Fixed default for default_page (Boris Zentner)
+        - Append the default_page to the url if url is a directory (Rob Starkey)
+        ! New global option logout_kills_session. Defaults to 'yes'.
+        	The behavior before this option was no (Rob Falcon)
+        - Fixed head requests for gzipped static files (Boris Zentner)
+        - Improved security for recent='yes' pages (Boris Zentner)
+        - PKIT_COMPONENT macros are also available
+        	for XSLT with <xsl:param name="..."> (Ben Ausden)
+        ! The return code from pagecode is completely ignored. If you have to set a
+		return code use pkit_status_code (Boris Zentner)
+	- Fixed form_validation_done in the eg/site's MyModel code. (Michael Cook)
+        - Fixed restricted page login if the user was not logged
+        	in before (Boris Zentner)
+        ! Anonymous sessions are created lazy as in pkit <= 1.05 (Boris Zentner)
+
+1.06
+	- empty parameters are stripped from the requested url
+		ie: http://www.xyz.de/test?=& (Boris Zentner)
+	- Fixed output_convert to handle calls like
+		$model->output_convert(anything => $text) (Boris Zentner)
+	- Fixed handling of __PACKAGE__ in Common.pm (Boris Zentner)
+        - Add pkit_default hook similar to pkit_common_code, but called after
+		pkit_common_code and before the page code is
+		executed. (Boris Zentner, Ben Ausden)
+	- Add PKIT_MACRO as extension to PKIT_COMPONENT so a component is easy
+		reusable (Boris Zentner)
+	! Single parameters for PKIT_COMPONENT are no longer supported.
+		(see migration/README) (Boris Zentner)
+	- Fixed session merge from an anonymous to a user that is logged in.
+		(Boris Zentner, Leonardo de Carvalho)
+	- Fixed pkit_merge_sessions (David Raimbault)
+        - Fixed writing and warning of gzipped static pages (Boris Zentner)
+        - Fixed default for html_clean_level. It is now 9 as documented (Boris Zentner)
+        - Fixed language localization support (Boris Zentner)
+        - Fixed default for post_max. It is now 100_000_000 as documented (Boris Zentner)
+        - Reenable gzip content it was ignored before. (Boris Zentner)
+        - Fixed uri handling of http://www.abc.de/ where we end in a empty uri instead
+		of index (Boris Zentner)
+	- Fixed usage of Digest::MD5::md5_hex in sub pkit_auth_credential and
+		pkit_auth_session_key in Common.pm (Boris Zentner)
+	- Set Default for the server attrs can_edit and reload (Boris Zentner)
+	- First attempt to make pkit warning clean (Boris Zentner, David Raimbault)
+        - Fix default timeout for 'recent_login_timeout' from unlimited to 3600
+		like the Docs say (Boris Zentner)
+	- Parse difficult parameters like
+		http://ka.brain.de/login2?passwd=ss&&&&submit&&login=s& (Boris Zentner)
+        - Add restricted page to the example site (Boris Zentner)
+        - Fixed setup_session without touch of pkit_merge_session (Boris Zentner)
+        - Fixed problem with append of check_cookie (Boris Zentner)
+        - Sessions are not lazy anymore (Boris Zentner)
+
+1.05
+	- <PKIT_COMPONENT NAME="foo"/> now works (Boris Zentner)
+	- empty uri_prefix works (Boris Zentner)
+	- No more than one cookie is used at all times, pkit_session_id for
+		when user is not logged in and has accessed session,
+		and pkit_id when user has logged in (session gets
+		tied to login)
+	! The pkit_done parameter is no longer filled in on HTML forms.
+		(see migration/README)
+	- Fixed problem with cookie being set when user logged out
+		(Rob Falcon)
+	- Fixed problem with sessions being created when user logged in
+		(David Raimbault)
+
+1.04
+	- PageKit now uses Data::FormValidator instead of HTML::FormValidator
+		(Mark Stosberg)
+	- Sessions cookies only set when session is actually created
+	- Fixed content handler for case where there is a loop containing
+		and document() func, and vars don't contain document() func,
+		and no other top-level tags without document() func (Boris Zentner)
+	- Fixed recent_login session (Boris Zentner, David Raimbault)
+	- Added pkit_startup class method (Boris Zentner)
+	- Charset fixes, now should deal with PageKit templates
+		and default_input_charset correctly.
+
+1.03
+	- PageKit now supports general charset conversions using Text::Iconv,
+		removed workaround for european charsets in XML::XPathTemplate
+		(Boris Zentner)
+	- PageKit Templates are converted to default_output_charset from
+		default_input_charset (Boris Zentner)
+	- Added charset translation support with output_charset method in
+		Model (Boris Zentner)
+	- PageKit Template file cache is now dependant on mtime of Config.xml
+	- fixed bug with pkit_lang (Ben Ausden)
+	- Added pkit_cleanup_code to main request handler (Boris Zentner)
+	- input and pnotes methods in Model now work outside of mod_perl
+	- PageKit templates no longer pre-parsed on server startup
+	- Multiple input request paramaters now not reset by FormValidator.pm
+		output, since FormValidator doesn't support multiple input
+		request params.
+	- Fixed errors in pkit_input_hashref and PKIT_ERRORFONT tags
+	- make test no longer inclued - instead use perl setup_eg.pl to
+		test example site.
+	- Re-added CONTENT_IF/ELSE/UNLESS (Rob Falcon)
+	- Updated Content.pm to reflect new API for XML::LibXML 0.92 - open_uri
+		callback is called for parent XML and XSLT documents
+	- Included stylesheets should work properly now (PK prepends the
+		View/pkit_view directory to the stylesheet URIs)
+	- Added examples for output in different media
+	- Added pkit_lang method to model - useful for selecting langauge from
+		database.
+	- Sessions only generated with something is written to session
+		hash (uses lazy option of Apache::PageKit::Session)
+	- Added content_type, supports different media outputs, including
+		XML, WML, and PDF
+	- Supports on-the-fly generation of PDF using Apache XML FOP
+	- Static content is passed through HTML::Clean before it is
+		gzipped (Boris Zentner)
+	- PageKit Template has now XML-style tags of the form <MODEL_VAR />
+		(Boris Zentner)
+	- Fixed bug with uri_match
+	- Fixed bug with charset conversions in CONTENT_LOOP (Boris Zentner)
+	- PageKit now returns gzipped output if Accept-Encoding includes the
+		string "zip" (Boris Zentner)
+	- PageKit removes all cache files before startup if reload global
+		config option is set to "no".
+	- Updated Makefile.PL to require lastest version of HTML::FillInForm
+	- $uri_with_query now includes uri_prefix (Ben Ausden)
+	- PKIT_SELFURL now omits pkit_messages, pkit_error_messages and
+		pkit_lang (Ben Ausden)
+	- XSL files now located in View/pkit_view directory instead of
+		View/pkit_view/XSL
+
+1.02
+	- Got rid of extraneous 'print "hi"' statement in PageKit.pm
+		(Boris Zentner, Leonardo de Carvalho)
+
+1.01
+	- fix for split expression for <PKIT_SELFURL> tags (Boris Zentner)
+	- eg/View/Default/index.tmpl was missing from the distribution
+		(Leonardo de Carvalho)
+	- Fixed bug with passing pkit_message when pkit_redirect method
+		is called (Ben Ausden)
+	- Fixed bug with passing pkit_message when pkit_redirect method
+		redirects to a URL with a pkit_login parameter
+	- Fixed bug in XML/XPathTemplate.pm where context was not passed
+		for CONTENT_LOOP tags.
+	- Better language localization support in XML/XPathTemplate.pm.  Now
+		uses algorithm based on XPath's lang() function.
+
+1.00
+	- Moved most of POD documentation to DocBook, published
+		at http://www.pagekit.org/guide
+	- Renamed <PKIT_*> tags as follows:
+	  <PKIT_IF NAME="VIEW:view"> -> <PKIT_VIEW NAME="view">
+	  <PKIT_LOOP NAME="MESSAGE"> -> <PKIT_MESSAGES>, <PKIT_IS_ERROR>, <PKIT_MESSAGE>
+	  <PKIT_VAR NAME="HOSTNAME"> -> <PKIT_HOSTNAME>
+	- support for relative and absolute names for PKIT_COMPONENT
+	- you may now place static HTML files in the pagekit/View/Default
+		or View/pkit_view directories.
+		If pagekit can not locate the approriate
+		template/xml file, it will return declined, but set
+		the filepath so that apache returns the files.
+	- fixed up static handing with default_page and not_found_page
+		(Boris Zentner)
+	- Replaced MyPageKit::Common with __PACKAGE__ in Common.pm
+		(Boris Zentner)
+
+0.99
+	- document() function now works in XML::XPathTemplate
+	- logins are redirected to selfurl if there is no pkit_done param
+	- merged View/Component and Page directories.
+	- $model->input_param -> $model->input, $model->fillinform, $model->pnotes
+	- $model->output_param -> $model->output
+	- $model->dispatch(class,method,params) now is
+		my $class_object = $model->pkit_create(class)
+		$class_object->method(params);
+	- authentication code no longer sets $model->input_param('pkit_user')
+		and $model->output_param('pkit_user')
+	- Fixed warning messages if $^W is turned on
+	- Now requires classes if they are not already loaded.  (Boris Zentner)
+	- Fixed bug when calling pkit_get_orig_uri from pkit_get_default_page
+	- Fixed bug when page_id is not found.
+	- Now matches </PKIT_COMPONENT>, </PKIT_VAR>, </MODEL_VAR> tags
+		generated by XSLT
+	- Fixed bug in View.pm for checking for new uploads to $pkit_view
+		directory.
+	- Fixed bug in XML::XPathTemplate where queries were converted
+		to lowercase. (Boris Zentner)
+
+0.98	Mon May  7 14:37:08 2001 EST
+	- Added support for XML::LibXSLT - can now generate
+                pages from XML and XSL stylesheets
+	- Separated out XML Template code in new module,
+		XML::XPathTemplate
+	- update last_activity in session for every hit -
+		makes sure that recent_login works everytime
+		and overcomes the fact that Apache::Session only
+		does a shallow check of the hash.
+	- Fixed bug with pkit_get_orig_uri
+	- Checks for recursive PKIT_COMPONENTS (that is over 100)
+	- When user logs out of a page that requires a login,
+		goes to default_page instead of login_page
+	- Fixed bug with cache when new template was placed in a
+		directory when there was already a corresponding template
+		in the 'Default' directory
+	- Added pkit_cleanup_code hook for Model class (Boris Zentner)
+	- Error code rewritten, since using $SIG{__DIE__} does not
+		play well with eval, and there were problems with the
+		server hanging after a die, when the session wasn't
+		properly deleted.  Die's are now trapped using 'eval'.
+		Also renamed Apache::PageKit::Error to Apache::ErrorReport
+	- pkit_message works when you perform a redirect
+		using $model->pkit_redirect
+	- Fixed bug with use_template is set to 'no'
+	- Fixed bug with XPath queries.
+	- Fixed bug with locating only files in Page dir for
+		preparse_templates
+
+0.97	Wed Apr 25 17:07:31 2001 EST
+	- Login code has been rewritten.  To attempt a login, the
+		pkit_login request parameter must be set.
+		The new_credential configuration option is no longer
+		supported.
+	- added can_edit to server config section Config.dtd file.
+	- Names in <CONTENT_VAR> and <CONTENT_LOOP> tags are
+		XPath queries
+	- Removed support for navigation bars, since they didn't fit
+		in well with the new Content and View modules.  Might
+		add them back if there is demand and I can find an
+		clean way of doing it (using XPointers in content
+		XML file???)
+	- Removed support for $model->content_param, since content
+		is now compiled into template and it is not possible
+		to get or set the tags run time.
+	- Automically converts UTF-8 Encoding to latin1 encodeing,
+		if Unicode::String is loaded (Yann Kerhervé)
+	- fixed bug with pre-parsing content from sub-directories
+	- input_param now works with parameters containing multiple values
+	- Add $model->pkit_set_errorfont($field), used mark <PKIT_ERRORFONT>
+		tags for errors.
+	- Added pkit_root method, gets PageKit root directory
+	- no longer escape pkit_done
+	- works with mod_proxy_add_uri.c apache module, using X-Original-URI
+		header
+	- Removed PKIT_LOGINOUT_LINK, this tag was
+		not necessary and cluttered the API,
+		see migration/README for details
+	- removed search_engine_headers config option
+	- server_id is now passed to startup, solves
+		problem with server options not being
+		loaded properly at startup.
+	- Added pkit_get_session_id
+	- Added pkit_fixup_uri method
+	- Added request_param_in_tmpl global attribute, which
+		supplements request_param_in_tmpl page attribute
+	- Added $model->pkit_output_filter, a hook that can
+		be used to filter the output
+	- Added <PKIT_VAR NAME="HOSTNAME">, which specifies
+		current host name.
+	- Added $model->pkit_get_server_id - gets server id from
+		Config.xml file.
+	- Added $model->pkit_get_default_page - put in so that
+		it can be overridden in derived model class
+	- if cache_dir is not set, default to the PKIT_ROOT/View/cache
+		and PKIT_ROOT/Content/cache
+	- moved html_clean_level from global section to server section
+	- added pkit_post_common_code hook, similar to
+		pkit_common_code, but called after page code is
+		executed.
+	- Added <CONTENT_(IF|UNLESS|ELSE)> tags.
+	- Fixed typo with login/out message.
+	- Components can now have content associated with them
+		(needs testing)
+	- Fixed problems with Content caching when page_id contains
+		'/' - content cache files are now determined my using
+		a MD5 hash
+
+0.96	Fri Feb 02 04:18:22 2001 EST
+	- added $model->pkit_input_hashref method, gets inputs
+		(request params) as a reference to hash
+	- renamed pkit_set_page_id to pkit_internal_redirect
+		easier to remember and naming consistant with
+		pkit_redirect method
+	- Added installation troubleshooting tips, thanks to
+		Chris Burbridge and Nick Wood for helpful pointers
+	- Apache::PageKit->handler and startup are now called as
+		 class methods
+	- pagekit.org example cookies should work even when
+		the url is not of the form *.pagekit.org
+	- fixed error when cookie_domain was not set
+	- cookie_domain is now a NMTOKENS field and you can pass
+		multiple domains to it, seperated by spaces
+	- Added $model->pkit_query method which is a wrapper to
+		HTML::Template::query
+	- Added support for <PKIT_VAR NAME="LAST_CRUMB">
+	- Fixed errors with s/cookie_crumb/bread_crumb/
+	- Added session_expires to control the expire time for
+		the session cookie
+
+0.95	Tue Jan 16 15:12:21 2001 EST
+	- Added method $model->pkit_redirect($url)
+	- Cache files are now 'chown'ed to the user and group
+		specified in the User and Group apache configuration
+		directives.  This is because the cache files are
+		generated under server startup, which is typically
+		run under 'root', but the cache files need to be
+		writeable by the Apache children, which run under
+		a non-root user.
+	- Made the Model base class (MyPageKit::Common) user
+		configurable, using the model_bass_class global
+		configuration option. This way two or more distinct
+		pagekit sites can operate on the same server.
+	- Added cache_dir global configuration option that
+		allows the administrator to specify the directory
+		to store the view and content cache.
+	- Fixed Apache::PageKit::Model->dbh so that it calls
+		MyPageKit::Common->pkit_dbi_connect if there isn't
+		already a database handle.
+
+0.94	Wed Jan 10 02:25:51 2001 EST
+	- Replaced derived Apache::PageKit handler module (eg MyPageKit)
+		with MyPageKit::Common and Apache::PageKit->handler.
+		See migration/README for details.
+	- Changed structure of Model to allow for multiple model
+		objects, each containing a reference to a common
+		$pk object.
+	- <PKIT_ERRORFONT name="foo"> bar</PKIT_ERRORFONT> is now
+		precompiled to <TMPL_VAR NAME="PKIT_ERRORFONT_BEGIN_foo">
+		bar</TMPL_VAR NAME="PKIT_ERRORFONT_END_foo"> for
+		improved performance.
+	- $dbh, $apr, and $session are now accessed from model through
+		dbh, apr, and session methods.
+	- Added docs on support for dynamically loaded components
+		that get specified at runtime using systax like
+		<PKIT_COMPONENT NAME="<MODEL_VAR NAME="foo">">
+	- You can now pass a hash reference to set multiple parameters
+		for output_param method
+	- Removed support for PKIT_INTERNET_EXPLORER and
+		PKIT_NETSCAPE tags.  These tags clutter the
+		API and are easily implemented in the model.
+
+0.93	Wed Jan 03 01:49:06 2001 EST
+	- Fixed documentation in Apache::PageKit::Model,
+		where output_param method was listed
+		as param.
+	- Updated pagekit.org web site with links to
+		a browsable repository of source code
+		and more documentation.
+	- Fixed problem with make test, with language
+		cache files conflicting b/c of different
+		default languages in test.
+
+0.92	Sun Dec 31 21:32:30 2000 EST
+	- Rewrote Model class so that Model classes are
+		standalone and not dependent on the PageKit
+		architecture.
+		* functions in Model now get called
+			as methods of derived Model class
+		* inputs and outputs are now accessed
+			by $model->input_param and 
+			$model->output_param instead of
+			$apr->param and $view->param
+		* $pk->redirect is no longer available
+		* $pk->continue no longer available, use
+			$model->pkit_set_page_id instead
+		* $pk->message moved to $model->pkit_message
+		* page and component_dispatch_prefix replaced
+			by model_dispatch_prefix
+	- XML and template files are now parsed by calling
+		Apache::PageKit::startup function.  Should fix
+		problems when PageKit is used inside a
+		<Directory>, <Location> or <Files> section.
+	- Fixed bug with not getting fill_in_form configuration
+		setting in View.pm
+	- Fixed bugs with language localization and session
+		management.
+	- Improved language localization example on pagekit.org
+		web site
+
+0.91  Tue Dec 26 04:05:56 2000 EST
+	- Changed name of page_id_match configuration directive to
+		uri_match.
+	- Fixed some permission problems when 'make test' is run
+		as root.
+
+0.90  Sun Dec 24 01:26:18 2000 EST
+	- Major changes in API and streamlining of pagekit
+		in preparation for 1.0 beta release.  
+	- Removed seldom used options and replaced others with
+		more user-friendly versions.
+	- Renamed Controller directory to Config directory
+	- Renamed <TMPL_VAR> and <TMPL_LOOP> tags to
+		<MODEL_VAR> and <MODEL_LOOP> for Model Data and
+		<CONTENT_VAR> and <CONTENT_LOOP> for Content Data and
+		<PKIT_VAR> and <PKIT_LOOP> for PageKit Data
+	- Renamed <PKIT_INCLUDE> to <PKIT_COMPONENT> and replaced
+		'include' with 'component' across the framework
+	- Moved and renamed nav_title option from config to 
+		<NAV_TITLE> </NAV_TITLE> in content XML for
+		better foreign language support.
+	- Renamed Apache::PageKit::FormValidator to Apache::PageKit::Model
+		and redesigned class to replace form_validator
+		constructor option with $model->validate_input($hash_ref)
+		method.  Eliminated error_page and error_page_run_code
+		options (user should use $pk->continue
+		in model instead).  This should make the development
+		easier because all the logic is in the Model class instead
+		being scattered across the derived class and configuration.
+	- View templates get pre-parsed using file_cache/cache option of
+		HTML::Template, and the HTML can be optimized by
+		using HTML::Clean if html_clean_level is set to >=1
+	- Changed template_cache option to use yes for cache
+		in HTML::Template and no for file_cache.
+		Got rid of shared_cache, since it is problematic
+		and file_cache is almost as fast.
+	- Moved fill_in_form to page attr from global attr
+	- Removed support for domains, including page_domain,
+		domain, is_topdomain attributes.
+	- Removed page based linking attributes, including
+		support for <PKIT_LINK> and <PKIT_JAVASCRIPT> tags and
+		is_popup, is_secure, popup_width, and popup_height.
+
+0.89  Sun Dec  3 18:27:11 2000 EST
+	- Major changes in API, leading up to 0.9 pre-beta and 1.0 beta release
+	- Created Apache::PageKit::Config, for configuration directives,
+		replacing Apache::PageKit::Info
+	- Created Apache::PageKit::Content, for XML content
+	- Created content XML files for separation of
+		content from presentation
+	- Reorganized pagekit.org files into Model/View/Content/Controller
+		directories
+	- Rewrote pagekit.org site to use DBD::Sprite and Apache::Session::File
+		instead of MySQL, so could include in test suite without
+		requiring MySQL
+	- Used Apache::Test in test suite to test working copy of pagekit.org
+		web site.
+
+0.05  Tue Oct 31 14:12:00 2000 EST
+	- Added support for language localization
+	- No longer require that entry in page.xml exist for all pages
+	- Replaced View and Module templates with Include templates
+		view parameter in page.xml is no longer used
+	- Renamed ModuleCode to IncludeCode
+	- Added <PKIT_NETSCAPE> and <PKIT_INTERNET_EXPLORER> tags
+	- Added $pk->redirect method
+	- Added $pk->continue method
+
+0.04  Tue Aug 29 13:12:53 2000 EST
+        - Added support for <TMPL_LOOP> XML tag
+        - modified pagekit.org to use <TMPL_LOOP>
+
+0.03  Tue Aug 29 00:13:33 2000 EST
+        - Replaced use of Apache::Session with adaption of
+		HTML::Embperl::Session
+
+0.02  Mon Aug 28 18:44:15 2000 EST
+	- Added XML Support for attributes and <TMPL_VAR> Elements
+
+0.01  Thu Aug 24 16:30:34 2000 EST
+	- original version; created by h2xs 1.20 with options
+		-X -n Apache::PageKit

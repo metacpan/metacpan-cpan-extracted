@@ -1,0 +1,49 @@
+0.20 -- Thu, 26 Jan 2017 16:12:46 +0300
+  [CHANGES]
+    * --escapes option
+    * --sort-keys option
+    * --minimal option now supports by ddp
+    * add hash separator for ddp output
+    * add deepcopy for perl output (booleans without refs to $VAR1)
+
+  [BUGFIXES]
+    * fix bug with --max-depth and booleans
+
+0.19 -- Mon, 16 Jan 2017 01:56:20 +0300
+  [CHANGES]
+    * add yaml output format
+    * change dependency from JSON::XS to JSON
+
+  [BUGFIXES]
+    * fix bug with --no-filename
+    * fix bug with --boolean on some systems
+    * fix bug with "'" at perl output
+
+0.18 -- Sun, 08 Jan 2017 22:35:21 +0300
+  [CHANGES]
+    * remove dependency from the URI::Split
+    * decode uri symbols at fragment and path for --url-parse
+    * --invert-match option
+    * --boolean option
+    * --select-tiny option
+
+  [BUGFIXES]
+    * correct parsing of the urls query
+
+0.17 -- Sat, 07 Jan 2017 16:27:30 +0300
+  [BUGFIXES]
+    * Fix utf8 bugs
+
+0.16 -- Fri, 06 Jan 2017 14:19:19 +0300
+  [CHANGES]
+    * --url-parse option
+    * --exec option
+    * ignore case for select
+
+  [BUGFIXES]
+    * max_depth and boolean types for json output
+
+0.15 -- Thu, 05 Jan 2017 20:31:28 +0300
+  * First version with Changes file
+  * Added options '--substing' and '--ignore-case'
+  * Changed "_" to "-" in options

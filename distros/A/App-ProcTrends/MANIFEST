@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/App/ProcTrends/Config.pm
+lib/App/ProcTrends/Cron.pm
+lib/App/ProcTrends/Commandline.pm
+lib/App/ProcTrends/RRD.pm
+MANIFEST            This list of files
+README
+t/00-config.t
+t/01-cron.t
+t/02-commandline.t
+t/03-rrd.t
+bin/cmdline.pl
+bin/cron.pl
+bin/img.pl
+bin/server.pl
+Makefile.PL
+META.yml
+META.json

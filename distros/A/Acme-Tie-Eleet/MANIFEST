@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Acme/Tie/Eleet.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/01-pod.t
+t/02-pod-coverage.t
+t/10-case_mixer.t
+t/11-extra_sent.t
+t/12-letters.t
+t/13-quotes.t
+t/14-spacer.t
+t/15-words.t

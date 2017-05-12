@@ -1,0 +1,5 @@
+MANIFEST
+README
+Makefile.PL
+MyFile.pm
+test.pl

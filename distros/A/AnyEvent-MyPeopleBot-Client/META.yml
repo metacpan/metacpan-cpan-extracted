@@ -1,0 +1,22 @@
+---
+abstract: 'MyPeopleBot API in an event loop'
+author:
+  - 'Hyungsuk Hong <hshong@perl.kr>'
+build_requires:
+  Test::More: 0
+  strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-MyPeopleBot-Client
+requires:
+  AnyEvent: 0
+  AnyEvent::HTTP::ScopedClient: 0
+  Moose: 0
+  namespace::autoclean: 0
+version: 0.0.2

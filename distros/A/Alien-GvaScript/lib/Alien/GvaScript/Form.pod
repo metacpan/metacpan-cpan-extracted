@@ -1,0 +1,496 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+Alien::GvaScript::Form - Wrapper around HTML Forms
+
+=head1 SYNOPSIS
+
+  <form id="my_form" onsubmit="return false;">
+    <div repeat="foo">
+      <h2>Foo #{foo.count}</h2>
+      <input type="text" name="person.name"/>
+      <input type="text" name="person.bdate"/>
+      This is the repeated foo section
+      <table>
+        <tr repeat="bar">
+          <td>Item #{bar.count}</td>
+          <td><input name="#{bar.path}.buz"></td>
+          <td><button onclick="GvaScript.Form.remove('#{bar.path}')">
+                Remove this row
+              </button></td>
+        </tr>
+      </table>
+       <button onclick="GvaScript.Form.add('#{foo.path}.bar')">
+          Add a bar
+       </button>
+    </div>  
+    <button onclick="GvaScript.Form.add('foo')">Add a foo</button>
+  </form>
+
+  <script>
+    var gvascript_form = new GvaScript.Form('my_form', {
+      datatree: {name:'kitty', bdate:'01.01.1990'},
+      dataprefix: 'person',
+      // 'active' form elements 
+      registry: [
+        ['input', 'mouseover', function(event) {}],
+        ['input', 'mouseout',  function(event) {}],
+        ['input', 'change',    function(event, newv ,oldv) {}],
+        ['input', 'init',      function(event, newv) {}]
+      ],
+      // handlers to form's custom events
+      onInit: function(gva_form) {},
+      onRepeatBlockRemove: function(gva_form, arg) {
+        arg[0] // removed repeat name
+        arg[1] // removed repeat path
+      },
+      onRepeatBlockAdd: function(gva_form, arg) {
+        arg[0] // added repeat name
+        arg[1] // added repeat path
+      },
+      onChange: function(gva_form, event) {
+        // event.target -> element changed
+        // event.memo.oldvalue -> changed element's old value
+        // event.memo.newvalue -> changed element's new value
+      },
+      onSubmit: function(gva_form) {
+        // ....
+        // do form submission
+        // ....
+        if(success)               {gva_form.fire('AfterSubmit', arg)}
+        else 
+        if(data_validation_error) {gva_form.fire('DataValidationError', arg)}
+        else                      {gva_form.fire('SubmitFailure', arg)} 
+      },
+      onAfterSubmit: function(gva_form, arg) {},
+      onDataValidationError: function(gva_form, arg) {},
+      onSubmitFailure: function(gva_form, arg) {},
+      onBeforeDestroy: function(gva_form, arg) {}
+    }
+  </script>
+
+
+=head1 DESCRIPTION
+
+This module of L<Alien::GvaScript> manages forms with
+hierarchical fields and dynamically repeated sections.
+It works in close collaboration with  L<Alien::GvaScript::Repeat>.
+
+The design is partially inspired by the C<Web Forms 2.0> proposal
+(L<http://www.whatwg.org/specs/web-forms/current-work/>), but is 
+not an attempt to implement the proposed specification: there are
+some differences both in syntax and in semantics.
+
+=head1 Constructor
+
+  new GvaScript.Form(form_id[, options])
+
+=over 12
+
+=item form_id
+
+id of the HTML form to extend
+
+=item options
+
+hash of optional properties that would define the behavior of the form
+
+=over 
+
+=item datatree
+
+tree represention of the initial form data. 
+
+Ex: 
+
+  { 
+    name: 'barbie', 
+    age: '49', 
+    friends: [
+      { name: 'ken', age: '35' }, 
+      { name: 'jen', age: '55' }
+    ] 
+  }
+
+=item dataprefix
+
+sometimes it's helpful to prefix the html input names to give them 'context'.
+
+Ex: C<doll.name> C<doll.friends.0.name>.
+
+in this example, the dataprefix should be set to 'doll'
+
+=item registry
+
+a list of arrays C<[expression, eventName, handler]>.
+
+each item in the array would be passed over to the L</notify> method.
+
+=item onInit
+
+function to be called after the successful initialization of the GvaScript.Form instance.
+
+=item onRepeatBlockRemove
+
+function to be called after a block in a repeated section is removed
+
+Signature
+
+  function onRepeatBlockRemove(gva_form, arg) {
+    // gva_form : GvaScript.Form instance
+    // arg: array containing repeat name as first element and repeat path as second
+  }
+
+=item onRepeatBlockAdd
+
+function to be called after a block in a repeated section is added
+
+Signature
+
+  function onRepeatBlockAdd(gva_form, arg) {
+    // gva_form : GvaScript.Form instance
+    // arg: array containing repeat name as first element and repeat path as second
+  }
+
+=item onChange
+
+function to be called when any of the form's elements has changed or onAdd/onRemove of a repeatable section.
+
+Signature
+
+  function onChange(gva_form, event) {
+    // gva_form : GvaScript.Form instance
+    // event: Event object fired by the change on the form element
+    //        Has a memo object that has olvalue and newvalue set unless 
+    //        called from the Repeat module
+  }
+
+=item onBeforeSubmit
+
+function to be called directly before the form submits.
+
+Signature
+
+  function onBeforeSubmit(gva_form) {
+    // gva_form : GvaScript.Form instance
+    // return false if you want to stop the form from submitting
+  }
+
+=item onSubmit
+
+function to be called when the form is submit.
+
+Signature
+
+  function onSubmit(gva_form) {
+    // gva_form : GvaScript.Form instance
+    // use to fire 'onAfterSubmit', 'onSubmitFailure' or 'onDataValidationError'
+  }
+
+=item onBeforeDestroy
+
+function to be called right before the form instance calls the destroy method.
+
+Callback useful for doing some inhouse cleaning before the form gets removed from the DOM.
+
+=item on[XYZ]
+
+Event handlers for custom form events. The form instance should fire these events so as corresponding handler can be fired.
+
+=item actionsbar
+
+initializes and instance of L<Alien::GvaScript::ActionsBar>.
+
+Signature
+
+      actionsbar : {
+          container :  'container_id',
+          actions   : [
+              {
+                  label : 'Submit Form',
+                  type  : 'submit'
+              },
+              {
+                  label : 'Init Form',
+                  type  : 'button',
+                  callback : function() {
+                    // 'this' correspond to the button 
+                    GvaScript.Form.init('form', datatree);
+                  }
+              }
+          ]
+      }
+
+=back
+
+=back
+
+=head1 HTML
+
+=head2 Markup of repeat elements
+
+Repeat elements may occur outside of forms and therefore 
+are described in a separate document; 
+see L<Alien::GvaScript::Repeat>.
+
+=head2 Autofocus
+
+The L</init> method inspects all form elements for an
+C<autofocus> attribute; the first element that possesses
+this attribute automatically receives focus.
+
+Similarly, when a repetition block is added into 
+the form through the L</add> method, the first
+element within that repetition block that possesses
+an C<autofocus> attribute automatically receives focus.
+
+=head1 METHODS
+
+=head2 destroy
+
+  gvascript_form.destroy()
+
+instance destructor -  will unregister the GvaScript.Form instance from the GvaScript.Forms namespace and will remove all of its observers.
+
+=head2 getId
+
+  gvascript_form.getId()
+
+returns the id of the form element that the gvascript_form instance is wrapped around.
+
+=head2 fire
+
+  gvascript_form.fire(eventName[, arg])
+
+used to fire event on the for instance and thus called corresponding responders and instance callback.
+
+C<eventName>: eventName to fire without the 'on' prefix.
+
+
+C<arg> argument to send over to the corresponding responder(s) and callback.
+
+this method will 
+
+=over
+
+=item 1. 
+
+execute the early responders set the on[eventName]
+
+=item 2. 
+
+execute instance on[eventName] callback
+
+=item 3. 
+
+execute the responders set the on[eventName]
+
+=back
+
+execution sequence will stop whenever one of the responders or callback returns C<false>
+
+NOTE that the B<onBeforeSubmit, onSubmit> events cannot be notified programatically. 
+You actually need to call form.submit() for these events to be fired.
+
+=head2 register
+
+   gvascript_form.register(expression, eventName, handler)
+   GvaScript.Form.register(form, expression, eventName, handler)
+
+tells the form to watch the I<eventName> on elements that match the I<expression> and to fire the corresponding I<handler>.
+
+C<expression> (String) - A css selector
+
+C<eventName> (String) - The name of the event, in all lower case, without the "on" prefix — e.g., "click" (not "onclick"). 
+
+A custom B<"init"> event is also supported which is fired on an input that gets its value initialized with the initialization of the form.
+
+C<handler> (Function) - handler to fire.
+
+Signature
+
+  function handler(event[, newValue[, oldValue]]) {
+    event.target // element being observed
+  }
+
+C<newValue> is set for the C<change> and the C<init> events.
+
+C<oldValue> is set for the C<change>.
+
+B<NOTE:> Form.Element.setValue method is wrapped in GvaScript.ProtoExtensions module to programatically fire the blur event after setting the value on the input, and hence firing the change handler if any.
+
+[I<This method can be called either as an instance method or as a generic method. If calling as a generic, pass the form HTMLElement/id in as the first argument.>]
+
+=head2 unregister
+
+   gvascript_form.unregister(expression[, eventName[, handler]])
+   GvaScript.Form.unregister(form, expression[, eventName[, handler]])
+
+removes observers set on given C<expression>.  if C<eventName> is provided, will only stop observing that eventName.
+if C<handler> is also provided, will just stop calling this handler.
+
+NOTE that the same handler signature should be used in the register method for it to work in the unregister method.
+
+[I<This method can be called either as an instance method or as a generic method. If calling as a generic, pass the form HTMLElement/id in as the first argument.>]
+
+=head2 init
+
+   gvascript_form.init(initial_tree, prefix)
+   GvaScript.Form.init(form, initial_tree, prefix)
+
+C<form> is the id of a form (or directly the DOM element).  Optional
+C<initial_tree> is a javascript nested datastructure containing
+initial values for fields, that will be passed to the 
+L</fill_from_tree> method.
+
+[I<This method can be called either as an instance method or as a generic method. If calling as a generic, pass the form HTMLElement/id in as the first argument.>]
+
+=head2 to_hash
+
+  var flat_hash = GvaScript.Form.to_hash(form);
+
+Inspects the contents of all fields in C<form> and 
+returns a flat hash of pairs (key-value).
+
+[I<This method can be called either as an instance method or as a generic method. If calling as a generic, pass the form HTMLElement/id in as the first argument.>]
+
+=head2 to_tree
+
+  var tree = GvaScript.Form.to_tree(form);
+
+Inspects the contents of all fields in C<form> and 
+returns a data tree, were dotted names in form names
+are expanded into sub-arrays or sub-hashes. So for example 
+if the form looks like
+
+  <input name="father.firstname"> <input name="father.lastname"><br>
+  <input name="mother.firstname"> <input name="mother.lastname"><br>
+  <div repeat="child" repeat-start="1">
+    <input name="#{child.path}.firstname"><br>
+  </div>
+
+and if that form has been expanded with 3 repetition blocks
+for children, the resulting tree would be
+
+  { "father" : {"firstname" : ..., "lastname": ...},
+    "mother" : {"firstname" : ..., "lastname": ...},
+    "child"  : [ {"firstname": ...},
+                 {"firstname": ...},
+                 {"firstname": ...} ] }
+
+[I<This method can be called either as an instance method or as a generic method. If calling as a generic, pass the form HTMLElement/id in as the first argument.>]
+
+=head2 fill_from_tree
+
+  GvaScript.Form.fill_from_tree(form, field_prefix, tree);
+
+Fills the form from values found in C<tree> (this is the 
+reverse of the L</to_tree> operation).
+Optional C<field_prefix> is prepended to key names in C<tree> for
+finding the corresponding form fields.
+
+The method walks through nested subtrees in C<tree>: the sequence
+of keys leading to a leaf is concatenated into a flat string, with dot 
+separators, and if the form has a corresponding input element,
+the value of that element is set to the value of the leaf.
+Furthermore, if the initial tree contains repeated data sets
+(array subtrees), and if the form contains repeat elements
+with the same path, then new repetition blocks are 
+dynamically created to match the number of items in the array:
+so if the form above is filled with the following tree
+
+  { "child"  : [ {"firstname": "Abel"},
+                 {"firstname": "Bob"},
+                 {"firstname": "Cod"},
+                 {"firstname": "Dave"}, ] }
+
+then four repetition blocks will automatically created in the form.
+
+[I<This method can be called either as an instance method or as a generic method. If calling as a generic, pass the form HTMLElement/id in as the first argument.>]
+
+=head2 add
+
+  GvaScript.Form.add(repeat_name, count);
+
+Creates one or several new repetition blocks.  The parameter C<count>
+is optional and defaults to 1.  Focus is automatically given to the
+first input element in the last repetition block that has an
+C<autofocus> attribute (if any).
+
+See L<Alien::GvaScript::Repeat/add> for more explanations on
+the C<add> operation.
+
+=head2 remove
+
+  GvaScript.Form.remove(repeat_block[, live_update]);
+
+Removes a repetition block from the DOM. The argument is either
+a DOM element or a string containing the element id.
+
+param C<Boolean> live_update: flag to indicate whether the 'remaining'
+repeatable sections are to be also removed from DOM, recreated by re-merging
+the data with repeat template, then finally re-appended to the DOM.
+Default true.
+
+All repetition blocks above the removed block are renumbered,
+leaving no hole in the index sequence. To do so, these
+blocks are also removed from the DOM, and then added
+again through the L</add> method. This operation is implemented
+by L<Alien::GvaScript::Repeat/remove>.
+
+The recreated blocks are then re-populated with their
+previous input values.
+
+=head2 autofocus
+
+  GvaScript.Form.autofocus(element);
+
+Inspects DOM children of  C<element>, and gives focus to the 
+first child that has an C<autofocus> attribute.
+
+=head1 GvaScript.Forms 
+
+namespace that holds all active instances of GvaScript.Form 
+
+instances are unique per form id
+
+=head2 METHODS 
+
+=head3 get
+
+  GvaScript.Forms.get(id)
+
+finds and returns the GvaScript.Form instance where id is the unique id of the form HTMLElement. 
+
+=head1 GvaScript.Form.Responders
+
+A repository of global listeners notified about every step of the GvaSript.Form lifecycle.
+
+Sometimes, you need to provide generic behaviors over all GvaScript.Form(s) in a single application.
+
+To achieve this, GvaScript.Form provides global Responders that will be executed for every GvaScript.Form instance.
+
+Responders by default are executed B<after> the instance specific event callback.
+
+
+=head2 METHODS
+
+=head3 register
+
+  GvaScript.Form.Responders.register({eventName: handler}[, {eventName: handler}[, ...]]})
+
+adding one or more global form events responders.
+
+Supported B<eventNames>: C<onInit, onChange, onBeforeSubmit, onSubmit, on[XXX]> where C<on[XXX]> is a custom event name.
+
+=head3 unregister
+
+  GvaScript.Form.Responders.unregister({eventName: handler}[, {eventName: handler}[, ...]]})
+
+unregistering one or more global form events responders.
+
+
+=head1 GvaScript.Form.EarlyResponders
+
+Identical to GvaScript.Form.Responders except that these responders would be executed B<before> the instance specific callback.

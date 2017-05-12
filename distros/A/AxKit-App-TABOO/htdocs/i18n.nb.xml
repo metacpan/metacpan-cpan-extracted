@@ -1,0 +1,183 @@
+<?xml version="1.0"?>
+<translations
+  xmlns="http://www.kjetil.kjernsmo.net/software/TABOO/NS/I18N/Texts" xml:lang="nb">
+
+  <text id="submit-by"> Innsendt av </text>
+  <text id="posted-by"> Postet av </text>
+  <text id="by"> Av </text>
+  <text id="to-cat"> Til kategori </text>
+  <text id="on-time"> Dato </text>
+  <text id="last-changed"> Sist endret </text>
+
+
+  <text id="submit-story"> Send inn nyhetssak </text>
+  <text id="submit-article"> Send inn artikkel </text>
+  <text id="submit-comment"> Legg inn kommentar </text>
+  <text id="story-stored"> Nyhetssak lagret </text>
+  <text id="editors-will-check"> Hvis det er nødvendig vil våre redaktører se over ditt innsendte innlegg og godkjenne det før det kommer fram for alle brukere. </text>
+  <text id="comment-stored"> Kommentar lagret og lagt til </text>
+  <text id="submit-story-menu"> Send inn sak </text>
+  <text id="submit-article-menu"> Send inn artikkel </text>
+  <text id="article-descr"> Overskriften til artikkelen </text>
+  <text id="article-title"> Tittel </text>
+  <text id="comment-descr"> Overskriften til kommentaren </text>
+  <text id="comment-title"> Tittel </text>
+  <text id="article-description-descr"> En beskrivelse av innholdet i artikkelen. Denne beskrivelsen vil gjerne opptre utenfor kontekst, og må derfor gi mening kun sammen med tittelen. Maks 254 tegn. </text>
+  <text id="article-description"> Beskrivelse </text>
+
+  <text id="article-file-upload-descr"> Du kan enten sende en fil til serveren ved å bruke dette feltet, eller skrive inn tekst og et kort navn under. </text>
+  <text id="article-file-upload"> Opplasting av fil </text>
+  <text id="article-filename-descr"> Hvis du ikke laster opp en fil må du likevel gi et navn for artikkelen som vil brukes i blant annet adressen, og skal være bare små bokstaver og tall men ingen mellomrom. Den kan være sammensatt av flere ord. </text>
+  <text id="article-filename"> Saksnavn </text>
+  <text id="article-textstring-descr"> Selve teksten til artikkelen kan skrives inn i feltet under. </text>
+  <text id="article-textstring"> Artikkel-tekst </text>
+
+  <text id="comment"> kommentar </text>
+  <text id="comments"> Kommentarer </text>
+  <text id="comments-verb"> kommenterer </text>
+  <text id="you-respond-to"> Du svarer på denne kommentaren: </text>
+  <text id="reply-to-this"> Svar på denne </text>
+  <text id="thread-below"> alle under denne </text>
+  <text id="everything-linktext"> Hele saken og alle kommentarer </text>
+
+
+  <text id="minicontent"> Ingress </text>
+  <text id="minicontent-descr"> Skriv inn det første avsnittet eller
+  ingressen til saken her. Denne vil opptre på lister over artikler,
+  på forsiden osv, med linker til resten. </text>
+
+  <text id="content"> Innholdet </text>
+  <text id="content-descr"> Skriv inn resten av innholdet her. </text>
+
+  <text id="descriptive-image"> Et beskrivende bilde </text>
+  <text id="descriptive-image-descr"> Adressen til et beskrivende bilde. </text>
+
+  <text id="linktext"> Linketekst </text>
+  <text id="linktext-descr"> Skriv inn en god, beskrivende tekst som skal brukes
+  til linken for resten av saken "Les mer" er et vanlig, men svært
+  dårlig valg. </text>
+
+  <text id="categorized-content"> Kategorisert innhold </text>
+  <text id="primcat"> Primær kategori </text>
+  <text id="primcat-descr"> Angi primær kategorisering for artikkelen.
+  Bruker et kontrollert vokabular. </text>
+
+  <text id="language"> Naturlig språk </text>
+  <text id="language-descr"> Angi språket artikkelen er skrevet på. </text>
+
+  <text id="article-sectionid"> Seksjon </text>
+  <text id="article-sectionid-descr"> Velg hvilken seksjon artikkelen
+  skal postes til. </text>
+  <text id="article-sectionid-descr-editorhelp"> En nypostet artikkel vil havne i en egen seksjon for redaktørens godkjennelse. Redaktøren må flytte den over i riktig seksjon når artikkelen godkjennes. </text>
+
+
+  <text id="editorok"> Redaktørens godkjennelse </text>
+  <text id="editorok-descr"> Kryss av for å angi at artikkelen er
+  godkjent for publisering. </text>
+
+  <text id="storyname"> Saksnavn </text>
+  <text id="storyname-descr"> Skriv inn et navn for saken. Dette vil brukes i blant annet adressen, og skal være bare små bokstaver og tall men ingen mellomrom. Den kan være sammensatt av flere ord.</text>
+  <text id="storyname-descr-editorhelp"> Når en vanlig bruker poster får saken et tilfeldig fem-siffers tall. Redaktøren bør bytte ut dette med et nogenlunde beskrivende ord. </text>
+
+  <text id="submitterid"> Innsenders ID </text>
+  <text id="submitter"> Innsender </text>
+  <text id="submitterid-descr"> Brukernavnet til den som sendte inn
+  artikkelen. </text>
+
+  <text id="authorid"> Forfatters ID </text>
+  <text id="authorid-descr"> Brukernavnet til forfatteren av artikkelen. Alle forfattere bør registreres i systemet. </text>
+
+
+  <text id="user-name"> Fullt navn </text>
+  <text id="username"> Brukernavn </text>
+  <text id="user-email"> Epost </text>
+  <text id="user-bio"> Biografi </text>
+  <text id="uri"> URI </text>
+  <text id="homepage"> Hjemmeside </text>
+  <text id="login"> Login </text>
+  <text id="password"> Passord </text>
+  <text id="authlevel"> autorisasjonsnivå </text>
+  <text id="new-password"> Nytt passord </text>
+  <text id="register"> Registrer </text>
+
+  <text id="suggested-user-exists"> Brukernavnet er allerede i bruk eller er ugyldig! </text>
+  <text id="suggested-user-stored"> Brukerinformasjonen ble lagret! </text>
+
+  <text id="suggested-cat-exists"> Kategorinavnet er allerede i bruk! </text>
+  <text id="suggested-cat-stored"> Kategori-informasjonen ble lagret! </text>
+  <text id="problem-occured"> Problemer oppsto </text>
+  <text id="unknown-problem"> Et problem med ukjent årsak </text>
+  <text id="either-upload-or-filename"> Du må enten gi et kort filnavn sammen med tekst i tekstfeltet eller laste opp en fil</text>
+  <text id="nosave-problem"> Artikkelen ble ikke lagret som forventet. Du kan prøve å gi den et annen navn eller kontakte webmaster</text>
+
+
+  <text id="listing-everything"> Lister opp alle saker </text>
+  <text id="list-noun"> liste </text>
+  <text id="overview"> Oversikt </text>
+  <text id="article-no-comments"> Artikkel uten kommentarer </text>
+  <text id="edit"> Rediger </text>
+  <text id="send"> Send </text>
+  <text id="search"> Søk </text>
+  <text id="preview"> Forhåndsvisning </text>
+  <text id="previous"> forrige </text>
+  <text id="update"> Oppdater </text>
+  <text id="change"> Endre </text>
+  <text id="repeat"> Gjenta </text>
+  <text id="not-found"> ikke funnet </text>
+  <text id="suggest"> Foreslå </text>
+  <text id="missing"> mangler</text>
+
+  <text id="top"> Topp </text>
+  <text id="me"> Meg </text>
+  <text id="for"> for </text>
+  <text id="to"> til </text>
+  <text id="or"> eller </text>
+  <text id="and"> og </text>
+  <text id="with"> med </text>
+  <text id="just"> bare </text>
+  <text id="new"> ny </text>
+
+  <text id="stories-title-menu"> Nyheter </text>
+  <text id="articles-title-menu"> Artikler </text>
+  <text id="sections-menu"> Seksjoner </text>
+  <text id="category-menu"> Klassifiseringskategorier </text>
+  <text id="frees-menu"> Frie emneord </text>
+  <text id="angles-menu"> Synsvinkler </text>
+  <text id="users-title-menu"> Bruker </text>
+  <text id="cats-title-menu"> Kategorier </text>
+  <text id="subqueue-story-menu"> Se innsendte </text>
+  <text id="submit-new-user"> Ny bruker </text>
+  <text id="user-info"> Brukerinformasjon </text>
+
+  <text id="new-username-descr"> Velg et ett-ords brukernavn. Det kan være opptil 8 tegn, bruk kun små bokstaver fra det engelske alfabetet. Dette vil også brukes i adressen til kommentarer du poster. </text>
+  <text id="new-fullname-descr"> Oppgi ditt fulle navn </text>
+  <text id="new-email-descr"> Oppgi en gyldig e-post adresse. Passordet ditt vil sendes til denne adressen. </text>
+  <text id="new-uri-descr"> Oppgi adressen til hjemmesiden din </text>
+  <text id="new-bio-descr"> Skriv inn en kort tekst som beskriver deg </text>
+
+  <text id="to-change-passwd-descr"> For å forandre passord, gi det
+  nye passorder to ganger. </text>
+
+  <text id="authlevel-descr"> Autorisasjonsnivået bestemmer hva du får
+  lov til å gjøre på sidene. </text>
+  
+  <text id="password-valid"> Passordet ble funnet å være gyldig. </text>
+  <text id="password-invalid"> Passordet du gav ble ikke funnet å være
+  gyldig. </text>
+  <text id="username-not-found"> Brukernavnet du ga passer ikke med
+  noen brukere på dette systemet. </text>
+  <text id="return-to-top-page"> Gå tilbake til hovedsiden av </text>
+  <text id="the-previous-page"> siden du kom fra </text>
+
+  <text id="submit-new-category"> Ny kategori </text>
+  <text id="catname"> Kategorinavn i kortversjon </text>
+  <text id="new-catname-descr"> Velg et kategorinavn i kortversjon. Dette skal være kun ett ord, det kan være opptil 15 tegn, bruk kun små bokstaver fra det engelske alfabetet. Dette vil ofte finnes i adressen til sidene. </text>
+
+  <text id="cat-name"> Kategorinavn </text>
+  <text id="new-catfullname-descr"> Kategorinavnet slik det vil fremstå for lesere av siden. </text>  
+  <text id="cat-uri-descr"> Å identifisere ting og kategorier ved hjelp av såkalte URIer er en viktig ting i framtidens web. Det er lurt å bruke termer fra f.eks. WordNet, men hvis du ikke vet hva vi snakker om her, la denne være åpen og overlat det til administrator. </text>
+  <text id="cattype"> Type av kategori </text>
+  <text id="new-cattype-descr"> Man kan lage nye kategorier, enten som frie emneord, i et kontrollert vokabular til primær eller sekundær klassifikasjon, eller som seksjon til nyhetssidene. </text>
+  <text id="cat-description"> Beskrivelse </text>
+  <text id="cat-description-descr"> En beskrivelse av kategorien. Denne beskrivelsen vil gjerne opptre utenfor kontekst, og må derfor gi mening kun sammen med navnet. Maks 254 tegn. </text>
+</translations>

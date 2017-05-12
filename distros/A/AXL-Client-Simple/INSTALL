@@ -1,0 +1,14 @@
+WHAT IS THIS?
+
+This is AXL::Client::Simple, a Perl module.
+Please see the README that comes with this distribution.
+
+HOW DO I INSTALL IT?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install

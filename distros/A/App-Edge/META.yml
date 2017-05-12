@@ -1,0 +1,29 @@
+---
+abstract: 'show the edge of logs with conditional grep'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Test::More: 0.88
+  Test::Output: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Edge
+provides:
+  App::Edge:
+    file: lib/App/Edge.pm
+    version: 0.03
+requires:
+  Getopt::Long: 2.42
+  Pod::Usage: 0
+  perl: 5.008001
+resources:
+  bugtracker: http://github.com/bayashi/App-Edge/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/App-Edge
+version: 0.03

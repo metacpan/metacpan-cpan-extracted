@@ -1,0 +1,11 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Authen/Users.pm
+t/01_test.t
+t/02_pod.t
+t/03_pod_coverage.t
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

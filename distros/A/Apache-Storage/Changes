@@ -1,0 +1,9 @@
+Revision history for Perl extension Apache::Storage
+
+1.0 Wed Feb 14 18:25:53 GMT-8 2001
+	- and so it begins.
+
+1.1 Tue Feb 20 17:43:47 PST 2001
+	-Updated the README.
+	-Fixed it so that make test would not fail.
+

@@ -1,0 +1,25 @@
+Genericize for any usage:
+* adapt it to other (non-boardgame) workloads
+  * Break the players=2 assumption
+    * Get the necessary metadata into the Physics plugins, to allow the
+      tournament system to figure out how many critters to put into each match.
+    * Handle the n=1 case
+    * Handle the n>2 case
+  * Break the direct-competition assumption
+    * Physics->double_match should become an internal method; it shouldn't be
+      called directly.
+    * Maybe Physics plugins should implement a specific ->fight()
+
+More Physics plugins:
+* Go
+* OCR
+* Speech recognition
+* Weather prediction
+
+Portability:
+* I know it works on linux
+* I doubt it works anywhere else.  (patches and test reports welcome)
+
+Other issues:
+* Disable migration by default.
+* Figure out why L::B hangs sometimes, and fix that.

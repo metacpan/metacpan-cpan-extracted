@@ -1,0 +1,68 @@
+#!/bin/sh
+#
+# Copyright 2013 Timo Benk
+# 
+# This file is part of nrun.
+# 
+# nrun is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# nrun is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with nrun.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Program: <FILE>
+# Author:  <AUTHORNAME> <<AUTHOREMAIL>>
+# Date:    <COMMITTERDATE>
+# Ident:   <COMMITHASH>
+# Branch:  <BRANCH>
+#
+# <CHANGELOG:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s>
+#
+
+PUBK="$1"
+USER="$2"
+PASS="$3"
+
+cat <<"EOF" | sed 's/^  //' | /usr/bin/expect - "$TARGET_HOST" "$PUBK" "$USER" "$PASS"
+
+  set host [lindex $argv 0]
+  set pubk [lindex $argv 1]
+  set user [lindex $argv 2]
+  set pass [lindex $argv 3]
+  
+  send "$host $pubk $user $pass\n"
+  
+  set fkey [open $pubk r]
+  set data [read $fkey]
+  
+  set data [string trimright "$data"]
+  
+  set timeout 60
+  
+  spawn ssh $user@$host
+  
+  expect {
+    "yes/no"   { send "yes\r"   }
+    "assword:" { send "$pass\r" }
+  }
+  
+  send "echo S\"\"tArToFkEyUpDaTe\r"
+  expect "StArToFkEyUpDaTe"
+  
+  send "test -d .ssh || mkdir .ssh\r"
+  send "chmod 0600 .ssh\r"
+  send "PUBK='$data'\r"
+  send "test -f .ssh/authorized_keys && grep -v \"\$PUBK\" .ssh/authorized_keys >/tmp/authorizes_keys\r"
+  send "echo \"\$PUBK\" >> tmp/authorized_keys\r"
+  send "mv tmp/authorized_keys .ssh/authorized_keys\r"
+  
+  send "echo E\"\"nDoFkEyUpDaTe\r"
+  expect "EnDoFkEyUpDaTe"
+EOF

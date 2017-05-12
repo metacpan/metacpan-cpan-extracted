@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: Acme-VerySign
+version: 1.00
+license: perl
+distribution_type: module
+requires:
+  Symbol::Approx::Sub: 2.00
+recommends:
+  Text::Metaphone: 0
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  Acme::VerySign:
+    file: lib/Acme/VerySign.pm
+    version: 1.00
+generated_by: Module::Build version 0.18_02

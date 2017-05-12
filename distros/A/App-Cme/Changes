@@ -1,0 +1,182 @@
+1.019 2017-04-30
+
+  This release brings some improvements:
+    * run: allow to use command args in var: lines
+    * cme: add '-verbose [ info | debug | trace ]' option to
+      get debug logs
+
+  Other bug fixes:
+    * do not replace hash variable in run script
+
+1.018 2017-04-07
+
+  This release improve 'cme run' command to make it more useful:  
+    * add -list option
+    * can compute script variables (var: section)
+    * can use environment variables 
+    * add possibility for scritps to provide their own doc
+      displayed with 'cme run xxx -doc'
+    * die when if a script variable is not defined
+    * look for system scripts in /usr/share/
+    * add bash completion for cme run command
+
+  Other changes:
+    * save option can now be used with all subcommand
+
+1.017 2017-03-05
+
+  This release bring a new cme sub-command to let you create
+  small configuration scripts: cme run
+
+  Misc:
+    * update © years
+
+1.016 2016-12-12
+
+  Bug fix:
+   * check command: propagate -force option to skip load check
+   * dump command must always be in quiet mode
+
+1.015 2016-10-14
+
+  Bug fix:
+   * cme: support utf8 in command args (Debian #839593)
+
+1.014 2016-09-24
+
+  Improvements:
+    * run deep_check when running commands check, edit, modify, shell
+      (requires Config::Model 2.089)
+    * improved error msg for unknown app (Closes Debian #836794)
+
+  Bug fix:
+    * cme: fix -strack-trace option
+
+1.013 2016-07-10
+
+  Usability improvements:
+    * clarify doc of -strict option (check cmd)
+    * fix typo in pod doc (tx Thomas Schmitt)
+    * suggest 'cme fix' when 'cme check' finds warnings
+    * add CONTRIBUTE.md
+
+1.012 2016-05-29
+
+  Bug fix:
+    * edit command degrades gracefully when recommended packages
+      are not isntalled
+    * shell command degrades gracefully without Term::ReadLine
+
+1.011 2016-04-21
+
+  New functionality:
+    * dump command can dump any config file(s) in YAML, JSON
+      or Perl format.
+
+1.010 2016-01-30
+
+  New functionality:
+  * Can read configuration directory from application
+    file, e.g. user.d/ssh. This will help reuse Model
+    between applications (e.g. systemd and
+    systemd --user).
+    This requires Config::Model 2.077
+
+  Bug fix:
+  * cme list: fix -dev option option (Debian #813188)
+
+1.009 2016-01-02
+
+  Bug fix release:
+  * remove warning about missing config file. It's better to
+    let the read/write backend handle bogus config file
+  * update command: improved messages shown to user
+  * list command: now work with -dev option
+
+1.008 2015-11-14
+
+  Bug fix release:
+    * fix -save option with modify command
+    * fix -try-app-as-model option
+
+1.007 2015-10-25
+
+  Usability improvements:
+    * cme: added -file option to replace '~~' argument
+    * bash_completion: added update sub command
+  Doc fixes:
+    * cme: fixed synopsis
+    * cme: added update doc
+
+1.006 2015-07-19
+
+    Doc fix release:
+    * cme edit doc: don't abuse L<> tag which are change in "the xxx manpage"
+    * cme list: improve help shown to user
+    * cme help: transform pod to text to avoid showing pod markup
+    * cme fix: corrected small mistakes in doc
+    * cme check: added another example in pod doc
+
+1.005 2015-05-25
+
+   * all: fixed confusing unwarranted warning message (about ~~ argument)
+
+1.004 2015-05-25
+
+    Mostly a bug fix release.
+    Please use now github to report issues on cme
+    ( https://github.com/dod38fr/cme-perl/issues )
+
+    * metadata:
+      * switched bugtracker to github's
+      * fixed repo and website urls (Tx xtaran)
+    * all: add a warning if conf file is not found (may mean a
+      missing ~~ argument). (I'd welcome ideas on how to replace this
+      iffy ~~ argument)
+    * dump command:
+      + added possibility to select a node to dump
+      * fixed -dumptype which is not mandatory
+    * test can run with local cme or system cme to fix debian continuous
+      integrations tests
+
+1.003 2015-04-26
+
+  Bug fix release:
+
+    * Common: pass cme messages through on_message_cb
+    * update: call C::M::Instance->update
+      (require Config::Model 2.068)
+    * dump: remove debug call to YYY
+
+1.002 2015-01-10
+
+    * gen-class-pod:
+	  * fix doc and missing command arguments
+    * update:
+	  + added -edit option to run editor after an update
+      * fix typo in pod doc
+    * dist.ini: updated © to 2015
+
+1.001 2014-11-29
+
+    * require Config::Model 2.063 (to avoid bash_completion clash)
+    * improved messages printed by update command
+    * added 'gen-class-pod' alias for gen_class_pod
+    * bash_completion:
+      + added help version commands update in hard-coded list of commands
+      * fixed syntax error
+
+0.001 2014-11-25
+
+    First release of App::Cme.
+
+    These are the changes done to cme compared to the old cme shipped
+    with Config::Model 2.061:
+
+    * Cme has been re-written with App::Cmd
+    - old mechanism for cme extension is removed. Extensions support
+      is provided by App::Cmd
+    + added gen_class_pod and update commands
+    + added -quiet option to suppress progress messages
+    * fix mistached options wrt available commands in bash_completion
+    * added -root-dir option (used for tests)

@@ -1,0 +1,59 @@
+# Messages for mamgal program.
+# Copyright (C) 2007-2008 Marcin Owsiany <marcin@owsiany.pl>
+# This file is distributed under the same license as the mamgal package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mamgal 0.01\n"
+"Report-Msgid-Bugs-To: Marcin Owsiany <marcin@owsiany.pl>\n"
+"POT-Creation-Date: 2009-08-08 19:01+0100\n"
+"PO-Revision-Date: 2008-12-10 18:18+0000\n"
+"Last-Translator: Marcin Owsiany <marcin@owsiany.pl>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/App/MaMGal/EntryFactory.pm:71
+#, perl-format
+msgid "Internal Error: [%s] does not end with a base name."
+msgstr "Błąd wewnętrzny: [%s] nie kończy się nazwą bazową."
+
+#. TRANSLATORS: This text will appear literally where no thumbnail is avaialable
+#. for a given object.
+#. Please use &nbsp; for whitespace, to avoid line breaks.
+#: lib/App/MaMGal/Formatter.pm:60
+msgid "[no&nbsp;icon]"
+msgstr "[brak&nbsp;obrazka]"
+
+#. TRANSLATORS: This text will appear literally where no path is
+#. avaialable for a given film.
+#. Please use &nbsp; for whitespace, to avoid line breaks.
+#: lib/App/MaMGal/Formatter.pm:74
+msgid "[no&nbsp;film]"
+msgstr "[brak&nbsp;filmu]"
+
+#. TRANSLATORS: The following three are for navigation on a slide page (&lt; is shown as <, and &gt; as >)
+#: lib/App/MaMGal/Formatter.pm:87
+msgid "&lt;&lt; prev"
+msgstr "&lt;&lt poprzednie"
+
+#: lib/App/MaMGal/Formatter.pm:88
+msgid "next &gt;&gt;"
+msgstr "następne &gt;&gt;"
+
+#: lib/App/MaMGal/Formatter.pm:89
+msgid "Up a dir"
+msgstr "do góry"
+
+#: lib/App/MaMGal/Formatter.pm:91
+msgid "This directory is empty"
+msgstr "Ten katalog jest pusty"
+
+#. TRANSLATORS: This is the text of the link from a slide page to the index page.
+#: lib/App/MaMGal/Formatter.pm:160
+msgid "index"
+msgstr "do listy zdjęć"
+
+#: lib/App/MaMGal/Formatter.pm:180
+msgid "Download"
+msgstr "Pobierz"

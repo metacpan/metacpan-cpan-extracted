@@ -1,0 +1,5 @@
+MANIFEST
+README
+Makefile.PL
+lib/Authen/Perl/NTLM.pm
+t/NTLM.t

@@ -1,0 +1,435 @@
+=head1 NAME
+
+AI::Prolog::Builtins - Builtin predicates that AI::Prolog supports
+
+=head1 REVISION
+
+ $Id: Builtins.pod,v 1.9 2005/08/06 23:28:40 ovid Exp $
+
+=head2 Comments
+
+Comments begin with a C<%> and terminate at the end of the line or begin with
+C</*> and terminate with C<*/>. 
+
+=head2 Variables
+
+As in Prolog, all variables begin with an upper-case letter and are not quoted.
+In the following example, C<STUFF> is a variable.
+
+ steals(badguy, STUFF, "Some rich person").
+
+=head2 Constants
+
+Constants begin with lower-case letters.  If you need a constant that begins
+with an upper-case letter or contains spaces or other non-alphanumeric
+characters, enclose the constant in single or double quotes  The quotes will
+not be included in the constant.
+
+In the following example, C<badguy> and C<Some rich person> are both constants:
+
+ steals(badguy, STUFF, "Some rich person").
+
+=head2 Miscellaneous
+
+This will not work:
+
+ p(X) :- X. /* does not work */
+
+Use this instead:
+
+ p(X) :- call(X).
+
+=head1 BUILTINS
+
+=over 4
+
+=item !/0
+
+The "cut" operator.  This is used when you wish to tell Prolog that you only
+need to satisfy a goal once.  For example, if you wish to deny someone the
+right to rent videos if they have overdue videos, you might use the cut
+operator as soon as you see they have any overdue video.  The fact that they
+have more than one overdue video doesn't matter.
+
+See the C<cut.pl> program in the C<examples/> directory that comes with this
+distribution.
+
+=item assert/1
+
+Add new facts to the database.  Only facts can be added, not rules.  This may
+change in the future.  See C<retract(X)>.
+
+ assert(loves(ovid,perl)).
+
+=item call/1
+
+Invokes C<X> as a goal.
+
+=item consult/1
+
+Supplied the name of a file containing Prolog code, this will consult the
+Prolog code in the file and add its contents to the current knowledgebase.
+
+Will warn if the file cannot be opened.
+
+=item div/2
+
+Succeeds if both terms are bound.  The value of the term is X / Y.
+Use with C<is(X,Y)>.
+
+ is(X, div(N,3)).
+
+This is the internal form of the infix operator:
+ 
+ N / 3.
+
+=item eq/2
+
+Succeeds if C<X> and C<Y> are equal.
+
+This is the internal form of the infix operator:
+
+ X == Y.
+
+=item fail/0
+
+This goal always fails.  Useful when you've reached a condition you
+know should not succeed.
+
+  kill(Hero, Beast) :-
+    not(has_weapon(Hero)), fail.
+
+=item ge/2
+
+Succeeds if both terms are bound and X >= Y.
+
+This is the internal form of the infix operator:
+
+ X >= Y.
+
+=item gt/2
+
+Succeeds if both terms are bound and X > Y.
+
+This is the internal form of the infix operator:
+
+ X > Y.
+
+=item halt/1
+
+In the C<aiprolog> shell, exist shell.  Currently has no other effect.
+
+=item if/3
+
+If C<X> succeeds as a goal, try C<Y> as a goal.  Otherwise, try C<Z>.
+
+ thief(badguy).
+ steals(PERP, X) :-
+   if(thief(PERP), eq(X,rubies), eq(X,nothing)).
+
+=item is/2
+
+If X is unbound and Y is bound to a number, the goal succeeds and X becomes
+bound to the value of Y.  Otherwise, succeeds if both terms are bound, numbers,
+and equal.
+
+All other conditions result in failure.
+
+This is the internal form of the infix operator:
+
+ X is Y.
+
+=item le/2
+
+Succeeds if both terms are bound and X <= Y.
+
+This is the internal form of the infix operator:
+
+ X <= Y.
+
+=item listing/0
+
+Dumps a listing of all user-defined predicates and how they are defined.
+
+=item listing/1
+
+Dumps a listing of the requested predicate.  C<X> must a variable or string
+instantiated in I<functor/arity>) form.  Note that, unlike most Prolog's, this
+means that the followig will not work:
+
+ listing(foo/2).
+
+Use this instead:
+
+ listing('foo/2').
+
+=item lt/2
+
+Succeeds if both terms are bound and X < Y.
+
+This is the internal form of the infix operator:
+
+ X < Y.
+
+=item minus/2
+
+Succeeds if both terms are bound.  The value of the term is X - Y.
+Use with C<is(X,Y)>.
+
+ is(X, minus(N,1)).
+
+This is the internal form of the infix operator:
+
+ N - 1.
+
+=item mod/2
+
+Succeeds if both terms are bound.  The value of the term is X % Y. (modulus)
+Use with C<is(X,Y)>.
+
+ is(X, mod(N,3)).
+
+This is the internal form of the infix operator:
+
+ N % 3.
+
+=item mult/2
+
+Succeeds if both terms are bound.  The value of the term is X * Y.
+Use with C<is(X,Y)>.
+
+ is(X, mult(N,3)).
+
+This is the internal form of the infix operator:
+
+ N * 3.
+
+=item ne/2
+
+Succeeds if C<X> and C<Y> cannot be proven to be equal.
+
+This is the internal form of the infix operator:
+
+ X \= Y.
+
+=item nl/0
+
+Prints a newline.
+
+=item not/1
+
+Succeeds if C<X> cannot be proven.  This is not negation as we're used to
+seeing it in procedural languages.
+
+=item notrace/0
+
+Turns off tracing of Prolog's attempt to satisfy goals.
+
+=item once/1
+
+Stop solving for C<X> if C<X> succeeds.  Defined as:
+
+ once(X) :- X, !;
+
+=item or/2
+
+Succeeds as a goal if either C<X> or C<Y> succeeds.
+
+=item plus/2
+
+Succeeds if both terms are bound.  The value of the term is X + Y.
+Use with C<is(X,Y)>.
+
+ is(X, plus(N,1)).
+
+=item print/1
+
+Prints the current Term.  If the term is an unbound variable, it will print the
+an underscore followed by the internal variable number (e.g., "_284").
+
+ print(ovid).         % prints "ovid"
+ print("Something").  % prints "Something"
+ print(Something).    % prints whatever variable Something is bound to 
+
+=item println/1
+
+Same as C<print(Term)>, but automatically prints a newline at the end.
+
+=item pow/2
+
+Succeeds if both terms are bound.  The value of the term is X ** Y 
+(X raised to the Y power).
+Use with C<is(X,Y)>.
+
+=item retract/1
+
+Remove facts from the database.  You cannot remove rules.  This may change in
+the future.  See C<assert(X)>.
+
+ retract(loves(ovid,java)).
+
+=item trace/0
+
+Turns on tracing of Prolog's attempt to satisfy goals.
+
+=item true/0
+
+True goal.  Automatically succeeds.
+
+=item var/1
+
+Succeeds if X is an unbound variable.  Otherwise, this goal fails.
+
+=item write/1
+
+Prints the current Term.  If the term is an unbound variable, it will print the
+an underscore followed by the internal variable number (e.g., "_284").
+
+ write(ovid).         % prints "ovid"
+ write("Something").  % prints "Something"
+ write(Something).    % prints whatever variable Something is bound to 
+
+=item writeln/1
+
+Same as C<write(Term)>, but automatically prints a newline at the end.
+
+=back
+
+=head1 LIMITATIONS
+
+These are known limitations that I am not terribly inclined to fix.  See the
+TODO list for those I am inclined to fix.
+
+ IF -> THEN; ELSE not allowed.
+
+Use C<if(IF, THEN, ELSE)> instead.
+
+Chaining terms with a semicolon for "or" does not work.  Use C<or/2> instead.
+
+=head1 TODO
+
+There are many things on this list.  The core functionality is there, but I do
+want you to be aware of what's coming.
+
+=over 4
+
+=item Improve printing.
+
+There are some bugs with printing and escaping characters.  Maybe I'll look
+into them :)
+
+=item More builtins.
+
+Currently, we only have a tiny subset of builtins available.  More are coming.
+
+=back
+
+=head1 MATH
+
+Since version .70, math is fully available in C<AI::Prolog>.  Note that math is
+implemented via the
+L<AI::Prolog::Parser::PreProcessor::Math|AI::Prolog::Parser::PreProcessor::Math>
+module.  This module rewrites Prolog math to an internal, predicate-based form
+with the L<AI::Prolog::Parser|AI::Prolog::Parser> can parse.  This may cause
+confusion when debugging.
+
+ X is 5 + 7.
+ % internally converted to 
+ % is(X, plus(5, 7)).
+
+The math predicates are officially deprecated and I<cannot> be used in the same
+expression with regular Prolog math.  
+
+Number may be integers, floats, doubles, etc.  A number that starts with a
+minus sign (-) is considered negative.  No number may end in a decimal point as
+the period is interpreted as the end of a clause.  The following is therefore a
+syntax error:
+
+ X is 5. + 7.
+
+Unfortunately, the parser doesn't yet yell about that.  We'll try and figure
+out why later.
+
+Omit the period after the number or put a zero after it:
+
+ X is 5.0 + 7.
+ X is 5 + 7.
+
+Because numbers use Perl scalars, you may mix types (ints and floats) and they
+will behave as you expect in Perl.
+
+Precedence is C<*> and C</>, left to right, followed by C<+> and C<->, left to
+right followed by C<%>, left to right.  (I probably should change that.)
+Naturally, parentheses may be used for grouping:
+
+ X is 3 * 5 + 2.   % is(X, plus(mult(3, 5), 2)).
+ X is 3 * (5 + 2). % is(X, mult(3, plus(5, 2))).
+
+When using math, note that C<is> is similar to Perl's assignment operator, C<=>.
+This can be confusing.
+
+ X is 3 + 2.
+
+Sets C<X> to the value of C<5>.  
+
+If C<X> is already instantiated, this goal succeeds if the value of C<X> is the
+value of the result of the right-hand side of the equation.  Internally, if X is not
+instantiated, it looks like this:
+
+ is(5, plus(3,2)).
+
+The C<=> operator tries to unify the left-hand side with the right-hand side:
+
+ X = 3 + 2.
+
+If C<X> is already instantiated, this goal succeeds if the value of C<X> is the
+same goal as the right-hand side of the equation.  Internally, if X is not
+instantiated, it looks like this:
+
+ eq(plus(3,2), plus(3,2)).
+
+When you first start using Prolog, you probably was C<is> instead of C<=>.
+
+Logical comparisons are straightforward:
+
+ 3 >= X.
+ Y > (4 + 3) * X.
+ X == Y. % a test for equality
+ X \= Y. % Not equal.  See caveats for ne/2
+ % etc.
+
+=head1 BUGS
+
+None known.
+
+=head1 SEE ALSO
+
+L<AI::Prolog::Introduction>
+
+L<AI::Prolog>
+
+W-Prolog:  L<http://goanna.cs.rmit.edu.au/~winikoff/wp/>
+
+X-Prolog:  L<http://www.iro.umontreal.ca/~vaucher/XProlog/>
+
+Roman BartE<225>k's online guide to programming Prolog:
+L<http://kti.ms.mff.cuni.cz/~bartak/prolog/index.html>
+
+=head1 AUTHOR
+
+Curtis "Ovid" Poe, E<lt>moc tod oohay ta eop_divo_sitrucE<gt>
+
+Reverse the name to email me.
+
+This work is based on W-Prolog, http://goanna.cs.rmit.edu.au/~winikoff/wp/,
+by Dr. Michael Winikoff.  Many thanks to Dr. Winikoff for granting me
+permission to port this.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005 by Curtis "Ovid" Poe
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

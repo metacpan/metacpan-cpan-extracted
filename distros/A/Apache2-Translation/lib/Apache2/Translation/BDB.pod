@@ -1,0 +1,146 @@
+=head1 NAME
+
+Apache2::Translation::BDB - A provider for Apache2::Translation
+
+=head1 SYNOPSIS
+
+  <TranslationProvider BDB>
+      BDBEnv   /path/to/directory
+      ReadOnly 1
+  </TranslationProvider>
+
+  or
+
+  $provider=Apache2::Translation::BDB->new(BDBEnv=>..., ...);
+
+  $provider->start;
+  $provider->stop;
+
+=head1 DESCRIPTION
+
+The C<BDB> provider implements the C<Apache2::Translation> provider interface
+as documented in L<Apache2::Translation::_base>. It provides for all optional
+functions.
+
+Other than the C<DB> providers C<BDB> doesn't implement a cache.
+BerkeleyDB is fast enough on its own. Neither does it monitor the timestamp
+of a file on disk. Hence it doesn't need a C<version> or C<timestamp> field.
+
+Nevertheless it implements a C<timestamp> method that can be used by external
+tools to synchronize the database state with external sources.
+
+=head2 B<Parameters>
+
+=over 2
+
+=item B<bdbenv /path/to/directory>
+
+Here you can pass a directory name or a C<BerkeleyDB::Env> object. In the
+latter case, the environment must be initialized with DB_INIT_MPOOL,
+DB_INIT_LOCK, DB_INIT_TXN and DB_INIT_LOG. Further, you need to specify a
+deadlock detection method.
+
+If a directory is passed (the normal case) the provider initializes the
+environment if it is not already set up. It creates 3 databases,
+C<Apache2::Translation::BDB-id.db>, C<Apache2::Translation::BDB-keyuri.db> and
+C<Apache2::Translation::BDB-extra.db>. C<Apache2::Translation::BDB-keyuri.db>
+is used as an associated database for C<Apache2::Translation::BDB-id.db>.
+That means it is a secondary index.
+
+The extra database holds only the timestamp value. But the provider offers
+an C<extra> method to store more information in this database.
+
+See L<CONFIGFURATION> below for performance tuning.
+
+=item B<readonly 1>
+
+If set to true the databases are opened in readonly mode. Please note that
+the program needs write permission to the database files even if this flag
+is set.
+
+=back
+
+=head2 B<Additional Methods>
+
+=over 2
+
+=item B<parent_txn>
+
+BerkeleyDB supports nested transactions. If you provide a parent transaction
+the provider wraps its changes in a child transaction. Otherwise it works in
+an unrelated transaction.
+
+=item B<extra_db>
+
+returns the database handle of the extra database.
+
+=item B<extra key value>
+
+stores and retrieves information from the extra database. If value is given
+it is written as value for the key to the database.
+
+returns the previous value of the key.
+
+Note, the key C<\ttmstmp> is reserved.
+
+=item B<timestamp time>
+
+sets or retrieves the timestamp from the extra database.
+
+=back
+
+=head1 CONFIGURATION
+
+A Berkeley database is configured and tuned via a config file named
+C<DB_CONFIG> located in the environment directory. The default parameters
+are quite small for a WEB server application where many processes access
+the database in parallel.
+
+To tune your database create an empty directory and within it a file named
+C<DB_CONFIG>. Then start the WEB Server or a helper program to create and
+initialize the databases.
+
+For me I found these values sufficient for a fairly large WEB Server:
+
+  set_lk_max_locks   5000
+  set_lk_max_lockers 5000
+  set_lk_max_objects 5000
+  set_tx_max         200
+  set_flags          DB_LOG_INMEMORY
+  set_lg_regionmax   1048576
+  set_lg_bsize       10485760
+
+See
+L<http://www.oracle.com/technology/documentation/berkeley-db/db/ref/toc.html>
+for further information.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Apache2::Translation>
+
+=item L<Apache2::Translation::DB>
+
+=item L<Apache2::Translation::File>
+
+=item L<Apache2::Translation::_base>
+
+=back
+
+=head1 AUTHOR
+
+Torsten Foertsch, E<lt>torsten.foertsch@gmx.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2008 by Torsten Foertsch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+# Local Variables:
+# mode: perl
+# End:

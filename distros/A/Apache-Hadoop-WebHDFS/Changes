@@ -1,0 +1,37 @@
+Revision history for Apache-Hadoop-WebHDFS
+
+0.04    Aug 6, 2013 - 
+        . Bumping version number so cpan will correctly index the latest version
+
+0.03.1  Aug 5, 2013 - 
+        . Bug Fix - Fixed transposed variables in rename method
+        
+
+0.03    July 15, 2013 - 
+        . NOTE THIS UPDATE BREAKS BACKWARD COMPATIBLITY WITH v0.01 and v.02 
+        . Adding 'contentsummary' method
+        . Adding 'gethomedirectory' method
+        . Adding 'setreplication' method
+        . Adding 'settimes' method
+        . Adding 'setpermssion' method
+        . Adding 'offset', 'length', 'buffersize' to Open.  
+        . Adding 'recrusive' flag to Delete.  
+        . Fixed typos in Rename, Delete, & Create, WebHDFS urls.
+        . Added 'delete' web request method as it's not supported by www::mechanize and needed for webhdfs rest interface
+        . Added File::Map as a dependency.  This is to help better manage memory usage when writing large files to HDFS.
+        . Setting 'stack_depth=0' to prevent history of requests from blowing up memory.
+        . Documentation updates.
+        
+
+0.02    May 22, 2013 -
+        . Added non-secure login and proxy methods.  
+        . getfilesum method added 
+        . Documentation updates for newly defined methods.
+
+0.01    March 12, 2013 - 
+        First version, released on an unsuspecting world. Note this is not 
+        the full WebHDFS api as I needed something to write files to a secure 
+        hadoop cluster using GSSAPI for authentication.   Current state is one
+        can read & write files/directories to HDFS.  One can also get a delegation
+        token.  See POD for further information on implemented methods.
+

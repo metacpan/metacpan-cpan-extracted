@@ -1,0 +1,108 @@
+# NAME
+
+App::vaporcalc - Calculate e-liquid recipes for DIY vaping
+
+# SYNOPSIS
+
+    # From a shell:
+    # sh$ vaporcalc
+
+    ## From Perl:
+    # use App::vaporcalc 'vcalc';
+    # my $calculated = vcalc(...); 
+    # (See EXPORTED)
+
+# WARNING
+
+**Nicotine is a deadly poison and can be absorbed through the skin.**
+
+**Don't play with it if you don't respect it!**
+
+**Any nicotine-containing product should be tested to determine nicotine
+concentration before use. Testing kits are available online. Be responsible.**
+
+# DESCRIPTION
+
+This is a set of simple utilities, roles, and objects for managing e-cig
+liquid recipes and calculating `ml` quantities based on a simple recipe
+format.
+
+From a shell, the [vaporcalc(1)](http://man.he.net/man1/vaporcalc) frontend starts with a base recipe outline and
+provides a command line interface to tweaking, saving, and loading recipes via
+an extensible command engine ([App::vaporcalc::CmdEngine](https://metacpan.org/pod/App::vaporcalc::CmdEngine)).
+
+If you'd like to manage recipes from perl, see ["vcalc"](#vcalc), below (or use
+[App::vaporcalc::Recipe](https://metacpan.org/pod/App::vaporcalc::Recipe) directly).
+
+# EXPORTED
+
+## vcalc
+
+    my $calculated = vcalc(
+      target_quantity   => 30,   # ml
+
+      base_nic_type     => 'PG', # nicotine base type (VG/PG, default PG)
+      base_nic_per_ml   => 100,  # mg/ml (base nicotine concentration)
+      target_nic_per_ml => 12,   # mg/ml (target nicotine concentration)
+
+      target_pg         => 65,   # target PG percentage
+      target_vg         => 35,   # target VG percentage
+
+      # target flavor(s) name, percentage, base type
+      # (or App::vaporcalc::Flavor objects)
+      flavor_array => [
+        +{ tag => 'Raspberry', percentage => 15, type => 'PG' },
+        # ...
+      ],
+    );
+
+    # Returns an App::vaporcalc::RecipeResultSet ->
+    my $recipe = $calculated->recipe;   # App::vaporcalc::Recipe instance
+    my $result = $calculated->result;   # App::vaporcalc::Result instance
+
+A functional interface to [App::vaporcalc::RecipeResultSet](https://metacpan.org/pod/App::vaporcalc::RecipeResultSet) -- takes a recipe
+(as a list of key/value pairs or an [App::vaporcalc::Recipe](https://metacpan.org/pod/App::vaporcalc::Recipe) object) and
+returns a calculated [App::vaporcalc::RecipeResultSet](https://metacpan.org/pod/App::vaporcalc::RecipeResultSet).
+
+See: 
+
+[App::vaporcalc::Recipe](https://metacpan.org/pod/App::vaporcalc::Recipe)
+
+[App::vaporcalc::Result](https://metacpan.org/pod/App::vaporcalc::Result)
+
+[App::vaporcalc::RecipeResultSet](https://metacpan.org/pod/App::vaporcalc::RecipeResultSet)
+
+[App::vaporcalc::Flavor](https://metacpan.org/pod/App::vaporcalc::Flavor)
+
+# TIPS
+
+Less is more with many flavors; you may want to start around 5% or so and work
+your way up.
+
+Ideally, let juices steep for at least a day (longer is usually better!)
+before sampling; shaking and warmth can help steep flavors faster.
+
+Don't use flavors containing diacetyl (frequently used to create a buttery
+taste). It's safe to eat, not safe to vape; the vapor causes "popcorn lung."
+Acetoin will ferment into diacetyl; avoid that for the same reasons.
+
+Anything containing artifical coloring or triglycerides is possibly not safe
+to vape.
+
+Flavors containing triacetin are reported to cause cracking in various plastic
+tanks. Triacetin is a reasonable flavor carrier and probably OK to vape, but
+may be rough on equipment. Same goes for citric acid -- and it may break down
+into lung/throat irritants upon heating.
+
+Buy nicotine from a reputable supplier and test it; there have been instances
+of nicotine solutions marketed as 100mg/ml going as high as 250mg/ml!
+
+# TODO
+
+- Optionally measuring by weight.
+- A pointy-clicky interface (Tkx or so?)
+- Integrated cost calculation
+
+# AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>

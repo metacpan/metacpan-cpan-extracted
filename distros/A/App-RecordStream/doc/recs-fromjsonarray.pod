@@ -1,0 +1,33 @@
+=head1 NAME
+
+recs-fromjsonarray
+
+=head1 recs-fromjsonarray --help-all
+
+ Usage: recs-fromjsonarray <args> [<files>]
+    Import JSON objects from within a JSON array.
+ Arguments:
+    --key|k <keys>               Optional Comma separated list of field names. If
+                                 none specified, use all keys. May be specified
+                                 multiple times, may be key specs
+    --filename-key|fk <keyspec>  Add a key with the source filename (if no
+                                 filename is applicable will put NONE)
+ 
+   Help Options:
+       --help  This help screen
+
+=head1 SEE ALSO
+
+=over
+
+=item * See L<App::RecordStream> for an overview of the scripts and the system
+
+=item * Run C<recs examples> or see L<App::RecordStream::Manual::Examples> for a set of simple recs examples
+
+=item * Run C<recs story> or see L<App::RecordStream::Manual::Story> for a humorous introduction to RecordStream
+
+=item * Every command has a C<--help> mode available to print out usage and
+examples for the particular command, just like the output above.
+
+=back
+

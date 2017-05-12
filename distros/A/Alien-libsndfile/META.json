@@ -1,0 +1,44 @@
+{
+   "abstract" : "libsndfile distribution for CPAN.",
+   "author" : [
+      "Kang-min Liu <gugod@gugod.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-libsndfile",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "File::ShareDir" : "1.00",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::libsndfile" : {
+         "file" : "lib/Alien/libsndfile.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "0.01"
+}

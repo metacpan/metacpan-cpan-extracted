@@ -1,0 +1,22 @@
+Build.PL
+Changes
+debian/changelog
+debian/control
+debian/copyright
+debian/libacme-brainfck-perl.examples
+debian/rules
+examples/countdown.pl
+examples/helloworld.pl
+examples/jabh.pl
+examples/math.pl
+examples/reverse.pl
+lib/Acme/Brainfuck.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/0-signature.t
+t/1.t
+
+SIGNATURE    Added here by Module::Build

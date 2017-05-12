@@ -1,0 +1,30 @@
+Revision history for Acme-Postmodern-Perl
+
+0.09    2014-05-27
+        * require 5.022
+
+0.08    2012-05-22
+        * require 5.020
+
+0.07    2012-05-21
+        * require 5.018
+
+0.06    2011-04-28
+        * require 5.016
+
+0.05    2010-03-24
+        * require 5.014, as 5.012-RC0 is born
+        * add docs on how to get the latest version of this distro
+
+0.04    2010-02-27
+        use 5.012 in Makefile.PL, we want no PASSes from CPAN testers
+
+0.03    2009-11-25
+        Check for 5.012 in test suite.
+
+0.02    2009-11-24
+        Switch to PACKAGE NAME VERSION syntax.
+
+0.01    2009-10-16
+        First version.
+

@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Algorithm-BreakOverlappingRectangles
+version:             0.01
+abstract:            ~
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Algorithm::RectanglesContainingDot: 0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Salvador Fandino <sfandino@yahoo.com>

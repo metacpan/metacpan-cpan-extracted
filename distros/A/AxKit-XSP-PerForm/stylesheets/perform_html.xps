@@ -1,0 +1,171 @@
+<%
+
+# X Path Script Stylesheet for PerForm
+
+$t->{'error'}{'pre'} = qq|<span class="form_error"><font color="red">|;
+$t->{'error'}{'post'} = "</font></span>";
+$t->{'error'}{'showtag'} = 0;
+
+$t->{'formerrors'} = $t->{'error'};
+
+$t->{'textfield'}{'testcode'} = sub {
+  my ($node, $t) = @_;
+  my $name = findvalue('@name|name', $node);
+  my $index = findvalue('@index|index', $node);
+  my $value = findvalue('@value|value', $node);
+  my $width = findvalue('@width|width', $node);
+  my $maxlength = findvalue('@maxlength|maxlength', $node);
+  $t->{'pre'} = qq|
+    <input 
+        type="text"
+        name="$name$index" 
+        value="$value" 
+        size="$width" 
+        maxlength="$maxlength" /> |;
+  $t->{'post'} = apply_templates('error', $node);
+  $t->{'showtag'} = 0;
+  return -1;
+};
+
+$t->{'password'}{'testcode'} = sub {
+  my ($node, $t) = @_;
+  my $name = findvalue('@name|name', $node);
+  my $value = findvalue('@value|value', $node);
+  my $width = findvalue('@width|width', $node);
+  my $maxlength = findvalue('@maxlength|maxlength', $node);
+  my $index = findvalue('@index|index', $node);
+  $t->{'pre'} = qq|
+    <input 
+        type="password"
+        name="$name$index" 
+        value="$value" 
+        size="$width" 
+        maxlength="$maxlength" /> |;
+  $t->{'post'} = apply_templates('error', $node);
+  $t->{'showtag'} = 0;
+  return -1;
+};
+
+$t->{'checkbox'}{'testcode'} = sub {
+  my ($node, $t) = @_;
+  my $name = findvalue('@name|name', $node);
+  my $value = findvalue('@value|value', $node);
+  my $index = findvalue('@index|index', $node);
+  $t->{'pre'} = qq|
+    <input 
+        type="checkbox"
+        name="$name$index" 
+        value="$value" />|;
+  $t->{'post'} = apply_templates('error', $node);
+  $t->{'showtag'} = 0;
+  return -1;
+};
+
+$t->{'submit_button'}{'testcode'} = sub {
+  my ($node, $t) = @_;
+  my $name = findvalue('@name|name', $node);
+  my $value = findvalue('@value|value', $node);
+  my $index = findvalue('@index|index', $node);
+  $t->{'pre'} = qq|
+    <input 
+        type="submit"
+        name="$name$index" 
+        value="$value" />|;
+  $t->{'post'} = apply_templates('error', $node);
+  $t->{'showtag'} = 0;
+  return -1;
+};
+
+$t->{'hidden'}{'testcode'} = sub {
+  my ($node, $t) = @_;
+  my $name = findvalue('@name|name', $node);
+  my $value = findvalue('@value|value', $node);
+  my $index = findvalue('@index|index', $node);
+  $t->{'pre'} = qq|
+    <input 
+        type="hidden"
+        name="$name$index" 
+        value="$value" />|;
+  $t->{'post'} = apply_templates('error', $node);
+  $t->{'showtag'} = 0;
+  return -1;
+};
+
+
+$t->{'option'}{'testcode'} = sub {
+  my ($node, $t) = @_;
+  my $selected = findvalue('@selected|selected', $node);
+  if ($selected eq 'selected') {
+    $selected = ' selected="selected" ';
+  }
+  else {
+    $selected = '';
+  }
+  my $value = findvalue('@value|value', $node);
+  $t->{'pre'} = qq|
+    <option 
+        value="$value" 
+        $selected >|;
+  $t->{'post'} = findvalue('@text|text', $node)."</option>";
+  $t->{'showtag'} = 0;
+  return -1;
+};
+
+$t->{'single_select'}{'testcode'} = sub {
+  my ($node, $t) = @_;
+  my $name = findvalue('@name|name', $node);
+  my $index = findvalue('@index|index', $node) || '';
+  $t->{'pre'} = qq|
+    <select name="$name$index">
+        |.apply_templates('options/option', $node);
+  $t->{'post'} = "</select>".apply_templates("error", $node);
+  $t->{'showtag'} = 0;
+  return -1;
+};
+
+$t->{'multi_select'}{'testcode'} = sub {
+  my ($node, $t) = @_;
+  my $name = findvalue('@name|name', $node);
+  my $index = findvalue('@index|index', $node) || '';
+  $t->{'pre'} = qq|
+    <select multiple="multiple" name="$name$index">
+        |.apply_templates('options/option', $node);
+  $t->{'post'} = "</select>".apply_templates("error", $node);
+  $t->{'showtag'} = 0;
+  return -1;
+};
+
+$t->{'textarea'}{'testcode'} = sub {
+  my ($node, $t) = @_;
+  my $name = findvalue('@name|name', $node);
+  my $cols = findvalue('@cols|cols', $node);
+  my $rows = findvalue('@rows|rows', $node);
+  my $wrap = findvalue('@wrap|wrap', $node);
+  my $value = findvalue('@value|value', $node);
+  my $index = findvalue('@index|index', $node);
+  if ($wrap) {
+    $wrap = ' wrap="physical" ';
+  }
+  else {
+    $wrap = '';
+  }
+  $t->{'pre'} = qq|
+    <textarea name="$name$index" cols="$cols" rows="$rows" $wrap >$value|;
+  $t->{'post'} = q|  </textarea> <br /> |.apply_templates('error', $node);
+  $t->{'showtag'} = 0;
+  return -1;
+};
+
+$t->{'file_upload'}{'testcode'} = sub {
+  my ($node, $t) = @_;
+  my $name = findvalue('@name|name', $node);
+  my $value = findvalue('@value|value', $node);
+  my $accept = findvalue('@accept|accept', $node);
+  $t->{'pre'} = qq|
+    <input type="file"  name="$name" accept="$accept" />|.apply_templates('error', $node);
+  $t->{'showtag'} = 0;
+  return -1;
+};
+
+ %>
+

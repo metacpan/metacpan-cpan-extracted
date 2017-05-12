@@ -1,0 +1,314 @@
+#!/usr/local/bin/perl
+
+#############################################################################
+# $Id: app-apache 3337 2004-02-27 14:06:50Z spadkins $
+#############################################################################
+
+# The exit codes returned are:
+#        0 - operation completed successfully
+#        1 - 
+#        2 - usage error
+#        3 - httpd could not be started
+#        4 - httpd could not be stopped
+#        5 - httpd could not be started during a restart
+#        6 - httpd could not be restarted during a restart
+#        7 - httpd could not be restarted during a graceful restart
+#        8 - conguration syntax error
+#
+# When multiple arguments are given, only the error from the _last_
+# one is reported.  Run "apachectl help" for usage info
+
+use App::Options;
+
+use strict;
+
+my $APACHEROOT  = $App::options{apache_root} || die "Variable [apache_root] not configured\n";
+my $PREFIX      = $App::options{prefix}      || $ENV{PREFIX} || die "Variable [prefix] not configured\n";
+my $PORT        = $App::options{app_server_apache_port}      || "80";
+my $SSLPORT     = $App::options{app_server_apache_ssl_port}  || "443";
+my $SERVERROOT  = $App::options{app_server_apache_root}      || "$PREFIX/apache/$PORT";
+my $LOGDIR      = $App::options{app_server_apache_logdir}    || "$SERVERROOT/logs";
+my $CONFDIR     = $App::options{app_server_apache_confdir}   || "$SERVERROOT/conf";
+
+mkdir("$PREFIX/apache")      if (! -d "$PREFIX/apache");
+mkdir("$PREFIX/apache/conf") if (! -f "$PREFIX/apache/conf");
+mkdir($SERVERROOT)           if (! -d $SERVERROOT);
+mkdir($CONFDIR)              if (! -d $CONFDIR);
+mkdir($LOGDIR)               if (! -d $LOGDIR);
+
+my $APACHECONF  = $App::options{apache_appserver_conf};
+if (!$APACHECONF) {
+    my ($APACHEBASECONF, $baseconf_mtime, $conf_mtime, @stat);
+    my ($APACHEBASELOG);
+
+    $APACHEBASECONF = "$PREFIX/apache/conf/httpd.conf";
+    $APACHEBASECONF = "$APACHEROOT/conf/httpd.conf" if (! -f $APACHEBASECONF);
+    $baseconf_mtime = 0;
+    if (-f $APACHEBASECONF) {
+        @stat = stat($APACHEBASECONF);
+        $baseconf_mtime = $stat[9];
+    }
+
+    $APACHECONF = "$CONFDIR/httpd.conf";
+    $conf_mtime = 0;
+    if (-f $APACHECONF) {
+        @stat = stat($APACHECONF);
+        $conf_mtime = $stat[9];
+    }
+
+    if ($baseconf_mtime && (!$conf_mtime || ($conf_mtime < $baseconf_mtime))) {
+        my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($conf_mtime);
+        my $mdatetime = sprintf("%04d%02d%02d-%02d%02d%02d", $year+1900, $mon+1, $mday, $hour, $min, $sec);
+        system("mv $APACHECONF $APACHECONF.$mdatetime") if (-f $APACHECONF);
+        $APACHEBASELOG = "$APACHEROOT/logs";
+        local(*CONF, *BASECONF);
+        open(main::BASECONF, "< $APACHEBASECONF") || die "Unable to open $APACHEBASECONF for reading: $!\n";
+        open(main::CONF,     "> $APACHECONF")     || die "Unable to open $APACHECONF for writing: $!\n";
+        while (<main::BASECONF>) {
+            chomp;
+            s/Port\s+80\s*/Port $PORT/;
+            s/Listen\s+80\s*/Listen $PORT/;
+            s/Listen\s+443\s*/Listen $SSLPORT/;
+            s/Listen\s+(\S+):80\s*/Listen $1:$PORT/;
+            s/Listen\s+(\S+):443\s*/Listen $1:$SSLPORT/;
+            s/<VirtualHost _default_:443>/<VirtualHost _default_:$SSLPORT>/;
+            s!$APACHEROOT/logs!$SERVERROOT/logs!g;
+            s!ServerRoot\s+$APACHEROOT!ServerRoot $SERVERROOT!g;
+            s! libexec/! $APACHEROOT/libexec/!g;
+
+            # do substitutions for {:var:} or {:var=default:} to the value in %App::options
+            s/\{:([a-zA-Z0-9_]+)(=?)([^:\{\}]*):\}/(defined $App::options{$1} ? $App::options{$1} : ($2 ? $3 : $1))/eg;
+
+            print main::CONF $_, "\n";
+        }
+        close(main::BASECONF);
+        close(main::CONF);
+    }
+}
+
+my $PIDFILE     = "$LOGDIR/httpd.pid";
+my $HTTPD       = "$APACHEROOT/bin/httpd -f $APACHECONF -d $SERVERROOT";
+#$HTTPD         .= " -f $APACHECONF";
+#$HTTPD         .= " -d $SERVERROOT";  # this causes libmm to put shmem/sems in right place
+my $LYNX        = "lynx -dump";
+my $STATUSURL   = "http://localhost/server-status";
+my $ERROR       = 0;
+
+my ($PID, $RUNNING, $STATUS);
+
+if ($#ARGV == -1) {
+    unshift(@ARGV, "help");
+}
+
+if (!$ENV{LD_LIBRARY_PATH}) {
+    $ENV{LD_LIBRARY_PATH} = "/usr/local/lib:$APACHEROOT/libexec";
+}
+else {
+    $ENV{LD_LIBRARY_PATH} = "$ENV{LD_LIBRARY_PATH}:/usr/local/lib:$APACHEROOT/libexec";
+}
+
+foreach my $cmd (@ARGV) {
+
+    if (-f $PIDFILE) {
+        $PID = &read_file($PIDFILE);
+        $PID =~ s/\n//g;
+        if ($PID && kill(0, $PID)) {
+            $STATUS = "httpd (pid $PID) running";
+            $RUNNING = 1;
+        }
+        else {
+            $STATUS = "httpd (pid $PID?) not running";
+            $RUNNING = 0;
+        }
+    }
+    else {
+        $STATUS = "httpd (no pid file) not running";
+        $RUNNING = 0;
+    }
+
+    if ($cmd eq "start") {
+        if ($RUNNING == 1) {
+            print "$0 $cmd: httpd (pid $PID) already running\n";
+        }
+        else {
+            if (system($HTTPD) == 0) {
+                print "$0 $cmd: httpd started\n";
+            }
+            else {
+                print "$0 $cmd: httpd could not be started\n";
+                $ERROR = 3;
+            }
+        }
+    }
+    elsif ($cmd eq "startssl" || $cmd eq "sslstart" || $cmd eq "start-SSL") {
+        if ($RUNNING == 1) {
+            print "$0 $cmd: httpd (pid $PID) already running\n";
+        }
+        else {
+            my $HTTPSD = $HTTPD;
+            $HTTPSD =~ s/ / -DSSL /;
+            if (system($HTTPSD) == 0) {
+                print "$0 $cmd: httpd started\n";
+            }
+            else {
+                print "$0 $cmd: httpd could not be started\n";
+                $ERROR = 3;
+            }
+        }
+    }
+    elsif ($cmd eq "stop") {
+        if ($RUNNING == 0) {
+            print "$0 $cmd: $STATUS\n";
+        }
+        else {
+            if (kill(15,$PID)) {
+                print "$0 $cmd: httpd stopped\n";
+            }
+            else {
+                print "$0 $cmd: httpd could not be stopped\n";
+                $ERROR = 4;
+            }
+        }
+    }
+    elsif ($cmd eq "restart") {
+        if ($RUNNING == 0) {
+            print "$0 $cmd: httpd not running, trying to start\n";
+            if (system($HTTPD) == 0) {
+                print "$0 $cmd: httpd started\n";
+            }
+            else {
+                print "$0 $cmd: httpd could not be started\n";
+                $ERROR = 5;
+            }
+        }
+        else {
+            if (system("$HTTPD -t > /dev/null 2>&1") == 0) {
+                if (kill(1,$PID) == 0) {    # SIGHUP
+                    print "$0 $cmd: httpd restarted\n";
+                }
+                else {
+                    print "$0 $cmd: httpd could not be restarted\n";
+                    $ERROR = 6;
+                }
+            }
+            else {
+                print "$0 $cmd: configuration broken, ignoring restart\n";
+                print "$0 $cmd: (run 'apachectl configtest' for details)\n";
+                $ERROR = 6;
+            }
+        }
+    }
+    elsif ($cmd eq "graceful") {
+        if ($RUNNING == 0) {
+            print "$0 $cmd: httpd not running, trying to start\n";
+            if (system($HTTPD) == 0) {
+                print "$0 $cmd: httpd started\n";
+            }
+            else {
+                print "$0 $cmd: httpd could not be started\n";
+                $ERROR = 5;
+            }
+        }
+        else {
+            if (system("$HTTPD -t > /dev/null 2>&1") == 0) {
+                if (kill(16,$PID) == 0) {  # SIGUSR1
+                    print "$0 $cmd: httpd gracefully restarted\n";
+                }
+                else {
+                    print "$0 $cmd: httpd could not be restarted\n";
+                    $ERROR = 7;
+                }
+            }
+            else {
+                print "$0 $cmd: configuration broken, ignoring restart\n";
+                print "$0 $cmd: (run 'apachectl configtest' for details)\n";
+                $ERROR = 7;
+            }
+        }
+    }
+    elsif ($cmd eq "freshstart") {
+        if ($RUNNING != 0) {
+            if (kill(15,$PID)) {
+                print "$0 $cmd: httpd stopped\n";
+            }
+            else {
+                print "$0 $cmd: httpd could not be stopped\n";
+                $ERROR = 4;
+            }
+        }
+        print "$0 $cmd: clearing logs, and pausing...\n";
+        unlink(<$LOGDIR/*>);
+        sleep(2);  # allow the port to become free again
+        if (system($HTTPD) == 0) {
+            print "$0 $cmd: httpd started\n";
+        }
+        else {
+            print "$0 $cmd: httpd could not be started\n";
+            $ERROR = 5;
+        }
+    }
+    elsif ($cmd eq "status") {
+        print "$0 $cmd: not implemented.\n";
+        # $LYNX $STATUSURL | awk ' /process$/ { print; exit } { print } '
+    }
+    elsif ($cmd eq "fullstatus") {
+        print "$0 $cmd: not implemented.\n";
+        # $LYNX $STATUSURL
+    }
+    elsif ($cmd eq "configtest") {
+        if (system("$HTTPD -t") == 0) {
+        }
+        else {
+            $ERROR = 8;
+        }
+    }
+    else {
+        print "\n";
+        print "usage: $0 (start|stop|restart|fullstatus|status|graceful|configtest|help)\n";
+        print <<EOF;
+
+start      - start httpd
+startssl   - start httpd with SSL enabled
+stop       - stop httpd
+restart    - restart httpd if running by sending a SIGHUP or start if 
+             not running
+fullstatus - dump a full status screen; requires lynx and mod_status enabled
+status     - dump a short status screen; requires lynx and mod_status enabled
+graceful   - do a graceful restart by sending a SIGUSR1 or start if not running
+configtest - do a configuration syntax test
+help       - this screen
+
+EOF
+        $ERROR = 2;
+    }
+}
+
+exit($ERROR);
+
+#############################################################################
+# subroutines
+#############################################################################
+
+sub read_file {
+   my ($file) = @_;
+   local(*FILE);
+   my (@file_txt, $file_txt);
+
+   if (open(main::FILE, "< $file")) {
+      @file_txt = <main::FILE>;
+      $file_txt = join("",@file_txt);
+      close(main::FILE);
+   }
+   $file_txt;
+}
+
+sub write_file {
+   my ($file,$str) = @_;
+   local(*FILE);
+
+   if (open(main::FILE, "> $file")) {
+      print main::FILE $str;
+      close(main::FILE);
+   }
+}
+

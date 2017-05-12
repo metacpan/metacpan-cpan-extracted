@@ -1,0 +1,26 @@
+Change log
+
+v1.100  2014-09-22
+    -   reason for perl 5.18 message 'Smartmatch is experimental
+        at ...' removed.
+    -   subfunction singular added to keep single array elements in
+        the original order.
+    -   version handling improved, version format changed.
+        Old three number version change to two numbers.
+
+v1.0.3  2012-09-01
+    -   intersection handles multiple equal elements in an array correct now.
+        e.g. intersection([1,2,1],[2,1]) -> (1,2)
+
+v1.0.2  2012-08-12
+    -   Missing build require module added.
+
+v1.0.1  2012-08-05
+    -   Module Test::Differences removed from test scripts to avoid
+        breaks on some systems.
+    -   Some example files added.
+    -   POD test and POD coverage test added.
+    -   compareOrder() modified, it's using ~~ smart-match operator.
+
+v1.0.0  2012-07-30
+    -   Initial version of Array::CompareAndFilter

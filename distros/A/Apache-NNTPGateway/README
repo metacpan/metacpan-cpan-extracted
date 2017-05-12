@@ -1,0 +1,19 @@
+
+ README file for Apache::NNTPGateway
+ ===================================
+
+ A NNTP (Usenet newsgroups) interface for mod_perl enabled Apache web server.
+
+ * Install this module somewhere in your @INC path.
+
+    perl Makefile.PL
+    make
+    make install
+
+ * Read the documentation in the source or man (or perldoc)
+   Apache::NNTPGateway once installed.
+
+ * Report bugs to author: heddy Boubaker <boubaker@cpan.org>
+
+
+

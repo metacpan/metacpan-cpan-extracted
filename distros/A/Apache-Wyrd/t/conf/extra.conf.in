@@ -1,0 +1,32 @@
+PerlTaintCheck on
+<Perl>
+	use strict;
+	use lib '@ServerRoot@/../blib/lib';
+	use Apache::Wyrd::Services::Key;
+	Apache::Wyrd::Services::Key->instance('A predictable keyphrase.');
+</Perl>
+PerlModule Apache::Wyrd::Request
+<Location />
+	SetHandler perl-script
+	PerlHandler TESTCLIENT::Handler
+</Location>
+<Location /restricted/>
+	SetHandler	perl-script
+	PerlHandler	Apache::Wyrd::Services::Auth TESTCLIENT::Handler
+	PerlSetVar	LoginFormUrl	/loginform.html
+	PerlSetVar	LSKeyURL		http://localhost:8529/login.html
+	PerlSetVar	LSLoginURL		http://localhost:8529/login.html
+	PerlSetVar	LSDownURL		/lsdown.html
+	PerlSetVar	NoCookieURL		/cookies.html
+	PerlSetVar	AuthPath		/
+	PerlSetVar	Debug			1
+	PerlSetVar	UserObject		TESTCLIENT::User
+	PerlSetVar	ReturnError		err_message
+	PerlSetVar	AuthLevel		test
+</Location>
+<Location /login.html>
+	SetHandler	perl-script
+	PerlHandler	Apache::Wyrd::Services::LoginServer
+	PerlSetVar	TicketDBFile @ServerRoot@/data/ticketbook.db
+	PerlSetVar	Debug	1
+</Location>

@@ -1,0 +1,65 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use AnnoCPAN::Perldoc::SyncDB;
+
+my %opts = (
+   verbose => 0,
+   dest => undef,
+   src => undef,
+   compress => undef,
+   help => undef,
+   version => undef,
+);
+
+Getopt::Long::Configure("bundling");
+GetOptions("v|verbose"    => \$opts{verbose},
+           "d|dest=s"     => \$opts{dest},
+           "s|src=s"      => \$opts{src},
+           "c|compress=s" => \$opts{compress},
+           "h|help"       => \$opts{help},
+           "V|version"    => \$opts{version},
+           ) or pod2usage(1);
+pod2usage(-exitstatus => 0, -verbose => 2, -input => \*DATA) if ($opts{help});
+print("AnnoCPAN::Perldoc::SyncDB v$AnnoCPAN::Perldoc::SyncDB::VERSION\n"),exit(0) if ($opts{version});
+
+AnnoCPAN::Perldoc::SyncDB->run(%opts);
+
+__DATA__
+
+=head1 NAME
+
+syncannopod - Mirror the AnnoCPAN database locally
+
+=head1 SYNOPSIS
+
+syncannopod [options]
+
+ Options:
+   -s --src=url        URL of the database
+   -d --dest=path      filename for downloaded database
+   -c --compress=opt   one of 'bz2', 'gz' or ''
+   -v --verbose        print status messages
+   -h --help           verbose help message
+   -V --version        print AnnoCPAN::Perldoc::SyncDB version
+
+See the C<perldoc AnnoCPAN::Perldoc::SyncDB> for a list of the default
+values and their meanings.
+
+=head1 DESCRIPTION
+
+Mirrors an annopod.db database to the local filesystem for use with
+the annopod command.  See the modules listed below for more details.
+
+=head1 SEE ALSO
+
+L<AnnoCPAN::Perldoc::SyncDB>
+
+L<AnnoCPAN::Perldoc>
+
+=head1 AUTHOR
+
+Clotho Advanced Media Inc., I<cpan@clotho.com>
+

@@ -1,0 +1,16 @@
+Revision history for App-Test-Tapat
+
+0.04    1224771882
+	Changed Makefile.PL so that the app gets installed into the site dir
+
+0.03_1  1224763269
+	Added Moose and TAP::Harness to the Makefile.PL
+
+0.02    1224678861
+        First _real_ version, released on an unsuspecting world. But at least it 
+	works! :) 
+
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

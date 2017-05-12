@@ -1,0 +1,31 @@
+NAME
+    Alien::Gimp - Encapsulate install info for GIMP
+
+SYNOPSIS
+      # Gimp/Makefile.PL
+      use ExtUtils::Depends;
+      my $pkg = ExtUtils::Depends->new(qw(Gimp Alien::Gimp)); # GIMP config info
+
+      use Alien::Gimp;
+      say Alien::Gimp->gimpplugindir;
+
+DESCRIPTION
+    Use in your Makefile.PL as above. Produces config info usable via
+    ExtUtils::Depends.
+
+    Available methods:
+
+  gimp
+    The path of the GIMP executable.
+
+  gimptool
+    The path of the gimptool executable.
+
+  gimpplugindir
+    The path of the GIMP plug-in directory.
+
+AUTHOR
+    Ed J
+
+SEE ALSO
+    Gimp, ExtUtils::Depends.

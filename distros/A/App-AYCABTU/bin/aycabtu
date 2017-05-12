@@ -1,0 +1,5 @@
+#!/usr/bin/env perl
+
+use lib 'lib';
+use App::AYCABTU;
+App::AYCABTU->new->run(@ARGV);

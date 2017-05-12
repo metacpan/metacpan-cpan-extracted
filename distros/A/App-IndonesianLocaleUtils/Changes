@@ -1,0 +1,6 @@
+Revision history for App-IndonesianLocaleUtils
+
+0.01    2015-07-10 (PERLANCAR)
+
+        - First release. Created to put split Perinci::CmdLine scripts from
+          Locale::ID::{Locality,Province}.

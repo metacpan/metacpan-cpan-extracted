@@ -1,0 +1,26 @@
+---
+abstract: 'Build and install GEOS'
+author:
+  - 'Alessandro Ranellucci <aar@cpan.org>'
+build_requires: {}
+configure_requires:
+  Alien::Base: 0
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-GEOS
+provides:
+  Alien::GEOS:
+    file: lib/Alien/GEOS.pm
+    version: 0.01
+requires:
+  Alien::Base: 0
+  File::ShareDir: 1.00
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

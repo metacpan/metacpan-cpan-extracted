@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d0a4fe56dc00758c72a088f1c8152ee52ef45e5d Build.PL
+SHA1 8b8b84915a6972b473099b3ec8af9453861150f6 Changes
+SHA1 c230edf167e81a9a7bf032e8e4cdadf5870e8bee MANIFEST
+SHA1 5f5263af6dd33fa08bf2838361e3961771e51a77 META.yml
+SHA1 cd14ada78fb37a0d926edd86eddcdf7f939de582 Makefile.PL
+SHA1 7458d0558314c45720a382362395992cfc0fb07c README
+SHA1 c2a67eec06c3c50d44c6de21b4112276c1f16f95 lib/Acme/DRM.pm
+SHA1 9f3a16ddcd38d60cafabb35b697dcd25286789bb t/00-load.t
+SHA1 5c78f38cbcbf39615397012496ddf722a75def92 t/doubleROT128.t
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 d10b40287bcdbfaaba708719d7b48537000a97e7 t/secureXOR.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFF53IEg+xEL6ZC5lERAvwaAJ9Q1UdB0uqVteH+jT2WjUS4IQvauQCffvs1
+bp3tF/BfGq9bF5/BSfcf06Q=
+=d/Ho
+-----END PGP SIGNATURE-----

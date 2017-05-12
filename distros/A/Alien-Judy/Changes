@@ -1,0 +1,125 @@
+Revision history for Alien-Judy
+
+0.27    Sat Mar 17, 2012
+        Acquire useful diagnostics for cpan testers
+
+0.26    Wed Jan 19, 2011
+        Re-assert that Dist::Zilla will keep src/judy-1.0.5/doc/man/man3/.keep
+        Manually mkdir src/judy-1.0.5/doc/man/man3
+        Remove tabs from Build.PL
+
+0.25    Tue Jan 18, 2011
+        Ignore $Config{make} and $Config{gmake} because they're not actually
+          useful. Look for GNU make more directly.
+        Fix documentation for inc_dirs and lib_dirs.
+        Build with Dist::Zilla
+
+0.24    Fri Jan 14, 2011
+        Remove DynaLoader check for Judy1Test. Needed? It was
+        accidentally committed before.
+
+
+0.23    Fri Jan 14, 2011
+        Load libJudy.so.1 for OpenSolaris
+
+0.22    ???
+
+0.21    ???
+
+0.20    Mon Jun 28
+        Try to find gmake if it's available
+
+0.19    Tue Jun 22 (during the TPF auction)
+        Fold both configure_requires and build_requires up to requires
+        Require Sub::Exporter for configuration
+
+0.18    Thu Jun 17 08:20:00 2010 -0700
+        Add dl_load_libjudy function
+        use warnings
+        use Sub::Exporter
+
+0.17    Mon Jun 14 00:44:44 2010 -0700
+        Use y_n instead of prompt
+        Annotate core requirements by the version of perl they appear in
+        Depend on ExtUtils::Liblist, not ExtUtils::LibList
+
+0.16    Thu Jun 10 22:19:03 2010 -0700
+        Find *.h and *.so in @INC/Alien/Judy too
+
+0.15    Thu Jun 10 11:34:35 2010 -0700
+        Glob for libJudy.so because naming conventions differ between platforms
+
+0.14    Thu Jun 10 10:46:13 2010 -0700
+        Re-add missing src/judy-1.0.5/examples/Makefile
+        Absolute paths in .gitignore so my src/judy-1.0.5/examples/Makefile will stop being dropped
+        Cleaning
+        Declare a bunch of missing configure_requires stuff
+        Install Judy.h and libJudy.h to blib/arch/Alien/Judy to make some CPAN smokers happier
+        Alien::Judy declares dynamic_config
+        MYMETA.yml is a distribution artifact
+        Be 5.005 safer
+        MYMETA.yml is a distribution artifact
+        Auto-generate README
+
+0.13    Tue Jun 8 09:34:28 2010 -0700
+        INC and LIB must be able to contain directories that don't yet exist but might in the future if Judy were installed
+        .gitignore was throwing away all the .c files in libJudy
+
+0.12    Sun Jun 6 11:01:44 2010 -0700
+        Install Judy.h to arch directory
+
+0.11    Sat Jun 5 16:23:02 2010 -0700
+        lib_dirs and inc_dirs pass an empty string to File::Spec->catdir to avoid accidentally turning into /
+        Allow *optional* html,man3 docs
+        Remove --prefix setting code
+        Specify many more ./configure directories explicity
+
+0.10    Wed May 12 14:58:07 2010 -0700
+        Update copyright
+        Build.PL is executable
+        Fixed pod syntax
+        Upgrade to Judy-1.0.5
+        Be nicer to 5.005
+        Add inc_dirs and lib_dirs functions
+        Declare dependency on ExtUtils::CBuilder
+        Removed useless Makefile.PL
+
+0.08    Sun Dec 06 20:08:00 2009
+        Absolutify prefix to ./configure
+        Run configure as `./configure', not `sh configure'. Maybe this helps the person using dmake on Windows
+        Cleaning
+
+0.07    Sat Dec 27 15:02:00 2008
+        Find Judy harder
+
+0.06    Tue Dec 24 00:27:00 2008
+        Stopped omitting all .c files.
+
+0.05    Mon Dec 23 23:50:00 2008
+        Build useful default configure argument
+        Remove useless BEGIN from My::Judy::Builder
+        Unfakeable MAKE.
+        Use system(STRING) instead of system(LIST) for less surprise
+        Actually build/test/install. Previous code stopped early due to a misunderstanding.
+        Try harder to chdir() back into place after moving away.
+
+0.04    Mon Dec 23 11:38:00 2008
+        Adding misisng files src/Judy-1.0.4/Makefile.{am,in}
+
+0.03    Sun Dec 22 11:30:00 2008
+        Added defaults to Build.PL prompts t unbreak automated installs
+
+0.02    Fri Dec 20 00:00:00 2008
+        Fixed installer to use 'test'/'install' action during
+          'test'/'install' steps. There was a copy/paste error and it
+          always ran the 'build' step.
+        Removed dependence on version.pm
+        Moved pod to separate file, trimmed Alien/Judy.pm
+        Module::Build artifacts to MANIFEST.SKIP
+        Remove two extra copies of the Judy C library
+        Minor pod fixes
+        Clarifid that Judy is licenced separately from Alien::Judy
+        Moved author tests to xt/
+
+0.01    Fri Dec 20 00:00:00 2008
+        First version, released on an unsuspecting world.

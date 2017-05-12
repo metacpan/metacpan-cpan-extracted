@@ -1,0 +1,23 @@
+bin/vw
+bin/vw-bus
+Changes
+edit
+etc/init.d/vw-ubuntu
+etc/vw_harness.tmpl
+lib/App/VW.pm
+lib/App/VW/Help.pm
+lib/App/VW/Install.pm
+lib/App/VW/Restart.pm
+lib/App/VW/Setup.pm
+lib/App/VW/Start.pm
+lib/App/VW/Stop.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-app-vw.t
+t/boilerplate.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

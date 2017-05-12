@@ -1,0 +1,47 @@
+NAME
+    Apache::SPARQL - mod_perl handler base class to implement a SPARQL query
+    service using HTTP bindings.
+
+SYNOPSIS
+     <Location /rdfstore>
+
+       SetHandler   perl-script
+       PerlHandler  Apache::SPARQL
+
+     </Location>
+
+     #
+
+     my $ua  = LWP::UserAgent->new();
+     my $req = HTTP::Request->new(GET => "http://pim.example/rdfstore?query=PREFIX+foaf%3A+%3Chttp%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2F%3E%0D%0ASELECT+%3Fpg%0D%0AWHERE%0D%0A++%28%3Fwho+foaf%3Aname+%22Norm+Walsh%22%29%0D%0A++%28%3Fwho+foaf%3Aweblog+%3Fpg%29%0D%0A");
+
+     my $res = $ua->request($req);
+
+DESCRIPTION
+    Apache::SPARQL is a mod_perl handler base class to implement a SPARQL
+    query service using HTTP bindings.
+
+IMPORTANT
+    This package is a base class and not expected to be invoked directly.
+    Please use one of the backends handlers instead.
+
+SUPPPORTED BACKENDS
+     Apache::SPARQL::RDFStore
+
+MOD_PERL COMPATIBILITY
+    This handler will work with both mod_perl 1.x and mod_perl 2.x.
+
+AUTHOR
+    Alberto Reggiori <alberto@asemantics.com>
+
+SEE ALSO
+     Apache::SPARQL::RDFStore
+     http://www.w3.org/TR/rdf-sparql-protocol/
+     http://www.w3.org/2001/sw/DataAccess/proto-wd/ (editor working draft)
+     http://www.w3.org/2001/sw/DataAccess/prot26
+     http://www.w3.org/TR/rdf-sparql-query/
+     http://www.w3.org/2001/sw/DataAccess/rq23/ (edit working draft)
+
+LICENSE
+    see LICENSE file included into this distribution
+

@@ -1,0 +1,14 @@
+# Basic POST multipart/form-data request
+#
+# The space is to get around a bug in HTTP::Message
+# (see <http://rt.cpan.org/NoAuth/Bug.html?id=13025>)
+
+POST / HTTP/1.0
+Content-Type: multipart/form-data; boundary="FOO FOO"
+
+--FOO FOO
+Content-Disposition: form-data; name="foo"
+
+bar
+--FOO FOO--
+

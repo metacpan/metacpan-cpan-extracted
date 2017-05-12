@@ -1,0 +1,174 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+#============================
+# Parse in command line options 
+
+my $opt_nav; # command option for nav file
+my $opt_pdf; # command option for pdf file
+my $trans; # command option for transition set (default clean sane)
+my $help; # command switch to display help
+my $if_gui; # boolean of operational mode, 1 = GUI, 0 = CLI
+my $class; # full class name to invoke
+
+BEGIN {
+  $help = 0;
+  $if_gui = ! @ARGV; # If no options given assume GUI mode
+  GetOptions(
+    'gui'           => \$if_gui,
+    'transitions:s' => \$trans,
+    'help|?'        => \$help,
+    'nav:s'         => \$opt_nav,
+    'pdf:s'         => \$opt_pdf,
+  );
+
+  pod2usage(0) if $help;
+
+  if ($if_gui) {
+
+    # test for Tk
+    eval { require Tk };
+    if ($@) {
+      print <<MESSAGE;
+Error: makebeamerinfo's "GUI mode" requires the Tk module to be installed.
+
+Installation may be accomplished from CPAN using the command `cpan Tk` with
+apropriate permissions. Many system package managers also provide Tk, on
+Ubuntu Linux `sudo apt-get install perl-tk` should do the trick.
+MESSAGE
+      exit(1);
+    }
+
+    # Tk is present set $class
+    $class = 'App::makebeamerinfo::GUI';
+  } else {
+    # CLI mode
+    $class = 'App::makebeamerinfo::CLI';
+  }
+
+}
+
+# use 'if' module to avoid bareword problem
+use if 1, $class;
+
+#============================
+# Use known information to find files
+
+while (@ARGV) {
+  my $arg = shift @ARGV;
+  
+  if ($arg =~ /\.nav$/) {
+    $opt_nav = $arg;
+  }
+
+  if ($arg =~ /\.pdf$/) {
+    $opt_pdf = $arg;
+  }
+}
+
+if (! $trans and $ENV{MAKEBEAMERINFO_TRANSITIONS}) {
+  $trans = $ENV{MAKEBEAMERINFO_TRANSITIONS};
+}
+
+my $app = $class->new( 
+  pdf => $opt_pdf, 
+  nav => $opt_nav, 
+  transition_set => $trans,
+);
+
+#============================
+# Run (class specific) script
+
+$app->run;
+
+__END__
+__POD__
+
+=head1 NAME
+
+makebeamerinfo - Creates .info file for use with Impressive and LaTeX Beamer
+
+=head1 SYNOPSIS
+
+  makebeamerinfo                        # No args starts the program in GUI mode
+  makebeamerinfo -p document.pdf        # Explicitly specify location of .pdf file
+  makebeamerinfo --help/-h              # Shows a usage message
+
+=head1 DESCRIPTION
+
+L<Impressive|http://impressive.sourceforge.net/> is a pdf viewer that aids in viewing presentations made in L<LaTeX Beamer|http://latex-beamer.sourceforge.net/>. Impressive uses a F<.info> control file to specify the transitions used between pages. While this file isn't necessary, the Beamer-based presentation can be presented in a much more consistant style when the F<.info> file is tuned to the individual presentation. C<makebeamerinfo> is designed to create this file based on an auxiliary file (F<.nav>) that Beamer creates in parallel with the presentation. It also does not require any configuration or tags in the presentation source.
+
+=head1 OPTIONS AND ARGUMENTS
+
+  makebeamerinfo [arguments] [files]
+
+  Run with no arguments or files starts the program in GUI mode
+
+  -g
+  --gui 
+      Explicitly request GUI mode
+
+  -t
+  --transitions
+      Request a specific transition set. Currenly it may be one of:
+      - all		allow all of the transitions
+      - default		impressive's default transitions (default)
+      - most		large set of selections for beamer
+      - none		no transitions are used
+      - turn	   	pageturn and wiperight, the author's preference
+
+      Note that these may also be specified with the (exported) environment
+      variable $MAKEBEAMERINFO_TRANSITIONS, again set to one of the above
+      selections. Note also that a command line switch wins if both are set.
+
+  -p
+  --pdf
+      Explicitly specify location of .pdf file
+
+  -n
+  --nav
+      Explicitly specify location of .nav file
+
+  Additional files may be specified without flags,
+  their file type(s) will be inferred by file extension
+
+  -h
+  --help
+      Shows a usage message and exit. Overrides all other options.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Impressive|http://impressive.sourceforge.net/>
+
+=item *
+
+L<LaTeX Beamer|http://latex-beamer.sourceforge.net/>
+
+=back
+
+=head1 SOURCE REPOSITORY
+
+L<http://github.com/jberger/MakeBeamerInfo>
+
+=head1 AUTHOR
+
+Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Joel Berger
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

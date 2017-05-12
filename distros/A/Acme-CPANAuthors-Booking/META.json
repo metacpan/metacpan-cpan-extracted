@@ -1,0 +1,65 @@
+{
+   "abstract" : "Booking.com CPAN authors",
+   "author" : [
+      "Philippe Bruhat (BooK) <book@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-CPANAuthors-Booking",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Acme::CPANAuthors" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0.88",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Acme::CPANAuthors" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0.88",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::CPANAuthors::Register" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/book/Acme-CPANAuthors-Booking.git"
+      }
+   },
+   "version" : "2016073001",
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_test_requires" : {
+      "Acme::CPANAuthors" : 0,
+      "Test::More" : 0.88,
+      "strict" : 0,
+      "warnings" : 0
+   }
+}

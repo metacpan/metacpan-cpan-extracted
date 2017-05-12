@@ -1,0 +1,36 @@
+---
+abstract: 'MPD DJ.'
+author:
+  - 'Alan Berndt <alan@eatabrick.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.035
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.120921'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-MPDJ
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  AppConfig: 0
+  Log::Dispatch: 0
+  Net::MPD: 0
+  Proc::Daemon: 0
+  perl: 5.010
+resources:
+  bugtracker: https://github.com/bentglasstube/App-MPDJ/issues
+  homepage: https://github.com/bentglasstube/App-MPDJ
+  repository: https://github.com/bentglasstube/App-MPDJ.git
+version: 1.09
+x_contributors:
+  - 'johna <johna@sordid.slotcar.prv>'

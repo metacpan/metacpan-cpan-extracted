@@ -1,0 +1,85 @@
+{
+   "abstract" : "Runs Travis-CI scripts (.travis.yml)",
+   "author" : [
+      "Fuji, Goro (gfx) <gfuji@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.5",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-test-travis",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
+            "YAML" : "0",
+            "perl" : "v5.10.0",
+            "version" : "0.77"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::test::travis" : {
+         "file" : "lib/App/test/travis.pm",
+         "version" : "v0.9.7"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gfx/App-test-travis/issues"
+      },
+      "homepage" : "https://github.com/gfx/App-test-travis",
+      "repository" : {
+         "url" : "git://github.com/gfx/App-test-travis.git",
+         "web" : "https://github.com/gfx/App-test-travis"
+      }
+   },
+   "version" : "v0.9.7",
+   "x_contributors" : [
+      "mooz <stillpedant@gmail.com>",
+      "Hideo Hattori <hattori-h@klab.com>",
+      "Fuji, Goro <g.psy.va@gmail.com>",
+      "Fuji, Goro <goro-fuji@cookpad.com>"
+   ]
+}

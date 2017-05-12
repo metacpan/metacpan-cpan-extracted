@@ -1,0 +1,432 @@
+#------------------------------------------------------------------------------
+# afsmonitor.pod
+#
+# Copyright © 2004-2006 Alf Wachsmann <alfw@slac.stanford.edu> and
+#                  Elizabeth Cassell <e_a_c@mailsnare.net>
+#
+# $Revision: 1.12 $ $Date: 2006/07/05 22:25:10 $ $Author: alfw $
+#
+# This library is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<afsmonitor> - Gathers statistics about File Servers and Cache Managers
+
+=head1 SYNOPSIS
+
+  use AFS::Monitor;
+  my ($fs, $cm);
+
+  ($fs, $cm) = afsmonitor(cmhosts => "hostName1");
+
+  ($fs, $cm) = afsmonitor(
+                          cmhosts => ["hostName1", "hostName2"],
+                          fshosts => ["hostName3", "hostName4"],
+                         );
+
+  ($fs, $cm) = afsmonitor(
+                          config => "configfilename",
+                          output => "outputfilename",
+                          detailed => 1,
+                         );
+
+  foreach $host (@$fs) {
+    print "FS Host: $host->{hostName}\n";
+    if($host->{probeOK}) {
+      print "probe successful\n";
+    }
+    else {
+      print "probe failed\n";
+    }
+  }
+
+  ($fs, $cm) =
+    afsmonitor(
+           cmhosts  => ["hostName1", "hostName2"],
+           fshosts  => ["hostName3", "hostName4", "hostName5"],
+           cmshow   => ["PerfStats_section", "fs_oc_downDst_more_50"],
+           fsshow   => ["VnodeCache_group", "FetchData_sqr"],
+           fsthresh => [
+                        { vcache_S_Entries => 10
+                        },
+                        { vcache_L_Allocs  => 30
+                        },
+                        { host => "hostName3",
+                          vcache_L_Writes => 20,
+                          handler => "HandlerScript arg1 arg2"
+                        },
+                        { host => "hostName5",
+                          vcache_L_Writes => 40,
+                        }
+                       ],
+           cmthresh => [
+                        { host => "hostName1",
+                          numPerfCalls => 80,
+                          handler => "HandlerScript arg"
+                        },
+                        { fs_oc_downDst_more_50 => 90
+                        },
+                        { cacheNumEntries => 60,
+                          handler => "HandlerScript"
+                        },
+                        { host => "hostName2",
+                          dlocalAccesses => 70
+                        }
+                       ],
+           );
+
+=head1 DESCRIPTION
+
+The B<afsmonitor> function gathers statistics about specified File Server
+and Cache Manager operations. It allows the issuer to monitor, from a
+single location, a wide range of File Server and Cache Manager
+operations on any number of machines in both local and foreign cells.
+
+There are 271 available File Server statistics and 571 available Cache
+Manager statistics, listed in the L<afsmon_stats(1)> documentation. By default,
+the command displays all of the relevant statistics for the file server
+machines named by the B<fshosts> argument and the client machines named
+by the B<cmhosts> argument. To limit the display to only the statistics
+of interest, list them in the configuration file specified by the
+B<config> argument. In addition, use the configuration file for the
+following purposes:
+
+=over
+
+=item *
+
+To set threshold values for any statistic. The statistics with values exceeding
+their thresholds are indicated in the returned data structure. There are no
+default threshold values.
+
+=item *
+
+To specify a program or script to associate with a statistic when it exceeds its
+threshold. The script and all of it's arguments will be included in the returned
+data structure in a format easy to invoke from within a Perl script. The AFS
+distribution does not include any such scripts.
+
+=item *
+
+To list the file server and client machines to gather statistics on, instead of
+using the B<fshosts> and B<cmhosts> arguments.
+
+=back
+
+For a description of the configuration file, see the
+L<"configuration file"|/"THE CONFIGURATION FILE"> section below.
+
+=head1 OPTIONS
+
+=over
+
+=item B<config>
+
+Names the configuration file which lists the machines to probe,
+statistics to display, and threshold values, if any. A partial
+pathname is interpreted relative to the current working directory.
+Provide this argument if not providing the B<fshosts> argument or
+B<cmhosts> argument. For instructions on creating this file, see the
+L<"configuration file"|/"THE CONFIGURATION FILE"> section below.
+
+=item B<output>
+
+Names the file to which the B<afsmonitor> function writes all of the
+statistics that it collects. By default, no output file is created.
+See the L<"writing to an output file"|/"WRITING TO AN OUTPUT FILE">
+section below for more information on this file.
+
+=item B<detailed>
+
+Formats the information in the output file named by B<output> argument in a
+maximally readable format. Provide the B<output> argument along with this one.
+
+=item B<fshosts>
+
+String with one name or reference to an array with names of one or
+more machines from which to gather File Server
+statistics. For each machine, provide either a fully qualified
+host name, or an unambiguous abbreviation (the ability to resolve
+an abbreviation depends on the state of the cell's name service
+at the time the command is issued). This argument can be combined
+with the B<cmhosts> argument, but not with the B<config> argument.
+
+=item B<cmhosts>
+
+String with one name or reference to an array with names of one or
+more machines from which to gather Cache Manager
+statistics. For each machine, provide either a fully qualified
+host name, or an unambiguous abbreviation (the ability to resolve
+an abbreviation depends on the state of the cell's name service
+at the time the command is issued). This argument can be combined
+with the B<fshosts> argument, but not with the B<config> argument.
+
+=item B<fsshow>
+
+Reference to an array with the names of individual statistics, groups of
+statistics, or sections of statistics to include in the File Servers (fs)
+data structure. Use this only if not using a configuration file. The
+L<afsmon_stats(1)> documentation specifies the group and section to which
+each statistic belongs. By default, all of the statistics will be included.
+
+=item B<cmshow>
+
+Reference to an array with the names of individual statistics, groups of
+statistics, or sections of statistics to include in the Cache Managers (cm)
+data structure. Use thi sonly if not using a configuration file. The
+L<afsmon_stats(1)> documentation specifies the group and section to which
+each statistic belongs. By default, all of the statistics will be included.
+
+=item B<fsthresh>
+
+Reference to an array of hash references containing thresholds to set. Each
+hash should contain a key that is the name of an individual File Server
+statistic, with it's value being the desired threshold value for that
+statistic. If it is a host-specific threshold, then the key B<host> should
+be included, with a value corresponding to one of the File Server hosts
+specified in the B<fshosts> argument. If a handler function is to be
+associated with the threshold, the key B<handler>'s value should be the name
+of the handler function and any arguments to be passed to the handler.
+
+=item B<cmthresh>
+
+Reference to an array of hash references containing thresholds to set. Each
+hash should contain a key that is the name of an individual Cache Manager
+statistic, with it's value being the desired threshold value for that
+statistic. If it is a host-specific threshold, then the key B<host> should
+be included, with a value corresponding to one of the Cache Manager hosts
+specified in the B<cmhosts> argument. If a handler function is to be
+associated with the threshold, the key B<handler>'s value should be the name
+of the handler function and any arguments to be passed to the handler.
+
+=back
+
+=head1 OUTPUT
+
+The return values are references to two arrays, one for file
+servers and one for cache managers. Each entry in each array
+is a reference to a hash containing information about one of
+the hosts specified either by the fshosts or cmhosts options,
+or in the config file. Each hash in these arrays contains the
+following entries:
+
+=over
+
+=item B<hostName>
+
+The name of the host that these statistics represent.
+
+=item B<probeOK>
+
+1 if the statistics were gathered successfully, 0 if the probe failed and no statistics were gathered.
+
+=item B<section_names>
+
+The rest of the keys are the names of sections of statistics (specified in the
+L<afsmon_stats(1)> documentation).
+Each section entry points to another hash containing entries for each group of
+statistics (with keys corresponding to the group name) within that section.
+Each group entry points to another hash containing entries for all of the
+individual statistics (with keys corresponding to the name of the statistic)
+within that group.
+The individual statistics also point to hashes, containing up to three entries:
+
+=over
+
+=item B<value>
+
+The value of the statistic for this host.
+
+=item B<overflow>
+
+This key will be present if the value has exceeded a threshold provided in the configuration file.
+If a command to execute was specified for this threshold, this entry will contain a string with
+the name of the command and all of the parameters that should be passed to the command.
+If no command to execute was specified, the value of this entry will be 1.
+
+=item B<threshold>
+
+If this value has exceeded a threshold, this entry will contain the threshold value.
+The threshold key will not exist in the hash if no threshold was specified, or if the
+specified threshold was not exceeded.
+
+=back
+
+If a config file with "show" directives was given, then only the statistics specified
+in the config file will be included, and any groups or sections that were not specified
+by a "show" statement and in which no individual statistics were specified by a "show"
+statement will not be included.
+
+=back
+
+For examples of accessing the information in the returned data structures
+and printing it in a readable format, refer to the B<afsmonitor> script
+in the B<examples> directory.
+
+=head1 WRITING TO AN OUTPUT FILE
+
+Include the B<output> argument to name the file into which the
+B<afsmonitor> function writes all of the statistics it collects.
+
+The output file is in ASCII format and records the same
+information as is returned in the File Server and Cache Manager
+data structures. The output file has the following format:
+
+   time  host_name  CM|FS   list_of_measured_values
+
+and specifies the time at which the list_of_measured_values were
+gathered from the Cache Manager (CM) or File Server (FS) process
+housed on host_name. On those occasion where probes fail, the
+value -1 is reported instead of the list_of_measured_values.
+
+If the administrator usually reviews the output file manually,
+rather than using it as input to an automated analysis program or
+script, including the B<detail> flag formats the data in a more
+easily readable form.
+
+=head1 THE CONFIGURATION FILE
+
+To customize the B<afsmonitor> function, create an ASCII-format
+configuration file and use the B<config> argument to name it. You
+can specify the following in the configuration file:
+
+=over
+
+=item *
+
+The File Servers, Cache Managers, or both, to gather statistics on.
+
+=item *
+
+The statistics to display. By default, the display includes 271
+statistics for File Servers and 571 statistics for Cache Managers.
+For information on the available statistics, see the L<afsmon_stats(1)>
+documentation.
+
+=item *
+
+The threshold values to set for statistics and a script or program
+to associate with the statistic if a threshold is exceeded. By
+default, no threshold values are defined.
+
+=back
+
+The following list describes the instructions that can appear
+in the configuration file:
+
+=over
+
+=item B<cm I<host_name>>
+
+Names a client machine for which to display statistics.
+
+=item B<fs I<host_name>>
+
+Names a file server machine for which to display statistics.
+
+=item B<thresh fs | cm I<field_name> I<thresh_val> [cmd_to_execute] [arg1] ... [argn]>
+
+Assigns the threshold value thresh_val to the statistic field_name,
+for either a File Server statistic (fs) or a Cache Manager statistic
+(cm). The optional cmd_to_execute field names a binary or script to
+associate with the statistic if the value of the statistic exceeds
+thresh_val. The optional arg1 through argn fields are additional values
+that the B<afsmonitor> function adds as arguments for the cmd_to_execute
+command. If any of them include one or more spaces, enclose the
+entire field in double quotes.
+
+If a statistic exceeds its threshold and there is a cmd_to_execute
+associated with it, afsmonitor will provide a string which can be
+used to easily execute the cmd_to_execute from within perl with the
+following parameters:
+
+cmd_to_execute I<host_name> fs|cm I<field_name threshold_val actual_val> [E<lt>arg1E<gt>] . . . [E<lt>argnE<gt>]
+
+The parameters cmd_to_execute, fs, cm, field_name, threshold_val,
+and arg1 through argn correspond to the values with the same name
+on the thresh line. The host_name parameter identifies the file
+server or client machine where the statistic has exceeded the
+threshold, and the actual_val parameter is the actual value of
+field_name that equals or exceeds the threshold value.
+
+Use the thresh line to set either a global threshold, which applies
+to all file server machines listed on fs lines or client machines
+listed on cm lines in the configuration file, or a machine-specific
+threshold, which applies to only one file server or client machine.
+To set a global threshold, place the thresh line before any of the
+fs or cm lines in the file. To set a machine-specific threshold,
+place the thresh line below the corresponding fs or cm line, and
+above any other fs or cm lines. A machine-specific threshold value
+always overrides the corresponding global threshold, if set. Do not
+place a thresh fs line directly after a cm line or a thresh cm line
+directly after a fs line.
+
+=item B<show fs | cm I<field/group/section>>
+
+Specifies which individual statistic, group of statistics, or
+section of statistics to include in the File Servers (fs) and/or
+Cache Managers (cm) data structure. The L<afsmon_stats(1)> documentation
+specifies the group and section to which each statistic belongs.
+Include as many show lines as necessary to customize the results
+as desired, and place them anywhere in the file.
+
+If there are no show lines in the configuration file, then all
+statistics for both Cache Managers and File Servers will be
+included. Similarly, if there are no show fs lines, then the File
+Servers data structure will contain all file server statistics,
+or if there are no show cm lines, then the Cache Managers data
+structure will display all client statistics.
+
+=item B<# I<comments>>
+
+Displays a line of text that the B<afsmonitor> function ignores because
+of the initial number (#) sign, which must appear in the very first
+column of the line.
+
+=back
+
+=head1 KNOWN BUGS
+
+Some statistical values reported by L<xstat_fs_test(1)> are not yet
+included in afsmonitor. This is a problem of the underlying OpenAFS
+libraries and will be fixed in this Perl module as soon as those
+libraries are fixed.
+
+=head1 AUTHORS
+
+The code and documentation for this class were contributed by Stanford
+Linear Accelerator Center, a department of Stanford University.  This
+documentation was written by
+
+=over
+
+=item Elizabeth Cassell <e_a_c@mailsnare.net> and
+
+=item Alf Wachsmann <alfw@slac.stanford.edu>
+
+=back
+
+=head1 COPYRIGHT AND DISCLAIMER
+
+ Copyright 2004-2006
+		Alf Wachsmann <alfw@slac.stanford.edu> and
+                Elizabeth Cassell <e_a_c@mailsnare.net>
+ All rights reserved.
+
+ Most of the explanations in this document are taken from the original
+ AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ Volume Server/Volume Location Server Interface
+ Edward R. Zayas
+ (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ (c) IBM Corporation 2000.
+ All rights reserved.
+
+ This library is free software; you can redistribute it and/or modify it
+ under the same terms as Perl itself.

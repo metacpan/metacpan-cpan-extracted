@@ -1,0 +1,52 @@
+{
+   "abstract" : "Extremely simple timed asynchronous events",
+   "author" : [
+      "Steve Bertrand <steveb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Async-Event-Interval",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Parallel::ForkManager" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevieb9/async-event-interval/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevieb9/async-event-interval.git",
+         "web" : "https://github.com/stevieb9/async-event-interval"
+      }
+   },
+   "version" : "0.03"
+}

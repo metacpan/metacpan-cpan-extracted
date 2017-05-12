@@ -1,0 +1,185 @@
+#!/usr/bin/perl
+#
+# This file is part of Audio-MPD
+#
+# This software is copyright (c) 2007 by Jerome Quelin.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
+use strict;
+use warnings;
+use 5.010;
+
+# PODNAME: mpd-dump-ratings
+# ABSTRACT: dump mpd ratings & filter them
+
+use DB_File;
+use Encode;
+use Getopt::Euclid;
+use List::MoreUtils qw[ all ];
+
+my %db;
+tie %db, 'DB_File', "$ENV{HOME}/.mpd/ratings.db";
+my $music = '/home/jquelin/Music';
+
+FILENAME:
+foreach my $file (sort keys %db) {
+    # minimum rating
+    next unless $db{$file} >= $ARGV{-min};
+
+    # match some pattern(s)
+    next if exists $ARGV{'<pattern>'}
+         && not all { $file =~ /$_/i } @{ $ARGV{'<pattern>'} };
+
+    # orphan files
+    if ( $ARGV{-orphan} ) {
+        next if -f "$music/$file";
+
+        # trying to repair
+        if ( $ARGV{-repair} ) {
+            my $utf = encode('utf-8', $file);
+            if ( -f "$music/$utf" ) {
+                print "$db{$file}: $utf [utf8]";
+                if ( exists($db{$utf}) && defined($db{$utf}) ) {
+                    # duplicate rating
+                    print "[duplicate]";
+                    if ( $db{$utf} == $db{$file} ) {
+                        delete $db{$file};
+                        say "[fixed]";
+                    } else {
+                        say "[mismatch $db{$file}!=$db{$utf}]";
+                        print "enter new rating: ";
+                        my $rate = <STDIN>;
+                        chomp $rate;
+                        $db{$utf} = $rate;
+                        delete $db{$file};
+                    }
+                } else {
+                    # ok, single rating, convert to utf8
+                    $db{$utf} = $db{$file};
+                    delete $db{$file};
+                    say "[fixed]";
+                }
+            } else {
+                if ( $ARGV{-delete} ) {
+                    say "$db{$file}: $file [delete]";
+                    delete $db{$file};
+                } else {
+                    say "$db{$file}: $file [orphan]";
+                }
+            }
+            next; #
+        }
+    }
+
+    print "$db{$file}: $file\n";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+mpd-dump-ratings - dump mpd ratings & filter them
+
+=head1 VERSION
+
+version 2.004
+
+=head1 DESCRIPTION
+
+Dumps the mpd ratings associated to songs. Each filename will be dumped
+on a line with a prefix "rating: ". One can filter out the filenames
+dumped with some options.
+
+=head1 NAME
+
+mpd-dump-ratings - dump mpd ratings
+
+=head1 USAGE
+
+    mpd-dump-ratings [options]
+
+=head1 OPTIONS
+
+=over 4
+
+=item -m[in[imum]] [=] <min>
+
+Minimum rating for a song to be displayed. Default to 0.
+
+=for Euclid: min.type:    int > 0
+    min.default: 0
+
+=item -o[rphan[ed]]
+
+Print only orphan pathes (ie, with no matching filename).
+
+=item -r[epair]
+
+Try to fix the database for orphan pathes (ie, doesn't work if
+C<-orphan> is not supplied). Existing fixes performed:
+
+=over 4
+
+=item try to convert orphan path to utf8.
+
+=back
+
+If one of those fix leads to a valid path, it will try to fix database.
+Of course, it checks if this leads to duplicate values.
+
+=item -d[elete]
+
+If C<-repair> did not manage to find a plausible replacement for the
+orphan rating, then it will remove this rating from the database. This
+can be the case when you removed a song...
+
+B<Warning>: you will potentially loose some information!
+
+=item <pattern>
+
+Filter out songs that don't match given C<pattern>.
+
+=for Euclid: repeatable
+    pattern.type:    string
+    pattern.default: ''
+
+=item --version
+
+=item --usage
+
+=item --help
+
+=item --man
+
+Print the usual program information
+
+=back
+
+=head1 AUTHOR
+
+Jerome Quelin, "<jquelin at cpan.org>"
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2008 Jerome Quelin, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Jerome Quelin
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2007 by Jerome Quelin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

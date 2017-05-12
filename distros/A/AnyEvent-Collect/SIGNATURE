@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8be71ebf447e146affcb7015e1411a961b8f45f7 ChangeLog
+SHA1 24732a9b1ab89cc3c3cc4290e89e27f114911341 INSTALL
+SHA1 776b35de0d79370b17f9b26a61565d97aaee5acd LICENSE
+SHA1 5b23e2f9465c147b8100d61f48459d31a345520c MANIFEST
+SHA1 e9d1a07b43b546b37a2979e9549bc0e189a60354 META.yml
+SHA1 009a0b81f70f31f7d4fa31966e62e98fde8cf035 Makefile.PL
+SHA1 335ba4fd3d6f048ec2cdca4b838820d82116f028 README
+SHA1 2751c6d3558fc686b7f34705dae816911b0df88e lib/AnyEvent/Collect.pm
+SHA1 17773bda271b8010977df370b94b57b5827923dd t/basic.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 8d931d5c7b6fc03e39a744d59522e4b7077562a1 t/release-portability.t
+SHA1 612226d447015079c046d65932f774304a4b9f20 t/release-synopsis.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIcBAEBAgAGBQJQFOwvAAoJEF6ojHedHIiFwrsQAMDChrw2VoVoxEML1t0vqgrr
+FXy9HbZSetWFmGxr7goVsiQD4HsIF4NWLHsEQwh9c95yOsYEuxq+TYkXnlahtNYv
+nu5PoUMSgr/KnFG+RlKlnBtiS7vQDTammOlknHV1nalpP0TlP4ESuMPRYAtAF4Z7
+mdZ6J7/YQiUfeypKCtBMMli5/QkdWmpf0CR+vWV/AEMzS15ssmDLba6qHo/SMxa9
+pwgfelx6htzchnQt8O9vrhnBatINgiORj8mNpaELBZBmrMax34/fcH0Cp/kmDPsb
+H9F3EmgJfufYT4QPO8l7xk2g7Ipy/ns8SRvz2zsgcKZISTm5ot/YKXd7R8bC7/Hs
+5u7B+v0jqsObXPLhxjAYVt8ciJatczPRFdojoWMXPJDBTT4CIY2C0vLaLTSXPHTI
+p8FDJblQfHSk9WmWw0vsUCMXuEvi/BCSGGMfJUfODwUQIMErJKvLbIVRn9s6kB+q
+/9ZuU4ZjDBOqXJsIX6MO3aeRxwekEjM+OZgMa2MnNwXQs57+/iEgd/5hhIG56qx2
+XFL74F1VvWnfSHlW3ls6IlpiUNhA2RoMhF3fMqn11sPgYQ7VbPmvKdQ3k58HEtrt
+G3XTDVC9nCxBkcX0D8mIjtoAT1k3BOw//XxKvGyY+ql+IxyqQyD2S3GBIdA63psg
+RJyAOP1d1+yo1fGMB9ia
+=rTbS
+-----END PGP SIGNATURE-----

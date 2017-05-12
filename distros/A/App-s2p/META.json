@@ -1,0 +1,366 @@
+{
+   "abstract" : "a stream editor",
+   "author" : [
+      "Leon Timmermans <leont@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-s2p",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Symbol" : "0",
+            "integer" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::FindPerl" : "0.009",
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open2" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::s2p" : {
+         "file" : "script/s2p",
+         "version" : "1.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-app-s2p at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=App-s2p"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/app-s2p.git",
+         "web" : "https://github.com/Leont/app-s2p"
+      }
+   },
+   "version" : "1.002",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.020000"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@Filter/GatherDir",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@Filter/PruneCruft",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@Filter/ManifestSkip",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@Filter/MetaYAML",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@Filter/License",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@Filter/Readme",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@Filter/ShareDir",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@Filter/Manifest",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@Filter/TestRelease",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@Filter/ConfirmRelease",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@Filter/UploadToCPAN",
+            "version" : "5.019"
+         },
+         {
+            "class" : "inc::MyMakeMaker",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "=inc::MyMakeMaker",
+            "version" : null
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "ExecDir",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneFiles",
+            "name" : "PruneFiles",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder" : [
+                     "ExecDir"
+                  ],
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::ExecDir",
+                        "name" : "ExecDir",
+                        "version" : "5.019"
+                     }
+                  ]
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "inherit_missing" : "1",
+                  "inherit_version" : "1",
+                  "meta_noindex" : "1"
+               }
+            },
+            "name" : "MetaProvides::Package",
+            "version" : "2.000001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
+            "name" : "CheckChangesHasContent",
+            "version" : "0.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "MetaConfig",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "MetaJSON",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "AutoPrereqs",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Repository",
+            "name" : "Repository",
+            "version" : "0.20"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Bugtracker",
+            "name" : "Bugtracker",
+            "version" : "1.111080"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::NextVersion",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::NextVersion" : {
+                  "first_version" : "0.001",
+                  "version_by_branch" : "0",
+                  "version_regexp" : "(?^:^v(.+)$)"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "Git::NextVersion",
+            "version" : "2.022"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "NextRelease",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Check" : {
+                  "untracked_files" : "die"
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "dist.ini",
+                     "Changes"
+                  ],
+                  "allow_dirty_match" : [],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Git/Check",
+            "version" : "2.022"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Commit" : {
+                  "add_files_in" : [],
+                  "commit_msg" : "v%v%n%n%c",
+                  "time_zone" : "local"
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "dist.ini",
+                     "Changes"
+                  ],
+                  "allow_dirty_match" : [],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Git/Commit",
+            "version" : "2.022"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Tag" : {
+                  "branch" : null,
+                  "signed" : 0,
+                  "tag" : "v1.002",
+                  "tag_format" : "v%v",
+                  "tag_message" : "v%v",
+                  "time_zone" : "local"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Git/Tag",
+            "version" : "2.022"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Push" : {
+                  "push_to" : [
+                     "origin"
+                  ],
+                  "remotes_must_exist" : 1
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Git/Push",
+            "version" : "2.022"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "PkgVersion",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Compile",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Compile" : {
+                  "filename" : "t/00-compile.t",
+                  "module_finder" : [
+                     ":InstallModules"
+                  ],
+                  "script_finder" : [
+                     ":ExecFiles"
+                  ]
+               }
+            },
+            "name" : "Test::Compile",
+            "version" : "2.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":AllFiles",
+            "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":NoFiles",
+            "version" : "5.019"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "5.019"
+      }
+   }
+}
+

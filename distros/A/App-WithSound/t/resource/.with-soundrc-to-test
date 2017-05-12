@@ -1,0 +1,12 @@
+SUCCESS=foo
+FAILURE=bar
+RUNNING=baz
+
+[cmd1]
+SUCCESS=cmd1_foo
+FAILURE=cmd1_bar
+RUNNING=cmd1_baz
+
+[cmd2]
+SUCCESS=cmd2_foo
+

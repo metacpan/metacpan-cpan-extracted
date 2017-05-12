@@ -1,0 +1,164 @@
+Revision history for App-Fasops
+
+0.5.11 2016-12-19T19:56:59Z
+    - Add `fasops stat`
+
+0.5.10 2016-12-18T20:19:59Z
+    - Remove dependency on List::MoreUtils
+    - Move calc_ld() here
+
+0.5.9 2016-12-17T18:06:32Z
+    - Close $out_fh and $in_fh at once
+
+0.5.8 2016-12-17T15:06:56Z
+    - Add `fasops concat`
+
+0.5.7 2016-12-17T04:57:15Z
+    - Add `fasops check`
+
+0.5.6 2016-12-16T10:30:10Z
+    - Fix unknown SNPs
+    - Add snp_ prefix to get_snps() and polarize_snp()
+
+0.5.5 2016-12-16T02:52:25Z
+    - Switch to Minilla
+    - Improve test coverage
+    - Without outgroups, consider indels occurred at target
+
+0.5.4  2016-12-15 03:13:17 CST
+    - Add `fasops xlsx`
+    - show_defaults => 1 for all commands
+
+0.5.3  2016-12-14 05:41:39 CST
+    - Add get_snps(), polarize_snp()
+    - Add get_indels(), polarize_indel()
+    - Merge xt/11-refine.t to t/
+
+0.5.2  2016-12-12 02:06:09 CST
+    - Bring Perl 5.10 back
+
+0.5.1  2016-12-09 21:51:44 CST
+    - Drop Perl 5.10
+
+0.5.0  2016-12-09 21:22:25 CST
+    - Read from stdin
+
+0.4.13  2016-07-07 22:32:08 CST
+    - Add codecov badge
+
+0.4.12  2016-06-30 16:35:03 CST
+    - Speed up Common::read_fasta()
+
+0.4.11  2016-06-26 03:46:35 CST
+    - Fix command refine with --chop
+
+0.4.10  2016-06-26 03:20:10 CST
+    - Add --chop to command refine
+
+0.4.9  2016-06-25 22:03:35 CST
+    - Merge command multilinks into links
+
+0.4.8  2016-06-21 06:11:14 CST
+    - Add --best to command links
+    - Command multilinks
+
+0.4.7  2016-06-19 04:06:59 CST
+    - App::RL::Common::decode_header() changed
+
+0.4.6  2016-05-30 21:31:20 CST
+    - Improve command refine following guides provided by Mario Roy.
+
+0.4.5  2016-05-24 22:33:02 CST
+    - Better prompts
+
+0.4.4  2016-05-24 08:36:40 CST
+    - Clean prompts
+
+0.4.3  2016-05-21 19:47:58 CST
+    - Parallelise command refine
+
+0.4.2  2016-05-14 03:54:19 CST
+    - Add `fasops join`
+    - Add --required to command subset
+    - Add --chr to command split
+
+0.4.1  2016-05-12 22:44:56 CST
+    - Add --length to command slice
+    - Add --length and --trim to command covers
+
+0.4.0  2016-05-12 03:40:52 CST
+    - Specify versions of dependencies
+
+0.3.14  2016-05-12 02:15:06 CST
+    - Add `fasops slice`
+
+0.3.13  2016-05-10 21:00:06 CST
+    - `fasops refine --outgroup --quick`
+
+0.3.12  2016-05-09 17:14:03 CST
+    - Fix ref_pair_D
+
+0.3.11  2016-05-08 20:02:14 CST
+    - Move subs from AlignDB::Util
+
+0.3.10  2016-05-07 17:30:24 CST
+    - codecov
+
+0.3.9  2016-05-07 14:15:37 CST
+    - Export nothing. Remove duplicated functions
+    - Add strict and warnings to every modules
+
+0.3.8  2016-05-05 00:26:00 CST
+    - move 11-refine.t to xt/
+
+0.3.7  2016-05-04 01:27:07 CST
+    - Add `fasops refine`
+
+0.3.6  2016-04-08 15:06:47 CST
+    - Require 5.10
+
+0.3.5  2016-04-08 15:01:07 CST
+    - Add travis-ci
+
+0.3.4  2016-02-27 01:57:33 CST
+    - `fasops replace` remove blocks
+
+0.3.3  2016-02-07 11:43:35 CST
+    - Fix warnings
+
+0.3.2  2016-01-15 17:18:28 CST
+    - A real Changes file
+
+0.3.1  Thu Jan  7 02:12:28 2016
+    - Add --size for `fasops axt2fas`
+
+0.2.9  Mon Dec 28 17:02:40 2015
+    - Common functions
+    - Add `fasops links`
+    - Add `fasops replace`
+
+0.2.6  Mon Dec 28 09:31:35 2015
+    - Change regex in App::Fasops::decode_header()
+
+0.2.5  Sun Dec 27 21:11:13 2015
+    - Tests for `fasops separate`
+
+0.2.4  Fri Dec 25 02:22:41 2015
+    - Rewrite axt2fas and maf2fas
+
+0.2.3  Thu Dec 24 23:24:10 2015
+    - Add `fasops covers`
+    - split and names accept more than one files
+
+0.2.2  2015-12-24 22:09:28 CST
+    - Fix `fasops split`
+    - Add `fasops separate`
+
+0.2.1  2015-10-28 19:19:10 CST
+    - Add license
+
+0.2.0  2015-07-31 02:49:59 CST
+    - Convert to Dist::Milla
+
+0.1.0  2015-04-13 00:00:00 CST
+    - Now useful

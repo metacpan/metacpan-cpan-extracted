@@ -1,0 +1,6 @@
+Revision history for Perl extension App::Diskd.
+
+0.01  Mon Sep 23 21:45:30 2013
+	- original version; created by h2xs 1.23 with options
+		-X App::Diskd
+

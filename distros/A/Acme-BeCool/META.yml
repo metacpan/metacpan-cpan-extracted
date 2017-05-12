@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+version:      0.02
+name:         Acme-BeCool
+abstract:     Do what it takes to be a Cool Hacker at the moment.
+author:
+    - Sean O'Rourke <seano@cpan.org>
+license:      perl
+version_from: BeCool.pm
+installdirs:  site
+requires:
+    LWP::Simple:                   0
+
+meta-spec:
+    version: 1.4
+    url: http://module-build.sourceforge.net/META-spec-v1.3.html
+
+distribution_type: module
+generated_by: your humble servant

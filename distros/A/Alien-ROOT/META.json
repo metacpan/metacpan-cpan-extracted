@@ -1,0 +1,70 @@
+{
+   "abstract" : "Utility package to install and locate CERN's ROOT library",
+   "author" : [
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-ROOT",
+   "no_index" : {
+      "directory" : [
+         "buildtools",
+         "t",
+         "xt",
+         "inc",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Archive::Extract" : "0",
+            "ExtUtils::CBuilder" : "0",
+            "File::Fetch" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "IPC::Open3" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::ROOT" : {
+         "file" : "lib/Alien/ROOT.pm",
+         "version" : "v5.34.36.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-ROOT"
+      },
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php",
+         "http://www.opensource.org/licenses/gpl-2.0.php"
+      ],
+      "repository" : {
+         "url" : "git://github.com/tsee/SOOT.git"
+      },
+      "x_Ratings" : "http://cpanratings.perl.org/d/Alien-ROOT"
+   },
+   "version" : "v5.34.36.1"
+}

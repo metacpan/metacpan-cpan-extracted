@@ -1,0 +1,55 @@
+NAME
+    Apache::GzipChain - compress HTML (or anything) in the OutputChain
+
+SYNOPSIS
+    In the configuration of your apache add something like
+
+        <Files *.html>
+        SetHandler perl-script
+        PerlHandler Apache::OutputChain Apache::GzipChain __your_handler__
+        PerlSetVar GzipForce on  # optional
+        </Files>
+
+DESCRIPTION
+    This module compresses any output from another perl handler if the
+    browser requesting the document understands gzip encoding or if the
+    config variable ForceGzip is set. To determine if the browser is able to
+    understand us we check its *Accept-Encoding* header.
+
+    The module works without influencing the other handlers in the chain.
+    The only thing that can be noticed by other handlers is that the
+    response header 'Content-Encoding' has been set. If GzipChain decides
+    not to do any compression, it just declines and doesn't even register
+    itself for the output chain.
+
+    GzipChain compresses every single buffer content it receives via the
+    output chain separately according to the GZIP specification (RFC 1952).
+    The compression ratio therefore suffers if the other module sends its
+    data in very small chunks. It is recommended that you use as few print
+    statements as possible in conjunction with the GzipChain. One single
+    print statement is recommended.
+
+HEADERS
+    This handler sets the header "Content-Encoding" to "gzip" whenever it
+    sends gzipped data.
+
+    It also sets or appends to the "Vary" header the values
+    "Accept-Encoding" unless the config variable GzipForce is set, in which
+    case the output is the same for all user agents.
+
+Unicode
+    To use this module under perl-5.8 or higher with Unicode data you have
+    to convert to octets before printing them. Something like this will do:
+
+      Encode::encode_utf8($res);
+
+PREREQUISITES
+    Compress::Zlib, Apache::OutputChain
+
+AUTHOR
+    Andreas Koenig, based on code by Jan Pazdziora
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

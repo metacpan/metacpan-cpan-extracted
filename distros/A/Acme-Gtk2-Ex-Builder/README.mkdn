@@ -1,0 +1,251 @@
+# NAME
+
+Acme::Gtk2::Ex::Builder - Funny Gtk2 Interface Design Module
+
+# VERSION
+
+version 0.008
+
+# SYNOPSIS
+
+    use strict;
+    use warnings;
+    use Gtk2 -init;
+    use Acme::Gtk2::Ex::Builder;
+    
+
+    my $app = build {
+        widget Window => contain {
+            info id           => 'window';
+            set  title        => 'Awesome App';
+            set  default_size => 200, 100;
+            set  position     => 'center';
+            on   delete_event => sub { Gtk2->main_quit; };
+    
+
+            widget Button => contain {
+                set label  => 'Action';
+                on clicked => sub { say 'Seoul Perl Mongers!' };
+            };
+        };
+    };
+    
+
+    $app->find('window')->show_all;
+    Gtk2->main;
+
+# METHODS
+
+## find
+
+Find and get widget by ID.
+You can find widget only you set `id` with `info` function.
+
+    my $app = build {
+        widget Window => contain {
+            info id => 'my-window';
+        };
+    };
+    
+
+    my $window = $app->find('my-window');
+
+# FUNCTIONS
+
+## build
+
+This function acts like ordinary "new" method.
+It is exported by default and returns [Acme::Gtk2::Ex::Builder](http://search.cpan.org/perldoc?Acme::Gtk2::Ex::Builder) object.
+It can contains several `widget` functions.
+
+    my $app = build {
+        widget Window;
+        widget Dialog;
+        widget FileChooser;
+        widget VBox;
+    };
+
+## widget
+
+This function creates the Gtk2 widget.
+In fact when you use this, `Gtk2::XXX->new` will be called.
+See [Gtk2](http://search.cpan.org/perldoc?Gtk2) and Gtk2 API reference.
+
+Following code will call `Gtk2::Window->new`.
+
+    my $app = build {
+        widget Window;
+    };
+
+If you need more children widgets,
+use `contain`, then call `widget` again and again.
+
+    my $app = build {
+        widget Window contain => {
+            widget HBox => contain {
+                widget Button;
+                widget Button;
+                widget Button;
+            };
+        };
+    };
+
+If you have to use more parameters for constructor,
+then specify additional parameters after the `widget` block.
+Following code create [Gtk2::SimpleList](http://search.cpan.org/perldoc?Gtk2::SimpleList) with
+additional `timestamp`, `nick` and `message` parameter.
+See [Gtk2](http://search.cpan.org/perldoc?Gtk2) and Gtk2 API reference.
+
+    use Gtk2;
+    use Gtk2::SimpleList; # Do NOT forgot!!
+    
+
+    my $app = build {
+        widget SimpleList => contain {
+            info id              => 'logviewer';
+            set  headers_visible => FALSE;
+            set  rules_hint      => TRUE;
+        }, (
+            timestamp => 'markup',
+            nick      => 'markup',
+            message   => 'markup',
+        );
+    };
+
+It also supports prebuilt widget.
+
+    my $prev_button = Gtk2::Button->new('Prev');
+    my $next_button = Gtk2::Button->new('Next');
+    my $quit_button = Gtk2::Button->new;
+    
+
+    my $app = build {
+        widget VBox => contain {
+            widget HBox => contain {
+                widget $prev_button;
+                widget $next_button;
+            };
+            widget $next_button => contain {
+                info packing => TRUE, TRUE, 1, 'end';
+                set  label   => 'quit';
+                on   clicked => \&quit_clicked;
+            }
+        };
+    };
+
+## info
+
+This function sets additional information.
+Since it is not realted to Gtk2 functions,
+attributes, signal and properties,
+so save anything what you want or need.
+
+Currently `id` and `packing` have some special meanings.
+`id` is used for `widget` method to find widget.
+`packing` is used for [Gtk2::VBox](http://search.cpan.org/perldoc?Gtk2::VBox) and [Gtk2::HBox](http://search.cpan.org/perldoc?Gtk2::HBox).
+
+    my $app = build {
+        widget Window => contain {
+            info id             => 'window';
+            set  title          => 'Seoul.pm irc log viewer';
+        };
+    
+
+        widget HBox => contain {
+            info id      => 'hbox';
+            info packing => TRUE, TRUE, 1, 'start';
+    
+
+            widget ScrolledWindow => contain {
+                set policy => 'never', 'automatic';
+            };
+        };
+    };
+
+## on
+
+This function connects signals for specified widget.
+Actually it is same as `$widget->signal_connect`.
+See [Gtk2](http://search.cpan.org/perldoc?Gtk2) and Gtk2 API reference.
+
+    my $app = build {
+        widget Window => contain {
+            on   delete_event => sub { Gtk2->main_quit };
+            widget VBox => contain {
+                widget ToggleButton => contain {
+                    set  label   => "show/hide";
+                    on   toggled => \&toggled;
+                };
+                widget Button => contain {
+                    set  label   => 'Quit';
+                    on   clicked => sub { Gtk2->main_quit };
+                };
+            };
+        };
+    };
+
+## set
+
+This function calls `$widget->set_KEY(VALUE)` function
+for specified widget.
+See [Gtk2](http://search.cpan.org/perldoc?Gtk2) and Gtk2 API reference.
+
+    my $app = build {
+        widget Window => contain {
+            set  title        => 'Awesome App';
+            set  default_size => 200, 100;
+            set  position     => 'center';
+        };
+    };
+
+## prop
+
+This function sets properties for specified widget.
+Actually it is same as `$widget->set(KEY, VALUE)`.
+See [Gtk2](http://search.cpan.org/perldoc?Gtk2) and Gtk2 API reference.
+
+    my $app = build {
+        widget Window => contain {
+            info id               => 'window';
+            set  position         => 'center';
+            prop title            => 'Window Example';
+            prop opacity          => 0.8;
+            prop 'default-width'  => 640;
+            prop 'default-height' => 480;
+            on   delete_event     => \&quit;
+        };
+    };
+
+## contain
+
+This function is used to set attributes, set properties,
+connect signal, add additional information or contain children widgets.
+
+    my $app = build {
+        widget Window => contain {
+            info   ...
+            set    ...
+            prop   ...
+            on     ...
+            widget ...
+        };
+    };
+
+# SEE ALSO
+
+The idea of this module is stealed from
+[Seoul.pm Perl Advent Calendar, 2010-12-24](http://advent.perl.kr/2010-12-24.html).
+I think [Gtk2::Ex::Builder](http://search.cpan.org/perldoc?Gtk2::Ex::Builder) will be released someday by the article's author.
+But before the release, this module colud be helpful for you
+who likes [Gtk2](http://search.cpan.org/perldoc?Gtk2) but too lazy to type all code by his/her own hands.
+
+# AUTHOR
+
+Keedi Kim - 김도형 <keedi@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Keedi Kim.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

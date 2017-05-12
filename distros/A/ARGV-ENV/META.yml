@@ -1,0 +1,25 @@
+---
+abstract: 'Parse an environment variable and unshift into @ARGV'
+author:
+  - 'Olivier Mengué <dolmen@cpan.org>'
+build_requires:
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ARGV-ENV
+requires:
+  Text::ParseWords: 0
+  perl: 5.005
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/dolmen/p5-ARGV-ENV
+  repository: https://github.com/dolmen/p5-ARGV-ENV.git
+version: 1.00

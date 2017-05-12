@@ -1,0 +1,24 @@
+Apache::GD::Thumbnail
+==================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the following other modules and/or libraries:
+
+   Apache::File
+   GD
+   Image::GD::Thumbnail
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2002 Issac Goldstand - All rights reserved.
+This library is free software.  It can be redistributed and/or modified under the same terms as Perl itself.

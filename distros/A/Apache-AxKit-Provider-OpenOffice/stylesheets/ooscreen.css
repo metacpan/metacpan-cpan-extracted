@@ -1,0 +1,94 @@
+/* header rules */
+
+span.section-title1, span.section-title2, span.section-title3, span.section-title4, h1, h2, h3, h4, h5, h6 {
+	font-family: Verdana,Arial,Helvetica,sans-serif;
+	font-weight: bold;
+	color:navy;
+}
+
+span.section-title1 {
+	font-size:26px;
+}
+
+/* body and main content rules */
+
+body {
+	background-color:white;
+        font-family: Verdana,Arial,Helvetica,sans-serif;
+	border-color: black; 
+	border-width: 2px 2px 2px 2px; 
+	margin: 5px 10px 5px 10px;
+	padding: 2px 0px 3px 5px;
+	border-style: solid;
+}
+
+div, span {
+	font-family: Tahoma,Verdana,Arial,Helvetica,sans-serif;
+}	
+
+a:link, a:visited {
+	text-decoration:none;
+	color:blue;
+}
+
+p, td, 	span.section-title3 {
+	font-size:14px;
+	font-family: Tahoma,Verdana,Arial,Helvetica,sans-serif;
+}			
+
+div.toc {
+	color: blue;
+	background-color:#eeeeee;
+	border-color: black; 
+	border-width: 2px 2px 2px 2px; 
+	border-style: solid;
+	margin: 1px 0px 1px 0px;
+	padding: 2px 0px 3px 5px;
+}
+
+div.main-content {
+	background-color: white;
+	border-color:black; 
+	border-width: 2px 2px 2px 2px; 
+	border-style: solid;
+	margin: 1px 0px 1px 0px;
+	padding: 2px 2px 5px 10px;
+}
+
+div.toc-item {
+	font-size:12px;
+	margin: 0px 0px 2px 25px;
+}
+
+div.header {
+	background-color: #eeeeee;
+	border-color:black; 
+	border-width: 2px 2px 2px 2px; 
+	border-style: solid;
+	margin: 1px 0px 1px 0px;
+	padding: 0px 0px 0px 10px;
+	height: 40px;
+}
+
+div.footer-nav {
+	background-color: #eeeeee;
+	border-color:black; 
+	border-width: 2px 2px 2px 2px; 
+	border-style: solid;
+	margin: 1px 0px 1px 0px;
+	padding: 1px 1px 1px 1px;
+}
+
+div.legal {
+        font-size:12px;
+	color:white;
+	text-align: center;
+}
+
+div.programlisting {
+	background-color:silver;
+	border-color: white; 
+	border-width: 2px 2px 2px 2px; 
+	border-style: solid;
+	width: 90%;
+}

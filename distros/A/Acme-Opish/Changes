@@ -1,0 +1,43 @@
+Revision history for Perl extension Acme::Opish.
+
+0.01  Mon Jun 23 16:16:59 2003
+    - original version; created by h2xs 1.22 with options
+        -X -A -n Acme::Opish
+
+0.01.1  Thu Jun 26 2003
+    - Fixed documentation.
+
+0.02  Thu Jun 26 2003
+    - Don't prefix non-vowel y's at the beginning of a word.
+    - Fixed the path of the opish result test file in eg/.
+    - Removed the opish result test file from eg/.
+
+0.03  Thu Jun 26 2003
+    - Oof.  Fixed the "^y" condition in a few ways.
+    - Special case 'ye'.
+    - Added test cases for ^y words.
+    - Updated documentation.
+
+0.03.1  Fri Jun 27 2003
+    - Whoops.  Looks like I accidentally uploaded no changes.  : \
+
+0.04  Mon Jun 30 2003
+    - Added a simple eg/ program to have osascript (on the Mac) speak
+      the result of an Acme::Opish cponversion.
+    - Added the ultra simple "op" script to eg/ so that I could 
+      impress my friend with "op Hello Aeryk", instead of,
+      perl -MACME::Opish -wle'print enop(@ARGV)' Hello Aeryk
+    - Updated the "OK" word list.
+    - Fixed the text in this file.
+    - Added a missing file to the MANIFEST
+    - Added the PREREQ_PM's to Makefile.PL.
+
+0.05  Wed Jul 9 2003
+    - Fixed the eg/ programs up a bit for Stephanie.  : )
+
+0.06  Sat Jul 26 2003
+    - Ack!!  I was requiring 5.8 in the Makefile.PL.  *sob*
+
+0.0601  Sun Sep 27 2003
+    - Moved the module to lib/Acme.
+    - Added MANIFEST.SKIP to the distro.

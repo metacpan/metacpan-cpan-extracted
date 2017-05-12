@@ -1,0 +1,13 @@
+Revision history for App-palien
+
+0.03      2016-03-05 06:56:40 -0500
+  - added --bin-dir and --dir-sep
+
+0.02      2015-04-24 05:16:08 -0400
+  - first CPAN release
+  - added --dll option
+  - added --modversion option
+  - added --detail option
+
+0.01      2015-04-23 12:54:26 -0400
+  - initial version

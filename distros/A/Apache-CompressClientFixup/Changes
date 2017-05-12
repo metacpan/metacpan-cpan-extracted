@@ -1,0 +1,37 @@
+Revision history for Perl extension Apache::CompressClientFixup
+
+0.07  Sun Jul 20 14:30:00 2003
+	- unnecessary warnings were patched with diff-file contributed by Rob Bloodgood.
+
+0.06  Wed Jan 15 16:59:00 2003
+	- file TODO has been added to distribution
+	- documentation is edited.
+	  5559 Jun 23 23:16 Apache-CompressClientFixup-0.06.tar.gz
+
+0.05  Mon Jan 13 11:12:00 2003
+	- Partial Request branch is modified in order to make it configurable.
+	- documentation is edited.
+	  5107 Jan 13 14:51 Apache-CompressClientFixup-0.05.tar.gz
+
+0.04  Tue Jan 07 21:23:00 2003
+	- MSIE over SSL is modified in order to make it configurable.
+	- documentation is edited.
+	- article "ContentCompressionClients" deleted from the package.
+	  4660 Jan  7 22:17 Apache-CompressClientFixup-0.04.tar.gz
+
+0.03  Thu Jan 02 23:00:00 2003
+	- MSIE over SSL is modified.
+	- documentation is edited.
+	  8064 Jan  2 23:31 Apache-CompressClientFixup-0.03.tar.gz
+
+0.02  Sun Oct 20 22:51:00 2002
+	- further development in accordance with the results of discussion on "ContentCompressionClients".
+	- documentation is edited and incorporated.
+	- Thanks to Bob Eng for the link to Microsoft Knowledge Base articles Q313712/Q312496.
+	  7855 Nov 10 23:09 Apache-CompressClientFixup-0.02.tar.gz
+
+0.01  Tue Jun 11 13:10:11 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Apache::CompressClientFixup
+	- documentation is storied separately in the draft of the article "ContentCompressionClients"
+	  2982 Oct 20 22:52 Apache-CompressClientFixup-0.01.tar.gz

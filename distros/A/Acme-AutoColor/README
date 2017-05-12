@@ -1,0 +1,54 @@
+NAME
+    Acme::AutoColor - automatic color names
+
+SYNOPSIS
+      use Acme::AutoColor;
+
+      $red   = RED();    # 'ff0000'
+      @green = GREEN();  # (0, 255, 0)
+
+DESCRIPTION
+    This module uses an AUTOLOAD function which assumes unrecognized methods
+    are color names.
+
+    Color names are case-insensitive, though style-wise one should probably
+    use all capitals.
+
+    It returns a hex string or a an array of RGB triplets depending on the
+    calling context.
+
+    Color schemes may be specified in the use line:
+
+      use Acme::AutoColor qw( X HTML );
+
+OCTARINE
+
+Octarine is the discworlds eigth color. It can't actually displayed with a RGB color scheme,
+but as far as we know, its R, G and B components are all zero. But you can use it anyway:
+
+  $octarine   = OCTARINE();    # '000000'
+
+Beware: Using OCTARINE() may - depending on your location, status as wizard and general thaumic
+background radiation levels - reconfigure your computer to display itself. This may result in
+damage to your system, secondary thaumic events, creatures from the dungeon dimensions appearing
+or the universe collapsing on itself.
+
+SEE ALSO
+    Graphics::ColorNames
+
+AUTHOR
+    Robert Rothenberg <rrwo at cpan.org>
+
+    current Maintainer: Rene Schickbauer <rene.schickbauer at gmail.com>
+
+REPORTING BUGS
+    We don't know of any bugs, but that doesn't mean there aren't any.
+    Please the CPAN bugtracker or mail Rene Schickbauer directly.
+
+LICENSE
+    Copyright (c) 2005 Robert Rothenberg. All rights reserved. This program
+    is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+
+    Now maintained by Rene Schickbauer, so i guess everything after version 0.01
+    is (C) 2010 Rene Schickbauer

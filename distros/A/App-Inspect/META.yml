@@ -1,0 +1,23 @@
+---
+abstract: 'Command line tool for inspecting installed modules'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test2::Suite: '0.000018'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Inspect
+requires:
+  List::Util: '0'
+  Term::ANSIColor: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: http://github.com/exodist/App-Inspect/issues
+  repository: http://github.com/exodist/App-Inspect/
+version: '0.002'

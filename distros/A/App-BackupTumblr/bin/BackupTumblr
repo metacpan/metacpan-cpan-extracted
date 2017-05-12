@@ -1,0 +1,118 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use JSON;
+use WWW::Tumblr;
+use File::Fetch;
+
+binmode STDOUT, ':encoding(UTF-8)';
+
+use constant {
+    NUMBER_OF_FETCH => 20
+};
+
+my ($total_count, $fetch_count) = (0, 0);
+my $tumblr_url = shift // 'http://dalinaum-kr.tumblr.com';
+my $tumblr = WWW::Tumblr->new;
+$tumblr->url($tumblr_url);
+
+while (1) {
+    $tumblr->read_json(
+	start => $total_count, 
+	num => NUMBER_OF_FETCH) =~ /(?<json>{.*});/;
+    
+    my $json_scalar = from_json($+{json}, { utf8 => 1});
+    my $posts = $json_scalar->{posts};
+    $total_count += $fetch_count = scalar @$posts;
+
+    say "[$total_count] fetching...";
+    
+    for my $post (@$posts) {
+	my $file_name = $post->{id} . '-' . $post->{slug};
+
+	if (-e "$file_name.json") {
+	    say "$file_name.json exists.";
+	    next;
+	}
+	
+	my %meta = (
+	    date => $post->{date}
+	    );
+	
+	my $body = $post->{'regular-body'} ||
+	    $post->{'quote-text'} ||
+	    $post->{'photo-caption'} ||
+	    $post->{'audio-caption'} ||
+	    $post->{'link-description'} ||
+	    $post->{'conversation-text'} ||
+	    '';
+	
+	$meta{title} = $post->{'regular-title'} ||
+	    $post->{'link-text'} ||
+	    $post->{'conversation-title'} ||
+	    $body;
+	
+	given ($post->{type}) {
+	    when ('link') {
+		$meta{'link-url'} = $post->{'link-url'};
+		break;
+	    }
+
+	    when ('audio') {
+		say "[Audio] fetching...";
+		$post->{'audio-player'} =~
+		    /audio_file=(?<audio>.*)&color/;
+		my $fetch = File::Fetch->new(
+		    uri => $+{audio}
+		    );
+		$fetch->fetch();
+		$meta{audio} = $fetch->output_file;
+		break;
+	    }
+	    
+	    when ('photo') {
+		say "[Photo] fetching...";
+		my @photos = map {
+		    my $photo = $_;
+		    my $photo_url = 
+			$photo->{'photo-url-1280'};
+		    my $fetch = File::Fetch->new(
+		    	uri => $photo_url
+		    	);
+		    $fetch->fetch();
+		    {
+			caption => $photo->{caption},
+			photo => $fetch->output_file
+		    };
+		} @{$post->{photos}};
+		$meta{photos} = \@photos;
+		break;
+	    }
+	}
+	
+	$meta{tags} = $post->{tags} if $post->{tags};
+
+	open my $content_file, '>:utf8', "$file_name.txt"
+	    or die $!;
+
+	say $content_file $body;
+
+	close $content_file;
+
+	open my $meta_file, '>', "$file_name.json"
+	    or die $!;
+
+	say $meta_file 
+	    to_json(\%meta, { ascii => 1, pretty => 1 });
+	
+	close $meta_file;
+    }
+    
+    last if $fetch_count != NUMBER_OF_FETCH;
+}
+
+say "\nTotal Count: $total_count";
+
+# END { say "$_ => $INC{$_}" for sort keys %INC }

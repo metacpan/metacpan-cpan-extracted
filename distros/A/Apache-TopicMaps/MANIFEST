@@ -1,0 +1,12 @@
+lib/Apache/TopicMaps.pm
+lib/Apache/TopicMaps/text/html/index.pm
+lib/Apache/TopicMaps/text/html/search.pm
+lib/Apache/TopicMaps/text/html/topic.pm
+lib/Apache/TopicMaps/application/xtmPLUSxml/index.pm
+lib/Apache/TopicMaps/application/xtmPLUSxml/search.pm
+lib/Apache/TopicMaps/application/xtmPLUSxml/topic.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+t/1.t

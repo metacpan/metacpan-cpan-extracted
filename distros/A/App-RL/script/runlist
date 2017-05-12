@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use App::RL;
+
+App::RL->run;
+
+=head1 OVERVIEW
+
+For help with App::RL, run "runlist help"
+
+=cut
+
+__END__
+
+perl -I lib/ t/07-genome.t
+perl -I lib/ t/11-cover.t
+perl -I lib/ t/12-stat2.t
+
+perl -I lib/ script/runlist
+
+perl -I lib/ script/runlist merge t/I.yml t/II.yml -o stdout
+
+perl -I lib/ script/runlist stat t/intergenic.yml -s t/chr.sizes -o stdout
+
+perl -I lib/ script/runlist compare --op intersect t/intergenic.yml t/repeat.yml -o stdout
+perl -I lib/ script/runlist compare --op intersect --mk t/Atha.yml t/Atha.trf.yml -o stdout
+
+perl -I lib/ script/runlist split t/repeat.yml -o stdout
+
+perl -I lib/ script/runlist genome t/chr.sizes -o stdout
+
+perl -I lib/ script/runlist combine t/Atha.yml -o stdout
+
+perl -I lib/ script/runlist some t/Atha.yml t/Atha.list -o stdout
+
+perl -I lib/ script/runlist cover t/S288c.txt -o stdout
+
+perl -I lib/ script/runlist coverage t/S288c.txt -s t/chr.sizes -m 1 -o stdout
+
+perl -I lib/ script/runlist span --op fill -n 1000 t/brca2.yml -o stdout
+
+perl -I lib/ script/runlist compare t/r1.yml t/r2.yml --op intersect -o stdout
+
+perl -I lib/ script/runlist stat2 --op intersect t/intergenic.yml t/repeat.yml -s t/chr.sizes -o stdout
+perl -I lib/ script/runlist stat2 --op intersect --mk --all t/Atha.yml t/Atha.trf.yml -s t/Atha.chr.sizes -o stdout
+
+perl ~/Scripts/egas/compare_runlist.pl --op intersect -f1 t/intergenic.yml -f2 t/repeat.yml
+
+perl -I lib/ script/runlist position --op overlap t/intergenic.yml t/S288c.txt -o stdout
+
+perl -I lib/ script/runlist genome t/chr.sizes -o stdout \
+    | perl -I lib/ script/runlist stat stdin -s t/chr.sizes --all -o stdout

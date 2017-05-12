@@ -1,0 +1,22 @@
+Revision history for Perl extension AnyEvent::Sereal.
+
+0.004 Mon Sep 17 22:41:13 CEST 2012
+      Documentation completed.
+      Requests Sereal::{En,De}coder 0.09
+
+0.003 Sun Sep 16 21:58:12 CEST 2012
+      Don't import {en,de}code_sereal functions anymore.
+
+0.002 Sat Sep 15 10:28:29 CEST 2012
+      use encoder/decoder objects for better performance
+
+      simple Sereal tools/sereal-benchmark.pl shows (perl 5.16 64 bits):
+
+                           Rate decode_fun encode_fun decode_obj encode_obj
+      decode_fun 487641/s         --       -15%       -23%       -41%
+      encode_fun 571139/s        17%         --       -10%       -31%
+      decode_obj 633031/s        30%        11%         --       -24%
+      encode_obj 829906/s        70%        45%        31%         --
+
+0.001 Fri Sep 14 13:10:35 CEST 2012
+      First release.

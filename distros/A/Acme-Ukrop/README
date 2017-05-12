@@ -1,0 +1,5 @@
+This is a preliminary implementation of parser of language Ukrop, based on
+ukrainian language. Internally, the language is the same perl but with
+ukrainian keywords instead. If you don't know ukrainian, don't bother.
+
+Community address: http://community.livejournal.com/ru_ukrop/

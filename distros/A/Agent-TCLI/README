@@ -1,0 +1,58 @@
+TCLI Core version 0.03
+
+This suite allows one to write Agents and create test scripts that direct
+the agents interactively.
+
+INSTALLATION
+
+To install with Module::Build, one can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Alternatively, one may load from CPAN, or hopefully a PPM repository on Windows
+machines.
+
+DEPENDENCIES
+
+		'Data::Dump' 	            => '0',
+		'TimeDate'					=> '1.16',
+		'FormValidator::Simple'		=> '0',
+		'Getopt::Lucid'             => '0.16',
+		'Scalar::List::Utils'        => '1.18',
+		'Module::Build'				=> '0',
+		'Net::Jabber'		        => 'undef',
+		'Net::XMPP'		   	     	=> '1.02',
+		'NetAddr::IP'		        => '3',
+		'Object::InsideOut'			=> '3.07',
+		'Test::Simple'              => '0.62',
+		'YAML::Syck'				=> '0'
+
+USING
+
+Passive Agents:
+One creates a script, see tail_agent.pl, that loads up a TCLI
+transport with users, packages and other pertinent information.
+The Agent will log in, join chatrooms if in the user list,
+and wait for further commands from authorized users or in a chatroom.
+
+Test script:
+A test script is written, Agent::TCLI::Testee, that loads up a Test Transport,
+other necessary transports, necessary local packages, and testees.
+
+Using testees, one creates tests ala Test::More with Agent controlling
+versions of ok, is_ , and like_ tests.
+These will run asynchronously after the testing starts. One must be conscious
+of the asynchronous nature of the test flow.
+
+It is necessary to call the test_master->run at the end of the test to ensure
+that all tests have completed.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Alcatel-Lucent
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

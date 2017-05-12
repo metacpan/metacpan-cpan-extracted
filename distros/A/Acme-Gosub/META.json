@@ -1,0 +1,66 @@
+{
+   "abstract" : "Implement BASIC-like \"gosub\" and \"greturn\" in Perl",
+   "author" : [
+      "Shlomi Fish <shlomif@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "keywords" : [
+      "Acme",
+      "BASIC",
+      "black magick",
+      "gosub",
+      "joke",
+      "retro",
+      "source filter",
+      "subroutine"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Gosub",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.37",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Filter::Util::Call" : "0",
+            "Text::Balanced" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Gosub" : {
+         "file" : "lib/Acme/Gosub.pm",
+         "version" : "v0.1.6"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/perl-acme-gosub"
+      }
+   },
+   "version" : "v0.1.6"
+}

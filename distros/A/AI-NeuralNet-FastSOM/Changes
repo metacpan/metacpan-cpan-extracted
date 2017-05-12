@@ -1,0 +1,121 @@
+Revision history for Perl extension AI::NeuralNet::FastSOM.
+
+0.19  Sat Dec  3 14:52:39 EST 2016
+    - fix some errant sprintf's
+
+0.18  Sat Dec  3 14:36:03 EST 2016
+    - force all tests serially, not just test_dynamic
+
+0.17  Sat Dec  3 02:43:38 EST 2016
+    - force test harness to test serially
+    - update copyright notice
+    - clean up tests
+
+0.16  Sat Jan  3 05:53:12 EST 2015
+    - version bump - hasnt been tested in a while...
+    - added auto-README generation to Makefile.PL
+    - update copyright notice
+
+0.15  Wed Jul 11 00:13:02 2012
+	- tidy up build a bit
+	- fixed warnings from CODE blocks using RETVAL without OUTPUT
+	  blocks in newer perls
+	- yet another typemap workaround. this time we have a 5.6.2 with
+	  a new ParseXS and an old xsubpp. i wont even mention the problem
+	  i found in old Test::More finding this. i hope it never becomes
+	  an issue. (Note: since this is an almost 3 year old issue and
+	  haven't seen any more cases, we'll assume it was isolated
+	  to a single user to start with and the whole mess is fixed
+	  now.)
+
+0.14  Fri Aug 21 12:52:32 2009
+	- work around some sort of ExtUtils::ParseXS bug in 5.6.2,
+	  not picking up typemap files unless specifically named "typemap"
+
+0.13  Mon Aug 17 08:42:37 2009
+	- fixed perl version check in Makefile.PL
+
+0.12  Sat Aug 15 14:24:50 2009
+	- will now pass -Wall -Wextra -ansi -Wdeclaration-after-statement
+	  (locally anyway)
+	- wrapped newSVpvs in INT2PTR to hopefully satisfy some platforms
+	- bumped perl require back up to 5.8.0 for now
+	- defined PERL_MAGIC_tied for older perls
+	- changed hv_fetchs() to hv_fetch() for older perls
+	- hacked in defines for Newx() and friends for older perls
+	- changed newSVpvs() to newSVpvn() for older perls
+	- created seperate typemap for older perls, along with Makefile.PL
+	  modification to use it before 5.8.0
+	- added requirement for Storable which is non-core in older perls
+	- moved perl require back down to 5.6.2
+
+0.11  Sun Aug  9 10:04:19 2009
+	- casting newSVpvs() to SV* to satisfy at least one platform
+	- added 'const char *' to typemap for older perls
+	- removed a few unneeded casts to internal types
+	- moved DESTROY methods to superclass, thus fixing missing
+	  Hexa::DESTROY and consolidating common code
+	- consolidated neighbors code
+	- general housekeeping
+
+0.10  Fri Aug  7 09:11:39 2009
+	- no longer relying on sizeof(void)
+	- removed a bit of old test code
+	- one more PTR2INT conversion
+	- experimentally dropped perl require to 5.6.2
+	- hopefully fixed a few casting problems for some platforms
+
+0.09  Wed Aug  5 20:26:17 2009
+	- removed several temporary AVs in train(), fixing massive
+	  memory leak
+	- removed another temp AV in _bmu_guts(), fixing another
+	  memory leak
+	- added pointer <-> IV conversions, hopefully fixing tons of
+	  warnings on platforms where ivsize != ptrsize
+	- added macros to speed up pointer conversions
+	- consolidated bmu code in ::FastSOM
+
+0.08  Fri Jul 31 16:17:32 2009
+	- removed leading underscore from struct member names
+	- removed all // comments, just in case...
+	- changed all native type (int,double) to perl types (IV,NV)
+	- fixed couple of instances of calling back to perl to get
+	  stuff from c structs
+	- reworked Storable support
+
+0.07  Sat Jul 25 14:18:03 2009
+	- clean up things a bit
+	- now using Atol() instead of atoi()
+	- now using Drand01() instead of rand()
+	- now using seedDrand01() instead of srand()
+	- fixed problem with not using all training vectors, or some twice
+	- removed non-core Data::Dumper from tests
+	- added tests for store/retrieve via Storable
+	- first public release
+
+0.06  Wed Jul 22 12:07:25 2009
+	- removed AI::NN::FSOM::ARRAY, ::MAP, and ::VECTOR modules
+	- removed Inline::C code from remaining modules
+	- removed dependence on non-core parent.pm
+	- removed remaining Inline::C macros and INLINE.h
+	- moved train() into C
+	- now parsing input_ and output_dim parameters (finally!)
+
+0.05  Mon Jul 20 13:20:06 2009
+	- re-added support for labels, originally in AI::NN::SOM
+	- added original AI::NN::SOM test suite (and it works!)
+
+0.04  Sat Jul 18 16:45:27 2009
+	- removed dependence on Inline::C
+	- minor refactor
+
+0.03  Sat Jul 18 09:30:08 2009
+	- created wrappers for most c-level stuff
+
+0.02  Wed Jul 15 18:56:13 2009
+	- moved data structures into C structs
+
+0.01  Thu Jul  2 09:07:01 2009
+	- original version; created by h2xs 1.23 with options
+		-AXn AI::NeuralNet::FastSOM
+

@@ -1,0 +1,3 @@
+BEGIN { delete $ENV{PERL5_CPAN_IS_RUNNING} }
+use Acme::MetaSyntactic ':all';
+print metatest_ams_list();

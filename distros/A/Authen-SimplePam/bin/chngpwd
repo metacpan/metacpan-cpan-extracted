@@ -1,0 +1,401 @@
+#!/usr/bin/perl -Tw
+
+#this is to prevent any enviroment variable that might change pam's
+# behaviour
+BEGIN {
+  undef %ENV;
+}
+
+our $VERSION = "1.1.2";
+
+use Getopt::Long;
+use Authen::SimplePam;# '0.1.21' ;
+use strict;
+
+#takes the calling path off (if needed)
+our $command = $0;
+$command =~ s/^.*\/([\w\.]+)$/$1/;
+$command =~ m/^.*?([\w\.]+).*$/;
+my $app = $1;
+
+#our defaults
+our $opt = {
+	    #debugging on/off
+	    debug           => 0,
+	    #no stdout messages on/off
+	    quiet           => 0,
+	    #do not log to syslog? on/off
+	    nosyslog        => 0,
+	    #Syslog facility to use
+	    facility        => 'LOG_AUTHPRIV',
+	    #can the user root be allowed to use this? this would not check
+	    #if the current password is right
+	    allow_root_mode => 0,
+	    #what pam service should we use to change the password?
+	    service         => 'passwd',
+	    #mail program if needed to be used
+	    mail_program    => "/bin/mail -s 'Critical error from $app' -n" ,
+	    #mail address to send critical messages
+	    mail_to         => 'root',
+	    #send unknown errors thru mail?
+	    mail_admin     => 1,
+	    #a log of the events in case we need to send thru mail
+	    log            => '',
+	    #lower uid limit (uid below this can not be changed)
+	    luid           => 500,
+	    #upper uid limit (uids above this cannot be changed)
+	    uuid           => 60000,
+	    #restrict to one user access?
+	    restrict_to_one_user => 0,
+	    #uid that can use this in case 'restrict_to_one_user' is enable
+	    uid_restricted => 99,
+	   };
+
+#get the command line options
+GetOptions (
+	    $opt, 
+	    'debug|d+', 'quiet|q', 'extra|e=s@'
+	   );
+
+#add the following options to the GetOptions() argument list to allow it to be configured from
+#the comand line.
+#Note that any user will be able to use it, what might become a security flow (at your own risk).
+#    'nosyslog|n', 'facility|f=s', 'allow_root_mode|a', 'service|s=s'
+
+#just got command line options.
+#now we can try to load Sys::Syslog
+unless ($opt->{nosyslog}){
+  eval {
+    use Sys::Syslog qw(:DEFAULT setlogsock);
+    1
+  };
+  log_msg ( "FATAL ERROR: Could not load Sys::Syslog. " .
+	    "Please install a new perl installation.\nErr1: $@\nErr2: $!\n", 9)
+    if ($@);
+}
+
+my $root_mode = 0;
+my $username      = $ARGV[0];
+our $old_password = $ARGV[1];
+our $new_password = $ARGV[2];
+my $pamh;
+my $exit;
+
+######## syslog start up ###########
+unless ($opt->{nosyslog}){
+  setlogsock('unix');
+  print "d:: Using syslog facility: " . $opt->{facility} . "\n" if $opt->{debug};
+  $opt->{log} .= "Using syslog facility: " . $opt->{facility} . "\n";
+  openlog ("${0}", 'pid', $opt->{facility});
+}
+
+#basic checkups
+log_msg ( "usage: $command user old_password new_password\n", 1)
+  if ($#ARGV != 2);
+
+log_msg ( "You need to run $command suid.\n" , 2)
+  if ($> != 0);
+
+log_msg ("User $username does not exist .\n", 7 )
+  unless defined (getpwnam($username));
+
+log_msg ("The user $username is not allowed to change password.\n", 4)
+  if (( getpwnam($username) > $opt->{uuid} ) || ( getpwnam($username) < $opt->{luid}));
+
+log_msg ("You are not allowed to run $command.\n", 16)
+  if ( ($opt->{restrict_to_one_user} ) && ( $< != $opt->{uid_restricted}));
+
+$root_mode = 1 if ( $< == $> );
+
+log_msg ("You cannot run $command as root.\n", 3)
+  if ( $root_mode && !$opt->{allow_root_mode} );
+
+my $auth = new Authen::SimplePam;
+$auth->username($username);
+$auth->current_password($old_password);
+$auth->new_password($new_password);
+$auth->service($opt->{service});
+
+my $result = $auth->change_password();
+print "the result from module is $result\n";
+if ( $result == 1 )
+{
+  log_msg ("Password successfully changed for $username.\n", 0);
+}
+elsif ( $result == 2 )
+{
+  log_msg ("Current password does not match.\n", 5);
+}
+else
+{
+  if ($auth->error_code)
+  {
+    log_msg (
+	     "PAM replyed: " . $auth->error_message . " \n",
+	     ($auth->error_code + 100)
+	    );
+  }
+  else
+  {
+    #Something bad happened
+    critical_error ("An error ocurred while trying to change ".
+		    "password for $username. Return code: $result\n", 15);
+  }
+}
+
+#logs a message to syslog (unless syslog is disabled)
+#prints it to stdout (unless in quiet mode)
+#and exits with the value specified in the second argument
+#if the second argument is not specified, it will return .
+sub log_msg{
+  my ($msg, $exit) = @_;
+  $msg .= " [" . join (", " , (@{$opt->{extra}})) . "]"
+    if defined ($opt->{extra});
+  print $msg unless $opt->{quiet};
+  syslog ('info', $msg) ;
+  closelog();
+  exit $exit if (defined ($exit));
+}
+
+#critical_error
+#a critical_error ocurred and we should mail the admin
+sub critical_error{
+  my ($message, $error) = @_;
+  print "d:: mail_admin status is " . $opt->{mail_admin} . "\n" if $opt->{debug};
+  if ($opt->{mail_admin})
+  {
+    print "d:: Using string: " . $opt->{mail_program} . " " . $opt->{mail_to} . "\n" if $opt->{debug};
+
+    open ( MAIL, "| " . $opt->{mail_program} . " " . $opt->{mail_to} ) or
+      log_msg ( "Could not open program " . $opt->{mail_app} . " to send email\n", 12) ;
+
+    print MAIL "This is a automatic message.\n\n";
+    print MAIL "An unkown error has occurred while running $command.\n";
+    print MAIL "\nREASON: $message\n";
+    print MAIL "The following log explains it:\n\n----------LOG----------\n\n";
+    print MAIL $opt->{log};
+    print MAIL "-----------LOG-----------\n\n";
+    print MAIL "For bug reports, suggestions, critics and patchs, mail to raul\@dias.com.br\n\n";
+    print MAIL "Regards,\n$command\n";
+
+    close ( MAIL );
+    log_msg ("Sent message to admin\n");
+  }
+
+  log_msg (@_);
+}
+
+
+__END__
+
+=head1 NAME
+
+chngpwd.pl - A secure one liner pam password changer
+
+=head1 SYNOPSIS
+
+chngpwd.pl [-d | --debug] [ -q | --quiet ] username old_password new_password
+
+=head1 DESCRIPTION
+
+chngpwd.pl is an program that lets any user changes any other users password
+if the user has other user's current password.'
+
+It should be able to work on any PAM aware system.
+
+This makes easier to use as wrapper for a system password changer, like
+from a CGI.
+
+=over 4
+
+=item -d, --debug
+Shows debugging messages.  (helpful to find bugs only).
+
+=item -q, --quiet
+quiet mode.  Does not output any normal message
+
+=item -e, --extra
+extra parameter.  anything specified as an argument for -e will be logged toghether.  Usefull for parsing the logs.
+
+=back
+
+=head1 EXIT STATUS
+
+chngpwd.pl returns a variety of status.  This makes it easy to know 
+the results from its exit status:
+
+=over 4 
+
+=item 0
+
+Password sucessfully changed.
+
+=item 1
+
+Wrong number of arguments passed to the program.
+
+=item 2
+
+The program is not suid.
+
+=item 3
+
+Root is trying to run the program (not allowed, but behaviour can be changed).
+
+=item 4
+
+Cannot change users password.  It is a special account.
+
+=item 5
+
+Authentication Error.  The old password did not matched.
+
+=item 6 **OUT**
+
+This exit code is obsolete.
+
+=item 7
+
+Provided username is invalid.
+
+=item 8  **OUT**
+
+This exit code is obsolete.
+
+=item 9
+
+Internal Error.  Could not load Sys::Syslog.
+
+=item 10 **OUT**
+
+This exit code is obsolete.
+
+=item 11 **OUT*
+
+Internal Error.  Unkown PAM response.
+
+This exit code is obsolete.
+
+=item 12
+
+Internal Error.  Could not open mail program.
+
+=item 13 **OUT**
+
+This exit code is obsolete.
+
+=item 14 **OUT**
+
+This exit code is obsolete.
+
+=item 15
+
+Internal Error. Something unexpected happened.
+
+=item 16
+
+Internal Error. User not allowed to run the program.
+
+=item 17 **OUT**
+
+This exit code is obsolete.
+
+=item 101
+
+New password unacceptable.  It is really short.
+
+=item 102
+
+New password unacceptable.  It is short (still).
+
+=item 103
+
+New password unacceptable.  It does not contain enough different characters
+
+=item 104
+
+New password unacceptable.  It is too simple or too systematic.
+
+=item 105
+
+New password unacceptable.  It is too similiar to the old one.
+
+=item 106
+
+New password unacceptable.  It is too simple or based in a common word.
+
+=item 107
+
+Password unchanged.  Usually happens if the ond and new passwords are equal.
+
+=back
+
+=head1 SECURITY AND INTERNALS
+
+This programs needs to be suid to run.
+
+If you still haven't give up yet, you have to read the source code before using this application.
+I have checked its code many times to make sure it doesn't have any security flaw.
+However I am not perfect.
+
+If you found any security issue (or would like to talk about this) please, mail me.
+
+There are a lower and upper uid limit that can be used by this program.
+If defaults to  < 500 (lower limit) and  > 60000 (upper limit). As this values
+are usually used for system accounts.  This can be changed in the $opt variable.
+
+Future versions will read this values directly from /etc/login.defs .
+
+The program logs in the syslog all activity.  And mails the administrator (root) if
+any unexpected behaviour is found.
+
+By default many configuration were taken out from the command line and the administrator 
+will have to change its default values inside the script (like the syslog facility to use 
+and the mail program that should be called).
+As it runs suided root, it would allow unwanted behaviour to be untrackable.
+
+The program will not let be run by root by default.  That's because of PAM's behaviour.
+If the application has the uid != 0 but the effective uid == 0, PAM will let the password
+to be changed if the old password is known (wanted behaviour).
+OTOH, if the uid == 0, PAM will not ask for a old password.  As this program was design to 
+be a wrapper, this might not be what the administrator wants, so it will refuse to run.
+This behaviour can be changed inside the program.
+
+If PAM does not ask for the current password (ask just the new one), the program will abort with
+an error.
+
+This program makes use of the prompt messages given by PAM when changing passowrd.
+This means that if the messages changes, the application will not know what to do.
+
+To prevent translations getting on the way (and possible security flaws), 
+this program deletes all environment variables, before starting the PAM library.
+
+Configuring the variables: $opt->{restrict_to_one_user} and
+$opt->{uid_restricted} allows to configure the 
+script to only be run by the uid specified in $opt->{uid_restricted}.
+This is handfull to allow only one specific user to change
+passwords (e.g. a web server) and restric access from others.
+
+It is important to know that this program relies on Authen::SimplePam
+now to deal with PAM.
+
+This means that if you use a non standard PAM module you might have to
+contact the Authen::SimplePam author in order to improve it.
+
+However chances are that Authen::SimplePam will works fine with
+most modules.
+
+
+=head1 REPORTING BUGS
+
+Please send bug reports, critics, comments and patchs to <raul@dias.com.br>
+
+=head1 SEE ALSO
+
+pam, passwd, perl
+
+=head1 AUTHOR
+
+Raul Dias <raul@dias.com.br>
+
+

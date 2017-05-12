@@ -1,0 +1,337 @@
+{
+   "abstract" : "Aspose.Pdf Cloud SDK for Perl",
+   "author" : [
+      "Farooq Sheikh <support@aspose.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AsposePdfCloud-PdfApi",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.10"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AsposeStorageCloud::StorageApi" : "0",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Date::Parse" : "0",
+            "DateTime" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "Exporter" : "0",
+            "File::Slurp" : "0",
+            "HTTP::Headers" : "0",
+            "HTTP::Request::Common" : "0",
+            "HTTP::Response" : "0",
+            "HTTP::Status" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Log::Any" : "0",
+            "MIME::Base64" : "0",
+            "Module::Runtime" : "0",
+            "Scalar::Util" : "0",
+            "Test::Exception" : "0",
+            "URI::Escape" : "0",
+            "URI::Query" : "0",
+            "perl" : "v5.6.0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "AsposePdfCloud::ApiClient" : {
+         "file" : "lib/AsposePdfCloud/ApiClient.pm"
+      },
+      "AsposePdfCloud::Configuration" : {
+         "file" : "lib/AsposePdfCloud/Configuration.pm"
+      },
+      "AsposePdfCloud::Object::Annotation" : {
+         "file" : "lib/AsposePdfCloud/Object/Annotation.pm"
+      },
+      "AsposePdfCloud::Object::AnnotationResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/AnnotationResponse.pm"
+      },
+      "AsposePdfCloud::Object::Annotations" : {
+         "file" : "lib/AsposePdfCloud/Object/Annotations.pm"
+      },
+      "AsposePdfCloud::Object::AnnotationsResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/AnnotationsResponse.pm"
+      },
+      "AsposePdfCloud::Object::AppendDocument" : {
+         "file" : "lib/AsposePdfCloud/Object/AppendDocument.pm"
+      },
+      "AsposePdfCloud::Object::Attachment" : {
+         "file" : "lib/AsposePdfCloud/Object/Attachment.pm"
+      },
+      "AsposePdfCloud::Object::AttachmentResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/AttachmentResponse.pm"
+      },
+      "AsposePdfCloud::Object::Attachments" : {
+         "file" : "lib/AsposePdfCloud/Object/Attachments.pm"
+      },
+      "AsposePdfCloud::Object::AttachmentsResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/AttachmentsResponse.pm"
+      },
+      "AsposePdfCloud::Object::BarcodeResponseList" : {
+         "file" : "lib/AsposePdfCloud/Object/BarcodeResponseList.pm"
+      },
+      "AsposePdfCloud::Object::BaseObject" : {
+         "file" : "lib/AsposePdfCloud/Object/BaseObject.pm"
+      },
+      "AsposePdfCloud::Object::Bookmark" : {
+         "file" : "lib/AsposePdfCloud/Object/Bookmark.pm"
+      },
+      "AsposePdfCloud::Object::BookmarkResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/BookmarkResponse.pm"
+      },
+      "AsposePdfCloud::Object::Bookmarks" : {
+         "file" : "lib/AsposePdfCloud/Object/Bookmarks.pm"
+      },
+      "AsposePdfCloud::Object::BookmarksResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/BookmarksResponse.pm"
+      },
+      "AsposePdfCloud::Object::Color" : {
+         "file" : "lib/AsposePdfCloud/Object/Color.pm"
+      },
+      "AsposePdfCloud::Object::Document" : {
+         "file" : "lib/AsposePdfCloud/Object/Document.pm"
+      },
+      "AsposePdfCloud::Object::DocumentPagesResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/DocumentPagesResponse.pm"
+      },
+      "AsposePdfCloud::Object::DocumentProperties" : {
+         "file" : "lib/AsposePdfCloud/Object/DocumentProperties.pm"
+      },
+      "AsposePdfCloud::Object::DocumentPropertiesResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/DocumentPropertiesResponse.pm"
+      },
+      "AsposePdfCloud::Object::DocumentProperty" : {
+         "file" : "lib/AsposePdfCloud/Object/DocumentProperty.pm"
+      },
+      "AsposePdfCloud::Object::DocumentPropertyResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/DocumentPropertyResponse.pm"
+      },
+      "AsposePdfCloud::Object::DocumentResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/DocumentResponse.pm"
+      },
+      "AsposePdfCloud::Object::DocumentTextReplaceResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/DocumentTextReplaceResponse.pm"
+      },
+      "AsposePdfCloud::Object::Field" : {
+         "file" : "lib/AsposePdfCloud/Object/Field.pm"
+      },
+      "AsposePdfCloud::Object::FieldResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/FieldResponse.pm"
+      },
+      "AsposePdfCloud::Object::FieldType" : {
+         "file" : "lib/AsposePdfCloud/Object/FieldType.pm"
+      },
+      "AsposePdfCloud::Object::Fields" : {
+         "file" : "lib/AsposePdfCloud/Object/Fields.pm"
+      },
+      "AsposePdfCloud::Object::FieldsResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/FieldsResponse.pm"
+      },
+      "AsposePdfCloud::Object::FontStyles" : {
+         "file" : "lib/AsposePdfCloud/Object/FontStyles.pm"
+      },
+      "AsposePdfCloud::Object::HorizontalAlignment" : {
+         "file" : "lib/AsposePdfCloud/Object/HorizontalAlignment.pm"
+      },
+      "AsposePdfCloud::Object::HttpResponseMessage" : {
+         "file" : "lib/AsposePdfCloud/Object/HttpResponseMessage.pm"
+      },
+      "AsposePdfCloud::Object::HttpStatusCode" : {
+         "file" : "lib/AsposePdfCloud/Object/HttpStatusCode.pm"
+      },
+      "AsposePdfCloud::Object::Image" : {
+         "file" : "lib/AsposePdfCloud/Object/Image.pm"
+      },
+      "AsposePdfCloud::Object::ImageResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/ImageResponse.pm"
+      },
+      "AsposePdfCloud::Object::Images" : {
+         "file" : "lib/AsposePdfCloud/Object/Images.pm"
+      },
+      "AsposePdfCloud::Object::ImagesResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/ImagesResponse.pm"
+      },
+      "AsposePdfCloud::Object::Int32" : {
+         "file" : "lib/AsposePdfCloud/Object/Int32.pm"
+      },
+      "AsposePdfCloud::Object::LineNumberRestartMode" : {
+         "file" : "lib/AsposePdfCloud/Object/LineNumberRestartMode.pm"
+      },
+      "AsposePdfCloud::Object::Link" : {
+         "file" : "lib/AsposePdfCloud/Object/Link.pm"
+      },
+      "AsposePdfCloud::Object::LinkActionType" : {
+         "file" : "lib/AsposePdfCloud/Object/LinkActionType.pm"
+      },
+      "AsposePdfCloud::Object::LinkAnnotation" : {
+         "file" : "lib/AsposePdfCloud/Object/LinkAnnotation.pm"
+      },
+      "AsposePdfCloud::Object::LinkAnnotationResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/LinkAnnotationResponse.pm"
+      },
+      "AsposePdfCloud::Object::LinkAnnotations" : {
+         "file" : "lib/AsposePdfCloud/Object/LinkAnnotations.pm"
+      },
+      "AsposePdfCloud::Object::LinkAnnotationsResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/LinkAnnotationsResponse.pm"
+      },
+      "AsposePdfCloud::Object::LinkElement" : {
+         "file" : "lib/AsposePdfCloud/Object/LinkElement.pm"
+      },
+      "AsposePdfCloud::Object::LinkHighlightingMode" : {
+         "file" : "lib/AsposePdfCloud/Object/LinkHighlightingMode.pm"
+      },
+      "AsposePdfCloud::Object::MergeDocuments" : {
+         "file" : "lib/AsposePdfCloud/Object/MergeDocuments.pm"
+      },
+      "AsposePdfCloud::Object::NumberStyle" : {
+         "file" : "lib/AsposePdfCloud/Object/NumberStyle.pm"
+      },
+      "AsposePdfCloud::Object::Orientation" : {
+         "file" : "lib/AsposePdfCloud/Object/Orientation.pm"
+      },
+      "AsposePdfCloud::Object::Page" : {
+         "file" : "lib/AsposePdfCloud/Object/Page.pm"
+      },
+      "AsposePdfCloud::Object::PageBorderAppliesTo" : {
+         "file" : "lib/AsposePdfCloud/Object/PageBorderAppliesTo.pm"
+      },
+      "AsposePdfCloud::Object::PageBorderDistanceFrom" : {
+         "file" : "lib/AsposePdfCloud/Object/PageBorderDistanceFrom.pm"
+      },
+      "AsposePdfCloud::Object::PageTextReplaceResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/PageTextReplaceResponse.pm"
+      },
+      "AsposePdfCloud::Object::PageVerticalAlignment" : {
+         "file" : "lib/AsposePdfCloud/Object/PageVerticalAlignment.pm"
+      },
+      "AsposePdfCloud::Object::PageWordCount" : {
+         "file" : "lib/AsposePdfCloud/Object/PageWordCount.pm"
+      },
+      "AsposePdfCloud::Object::Pages" : {
+         "file" : "lib/AsposePdfCloud/Object/Pages.pm"
+      },
+      "AsposePdfCloud::Object::PaperSize" : {
+         "file" : "lib/AsposePdfCloud/Object/PaperSize.pm"
+      },
+      "AsposePdfCloud::Object::Rectangle" : {
+         "file" : "lib/AsposePdfCloud/Object/Rectangle.pm"
+      },
+      "AsposePdfCloud::Object::ReportType" : {
+         "file" : "lib/AsposePdfCloud/Object/ReportType.pm"
+      },
+      "AsposePdfCloud::Object::ResponseMessage" : {
+         "file" : "lib/AsposePdfCloud/Object/ResponseMessage.pm"
+      },
+      "AsposePdfCloud::Object::Rotation" : {
+         "file" : "lib/AsposePdfCloud/Object/Rotation.pm"
+      },
+      "AsposePdfCloud::Object::SaaSposeResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/SaaSposeResponse.pm"
+      },
+      "AsposePdfCloud::Object::SectionStart" : {
+         "file" : "lib/AsposePdfCloud/Object/SectionStart.pm"
+      },
+      "AsposePdfCloud::Object::Signature" : {
+         "file" : "lib/AsposePdfCloud/Object/Signature.pm"
+      },
+      "AsposePdfCloud::Object::SplitResult" : {
+         "file" : "lib/AsposePdfCloud/Object/SplitResult.pm"
+      },
+      "AsposePdfCloud::Object::SplitResultDocument" : {
+         "file" : "lib/AsposePdfCloud/Object/SplitResultDocument.pm"
+      },
+      "AsposePdfCloud::Object::SplitResultResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/SplitResultResponse.pm"
+      },
+      "AsposePdfCloud::Object::Stamp" : {
+         "file" : "lib/AsposePdfCloud/Object/Stamp.pm"
+      },
+      "AsposePdfCloud::Object::StampType" : {
+         "file" : "lib/AsposePdfCloud/Object/StampType.pm"
+      },
+      "AsposePdfCloud::Object::String" : {
+         "file" : "lib/AsposePdfCloud/Object/String.pm"
+      },
+      "AsposePdfCloud::Object::StyleIdentifier" : {
+         "file" : "lib/AsposePdfCloud/Object/StyleIdentifier.pm"
+      },
+      "AsposePdfCloud::Object::TextEffect" : {
+         "file" : "lib/AsposePdfCloud/Object/TextEffect.pm"
+      },
+      "AsposePdfCloud::Object::TextFormat" : {
+         "file" : "lib/AsposePdfCloud/Object/TextFormat.pm"
+      },
+      "AsposePdfCloud::Object::TextFormatResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/TextFormatResponse.pm"
+      },
+      "AsposePdfCloud::Object::TextItem" : {
+         "file" : "lib/AsposePdfCloud/Object/TextItem.pm"
+      },
+      "AsposePdfCloud::Object::TextItemResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/TextItemResponse.pm"
+      },
+      "AsposePdfCloud::Object::TextItems" : {
+         "file" : "lib/AsposePdfCloud/Object/TextItems.pm"
+      },
+      "AsposePdfCloud::Object::TextItemsResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/TextItemsResponse.pm"
+      },
+      "AsposePdfCloud::Object::TextReplace" : {
+         "file" : "lib/AsposePdfCloud/Object/TextReplace.pm"
+      },
+      "AsposePdfCloud::Object::TextReplaceListRequest" : {
+         "file" : "lib/AsposePdfCloud/Object/TextReplaceListRequest.pm"
+      },
+      "AsposePdfCloud::Object::TextState" : {
+         "file" : "lib/AsposePdfCloud/Object/TextState.pm"
+      },
+      "AsposePdfCloud::Object::TiffExportOptions" : {
+         "file" : "lib/AsposePdfCloud/Object/TiffExportOptions.pm"
+      },
+      "AsposePdfCloud::Object::Underline" : {
+         "file" : "lib/AsposePdfCloud/Object/Underline.pm"
+      },
+      "AsposePdfCloud::Object::VerticalAlignment" : {
+         "file" : "lib/AsposePdfCloud/Object/VerticalAlignment.pm"
+      },
+      "AsposePdfCloud::Object::WordCount" : {
+         "file" : "lib/AsposePdfCloud/Object/WordCount.pm"
+      },
+      "AsposePdfCloud::Object::WordCountResponse" : {
+         "file" : "lib/AsposePdfCloud/Object/WordCountResponse.pm"
+      },
+      "AsposePdfCloud::PdfApi" : {
+         "file" : "lib/AsposePdfCloud/PdfApi.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "1.01"
+}

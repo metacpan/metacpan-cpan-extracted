@@ -1,0 +1,145 @@
+
+Changelog for perl module AWS::S3
+
+0.13 2017-02-06
+  - Add documentation for parameter 'prefix' for AWS::S3::FileIterator
+  - Add test coverage (GH #8, thanks to simbabque for these changes)
+  - Fix over encoding of characters in path (GH #6)
+
+0.12 2016-03-07
+  - Fix DNS bucket name checking for non-valid DNS bucket nams (GH #4)
+  - Fix URI escaping for filenames to avoid infinite loop on spaces (GH #5)
+
+0.11 2015-08-31
+  - Fix signed_url to URI escape the Signature param value (GH #3)
+
+0.10 2015-06-23
+  - dist changes related to kwalitee (no functional changes)
+
+0.051 2015-05-23
+  - default size to 0 when not set in content-length (GH #1)
+
+0.050 2014-10-23
+  New maintainer leejo
+  - Add lib/AWS/S3/Request/GetPreSignedUrl.pm to MANIFEST
+  - Various changes in dist related to issue tracking, testing, etc
+
+0.040 2014-10-23
+  Work done by leejo
+  - Add signed_url method to AWS::S3::File and tests
+  - Fix load / hash order bugs in AWS::S3::Signer
+  - Resolve https://rt.cpan.org/Ticket/Display.html?id=92423
+
+0.03_01 2012-06-14
+  Work done by Evan Carroll (http://www.evancarroll.com)
+  - Migrated to Moose & removed dependencies on VSO
+  - Fixed bug introduced by previous commit, reverted to contenttype & all tests pass
+
+0.028 2012-03-01
+  - Fixed: AWS/S3.pm required a higher version of VSO than the Makefile.PL and META.yml.
+  - Strange: Local testing shows $bucket->delete_multi works, but it gives me
+    some problems in production.
+
+0.027 2012-02-24
+  - Fixed sporadic error:
+    "Invalid value for AWS::S3::File.size: isn't a Int: [Str] 'contenttype': Must contain only numbers 0-9"
+
+0.026 2012-01-30
+  - $bucket->file( $missing_file ) was failing silently, causing strange behavior
+    further upstream.  Now it will confess with the http response from S3.
+
+0.025 2012-01-12
+  - $bucket->delete_multi( @keys ) actually works now.
+
+0.024 2012-01-05
+  - Better integration with CloudFront.
+  - More CF-related updates are on the way.
+
+0.023 2012-01-04
+  - Complete overhaul of the request-signing methodology.  Amazon should not be
+    allowed to design any more public APIs until they learn about this little
+    thing we call "Uniformity"
+
+0.022 2012-01-04
+  - was never actually released...we skipped from 0.021 to 0.023
+
+0.021 2011-12-31
+  - File's S3 was a weak ref, which caused problems.  No longer...
+
+0.020 2011-12-21
+  - Updated to be compatible with VSO 0.21
+
+0.019 2011-12-14
+  - Bucket's S3 was a weak ref, which caused problems sometimes.  Not anymore...
+    we'll see if that fixes it.
+
+0.018 2011-12-13
+  - Thanks to ukautz++ (Ulrich Kautz) for adding the ability to set the content-type
+    of files stored in S3.
+  - He even updated the POD to show how to set the content-type (via 'contenttype').
+
+0.017 2011-12-11
+  - Fixed broken META.yml (again)
+
+0.016 2011-12-10
+  - Fixed broken META.yml
+
+0.015 2011-12-10
+  - Migrated to github.
+  - Added repository url to meta.
+
+0.014 2011-12-09
+  - A few minor updates.
+
+0.013 2011-11-29
+  - AWS::S3::FileIterator now includes properties 'has_prev' and 'has_next' to
+    help in scenarios of building 'prev' and 'next' navigations.
+  - POD is in need of some TLC.
+  - I'll get to it soon...honest.
+
+0.012 2011-11-29
+  - Some bug fixes.  Upgrade recommended.
+
+0.011 2011-11-23
+  - Achieved an entry in the Guinness Book of World Records for
+    "Most Uploads to PAUSE in a Single Day"
+  - Removed another invalid reference to a *::Lite module that doesn't exist
+    on CPAN.
+
+0.010 2011-11-23
+  - Added missing files to MANIFEST.
+
+0.009 2011-11-23
+  - Added missing prereq Iterator::Paged
+
+0.008 2011-11-23
+  - Fixed some POD to clearly show that a scalar reference is always needed
+    to set the contents of a file.
+  - Removed bad reference to a *::Lite module that doesn't exist on CPAN.
+
+0.007 2011-11-22
+  - Fixed AWS::S3::FileIterator to work properly.
+  - New tests confirm it.
+  - Now require LWP::UserAgent::Determined instead of just LWP::UserAgent.
+  - More POD updates.
+
+0.006 2011-11-22
+  - Updated some of the POD.
+
+0.005 2011-11-21
+  - Setting file contents via a coderef now works properly.
+
+0.004 2011-11-21
+  - I didn't update 'Changes' or 'META.yml' in v0.003 - fixing...
+
+0.003 2011-11-21
+  - All basic functionality (that I need right now) appears to be working.
+  - Tests rewritten.
+  - Everything appears to be good.
+
+0.002 2011-11-20
+  - Removed some incorrect POD.
+
+0.001 2011-11-20
+  - Initial release.
+

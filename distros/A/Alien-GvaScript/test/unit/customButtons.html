@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <meta http-equiv="Content-Type" content='text/html; charset=iso-8859-1' />
+    <link rel="stylesheet" href="../test.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="../images/GvaScript.css" type="text/css" media="screen" charset="utf-8" />
+
+    <script src="../../lib/Alien/GvaScript/lib/prototype.js" type="text/javascript"></script>
+    <script src="../unittest.js" type="text/javascript"></script>
+    <script src="../../lib/Alien/GvaScript/lib/GvaScript.js" type="text/javascript"></script>
+    <title>GvaScript Unit Tests</title>
+  </head>
+  <body>
+    <h1>Unit Tests :: GvaScript/customButtons.js </h1>
+    <p>Tests for CustomButtons/ActionsBar functionalities</p>
+    
+    <!-- Test Log output -->
+    <div id="testlog">...</div>
+
+    <div id="actions_bar"></div>
+    <div id="custom"></div>
+
+    <script type="text/javascript" language="javascript" charset="iso-8859-1">
+    // <![CDATA[
+    new Test.Unit.Runner({
+        // test the initialization of ActionsBar component
+        testInit: function() { with(this) {
+            var ab = new GvaScript.CustomButtons.ActionsBar('actions_bar', {
+            selectfirst: true,
+            actions: [
+                {
+                    label: 'submit',
+                    type: 'submit'
+                },
+                {
+                    label: 'reset',
+                    condition: true,
+                    type: 'reset'
+                },
+                {
+                    id: 'custom_button',
+                    label: 'custom',
+                    type: 'button',
+                    callback: function() {$('custom').update('custom clicked')}
+                },
+                {
+                    id: 'hidden_button',
+                    label: 'hidden',
+                    condition: false
+                }
+            ]});
+
+            assertInstanceOf(GvaScript.CustomButtons.ActionsBar, ab, 'ActionsBar component has not been properly initialized!');
+            assert($('actions_bar').hasClassName('gva-actionsbar'), 'ActionsBar did not set the default classname'); 
+        }},
+        
+        // wait a second to make sure that DOM is updated
+        // test that the buttons has been rendered properly
+        testButtons: function() { with(this) {
+            wait(1000, function() { with(this) {
+                assertEqual(3, $('actions_bar').select('button').length, 'Failed to render 3 buttons');
+                         
+                assertEqual(1, $('actions_bar').select('button[type="submit"]').length, 'Failed to render type submit buttons');
+                assertEqual(1, $('actions_bar').select('button[type="reset"]').length, 'Failed to render type reset buttons');
+
+                assertVisible('actions_bar_btn_0', 'Failed to set generic id');
+                assertVisible('actions_bar_btn_1', 'Failed to set generic id');
+
+                assert(!$('hidden_button'), 'Failed to compile button condition');
+                assertVisible('custom_button', 'Failed to compile button condition');
+
+                Event.simulateMouse($('custom_button').down('.btn'), 'click');
+
+                assertEqual('custom clicked', $('custom').innerHTML);
+            }});
+        }},
+        
+        // tests that Button Navigation is properly set on Buttons 
+        testButtonsNavigation: function() { with(this) {
+            assert($('actions_bar_btn_0').hasClassName('btn-focus'), 'Failed to set default focus');
+            wait(1, function() { with(this) {
+                Event.simulateKey('actions_bar_btn_0', 'keydown', {keyCode:Event.KEY_RIGHT});
+                assert(! $('actions_bar_btn_0').hasClassName('btn-focus'), 'Failed to move focus');
+                assert($('actions_bar_btn_1').hasClassName('btn-focus'), 'Failed to move focus');
+
+                Event.simulateKey('actions_bar_btn_1', 'keydown', {keyCode:Event.KEY_LEFT});
+                assert($('actions_bar_btn_0').hasClassName('btn-focus'), 'Failed to move focus');
+                assert(! $('actions_bar_btn_1').hasClassName('btn-focus'), 'Failed to move focus');
+            }});
+        }}
+    });
+
+    // ]]>
+    </script>
+    </body>
+</html>

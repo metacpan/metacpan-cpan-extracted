@@ -1,0 +1,11 @@
+bin/psort
+lib/App/psort.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+t/psort.t
+t/version_check.t
+Changes
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

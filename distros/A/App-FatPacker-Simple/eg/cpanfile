@@ -1,0 +1,2 @@
+requires 'HTTP::Tiny';
+requires 'Sub::Retry';

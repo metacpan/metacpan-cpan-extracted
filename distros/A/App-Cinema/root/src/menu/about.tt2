@@ -1,0 +1,57 @@
+[% META title = 'ABOUT' %]
+<div id="about" size = "50%">
+<b>Comment</b>
+<p>
+[% IF !Catalyst.user_exists %]
+<ul>
+	<li>Add</li>
+	<li>View</li>
+</ul>
+[% ELSE %]
+<ul>
+	<li><a href="[% base %]comment/add">Add</a>
+	</li>
+	<li><a href="[% base %]comment/view">View</a>
+	</li>
+</ul>
+[% END %] 
+</p>
+<b>My Profile</b>
+[% IF !Catalyst.user_exists %]
+<!--<p>Please <a href="[% Catalyst.uri_for('/user/captcha/') %]">login in</a> first</p>-->
+<ul>
+	<li>Course Project</li>
+	<!--<li>PerlMonk Q&A</li>-->
+	<li>Resume<br>
+	</li>
+</ul>
+[% ELSE %]
+<ul>
+	<li><a href="http://students.engr.scu.edu/~cmo/index.html">Course Projects</a><br>
+	</li>
+	<li><a href="[% base %]static/Resume_Jeff Mo.pdf">Resume</a><br>
+	</li>	
+	<li><a href="http://perlmonks.org/index.pl?node_id=6364;user=sman">PerlMonk Q&A</a><br>
+	</li>	
+</ul>
+[% END %]
+<b>My Design</b>
+[% IF Catalyst.check_any_user_role('vipuser') %]
+<p>Please leave some comment for me to improve my design. Thanks.</p>
+<ul>
+	<li><a href="http://search.cpan.org/~sman/">Source</a></li>
+	<li><a href="[% base %]static/rt.txt">
+	Runtime Info</a></li>
+	<!--<li><a href="[% base %]static/db.txt">
+	Table Schema</a></li>-->
+</ul>
+[% ELSE %]
+<p>You can get access from becoming
+<a href="[% Catalyst.uri_for('/menu/howto') %]">vipuser</a>.</p>
+<ul>
+	<li>Source</li>
+	<!--<li>Table Schema</li>-->
+	<li>Runtime Info</li>
+</ul>
+[% END %]	
+</div>

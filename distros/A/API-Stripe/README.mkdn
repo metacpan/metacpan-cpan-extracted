@@ -1,0 +1,373 @@
+# NAME
+
+API::Stripe - Stripe.com API Client
+
+# VERSION
+
+version 0.07
+
+# SYNOPSIS
+
+    use API::Stripe;
+
+    my $stripe = API::Stripe->new(
+        username   => 'USERNAME',
+        identifier => 'APPLICATION NAME',
+    );
+
+    $stripe->debug(1);
+    $stripe->fatal(1);
+
+    my $charge = $stripe->charges('ch_163Gh12CVMZwIkvc');
+    my $results = $charge->fetch;
+
+    # after some introspection
+
+    $charge->update( ... );
+
+# DESCRIPTION
+
+This distribution provides an object-oriented thin-client library for
+interacting with the Stripe ([https://stripe.com](https://stripe.com)) API. For usage and
+documentation information visit [https://stripe.com/docs/api](https://stripe.com/docs/api). API::Stripe is
+derived from [API::Client](https://metacpan.org/pod/API::Client) and inherits all of it's functionality. Please read
+the documentation for API::Client for more usage information.
+
+# ATTRIBUTES
+
+## identifier
+
+    $stripe->identifier;
+    $stripe->identifier('IDENTIFIER');
+
+The identifier attribute should be set to a string that identifies your app.
+
+## username
+
+    $stripe->username;
+    $stripe->username('USERNAME');
+
+The username attribute should be set to an API key associated with your account.
+
+## debug
+
+    $stripe->debug;
+    $stripe->debug(1);
+
+The debug attribute if true prints HTTP requests and responses to standard out.
+
+## fatal
+
+    $stripe->fatal;
+    $stripe->fatal(1);
+
+The fatal attribute if true promotes 4xx and 5xx server response codes to
+exceptions, a [API::Client::Exception](https://metacpan.org/pod/API::Client::Exception) object.
+
+## retries
+
+    $stripe->retries;
+    $stripe->retries(10);
+
+The retries attribute determines how many times an HTTP request should be
+retried if a 4xx or 5xx response is received. This attribute defaults to 0.
+
+## timeout
+
+    $stripe->timeout;
+    $stripe->timeout(5);
+
+The timeout attribute determines how long an HTTP connection should be kept
+alive. This attribute defaults to 10.
+
+## url
+
+    $stripe->url;
+    $stripe->url(Mojo::URL->new('https://api.stripe.com'));
+
+The url attribute set the base/pre-configured URL object that will be used in
+all HTTP requests. This attribute expects a [Mojo::URL](https://metacpan.org/pod/Mojo::URL) object.
+
+## user\_agent
+
+    $stripe->user_agent;
+    $stripe->user_agent(Mojo::UserAgent->new);
+
+The user\_agent attribute set the pre-configured UserAgent object that will be
+used in all HTTP requests. This attribute expects a [Mojo::UserAgent](https://metacpan.org/pod/Mojo::UserAgent) object.
+
+# METHODS
+
+## action
+
+    my $result = $stripe->action($verb, %args);
+
+    # e.g.
+
+    $stripe->action('head', %args);    # HEAD request
+    $stripe->action('options', %args); # OPTIONS request
+    $stripe->action('patch', %args);   # PATCH request
+
+The action method issues a request to the API resource represented by the
+object. The first parameter will be used as the HTTP request method. The
+arguments, expected to be a list of key/value pairs, will be included in the
+request if the key is either `data` or `query`.
+
+## create
+
+    my $results = $stripe->create(%args);
+
+    # or
+
+    $stripe->POST(%args);
+
+The create method issues a `POST` request to the API resource represented by
+the object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+## delete
+
+    my $results = $stripe->delete(%args);
+
+    # or
+
+    $stripe->DELETE(%args);
+
+The delete method issues a `DELETE` request to the API resource represented by
+the object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+## fetch
+
+    my $results = $stripe->fetch(%args);
+
+    # or
+
+    $stripe->GET(%args);
+
+The fetch method issues a `GET` request to the API resource represented by the
+object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+## update
+
+    my $results = $stripe->update(%args);
+
+    # or
+
+    $stripe->PUT(%args);
+
+The update method issues a `PUT` request to the API resource represented by
+the object. The arguments, expected to be a list of key/value pairs, will be
+included in the request if the key is either `data` or `query`.
+
+# RESOURCES
+
+## account
+
+    $stripe->account;
+
+The account method returns a new instance representative of the API
+_Account_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#account](https://stripe.com/docs/api#account).
+
+## application\_fees
+
+    $stripe->application_fees;
+
+The application\_fees method returns a new instance representative of the API
+_Application Fees_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#application\_fees](https://stripe.com/docs/api#application_fees).
+
+## balance
+
+    $stripe->balance->history;
+
+The balance method returns a new instance representative of the API
+_Balance_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#balance](https://stripe.com/docs/api#balance).
+
+## bitcoin\_receivers
+
+    $stripe->bitcoin->receivers;
+
+The bitcoin\_receivers method returns a new instance representative of the API
+_Bitcoin Receivers_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#bitcoin\_receivers](https://stripe.com/docs/api#bitcoin_receivers).
+
+## cards
+
+    $stripe->cards;
+
+The cards method returns a new instance representative of the API
+_Cards_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#cards](https://stripe.com/docs/api#cards).
+
+## charges
+
+    $stripe->charges;
+
+The charges method returns a new instance representative of the API
+_Charges_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#charges](https://stripe.com/docs/api#charges).
+
+## coupons
+
+    $stripe->coupons;
+
+The coupons method returns a new instance representative of the API
+_Coupons_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#coupons](https://stripe.com/docs/api#coupons).
+
+## customers
+
+    $stripe->customers;
+
+The customers method returns a new instance representative of the API
+_Customers_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#customers](https://stripe.com/docs/api#customers).
+
+## discounts
+
+    $stripe->discounts;
+
+The discounts method returns a new instance representative of the API
+_Discounts_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#discounts](https://stripe.com/docs/api#discounts).
+
+## disputes
+
+    $stripe->disputes;
+
+The disputes method returns a new instance representative of the API
+_Disputes_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#disputes](https://stripe.com/docs/api#disputes).
+
+## events
+
+    $stripe->events;
+
+The events method returns a new instance representative of the API
+_Events_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#events](https://stripe.com/docs/api#events).
+
+## fee\_refunds
+
+    $stripe->application_fees('fee_6HiNDgLZ85q6KD')->refunds('fr_6HiNza7kmLzMFc');
+
+The fee\_refunds method returns a new instance representative of the API
+_Application Fee Refunds_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#fee\_refunds](https://stripe.com/docs/api#fee_refunds).
+
+## file\_uploads
+
+    $stripe->files;
+
+The file\_uploads method returns a new instance representative of the API
+_File Uploads_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#file\_uploads](https://stripe.com/docs/api#file_uploads).
+
+## invoiceitems
+
+    $stripe->invoiceitems;
+
+The invoiceitems method returns a new instance representative of the API
+_Invoice Items_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#invoiceitems](https://stripe.com/docs/api#invoiceitems).
+
+## invoices
+
+    $stripe->invoices;
+
+The invoices method returns a new instance representative of the API
+_Invoices_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#invoices](https://stripe.com/docs/api#invoices).
+
+## plans
+
+    $stripe->plans;
+
+The plans method returns a new instance representative of the API
+_Plans_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#plans](https://stripe.com/docs/api#plans).
+
+## recipients
+
+    $stripe->recipients;
+
+The recipients method returns a new instance representative of the API
+_Recipients_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#recipients](https://stripe.com/docs/api#recipients).
+
+## refunds
+
+    $stripe->refunds;
+
+The refunds method returns a new instance representative of the API
+_Refunds_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#refunds](https://stripe.com/docs/api#refunds).
+
+## subscriptions
+
+    $stripe->subscriptions;
+
+The subscriptions method returns a new instance representative of the API
+_Subscriptions_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#subscriptions](https://stripe.com/docs/api#subscriptions).
+
+## tokens
+
+    $stripe->tokens;
+
+The tokens method returns a new instance representative of the API
+_Tokens_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#tokens](https://stripe.com/docs/api#tokens).
+
+## transfer\_reversals
+
+    $stripe->transfers('tr_164xRv2eZvKYlo2CZxJZWm1E')->reversals;
+
+The transfer\_reversals method returns a new instance representative of the API
+_Transfer Reversals_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#transfer\_reversals](https://stripe.com/docs/api#transfer_reversals).
+
+## transfers
+
+    $stripe->transfers;
+
+The transfers method returns a new instance representative of the API
+_Transfers_ resource requested. This method accepts a list of path
+segments which will be used in the HTTP request. The following documentation
+can be used to find more information. [https://stripe.com/docs/api#transfers](https://stripe.com/docs/api#transfers).
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

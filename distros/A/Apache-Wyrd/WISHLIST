@@ -1,0 +1,24 @@
+Wishes, pipe-dreams, etc.
+
+-   Modify installation Makefile.PL to use PM_FILTER to allow #ifdefine -
+    style commenting out of all debugging code.
+
+-   Security-enhanced version that prevents read-access to CodeRing
+    cryptography key values or "cookie-stealing": partially addressed by
+    IP-tying in v. 94.
+
+-   Integration with CSS/Javascript/Ajax -- e.g.
+    Apache::Wyrd::Interfaces::SmartInput kind of begs to be integrated with a
+    style-sheet generator of some kind, Apache::Wyrd::Input should have some
+    conditional validation on the client side.
+
+-   Trace and debugging information from DBI automatically using
+    $dbh->handle_<foo>
+
+-   Automatic useage message via override on errors
+
+-   Base Wyrd object should be either more seperable or totally inseperable
+    from an Apache::Wyrd::DBL object.
+
+-   General audit to enforce object-model integrity and interface consistency,
+    possibly a rewrite using closures instead of the "old style" references.

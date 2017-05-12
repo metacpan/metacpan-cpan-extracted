@@ -1,0 +1,26 @@
+url;http://192.168.59.129/demo;\eor;;;
+;overnight express;24h;normal;\eor;
+\eor;5 greatest American novels - Order now!;;;;
+post;\noop;delivery;\eor;;
+value;\noop;normal;\eor;;
+\eor;;;;;
+\eor;Product Number;Titel;Quantity;Price in Euro;Value
+post;item;;quantity;;\eor
+value;111001;Blood Meridian : Or the Evening Redness in the West by Cormac Mccarthy    ;;67;\eor
+value;111134;As I Lay Dying  by William Faulkner;;7;\eor
+value;111267;The Great Gatsby by F. Scott Fitzgerald ;;2;\eor
+value;111400;The Portrait of a Lady  by Henry James;;34;\eor
+value;111533;The Adventures of Huckleberry Finn  by Mark Twain    ;;56;\eor
+\eor;;;;;
+;Order system message:;;\eor;;
+\eor;;;;;
+;Order for:;jewa;\eor;;
+\eor;;;;;
+;Delivery mode:;;\eor;;
+\eor;;;;;
+\eor;Product Number;Titel;Quantity;Price in Euro;Value
+;;;;;;\eor
+;;;;;;\eor
+;;;;;;\eor
+;;;;;;\eor
+;;;;;;\eou

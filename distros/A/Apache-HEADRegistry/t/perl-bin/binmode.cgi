@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+use MIME::Base64;
+
+my $img64 = 'R' .
+'0lGODlhFAAWAOMAAP////8zM8z//8zMzJmZmWZmZmYAADMzMwCZzACZMwAzZgAAAAAAAAAAAAAA
+AAAAACH+TlRoaXMgYXJ0IGlzIGluIHRoZSBwdWJsaWMgZG9tYWluLiBLZXZpbiBIdWdoZXMsIGtl
+dmluaEBlaXQuY29tLCBTZXB0ZW1iZXIgMTk5NQAh+QQBAAACACwAAAAAFAAWAAAEkPDISae4WBzA
+u99Hdm1eSYYZWXYqOgJBLAcDoNrYNssGsBy/4GsX6y2OyMWQ2OMQngSlBjZLWBM1AFSqkyU4A2tW
+ywUMYt/wlTSIvgYGA/Zq3QwU7mmHvh4g8GUsfAUHCH95NwMHV4SGh4EdihOOjy8rZpSVeiV+mYCW
+HncKo6Sfm5cliAdQrK1PQBlJsrNSEQA7';
+
+my $img = decode_base64($img64);
+
+print "Content-type: image/gif\n\n";
+
+binmode(STDOUT);
+
+print $img;

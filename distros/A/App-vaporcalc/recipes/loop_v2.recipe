@@ -1,0 +1,58 @@
+{
+   "recipe" : {
+      "target_pg" : "30",
+      "flavor_array" : [
+         {
+            "tag" : "TFA Berry Crunch",
+            "type" : "PG",
+            "percentage" : "2"
+         },
+         {
+            "tag" : "TFA Bavarian Cream",
+            "type" : "PG",
+            "percentage" : "2"
+         },
+         {
+            "type" : "PG",
+            "percentage" : "2",
+            "tag" : "TFA Marshmallow"
+         },
+         {
+            "percentage" : "1",
+            "type" : "PG",
+            "tag" : "Acetyl Pyrazine (TFA)"
+         },
+         {
+            "tag" : "TFA Fruit Circles With Milk",
+            "percentage" : "2",
+            "type" : "PG"
+         },
+         {
+            "tag" : "TFA Sweet Cream",
+            "percentage" : "1",
+            "type" : "PG"
+         },
+         {
+            "percentage" : "2",
+            "type" : "PG",
+            "tag" : "TFA Strawberry Ripe"
+         },
+         {
+            "percentage" : "2",
+            "type" : "PG",
+            "tag" : "TFA Blueberry Wild"
+         },
+         {
+            "percentage" : "3",
+            "type" : "PG",
+            "tag" : "TFA Fruit Circles"
+         }
+      ],
+      "target_vg" : 70,
+      "target_nic_per_ml" : "3",
+      "notes" : [],
+      "base_nic_per_ml" : 100,
+      "base_nic_type" : "PG",
+      "target_quantity" : "160"
+   }
+}

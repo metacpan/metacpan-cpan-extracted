@@ -1,0 +1,29 @@
+---
+abstract: 'Convert JSON data to various formats'
+author:
+  - 'Olivier Mengué <dolmen@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Is: '20140823.1'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-JSON-to
+recommends:
+  Cpanel::JSON::XS: '3.0115'
+requires:
+  Data::Dumper: '2.154'
+  JSON::MaybeXS: '1.003003'
+  YAML::Tiny: '1.62'
+  perl: '5.008'
+resources:
+  homepage: https://github.com/dolmen/p5-App-JSON-to
+  repository: https://github.com/dolmen/p5-App-JSON-to.git
+version: '1.000'

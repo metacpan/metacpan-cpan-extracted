@@ -1,0 +1,63 @@
+===========================================================================
+                 Release of version 1.62 of Acme::EyeDrops
+===========================================================================
+
+NAME
+    Acme::EyeDrops - Visual Programming in Perl
+
+SYNOPSIS
+    use Acme::EyeDrops qw(sightly);
+
+    print sightly( { Shape       => 'camel',
+                     SourceFile  => 'eyesore.pl' } );
+
+DESCRIPTION
+    Acme::EyeDrops converts a Perl program into an equivalent one,
+    but without all those unsightly letters and numbers.
+
+    In a Visual Programming breakthrough, EyeDrops allows you to pour
+    the generated program into various shapes, such as UML diagrams,
+    enabling you to instantly understand how the program works just
+    by glancing at its new and improved visual representation.
+
+INSTALLATION
+    Most of you already know the drill:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Alternatively, if you have Module::Build installed, you can:
+
+        perl Build.PL
+        perl Build
+        perl Build test
+        perl Build install
+
+    It's all pure Perl, so you can also install by putting the .pm
+    file and *.eye files in the appropriate local sub-directory.
+
+    This module should work on all Windows and Unix variants for
+    Perl 5.6 and above, but is untested on other platforms.
+
+AUTHOR
+    Andrew Savige
+
+COPYRIGHT
+    Copyright (c) 2001-2015 Andrew Savige. All rights reserved.
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+===========================================================================
+
+AVAILABILITY
+
+Acme::EyeDrops has been uploaded to the CPAN.
+
+===========================================================================

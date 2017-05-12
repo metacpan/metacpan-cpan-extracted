@@ -1,0 +1,71 @@
+NAME
+    Algorithm::Shape::RandomTree - Create an object representing a
+    procedural, editable, randomized plant shape that can be rendered
+    graphically by other modules.
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+    A detailed synopsis with examples will be released soon.
+
+EXPORT
+    A list of functions that can be exported. You can delete this section if
+    you don't export anything, such as for a purely object-oriented module.
+
+SUBROUTINES/METHODS
+  calc_new_deltas
+  calc_new_endpoints
+  calc_new_nodulation
+  create_branch
+  create_branches
+  create_branches_recursive
+  create_path
+  create_stem
+  create_tree
+  make_branch
+AUTHOR
+    Tamir Lousky, "<tlousky at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-algorithm-shape-randomtree at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Algorithm-Shape-RandomTr
+    ee>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Algorithm::Shape::RandomTree
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Algorithm-Shape-RandomTree
+        >
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Algorithm-Shape-RandomTree>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Algorithm-Shape-RandomTree>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Algorithm-Shape-RandomTree/>
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2010 Tamir Lousky.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,61 @@
+Revision history for Perl extension Array::Heap.
+
+3.22  Wed Dec  7 13:06:05 CET 2016
+	- work around a bug in perl 5.20 and later where undef array elements
+          sometimes are represented by 0-pointers, on which perl functions
+          later crash.
+
+3.21  Wed Jul 15 01:39:13 CEST 2015
+	- mentioned Array::Heap::PriorityQueue::* modules
+          with easier API.
+        - suppress soem bogus warnings on some old 5.12 perls.
+
+3.2   Wed Jul 15 01:25:19 CEST 2015
+	- perl 5.10 changed how $a a,d $b variables work,
+          causing functions to fail when called form multiple packages
+          since then (analyzed by Bob Mathews).
+	- added t/03_pkg.t, based on testcase by Bob Mathews.
+        - added stability canary support.
+
+3.1   Mon Oct 27 23:33:24 CET 2014
+	- simplify logic in splice_heap.
+        - report out-of-bounds indices in adjust_heap*,
+          instead of crashing or worse.
+
+3.0   Fri Apr 19 22:11:11 CEST 2013
+	- implement _idx variants that also keep an index value
+          updates in array references.
+
+2.0   Sun Jul 26 07:25:27 CEST 2009
+	- complete rewrite (use the hopefully clearer
+          libev hash functions).
+	- add splice_heap and adjust_heap family of functions.
+	- speed up _cmp family of functions by using the MULTICALL
+          API.
+        - clarify comparison function semantics.
+        - comparison is now >, not >=.
+        - speed up of everything by taking advantage of the freedom the
+          "no magical/tied stuff is supported" rule.
+
+1.3   Sun Jul 26 04:58:00 CEST 2009
+	- push_heap_cmp tried to push the comparison function
+          as data element (analyzed by Mark Kidwell).
+
+1.2   Wed Jul  1 10:29:10 CEST 2009
+	- rename to Array::Heap.
+
+1.1   Sat Sep 22 15:38:18 CEST 2007
+	- applied patches by thomas drugeon to add
+          _lex variants doing string instead of numeric
+          compares by default.
+
+1.0   Thu Mar  3 17:59:22 CET 2005
+	- change of contact address.
+        - mature enough for 1.0.
+
+0.02  Tue Oct  7 22:41:30 CEST 2003
+	- changed name to Array::Heap2.
+
+0.01  Thu Sep 18 07:08:54 CEST 2003
+	- original version; copied from Linux-NBD
+

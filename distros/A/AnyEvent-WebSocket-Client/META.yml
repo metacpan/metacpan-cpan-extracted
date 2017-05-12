@@ -1,0 +1,42 @@
+---
+abstract: 'WebSocket client for AnyEvent'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Protocol::WebSocket: '0.20'
+  Test::More: '0.94'
+  perl: '5.008'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.006'
+dynamic_config: '1'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-WebSocket-Client
+no_index:
+  directory:
+    - example
+recommends:
+  EV: '0'
+  IO::Socket::SSL: '0'
+  Math::Random::Secure: '0'
+  Net::SSLeay: '0'
+  PerlX::Maybe::XS: '0'
+requires:
+  AnyEvent: '0'
+  Moo: '2.0'
+  PerlX::Maybe: '0.003'
+  Protocol::WebSocket: '0.20'
+  URI: '1.53'
+  URI::ws: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/plicease/AnyEvent-WebSocket-Client/issues
+  homepage: https://metacpan.org/pod/AnyEvent::WebSocket::Client
+  repository: git://github.com/plicease/AnyEvent-WebSocket-Client.git
+version: '0.38'
+x_serialization_backend: 'YAML::Tiny version 1.69'

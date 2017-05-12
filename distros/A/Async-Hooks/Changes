@@ -1,0 +1,28 @@
+Revision history for Async-Hooks
+
+0.16      2011-10-23 09:53:47 Europe/Lisbon
+        * Fix optional Moose tests: detection was broken by 0.15
+
+0.15      2011-10-22 22:38:46 Europe/Lisbon
+        * Re-organize test suite to be easier to read and extend
+        * Bump version to be bigger than the one in 0.05
+          Async::Hooks::Ctl file
+
+0.06      2011-10-22 17:52:59 Europe/Lisbon
+        * Dzil-ify the distribution
+
+0.05    Mon Mar 23 17:50:12 WET 2009
+        * Added has_hooks_for($hook) method
+
+0.04    Sat Mar 21 15:20:33 WET 2009
+        * Added $is_done flag to cleanup callback
+
+0.03    Sat Mar 21 14:46:36 WET 2009
+        * Make sure our versions have two digits
+			  * Fix: chain run was clearing all callbacks
+
+0.02    Thu Mar 19 18:49:39 WET 2009
+        * Fixed Moose tests when the Moose is missing
+
+0.01    Wed Mar 18 13:05:02 WET 2009
+        * First version, released on an unsuspecting world.

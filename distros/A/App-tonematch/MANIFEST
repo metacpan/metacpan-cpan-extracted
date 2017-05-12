@@ -1,0 +1,20 @@
+Build.PL
+lib/App/tonematch.pm
+script/tonematch
+MANIFEST			This list of files
+Makefile.PL
+META.yml
+META.json
+Changes
+ignore.txt
+INSTALL
+LICENSE
+README.md
+t/00-load.t
+t/author-critic.t
+t/author-pod-syntax.t
+t/manifest.t
+t/author-pod-coverage.t
+t/pod.t
+t/version.t
+xt/boilerplate.t

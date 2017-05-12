@@ -1,0 +1,8 @@
+Revision history for Perl extension Audio::OSS
+
+0.0501 Mon Apr 16 14:03:53 EDT 2001
+	- Add mixer interface stuff (not properly documented yet).
+	- Fix problems on FreeBSD.
+
+0.05 Tue Mar 27 11:57:45 EST 2001
+	- First external release.

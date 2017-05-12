@@ -1,0 +1,76 @@
+{
+   "abstract" : "Alien::Build plugin to cache files downloaded from the internet",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Build-Plugin-Fetch-Cache",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Build" : "0.06",
+            "File::HomeDir" : "1.00",
+            "Path::Tiny" : "0.100",
+            "Sereal" : "3.015",
+            "URI" : "1.71",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Alien::Build" : "0.06",
+            "Capture::Tiny" : "0",
+            "File::chdir" : "0",
+            "Test2::Suite" : "0.000060",
+            "Test::More" : "0.94",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Alien-Build-Plugin-Fetch-Cache/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Alien::Build::Plugin::Fetch::Cache",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Alien-Build-Plugin-Fetch-Cache.git",
+         "web" : "https://github.com/plicease/Alien-Build-Plugin-Fetch-Cache"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

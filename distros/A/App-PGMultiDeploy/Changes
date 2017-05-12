@@ -1,0 +1,7 @@
+Revision history for App-PGMultiDeploy
+0.04    2016-07-16
+        Fixed typo of name of cpan module, fixes #113569
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

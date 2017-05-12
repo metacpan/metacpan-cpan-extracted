@@ -1,0 +1,40 @@
+Apache/AuthCookieNTLM version 0.06
+==================================
+
+As explained in the Apache::AuthenNTLM module, depending on the user's 
+config, IE will supply your Windows logon credentials to the web server
+when the server asks for NTLM authentication. This saves the user typing in
+their windows login and password. 
+
+Apache::AuthCookieNTLM is an interface to Shannon Peevey's 
+Apache::AuthenNTLM module. The main aim is to authenticate a user 
+using their Windows login and authenticating against the Windows
+PDC, but to also store their login name into a cookie. This means
+that it can be accessed from other pages and stops the system
+having to authenticate for every request.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+		'Test::More'	     => 0.01,
+		'Apache::AuthenNTLM' => 2.07,
+		'Apache::Request'    => 0.01,
+		'Apache::Cookie'     => 0.01,	
+
+COPYRIGHT AND LICENCE
+
+This module is free software; you can redistribute it or modify it
+under the same terms as Perl itself.
+
+Copyright (C) 2003 Leo Lapworth <llap@cuckoo.org>, Francoise Dehinbo
+

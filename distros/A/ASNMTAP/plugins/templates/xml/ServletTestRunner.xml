@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+  <testsuite name ="be.asnmtap.common.businessservices.service.TestAsnmtapServiceRemote" tests="2" failures="0" errors="0" time="0.183">
+    <testcase name="testHeavyLoad1" time ="0.075">
+    </testcase>
+    <testcase name="testHeavyLoad2" time="0.05">
+    </testcase>
+  </testsuite>
+</testsuites>
+

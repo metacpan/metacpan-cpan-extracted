@@ -1,0 +1,41 @@
+
+Changes of Apache::OutputChain and related packages:
+
+0.11 Wed Aug 28 11:35:41 MET DST 2002
+	On 5.6.1, undef *STDOUT caused coredumps. Commented out. Feel
+	free to modify the source code in such a way that it works on
+	your version of perl.
+
+0.10 Mon Aug 26 14:36:59 MET DST 2002
+	Used undef *STDOUT and returned the untie.
+
+0.09 Mon Aug 26 12:38:53 MET DST 2002
+	Removed untie *STDOUT, suggested by Andreas Koenig.
+
+0.08 Thu Aug  8 19:41:40 MET DST 2002
+	Added minimal tests.
+
+0.07 Fri Oct  1 10:05:55 MET DST 1999
+	Fixed problem with Apache::SSIChain, now doesn't use the tree
+	method, patch by Perrin Harkins.
+
+0.06 Wed Aug 19 10:07:18 MET DST 1998
+	Fixed problem with cooperation with Apache::SSI and
+	HTML::SimpleParse 0.04, patch by Ken Williams.
+
+	Added note about PERL_STACKED_HANDLERS to the docs.
+
+0.05 Tue Aug 18 16:23:05 MET DST 1998
+	Apache::SSIChain fixed to work with the new Apache::SSI 1.91.
+	This meant changing as_HTML to get_output. Documentation
+	extended.
+
+0.04 Thu Apr  9 13:35:41 MET DST 1998
+	Added module Apache::SSIChain.
+
+0.03 Tue Feb  3 13:51:12 MET 1998
+	Added a small bug fix by Andreas Koenig in MakeCapital.
+
+0.02
+	Original release.
+

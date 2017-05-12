@@ -1,0 +1,57 @@
+{
+   "abstract" : "Perl extension to get info from MP3 files.",
+   "author" : [
+      "Dave Cross, E<lt>dave@dave.org.ukE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AudioFile-Info-MP3-Info",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AudioFile::Info" : "0",
+            "MP3::Info" : "0",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "AudioFile::Info::Build" : {
+         "file" : "lib/AudioFile/Info/Build.pm"
+      },
+      "AudioFile::Info::MP3::Info" : {
+         "file" : "lib/AudioFile/Info/MP3/Info.pm",
+         "version" : "v1.4.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davorg/audiofile-info-mp3-info.git",
+         "web" : "https://github.com/davorg/audiofile-info-mp3-info"
+      }
+   },
+   "version" : "v1.4.1",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

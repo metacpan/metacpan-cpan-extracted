@@ -1,0 +1,44 @@
+# source
+#   data_file:		acisf05124N001_evt2_gsf_ds_lc_sorted.fits
+#   arcsec/pixel:	0.492
+# background
+#   data_file:		acisf05124N001_evt2_gsf_ds_lc_sorted.fits
+#   arcsec/pixel:	0.492
+# column units
+#   area:		arcsec**2
+#   surf_bri:		cnts/arcsec**2
+#   surf_err:		cnts/arcsec**2
+
+# summed background-subtracted results
+upto   net_counts     error   background    berror      area  surf_bri  surf_err
+---- ------------ --------- ------------ --------- --------- --------- ---------
+   1     5395.000    73.736       21.000     4.583    284.91    18.936     0.259
+   2    38977.000   197.977      109.000    10.440   1130.20    34.487     0.175
+
+
+# background-subtracted results
+ reg   net_counts     error   background    berror      area  surf_bri  surf_err
+---- ------------ --------- ------------ --------- --------- --------- ---------
+   1     5395.000    73.736       21.000     4.583    284.91    18.936     0.259
+   2    33582.000   183.734       88.000     9.381    845.29    39.728     0.217
+
+
+# source_region(s):
+# annulus(4164,4239,0,38.5198,n=2)
+
+# summed_source_data
+ reg       counts    pixels      sumcnts    sumpix
+---- ------------ --------- ------------ ---------
+   1     5416.000      1177     5416.000      1177
+   2    33670.000      3492    39086.000      4669
+
+
+# background_region(s)
+# annulus(4264,4223,0,38.5198,n=2)
+
+# summed_background_data
+ reg       counts    pixels      sumcnts    sumpix
+---- ------------ --------- ------------ ---------
+   1       21.000      1177       21.000      1177
+   2       88.000      3492      109.000      4669
+

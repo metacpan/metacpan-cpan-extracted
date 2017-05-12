@@ -1,0 +1,337 @@
+#!/usr/bin/perl -w
+# prefix: puts a prefix before each incoming line
+# Copyright 2010-2013 Josh Rabinowitz.
+#
+# note that this 'ABSTRACT' winds up in the readme
+#
+# ABSTRACT: provides 'prefix' filter, which prepends data to lines passed
+
+use strict;
+use warnings;
+use Getopt::Long; 
+use Sys::Hostname;
+use Time::HiRes qw(time);
+use File::Basename;
+use POSIX; # for strftime
+use List::Util qw(max);
+
+our $VERSION = '0.18';
+
+my $prog=basename( $0 );
+my $help;
+my $version;
+my $user_text = "";
+my $suffix;
+my $space = 1;
+my $quote;
+my $timestamp;
+my $utimestamp;
+my $elapsedstamp;
+my $diffstamp;
+my $raw;
+my $hoststamp;
+#my $loadstamp; # deferred feature
+#my $memstamp;  # deferred feature
+my $hostname = Sys::Hostname::hostname();
+
+
+# Usage() : returns usage information
+sub Usage {
+    "$prog: A program that adds items to the start or end of lines read from stdin or named files\n" . 
+    "$prog [--text=prefix:] [--timestamp] [---utimestamp] [-hoststamp] [-no-space]\n" .
+    #"     [--loadstamp] [--memstamp]\n" .  # DEFERRED FEATURES
+    "      [--diffstamp] [--elapsedstamp] [--raw] [--quote] [--version] [FILES]\n" .
+    "   --text='your_text_here' prefixes each line with the desired text\n" . 
+    "   --hoststamp    shows hostname\n" .
+    "   --timestamp    shows timestamp,\n" . 
+    "   --utimestamp   shows with microsecond (if this and -timestamps are used, this prevails)\n" . 
+    "   --elapsedstamp shows time since run began" . 
+    "   --diffstamp    shows time between last lines read\n" .
+    "   --raw          shows elapsed and diffstamps in seconds, always\n" .
+    "   --quote        shows each original line in single quotes\n" .
+    "   --suffix       puts data at end, not start\n" .
+    "   --no-space     puts no space between line read and additional data\n" .
+    "   --version shows version and exits\n" .
+    "     $prog is a filter which prepends data (like the time or the hostname) to lines read\n" .
+    "     from passed filenames or stdin.\n";
+}
+
+
+# call main()
+main();
+
+# main()
+sub main {
+    # we should match the order here, in Usage() output, and in the pod
+    # Note also to update all when adding options
+    GetOptions(
+        "h|help!"          => \$help,
+        "version!"         => \$version,
+        "text=s"           => \$user_text,   # this is better than 'prefix' because it might be a suffix
+        "suffix!"          => \$suffix,
+        "space!"           => \$space,
+        "quote!"           => \$quote,
+        "timestamp!"       => \$timestamp,
+        "utimestamp!"      => \$utimestamp,
+        "hoststamp!"       => \$hoststamp,
+        "diffstamp!"       => \$diffstamp,
+        "elapsedstamp!"    => \$elapsedstamp,
+        "raw!",            => \$raw,
+        #"loadstamp!"      => \$loadstamp,
+        #"memstamp!"       => \$memstamp,
+    ) or die Usage();
+    die Usage() if $help;
+
+    if ($version) {
+        print "$prog $VERSION\n";
+        exit(0);
+    }
+
+    $|++;
+    my $startt = time();
+    my $lasttime = $startt;   # use to store the prev time for diffstamp
+    my $time = $startt;   # use to store the current time if --timestamp or --utimestamp
+    while(<>) {
+        $_ =~ s/(\n|\r)+//;
+        $_ = "'$_'" if $quote;
+
+        # now, build up our prefixes
+        my @prefixes = ();
+        push( @prefixes, $user_text ) if $user_text;
+        if ($hoststamp) {
+            push (@prefixes, $hostname);
+        }
+        if ($timestamp || $utimestamp || $elapsedstamp || $diffstamp) {
+            $time = time();
+        }
+        if ($timestamp || $utimestamp) {
+            my $str = getdatetime( $time );
+            if ($utimestamp) {
+                my $frac = sprintf("%0.5f", $time - int($time));
+                $frac =~ s/^0//;    # remove leading 0, but not the .
+                $str .= $frac;
+            }
+            push( @prefixes, $str );
+        }
+        if ($elapsedstamp) {
+            push(@prefixes, 
+                sprintf("%s elapsed", seconds_for_display( $time - $startt, 5 ) ) );
+        }
+        if ($diffstamp) {
+            push(@prefixes, 
+                sprintf("%s diff", seconds_for_display( $time - $lasttime, 5 ) ) );
+        }
+        #if ($loadstamp) {  # DEFERRED FEATURE
+        #    require CPULoad;
+        #    my @loads = CPULoad::get_loads();
+        #    push(@prefixes, sprintf ("load:%0.2f", $loads[0]));
+        #}
+        #if ($memstamp) {   # DEFERRED FEATURE
+        #    require MemInfo;
+        #    my $info = MemInfo::get_meminfo();
+        #    my ($free, $cached, $swapped) = ($info->{MemFree}, $info->{Cached}, $info->{SwapCached});
+        #    my $str = sprintf( "%s free, %s cached, %s swapped", 
+        #        convert_bytes_to_human_size( $free ),
+        #        convert_bytes_to_human_size( $cached ),
+        #        convert_bytes_to_human_size( $swapped ) );
+        #    push(@prefixes, $str);
+        #}
+        my $out = "";
+        if (@prefixes) {
+            if ($suffix) { # not prefix, suffix
+                $out .= $_; 
+                $out .= " " if $space;
+            }
+            $out .= join(" ", @prefixes);
+            if (!$suffix) {  # yes suffix
+                $out .= " " if $space;
+                $out .= $_; 
+            }
+        } else {
+            $out = $_;
+        }
+        print $out, "\n";
+        $lasttime = $time;
+    }
+}
+
+sub getdatetime { 
+    my $t = shift || time();
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($t);
+    #return sprintf("%04d-%02d-%02d %02d:%02d:%02d", 1900+$year, $mon+1, $mday, $hour, $min, $sec);
+    return POSIX::strftime( "%Y-%m-%d %H:%M:%S", $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst);
+}
+
+############################################
+# converts seconds to human-readable.
+# I couldn't find a module on cpan that did (exactly) this :)
+# the criteria is a short string describing the time duration, that's easy to parse.
+# (DateTime::Format::Human::Duration is similar, but won't show fractional durations like "1.2 mins"
+sub seconds_for_display {
+    my $t = shift;
+    my $precision = shift || 2;
+    my $format = '%1.' . ${precision} . "f";
+
+    if ($raw) { 
+        if (int($t) == $t) {
+            return "$t secs";
+        } else {
+            return sprintf( $format, $t ) . " secs";
+        }
+    }
+
+    # start from largest unit, a year, and work towards smaller units
+    if (abs($t) >= 86400 * 365.25) {
+        # this is not exact because we ignore leap years
+        return sprintf($format, $t/(86400 * 365.25)) . " years"; 
+    } 
+
+    # Considered, but removed, months entries in seconds_for_display()
+    # 1) hard to abbreviate months in 4 chars. mnths? 
+    # 2) 2.1 months looks especially weird
+    # 3) months are much more variable-sized than any other time unit
+    #    therefore more ambiguous and complex to compute (Ie, 28 vs 31 days)
+    #my $seconds_per_month = (365.25 / 12) * 86400;    # mythical equal-sized months
+    #if (abs($t) >= $seconds_per_month) {
+    #    return sprintf($format, $t/$seconds_per_month) . " mnths"; 
+    #} 
+    
+    if (abs($t) >= 86400) {
+        return sprintf($format, $t/86400) . " days"; 
+    } 
+    if (abs($t) >= 60*60) {
+        return sprintf($format, $t/3600) . " hrs"; 
+    }
+    if (abs($t) >= 60) {
+        return sprintf($format, $t/60) . " mins"; 
+    }
+
+    # now from 1/100th of a second and smaller...
+    if (abs($t) <= 0.01) {
+    	return sprintf($format, $t*1000) . " ms"; 
+    }
+    # then between 0.01 and 0.1 ...
+    if (abs($t) <= 0.1) {               # note that we ignore $format here
+        my $prec = max(2, $precision);  
+    	return sprintf("%0.${prec}f", $t) . " secs"; 
+    }
+    
+    # for abs($t) between 0.1 and 60
+    return sprintf("$format secs", $t); 
+}
+
+
+=pod
+
+=head1 NAME     
+            
+prefix - adds hostname, time information, or more to lines from stdin (or read from files)
+                    
+=head1 SYNOPSIS     
+                
+    % tail -f /var/log/some.log | prefix -host -timestamp 
+
+tails a file, showing each line with a hostname and a timestamp like. 
+So if we were tailing a growing file with lines like:
+
+    OK: System operational
+    Warning: Disk bandwidth saturated
+
+we would get real-time output like:
+
+    host.example.com 2013-10-13 16:51:26 OK: System operational
+    host.example.com 2013-10-13 16:55:47 Warning: Disk bandwidth saturated
+    host.example.com 2013-10-13 16:55:49 Warning: Things are wonky: disks spinning backwards
+    host.example.com 2013-10-13 16:55:50 Error: Data read wackbards
+    host.example.com 2013-10-13 16:56:10 OK: Spacetime reversal complete
+
+Note that the hostname (host.example.com) and the date have been prepended to the lines from the file
+
+The prefix program also supports adding arbitrary text, current time to the microsecond, 
+time elapsed since invocation, time since last line output, 
+adding text at the end instead of the beginning of the line, and more.
+
+=head1 DESCRIPTION 
+
+A text filter that prepends (or appends) data to lines read from stdin or named files, and echos them to stdout
+
+=head1 OPTIONS
+
+=head2 --text='arbitrary text here'
+
+add any particular string you like. For example
+
+    % ./some_program | prefix -text="TestRun17:" -utime > logfile.txt
+
+The above example would prefix each line output from some_program with the time and the text 'TestRun17:' (without the quotes).
+                
+=head2 --timestamp
+
+Add a timestamp to each line
+
+    % ls -l | prefix -timestamp 
+                
+=head2 --utimestamp
+
+Add a timestamp, showing fractions of a second to each line
+
+Example:
+    
+    % ls -l | prefix -utimestamp 
+                
+=head2 --hoststamp
+
+Add the hostname to each line
+
+=head2 --no-space
+
+Don't put a space between the original line read and the data added  to each line
+
+=head2 --suffix
+
+Show all added data at end of line, not start of line
+
+For example:
+
+    % echo "abc" | prefix -suffix -text=:Run17:
+
+will output
+    
+    abc :Run17:
+
+(note how the added text is now at the end of the line) whereas: 
+
+    % echo "abc" | prefix -text=:Run17:
+
+would output
+
+    :Run17: abc
+
+=head2 --elapsedstamp
+
+Add the time since the prefix program was started to each line
+
+=head2 --diffstamp
+
+Add time elapsed since last line seen. Shows fractional time. 
+
+This can be useful when tailing logfiles or output of programs
+and you want to see which lines take longer or shorter to output.
+
+=head2 --raw
+
+Show --elapsedstamp and --diffstamp times in seconds, and never in 
+other units (like minutes or microseconds, for example)
+
+=head2 --quote
+
+Show each original line read in single quotes
+
+=head1 AUTHOR
+
+Josh Rabinowitz <joshr>
+    
+=for future_head1 SEE ALSO
+=for future L<DBIx::FileStore>, L<fdbcat>,  L<fdbls>, L<fdbmv>,  L<fdbput>,  L<fdbrm>,  L<fdbstat>,  L<fdbtidy>
+    
+=cut   

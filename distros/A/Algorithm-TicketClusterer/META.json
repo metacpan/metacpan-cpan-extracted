@@ -1,0 +1,44 @@
+{
+   "abstract" : "A Perl Module for Retrieving Tickets Similar to a Given Ticket",
+   "author" : [
+      "Avinash Kak (kak@purdue.edu)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Algorithm-TicketClusterer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Spreadsheet::ParseExcel" : "0.59",
+            "Spreadsheet::XLSX" : "0.13",
+            "Text::Iconv" : "1.7",
+            "WordNet::QueryData" : "1.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.01"
+}

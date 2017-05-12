@@ -1,0 +1,83 @@
+{
+   "abstract" : "collaborative IRC helper",
+   "author" : [
+      "Martín Ferrari",
+      "Damyan Ivanov",
+      "gregor herrmann"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4206",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-KGB",
+   "no_index" : {
+      "directory" : [
+         "privinc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40",
+            "perl" : "5.010"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "Digest::SHA" : "0",
+            "DirHandle" : "0",
+            "File::Touch" : "0",
+            "Git" : "0",
+            "IPC::Run" : "0",
+            "IPC::System::Simple" : "0",
+            "JSON::RPC::Legacy::Client" : "0",
+            "JSON::XS" : "0",
+            "POE" : "0",
+            "POE::Component::IRC" : "5.56",
+            "POE::Component::Server::SOAP" : "0",
+            "Proc::PID::File" : "0",
+            "SOAP::Lite" : "0",
+            "SVN::Core" : "0",
+            "SVN::Fs" : "0",
+            "SVN::Repos" : "0",
+            "Schedule::RateLimiter" : "0",
+            "Time::Piece" : "0",
+            "WWW::Shorten" : "0",
+            "YAML" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Remove" : "0",
+            "Git" : "0",
+            "SVN::Core" : "0",
+            "SVN::Fs" : "0",
+            "SVN::Repos" : "0",
+            "Test::Compile" : "0",
+            "Test::Differences" : "0",
+            "Test::Exception" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Simple" : "0.92",
+            "YAML" : "0",
+            "autodie" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt"
+      ]
+   },
+   "version" : "1.33"
+}

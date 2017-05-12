@@ -1,0 +1,75 @@
+{
+   "abstract" : "The way of CLI for Amon2 App",
+   "author" : [
+      "Dai Okabayashi <bayashi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amon2-CLI",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40",
+            "Module::Build::Pluggable" : "0",
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Amon2::Util" : "0",
+            "Carp" : "0",
+            "Getopt::Long" : "0",
+            "Plack::Util" : "0",
+            "Pod::Usage" : "0",
+            "perl" : "5.008005",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Output" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Amon2::CLI" : {
+         "file" : "lib/Amon2/CLI.pm",
+         "version" : "0.04"
+      },
+      "Amon2::Plugin::CLI" : {
+         "file" : "lib/Amon2/Plugin/CLI.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/bayashi/Amon2-CLI/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/bayashi/Amon2-CLI"
+      },
+      "x_IRC" : {
+         "url" : "irc://chat.freenode.org/#bayadev",
+         "web" : "http://webchat.freenode.net/?channels=%23bayadev"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

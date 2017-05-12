@@ -1,0 +1,8 @@
+{
+    "facets": { 
+        "size": {
+        "statistical": {
+            "field": "stat.size"
+    } } },
+    "size":0
+}

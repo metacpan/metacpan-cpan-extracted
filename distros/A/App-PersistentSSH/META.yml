@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                App-PersistentSSH
+version:             0.04
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    MooseX::Getopt:                0.15
+    MooseX::LogDispatch:           0
+    MooseX::POE:                   0
+    namespace::clean:              0
+    Test::use::ok:                 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

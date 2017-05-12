@@ -1,0 +1,7 @@
+ace.pl is a replacement for tace and aceclient.  If you have the perl
+Readline package installed it offers a host of nice features,
+including command-line editing and command completion.  The other
+scripts in this directory are small examples of using AcePerl.
+
+Lincoln
+

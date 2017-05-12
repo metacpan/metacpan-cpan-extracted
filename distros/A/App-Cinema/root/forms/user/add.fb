@@ -1,0 +1,28 @@
+name: user_add
+method: POST
+fields:
+	fname:
+		label: First Name
+		size: 30
+	lname:
+		label: Last Name
+		size: 30		
+	email:
+		label: Email
+		size: 30
+		validate: EMAIL
+		required: 1
+	uid:
+		label: User Id
+		size: 30
+		required: 1
+	pwd:
+		label: Password
+		size: 30
+		type: Password
+		required: 1  
+	role:
+        label:   Role
+        options: 1=user, 3=admin
+	    value: 1
+stylesheet: 1

@@ -1,0 +1,18 @@
+extra: archive_read_data_into_fh
+extra: archive_entry_set_stat
+extra: archive_read_open_fh
+extra: archive_write_open_fh
+extra: archive_entry_set_fflags_text
+extra: archive_perl_codeset
+extra: archive_perl_utf8_mode
+extra: archive_entry_set_mac_metadata
+extra: archive_entry_set_sourcepath
+
+unimplemented: archive_entry_copy_bhfi
+unimplemented: archive_entry_partial_links
+unimplemented: archive_read_disk_set_matching
+unimplemented: archive_read_disk_set_metadata_filter_callback
+unimplemented: archive_read_extract_set_progress_callback
+unimplemented: archive_read_set_switch_callback
+
+total unimplemented symbols: 6

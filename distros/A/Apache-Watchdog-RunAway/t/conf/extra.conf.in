@@ -1,0 +1,39 @@
+<IfModule mod_status.c>
+    # XXX: can try to loadmodule mod_status if it's not loaded and DSO
+    ExtendedStatus On
+</IfModule>
+
+<IfDefine MODPERL2>
+
+    # make sure that we test under Taint + warnings mode
+    PerlSwitches -wT
+
+    PerlModule Apache2
+    PerlModule Apache::Scoreboard
+    <Location /scoreboard>
+        SetHandler modperl
+        PerlResponseHandler Apache::Scoreboard::send
+    </Location>
+
+</IfDefine>
+
+
+<IfDefine !MODPERL2>
+
+    # make sure that we test under Taint + warnings mode
+    PerlTaintCheck On
+    PerlWarn      On
+
+    PerlModule Apache::Scoreboard
+    <Location /scoreboard>
+        SetHandler perl-script
+        PerlHandler Apache::Scoreboard::send
+    </Location>
+
+</IfDefine>
+
+
+#PerlSwitches -Dm
+
+
+

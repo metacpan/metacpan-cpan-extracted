@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Apache2-S3.t
+lib/Apache2/S3.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Alien::Selenium;
+
+=head1 NAME
+
+selenium_install - minimal Selenium installation
+
+=head1 SYNOPSIS
+
+    selenium_install destdir
+
+=head1 DESCRIPTION
+
+Peforms a minimal Selenium installation using the files installed
+by Alien::Selenium.
+
+=cut
+
+my $dir = shift || './selenium';
+
+print "Installing Selenium to $dir\n";
+
+Alien::Selenium->install( $dir );
+
+print "Installed Selenium to $dir\n";

@@ -1,0 +1,151 @@
+#!perl
+use strict;
+use warnings;
+use App::LogStats;
+
+my $stats = App::LogStats->new->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+stats - helps you to calculate data from lines
+
+
+=head1 SYNOPSIS
+
+    $ stats [options] FILE ...
+
+    or
+
+    $ cat FILE | stats [option]
+
+    options:
+             --file          file path
+        -f,  --fields        select only these fields to take stats
+        -d,  --delimiter     specify the delimiter to split the log
+             --more          calculate more results(NOTE: require more memory)
+        -t,  --through       STDIN is shown
+             --tsv           show the result as TSV
+             --csv           show the result as CSV
+        -di, --digit         number of the digit after decimal point(default:2)
+             --no-comma      not add the comma
+             --crlf          put a line feed as CRLF
+             --cr            put a line feed as CR
+                             (default line feed is LF)
+        -s,  --strict        treats only the strict numbers field
+             --rc            rc file(default: .statsrc)
+        -h,  --help          show this help
+        -v,  --version       show the version
+
+
+=head1 EXAMPLE
+
+If you have the log file which include response time, and response time were logged at the 7th element, for example you write the command like below
+
+    $ stats -f7 access_log
+
+then show the result like this
+
+     --------- -------- 
+                     7  
+     --------- -------- 
+      count      3,096  
+      sum       747.20  
+     --------- -------- 
+      average     0.24  
+     --------- -------- 
+      max         5.01  
+      min         0.01  
+      range          5  
+     --------- -------- 
+
+Or no option was spesified, C<stats> will calculate the first element.
+
+    $ stats access_log
+    
+     --------- ------ 
+                   1  
+     --------- ------ 
+      count       10  
+      sum         55  
+     --------- ------ 
+      average   5.50  
+     --------- ------ 
+      max         10  
+      min          1  
+      range        9  
+     --------- ------ 
+
+This is a bit complex example.
+
+    $ cat example_log
+    1100,1200
+    2300,1300
+    3400,1400
+
+    $ cat example_log | stats -d',' -f1,2 --no-comma --digit 3 --more
+    
+     ---------- ------------- -------
+                           1       2
+     ---------- ------------- -------
+      count                3       3
+      sum               6800    3900
+     ---------- ------------- -------
+      average       2266.667    1300
+      median            2300    1300
+      mode          2266.667    1300
+     ---------- ------------- -------
+      max               3400    1400
+      min               1100    1200
+      range             2300     200
+      variance   1323333.333   10000
+      stddev        1150.362     100
+     ---------- ------------- -------
+
+OK, you can get the result as CSV
+
+    $ cat example_log | stats -d',' -f1,2 --no-comma --digit 3 --more --csv
+    
+    ,"1","2"
+    "count","3","3"
+    "sum","6800","3900"
+    "average","2266.667","1300"
+    "median","2300","1300"
+    "mode","2266.667","1300"
+    "max","3400","1400"
+    "min","1100","1200"
+    "range","2300","200"
+    "variance","1323333.333","10000"
+    "stddev","1150.362","100"
+
+
+=head1 CONFIGURATION
+
+C<stats> command will look for a configuration file before reading its command line parameters.
+
+The default configuration file is C<.statsrc> but you can specify it by C<--rc> option. And the location of a configuration file is $HOME but if the STATSRC_DIR environment variable is set, C<stats> will look for config in that directory or current.
+
+The configuration file is just a list of names and values, separated by colons. Values that take lists are just space separated. A sample configuration file might read:
+
+    more: 1
+    tsv: 1
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+
+=head1 SEE ALSO
+
+L<App::LogStats>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=cut

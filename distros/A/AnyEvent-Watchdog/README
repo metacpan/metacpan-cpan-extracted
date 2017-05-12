@@ -1,0 +1,59 @@
+NAME
+    AnyEvent::Watchdog - generic watchdog/program restarter
+
+SYNOPSIS
+       # MUST be use'd as the very first thing in the main program,
+       # as it clones/forks the program before it returns.
+       use AnyEvent::Watchdog;
+
+DESCRIPTION
+    This module implements a watchdog that can repeatedly fork the program
+    and thus effectively restart it - as soon as the module is use'd, it
+    will fork the program (if possible) and continue to run it normally in
+    the child, while the parent becomes a supervisor.
+
+    The child can then ask the supervisor to restart itself instead of
+    exiting, or ask the supervisor to restart it gracefully or forcefully.
+
+    NOTE: This module *MUST* be used as the first thing in the main program.
+    It will cause weird effects when used from another module, as perl does
+    not expect to be forked inside "BEGIN" blocks.
+
+RECIPES
+    Use AnyEvent::Watchdog solely as a convenient on-demand-restarter:
+
+       use AnyEvent::Watchdog;
+
+       # and whenever you want to restart (e.g. to upgrade code):
+       use AnyEvent::Watchdog::Util;
+       AnyEvent::Watchdog::Util::restart;
+
+    Use AnyEvent::Watchdog to kill the program and exit when the event loop
+    fails to run for more than two minutes:
+
+       use AnyEvent::Watchdog autorestart => 1, heartbeat => 120;
+
+    Use AnyEvent::Watchdog to automatically kill (but not restart) the
+    program when it fails to handle events for longer than 5 minutes:
+
+       use AnyEvent::Watchdog heartbeat => 300;
+
+VARIABLES/FUNCTIONS
+    This module is controlled via the AnyEvent::Watchdog::Util module:
+
+       use AnyEvent::Watchdog::Util;
+
+       # attempt restart
+       AnyEvent::Watchdog::Util::restart;
+
+       # check if it is running
+       AnyEvent::Watchdog::Util::enabled
+          or croak "not running under watchdog!";
+
+SEE ALSO
+    AnyEvent::Watchdg::Util, AnyEvent.
+
+AUTHOR
+     Marc Lehmann <schmorp@schmorp.de>
+     http://home.schmorp.de/
+

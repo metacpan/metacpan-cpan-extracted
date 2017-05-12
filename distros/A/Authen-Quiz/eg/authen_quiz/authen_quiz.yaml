@@ -1,0 +1,34 @@
+#
+# Authen::Quiz data sample.
+#
+---
+F01:
+  - The color of apple ?
+  - blue
+F02:
+  - The color of strawberry ?
+  - red
+F03:
+  - The color of orange ?
+  - orange
+F04:
+  - Baseball player's Matsui's nickname ?
+  - godzilla
+F05:
+  - Ninja's good technique ?
+  - jump
+F06:
+  - The capital of Japan ?
+  - tokio
+F07:
+  - Doughnut and Hamburger. Which is the sweet one ?
+  - doughnut
+F08:
+  - Batman and Superman. Which is the strong one ?
+  - superman
+F09:
+  - Do when you keep smoking the cigarette ?
+  - dies
+F10:
+  - The one drunk after it finishes eating sushi ?
+  - agari

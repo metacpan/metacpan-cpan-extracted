@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 529f8d7b1790f6ce2f149f07dc3156e4192d011b Changes
+SHA1 6cdfb385ffe721014248eaebfae0409fd2c2c514 LICENSE
+SHA1 ea0d21d05b39ea858330c6a45f86ed0dffcfb940 MANIFEST
+SHA1 8a1ff2509695b653a1df5c5fc3540ee1d60d91d3 META.yml
+SHA1 dcf8271b3b23a610819ce8e55e65f4334cf28540 Makefile.PL
+SHA1 8d6f4837a3e4c76d5b4b434502f32873a4af451c README.mkdn
+SHA1 415efa9804772ea6a025499cdf648952212d6f4b dist.ini
+SHA1 7832cb78eb24c0979c3fec1d779f96a26195167c lib/Auth/YubiKey/Client/Web.pm
+SHA1 5235ce4c37eddf1b6dda97f2f0d4ee74849df114 lib/Auth/YubiKey/Client/Web/Response.pm
+SHA1 5ad2c03b9d9af66467dfe37a20ed611f2f2be114 script/auth-yubikey-demo
+SHA1 86cd488198ef1835477613f6a2256994986660aa t/00-load.t
+SHA1 e778780cb6563848afc4d806943d4a59300ec6e1 t/author-no-tabs.t
+SHA1 a8a3b6c291113fff0f1765ef584a08bc4498bdc0 t/release-kwalitee.t
+SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
+SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
+SHA1 91bacb1498d0fb115ed2f1130ffbe8d593931a2d weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlZTSq0ACgkQh4j7xTiFuxH3iQCePP5SsPecNXRX+sTKWDNcTog/
+kfUAoLUB7T0OlYWwsiak7bxdWvtP5fiC
+=p8fA
+-----END PGP SIGNATURE-----

@@ -1,0 +1,5 @@
+plan for Amon3.0
+
+remove Amon2::Web::Dispatcher::Lite and use Router::Simple::Sinatraish directly...
+- easy facebook integration
+- easy twitter integration

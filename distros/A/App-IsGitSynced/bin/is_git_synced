@@ -1,0 +1,329 @@
+#!/usr/bin/perl
+
+# PODNAME: is_git_synced
+
+
+use strict;
+use warnings FATAL => 'all';
+use Pod::Usage;
+use Term::ANSIColor qw(:constants);
+use Hash::Util qw(lock_keys);
+use App::IsGitSynced;
+
+# 'constants'
+my $TRUE  = 1;
+my $FALSE = '';
+
+my $SUCCESS_EXIT_STATUS = 0;
+my $ERROR_EXIT_STATUS   = 1;
+
+# global vars
+my %OPTIONS = (
+    '--quiet'          => $FALSE,
+    '--only_errors'    => $FALSE,
+    '--ignore_missing' => $FALSE,
+    '--version'        => $FALSE,
+    '--show_ok'        => $FALSE,
+    '--help'           => $FALSE,
+);
+lock_keys(%OPTIONS); # To make sure you haven't misspelled key
+
+my %STATUSES = (
+    'success' => 1,
+    'fail'    => 2,
+    'skip'    => 3,
+);
+lock_keys(%STATUSES); # To make sure you haven't misspelled key
+
+# subs
+sub get_paths_and_set_options {
+
+    my @paths;
+
+    foreach my $argv (@ARGV) {
+        if (grep {$argv eq $_} keys %OPTIONS) {
+            $OPTIONS{$argv} = $TRUE;
+        } else {
+            push @paths, $argv;
+        }
+    }
+
+    return @paths;
+}
+
+sub error {
+    my ($message) = @_;
+
+    if (!$OPTIONS{'--quiet'}) {
+        if (-t STDOUT) {
+            print RED();
+            print "Error: $message\n";
+            print RESET();
+        } else {
+            print "Error: $message\n";
+        }
+    }
+}
+
+
+sub is_dir {
+    my ($path) = @_;
+
+    if (-d $path) {
+        return $STATUSES{success};
+    } elsif ( (not -d $path) and $OPTIONS{'--ignore_missing'}) {
+        return $STATUSES{skip};
+    } else {
+        return (
+            $STATUSES{fail},
+            "path '$path' is not a directory"
+        );
+    }
+}
+
+sub has_no_untracked {
+    my ($path) = @_;
+
+    my $output = `cd $path; git status --porcelain`;
+    my @remotes = split(/\n/, $output);
+
+    my $has_untracked = $FALSE;
+    foreach my $line (@remotes) {
+        $has_untracked = $TRUE if $line =~ /^\?\?/;
+    }
+
+    if (not $has_untracked) {
+        return $STATUSES{success};
+    } else {
+        return (
+            $STATUSES{fail},
+            "path '$path' has untracked files",
+        );
+    }
+}
+
+sub is_git_repo {
+    my ($path) = @_;
+
+    `cd $path; git status 2>&1`;
+
+    if (not ${^CHILD_ERROR_NATIVE}) {
+        return $STATUSES{success};
+    } else {
+        return (
+            $STATUSES{fail},
+            "path '$path' is not a git repository"
+        );
+    }
+}
+
+sub has_no_unstaged_changes {
+    my ($path) = @_;
+
+    `cd $path; git diff --exit-code 2>&1`;
+
+    if (not ${^CHILD_ERROR_NATIVE}) {
+        return $STATUSES{success};
+    } else {
+        return (
+            $STATUSES{fail},
+            "path '$path' has unstaged changes"
+        );
+    }
+}
+
+sub has_no_staged_changes {
+    my ($path) = @_;
+
+    `cd $path; git diff --cached --exit-code 2>&1`;
+
+    if (not ${^CHILD_ERROR_NATIVE}) {
+        return $STATUSES{success};
+    } else {
+        return (
+            $STATUSES{fail},
+            "path '$path' has staged changes",
+        );
+    }
+}
+
+sub has_origin {
+    my ($path) = @_;
+
+    my $output = `cd $path; git remote`;
+    my @remotes = split(/\n/, $output);
+
+    my $has_origin;
+    foreach my $remote (@remotes) {
+        $has_origin = $TRUE if $remote eq 'origin';
+    }
+
+    if ($has_origin) {
+        return $STATUSES{success};
+    } else {
+        return (
+            $STATUSES{fail},
+            "path '$path' has no remote 'origin'",
+        );
+    }
+}
+
+# http://stackoverflow.com/questions/8830833/check-that-the-local-git-repo-has-everything-commited-and-pushed-to-master
+sub has_no_divergences_with_origin {
+    my ($path) = @_;
+
+    my $output = `cd $path; git branch`;
+    my @branches = map { s/..(.*)/$1/; $_; } split(/\n/, $output);
+
+    my $has_divergences_with_origin;
+    foreach my $branch (@branches) {
+        next if $branch eq '(no branch)';
+        next if $branch =~ /(detached .*)/;
+
+        my $local = `cd $path; git rev-parse --verify $branch 2>&1`;
+        my $origin = `cd $path; git rev-parse --verify origin/$branch 2>&1`;
+
+        $has_divergences_with_origin = $TRUE if $local ne $origin;
+    }
+
+    if (not $has_divergences_with_origin) {
+        return $STATUSES{success};
+    } else {
+        return (
+            $STATUSES{fail},
+            "path '$path' has some divergences with remote 'origin'",
+        );
+    }
+}
+
+# main
+my @paths = get_paths_and_set_options();
+
+if ($OPTIONS{'--help'}) {
+    pod2usage({
+        -exitval => $SUCCESS_EXIT_STATUS,
+    });
+} elsif ($OPTIONS{'--version'}) {
+    print "is_git_synced $App::IsGitSynced::VERSION\n";
+    exit $SUCCESS_EXIT_STATUS;
+}
+
+my $was_error;
+
+if (!@paths) {
+    error("no required path specified");
+    $was_error++;
+}
+
+foreach my $path (@paths) {
+
+    my @checks = (
+        \&is_dir,
+        \&is_git_repo,
+        \&has_no_untracked,
+        \&has_no_unstaged_changes,
+        \&has_no_staged_changes,
+        \&has_origin,
+        \&has_no_divergences_with_origin,
+    );
+
+    my $local_error;
+    my $skipped;
+
+    CHECKS:
+    foreach my $check (@checks) {
+        my ($check_result, $fail_text) = $check->($path);
+
+        if ($check_result == $STATUSES{success}) {
+            next CHECKS;
+        } elsif ($check_result == $STATUSES{skip}) {
+            $skipped = $TRUE;
+            last CHECKS;
+        } elsif ($check_result == $STATUSES{fail}) {
+            error($fail_text);
+            $local_error = 1;
+            last CHECKS;
+        }
+    };
+
+    if ($local_error) {
+        $was_error++;
+    } elsif ($skipped) {
+        print "Skipping path '$path'\n" if (!$OPTIONS{'--quiet'} && !$OPTIONS{'--only_errors'});
+    } else {
+        print "Success: path '$path' has no local changes and fully synced to remote\n" if (!$OPTIONS{'--quiet'} && !$OPTIONS{'--only_errors'});
+    }
+
+}
+
+if (!$was_error) {
+    if ($OPTIONS{'--show_ok'}) {
+        print GREEN();
+        print "ok\n";
+        print RESET();
+    }
+    exit $SUCCESS_EXIT_STATUS;
+} else {
+    exit $ERROR_EXIT_STATUS;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+is_git_synced
+
+=head1 VERSION
+
+version 1.0.3
+
+=head1 SYNOPSIS
+
+is_git_synced [options] dir1 [dir2 ...]
+
+ Options:
+
+      --quiet           Script will not output anything
+      --only_errors     Script will write only dirs with errors
+      --ignore_missing  Will ignore missing dirs
+      --show_ok         Show 'ok' message if everthing is synced
+      --help            Show this message
+      --version         Show version number
+
+Script checks every specified dir if it is a git repo and it has no local
+changes that are not in remote repository origin. Script by default will
+output information about every checking dir in the separate line. The exit
+status will be 0 if everything is synced and 1 otherwise.
+
+Project url: https://github.com/bessarabov/App-IsGitSynced
+
+=head1 SOURCE CODE
+
+The source code for this module is hosted on GitHub
+L<https://github.com/bessarabov/App-IsGitSynced>
+
+=begin comment
+
+Subs that check git repo
+
+They return 2 values: 1) $check_status (from %STATUSES) 2) $fail_text that
+should be printed
+
+=end comment
+
+=head1 AUTHOR
+
+Ivan Bessarabov <ivan@bessarabov.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Ivan Bessarabov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

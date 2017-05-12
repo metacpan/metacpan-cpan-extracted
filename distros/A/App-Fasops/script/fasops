@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use App::Fasops;
+
+App::Fasops->run;
+
+=head1 OVERVIEW
+
+For help with App::Fasops, run "fasops help"
+
+=cut
+
+__END__
+
+perl -I lib/ script/fasops help
+
+perl -I lib/ script/fasops names t/example.fas -c -o stdout
+cat t/example.fas | perl -I lib/ script/fasops names stdin -c -o stdout
+
+perl -I lib/ script/fasops subset t/example.fas t/example.name.list -o stdout
+cat t/example.fas | perl -I lib/ script/fasops subset stdin t/example.name.list -o stdout
+
+perl -I lib/ t/04-subset.t
+
+perl -I lib/ script/fasops covers t/example.fas -o stdout -n S288c
+cat t/example.fas | perl -I lib/ script/fasops covers stdin -o stdout -n S288c
+
+cat t/example.axt | perl -I lib/ script/fasops axt2fas stdin -o stdout
+perl -I lib/ script/fasops axt2fas t/example.axt -t S288c -q RM11_1a -s t/RM11_1a.chr.sizes -o stdout
+
+cat t/example.maf | perl -I lib/ script/fasops maf2fas stdin -o stdout
+
+perl -I lib/ script/fasops separate t/example.fas --nodash --rc
+perl -I lib/ script/fasops separate t/example.fas --nodash --rc -o stdout
+cat t/example.fas | perl -I lib/ script/fasops separate stdin --nodash --rc -o stdout
+
+cat t/example.fas | perl -I lib/ script/fasops links stdin -o stdout
+perl -I lib/ script/fasops links t/example.fas --best -o stdout
+perl -I lib/ script/fasops links t/example.fas --pair -o stdout
+
+cat t/example.fas | perl -I lib/ script/fasops replace stdin t/replace.tsv -o stdout
+
+cat t/example.fas | perl -I lib/ script/fasops refine stdin --msa mafft -o stdout
+perl -I lib/ script/fasops refine t/example.fas --msa none --chop 10 -o stdout
+
+cat t/example.fas | perl -I lib script/fasops split stdin -o stdout
+
+cat t/slice.fas | perl -I lib script/fasops slice stdin t/slice.yml --name S288c -o stdout
+
+cat t/S288cvsYJM789.slice.fas | perl -I lib script/fasops join t/S288cvsRM11_1a.slice.fas stdin t/S288cvsSpar.slice.fas -n S288c -o stdout
+
+cat t/example.fas | perl -I lib script/fasops xlsx stdin -o example.xlsx
+cat t/example.fas | perl -I lib script/fasops xlsx stdin -l 50 --outgroup -o example.outgroup.xlsx
+rm example.xlsx example.outgroup.xlsx
+
+cat t/Arabid_thaliana.pair.fas | perl -I lib script/fasops check stdin t/NC_000932.fa -o stdout
+
+cat t/example.fas | perl -I lib script/fasops concat stdin t/example.name.list -o stdout
+
+cat t/example.fas | perl -I lib script/fasops stat stdin -o stdout

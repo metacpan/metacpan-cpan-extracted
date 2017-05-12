@@ -1,0 +1,150 @@
+=head1 App::FTNDB To Do
+
+=head2 General
+
+Create App::FTNDB::Examples for example configuration files and scripts?
+
+Move code repository information and the distribution archive information from
+the README file to elsewhere, like I already did with FTN::Database v0.41; the
+POD in lib/FTN/Database.pm is where I put it there, so need to decide there to
+put for for this.  Main script and module?
+
+Add an option, like -r, for specifying a region number; to be used like the
+zone (-z) or net (-n) options, and available to all commands as needed.
+
+Add script option for referencing an sql string for things like defining a
+table or other definitions.  Is "-s" already being used?
+
+Use Test::Database in test scripts?
+
+
+=head2 ftndbadm
+
+Develop a new version of the ftndb-admin script, basing it on App::Cmd and at
+least initially having the name ftndbadm.  Move the functionality currently
+in the ftndb-admin script to the new ftndbadm script.
+
+
+=head2 App::FTNDB::Command::drop.pm
+
+As part of the transition to using App::Cmd; move the functionality for the
+I<drop> command from bin/ftndb-admin to the new module for the drop command.
+
+Besides functionality for dropping databases and tables by their names, add
+being able to drop an index by name.
+
+
+=head2 App::FTNDB::Command::create.pm
+
+As part of the transition to using App::Cmd; move the functionality for the
+I<create> command from bin/ftndb-admin to the new module for the create command.
+
+Add a command line option to reference a file containing the definition of a
+nodelist table ("-s" as noted above?); perhaps also add a configuration option
+for the same thing?
+
+
+=head2 App::FTNDB::Nodelist
+
+After create_ftn_table is available: rewrite create_nodelist_table to use that
+and the new define_nodelist_table function.
+
+Add a function to enable getting the nodelist header information; when given a
+full path to a nodelist file, it will return a hash with at least the ftnyear
+and yearday information. (Should really be a function of or an extension to
+FTN::Nodelist.)
+
+Add a function that checks if an ftnyear:yearday combination is already in the
+database. Check for the ftnyear first; if that is present, then check yearday?
+Or should such a function be in FTN::Database::Nodelist, as that is a database
+function?
+
+Derive and move function to insert or update an entry from ftndb-nodelist.
+Separate functions for insert & update, or different options in same function?
+
+Move get_nodelist_filename subroutine from the ftndb-nodelist script?
+
+Derive and move a function for executing queries on the nodelist table from
+the code used in the list_ftn_nodelist subroutine.
+
+As part of adding statistics related functions, add a function that counts
+the number of nodes that have a particular flag associated with it?  Could
+use the name "get_nodelist_flag_count ($dbh, $table_name, $nodelist_flag)"
+but how to build in extra parts of the search for things like "zone = 1"?
+Also add something that counts the number of things like hubs, nodes marked
+as private, etc?
+
+
+=head2 ftndb-nodelist
+
+The 'region' field for a zone independent node is not being set correctly
+in the database;  example 2:2/0 is being set to region 19, or 1:1/0
+which is being set to 0.  Should be set to the same as the zone number.
+
+Need to add something to the database to reflect nodes being under a hub?
+Or otherwise reflect the actual order of the nodes listed in a net? (If
+there are no hub nodes in a particular net, then effectively the hub
+node for them all is the host node.)
+
+Move code for processing the -f & -e options into a separate subroutine, so
+it could be used by more than just the load command?
+
+Two additional fields are now available in the nodelist table;  one for the
+year of the particular nodelist being worked on and is named 'ftnyear', and
+one for the day number of the nodelist being worked on and is named 'yearday'.
+Both fields have been added to the default ftnnode index. This will allow
+historical nodelist information in the database by being able to have more
+than just one of a particular type.  Need to add functionality to the 
+script and/or module to enable this, including especially being able to
+determine the two fields from information in the nodelist being loaded.
+Change load command to only load new nodelist information. Add a new
+'update' command, for updating/correcting a table entry?
+
+Add separate commands to create or drop the ftnnode index on the nodelist
+table?
+
+Script does not seem to properly handle a file that ends in just blank
+lines, instead of a content line or a ^Z character. (Should fail gracefully
+for a badly formatted file.)
+
+The list of nodelist files is being reverse sorted when there are multiple
+nodelists of the same basename being processed;  that takes care of a set
+of files all from the same year but not ones that are from different years.
+Once ftnyear and yearday information for each file can be made available,
+the files can be sorted by that.
+
+Add a test nodelist for use with this?
+
+Use a template framework of some sort instead of the builtin 'format'
+operations for the reporting functionality, but perhaps keeping it as
+a default? Add the type field to the List command output?  Redo the
+header (extra line)?
+
+
+=head2 ftndb-admin
+
+Remove the ftndb-admin script from the distribution once its functionality has
+been moved to ftndbadm.
+
+
+=head1 SEE ALSO
+
+ L<ftndbadm>, L<ftndb-admim>, L<ftndb-nodelist>, L<App::FTNDB>, L<App::FTNDB::Command::create>,
+  L<App::FTNDB::Command::drop>, L<App::FTNDB::Nodelist>, L<FTN::Database>, L<FTN::Database::Nodelist>
+
+=head1 AUTHOR
+
+Robert James Clay, C<< <jame at rocasa.us> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2012 Robert James Clay, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+
+
+

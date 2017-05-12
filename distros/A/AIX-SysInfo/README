@@ -1,0 +1,40 @@
+AIX::SysInfo is a Perl module for retrieving information about an AIX pSeries system
+
+You can install it using the usual Perl fashion:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+The documentation is in the module file.  Once you install
+the file, you can read it with perldoc.
+
+        perldoc AIX::SysInfo
+
+If you want to read it before you install it, you can use
+perldoc directly on the module file.
+
+        perldoc  SysInfo.pm
+
+VERSION
+    1.2  - some bug fixes, added several more keys
+    1.1  - rewrite (released on Tue Jun 16 16:39:00 CDT 2009)
+    1.0 (released 2000-07-03)
+
+
+AUTHOR
+      Sandor W. Sklar
+      <mailto:ssklar@stanford.edu>
+      <http://whippet.stanford.edu/~ssklar/>
+
+      Sergey Leonovich
+      sleonov@cpan.org
+  
+COPYRIGHT/LICENSE
+    Copyright (c) 2001, Sandor W. Sklar.
+    Copyright (c) 2009, Sergey Leonovich
+
+    This module is free software. It may be used, redistributed, and/or modified
+    under the terms of the Perl Artistic License.
+

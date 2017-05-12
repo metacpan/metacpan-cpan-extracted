@@ -1,0 +1,16 @@
+SYNOPSIS
+
+    See upf.
+
+DESCRIPTION
+
+    This distribution includes upf, a single CLI scripts with subcommands.
+
+SEE ALSO
+
+    Unix::Passwd::File
+
+    App::UpfUtils, where each function in Unix::Passwd::File has its own
+    CLI script instead of a single CLI program for all the functions like
+    upf.
+

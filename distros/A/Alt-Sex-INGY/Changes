@@ -1,0 +1,37 @@
+0.12 Sat Aug 16 16:24:59 PDT 2014
+ - Fix strict/warnings
+
+0.11 Sat Aug 16 15:18:17 PDT 2014
+ - Change Pod to Swim
+
+0.10 Sat Aug 16 10:45:17 PDT 2014
+ - Meta 0.0.2
+
+0.09 Sat Aug 16 03:38:38 PDT 2014
+ - Eliminate spurious trailing whitespace
+
+0.08 Fri Aug 15 19:52:32 PDT 2014
+ - Add t/000-require-modules.t
+
+0.07 Fri Aug 15 17:55:32 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.06 Sat Aug  2 10:02:10 PDT 2014
+ - Fix Copyright years.
+ - Remove cruft doc from lib/Alt/Sex/INGY.pm
+
+0.05 Mon Jul 28 07:22:55 PDT 2014
+ - Fix typo in Meta nometaindex => metanoindex
+
+0.04 Mon Jul 28 07:14:27 PDT 2014
+ - Switch to Zilla-Dist
+
+0.03 Thu Jul 26 11:03:45 PDT 2012
+ - Add utf8 pod encoding
+
+0.02 Wed Jul 25 20:50:25 PDT 2012
+ - no_index Sex.pm
+
+0.01 Wed Jul 25 16:52:30 PDT 2012
+ - Initial release.
+

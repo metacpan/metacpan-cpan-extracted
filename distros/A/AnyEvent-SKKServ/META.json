@@ -1,0 +1,53 @@
+{
+   "abstract" : "Lightweight skkserv implementation for AnyEvent",
+   "author" : [
+      "Takumi Akiyama E<lt>akiym@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-SKKServ",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "7.04",
+            "perl" : "5.008005"
+         }
+      }
+   },
+   "provides" : {
+      "AnyEvent::SKKServ" : {
+         "file" : "lib/AnyEvent/SKKServ.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

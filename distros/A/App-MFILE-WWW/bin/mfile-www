@@ -1,0 +1,509 @@
+#!/usr/bin/perl
+# ************************************************************************* 
+# Copyright (c) 2014, SUSE LLC
+# 
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+# 
+# 2. Redistributions in binary form must reproduce the above copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution.
+# 
+# 3. Neither the name of SUSE LLC nor the names of its contributors may be
+# used to endorse or promote products derived from this software without
+# specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+# ************************************************************************* 
+#
+# App::MFILE::WWW server startup script
+#
+# -------------------------------------------------------------------------
+
+use 5.014;
+use strict;
+use warnings;
+
+#use App::CELL::Test::LogToFile; # uncomment this line to debug initialization
+use App::CELL qw( $meta $site );
+use App::CELL::Util qw( is_directory_viable );
+use App::MFILE::WWW qw( $VERSION );
+use Getopt::Long;
+use File::Path qw( make_path remove_tree );
+use File::ShareDir;
+use File::Spec;
+use Module::Load;
+use Module::Runtime qw( is_module_name require_module );
+use Plack::Builder;
+use Plack::Runner;
+use Plack::Session::Store::File;
+use Try::Tiny;
+use Web::Machine;
+ 
+
+
+
+=head1 NAME
+
+mfile-www - App::MFILE::WWW server startup script
+
+
+
+
+=head1 SYNOPSIS
+
+Standalone mode (runs demo "app" on http://localhost:5001):
+
+    $ mfile-www
+
+Derived distribution mode with derived distro 'App::Dochazka::WWW':
+
+First, create necessary directories and symlinks by running as root with --init:
+
+    $ sudo mfile-www --ddist=App-Dochazka-WWW --init
+
+Then, start the HTTP server
+
+    $ mfile-www --ddist=App-Dochazka-WWW
+
+Or, if you need site configuration:
+
+    $ mfile-www --dist=App-Dochazka-WWW --sitedir=/foo/bar/baz
+  
+NOTE: Be careful with the C<--ddist> option - especially when running as
+root - because the script will treat the argument to this option as a
+"derived" Perl distribution, and attempt to create new directories and
+symlinks in that distribution's "sharedir" (shared directory).
+
+
+=head1 DESCRIPTION
+
+Run this script from the bash prompt to start the server that will provide the
+HTTP server (e.g. Starman) that will serve the JavaScript source files that
+make up your application's frontend.
+
+=head2 Standalone operation (demo)
+
+=over
+
+=item * by default (in the absence of the C<--ddist> option), C<$ddist> is
+set to the empty string
+
+=item * C<$ddist_dir> is not set
+
+=item * the script calls the C<App::MFILE::WWW::init> routine, which loads
+the configuration parameters stored in C<config/WWW_Config.pm> of the
+core distro (L<App::MFILE::WWW>) sharedir
+
+=item * since no C<sitedir> option was specified on the command line, no
+other configuration files are loaded
+
+=item * the configuration parameters and their core default values can be
+seen in C<config/WWW_Config.pm> under the core distro (L<App::MFILE::WWW>)
+sharedir
+
+=item * a very important configuration parameter is MFILE_WWW_LOG_FILE,
+which is the full path to the log file where the Perl side of
+L<App::MFILE::WWW> will write its log messages -- by default, this is set
+to '.mfile-www.log' in the user's home directory, and the current setting is
+always reported on-screen by the startup script so the user knows where to
+look if something goes wrong
+
+=item * the HTTP server is started by calling L<Plack::Runner>, and the
+script reports to the user the port number at which it is listening (5001 by
+default)
+
+=item * the HTTP server always interprets URL paths it receives relative to
+its "root" (called C<HTTP_ROOT> for the purposes of this document), which
+is set to the core distro (L<App::MFILE::WWW>) sharedir in this case
+
+=item * JS and CSS files are considered "static content" and will be served
+from C<HTTP_ROOT/js> and C<HTTP_ROOT/css>, respectively
+
+=item * when an HTTP 'GET' request comes in on the port where the HTTP
+server is listening, and it is not requesting static content, the request
+is passed on to the L<Web::Machine> application (effectively,
+L<App::MFILE::WWW::Resource>) for processing
+
+=item * POST requests are assumed to be AJAX calls and are handled by the
+C<process_post> routine of L<App::MFILE::WWW::Resource>
+
+=item * GET requests are assumed to have originated from a web browser
+running on a user's computer -- to handle these, the C<main_html> routine
+of C<Resource.pm> generates HTML code which is sent back in the HTTP
+response
+
+=item * the HTML so generated contains embedded JavaScript code to start up
+L<RequireJS|http://requirejs.org> with the required configuration
+and pass control over to "the JavaScript side" of L<App::MFILE::WWW>
+
+=back
+
+The embedded JavaScript code does the following:
+
+=over
+
+=item * sets the C<baseURL> to C<< $site->MFILE_WWW_REQUIREJS_BASEURL >>, which
+is set to C</js> -- in absolute terms, this means C<HTTP_ROOT/js>
+
+=item * sets the "C<app>" path config to C<< $site->MFILE_APPNAME >> -- for
+example, if C<< $site->MFILE_APPNAME >> is set to 'foobar', the path config for
+C<app> will be set to C<foobar> and a RequireJS dependency C<app/bazblat>
+on the JavaScript side will translate to C<HTTP_ROOT/js/foobar/bazblat.js>
+
+=item * in this particular case, of course, C<MFILE_APPNAME> is set to
+C<mfile-www>
+
+=item * persuades RequireJS via magic incantations to "play nice" together
+with jQuery and QUnit
+
+=item * by calling C<requirejs.config>, brings in site configuration
+parameters needed on the JavaScript side so they can be accessed via the
+C<cf> JS module
+
+=item * passes control to the C<app/main> JS module
+
+=back
+
+What happens on the JavaScript side is described in a different section of
+this documentation.
+
+
+=head2 Derived distribution mode
+
+Nice as the demo may be, the real purpose of L<App::MFILE::WWW> is to provide a
+structure for writing "real" web frontends. For this purpose, C<bin/mfile-www>
+is run in "derived distribution mode". 
+
+Here is a "play-by-play" description of what happens in this scenario when
+the startup script is run. Again, refer to the script source code
+for better understanding:
+
+=over
+
+=item * C<$ddist> is set to the string given in the C<--ddist> option, e.g.
+C<App-Dochazka-WWW> (or 'App::Dochazka::WWW' in which case it will be converted
+to the correct, hyphen-separated format)
+
+=item * C<$ddist_dir> is set to C<File::ShareDir::dist_dir( $ddist )>, i.e.
+the derived distro sharedir (extending the above example, the distro sharedir
+of L<App::Dochazka::WWW>)
+
+=item * the presence of the C<--ddist> option triggers a special routine
+whose purpose is to ensure that the derived distro exists and that its
+sharedir is properly set up to work with L<App::MFILE::WWW>:
+
+=over
+
+=item * error exit if the distro referred to by the C<--ddist> option
+doesn't exist 
+
+=item * error exit if the distro lacks a sharedir
+
+=item * C<css> and C<js/core> need to exist and be symlinks to the same
+directories in the L<App::MFILE::WWW> sharedir. If this is not the
+case, the script displays a message asking the user to re-run the
+script as root with --init
+
+=item * if already running as root, the symlinks are created and the
+script displays a message asking to be re-run without --init as a normal user
+
+=item * once the symlinks are in place, the script runs some sanity
+checks (mainly verifying the existence of certain files in their
+expected places)
+
+=back
+
+=item * the script calls the C<App::MFILE::WWW::init> routine, which loads
+the configuration parameters stored in the following places:
+
+=over
+
+=item * the L<App::MFILE::WWW> distro sharedir (under C<config/WWW_Config.pm>)
+
+=item * the derived distro sharedir (also under C<config/WWW_Config.pm>)
+
+=item * finally and optionally, if a sitedir was specified on the
+command line -- for example C<--sitedir=/etc/dochazka-www> --,
+configuration parameters are loaded from a file C<WWW_SiteConfig.pm> in
+that directory, overriding the defaults
+
+=back
+
+=item * the derived distro's configuration should override the
+MFILE_APPNAME parameter -- in our example, it could be set to 'dochazka-www'
+
+=item * also refer to the previous section to review the explanation of the
+MFILE_WWW_LOG_FILE parameter
+
+=item * the HTTP server is started by calling L<Plack::Runner>, and the
+script reports to the user at what port number it is listening (5001 by
+default)
+
+=item * the HTTP server always interprets URL paths it receives relative to
+its "root" (called C<HTTP_ROOT> for the purposes of this document), which
+is set to the I<derived distro's sharedir>
+
+=item * the rest of the description is the same as for L<Standalone
+operation>
+
+=back
+
+=cut
+
+# global variables
+my $mfile_sharedir = File::ShareDir::dist_dir( 'App-MFILE-WWW' ); 
+my $sharedir_writable = ( -w $mfile_sharedir ) || 0;
+my ( $ddist_distro, $dispatch_module, $ddist_sharedir );
+
+
+sub _get_sharedir {
+    my ( $distro ) = @_;
+
+    # for distro, we allow both formats My::Distro and My-Distro
+    # distro might be just Foo, or Foo::Bar, or Foo-Bar
+    my @tmp_c;
+    if ( $distro =~ m/\:/ ) {
+        @tmp_c = split( '::', $distro ); 
+    } elsif ( $distro =~ m/\-/ ) {
+        @tmp_c = split( '-', $distro );
+    } else {
+        @tmp_c = ( $distro );
+    }
+    my $app_distro = join( '-', @tmp_c );
+    my $module = join( '::', @tmp_c );
+    my $app_module = $module . '::Dispatch';
+    die "$app_module is not a module name" unless is_module_name( $app_module );
+    print "_get_sharedir: Derived distro is $app_distro\n";
+
+    my $status = undef;
+    try {
+        require_module( $app_module );
+    } catch {
+        $status = "Module $app_module cannot be found. Bailing out!";
+    };
+    die $status if $status;
+
+    my $distro_sharedir;
+    $status = undef;
+    try {
+        $distro_sharedir = File::ShareDir::dist_dir( $app_distro );
+    } catch {
+        $status = "Could not find a sharedir for distro $app_distro: $_";
+    };
+    die $status if $status;
+
+    return ( $app_distro, $app_module, $distro_sharedir );
+}
+
+sub _symlink_paths {
+    my ( $ddir ) = @_;
+    # set up "old" and "new" state variables for our symlinks
+    state $old_css = File::Spec->catfile( $mfile_sharedir, 'css' );
+    state $new_css = File::Spec->catfile( $ddir, 'css' );
+    state $old_corejs = File::Spec->catfile( $mfile_sharedir, 'js', 'core' );
+    state $new_corejs = File::Spec->catfile( $ddir, 'js', 'core' );
+
+    return ( 
+        old_css => $old_css,
+        new_css => $new_css,
+        old_corejs => $old_corejs,
+        new_corejs => $new_corejs,
+    );
+}
+ 
+sub _symlinks_exist {
+    my ( $ddir ) = @_;
+    my %sp = _symlink_paths( $ddir );
+    # check if the "new" already exist and are symlinks
+    return ( -l $sp{new_css} and -l $sp{new_corejs} );
+}
+    
+sub _create_symlink {
+    my ( $old, $new ) = @_;
+    die "Need to be root to create symlink" unless $sharedir_writable;
+    my ( undef, $path, $file ) = File::Spec->splitpath( $new );
+    make_path( $path );
+    symlink( $old, $new ) ;
+    if ( ! stat( $new ) ) {
+        unlink( $new );
+        die "Could not create symlink $old -> $new";
+    }
+    return;
+}
+
+#
+# MAIN
+#
+print "App::MFILE::WWW ver. $VERSION\n";
+
+my $init = '';
+my $ddist = '';
+my $sitedir = '';
+my $http_root;
+
+# Report the result
+print "Running as ";
+print "root\n" if $sharedir_writable;
+print "a normal user\n" if not $sharedir_writable;
+
+# determine if we are running in standalone or derived distribution mode
+GetOptions(
+    'ddist=s' => \$ddist,
+    'init' => \$init,
+    'sitedir=s' => \$sitedir,
+);
+
+# if the user as specified a derived distribution, we might be running in
+# derived distribution mode
+if ( $ddist ) {
+
+    ( $ddist_distro, $dispatch_module, $ddist_sharedir ) = _get_sharedir( $ddist );
+    print "Derived distro is $ddist_distro\n";
+    print "Derived distro sharedir is $ddist_sharedir\n";
+
+    # in derived distro mode, we need symlinks; check if they exist
+    if ( ! _symlinks_exist( $ddist_sharedir ) ) {
+        print "\$sharedir_writable == $sharedir_writable\n";
+        if ( ! $sharedir_writable ) {
+            print "Symlinks not present and sharedir not writable: run the script again as root\n";
+            exit;
+        }
+        if ( $init ) {
+            # if unsuccessful, the _create_symlink routine will die and attempt
+            # to clean up after itself
+            my %sp = _symlink_paths( $ddist_sharedir );
+            _create_symlink( $sp{old_css}, $sp{new_css} );
+            _create_symlink( $sp{old_corejs}, $sp{new_corejs} ); 
+        }
+    }
+
+    print "Symlinks are OK";
+
+    # symlinks are OK, but if running with --init we can't continue
+    if ( $init ) {
+        print "; now run the script again as a normal user without the --init option\n";
+        exit;
+    } else {
+        print "\n";
+    }
+
+    # all should be green now, but we doublecheck anyway: in derived distribution mode
+    # we need to fulfill the following conditions:
+
+    # 1. the distro needs to have a valid sharedir
+    die "Derived distro given, but no sharedir" unless $ddist_sharedir;
+
+    # 2. the symlinks to the App::MFILE::WWW sharedir need to have been created
+    die "Derived distro given, but symlinks not created" unless _symlinks_exist( $ddist_sharedir );
+
+    # all conditions fulfiled
+    print "Running in derived distribution mode\n";
+    $http_root = $ddist_sharedir;
+
+} else {
+
+    die "Running with --init in standalone mode; nothing to do" if $init;
+    print "Running in standalone mode\n";
+    $http_root = $mfile_sharedir;
+    $dispatch_module = 'App::MFILE::WWW::Dispatch';
+
+}
+
+print "Dispatch module is $dispatch_module\n";
+
+#
+#
+# we now know which mode we are running in ("standalone" - $ddist is false -, or
+# "derived distribution" - $ddist is distro name/true)
+#
+#
+
+#
+# prepare arguments for the call to App::MFILE::WWW::init
+#
+my %ARGS = ();
+if ( $ddist and $ddist_sharedir ) {
+    $ARGS{mode} = 'DDIST';
+    if ( is_directory_viable( $ddist_sharedir ) ) {
+        print "Derived distribution $ddist has a viable sharedir $ddist_sharedir; passing it to App::MFILE::WWW init routine\n";
+        $ARGS{ddist_sharedir} = $ddist_sharedir;
+    } else {
+        print "WARNING: problem with derived distribution $ddist sharedir $ddist_sharedir\n";
+    }
+}
+if ( $sitedir ) {
+    if ( is_directory_viable( $sitedir) ) {
+        print "Sitedir $sitedir is viable; passing it to App::MFILE::WWW init routine\n";
+        $ARGS{sitedir} = $sitedir;
+    } else {
+        print "WARNING: given sitedir ->$sitedir<- is not viable!\n";
+    }
+}
+
+my $status = App::MFILE::WWW::init( %ARGS );
+die "\n" . $status->text unless $status->ok;
+
+print "Application is " . $site->MFILE_APPNAME . "\n";
+
+#
+# get the right version string -- the interesting thing here is that this works
+# even if $ddist is set to the empty string!
+#
+my $ddist_with_colons = $ddist;
+my $ddist_version;
+$ddist_with_colons =~ s/-/::/g;
+load $ddist_with_colons;
+{
+    no strict 'refs';
+    $ddist_version = ${ $ddist_with_colons . '::VERSION' };
+}
+$meta->set('META_MFILE_APPVERSION', $ddist_version);
+
+print "Application version is " . $meta->META_MFILE_APPVERSION . "\n";
+print "Log messages will be written to " . $site->MFILE_WWW_LOG_FILE .  "\n";
+print "JS and CSS files will be served from $http_root\n";
+print "Starting server\n";
+
+my $runner = Plack::Runner->new;
+
+# FIXME: parse @ARGV looking for 'host' and 'port' - if both are present, fine.
+# If only one is present, error exit. If neither are present, default to
+# MFILE_WWW_HOST and MFILE_WWW_PORT
+
+push @ARGV, ( 
+    '--host=' . $site->MFILE_WWW_HOST,
+    '--port=' . $site->MFILE_WWW_PORT,
+);
+
+$runner->parse_options(@ARGV);
+remove_tree( '/tmp/mfile-www-sessions' );
+mkdir '/tmp/mfile-www-sessions';
+
+$runner->run( 
+    builder {
+        enable "StackTrace", force => 1;
+#        enable "Session", store => 'File';
+        enable "Session", store => Plack::Session::Store::File->new(
+            dir => '/tmp/mfile-www-sessions',
+        );
+        enable "Static", path => qr{^/(js|css)/}, root => $http_root;
+        Web::Machine->new( resource => $dispatch_module, )->to_app;
+    }
+);
+

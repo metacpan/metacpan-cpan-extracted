@@ -1,0 +1,30 @@
+Revision history for App-reposdb
+
+0.004   2016-06-15 (PERLANCAR)
+
+	- Add tagging (add --has-tag & --lacks-tag in ls, add subcommands
+	  tag/remove-tag/remove-all-tags, add tab completion for repo &
+	  tag).
+
+
+0.003   2016-06-12 (PERLANCAR)
+
+        - ls: Support multiple --sort.
+
+        - ls: Format timestamps.
+
+        - [doc] Add package description.
+
+
+0.002   2016-06-12 (PERLANCAR)
+
+	- ls: Add --sort.
+
+	- [ux] Require reposdb_path instead of defaulting to ~/repos.db.
+
+	- Tweak Rinci metadata: add 'common' argument tag.
+
+
+0.001   2016-06-12 (PERLANCAR)
+
+        - First, minimal release.

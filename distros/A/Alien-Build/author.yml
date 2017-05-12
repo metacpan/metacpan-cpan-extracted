@@ -1,0 +1,55 @@
+---
+pod_spelling_system:
+  skip: 0
+  # list of words that are spelled correctly
+  # (regardless of what spell check thinks)
+  stopwords:
+    - alienfile
+    - ar
+    - bzip
+    - cmake
+    - cp
+    - devnull
+    - gmake
+    - ld
+    - nasm
+    - pkgconf
+    - xz
+    - interpolator
+    - Autoconf
+    - autoconf
+    - MSYS
+    - ftpcopy
+    - ETJ
+    - Mughal
+    - SIVOAIS
+    - Zaki
+    - mohawk
+    - plugable
+    - cflags
+    - libs
+    - PkgConfig
+    - sys
+    - destdir
+    - alienfile
+    - unstaged
+    - checkpointed
+    - ssl
+    - readme
+    - toolset
+    - unixy
+    - microsoft
+    - GnuWin
+    - subplugin
+    - alienizing
+    - libfoo
+    - libpkgconf
+    - pc
+
+pod_coverage:
+  skip: 0
+  # format is "Class#method" or "Class", regex allowed
+  # for either Class or method.
+  private:
+    - Alien::Build::Plugin::.*#init
+

@@ -1,0 +1,14 @@
+Revision history for App-lzf
+
+0.02    2014-07-02 (SHARYANTO)
+
+        - No functional changes.
+
+        - [Bugfix] scripts/ or bin/ files need to have something like #!perl and
+          not #!/usr/bin/env perl so it can be replaced to the path of perl when
+          installing [RT#96884]
+
+
+0.01    2014-04-14 (SHARYANTO)
+
+        - First release.

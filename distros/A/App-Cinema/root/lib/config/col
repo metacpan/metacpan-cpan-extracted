@@ -1,0 +1,30 @@
+[% site.rgb = {
+     black  = '#000000'
+     white  = '#ffffff'
+     grey1  = '#46494c'
+     grey2  = '#c6c9cc'
+     grey3  = '#e3e6ea'
+     pink   = '#CC4444'
+     green  = '#45735f'
+     blue   = '#89b8df'
+     orange = '#ffa500'
+     #red    = '#CC0000'
+     red = '#A80000'
+   };
+
+   site.col = {
+      page    = site.rgb.white
+      text    = site.rgb.black
+      head    = site.rgb.red
+      line    = site.rgb.orange
+      message = site.rgb.green
+      error   = site.rgb.red
+      link    = site.rgb.orange
+      border  = site.rgb.pink      
+   };
+   
+   site.font = {
+   	  family  = "sans-serif,Arial"  
+   	  #family  = "Arial"
+   }
+%]

@@ -1,0 +1,76 @@
+{
+   "abstract" : "(DEPRECATED) easy access to data in many formats",
+   "author" : [
+      "Jeff Zucker (jeff@vpservices.com)",
+      "Sven Dowideit (SvenDowideit@fosiki.com)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyData",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Module::CPANTS::Analyse" : "0.96",
+            "Test::CPAN::Changes" : "0",
+            "Test::CheckManifest" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Output" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-AnyData@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=AnyData"
+      },
+      "homepage" : "https://metacpan.org/release/AnyData",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perl5-dbi/AnyData.git",
+         "web" : "https://github.com/perl5-dbi/AnyData"
+      },
+      "x_IRC" : "irc://irc.perl.org/#dbi",
+      "x_MailingList" : "mailto:dbi-dev@perl.org'",
+      "x_deprecated" : 1
+   },
+   "version" : "0.12"
+}

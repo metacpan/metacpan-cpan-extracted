@@ -1,0 +1,51 @@
+MadJACK perl interface
+======================
+
+Perl module to make it easily to control a MadJACK server from a perl script.
+
+
+INSTALLATION
+------------
+
+	I use Module::Build to build and install the module.
+	To install this module type the following:
+	
+		perl Build.PL
+		./Build
+		./Build test
+		
+	And then as root:
+	
+		./Build install
+
+
+API Overview
+------------
+
+	Audio::MadJACK
+		- new( url )
+		- new( host, port )
+		- play()
+		- pause()
+		- stop()
+		- cue()
+		- eject()
+		- load( filepath )
+		- get_state()
+		- get_position()
+		- get_filepath()
+		- get_url();
+		- ping()
+		
+
+AUTHOR
+------
+
+	Nicholas J. Humfrey, njh@aelius.com
+
+
+COPYRIGHT
+---------
+
+	Copyright (C) 2005 Nicholas J. Humfrey
+

@@ -1,0 +1,74 @@
+#!perl
+
+use strict;
+use warnings;
+use DBI;
+use FCGI;
+use App::CPANIDX::Renderer;
+use App::CPANIDX::Queries;
+use Config::Tiny;
+use Getopt::Long;
+
+my $config = 'cpanidx.ini';
+
+GetOptions( 'config=s', \$config, );
+
+my $ini = Config::Tiny->new();
+
+my $cfg = $ini->read( $config ) or die $ini->errstr, "\n";
+
+my $port = $cfg->{_}->{socket};
+my $dsn = $cfg->{_}->{dsn};
+my $user = $cfg->{_}->{user};
+my $pass = $cfg->{_}->{pass};
+
+die "No 'socket' was specified in the config file '$config', aborting\n" unless $port;
+die "No 'dsn' was specified in the config file '$config', aborting\n" unless $dsn;
+
+my $dbh = DBI->connect($dsn,$user,$pass) or die $DBI::errstr, "\n";
+
+my $socket = FCGI::OpenSocket( $port, 5 );
+my $request = FCGI::Request( \*STDIN, \*STDOUT, \*STDERR,
+    \%ENV, $socket );
+
+FCGI: while( $request->Accept() >= 0 ) {
+  my $path = $ENV{'REQUEST_URI'};
+  my ($root,$enc,$type,$search) = grep { $_ } split m#/#, $path;
+  $search = '0' if $type =~ /^next/ and !$search;
+  my @results = _search_db( $type, $search );
+  #$enc = 'yaml' unless $enc and $enc =~ /^(yaml|json|xml|html)$/i;
+  $enc = 'yaml' unless $enc and grep { lc($enc) eq $_ } App::CPANIDX::Renderer->renderers();
+  my $ren = App::CPANIDX::Renderer->new( \@results, $enc );
+  my ($ctype, $string) = $ren->render( $type );
+  print "Content-type: $ctype\r\n\r\n";
+  print $string;
+}
+
+FCGI::CloseSocket( $socket );
+exit 0;
+
+sub _search_db {
+  my ($type,$search) = @_;
+  my @results;
+  if ( my $sql = App::CPANIDX::Queries->query( $type ) ) {
+    if ( ( $type eq 'mod' or $type eq 'corelist' or $type eq 'perms' )
+         and !( $search =~ m#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# ) ) {
+      return @results;
+    }
+    # send query to dbi
+    if ( my $sth = $dbh->prepare_cached( $sql->[0] ) ) {
+      $sth->execute( ( $sql->[1] ? $search : () ) );
+      while ( my $row = $sth->fetchrow_hashref() ) {
+        push @results, { %{ $row } };
+      }
+      if ( $type eq 'mod' ) { # sanity check
+        @results = grep { $_->{mod_name} eq $search } @results;
+      }
+    }
+    else {
+      warn $DBI::errstr, "\n";
+      return @results;
+    }
+  }
+  return @results;
+}

@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/Apache/Session/SQLite.pm
+t/00_compile.t
+t/01_sqlite.t
+
+

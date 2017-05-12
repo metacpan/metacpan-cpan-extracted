@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# Try this vim command:
+#
+# :map \ghu :let $l=line(".")<cr>:let $p=@%<cr>:!echo -n "$(git hub url $p $l)" \| xsel -b<cr><cr>
+
+set -e
+
+command:url() {
+  set -- "${command_arguments[@]}"
+
+  local path= line=
+  if inside-git-repo && [ $# -gt 0 ] && [ -e "$1" ]; then
+    path="$1"
+    path="${path%/}"
+    [ -n "$2" ] && line="$2"
+    command_arguments=()
+  fi
+
+  get-args '?owner:get-user/repo:get-repo'
+  branch="$(git rev-parse --abbrev-ref HEAD)"
+  url="https://github.com/$owner/$repo/tree/$branch"
+
+  if [ -n "$path" ]; then
+    url+="/$path"
+    if [ -n "$line" ]; then
+      url+="#L$line"
+    fi
+  fi
+
+  if pipeline; then
+    echo -n "$url"
+  else
+    echo "$url"
+  fi
+
+  msg_ok=0
+}
+
+# vim: set lisp:

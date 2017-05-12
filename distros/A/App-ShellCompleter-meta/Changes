@@ -1,0 +1,15 @@
+0.003   2017-02-16 (PERLANCAR)
+
+	- [refactor] Use Complete::Acme::MetaSyntactic.
+
+
+0.002   2016-11-04 (PERLANCAR)
+
+	- Use 'meta --themes' to get list of installed themes instead of
+	  listing Acme::MetaSyntactic::* modules which produces some false
+	  positives.
+
+
+0.001   2016-11-04 (PERLANCAR)
+
+        - First release.

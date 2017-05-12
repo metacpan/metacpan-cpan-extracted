@@ -1,0 +1,820 @@
+<html>
+<head>
+  <title>ActiveWorks Perl / Java / C Cross Reference</title>
+</head>
+<body bgcolor="#f0f0f0" link="#cc0000" vlink="brown">
+
+
+<h1 align="center">ActiveWorks Perl / Java / C Cross Reference</h1>
+
+<p align="center">See also the <a href="Admin/index.html">Aw::Admin</a> Reference.</p>
+
+<center>
+
+<table width="90%" border=1 bgcolor="#cccc99">
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw.html">Aw</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw.html#getDiagnostics">getDiagnostics</a></td><td>getDiagnostics</td><td>awGetDiagnostics</td></tr>
+  <tr valign="top"><td><a href="Aw.html#setDiagnostics">setDiagnostics</a></td><td>setDiagnostics</td><td>awSetDiagnostics</td></tr>
+  <tr valign="top"><td><a href="Aw.html#err">err</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw.html#errmsg">errmsg</a></td><td>&nbsp;</td><td>awErrorToCompleteString</td></tr>
+  <tr valign="top"><td><a href="Aw.html#error">error</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw.html#getWarn">getWarn</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw.html#setDefaultBroker">setDefaultBroker</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw.html#setWarn">setWarn</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw.html#setWarnAll">setWarnAll</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw.html#warn">warn</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+
+<!-- Aw::Adapter -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_Adapter.html">Aw::Adapter</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#new">new</a></td><td>new</td><td>awAdapterLoadProperties<br>awAdapterInitLogging<br>awAdapterCreate</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#DESTROY">DESTROY</a></td><td>finalize</td><td>awDeleteAdapter</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#err">err</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#errmsg">errmsg</a></td><td>&nbsp;</td><td>awErrorToCompleteString</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#error">error</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Adapter.html#addEvent">addEvent</a></td><td>addEvent</td><td>awAdapterAddEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#beginSetup">beginSetup</a></td><td>beginSetup</td><td><code>&lt;adapter&gt;-&gt;</code>beginSetupFunction</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#beginTransaction">beginTransaction</a></td><td>beginTransaction</td><td><code>&lt;adapter&gt;-&gt;</code>beginTransactionFunction</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#checkPublications">checkPublications</a></td><td>checkPublications</td><td>awAdapterCheckPublications</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#cleanupEventType">cleanupEventType</a></td><td>cleanupEventType</td><td><code>&lt;adapter&gt;-&gt;</code>cleanupEventTypeFunction</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#connectTest">connectTest</a></td><td>connectTest</td><td>awAdapterConnectTest</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#createAdapterClient">createAdapterClient</a></td><td>createAdapterClient</td><td>awAdapterCreateClient</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#createClient">createClient</a></td><td>createClient</td><td>awAdapterCreateClient</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#deliverErrorEvent">deliverErrorEvent</a></td><td>deliverErrorEvent</td><td>awAdapterDeliverErrorEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#endSetup">endSetup</a></td><td>endSetup</td><td><code>&lt;adapter&gt;-&gt;</code>endSetupFunction</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#endTransaction">endTransaction</a></td><td>endTransaction</td><td><code>&lt;adapter&gt;-&gt;</code>endTransactionFunction</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Adapter.html#getAdapterEventName">getAdapterEventName</a></td><td>getAdapterEventName</td><td>awGetEventTypeName(<code>&lt;adapter&gt;-&gt;adapterInfo</code>)</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getAdapterInfo">getAdapterInfo</a></td><td>getAdapterInfo</td><td>awAdapterGetAdapterInfo</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getAdapterType">getAdapterType</a></td><td>getAdapterType<br>&lt;adapter&gt;.adapterType</td><td><code>&lt;adapter&gt;-&gt;</code>adapterType</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getAdapterVersion">getAdapterVersion</a></td><td>&lt;adapter&gt;.adapterVersion</td><td><code>&lt;adapter&gt;-&gt;</code>adapterVersion</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getAdminClient">getAdminClient</a></td><td>getAdminClient</td><td><code>&lt;adapter&gt;-&gt;</code>adminClient</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getBroker">getBroker</a></td><td>getBroker<br>&lt;adapter&gt;.broker</td><td><code>&lt;adapter&gt;-&gt;</code>broker</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getBrokerClient">getBrokerClient</a></td><td>getBrokerClient<br>&lt;adapter&gt;.brokerClient</td><td><code>&lt;adapter&gt;-&gt;</code>brokerClient</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getBrokerHost">getBrokerHost</a></td><td>getBrokerHost<br>&lt;adapter&gt;.brokerHost</td><td><code>&lt;adapter&gt;-&gt;</code>brokerHost</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getBrokerName">getBrokerName</a></td><td>getBrokerName<br>&lt;adapter&gt;.brokerName</td><td><code>&lt;adapter&gt;-&gt;</code>brokerName</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getClient">getClient</a></td><td>getClient<br>&lt;adapter&gt;.brokerClient</td><td><code>&lt;adapter&gt;-&gt;</code>brokerClient</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getClientGroup">getClientGroup</a></td><td>getClientGroup<br>&lt;adapter&gt;.clientGroup</td><td><code>&lt;adapter&gt;-&gt;</code>clientGroup</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getClientId">getClientId</a></td><td>getClientId</td><td><code>&lt;adapter&gt;-&gt;</code>clientId</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getClientName">getClientName</a></td><td>&lt;adapter&gt;.clientName</td><td><code>&lt;adapter&gt;-&gt;</code>clientName</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getEventDef">getEventDef</a></td><td>getEventDef</td><td>awAdapterGetEventDef</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getEventDefs">getEventDefs</a></td><td>getEventDefs</td><td><code>&lt;adapter&gt;-&gt;</code>eventDefs</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getEvents">getEvents</a></td><td>getEvents</td><td>awAdapterGetEvents</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getPublishWaitTime">getPublishWaitTime</a></td><td>getPublishWaitTime</td><td>awAdapterGetPublishWaitTime</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getReplyDef<hr noshade width="80%" align="left"><font size=1><i>For Internal Use Only</i></font></td><td>&nbsp;</td></tr>
+
+  <tr valign="top"><td>&nbsp;</td><td>handleBrokerEvent</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#init">init</a></td><td>init</td><td>awAdapterInit</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#initStatusSubscriptions">initStatusSubscriptions</a></td><td>initStatusSubscriptions</td><td>awAdapterInitStatusSubscriptions<hr noshade align="left" width="80%">awAdapterPublishStatus</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#isConnectTest">isConnectTest</a></td><td>isConnectTest</td><td>awAdapterIsConnectTest</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#isMaster">isMaster</a></td><td>isMaster</td><td>awAdapterIsMaster</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Adapter.html#loadProperties">loadProperties</a></td><td>loadProperties</td><td>awAdapterLoadProperties<hr noshade width="80%" align="left">awAdapterInitLogging</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#processPublication">processPublication</a></td><td>processPublication</td><td><code>&lt;adapter&gt;-&gt;</code>processPublicationFunction</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#processRequest">processRequest</a></td><td>processRequest</td><td><code>&lt;adapter&gt;-&gt;</code>processRequestFunction</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#publishStatus">publishStatus</a></td><td>publishStatus</td><td>awAdapterPublishStatus</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#removeEvent">removeEvent</a></td><td>removeEvent</td><td>awAdapterRemoveEvent</td></tr>
+
+  <tr valign="top"><td>&nbsp;</td><td>reportGetEventFailure</td>&nbsp;<td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>reportExitFailure</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>resetBrokerCheck</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>&lt;adapter&gt;.resources</td><td>&nbsp;</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Adapter.html#setConnectionDescriptorSSL">setConnectionDescriptorSSL</a></td><td>setConnectionDescriptorSSL</td><td>awAdapterSetDescriptorSSL</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#setStatusProperty">setStatusProperty</a></td><td>setStatusProperty</td><td>awAdapterSetStatusProperty</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Adapter.html#setupEvent">setupEvent</a></td><td>setupEvent</td><td><code>&lt;adapter&gt;-&gt;</code>setupEventFunction</td></tr>
+  <tr><td colspan=3 bgcolor="#bfbfbf" align="center"><strong><i>methods requiring an AdapterHandle are accessible from Aw::Adapter</i></strong></td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#createEvent">createEvent</a></td><td>createEvent</td><td>awAdapterCreateEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#createTypedEvent">createTypedEvent</a></td><td>&nbsp;</td><td>awAdapterCreateTypedEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#deliverAckReplyEvent">deliverAckReplyEvent</a></td><td>deliverAckReplyEvent</td><td>awAdapterDeliverAckReplyEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#deliverNullReplyEvent">deliverNullReplyEvent</a></td><td>deliverNullReplyEvent</td><td>awAdapterDeliverNullReplyEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#deliverPartialReplyEvent">deliverPartialReplyEvent</a></td><td>&nbsp;</td><td>awAdapterDeliverPartialReplyEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#deliverReplyEvent">deliverReplyEvent</a></td><td>deliverReplyEvent</td><td>awAdapterDeliverReplyEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getEventTypeDef">getEventTypeDef</a></td><td>getEventTypeDef</td><td>awAdapterGetEventTypeDef</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#getStringField">getStringField</a></td><td>getStringField</td><td>awAdapterGetStringField</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#publish">publish</a></td><td>publish</td><td>awAdapterPublishEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#setFieldFromString">setFieldFromString</a></td><td>&nbsp;</td><td>awAdapterSetFieldFromString</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#setStringField">setStringField</a></td><td>setStringField</td><td>awAdapterSetStringField</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#setupEventVerify">setupEventVerify</a></td><td>setupEventVerify</td><td>awAdapterSetupEventVerify</td></tr>
+  <tr valign="top"><td><a href="Aw_Adapter.html#toFormattedString">toFormattedString</a></td><td>toFormattedString</td><td>awAdapterToFormattedString</td></tr>
+
+
+<!-- Aw::Client -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_Client.html">Aw::Client</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#new">new</a></td><td>new</td><td>awNewBrokerClient</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>awDestroyClient</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#err">err</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#errmsg">errmsg</a></td><td>&nbsp;</td><td>awErrorToCompleteString</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#error">error</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Client.html#acknowledge">acknowledge</a></td><td>acknowledge</td><td>awAcknowledge</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#acknowledgeThrough">acknowledgeThrough</a></td><td>acknowledgeThrough</td><td>awAcknowledgeThrough</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#beginTransaction">beginTransaction</a></td><td>beginTransaction</td><td>awBeginTransaction</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#cancelCallbackForSubId">cancelCallbackForSubId</a></td><td>cancelCallbackForSubId</td><td>awCancelCallbackForSubId</td>
+  <tr valign="top"><td><a href="Aw_Client.html#cancelCallbackForTag">cancelCallbackForTag</a></td><td>cancelCallbackForTag</td><td>awCancelCallbackForTag</td>
+  <tr valign="top"><td><a href="Aw_Client.html#cancellCallbacks">cancellCallbacks</a></td><td>cancellCallbacks</td><td>awCancelCallbacks</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#cancelSubscription">cancelSubscription</a></td><td>cancelSubscription</td><td>awCancelSubscription</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Client.html#cancelSubscriptions">cancelSubscriptions</a></td><td>cancelSubscriptions</td><td>awCancelSubscriptionFromStruct<br>&nbsp;<b>|</b> awCancelSubscriptionsFromStructs</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Client.html#canPublish">canPublish</a></td><td>canPublish</td><td>awCanPublish</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#canSubscribe">canSubscribe</a></td><td>canSubscribe</td><td>awCanSubscribe</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#clearQue">clearQue</a></td><td>clearQue</td><td>awClearClientQueue</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#connect">connect</a></td><td>&nbsp;</td><td><hr width="80%" align="left" noshade>awNewBrokerClient<br>&nbsp;<b>|</b> awReconnectBrokerClient</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Client.html#deliver">deliver</a></td><td>deliver</td><td>awDeliverEvent<br>&nbsp;<b>|</b> awDeliverEvents</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Client.html#deliverAckReplyEvent">deliverAckReplyEvent</a></td><td>deliverAckReplyEvent</td><td>awDeliverAckReplyEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#deliverErrorReplyEvent">deliverErrorReplyEvent</a></td><td>deliverErrorReplyEvent</td><td>awDeliverErrorReplyEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#deliverPartialReplyEvents">deliverPartialReplyEvents</a></td><td>deliverPartialReplyEvents</td><td>awDeliverPartialReplyEvents</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#deliverNullReplyEvent">deliverNullReplyEvent</a></td><td>deliverNullReplyEvent</td><td>awDeliverNullReplyEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#deliverReplyEvent">deliverReplyEvent</a></td><td>deliverReplyEvent</td><td>awDeliverReplyEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#deliverReplyEvents">deliverReplyEvents</a></td><td>deliverReplyEvents</td><td>awDeliverReplyEvents</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#deliverRequestAndWait">deliverRequestAndWait</a></td><td>deliverRequestAndWait</td><td>awDeliverRequestAndWait</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Client.html#disconnect">disconnect</a></td><td>disconnect</td><td>awDisconnectClient</td>
+  <tr valign="top"><td><a href="Aw_Client.html#dispatch">dispatch</a></td><td>dispatch</td><td>awDispatch</td>
+  <tr valign="top"><td><a href="Aw_Client.html#doesSubscriptionExist">doesSubscriptionExist</a></td><td>doesSubscriptionExist</td><td>awDoesSubscriptionExist</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Client.html#endTransaction">endTransaction</a></td><td>endTransaction</td><td>awEndTransaction</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Client.html#getAccessLabel">getAccessLabel</a></td><td>getAccessLabel</td><td>awGetClientAccessLabel</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getApplicationName">getApplicationName</a></td><td>getApplicationName</td><td>awGetClientApplicationName</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getBrokerHost">getBrokerHost</a></td><td>getBrokerHost</td><td>awGetClientBrokerHost</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getBrokerName">getBrokerName</a></td><td>getBrokerName</td><td>awGetClientBrokerName</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getBrokerPort">getBrokerPort</a></td><td>getBrokerPort</td><td>awGetClientBrokerPort</td>
+  <tr valign="top"><td><a href="Aw_Client.html#getBrokerSSLCertificate">getBrokerSSLCertificate</a></td><td>getBrokerSSLCertificate</td><td>awGetBrokerSSLCertificate</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getCanPublishNames">getCanPublishNames</a></td><td>getCanPublishNames</td><td>awGetCanPublishNames</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getCanPublishTypeDefs">getCanPublishTypeDefs</a></td><td>getCanPublishTypeDefs</td><td>awGetCanPublishTypeDefs</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getCanSubscribeNames">getCanSubscribeNames</a></td><td>getCanSubscribeNames</td><td>awGetCanSubscribeNames</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getCanSubscribeTypeDefs">getCanSubscribeTypeDefs</a></td><td>getCanSubscribeTypeDefs</td><td>awGetCanSubscribeTypeDefs</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getClientGroup">getClientGroup</a></td><td>getClientGroup</td><td>awGetClientGroup</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getClientId">getClientId</a></td><td>getClientId</td><td>awGetClientId</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getClientInfoset">getClientInfoset</a></td><td>getClientInfoset</td><td>awGetClientInfoset</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getClientSSLEncryptionLevel">getClientSSLEncryptionLevel</a></td><td>getClientSSLEncryptionLevel</td><td>awGetClientSSLEncryptionLevel</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getClientStateShareLimit">getClientStateShareLimit</a></td><td>ClientStateShareLimit</td><td>awGetClientStateShareLimit</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getClientTerritoryName">getClientTerritoryName</a></td><td>ClientTerritoryName</td><td>awGetClientTerritoryName</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getConnectionDescriptor">getConnectionDescriptor</a></td><td>getConnectionDescriptor</td><td>awGetClientConnectionDescriptor</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Client.html#getDefaultBrokerPort">getDefaultBrokerPort</a></td><td>getDefaultBrokerPort</td><td>awGetDefaultBrokerPort</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Client.html#getEvent">getEvent</a></td><td>getEvent</td><td>awGetEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getEvents">getEvents</a></td><td>getEvents</td><td>awGetEvents</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getEventTypeDef">getEventTypeDef</a></td><td>getEventTypeDef</td><td>awGetEventTypeDef</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getEventTypeDefs">getEventTypeDefs</a></td><td>getEventTypeDefs</td><td>awGetEventTypeDefs</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Client.html#getEventTypeInfosetNames">getEventTypeInfosetNames</a></td><td>getEventTypeInfosetNames</td><td>awGetEventTypeInfosetNames</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getEventTypeNames">getEventTypeNames</a></td><td>getEventTypeNames</td><td>awGetEventTypeNames</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getFamilyEventTypeNames">getFamilyEventTypeNames</a></td><td>&nbsp;</td><td>awGetFamilyEventTypeNames</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getFamilyNames">getFamilyNames</a></td><td>&nbsp;</td><td>awGetFamilyNames</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getLastPublishSequenceNumber">getLastPublishSequenceNumber</a></td><td>getLastPublishSequenceNumber</td><td>awGetClientLastPublishSequenceNumber</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getPlatformInfo">getPlatformInfo</a></td><td>getPlatformInfo</td><td>awGetPlatformInfo</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getPlatformInfoKeys">getPlatformInfoKeys</a></td><td>getPlatformInfoKeys</td><td>awGetPlatformInfoKeys</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getQueLength">getQueLength</a></td><td>getQueLength</td><td>awGetClientQueueLength</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getScopeEventTypeNames">getScopeEventTypeNames</a></td><td>&nbsp;</td><td>awGetScopeEventTypeNames</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getScopeNames">getScopeNames</a></td><td>getScopeNames</td><td>awGetScopeNames</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getStateShareLimit">getStateShareLimit</a></td><td>getStateShareLimit</td><td>awGetClientStateShareLimit</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getSubscriptions">getSubscriptions</a></td><td>getSubscriptions</td><td>awGetSubscriptions</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#getTerritoryName">getTerritoryName</a></td><td>getTerritoryName</td><td>awGetClientTerritoryName</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Client.html#interruptDispatch">interruptDispatch</a></td><td>interruptDispatch</td><td>awInterruptDispatch</td>
+  <tr valign="top"><td><a href="Aw_Client.html#interruptGetEvents">interruptGetEvents</a></td><td>interruptGetEvents</td><td>awInterruptGetEvents</td>
+  <tr valign="top"><td><a href="Aw_Client.html#isClientPending">isClientPending</a></td><td>isClientPending</td><td>awIsClientPending</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#isConnected">isConnected</a></td><td>isConnected</td><td>awIsClientConnected</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#isPending">isPending</a></td><td>isPending</td><td>awIsPending</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Client.html#mainLoop">mainLoop</a></td><td>mainLoop</td><td>awMainLoop</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#makeSubId">makeSubId</a></td><td>makeSubId</td><td>awMakeSubId</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#makeTag">makeTag</a></td><td>makeTag</td><td>awMakeTag</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#makeTransactionId">makeTransactionId</a></td><td>makeTransactionId</td><td>awMakeTransactionId</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#makeUniqueSubId">makeUniqueSubId</a></td><td>makeUniqueSubId</td><td>awMakeUniqueSubId</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#newOrReconnect">newOrReconnect</a></td><td>newOrReconnect</td><td>awNewOrReconnectBrokerClient</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#newSubscription">newSubscription</a></td><td>newSubscription</td><td>awNewSubscription</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Client.html#prime">prime</a></td><td>prime</td><td>awPrimeClient</td>
+  <tr valign="top"><td><a href="Aw_Client.html#primeAllClients">primeAllClients</a></td><td>primeAllClients</td><td>awPrimeAllClients</td>
+  <tr valign="top"><td><a href="Aw_Client.html#publish">publish</a></td><td>publish</td><td>awPublishEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#publishRequestAndWait">publishRequestAndWait</a></td><td>publishRequestAndWait</td><td>awPublishRequestAndWait</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#reconnect">reconnect</a></td><td>reconnect</td><td>awReconnectBrokerClient</td></tr>
+
+
+<!-- 
+  <tr valign="top"><td><b><i>Add This!!</i></b></td>
+-->
+
+  <tr valign="top"><td><a href="Aw_Client.html#registerCallback">registerCallback</a></td><td>registerCallback</td><td>awRegisterCallback</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#registerCallbackForSubId">registerCallbackForSubId</a></td><td>registerCallbackForSubId</td><td>awRegisterCallbackForSubId</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Client.html#registerCallbackForTag">registerCallbackForTag</a></td><td>registerCallbackForTag</td><td>awRegisterCallbackForTag</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>registerConnectionCallback</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#setAutomaticControlLabel">setAutomaticControlLabel</a></td><td>setAutomaticControlLabel</td><td>awSetAutomaticControlLabel</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#setClientInfoset">setClientInfoset</a></td><td>setClientInfoset</td><td>awSetClientInfoset</td></tr>
+
+
+
+  <tr valign="top"><td><a href="Aw_Client.html#setDefaultClientTimeOut">setDefaultClientTimeOut</a></td><td>setDefaultClientTimeOut</td><td>awSetDefaultClientTimeout</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#setPlatformInfo">setPlatformInfo</a></td><td>setPlatformInfo</td><td>awSetPlatformInfo</td></tr>
+  <tr valign="top"><td><a href="Aw_Client.html#setStateShareLimit">setStateShareLimit</a></td><td>setStateShareLimit</td><td>awSetStateShareLimit</td>
+  <tr valign="top"><td><a href="Aw_Client.html#stopMainLoop">stopMainLoop</a></td><td>stopMainLoop</td><td>awStopMainLoop</td>
+  <tr valign="top"><td><a href="Aw_Client.html#threadedCallBacks">threadedCallBacks</a></td><td>threadedCallBacks</td><td>awThreadedCallbacks</td>
+  <tr valign="top"><td><a href="Aw_Client.html#toString">toString</a></td><td>toString</td><td>awClientToString</td></tr>
+
+
+
+<!-- Aw::ConnectionDescriptor -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_ConnectionDescriptor.html">Aw::ConnectionDescriptor</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#new">new</a></td><td>new</td><td>awNewBrokerConnectionDescriptor</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>awDeleteDescriptor</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#err">err</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#errmsg">errmsg</a></td><td>&nbsp;</td><td>awErrorToCompleteString</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#error">error</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#copy">copy</a></td><td>copy</td><td>awCopyDescriptor</td></tr>
+
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#getAccessLabelHint">getAccessLabelHint</a></td><td>getAccessLabelHint</td><td>awGetDescriptorAccessLabelHint</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#getAutomaticReconnect">getAutomaticReconnect</a></td><td>getAutomaticReconnect</td><td>awGetDescriptorAutomaticReconnect</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#getConnectionShare">getConnectionShare</a></td><td>getConnectionShare</td><td>awGetDescriptorConnectionShare</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#getSharedEventOrdering">getSharedEventOrdering</a></td><td>getSharedEventOrdering</td><td>awGetDescriptorSharedEventOrdering</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#getSSLCertificate">getSSLCertificate</a></td><td>getSSLCertificate</td><td>awGetDescriptorSSLCertificate</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#getSSLCertificateDns">getSSLCertificateDns</a></td><td>getSSLCertificateDns</td><td>awGetSSLCertificateDns</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#getSSLCertificateFile">getSSLCertificateFile</a></td><td>getSSLCertificateFile</td><td>awGetDescriptorSSLCertificate</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#getSSLDistinguishedName">getSSLDistinguishedName</a></td><td>getSSLDistinguishedName</td><td>awGetDescriptorSSLCertificate</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#getSSLEncrypted">getSSLEncrypted</a></td><td>getSSLEncrypted</td><td>awGetDescriptorSSLEncrypted</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#getSSLEncryptionLevel">getSSLEncryptionLevel</a></td><td>getSSLEncryptionLevel</td><td>awGetSSLEncryptionLevel</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#getSSLRootDns">getSSLRootDns</a></td><td>getSSLRootDns</td><td>awGetSSLRootDns</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#getStateShare">getStateShare</a></td><td>getStateShare</td><td>awGetDescriptorStateShare</td></tr>
+
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#setAccessLabelHint">setAccessLabelHint</a></td><td>setAccessLabelHint</td><td>awSetDescriptorAccessLabelHint</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#setAutomaticReconnect">setAutomaticReconnect</a></td><td>setAutomaticReconnect</td><td>awSetDescriptorAutomaticReconnect</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#setConnectionShare">setConnectionShare</a></td><td>setConnectionShare</td><td>awSetDescriptorConnectionShare</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#setSharedEventOrdering">setSharedEventOrdering</a></td><td>setSharedEventOrdering</td><td>awSetDescriptorSharedEventOrdering</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#setSSLCertificate">setSSLCertificate</a></td><td>setSSLCertificate</td><td>awSetDescriptorSSLCertificate</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#setSSLEncrypted">setSSLEncrypted</a></td><td>setSSLEncrypted</td><td>awSetDescriptorSSLEncrypted</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#setStateShare">setStateShare</a></td><td>setStateShare</td><td>awSetDescriptorStateShare</td></tr>
+  <tr valign="top"><td><a href="Aw_ConnectionDescriptor.html#toString">toString</a></td><td>toString</td><td>awDescriptorToString</td></tr>
+
+
+<!-- Aw::Date -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_Date.html">Aw::Date</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_Date.html#new">new</a></td><td>new</td><td>awNewBrokerDate<br>&nbsp;<b>|</b> awNewEmptyBrokerDate</td></tr>
+  <tr valign="top"><td><a href="Aw_Date.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>awDeleteDate</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Date.html#clear">clear</a></td><td>clear</td><td>awClearDate<br>awClearTime</td></tr>
+  <tr valign="top"><td><a href="Aw_Date.html#clearDate">clearDate</a></td><td>&nbsp;</td><td>awClearDate<br>awClearTime</td></tr>
+  <tr valign="top"><td><a href="Aw_Date.html#clearTime">clearTime</a></td><td>clearTime</td><td>awClearTime</td></tr>
+  <tr valign="top"><td><a href="Aw_Date.html#compareTo">compareTo</a></td><td>compareTo</td><td>awCompareDate</td></tr>
+  <tr valign="top"><td><a href="Aw_Date.html#equals">equals</a></td><td>equals</td><td><hr noshade width="80%" align="left">awCompareDate</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Date.html#getDateCtime">getDateCtime</a></td><td>getJavaDate</td><td>awGetDateCtime</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getJavaCalendar</td><td>&nbsp;</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Date.html#setDate">setDate</a></td><td>setDate</td><td>awDateSetDate</td></tr>
+  <tr valign="top"><td><a href="Aw_Date.html#setDateCtime">setDateCtime</a></td><td>setJavaDate</td><td>awSetDateCtime</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Date.html#setDateTime">setDateTime</a></td><td>setDateTime</td><td>awSetDateTime</td></tr>
+  <tr valign="top"><td><a href="Aw_Date.html#setDateTimeFormat">setDateTimeFormat</a><hr noshade width="80%" align="left">
+  <font size=1><i>Note:  This is in adapter_helper.h and may not be applicable
+here.</i></td><td>&nbsp;</td><td>awAdapterSetDateTimeFormat</td></tr>
+  <tr valign="top"><td><a href="Aw_Date.html#setTime">setTime</a></td><td>setTime</td><td>awSetTime</td></tr>
+  <tr valign="top"><td><a href="Aw_Date.html#toString">toString</a></td><td>toString</td><td>awDateToString</td></tr>
+
+
+<!-- Aw::Error -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_Error.html">Aw::Error</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_Error.html#new">new</a></td><td>new</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Error.html#DESTORY">DESTORY</a></td><td>delete</td><td>awDeleteError</td></tr>
+  <tr valign="top"><td><a href="Aw_Error.html#err">err</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Error.html#errmsg">errmsg</a></td><td>&nbsp;</td><td>awErrorToCompleteString</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Error.html#delete">delete</a></td><td>delete</td><td>awDeleteError</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Error.html#getCode">getCode</a></td><td>getCode</td><td>awGetErrorCode</td></tr>
+  <tr valign="top"><td><a href="Aw_Error.html#getDiagnostics">getDiagnostics</a></td><td>getDiagnostics</td><td>awGetDiagnostics</td></tr>
+  <tr valign="top"><td><a href="Aw_Error.html#getMinorCode">getMinorCode</a></td><td>getMinorCode</td><td>awGetErrorMinorCode</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Error.html#setCurrent">setCurrent</a></td><td>setCurrent</td><td>awSetCurrentError<hr noshade align="left" width="80%">awDeleteError</td></tr>
+  <tr valign="top"><td><a href="Aw_Error.html#setDiagnostics">setDiagnostics</a></td><td>setDiagnostics</td><td>awSetDiagnostics</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Error.html#toCompleteString">toCompleteString</a></td><td>toCompleteString</td><td>awErrorToCompleteString</td></tr>
+  <tr valign="top"><td><a href="Aw_Error.html#toString">toString</a></td><td>toString</td><td>awErrorToString</td></tr>
+
+
+<!-- Aw::Event -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_Event.html">Aw::Event</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#new">new</a></td><td>new</td><td>awNewBrokerEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>awDeleteEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#err">err</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#errmsg">errmsg</a></td><td>&nbsp;</td><td>awErrorToCompleteString</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#error">error</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+
+
+
+  <tr valign="top"><td><a href="Aw_Event.html#clear">clear</a></td><td>clear</td><td>awClearEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#clearField">clearField</a></td><td>clearField</td><td>awClearEventField</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>clearModificationFlag</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#fromBinData">fromBinData</a></td><td>fromBinData</td><td>awEventFromBinData</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Event.html#getTypeBaseName">getTypeBaseName</a></td><td>getBaseTypeName</td><td>awGetEventTypeBaseName</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getBooleanField">getBooleanField</a></td><td>getBooleanField</td><td>awGetBooleanField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getBooleanSeqField">getBooleanSeqField</a></td><td>getBooleanSeqField</td><td>awGetBooleanSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getByteField">getByteField</a></td><td>getByteField</td><td>awGetByteField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getByteSeqField">getByteSeqField</a></td><td>getByteSeqField</td><td>awGetByteSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getCharField">getCharField</a></td><td>getCharField</td><td>awGetCharField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getCharSeqField">getCharSeqField</a></td><td>getCharSeqField</td><td>awGetCharSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getClient">getClient</a></td><td>getClient</td><td>awGetEventClient</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getDateField">getDateField</a></td><td>getDateField</td><td>awGetDateField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getDateSeqField">getDateSeqField</a></td><td>getDateSeqField</td><td>awGetDateSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getDoubleField">getDoubleField</a></td><td>getDoubleField</td><td>awGetDoubleField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getDoubleSeqField">getDoubleSeqField</a></td><td>getDoubleSeqField</td><td>awGetDoubleSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getEventId">getEventId</a></td><td>getEventId</td><td>awGetEventId</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getFamilyTypeName">getFamilyTypeName</a></td><td>&nbsp;</td><td>awGetEventTypeFamilyName</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getField">getField</a></td><td>getField</td><td>awGetField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getFieldNames">getFieldNames</a></td><td>getFieldNames</td><td>awGetFieldNames</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getFieldType">getFieldType</a></td><td>getFieldType</td><td>awGetEventFieldType</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getFloatField">getFloatField</a></td><td>getFloatField</td><td>awGetFloatField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getFloatSeqField">getFloatSeqField</a></td><td>getFloatSeqField</td><td>awGetFloatSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getIntegerField">getIntegerField</a></td><td>getIntegerField</td><td>awGetIntegerField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getIntegerSeqField">getIntegerSeqField</a></td><td>getIntegerSeqField</td><td>awGetIntegerSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getLongField">getLongField</a></td><td>getLongField</td><td>awGetLongField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getLongSeqField">getLongSeqField</a></td><td>getLongSeqField</td><td>awGetLongSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getNativeLongField">getNativeLongField</a></td><td>&nbsp;</td><td>awGetLongFieldNative</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Event.html#getPublishSequenceNumber">getPublishSequenceNumber</a></td><td>getPublishSequenceNumber</td><td>awGetEventPublishSequenceNumber</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getReceiptSequenceNumber">getReceiptSequenceNumber</a></td><td>getReceiptSequenceNumber</td><td>awGetEventReceiptSequenceNumber</td></tr>
+
+
+
+  <tr valign="top"><td><a href="Aw_Event.html#getScopeTypeName">getScopeTypeName</a></td><td>getScopeTypeName</td><td>awGetEventTypeScopeName</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getSequenceField">getSequenceField</a></td><td>getSequenceField</td><td>awGetSequenceField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getSequenceFieldSize">getSequenceFieldSize</a></td><td>getSequenceFieldSize</td><td>awGetSequenceFieldSize</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getShortField">getShortField</a></td><td>getShortField</td><td>awGetShortField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getShortSeqField">getShortSeqField</a></td><td>getShortSeqField</td><td>awGetShortSeqField</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Event.html#getStringField">getStringField</a></td><td>getStringField</td><td>awGetStringField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getStringSeqField">getStringSeqField</a></td><td>getStringSeqField</td><td>awGetStringSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getStructFieldAsEvent">getStructFieldAsEvent</a></td><td>getStructFieldAsEvent</td><td>awGetStructFieldAsEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getStructSeqFieldAsEvents">getStructSeqFieldAsEvents</a></td><td>getStructSeqFieldAsEvents</td><td>awGetStructSeqFieldAsEvents</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getStructFieldAsHash">getStructFieldAsHash</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getSubscriptionIds">getSubscriptionIds</a></td><td>getSubscriptionIds</td><td>awGetSubscriptionIds</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getTag">getTag</a></td><td>getTag</td><td>awGetEventTag</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getTypeDef">getTypeDef</a></td><td>getTypeDef</td><td>awGetTypeDefFromEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getTypeName">getTypeName</a></td><td>getTypeName</td><td>awGetEventTypeName</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getUCCharField">getUCCharField</a></td><td>getUCCharField</td><td>awGetUCCharField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getUCCharSeqField">getUCCharSeqField</a></td><td>getUCCharSeqField</td><td>awGetUCCharSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getUCStringField">getUCStringField</a></td><td>getUCStringField</td><td>awGetUCStringFieldAsUTF8</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#getUCStringSeqField">getUCStringSeqField</a></td><td>getUCStringSeqField</td><td>awGetUCStringSeqFieldAsUTF8</td></tr>
+
+
+  <tr valign="top"><td>&nbsp;</td><td>hasBeenModified</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#isAckReply">isAckReply</a></td><td>isAckReply</td><td>awIsAckReplyEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#isErrorReply">isErrorReply</a></td><td>isErrorReply</td><td>awIsErrorReplyEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#isFieldSet">isFieldSet</a></td><td>isFieldSet</td><td>awIsEventFieldSet</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#isLastReply">isLastReply</a></td><td>isLastReply</td><td>awIsLastReplyEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#isNullReply">isNullReply</a></td><td>isNullReply</td><td>awIsNullReplyEvent</td></tr>
+
+
+
+
+
+
+  <tr valign="top"><td><a href="Aw_Event.html#setBooleanField">setBooleanField</a></td><td>setBooleanField</td><td>awSetBooleanField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setBooleanSeqField">setBooleanSeqField</a></td><td>setBooleanSeqField</td><td>awSetBooleanSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setByteField">setByteField</a></td><td>setByteField</td><td>awSetByteField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setByteSeqField">setByteSeqField</a></td><td>setByteSeqField</td><td>awSetByteSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setCharField">setCharField</a></td><td>setCharField</td><td>awSetCharField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setCharSeqField">setCharSeqField</a></td><td>setCharSeqField</td><td>awSetCharSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setClient">setClient</a></td><td>setClient</td><td>awSetEventClient</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setDateField">setDateField</a></td><td>setDateField</td><td>awSetDateField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setDateSeqField">setDateSeqField</a></td><td>setDateSeqField</td><td>awSetDateSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setDoubleField">setDoubleField</a></td><td>setDoubleField</td><td>awSetDoubleField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setDoubleSeqField">setDoubleSeqField</a></td><td>setDoubleSeqField</td><td>awSetDoubleSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setField">setField</a></td><td>setField</td><td>awSetField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setFloatSeqField">setFloatSeqField</a></td><td>setFloatSeqField</td><td>awSetFloatSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setIntegerField">setIntegerField</a></td><td>setIntegerField</td><td>awSetIntegerField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setIntegerSeqField">setIntegerSeqField</a></td><td>setIntegerSeqField</td><td>awSetIntegerSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setLongField">setLongField</a></td><td>setLongField</td><td>awSetLongField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setLongSeqField">setLongSeqField</a></td><td>setLongSeqField</td><td>awSetLongSeqField</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>setModificationFlag</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setPublishSequenceNumber">setPublishSequenceNumber</a></td><td>setPublishSequenceNumber</td><td>awSetEventPublishSequenceNumber</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setSequenceField">setSequenceField</a></td><td>setSequenceField</td><td>awSetSequenceField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setSequenceFieldSize">setSequenceFieldSize</a></td><td>setSequenceFieldSize</td><td>awSetSequenceFieldSize</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setShortField">setShortField</a></td><td>setShortField</td><td>awSetShortField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setShortSeqField">setShortSeqField</a></td><td>setShortSeqField</td><td>awSetShortSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setStringField">setStringField</a></td><td>setStringField</td><td>awSetStringField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setStringSeqField">setStringSeqField</a></td><td>setStringSeqField</td><td>awSetStringSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setStructFieldFromEvent">setStructFieldFromEvent</a></td><td>setStructFieldFromEvent</td><td>awSetStructFieldFromEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setStructSeqFieldFromEvents">setStructSeqFieldFromEvents</a></td><td>setStructSeqFieldFromEvents</td><td>awSetStructSeqFieldFromEvents</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setUCCharField">setUCCharField</a></td><td>setUCCharField</td><td>awSetUCCharField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setUCCharSeqField">setUCCharSeqField</a></td><td>setUCCharSeqField</td><td>awSetUCCharSeqField</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setUCStringField">setUCStringField</a></td><td>setUCStringField</td><td>awSetUCStringFieldAsUTF8</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setUCStringSeqField">setUCStringSeqField</a></td><td>setUCStringSeqField</td><td>awSetUCStringSeqFieldAsUTF8</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Event.html#setTag">setTag</a></td><td>setTag</td><td>awSetEventTag</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#setStringFieldToSubstring">setStringFieldToSubstring</a></td><td>setStringFieldToSubstring</td><td>awSetStringFieldToSubstring<br>&nbsp;<b>|</b> awSetUCStringFieldToSubstring</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Event.html#stringFromANSI">stringFromANSI</a></td><td>stringFromANSI</td><td>awAtoUC<br>&nbsp;<b>|</b> awAtoUTF8</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#stringToANSI">stringToANSI</a></td><td>stringToANSI</td><td>awUCtoA<br>&nbsp;<b>|</b> awUTF8toA</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Event.html#toBinData">toBinData</a></td><td>toBinData</td><td>awEventToBinData</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#toFormattedString">toFormattedString</a></td><td>toFormattedString</td><td>awEventToFormattedString</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#toHash">toHash</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#toString">toString</a></td><td>toString</td><td>awEventToString</td></tr>
+  <tr valign="top"><td><a href="Aw_Event.html#validate">validate</a></td><td>validate</td><td>awValidateEvent</td></tr>
+
+
+<!-- Aw::EventType -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_EventType.html">Aw::EventType</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#new">new</a></td><td>new</td><td>awNewAdapterET</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+  <tr valign="top"><td><a href="Aw_EventType.html#delete">delete</a></td><td>delete</td><td>awDeleteAdapterET</td></tr>
+
+  <tr valign="top"><td><a href="Aw_EventType.html#getBooleanInfo">getBooleanInfo</a></td><td>getBooleanInfo</td><td>awAdapterETInfoGetBoolean</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#getErrorRequestsTo">getErrorRequestsTo<br>&nbsp;&nbsp;errorRequestsTo</a></td><td>getErrorRequestsTo</td><td><code>&lt;adapterET&gt;-&gt;</code>errorRequestTo</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getFieldInfoset</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#getInfoSets">getInfoSets</a></td><td>getInfoSets</td><td><code>&lt;adapterET&gt;-&gt;</code>infoSets</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#getIntegerInfo">getIntegerInfo</a></td><td>getIntegerInfo</td><td>awAdapterETInfoGetInteger</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#getMaxResults">getMaxResults<br>&nbsp;&nbsp;maxResults</a></td><td>getMaxResults</td><td><code>&lt;adapterET&gt;-&gt;</code>maxResults</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#getName">getName<br>&nbsp;&nbsp;name</a></td><td>getName</td><td><code>&lt;adapterET&gt;-&gt;</code>name</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#getNextPublish">getNextPublish<br>&nbsp;&nbsp;nextPublish</a></td><td>getNextPublish</td><td><code>&lt;adapterET&gt;-&gt;</code>nextPublish</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#getPublishReply">getPublishReply<br>&nbsp;&nbsp;publishReply</a></td><td>getPublishReply</td><td><code>&lt;adapterET&gt;-&gt;</code>publishReply</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#getReplyName">getReplyName<br>&nbsp;&nbsp;replyName</a></td><td>getReplyName</td><td><code>&lt;adapterET&gt;-&gt;</code>replyName</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getReplyTypeDef</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#getStringInfo">getStringInfo</a></td><td>getStringInfo</td><td>awAdapterETInfoGetString</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#getStringSeqInfo">getStringSeqInfo</a></td><td>getStringSeqInfo</td><td>awAdapterETInfoGetStringSeq</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getStructSeqInfo</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#getSubscriptionFilter">getSubscriptionFilter<br>&nbsp;&nbsp;subscriptionFilter</a></td><td>getSubscriptionFilter</td><td><code>&lt;adapterET&gt;-&gt;</code>subscriptionFilter</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getTypeDef</td><td>&nbsp;</td></tr>
+
+  <tr valign="top"><td><a href="Aw_EventType.html#hasReply">hasReply</a></td><td>hasReply</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>infoGetField</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>infoIsSet</td><td>&nbsp;</td></tr>
+
+  <tr valign="top"><td>&nbsp;</td><td>isAutoAck</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#isAutoCleanup">isAutoCleanup</a></td><td>isAutoCleanup</td><td><code>&lt;adapterET&gt;-&gt;</code>autoCleanup</td></tr>
+
+  <tr valign="top"><td>&nbsp;</td><td>isIgnoreProcessResults</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#isPublish">isPublish</a></td><td>isPublish</td><td><code>&lt;adapterET&gt;-&gt;</code>isPublish</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#isPublishReply">isPublishReply<br>&nbsp;&nbsp;publishReply</a></td><td>isPublishReply</td><td><code>&lt;adapterET&gt;-&gt;</code>publishReply</td></tr>
+
+  <tr valign="top"><td><a href="Aw_EventType.html#setPublishInterval">setPublishInterval</a></td><td>setPublishInterval</td><td>awAdapterETSetPublishInterval</td></tr>
+
+  <tr valign="top"><td><a href="Aw_EventType.html#setPublishReply">setPublishReply</a></td><td>setPublishReply</td><td><code>&lt;adapterET&gt;-&gt;</code>publishReply</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_EventType.html#needsAck">needsAck</a></td><td>needsAck</td><td><code>&lt;adapterET&gt;-&gt;</code>needsAck</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#newSubscription">newSubscription</a></td><td>newSubscription</td><td>&nbsp;</td></tr>
+
+
+  <tr valign="top"><td>&nbsp;</td><td>setAutoAck</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#setReply">setReply</a></td><td>setReply</td><td>awAdapterETSetReply</td></tr>
+
+  <tr valign="top"><td><a href="Aw_EventType.html#setErrorRequestsTo">setErrorRequestsTo</a></td><td>setErrorRequestsTo</td><td><code>&lt;adapterET&gt;-&gt;</code>errorRequestTo</td></tr>
+
+  <tr valign="top"><td>&nbsp;</td><td>setIgnoreProcessResults</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#setNextPublish">setNextPublish</a></td><td>setNextPublish</td><td>awAdapterETSetNextPublish</td></tr>
+  <tr valign="top"><td><a href="Aw_EventType.html#setSubscriptionFilter">setSubscriptionFilter</a></td><td>setSubscriptionFilter</td><td><code>&lt;adapterET&gt;-&gt;</code>subscriptionFilter</td></tr>
+
+
+<!-- Aw::Filter -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_Filter.html">Aw::Filter</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_Filter.html#new">new</a></td><td>new</td><td>awNewBrokerFilter</td></tr>
+  <tr valign="top"><td><a href="Aw_Filter.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>awDeleteFilter</td></tr>
+  <tr valign="top"><td><a href="Aw_Filter.html#err">err</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Filter.html#errmsg">errmsg</a></td><td>&nbsp;</td><td>awErrorToCompleteString</td></tr>
+  <tr valign="top"><td><a href="Aw_Filter.html#error">error</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Filter.html#getEventTypeName">getEventTypeName</a></td><td>getEventTypeName</td><td>awGetFilterEventTypeName</td></tr>
+  <tr valign="top"><td><a href="Aw_Filter.html#getFilterString">getFilterString</a></td><td>getFilterString</td><td>awGetFilterString</td></tr>
+  <tr valign="top"><td><a href="Aw_Filter.html#match">match</a></td><td>match</td><td>awMatchFilter</td></tr>
+  <tr valign="top"><td><a href="Aw_Filter.html#toString">toString</a></td><td>toString</td><td>awFilterToString</td></tr>
+
+
+<!-- Aw::Format -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_Format.html">Aw::Format</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_Format.html#new">new</a></td><td>new</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Format.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>awEventFormatFree</td></tr>
+  <tr valign="top"><td><a href="Aw_Format.html#err">err</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Format.html#errmsg">errmsg</a></td><td>&nbsp;</td><td>awErrorToCompleteString</td></tr>
+  <tr valign="top"><td><a href="Aw_Format.html#error">error</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Format.html#assemble">assemble</a></td><td>assemble</td><td>awEventFormatAssemble<br>awErrorToCompleteString</td></tr>
+  <tr valign="top"><td><a href="Aw_Format.html#format">format</a></td><td>format</td><td>awEventToFormattedString</td></tr>
+  <tr valign="top"><td><a href="Aw_Format.html#formatBindVariable">formatBindVariable</a></td><td>formatBindVariable</td><td>awEventFormatBindVariable</td></tr>
+  <tr valign="top"><td><a href="Aw_Format.html#free">free</a></td><td>&nbsp;</td><td>awEventFormatFree</td></tr>
+  <tr valign="top"><td><a href="Aw_Format.html#getTokenCount">getTokenCount</a></td><td>getTokenCount</td><td>awEventFormatTokens</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getTokenValue</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>isReferenceToken</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Format.html#preparse">preparse</a></td><td>preparse</td><td>awEventFormatPreparse</td></tr>
+  <tr valign="top"><td><a href="Aw_Format.html#setFormatMode">setFormatMode</a></td><td>setFormatMode</td><td>awSetFormatMode</td></tr>
+
+
+<!-- Aw::Info -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_Info.html">Aw::Info</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_Info.html#toString">toString</a></td><td>toString</td><td>
+				  awClientInfoToIndentedString<br>
+				  awClientGroupInfoToIndentedString<br>
+				  awClientInfoToString<br>
+				  awClientInfoToCompleteString<br>
+				  awClientGroupInfoToString<br>
+				  awTerritoryInfoToString<br>
+				  awTerritoryGatewayInfoToString<br>
+				  awSharedEventTypeInfoToString<br>
+				  awServerLogEntryToString<br>
+   awTraceEventToString</td></tr>
+  <tr valign="top"><td><a href="Aw_Info.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>free</td></tr>
+
+
+<!-- Aw::License -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_License.html">Aw::License</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_License.html#new">new</a></td><td>new</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_License.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_License.html#getExpiration">getExpiration</a></td><td>&nbsp;</td><td>awGetLicenseExpiration</td></tr>
+  <tr valign="top"><td><a href="Aw_License.html#getFlags">getFlags</a></td><td>&nbsp;</td><td>awGetLicenseFlags</td></tr>
+  <tr valign="top"><td><a href="Aw_License.html#getProduct">getProduct</a></td><td>&nbsp;</td><td>awGetLicenseProduct</td></tr>
+  <tr valign="top"><td><a href="Aw_License.html#getPlatform">getPlatform</a></td><td>&nbsp;</td><td>awGetLicensePlatform</td></tr>
+  <tr valign="top"><td><a href="Aw_License.html#getMajorVersion">getMajorVersion</a></td><td>&nbsp;</td><td>awGetLicenseMajorVersion</td></tr>
+  <tr valign="top"><td><a href="Aw_License.html#getMinorVersion">getMinorVersion</a></td><td>&nbsp;</td><td>awGetLicenseMinorVersion</td></tr>
+  <tr valign="top"><td><a href="Aw_License.html#getSerialNumber">getSerialNumber</a></td><td>&nbsp;</td><td>awGetLicenseSerialNumber</td></tr>
+  <tr valign="top"><td><a href="Aw_License.html#verify">verify</a></td><td>verify</td><td>awValidateLicense</td></tr>
+
+
+
+
+<!-- Aw::Log -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_Log.html">Aw::Log</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_Log.html#new">new</a></td><td>new</td><td>&nbsp;<hr noshade align="left" width="80%">awAdapterInitLogging</td></tr>
+  <tr valign="top"><td><a href="Aw_Log.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Log.html#alert">alert</a></td><td>alert</td><td>awAdapterAlert</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Log.html#beQuiet">beQuiet</a></td><td><code>&lt;log&gt;-&gt;</code>beQuiet</td><td>awAdapterBeQuiet<br>awAdapterSetQuiet</td></tr>
+
+  <tr valign="top"><td>&nbsp;</td><td>configNT</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>configNTService</td><td>&nbsp;</td></tr>
+
+
+  <tr valign="top"><td><font size=1><i>Debug routines are for internal use only.</i></font></td><td>debug</td><td>awAdapterDebug</td></tr>
+  <tr valign="top"><td><a href="Aw_Log.html#doPrintf">doPrintf</a></td><td><code>&lt;log&gt;-&gt;</code>doPrintf</td><td>awAdapterDoLogPrintf</td></tr>
+
+  <tr valign="top"><td>&nbsp;</td><td>getBundle</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getCategory</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getenv</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getFacilityNames</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Log.html#getMessage">getMessage</a></td><td>getMessage</td><td>awAdapterGetMessage</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getMessageId</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Log.html#getOptionList">getOptionList</a></td><td>getOptionList</td><td>awAdapterLoggingOptionList</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getPropertyDefaults</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getPropertyNames</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getWindowsDirectory</td><td>&nbsp;</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Log.html#info">info</a></td><td>info</td><td>awAdapterInfo</td></tr>
+  <tr valign="top"><td><a href="Aw_Log.html#init">init</a></td><td>init</td><td>awAdapterInitLogging</td></tr>
+  <tr valign="top"><td><a href="Aw_Log.html#isDebug">isDebug</a></td><td>isDebug</td><td>awAdapterDoDebug</td></tr>
+  <tr valign="top"><td><a href="Aw_Log.html#isDoPrintf">isDoPrintf</a></td><td>isDoPrintf</td><td>awAdapterDoLogPrintf</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>isHpux</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Log.html#isInfo">isInfo</a></td><td>isInfo</td><td>awAdapterIsInfo</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>isIrix</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Log.html#isQuiet">isQuiet</a></td><td>isQuiet</td><td>awAdapterBeQuiet</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>isSolaris</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>isUnix</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>isWindows</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>isWindows95</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>isWindowsNT</td><td>&nbsp;</td></tr>
+
+  <tr valign="top"><td>&nbsp;</td><td>removeNewLines</td><td>&nbsp;</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Log.html#setDebug">setDebug</a></td><td>setDebug</td><td>awAdapterSetDebug</td></tr>
+  <tr valign="top"><td><a href="Aw_Log.html#startLogging">startLogging<br>&nbsp;&nbsp;start</a></td><td>startLogging</td><td>awAdapterStartLogging<hr noshade width="80%" align="left">awAdapterSetLoggingProperties</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>unconfigNT</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>unconfigNTService</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Log.html#warning">warning</a></td><td>warning</td><td>awAdapterWarning</td></tr>
+
+
+<!-- Aw::Properties -->
+
+<!--
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_Properties.html">Aw::Properties</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_Properties.html#new">new</a></td><td>new</td><td>awNewAdapterProperties<br>awAdapterLoadProperties</td></tr>
+  <tr valign="top"><td><a href="Aw_Properties.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>awDeleteAdapterProperties</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Properties.html#getBooleanProperty">getBooleanProperty</a></td><td>getBooleanProperty</td><td>awAdapterGetBooleanProperty</td></tr>
+  <tr valign="top"><td><a href="Aw_Properties.html#getIntegerProperty">getIntegerProperty</a></td><td>getIntegerProperty</td><td>awAdapterGetIntegerProperty</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getStringProperty</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Properties.html#getProperty">getProperty</a></td><td>getProperty</td><td>awAdapterGetProperty</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Properties.html#isProperty">isProperty</a></td><td>isProperty</td><td>awAdapterIsProperty</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>keys</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>removeProperty</td><td>&nbsp;</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Properties.html#setBooleanProperty">setBooleanProperty</a></td><td>setBooleanProperty</td><td>awAdapterSetBooleanProperty</td></tr>
+  <tr valign="top"><td><a href="Aw_Properties.html#setIntegerProperty">setIntegerProperty</a></td><td>setIntegerProperty</td><td>awAdapterSetIntegerProperty</td></tr>
+  <tr valign="top"><td><a href="Aw_Properties.html#setProperty">setProperty</a></td><td>setProperty</td><td>awAdapterSetProperty</td></tr>
+  <tr valign="top"><td><a href="Aw_Properties.html#setProperties">setProperties<br>loadProperties</a></td><td>setProperties</td><td>awAdapterLoadProperties</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>setSystemProperties</td><td>&nbsp;</td></tr>
+-->
+
+<!-- Aw::Replies -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_Replies.html">Aw::Replies</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_Replies.html#new">new</a></td><td>new</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Replies.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Replies.html#addReplyEvent">addReplyEvent<br>add</a></td><td>addReplyEvent</td><td>awAdapterReplyEventsAdd</td></tr>
+  <tr valign="top"><td><a href="Aw_Replies.html#finishReplies">finishReplies<br>finish</a></td><td>finishReplies</td><td>awAdapterReplyEventsFinish</td></tr>
+  <tr valign="top"><td><a href="Aw_Replies.html#start">start</a></td><td>&nbsp;</td><td>awAdapterReplyEventsStart</td></tr>
+  <tr valign="top"><td><a href="Aw_Replies.html#cancel">cancel</a></td><td>&nbsp;</td><td>awAdapterReplyEventsStart</td></tr>
+
+
+<!-- Aw::SSLCertificate -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_SSLCertificate.html">Aw::SSLCertificate</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_SSLCertificate.html#new">new</a></td><td>new</td><td>awGetSSLCertificate</td></tr>
+  <tr valign="top"><td><a href="Aw_SSLCertificate.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+  <tr valign="top"><td><a href="Aw_SSLCertificate.html#toIndentedString">toIndentedString</a></td><td>&nbsp;</td><td>awSSLCertificateToIndentedString</td></tr>
+  <tr valign="top"><td><a href="Aw_SSLCertificate.html#getBeginDate">getBeginDate</a></td><td>&lt;ssl&gt;.begin_date</td><td><code>&lt;ssl&gt;->begin_date</td></tr>
+  <tr valign="top"><td><a href="Aw_SSLCertificate.html#getDistinguishedName">getDistinguishedName</a></td><td>&lt;ssl&gt;.distinguished_name</td><td><code>&lt;ssl&gt;->distinguished_name</td></tr>
+  <tr valign="top"><td><a href="Aw_SSLCertificate.html#getEndDate">getEndDate</a></td><td>&lt;ssl&gt;.end_date</td><td><code>&lt;ssl&gt;->end_date</td></tr>
+  <tr valign="top"><td><a href="Aw_SSLCertificate.html#getIssuerDistinguishedName">getIssuerDistinguishedName</a></td><td>&lt;ssl&gt;.issuer_distinguised_name</td><td><code>&lt;ssl&gt;->issuer_distinguised_name</td></tr>
+  <tr valign="top"><td><a href="Aw_SSLCertificate.html#toString">toString</a></td><td>&nbsp;</td><td>awSSLCertificateToString</td></tr>
+  <tr valign="top"><td><a href="Aw_SSLCertificate.html#getStatus">getStatus</a></td><td>&lt;ssl&gt;.status</td><td><code>&lt;ssl&gt;->status</td></tr>
+
+
+<!-- Aw::Subscription -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_Subscription.html">Aw::Subscription</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_Subscription.html#new">new</a></td><td>new</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Subscription.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Subscription.html#getEventTypeName">getEventTypeName</a></td><td>&lt;sub&gt;.event_type_name</td><td><code>&lt;sub&gt;-&gt;</code>event_type_name</td></tr>
+  <tr valign="top"><td><a href="Aw_Subscription.html#getFilter">getFilter</a></td><td>&lt;sub&gt;.filter</td><td><code>&lt;sub&gt;-&gt;</code>filter</td></tr>
+  <tr valign="top"><td><a href="Aw_Subscription.html#getSubId">getSubId</a></td><td>&lt;sub&gt;.sub_id</td><td><code>&lt;sub&gt;-&gt;</code>sub_id</td></tr>
+
+
+<!-- Aw::TypeDef -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_TypeDef.html">Aw::TypeDef</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#new">new</a></td><td>new</td><td>awGetEventTypeDef<br>&nbsp;<b>|</b> awGetTypeDefFromEvent</td></tr>
+
+  <tr valign="top"><td><a href="Aw_TypeDef.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#err">err</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#errmsg">errmsg</a></td><td>&nbsp;</td><td>awErrorToCompleteString</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#error">error</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_TypeDef.html#getBaseTypeName">getBaseTypeName</a></td><td>getBaseTypeName</td><td>awGetTypeDefBaseName</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#getBrokerHost">getBrokerHost</a></td><td>getBrokerHost</td><td>awGetTypeDefBrokerHost</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#getBrokerName">getBrokerName</a></td><td>getBrokerName</td><td>awGetTypeDefBrokerName</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#getBrokerPort">getBrokerPort</a></td><td>getBrokerPort</td><td>awGetTypeDefBrokerPort</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#getDescription">getDescription</a></td><td>getDescription</td><td>awGetTypeDefDescription</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#getFamilyTypeName">getFamilyTypeName</a></td><td>&nbsp;</td><td>awGetTypeDefFamilyName</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#getFieldDef">getFieldDef</a></td><td>getFieldDef</td><td>awGetTypeDefFieldDef</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#getFieldNames">getFieldNames</a></td><td>getFieldNames</td><td>awGetTypeDefFieldNames</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#getFieldType">getFieldType</a></td><td>getFieldType</td><td>awGetTypeDefFieldType</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#getScopeTypeName">getScopeTypeName</a></td><td>getScopeTypeName</td><td>awGetTypeDefScopeName</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#getStorageType">getStorageType</a></td><td>getStorageType</td><td>awGetTypeDefStorageType</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#getTerritoryName">getTerritoryName</a></td><td>getTerritoryName</td><td>awGetTypeDefTerritoryName</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#getTimeToLive">getTimeToLive</a></td><td>getTimeToLive</td><td>awGetTypeDefTimeToLive</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDef.html#getTypeName">getTypeName</a></td><td>getTypeName</td><td>awGetTypeDefTypeName</td></tr>
+
+  <tr valign="top"><td><a href="Aw_TypeDef.html#toString">toString</a></td><td>toString</td><td>awTypeDefToString</td></tr>
+
+
+
+<!-- Aw::TypeDefCache -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_TypeDefCache.html">Aw::TypeDefCache</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_TypeDefCache.html#new">new</a></td><td>new</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDefCache.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDefCache.html#err">err</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDefCache.html#errmsg">errmsg</a></td><td>&nbsp;</td><td>awErrorToCompleteString</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDefCache.html#error">error</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+  <tr valign="top"><td><a href="Aw_TypeDefCache.html#flushCache">flushCache</a></td><td>flushCache</td><td>awFlushTypeDefCache</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDefCache.html#lockCache">lockCache</a></td><td>lockCache</td><td>awLockTypeDefCache</td></tr>
+  <tr valign="top"><td><a href="Aw_TypeDefCache.html#unlockCache">unlockCache</a></td><td>unlockCache</td><td>awUnlockTypeDefCache</td></tr>
+
+
+<!-- Aw::Util -->
+
+
+  <tr><td colspan=3 bgcolor="#bfbfbf"><strong><big><a href="Aw_Util.html">Aw::Util</a></big></strong></td></tr>
+  <tr><th>Perl</th><th>Java</th><th>C</th></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#new">new</a></td><td>new</td><td>awAdapterInitHandle</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#DESTROY">DESTROY</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#err">err</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#errmsg">errmsg</a></td><td>&nbsp;</td><td>awErrorToCompleteString</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#error">error</a></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+
+
+  <tr valign="top"><td>&nbsp;</td><td>clearEventField</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#createEvent">createEvent</a></td><td>createEvent</td><td>awAdapterCreateEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#createTypedEvent">createTypedEvent</a></td><td>&nbsp;</td><td>awAdapterCreateTypedEvent</td></tr>
+
+
+  <tr valign="top"><td><a href="Aw_Util.html#deliverAckReplyEvent">deliverAckReplyEvent</a></td><td>deliverAckReplyEvent</td><td>awAdapterDeliverAckReplyEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#deliverNullReplyEvent">deliverNullReplyEvent</a></td><td>deliverNullReplyEvent</td><td>awAdapterDeliverNullReplyEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#deliverPartialReplyEvent">deliverPartialReplyEvent</a></td><td>&nbsp;</td><td>awAdapterDeliverPartialReplyEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#deliverReplyEvent">deliverReplyEvent</a></td><td>deliverReplyEvent</td><td>awAdapterDeliverReplyEvent</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>deliverReplyEvents</td><td>&nbsp;</td></tr>
+
+  <tr valign="top"><td>&nbsp;</td><td>getBooleanField</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#getEventTypeDef">getEventTypeDef</a></td><td>getEventTypeDef</td><td>awAdapterGetEventTypeDef</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getIntegerField</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getIntegerSeqField</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#getStringField">getStringField</a></td><td>getStringField</td><td>awAdapterGetStringField</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getStringSeqField</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td>&nbsp;</td><td>getStructSeqFieldAsEvents</td><td>&nbsp;</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#initHandle">initHandle</a></td><td>initHandle</td><td>awAdapterInitHandle</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#isEventFieldSet">isEventFieldSet</a></td><td>isEventFieldSet</td><td>awAdapterIsEventFieldSet</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Util.html#publish">publish</a></td><td>publish</td><td>awAdapterPublishEvent</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#newSubscription">newSubscription</a></td><td>newSubscription</td><td>awAdapterNewSubscription<hr noshade width="80%" align="left">awAdapterInitHandle</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Util.html#setEventField">setEventField</a></td><td>setEventField</td><td>awAdapterSetEventField</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#setDateTimeFormat">setDateTimeFormat</a></td><td>&nbsp;</td><td>awAdapterSetDateTimeFormat</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#setFieldFromString">setFieldFromString</a></td><td>&nbsp;</td><td>awAdapterSetFieldFromString</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#setStringField">setStringField</a></td><td>setStringField</td><td>awAdapterSetStringField</td></tr>
+
+  <tr valign="top"><td><a href="Aw_Util.html#setupEventVerify">setupEventVerify</a></td><td>setupEventVerify</td><td>awAdapterSetupEventVerify</td></tr>
+  <tr valign="top"><td><a href="Aw_Util.html#toFormattedString">toFormattedString</a></td><td>toFormattedString</td><td>awAdapterToFormattedString</td></tr>
+</table>
+
+</center>
+
+<p><hr size=3 noshade>
+
+</body>
+</html>

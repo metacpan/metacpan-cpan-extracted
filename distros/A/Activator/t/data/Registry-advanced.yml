@@ -1,0 +1,13 @@
+deep_hash:
+  level_1:
+    level_2:
+      level_3: ${VAR1}
+top_level: ${VAR2}
+list:
+  - foo
+  - bar
+  - ${VAR3}
+  - ${VAR4}
+  - ${VAR5}
+multi: ${VAR1} plus ${VAR2} equals ${VAR4} - ${VAR1}
+recursive: ${multi} equals ${VAR3}

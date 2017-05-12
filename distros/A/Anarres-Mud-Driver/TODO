@@ -1,0 +1,4 @@
+Make all the typecheck routines for all loop types explicit.
+	Generate labels on all loops in the semantic pass.
+Fix the codegenerator.
+Deal with sscanf.

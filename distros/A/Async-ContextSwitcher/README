@@ -1,0 +1,27 @@
+NAME
+    Async::ContextSwitcher - helps track execution context in async programs
+
+DESCRIPTION
+    This is a very simple module that helps you carry around execution
+    context in async programs.
+
+    Idea is simple:
+
+    *   you create a new context when a new web request comes or whan a new
+        message comes from a queue or command line script starts
+
+    *   use "cb_w_context" to create callbacks
+
+    *   correct context restored when your callbacks are called
+
+    *   use "context" to access it
+
+    You can live without it in simple applications It's not something you
+    can deal
+
+AUTHOR
+    Ruslan Zakirov <Ruslan.Zakirov@gmail.com>
+
+LICENSE
+    Under the same terms as perl itself.
+

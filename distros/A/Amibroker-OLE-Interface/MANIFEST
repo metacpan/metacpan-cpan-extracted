@@ -1,0 +1,13 @@
+Changes
+ignore.txt
+lib/Amibroker/OLE/Interface.pm
+lib/Amibroker/OLE/APXCreator.pm
+Makefile.PL
+Makefile
+MANIFEST
+MYMETA.json
+MYMETA.yml
+README
+t/Interface.t
+t/APXCreator.t
+t/test_afl.afl

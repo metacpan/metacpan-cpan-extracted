@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="NULL" type="application/x-xsp"?>
+<?xml-stylesheet href="/transforms/user/make-control.xsl" type="text/xsl"?>
+<?xml-stylesheet href="/transforms/user/xhtml/new.xsl" type="text/xsl"?>
+<xsp:page
+  xmlns:xsp="http://www.apache.org/1999/XSP/Core"
+  xmlns:user="http://www.kjetil.kjernsmo.net/software/TABOO/NS/User"
+  xmlns:ct="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Control"
+  xmlns:cust="http://www.kjetil.kjernsmo.net/software/TABOO/NS/CustomGrammar"
+  xmlns:param="http://www.axkit.org/2002/XSP/QueryParam"
+  xmlns:sendmail="http://axkit.org/NS/xsp/sendmail/v1"
+  xmlns:i18n="http://www.kjetil.kjernsmo.net/software/TABOO/NS/I18N">
+  <cust:user>
+    <param:if-exists name="submitted">
+      
+      
+      <user:exists>
+	<user:username><param:get name="username"/></user:username>
+	<user:true><cust:title><i18n:insert>suggested-user-exists</i18n:insert></cust:title></user:true>
+	<user:false>
+	  <sendmail:send-mail>
+	    <sendmail:smtphost>localhost</sendmail:smtphost>
+	    <sendmail:from>webmaster@dev.kjernsmo.net</sendmail:from>
+	    <sendmail:subject>TABOO Reg</sendmail:subject>
+	    <sendmail:to><param:get name="email"/></sendmail:to>
+	    <sendmail:body>
+	      You've been registered as <param:get name="username"/>
+	      with password <param:get name="passwd"/> .
+	    </sendmail:body>
+	  </sendmail:send-mail>
+	  <user:new-user/>
+	  <cust:title><i18n:insert>suggested-user-stored</i18n:insert></cust:title>
+	</user:false>
+      </user:exists>
+    </param:if-exists>
+
+    <param:unless-exists name="submitted">
+      <cust:title><i18n:insert>submit-new-user</i18n:insert></cust:title>
+      
+      <ct:control element="input" type="text" name="username" size="8" maxlength="8">
+	<ct:title><i18n:insert>username</i18n:insert></ct:title>
+	<ct:descr><i18n:insert>new-username-descr</i18n:insert></ct:descr>
+      </ct:control>
+      <ct:control element="input" type="text" name="name" size="30" maxlength="30">
+	<ct:title><i18n:insert>user-name</i18n:insert></ct:title>
+	<ct:descr><i18n:insert>new-fullname-descr</i18n:insert></ct:descr>
+      </ct:control>
+      <ct:control element="input" type="text" name="email" size="30" maxlength="129">
+	<ct:title><i18n:insert>user-email</i18n:insert></ct:title>
+ 	<ct:descr><i18n:insert>new-email-descr</i18n:insert></ct:descr>
+     </ct:control>
+
+      <ct:control element="input" type="text" name="uri" size="60" maxlength="254">
+	<ct:title>
+	  <i18n:insert>homepage</i18n:insert>
+	  <i18n:insert>uri</i18n:insert>
+	</ct:title>
+  	<ct:descr><i18n:insert>new-uri-descr</i18n:insert></ct:descr>
+      </ct:control>
+      
+      <ct:control element="input" type="text" name="bio" size="60" maxlength="254">
+	<ct:title>
+	  <i18n:insert>user-bio</i18n:insert>
+	</ct:title>
+  	<ct:descr><i18n:insert>new-bio-descr</i18n:insert></ct:descr>
+     </ct:control>
+
+      <ct:control element="input" type="hidden" name="passwd">
+	<ct:value><user:random-password/></ct:value>
+      </ct:control>
+
+
+      
+      <ct:control element="input" type="submit" name="submitted"> 
+	<ct:value><i18n:insert>register</i18n:insert></ct:value>
+      </ct:control>
+    </param:unless-exists>
+
+  </cust:user>
+</xsp:page>

@@ -1,0 +1,19 @@
+Revision history for Perl extension App::Relate.
+
+0.01  Tue Jun 19 21:38:08 2007
+	- original version; created by h2xs 1.23 with options
+		-AX -n App::Relate -b 5.8.0
+
+0.02  Saturday June 23, 2007   6:44 PM
+        - fixed PREREQ_PM dependency on Test::File::Contents
+          and revised SYNOPSIS in pod
+
+0.03  Sunday June 24, 2007  12:04 AM
+        - added EXE_FILES to install 'relate' binary
+        - fixed skip counts in relate.t
+        - made Data::Dumper load conditional on $DEBUG (trying
+          to cover an odd FAIL report on OpenBSD)
+
+0.04  Tue Mar 16 17:11:25 2010
+        - renaming module from App::Relate to App::Relate::Complex
+        - renaming script from relate to relate_complex

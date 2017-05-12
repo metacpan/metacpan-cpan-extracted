@@ -1,0 +1,36 @@
+#!/usr/bin/perl -w
+# Use this script to upgrade a Wiki db that doesn't have search.
+# Just run this in your WikiDBRoot directory.
+
+use DBI;
+for (<wiki-*.db>) {
+my $db = DBI->connect("dbi:SQLite:./$_");
+    $db->do(q{
+        CREATE TABLE IgnoreWord 
+        (
+         id INTEGER PRIMARY KEY,
+         word NOT NULL
+        )
+    });
+    $db->do(q{CREATE UNIQUE INDEX IgnoreWord_word on IgnoreWord (word)});
+    $db->do(q{
+        CREATE TABLE Word 
+        (
+         id INTEGER PRIMARY KEY,
+         word NOT NULL
+        )
+    });
+    $db->do(q{CREATE UNIQUE INDEX Word_word on Word (word)});
+    $db->do(q{
+        CREATE TABLE ContentIndex
+        (
+         page_id     INTEGER             NOT NULL,
+         word_id     INTEGER             NOT NULL,
+         value       INTEGER             NOT NULL
+        )
+    });
+    $db->do(q{
+        create unique index ContentIndex_idx on ContentIndex (page_id, word_id)
+    });
+}
+

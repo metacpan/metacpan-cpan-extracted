@@ -1,0 +1,11 @@
+^.git/*
+^Makefile$
+^Makefile.old$
+^MANIFEST.bak$
+^blib/*
+^\.shipit
+^.*~$
+^Acme-Lingua-ZH-Remix-.\..*$
+pm_to_blib$
+^\.prove$
+^MYMETA\.(json|yml)$

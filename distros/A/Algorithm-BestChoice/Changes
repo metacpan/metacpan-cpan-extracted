@@ -1,0 +1,4 @@
+0.01 Monday May 18 11:48:26 PDT 2009:
+    - Added documentation
+    - ->best will extract value for you automatically
+    - Initial release

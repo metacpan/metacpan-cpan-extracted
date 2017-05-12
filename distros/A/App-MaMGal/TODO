@@ -1,0 +1,38 @@
+List of things to do
+--------------------
+
+The following things would be useful, though not critical:
+
+Check FSF address in GNU licenses.
+
+Make the film miniatures stand out by having e.g. an overlay film icon.
+
+Add options for forcing mamgal to refresh slides and/or miniatures despite them
+being fresh. This will be useful when e.g. regenerating the gallery in a
+different locale (or with some modified options, when they are implemented).
+There could also be an option to just remove generated files, rather than
+creating them.
+
+There are some features in imageindex which would be nice to have, such as
+graphic smileys, or greater ability to control the appearance of pages.
+
+Ability to rapidly move from a directory to any of its parents by clicking on a
+component of the path displayed at the top of the page.
+
+Parallel processing - having all CPUs busy generating the gallery would be
+nice, but need to think AT LEAST of the following possibly non-thread-safe
+calls first:
+ - fork (to call mplayer): possibly fork off a worker process before starting any threads
+ - localtime/gmtime: :-/
+ - readdir: only ever call from the main thread?
+ - thread-safety of other modules that we use
+
+Investigate the possibility of speeding up loading of creation timestamp from
+the EXIF data, possibly by caching it. Currently it constitutes most of the
+processing time for regenerating the top-most index file.
+
+Add an option to treat directories more than N levels deep and older than T
+days as not needing a refresh. This would significantly speed up refreshes of
+large galleries.
+
+Make description suppression optional.

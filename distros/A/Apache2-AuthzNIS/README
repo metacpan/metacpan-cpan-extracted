@@ -1,0 +1,115 @@
+NAME
+
+    Apache2::AuthzNIS - mod_perl2 NIS Group Authorization module
+
+SYNOPSIS
+
+        <Directory /foo/bar>
+        # This is the standard authentication stuff
+        AuthName "Foo Bar Authentication"
+        AuthType Basic
+
+        # The following is actually only needed when you will authenticate
+        # via NIS passwd as well as authorize via NIS group.
+        # Apache2::AuthenNIS is a separate module.
+        PerlAuthenHandler Apache2::AuthenNIS
+
+        # Standard require stuff, NIS users or groups, and
+        # "valid-user" all work OK
+        require user username1 username2 ...
+        require group groupname1 groupname2 ...
+        require valid-user
+
+        PerlAuthzHandler Apache2::AuthzNIS
+
+        </Directory>
+
+        These directives can also be used in the <Location> directive or in
+        an .htaccess file.
+
+DESCRIPTION
+
+    This perl module is designed to work with mod_perl, the Net::NIS module
+    by Rik Haris (rik.harris@fulcrum.com.au), and the Apache2::AuthenNIS
+    module. Version 0.11 of Apache::AuthzNIS was renamed and modified to use
+    mod_perl2. That module was a direct adaptation of Michael Parker's
+    (parker@austx.tandem.com) Apache::AuthenSmb module (which also included
+    an authorization routine).
+
+    The module calls Net::NIS::yp_match using each of the require group
+    elements as keys to the the group.byname map, until a match with the
+    (already authenticated) user is found.
+
+    For completeness, the module also handles require user and require
+    valid-user directives.
+
+  Apache2::AuthenNIS vs. Apache2::AuthzNIS
+
+    The following comments are from Apache::AuthzNIS.
+
+    I've taken "authentication" to be meaningful only in terms of a user and
+    password combination, not group membership. This means that you can use
+    Apache::AuthenNIS with the require user and require valid-user
+    directives. In the NIS context I consider require group to be an
+    "authorization" concern. I.e., Group authorization consists of
+    establishing whether the already authenticated user is a member of one
+    of the indicated groups in the require group directive. This process may
+    be handled by Apache::AuthzNIS.
+
+  Functions
+
+    handler
+        This is the mod_perl2 handler function.
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+AUTHOR
+
+    Demetrios E. Paneras "<dep at media.mit.edu>"
+
+    Ported to mod_perl by Shannon Eric Peevey "<speeves at unt.edu>"
+
+    Ported to mod_perl2 by Nguon Hao Ching "<hao at iteaha.us>"
+
+BUGS
+
+    Please report any bugs or feature requests to "bug-apache2-authznis at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Apache2-AuthzNIS>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT & DOCUMENTATION
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Apache2::AuthzNIS
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Apache2-AuthzNIS>
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Apache2-AuthzNIS>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Apache2-AuthzNIS>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Apache2-AuthzNIS>
+
+COPYRIGHT & LICENSE
+
+    Copyright (c) 1998 Demetrios E. Paneras, MIT Media Laboratory.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

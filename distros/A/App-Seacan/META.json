@@ -1,0 +1,75 @@
+{
+   "abstract" : "A tool to prepare a self-contained app directory.",
+   "author" : [
+      "Kang-min Liu C<< <gugod@gugod.org> >>."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.2",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Seacan",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mo" : "0",
+            "TOML" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Seacan" : {
+         "file" : "lib/App/Seacan.pm",
+         "version" : "v0.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/Seacan/issues"
+      },
+      "homepage" : "https://github.com/gugod/Seacan",
+      "repository" : {
+         "url" : "git://github.com/gugod/Seacan.git",
+         "web" : "https://github.com/gugod/Seacan"
+      }
+   },
+   "version" : "0.1.0",
+   "x_authority" : "cpan:GUGOD",
+   "x_contributors" : [
+      "nxadm <pub.claudio@gmail.com>",
+      "Mickey Nasriachi <mickey@cpan.org>",
+      "Kang-min Liu <gugod@users.noreply.github.com>",
+      "Kang-min Liu <gugod@gugod.org>"
+   ]
+}

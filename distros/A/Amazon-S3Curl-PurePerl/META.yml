@@ -1,0 +1,27 @@
+---
+abstract: 'Amazon::S3Curl::PurePerl - Pure Perl s3 helper/downloader.'
+author:
+  - 'Samuel Kaufman <samuel.c.kaufman@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amazon-S3Curl-PurePerl
+requires:
+  Digest::SHA::PurePerl: '5.85'
+  File::Spec: '3.40'
+  File::Temp: '0.2301'
+  IPC::System::Simple: '1.21'
+  Log::Contextual: '0.006000'
+  Module::Runtime: '0.013'
+  Moo: '1.003000'
+  Test::More: '0.98'
+resources:
+  bugtracker: https://github.com/ediblenergy/Amazon-S3Curl-PurePerl/issues
+  repository: https://github.com/ediblenergy/Amazon-S3Curl-PurePerl.git
+version: '0.054'

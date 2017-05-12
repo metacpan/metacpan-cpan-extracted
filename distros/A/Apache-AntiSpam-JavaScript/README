@@ -1,0 +1,88 @@
+Copyright (c) 2003, 2004 Alex Pleiner - zeitform Internet Dienste. 
+alex@zeitform.de - http://www.zeitform.de. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+
+--------
+Abstract
+--------
+
+Apache::AntiSpam::JavaScript is based on Apache::AntiSpam and implements 
+a filter module to prevent e-mail addresses exposed as is on web pages. 
+This module converts the anchors containing e-mail addresses (mailto:) 
+to JavaScript code.
+
+This module is Filter aware, meaning that it can work within
+Apache::Filter framework without modification.
+
+You may want to use other Apache::AntiSpam::* modules after this one.
+
+This work is based on the Apache::AntiSpam::* modules provided by
+Tatsuhiko Miyagawa <miyagawa@bulknews.net>. 
+
+Example output:
+
+   # in html-file
+   <a href="mailto:alex@zeitform.de">alex@zeitform.de</a>
+
+   # in browser
+   <script type="text/javascript">
+     JSlt=unescape('%3C'); // "<"
+     JSgt=unescape('%3E'); // ">"
+     document.write(''+JSlt+'a h'+'ref='+'"mai'+'lto:'+'alex'+'@zei'+'tfor'+
+                    'm.de'+'"'+JSgt+'al'+'ex@z'+'eitf'+'orm.'+'de'+JSlt+'/'+
+                    'a'+JSgt+'');
+   </script>
+
+
+------------
+Requirements
+------------
+
+This module requires:
+ 
+   - Apache::Constants
+   - Apache::File
+
+The requirements are encoded in Makefile.PL.  
+
+------------------
+Basic Installation
+------------------
+
+Apache::AntiSpam::JavaScript may be installed through the CPAN shell in 
+the usual CPAN shell manner.  This typically is:
+
+  $ perl -MCPAN -e 'install Apache::AntiSpam::JavaScript'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme Apache::AntiSpam::JavaScript
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install Apache::AntiSpam::JavaScript
+
+-------------------
+Manual Installation
+-------------------
+
+Apache::AntiSpam::JavaScript can also be installed manually.  
+
+Download the package from:
+http://alex.zeitform.de/spamtrap/
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+

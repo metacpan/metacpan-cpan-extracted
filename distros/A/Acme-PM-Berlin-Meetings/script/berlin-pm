@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+
+use strict;
+use Acme::PM::Berlin::Meetings;
+
+my $count = shift || 1;
+for (next_meeting($count)) {
+    print $_, "\n";
+}
+

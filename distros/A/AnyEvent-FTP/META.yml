@@ -1,0 +1,38 @@
+---
+abstract: 'Simple asynchronous FTP client and server'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  File::HomeDir: '0.91'
+  Module::Build: '0.28'
+  perl: '5.010001'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-FTP
+no_index:
+  directory:
+    - example
+    - tools
+recommends:
+  EV: '0'
+requires:
+  AnyEvent: '0'
+  File::chdir: '0'
+  List::MoreUtils: '0'
+  Moo: '2.0'
+  Path::Class: '0.26'
+  PerlIO::eol: '0'
+  URI: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/plicease/AnyEvent-FTP/issues
+  homepage: http://perl.wdlabs.com/AnyEvent-FTP
+  repository: git://github.com/plicease/AnyEvent-FTP.git
+version: '0.09'

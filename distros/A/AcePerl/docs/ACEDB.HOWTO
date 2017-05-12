@@ -1,0 +1,364 @@
+			ACEDB HOWTO
+
+ACeDB is poorly documented and very intimidating to the new user.
+Despite this, it is not hard to install the database and get it
+running.
+
+OBTAINING THE SOFTWARE
+
+ACeDB is available in both binary and source code form.  I strongly
+recommend that you install the server from source code. The source
+distributions tend to be more up to date than the binary
+distributions, and subtle differences between shared libraries can
+cause ACeDB binaries linked on one platform to behave differently on
+another.
+
+ACeDB distributions are available at:
+
+  ftp://ftp.wormbase.org/pub/wormbase/software/
+  ftp://ncbi.nlm.nih.gov/repository/acedb/
+
+I recommend that you use the ftp.wormbase.org URL, as this contains
+the latest stable snapshot of ACeDB that I use for testing and
+debugging the current release of AcePerl.
+
+COMPILING THE SOFTWARE
+
+Unpack the software into its own directory:
+
+	1) mkdir acedb
+	2) gunzip -c acedb-latest.tar.gz | tar xvf -
+
+Compile the software.  The makefile requires that an environment
+variable named ACEDB_MACHINE be defined.  This environment variable is
+in turn used to select the makefile to be used to compile.  To figure
+out what to set this environment variable to, type "make". You will
+receive an error message listing the alternatives. Choose one for your 
+system, and run "make again".
+
+	3) cd acedb
+	4) make  (error message listing possibilities)
+	5) setenv ACEDB_MACHINE LINUX_4  (for example)
+	6) make
+
+This will create a subdirectory named bin.LINUX_4 (or whatever your
+operating system is), containing the executables along with a number
+of other files.
+
+INSTALLING THE SOFTWARE
+
+ACeDB runs as an Internet server.  As such, it should not be run as
+root, but as an unprivileged user.  My strategy has been to create a
+new user and group, both named "acedb".  The server runs as "acedb",
+and all database developers belong to the "acedb" group, giving them
+write access to the database files.
+
+After creating the acedb user, create a "bin" directory and copy the
+executables into it:
+
+	1) cd ~acedb
+	2) mkdir bin
+	3) cd ~/acedb (where the source code was compiled)
+	4) cd bin.LINUX_4 (or whatever)
+	5) cp xace tace giface saceserver sgifaceserver makeUserPasswd ~acedb/bin/
+
+Now put ~acedb/bin on your path so that the Ace::Local module can find
+the giface and tace programs.  This usually involves editing .cshrc or
+.bashrc to change the PATH variable.  (See your system administrator
+if you don't know how to do this).
+
+CREATING DATABASES
+
+Each ACeDB database lives in a separate subdirectory, which I
+conventionally place under ~acedb/.  You will often be installing a
+compressed database archive, such as the C. elegans database (see the
+NCBI FTP site).  In this case, simply unpack the database into the
+~acedb/ directory.  Programs like xace, tace, and the servers will
+refer to the database by its path. Within the database directory
+should be the subdirectories databases/, wspec/, wdoc/, wgf/, wquery/,
+and possibly others.  If not, make sure that you unpacked the database
+package correctly.
+
+Now examine and edit the file ~acedb/wspec/passwd.wrm.  This contains
+the names of user accounts that are allowed to write to the database.
+Make this file readable by everyone, but only writable by you (and
+other trusted users).  If you will be running an ACeDB server, you
+should examine the file ~acedb/wspec/server.wrm.  This contains read
+and write policies for the server.  You can restrict who can read and
+write to the database, although currently you are limited to
+restricting read and write privileges to local users versus non-local
+users.
+
+Creating a new database from scratch is somewhat more difficult,
+because you have to create an appropriate models (schema) file.
+Please see NEW_DB.HOWTO for help.
+
+Now confirm that the database is correctly installed by running the
+xace program.
+
+	xace ~acedb/elegans  (or whatever)
+
+You should be able browse the data, view graphics, and so on.
+
+INSTALLING AN ACE SERVER
+
+ACEDB comes with two servers called "saceserver" and "sgifaceserver".
+The difference between the two is that sgifaceserver has the ability
+to serve graphical pictures.  Aceserver is text-only. In general, you
+will want to use sgifaceserver unless you know you will never need to
+serve pictures.  If you download a binary distribution of ACEDB, the
+two executables may have the name of the operating system appended to
+them.  Never fear.  Just rename the files to "saceserver" and
+"sgifaceserver."
+
+A full description of installing s(gif)aceserver is given in the ACEDB
+web pages at:
+
+  http://www.acedb.org/Development/wdoc/Socket_Server/SOCKET_aceserver.html
+
+However, it is a rather technical description.  Here's a brief summary
+of what you need to do:
+
+1) Set up server password permissions:
+	a. Choose an administrative username and password.  For example "admin"
+	   and "acepass"
+
+	b. Generate a "hash" of the username and password using the makeUserPasswd
+	   program (this comes with the acedb binaries):
+               % makeUserPasswd admin
+		// Please enter passwd: ******
+		// Please re-enter passwd: ******
+		// The following line is a valid entry for wspec/serverpasswd.wrm
+
+		admin e5cc20aa1a8f3e7e5b29728bbd1355d8
+
+        c. Find the file named serverpasswd.wrm located in the wspec/ subdirectory
+	   of the acedb database directory.  Add these two lines to the end of the file:
+
+                admin: admin
+	        admin e5cc20aa1a8f3e7e5b29728bbd1355d8
+
+            The first line tells the server that the "admin" user has administrative
+            access, and can start and stop the server.  The second line says that
+	    "admin" has the password encoded in the numbers.
+
+        d. If you want to create additional users with read-only or read/write,
+           permissions, you can do so by generating more user names and password
+	   hashes with makeUserPasswd, and entering them into the serverpasswd.wrm
+	   file as described before.  Here is an example that grants "fred" and "ethel"
+           read/write access, and grants "ricky" read-only access:
+
+           admin: admin
+           write: fred ethel
+           read: ricky
+
+ 	   admin e5cc20aa1a8f3e7e5b29728bbd1355d8
+           fred 08b622ddf7eb7c8e44cdb3bd6362f966
+           ricky 64c12094434c3c4a1a24cdd21ad06485
+           ethel f95557500f46122aacd59ce920aae6e8
+
+2) Try to start the server under your own account, using saceclient.
+
+Assuming that you have installed the acedb databases using your own
+user permissions, you can try to run the web server as yourself.  Open
+up two command windows on your system.  In one type this command:
+
+ 	% ~acedb/bin/sgifaceserver ~acedb/elegans 5000
+
+This is telling the server to run on port 5000 and to read data from
+the database directory located at ~acedb/elegans.  If all is well, you
+will see messages like this:
+
+   // Database directory: /usr/local/acedb/elegans
+   // Shared files: /usr/local/acedb
+   // #### Server started at 2003-05-12_11:54:13
+   // #### host=brie3.cshl.org  listening port=5000
+   // #### Database dir=/usr/local/acedb/elegans/
+   // ####  Working dir=/usr/local/acedb/elegans/
+   // #### clientTimeout=600 serverTimeout=600 maxbytes=102400 autoSaveInterval=600
+
+The messages will stop, indicating that the server is waiting for
+incoming connections.
+
+In the other window, launch saceclient with this command:
+
+      % ~acedb/bin/saceclient localhost -port 5000
+
+It will prompt you for a userid (type "admin") and a password (type
+the password).  If all goes well, you will get this prompt:
+
+      acedb@localhost> 
+
+and the server will accept queries.  For example, try the command
+"Find Model".
+
+3) Try to communicate with the server using aceperl.
+
+When you installed AcePerl, it should have installed a small interface
+script named ace.pl.  Confirm that it can talk to the server:
+
+    % ace.pl -host localhost -port 5000
+
+By default, you will get an "anonymous" read only connection, and you
+will see the prompt: 
+
+    aceperl>
+
+indicating that the database is ready to accept queries.
+
+4) Shut down the server.
+
+When you are ready, shut down the server like this:
+
+   % ace.pl -host localhost -port 5000 -user admin -pass acepass
+   aceperl> shutdown now
+
+5) Try running the server as the "acedb" user.
+
+If you are going to be running the acedb server a lot, it is better to
+run it under the "acedb" account than under your personal login.  The
+reason for this is that bugs in the acedb server code may
+inadvertently expose your personal files to snooping or deletion if
+the server is running under your personal ID.
+
+To run the server as acedb, you must make its database files writable
+by the acedb user.  To do this, become the root user, and run the
+following commands:
+
+  # chown -R acedb ~acedb/elegans/database
+  # chgrp -R acedb ~acedb/elegans/database
+  # chmod -R +rw ~acedb/elegans/database
+
+Replace the path ~acedb/elegans with the path to the database that you
+want to be accessible.  What this is doing is to make the "database"
+subdirectory owned by the acedb user and writable by it.
+
+Still running as root, become the acedb user:
+
+  # su acedb
+
+Now confirm that you can still launch the server:
+
+  % ~acedb/bin/sgifaceserver ~acedb/elegans 5000
+
+and talk to it:
+
+  % ace.pl -host localhost -port 5000
+
+Congratulations.  You're almost done.  The last step is to arrange for
+the acedb socket server to start up automatically when needed.
+
+GETTING THE SERVER TO START AUTOMATICALLY
+
+There are two recipes for this, depending on whether your system uses
+standard "inetd" "super daemon" to start up services on an as-needed
+basis, or uses the new enhanced version called "xinetd."  The way to
+tell is to look in your /etc directory.  If you see a file named
+inetd.conf, then you are using the traditional inetd daemon.  If you
+see instead a directory named xinetd.d/ then you are using xinetd.
+
+1) Configuring for inetd:
+
+  a) Find the file /etc/services, and add the following line to the
+      end of the file:
+
+     elegans   5000/tcp
+
+     This is defining a new service named "elegans" which runs on
+     port 5000.  You can change this symbolic name to anything you
+     like.  If you have multiple acedb databases running, give each
+     one a distinctive name and port number.  Avoid using any port
+     numbers that are already mentioned in the file.
+
+   b) Find the file /etc/inetd.conf, and add the following line:
+
+    elegans  stream  tcp wait acedb  /usr/local/acedb/bin/sgifaceserver
+            sgifaceserver /usr/local/acedb/elegans
+
+    This is all one line, but has been word-wrapped to fit.
+
+    The first field refers to the service named "elegans" that you
+    defined in /etc/services and is necessary for inetd to associate
+    the service with the proper port number.  Modify as you see fit.
+
+   c) Tell inetd to reread its configuration files.  Use "ps" to find
+      the ID of the inetd daemon like this:
+
+      # ps -elf | grep inetd
+      140 S root       121     1  0  68   0    -   475 do_sel May11 ? 00:00:00 /usr/sbin/inetd
+
+      and use "kill -HUP" to tell the server to reread inetd.conf
+      (this must be done as root):
+
+      # kill -HUP 140
+
+You should now be able to communicate with the server using saceclient
+or ace.pl.  If it's not working, look in the following log files for
+helpful error messages:
+
+      /var/log/messages
+      ~acedb/elegans/database/log.wrm
+      ~acedb/elegans/database/serverlog.wrm
+
+2) Configuring for xinetd:
+
+  a) Find the file /etc/services, and add the following line to the
+      end of the file:
+
+     elegans   5000/tcp
+
+     This is defining a new service named "elegans" which runs on
+     port 5000.  You can change this symbolic name to anything you
+     like.  If you have multiple acedb databases running, give each
+     one a distinctive name and port number.  Avoid using any port
+     numbers that are already mentioned in the file.
+
+  b) Find the directory /etc/xinetd.d.  Create a file named after
+     the service chosen in (a) containing these contents:
+
+        # file: elegans
+	# default: on
+        # description: C. elegans acedb database
+	service elegans
+	{
+	        disable                 = no
+	        protocol                = tcp
+	        socket_type             = stream
+	        flags                   = REUSE
+	        wait                    = yes
+	        user                    = acedb
+	        group                   = acedb
+	        log_on_success          += USERID DURATION
+	        log_on_failure          += USERID HOST
+	        server                  = /usr/local/acedb/bin/saceserver
+	        server_args             = /usr/local/acedb/elegans
+	}
+
+      Change the line "service elegans" to be the symbolic name chosen
+      in (a).
+
+   c) Tell xinetd to restart.  Use "ps" to find the ID of the xinetd 
+	daemon like this:
+
+      # ps -elf | grep xinetd
+      140 S root       457     1  0  69   0    -   557 do_sel Mar09 ? 00:00:21 xinetd
+
+      and use "kill -HUP" to tell the server to reread inetd.conf
+      (this must be done as root):
+
+      # kill -HUP 140
+
+You should now be able to communicate with the server using saceclient
+or ace.pl.  If it's not working, look in the following log files for
+helpful error messages:
+
+      /var/log/messages
+      ~acedb/elegans/database/log.wrm
+      ~acedb/elegans/database/serverlog.wrm
+
+Lincoln Stein
+May 2003
+
+
+
+

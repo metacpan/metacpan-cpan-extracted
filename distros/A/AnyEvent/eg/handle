@@ -1,0 +1,33 @@
+#!/opt/bin/perl
+
+# This small example script shows how to do non-blocking
+# reads from a file handle.
+
+use AnyEvent::Handle;
+my $cv = AnyEvent->condvar;
+
+my $ae_fh =
+    AnyEvent::Handle->new (
+       fh => \*STDIN,
+       on_error => sub { $cv->broadcast }
+    );
+
+$ae_fh->push_read (line => sub {
+   my ($ae_fh, $line) = @_;
+   print "Got line [$line]\n";
+
+   $ae_fh->push_read (sub {
+      my ($ae_fh) = @_;
+      print "Got additional data:[\n".$ae_fh->rbuf."]\n";
+
+      if ($ae_fh->rbuf =~ s/^.*\bend\b//s) {
+         print "'end' detected, stopping program\n";
+         $cv->broadcast;
+         return 1;
+      }
+
+      return 0;
+   });
+});
+
+$cv->wait;

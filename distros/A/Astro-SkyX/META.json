@@ -1,0 +1,42 @@
+{
+   "abstract" : "Perl extension for communications with The SkyX Scripting Engine Version 10.2.0 (Build 6519 and later).",
+   "author" : [
+      "Robert Woodard <kayak.man@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Astro-SkyX",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket" : "1.31",
+            "Scalar::Util" : "1.22"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.11"
+}

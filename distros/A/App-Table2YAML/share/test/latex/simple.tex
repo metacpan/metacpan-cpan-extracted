@@ -1,0 +1,12 @@
+\begin{tabular}{rlrrrrrll}
+uid & string & integer_decimal & integer_hexadecimal & integer_octal & float_exponential & float_fixed & float_special & boolean \\
+\hline
+0 & " & 0 & 0x00 & 000 & 0\,(0) & 0.00 & inf & Y \\
+1 & ! & +1000 & +0x3E8 & +01750 & +1.0000\,(+03) & +999.99 & -INF & YES \\
+2 & @ & 1000000 & 0xF4240 & 03641100 & 1\,(6) & 54.1234 & nan & ON \\
+3 & # & -1234 & 0x4d2 & 02322 & -1.234000\,(+03) & 1_234.56 & NAN & TRUE \\
+4 & $ & -56789 & 0xDDD5 & 0156725 & 5.678900\,(+04) & 56_789.012 & NaN & N \\
+5 & % & +0 & +0x00 & +000 & +0\,(0) & +0.00 & InF & FALSE \\
+6 & & & -0 & -0x00 & -000 & -0\,(0) & -0.00 & infinity & NO \\
+7 & * & 1234567890 & 0x499602D2 & 011145401322 & 1.234568\,(+09) & 1234567890 & -infinity & OFF \\
+\end{tabular}

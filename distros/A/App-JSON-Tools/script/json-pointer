@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use JSON::MaybeXS;
+use JSON::Pointer;
+
+my $USAGE = <<EOF;
+usage: 
+json-pointer <json pointer> < <filename>
+json-pointer <json pointer> <filename>
+cat <filename> | json-pointer <json pointer>
+EOF
+
+sub main {
+    my $options;
+    GetOptions("help|h|?" => \$options->{help});
+
+    die $USAGE if $options->{help};
+    die "too many arguments\n$USAGE"   if @ARGV > 2;
+#   die "not enough arguments\n$USAGE" if @ARGV == 0;
+
+    my $json_pointer = $ARGV[0];
+
+    my @lines = $ARGV[1] ? <$ARGV[1]> : <STDIN>;
+    my $json_in  = join "", @lines;
+    my $data_in  = JSON::MaybeXS->new->utf8->decode($json_in);
+    my $data_out = $json_pointer
+        ? JSON::Pointer->get($data_in, $json_pointer)
+        : $data_in;
+
+    if (ref $data_out) {
+        print JSON::MaybeXS->new->utf8->canonical->pretty->encode($data_out);
+    }
+    else {
+        print "\"$data_out\"\n";
+    }
+
+}
+
+main;
+

@@ -1,0 +1,10 @@
+#!/usr/bin/perl -w
+
+use strict;
+use App::GUI::Notepad;
+
+my $notepad = App::GUI::Notepad->new;
+# $notepad->configure();
+$notepad->MainLoop();
+
+exit(0);

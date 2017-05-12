@@ -1,0 +1,7 @@
+Revision history for Perl extension Acme::Snark.
+
+0.01  Fri Dec 21 04:15:16 2001
+	- original version; created by h2xs 1.19
+
+0.04  Sun Apr 15 16:33:00 2007
+        - Improve CPANTS score.

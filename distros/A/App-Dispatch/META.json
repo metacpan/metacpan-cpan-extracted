@@ -1,0 +1,47 @@
+{
+   "abstract" : "Tool to have #! dispatch to the best executable for the job.",
+   "author" : [
+      "Chad Granum <exodist7@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4204",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Dispatch",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Simple" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      }
+   },
+   "provides" : {
+      "App::Dispatch" : {
+         "file" : "lib/App/Dispatch.pm",
+         "version" : "0.007"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/App-Dispatch/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/exodist/App-Dispatch"
+      }
+   },
+   "version" : "0.007"
+}

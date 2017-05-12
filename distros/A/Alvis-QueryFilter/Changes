@@ -1,0 +1,7 @@
+Revision history for Perl module Alvis::QueryFilter
+
+1.2:
+   Various small but important bug fixes to account for lemma processing, and introducing
+   text markup.  Also extended the testing to make it more realistic.
+
+

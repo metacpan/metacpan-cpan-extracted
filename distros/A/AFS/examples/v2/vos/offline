@@ -1,0 +1,31 @@
+#!/usr/local/bin/perl
+
+use v5.10.0;
+use blib;
+use strict;
+use warnings;
+
+use AFS::VOS;
+use Scalar::Util qw(looks_like_number);
+
+my ($vos, $server, $part, $volume, $busy, $sleep, $ok);
+
+die "Usage: $0 server partition volume [bussy sleep]\n" if $#ARGV < 2;
+
+$server = shift;
+$part   = shift;
+$volume = shift;
+$busy   = shift // 0;
+$sleep  = shift // 0;
+
+if (defined $busy  and !looks_like_number($busy))  { warn "$0: BUSY is not an INTEGER ...\n"; }
+else                                               { $busy = int($busy); }
+if (defined $sleep and !looks_like_number($sleep)) { warn "$0: SLEEP is not an INTEGER ...\n"; }
+else                                               { $sleep = int($sleep); }
+
+$vos = AFS::VOS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n" and die;
+
+$ok = $vos->offline($server, $part, $volume, $busy, $sleep);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { printf "Task %s \n", $ok ? "done" : "failed"; }

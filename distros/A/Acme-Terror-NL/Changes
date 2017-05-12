@@ -1,0 +1,15 @@
+Revision history for Perl module Acme::Terror::NL
+
+0.04 Mar 13 2013
+    - source site changed HTML markup; patched module
+
+0.03 Dec 14 2007
+    - source site changed HTML markup; patched module
+
+0.02 Jun 04 2007
+    - source site changed HTML markup; patched module
+
+0.01 Aug 10 2006
+    - original version; created by ExtUtils::ModuleMaker 0.44
+
+

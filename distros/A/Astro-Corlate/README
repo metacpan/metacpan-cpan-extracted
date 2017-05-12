@@ -1,0 +1,91 @@
+Astro::Corlate modules
+----------------------  
+
+What is it?
+-----------
+
+The Astro::Corlate module is an semi-OO interface to the Fortran 90 Corlate
+package. Corlate compares two CLUSTER format catalogue files, one typically
+being the results of a new observation, and the other a reference catalogue
+such as the USNO-A2. It returns an array of files with information on any
+variable objects found during the cross-corelation of the two catalogues.
+
+CLUSTER format files can be handled using the Astro::Catalog::Cluster module,
+and the USNO-A2 catalogue for defined sky regions retrieved seamlessly using
+the Astro::Catalog::USNOA2 module. Both of these modules are available from
+the eSTAR website (http://www.estar.org.uk/). 
+
+Why do it?
+----------
+
+This module was written as part of the eSTAR project.
+
+Requirements
+------------
+
+The module is an XS wrapper for the Fortran 90 corlate code. It requires a
+Fortran 90 compiler, such as the NAG f95 compiler, to build. XS and the
+ExtUtils::F77 module was not designed to wrap F90 code and some liberties
+were taken during when wrapping the subroutine library. These may cause
+difficulties when trying to compile the module on a non-native platform.
+
+Provides
+--------
+
+The package provides the following classes
+
+    Astro::Corlate
+    Astro::Corlate::Wrapper
+    
+and the following Fortran 90 module libraries
+
+    libCorlate.a    
+
+Where can I get it?
+-------------------
+
+The package is availabe from CPAN <http://www.cpan.org/> and from
+the eSTAR Project at http://www.estar.org.uk
+
+Installation
+------------
+
+You should first build the libCorlate.a library, see the Wrapper/Fortran
+directory and follow the instructions in the README file there. A Fortran
+90 compiler is needed to build the library.
+
+Installation is automated using the ExtUtils::MakeMaker library
+
+     % perl Makefile.PL
+     % make
+     % make test
+     % make install
+
+Authors
+-------
+
+The Corlate fortran module was written by Tim Naylor <timn@astro.ex.ac.uk>,
+of the University of Exeter Astrophysics Group (http://www.astro.ex.ac.uk/). 
+The Perl wrapper was written by Alasdair Allan <aa@astro.ex.ac.uk>, as part 
+of his work for the eSTAR project. 
+
+Acknowledgements
+----------------
+
+The author very much appreciates the help and advise given by Tim Jenness <timj@jach.hawaii.edu> of the Joint Astronomy Centre (JAC) in Hawaii during
+the writing of the Corlate Perl wrapper.
+
+License
+-------
+This package is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA

@@ -1,0 +1,22 @@
+PerlSetEnv PERL5LIB lib
+
+<Directory @DocumentRoot@>
+AddDefaultCharset iso-8859-1
+</Directory>
+
+<Location /utf-8>
+AddDefaultCharset utf-8
+SetHandler perl-script
+PerlHandler Apache::TestCharset
+</Location>
+
+<Location /euc-jp>
+AddDefaultCharset euc-jp
+SetHandler perl-script
+PerlHandler Apache::TestCharset
+</Location>
+
+<Location /mod>
+SetHandler perl-script
+PerlHandler Apache::TestCharsetModify
+</Location>

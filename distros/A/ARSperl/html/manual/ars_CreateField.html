@@ -1,0 +1,51 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual - ars_CreateField</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_CreateField(ctrl, schema, fieldHash, reservedIdOK=0 )</CODE></H2>
+
+      This function creates a new field. You must first
+      populate the <CODE>fieldHash</CODE> before calling this routine.
+      <P><CODE>schema</CODE> is the name of the schema where the field is to be created.
+      <P><CODE>fieldHash</CODE> is a
+      <A HREF="ds_field_hash.html">Field Properties Structure</a> hash. 
+      <P><CODE>reservedIdOK</CODE> must be set to 1 if you want to create a field in
+      the reserved field id range (i.e. <= 536870912).
+
+      <P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns 1
+          <DT><B>On failure</B><DD>
+              Returns 0
+      </DL>
+
+      <P>Example:
+
+      <P><BLOCKQUOTE>
+      <I> This example copies an existing field to a new 
+          field. I.e. it simply re-saves the field under
+          a new name. </I></BLOCKQUOTE>
+
+      <PRE>
+      ($fd = ars_GetField($c, "Schema", 536870913)) ||
+	    die $ars_errstr;
+      $fd->{fieldId}   = $fd->{fieldId} + 100000;
+      $fd->{fieldName} = "Copy of ".$fd->{fieldName};
+      ars_CreateField( $c, "Schema", $fd ) || die $ars_errstr;
+      </PRE>
+
+<B>Notes</B>: Hash keys <CODE>helpText, owner</CODE> and 
+<CODE>changeDiary</CODE> are optional when calling this routine.
+<CODE>fieldId</CODE> can be specified as 0 if you want the the server
+to generate a field id.
+<P>
+<I>This function was introduced in version 1.90 of ARSperl</I>
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

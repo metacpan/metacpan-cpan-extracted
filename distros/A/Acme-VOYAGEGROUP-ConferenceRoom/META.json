@@ -1,0 +1,92 @@
+{
+   "abstract" : "It's new $module",
+   "author" : [
+      "monmon <lesamoureuses@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-VOYAGEGROUP-ConferenceRoom",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::MessagePack" : "0",
+            "Encode::Locale" : "0",
+            "JSON::XS" : "0",
+            "UNIVERSAL::require" : "0",
+            "XML::Smart" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Base::Less" : "0",
+            "Test::More" : "0.98",
+            "Test::Pretty" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::VOYAGEGROUP::ConferenceRoom" : {
+         "file" : "lib/Acme/VOYAGEGROUP/ConferenceRoom.pm",
+         "version" : "0.01"
+      },
+      "Acme::VOYAGEGROUP::ConferenceRoom::Output::Color" : {
+         "file" : "lib/Acme/VOYAGEGROUP/ConferenceRoom/Output/Color.pm"
+      },
+      "Acme::VOYAGEGROUP::ConferenceRoom::Output::JSON" : {
+         "file" : "lib/Acme/VOYAGEGROUP/ConferenceRoom/Output/JSON.pm"
+      },
+      "Acme::VOYAGEGROUP::ConferenceRoom::Output::MessagePack" : {
+         "file" : "lib/Acme/VOYAGEGROUP/ConferenceRoom/Output/MessagePack.pm"
+      },
+      "Acme::VOYAGEGROUP::ConferenceRoom::Output::XML" : {
+         "file" : "lib/Acme/VOYAGEGROUP/ConferenceRoom/Output/XML.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/monmon/Acme-VOYAGEGROUP-ConferenceRoom/issues"
+      },
+      "homepage" : "https://github.com/monmon/Acme-VOYAGEGROUP-ConferenceRoom",
+      "repository" : {
+         "url" : "https://github.com/monmon/Acme-VOYAGEGROUP-ConferenceRoom.git",
+         "web" : "https://github.com/monmon/Acme-VOYAGEGROUP-ConferenceRoom"
+      }
+   },
+   "version" : "0.01"
+}

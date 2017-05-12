@@ -1,0 +1,33 @@
+PerlLoadModule Apache2::Translation
+PerlLoadModule TestConfig
+
+PerlTransHandler Apache2::Translation
+PerlMapToStorageHandler Apache2::Translation
+
+TranslationKey default
+
+Include conf/db.inc
+
+<Perl>
+package My::Handler;
+
+use strict;
+use Apache2::RequestRec;
+use Apache2::RequestIO;
+use Apache2::RequestUtil;
+use Apache2::Const -compile=>qw{OK};
+
+sub handler {
+  my $r=shift;
+
+  $r->content_type('text/plain');
+
+  $r->print(substr( $r->notes->{t}, 1 ));
+
+  return Apache2::Const::OK;
+}
+</Perl>
+
+<VirtualHost recursion>
+    TranslationProvider BDB BDBEnv=@t_conf@/BDBENV
+</VirtualHost>

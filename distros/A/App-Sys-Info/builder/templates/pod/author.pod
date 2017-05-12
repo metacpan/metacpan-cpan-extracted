@@ -1,0 +1,13 @@
+=head1 AUTHOR
+
+[%AUTHOR%] <[%EMAIL%]>.
+
+=head1 COPYRIGHT
+
+Copyright [%YEAR%] [%AUTHOR%]. All rights reserved.
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version [%PERL%] or,
+at your option, any later version of Perl 5 you may have available.

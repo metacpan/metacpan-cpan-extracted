@@ -1,0 +1,25 @@
+License and Copyright for Alien::InteractiveBrokers
+---------------------------------------------------
+
+Copyright (c) 2010-2012 Jason McManus
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+Market Data and the InteractiveBrokers Service
+----------------------------------------------
+
+The authors are NOT associated with InteractiveBrokers, and as such, take
+no responsibility or provide no warranty for your use of this module or the
+InteractiveBrokers service.  You do so at your own responsibility.  No
+warranty for any purpose is either expressed or implied by your use of this
+module suite.
+
+The data from InteractiveBrokers are under an entirely separate license that
+varies according to exchange rules, etc.  It is your responsibility to
+follow the InteractiveBrokers and exchange license agreements with the data.
+
+# END

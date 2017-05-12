@@ -1,0 +1,44 @@
+clear
+power on
+regs
+
+op a0 55
+
+# IY should now be set to 55
+test iy = 55
+
+op 88
+
+# IY should now be set to 54
+test iy = 54
+
+# Wrap and negative case --------------
+power on
+
+op a0 00
+
+# IY should now be set to 00
+test iy = 0
+
+op 88
+
+# Should be: IY=FF, S=1
+test iy = ff
+test s = 1
+
+# Zero case --------------------------
+power on
+
+op a0 01
+
+# Should be: IY=01, Z=0
+test iy = 1
+test z = 0
+
+op 88
+
+# Should be: IY=00, Z=1
+test iy = 0
+test z = 1
+
+save verify_88.txt

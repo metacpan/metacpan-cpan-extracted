@@ -1,0 +1,130 @@
+Requirements
+============
+
+The Aw package should work on any platform that can host both ActiveWorks
+and Perl.  The ActiveWorks C CADK (Commercial Adapter Development Kit)
+must also have been installed (see "BUILDING") and a C compiler must be
+available.
+
+The package has been verified to work with ActiveWorks 3.0 and 4.0 and the
+following OSs and versions of Perl:
+
+
+Solaris 2.6 and
+  Perl 5.004_04
+  Perl 5.005_03
+  Perl 5.6.1
+  Perl 5.8.0
+
+Solaris 8.0 and
+  Perl 5.004_04
+  Perl 5.8.0
+
+
+
+Building
+========
+
+Assuming GNU tar:
+
+  %  tar zxvf Aw-XY.tar.gz
+  %  cd Aw-XY
+  %  perl Makefile.PL
+  %  make
+  %  make install
+
+The Makefile.PL may or may not detect the library directories where you have 
+the ActiveWorks libraries installed.  If "perl Makefile.PL" gives warnings of
+the form:
+
+  Note (probably harmless): No library found for -lawalog30
+
+you will need to edit c/Makefile.PL, xs/Makefile.PL and xs/Aw/Makefile.PL
+to set the 'INC" and "LIBS' variables to contain the right path.
+"/opt/active40/" is the assumed ActiveWorks installation path.
+
+
+
+CADK and libcustcadk31
+----------------------
+
+If you see one (or probably two) warnings after running 'perl Makefile.PL"
+like:
+
+  Note (probably harmless): No library found for -lcustcadk31
+
+it means that you have not built libcustcadk31 OR have not installed
+the dependent sources for the "Commercial Adapter Development Kit".
+
+To check installation, check for the presence of the directory:
+
+  /opt/active40/samples/adapter_devkit/c_lib
+
+or check in /var/opt/activesw/install40/pkginst.log, for the corresponding
+strings:
+
+  CADK-UNIX-Any: pkga0000 pkga0107
+  CADK-UNIX-Any: "ActiveWorks Adapter Development Kit (Source) for Unix"
+
+If you find either of these your installation should be ok and you need
+only compile the library.  To do so (in a bash shell):
+
+  % cd /opt/active40/samples/adapter_devkit/c_lib
+  % export CLASSPATH=/opt/active40/classes
+  % make -f Makefile.unix
+
+If not installed, insert your ActiveWorks CD and install the
+"ActiveWorks Commercial Adapter Development Kit on Multi-Platform"
+with _both_ installation keys, you should see a message like:
+
+  Item Name                                      Install Size
+  ---- ----                                      ------- ----
+  1)   Language Adapters                         Yes     6140 Kb
+            Commercial Adapter Dev Kit
+
+You may repeat the installation and add only the extra packages
+that you wish without removing or harming your existing installation.
+
+If you would rather not rerun the installation script again, you
+can install the package manually by inserting the CD and:
+
+  % cd /opt/active40 
+  % tar zxvf /cdrom/activesw/unix/common/pkga107.taz
+
+then, proceed to build the library as shown above and repeat the
+'perl Makefile.PL' from the Aw directory.
+
+
+
+Running
+=======
+
+If when running a test script you find an error like:
+
+Can't load '/opt/lib/perl5/site_perl/5.005/sun4-solaris/auto/Aw/Aw.so' for module Aw: ld.so.1: perl: fatal: libawalog31.so: open failed: No such file or directory at /opt/lib/perl5/5.00503/sun4-solaris/DynaLoader.pm line 169.
+
+then you will need to set your library path:
+
+% export LD_LIBRARY_PATH=/opt/active40/lib
+
+(or wherever you have the libraries installed) and rerun the script.
+
+
+
+Testing
+=======
+
+"make test" has not been implemented .  In the bin/ directory,
+"time_adapter.pl" and "time_test.pl" are Perl rewrites of the provided AW
+time adapters ("time_adapter.c", "TimeAdapter.java", "time_test.c" and
+"TimeTest.java").
+
+In one window or two:
+
+  % ./time_adapter.pl 
+  % ./time_test.pl
+  
+
+The best test of your system will be the EventOfDoom script (eod.pl) which
+tries to create an event with one of each data type and deeply nested.  See
+the bin/index.html for a complete list of provided test and demo scripts.

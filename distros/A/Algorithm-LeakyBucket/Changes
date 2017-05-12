@@ -1,0 +1,14 @@
+Revision history for Perl extension Algorithm::LeakyBucket.
+
+0.01  Wed Jul 18 16:10:11 2012
+	- original version; created by h2xs 1.23 with options
+		-AX -n Algorithm::LeakyBucket
+
+0.06  Fri Jul 20 11:07:30 EDT 2012
+        - Removed old namspace base tricks.
+
+0.07  Fri Jul 20 14:58:01 EDT 2012
+	- Some servers can't install Cache::Memecahed::Fast, we added support for Cache::Memcached
+
+0.08  Mon Jul 30 14:14:42 EDT 2012
+	- Changed perldocs to match module name.

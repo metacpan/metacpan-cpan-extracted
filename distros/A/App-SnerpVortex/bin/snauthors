@@ -1,0 +1,102 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use lib qw(./lib);
+
+use SVN::Dump::AuthorExtractor;
+use Getopt::Long;
+
+my $dump_file_name;
+my $help = 0;
+
+my $getopt_okay = GetOptions(
+	'dump=s',       \$dump_file_name,
+	'help',         \$help,
+);
+
+if ($help or !$getopt_okay) {
+	die(
+		"$0 usage:\n",
+		"  --dump=FILENAME     location of svn dump file to replay\n",
+		"  --help              you're soaking in it.\n",
+	);
+}
+
+unless (defined $dump_file_name and length $dump_file_name) {
+	die "$0: --dump=FILENAME required\n";
+}
+unless (-e $dump_file_name) {
+	die "$0: --dump path ($dump_file_name) doesn't exist\n";
+}
+unless (-f $dump_file_name) {
+	die "$0: --dump path ($dump_file_name) must be a file\n";
+}
+
+# Begin replaying.
+
+my $replayer = SVN::Dump::AuthorExtractor->new(
+	svn_dump_filename => $dump_file_name,
+);
+
+$replayer->walk();
+exit;
+
+__END__
+
+=head1 NAME
+
+snauthors - print an authors.txt file from a Subversion dump to stdout
+
+=head1 SYNOPSIS
+
+	snauthors --dump project.svndump > authors.txt
+
+=head1 DESCRIPTION
+
+Collecting the authors for a project is one of the more tedious parts
+of converting to Git.  This snauthors utility finds the unique authors
+in a Subversion dump and prints them to standard output.
+
+The authors.txt file is not completely useful by itself.  The authors'
+e-mail addresses are presented as the user name at the dump's UUID
+(universal unique ID).
+
+However, the resulting authors.txt is complete.  There will be no
+surprise failures during the lengthy conversion process.  You won't
+have to restart from the beginning.  And, of course, you can fix the
+e-mail addresses before continuing with the conversion.
+
+=head1 USAGE
+
+=head2 --dump SVN_DUMP_FILENAME
+
+The location of the Subversion dump.  Required since nothing can be
+done without one.
+
+=head1 SEE ALSO
+
+L<App::SnerpVortex> - Main documentation for Snerp Vortex.
+
+L<SVN::Dump> - Subversion dumps are parsed by SVN::Dump.
+
+snanalyze - Analyze a Subversion dump, and produce an index database
+for other tools to process.
+
+snassign-auto - Automatically assign tags and branches to a snanalyze
+index.
+
+snassign-gui - Graphical snanalyze index browser.  Future plans will
+allow users to assign branches and tags by hand.  Requires Gtk.
+
+snerp - Convert a Subversion repository to a flat filesystem or Git.
+Uses the snanalyze index, with help from the snassign tools, to
+intelligently branch and tag as it goes.
+
+=head1 AUTHORS AND LICENSE
+
+Snerp Vortex is Copyright 2010 by Rocco Caputo and contributors.
+
+It is released under the same terms as Perl itself.
+
+=cut

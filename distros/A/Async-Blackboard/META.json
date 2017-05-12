@@ -1,0 +1,42 @@
+{
+   "abstract" : "A simple blackboard database and dispatcher.",
+   "author" : [],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4202",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Async-Blackboard",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "BSD::Resource" : "0",
+            "Devel::Leak" : "0",
+            "EV" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mouse" : "0",
+            "Scalar::Util" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Async::Blackboard" : {
+         "file" : "lib/Async/Blackboard.pm",
+         "version" : "v0.3.14"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.3.14"
+}

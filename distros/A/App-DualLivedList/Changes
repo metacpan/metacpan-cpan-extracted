@@ -1,0 +1,26 @@
+Revision history for Perl extension App::DualLivedList.
+
+0.05  Thu Apr 23 23:55:15 2015
+   - original version; created by h2xs 1.23 with options
+	  -ABX -b 5.5.0 -n App::DualLivedList
+	     -went back to ExtUtils::MakeMaker
+
+0.04  Thu Apr 23 13:36:39 2015
+   - original version; created by h2xs 1.23 with options
+	  -ABX -b 5.5.0 -n App::DualLivedList
+	     -fix for timestamp issues
+
+0.03 Thu Apr 23 03:19:02 2015
+   - original version; created by h2xs with options
+      -ABX -b 5.5.0 -n App::DualLivedList
+         -added "Fetching more info" feature
+
+0.02  Fri May 30 17:11:22 2014 
+   - original version; created by h2xs 1.23 with options
+	  -ABX -b 5.5.0 -n App::DualLivedList
+		 -current as of version 5.21.1
+
+0.01  Mon Jun 11 05:19:09 2012
+   - original version; created by h2xs 1.23 with options
+      -ABX -b 5.5.0 -n App::DualLivedList
+

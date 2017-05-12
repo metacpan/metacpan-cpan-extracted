@@ -1,0 +1,14 @@
+TODO
+
+- Automatically detect when a file upload has been cancelled
+  and notify the client on the next progress update
+- abstract out the cache so that it can work in distributed
+  environments, and on platforms where Cache::FastMmap is
+  not available (Windows)
+- Make the cache size and location configurable
+- add support to indicate which file is currently being uploaded
+  when uploading multiple files at once
+- Allow finer grained configuration in Apache (UploadProgress On/Off)
+- clean up JS, XSL and CSS files
+- add more stylesheets
+- add more examples

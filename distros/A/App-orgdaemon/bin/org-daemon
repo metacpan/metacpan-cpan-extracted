@@ -1,0 +1,1026 @@
+#!/usr/bin/perl -w
+# -*- perl -*-
+
+#
+# Author: Slaven Rezic
+#
+# Copyright (C) 2009,2013,2014,2015,2016,2017 Slaven Rezic. All rights reserved.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# Mail: slaven@rezic.de
+# WWW:  http://www.rezic.de/eserte/
+#
+
+package # hide from PAUSE indexer
+    App::orgdaemon;
+
+use strict;
+use 5.008; # scalar open
+
+our $VERSION = '1.04';
+
+use Getopt::Long;
+use List::Util qw(max);
+use Time::Local qw(timelocal);
+use Tk qw(tkinit Ev MainLoop);
+use Tk::PNG;
+
+{
+    package # hide from PAUSE indexer
+	Emacs::Org::Daemon::Date;
+    sub new {
+	my($class, %args) = @_;
+	bless {%args}, $class;
+    }
+
+    ## accessors
+    # raw text of the date (complete first line of entry)
+    sub text     { $_[0]->{text} }
+    # raw start date (typically YYYY-MM-DD with or without localized weekday)
+    sub date     { $_[0]->{date} }
+    # raw start time (typically HH:MM), may be missing for time-less dates (test with !length)
+    sub time     { $_[0]->{time} }
+    # raw early (head) warning (something like "-5min")
+    sub early_warning { $_[0]->{early_warning} }
+    # epoch of start date+time
+    sub epoch    { $_[0]->{epoch} }
+    # epoch of early (head) warning (typically 30min before date, may be modified using -XXX unit syntax)
+    sub early_warning_epoch { $_[0]->{early_warning_epoch} }
+    # raw end date (may be missing, test with !length)
+    sub date_end { $_[0]->{date_end} }
+    # raw end time (may be missing, test with !length)
+    sub time_end { $_[0]->{time_end} }
+    # org file
+    sub file     { $_[0]->{file} }
+    # line in org file
+    sub line     { $_[0]->{line} }
+
+    ## methods
+    sub id {
+	my $self = shift;
+	join '|', $self->{text}, $self->{date};
+    }
+    sub state {
+	my $self = shift;
+	my $now = do { package main; time }; # hack: don't call the method time() in this package, and using CORE::time does not work together with Time::Fake
+	if ($now >= $self->{epoch}) {
+	    'due';
+	} elsif (defined $self->{early_warning_epoch} && $now >= $self->{early_warning_epoch}) {
+	    'early';
+	} else {
+	    'wait';
+	}
+    }
+    sub formatted_text {
+	my $self = shift;
+	(my $formatted_text = $self->{text}) =~ s{\t}{ }g;
+	$formatted_text =~ s{^\*+}{};
+	$formatted_text =~ s{^\s+}{};
+	$formatted_text =~ s{^(TODO|DONE|WAITING|WONTFIX|LATER)\s+}{};
+	$formatted_text;
+    }
+    sub copy {
+	my($self, $src) = @_;
+	while(my($k,$v) = each %$src) {
+	    $self->{$k} = $v;
+	}
+    }
+    sub date_of_date {
+	my $self = shift;
+	my @l = localtime $self->{epoch};
+	sprintf "%04d-%02d-%02d", $l[5]+1900, $l[4]+1, $l[3];
+    }
+    sub start_is_timeless {
+	my $self = shift;
+	!length $self->{time};
+    }
+    sub end_is_timeless {
+	my $self = shift;
+	!length $self->{time_end};
+    }
+    sub epoch_end {
+	my $self = shift;
+	my($Y,$M,$D) = $self->{date_end} =~ m{^(\d{4})-(\d{2})-(\d{2})};
+	my($h,$m);
+	if ($self->end_is_timeless) {
+	    ($h,$m) = (23,59);
+	} else {
+	    ($h,$m) = $self->{time_end} =~ m{^(\d{1,2}):(\d{2})};
+	}
+	Time::Local::timelocal(0,$m,$h,$D,$M-1,$Y);
+    }
+}
+
+my $small_font = 'sans 8';
+my $default_early_warning = 30*60;
+my $default_timeless_early_warning = 86400;
+my $include_timeless;
+my $time_fallback = '06:00';
+my $recheck_interval;
+my $debug;
+my $use_emacsclient_eval = 1;
+my $emacsclient_fmt_cmd;
+my $show_version;
+my $overview_widget = 'hlist';
+
+my $mw;
+my $lb;
+my @lb_contents;
+my %org_files;
+my %open_warning;
+our %window_for_date;    # ($date_id -> $tk_window), for a (maybe) currently display date; "our" just for testing
+my %seen_early_warning; # ($date_id -> 1)
+my %seen_due_date;      # ($date_id -> 1)
+my $with_move_button;
+
+sub normal_repeater {
+    $lb->repeat($recheck_interval*1000, sub { tk_do_one_iteration() });
+}
+
+sub show_date_by_index_in_emacs {
+    my($index) = @_;
+    my $date = $lb_contents[$index];
+    if (!$date) {
+	# probably a date separator --- look for the next entry and use it
+	if ($lb_contents[$index+1]) {
+	    $date = $lb_contents[$index+1];
+	} else {
+	    return;
+	}
+    }
+    $lb->after(100, sub { show_date_in_emacs($date) }); # do it after the buttonrelease event
+}
+
+sub show_date_in_emacs {
+    my $date = shift;
+    my $file = $date->{file};
+    die "No file associated with given date" if !defined $file;
+    my @cmd;
+    if ($emacsclient_fmt_cmd) {
+	my $line = defined $date->{line} ? $date->{line} : 1;
+	my $cmd = $emacsclient_fmt_cmd;
+	$cmd =~ s{%l}{$line}g;
+	$cmd =~ s{%f}{$file}g;
+	system $cmd;
+	if ($? != 0) {
+	    warn "Failed to run '$cmd'";
+	}
+    } else {
+	if ($use_emacsclient_eval) {
+	    # XXX escape $file?
+	    my $eval = qq{(progn (find-file "$file")};
+	    if ($date->{line}) {
+		$eval .= " (goto-line $date->{line}) (org-show-entry)";
+	    }
+	    $eval .= qq{ (select-frame-set-input-focus (window-frame)) "Positioning in file $file at line $date->{line}" )};
+	    @cmd = ('emacsclient', '--eval', $eval);
+	} else {
+	    @cmd = ('emacsclient', '-n',
+		    (defined $date->{line} ? '+'.$date->{line} : ()),
+		    $file,
+		   );
+	}
+	if (eval { require IPC::Run; 1 }) {
+	    IPC::Run::run(\@cmd, '>', \my $ignore)
+		    or warn "Failed to run '@cmd'";
+	} else {
+	    system @cmd;
+	    if ($? != 0) {
+		warn "Failed to run '@cmd'";
+	    }
+	}
+    }
+}
+
+sub tk_do_one_iteration {
+    if (check_for_updates()) {
+	update_lb();
+    }
+
+    check_for_alarms();
+
+    colorize_entries();
+}
+
+sub update_lb {
+    if ($overview_widget eq 'listbox') {
+	$lb->delete(0, "end");
+    } else {
+	$lb->delete('all');
+    }
+    @lb_contents = ();
+    my @dates = map { @{ $_->{dates} } } values %org_files;
+    @dates = sort { $a->{epoch} <=> $b->{epoch} } @dates;
+    if (!@dates) {
+	if ($overview_widget eq 'listbox') {
+	    $lb->insert("end", "<no dates>");
+	} else {
+	    $lb->add(0, -text => '<no dates>');
+	}
+    } else {
+	my $now = time;
+	my @l1 = localtime $now;
+	my $today_end = timelocal 59,59,23,@l1[3..5];
+	my @l2 = localtime $now+86400; # XXX which is not correct during DST switches, but well
+	my $tomorrow_end = timelocal 59,59,23,@l2[3..5];
+
+	# XXX find a solution with less parsing here (i.e. $date
+	# should have more information available)
+	my @segmented_dates; # ([$dateobj, [$text, $tags, $scheduled, $orgdate]], ...)
+	for my $date (@dates) {
+	    my $formatted_text = $date->formatted_text;
+	    if ($formatted_text =~ s{\s+(<.*?>)}{}) {
+		my $orgdate = $1;
+		my($scheduled, $tags);
+		if ($formatted_text =~ s{\s+(SCHEDULED:)$}{}) {
+		    $scheduled = $1;
+		}
+		if ($formatted_text =~ s{\s+(:\S+:)$}{}) {
+		    $tags = $1;
+		}
+		my $text = $formatted_text;
+		push @segmented_dates, [$date, [$text, $tags, $scheduled, $orgdate]];
+	    } else {
+		warn "Can't parse " . $date->formatted_text . "...\n";
+		push @segmented_dates, [$date];
+	    }
+	}
+	# Maximum lengths for sprintf
+	my(@max);
+	for my $i (0..3) {
+	    $max[$i] = max map {
+		my $text_segments = $_->[1];
+		if ($text_segments && defined $text_segments->[$i]) {
+		    length $text_segments->[$i];
+		} else {
+		    0;
+		}
+	    } @segmented_dates;
+	}
+	my $fmt = join(' ', map { '%-' . $_ . 's' } @max);
+
+	my $last_day;
+	my $lb_i = -1;
+	for my $segmented_date (@segmented_dates) {
+	    $lb_i++;
+	    my($date, $text_segments) = @$segmented_date;
+	    my $this_day = $date->date_of_date;
+	    if (!defined $last_day || $this_day ne $last_day) {
+		my $today_or_tomorrow;
+		if      ($date->{epoch} <= $today_end) {
+		    $today_or_tomorrow = ' (today)';
+		} elsif ($date->{epoch} <= $tomorrow_end) {
+		    $today_or_tomorrow = ' (tomorrow)';
+		} else {
+		    $today_or_tomorrow = '';
+		}
+		my $text = '  ' . $this_day . $today_or_tomorrow;
+		if ($overview_widget eq 'listbox') {
+		    $lb->insert('end', $text);
+		} else {
+		    $lb->add($lb_i, -text => $text);
+		    $lb_i++;
+		}
+		push @lb_contents, undef;
+		$last_day = $this_day;
+	    }
+	    my $text;
+	    if ($text_segments) {
+		if ($overview_widget eq 'listbox') {
+		    no warnings 'uninitialized';
+		    $lb->insert('end', sprintf $fmt, @$text_segments);
+		} else {
+		    $lb->add       ($lb_i,    -text => $text_segments->[0]); # text
+		    $lb->itemCreate($lb_i, 1, -text => $text_segments->[3]); # orgdate
+		    $lb->itemCreate($lb_i, 2, -text => $text_segments->[1]); # tags
+		}
+	    } else {
+		if ($overview_widget eq 'listbox') {
+		    $lb->insert("end", $date->formatted_text);
+		} else {
+		    $lb->add($lb_i, -text => $date->formatted_text);
+		}
+	    }
+	    push @lb_contents, $date;
+	}
+    }
+}
+
+{
+    my %hl_is;
+    sub colorize_entries {
+	for my $i (0 .. $#lb_contents) {
+	    my($fg, $bg) = ('black', 'grey80');
+	    if ($lb_contents[$i]) {
+		my $duration = $lb_contents[$i]->{epoch} - time;
+		if ($duration < 3600) {
+		    ($fg, $bg) = ('white', 'red');
+		} elsif ($duration < 86400) {
+		    ($fg, $bg) = ('black', 'orange');
+		} elsif ($duration < 86400*7) {
+		    ($fg, $bg) = ('black', 'yellow');
+		} else {
+		    ($fg, $bg) = ('black', 'green');
+		}
+	    }
+	    if ($overview_widget eq 'listbox') {
+		$lb->itemconfigure($i, -foreground => $fg, -background => $bg, -selectforeground => $fg, -selectbackground => $bg);
+	    } else {
+		my $style = $hl_is{$fg}->{$bg};
+		if (!$style) {
+		    $style = $hl_is{$fg}->{$bg} = $lb->ItemStyle('text', -foreground => $fg, -background => $bg, -selectforeground => $fg, -selectbackground => $bg);
+		}
+		$lb->entryconfigure($i, -style => $style);
+		eval {
+		    $lb->itemConfigure($i, 1, -style => $style);
+		    $lb->itemConfigure($i, 2, -style => $style);
+		};
+	    }
+	}
+    }
+}
+
+sub check_for_alarms {
+    my %active;
+    my @dates = map { @{ $_->{dates} } } values %org_files;
+    my $date_i = -1;
+    for my $date (@dates) {
+	$date_i++;
+	my $date_id = $date->id;
+	$active{$date_id} = 1;
+	my $date_state = $date->state;
+	if ($date_state =~ m{^(early|due)$}) {
+	    my $is_early_warning = $date_state eq 'early';
+	    my $t = $window_for_date{$date_id};
+	    if ($t && Tk::Exists($t)) {
+		next if $t->{DateState} eq $date_state; # nothing changed
+	    }
+	    if ($date_state eq 'early') {
+		if ($seen_early_warning{$date_id}) {
+		    next; # user already saw the early warning and clicked it away, don't redisplay
+		} else {
+		    $seen_early_warning{$date_id} = 1;
+		}
+	    } elsif ($date_state eq 'due') {
+		if ($seen_due_date{$date_id}) {
+		    next;
+		} else {
+		    $seen_due_date{$date_id} = 1;
+		}
+	    }
+
+	    my %colargs    = (
+			      -background => ($is_early_warning ? 'orange' : 'red'),
+			      -foreground => ($is_early_warning ? 'black'  : 'white'),
+			     );
+	    my %smlbtnargs = (-font => $small_font);
+	    my %t_args = (
+			  -title => ($is_early_warning ? "Early Warning" : "Alarm!"),
+			  %colargs,
+			 );
+
+	    if ($t && Tk::Exists($t)) {
+		# something changed: early -> due
+		$t->configure(%t_args);
+		$_->destroy for $t->children;
+		$t->{OverflowCounter}->cancel;
+		$t->deiconify;
+		$t->raise;
+		$t->{DateState} = $date_state;
+	    } else {
+		$t = $mw->Toplevel(%t_args);
+		$t->bind($_ => sub { $t->destroy })
+		    for ('<Escape>', '<Control-q>');
+		$t->{DateId} = $date_id;
+		$t->{DateState} = $date_state;
+	    }
+	    $t->Label(-text => (($is_early_warning ? "Early warning:\n" : "")
+				. $date->formatted_text),
+		      -justify => 'left',
+		      -anchor => 'nw',
+		      -font => 'sans 24',
+		      %colargs,
+		     )->pack(qw(-fill x -expand 1));
+	    my $overflow = ($is_early_warning ? "" : "+00:00");
+	    $t->Label(-textvariable => \$overflow,
+		      -justify => 'right',
+		      -anchor => 'e',
+		      %colargs, %smlbtnargs,
+		     )->pack(qw(-side right));
+	    my @button_opts = (
+			       -anchor => 'w',
+			       -borderwidth => 1,
+			       -highlightthickness => 0,
+			       -padx => 1, -pady => 1,
+			       %colargs, %smlbtnargs,
+			      );
+	    my $edit_b = $t->Button(
+				    -text => 'Edit',
+				    -command => sub { show_date_in_emacs($date) },
+				    @button_opts,
+				   )->pack(qw(-side left));
+	    my $mv_b;
+	    if ($with_move_button) {
+		my($right, $left) = ("\x{2192}", "\x{2190}");
+		$mv_b = $t->Button(
+				   -text => $right,
+				   -command => sub {
+				       if ($mv_b->cget(-text) eq $left) {
+					   $t->MoveToplevelWindow(10, $t->y);
+					   $mv_b->configure(-text => $right);
+				       } else {
+					   $t->MoveToplevelWindow($t->screenwidth-60, $t->y);
+					   $mv_b->configure(-text => $left);
+				       }
+				   },
+				   @button_opts,
+				  )->pack(qw(-side left));
+	    }
+	    $t->bind('<Control-e>' => sub { $edit_b->invoke });
+	    if ($mv_b) {
+		$t->bind('<Control-m>' => sub { $mv_b->invoke });
+	    }
+	    if ($is_early_warning) {
+		$t->{OverflowCounter} =
+		    $t->repeat(1000, sub {
+				   my $diff = $date->{epoch} - time;
+				   if ($diff <= 0) { # may happen if the original date was deleted
+				       $t->{OverflowCounter}->cancel;
+				       $overflow = "";
+				   } else {
+				       $overflow = sprintf "-%02d:%02d", int($diff/60), $diff%60;
+				   }
+			       });
+	    } else {
+		$t->{OverflowCounter} =
+		    $t->repeat(1000, sub {
+				   my $diff = time - $date->{epoch};
+				   $overflow = sprintf "+%02d:%02d", int($diff/60), $diff%60;
+			       });
+	    }
+
+	    $Tk::platform = $Tk::platform; # peacify -w
+	    if ($Tk::platform eq 'unix') {
+		my($wrapper) = $t->wrapper;
+		# set sticky flag for gnome and fvwm2
+		eval q{
+		    $t->property('set','_WIN_STATE','CARDINAL',32,[1],$wrapper); # sticky
+		    $t->property('set','_WIN_LAYER','CARDINAL',32,[6],$wrapper); # ontop
+		};
+		warn $@ if $@;
+	    }
+
+	    eval { $t->attributes(-topmost => 1) };
+	    warn $@ if $@;
+
+	    $window_for_date{$date_id} = $t;
+	}
+    }
+
+    # Cleanup outdated windows (not existing or very old dates)
+    {
+	my @destroy_w;
+	$mw->Walk(sub {
+		      my $w = shift;
+		      if ($w->isa('Tk::Toplevel')) {
+			  my $date_id = $w->{DateId};
+			  if ($date_id && !$active{$date_id}) {
+			      push @destroy_w, $w;
+			  }
+		      }
+		  });
+	$_->destroy for @destroy_w;
+    }
+
+    # cleanup data structures
+    for my $ref (\%window_for_date, \%seen_early_warning, \%seen_due_date) {
+	while(my($k) = each %$ref) {
+	    if (!$active{$k}) {
+		delete $ref->{$k};
+	    }
+	}
+    }
+}
+
+sub check_for_updates {
+    my $changes = 0;
+    for my $org_file (keys %org_files) {
+	my $org_data = $org_files{$org_file};
+	my($modtime) = (stat($org_file))[9];
+	if (!defined $modtime) {
+	    # non-existing file
+	    $org_data->{modified} = $modtime;
+	    $org_data->{dates} = [];
+	    open_warning($org_file);
+	    $changes++;
+	    next;
+	}
+	delete $open_warning{$org_file};
+	if (!$org_data->{modified} || $org_data->{modified} < $modtime) {
+	    my @new_org_data_dates = find_dates_in_org_file($org_file, include_timeless => $include_timeless, time_fallback => $time_fallback);
+	    my %old_org_data_dates; # id -> date
+	    if ($org_data->{dates}) {
+		for my $date (@{ $org_data->{dates} }) {
+		    my $date_id = $date->id;
+		    $old_org_data_dates{$date_id} = $date;
+		}
+	    }
+	    $org_data->{dates} = [];
+	    for my $date (@new_org_data_dates) {
+		my $date_id = $date->id;
+		if (exists $old_org_data_dates{$date_id}) {
+		    my $old_date = $old_org_data_dates{$date_id};
+		    $old_date->copy($date);
+		    push @{ $org_data->{dates} }, $old_date; # re-use old date object with new values
+		} else {
+		    push @{ $org_data->{dates} }, $date;
+		}
+	    }
+	    $org_data->{modified} = $modtime;
+	    $changes++;
+	}
+    }
+    $changes;
+}
+
+sub find_dates_in_org_file {
+    my($file, %opts) = @_;
+    my $include_timeless = delete $opts{include_timeless};
+    my $time_fallback = delete $opts{time_fallback} || '00:00';
+    die "Unhandled options: " . join(" ", %opts) if %opts;
+
+    my @dates;
+
+    # This is org-stamp-time-of-day-regexp constant from org.el,
+    # version 4.67d
+
+    # In newer org.el this seems to have an different format;
+    # see org-time-stamp-formats
+
+    # Additionaly the weekday is optional, some org-mode versions seem
+    # to deal without the weekday.
+
+    # '-count unit' is a private extension. It seems that org-mode
+    # is ignoring everything after the recognized date/time.
+
+    # The original org-stamp-time-of-day-regexp has the 2nd date
+    # matched with a backreference (\1). This is wrong for dates
+    # spanning over midnight, e.g.
+    #
+    #    <2010-12-03 Pet 20:00>--<2010-12-04 Sub 00:00>
+
+    # Times may be H:MM or HH:MM
+
+    my $date_qr           = qr{[0-9]{4}-[0-9]{2}-[0-9]{2}};
+    my $wkday_qr          = qr{\w+};
+    my $date_and_wkday_qr = qr{$date_qr(?:[ ]+$wkday_qr)?};
+    my $time_qr           = qr{[012]?[0-9]:[0-5][0-9]};
+    my $maybe_time_qr     = $include_timeless ? qr{(?:[ ]+($time_qr))?} : qr{[ ]+($time_qr)};
+    my $headwarn_qr       = qr{-[0-9]+(?:s|min|h|d|w|m|y)};
+    my $repeater_qr       = qr{(?:\.|\+)?\+[0-9]+(?:s|min|h|d|w|m|y)};
+    my $org_stamp_time_of_day_regexp =
+	qr{
+	      <
+	      ($date_and_wkday_qr)
+	      $maybe_time_qr # capture group within qr
+	      (?:[ ]+$repeater_qr)?
+	      (?:[ ]+($headwarn_qr))?
+	      >
+	      (?:--?
+		  <($date_and_wkday_qr)$maybe_time_qr>
+	      )?
+      }x;
+
+    my $fh;
+ TRY_OPEN: {
+	my $tries = $open_warning{$file} ? 1 : 10;
+	for (1..$tries) {
+	    open $fh, $file
+		and last TRY_OPEN;
+	    # maybe emacs is now in this moment writing to the file?
+	    if ($tries > 1) {
+		warn "NOTE: file '$file' probably vanished or is saved in this moment. Will retry again.\n";
+		select undef, undef, undef, 0.1; # wait and retry
+	    }
+	}
+	# nope, file probably permanently vanished
+	open_warning($file);
+	return;
+    }
+    delete $open_warning{$file};
+
+    my $buf = "";
+ TRY_READ: {
+	for (1..10) {
+	    local $/ = undef;
+	    $buf .= <$fh>;
+	    select(undef,undef,undef,0.1);
+	    seek $fh, 0, 1 or die $!;
+	    last TRY_READ if eof($fh);
+	    warn "NOTE: resuming reading file '$file' after " . length($buf) . " bytes...\n";
+	}
+    }
+
+    my $linenumber = 0;
+    my $last_item;
+    my $last_seek;
+    open $fh, "<", \$buf
+	or die "Cannot open scalar, should not happen!";
+    binmode $fh, ':encoding(utf-8)'; # a modern default
+    while(defined(my $textline = <$fh>)) {
+	$linenumber++;
+	chomp $textline;
+	if ($textline =~ m{-\*-.*\bcoding:\s*([^; ]+).*-\*-}) {
+	    my $encoding = $1;
+	    binmode $fh, ':encoding(' . $encoding . ')';
+	}
+
+	if ($textline =~ m{^\*}) { # remember the last item
+	    $last_item = $textline;
+	    $last_seek = tell($fh) - bytes::length($textline) - bytes::length($/);
+	}
+
+	while ($textline =~ m{$org_stamp_time_of_day_regexp}g) {
+	    my($date, $time, $early_warning, $date_end, $time_end) = ($1, $2, $3, $4, $5);
+	    my $use_time = defined $time ? $time : $time_fallback;
+	    my($Y,$M,$D) = $date =~ m{^(\d{4})-(\d{2})-(\d{2})};
+	    my($h,$m) = $use_time =~ m{^(\d{1,2}):(\d{2})};
+	    my $epoch = timelocal(0,$m,$h,$D,$M-1,$Y);
+	    if ($epoch >= time - 2*86400) { # we also collect also dates, just in case they are still displayed; also the early warning time is not considered here
+		my $text;
+		if (defined $last_item) {
+		    if ($last_item ne $textline) {
+			$text = "$last_item $textline";
+		    } else {
+			$text = $last_item;
+		    }
+		} else {
+		    $text = $textline;
+		}
+		if ($text =~ m{^\*+\s+(?:DONE|WONTFIX)\b}) {
+		    next; # ignore DONE and WONTFIX items
+		}
+		my %date_params = (epoch => $epoch,
+				   date  => $date,
+				   time  => $time,
+				   early_warning => $early_warning,
+				   date_end => $date_end,
+				   time_end => $time_end,
+				   text  => $text,
+				   file  => $file,
+				   line  => $linenumber,
+				   seek  => $last_seek,
+				  );
+
+		my $early_warning_secs;
+		if ($early_warning) {
+		    $early_warning_secs = _get_head_warning_secs($early_warning);
+		}
+		if (!defined $early_warning_secs) {
+		    $early_warning_secs = !length $time ? $default_timeless_early_warning : $default_early_warning;
+		}
+		if ($early_warning_secs > 0) {
+		    $date_params{early_warning_epoch} = $epoch - $early_warning_secs;
+		}
+
+		my $date = Emacs::Org::Daemon::Date->new(%date_params);
+		my $date_state = $date->state;
+		if (
+		    ($date_state eq 'due' && $window_for_date{$date->id} && Tk::Exists($window_for_date{$date->id}))
+		    ||
+		    $date_state =~ m{^(wait|early)}
+		   ) {
+		    push @dates, $date;
+		}
+	    }
+	}
+    }
+
+    @dates;
+}
+
+sub _get_head_warning_secs {
+    my($s) = @_;
+    if (my($count, $unit) = $s =~ m{-([0-9]+)(s|min|h|d|w|m|y)}) {
+	$count * {s   => 1,
+		  min => 60,
+		  h   => 60*60,
+		  d   => 60*60*24,
+		  w   => 60*60*24*7,
+		  # as suggested in org-get-wdays in org.el
+		  m   => 60*60*24*30.4,
+		  y   => 60*60*24*365.25,
+		 }->{$unit};
+    } else {
+	warn "Cannot parse '$s'";
+	undef;
+    }
+}
+
+sub open_warning {
+    my $file = shift;
+    $open_warning{$file} ||= 0;
+    if ($open_warning{$file} > 3) {
+    } elsif ($open_warning{$file} == 3) {
+	warn "Can't open $file: $!. Won't warn anymore!\n";
+    } else {
+	warn "Can't open $file: $!";
+    }
+    $open_warning{$file}++;
+}
+
+return 1 if caller;
+
+GetOptions(
+	   "d|debug!" => \$debug,
+	   "recheck-interval=i" => \$recheck_interval,
+	   "early-warning=i" => \$default_early_warning,
+	   "early-warning-timeless=i" => \$default_timeless_early_warning,
+	   "include-timeless!" => \$include_timeless,
+	   'time-fallback=s' => \$time_fallback,
+	   "small-font=s" => \$small_font,
+	   'emacsclient-eval!' => \$use_emacsclient_eval,
+	   'emacsclient-cmd=s' => \$emacsclient_fmt_cmd,
+	   'overview-widget=s' => \$overview_widget,
+	   'v|version' => \$show_version,
+	   'move-button!' => \$with_move_button,
+	  )
+    or die <<EOF;
+$0 [--debug] [--early-warning=seconds] [--early-warning-timeless=seconds] [--recheck-interval=seconds]
+\t[--no-emacsclient-eval] [--emacsclient-cmd=...]
+\t[--overview-widget=...] [--move-button]
+\t[--[no-]include-timeless] [--time-fallback HH:MM]
+\torgfile ...
+$0 --version
+EOF
+
+if ($overview_widget !~ m{^(listbox|hlist)$}i) {
+    die "Valid values for --overview-widget are 'listbox' or 'hlist'.\n";
+}
+
+if ($show_version) {
+    print "org-daemon $VERSION\n";
+    exit 0;
+}
+
+if (!$recheck_interval) {
+    if ($debug) {
+	$recheck_interval = 3;
+    } else {
+	$recheck_interval = 60;
+    }
+}
+if ($recheck_interval < 1) {
+    die "Invalid --recheck-interval, must be 1 second or larger.\n";
+}
+
+{
+    my @org_files = @ARGV;
+    if (!@org_files) {
+	die "No org files given, exiting...\n";
+    }
+    %org_files = map { ($_, {}) } @org_files;
+}
+
+$mw = tkinit;
+if (!$debug) {
+    if ($^O eq 'darwin') { # XXX actually should check for Xquartz or so
+	$mw->after(1000, sub { $mw->iconify }); # XXX hack --- the window gets invisible and unselectable if immediately iconified. See https://rt.cpan.org/Ticket/Display.html?id=114203
+    } else {
+	$mw->iconify;
+    }
+}
+
+# Taken from http://orgmode.org/org-mode-unicorn-logo.png, scaled down
+# to 32x32 and encoded using "mmencode -b"
+my $org_logo = $mw->Photo
+    (-format => 'png',
+     -data => <<EOF);
+iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAA
+CXBIWXMAAA9hAAAPYQGoP6dpAAAAB3RJTUUH3wUGBTUoU3h8UQAAAB1pVFh0Q29tbWVudAAA
+AAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAFK0lEQVRYw92XW2xURRjHfzPn7G5Lu9sutBRa
+CmWpBYqRm1wSExEVSkTDxYSEaAwJIUII8GAgpvhkQiERMTFR8AVIfEQIDyghEWsikEIUY+VS
+uZRLK70Xena7dPecmfGhy1KktHLVOMl5OXPmfP/v8v/+3whjjOFfXPJZGuvP12cGQCmFEOLZ
+AzDGoLXGsiwaGhpwHOfZA2hra2P//v3Ytk0oFLpn3x7o4J2QJWJRok03UJ5LIDtETvFo7gSz
+o6uLYaEQpL7te66+vp6amhri8TgrV65ECHHPPoDolwXGgBBoz+PU7l1cqzmG09yEcpP4Q7nk
+FxYxbcFC2krK2P39UT7fsJ5YMklnZyejR4wAoKqqCsdxWLx4MbNnz04X4N/rQDyIhrG2Vg5t
+XEfL+TMgQAiJEQJLKS6Hh9NQOAYnmIPp7mZjtuTosFHMeX0+/u4YlZWVrFq1ihUrVuDz+QZM
+0X0AjNYk43G+Wf0ebRfqsP3+3rBhSFg+qktf4FZmVjp3GkNWLErAZ9PS3kng5k1279lDJBLB
+8zxs2/7nfUB7HkJKftxRRfOZWnwZmenQSW34ufi5XuNao43BAFppJrw4gz+lHy93KFt37iQS
+ieC67qDG7wVgDNK2aa07x9mD+8gMh9HK6w0Thrg/QDSQiQC0EIhUwRUXFPDZunWsX7qYwqIi
+1n6ynU7HQUrr4TqhMRqA41/uwDckC+26d7EhsLTG1gqTfgdSSKLxbgDemD4drlzCAg4dP4Fl
+SVzPGxRAOkZCWiSiDm1/1CGlRCuV8h4SlkUw0UPu7W7as+7yWBuN0x1n7rr1zJg4gdziMXRF
+o3x9+DCRokJmlpc/nBa01J1Fucl03rUQ2Mrj+NhJAIxvbcTWCtGHUlJKpBAc+62Wi11daCCp
+FGu3f8qqrduoPn2aKzea+PXChX614J4q6em6lfactP+CaCCDn8ZO4qWr55nWcIlTJePxG4j2
+9OB6Hj7bBgRZGQGklHhKEQ6FuNjYSOWur8gPh5lUUsLUsrKBAfiHZCGkxGidLj5PSsrabvDL
+qFJagmEKnQ4yXJfOpMv7ixZRXDCcq83NCODIyVM0dXQwJBBA94mSE4vx8pQpA9cAQH7ZRCzb
+h1GKhGUjMNjGMK6jmUt5I7ntC3A5byRKKSaXjmPZa68SDgbT59csWcKRmpN8ceAAN6NRno9E
+yMvNwWjDnKlTB2GB1mTl5ZM/fiJCKVpCQ6nLH4Vfe2S4SWZdv9AnKTCzvJxwMIjWGpV6XM+j
+YvYsDlRtYc3SJQzLyUEKwdY1q/H77EE6Yar/O0032PvWXJwRxVQXjaOoq4PS9iaGxR2u5+Zz
+cswEPGNYPm8ea99eOqCIpWcBrbGkHCQFQmC0JjSykAVbdnBw03pyC4q5nDeSxtw8pNbpJqSV
+orG1tX+P+hk6HmT8PhoKKTHGUFaxkDc3f0xxcwMimUQJiWfZJK1evNKy+L2+nouNDU9+Jryj
+2eXL3mHDpg+ZPKqQ20mXpNYIq7e9SiFo6uhg77eH0SldeNT1QDk2WiOkJBqLceLsOfZ+9x11
+164RDgbxlEJKya1olAPbtlJSUICQEvEkp2KRylswO5uKWTPZs7mSD5YvJ+G6WJaFSGnB8dpa
+ZJ/e8dTGctuyeLdiPvurtlBSUIDWGp/P5mJDY0oXzNMHoLRmeDjMno82s/SVOQggFo8/VhHa
+D/NxXzptWLYM27Jpam9/7LH5kZfW2uz7odoYY4yn1CP9Qzzu3fB2IkFmIPDkafi/vJz+JwH8
+BUIoz9dd4ccZAAAAAElFTkSuQmCC
+EOF
+$mw->Icon(-image => $org_logo); 
+
+if ($overview_widget eq 'listbox') {
+    $lb = $mw->Scrolled('Listbox',
+			-width => 100,
+			-height => 8,
+			-scrollbars => "osoe",
+			-font => 'Courier 9', # a fixed font
+		       )->pack(qw(-fill both -expand 1));
+    $lb->bind("<Double-1>" => sub {
+		  show_date_by_index_in_emacs(shift->xyIndex);
+	      });
+} else {
+    require Tk::HList;
+    require Tk::ItemStyle;
+    $lb = $mw->Scrolled('HList',
+			-width => 100,
+			-height => 10,
+			-scrollbars => 'osoe',
+			-selectbackground => '#4a6984',
+			-selectmode => 'browse',
+			-header => 0,
+			-columns => 3,
+			-command => sub {
+			    my $path = shift;
+			    show_date_by_index_in_emacs($path);
+			},
+		       )->pack(qw(-fill both -expand 1));
+    $lb->anchorClear;
+    $lb->columnWidth(0, 400);
+}
+$lb->Button(-padx => 0, -pady => 0, -borderwidth => 1,
+	    -font => $small_font,
+	    -text => 'Update',
+	    -command => \&tk_do_one_iteration,
+	   )->place(-relx => 1, -rely => 1, -anchor => 'se');
+
+tk_do_one_iteration();
+if ($recheck_interval == 60) {
+    # synchronize with full minute, only implemented for recheck_interval=60
+    my(@l) = localtime;
+    my $first_delay = $recheck_interval - $l[0];
+    if ($first_delay) {
+	$lb->after($first_delay*1000, sub {
+		       tk_do_one_iteration();
+		       normal_repeater();
+		   });
+    } else {
+	normal_repeater();
+    }
+} else {
+    normal_repeater();
+}
+
+$mw->protocol('WM_DELETE_WINDOW', sub {
+		  return if ($mw->messageBox
+			     (-icon => "question",
+			      -title => "Exit org-daemon",
+			      -message => "Really exit org-daemon?",
+			      -type => "YesNo",
+			      -default => 'No',
+			     ) =~ /no/i);
+		  $mw->destroy;
+	      });
+
+# emacsclient does not start if a directory is missing,
+# so make sure we change into a non-removable directory.
+chdir '/';
+
+#$mw->WidgetDump;
+MainLoop;
+
+__END__
+
+=head1 NAME
+
+org-daemon - watch for appointments in org-mode files
+
+=head1 SYNOPSIS
+
+    org-daemon [--debug] [--early-warning=seconds] [--recheck-interval=seconds] \
+               [--no-emacsclient-eval] [--emacsclient-cmd=...] \
+               [--overview-widget=...] [--move-button] \
+               orgfile ... &
+
+=head1 DESCRIPTION
+
+B<org-daemon> is a Perl/Tk program which watches one or more emacs
+org-mode files for appointments, that is, entries in the form of C<<
+<YYYY-MM-DD AAA HH:MM> >> and fires alarms.
+
+=head1 OPTIONS
+
+=over
+
+=item --early-warning=I<seconds>
+
+There's an warning before the real alarm 30 minutes (1800 seconds)
+before. This option can be used to change this period. Use 0 to turn
+early warnings off completely.
+
+=item --recheck-interval=I<seconds>
+
+Set the interval for checking the specified org-mode files for
+changes. By default, B<org-daemon> checks every 60 seconds.
+
+=item --debug
+
+Turn on debugging mode. Currently this means: do not iconify
+appointment list by default, and check every 3 seconds instead every
+60 seconds.
+
+=item --no-emacsclient-eval
+
+If there are problems with the usage of C<emacsclient --eval>, then
+this option may be used for simple non-eval emacsclient usage. If this
+is used, then a referenced org entry is not opened automatically.
+
+=item --emacsclient-cmd=I<cmdline ... %l %f ...>
+
+Provide an alternative commandline for emacsclient calls. The
+placeholder strings C<%l> and C<%f> are replaced by line and file.
+Example:
+
+    org-daemon --emacsclient-cmd="ssh otheruser@otherhost emacsclient +%l '%f'" ...
+
+=item --overview-widget=I<widgettype>
+
+Select widget for overview window. Default is C<hlist>, another
+possible value is C<listbox>.
+
+=item --move-button
+
+The early warning and alarm windows will get an additional "move"
+button (displayed with a right arrow: E<x2192>) for moving the window
+quickly to the right screen border.
+
+=back
+
+=head2 FEATURES
+
+=over
+
+=item * Watch all given files periodically every minute (or the
+interval as given with the C<--recheck-interval> switch).
+
+=item * Iconified list of next appointments, with entries in different
+colors (red for appointments in near future, over orange and yellow to
+green for appointments in far future)
+
+=item * By double-clicking on an entry in the appointment list, or
+clicking on the Edit button in the alarm window, the corresponding
+entry will be shown in emacs itself (needs B<emacsclient> and emacs
+has to be put into C<server-start> mode)
+
+=item * Show an early warning 30 minutes before (or the period
+specified with C<--early-warning>. Individual early warnings may be
+specified with the following extended org syntax: C<< <YYYY-MM-DD AAA
+HH:MM -CountUnit> >>, where Unit may be one of s (seconds), min
+(minutes), h (hours), w (weeks), m (months), and y (years). Example:
+
+     <2009-12-25 Fr 12:00 -10min>
+
+=back
+
+=head1 TODO
+
+ * it would be nice if it was possible to specify individual pre-alarm
+   times in org-mode and use them in org-daemon
+
+ * what about locations attached to lon/lat, and automatic routing and
+   automatic pre-alarm calculation?
+
+ * it may happen that the update check happens just in the moment when
+   emacs is about to save the file, leaving a half-written file. this
+   may be workarounded by reading the file contents twice and compare
+   if the contents are the same
+
+ * more gui elements:
+   * close button for alarm toplevel
+   * reload button for data list window
+   * iconify button for data list window
+   * add another file into watcher list
+   * remove a file from the watcher list
+   * show the current watcher list
+   * maybe some debugging helpers (time of the update, parsed contents...)
+
+ * do things asynchronously (like reading files etc.)?
+
+=head1 PREREQUISITES
+
+Tk
+
+=head1 AUTHOR
+
+Slaven Rezic
+
+=cut

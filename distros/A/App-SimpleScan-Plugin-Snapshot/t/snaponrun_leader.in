@@ -1,0 +1,5 @@
+%%snap_dir t
+%%snapshot on
+%%snap_prefix http://somewhere.com
+http://cpan.org/ /Python/ Y branding
+http://perl.org/ /Perl/ Y branding

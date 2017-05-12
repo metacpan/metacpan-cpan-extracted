@@ -1,0 +1,38 @@
+---
+abstract: 'Prepare a diff between two given directories'
+author:
+  - 'Alex Efros <powerman@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Devel::AssertOS: '0'
+  Devel::CheckOS: '1.63'
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-powerdiff
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  App::powerdiff:
+    file: lib/App/powerdiff.pm
+    version: v1.0.0
+requires:
+  File::Temp: '0'
+  Getopt::Long: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/powerman/powerdiff/issues
+  homepage: https://github.com/powerman/powerdiff
+  repository: https://github.com/powerman/powerdiff.git
+version: v1.0.0

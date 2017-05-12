@@ -1,0 +1,3258 @@
+#!/usr/bin/perl -w
+my $RCS_Id = '$Id: album.pl,v 1.86 2007/04/02 09:07:50 jv Exp $ ';
+
+# Author          : Johan Vromans
+# Created On      : Tue Sep 15 15:59:04 2002
+# Last Modified By: Johan Vromans
+# Last Modified On: Mon Apr  2 11:07:05 2007
+# Update Count    : 2830
+# Status          : Unknown, Use with caution!
+
+################ Common stuff ################
+
+$VERSION = "1.06";
+
+use strict;
+
+# Package or program libraries, if appropriate.
+# $LIBDIR = $ENV{'LIBDIR'} || '/usr/local/lib/sample';
+# use lib qw($LIBDIR);
+# require 'common.pl';
+
+# Package name.
+my $my_package = 'Sciurix';
+# Program name and version.
+my ($my_name, $my_version) = $RCS_Id =~ /: (.+).pl,v ([\d.]+)/;
+# Tack '*' if it is not checked in into RCS.
+$my_version .= '*' if length('$Locker:  $ ') > 12;
+
+my $creator = "Created with <a href=\"http://search.cpan.org/~jv/Album/\">Album</a> $::VERSION";
+
+################ Command line parameters ################
+
+use Getopt::Long 2.13;
+
+# Command line options.
+my $import_exif = 0;
+my $import_dir;
+my $update = 0;			# add new from large/import
+my $dest_dir = ".";
+my $info_file;
+my $linkthem = 1;		# link orig to large, if possible
+my $clobber = 0;
+my $mediumonly = 0;		# only medium size (for web export)
+my $externalize_formats = 0;	# create external format files
+my $verbose = 1;		# verbose processing
+
+# These are left undefined, for set_defaults. Note: our, not my.
+our $index_columns;
+our $index_rows;
+our $thumb;
+our $medium;			# medium size, between large and small
+our $album_title;
+our $caption;
+our $datefmt;
+our $icon;
+our $locale;
+our $lib_common;
+
+# These are not command line options.
+my $journal;			# create journal
+
+# Development options (not shown with -help).
+my $debug = 0;			# debugging
+my $trace = 0;			# trace (show process)
+my $test = 0;			# test mode.
+
+# Process command line options.
+app_options();
+
+# Post-processing.
+$trace |= ($debug || $test);
+$dest_dir =~ s;^\./;;;
+$import_dir =~ s;^\./;; if $import_dir;
+
+################ Presets ################
+
+use constant DEFAULTS => { info       => "info.dat",
+			   title      => "Photo Album",
+			   medium     => 0,
+			   mediumsize => 915,
+			   thumbsize  => 200,
+			   indexrows  => 3,
+			   indexcols  => 4,
+			   caption    => "fct",
+			   captionmin => "f",
+			   dateformat => '%F',
+			   icon	      => 0,
+			 };
+
+my $TMPDIR = $ENV{TMPDIR} || $ENV{TEMP} || '/usr/tmp';
+
+my $picpat = qr{(?i:jpe?g|png|gif)};
+my $movpat = qr{(?i:mpe?g|mov|avi)};
+my $xtrpat = qw{(?i:html?)};
+my $suffixpat = qr{\.$picpat|$movpat};
+my $xsuffixpat = qr{\.$picpat|$movpat|$xtrpat};
+
+my %capfun = ('c' => \&c_caption,
+	      'f' => \&f_caption,
+	      's' => \&s_caption,
+	      't' => \&t_caption,
+	     );
+
+my $br = br();
+
+# Max.number of clickable index numbers (should be odd).
+use constant IXLIST => 15;
+
+# Helper programs
+my $prog_jpegtran  = findexec("jpegtran");
+my $prog_mplayer   = findexec("mplayer");
+my $prog_mencoder  = findexec("mencoder");
+
+################ The Process ################
+
+use File::Spec;
+use File::Path;
+use File::Basename;
+use Time::Local;
+use Image::Info;
+use Image::Magick;
+use Data::Dumper;
+use POSIX qw(locale_h strftime);
+use locale;
+
+# The files already there, if any.
+my $gotlist = new FileList;
+# The files in the import dir, if any.
+my $implist = new FileList;
+
+# The list of files, in the order to be processed.
+# This list is initialy filled from info.dat, and (optionally) updated
+# from the other lists.
+my $filelist = new FileList;
+
+# This is the list of all entries to be journalled (all images, plus
+# possible interspersed loose annotations).
+my @journal;
+
+# Load cached info, if possible.
+load_cache();
+
+# Load image names and info from the info file, if any.
+# This produces the initial file list.
+load_info();
+#print STDERR Data::Dumper->Dump([$filelist],[qw(filelist)]);
+
+# Load image names and info for files we already got.
+load_files()  if -d d_large();
+#print STDERR Data::Dumper->Dump([$gotlist],[qw(gotlist)]);
+
+# Load image names and info for files we can import.
+load_import() if $import_dir && -d $import_dir;
+#print STDERR Data::Dumper->Dump([$implist],[qw(implist)]);
+
+# Apply defaults to unset parameters.
+set_defaults();
+
+# warn("date => ", strftime($datefmt, localtime(time)), "\n");
+
+# Verify and update the file list.
+my $added = update_filelist();
+#print STDERR Data::Dumper->Dump([$filelist],[qw(filelist)]);
+
+my $num_entries = $filelist->tally;
+print STDERR ("Number of entries = $num_entries",
+	      $added ? " ($added added)" : "",
+	      "\n") if $verbose > 1;
+die("Nothing to do?\n") unless $num_entries > 0;
+exit(0) if $test;
+
+# Clean up and create directories.
+if ( $clobber ) {
+    rmtree([d_thumbnails(), d_medium()], $verbose > 1);
+}
+mkpath([d_large(), d_thumbnails(), d_icons(), d_css()], $verbose > 1);
+mkpath([d_medium()], $verbose > 1) if $medium;
+
+# Copy the button images over to the target directory.
+add_button_images();
+
+# Create the default style sheets, if necessary.
+add_stylesheets();
+
+# Copy images in place, rotate if necessary, and create the thumbnails.
+prepare_images();
+
+# Update cache.
+update_cache();
+my $cache_update = 0;
+
+my $entries_per_page = $index_columns*$index_rows;
+my $num_indexes = int(($num_entries - 1) / $entries_per_page) + 1;
+
+my $fn = "img0000";
+# Cleanup excess files.
+for ( 0 ) {
+    my $excess = $fn++ . ".html";
+    unlink(d_medium($excess));
+    unlink(d_large($excess)) or last;
+}
+
+# Map file names to html pages. Start with 1 to match "image N of M".
+my @htmllist;
+for my $i ( 0 .. $num_entries-1 ) {
+    $htmllist[$i] = $fn++ . ".html";
+}
+
+# Cleanup excess files.
+for (my $i = $num_entries ; ; $i++ ) {
+    my $excess = $fn++ . ".html";
+    unlink(d_medium($excess));
+    unlink(d_large($excess)) or last;
+}
+
+# Init formats.
+init_formats();
+
+# Write the individual pages.
+write_image_pages();
+
+# Write the index pages.
+write_index_pages();
+
+# Write the journal.
+write_journal_pages();
+
+# Create index icon.
+create_index_icon();
+
+# Final update, if needed.
+update_cache() if $cache_update;
+
+exit 0;
+
+################ Subroutines ################
+
+# Image types.
+use constant T_JPG    => 1;
+use constant T_MPG    => 2;
+use constant T_VOICE  => 3;	# still image + sound
+# Pseudo types.
+use constant T_PSEUDO => 0;
+use constant T_TAG    => -1;
+use constant T_ANN    => -2;
+use constant T_REF    => -3;
+
+# List of possible subdirs to process.
+my @subdirs;
+
+# Journal tags
+my %jnltags;
+
+# Note: the HTML generators use the file names relatively.
+sub fjoin	 { File::Spec->catfile(@_); }
+sub d_dest       { unshift(@_, $dest_dir) unless $dest_dir eq ".";
+		   fjoin(@_); }
+sub d_large      { unshift(@_, "large");      goto &d_dest; }
+sub d_medium     { unshift(@_, "medium");     goto &d_dest; }
+sub d_thumbnails { unshift(@_, "thumbnails"); goto &d_dest; }
+sub d_journal    { unshift(@_, "journal");    goto &d_dest; }
+
+sub d_destc      { unshift(@_, $lib_common) if $lib_common ne ""; goto &d_dest; }
+sub d_icons      { unshift(@_, "icons");   goto &d_destc; }
+sub d_css        { unshift(@_, "css");     goto &d_destc; }
+sub d_fmt        { unshift(@_, "formats"); goto &d_destc;}
+
+my %optcfg;			# option set from config files
+
+sub setopt {
+    no strict qw(refs);
+    return if defined(${$_[0]});
+    print STDERR ("setopt $_[0] -> $_[1]\n") if $trace;
+    ${$_[0]} = $_[1];
+    $optcfg{$_[0]} = 1;
+}
+
+sub parse_line {
+    local ($_) = (@_);
+    my $err = 0;
+
+    if ( /^!?\s*(\S.*)/ ) {
+	$_ = $1;
+	if ( /^title\s+(.*)/ ) {
+	    setopt("album_title", $1);
+	}
+	elsif ( /^page\s+(\d+)x(\d+)/ ) {
+	    setopt("index_rows", $1);
+	    setopt("index_columns", $2);
+	}
+	elsif ( /^thumbsize\s*(\d+)/ ) {
+	    setopt("thumb", $1);
+	}
+	elsif ( /^mediumsize\s*(\d+)/ ) {
+	    setopt("medium", $1);
+	}
+	elsif ( /^medium\s*(-?\d+)?/ ) {
+	    setopt("medium", $1 || DEFAULTS->{mediumsize});
+	}
+	elsif ( /^dateformat\s*(.*)/ ) {
+	    setopt("datefmt", $1);
+	}
+	elsif ( /^caption\s*(.*)/ ) {
+	    setopt("caption", $1);
+	}
+	elsif ( /^icon\s*(.*)/ ) {
+	    setopt("icon", defined($1) && length($1) ? $1 : 1);
+	}
+	elsif ( /^locale\s*(.*)/ ) {
+	    setopt("locale", $1);
+	}
+	elsif ( /^depth\s+(\d+)/ ) {
+	    # lib_common is used in the HTML, don't use fjoin.
+	    setopt("lib_common", join("/", ("..") x $1));
+	}
+	else {
+	    warn("Unknown control: $_[0]\n");
+	    $err++;
+	}
+    }
+    else {
+	warn("Invalid control: $_[0]\n");
+	$err++;
+    }
+    $err;
+}
+
+sub set_defaults {
+    # Load settings from user files.
+    my $sl;
+    unless ( $sl = $ENV{ALBUMCONFIG} ) {
+	$sl = ".albumrc";
+	$sl .= ":".$ENV{HOME}."/.albumrc" if $ENV{HOME};
+    }
+    foreach my $cf ( split(/:/, $sl) ) {
+	unless ( -f $cf ) {
+	    warn("$cf: $!\n") if $ENV{ALBUMCONFIG};
+	    next;
+	}
+	open(my $fh, "<$cf") || next;
+	warn("parsing: $cf\n") if $trace;
+	my $err = 0;
+	while ( <$fh> ) {
+	    next if /^\s*#/;
+	    next unless /\S/;
+	    $err += parse_line($_);
+	}
+	close($fh);
+	die("Errors in config file $cf, aborted\n") if $err;
+    }
+
+    # Finally, apply defaults if necessary.
+    warn("apply defaults\n") if $trace;
+    setopt("album_title",   DEFAULTS->{title});
+    setopt("index_rows",    DEFAULTS->{indexrows});
+    setopt("index_columns", DEFAULTS->{indexcols});
+    setopt("thumb",         DEFAULTS->{thumbsize});
+    setopt("datefmt",       DEFAULTS->{dateformat});
+    setopt("icon",          DEFAULTS->{icon});
+
+    $medium = DEFAULTS->{mediumsize} if defined($medium) && !$medium || $mediumonly;
+    $medium = 0 if defined($medium) && $medium < 0;
+
+    # Caption values.
+    setopt("caption", DEFAULTS->{( -s $info_file || $import_dir) ?
+				 "caption" : "captionmin" });
+    die("Invalid value for caption: $caption\n")
+      unless $caption =~ /^[fsct]*$/i;
+    $caption = lc($caption);
+
+    if ( $locale ) {
+	setlocale(LC_TIME, $locale);
+	setlocale(LC_COLLATE, $locale);
+    }
+
+    if ( defined($lib_common) ) {
+	$lib_common =~ s;/+$;;;
+    }
+    $lib_common ||= "";
+}
+
+sub load_info {
+    my %typemap = ( 'p' => T_JPG, 'm' => T_MPG, 'v' => T_VOICE );
+
+    # If an info has been supplied, it'd better exist.
+    if ( $info_file ) {
+	die("$info_file: $!\n") unless -s $info_file;
+    }
+    else {
+	# Try default.
+	$info_file = d_dest(DEFAULTS->{info});
+	unless ( -s $info_file ) {
+	    my $add_new; $add_new++ if $import_dir;
+	    my $add_src; $add_src++ if -d d_large();
+	    print STDERR ("No ", DEFAULTS->{info});
+	    print STDERR (", adding images from ") if $add_src || $add_new;
+	    print STDERR (d_large())               if $add_src;
+	    print STDERR (" and ")                 if $add_src && $add_new;
+	    print STDERR ($import_dir)             if $add_new;
+	    print STDERR ("\n");
+	    return;
+	}
+    }
+
+    my $err = 0;
+    my $file;
+    my $tag;
+
+    my $fh = do { local *FH; *FH };
+    die("$info_file: $!\n")
+      unless open($fh, $info_file);
+    warn("parsing: $info_file\n") if $trace;
+
+    my $el;
+    my %dirs;
+
+    while ( <$fh> ) {
+	chomp;
+
+	next if /^\s*#/;
+	next unless /\S/;
+
+	if ( /^\s+/ && $el ) {
+	    $el->description($el->description . "\n" . $_);
+	    next;
+	}
+
+	if ( /^!\s*(\S.*)/ ) {
+	    $_ = $1;
+	    if ( /^tag\s*(.*)/ ) {
+		$tag = $1;
+		$tag =~ s/\s$//;
+		$tag =~ s/\s+/ /g;
+	    }
+	    elsif ( /^subdirs\s*(.*)/ ) {
+		foreach ( split(' ', $1)) {
+		    $dirs{$_}++;
+		}
+	    }
+	    elsif ( /^journal\s*(.*)/ ) {
+		if ( $filelist->tally ) {
+		    warn("\"!journal\" must precede image info\n");
+		    $err++;
+		}
+		load_info_journal($err, $fh);
+		return;
+	    }
+	    else {
+		$err += parse_line("!".$_);
+	    }
+	    next;
+	}
+
+	($file, $a) = $_ =~ /^(.+?$xsuffixpat)\s*(.*)/;
+
+	my $rotate;
+	my $type = T_JPG;
+	my $assc;
+	while ( $a && $a =~ /^-(\w):(\S+)\s*(.*)/ ) {
+	    if ( lc($1) eq 'o' ) {
+		$rotate = 90 * ($2 % 4);
+	    }
+	    elsif ( lc($1) eq 'i' ) {
+		$assc = fjoin(basename($file), $2);
+		unless ( -s $assc && -r _ ) {
+		    warn("$file (info): $assc [$!]\n");
+		    undef $assc;
+		}
+	    }
+	    elsif ( lc($1) eq 't' ) {
+		$type = $typemap{lc($2)}
+		  or warn("$file (info): Illegal type: $2\n"), $err++;
+	    }
+	    $a = $3;
+	}
+	$el = new ImageInfo($file);
+	$el->type($type);
+	$el->description($a) if $a;
+	$el->tag($tag) if $tag;
+	$el->_rotation($rotate) if defined($rotate);
+	if ( $file =~ /^(.+)\.$movpat$/i ) {
+	    $el->type(T_MPG);
+	    $el->assoc_name($1."s.jpg"); # associates still image
+	}
+	elsif ( $type == T_VOICE ) {
+	    (my $t = $file) =~ s/\.jpg$/.mp3/i;
+	    $el->assoc_name($t);
+	}
+	elsif ( $file =~ /.\.html?$/i ) {
+	    $type = T_REF;
+	}
+	if ( $type == T_REF ) {
+	    for ( fjoin(dirname($file), "icon.jpg") ) {
+		$assc = $_ if !defined $assc && -f $_;
+	    }
+	    $assc = d_icons("extern.jpg") unless defined $assc;
+	    $el->assoc_name($assc);
+	    $el->dest_name($file);
+	    $el->type($type);
+	}
+	$filelist->add($el);
+	$dirs{$1} = 1 if $type != T_REF && $file =~ m;^(.+)[/\\][^/\\]+$;;
+    }
+    close($fh);
+    die("Aborted\n") if $err;
+    @subdirs = sort(keys(%dirs));
+}
+
+sub load_info_journal {
+    my $err = shift;
+    my $fh = shift;
+
+    #### WARNING: EXPERIMENTAL ####
+
+    warn("parsing (journal mode)\n") if $trace;
+
+    my %typemap = ( 'p' => T_JPG, 'm' => T_MPG, 'v' => T_VOICE );
+
+    my $tag;
+    my $nexttag = 0;
+    my $annotation = "";
+    my $tags = 0;
+    my %dirs;
+    local($/) = "";		# para mode
+    while ( <$fh> ) {
+	chomp;
+	next if /^\s*#/;
+	next unless /\S/;
+
+	# Handle controls.
+	if ( /^!\s*(\S.*)/ ) {
+	    $_ = $1;
+	    if ( /^tag\s*(.*)/ ) {
+		$tag = $1;
+		$tag =~ s/\s$//;
+		$tag =~ s/\s+/ /g;
+
+		if ( $tag !~ /\S/ ) {
+		    warn("Tag may not be empty\n");
+		    $err++;
+		    next;
+		}
+		if ( exists($jnltags{$tag}) ) {
+		    warn("Tag \"$tag\" is not unique\n");
+		    $err++;
+		}
+		$jnltags{$tag} = sprintf("%04d", ++$nexttag);
+		my $el = new ImageInfo;
+		$el->tag($tag);
+		$el->type(T_TAG);
+		push(@journal, $el);
+		$tags++;
+	    }
+	    elsif ( /^subdirs\s*(.*)/ ) {
+		foreach ( split(' ', $1)) {
+		    $dirs{$_}++;
+		}
+	    }
+	    elsif ( /^journal\s*(.*)/ ) {
+		if ( $filelist->tally ) {
+		    warn("\"!journal\" must precede image info\n");
+		    $err++;
+		}
+		# Ignore.
+	    }
+	    else {
+		$err += parse_line("!".$_);
+	    }
+	    next;
+	}
+
+	if ( /^\*\s*(.*)/s ) {
+	    $_ = $1;
+	}
+	else {
+	    my $el = new ImageInfo;
+	    $el->annotation($_);
+	    $el->tag($tag);
+	    $el->type(T_ANN);
+	    push(@journal, $el);
+	    next;
+	}
+	s/\s*\n\s+/ /g;
+	my @a = split(/\n/, $_);
+	$_ = shift(@a);
+	my $annotation = join(" ", @a);
+
+	my ($file, $a) = $_ =~ /^(.+?)$xsuffixpat\s*(.*)/;
+
+	my $rotate;
+	my $type = T_JPG;
+	my $assc;
+	while ( $a && $a =~ /^-(\w):(\S+)\s*(.*)/ ) {
+	    if ( lc($1) eq 'o' ) {
+		$rotate = 90 * ($2 % 4);
+	    }
+	    elsif ( lc($1) eq 'i' ) {
+		$assc = fjoin(basename($file), $2);
+		unless ( -s $assc && -r _ ) {
+		    warn("$file (info): $assc [$!]\n");
+		    undef $assc;
+		}
+	    }
+	    elsif ( lc($1) eq 't' ) {
+		$type = $typemap{lc($2)}
+		  or warn("$file (info): Illegal type: $2\n"), $err++;
+	    }
+	    $a = $3;
+	}
+	my $el = new ImageInfo($file);
+	$el->type($type);
+	$el->description($a) if $a;
+	$el->tag($tag) if $tag;
+	# $annotation ||= $a;
+	if ( $annotation ) {
+	    $annotation =~ s/^\s+//;
+	    $annotation =~ s/\s+$//;
+	    $annotation =~ s/\s+/ /g;
+	    $el->annotation($annotation);
+	}
+
+	$el->_rotation($rotate) if defined($rotate);
+	if ( $file =~ /^(.+)\.$movpat$/i ) {
+	    $el->type(T_MPG);
+	    $el->assoc_name($1."s.jpg"); # associates still image
+	}
+	elsif ( $type == T_VOICE ) {
+	    (my $t = $file) =~ s/\.jpg$/.mp3/i;
+	    $el->assoc_name($t);
+	}
+	elsif ( $file =~ /.\.html?$/i ) {
+	    $type = T_REF;
+	}
+	if ( $type == T_REF ) {
+	    for ( fjoin(dirname($file), "icon.jpg") ) {
+		$assc = $_ if !defined $assc && -f $_;
+	    }
+	    $assc = d_icons("extern.jpg") unless defined $assc;
+	    $el->assoc_name($assc);
+	    $el->dest_name($file);
+	    $el->type($type);
+	}
+
+	if ( $type > T_PSEUDO ) {
+	    my @a = ($annotation);
+	    my $pi = scalar(@journal) - 1;
+	    while ( $pi >= 0 ) {
+		my $e = $journal[$pi];
+		last if $e->type != T_ANN;
+		push(@a, $e->annotation);
+		$pi--;
+	    }
+	    $el->annotation([@a]) if @a;
+	}
+
+	$filelist->add($el);
+	push(@journal, $el) if !$a || $a !~ /^--/;
+
+	$dirs{$1} = 1 if $type != T_REF && $file =~ m;^(.+)[/\\][^/\\]+$;;
+
+    }
+    close($fh);
+    die("Aborted\n") if $err;
+    @subdirs = sort(keys(%dirs));
+    $journal = $tags;		# no tags -- no journal...
+}
+
+sub load_files {
+    my $dh = do { local *DH; *DH; };
+    opendir($dh, d_large())
+      or die("Cannot opendir " . d_large() . ": $!\n");
+    my @files = sort grep { !/^\./ && /$suffixpat$/ } readdir($dh);
+    closedir($dh);
+
+    foreach my $dir ( @subdirs ) {
+	opendir($dh, d_large($dir))
+	  or die("Cannot opendir " . d_large($dir) . ": $!\n");
+	push(@files,
+	     map { "$dir/$_" }
+	         sort grep { !/^\./ && /$suffixpat$/ } readdir($dh));
+	closedir($dh);
+    }
+
+    while ( @files ) {
+	my $f = shift(@files);
+	next unless -f d_large($f);
+	my $el = new ImageInfo(d_large($f));
+	$el->type(T_JPG);
+	if ( $f =~ /^(.+)\.$picpat$/ ) {
+	    my $m = "$1.mp3";
+	    if ( -s d_large($m) ) {
+		$el->type(T_VOICE);
+		$el->assoc_name($m);
+		warn(d_large($f).": Changed to VOICE\n") if $verbose;
+	    }
+	}
+	elsif ( $f =~ /^(.+)\.$movpat$/i ) {
+	    $el->type(T_MPG);
+	    my $assoc = $1."s.jpg";
+	    $el->assoc_name($assoc);
+	    if ( @files && $files[0] eq $assoc ) {
+		shift(@files);
+		warn(d_large($assoc).": Skipped still\n") if $verbose;
+	    }
+	}
+	$gotlist->add($el, $f);
+    }
+}
+
+sub load_import {
+    my $dh = do { local *DH; *DH; };
+    opendir($dh, $import_dir)
+      or die("Cannot opendir $import_dir: $!\n");
+
+    my @files = sort grep { !/^\./ && /$suffixpat$/ } readdir($dh);
+    closedir($dh);
+
+    while ( @files ) {
+	my $f = shift(@files);
+	next unless -f fjoin($import_dir, $f);
+
+	my $el = new ImageInfo(fjoin($import_dir, $f));
+	if ( $import_exif ) {
+	    shift(@files) if handle_exif($f, $files[0], $el);
+	}
+	else {
+	    $el->type(T_JPG);
+	    if ( $f =~ /^(.+)\.$movpat$/i ) {
+		$el->type(T_MPG);
+		$el->assoc_name($1."s.jpg");
+	    }
+	    $implist->add($el, $f);
+	}
+    }
+}
+
+sub handle_exif {
+    my ($file, $next, $el) = @_;
+
+    # Sony DSC-V1 produces the following files:
+    #   DSC0nnnn.JPG	still image
+    #   DSC0nnnn.JPE	mail mode image*
+    #   DSC0nnnn.MPG	voice mode image*
+    #   DSC0nnnn.TIF	uncompressed image*
+    #   CLP0nnnn.GIF	clip motion file
+    #   CLP0nnnn.HTM	clip motion file index
+    #   MBL0nnnn.GIF	clip motion file, mobile mode
+    #   MBL0nnnn.HTM	clip motion file index, mobile mode
+    #   MOV0nnnn.MPG	movie
+    # Files marked with * have a normal still image associated.
+
+    # Normal still image.
+    if ( $file =~ /^(.{4})(\d{4})\.($picpat)$/i ) {
+	my ($type, $seq, $ext) = ($1, $2, $3);
+	my $fd = $el->DateTime || "";
+	if ( $fd =~ /(\d\d\d\d):(\d\d):(\d\d) (\d\d):(\d\d):(\d\d)/ ) {
+	    my $time = timelocal($6,$5,$4,$3,$2-1,$1);
+	    my $new = "$1$2$3$4$5$6$seq";
+	    my $ii = cache_entry("$new.$ext");
+	    if ( $ii && !$ii->orig_name ) {
+		$ii->orig_name(fjoin($import_dir, $file));
+	    }
+
+	    $el->type(T_JPG);
+	    $el->dest_name("$new.$ext");
+	    $el->timestamp($time);
+	    $file = "$new.$ext";
+	    cache_entry($file, $el) unless $ii;
+	}
+	else {
+	    warn(fjoin($import_dir, $file).": Missing or unparsable file date [$fd]\n")
+	      if $verbose;
+	    $el->type(T_JPG);
+	}
+	if ( $next && $next eq "$type$seq.mpg" ) {
+	    warn(fjoin($import_dir, $file).": Changed to VOICE\n") if $verbose;
+	    $el->type(T_VOICE);
+	    (my $t = $file) =~ s/\.jpg$/.mp3/i;
+	    $el->assoc_name($t);
+	    $implist->add($el);
+	    return 1;
+	}
+	$implist->add($el);
+    }
+
+    # MPEG movie.
+    elsif ( $file =~ /^(.{4})(\d{4})\.($movpat)$/i ) {
+	my ($type, $seq, $ext) = ($1, $2, $3);
+	# We have to trust the file date...
+	my $time = $el->timestamp;
+	my @tm = localtime($time);
+	my $new = sprintf("%04d%02d%02d%02d%02d%02d$seq",
+			  1900+$tm[5], 1+$tm[4], @tm[3,2,1,0]);
+	my $ii = cache_entry("$new.$ext");
+	if ( $ii && !$ii->orig_name ) {
+	    $ii->orig_name(fjoin($import_dir, $file));
+	}
+
+	$el->type(T_MPG);
+	$el->dest_name("$new.$ext");
+	$el->assoc_name($new."s.jpg");
+	$implist->add($el, "$new.$ext");
+	$file = "$new.$ext";
+	cache_entry($file, $el) unless $ii;
+    }
+
+    # Assume ordinary JPEG or some picture.
+    elsif ( $file =~ /^.*$picpat$/) {
+	$el->type(T_JPG);
+	$el->orig_name(fjoin($import_dir, $file));
+	$el->dest_name($file);
+	$implist->add($el, $file);
+    }
+
+    # Assume ordinary MPEG or some movie.
+    elsif ( $file =~ /^(.*)($movpat)$/) {
+	$el->type(T_MPG);
+	$el->orig_name(fjoin($import_dir, $file));
+	$el->dest_name($file);
+	$el->assoc_name($1."s.jpg");
+	$implist->add($el, $file);
+    }
+    return 0;
+}
+
+sub update_filelist {
+    my $todo = new FileList;
+
+    my $el;
+    my %seen;
+    my $missing;
+    my $prev;
+
+    foreach $el ( $filelist->entries ) {
+	my $f = $el->dest_name;
+	$seen{$f}++;
+	print STDERR ("todo[inf]: $f") if $trace;
+	my $entry = $gotlist->byname($f);
+	if ( $entry ) {
+	    print STDERR (" -- got") if $trace;
+	}
+	elsif ( $entry = $implist->byname($f) ) {
+	    print STDERR (" -- imp") if $trace;
+	}
+	elsif ( $el->type == T_REF ) {
+	    $entry = $el;
+	    print STDERR (" -- ref") if $trace;
+	}
+	if ( $entry ) {
+	    unless ( $el->description =~ /^--($|\s)/ ) {
+		# Copy properties from info.
+		$entry->tag($el->tag);
+		$entry->description($el->description);
+		$entry->annotation($el->annotation);
+		$entry->_rotation($el->_rotation);
+		# Add and create prev/next links.
+		$entry->prev($prev->seq) if $prev;
+		$todo->add($entry);
+		$prev->next($entry->seq) if $prev;
+		print STDERR ("\n") if $trace;
+	    }
+	    else {
+		print STDERR (" (ignored)\n") if $trace;
+		undef $entry;
+	    }
+	}
+	else {
+	    if ( $trace ) {
+		print STDERR ("\n");
+	    }
+	    else {
+		unless ( $el->description =~ /^--($|\s)/ ) {
+		    print STDERR ("todo[inf]: $f -- missing\n");
+		}
+	    }
+	    unless ( $el->description =~ /^--($|\s)/ ) {
+		$missing++;
+	    }
+	}
+	$prev = $entry if $entry && $entry->type != T_REF;
+    }
+    die("Aborted!\n") if $missing;
+
+    unless ( $filelist->tally == 0 || $update ) {
+	$filelist = $todo;
+	return 0;
+    }
+
+    my $newinfo = "";
+    my $date;
+    my $new;
+
+    foreach $el ( $gotlist->entries ) {
+	my $f = $el->dest_name;
+	print STDERR ("todo[got]: $f") if $trace;
+	if ( $seen{$f}++ ) {
+	    print STDERR (" -- seen\n") if $trace;
+	    next;
+	}
+	print STDERR (" -- added\n") if $trace;
+	my $nd = "";
+	if ( $f =~ /^(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/ ) {
+	    my $tl = timelocal($6,$5,$4,$3,$2-1,$1);
+	    $nd = strftime($datefmt, localtime($tl));
+	    $el->timestamp($tl);
+	}
+	if ( !defined($date) || $nd ne $date ) {
+	    $newinfo .= "\n!tag $nd\n";
+	    $newinfo .= "\n" if $journal;
+	    $date = $nd;
+	}
+	$newinfo .= $journal ? "* $f\n\n" : "$f\n";
+	$el->tag($date) if $date;
+	$el->prev($prev->seq) if $prev;
+	$todo->add($el);
+	$prev->next($el->seq) if $prev;
+	$prev = $el unless $el->type == T_REF;
+	push(@journal, $el) if $journal;
+	$new++;
+    }
+
+    foreach $el ( $implist->entries ) {
+	my $f = $el->dest_name;
+	print STDERR ("todo[imp]: $f") if $trace;
+	if ( $seen{$f}++ ) {
+	    print STDERR (" -- seen\n") if $trace;
+	    next;
+	}
+	print STDERR (" -- added\n") if $trace;
+	my $nd = "";
+	my $time = $el->timestamp;
+	if ( $time ) {
+	    $nd = strftime($datefmt, localtime($time));
+	}
+	if ( !defined($date) || $nd ne $date ) {
+	    $newinfo .= "\n!tag $nd\n";
+	    $newinfo .= "\n" if $journal;
+	    $date = $nd;
+	}
+	$newinfo .=
+	  ($journal ? "* " : "") .
+	    "$f " .
+	      ($el->rotation ? ("-O:".int($el->rotation/90)." ") : "") .
+		($el->type == T_VOICE ? "-T:V " : "") .
+		  ($journal ? " \n\n" : " \n");
+	$el->tag($date) if $date;
+	$el->prev($prev->seq) if $prev;
+	$todo->add($el);
+	$prev->next($el->seq) if $prev;
+	$prev = $el unless $el->type == T_REF;
+	push(@journal, $el) if $journal;
+	$new++;
+    }
+
+    $filelist = $todo;
+
+    unless ( $new ) {		# nothing to add
+	warn("No new images imported\n") if $verbose > 1;
+	return 0;
+    }
+
+    return $new if $test;
+
+    unless ( -w $info_file ) {
+	warn("$info_file: Cannot update (".
+	     (-e _ ? "no write access" : "does not exist") .
+	     ")\n") if $verbose;
+	return $new;
+    }
+
+    my $infosize = -s $info_file;
+
+    # Append new info.
+    warn("Updating $info_file\n") if $verbose > 1;
+    my $fh = do { local *F; *F };
+    open($fh, ">>", $info_file) || die("$info_file: $!\n");
+    unless ( $infosize ) {
+	print $fh ("# album control file created by Album $::VERSION, ".
+	       localtime(time), "\n\n");
+	print $fh ("!title $album_title\n") if $album_title;
+	if ( $medium && !$optcfg{"medium"} ) {
+	    print $fh ($medium != DEFAULTS->{mediumsize} ?
+		       "!mediumsize $medium\n" : "!medium\n");
+	}
+	print $fh ("!thumbsize $thumb\n")
+	  if !$optcfg{"thumb"} && $thumb != DEFAULTS->{thumbsize};
+	print $fh ("!page ${index_rows}x${index_columns}\n")
+	  if !$optcfg{index_rows} && $index_rows != DEFAULTS->{indexrows}
+	      || !$optcfg{index_columns} && $index_columns != DEFAULTS->{indexcols};
+	print $fh ("!caption $caption\n")
+	  if !$optcfg{"caption"} && $caption ne DEFAULTS->{caption};
+    }
+    print $fh ("\n# New entries added by $my_name $my_version, ".
+	       localtime(time), "\n",
+	       $newinfo,
+	       "\n");
+    close($fh);
+
+    $new;
+}
+
+sub prepare_images {
+    my $ddot = 0;
+    my $tdot = 0;
+    my $fmt = "[%" . length($filelist->tally) . "d]\n";
+    my $msgfile;
+    my $msg = sub {
+	return unless $verbose > 1;
+
+	if ( $verbose > 2 ) {
+	    if ( $msgfile ) {
+		print STDERR ("$msgfile: ");
+		$msgfile = "";
+	    }
+
+	    print STDERR (@_ ? @_ : "OK\n");
+	}
+
+	unless ( @_ ) {
+	    unless ( $msgfile ) {
+		print STDERR ("OK\n");
+		return;
+	    }
+	    print STDERR (".");
+	    $tdot++;
+	    if ( ++$ddot >= 50 ) {
+		printf STDERR ($fmt, $tdot);
+		$ddot = 0;
+	    }
+	    return;
+	}
+
+	printf STDERR ($fmt, $tdot) if $ddot;
+	$ddot = 0;
+
+	if ( $msgfile ) {
+	    print STDERR ("$msgfile: ");
+	    $msgfile = "";
+	    $tdot++;
+	}
+
+	print STDERR (@_);
+    };
+
+    my $image;
+    my $i_large;
+
+    my $readimage = sub {
+	my ($file) = (@_, $i_large);
+	$image = new Image::Magick;
+	my $t = $image->Read($file);
+	warn("read($file): $t\n") if $t;
+	#$image->Profile(name => "*", profile => undef);
+    };
+
+    my $resize = sub {
+	 my ($n) = @_;
+	 my ($origx, $origy) = $image->Get(qw(width height));
+	 my $ratio = $origx > $origy ? $origx / $n : $origy / $n;
+	 my $t = $image->Resize(width => $origx/$ratio, height => $origy/$ratio);
+	 warn("resize: $t\n") if $t;
+    };
+
+    foreach my $el ( $filelist->entries ) {
+	$msg->(), next unless $el->type > 0;
+	my $file = $el->dest_name;
+	$msgfile = $file;
+	$image = undef;
+
+	# Check for directory names, e.g. f01/p01.jpg.
+	my $dn = dirname($file);
+	if ( $dn && $dn ne "." ) { # we have a dir name.
+	    mkpath([d_thumbnails($dn), d_large($dn)], 1);
+	    mkpath([d_medium($dn)], 1) if $medium;
+	}
+
+	$i_large = d_large($file);
+	my $movie = $el->type == T_MPG;
+
+	# Copy the file into place.
+	if ( ! -s $i_large && $el->orig_name ) {
+	    my $i_src = $el->orig_name;
+	    my $time = $el->timestamp;
+
+	    if ( $movie ) {
+
+		# Need copy?
+		my $copyit = !$linkthem
+		  || (($el->rotation || $el->mirror) && $prog_mencoder);
+
+		# Try to link.
+		if ( !$copyit ) {
+		    $msg->("link ");
+		    if ( link($i_src, $i_large) == 1 ) {
+			# Ok, done.
+		    }
+		    else {
+			# Need copy.
+			unlink($i_large); # just in case
+			$msg->("[copy] ");
+			$copyit = 1;
+		    }
+		}
+		else {
+		    $msg->("copy");
+		}
+
+		# Need copy?
+		if ( $copyit ) {
+		    if ( $prog_mencoder ) {
+			$msg->("/rotate (be patient)") if $el->rotation;
+			$msg->(" ");
+			# Currently. movies have a bad ugly copy routine...
+			copy_mpg($i_src, $i_large, $time,
+				 $el->rotation, $el->mirror);
+		    }
+		    else {
+			$msg->(" [no rotation]") if $el->rotation;
+			$msg->(" ");
+			copy($i_src, $i_large, $time);
+		    }
+		}
+	    }
+	    elsif ( $el->rotation || $el->mirror ) {
+		$msg->("copy");
+		$msg->("/rotate") if $el->rotation;
+		$msg->("/mirror") if $el->mirror;
+		$msg->(" ");
+
+		# Use jpegtran to rotate jpg files.
+		if ( ($el->file_ext || "") eq "jpg" && $prog_jpegtran ) {
+		    my $cmd = "$prog_jpegtran -copy all -rotate " . $el->rotation . " ";
+		    $cmd .= $el->mirror eq 'h' ? "-transpose " : "-transverse "
+		      if $el->mirror;
+		    $cmd .= "-outfile " . squote($i_large) .
+		      " " . squote($i_src);
+		    my $t = `$cmd 2>&1`;
+		    $msg->($t) if $t;
+		    utime($time, $time, $i_large);
+		}
+		# Otherwise, let Image::Magick handle it.
+		else {
+		    $readimage->($i_src);
+		    $image->Rotate();
+		    if ( $el->mirror ) {
+			$image->Flip if $el->mirror eq 'h';
+			$image->Flop if $el->mirror eq 'v';
+		    }
+		    my $t = $image->Write($i_large);
+		    $msg->($t) if $t;
+		    utime($time, $time, $i_large);
+		}
+	    }
+	    elsif ( $linkthem ) {
+		$msg->("link ");
+		unless ( link($i_src, $i_large) == 1 ) {
+		    unlink($i_large); # just in case
+		    $msg->("[copy] ");
+		    copy($i_src, $i_large, $time);
+		}
+	    }
+	    else {
+		$msg->("copy ");
+		copy($i_src, $i_large, $time);
+	    }
+	    if ( $el->type == T_VOICE ) {
+		$msg->("sound ");
+		copy_voice($i_src, d_large($el->assoc_name),
+			   $time);
+	    }
+	}
+	if ( $movie ) {
+	    $movie = $file;
+	    $file = $el->assoc_name;
+	    $i_large = d_large($file);
+	    unless ( -s $i_large ) {
+		$msg->("still ");
+		$image = still($el);
+	    }
+	}
+
+	my $i_medium = d_medium($file);
+	my $i_small  = d_thumbnails($file);
+
+	if ( $medium && ! -s $i_medium ) {
+	    $readimage->() unless $image;
+	    $msg->("medium ");
+	    $resize->($medium);
+	    my $t = $image->Write($i_medium);
+	    $msg->($t) if $t;
+	}
+	$el->medium_size(-s $i_medium) if $medium && !$movie;
+
+	if ( ! -s $i_small ) {
+	    $readimage->() unless $image;
+	    $msg->("thumbnail ");
+	    $resize->($thumb);
+	    my $t = $image->Write($i_small);
+	    $msg->($t) if $t;
+	}
+
+	$msg->(); 		# flush
+
+    }
+    printf STDERR ($fmt, $tdot) if $ddot && $tdot;
+}
+
+################ Formats ################
+
+my $fmt_image_page;
+my $fmt_large_page;
+my $fmt_medium_page;
+my $fmt_index_page;
+my $fmt_journal_page;
+
+# <<HereDoc helper to retain a nice program layout.
+sub heredoc($$) {
+    my ($doc, $indent) = @_;
+    $indent = " " x $indent;
+    my $res = "";
+    foreach ( split(/\n/, $doc) ) {
+	my $line = detab($_);
+	$line =~ s/^$indent//;
+	$res .= $line . "\n";
+    }
+    $res;
+}
+
+sub init_formats {
+    my $lib_common = $lib_common;
+    $lib_common .= "/" if $lib_common ne "";
+
+    my $did = 0;
+    my $load = sub {
+	my ($req, $data) = @_;
+	my $fmt = d_fmt($req);
+	if ( -s $fmt ) {
+	    local($/);
+	    open (my $fh, $fmt) || die("$fmt: $!\n");
+	    $data = <$fh>;
+	    close($fh);
+	}
+	elsif ( $externalize_formats ) {
+	    unless ( $did ) {
+		my $fdir = d_fmt("");
+		$fdir =~ s/\/+$//;
+		unless ( -d $fdir ) {
+		    print STDERR ("mkdir $fdir\n");
+		    mkdir(d_fmt(""));
+		}
+	    }
+	    print STDERR ("Creating formats: ") if $verbose > 1 && !$did++;
+	    print STDERR ("$req ") if $verbose > 1;
+	    open (my $fh, '>', $fmt) || die("$fmt: $!\n");
+	    print {$fh} $data;
+	    close($fh);
+	}
+	$data =~ s/\$\{lib_common\}/$lib_common/g;
+	$data =~ s/^([ \t]+)/detab($1)/gem;
+	$data;
+    };
+
+    # Format for index pages (mostly).
+    #
+    # Variables:
+    #
+    #  $title
+    #  $ltop
+    #  $rtop
+    #  $vbuttons / $hbuttons
+    #  $jscript
+    #  $contents
+
+    $fmt_index_page = $load->("index.fmt", heredoc(<<'    EOD', 4));
+    <?xml version="1.0" encoding="iso-8859-15"?>
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+    <html>
+      <head>
+	<link rel="stylesheet" href="${lib_common}css/index.css">
+	<title>$title</title>
+	$jscript
+      </head>
+      <body>
+	<table>
+	  <tr>
+	    <td></td>
+	    <td align='left'>
+	      <p class='hdl'>
+		$ltop
+	      </p>
+	    </td>
+	    <td align='right'>
+	      <p class='hdr'>
+		$rtop
+	      </p>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td valign='top'>
+	      $vbuttons
+	    </td>
+	    <td valign='top' colspan='2'>
+	      $contents
+	    </td>
+	  </tr>
+	</table>
+      </body>
+    </html>
+    EOD
+
+    # Format for image pages (mostly).
+    #
+    # Variables:
+    #
+    #  $title
+    #  $ltop
+    #  $rtop
+    #  $vbuttons / $hbuttons
+    #  $jscript
+    #  $image
+    #  $lbot
+    #  $rbot
+
+    $fmt_image_page = $load->("image.fmt", heredoc(<<'    EOD', 4));
+    <?xml version="1.0" encoding="iso-8859-15"?>
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+    <html>
+      <head>
+	<title>$title</title>
+	<link rel="stylesheet" href="../${lib_common}css/$dir.css">
+	$jscript
+      </head>
+      <body>
+	<table>
+	  <tr>
+	    <td></td>
+	    <td align='left' valign='top'>
+	      <p class='hdl'>
+		$ltop
+	      </p>
+	    </td>
+	    <td align='right' valign='top'>
+	      <p class='hdr'>
+		$rtop
+	      </p>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td valign='top'>
+	      $vbuttons
+	    </td>
+	    <td align='center' valign='top' colspan='2'>
+	      $image
+	    </td>
+	  </tr>
+	  <tr>
+	    <td></td>
+	    <td align='left' valign='top'>
+	      <p class='ftl'>
+		$lbot
+	      </p>
+	    </td>
+	    <td align='right' valign='top'>
+	      <p class='ftr'>
+		$rbot
+	      </p>
+	    </td>
+	  </tr>
+	</table>
+      </body>
+    </html>
+    EOD
+
+    $fmt_large_page  = $load->("large.fmt",  $fmt_image_page);
+    $fmt_medium_page = $load->("medium.fmt", $fmt_image_page);
+
+    # Format for journal pages (mostly).
+    #
+    # Variables:
+    #
+    #  $title
+    #  $tag
+    #  $vbuttons / $hbuttons
+    #  $journal
+    #  $jscript
+
+    $fmt_journal_page = $load->("journal.fmt", heredoc(<<'    EOD', 4));
+    <?xml version="1.0" encoding="iso-8859-15"?>
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+    <html>
+      <head>
+	<link rel='stylesheet' href='../${lib_common}css/journal.css'>
+	<title>$title</title>
+	$jscript
+      </head>
+      <body>
+	<table class='outer'>
+	  <tr class='grey'>
+	    <td>
+	      <p class='hd'>
+		$tag
+	      </p>
+	    </td>
+	    <td align='right'>
+	      $hbuttons
+	    </td>
+	  </tr>
+	  $journal
+	  <tr class='grey'>
+	    <td>&nbsp;</td>
+	    <td align='right'>
+	      $hbuttons
+	    </td>
+	  </tr>
+	</table>
+      </body>
+    </html>
+    EOD
+
+    print STDERR ("\n") if $did;
+}
+
+sub process_fmt {
+    my ($fmt, %map) = @_;
+    $fmt =~ s/^(.*?)\$(\w+)\b/$1.indent($map{$2}, length($1))/gme;
+    $fmt;
+}
+
+################ Helpers for Image/Index/Journal pages ################
+
+sub jscript {
+    my (%nav) = @_;
+    my $next = $nav{next};
+    my $prev = $nav{prev};
+    my $up   = $nav{up};
+    my $down = $nav{down};
+    my $idx  = $nav{idx};
+    my $jnl  = $nav{jnl};
+    my $js = heredoc(<<"    EOD", 4);
+    <script type='text/javascript'>
+    function handleKey(e) {
+      var key;
+      if ( e == null ) { // IE
+	key = event.keyCode
+      }
+      else { // Mozilla
+	if ( e.altKey || e.ctrlKey ) {
+	  return true
+	}
+	key = e.which
+      }
+      switch(key) {
+    EOD
+
+    $js .= "    case   8: window.location = '$prev'; break // Backspace\n" if $prev;
+    $js .= "    case  32: window.location = '$next'; break // Space\n"     if $next;
+    $js .= "    case  13: window.location = '$down'; break // Enter\n"     if $down;
+    $js .= "    case 117: window.location = '$up'; break // 'u'\n"         if $up;
+    $js .= "    case 100: window.location = '$idx'; break // 'd'\n"        if $idx;
+    $js .= "    case 106: window.location = '$jnl'; break // 'j'\n"        if $jnl;
+
+    $js .= heredoc(<<"    EOD", 4);
+       default:
+      }
+      return false
+    }
+    
+    document.onkeypress = handleKey
+    </script>
+    EOD
+    $js;
+}
+
+sub button($$;$$) {
+    my ($tag, $link, $level, $active) = @_;
+    my $Tag = ucfirst($tag);
+
+    $level  = 0 unless defined $level;
+    $active = 1 unless defined $active;
+    $tag .= "-gr" unless $active;
+    $level = "../" x $level;
+    $level .= $lib_common . "/" if $lib_common ne "";
+    my $b = img("${level}icons/$tag.png", align => "top",
+		border => 0, alt => "[$Tag]");
+    $active ? "<a class='info' href='$link' alt='[$Tag]'>$b</a>" : $b;
+}
+
+sub ixname($) {
+    my ($x) = @_;
+    "index" . ($x ? $x : "") . ".html";
+}
+
+# To aid XHTML compliancy.
+sub br { "<br>" }
+
+# Pseudo-smart approach to creating paired single/double quotes.
+# Note that the (s-|s\s|t\s) case is specific to the dutch language,
+# but probably won't harm other languages...
+# Yes, you'll get stupid results with input like rock'n'roll.
+
+sub fixquotes($) {
+    my ($t) = @_;
+
+    # HTML::Entities will already have turned " into &quot; -- undo.
+    $t =~ s/\&quot;/"/g;
+    while ( $t =~ /^([^"]*)"([^"]+)"(.*)/s ) {
+	$t = $1 . "&ldquo;" . $2 . "&rdquo;" . $3;
+    }
+    $t =~ s/"/&quot;/g;
+
+    # HTML::Entities will already have turned ' into &#39; -- undo.
+    $t =~ s/\&#39;/'/g;
+    while ( $t =~ /^(.*?)'(s-|s\s|t\s)(.*)/s ) {
+	$t = $1 . "&apos;" . $2 . $3;
+    }
+    while ( $t =~ /^([^']*)'([^']+)'(.*)/s ) {
+	$t = $1 . "&lsquo;" . $2 . "&rsquo;" . $3;
+    }
+    $t;
+}
+
+# Escape sensitive characters in HTML.
+# Two variants: one using HTML::Entities, the other a dumber stub.
+# If HTML::Entities is available, it will be used.
+
+sub html($) {
+    eval {
+	require HTML::Entities;
+	# Apply Latin-9 instead of Latin-1.
+	no warnings 'once';
+	for ( \%HTML::Entities::char2entity ) {
+	    $_->{chr(0204)} = '&euro;';
+	    $_->{chr(0246)} = '&Scaron;';
+	    $_->{chr(0250)} = '&scaron;';
+	    $_->{chr(0264)} = '&Zcaron;';
+	    $_->{chr(0270)} = '&zcaron;';
+	    $_->{chr(0274)} = '&OE;';
+	    $_->{chr(0275)} = '&oe;';
+	    $_->{chr(0276)} = '&Yuml;';
+	}
+	no warnings 'redefine';
+	*html = sub($) {
+	    my ($t) = @_;
+	    return '' unless $t;
+	    $t = HTML::Entities::encode($t);
+	    fixquotes($t);
+	};
+    };
+    no warnings 'redefine';
+    *html = sub($) {
+	my ($t) = @_;
+	return '' unless $t;
+	$t =~ s/&/&amp;/g;
+	$t =~ s/</&lt;/g;
+	$t =~ s/>/&gt;/g;
+	fixquotes($t);
+    } if $@;
+    goto &html;
+}
+
+sub htmln($) {
+    # Escape HTML sensitive characters, and turn newlines into <br>.
+    my $t = html(shift);
+    return '' unless $t;
+    $t =~ s/\n+/$br/go;
+    $t;
+}
+
+sub indent($$) {
+    # Shift contents to the right so it fits pretty.
+    my ($t, $n) = @_;
+    $n = " " x $n;
+    return $n unless $t;
+    $t = detab($t);
+    $t =~ s/\n+$//;
+    $t =~ s/\n/\n$n/g;
+    $t;
+}
+
+sub img($%) {
+    my ($file, %atts) = @_;
+    my $ret = "<img src='" . $file . "'";
+    foreach ( sort(keys(%atts)) ) {
+	$ret .= " $_='" . $atts{$_} . "'";
+    }
+    $ret . ">";
+}
+
+#### Size helpers.
+
+sub bytes($) {
+    my $t = shift;
+    return $t . "b" if $t < 10*1024;
+    return ($t >> 10) . "kb" if $t < 10*1024*1024;
+    ($t >> 20) . "Mb";
+}
+
+sub size_info($;$) {
+    my ($el, $med) = @_;
+    return unless $el->width;
+
+    my $ret = "";
+    $ret .= $el->width . "x" . $el->height if $el->width;
+    for ( $med ? $el->medium_size : $el->file_size ) {
+	next unless $_;
+	$ret .= "," if $ret;
+	$ret .= bytes($_);
+    }
+    $ret;
+}
+
+#### EXIF helpers.
+
+sub restyle_exif($) {
+    my ($el) = @_;
+    my $ret = "";
+    my $v;
+
+    my $app = sub {
+	$ret .= "<tr><td>".htmln($_[0])."</td>".
+	            "<td>".htmln($_[1])."</td></tr>\n";
+    };
+
+    $app->("Date", $v) if $v = $el->DateTime;
+    my $t = $el->ExposureTime || 0;
+    if ( $t && $t <= 0.5 ) {
+	$t = "1/".int(0.5 + 1/$t)."s";
+    }
+    $app->("Exposure",
+	   join(" ", $el->ExposureMode || "",
+		$el->ExposureProgram || "", $t));
+    $app->("Aperture", sprintf("%.1f", $v))
+      if $v = $el->FNumber;
+    if ( $v = $el->FocalLength ) {
+	if ( $el->Model eq "DSC-V1" ) {
+	    $v .= sprintf("mm  (%.1fmm equiv.)", $v*4.857);
+	}
+	else {
+	    $v .= "mm";
+	}
+	$app->("Focal length", $v);
+    }
+    $app->("ISO", $v) if $v = $el->ISOSpeedRatings;
+    $app->("Flash", $v)
+      if ($v = $el->Flash) && $v ne "Flash did not fire";
+    $app->("Metering", $v) if $v = $el->MeteringMode;
+    $app->("Scene", $v) if $v = $el->SceneCaptureType;
+    $app->("Camera",
+	   join(" ", $v, $el->Model))
+      if $v = $el->Make;
+}
+
+#### Caption helpers.
+
+sub f_caption($) {
+    my ($el) = @_;
+    my $s = htmln($el->dest_name);
+    if ( $el->Make ) {
+	$s = "&nbsp;$s<a href='#' class='info'>&nbsp;<span>".
+	  "<table border='1' width='100%'>\n".
+	    restyle_exif($el) . "</table>\n".
+	      "</span></a>";
+    }
+    $s;
+}
+
+sub s_caption($) {
+    my ($el) = @_;
+    size_info($el, $medium);
+}
+
+sub t_caption($) {
+    my ($el) = @_;
+    $el->tag  ? htmln($el->tag) : "";
+}
+
+sub c_caption($) {
+    my ($el) = @_;
+    my $t = $el->description || "";
+    $t =~ s/\n.*//;
+    htmln($t);
+}
+
+#### Misc.
+
+sub update_if_needed($$) {
+    my ($fname, $new) = @_;
+
+    # Do not overwrite unless modified.
+    if ( -s $fname && -s _ == length($new) ) {
+	local($/);
+	my $hh = do { local *F; *F };
+	my $old;
+	open($hh, $fname) && ($old = <$hh>) && close($hh);
+	if ( $old eq $new ) {
+	    return 0;
+	}
+    }
+
+    my $fh = do { local *F; *F };
+    open($fh, ">$fname")
+      or die("$fname (create): $!\n");
+    print $fh $new;
+    close($fh);
+    1;
+}
+
+sub uptodate($$) {
+    my ($type, $mod) = @_;
+    if ( $mod ) {
+	print STDERR ("(Needed to write ", $mod,
+		      " $type page", $mod == 1 ? "" : "s", ")\n");
+    }
+    else {
+	print STDERR ("(No $type pages needed updating)\n");
+    }
+}
+
+################ Image Pages ################
+
+sub write_image_pages {
+    print STDERR ("Creating ", $num_entries, " image page",
+		  $num_entries == 1 ? "" : "s", "\n") if $verbose > 1;
+    my $mod = 0;
+
+    for my $el ( $filelist->entries ) {
+	write_image_page($el, "large") && $mod++;
+	write_image_page($el, "medium") && $mod++ if $medium;
+    }
+    uptodate("image", $mod) if $verbose > 1;
+}
+
+sub write_image_page {
+    my ($el, $dir) = @_;
+
+    if ( $el->type <= T_PSEUDO ) {
+	warn("PSEUDO: ", Dumper($el)) unless $el->type == T_REF;
+	return;
+    }
+
+    my $i = $el->seq - 1;
+    my $file = $el->dest_name;
+    my $rf = $file;
+
+    # Try movie.
+    my $movie = $el->type == T_MPG;
+    if ( $movie ) {
+	$file = $el->assoc_name;
+    }
+
+    my $tt = "$album_title: Image " . ($i+1);
+    $tt .= " of " . $num_entries if $num_entries > 1;
+    $tt = htmln($tt);
+    my $it = htmln($el->description) || " ";
+
+    my $next = ($el->next || $num_entries+1) - 1;
+    my $prev = ($el->prev || 0) - 1;
+    my %nav = (next => $next < $num_entries ? $htmllist[$next] : "",
+	       prev => $prev > 0 ? $htmllist[$prev] : "",
+	       idx  => "../".ixname(int($i/$entries_per_page)),
+	       up   => "../".ixname(int($i/$entries_per_page)));
+
+    my @b = (
+	     ($dir eq "large" && $medium) ?
+	     button("medium", "../medium/".$htmllist[$i],              1, 1) :
+	     button("index",  "../".ixname(int($i/$entries_per_page)), 1, 1),
+	     button("first",  $htmllist[0],                            1, $i > 0),
+	     button("prev",   $htmllist[$prev] || "",                  1, $prev >= 0),
+	     button("next",   $htmllist[$next] || "",                  1, $next < $num_entries),
+	     button("last",   $htmllist[-1],                           1, $i < $num_entries-1));
+
+    if ( $journal && exists $jnltags{$el->tag} ) {
+	my $page = "../journal/jnl" . $jnltags{$el->tag} . ".html#img".sprintf("%04d", $i+1);
+	push(@b, button("journal", $page, 1, 1));
+	$nav{jnl} = $page;
+    }
+    if ( $el->type == T_VOICE ) {
+	my $sound = $el->assoc_name;
+	push(@b, button("sound", "../large/$sound", 1, 1));
+    }
+
+    my $imglink;
+    if ( $dir eq "medium" ) {
+	if ( $mediumonly ) {
+	    $imglink = img($file, alt => "[Image]", border => 2);
+	}
+	elsif ( $movie ) {
+	    $imglink = "<a href='../large/" . $el->dest_name . "'>" .
+	      img($file, alt => "[Click to play movie]", border => 2) .
+		"</a>";
+	    $nav{down} = "../large/" . $el->dest_name;
+	}
+	else {
+	    $imglink = "<a href='../large/".$htmllist[$i]."'>" .
+	      img($file, alt => "[Click for bigger image]", border => 2) .
+		"</a>";
+	    $nav{down} = "../large/" . $htmllist[$i];
+	}
+    }
+    else {
+	if ( $movie ) {
+	    $imglink = "<a href='" . $el->dest_name . "'>" .
+	      img($file, alt => "[Click to play movie]", border => 2) .
+		"</a>";
+	}
+	else {
+	    $imglink = img($file, alt => "[Image]", border => 2);
+	}
+	$nav{up} = "../medium/" . $htmllist[$i];
+    }
+
+    my $auxright = htmln($el->dest_name);
+    my $s = size_info($el);
+    $auxright .= " ($s)" if $s;
+    $auxright .= "&nbsp;&nbsp;&nbsp;$creator" if $creator;
+    my $auxleft  = htmln($el->tag || "");
+
+    my $it2 = $it;
+    if ( $el->Make ) {		# EXIF info
+	$it2 = "<a href='#' class='info'>" . $it .
+	  "<span>" .
+	    "<table border='1' width='100%'>\n" .
+	      restyle_exif($el) . "</table>\n" .
+		"</span></a>";
+    }
+    my $tt2 = $tt;
+
+    if ( $dir eq "medium" && $el->annotation ) {
+	my @a = UNIVERSAL::isa($el->annotation, "ARRAY")
+	  ? @{$el->annotation} : ($el->annotation);
+	my $t = "";
+	foreach ( reverse(@{$el->annotation}) ) {
+	    next unless $_;
+	    my $x = $_;		# copy
+	    $x = html($x) unless $x =~ /^</;
+	    $t .= "<p>\n" if $t;
+	    $t .= $x;
+	}
+	$tt2 = "<a href='#' class='info'>" . $tt .
+	  "<span>" .
+	    "<table border='1' width='100%'>\n" .
+	      "<tr><td>$t</td></tr>" .
+		"</table>\n" .
+		  "</span></a>" if $t;
+    }
+
+    update_if_needed(d_dest($dir, $htmllist[$i]),
+		     process_fmt($dir eq "medium" ?
+				   $fmt_medium_page :
+				   $fmt_large_page,
+				 title	  => $it,
+				 dir	  => $dir,
+				 ltop	  => $it2,
+				 rtop	  => $tt2,
+				 hbuttons => join("", @b),
+				 vbuttons => join("$br\n", @b),
+				 jscript  => jscript(%nav),
+				 image	  => $imglink,
+				 lbot	  => $auxleft,
+				 rbot	  => $auxright,
+				));
+}
+
+################ Index Pages ################
+
+sub write_index_pages {
+    print STDERR ("Creating ", $num_indexes, " index page",
+		  $num_indexes == 1 ? "" : "s", "\n") if $verbose > 1;
+    my $mod = 0;
+    for my $i ( 0 .. $num_indexes-1 ) {
+	write_index_page($i) && $mod++;
+    }
+    uptodate("index", $mod) if $verbose > 1;
+
+    # Cleanup excess indices.
+    for (my $i = $num_indexes ; ; $i++ ) {
+	unlink(d_dest("index$i.html")) or last;
+    }
+}
+
+sub write_index_page {
+    my ($x) = @_;
+
+    my $tt = $album_title.": Index"; # left title
+    my $t = "";			# right (index select)
+    my @b;			# buttons
+    my %nav;
+
+    # Construct buttons and index selector.
+    if ( $num_indexes > 1 ) {
+	$nav{next} = ixname($x+1) if $x < $num_indexes-1;
+	$nav{prev} = ixname($x-1) if $x > 0;
+	$nav{up}   = join("/",$lib_common,"index.html") if $lib_common ne "";
+
+	push(@b, button("up", join("/",$lib_common,"index.html"),  0, 1))
+	  unless $lib_common eq "";
+	push(@b,
+	     button("first", ixname(0),              0, $x > 0             ),
+	     button("prev",  ixname($x-1),           0, $x > 0             ),
+	     button("next",  ixname($x+1),           0, $x < $num_indexes-1),
+	     button("last",  ixname($num_indexes-1), 0, $x < $num_indexes-1));
+	$tt .= " " . ($x+1) . " of $num_indexes";
+	my @ixlist = ( 0..$num_indexes-1 );
+	if ( @ixlist > IXLIST ) {
+	    @ixlist = ( $x );
+	    while ( @ixlist < IXLIST ) {
+		push(@ixlist, $ixlist[-1]+1)
+		  if $ixlist[-1]+1 < $num_indexes;
+		unshift(@ixlist, $ixlist[0]-1)
+		  if @ixlist < IXLIST && $ixlist[0] > 0;
+	    }
+	}
+	$t .= "...\n" if $ixlist[0];
+	foreach ( @ixlist ) {
+	    if ( $_ == $x ) {
+		$t .= ($x+1) . "\n";
+	    }
+	    else {
+		my $el = $filelist->byseq(($_ * $index_rows * $index_columns) + 1);
+		$t .= "<a";
+		if ( my $tag = $el->tag ) {
+		    $t .= " title=\"$tag\"";
+		}
+		$t .= " href='" . ixname($_) . "'>" . ($_+1) . "</a>\n";
+	    }
+	}
+	$t .= "...\n" if $ixlist[-1] < $num_indexes-1;
+    }
+    elsif ( $lib_common ) {
+	push(@b, button("up", join("/",$lib_common,"index.html"),  0, 1));
+	$nav{up} = join("/",$lib_common,"index.html");
+    }
+
+    my $first_in_row = $x * $entries_per_page;
+
+    if ( $journal && exists $jnltags{$filelist->byseq($first_in_row+1)->tag} ) {
+	my $page = "journal/jnl". $jnltags{$filelist->byseq($first_in_row+1)->tag} .
+	  ".html#img" . sprintf("%04d", $first_in_row+1);
+	push(@b, button("journal", $page, 0, 1));
+	$nav{jnl} = $page;
+    }
+
+    # Construct the actual index part.
+    my $cc = "<table class='outer'>\n";
+
+    for ( my $i = 0; $i < $index_rows; $i++, $first_in_row += $index_columns ) {
+	if ( $first_in_row < $num_entries ) {
+	    $cc .= "  <tr>\n";
+	    for ( my $j = 0; $j < $index_columns; $j++ ) {
+		my $this = $first_in_row + $j;
+		if ( $this < $num_entries ) {
+		    my $el = $filelist->byseq($this+1);
+		    my $file = $el->dest_name;
+		    my $img;
+		    my $base;
+		    my $target = "";
+		    if ( $el->type == T_REF ) {
+			$img = $el->assoc_name;
+			$base = $el->orig_name;
+			$target = " target=\"_blank\"";
+		    }
+		    else {
+			$img = $el->type == T_MPG ? $el->assoc_name : $file;
+			$img = "thumbnails/$img";
+			$base = $medium ? "medium/" : "large/";
+			$base .= $htmllist[$this];
+		    }
+
+		    $cc .= heredoc(<<"                    EOD", 16);
+		    <td align='center' valign='bottom'>
+		      <table class='inner'>
+			<tr>
+			  <td align='center'>
+			    <a href='$base'$target>@{[img($img, alt => "[Click for bigger image]", border => 0)]}</a>
+			  </td>
+			</tr>
+			<tr>
+			  <td align='center'>
+			    <p class='ft'>@{[join($br, map { $capfun{$_}->($el) } split(//, $caption))]}</p>
+			  </td>
+			</tr>
+		      </table>
+		    </td>
+                    EOD
+		}
+		else {
+		    $cc .= "    <td width='$thumb'>&nbsp</td>\n";
+		}
+	    }
+	    $cc .= "  </tr>\n";
+	}
+    }
+    $cc .= "</table>\n";
+
+    update_if_needed(d_dest(ixname($x)),
+		     process_fmt($fmt_index_page,
+				 title    => $tt,
+				 ltop     => $tt,
+				 rtop     => $t,
+				 hbuttons => join("", @b),
+				 vbuttons => join("$br\n", @b),
+				 jscript  => jscript(%nav),
+				 contents => $cc,
+				));
+}
+
+################ Journal Pages ################
+
+sub write_journal_pages {
+    return unless $journal;
+    print STDERR ("Creating ", $journal, " journal page",
+		  $journal == 1 ? "" : "s", "\n") if $verbose > 1;
+    mkpath([d_journal()], $verbose > 1);
+    my $mod = write_journal();
+    uptodate("journal", $mod) if $verbose > 1;
+}
+
+sub write_journal {
+    my $jname = sub { sprintf("jnl%04d.html", shift) };
+
+    my @ann;
+    my $seq = 1;
+    my $x = 0;
+    my $tag;
+
+    my $flush = sub {
+	my $jnl = "";
+	my $ix = int($seq / ($index_rows * $index_columns)) || "";
+	foreach my $e ( @ann ) {
+	    my $t = $e->annotation;
+	    $t = (UNIVERSAL::isa($t, "ARRAY") ? $t->[0] : $t) || "";
+	    $t = html($t) unless $t =~ /^</i;
+	    if ( $e->type == T_ANN ) {
+		$jnl .= "<tr>\n".
+			"  <td class='twocol' colspan='2' valign='middle' align='left'>\n".
+			"    " . indent($t, 4) . "\n".
+			"  </td>\n".
+			"</tr>\n";
+		next;
+	    }
+
+	    # We cannot use $el->seq, since that's the info.dat order
+	    # which includes the skipped entries.
+	    my $dst = ($e->type == T_REF) ? $e->assoc_name :
+	      d_thumbnails($e->type == T_MPG ? $e->assoc_name : $e->dest_name);
+	    my $img = "<a name='" . sprintf("img%04d", $seq) . "' " .
+	              ($e->type == T_REF ? " target=\"_blank\"" : "").
+		      "href='../" .
+		      ($e->type == T_REF ? $e->dest_name : d_medium(sprintf("img%04d.html", $seq))) .
+		      "' border='0'>" .
+		      "<img src='../" .
+		      $dst . "'></a>";
+
+	    $jnl .= "<tr>\n".
+	            "  <td valign='middle' align='left'>\n".
+		    "    " . indent($t || "&nbsp;", 4) . "\n".
+		    "  </td>\n".
+		    "  <td valign='top' align='left'>\n".
+		    "    " . indent($img, 4) . "\n".
+		    "  </td>\n".
+		    "</tr>\n";
+	    $seq++;
+	}
+	my @b = ( button("first", $jname->(1),         1, $x > 0         ),
+		  button("prev",  $jname->($x),        1, $x > 0         ),
+		  button("next",  $jname->($x+2),      1, $x < $journal-1),
+		  button("last",  $jname->($journal),  1, $x < $journal-1),
+		  button("index", "../index$ix.html",  1, 1             ),
+	     );
+	my %nav = ( up  => "../index$ix.html",
+		    idx => "../index$ix.html" );
+	$nav{prev} = $jname->($x) if $x > 0;
+	$nav{next} = $jname->($x+2) if $x < $journal-1;
+
+	$x++;
+
+	update_if_needed(d_journal("jnl" . $jnltags{$tag} . ".html"),
+			 process_fmt($fmt_journal_page,
+				     title    => "Journal: " . htmln($tag),
+				     tag      => htmln($tag),
+				     hbuttons => join("", @b),
+				     vbuttons => join("$br\n", @b),
+				     journal  => $jnl,
+				     jscript  => jscript(%nav),
+				    ));
+    };
+
+    my $mod = 0;
+
+    foreach my $el ( @journal ) {
+	my $t = $el->type;
+	if ( $t == T_TAG ) {
+	    $flush->() && $mod++ if @ann;
+	    $tag = $el->tag;
+	    @ann = ();
+	}
+	else {
+	    push(@ann, $el);
+	}
+    }
+    $flush->() && $mod++ if @ann;
+
+    $mod;
+}
+
+################ ################
+
+#### Persistent info (cache) helpers.
+
+{ my $cache;
+
+  my @stats; INIT { @stats = (0, 0, 0); }
+
+  sub load_cache {
+    $cache = new ImageInfoCache
+      ((!$clobber && -s d_dest(".cache")) ? d_dest(".cache") : undef);
+  }
+
+  sub update_cache {
+    $cache->store(d_dest(".cache"));
+  }
+
+  sub cache_entry {
+      if ( @_ == 1 ) {
+	  $stats[0]++;
+	  my $ii = $cache->entry(@_);
+	  $stats[1]++ if $ii;
+	  warn("Cache miss: $_[0]\n") if !$ii && $trace;
+	  return $ii;
+      }
+      $stats[2]++;
+      $cache->entry(@_);
+  }
+
+  END {
+      print STDERR ("Cache: store = $stats[2], lookup = $stats[0], hits = $stats[1]\n")
+	if $trace;
+  }
+}
+
+#### Miscellaneous.
+
+sub findexec {
+    my ($bin) = @_;
+    foreach ( File::Spec->path ) {
+	my $try = File::Spec->catfile($_, $bin);
+	return $try if -x $try;
+    }
+    undef;
+}
+
+sub squote {
+    my ($t) = @_;
+    $t =~ s/([\\\"])/\\$1/g;
+    $t = '"'.$t.'"' if $t =~ /[^-\w.\/]/;
+    $t;
+}
+
+################ Button Images ################
+
+sub add_button_images {
+    # Extract button images from DATA section.
+
+    my $out = do { local *OUT; *OUT };
+    my $name;
+    my $doing = 0;
+    my $did = 0;
+
+    while ( <DATA> ) {
+        if ( $doing ) {         # uudecoding...
+            if ( /^Xend/ ) {
+                close($out);
+                $doing = 0;	# Done
+		next;
+            }
+            # Select lines to process.
+            next if /[a-z]/;
+	    next unless /^X(.*)/s;
+	    $_ = $1;
+            next unless int((((ord() - 32) & 077) + 2) / 3)
+              == int(length() / 4);
+            # Decode.
+            print $out unpack("u",$_);
+            next;
+        }
+
+        # Otherwise, search for the uudecode 'begin' line.
+        if ( /^Xbegin\s+\d+\s+(.+)$/ ) {
+	    next if !$clobber && -s d_icons($1);
+	    print STDERR ("Creating icons: ") if $verbose > 1 && !defined($name);
+	    $did++;
+            $name = d_icons($1);
+	    print STDERR ("$1 ") if $verbose > 1;
+            open($out, ">$name");
+	    binmode($out);
+            $doing = 1;         # Doing
+            next;
+        }
+    }
+    print STDERR ("\n") if $verbose > 1;
+    if ( $doing ) {
+        die("Error in DATA: still processing $name\n");
+        unlink($name);
+    }
+}
+
+################ Style Sheets ################
+
+my $add_stylesheet_msg;
+sub add_stylesheets {
+    my $css_fontfam = "font-family: Verdana, Arial, Helvetica";
+    my $WHITE = "#FFFFFF";
+    my $BLACK = "#000000";
+    my $RED   = "#FF0000";
+    my $LGREY = "#E0E0E0";
+    my $MGREY = "#D0D0D0";
+    my $DGREY = "#C0C0C0";
+
+    $add_stylesheet_msg = 0;
+
+    add_stylesheet("common", heredoc(<<"    EOD", 4));
+    body {
+	font-size:  80%; $css_fontfam;
+	text: $BLACK;
+	background: $DGREY;
+    }
+    td {
+	font-size:  80%; $css_fontfam;
+    }
+    p.hdl, p.hdr {
+	font-size: 140%; font-weight: bold;
+	$css_fontfam;
+    }
+    p.ftl, p.ftr {
+	font-size:  80%; $css_fontfam;
+    }
+    a:link {
+	color: $BLACK; text-decoration: none;
+    }
+    a:visited {
+	color: $BLACK; text-decoration: none;
+    }
+    a:active {
+	color: $RED; text-decoration: none;
+    }
+    EOD
+
+    add_stylesheet("index", heredoc(<<"    EOD", 4));
+    \@import "common.css";
+    a.info {
+	position: relative; z-index: 24; background-color: $LGREY;
+	color: $BLACK; text-decoration:none;
+    }
+    a.info:hover {
+	z-index: 25; background-color: $LGREY;
+    }
+    a.info span {
+	display: none;
+    }
+    a.info:hover span {
+	display: block;
+	position: absolute; top: 2em; left: 2em; width: 25em;
+	border: 0px; background-color: $MGREY; color: $BLACK;
+	text-align: center;
+    }
+    table.outer {
+	background: #d0d0d0;
+	border-collapse: separate;
+	border-width: 2px;           /* border=2 */
+	border-style: solid;
+	border-color: #e8e8e8 #727272 #727272 #e8e8e8;
+	border-spacing: 3px;        /* cellspacing = 3 */
+    }
+    table.outer tr {
+	background: #e0e0e0;
+    }
+    table.outer td {
+	border-width: 1px;
+	border-style: solid;
+	border-color: #7c7c7c #f5f5f5 #f5f5f5 #7c7c7c;
+    }
+    table.inner {
+	border: outset 0px;
+    }
+    table.inner td {
+	border: inset 0px;
+    }
+    p.hdr {
+	font-size: 140%; font-weight: bold;
+	font-family: Verdana, Arial, Helvetica;
+    }
+    p.hdr a:link {
+	color: #000000; text-decoration: underline;
+    }
+    p.hdr a:visited {
+	color: #000000; text-decoration: underline;
+    }
+    p.hdr a:hover {
+	color: #FF0000; text-decoration: underline;
+    }
+    EOD
+
+    add_stylesheet("large", heredoc(<<"    EOD", 4));
+    \@import "common.css";
+    a.info {
+	position: relative; z-index: 24; background-color: $DGREY;
+	color: $BLACK; text-decoration: none;
+    }
+    a.info:hover {
+	z-index: 25; background-color: $DGREY;
+    }
+    a.info span {
+	display: none;
+    }
+    a.info:hover span {
+	display: block;
+	position: absolute; top: 2em; left: 2em; width: 15em;
+	border: 0px; background-color: $MGREY; color :$BLACK;
+	text-align: center;
+    }
+    EOD
+
+    add_stylesheet("medium", heredoc(<<"    EOD", 4));
+    \@import "common.css";
+    a.info {
+	position: relative; z-index: 24; background-color: $DGREY;
+	color:$BLACK; text-decoration:none;
+    }
+    a.info:hover {
+	z-index: 25; background-color: $DGREY;
+    }
+    a.info span {
+	display: none;
+    }
+    a.info:hover span {
+	display: block;
+	position: absolute; top:2em; left: 2em; width: 15em;
+	border: 0px; background-color: $MGREY; color: $BLACK;
+	text-align: center;
+    }
+    EOD
+
+    add_stylesheet("journal", heredoc(<<"    EOD", 4));
+    body {
+	font-size: 100%; $css_fontfam;
+	text: $BLACK;
+	background: $WHITE;
+    }
+    p.hd {
+	font-size: 140%; font-weight: bold;
+	margin-left: 0.1in; margin-top: 0.1in; margin-bottom: 0.1in;
+    }
+    table.outer {
+	width: 500px;
+	border-spacing: 10px;
+    }
+    tr.grey {
+	background: $DGREY;
+    }
+    table.outer td {
+    }
+    EOD
+
+    print STDERR ("\n") if $add_stylesheet_msg;
+}
+
+sub add_stylesheet {
+    my ($css, $data) = @_;
+    return if -e d_css("$css.css");
+    print STDERR ("Creating style sheets: ")
+      unless $verbose <= 1 || $add_stylesheet_msg++;
+    print STDERR ("$css.css ");
+    $css = d_css("$css.css");
+    open(my $out, ">".$css) or die("$css: $!\n");
+    binmode($out);
+    print {$out} ($data);
+    close($out) or die("$css: $!\n");
+}
+
+################ End Style Sheets ################
+
+sub detab {
+    my ($line) = @_;
+    my $orig = $line;
+    my (@l) = split(/\t/, $line, -1);
+
+    # Replace tabs with blanks, retaining layout
+
+    $line = shift(@l);
+    $line .= " " x (8-length($line)%8) . shift(@l) while @l;
+
+    $line;
+}
+
+################ Copying: plain files ################
+
+sub copy {
+    my ($orig, $new, $time) = @_;
+
+    $time = (stat($orig))[9] unless defined($time);
+
+    my $in = do { local *F; *F };
+    open($in, "<", $orig) or die("$orig: $!\n");
+    binmode($in);
+
+    my $out = do { local *F; *F };
+    open($out, ">", $new) or die("$new: $!\n");
+    binmode($out);
+
+    my $buf;
+
+    for (;;) {
+	my ($r, $w, $t);
+	defined($r = sysread($in, $buf, 10240))
+	  or die("$orig: $!\n");
+	last unless $r;
+	for ( $w = 0; $w < $r; $w += $t ) {
+	    $t = syswrite($out, $buf, $r - $w, $w)
+	      or die("$new: $!\n");
+	}
+    }
+    close($in);
+    close($out) or die("$new: $!\n");
+    utime($time, $time, $new);
+}
+
+################ Copying: MPG files ################
+
+sub copy_mpg {
+    my ($orig, $new, $time, $rotate, $mirror) = @_;
+    $time = (stat($orig))[9] unless defined($time);
+
+    # I'm not sure what this does. The resultant file is about 10% of
+    # the original, without missing something...
+    my $cmd = "$prog_mencoder -of mpeg -oac copy -ovc ".
+	($rotate ? "lavc -lavcopts vcodec=mpeg1video -vop rotate=".int($rotate/90)." " : "copy ") .
+	  squote($orig) . " -o ". squote($new);
+    warn("\n+ $cmd\n") if $verbose > 2;
+
+    my $res = `$cmd 2>&1`;
+    die("${res}Aborted\n") if $?;
+
+    utime($time, $time, $new);
+}
+
+sub still {
+    my ($el) = @_;
+
+    my $new = d_large($el->assoc_name);
+    my $still = new Image::Magick;
+    if ( $prog_mplayer ) {
+	my $tmp = "00000001.jpg";
+	my $tmp2 = "00000002.jpg";
+	if ( -e $tmp ) {
+	    die("ERROR: mplayer needs to create a file $tmp, but it already exists!\n");
+	}
+	# Sometimes, -frames 1 does not produce anything. Need -frames 2.
+	my $cmd = "$prog_mplayer -really-quiet -nojoystick -nolirc -nosound -frames 2 -vo jpeg " .
+	  squote(d_large($el->dest_name));
+	warn("\n+ $cmd\n") if $verbose > 2;
+	my $t = `$cmd 2>&1`;
+	warn("$t\n") unless -s $tmp;
+	$still->Read($tmp);
+	unlink($tmp, $tmp2);
+    }
+    else {
+	# This may take minutes.
+	$still->Read(d_large($el->dest_name)."[0]");
+    }
+
+    # Get still dimensions.
+    my ($hs, $ws) = $still->Get(qw(height width));
+    unless ( $hs && $ws ) {
+	$still->Read(d_icons("movie.jpg"));
+	$still->Write($new);
+	return $still;
+    }
+    # Scale to 640x480 if needed.
+    my $r = $hs > $ws ? 640 / $hs : 640 / $ws;
+    if ( abs($r - 1) > 0.05 ) {
+	$still->Resize(width => $r*$ws, height => $r*$hs);
+	($hs, $ws) = $still->Get(qw(height width));
+    }
+
+    # Create black canvas.
+    my $canvas = new Image::Magick;
+    $canvas->Set(size => ($ws+240).'x'.($hs+180));
+    $canvas->ReadImage('xc:black');
+    my ($hc, $wc) = $canvas->Get(qw(height width));
+
+    # Place the still on top of it.
+    # Center image
+    $canvas->Composite(image => $still, compose => 'Atop', x => 120, 'y' => 90);
+    # Bottom slice.
+    $canvas->Composite(image => $still, compose => 'Atop', x => 120, 'y' => $hs+135);
+    # Top slice. Cannot place at negative offsets, so crop the still first.
+    $still->Crop(width => $ws, height => 45, x => 0, 'y' => $hs-45);
+    $canvas->Composite(image => $still, compose => 'Atop', x => 120, 'y' => 0);
+    undef $still;
+
+    # Drill spocket holes.
+    my $hole = new Image::Magick;
+    $hole->Set(size => '60x40');
+    $hole->ReadImage("xc:grey90");
+    $hole->Draw(primitive => 'polygon', fill => "black",
+		points => " 0,0   5,0   0,5");
+    $hole->Draw(primitive => 'polygon', fill => "black",
+		points => "60,0  55,0  60,5");
+    $hole->Draw(primitive => 'polygon', fill => "black",
+		points => "60,40 55,40 60,35");
+    $hole->Draw(primitive => 'polygon', fill => "black",
+		points => " 0,40  5,40  0,35");
+
+    for ( my $v = 0; $v < $hc;  $v += 80 ) {
+	for my $h ( 30, $wc-90 ) {
+	    $canvas->Composite(image => $hole, compose => 'Atop',
+			    geometry => "+$h+$v");
+	}
+    }
+
+    $canvas->Write($new);
+    my $time = $el->timestamp;
+    utime($time, $time, $new);
+    $canvas;
+}
+
+################ Copying: Voice files ################
+
+sub copy_voice {
+    my ($orig, $new, $time) = @_;
+    $time = (stat($orig))[9] unless defined($time);
+    $orig =~ s/\.\w+$/.mpg/;
+    return if -s $new;
+    return unless $prog_mplayer;
+
+    # This will produce an MP2 file. Good enough for now...
+    my $cmd = "$prog_mplayer -nojoystick -nolirc -vo null ".
+      "-dumpaudio -dumpfile " . squote($new) . " " . squote($orig);
+    warn("\n+ $cmd\n") if $trace;
+    my $res = `$cmd 2>&1`;
+    die("${res}Aborted\n") if $?;
+    die("${res}Aborted\n") unless -s $new;
+
+    utime($time, $time, $new);
+}
+
+################ Index Icon Maintenance ################
+
+sub create_index_icon {
+    return unless $icon;
+    print STDERR ("Creating index icon\n") if $verbose > 1;
+    unless ( indexicon() ) {
+	print STDERR ("(Index icon not modified)\n") if $verbose > 1;
+    }
+}
+
+sub indexicon {
+    my @imgs;
+    for ( my $i = 0; $i < $index_rows*$index_columns; $i++ ) {
+	next if $i >= $num_entries;
+	my $el = $filelist->byseq($i+1);
+	my $file = $el->dest_name;
+	my $img;
+	if ( $el->type == T_REF ) {
+	    $img = $el->assoc_name;
+	}
+	else {
+	    $img = $el->type == T_MPG ? $el->assoc_name : $file;
+	    $img = "thumbnails/$img";
+	}
+	push(@imgs, $img);
+    }
+
+    my $iconfile = "icon.jpg";
+    my $ii = cache_entry(" indexicon ");
+    if ( -f $iconfile && $ii && $ii->dest_name eq "@imgs" ) {
+	return 0;
+    }
+    my $el = new ImageInfo($iconfile);
+    $el->dest_name("@imgs");
+    cache_entry(" indexicon ", $el);
+    $cache_update++;
+
+    my $image = new Image::Magick->new;
+    foreach ( @imgs ) {
+	$image->Read($_);
+    }
+
+    my $width = $thumb;
+    my $height = int($thumb*0.75);
+
+    $image = $image->Montage(tile=>"${index_columns}x${index_rows}",
+			     texture=>"xc:gray90");
+    $image->Resize(geometry=>"${width}x${height}");
+    $image->Write($iconfile);
+    1;
+}
+
+################ Subroutines ################
+
+sub app_options {
+    my $help = 0;		# handled locally
+    my $ident = 0;		# handled locally
+
+    # Process options, if any.
+    # Make sure defaults are set before returning!
+    return unless @ARGV > 0;
+
+    if ( !GetOptions(
+	# Run time options.
+	'clobber'        => \$clobber,
+	'dcim=s'         => sub { $import_dir = $_[1]; $import_exif++ },
+	'exif'           => \$import_exif,
+	'import=s'       => \$import_dir,
+	'info=s'         => \$info_file,
+	'link!'          => \$linkthem,
+	'update'         => \$update,
+	'mediumonly'     => \$mediumonly,
+	'extformats'	 => \$externalize_formats,
+
+        # Album options. Can also be set in info/config files.
+	'captions=s'     => \$caption,
+	'cols|columns=i' => \$index_columns,
+	'icon!'          => \$icon,
+	'medium'         => sub { $medium = 0 },
+	'mediumsize=i'   => \$medium,
+	'rows=i'         => \$index_rows,
+	'thumbsize=i'    => \$thumb,
+	'title=s'        => \$album_title,
+
+	# Miscellaneous.
+	'debug'          => \$debug,
+	'help|?'         => \$help,
+	'ident'          => \$ident,
+	'quiet'          => sub { $verbose = 0 },
+	'test'           => \$test,
+	'trace'          => \$trace,
+	'verbose+'       => \$verbose,
+        )
+	 or $help
+	 or @ARGV > 1
+	 or @ARGV && ! -d $ARGV[0]
+       )
+    {
+	app_usage(2);
+    }
+
+    app_ident() if $ident;
+    $dest_dir = @ARGV ? shift(@ARGV) : ".";
+    $dest_dir =~ s;^\./;;;
+    if ( $import_dir ) {
+	die("$import_dir: Not a directory\n")
+	  unless -d $import_dir;
+	$import_dir =~ s;^\./;;;
+    }
+}
+
+sub app_ident {
+    print STDERR ("This is $my_package [$my_name $my_version]\n");
+}
+
+sub app_usage {
+    my ($exit) = @_;
+    app_ident();
+    print STDERR heredoc(<<"    EndOfUsage", 4);
+    Usage: $0 [options] [ directory ]
+      Album:
+	--info XXX          description file, default "@{[DEFAULTS->{info}]}" (if it exists)
+	--title XXX         album title, default "@{[DEFAULTS->{title}]}"
+	--[no]icon          [do not] produce an album icon
+      Index:
+	--cols NN           number of columns per page, default @{[DEFAULTS->{indexcols}]}
+	--rows NN           number of rows per page, default @{[DEFAULTS->{indexrows}]}
+	--thumbsize NNN     the max size of thumbnail images, default @{[DEFAULTS->{thumbsize}]}
+	--captions XXX      f: filename s: size c: description t: tag
+      Medium:
+	--medium            produce medium sized images of size @{[DEFAULTS->{mediumsize}]}
+	--mediumsize NNN    the max size of medium sized images, default @{[DEFAULTS->{mediumsize}]}
+	--mediumonly        ignore large images and links (for web export)
+      Importing:
+	--import XXX        original images
+	--exif              use w/ EXIF info, if possible
+	--dcim XXX          as --import with --exif
+	--update            add new entries from import, if needed
+	--[no]link          [do not] link to original, instead of copying. Default is link.
+      Miscellaneous:
+	--clobber           recreate everything (except large)
+	--test              verify only
+	--help              this message
+	--ident             show identification
+	--verbose           verbose information
+    EndOfUsage
+    exit $exit if defined $exit && $exit != 0;
+}
+
+################ Modules ################
+
+package ImageInfo;
+
+my @std_fields;
+my @exif_fields;
+my $exif_rot;
+
+INIT {
+    @std_fields  = qw(type seq next prev
+		      dest_name orig_name assoc_name
+		      timestamp file_size medium_size
+		      tag description annotation
+		      rotation mirror);
+
+    @exif_fields = qw(DateTime ExifImageLength ExifImageWidth
+		      ExposureMode ExposureProgram ExposureTime
+		      FNumber Flash FocalLength ISOSpeedRatings
+		      ImageDescription Make Model
+		      MeteringMode SceneCaptureType Orientation
+		      height width file_ext);
+
+    $exif_rot = { top_left   => [   0, ''  ],    # 1: no corr. needed
+		  top_right  => [   0, 'v' ],    # 2: flop (V)
+		  bot_right  => [ 180, ''  ],    # 3: 180
+		  bot_left   => [   0, 'h' ],    # 4: flip (H)
+		  left_top   => [  90, 'h' ],    # 5: flip 90
+		  right_top  => [  90, ''  ],    # 6: 90
+		  right_bot  => [  90, 'v' ],    # 7: flop 90
+		  left_bot   => [ 270, ''  ],    # 8: 270
+		};
+}
+
+my $largepat;
+sub basename_nolarge {
+    my ($f) = @_;
+    unless ( $largepat ) {
+	$largepat = quotemeta(::d_large());
+	$largepat = qr;^$largepat[/\\];;
+    }
+    $f =~ s;$largepat;;;
+    $f;
+}
+
+sub new {
+    my ($pkg, $file) = @_;
+    $pkg = ref($pkg) if ref($pkg);
+
+    my $self = { $file ?
+		 (orig_name    => $file,
+		  dest_name    => basename_nolarge($file)) : (),
+		 description  => "",
+		 annotation   => [],
+		 tag	      => "",
+	       };
+
+    if ( $file && -f $file ) {
+	my @st = stat(_);
+	my $ii = ::cache_entry($file);
+	if ( $ii  ){
+	    $self = $ii;
+	    delete($self->{$_}) foreach grep { /^_/ } keys(%$self);
+	}
+
+	# Else, get image info.
+	else {
+	    my $ii = Image::Info::image_info($file);
+	    $self->{file_size} = $st[7];
+	    $self->{timestamp} = $st[9];
+	    unless ( exists($ii->{error}) ) {
+		for my $key ( @exif_fields ) {
+		    my $val = $ii->{$key};
+		    next unless defined $val;
+		    if ( $key eq "Orientation" ) {
+			($self->{rotation}, $self->{mirror}) =
+			  @{$exif_rot->{$val}}
+			    if exists $exif_rot->{$val};
+		    }
+		    else {
+			$val = $val->as_float
+			  if UNIVERSAL::can($val,"as_float");
+			$self->{$key} = $val;
+		    }
+		}
+		::cache_entry($file, $self);
+	    }
+	}
+	# Actualize.
+	$self->{file_size} = $st[7];
+	$self->{timestamp} = $st[9];
+    }
+
+    bless($self, $pkg);
+}
+
+INIT {
+    no strict 'refs';
+    for my $sub ( @std_fields, @exif_fields ) {
+	$sub = "_".$sub if $sub eq "rotation";
+	*{"ImageInfo::$sub"} = sub {
+	    my ($self, $value) = @_;
+	    $self->{$sub} = $value if defined($value);
+	    $self->{$sub};
+	};
+    }
+}
+
+sub rotation  {
+    my ($self) = @_;
+    defined($self->{_rotation}) ? $self->{_rotation} : $self->{rotation};
+}
+
+sub html_name {
+    my ($self) = @_;
+    sprintf("img%04d.html", $self->seq);
+}
+
+package FileList;
+
+use Class::Struct "FileList" =>
+  [ _tally	=> '$',
+    _data       => '$',
+    _hash	=> '$',
+  ];
+
+sub add {
+    my ($self, $el, $name) = @_;
+    my $data = $self->_data;
+    my $hash = $self->_hash;
+    $self->_hash($hash = {}) unless $hash;
+    $self->_data($data = []) unless $data;
+    push(@$data, $el);
+    $hash->{$name || $el->dest_name || ""} = $el;
+    $self->_tally(($self->_tally||0)+1);
+    $el->seq($self->_tally);
+    $self;
+}
+
+sub byname {
+    my ($self, $file) = @_;
+    $self->_hash ? $self->_hash->{$file} : undef;
+}
+
+sub entries {
+    my ($self) = @_;
+    $self->_data([]) unless $self->_data;
+    wantarray ? @{$self->_data} : $self->_data;
+}
+
+sub tally {
+    my ($self) = @_;
+    $self->_tally || 0;
+}
+
+sub byseq {
+    my ($self, $seq) = @_;
+    $self->_data ? $self->_data->[$seq-1] : undef;
+}
+
+#### Cache maintenance.
+
+package ImageInfoCache;
+
+use constant CACHE_VERSION => 3;
+
+sub new {
+    my ($pkg, $file) = @_;
+    $pkg = ref($pkg) || $pkg;
+    my $self = bless({}, $pkg);
+    if ( defined($file) ) {
+	$self->load($file);
+	if ( ($self->{_version} || 1) != CACHE_VERSION ) {
+	    warn("Incompatible cache version " . $self->version .
+		 " -- invalidated\n") if $verbose;
+	    $self = bless({}, $pkg);
+	}
+    }
+    $self->{_version} = CACHE_VERSION;
+    $self;
+}
+
+sub load {
+    my ($self, $file) = @_;
+    our $info;
+    $info = undef;
+    eval {
+	require $file;
+    };
+    if ( $@ ) {
+	warn("Illegal cache -- invalidated\n") if $verbose;
+	return;
+    }
+    @{$self}{keys(%$info)} = values(%$info);
+}
+
+sub store {
+    my ($self, $file) = @_;
+    $Data::Dumper::Indent = 1;
+    $Data::Dumper::Sortkeys = 1;
+    $Data::Dumper::Sortkeys = 1; # avoid warnings
+    $Data::Dumper::Purity = 1;
+    my $cache = do { local *C; *C };
+    open($cache, ">$file")
+      and print $cache (Data::Dumper->Dump([$self],[qw(info)]), "\n1;\n")
+	and close($cache);
+}
+
+sub entry {
+    my ($self, $file, $entry) = @_;
+    $file =~ s;^\./;;;
+    if ( defined $entry ) {
+	$self->{$file} = $entry;
+    }
+    else {
+	$entry = $self->{$file};
+    }
+    $entry;
+}
+
+sub entries {
+    my ($self) = @_;
+    [ sort(keys(%{$self})) ];
+}
+
+sub version {
+    my ($self) = @_;
+    $self->{_version};
+}
+
+package main;
+
+=head1 NAME
+
+Album - create and maintain HTML based photo albums
+
+=head1 SYNOPSIS
+
+A photo album consists of a number of (large) pictures, small thumbnail
+images, and index pages. Optionally, medium sized images can be
+generated as well. The album will be organised as follows:
+
+  index.html       first or only index page
+  indexN.html      subsequent index pages (N = 1, 2, ...)
+  icons/           directory with navigation icons
+  large/           original (large) images, with HTML pages
+  medium/          optional medium sized images, with HTML pages
+  thumbnail/       thumbnail images
+
+Each image can be labeled with a description, a tag (applies to a
+group of images, e.g. a date), the image name, and some
+characteristics (size and dimensions).
+
+Images can be handled 'in situ', or imported from e.g. a CD-ROM or
+digital camera. Optionally, EXIF information from digital camera files
+can be taken into account.
+
+=head1 DESCRIPTION
+
+For a description how to use the program, see L<Album::Tutorial>.
+
+=head1 AUTHOR AND CREDITS
+
+Johan Vromans (jvromans@squirrel.nl) wrote this module.
+
+Web site: http://www.squirrel.nl/people/jvromans/Album/index.html
+
+=head1 COPYRIGHT AND DISCLAIMER
+
+This program is Copyright 2004 by Squirrel Consultancy. All
+rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of either: a) the GNU General Public License as
+published by the Free Software Foundation; either version 1, or (at
+your option) any later version, or b) the "Artistic License" which
+comes with Perl.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See either the
+GNU General Public License or the Artistic License for more details.
+
+=cut
+
+__END__
+
+Xbegin 644 index.png
+XMB5!.1PT*&@H````-24A$4@```"$````A"`````!RCYVS```!?TE$050XC;V3
+XMOTM"413'/^JSAR))B3B;0F[A%KGDT-(D+D(0!*W^`[T6EPP:0W`2A":7>+N#
+XM+C4(\D9U4&?Q1QB1^"L:>M?W>$HNT7>YY][[.>=^W^$=6Y4MDO1U.;3>^!PF
+XM8E)1YUTK$70FXB[`5H7/6PTY8B6:4Z)W;K!5F2A:)./W6HEQ(]>,9EW8H:)%
+XMBN$U`.]Q,:)50`*5C/0FSMWRQUP/G9YT6CU'8CF7_;,S02A)Y54/3QX/?[YE
+XMV#WRSM@)`0SZ``<R,.U8^A%X`BCD`>Y#0#NEW]C7'%KU%X3P\5X`J`/PO`^,
+XMK,0X;V25-M20%+&/DCK5PX"9L">-G-A&'U_JJD;PI2=JQ$S$(BL()5A:==U,
+XM@/<"H%X#2.T#(^%7$+O7`-0`DB&@+8C_[7KO$F``P(T,3`W"%VR.7<P:1E8'
+XMLR0<SFD_7!9[-]G5?TI+?R7QD"GN&3F>5;3(D0`)XF7M*N-;M]C*-:-Q8^8V
+XC2LP<3"KJ)L"8V]^UO6/?/_-HCRMMEKD`````245.1*Y"8((`
+X`
+Xend
+Xbegin 644 medium.png
+XMB5!.1PT*&@H````-24A$4@```"$````A"`````!RCYVS```!(DE$050XC;W3
+XMOTZ#4!3'\2\4TM3$="!]@"8FLK*Y]@U(]`&<VSJYZ<)2)ZT./$`GZ<CN`&_`
+XM*+@T<34-HHE-TS^ZM$+@`I/^EDLXGW`N]^9(/C51=NMFGJ]HC8Q8>.YJEA==
+XMU>RU`,F'K^N`IIX7X1)C=`"2S^(JT*U..R^29SLT;EK(X`7ZY*@`:)],],`#
+XM&5PLI5`'4(:X(+-9-3LE/WH,(#.?Z<46F<A5Q;\3'W7".8VJQ>-]/`RKA/.P
+XM);Z(RL5TO`7B050FG-MO`-[[D5A,[_9/2?]%))QQ^C89I-O]O=5/]3+;_54O
+XMB,,SQ/FOF].Z85(M&NKRK:08[;J86&LA6-N8H$#O*3BW-,$7[-#HI3,GS'[F
+X@8.&Y(I#.;77JS^,'X]I4;J49'ZH`````245.1*Y"8((`
+X`
+Xend
+Xbegin 644 first.png
+XMB5!.1PT*&@H````-24A$4@```"$````A"`````!RCYVS```!;4E$050XC873
+XMNT["4!C`\7]+"<&%@?``)"9V,`8F77D#XF4$W44G0Q"7+BI1)X75(*QBV!P<
+XM8'6QQAC%B0<P#"P2PLVAI3TMK9[E.SGGU^_2Y$AM_EF*&2<]]TTT((A!JSGJ
+XMND4\F$Z%`:D-/R<Z(=4M.D.2ITL@M1D4=56+1=RB_UGN),_"R-#2U>KR`B"R
+XM457U%LC01%,6[@&4'$V0F8Q",9]!5P!D>EU5*/%FA.F[=2([OZK=&K'TZ"/J
+XMY2D`YP]"-\+]K'YME"@)P"%,,+D4@5AE#J[N'97M''<5H]1%P]F\E:-6,9HL
+XMN8"5X]6<XGGB`E:.1,[8K6_Y";+[QK;@)O8LNP<`2/D=/T'F$(#`T;:?L$A^
+XM4Q3B/Y6RT@V`7)0:W@(RLQ<`CF=^@FS"B(4/H8]HO-.WR9IYO"J(0'#XC??Z
+XM,F=)HXT]P;A,&A1(/>E[6M0C0[F33-EOSG/-WQP,6DTO8+_;OY?\'^`7/!!E
+X1K2\A))\`````245.1*Y"8((`
+X`
+Xend
+Xbegin 644 first-gr.png
+XMB5!.1PT*&@H````-24A$4@```"$````A"`````!RCYVS```!2DE$050XC873
+XM36K"0!3`\7]B1"P%H5&$?@A"H=EFUZTW\`@]0$_0;K)I3Y`#>(3LNX@WR++I
+XM2M"V(-520131U"XF'Y,QJ6_S(//+O)?,/&W(D3#B',W5%;,BB;7O;4>JZ%;[
+XMO3J@#6'U&%"S5!%NL)].0!NR?@@LI]50Q>+5#>WG.CKX@36X/@`T;@=6X(,.
+XM'HYQL`Y@W..!3K2MM4H^]`9`9SZRI!*12/LH?:+GWYK^B#Q9E8CIQQZ`\4SJ
+XM)@]$B8D$<GLDX%T&LDC!%\4B!B@@ZR,!XQG%8ODI\O=2`6F5TW.1SYIE@O:%
+XMR!WU"+).$W+9*A,)T10B_[&4-,M$2CHRR=^=-IIHMU30CN_%U:]4Q>R&BXS$
+XM0Z)5)%&I;I232.,M[K2/LRL$.Y<^&-![">X<LV`'-[1[V<P51C)SL/:](I#-
+X;[?^A'P/\`;NE8"0C>L''`````$E%3D2N0F""
+X`
+Xend
+Xbegin 644 last.png
+XMB5!.1PT*&@H````-24A$4@```"$````A"`````!RCYVS```!<4E$050XC863
+XM/4M"41C'?_>HB"T.X@<0@BX1HE.MCFVB-1K1FC9)6"TNO2`MU6T-J[$4MX8&
+XM_087(L@F/T`XM"2B7AN.+_?E6/_E.3SGQ__YWWMXM!;_R#^IHZ[[)N*S$;UF
+XM8]!Q$[%`.A4"M!;\G)@$=3?1[I,\70*M1>_8U,O1L)OX_C#:R;,0`IJF7EWV
+XM`(0WJKK9!`$-RG[//8`_3P,$HT$PNN!#5P`$W8X>!GBW9/O-A8G9Z>5"UKN'
+XM103U<P`LX]&9QG:NC4L"L*[&.4WI`?7*"(!KNXN#X/G2BS@)GBIC`&[NE3D`
+XM:K)8M]K.`H*:?'3+B">44R"[+OOYA#H'V9)L[T^'N*=L%^6?*.1F+:?'5E&F
+XM.)@#3H_,H?``#B)[)&T+=L`^)3,!\@[`YK&Y*NM>W!E>$(FUOP'6)G8N`($O
+XMT/]"K<])CC3EH1(8&J3!#ZE7<[<<43@8[61JOG-*37<.>LV&"ICO[=_RO+Y'
+X5OU]T8)`W'C>9`````$E%3D2N0F""
+X`
+Xend
+Xbegin 644 last-gr.png
+XMB5!.1PT*&@H````-24A$4@```"$````A"`````!RCYVS```!3DE$050XC873
+XM34K#0!3`\7\F*:5U4:$4W`A&"V;;G=O>H$?P`)Y`-]GH"7J`'B%[%^D-LC3B
+XM1P0W@A3LHBVE^7"1IDDF,_HV$_)^O'G#FS'F_!/6?DT6<J9O5L3&]W:1+.S6
+XM9-P!C#FL[P+:CBS"+:/[+AAS-K>!XPYZLE@^3</10P<!?N#,A@U`[VKF!#X(
+XM\'"M1A[`NL$#0;)K#S0'O000+"*G!Y`4YY:8.'Q]_>3KYTHGTF@)0/RVU@BR
+XM][Q*_++2"+(H)\GK2B/(/@JRU@A2!:F+LMV22((LBG,2I1IAV/D$+%NHA;#S
+XM$5K#KGH7<78,@%F"NC`4H"8,NP!'E;^5FV&<-WJHUS@T>5$#E1HG^]M_:M8`
+XM@KX=+@&*A`00F*WM-^IXWO<QP8V5()XR`0O&C\&UVU=4F(:C<?GFE%&\.=CX
+X?G@J4[_;OD*??C%],IF=*M!8^B@````!)14Y$KD)@@@``
+X`
+Xend
+Xbegin 644 next.png
+XMB5!.1PT*&@H````-24A$4@```"$````A"`````!RCYVS```!,4E$050XC873
+XMOTK#0!S`\6^O*:6"=`B%_EL*@EF[N?8-^@@.0A'[`BI"0-07B$C!H8^0W2%Y
+XM@XS&J4N2%J1#$2RE+;A4T]S%WF\Y?G<?[O<[CE_!1Q/&;MW.Y1.SN">6GKN>
+XMR*)3ZO<J0,&'[]N`LB6+<$7WX0@*/LN;P+)K55DLWIVP^UA!@!=8XQ,%4#T;
+XM6X$'`EQL0SD',(:X(-BNR[5_'GH*()A/K+3$E\I$-KU.="(>S#2"Z<54(Y@-
+XM8HT@N8HT@F@8:P31Y50C2.YTHGFO$>V7QF'1=EK[J?JKS><,4$5]U,ANR%4:
+XMKQ*016M4ER^5JCP=*WT)S$ZX^$M5@*!86GVJ^P!\[/KH8V]RP<:A#P;TWH)S
+XMV\RYP0F[O73F<N-WYF#IN7D@G=O#D?O[F?@!Z/M.5(VCE!4`````245.1*Y"
+X"8((`
+X`
+Xend
+Xbegin 644 next-gr.png
+XMB5!.1PT*&@H````-24A$4@```"$````A"`````!RCYVS```!'TE$050XC873
+XM,4[#,!2`X3]NFJ@L':*.2$0*D#4;:V[0(W``3@!+%GJ"'J!'R,Z0WB`C@2*%
+XM'77H0N6TD5@*;9Y-\Q;KV9^>GV4]9TE/N(>U7<N38'`BMD6^JZ4(A]-T!#A+
+XM^'XJ\6,I*DWR?`'.DNUC&6>3L12;UWF5S$8H*,IX$1F`\=TB+@M0D).YQCF`
+XM^T`.BG;G3_YYZ"V`8EW'QRM:DZEN6NL^H5=-CZ!YET0*FI7N$>@/W2,DL0C1
+XMKDW0?/8)[^HDL?V('WGG:_B1SUDA@'F+=^UU-V0-[T8`6<._E$"*<&#TI0C"
+XM:O.7F@#%8*B_S'T`W@Z=3LGV5K"?,P47TI?R/@LL%>95DAYGSAJ_,P?;(K>!
+X=X]R>#^OO=^('W$Y.6'!/."L`````245.1*Y"8((`
+X`
+Xend
+Xbegin 644 prev.png
+XMB5!.1PT*&@H````-24A$4@```"$````A"`````!RCYVS```!-TE$050XC863
+XM34["0!S%?RU%@HEA43D`B8G==L>V*JPY@@?P``90&R/&`_0`+#Q`UZ"V-^C2
+XMNN(`RH*8V/!E7(BA\R%]FTEF?O/FS4O^1DR!K,VZGLHG=BE'9%&XG,A$H]SQ
+XMJH`1PU<OH>+(1#K''>R#$9-U$\>OUV1B]AJD[GT5$Z+$&1XI`+7FT$DB,"'$
+XMMY1S`.N"$$S6RTK]GX\>`YA,)X[XQ*>(F<K%\6,!\=)?[":>+M?L),;];]E4
+XM)$8W*R670(S\A0*0[^KY6G40/#YZ.B!/'`ZTY>=SG-[N%1"T?0TB&K>-*R6+
+XM]'3+Z,J5R:V?/90*"$[NI"SJ!UM-V<-NI#-AZT`F2N7YNV+TJ[=-C@Z^MFY6
+XM`1VPP!LGY[ZM<0A2U]O.G%9_,P=9%.J`[=SNECH-LGX`6BE1+/?*'38`````
+X(245.1*Y"8((`
+X`
+Xend
+Xbegin 644 prev-gr.png
+XMB5!.1PT*&@H````-24A$4@```"$````A"`````!RCYVS```!(4E$050XC873
+XM,6[",!0&X-].(D2'TBAB)Q(27K.QY@8Y0@_0$[1+EO8$.0!'R,Z0W,`CZ136
+XM"B'*T@B%B`ZE`K]GR%LLQ5^>GU_R1(F><,]KMZ4[@7,EFB)O:RI"+XF'`$0)
+XM_+QI#!05U0'1^P,@2C2O6J7C$17[559%'T-(H-!J,64`H_E"Z0*00([49?L`
+XMX+X@!R2Z=C"^<=$9`$AL:V4>T9E,LA=W7SWB>WTBU=`,K',DQV[-3I4$G.X+
+XM&S`$*Y**MK:!:^&%HD?@:6(C1J6^C9BWM1'2,7_"!.VZ+VC;V9=CY?*_RW^D
+XM.8*PVAN/'"H<[[!AB?[B\UQ'@O1H!<<,">`"\5(_IX$E0U9%\67FK/$_<T!3
+X?Y#9PF=O[P:>!QB_1RTX:[.:Q%@````!)14Y$KD)@@@``
+X`
+Xend
+Xbegin 644 up.png
+XMB5!.1PT*&@H````-24A$4@```"$````A"`````!RCYVS```!)TE$050XC;73
+XML4K#0!S'\6^2%IK!$FA?H%,A3]#)1Y`.3I+!P2(:'\!"44=?((LX]@$RMRJ9
+XMQ+%3H#AT2=,B+92ZE+01E[8F,<GAX&^Y/]P'_G?'_24'00K;-9PG=RI*1,RZ
+XM[GJ4%+6B;E0!R8&W^P742W&P&H)VW0#)87:V:)J4E;@(EUBV]EA%.>5AT.RH
+XMJIQH(JOJX<<@:""#BYEQ#1,79,)U[F61F8_JY7P!)44D1%WB>3J:Y(M^QS\?
+XMYXG>[0;?]+)%[RX`O*MQEGB^"0#P+B;IXJ6]V59^:YHF^NVO?3UM^?MZ]X/X
+XM?#^)=G\]_B4.+DG/W]_T_\0JS!>5VG"9+Y2BL(N.E;%IH4,!#,=._^V6K1F1
+XEF4O+;N9@UG73P,_<"D\JR#<E0U*RN@H0E`````!)14Y$KD)@@@``
+X`
+Xend
+Xbegin 644 journal.png
+XMB5!.1PT*&@H````-24A$4@```"$````A"`````!RCYVS```!I$E$050XC863
+XM/4B"412&'_4STS(CZ8>@(0SZ:@E)I+8<B@@"FYJ"HBD(6FHI")=L<71H#)R:
+XM<JBE(%V:"KXA(B.BJ:F"I!\QS1JNM_Q^K+.\EW,>[GG/@6/+\D\H5?U\,E;\
+XMCAJBD$F7[HQ$KS,:<0.V++QO:+A4(Y$K$MSR@"U+85U38^T^(Y&_2N:"<3=V
+XMR&CJ;I\)P#>RJVH94"!-3"D>`LYI+FY$>:0;4):7TU,H?)9<[;S'@>9I3E*"
+XM2'0#](M9GNZ&?+B7@`88;:X.8MI'XZ+0<-CDITJ43F6B8Y"S-V#8JR=>5R4Q
+XM$2=Q"Z0&](1K5A(J3#X";88NGK6:S@M6/LJ7PG"_R:@D7L0L@;VZ1,,$`)U0
+XMWI2E:+B6:(K+?.5(OD(ZHG(OM-4+'=L`!_OZ+OD9H2MSX!H".#?X4$)"N^HZ
+XM]>Z82WKBZPT`NP>HO`)\&(CG<:"ZC_LQJS\<`0!ZP!:0I19)^'MS>5_+SS*=
+XMQK7:<3B+#W5,7@N"*+&R)5!.$@4%(L?:?,QO\4,R%XS\WIQER)N#0B9M!?S>
+X;[=]A_P_@&\BG:"&P_Q,B`````$E%3D2N0F""
+X`
+Xend
+Xbegin 644 sound.png
+XMB5!.1PT*&@H````-24A$4@```"$````A"`````!RCYVS```!FTE$050XC9V3
+XMOTL"<1C&G_/.S"(;5"@20HF\P7Y($$5#V"@$_0$5$FT);0VYN"31$`5"2X1+
+XM0TO<%$3#'10M#5<.>0:A!(:D$DJD<ITTJ.?=^2MZE[OO^WR^[_N\W+T$ARY!
+XMU9Y23JN820519!DQH27L^A6/$0#!`=\!'@9:2PAEN/?Z`()#<9>G@]9!+9&/
+XMA05WR`@=P/)T9*P)$*.%,YIG`0I@$*14HE2(/0K1+]S[_8P7%"318&VHJ?0S
+XMGWZI'9S567*)*;G%Y452TK93U_]\U>J`KCG5L48M2*-K9'X_VX88'%BP3S@!
+XM'+>IL;%JZN)C2`O\P>D_9\E7LA93!R)Y^"`"XQ]MB:>M$@#4OXU,I&^368LM
+XM!>"\U-+']5&FEJB\:VI69WD+9.3$4OW-12F(.\6=];6J,AO2*;J,RGH_J.UE
+XMK@S,3/?4?9CM0GYN,EH]THL`'`ZU#U)?SI`G?AN`X<W37J48!P""P]4!':$@
+XM20!)JJ;X\0D[7E"`YX;W!<UHBGA8<'L:.]<RZCL'%%FF%=#8V\[1_?_X!<SK
+X2=/BT1/6\`````$E%3D2N0F""
+X`
+Xend
+Xbegin 644 movie.jpg
+XM_]C_X``02D9)1@`!`0$`2`!(``#_VP!#``4#!`0$`P4$!`0%!04&!PP(!P<'
+XM!P\+"PD,$0\2$A$/$1$3%AP7$Q0:%1$1&"$8&AT='Q\?$Q<B)"(>)!P>'Q[_
+XMVP!#`04%!0<&!PX("`X>%!$4'AX>'AX>'AX>'AX>'AX>'AX>'AX>'AX>'AX>
+XM'AX>'AX>'AX>'AX>'AX>'AX>'AX>'A[_P``1"`!:`'@#`2(``A$!`Q$!_\0`
+XM'P```04!`0$!`0$```````````$"`P0%!@<("0H+_\0`M1```@$#`P($`P4%
+XM!`0```%]`0(#``01!1(A,4$&$U%A!R)Q%#*!D:$((T*QP152T?`D,V)R@@D*
+XM%A<8&1HE)B<H*2HT-38W.#DZ0T1%1D=(24I35%565UA96F-D969G:&EJ<W1U
+XM=G=X>7J#A(6&AXB)BI*3E)66EYB9FJ*CI*6FIZBIJK*SM+6VM[BYNL+#Q,7&
+XMQ\C)RM+3U-76U]C9VN'BX^3EYN?HZ>KQ\O/T]?;W^/GZ_\0`'P$``P$!`0$!
+XM`0$!`0````````$"`P0%!@<("0H+_\0`M1$``@$"!`0#!`<%!`0``0)W``$"
+XM`Q$$!2$Q!A)!40=A<1,B,H$(%$*1H;'!"2,S4O`58G+1"A8D-.$E\1<8&1HF
+XM)R@I*C4V-S@Y.D-$149'2$E*4U155E=865IC9&5F9VAI:G-T=79W>'EZ@H.$
+XMA8:'B(F*DI.4E9:7F)F:HJ.DI::GJ*FJLK.TM;:WN+FZPL/$Q<;'R,G*TM/4
+XMU=;7V-G:XN/DY>;GZ.GJ\O/T]?;W^/GZ_]H`#`,!``(1`Q$`/P#ZI\=^,O#?
+XM@?0I-9\3:I#I]HG0N?FD/]U5ZL?85\I^._VQ]5O]1.F?#?PJ7W,5CN+Y2\LG
+XMNL2<#\2?H*X[_@H)JHU7XCZ)-;27!LUTPQJK,?++K*Y+JO8D,H)ZD!?2O1/V
+XM8_!EA;_!+2O&-MIEK%-=^8LUP0#-(RSO'UZA?DZ<<T`>*I\1/CG\1_'/_")O
+XMXOO--U&0RAH%G^R1QE068$KR.F/RJ;XD_#SXM^$_"=UXEUSXA_;K:RV!DAUJ
+XMXDE^=U08#`=V]>F:T?A[%8P?ML20:A=I:V4M]>F>620(%!MI'ZGIS@5Z/^U]
+XMJOAU/AQJFEZ%K=E>B26V^6.Y21F&]6/0^U`'D'P>M?V@-=\/W/B/P%K^M7=I
+XM9SM;R0_VGN;<%#D"*1CD8<<@=37H_@W]K'QSX/UI_#_Q2\-O>/;D+.8XQ;W<
+XM60""5/RMP0?X>O6NG_8_\/F#X%1ZW:ZE!'/)>7$\D*R8D`5O+SP<C[@Z^OTK
+XMY^^*DG_"3_M0W$6H,]VMSJ]I:3;NKHHCB(]^%QF@#[_^%OQ3\%?$FR:X\+ZQ
+XM'<3(,RVDH\N>,>Z'G`]1D5W61ZU\/_&/X&Z9X3TB[^)?PE\37.C-I*&YGLY;
+XMEDEB`/6)QSG)QM/7UKH/@#^UM:W2VOA_XFC[-.1L36(T`C8^LRC[O^\!C/4`
+XM9-`'V!15>PO;2_LXKRQN(KFVF4/%+$P974]"".HJQ0`4444`%%%)O%`"Y'K1
+XM7"GXD:%/\68/AUI\\=WJ0LIKR\,;@K;*A4*C?[9+9QV`]Q10!\:?MQ6GE:KX
+XM>G"][N$D=.&C('ZFN%\*?$7XJ7GP_L/AMX,%Y'IUNTCN+"$M-*SR%_FDZJH)
+XM'`('KFO6/V\+/;;:?<;.(M5N(P1T&\9Q_P".?H:L_L?RH_PQNE^4O'JDBG`P
+XM=NR,CGZDUPYEC7@L.ZJ5SNR_"+%5O9MV/+]._9]^)6M2O>:K)I]G-)\SF\O0
+XM\K$]SLW?J:WT_92\7.H(\0:1_P!\O_A7U9IYD`!ALXQ_M.:UX6<K\Y0G_9KY
+XM9<0XJ;TLCV)Y31AW?S/A_7/@3\8/"$37FD037L2C<SZ5<L7''/R<,?P!K@/`
+XM?BO^QOB?I/C#7H)-7^R:@EW=1NWS3$-D\GOW_"OT=\4:D="\`^(M:BNU4V6E
+XMW-QL88.4B9N.>N0*^#_V6O`&E?$CXIC0]=2:33(K"XN;@0N4<`*$4@CIAW4^
+XM^,5]+E^,G6HN=5;'A8FE&G4Y8'M'QX^)G@;Q;\&-9N?!6H2(]PL,4]G,2DT+
+XM-,N5V]P0#R"1[]JXK]D[X>>"/'7A'Q3;>,;24&6XMXK&_B)62U=5<M@]"#N7
+XM(((.![$-^+_[+?B?PQYVH^$;@^(=+&2(Q@7"+V!'1C].OIVIO[-_Q7\-_#[0
+XM=3\$^,=#N;:6:]>YCOU4AX)"B)Y<B'G`V9[]2,5VTZT*BO%F$H2CJT9<OC;X
+XM@_LZ?$?4/"6A>*8=6L+-T8V\H\RVD1T#K\IY1MK#.TBOJ#X6?M6_#OQ3!%;>
+XM(ISX8U$A0RW9)@9C_=D`P!_O8^M?&/BB[M_&/Q_>6T=+JVU#6X886&2LD>](
+XMP>>V!7H'[8'A/P5H?]CZOX<T1M(U#49IA=0P29MF50IRJ'E&RW0''XUJ2?H)
+XMINJZ=J5JMUI]];7<#C*R02JZG\035II%4%F95`YR37Y<^#/AY\4+_P`+6VM^
+XM%I;I=/O`S(MMJ'E$[79#D9`ZJ:R_!T_Q#\<ZO'X>TOQ'JUQ,8F;9-J,@0(.N
+XM<GI_C0!^FOBOXA>"?"MLUSX@\4:381JN<27*[V^BC+,?8`U\I?&_]KB?48)M
+XM!^%EM<0-.#$VJ31?O<'C]RG.">S'D9Z`\CYVG\!7]G\5K#P1KEVJW-S<V\4T
+XMT)W[1+@Y&>I`->OVW@/POX(_:+^'NDVTSVVGW",]U<W4P)9AY@W$G`7H!T`H
+XM`I?L4Q:K:_M.PPZN+A+Y[*Y:Y%P3YA+1AOFSSDY!YHKI_A/J^DW_`.WY/=^&
+XM[RWO-*O&N8XIXLE'5;,YVD]?F3KWP>O6BBX&]^WE9[O"LDH3F'68G)!Z!HI.
+XM?U'YURG[&-SO\)Z[:;@?*ODDVXY&Y,9_\<_2O2?VY;/S/`>NR>6#Y4MK,#GI
+XM\R)G_P`>->0_L53<>*+8E?\`EU<#O_RU!_I7C9_&^`G\OS/6R65L7'YGTU:?
+XM9RPW0RSMZ#I7060"HNV+R!_+\JP;-[D#"3QPKZG`K:T]P<#[1]H;T/\`A7P5
+XM$^FQ:W9R/[5&HRZ1^SOXFG\^"0W,45JA48)\R558?]\EJ\=_X)SZ,6U?Q=XB
+XM="1!;P6<9`Z[V9V_]%I^==5^WEJ4=I\)-)TQ+=[>:^U9&?GATCC<G_QYEK=_
+XM8(T0V7P/GU(Y275-3FE5P!G8@6,?^/(]?=X;]W@;]SXZM[U8]JU&.W=GDM)A
+XM')_'&>,_AZUYE\1OA=X-\=P/_;FE1B\8`"\@&R=<=/F'7Z'->D:J;A&V7<,;
+XM_P!R51@FLF5U1"S%L'T&:^9K5I4JO-#W7]Q[.&IJ4+2U/C3XA_`SQ)\,[C_A
+XM,O"^OQ75MI;BZ65T$4\!4Y!P<J^..G7TKS#XC?$+Q%X_-@_B`V\DED)!&\,0
+XM3=OV[B<<?PBOL3]IV_\`LWP0\1R1W:2K+'%#M9<M\TJ+U^F:\^_99T33;_X0
+XM31ZGIUO>PW.IS/LN(0Z'"1KT8>J_SKWL-G$X8-UZRO9V.:>61J8CV4';2YA_
+XM#WX[>"?#O@'2M#ET_61=6-JL4@$2%'?'S,IW9P6SU&>:\W_9O\7^&O!/C'4M
+XM9\327@A;2Y;>V6VBWEI6>,KGG@84U]*W?P@^'-S,\TGA6S#,<D(SH/R#`5D>
+XM+/A%X"MO">LSZ=X;MXKQ=/G,#AW)1O+)4C+$9!%.GQ+A9R4;.[+GP_7BF^9'
+XMA.L^.FUGX\V_COPYH5YJ!MI(9H+.1#N=HT`!.S/&X`_3TKT:V^%/Q"^,.L6V
+XMN>.KBU\/V4*;(X8HMTVPG)`3/'U8\9Z&M_\`9%^RR?#*0B%1*FI2I(RJ-S?*
+XMA&3_`,"_2OH73$*Q<0")".`3DGWK#'YY5IU94:<;6ZCH953=*-63O<^8/A5X
+XM9TKP#^W!HOA[2O.^Q1PNL6]MSY>P8DD^[$G\>/2BMZYC2#]O_P`-3%L>=$K-
+XMN/<VLJ@?H**]_"S=2A"4GK8\3$02JR2/2_VR[3[1X!\1IY8;=IT<QR?[D@.?
+XMPVBOC?X+_$5/AW/J]S_9YO9KR!$B&_:%96)Y/7&":^YOVJ+/[5X*UM-@9I-"
+XMN0N3P2$<C]2*^./V0O"NG^+_`(M'3-0T^WO1%I\MQ"L_W$D5TPY'?`+<'(R0
+XM>H%:UJ,*T'3FKIA2JSHS4X/5%#Q/\:/B=>[+@W[Z3:SY,*V]N$#`>C$$GKUS
+XM7H.E:1^TM;P+=VOB3'R[DB>\B;</H5*_G5?]M6P2VF\+RPQ!%5;J$[0`HP8B
+XM`!^+5]0V^C6-A\/M!U*WU#S_`+1:6W!((.Z'.016<,%AX*R@ON-)XJM-WE-_
+XM>?"?Q3^)_C7XAVNFZ5XJEBN9-&>?RVABVL=^T-NVG:<;."`.IKZM_96^,/PR
+XMM_AIH/@2XUC^S-4LX"CQWD?E)+([EV*/RIRS'`)!]J\%_9;TE]5^-.M,+0W2
+XM6ME<R.NW=@&5$R1W'S8K2_:Y\,^&]!MM(O=,TF"QU*]N)!*T0*;E0#.5Z9RP
+XMYZU53#PG#D6ABIM2N?;5Y(1%OMKM+NU<9P6#8'^%93DA243<?05\?_"VQ^-6
+XMA^#-,\2^$-;CU&RND,K:7=/O`4,0``W`R!GY2.*],\(?M'>'[B[;1_&MC<>&
+XM-6@?RYO-1GA5P<<_Q+^(_'O7RF891B(OGAJO+?[CV\'C*5K-V]1G[9=U:P_"
+XM-D16CGN-0@B*GY=PPS_C]VG_`+,MK/;?!/178.J7#SR\]/\`7.O\E!KE_P!M
+XM'Q!9:KX`\.KIU[9WMK<Z@\R3VLJRH^R,@\CH?WG2O0?@=9I;?"#PS$DNUFL%
+XME:-CC[Y+?C]ZN;%0]GE,(M;R_P`ST<)+FQS?11.P'2H+R!;BTFMWP5E1D8$9
+XM&",5.*",U\U%VDF?1R5TT>&?L;331>']?TQ0!-;:D&8$<@L@7G_O@U])V!8#
+XM$UR)9"/N@]*^;/V<D6P^)7Q'T<[E2/4`4&/X5EF&<>^5KZ!.JZ3HNF2ZAJ$\
+XM&GV,0)ENKF0(OYG^E>[F<7+'2MJW9_@CP*#2PJOTNOQ/$?',<4/[<G@-QA3+
+XM';LQ)X)W3*/T`%%<=J7CS2/B#^UMX$U+189!:6FI6=HDSC!GVW!;?CL/GP,T
+XM5]S@H.&'A&:LTCY/%3O5;CL?7/QWM!=Z+Y&T'S[2YA.[H<J*_/'X'?$:[^%O
+XMC8^*;"QCOK@6DMNL$CE4._'+8Y(!`.!C..HK])?BM&KV%FQ&1YC*1ZY'3]*\
+XM*\#_`+/GA;372YM?#<FI39)$M[\RC_@)^7]*ZC$^3/'WC7QE\4-8\Z_A>YV2
+XM.\%I9VY*1;CS@#)[=R>E45T?XCK&D:Z7XK"(`$46]QA<<#`QQ7Z+Z=\/=1MK
+XM58;:VL;.)1Q$F%`_!1@58?P-K2@D/;-CH`Y_PH`_/+P%XJ^(7PGUYO$.D6M[
+XMI=Q,A@E:[LVV3+D,4;>.>0#Z\5/\9OBIJ?Q.FT^YU73K:RGM/.9_(9MDC2%2
+XM2%/W<;?4]:^_6\/^(K#=LM79#PRH0RL/0CO7G&K_``J^'6JWDH\1>$XH_,5@
+XMSVJ_9Y58_P`0Q@9SF@"U\'H_"]S\'-`D\/\`B:RU">RTVV2]M4<&2&8HH=2!
+XMR`&+<D<XZFODGPS90>+OVCFM[J%;BVN];N)98V&0\:N[D$#V6O9O&/[->G::
+XML>L_#7QO>VUZC_);78*LG'7S$P1R/0YKS[P#X;^)_P`&?'=IX[E\"3ZS#:^<
+XMFY%,L3AT9&8,F2#ACR1WZ4`6_P!IGX=^%?!_A^QU/08KFUENK[RVM_-+0[=C
+XM$D`]#D*!STSQ6]\(/%_Q6;X?V-W8>'=+US1K0?9(8U;R;G9&`O!!P?3)!Z5Q
+XM/[1OQ9TWXF0:7]@T:ZTB2WGEDN;64@JA*H%"D?>_BR2`?:O<OA1-X=\/_L[Z
+XM1<67B#3[F]33[BYN;5)E\R%SND(8`YX#`=*PQ&&HXB/+5BFC:CB*E&7-3=F<
+XMMI?[2/AN=S'>Z)JELX'/EA9`,#GH0<5=E_:,\"JC%(-4=@.%\@<G\Z\^_8L\
+XM,7VN_$+5-7MX/.32].9F;.,/(P`Z^P>J?[7UBL?Q)TM[:*-/M&EH-L:X)82R
+XM\GU/('X5Y3X<P+=[/[STUGN+2M=?<8UK\6KC1/B%XD\5>']+C`U<;42ZR?*R
+XM5.XA3@G(/?O4/CR3XD^+/!B>./%6H.^C&18[6,N%1B25RD:\`?*>:]G_`&J]
+XM(L=!^$\>AN;2VO;6XMF\A2@=P%(S@=?O9->6^)O'NGZY\(=`^'&@Z=>7VH)%
+XM"9I%7A95))11C+=>O`^M>I3PM&#YE'7:_IL>;4Q-6HK2>G^9W&L^%].\$?$C
+XMX`RZ;8QQ_P!HFQNYRH(\R22:+.6ZD@,#^/I17=_LT?!'7-<US3O'7Q/U&XN;
+XMC1!!%I.G-+N\D1*OEECT&W:I"CN,GFBNC<P/KJ:"*;:)HDD"G*[E!P?7Z\T\
+XM*`,`#%.HH`****`#ZU6N[&TO(S'=6T4RGLZYJS10!R6I>!M.GRUH[VS>GWE_
+XM6LV/1?%6B+MTZ=+JWSS$#Q_WR>GX&N_I#WH`^?\`7?`?A+6->:\\8^#+2]W,
+XM[3%K8+(=V?XA@]3GK7&^-_@1\(]0>)O#FFZCI64(E6*Y?`/88<M[]Z^L'1&R
+XM&16'N*Q]8L+%T!>RMF.[O$I_I0!\W^#?V=[/PK;7%]X5^+^OZ"][`IN(;61%
+XMWX!(5O[V,G!/(R?6N1N_V>H_$^J?;?$_Q+U:4P1A8Y+B+S7QG.%YX_QKZL;3
+XM=.W?\>%KU_YXK_A3FTS3=I/]GVG7_GBO^%`'RO#^SGX2FU@S76K:_KP^4_Z0
+XMX5Y#CG.,G&?TKVGX;?!?0M`(DL]#M-)C8#<57=/(/0L<M^M>O6%O;PQ*(H(H
+XBP%Z*@%63]X#MB@"&QLK>QMEM[2%8HUZ!1^OUHJS10!__V0``
+X`
+Xend

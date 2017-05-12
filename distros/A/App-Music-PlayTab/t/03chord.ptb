@@ -1,0 +1,106 @@
+# Plain
+C	C	(C) root
+Cis	C#	(C) root sharp
+C#	C#	(C) root sharp
+
+Des	Db	(D) root flat
+Ds	Db	(D) root flat
+Db	Db	(D) root flat
+D	D	(D) root
+Dis	D#	(D) root sharp
+D#	D#	(D) root sharp
+
+Ees	Eb	(E) root flat
+Es	Eb	(E) root flat
+Eb	Eb	(E) root flat
+E	E	(E) root
+
+F	F	(F) root
+Fis	F#	(F) root sharp
+F#	F#	(F) root sharp
+
+Ges	Gb	(G) root flat
+Gs	Gb	(G) root flat
+Gb	Gb	(G) root flat
+G	G	(G) root
+Gis	G#	(G) root sharp
+G#	G#	(G) root sharp
+
+Aes	Ab	(A) root flat
+As	Ab	(A) root flat
+Ab	Ab	(A) root flat
+A	A	(A) root
+Ais	A#	(A) root sharp
+A#	A#	(A) root sharp
+
+Bes	Bb	(B) root flat
+Bs	Bb	(B) root flat
+Bb	Bb	(B) root flat
+B	B	(B) root
+
+# Minor.
+C-	Cm	(C) root minus
+Cmin	Cm	(C) root minus
+Cm	Cm	(C) root minus
+
+# Augmented.
+C+	C+	(C) root plus
+Caug	C+	(C) root plus
+
+# Diminished.
+Co	Co	(C) root dim
+C0	Co	(C) root dim
+Cdim	Co	(C) root dim
+Cmb5	Co	(C) root dim
+
+# Major7 (delta).
+Cmaj7	Cmaj7	(C) root delta
+
+# Half-diminished.
+C%	C%	(C) root hdim
+Cm7b5	C%	(C) root hdim
+
+# Suspended (4 and 2).
+Csus	Csus4	(C) root (4) susp
+Csus4	Csus4	(C) root (4) susp
+Csus2	Csus2	(C) root (2) susp
+
+# Minor mods.
+Cm7	Cm7	(C) root minus (7) addn
+Cm2	Cm2	(C) root minus (2) addn
+
+# Additions.
+# Note that 9, 11, etc imply 7 but this is only shown if
+# the addition is not plain. C13 -> C13 but C_b13 -> C7b13.
+C6	C6	(C) root (6) addn
+C9	C9	(C) root (9) addn
+C69	C6.9	(C) root (6) addn (9) addn
+C11	C11	(C) root (11) addn
+C13	C13	(C) root (13) addn
+
+# Note the use of syntactic sugar to separate elements.
+C(b13)	C7(b13)	(C) root (7) addn (13) addf
+C)b13(	C7(b13)	(C) root (7) addn (13) addf
+C_b13	C7(b13)	(C) root (7) addn (13) addf
+C b13	C7(b13)	(C) root (7) addn (13) addf
+C.b13	C7(b13)	(C) root (7) addn (13) addf
+C7(b13)	C7(b13)	(C) root (7) addn (13) addf
+
+# Subtractions. Cno3rd = Csus2.
+Cno3	Csus2	(C) root (2) susp
+Cno 3	Csus2	(C) root (2) susp
+Cno3rd	Csus2	(C) root (2) susp
+Cno5	Cno5	(C) root (no5) addn
+Cno 5	Cno5	(C) root (no5) addn
+Cno5th	Cno5	(C) root (no5) addn
+
+# Some harder ones.
+Csus4b13	C7sus4(b13)	(C) root (7) addn (4) susp (13) addf
+
+# F#11 will be interpreted as F# 11, need a separator if F #11 is meant.
+F_#11/A	F7(#11)/A	(F) root (7) addn (11) adds slash (A) hroot
+F6#11/A	F7(6)(#11)/A	(F) root (7) addn (6) addn (11) adds slash (A) hroot
+
+F_#11\A	F7(#11)\A	(F) root (7) addn (11) adds bslash (A) hroot
+F6#11\A	F7(6)(#11)\A	(F) root (7) addn (6) addn (11) adds bslash (A) hroot
+

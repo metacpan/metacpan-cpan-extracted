@@ -1,0 +1,6 @@
+Revision history for Perl extension Audio::AMaMP.
+
+0.01  Tue Mar 16 17:16:52 2004
+	- original version; created by h2xs 1.23 with options
+		-A -n Audio::AMaMP -p amamp ../c/amamp_binding.h
+

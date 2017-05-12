@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+
+<title>The Canny, Microlight and Simple CMS</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="stylesheet" type="text/css" href="<: $css_url :>/table.tx.css">
+<link rel="stylesheet" type="text/css" href="<: $css_url :>/web.page.css">
+
+<link rel="stylesheet" type="text/css" href="<: $validator_css_url :>/validator.css">
+
+<link rel="stylesheet" type="text/css" href="<: $yui_url :>/build/fonts/fonts-min.css">
+<link rel="stylesheet" type="text/css" href="<: $yui_url :>/build/assets/skins/sam/skin.css">
+
+<script type="text/javascript" src="<: $yui_url :>/build/yahoo/yahoo-min.js"></script>
+<script type="text/javascript" src="<: $yui_url :>/build/dom/dom-min.js"></script>
+<script type="text/javascript" src="<: $yui_url :>/build/event/event-min.js"></script>
+<script type="text/javascript" src="<: $yui_url :>/build/connection/connection-min.js"></script>
+<script type="text/javascript" src="<: $yui_url :>/build/datasource/datasource-min.js"></script>
+<script type="text/javascript" src="<: $yui_url :>/build/element/element-min.js"></script>
+<script type="text/javascript" src="<: $yui_url :>/build/datatable/datatable-min.js"></script>
+<script type="text/javascript" src="<: $yui_url :>/build/json/json-min.js"></script>
+<script type="text/javascript" src="<: $yui_url :>/build/container/container_core-min.js"></script>
+<script type="text/javascript" src="<: $yui_url :>/build/menu/menu-min.js"></script>
+<script type="text/javascript" src="<: $yui_url :>/build/tabview/tabview-min.js"></script>
+<script type="text/javascript" src="<: $yui_url :>/build/treeview/treeview.js"></script>
+
+<script type="text/javascript" src="<: $validator_js_url :>/validator.js"></script>
+
+<script type="text/javascript">
+<: $head_js :>
+
+function init()
+{
+
+<: $head_init :>
+}
+YAHOO.util.Event.onDOMReady(init);
+</script>
+
+</head>
+
+<body class="yui-skin-sam">
+
+<h3 class="blue_center">The Canny, Microlight and Simple CMS</h3>
+
+<div id="tabview_container">
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+---
+abstract: 'Test driver'
+author:
+  - 'Kenneth Olwing <knth@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::Simple: '1.302083'
+configure_requires:
+  ExtUtils::MakeMaker: '7.12'
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-TestOnTap
+no_index:
+  directory:
+    - t
+    - inc
+    - extras
+    - author
+requires:
+  Archive::Zip: '1.47'
+  Config::Std: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Copy::Recursive: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  Grep::Query: '1.002'
+  JSON: '0'
+  LWP::Simple: '0'
+  List::Util: '0'
+  Net::Domain: '0'
+  POSIX: '0'
+  Pod::Simple::Search: '0'
+  Pod::Usage: '0'
+  Sort::Naturally: '0'
+  TAP::Formatter::Console: '0'
+  TAP::Formatter::File: '0'
+  TAP::Parser::Scheduler::Job: '0'
+  TAP::Parser::Scheduler::Spinner: '0'
+  UUID::Tiny: '0'
+  perl: '5.010001'
+resources:
+  repository: https://github.com/kenneth-olwing/App-TestOnTap.git
+version: '0.032'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

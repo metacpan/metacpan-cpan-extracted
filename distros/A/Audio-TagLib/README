@@ -1,0 +1,71 @@
+TagLib Perl binding
+===================
+
+PREFACE
+
+Almost ALL the docus are commented by the original C/C++ lib authors
+Scott Wheeler at http://developer.kde.org/~wheeler/ , Allan Sandfeld
+Jenson at kde@carewolf.org and Ismael Orenstein at orenstein@kde.org.
+
+Of course, I modified some parts slightly :-)
+
+DESCRIPTION
+
+TagLib -  a library for reading and editing audio meta data, commonly 
+know as tags.
+
+Some goals of TagLib:
+ - A clean, high level, C++ API to handling audio meta data.
+ - Support for at least ID3v1, ID3v2 and Ogg Vorbis comments.
+ - A generic, simple API for the most common tagging related functions.
+ - Binary compatibility between minor releases using the standard
+KDE/Qt techniques for C++ binary compatibility.
+ - Make the tagging framework extensible by library users; i.e. it
+will be possible for libarary users to implement  additional ID3v2
+frames, without modifying the TagLib source (through the use of
+Abstract Factories and such.
+
+Because TagLib desires to be toolkit agnostic, in hope of being widely
+adopted and the most flexible in licensing
+TagLib provides many of its own toolkit classes; in fact the only
+external dependancy that TagLib has, it a semi-sane STL implementation.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Refer to INSTALL for more details.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  libtag.so and taglib-config
+  The latter is provided by the taglib-devel package
+
+Note this well It has not been tested with later versions.
+
+TESTING
+
+Testing has been conducted with the taglib version 1.9.1. Earlier versions
+may not work as well, due at least to new functionality.`
+N.B.: A source of packages for Windows, nuget.org, uses their own numbering scheme,
+which does not reflect the source numbering.
+
+Contributions are welcome.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 - 2010 by Dongxu Ma
+Copyright (C) 2011- 2015 Geoffrey Leach
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

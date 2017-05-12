@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/AI-NeuralNet-Kohonen.t
+lib/AI/NeuralNet/Kohonen.pm
+lib/AI/NeuralNet/Kohonen/Input.pm
+lib/AI/NeuralNet/Kohonen/Node.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,215 @@
+package App::local::lib::helper::rationale;
+
+=head1 NAME
+
+App::local::lib::helper::rationale - Why write this?
+
+=head1 SYNOPSIS
+
+A quick review of why I wrote this application and what problem it solves for
+me (and possible you.)
+
+=head1 DISCUSSION
+
+This document is intended to give futher details and examples of the type of
+problem I hade which caused me to write this application.  For more technical
+details you should also review the brief documentation written at 
+L<App::local::lib::helper> or simply review the source code since there's not a
+lot of it :)
+
+Generally speaking, I think L<local::lib> is awesome.  It deals very concisely
+with the age old problem of how to best manage Perl dependecies installed from
+L<CPAN>.  Using L<local::lib> you can easily create a user level L<CPAN> library root
+directory and install all your application dependencies into it.  This way when 
+you need a new CPAN module you don't need root access or to work with an
+administrator, nor do you worry about how your new L<CPAN> modules might cause
+trouble for other users of Perl on a shared server.  L<local::lib> clarifies 
+and simplifies your development and deployment workflow.  If you are not
+convinced you should review the L<local::lib> documentation first.
+
+However there are two questions that users of L<local::lib> have to answer.  One
+(which is not going to be dealt with here) is "What is the best practice for
+locating and naming my locally lib managed directories?" For the purposes of
+the remaining discussion I will usually describe such a directory as being
+created under the user "home" directory (C<$HOME> or C<~> on Unix like machines)
+however I know some people prefer to create a 'extlib' directory within the root
+of the application that the L<local::lib> is being created for.  No sides on 
+this question will be currently taken.
+
+The second question, the one which this application was written as a possible
+answer to, is "How do I easily enable or disable Perl recognition of a particular
+L<local::lib>?"  To answer this lets step back and review how Perl searches for
+CPAN installed dependencies.
+
+The Perl binary, when you install it, will automatically create a set of 
+directories that are used as a sort of "path" to search for dependencies.
+You can see yours by typing C<perl -V> from the command line.  Here's what I see
+when I do so on my terminal:
+
+  $ perl -V
+
+    [EXTENSIVE OUTPUT SNIPPED]
+
+  @INC:
+    /Users/johnn/perl5/perlbrew/perls/perl-5.10.1/lib/5.10.1/darwin-thread-multi-2level
+    /Users/johnn/perl5/perlbrew/perls/perl-5.10.1/lib/5.10.1
+    /Users/johnn/perl5/perlbrew/perls/perl-5.10.1/lib/site_perl/5.10.1/darwin-thread-multi-2level
+    /Users/johnn/perl5/perlbrew/perls/perl-5.10.1/lib/site_perl/5.10.1
+
+Your default search path (or C<@INC>) is typically installed into a global area on
+your machine, or as in the case above, when using perlbrew, into a central area
+in your C<$HOME> directory.  You can also see this by dumping C<@INC> and C<$ENV{PATH}>:
+
+    $ perl -e 'use Data::Dumper; warn Dumper @INC, split(":",$ENV{PATH})'
+ 
+    $VAR1 = '/Users/johnn/perl5/perlbrew/perls/perl-5.10.1/lib/5.10.1/darwin-thread-multi-2level';
+    $VAR2 = '/Users/johnn/perl5/perlbrew/perls/perl-5.10.1/lib/5.10.1';
+    $VAR3 = '/Users/johnn/perl5/perlbrew/perls/perl-5.10.1/lib/site_perl/5.10.1/darwin-thread-multi-2level';
+    $VAR4 = '/Users/johnn/perl5/perlbrew/perls/perl-5.10.1/lib/site_perl/5.10.1';
+    $VAR5 = '.';
+    $VAR6 = '/Users/johnn/perl5/perlbrew/bin';
+    $VAR7 = '/Users/johnn/perl5/perlbrew/perls/current/bin';
+    $VAR8 = '/usr/bin';
+    $VAR9 = '/bin';
+    $VAR10 = '/usr/sbin';
+    $VAR11 = '/sbin';
+    $VAR12 = '/usr/local/bin';
+    $VAR13 = '/usr/local/git/bin';
+    $VAR14 = '/usr/X11/bin';
+    $VAR15 = '/opt/local/bin';
+    $VAR16 = '/opt/local/sbin';
+
+Note the directory C</Users/johnn/perl5/perlbrew/perls/current/bin> is in C<$PATH>
+This is so that any command line utilities installed by CPAN (such as L<App::Ack>)
+will be easy to find and not require you to type in the full path to that tool.
+
+Now, when you create a L<local::lib>, Perl has no way to automatically detect
+it.  Perhaps it would be cool if a future version of Perl could notice the
+presence of a L<local::lib> and add it automatically, but that's not today.  As
+of now you need to tell Perl to modify C<@INC> and C<$PATH> in such a way as that it
+can use your locally lib installed dependencies.
+
+The documentation for L<local::lib> recommends adding a bit of code to your 
+C<.bashrc> script (assuming you are on a Unixlike system.)  This works well if
+you only have a single L<local::lib> setup, however if you are like me and
+you create a new L<local::lib> per application this is not going to work very
+well.  You need a way to 'flip' a L<local::lib> on and off as you move from
+one project to another.  Additionally, for the purposes of deployment, you may
+wish for something that requires less setup.
+
+One option is to manually 'activate' a particular local lib for each perl
+command you run.
+
+    perl -I ~/mylib/lib/perl5 -Mlocal::lib=~/mylib [COMMAND]
+
+You can see it work like so:
+
+    $ perl -I ~/mylib/lib/perl5/ -Mlocal::lib=~/mylib/ -e 'use Data::Dumper; warn Dumper @INC, split(":",$ENV{PATH})'
+    $VAR1 = '/Users/johnn/mylib/lib/perl5/darwin-thread-multi-2level';
+    $VAR2 = '/Users/johnn/mylib/lib/perl5';
+    $VAR5 = '/Users/johnn/perl5/perlbrew/perls/perl-5.10.1/lib/5.10.1/darwin-thread-multi-2level';
+    $VAR6 = '/Users/johnn/perl5/perlbrew/perls/perl-5.10.1/lib/5.10.1';
+    $VAR7 = '/Users/johnn/perl5/perlbrew/perls/perl-5.10.1/lib/site_perl/5.10.1/darwin-thread-multi-2level';
+    $VAR8 = '/Users/johnn/perl5/perlbrew/perls/perl-5.10.1/lib/site_perl/5.10.1';
+    $VAR9 = '.';
+    $VAR10 = '/Users/johnn/mylib/bin';
+    $VAR11 = '/Users/johnn/perl5/perlbrew/bin';
+    $VAR12 = '/Users/johnn/perl5/perlbrew/perls/current/bin';
+    $VAR13 = '/usr/bin';
+    $VAR14 = '/bin';
+    $VAR15 = '/usr/sbin';
+    $VAR16 = '/sbin';
+    $VAR17 = '/usr/local/bin';
+    $VAR18 = '/usr/local/git/bin';
+    $VAR19 = '/usr/X11/bin';
+    $VAR20 = '/opt/local/bin';
+    $VAR21 = '/opt/local/sbin';
+
+As you can see, the local lib is now added to C<@INC> and C<$PATH> has been altered.
+Additionally, a few other perl C<%ENV> settings are created so that L<CPAN> knows
+where to install dependencies.
+
+This is a workable option for deployment, since you are probably scripting that
+and have limited interactivity needs.  However it is onerous for developers.
+
+Making it easier for developers is the basic reason for being for this
+application.  The created helper script wraps the above effort into a single
+and hopefully short command.  Additionally, its not limited to Perl commands.
+So you can use it like:
+
+    ~/mylib/bin/localenv bash
+
+And spawn off a subshell where your C<@INC>, C<$PATH> and other important bits have
+been properly setup.  You can then exit the shell when you need to cancel the
+alterations.  Or you can just use the command like
+
+    ~/mylib/bin/localenv perl -V
+
+And you get the expected output.  I personally find this easier but your results
+may differ.  Feedback and thoughts regarding improvements very welcomed.
+
+=head1 EXAMPLES
+
+The following are some example usage for this application
+
+=head2 Setting up a development environment
+
+Let's say you clone some application down from L<http://github.com> and you are going to
+start development.  You will need to setup a L<local::lib> of that applications
+dependencies as part of your job.  You can do so like (from the directory that
+contains the application C<Makefile.PL>)
+
+    curl -L http://cpanmin.us | perl - --local-lib ~/mylib App::local::lib::helper .
+
+and then you can use the bash trick from above to flip on your local lib
+environment:
+
+    ~/mylib/bin/localenv bash
+
+and then you can start working, running code, or even adding to the dependency
+list.
+
+=head2 Installing / Deploying an application
+
+Say you want to install an application from L<CPAN> and just run it on a shared
+server.  Let's assume you have very little or no control beyond your C<$HOME>
+directory.
+
+    curl -L http://cpanmin.us | perl - --local-lib ~/mygitalist Gitalist App::local::lib::helper
+
+Here we are running cpanminus directly off the web, installing L<Gitalist>, a
+L<Catalyst> based git web front end, and setting up a local lib helper for it.
+
+We can then startup L<Gitalist>:
+
+    ~/mygitalist/bin/localenv gitalist_server.pl --repo_dir $REPO
+
+Hopefully this eases some of your deployment issues!
+
+=head2 Using in an applicatin or module Makefile.PL
+
+If you add this as a requirement to your C<Makefile.PL> and it is installed into
+a C<local::lib> the helper will automatically be added.
+
+Example C<Makefile.PL>
+
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings FATAL => 'all';
+    use inc::Module::Install;
+
+    requires 'App::local::lib::helper';
+    ## rest of your file
+
+=head1 AUTHOR
+
+See L<App::local::lib::helper> for Authorship information
+
+=head1 COPYRIGHT & LICENSE
+
+See L<App::local::lib::helper> for Copyright and Licensing information.
+
+=cut
+
+

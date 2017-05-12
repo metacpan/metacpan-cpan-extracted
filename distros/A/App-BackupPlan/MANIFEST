@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+t/BackupPlan.t
+lib/App/BackupPlan.pm
+bin/backup.pl
+bin/log4perl.conf
+TestData/log4perl.conf
+TestData/testPlan.xml
+TestData/source/tst1.txt
+TestData/source/tst2.txt
+TestData/source/tst3.txt
+TestData/source/tst4.txt
+TestData/target/dummy
+META.yml                                 Module meta-data (added by MakeMaker)

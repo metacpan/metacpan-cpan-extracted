@@ -1,0 +1,156 @@
+#!perl
+use strict;
+use warnings;
+use 5.014;
+
+use Getopt::Long qw(:config gnu_getopt);
+use App::Multigit qw(mgconfig mg_parent all_repositories mg_each);
+use App::Multigit::Script ();  # Avoid trying to get --workdir and chdir to it.
+use Future;
+use curry;
+
+use Cwd qw(getcwd);
+use File::Copy;
+use HTTP::Tiny;
+use Path::Class;
+use Try::Tiny;
+
+my %options = App::Multigit::Script::get_default_options;
+GetOptions(\%options,
+    'update-only|u',
+    'clean|c',
+    'remove-repos|rm',
+);
+
+die "update-only is not compatible with clean"
+    if $options{'update-only'} and $options{clean};
+die "update-only is not compatible with remove-missing"
+    if $options{'update-only'} and $options{'remove-missing'};
+
+$options{workdir} //= getcwd;
+
+chdir $options{workdir};
+
+$options{workdir} = dir($options{workdir});
+
+my $config = shift;
+
+if ($config) {
+    if($config eq '-') {
+        # read updated config from stdout
+        copy(\*STDIN, mgconfig);
+    }
+    elsif ($config =~ m{://}) {
+        HTTP::Tiny->new->mirror($config, mgconfig);
+    }
+    else {
+        copy($config, mgconfig);
+    }
+}
+
+my $existing_mg = try {
+    mg_parent
+}
+catch {
+    die "Failed to initialise from $config.\n" if $config;
+    return;
+};
+
+if ($existing_mg) {
+    my $f = mg_each(sub {
+        my $repo = shift;
+        return Future->done if -e $repo->config->{dir};
+
+        return Future->done
+            if $options{'update-only'}
+            or $options{clean};
+
+        my $cmd = [
+            qw(git clone),
+            (
+                $repo->config->{branch} 
+                ? ('-b', $repo->config->{branch} )
+                : ()
+            ),
+            $repo->config->{url}
+        ];
+
+        $repo->run($cmd, ia_config => { no_cd => 1 })
+            ->finally($repo->curry::report)
+    });
+
+    say for $f->get;
+}
+
+# Create the config if we don't have one.
+# Don't update it if we're going to delete dirs.
+if (not $existing_mg
+     or not $options{'remove-missing'})
+{
+    App::Multigit::mkconfig($options{workdir});
+}
+
+if ($options{'remove-missing'}) {
+    my %dirs = map { $_->{dir} => 1 } values %{ all_repositories($options{workdir}) };
+
+    for my $dir ($options{workdir}->children) {
+        next unless $dir->is_dir;
+        next if $dirs{ $dir->relative($options{workdir}) };
+
+        $dir->rmtree and say "Removed " . $dir->relative($options{workdir});
+    }
+}
+
+App::Multigit::clean_config($options{workdir})
+    if $options{clean};
+
+=head1 SYNOPSIS
+
+    mg init [--update-only|u] [--clean|c] [--remove-missing|--rm|-R] [FILE]
+
+With FILE, creates a .mgconfig with the contents of FILE. FILE may be a local
+file, a URL or stdin (indicated with -); the script will try to get it if it can.
+
+Any existing .mgconfig file will be overwritten.
+
+Then, with or without FILE, does two things:
+
+First, reads any existing .mgconfig and clones any URLs that haven't been
+cloned. With FILE, therefore, spawns a new copy of the project. (Caveat:
+C<--clean>, C<--update-only>.)
+
+Second, creates or updates the .mgconfig by iterating the subdirectories and
+assuming they are git repos, registering any that have not been. (Caveat:
+C<--remove-missing>.)
+
+Except for the dir keys, all existing configuration will be maintained, if
+possible.
+
+=head1 OPTIONS
+
+=head2 --update-only
+
+=head2 -u
+
+This will update the .mgconfig but won't clone anything. If FILE was provided,
+this will basically just copy the file to ./.mgconfig and exit.
+
+=head2 --clean
+
+=head2 -c
+
+Removes the config for any directory not present. Necessarily, this requires
+that we do not clone them first.
+
+C<--clean> is incompatible with C<--update-only>.
+
+=head2 --remove-repos
+
+=head2 --rm
+
+Removes any directory not present in the config. Note that if there is no config
+yet, it will be created irrespective of this option; and thus this option will
+have no effect in that situation.
+
+This option will B<not> check for changes in the repository. It will just delete
+it.

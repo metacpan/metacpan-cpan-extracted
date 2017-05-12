@@ -1,0 +1,21 @@
+Build.PL
+examples/README.examples
+HISTORY
+INSTALL
+lib/Array/AsObject.pm
+lib/Array/AsObject.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/as_hash.t
+t/at.t
+t/basic.t
+t/index.t
+t/pod.t
+t/pod_coverage.t
+t/runtests
+t/runtests.bat
+t/set.t
+t/test.pl
+META.yml

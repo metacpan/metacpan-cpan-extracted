@@ -1,0 +1,494 @@
+#!perl
+
+# Note: This script is a CLI interface to Riap function /App/errnos/list_errnos
+# and generated automatically using App::GenPericmdScript version 0.15
+
+our $DATE = '2015-09-10'; # DATE
+our $DIST = 'App-errnos'; # DIST
+our $VERSION = '0.02'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+# code_before_instantiate_cmdline
+print "";
+
+Perinci::CmdLine::Any->new(
+    url => "/App/errnos/list_errnos",
+)->run;
+
+# ABSTRACT: List possible $! ($OS_ERROR, $ERRNO) values on your system
+# PODNAME: errnos
+# code_after_end
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+errnos - List possible $! ($OS_ERROR, $ERRNO) values on your system
+
+=head1 VERSION
+
+This document describes version 0.02 of errnos (from Perl distribution App-errnos), released on 2015-09-10.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % errnos [options] [query]
+
+Examples:
+
+List possible errno numbers with their messages:
+
+ % errnos -l
+
+Search specific errnos:
+
+ % errnos -l 'No such'
+
+=head1 DESCRIPTION
+
+Sample output:
+
+ +--------+-----------------------------------+
+ | number | string                            |
+ +--------+-----------------------------------+
+ | 1      | Operation not permitted           |
+ | 2      | No such file or directory         |
+ | 3      | No such process                   |
+ | 4      | Interrupted system call           |
+ | 5      | Input/output error                |
+ | 6      | No such device or address         |
+ | 7      | Argument list too long            |
+ | 8      | Exec format error                 |
+ | 9      | Bad file descriptor               |
+ | 10     | No child processes                |
+ | 11     | Resource temporarily unavailable  |
+ | 12     | Cannot allocate memory            |
+ | 13     | Permission denied                 |
+ | 14     | Bad address                       |
+ | 15     | Block device required             |
+ | 16     | Device or resource busy           |
+ | 17     | File exists                       |
+ | 18     | Invalid cross-device link         |
+ | 19     | No such device                    |
+ | 20     | Not a directory                   |
+ | 21     | Is a directory                    |
+ | 22     | Invalid argument                  |
+ | 23     | Too many open files in system     |
+ | 24     | Too many open files               |
+ | 25     | Inappropriate ioctl for device    |
+ | 26     | Text file busy                    |
+ | 27     | File too large                    |
+ | 28     | No space left on device           |
+ | 29     | Illegal seek                      |
+ | 30     | Read-only file system             |
+ | 31     | Too many links                    |
+ | 32     | Broken pipe                       |
+ | 33     | Numerical argument out of domain  |
+ | 34     | Numerical result out of range     |
+ | 35     | Resource deadlock avoided         |
+ | 36     | File name too long                |
+ | 37     | No locks available                |
+ | 38     | Function not implemented          |
+ | 39     | Directory not empty               |
+ | 40     | Too many levels of symbolic links |
+ +--------+-----------------------------------+
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for number options
+
+=over
+
+=item B<--number-in-json>=I<s>
+
+Only return records where the 'number' field is in the specified values (JSON-encoded).
+
+See C<--number-in>.
+
+=item B<--number-in>=I<s@>
+
+Only return records where the 'number' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--number-is>=I<i>
+
+Only return records where the 'number' field equals specified value.
+
+=item B<--number-isnt>=I<i>
+
+Only return records where the 'number' field does not equal specified value.
+
+=item B<--number-max>=I<i>
+
+Only return records where the 'number' field is less than or equal to specified value.
+
+=item B<--number-min>=I<i>
+
+Only return records where the 'number' field is greater than or equal to specified value.
+
+=item B<--number-not-in-json>=I<s>
+
+Only return records where the 'number' field is not in the specified values (JSON-encoded).
+
+See C<--number-not-in>.
+
+=item B<--number-not-in>=I<s@>
+
+Only return records where the 'number' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--number-xmax>=I<i>
+
+Only return records where the 'number' field is less than specified value.
+
+=item B<--number-xmin>=I<i>
+
+Only return records where the 'number' field is greater than specified value.
+
+=item B<--number>=I<i>
+
+Only return records where the 'number' field equals specified value.
+
+=back
+
+=head2 Filtering for string options
+
+=over
+
+=item B<--string-contains>=I<s>
+
+Only return records where the 'string' field contains specified text.
+
+=item B<--string-in-json>=I<s>
+
+Only return records where the 'string' field is in the specified values (JSON-encoded).
+
+See C<--string-in>.
+
+=item B<--string-in>=I<s@>
+
+Only return records where the 'string' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--string-is>=I<s>
+
+Only return records where the 'string' field equals specified value.
+
+=item B<--string-isnt>=I<s>
+
+Only return records where the 'string' field does not equal specified value.
+
+=item B<--string-max>=I<s>
+
+Only return records where the 'string' field is less than or equal to specified value.
+
+=item B<--string-min>=I<s>
+
+Only return records where the 'string' field is greater than or equal to specified value.
+
+=item B<--string-not-contains>=I<s>
+
+Only return records where the 'string' field does not contain specified text.
+
+=item B<--string-not-in-json>=I<s>
+
+Only return records where the 'string' field is not in the specified values (JSON-encoded).
+
+See C<--string-not-in>.
+
+=item B<--string-not-in>=I<s@>
+
+Only return records where the 'string' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--string-xmax>=I<s>
+
+Only return records where the 'string' field is less than specified value.
+
+=item B<--string-xmin>=I<s>
+
+Only return records where the 'string' field is greater than specified value.
+
+=item B<--string>=I<s>
+
+Only return records where the 'string' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--query>=I<s>, B<-q>
+
+Search.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--sort>=I<s>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C errnos errnos
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete errnos 'p/*/`errnos`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 ENVIRONMENT
+
+=head2 ERRNOS_OPT => str
+
+Specify additional command-line options
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at C<~/.config/errnos.conf>, C<~/errnos.conf> or C</etc/errnos.conf> (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features. 
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+List of available configuration parameters:
+
+ detail (see --detail)
+ fields (see --field)
+ format (see --format)
+ naked_res (see --naked-res)
+ number (see --number)
+ number.in (see --number-in)
+ number.is (see --number-is)
+ number.isnt (see --number-isnt)
+ number.max (see --number-max)
+ number.min (see --number-min)
+ number.not_in (see --number-not-in)
+ number.xmax (see --number-xmax)
+ number.xmin (see --number-xmin)
+ query (see --query)
+ sort (see --sort)
+ string (see --string)
+ string.contains (see --string-contains)
+ string.in (see --string-in)
+ string.is (see --string-is)
+ string.isnt (see --string-isnt)
+ string.max (see --string-max)
+ string.min (see --string-min)
+ string.not_contains (see --string-not-contains)
+ string.not_in (see --string-not-in)
+ string.xmax (see --string-xmax)
+ string.xmin (see --string-xmin)
+ with_field_names (see --with-field-names)
+
+=head1 FILES
+
+~/.config/errnos.conf
+
+~/errnos.conf
+
+/etc/errnos.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-errnos>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-errnos>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-errnos>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,52 @@
+Changes to Apache-AuthenURL
+
+2.05 Mon Apr 25 23:01:53 EDT 2005
+	- moved return on non-OK response to $r->get_basic_auth_pw 
+          below $r->is_initial_req
+	- Cache.pm: added debug messages
+	- Cache.pm: added support for NoPasswd directive
+
+2.04 Thu Apr 21 11:23:43 EDT 2005
+	- moved call to $r->get_basic_auth_pw to before test for
+	  $r->is_initial_req to fix seg fault in authz handler
+	  per Geoff Young's explanation.
+	  <URL:http://marc.theaimsgroup.com/?l=apache-modperl&m=108799946109520&w=2>
+
+2.03 Fri Apr 15 10:47:12 EDT 2005
+	- made changes to AuthenURL.pm and Cache.pm per new MP2 API
+	  <URL:http://perl.apache.org/docs/2.0/rename.html>
+	- removed mod_perl prereq from Makefile.PL as it implies MP1
+	- updated README to note that it does basic authentication
+
+2.02 Wed Dec  8 01:22:28 EST 2004
+	- fixed $VERSION, why must it be defined above "use modperl" ?
+
+2.01 Fri Dec  3 19:21:45 EST 2004
+	- added mod_perl to Makefile.PL prereq
+
+2.00 Fri Dec  3 12:48:26 EST 2004
+	- added t/01use.t to satisfy CPAN
+	- fixed some documentation in Apache::AuthenURL
+	- moved pm files under lib/Apache
+
+0.10 Sat Apr 17 17:54:27 EDT 2004
+	- added support for MP2
+	- added requirement for Apache::Log
+
+0.9 Tue Nov  4 10:25:07 EST 2003
+	- added configuration variable AuthenURL_proxy, thank you Michael Roper
+
+0.8 Tue Aug 15 15:45:25 EDT 2000
+	- added method directive, GET|HEAD|etc
+	- removed requirement for HTTPD::UserAdmin
+	- added requirement for Apache::AuthenCache
+
+0.7 Thu Feb 11 12:23:05 EST 1999
+	- disabled LWP SIGALRM handler, thank you Daniel Bergstrom
+
+0.6 Thu Aug 13 09:09:52 EDT 1998
+	- renamed configuration variable prefix from Auth_URL to AuthenURL
+	- removed cache-ing code in favor of Apache::AuthenCache
+
+0.5 Tue Aug 11 14:24:40 EDT 1998
+	- initial

@@ -1,0 +1,20 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/App/PDF/Link.pm
+lib/App/PDF/Link/Icons.pm
+lib/App/PDF/Link/Icons/BandInABox.pm
+lib/App/PDF/Link/Icons/Border.pm
+lib/App/PDF/Link/Icons/Document.pm
+lib/App/PDF/Link/Icons/JPG.pm
+lib/App/PDF/Link/Icons/MuseScore.pm
+lib/App/PDF/Link/Icons/PDF.pm
+lib/App/PDF/Link/Icons/PNG.pm
+lib/App/PDF/Link/Icons/iRealPro.pm
+script/pdflink.pl
+script/pp.PL
+t/00-load.t
+t/01-icons.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

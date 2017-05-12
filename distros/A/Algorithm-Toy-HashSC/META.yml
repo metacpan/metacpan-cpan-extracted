@@ -1,0 +1,35 @@
+---
+abstract: 'toy separate chain hash implementation'
+author:
+  - 'Jeremy Mates <jmates@cpan.org>'
+build_requires:
+  Moo: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  namespace::clean: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+  strict: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-Toy-HashSC
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Moo: '0'
+  Scalar::Util: '0'
+  namespace::clean: '0'
+  perl: '5.014'
+  strict: '0'
+resources:
+  repository: git://github.com/thrig/Algorithm-Toy-HashSC.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

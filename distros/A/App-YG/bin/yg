@@ -1,0 +1,206 @@
+#!perl
+use strict;
+use warnings;
+use App::YG;
+
+my $yg = App::YG->new;
+$yg->run(@ARGV);
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+yg - log line filter, like \G of MySQL
+
+
+=head1 SYNOPSIS
+
+    $ yg [options] FILE ...
+
+    or
+
+    $ cat apache_log | yg [option]
+
+    options:
+        -p,  --parser         parser(default: apache-combined)
+             --tab            show tab delimited log
+             --space          show space delimited log
+                              NOTE: if you set options --tab or --space, then --parser option is ignored
+             --ltsv           parsed and show LTSV log
+        -n,  --number         if you specify delimiter and -n, then show number points
+        -m,  --match          show log lines only if a keyword matches
+        -re, --regexp         show log lines only if regular expression matches
+        -i,  --ignore-case    regexp option: ignore case distinctions
+        -r,  --raw            also show raw log lines
+        -t,  --through        ignore yg command, output only raw log lines
+             --digest         show digest of raw log string
+
+        -c, --color           show colorized log
+
+        -h,  --help           show this help message
+        -V,  --version        show version
+
+
+=head1 EXAMPLES
+
+parse Apache Combined logs, show logs vertically with labels of element
+
+    $ yg apache_commbined_log
+
+parse Apache Error logs, show logs vertically with labels of element
+
+    $ yg -p apache-error apache_error_log
+
+parse TAB-delimited logs, show logs vertically
+
+    $ yg --tab tab_delimited_log
+
+parse TAB-delimited logs, show logs vertically with number labels
+
+    $ yg --tab -n tab_delimited_log
+
+parse SPACE-delimited logs, show logs vertically
+
+    $ yg --space space_delimited_log
+
+parse LTSV logs, show logs vertically
+
+    $ yg --ltsv ltsv_log
+
+tailed log
+
+    $ tail -f apache_commbined_log | yg
+
+
+=head1 DESCRIPTION
+
+C<yg> is a log viewer(filter) to show log lines vertically.
+
+When you check apache logs, I guess you do like this
+
+    $ cat apache_log
+    127.0.0.1 - - [30/Sep/2012:12:34:56 +0900] "GET /foo HTTP/1.0" 200 123 "http://example.com/foo" "Mozilla/5.0"
+    127.0.0.1 - - [30/Sep/2012:12:34:57 +0900] "GET /bar HTTP/1.0" 301 124 "http://example.com/bar" "Mozilla/5.1"
+
+If you use C<yg>, log lines are showed like below:
+
+    $ yg apache_log
+    ******************** 1 ********************
+         Host: 127.0.0.1
+        Ident: -
+     Authuser: -
+         Date: 30/Sep/2012:12:34:56 +0900
+      Request: GET /foo HTTP/1.0
+       Status: 200
+        Bytes: 123
+      Referer: http://example.com/foo
+    UserAgent: Mozilla/5.0
+
+    ******************** 2 ********************
+         Host: 127.0.0.1
+        Ident: -
+     Authuser: -
+         Date: 30/Sep/2012:12:34:57 +0900
+      Request: GET /bar HTTP/1.0
+       Status: 200
+        Bytes: 124
+      Referer: http://example.com/bar
+    UserAgent: Mozilla/5.1
+
+easier for understanding.
+
+Of course, C<yg> can work for like below.
+
+    $ cat apache_log | yg
+
+C<yg> command supports few formats of log. And you can write custom parser of L<App::YG>.
+
+=head2 PARSERS
+
+Above sample uses L<App::YG::Apache::Combined>. It is default parser. If you want to view other format logs, you should specify C<--parser> option.
+
+    $ cat apache-error-log | yg --parser apache-error
+
+Then C<yg> uses L<App::YG::Apache::Error> to parse log lines.
+
+    $ cat apache-error-log | yg --parser apache-error
+    ******************** 1 ********************
+         Date: Sat Oct 06 17:34:17 2012
+    Log_Level: error
+       Client: 127.0.0.1
+      Message: File does not exist: /var/www/html/favicon.ico
+
+App::YG has below parsers.
+
+=over 2
+
+=item App::YG::Apache::Combined
+
+for apache combined log
+
+=item App::YG::Apache::Common
+
+for apache common log
+
+=item App::YG::Apache::Error
+
+for apache error log
+
+=item App::YG::Nginx::Main
+
+for nginx main log
+
+=back
+
+=head3 HOW TO WRITE YOUR OWN PARSER
+
+L<App::YG> is designed to be easily extensible. You might want to write a custom log parser. Each parser is easy to write one.
+
+For example:
+
+    package App::YG::MyApp::Log;
+    use strict;
+    use warnings;
+
+    sub parse {
+        my $line = shift;
+
+        $line =~ m!^DATE:([^\t]+)\t([^\t]+)\tMSG:(.+)$! or warn "failed to parse line: '$line'\n";
+
+        return [
+            $1 || '',
+            $2 || '',
+            $3 || '',
+        ];
+    }
+
+    sub labels {
+        return [qw/
+            Date
+            Level
+            Message
+        /];
+    }
+
+Parser class must have 2 methods C<parser> and C<labels>. Both methods must return array reference. Let's look at the anatomy of App::YG::* modules. And check test codes in F<t/parser/*/*.t>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+
+=head1 SEE ALSO
+
+L<App::YG>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=cut

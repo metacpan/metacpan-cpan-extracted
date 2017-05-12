@@ -1,0 +1,4 @@
+Revision history for Acme-Globule
+
+0.004     2011-05-13 18:03:10 Europe/London
+        updated distribution to use Dist::Zilla

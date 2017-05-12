@@ -1,0 +1,4 @@
+name = "Amazon-S3-Thin"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,55 @@
+Revision history for Perl extension AxKit::App::Gallery
+
+$Id: Changes,v 1.5 2004/02/26 17:44:29 nik Exp $
+
+0.50  <date>
+
+      - Stop using a home grown XML format for storing cached image
+        information, and use a home grown RDF format instead.  This 
+        completely changes the code needed to style the output to HTML or
+        RSS, so any customisations you have made to the existing *2html.xsl
+        stylesheets will probably need to be redone.
+
+      - Added AxKit::App::Gallery::namespaces to document the namespaces
+        used in the pipeline.
+
+      - Commented out the debugging calls to log_error() that litter the code,
+        until a more extensible logging system is implemented.
+
+      - Made extractimageinfo.xps generic enough to be useful in the 
+        imagesheet pipeline.
+
+      - Use the filesystem path to each image as its key in the cache
+        directory, rather than the image's URI.  This means that the same
+        physical image available via multiple URIs will only be cached once.
+        It also means that the existing contents of your cache directories
+        are now out of date, and should be deleted.
+
+      - Add a <server> block that includes information about the web server's
+        configuration, which helps when constructing the protocol and hostname
+        parts of a URL.
+
+      - Use more of the image meta-data in the default output stylesheets.  In
+        particular, show
+            
+            - More exposure details (focal length, F number, exposure program)
+	    - Whether or not the flash fired
+
+        and only display the data if it exists in the file.
+
+      - Use a URI-encoding algorithm implemented in XSLT, reducing the amount
+        of AxKit specific Perl code.
+
+      - RSS output support.  Using AxKit's support for chaining stylesheets
+        keyed off a 'style' parameter to enable a choice of output
+        stylesheets.  With the correct entries in httpd.conf this means you
+        can append '?style=rss' to a directory listing URL and get basic RSS
+	suitable for syndicating to other web sites.
+
+      - Added tests.  Granted, it's only to make sure that the POD files
+        validate, but it's a start.
+
+0.40  30 March, 2003
+
+      - Initial public release
+

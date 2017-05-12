@@ -1,0 +1,35 @@
+---
+abstract: 'Tiny asynchronous (non-blocking) interface to EC2 using AnyEvent'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  Data::Dumper: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-EC2-Tiny
+no_index:
+  file:
+    - README.pod
+requires:
+  AnyEvent::HTTP: 0
+  Carp: 0
+  HTTP::Tiny: 0
+  Moo: 0
+  Net::EC2::Tiny: 0
+resources:
+  bugtracker: http://github.com/xsawyerx/anyevent-ec2-tiny/issues
+  repository: http://github.com/xsawyerx/anyevent-ec2-tiny
+version: 0.002

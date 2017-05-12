@@ -1,0 +1,53 @@
+{
+   "abstract" : "Handle command line processing for programs with subcommands",
+   "author" : [
+      "G. Wade Johnson <gwadej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.06, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-CmdDispatch",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Tiny" : "0",
+            "Term::ReadLine" : "0",
+            "Test::Exception" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gwadej/app-cmddispatch.git",
+         "web" : "https://github.com/gwadej/app-cmddispatch"
+      }
+   },
+   "version" : "0.43",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}
+

@@ -1,0 +1,28 @@
+---
+abstract: 'L<App::Nopaste> interface to L<http://dpaste.com>'
+author:
+  - 'Sergey Romanov <sromanov@cpan.org>'
+build_requires: {}
+configure_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.141170'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Nopaste-Service-dpaste
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  App::Nopaste: '0.91'
+  JSON: '0'
+resources:
+  bugtracker: https://github.com/sergeyromanov/app-nopaste-service-dpaste/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/sergeyromanov/app-nopaste-service-dpaste
+version: '0.03'
+x_test_requires:
+  Test::More: '0.47'

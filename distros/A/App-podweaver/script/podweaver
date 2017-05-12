@@ -1,0 +1,234 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: Run Pod::Weaver on a file or distribution.
+# PODNAME: podweaver
+
+use warnings;
+use strict;
+
+#  Ensure I'm using my devel modules when running from my devel dir.
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../../../Pod-Weaver-Role-SectionReplacer/src/lib";
+use lib "$FindBin::Bin/../../../Pod-Weaver-PluginBundle-ReplaceBoilerplate/src/lib";
+
+use Getopt::Long;
+use Pod::Usage;
+use Log::Any::Adapter;
+
+use App::podweaver;
+
+our $VERSION = '1.00';
+
+# ---------------------------------------------------------------------------
+
+my $help    = 0;
+my $man     = 0;
+my $version = 0;
+
+my %options = (
+    new       => 0,
+    no_backup => 0,
+    antispam  => '',
+    verbose   => 0,
+    );
+
+if( my $config = App::podweaver->config() )
+{
+    foreach my $option ( keys( %{$config->{ _ }} ) )
+    {
+        if( exists( $options{ $option } ) )
+        {
+            $options{ $option } = $config->{ _ }->{ $option };
+        }
+        else
+        {
+            warn "Ignoring unsupported config option '$option' in " .
+                App::podweaver->_config_file(), "\n";
+        }
+    }
+}
+
+Getopt::Long::Configure( 'gnu_getopt' );
+Getopt::Long::GetOptions(
+    'help|?|h'                => \$help,
+    'man'                     => \$man,
+    'version'                 => \$version,
+    'verbose|v+'              => \$options{ verbose },
+    'new'                     => \$options{ new },
+    'no_backup|nobackup'      => \$options{ no_backup },
+    'antispam=s'              => \$options{ antispam },
+    ) or pod2usage( 2 );
+
+pod2usage( 1 ) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+if( $version )
+{
+    print "podweaver, version $VERSION\n\n",
+        "Config file: ", App::podweaver->_config_file(), "\n";
+    exit( 0 );
+}
+
+# ---------------------------------------------------------------------------
+
+my ( $verbose );
+
+$verbose = delete $options{ verbose };
+$verbose = 2 - $verbose;
+$verbose = 0 if $verbose < 0;
+
+Log::Any::Adapter->set( 'Dispatch',
+    outputs => [
+        [ 'Screen', min_level => $verbose, newline => 1, ],
+        ],
+    );
+
+App::podweaver->weave_distribution( %options );
+
+__END__
+
+=pod
+
+=head1 NAME
+
+podweaver - Run Pod::Weaver on a file or distribution.
+
+=head1 VERSION
+
+version 1.00
+
+=head1 SYNOPSIS
+
+podweaver [options]
+
+ Options:
+   -v, --verbose     increase verbosity
+   --new             write to *.new files rather than overwriting existing
+   --no_backup       skip generating *.bak files when editing files
+   --antispam=str    replace @ in author emails with 'str'.
+   --help            brief help message
+   --man             full documentation
+   --version         display version information and exit
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--new>
+
+Write the modified version of a file to a new file based on the original
+filename with a C<.new> extension, rather than the default behaviour of
+overwriting the original.
+
+When B<--new> is supplied, no *.bak backup of the original is created (since
+the original is left untouched.)
+
+=item B<--no_backup>
+
+Skips the production of *.bak backups for any changed files.
+Be warned, this could result in loss of the file contents if anything goes
+wrong, use with caution. (Or better still, use with your changes safely
+commited to the VCS of your choice.)
+
+=item B<--antispam=>I<string>
+
+Replaces the @ in author email addresses with the supplied string as an
+anti-spam measure.
+Given that the original email is still within the META.yml, this will not
+prevent all spam harvesting, but it may at least help.
+
+=item B<-v>, B<--verbose>
+
+Increases the level of messages displayed.
+
+=item B<--help>, B<-h>, B<-H>, B<-?>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--version>
+
+Prints version information and the location of the config file and
+exits.
+
+=back
+
+=head1 DESCRIPTION
+
+L<podweaver> will run L<Pod::Weaver> across all files in a distribution,
+editing them in place and leaving a backup of the original in
+I<original>.bak.
+
+This was designed to run with the
+L<Pod::Weaver::PluginBundle::ReplaceBoilerplate> plugin, so you can
+run L<podweaver> as part of your release process to update the boilerplate
+and other automatically generated POD in your source files, rather than
+the default L<Pod::Weaver> behaviour of appending.
+
+To use L<podweaver> it is suggested you place a C<weaver.ini> file in
+the root of your distribution with contents similar to:
+
+  [@ReplaceBoilerplate]
+
+If no C<weaver.ini> is provided then the default L<Pod::Weaver> settings
+are used, which will continuously append duplicate sections each time you
+run L<podweaver>.
+
+L<podweaver> expects to be run in the root of your distribution, and will
+look for a META.json or META.yml file to extract details such as the author,
+licence and version.  If no META file is found then it will issue a warning,
+but still run, which may result in some sections being missing from the
+final POD, it is recommended that you run L<podweaver> again after you've
+generated your META file.
+
+Currently L<podweaver> looks in the C<lib>, C<bin> and C<script> dirs for
+modules or scripts that should be woven.
+This should probably be configurable.
+
+Please see the documentation in L<App::podweaver> for bugs and issues.
+
+=head1 CONFIGURATION FILE
+
+If you find yourself using the same command-line options repeatedly
+you can set them as defaults in an application configuration file.
+
+This file is located in C<$HOME/.app_podweaver/podweaver.ini> for
+UNIX-based operating systems, and
+C<~/Local Settings/Application Data/App-podweaver/podweaver.ini> under Windows.
+
+You can find the exact location of your configuration file using
+the B<--version> option.
+
+The configuration file follows L<Config::Tiny> style .ini format and
+consists of command-line option names for keys, for example:
+
+  antispam  = BLAHBLAH
+  no_backup = 1
+  verbose   = 2
+
+This would be as if you provided C<< --antispam=BLAHBLAH --no_baackup -vv >>
+on the command-line.
+
+Any options supplied on the command-line will override those supplied
+within the configuration file.
+
+=head1 SEE ALSO
+
+L<Pod::Weaver>, L<App::podweaver>.
+
+=head1 AUTHOR
+
+Sam Graham <libapp-podweaver-perl BLAHBLAH illusori.co.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010-2011 by Sam Graham <libapp-podweaver-perl BLAHBLAH illusori.co.uk>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

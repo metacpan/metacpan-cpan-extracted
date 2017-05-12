@@ -1,0 +1,35 @@
+#PerlSwitches -I@ServerRoot@/../lib -I@ServerRoot@/../t/TestSSL
+
+PerlModule TestSSL::is_https
+PerlModule TestSSL::lookup
+
+<IfModule mod_ssl.c>
+    PerlSetVar HAVE_SSL 1
+</IfModule>
+
+<Location /TestSSL/is_https>
+    SetHandler modperl
+    PerlResponseHandler TestSSL::is_https
+</Location>
+
+<Location /TestSSL/lookup>
+    SetHandler modperl
+    PerlResponseHandler TestSSL::lookup
+</Location>
+
+<IfModule mod_ssl.c>
+    <VirtualHost SSL>
+        SSLEngine On
+        SSLCertificateFile @ServerRoot@/../t/conf/localhost.cert
+
+        <Location /TestSSL/is_https>
+            SetHandler modperl
+            PerlResponseHandler TestSSL::is_https
+        </Location>
+
+        <Location /TestSSL/lookup>
+            SetHandler modperl
+            PerlResponseHandler TestSSL::lookup
+        </Location>
+    </VirtualHost>
+</IfModule>

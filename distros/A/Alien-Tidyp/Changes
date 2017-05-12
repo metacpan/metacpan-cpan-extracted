@@ -1,0 +1,80 @@
+Revision history for Alien-Tidyp
+
+1.4.7	31/05/2011
+	- fixed http://www.cpantesters.org/cpan/report/b74b5c2c-6fa9-1014-aa8f-4b9555dfede8 (force nmake for MSVC build)
+	- fixed http://www.cpantesters.org/cpan/report/138b45f2-4b6f-11e0-afaf-8138785ebe45 (ar not in PATH on solaris)
+
+1.4.6	10/03/2011
+	- fixed http://www.cpantesters.org/cpan/report/8446953a-4287-11e0-bace-65d4790d71a6 (devnull)
+	- fixed http://rt.cpan.org/Ticket/Display.html?id=66382 (MacOSX 10.6.6 failure)
+
+1.4.5	26/11/2010
+	- alternative dowload location (too many cpan testers fail to download tarball from github)
+	- config.guess + config.sub hack (DragonFly BSD failure)
+
+1.4.4	05/11/2010
+	- more error info in case of sha1 checksum failure
+	- cosmetic POD changes
+	- new option: Build.PL --srctarball=<url_or_filename>
+
+1.4.3	25/09/2010
+	- using File::Path legacy functions (works with File::Path <2.0 e.g. RHEL5)
+
+1.4.2	23/09/2010
+	- fixing cygwin cpan testers build failure (forcing 'make')
+	- deleting the old content of sharedir during install
+	- sending all build messages to stderr
+
+1.4.1	21/09/2010
+	- tidyp v1.04
+
+1.2.8	18/08/2010
+	- fix for 64bit Linux (forcing -fPIC)
+	- using -L/path/to instead of -L'/path/to' (EU::MM does not like it)
+
+1.2.7	11/07/2010
+	- win32/gcc CPAN Tester failure fix
+	- small changes in win32/msvc makefile
+
+1.2.6	09/07/2010
+	- windows-msvc support added (both 32/64bit)
+
+1.2.5	07/07/2010
+	- linux/amd64 test failure fixed
+	- support for env variable TIDYP_DIR introduced
+
+1.2.4	06/07/2010
+	- added detection of already installed tidyp
+	- leaving out ranlib on mingw build (fixing CPAN Testers failures)
+
+1.2.3	11/05/2010
+	- tidyp source not directly include but downloaded before build
+	- Win32 dmake support
+	- UNIX systems now use ./configure + make
+
+1.2.1	10/05/2010
+	- tidyp 1.02 sources
+
+1.0.1	25/04/2010
+	- tidyp 1.0 sources
+	- gmake as a fallback on solaris reverted
+
+0.99.7	06/04/2010
+	- Fix for no_index (another try)
+	- Use gmake as a fallback on solaris
+
+0.99.6	06/04/2010
+	- Better GNU make detection (solaris, netbsd CPAN tester failures)
+	- Fix for no_index
+
+0.99.5	04/04/2010
+	- Fixing FreeBSD CPAN tester failures
+	- Fixing Win32 CPAN tester failures
+	- Build.PL cosmetics
+	- Quoting tidyp license
+
+0.99.4	02/04/2010
+	- The first CPAN release
+
+0.99.3	01/03/2010
+	- Initial version by kmx

@@ -1,0 +1,571 @@
+=head1 NAME
+
+ALPM - readonly access to pacman's libalpm.
+
+=head1 VERSION
+
+3.06
+
+This version of ALPM is compatible with pacman 4.
+
+=head1 SYNOPSIS
+
+  ## We can start by setting options all by ourselves.
+  use ALPM;
+  my $alpm = ALPM->new('/', '/var/lib/db'); # root and dbpath
+  $alpm->set_cachedirs('/var/cache/pacman/pkg');
+  $alpm->set_logfile('/var/log/pacman.log');
+  
+  ## Or use ALPM::Conf, a handy module for pacman.conf parsing.
+  use ALPM::Conf qw(/etc/pacman.conf);
+  ## ALPM::Conf loads an object into "our" package variable.
+  our $alpm;
+  
+  ## Querying databases & packages
+  my $localdb = $alpm->localdb;
+  my $pkg = $localdb->find('perl') or die 'wtfbbq';
+  printf "%s %s %s %d\n", $pkg->name, $pkg->version,
+      $pkg->arch, $pkg->size;
+  
+  my $extradb = $alpm->register('extra') or die $alpm->strerror;
+  $extradb->add_mirror('ftp://ftp.archlinux.org/extra/os/i686')
+      or die $alpm->strerror;
+  $extradb->update or die $alpm->strerror;
+  my @perlpkgs = $extradb->search('perl');
+  printf "%d perl packages found.\n", scalar @perlpkgs;
+  
+  ## libalpm's version comparison function. (a classy method)
+  my $cmp = ALPM->vercmp('0.01', '0.02');
+  if($cmp == -1){
+  	print "less than\n";
+  }elsif($cmp == 0){
+  	print "equal\n";
+  }elsif($cmp == 1){
+  	print "greater than\n";
+  }
+  
+  ## $found is undef or the package object for findme.
+  my @syncdbs = $alpm->syncdbs;
+  my $found = $alpm->find_dbs_satisfier('findme', @syncdbs);
+  $found = $alpm->find_satisfier('findme', $extradb->pkgs);
+  
+  ## These are perl wrappers around localdb and syncdbs:
+  
+  ## Search all databases/repos (includes localdb).
+  printf "%10s: %s %s\n", $_->db->get_name, $_->name,
+  	$_->version for $alpm->search('perl');
+  
+  ## Find a database by name of repository.
+  my $coredb = $alpm->db('core');
+
+=head1 DESCRIPTION
+
+Archlinux uses a package manager called pacman.  Pacman internally
+uses the alpm library for handling its database of packages.  This
+module creates a perlish object-oriented interface to the libalpm C library.
+
+In the past this module implemented transactions as well, allowing you
+to modify the system/database. This is no longer implemented because
+I grew tired of rewriting this module every time the pacman API was
+changed.
+
+=head1 CLASS METHODS
+
+=head2 new
+
+  $OBJ = ALPM->new($ROOTDIR, $DBDIR);
+
+=over 4
+
+=item C<$ROOTDIR>
+
+The root directory for all deployed packages managed by libalpm.
+
+=item C<$DBDIR>
+
+The database directory where the local database and sync databases are kept.
+
+=item C<$OBJ>
+
+An ALPM object which is used for all other method calls. This is referenced in
+the object method definitions below.
+
+=back
+
+=head2 version
+
+  $VERSTR = ALPM->version()
+
+=over 4
+
+=item C<$VERSION>
+
+libalpm's internal version string, as returned by the I<alpm_version> C function.
+
+=back
+
+=head2 caps
+
+  @CAPS = ALPM->caps()
+
+=over 4
+
+=item C<@CAPS>
+
+Corresponds to the I<alpm_capabilities> C function. A list of strings, describing
+capabilities of libalpm. Any of the following capabilities may or may not be
+present:
+
+=over 4
+
+=item nls
+
+Foreign language support.
+
+=item downloader
+
+If libcurl is installed then a downloader is embedded.
+
+=item signatures
+
+If gpgme is installed then package/database signatures are supported.
+
+=back
+
+=back
+
+=head1 ALPM OBJECT METHODS
+
+These methods can be used with ALPM objects created from the "new" method
+above. In the following methods, C<$OBJ> represents an ALPM object.
+
+=head2 errno
+
+  $ERRNO = $OBJ->errno()
+
+=over 4
+
+=item C<$ERRNO>
+
+The internal libalpm error number. If no error occurs this is zero.
+
+=back
+
+=head2 strerror
+
+  $ERRSTR = $OBJ->strerror()
+
+=over 4
+
+=item C<$ERRSTR>
+
+The error string describing the last error that occurred. Note: the language of the error messages depends on the value of $ENV{LC_ALL}.
+
+=back
+
+=head2 find_satisfier
+
+  $PKG | undef = $OBJ->find_satisfier($DEPSTR, @PKGS)
+
+=over 4
+
+=item C<$DEPSTR>
+
+The dependency that libalpm should attempt to satisfy (e.g. 'foo', 'foo>2.0', etc.)
+
+=item C<@PKGS>
+
+A list of L<ALPM::Package> objects that are potential satisfiers.
+
+=item C<$PKG>
+
+If a package satisfies the dependency, it is returned.
+
+=item C<undef>
+
+Returned if no satisfier is found.
+
+=back
+
+=head2 find_dbs_satisfier
+
+  $PKG | undef = $OBJ->find_dbs_satisfier($DEPSTR, @DBS)
+
+=over 4
+
+=item C<$DEPSTR>
+
+The dependency that libalpm should attempt to satisfy (e.g. 'foo', 'foo>2.0', etc.)
+
+=item C<@DBS>
+
+A list of L<ALPM::DB> objects whose packages will be searched for satisfiers
+
+=item C<$PKG>
+
+If a package satisfies the dependency, it is returned.
+
+=item C<undef>
+
+Returned if no satisfier is found.
+
+=back
+
+=head2 check_conflicts
+
+  @CONFLICTS = $OBJ->check_conflicts(@PKGS)
+
+=over 4
+
+=item C<@PKGS>
+
+A list of L<ALPM::Package> objects which are checked for inter-conflicts.
+
+=item C<@CONFLICTS>
+
+A list of hashrefs describing any conflicts. See L</Conflict>.
+
+=back
+
+=head2 fetch_pkgurl
+
+  $PATH | undef = $OBJ->fetch_pkgurl($URL)
+
+=over 4
+
+=item C<$URL>
+
+The url to a package file which will be downloaded to our default
+package cache location.
+
+=item C<$PATH>
+
+The path to our package file if the download succeeds.
+
+=item C<undef>
+
+If the download fails. Check L</strerror>.
+
+=back
+
+=head2 load_pkgfile
+
+  $PKG | undef = $PM->load_pkgfile($PATH, $FULL, $SIGLEVEL);
+
+These parameters are kind of funky but they match the I<alpm_pkg_load> function.
+
+=over 4
+
+=item C<$PATH>
+
+The path to a package file (i.e. pkg.tar.xz).
+
+=item C<$FULL>
+
+Full (1) or partial load (0). Trust me, don't install partial loads.
+That happened with clyde once.
+
+=item C<$SIGLEVEL>
+
+Signature level hashref or the string C<"default">. See L</Signature Level>.
+
+=item C<$PKG>
+
+On success, an L<ALPM::Package> object.
+
+=item C<undef>
+
+On failure. Check L</strerror>.
+
+=back
+
+=head2 localdb
+
+  $DB = $OBJ->localdb()
+
+=over 4
+
+=item C<$DB>
+
+An L<ALPM::DB::Local> object.
+
+=back
+
+=head2 register
+
+  $DB | undef = $OBJ->register($NAME, $SIGLEVEL?)
+
+Registers a remote synchronizable database.
+
+=over 4
+
+=item C<$NAME>
+
+The name to use for the database (e.g. core, extra, community.)
+
+=item C<$SIGLEVEL> I<(Optional>)
+
+The signature level to use for the database, including the database file and each
+package file downloaded from the database mirror. If none is specified, then the
+signature level is set to C<'default'> which is equivalent to the signature level set with
+the I<set_defsiglvl> method.
+
+=item C<$DB>
+
+On success, an L<ALPM::DB::Sync> object.
+
+=item C<undef>
+
+On failure. Check L</strerror>.
+
+=back
+
+=head2 syncdbs
+
+  @DBS = $OBJ->syncdbs()
+
+Retrieve a list of sync databases that have previously been registered.
+
+=over 4
+
+=item C<@DBS>
+
+A list of L<ALPM::DB::Sync> objects.
+
+=back
+
+=head2 unregister_all
+
+  1 | undef = $OBJ->unregister_all()
+
+Unregisters all sync databases. If you try to use previously registered
+L<ALPM::DB::Sync> objects, they will probable cause a segfault...
+
+Returns 1 on success or undef on error. Check L</strerror> on error.
+
+=head1 ALPM OPTIONS
+
+ALPM has a number of options corresponding to the
+C<alpm_option_get_...> and C<alpm_option_set...> C functions in the
+library.  Options which take multiple values (hint: they have a plural
+name) accept multiple arguments in the corresponding methods.
+Similarly the same options return a list.
+
+=head2 Read-write options
+
+=over
+
+=item B<logfile> - path to the pacman logfile
+
+=item B<arch> - the machine architecture to use
+
+=item B<gpgdir> - path to gpg stuff
+
+=item B<cachedirs>* - paths containing package caches
+
+=item B<noupgrades>* - a list of package names to not upgrade
+
+=item B<noextracts>* - a list of package names to not extract
+
+=item B<assumeinstalled>* - a list of dependencies to assume are satisfied.
+The setter methods take either a dependency hash or a string representing
+a dependency.  The accessor returns a list of dependency hash references.
+
+=item B<ignorepkgs>* - a list of package names to ignore for upgrade
+
+=item B<ignoregroups>* - a list of groups to ignore for upgrade
+
+=item B<usesyslog> - if true, log to the system log as well
+
+=item B<deltaratio> - accepts a decimal from 0 to 1
+
+=item B<checkspace> - check for available diskspace
+
+=item B<defsiglvl> - the default signature level. See L</Signature Level>.
+This name was shortened from I<alpm_option_set_default_signature_level>.
+You're welcome.
+
+=back
+
+=head2 Read-only options
+
+=over
+
+=item B<root> - path to the installation root
+
+=item B<dbpath> - path to the database
+
+=item B<lockfile> - path to the lockfile
+
+=back
+
+  * = the option is set with (and gets you) a list
+
+=head2 Callback options
+
+Callbacks can only be set to code references.
+
+=head3 logcb - Generic logging
+
+The log level and message are passed to the provided code ref as
+arguments.
+
+=over 4
+
+=item 1. level
+
+This is one of the following strings: error, warning, debug, function, or unknown.
+
+=item 2. message
+
+This is the message itself.
+
+=back
+
+=head1 DATA TYPES
+
+Several libalpm data types have been converted into hash references. The
+alternative is to turn them into full-blown objects, which seems pointless
+considering the only methods are data accessors.
+
+=head2 Dependency
+
+Dependencies specify constraints on a set of packages. Only certain packages
+satisfy a dependency. These can be used in places other than dependencies,
+such as conflicts. Dependencies have the following keys:
+
+=over 4
+
+=item name
+
+The name of a package.
+
+=item version
+
+A version string, which can be empty.
+
+=item mod
+
+A boolean operator used to compare package versions to our dependency
+version, must be either an empty string (which allows any version), =, >=,
+<=, >, <, or ? if an internal error occurred.
+
+=item desc
+
+If the dependency is optional this key gives a description of the dependency. This key does not exist on a regular dependency.
+
+=back
+
+=head2 Conflict
+
+Conflicts have the following keys:
+
+=over 4
+
+=item package1
+
+An L<ALPM::Package> object.
+
+=item package2
+
+An L<ALPM::Package> object.
+
+=item reason
+
+A hashref that is identical to a dependency. See L</Dependency>.
+
+=back
+
+=head2 Signature Level
+
+Signature levels describe the level of security which is required for packages files
+and by databases files. Different degrees of signature checking can be used for
+either type of file. The signature checking is performed after the file is downloaded
+in order to verify the original packager. B<When gpg is not available an invalid argument
+error will be raised from libalpm if you try to set the siglevel.>
+
+A "siglvl" can either be the string C<"default"> or a hash reference. A value of C<"default">
+can be used when registering a database to instruct libalpm to use the default siglevel
+that is set by I<set_defsiglvl>. A siglvl hashref must contain a C<"pkg"> key
+and a C<"db"> key. Other keys are ignored.
+
+Possible hash values include:
+
+=over 4
+
+=item C<"never">
+
+No signature verification is performed.
+
+=item C<"optional">
+
+Signatures are optional. They are checked if they are available.
+
+=item C<"required">
+
+Signatures are required.
+
+=back
+
+The string C<"trustall">, preceded by a space, can be added to C<"optional"> or
+C<"required"> options to specify that signatures from anyone are to be trusted.
+
+Here are some example siglevels:
+
+  $alpm->set_defsiglvl({ 'pkg' => 'never', 'db' => 'never' });
+  $alpm->set_defsiglvl({ 'pkg' => 'optional', 'db' => 'required trustall' });
+  $alpm->set_defsiglvl({ 'pkg' => 'required', 'db' => 'optional' });
+
+=head1 ERRORS
+
+In previous version of this module, errors were thrown automatically. Since then,
+errors are no longer stored in a global variable (like UNIX's errno) but are instead
+stored inside of the libalpm handle structure. In order to preserve the old functionality
+I will have to either store a copy of the ALPM object inside every other object or use
+the internal C representation which I'm technically not supposed to know.
+
+Whatever. I'm too lazy for either of those. What this means for you is you really really
+should check for errors yourself. If a method call returns undef you should follow it
+up with an "or die". Something like this:
+
+  $db->force_update or die $alpm->strerror;
+
+This is annoying but not unlike most other perl error checking. If you find yourself
+calling methods on an undefined value then an error most likely occurred.
+
+But wait there's more! Errors are actually thrown when getting/setting options and
+an error condition occurs.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<ALPM::Conf>, L<ALPM::DB>, L<ALPM::Package>, L<ALPM::Transaction>
+
+=item * L<http://projects.archlinux.org/pacman.git/> - git repository for pacman/libalpm
+
+=item * L<http://code.toofishes.net/pacman/doc/> - libalpm doxygen docs
+
+=item * L<http://wiki.archlinux.org/index.php/Pacman>
+
+=item * L<http://github.com/andrewgregory/perl-alpm> - git repo for this module.
+
+=back
+
+=head1 AUTHOR
+
+Justin Davis, C<< <juster at cpan dot org> >>
+
+Andrew Gregory <apg@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Justin Davis
+
+Copyright (C) 2015 by Andrew Gregory <apg@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

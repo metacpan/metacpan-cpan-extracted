@@ -1,0 +1,17 @@
+.gitignore
+Changes
+lib/Asm/Z80/Table.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/sjasmplus.t
+t/Table.t
+tools/build_Table.pl
+tools/Table_template.pm
+tools/Z80_instructions.dat

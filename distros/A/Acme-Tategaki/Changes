@@ -1,0 +1,40 @@
+Revision history for Perl extension Acme-Tategaki
+
+0.12 2013-07-13T12:49:09Z
+
+    - added tategaki_one_line command
+
+0.11 2013-07-13T09:51:47Z
+
+    - added tategaki_one_line method and corresponding to the conversion to vertical writing various
+
+0.10 2013-06-21T02:25:47Z
+    - added Test::Base::Less and Acme::Tategaki dose not Encode/Decode String.
+
+0.09 2013-06-18T14:58:06Z
+    - change a dependence module and added test
+
+0.08 2013-06-17T06:37:04Z
+    - Do not use /usr/bin/env
+
+0.07 2013-06-17T02:18:37Z
+    - added vertical forms (FE10 to FE19) transformation.
+
+0.06 2013-06-17T00:37:20Z
+    - modified POD
+
+0.05 2013-06-16T13:25:05Z
+    - return scalar or array
+
+0.04 2013-06-16T08:15:53Z
+    - split by punctuation
+
+0.03 2013-06-16T07:37:25Z
+    - modified POD
+
+0.02 2013-06-16T07:34:30Z
+    - catch a error
+
+0.01 2013-06-16T06:34:58Z
+    - original version
+

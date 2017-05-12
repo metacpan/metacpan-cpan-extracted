@@ -1,0 +1,183 @@
+Revision history for Perl extension Alien-FLTK
+
+v1.3.3 2016-04-18T15:27:53Z
+
+	- Configure 64bit lib for relocation
+	- New opengl example
+
+v1.3.3 2016-04-14T01:45:26Z
+
+    - Build with stable 1.3.3 release of FLTK
+    - Resolve missing prereq (I hope)
+
+Version 0.09635001 | 2012-07-22 08:40:13Z (Sun, 22 Jul 2012) | 5dae2c1
+
+    Resolved Issues/Bug Fixes:
+     * Define FL_LIBRARY during build
+     * Work around Win32 bug
+
+    Notes:
+     * Builds against r9635 of the 1.3.x branch of fltk
+
+Version 0.07704001 | 2010-09-18 01:55:22Z (Sat, 18 Sep 2010) | 70e72ea
+
+    Resolved Issues/Bug Fixes:
+     * #define symbols for dirent location were malformed
+
+Version 0.07694001 | 2010-09-04 03:56:05Z (Sat, 04 Sep 2010) | 45bb2d7
+
+    Selected Upstream Changes:
+     * [r7704] Fixed Windows class name (xclass) setup and caching mechanism.
+       This was not yet completely converted to UTF-8. Cleaned up related
+       code, removed old comments.
+       Tested and confirmed that the xclass() setup works and that different
+       icons can be set for different window classes (as it was in FLTK
+       1.1.10).
+     * [r7697] Full support of UTF-8 text for PostScript printing/output in 2
+         ways:
+          - Latin characters (unicode <= 17F) and a few other symbols, among
+            which the ?\226?\130?\172 (Euro), are output using vectorial fonts
+          - All other characters are output as a bitmap copy of their
+            offscreen rendition.
+     * [r7696] Simpler PostScript output of Fl_Bitmap objects
+     * [r7695] PostScript output of Fl_Pixmap objects: accept now arbitrarily
+       large pixmaps
+
+Version 0.07694001 | 2010-09-04 03:56:05Z (Sat, 04 Sep 2010) | 45bb2d7
+
+    Notes:
+     * Builds against r7694 of the 1.3.x branch of fltk
+
+Version 0.07063001 | 2010-02-15 22:06:30Z (Mon, 15 Feb 2010) | b0766e6
+
+    Resolved Issues/Bug Fixes:
+     * Untested CygWin configuration and build fixes
+
+    Notes:
+     * For now, we only support Win32-ish CygWin builds. In the future, we may
+       include X11-like builds. But don't count on it.
+
+Version 0.07063 | 2010-02-13 16:54:31Z (Sat, 13 Feb 2010) | 0bfc53b
+
+    Resolved Issues/Bug Fixes:
+     * Rather than X11, OSX/Darwin uses Carbon for graphics so we no longer
+       search for X11-related libs
+
+    Documentation/Sample Code/Test Suite:
+     * The XCursor lib is now noted as being optional in POD and README
+
+    Notes:
+     * This dist also includes other OS X 'fixes' which are completly untested
+       and will probably fail
+     * Upgraded fltk lib to svn r7063. See the following changelogs for more:
+       - http://fltk.org/articles.php?L967 (r7020 snapshot)
+       - http://fltk.org/articles.php?L968 (r7034 snapshot)
+       - http://fltk.org/articles.php?L970 (r7037 snapshot)
+       - http://fltk.org/articles.php?L973 (r7063 snapshot)
+
+Version 0.07008017 | 2010-02-10 07:18:40Z (Wed, 10 Feb 2010) | 364f273
+
+     Resolved Issues/Bug Fixes:
+     * X11-related libs are now linked in the correct, working order (I hope)
+
+Version 0.07008016 | 2010-02-09 21:35:54Z (Tue, 09 Feb 2010) | 37735bc
+
+    Internal/Behavioral Changes:
+     * Alien::FLTK has been split into two projects. See Notes below.
+     * cflags() and cxxflags() no longer include list of include directories
+     * Renamed include_path() => include_dirs() now that it returns all
+          required include directories
+     * Internal method config('blah') now returns blah's data in the config
+          hash
+     * Compile using Quartz drawing instead of X11 on Apple OS X
+     * Four months of stuff I forgot to keep the changelog up to date for. You
+           could check out the commit logs if you're bored.
+
+    Notes:
+     * When stable, this will be an API-breakin' release
+     * Alien::FLTK has been split into two projects. The first, Alien::FLTK
+           will now build the stable 1.3.x branch of FLTK while Alien::FLTK2
+           will build the 2.0.x branch.
+
+Version 0.06921 | 2009-10-11 05:50:42Z (Sun, 11 Oct 2009) | 335da88
+
+    Internal/Behavioral Changes:
+     * Upgrading to r6921
+     * include_path() and library_path() methods are (hopefully) less flimsey
+     * Slightly better platform handling
+
+Version 0.06916 | 2009-10-11 05:50:42Z (Sun, 11 Oct 2009) | 335da88
+
+    Resolved Issues/Bug Fixes:
+     * lib/header checks (should) now work on Unix
+     * configure action /should/ work on Solaris
+
+    Internal/Behavioral Changes:
+     * Upgrading to r6916
+     * We configure fltk before creating Build script in case we run into
+          trouble (typically missing libs on *nix) and need to exit(0) so test
+          results in NA
+
+    Documentation/Sample Code/Test Suite:
+     * Full OO syntax is now used in docs, tests, and examples
+     * Trimmed down t/0000_use/0002_exe.t so tests don't fail under tunneled X11
+
+    Notes:
+     * I'll get this right eventually... ((sigh))
+
+Version 0.06879 | 2009-10-04 04:46:04Z (Sun, 04 Oct 2009) | b9cf221
+
+    Resolved Issues/Bug Fixes:
+     * None yet
+
+    Internal/Behavioral Changes:
+     * More spitballing with *nix
+
+    Documentation/Sample Code/Test Suite:
+     * capabilities() and config() methods are now documented
+
+    Notes:
+     * Upgrading to fltk2 r6858 which comes with a modified license which
+         remains "in the spirit of the original FLTK 2 license, but at the
+         same time [complies with] Debian license requirements."
+
+Version 0.06844 | 2009-09-03 05:03:50Z (Thu, 03 Sep 2009) | 7ea0002
+
+     Resolved Issues/Bug Fixes:
+     * It actually works (...on Windows, at least)
+
+    Internal/Behavioral Changes:
+     * Alternatives are presented when we fail to download fltk's source
+     * Building fltk2 using ExtUtils::CBuilder and manual configuration
+
+    Documentation/Sample Code/Test Suite:
+     * New GL example: example/0003_gl.pl
+     * Adding list of prerequisites for non-Win32 systems
+
+    Notes:
+     * With the required X11-related libs installed, Alien::FLTK builds and
+         tests just fine on my Xubuntu box but I've received nothing but
+         FAIL-mail from CPAN Testers on non-Win32 systems. ...I'll take
+         suggestions from any *nix knowledgeable person who'd like to help.
+
+Version 0.068410 | 2009-08-22 07:10:42Z (Sat, 22 Aug 2009) | ecfdb18
+
+    API Changes/Compatibility Information:
+     * It actually exists
+
+     Resolved Issues/Bug Fixes:
+     * ...see above
+
+    Internal/Behavioral Changes:
+     * ...see above
+
+    Documentation/Sample Code/Test Suite:
+     * ...see above
+
+    Notes:
+     * Meanwhile...
+         - ...stuff is going on.
+
+_ -.-. .... .- -. --. . ... _________________________________________
+For more information, see the commit log:
+    http://github.com/sanko/alien-fltk/commits

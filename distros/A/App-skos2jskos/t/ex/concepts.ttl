@@ -1,0 +1,20 @@
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+
+@base <http://example.org/> .
+
+<> a skos:ConceptScheme;
+    dct:title "a scheme"@en;
+    dct:description "a scheme for testing"@en;
+    vann:preferredNamespacePrefix "example" .
+
+<A> a skos:Concept;
+    skos:inScheme <>;
+    skos:notation "\u2603"^^<x:some:type>;
+    skos:prefLabel "A"@en, "Ä"@de ;
+    skos:narrower <B>.
+
+<B> a skos:Concept;
+    skos:inScheme <>;
+    skos:notation "\u2639".

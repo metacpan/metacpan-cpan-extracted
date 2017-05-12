@@ -1,0 +1,52 @@
+Revision history for Perl extension App-Koyomi
+
+{{$NEXT}}
+
+2015-07-19 v0.6.0  YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>
+
+    - Fix: Wait child processes using Proc::Wait3
+
+2015-06-07 v0.5.2  YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>
+
+    - Fix: Add necessary module dependency (DBD::SQLite)
+
+2015-06-07 v0.5.1  YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>
+
+    - Add: Command-line options for koyomi-cli - --config|-c <Str> to specify
+      config path, --debug|-d for debug logging.
+
+2015-06-07 v0.5.0  YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>
+
+    - Add: SQLite schema
+    - Add: Fake implementation of semaphore datasource module
+
+2015-06-07 v0.4.2  YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>
+
+    - Add: koyomi command-line options - --config|-c <Str> to specify config path,
+      --debug|-d for debug logging.
+
+2015-06-07 v0.4.1  YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>
+
+    - Feature: koyomi-cli - CRUD for job records.
+
+2015-05-31 v0.3.0  YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>
+
+    - Change: Divide jobs' timetable datasource from jobs data
+    - Feature: Enable to specify user to execute job command
+    - Fix: Allow multiple schedule records per job
+    - Improvement: Safely update jobs to improve worker's availability
+
+2015-05-29 v0.1.4  YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>
+
+    - Fix: Include script/koyomi to dist package
+    - Fix: Module requirements in META.json
+    - Fix: Some wrongness of PODs related to Teng DataSource
+
+2015-05-28 v0.1.0  YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>
+
+    - Initial Release.
+    - Feature: koyomi worker job scheduler
+    - Feature: Customizable config file
+    - Feature: Teng w/ MySQL support for Job Datastore
+    - Feature: Lock record for Teng w/ MySQL not to run job coincidently
+

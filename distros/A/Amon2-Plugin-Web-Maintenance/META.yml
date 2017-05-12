@@ -1,0 +1,40 @@
+---
+abstract: 'Simple maintenance announcement page plugin for Amon2.'
+author:
+  - 'zoncoen <zoncoen@gmail.com>'
+build_requires:
+  Amon2: '0'
+  Test::More: '0.98'
+  Test::WWW::Mechanize::PSGI: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amon2-Plugin-Web-Maintenance
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Amon2::Plugin::Web::Maintenance:
+    file: lib/Amon2/Plugin/Web/Maintenance.pm
+    version: '0.01'
+requires:
+  Net::CIDR::Lite: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/zoncoen/Amon2-Plugin-Web-Maintenance/issues
+  homepage: https://github.com/zoncoen/Amon2-Plugin-Web-Maintenance
+  repository: git://github.com/zoncoen/Amon2-Plugin-Web-Maintenance.git
+version: '0.01'
+x_authority: cpan:ZONCOEN

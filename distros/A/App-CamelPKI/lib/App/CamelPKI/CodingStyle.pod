@@ -1,0 +1,179 @@
+=head1 STYLE DU CODE De Camel-PKI
+
+On n'entend pas ici les discussions stériles sur la question de la
+position de l'accolade ouvrante d'une sub (sur la même ligne ? À la
+ligne suivante ?) ni la largeur des tabulations : ce serait de
+l'«orthographe de code» ou de la «grammaire de code», mais pas du
+style.
+
+=head2 Langues
+
+La documentation est en français dans la mesure du possible; mais le
+code est en anglais, en particulier les APIs.  Ce dernier choix permet
+de simplifier la réutilisation du code existant : notamment quand on
+hérite d'une classe écrite en anglais (cf. L</Façades sur le CPAN>),
+il serait contre-productif (encore que pas impossible en Perl) de
+traduire tous les noms de méthodes en français dans la sous-classe...
+
+=head2 Orientation objet
+
+Comme dans tout langage de programmation moderne, on peut programmer
+orienté objet en Perl avec des interfaces claires, des mécanismes de
+répartition et de partage de code et de responsabilités pour une
+maintenabilité maximale; et on peut aussi commettre d'infâmes monceaux
+de code spaghetti.  La différence de Perl avec les autres langages,
+c'est qu'il permet d'aller plus loin dans ces deux directions... Dans
+la mesure du possible, nous ne faisons pas usage de la plus grande
+latitude de programmer comme un cochon offerte par Perl :-).
+
+=head2 Documentation
+
+La documentation d'une classe ou d'une méthode doit être nécessaire et
+suffisante pour la réécrire depuis la page blanche sans regarder son
+code. Cela inclut I<a minima> un synopsis (testé ! Cf. ci-dessous)
+pour chaque module, et deux à trois phrases pour chaque sub.  Ces
+dernières doivent expliciter le type et la signification de chaque
+paramètre, de la valeur de retour et des effets de bord de ladite
+sub. Prendre garde qu'en Perl il y a un paramètre caché pour chaque
+sub, qui est le contexte d'évaluation (scalaire, liste ou void) !
+
+=head2 Tests
+
+Camel-PKI est bardé de tests unitaires comme il se doit; ceux-ci sont
+présents à trois endroits différents : dans t/ (comme dans la plupart
+des modules CPAN), à la fin du code source des modules, en style
+L</perlmodlib>, et même dans le POD (ces deux dernières
+fonctionnalités sont documentées dans et implémentées par
+L<My::Tests::Below>). Les tests dans t/ sont «black-box», en ce sens
+qu'ils doivent continuer à fonctionner même si on réimplémente la
+classe de zéro. Ceux dans le code source du module sont «white-box»;
+enfin, le test du POD permet de s'assurer que les exemples de code qui
+s'y trouvent (en particulier la section SYNOPSIS) marchent pour de
+vrai.
+
+=head2 Exceptions
+
+Camel-PKI utilise systématiquement des exceptions construites. Les
+exceptions, tout comme le fait qu'elles soient construites
+(c'est-à-dire des objets) sont tous deux indispensables à la
+robustesse du code :
+
+=over
+
+=item I<exceptions, plutôt qu'une valeur de retour d'erreur>
+
+Pour la plupart des modes de programmation (le temps-réel étant un
+contre-exemple notable mais hors sujet ici), la robustesse exige
+d'interrompre le flux normal du programme aussitôt après l'erreur,
+sans quoi les pannes risquent de s'amplifier de manière byzantine. Or
+encoder l'erreur sous la forme d'une simple valeur de retour spéciale,
+c'est presque inviter l'appelant à oublier de contrôler cette
+valeur... Les exceptions levées avec C<die> et consorts garantissent
+que le code qui les attrape (s'il y en a) existe B<spécifiquement>
+pour traiter les erreurs et n'essaye pas de faire autre chose en même
+temps : c'est une forme de séparation des préoccupations qui est
+positive pour la qualité.
+
+=item I<exceptions construites, plutôt que messages d'erreur>
+
+Pour attraper une exception lancée avec C<die($message_texte)>, il
+faut la parser avec une expression régulière afin de la distinguer de
+toutes les autres exceptions possibles... I<enough said>.
+
+=back
+
+Sauf exception (ha ha ha), le module L<Error> est utilisé pour ce
+faire.  (Les mauvaises langues disent que ce module fuit dans certains
+cas, mais en réalité cette bogue, d'ailleurs imputable à
+l'interpréteur Perl et non pas à I<Error>, a disparu depuis la version
+5.6.1 au moins).
+
+=head2 Constructeurs nommés
+
+En Perl, comme dans tout langage qui ne s'infatue pas de construction
+atomique des objets et qui ne fait pas l'erreur de confondre méthode
+dynamique et méthode d'instance
+(L<http://www.c2.com/cgi/wiki?ConstructorsAreEvil>), il n'y a pas de
+spécialité du langage pour les constructeurs : un constructeur n'est
+rien d'autre qu'une méthode de classe qui renvoie un objet.  Nous
+tirons profit de cette fonctionnalité : les constructeurs ne
+s'appellent en général pas C<new> qui est ambigu, mais C<build> (pour
+construire l'objet à partir de ses composants eux-mêmes objet),
+C<load> (pour charger l'objet depuis le fichier de configuration ou
+une autre forme de dépôt persistant), C<parse> (pour charger l'objet
+depuis une chaîne de caractères) ou C<the> (pour un singleton).
+
+=head2 I<Capability discipline>
+
+La sécurité dans App::CamelPKI est une défense en profondeur : chaque classe
+objet y participe.  La I<capability discipline>, que nous appliquons,
+recommande que les instances d'objets représentent des droits : si je
+possède une référence sur un objet, j'ai le droit d'invoquer toutes
+les méthodes publiques qu'il propose et aucune autre; si je ne possède
+pas de référence sur cet objet, je ne sais même pas s'il existe.
+
+L<http://www.c2.com/cgi/wiki?CapabilitySecurityModel>
+
+En pratique, on observe les restrictions suivantes dans le code pour
+garantir la sécurité de l'application:
+
+=over
+
+=item B<la programmation objet c'est sérieux>
+
+Toute violation de l'ensemble des bonnes pratiques habituelles de la
+programmation objet connues collectivement sous le nom de B<loi de
+Déméter> (L<http://www.c2.com/cgi/wiki?LawOfDemeter> : appel d'une
+méthode privée, modification d'un champ sans passer par un accesseur,
+etc.) met à mal le fondement de la I<capability discipline> et
+constitue donc un trou de sécurité potentiel.
+
+=item B<pas d'autorité ambiante dans le contrôleur>
+
+Le contrôleur s'interdit d'accéder au modèle autrement que par
+l'intermédiaire de $c->model("Foo").  Celui-ci peut renvoyer un
+«modèle réduit», c'est-à-dire une sous-classe de App::CamelPKI::Model::Foo
+qui refuse certaines actions; en terminologie I<capability
+discipline>, ce «modèle réduit» s'appelle une B<facette>.  Le cas le
+plus courant de facette est la facette «lecture seule», qui refuse
+toutes les écritures.
+
+=item B<documentation des droits du modèle>
+
+Le POD de chaque classe du modèle contient une section B<Droits> qui
+documente le niveau de privilège acquis lorsqu'on dispose de l'accès à
+une instance de cette classe.  S'il existe des facettes à ce modèle,
+elles sont documentées séparément dans cette même section.  Toute
+méthode exportée par l'API de cette classe qui permet d'outrepasser
+les droits documentés constitue une B<fuite de privilèges> et un trou
+de sécurité potentiel.
+
+=back
+
+=head2 Façades sur le CPAN
+
+De nombreuses classes dans ce paquetage ne sont que de minces
+surcouches sur un module du CPAN préexistant (ou développé par les
+mêmes auteurs pour l'occasion, comme L<Crypt::X509::CA>).  Cette façon
+de faire présente de nombreux avantages :
+
+=over
+
+=item I<uniformisation de l'API>
+
+En particulier en matière de constructeurs avec des noms rigolos
+(L</Constructeurs nommés>) et de gestion des exceptions
+(L</Exceptions>)
+
+=item I<un endroit tout désigné pour corriger les bogues>
+
+Surcharger pour déboguer c'est MAL, mais Tellement Pratique®.
+
+=item I<traduction de l'API>
+
+Si on souhaite faire l'effort de traduire la documentation d'un module
+du CPAN au bénéfice des développeurs insuffisamment anglophones
+(cf. L</Langues>), le POD de la surcouche I<ad-hoc> est un bon endroit
+pour le faire.
+
+=back

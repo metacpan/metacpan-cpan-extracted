@@ -1,0 +1,50 @@
+
+
+#  The queries to be used for precision-recall calculations must be in the
+#  format shown below:
+
+
+q0:  yobj0 yobj1
+
+q1:  scope declaration assign member local test void static
+
+q2:  program ListIterator add ArrayList args
+
+q3:  string getAllChars throw IOException distinct TreeMap histogram map
+
+q4:  Cloneable CloneNotSupportedException xobj_clone array random printstring
+
+q5:  getName user maryjo jojo StudentUser user derived base invoke
+
+q6:  swing actionPerformed closeButton startButton windowClosing greetingButton
+
+q7:  pane MyTextPanel jpanel insertUpdate
+
+q8:  threading ThreadFileIO extends datafile readOneString InterruptedException
+
+q9:  synchronized withdraw balance Withdrawer random Math Account Depositor
+
+q10: ChatServer ServerSocket exception clientHandler clientList ArrayList
+
+q11: ListIterator InputStreamReader getOutputStream exception flush 
+
+q12: newInstance driver executeQuery insert executeQuery resultSetMetaData 
+
+q13: autocommit drop table friends sportsclub primary sport getString
+
+q14: duplcatebase virtual nonvirtual operator subobject printing
+
+q15: abstract shape polygonalApprox getRadius curvedShape area circumsference
+
+q16: rectangle area circumference virtual circle double bool numvertices
+
+q17: namespace circle shape getRadius getWidth getHeight
+
+q18: namespace destructor const iostream return
+
+q19: fstream namespace position number write item skip position
+
+q20: algorithm deque algorithm animals sort number push iter string 
+
+
+

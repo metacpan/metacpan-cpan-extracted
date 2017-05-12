@@ -1,0 +1,25 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  AnyEvent::Fork: '0.6'
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Fork-RPC
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '6'
+  Guard: '1'
+  common::sense: '3.6'
+version: 1.23

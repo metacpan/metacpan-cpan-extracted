@@ -1,0 +1,26 @@
+Revision history for App-CmdDispatch
+
+0.43 2015-09-12
+  - Declare a minimum perl version in Makefile.PL
+  - Test for minimum perl version in author tests
+  - Make alias help cleaner for aliases with different lengths
+0.42 2014-08-16T22:10:00-0500
+  - Modify testing code to use xt-based author tests
+  - Update metadata for more repo information
+  - Modify MANIFEST.SKIP to improve Kwalitee
+0.41 2013-07-09T21:44:00-0500
+  - Correct handling of autodie exceptions
+0.4  2013-01-21T22:02:35-0600
+  - CPANTESTERS passing. Upgrade version to release.
+0.3_01 2013-01-19T12:35:00-0600
+  - Attempt to fix reported CPANTESTERS errors with IO.
+0.3  2013-01-17T22:00:00-0600
+  - Added abstract for help, hint, and shell.
+  - Correct abstract offset handling for 'hint commands'.
+  - Update metadata to list repo.
+  - Corrected usage of Term::ReadLine module.
+0.2  2013-01-13T20:05:01-0600
+  - Redesign help/hint text to be constructed from multiple pieces.
+  - Improve documentation on main module.
+0.1  2013-01-13T01:20:01-0600
+  - Initial release.

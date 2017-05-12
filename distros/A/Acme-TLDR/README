@@ -1,0 +1,72 @@
+NAME
+
+    Acme::TLDR - Abbreviate Perl namespaces for the Extreme Perl Golf
+
+VERSION
+
+    version 0.004
+
+SYNOPSIS
+
+        #!/usr/bin/env perl
+        use strict;
+        use warnings;
+    
+        use Acme::TLDR;
+        use D::D;       # Data::Dump
+        use D::MD5;     # Digest::MD5
+        use DT;         # DateTime
+        use HTTP::T;    # HTTP::Tiny
+    
+        print DT->now, "\n";
+    
+        my $ua = HTTP::T->new;
+        my $res = $ua->get('http://ifconfig.me/all');
+        dd $res;
+    
+        my $md5 = D::MD5->new;
+        $md5->add($res->{content});
+        print $md5->hexdigest, "\n";
+
+DESCRIPTION
+
+    This module is heavily inspired on the shortener module proposal
+    <http://mail.pm.org/pipermail/rio-pm/2012q2/009177.html> by Fernando
+    Correa de Oliveira <https://metacpan.org/author/FCO>, albeit it
+    operates in a completely distinct way.
+
+ENVIRONMENT VARIABLES
+
+      * DEBUG - when set, dump the internals status (most importantly, the
+      long <=> short name mapping;
+
+      * NOCACHE - when set, no persistent cache is saved.
+
+CAVEAT
+
+    To reduce loading time (ExtUtils::Installed->new->modules is too damn
+    slow), an installed module cache is initialized upon Acme::TLDR start.
+    It is updated when the perllocal.pod file of the used Perl version gets
+    a modified time more recent than the cache file itself.
+
+SEE ALSO
+
+      * App::p
+
+      * L
+
+AUTHOR
+
+    Stanislaw Pusep <stas@sysd.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Stanislaw Pusep.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+CONTRIBUTOR
+
+    Sergey Romanov <sromanov-dev@yandex.ru>
+

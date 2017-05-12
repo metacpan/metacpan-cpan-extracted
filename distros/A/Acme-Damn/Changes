@@ -1,0 +1,24 @@
+Revision history for Perl extension Acme::Damn.
+
+
+0.06  Sun Oct 26 20:50:12 2014
+  - support for Perl >= v5.18
+
+0.05  Tue Feb 14 12:10:59 2012
+  - added support for modified bless() behaviour as suggested by
+    Bo Lindbergh <blgl@cpan.org>
+      - see https://rt.cpan.org/Ticket/Display.html?id=74899
+
+0.04  Sat May 16 10:42:00 2009
+  - changed handling of PL_no_modify to comply with GCC's -Wformat and
+    -Werror=format-security
+
+0.03  Sat Feb  5 00:09:32 2006
+  - added support for any alias, not just the ones defined in v0.02
+
+0.02	Tue Jun 10 18:13:31 2003
+  - added support for aliases for damn() as suggested by
+    Claes Jacobsson <claes@surfar.nu>
+
+0.01	Sun Jun  8 13:40:03 2003
+  - initial Acme::Damn release

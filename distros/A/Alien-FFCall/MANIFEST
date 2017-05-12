@@ -1,0 +1,10 @@
+Build.PL
+ffcall-1.10.tar.gz
+inc/My/ModuleBuild.pm
+inc/My/test.c
+lib/Alien/FFCall.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t

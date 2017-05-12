@@ -1,0 +1,70 @@
+Revision history for App-ZodiacUtils
+
+0.10    2016-06-02 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix startup overhead degradation.
+
+
+0.09    2016-06-02 (PERLANCAR)
+
+        - [ux] Add coercion rule 'str_alami_en' to allow things like: 'zodiac-of
+          today'.
+
+
+0.08    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+
+0.07    2015-12-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [build] Re-build with updated Perinci::To::POD (0.72) which fixes
+          rendering of examples in modules' POD.
+
+
+0.06    2015-12-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [build] Re-build with updated Perinci::To::POD (0.70) which fixes
+          rendering of modules' POD with regard to result_naked=1/args_as !=
+          'hash'.
+
+
+0.05    2015-12-17 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Pod::Weaver::Plugin::Rinci (0.50),
+          Perinci::Sub::ConvertArgs::Argv (0.07), and
+          Perinci::Sub::To::CLIDocData (0.24) which produces nicer/correct
+          command-line in examples.
+
+
+0.04    2015-11-28 (PERLANCAR)
+
+	- Switch to Perinci::CmdLine::Inline for faster startup, allow
+	  multiple arguments.
+
+
+0.03    2015-11-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace DateTime::Event::Zodiac with Zodiac::Tiny.
+
+
+0.02    2015-11-21 (PERLANCAR)
+
+	- Add utility: chinese-zodiac-of.
+
+
+0.01    2015-11-09 (PERLANCAR)
+
+        - First release.

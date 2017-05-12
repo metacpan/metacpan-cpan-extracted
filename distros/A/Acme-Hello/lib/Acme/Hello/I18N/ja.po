@@ -1,0 +1,22 @@
+# Japanese messages GNU hello
+# Copyright (C) 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+# IIDA Yosiaki <iida@gnu.org>, 1999, 2000, 2001, 2002.
+# This file is distributed under the same license as the hello package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: GNU hello 2.0.50\n"
+"POT-Creation-Date: 2002-05-22 19:23+0200\n"
+"PO-Revision-Date: 2002-02-08 12:19+09:00\n"
+"Last-Translator: IIDA Yosiaki <iida@gnu.org>\n"
+"Language-Team: Japanese <ja@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=EUC-JP\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "hello, world\n"
+msgstr "世界よ、こんにちは\n"
+
+msgid "Hello, world!"
+msgstr "世界よ、こんにちは！"
+

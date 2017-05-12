@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use App::TaskBuilder;
+
+my %opt;
+GetOptions(
+  \%opt,
+  'name=s',
+  'require=s%',
+  'include=s@',
+  'version=s',
+  'output=s',
+);
+die "--name is required\n" unless $opt{name};
+die "--version is required\n" unless $opt{version};
+$opt{require} ||= {};
+$opt{include} ||= [];
+App::TaskBuilder->new(%opt)->run;

@@ -1,0 +1,50 @@
+# Before `make install' is performed this script should be runnable with
+# `make test'. After `make install' it should work as `perl Audio-Stream-Crossfade.t'
+
+#########################
+
+use Test::More tests => 2;
+BEGIN { use_ok('Audio::Stream::Crossfade') };
+
+#########################
+
+# Insert your test code below, the Test::More module is use()ed here so read
+# its man page ( perldoc Test::More ) for help writing this test script.
+
+use IO::File;
+my $mixer = new Audio::Stream::Crossfade(duration => 1, silentOut => 0.8, silentIn => 0);
+my $blankDetect = -40;
+
+my $wav = new IO::File "t/1.raw";
+
+my $s = 0;
+
+my $out = new IO::File "> t/result.raw";
+
+binmode STDOUT, ":raw";
+while (1) {
+	my $pcm;
+
+	sysread ($wav, $pcm, 4096);
+	unless ($pcm) {
+		$mixer->switch;
+		close($wav);
+		warn "Switch";
+		$s++;
+		
+		if ($s == 3) {
+			last;
+		}
+		if ($s == 1) {
+			$wav = new IO::File "t/starter.raw";
+		}
+		if ($s == 2) {
+			$wav = new IO::File "t/2.raw";
+		}
+		
+		next;
+	}
+	
+	$pcm = $mixer->mixPcmFrames($pcm);
+	syswrite($out, $pcm);
+}

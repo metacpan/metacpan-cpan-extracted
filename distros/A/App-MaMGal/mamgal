@@ -1,0 +1,219 @@
+#!/usr/bin/perl
+# Copyright 2007-2011 Marcin Owsiany <marcin@owsiany.pl>
+# See the README file for license information
+use strict;
+use warnings;
+
+=head1 NAME
+
+mamgal - a program for creating static image galleries
+
+=cut
+
+use App::MaMGal;
+App::MaMGal->new('')->make_roots($ARGV[0]);
+
+=head1 SYNOPSIS
+
+  mamgal <directory>
+
+=head1 DESCRIPTION
+
+mamgal recursively scans a directory and turns it into a gallery, that is
+- creates HTML files for browsing pictures within this directory. If the
+directory already contains a gallery, it tries to run as fast as possible, by
+only refreshing the files that it needs to, based on file modification
+timestamps.
+
+When successful, mamgal prints nothing and exits 0.
+
+=head2 Features
+
+MaMGal was inspired by imageindex(1) and as such aims for a similar featureset
+but higher efficiency and better code architecture.
+
+=over
+
+=item *
+
+Index and slide views, simple layouts.
+
+=item *
+
+Image captions extracted from comments embedded in images themselves. This way
+your photo descriptions will never get lost.
+
+=item *
+
+Static HTML output, no need for PHP or other server-side execution support.
+
+=item *
+
+Designed with efficiency in mind - only reads and processes the files which
+were modified since the last run.
+
+=item *
+
+Image creation time extracted from EXIF metadata.
+
+=back
+
+=head2 Supported images
+
+For the purpose of creating icons and slides, MaMGal supports the same images
+as ImageMagick and the same films as mplayer.  However it decides whether a
+file is an image, film or something else, based on file extension. Please report
+any file extensions that should be treated as an image or film, but are not.
+
+=head2 Created files
+
+In each directory mamgal creates an 'index.html' and a number of hidden files
+and directories whose names start with '.mamgal-':
+
+=over
+
+=item .mamgal-root
+
+an empty marker file placed in the gallery root directory
+
+=item .mamgal-slides
+
+a directory containing HTML files presenting one image each
+
+=item .mamgal-medium
+
+a directory containing images scaled to be viewable on screen when shown within the slides
+
+=item .mamgal-thumbnails
+
+a directory containing "iconized" versions of images
+
+=item .mamgal-index.png
+
+a montage image showing the contents of the given directory
+
+=item .mamgal-style.css
+
+a stylesheet for the HTML files in the given tree
+
+=item .mamgal-tmp
+
+a temporary file that might be left over from a crash
+
+=back
+
+=head2 Performance
+
+MaMGal was designed with efficiency in mind, for example:
+
+=over
+
+=item *
+
+loads image data or metadata lazily, only when (and if) it needs it,
+
+=item *
+
+only processes files when it needs to refresh or create an output file when it
+is stale or missing,
+
+=item *
+
+runs as a single process, does not reexecute itself when recursing,
+
+=item *
+
+uses Perl calls and ImageMagick library to load and scale images, create and
+delete files, rather than executing external shell commands to do this (mplayer
+being the only exception).
+
+=back
+
+Here is some example data of processing 15GB worth of images (9100 files in a
+tree of 528 directories), compared to imageindex(1):
+
+=over
+
+=item generating a gallery from scratch:
+
+=over
+
+=item imageindex:
+
+3 hours, 96%CPU usage, 170K major + 227M minor pagefaults
+
+=item mamgal:
+
+1.5 hours, 92%CPU usage, 146K major + 102M minor pagefaults
+
+=back
+
+=item re-run on a freshly generated gallery:
+
+=over
+
+=item imageindex:
+
+51 minutes, 89%CPU usage, 155K major + 103M minor pagefaults
+
+=item mamgal:
+
+3.5 minutes, 58%CPU usage, 115 major + 1.7M minor pagefaults
+
+=back
+
+=back
+
+=head2 Name and History
+
+MaMGal stands for "Marcin and Magda Gallery", as it was initially written to
+create my and my then-fiancée's photo collection. In the past I had been using
+imageindex(1) for that, but with time our collection grew too large to be
+processed with it in a timely manner, as imageindex took its time to read each
+picture on every run. Therefore I came up with an idea for a gallery program
+that would only process pictures that changed since the last run, and had a
+test suite that would make it safer to modify.
+
+=head1 SECURITY
+
+MaMGal trusts the files it reads. It currently does not properly escape all
+input read from the images before embedding it in the files it produces,
+potentially leading to XSS-like vulnerabilities, if the input files are coming
+from an untrusted source. This will probably be improved in the future.
+
+=head1 CAVEATS
+
+=head2 Root directory
+
+Note that the directory specified on the command line is treated as the root of
+the gallery, that is a directory that has no links to its parent directory.
+Therefore to refresh a gallery you always need to run mamgal with the root
+directory as an argument. (Otherwise, the subdirectory you specify will itself
+turn into a root directory.)
+
+=head2 Duplicate Description Suppression
+
+In the "index" view, if an entry's description is the same as its immediate
+predecessor's description, then it is omitted. This way you can have identical
+descriptions embedded in multiple images, but the index view is not cluttered
+with them.
+
+=head1 AUTHOR
+
+MaMGal is Copyright 2007-2011 Marcin Owsiany <marcin@owsiany.pl>
+
+=head1 SEE ALSO
+
+mplayer(1), jhead(1), imageindex(1), Image::Info(3), Image::ExifTool(3)
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+Please see the README file for more copyright and license information.
+
+=cut
+

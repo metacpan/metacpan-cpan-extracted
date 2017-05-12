@@ -1,0 +1,11 @@
+Revision history for Acme-Siteswap
+
+0.03 - Tue Sep 18 17:21:38 PDT 2007
+ * Reformatted Seamus' patch, added List::Util dependency
+
+0.02 - Tue Sep 18 17:07:06 PDT 2007
+ * Siteswap support added by Seamus Campbell
+
+0.01 - Mon Jun 25 09:26:41 PDT 2007
+ * Initial revision
+

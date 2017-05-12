@@ -1,0 +1,29 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::PTS;
+use AFS::Cell qw (localcell);
+
+my ($sec, $cell, $pts);
+
+die "Usage: $0 [security [cell]]\n" if $#ARGV > 1;
+
+$sec  = 1 if $#ARGV == -1;
+$cell = localcell if $#ARGV < 1;
+
+$sec  = shift unless $sec;
+$cell = shift unless $cell;
+
+$pts = AFS::PTS->new($sec, $cell);
+if ($AFS::CODE) { print "Error Code: $AFS::CODE\n"; }
+else { print "OK \n"; }
+
+test_it($pts);
+
+sub test_it {
+    my $self = shift;
+    $self->DESTROY;
+}

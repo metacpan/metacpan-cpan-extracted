@@ -1,0 +1,43 @@
+
+%module{Algorithm::KNN::XS};
+
+// Associate a perl class with a C++ class
+%name{Algorithm::KNN::XS::LibANNInterface} class LibANNInterface
+{
+  // can be called in Perl as Algorithm::KNN::LibANNInterface->new( ... );
+  LibANNInterface(std::vector<std::vector<double>> points, std::string dump, bool use_bd_tree, int bucket_size, int split_rule, int shrink_rule);
+
+  %name{set_annMaxPtsVisit}
+    void set_annMaxPtsVisit(int max_points);
+
+  %name{annkSearch}
+    std::vector<std::vector<double>> annkSearch(std::vector<double> query_point, int limit_neighbours, double epsilon);
+
+  %name{annkPriSearch}
+    std::vector<std::vector<double>> annkPriSearch(std::vector<double> query_point, int limit_neighbours, double epsilon);
+
+  %name{annkFRSearch}
+    std::vector<std::vector<double>> annkFRSearch(std::vector<double> query_point, int limit_neighbours, double epsilon, double radius);
+
+  %name{annCntNeighbours}
+    int annCntNeighbours(std::vector<double> query_point, double epsilon, double radius);
+
+  %name{theDim}
+    int theDim();
+
+  %name{nPoints}
+    int nPoints();
+
+  %name{Print}
+    std::string Print(bool print_points);
+
+  %name{Dump}
+    std::string Dump(bool print_points);
+
+  %name{getStats}
+    std::vector<double> getStats();
+
+  ~LibANNInterface();
+};
+
+

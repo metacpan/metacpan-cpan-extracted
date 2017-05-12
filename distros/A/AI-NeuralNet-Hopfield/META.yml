@@ -1,0 +1,24 @@
+---
+abstract: 'A simple Hopfiled Network Implementation.'
+author:
+  - 'leprevost <leprevost@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AI-NeuralNet-Hopfield
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Math::SparseMatrix: 0.03
+  Moose: 2.0604
+  perl: 5.006
+version: 0.1

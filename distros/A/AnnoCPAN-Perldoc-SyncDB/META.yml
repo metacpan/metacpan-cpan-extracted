@@ -1,0 +1,17 @@
+---
+name: AnnoCPAN-Perldoc-SyncDB
+version: 0.11
+author:
+  - 'Clotho Advanced Media, Inc. <cpan@clotho.com>'
+abstract: Download the AnnoCPAN database
+license: perl
+requires:
+  File::Spec: 0
+  LWP::UserAgent: 0
+build_requires:
+  Test::More: 0
+provides:
+  AnnoCPAN::Perldoc::SyncDB:
+    file: lib/AnnoCPAN/Perldoc/SyncDB.pm
+    version: 0.11
+generated_by: Module::Build version 0.2611

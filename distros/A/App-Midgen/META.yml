@@ -1,0 +1,65 @@
+---
+abstract: 'Check B<RuntimeRequires> & B<TestRequires> of your package for CPAN inclusion.'
+author:
+  - 'Kevin Dawson <bowtie@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::CheckDeps: '0.01'
+  Test::More: '1.001003'
+  Test::Requires: '0.07'
+configure_requires:
+  ExtUtils::CBuilder: 0.27
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: App::Midgen
+name: App-Midgen
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  ExtUtils::MakeMaker: '6.68'
+  File::Spec::Functions: '3.47'
+  List::Util: '1.38'
+  Test::Pod: '1.48'
+  Test::Pod::Coverage: '1.08'
+  Test::Script: '1.07'
+requires:
+  Carp: '1.3301'
+  Class::XSAccessor: '1.19'
+  Cwd: '3.47'
+  Data::Printer: '0.35'
+  File::Slurp::Tiny: '0.003'
+  File::Spec: '3.47'
+  Getopt::Long: '2.42'
+  JSON::Tiny: '0.49'
+  List::MoreUtils: '0.33'
+  MetaCPAN::Client: '1.003'
+  Module::CoreList: '3.1'
+  Moo: '1.004005'
+  PPI: '1.215'
+  PPI::XS: '0.902'
+  Perl::MinimumVersion: '1.37'
+  Perl::PrereqScanner: '1.019'
+  Pod::Usage: '1.63'
+  Term::ANSIColor: '4.03'
+  Tie::Static: '0.04'
+  Time::Stamp: '1.3'
+  Try::Tiny: '0.22'
+  Type::Tiny: '0.042'
+  constant: '1.27'
+  perl: 5.8.1
+  version: '0.9908'
+resources:
+  bugtracker: https://github.com/kevindawson/App-Midgen/issues
+  homepage: https://github.com/kevindawson/App-Midgen
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/kevindawson/App-Midgen.git
+version: '0.34'

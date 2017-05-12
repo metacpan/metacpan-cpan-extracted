@@ -1,0 +1,72 @@
+Revision history for Acme-CPANAuthors-Russian
+
+1.07  2011-07-25 00:23
+	Add ASDEEVA, MEETTYA, remove YKO
+
+1.06  2010-10-28 11:44
+	164 authors
+
+1.05  2010-10-28 00:41
+	163 authors and 106 pause ids
+
+1.04  2010-07-30 19:25
+	159 authors and 104 pause ids
+
+1.03  2010-07-30 02:19
+	150 authors and 101 pause ids
+
+1.02  2010-02-25 18:09
+	1.01 was fail version. Now 147 authors and 101 pause ids
+
+1.01  2010-02-25 18:09
+	114 authors and 69 pause ids
+
+1.00  2009-10-16 02:22
+	129 authors and 86 pause ids
+
+0.92  2009-06-05 11:17
+	116 authors and 79 pause ids
+
+0.91  2009-04-24 01:46
+	Add examples/test.pl
+	Update script/cpan-aurhor.pl
+	Fix version and changes
+
+0.11  2009-04-20 22:22
+	113 authors and 73 pause ids
+	Update Build.PL (thanks to chorny)
+	Change POD
+
+0.10  2009-04-14
+	113 authors and 74 pause ids
+
+0.9   2009-03-24
+	116 authors and 71 pause ids
+
+0.8   2009-02-12
+	128 authors and 78 pause ids
+
+0.6-0.7 February 11, 2009
+        126 authors
+
+0.4-0.5 February 11, 2009
+        124 authors and 77 pause ids
+
+0.3     February 10, 2009
+        123 authors
+
+0.2     February 9, 2009
+        124 authors
+
+0.0203  February 7, 2009
+        Added a lot of authors
+
+0.02    February 7, 2009
+        Added 140 authors, script for fetch
+
+0.0102  February 7, 2009
+        Added Anatoly Sharifulin
+
+0.0101  November 2, 2008
+        First version, released on an unsuspecting world.
+

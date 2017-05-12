@@ -1,0 +1,13 @@
+:Methods tested :
+
+write_pid
+get_pid
+read_pidfile
+
+check_root
+kill
+
+change_user
+
+chroot
+detach

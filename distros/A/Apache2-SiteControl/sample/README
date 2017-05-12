@@ -1,0 +1,24 @@
+WARNING: This sample is tuned for use with mod_perl 1.xx, NOT mod_perl2. Use
+Apache2::SiteControl for mod_perl2 installations.
+
+This is a complete sample. To set it up:
+
+1) mkdir /tmp/sessions /tmp/session/locks and make sure apache will have
+   read/write access to them.
+2) Edit apache_modperlinit.pl and apache_sitecontrol.conf file and update the
+   relevant paths and fields (location mappings). Use the Directory and Alias
+   lines in this file to create a mapping for apache to this directory as
+   /sample.
+3) Restart apache and check logs.
+4) Try to access /sample/page.html. 
+   - You should be sent to the login page. 
+     The valid logins are: admin/test and user/test.
+   - You should see the page. If you are logged in as "admin", then you
+     should have editable fields. If not, you should just see data.
+5) Go to /sample/logout.html
+   - You should see a logout message
+6) Try to access /sample/page.html again.
+   - You should see the login screen again.
+
+Debugging is turned on in the default configuration, so check error_log in 
+apache if you have problems.

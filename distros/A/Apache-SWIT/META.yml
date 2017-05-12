@@ -1,0 +1,46 @@
+--- #YAML:1.0
+name:               Apache-SWIT
+version:            0.54
+abstract:           mod_perl server with integrated testing
+author:
+    - Boris Sukholitko (boriss@gmail.com)
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Apache2::Cookie:      
+    Apache2::Request:     
+    Apache::Test:         
+    Class::Accessor:      
+    Class::DBI:           
+    Class::DBI::Pg:       0.09
+    Class::DBI::Pg::More:  0.04
+    DBIx::VersionedSchema:  0.03
+    Devel::NYTProf:       
+    ExtUtils::ModuleMaker:  
+    File::Slurp:          
+    HTML::Tested:         0.48
+    HTML::Tested::ClassDBI:  0.21
+    HTML::Tested::JavaScript:  0.13
+    IO::CaptureOutput:    
+    IPC::Run:             
+    Linux::Smaps:         
+    Linux::Unshare:       
+    Package::Alias:       
+    Queue::Worker:        
+    Template:             
+    Test::Simple:         0.44
+    Test::TempDatabase:   0.16
+    WWW::Mechanize:       
+    YAML:                 
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,31 @@
+App-SimpleScan-Plugin-Cache version 0.0.1
+
+This simple_scan plugin adds the %%cache and
+%%nocache pragmas to the simple_scan language.
+
+%%cache turns on internal caching of pages by
+URL; %%nocache turns it off again.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+App::SimpleScan, Module::Pluggable, WWW::Mechanize::Pluggable,
+WWW::Mechanize::Plugin::Cache.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Joe McMahon and Yahoo!
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

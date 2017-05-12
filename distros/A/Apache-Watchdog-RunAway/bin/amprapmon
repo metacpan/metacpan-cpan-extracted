@@ -1,0 +1,95 @@
+#!/usr/bin/perl -w
+
+use Apache::Watchdog::RunAway ();
+
+### Start User configurable part ###
+
+$Apache::Watchdog::RunAway::TIMEOUT  = 5; #in seconds!
+$Apache::Watchdog::RunAway::DEBUG    = 1;
+$Apache::Watchdog::RunAway::POLLTIME = 5;
+$Apache::Watchdog::RunAway::LOCK_FILE = "/tmp/safehang.lock";
+$Apache::Watchdog::RunAway::SCOREBOARD_URL = "http://localhost/scoreboard";
+$Apache::Watchdog::RunAway::LOG_FILE = "/tmp/safehang.log";
+$Apache::Watchdog::RunAway::VERBOSE = 0;
+
+### End User configurable part ###
+
+############################################
+### Don't change a thing below this line ###
+
+usage() unless @ARGV == 1;
+
+if ($ARGV[0] eq 'start') {
+    Apache::Watchdog::RunAway::start_detached_monitor();
+}
+elsif ($ARGV[0] eq 'restart') {
+    Apache::Watchdog::RunAway::stop_monitor();
+    Apache::Watchdog::RunAway::start_detached_monitor();
+}
+elsif ($ARGV[0] eq 'stop') {
+    Apache::Watchdog::RunAway::stop_monitor();
+}
+else {
+    usage();
+}
+
+#########
+sub usage {
+    die qq{\tusage: $0 start|stop|restart\n};
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+amprapmon - Apache ModPerl RunAway Processes MONitor
+
+=head1 SYNOPSIS
+
+  % amprapmon <start|stop|restart>
+
+=head1 CONFIGURATION
+
+You should edit the top of the program where the configuration
+parameters are located.  See the CONFIGURATION section of
+Apache::Watchdog::RunAway for more info.
+
+=head1 DESCRIPTION
+
+The amprapmon program is uses C<Apache::Watchdog::RunAway> module to
+monitor and kill off hanging Apache/mod_perl processes.
+
+The amprapmon program can run even when the Apache/mod_perl server is
+stopped (it'll just wait for a server to start).  There is no need to
+restarted the program when the Apache/mod_perl server is started if it
+was running before.
+
+The program provides an I<rc.d> like or C<apachectl> interface so you
+can use as any other script invoked at startup/shutdown.
+
+See Apache::Watchdog::RunAway for more info.
+
+=head1 PREREQUISITES
+
+You need to have B<Apache::Watchdog::RunAway> installed.
+
+=head1 BUGS
+
+Was ist dieses?
+
+=head1 SEE ALSO
+
+L<Apache>, L<mod_perl>, L<Apache::Scoreboard>
+
+=head1 AUTHORS
+
+Stas Bekman <sbekman@iname.com>
+
+=head1 COPYRIGHT
+
+The amprapmon is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

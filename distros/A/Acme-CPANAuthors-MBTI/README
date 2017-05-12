@@ -1,0 +1,60 @@
+Acme::CPANAuthors::MBTI
+
+Minimal release atm.
+
+Send bug reports ( or preferably patches ) if you want inclusion.
+
+Will generate extra .pm files on demand as soon as we have members (
+Trivial Effort )
+
+Recommended quiz for people who have no idea and just want to play
+along: <http://www.25quiz.com/>
+
+Its not guaranteed to be accurate, but that doesn't matter.
+
+Its a generalisation tool.
+
+Just because the generalisation holds that averages of demographic
+X[0..50] is "Y", that does not mean you can take X[1] and assert Y.
+
+However, knowing X[1] is between X[0] and X[50] you can conjecture their
+odds at being relative to the demographic average Y.
+
+Thus, one can conjecture what one *might* do in a slightly better manner
+than enumerating all possible behaviours observed in humans.
+
+Blah blah blah more ranting here.
+
+Creds to "ETHER" <https://metacpan.org/author/ETHER> for the original
+entry I stole all the things from and refactored them to death,
+Acme::CPANAuthors::Nonhuman
+
+Subsequently, my source file is a lot smaller and needs about 3
+variables modifed to make a new type.
+
+So just change the files in "/authorlists"
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

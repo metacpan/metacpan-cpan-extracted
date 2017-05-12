@@ -1,0 +1,46 @@
+--- #YAML:1.0
+name:               Ambrosia
+version:            0.010
+abstract:           a powerful web application framework that can be used to create general applications too.
+author:
+    - Nikolay Kuritsyn <knm@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  6.31
+    File::ShareDir::Install:  0.03
+build_requires:
+    Moose:            0
+    Test::Deep:       0
+    Test::Exception:  0
+    Test::More:       0
+requires:
+    Apache:               0
+    Apache::Constants:    0
+    Apache::Request:      0
+    Carp:                 0
+    CGI:                  0
+    CGI::Cookie:          0
+    Data::Dumper:         0
+    Data::Serializer:     0
+    DBI:                  0
+    Exporter:             0
+    File::Path:           0
+    Getopt::Long::Descriptive:  0.087
+    if:                   0
+    integer:              0
+    IO::File:             0
+    JSON::XS:             0
+    overload:             0
+    Scalar::Util:         0
+    SOAP::Lite:           0
+    Time::HiRes:          0
+    XML::LibXML:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

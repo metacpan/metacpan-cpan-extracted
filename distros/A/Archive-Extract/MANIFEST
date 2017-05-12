@@ -1,0 +1,37 @@
+CHANGES
+lib/Archive/Extract.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_Archive-Extract.t
+t/src/double_dir.zip
+t/src/x.bz2
+t/src/x.gz
+t/src/x.ear
+t/src/x.jar
+t/src/x.par
+t/src/x.tar
+t/src/x.tar.gz
+t/src/x.tar.xz
+t/src/x.tgz
+t/src/x.txz
+t/src/x.war
+t/src/x.xz
+t/src/x.Z
+t/src/x.Z
+t/src/x.zip
+t/src/x.lzma
+t/src/y.ear
+t/src/y.jar
+t/src/y.par
+t/src/y.tar
+t/src/y.tar.bz2
+t/src/y.tar.gz
+t/src/y.tar.xz
+t/src/y.tbz
+t/src/y.tgz
+t/src/y.txz
+t/src/y.war
+t/src/y.zip
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

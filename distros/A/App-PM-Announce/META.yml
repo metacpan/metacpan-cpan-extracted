@@ -1,0 +1,51 @@
+---
+abstract: 'Announce your PM meeting via Meetup and LinkedIn'
+author:
+  - 'Robert Krimen <rkrimen@cpan.org>'
+build_requires:
+  Directory::Scratch: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.87'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-PM-Announce
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Config::General: 0
+  Config::JFDI: 0
+  DBD::SQLite: 0
+  DBI: 0
+  DBIx::Simple: 0
+  Data::Dump: 1.14
+  Data::UUID: 0
+  Date::Manip: 0
+  DateTime: 0
+  DateTimeX::Easy: 0
+  Document::TriPart: 0
+  File::HomeDir: 0
+  Getopt::Chain: 0
+  HTML::TreeBuilder: 0
+  HTTP::Request::Common: 0
+  JSON: 2
+  Log::Dispatch: 0
+  Moose: 0
+  Path::Class: 0
+  SQL::Script: 0
+  Scalar::Util: 0
+  String::Util: 0
+  Text::Table: 0
+  WWW::Mechanize: 0
+  WWW::UsePerl::Journal::Post: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/robertkrimen/app-pm-announce/tree/master
+version: 0.025

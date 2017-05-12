@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/digits/deep_digits.pl
+examples/digits/digits.pl
+examples/digits/get_digits.sh
+examples/digits/idx_to_fits.pl
+lib/AI/Nerl.pm
+lib/AI/Nerl/Network.pm
+t/nerl.t
+t/nerl_network.t

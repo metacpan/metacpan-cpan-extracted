@@ -1,0 +1,91 @@
+{
+   "abstract" : "Find information of installed packages",
+   "author" : [
+      "Jens Rehsack <rehsack@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-Packages",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.90"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "IPC::Run" : "0",
+            "Module::Pluggable" : "4.8"
+         },
+         "requires" : {
+            "IPC::Cmd" : "0",
+            "IPC::Open3" : "0",
+            "Module::Pluggable" : "4.5"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Packages" : {
+         "file" : "lib/Alien/Packages.pm",
+         "version" : "0.003"
+      },
+      "Alien::Packages::Base" : {
+         "file" : "lib/Alien/Packages/Base.pm",
+         "version" : "0.003"
+      },
+      "Alien::Packages::Dpkg" : {
+         "file" : "lib/Alien/Packages/Dpkg.pm",
+         "version" : "0.003"
+      },
+      "Alien::Packages::LsLpp" : {
+         "file" : "lib/Alien/Packages/LsLpp.pm",
+         "version" : "0.003"
+      },
+      "Alien::Packages::Msi" : {
+         "file" : "lib/Alien/Packages/Msi.pm",
+         "version" : "0.003"
+      },
+      "Alien::Packages::PkgInfo" : {
+         "file" : "lib/Alien/Packages/PkgInfo.pm",
+         "version" : "0.003"
+      },
+      "Alien::Packages::Pkg_Info::pkgsrc" : {
+         "file" : "lib/Alien/Packages/Pkg_Info/pkgsrc.pm",
+         "version" : "0.003"
+      },
+      "Alien::Packages::Pkg_Info::ports" : {
+         "file" : "lib/Alien/Packages/Pkg_Info/ports.pm",
+         "version" : "0.003"
+      },
+      "Alien::Packages::Rpm" : {
+         "file" : "lib/Alien/Packages/Rpm.pm",
+         "version" : "0.003"
+      },
+      "Alien::Packages::RpmDB" : {
+         "file" : "lib/Alien/Packages/RpmDB.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/rehsack/Alien-Packages"
+      }
+   },
+   "version" : "0.003"
+}

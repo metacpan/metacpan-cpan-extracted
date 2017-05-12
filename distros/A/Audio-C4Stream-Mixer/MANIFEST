@@ -1,0 +1,9 @@
+Changes
+INLINE.h
+Makefile.PL
+MANIFEST
+Mixer.xs
+ppport.h
+README
+t/Audio-C4Stream-Mixer.t
+lib/Audio/C4Stream/Mixer.pm

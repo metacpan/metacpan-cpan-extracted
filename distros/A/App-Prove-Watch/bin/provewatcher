@@ -1,0 +1,80 @@
+#!perl
+
+use strict;
+use warnings;
+use App::Prove::Watch;
+
+my $watcher = App::Prove::Watch->new(@ARGV);
+
+exit($watcher->run ? 0 : 1);
+
+=head1 NAME
+
+provewatcher
+
+=head1 VERSION
+
+version 0.3
+
+=head1 DESCRIPTION
+
+Watches for changes in the current directroy tree and runs prove when there are
+changes.
+
+=head1 ARGUMENTS
+
+C<provwatcher> takes all the arguments that C<prove> takes with two additions:
+
+=head2 --watch
+
+Specifies what directories should be watched:
+
+	# just watch lib
+	$ provewatcher --watch lib
+	
+	# watch lib and t
+	$ provewatcher --watch lib --watch t
+	
+This defaults to C<.> if not given.
+
+=head2 --run
+
+Allows you to run something other than prove when changes happen. For example if
+you where using L<Dist::Zilla>
+
+	$ provewatcher --run 'dzil test'
+	
+	
+=head2 --ignore
+
+Adds another regexp to the list of files that are ignored.  Can be given
+multiple times.
+	
+=head1 NOTIFICATIONS
+
+If you install L<Log::Dispatch::DesktopNotification>, desktop notifications will
+be sent whenever the overall state of the tests change (failing to passing or
+passing to failing).
+
+L<Log::Dispatch::DesktopNotification> is not listed as a prereq for this module,
+it will not be installed by default when you install this module.
+
+=head1 AUTHORS
+
+    Chris Reinhardt
+    crein@cpan.org
+    
+=head1 COPYRIGHT
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=head1 SEE ALSO
+
+L<App::Prove::Watch>, L<App::Prove>, perl(1)
+
+=cut
+	

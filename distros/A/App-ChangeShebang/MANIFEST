@@ -1,0 +1,14 @@
+Changes
+LICENSE
+META.json
+Makefile.PL
+README.md
+cpanfile
+lib/App/ChangeShebang.pm
+minil.toml
+script/change-shebang
+t/00_compile.t
+t/01_basic.t
+t/Util.pm
+META.yml
+MANIFEST

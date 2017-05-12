@@ -1,0 +1,244 @@
+<html>
+<head>
+<title>Alzabo: The Perl Data Modeling Tool</title>
+<link rel=stylesheet href="alzabo.css" type="text/css">
+</head>
+
+<body>
+
+% if ($s) {
+<div id="toptwo">
+ <img src="cube_logo.jpg" width="120" height="24" border="0" alt="logo">
+</div>
+% } else {
+<div id="hometop">
+ <img src="hyena.jpg" width="186" height="78" border="0" alt="logo">
+</div>
+% }
+
+<div id="crumb">
+ <h7><& .breadcrumbs, s => $s, t => $t, c => $c &></h7>
+</div>
+
+% if (@errors) {
+<div class="levelone">
+%   foreach (@errors) {
+ <h4 class="error"><% $_ | h %></h4>
+%   }
+</div>
+% }
+
+<table width="100%" cellspacing="0" cellpadding="0">
+ <tr valign="top">
+
+% if ( $s && $m->request_comp->attr('show_tables') ) {
+%   my @t = $s->tables;
+  <td>
+
+<div class="left">
+ <h2>Tables</h2>
+%   for ( my $x = 0; $x < @t; $x++ ) {
+ <h3>\
+%     if ($x) {
+<& href,
+    text => '&laquo;',
+    escape => 0,
+    path => 'move_table' . Alzabo::GUI::Mason::Config::mason_extension(),
+    query => { table => $t[$x]->name,
+               before => $t[$x - 1]->name,
+               schema => $s->name,
+             },
+ &>\
+%     } else {
+<span class="left_invisible">&laquo;</span>\
+%     }
+&nbsp;\
+<& href,
+   text => $t[$x]->name,
+   path => 'view_table' . Alzabo::GUI::Mason::Config::mason_extension(),
+   query => { table => $t[$x]->name,
+              schema => $s->name,
+            },
+ &>\
+&nbsp;\
+%     if ( $x != $#t ) {
+<& href,
+   text => '&raquo;',
+   escape => 0,
+   path => 'move_table' . Alzabo::GUI::Mason::Config::mason_extension(),
+   query => { table => $t[$x]->name,
+              after => $t[$x + 1]->name,
+              schema => $s->name,
+            },
+ &>\
+%     }
+</h3>
+%   }
+</div>
+
+  </td>
+% }
+
+
+
+% if ( $t && $m->request_comp->attr('show_columns') ) {
+%   my @c = $t->columns;
+  <td>
+
+<div class="middle">
+ <p>
+ <& href,
+    text => 'jump to foreign keys/indexes',
+    path => 'view_table_other' . Alzabo::GUI::Mason::Config::mason_extension(),
+    query => { table => $t->name,
+               schema => $s->name,
+             },
+  &>
+ </p>
+
+ <h2>Columns</h2>
+%   for ( my $x = 0; $x < @c; $x++ ) {
+<h3>\
+%     if ($x) {
+<& href,
+   text => '&laquo;',
+   escape => 0,
+   path => 'move_column' . Alzabo::GUI::Mason::Config::mason_extension(),
+   query => { column => $c[$x]->name,
+              before => $c[$x - 1]->name,
+              table  => $c[$x]->table->name,
+              schema => $s->name,
+            },
+ &>\
+%     } else {
+<span class="middle_invisible">&laquo;</span>\
+%     }
+&nbsp;\
+ <& href,
+    text => $c[$x]->name,
+    path => 'view_column' . Alzabo::GUI::Mason::Config::mason_extension(),
+    query => { column => $c[$x]->name,
+               table  => $c[$x]->table->name,
+               schema => $s->name,
+             },
+  &>\
+%     if ( $c[$x]->is_primary_key ) {
+&nbsp;-&nbsp;<b>pk</b>\
+%     }
+&nbsp;\
+%     if ( $x != $#c ) {
+<& href,
+   text => '&raquo;',
+   escape => 0,
+   path => 'move_column' . Alzabo::GUI::Mason::Config::mason_extension(),
+   query => { column => $c[$x]->name,
+              after  => $c[$x + 1]->name,
+              table  => $c[$x]->table->name,
+              schema => $s->name,
+            },
+  &>\
+%     }
+</h3>
+%   }
+</div>
+
+  </td>
+% }
+
+% $m->call_next( %args, %ARGS );
+
+ </tr>
+</table>
+
+<div id="bottom">
+
+</div>
+
+</body>
+</html>
+
+<%args>
+$schema => undef
+$table => undef
+$column => undef
+$foreign_key_table_to => undef
+$foreign_key_columns_from => undef
+$foreign_key_columns_to => undef
+@errors => ()
+</%args>
+
+<%init>
+my $s;
+my %args;
+my ($comp, @args);
+if ( defined $schema )
+{
+    eval{ $s = Alzabo::Create::Schema->load_from_file( name => $schema ); };
+    my $e = $@;
+    $m->comp( 'exception', $e ) if $e;
+    $args{s} = $s;
+}
+
+my $t;
+if ( defined $table )
+{
+    eval{ $t = $s->table($table); };
+    my $e = $@;
+    $m->comp( 'exception', $e ) if $e;
+    $args{t} = $t;
+}
+
+my $c;
+if ( defined $column )
+{
+    eval{ $c = $t->column($column); };
+    my $e = $@;
+    $m->comp( 'exception', $e ) if $e;
+    $args{c} = $c;
+}
+</%init>
+
+<%def .breadcrumbs>
+<& href,
+   text => 'Schema Editor',
+   path => 'index' . Alzabo::GUI::Mason::Config::mason_extension(),
+ &>
+% if ($s) {
+&gt;
+<& href,
+   text => $s->name,
+   path => 'view_schema' . Alzabo::GUI::Mason::Config::mason_extension(),
+   query => { schema => $s->name },
+ &>
+% }
+% if ($t) {
+&gt;
+<& href,
+   text => $t->name,
+   path => 'view_table' . Alzabo::GUI::Mason::Config::mason_extension(),
+   query => { table => $t->name, schema => $s->name },
+ &>
+% }
+% if ($c) {
+&gt;
+<& href,
+   text => $c->name,
+   path => 'view_column' . Alzabo::GUI::Mason::Config::mason_extension(),
+   query => { column => $c->name, table => $t->name, schema => $s->name },
+ &>
+% }
+<%args>
+$s
+$t
+$c
+</%args>
+</%def>
+
+<%flags>
+inherit => 'syshandler'
+</%flags>
+
+<%attr>
+show_tables => 1
+show_columns => 1
+</%attr>

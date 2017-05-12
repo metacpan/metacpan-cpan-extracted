@@ -1,0 +1,63 @@
+---
+abstract: 'Sets up an interface to passing Template Toolkit templates'
+author:
+  - 'Ivan Wills <ivan.wills@gmail.com>'
+build_requires:
+  Test::More: '0.88'
+  Test::Warnings: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-TemplateCMD
+provides:
+  App::TemplateCMD:
+    file: lib/App/TemplateCMD.pm
+    version: v0.6.7
+  App::TemplateCMD::Command:
+    file: lib/App/TemplateCMD/Command.pm
+    version: v0.6.7
+  App::TemplateCMD::Command::Build:
+    file: lib/App/TemplateCMD/Command/Build.pm
+    version: v0.6.7
+  App::TemplateCMD::Command::Cat:
+    file: lib/App/TemplateCMD/Command/Cat.pm
+    version: v0.6.7
+  App::TemplateCMD::Command::Conf:
+    file: lib/App/TemplateCMD/Command/Conf.pm
+    version: v0.6.7
+  App::TemplateCMD::Command::Describe:
+    file: lib/App/TemplateCMD/Command/Describe.pm
+    version: v0.6.7
+  App::TemplateCMD::Command::Help:
+    file: lib/App/TemplateCMD/Command/Help.pm
+    version: v0.6.7
+  App::TemplateCMD::Command::List:
+    file: lib/App/TemplateCMD/Command/List.pm
+    version: v0.6.7
+  App::TemplateCMD::Command::Print:
+    file: lib/App/TemplateCMD/Command/Print.pm
+    version: v0.6.7
+requires:
+  Class::Date: '1.001'
+  Clone: '0.17'
+  File::ShareDir: '1.03'
+  JSON: '0'
+  List::MoreUtils: '0'
+  Path::Tiny: '0'
+  Readonly: '0'
+  Template: '2.14'
+  Template::Provider: '2.94'
+  YAML: '0'
+  perl: '5.008'
+  version: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-TemplateCMD
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/ivanwills/App-TemplateCMD
+version: v0.6.7
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

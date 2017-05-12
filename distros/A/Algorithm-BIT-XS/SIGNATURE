@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 2696f68574c176b6e3672742a5ce12f08849b0fa Changes
+SHA1 d4109bf165acc1677d6b711e288209d7df59f535 MANIFEST
+SHA1 d6876ced30073c0f996dfafff4f3e2e37bdaaad5 META.json
+SHA1 e4f20ad6d95fbe0a8b2048f595f6730b849e0a12 META.yml
+SHA1 4681292d779a7bd0595c7103df928e8b04c6146b Makefile.PL
+SHA1 45e2aa510ed891a5dd477e7117388af07156fa92 README
+SHA1 74b22517988f172fe23cf6086d6dd0fcd5e856b4 XS.xs
+SHA1 9652c86543bf04979d53282b363b8f359f3a52ea lib/Algorithm/BIT/XS.pm
+SHA1 b7a1aba3cbf230cd3de6d5105258587f6a8484fd ppport.h
+SHA1 3f7bc73f77d3e5a0ef4ddd9bbc8130140f0af7be t/Algorithm-BIT-XS.t
+SHA1 f5c02e74f95796620329ae3d6d28897612a0918c typemap
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAlkGI/UQHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYk6mEACARKl1thHJDBuIdu8kRbv1Qs+zz5DUWTSt
+h1IMzXEifZkeVOMZ9w8U4YvFZBnP/UVFouQo2Td1tRVxaDJ+Fa3aTzhhQskJ2Nkw
+9wYAIRbyBxA/ee3eNgisjzDE/1UtdFAtRGDDUVFEJwx5H7Mpd/VGw7yDi4XCV/XT
+LJeeG6ZSukBqyp1tmCPK4/aUye84vLvo23knNuzeJKO8CDt45Wr6yG4BkuL9YIT8
+NhA+0DE18z4mmaCNX12wVM48w/RR6L3CjuWN06oC6xlxOGl/vnubIvqRBUN0gwqk
+4ly+0aHRA9VylHv+efsWKEB7yckoNr0CBXRvqjvAp7cC0jDmqVp5hl3iFTSNyX5I
+QMZpYMz3204H4TaJv/g6H1od7CdzZfeojkXeEFFNiu6V5hAawODO1tNOej4a2Wck
+Yccz4CGfR/QHcmirOxVzuLOM5SNEvPOZXE3imJWV9VTTI7gXtK1qXgtwTP+GObnR
+F9kVXK0tT6cXMhsIRQqcNAgMyQpyrbMJGI+HP+MXwq+Z9J0+v+ozqPSK0rILWWQ1
+GJpyN9wSV5LmQglB5WLbsF5msJO5qmuqpyqQCj4OGjbMrKccFr1vWX8nUzqRWdGW
+NodSuY4HBfhlgEU/2337/ZKxodAMiVo1UoYu/QB88LrO+7GbH+XfvUokPJhM54jn
+bu5pt0sxGQ==
+=GA+W
+-----END PGP SIGNATURE-----

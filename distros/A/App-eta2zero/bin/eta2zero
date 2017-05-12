@@ -1,0 +1,102 @@
+#!perl
+
+our $DATE = '2015-04-22'; # DATE
+our $VERSION = '0.03'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Proc::ChildError qw(explain_child_error);
+use Progress::Any '$progress';
+use Progress::Any::Output 'TermProgressBarColor';
+
+sub _run {
+    @ARGV == 1 or die "Usage: eta2zero <command>\n";
+    my $res = `$ARGV[0]`;
+    die "eta2zero: Command failed: " . explain_child_error() if $?;
+    $res += 0;
+}
+
+my $target = _run();
+exit 0 unless $target > 0;
+$progress->target($target);
+$progress->update(pos => 0);
+
+while (1) {
+    sleep 2; # XXX autocalculate/adjust the appropriate time for interval
+    my $pos = $target - _run();
+    $pos = 0 if $pos < 0;
+    $progress->update(pos => ($pos));
+    last if $pos >= $target;
+}
+$progress->finish;
+
+1;
+# ABSTRACT: Display countdown progress bar
+# PODNAME: eta2zero
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+eta2zero - Display countdown progress bar
+
+=head1 VERSION
+
+This document describes version 0.03 of eta2zero (from Perl distribution App-eta2zero), released on 2015-04-22.
+
+=head1 SYNOPSIS
+
+ % eta2zero 'command-that-produces-a-number'
+
+Suppose in one terminal you're deleting files in a large directory, which might
+take a while. You can open another terminal, C<cd> to that directory, and type:
+
+ % eta2zero 'find -mindepth 1 | wc -l'
+
+It will display a progress bar with ETA:
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+=head1 FAQ
+
+=head1 SEE ALSO
+
+This script is inspired by the shell version created by Chris Lamb:
+L<https://chris-lamb.co.uk/posts/calculating-eta-to-zero-in-shell>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-eta2zero>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-eta2zero>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-eta2zero>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

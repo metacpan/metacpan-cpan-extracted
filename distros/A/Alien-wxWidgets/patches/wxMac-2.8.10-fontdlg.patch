@@ -1,0 +1,16 @@
+diff -u src/mac/carbon/fontdlgosx.mm src/mac/carbon/fontdlgosx.mm
+--- src/mac/carbon/fontdlgosx.mm	2007/01/22 21:46:14	44296
++++ src/mac/carbon/fontdlgosx.mm	2009/09/01 13:36:08	61800
+@@ -169,7 +169,11 @@
+ 
+     NSModalSession session = [NSApp beginModalSessionForWindow:fontPanel];
+ 
+-    [NSApp runModalSession:session];
++    for (;;)
++    {
++        if ([NSApp runModalSession:session] != NSRunContinuesResponse)
++            break;
++    }
+ 
+     [NSApp endModalSession:session];
+ 

@@ -1,0 +1,38 @@
+---
+abstract: unknown
+author:
+  - 'Mario Zieschang <mziescha@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Docker-Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '0'
+  AnyEvent::HTTP: '0'
+  AnyEvent::Socket: '0'
+  Carp: '0'
+  HTTP::Request: '6.01'
+  JSON: '2.9'
+  LWP::Protocol::http::SocketUnixAlt: '0'
+  LWP::Protocol::https: '6.01'
+  LWP::UserAgent: '6.12'
+  URI: '1.71'
+  perl: '5.016000'
+resources:
+  repository: https://github.com/mziescha/App-Docker-Client.git
+version: '0.010300'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,42 @@
+List of known problems:
+
+-   Apache2 incompatible.  An Apache2::Wyrd framework is in the works, though
+    it may be released as a context-sensitive wrapper class.
+
+-   Concurrent access modes (CDB_<FOO>)of the BerkeleyDB module have
+    not been widely tested, and the BerkeleyDB Index is scheduled for
+    demolition before the 1.0 release.
+
+List of known problems which will not be fixed, and why:
+
+-   Until there's a good reason to do so, Apache::Wyrd will continue to
+    use the "old-style" file semantics, since they are slightly more
+    efficient than the IO::<FOO> packages.  A general attempt has been
+    made to make it reasonably easy to override these methods if you
+    must use another method of dealing with files.  Please report a bug
+    to the author if the offending code is not easy enough to override.
+
+-   Wyrds should be case-insensitive: too cycle-costly and only encourages
+    sloppiness.  Attributes are already case-insensitive.
+
+-   Should be able to put HTML within the attributes inside the Wyrd tag:
+    Only a few instances can't be done with Attribute Wyrds, and those will
+    likely require an additional mini-interpreter "language" like the
+    Apache::Wyrd::Services::Setter conditional mini-language for escaping
+    HTML:  This would likely be cycle-costly.
+
+-   Wyrds should not encourage polluting the system-wide module
+    namespace:  Guilty as charged.
+
+-   It should work more like PHP or Mason: No need to duplicate effort. If
+    PHP or Mason works for you, use it!
+
+-   The _self_parse method which is integral to the Wyrd object is
+    functionally incompatible with the idea of a "non-parsed-header"
+    document:  It makes more sense to use something else hand-coded if you
+    need to do that.
+
+-   The labor cost of converting the framework to D.C.'s spiffy new "Best
+    Practices" at this point outweigh the benefits.  Even the Apache2 port
+    will not need sufficient rewriting.  Current style is consistent where
+    required, and many of the more important best practices are already used.

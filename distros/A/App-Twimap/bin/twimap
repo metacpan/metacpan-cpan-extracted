@@ -1,0 +1,57 @@
+#!/home/acme/perl-5.12.3/bin/perl
+use strict;
+use warnings;
+use App::Twimap;
+use Config::Tiny;
+use Mail::IMAPClient;
+use Net::Twitter;
+
+my $config = Config::Tiny->read( shift || 'twimap.conf' );
+$config->{imap}->{Uid}       = 1;
+$config->{twitter}->{traits} = [qw/OAuth API::RESTv1_1 RetryOnError/];
+
+my $mailbox = $config->{_}->{mailbox} || die "No mailbox";
+
+my $imap = Mail::IMAPClient->new( %{ $config->{imap} } )
+    or die "new failed: $@\n";
+
+my $twitter = Net::Twitter->new( %{ $config->{twitter} } );
+
+my $twimap = App::Twimap->new(
+    mail_imapclient => $imap,
+    net_twitter     => $twitter,
+    mailbox         => $mailbox,
+);
+
+$twimap->sync_home_timeline;
+$twimap->sync_replies;
+
+=head1 NAME
+
+twimap - Push your Twitter home timeline to an IMAP server
+
+=head1 SYNOPSIS
+
+  $ twimap twimap.conf
+
+=head1 DESCRIPTION
+
+Twitter is an online social networking and microblogging service. The Internet
+Message Access Protocol (IMAP) is an Internet standard protocols for e-mail
+retrieval from a server. This module stores your Twitter home timeline in a
+folder on an IMAP server.
+
+See L<App::Twimap>.
+
+=head1 AUTHOR
+
+Leon Brocard <acme@astray.com>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2011, Leon Brocard
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it or modify it
+under the same terms as Perl itself.

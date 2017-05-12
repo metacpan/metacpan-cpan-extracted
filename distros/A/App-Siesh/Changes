@@ -1,0 +1,58 @@
+Revision history for App-Siesh
+
+0.21    2012-01-10
+
+	Fix "Use of qw(...) as parentheses is deprecated" under 5.14
+	[patch by atomicstack]
+
+0.20	2009-08-01
+
+	added first test to the distribution
+
+        App::Siesh
+
+		falling back to cat in case view can't call PAGER
+		added batch support (--command and --file)
+		added --help and --man
+		corrected wrong usage of pod2usage
+		new paramter --config to read options from another file
+		Documented "off" option for --tls
+		added ssl debugging
+		added special handling of rm *
+		read configuration file with Config::Tiny
+		better completion support for put and get
+
+	Net::ManageSieve::Siesh
+
+		added activate to mirror deactivate
+		new listscripts behaviour
+		checking havespace before putting a script
+		die in case of error
+		new function script_exists
+		using autodie
+
+0.11	2009-07-23
+	added dependency on Pod::Usage
+
+0.10	2009-07-23
+	forget to add lib/App/Siesh.pm to MANIFEST
+
+0.09	2009-07-23
+	handles moving of active scripts correctly
+	created App::Siesh
+	split documentation between App::Siesh und siesh
+	added new --password paramter
+
+0.08    2009-07-23
+	added --debug and --tls command line options (by Darian Anthony Patrick)
+	corrected some typos
+	added module_name to generate a packlist for pkgsrc
+
+0.07    2009-07-22
+	changed makefile.pl policy to passthrough
+	added explicit dist_abstract
+	better help messges (by Edgar Fuss)
+	author information was listed twice
+
+0.06	2009-07-20
+	first public release

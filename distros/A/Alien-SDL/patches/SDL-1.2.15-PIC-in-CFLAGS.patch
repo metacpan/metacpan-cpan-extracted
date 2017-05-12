@@ -1,0 +1,13 @@
+--- SDL-1.2/configure	2014-04-23 12:59:05.000000000 +0200
++++ SDL-1.2/configure	2014-04-23 12:59:14.000000000 +0200
+@@ -7538,7 +7538,9 @@
+ if test x"$lt_cv_prog_compiler_pic_works" = xyes; then
+     case $lt_prog_compiler_pic in
+      "" | " "*) ;;
+-     *) lt_prog_compiler_pic=" $lt_prog_compiler_pic" ;;
++     *) lt_prog_compiler_pic=" $lt_prog_compiler_pic" 
++       CFLAGS="$CFLAGS$lt_prog_compiler_pic"
++     ;;
+      esac
+ else
+     lt_prog_compiler_pic=

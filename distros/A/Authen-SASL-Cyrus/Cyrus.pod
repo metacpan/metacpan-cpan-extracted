@@ -1,0 +1,151 @@
+
+=head1 NAME
+
+Authen::SASL::Cyrus - XS SASL Authentication
+
+=head1 SYNOPSIS
+
+ use Authen::SASL;
+
+ $sasl = Authen::SASL->new(
+   mechanism => 'NAME',
+   callback => { NAME => VALUE, NAME => VALUE, ... },
+ );
+
+
+ $conn = $sasl->client_new(<service>, <server>);
+
+
+=head1 DESCRIPTION
+
+SASL is a generic mechanism for authentication used by several
+network protocols. B<Authen::SASL::Cyrus> provides an implementation
+framework that all protocols should be able to share.
+
+The XS framework makes calls into the existing libsasl2.so shared 
+library to perform SASL client connection functionality, including
+loading existing shared library mechanisms.
+
+
+=head2 CONSTRUCTOR
+
+The contructor may be called with or without arguments. Passing arguments is
+just a short cut to calling the C<mechanism> and C<callback> methods.
+
+=item client_new( SERVICE, HOST )
+
+Creates and returns a new connection object blessed into Authen::SASL::Cyrus.
+It is on that returned reference that the following methods are available.
+The SERVICE is the name of the service being implemented, which may be used
+by the underlying mechanism. An example service is "ldap". The HOST is the
+name of the server being contacted, which may also be used by the underlying
+mechanism.
+
+=head2 Authen::SASL::Cyrus METHODS
+
+=over 4
+
+=item callback ( NAME )
+
+Tells if the named callback has a handler installed. The list of implemented
+callbacks is "user", "auth", and "language". Others may be implemented in
+future releases.
+
+=item callback( NAME => VALUE,  NAME => VALUE, ... )
+
+Sets the given callback(s) to the given value(s). See the C<Callbacks> section
+for a description of callback VALUEs. See above for a list of implemented
+callback NAMEs.
+
+=item client_start
+
+The initial step to be performed. Returns the initial value to pass to the server.
+
+=item client_step( CHALLENGE )
+
+This method is called when a response from the server requires it. CHALLENGE
+is the value from the server. Returns the next value to pass to the server.
+
+=item code
+
+Returns a 1 if an error has occurred in any step along the way. See the
+C<error> method to get a better explanation of what error occurred. 
+Returns a 0 if no errors have occurred.
+
+=item error
+
+Returns a string with a brief description of what caused the last error,
+AND clears the error message so that subsequent calls will return an empty
+string until another error occurs.
+
+=item host
+
+Returns the host argument that was passed to C<client_new>
+=item mechanism
+
+Returns the SASL mechanism currently in use. It should match one of the 
+installed SASL shared library mechanisms (see your SASL distribution for
+a list of available mechanisms).
+
+=item property( NAME )
+
+Gets the SASL value for the named property. Currently implemented property
+names are: "user", "ssf", "maxout", "realm", "optctx", "iplocal" | "sockname", 
+"ipremote" | "peername". 
+
+=item property( NAME => VALUE, NAME => VALUE, ... )
+
+Sets the named property(ies) to the given value(s). Currently implemented 
+property names are given above.
+
+=item service
+
+Returns the service argument that was passed to C<client_new>
+
+=back
+
+=head2 Callbacks
+
+There are three different ways in which a callback may be passed
+
+=over
+
+=item CODEREF
+
+If the value passed is a code reference then, when needed, it will be called
+and the connection object will be passed as the first argument.
+
+=item ARRAYREF
+
+If the value passed is an array reference, the first element in the array
+must be a code reference. When the callback is called the code reference
+will be called with the connection object passed as the first argument
+and the second value from the array passed after. The code reference
+should return a scalar value which is the answer to the callback, e.g.
+a "user" callback should return a single string which is the username of
+the client.
+
+=item SCALAR
+
+All other values passed will be returned directly to the SASL library
+as the answer to the callback.
+
+=back
+
+=head1 SEE ALSO
+
+L<Authen::SASL>
+
+=head1 AUTHOR
+
+Mark Adamson <mark@nb.net>
+
+Please report any bugs, or post any suggestions, to the author.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005 Carnegie Mellon University. All rights reserved. This 
+program is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself.
+
+=cut

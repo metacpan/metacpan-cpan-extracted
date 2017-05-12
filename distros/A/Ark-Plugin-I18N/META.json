@@ -1,0 +1,79 @@
+{
+   "abstract" : "Ark plugin for I18N",
+   "author" : [
+      "Daisuke Murase <typester@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.9.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ark-Plugin-I18N",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Ark" : "0",
+            "Locale::Maketext::Lexicon" : "0",
+            "Locale::Maketext::Simple" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Ark::Plugin::I18N" : {
+         "file" : "lib/Ark/Plugin/I18N.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ark-framework/Ark-Plugin-I18N/issues"
+      },
+      "homepage" : "https://github.com/ark-framework/Ark-Plugin-I18N",
+      "repository" : {
+         "url" : "git://github.com/ark-framework/Ark-Plugin-I18N.git",
+         "web" : "https://github.com/ark-framework/Ark-Plugin-I18N"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Songmu <y.songmu@gmail.com>"
+   ]
+}

@@ -1,0 +1,39 @@
+Apache-BabyConnect version 0.93
+===============================
+
+The previous version 0.92 is missing many files and instructions on
+how to use the Apache::BabyConnect. That version was my first module
+to upload to CPAN and it has many bugs. Use version 0.93 instead.
+
+Apache::BabyConnect version 0.93 is stable and has been tested on
+Linux Fedora.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+DBI::BabyConnect
+
+
+GETTING STARTED
+See the file eg/README
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Bassem W. Jamaleddine
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,175 @@
+#!/usr/bin/perl
+
+# Created on: 2014-01-10 09:11:44
+# Create by:  dev
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use version;
+use Carp;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use File::stat;
+use Path::Tiny;
+use App::watchdo;
+
+our $VERSION = version->new('0.0.6');
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+my %option = (
+    sleep   => 1,
+    verbose => 0,
+    man     => 0,
+    help    => 0,
+    VERSION => 0,
+);
+
+if ( !@ARGV ) {
+    pod2usage( -verbose => 1 );
+}
+
+main();
+exit 0;
+
+sub main {
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'first|f!',
+        'watch|w=s@',
+        'dir|d=s@',
+        'git|g',
+        'sleep|s=i',
+        'test|t!',
+        'verbose|v+',
+        'man',
+        'help',
+        'version',
+    ) or pod2usage(2);
+
+    if ( $option{'version'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+    elsif ( !$option{watch} && !$option{git} ) {
+        warn "You must specify files to watch!\n";
+        pod2usage( -verbose => 1 );
+    }
+    elsif ( !@ARGV ) {
+        warn "Showing files when they change\n";
+    }
+
+    # do stuff here
+    my $watch = App::watchdo->new(
+        dirs  => $option{dir} || [],
+        files => $option{watch} || [],
+        git   => $option{git},
+        wait  => $option{sleep},
+        run   => \&run,
+    );
+
+    run() if $option{first};
+
+    $watch->watch();
+
+    return;
+}
+
+sub run {
+    my @changed = @_;
+    my $cmd = join ' ', @ARGV;
+
+    if ( !@ARGV ) {
+        print join "\n", map { $_->path } @changed;
+        print "\n";
+    }
+    elsif ( $option{test} ) {
+        warn $cmd;
+    }
+    else {
+        system $cmd;
+    }
+}
+
+__DATA__
+
+=head1 NAME
+
+watch-do - Run a command when watched files change
+
+=head1 VERSION
+
+This documentation refers to watch-do version 0.0.6
+
+=head1 SYNOPSIS
+
+   watch-do [option]
+   watch-do -w file1 [-w file2 ...] [--] cmd
+
+ OPTIONS:
+  cmd               Command to run when file changes
+  -w --watch[=]file File to be watched for changes
+  -g --git          Use git to find what to watch (ie monitor files that git
+                    see have changed)
+  -f --first        Execute the cmd on the first run as well as when files
+                    change.
+  -s --sleep[=]int  Time in seconds to sleep between checking for changes
+                    (Default 1s)
+  -t --test         Only test that the script would be executed on file
+                    changes, will warn with the execution of the command.
+     --no-test      Turn off testing (Default)
+
+  -v --verbose      Show more detailed option
+     --version      Prints the version information
+     --help         Prints this help information
+     --man          Prints the full documentation for watch-do
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2014 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

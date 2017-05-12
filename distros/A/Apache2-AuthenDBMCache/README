@@ -1,0 +1,38 @@
+
+$Id: README,v 1.6 2006/03/02 20:50:36 reggers Exp $
+
+Updated for Apache2 2-Mar-2006 by Reg Quinton <reggers@ist.uwaterloo.ca>
+
+----------------------
+This module, Apache::AuthenDBMCache, is an Apache/mod_perl authentication
+handler to accelerate logins that use other perl methods (like AuthenURL,
+AuthenSMB, or etc.). It requires Apache support for the stacking of modules
+(which has been there for quite some time).
+
+To build and install it, please run
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+To read more about this module try
+
+    pod2text AuthenDBMCache.pm 
+
+In many ways this is just another implementation of AuthenCache but instead of
+using shared memory I use a DBM file to cache data. We were using the shared
+memory method but ran into problems when the cache filled. There are other
+issues.
+
+BEWARE: If you want to use this module the system manager will have to have
+        set up the cache file and a cron job to prune the cache. See the POD.
+
+This package is Copyright (C) 2002 by Reg Quinton, Information Systems and
+Technology, University of Waterloo. It may be copied, used and redistributed
+under the same terms as perl itself.
+
+Reg Quinton <reggers@ist.uwaterloo.ca>
+
+                                     "Stay calm, be brave, wait for the signs."
+							Dead Dog Cafe/CBC Radio

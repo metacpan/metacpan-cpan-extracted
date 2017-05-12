@@ -1,0 +1,24 @@
+1.04 10 Oct 2009
+----------------
+Added PREREQ for Text::Balanced 1.99 as per RT #1443
+Removed the MY override of test_via_harness, fails on Strawberry RT #50225
+
+1.02 04 Sep 2002
+----------------
+Removed some debug information that would show up if the module died.
+Also applied a patch from Jouke Visser to preserve the original scripts
+line numbering.
+This means that if you have a script that uses Acme::Comment and that
+script emits a warning or an error, the line numbering will now be
+correct.
+
+
+1.01 13 Aug 2002
+----------------
+Fixed a bug in the passing of parameters that would not always
+'quotemeta' regex metacharacters
+Added 'Foxbase' as a language we support.
+
+1.00 12 May 2002
+----------------
+First release

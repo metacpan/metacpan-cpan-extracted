@@ -1,0 +1,43 @@
+Revision history for Perl extension SetWWWTheme.
+
+0.01  Thu Aug 12 14:11:32 1999
+	- original version; created by h2xs 1.18
+
+1.00  Wed Sep 15 18:11:11 1999
+	- first release
+
+1.01  Sun Jan 30 22:32:02 2000
+	- added support for @MORELINKSTITLE directive
+	- general cleanups
+
+1.02  Mon Jan 31 13:14:11 2000
+	- added support for @TOPBAR & @BOTTOMBAR
+	  at the request of the JAC
+
+1.03  Tue Feb 01 19:28:51 2000
+	- fixed bug in auto HTML cleaning routine
+	  (ie that bit that puts in missing </HEAD> tags, 
+	   etc.)
+
+1.04  Mon Feb 14 16:05:11 2000
+	- addes "printable" support to allow servers
+	  to send out un-themed pages without subverting
+	  the entire theming process.
+
+1.05  Tues Mar 21 19:01:11 2000
+	- fixed "printable" generation so that it 
+          uses GET methods rather than the ridiculous
+	  virtual directory method I had cooked up
+	  in 1.04.  :) 
+
+1.06  Thurs Mar 23 22:02:42 2000
+    - added support for escaped semi-colons in directives
+      (eg @MORELINKSTITLE=More Links\;; goes to "More Links;"
+      This was added at the request of the JAC for embedding 
+      Javascript.  Use it wisely.  Note that the escaping is
+      simple-minded..... You can't escape escapes, for example.
+    - added support for @SIDEBARWIDTH directive.  The sidebar
+      width was previously set to 150 pixels.
+    - added support for @NOSIDEBAREXTRAS directive.  This turns
+      off all but the @SIDEBARMENULINKS (ie no search box,
+      stuff like that).   

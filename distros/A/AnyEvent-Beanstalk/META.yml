@@ -1,0 +1,26 @@
+---
+abstract: 'Async client to talk to beanstalkd server'
+author:
+  - 'Graham Barr'
+build_requires:
+  Test::Deep: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Beanstalk
+requires:
+  AnyEvent: '0'
+  Class::Accessor::Fast: '0'
+  YAML: '0'
+resources:
+  homepage: http://search.cpan.org/dist/AnyEvent-Beanstalk/
+  repository: git://github.com/gbarr/AnyEvent-Beanstalk.git
+version: '1.170590'
+x_serialization_backend: 'YAML::Tiny version 1.70'

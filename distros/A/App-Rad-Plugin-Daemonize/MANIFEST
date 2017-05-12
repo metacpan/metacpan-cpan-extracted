@@ -1,0 +1,16 @@
+App-Rad-Plugin-Daemonize-0.1.5.tar.gz
+Changes
+ignore.txt
+lib/App/Rad/Plugin/Daemonize.pm
+Makefile.PL
+MANIFEST
+README
+t/.02-funcs_t.pid
+t/00-load.t
+t/01-rad.t
+t/02-funcs.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/tested_methods
+META.yml                                 Module meta-data (added by MakeMaker)

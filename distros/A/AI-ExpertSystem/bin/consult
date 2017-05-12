@@ -1,0 +1,302 @@
+#!/bin/sh
+# the next line restarts using wish \
+exec wish "$0" "$@"
+
+################################################################################
+# To do
+# -----
+# Save defaults for program to run, text colour etc
+################################################################################
+
+package require cmdline
+
+################################################################################
+# Some global variables
+################################################################################
+
+set display_information 1
+set filehandle ""
+set filename ""
+set program "simpleshell"
+set error ""
+set choice ""
+
+toplevel .askme
+wm withdraw .askme
+
+################################################################################
+# The question asking dialog
+################################################################################
+
+proc ask_the_user {message argv} {
+	# Restore the toplevel item so that we can 
+	# put the dialog box together
+
+	wm deiconify .askme
+	wm title .askme "What I want to know is?"
+
+	# Set the question text
+
+	label .askme.l -text $message -padx 10 -pady 10 -wraplength 300
+	pack .askme.l -side top -anchor n
+
+	# The is where the users choice will go
+	global choice
+	set choice ""
+
+	# Set up each button
+	set counter 1
+	foreach option $argv {
+		button .askme.$counter -text $option -command [list set choice $counter]
+		pack .askme.$counter -side top -anchor n -fill x
+		incr counter
+	}
+
+	vwait choice
+
+	# Our option has been set, now dismantel the 
+	# contents of the toplevel so we can build it
+	# up again from scratch next time.
+
+	wm withdraw .askme
+	destroy .askme.l
+	set counter 1
+	foreach option $argv {
+		destroy .askme.$counter
+		incr counter
+	}
+
+	return $choice
+}
+
+################################################################################
+# Setting up the window
+################################################################################
+
+proc main {} {
+	wm title . "Simple Inference Engine"
+	wm geometry . 500x500
+
+	# The top frame holds the buttons
+
+	frame .top
+	button .load -text "Load..." -command "do_load" -width 8 
+	button .run  -text "Run"     -command "do_run"  -width 8 -state disabled
+	button .save -text "Save..." -command "do_save" -width 8 -state disabled
+	checkbutton .display -text "Display 'information' messages" -variable display_information -onvalue 1 -offvalue 0
+	pack .load .run .save .display -side left -anchor n -in .top
+	pack .top -anchor nw
+
+	# A log of the output is written here
+
+	text .text -yscrollcommand {.textscroll set}
+	scrollbar .textscroll -orient vertical -command {.text yview}
+	pack .text -side top -anchor w -fill both -expand 1 
+	pack .textscroll -side right -fill y -in .text
+
+	# Define some colours
+
+	.text tag config is_status      -foreground blue
+	.text tag config is_question    -foreground red
+	.text tag config is_response    -foreground cyan
+	.text tag config is_answer      -foreground green
+	.text tag config is_information -foreground grey
+
+	# A nice hello message
+
+	status "Welcome to the Tcl/Tk expert system shell"
+	status ""
+	status "This program is used to call the command line"
+	status "expert system called simpleshell and allows"
+	status "you to interact with it via the gui"
+	status ""
+	status "First select a knowledgebase to load with the Load button"
+	status "Then start a consultation with the Run button"
+	status "You can rerun the consultation as many times as you like"
+	status ""
+	status "The Save button allows you to save the contents of the"
+	status "session to a file"
+	status ""
+	status "The \"Display 'information' messages\" check box is used"
+	status "to turn the grey information messages on and off. The "
+	status "information messages tell you what the expert system is"
+	status "up to and can be quite voluminous"
+	status ""
+	status "Have fun - Peter Hickman"
+	status ""
+
+	# Do we have a command line file
+
+	global filename
+	if {$filename != ""} {
+		load_a_file $filename
+	}
+}
+
+################################################################################
+# Code to handle the buttons
+################################################################################
+
+proc do_load {} {
+	status "Load a file..."
+
+	set types {{{XML Files} {.xml}} {{All Files} *}}
+
+	global filename
+	set filename [tk_getOpenFile -filetypes $types -title "Load a knowledge base"]
+
+	if {$filename != ""} {
+		load_a_file $filename
+	} {
+		status "No file was selected"
+	}
+}
+
+proc load_a_file {filename} {
+	if {[file isfile $filename] == 0} {
+		status "The file you selected is not really a file"
+	} elseif {[file readable $filename] == 0} {
+		status "The file you selected in not readable"
+	} else {
+		.run  configure -state normal
+		status "Loading file $filename"
+		status "The next step is to Run it..."
+
+		wm title . [append newtitle "Simple Inference Engine: " [file tail $filename]]
+	}
+}
+
+proc do_run {} {
+	status "Run the file..."
+	status "This may take a few moments to get started..."
+	.save configure -state normal
+	.run  configure -state disabled
+
+	global filename
+	global program
+	set filehandle [open "|$program -t $filename" "r+"]
+
+	set question ''
+	set responses [list]
+
+	.text delete 0.1 end
+
+	while {![eof $filehandle]} {
+		set text [gets $filehandle]
+
+		if {[regexp {^status:(.*)} $text match newtext]} {
+			status $newtext
+		} elseif {[regexp {^question:(.*)} $text match newtext]} {
+			set question $newtext
+			set responses [list]
+			question $newtext
+		} elseif {[regexp {^response:(.*)} $text match newtext]} {
+			if {$newtext != "*"} {
+				lappend responses "$newtext"
+				response "One possible answer is => $newtext"
+			} else {
+				set is [ask_the_user $question $responses]
+				puts $filehandle $is
+				flush $filehandle
+				incr is -1
+				set word [lindex $responses $is]
+				answer "Your answer is => $word"
+			}
+		} elseif {[regexp {^information:(.*)} $text match newtext]} {
+			information $newtext
+		} elseif {[regexp {^explaination:(.*)} $text match newtext]} {
+			status $newtext
+		} else {
+			status $text
+		}
+	}
+
+	.run  configure -state normal
+}
+
+proc do_save {} {
+	status "Save the output..."
+
+	set types { {{Text Files} {.txt} } {{All Files} * } }
+
+	set filename [tk_getSaveFile -filetypes $types -title "Save the results of a run" -initialfile "Results.txt"]
+
+	if {$filename != ""} {
+		if {[file isfile $filename] == 0} {
+			status "The file you selected is not really a file"
+		} elseif {[file writeable $filename] == 0} {
+			status "The file you selected in not writeable"
+		} else {
+			status "Saving the output to $filename"
+			set handle [open $filename "w"]
+			puts $handle [.text get 0.1 end]
+			close $handle
+		}
+	} {
+		status "No file was selected"
+	}
+}
+
+################################################################################
+# Utility functions
+################################################################################
+
+proc status      {text} { mymessage $text is_status }
+proc question    {text} { mymessage $text is_question }
+proc response    {text} { mymessage $text is_response }
+proc answer      {text} { mymessage $text is_answer }
+
+proc information {text} {
+	global display_information
+	if {$display_information == 1} {
+		mymessage $text is_information
+	}
+}
+
+proc mymessage {text tag} {
+	.text insert end "$text\n" $tag
+	.text see end
+	update
+}
+
+################################################################################
+# The program starts here
+################################################################################
+
+# Was there a filename on the command line
+
+set p_count 0
+
+while {[set err [cmdline::getopt argv {f.arg p.arg} opt val]] > 0} {
+	switch -- $opt {
+		f {
+			if {$filename == ""} {
+				set filename $val
+			} {
+				set error "The $opt switch should only be used once"
+			}
+		}
+		p {
+			if {$p_count == 0} {
+				set program $val
+				incr p_count
+				if {[file executable $program] != 1} {
+					set error "The program '$program' is not runable"
+				}
+			} {
+				set error "The $opt switch should only be used once"
+			}
+		}
+	}
+}
+
+if {$err < 0} {
+	puts "There was an error: $val"
+	exit
+}\
+elseif {$error != ""} {
+	puts "There was an error: $error"
+	exit
+}
+
+main

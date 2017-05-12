@@ -1,0 +1,324 @@
+package App::Sqitch::Command::plan;
+
+use 5.010;
+use strict;
+use warnings;
+use utf8;
+use Locale::TextDomain qw(App-Sqitch);
+use App::Sqitch::X qw(hurl);
+use Moo;
+use Types::Standard qw(Str Int ArrayRef Bool);
+use Type::Utils qw(class_type);
+use App::Sqitch::ItemFormatter;
+use namespace::autoclean;
+use Try::Tiny;
+extends 'App::Sqitch::Command';
+
+our $VERSION = '0.9995';
+
+my %FORMATS;
+$FORMATS{raw} = <<EOF;
+%{:event}C%e %H%{reset}C%T
+name      %n
+project   %o
+%{requires}a%{conflicts}aplanner   %{name}p <%{email}p>
+planned   %{date:raw}p
+
+%{    }B
+EOF
+
+$FORMATS{full} = <<EOF;
+%{:event}C%L %h%{reset}C%T
+%{name}_ %n
+%{project}_ %o
+%R%X%{planner}_ %p
+%{planned}_ %{date}p
+
+%{    }B
+EOF
+
+$FORMATS{long} = <<EOF;
+%{:event}C%L %h%{reset}C%T
+%{name}_ %n
+%{project}_ %o
+%{planner}_ %p
+
+%{    }B
+EOF
+
+$FORMATS{medium} = <<EOF;
+%{:event}C%L %h%{reset}C
+%{name}_ %n
+%{planner}_ %p
+%{date}_ %{date}p
+
+%{    }B
+EOF
+
+$FORMATS{short} = <<EOF;
+%{:event}C%L %h%{reset}C
+%{name}_ %n
+%{planner}_ %p
+
+%{    }s
+EOF
+
+$FORMATS{oneline} = '%{:event}C%h %l%{reset}C %n%{cyan}C%t%{reset}C';
+
+has event => (
+    is      => 'ro',
+    isa     => Str,
+);
+
+has change_pattern => (
+    is      => 'ro',
+    isa     => Str,
+);
+
+has planner_pattern => (
+    is      => 'ro',
+    isa     => Str,
+);
+
+has max_count => (
+    is      => 'ro',
+    isa     => Int,
+);
+
+has skip => (
+    is      => 'ro',
+    isa     => Int,
+);
+
+has reverse => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 0,
+);
+
+has format => (
+    is       => 'ro',
+    isa      => Str,
+    default  => $FORMATS{medium},
+);
+
+has formatter => (
+    is       => 'ro',
+    isa      => class_type('App::Sqitch::ItemFormatter'),
+    lazy     => 1,
+    default  => sub { App::Sqitch::ItemFormatter->new },
+);
+
+sub options {
+    return qw(
+        event=s
+        change-pattern|change=s
+        planner-pattern|planner=s
+        format|f=s
+        date-format|date=s
+        max-count|n=i
+        skip=i
+        reverse!
+        color=s
+        no-color
+        abbrev=i
+        oneline
+    );
+}
+
+sub configure {
+    my ( $class, $config, $opt ) = @_;
+
+    # Set base values if --oneline.
+    if ($opt->{oneline}) {
+        $opt->{format} ||= 'oneline';
+        $opt->{abbrev} //= 6;
+    }
+
+    # Determine and validate the date format.
+    my $date_format = delete $opt->{date_format} || $config->get(
+        key => 'plan.date_format'
+    );
+    if ($date_format) {
+        require App::Sqitch::DateTime;
+        App::Sqitch::DateTime->validate_as_string_format($date_format);
+    } else {
+        $date_format = 'iso';
+    }
+
+    # Make sure the plan format is valid.
+    if (my $format = $opt->{format}
+        || $config->get(key => 'plan.format')
+    ) {
+        if ($format =~ s/^format://) {
+            $opt->{format} = $format;
+        } else {
+            $opt->{format} = $FORMATS{$format} or hurl plan => __x(
+                'Unknown plan format "{format}"',
+                format => $format
+            );
+        }
+    }
+
+    # Determine how to handle ANSI colors.
+    my $color = delete $opt->{no_color} ? 'never'
+        : delete $opt->{color} || $config->get(key => 'plan.color');
+
+    $opt->{formatter} = App::Sqitch::ItemFormatter->new(
+        ( $date_format   ? ( date_format => $date_format          ) : () ),
+        ( $color         ? ( color       => $color                ) : () ),
+        ( $opt->{abbrev} ? ( abbrev      => delete $opt->{abbrev} ) : () ),
+    );
+
+    return $class->SUPER::configure( $config, $opt );
+}
+
+sub execute {
+    my $self   = shift;
+    my $plan = $self->default_target->plan;
+
+    # Exit with status 1 on no changes, probably not expected.
+    hurl {
+        ident   => 'plan',
+        exitval => 1,
+        message => __x(
+            'No changes in {file}',
+            file => $plan->file,
+        ),
+    } unless $plan->count;
+
+    # Search the changes.
+    my $iter = $plan->search_changes(
+        operation => $self->event,
+        name      => $self->change_pattern,
+        planner   => $self->planner_pattern,
+        limit     => $self->max_count,
+        offset    => $self->skip,
+        direction => $self->reverse ? 'DESC' : 'ASC',
+    );
+
+    # Send the results.
+    my $formatter = $self->formatter;
+    my $format    = $self->format;
+    $self->page( '# ', __x 'Project: {project}', project => $plan->project );
+    $self->page( '# ', __x 'File:    {file}', file => $plan->file );
+    $self->page('');
+    while ( my $change = $iter->() ) {
+        $self->page( $formatter->format( $format, {
+            event         => $change->is_deploy ? 'deploy' : 'revert',
+            project       => $change->project,
+            change_id     => $change->id,
+            change        => $change->name,
+            note          => $change->note,
+            tags          => [ map { $_->format_name } $change->tags ],
+            requires      => [ map { $_->as_string } $change->requires ],
+            conflicts     => [ map { $_->as_string } $change->conflicts ],
+            planned_at    => $change->timestamp,
+            planner_name  => $change->planner_name,
+            planner_email => $change->planner_email,
+        } ) );
+    }
+
+    return $self;
+}
+
+1;
+
+__END__
+
+=head1 Name
+
+App::Sqitch::Command::plan - List the changes in the plan
+
+=head1 Synopsis
+
+  my $cmd = App::Sqitch::Command::plan->new(%params);
+  $cmd->execute;
+
+=head1 Description
+
+If you want to know how to use the C<plan> command, you probably want to be
+reading C<sqitch-plan>. But if you really want to know how the C<plan> command
+works, read on.
+
+=head1 Interface
+
+=head2 Attributes
+
+=head3 C<change_pattern>
+
+Regular expression to match against change names.
+
+=head3 C<planner_pattern>
+
+Regular expression to match against planner names.
+
+=head3 C<event>
+
+Event type buy which to filter entries to display.
+
+=head3 C<format>
+
+Display format template.
+
+=head3 C<max_count>
+
+Maximum number of entries to display.
+
+=head3 C<reverse>
+
+Reverse the usual order of the display of entries.
+
+=head3 C<skip>
+
+Number of entries to skip before displaying entries.
+
+=head2 Instance Methods
+
+=head3 C<execute>
+
+  $plan->execute;
+
+Executes the plan command. The plan will be searched and the results output.
+
+=head1 See Also
+
+=over
+
+=item L<sqitch-plan>
+
+Documentation for the C<plan> command to the Sqitch command-line client.
+
+=item L<sqitch>
+
+The Sqitch command-line client.
+
+=back
+
+=head1 Author
+
+David E. Wheeler <david@justatheory.com>
+
+=head1 License
+
+Copyright (c) 2012-2015 iovation Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=cut

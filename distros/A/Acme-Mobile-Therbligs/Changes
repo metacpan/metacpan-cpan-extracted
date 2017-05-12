@@ -1,0 +1,31 @@
+Revision history for Perl extension Acme::Mobile::Therbligs.
+
+0.05  Fri Apr 09 15:20:00 2010
+	- maintenance taken over by Rene Schickbauer
+    - Changed build system back to Makefile.PL only for
+      easier integration into my tool chains
+    - Added some self tests
+
+0.04  Wed Jan  5 2005
+	- renamed to Acme::Mobile::Therbligs
+
+0.03  Wed Jan  5 2005
+	- corrections to POD
+	- added SEE ALSO section for similar module
+
+0.02  Sun Jan  2 20:07:00 2005
+	- added more tests
+	- added option for NO_SHIFT
+	- updated documentation
+	- added ability to change options in constructor
+	- added option for NO_SENTENCE_CAPS
+	- added case flag to count function
+	- added debug flag to count function
+
+0.01  Fri Dec 31 14:10:24 2004
+	- original version; created by h2xs 1.23 with options
+		-n Acme::Mobile::Thurblings -v 0.01 -X -P -b 5.6.0
+
+
+
+

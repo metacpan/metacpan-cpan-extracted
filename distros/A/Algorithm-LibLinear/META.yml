@@ -1,0 +1,40 @@
+---
+abstract: 'A Perl binding for LIBLINEAR, a library for classification/regression using linear SVM and logistic regression.'
+author:
+  - 'Koichi SATOH E<lt>sekia@cpan.orgE<gt>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::LeakTrace: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+  Module::Build::XSUtil: '0.14'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-LibLinear
+provides:
+  Algorithm::LibLinear:
+    file: lib/Algorithm/LibLinear.pm
+    version: '0.17'
+  Algorithm::LibLinear::DataSet:
+    file: lib/Algorithm/LibLinear/DataSet.pm
+  Algorithm::LibLinear::FeatureScaling:
+    file: lib/Algorithm/LibLinear/FeatureScaling.pm
+  Algorithm::LibLinear::Model:
+    file: lib/Algorithm/LibLinear/Model.pm
+  Algorithm::LibLinear::Types:
+    file: lib/Algorithm/LibLinear/Types.pm
+requires:
+  List::MoreUtils: '0'
+  Smart::Args: '0'
+  perl: v5.14.0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: '0.17'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

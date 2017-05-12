@@ -1,0 +1,308 @@
+#!/usr/bin/env perl
+
+# Created on: 2009-11-27 11:38:06
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use File::Find qw/find/;
+use Term::ANSIColor;
+
+our $VERSION = 0.4;
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+my $GOOD     = colored('GOOD', 'green');
+my $BAD      = colored('BAD ', 'red');
+
+my %option = (
+    out     => undef,
+    verbose => 0,
+    man     => 0,
+    help    => 0,
+    VERSION => 0,
+);
+
+if ( !@ARGV ) {
+    pod2usage( -verbose => 1 );
+}
+
+main();
+exit 0;
+
+sub main {
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'group|g=s',
+        'user|u=s',
+        'recurse|r!',
+        'write|w',
+        'rule|m=s',
+        'verbose|v+',
+        'man',
+        'help',
+        'version',
+    ) or pod2usage(2);
+
+    if ( $option{'version'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+
+    # do stuff here
+    my $start_dir = `pwd`;
+    chomp $start_dir;
+    for my $dir (@ARGV) {
+        my $cwd = $dir;
+        if (-f $cwd) {
+            my ($file) = $cwd =~ m{(?:/|^)([^/]+)$};
+            $cwd =~ s{(?:/|^)([^/]+)$}{};
+            $cwd ||= '.';
+            chdir $cwd;
+            $cwd = `pwd`;
+            chomp $cwd;
+            $cwd .= "/$file";
+        }
+        else {
+            warn "$cwd\n" if $option{verbose} > 1;
+            chdir $cwd;
+            $cwd = `pwd`;
+            chomp $cwd;
+        }
+
+        check_perms($cwd);
+
+        chdir $start_dir;
+    }
+
+    return;
+}
+
+sub check_perms {
+    my ($cwd) = @_;
+    my $dir = $cwd;
+
+    my $all_good = 1;
+    my $first    = 1;
+    my $last     = 0;
+    while ($cwd ne '/' || $last) {
+        if (-l $cwd) {
+            my $ls = `/bin/ls -dl $cwd`;
+            my ($link) = $ls =~ /->\s+(.*)$/;
+            push @ARGV, $link if -e $link;
+        }
+        my ($perms, $seen_before) = check_perm($cwd, $first);
+        last if $seen_before && !$option{verbose};
+
+        print '' . ($perms ? $GOOD : $BAD) . " $cwd\n";
+        $all_good = 0 unless $perms;
+
+        if (-d $cwd) {
+            chdir '..';
+            $cwd = `pwd`;
+            chomp $cwd;
+            if ($cwd eq '/' && !$last) {
+                $last = 1;
+            }
+            else {
+                $last = 0;
+            }
+        }
+        else {
+            $cwd =~ s{(?:/|^)[^/]+$}{};
+            $cwd ||= '.';
+            chdir $cwd;
+            $cwd = `pwd`;
+            chomp $cwd;
+        }
+
+        $first = 0;
+    }
+
+    if ($option{recurse} && -d $dir) {
+        if ($all_good) {
+            find(
+                sub {
+                    return if $File::Find::name =~ m{/[.]svn};
+
+                    my ($perm) = check_perm($File::Find::name, 1);
+
+                    if (!$perm) {
+                        print "$File::Find::name $BAD\n";
+                        $all_good = 0;
+                    }
+                },
+                $dir
+            );
+            print "All sub files and folders were $GOOD\n" if $all_good;
+        }
+        else {
+            print "There were some bad directories in $dir\n";
+        }
+    }
+}
+
+{
+    my %perms;
+
+    sub check_perm {
+        my ($dir, $first) = @_;
+
+        return ($perms{$dir}, 1) if exists $perms{$dir};
+
+        my $perm_re = $first ? qr/r../ : qr/..[xX]/;
+        my %perms;
+        my $dir_quote = cmd_quote($dir);
+        my @perms     = `getfacl $dir_quote 2> /dev/null`;
+
+        for my $perm (@perms) {
+              $perm =~ /^#\s*(owner|group):\s*(\w+)/ ? $perms{g}{$1}{$1}       = $2
+            : $perm =~ /^#\s*file/                   ? undef
+            : $perm =~ /^(\w+)::(...)/               ? $perms{$1}{$1}{$1}      = $2
+            : $perm =~ /^(\w+):(\w+):(...)/          ? $perms{$1}{$2}{$2}      = $3
+            : $perm =~ /^default:(\w+)::(...)/       ? $perms{default}{$1}{$1} = $2
+            : $perm =~ /^default:(\w+):(\w+):(...)/  ? $perms{default}{$1}{$2} = $3
+            : $perm =~ /^\s+\Z/xms                   ? undef
+            :                                          warn "Unknown line '$perm'\n";
+        }
+
+        if ($option{group}) {
+            if (
+                (
+                    $perms{g}{group}{group} eq $option{group}
+                    && $perms{group}{group}{group} =~ /$perm_re/
+                )
+                || (
+                    $perms{group}{$option{group}}{$option{group}}
+                    && $perms{group}{$option{group}}{$option{group}} =~ /$perm_re/
+                )
+                || (
+                    $perms{other}{other}{other}
+                    && $perms{other}{other}{other} =~ /$perm_re/
+                )
+            ) {
+                return ($perms{$dir} = 1, 0);
+            }
+            else {
+                return ($perms{$dir} = 0, 0);
+            }
+        }
+        elsif ($option{user}) {
+            if (
+                (
+                    $perms{g}{user}{user} eq $option{user}
+                    && $perms{user}{user}{user} =~ /$perm_re/
+                )
+                || (
+                    $perms{user}{$option{user}}{$option{user}}
+                    && $perms{user}{$option{user}}{$option{user}} =~ /$perm_re/
+                )
+                || (
+                    $perms{other}{other}{other}
+                    && $perms{other}{other}{other} =~ /$perm_re/
+                )
+            ) {
+                return ($perms{$dir} = 1, 0);
+            }
+            else {
+                return ($perms{$dir} = 0, 0);
+            }
+        }
+        elsif (
+            $perms{other}{other}{other}
+            && $perms{other}{other}{other} =~ /$perm_re/
+        ) {
+            return ($perms{$dir} = 1, 0);
+        }
+
+        return ($perms{$dir} = 0, 0);
+    }
+}
+
+sub cmd_quote {
+    my ($cmd) = @_;
+
+    $cmd =~ s/\\/\\\\/gxms;
+    $cmd =~ s/"/\\"/gxms;
+    $cmd =~ s/\$/\\\$/gxms;
+    $cmd =~ s/`/\\`/gxms;
+
+    return qq{"$cmd"};
+}
+
+__DATA__
+
+=head1 NAME
+
+chkfacl - Uses the whole hierarchy of a file to check that it can be read by the specified user or group
+
+=head1 VERSION
+
+This documentation refers to chkfacl version 0.4.
+
+=head1 SYNOPSIS
+
+   chkfacl [option] ( dir | file )
+
+ OPTIONS:
+  -g --group=name Name of group to check
+  -u --user=name  Name of user to check
+  -r --recurse    Recurse into sub directories
+  -w --write      Write facls to make user or group be able to access needed directories?
+  -m --rule       One rule to rule them all?
+
+  -v --verbose    Show more detailed option
+     --VERSION    Prints the version information
+     --help       Prints this help information
+     --man        Prints the full documentation for chkfacl
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2015 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

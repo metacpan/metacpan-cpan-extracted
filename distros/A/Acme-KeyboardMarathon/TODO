@@ -1,0 +1,11 @@
+- Handle arc momvent, not squre movement.
+
+- Adjustments for keyboard gaps.
+
+- Adjustments for other keyboards.
+
+- Adjustments for hand-sizes affecting arcs.
+
+- Handle references to avoid copying large amounts of data.
+
+- Handle Latin-1 and other extended character sets.

@@ -1,0 +1,52 @@
+NAME
+    App::docsisious - Edit DOCSIS config files on web
+
+VERSION
+    0.08
+
+DESCRIPTION
+    App::docsisious is a Mojolicious web application for editing DOCSIS
+    config files.
+
+    Try out <http://home.thorsen.pm/docsisious> for a demo.
+
+INSTALLATION
+      $ curl -L https://cpanmin.us | perl - -M https://cpan.metacpan.org App::docsisious
+
+    You also need SNMP.pm to be able to write "human readable" OIDs. The
+    standard behavior is to decode all OIDs as numeric.
+
+      $ sudo apt-get install libsnmp-perl
+
+    If you are using a custom perl build, you have to get SNMP.pm
+    <http://www.net-snmp.org/download.html> manually.
+
+SYNOPSIS
+      # Step 1:
+      $ docsisious --listen http://*:8000
+      # Step 2:
+      $ open http://localhost:8000
+
+COPYRIGHT AND LICENSE
+  Icons
+    *   Daniel Bruce <http://www.flaticon.com/free-icon/question-mark_3711>
+
+    *   Dave Gandy
+        <http://www.flaticon.com/free-icon/fullscreen-arrows-symbol_25183>
+
+    *   Egor Rumyantsev
+        <http://www.flaticon.com/free-icon/settings-work-tool_70367">
+
+    *   Freepik <http://www.flaticon.com/free-icon/save-icon_64052>
+
+    *   Google <http://www.flaticon.com/free-icon/download-button_60721>
+
+  Code
+    Copyright (C) 2014, Jan Henning Thorsen
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+

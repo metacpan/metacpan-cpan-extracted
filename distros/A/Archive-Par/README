@@ -1,0 +1,38 @@
+Perl Module Archive-Par:
+
+    Tools for using & manipulating par files
+
+Description:
+
+Modules & Classes:
+
+    Archive::Par - use & manipulate par files
+
+Executables:
+
+    *None*
+
+Required Perl Version:
+
+    5.6.1
+
+Required Packages:
+
+    Class-MethodMaker 1.02
+    Log-Info          1.03
+    IPC-Run           0.44
+
+Required Executables:
+
+    par
+
+Package Maintainer: 
+
+    Martyn J. Pearce fluffy@cpan.org
+
+Copyright: 
+
+    Copyright (c) 2002 Martyn J. Pearce.  This program is free software; you
+    can redistribute it and/or modify it under the same terms as Perl itself.
+
+6th March, 2002

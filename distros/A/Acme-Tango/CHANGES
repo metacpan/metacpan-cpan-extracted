@@ -1,0 +1,26 @@
+Revision history for Perl extension Acme::Tango.
+
+0.07  Sat Jan 01 14:00:00 2011
+	- Fix dependencies, code modernization 
+
+0.06  Tue Aug 17 15:00:00 2007
+	- Documentation improved
+	- Kwalitee improved
+
+0.05  Tue Aug 09 14:00:00 2005
+  - https://rt.cpan.org/Ticket/Display.html?id=6730 - done
+
+0.04  Thu Oct 10 07:47:00 2002
+	- Made the output more orange
+	- Added colour_swatches.pl as an example
+
+0.03  Thu Oct 10 06:59:00 2002
+	- fixed the docs (hat-tip: Mike Castle)
+
+0.02  Mon Oct  7 09:07:05 2002
+	- fixed dependancies issue
+
+0.01  Sat Oct  5 16:48:03 2002
+	- original version; created by h2xs 1.2 with options
+		-n Acme::Tango
+

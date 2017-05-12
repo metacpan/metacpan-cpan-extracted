@@ -1,0 +1,116 @@
+<%
+
+# Copyright (c) 2003 Nik Clayton
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+# 
+# $Id: addconfig.xps,v 1.2 2003/07/11 16:39:05 nik Exp $
+ 
+use URI;
+use URI::Escape;
+
+$t->{image}{testcode} = sub {
+	my $node = shift;
+	my $t = shift;
+
+	my $cgi = Apache::Request->new($r);
+
+	my $uri = URI->new($r->uri());
+        $uri =~ s/^\///;                        # Trim the leading '/'
+        $uri = join("\n",
+                map { "<component><e>$_</e><u>" . uri_unescape($_) . "</u></component>" } split(/\//, $uri));
+
+	my $dirpath = $r->filename();
+	my $filename = findvalue('filename', $node);
+        my $type = $r->lookup_file($filename)->content_type();
+
+	$t->{postchildren} = <<EOXML;
+<uri>$uri</uri>
+<dirpath>$dirpath</dirpath>
+<content-type>$type</content-type>
+EOXML
+
+	$t->{showtag} = 1;
+	return 1;
+};
+
+$t->{album}{testcode} = $t->{image}{testcode};
+
+$t->{config}{testcode} = sub {
+	my $node = shift;
+	my $t = shift;
+
+	my @variables = qw(ProofsheetColumns ImagesPerProofsheet
+			GalleryCache GalleryThumbQuality);
+
+	$t->{postchildren} = "<perl-vars>\n";
+	foreach my $variable (@variables) {
+		$t->{postchildren} .= "<var name='$variable'>" . $r->dir_config($variable) . "</var>\n";
+	}
+
+        # Make sure the specified size is one we're configured to
+        # support.  If it isn't then use the default size
+        my $sizelist = $r->dir_config('GallerySizes');
+        $sizelist = '133 640 800 1024' unless defined $sizelist;
+        my @sizes = split(/\s+/, $sizelist);
+ 
+        $t->{postchildren} .= <<EOXML;
+<GallerySizes>
+  <size type="thumb">$sizes[0]</size>
+EOXML
+        foreach (@sizes[1..$#sizes]) {
+                $t->{postchildren} .= "<size>$_</size>\n";
+        }
+
+        $t->{postchildren} .= "</GallerySizes>";
+
+
+	$t->{postchildren} .= "</perl-vars>\n";
+
+	my $s = $r->server();
+	my $admin = $s->server_admin();
+	my $hostname = $s->server_hostname();
+	my $port = $s->port();
+
+	# Work out whether or not this is an SSL server
+#	my $sproc = $r->lookup_uri($r->uri);
+	my $ssl = $r->subprocess_env('HTTPS');
+
+	my $site = sprintf("%s://%s", $ssl ? 'https' : 'http', $hostname);
+
+	$t->{postchildren} .= <<EOXML;
+<server>
+  <site>$site</site>
+  <admin>$admin</admin>
+  <hostname>$hostname</hostname>
+  <port>$port</port>
+</server>
+EOXML
+
+	$t->{showtag} = 1;
+	return 1;
+};
+	
+print apply_templates();
+
+%>

@@ -1,0 +1,31 @@
+[% PROCESS header.html title="Home" rss="global" %]
+[% PROCESS login_form.html %]
+[% PROCESS form.html %]
+
+<div class="motd">
+<h3>POD Indexing Project</h3>
+<div class="motd_body">
+This is another project for improving Perl documentation, by making it more
+accessible and searchable. We need volunteers; please take a look at 
+<a href="http://pod-indexing.annocpan.org/">http://pod-indexing.annocpan.org/</a>.
+</div>
+</div>
+
+<div class="motd_more"><a href="[% root_uri_rel %]/motd">More "tips of the day"...</a></div>
+
+<h2>Recent notes 
+<a href="[% root_uri_rel %]/recent.rss"><img src="[% img_root %]/rss1.gif" alt="RSS 1.0" title="Recent notes RSS feed" width="80" height="15"></a></h2>
+
+[% PROCESS note_table.html notes=recent %]
+
+<div class="pager">
+Page
+[% FOR i = [ 1 .. pages ] %]
+    [% IF i == page %]
+        <b>[% i %]</b>
+    [% ELSE %]
+        <a href="[% root_uri_rel %]/?page=[% i %]">[% i %]</a>
+    [% END %]
+[% END %]
+</div>
+[% PROCESS footer.html %]

@@ -1,0 +1,83 @@
+=pod
+
+=head1 Request for Comments, AutoCode
+
+=head2 RFC 1: Twin projects
+
+AutoCode and AutoSQL are twins. Although AutoCode comes earlier few day than
+AutoSQL, they present the same Perl spirit.
+
+"If we're going to talk about good software design, we have to talk about 
+Laziness, Impatience, and Hubris, the basis of good software design. 
+- Larry Wall, Chapter 10, Programming Perl 3rd Ed"
+
+
+
+=head2 RFC 2: Pattern of accessor name
+
+The pattern of accessor name, or broadly speaking method, is fixed as
+
+  /^[_a-z][_a-z0-9]+$/
+
+in the module AutoCode::AccessorMaker.
+
+The why the pattern should be that are:
+
+=over 2
+
+=item * it should be a vilad Perl method name
+
+=item * the feedback from AutoSQL -- 
+
+=back
+
+=head2 RFC 3: Flattening name
+
+If the question of RFC 2 is not answered, then there is another problem. 
+There will be a method called 'flatten_name' in AutoCode::Schema, simply 
+performing
+
+    "\L$name"
+
+=head2 RFC 4: Static maker/factory?
+
+AutoCode::AccessorMaker, as well as historic AutoCode::Initializer, should be 
+so-called 'static class', in Java terms.
+
+This instance of such makers does not mean anything. All methods inside should
+be used regardless of the state of any instance; they just act as normal methods
+
+The configuration on such static class should be static too. For example, in
+AutoCode::AccessorMaker, you can let this maker marks itself as the meta-info of
+the generated classes.
+
+    $AutoCode::AccessorMaker::mark_maker=1;
+
+Then all generated module, before the above value is changed again, will have a
+%META as a class variable to store which is the maker of it, etc.
+
+When you invoke the method in this static class, there are 2 strategies.
+
+=over 2
+
+=item * AutoCode::AccessorMaker->make_scalar_accessor
+
+=item * AutoCode::AccessorMaker::make_scalar_accessor
+
+=back
+
+I have some unspoken sense that the first one is better, though the second one
+looks more like a normal method out of  the OOP concept.
+
+=head2 RFC 5: RFC numbers
+
+This is a out-of-topic.
+
+the RFC numbers could not be sequential according to the categories of topic.
+It is more of flexibility to stuff in any idea which sparks on your mind, and 
+organize it afterward.
+
+The idea comes randomly and preciously. Don't leak them due to your 
+mismanagement. :-)
+
+=cut

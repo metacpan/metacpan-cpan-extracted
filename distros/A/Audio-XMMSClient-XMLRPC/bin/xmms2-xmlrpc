@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Audio::XMMSClient::XMLRPC;
+
+my $srv = Audio::XMMSClient::XMLRPC->new({ port => 9000 });
+$srv->loop();

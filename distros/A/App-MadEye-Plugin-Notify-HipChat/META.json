@@ -1,0 +1,78 @@
+{
+   "abstract" : "send message to HipChat",
+   "author" : [
+      "Kazuhiro Homma <kazu.homma@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-MadEye-Plugin-Notify-HipChat",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::MadEye" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::MadEye::Plugin::Notify::HipChat" : {
+         "file" : "lib/App/MadEye/Plugin/Notify/HipChat.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kazuph/App-MadEye-Plugin-Notify-HipChat/issues"
+      },
+      "homepage" : "https://github.com/kazuph/App-MadEye-Plugin-Notify-HipChat",
+      "repository" : {
+         "url" : "git://github.com/kazuph/App-MadEye-Plugin-Notify-HipChat.git",
+         "web" : "https://github.com/kazuph/App-MadEye-Plugin-Notify-HipChat"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Norimitsu Sasao <norimitsu.sasao@gaiax.com>",
+      "vagrant <vagrant@localhost.localdomain>"
+   ]
+}

@@ -1,0 +1,37 @@
+AtteanX-Store-LDF
+=================
+
+Created:      2015-07-03
+Home page:    <https://metacpan.org/release/AtteanX-Store-LDF>
+Bug tracker:  <https://github.com/phochste/AtteanX-Store-LDF/issues>
+Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
+Maintainer:   Patrick Hochstenbach (HOCHSTEN) <patrick.hochstenbach@ugent.be>
+
+0.04	2016-05-15	Quality improvements
+
+ - Change hashbang to use env.
+ - Use the CostPlanner API correctly.
+
+0.02	2016-03-07	API change for plan
+
+ - Rename AtteanX::Store::LDF::Plan::Triple to AtteanX::Plan::LDF::Triple.
+
+0.01	2016-02-09	Dist::Inkt packaging
+
+ - Use Dist::Inkt packaging.
+
+0.006	2016-02-04	LDF query planning
+
+ [ Bug Fixes ]
+ - Fix bugs so that variables can be passed to selecting methods.
+
+ [ Other ]
+ - Added: Lots of changes related to integrating LDF into query planning.
+ - endpoint_url attribute has been deprecated in favour of a start_url
+   attribute.
+
+0.003	2015-08-17	changing count_triples into more accurate count_triples_estimate
+
+0.002	2015-07-06	Setting minimum requirements for RDF::LinkedData test
+
+0.001	2015-07-03	Initial release

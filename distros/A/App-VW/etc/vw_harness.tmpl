@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use [% app %] qw( [% modules %] On::Continuity );
+my %opts = @ARGV;
+App->init;
+App->continue(port => $opts{port});

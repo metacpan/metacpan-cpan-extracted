@@ -1,0 +1,9 @@
+##-*- Mode: Change-Log; coding: utf-8; -*-
+##
+## Change log for perl distribution Alien::Moot
+
+v0.002 Wed, 02 Mar 2016 15:42:20 +0100 moocow
+	+ specify Alien::Base::ModuleBuild in configure_requires, fixes RT bug #112611
+
+v0.001 Mon, 22 Feb 2016 14:04:03 +0100 moocow
+	+ initial version

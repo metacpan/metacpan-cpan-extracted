@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Astro-FITS-CFITSIO-Simple
+version:            0.18
+abstract:           ~
+author:
+    - Diab Jerius <djerius@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Astro::FITS::CFITSIO:  1.02
+    Astro::FITS::CFITSIO::CheckStatus:  0.03
+    Astro::FITS::Header::CFITSIO:  0
+    Params::Validate:     0.72
+    PDL:                  0
+    Scalar::Util:         0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

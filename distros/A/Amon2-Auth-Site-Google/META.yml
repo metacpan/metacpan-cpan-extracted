@@ -1,0 +1,43 @@
+---
+abstract: 'Google auth integration for Amon2'
+author:
+  - 'ntakanashi <ntakanashi666 at gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.1, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amon2-Auth-Site-Google
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Amon2::Auth::Site::Google:
+    file: lib/Amon2/Auth/Site/Google.pm
+    version: '0.04'
+requires:
+  Amon2::Auth: '0.03'
+  JSON: '2.59'
+  LWP::UserAgent: '6.05'
+  Mouse: '1.11'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ntakanashi/Amon2-Auth-Site-Google/issues
+  homepage: https://github.com/ntakanashi/Amon2-Auth-Site-Google
+  repository: git://github.com/ntakanashi/Amon2-Auth-Site-Google.git
+version: '0.04'
+x_contributors:
+  - 'onishi <yasuhiro.onishi@gmail.com>'
+  - 'ntakanashi <ntakanashi666@gmail.com>'

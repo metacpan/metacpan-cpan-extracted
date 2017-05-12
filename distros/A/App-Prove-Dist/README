@@ -1,0 +1,59 @@
+NAME
+    App::Prove::Dist - Prove that a Perl Module Dist is OK for CPAN
+
+SYNOPSIS
+        prove-dist                      # make dist; unzip dist;
+                                        # test against core-only + custom-locallib
+        prove-dist test --perl=5.14.1   # use a specific perl
+        prove-dist test --perl=5.10.1 --perl=5.12.0 --perl=5.14.2
+        prove-dist list                 # list your defined dependencies
+        prove-dist scan                 # scan for your required dependencies
+        prove-dist make --perl=...      # make a custom locallib for your dist
+                                          # and your perl. prove-dist will look 
+                                          # for this lib when you test your dist
+        prove-dist wipe --perl=...      # delete the custom locallib
+        prove-dist perls                # list perls to test against
+
+DESCRIPTION
+    When releasing a Perl module distribution, it is good to test it on a
+    clean perl installation and on muliple versions of installed perl. Many
+    modules have dependency modules, so a truly clean Perl won't work. You
+    can use locallib to work around that. You'll need to set up a locallib
+    for each version of perl, for each module you release.
+
+    App::Prove::Dist does all this for you:
+
+        cd your-dist-dir
+        prove-dist perls                # Get a list of perls to use
+        prove-dist make --perl=5.14.2   # Create a custom locallib for a perl
+        prove-dist perls                # List now shows locallib
+        prove-dist test --perl=5.14.2   # Prove against clean perl + new locallib
+
+    "prove-dist" will use "lib-core-only" and your custom locallib to prove
+    your "t/" tests, so you can be more certain it will pass cpantesters.
+
+STATUS
+    THIS IS A ROUGH DRAFT AND PROOF OF CONCEPT RELEASE! DON'T USE IT YET!
+
+    Currently:
+
+        * Only likes Unix
+        * Only likes perlbrew
+        * Many hardcoded assumptions
+        * Scan not implemented
+        * Not fully configurable
+        * Will probably push your grandmother down the stairs
+
+    Suggestions and patches welcome!
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2011. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

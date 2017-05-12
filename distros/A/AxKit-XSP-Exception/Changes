@@ -1,0 +1,14 @@
+Revision history for Perl extension AxKit::XSP::Exception.
+
+1.6
+    - Roll back entire "transaction" if we hit an exception.
+
+1.5
+	- Allow catching any type of exception (Mike Chamberlain)
+
+1.4
+    - Updated to AxKit 1.4 API
+
+0.01  Wed Feb 14 13:15:14 2001
+	- original version; created by h2xs 1.19
+

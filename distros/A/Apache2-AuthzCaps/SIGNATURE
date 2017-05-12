@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 c60116bd6cc260b136597293eb42a0361084e215 Changes
+SHA1 9a9ae73a219b8820954574918e78c957fe5611dc MANIFEST
+SHA1 bb7f0170d29ddf43bdeb394692dbbd1cb2136777 META.json
+SHA1 a4a4fcddb4c0c5bb739ef8eab35fc6cde22d9431 META.yml
+SHA1 d3a3d76bb08712c3314ad76d9582ff0a44423b3e Makefile.PL
+SHA1 81d35f6e27e44faeeacd080a852e865d4f3606da README
+SHA1 9254278ab1103b30397c9700b116e4d38bc87daa lib/Apache2/AuthzCaps.pm
+SHA1 8a141d16901982100d245142e4462ac68fd7942e lib/Apache2_4/AuthzCaps.pm
+SHA1 644b5fdad21c8aaa42703463d28cd3be9c190361 t/Apache2-AuthzCaps.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJV9EPZAAoJEMoENb5ewbNiD1oP/1/wtddWaSXjXsdQloYGrdQ5
+20ks4us+uum2XNtA3SSLVGDuyySftfJFdQpns08NkMkqCf8pgKHTM4B5HhV0Qp1p
+sYE+CpA568xhubBIMqGdMXWsDDtPNPqwazmn7VWYuz/BSEaizsThpuu3pJj9iscZ
+6/4q5vGXbKaQwRNP/HUtHLi5FAIBN0S/CwgEYINjJtS8FSSd/6prVnTJ74RXfsOd
+TIFhvr6lmDeHvKv1u1ReUEooIp6J90MjDZMmm/iWlglHh+s0CtMVww6gBWQuzXsx
+IvvtMTlE29ZEhEkGJY1P085OOSw1Cv3rKTth31/BrJ6SEG1U5zLGKL5XEQ8tZ94X
+/wxQJ6iVKqLZzTpFPzfZMnB6Rugjfj00H/pxbS4VTZvX4UBpcd5yYv6XWQNypA3S
+O5VcktiiHaGvuJ/6eeEu220XxdKq5qQwpujwhk+xon/HStg4fRRA3qJHaXbwGfM+
+DMHxYY4odX1bARK+EcYhsZmlkQZNOlHJMVRFpek+igdOGRkCTyRVeakzY9mCPL56
+t9gi6g5vqpviC9aAINOcl0o0sMw+/jWloe1oBLJi3claAbjO8/UZ5Y7yPDAbZZpW
+8nvMmQk0a9+o8ja04rDlLalF37fjubi5ZEMFsCz4PgjRkw8cDtX7lbz0cfSr6Wt7
+zXtFoZXw1J3HCWuZrtbO
+=PugC
+-----END PGP SIGNATURE-----

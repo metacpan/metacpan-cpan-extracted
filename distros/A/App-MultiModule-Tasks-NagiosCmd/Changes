@@ -1,0 +1,6 @@
+1.161330  2016-05-12 15:25:52-07:00 America/Los_Angeles
+    - Fixed a nasty bug
+    - Better error reporting
+
+1.161200  2016-04-29 16:12:32-07:00 America/Los_Angeles
+    - Initial Release

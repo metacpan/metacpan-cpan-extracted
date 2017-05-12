@@ -1,0 +1,53 @@
+Greetings Perlfolk,
+
+** What is this?
+
+AI::NeuralNet::BackProp is a simply back-propagation,
+feed-foward neural network designed to learn using
+a generalization of the Delta rule and a bit of Hopefield
+theory. 
+
+** What's new?
+
+From the POD:
+This is version 0.89. In this version I have included a
+new feature, output range limits, as well as automatic
+crunching of run() and learn*() inputs. Included in the
+examples directory are seven new practical-use example
+scripts. Also implemented in this version is a much cleaner
+learning function for individual neurons which is more
+accurate than previous verions and is based on the LMS
+rule. See range() for information on output range limits.
+I have also updated the load() and save() methods so that
+they do not depend on Storable anymore. In this version you
+also have the choice between three network topologies, two
+not as stable, and the third is the default which has been
+in use for the previous four versions.
+
+Checkout the nifty HTML-format docs in "docs.htm"
+
+** What do you think?
+
+Now I know you people are out there that are using the module...
+I can hear the fists hitting the keyboards in frustration. :-) Relieve
+some of that frustration by e-mailing me and letting me know what
+you think of the module and any suggestions you got. Especially you
+guys in HP Labs and at Xerox! :-)
+
+Use it, let me know what you all think. This is just a
+groud-up write of a neural network, no code stolen or
+anything else. It uses the -IDEA- of back-propagation
+for error correction, with the -IDEA- of the delta
+rule and hopefield theory, as I understand them. So, don't expect
+a classicist view of nerual networking here. I simply wrote
+from operating theory, not math theory. Any die-hard neural
+networking gurus out there? Let me know how far off I am with
+this code! :-)
+	
+Regards,
+
+        ~ Josiah Bryan, <jdb@wcoil.com>
+
+Latest Version:
+
+        http://www.josiah.countystart.com/modules/AI/cgi-bin/rec.pl?README

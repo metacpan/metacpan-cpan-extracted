@@ -1,0 +1,31 @@
+<div id="page">
+      <div id="content">
+        <div id="header">
+        <h1>Configure two-factor authentification</h1>
+        </div>
+        <% IF session.user.otp_secret %>
+          <h2>Automatic configuration</h2>
+          <div>Scan this QR code</div>
+          <img src="/auth/setup/qrcode.png" alt="Google Authenticator QR code for setting up two-factor configuration">
+          <h2>Manual configuration</h2>
+          <ol>
+          <li>User account: <% session.user.name %></li>
+          <li>User key: <% auth.registration_key %></li>
+          </ol>
+          <form name="regenerate" method="POST" action="" enctype="multipart/data">
+              <input type="hidden" name="action" value="regenerate" />
+              <input type="submit" value="Regenerate" />
+          </form>
+          <form name="deactivate" method="POST" action="" enctype="multipart/data">
+              <input type="hidden" name="action" value="deactivate" />
+              <input type="submit" value="Deactivate" />
+          </form>
+        <% ELSE %>
+          <div>Two factor authentication is disabled.</div>
+          <form name="activate" method="POST" action="" enctype="multipart/data">
+              <input type="hidden" name="action" value="regenerate" />
+              <input type="submit" value="Activate" />
+          </form>
+        <% END %>
+      </div>
+</div>

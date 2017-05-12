@@ -1,0 +1,23 @@
+---
+abstract: 'Hang out inside of your application'
+author:
+  - 'Scott Walters <scott@slowass.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.88, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-MUDLike
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Continuity: '1.5'
+  Devel::Pointer: '0'
+version: '0.04'

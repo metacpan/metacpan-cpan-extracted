@@ -1,0 +1,123 @@
+Revision history for App-RL
+
+0.2.32 2017-05-07T17:37:15Z
+    - Don't use `Path::Tiny::path($filename)->lines( { chomp => 1 } );`
+
+0.2.31 2016-12-31T07:44:18Z
+    - Improve coverages
+
+0.2.30 2016-12-30T10:44:42Z
+    - Add command coverage
+
+0.2.29 2016-12-18T15:30:27Z
+    - Switch to Minilla
+    - Improve test coverage
+
+0.2.28  2016-12-09 22:09:26 CST
+    - Release to CPAN
+
+0.2.27  2016-07-07 22:27:57 CST
+    - Add codecov badge
+
+0.2.26  2016-06-23 03:43:51 CST
+    - Accept '-' in names for command merge
+
+0.2.25  2016-06-20 16:41:50 CST
+    - Release to CPAN
+
+0.2.24  2016-06-20 03:43:53 CST
+    - Add read_lines() to Common
+
+0.2.23  2016-06-19 03:00:12 CST
+    - Change field names of decode_header()
+
+0.2.22  2016-05-24 13:57:04 CST
+    - Fix command compare
+
+0.2.21  2016-05-24 13:50:18 CST
+    - Clean prompts
+
+0.2.20  2016-05-24 13:33:26 CST
+    - Command span handles stdin
+
+0.2.19  2016-05-24 09:16:47 CST
+    - Command stat handles stdin
+
+0.2.18  2016-05-14 20:39:39 CST
+    - Multiple infiles for command compare
+
+0.2.17  2016-05-12 03:52:40 CST
+    - Specify versions of dependencies
+
+0.2.16  2016-05-07 16:10:40 CST
+    - Improve test coverage
+
+0.2.15  2016-05-07 15:23:55 CST
+    - Travis CI
+
+0.2.14  2016-05-07 14:37:32 CST
+    - Export nothing. Remove duplicated functions
+    - Add strict and warnings to every modules
+
+0.2.13  2016-05-05 05:09:40 CST
+    - Command position
+
+0.2.12  2016-04-27 19:18:02 CST
+    - Release to CPAN
+
+0.2.11  2016-04-26 05:12:07 CST
+    - covers to cover
+
+0.2.10  2016-04-24 21:24:03 CST
+    - More stricter YAML
+
+0.2.9  2016-04-11 01:53:43 CST
+    - Fix --all
+
+0.2.8  2016-04-11 01:28:45 CST
+    - Add --all to stat and stat2
+
+0.2.7  2016-04-10 04:40:19 CST
+    - Back to AlignDB::IntSpan.
+      Memory leaks in untracked XS codes. Pure C is fine.
+
+0.2.6  2016-04-10 01:04:30 CST
+    - AlignDB::IntSpanXS is now stable
+
+0.2.5  2016-04-08 15:05:07 CST
+    - Require 5.10
+
+0.2.4  2016-04-08 14:57:41 CST
+    - Add travis-ci
+
+0.2.3  2016-04-08 10:47:40 CST
+    - Command stat2
+
+0.2.2  2016-04-06 01:29:29 CST
+    - Command covers
+
+0.2.1  2016-04-03 05:04:04 CST
+    - Back to AlignDB::IntSpan
+        - Failed in `runlist compare all-gene.yml paralog.yml --op intersect --mk -o all-gene-paralog.yml`
+
+0.2.0  2016-04-03 03:46:57 CST
+    - Switch to AlignDB::IntSpanXS
+
+0.1.9  2016-03-29 22:06:48 CST
+    - Command some
+
+0.1.8  2016-03-29 21:19:57 CST
+    - Command combine: combine multiple keys
+
+0.1.7  2016-03-29 20:30:45 CST
+    - add --mk to `runlist span`
+
+0.1.6  2016-03-27 05:48:27 CST
+    - Command span: operating spans in runlists
+
+0.1.5  2016-03-27 04:31:28 CST
+    - Command genome
+
+0.1.4  2016-01-15 17:14:37 CST
+    - A real Changes file
+    - See git log

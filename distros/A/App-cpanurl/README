@@ -1,0 +1,30 @@
+cpanurl
+
+  Sorry. This module is DEPRECATED because L<cpanm> and L<cpanfile> is much better.
+  If you want to install moudles, use L<cpanm> and L<cpanfile> instead.
+  See https://github.com/kraih/mojo/wiki/Installation-of-cpan-modules-by-cpanm-and-cpanfile
+  This module will be removed from CPAN on 2014/3/1
+
+INSTALLATION
+
+  curl -kL https://raw.github.com/yuki-kimoto/cpanurl/master/script/cpanurl > cpanurl
+  chmod +x cpanurl
+
+or
+  cpan App-cpanurl
+  
+Examples:
+
+  cpanurl Mojolicious 3.82
+  
+  You can get output http://cpan.metacpan.org/authors/id/S/SR/SRI/Mojolicious-3.82.tar.gz
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Yuki Kimoto
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

@@ -1,0 +1,73 @@
+=pod
+
+=head1 NAME
+
+App::EditorTools::Vim - Vim binding to App::EditorTools
+
+=head1 SYNOPSIS
+    
+    # Install the vim script to create binding to App::EditorTools with:
+	editortools install-vim
+
+=head1 DESCRIPTION
+
+Once the vim bindings have been installed (per the instructions in the
+SYNOPIS) you can use the mappings below speed editing/refactoring your
+Perl code. See L<App::EditorTools> for a description of each refactoring
+routine.
+
+=head1 MAPPINGS
+
+=over 4
+
+=item ,pp
+
+EditorToolsMenu - Brings up a menu to choose the following routines
+
+=item ,pL
+
+RenameVariable - Placing the cursor over a variable and pressing this
+mapping will prompt for a new variable name, then rename all occurrences
+of the varialbe within that lexical scope to the new name.
+
+See L<App::EditorTools> for more.
+
+=item ,pI
+
+IntroduceTemporaryVariable - Selecting a range of text and pressing this
+mapping will prompt for a new variable name, then add a new statement
+declaring the variable and setting it the the highlighted expression, and
+finally replace the currently highlighted text with a reference to the
+variable.
+
+See L<App::EditorTools> for more.
+
+=item ,pP
+
+RenamePackageFromPath - Pressing this mapping will change the C<package>
+declaration in the current file to reflect that files path name. For example,
+if you are editing C<lib/App/EditorTools.pm> the package declaration will be
+changed to C<package App::EditorTools;>. At the moment there must be a valid
+package declaration in the file for this to work.
+
+See L<App::EditorTools> for more.
+
+=back
+
+=head1 SEE ALSO
+
+Also see L<PPIx::EditorTools>, L<Padre>, and L<PPI>.
+
+=head1 AUTHOR
+
+Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Mark Grimes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

@@ -1,0 +1,52 @@
+Encode prepends a Byte Order Marker when performing an Encode
+of type (if that's the right word) UTF16. The BOM tels the receiving
+program (or library) whether the following bytes are ordered in
+big-endian (aka network) or little-endian order. In addition to prepending
+the BOM, Encode will re-arrange the bytes. How it knows what the going-in
+ordwer is, is not known.
+
+http://en.wikipedia.org/wiki/Byte_order_mark
+
+There appears to be come confusion about what TagLib does or expects.
+
+t/TagLib_String.t goes to some effort to deal with th "fact" that TagLib
+appears to want UTF-16LE, whereas the construction of the MPEG header in
+include/MPEG_Header.pm appears to be attempting to construct a heder in
+UTF-16BE
+
+perl -e 'use Config; print $Config{byteorder}, "\n"' gets the byteorder
+expressed as '12345678' for LE. and the reverse for BE. perl -V:byteorder
+yields the smae thing
+
+perl -e ' printf("%#02x ", $_) for unpack("W*", pack L=>0x12345678);'
+is supposed to give byte order; on my Inte (therefore LE) system the result is
+0x78 0x56 0x34 0x12. Which is the non-portable arrangement of a LE integer.
+
+There's a lengthy explanation of byte order in perlfunc, under pack.
+Cf also perlport
+
+From pack(): Basically, Intel and VAX CPUs are little-endian, while everybody else,
+including Motorola m68k/88k, PPC, Sparc, HP PA, Power, and Cray, are big-endian.
+Alpha and MIPS can be either: Digital/Compaq uses (well, used) them in little-endian mode,
+but SGI/Cray uses them in big-endian mode.
+
+This may be important. From Encode::Unicode,
+When BE or LE is omitted during encode(), it returns a BE-encoded string with
+BOM prepended. So when you want to encode a whole text file, make sure you encode()
+the whole text at once, not line by line or each line, not file,
+will have a BOM prepended.
+
+There appears to be some confusion as to whether Perl and TagLib have builtin assumptions
+about byte order. As noted above, Perl manages to figure it out per system. The 
+same is true of TagLib, as follows.
+
+In Verified SYSTEM_BYTEORDER == 1 => little_endian
+    put a diagnostic in ConfigureChecks.cmake
+
+In ConfigureChecks.cmake, SYSTEM_BYTEORDER is computed. In the case of my Intel system,
+I've verified that this computes to little_endian. This is translated to the function
+Utils::SystemByteOrder in taglib/toolkit/tutils.h, which I've verified reports the 
+correct value. This only possibility for a glitch is if SYSTEM_BYTEORDER is not defined,
+than an inline function is declared that uses integer properties it infer little_endian,
+and uses big_endian as the default. So it is conceivable that somehow a little_endian
+system will wind up being treated as big_endian. Presumably, a remote possibility.

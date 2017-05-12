@@ -1,0 +1,42 @@
+--- #YAML:1.0
+name:     Acme-CPANAuthors-CPAN-OneHundred
+version:  1.11
+abstract: The CPAN Authors who have 100+ distributions on CPAN
+author:
+  - Barbie <barbie@cpan.org>
+
+license:                  artistic_2
+distribution_type:        module
+installdirs:              site
+
+requires:
+  perl:                   5.006
+  Acme::CPANAuthors:      0.04
+recommends:
+  Test::CPAN::Meta:       0
+  Test::CPAN::Meta::JSON: 0
+  Test::Pod:              1.00
+  Test::Pod::Coverage:    0.08
+build_requires:
+  IO::File:               0
+  Test::More:             0.70
+
+provides:
+  Acme::CPANAuthors::CPAN::OneHundred:
+    file:     lib/Acme/CPANAuthors/CPAN/OneHundred.pm
+    version:  1.11
+
+no_index:
+  directory:
+    - t
+    - examples
+
+resources:
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANAuthors-CPAN-OneHundred
+  repository: http://github.com/barbie/acme-cpanauthors-cpan-onehundred
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: update100.pl 1.02

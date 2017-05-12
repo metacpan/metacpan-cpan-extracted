@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_GetListActiveLink(ctrl,schema=NULL,changedSince=0)</CODE></H2>
+
+      This function will look up the names of all active links, or a subset
+      restricted to a certain schema name (if you provide a schema name).<P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              An array of Active Link names.
+          <DT><B>On failure</B><DD>
+              <CODE>undef</CODE>
+      </DL>
+
+      <P>Example:
+
+      <PRE>
+      @alink_names = ars_GetListActiveLink($c); # get all active links
+      @alink_names = ars_GetListActiveLink($c, "Group"); 
+                           # get all active links associated with the
+                           # "Group" schema.
+      </PRE>
+
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

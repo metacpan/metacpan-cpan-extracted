@@ -1,0 +1,16 @@
+Revision history for Perl extension Authen::SASL::SASLprep
+
+1.100 (2016-09-25)
+	- added support for stored strings
+	  FIXES: #117767: Please add 'stored strings' capability
+
+1.011 (2015-03-13)
+	- rebuild with updated metadata
+	  FIXES: #102903: Old FSF address
+
+1.01 (2009-12-14)
+	- switch to Module::Build
+	- fixes FAILures during make test
+
+1.00 (2009-12-11)
+	- initial version, based on Net::IDN::Encode

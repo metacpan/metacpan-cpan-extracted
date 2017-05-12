@@ -1,0 +1,58 @@
+{
+   "abstract" : "Awk to Perl translator",
+   "author" : [
+      "Leon Timmermans <leont@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-a2p",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::FindPerl" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "IPC::Open2" : "0",
+            "Test::More" : "0.89"
+         }
+      }
+   },
+   "provides" : {
+      "App::a2p" : {
+         "file" : "lib/App/a2p.pm",
+         "version" : "1.009"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-app-a2p at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=App-a2p"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/app-a2p.git",
+         "web" : "https://github.com/Leont/app-a2p"
+      }
+   },
+   "version" : "1.009"
+}
+

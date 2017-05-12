@@ -1,0 +1,44 @@
+Version 1.13 - 20th March 2006
+    + Changed to use Module::Build
+
+Version 1.12 - 7th January 2006
+    + Added basic unit tests
+
+Version 1.11 - 30th December 2005
+    + Changed license to Apache 2.0
+      http://www.apache.org/licenses/LICENSE-2.0
+
+Version 1.10 - 29th December 2005
+    + Added Changes file.
+
+    + Added GPL license header comment to various files.
+
+    + Modified Makefile.PL to send anonymous information to
+      http://perlgirl.org.uk/lib/usage.cgi if the user
+      agrees. This is so I can track which of my modules
+      are most heavily used and on what platforms, so I can
+      concentrate on maintaning the most popular ones in
+      my limited spare time.
+
+Version 1.9 - 8th December 2005
+    + Altered POD.
+
+Version 1.8 - 2nd December 2005
+    + Added some additional checking on username as per
+      main.lua's disallowed characters in usernames.
+
+Version 1.7 - 12th November 2005
+    + Updated to use Colloquy::Data and added small pod.
+
+Version 1.6 - 12th November 2005
+    + Changed to use Colloquy::Data.
+
+Version 1.5 - 11th November 2005
+    + missing __END__
+
+Version 1.4 - 11th November 2005
+    + Fixed typos.
+
+Version 1.1 - 11th November 2005
+    + Adding initial revision.
+

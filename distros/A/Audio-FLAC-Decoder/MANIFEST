@@ -1,0 +1,18 @@
+Changes
+Decoder.pm
+Decoder.xs
+Makefile.PL
+MANIFEST
+README
+TODO
+t/decoder.t
+t/pod.t
+t/test.flac
+examples/decode
+include/common.h
+include/dither.h
+include/replaygain_synthesis.h
+dither.c
+replaygain_synthesis.c
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,4 @@
+type: test
+architecture: i386
+distribution: lenny-opera
+distribution_aliases: [lenny, unstable]

@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 7e5a98ca886cf2984eb9f38dbb77230051a3f7ee Changes
+SHA1 f57ad02a54fec73f9d45299cba90119bdf9d162f MANIFEST
+SHA1 022d9fc1588ce5595fcf51c0a2d8b26593272623 META.json
+SHA1 d91594091cd6181c47efc78a27194a38ab0d2321 META.yml
+SHA1 3688b18433d0624eac4192ac1935997fd131b68e Makefile.PL
+SHA1 b5da36053f420ae345ef8d41d9d32db5b35c8933 README
+SHA1 37999fb703df08c09d0d87ebec4896fd188dc1c9 lib/App/Statsbot.pm
+SHA1 5236cde3fea3088c80143021b23b70836237a8f0 statsbot
+SHA1 c6b00eb68e962b1bee4ed28d1b97ae400f243218 t/App-Statsbot.t
+SHA1 fa4cca04d35b71b2c9a4d04e5977efb3868f88aa t/perlcritic.t
+SHA1 e4e0fd9a5add27aea8ea4b88c780bba779e973f6 t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJW8/3SAAoJEMoENb5ewbNi11UQAJK6fq39zU7pL+w4YwipQnEq
+dHo/lB9Gw+rZuNEGos+MJOS4P0ZofgOMcWq+znTa3GXlollWb4hqzSPj9DdcZbK/
+mK4arnGc0NY4zzRWDHEiDcxooUWyy+A4XLJvZOy/AqVAX7FH1ix0LVRRSRWclBHU
+rNu1j1tcVP7nK7AudtZUli/2jp/mokF6hfSI543LQQ/8ixTsH3pkJqHFZ1XPhZed
+nSDF1UHXQWKAiyciSF0iLClYdmW7SIjo0Lc7Z1NW/auyWs6q+aQYO8Ok+dpJ8WKb
+CusXCjMjLlKzETvSOEOIMUvp6Cs8oqswRyuor39Eb9+4N8X4agzPuH7qTpuD9cvt
+cSEFtFvJnvYc+yLCefRh9eduE7XXxQtM0b/bcLr/VFv1wWu3ADFyC0MmPRogrGrd
+FHX6Rj8/VGg5pSrk9LrC3OMJ34xO4vPE5EVpI0rhKhyKG66I3ImCWDeJ5fR0vVyK
+W9wRqSbc4pIDqrfmDxx2IhB846gxoj05Uf3/zyxEv/r8cue5JTAZx70ae+D304gq
+O5QVs+kujx2UhKE1rSjKyohQAVWAwJ/jOUSZhwkhWNEokWoYfUv0jFBkHm0I1nsf
+6KqDhhh0ijOsgIvLj8R/7RYs/RIuhS1wCGs5AynYXDcYMsv12Ea3Dwn8EUOjM8cv
+qhm5Uw1+IBiA/MXTJWC9
+=ysF2
+-----END PGP SIGNATURE-----

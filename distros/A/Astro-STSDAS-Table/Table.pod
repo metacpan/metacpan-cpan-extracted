@@ -1,0 +1,59 @@
+=pod
+
+=head1 NAME
+
+Astro::STSDAS::Table - access STSDAS format table files
+
+=head1 DESCRIPTION
+
+B<Astro::STSDAS::Table> is a collection of routines to read STSDAS
+table files (see L<http://stsdas.stsci.edu/STSDAS.html> for more
+information on the format).  Casual users should peruse 
+B<Astro::STSDAS::Table::Simple>.  
+
+Those requiring a more flexible interface may wish to use
+B<Astro::STSDAS::Table::Binary>, which is a subclass of
+B<Astro::STSDAS::Table::Base>.
+
+The package currently suffers from the following flaws:
+
+=over 8
+
+=item *
+
+Only binary tables are supported
+
+=item *
+
+Tables can only be read.
+
+=item *
+
+Reading of column-ordered binary tables is untested.
+
+=item *
+
+Reading of binary tables with vector elements is untested.
+
+=item *
+
+These classes were not designed as a drop in replacement for
+the STSDAS Table package.  They were designed to simply
+read entire tables as is.  As such the design might
+not scale well.
+
+=back
+
+=head1 LICENSE
+
+This software is released under the GNU General Public License.  You
+may find a copy at 
+
+   http://www.fsf.org/copyleft/gpl.html
+
+=head1 AUTHOR
+
+Diab Jerius ( djerius@cpan.org )
+
+=cut
+

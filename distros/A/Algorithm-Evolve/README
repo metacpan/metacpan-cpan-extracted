@@ -1,0 +1,40 @@
+Algorithm/Evolve version 0.03
+=============================
+
+This module is intended to be a useful tool for quick and easy implementation
+of evolutionary algorithms. It aims to be flexible, yet simple. For this
+reason, it is not a comprehensive implementation of all possible evolutionary
+algorithm configurations. The flexibility of Perl allows the evolution of
+any type of object conceivable: a simple string or array, a deeper structure
+like a hash of arrays, or even a complex object like graph object from another
+CPAN module, etc. 
+
+It's also worth mentioning that evolutionary algorithms are generally very
+CPU-intensive. There are a great deal of calls to C<rand()> and a lot of
+associated floating-point math. If you want a lightning-fast framework, then
+searching CPAN at all is probably a bad place to start. However, this doesn't
+mean that I've ignored efficiency. The fitness function is often the biggest
+bottleneck.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  List::Util qw/shuffle/;
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Mike Rosulek <mike@mikero.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

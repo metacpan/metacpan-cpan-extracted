@@ -1,0 +1,146 @@
+=pod
+
+=head1 NAME
+
+Apache::Wyrd::Site - Wyrds for site maintenance and integration
+
+=head1 DESCRIPTION
+
+The Apache::Wyrd::Site::* modules present re-useable solutions to a few of
+the common problems of getting a web site to be integrated and
+self-maintaining.  They are kept separate from the other modules in the
+Apache::Wyrd hierarchy because they follow a more rigid set of conventions
+on site construction than the other modules, and would introduce
+inflexibility to the other Modules if more closely integrated.
+
+As a whole, they represent the more functional aspects of a "house style",
+which makes several assumptions:
+
+=over
+
+=item The host system is Unix-like, following a process model
+
+=item The apache version is < 2.0 with multiple listening processes
+
+=item There is no more than one Wyrd namespace per virtual host
+
+=item The site is organized hierarchically in one or more trees
+
+=item Each tree is a "section" with a single parent node as its root
+
+=item Each tree node is either a leaf or a joint between one or more
+branches
+
+=item Each node is a "Page", with a distinct title, subject, and contents
+
+=item Each Page either has a parent Page or is a section root
+
+=item Each Page exists in an HTML file, and that file's name ends with
+".html"
+
+=back
+
+Additionally, some more attributes than the standard ones available in the
+default Apache::Wyrd::Services::Index objects are used by items in the Site
+hierarcy, and your instance of Apache::Wyrd::Site::Index should include
+them:
+
+=over
+
+=item published
+
+Date used in sorting/limiting by date.
+
+=item parent
+
+Docroot-relative path of the parent Page of the Page (see
+Apache::Wyrd::Site::NavPull for conventions).
+
+=item tags
+
+Subject tokens of a given page (see Apache::Wyrd::Site::TagPull for
+conventions).
+
+=back
+
+For these modules, the Apache::Wyrd::Site::Page object is the base unit of
+the Site.  An Apache::Wyrd::Services::Index-derived object is used by the
+Site to maintain the cache of meta-information on pages (N.B. One such
+object is the Apache::Wyrd::Site::Index, which has some additional support
+methods for objects in this hierarchy.)
+
+The Index keeps track of all Page meta-information: what is the parent of a
+page, what is its title, its publication date, etc, and also a reverse index
+for certain attributes, called "maps", which designate which Pages have that
+attribute (for example, which pages have the word "ocelot" on them, or which
+pages are tagged "newsletter").  Following this convention, this index
+object is queried for information either about a specific Page or about what
+pages match a certain criterion.
+
+Two main classes of objects relate between the Index and the Pages.  These
+are the Pull classes and the Widget classes.
+
+=head2 Pulls
+
+A Pull is a list of pages, derived from a map-query to the index.  The list
+is determined by filtering the meta-information for specific values. 
+Additionally, the presentation for each item in the list is different
+depending on the item's relation to the page on which the pull appears. 
+Pulls are used either to display Pages relevant to a particular topic
+(TagPulls) or to display the navigation-tree hierarchy of the page in
+relation to an arbitrary Page, or to the page on which the pull appears
+(NavPull).
+
+=head2 Widgets
+
+A Widget is an object which contains one or more "states" which influence
+its behavior at the time the Page is requested from the server.  Widgets
+store their page state in the enclosing page and the Page modifies links in
+the widget to preserve the state of Widgets on the page between page serves.
+
+Additionally, Widgets allow dynamic content to "filter up" into the
+meta-information stored for a Page object, so that the problem of
+word-searching for dynamic content on a page is solved by refreshing the
+meta-information cache of a page when the dynamic content on it changes. 
+Often, Widget objects are used to contain Pulls in this way so that
+word-search data on a page is kept accurate.
+
+=head2 IndexBots
+
+The question of how to efficiently create onetime "builds" of the Index
+cache is answered by the [MySQL]IndexBot class.  This is a combination Wyrd
+and Bot (See Apache::Wyrd::Bot), which when served up causes an
+Apache::Wyrd::Bot process to be launched in the background, systematically
+requesting every page in the site to be served up, causing the index on each
+page to be refreshed.  The bredth of these requests can be limited by file
+modification date since a cached date to reduce the time for this build to
+take.
+
+=head2 Other Objects in the Apache::Wyrd::Site Hierarchy
+
+This hierarchy is meant to be somewhat more volitile than the rest of the
+Apache::Wyrd classes.  As useful objects following these conventions come
+into common usage, they will be added to the area, but may not be adequately
+documented or feature-frozen until their development has stabilized.
+
+=head1 AUTHOR
+
+Barry King E<lt>wyrd@nospam.wyrdwright.comE<gt>
+
+=head1 SEE ALSO
+
+=over
+
+=item Apache::Wyrd
+
+General-purpose HTML-embeddable perl object
+
+=back
+
+=head1 LICENSE
+
+Copyright 2002-2007 Wyrdwright, Inc. and licensed under the GNU GPL.
+
+See LICENSE under the documentation for C<Apache::Wyrd>.
+
+=cut

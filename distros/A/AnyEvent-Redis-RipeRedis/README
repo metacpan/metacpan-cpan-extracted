@@ -1,0 +1,42 @@
+AnyEvent-Redis-RipeRedis version 1.62
+======================
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DESCRIPTION
+
+MODULE IS DEPRECATED. Use AnyEvent::RipeRedis instead. The interface of
+AnyEvent::RipeRedis has several differences from interface of
+AnyEvent::Redis::RipeRedis. For more information see documentation.
+
+AnyEvent::Redis::RipeRedis is the flexible non-blocking Redis client with
+reconnect feature. The client supports subscriptions, transactions and
+connection via UNIX-socket.
+
+Requires Redis 1.2 or higher and any supported event loop.
+
+AUTHOR
+
+Eugene Ponizovsky, <ponizovsky@gmail.com>
+
+Special thanks
+
+* Alexey Shrub
+* Vadim Vlasov
+* Konstantin Uvarin
+* Ivan Kruglov
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2012-2016, Eugene Ponizovsky, <ponizovsky@gmail.com>.
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

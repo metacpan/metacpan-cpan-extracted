@@ -1,0 +1,28 @@
+Revision history for Acme::CPANAuthors::Turkish
+
+0.23 Tue Jul  5 00:52:53 2016
+    => Update repo url.
+
+0.22 Sun Jul 28 08:27:22 2013
+    => Fix for RT#87079
+
+0.21 Mon Aug 27 01:11:36 2012
+    => Distro fixes.
+
+0.20 Fri Nov  5 01:04:48 2010
+    => New authors.
+
+0.14 Wed Sep 30 03:05:17 2009
+    => Perl::Critic refactoring.
+
+0.13 Wed Apr 22 03:28:38 2009
+    => Update build tools.
+
+0.12 Sat Apr 18 20:58:52 2009
+    => Bump version. CPAN did not seem to get 0.11.
+
+0.11 Sat Apr 18 10:59:20 2009
+    => Fix Pod encoding.
+
+0.10 Sat Apr 18 08:15:15 2009
+    => Initial release.

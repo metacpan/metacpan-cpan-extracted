@@ -1,0 +1,32 @@
+---
+abstract: 'A tiny AnyEvent wrapper for Digest::*'
+author:
+  - 'Yasutaka ATARASHI <yakex@cpan.org>'
+build_requires:
+  Digest::MD5: 0
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-Digest
+recommends:
+  AnyEvent::AIO: 1
+  IO::AIO: 1
+requires:
+  AnyEvent: 0
+  Digest: 0
+  Scalar::Util: 0
+  perl: 5.006
+resources:
+  homepage: https://github.com/yak1ex/AnyEvent-Digest
+  repository: https://github.com/yak1ex/AnyEvent-Digest.git
+version: v0.0.5

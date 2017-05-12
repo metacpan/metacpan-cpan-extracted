@@ -1,0 +1,28 @@
+Format: 1.8
+Date: Fri, 22 Jan 2010 16:54:01 +0100
+Source: foobar
+Binary: foobar
+Architecture: source all
+Version: 2.0-1
+Distribution: unstable
+Urgency: low
+Maintainer: Esteban Manchado Velázquez <estebanm@estebanm-desktop>
+Changed-By: Esteban Manchado Velázquez <estebanm@estebanm-desktop>
+Description: 
+ foobar     - <short description; defaults to some wise words>
+Changes: 
+ foobar (2.0-1) unstable; urgency=low
+ .
+   * First version
+Checksums-Sha1: 
+ 5ae0657d546fdd4458987ff2d92a4ade0f7a5bea 461 foobar_2.0-1.dsc
+ 64376ba7e54f01017967ced8f8cac22720289f4d 1786 foobar_2.0-1.tar.gz
+ 3d700fc6446054eabd7c55ec4f0f7d0c441e2ced 2082 foobar_2.0-1_all.deb
+Checksums-Sha256: 
+ b036ad32ee36b8e7200a5b09b0f5da8ca67ba63cbc4f588d47c0a34a42deaf54 461 foobar_2.0-1.dsc
+ 9b2159ea132c732773577e522bd065a0b5e4adc8fd1a829e29a414463d9582c0 1786 foobar_2.0-1.tar.gz
+ 2b31f5cd5f2bb5d4f6709072973848f13c1d598a8747ed3e1708dfae037d0a30 2082 foobar_2.0-1_all.deb
+Files: 
+ 5f919eefb0475eed3e95634f6e6da034 461 misc optional foobar_2.0-1.dsc
+ c7c177bfd739e785a846952bf16a93d4 1786 misc optional foobar_2.0-1.tar.gz
+ f0e0790d406a4487b7bfe2b2d3586500 2082 misc optional foobar_2.0-1_all.deb

@@ -1,0 +1,35 @@
+---
+abstract: 'munge the Bash PATH environment variable'
+author:
+  - 'The following person is the author of all the files provided in this'
+build_requires:
+  Test::Differences: 0
+  Test::More: 0
+configure_requires:
+  Module::Build::Tiny: 0.027
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-pathed
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Getopt::Long: 0
+  Pod::Find: 0
+  Pod::Usage: 0
+resources:
+  bugtracker: https://github.com/marcelgruenauer/pathed/issues
+  homepage: https://github.com/marcelgruenauer/pathed
+  repository: https://github.com/marcelgruenauer/pathed.git
+version: 0.07
+x_contributors:
+  - 'Marcel Gruenauer <hanekomu@gmail.com>'

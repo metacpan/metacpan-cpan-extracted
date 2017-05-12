@@ -1,0 +1,24 @@
+Revision history for App-GitHooks-Plugin-NotifyReleasesToSlack
+
+v1.1.1  2016-05-21
+        - Switched to Test::Requires::Git instead of the now obsolete
+          Test::Git::has_git(). Thank you, Philippe Bruhat!
+        - Relicensed under Perl 5 terms.
+
+v1.1.0  2015-06-23
+        - Allow notifying everyone in the release channels (GH-1).
+        - Fix documentation.
+
+v1.0.2  2015-04-20
+        - Make the main line of the release more visible.
+        - Don't notify the entire channel, since it does not appear to work for
+          bots.
+
+
+v1.0.1  2015-04-13
+        - Fix post requests to Slack.
+        - Improve error reporting when Slack's webhook service cannot be
+          reached.
+
+v1.0.0  2015-04-12
+        - Public release.

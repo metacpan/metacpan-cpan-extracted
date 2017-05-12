@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+SkyCat.pm
+SkyCat.xs
+typemap
+README
+t/require.t

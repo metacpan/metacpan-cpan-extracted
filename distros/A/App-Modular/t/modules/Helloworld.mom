@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+use strict;
+#use modularizer::module;
+
+package App::Modular::Module::Helloworld;
+
+use App::Modular;
+use base qw(App::Modular::Module);
+
+sub module_depends {
+   my ($self) = shift;
+   $self->modularizer()->mlog(99, "Helloworld: I depend on Printer");
+   return "Printer";
+};
+
+sub sayhello { 
+   my ($self) = shift;
+   $self->modularizer()->mlog(99, "Helloworld will say hello now");
+   $self->modularizer()->module('Printer')->
+      printer("Hello, World!\n"); 
+   return;
+};
+
+sub stringhello {
+   my ($self) = shift;
+
+   $self->modularizer()->mlog(99, "Helloworld will return a greeting");
+   return $self->modularizer()->module('Printer')->
+      string("Hello, World!"); 
+
+};
+
+1;

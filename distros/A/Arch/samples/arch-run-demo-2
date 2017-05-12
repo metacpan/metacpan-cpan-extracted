@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Gtk2 -init;
+use Glib qw(TRUE FALSE);
+use Arch::Run qw(poll run_async LINES);
+
+# use "/usr/share/doc/*" on slow disks
+my @dirs = @ARGV ? @ARGV : glob('/usr/share/*');
+
+my $window = Gtk2::Window->new;
+my $label = Gtk2::Label->new("no du output yet");
+my $pbar = Gtk2::ProgressBar->new;
+my $vbox = Gtk2::VBox->new;
+$vbox->add($label); $vbox->add($pbar); $window->add($vbox);
+$window->signal_connect(destroy => sub { Gtk2->main_quit; });
+$window->set_default_size(200, 48); $window->show_all;
+sub set_str { $label->set_text($_[0]); }
+
+my $keep = 1;
+Glib::Timeout->add(100, sub { $pbar->pulse; poll(0); $keep; });
+
+run_async(
+	command => [ 'du', '-hs', @dirs ],
+	mode    => LINES,
+	datacb  => sub { chomp(my $str = $_[0]); set_str($str); },
+	exitcb  => sub { $keep = 0; set_str("exit code: $_[0]"); },
+);
+
+Gtk2->main;

@@ -1,0 +1,8 @@
+AuthChecker.pm
+AuthChecker.xs
+Changes
+COPYING
+MANIFEST
+Makefile.PL
+README
+test.pl

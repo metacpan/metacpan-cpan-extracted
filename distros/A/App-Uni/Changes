@@ -1,0 +1,78 @@
+Revision history for App-Uni
+
+9.003     2015-11-05 23:09:51-05:00 America/New_York
+        - when printing combining marks, give them a DOTTED CIRCLE
+          with which to combing (◌)
+
+9.002     2014-10-31 20:34:32-04:00 America/New_York
+        - add "-8" to show UTF-8 encoded bytes
+        - better handling of errors and getopt
+
+9.001     2014-10-26 19:08:57-04:00 America/New_York
+        - default behavior is now "dwim"
+        - added -n for "search names only"
+        - refactored to be testable, but no actual tests exist 😏
+
+9.000     2014-10-24 12:34:12-04:00 America/New_York
+        - total rewrite, done with much love, by rjbs
+        - now supports lookup by hex code
+        - now supports single ascii char lookup
+        - now supports multiple fixed substring lookup
+
+[Changes for v8 - 2011年 7月 6日 周三 08時32分43秒 CST]
+
+* Add advertisement for user to upgrade to Perl 5.14 just
+  for searching Emojis. (@rjbs, @miyagawa)
+
+[Changes for v7 - 2011年 6月28日 周二 23時28分09秒 CST]
+
+* Bump version since 5.014001 < 6.000.
+
+[Changes for v5.14.1 - 2011年 6月28日 周二 22時55分35秒 CST]
+
+* No functional changes.
+
+* Add "app" and "unicode" keywords to META.yml to see if they
+  will show up somewhere on search.cpan.org or metacpan...
+
+  (Thanks to @confound++ for wondering about keywords on IRC.)
+
+[Changes for v6 - 2011年 6月19日 周日 07時05分46秒 CST]
+
+* Unbundle UnicodeData.txt, using Perl-supplied unicore/Name.pl instead. (RJBS)
+
+* If the argument is a single non-ASCII character, the character itself
+  is no longer printed.
+
+* If the argument is a single non-ASCII character, then the character
+  itself is printed instead.
+
+[Changes for v5.14.0 - 2011年 6月13日 周一 11時36分52秒 CST]
+
+* Bump version number since 0.014 < 0.200.
+
+[Changes for v0.14.0 - 2011年 6月 7日 周二 04時24分09秒 CST]
+
+* Bundle UnicodeData.txt with this distribution as Perl 5.14 no longer
+  installs it.
+
+[Changes for v0.12.0 - 2010年 4月13日 周二 21時43分46秒 CST]
+
+* This module now requires Perl v5.12.0.
+
+* Improved matching speed using memory-intensive :mmap and for(<$fh>) loops.
+
+[Changes for 0.03 - 2009年12月11日 周五 20時28分31秒 CST]
+
+* If the argument to "uni" is a single character, then the character
+  itself is also printed out in addition to code and name matches.
+
+[Changes for 0.02 - 2009年12月10日 周四 08時13分22秒 CST]
+
+* Fix module name in POD.
+* Error messages are now printed witout tracing info.
+
+[Changes for 0.01 - 2009年12月10日 周四 07時59分22秒 CST]
+
+* First CPAN release.
+

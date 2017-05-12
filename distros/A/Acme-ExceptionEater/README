@@ -1,0 +1,36 @@
+Acme-ExceptionEater version 0.0.1
+
+Placing an Acme::ExceptionEater object in a lexical in the
+outer-most scope of an eval will prevent exceptions from
+escaping the eval where they may confuse, annoy, frighten,
+or inform others.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following
+commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Kyle Hasselbacher
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

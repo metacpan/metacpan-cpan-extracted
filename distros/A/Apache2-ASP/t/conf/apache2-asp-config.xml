@@ -1,0 +1,110 @@
+<?xml version="1.0" ?>
+<!DOCTYPE configuration SYSTEM "http://www.devstack.com/schemae/configuration.dtd">
+<configuration>
+
+  <system>
+    <post_processors>
+<!--
+      <class>My::PostProcessor</class>
+      <class>My::PostProcessor2</class>
+-->
+    </post_processors>
+    <libs>
+      <lib>@ServerRoot@/lib</lib>
+    </libs>
+    <load_modules>
+      <module>DBI</module>
+      <module>DBD::SQLite</module>
+    </load_modules>
+    <env_vars>
+      <var>
+        <name>myvar</name>
+        <value>value</value>
+      </var>
+      <var>
+        <name>myvar2</name>
+        <value>value2</value>
+      </var>
+    </env_vars>
+    <settings>
+      <setting>
+        <name>mysetting</name>
+        <value>value</value>
+      </setting>
+      <setting>
+        <name>mysetting2</name>
+        <value>value2</value>
+      </setting>
+    </settings>
+  </system>
+  
+  <errors>
+    <error_handler>My::ErrorHandler</error_handler>
+    <mail_errors_to>jdrago_999@yahoo.com</mail_errors_to>
+    <mail_errors_from>root@localhost</mail_errors_from>
+    <smtp_server>localhost</smtp_server>
+  </errors>
+
+  <web>
+    <application_name>DefaultApp</application_name>
+    <application_root>@ServerRoot@</application_root>
+    <handler_root>@ServerRoot@/handlers</handler_root>
+    <media_manager_upload_root>@ServerRoot@/MEDIA</media_manager_upload_root>
+    <www_root>@ServerRoot@/htdocs</www_root>
+    <page_cache_root>@ServerRoot@/PAGE_CACHE</page_cache_root>
+    <handler_resolver>Apache2::ASP::HTTPContext::HandlerResolver</handler_resolver>
+    <handler_runner>Apache2::ASP::HTTPContext::HandlerRunner</handler_runner>
+    <filter_resolver>Apache2::ASP::HTTPContext::FilterResolver</filter_resolver>
+    <request_filters>
+      <filter>
+        <uri_match>/.*</uri_match>
+        <class>My::MemberFilter</class>
+      </filter>
+<!--
+      <filter>
+        <uri_equals>/index.asp</uri_equals>
+        <class>My::MemberFilter2</class>
+      </filter>
+-->
+    </request_filters>
+    <disable_persistence>
+      <location>
+        <uri_match>/nostate/.*</uri_match>
+        <disable_session>1</disable_session>
+        <disable_application>1</disable_application>
+      </location>
+<!--
+      <location>
+        <uri_match>/other\-links/.*</uri_match>
+        <disable_session>1</disable_session>
+        <disable_application>1</disable_application>
+      </location>
+-->
+    </disable_persistence>
+    
+  </web>
+
+  <data_connections>
+    <session>
+      <manager>Apache2::ASP::SessionStateManager::SQLite</manager>
+      <cookie_name>session-id</cookie_name>
+      <dsn>DBI:SQLite:dbname=/tmp/apache2_asp_applications</dsn>
+      <username></username>
+      <password></password>
+      <session_timeout>30</session_timeout>
+    </session>
+    <application>
+      <manager>Apache2::ASP::ApplicationStateManager::SQLite</manager>
+      <dsn>DBI:SQLite:dbname=/tmp/apache2_asp_applications</dsn>
+      <username></username>
+      <password></password>
+    </application>
+    <main>
+      <dsn>DBI:SQLite:dbname=/tmp/apache2_asp_applications</dsn>
+      <username></username>
+      <password></password>
+    </main>
+  </data_connections>
+
+</configuration>
+

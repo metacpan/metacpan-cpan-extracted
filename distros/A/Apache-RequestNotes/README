@@ -1,0 +1,125 @@
+NAME
+
+Apache::RequestNotes - pass form and cookie data around in pnotes
+
+SYNOPSIS
+
+httpd.conf:
+
+  PerlInitHandler Apache::RequestNotes
+  PerlSetVar MaxPostSize 1024
+  PerlSetVar DisableUploads On
+
+  MaxPostSize is in bytes and defaults to 1024, thus is optional.
+  DisableUploads defaults to On, and likewise is optional.
+
+DESCRIPTION
+
+Apache::RequestNotes provides a simple interface allowing all phases
+of the request cycle access to cookie or form input parameters in a
+consistent manner.  Behind the scenes, it uses libapreq functions to
+parse request data and puts references to the data objects in pnotes.
+
+EXAMPLE
+
+httpd.conf:
+
+  PerlInitHandler Apache::RequestNotes
+
+some Perl*Handler or Registry script:
+
+  my $input      = $r->pnotes('INPUT');   # Apache::Table reference
+  my $uploads    = $r->pnotes('UPLOADS'); # Apache::Upload array ref
+  my $cookies    = $r->pnotes('COOKIES'); # hash reference
+  
+  # GET and POST data
+  my $foo        = $input->get('foo');
+
+  # uploaded files
+  foreach my $upload (@$uploads) {
+    my $name     = $upload->name'
+    my $fh       = $upload->fh;
+    my $size     = $upload->size;
+  }
+
+  # cookie data
+  my $bar        = $cookies->{'bar'};
+
+After using Apache::RequestNotes:
+  o $cookies contains a reference to a hash with the names and values
+    of all cookies sent back to your domain and path.
+
+  o $input contains a reference to an Apache::Table object and can be
+    accessed via Apache::Table methods - if a form contains both GET
+    and POST data, both are available via $input.
+
+  o $uploads contains a reference to an array containing all the
+    Apache::Upload objects for the request, which can be used to
+    access uploaded file information.
+
+Once Apache::RequestNotes has been called, all other phases can have
+access to the form input and cookie data without parsing it
+themselves. This relieves some strain, especially when the GET or POST
+data is required by numerous handlers along the way.
+
+NOTES
+
+It should be noted that Apache::Request 0.3103 and above now offers
+the Apache::Request->instance() method, which offers the ability
+to access the same Apache::Request object over and over again.
+While the availability of instance() does absorb the problems that
+prompted Apache::RequestNotes, namely the ability to read from POST
+more than once, you still have to parse the various data yourself.
+Thus, the utility of Apache::RequestNotes is now simply the ability
+to have a common API for all your handlers to use.
+
+Apache::RequestNotes can really be called from just about any request
+phase.  Thus, if you need to postpone data parsing until after uri 
+translation, using RequestNotes as a PerlFixupHandler should work
+just fine.  Keep in mind that Apache::RequestNotes returns OK, which
+would preclude it's use in conjuction with other PerlTransHandlers
+and PerlTypeHandlers (but it doesn't really belong there anyway).
+
+MaxPostSize applies to file uploads as well as POST data, so if you
+plan on uploading files bigger than 1K, you will need to the override
+the default value.
+
+$Apache::RequestNotes:err is set if libapreq reports a problem
+parsing the form data, thus it can be used to verify whether $input
+and $uploads contain valid objects.  Apache::RequestNotes will _not_
+return SERVER_ERROR in the event libapreq encounters an error.  This
+may change in future releases.
+
+Verbose debugging is enabled by setting the variable
+$Apache::RequestNotes::DEBUG to 1 or greater. To turn off all debug
+information, set your apache LogLevel above info level.
+
+This is alpha software, and as such has not been tested on multiple
+platforms or environments.  It requires PERL_INIT=1, PERL_LOG_API=1,
+and maybe other hooks to function properly. Doug MacEachern's libapreq
+is also required - you can get it from CPAN under the Apache tree.
+
+FEATURES/BUGS
+
+Since POST data cannot be read more than once per request, it is 
+improper to both use this module and try to gather form data again
+via CGI.pm or by reading it yourself from a cgi script or handler
+later in the request cycle.  Unlike versions of RequestNotes prior
+to 0.06, however, you can call Apache::Request->instance($r) without
+impunity - Apache::Request->new($r) is off limits, though.
+
+SEE ALSO
+
+perl(1), mod_perl(1), Apache(3), Apache::Request(3), libapreq(1),
+Apache::Table(3)
+
+AUTHOR
+
+Geoffrey Young <geoff@cpan.org>
+
+COPYRIGHT
+
+Copyright (c) 2000, Geoffrey Young.  All rights reserved.
+
+This module is free software.  It may be used, redistributed
+and/or modified under the same terms as Perl itself.

@@ -1,0 +1,10 @@
+Breadcrumb {
+ powerline: 1;
+ highlight-bg: 238;
+}
+MenuBar { bg: 'blue'; fg: 'hi-yellow'; rv: 0; highlight-fg: 'black'; }
+Menu { bg: '232'; fg: 'white'; rv: 0; }
+Table { highlight-bg: '238'; highlight-fg: 'hi-yellow'; highlight-b: 0; }
+FileViewer { highlight-b: 0; }
+GridBox { col-spacing: 1; }
+

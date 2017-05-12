@@ -1,0 +1,44 @@
+use alienfile;
+
+plugin 'Probe::GnuWin32' => (
+  registery_key_regex => qr/^flex/i,
+  exe_name => 'flex',
+  exe_match => qr/flex/,
+  exe_version => qr/version ([0-9\.]+)/,
+);
+
+plugin 'Probe::CommandLine' => (
+  command => 'flex',
+  args    => ['--version'],
+  match   => qr/flex/,
+  version => qr/([0-9\.]+)/,
+);
+
+share {
+
+  requires 'Alien::bison' => '0.11';
+  requires 'Alien::m4'    => '0.08';
+
+  plugin 'Download' => (
+    url     => 'https://github.com/westes/flex/releases',
+    version => qr/^flex-([0-9\.]+)\.tar\.gz$/,
+  );
+
+  plugin 'Extract' => 'tar.gz';  
+  
+  plugin 'Build::Autoconf' => ();
+
+  gather sub {
+    my($build) = @_;
+    if(`flex --version` =~ /([0-9\.]+)/)
+    {
+      $build->runtime_prop->{version} = $1;
+    }
+    else
+    {
+      $build->runtime_prop->{version} ||= 'unknown';
+    }
+  };
+
+}
+

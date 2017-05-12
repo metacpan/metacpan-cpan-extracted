@@ -1,0 +1,65 @@
+{
+   "abstract" : "BooK is my Bitch",
+   "author" : [
+      "José Castro <cog@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-BooK-Is-My-Bitch",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::MetaSyntactic" : "0",
+            "Acme::MetaSyntactic::Themes" : "1.000",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-acme-book-is-my-bitch@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-BooK-Is-My-Bitch"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/book/Acme-BooK-Is-My-Bitch.git",
+         "web" : "http://github.com/book/Acme-BooK-Is-My-Bitch"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Philippe Bruhat (BooK) <book@cpan.org>",
+      "Сергей Романов <sromanov@cpan.org>",
+      "Olivier Mengué <dolmen@cpan.org>"
+   ]
+}
+

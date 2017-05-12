@@ -1,0 +1,39 @@
+Revision history for Perl extension Apache::ModSSL.
+
+0.10  Sun May 26 17:25:33 CEST 2013
+      - reactivate tests w/o mod_ssl
+
+0.09  Sun May 26 17:12:25 CEST 2013
+      - fix tests to work with newer A::T versions
+        newer A::T versions create an UA that uses an explicit SSL_ca_file
+        prevent that.
+
+0.08  Fri May  6 16:13:02 CEST 2011
+	- :withtestmore ==> -withtestmore (see Apache::Test)
+
+0.07  Wed Oct 29 10:56:45 CET 2008
+	- removed the post_config hook for ssl function retrieval.
+
+0.06  Thu Apr  3 09:26:46 CEST 2008
+	- make it use()able without mod_perl, e.g. for doing
+	  perl -MApache2::ModSSL -le 'print $Apache2::ModSSL::VERSION'
+
+0.05  Wed Apr  2 21:27:49 CEST 2008
+	- added ssl_ext_lookup method
+
+0.04  Thu Mar 27 10:37:47 CET 2008
+	- Crypt::SSLeay added to dependencies
+	- Makefile.PL now accepts the -apxs option.
+	- using XSLoader instead of Apache2::XSLoader
+
+0.03  Wed Apr 27 15:52:58 CEST 2005
+	- ported to 2.0.0-RC5
+	- renamed to Apache2::ModSSL
+	- SPEC file added
+
+0.02  Wed Dec 15 15:58:37 CET 2004
+	- first public avaliable version
+
+0.01  Sun Oct 24 15:54:53 2004
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.8.0 -n Apache::ModSSL

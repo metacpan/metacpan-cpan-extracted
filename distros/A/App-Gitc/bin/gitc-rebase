@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-rebase
+# ABSTRACT: Rebase a changeset
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    branch_point
+    full_changeset_name
+    git
+    is_auto_fetch
+);
+use Getopt::Long qw( :config pass_through );
+
+my $onto;
+GetOptions( 'onto=s' => \$onto );
+if ($onto) {
+    my $original = $onto;
+    $onto = $onto =~ m/^(master|test|stage|prod)$/
+          ? "origin/$onto"
+          : full_changeset_name($onto);
+    die "I don't understand --onto argument '$original'\n" if not $onto;
+    unshift @ARGV, "--onto $onto";
+}
+
+# make sure our mirror of the origin is up to date
+git "fetch origin" if is_auto_fetch();
+my $merge_base = branch_point();
+
+# it would be great to automatically do '--onto stage' if this changeset
+# is based on stage (and so forth).  At this point, you have to specify
+# it manually.
+
+exec "git rebase @ARGV $merge_base";
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-rebase - Rebase a changeset
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

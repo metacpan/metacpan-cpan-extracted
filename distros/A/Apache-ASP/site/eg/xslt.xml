@@ -1,0 +1,27 @@
+#!/usr/bin/perl /usr/bin/asp-perl
+
+<?xml version="1.0"?>
+<page>
+ <title>Hello World!</title>
+ <content>
+  <paragraph>This is my first XSLT enabled Apache::ASP XML script! </paragraph>
+  <paragraph>
+	I am quite pleased with how well this works, and speedy
+	too once the XML -> XSL tranformation gets cached with XSLTCache setting.
+  </paragraph>
+  <paragraph>
+	Both the <file src="<%=&basename($0)%>" title="XML file" /> 
+	and <file src="template.xsl" title="XSL template" />
+	file will be executed as ASP scripts
+	before the XSL will be applied to the XML.  This give you 
+	a very powerful dynamic XML publishing solution with full
+	ASP scripted XSL &amp; XML files.
+	<p />
+	With this foundation in place, we will be able to implement XSP
+	with all its <%=$Server->HTMLEncode('<xsp:logic>')%> tags no problem.
+  </paragraph>
+ </content>
+ <file src="<%=&basename($0)%>" title="view this file's source" /> -
+ <file src="template.xsl" title="view the xslt template" />
+
+</page>

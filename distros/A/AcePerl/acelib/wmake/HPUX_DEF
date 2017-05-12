@@ -1,0 +1,26 @@
+# $Id: HPUX_DEF,v 1.1 2002/11/14 20:00:06 lstein Exp $
+
+
+#################################################################
+############### acedb: R.Durbin and J.Thierry-Mieg ##############
+########### wmake/DEC_ALPHA_DEF    March-18-1993       ##########
+#################################################################
+
+#################################################################
+########## Machine dependant compiler modification ##############
+####### for the DEC-Alpha 3000 model 500 running Unix ###########
+#################################################################
+########### This file is included by wmake/truemake #############
+######  Edit this file to adapt the ACeDB to a new machine ######
+#####   following the explanations given in wmake/truemake  #####
+#################################################################
+
+NAME = HP
+COMPILER = gcc -g -DNO_LEFT_CASTING -DACEDB4 -I/usr/include/X11R5 -I/usr/local/include/MIT/X11R5/include
+LINKER = gcc -g -L/usr/lib/X11R5
+
+LIBS = -lm 
+
+#################################################################
+#################################################################
+ 

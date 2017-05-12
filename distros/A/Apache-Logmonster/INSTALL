@@ -1,0 +1,44 @@
+
+INSTALLATION
+
+    Step 1 - Download and install (it's FREE!)
+	from CPAN or
+        http://tnpi.net/cart/index.php?crn=210&rn=385&action=show_detail
+
+        Install it The Perl Way:
+
+           perl Makefile.PL
+           make test
+           make install 
+
+	To install any missing dependencies, use 'make deps'
+
+        To install the config file, use 'make conf' or 'make newconf'.
+        newconf will overwrite any existing config file, so use it only for
+        new installs.
+
+    Step 2 - Edit logmonster.conf
+         vi /usr/local/etc/logmonster.conf
+
+    Step 3 - Edit httpd.conf
+        Adjust the CustomLog and ErrorLog definitions. We make two changes,
+        appending %v (the vhost name) to the CustomLog and adding cronolog
+        to automatically rotate the log files.
+
+          LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %v" combined
+          CustomLog "| /usr/local/sbin/cronolog /var/log/apache/%Y/%m/%d/access.log" combined
+          ErrorLog "| /usr/local/sbin/cronolog /var/log/apache/%Y/%m/%d/error.log"
+
+    Step 4 - Test manually, then add to cron.
+          crontab -u root -e
+          5 1 * * * /usr/local/sbin/logmonster -i day
+
+    Step 5 - Read the FAQ
+        <http://tnpi.net/wiki/Logmonster_FAQ>
+
+    Step 6 - Enjoy
+        Allow Logmonster to make your life easier by handling your log
+        processing. Enjoy the daily summary emails, and then express your
+        gratitude by making a small donation to support future development
+        efforts.
+

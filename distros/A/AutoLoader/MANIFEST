@@ -1,0 +1,13 @@
+Artistic
+Changes
+Copying
+lib/AutoLoader.pm
+lib/AutoSplit.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00pod.t
+t/01AutoLoader.t
+t/02AutoSplit.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

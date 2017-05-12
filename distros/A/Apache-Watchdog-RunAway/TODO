@@ -1,0 +1,43 @@
+* improve the test suite to run a slow response handler (sleep 20) and
+  check that we actually spot and kill that process
+
+* if it's polling the server every so often, it might as well generate
+  a periodic report of what it finds.  How many processes, how long
+  each has been running, how much memory, etc.
+
+* add a regex for URLs not to be watched, since these can be lengthy
+upload/download operations. Note that you have only 64 chars of the URI
+provided by Apache::Scoreboard
+
+* Eric has proposed to add a support for virtual hosts, based on
+vhostrec->server_name
+
+* From: Brad Morris <brad.morris@turner.com>
+Subject: Apache-Watchdog-RunAway suggestion/help
+
+I like the idea of watchdog very much.  We have various script that
+sometimes run away, and it is pretty hard to debug properly because we
+are dealing with unreliable feed data.
+
+However, a weak point of your current implementation seems to be the
+kill -9.
+
+The problem for us is that although we want to kill the runaway
+processes, we also want a record of what was killed doing what so we
+can go back later and fix.
+
+Have you thought about using the advise from the Debugging mod_perl -
+Hanging Processes: Detection and Diagnostics - Determination of the
+reason - Using the Perl Trace section of your excellent modperl guide?
+
+Installing a signal handler in the startup.pl and killing that signal
+inside the Apache-Watchdog-RunAway gives the added bonus of a logged
+stack trace every time a dead process is killed.
+
+Also, it would be nice to log the request that caused this problem.
+This can be gotten from image->request;.  This is pretty simple.
+
+Anyway, I have implemented the kill -USR2 in my startup.pl and things
+seem to work (it logs the carp nicely to the error log).  Then I need
+to change your kill to do a kill -USR2.
+

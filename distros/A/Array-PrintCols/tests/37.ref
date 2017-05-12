@@ -1,0 +1,16 @@
+Test 37: Complex words, indent 5, array ref
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+     3D                    NTDesktop_long        memory                
+     FSPEC_complete        NTDesktop_short       photoshop             
+     FSPEC_long            NT_other_complete     sys32_win95_complete  
+     FSPEC_short           NT_other_long         sys32_win95_long      
+     ISPEC_complete        NT_other_short        sys32_win95_short     
+     ISPEC_long            SysNT_complete        ubench                
+     ISPEC_short           SysNT_long            vox                   
+     LargeApps             SysNT_short           wmt_ubench            
+     MMx_complete          Win95Desktop_complete xmark96_complete      
+     MMx_long              Win95Desktop_long     xmark96_long          
+     MMx_short             Win95Desktop_short    xmark96_short         
+     Multimedia_complete   front_end             
+     NTDesktop_complete    games                 
+12345678901234567890123456789012345678901234567890123456789012345678901234567890

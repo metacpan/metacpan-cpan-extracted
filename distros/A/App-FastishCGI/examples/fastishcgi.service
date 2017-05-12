@@ -1,0 +1,11 @@
+[Unit]
+Description = FastCGI <-> CGI bridge 
+
+[Service]
+ExecStart = /usr/bin/fastishcgi
+User = www-data
+Group = www-data
+
+[Install]
+WantedBy = multi-user.target
+

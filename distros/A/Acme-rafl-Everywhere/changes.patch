@@ -1,0 +1,14 @@
+diff --git a/Changes b/Changes
+index 455ddeb..039488d 100644
+--- a/Changes
++++ b/Changes
+@@ -1,5 +1,9 @@
+ Revision history for Perl extension Acme::rafl::Everywhere.
+ 
++0.010   21.03.2013
++        * Added another facts (thanks, Toby Inkster).
++          (GH #9, #11)
++
+ 0.009   15.01.2013
+         * Added another fact (thanks, Steve Scaffidi @hercynium)
+         * Small fix with exclamation mark.

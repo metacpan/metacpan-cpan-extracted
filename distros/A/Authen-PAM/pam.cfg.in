@@ -1,0 +1,4 @@
+return {
+   CC => '@CC@',
+   DEFINE => '@DEFS@'
+};

@@ -1,0 +1,59 @@
+Sept. 15, 2005: Version 1.0.1
+   - Added a session_removed attribute that can be used to detect session
+     collisions in the web app.
+
+July 8, 2005: Version 1.0
+   - Added code so that session encryption key can be set by external code.
+     This allows a random, in-memory key to be used instead of a static one
+     that can be compromised by reading a config file. 
+   - INCOMPATIPLE NAME CHANGE: Changed AccessController to Apache::SiteControl.
+     This makes more sense in the CPAN sense, and will help with installation
+     and version checking. See README.UPGRADING_TO_1.0.
+
+June 14, 2005: Version 0.46
+   - Added encryption when saving passwords to session files. Adds a little
+     security, but still needs to be better.
+
+May 5, 2005: Version 0.42
+   - Fixed bug in saving extra user credentials to session
+
+May 1, 2005: Version 0.42
+   - Changed name to Apache::SiteControl
+   - Removed radius bugfix from 0.41...needs more debugging
+
+May 1, 2005:
+   - Fixed bug when passing extended credentials to check_credentials.
+
+Apr 29, 2005: Version 0.41
+   - Added the ability to pass extra "credentials" from the login page. This
+     will allow you to choose alternatives (such as imap server for a webmail
+     client, etc.)
+   - Patched Radius.pm to include NAS IP
+
+Apr 20, 2005: Version 0.41
+   - Added ability to store password in user object. This is enabled with an
+     Apache directive.
+   
+Mar 1, 2005: Version 0.3.1
+   - Changed call to user factory so that all credentials are passed. This
+     makes it possible to embed the password in the user object for things like
+     pass-through logins.
+   - New option to allow caching of passwords in the server side session (off
+     by default for security reasons...see docs/apache)
+
+June 7, 2004: Version 0.3
+   - Now works with Apache 2/mod_perl 2 in Apache compat mode
+   - Wrote sample sites for both apache 1 and 2.
+   - Updated docs to reflect all the changes
+
+June 2, 2004
+   - Updated concepts of User, UserFactory
+      - User now has methods for managing the session. You can add data to the
+        session simply by calling $user->setAttribute(...), and you can get it
+        back by calling $user->getAttribute(...)
+      - Logouts are now done by simply calling $user->logout
+      - UserFactory is now tightly integrated with Apache::Session::File, and
+        the factory is now responsible for all persistence management.
+   - Much less code need be written to start using the package. Mostly done in
+     httpd.conf now. (You still need to write rules, and a permission factory
+     of course).

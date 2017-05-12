@@ -1,0 +1,57 @@
+NAME
+    Acme::Roman - Do maths like Romans did
+
+SYNOPSIS
+        use Acme::Roman;
+
+        print I + II; # III, of course!
+
+DESCRIPTION
+    The Roman Empire ruled over a large part of the ocidental world for a
+    long time, probably too long for the conquested people.
+
+    They were finally won and there are some who say it was because they
+    could not do mathematics. Such liars!
+
+    This module redeems Perl with the ungratefully forgotten Roman numbers,
+    which now can find their glory again.
+
+INSPIRATION
+    That module was inspired by
+
+        Ruby Quiz - Roman Numerals (#22)
+        http://rubyquiz.com/quiz22.html
+
+    See the hightlighted solution at the Quiz Summary in the same page.
+
+EXAMPLES
+    Take a look at eg/roman.pl in this distribution for an amusing example.
+
+BUGS
+    Acme::Roman does not like numbers greater than 3999. Why would you like
+    such big numbers?
+
+    Only knows how to do addition, subtraction and multiplication. What else
+    do you think that Romans did with such a lovely numeric system?
+
+    Ranges (like I..X) don't work :(
+
+    The actual implementation does a bit of brute force when defining empty
+    prototypes so that barewords are resolved into subroutine calls. I don't
+    know if it can be fixed.
+
+    If you find a bug, tell Julio Caesar from a respectful and safe
+    distance. (He's always looking for entertainment at the circus. And
+    lions are ever hungry.) If you prefer, you might file a report at
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-Roman or via e-mail at
+    bug-Acme-Roman@rt.cpan.org. (Ok, CPAN RT now likes me again.)
+
+AUTHOR
+    Adriano R. Ferreira <ferreira@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2007, 2008 Adriano R. Ferreira
+
+    The Acme::Roman module is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+

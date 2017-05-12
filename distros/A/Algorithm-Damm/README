@@ -1,0 +1,79 @@
+NAME
+    Algorithm::Damm - Calculate the Damm error correction check digit.
+
+SYNOPSIS
+      use Algorithm::Damm qw/check_digit is_valid/;
+
+      $c = check_digit("43881234567");
+      print "It works\n" if is_valid("43881234567$c");
+
+DESCRIPTION
+    This module implements the Damm algorithm for calculating a check digit.
+
+    You can find information about the algorithm by searching the web for
+    "Damm ECC". In particular, see the "SEE ALSO" section (below).
+
+FUNCTIONS
+    is_valid CHECKSUMMED_NUM
+        This function returns 1 if the final character of CHECKSUMMED_NUM is
+        the correct checksum for the rest of the number, 0 if not, and undef
+        if CHECKSUMMED_NUM contains an invalid character or does not contain
+        at least two digits (one for the number, and one for the checksum).
+
+        This function is equivalent to
+
+          substr $N,length($N)-1 eq check_digit(substr $N,0,length($N)-1)
+
+        Additionally, due to the way this algorithm works, if you crank the
+        checksum calculation through the last digit (checkdigit included),
+        you will end up with a value of 0.
+
+    check_digit NUM
+        This function returns the checksum of the given number. It will
+        return undef if it is not able to calculate the checksum.
+
+HISTORY
+    This module came about as I was reverse engineering a checksum method
+    being used on another project of mine. History of the method used was
+    lost to the sands of time, and I needed something to run some quick
+    tests on various checksum algorithms.
+
+    This module is a reimplementation of one of the algorithms I had tested.
+
+SEE ALSO
+    Algorithm::CheckDigits
+        Algorithm::CheckDigits is a module that this probably should have
+        been written as a part of. There is an open issue
+        (<https://github.com/MidLifeXis/perl-algorithm-damm/issues/1>) to
+        add an integration layer for this module to Algorithm::CheckDigits.
+
+    Algorithm::LUHN
+        Original code based on Algorithm::LUHN by Tim Ayers.
+
+    Math::CheckDigits
+        Slightly different approach to generating check digits.
+
+    Wikipedia
+        <http://en.wikipedia.org/wiki/Damm_algorithm> - Article explaining
+        the Damm error correction algorithm.
+
+REPOSITORY
+    You can find the source at
+    <https://www.github.org/MidLifeXis/perl-algorithm-damm>.
+
+BUGS
+    None known at this time, but feel free to submit them to RT or the issue
+    tracker for this source at GitHub.
+
+AUTHOR
+    This module was written by Brian T. Wightman
+    (http://search.cpan.org/search?author=MLX) based on the module
+    Algorithm::LUHN by Tim Ayers.
+
+COPYRIGHT
+    Copyright (c) 2013 Brian T. Wightman. All rights reserved.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

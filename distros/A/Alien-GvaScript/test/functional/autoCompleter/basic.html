@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+  <link href="../../test.css" rel="stylesheet" type="text/css">
+  <link href="../../images/GvaScript.css" rel="stylesheet" type="text/css">
+  <script src="../../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+
+  <style type="text/css">
+  label {display: inline-table; width: 120px; text-align: right}
+  .AC_dropdown em {font: 8pt 'courier new'; font-style: normal} 
+  </style>
+
+  <script>
+    var _states = {'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 
+      'CA': 'California', 'CO': 'Colorado', 'CT': 'Connecticut', 'DE': 'Delaware', 
+      'DC': 'District Of Columbia', 'FL': 'Florida', 'GA': 'Georgia', 'HI': 'Hawaii', 
+      'ID': 'Idaho', 'IL': 'Illinois', 'IN': 'Indiana', 'IA': 'Iowa', 'KS': 'Kansas', 
+      'KY': 'Kentucky', 'LA': 'Louisiana', 'ME': 'Maine', 'MD': 'Maryland', 
+      'MA': 'Massachusetts', 'MI': 'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 
+      'MO': 'Missouri', 'MT': 'Montana', 'NE': 'Nebraska', 'NV': 'Nevada', 
+      'NH': 'New Hampshire', 'NJ': 'New Jersey', 'NM': 'New Mexico', 'NY': 'New York', 
+      'NC': 'North Carolina', 'ND': 'North Dakota', 'OH': 'Ohio', 'OK': 'Oklahoma', 
+      'OR': 'Oregon', 'PA': 'Pennsylvania', 'RI': 'Rhode Island', 'SC': 'South Carolina', 
+      'SD': 'South Dakota', 'TN': 'Tennessee', 'TX': 'Texas', 'UT': 'Utah', 'VT': 'Vermont', 
+      'VA': 'Virginia', 'WA': 'Washington', 'WV': 'West Virginia', 'WI': 'Wisconsin', 'WY': 'Wyoming'}; 
+    _states = $H(_states);
+
+    function filterStates(prefix) {
+      prefix = prefix || '';
+      prefix = prefix.toUpperCase();
+      var match = _states.keys().findAll(function(k) {
+        return _states.get(k).toUpperCase().startsWith(prefix);
+      });
+      
+      return match.collect(function(k) {
+        return {value: _states.get(k), label: _states.get(k) + ' <em>('+k+')</em>'}
+      });
+    }
+
+    var ac1 = new GvaScript.AutoCompleter(["Monsieur", "Madame", "Mademoiselle", "Docteur", "Maître", "Professeur"], {
+        minimumChars: 0,
+        ignorePrefix: true,
+        caseSensitive: false,
+        autoSuggest: false,
+        typeAhead: false
+      }
+    );
+    var ac2 = new GvaScript.AutoCompleter(_states.values(), {
+      minimumChars: 1,
+      caseSensitive: false,
+      autoSuggest: true,
+      autoSuggestDelay: 100,
+      typeAhead: false
+    });
+    var ac3 = new GvaScript.AutoCompleter(filterStates, {
+      minimumChars: 2,
+      autoSuggest: true,
+      autoSuggestDelay: 1000,
+      typeAhead: true
+    });
+  </script>
+</head>
+
+<body>
+
+  <h1>Basic Autocompleters</h1>
+
+  <p>
+  Basic autocompleters are bound to a static list or a function that returns a static list.<br/>
+  Static list datasource gets filtered automatically to return values that match user's input.<br/>
+  Function datasources manually filter a list according to custom needs.<br/>
+  </p><br/>
+
+  <label>Title<sup>static list</sup> :</label> <input type="text" autocomplete="off" class="AC_input" onfocus="ac1.autocomplete(this)" /> 
+            <em>(minimumChars: 0, typeAhead: false, autoSuggest: false, ignorePrefix: true)</em>
+            <br/><br/>
+
+  <label>US state<sup>static list</sup> :</label> <input type="text" autocomplete="off" class="AC_input" onfocus="ac2.autocomplete(this)" /> 
+            <em>(minimumChars: 1, typeAhead: false, autoSuggest: true, autoSuggestDelay: 100)</em>
+            <br/><br/>
+
+  <label>US state<sup>function</sup> :</label> <input type="text" autocomplete="off" class="AC_input" onfocus="ac3.autocomplete(this)" id="inpt_ac3"/> 
+            <em>(minimumChars: 2, typeAhead: true, autoSuggest: true, autoSuggestDelay: 1000)</em>
+          
+</body>
+
+</html>

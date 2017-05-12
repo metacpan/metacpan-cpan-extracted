@@ -1,0 +1,21 @@
+The App-orgdaemon distribution provides the "org-daemon" program, a
+Tk application which sits in the background and "warns" about
+appointments found in configured org-mode files.
+
+Installation:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You can use the org-daemon script found in the bin subdirectory
+directly, without installation. Make sure that at least Perl/Tk is
+installed.
+
+Usage:
+
+	org-daemon --recheck-interval=3 /path/to/TODO.org &
+
+Run "perldoc bin/org-daemon" or "tkpod bin/org-daemon" for complete
+documentation.

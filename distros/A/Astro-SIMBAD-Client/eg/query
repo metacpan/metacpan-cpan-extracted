@@ -1,0 +1,67 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use Astro::SIMBAD::Client;
+use File::Basename;
+
+@ARGV or do {print <<eod; exit};
+
+Query SIMBAD 4 for the objects on the command line. The format provided
+by Astro::SIMBAD is cleared so you get the full effect.
+
+usage: @{[basename $0]} object ...
+
+eod
+
+my $simbad = Astro::SIMBAD::Client->new (
+    type => 'txt',
+    format => {txt => ''},
+    parser => {txt => ''},
+);
+
+foreach my $obj (@ARGV) {
+    eval {
+	print $simbad->query (id => $obj), "\n";
+	1;
+    } or print ( $@ || 'An unknown error occurred' );
+}
+__END__
+
+=head1 TITLE
+
+query - Query SIMBAD, displaying text result.
+
+=head1 SYNOPSIS
+
+ query Arcturus
+ query  # Gets you brief help
+
+=head1 OPTIONS
+
+None.
+
+=head1 DETAILS
+
+This script takes as its arguments the names of objects to be looked up
+in the SIMBAD database, and copies the obtained information to standard
+output as returned from SIMBAD.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006, 2008, 2010-2016 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+# ex: set textwidth=72 :

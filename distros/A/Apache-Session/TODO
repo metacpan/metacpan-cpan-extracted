@@ -1,0 +1,18 @@
+- Document the API Apache::Session expects you to implement for new                 
+  stores, lockers, serializers, and generators.                                     
+- Make interfaces more abstract so using a tied hash is not the only                
+  easily accessible option.                                                         
+- Review and expand test coverage as much as possible (anybody have                 
+  a spare Sybase or Oracle?).                                                       
+- Address anything at                                                               
+  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Apache-Session                           
+- Address anything in http://cpanratings.perl.org/d/Apache-Session                  
+  appropriately.                                                                    
+- Review and apply suggestions and patches from contributors.                       
+- Form a secret cabal to get the cpanrating up to 4.5 stars.                        
+- Work with any testing monkeys that the Phalanx project brings me,                 
+  http://qa.perl.org/phalanx/distros.html                                           
+- Always precede a release with as many dev releases as necessary                   
+  (is this getting too detailed?).                                                  
+- Generally treat the distribution with great care because it is                    
+  widely used.                                                                      

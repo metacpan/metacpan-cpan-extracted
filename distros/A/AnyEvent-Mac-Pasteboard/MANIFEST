@@ -1,0 +1,13 @@
+Changes
+INSTALL.md
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README.md
+cpanfile
+lib/AnyEvent/Mac/Pasteboard.pm
+t/00_compile.t
+t/01_construct.t
+t/02_changing.t

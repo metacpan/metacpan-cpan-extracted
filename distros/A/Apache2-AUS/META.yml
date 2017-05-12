@@ -1,0 +1,34 @@
+---
+name: Apache2-AUS
+version: 0.02
+author:
+  - 'Tyler "Crackerjack" MacDonald <japh@crackerjack.net>'
+abstract: 'Authorization, Users, and Sessions for Apache2.'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Apache2::Request: 2.06
+  DBIx::Migration::Directories: 0.01
+  Schema::RDBMS::AUS: 0.03
+  mod_perl2: 2.000001
+build_requires:
+  Apache::Test: 0
+  Apache::TestMB: 0
+  DBIx::Migration::Directories: 0.05
+  DBIx::Transaction: 0.007
+  Module::Build: 0.27_03
+  Schema::RDBMS::AUS: 0.03
+  mod_perl2: 2.000001
+provides:
+  Apache2::AUS:
+    file: lib/Apache2/AUS.pm
+    version: 0.02
+  Apache2::AUS::RequestRec:
+    file: lib/Apache2/AUS/RequestRec.pm
+  Apache2::AUS::Util:
+    file: lib/Apache2/AUS/Util.pm
+generated_by: Module::Build version 0.2706
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

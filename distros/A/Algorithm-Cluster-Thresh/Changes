@@ -1,0 +1,16 @@
+Revision history for Algorithm-Cluster-Thresh
+
+0.05      2011-06-29 10:58:42 Europe/Berlin
+    Fixed: each() on arrays not available in 5.008
+
+0.04      2011-06-28 13:48:24 Europe/Berlin
+    Explicit tests for average,single,complete linkage clustering
+
+0.03      2011-06-27 14:16:36 Europe/Berlin
+    Added GitHub urls
+
+0.02      2011-06-20 16:15:59 Europe/Berlin
+    Fixed manifest
+
+0.01      2011-06-20 15:56:34 Europe/Berlin
+    Initial release

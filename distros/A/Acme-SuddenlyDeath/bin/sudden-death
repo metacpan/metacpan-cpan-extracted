@@ -1,0 +1,51 @@
+#!perl
+use strict;
+use warnings;
+use utf8;
+
+use Acme::SuddenlyDeath;
+use Encode;
+
+my $str = Encode::decode_utf8($ARGV[0] || '突然の死');
+
+print Encode::encode_utf8(sudden_death($str));
+print "\n";
+
+exit(0);
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+sudden-death - CLI interface of Acme::SuddenlyDeath
+
+=head1 SYNOPSIS
+
+    $ sudden-death [string]
+
+    # e.g.
+    #    $ sudden-death 'Sudden Death'
+    #    ＿人人人人人人人＿
+    #    ＞ Sudden death ＜
+    #    ￣^Y^Y^Y^Y^Y^Y^￣
+
+=head1 DESCRIPTION
+
+sudden-death is the command that generates ASCII Art of sudden death (突然の死) style.
+
+=head1 AUTHOR
+
+papix E<lt>mail@papix.netE<gt>
+
+=head1 DEPENDENCIES
+
+Text::VisualWidth 0.02 or later.
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

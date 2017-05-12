@@ -1,0 +1,30 @@
+---
+abstract: 'Perl extension to get info from MP3 files.'
+author:
+  - 'Dave Cross, E<lt>dave@dave.org.ukE<gt>'
+build_requires:
+  YAML: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AudioFile-Info-MP3-ID3Lib
+provides:
+  AudioFile::Info::Build:
+    file: lib/AudioFile/Info/Build.pm
+  AudioFile::Info::MP3::ID3Lib:
+    file: lib/AudioFile/Info/MP3/ID3Lib.pm
+    version: v1.7.3
+requires:
+  AudioFile::Info: '0'
+  MP3::ID3Lib: '0'
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/davorg/audiofile-info-mp3-id3lib.git
+version: v1.7.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

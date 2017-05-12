@@ -1,0 +1,42 @@
+---
+abstract: 'Web to IRC Gateway'
+author:
+  - 'Kan Fushihara <kan dot fushihara at gmail dot com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Donburi
+no_index:
+  directory:
+    - inc
+    - t
+    - tmpl
+    - xt
+requires:
+  AnyEvent: 0
+  AnyEvent::IRC::Client: 0
+  Class::Accessor::Lite: 0.04
+  Class::Load: 0
+  Exporter: 5.36
+  File::ShareDir: 0
+  Hash::MultiValue: 0
+  JSON: 0
+  Router::Simple: 0
+  Scope::Container: 0
+  String::CamelCase: 0
+  Text::Xslate: 0
+  Twiggy::Server: 0
+  YAML::Syck: 0
+  opts: 0
+  parent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

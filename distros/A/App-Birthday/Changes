@@ -1,0 +1,13 @@
+Revision history for App-Birthday
+
+0.4 2015-10-14
+    `eq` used for string compare insteade of `==`
+
+0.3 2012-08-03
+    Verify fuction as an option added
+
+0.2 2012-08-03
+    enhancement in documentation
+
+0.1 2012-08-02
+    First version, released on an unsuspecting world.

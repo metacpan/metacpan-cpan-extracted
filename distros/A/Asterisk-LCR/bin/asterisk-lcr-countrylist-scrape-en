@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use LWP::Simple;
+
+my $content = get ("http://www.infobel.com/france/wp/InterDial/");
+my $chunk1  = '<option value="';
+my $chunk2  = '" >';
+my $chunk3  = '</option>';
+
+my %countries = $content =~ /$chunk1(.*?)$chunk2(.*?)$chunk3/g;
+for (sort keys %countries)
+{
+    _scrape_country ( $_, $countries{$_} );
+}
+
+
+sub _scrape_country
+{
+    my $country_key    = shift;
+    my $country_label  = shift;
+
+    my $content        = get ("http://www.infobel.com/france/wp/InterDial/?country=$country_key");
+    my $country_prefix = _scrape_country_prefix ($content);
+
+    my $chunk1  = quotemeta ('<td valign="top"><li>');
+    my $chunk2  = quotemeta ('<font color="red"><b>');
+    my $chunk3  = quotemeta ('</b></font></li></td>');
+
+    my @lines   = $content =~ /($chunk1.*?$chunk2.*?$chunk3)/g;
+    print "$country_prefix : $country_label\n";
+    foreach my $line (@lines)
+    {
+        my ($city, $prefix) = $line =~ /$chunk1(.*?)$chunk2(.*?)$chunk3/;
+    
+        my @pfx = $prefix =~ /,/ ? split /\s*,\s*/, $prefix : ( $prefix );
+        for (@pfx)
+        {
+            print "$country_prefix$_,$country_label / $city\n";
+        }
+    }
+}
+
+
+sub _scrape_country_prefix
+{
+    my $content = shift;
+    my $chunk1  = quotemeta ('</select> <font color="red"><b>+ ');
+    my $chunk2  = quotemeta ('</b></font>');
+    my ($res)   = $content =~ /$chunk1(.*?)$chunk2/;
+    return $res;
+}
+
+
+__END__

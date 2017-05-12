@@ -1,0 +1,8 @@
+Changes
+lib/Acme/Drunk.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/01_test.t
+META.yml                                Module meta-data (added by MakeMaker)

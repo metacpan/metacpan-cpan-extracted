@@ -1,0 +1,21 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache-Queue
+version:      0.6
+version_from: Queue.pm
+installdirs:  site
+requires:
+    Apache2:                       0
+    Apache::Connection:            0
+    Apache::Const:                 0
+    Apache::Log:                   0
+    Apache::RequestIO:             0
+    Apache::RequestRec:            0
+    Apache::RequestUtil:           0
+    Apache::SubRequest:            0
+    DB_File:                       0
+    Fcntl:                         0
+    Template:                      0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

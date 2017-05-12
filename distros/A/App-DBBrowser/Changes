@@ -1,0 +1,534 @@
+Revision history for App-DBBrowser
+
+
+1.053   2017-04-21
+        - New option "grid".
+        - Minimum version "Term::TablePrint" is "0.053".
+        - Update documentation.
+        - Update year copyright.
+
+1.052   2016-08-30
+        - Use "Term::Form" instead of "Term::ReadLine::Simple".
+
+1.051   2016-05-13
+        - Fixed option "File History".
+
+1.050   2016-02-21
+        - Bugfix: minimum plugin API version is "1.5".
+        - PREREQ_PM: raised required version of different modules.
+
+1.018_01   2016-02-14
+        - Code refactoring.
+        - Requires "Term::Choose::LineFold".
+        - Update year copyright.
+
+1.018   2015-12-21
+        - New option to set the default input-file-search-directory.
+        - Update documentation.
+
+1.017   2015-12-15
+        - Create table: options to set the default data type and the name of the id col.
+        - Stable release.
+        - Update documentation.
+
+1.016_07   2015-12-09
+        - SQLite: reconnect to the DB only before dropping or creating a DB.
+
+1.016_06   2015-12-08
+        - SQLite: reconnect to the DB before writing to the DB.
+        - Code refactoring.
+        - Minimum version "Term::Choose::Util" is "0.027".
+        - Filename: choose instead of reading.
+
+1.016_05   2015-12-06
+        - Bugfix: UPDATE after INSERT: only inserted cols for UPDATE.
+        - Code refactoring.
+        - Update documentation.
+
+1.016_04   2015-12-01
+        - SELECT: add "$sth->finish()" where no rows are fetched.
+        - Code refactoring.
+
+1.016_03   2015-11-27
+        - Update module "CreateTable".
+        - Minimum version "Term::TablePrint" is "0.025".
+
+1.016_02   2015-11-26
+        - Removed "\K" - not available before 5.10.
+        - Fixed bug in backwards-compatibility-code.
+
+1.016_01   2015-11-23
+        - SQLite: new feature "create table" and "drop table".
+        - Code refactoring.
+        - Update documentation.
+
+1.016   2015-11-10
+        - Update Insert-package.
+        - Code refactoring and cleanup.
+        - Update documentation.
+
+1.015   2015-11-08
+        - Update Insert-package.
+        - Removed the "location of the configuration directory has changed"-message.
+        - Update documentation.
+
+1.014   2015-08-17
+        - Raised "Term::TablePrint" minimum version to "0.024".
+
+1.013   2015-08-17
+        - Removed support for the plugin api version "1.3".
+        - The option "Table rows" has now 3 different settings instead of 2. The default behavior has changed.
+
+1.012   2015-04-13
+        - New dependency "File::Which";
+        - config dir is $XDG_CONFIG_HOME if which( xdg-user-dir ).
+        - the config dir is now called "db_browser" instead of "db_browser_conf".
+        - Update documentation.
+
+1.011   2015-03-28
+        - "Term::ReadLine::Simple" minimum version "0.300".
+
+1.010   2015-03-25
+        - Refactoring options.
+        - Removed dependency on "File::Slurp" [RT #103037 - Karen Etheridge (ETHER)].
+        - "Term::Choose::Util" minimum version "0.025".
+        - Update documentation.
+
+1.009   2015-03-19
+        - "Term::ReadLine::Simple" minimum version "0.208".
+        - Code refactoring.
+
+1.008   2015-02-25
+        - New plugin api (1.4).
+        - Removed support for the plugin api version "1.1" and "1.2".
+        - Bugfix "Database settings": display the global setting if database specific setting is undefined.
+        - Update documentation.
+
+1.007   2015-02-23
+        - Do not offer "Insert", "Update", "Delete" when not supported (union, join).
+        - Update documentation.
+
+1.006   2015-02-16
+        - Code refactoring (join alias tables/idx).
+
+1.005   2015-02-14
+        - Re-enable "AutoCommit" because no "commit"s in db plugins (where required: "begin_work" disables "AutoCommit" automatically).
+
+1.004   2015-02-11
+        - JOIN: add the tablename to the column names.
+
+1.003   2015-02-06
+        - Bugfix option "mouse".
+        - Support Debug plugin.
+        - Update "INSERT" menu.
+        - Update documentation.
+
+1.002   2015-02-03
+        - Bugfix options.
+        - DB plugins: "AutoCommit" to 0.
+
+1.001   2015-01-31
+        - Read db configuration file if db_plugin settings have changed.
+        - Bugfix options insert.
+        - Code refactoring.
+        - Update documentation.
+
+0.999   2015-01-29
+        - Changed available operators.
+        - Handle missing "sql_regexp" and "concatenate" method.
+        - Code refactoring.
+
+0.998   2015-01-28
+        - Bugfix in"App::DBBrowser::DB::SQLite" (search directories).
+        - Code refactoring (schema).
+
+0.997   2015-01-27
+        - Bugfix in LIMIT;
+        - Don't ask to choose if only one database.
+        - Code refactoring.
+        - Plugin API version 1.3.
+        - Update documentation.
+
+0.996   2015-01-25
+        - Code refactoring.
+        - Update documentation.
+
+0.995   2015-01-22
+        - Removed option "sssc_mode".
+        - Update documentation.
+
+0.994   2015-01-22
+        - Bugfixes database setting default values.
+        - Bugfixes in "__read_config_files" and "__write_config_files".
+        - Plugin API version 1.2.
+        - Code refactoring.
+        - Update documentation.
+
+0.993   2015-01-09
+        - Bugfix: Table/hidden menu.
+        - Plugin API version 1.1.
+        - Code refactoring.
+        - Update documentation.
+
+0.992   2015-01-04
+        - Bugfix: "sssc_mode" in "Insert".
+        - Bugfix: column menu in "union".
+        - New plugin method "plugin_api_version".
+        - Removed option "Input filter" (now always enabled).
+        - Code refactoring.
+        - Update documentation.
+
+0.991   2014-12-24
+        - Bugfix in hidden menu.
+        - Use 'catfile' to build the glob pattern for the search of the installed db drivers.
+        - Code refactoring.
+
+0.990   2014-12-22
+        - SQLite: @ARGV are now databases instead of directories.
+        - Bugfix in "prepare_connect_parameter".
+        - Regexp: use different "operators" for case (in)sensitivity instead of an option.
+        - SQLite: move "regexp case sensitivity"-code into the database plugin.
+        - Code refactoring.
+        - Update documentation.
+
+0.049_09   2014-12-21
+        - Code refactoring.
+        - Back to the old plugin name format.
+        - Update documentation.
+
+0.049_08   2014-12-19
+        - Code refactoring.
+        - Changed plugin name format.
+        - Update documentation.
+
+0.049_07   2014-12-18
+        - Code refactoring.
+        - Update documentation.
+
+0.049_06   2014-12-11
+        - Code refactoring.
+        - Update documentation.
+
+0.049_05   2014-12-08
+        - Code refactoring.
+        - Update documentation.
+        - Minimum Perl version "5.8.3".
+        - "Term::TablePrint": minimum version "0.021".
+        - Fixed typo in method name  [github #3 - Ivan Baidakou (basiliscos)].
+
+0.049_04   2014-12-05
+        - Bugfix inf sub "read_json": "JSON::XS" -> "JSON".
+        - "Term::TablePrint": minimum version "0.020".
+        - Minimum Perl version "5.8.9".
+
+0.049_03   2014-12-04
+        - Code refactoring.
+
+0.049_02   2014-12-01
+        - "App::DBBrowser::DB": a module for each driver.
+
+0.049_01   2014-11-29
+        - Code refactoring.
+
+0.049   2014-11-28
+        - Code refactoring.
+        - "Term::Choose-Util" minimum version "0.017".
+
+0.048   2014-11-20
+        - Update documentation.
+        - "Term::Choose" minimum version "1.117".
+
+0.047   2014-11-11
+        - New option "Debug".
+        - Code refactoring.
+        - Update documentation.
+
+0.046_01   2014-11-08
+        - Added file history.
+        - Choose parse module: Textfiles instead of only CSV files.
+        - Update documentation.
+
+0.046   2014-11-07
+        - Support file formats supported by "Spreadsheet::Read".
+        - New dependencies: "Spreadsheet::Read" and "Text::ParseWords".
+        - Code refactoring.
+        - Update documentation.
+
+0.045   2014-10-29
+        - Code refactoring.
+
+0.044_03   2014-10-28
+        - Switched back to "Text::CSV".
+        - Added missing dependency in the "Makefile.PL".
+        - Bugfix.
+        - Update documentation.
+
+0.044_02   2014-10-28
+        - Refactoring input.
+
+0.044_01   2014-10-27
+        - Bugfixes input.
+
+0.044   2014-10-27
+        - Use of "Text::ParseWords" instead of "Text::CSV" to parse rows.
+        - Update documentation.
+
+0.043   2014-10-02
+        - Bugfix "print_error_message" [github #2 - Mark Lawrence].
+        - Don't print all filenames when searching SQLite databases.
+
+0.042   2014-10-01
+        - Handle undefined input filename.
+
+0.041_02   2014-09-29
+        - Insert: additional option to choose single rows.
+        - Modified menu behavior.
+
+0.041_01   2014-09-27
+        - Let "SET" sub-statement behave like similar other sql sub-statements.
+
+0.041   2014-09-26
+        - Code cleanup.
+        - Improved documentation.
+
+0.040_05   2014-09-23
+        - Bugfix row-col filter.
+        - Bugfix temp csv config.
+        - Update menu navigation.
+
+0.040_04   2014-09-23
+        - Update menu navigation.
+        - Update documentation.
+
+0.040_03   2014-09-23
+        - Update "INSERT INTO".
+        - Code refactoring.
+        - Update documentation.
+
+0.040_02   2014-09-20
+        - Bugfix "print_error_message".
+
+0.040_01   2014-09-19
+        - Added experimental sql features (update, delete, insert into).
+        - Update documentation.
+
+0.040   2014-09-03
+        - Menu memory for config and SQL menus.
+        - Replaced "Term::ReadLine::Tiny" with "Term::ReadLine::Simple".
+        - Update documentation.
+
+0.039   2014-08-16
+        - Perl minimum version from "5.10.1" to "5.10.0".
+
+0.038   2014-08-16
+        - Improved documentation.
+
+0.037   2014-07-28
+        - Bugfix: regex case sensitivity setting.
+        - New dependency: "Term::ReadLine::Tiny".
+        - "use JSON" instead of "use JSON::XS".
+        - Update Makefile.PL.
+        - Code refactoring.
+        - Update documentation.
+
+0.036   2014-07-10
+        - Required minimum version of "Term::Choose::Util" is now "0.011".
+        - Update documentation.
+
+0.035_04   2014-07-09
+        - Required minimum version of "Term::Choose::Util" is now "0.010".
+        - Some read line changes.
+        - Update documentation.
+
+0.035_03   2014-07-08
+        - Bugfix in JSON encoding.
+        - Update "Reset".
+        - Code refactoring.
+        - Update documentation.
+
+0.035_02   2014-07-05
+        - Code refactoring.
+        - Fixed option "HELP".
+
+0.035_01   2014-07-04
+        - New configuration file format: each database driver has now its own file.
+        - One option ("Menus") instead of three to set table/schema/database menu memory behavior.
+        - The fetching of the required data for connecting to databases has changed.
+        - Changed "Reset" option.
+        - Required minimum version of "Term::TablePrint" is now "0.013".
+        - Required minimum version of "Term::Choose::Util" is now "0.009".
+
+0.035   2014-06-29
+        - Required minimum version of "Term::Choose::Util" is now "0.008".
+        - New option to set the default directories where "db-browser" searches for SQLite databases.
+        - Update documentation.
+
+0.034   2014-06-18
+        - Bugfix in LIMIT-submenu.
+        - Update documentation.
+
+0.033   2014-06-15
+        - Raised the required minimum version of "Term::TablePrint" and "Term::Choose::Util".
+        - Changed the layout of the "Path" output.
+        - Fixed: a change of the setting of the option "mouse" is immediately effective.
+
+0.032   2014-05-30
+        - Printing the table header on each page is not enabled by default.
+
+0.031   2014-05-28
+        - Fixed bug in the option code.
+
+0.030   2014-05-28
+        - Added an option to reset the database specific settings back to "Database defaults".
+        - Code refactoring.
+        - Update documentation.
+
+0.029_02   2014-05-25
+        - Fixed option "Binary Filter".
+        - Removed the extra code which moved "YES" before "NO".
+        - Code refactoring.
+        - Update documentation.
+
+0.029_01   2014-05-21
+        - Each package has now its own file.
+        - Renamed the option "Expand" to "Enchant"
+        - Added the option "Table Header" in "Enchant".
+        - Update documentation.
+
+0.029   2014-05-05
+        - Parentheses: the user can choose if the parentheses menu entry is located before or after the column names.
+        - Update documentation.
+
+0.028   2014-04-28
+        - Bugfix documentation.
+
+0.027   2014-04-28
+        - Improved documentation.
+
+0.026   2014-04-28
+        - Improved documentation.
+
+0.025   2014-04-26
+        - SQL menu entry "COLUMNS" is now called "SELECT".
+        - Code refactoring.
+        - Improved documentation.
+
+0.024   2014-04-21
+        - Bugfix in "backup_in_hidd".
+        - It is possible now also with "GROUP BY" to choose more than one column at once.
+        - Update documentation.
+
+0.023   2014-04-10
+        - Update documentation.
+
+0.022   2014-03-24
+        - Update "ALL TABLES" in UNION.
+        - Mininum version of "Term::TablePrint" is now 0.005.
+        - Update Makefile.PL
+
+0.021   2014-03-22
+        - Bugfix in UNION.
+        - New: "ALL TABLES" in UNION.
+
+0.020   2014-03-21
+        - Rewritten in OO style.
+        - Outsourced code to "Term::Choose::Util".
+
+0.019   2014-03-08
+        - "COLUMNS": it is now possible to choose more than one column at once for the "SELECT" statement (experimental).
+        - Update documentation.
+
+0.018   2014-03-07
+        - "App::DBBrowser" requires "Term::Choose" version 1.100 or higher.
+        - Outsourced the table print function in its own module: "Term::TablePrint".
+        - Code refactoring.
+
+0.017   2014-02-19
+        - Added new option "ENV DBI" which allows the use of DBI_USER and DBI_PASS to login.
+        - Removed the option "Default user".
+        - Removed the option "Separator"
+        - "pg_enable_utf8" can always be set to "auto" (with "DBD::Pg" < 3.0.0 "auto" is mapped to "enabled").
+        - Use "FinBin" the get the path of the program.
+        - Code refactoring.
+        - Update documentation.
+
+0.016   2014-02-08
+        - Bugfix and update in setting "pg_enable_utf8".
+
+0.015   2014-02-07
+        - Fixed bug in "search SQLite databases".
+        - "pg_enable_utf8" can be set to "auto" if "DBD::Pg" >= 3.x.x.
+        - Added release test "year_copyright.t".
+        - Update documentation.
+
+0.014   2014-02-04
+        - Detect encodings.
+        - Refactoring system/meta filter.
+        - Added LICENSE file.
+        - Improved documentation.
+
+0.013   2014-01-28
+        - Scalar functions applicable also to "GROUP BY" columns.
+
+0.012   2014-01-27
+        - "SQLite" is selected if @ARGV.
+        - Added support for MSWin32 OS.
+
+0.011   2014-01-24
+        - The "mouse mode" is now already effective in the "option" menu.
+        - Option "login": removed the choice "for every connection".
+        - Update license.
+        - Update documentation.
+
+0.010   2014-01-20
+        - Removed experimental typecast (Pg - aggregate).
+        - Keep track of the terminal width instead of using "SIGWINCH".
+        - Adapted "db-browser" to the new "Term::Choose" (version 1.070): "choose" has now set no "limit" by default.
+        - "sql_regex": typecast to "text" for "Pg".
+        - Bugfix: if "select" is empty when leaving "aggregate" or "group by" set "select_type" to "*".
+        - If a field contains a reference replace the reference with the reference type plus ' REF'.
+        - Code refactoring.
+
+0.009   2014-01-16
+        - New option "Parentheses". Enable parentheses in "WHERE" or/and "HAVING TO" clause.
+        - New database options to set "host" and "port" (untested).
+        - Bugfix: quoting alias in "aggregate" with "quote_identifier" instead of "quote".
+        - Experimental: typecast to "numeric" in aggregate function if driver is 'Pg'.
+        - Hidden: added function "BIT_LENGTH" and "CHAR_LENGTH".
+        - Updated documentation.
+
+0.008   2014-01-12
+        - Added link to the GitHub repo "App-DBBrowser".
+        - Code refactoring.
+
+0.007   2014-01-11
+        - Bugfixed undefined "sqlite_master" primary and foreign keys by replacing in "primary_and_foreign_keys" the parsing of "sqlite_master" with "pragma foreign_key_list(table)".
+        - Bugfix: regexp for SQLite systemtables from "/sqlite/i" to "/sqlite_/i".
+        - Changed application directory: from "$HOME/.db_browser_conf" to "File::HomeDir->my_data/db_browser_conf".
+        - Added option "Path" which shows the path of the "db-browser" and the application directory.
+        - Code update of limit "Max Rows".
+        - Updated documentation.
+
+0.006   2014-01-07
+        - Bugfix: reset cached data if db settings have changed.
+        - Code refactoring and update - e.g. move db-specific code in the db-section; add "WHERE 1 = 0" to the "SELECT" query where only the column names are needed.
+        - Improved documentation.
+
+0.005   2014-01-06
+        - Bugfix.
+        - Code update and refactoring.
+        - Improved documentation.
+
+0.004   2014-01-05
+        - Changed some error handling.
+        - Code clean up and refactoring.
+        - Improved documentation.
+
+0.003   2014-01-04
+        - Fixed documentation.
+
+0.002   2014-01-04
+        - Code clean up.
+
+0.001   2014-01-04
+        - First release on CPAN.

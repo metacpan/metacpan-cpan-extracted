@@ -1,0 +1,51 @@
+Revision history for the Perl MegaHAL extension.
+
+0.08 = 0.07_01 2015-04-12
+
+0.07_01   Apr 14 2012
+        - mention Hailo.pm in docs
+        - use 'unsigned int' as 32 bit data type
+        - mingw64 supported
+
+0.07 = 0.06_01 Jul 12 2008
+0.06_01   Jan 24 2008
+        - corrected documentation (typo found by ZOFFIX)
+        - void megahal_learn by Craig Andrews
+        - Mac Darwin compatibility
+
+0.06 = 0.05_01 Nov 26 2007
+0.05_01   Mar 11 2007
+        - libmegahal.c/execute_command, free_words, etc:
+           change register int to unsigned int
+        - tests moved to t/test.t
+        - pod.t
+
+0.05 = 0.04_02 Feb 08 2007
+0.04_02   Jan 31 2007
+        - Removed inclusion of <getopt.h> in libmegahal.c
+
+0.04_01   Oct 03 2006
+new maintainer: Alexandr Ciornii
+        - Integrated my patch to compile under Mingw and MSVC
+        - Submitted this patch for C library.
+          See https://alioth.debian.org/tracker/index.php?func=detail&aid=303914&group_id=30393&atid=410992
+        - License (GPL from C library)
+        - META.yml
+        - Fix compilation error under FreeBSD. Tested on FreeBSD 5.4.
+
+0.04  Thu Jan 22 21:09:18 PST 2004
+	- Moved from MegaHAL -> AI::MegaHAL namespace
+	- Included sources from the MegaHAL distribution - should no longer
+	  have to download and install as a separate shared library.
+
+0.03  Sat Feb  3 17:01:32 2001
+	- Minor fix for a warning that I apparently didn't notice in 0.02
+          (Still involving the 'our' reserved word.)
+
+0.02  Thu Jan 25 10:19:23 2001
+	- Fixed a bug in MegaHAL.pm which prevented compilation under
+	  perl 5.005_03.  (As reported by Mark Symonds.)
+
+0.01  Thu Nov 16 20:29:21 2000
+	- Original version.
+

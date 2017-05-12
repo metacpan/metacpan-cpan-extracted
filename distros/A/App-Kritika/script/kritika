@@ -1,0 +1,93 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::Kritika;
+use App::Kritika::Settings;
+
+my ($file) = @ARGV;
+die "Usage: <file>\n" unless $file && -f $file;
+
+my $settings = App::Kritika::Settings->new(file => $file)->settings;
+
+my $kritika = App::Kritika->new(%$settings);
+
+my $report = $kritika->validate($file);
+
+foreach my $issue (@$report) {
+    $issue->{col_no} //= 1;
+    print "$file:$issue->{line_no}:$issue->{col_no}: [$issue->{profile}/$issue->{rule}] $issue->{message}\n";
+}
+
+__END__
+
+=head1 NAME
+
+kritika - integrate with kritika.io
+
+=head1 SYNOPSIS
+
+    kritika lib/MyFile.pm
+
+=head1 DESCRIPTION
+
+This command allows you to quickly analyze file using L<https://kritika.io> service. Normally C<kritika.io> analyzes
+your repository after the push, but of course sometimes you would like to know if something's wrong before doing
+a commit.
+
+This command easily integrates with text editors.
+
+=head1 CONFIGURATION
+
+A special file C<.kritikarc> has to be placed in the root directory of the project with the following configuration:
+
+    # This is the default, if you're using public Kritika service this option is not needed
+    base_url=https://kritika.io
+
+    # This is your repository token that you can obtain from the repository integrations page on kritika.io
+    token=deba194179c1bdd7fca70724d57d85a7ed8d6dbe
+
+If you want to force project root, use C<root> option:
+
+    root=/path/to/my/project
+
+=head1 TEXT EDITORS
+
+C<kritika> produces text output by default. This can be parsed by editors that support error reporting.
+
+=head2 Vim
+
+You can either manually call kritika from C<vim>:
+
+    :!kritika %
+
+Or use a C<compiler> plugin L<https://github.com/kritikaio/vim-kritika>.
+
+    :compiler kritika
+    :Kritika
+
+=head2 SublimeText3
+
+See L<https://github.com/kritikaio/SublimeLinter-kritika> plugin.
+
+=head1 DEVELOPMENT
+
+=head2 Repository
+
+    http://github.com/kritikaio/app-kritika
+
+=head1 CREDITS
+
+=head1 AUTHOR
+
+Viacheslav Tykhanovskyi, C<vti@cpan.org>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017, Viacheslav Tykhanovskyi
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=cut

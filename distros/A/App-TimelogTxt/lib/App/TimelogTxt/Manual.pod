@@ -1,0 +1,289 @@
+=head1 NAME
+
+App::TimelogTxt::Manual - Overview of the L<App::TimelogTxt> modules and
+C<timelog> application.
+
+=head1 VERSION
+
+This manual applies to L<App::TimelogTxt> version 0.22.
+
+=head1 INTRODUCTION
+
+In a job a long time ago, I found that I would regularly reach the end of a
+long, tiring day and have no idea what I had done. Just as regularly, I found
+that my most important projects were not progressing very rapidly. Many people
+find themselves in the same position. I decided to do something about it, I
+found an application on the Palm that tracked Clients, Projects, and Tasks (as
+well as mileage and expenses) called TEAK.
+
+I started tracking everything I did at work. After a few days, I had identified
+many of the interruptions that prevented me from making progress. I had also
+noted that some of my busiest, yet least productive days were almost all
+interruptions. I used this information to improve my work and to keep people
+updated with why my various projects were not progressing as expected. When I
+needed to make faster progress, I had the data to help my manager redirect the
+worst of the interruptions.
+
+=head2 The Need for Change
+
+This was wonderful. Unfortunately, the Palm platform did not survive in the
+market. I continued to keep my Palm functional partially to use TEAK. But, I
+eventually had to admit that I could not rely on my Palm to continue. By this
+time I had an Android smart phone and I figured it would be pretty easy to find
+something to replace TEAK. No such luck.
+
+I had been using Gina Trapani's Todo.txt program for a while at this point.
+It's main feature is the simplicity of its file format:
+
+=over 4
+
+=item * 
+
+One entry per line
+
+=item *
+
+pure text
+
+=item *
+
+minimal formatting
+
+=back
+
+I decided that this would be a better basis for a new time logging program than
+some binary format. So I wrote a quickie Perl script to allow me to start and
+stop task timers and to generate simple reports.
+
+As I used the program, I found other commands and reports that could be useful.
+In the end, it was obvious that this tool needed to be cleaned up a re-written.
+This module is the result of that rewrite.
+
+=head1 The C<timelog> Program
+
+The C<timelog> program is how you manipulate your time log and generate
+reports. The program is executed with a command and optional arguments.
+
+=head1 Supported Commands
+
+The C<timelog> program supports a number of commands that manipulate or report
+on the time logged by the program.
+
+=head2 Adding Events
+
+The commands you will use the most involve adding events to the time log. The
+string C<{event description}> is a text string that may have a I<+project> and/or
+a I<@task>. The first string of non-whitespace characters beginning with a 'C<+>'
+is treated as the I<project> for this event. The project is only relevant when
+using the reporting commands. Likewise, the first string of non-whitespace
+characters beginning with a 'C<@>' is treated as a task.
+
+If an event has no task, the non-project part of the event is treated as the
+task. Otherwise, the non-project, non-task part of the event is treated as
+detail information for the event.
+
+=over 4
+
+=item  start {event description}
+     
+Stop the current event and start timing a new event. Since C<timelog> only
+tracks one event at a time, the current event is always stopped when starting
+a new event.
+
+=item stop
+
+Stop timing the current event.
+
+=item push {event description}
+
+Save the current event on stack and start timing new event. The current event
+is saved in the stack file in the timelog directory. You can manipulate the
+saved event with B<pop> or B<drop>.
+
+=item pop
+
+Stop the current event and restart top event on stack. This also removes the
+event from the stack.
+
+=item drop [all|{n}]
+
+Drop one or more events from top of event stack. If no arguments are supplied,
+only the top item is dropped. If the argument is a number, that number of
+events is dropped from the stack. If the argument I<all> is supplied, the stack
+is cleared.
+
+=back
+
+=head2 Reporting
+
+The reporting commands generate a report of information from the timelog files.
+Many of these commands accept a I<date> or pair of I<date>s. The date is
+normally expected to be of the form C<YYYY-MM-DD>. However, a small number
+of shortcuts are also allowed.
+
+The strings 'I<today>' and 'I<yesterday>' resolve to the obvious date. The days
+of the week are also allowed, each resolves to that day of the week prior to the
+current day. If the current day is Wednesday, I<monday> resolves to two days ago,
+and I<thursday> resolves to six days ago.
+
+Any time you supply a pair of dates, the second must be later in time than the
+first.
+
+The reporting commands are:
+
+=over 4
+
+=item hours [date [end date]]
+
+Display the hours worked for each of the appropriate days.
+
+=item ls [date]
+
+List events for the specified day. Default to today.
+
+=item lsproj
+
+List known projects, one per line.
+
+=item lstk
+
+Display items on the stack. The top event on the stack is the one that is
+resumed by the B<pop> command.
+
+=item report [date [end date]]
+
+Display a report for the specified days.
+
+This report is grouped by day, with each project grouped under the day.
+Each event for a project is displayed under the project. Accumulated times are
+displayed for each project and day.
+
+=item summary [date [end date]]
+
+Display a summary of the appropriate days' projects.
+
+For each day, the list of projects active during that day is shown along with
+the aggregate time spent on that project.
+
+=back
+
+=head2 Other Commands
+
+The remaining commands do not necessarily fit into one of the other categories.
+
+=over 4
+
+=item init [dir]
+
+Prepare the system for use with C<timelog>. First, it creates the directory
+where timelog stores its information, if that directory does not already exist.
+Then, the command creates and initializes the F<.timelogrc> configuration file,
+in the user's home directory, with the information needed to run.
+
+=item edit
+
+Open the timelog file in the current editor. The editor can be specified in the
+configuration file. If no editor is specified in the configuration, the program
+uses the value of the C<VISUAL> environment variable. If C<VISUAL> has no value,
+then the value of C<EDITOR> is used instead. If neither environment variable has
+a value, then the program defaults to C<vim>
+
+=item shell
+     
+Execute commands as entered until quit.
+
+This command starts an interactive mode where each line typed is a new command
+to C<timelog>. Each string entered is just like the C<timelog> command line,
+without the program name.
+
+This mode continues in effect until you enter the string C<quit> on a line by
+itself.
+
+=item hint [command|alias]
+
+A list of commands and/or aliases. The I<hint> command is mostly intended as a
+quick syntax or command name reminder.
+
+With no arguments, you get a list of the commands and aliases, one per line.
+The commands are listed with simple usage information. Each alias is listed
+with its definition.
+
+Calling I<hint> with an argument of 'I<commands>' lists the hint information
+for just the commands. Calling I<hint> with an argument of 'I<aliases>' lists
+the hint information for just the aliases.
+
+Any other argument is looked up in the command list and then the alias list and
+the first matching item is displayed.
+
+=item help [command|alias]
+
+Display help about commands and/or aliases. The I<help> command gives more
+detailed help about the command or alias.
+
+With no arguments, you get a list of the commands and aliases, each with its
+associated help text. The commands are each listed as a usage line with some
+explanatory text. Each alias is listed with its definition.
+
+Calling I<help> with an argument of 'I<commands>' lists the help information
+for just the commands. Calling I<help> with an argument of 'I<aliases>' lists
+the help information for just the aliases.
+
+Any other argument is looked up in the command list and then the alias list and
+the first matching item is displayed.
+
+=back
+
+=head1 Configuration
+
+The C<timelog> program uses the file F<~/.timelogrc> if it exists.
+
+The configuration file is expected to contain data in two major parts:
+
+=head2 General Configuration
+
+The first section defined general configuration information in a key=value
+format. The recognized keys are:
+
+=over 4
+
+=item editor
+
+The editor to use when opening the timelog file with the C<edit> command.
+If not specified, it will use the value of either the VISUAL or EDITOR
+environment variables. If non are found, it will default to C<vim>.
+
+=item dir
+
+The directory in which to find the timelog data files. Defaults to the
+C<timelog> directory in the user's home directory.
+
+=item defcmd
+
+The default command to by used if none is supplied to timelog. By default,
+this is the 'B<stop>' command.
+
+=back
+
+=head2 Command Aliases
+
+The configuration file may also contain an 'C<[alias]>' section that defines
+command aliases. Each alias is defined as a C<shortname=expanded string>.
+
+For example, if you regularly need to make entries for reading email and
+triaging bug reports you might want the following in your configuration.
+
+  [alias]
+    email = start +Misc @Email
+    triage = start +BugTracker @Triage
+
+=head1 AUTHOR
+
+G. Wade Johnson  C<< <gwadej@cpan.org> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2013, G. Wade Johnson C<< <gwadej@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+

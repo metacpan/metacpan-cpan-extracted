@@ -1,0 +1,22 @@
+# Turkish translations for hello messages.
+# Copyright (C) 2001 Free Software Foundation, Inc.
+# Nilgün Belma Bugüner <nilgun@fide.org>, 2001.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: hello 2.0.50\n"
+"POT-Creation-Date: 2002-05-22 19:23+0200\n"
+"PO-Revision-Date: 2002-02-07 10:04+0200\n"
+"Last-Translator: Nilgün Belma Bugüner <nilgun@fide.org>\n"
+"Language-Team: Turkish <gnu-tr-u12a@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 0.9.5\n"
+
+msgid "hello, world\n"
+msgstr "merhaba, dünya\n"
+
+msgid "Hello, world!"
+msgstr "Merhaba, dünya!"
+

@@ -1,0 +1,56 @@
+=head1 NAME
+
+fromsam
+
+=head1 USAGE
+
+    Usage: recs fromsam <args> [<files>]
+       Each line of input (or lines of <files>) is parsed as a SAM (Sequence
+       Alignment/Map) formatted record to produce a recs output record. To parse a
+       BAM file, please pipe it from `samtools view file.bam` into this command.
+    
+       The output records will contain the following fields:
+    
+          qname flag rname pos mapq cigar rnext pnext tlen seq qual
+    
+       Additional optional SAM fields are parsed into the "tag" key, which is a hash
+       keyed by the SAM field tag name. The values are also hashes containing a
+       "type" and "value" field. For example, a read group tag will end up in your
+       record like this:
+    
+          tags => {
+            RG => {
+              type  => "Z",
+              value => "...",
+            }
+          }
+    
+       Refer to the SAM spec for field details: http://samtools.github.io/hts-
+       specs/SAMv1.pdf
+    
+    Arguments:
+       --flags                      Decode flag bitstring into a "flags" hashref
+       --quals                      Decode qual string into a "quals" array of
+                                    numeric values
+       --filename-key|fk <keyspec>  Add a key with the source filename (if no
+                                    filename is applicable will put NONE)
+    
+      Help Options:
+          --help  This help screen
+    
+    Examples:
+       Parse SAM and calculate average mapping quality:
+          recs fromsam input.sam | recs collate -a avg,mapq
+       Parse BAM:
+          samtools view input.bam | recs fromsam
+       Parse SAM pre-filtered by read group:
+          samtools view -r SAMPLE-1234 input.sam | recs fromsam
+       The same, but probably slower:
+          recs fromsam input.sam | recs grep '{{tag/RG/value}} eq "SAMPLE-1234"'
+
+=head1 SEE ALSO
+
+L<App::RecordStream::Bio>
+
+=cut
+

@@ -1,0 +1,74 @@
+---
+abstract: 'operating chromosome runlist files'
+author:
+  - 'Qiang Wang <wang-q@outlook.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-RL
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::RL:
+    file: lib/App/RL.pm
+    version: v0.2.32
+  App::RL::Command::combine:
+    file: lib/App/RL/Command/combine.pm
+  App::RL::Command::compare:
+    file: lib/App/RL/Command/compare.pm
+  App::RL::Command::cover:
+    file: lib/App/RL/Command/cover.pm
+  App::RL::Command::coverage:
+    file: lib/App/RL/Command/coverage.pm
+  App::RL::Command::genome:
+    file: lib/App/RL/Command/genome.pm
+  App::RL::Command::merge:
+    file: lib/App/RL/Command/merge.pm
+  App::RL::Command::position:
+    file: lib/App/RL/Command/position.pm
+  App::RL::Command::some:
+    file: lib/App/RL/Command/some.pm
+  App::RL::Command::span:
+    file: lib/App/RL/Command/span.pm
+  App::RL::Command::split:
+    file: lib/App/RL/Command/split.pm
+  App::RL::Command::stat:
+    file: lib/App/RL/Command/stat.pm
+  App::RL::Command::stat2:
+    file: lib/App/RL/Command/stat2.pm
+  App::RL::Common:
+    file: lib/App/RL/Common.pm
+requires:
+  AlignDB::IntSpan: v1.0.7
+  App::Cmd: '0.330'
+  IO::Zlib: '0'
+  IPC::Cmd: '0'
+  List::Util: '0'
+  Path::Tiny: '0.076'
+  Set::Scalar: '1.29'
+  Tie::IxHash: '1.23'
+  YAML::Syck: '1.29'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/wang-q/App-RL/issues
+  homepage: https://github.com/wang-q/App-RL
+  repository: git://github.com/wang-q/App-RL.git
+version: 0.2.32
+x_contributors:
+  - 'Qiang Wang <wang-q@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.014'

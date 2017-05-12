@@ -1,0 +1,97 @@
+# Integer or named level
+severity  = 5
+# Zero or One
+only      = 1
+# Zero or One
+force     = 0
+# Integer or format spec
+verbose   = 4
+# A positive integer
+top       = 50
+# A theme expression
+theme     = (pbp || security) && bugs
+# Space-delimited list
+include   = NamingConventions ClassHierarchies
+# Space-delimited list
+exclude   = Variables  Modules::RequirePackage
+# Zero or One
+criticism-fatal = 1
+# Zero or One
+color     = 1
+# Zero or One
+allow-unsafe = 1
+# pager to pipe output to
+pager     = less
+
+[Perl::Critic::Policy::Variables::RequireLexicalLoopIterators]
+severity = 4
+# set_themes = foo bar
+# add_themes = baz
+# maximum_violations_per_document = 57
+# arg1 = value1
+# arg2 = value2
+
+[Perl::Critic::Policy::Bangs::ProhibitBitwiseOperators]
+severity = 4
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitSleepViaSelect]
+severity = 4
+
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitStringyEval]
+severity = 4
+
+[Perl::Critic::Policy::BuiltinFunctions::RequireGlobFunction]
+severity = 4
+
+[Perl::Critic::Policy::ClassHierarchies::ProhibitOneArgBless]
+severity = 4
+
+[Perl::Critic::Policy::ControlStructures::ProhibitMutatingListFunctions]
+severity = 4
+
+[Perl::Critic::Policy::InputOutput::ProhibitBarewordFileHandles]
+severity = 4
+
+[Perl::Critic::Policy::InputOutput::ProhibitInteractiveTest]
+severity = 4
+
+[Perl::Critic::Policy::InputOutput::ProhibitTwoArgOpen]
+severity = 4
+
+[Perl::Critic::Policy::InputOutput::RequireEncodingWithUTF8Layer]
+severity = 4
+
+[Perl::Critic::Policy::Modules::ProhibitEvilModules]
+severity = 4
+
+[Perl::Critic::Policy::Modules::RequireBarewordIncludes]
+severity = 4
+
+[Perl::Critic::Policy::Modules::RequireFilenameMatchesPackage]
+severity = 4
+
+[Perl::Critic::Policy::Subroutines::ProhibitExplicitReturnUndef]
+severity = 4
+
+[Perl::Critic::Policy::Subroutines::ProhibitNestedSubs]
+severity = 4
+
+[Perl::Critic::Policy::Subroutines::ProhibitReturnSort]
+severity = 4
+
+[Perl::Critic::Policy::Subroutines::ProhibitSubroutinePrototypes]
+severity = 4
+
+[Perl::Critic::Policy::TestingAndDebugging::ProhibitNoStrict]
+severity = 4
+
+[Perl::Critic::Policy::TestingAndDebugging::RequireUseStrict]
+severity = 4
+
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitLeadingZeros]
+severity = 4
+
+[Perl::Critic::Policy::Variables::ProhibitConditionalDeclarations]
+severity = 4
+
+

@@ -1,0 +1,13 @@
+Revision history for App::wu
+
+0.04    2015-04-22
+        - Changed location capture to command line arg
+        - Changed ownership to DFARRELL
+
+0.02    2015-01-09
+        - Added more graceful / helpful error handling
+        - Updated location text
+
+0.01    2014-09-11
+        - Initial build
+

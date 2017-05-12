@@ -1,0 +1,13 @@
+DESCRIPTION
+
+    This distribution includes a few utility scripts related to
+    Perinci::CmdLine modules family.
+
+    #INSERT_EXECS_LIST
+
+SEE ALSO
+
+    Perinci
+
+    App::PerinciUtils
+

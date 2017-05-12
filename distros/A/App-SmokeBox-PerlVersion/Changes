@@ -1,0 +1,95 @@
+==================================================
+Changes from 2008-09-30 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.16 at 2013-09-29 15:18:22 +0000
+-----------------------------------------
+
+  Change: 5aa387de3db05d1c811d67f71a9e6459f32b9d4e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-29 16:18:22 +0000
+
+    Capture the OS version string as well (osvers) 
+
+-----------------------------------------
+version 0.14 at 2013-09-27 18:02:36 +0000
+-----------------------------------------
+
+  Change: b578c1a0f33be86304737b9a27b72b436f1063f4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-27 19:02:36 +0000
+
+    Bump version to fix compile test 
+
+-----------------------------------------
+version 0.12 at 2013-09-15 12:17:31 +0000
+-----------------------------------------
+
+  Change: 115511afc5d0e095fdaf4ac32bdf311e2274a812
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-15 13:17:31 +0000
+
+    Remove use of POE::Quickie and just use POE::Wheel::Run 
+
+-----------------------------------------
+version 0.10 at 2013-08-26 19:16:22 +0000
+-----------------------------------------
+
+  Change: 556de0b0b3a15ce790e8c9caf1d30a7489e996e2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-08-26 20:16:22 +0000
+
+    Refactored the internals to gather version and archname in a better
+    way 
+
+-----------------------------------------
+version 0.08 at 2010-09-26 20:20:51 +0000
+-----------------------------------------
+
+  Change: 91d9d7ea3b8db6cae6ba85b27bcb51591a56c284
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-26 21:20:51 +0000
+
+    Hold a refcount open for requesting sessions. 
+
+-----------------------------------------
+version 0.06 at 2010-09-21 19:58:04 +0000
+-----------------------------------------
+
+  Change: 3a045e903d1fc3de7dad798d7f732a5e1148cf88
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-21 20:58:04 +0000
+
+    Amended the regex to take into account blead git-built perls, thanks
+    to Andreas 
+
+-----------------------------------------
+version 0.04 at 2010-09-21 11:57:20 +0000
+-----------------------------------------
+
+  Change: a7350804d2d3af0e74a5b818428dd6fae7f9506d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-21 12:57:20 +0000
+
+    Add more diag output to the tests 
+
+-----------------------------------------
+version 0.02 at 2010-09-20 22:29:13 +0000
+-----------------------------------------
+
+  Change: ddfa282974fea8aaf2c547931c18eb10fa80d26e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-20 23:29:13 +0000
+
+    Added tests and documentation including SYNOPSIS 
+
+  Change: 858f14a54f6b0cf9c8445d67d86ba7c7ad82f9ad
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-09-20 22:54:26 +0000
+
+    Ho-Hum 
+
+================
+End of releases.
+================

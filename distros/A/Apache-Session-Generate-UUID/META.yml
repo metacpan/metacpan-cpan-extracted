@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Apache-Session-Generate-UUID
+version: 0.2
+author:
+  - Nick Gerakines <nick@socklabs.com>
+abstract: UUID for session ID generation
+license: perl
+generated_by: Module::Build version 0.2612, without YAML.pm

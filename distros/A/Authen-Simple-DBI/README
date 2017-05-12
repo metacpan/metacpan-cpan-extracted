@@ -1,0 +1,83 @@
+NAME
+    Authen::Simple::DBI - Simple DBI authentication
+
+SYNOPSIS
+        use Authen::Simple::DBI;
+    
+        my $dbi = Authen::Simple::DBI->new(
+            dsn       => 'dbi:SQLite:dbname=database.db',
+            statement => 'SELECT password FROM users WHERE username = ?'
+        );
+    
+        if ( $dbi->authenticate( $username, $password ) ) {
+            # successfull authentication
+        }
+    
+        # or as a mod_perl Authen handler
+
+        PerlModule Apache::DBI
+        PerlModule Authen::Simple::Apache
+        PerlModule Authen::Simple::DBI
+
+        PerlSetVar AuthenSimpleDBI_dsn       "dbi:SQLite:dbname=database.db"
+        PerlSetVar AuthenSimpleDBI_statement "SELECT password FROM users WHERE username = ?"
+
+        <Location /protected>
+          PerlAuthenHandler Authen::Simple::DBI
+          AuthType          Basic
+          AuthName          "Protected Area"
+          Require           valid-user
+        </Location>
+
+DESCRIPTION
+    DBI authentication.
+
+METHODS
+    * new
+        This method takes a hash of parameters. The following options are
+        valid:
+
+        * dsn   Database Source Name. Required.
+
+                    dsn => 'dbi:SQLite:dbname=database.db'
+                    dsn => 'dbi:mysql:database=database;host=localhost;'
+
+        * statement
+                SQL statement. The statement must take a single string
+                argument (username) and return a single value (password).
+                Required.
+
+                    statement => 'SELECT password FROM users WHERE username = ?'
+
+        * username
+                Database username.
+
+                    username => 'username'
+    
+        * password
+                Database password.
+
+                    password => 'secret'
+
+        * log   Any object that supports "debug", "info", "error" and
+                "warn".
+
+                    log => Log::Log4perl->get_logger('Authen::Simple::DBI')
+
+    * authenticate( $username, $password )
+        Returns true on success and false on failure.
+
+SEE ALSO
+    Authen::Simple.
+
+    Authen::Simple::Password.
+
+    DBI.
+
+AUTHOR
+    Christian Hansen "ch@ngmedia.com"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

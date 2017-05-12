@@ -1,0 +1,23 @@
+.travis.yml
+Changes
+INSTALL
+lib/Alien/pkgconf.pm
+LICENSE
+maint/releaseprep
+maint/travis
+Makefile.PL
+MANIFEST			This list of files
+patch/pkgconf-cygwin-1.2.1.diff
+README
+script/build.pl
+script/clean.pl
+script/extract.pl
+script/fetch.pl
+script/probe.pl
+script/stage.pl
+script/system.pl
+t/00_diag.t
+t/helper.t
+t/xs.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,8 @@
+port: 3000
+inactivity_delay: 30
+services:
+    techblog: webapp.techblog
+CHI:
+    driver: FastMmap
+
+

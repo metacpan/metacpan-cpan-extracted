@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+cpanfile
+dist.ini
+lib/Archive/Any/Create.pm
+lib/Archive/Any/Create/Tar.pm
+lib/Archive/Any/Create/Zip.pm
+t/00_compile.t
+t/01_tar.t
+t/02_zip.t
+t/release-pod-syntax.t

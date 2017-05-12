@@ -1,0 +1,10 @@
+clear
+power on
+regs
+
+op ea
+
+# should be no change except the PC
+regs
+
+save verify_EA.txt

@@ -1,0 +1,90 @@
+[%#
+   Apache2::WebApp::Toolkit - Admin Control Panel (error.tt)
+   Copyright (C) 2010 Marc S. Brooks <mbrooks@cpan.org>
+
+   Licensed under the terms of the BSD License
+   http://www.opensource.org/licenses/bsd-license.php
+-%]
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Internal Server Error</title>
+
+	<meta http-equiv="pragma" content="no-cache" />
+
+	<script type="text/javascript" src="/extras/admin/js/disable.js"></script>
+
+	<style type="text/css">
+		@import url( /extras/admin/css/base.css );
+		@import url( /extras/admin/css/content.css );
+	</style>
+</head>
+<body>
+
+<noscript>
+	<h2>
+		To use this admin you must have a JavaScript-enabled browser
+	</h2>
+</noscript>
+
+
+<!-- page begin -->
+
+<div id="page">
+	<div class="back">
+		<a href="javascript:window.history.go(-1)" title="Back">
+			Back
+		</a>
+	</div>
+
+	<h2 class="title">
+		Internal Server Error
+	</h2>
+
+	<div id="split">
+		<hr></hr>
+	</div>
+</div>
+
+<!-- page end -->
+
+
+<!-- error begin -->
+
+<div id="error">
+
+[% IF output %]
+	<h3>
+		[% title %]
+	</h3>
+
+	[% output %]
+[% ELSE %]
+	The server encountered an unexpected condition which prevented it from fulfilling the request.  Please try one of the following:
+
+	<ul>
+		<li>
+			Click your browser's REFRESH button to try reconnecting to this page.
+		</li>
+		<li>
+			Click your browser's BACK button to return to the previous page.
+		</li>
+		<li>
+			Click <a href="javascript:window.history.go(-1)" title="Back">here</a> to go to the [% apache_domain FILTER upper %] homepage.
+		</li>
+		<li>
+			If you continue to experience this error, contact <a href="mailto:[% project_email %]">Support</a> to report it.
+		</li>
+	</ul>
+[% END %]
+
+</div>
+
+<!-- error end -->
+
+
+</body>
+</html>

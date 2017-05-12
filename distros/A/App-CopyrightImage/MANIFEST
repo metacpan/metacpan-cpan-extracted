@@ -1,0 +1,20 @@
+appveyor.yml
+bin/imgcopyright
+Changes
+doc/install_image_magick.txt
+lib/App/CopyrightImage.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/05-api.t
+t/10-operations.t
+t/data/base.jpg
+t/data/copyr.jpg
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/Testing.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

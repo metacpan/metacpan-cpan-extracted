@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Archive-Tar-Merge
+version:             0.01
+abstract:            Merge two or more tarballs into one
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Archive::Tar::Wrapper:         0.1
+    Digest::MD5:                   0
+    File::Temp:                    0
+    Sysadm::Install:               0.24
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Mike Schilli <cpan@perlmeister.com>

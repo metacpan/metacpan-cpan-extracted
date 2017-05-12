@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+README
+typemap
+Makefile.PL
+mod_icon.c
+mod_icon.h
+Icon.pm
+Icon.xs
+

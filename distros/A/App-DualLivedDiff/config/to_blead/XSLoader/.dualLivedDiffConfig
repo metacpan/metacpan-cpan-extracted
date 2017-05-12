@@ -1,0 +1,5 @@
+---
+files:
+  XSLoader_pm.PL: ext/DynaLoader/XSLoader_pm.PL
+  t/XSLoader.t: ext/DynaLoader/t/XSLoader.t
+

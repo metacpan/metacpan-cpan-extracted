@@ -1,0 +1,6 @@
+Revision history for App-trash-u
+
+0.20     2016-12-27 (PERLANCAR)
+
+         - First release, split from File-Trash-Undoable to reduce dependencies
+           on that dist.

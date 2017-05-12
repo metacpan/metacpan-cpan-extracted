@@ -1,0 +1,8 @@
+Revision history for AnyEvent-EditText
+
+0.2 Tue Apr 29 18:12:39 CEST 2008
+        - actually implemented set_editor
+        - rename to AnyEvent::EditText
+
+0.1 Thu Mar 20 10:18:52 CET 2008
+        - first implementation

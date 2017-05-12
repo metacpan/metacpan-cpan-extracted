@@ -1,0 +1,34 @@
+Revision history for Perl extension Acme::EnclosedChar
+
+0.09    Sat Apr  4 18:34:13 JST 2015
+        - fix synopsis typo(thanks zoffixznet)
+
+0.08    Sat Apr  4 14:04:11 JST 2015
+        - add kwalitee badge
+        - add LICENSE file
+
+0.07    Sat Mar 28 15:06:53 JST 2015
+        - add x_IRC param in META for metacpan
+
+0.06    Sun Nov 16 20:54:41 JST 2014
+        - more works double digit number fine(thanks Thomas)
+
+0.05    Sun Nov 16 11:39:55 JST 2014
+        - refactor
+
+0.04    Sat Nov  8 19:27:42 JST 2014
+
+            commit 6159dda0c36935b8ea579eef0405ebac3e33b939
+            Author: Kent Fredric <kentfredric@gmail.com>
+            Date:   Sat Nov 8 22:32:16 2014 +1300
+
+                Hardcode UTF8 parsed string to avoid Mojibake
+
+0.03    Sat Nov  8 14:32:14 JST 2014
+        - fix garbled META.json manually
+
+0.02    Sat Nov  8 13:45:52 JST 2014
+        - Also encode '-=+*'
+
+0.01    Sat Nov  8 11:53:21 JST 2014
+        - original version

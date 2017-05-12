@@ -1,0 +1,18 @@
+Changes
+check.c
+Makefile.PL
+MANIFEST
+MPC.xs
+ppport.h
+README
+t/0_pod.t
+t/0_pod_coverage.t
+t/1_audio_mpc.t
+t/2_audio_mpc_reader.t
+t/test.mpc
+t/test.wav
+typemap
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Audio/MPC.pm
+META.yml                                 Module meta-data (added by MakeMaker)

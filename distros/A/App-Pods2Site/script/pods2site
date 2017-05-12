@@ -1,0 +1,27 @@
+#! perl
+
+use strict;
+use warnings;
+
+use App::Pods2Site;
+
+$| = 1;
+
+# This is very shallow; just pass @ARGV on to the A::TOT entry point
+#
+exit(App::Pods2Site::main(@ARGV));
+
+__END__
+
+=head1 NAME
+
+pods2site
+
+The command-line entrypoint to App::Pods2Site, a tool that creates a trivial HTML site based on all
+the pods it can find.
+
+For a description of valid options and arguments, see the L<App::Pods2Site::Args> documentation.
+
+For the manual, see L<App::Pods2Site>.
+
+=cut

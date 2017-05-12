@@ -1,0 +1,43 @@
+Audio-GtkGramofile version 0.10
+===============================
+
+Audio::GtkGramofile provides the functionality to enable the enclosed 
+script, gtkgramo. The script gives a Gtk2 front end to the 
+libgramofile library, which allows large .wav files to be split, and 
+then a variety of different signal processing algorithms can be 
+applied to the resultant (smaller) .wav files.
+
+See: http://www.opensourcepartners.nl/~costar/gramofile/ for details of
+Gramofile, upon which this is based.
+
+See: http://sourceforge.net/projects/libgramofile/ for the library
+derived from Gramofile, and Audio::Gramofile.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Audio::Gramofile, Gtk2
+
+CREDITS
+
+Thanks to muppet <scott At asofyet.org> for help with the code in 
+Logic.pm, and Jon Mitchell <jmitchell At messagelabs.com> for help 
+with scrolling windows.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2008 by Bob Wilkinson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.

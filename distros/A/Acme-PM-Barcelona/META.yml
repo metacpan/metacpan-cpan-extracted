@@ -1,0 +1,22 @@
+---
+abstract: 'Talks and projects by Barcelona.pm'
+author:
+  - 'Alex Muntada <alexm@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-PM-Barcelona
+requires:
+  DateTime: '0'
+  DateTime::Event::ICal: '0'
+  DateTime::Set: '0'
+resources:
+  repository: https://github.com/alexm/acme-pm-barcelona.git
+version: '0.05'
+x_serialization_backend: 'YAML::Tiny version 1.69'

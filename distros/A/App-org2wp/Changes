@@ -1,0 +1,20 @@
+Revision history for App-org2wp
+
+0.004   2016-12-22 (PERLANCAR)
+
+        - Add option: --schedule.
+
+
+0.003   2016-12-14 (PERLANCAR)
+
+	- Adjust example to use hash-style option (Perinci::CmdLine 1.65+).
+
+
+0.002   2016-12-02 (PERLANCAR)
+
+	- Add options: --comment-status, --extra-attrs.
+
+
+0.001   2016-11-14 (PERLANCAR)
+
+        - First release.

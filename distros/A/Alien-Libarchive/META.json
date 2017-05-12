@@ -1,0 +1,77 @@
+{
+   "abstract" : "Build and make available libarchive",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : "1",
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Libarchive",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Libarchive::Installer" : "0.15",
+            "Alien::bz2::Installer" : "0.03",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Libarchive::Installer" : "0.15",
+            "Alien::bz2::Installer" : "0.03",
+            "Module::Build" : "0.3601",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Libarchive::Installer" : "0.15",
+            "File::ShareDir" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Alien-Libarchive2/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/Alien-Libarchive",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Alien-Libarchive2.git",
+         "web" : "https://github.com/plicease/Alien-Libarchive2"
+      }
+   },
+   "version" : "0.28",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

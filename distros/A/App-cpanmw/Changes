@@ -1,0 +1,14 @@
+Revision history for Perl extension cpanmw
+
+0.03 2014-09-13T09:17:38Z
+
+	- fix new-line to LF
+
+0.02 2014-09-08T19:03:14Z
+
+	- first release version for CPAN
+
+0.01 2014-09-05T16:23:00Z
+
+    - original version
+

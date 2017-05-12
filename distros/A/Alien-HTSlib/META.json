@@ -1,0 +1,45 @@
+{
+   "abstract" : "Installation of HTSlib for Perl",
+   "author" : [
+      "Rishi Nag <rishi@ebi.ac.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-HTSlib",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0",
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "File::ShareDir" : "1.00",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::HTSlib" : {
+         "file" : "lib/Alien/HTSlib.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.apache.org/licenses/LICENSE-2.0.txt"
+      ]
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

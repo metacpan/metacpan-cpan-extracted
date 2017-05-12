@@ -1,0 +1,7 @@
+<IfModule mod_alias.c>
+Alias /ALIAS @DOCUMENTROOT@
+</IfModule>
+
+PerlSwitches -I@SERVERROOT@/pm
+
+Options None

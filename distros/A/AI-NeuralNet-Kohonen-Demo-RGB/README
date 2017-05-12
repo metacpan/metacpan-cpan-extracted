@@ -1,0 +1,48 @@
+AI/NeuralNet/Kohonen/Demo/RGB version 0.01
+==========================================
+
+	use AI::NeuralNet::Kohonen::Demo::RGB;
+	$_ = AI::NeuralNet::Kohonen::Demo::RGB->new(
+			map_dim => 39,
+			epochs  => 9,
+			table   => "R G B"
+				  ."1 0 0"
+				  ."0 1 0"
+				  ."0 0 1",
+	);
+	$_->train;
+	exit;
+
+A sub-class of "AI::NeuralNet::Kohonen" that Impliments extra methods
+for make use of TK in a very slow demonstration of how a SOM can
+classify RGB colours. See the SYNOPSIS manpage.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	AI::NeuralNet::Kohonen
+	Tk
+	Tk::Canvas
+	Tk::Label
+
+SEE ALSO
+    See the AI::NeuralNet::Kohonen manpage; the AI::NeuralNet::Kohonen::Node
+    manpage;
+
+AUTHOR AND COYRIGHT
+    This implimentation Copyright (C) Lee Goddard, 2003. All Rights
+    Reserved.
+
+    Available under the same terms as Perl itself.
+
+

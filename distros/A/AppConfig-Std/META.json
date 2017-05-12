@@ -1,0 +1,44 @@
+{
+   "abstract" : "subclass of AppConfig that provides standard options",
+   "author" : [
+      "Neil Bowers <neilb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "AppConfig-Std",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AppConfig" : "0",
+            "Pod::Usage" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/AppConfig-Std",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/AppConfig-Std.git",
+         "web" : "https://github.com/neilb/AppConfig-Std"
+      }
+   },
+   "version" : "1.10"
+}
+

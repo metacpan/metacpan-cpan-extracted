@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         AxKit-XSP-BasicSession
+version:      0.22
+version_from: lib/AxKit/XSP/BasicSession.pm
+installdirs:  site
+requires:
+    Apache::AuthCookie:            0
+    Apache::AxKit::Language::XSP::TaglibHelper: 0
+    Apache::Cookie:                0
+    Apache::Session::Flex:         0
+    AxKit:                         1.6
+    Date::Format:                  0
+    Digest::MD5:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,44 @@
+Revision history for Perl extension Audio::Mad.
+
+0.5
+	- corrected a segfault while decoding mono streams with
+	  MAD_DITHER_S16_*
+	  
+	- added in 'option' method to Audio::Mad::Stream to set
+	  stream flags.  flags can also be set in the 'new'
+	  class method,  by sending them as the first paramater.
+	  
+	- corrected typo in dither.c,  the mad_dither_s32_{le,be}
+	  routines were ordering the bytes of the sample 
+	  incorrectly.
+
+0.4  Thu Jun  9 00:02:00 2002
+	- changed module name space from 'Mad' to 'Audio::Mad'
+	
+	- documentation segmentation,  updates,  additions.
+
+0.3  Wed Jun  8 00:01:00 2002
+	- split Mad::Dither code into Mad::Resample and Mad::Dither.
+	  both of which work on naitve mad_fixed_t streams and 
+	  return data wrapped in plain SV's.  I'm not entirely sure
+	  I'm treating SV's correctly in this module,  if you see
+	  me being stupid -- please tell me so I can fix it.
+	  
+	- interface work is mostly complete,  a few touchups,  
+	  segfault fixes (damn buffer handling) and a bit of 
+	  documentation added.  this is ready for alpha release.
+	  it is capable of taking raw mp3 input data and returning data
+	  suitable to be sent at /dev/dsp.
+
+0.2  Wed Jun  5 12:00:00 2002
+	- created perl package Mad::Dither from code found in
+	  the mad source distribution.  it preforms generic
+	  dithering and linear resampling on data derived from
+	  mad_synth to provide raw pcm data to perl script.
+
+0.1  Sat Jun  1 12:00:00 2002
+	- created perl interfaces for:  mad_stream,  mad_frame,
+	  mad_synth,  and mad_timer (in Mad::Stream, Mad::Frame, etc..).
+
+	- original version; created by h2xs 1.21 with options
+		-a -n Mad -x /usr/include/mad.h -lmad

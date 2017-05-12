@@ -1,0 +1,57 @@
+---
+abstract: 'Conference Mixing/Streaming Orchestrator'
+author:
+  - 'Leon Wright < techman@cpan.org >'
+build_requires:
+  File::Temp: 0
+  Test::More: 0
+  Test::Warnings: 0
+  Time::Local: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  File::ShareDir::Install: 0.06
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-EventStreamr
+requires:
+  Carp: 0
+  Config::JSON: 0
+  Cwd: 0
+  Dancer: 0
+  Data::Dumper: 0
+  File::Basename: 0
+  File::Path: 0
+  File::ReadBackwards: 0
+  File::ShareDir::Tarball: 0
+  File::Slurp: 0
+  File::Spec: 0
+  File::Tail: 0
+  FindBin: 0
+  Getopt::Long: 0
+  HTTP::Tiny: 0
+  Hash::Merge::Simple: 0
+  IO::Socket::INET: 0
+  JSON: 0
+  Log::Log4perl: 0
+  Method::Signatures: 20141021
+  Module::Load: 0
+  Moo: 0
+  Moo::Role: 0
+  POSIX: 0
+  Proc::Daemon: 0
+  Proc::ProcessTable: 0
+  Scalar::Util::Reftype: 0
+  Sys::Hostname: 0
+  experimental: 0.013
+  lib: 0
+  namespace::clean: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/plugorgau/eventstreamr-station
+version: 0.5

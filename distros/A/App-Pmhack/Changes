@@ -1,0 +1,9 @@
+Revision history for App::Pmhack
+
+0.02	16 September 2010
+		Make sure at least version 2.07 of File::Path is available
+		Make docs a little more clear that pmhack does not work with module hierarchies		
+
+0.01    14 September 2010
+        Initial release
+

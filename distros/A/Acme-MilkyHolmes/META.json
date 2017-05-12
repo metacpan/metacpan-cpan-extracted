@@ -1,0 +1,123 @@
+{
+   "abstract" : "There's more than one way to do it!(SEIKAI HA HITOTSU! JANAI!!)",
+   "author" : [
+      "Takuya Tsuchida <tsucchi@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-MilkyHolmes",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0",
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Section::Simple" : "0",
+            "Encode" : "0",
+            "Localizer::Resource" : "0",
+            "Localizer::Style::Gettext" : "0",
+            "Mouse" : "0",
+            "Mouse::Role" : "0",
+            "Readonly" : "0",
+            "YAML::Tiny" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::MockTime" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::MilkyHolmes" : {
+         "file" : "lib/Acme/MilkyHolmes.pm",
+         "version" : "0.07"
+      },
+      "Acme::MilkyHolmes::Character" : {
+         "file" : "lib/Acme/MilkyHolmes/Character.pm"
+      },
+      "Acme::MilkyHolmes::Character::AliceMyojingawa" : {
+         "file" : "lib/Acme/MilkyHolmes/Character/AliceMyojingawa.pm"
+      },
+      "Acme::MilkyHolmes::Character::CordeliaGlauca" : {
+         "file" : "lib/Acme/MilkyHolmes/Character/CordeliaGlauca.pm"
+      },
+      "Acme::MilkyHolmes::Character::HerculeBarton" : {
+         "file" : "lib/Acme/MilkyHolmes/Character/HerculeBarton.pm"
+      },
+      "Acme::MilkyHolmes::Character::KazumiTokiwa" : {
+         "file" : "lib/Acme/MilkyHolmes/Character/KazumiTokiwa.pm"
+      },
+      "Acme::MilkyHolmes::Character::NeroYuzurizaki" : {
+         "file" : "lib/Acme/MilkyHolmes/Character/NeroYuzurizaki.pm"
+      },
+      "Acme::MilkyHolmes::Character::SherlockShellingford" : {
+         "file" : "lib/Acme/MilkyHolmes/Character/SherlockShellingford.pm"
+      },
+      "Acme::MilkyHolmes::Group::Detective" : {
+         "file" : "lib/Acme/MilkyHolmes/Group/Detective.pm"
+      },
+      "Acme::MilkyHolmes::Group::MilkyHolmes" : {
+         "file" : "lib/Acme/MilkyHolmes/Group/MilkyHolmes.pm"
+      },
+      "Acme::MilkyHolmes::Role::HasPersonalColor" : {
+         "file" : "lib/Acme/MilkyHolmes/Role/HasPersonalColor.pm"
+      },
+      "Acme::MilkyHolmes::Role::ToysOwner" : {
+         "file" : "lib/Acme/MilkyHolmes/Role/ToysOwner.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tsucchi/p5-Acme-MilkyHolmes/issues"
+      },
+      "homepage" : "https://github.com/tsucchi/p5-Acme-MilkyHolmes",
+      "repository" : {
+         "url" : "git://github.com/tsucchi/p5-Acme-MilkyHolmes.git",
+         "web" : "https://github.com/tsucchi/p5-Acme-MilkyHolmes"
+      }
+   },
+   "version" : "0.07",
+   "x_authority" : "cpan:TSUCCHI",
+   "x_contributors" : [
+      "htk291 <htk0129@gmail.com>",
+      "htk291 <htk291@gmail.com>"
+   ]
+}

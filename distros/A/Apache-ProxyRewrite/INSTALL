@@ -1,0 +1,46 @@
+$Id: INSTALL,v 1.1 2001/01/02 23:10:47 cgilmore Exp $
+
+=head1 NAME
+
+INSTALL - Apache::ProxyRewrite installation instructions
+
+=head1 DESCRIPTION
+
+How to build, test, configure and install Apache::ProxyRewrite
+
+=head1 PREREQUISITES
+
+=over 3
+
+=back
+
+=head1 Build and install Apache::ProxyRewrite
+
+=over 3
+
+In this current directory run:
+
+  perl Makefile.PL
+  make
+  make install
+
+=back
+
+=head1 Testing Apache::ProxyRewrite
+
+=over 3
+
+At this time, no regression tests are available.
+
+=back
+
+=head1 Notes
+
+=over 3
+
+=back
+ 
+=head1 Support
+
+See the SUPPORT file.
+

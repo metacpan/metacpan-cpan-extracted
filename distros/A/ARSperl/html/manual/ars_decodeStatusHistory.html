@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+  <title>ARSperl Manual - ars_decodeStatusHistory</title>
+</head>
+
+<body bgcolor="#ffffff">
+
+
+   
+<h2><code>ars_decodeStatusHistory($field_value)</code></h2>
+
+
+	Use this to decode the field value of the status history 
+	field. It will decode it into an array of hash references.
+	Each array element will correspond to the enumeration value
+	of the status field. Each hash reference will contain a
+	USER and TIME hash key. These correspond to the user and time
+	that the status field was last in a particular enumerated 
+	state. You can use 
+        <a href="ars_GetField.html">ars_GetField()</a> to map from labels (open,
+	held, closed, etc) to enumerations (0, 1, 2, etc).<br>
+The Status History field (field ID 15) is a core field. That means it is present on all Regular forms,
+even if Status History logging ist disabled (in ARS 7.1.0 or higher).
+
+      
+<dl>
+
+         <dt><b>On success</b></dt>
+  <dd>
+		Returns an array of hash references.
+         </dd>
+  <dt><b>On failure</b></dt>
+  <dd>
+                Returns undef.
+      </dd>
+</dl>
+
+
+      
+<p>Example:
+
+      </p>
+<pre>	%entry = ars_GetEntry($ctrl, $form, $entry, 15)<br><br>	@status_hist_values = ars_decodeStatusHistory($entry{15});<br><br>	# print the status history for the first status (0)<br>	print $status_hist_values[0]-&gt;{USER}."\n";<br>	print localtime($status_hist_values[0]-&gt;{TIME})."\n";	<br><br>For a more detailed example, refer to the ars_decodeStatusHistory.pl file in the <span style="font-style: italic;">examples</span> directory.<br></pre>
+<i>ars_decodeStatusHistory was introduced in version 1.52 of ARSperl. </i><br>
+<hr width="30%">
+<p>
+<a href="toc.html"><img alt="&lt;--" src="arrow.gif" align="middle"> Table of Contents </a>
+</p>
+<p>
+</p>
+<address>
+Last changes to this page 2 aug 2007 by Michiel Beijen<br>
+
+&copy; J.C.Murphy, J.W.Murphy 1997 arsperl@arsperl.org
+</address>
+
+</body>
+</html>

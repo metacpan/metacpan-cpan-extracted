@@ -1,0 +1,55 @@
+# NAME
+
+App::KeePass2 - KeePass2 commandline tools
+
+# VERSION
+
+version 0.04
+
+# ATTRIBUTES
+
+## file
+
+The password file
+
+## create
+
+Create the keepass2 file
+
+## dump\_groups
+
+Dump the content of the groups
+
+## list\_groups
+
+List the groups with icon
+
+# METHODS
+
+## run
+
+Start the cli app
+
+    use App::KeePass2;
+    my $keepass = App::KeePass2->new_with_options;
+    $keepass->run;
+
+# BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+https://tasks.celogeek.com/projects/app-keepass2/issues
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+# AUTHOR
+
+celogeek <me@celogeek.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by celogeek <me@celogeek.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

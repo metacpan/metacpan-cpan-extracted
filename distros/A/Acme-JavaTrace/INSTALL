@@ -1,0 +1,27 @@
+
+INSTALLATION NOTES
+    
+    This module can be installed using two methods. Choose whichever 
+    fits your configuration or your taste. 
+
+    The Flashy New Way
+    ------------------
+    You can use Module::Build, the pure Perl installation method, 
+    by striking the following keys on your keyboard: 
+    
+      $ perl Build.PL
+      $ ./Build test
+      $ ./Build install
+
+
+    The Good Old Way
+    ----------------
+    The brave ExtUtils::MakeMaker can still be used by simply typing 
+    the following commands:
+    
+      $ perl Makefile.PL
+      $ make
+      $ make install
+    
+    and everything should work fine. 
+

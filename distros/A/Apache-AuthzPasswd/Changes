@@ -1,0 +1,15 @@
+Revision history for Perl extension Apache::AuthzPasswd.
+
+0.10  Mon Oct 26 13:32 1998
+	- First Beta Release
+
+0.11  Wed Jul 02  13:32 2003
+	- added a test.pl to authzpasswd module
+	- Updated the Makefile to check for mod_perl
+	  and ask if you want to install 
+	  Apache::AuthzPasswd 
+	- added the test.pl to the MANIFEST
+
+0.12  Fri Jan 02  13:03 2003
+	- Added check for Primary group. Thanks Fredrik Ax!
+	- Added update of CGI env variable REMOTE_GROUP to authorized group. Again, thanks Fredrik Ax!

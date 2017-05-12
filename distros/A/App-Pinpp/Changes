@@ -1,0 +1,13 @@
+Revision history for App::Pinpp
+
+0.03      2017-01-16 14:25:22+11:00 Australia/Melbourne
+
+        * Bugfix: We now process all slides for code, not just every second slide.
+
+0.02      2017-01-15 17:52:44+11:00 Australia/Melbourne
+
+        * Indented slides without styles will be formatted as code blocks.
+
+0.01    Mon Jul 18 18:18:05 EDT 2016
+
+        * First release!

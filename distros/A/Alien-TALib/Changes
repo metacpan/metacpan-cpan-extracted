@@ -1,0 +1,83 @@
+Tue Sep 2 12:03:13 2014 -0400
+b92beb613eed0cf9ecd224fc7e197530bdb5229f
+Releasing 0.07
+
+Tue Sep 2 11:59:53 2014 -0400
+8132b9f308dd4d54a40d8e77aa7323961c44750e
+Adding win32-64 bit support
+
+Tue Aug 26 11:52:16 2014 -0400
+6ef6abe82763137487073728fd52d55f4c3c1783
+removing unnecessary modules from the main PM file
+
+Tue Aug 26 11:17:42 2014 -0400
+fe1354f998f3717b3553815a371e92def1fd32e7
+updating changelog
+
+Tue Aug 26 11:17:14 2014 -0400
+675110dd7c3257aebd72c120fd83e8abcc3df2c5
+Releasing 0.06
+Tue Sep 2 11:59:53 2014 -0400
+8132b9f308dd4d54a40d8e77aa7323961c44750e
+Adding win32-64 bit support
+
+Tue Aug 26 11:52:16 2014 -0400
+6ef6abe82763137487073728fd52d55f4c3c1783
+removing unnecessary modules from the main PM file
+
+Tue Aug 26 11:17:42 2014 -0400
+fe1354f998f3717b3553815a371e92def1fd32e7
+updating changelog
+
+Tue Aug 26 11:17:14 2014 -0400
+675110dd7c3257aebd72c120fd83e8abcc3df2c5
+Releasing 0.06
+Tue Aug 26 11:17:14 2014 -0400
+675110dd7c3257aebd72c120fd83e8abcc3df2c5
+Releasing 0.06
+Tue Aug 26 11:16:12 2014 -0400
+1c180e2968809e65ab015a72d59975d7b1e8a6ac
+updating manifest and creating license to 0
+
+Tue Aug 26 11:14:46 2014 -0400
+c8b6b9c50178af0932bb3e20aaa31e07425f6ffa
+Merge pull request #2 from kmx/master
+compat with strawberry PDL edition
+Tue Aug 26 12:13:03 2014 +0200
+a95dabe90edb6dc480218a1b1c8145cfc7096962
+compat with strawberry PDL edition that comes with pre-built ta-lib binaries
+
+Mon Aug 25 16:15:23 2014 -0400
+c860d63ab04f2e7f5116ed2f1dfe74648149f363
+Releasing 0.05
+Mon Aug 25 16:13:36 2014 -0400
+6f5a834d841397faadddc940a69219766c2be315
+Updating bug in HomeDir call
+
+Mon Aug 25 16:05:28 2014 -0400
+638181f63dee82364728c736ea59e16178a551ac
+Windows support added
+
+Mon Aug 25 15:09:46 2014 -0400
+71430c7f4066668d161d8c02d15774b164232855
+Updating the Build.PL script to actually do the builds so that it is done when Alien::TALib gets installed. After that ConfigData has all the required info
+
+Mon Aug 25 14:38:24 2014 -0400
+69a6b8f9f9de76a7c2c3d90d47ad199a7848fbee
+Allowing for proper handling of already installed ta-lib
+
+Mon Aug 25 12:20:18 2014 -0400
+ad97fd701c795d8eee6484c24fd207dbcb4ea12d
+Updating Alien::TALib to not use Alien::Base which sucks.
+
+Mon Aug 25 11:56:52 2014 -0400
+6c8715c2d09044687dc416473689692b9a557a5c
+Informing the user which path has been chosen
+
+Mon Aug 25 11:53:55 2014 -0400
+3d7649dbffb16fc6155ec436d3247f4723b2021f
+Adding cflags/libs detection to Build.PL
+
+Fri May 30 18:41:16 2014 -0400
+bc7db05a328a641e159ce8d2a0187494a12be26c
+Updating version for release

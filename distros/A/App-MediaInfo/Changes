@@ -1,0 +1,11 @@
+Revision history for App-MediaInfo
+
+0.11    2016-04-06 (PERLANCAR)
+
+	- [Bugfix] Fix broken CLI (Riap URL was not updated).
+
+
+0.10    2016-04-06 (PERLANCAR)
+
+	- First release, split from Media-Info to reduce dependencies of
+          Media-Info.

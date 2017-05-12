@@ -1,0 +1,48 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::PTS;
+
+print "anon: ";chop(my $anon=<STDIN>);
+print "AFS::ANONYMOUSID  = ",&AFS::ANONYMOUSID ,"\n";
+
+my $pts = AFS::PTS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+print "----- scaler\n";
+
+my $name = 'foobar';
+my $id = $pts->id($name, $anon);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "name = $name id = $id\n"; }
+
+
+print "----- array\n";
+
+my @names = ('nog','testafs','hans','foobar');
+
+my @ids = $pts->id(\@names,$anon);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else {
+    print "Names = @names \n";
+    foreach my $id (@ids) {
+        print "id = $id\n";
+    }
+}
+
+
+print "----- hash\n";
+
+my %idhash;
+foreach my $id (@names) { $idhash{$id} = ''; }
+
+my $hash = $pts->id(\%idhash,$anon);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else {
+    foreach my $key (keys %$hash) {
+        print "$key = $$hash{$key}\n";
+    }
+}

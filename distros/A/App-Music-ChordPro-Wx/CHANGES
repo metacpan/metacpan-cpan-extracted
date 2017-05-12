@@ -1,0 +1,40 @@
+0.74	Apr 13 2017
+
+	Add preferences for transposition.
+
+0.710.4 Mar 14 2017
+
+	Fix missing packaging files.
+
+0.710.3 Jan 21 2017
+
+	Fix URL generation (Windows).
+	Add help for ChordPro config.
+
+0.710.2 Jan 18 2017
+
+	Fix PDF previewer startup on Windows.
+	Add tooltip help for PDF previewer preference.
+
+0.710.1 Jan 17 2017
+
+	Fix config file dialog button.
+
+0.71    Jan 17 2017
+
+	Add preferences dialog to select a custon config file and a
+	PDF previewer.
+
+0.700.4 Jan 11 2017
+
+	Remove res/version.dat. Use a fixed version for the ChordPro
+	dependency.
+
+0.700.x Jan 10 2017
+
+	The ususal movements to get packaging right.
+
+0.70	Jan 09 2017
+
+	Split WxChordPro into its own package.
+

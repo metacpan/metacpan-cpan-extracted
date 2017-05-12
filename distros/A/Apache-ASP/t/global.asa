@@ -1,0 +1,121 @@
+
+# script tag not needed, just in for IIS Compat test
+<script runat=server>
+
+use lib '.';	
+use T;	
+use strict;
+use vars qw($Application $Session $t $Deep);
+use Carp qw(confess);
+
+$SIG{__DIE__} = \&confess;
+
+sub Application_OnStart {
+    $Application->{Start} = 1;
+}
+
+sub Session_OnStart {
+    $Session->{Count} = 10;
+}
+
+sub Script_OnStart {
+    $t = T->new();
+}
+
+sub Script_OnEnd {
+    $t && $t->done;
+}
+
+sub Script_OnFlush {
+    my $data = $Response->{BinaryRef};
+    for ( split(/\n/, $$data) ) {
+	next if /^\s*$/;
+	unless(/^((not )?ok)|\d+\.\.\d+/) {
+	    $t->eok(0, "Garbage in output: $_");
+	}
+    }
+}
+
+sub my::print {
+    my($args, $html) = @_;
+    print $html;
+}
+
+sub my::tag {
+    $t->eok($Deep, 'Deep tag not evaluated');
+}
+
+sub my::deeptag {
+    $t->ok;
+    $Deep++;
+}
+
+sub my::tag_check_value {
+    my $args = shift;
+    if($args->{value}) {
+	$t->ok;
+    } else {
+	$t->not_ok;
+    }
+}
+
+sub my::tag_check_value_ref {
+    my($args) = shift;
+    if(ref $args->{value}) {
+	$t->ok;
+    } else {
+	$t->not_ok;
+    }
+}
+
+sub my::tag_check_value_not_ref {
+    my($args) = shift;
+    if(ref $args->{value}) {
+	$t->not_ok;
+    } else {
+	$t->ok;
+    }
+}
+
+sub my::returnok {
+    $t->eok($_[1] eq 'ok', 'String return');
+}
+
+sub my::args {
+    $t->eok($_[0]->{ok}, $_[0]->{error} || "Argument passing");
+}
+
+# CLEANUP old state files from previous test script runs
+# so things like Application_OnStart may run
+if($0 =~ m|application\.t$|) {
+#    print STDERR "-- ASP State Initialization for Tests --\n";
+    die unless (-e '../t');
+    for my $dir ( qw(.cache .state) ) {
+	my @dirs = ($dir);
+	my @delete_dirs;
+	while(@dirs) {
+	    my $dir = shift @dirs;
+	    next unless -d $dir;
+	    opendir(DIR, $dir);
+	    for(readdir(DIR)) {	
+		next if /^\.\.?$/;
+		$_ =~ tr///; # untaint
+		my $file = "$dir/$_";
+		if(-d $file) {
+		    push(@dirs, $file);
+		} elsif(-e $file) {
+		    unlink($file);
+		} else {
+		    die("$file does not exist, but we just read it");
+		}
+	    }
+	    unshift(@delete_dirs, $dir);
+	}
+	for(@delete_dirs) {
+	    rmdir($_);
+	}
+    }
+}
+
+# script tag not needed, just in for IIS Compat test
+</script>

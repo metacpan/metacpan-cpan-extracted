@@ -1,0 +1,25 @@
+This is Perl module Acme::Collector64.
+
+INSTALLATION
+
+Acme::Collector64 installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpanm Acme::Collector64
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Acme::Collector64 documentation is available as in POD. So you can do:
+
+    % perldoc Acme::Collector64
+
+to read the documentation online with your favorite pager.

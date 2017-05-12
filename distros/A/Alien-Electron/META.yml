@@ -1,0 +1,33 @@
+---
+abstract: 'Download and install the electron GUI framework'
+author:
+  - 'Doug Hoyte <doug@hcsw.org>'
+build_requires:
+  File::Path: '0'
+  File::Spec::Functions: '0'
+  IO::File: '0'
+  IO::Uncompress::Unzip: '0'
+  Module::Build: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Electron
+provides:
+  Alien::Electron:
+    file: lib/Alien/Electron.pm
+    version: '0.103'
+requires:
+  File::ShareDir: '0'
+resources:
+  bugtracker: https://github.com/hoytech/Alien-Electron/issues
+  homepage: https://github.com/hoytech/Alien-Electron
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hoytech/Alien-Electron.git
+version: '0.103'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

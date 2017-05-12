@@ -1,0 +1,6 @@
+Revision history for Perl extension Audio::GSM.
+
+0.01  Thu May  7 14:56:00 2009
+	- original version; created by h2xs 1.23 with options
+		-xOn Audio::GSM gsm.h
+

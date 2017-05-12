@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+
+# generic xml display
+# should work with any data model
+
+use strict;
+use vars qw($DB);
+
+use Ace 1.65;
+use CGI 2.42 qw/:standard :html3 escape/;
+use CGI::Carp qw/fatalsToBrowser/;
+use Ace::Browser::AceSubs;
+
+
+AceError(<<END) unless param('name') && param('class');
+Call this script with URL parameters of
+<VAR>name</VAR> and <VAR>class,</VAR> where
+"name" and "class" correspond to the name and class of the
+Ace object of interest.
+END
+
+my $obj = GetAceObject() || AceNotFound();
+
+print header('text/plain');
+print qq(<?xml version="1.0" standalone="yes"?>\n\n);
+print $obj->asXML;

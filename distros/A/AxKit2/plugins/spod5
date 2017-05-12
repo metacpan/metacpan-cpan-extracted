@@ -1,0 +1,440 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+=head1 NAME
+
+spod5 - Displays spod5 (pod to s5) presentations
+
+=head1 SYNOPSIS
+
+  <Location /presentations>
+  DocumentRoot /path/to/presentations
+  Plugin spod5
+  </Location>
+
+=head1 DESCRIPTION
+
+This plugin uses Pod::SAX to turn pod files on the fly into S5 presentations.
+
+See L<http://meyerweb.com/eric/tools/s5/> for details on S5's HTML format.
+
+Requires the s5 javascript and css files under F<ui/default> in the directory
+of your POD files. These are shipped with AxKit2 in the F<demo/spod5> directory.
+
+=head1 POD FORMAT
+
+Every C<=head1> heading creates a new slide. Everything else is just the good
+old POD format you know and love.
+
+You can use C<=img PATH> to include an image.
+
+Use C<=meta ITEM DATA> to define metadata. The following pieces of metadata can
+be used:
+
+=over 4
+
+=item * title
+
+=item * author
+
+=item * company
+
+=item * presdate
+
+(Presentation Date)
+
+=item * view
+
+"outline" or "slideshow" (default = "slideshow")
+
+=item * controls
+
+"hidden" or "visible" (default = "hidden")
+
+=item * title_top
+
+(A header)
+
+=item * title_bottom
+
+(A footer)
+
+=back
+
+Use C<=over -1> to tell spod5 that the list should display incrementally. Use
+C<=over -2> to tell spod5 that the list should display incrementally with the
+first item automatically shown.
+
+=cut
+
+use Pod::SAX;
+use XML::LibXML::SAX::Builder;
+use XML::LibXML;
+use XML::LibXSLT;
+use AxKit2::Utils qw(bytelength);
+use AxKit2::Transformer::XSLT;
+
+use constant EZPOD => eval { require XML::Filter::EzPod };
+
+my $xslt   = XML::LibXSLT->new();
+my $parser = XML::LibXML->new();
+my $pod2s5;
+my $add_params;
+
+sub hook_response {
+    my ($self) = @_;
+    
+    my $client = $self->client;
+    
+    my $file = $client->headers_in->filename;
+    $self->log(LOGDEBUG, "request for file $file");
+    return DECLINED unless $file =~ /\.(pod|pm)$/;
+    return DECLINED unless -f $file;
+    
+    open(my $fh, $file) || die "Failed to open($file): $!";
+    
+    my $builder = XML::LibXML::SAX::Builder->new();
+    my $handler = $builder;
+    if (EZPOD) {
+        $self->log(LOGDEBUG, "Using EzPod");
+        $handler = XML::Filter::EzPod->new( Handler => $builder );
+    }
+    my $p = Pod::SAX->new( Handler => $handler );
+    $p->parse_file($fh);
+
+    my $doc = $builder->result();
+    
+    my $base_uri = $client->headers_in->uri . $client->headers_in->path_info;
+    
+    $base_uri =~ s/[^\/]*$//; # strip filename part
+    $base_uri = "http://" . $client->headers_in->header('Host') . "$base_uri";
+    
+    my %params = (
+        base => $base_uri,
+        );
+    
+    my $addp_style = $xslt->parse_stylesheet($parser->parse_string($add_params));
+    my $interim = $addp_style->transform($doc, 
+                               AxKit2::Transformer::XSLT::fixup_params(%params)
+                               );
+    
+    # print "Interim doc: ", $interim->toString;
+
+    my $stylesheet = $xslt->parse_stylesheet($parser->parse_string($pod2s5));
+    my $output = $stylesheet->transform($interim);
+    
+    my $ct  = $stylesheet->media_type;
+    my $enc = $stylesheet->output_encoding;
+    my $out = $stylesheet->output_string($output);
+
+    $client->headers_out->header('Content-Length', bytelength($out));
+    $client->headers_out->header('Content-Type', "$ct; charset=$enc");
+    $client->send_http_headers;
+    $client->write($out);
+    
+    return DONE;
+}
+
+$add_params = <<'EOT';
+<xsl:stylesheet version="1.0"  
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+    >
+
+<xsl:param name="base"/>
+<xsl:param name="style">slides.css</xsl:param>
+<xsl:param name="uidir">default</xsl:param>
+
+<xsl:template match="/pod">
+  <pod>
+    <meta>
+        <base><xsl:value-of select="$base"/></base>
+        <ui-dir><xsl:value-of select="$uidir"/></ui-dir>
+        <slides><xsl:value-of select="$style"/></slides>
+        <xsl:apply-templates select='meta'/>
+    </meta>
+    <xsl:apply-templates/>
+  </pod>
+</xsl:template>
+
+<xsl:template match="meta">
+    <xsl:element name="{substring-before(./text(), ' ')}">
+        <xsl:value-of select="substring-after(./text(), ' ')"/>
+    </xsl:element>
+</xsl:template>
+
+<xsl:template match="*|@*">
+    <xsl:copy>
+      <xsl:apply-templates select="*|@*|node()"/>
+    </xsl:copy>
+</xsl:template>
+
+</xsl:stylesheet>
+EOT
+
+$pod2s5 = <<'EOT';
+<xsl:stylesheet version="1.0"  
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+    >
+
+<xsl:output method="html" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN"
+                          doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
+                          indent="yes"/>
+
+<xsl:template match="/pod">
+    <html>
+    
+    <head>
+    <title><xsl:value-of select="meta/title"/></title>
+    <!-- metadata -->
+    <meta name="generator" content="spod5" />
+    <meta name="version" content="S5 1.1" />
+    <meta name="presdate" content="{meta/presdate}" />
+    <meta name="author" content="{meta/author}" />
+    <meta name="company" content="{meta/company}" />
+    
+    <!-- configuration parameters -->
+    <meta name="defaultView" content="{meta/view or 'slideshow'}" />
+    <meta name="controlVis" content="{meta/controls or 'hidden'}" />
+    
+    <base href="{meta/base}ui/{meta/ui-dir}/"/>
+    
+    <!-- style sheet links -->
+    <link rel="stylesheet" href="{meta/slides}" type="text/css" media="projection" id="slideProj" />
+    <link rel="stylesheet" href="outline.css" type="text/css" media="screen" id="outlineStyle" />
+    <link rel="stylesheet" href="print.css" type="text/css" media="print" id="slidePrint" />
+    <link rel="stylesheet" href="opera.css" type="text/css" media="projection" id="operaFix" />
+    
+    <!-- S5 JS -->
+    <script src="slides.js" type="text/javascript"></script>
+    
+    <style type="text/css">
+    <!--
+    /* 
+     * perltidy's styles
+     */
+    .c  { color: #228B22;                    } /* comment */
+    .cm { color: #000000;                    } /* comma */
+    .co { color: #000000;                    } /* colon */
+    .h  { color: #CD5555; font-weight:bold;  } /* here-doc-target */
+    .hh { color: #CD5555; font-style:italic; } /* here-doc-text */
+    .i  { color: #00688B;                    } /* identifier */
+    .j  { color: #000000; font-weight:bold;  } /* label */
+    .k  { color: #8B4513; font-weight:bold;  } /* keyword */
+    .m  { color: #FF0000; font-weight:bold;  } /* subroutine */
+    .n  { color: #B452CD;                    } /* numeric */
+    .p  { color: #000000;                    } /* paren */
+    .pd { color: #228B22; font-style:italic; } /* pod-text */
+    .pu { color: #000000;                    } /* punctuation */
+    .q  { color: #CD5555;                    } /* quote */
+    .s  { color: #000000;                    } /* structure */
+    .sc { color: #000000;                    } /* semicolon */
+    .v  { color: #B452CD;                    } /* v-string */
+    .w  { color: #000000;                    } /* bareword */
+    
+    /* ====================================================================== *
+     * Sample stylesheet for Syntax::Highlight::HTML                          *
+     *                                                                        *
+     * Copyright (C)2004 Sebastien Aperghis-Tramoni, All Rights Reserved.     *
+     *                                                                        *
+     * This file is free software; you can redistribute it and/or modify      *
+     * it under the same terms as Perl itself.                                *
+     * ====================================================================== */
+    
+    .h-decl { color: #336699; font-style: italic; }   /* doctype declaration  */
+    .h-pi   { color: #336699;                     }   /* process instruction  */
+    .h-com  { color: #338833; font-style: italic; }   /* comment              */
+    .h-ab   { color: #000000; font-weight: bold;  }   /* angles as tag delim. */
+    .h-tag  { color: #993399; font-weight: bold;  }   /* tag name             */
+    .h-attr { color: #000000; font-weight: bold;  }   /* attribute name       */
+    .h-attv { color: #333399;                     }   /* attribute value      */
+    .h-ent  { color: #cc3333;                     }   /* entity               */
+    
+    .h-lno  { color: #cccccc; background: #eee;   }   /* line numbers         */
+    -->
+    </style>
+    
+    
+    </head>
+    <body>
+    
+    <div class="layout">
+    <div id="controls"><!-- DO NOT EDIT --></div>
+    <div id="currentSlide"><!-- DO NOT EDIT --></div>
+    <div id="header"></div>
+    <div id="footer">
+    <h1><xsl:value-of select="meta/presdate"/></h1>
+    <h2><xsl:value-of select="meta/title"/></h2>
+    </div>
+    
+    </div>
+    
+    
+    <div class="presentation">
+    
+    <div class="slide">
+    <xsl:value-of select="meta/title_top"/>
+    <h1><xsl:value-of select="meta/title"/></h1>
+    <h3><xsl:value-of select="meta/author"/></h3>
+    <h4><xsl:value-of select="meta/company"/></h4>
+    <xsl:value-of select="meta/title_bottom"/>
+    </div>
+    
+    <xsl:apply-templates select="*[starts-with(name(), 'head')]"/>
+    
+    </div>
+    
+    </body>
+    </html>
+</xsl:template>
+
+<xsl:template match="pod">
+ <xsl:apply-templates/>
+</xsl:template>
+
+<xsl:template match="para">
+  <xsl:choose>
+    <xsl:when test="./*[name() != 'orderedlist' and name() != 'itemizedlist']">
+      <p>
+        <xsl:apply-templates/>
+      </p>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:apply-templates/>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template match="verbatim">
+  <pre class="verbatim"><xsl:apply-templates/></pre>
+</xsl:template>
+
+<xsl:template match="link">
+  <xsl:choose>
+    <xsl:when test='string-length(@section) and not( string-length(@page) )'>
+      <xsl:choose>
+        <xsl:when test='starts-with(@section, "/")'>
+          <a href="/view{@section}"><xsl:apply-templates/></a>
+        </xsl:when>
+        <xsl:otherwise>
+          <a href="#{translate(@section,' ','-')}"><xsl:apply-templates/></a>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:when>
+    <xsl:otherwise>
+      <a href="./{@page}#{translate(@section,' ','-')}"><xsl:apply-templates/></a>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template match="xlink">
+  <a href="{@href}"><xsl:apply-templates/></a><img src="/img/out.png"/>
+</xsl:template>
+
+<xsl:template match="head1">
+  <div class="slide"><h1><xsl:apply-templates/></h1>
+  <xsl:apply-templates select="following-sibling::*[generate-id(preceding-sibling::head1[1]) = generate-id(current())]"/>
+  </div>
+</xsl:template>
+
+<xsl:template match="head2">
+  <h2><xsl:apply-templates/></h2>
+</xsl:template>
+
+<xsl:template match="head3">
+  <h3><xsl:apply-templates/></h3>
+</xsl:template>
+
+<xsl:template match="head4">
+  <h4><xsl:apply-templates/></h4>
+</xsl:template>
+
+<xsl:template match="itemizedlist">
+  <ul>
+    <xsl:choose>
+        <xsl:when test="@indent_width = -1">
+            <xsl:attribute name="class">incremental</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="@indent_width = -2">
+            <xsl:attribute name="class">incremental show-first</xsl:attribute>
+        </xsl:when>
+    </xsl:choose>
+    <xsl:apply-templates/>
+  </ul>
+</xsl:template>
+
+<xsl:template match="orderedlist">
+  <ol>
+    <xsl:choose>
+        <xsl:when test="@indent_width = -1">
+            <xsl:attribute name="class">incremental</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="@indent_width = -2">
+            <xsl:attribute name="class">incremental show-first</xsl:attribute>
+        </xsl:when>
+    </xsl:choose>
+    <xsl:apply-templates/>
+  </ol>
+</xsl:template>
+
+<xsl:template match="listitem">
+  <li><xsl:apply-templates/></li>
+</xsl:template>
+
+<xsl:template match="itemtext">
+  <span class="itemtext"><xsl:apply-templates/></span>
+</xsl:template>
+
+<xsl:template match="hr">
+  <hr/>
+</xsl:template>
+
+<xsl:template match="C">
+  <code><xsl:apply-templates/></code>
+</xsl:template>
+
+<xsl:template match="B">
+  <b><xsl:apply-templates/></b>
+</xsl:template>
+
+<xsl:template match="I">
+  <i><xsl:apply-templates/></i>
+</xsl:template>
+
+<xsl:template match="F">
+  <code class="file"><xsl:apply-templates/></code>
+</xsl:template>
+
+<xsl:template match="indent">
+  <blockquote><xsl:apply-templates/></blockquote>
+</xsl:template>
+
+<xsl:template match="markup[@type='image']">
+    <img src="{.}"/>
+</xsl:template>
+
+<xsl:template match="img">
+    <img src="{.}"/>
+</xsl:template>
+
+<xsl:template match="*|@*">
+    <xsl:copy>
+      <xsl:apply-templates select="*|@*|node()"/>
+    </xsl:copy>
+</xsl:template>
+
+</xsl:stylesheet>
+EOT

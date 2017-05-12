@@ -1,0 +1,45 @@
+icli - Icinga Command Line Interface
+
+Requires:
+ * A local icinga daemon + access to some of its files
+ * perl v5.10 or newer with the following modules:
+ * DateTime
+ * DateTime::Format::Strptime
+ * DateTime::TimeZone
+ * List::MoreUtils
+ * Term::Size
+
+Installation:
+
+ > perl Build.PL
+ > ./Build
+ > sudo ./Build install
+
+You can then run 'man icli' for more information.
+
+Extra modules required for testing:
+ * Test::More
+ * Test::Compile
+ * Test::Pod
+ * Test::Command
+
+Note: To work with an Icinga installation, icli needs to know the path to
+three files:
+* objects.cache (icinga.cfg object_cache_file)
+* status.dat (icinga.cfg status_file)
+* icinga.cmd (icinga.cfg command_file)
+
+If you are building interactively and the default values for these paths
+do not exist, you will be asked for them -- hit return to keep the default.
+In a non-interactive build, the defaults will be used (unless changed using
+an option, see below).
+
+If you need to set them regardless of the build host, do not wish to be
+promited at all, or are using a non-interactive build process (perhaps even
+for a whole distribution), you can set them using the following options:
+
+> perl Build.PL --icli-object-file=.../objects.cache \
+                --icli-status-file=.../status.dat \
+                --icli-command-file=.../icinga.cmd
+
+http://finalrewind.org/projects/icli

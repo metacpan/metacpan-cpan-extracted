@@ -1,0 +1,1 @@
+Connection pool for AnyEvent::MySQL. Provides connect_pool method.

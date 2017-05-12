@@ -1,0 +1,95 @@
+# NAME
+
+Archive::Merged - virtually merge two archives
+
+# SYNOPSIS
+
+    my $merged = Archive::Merged->new(
+        Archive::Tar->new( 'default_theme.tar' ),
+        Archive::SevenZip->archiveTarApi( archivename => 'theme.zip' ),
+        Archive::Dir->new( 'customized/' ),
+    );
+
+# METHODS
+
+## `Archive::Merged->new`
+
+    my $merged = Archive::Merged->new(
+        Archive::Tar->new( 'default_theme.tar' ),
+        Archive::Dir->new( 'customized/' ),
+    );
+
+Creates a new archive as the merged view of one or more archives
+or directories.
+
+## `->directory`
+
+## `->archives`
+
+    my @archives = $merged->archives;
+
+Accessor for the archives that represent this archive.
+
+## `->contains_file`
+
+    if( $merged->contains_file( $file ) ) {
+        print "Yay!"
+    } else {
+        print "File '$file' not found";
+    };
+
+Returns the underlying archive that contains the file. Returns
+undef if the file is not found.
+
+## `->get_content( $file, %options )`
+
+    my $content = $merged->get_content( $file, binmode => ':raw' )
+
+Returns the content of the file, potentially with the encoding.
+
+## `->list_files( )`
+
+    my @contents = $merged->list_files;
+
+Lists the contained files of the archive. Files that are shadowed
+are only listed once.
+
+## `->extract_file( )`
+
+    $merged->extract_file( $name => $target );
+
+Extracts the file to the target name.
+
+# REPOSITORY
+
+The public repository of this module is 
+[http://github.com/Corion/archive-merged](http://github.com/Corion/archive-merged).
+
+# SUPPORT
+
+The public support forum of this module is
+[https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-Merged](https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-Merged)
+or via mail to [archive-merged-Bugs@rt.cpan.org](https://metacpan.org/pod/archive-merged-Bugs@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2015-2016 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.
+
+# SEE ALSO
+
+[Archive::Tar](https://metacpan.org/pod/Archive::Tar)
+
+[Archive::SevenZip::API::ArchiveTar](https://metacpan.org/pod/Archive::SevenZip::API::ArchiveTar)

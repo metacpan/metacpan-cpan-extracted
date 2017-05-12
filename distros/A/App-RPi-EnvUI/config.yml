@@ -1,0 +1,16 @@
+session: "JSON"
+
+engines:
+  session:
+    JSON:
+      session_dir: "/tmp/sessions"
+
+plugins:
+  Auth::Extensible:
+    no_login_handler: 1
+    disable_roles: 1
+    realms:
+      login:
+        provider: "App::RPi::EnvUI::Auth"
+
+

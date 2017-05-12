@@ -1,0 +1,24 @@
+# hello 2.0.50
+# Copyright (C) 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+# Tedi Heriyanto <tedi_h@gmx.net>, 1999, 2002.
+# This file is distributed under the same license as the hello package.
+# Tedi Heriyanto <tedi_h@gmx.net>, 1999, 2002.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: hello 2.0.50\n"
+"POT-Creation-Date: 2002-05-22 19:23+0200\n"
+"PO-Revision-Date: 2002-03-20 23:38GMT+0700\n"
+"Last-Translator: Tedi Heriyanto <tedi_h@gmx.net>\n"
+"Language-Team: Indonesian <translation-team-id@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 0.9.5\n"
+
+msgid "hello, world\n"
+msgstr "hello, world\n"
+
+msgid "Hello, world!"
+msgstr "Hello, world!"
+

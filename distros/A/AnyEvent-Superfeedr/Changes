@@ -1,0 +1,25 @@
+Revision history for Perl extension AnyEvent::Superfeedr
+
+0.04 Tue Mar 23 14:50:17 2010
+        - Fixed Atom namespace in <feed> and added <title> and <updated> in $n->as_xml (miyagawa)
+        - Added $notification->title attribute
+
+0.03
+        - [incompatible] change arguments of on_connect() (pass $superfeedr)
+        - [incompatible] adds an explicit ->connect() that you have to call now
+        - Fix an error reported by Tatsuhiko Miyagawa with connect errors
+        - Adds $notification->as_xml
+        - Fixes a problem where notifications would always be empty
+          Apparently Superfeedr changed some XML namespaces
+        - Other minor cleanups
+
+0.02  Wed Aug 5 15:55:00 2009
+        Some non backward compatible changes:
+        - Enabled bulk subscription with one subscribe()
+          call (Tatsuhiko Miyagawa)
+        - Allows callback to subscribe and unsubscribe. (Tatsuhiko Miyagawa)
+        - Removed subscription/unsubscription options in favor of user's own
+          timer (Tatsuhiko Miyagawa)
+
+0.01  Fri Jul 24 21:58:34 2009
+        - Initial version that doesn't do much

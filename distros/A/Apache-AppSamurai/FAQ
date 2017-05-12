@@ -1,0 +1,116 @@
+AppSamurai Frequently Answered (though perhaps never asked) Questions
+
+Introduction
+------------
+Q: Why is this FAQ so sparse, useless, condescending, confusing, revoltingly
+   formatted, poorly written?  This is pretty much the worst FAQ ever made.
+A: Thanks!  Someone is actually reading the FAQ!
+
+Q: Really, though, couldn't you think of any questions?
+A: Sounds like you are pretty sharp.  Why don't you ask some....
+
+
+General
+-------
+Q: I am using multiple authentication methods, and the credentials passed into
+   the login form seem to be going to the wrong places... help!
+A: The order of credentials (and how they are checked) is defined by their
+   order inside the AuthMethods setting for your auth name.  The first
+   authentication method in the list will be the first to be checked, and
+   will get the value sent to the credential_1 value in the login form,
+   login.html.
+
+   In most cases, you will want your strongest (or any dynamic/token based)
+   authentication checked first.  Set that to credential_1 and put it first
+   in the AuthMethods list.  You want your weakest, (easiest guessed or most
+   static), authentication method checked last, so put it in the last
+   credential_ value in your login.html form and last in the AuthMethods list.
+
+Q: But I want the order of credential entry boxes to be different on 
+   the login form...
+A: Then move them around in the HTML.  The HTML order does not matter, just
+   the credential_X value assigned to an input. (X being the number)
+
+Q: I am using files for session storage and locking.  How can I cleanup all
+   those stale session files?
+A: Future versions may have built in cleanup.  For now you should use
+   something like the following, run as your webserver user on a regular
+   basis:
+
+    /usr/bin/find /var/www/session/sessions /var/www/session/slock -mtime +8 -type f | grep -v Track | xargs /bin/rm
+
+   (Make sure to set the session and session lock directories according to your setup, and adjust the -mtime value to the maximum age in days you want to keep)
+ 
+Q: I enabled debugging in AppSamurai for my authname, (by using
+   "PerlSetVar authnameDebug 1" in my Apache configuration), yet I am not
+   seeing debugging messages in the log.
+A: Apache is probably not configured to log debug level messages.  Change the
+   the "LogLevel" setting for "ErrorLog" in your Apache config to debug.
+   Don't forget to turn OFF AppSamurai debugging for production!  It logs
+   potentially sensitive information that you do not want sitting in a logfile
+   in your DMZ.
+
+Auth Modules
+------------
+Q: How does the AuthBasic auth module work?
+A: The AuthBasic auth module attempts to authenticate with a web server using
+   HTTP Basic Auth authentication.  (This is the "old" style login where
+   a popup box appears asking for a username and password.)  Since AppSamurai
+   is often used to protect backend servers that only have HTTP Basic Auth
+   enabled, the server used will usually be the same as AppSamurai is
+   protecting.
+
+Q: "Basic", "Radius", and "Simple"... not a lot of auth choices...
+A: Instead of writing 800 auth modules, AppSamurai comes with two basic auth
+   modules (that I personally use), plus the AuthSimple module which opens
+   up access to any Authen::Simple supported authentication adaptor.
+   (Authen::Simple::Kerberos, Authen::Simple::PAM, etc.)  More AppSamurai
+   auth modules may appear in future releases.  (Especially if anyone sends
+   me code... hint hint.)
+
+Q: I want to write a new auth module to authenticate using a web service
+   on my mainframe.  (I will call it AuthWebEBCDIC.) What do I do?
+A: About time! Everyone is asking for this one.  Adding an auth module
+   is fairly simple.
+
+ * Use the AuthTest.pm test module as your template (from examples/auth/
+   in the Apache-AppSamurai dist.)
+
+ * Add any configuration defaults and other pre-initialization to the
+   Configure() method.
+
+ * Add any needed initialization code (to connect to the web service or
+   whatever) in the Initialize() method.
+
+ * Place the authentication code into the Authenticator() method,
+   taking care to handle errors and not "fail open".
+
+ * Copy the new module to someplace in your Perl path that Apache can get it
+
+ * Setup an Apache config to test your module, including an AppSamurai
+   config with 'PerlSetVar xxxAuthWebEBCDICyyy "zzzz"' settings to setup
+   your module.  (xxx = authname, yyy = config key, zzz = config value)
+
+ * Test!
+
+ * DOCUMENT!!! (at least in the module POD)
+
+ * Share! (optional... but please share)
+   
+
+OWA Proxy Example
+-----------------
+Q: Why do I get "Access Denied" instead of the login page when I first connect?
+A: Make sure your rewrite rules are used inside a VirtualHost section.  If you would rather leave them global, add the following lines to your SSL VirtualHost section:
+ RewriteEngine on
+ RewriteOptions inherit
+
+Q: Under Apache 2, in error_log or ssl_error_log, why do I see errors like: "SSL Proxy requested for FQDN:443 but not enabled [Hint: SSLProxyEngine]"
+A: Put the following line into your SSL VirtualHost section(s):
+ SSLProxyEngine on
+
+Q: Why do you have near-duplicate proxy directory sections, with the only difference being <Directory proxy:*> vs. <Proxy *> ?
+A: IfDefine can not be used to just wrap the Directory or Proxy tag.  This breakage appears to be completely undocumented, and yes, there is a dent in the wall by my desk that I blame directly for it.
+
+
+$Id: FAQ,v 1.2 2008/05/03 06:43:22 pauldoom Exp $

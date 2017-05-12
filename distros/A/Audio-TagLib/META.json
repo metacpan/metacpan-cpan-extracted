@@ -1,0 +1,49 @@
+{
+   "abstract" : "A library for reading and editing audio meta data, commonly known as \"tags\".",
+   "author" : [
+      "Geoffrey Leach <gleach@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Audio-TagLib",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "lib/Audio/TagLib"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "version" : "0.77"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.99",
+            "perl" : "5.012000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.67",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

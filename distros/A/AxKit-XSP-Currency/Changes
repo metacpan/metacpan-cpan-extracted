@@ -1,0 +1,45 @@
+$Id: /local/CPAN/AxKit-XSP-Currency/Changes 1486 2008-03-08T22:00:13.791163Z claco  $
+Revision history for Perl module AxKit::XSP::Currency
+
+0.13000 Sat Mar 8 16:58:29 2008
+    - Converted to Module::Install
+
+0.12 Mon Mar 21 19:05:12 2005
+    - Fixed small warnings typo in warnings.t :-)
+
+0.11 Mon Mar 21 18:36:53 2005
+    - Added Test::Strict warnings tests
+    - Added currency code verification using Locale::Currency
+
+0.10 Sun Mar 20 19:05:15 2005
+   - Fixed utf symbol output problems under 5.8.x
+   - Changed options defaults to use FMT_SYMBOL/SYM_UTF
+
+0.09 Mon Mar 14 20:39:23 2005
+    - Added Test::Strict tests
+    - Added Finance-Currency-Convert-WebserviceX requirement to META.yml
+
+0.08 Thur Mar 10 20:11:43 2005
+    - Added currency conversion via Finance::Currency::Convert::WebserviceX
+
+0.07 Tue Mar 08 22:35:16 2005
+    - Fixed xsp.t test error when Apache::Test wasn't installed
+
+0.06 Sat Mar 05 16:05:43 2005
+    - Added currency:symbol tag and tests
+
+0.05 Sat Mar 05 16:03:13 2005
+    - Added Makefile.PL to MANIFEST
+    - Tweaked MANIFEST.SKIP to stop ditching Makefile.PL :-)
+
+0.04 Sat Mar 05 13:21:24 2005
+    - Tweaked META.tml format
+
+0.03 Fri Mar 04 21:51:19 2005
+    - Fixed pod for missing currency:price child tag
+
+0.02 Fri Mar 04 20:16:23 2005
+    - Added missing README entry in MANIFEST
+
+0.01 Fri Mar 04 19:23:13 2005
+    - Initial release

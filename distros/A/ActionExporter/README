@@ -1,0 +1,28 @@
+ActionExporter version 0.01
+===========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries,
+but may be useful in conjunction with your own code.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003, Adam Griffiths, Goldcross Technical.
+All Rights Reserved.
+
+This Program is free software. You may copy or
+redistribute it under the same terms as Perl itself.
+
+NO warranty; not even for MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.
+

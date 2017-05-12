@@ -1,0 +1,17 @@
+--- include/wx/defs.h      2014-06-14 22:48:48.000000000 +0100
++++ include/wx/defs.h      2014-11-02 18:57:38.546856700 +0000
+@@ -356,8 +356,13 @@
+         #define HAVE_TR1_TYPE_TRAITS
+     #endif
+ #endif
++#if defined(__MINGW32__)
++    #if defined(HAVE_TR1_TYPE_TRAITS)
++        #undef HAVE_TR1_TYPE_TRAITS
++    #endif
++#endif
+
+-#if defined(__has_include)
++#if defined(__has_include) && !defined(__MINGW32__)
+     /*
+         Notice that we trust our configure tests more than __has_include(),
+         notably the latter can return true even if the header exists but isn't

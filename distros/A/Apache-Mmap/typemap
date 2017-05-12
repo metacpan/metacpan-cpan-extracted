@@ -1,0 +1,23 @@
+##
+## $Id: typemap,v 1.1 1997/09/09 03:30:02 fletch Exp $
+##
+TYPEMAP
+Mmap*	O_OBJECT
+size_t	T_IV
+off_t	T_IV
+
+OUTPUT
+
+O_OBJECT
+    $arg = newSV( 0 );
+    sv_setref_iv( $arg, CLASS, (IV)$var );
+
+INPUT
+
+O_OBJECT
+  if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+    $var = ($type)SvIV((SV*)SvRV( $arg ));
+  else{
+    warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+    XSRETURN_UNDEF;
+  }

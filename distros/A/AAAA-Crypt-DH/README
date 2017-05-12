@@ -1,0 +1,42 @@
+NAME
+    AAAA::Crypt::DH - making Crypt::DH installable
+
+SYNOPSIS
+      # in Makefile.PL
+
+      requires 'AAAA::Crypt::DH';
+
+DESCRIPTION
+    AAAA::Crypt::DH is a Task distribution that makes sure that either
+    Math::BigInt::GMP or Math::BigInt::Pari are installed so that Crypt::DH
+    works at a speed approaching reasonable.
+
+    If you have a dependency on Crypt::DH add AAAA::Crypt::DH as an
+    additional dependency and one of the above Math libs will be installed
+    before Crypt::DH.
+
+    Why the 'AAAA'? Well, CPAN and CPANPLUS install prereqs sorted
+    alphabetically, the 'AAAA' ensures that this prereq is installed before
+    Crypt::DH. Simples.
+
+AUTHOR
+    Chris "BinGOs" Williams
+
+LICENSE
+    Copyright © Chris Williams
+
+    This module may be used, modified, and distributed under the same terms
+    as Perl itself. Please see the license that came with your Perl
+    distribution for details.
+
+SEE ALSO
+    Crypt::DH::GMP
+
+    Math::BigInt::GMP
+
+    Math::BigInt::Pari
+
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-DH>
+
+    <http://cpanratings.perl.org/dist/Crypt-DH>
+

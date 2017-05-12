@@ -1,0 +1,379 @@
+#!perl -w
+# run this document through perl to check its syntax
+use Pod::Checker;
+podchecker(\*DATA);
+__END__
+
+=head1 NAME
+
+App::exceptions - Programming with Exceptions
+
+=head1 INTRODUCTION
+
+Programming with Exceptions
+is a much more reliable way to prepare for unusual conditions
+than trying to handle error codes returned from functions and methods
+That is why programming with exceptions is an Enterprise Programming
+topic.  However, Perl has not always supported programming with
+exceptions, and many Perl programmers are not familiar with this
+style of programming using Perl.
+
+This document was written to explain the support within the Perl
+language for programming using exceptions in general.  It also explains
+the standards for exception programming in the App-Context framework.
+
+The short answer is that we recommend the following modules
+to assist in exception programming.
+
+  Carp
+  CGI::Carp
+  Fatal
+  Exception::Class
+  Devel::Stacktrace
+
+However, it is important to understand what each does for you,
+why, and how they all fit together.
+So for the longer answer, read on.
+
+=head1 IMPORTANCE OF EXCEPTION PROGRAMMING
+
+Exception Programming is a technique to deal with exceptional 
+conditions (i.e. errors) encountered during runtime. 
+It is contrasted with the more common technique of 
+Error Checking.
+
+Error Checking is a technique where an operation is performed.
+Then all possible error conditions are checked and handled.
+This requires the developer to address the following challenges.
+
+=over
+
+=item 1. Error Completeness
+
+The developer must consider all possible error conditions
+(difficult to foresee and consider at every level).
+
+=item 2. Error Propagation
+
+The developer must add quite a bit of additional logic
+to allow subsequent statements after the error condition
+to be skipped and the error to be propagated upward in
+the call stack to the place where
+it can be acted on appropriately.
+
+=back
+
+The problems with Error Checking is that it is so difficult
+to do and so rarely done completely. 
+Since the program runs fine when no errors are
+encountered, the developer invariably fails to put in all of
+the error checks and the accompanying error propagation logic.
+
+Exception Programming addresses these problems using the
+following methods.
+
+=over
+
+=item 1. Error Completeness
+
+Exceptions are grouped into an exception hierarchy.
+Therefore, high level code needs only make the distinctions
+between exceptions that it thinks are relevant.  If additional
+exceptions are added later by low level code, they will be
+handled in accordance with the upper levels of the exception
+hierarchy which are already known.
+
+=item 2. Error Propagation
+
+Exceptions take advantage of built-in language support
+(longjmp() in C) to unravel the call stack.  Additional
+logic is not required by the developer to propagate the
+error to a place that is prepared to handle it.
+
+=back
+
+Because Exception Programming addresses the issue of 
+software reliability (one of the Attributes of Enterprise
+Systems), it is necessarily an Enterprise Programming issue.
+
+=head1 PERL 5 LANGUAGE SUPPORT
+
+Perl did not always support exception programming.
+Even in Perl 5.6.1, the support for exception programming
+is somewhat scattered.
+The following are features of Perl 5 which are relevant
+to exception programming.
+
+=head2 die
+
+  Camel Book: Chapter 3: Functions, "die"
+  Online Doc: man perlfunc (or "perldoc perlfunc")
+
+The "die" function prints its arguments to STDERR and causes
+the program to exit.  It has some extra features, like appending
+__FILE__ and __LINE__ strings if the args don't end with a
+newline.  The biggest feature is that it may be "caught"
+if it is executed within an eval statement.
+
+Simply put, "die" is the native Perl way of "throwing" an
+exception.  The only "attributes" of the "exception" is the
+message (concatenated args) of the "die" itself.
+
+  if ($error_condition_xyz_exists) {
+      die "Error XYZ occurred";
+  }
+
+The "warn" function is similar to "die", in that it prints out
+its arguments to STDERR in the same way, but it does not try
+to exit or throw an exception in any way.  Therefore, it's not
+relevant for this discussion.
+
+  die  "I'm dying";    # print msg to STDERR and exit
+
+=head2 croak and confess
+
+  Camel Book: Chapter 7: The Standard Perl Library, "Carp"
+  Online Doc: man Carp (or "perldoc Carp")
+
+The Carp.pm module is part of the Standard Perl Library
+It allows you to throw exceptions (like "die"), but it reports
+the line number and file name from the perspective of the 
+caller of the function/method that died.
+
+This is useful for library code, so that the programmer sees
+where he invoked the function that failed rather than seeing
+where within that function the failure occurred.
+
+  use Carp;
+
+  croak "We're outta here!";     # like "die", but line # from caller
+  confess "It was my fault: $!"; # like "croak" but with stack trace
+
+Using "croak" to throw an exception references the line # and
+file name of the caller.
+
+Using "confess" to throw an exception causes a 
+stack trace to be printed also.
+
+=head2 CGI::Carp
+
+  Online Doc: man CGI::Carp (or "perldoc CGI::Carp")
+
+If you are developing perl scripts which will be run
+by a web server, the STDERR stream is usually redirected
+the web server error log.  However, the output generated
+by "die" is not formatted nicely, with a datetime stamp
+and filename, as is customary with error log entries.
+
+The CGI::Carp package replaces die, croak, and confess
+with versions which work the same but format the output
+a little more nicely for the web server error log.
+You can even direct fatal errors to the browser.
+
+  use CGI::Carp;
+
+  die  "I'm dying";              # print msg to log and exit
+  warn "I'm confused";           # print msg to log
+  croak "We're outta here!";     # like "die", but line # from caller
+  confess "It was my fault: $!"; # like "croak" but with stack trace
+  carp "It was your fault!";     # like "warn", but line # from caller
+
+  use CGI::Carp qw(fatalsToBrowser);
+  die "Fatal error messages are now sent to browser";
+
+=head2 $!
+
+  Camel Book: Chapter 2: The Gory Details/Special Variables, $!
+  Online Doc: man perlvar (or "perldoc perlvar")
+
+If used in a string context, yields the error string
+from the last system call error in the currently executing perl 
+interpreter.
+
+You shouldn't depend on $! being 
+anything in particular unless you've gotten a specific error
+indicating a system error.
+
+So when you get a system call error returned from a perl function
+(system calls usually relate to files, networking,
+processes, or interprocess communication), you can check $!.
+
+If you want to use good exception programming techniques, every
+perl function which can fail from a system call error should
+be checked for its return value so that an exception may be
+thrown.
+
+  $file = "foo.txt";
+  open(FILE, "< $file") || die "Error opening [$file]: $!";
+
+Of course, if your program's requirements allow you to
+handle the error locally without
+throwing an exception, you are welcome to.
+However, every possible error needs to be thought about
+and accounted for.
+
+  $file = "foo.txt";
+  if (open(FILE, "< $file")) {  # if file doesn't exist, that's ok
+      @data = <FILE>;
+      close(FILE);
+  }
+
+=head2 eval
+
+  Camel Book: Chapter 3: Functions, "eval"
+  Online Doc: man perlfunc (or "perldoc perlfunc")
+
+Eval serves as Perl's version of a "try {}" block.
+
+If a "die" (an exception) occurs within an "eval", the program
+is not terminated, only the "eval".  All of the code
+that was eval'ed, after the exception, is skipped.
+
+Eval has two syntaxes, "eval EXPR" and "eval BLOCK".
+
+The "eval EXPR" syntax causes the code contained in the 
+EXPR expression to be compiled every time the 
+statement is executed during runtime.
+
+  eval "&do_big_function();";
+  $code = "&do_another_big_operation();";
+  eval $code;
+
+The "eval BLOCK" syntax causes the code contained in the
+BLOCK to be compiled only once (at script compile time),
+so it is much more efficient and appropriate for 
+exception programming.
+(Please note the semi-colon that must follow the BLOCK.)
+
+  eval {
+      &do_big_function();
+  };
+
+If any exception ("die") is thrown within the do_big_function(),
+the program will not terminate.  Control will simply be returned
+to the end of the eval block.
+
+=head2 $@
+
+  Camel Book: Chapter 2: The Gory Details/Special Variables, $@
+  Online Doc: man perlvar (or "perldoc perlvar")
+
+The is the Perl syntax error message from the last "eval" command.
+Alternatively, it is the message of an exception that was thrown
+(using "die").
+If null, the last eval was parsed and executed correctly, with
+no exceptions.
+
+Thus, perl exception programming can be done with the following.
+
+  eval {
+      &do_big_function();
+  };
+  if ($@) {
+      # handle the exception ($@ is the exception message)
+  }
+
+  sub do_big_function {
+      ...
+      if ($error_condition_xyz_exists) {
+          die "Error XYZ occurred";
+      }
+      ...
+  }
+
+=head2 $SIG{__DIE__}
+
+  Camel Book: Chapter 2: The Gory Details/Special Variables, %SIG
+  Online Doc: man perlvar (or "perldoc perlvar")
+
+This handler is not necessary to know about to do exception 
+programming in Perl.  However, it may be used by modules that assist
+in exception handling tasks.
+
+The %SIG hash contains references to subroutines which are called
+in response to signals received by the process.  "__DIE__" is a
+special internal hook which is not really an external signal.
+
+So if you desired to do some additional processing between the
+time that the "die" exception was thrown and the time it was
+handled, you could replace the $SIG{__DIE__} handler.
+
+  $SIG{__DIE__} = sub {
+      # do something (@_ are the args of the "die")
+  };
+
+=head2 caller
+
+  Camel Book: Chapter 3: Functions, "caller"
+  Online Doc: man perlfunc (or "perldoc perlfunc")
+
+The "caller" function allows you to examine the call stack
+in order (for example) to print stack traces.
+
+=head2 Weaknesses in the Native Perl Exception Support
+
+The eval/die pair provides the critical language support
+necessary for Error Propagation. 
+
+However, the single
+attribute of an exception, the message, leaves the
+developer without an exception hierarchy which would
+allow him to ensure Error Completeness in his
+exception handling.
+
+Furthermore, the Perl functions themselves must be
+checked for errors rather than throwing exceptions.
+
+=head1 EXCEPTION PROGRAMMING USING Fatal.pm
+
+Causes all of the perl functions to throw exceptions
+rather than simply return error codes or set error
+flags.
+
+=head1 EXCEPTION PROGRAMMING USING Error.pm
+
+Introduces the ability to have an Exception Class
+(not just a message) and to use "try/catch"
+syntax.
+
+It does this be defining try() and catch() subroutines
+with appropriate prototypes, using the "{}" blocks
+as closures (or anonymous subroutines).  See the following
+references.
+
+  Camel Book: Chapter 2: The Gory Details, Subroutines, Prototypes
+  Camel Book: Chapter 4: References and Nested Data Structures, Using Hard References, Closures
+
+However, you must be very careful in the placement of
+your semi-colons using the try/catch syntax provided by
+Error.pm or your
+module will leak memory (very bad in a mod_perl context).
+
+=head1 EXCEPTION PROGRAMMING USING Exception::Class
+
+Introduces the capability to collect exception
+classes easily in a class hierarchy.  This helps
+address the issue of Error Completeness.
+
+=head1 EXCEPTION PROGRAMMING USING Devel::Stacktrace
+
+Adds the capability to print out more detailed
+stack trace information than was possible with
+"confess".
+
+=head1 FURTHER RESEARCH
+
+An excellent section on Exception Handling in Perl
+exists in the mod_perl Guide.
+
+  http://perl.apache.org/guide/perl.html#Exception_Handling_for_mod_perl
+
+You can read up on future directions
+for Perl and the evolving exception support here.
+
+  http://www.perl.com/pub/a/2002/01/15/apo4.html?page=3
+  http://dev.perl.org/rfc/88.html
+  http://nntp.perl.org/group/perl.perl6.language.errors
+
+=cut
+

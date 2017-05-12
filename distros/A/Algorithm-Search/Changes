@@ -1,0 +1,7 @@
+Revision history for Perl extension Algorithm::Search.
+
+0.04 Fixed cost based example (module code did not change except for version #)
+
+0.03 Logging of moves in trace
+
+0.02  Originally Released Version

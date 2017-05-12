@@ -1,0 +1,45 @@
+                    Wormhole Example
+                    ================
+
+An example of using the wormhole aspect. Shows how the design degrades
+when a feature is added, and how refactoring to aspects improves the
+design.
+
+
+before.pl -    the initial design. Our company prints documents. We have
+               the classes Printer, SpamPrintJob, and SpamDocument. To
+               print a job you create it, create a Printer, and call
+               $printer->print($job). The call flow will be (Class::method):
+
+               Printer::print
+                   SpamPrintJob::spool
+                      SpamDocument::spool
+
+               All is well: the design is nice and clean, and allows us
+               to create a hierarchy of classes for different jobs and
+               different documents.
+
+
+after_oop.pl - we are told the company has purchased several new
+               printers. This means that SpamDocument::spool must get
+               the  name of the printer from somewhere. And it must be
+               the name of the printer that is currently printing this
+               document. So we append the Printer object to the argument
+               list of each method in the call flow. SpamPrintJob now
+               suffers from EEK. It knows about the fact that SpamDocument
+					needs a Printer.
+
+
+after_aop.pl - to remove EEK we refactor to use the Wormhole aspect.
+               SpamPrintJob now knows nothing of the fact that we have
+               several printers. In fact, the code is exactly like
+               before.pl, except for these changes:
+
+               * added to Printer instance data for name support
+               * added a wormhole aspect
+               * appended a Printer argument to SpamDocument::spool
+
+               The wormhole allows us to pass the Printer down a call
+               flow, without modifying any objects along the way.
+
+

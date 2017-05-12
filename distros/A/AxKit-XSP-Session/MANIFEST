@@ -1,0 +1,7 @@
+t/01basic.t
+Makefile.PL
+Changes
+MANIFEST
+README
+lib/AxKit/XSP/Session.pm
+lib/Apache/AxKit/Plugins/Session.pm

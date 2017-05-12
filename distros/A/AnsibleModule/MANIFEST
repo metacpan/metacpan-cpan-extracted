@@ -1,0 +1,16 @@
+Changes
+lib/AnsibleModule.pm
+lib/Test/AnsibleModule.pm
+Makefile.PL
+MANIFEST			This list of files
+README.txt
+script/ansible-perl
+t/01_basic.t
+t/02_test.t
+t/03_args.t
+t/ext/arg_test
+t/ext/echo
+t/ext/exit_json
+t/ext/fail_json
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

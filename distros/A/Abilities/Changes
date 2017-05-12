@@ -1,0 +1,53 @@
+Revision history for Abilities
+
+0.5       2013-05-03 20:56:51 Asia/Jerusalem
+	[ BUGFIXES ]
+	- Fixed all bugs introduced in versions 0.3 and 0.4 that made this
+	  package unusable (see the UPGRADING FROM v0.2 sections in both
+	  Abilities.pm and Abilities/Features.pm for more info)
+
+0.4       2013-05-02 21:06:25 Asia/Jerusalem
+	[ VARIOUS CHANGES ]
+	- Moved from Any::Moose to Moo as per the former's deprecation
+
+	[ BUGFIXES ]
+	- fixed _build_abilities() to skip non-blessed roles (submitted by cafe01)
+	- small documentation fixes
+
+0.3       2012-12-28 17:15:01 Asia/Jerusalem
+	[ BACKWARDS COMPATIBILITY BROKEN ]
+	- Actions and features can now have constraints. When an action/features
+	  doesn't have any, then it's really a yes/no (have/don't) option.
+	  When an action/feature does have constraints, then it's no longer
+	  a yes/no option. This allows more finer grained control over
+	  abilities.
+	- The can_perform() method now can only take one action, not a list.
+	  It now also takes an optional constraint. Same goes for has_feature().
+	- The required actions() method in Abilities.pm and features() method
+	  in Abilities/Features.pm now expects a different return structure,
+	  read the docs for more info
+	- Abilities::Scoped is removed since Abilities now provides the
+	  same functionality with the new constraints paradigm
+
+	[ VARIOUS CHANGES ]
+	- Now using Any::Moose instead of Moose
+	- Changed the names of Abilities::assigned_role() and Abilities::belongs_to()
+	  (they were the same method) to Abilities::assigned_role() and
+	  added a deprecation warning for the previous two
+	- Changed the name of Abilities::does_role() to Abilities::does_role()
+	  and added a deprecation warning to the previous one
+	- Changed the name of Abilities::Features::inherits_plan()
+	  to Abilities::Features::inherits_plan() and added a deprecation
+	  warning for the previous one
+	- Created a test suite
+
+0.2       2011-02-01 19:16:06 Asia/Jerusalem
+	- Added Abilites::Scoped - a special version of Abilites.pm that
+	  supports scoping
+
+0.1       2010-07-20 23:31:59 Asia/Jerusalem
+	- Initial release
+	- Base code extracted from my Catalyst::Plugin::Authorization::Abilities module
+	  and turned into a Moose role
+	- Added the "Features" code to support customer-plan-features management
+

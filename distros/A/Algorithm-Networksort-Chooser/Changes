@@ -1,0 +1,9 @@
+0.110   2016-02-16
+  * Update docs
+  * Properly reference binary in Makefile (oops)
+  * Support --help/-h
+  * Better error messages when invalid algorithms are specified
+  * Support optimisation by average swaps
+
+0.100   2013-02-19
+  * Initial release

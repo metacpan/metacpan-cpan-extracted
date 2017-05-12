@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+example/01-myapp
+example/02-registered
+example/03-subshell-app
+lib/App/Rad/Plugin/ReadLine.pm
+lib/App/Rad/Plugin/ReadLine/Demo.pm
+t/00-loads.t
+weaver.ini

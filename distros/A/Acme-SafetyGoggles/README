@@ -1,0 +1,58 @@
+Acme-SafetyGoggles
+
+Is some module you imported using source filtering? If the
+answer is yes, or if the answer is "I don't know", then
+you can't trust the code in front of your own eyes! 
+
+That's why you should always use patent-pending 
+Acme::SafetyGoggles in your untrusted Perl code! 
+Acme::SafetyGoggles  compares your original source file
+with the code that is actually going to be run, and
+alerts you to any differences. 
+
+Protect the programmer's seventh most important
+attribute --  his/her eyes -- with the Acme::SafetyGoggles
+module.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Acme::SafetyGoggles
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-SafetyGoggles
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Acme-SafetyGoggles
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Acme-SafetyGoggles
+
+    Search CPAN
+        http://search.cpan.org/dist/Acme-SafetyGoggles/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Marty O'Brien
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,31 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - ars_DecodeAlertMessage</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+    <H2><code>ars_DecodeAlertMessage(ctrl, message, messagelength)</code></H2>
+    <font face="Minion-Regular" size="3">Decodes a formatted alert message and returns the component parts of the message to the alert client.</font>
+      <DL>
+          <DT><B>On success</B><DD>
+			Decodes a formatted alert message and returns the component parts of the message to the alert client. 
+          <DT><B>On failure</B><DD>
+		returns 0
+      </DL>
+      <P>
+<em>ars_DecodeAlertMessage was intrduced in version 1.8 of ARSperl.</em>
+      <P>Example:
+
+    <PRE>
+      (@userlist = ars_DecodeAlertMessage($ctrl, $message, $len)) || die $ars_errstr;
+      </PRE>
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+    <address>Last changes to this page 26th Feb 2006 by Jarl Grøneng<br>
+      &#169; J.C.Murphy, J.W.Murphy 1997 arsperl@arsperl.org
+</address>
+</BODY>
+</HTML>

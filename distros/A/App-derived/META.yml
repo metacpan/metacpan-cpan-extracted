@@ -1,0 +1,52 @@
+---
+abstract: 'run command periodically and calculate rate and check from network'
+author:
+  - 'Masahiro Nagano E<lt>kazeburo@gmail.comE<gt>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-derived
+no_index:
+  directory:
+    - inc
+provides:
+  App::derived:
+    file: lib/App/derived.pm
+    version: 0.10
+  App::derived::Plugin:
+    file: lib/App/derived/Plugin.pm
+    version: 0
+  App::derived::Plugin::Dumper:
+    file: lib/App/derived/Plugin/Dumper.pm
+    version: 0
+  App::derived::Plugin::GrowthForecast:
+    file: lib/App/derived/Plugin/GrowthForecast.pm
+    version: 0
+  App::derived::Plugin::Memcached:
+    file: lib/App/derived/Plugin/Memcached.pm
+    version: 0
+requires:
+  Class::Accessor::Lite: 0.05
+  File::Copy: 0
+  File::Temp: 0
+  Getopt::Long: 0
+  IO::Socket::INET: 0
+  JSON: 2.53
+  LWP::UserAgent: 6.02
+  Log::Minimal: 0.14
+  Module::Load: 0.24
+  POSIX: 0
+  Pod::Usage: 0
+  Proclet: 0.23
+  perl: 5.008005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.10

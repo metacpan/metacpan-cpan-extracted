@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+lib/Acme/OneBit.pm
+README
+t/onebit.t
+META.yml                                 Module meta-data (added by MakeMaker)

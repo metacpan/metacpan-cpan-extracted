@@ -1,0 +1,461 @@
+#!/usr/bin/perl -w
+
+###############################################################################
+#
+# pod2epub - A utility to convert Pod to an ePub eBook.
+#
+# Copyright 2010-2012, John McNamara, jmcnamara@cpan.org
+#
+# Documentation after __END__
+#
+
+use strict;
+use App::Pod2Epub;
+use Getopt::Long;
+use Pod::Usage;
+use EBook::EPUB;
+use Data::UUID;
+use File::Temp 'tempfile';
+
+
+# Set some defaults for the commandline options.
+my $author         = 'Perl Author';
+my $title          = 'Pod Document';
+my $language       = 'en';
+my $out_filename   = '';
+my $css_filename   = '';
+my $cover_filename = '';
+my $user_css       = 0;
+my $xhtml_only     = 0;
+my $version        = 0;
+my $man            = 0;
+my $help           = 0;
+my $whine          = 1;
+my $errata         = 1;
+my $complain       = 0;
+
+
+main();
+
+###############################################################################
+#
+# main()
+#
+# The main application function.
+#
+sub main {
+
+    my $in_fh;
+    my $in_filename;
+    my $xhtml_fh;
+    my $xhtml_filename;
+
+    # Read any commandline options.
+    get_commandline_options();
+
+    # Create the pod2epub parser.
+    my $parser = App::Pod2Epub->new();
+
+    # Set the input filehandle.
+    if ( $in_filename = $ARGV[0] ) {
+        open $in_fh, '<', $in_filename
+          or die "Couldn't open $in_filename: $!\n";
+    }
+    else {
+        $in_fh = *STDIN;
+    }
+
+
+    if ( $xhtml_only ) {
+
+        # Output the XHTML doc only. This is mainly use for debugging
+        # the XHTML output.
+        if ( $out_filename ) {
+            open $xhtml_fh, '>', $out_filename
+              or die "Couldn't open $out_filename: $!\n";
+        }
+    }
+    else {
+
+        # Write the XHTML to a temp file. This will be added to the ePub doc.
+        ( $xhtml_fh, $xhtml_filename ) = tempfile();
+    }
+
+    # Parse the Pod doc and output the XHTML file.
+    $parser->output_fh( $xhtml_fh );
+    $parser->parse_file( $in_fh );
+
+    close $xhtml_fh;
+    close $in_fh;
+
+    # If using the --xhtml-only option exit before creating an ePub doc.
+    return if $xhtml_only;
+
+
+    # Create EPUB object
+    my $epub = EBook::EPUB->new();
+
+    # Set the ePub metadata.
+    $epub->add_title( $title );
+    $epub->add_author( $author );
+    $epub->add_language( $language );
+
+
+    # Add user defined cover image if it supplied.
+    add_cover( $epub, $cover_filename ) if $cover_filename;
+
+    # Add the Dublin Core UUID.
+    my $du = Data::UUID->new();
+    my $uuid = $du->create_from_name_str( NameSpace_URL, 'www.perl.org' );
+
+    {
+
+        # Ignore overridden UUID warning form EBook::EPUB.
+        local $SIG{__WARN__} = sub { };
+        $epub->add_identifier( "urn:uuid:$uuid" );
+    }
+
+    # Add some other metadata to the OPF file.
+    $epub->add_meta_item( 'Pod2epub version',    $App::Pod2Epub::VERSION );
+    $epub->add_meta_item( 'EBook::EPUB version', $EBook::EPUB::VERSION );
+
+
+    # Get the user supplied or default css file name.
+    $css_filename = get_css_file( $css_filename );
+
+
+    # Add package content: stylesheet, font, xhtml
+    $epub->copy_stylesheet( $css_filename, 'styles/style.css' );
+    $epub->copy_xhtml( $xhtml_filename, 'text/main.xhtml', linear => 'no' );
+
+
+    # Add Pod headings to table of contents.
+    set_table_of_contents( $epub, $parser->{'to_index'} );
+
+
+    # Generate the ePub eBook.
+    $epub->pack_zip( $out_filename );
+
+    # Clean up any temporary files.
+    unlink $xhtml_filename;
+    unlink $css_filename if !$user_css;
+
+}
+
+
+###############################################################################
+#
+# set_table_of_contents()
+#
+# Add the Pod headings to the NCX <navMap> table of contents.
+#
+sub set_table_of_contents {
+
+    my $epub         = shift;
+    my $pod_headings = shift;
+
+    my $play_order   = 1;
+    my $navpoint_obj = $epub;
+
+
+    for my $heading ( @$pod_headings ) {
+
+        my $heading_level = $heading->[0];
+        my $section       = $heading->[1];
+        my $label         = $heading->[2];
+        my $content       = 'text/main.xhtml';
+
+        # Only deal with head1 and head2 headings.
+        next if $heading_level > 2;
+
+        # Add the pod section to the NCX data, Except for the root heading.
+        $content .= '#' . $section if $play_order > 1;
+
+        my %options = (
+            content    => $content,
+            id         => 'navPoint-' . $play_order,
+            play_order => $play_order,
+            label      => $label,
+        );
+
+        $play_order++;
+
+        # Add the navpoints at the correct nested level.
+        if ( $heading_level == 1 ) {
+            $navpoint_obj = $epub->add_navpoint( %options );
+        }
+        else {
+            $navpoint_obj->add_navpoint( %options );
+        }
+    }
+}
+
+###############################################################################
+#
+# get_css_file()
+#
+# Get the user supplied or default css file name.
+#
+sub get_css_file {
+
+    my $css_filename = shift;
+    my $css_fh;
+
+    # If the user supplied the css filename check if it exists.
+    if ( $css_filename ) {
+        if ( -e $css_filename ) {
+            $user_css = 1;
+            return $css_filename;
+        }
+        else {
+            warn "CSS file $css_filename not found.\n";
+        }
+    }
+
+    # If the css file doesn't exist or wasted supplied create a default.
+    ( $css_fh, $css_filename ) = tempfile();
+
+    print $css_fh "h1         { font-size: 110%; }\n";
+    print $css_fh "h2, h3, h4 { font-size: 100%; }\n";
+
+    close $css_fh;
+
+    return $css_filename;
+}
+
+
+###############################################################################
+#
+# add_cover()
+#
+# Add a cover image to the eBook. Add cover metadata for iBooks and add an
+# additional cover page for other eBook readers.
+#
+sub add_cover {
+
+    my $epub           = shift;
+    my $cover_filename = shift;
+
+
+    # Check if the cover image exists.
+    if ( !-e $cover_filename ) {
+        warn "Cover image $cover_filename not found.\n";
+        return undef;
+    }
+
+    # Add cover metadata for iBooks.
+    my $cover_id = $epub->copy_image( $cover_filename, 'images/cover.jpg' );
+    $epub->add_meta_item( 'cover', $cover_id );
+
+    # Add an additional cover page for other eBook readers.
+    my $cover_xhtml =
+        qq[<?xml version="1.0" encoding="UTF-8"?>\n]
+      . qq[<!DOCTYPE html\n]
+      . qq[     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n]
+      . qq[    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n\n]
+      . qq[<html xmlns="http://www.w3.org/1999/xhtml">\n]
+      . qq[<head>\n]
+      . qq[<title></title>\n]
+      . qq[<meta http-equiv="Content-Type" ]
+      . qq[content="text/html; charset=iso-8859-1"/>\n]
+      . qq[<style type="text/css"> img { max-width: 100%; }</style>\n]
+      . qq[</head>\n]
+      . qq[<body>\n]
+      . qq[    <img alt="" src="../images/cover.jpg" />\n]
+      . qq[</body>\n]
+      . qq[</html>\n\n];
+
+    # Crete a temp file for the cover xhtml.
+    my ( $tmp_fh, $tmp_filename ) = tempfile();
+
+    print $tmp_fh $cover_xhtml;
+    close $tmp_fh;
+
+    # Add the cover page to the ePub doc.
+    $epub->copy_xhtml( $tmp_filename, 'text/cover.xhtml', linear => 'no' );
+
+    # Add the cover to the OPF guide.
+    my $guide_options = {
+        type  => 'cover',
+        href  => 'text/cover.xhtml',
+        title => 'Cover',
+    };
+
+    $epub->guide->add_reference( $guide_options );
+
+    # Cleanup the temp file.
+    unlink $cover_xhtml;
+
+    return $cover_id;
+}
+
+
+###############################################################################
+#
+# get_commandline_options()
+#
+# Parse options from the commandline using GetOptions.
+#
+sub get_commandline_options {
+
+    # Use GetOptions for the commandline parsing.
+    GetOptions(
+        'a|author=s'     => \$author,
+        't|title=s'      => \$title,
+        'l|language=s'   => \$language,
+        'o|outfile=s'    => \$out_filename,
+        's|stylesheet=s' => \$css_filename,
+        'c|cover=s'      => \$cover_filename,
+        'v|version'      => \$version,
+        'x|xhtml-only'   => \$xhtml_only,
+        'h|help'         => \$help,
+        'man'            => \$man,
+        'whine!'         => \$whine,
+        'errata!'        => \$errata,
+        'complain!'      => \$complain,
+    ) or pod2usage( 2 );
+
+    # Print the application version and exit.
+    die "pod2epub, version $App::Pod2Epub::VERSION\n" if $version;
+
+    # Print the application usage or manpage.
+    pod2usage( 1 ) if $help;
+    pod2usage( -verbose => 2 ) if $man;
+
+    # Require the outfile argument.
+    pod2usage( 1 ) if !$out_filename;
+
+    # Print usage when there are no options used.
+    pod2usage() if @ARGV == 0 && -t STDIN;
+}
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+pod2epub - A utility to convert Pod to an ePub eBook.
+
+=head1 SYNOPSIS
+
+pod2epub [options] podfile --outfile file.epub
+
+    Main options (see manpage for all options):
+        -o --outfile    Name of output ePub file.
+        -t --title      Add ePub book title.
+        -a --author     Add ePub book author.
+        -s --stylesheet Change the default stylesheet.
+        -c --cover      Add cover image.
+        -h --help       Print a brief help message.
+        -m --man        Print the full manpage.
+
+    Example:
+        pod2epub some_module.pm -o some_module.epub
+
+=head1 DESCRIPTION
+
+This program is used for converting Pod documents to ePub eBooks. The output eBook can be read on a variety of hardware and software eBook readers.
+
+Pod is Perl's I<Plain Old Documentation> format, see L<http://perldoc.perl.org/perlpod.html>. EPub is an eBook format, see L<http://en.wikipedia.org/wiki/Epub>.
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<podfile>
+
+The input file containing Pod documentation.
+
+=item B<-o or --outfile>
+
+The output ePub file. This is a required argument.
+
+=item B<-s or --stylesheet>
+
+Specify the CSS stylesheet that the ePub eBook will use. If none is supplied the following minimal stylesheet is used:
+
+    h1         { font-size: 110%; }
+    h2, h3, h4 { font-size: 100%; }
+
+=item B<-c or --cover>
+
+Add an image for use as a book cover.
+
+=item B<-t or --title>
+
+Add the ePub book title. Defaults to "Pod Document". A future release will parse this from the Pod document where possible.
+
+=item B<-a or --author>
+
+Add the ePub book author. Defaults to "Perl Author". A future release will parse this from the Pod document where possible.
+
+=item B<-h or --help>
+
+Print a brief help message and exit.
+
+=back
+
+=head1 SECONDARY OPTIONS
+
+=over 4
+
+=item B<-x or --xhtml-only>
+
+Output the Pod documentation in XHTML format without converting it ePub. This can be useful for debugging XHTML errors.
+
+=item B<-l or --language>
+
+Add the ePub book language. Defaults to "en".
+
+=item B<-m or --man>
+
+Prints the manpage and exit.
+
+=item B<-v or --version>
+
+Prints the version of the C<pod2epub> application.
+
+=item B<-e or --errata>
+
+Generate a "Pod Errors" section at the end of the document if there are Pod errors. This is the default. To turn this feature off use C<--no-errata> or C<-no-e>. Equivalent to the L<Pod::Simple> C<no_errata_section()> method.
+
+=back
+
+
+=head1 TODO
+
+=over 4
+
+=item *
+
+Parse the document title from the Pod doc, where possible.
+
+=item *
+
+Parse the author name from the Pod doc, where possible.
+
+=item *
+
+Add an XHTML validation option.
+
+=item *
+
+Add controls and defaults for internal links.
+
+=back
+
+=head1 AUTHOR
+
+John McNamara jmcnamara@cpan.org
+
+
+=head1 COPYRIGHT
+
+© MMXII, John McNamara.
+
+All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.
+
+=cut

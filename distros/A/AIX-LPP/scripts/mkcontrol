@@ -1,0 +1,21 @@
+#!/usr/bin/perl -w
+# mkcontrol - script to generate an lppbuild control file from lpp_name
+# (note: only creates limited 'control' file)
+#
+# usage: mkcontrol < lpp_name > control
+
+use AIX::LPP::lpp_name;
+
+# change this to use stdin/stdout
+
+$package = AIX::LPP::lpp_name->read(\*STDIN);
+
+# instead of calling write(), find the data we want and print it to stdout
+
+my ($name,$version,$type,$four,$fs) = $package->lpp();
+
+my ($fsname,$vrmf,$disk,$bboot,$cntnt,$lang,$desc,$cmnt) = 
+	$package->fileset($fs);
+print 'NAME=',"$fsname\n";
+print 'VERSION=',"$vrmf\n";
+print 'DESCRIPTION=',"$desc\n";

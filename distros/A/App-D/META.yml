@@ -1,0 +1,28 @@
+---
+abstract: 'show time and month info'
+author:
+  - 'Ivan Bessarabov <ivan@bessarabov.ru>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-D
+requires:
+  Carp: 0
+  Class::Date: 0
+  Term::ANSIColor: 0
+  open: 0
+  perl: v5.8.0
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/bessarabov/App-D/issues
+  homepage: https://github.com/bessarabov/App-D
+  repository: https://github.com/bessarabov/App-D.git
+version: 1.3.2

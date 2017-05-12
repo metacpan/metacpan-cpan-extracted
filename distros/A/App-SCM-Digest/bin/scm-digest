@@ -1,0 +1,103 @@
+#!perl
+
+use warnings;
+use strict;
+
+use App::SCM::Digest;
+
+use Getopt::Long;
+use Pod::Usage;
+use YAML;
+
+sub load_config
+{
+    my ($path) = @_;
+
+    my $config = YAML::LoadFile($path);
+    return $config;
+}
+
+sub main
+{
+    my %options;
+    GetOptions(\%options, 'conf=s',
+               'update', 'get-email', 'from=s', 'to=s');
+
+    my $config_path = $options{'conf'} || '/etc/scm-digest.conf';
+    if (not -e $config_path) {
+        print STDERR "Configuration file not found.\n";
+        pod2usage(10);
+    }
+    my $config = load_config($config_path);
+
+    my $app = App::SCM::Digest->new($config);
+
+    if ($options{'update'}) {
+        $app->update();
+    } elsif ($options{'get-email'}) {
+        my $email = $app->get_email($options{'from'}, $options{'to'});
+        if ($email) {
+            print $email->as_string();
+        }
+    } else {
+        print STDERR "Invalid options.\n";
+        pod2usage(10);
+    }
+}
+
+main();
+
+1;
+
+__END__
+
+=head1 NAME
+
+scm-digest - Send repository commit digest emails
+
+=head1 SYNOPSIS
+
+scm-digest [ options ]
+
+Options:
+
+  --conf {config}  Set configuration path (defaults to /etc/scm-digest.conf)
+  --update         Initialise and update local repositories
+  --get-email      Print digest email to standard output
+  --from {time}    Only include commits made after this time in digest
+  --to {time}      Only include commits made before this time in digest
+
+Time format is '%Y-%m-%dT%H:%M:%S', e.g. '2000-12-25T22:00:00'.
+
+The configuration file must be in YAML format.  Options that may be
+specified are as follows:
+
+  db_path:          /path/to/db
+  repository_path:  /path/to/local/repositories
+  timezone:         UTC
+  ignore_errors:    0
+  headers:
+    From: From Address <from@example.org>
+    To:   To Address <to@example.org>
+    ...
+  repositories:
+    - name: test
+      url: http://example.org/path/to/repository
+      type: [git|hg]
+    - name: local-test
+      url: file:///path/to/repository
+      type: [git|hg]
+      ...
+
+C<db_path>, C<repository_path>, and C<repositories> are mandatory
+options.
+
+C<timezone> is optional, and defaults to 'UTC'.  See
+L<DateTime::TimeZone::Catalog> for a list of valid timezones.
+
+C<ignore_errors> is an optional boolean, and defaults to false.  If
+false, errors will cause the process to abort immediately.  If true,
+errors will instead be printed to C<stderr>, and the process will
+continue onto the next repository.
+
+=cut

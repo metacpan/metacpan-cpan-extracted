@@ -1,0 +1,84 @@
+NAME
+    Apache::ReverseProxy - An Apache mod_perl reverse proxy
+
+SYNOPSIS
+     # In Apache config file
+     <Location />
+     SetHandler perl-script
+     PerlHandler Apache::ReverseProxy
+     PerlSetVar ReverseProxyConfig /usr/local/apache/conf/rproxy.conf
+     </Location>
+
+    # In rproxy.conf / http://www.cpan.org/
+
+DESCRIPTION
+    This is a reverse proxy module for Apache with mod_perl. It is intended
+    to replace Apache::ProxyPass. Given a list of URI mappings, this module
+    will translate an incoming URI, retrieve the contents for the translated
+    URI, and return the contents to the original requestor. This module
+    allows you to specify exact matching (instead of regular expression
+    matching) and handles query string translations.
+
+CONFIGURATION
+    You will need to set the ReverseProxyConfig perl variable in Apache to
+    the path of the reverse proxy mapping file. For example:
+
+     <Location />
+     SetHandler perl-script
+     PerlHandler Apache::ReverseProxy
+     PerlSetVar ReverseProxyConfig /usr/local/apache/conf/rproxy.conf
+
+     # Optional configuration items:
+     #PerlSetVar ReverseProxyChain http://proxy.mycompany.com:8888/
+     #PerlSetVar ReverseProxyNoChain mycompany.com
+     </Location>
+
+    ReverseProxyChain specifies a proxy server to use. This is sometimes
+    called *proxy chaining* when one proxy server uses another proxy server.
+    The ReverseProxyNoChain directive can specify a domain to not use proxy
+    chaining on.
+
+    Reverse proxy configuration files have three fields, each separated by
+    white space. The first field is the uri to look for, the second field is
+    the replacement uri, and the third field is optional and allows you to
+    specify comma separated options for the mapping. The only option that is
+    currently supported is the exact parameter, which will make the reverse
+    proxy use exact matching for the first parameter instead of using
+    regular expressions. This feature is convenient when the first parameter
+    contains characters that may need to be escaped or quotemeta'ed. Exact
+    options are evaluated first. If there isn't an exact match, regular
+    expression matches are performed. Configuration files may contain
+    comments, which start with a pound sign. For example:
+
+     /news/ http://www.news.com/
+     / http://www.perl.com/
+     /stats http://localhost/stats exact
+     # /stats maps exactly to http://localhost/stats
+     # /stats/b maps to http://www.perl.com/stats/b
+     /french/news http://www.news.com/?language=french
+     # /french/news/index -> http://www.news.com/index?language=french
+     # /french/news/index?a=b -> http://www.news.com/index?language=french&a=b
+
+TO-DO
+      1. Cookie header translation.
+      2. Verbose/debug logging.
+
+REQUIREMENTS
+     This module requires LWP, available at:
+     http://www.cpan.org/modules/by-module/LWP/
+
+AUTHOR
+     Clinton Wong, http://search.cpan.org/~clintdw/
+
+COPYRIGHT
+     Copyright (c) 1999-2005 Clinton Wong.
+     Additional modifications Copyright (c) 2000 David Jao.
+     Additional modifications Copyright (c) 2005 Penny Leach.
+     All rights reserved.
+ 
+     This program is free software; you can redistribute it
+     and/or modify it under the same terms as Perl itself.
+ 
+     This module is based on Apache::ProxyPass, by Michael
+     Smith <mjs@iii.co.uk>, which is based on Apache::ProxyPassThru.
+

@@ -1,0 +1,22 @@
+int *	T_int_array
+
+INPUT
+T_int_array
+	if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+		AV *av = (AV *)SvRV($arg);
+		int i = 0, len = AvFILL(av) + 1;
+		SV **sv;
+		$var = alloca(len * sizeof(int));
+		while (i < len) {
+			sv = av_fetch(av, i, 0);
+			if (sv && looks_like_number(*sv)) {
+				${var}[i] = SvIV(*sv);
+			}
+			else {
+				${var}[i] = 0;
+			} ++i;
+		}
+	}
+	else {
+		croak(\"$var is not an array reference\");
+	}

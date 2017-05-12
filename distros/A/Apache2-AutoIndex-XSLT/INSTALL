@@ -1,0 +1,8 @@
+perl Build.PL
+perl Build
+perl Build test
+perl Build install
+
+cp -r examples/apache/htdocs/* {{root of your website}}
+cp examples/apache/conf/filetypes.dat {{apache conf directory}}
+

@@ -1,0 +1,7 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Apache/No404Proxy/Mogile.pm
+t/00-basic.t

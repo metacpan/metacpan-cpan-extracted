@@ -1,0 +1,272 @@
+2016-10-20 12:09  osalaun_ur1
+
+	* trunk/META.yml, trunk/lib/AuthCAS.pm: Preparing version 1.7
+
+2016-10-20 09:08  osalaun_ur1
+
+	* trunk/lib/AuthCAS.pm: Add encoding declaration in perl module.
+	  Fix for this bug report:
+	  https://rt.cpan.org/Ticket/Display.html?id=87241
+
+2012-09-10 09:40  olivier.salaun
+
+	* trunk/LICENSE, trunk/MANIFEST, trunk/MANIFEST.SKIP,
+	  trunk/META.yml: add LICENSE file
+
+2012-09-08 03:44  svendowideit
+
+	* trunk/MANIFEST, trunk/MANIFEST.SKIP, trunk/META.json,
+	  trunk/META.yml: add MANIFEST.SKIP so that we don't accidentally
+	  add past releases to the MANIFEST during disttest
+
+2012-09-07 11:58  olivier.salaun
+
+	* trunk/Build.PL, trunk/MANIFEST, trunk/META.json, trunk/META.yml:
+	  Failed to build release 1.6 ; creating a META.json file for a try
+
+2012-09-07 08:34  olivier.salaun
+
+	* trunk/Changes: preparing 1.6
+
+2012-09-07 01:15  svendowideit
+
+	* trunk/Build.PL, trunk/MANIFEST, trunk/META.yml: small META
+	  updates
+
+2012-09-07 01:14  svendowideit
+
+	* trunk/lib/AuthCAS.pm, trunk/t/simple.t: don't tlk to CAS server
+	  unless service_url and ticket are defined
+
+2012-09-07 01:14  svendowideit
+
+	* trunk/Build.PL, trunk/MANIFEST, trunk/lib/AuthCAS.pm,
+	  trunk/t/simple.t: add simplistic unit test to expose a problem in
+	  error reporting and un-set variables
+
+2012-09-07 01:13  svendowideit
+
+	* trunk/Build.PL, trunk/META.yml, trunk/Makefile.PL: list same deps
+	  in Build.PL and Makefile.PL -
+	  https://rt.cpan.org/Public/Bug/Display.html?id=52682
+
+2012-09-07 01:12  svendowideit
+
+	* trunk/lib/AuthCAS.pm: missed a link
+
+2012-09-07 01:12  svendowideit
+
+	* trunk/lib/AuthCAS.pm: even more pod
+
+2012-09-07 01:11  svendowideit
+
+	* trunk/lib/AuthCAS.pm: learning a little more pod
+
+2012-09-07 01:11  svendowideit
+
+	* trunk/lib/AuthCAS.pm: learning a little pod
+
+2012-09-07 01:10  svendowideit
+
+	* trunk/lib/AuthCAS.pm: move some pod around
+
+2012-09-07 01:10  svendowideit
+
+	* trunk/Changes, trunk/META.yml, trunk/README,
+	  trunk/lib/AuthCAS.pm: add SSL_version option to constructor to
+	  allow for servers that cause problems
+	  add pod skeletons for all functions
+
+2012-09-07 01:09  svendowideit
+
+	* trunk/lib/AuthCAS.pm: perltidy
+
+2011-04-11 14:35  olivier.salaun
+
+	* trunk/META.yml, trunk/lib/AuthCAS.pm: changement de numéro de
+	  version pour s'adapter à CPAN : 1.4.1 => 1.5
+
+2011-04-11 14:00  olivier.salaun
+
+	* trunk/META.yml, trunk/lib/AuthCAS.pm: preparing release 1.4.1
+
+2011-04-11 13:50  olivier.salaun
+
+	* trunk/Changes: updating changelog
+
+2011-04-11 13:41  olivier.salaun
+
+	* trunk/lib/AuthCAS.pm: Bug fix reported by S.Posé, Rectorat de la
+	  Réunion. AUthentication requests would not get processed by the
+	  CAS server. Replaced \n with \r\n while performing an HTTP GET.
+
+2009-06-08 13:00  olivier.salaun
+
+	* trunk/Changes: Update changelog
+
+2009-06-08 13:00  olivier.salaun
+
+	* trunk/META.yml, trunk/lib/AuthCAS.pm: Renaming 1.3.3 release to
+	  1.4 to match the CPAN versionning style
+
+2009-06-05 15:47  olivier.salaun
+
+	* trunk/Changes, trunk/META.yml, trunk/lib/AuthCAS.pm: preparing
+	  version 1.3.3
+
+2009-05-12 15:48  olivier.salaun
+
+	* trunk/Changes, trunk/META.yml, trunk/lib/AuthCAS.pm: Updating the
+	  version number
+
+2009-05-12 07:31  olivier.salaun
+
+	* trunk/lib/AuthCAS.pm: Change: now use eval() to check if perl
+	  modules are available ; this is
+	  required by recent Perl interpreters
+
+2007-10-16 09:26  olivier.salaun
+
+	* trunk/lib/AuthCAS.pm: Updated release number
+
+2007-10-16 09:20  olivier.salaun
+
+	* trunk/Changes, trunk/META.yml: Preparing 1.3.1 release
+
+2007-10-16 09:13  olivier.salaun
+
+	* trunk/lib/AuthCAS.pm: [reported by S.McDonald, bepress.com] Fix:
+	  error at "make test" : "Global symbol "$xmlRef" requires explicit
+	  package name"
+	  The code was still refering to the old $xmlRef variable
+
+2007-08-21 08:43  olivier.salaun
+
+	* trunk/Changes: Updated
+
+2007-08-21 08:31  olivier.salaun
+
+	* trunk/lib/AuthCAS.pm: [reported by P.Brusten]Fix: expected an
+	  arrayref instead of an array for gethttps2() output. This bug was
+	  introduced by S.More's patch. Concel it.
+
+2007-08-21 08:20  olivier.salaun
+
+	* trunk/README: Refer to the bug tracking system
+
+2007-04-06 16:14  olivier.salaun
+
+	* trunk/Changes: Updated
+
+2007-04-06 16:10  olivier.salaun
+
+	* trunk/META.yml, trunk/lib/AuthCAS.pm: preparind 1.2
+
+2007-04-06 16:05  olivier.salaun
+
+	* trunk/lib/AuthCAS.pm: [Kasper Løvschall] Fix: XML parser now
+	  accepts multiple name space tags in CAS xml responses
+
+2007-04-06 15:56  olivier.salaun
+
+	* trunk/lib/AuthCAS.pm: [#24021] [Stephen More] Fix: error trapping
+	  in get_https2
+
+2007-04-06 15:30  olivier.salaun
+
+	* trunk/debian, trunk/debian/compat, trunk/debian/control,
+	  trunk/debian/copyright, trunk/debian/rules: [Lionel Porcheron,
+	  Anywhere] Added the required files to allow Debian packaging.
+
+2006-11-13 13:02  olivier.salaun
+
+	* trunk/Changes: updated
+
+2006-04-11 14:01  olivier.salaun
+
+	* trunk/lib/AuthCAS.pm: Fix: Added "Host:" HTTP header field to
+	  requests
+
+2006-03-14 09:42  olivier.salaun
+
+	* trunk/META.yml, trunk/lib/AuthCAS.pm, trunk/t/00.load.t:
+	  preparing release 1.1
+
+2006-03-14 08:40  olivier.salaun
+
+	* trunk/t/00.load.t: [reported by L.Porcheron]: incorrect tests
+	  referring to old module name
+
+2005-04-21 15:02  olivier.salaun
+
+	* trunk/lib/AuthCAS.pm, trunk/lib/CAS.pm: enamed module
+
+2005-04-21 14:50  olivier.salaun
+
+	* trunk/Build.PL, trunk/MANIFEST, trunk/META.yml,
+	  trunk/Makefile.PL, trunk/sampleCasClient.pl: enamed project
+	  AuthCAS?\024?\024
+
+2005-04-21 14:04  olivier.salaun
+
+	* trunk/sampleCasClient.pl: restore sample code
+
+2005-04-21 14:04  olivier.salaun
+
+	* trunk, trunk/.cvsignore, trunk/Build.PL, trunk/CAS.pm,
+	  trunk/ChangeLog, trunk/Changes, trunk/MANIFEST, trunk/META.yml,
+	  trunk/Makefile.PL, trunk/README, trunk/lib, trunk/lib/CAS.pm,
+	  trunk/sampleCasClient.pl, trunk/t, trunk/t/00.load.t,
+	  trunk/t/pod-coverage.t, trunk/t/pod.t: A clean CPAN distribution
+	  of CAS.pm
+
+2003-11-28 14:19  olivier.salaun
+
+	* trunk/CAS.pm: Rename sub
+
+2003-11-27 11:12  olivier.salaun
+
+	* trunk/CAS.pm: Change: allow all service Path to be changed at
+	  new() time
+
+2003-11-26 15:55  olivier.salaun
+
+	* trunk/CAS.pm: Add getServerGatewayURL() for nonblocking login
+	  check
+
+2003-11-25 15:41  olivier.salaun
+
+	* trunk/ChangeLog: Update
+
+2003-11-25 15:40  olivier.salaun
+
+	* trunk/CAS.pm, trunk/sampleCasClient.pl: Change: Better error
+	  management via the $errors variable
+
+2003-11-14 16:09  olivier.salaun
+
+	* trunk/ChangeLog: Add Changelog
+
+2003-11-14 16:08  olivier.salaun
+
+	* trunk/CAS.pm: [proposed by V.Mathieu] Change: verify CAS server
+	  certificate only if capath or cafile were set
+
+2003-11-14 15:33  olivier.salaun
+
+	* trunk/CAS.pm, trunk/sampleCasClient.pl: [reported by V.Mathieu]
+	  Fix SSL_verify_mode
+
+2003-11-14 15:08  olivier.salaun
+
+	* trunk/CAS.pm, trunk/sampleCasClient.pl: [reported by V. Mathieu]
+	  Fix: capath and cafile were inverted in sample code
+
+2003-11-14 15:00  olivier.salaun
+
+	* trunk/CAS.pm, trunk/sampleCasClient.pl: Initial revision
+
+2012-12-19 11:01  root
+
+	* branches, tags, trunk: Init
+

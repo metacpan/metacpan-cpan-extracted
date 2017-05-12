@@ -1,0 +1,98 @@
+? my $app = shift;
+
+<div id="prefs" class="config config_body">
+  <form id="config_data" onsubmit="return Alice.prefs.submit(this)">
+    <table>
+      <tr>
+        <td>
+          <table>
+            <tr><td>
+              <input type="checkbox"<? if ($app->config->images eq "show") { ?> checked<? } ?> name="images" id="images" />
+              <label for="images" title="Show images, audio, and video in the chatroom">Inline media?</label>
+            </td></tr>
+
+            <tr><td>
+              <input type="checkbox"<? if ($app->config->animate eq "show") { ?> checked<? } ?> name="animate" id="animate" />
+              <label for="animate">Animate gifs?</label>
+            </td></tr>
+
+            <tr><td>
+              <input type="checkbox"<? if ($app->config->avatars eq "show") { ?> checked="checked"<? } ?> name="avatars" id="avatars" />
+              <label for="avatars">Show avatars?</label>
+            </td></tr>
+
+            <tr><td>
+              <input type="checkbox"<? if ($app->config->alerts eq "show") { ?> checked="checked"<? } ?> name="alerts" id="alerts" />
+              <label for="alerts">Enable alerts?</label>
+              <a style="font-size:10px" href="javascript:void(0)" onclick="window.webkitNotifications.requestPermission()">Grant permission</a>
+            </td></tr>
+
+            <tr><td>
+              <input type="checkbox"<? if ($app->config->audio eq "show") { ?> checked="checked"<? } ?> name="audio" id="audio" />
+              <label for="audio">Enable audio?</label>
+            </td></tr>
+
+            <tr><td>
+              <label for="style">Style</label>
+              <select name="style" id="style">
+                <option value="default"<? if ($app->config->style eq "default") {?> selected<? } ?>>Default</option>
+                <option value="dark"<? if ($app->config->style eq "dark") {?> selected<? } ?>>Dark</option>
+                <option value="solarized"<? if ($app->config->style eq "solarized") {?> selected<? } ?>>Solarized</option>
+              </select>
+            </td></tr>
+
+            <tr><td>
+              <label for="timeformat">Time Format</label>
+              <select name="timeformat" id="timeformat">
+                <option value="12"<? if ($app->config->timeformat eq "12") {?> selected<? } ?>>12 Hour</option>
+                <option value="24"<? if ($app->config->timeformat eq "24") {?> selected<? } ?>>24 Hour</option>
+              </select>
+            </td></tr>
+          </table>
+        </td>
+
+        <td>
+          <table>
+            <tr><td>
+              <label>Highlights</label>
+              <select name="highlights" multiple="multiple" id="highlights">
+                <? for my $highlight (@{$app->config->highlights}) { ?>
+                <option value="<?= $highlight ?>"><?= $highlight ?></option>
+                <? } ?>
+              </select>
+              <div class="controls">
+                <a href="#" onclick="return Alice.prefs.addHighlight()">Add</a>
+                <a href="#" onclick="return Alice.prefs.removeHighlights()">Remove</a>
+              </div>
+            </td></tr>
+
+            <tr><td>
+              <label>Monospace Nicks</label>
+              <select name="monospace_nicks" multiple="multiple" id="monospace_nicks">
+                <? for my $nick (@{$app->config->monospace_nicks}) { ?>
+                <option value="<?= $nick ?>"><?= $nick ?></option>
+                <? } ?>
+              </select>
+              <div class="controls">
+                <a href="#" onclick="return Alice.prefs.addNick()">Add</a>
+                <a href="#" onclick="return Alice.prefs.removeNicks()">Remove</a>
+              </div>
+            </td></tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding-top:0" colspan="2">
+          <label for="quitmsg">Quit Message</label>
+          <input type="text" name="quitmsg" id="quitmsg" style="width:295px" value="<?= $app->config->quitmsg ?>"/>
+        </td>
+      </tr>
+    </table>
+
+    <div class="buttons">
+      <button type="submit">Save</button>
+      <button onclick="Alice.prefs.remove(); return false;">Cancel</button>
+    </div>
+
+  </form>
+</div>

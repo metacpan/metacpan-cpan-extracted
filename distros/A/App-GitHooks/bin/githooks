@@ -1,0 +1,408 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+# External dependencies.
+use App::GitHooks;
+use Cwd qw();
+use Data::Dumper;
+use Data::Section -setup;
+use File::Spec;
+use Getopt::Long;
+use Git::Repository;
+use Pod::Usage qw();
+use Try::Tiny;
+use autodie;
+
+
+=head1 NAME
+
+githooks - Setup utility for App::GitHooks
+
+
+=head1 VERSION
+
+Version 1.9.0
+
+
+=head1 DESCRIPTION
+
+This command line utility allows setting up git hooks in the current git
+repository, so that all of App::GitHooks' hooks are triggered properly.
+
+
+=head1 SYNOPSIS
+
+	githooks <command>
+
+
+=head1 COMMANDS
+
+=over 4
+
+=item * C<help> - Show the commands available.
+
+=item * C<install> - Install all the git hooks for the current repository.
+
+=item * C<list> - List the plugins currently installed.
+
+=item * C<uninstall> - Remove all the git hooks for the current repository.
+
+=item * C<version> - Display the version of App::GitHooks in use.
+
+=back
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item * C<--chmod> - Chmod to use for the git hooks (default: 755).
+
+=back
+
+=cut
+
+# Parse the action.
+my $action = shift( @ARGV );
+usage()
+	if !defined( $action ) || $action eq '';
+
+# Parse command-line options.
+my $chmod = '0755';
+Getopt::Long::GetOptions(
+	'chmod'     => \$chmod,
+);
+
+# List of supported hooks we'll need to set up.
+my $supported_hooks = $App::GitHooks::HOOK_NAMES;
+
+# Actions.
+my $actions =
+{
+	help      => \&usage,
+	install   => \&install,
+	list      => \&list,
+	uninstall => \&uninstall,
+	version   => \&version,
+};
+if ( !defined( $actions->{ $action } ) )
+{
+	usage( "The action '$action' is not valid." );
+}
+$actions->{ $action }();
+exit(0);
+
+
+=head1 FUNCTIONS
+
+=head2 usage()
+
+Display the usage information on the command line and force exit.
+
+	usage();
+
+=cut
+
+sub usage
+{
+	my ( $message ) = @_;
+	chomp( $message )
+		if defined( $message );
+
+	$message //= "Setup utility for App::GitHooks.";
+	$message = "\n$message\n";
+
+	Pod::Usage::pod2usage(
+		{
+			-message  => $message,
+			-exitval  => 'NOEXIT',
+      -verbose  => 99,
+			-sections =>
+			[
+				qw(
+					SYNOPSIS
+					COMMANDS
+					OPTIONS
+				)
+			],
+		}
+	);
+	exit(0);
+}
+
+
+=head2 uninstall()
+
+Remove git hooks triggering App::GitHooks from the current git repository.
+
+	uninstall();
+
+=cut
+
+sub uninstall
+{
+	my $hooks_directory = get_hooks_directory();
+
+	foreach my $hook_name ( @$supported_hooks )
+	{
+		my $hook_filename = File::Spec->catfile( $hooks_directory, $hook_name );
+		unlink( $hook_filename );
+	}
+
+	print "The git hooks have been uninstalled successfully.\n";
+
+	return;
+}
+
+
+=head2 install()
+
+Install git hooks triggering App::GitHooks for the current git repository.
+
+	install();
+
+=cut
+
+sub install
+{
+	my $hooks_directory = get_hooks_directory();
+
+	# Retrieve the hook template.
+	my $hook_template_ref = __PACKAGE__->section_data( 'hook_template' );
+	my $template = $$hook_template_ref;
+	$template =~ s/\Q{{perl}}\E/$^X/g;
+
+	my $errors = 0;
+	foreach my $hook_name ( @$supported_hooks )
+	{
+		my $hook_content = $template;
+		$hook_content =~ s/\Q{{name}}\E/$hook_name/g;
+
+		my $hook_filename = File::Spec->catfile( $hooks_directory, $hook_name );
+
+		try
+		{
+			# Write the hook file.
+			open( my $hook_fh, '>', $hook_filename );
+			print $hook_fh $hook_content;
+			close( $hook_fh );
+
+			# Make the hook file executable.
+			chmod oct( $chmod ), $hook_filename;
+		}
+		catch
+		{
+			$errors++;
+			print "Unable to set up hook file for $hook_name, skipped: $_\n";
+		};
+	}
+
+	print $errors > 0
+		? 'Some errors occurred when installing the git hooks, please try again.'
+		: 'The git hooks have been installed successfully.';
+	print "\n";
+
+	return;
+}
+
+
+=head2 version()
+
+Display the version of App::GitHooks in use.
+
+	version();
+
+=cut
+
+sub version
+{
+	print "Using App::GitHooks version $App::GitHooks::VERSION.\n";
+
+	# Instantiate an object, but we're not using any hook-dependent features
+	# (yet) in this function, so any hook name will do here.
+	my $app = App::GitHooks->new(
+		name => 'pre-commit',
+	);
+
+	# Retrieve all the plugins available.
+	my @plugins =
+		sort keys
+		(
+			%{{
+				map { $_ => 1 }
+				map { @$_ }
+				values %{ $app->get_all_plugins() || {} }
+			}}
+		);
+
+	# Display plugin versions.
+	if ( scalar( @plugins ) != 0 )
+	{
+		print "\n";
+		print "Plugins:\n";
+		foreach my $plugin_name ( @plugins )
+		{
+			printf(
+				"  - %s: v%s\n",
+				$plugin_name,
+				$plugin_name->VERSION(),
+			);
+		}
+	}
+
+	return;
+}
+
+
+=head2 list()
+
+List the plugins currently installed.
+
+	list();
+
+=cut
+
+sub list
+{
+	# Instantiate an object, but we're not using any hook-dependent features
+	# (yet) in this function, so any hook name will do here.
+	my $app = App::GitHooks->new(
+		name => 'pre-commit',
+	);
+
+	# Retrieve all the plugins available.
+	my $all_plugins = $app->get_all_plugins();
+
+	# Display the list of plugins by hook.
+	print "\n";
+	if ( scalar( keys %$all_plugins ) == 0 )
+	{
+		print "No plugins installed!\n";
+	}
+	else
+	{
+		foreach my $hook_name ( keys %$all_plugins )
+		{
+			print "Plugins active for $hook_name:\n";
+			foreach my $plugin_name ( @{ $all_plugins->{ $hook_name } } )
+			{
+				print "    - $plugin_name\n";
+			}
+			print "\n";
+		}
+	}
+
+	return;
+}
+
+
+=head1 PRIVATE FUNCTIONS
+
+=head2 get_hooks_directory()
+
+Return the path to the hooks directory for the current git repository.
+
+	my $hooks_directory = get_hooks_directory();
+
+=cut
+
+sub get_hooks_directory
+{
+	# Make sure we're in a git repository.
+	my $current_directory = Cwd::getcwd();
+	my $repository = Git::Repository->new( work_tree => $current_directory );
+
+	die "The command '$action' requires being in a git repository, which $current_directory is not.\n"
+		if !defined( $repository );
+
+	# Find out the git repository, as the hooks directory will be directly under
+	# that path.
+	my $git_directory = $repository->git_dir();
+	die "Could not determine git directory for the repository in $current_directory.\n"
+		if !defined( $git_directory );
+
+	return File::Spec->catfile( $git_directory, 'hooks' );
+}
+
+
+=head1 BUGS
+
+Please report any bugs or feature requests through the web interface at
+L<https://github.com/guillaumeaubert/App-GitHooks/issues/new>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc App::GitHooks
+
+
+You can also look for information at:
+
+=over
+
+=item * GitHub's request tracker
+
+L<https://github.com/guillaumeaubert/App-GitHooks/issues>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/app-githooks>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/app-githooks>
+
+=item * MetaCPAN
+
+L<https://metacpan.org/release/App-GitHooks>
+
+=back
+
+
+=head1 AUTHOR
+
+L<Guillaume Aubert|https://metacpan.org/author/AUBERTG>,
+C<< <aubertg at cpan.org> >>.
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2013-2017 Guillaume Aubert.
+
+This code is free software; you can redistribute it and/or modify it under the
+same terms as Perl 5 itself.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the LICENSE file for more details.
+
+=cut
+
+
+__DATA__
+
+__[ hook_template ]__
+#!{{perl}}
+
+use strict;
+use warnings;
+
+use App::GitHooks;
+
+
+=head1 NAME
+
+{{name}} - Call App::GitHooks for the {{name}} hook.
+
+=cut
+
+App::GitHooks->run(
+	name      => $0,
+	arguments => \@ARGV,
+);

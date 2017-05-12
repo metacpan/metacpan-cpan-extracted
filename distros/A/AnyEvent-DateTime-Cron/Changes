@@ -1,0 +1,49 @@
+Revision history for AnyEvent-DateTime-Cron
+
+0.08
+	2013-11-09
+	OTHER:
+	 - Actually enabled issues on github so they won't go to RT.
+           Re-releasing so the dist META will point to the correct location.
+
+0.07
+	2013-11-08
+	OTHER:
+         - Changing bug tracker to agorman's forked repo on github
+
+0.06    2013-04-01
+	BUG FIX:
+	 - Removing use of //= so this works with Perl
+           versions less than 5.10
+
+0.05    2013-01-28
+        ENHANCEMENT:
+         - Adding the ability to change the backend to the
+           Quartz cron format
+
+0.04    2013-01-15
+        BUG FIX:
+         - Fixing bug with new time_zone code
+
+        ENHANCEMENT:
+         - Making time_zone a constructor argument
+
+0.03    2013-01-12
+        ENHANCEMENT:
+         - added support for timezones, thanks to AGORMAN for
+           the patch
+
+0.02    2011-09-03
+
+        BREAKING CHANGES:
+         - changed the format of the add() command
+         - changed the exit signal to TERM
+
+        OTHER:
+         - added the single option for add()
+         - delete() wasn't stopping jobs correctly - thanks to
+           Andy Walker for sending a patch
+
+0.01    2011-07-19
+        First version released
+

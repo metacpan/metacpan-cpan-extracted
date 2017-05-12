@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::Diskd;
+
+if (@ARGV > 0 and $ARGV[0] eq "-d") {	# daemon mode
+
+  App::Diskd::Daemon();
+
+} else {			# client mode
+
+  App::Diskd::Client();
+
+}

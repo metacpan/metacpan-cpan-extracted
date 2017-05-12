@@ -1,0 +1,65 @@
+Astro::SkyCat
+-------------
+
+A perl interface to the ESO (European Southern Observatory) SkyCat library.
+The SkyCat library is used to access astronomical catalogues and image
+servers across the internet.
+
+This is currently in proof of concept stage. Simple things work but the
+perl interface may change.
+
+Requirements
+------------
+
+- The catlib library itself. Available from 
+   ftp://ftp.eso.org/pub/archive/skycat/README.html
+  The higher level SkyCat libraries are not required.
+
+- This module uses the C++ interface to CatLib so you will need
+  a C++ compiler
+
+Building
+--------
+
+Currently the Makefile.PL file must be edited manually to
+reflect the location of the catlib libraries and the
+name of the C++ compiler to be used on your system.
+
+  perl Makefile.PL
+  make
+  make install
+
+There are currently no tests.
+
+Documentation
+-------------
+
+The catlib library is documented at http://archive.eso.org/skycat/docs/cat/
+
+The perl interface attempts to match the C++ interface as much as possible.
+See the module documentation for more information.
+
+Platforms
+---------
+
+The module has only been tested under linux.
+
+Author
+------
+
+This module was written by Tim Jenness  <t.jenness@jach.hawaii.edu>
+of the Joint Astronomy Centre.
+
+Copyright (C) 2001 Tim Jenness.  All rights reserved.  This program is
+free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+The SkyCat library itself was written by Allan Brighton <abrighto@eso.org>
+and is copyrighted European Southern Observatory.
+
+Changes
+-------
+
+ v0.01 - initial test release to CPAN
+
+

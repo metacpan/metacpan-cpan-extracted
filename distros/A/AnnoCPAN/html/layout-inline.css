@@ -1,0 +1,16 @@
+
+hr {
+    clear: both;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: thin dotted #DDD;
+}
+
+.content { 
+    margin: 8px 0;
+}
+
+div.noteblock, div.noteblock_inline {
+    margin: 0.5ex 10%;
+}

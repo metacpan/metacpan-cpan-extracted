@@ -1,0 +1,14 @@
+Revision history for Perl extension Algorithm::Scale2x
+
+0.04  Wed Nov 18 2009
+    - repackaged with a new version of Module::Install
+
+0.03  Tue Jun 17 2008
+    - repackaged
+
+0.02  Tue May 15 2007
+    - fix test suite. "@x = qw(0) x 4;" doesn't work on perls <= 5.8.7
+
+0.01  Mon May 14 2007
+    - original version
+

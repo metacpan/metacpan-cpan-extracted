@@ -1,0 +1,24 @@
+NAME
+    Acme::MetaSyntactic::legocityundercover - LEGO City Undercover theme
+
+VERSION
+    version 0.02
+
+DESCRIPTION
+    Characters from the LEGO City Undercover game as gleaned from the
+    <http://www.gamefaqs.com/> walkthrough.
+
+    *There she is, LEGO City!*
+
+SEE ALSO
+    Acme::MetaSyntactic, Acme::MetaSyntactic::List.
+
+AUTHOR
+    Chris Williams
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

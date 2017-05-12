@@ -1,0 +1,14 @@
+# vim: set textwidth=
+# one line per pattern, following the scheme:
+#
+#       package ; reason
+#
+# string comparison with package field.
+#
+mdv-distrib-tools       ; mageia/rpm toolchain
+perl-Image-Magick       ; from imagemagick
+perl-kolab              ; not updated since 2004
+perl-Mail-SpamAssassin  ; spamassassin should be handled with care
+perl-qt4                ; from kdebindings
+perl-SVN                ; from subversion
+perl-URPM               ; rpm toolchain

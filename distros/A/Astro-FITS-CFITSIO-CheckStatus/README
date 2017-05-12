@@ -1,0 +1,38 @@
+Astro/FITS/CFITSIO/CheckStatus version 0.01
+===========================================
+
+This module provides a method to automatically catch status errors
+returned by the CFITSIO library (which reads FITS formatted data
+files).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Astro::FITS::CFITSIO
+
+It will use these if available:
+
+   Log::Log4perl
+
+
+AUTHOR
+
+  Diab Jerius <djerius@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2004 by The Smithsonian Astrophysical Observatory.
+
+  This software is released under the GNU General Public License. You may
+  find a copy at http://www.fsf.org/copyleft/gpl.html.
+

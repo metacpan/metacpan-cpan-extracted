@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/AnyLoader.pm
+t/AnyLoader-qualified.t
+t/AnyLoader.t
+t/NoAnyLoader-qualified.t
+t/NoAnyLoader.t
+t/Testing/AnyLoader.pm

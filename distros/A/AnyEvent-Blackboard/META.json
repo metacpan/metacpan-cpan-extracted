@@ -1,0 +1,43 @@
+{
+   "abstract" : "An extension of Async::Blackboard which uses AnyEvent",
+   "author" : [],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4202",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-Blackboard",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "BSD::Resource" : "0",
+            "Devel::Leak" : "0",
+            "EV" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Async::Blackboard" : "v0.3.10",
+            "Mouse" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "AnyEvent::Blackboard" : {
+         "file" : "lib/AnyEvent/Blackboard.pm",
+         "version" : "v0.4.10"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.4.10"
+}

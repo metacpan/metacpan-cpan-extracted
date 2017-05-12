@@ -1,0 +1,86 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.010_001;
+
+use Pod::Usage;
+
+use version; our $VERSION = 'v0.2.2';
+
+use App::Memcached::Roaster;
+
+if (__FILE__ eq $0) {
+    main()
+} else {
+    return 1;
+}
+
+sub main {
+    my $params = App::Memcached::Roaster->parse_args(@ARGV);
+    pod2usage(-verbose => 1) if $params->{help};
+    pod2usage(-verbose => 2) if $params->{man};
+    App::Memcached::Roaster->new(%$params)->run;
+}
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+B<memcached-roaster> - Random data generator for Memcached
+
+=head1 SYNOPSIS
+
+Generates random data:
+
+    # Complete format
+    memcached-roaster [-a|--addr=<IPADDRESS>[:<PORT>]] \
+        [-n|--num=<DATA_NUMBER>] [-S|--max-size=<MAX_DATA_LENGTH>] [OPTIONS]
+
+    # Examples
+    memcached-roaster -a 127.0.0.1:11211
+    memcached-roaster -a localhost    # 11211 port by default
+    memcached-roaster -S 1000 -n 100  #   1kb * 100
+    memcached-roaster -S 100k -n 1000 # 100kb * 1000
+
+Help / Manual:
+
+    memcached-roaster --help|-h
+    memcached-roaster --man
+
+=head1 DESCRIPTION
+
+This script generates random data and load them onto Memcached.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--debug|-d>
+
+Shows debug logs.
+
+=back
+
+=head1 SEE ALSO
+
+L<App::Memcached::Roaster>,
+L<Cache::Memcached::Fast>,
+L<http://www.memcached.org/>
+
+=head1 AUTHORS
+
+YASUTAKE Kiyoshi E<lt>yasutake.kiyoshi@gmail.comE<gt>
+
+=head1 LICENSE
+
+Copyright (C) 2015 YASUTAKE Kiyoshi.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.  That means either (a) the GNU General Public
+License or (b) the Artistic License.
+
+=cut
+

@@ -1,0 +1,25 @@
+######################################################################
+    Acme::Prereq::None 0.01
+######################################################################
+
+NAME
+    Acme::Prereq::None - Module for testing CPAN module prerequisites
+
+SYNOPSIS
+        use Acme::Prereq::None;
+
+DESCRIPTION
+    Acme::Prereq::None does nothing and it has no dependencies. It can be
+    used for testing dependencies among CPAN modules.
+
+SEE ALSO
+    Acme::Preqreq::A, Acme::Prereq::B
+
+LEGALESE
+    Copyright 2007 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2007, Mike Schilli <mschilli@perlmeister.com>
+

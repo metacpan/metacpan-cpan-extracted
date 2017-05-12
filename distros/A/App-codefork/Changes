@@ -1,0 +1,35 @@
+==================================================
+Changes from 1740-10-25 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2014-08-09 00:24:34 +0000
+------------------------------------------
+
+  Change: 7c2af6bfc139bcd2914439eaf7c8725bf7d547e2
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-08-09 02:24:23 +0000
+
+    Added travis.yml 
+
+  Change: 8d78d8e369c7f22d63cdc08051963feb8a7642f1
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-08-09 02:23:05 +0000
+
+    ex to eg and World's to Worlds 
+
+  Change: 47cc662a0974b77062125008fbc6b6b27b02b72d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-08-09 02:21:53 +0000
+
+    First version, all i need is in ;9 
+
+  Change: 40144f037f30f34c3d64340544692b85bb45c2fd
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-08-09 00:33:46 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,30 @@
+NAME
+    Acme::Ford::Prefect - FFI test module for Alien::Base
+
+SYNOPSIS
+     use Acme::Ford::Prefect;
+ 
+     my $answer = Acme::Ford::Prefect::answer(); # == 42 of course
+
+DESCRIPTION
+    Alien::Base comprises base classes to help in the construction of
+    "Alien::" modules. Modules in the Alien namespace are used to locate and
+    install (if necessary) external libraries needed by other Perl modules.
+
+    This module is a toy module to test the efficacy of the Alien::Base
+    system with its experimental FFI interfaces. This module depends on
+    another toy module Acme::Alien::DontPanic which provides the needed
+    libdontpanic library to be able to tell us the "answer" to life, the
+    universe and everythin.
+
+SEE ALSO
+    FFI::Platypus
+    Alien::Base
+    Alien
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2013 Graham Ollis
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

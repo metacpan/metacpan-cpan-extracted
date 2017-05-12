@@ -1,0 +1,134 @@
+#!/usr/bin/perl -w
+use v5.14;
+use App::Eduard;
+
+App::Eduard->run;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+eduard - GnuPG email sign/encrypt testing bot
+
+=head1 SYNOPSIS
+
+Manually:
+
+  eduard --from=eduard@example.org --key=12345678 < mail.eml
+
+In F</etc/aliases>:
+
+  eduard: |/path/to/eduard --from=eduard@example.org --key=12345678 --keydir=/srv/eduard-keydir --debug --logfile=/var/log/eduard
+
+=head1 DESCRIPTION
+
+Eduard is Ceata's reimplementation of the Edward reply bot referenced in L<https://emailselfdefense.fsf.org/>.
+
+It reads an email from STDIN, checks it for PGP signatures and encryption, then replies appropriately.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--always-trust>, B<--no-always-trust>
+
+If B<--always-trust>, skip key validation and assume that used keys are always fully trusted. See the gpg(1) manpage, option C<--trust-model always> for more information. Defaults to B<--no-always-trust>.
+
+=item B<--debug>, B<--no-debug>
+
+If B<--debug>, output some debugging information on STDERR. Defaults to B<--no-debug>
+
+=item B<--from>=I<address>
+
+Mail address to send messages from.
+
+=item B<--key>=I<keyid>
+
+ID of key used for encrypting replies.
+
+=item B<--keydir>=I</path/to/keydir>
+
+Path to GnuPG homedir.
+
+=item B<--logfile>=I</path/to/logfile>
+
+If B<--debug>, append debug information to this file. Ignored if B<--no-debug>.
+
+=item B<--passphrase>=I<passphrase>
+
+Private key passphrase.
+
+=item B<--tmpl-path>=I<path>
+
+Path to the template directory. Users of the default templates can select the language with this argument. Available languages: en. Defaults to B<--tmpl-path=en>.
+
+=item B<--use-agent>, B<--no-use-agent>
+
+If B<--use-agent>, use L<gpg-agent(1)>. Defaults to B<--no-gpg-agent>.
+
+=back
+
+=head1 ENVIRONMENT
+
+Configuration can also be done via the environment. Use 1 for true and 0 for false. Command-line options override environment variables.
+
+=over
+
+=item EDUARD_ALWAYS_TRUST
+
+Corresponds to B<--always-trust> (if true) and B<--no-always-trust> (if false).
+
+=item EDUARD_DEBUG
+
+Corresponds to B<--debug> (if true) and B<--no-debug> (if false).
+
+=item EDUARD_FROM
+
+Corresponds to B<--from>.
+
+=item EDUARD_KEY
+
+Corresponds to B<--key>.
+
+=item EDUARD_KEYDIR
+
+Corresponds to B<--keydir>.
+
+=item EDUARD_LOGFILE
+
+Corresponds to B<--logfile>.
+
+=item EDUARD_PASSPHRASE
+
+Corresponds to B<--passphrase>.
+
+=item EDUARD_TMPL_PATH
+
+Corresponds to B<--tmpl-path>.
+
+=item EDUARD_USE_AGENT
+
+Corresponds to B<--use-agent> (if true) and B<--no-use-agent> (if false).
+
+=back
+
+=head1 SEE ALSO
+
+L<App::Eduard>, L<http://ceata.org/proiecte/eduard>
+
+=head1 AUTHOR
+
+Marius Gavrilescu, E<lt>marius@ceata.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Fundația Ceata
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+INSTALL
+No.pm
+t/01basic.t
+t/02perl.t
+t/03pragma.t
+t/04lib.t
+t/05package.t
+t/lib/.nothing

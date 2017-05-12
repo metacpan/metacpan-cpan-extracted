@@ -1,0 +1,15 @@
+Revision history for App-CheckArchiveFilename
+
+0.003   2016-09-09 (PERLANCAR)
+
+	- [ux] Some columns have not been positioned.
+
+
+0.002   2016-09-09 (PERLANCAR)
+
+	- Also show compressor types for compressed non-archives.
+
+
+0.001   2016-09-09 (PERLANCAR)
+
+        - First release.

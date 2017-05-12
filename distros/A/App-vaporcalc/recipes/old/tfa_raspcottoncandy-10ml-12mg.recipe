@@ -1,0 +1,26 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "TFA Circus Cotton Candy",
+            "percentage" : "10"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Raspberry (sweet)",
+            "percentage" : "4"
+         }
+      ],
+      "target_pg" : "50",
+      "base_nic_per_ml" : "100",
+      "base_nic_type" : "PG",
+      "target_quantity" : "10",
+      "target_nic_per_ml" : "12",
+      "target_vg" : "50",
+      "notes" : [
+         "Try 10% EM with 4% Blueberry (extra)",
+         "(Jon)"
+      ]
+   }
+}

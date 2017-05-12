@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use utf8;
+
+use Acme::Oppai;
+use Encode;
+use Time::HiRes qw(usleep);
+
+my $wait = 1;
+$SIG{INT} = 'IGNORE';
+
+my $encoding = 'utf8';
+if ($ENV{LANG} =~ /euc/i) {
+    $encoding = 'euc-jp';
+} elsif ($ENV{LANG} =~ /(shiftjis|sjis)/i) {
+    $encoding = 'shiftjis';
+} elsif ($ENV{LANG} =~ /jis/i) {
+    $encoding = '7bit-jis';
+}
+binmode STDOUT, ":encoding($encoding)";
+
+my $up = Acme::Oppai->new(default => 'up', use_utf8 => 1)->Oppai('おっ');
+my $down = Acme::Oppai->new(default => 'down', use_utf8 => 1)->Oppai('ぱい！');
+$up   = "$up";
+$down = "$down";
+
+my $now = $up;
+my $i = 0;
+while ($wait > 0) {
+    display($now);
+    $now = $now eq $up ? $down : $up;
+    usleep(int($wait * 1000000));
+    $wait -= (int($wait + 1) / 40);
+    last if $i++ > 100;
+}
+exit;
+
+sub display {
+    my $now = shift;
+
+    my $out;
+    my @parts = split(/\n/, $now);
+    my ($maxy, $maxx) = `stty size` =~ /(\d+) (\d+)/;
+    for (my $y = 0;$y < $maxy;$y++) {
+        for (my $x = 0;$x < $maxx - 24;$x += 24) {
+            my $line = $parts[($y % scalar(@parts))];
+            $out .= $line . ' 'x(24 - length(encode('euc-jp', $line)));
+        }
+        $out .= "\n";
+    }
+    print $out;
+}

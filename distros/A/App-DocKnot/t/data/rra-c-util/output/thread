@@ -1,0 +1,250 @@
+\==[doc]      [2] [\bullet(packed)[\link[\1][\2]]]
+\==[program]  [3]
+    [\tablerow[\1 \version[\2]] [\release[\2]]
+        [\link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+        (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+              [PGP signature])]
+        [\link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+        (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+              [PGP signature])]]
+\==[download] [3]
+    [\1 \version[\2]\break
+     \link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+     (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+           [signature])\break
+     \link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+     (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+           [signature])\break
+    Released \release[\2]]
+
+\heading[rra-c-util][software]
+
+\h1[rra-c-util]
+
+\quote[
+
+    Greenspun's Tenth Rule of Programming: any sufficiently complicated C
+    or Fortran program contains an ad hoc informally-specified bug-ridden
+    slow implementation of half of Common Lisp.
+
+][Phil Greenspun][]
+
+\div(sidebar)[
+    \h2[Download]
+
+    \download[rra-c-util][rra-c-util]
+        [devel/rra-c-util-\version[rra-c-util]]
+
+    \link[https://archives.eyrie.org/software/ARCHIVE/rra-c-util/]
+         [Archive]
+
+    \h2[Documentation]
+
+    \link[readme.html][General overview] \break
+    \link[news.html][Change summary] \break
+    \link[fakepam.html][PAM testing] \break
+    \link[test-rra.html][Test::RRA] \break
+    \link[test-rra-automake.html][Test::RRA::Automake] \break
+    \link[test-rra-config.html][Test::RRA::Config] \break
+    \link[test-rra-moduleversion.html][Test::RRA::ModuleVersion]
+
+    \h2[Development]
+
+    \link[todo.html][To-do list] \break
+    \link[https://github.com/rra/rra-c-util]
+         [GitHub] \break
+    \link[https://github.com/rra/rra-c-util/issues]
+         [Bug tracker] \break
+    \link[https://git.eyrie.org/?p=devel/rra-c-util.git]
+         [Git repository] \break
+    \link[https://www.openhub.net/p/rra-c-util]
+         [Open HUB code analysis]
+]
+
+\h2[Blurb]
+
+rra-c-util is my collection of portability functions, utility functions,
+Autoconf macros, and related shared C infrastructure, akin to gnulib but
+without any GPL-covered code and additional support for Kerberos and PAM
+development.  It serves as a common repository of code and infrastructure
+used across multiple projects so that files have a canonical latest
+version.  It's not intended for installation as a regular package;
+instead, other packages are expected to copy files from here as needed.
+
+\h2[Description]
+
+The origins of this package are in the libinn utility library in INN.
+Some of the utility and portability functions here are directly inspired
+by or based on versions in older versions of INN, and I wrote and rewrote
+considerable additional portability code and utility libraries when I took
+over INN maintenance.  When I started maintaining other C packages, I
+started copying pieces of libinn into those packages and merging it with
+other portability and utility code.  Over time, each package gained a
+slightly different version of various utility functions, replacements for
+missing functions, and Autoconf macros.
+
+The goal of this package is to merge all the various versions of any
+portability or utility code that's used in more than one of my packages in
+one place.  Then, each package can update to the latest rra-c-util version
+before each release and gain from the improvements made for all other
+packages.  You can think of it as my version of
+\link[https://www.gnu.org/software/gnulib/][Gnulib], with everything
+released under a permissive license (no GPL).
+
+As well as C portability frameworks, Autoconf macros, and a general C
+utility library, this package has also accumulated a considerable
+collection of standard tests (for C and Perl packages) and a large library
+of test utilities and support functions.  It also includes extensive
+support for writing and testing PAM modules, and a portable implementation
+of AFS PAGs.
+
+This package uses the infrastructure of C TAP Harness for testing, but is
+not the canonical version of \code[tests/runtests.c],
+\code[tests/tap/basic.[ch]], \code[tests/tap/macros.h], or
+\code[tests/tap/libtap.sh].  Those files should be pulled from
+\link[https://www.eyrie.org/~eagle/software/c-tap-harness/][C TAP Harness]
+instead.
+
+\h2[Requirements]
+
+Everything requires a C compiler to build and expects an ISO C89 or later
+C compiler and libraries.  Presence of strdup is also assumed, which is
+guaranteed by POSIX 2008 but common in many earlier C libraries as well.
+Otherwise, the files are meant to be copied into packages and the
+requirements depend on which files one copies.
+
+A Kerberos library, either MIT Kerberos or Heimdal, is required to build
+this package as-is, since the Kerberos portability layer is built and
+tested by default.  The other code will run fine without this requirement
+when copied into other packages.
+
+PAM libraries and headers are required to build the package as-is, since
+the PAM supporting library is built and tested by default.  Other code can
+be copied from this package without introducing a PAM dependency.
+
+To build the the kafs portability layer, one of Linux, Mac OS X, Solaris
+11, the kafs library that comes with either Heimdal or KTH Kerberos, the
+kopenafs library that comes with newer OpenAFS, AFS header files (on any
+other platform besides AIX or IRIX), or AFS libraries (on AIX and IRIX) is
+required.  AIX binaries with AFS PAG support may not run on AIX systems
+that do not have an AFS client installed due to how AIX handles system
+calls.
+
+To run the full test suite, and to use the Perl test support libraries,
+Perl 5.6.2 or later is required.  The following additional Perl modules
+will be used if present:
+
+\bullet(packed)[IPC::System::Simple]
+\bullet(packed)[Test::MinimumVersion]
+\bullet(packed)[Test::Perl::Critic]
+\bullet(packed)[Test::Pod]
+\bullet(packed)[Test::Spelling]
+\bullet(packed)[Test::Strict]
+
+All are available on CPAN.  Those tests will be skipped if the modules are
+not available.
+
+To bootstrap from a Git checkout, or if you change the Automake files and
+need to regenerate Makefile.in, you will need Automake 1.11 or later.  For
+bootstrap or if you change configure.ac or any of the m4 files it includes
+and need to regenerate configure or config.h.in, you will need Autoconf
+2.64 or later.  Perl is also required to generate manual pages from a
+fresh Git checkout.
+
+\h2[Download]
+
+The distribution:
+
+\table[][
+    \program[rra-c-util][rra-c-util]
+        [devel/rra-c-util-\version[rra-c-util]]
+]
+
+An \link[https://archives.eyrie.org/software/ARCHIVE/rra-c-util/] [archive
+of older releases] is also available.
+
+rra-c-util is maintained using the Git version control system.  To check
+out the current development tree, see
+\link[https://github.com/rra/rra-c-util][GitHub] or clone:
+
+\pre[    https://git.eyrie.org/git/devel/rra-c-util.git]
+
+Pull requests on GitHub are welcome.  You can also
+\link[https://git.eyrie.org/?p=devel/rra-c-util.git][browse the current
+development source].
+
+\h2[Documentation]
+
+\div(left)[
+    \class(first)[User documentation:]
+
+    \doc[readme.html][README]
+    \doc[news.html][Change summary]
+    \doc[fakepam.html][PAM testing]
+    \doc[test-rra.html][Test::RRA]
+    \doc[test-rra-automake.html][Test::RRA::Automake]
+    \doc[test-rra-config.html][Test::RRA::Config]
+    \doc[test-rra-moduleversion.html][Test::RRA::ModuleVersion]
+    \doc[license.html][License and copyright]
+
+    Developer documentation:
+
+    \doc[todo.html][To-do list]
+    \doc[https://github.com/rra/rra-c-util]
+        [GitHub]
+    \doc[https://github.com/rra/rra-c-util/issues]
+        [Bug tracker]
+    \doc[https://www.openhub.net/p/rra-c-util]
+        [Open HUB code analysis]
+]
+
+\div(right)[
+    \class(first)[API documentation:]
+
+    \doc[xmalloc.html][xmalloc, xcalloc, and xrealloc]
+
+    Test scripts:
+
+    \doc[module-version.html][tests/perl/module-version-t]
+    \doc[module-version-perl.html][t/style/module-version.t]
+]
+
+\h2(after)[License]
+
+The rra-c-util package as a whole is covered by the following copyright
+and license:
+
+\block[
+
+    Copyright 2000, 2009-2010, 2013-2016
+        Russ Allbery <eagle@eyrie.org>
+
+    Copyright 2009-2014
+        The Board of Trustees of the Leland Stanford Junior University
+
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+]
+
+Some individual source files are covered by other, compatible licenses.
+For complete copyright and license information, see the file
+\link[license.html][LICENSE] in the rra-c-util source distribution.
+
+\signature

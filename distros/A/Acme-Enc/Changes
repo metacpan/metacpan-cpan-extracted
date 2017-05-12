@@ -1,0 +1,6 @@
+Revision history for Perl extension Acme::Enc.
+
+0.0.1  Sun Nov 13 10:28:18 2005
+	- original version; created by h2xs 1.22 with options
+		-AXc -n Acme::Enc
+

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/App/WhatTimeIsIt.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+README.pod
+script/what_time_is_it
+t/00_compile.t
+t/01_basic.t
+xt/01_perlcritic.t
+xt/02_pod-coverage.t
+xt/03_pod.t
+xt/04_notabs.t
+xt/05_code_metrics.t
+META.yml

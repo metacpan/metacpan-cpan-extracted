@@ -1,0 +1,30 @@
+---
+abstract: 'knowledge and wisdom interface through questioning'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+keywords:
+  - knowledge
+  - wisdom
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-KnowledgeWisdom
+provides:
+  Acme::KnowledgeWisdom:
+    file: lib/Acme/KnowledgeWisdom.pm
+    version: 0.01
+requires:
+  Moose: 0
+resources:
+  bugtracker: http://github.com/jozef/Acme-KnowledgeWisdom/issues
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jozef/Acme-KnowledgeWisdom.git
+version: 0.01

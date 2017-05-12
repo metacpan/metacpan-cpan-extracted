@@ -1,0 +1,231 @@
+{
+   "abstract" : "light weight Catalyst-ish web application framework",
+   "author" : [
+      "Daisuke Murase <typester@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.8.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ark",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "JSON" : "0",
+            "Text::MicroTemplate::Extended" : "0.09",
+            "Text::Xslate" : "0"
+         },
+         "requires" : {
+            "Class::Data::Inheritable" : "0",
+            "Clone" : "0",
+            "Data::UUID" : "0",
+            "Data::Util" : "0",
+            "Devel::StackTrace" : "0",
+            "Digest::SHA1" : "0",
+            "Exporter::AutoClean" : "0",
+            "FormValidator::Lite" : "0",
+            "HTML::Escape" : "0",
+            "HTML::Shakan" : "2.00",
+            "HTTP::Cookies" : "0",
+            "HTTP::Message" : "0",
+            "Module::Pluggable::Object" : "0",
+            "Mouse" : "1.0",
+            "Object::Container" : "0.08",
+            "Path::AttrRouter" : "0.03",
+            "Path::Class" : "0.16",
+            "Plack" : "0.9910",
+            "Plack::Request::WithEncoding" : "0.10",
+            "Plack::Response" : "0",
+            "Text::MicroTemplate" : "0",
+            "Text::SimpleTable" : "0",
+            "Try::Tiny" : "0.02",
+            "URI" : "0",
+            "URI::WithBase" : "0",
+            "perl" : "5.008001"
+         },
+         "suggests" : {
+            "Ark::Plugin::Authentication" : "0",
+            "Ark::Plugin::I18N" : "0",
+            "Ark::Plugin::MobileJP" : "0",
+            "Ark::Plugin::ReproxyCallback" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Output" : "0",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Ark" : {
+         "file" : "lib/Ark.pm",
+         "version" : "1.20"
+      },
+      "Ark::Action" : {
+         "file" : "lib/Ark/Action.pm"
+      },
+      "Ark::ActionClass::Form" : {
+         "file" : "lib/Ark/ActionClass/Form.pm"
+      },
+      "Ark::Component" : {
+         "file" : "lib/Ark/Component.pm"
+      },
+      "Ark::Context" : {
+         "file" : "lib/Ark/Context.pm"
+      },
+      "Ark::Context::Debug" : {
+         "file" : "lib/Ark/Context/Debug.pm"
+      },
+      "Ark::Controller" : {
+         "file" : "lib/Ark/Controller.pm"
+      },
+      "Ark::Controller::Form" : {
+         "file" : "lib/Ark/Controller/Form.pm"
+      },
+      "Ark::Core" : {
+         "file" : "lib/Ark/Core.pm"
+      },
+      "Ark::Form" : {
+         "file" : "lib/Ark/Form.pm"
+      },
+      "Ark::Logger" : {
+         "file" : "lib/Ark/Logger.pm"
+      },
+      "Ark::Model" : {
+         "file" : "lib/Ark/Model.pm"
+      },
+      "Ark::Model::Adaptor" : {
+         "file" : "lib/Ark/Model/Adaptor.pm"
+      },
+      "Ark::Models" : {
+         "file" : "lib/Ark/Models.pm"
+      },
+      "Ark::Plugin" : {
+         "file" : "lib/Ark/Plugin.pm"
+      },
+      "Ark::Plugin::CSRFDefender" : {
+         "file" : "lib/Ark/Plugin/CSRFDefender.pm"
+      },
+      "Ark::Plugin::Encoding::Null" : {
+         "file" : "lib/Ark/Plugin/Encoding/Null.pm"
+      },
+      "Ark::Plugin::Encoding::Unicode" : {
+         "file" : "lib/Ark/Plugin/Encoding/Unicode.pm"
+      },
+      "Ark::Plugin::FormValidator::Lite" : {
+         "file" : "lib/Ark/Plugin/FormValidator/Lite.pm"
+      },
+      "Ark::Plugin::Session" : {
+         "file" : "lib/Ark/Plugin/Session.pm"
+      },
+      "Ark::Plugin::Session::Backend" : {
+         "file" : "lib/Ark/Plugin/Session/Backend.pm"
+      },
+      "Ark::Plugin::Session::State::Cookie" : {
+         "file" : "lib/Ark/Plugin/Session/State/Cookie.pm"
+      },
+      "Ark::Plugin::Session::State::OpenSocial" : {
+         "file" : "lib/Ark/Plugin/Session/State/OpenSocial.pm"
+      },
+      "Ark::Plugin::Session::State::URI" : {
+         "file" : "lib/Ark/Plugin/Session/State/URI.pm"
+      },
+      "Ark::Plugin::Session::State::URI::ExtendContext" : {
+         "file" : "lib/Ark/Plugin/Session/State/URI/ExtendContext.pm"
+      },
+      "Ark::Plugin::Session::Store::Memory" : {
+         "file" : "lib/Ark/Plugin/Session/Store/Memory.pm"
+      },
+      "Ark::Plugin::Session::Store::Model" : {
+         "file" : "lib/Ark/Plugin/Session/Store/Model.pm"
+      },
+      "Ark::Request" : {
+         "file" : "lib/Ark/Request.pm"
+      },
+      "Ark::Response" : {
+         "file" : "lib/Ark/Response.pm"
+      },
+      "Ark::Test" : {
+         "file" : "lib/Ark/Test.pm"
+      },
+      "Ark::Test::Context" : {
+         "file" : "lib/Ark/Test/Context.pm"
+      },
+      "Ark::View" : {
+         "file" : "lib/Ark/View.pm"
+      },
+      "Ark::View::JSON" : {
+         "file" : "lib/Ark/View/JSON.pm"
+      },
+      "Ark::View::MT" : {
+         "file" : "lib/Ark/View/MT.pm"
+      },
+      "Ark::View::TT" : {
+         "file" : "lib/Ark/View/TT.pm"
+      },
+      "Ark::View::Xslate" : {
+         "file" : "lib/Ark/View/Xslate.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ark-framework/ark/issues"
+      },
+      "homepage" : "https://github.com/ark-framework/ark",
+      "repository" : {
+         "url" : "git://github.com/ark-framework/ark.git",
+         "web" : "https://github.com/ark-framework/ark"
+      }
+   },
+   "version" : "1.20",
+   "x_contributors" : [
+      "Masakazu Ohtsuka <o.masakazu@gmail.com>",
+      "mattn <mattn.jp@gmail.com>",
+      "Ryo Miyake <ryo.studiom@gmail.com>",
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
+      "Shinichiro Sei <sei@kayac.com>",
+      "hisaichi5518 <info@moe-project.com>",
+      "ichirin2501 <ichirin.2501@gmail.com>",
+      "Daisuke Murase <typester@gmail.com>",
+      "FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>",
+      "Masatoshi Kawazoe (acidlemon) <kawazoe-masatoshi@kayac.com>",
+      "tei-you <tei-you@kayac.com>",
+      "hisaichi5518 <hisaichi5518@gmail.com>",
+      "Songmu <y.songmu@gmail.com>"
+   ]
+}

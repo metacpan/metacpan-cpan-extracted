@@ -1,0 +1,360 @@
+#!/usr/bin/env perl
+
+use App::Pipeline::Simple;
+use Getopt::Long;
+use Carp;
+
+use strict;
+use warnings;
+
+use constant PROGRAMME_NAME => 'spipe';
+# ABSTRACT: simple pipeline running interface
+our $VERSION = '0.9.1'; # VERSION
+# PODNAME: spipe
+
+# raising $OUTPUT_AUTOFLUSH flag to get immediate reporting
+$| = 1;
+
+# catch interuptions cleanly
+$SIG{'INT'} = 'CLEANUP';
+sub CLEANUP { exit(1) }
+
+
+# variables to catch command line options
+our $DEBUG = '';
+our $CONFIG = '';
+our $DIR = '.';
+our $GRAPHVIZ;
+our $INPUT = '';
+our $ITYPE  =  '';
+#our $CONTINUE; # not implemented yet
+our $START  =  '';
+our $STOP  =  '';
+our $VERBOSE;
+
+GetOptions(
+           'v|version'     => sub{ print PROGRAMME_NAME, ", version ", $VERSION, "\n";
+				   exit(1); },
+           'g|debug'       => \$DEBUG,
+           'c|config:s'    => \$CONFIG,
+           'd|directory:s' => \$DIR,
+           'i|input:s'     => \$INPUT,
+           'it|itype:s'    => \$ITYPE,
+	   'graphviz'      => \$GRAPHVIZ,
+#	   'continue'      => \$CONTINUE,
+	   'start:s'       => \$START,
+	   'stop:s'        => \$STOP,
+	   'verbose:i'     => \$VERBOSE,
+           'h|help|?'      => sub{ exec('perldoc',$0); exit(0) },
+           );
+
+
+my %args;
+$args{config} = $CONFIG if $CONFIG;
+$args{dir}   = $DIR;
+$args{input} = $INPUT if $INPUT;
+$args{itype} = $ITYPE if $ITYPE;
+$args{start} = $START if $START;
+$args{stop}  = $STOP  if $STOP;
+$args{verbose} = $VERBOSE  if $VERBOSE;
+
+unless (-e "$DIR/config.yml" or $CONFIG ) {
+    croak "ERROR: Need either explicit config file or ".
+	"it has to be found the working directory\n"
+}
+
+my $p = App::Pipeline::Simple->new(%args);
+print $p->graphviz and exit if $GRAPHVIZ;
+print $p->stringify and exit if $DEBUG;
+
+$p->run();
+
+__END__
+
+=pod
+
+=head1 NAME
+
+spipe - simple pipeline running interface
+
+=head1 VERSION
+
+version 0.9.1
+
+=head1 SYNOPSIS
+
+B<spipe> [B<--version> | [B<-?|-h|--help>] | [B<-g|--debug>] |
+   B<[--graphviz> | B<[-c|--config> file | [B<[-d|--directory> value] |
+   B<[-i|--input> string| B<[-it|--itype> string |
+   [B<[--start> value] | [B<[--stop> value]
+
+  spipe -config t/data/string_manipulation.yml -d /tmp/test
+
+=head1 DESCRIPTION
+
+Spipe is a control script for running simple pipelines read from
+configuration files written in YAML language.
+
+For internal details of the pipeline, check the documentation for the
+perl module L<App::Pipeline::Simple>.
+
+=head1 NAME
+
+spipe - simple pipeline running interface
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<-v | --version>
+
+Print out a line with the program name and version number.
+
+=item B<-? | -h | --help>
+
+Show this help.
+
+=item B<-g | --debug>
+
+Print out the UNIX command line equivalent of the pipeline and exit.
+
+Reports parsing and logical errors.
+
+=item B<--graphviz>
+
+Print out a graphviz dot file.
+
+Example one liner to display a graph of the pipeline:
+
+  spipe -config t/data/string_manipulation.yml -graph > \
+  /tmp/p.dot; dot -Tpng /tmp/p.dot| display
+
+=item B<-c | --config> string
+
+Path to the config file. Required unless there is a file called
+config.yml in the current directory.
+
+=item B<-d | --directory> string
+
+Directory to keep all files.
+
+If the directory does not exist, it will be created and a copy of the
+config file will be copied into it under name C<config.yml>.
+
+For subsequent runs of the that pipeline, you adjust the parameters in
+the configuration file and rerun spipe without -config and -directory
+options.
+
+=item B<-i | --input> string
+
+Optional input to pipeline.
+
+=item B<-it | --itype> string
+
+Type of the optional input. Values?
+
+=item B<--start> string
+
+ID of the step to start or restart the pipeline.
+
+Fails if the prerequisites of the step are not met, i.e. the input
+file(s) does not exist.
+
+=item B<--stop> string
+
+ID of the step to stop the pipeline. Defaults to the last step.
+
+=item B<--verbose> int
+
+Verbosity level. Defaults to zero. This will get translated to
+Log::Log4perl levels:
+
+  verbose   =  -1    0     1     2
+  log level =  DEBUG INFO  WARN  ERROR
+
+=back
+
+=head1 RUNNING
+
+Example run:
+
+  spipe -config t/data/string_manipulation.xml -dir /tmp/test
+
+reads instructions from the config file and writes all information to
+the project directory.
+
+The debug option will parse the config file, print out the command
+line equivalents of all commands and print out warnings of problems
+encountered in the file:
+
+  spipe -config t/data/string_manipulation.xml -dir /tmp/test
+
+An other tool integrated in the system is visualization of the
+execution graph. It is done with the help of L<GraphViz> perl
+interface module that will need to be installed from CPAN.
+
+The following command line creates a Graphviz dot file, converts it
+into an image file and opens it with the Imagemagic display program:
+
+  spipe -config t/data/string_manipulation.xml -graph > \
+    /tmp/p.dot; dot -Tpng /tmp/p.dot | display
+
+=head1 CONFIGURATION
+
+The default configuration is written in YAML, a simple and human
+readable language that can be parsed in many languages cleanly into
+data structures.
+
+The YAML file contains four top level keys for the hash that the file
+will be read into: 1) C<name> to give the pipeline a short name, 2)
+C<version> to indicate the version number, 3) C<description> to give a
+more verbose explanation what the pipeline does, and 4) C<steps>
+listing pipeline steps.
+
+  ---
+  description: "Example of a pipeline"
+  name: String Manipulation
+  version: '0.4'
+  steps:
+
+Each C<step> is identified by an unique short ID and has a C<name>
+that identifies an executable somewhere in the system
+path. Alternatively, you can give the full path leading to the
+executable file with key C<path>. The name will be added to the path
+and padded with a suitable separator character when needed.
+
+Arguments to the executable are given individually as key/value pairs
+within the C<args> tag. A single hyphen is added in front of the
+argument key when they are executed. If two hyphens are needed, just
+add one the key. Arguments can exist without values, too.
+
+  s3:
+    name: cat
+    args:
+      in:
+        type: redir
+        value: s1.txt
+      n:
+      out:
+        type: redir
+        value: s3_mod.txt
+    next:
+      - s4
+
+There are two special keys C<in> and C<out> that need to have a key
+ C<type> defined. The IO C<type> can get several kinds of values:
+
+=over
+
+=item C<unnamed>
+
+that indicates that the argument is an unnamed argument to the
+executable
+
+=item C<redir>
+
+will be interpreted as UNIX redirection character '&lt' or '&gt'
+depending on the context
+
+=item C<file>
+
+means that IO happens from/to a file and is rendered as named argument
+
+=item C<dir>
+
+is rendered like file, but is a mnemonic that all files under this
+directory name are processed
+
+=back
+
+Finally, the C<step> tag can contain the C<next> key that
+gives an array of IDs for the next steps in the execution. Typically,
+these steps depend on the previous step for input.
+
+Practices that are completely bonkers, like spaces in file names, are
+not supported.
+
+Finally, it is worth noting that YAML can need escaping and quoting to
+get special characters inside strings. Double quotes around a string
+works most of the time well. A single quote inside a single quoted
+string needs to be doubled.
+
+The following example of a perl one-liner (Thanks to Nic Walker for
+alerting me) could be equally well written using double quotes like
+this: "'print $F[1]'"
+
+  s6:
+    name: perl
+    args:
+      lane: '''print $F[1]'''
+      in:
+        type: redir
+        value: myfile
+      out:
+        type: redir
+        value: sec_column
+
+=head2 Advanced features
+
+The pipeline does not have to be linear; it can contain branches. For
+example, the pipeline can have several start points with different
+kinds of input: file and string.
+
+Sometimes it is useful to run the same pipeline with different
+parameter. The starting point of execution can take a value from the
+command line.  Leave the value for the given argument blank in the
+configuration file and give it from the command line. Matching of
+values is done by matching the type string.
+
+  spipe -conf input_demo.yml --input=ABC --itype=str
+
+  ---
+  description: "Demonstrate input from command line"
+  name: input.yml
+  version: '0.1'
+  steps:
+    s1:
+      name: echo
+      args:
+        in:
+          type: unnamed
+          value:
+        out:
+          type: redir
+          value: s1_string.txt
+
+The empty C<value> will be filled in from the command line into the
+C<config.yml> stored in the project directory. Also, the config file
+looks slightly different since the steps are written out as
+App::Pipeline::Simple objects. Functionally there is no difference.
+
+=head1 TO DO
+
+This pipeline engine has been tested using mostly linear pipelines.
+Extensive branching and complex dependencies might not work as expected.
+
+There are no explicit tests for the existence of step input
+files. Scripts are expected to run these steps themselves and die
+gracefully when appropriate.
+
+There has been no attempt to execute steps in parallel fashion.
+
+If all this is included, this pipeline engine might not be "simple"
+any more.
+
+=head1 SEE ALSO
+
+L<App::Pipeline::Simple>
+
+=head1 AUTHOR
+
+Heikki Lehvaslaiho, KAUST (King Abdullah University of Science and Technology).
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Heikki Lehvaslaiho.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,7 @@
+perl Makefile.pl
+make
+make install
+
+
+duh.
+

@@ -1,0 +1,4 @@
+
+These two examples are taken directly from Robert Barta's
+AI::NeuralNet::SOM package. The only modification is s/SOM/FastSOM/g.
+

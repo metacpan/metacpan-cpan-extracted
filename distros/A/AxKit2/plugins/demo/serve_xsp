@@ -1,0 +1,45 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+sub init {
+    my $self = shift;
+    
+    $self->register_config('XSP_Match', sub { $self->matchfiles(@_) });
+}
+
+sub matchfiles {
+    my ($self, $conf) = (shift, shift);
+    
+    my $key = $self->plugin_name . '::matchfiles';
+    @_ and $conf->notes($key, shift);
+    $conf->notes($key);
+}
+
+sub hook_xmlresponse {
+    my ($self, $input) = @_;
+    
+    $self->log(LOGDEBUG, "XSP Transform");
+    
+    my $match = $self->matchfiles($self->config);
+    
+    $self->log(LOGDEBUG, "Does ", $self->client->headers_in->filename, " match $match?");
+    return DECLINED unless $self->client->headers_in->filename =~ /$match/;
+    
+    my $out = $input->transform(XSP());
+    
+    return OK, $out;
+}

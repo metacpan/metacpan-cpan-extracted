@@ -1,0 +1,56 @@
+Revision history for Perl extension Audio::WMA.
+
+1.2 Sun Nov  9 18:53:43 PST 2008
+	* KDF : Parse replaygain and comment tags from WMA Extended Content block
+	* Andy: Would give up trying to parse a filehandle too soon because no size value was set
+	* Andy: Requires a size param when passed a filehandle, it will get into an infinite loop otherwise
+	* Andy: Sample rate field was being read as a 16-bit value instead of 32-bit
+	* Andy: Don't be case-sensitive when looking for WMA picture tag
+	* Andy: type_data_length and error_data_length are 32-bit values
+	* Andy: Add some missing wFormatTag values
+
+1.0 Thu Jan  4 14:23:27 PST 2007
+
+	* RT #17556 - get tags from files with DRM.
+	* Calculate bitrates properly.
+	* Standalone object parsing.
+	* Combine some duplicated code.
+	* Parse the ASF_Extended_Stream_Properties_Object
+	* Parse a ASF_Metadata_Object inside a ASF_Extended_Header_Object.
+	* Parse embedded WM/Picture files.
+	* Create array refs for tags with multiple values.
+
+0.8 Sat Nov 26 00:13:34 PST 2005
+
+	Patch from Vidur Apparo to support parsing streams.
+
+0.7 Thu Oct  7 16:16:45 PDT 2004
+
+	Fix infinite loop case for 0 length objects.
+
+0.6 Sat Oct  2 11:35:56 PDT 2004
+
+	Handle Extended Header Objects, and Metadata Library Objects for additional author information.
+
+	Internal cleanup
+
+0.5 Fri Oct  1 19:15:59 PDT 2004
+
+	Changes comments() to be tags() - more similar to other audio modules.
+
+	Handle a second type of DRM file.
+
+	Parse Stream_Properties objects now to get the bits_per_sample, sample_rate, etc.
+
+0.3 Sat Sep 25 19:40:41 PDT 2004
+
+	Expose if a file is DRM encrypted - patch from Kevin Deane-Freeman
+
+0.2 Mon Feb 16 17:22:25 2004
+
+	Integrated sanity checks from Dean. Print out the file name if we error out.
+
+0.1 Thu Dec  4 13:46:05 2003
+	- original version; created by h2xs 1.22 with options
+		-n Audio::WMA -X -A
+

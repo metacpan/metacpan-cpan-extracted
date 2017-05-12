@@ -1,0 +1,8 @@
+[project]
+title           = Basic
+
+[apache]
+doc_root        = @ServerRoot@
+disable_uploads = 0
+post_max        = 5242880
+temp_dir        = /tmp

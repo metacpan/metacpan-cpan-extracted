@@ -1,0 +1,2619 @@
+#!perl -w
+use strict;
+use warnings;
+use Prima;
+use Prima::Application name => "Morphometry I";
+use App::PLab::ImageApp;
+use App::PLab::Calibrations;
+use Prima::Edit;
+use Prima::ExtLists;
+use Prima::IPA qw/Local Point Global Misc/;
+use XML::Parser;
+
+$::application-> icon( App::PLab::ImageAppGlyphs::icon( bga::drawprocesses));
+
+package ocq;
+
+use constant Files      => 0;
+use constant Basics     => 1;
+use constant Histogram  => 2;
+use constant Equalize   => 3;
+
+package MorphoWindow;
+use vars qw(@ISA);
+@ISA = qw(App::PLab::Calibrations);
+
+sub make_contour_continuous
+{
+   # input: ([@x_coordinates_of_a_contour], [@y_coordinates_of_a_contour])
+   # output: ([@x_coordinates_of_a_contour], [@y_coordinates_of_a_contour])
+   # it is supposed that first point is *not* equal to the last one
+   my @x = @{$_[0]};
+   my @y = @{$_[1]};
+   my (@cx,@cy);
+
+   for my $i (0..$#x) {
+      push @cx, $x[$i];
+      push @cy, $y[$i];
+
+      my ($x1,$y1) = ($x[$i],$y[$i]);
+      my ($x2,$y2);
+
+      if ($i == $#x) {
+	 ($x2,$y2) = ($x[0],$y[0]);
+      } else {
+	 ($x2,$y2) = ($x[$i+1],$y[$i+1]);
+      }
+      my ($x,$y) = ($x1, $y1);
+      my ($dx,$sx,$dy,$sy);
+
+      if ($x2 >= $x1) {
+	 $dx = $x2-$x1;
+	 $sx = 1;
+      } else {
+	 $dx = $x1-$x2;
+	 $sx = -1;
+      }
+
+      if ($y2 >= $y1) {
+         $dy = $y2-$y1;
+         $sy = 1;
+      } else {
+         $dy = $y1-$y2;
+         $sy = -1;
+      }
+
+      if ($dy <= $dx) {
+         # case 1: angular coefficient <= 1
+         my $e = 2 * $dy - $dx;
+         until ($x == $x2 && $y == $y2) {
+            unless ($x == $x1 && $y == $y1) {
+	       push @cx, $x;
+	       push @cy, $y;
+            }
+            while ($e >= 0) {
+               $y += $sy;
+               $e -= 2 * $dx;
+            }
+            $x += $sx;
+            $e += 2 * $dy;
+         }
+      } else {
+         # case 2: angular coefficient > 1
+         my $e = 2 * $dx - $dy;
+         until ($x == $x2 && $y == $y2) {
+            unless ($x == $x1 && $y == $y1) {
+	       push @cx, $x;
+	       push @cy, $y;
+            }
+            while ($e >= 0) {
+               $x += $sx;
+               $e -= 2 * $dy;
+            }
+            $y += $sy;
+            $e += 2 * $dx;
+         }
+      }
+   }
+   return [@cx],[@cy];
+}
+
+my $pi = 4 * atan2 1, 1;
+{
+my (@sines,@cosines);
+my $rotations;
+
+# call init_convex($rotations) every time the number of rotations changes
+sub init_convex
+{
+   # input: ($requested_rotations)
+   # output: ()
+   my $requested_rotations = shift;
+   @sines = ('dummy'); @cosines = ('gummy');
+   my $delta = $pi / $requested_rotations;
+   my $angle = 0;
+   $rotations = 1;
+
+   while ( $angle < $pi) {
+      push @cosines, cos $angle;
+      push @sines, sin $angle;
+      $angle += $delta;
+      $rotations++;
+   }
+   $rotations--;
+}
+
+sub get_convex
+{
+   # input: ($w, @flattened_x_y_of_a_contour)
+   # output: ([@flattened_x_y_of_a_continuous_convex],
+   #          [@flattened_x_y_of_a_non_continuous_convex],
+   #          $length_of_a_contour, $breadth_of_a_contour)
+   # it is supposed that the first point is *equal* to the last one
+   my $w = shift;
+   my $xcalib = $w->{ini}->{XCalibration};
+   my $ycalib = $w->{ini}->{YCalibration};
+   # do not edit here
+   my @coord = @_;
+   my (@x,@y);
+   my (@xx,@yy);
+   while (@coord) {
+      push @x, shift @coord;
+      push @y, shift @coord;
+   }
+   @xx = map { $_*$xcalib } @x;
+   @yy = map { $_*$ycalib } @y;
+   my $length = -1.0e20;
+   my $breadth = 1.0e20;
+   my $count = @x;
+   my (@indexmin,@indexmax);
+
+   for my $k (1..$rotations) {
+      my ($xmin,$xmax) = (1.0e20,-1.0e20);
+      my ($imin,$imax);
+      my $sin = $sines[$k];
+      my $cos = $cosines[$k];
+      my $f;
+
+      for my $i (1..$#x) {
+         $f = $cos * $xx[$i] - $sin * $yy[$i];
+         if ( $f < $xmin) {
+            $xmin = $f;
+            $imin = $i;
+         }
+         if ( $f > $xmax) {
+            $xmax = $f;
+            $imax = $i;
+         }
+      }
+
+      $indexmin[$k] = $imin;
+      $indexmax[$k] = $imax;
+
+      $f = abs($xmax - $xmin);
+      $length = $f if $f > $length;
+      $breadth = $f if $f < $breadth;
+   }
+
+   my (@cx,@cy);
+   for my $k (1..$rotations) {
+      my $i = $indexmin[$k];
+      my ($x,$y) = ($x[$i],$y[$i]);
+      if ( @cx == 0
+	   || (($x != $cx[-1] || $y != $cy[-1])
+	       && ($x != $cx[0] || $y != $cy[0]))) {
+	 push @cx, $x;
+	 push @cy, $y;
+      }
+   }
+   for my $k (1..$rotations) {
+      my $i = $indexmax[$k];
+      my ($x,$y) = ($x[$i],$y[$i]);
+      if ( @cx == 0
+	   || (($x != $cx[-1] || $y != $cy[-1])
+	       && ($x != $cx[0] || $y != $cy[0]))) {
+	 push @cx, $x;
+	 push @cy, $y;
+      }
+   }
+   my ($cx,$cy) = make_contour_continuous([@cx], [@cy]);
+   my @ccx = @$cx;
+   my @ccy = @$cy;
+   push @cx, $cx[0];
+   push @cy, $cy[0];
+   push @ccx, $ccx[0];
+   push @ccy, $ccy[0];
+   # flatten
+   my @ret1 = ();
+   while (@cx) {
+      push @ret1, shift(@cx), shift(@cy);
+   }
+   my @ret2 = ();
+   while (@ccx) {
+      push @ret2, shift(@ccx), shift(@ccy);
+   }
+   return ([@ret2], [@ret1], $length, $breadth);
+}
+}
+
+sub get_holes
+{
+   # input: ([@flattened_x_y_of_a_contour], [@flattened_x_y_of_a_convex])
+   # output: ([@flattened_x_y_of_hole_1], [@flattened_x_y_of_hole_2], ...)
+   # it is supposed that both contour and convex have their first points *equal* to their last points
+   # XXX it is required that convex was not made continuous!
+   my ($contour,$convex) = @_;
+   my (@contour) = @$contour;
+   my (@convex) = @$convex;
+   my (@x,@y,@cx,@cy);
+
+   while (@contour) {
+      push @x, shift @contour;
+      push @y, shift @contour;
+   }
+   while (@convex) {
+      push @cx, shift @convex;
+      push @cy, shift @convex;
+   }
+   my (@holes);
+
+   for my $i (0..$#cx-1) {
+      my ($x1,$y1) = ($cx[$i],$cy[$i]);
+      my ($x2,$y2) = ($cx[$i+1],$cy[$i+1]); # we guaranteed to have $i+1 point
+
+      next if abs($x1 - $x2) <= 1 && abs($y1 - $y2) <= 1;
+      my ($j1,$j2);
+
+      for ( $j1 = 0; $j1 < $#x; $j1++) {
+	 last if $x[$j1] == $x1 && $y[$j1] == $y1;
+      }
+      for ( $j2 = 0; $j2 < $#x; $j2++) {
+	 last if $x[$j2] == $x2 && $y[$j2] == $y2;
+      }
+      if ( $j2 < $j1) {
+	 ($j2,$j1) = ($j1,$j2);
+      }
+      next if $j2 - $j1 == 1 || ( $j1 == 0 && $j2 == $#x - 1);
+      if ( $j2-$j1 > $#x - $j2 + $j1) {
+	 ($j2,$j1) = ($j1,$j2);
+      }
+      my $j = $j1;
+      my (@hx,@hy);
+
+
+      until ($j == $j2) {
+	 push @hx, $x[$j];
+	 push @hy, $y[$j];
+	 $j++;
+	 $j = 0 if $j >= $#x;
+      }
+      push @hx, $x[$j];
+      push @hy, $y[$j];
+      my ($hx,$hy) = make_contour_continuous([@hx], [@hy]);
+      push @$hx, $hx->[0];
+      push @$hy, $hy->[0];
+      # flatten
+      my @ret = ();
+      while (@$hx) {
+	 push @ret, shift(@$hx), shift(@$hy);
+      }
+      push @holes, [@ret];
+   }
+   return @holes;
+}
+
+
+# WIN
+
+sub win_objectsetsmenuaction
+{
+   my ( $self, $id) = @_;
+   my $menu = $self-> menu;
+   return if $self-> {currentSet} == $id;
+   $menu-> checked( 'lw'.($self-> {ini}-> {'LW'.$self-> {currentSet}}), 0);
+   $menu-> checked( 'lw'.($self-> {ini}-> {'LW'.$id}), 1);
+   $menu-> checked( $self-> {currentSet}, 0);
+   $menu-> checked( $id, 1);
+   my $iv = $self-> IV;
+   $self-> iv_cancelmode( $iv);
+   $self-> {currentSet} = $id;
+   $self-> pt_newset();
+   $iv-> {bone}-> backColor( $self-> {ini}-> {$self-> {setColors}->[ $self-> {currentSet}]});
+   my $c = $menu-> text( $id);
+   $c =~ s/\~//;
+   $self-> sb_text("Object set:$c");
+}
+
+sub win_objectlwmenuaction
+{
+   my ( $self, $id) = @_;
+   my $width = $id;
+   $width =~ s/lw//;
+   $width = 9 if $width > 9;
+   $width = 1 if $width < 1;
+   return if $width == $self-> {ini}-> {'LW'.$self-> {currentSet}};
+   $self-> {ini}-> {'LW'.$self-> {currentSet}} = $width;
+   $self-> sb_text("Line width set:$width");
+}
+
+sub win_inidefaults
+{
+   my $w = $_[0];
+   my $calcopt = '';
+   vec( $calcopt, 0, 32) = ocq::Files | ocq::Basics;
+   return (
+      $w-> SUPER::win_inidefaults,
+      RecWindowPos     => '100 100',
+      RecWindowVisible => 0,
+      UFThreshold      => 40,
+      BinThreshold     => 128,
+      EdgeSize         => 3,
+      MinArea          => 0,
+      MaxArea          => 0,
+      LW0              => 1,
+      LW1              => 1,
+      LW2              => 3,
+      EqualBrightness  => 0,
+      CalcBrightness   => 0,
+      CalcConvex       => 0,
+      CalcHoles        => 0,
+      HolesPercent     => 5,
+      NumberOfRotations=> 128,
+      StatPath         => '.',
+      CalcOptions      => $calcopt,
+      FrameWidth       => 0,
+      FrameColor       => 0,
+      InvertImage      => 0,
+   );
+}
+
+
+sub on_create
+{
+   my $self = $_[0];
+
+   $self-> SUPER::on_create;
+
+   my $w = $self;
+   $w-> {dataExt} = 'xml';
+   my $i = $w-> {ini};
+   my $xref = [
+      ['*0' => "~Features"   => \&win_objectsetsmenuaction],
+      ['1'  => "~Background" => \&win_objectsetsmenuaction],
+      ['2'  => "~Remove"     => \&win_objectsetsmenuaction],
+      [],
+      [ LineWidthIncrement =>  '~Increase line width' => sub {
+         $_[0]-> win_objectlwmenuaction( 'lw'.($_[0]-> {ini}-> {'LW'.$_[0]-> {currentSet}} + 1));
+      }],
+      [ LineWidthDecrement => '~Decrease line width' => sub {
+         $_[0]-> win_objectlwmenuaction( 'lw'.($_[0]-> {ini}-> {'LW'.$_[0]-> {currentSet}} - 1));
+      }],
+   ];
+   $w-> {setColors}      = [ qw( Color_Features Color_Background Color_Remove)];
+   $w-> menu-> insert( [[ "~Object sets" => $xref]], 'edit' , 6);
+   $w-> {currentSet} = 0;
+   $w-> pt_init();
+   my $iv = $w-> IV;
+   my $bone = $iv-> {bone};
+   $bone-> backColor( $w-> {ini}-> {$w-> {setColors}->[$w-> {currentSet}]});
+   $bone-> set( onMouseClick => sub {
+      my ( $cs, $mx) = ( $w-> {currentSet} + 1, scalar @{$w-> {setColors}});
+      $cs = 0 if $cs >= $mx;
+      $w-> win_objectsetsmenuaction($cs);
+      $_[0]-> clear_event;
+   });
+
+   my $cck = $self-> ToolBar-> insert(
+       SpeedButton =>
+       name        => "Contours",
+       origin      => [120, 1],
+       size        => [ 36, 36],
+       image       => App::PLab::ImageAppGlyphs::icon( bga::drawprocesses),
+       enabled     => 0,
+       checkable   => 1,
+       checked     => 1,
+       hint        => 'Toggle contours tickmarks drawing',
+       onClick     => sub { $self-> iv_togglemode( $iv)},
+       glyphs      => 2,
+       text        => "",
+       selectable  => 0,
+       transparent => 1,
+       flat        => 1,
+       borderWidth => 1,
+       glyphs => 1,
+   );
+
+   $self-> ToolBar-> insert(
+       SpeedButton =>
+       name        => "CalcStatistics",
+       origin      => [ 162, 1],
+       size        => [ 36, 36],
+       image       => App::PLab::ImageAppGlyphs::icon( bga::calcstatistics),
+       enabled     => 1,
+       hint        => 'Calculate statistics',
+       onClick     => sub { $self-> opt_statistics(); },
+       text        => "",
+       selectable  => 0,
+       transparent => 1,
+       flat        => 1,
+       borderWidth => 1,
+   );
+   $iv-> {drawmode} = $cck-> checked ? 1 : undef;
+   init_convex( $w->{ini}->{NumberOfRotations});
+}
+
+sub on_destroy
+{
+   my ($w,$i) = ($_[0],$_[0]->{ini});
+   $i-> {RecWindowVisible} = defined $w-> {recWindow} ? 1 : 0;
+   $w-> SUPER::on_destroy;
+}
+
+sub win_closeframe
+{
+   my $w = $_[0];
+   $w-> SUPER::win_closeframe;
+   $w-> pt_clear_all();
+   $w-> rpt_clear();
+}
+
+sub win_framechanged
+{
+   my $w = $_[0];
+   $w-> SUPER::win_framechanged;
+   $w-> {mirrorImage} = undef;
+   my $i = $w-> IV-> image;
+   my $canApply = defined $i && $i-> type == im::Byte;
+   $w-> menu-> EditToggleMode-> enabled( defined $i);
+   $w-> menu-> EditApplyContours-> enabled( $canApply);
+   $w-> menu-> EditValidate-> enabled( defined $i);
+   $w-> menu-> EditImport-> enabled( defined $i);
+   $w-> ToolBar-> Contours-> enabled( defined $i);
+   if ( $w-> {recWindow}) {
+      my $r = $w-> {recWindow};
+      if ( defined $i) {
+         my @sz = $i-> size;
+         $r-> Min-> max( $sz[0] * $sz[1]);
+         $r-> Max-> max( $sz[0] * $sz[1]);
+         $r-> Edge-> max(int(($sz[0] < $sz[1] ? $sz[0] : $sz[1]) / 2));
+      }
+      $r-> ApplyBtn-> enabled( $canApply);
+      $r-> RestoreBtn-> enabled( $canApply && defined $w-> {mirrorImage});
+      $r-> Preview1-> enabled( $canApply);
+      $r-> Preview2-> enabled( $canApply);
+      $r-> Preview3-> enabled( $canApply);
+   }
+   $w-> pt_newset;
+}
+
+sub win_showrec
+{
+   my $w = $_[0];
+   if ( $w-> {recWindow}) {
+      $w-> {recWindow}-> bring_to_front;
+      $w-> {recWindow}-> select;
+      return;
+   }
+   $w-> {recWindow} = PropRollup-> create( owner => $w);
+}
+
+sub win_entersubplace
+{
+   my $w = $_[0];
+   $w-> {savePointer} = $::application-> pointer;
+   $::application-> pointer( cr::Wait);
+   return defined $w-> {mirrorImage} ? $w-> {mirrorImage} : $w-> IV-> image;
+}
+
+sub win_leavesubplace
+{
+   my $w = $_[0];
+   $::application-> pointer( $w-> {savePointer});
+   $w-> {mirrorImage} = $w-> IV-> image unless defined $w-> {mirrorImage};
+   $w-> IV-> image( $_[1]);
+   $w-> {recWindow}-> RestoreBtn-> enabled( 1) if $w-> {recWindow};
+   $w-> {savePointer} = undef;
+}
+
+sub win_restore
+{
+   my ( $w, $i) = @_;
+   $w-> IV-> repaint, return unless defined $w-> {mirrorImage};
+   $w-> IV-> image($w-> {mirrorImage});
+   $w-> {mirrorImage} = undef;
+   $w-> {recWindow}-> RestoreBtn-> enabled( 0) if $w-> {recWindow};
+}
+
+sub win_syncrecdata
+{
+   my $w = $_[0];
+   return unless $w-> {recWindow};
+   my $r = $w-> {recWindow};
+   my $i = $w-> {ini};
+   $i-> {UFThreshold}  = $r-> Union-> value;
+   $i-> {BinThreshold} = $r-> Binary-> value;
+   $i-> {EdgeSize}     = $r-> Edge-> value;
+   $i-> {MinArea}      = $r-> Min-> value;
+   $i-> {MaxArea}      = $r-> Max-> value;
+}
+
+sub win_validate
+{
+   my ( $w, $silent) = @_;
+   my ( $min, $max, $edge);
+   my ( $umax, $umin, $j, $iptr);
+
+   return unless defined $w-> {file};
+
+   $w-> win_syncrecdata;
+   $umin = $w-> {ini}-> {MinArea};
+   $umax = $w-> {ini}-> {MaxArea};
+
+   unless ( $silent) {
+      $w-> iv_cancelmode( $w-> IV);
+      $iptr = $::application-> pointer;
+      $::application-> pointer( cr::Wait);
+   }
+
+   my @is = $w-> IV-> image-> size;
+
+   for ( $j = 0; $j < 2; $j++) {
+
+      if ( $j == 0) {
+         $min = $umin;
+         $max = $umax;
+      } else {
+         $min = 0;
+         $max = $is[0] * $is[1];
+      }
+
+      $edge = $w-> {ini}-> {EdgeSize};
+
+      my $i = Prima::Image-> create(
+         width        => $is[0],
+         height       => $is[1],
+         type         => im::BW,
+         preserveType => 1,
+      );
+
+      $i-> begin_paint;
+      $i-> color( cl::Black);
+      $i-> bar(0,0,@is);
+      $i-> color( cl::White);
+      my $k;
+      my $lastLW = 0;
+
+      if ( defined $w-> {lineStorage}) {
+         my $wwl  = $w->{lineStorage}->[$j];
+         my $wwlw = $w->{lwStorage}  ->[$j];
+         next unless defined $wwl;
+         for ( $k = 0; $k < @$wwl; $k++) {
+            $i-> lineWidth( $$wwlw[$k]), $lastLW = $$wwlw[$k] if $lastLW != $$wwlw[$k];
+            $i-> polyline( $$wwl[ $k]);
+         }
+      }
+      $i-> end_paint;
+      $i-> type( im::Byte);
+
+      $i = Prima::IPA::Global::fill_holes( $i,
+         edgeSize => $edge,
+      );
+
+      if ( defined $w-> {lineStorage} && defined $w->{lineStorage}->[ 2]) {
+         $i-> begin_paint;
+         $i-> color( cl::Black);
+         my $wwl  = $w->{lineStorage}->[ 2];
+         my $wwlw = $w->{lwStorage}->[ 2];
+         for ( $k = 0; $k < @$wwl; $k++) {
+            $i-> lineWidth( $$wwlw[$k]), $lastLW = $$wwlw[$k] if $lastLW != $$wwlw[$k];
+            $i-> polyline( $$wwl[ $k]);
+         }
+         $i-> end_paint;
+         $i-> type( im::Byte);
+
+         $i = Prima::IPA::Global::fill_holes( $i,
+            edgeSize => $edge,
+         );
+      }
+
+      $i = Prima::IPA::Global::area_filter( $i,
+         edgeSize => $edge,
+         minArea  => $min,
+         maxArea  => $max,
+      );
+
+      my $cc = [ grep { ($w->win_calcbasicparameters(@$_))[0] }
+                    @{Prima::IPA::Global::identify_contours( $i, edgeSize => $edge)} ];
+      $cc = undef unless scalar @$cc;
+      $w-> {lineStorage}-> [ $j] = $cc;
+      $w-> {lwStorage}-> [ $j] = defined $cc ? [ (1) x scalar @$cc] : undef;
+   }
+   $w-> {lineStorage}-> [ 2] = undef;
+   $w-> {lwStorage}-> [ 2] = undef;
+
+   unless ( $silent) {
+      $w-> modified( 1);
+      $w-> pt_newset;
+      $w-> IV-> repaint;
+      $::application-> pointer( $iptr);
+   }
+}
+
+sub win_outline_convex_hull
+{
+   my ($w) = @_;
+
+   init_convex( $w->{ini}->{NumberOfRotations});
+   my $ptr = $w-> {lineStorage}->[0];
+   return unless defined $ptr;
+   my @bubik = ();
+   for my $pp ( @$ptr) {
+      my ( $fc, $fnc, $len, $brd) = $w-> get_convex( @$pp);
+      push @bubik, $fc;
+   }
+   $w-> {lineStorage}-> [ 1] = \@bubik;
+   $w-> {lwStorage}-> [ 1] = [ (1) x @bubik];
+   $w-> modified( 1);
+   $w-> pt_newset;
+   $w-> IV-> repaint;
+}
+
+sub win_applycontours
+{
+   my $w = $_[0];
+   $w-> iv_cancelmode( $w-> IV);
+   return if defined $w-> {lineStorage}->[0] &&
+        ( Prima::MsgBox::message( "Erase present contours?", mb::YesNoCancel|mb::Warning) != mb::Yes);
+
+   $w-> win_syncrecdata;
+   my $i = $w-> {ini};
+   my ( $u, $b, $e, $mi, $ma) = (
+      $i-> {UFThreshold},
+      $i-> {BinThreshold},
+      $i-> {EdgeSize},
+      $i-> {MinArea},
+      $i-> {MaxArea},
+   );
+
+   $w-> win_objectsetsmenuaction( 0);
+   $w-> pt_clear;
+   my $im = Prima::IPA::Local::unionFind(
+      $w-> win_entersubplace,
+      method    => 'ave',
+      threshold => $u);
+
+   $im = Prima::IPA::Point::threshold(
+      $im,
+      minvalue => 0,
+      maxvalue => $b);
+
+   $im = Prima::IPA::Global::fill_holes( $im,
+      edgeSize => $e,
+   );
+   $im = Prima::IPA::Global::area_filter( $im,
+      edgeSize => $e,
+      minArea  => $mi,
+      maxArea  => $ma,
+   );
+
+   my $cc = Prima::IPA::Global::identify_contours( $im, edgeSize => $e);
+   ${$w-> pt_lines_ptr()} = $cc if scalar @$cc;
+   ${$w-> pt_lw_ptr()}    = [ (1) x scalar @$cc] if scalar @$cc;
+   $w-> pt_newset;
+   $w-> modified( 1);
+
+   $::application-> pointer( $w-> {savePointer});
+   $w-> win_restore;
+}
+
+sub win_set_negative
+{
+   my ( $w, $neg) = @_;
+   $neg = $neg ? 1 : 0;
+   return if $w-> {ini}-> {InvertImage} == $neg;
+   $w-> {ini}-> {InvertImage} = $neg;
+   $w-> menu-> EditInvertImage-> checked( $neg);
+   return unless $w-> IV-> image;
+   $w-> win_loadfile( $w-> {file});
+}
+
+sub win_abortpacket
+{
+   $_[0]-> {packetAborted} = 1;
+}
+
+sub win_xmlerror
+{
+   # bad
+   my ($w, $xmlname) = @_;
+   my $at = $@;
+   Prima::MsgBox::message("Cannot load $xmlname", mb::OKCancel,
+         { buttons => { mb::Cancel => {
+            text        => '~Details >>',
+            modalResult => 0,
+            onClick     => sub {
+               Prima::MsgBox::message_box( "XML loader diagnostics", "$xmlname:$at", mb::OK|mb::NoSound);
+            },
+     }}});
+   $w-> win_abortpacket;
+}
+
+sub win_xmlload
+{
+   my ( $w, $xmlname, %profile) = @_;
+   my %state = (
+      feats  => [],
+      backs  => [],
+      points => [],
+   );
+   my ( $n0, $n1, $n2) = ( $w-> menu-> text(0), $w-> menu-> text(1), 'point');
+   $n0 =~ s[\~][]g;
+   $n0 = lc $n0;
+   $n1 =~ s[\~][]g;
+   $n1 = lc $n1;
+   my @is;
+   @is = $w-> IV-> image-> size if $w->IV-> image;
+
+   my $objsub = $profile{onObject};
+   
+   my $xml = new XML::Parser(
+      Handlers => {
+         Start => sub {
+            my ($obj, $el, %attrs) = @_;
+            return if $state{finished_header};
+            if ($el eq 'morphology_data') {
+               return if $state{seen_header};
+               $state{morphology_data} = {%attrs};
+               $state{seen_header} = 1;
+            } elsif ( $el eq 'object') {
+               return unless $state{seen_header};
+               return if $state{reading_object};
+               $state{reading_object} = 1;
+               for ( qw( type x y)) {
+                  die "No tag:$_" unless defined $attrs{$_};
+               }
+               if ( $objsub) {
+                  $_ = $objsub-> ( \%attrs, $n0, $n1);
+                  return if $_ && $_ eq 'nocalc';
+               }   
+               
+               if ( $attrs{type} eq $n0 || $attrs{type} eq $n1) {
+                  my @xs = split( ' ', $attrs{x});
+                  my @ys = split( ' ', $attrs{y});
+                  return if scalar @xs != scalar @ys;
+                  my @poly = ();
+                  my $i;
+                  for ( $i = 0; $i < scalar @xs; $i++) {
+                     next if $xs[$i] < 0 || $ys[$i] < 0;
+                     next if scalar( @is) && ( $xs[$i] >= $is[0] || $ys[$i] >= $is[1]);
+                     next if scalar @poly and $xs[$i] == $poly[-2] and $ys[$i] == $poly[-1];
+                     push( @poly, $xs[$i], $ys[$i]);
+                  }
+                  $i = $attrs{type} eq $n0 ? $state{feats} : $state{backs};
+                  push ( @$i, \@poly) if scalar @poly > 3;
+               } elsif ( $attrs{type} eq $n2) {
+                  return if $attrs{x} < 0 || $attrs{y} < 0;
+                  return if scalar( @is) && (  $attrs{x} >= $is[0] || $attrs{y} >= $is[1]);
+                  push( @{$state{points}}, $attrs{x}, $attrs{y});
+               }
+            } else {
+               $state{has_extras} = 1;
+            }
+         },
+         End => sub {
+            my ($obj, $el) = @_;
+            $state{finished_header} = 1 if $el eq 'morphology_data';
+            $state{reading_object}  = 0 if $el eq 'object';
+         },
+      });
+   eval { parsefile $xml $xmlname; };
+   if ($@) {
+      $w-> win_xmlerror( $xmlname);
+      return 0;
+   }
+   return \%state;
+}   
+
+sub win_newframe
+{
+   my $w = $_[0];
+   $w-> SUPER::win_newframe;
+
+   return unless defined $w-> {file};
+
+   $w-> win_extwarn if defined $w-> {ini}-> {path} &&
+      defined $w-> {oldPath} && $w-> {oldPath} ne $w-> {ini}-> {path};
+   $w-> {oldPath} = $w-> {ini}-> {path};
+
+   
+   my $img = $w-> IV-> image;
+   
+   if ( $w-> {ini}-> {InvertImage}) {
+      my ( $gray, $bpp) = ( $img-> type & im::GrayScale, $img-> type & im::BPP);
+      if ( $gray && $bpp > 1) {
+         $img-> resample( 0, 255, 255, 0);
+      } elsif ( $bpp < 24) {
+         $img-> palette([ map { 255 - $_} @{$img-> palette}]);
+      } else {
+         my $c = $img-> data;
+         $c =~ s/(.)/chr(255-ord($1))/ge;
+         $img-> data( $c); 
+      }
+   }
+
+   my @is = $img-> size;
+   my $i;
+   my $lw = $w-> {ini}-> {FrameWidth};
+   my $c  = $w-> {ini}-> {FrameColor} ? 0xffffff : 0;
+   while ( $lw--) {
+      for ( $i = $lw; $i < $is[0] - $lw; $i++) {
+         $img-> pixel( $i, $lw, $c);
+         $img-> pixel( $i, $is[1]-$lw-1, $c);
+      }
+      for ( $i = $lw; $i < $is[1] - $lw; $i++) {
+         $img-> pixel( $lw, $i, $c);
+         $img-> pixel( $is[0]-$lw-1, $i, $c);
+      }
+   }
+
+
+   my $xmlname = $w-> win_extname( $w-> {file});
+   return unless -f $xmlname;
+
+   $w-> {file} =~ m{[/\\]([^/\\]*)$};
+   my $iname = $1;
+
+
+   my $state = $w-> win_xmlload( $xmlname);
+   return unless $state;
+
+   for ( qw( imagename imagewidth imageheight xcalib ycalib)) {
+      next if defined $state->{morphology_data}->{$_};
+      $@ = "Tag $_ not present into morphology_data section.\n";
+      $w-> win_xmlerror( $xmlname);
+   }   
+
+   if ( !$w->{silence} && (
+         ($state->{morphology_data}->{imagename}  ne $iname) ||
+         ($state->{morphology_data}->{imagewidth}  != $is[0]) ||
+         ($state->{morphology_data}->{imageheight} != $is[1])
+      )) {
+      return if Prima::MsgBox::message( "There were minor data inconsistency in $xmlname. Load it anyway?",
+         mb::YesNo|mb::Warning
+      ) == mb::No;
+   }
+
+  
+   my @icalib = ($state->{morphology_data}->{xcalib} , $state->{morphology_data}->{ycalib});
+   if ( $icalib[0] != $w->{ini}->{XCalibration} || $icalib[1] != $w->{ini}->{YCalibration}) {
+      if ( $w->{silence} || ( Prima::MsgBox::message("Image contains calibrations [@icalib] opposite to current [".
+          $w->{ini}->{XCalibration}.' '.$w->{ini}->{YCalibration}.']. '.
+          "Keep current settings?",
+          mb::YesNo|mb::Warning, { buttons => { mb::No => { text => '~Apply new'}}}) == mb::Yes)) {
+          $w-> modified( 1);
+      } else {
+          $w->{ini}->{XCalibration} = $icalib[0];
+          $w->{ini}->{YCalibration} = $icalib[1];
+      }
+   }
+
+   $w-> {points} = $state->{points} if scalar @{$state->{points}};
+   if ( scalar @{$state->{feats}}) {
+      $w-> {lineStorage}->[0] = $state->{feats};
+      $w-> {lwStorage}->[0]   = [(1) x scalar @{$state->{feats}}];
+   }
+   if ( scalar @{$state->{backs}}) {
+      $w-> {lineStorage}->[1] = $state->{backs};
+      $w-> {lwStorage}->[1]   = [(1) x scalar @{$state->{backs}}];
+   }
+}
+
+use constant PI => 4 * atan2 1, 1;
+
+sub win_calcbasicparameters
+{
+   my $w = shift;
+
+   # input: xy array
+   # output in array context: (area,perimeter,formfactor,xcen,ycen,fxcen,fycen)
+   # initialization:
+   my ($xCalib, $yCalib) = ( $w-> {ini}-> {XCalibration}, $w-> {ini}-> {YCalibration});
+
+   # algorithm
+   my $xflag = 1;
+   my( @x, @y);
+   for (@_) {
+      push @x, $_ if $xflag;
+      push @y, $_ unless $xflag;
+      $xflag = !$xflag;
+   }
+   return () unless @x;
+   unless ($x[$#x] == $x[0] && $y[$#y] == $y[0]) {
+      push @x, $x[0];
+      push @y, $y[0];
+   }
+   my ($xyCalib,$xxCalib,$yyCalib) = ($xCalib*$yCalib,$xCalib*$xCalib,$yCalib*$yCalib);
+   my ($area,$perimeter,$xcen,$ycen,$fxcen,$fycen,$ff) = (0,0,0,0,0,0,0,0,0);
+   for my $i ( 1..$#x) {
+      $area += $xyCalib * ($x[$i-1] * $y[$i] - $x[$i] * $y[$i-1]);
+      my $dx = $x[$i-1] - $x[$i];
+      my $dy = $y[$i-1] - $y[$i];
+      $perimeter += sqrt( $xxCalib * $dx * $dx + $yyCalib * $dy *$dy);
+      $xcen += $x[$i];
+      $ycen += $y[$i];
+      $fxcen += $xCalib * $x[$i];
+      $fycen += $yCalib * $y[$i];
+   }
+   $area = abs( $area / 2);
+   $ff = 4 * PI * $area / $perimeter / $perimeter
+      if $perimeter > 0;
+   $xcen /= @x;
+   $ycen /= @y;
+   $fxcen /= @x;
+   $fycen /= @y;
+   return ($area,$perimeter,$ff,$xcen,$ycen,$fxcen,$fycen);
+}
+
+
+sub win_saveframe
+{
+   my $w = $_[0];
+   my $xmlname = $w-> win_extname( $w-> {file});
+
+   return 1 unless $w-> {modified};
+
+   if ( open F, "> $xmlname") {
+      my $waitPtr = $::application-> pointer;
+      $::application-> pointer( cr::Wait);
+      $w-> sb_text("saving $xmlname");
+      $w-> win_validate(1);
+      $w-> win_syncrecdata;
+      my $image = $w-> IV-> image;
+      if ( $w->{ini}->{CalcBrightness} && $w->{ini}->{EqualBrightness}) {
+         # subtracting low frequencies
+         $w-> sb_text("Equalizing background ...");
+         my $i1 = Prima::IPA::Global::butterworth( $image, 
+            low        => 1,
+            homomorph  => 0,
+            power      => 2,
+            cutoff     => 20,
+            boost      => 0.7,
+            spatial    => 1,
+            lowquality => 1,
+         );
+         $i1-> type( $image-> type);
+         $image = Prima::IPA::Point::subtract( $image, $i1);
+         $w-> sb_text("saving $xmlname");
+      }   
+         
+
+      my ( $iname, $ix, $iy, $path, $datestr, $xc, $yc, $objects, $i) = (
+         $w->{file}, $image-> size, $w->{ini}->{path}, scalar(gmtime(time)),
+         $w->{ini}->{XCalibration}, $w->{ini}->{YCalibration}, 0
+      );
+      $iname =~ m{[/\\]([^/\\]*)$};
+      $iname = $1;
+
+      for ( $i = 0; $i < 2; $i++) {
+         my $ptr = $w-> {lineStorage}->[$i];
+         next unless defined $ptr;
+         $objects += scalar @$ptr;
+      }
+      $objects += scalar @{$w-> {points}} / 2 if defined $w-> {points};
+      my $objCount = 0;
+
+print F <<HEADER;
+<?xml version="1.0"?>
+<!DOCTYPE morphology_data SYSTEM "morphology_data.dtd">
+<!-- This is a generated file.  Do not edit! -->
+<morphology_data
+  imagename    = "$iname"
+  imagewidth   = "$ix"
+  imageheight  = "$iy"
+  directory    = "$path"
+  creator      = "MorphologyI"
+  creationdate = "$datestr"
+  xcalib       = "$xc"
+  ycalib       = "$yc"
+  objects      = "$objects"
+>
+
+HEADER
+
+      for ( $i = 0; $i < 2; $i++) {
+         my $ptr = $w-> {lineStorage}->[$i];
+         next unless defined $ptr;
+         my $type = $w-> menu-> text( $i);
+         $type =~ s[\~][]g;
+         $type = lc $type;
+         for ( @$ptr) {
+             $objCount++;
+             my ( $xs, $ys) = ( '', '', '', '');
+             my $j;
+             my $pp = $_;
+             for ( $j = 0; $j < scalar @$pp; $j += 2) {
+                $xs .= $$pp[$j].' ';
+                $ys .= $$pp[$j+1].' ';
+             }
+             print F <<BODY;
+<object type = "$type"
+   x = "$xs"
+   y = "$ys"
+BODY
+# Calc brightness
+             if ( $w->{ini}->{CalcBrightness}) {
+                my $img = Prima::Image-> create(
+                   width => $ix,
+                   height => $iy,
+                   type => im::BW,
+                   preserveType => 1,
+                );
+                $img-> begin_paint;
+                $img-> color( cl::Black);
+                $img-> bar(0,0,$ix,$iy);
+                $img-> color( cl::White);
+                $img-> polyline( $pp);
+                $img-> end_paint;
+                $img-> type( im::Byte);
+                $img = Prima::IPA::Global::fill_holes( $img,
+                   edgeSize => $w->{ini}->{EdgeSize},
+                );
+                $img = Prima::IPA::Global::area_filter( $img,
+                   edgeSize => $w->{ini}->{EdgeSize},
+                   minArea  => $w->{ini}->{MinArea},
+                   maxArea  => $w->{ini}->{MaxArea},
+                ); # XXX do we really need area_filter here?
+                my $n = int($img-> sum / 255); # amount of significant pixels
+     	        my ($sum,$sum2);
+                my @pixarray = (0) x 256;
+                if ( $n != 0) {
+                   $img = IPA::Point::mask( $img,
+                      test => 255,
+                      match => $image,
+                      mismatch => 0
+                   );
+                   $sum = $img-> sum;
+                   $sum2 = $img-> sum2;
+                   @pixarray = Prima::IPA::Misc::histogram( $img);
+                   $pixarray[0] -= $img-> width * $img-> height - $n;
+                }
+                $img-> destroy;
+                print F <<BRIGHT;
+   brightnessN = "$n"
+   brightnessSum = "$sum"
+   brightnessSum2 = "$sum2"
+   histogram = "@pixarray"
+BRIGHT
+                   $w-> sb_text( int( $objCount / $objects * 100).'%');
+             }
+
+             if ( $i == 0) {
+                my ($area,$perimeter,$ff,$xcen,$ycen,$fxcen,$fycen)
+                   = $w-> win_calcbasicparameters( @$pp);
+                if (defined $area) {
+                   print F <<PARAMS;
+   area      = "$area"
+   perimeter = "$perimeter"
+   formfactor= "$ff"
+   xcentroid = "$xcen"
+   ycentroid = "$ycen"
+   fxcentroid= "$fxcen"
+   fycentroid= "$fycen"
+PARAMS
+                }
+
+   # Calc convex
+                if ( $w->{ini}->{CalcConvex}) {
+                   my ( $fc, $fnc, $len, $brd) = $w-> get_convex( @$pp);
+                   my $width = 4 * $area / $pi / $len;
+                   my ($carea,$perimeter,$ff,$xcen,$ycen,$fxcen,$fycen)
+                      = $w-> win_calcbasicparameters( @$fc);
+                   my $cwidth = 4 * $carea / $pi / $len;
+                   my $lw = $len / $width;
+                   my $clw = $len / $cwidth;
+                   my $si = $pi * $len * $len / 4 / $carea;
+                      print F <<PARAMS;
+   width            = "$width"
+   length           = "$len"
+   length_width     = "$lw"
+   breadth          = "$brd"
+   convex_area      = "$carea"
+   convex_width     = "$cwidth"
+   convex_perimeter = "$perimeter"
+   convex_formfactor= "$ff"
+   convex_xcentroid = "$xcen"
+   convex_ycentroid = "$ycen"
+   convex_fxcentroid= "$fxcen"
+   convex_fycentroid= "$fycen"
+   convex_length_width= "$clw"
+   spreading_index  = "$si"
+PARAMS
+                       if ( $w->{ini}->{CalcHoles}) {
+                          my @holz = get_holes( $pp, $fnc);
+                          my $h = '"';
+                          for ( @holz) {
+                             my ($harea) = ($w-> win_calcbasicparameters( @$_));
+                             $h .= "$harea ";
+                          }
+                          $h =~ s/\s*$//; $h .= '"';
+                          print F "   harea = $h\n";
+                       }
+                   }
+                }
+# End calc
+             print F "/>\n\n";
+          }
+      }
+
+      my $ww = $w-> {points};
+      if ( defined $ww) {
+         for ( $i = 0; $i < scalar @$ww; $i+=2) {
+            print F <<POINTS;          
+<object type = "point"
+  x = "$$ww[$i]"
+  y = "$$ww[$i+1]"
+\/>
+POINTS
+         }
+      }
+
+      print F "</morphology_data>\n";
+      close F;
+      $w-> sb_text( 'saved ok.');
+      $w-> modified( 0);
+      $::application-> pointer( $waitPtr);
+   } else {
+      if ( $w->{silence}) {
+         $w-> win_abortpacket;
+         return 0;
+      }
+      return 0 if Prima::MsgBox::message(
+         "Error saving file $xmlname. Ignore changes?", mb::YesNo|mb::Warning) == mb::No;
+   }
+   return 1;
+}
+
+sub win_newextras
+{
+   my $w = $_[0];
+   $w-> SUPER::win_newextras;
+
+   return unless defined $w-> {prevFile};
+   my $num = $w->{cypherMask};
+   my $xmlname;
+   my ( $min, $max) = $w-> win_getseriesrange;
+   $xmlname = $w-> win_formfilename( $min);
+   $xmlname = $w-> win_extname( $xmlname);
+
+   return unless -f $xmlname;
+
+   my $state = $w-> win_xmlload( $xmlname);
+   return unless $state;
+   $w-> {extraPoints} = $state-> {points} if scalar @{$state-> {points}};
+}
+
+sub win_importextras
+{
+   my $w   = $_[0];
+   $w-> iv_cancelmode( $w-> IV);
+   my $d   = $w-> dlg_file(
+      cwd         => 1,
+      directory   => $w->{ini}->{path},
+      filterIndex => 0,
+      multiSelect => 0,
+      filter    => [
+         ['Data files' => '*.xml'],
+         ['All files' => '*']
+      ],
+   );
+   return 0 unless $d-> execute;
+   my $state = $w-> win_xmlload( $d-> fileName);
+   return unless $state;
+   my $x = 0;
+   if ( scalar @{$state->{feats}}) {
+      $w-> {lineStorage}->[0] = [] unless defined $w->{lineStorage}->[0]; 
+      $w-> {lwStorage}->[0]   = [] unless defined $w->{lwStorage}->[0]; 
+      push( @{$w-> {lineStorage}->[0]}, @{$state->{feats}});
+      push( @{$w-> {lwStorage}->[0]},   (1) x scalar @{$state->{feats}});
+      $x |= 1;
+   }
+   if ( scalar @{$state->{backs}}) {
+      $w-> {lineStorage}->[1] = [] unless defined $w->{lineStorage}->[0]; 
+      $w-> {lwStorage}->[1]   = [] unless defined $w->{lwStorage}->[0]; 
+      push( @{$w-> {lineStorage}->[1]}, @{$state->{backs}});
+      push( @{$w-> {lwStorage}->[1]},   (1) x scalar @{$state->{backs}});
+      $x |= 2;
+   }
+   return unless $x; # no contours to import
+   $w-> pt_updatemenu;
+   $w-> IV-> repaint;
+   $w-> modified(1);
+}   
+
+sub win_closeextras
+{
+   my $w = $_[0];
+   $w-> SUPER::win_closeextras;
+   $w-> rptex_clear();
+}
+
+sub win_extraschanged
+{
+   my $w = $_[0];
+   $w-> SUPER::win_extraschanged;
+   $w-> menu-> EditOptCalib-> enabled( defined $w-> {nextFile} || defined $w-> {prevFile});
+}
+
+
+# WIN_END
+# OPT
+
+sub opt_colors
+{
+   return {
+       Features    => [ cl::LightGreen,    'Features'],
+       Background  => [ cl::Yellow,        'Background'], 
+       Remove      => [ cl::White,         'Remove'], 
+       Points      => [ cl::LightRed,      'Points'],  
+   },
+}
+
+sub opt_colormount
+{
+   my $w = $_[0];
+   $w-> IV-> {bone}-> backColor( $w-> {ini}-> {$w-> {setColors}->[$w-> {currentSet}]});
+}
+
+sub opt_keys
+{
+   return {
+      %{$_[0]-> SUPER::opt_keys()},
+      EditImport    => [ kb::NoKey , "Import another contours into document"],
+      EditOptCalib  => [ kb::NoKey , "Recalculate series"],
+      EditCalcStats => [ '@C'      , "Calculate and display statistics"],
+      Undo1         => [ kb::Backspace , "Undo drawing"],
+      Undo2         => [ km::Alt|kb::Backspace , "Undo group of lines"],
+      Undo3         => [ '@U'          , "Show undo dialog"],
+      EditInvertImage => [ kb::NoKey   , "Invert image"],
+      EditClearAll  => [ kb::NoKey     , "Clear all drawings"],
+      EditRemovePoints   => [ kb::NoKey     , "Remove all points"],
+      EditToggleMode     => [ 'F11'     , "Toggle drawings/points mode"],
+      EditValidate       => [ km::Ctrl|kb::Enter , "Validate contours"], 
+      EditRecSetup       => [ kb::NoKey  , "Display recognition setup dialog"],
+      EditApplyContours  => [ km::Alt|kb::Enter , "Apply contours to document"],
+      EditHack           => [ kb::NoKey         , "Outline convex hull of current drawing"],
+      HelpAbout        => [ kb::NoKey,      'Standard about box'],
+      HelpPlabApps     => [ kb::NoKey,      'Online PlabApps overview'],
+      HelpContents     => [ kb::NoKey,      'Online Morphometry I overview'],
+      LineWidthIncrement => [ '@+',   'Increment line width for current object'],
+      LineWidthDecrement => [ '@-',   'Decrement line width for current object'],
+   };
+};
+
+sub opt_changecalib
+{
+   my $w = $_[0];
+
+   Prima::MsgBox::message( "No series to convert"), return if ( !defined $w-> {nextFile} && !defined $w-> {prevFile});
+
+   my $num = $w-> {cypherMask};
+   my ( $fn, $tn) = $w-> win_getseriesrange;
+
+   return if Prima::MsgBox::message( "This will recalculate series ".
+      $w-> {fileBeg}.('X' x $num).$w-> {fileEnd}." [$fn-$tn] . Proceed?",
+      mb::OKCancel|mb::Information) != mb::OK;
+
+   my $fnsave = $w->{fileNum};
+   my $f;
+   my $ok = 1;
+
+   $w->{silence} = 1;
+   $w->{packetAborted} = 0;
+
+   my $userAborted = 0;
+
+   my $statwin = $w-> insert( Dialog =>
+      centered    => 1,
+      text        => 'Processing',
+      size        => [ 300, 60],
+      onKeyDown   => sub {
+         my ( $self, $code, $key, $mod) = @_;
+         if ( $key == kb::Esc &&
+            ( Prima::MsgBox::message("Abort process?", mb::OKCancel|mb::Warning) == mb::OK)) {
+            $userAborted = 1;
+            $_[0]-> text('Cancelling');
+         }
+      },
+      onClose     => sub {
+         $_[0]-> clear_event;
+         return if Prima::MsgBox::message("Abort process?", mb::OKCancel|mb::Warning) != mb::OK;
+         $userAborted = 1;
+         $_[0]-> text('Cancelling');
+      },
+   );
+
+   my $g = $statwin-> insert( Gauge =>
+      origin => [ 5, 5],
+      size   => [ $statwin-> width - 10, $statwin-> height - 10],
+      min    => $fn,
+      max    => $tn,
+      value  => $fn,
+      font   => {height => $statwin-> height - 16},
+   );
+
+   $statwin-> execute_shared;
+
+   for my $i ( $fn..$tn) {
+       $f = sprintf( "%s%0${num}d%s",$w->{fileBeg}, $i, $w-> {fileEnd});
+       $::application-> yield;
+       $ok = 0, last, if $userAborted;
+       if ( !$w-> win_loadfile( $f) || $w->{packetAborted}) {
+          Prima::MsgBox::message("Calibration aborted - error processing file $f", mb::OK|mb::Error);
+          $ok = 0;
+          last;
+       }
+       $w-> modified(1);
+
+       $g-> value( $i);
+   }
+
+   $w->{silence} = 0;
+   $statwin-> destroy;
+   if ( $ok) {
+      Prima::MsgBox::message("Queue processed", mb::OK|mb::Information);
+      $w->win_loadfile( sprintf( "%s%0${num}d%s",$w->{fileBeg}, $fnsave, $w-> {fileEnd}));
+   }
+}
+
+sub opt_calcdlg
+{
+   my $w = $_[0];
+   my $d = $w->{CalcOptDialog};
+   $w-> iv_cancelmode( $w-> IV);
+   unless ( $d) {
+      $d = Prima::Dialog-> create(
+         size     => [ 320, 200],
+         text     => 'Select items to calculate',
+         owner    => $w,
+         centered => 1,
+      );
+      $d-> insert( CheckList => 
+         origin => [ 10, 76],
+         size   => [ 300, 110],
+         name   => 'CheckList',
+         vector => $w-> {ini}->{CalcOptions},
+         vScroll=> 1,
+         items  => [
+            'List of files',
+            'Morphometric parameters',
+            'Brightness histogram',
+            'Subtract backround from histogram',
+         ],
+      );
+      $w-> dlg_okcancel( $d);
+      $w->{CalcOptDialog} = $d;
+   }
+   return if $d-> execute != mb::OK;
+   return $w-> {ini}-> {CalcOptions} = $d-> CheckList-> vector;
+}
+
+sub opt_statistics
+{
+   my $w = $_[0];
+   if ( defined $w-> {file}) {
+      return unless $w-> win_saveframe;
+   }
+   my $d = $w-> dlg_file(
+      cwd       => 1,
+      directory => $w-> {ini}-> {path},
+      filter    => [
+         ['Data files' => '*.xml'],
+         ['All files' => '*']
+      ],
+      multiSelect => 1,
+      filterIndex => 0,
+   );
+   my @res = $d-> execute;
+   return unless @res;
+
+   my $dres = $w-> opt_calcdlg;
+   return unless defined $dres;
+
+   my %dataCommon = ();
+   my %dataFore   = ();
+   my %dataBack   = ();
+   my @dataHist;
+   my %disabled = map {$_=>1} qw(x y type brightnessN brightnessSum brightnessSum2
+      xcentroid ycentroid fxcentroid fycentroid harea histogram
+      convex_xcentroid convex_ycentroid convex_fxcentroid convex_fycentroid
+      );
+   my $index = 0;
+   my $statCount = 4;
+   my @resName;
+
+
+   for my $xmlname ( @res) {
+      my ( $bN, $bSum, @hist);
+      push( @resName, "$xmlname : ");
+      my $state = $w-> win_xmlload( $xmlname, onObject => sub {
+         my ( $attrs, $n0, $n1) = @_;
+         # collect sum of backgrounds
+         if ( $attrs->{type} eq $n0 || $attrs->{type} eq $n1) {
+            my $stref = $attrs->{type} eq $n0 ? \%dataFore : \%dataBack;
+            if ( 3 == grep {exists $attrs->{$_}} qw{brightnessN brightnessSum brightnessSum2}) {
+               $stref->{brightness} = [(0) x $statCount] unless defined $stref->{brightness};
+               $stref->{brightness}-> [0] += $attrs->{brightnessN};
+               $stref->{brightness}-> [1] += $attrs->{brightnessSum};
+               $stref->{brightness}-> [2] += $attrs->{brightnessSum2};
+               # XXX warning - bogus data for backgrounds !!
+               $stref->{brightness}-> [$statCount + $index] = $attrs->{brightnessSum} / $attrs->{brightnessN};
+               # collect local sum of background data
+               if ( $attrs->{type} eq $n1) {
+                  $bN   += $attrs->{brightnessN};
+                  $bSum += $attrs->{brightnessSum};
+               }
+            }
+            return if $attrs->{type} eq $n1; # no background relevant data further
+
+            push @dataHist, exists( $attrs->{histogram}) ? [split(' ', $attrs->{histogram})] : undef;
+            push( @hist, $dataHist[-1]) if $dataHist[-1]; # push the histogram ref for the post-processing
+            
+            if ( exists $attrs->{area} && exists $attrs->{harea}) {
+               my $nh = 0;
+               my $tharea = 0;
+               my $minArea = $attrs->{area} * $w->{ini}->{HolesPercent} / 100;
+               my @holz = split ' ', $attrs->{harea};
+               for my $harea ( @holz) {
+                  next if $harea < $minArea;
+                  $nh++;
+                  $tharea += $harea;
+               }
+               $dataCommon{process_index} = [(0) x $statCount]
+                  unless defined $dataCommon{process_index};
+               $dataCommon{process_index}-> [0]++;
+               $dataCommon{process_index}-> [1] += $nh;
+               $dataCommon{process_index}-> [2] += $nh * $nh;
+               $dataCommon{process_index}-> [$statCount + $index] = $nh;
+               $dataCommon{process_domain} = [(0) x $statCount]
+                  unless defined $dataCommon{process_domain};
+               $dataCommon{process_domain}-> [0]++;
+               $dataCommon{process_domain}-> [1] += $tharea;
+               $dataCommon{process_domain}-> [2] += $tharea * $tharea;
+               $dataCommon{process_domain}-> [$statCount + $index] = $tharea;
+            }
+            for ( keys %{$attrs}) {
+               next if $disabled{$_};
+               $dataCommon{$_} = [(0) x $statCount] unless defined $dataCommon{$_};
+               $dataCommon{$_}-> [0]++;
+               $dataCommon{$_}-> [1] += $attrs->{$_};
+               $dataCommon{$_}-> [2] += $attrs->{$_} * $attrs->{$_};
+               $dataCommon{$_}-> [$statCount + $index] = $attrs->{$_};
+            }
+            $index++;
+            $resName[-1] .= "$index ";
+         }
+      } 
+      );
+      return unless $state;
+      # subtract backgrounds
+      if ( vec( $dres, ocq::Equalize, 1)) {
+          if (!$bN && @hist) {
+             # noting to subtract, nulling histograms
+             splice( @dataHist, -(@hist), (@hist), (undef)x scalar(@hist));
+          } elsif ( @hist) {
+             my $b = int($bSum / $bN); # average brightness for background(s) within file
+             if ( $b > 255 || $b < 0) {
+                $@ = "Somehow the average brightness is not in range of 0..255.\n";
+                $w-> win_xmlerror( $xmlname);
+             }   
+             for ( @hist) { # shift array left $b times
+                splice( @$_, 0, 0, (0)x(255-$b)); # add space for negative brightnesses
+                push( @$_, (0)x($b)); 
+             }
+          }   
+      }
+   }
+
+   $dataCommon{brightness} = $dataFore{brightness} if defined $dataFore{brightness};
+   $dataCommon{backingbrightness} = $dataBack{brightness} if defined $dataBack{brightness};
+   for ( keys %dataCommon) {
+      $dataCommon{$_}->[1] /= $dataCommon{$_}->[0];
+      $dataCommon{$_}->[2] = undef, next if $dataCommon{$_}->[0] < 2;
+      $dataCommon{$_}->[2] = ($dataCommon{$_}->[2] - $dataCommon{$_}->[0] *
+         $dataCommon{$_}->[1] * $dataCommon{$_}->[1]) /
+         ($dataCommon{$_}->[0] - 1);
+      $dataCommon{$_}->[3] = $dataCommon{$_}->[2] / $dataCommon{$_}->[0];
+      $dataCommon{$_}->[2] = ( $dataCommon{$_}->[2] > 0) ? sqrt( $dataCommon{$_}->[2]) : 0;
+      $dataCommon{$_}->[3] = ( $dataCommon{$_}->[3] > 0) ? sqrt( $dataCommon{$_}->[3]) : 0;
+   }
+   delete $dataCommon{backingbrightness};
+
+   my @fmt = ();
+   my @order = qw(area perimeter formfactor length width breadth
+                  brightness convex_area
+                  convex_perimeter convex_formfactor convex_width
+                  process_index process_domain length_width
+                  convex_length_width spreading_index);
+   my @names = ();
+   my %order = ();
+   for (@order) {
+      if ( defined $dataCommon{$_}) {
+         push @names, $_;
+         $order{$_} = 1;
+      }
+   }
+   for ( sort keys %dataCommon) {
+      push @names, $_ unless exists $order{$_};
+   }
+   for ( @names) {
+      push @fmt, 13;
+      $fmt[-1] = length( $_) if $fmt[-1] < length( $_);
+   }
+   my $colsformat2 = " %3s ";
+   my $colsformat  = " $colsformat2| ";
+   my $exformat   = '';
+   $exformat .= '%'.$_.'s | ' for @fmt;
+   $exformat .= "\n";
+   my $exformat2 = " $exformat";
+   $exformat2 =~ s/\s\|//g;
+
+   my $divline    = 7 + 3 * scalar @names;
+   $divline += $_ for @fmt;
+   $divline = '-' x $divline;
+   $divline .= "\n";
+
+   my $hdr        = sprintf( "    # | $exformat", @names);
+   my $texts = '';
+   my $tm = localtime;
+   $texts = <<HR;
+Statistics morphology data
+Calculated on $tm
+HR
+   if ( vec( $dres, ocq::Files, 1)) {
+      my $howmany = ( scalar @resName > 1) ? "s were" : " was";
+      $texts .= "The following file$howmany used for data gathering:\n";
+      $texts .= "   $_\n" for @resName;
+   }
+   $texts .= sprintf("Average background brightness: %.7g +/- %.7g (averaged by %d pixels)\n",
+      $dataBack{brightness}->[1],
+      $dataBack{brightness}->[3],
+      $dataBack{brightness}->[0],
+   ) if defined $dataBack{brightness};
+   my ( $title, $meta1, $meta2) = ( "$texts\n", '', '');
+
+   if ( vec( $dres, ocq::Basics, 1)) 
+   {
+      {
+         (my $xhdr = $hdr) =~ s/\s\|//g;
+         my $xdivline = '-' x length $xhdr;
+         $meta1 = $meta2 = "$xdivline\n$xhdr$xdivline\n";
+      }
+
+      $texts .="\n$divline$hdr$divline";
+      my $i;
+      my @avail = ( 1 ) x ( scalar @names);
+
+      for ( $i = 0; $i < $index; $i++) {
+         my @data = map { $dataCommon{$_}->[$i + $statCount]} @names;
+         my $j = 0;
+         for ( @data) {
+            $avail[ $j++] &= defined ($_) ? 1 : 0;
+            $_ = defined $_ ? sprintf( '%13.7g', $_) : "N/A";
+         }
+         $texts .= sprintf( "$colsformat$exformat",   $i + 1, @data);
+         $meta1 .= sprintf( "$colsformat2$exformat2", $i + 1, @data);
+      }
+      $texts .= $divline . $hdr . $divline;
+      my @elabels = qw( N Ave SD SEM);
+      for $i ( 1, 3, 2, 0) {
+         my @data = map { $dataCommon{$_}->[$i]} @names;
+         my $j = 0;
+         for ( @data) {
+            $_ = defined $_ ? ( sprintf( '%1'.($avail[$j] ? '3' : '2').'.7g', $_).($avail[$j] ? '' : '*')) : "N/A";
+            $j++;
+         }
+         $texts .= sprintf( "$colsformat$exformat",  $elabels[$i], @data);
+         $meta2 .= sprintf( "$colsformat2$exformat2", $elabels[$i], @data);
+      }
+      $texts .= $divline;
+   }
+   
+   if ( vec( $dres, ocq::Histogram, 1)) {
+       my $maxSpace = 10;
+       my ( $cnt, $min, $max) = ( 0, 255, 0);
+       for ( @dataHist) {
+          next unless defined $_;
+          $cnt++;
+          my $j = 0;
+          $j++ while $j < @$_ && $$_[$j] == 0;
+          $min = $j if $j < $min;
+          $j = @$_ - 1;
+          $j-- while $j && $$_[$j] == 0;
+          $max = $j if $j > $max;
+       }   
+       for ( @dataHist) {
+          splice( @$_, $max);
+          splice( @$_, 0, $min);
+       } 
+       
+       my ( @sum, @sum2, @ave, @sd, @sem, $j);
+       for ( @dataHist) {
+          next unless $_;
+          for ( $j = 0; $j < @$_; $j++) {
+             $sum[$j] += $$_[$j];
+             $sum2[$j] += $$_[$j] * $$_[$j];
+          }
+       }  
+       for ( $j = 0; $j < @sum; $j++) {
+          $sum2[$j] /= $cnt;
+          my $x = $sum[$j] / $cnt;
+          $sum2[$j] = $sum2[$j] - $x * $x;
+          $ave[$j]  = $sum[$j] / $cnt;
+          $sd[$j]   = sqrt( $sum2[$j]);
+          $sem[$j]  = sqrt( $sum2[$j] / $cnt);
+       }   
+       
+       $texts .= "\nBrightness histogram data\n";
+       $meta2 .= "\nBrightness histogram data\n";
+       if ( vec( $dres, ocq::Equalize, 1)) {
+          $min -= 255;
+          $max -= 255;
+       } 
+       my $i;
+       my $xdivline = ('-' x ( 9 + scalar(@dataHist) * 6 + 3 + 40 + 2));
+
+       my $c = '';
+       $c .= "$xdivline\n        |";
+       for ( $i = 0; $i < @dataHist; $i++) {
+          $c .= sprintf("%6d", $i + 1);
+       }  
+       $c .= ' | ';
+       $c .= sprintf('%10s'x4, qw(Sum Ave SEM SD));
+       $c .= " |\n$xdivline\n";
+       for ( $i = 0; $i < $max - $min; $i++) {
+          $c .= sprintf( '   %3d  |', $i + $min);
+          for ( @dataHist) {
+             if ( defined $_) {
+                $c .= defined($_->[$i]) ? sprintf('%6d', $_->[$i]) : '   N/A';
+             } else {
+                $c .= '   N/A';
+             }   
+          }   
+          $c .= ' | ';
+          $c .= sprintf("%10.5g"x4, $sum[$i], $ave[$i], $sd[$i], $sem[$i]);
+          $c .= " |\n";
+       }
+       $texts .= $c;
+       $c =~ s/\|//g;
+       $meta1 .= "\n" . $c;
+       $texts .= "$xdivline\n";
+   }
+
+
+   sub esummary
+   {
+      my ( $dlg, $textRef, $w) = @_;
+      my $dir = eval { Cwd::abs_path( $w-> {ini}-> {StatPath})};
+      $dir = '.' if $@;
+      $dir = '' unless -d $dir;
+      my $d = Prima::SaveDialog-> create(
+         owner   => $dlg,
+         filter  => [
+            ['Text files' => '*.txt'],
+            ['All files' => '*']
+         ],
+         directory => $dir,
+      );
+      my $res = $d-> execute;
+      if ( $res) {
+         open F, '>'.$d-> fileName;
+         print F $$textRef;
+         close F;
+      };
+      $w-> {ini}-> {StatPath} = $d-> directory;
+      $d-> destroy;
+   }
+
+   my $dlg = Prima::Window-> create(
+      size => [ 520, 430],
+      text => 'Statistic results',
+      widgetClass => wc::Dialog,
+      centered => 1,
+      menuItems   => [
+         [ '~Export' => [
+            ["~Summary..." => "F2" => kb::F2 => sub { esummary( $_[0], \$meta2, $w)} ],
+            ["~Experiment data..." => "Ctrl+F2" => km::Ctrl|kb::F2 => sub { esummary( $_[0], \$meta1, $w)} ],
+         ]],
+         [ 'Copy' => "" => kb::NoKey => sub { $::application-> Clipboard-> store( 'Text', $texts);}],
+      ],
+   );
+
+   $dlg-> insert( Edit =>
+      origin   => [ 1, 1],
+      size     => [ $dlg-> width - 2, $dlg-> height - 2],
+      text     => $texts,
+      growMode => gm::Client,
+      hScroll  => 1,
+      vScroll  => 1,
+      readOnly => 1,
+      font     => { pitch => fp::Fixed},
+      wordWrap => 0,
+      syntaxHilite => 1,
+      hiliteNumbers     => undef,
+      hiliteQStrings    => undef,
+      hiliteQQStrings   => undef,
+      hiliteIDs         => undef,
+      hiliteChars       => undef,
+      hiliteREs         => [ '(N\/A)', cl::Red,
+          '(([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?\*)', cl::Red],
+   );
+
+   $dlg-> select;
+}
+
+
+sub opt_propcreate
+{
+   my ( $w, $dlg, $nb, $nbpages) = @_;
+   $w-> SUPER::opt_propcreate( $dlg, $nb, $nbpages);
+   $nb-> tabs( @{$nb-> tabs}, 'Calculations', 'Frame');
+   $nb-> insert_to_page( $nb-> pageCount - 2,
+      [ Label =>
+        text     => 'By default, only the area, the perimeter, the formfactor and centroid locations are calculated,though the program is perfectly capable of calculating all other parameters.  The reason for disabling the rest is that it normally takes significant amount of time to calculate them.',
+        wordWrap => 1,
+        designScale => [ $nbpages-> font-> width, $nbpages-> font-> height],
+        valignment => ta::Top,
+        name       => 'TopText',
+    ],[ CheckBox =>
+        origin => [ 5, 185],
+        name => 'CalcBrightness',
+        size => [ 300, 27],
+        text => 'Calculate ~brightness',
+        onCheck => sub {
+           $nbpages-> EqualBrightness-> set(
+              checked => ($_[0]-> checked ? $nbpages-> EqualBrightness-> checked : 0),
+              enabled => $_[0]-> checked,
+           );
+        },   
+    ],[ CheckBox =>
+        origin => [ 5, 155],
+        name => 'EqualBrightness',
+        size => [ 300, 27],
+        text => 'E~qualize brightness',
+    ],[ CheckBox =>
+        origin => [ 5, 125],
+        name => 'CalcConvex',
+        size => [ 248, 27],
+        text => 'Convex ~hull derived parameters',
+    ],[ Label =>
+        origin => [ 5, 100],
+        height => 20,
+        name => 'SigRot',
+        text => '~Number of rotations',
+    ],[ SpinEdit =>
+        origin => [ 5, 80],
+        name => 'NumberOfRotations',
+        size => [ 100, 20],
+        min  => 1,
+        max  => 256,
+    ],[ CheckBox =>
+        origin => [ 5, 50],
+        name => 'CalcHoles',
+        size => [ 248, 27],
+        text => '~Process index / domain',
+        onCheck => sub {
+           $nbpages-> CalcConvex-> set(
+              checked => ($_[0]-> checked ? 1 : $nbpages-> CalcConvex-> checked),
+              enabled => !$_[0]-> checked,
+           );
+        },
+    ],[ Label =>
+        origin => [ 5, 25],
+        name => 'SigPce',
+        height => 20,
+        text => 'Significance level for holes, %',
+    ],[ SpinEdit =>
+        origin => [ 5, 5],
+        name => 'HolesPercent',
+        size => [ 100, 20],
+    ],);
+   $nbpages-> TopText-> rect( 5, $nbpages-> EqualBrightness-> top, $nbpages-> width - 5, $nbpages-> height - 5);
+   $nbpages-> SigPce-> focusLink( $nbpages-> HolesPercent);
+   $nbpages-> SigRot-> focusLink( $nbpages-> NumberOfRotations);
+   
+   my @fcnt = $nb-> insert_to_page( $nb-> pageCount - 1,
+      [ RadioGroup => 
+         origin => [ 5, 60],
+         size   => [ 200, 53],
+         name   => 'FrameColor',
+         text   => 'Frame color',
+      ], [ SpinEdit => 
+         origin => [5,5],
+         name   => 'FrameWidth',
+         size   => [100, 20],
+         min    => 0,
+         max    => 50,
+      ], [ Label => 
+         origin => [5, 35],
+         size   => [ 100, 20],
+         text   => 'Frame ~width',
+      ],
+   );
+   $fcnt[2]-> focusLink( $fcnt[1]);
+
+   $fcnt[0]-> insert( [ Radio => 
+      origin => [ 9, 5],
+      size   => [ 89, 28],
+      name   => 'FT_Black',
+      text   => 'B~lack',
+   ], [ Radio => 
+      origin => [ 102, 5],
+      size   => [ 89, 28],
+      name   => 'FT_White',
+      text   => 'W~hite',
+   ]);
+
+   my $s1 = $nb-> insert_to_page( 1, Slider =>
+       origin => [ 100, 10],
+       size   => [ 270, 56],
+       min    => 1,
+       max    => 10,
+       name   => 'LineWidth',
+       scheme => ss::Gauge,
+       snap   => 1,
+       increment => 1,
+       step      => 1,
+       onChange  => sub {
+          unless ( $nbpages-> {deprecate}) {
+             my $widths = $dlg-> {page2}-> {widths};
+             $$widths[ $nbpages-> NameSel-> focusedItem] = $_[0]-> value;
+          }
+       },
+   );
+   my $s2 = $nb-> insert_to_page( 1, Label =>
+       origin => [ 10, 10],
+       size   => [ 90, 56],
+       text   => "Line ~width\n[Alt + - and 1-9]",
+       focusLink  => $s1,
+       autoWidth  => 0,
+       valignment => ta::Center,
+       wordWrap   => 1,
+   );
+   my $delta = $nbpages-> LineWidth-> top;
+   for ( $nbpages-> widgets_from_page(1)) {
+      next if $_ == $s1 || $_ == $s2;
+      $_-> bottom( $_-> bottom + $delta);
+   }
+
+   my $namesel = $nbpages-> NameSel;
+   $namesel-> set( onChange => sub {
+      $nbpages-> {deprecate} = 1;
+      $nbpages-> LineWidth-> value( $dlg-> {page2}-> {widths}-> [ $_[0]-> focusedItem]);
+      $nbpages-> {deprecate} = undef;
+   });
+}
+
+my %widcolors = ( Features => 1, Background => 1, Remove => 1);
+
+sub opt_proppush
+{
+   my ( $w, $dlg, $nb, $nbpages) = @_;
+   $w-> SUPER::opt_proppush( $dlg, $nb, $nbpages);
+   my $nbc = $nbpages-> pageIndex;
+   $nbpages-> pageIndex(3);
+   for ( qw( CalcBrightness EqualBrightness CalcConvex CalcHoles)) {
+      $nbpages->bring($_)->checked( $w->{ini}->{$_});
+   }   
+   $nbpages-> CalcBrightness-> notify(q(Check)); # force dependent disablements
+   $nbpages-> CalcHoles->      notify(q(Check)); 
+   for ( qw( HolesPercent NumberOfRotations)) {
+      $nbpages->bring($_)->value( $w->{ini}->{$_});
+   }   
+   $nbpages-> pageIndex( $nbc);
+   $dlg->{page3}->{NumberOfRotations} = $w->{ini}->{NumberOfRotations};
+   my $i = 0;
+   my %colors = %{$w-> opt_colors};
+   my %ids    = map { ( $_ , $i++ ) } keys %colors;
+   my @widths = (1) x scalar keys %colors;
+   $widths[$ids{Features}]   = $w-> {ini}-> {LW0};
+   $widths[$ids{Background}] = $w-> {ini}-> {LW1};
+   $widths[$ids{Remove}]     = $w-> {ini}-> {LW2};
+   $dlg-> {page2}-> {widths} = \@widths;
+   $nbpages-> LineWidth-> value( $widths[ $nbpages-> NameSel-> focusedItem]);
+   $nbpages-> FrameWidth-> value( $w-> {ini}-> {FrameWidth});
+   $nbpages-> FrameColor-> index( $w-> {ini}-> {FrameColor} ? 1 : 0);
+}
+
+sub opt_proppop
+{
+   my ( $w, $dlg, $nb, $nbpages, $mr) = @_;
+   $w-> SUPER::opt_proppop( $dlg, $nb, $nbpages, $mr);
+   if ( $mr) {
+      for ( qw( EqualBrightness CalcBrightness CalcConvex CalcHoles)) {
+         $w->{ini}->{$_} = $nbpages-> bring($_)-> checked;
+      }   
+      for ( qw( HolesPercent NumberOfRotations)) {
+         $w->{ini}->{$_} = $nbpages-> bring($_)-> value;
+      }   
+      my $i = 0;
+      my %colors = %{$w-> opt_colors}; 
+      my %ids    = map { ( $_ , $i++ ) } keys %colors;
+      $w-> {ini}-> {LW0} = $dlg-> {page2}-> {widths}-> [$ids{Features}];
+      $w-> {ini}-> {LW1} = $dlg-> {page2}-> {widths}-> [$ids{Background}];
+      $w-> {ini}-> {LW2} = $dlg-> {page2}-> {widths}-> [$ids{Remove}];
+      init_convex( $w->{ini}->{NumberOfRotations}) if
+         $w->{ini}->{NumberOfRotations} != $dlg->{page3}->{NumberOfRotations};
+      my @v = ( $nbpages-> FrameWidth-> value, $nbpages-> FrameColor-> index ? 1 : 0);
+      if ( $v[0] != $w-> {ini}-> {FrameWidth} || $v[1] != $w-> {ini}-> {FrameColor}) {
+         $w-> {ini}-> {FrameWidth}  = $v[0]; 
+         $w-> {ini}-> {FrameColor}  = $v[1];
+         $w-> win_loadfile( $w-> {file});
+      }
+   }
+}
+
+
+# OPT_END
+# PT
+
+sub pt_lines
+{
+   return $_[0]-> {lineStorage}->[$_[0]->{currentSet}];
+}
+
+sub pt_lines_ptr
+{
+   return \$_[0]-> {lineStorage}->[$_[0]->{currentSet}];
+}
+
+sub pt_lw
+{
+   return $_[0]-> {lwStorage}->[$_[0]->{currentSet}];
+}
+
+sub pt_lw_ptr
+{
+   return \$_[0]-> {lwStorage}->[$_[0]->{currentSet}];
+}
+
+
+
+sub pt_init
+{
+   $_[0]-> pt_clear_all();
+}
+
+sub pt_undo1
+{
+   my $w  = $_[0];
+   $w-> iv_cancelmode( $w-> IV);
+   return unless defined $w-> pt_lines;
+   $w-> pt_undo2() if scalar @{$w-> pt_lines->[-1]} < 3;
+   $w-> IV-> repaint, return unless defined $w-> {lineStorage}->[$w->{currentSet}];
+   pop @{$w-> pt_lines->[-1]};
+   pop @{$w-> pt_lines->[-1]};
+   $w-> pt_undo2() if scalar @{$w-> pt_lines->[-1]} < 3;
+   $w-> IV-> repaint;
+   $w-> modified( 1);
+}
+
+sub pt_undo2
+{
+   my $w  = $_[0];
+   $w-> iv_cancelmode( $w-> IV);
+   return unless defined $w-> pt_lines;
+   pop @{$w-> pt_lines()};
+   pop @{$w-> pt_lw()};
+   $w-> sb_text( "Noting to undo"), $w-> pt_clear() unless scalar @{$w-> pt_lines()};
+   $w-> IV-> repaint;
+   $w-> modified( 1);
+}
+
+sub pt_undo3
+{
+   my $w  = $_[0];
+   $w-> iv_cancelmode( $w-> IV);
+   return unless defined $w-> pt_lines;
+
+   my $lrSave = $w-> pt_lines;
+   my $lrUse  = [];
+   my $count  = 0;
+   for ( @$lrSave) {
+      next if scalar @$_ < 3;
+      push( @$lrUse, [@$_]);
+      $count += scalar @$_ - 2;
+   }
+   $count /= 2;
+   ${$w-> pt_lines_ptr()} = $lrUse;
+
+   my $d = $w-> insert( Dialog =>
+      width  => 300,
+      height => 120,
+      text   => 'Undo',
+      %App::PLab::ImageAppWindow::dlgProfile,
+   );
+   $w-> dlg_okcancel( $d);
+   $d-> insert( ScrollBar =>
+      origin => [ 10, 80],
+      width  => 280,
+      vertical => 0,
+      min      => 0,
+      max      => $count,
+      value    => $count,
+      selectable => 1,
+      tabStop    => 1,
+      current    => 1,
+      onChange => sub {
+         my $count  = $_[0]-> value;
+         if ( $count == 0) {
+            ${$w-> pt_lines_ptr()} = undef;
+         } elsif ( $count == $_[0]->{max}) {
+            ${$w-> pt_lines_ptr()} = $lrUse;
+         } else {
+            my $lr     = [];
+            $count *= 2;
+            for ( @$lrSave) {
+               my $cx = scalar @$_ - 2;
+               if ( $count >= $cx) {
+                  push( @$lr, [@$_]);
+                  $count -= $cx;
+                  last unless $count;
+               } else {
+                  push ( @$lr, [ @$_[0..$count+1]]);
+                  last;
+               }
+            }
+            ${$w-> pt_lines_ptr()} = $lr;
+         }
+         $w-> IV-> repaint;
+      },
+   );
+   if ( $d-> execute == mb::Cancel) {
+      ${$w-> pt_lines_ptr()} = $lrSave;
+   } else {
+      if ( $w-> pt_lines) {
+         splice( @{$w-> pt_lw()}, scalar @{$w-> pt_lines});
+      } else {
+         $w-> pt_clear();
+      }
+      $w-> modified( 1);
+   }
+   $d-> destroy;
+   $w-> IV-> repaint;
+}
+
+sub pt_start
+{
+   my $w  = $_[0];
+   ${$w-> pt_lines_ptr()} = [] unless defined $w-> pt_lines;
+   ${$w-> pt_lw_ptr()} = [] unless defined $w-> pt_lw;
+   push( @{$w-> pt_lines()}, []);
+   push( @{$w-> pt_lw()}, $w->{ini}->{'LW'.$w->{currentSet}});
+   $w-> pt_updatemenu;
+}
+
+sub pt_updatemenu
+{
+   my $w  = $_[0];
+   $w-> menu-> Undo1-> action( \&pt_undo1);
+   $w-> menu-> Undo1-> enable;
+   $w-> menu-> Undo2-> action( \&pt_undo2);
+   $w-> menu-> Undo2-> enable;
+   $w-> menu-> Undo3-> action( \&pt_undo3);
+   $w-> menu-> Undo3-> enable;
+}
+
+sub pt_add
+{
+   my $w  = $_[0]-> pt_lines;
+   $w = $$w[-1];
+   push( @$w, $_[1], $_[2]);
+}
+
+sub pt_close
+{
+   my $w  = $_[0]-> pt_lines;
+   return unless defined $w;
+   $_[0]-> pt_undo2 if scalar @{$w->[-1]} < 3;
+}
+
+sub pt_newset
+{
+   defined $_[0]-> pt_lines ?
+      $_[0]-> pt_updatemenu :
+      $_[0]-> pt_clear;
+}
+
+sub pt_clear
+{
+   my $w = $_[0];
+   ${$w-> pt_lines_ptr()} = undef;
+   ${$w-> pt_lw_ptr()} = undef;
+   for ( qw( Undo1 Undo2 Undo3)) {
+      $w-> menu-> action( $_, sub{});
+      $w-> menu-> disable( $_);
+   }
+}
+
+sub pt_clear_all
+{
+   my $w = $_[0];
+   $w-> pt_clear;
+   my $sc = scalar @{$w->{setColors}};
+   $w-> {lineStorage} = [];
+   $w-> {lwStorage} = [];
+   while ( $sc--) {
+      push( @{$w-> {lineStorage}}, undef);
+      push( @{$w-> {lwStorage}}, undef);
+   }
+}
+
+# PT_END
+# RPT
+
+sub rpt_toggle
+{
+   my ( $w, $x, $y) = @_;
+   $w-> {points} = [] unless defined $w-> {points};
+   $w = $w->{points};
+   my $i = 0;
+   my $found = undef;
+   for ( $i = 0; $i < scalar @$w; $i+=2) {
+      my ( $ax, $ay) = @$w[$i,$i+1];
+      $found = $i, last if abs( $ax - $x) < $App::PLab::ImageAppWindow::pointClickTolerance &&
+       abs( $ay - $y) < $App::PLab::ImageAppWindow::pointClickTolerance;
+   }
+   defined $found ? splice( @$w, $i, 2) : push( @$w, $x, $y);
+   return !defined $found;
+}
+
+sub rpt_clear
+{
+   $_[0]-> {points} = undef;
+}
+
+sub rptex_clear
+{
+   $_[0]-> {extraPoints} = undef;
+}
+
+# RPT_END
+# IV
+
+sub IV_MouseDown
+{
+   my ( $w, $self, $btn, $mod, $x, $y) = @_;
+
+   $w-> SUPER::IV_MouseDown( $self, $btn, $mod, $x, $y);
+   return unless $self-> eventFlag;
+
+   $self-> clear_event, return if $btn != mb::Left;
+
+   if ($self->{transaction}) {
+      if ( $self->{transaction} == 2) {
+         my ( $ax, $ay) = $self-> screen2point( $x, $y);
+         $self-> {transaction} = 1;
+         $w-> pt_add( $ax, $ay);
+         $w-> sb_text( "Freehand: $ax $ay");
+         $w-> modified( 1);
+         $self-> repaint;
+      }
+      $self-> clear_event;
+      return;
+   }
+
+   unless ( $self->{drawmode}) {
+      my ( $ax, $ay) = $self-> screen2point( $x, $y);
+      if ( $w-> rpt_toggle( $ax, $ay)) {
+         $self-> begin_paint;
+         $self-> color( $w->{pointColor});
+         my $p = ( 6 * $self-> zoom < 1) ? 1 : ( 6 * $self-> zoom);
+         $self-> fill_ellipse( $x, $y, $p, $p);
+         $self-> end_paint;
+         $w-> sb_text( "New reference point: $ax $ay");
+      } else {
+         my $p = ( 32 * $self-> zoom < 1) ? 1 : ( 32 * $self-> zoom);
+         $self-> invalidate_rect( $x - $p, $y - $p, $x + $p, $y + $p);
+         $w-> sb_text( "Reference point deleted: $ax $ay");
+      }
+      $w-> modified( 1);
+      $self-> clear_event;
+      return;
+   }
+
+   {
+      #starting freehand session
+      $w-> iv_entermode( $self, 1);
+      $w-> pt_start;
+      my ( $ax, $ay) = $self-> screen2point( $x, $y);
+      $w-> pt_add( $ax, $ay);
+      $w-> modified( 1);
+      $w-> sb_text( "Freehand: $ax $ay");
+   }
+   $self-> clear_event;
+}
+
+sub IV_MouseClick
+{
+   my ( $w, $self, $btn, $mod, $x, $y, $dbl) = @_;
+
+   if ( $btn == mb::Right and ( $self-> {transaction})) {
+      $w-> iv_cancelmode( $self) if $self-> {transaction} == 2;
+      $self-> clear_event;
+      return;
+   }
+}
+
+sub IV_MouseUp
+{
+   my ( $w, $self, $btn, $mod, $x, $y) = @_;
+   return unless $self->{transaction};
+   $w-> SUPER::IV_MouseUp( $self, $btn, $mod, $x, $y);
+   return unless $self-> eventFlag;
+   if ( $btn == mb::Left and $self-> {transaction} == 1) {
+      $self-> {transaction} = 2;
+      $self-> {xors} = undef;
+      $w-> sb_text("Lineplot:");
+      $self-> clear_event;
+   }
+}
+
+sub IV_MouseMove
+{
+   my ( $w, $self, $mod, $x, $y) = @_;
+   unless ( $self->{transaction}) {
+      if (( $mod & km::Shift) && defined $self-> image) {
+         my $i = $self-> image;
+         my $pix = $i-> pixel( $self-> screen2point( $x, $y));
+         $w-> sb_text((( $i-> type & im::BPP) > 8) ?
+            sprintf("%02x %02x %02x", ($pix>>16)&0xFF, ($pix>>8)&0xFF, $pix&0xFF) :
+            $pix
+         ) if $pix != cl::Invalid;
+      }
+   }
+   $w-> SUPER::IV_MouseMove( $self, $mod, $x, $y);
+   return unless $self-> eventFlag && $self-> {transaction};
+   if ( $self-> {transaction} == 1) {
+      my ( $x1, $y1) = $self-> point2screen( @{$w-> pt_lines->[-1]}[-2,-1]);
+      $w-> pt_add( $self-> screen2point( $x, $y));
+      $self-> begin_paint;
+      $self-> color( $w-> {ini}-> {$w->{setColors}->[$w->{currentSet}]});
+      $self-> lineWidth( $self-> zoom * $w-> {ini}-> {'LW'.$w->{currentSet}});
+      $self-> line( $x, $y, $x1, $y1);
+      $self-> end_paint;
+      $w-> sb_text("Freehand: $x1 $y1");
+   } elsif ( $self-> {transaction} == 2) {
+      my ( $ax, $ay) = $self-> point2screen( @{$w-> pt_lines->[-1]}[-2,-1]);
+      $self-> begin_paint;
+      $self-> color( cl::White);
+      $self-> rop( rop::XorPut);
+      $self-> linePattern( lp::Dot);
+      $self-> line( $ax, $ay, @{$self->{xors}}) if defined $self->{xors};
+      $self-> line( $ax, $ay, $x, $y);
+      $self-> {xors} = [$x, $y];
+      $self-> end_paint;
+      my ( $x1, $y1) = $self-> screen2point( $x, $y);
+      $w-> sb_text("Lineplot: $x1 $y1");
+   }
+}
+
+sub IV_Paint
+{
+   my ( $w, $self, $canvas) = @_;
+   $self-> on_paint( $canvas);
+   my $wl = $w-> {lineStorage};
+   $canvas-> translate( $self-> point2screen( 0, 0));
+   my $z = $self-> zoom;
+   my $p = ( 6 * $z < 1) ? 1 : ( 6 * $z);
+   if ( defined $wl) {
+      my $i;
+      for ( $i = 0; $i < scalar @{$w->{setColors}}; $i++) {
+         my $wwl  = $w->{lineStorage}->[$i];
+         my $wwlw = $w->{lwStorage}->[$i];
+         next unless defined $wwl;
+         $canvas-> color( $w-> {ini}-> {$w->{setColors}->[$i]});
+         my $j;
+         my $lastLW = 0;
+         for ( $j = 0; $j < @$wwl; $j++) {
+            my @x = map { $_ * $z } @{$$wwl[$j]};
+            $canvas-> lineWidth( $$wwlw[$j] * $z), $lastLW = $$wwlw[$j] if $lastLW != $$wwlw[$j];
+            $canvas-> polyline( \@x);
+         }
+      }
+   }
+   $wl = $w-> {points};
+   if ( defined $wl) {
+      my $i;
+      $canvas-> color( $w->{pointColor});
+      for ( $i = 0; $i < scalar @$wl; $i+=2) {
+         my ( $x, $y) = @$wl[ $i, $i+1];
+         $canvas-> fill_ellipse( $x * $z, $y * $z, $p, $p);
+      }
+   }
+   $wl = $w-> {extraPoints};
+   if ( defined $wl) {
+      my $i;
+      $canvas-> color( $w->{pointColor});
+      $canvas-> lineWidth( $z);
+      for ( $i = 0; $i < scalar @$wl; $i+=2) {
+         my ( $x, $y) = @$wl[ $i, $i+1];
+         $canvas-> line( $x * $z - $p, $y * $z - $p, $x * $z + $p, $y * $z + $p);
+         $canvas-> line( $x * $z + $p, $y * $z - $p, $x * $z - $p, $y * $z + $p);
+      }
+   }
+}
+
+sub iv_cancelmode
+{
+   my ( $w, $self) = @_;
+   my $t = $self->{transaction};
+   $w-> SUPER::iv_cancelmode( $self);
+   $w-> pt_close() if $t;
+}
+
+sub iv_togglemode
+{
+   my ( $w, $self) = @_;
+   return if !$ImageApp::testing and !defined $self-> image;
+   $w-> iv_cancelmode( $self);
+   $self-> {drawmode} = defined $self-> {drawmode} ? undef : 1;
+   $w-> ToolBar-> Contours-> checked( defined $self-> {drawmode});
+   $w-> sb_text( defined $self-> {drawmode} ? "Drawing mode on - Esc or right button to cancel" : "Reference point mode on");
+}
+
+# IV_END
+
+package PropRollup;
+use vars qw(@ISA);
+@ISA = qw(Prima::Dialog);
+
+sub profile_default
+{
+   my $def = $_[ 0]-> SUPER::profile_default;
+   my %prf = (
+       borderIcons => bi::SystemMenu | bi::TitleBar,
+       width => 207,
+       height => 306,
+       sizeDontCare => 0,
+
+       text => 'Parameters',
+       visible => 0,
+   );
+   @$def{keys %prf} = values %prf;
+   return $def;
+}
+
+sub init
+{
+   my $self = shift;
+   my %profile = $self-> SUPER::init(@_);
+
+   my $image = Prima::Icon->create( width=>16, height=>16, type => im::bpp1,
+     palette => [ 0,0,0,0,0,0],
+     data =>
+     "\x01\x00\x00\x00A\x08\x00\x00\!\x10\x00\x00\x10 \x00\x00\x07\xc0\x00\x00".
+     "\x080\x00\x001\x88\x00\x00C\xc0\x00\x00\x03\xc4\x00\x00\!\x88\x00\x00".
+     "\x18p\x00\x00\x07\x80\x00\x00\x10\x10\x00\x00\!\x08\x00\x00A\x04\x00\x00".
+     "\x01\x00\x00\x00".
+   '');
+
+   my $w = $self-> owner;
+
+   my $i = $w-> IV-> image;
+   my @sz = defined $i ? $i-> size : (0,0);
+   my $canApply = defined $i && $i-> type == im::Byte;
+
+   $self-> insert(
+     [ Label =>
+       origin => [ 5, 280],
+       name => 'UF',
+       size => [ 148, 20],
+       text => 'Union ~find threshold',
+   ],[ SpinEdit =>
+       origin => [ 5, 255],
+       name => 'Union',
+       size => [ 148, 20],
+       min => 1,
+       value => $w-> {ini}-> {UFThreshold},
+       max => 255,
+   ],[ Label =>
+       origin => [ 5, 230],
+       name => 'BT',
+       size => [ 148, 20],
+       text => '~Binary threshold',
+   ],[ SpinEdit =>
+       origin => [ 5, 205],
+       name => 'Binary',
+       size => [ 148, 20],
+       min => 0,
+       value => $w-> {ini}-> {BinThreshold},
+       max => 255,
+   ],[ Label =>
+       origin => [ 5, 180],
+       name => 'ES',
+       size => [ 148, 20],
+       text => '~Edge size',
+   ],[ SpinEdit =>
+       origin => [ 5, 155],
+       name => 'Edge',
+       size => [ 148, 20],
+       value => $w-> {ini}-> {EdgeSize},
+       min  => 1,
+       max  => defined $i ? ( int(($sz[0] < $sz[1] ? $sz[0] : $sz[1]) / 2)) : 16383,
+   ],[ Label =>
+       origin => [ 5, 130],
+       name => 'MIN',
+       size => [ 148, 20],
+       text => 'Mi~n area',
+   ],[ SpinEdit =>
+       origin => [ 5, 105],
+       name => 'Min',
+       size => [ 148, 20],
+       value => $w-> {ini}-> {MinArea},
+       min  => 0,
+       max  => defined $i ? ( $sz[0] * $sz[1]) : 1e12,
+   ],[ Label =>
+       origin => [ 5, 80],
+       name => 'MAX',
+       size => [ 148, 20],
+       text => 'Ma~x area',
+   ],[ SpinEdit =>
+       origin => [ 5, 55],
+       name => 'Max',
+       size => [ 148, 20],
+       min  => 0,
+       max  => defined $i ? ( $sz[0] * $sz[1]) : 1e12,
+       value => $w-> {ini}-> {MaxArea},
+   ],[ Button =>
+       origin => [ 5, 5],
+       name => 'ApplyBtn',
+       size => [ 96, 36],
+       text => '~Apply',
+       enabled => $canApply,
+       onClick => sub {
+          $w-> win_applycontours;
+       },
+   ],[ Button =>
+       origin => [ 106, 5],
+       name => 'RestoreBtn',
+       size => [ 96, 36],
+       text => '~Restore',
+       enabled => $canApply && defined $w-> {mirrorImage},
+       onClick => sub {
+          $w-> win_restore;
+       },
+   ],[ SpeedButton =>
+       origin => [ 164, 255],
+       name => 'Preview1',
+       image => $image,
+       size => [ 36, 21],
+       enabled => $canApply,
+       hint    => 'Previews union find method',
+       onClick => sub {
+          $w-> win_leavesubplace(
+            Prima::IPA::Local::unionFind(
+               $w-> win_entersubplace,
+               method    => 'ave',
+               threshold => $self-> Union-> value));
+       },
+   ],[ SpeedButton =>
+       origin => [ 164, 205],
+       name => 'Preview2',
+       size => [ 36, 21],
+       image => $image,
+       enabled => $canApply,
+       hint    => 'Previews union find and threshold methods',
+       onClick => sub {
+          my $im = Prima::IPA::Local::unionFind(
+             $w-> win_entersubplace,
+             method    => 'ave',
+             threshold => $self-> Union-> value);
+          $w-> win_leavesubplace(
+             Prima::IPA::Point::threshold(
+                $im,
+                minvalue => 0,
+                maxvalue => $self-> Binary-> value,
+          ));
+       },
+   ],[ SpeedButton =>
+       origin => [ 164, 54],
+       name => 'Preview3',
+       size => [ 36, 120],
+       image => $image,
+       enabled => $canApply,
+       hint    => 'Previews all methods',
+       onClick => sub {
+          my $im = Prima::IPA::Local::unionFind(
+             $w-> win_entersubplace,
+             method    => 'ave',
+             threshold => $self-> Union-> value);
+          $im = Prima::IPA::Point::threshold(
+             $im,
+             minvalue => 0,
+             maxvalue => $self-> Binary-> value);
+          $im = Prima::IPA::Global::fill_holes( $im,
+             edgeSize => $self-> Edge-> value,
+          );
+          $im = Prima::IPA::Global::area_filter( $im,
+             edgeSize => $self-> Edge-> value,
+             minArea  => $self-> Min-> value,
+             maxArea  => $self-> Max-> value,
+          );
+          $w-> win_leavesubplace( $im);
+       },
+   ],);
+   my @p = split( ' ', $w->{ini}->{RecWindowPos});
+   my @as = $::application-> size;
+   my @ss = $self-> size;
+   for ( 0..1) {
+      $p[$_] = 100 unless defined $p[$_];
+      $p[$_] = 0 if $p[$_] < -$ss[$_] + 100;
+      $p[$_] = $as[$_] - $ss[$_] - 30 if $p[$_] > $as[$_] - $ss[$_] - 30;
+   }
+
+   $self-> origin( @p);
+   $self-> visible(1);
+   return %profile;
+}
+
+sub cleanup
+{
+   my $self = $_[0];
+   my $w = $self-> owner;
+   $w-> {recWindow} = undef;
+   my $i = $w-> {ini};
+   $i-> {RecWindowPos}  = join( ' ', $self-> origin);
+   $i-> {UFThreshold} = $self-> Union-> value;
+   $i-> {BinThreshold} = $self-> Binary-> value;
+   $i-> {EdgeSize} = $self-> Edge-> value;
+   $i-> {MinArea}  = $self-> Min-> value;
+   $i-> {MaxArea}  = $self-> Max-> value;
+   $self-> SUPER::cleanup();
+}
+
+package Run;
+
+my $wfil = App::PLab::ImageAppWindow::winmenu_file();
+splice( @{$$wfil[1]}, -2, 0,
+   [],
+   [ EditImport      => "~Import contours" => q(win_importextras)],
+   [ '-EditOptCalib' => "~Recalculate series"  => q(opt_changecalib)],
+   [ EditCalcStats   => "~Calculate statistics"  => q(opt_statistics)],
+);
+
+my $wedt = App::PLab::ImageAppWindow::winmenu_edit();
+splice( @{$$wedt[2]}, 0, 0,
+   [ '-Undo1' => "~Undo drawing" => "BkSp" => kb::Backspace , sub {},],
+   [ '-Undo2' => "~Group undo" => "Alt+BkSp" => km::Alt|kb::Backspace , sub {},],
+   [ '-Undo3' => "Undo ~dialog" => "Alt+U" => '@U' => sub {},],
+   [ EditClearAll => "Clear all ~drawings"  => sub {
+      $_[0]-> iv_cancelmode( $_[0]-> IV);
+      $_[0]-> pt_clear;
+      $_[0]-> IV-> repaint;
+      $_[0]-> modified( 1);
+   }, ],
+   [ EditRemovePoints => "Clear all ~points"    => sub {
+      $_[0]-> rpt_clear;
+      $_[0]-> IV-> repaint;
+      $_[0]-> modified( 1);
+   }, ],
+   [],
+   [ '-EditToggleMode' => "~Toggle points <-> drawings" => 'F11'=>'F11' => sub { $_[0]-> iv_cancelmode( $_[0]-> IV); $_[0]-> iv_togglemode( $_[0]-> IV)}],
+   [],
+   [ 'EditInvertImage' => '~Invert image' => sub { $_[0]-> win_set_negative( $_[0]-> {ini}-> {InvertImage} ? 0 : 1); } ],
+   [ '-EditValidate' => "~Validate contours" => 'Ctrl+Enter'=> km::Ctrl|kb::Enter ,
+       sub { $_[0]-> win_validate(0) }],
+   [ EditRecSetup => "Recognition ~setup"  => sub { $_[0]-> win_showrec; }, ],
+   [ '-EditApplyContours' => "~Apply contours" => 'Alt+Enter'=> km::Alt|kb::Enter , q(win_applycontours)],
+   [],
+   [ 'EditHack' => "~Outline convex ~hull" => q(win_outline_convex_hull)],
+);
+
+my $w = MorphoWindow-> create(
+   visible   => 0,
+   menuItems => [
+      $wfil,
+      $wedt,
+      App::PLab::ImageAppWindow::winmenu_view(),
+      [],["~Help" => [
+         [ HelpAbout =>  "~About" => sub {Prima::MsgBox::message("PLab application series, Morphometry I, version 1.00", mb::OK|mb::Information)}],
+         [ HelpPlabApps => "~PLab Apps" => sub { $_[0]-> open_help(); }],
+         [ HelpContents => "~Contents" => sub { $_[0]-> open_help("MorphometryI"); }],
+      ]],
+   ],
+   accelItems => [
+      ( map {[ "lw$_" => $_ => "Alt+$_" => "\@$_" => q(win_objectlwmenuaction)]} 1..9),
+   ],
+);
+$w-> IV-> delegations(['MouseClick', 'Paint']);
+
+$w-> sb_text("Started OK");
+$w-> visible(1);
+$w-> select;
+
+$w-> win_showrec if $w-> {ini}-> {RecWindowVisible};
+$w-> menu-> EditInvertImage-> check if $w-> {ini}-> {InvertImage};
+$w-> win_extwarn;
+
+run Prima;
+

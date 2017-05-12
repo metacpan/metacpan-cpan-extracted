@@ -1,0 +1,57 @@
+diff --git a/Makefile b/Makefile
+index 9754ddf..c3dc048 100644
+--- a/Makefile
++++ b/Makefile
+@@ -79,10 +79,10 @@ install: bzip2 bzip2recover
+ 	cp -f bzip2 $(PREFIX)/bin/bunzip2
+ 	cp -f bzip2 $(PREFIX)/bin/bzcat
+ 	cp -f bzip2recover $(PREFIX)/bin/bzip2recover
+-	chmod a+x $(PREFIX)/bin/bzip2
+-	chmod a+x $(PREFIX)/bin/bunzip2
+-	chmod a+x $(PREFIX)/bin/bzcat
+-	chmod a+x $(PREFIX)/bin/bzip2recover
++	chmod a+x $(PREFIX)/bin/bzip2$(EXE)
++	chmod a+x $(PREFIX)/bin/bunzip2$(EXE)
++	chmod a+x $(PREFIX)/bin/bzcat$(EXE)
++	chmod a+x $(PREFIX)/bin/bzip2recover$(EXE)
+ 	cp -f bzip2.1 $(PREFIX)/man/man1
+ 	chmod a+r $(PREFIX)/man/man1/bzip2.1
+ 	cp -f bzlib.h $(PREFIX)/include
+diff --git a/bzlib.h b/bzlib.h
+index 8277123..bcbb745 100644
+--- a/bzlib.h
++++ b/bzlib.h
+@@ -82,7 +82,11 @@ typedef
+ #      undef small
+ #   endif
+ #   ifdef BZ_EXPORT
++#   ifdef BZ_STATIC
++#   define BZ_API(func) func
++#   else
+ #   define BZ_API(func) WINAPI func
++#   endif
+ #   define BZ_EXTERN extern
+ #   else
+    /* import windows dll dynamically */
+diff --git a/makefile.msc b/makefile.msc
+index 799a18a..47a4f61 100644
+--- a/makefile.msc
++++ b/makefile.msc
+@@ -61,3 +61,17 @@ clean:
+ .c.obj: 
+ 	$(CC) $(CFLAGS) -c $*.c -o $*.obj
+ 
++
++$(PREFIX)\bin:
++	md "$(PREFIX)\bin"
++
++$(PREFIX)\lib:
++	md "$(PREFIX)\lib"
++
++$(PREFIX)\include:
++	md "$(PREFIX)\include"
++
++install: $(PREFIX)\bin $(PREFIX)\lib $(PREFIX)\include
++	cp *.exe $(PREFIX)\bin
++	cp bzlib.h $(PREFIX)\include
++	cp *.lib $(PREFIX)\lib

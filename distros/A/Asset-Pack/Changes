@@ -1,0 +1,58 @@
+Revision history for Asset-Pack
+
+0.000008 2017-03-07T13:25:07Z a58e4fc
+ - Bugfix: Stop accidentally calling plan() twice in App::FatPacker interop test
+
+0.000007 2017-03-07T11:25:49Z b702db9
+ - Bugfix: Avoid failing tests under -Ddefault_inc_excludes_dot
+ - Tests made portable on older Test::More's
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.000006, see misc/*.deps* for details
+ - develop: +3 ↑2 (suggests: ↑2)
+ - test: ↓1
+
+0.000006 2015-07-21T13:10:16Z ecb364b
+ [Dependencies::Stats]
+ - Dependencies changed since 0.000005, see misc/*.deps* for details
+ - test: -3
+
+ [Documentation]
+ - Document current state of perl version support
+
+ [Tests]
+ - Undo previous bundling experiment. Upstream are scheduled to potentially ship with 5.6 support, but pragmatically,
+   we don't really need it.
+
+0.000005 2015-07-19T20:45:18Z f2f12fb
+ [Dependencies::Stats]
+ - Dependencies changed since 0.000004, see misc/*.deps* for details
+ - test: +3 -1
+
+ [Tests]
+ - Bundling Test::Requires temporarily till upstream re-establish perl 5.6 support in their installer
+   https://github.com/tokuhirom/Test-Requires/issues/11
+
+0.000004 2015-07-13T06:11:23Z fcd9a2c
+ [BugFix Bugfix]
+ - Actually resolve the change I claimed to fix in 0.000003 because I can't count '0's.
+
+0.000003 2015-07-13T05:40:50Z f70f711
+ [BugFix]
+ - Don't execute FatPacker interop test with FatPacker < 0.009017
+ - Fatpacking itself should still work before this, but its just not practical to test
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.000002, see misc/*.deps* for details
+ - test: (recommends: ↑1)
+
+0.000002 2015-07-11T05:00:03Z a542c60
+ [Features / find_and_pack indexes]
+ - find_and_pack now generates the promised pack index as the root namespace.
+ - Index will be updated oppurtunitistically when there are no fails and there are file updates being performed.
+
+ [Internals]
+ - Generated modules use a slightly more efficient initial DATA -> Scalar slurp
+
+0.000001 2015-07-10T09:11:42Z 1b264d6
+ - Initial release.

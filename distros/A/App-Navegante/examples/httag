@@ -1,0 +1,142 @@
+filename(./httag)
+formtitle(Tagging Tool)
+proc(id)
+desc(httagDesc)
+livefeedback(httagLive)
+annotate(httagit)
+iform(text)
+
+##
+
+=head1 NAME
+
+htspell - an application built using Navegante
+
+=head1 SYNOPSIS
+
+Build the application:
+
+  $ navegante examples/htspell
+
+Use the newly created file I<htspell> as a CGI.
+
+=head1 DESCRIPTION
+
+This application behaves as a CGI and it checks in a dictionary if
+the word exists. The application keeps track of words not found. On
+every request we also use the banner live feedback section to present
+some information about the number of not found words. The specific DSL 
+section is:
+
+  cginame(./htspell)
+  formtitle(Spell Checking Tool)
+  proc(htspellFunction)
+  desc(htspellDesc)
+  init(htspellInit)
+  feedback(htspellFeedback)
+  livefeedback(htspellLive)
+
+=head1 MODULES
+
+=head2 C<Text::Aspell>
+
+Module C<Text::Aspell> was used to check for words in a dictionary.
+
+=cut
+
+use DBI;
+
+=head1 VARIABLES
+
+Some variables were used so that we can present information about the
+number of words processed with every request.
+
+=head2 C<$processed>
+
+This variable keeps tracks of the total of processed words in every
+request.
+
+=head2 C<$found>
+
+This variable keeps track of the number of found words in the dictionary.
+
+=head2 C<$not_found>
+
+This variable keeps track of the number of found not words in the 
+dictionary.
+
+=cut
+
+=head1 FUNCTIONS
+
+=head2 C<htspellDesc>
+
+This function prints the description of the application. This
+is defined in the DSL by the C<desc> statement.
+
+=cut
+
+sub httagDesc {
+    return "URL tagging utility.";
+}
+
+=head2 C<htspellFunction>
+
+This function is used to process the page content. We are checking for
+words in the dictionary, we are pushing words not found to the special
+variable I<estado> in order to keep track of not found words over
+sequential requests. We are also updating counters, like the number of
+processed or not found words.
+
+XXX _loadit
+
+=cut
+
+sub id {
+    my $item = shift;
+    if ($item =~ m/__MARCA__/) {
+        $item = _loadit($item);
+    }
+    return $item;
+}
+
+=head2 C<htspellLive>
+
+This is the function that prints the HTML that feeds the banner section
+for reporting information. This is defined in the DSL by the
+C<livefeedback> statement. Here we print information about the number 
+of not found words for every page viewed.
+
+=cut
+
+sub httagLive {
+    my $dbh = DBI->connect('dbi:mysql:httag','httag','smash');
+    my $sth = $dbh->prepare("SELECT * FROM tags WHERE url='$U'");
+    $sth->execute();
+    my @found = ();
+    while (@row = $sth->fetchrow_array()) {
+        push @found, "<a href='http://nrc.homelinux.org/cgi-bin/check_tag?tag=$row[2]'>$row[2]</a>";
+    }
+    my $r = 'Current tags: ' . join ',', @found;
+    return $r;
+}
+
+=head2 C<htspellInit>
+
+This function runs on the beginig of every request and it's used here
+to reset word counters and create an Aspell object for word checking. 
+This is defined in the DSL by the C<init> statement.
+
+=cut
+
+
+sub httagit {
+
+    my $url = $U;
+    my $tag = param('user_data');
+
+    if( ($url ne '') and ($tag ne '') ) {
+        my $dbh = DBI->connect('dbi:mysql:httag','httag','smash');
+        $dbh->do("INSERT INTO tags (url,tag) VALUES('$url','$tag')");
+    }
+}

@@ -1,0 +1,13 @@
+Revision history for App-MarkdownUtils
+
+0.02    2016-01-31 (PERLANCAR)
+
+        - Rename module/dist from App-MarkdownToPODUtils to the more general
+          App-MarkdownUtils.
+
+        - Add utility: markdown-to-html.
+
+
+0.01    2016-01-31 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,9 @@
+Revision history for AnyEvent-Cron
+
+0.03    二 11/15 02:15:46 2011
+        Re-write schedule method.
+        Support REAL crontab format.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,126 @@
+NAME
+    Acme::Has::Tiny - tiny implementation of Moose-like "has" keyword
+
+SYNOPSIS
+       package Person;
+   
+       use Acme::Has::Tiny qw(new has);
+       use Types::Standard -types;
+   
+       has name => (isa => Str);
+       has age  => (isa => Num);
+
+DESCRIPTION
+    Acme::Has::Tiny provides a Moose-like `has` function. It is not
+    particularly full-featured, providing just enough to be useful for small
+    OO projects.
+
+    Generally speaking, I'd recommend using Moo or Moose instead, but if you
+    want to use this then I'm fairly unlikely to hunt you down with dogs.
+
+    This module was originally written for Type::Tiny, but turned out to be
+    just a smidgen slower than the system it was replacing, so was abandoned.
+
+  Methods
+    `has \@attrs, %spec`
+    `has $attr, %spec`
+        Create an attribute. This method can also be exported as a usable
+        function.
+
+        The specification supports the following options:
+
+        `is => "ro" | "rw" | "rwp"`
+            Defaults to "ro".
+
+        `required => 1`
+        `default => $coderef`
+            Defaults are always eager (not lazy).
+
+        `builder => $coderef | $method_name | 1`
+            Builders are always lazy.
+
+        `predicate => $method_name | 1`
+        `isa => $type`
+            Type constraint (use Types::Standard or another
+            Type::Library-based type constraint library).
+
+    `create_constructor $method_name, %options`
+        If you want a constructor, then you could call this after defining
+        your attributes. (Or you could just import `new` from this module.)
+
+           package Person;
+   
+           use Acme::Has::Tiny qw(has);
+           use Types::Standard -types;
+   
+           has name => (isa => Str);
+           has age  => (isa => Num);
+   
+           Acme::Has::Tiny->create_constructor("new");
+           Acme::Has::Tiny->create_constructor(
+              "new_from_arrayref",
+              buildargs => sub {
+                 my ($class, $aref) = @_;
+                 return { name => $aref->[0], age => $aref->[1] };
+              },
+           );
+
+        Currently supported options:
+
+        `buildargs => $coderef | $method_name`
+        `build => $coderef | $method_name`
+        `class => $class_name`
+            Package to build a constructor for; if omitted, uses the caller.
+
+        `replace => $bool`
+            Allow `create_constructor` to overwrite an existing method.
+
+        There's no law that says you have to use `create_constructor`. You can
+        write your own constructor if you like. In which case, you might like
+        to make use of...
+
+    `assert_valid($class, \%params)`
+        Check that a hash of parameters is valid according to type constraints
+        and required attributes of $class and any classes it inherits from.
+
+        Returns the hashref or dies.
+
+           sub new {
+              my ($class, %params) = @_;
+              ...; # other stuff here
+              my $self = bless(
+                 Acme::Has::Tiny->assert_valid($class, \%params),
+                 $class,
+              );
+              ...; # other stuff here
+              return $self;
+           }
+
+  Constants
+    `CAN_HAZ_XS`
+        Whether Class::XSAccessor can be used.
+
+CAVEATS
+    Inheriting attributes from parent classes is not super well-tested.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Acme-Type-Tiny>.
+
+SEE ALSO
+    Moo, Moose, Mouse.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

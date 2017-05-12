@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/mhere
+dist.ini
+lib/App/moduleshere.pm
+t/00.load.t
+t/01.mhere.t
+t/02.dry-run.t
+t/release-pod-syntax.t

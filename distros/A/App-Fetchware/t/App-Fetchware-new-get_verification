@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+# Tests cmd_new()'s get_verification() subroutine that uses Term::UI to ask the user
+# questions. This "test script" is called by t/bin-fetchware-new.t's using
+# Test::Expect, if its optionally installed. And Test::Expect answer's the
+# questsions that this script asks thereby testing get_verification() Q&A interface.
+
+# Needed so perl can find App::Fetchware.
+use lib 'lib';
+
+use Test::More;
+use Test::Builder;
+use Term::ReadLine;
+
+use App::Fetchware 'get_verification';
+
+my $current_file_list =
+[
+    [ 'CURRENT-IS-2.2.21', '999910051831' ],
+    [ 'httpd-2.2.21-win32-src.zip', '999909121702' ],
+    [ 'httpd-2.2.21-win32-src.zip.asc', '999909121702' ],
+    [ 'httpd-2.2.21.tar.bz2', '999909121702' ],
+    [ 'httpd-2.2.21.tar.bz2.asc', '999909121702' ],
+    [ 'httpd-2.2.21.tar.gz', '999909121702' ],
+    [ 'httpd-2.2.21.tar.gz.asc', '999909121702' ],
+];
+
+my $term = Term::ReadLine->new('testing fetchware new');
+
+my $fetchwarefile = "# Test fetchwarefile";
+
+my $lookup_url = $ENV{FETCHWARE_HTTP_LOOKUP_URL};
+
+my $verification_hashref = get_verification($term, $current_file_list, $lookup_url);
+
+ok(exists $verification_hashref->{user_keyring},
+    'checked get_verification() keyring success.');
+like($verification_hashref->{user_keyring}, qr/on|true/i,
+    'checked get_verification() keyring value.');
+
+ok(exists $verification_hashref->{verify_method},
+    'checked get_verification method sucess.');
+like($verification_hashref->{verify_method}, qr/gpg/i,
+    'checked get_verification() verify_method value.');
+
+# Spit out # of tests run.
+done_testing();
+
+# Print a bogus "prompt" to keep Expect from freaking out, because it presumes
+# the prompt works like it does in a shell, but fetchware new is not a shell.
+print "Bogus shell: \n";
+
+# Because we're in a child process not the same one that is running the main
+# test suite, if any tests fail this failure will not be reported back to our
+# caller. So, we use Test::Builder to check if our tests have passed, and if
+# they have we do nothing and return succes, but if not we throw an exception.
+my $test = Test::Builder->new();
+unless ($test->is_passing()) {
+    diag explain \[$test->details()];
+    die <<EOD;
+get_verification test file for testing get_verification() using Test::Expect has
+failed!  The details() method of this process's Test::Builder object should have
+been printed above to help you figure out what went wrong.
+EOD
+}

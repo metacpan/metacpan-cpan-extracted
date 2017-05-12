@@ -1,0 +1,22 @@
+bin/fatpack
+Changes
+lib/App/FatPacker.pm
+lib/App/FatPacker/Trace.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/basic.t
+t/line.t
+t/line/lib/line/a.pm
+t/line/line-test.pl
+t/mod/ModuleA.pm
+t/mod/ModuleB.pm
+t/mod/ModuleC.pm
+t/mod/ModuleCond.pm
+t/mod/ModuleD.pl
+t/mod/ModuleD.pm
+t/pack.t
+t/trace.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

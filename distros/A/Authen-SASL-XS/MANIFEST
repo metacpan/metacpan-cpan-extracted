@@ -1,0 +1,15 @@
+CHANGES
+lib/Authen/SASL/XS/Security.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/common.pl
+t/gssapiskel.pl
+t/plain.t
+typemap
+XS.pm
+XS.pod
+XS.xs
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

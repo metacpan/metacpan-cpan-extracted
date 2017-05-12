@@ -1,0 +1,48 @@
+NAME
+    Algorithm::SISort - Select And Insert sorting algorithm
+
+DESCRIPTION
+    This module implements a sorting algorithm I saw in BIT 28 (1988) by
+    István Beck and Stein Krogdahl. This implementation is mainly intended to
+    try out the Inline module by Brian Ingerson. The algorithm is a
+    combination of *Straight Insertion Sort* and *Selection Sort*. While
+    *Insertion Sort* and *Selection Sort* both are of complexity O(n**2),
+    *Select and Insert Sort* should have complexity O(n**1.5).
+
+    For more usage information, read the Algorithm::SISort pod
+    documentation.
+
+INSTALLING
+    Installing this module is as easy as unpacking the tar archive, cd'ing
+    to the extracted directory, and running:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+   
+   And if you are using the CPAN shell, it's is as easy as going:
+      perl -MCPAN -e shell
+      install Algorithm::SISort
+
+   Note, that this module requires Inline v. 0.40 or newer. The perl
+   Makefile.PL step will detect if any components are missing and issue a
+   warning, and CPAN should download install any dependencies automatically.
+
+BUGS
+   Bug-reports are very welcome on the CPAN Request Tracker at: 
+                                                         
+     http://rt.cpan.org/NoAuth/Bugs.html?Dist=Algorithm-SISort
+
+AUTHOR
+    Hrafnkell F. Hlodversson, keli@panmedia.dk
+
+COPYRIGHT
+    Copyright 2001, Hrafnkell F Hlodversson
+
+    All Rights Reserved. This module is free software. It may be used,
+    redistributed and/or modified under the terms of the Perl Artistic
+    License.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

@@ -1,0 +1,18 @@
+Build.PL
+Changes
+eg/sample.pl
+lib/Acme/Math/PerfectChristmasTree.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+README.pod
+t/00.load.t
+t/01.calc_perfect_christmas_tree.t
+xt/perlcritic.t
+xt/pod-coverage.t
+xt/pod.t
+xt/podspell.t
+xt/synopsis.t

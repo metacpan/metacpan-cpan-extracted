@@ -1,0 +1,14 @@
+MANIFEST
+Makefile.PL
+README
+README.old
+SFLAP.pm
+TOC.pm
+test.pl
+tocbot/do.pl
+tocbot/fortune.pl
+tocbot/ident.pl
+tocbot/relay.pl
+tocbot/toc.config
+tocbot/tocbot.config
+tocbot/tocbot.pl

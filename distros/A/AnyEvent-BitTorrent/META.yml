@@ -1,0 +1,48 @@
+---
+abstract: 'Yet Another BitTorrent Client Module'
+author:
+  - 'Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-BitTorrent
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  AnyEvent::BitTorrent:
+    file: lib/AnyEvent/BitTorrent.pm
+    version: v1.0.2
+recommends:
+  Data::Dump: '0'
+requires:
+  AnyEvent: '0'
+  AnyEvent::HTTP: '0'
+  Digest::SHA: '0'
+  Moo: '0'
+  Net::BitTorrent::Protocol: '0'
+  Scalar::Util: '0'
+  Type::Tiny: '0'
+  Types::Standard: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/sanko/anyevent-bittorrent/issues
+  homepage: https://github.com/sanko/anyevent-bittorrent
+  repository: git://github.com/sanko/anyevent-bittorrent.git
+version: 1.0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,11 @@
+requires "Cwd";
+requires "Daemon::Control";
+requires "File::Temp";
+requires "Getopt::Long::Descriptive";
+requires "IPC::Signal";
+requires "List::MoreUtils";
+requires "Mo";
+requires "Module::Load";
+requires "Parallel::ForkManager";
+requires "Process::Child::Leash";
+requires "YAML";

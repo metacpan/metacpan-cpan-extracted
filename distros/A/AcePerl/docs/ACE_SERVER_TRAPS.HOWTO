@@ -1,0 +1,207 @@
+
+   NOTE: These notes were put together by Sarah Yurman, a programmer at
+   Spatial Focus, while setting up her first ACEDB server. She has
+   contributed these notes in the hope that they will help other
+   programmers to avoid the traps that she stumbled into. Another
+   important document to consult is [1]wrpc/SERVER.INSTALLATION, part of
+   the ACeDB source distribution.
+   
+                      Troubleshooting a new ACE Database
+     _________________________________________________________________
+   
+Introduction
+May 25, 1999
+
+   This is a list of things great and small that we have discovered while
+   implementing a new ACE database at [2]Spatial Focus. We are working
+   with ACE in Linux, at the time of this writing we are using Redhat
+   5.2.
+   
+Caveat Emptor
+
+   This document is a work in progress. It is being written while we are
+   solving problems. Its primary purpose is to maintain a record for
+   internal use at Spatial Focus. Although we don't deliberately make
+   mistakes, anything in this document could be wrong. Mistakes will be
+   corrected as they are found. We are not responsible for any harm
+   resulting from information we record here.
+   
+Merci!
+
+   Many thanks to [3]Lincoln Stein and all the folks at the Human Genome
+   Project.
+   
+  Contents
+  
+    Environment Description
+    
+    Installation
+    
+      ACEDB
+      
+     *
+       
+      ACEDB and environment variables
+     *
+       
+      Permissions
+       
+      Gifaceserver
+      
+     *
+       
+      inetd.conf
+     *
+       
+      server.log
+       
+    Models
+    
+      Editors
+      
+      White Space
+      
+    To Do
+     _________________________________________________________________
+   
+  Environment Description
+  
+   These notes refer to the following environment:
+     * ACEDB: 4.7g, loaded from the Linux binary
+       (bin.linux_libc6.4_7g.tar.Z)
+     * Perl 5.005_03
+     * CGI.pm 2.51
+     * AcePerl 1.54
+     * Gifaceserver loaded from gifaceserver.LINUX
+     * Apache 1.3
+       (This is just for local use, so upgrading hasn't been a priority)
+     * Netscape 4.51
+     * Linux (Redhat 5.2)
+     * bash shell
+       
+  Installation:
+  ACEDB
+  
+    ACEDB and environment variables
+    
+      Problem
+      
+   If nothing works, chances are the environment variables haven't been
+   set. The acedb and textdb scripts built by INSTALL wouldn't work due
+   to the differences in shells. acedb sets environment variables called
+   $ACEDB and $DBDIR, and appends your path, then starts the xace
+   graphical interface to ACEDB. textdb sets the environment variables
+   and starts the tace text interface.
+   
+      Solution
+      
+   I altered my .bash_profile with the following lines:
+   
+   ACEDB=[pathname to database]
+   DBDIR=[pathname to database]/database/
+   PATH=$PATH:[pathname to ace software directory]/bin
+   export ACEDB
+   export DBDIR
+   (PATH was already exported)
+   
+      Testing the Solution
+      
+   Use the echo command to make sure the environment variables are in
+   place. We put our "contacts" database under /home/httpd because that
+   directory is accessible to the web server. This is a requirement of
+   AceBrowser, which we want to use as the primary interface.
+   
+   A test of the $ACEDB environment variable looks like this:
+   echo $ACEDB (return)
+   
+   It returns this:
+   /home/httpd/database/contacts/
+   
+      Consequences of the Solution
+      
+   The NOTES file distributed with this version of ACEDB advises you to
+   move the acedb and textace scripts to /usr/local/bin, and using them
+   to start the program. With your environment variables in place, you
+   can simply use xace or tace instead.
+   
+    Permissions
+    
+   Take your permissions seriously. Richard Durbin's Installation Guide
+   is out of date, but gives good advice in this department.
+   
+  Gifaceserver
+  Warning: this isn't yet working completely
+  
+    Problem
+    
+   Most documentation dealing with this software simply tells you to get
+   it going. The software comes with no documentation whatsoever. No
+   README at all. There is a manual that comes in /acedocs called
+   aceserver.html. Its installation instructions don't work on version
+   4.7g.
+   
+    Solution
+    
+   The best installation information is in the README file for
+   AcePerl-1.54. A few more hints are listed here.
+   
+   The AcePerl README file implies creating a user called acedb. This
+   creates permissions problems that we haven't solved yet. We are using
+   individual user names instead.
+   
+   One thing that no documentation mentions is that we had to move
+   gifaceserver.LINUX to /usr/local/bin/gifaceserver. Obvious, but still
+   makes you wonder while you do it.
+   
+    Inetd.conf
+    
+   Our individual inetd.conf files were completely commented out, and the
+   daemon stopped because of our dispersed locations. Append the required
+   line to the file, and enter:
+   
+   Killall -HUP inetd
+   
+    server.log
+    
+   The server really wants a server.log file, writable by the user to
+   whom the gifaceserver is assigned in the inetd.conf file. We created
+   one by opening the gifaceserver on a fake port number (12345):
+   
+   /usr/local/bin/gifaceserver /home/httpd/database/contacts 12345
+   1200:1200:10
+   
+Models
+
+  Documentation
+  
+   The best documentation for models is in /acedocs/exploring/*. The
+   table of contents is in /acedocs/exploring/toc_models.html.
+   Unfortunately, like all the ACEDB documentation, it uses absolute
+   pathnames. We have converted these pathnames to relative ones, and
+   will make the document available for download on the Spatial Focus
+   private web page. Although the document is marked "draft" and dated
+   1994, it is thorough and simple. Doesn't appear to be significantly
+   out of date.
+   
+   The moviedb database is the best simple example of a database.
+   
+  Editors
+  
+   ACEDB is picky about its ascii. vi works great. Can't vouch for emacs
+   ;-). Don't use anything nasty like a word processor.
+   
+  White Space
+  
+   It really likes alignment, and it likes tabs. Combining tabs and
+   spaces kills otherwise perfectly good models every five seconds.
+   
+    To Do
+    
+   Solve the mysteries of the failure of AceBrowser. Every other means of
+   access works now.
+
+References
+
+   1. file://localhost/home/lstein/projects/Ace-perl/docs/SERVER_INSTALLATION.HOWTO
+   2. http://www.spatialfocus.com/
+   3. http://stein.cshl.org/

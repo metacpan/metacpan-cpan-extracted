@@ -1,0 +1,56 @@
+---
+abstract: 'A client for Amazon DynamoDB'
+author:
+  - 'Rusty Conover <rusty@luckydinosaur.com>'
+  - 'Tom Molesworth <cpan@entitymodel.com>'
+build_requires:
+  Data::Dumper: '0'
+  IO::Async::Loop: '0'
+  IO::Async::SSL: '0'
+  String::Random: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amazon-DynamoDB
+requires:
+  AWS::Signature4: '0'
+  B: '0'
+  Future: '0'
+  Future::Utils: '0'
+  HTTP::Request: '0'
+  IO::Async::Timer::Countdown: '0'
+  JSON::MaybeXS: '0'
+  Kavorka: '0'
+  LWP::UserAgent: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  MIME::Base64: '0'
+  Module::Load: '0'
+  Mojo::UserAgent: '0'
+  Net::Async::HTTP: '0.30'
+  POSIX: '0'
+  Type::Library: '0'
+  Type::Registry: '0'
+  Type::Utils: '0'
+  Types::Standard: '0'
+  VM::EC2::Security::CredentialCache: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/rustyconover/Amazon-DynamoDB/issues
+  homepage: http://search.cpan.org/dist/Amazon-DynamoDB/
+  repository: git://github.com/rustyconover/Amazon-DynamoDB.git
+version: '0.35'
+x_contributors:
+  - 'Eric Johnson <eric.git@iijo.org>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Rusty Conover <rustyconover@users.noreply.github.com>'

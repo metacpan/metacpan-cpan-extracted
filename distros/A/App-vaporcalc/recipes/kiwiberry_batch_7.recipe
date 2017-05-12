@@ -1,0 +1,28 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "TFA Double Kiwi",
+            "percentage" : "4"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Dragonfruit",
+            "percentage" : "1"
+         },
+         {
+            "type" : "PG",
+            "tag" : "INW Strawberry",
+            "percentage" : "1"
+         }
+      ],
+      "target_pg" : "30",
+      "base_nic_per_ml" : 100,
+      "base_nic_type" : "PG",
+      "target_quantity" : "120",
+      "target_nic_per_ml" : "3",
+      "target_vg" : 70,
+      "notes" : []
+   }
+}

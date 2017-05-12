@@ -1,0 +1,72 @@
+{
+   "abstract" : "Sugary Juju charm authoring goodness",
+   "author" : [
+      "Adam Stokes <adamjs@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-CharmKit",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Kwalitee" : "1.21",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd" : "0.330",
+            "Class::Tiny" : "1.004",
+            "Email::Address" : "1.908",
+            "Expect" : "1.21",
+            "Exporter::Tiny" : "0.042",
+            "File::ShareDir" : "1.102",
+            "Import::Into" : "1.002005",
+            "Module::Runtime" : "0",
+            "Path::Tiny" : "0.076",
+            "Rex" : "v1.3.3",
+            "Set::Tiny" : "0.03",
+            "Smart::Comments" : "1.06",
+            "YAML::Tiny" : "1.69",
+            "autobox" : "0",
+            "autobox::Core" : "0",
+            "boolean" : "0.45",
+            "true" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/charmkit/App-CharmKit/issues"
+      },
+      "homepage" : "https://github.com/charmkit/App-CharmKit",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/charmkit/App-CharmKit.git",
+         "web" : "https://github.com/charmkit/App-CharmKit"
+      },
+      "x_IRC" : "'irc://freenode.net/#ubuntu-solutions'"
+   },
+   "version" : "2.07",
+   "x_serialization_backend" : "JSON::XS version 3.02"
+}
+

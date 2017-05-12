@@ -1,0 +1,258 @@
+---
+abstract: 'record interactive terminal sessions'
+author:
+  - 'Jesse Luehrs <doy@tozt.net>'
+build_requires:
+  File::Spec: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IO::Select: 0
+  IPC::Open3: 0
+  Test::More: 0.88
+  Test::Requires: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132830'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Ttyrec
+provides:
+  App::Ttyrec:
+    file: lib/App/Ttyrec.pm
+    version: 0.02
+requires:
+  Getopt::Long: 0
+  Moose: 0
+  Term::Filter: 0
+  Tie::Handle::TtyRec: 0.04
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/doy/app-ttyrec/issues
+  homepage: http://metacpan.org/release/App-Ttyrec
+  repository: git://github.com/doy/app-ttyrec.git
+version: 0.02
+x_Dist_Zilla:
+  perl:
+    version: 5.018001
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@DOY/TestMoreDoneTesting'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@DOY/GatherDir'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@DOY/PruneCruft'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@DOY/ManifestSkip'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@DOY/MetaYAML'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@DOY/License'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@DOY/Readme'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      name: '@DOY/RunExtraTests'
+      version: 0.013
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@DOY/ExecDir'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@DOY/ShareDir'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@DOY/MakeMaker'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@DOY/Manifest'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@DOY/TestRelease'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@DOY/ConfirmRelease'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@DOY/MetaConfig'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@DOY/MetaJSON'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@DOY/NextRelease'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@DOY/CheckChangesHasContent'
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@DOY/PkgVersion'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@DOY/Authority'
+      version: 1.006
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@DOY/PodCoverageTests'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@DOY/PodSyntaxTests'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@DOY/NoTabsTests'
+      version: 0.05
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@DOY/EOLTests'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@DOY/Test::Compile'
+      version: 2.037
+    -
+      class: Dist::Zilla::Plugin::Metadata
+      name: '@DOY/Metadata'
+      version: 3.03
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@DOY/MetaResources'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@DOY/Git::Check'
+      version: 2.016
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@DOY/Git::Commit'
+      version: 2.016
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@DOY/Git::Tag'
+      version: 2.016
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@DOY/Git::NextVersion'
+      version: 2.016
+    -
+      class: Dist::Zilla::Plugin::ContributorsFromGit
+      name: '@DOY/ContributorsFromGit'
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@DOY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package: {}
+        Dist::Zilla::Role::MetaProvider::Provider:
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
+      name: '@DOY/MetaProvides::Package'
+      version: 1.15000000
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@DOY/PodWeaver'
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@DOY/UploadToCPAN'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: recommends
+      name: TestRecommends
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: 5.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: 5.008
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 5.008
+x_authority: cpan:DOY

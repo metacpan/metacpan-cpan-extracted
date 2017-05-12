@@ -1,0 +1,372 @@
+#------------------------------------------------------------------------------
+# RCS-Id: "@(#)$RCS-Id: pod/v2/afsperlvldb.pod 2e2ca60 Tue Apr 15 13:04:20 2014 +0200 Norbert E Gruener$"
+#
+# © 2005-2014 Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+# © 2003-2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+#             Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<AFS::VLDB> - Class to communicate with the B<AFS Volume Location Server>
+
+=head1 SYNOPSIS
+
+  use AFS::VLDB;
+
+  my $vldb = AFS::VLDB->new(1, 120, 1);
+  $vol->DESTROY;
+
+  $vldb = AFS::VLDB->new;
+  my $ok = $vldb->addsite('server2', 'vicepa', 'volume');
+  $ok = $vldb->remsite('server1', '/vicepa', 'volume');
+
+  $ok = $vos->changeloc('volume', 'server2', '/vicepb');
+
+  $ok = $vldb->removeaddr('192.168.18.25');
+
+  my ($succ, $fail) = $vldb->delentry(['volume', 'volume.projects']);
+  ($succ, $fail) = $vldb->delentry('volume');
+  ($succ, $fail) = $vldb->delgroups('home', 'server', '/vicepa', 1);
+
+  my @addrlist = $vldb->listaddrs('', '', 0, 1);
+
+  my $vldblist = $vldb->listvldb('server1', '/vicepa');
+  my $vldblist = $vldb->listvldbentry('root.afs');
+
+  $ok = $vldb->lock('volume');
+  $ok = $vldb->unlock('volume');
+  $ok = $vldb->unlockvldb('server1', '/vicepa');
+
+  $ok = $vldb->syncserv('server1', '/vicepa');
+  $ok = $vldb->syncvldb('server1', '/vicepa');
+  $ok = $vldb->syncvldbentry('volume');
+
+=head1 DESCRIPTION
+
+This class is used to communicate with the B<AFS Volume Location
+Server> in order to maintain and to administer the Volume Location
+Database (VLDB) maintained by the Volume Location Server.  The VLDB is
+used to allow AFS application programs to discover the location of any
+volume within its cell, along with select information about the nature
+and state of that volume.  This class provides methods to lookup for
+volumes or to lock/unlock them in the DB.  It is used to remove and to
+list DB entries, and to synchronize the VLDB against the AFS
+partitions.
+
+Before you can access any VLDB records you must establish a connection
+to the Volume Location Server.  This is done by the constructor method
+I<new> which returns a VLDB object.  A VLDB object is essentially a
+handle to talk to the Volume Location Server in a given cell.  Such a
+VLDB object is required before any of the other VLDB instance methods
+can be called.
+
+=head1 COMPATIBILITY
+
+There was no version 1 implementation and hence there are no version
+conflicts :-)
+
+=head1 METHODS
+
+=over 4
+
+=item B<CONSTRUCTOR>
+
+=item S< >
+
+=item B<$vldb = AFS::VLDB-E<gt>new([VERBOSE [, TIMEOUT [, NOAUTH [, LOCALAUTH [, CELL [, ENCRYPT]]]]]);>
+
+Creates a new object of the class AFS::VLDB.  An AFS::VLDB object is
+essentially a handle to talk to the Volume Location Server.
+Internally an AFS::VLDB object is a pointer to a ubik_client
+structure, although this may change and the value returned from
+AFS::VLDB::new should always be treaded as an opaque handle.
+
+Set VERBOSE (default 0) to 1 to produce on the standard output stream
+a detailed trace of the method's execution.  TIMEOUT is the time of
+inactivity in seconds before the connection to the VLDB server is
+declared dead (default 90 seconds).  Set LOCALAUTH (default 0) to 1
+only when issuing a command on a server machine.  If NOAUTH is 1
+(default 0) it establishes an unauthenticated connection to the
+server, in which the servers treat the issuer as an unprivileged user.
+CELL (default NULL) specifies the cell in which to run the
+command. Set ENCRYPT to 1 (default 0) to encrypt the connection to the
+VLDB server.
+
+=item B<DESTRUCTOR>
+
+=item S< >
+
+=item B<$vldb-E<gt>DESTROY;>
+
+Destroys the ubik connection to the Volume Location Server and frees the
+ubik_client structure.
+
+
+=item B<INSTANCE METHODS>
+
+=item S< >
+
+=item B<$ok = $vldb-E<gt>addsite(SERVER, PARTITION, VOLUME [, ROVOL, VALID]);>
+
+Defines a new read-only site specified by the SERVER and PARTITION
+arguments, in the Volume Location Database (VLDB) entry of the
+read/write VOLUME (volume name or volume ID number).
+ROVOL specifies either the complete name or volume ID number of the readonly
+volume. This will only be honored if the source read/write volume does not
+already have a readonly volume ID associated with it. If the source
+read/write volume already has a readonly volume ID, the specified ID will
+be ignored, and a warning will be printed.
+If this is not specified and the source read/write volume does not already
+have a readonly volume ID, a volume ID for the readonly volume will be
+allocated for it when the B<vos->release> method is run.
+The automatically allocated readonly volume IDs should be fine for almost
+all cases, so you should almost never need to specify this argument. This
+argument is supported when the AFS Perl modules are linked with the
+OpenAFS system libraries v1.4.12 or later.
+The VALID flag marks the site as up-to-date in the VLDB. You should only
+do this if the new site already has a current readonly replica of the
+volume, but for some reason it is not in the VLDB as a replica site.
+This is useful when an existing read-only volume is dumped and restored
+with the B<-readonly> flag at the new site. This argument is supported
+when the AFS Perl modules are linked with the OpenAFS system libraries
+v1.4.7 or later.
+
+It calls the AFS system library function I<UV_AddSite> or
+I<UV_AddSite2> (OpenAFS v.1.4.12 or later).
+
+=item B<$ok = $vldb-E<gt>changeloc(VOLUME, SERVER, PARTITION);>
+
+Changes the location of the read/write VOLUME (volume name or volume
+ID number) in the VLDB to SERVER and PARTITION.  This method is only
+available with OpenAFS.  It calls the AFS system library function
+I<UV_ChangeLocation>.
+
+=item B<($succ, $fail) = $vldb-E<gt>delentry(VOLUME [, NOEXECUTE]);>
+
+=item B<($succ, $fail) = $vldb-E<gt>delentry(\@VOLUME [, NOEXECUTE]);>
+
+Removes the VLDB entry for each specified VOLUME.  VOLUME is either a
+scalar value or a reference to an array of volume names or of volume
+ids.  If you set NOEXECUTE to 1 (default 0) then the volume name is
+just printed but NOT deleted.  It returns the number of successfully
+deleted volumes and the number of failed volumes.  It calls the
+AFS system library function I<VL_DeleteEntry>.
+
+B<Cautions>
+
+Do not use this method to remove a volume in normal circumstances; it
+does not remove a volume from the file server machine, and so is
+likely to make the VLDB inconsistent with state of the volumes on
+server machines. Use the AFS::VOS remove method to remove both the
+volume and its VLDB entry.
+
+=item B<($succ, $fail) = $vldb-E<gt>delgroups(PREFIX, SERVER, PARTITION [, NOEXECUTE]);>
+
+Removes the VLDB entries for groups of volumes.  PREFIX specifies a
+certain character string for the beginning of the volume name. SERVER
+specifies the file server machine and PARTITION specifies the
+partition name where the volumes where sitting.  If you specify an
+empty string for either PREFIX, SERVER, or PARTITION it is considered
+as a wild card option for this argument.  If you set NOEXECUTE to 1
+(default 0) then the volume name is just printed but NOT deleted.  It
+returns the number of successfully deleted volumes and the number of
+failed volumes.  It calls the AFS system library function
+I<VL_DeleteEntry>.
+
+B<Cautions>
+
+Do not use this method to remove a volume in normal circumstances; it
+does not remove a volume from the file server machine, and so is
+likely to make the VLDB inconsistent with state of the volumes on
+server machines. Use the AFS::VOS remove method to remove both the
+volume and its VLDB entry.
+
+=item B<@addrlist = $vldb-E<gt>listaddrs([HOST [, UUID [, NORESOLVE [, PRINTUUID]]]]);>
+
+Returns all server entries from the VLDB.  An entry is created as the
+File Server initializes and registers the contents of its local
+C<sysid> file in the VLDB.  The return value is an array of hashes.
+If you specify HOST or UUID only the entry for this HOST or UUID is
+returned.  If you set NORESOLVE (default 0) to 1, only the IP address
+is returned.  If you set PRINTUUID (default 0) to 1, the UUID (AFS'
+internal host representation) for each server is also returned.
+
+It calls the AFS system library function I<VL_GetAddrs> or
+I<VL_GetAddrsU>.
+
+B<Important Hint>
+
+In version 2.4.1 the hash key names for "NAME" and "IP" have changed.
+The new names are now "NAME-x" and "IP-x" where "x" is {1,2,3,...}.
+
+You can find an example how to print the entire content of
+returned array of hashes in the C<examples/v2/vldb> directory.
+
+=item B<$vldblist = $vldb-E<gt>listvldb([SERVER [, PARTITION [, LOCK]]]);>
+
+Returns information from the Volume Location Database (VLDB) entry for
+each volume specified.  The return value is a reference to a hash
+table containing the values from the C structure C<nvldbentry>.  The
+actual information returned depends on the combination of arguments
+supplied when the method is applied. Combine the arguments as
+indicated:
+
+ * Every entry in the VLDB: provide no arguments.
+
+ * Every VLDB entry that mentions a certain file server
+   machine as the site for a volume: specify the SERVER argument.
+
+ * Every VLDB entry that mentions a certain partition on any
+   file server machine as the site for a volume: specify the
+   PARTITION argument.
+
+ * Every VLDB entry that mentions a certain partition on a
+   certain file server machine as the site for a volume:
+   combine the SERVER and PARTITION arguments.
+
+If you set LOCK (default 0) to 1 it returns only locked VLDB
+entries. This flag can be combined with the SERVER argument, the
+PARTITION argument, or both.
+
+It calls the AFS system library function I<VolumeInfoCmd>.
+
+You can find an example how to print the entire content of the
+returned hash reference in the C<examples/v2/vldb> directory.
+
+=item B<$vldblist = $vldb-E<gt>listvldbentry(VOLUME);>
+
+Returns information from the Volume Location Database (VLDB) entry for
+the specified VOLUME (volume name or volume ID number).  The return
+value is a reference to a hash table containing the values from the C
+structure C<nvldbentry>.
+
+It calls the AFS system library function I<VolumeInfoCmd>.
+
+You can find an example how to print the entire content of the
+returned hash reference in the C<examples/v2/vldb> directory.
+
+=item B<$ok = $vldb-E<gt>lock(VOLUME);>
+
+Locks the VLDB entry for VOLUME (volume name or volume ID number),
+blocking any operation that requires a write to that entry. The lock
+applies to all of the volume versions associated with the entry, not
+just the one specified.  It calls the AFS system library function
+I<VL_SetLock>.
+
+=item B<$ok = $vldb-E<gt>removeaddr(IP);>
+
+Removes from the VLDB the server entry that includes the address
+specified by the IP argument.  It calls the AFS system library
+function I<VL_ChangeAddr>.
+
+=item B<$ok = $vldb-E<gt>remsite(SERVER, PARTITION, VOLUME);>
+
+Removes the read-only replication site specified by the SERVER and
+PARTITION arguments from the Volume Location Database (VLDB) entry for
+the indicated read/write VOLUME.
+
+This method is useful for removing read-only sites that were
+mistakenly created with the I<addsite> method, before the volume was
+actually released. If a read-only copy already exists at the site, it
+is not affected. However, if this read-only site was the last site
+housing any version of the volume, then the entire VLDB entry is
+removed, even if a copy of the read-only version still actually exists
+at the site.It calls the AFS system library function I<UV_RemoveSite>.
+
+=item B<$ok = $vldb-E<gt>syncserv(SERVER [, PARTITION]);>
+
+Verifies that each volume mentioned in a VLDB entry actually exists at
+the site indicated in the entry. It checks all VLDB entries that
+mention a read/write, read-only, or backup site either on any
+partition on the file server machine specified by the SERVER argument,
+or on the one partition specified by the SERVER and PARTITION
+arguments.
+It calls the AFS system library function I<UV_SyncServer>.
+
+=item B<$ok = $vldb-E<gt>syncvldb(SERVER [, PARTITION]);>
+
+Verifies that the status of the volumes housed either on all
+partitions on the file server machine specified by the SERVER
+argument, or on the single partition specified by the SERVER and
+PARTITION arguments, is recorded correctly in the VLDB.  It calls the
+AFS system library function I<UV_SyncVolume>.
+
+=item B<$ok = $vldb-E<gt>syncvldbentry(VOLUME);>
+
+Verifies that the status of the VOLUME is recorded correctly in the
+VLDB.  It calls the AFS system library function I<UV_SyncVolume>.
+
+=item B<$ok = $vldb-E<gt>unlock(VOLUME);>
+
+Releases the lock on the VLDB entry for the specified VOLUME (volume
+name or volume ID number).  It calls the AFS system library function
+I<UV_LockRelease>.
+
+=item B<$ok = $vldb-E<gt>unlockvldb([SERVER [, PARTITION]]);>
+
+Releases the lock on the VLDB entries
+indicated by the combination of arguments provided:
+
+  * To unlock all entries in the VLDB, provide no arguments.
+
+  * To unlock all entries that mention a file server machine
+    in a site definition, provide its name with the SERVER
+    argument.
+
+  * To unlock all entries that mention a partition on any
+    file server machine in a site definition, provide the
+    partition name with the PARTITION argument.
+
+  * To unlock all entries that mention a specific site,
+    provide both the SERVER and PARTITION arguments.
+
+It calls the AFS system library function I<VL_ReleaseLock>.
+
+=back
+
+=head1 AUTHORS
+
+The code and documentation for this class were contributed by Stanford
+Linear Accelerator Center, a department of Stanford University.  This
+documentation were written by
+
+=over
+
+=item Alf Wachsmann E<lt>alfw@slac.stanford.eduE<gt>, and
+
+=item Norbert E. Gruener E<lt>nog@MPA-Garching.MPG.deE<gt>
+
+=item S< >
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (c) 2005-2011 Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+ Copyright (c) 2003-2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+                         Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+ All rights reserved.
+
+Most of the explanations in this document are taken from the original
+AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ Volume Server/Volume Location Server Interface
+ Edward R. Zayas
+ Copyright (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ Copyright (c) IBM Corporation 2000.
+ All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DOCUMENT VERSION
+
+Revision $Rev: 1078 $

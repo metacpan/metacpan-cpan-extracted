@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache-MP3
+version:      4.00
+version_from: 
+installdirs:  site
+requires:
+    Apache2::RequestRec:           2.000001
+    Audio::Wav:                    0.02
+    CGI::Session:                  4.03
+    Inline::MakeMaker:             0.01
+    Locale::Maketext:              1.03
+    MP3::Info:                     0.8
+    Ogg::Vorbis::Header:           0.02
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,7 @@
+2016-01-20 AnyEvent::DNS::Nameserver v1.2
+Fix for "Bad arg length for Socket::unpack_sockaddr_in, length is 28, should be 16" when accepting IPv6 requests.
+
+2015-03-17 AnyEvent::DNS::Nameserver v1.1
+1)修复文档错误
+
+2015-03-17 AnyEvent::DNS::Nameserver v1.0 release

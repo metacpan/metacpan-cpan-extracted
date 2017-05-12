@@ -1,0 +1,54 @@
+This is a silly little example that shows how you
+can use AnyEvent::WebSocket::Client.
+
+ - jobserver is a Mojolicious::Lite app (also requires Mojo::Redis
+   and a redis server running on localhost) that cordinates and
+   displays job output.
+ 
+ - jobrunner is an AnyEvent::WebSocket::Client program that runs a
+   program locally and sends the output as events via WebSocket
+   to jobserver.
+ 
+ - slowlast is just a program that runs last -30 very slowly so
+   that you can see the output update on the server.
+   
+ - jobviewer is an AnyEvent::WebSocket::Client program that attaches
+   to the jobserver and displays a job as it isrunning via 
+   WebSockets.
+
+There are probably a few bugs and race conditions (in particular
+events may be missing for currently running jobs in the webapp
+or from the jobviewer) and there are probably better ways to do
+this sort of thing, but it demonstrates the library so there it
+is.
+
+Instructions:
+
+  - install the prereqs if they aren't there:
+
+    % cpanm --installdeps .  
+
+  - start the jobserver 
+  
+    % jobserver
+    
+  - in another window run a slow running process that produces
+    some output, you can use slowlast as an example that comes
+    with this distro
+    
+    % slowlast
+  
+  - in your web browser, go to the jobserver url and navigate
+    to the slow running process.  You should see the existing
+    output, plus any new output as it gets sent through the 
+    job server.
+  
+    http://localhost:3000
+
+  - in another window (again!) you can use jobviewer to watch
+    a job in process:
+    
+    % jobviewer
+    ... lists jobs managed by jobserver
+    % jobviewer 1234:1
+    ... watch job 1234:1

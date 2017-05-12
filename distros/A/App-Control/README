@@ -1,0 +1,35 @@
+App::Control
+============
+
+Description
+-----------
+
+App::Control is a simple module to replicate the kind of
+functionality you get with apachectl to control apache, but
+for any script or executable. There is a very simple OO
+interface, where the constructor is used to specify the
+executable, command line arguments, and pidfile, and various
+methods (start, stop, etc.) are used to control the
+executable in the obvious way.
+
+Installation
+------------
+
+The usual ...
+
+> perl Makefile.PL
+> make
+[ > make test ]
+> make install
+
+Copyright
+---------
+
+Copyright (c) 2001 Ave Wrigley. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms as Perl
+itself.
+
+Author
+------
+
+Ave Wrigley <Ave.Wrigley@itn.co.uk>

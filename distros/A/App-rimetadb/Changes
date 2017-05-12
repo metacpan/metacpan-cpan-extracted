@@ -1,0 +1,158 @@
+Revision history for App-rimetadb
+
+0.20    2016-12-10 (PERLANCAR)
+
+	- Add subcommand: function-stats.
+
+	- arguments: Add option --type to filter only arguments with
+	  certain type.
+
+	- Fix SQL statements (ORDER must be after WHERE, query must use
+	  %str%).
+
+
+0.19    2016-12-10 (PERLANCAR)
+
+        - Make subcommand 'arguments' show more details about each function
+          argument. Add subcommand 'argument-stats' that just shows the number
+          of occurrences for each argument.
+
+
+0.18    2016-09-27 (PERLANCAR)
+
+	- Add tab completion.
+
+
+0.17    2016-09-27 (PERLANCAR)
+
+	- Add subcommand: meta.
+
+
+0.16    2016-03-10 (PERLANCAR)
+
+	- Test schema migration during release, not author testing (I
+	  practically never run tests with AUTHOR_TESTING=1).
+
+	- Replace JSON with JSON::MaybeXS.
+
+
+0.15    2016-01-03 (PERLANCAR)
+
+	- Add subcommand: arguments.
+
+
+0.14    2015-12-01 (PERLANCAR)
+
+	- [Bugfix] More SQL fixes, derp.
+
+	- Bump database schema version 4->5 (also add 'mtime' column to
+	  function).
+
+	- functions: [ux] Show full function name when not in detail mode.
+
+
+0.13    2015-12-01 (PERLANCAR)
+
+	- Bump database schema version 3->4 (also add 'dist' column to
+	  function).
+
+
+0.12    2015-12-01 (PERLANCAR)
+
+        - Rename dist from App-UpdateRinciMetadataDb to App-rimetadb. Will make
+          the app a bit more general, e.g. to be used by
+          Dist-Zilla-Plugin-Rinci-AddToDb.
+
+
+0.11    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.10    2015-08-17 (PERLANCAR)
+
+        - Switch from Log::Any to Log::Any::IfLOG.
+
+        - Fix Rinci metadata.
+
+        - Add xt/author/sql_schema_versioned.t.
+
+
+0.09    2014-12-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace Module::Path with Module::Path::More.
+
+
+0.08    2014-12-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update renamed module SHARYANTO::Package::Util ->
+	  Package::MoreUtil.
+
+
+0.07    2014-09-12 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch to SQL::Schema::Versioned (module renamed).
+
+
+0.06     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.05    2014-07-04 (SHARYANTO)
+
+        - [Bugfix] Avoid the use of $_ for loose loops because something else
+          might overwrite it (e.g. during module load(), for modules that don't
+          quite behave).
+
+
+0.04    2014-07-04 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Bump database schema from 1 -> 2 (rename 'module' to 'package').
+
+        [ENHANCEMENTS]
+
+        - Add option: delete. Can be used to avoid deleting old packages from
+          database (via delete=>0 or --nodelete).
+
+        - Add options: -m, -M (like Perl's).
+
+        - Support adding packages with '+Foo::Bar' syntax, without loading
+          module of the same name.
+
+        - Supporting adding package prefixes with '+Foo::Bar::' or
+          '+Foo::Bar::*' syntax.
+
+        - Can now exclude prefixes too (e.g. --exclude 'Foo::Bar' --exclude
+          'Foo::Bar::' to exclude Foo::Bar as well as all packages under it).
+
+
+0.03    2014-06-20 (SHARYANTO)
+
+        - Test with MySQL (in addition to SQLite).
+
+
+0.02    2014-06-20 (SHARYANTO)
+
+        - Add option: --exclude.
+
+        - Make use of progress indicator optional.
+
+
+0.01    2014-06-19 (SHARYANTO)
+
+        - First release.

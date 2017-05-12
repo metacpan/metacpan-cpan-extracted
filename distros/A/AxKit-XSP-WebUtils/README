@@ -1,0 +1,3 @@
+AxKit::XSP::WebUtils is an AxKit XSP tag library for certain things
+that are necessary for building web applications. Things like redirects,
+server_root, url encoding, etc.

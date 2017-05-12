@@ -1,0 +1,101 @@
+<HTML>
+<HEAD>
+<TITLE>LCSS.pm</TITLE>
+<LINK REL="stylesheet" HREF="../html/docs.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;LCSS.pm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+    <LI><A HREF="#name">NAME</A></LI>
+    <LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+    <LI><A HREF="#description">DESCRIPTION</A></LI>
+    <LI><A HREF="#methods">METHODS</A></LI>
+    <UL>
+
+        <LI><A HREF="#lcss">LCSS</A></LI>
+        <LI><A HREF="#css">CSS</A></LI>
+        <LI><A HREF="#css_sorted">CSS_Sorted</A></LI>
+    </UL>
+
+    <LI><A HREF="#export">EXPORT</A></LI>
+    <LI><A HREF="#author">AUTHOR</A></LI>
+    <LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Algorithm::LCSS - Perl extension for getting the Longest Common Sub-Sequence</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Algorithm::LCSS qw( LCSS CSS CSS_Sorted );
+    my $lcss_ary_ref = LCSS( \@SEQ1, \@SEQ2 );  # ref to array
+    my $lcss_string  = LCSS( $STR1, $STR2 );    # string
+    my $css_ary_ref = CSS( \@SEQ1, \@SEQ2 );    # ref to array of arrays
+    my $css_str_ref = CSS( $STR1, $STR2 );      # ref to array of strings
+    my $css_ary_ref = CSS_Sorted( \@SEQ1, \@SEQ2 );  # ref to array of arrays
+    my $css_str_ref = CSS_Sorted( $STR1, $STR2 );    # ref to array of strings</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module uses Algoritm::Diff to implement LCSS and is orders of magnitude
+faster than String::LCSS.</P>
+<P>If you pass the methods array refs you get back array (ref) format data. If
+you pass strings you get a string or a ref to an array of strings.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>
+<H2><A NAME="lcss">LCSS</A></H2>
+<P>Returns the longest common sub sequence. If there may be more than one (with
+exactly the same length) and it matters use CSS instead.</P>
+<PRE>
+    my $lcss_ary_ref = LCSS( \@SEQ1, \@SEQ2 );  # ref to array
+    my $lcss_string  = LCSS( $STR1, $STR2 );    # string</PRE>
+<P>
+<H2><A NAME="css">CSS</A></H2>
+<P>Returns all the common sub sequences, unsorted.</P>
+<PRE>
+    my $css_ary_ref = CSS( \@SEQ1, \@SEQ2 );  # ref to array of arrays
+    my $css_str_ref = CSS( $STR1, $STR2 );    # ref to array of strings</PRE>
+<P>
+<H2><A NAME="css_sorted">CSS_Sorted</A></H2>
+<P>Returns all the common sub strings, sorted from longest to shortest CSS.</P>
+<PRE>
+    my $css_ary_ref = CSS_Sorted( \@SEQ1, \@SEQ2 );  # ref to array of arrays
+    my $css_str_ref = CSS_Sorted( $STR1, $STR2 );    # ref to array of strings</PRE>
+<P>
+<HR>
+<H1><A NAME="export">EXPORT</A></H1>
+<P>None by default.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Dr James Freeman &lt;<A HREF="mailto:james.freeman@id3.org.uk">james.freeman@id3.org.uk</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><EM>perl</EM>.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;LCSS.pm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,462 @@
+1.33 (2014-08-06)
+  * TestBot: set $ENV{USER} to getpwnam($>) to fix discrepancy when running
+    under sudo (as in pbuilder)
+
+1.32 (2014-08-04)
+  [ Damyan Ivanov ]
+  * bot: store real path to the pid directory
+  * bot: remove PID file on exit
+  * fix utf-8 locale detection in 50-client.t
+  * TestBot: test helper module for running a real bot for tests
+  * 50-client.t: check real bot output
+  * TestBot: report bot PID when starting/stopping
+  * convert 52-client-git to TestBot
+  * fix detection of common changes path when using msg_template
+  * require File::Remove and Test::Differences for tests
+  * convert 53-client-git-merges.t to TestBot
+  * convert 54-client-git-squash.t to TestBot
+  * convert t/55-client-git-merges-ff.t to TestBot
+  * convert t/56-client-git-ff-merge-2.t to TestBot
+  * convert t/57-client-git-squash-tags.t to TestBot
+  * avoid double-spaces when formatting messages
+  * bot: honour broadcast channels setting when relaying messages too
+
+  [ gregor herrmann ]
+  * kgb.conf(5): improve documentation for server_addr variable.
+    (Closes: #744689)
+
+  [ Damyan Ivanov ]
+  * kgb-client: add support for setting Git-specific options via the
+    configuration file/command line
+  * point to client backends for backend-specific configuration options
+  * use encoding 'utf8' --> use utf8
+  * replace given/when with chained if/elsif/else
+  * missing newline between =items (POD)
+  * update FSF address
+  * bump years of copyrigght
+  * put GPL_2 as license in Build.PL (gpl2 is not recognised anymore)
+  * move gathering of data from new() to _detect_commits
+  * a new internal method, _reset, for resetting the parsed reflog data
+  * use strict and warnings in tests
+  * tests: replace explicit plans with done_testing()
+  * die when the reflog is empty
+  * fix typo in changelog (wheter -> whether), thanks lintian
+
+1.31 (2013-08-17)
+  * client: default to using json
+  * remove author-login from default message templates
+  * import dirname in Client.pm
+  * configure test git repositories whether test bot is running or not
+  * remove project from default configuration
+  * update documentation about default message templates
+  * add author_name field for CVS commits
+  * client: decode arguments given to --relay-msg
+  * require JSON::XS instead of plain JSON
+
+1.30 (2013-08-09)
+  * bot: fix colorize_change_wrapper
+
+1.29 (2013-08-08)
+  * add versions to all modules
+  * ensure strict and warnings are used everywhere
+
+1.28 (2013-08-08)
+  [ gregor herrmann ]
+  * client: Fix failure with Safe-2.35.
+    Thanks to Petr Písař <ppisar@redhat.com> for the patch.
+
+  [ Damyan Ivanov ]
+  * client: detect UTF8 in full author name
+  * git client: add kgb.enable-branch-ff-notification Git option (true by
+    default) for managing fast forward notifications
+  * declare test dependencies in test_requires
+  * client: add --debug option
+  * git client: chomp git-config-determined config file path before usage
+  * replace ~~ (smartmatch) usage. ~~ is deprecated in perl 5.18
+  * replace given/when usage, declared experimental in perl 5.18
+  * client: verify config file structures
+  * git client: do not die on unknown ref updates (see #706375)
+  * git client: squash creation if numerous tags (>5 currently)
+  * git client: configurable tag squash threshold/message
+  * client: correct POD about Client->format_message arguments
+  * bot: allow setting of "" color to disable colouring of a given item
+  * bot: use App::KGB::Painter for coloring
+  * bot: add --simulate-color option enabling color codes in the dump file
+  * git client: include tag name in the Tag object created from annotated tags
+  * git client: allow specifying project-id via git-config
+  * t/50-client.t: skip tests with UTF-8 commit messages (subversion) unless
+    C_TYPE is known to use UTF-8. RT#80664
+  * adapt to newer JSON-RPC which renamed the client module (RT#80666)
+
+1.27 (2013-05-29)
+ * client:
+   + --repository option is no longer required
+   + add support for entirely client-constructed notifications
+   + verbose complaint when a message cannot be encoded as JSON
+   + add support for batching messages
+   + Git: include author name in commit information (Debian: #700319)
+   + Git: add support for configuring some settings via git-config
+   + Git: implement commit squashing for large branch updates
+ * bot:
+   + support miltiple relay messages per request
+   + properly handle multi-line relayed messages
+   + add rate limit support to JSON message relay implementation
+   + Fix a problem where authentication was sent too late, due to throttling
+     caused by JOIN commands sent earlier. This change uses the AutoJoin plugin
+     that knows how to interact with NickServID properly. Patch contributed by
+     poco-irc maintainer, Hinrik Orn Sigurdsson.
+ * both:
+   + add support for ${project} substitution in web_link
+   + documentation improvements
+ * building
+   + Add Time::Piece and IPC::Run to Build.PL.
+   + Build.PL: create LICENSE file during `make dist'.
+
+1.26 (2013-03-28)
+
+  * update kgb-client.conf manual with the new options
+  * rework Git branch walking
+    avoids multiple notification about merged commits (Closes Debian bug #698133)
+  * notify even if log message is invalid UTF-8
+    notification with log of "(log is invalid UTF-8)" is better than
+    no notification at all
+    (Closes Debian bug #691183)
+
+1.25 (2012-12-27)
+ * Documentation
+   + client/CVS: mention that CVSROOT is a module
+   + add HOWTO.release to MANIFEST
+ * Internal:
+   + Client/Git: rename _process_commit method to _process_changeset to better
+     describe what it does
+ * Client/Server:
+   + add support for using IRC notices
+   + add support for disabling color
+ * Client:
+   + fix --password option definition
+   + rework configuration to make priority explicit
+
+1.24 (2012-11-22)
+  * Documentation:
+    + Document KGB protocol (currently v4 JSON only).
+    + kgb-client.conf(5): add single-line-commit option.
+    + Document web-link configuration via git-config.
+  * Client:
+    + Add a few checks on the configuration file.
+    + Add --man and --help command-line options.
+    + Fix validation of --single-line-commits argument.
+    + Support web-link option via git configuration.
+  * Server:
+    + Avoid responding to senders having .bot. in their hostname.
+    + change default port to 5391. Closes Debian bug #691562 -- port conflict
+      with approx.
+    + kgb-add-project: chown/chmod config (snippet) like kgb.conf.
+    + Use asterisk for web link separator (used also for commit message
+      separator).
+    + Explicitly check and die if included conf file doesn't exist.
+    + Put URL on first line of multi-line notifications.
+    + Put back SVN in requirements now that Module::Build is fixed. See
+      https://rt.cpan.org/Public/Bug/Display.html?id=59593
+
+1.23 (2012-10-20)
+  * t/compile*: use Test::Compile::Internal in order to show verbose errors
+  * Server:
+    + add --debug command line switch
+    + replace --config-dir option with 'include:' configuration item
+      add 'include: "/etc/kgb-bot/kgb.conf.d"' to the default config
+    + default pid_dir to /var/run/kgb-bot
+  * Documentation:
+    + add manuals for kgb.conf and kgb-client.conf
+    + pod.t: test documentation in man*/ too
+    + give example for gitweb URL
+  * Client:
+    + show expanded web-link in verbose mode
+    + dump processed configuration in verbose mode
+    + shorten_url: really return plain URL if shortening is not enabled
+    + send_changes: detailed dump in verbose mode
+    + introduce module-and-branch-re setting and deprecate
+      branch-and-module-re-swap
+
+1.22 (2012-10-14)
+  * kgb-add-project: document the new --dir option
+  * Add API documentation (JSON-RPC only)
+  * Server:
+    + prepend all IRC strings with a hidden character to avoid addressing
+    + honour --foreground when reloading and don't reopen the log
+    + change the delimiters around web links to make konsole users' life
+      easier
+    + pass --config-dir too on restart
+    + add new kgb-split-config script
+    + refuse to load world-readable configuration files
+  * fix a bug in determining the longest common directory in a change set
+
+1.21 (2012-10-11)
+ * Server:
+  + fix exception handling
+  + better error messages
+ * Debli: prepend 'http://deb.li/' to the returned key
+
+1.20 (2012-10-11)
+ * kgb-add-project: avoid using 'keys($hashref)' which requires too recent perl
+ * Client:
+   + add --reposotory to synopsis
+   + fix --repository in CVS example
+   + CVS: silence debugging output
+   + WWW:Shorten::Debli implementation (uses deb.li for URL shortening)
+   + determine default repository type from the environment
+     (makes --repository useless)
+   + determine default module from git directory
+     (makes --module redundant for Git)
+   + allow explicit protocol configuration
+   + saving of last contacted server -- in a separate method
+ * Server:
+   + ensure trailing \n in KGB->out
+   + note repository id on internal errors
+   + conf.d/*.conf style configuration
+   + use exceptions for handling argument errors
+   + turn on utf8 mode on STDOUT/ERR
+   + use shorter timestamp representation
+ * Both:
+   + protocol 4 (JSON-RPC)
+   + plain message relaying (Closes: #689641)
+
+ * some spellchecking
+
+1.19 (2012-10-05)
+
+ * Bot:
+   + add timestamp to log messages
+   + use KGB->out() instead of plain warn() for consistent log messages
+   + tighten auto-responce rate-limit to stop storms in the first screen
+   + silently ignore empty changes
+   + do not crash on internal errors while processing requests
+ * kgb-add-project: sort the channel hashes to make sure "name" is the first
+   key.
+
+1.18 (2012-10-05)
+  * bot: fix channel-must-have-a-repository check for broadcast channels
+
+1.17 (2012-10-05)
+  * improve wording of web-link description
+  * 50-client.t: support keeping temporary directory
+  * declare POD encoding
+  * additional documentation for web-link
+  * explain status-dir in the sample client config
+  * add support for URL shortening via WWW::Shorten
+    + kgb-client: add libwww-shorten-perl to Recommends
+  * client: add --fake option. Fakes a commit to help testing server connection
+    (Closes: #689540)
+  * bot: introduce broadcast channels which receive notifications from all
+    repositories
+    Closes: #688993
+    + introduce private repositories
+  * bot: fail if a repository has no associated channels
+  * typo/doc fixes
+  * kgb-add-project: add option to save config back to file
+
+1.16 (2012-10-03)
+ * Misc
+   + Typos in documentation fixed
+ * Server
+   + indicate replacement using 'brown' (which should be displayed as low
+     intensity red or something) instead of inverse
+   + add script to add simple projects quickly
+   + call $poe_kernel->has_forked in the child process
+     Makes the reload action of the bot work (Closes: #689018)
+   + reopen logs on reload
+   + create log file in the init script, not in postinst
+   + init script: depend on $network facility and add status option.
+   + init script: add pidfile argument to status option
+   + add bot reload to logrotate configuration
+ * Client
+   + honour 'repository' setting in kgb-client.conf (Closes: 688992)
+   + fix forced single-line commit mode. reported by joeyh, fix by dondelelcaro
+ * Both
+   + Add support for plain web links. No URL shortening yet
+   + Protocol v3 (used by client when extra parameters, e.g. web link need to
+     be sent)
+   + Add CVS support (Closes: #689288) (Mostly in the client, but server needed
+     some changes to drop assumptions that commits always have IDs)
+
+1.15 (2011-09-14)
+ * Client:
+   + make File::Touch usage optional, used only when status_dir is present
+   + use single line note for annotated tags
+   + document --status-dir
+   + consistent POD formatting
+   + POD fix for --single-line-commits in synopsis
+ * Server:
+   + fix single line commits with multi-line explaination
+   + move detect_common_dir to App::KGB::Change (as a class method)
+   + no bold revision by default
+   + drop (bold) repository name from the notification
+ * Misc:
+   + fix eg/run-test-bot-dump
+   + My::Builder: make the 'orig' target also provide a (hardlinked)
+     distribution archive
+ * Tests:
+   + initially trim the dump file only if existing
+   + fix single line notification separator
+   + tags are single line too
+   + add tests for decect_common_dir
+   + more extensive tests for debian/patches series some.patch (still passing)
+1.14 (2011-08-24)
+  * Client:
+   + pass the client instance to the server ref
+   + add an option to keep the last used server in a directory
+  * Server:
+   + do not pre-pad $path_string if it is empty
+   + make the message separator colorizable (and leave gray for now)
+   + avoid calling md5_hex with wide characters
+  * Both:
+   + add support for single line commit notifications
+  * Meta:
+   + add MANIFEST and META.yml to MANIFEST (and the distribution)
+  * Misc
+   + provide examples for running two test bots
+   + provide test client configuration
+   + use sample test client config in tests
+1.13 (2011-08-13)
+  * bot: add --simulate option
+  * remove dead code
+  * run-test-bot passes arguments to kgb-bot
+  * change the port of the test bot
+  * silence more git jabber during tests
+  * add tests for simulated IRC output
+1.12 (2011-08-13)
+  * Updated META.*
+1.11 (no public release)
+  * test creation of brand new, orphan branch
+  * fix: no warnings when commits have no author
+  * bot: log repository on authentication failure
+  * put tag name in changes for plain tags too
+  * bot: always decode parameters
+1.10 (2011-08-11)
+  [ Daman Ivanov ]
+  * disable indexing of privinc/
+  * fix a couple of cases of conrdirtional declaration
+  * add a Perl::Critic test for conditional declarations
+  * bot: do not answer back if no answers are configured
+  * rate-lmit autoresponses
+1.09 (no official release)
+  [ Damyan Ivanov ]
+  * Skip some tests when required SVN::* or Git modules are unavailable
+  * Fix dist_name from App::KGB to App-KGB
+1.08 (2011-08-05)
+  [ Damyan Ivanov ]
+  * Fix version disparity between App::KGB and kgb-bot
+1.07 (2011-07-26)
+  [ Damyan Ivanov ]
+  * Client::Git: use --format=raw when describing annotated tags
+1.06 (2010-12-04)
+  [ gregor herrmann ]
+  * kgb-bot:
+    - fix typo when accessing global config
+    - call polygen_available with full class name
+  [ Damyan Ivanov ]
+  * kgb-bot: drop the asterix prefix from revision number
+  * Makefile: fix (real|dist)clean targets to use ./Build for the real work
+  * App::KGB::Change:
+    + fix typo in POD
+    + make the stringification method public and document it
+  * t/52-client-git.t: when comparing changes, force objects to stringify
+  * MANIFEST.SKIP: add MYMETA.yml
+  * fix typo in Client::Subversion POD
+
+1.05 (2010-09-10)
+  * kgb-bot: use File::Which to find polygen binary; split out the
+    polygen-finding function; closes: #593631
+  * kgb-bot: check existence of polygen binary before using it;
+    closes: #593633
+  * add gregor to copyright holders
+  * move polygen detection entirely at runtime
+  * any problems in finding polygen binary are logged only when debug is
+    enabled as a counter-measure against remotely-assisted log abuse
+
+1.04 (2010-08-03)
+  * use Digest::SHA from core instead of ::SHA1
+  * remove references to Svn::* from Build.PL
+    Closes: #582739 (by working around #589812)
+
+1.03 (2010-04-28)
+  * Synchronized versions of kgb-bot and KGB
+
+1.02 (no official release)
+  * Protocol v2
+    + Adds a new parameter, revision prefix, which is printed plain before the
+      bold commit ID
+    + The default revision prefix is empty ('')
+    + Subversion revision prefix is 'r'
+
+1.01 (2009-12-05)
+  * Client: drop branch/module detection if not all changed paths are in the
+    same branch/module
+
+1.00 (2009-12-02)
+  * ServerRef: send commit_id as a string
+  * Commit: decode UTF-8 log messages
+  * ServerRef: encode all strings before sending
+
+0.16 (2009-11-24)
+  * bot:
+    + print the path information part along the author and revision
+
+0.15 (2009-11-07)
+  * bot:
+    + bump years of copyright
+    + make manual page speak about 'kgb-bot', not 'KGB'
+    + out(): this is a class method, do not print the first argument
+    + remove the '_ECHO_' network
+  * Git:
+    + more robust commit parsing
+    + fix describing newly created branches
+  * client:
+    + fail gracefuly when repo type module is not available
+  * tests
+    + support sending test commits to a live running bot when
+      TEST_KGB_BOT_RUNNING is in the environment
+
+0.14 (2009-11-02)
+  * Git: fix describing merge commits
+  * bot: replace change flags (A+)... with colors
+  * bot: avoid sending changed files list for commits that don't
+    contain changed files
+  * bot: always detect common changes directory
+
+0.13 (2009-11-01)
+  * kgb-bot: fix the code detecting common root for all changes
+
+0.12 (2009-10-31)
+  * add a test ensuring that App::KGB and kgb-bot are the same version
+  * client
+    + honor branch and module supplied by commit
+    + make server choice stable within one client call
+    + Git
+      - drop autodie and check for error when calling open()
+      - when describing changes, use App::KGB::Change objects
+      - fix parsing of multi-line log messages
+      - fix reverse commit order on branch updates
+      - special handling of signed/annotated tags
+      - use raw commit logs to detect file additions/removals
+
+0.11 (2009-10-26)
+  * move generation of a smart answers to a subroutine
+  * make the autoresponder use polygen
+  * fix typo in an error message
+
+0.10 (2009-10-25)
+  * kgb-bot has its own version. no longer pulls the client via App::KGB
+
+0.09 (2009-10-24)
+  * print unhandled IRC stuff only when debugging is enabled
+  * implement logging
+  * drop auto-rejoin TODO item (sort of done)
+  * move discovery of sender's net into a subroutine
+  * respond to CTCP requests
+  * implement !version command
+  * MANIFEST.SKIP: also skip blib
+  * make orig target invoke d/rules clean to ensure the tarball is created
+    off a clean tree
+  * test-server.conf: use local irc server for testing
+    test server considers all local users admins
+  * handle both public and private messages

@@ -1,0 +1,13 @@
+#--- select one Plugin module and config file
+Plugin:
+  Name: 'DistByTime' 
+  Config: '/var/www/perl/Apache2/BalanceLogic/Config/PluginConfig/DistByTime.yaml'
+  #Name: 'DistByCookie' 
+  #Config: '/var/www/perl/Apache2/BalanceLogic/Config/PluginConfig/DistByCookie.yaml'
+  #Name: 'DistByURL' 
+  #Config: '/var/www/perl/Apache2/BalanceLogic/Config/PluginConfig/DistByURL.yaml'
+
+#--- your server admin ipaddress. it can use __force__ option.
+ADMIN_IP:
+  - 127.0.0.1
+  #- 192.168.1.0/24

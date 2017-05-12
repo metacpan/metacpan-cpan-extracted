@@ -1,0 +1,39 @@
+---
+abstract: 'Sendmail Milter that limits message rate by sender'
+author:
+  - 'Michael Schout <mschout@cpan.org>'
+build_requires:
+  Module::Signature: '0'
+  Socket: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Milter-Limit
+requires:
+  Carp: '0'
+  Class::Accessor: '0'
+  Class::Singleton: '0'
+  Config::Tiny: '0'
+  Exporter: '0'
+  File::Path: '2.0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  POSIX: '0'
+  Pod::Usage: '0'
+  Proc::PID::File: '0'
+  Sendmail::PMilter: '0.98'
+  Sys::Syslog: '0'
+  base: '0'
+  lib: '0'
+  strict: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-Milter-Limit
+  homepage: http://search.cpan.org/dist/App-Milter-Limit/
+  repository: git://github.com/mschout/milter-limit.git
+version: '0.52'

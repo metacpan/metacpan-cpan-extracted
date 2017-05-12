@@ -1,0 +1,66 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: AtteanX-Store-LDF
+Upstream-Contact: KJETILK <kjetilk@cpan.org>, Kjetil Kjernsmo <kjetilk@cpan.org>, and Patrick Hochstenbach (HOCHSTEN) <patrick.hochstenbach@ugent.be>
+Source: https://metacpan.org/release/AtteanX-Store-LDF
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ lib/AtteanX/Plan/LDF/Triple.pm
+ t/00-load.t
+ t/planner.t
+ t/triplestore.t
+Copyright: Copyright 2016 Kjetil Kjernsmo and Patrick Hochstenbach.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ demo/README
+ demo/boot.sh
+ demo/test.json
+ demo/test.pl
+ demo/test.psgi
+ demo/test.ttl
+Copyright: Unknown
+License: Unknown
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: README
+ lib/AtteanX/Store/LDF.pm
+Copyright: This software is copyright (c) 2015 by Patrick Hochstenbach.
+ This software is copyright (c) 2016 by Patrick Hochstenbach and Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/Test/Attean/Store/LDF/Role/CreateStore.pm
+Copyright: This software is copyright (c) 2015 by Patrick Hochstenbach.
+ This software is copyright (c) 2015, 2016 by Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/AtteanX/Query/AccessPlan/LDF.pm
+Copyright: This software is copyright (c) 2016 by Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2016 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2016 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

@@ -1,0 +1,14 @@
+Revision history for Perl extension Algorithm::FloodControl.
+
+1.99  Bugfixes
+1.96  опять без подписи :-( ну нахрена я его подписать решил?
+1.95  Я хочу есть и спать. А не править баги в этом модуле.
+1.94  Опять проебал
+1.93  Чтв Ноя  6 15:56:46 MSK 2008
+      SIGNATURE
+1.92  Чтв Ноя 6 15:49:01 MSK 2008
+      is_user_overrated returns not only true/false, but timeout until unlocking
+1.91  Wed Nov 5 14:56:01 MSK 2008
+      Params::Validate for all methods
+1.90  Tue Nov 4 04:08:38 MSK 2008
+	  Support for OO. Backends for Cache::Memcached(::Fast), Cache::FastMmap

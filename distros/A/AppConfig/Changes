@@ -1,0 +1,135 @@
+Revision history for Perl module AppConfig
+
+1.71 2015-03-01 NEILB
+    - Switched to a much more concise README, rather than one based on the pod.
+      SHLOMIF++
+    - Added documentation for the varlist() method to the doc for
+      AppConfig::State. RT#36409
+    - Added "use 5.006" to all the modules. RT#47799
+    - Fixed syntax error in doc. RT#74104
+
+1.70 2015-03-01 NEILB
+    - Some trailing spaces removed. SHLOMIF++
+    - Min perl specified in the dist metadata. SHLOMIF++
+    - Scoped declaration of $_ to fix warning. RT#68068 CELOGEEK++
+    - Fixed mistake in documentation - RT#35640, Steve Bertrand++
+
+1.69 2015-02-12 NEILB
+    - License type added to metadata. ASB++
+    - Fixed typo in code example. ASB++
+    - Reformatted this file as per CPAN::Changes::Spec
+
+1.68 2015-02-03 NEILB
+    - Spelling corrections for docs. RT #84896. ASB++
+    - Added pod release-time test. ASB++
+    - Added links to entries in SEE ALSO. ASB++
+
+1.67 2015-01-18 NEILB
+    - Version bumped for a non-developer release, now I've sorted all
+      the pod issues.
+    - Added github repo to metadata and pod
+
+1.66_03 2015-01-16 NEILB
+    - More pod & whitespace cleanup
+
+1.66_02 2015-01-15 NEILB
+    - Getting pod fails from CPAN Testers for various recent versions
+      of Perl. There was an empty =item. RT #84318.
+
+1.66_01 2015-01-10 NEILB
+    - First dev release, to check that everything's ok.
+    - ABW granted co-maint, so I could set up a github repo and do a
+      release with it linked. Thanks to ABW, ADAMK, and MST.
+
+1.66 2007-07-06 ABW
+    - Removed File::HomeDir from the test scripts.
+
+1.65 2007-05-30 ABW
+    - Changed meaning of '~' interpolation to mean $ENV{HOME} rather than
+      $ENV{HOME} or wherever File::HomeDir thinks your home directory is.
+      This allows us to remove the dependency on File::HomeDir which was
+      causing insallation problems (particularly on Mac OSX), and led to
+      a long dependency chain for AppConfig and other modules that rely on
+      it (like Template Toolkit).
+
+1.64 2007-01-02 ADAMK
+    - Bug fix to prevent crashing for users with no home directory
+    - Increase File::HomeDir dep to 0.61 which supports no home directory
+      cases properly.
+
+1.63 2006-08-03 ADAMK
+    - Unified version numbers and removed repository magic
+    - Removed "use warnings" to get the Perl version dependency back to 5.005
+    - Removed "use base Exporter" which doesn't always work
+    - Use File::HomeDir to find $HOME instead of doing it ourself, sorta
+    - Fixed a POD bug in AppConfig::Sys and added a 99_pod.t test
+    - Added a LICENSE file
+
+1.56 2004-02-04 ABW
+    - Applied a patch from Jianhong Feng to add "heredoc" style quoting.
+    - Applied patch from Dave Viner to AppConfig::Sys to fix problems on
+      Win32.  Thanks also to Ijon Tichy for a similar patch.
+    - Applied patch from Axel Gerstmair to prevent undefined variable
+      warnings in block.t test.
+
+1.55 2003-04-29 ABW
+    - Fixed version numbers of various files which had got out-of-step
+      with CPAN.
+
+1.54 2003-04-29
+    - Added POSIX style '=value' suffixes to --parameters.  Thus '--foo=bar'
+      is now equivalent to '-foo bar'.
+    - Added AppConfig::CGI module to parse CGI script parameters.
+    - Added cgi() delegate method to AppConfig to instantiate and call
+      AppConfig::CGI.
+    - Added CGI documentation and cleaned up copious typos, grammos and
+      thinkos.
+    - Applied documentation patches from Tim Mooney.
+    - Fixed missing '>' tyop which caused POD to complain.  Thanks to
+      David Cantrell and many others for reporting it.
+    - Applied patch from Steven McDowall to provide default options
+      for LIST and HASH data types.
+    - Applied patch from Robert Goff to allow '$' to be escaped (e.g. \$)
+      to suppress variable expansion in files.
+    - Applied patch from John Salmon to allow comments to appear anywhere
+      on a line, not just at the beginning.
+
+1.53 not released
+    - various changes, incorporated above.
+
+1.52 1998-10-29 ABW
+    - Modified AppConfig::Getopt to work with Getopt::Long version 2.17,
+      instead of the yet-to-be-released-as-of-29-Oct-1998 version 2.93
+      (3.00 beta).  Getopt::Long version 3.00 offers object-orientation
+      but will continue to be backwardly compatible with earlier versions.
+      Thus, AppConfig::Getopt should continue with future versions of
+      Getopt::Long.  Nice one, Johan!
+    - Added code to AppConfig::State::define() to handle the compact format.
+      The ALIAS and ARGS options are extracted from it and the ARGCOUNT
+      is determined from the ARGS parameter.
+    - Added Getopt::Long version 2.17 as a dependency in Makefile.PL.
+      Added documentation to note this and explain how to modify the
+      Makefile.PL to avoid this check.
+    - Added t/compact.t and expanded t/getopt.t test files.
+    - Added documentation for AppConfig::Getopt use and the compact definition
+      format.
+    - Added documentation for +/- prefix format in configuration files.
+    - Other minor documentation fixes.
+
+1.51 1998-10-22 ABW
+    - Added '+variable' (set on) and '-variable' (reset to 0 or default)
+      syntax for configuration files, as suggested by Chip Salzenberg.
+    - Fixed auto-creation of variables that was generating two warning
+      messages each time.
+    - Removed some straggling references to the AppConfig::Const module.
+    - Changed Makefile.PL to explicitly list MAN3PODS for all AppConfig::*
+      modules.  ExtUtils::MakeMaker ignores files that match the pattern
+      /(config|setup).*\.pm/i;  Thanks to Alex Medina for catching that.
+
+1.50 1998-10-21 ABW
+    - Completed documentation.
+    - First public beta release.
+
+0.01 1998-10-12 ABW
+    - First release to CPAN
+

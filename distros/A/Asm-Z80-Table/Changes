@@ -1,0 +1,17 @@
+0.03	2015-12-28
+	Other
+	* Add link to git repository
+
+0.02	2010-11-21
+	Bug Fixes
+	* POD update
+	New Features
+	* The RST instruction takes as its parameter either the address to jump to 
+	  or the reset vector number - this is just the address / 8.
+
+0.01    2010-11-20
+	* Spin off CPU::Z80::Assembler, to be usable by other modules
+	Changes from original CPU::Z80::Assembler::AsmTable:
+	* Accept 'jr <po|pe|p|m>,NN', compile 'jp ...' instead
+	* do not support variants of ixh, ixl, iyh, iyl (xh, hx, ...)
+	* do not support [] instead of ()

@@ -1,0 +1,239 @@
+BRN(1)                User Contributed Perl Documentation               BRN(1)
+
+
+
+NNAAMMEE
+       brn - bulk rename - a fork of rename.
+
+SSYYNNOOPPSSIISS
+       bbrrnn [ { --vv | --qq } ... ] ] [ --nn ] [ --ff ] [ --DD ] [ --CC _c_o_n_f_i_g_p_a_t_h ]
+       [ --MM _p_e_r_l_m_o_d_u_l_e ] [ --pp _p_e_r_l_e_x_p_r [ --pp _p_e_r_l_e_x_p_r ... ] ]
+       { [ --ee ] _p_e_r_l_e_x_p_r | --uu _p_r_e_s_e_t } [ _f_i_l_e_s ... ]
+
+       bbrrnn [ --CC _c_o_n_f_i_g_p_a_t_h ] { --LL | ----lliisstt } [ _p_r_e_s_e_t ] ...
+
+       bbrrnn [ --CC _c_o_n_f_i_g_p_a_t_h ] ...  { --SS | ----ssaavvee } _p_r_e_s_e_t
+
+       bbrrnn --VV | ----vveerrssiioonn
+
+       bbrrnn --?? | ----hheellpp
+
+       bbrrnn --RR | ----rreeaaddmmee
+
+       bbrrnn --mm | ----mmaann
+
+DDEESSCCRRIIPPTTIIOONN
+       "brn" renames the filenames supplied according to the rule(s) given by
+       the --expr (-e) option(s). If no such option is present then the first
+       argument is taken to be the rule. The _p_e_r_l_e_x_p_r argument is a Perl
+       expression which is expected to modify the $_ string in Perl for at
+       least some of the filenames specified. If a given filename is not
+       modified by the expression, it will not be renamed. If no filenames are
+       given on the command line, filenames will be read via standard input.
+
+       For example, to rename all files matching "*.bak" to strip the
+       extension, you might say
+
+               brn 's/\.bak$//' *.bak
+
+       To translate uppercase names to lower, you'd use
+
+               brn 'y/A-Z/a-z/' *
+
+       brn loads all Modules into a _USER package, and this is also where all
+       expresions are evaluated. Note that the _USER package doesn't have
+       'strict' turned on, so variables do not need to be pre-declared. There
+       are also a few predefined helper functions in its scope, to ease common
+       rename tasks.
+
+       In void context, all of these helper functions output as if in scalar
+       context by modifing their first parameter or $_ (if their parameter is
+       unmodifiable). They will use $_ for their input data if called without.
+       Thus, one can now uppercase all files in a directory just by saying
+
+               brn 'uc' *
+
+       This can also be used in expression interpolation inside larger
+       strings, so as to achieve more complex results. The command:
+
+               brn 's/Show-(.*?).avi/Show - @{[ hc(spc($1)) ]}.avi/' *
+
+       Will extract a substring, perform space replacement, convert to
+       highlight case, and re-insert the substring back into the name.
+
+       The full set of helper functions are:
+
+       sslluurrpp       slurp reads in an entire file given a filename or
+                   filehandle. In array context it returns individual chomped
+                   lines, while in scalar context it returns the entire file.
+
+       rrdd          rd reads entire directories and is the equivalent of slurp.
+                   In array context it returns an array containing all the
+                   entries in all the directories passed to it. In scalar
+                   context it returns all the directory names in a single
+                   string, separated by newlines.
+
+       ssppcc(($$;;$$))    by default _s_p_c_(_) takes a string and returns it with all
+                   dots ('.') and underscores ('_') converted to spaces. An
+                   optional second argument can provide a string of characters
+                   that overrides the list of characters to convert to spaces.
+
+       sscc(($$))       _s_c_(_) returns its input string converted to 'Sentence' case,
+                   meaning that the letter of each embedded sentence will be
+                   capitalized.
+
+       ttcc(($$))       _t_c_(_) returns its input string converted to 'Title' case,
+                   meaning that the first letter of each word is uppercased.
+
+       hhcc(($$))       _h_c_(_) returns its input string converted to 'Highlight'
+                   case, meaning that the first letter of each non-trivial
+                   word is uppercased.
+
+OOPPTTIIOONNSS
+       --vv, ----vveerrbboossee
+               Verbose: increases the verbosity of brn. This option can appear
+               multiple times, and each appearance increases brn's verbosity
+               level by one. The option ----qquuiieett can be used to decrease
+               verbosity.  The following table lists the information presented
+               at different verbosity levels. The default verbosity is 1.
+
+                   -1 VVeerryy QQuuiieett     No Text Output at All
+                    0 QQuuiieett          Only Display Errors
+                    1 NNoorrmmaall         Display Errors and Warnings
+                    2 VVeerrbboossee        List the Files being Processed.
+
+               Note that currently not all text is surpressed at level -1.
+
+       --qq, ----qquuiieett
+               Quiet: decreases the verbosity level of brn by 1. See ----vveerrbboossee
+               for a discussion of verbosity levels.
+
+       --nn, ----nnoopp
+               No Operation (NOP): show what files would have been renamed.
+
+       --ff, ----ffoorrccee
+               Force: overwrite existing files.
+
+       --DD, ----ddeebbuugg
+               Debug: Turn on internal debugging shims. Intended for
+               developers only.
+
+       --ee, ----eexxpprr
+               Expression: this option holds a rename expression to be used to
+               rename files. Multiple instances of this flag may appear on the
+               command line, and they are executed in order, for each file
+               specified.
+
+               If no occurance of this flag appears on the command line, then
+               the first argument will be taken as a rename expression and
+               subsequent arguments will be taken as file names.
+
+               If this flag does appear on the command line, then all
+               arguments are assumed to be file names.
+
+       --MM _m_o_d_u_l_e_[_=_f_o_o_,_b_a_r_]
+               Load the listed modules at the start of the program. If the
+               optional extra parameters are added, then they will be used to
+               import the listed functions. Multiple instances can appear on
+               the command line, and they will be loaded in the order given.
+
+       --pp _p_e_r_l_e_x_p_r, ----pprreeaammbbllee=_p_e_r_l_e_x_p_r
+               Preamble: execute the expression once, before looping over the
+               files to rename, this can be useful to load data files or do
+               other setup before complex rename procedures. Multiple
+               preambles can be given, and they will be executed in order.
+
+       --uu | ----uussee _p_r_e_s_e_t
+               Use preset: Rather than specifying a complex operation on the
+               command line, you can also save a set of command line options
+               in a config file, and use them by using the 'use' option. By
+               default the config file is stored in _$_{_H_O_M_E_}_/_._c_o_n_f_i_g_/_r_n_._c_o_n_f
+               but this can be changed with the ----ccoonnffiigg (--cc) command.
+               Multiple use options can be specified, and their operations
+               will be executed in turn.
+
+       --SS | ----ssaavvee _p_r_e_s_e_t
+               Save preset: Rather than executing the contents of the current
+               command line, the options will be stored in the rn config file
+               under the given preset name.
+
+       --LL | ----lliisstt _p_r_e_s_e_t
+               List preset: Rather than performing a rename operation, just
+               list the command line options stored under the given preset
+               name. Multiple ----lliisstt options can be given, to see multiple
+               presets.
+
+       --CC | ----ccoonnffiigg _c_o_n_f_i_g_p_a_t_h
+               Normally, all stored presets are assumed to be in the default
+               location, which is _$_{_H_O_M_E_}_/_._c_o_n_f_i_g_/_r_n_._c_o_n_f, but this can be
+               changed on a preset-by-preset basis with the ----ccoonnffiigg option,
+               which allows you to specify the full pathname of another config
+               file.
+
+               If a preset itself references other presets then they will be
+               looked up either in the last specified config file, which will
+               be the one specified in that preset (if any).
+
+       --VV | ----vveerrssiioonn
+               Version: display the current version of this program.
+
+       --??, ----hheellpp
+               Help: Display this documentation.
+
+       --mm, ----mmaann
+               Manual: Display a full man page.
+
+EEXXIITT CCOODDEESS
+       brn returns an exit code indicating the success or failure of the
+       requested operation. 0 always indicates a success. A return code less
+       than 16 indicates success in an auxiliary function of brn (such as
+       successfully return its version.) Starting at 16, the error codes
+       indicate various fatal errors.
+
+            0 NNoonnee           No Error
+            1 HHeellpp           Help was requested
+            2 DDooccss           Readme or manual was requested
+            3 IInnffoo           Other information was requested
+           16 GGeenneerraall        Unknown Error
+           17 NNooSSuucchhFFiillee     File Not Found
+           18 BBaaddCCoonnffiiggFFiillee  Configuration File Error
+           19 BBaaddPPrreesseett      No Such Preset
+           20 NNoottIImmpplleemmeenntteedd This Feature is Currently Not Implemented
+
+EENNVVIIRROONNMMEENNTT
+       The 'HOME' environment variable is used to determine the default
+       location of the rn.conf file.
+
+AAUUTTHHOORR
+        Original Author: Larry Wall
+        Second Author:   Robin Barker
+        Current Author:  Stirling Westrup
+
+SSEEEE AALLSSOO
+       _m_v(1), _p_e_r_l(1), _r_e_n_a_m_e(1), _p_r_e_n_a_m_e(1), _F_i_l_e_:_:_r_e_n_a_m_e(3pm),
+       _A_p_p_:_:_p_e_r_l_m_v(3pm)
+
+DDIIAAGGNNOOSSTTIICCSS
+       If you give an invalid Perl expression you'll get a syntax error.
+
+BBUUGGSS
+       There are probably innumerable bugs in this code as it is still in
+       alpha state. Among the known problems are the possibly incorrect
+       chaining of -u options, and the failure to always maintain the order of
+       mixed -e and -u options.
+
+       In addition there are many stubs for features that do not yet work
+       fully (if at all) and the documentation is slightly behind the work.
+
+HHIISSTTOORRYY
+       The original "rename" did not check for the existence of target
+       filenames, so had to be used with care.  I hope I've fixed that (Robin
+       Barker).
+
+       The original "rename" seemed to me to be lacking a number of useful
+       features, and as its last update had been back in 1998, I (Stirling
+       Westrup) decided to fork a version to work on.
+
+
+
+perl v5.14.2                      2012-07-17                            BRN(1)

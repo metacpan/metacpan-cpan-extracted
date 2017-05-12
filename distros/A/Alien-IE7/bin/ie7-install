@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+
+###############################################################################
+# Required inclusions.
+###############################################################################
+use strict;
+use warnings;
+use Alien::IE7;
+use Getopt::Long;
+use Pod::Usage;
+
+###############################################################################
+# Read in our command line arguments.
+###############################################################################
+my $quiet;
+my ($help, $man);
+GetOptions(
+    'quiet'     => \$quiet,
+    'help|?'    => \$help,
+    'man'       => \$man,
+    ) || pod2usage(1);
+pod2usage(1) if ($help);
+pod2usage( -exitstatus=>0, -verbose=>2 ) if ($man);
+
+my $dir = shift || './ie7';
+
+###############################################################################
+# Install IE7.
+###############################################################################
+print "Installing IE7 to $dir\n" unless ($quiet);
+Alien::IE7->install( $dir );
+print "... done\n" unless ($quiet);
+
+=head1 NAME
+
+ie7-install - IE7 javascript library installation
+
+=head1 SYNOPSIS
+
+  ie7-install [options] destdir
+
+  Options:
+    --quiet     Install quietly; only report errors
+    --help/-?   Brief help message
+    --man       Full documentation
+    destdir     Directory to install to (default "./ie7")
+
+=head1 DESCRIPTION
+
+Installs the IE7 javascript compability library, using C<Alien::IE7>.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--quiet>
+
+Install quietly; only error messages will be displayed.
+
+=item B<--help/-?>
+
+Displays a brief help message.
+
+=item B<--man>
+
+Displays the full documenation.
+
+=item B<destdir>
+
+Directory that the IE7 javascript compatibility library should be installed
+into.  Defaults to F<./ie7>.
+
+=back
+
+=head1 AUTHOR
+
+Graham TerMarsch (cpan@howlingfrog.com)
+
+=head1 LICENSE
+
+Copyright (C) 2007, Graham TerMarsch.  All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Alien::IE7>.
+
+=cut

@@ -1,0 +1,168 @@
+NAME
+    Array::Heap - treat perl arrays as binary heaps/priority queues
+
+SYNOPSIS
+     use Array::Heap;
+
+DESCRIPTION
+    There are a multitude of heap and heap-like modules on CPAN, you might
+    want to search for /Heap/ and /Priority/ to find many. They implement
+    more or less fancy datastructures that might well be what you are
+    looking for.
+
+    This module takes a different approach: It exports functions (i.e. no
+    object orientation) that are loosely modeled after the C++ STL's binary
+    heap functions. They all take an array as argument, just like perl's
+    built-in functions "push", "pop" etc.
+
+    The implementation itself is in C for maximum speed.
+
+FUNCTIONS
+    All of the following functions are being exported by default.
+
+    make_heap @heap (\@)
+        Reorders the elements in the array so they form a heap, with the
+        lowest value "on top" of the heap (corresponding to the first array
+        element).
+
+    make_heap_idx @heap (\@)
+        Just like "make_heap", but updates the index (see INDEXED
+        OPERATIONS).
+
+    make_heap_lex @heap (\@)
+        Just like "make_heap", but in string comparison order instead of
+        numerical comparison order.
+
+    make_heap_cmp { compare } @heap (&\@)
+        Just like "make_heap", but takes a custom comparison function.
+
+    push_heap @heap, $element, ... (\@@)
+        Adds the given element(s) to the heap.
+
+    push_heap_idx @heap, $element, ... (\@@)
+        Just like "push_heap", but updates the index (see INDEXED
+        OPERATIONS).
+
+    push_heap_lex @heap, $element, ... (\@@)
+        Just like "push_heap", but in string comparison order instead of
+        numerical comparison order.
+
+    push_heap_cmp { compare } @heap, $element, ... (&\@@)
+        Just like "push_heap", but takes a custom comparison function.
+
+    pop_heap @heap (\@)
+        Removes the topmost (lowest) heap element and repairs the heap.
+
+    pop_heap_idx @heap (\@)
+        Just like "pop_heap", but updates the index (see INDEXED
+        OPERATIONS).
+
+    pop_heap_lex @heap (\@)
+        Just like "pop_heap", but in string comparison order instead of
+        numerical comparison order.
+
+    pop_heap_cmp { compare } @heap (&\@)
+        Just like "pop_heap", but takes a custom comparison function.
+
+    splice_heap @heap, $index (\@$)
+        Similar to "pop_heap", but removes and returns the element at index
+        $index.
+
+    splice_heap_idx @heap, $index (\@$)
+        Just like "splice_heap", but updates the index (see INDEXED
+        OPERATIONS).
+
+    splice_heap_lex @heap, $index (\@$)
+        Just like "splice_heap", but in string comparison order instead of
+        numerical comparison order.
+
+    splice_heap_cmp { compare } @heap, $index (&\@$)
+        Just like "splice_heap", but takes a custom comparison function.
+
+    adjust_heap @heap, $index (\@$)
+        Assuming you have only changed the element at index $index, repair
+        the heap again. Can be used to remove elements, replace elements,
+        adjust the priority of elements and more.
+
+    adjust_heap_idx @heap, $index (\@$)
+        Just like "adjust_heap", but updates the index (see INDEXED
+        OPERATIONS).
+
+    adjust_heap_lex @heap, $index (\@$)
+        Just like "adjust_heap", but in string comparison order instead of
+        numerical comparison order.
+
+    adjust_heap_cmp { compare } @heap, $index (&\@$)
+        Just like "adjust_heap", but takes a custom comparison function.
+
+  COMPARISON FUNCTIONS
+    All the functions come in two flavours: one that uses the built-in
+    comparison function and one that uses a custom comparison function.
+
+    The built-in comparison function can either compare scalar numerical
+    values (string values for *_lex functions), or array refs. If the
+    elements to compare are array refs, the first element of the array is
+    used for comparison, i.e.
+
+      1, 4, 6
+
+    will be sorted according to their numerical value,
+
+      [1 => $obj1], [2 => $obj2], [3 => $obj3]
+
+    will sort according to the first element of the arrays, i.e. "1,2,3".
+
+    The custom comparison functions work similar to how "sort" works: $a and
+    $b are set to the elements to be compared, and the result should be
+    greater than zero then $a is greater than $b, 0 otherwise. This means
+    that you can use the same function as for sorting the array, but you
+    could also use a simpler function that just does "$a > $b".
+
+    The first example above corresponds to this comparison "function":
+
+      { $a <=> $b }
+
+    And the second example corresponds to this:
+
+      { $a->[0] <=> $b->[0] }
+
+    Unlike "sort", the default sort is numerical and it is not possible to
+    use normal subroutines.
+
+  INDEXED OPERATIONS
+    The functions whose names end in "_idx" also "update the index". That
+    means that all elements must be array refs, with the first element being
+    the heap value, and the second value being the array index:
+
+      [$value, $index, ...]
+
+    This allows you to quickly locate an element in the array when all you
+    have is the array reference.
+
+BUGS
+    *   Numerical comparison is always done using floatingpoint, which
+        usually has less precision than a 64 bit integer that perl might use
+        for integers internally, resulting in precision loss on the built-in
+        comparison.
+
+    *   This module does not work with tied or magical arrays or array
+        elements, and, in fact, will even crash when you use those.
+
+    *   This module can leak memory (or worse) when your comparison function
+        exits unexpectedly (e.g. "last") or throws an exception, so do not
+        do that.
+
+SEE ALSO
+    This module has a rather low-level interface. If it seems daunting, you
+    should have a look at Array::Heap::ModifiablePriorityQueue, which is
+    based on this module but provides more and higher-level operations with
+    an object-oriented API which makes it harder to make mistakes.
+
+    A slightly less flexible (only numeric weights), but also slightly
+    faster variant of that module can be found as
+    Array::Heap::PriorityQueue::Numeric on CPAN.
+
+AUTHOR AND CONTACT INFORMATION
+     Marc Lehmann <schmorp@schmorp.de>
+     http://software.schmorp.de/pkg/Array-Heap
+

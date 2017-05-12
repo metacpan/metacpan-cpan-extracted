@@ -1,0 +1,8 @@
+Revision history for Acme-BottomsUp
+
+0.02    2006-08-17
+	* Added prerequisites to Makefile.PL
+
+0.01    2006-08-14
+	* Initial release
+

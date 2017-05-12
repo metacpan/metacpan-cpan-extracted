@@ -1,0 +1,48 @@
+NAME
+    Alien::Chipmunk - Alien package for the Chipmunk Physics library
+
+SYNOPSIS
+        use Module::Build;
+        use Alien::Chipmunk;
+
+        my $alien = Alien::Chipmunk->new;
+
+        my $builder = Module::Build->new(
+            module_name => 'Some::Library::Chipmunk',
+            # ...
+            configure_requires => {
+                'Alien::Chipmunk' => 0,
+                # ...
+            },
+            build_requires => {
+                'Alien::Chipmunk' => 0
+                # ...
+            },
+            extra_compiler_flags => $alien->cflags,
+            extra_linker_flags   => $alien->libs,
+        );
+
+        $builder->create_build_script();
+
+DESCRIPTION
+    Alien::Chipmunk installs and downloads the Chipmunk Physics library.
+
+SEE ALSO
+    *   Alien
+
+    *   Alien::Base
+
+    *   Chipmunk
+
+AUTHORS
+    Jeffrey T. Palmer <jtpalmer@cpan.org>
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2015 by Jeffrey T. Palmer.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

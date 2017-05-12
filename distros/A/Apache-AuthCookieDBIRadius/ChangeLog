@@ -1,0 +1,12 @@
+Revision history for Perl extension Apache::AuthCookieDBI.
+
+0.01  Mon Apr  3 10:50:32 2000
+	- original version; created by h2xs 1.19
+
+1.18	Tue May 15 11:23:22 2001	 	
+	- rewritten from Apache::AuthCookieDBI 1.18
+
+1.19 	Wed Nov 14 12:06:03 2001
+	- Updated README
+	- Updated perldoc Apache::AuthCookieDBIRadius
+	- UNIVERSIAL::AUTOLOAD was complaining about earlier declarations.

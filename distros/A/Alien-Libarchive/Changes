@@ -1,0 +1,132 @@
+Revision history for Alien-Libarchive
+
+0.28      2016-09-27 14:32:45 -0400
+  - require Alien::Libarchive::Installer 0.15 (gh#5)
+
+0.27      2016-04-11 17:00:12 -0400
+  - Fixes for Strawberry Perl
+
+0.26      2015-06-17 22:35:55 -0400
+  - 01_use.t was still testing old modules
+    (which is fine if you are upgrading)
+    they have now been removed from this test.
+
+0.25      2015-06-17 20:47:36 -0400
+  - Remove old ::Unix and ::MSWin32 modules
+    I believe I was the only one to ever use these,
+    and only by older versions of Alien::Libarchive
+    itself.
+  - Honour the ALIEN_FORCE environment variable a la Alien::Base
+
+0.24      2015-04-22 17:24:15 -0400
+  - Fix the synopsis to be more accurate
+
+0.23      2015-04-22 07:26:11 -0400
+  - install into arch specific directory
+
+0.22      2014-10-08 14:34:37 -0400
+  - add version method
+  - fixed weird recursive deps on MSWin32
+
+0.21      2014-06-19 07:41:16 -0400
+  - promoted to production
+
+0.20_04   2014-06-18 16:02:34 -0400
+  - explicitly declare Alien::bz2::Installer as a configure prereq
+
+0.20_03   2014-06-18 07:55:33 -0400
+  - use Alien::LZO::Installer to find / install libzo2 if possible
+
+0.20_02   2014-06-17 03:49:45 -0400
+  - mock up a libbz2.la on MSWin32 so that bzip2 + libarchive dll works
+
+0.20_01   2014-06-16 18:21:55 -0400
+  - use Alien::bz2::Installer if possible to build libbz2 if it is not provided by OS
+
+0.20      2014-06-10 20:32:27 -0400
+  - mark prereqs as dynamic
+
+0.19      2014-06-10 20:17:45 -0400
+  - dynamic libs handle upgrades more gracefully
+  - promote to production
+
+0.18_06   2014-06-10 10:39:36 -0400
+  - Archive::Libarchive::XS dev compat
+
+0.18_05   2014-06-10 10:19:42 -0400
+  - require Alien::Libarchive::Installer 0.03
+
+0.18_04   2014-06-10 09:19:32 -0400
+  - cflags reference bug fix
+
+0.18_03   2014-06-10 09:06:55 -0400
+  - fix prereqs
+
+0.18_02   2014-06-10 08:36:20 -0400
+  - libs and cflags now return a list in list context and a scalar in scalar context
+    (used to always return a scalar)
+
+0.18_01   2014-06-10 08:19:36 -0400
+  - completely new implementation based on Alien::Libarchive::Installer instead of Alien::Base
+
+0.18      2014-02-03 16:40:43 -0500
+  - Fix ExtUtils::CChecker calling error
+
+0.17      2014-02-03 16:37:39 -0500
+  - remove -fPIC / -fno-common detection and instead rely on $Config{cccdlflags}
+  - use $Config{optimize} for CFLAGS passed to libarchive configure
+
+0.16      2014-02-02 04:30:52 -0500
+  - build with -fPIC if possible
+
+0.15      2014-01-29 11:30:49 -0500
+  - fix prereqs
+
+0.14      2014-01-29 09:37:52 -0500
+  - build with -fno-common if possible
+
+0.12      2014-01-02 10:59:11 -0500
+  - require Alien::Libarchive::MSWin32 0.04 on MSWin32
+
+0.11      2013-12-24 09:26:53 -0500
+  - require Alien::Libarchive::MSWin32 0.02 on MSWin32
+
+0.10      2013-12-19 03:04:41 -0500
+  - fix for beter detection of libarchive sans pkg-config as a system install
+    (runtime didn't work on non-FreeBSD systems)
+
+0.09      2013-12-18 09:06:08 -0500
+  - verify Alien deps flags can at least compile a simple c program
+  - better detection of libarchive sans pkg-config as a system install
+
+0.08      2013-12-12 17:07:56 -0500
+  - documentation
+  - try to use Alien::bz2 if available
+  - include bin directory in PATH for cygwin install_type = share 
+    so dll can be found
+  - basic compile check to be sure it works
+
+0.07      2013-12-05 18:44:24 -0500
+  - prefer non-system lib when that is what you installed
+  - patch 3.1.2 on cygwin so that it will build
+  - Strawberry Perl support via Alien::Libarchive::MSWin32
+
+0.06      2013-11-29 10:02:22 -0500
+  - support for perl 5.12, 5.10, 5.8
+
+0.05      2013-11-26 16:57:45 -0500
+  - more diagnostics
+
+0.04      2013-11-26 12:05:20 -0500
+  - use Alien::OpenSSL and Alien::LibXML if available
+  - First CPAN release
+
+0.03      2013-11-20 12:46:58 -0500
+  - support for FreeBSD native build
+
+0.02      2013-11-15 10:55:29 -0500
+  - rm deps on Alien::OpenSSL, Alien::LibXML
+  - rm dep on Path::Class
+
+0.01      2013-11-14 17:07:12 -0500
+  - initial version

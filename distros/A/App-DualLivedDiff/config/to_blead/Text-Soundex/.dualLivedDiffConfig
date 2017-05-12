@@ -1,0 +1,6 @@
+---
+dirs-recursive:
+  .: ext/Text-Soundex
+exclude-regexes:
+  - '^(?:\.?/)?META.yml$'
+  - '^(?:\.?/)?MANIFEST$'

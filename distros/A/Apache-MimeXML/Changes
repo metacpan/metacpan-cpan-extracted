@@ -1,0 +1,29 @@
+Revision history for Perl extension Apache::MimeXML.
+
+0.01  Sat Apr 17 20:56:00 1999
+	- original version; created by h2xs 1.18
+
+0.02  Sun Apr 25 1999
+	- Some bug fixes
+	- Added support for EBCDIC
+	- Addes support for UTF-16-Little Endian
+	- Fixed problem with Red Hat's version of perl
+
+0.03  Sat Apr 22 2000
+	- Added 'is_xml' into apache notes table if we recognise it as xml.
+
+0.04  Sun Apr 23 2000
+	- Use $r->content_encoding rather than embed in content-type.
+
+0.05  Mon Apr 24 2000
+	- Added ability to use from other modules
+	- Some other minor tweaks
+
+0.06  Tue Apr 25 2000
+	- SetHandler perl-script if we detect a PerlHandler
+
+0.07  Wed Apr 16 2000
+	- Do the right thing (tm) instead of what 0.06 did.
+
+0.08  Fri May 12 2000
+	- Don't use content-encoding - major D'oh!

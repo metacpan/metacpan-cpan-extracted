@@ -1,0 +1,14 @@
+MANIFEST
+Makefile.PL
+ProxyConf.pm
+t/1binaryip.t
+t/2calcsubnets.t
+t/3processvalue.t
+t/4getproxyconf.t
+t/5buildpacfunc.t
+t/pc1.ini
+t/pc2.ini
+t/t1.pac
+t/t2.pac
+t/t3.pac
+t/t4.pac

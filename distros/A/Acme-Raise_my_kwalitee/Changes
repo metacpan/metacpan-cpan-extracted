@@ -1,0 +1,9 @@
+Revision history for Perl extension Acme::Raise_my_kwalitee.
+
+0.02  15.09.04
+        - added some of Beatniks modules.
+
+0.01  Wed Sep 15 11:28:37 2004
+	- original version; created by h2xs 1.23 with options
+		-AX Acme::Raise_my_kwalitee
+

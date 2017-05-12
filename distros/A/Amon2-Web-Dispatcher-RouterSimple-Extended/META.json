@@ -1,0 +1,41 @@
+{
+   "abstract" : "extending Amon2::Web::Dispatcher::RouterSimple",
+   "author" : [
+      "Taiyoh Tanaka <sun.basix@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amon2-Web-Dispatcher-RouterSimple-Extended",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      }
+   },
+   "provides" : {
+      "Amon2::Web::Dispatcher::RouterSimple::Extended" : {
+         "file" : "lib/Amon2/Web/Dispatcher/RouterSimple/Extended.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.05"
+}

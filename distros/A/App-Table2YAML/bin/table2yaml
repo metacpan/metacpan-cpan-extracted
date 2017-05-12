@@ -1,0 +1,89 @@
+#!/usr/bin/env perl
+
+use common::sense;
+use warnings FATAL => q(all);
+use autodie q(:all);
+use Getopt::Long;
+use Pod::Find qw(pod_where);
+use Pod::Usage;
+use App::Table2YAML::CLI;
+
+our $VERSION = '0.003'; # VERSION
+
+binmode STDOUT, q(:utf8);
+
+my %opt;
+my $result = GetOptions(
+    q(--list_loaders|l)       => sub { $opt{ $_[0] } = $_[1] },
+    q(--input_type|t=s)       => sub { $opt{ $_[0] } = $_[1] },
+    q(--input|i=s)            => sub { $opt{ $_[0] } = $_[1] },
+    q(--allow_nulls|n=i)      => sub { $opt{ $_[0] } = $_[1] },
+    q(--field_separator|f=s)  => sub { $opt{ $_[0] } = $_[1] },
+    q(--record_separator|r=s) => sub { $opt{ $_[0] } = $_[1] },
+    q(--field_offset|o=s{1,}) => sub { push @{ $opt{ $_[0] } }, $_[1]; }
+);
+
+pod2usage( -verbose => 1 ) if !($result) || !(%opt);
+
+my $cli_obj = App::Table2YAML::CLI->new();
+my $check   = $cli_obj->parse_opts(%opt);
+unless ($check) {
+    pod2usage(
+        message  => join( q(\n), @{ $cli_obj->errors() } ),
+        -verbose => 1,
+    );
+}
+
+if ( exists $cli_obj->opts->{list_loaders} ) {
+    foreach my $loader ( sort keys %{ $cli_obj->loaders() } ) {
+        my $value = $cli_obj->loaders->{$loader};
+        $value = $value ? q(ok) : q(uninplemented);
+        say sprintf q(%s => %s), $loader, $value;
+    }
+}
+
+my @yaml = $cli_obj->table2yaml();
+foreach my $line (@yaml) {
+    say $line;
+}
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+table2yaml - Command Line Interface for B<App::Table2YAML>.
+
+=head1 VERSION
+
+version 0.003
+
+=head1 DESCRIPTION
+
+=head1 USAGE
+
+    table2yaml <--input-type=LOADER> <--input=FILENAME> [OTHER_OPTIONS]
+
+    OPTIONS:
+        [ --list_loaders     | -l ]    List valid loaders
+        [ --input_type       | -t ]    Determine a loader for input
+        [ --input            | -i ]    Filename or STDIN
+        [ --allow_nulls      | -n ]    Control output of null fields [0|1]
+        [ --field_separator  | -f ]    Character field separator (DSV)
+        [ --record_separator | -r ]    Lines/Records separator
+        [ --field_offset     | -o ]    Field Offset list (Fixed Width)
+
+=head1 OPTIONS
+
+=head1 EXAMPLES
+
+=head1 AUTHOR
+
+Ronaldo Ferreira de Lima aka jimmy <jimmy at gmail>.
+
+=head1 SEE ALSO
+
+B<App::Table2YAML::CLI>.
+
+=cut

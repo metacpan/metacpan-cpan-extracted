@@ -1,0 +1,159 @@
+#========================================================================
+#
+# Changes 
+#
+# DESCRIPTION
+#   Revision history for the Apache::Template module.
+#
+# AUTHOR
+#   Andy Wardley   <abw@wardley.org>
+#
+# REVISION
+#   $Id: Changes,v 1.4 2004/04/27 09:14:10 abw Exp $
+#
+#========================================================================
+
+#------------------------------------------------------------------------
+# Version 0.09 - 27th April 2004
+#------------------------------------------------------------------------
+
+* Added 'type' to list of TT2Headers.  If no TT2Headers are specified,
+  then it defaults to just 'type', for backwards compatability with 
+  earlier versions.  However, if you do have TT2Headers specified, then
+  you will need to explicitly add 'type' to the list if you want it sent.
+    
+    TT2Headers      type length 
+
+* Added TT2ContentType parameter to set a Content-Type other than 
+  text/html
+
+    TT2ContentType  text/xml
+
+#------------------------------------------------------------------------
+# Version 0.08 - 21st August 2003
+#------------------------------------------------------------------------
+
+* Added TT2Wrapper option.
+
+* Fixed documentation to indicate that virtual hosts can have
+  separate configurations, but not separate directories, locations,
+  files, etc.
+
+
+#------------------------------------------------------------------------
+# Version 0.07 - 13th December 2002               # not released - my bad
+#------------------------------------------------------------------------
+
+* Added 'request' parameter.
+
+* Applied a patch from Rick Myers to add ACCESS_CONF to the req_override
+  options.
+
+* Change handler() method to create a new service for each unique 
+  hostname.  This now handles virtual hosts correctly.
+
+* Added TT2Tolerant, TT2Constant and TT2ConstantsNamespace options.
+
+
+#------------------------------------------------------------------------
+# Version 0.06 - 22nd January 2002
+#------------------------------------------------------------------------
+
+* Bumped version number so that PAUSE will allow me to upload it.
+  The first attempt to upload 0.05 failed but left a CPAN database 
+  entry, preventing me from uploading 0.05 again.
+
+
+#------------------------------------------------------------------------
+# Version 0.05 - 22nd January 2002
+#------------------------------------------------------------------------
+
+* Backed out Darren's first patch listed below in 0.04 because it changes
+  the nature of, and interface to the various parameters (e.g. env('foo') 
+  vs env.foo).  I tried to enclose these items in object wrappers so that
+  they can look like hashes but propagate changes back up to the Apache
+  request object, but it wasn't easy.  So I've gone with the original 
+  behaviour for now until someting better comes along.
+
+* Fixed an "uninitialised value in numeric eq (==)" warning in the 
+  Template::Server::Apache module.  Thanks to Pierre Phaneuf for 
+  reporting the problem.
+
+* Applied a patch from Darren Chamberlain which adds the 'uploads' option
+  to TT2Params for handling file uploads.
+
+* Applied a patch from Rick Myers to prevent the Apache::Template::_merge
+  method from merging the same configuration hash together.
+
+
+#------------------------------------------------------------------------
+# Version 0.04 - 15th June 2001
+#------------------------------------------------------------------------
+
+* Applied 2 patches from Darren Chamberlain:
+
+  * Form parameters, cookies, pnotes, and the like are closures
+    rather than data structures; updates to these from the
+    templates themselves are reflected in the request_rec and the
+    associated Perl objects. As a consequence, these are called
+    as from the templates as [% params('id') %] rather than
+    [% params.id %]. Setting these works as you would expect:
+    [% params("Fruit", "Lemon") %] sets fruit=lemon.
+
+    ### NOTE: the above change has been backed out in 0.05 ###
+
+  * I fixed a small bug that resulted from the E-tag patch I submitted
+    for Apache::Template 0.2.  My patch was md5_hex'ing the reference to
+    the content, not the content itself... this is included in the
+    attached diff.
+
+  (NOTE: that was my fault - I lost his patch and tried, but failed,
+  to recreate it from memory - D'Oh!)
+
+* Applied a patch from Mark Fowler to add the correct pre-reqs for 
+  Apache::Request and Apache::ModuleConfig to Makefile.PL.
+
+
+#------------------------------------------------------------------------
+# Version 0.03 - 15th June 2001
+#------------------------------------------------------------------------
+
+* Fixed a bug at the point where a service module was instantiated which 
+  hard-coded the error code as Template::Service::Apache::ERROR.  Now 
+  calls $module->error().
+
+* Removed a stray debugging message which reported installation of a 
+  custom SERVICE_HANDLER.
+
+* Applied a patch from Mark Fowler <mark@profero.com> to fix a bug caused
+  when you don't have any configuration options specified in httpd.conf.
+
+* Applied another patch from Mark to load the service module (which may
+  not be the regular one) via require.
+
+* Applied a patch from Tony Payne <anthonyp@petsmart.com> to correctly
+  implement the DIR_CREATE, DIR_MERGE, SERVER_CREATE and SERVER_MERGE
+  facilities to support multiple configurations.  He reports that these
+  now appear to work OK on later versions of mod_perl.
+
+* Added the E-tag header, thanks to a patch from Darren Chamberlain.
+
+
+#------------------------------------------------------------------------
+# Version 0.02 - 16th Feb 2001
+#------------------------------------------------------------------------
+
+* First official public alpha release
+
+* Integrated various bits of code from the "Grover" module and 
+  Apache::Template 0.1, as donated by Darren Chamberlain.
+
+
+#------------------------------------------------------------------------
+# Version 0.01
+#------------------------------------------------------------------------
+
+* Unofficial pre-release as part of the Template Toolkit 2.01 snapshot.
+
+
+

@@ -1,0 +1,31 @@
+Acme::Oil version 0.01
+=====================
+
+There are two educational effects of this module.
+First, if the variable is soaked in oil, it becomes slippery.
+Second, it is dangerous to bring the fire close to the oil.
+Please remembere these points, enjoy your Perl life!
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  warnings
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Makamaka Hannyaharamitu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

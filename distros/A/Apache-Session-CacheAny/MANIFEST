@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Apache/Session/CacheAny.pm
+lib/Apache/Session/Store/CacheAny.pm
+t/00_compile.t
+t/01_cache.t
+t/02_namespace.t
+t/03_expires.t
+t/04_no_impl.t
+t/05_cache_opts.t
+META.yml                                 Module meta-data (added by MakeMaker)

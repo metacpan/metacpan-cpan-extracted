@@ -1,0 +1,64 @@
+mowyw (0.8.0)
+	* lib/App/Mowyw.pm: Fix deprecation warnings in regexes
+	* lib/App/Mowyw.pm: Ignore .git directories
+	* Build.PL: Require perl 5.10 at least
+	* travis testing
+mowyw (0.7.2)
+	* lib/App/Mowyw.pm: guard against failed opendir()
+mowyw (0.7.1)
+	* script/mowyw: remove some fallout from the Mowyw -> App::Mowyw
+	transition (Kurt Tomlinson)
+	* t/: silence harmless warnings
+mowyw (0.7.0)
+	* lib/: revamped modules to live in the App:: namespace in preparation of
+	a CPAN release
+	* script/: new directory for the mowyw script
+mowyw (0.6.2)
+	* lib/Mowyw/Datasource/XML.pm: more robust XML reading
+	* example/: added missing files
+mowyw (0.6.1)
+	* lib/Mowyw.pm: silenced warning on [% readvar %]
+mowyw (0.6.0)
+	* lib/Mowyw/Lexer.pm: Add position and line numbers to parsed tokens
+	* lib/Mowyw.pm: Add line number to error message
+	* *: Changed license to Artistic 2.0
+mowyw (0.5.2)
+	* lib/Mowyw.pm: configurable filter for which files to process
+	* lib/Mowyw/Datasource/Result.pm: First shot at a more general result set
+	  framework. Not yet used by the rest of the program.
+mowyw (0.5.1)
+	* mowyw: make mowyw encoding aware, added --encoding option. Default is
+	  utf-8
+mowyw (0.5.0)
+	* mowyw: Moved nearly all functionally to a module to allow better testing
+	* mowyw.1.txt: structured documentation in the asciidoc format
+	* t/: many more new test files
+	* lib/Mowyw.pm: added [% ifvar %] tag
+	* lib/Mowyw.pm: added [% bind %] and [% for %] tags
+	* lib/Mowyw/Datasource.pm: Added generic datasource interface
+	* lib/Mowyw/Datasource/DBI.pm: DBI based SQL backend
+	* lib/Mowyw/Datasource/XML.pm: XML::Simple based XML backend
+	* Build.PL: install helper script
+mowyw (0.4.1)
+	* mowyw: Added support for a global include file (includes/global)
+	* mowyw: Reads config file, and modifies include filenames according to
+	that
+mowyw (0.4.0)
+	* mowyw: Added support for new delimiters: [% ... %] instead of [[[
+	  ... ]]]. Currently they are interchangable, so [% .. ]]] works, but
+	  this is considered a bug rather than a feature.
+	* README: update accordingly
+	* example/source/foo2.shtml: added example [% ... %] tags
+mowyw (0.3.0)
+	* mowyw: Added support for syntax highliting, variables and comments
+	* README: update accordingly
+	* example/source/bar.shtml: added syntax hilighting example
+	* example/source/style.css: added syntax hilighting classes
+	* Mowyw/Lexer.pm: fixed handling of "0" string
+mowyw (0.2.0) 
+	* Mowyw/Lexer.pm: added a separate lexer
+	* mowyw: (nearly) complete rewrite using a recursive-descending parser
+	* README: added description for [[[verbatim foo]]] (arbitrary
+	stuff)[[[endverbatim foo]]]
+
+# vim: set noexpandtab

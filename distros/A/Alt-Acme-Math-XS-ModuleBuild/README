@@ -1,0 +1,59 @@
+NAME
+    Acme::Math::XS - Math is HARD (faster!)
+
+SYNOPSIS
+        use Acme::Math::XS;
+
+        print "2 + 2 = ${\add(2, 2)}\n";
+
+DESCRIPTION
+    This is a tiny example "XS" module. It was written to show how one would
+    write the same thing using Inline::Module, Inline, Inline::C and
+    Inline::CPP.
+
+    It has a pure "XS" version and "Alt"(ternate) modules for all the common
+    CPAN module frameworks.
+
+    The source code for all these modules is in one git repository, on
+    separate branches: <https://github.com/ingydotnet/acme-math-xs-pm>
+
+SEE
+    Acme::Math::XS
+        Pure XS version, shipped with ExtUtils::MakeMaker.
+
+    Alt::Acme::Math::XS::EUMM
+        Inline::Module (using Inline::C) version shipped with plain old
+        ExtUtils::MakeMaker.
+
+    Alt::Acme::Math::XS::DistZilla
+        Inline::Module version shipped with Dist::Zilla and
+        Dist::Zilla::Plugin::InlineModule.
+
+    Alt::Acme::Math::XS::ZillaDist
+        Inline::Module version shipped with Zilla::Dist.
+
+    Alt::Acme::Math::XS::ModuleBuild
+        Inline::Module version shipped with Module::Build and
+        Module::Build::InlineModule.
+
+    Alt::Acme::Math::XS::ModuleInstall
+        Inline::Module version shipped with Module::Build and
+        Module::Build::InlineModule.
+
+    Alt::Acme::Math::XS::CPP
+        Inline::Module (using Inline::CPP) version shipped with
+        ExtUtils::MakeMaker.
+
+AUTHORS
+    *   Ingy döt Net <ingy@cpan.org>
+
+    *   David Oswald <davido@cpan.org>
+
+COPYRIGHT
+    Copyright 2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version="0.6" generator="pbf2osm">
+	<node id="160058" lat="50.8964422" lon="6.9105884" version="2" changeset="615185" user="Raymond" uid="16478" timestamp="2008-01-12T20:21:36Z"/>
+	<node id="160059" lat="50.8962811" lon="6.9110955" version="2" changeset="118299" user="grenzdebil_bonn" uid="6390" timestamp="2009-02-04T09:32:58Z"/>
+	<node id="160060" lat="50.8966155" lon="6.9118676" version="2" changeset="118299" user="grenzdebil_bonn" uid="6390" timestamp="2009-02-04T09:32:57Z"/>
+	<node id="160061" lat="50.8968107" lon="6.9119038" version="2" changeset="118299" user="grenzdebil_bonn" uid="6390" timestamp="2009-02-04T09:32:57Z"/>
+	<node id="160062" lat="50.8970370" lon="6.9118038" version="2" changeset="118299" user="grenzdebil_bonn" uid="6390" timestamp="2009-02-04T09:32:57Z"/>
+	<node id="32973718" lat="50.7923997" lon="6.1199098" version="4" changeset="1186920" user="Bürste" uid="61341" timestamp="2009-05-14T12:28:46Z">
+		<tag k="amenity" v="fuel" />
+		<tag k="operator" v="Jet" />
+		<tag k="source" v="image" />
+	</node>
+	<node id="160066" lat="50.9001846" lon="6.9059978" version="1" changeset="204" user="LA2" uid="229" timestamp="2005-08-01T19:52:29Z"/>
+	<node id="160067" lat="50.8990873" lon="6.9083526" version="2" changeset="615185" user="Raymond" uid="16478" timestamp="2008-01-12T20:20:00Z"/>
+	<node id="160068" lat="50.8978667" lon="6.9108812" version="3" changeset="5441695" user="mapwitch" uid="7079" timestamp="2010-08-09T09:34:32Z"/>
+</osm>

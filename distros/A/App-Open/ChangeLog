@@ -1,0 +1,85 @@
+v0.0.4:
+
+commit cc3e401c15918117693b93bc6df06599333570ba
+Author: Erik Hollensbe <erik@hollensbe.org>
+Date:   Thu Jul 10 01:07:30 2008 -0700
+
+     * Bumped version, this revision tagged 0.0.4
+
+commit 75b42899b8d8627848d50eeb45a70149430c03b3
+Author: Erik Hollensbe <erik@hollensbe.org>
+Date:   Thu Jul 10 01:05:48 2008 -0700
+
+     * Fixed a bug in the YAML backend documentation.
+
+commit 88c65baa161204dccd7b9238912ba01e9dd5482b
+Author: Erik Hollensbe <erik@hollensbe.org>
+Date:   Thu Jul 10 00:54:01 2008 -0700
+
+     * Fixed an ugly bug in the 50-openbin test, the exit_1 helper script is now templated with the perl in $^X instead of assuming the one in the path will work (boy do I feel dumb).
+     * Updated MANIFEST and MANIFEST.SKIP to reflect package changes
+     * Some leftovers from the last ./Build dist that we want to keep
+
+commit a79b70e8081203e789dc25ffb6c7bf7260d6d22c
+Author: Erik Hollensbe <erik@hollensbe.org>
+Date:   Wed Jul 9 03:19:41 2008 -0700
+
+     * Updated ChangeLog
+
+v0.0.3:
+
+commit 5e061b35657221290ed62f41ef73f82cc4aa3093
+Author: Erik Hollensbe <erik@hollensbe.org>
+Date:   Wed Jul 9 03:17:03 2008 -0700
+
+     * Forgot an important documentation fix
+
+commit 2efc7f1c956e02334776605c863caf142e89b250
+Author: Erik Hollensbe <erik@hollensbe.org>
+Date:   Wed Jul 9 03:12:29 2008 -0700
+
+     * Fixed ::Backend::MailCap tests
+     * More Build.PL dependency fixes
+     * Tagged 0.0.3
+
+v0.0.2:
+
+commit 0ed1839e409f44275c35b5a600643df71a7b2293
+Author: Erik Hollensbe <erik@hollensbe.org>
+Date:   Sun Jul 6 19:31:25 2008 -0700
+
+     * Added ChangeLog to repository
+     * Fixed Build.PL script/required libs definitions and added Mail::Cap and MIME::Types to recommended modules
+     * Bumped version to 0.0.2 (will be tagged)
+
+commit b80f0375eac75d739fa6d3dbfd282b09d097a175
+Author: Erik Hollensbe <erik@hollensbe.org>
+Date:   Sun Jul 6 19:13:33 2008 -0700
+
+     * Fixed MANIFEST
+
+commit a6bf5b8df095765c6a342256f92ddb2c5fd32625
+Author: Erik Hollensbe <erik@hollensbe.org>
+Date:   Sun Jul 6 19:09:51 2008 -0700
+
+     * Added accidentally omitted COPYING file
+
+commit 7a6eb916812eee9ef50538afca2800c99403e311
+Author: Erik Hollensbe <erik@hollensbe.org>
+Date:   Sun Jul 6 19:08:01 2008 -0700
+
+     * Fixed Makefile.PL
+
+commit 8cafa1e7e22ad46685f610a733ce037cff9c3874
+Merge: 3d98176... 6f62f1e...
+Author: Erik Hollensbe <erik@hollensbe.org>
+Date:   Fri Jul 4 17:05:59 2008 -0700
+
+    Merge branch 'master' of ssh://hollensbe.org/git/open
+
+commit 6f62f1e7486354ae1d8af1c51a52278a35abdafd
+Author: Erik Hollensbe <erik@hollensbe.org>
+Date:   Fri Jul 4 17:01:40 2008 -0700
+
+     * Building out the distribution files
+     * Fixed license entry in Build.PL

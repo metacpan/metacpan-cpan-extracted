@@ -1,0 +1,54 @@
+---
+abstract: 'Design by contract via Perl attributes'
+author:
+  - 'Viacheslav Tykhanovskyi, C<vti@cpan.org>.'
+build_requires:
+  Test::Fatal: 0
+  Test::More: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.5, CPAN::Meta::Converter version 2.130880'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Attribute-Contract
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Attribute::Contract:
+    file: lib/Attribute/Contract.pm
+    version: 0.05
+  Attribute::Contract::Modifier::Ensures:
+    file: lib/Attribute/Contract/Modifier/Ensures.pm
+  Attribute::Contract::Modifier::Requires:
+    file: lib/Attribute/Contract/Modifier/Requires.pm
+  Attribute::Contract::Modifier::Throws:
+    file: lib/Attribute/Contract/Modifier/Throws.pm
+  Attribute::Contract::Utils:
+    file: lib/Attribute/Contract/Utils.pm
+requires:
+  Carp: 0
+  Exporter: 0
+  Scalar::Util: 0
+  Type::Tiny: 0.006
+  perl: 5.012
+resources:
+  bugtracker: https://github.com/vti/attribute-contract/issues
+  homepage: https://github.com/vti/attribute-contract
+  repository: git://github.com/vti/attribute-contract.git
+version: 0.05
+x_contributors:
+  - 'Viktor Turskyi <koorchik@gmail.com>'
+  - 'vti <viacheslav.t@gmail.com>'

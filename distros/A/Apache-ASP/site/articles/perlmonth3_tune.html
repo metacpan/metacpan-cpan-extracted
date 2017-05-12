@@ -1,0 +1,761 @@
+
+<html>
+<head><title>Apache::ASP Site Tuning</title></head>
+<body bgcolor=white>
+
+<blockquote>
+Note: this article was from a series running on PerlMonth from 1999.
+PerlMonth.com seems to have disappeared, so this article is reposted
+with some slight modifications to make it current for recent releases
+of Apache::ASP ( versions >= 2.29 ).
+</blockquote>
+
+<h2>Apache::ASP Site Tuning</h2>
+by Joshua Chamas <i>&lt;chamas&nbsp;at&nbsp;alumni.stanford.org&gt;</i>
+<p>
+
+
+
+Last month, we used Apache::ASP to build a simple 
+<a href=http://www.apache-asp.org/apps/bookmarks/>MyBookmarks</a>
+web application.  Now we are going to tune the 
+<a href=http://www.apache-asp.org/>Apache::ASP</a> web application and 
+<a href=http://www.apache.org>Apache</a> web server, taking a mild mannered 
+web app running at <tt>250,000</tt> pages per day, and boosting it up 4 times 
+to a <tt>1,000,000</tt> pages per day powerhouse.
+<p>
+Are you ready? <font size=+1>Let's Tune!</font>
+<p>
+
+<h3>Methodology</h3>
+The application was taken as it was built last week,
+and incrementally benchmarked, changing one configuration
+setting at a time, and showing the performance changes 
+below.  The URL tested is the main URL of the application,
+<a href=http://www.apache-asp.org/apps/bookmarks/index.asp
+  >.../bookmarks/index.asp</a>.
+<p>
+The application is run on a Solaris x86 box, PII300 512K cache
+with 2 4G 7200 RPM SCSI drives in a software RAID 1 configuration.  
+The following numbers are not meant to be compared against
+other web application environments, or systems, but show 
+relative performance improvements when tuning Apache::ASP 
+and Apache on this particular system.
+<p>
+The web server software being tested is apache 1.3.4, with 
+the testing client <tt>ab</tt>, or ApacheBench, 
+run locally on the server.  Because ApacheBench does not support
+cookies, a new Apache::ASP $Session is created in StateDir
+for every request, so that the benchmark numbers are worse 
+than what you would see in a production setting.  Obviously testing locally
+does not take into account many slow client connections
+over the internet, which would likely be offset by a reverse
+proxy accelerator in production 
+(<a href=http://perl.apache.org/guide>see mod_perl guide</a>).
+<p>
+The <tt>ab</tt> program was run with 5 concurrent clients for 
+30 seconds with the following command:
+<pre>
+  ab -c 5 -t 30 http:// $HOST /bookmarks/index.asp
+</pre>
+
+<h3>Tuning</h3>
+
+After running the first bench, and watching the system under
+top, it becomes strikingly clear that disk i/o is the bottleneck,
+with 50%+ of the time spent waiting for disk.  The reason
+is that state management for $Session and $Application uses
+SDBM_File, or optionally DB_File, databases on disk to store data, 
+and is highly i/o intensive.
+<p>
+The <i>trick</i> then is to relocate the <tt>StateDir</tt> 
+to a fast cached file system.  On Solaris, this happens to 
+be /tmp/... by default, but on Linux and WinNT, the file systems seem
+to be cached automatically, so you may not need to do anything
+except locate <tt>StateDir</tt> to a secure, non-browsable, location.
+Using a cached or RAM file system will also spare your disk, which is good 
+as it is often the first thing to go on your box.
+
+
+
+<center>
+<p>
+<table border=0 bgcolor=gray>
+
+<tr bgcolor=white>
+<td><b>Hits/sec</b></td>
+<td align=center><b>Before</b></td>
+<td align=center><b>After</b></td>
+</tr>
+
+<tr>
+<td bgcolor=#bbccff>
+	<tt>
+	+116%
+	</tt>
+</b></td>
+<td bgcolor=yellow><tt>6.5 h/s</tt></td>
+<td bgcolor=yellow><tt>14.1 h/s</tt></td>
+</tr>
+<tr bgcolor=white><td colspan=3><b>Configuration</b></td></tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>AP.htaccess</td>
+	<td bgcolor=#c0c0c0>yes</td>
+	<td bgcolor=#c0c0c0>yes</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>APMaxClients</td>
+	<td bgcolor=#c0c0c0>5</td>
+	<td bgcolor=#c0c0c0>5</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>APMaxRequestsPerChild</td>
+	<td bgcolor=#c0c0c0>50</td>
+	<td bgcolor=#c0c0c0>50</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>Debug</td>
+	<td bgcolor=#c0c0c0>1</td>
+	<td bgcolor=#c0c0c0>1</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>Global</td>
+	<td bgcolor=#c0c0c0>.</td>
+	<td bgcolor=#c0c0c0>.</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>GlobalPackage</td>
+	<td bgcolor=#c0c0c0>My::Bookmarks</td>
+	<td bgcolor=#c0c0c0>My::Bookmarks</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>SessionSerialize</td>
+	<td bgcolor=#c0c0c0>0</td>
+	<td bgcolor=#c0c0c0>0</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>SessionTimeout</td>
+	<td bgcolor=#c0c0c0>15</td>
+	<td bgcolor=#c0c0c0>15</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=pink>StateDir</td>
+	<td bgcolor=pink>.state</td>
+	<td bgcolor=pink>/tmp/bookmarks</td>
+	</tr>
+
+
+	<tr bgcolor=white>
+	<td><b>Comments</b></td>
+	<td><font size=-1>Disk i/o activity takes 50% of the time, because the StateDir is pointed at a non-caching file system.</font></td>
+	<td><font size=-1>Disk i/o activity is nearly 0%, with roughly 75% of the time spent in the user space, and 25% in the kernel</font></td>
+	</tr>
+
+<tr bgcolor=white>
+<td><b>Legend</b></td>
+<td colspan=2>
+<font size=-2 face=verdana>
+Configuration items
+that start with AP are Apache configuration options, the
+rest are Apache::ASP.  The 
+.htaccess one means that configurations are stored in the .htaccess
+if yes, if no in a configuration file.  The configuration changes
+between benchmarks are highlighted in <font color=pink><b>pink</b></font>.
+</font>
+</td></tr>
+</table>
+<p>
+</center>
+
+More straightforward is turning off debugging.  
+The Apache::ASP code has been streamlined for production
+when debugging is turned off, and there is a significant
+penalty for leaving it on, as well as a bunch of clutter
+in your error_log.  
+
+
+
+<center>
+<p>
+<table border=0 bgcolor=gray>
+
+<tr bgcolor=white>
+<td><b>Hits/sec</b></td>
+<td align=center><b>Before</b></td>
+<td align=center><b>After</b></td>
+</tr>
+
+<tr>
+<td bgcolor=#bbccff>
+	<tt>
+	+12%
+	</tt>
+</b></td>
+<td bgcolor=yellow><tt>14.1 h/s</tt></td>
+<td bgcolor=yellow><tt>15.8 h/s</tt></td>
+</tr>
+<tr bgcolor=white><td colspan=3><b>Configuration</b></td></tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>AP.htaccess</td>
+	<td bgcolor=#c0c0c0>yes</td>
+	<td bgcolor=#c0c0c0>yes</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>APMaxClients</td>
+	<td bgcolor=#c0c0c0>5</td>
+	<td bgcolor=#c0c0c0>5</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>APMaxRequestsPerChild</td>
+	<td bgcolor=#c0c0c0>50</td>
+	<td bgcolor=#c0c0c0>50</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=pink>Debug</td>
+	<td bgcolor=pink>1</td>
+	<td bgcolor=pink>0</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>Global</td>
+	<td bgcolor=#c0c0c0>.</td>
+	<td bgcolor=#c0c0c0>.</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>GlobalPackage</td>
+	<td bgcolor=#c0c0c0>My::Bookmarks</td>
+	<td bgcolor=#c0c0c0>My::Bookmarks</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>SessionSerialize</td>
+	<td bgcolor=#c0c0c0>0</td>
+	<td bgcolor=#c0c0c0>0</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>SessionTimeout</td>
+	<td bgcolor=#c0c0c0>15</td>
+	<td bgcolor=#c0c0c0>15</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>StateDir</td>
+	<td bgcolor=#c0c0c0>/tmp/bookmarks</td>
+	<td bgcolor=#c0c0c0>/tmp/bookmarks</td>
+	</tr>
+
+
+	<tr bgcolor=white>
+	<td><b>Comments</b></td>
+	<td><font size=-1>Disk i/o activity is nearly 0%, with roughly 75% of the time spent in the user space, and 25% in the kernel</font></td>
+	<td><font size=-1></font></td>
+	</tr>
+
+<tr bgcolor=white>
+<td><b>Legend</b></td>
+<td colspan=2>
+<font size=-2 face=verdana>
+Configuration items
+that start with AP are Apache configuration options, the
+rest are Apache::ASP.  The 
+.htaccess one means that configurations are stored in the .htaccess
+if yes, if no in a configuration file.  The configuration changes
+between benchmarks are highlighted in <font color=pink><b>pink</b></font>.
+</font>
+</td></tr>
+</table>
+<p>
+</center>
+
+Those were the two big basic tunes for Apache::ASP.
+Let's now go to the Apache web server.  So far, our
+configuration information has been stored in a .htaccess
+file, which must be reparsed every request by Apache.
+So, we move the configuration information into one of 
+the *.conf configuration files, to avoid that per
+request overhead.  Also make sure to disallow .htaccess
+file parsing on up the file tree by setting an 
+
+<pre>
+  AllowOverride None
+</pre>
+
+wherever your Apache::ASP application is located.
+
+
+
+<center>
+<p>
+<table border=0 bgcolor=gray>
+
+<tr bgcolor=white>
+<td><b>Hits/sec</b></td>
+<td align=center><b>Before</b></td>
+<td align=center><b>After</b></td>
+</tr>
+
+<tr>
+<td bgcolor=#bbccff>
+	<tt>
+	+9%
+	</tt>
+</b></td>
+<td bgcolor=yellow><tt>15.8 h/s</tt></td>
+<td bgcolor=yellow><tt>17.3 h/s</tt></td>
+</tr>
+<tr bgcolor=white><td colspan=3><b>Configuration</b></td></tr>
+
+	<tr>
+	<td bgcolor=pink>AP.htaccess</td>
+	<td bgcolor=pink>yes</td>
+	<td bgcolor=pink>no</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>APMaxClients</td>
+	<td bgcolor=#c0c0c0>5</td>
+	<td bgcolor=#c0c0c0>5</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>APMaxRequestsPerChild</td>
+	<td bgcolor=#c0c0c0>50</td>
+	<td bgcolor=#c0c0c0>50</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>Debug</td>
+	<td bgcolor=#c0c0c0>0</td>
+	<td bgcolor=#c0c0c0>0</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>Global</td>
+	<td bgcolor=#c0c0c0>.</td>
+	<td bgcolor=#c0c0c0>.</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>GlobalPackage</td>
+	<td bgcolor=#c0c0c0>My::Bookmarks</td>
+	<td bgcolor=#c0c0c0>My::Bookmarks</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>SessionSerialize</td>
+	<td bgcolor=#c0c0c0>0</td>
+	<td bgcolor=#c0c0c0>0</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>SessionTimeout</td>
+	<td bgcolor=#c0c0c0>15</td>
+	<td bgcolor=#c0c0c0>15</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>StateDir</td>
+	<td bgcolor=#c0c0c0>/tmp/bookmarks</td>
+	<td bgcolor=#c0c0c0>/tmp/bookmarks</td>
+	</tr>
+
+
+	<tr bgcolor=white>
+	<td><b>Comments</b></td>
+	<td><font size=-1></font></td>
+	<td><font size=-1>Couldn't believe my eyes when I saw there to be so little difference when not using .htaccess.  My guess is that the Apache people optimized this at some point.</font></td>
+	</tr>
+
+<tr bgcolor=white>
+<td><b>Legend</b></td>
+<td colspan=2>
+<font size=-2 face=verdana>
+Configuration items
+that start with AP are Apache configuration options, the
+rest are Apache::ASP.  The 
+.htaccess one means that configurations are stored in the .htaccess
+if yes, if no in a configuration file.  The configuration changes
+between benchmarks are highlighted in <font color=pink><b>pink</b></font>.
+</font>
+</td></tr>
+</table>
+<p>
+</center>
+
+The MaxRequestsPerChild is commonly overlooked in 
+web server setup.  What this does is control the
+number of requests that a child httpd server may
+serve before exiting, and the parent reforking 
+another one.  With mod_perl library loading
+and script recompilations, a fork is no small thing,
+and avoiding the fork penalty is important.
+<p>
+We had the MaxRequestsPerChild pretty low before 
+at 50 but we up it now to 500 which should be fine
+for production.  You don't want to set this too high,
+or the mod_perl httpds will often take up too much
+memory because of leaks, and shared forked code
+becoming unshared as it gets dirtied.
+
+
+
+<center>
+<p>
+<table border=0 bgcolor=gray>
+
+<tr bgcolor=white>
+<td><b>Hits/sec</b></td>
+<td align=center><b>Before</b></td>
+<td align=center><b>After</b></td>
+</tr>
+
+<tr>
+<td bgcolor=#bbccff>
+	<tt>
+	+31%
+	</tt>
+</b></td>
+<td bgcolor=yellow><tt>17.3 h/s</tt></td>
+<td bgcolor=yellow><tt>22.8 h/s</tt></td>
+</tr>
+<tr bgcolor=white><td colspan=3><b>Configuration</b></td></tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>AP.htaccess</td>
+	<td bgcolor=#c0c0c0>no</td>
+	<td bgcolor=#c0c0c0>no</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>APMaxClients</td>
+	<td bgcolor=#c0c0c0>5</td>
+	<td bgcolor=#c0c0c0>5</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=pink>APMaxRequestsPerChild</td>
+	<td bgcolor=pink>50</td>
+	<td bgcolor=pink>500</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>Debug</td>
+	<td bgcolor=#c0c0c0>0</td>
+	<td bgcolor=#c0c0c0>0</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>Global</td>
+	<td bgcolor=#c0c0c0>.</td>
+	<td bgcolor=#c0c0c0>.</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>GlobalPackage</td>
+	<td bgcolor=#c0c0c0>My::Bookmarks</td>
+	<td bgcolor=#c0c0c0>My::Bookmarks</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>SessionSerialize</td>
+	<td bgcolor=#c0c0c0>0</td>
+	<td bgcolor=#c0c0c0>0</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>SessionTimeout</td>
+	<td bgcolor=#c0c0c0>15</td>
+	<td bgcolor=#c0c0c0>15</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>StateDir</td>
+	<td bgcolor=#c0c0c0>/tmp/bookmarks</td>
+	<td bgcolor=#c0c0c0>/tmp/bookmarks</td>
+	</tr>
+
+
+	<tr bgcolor=white>
+	<td><b>Comments</b></td>
+	<td><font size=-1>Couldn't believe my eyes when I saw there to be so little difference when not using .htaccess.  My guess is that the Apache people optimized this at some point.</font></td>
+	<td><font size=-1>This bench only had 684 requests, so there was no parent httpd forking during this time, whereas before there may have been reforking every few seconds during the 30 second bench.</font></td>
+	</tr>
+
+<tr bgcolor=white>
+<td><b>Legend</b></td>
+<td colspan=2>
+<font size=-2 face=verdana>
+Configuration items
+that start with AP are Apache configuration options, the
+rest are Apache::ASP.  The 
+.htaccess one means that configurations are stored in the .htaccess
+if yes, if no in a configuration file.  The configuration changes
+between benchmarks are highlighted in <font color=pink><b>pink</b></font>.
+</font>
+</td></tr>
+</table>
+<p>
+</center>
+
+Back to Apache::ASP, and some finer tuning.  By
+default SessionSerialize is 0, and we are going
+to turn it on.  What this does is lock $Session
+for exclusive use during the course of the script
+being run, so that any reads or writes to $Session
+don't have to lock it every time.  Because of the i/o
+requirements of SDBM_File, each time $Session is read from
+or written to, it is freshly tied to the 
+database and locked, so to avoid these ties can save much.
+<p>
+The reason why SessionSerialize is not enabled
+by default is that one could easily deny service
+to a user with a long running script, such that no
+other scripts for that same user $Session could be run,
+and this requires some expertise.
+Also SessionSerialize is probably not a good thing 
+for framed sites, where there is greater concurrency 
+for the same $Session.
+
+
+
+<center>
+<p>
+<table border=0 bgcolor=gray>
+
+<tr bgcolor=white>
+<td><b>Hits/sec</b></td>
+<td align=center><b>Before</b></td>
+<td align=center><b>After</b></td>
+</tr>
+
+<tr>
+<td bgcolor=#bbccff>
+	<tt>
+	+12%
+	</tt>
+</b></td>
+<td bgcolor=yellow><tt>22.8 h/s</tt></td>
+<td bgcolor=yellow><tt>25.74 h/s</tt></td>
+</tr>
+<tr bgcolor=white><td colspan=3><b>Configuration</b></td></tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>AP.htaccess</td>
+	<td bgcolor=#c0c0c0>no</td>
+	<td bgcolor=#c0c0c0>no</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>APMaxClients</td>
+	<td bgcolor=#c0c0c0>5</td>
+	<td bgcolor=#c0c0c0>5</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>APMaxRequestsPerChild</td>
+	<td bgcolor=#c0c0c0>500</td>
+	<td bgcolor=#c0c0c0>500</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>Debug</td>
+	<td bgcolor=#c0c0c0>0</td>
+	<td bgcolor=#c0c0c0>0</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>Global</td>
+	<td bgcolor=#c0c0c0>.</td>
+	<td bgcolor=#c0c0c0>.</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>GlobalPackage</td>
+	<td bgcolor=#c0c0c0>My::Bookmarks</td>
+	<td bgcolor=#c0c0c0>My::Bookmarks</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=pink>SessionSerialize</td>
+	<td bgcolor=pink>0</td>
+	<td bgcolor=pink>1</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>SessionTimeout</td>
+	<td bgcolor=#c0c0c0>15</td>
+	<td bgcolor=#c0c0c0>15</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>StateDir</td>
+	<td bgcolor=#c0c0c0>/tmp/bookmarks</td>
+	<td bgcolor=#c0c0c0>/tmp/bookmarks</td>
+	</tr>
+
+
+	<tr bgcolor=white>
+	<td><b>Comments</b></td>
+	<td><font size=-1>This bench only had 684 requests, so there was no parent httpd forking during this time, whereas before there may have been reforking every few seconds during the 30 second bench.</font></td>
+	<td><font size=-1></font></td>
+	</tr>
+
+<tr bgcolor=white>
+<td><b>Legend</b></td>
+<td colspan=2>
+<font size=-2 face=verdana>
+Configuration items
+that start with AP are Apache configuration options, the
+rest are Apache::ASP.  The 
+.htaccess one means that configurations are stored in the .htaccess
+if yes, if no in a configuration file.  The configuration changes
+between benchmarks are highlighted in <font color=pink><b>pink</b></font>.
+</font>
+</td></tr>
+</table>
+<p>
+</center>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+From start to finish, we have nearly quadrupled the
+speed of the web application, and thus the site's
+ability to serve up web pages.  This one should handle
+just about 1,000,000 page views per day. :) 
+
+
+
+<center>
+<p>
+<table border=0 bgcolor=gray>
+
+<tr bgcolor=white>
+<td><b>Hits/sec</b></td>
+<td align=center><b>Before</b></td>
+<td align=center><b>After</b></td>
+</tr>
+
+<tr>
+<td bgcolor=#bbccff>
+	<tt>
+	+296%
+	</tt>
+</b></td>
+<td bgcolor=yellow><tt>6.5 h/s</tt></td>
+<td bgcolor=yellow><tt>25.74 h/s</tt></td>
+</tr>
+<tr bgcolor=white><td colspan=3><b>Configuration</b></td></tr>
+
+	<tr>
+	<td bgcolor=pink>AP.htaccess</td>
+	<td bgcolor=pink>yes</td>
+	<td bgcolor=pink>no</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>APMaxClients</td>
+	<td bgcolor=#c0c0c0>5</td>
+	<td bgcolor=#c0c0c0>5</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=pink>APMaxRequestsPerChild</td>
+	<td bgcolor=pink>50</td>
+	<td bgcolor=pink>500</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=pink>Debug</td>
+	<td bgcolor=pink>1</td>
+	<td bgcolor=pink>0</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>Global</td>
+	<td bgcolor=#c0c0c0>.</td>
+	<td bgcolor=#c0c0c0>.</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>GlobalPackage</td>
+	<td bgcolor=#c0c0c0>My::Bookmarks</td>
+	<td bgcolor=#c0c0c0>My::Bookmarks</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=pink>SessionSerialize</td>
+	<td bgcolor=pink>0</td>
+	<td bgcolor=pink>1</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=#c0c0c0>SessionTimeout</td>
+	<td bgcolor=#c0c0c0>15</td>
+	<td bgcolor=#c0c0c0>15</td>
+	</tr>
+
+	<tr>
+	<td bgcolor=pink>StateDir</td>
+	<td bgcolor=pink>.state</td>
+	<td bgcolor=pink>/tmp/bookmarks</td>
+	</tr>
+
+
+	<tr bgcolor=white>
+	<td><b>Comments</b></td>
+	<td><font size=-1>Disk i/o activity takes 50% of the time, because the StateDir is pointed at a non-caching file system.</font></td>
+	<td><font size=-1></font></td>
+	</tr>
+
+<tr bgcolor=white>
+<td><b>Legend</b></td>
+<td colspan=2>
+<font size=-2 face=verdana>
+Configuration items
+that start with AP are Apache configuration options, the
+rest are Apache::ASP.  The 
+.htaccess one means that configurations are stored in the .htaccess
+if yes, if no in a configuration file.  The configuration changes
+between benchmarks are highlighted in <font color=pink><b>pink</b></font>.
+</font>
+</td></tr>
+</table>
+<p>
+</center>
+
+For more information on Apache::ASP tuning, see the 
+<a href=http://www.apache-asp.org/tuning.html>tuning docs online</a>.
+
+</body>
+</html>

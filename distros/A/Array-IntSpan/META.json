@@ -1,0 +1,49 @@
+{
+   "abstract" : "Handles arrays of scalars or objects using integer ranges",
+   "author" : [
+      "Dominique Dumont"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Array-IntSpan",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-project@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Array-IntSpan"
+      },
+      "homepage" : "https://github.com/dod38fr/array-intspan-perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dod38fr/array-intspan-perl.git",
+         "web" : "https://github.com/dod38fr/array-intspan-perl"
+      }
+   },
+   "version" : "2.003"
+}
+

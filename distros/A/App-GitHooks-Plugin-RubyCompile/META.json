@@ -1,0 +1,60 @@
+{
+   "abstract" : "Verify that staged Ruby files compile.",
+   "author" : [
+      "Jacob Maurer <jmaurer@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-GitHooks-Plugin-RubyCompile",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::Exception" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::Git" : "0",
+            "Test::More" : "0.94",
+            "Test::Type" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::GitHooks" : "0",
+            "System::Command" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "App::GitHooks::Plugin::RubyCompile" : {
+         "file" : "lib/App/GitHooks/Plugin/RubyCompile.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jacobmaurer/App-GitHooks-Plugin-RubyCompile/issues"
+      },
+      "homepage" : "https://metacpan.org/release/App-GitHooks-Plugin-RubyCompile",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jacobmaurer/App-GitHooks-Plugin-RubyCompile"
+      }
+   },
+   "version" : "v1.0.0"
+}

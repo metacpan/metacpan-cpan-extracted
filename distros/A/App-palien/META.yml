@@ -1,0 +1,25 @@
+---
+abstract: 'Command line interface to Alien::Base'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-palien
+requires:
+  Path::Class: '0.26'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/plicease/App-palien/issues
+  homepage: http://perl.wdlabs.com/App-palien
+  repository: git://github.com/plicease/App-palien.git
+version: '0.03'

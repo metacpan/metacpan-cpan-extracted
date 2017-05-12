@@ -1,0 +1,3 @@
+check process eg-fastcgi with pidfile /home/rob/develop/App-ForExample/Eg/eg-fastcgi.pid
+  start program = "/home/rob/develop/App-ForExample/Eg/fastcgi-start-stop start"
+  stop program  = "/home/rob/develop/App-ForExample/Eg/fastcgi-start-stop stop"

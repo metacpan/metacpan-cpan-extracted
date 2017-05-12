@@ -1,0 +1,21 @@
+Source: libanyevent-onkyo-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5)
+Build-Depends-Indep: perl (>= 5.6.10-12),
+  libanyevent-serialport-perl, libdevice-onkyo-perl
+Maintainer: Mark Hindess <soft-debian@temporalanomaly.com>
+Standards-Version: 3.9.1.0
+Homepage: http://search.cpan.org/dist/AnyEvent-Onkyo/
+
+Package: libanyevent-onkyo-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends},
+  libanyevent-serialport-perl, libdevice-onkyo-perl
+Description: AnyEvent::Onkyo Perl Module to control Onkyo/Integra AV equipment
+ AnyEvent Perl Module that uses the ISCP (serial) and eISCP (TCP) protocol to
+ control Onkyo/Integra AV equipment.
+ .
+ An example script is provide that enables the sending of commands to
+ power on/off, change volume, etc. on a networked or serial device.
+

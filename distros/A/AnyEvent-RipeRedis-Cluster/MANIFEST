@@ -1,0 +1,17 @@
+Changes
+examples/example.pl
+lib/AnyEvent/RipeRedis/Cluster.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-base.t
+t/01-error-codes.t
+t/02-accessors.t
+t/03-functions.t
+t/04-commands.t
+t/05-exceptions.t
+t/06-pod.t
+t/07-pod-coverage.t
+t/test_helper.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

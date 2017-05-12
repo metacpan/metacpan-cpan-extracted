@@ -1,0 +1,7 @@
+Revision history for Perl extension Algorithm::Interval2Prefix.
+
+0.02  2-dec-2003
+	- added interval2regex() on suggestion from Fergal Daly
+
+0.01  29-nov-2003
+	- first version

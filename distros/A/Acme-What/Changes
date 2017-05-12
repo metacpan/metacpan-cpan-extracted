@@ -1,0 +1,33 @@
+Acme-What
+=========
+
+Created:      2012-02-06
+Home page:    <https://metacpan.org/release/Acme-What>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Acme-What>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.005	2014-09-16
+
+ [ Packaging ]
+ - Fix repo link.
+
+0.004	2014-09-11
+
+ [ Documentation ]
+ - Somewhat simplify bundled example.
+
+ [ Other ]
+ - Updated: Use Sub::Util instead of Sub::Name.
+ - Updated: Use base.pm instead of parent.pm.
+
+0.003	2014-09-11
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.002	2012-02-12	Happy Birthday Isabel!
+
+ [ Packaging ]
+ - Declare testing dependency on Test::Exception.
+
+0.001	2012-02-06	Initial release

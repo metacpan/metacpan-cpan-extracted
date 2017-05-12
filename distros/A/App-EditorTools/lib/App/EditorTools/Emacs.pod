@@ -1,0 +1,57 @@
+=pod
+
+=head1 NAME
+
+App::EditorTools::Emacs - Emacs binding for App::EditorTools
+
+=head1 SYNOPSIS
+    
+    # Install the emacs script to create binding to App::EditorTools with:
+	editortools install-emacs
+
+=head1 DESCRIPTION
+
+Once the emacs bindings have been installed (per the instructions in the
+SYNOPIS) you can use the mappings below speed editing/refactoring your
+Perl code. See L<App::EditorTools> for a description of each refactoring
+routine.
+
+=head1 MAPPINGS
+
+=over 4
+
+=item TODO
+
+EditorToolsMenu - brings up a menu to choose the following routines
+
+=item C-c e r
+
+RenameVariable - see L<App::EditorTools>
+
+=item TODO
+
+RenamePackageFromPath - see L<App::EditorTools>
+
+=item C-c e t
+
+IntroduceTemporaryVariable - see L<App::EditorTools>
+
+=back
+
+=head1 SEE ALSO
+
+Also see L<PPIx::EditorTools>, L<Padre>, and L<PPI>.
+
+=head1 AUTHOR
+
+Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Mark Grimes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

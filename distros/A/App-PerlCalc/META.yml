@@ -1,0 +1,25 @@
+---
+abstract: 'A simple but feature filled command line Perl calculator'
+author:
+  - 'David Caldwell <david@porkrind.org>'
+build_requires:
+  Test::Script::Run: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-PerlCalc
+provides:
+  App::PerlCalc:
+    file: lib/App/PerlCalc.pm
+    version: v1.2.0
+recommends:
+  Term::ReadLine: 0
+requires:
+  perl: v5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v1.2.0

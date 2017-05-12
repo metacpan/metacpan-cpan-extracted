@@ -1,0 +1,75 @@
+NAME
+    Apache::RSS - generate RSS output for directory Index.
+
+SYNOPSIS
+    setup your httpd.conf
+
+     PerlModule Apache::RSS
+     <Diretory /path/to/htdocs>
+     Options +Indexes
+     PerlHandler Apache::RSS
+     RSSEnableRegexp \.html$
+     RSSScanHTMLTitle On
+     RSSEncoding UTF-8
+     RSSEncodeHandler Apache::RSS::Encoding::JcodeUTF8
+     </Directory>
+
+    and access with QUERY_STRING *index=rss*
+
+      http://yourhost/?index=rss
+
+DESCRIPTION
+    Apache::RSS generate RSS output of directory Index. Just like a
+    mod_index_rss.
+
+    http://software.tangent.org/projects.pl?view=mod_index_rss
+
+DIRECTIVES
+    RSSEnableRegexp <regexp>
+        A regular expression of files which added in RSS. default .*
+
+    RSSChannelTitle <title>
+        set channel Title. default "Index Of *uri*"
+
+    RSSChannelDescription <description>
+        set channel description. default "Index Of *uri*"
+
+    RSSCopyRight <copyright>
+        set CopyRight string. default "CopyRight *current_year* *hostname*"
+
+    RSSLanguage <language>
+        set RSS language. default en-us
+
+    RSSEncoding <encoding>
+        set RSS encoding. default UTF-8
+
+    RSSScanHTMLTitle <On|Off>
+        scan HTML files and set HTML <title> as RSS <title> or not. default
+        Off
+
+    RSSEncodeHandler <EncodeHandlerClass>
+        works with RSSScanHTMLTitle and encode HTML title string. see the
+        Apache::RSS::Encoding::JcodeUTF8 manpage for details.
+
+OPTIONS
+    This module supports query string option to configure the order of items
+    in generated RSS file. Options are subset of those for mod_auto_index.
+    For example, accessed with
+
+      http://hostname/?index=rss&M=D
+
+    generated RSS will put items order by mtime desc. default is `N=A'.
+
+AUTHORS
+    IKEBE Tomohiro <ikebe@edge.co.jp>
+
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the XML::RSS manpage, the mod_perl manpage
+
+    http://software.tangent.org/projects.pl?view=mod_index_rss
+

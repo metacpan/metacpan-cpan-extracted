@@ -1,0 +1,33 @@
+---
+abstract: ~
+author:
+  - '$self->{author}, C<< <$self->{email_obfuscated}> >>'
+  - 'Jon Allen (JJ) <jj@jonallen.info>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Cmd-Starter
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Monkey: 0
+  Module::Starter::Simple: 0
+  perl: 5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository:
+    type: git
+    url: git://github.com/jonallen/App-Cmd-Starter.git
+    web: https://github.com/jonallen/App-Cmd-Starter
+version: 0.02

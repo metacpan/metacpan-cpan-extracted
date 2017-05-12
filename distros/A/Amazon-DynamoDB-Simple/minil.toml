@@ -1,0 +1,6 @@
+name = "Amazon-DynamoDB-Simple"
+# badges = ["travis"]
+authority="cpan:KABLAMO"
+
+module_maker="ModuleBuildTiny"
+

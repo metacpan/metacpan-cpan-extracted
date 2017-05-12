@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+mk_README.sh
+README
+perl-Apache2-SafePnotes.spec
+t/TEST.PL
+t/response/TestPnotes/pnotes.pm
+lib/Apache2/SafePnotes.pm
+META.yml                                 Module meta-data (added by MakeMaker)

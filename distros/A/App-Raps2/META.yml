@@ -1,0 +1,43 @@
+---
+abstract: 'A Password safe'
+author:
+  - 'Copyright (C) 2011-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>'
+build_requires:
+  Test::Compile: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Raps2
+provides:
+  App::Raps2:
+    file: lib/App/Raps2.pm
+    version: '0.54'
+  App::Raps2::Password:
+    file: lib/App/Raps2/Password.pm
+    version: '0.54'
+  App::Raps2::UI:
+    file: lib/App/Raps2/UI.pm
+    version: '0.54'
+requires:
+  Carp: '0'
+  Config::Tiny: '0'
+  Crypt::CBC: '0'
+  Crypt::Eksblowfish: '0'
+  Crypt::Eksblowfish::Bcrypt: '0'
+  File::BaseDir: '0'
+  File::Path: '2.0605'
+  File::Slurp: '0'
+  Getopt::Long: '0'
+  POSIX: '0'
+  Term::ReadLine: '0'
+  perl: v5.10.0
+version: '0.54'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

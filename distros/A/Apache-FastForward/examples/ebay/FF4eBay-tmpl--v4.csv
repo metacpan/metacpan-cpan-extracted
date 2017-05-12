@@ -1,0 +1,28 @@
+"url";;"\eor";;;;;;;
+"\eor";" Was sind meine Waren bei eBay wert?";;;;;;;;
+"\eor";;;;;;;;;
+"\eor";"Warennummer";"Beschreibung";"Prüfen";;;;;;
+"post";"item";;"check";"\eor";;;;;
+"value";"L1B215";"Blood Meridian : Or the Evening Redness in the West by Cormac Mccarthy    ";;"\eor";;;;;
+"value";"L1B226";"As I Lay Dying  by William Faulkner";;"\eor";;;;;
+"value";"L1B237";"The Great Gatsby by F. Scott Fitzgerald ";;"\eor";;;;;
+"value";"L1B311";"The Portrait of a Lady  by Henry James";;"\eor";;;;;
+"value";"L1B119";"The Adventures of Huckleberry Finn  by Mark Twain    ";;"\eor";;;;;
+"\eor";;;;;;;;;
+;"Order system message:";;"\eor";;;;;;
+"\eor";;;;;;;;;
+"\eor";"Ergebnisse von eBay und Lagerverwaltung";;;;;;;;
+"\eor";;;;;;;;;
+"\eor";"Ausgewählte Produkte am Lager";;;;;;;;
+;"Einkaufswert ";;"\eor";;;;;;
+;"eBay-Wert ";;"\eor";;;;;;
+;"Differenz eBay-Wert minus Einkaufswert ";;"\eor";;;;;;
+"\eor";;;;;;;;;
+"\eor";"Angaben zu den einzelnen Produkten am Lager";;;;;;;;
+"\eor";"eBay-Artikelnummer";"Beschreibung";"Lager- bestand in Stück";"Einkaufs- preis ";"Aktueller eBay Auktionspreis ";"Einkaufswert vom Lagerbestand";"Wert vom Lager- bestand nach eBay-Preis";"Differenz eBay minus Einkaufswert";
+;;;;;;"\eor"
+;;;;;;"\eor"
+;;;;;;"\eor"
+;;;;;;"\eor"
+;;;;;;"\eor"
+"\eou";;;;;;;;;

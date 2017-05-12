@@ -1,0 +1,27 @@
+Changes
+=======
+
+0.00006 - 09 Mar 2010
+    - Add --notest option to bundledeps command
+
+0.00005 - 06 Mar 2010
+    - Decrease requirement for cpanminus, as 0.9910 already have zip
+      support
+
+0.00004 - 26 Feb 2010
+    - Allow installation to proceed without running tests
+      (if demamded)
+    - Require newest version of cpanminus (or download a newer
+      version from http://github.com/miyagawa/cpanminus.
+      0.99_06 was used for testing)
+
+0.00003 - 26 Feb 2010
+    - Now uses cpanminus
+    - Add xt tests
+
+0.00002 - 08 Feb 2010
+    - Add 'bundledeps' script (miyagawa)
+    - Fix some warnings / POD errors (miyagawa)
+
+0.00001 - 17 Dec 2009
+    - Initial release

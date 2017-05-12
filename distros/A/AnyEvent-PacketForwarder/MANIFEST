@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/AnyEvent-PacketForwarder.t
+lib/AnyEvent/PacketForwarder.pm
+examples/N-slave.pl
+examples/pktproxy.pl
+examples/sftp-clean.pl
+examples/sftp-server-wrapper.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

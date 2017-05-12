@@ -1,0 +1,33 @@
+<body bgcolor="#ffffff">
+<head>
+<meta http-equiv="refresh" content="<VAR_REDIRECT>;URL=<VAR_URI>">
+<title>Message of the Day</title>
+</head>
+<center>
+<table border="0" cellpadding="1" cellspacing="0" width="500"
+       bgcolor="#000000">
+<tr><td align="center">
+    <table border="0" cellpadding="8" cellspacing="0" width="100%"
+           bgcolor="#ffffff">
+    <td align="center">
+        <font face="Arial,Helvetica"><b>Apache WebServer</b></font>
+    </td>
+    </tr><tr>
+    <td align=left>
+        <font face="Arial,Helvetica">
+        The use of this  computing  system  is  restricted  to
+        the conduct of company  authorized  business  by  authorized
+        users.   All information and  communications on this system
+        are  subject  to review,  monitoring and recording at any time,
+        without notice or permission.  Unauthorized access or use may
+        be subject to prosecution.
+        </font>
+    </td>
+    </tr></table>
+</td>
+</tr></table>
+<p>
+<a href="<VAR_URI>"><font face="Arial,Helvetica"
+   size="-1">click here to proceed</font></a><p>
+ 
+</body></html>

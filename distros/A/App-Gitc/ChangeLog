@@ -1,0 +1,11 @@
+---
+version: 0.58
+date: 10/16/2012
+changes:
+        - fix bug in version tag handling
+        - fix promotions under git 1.7.10
+---
+version: 0.57
+date: 09/10/2012
+changes:
+        - the first public release

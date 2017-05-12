@@ -1,0 +1,62 @@
+{
+   "abstract" : "Archive Devel::Cover reports",
+   "author" : [
+      "Thomas Klausner <domm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300025, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-ArchiveDevelCover",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "File::Copy" : "0",
+            "HTML::TableExtract" : "0",
+            "Moose" : "0",
+            "MooseX::Getopt" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Copy::Recursive" : "0",
+            "File::Temp" : "0",
+            "Path::Class" : "0",
+            "Test::File" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Test::Trap" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/domm/App-ArchiveDevelCover.git",
+         "web" : "http://github.com/domm/App-ArchiveDevelCover"
+      }
+   },
+   "version" : "1.002"
+}
+

@@ -1,0 +1,29 @@
+Apache::AuthenProgram is a mod_perl module that provides a
+reasonably general mechanism to perform username/password
+authentication in Apache by calling an external program.
+Authentication by an external program is useful when a
+program can perform an authentication not supported by any
+Apache modules (for example, cross-domain authentication is
+not supported by Apache::NTLM or Apache::AuthenSmb, but is
+supported by Samba's smbclient program).
+
+Installing Apache::AuthenProgram follows the normal CPAN
+convention:
+    perl Makefile.PL
+    make
+    make test
+    make install
+Remember that after installation, you will need to restart
+your Apache server to load Apache::AuthenProgram.
+
+Please note that in this version of Apache::AuthenProgram,
+"make test" only ensures that the module loads without
+errors.
+
+
+COPYRIGHT
+
+Copyright (c) 2002 Mark Leighton Fisher, Thomson multimedia Inc.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

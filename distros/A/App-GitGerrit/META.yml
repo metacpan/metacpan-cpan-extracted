@@ -1,0 +1,43 @@
+---
+abstract: 'A container for functions for the git-gerrit program'
+author:
+  - 'Gustavo L. de M. Chaves <gnustavo@cpan.org>'
+build_requires:
+  Test::More: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-GitGerrit
+recommends:
+  LWP::Simple: 0
+  Net::Netrc: 0
+  Term::Prompt: 0
+  Win32: 0.45
+requires:
+  Data::Dumper: 0
+  Exporter: 0
+  File::Spec: 0
+  File::Temp: 0
+  Gerrit::REST: 0.009
+  Getopt::Long: 0
+  Pod::Usage: 0
+  Text::Table: 0
+  URI: 0
+  URI::Escape: 0
+  locale: 0
+  open: 1.07
+  perl: 5.010
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/gnustavo/git-gerrit/issues
+  homepage: http://search.cpan.org/dist/App-GitGerrit/
+  repository: git://github.com/gnustavo/git-gerrit.git
+version: 0.022

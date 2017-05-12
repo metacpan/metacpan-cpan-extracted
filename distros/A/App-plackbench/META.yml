@@ -1,0 +1,30 @@
+---
+abstract: 'Benchmarking/Debugging tool for Plack web requests'
+author:
+  - 'Paul Boyd <boyd.paul2@gmail.com>'
+build_requires:
+  Class::Load: '0'
+  FindBin: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-plackbench
+requires:
+  Getopt::Long: '0'
+  HTTP::Request: '0'
+  List::Util: '0'
+  Plack: '0'
+  Scalar::Util: '0'
+  Time::HiRes: '0'
+  perl: v5.10.1
+resources:
+  homepage: https://github.com/pboyd/App-plackbench
+  repository: https://github.com/pboyd/App-plackbench.git
+version: '0.5'

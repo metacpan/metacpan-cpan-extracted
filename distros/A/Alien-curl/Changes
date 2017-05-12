@@ -1,0 +1,20 @@
+Revision history for Alien-curl
+
+0.06      2017-03-28 14:20:06 -0400
+  - Add documentation for usability
+
+0.05      2017-03-02 06:53:34 +1100
+  - Remove dep on Alien::Base2
+
+0.04      2017-02-08 08:01:02 -0500
+  - Require Alien::build 0.11 for bugfixes
+
+0.03      2017-02-04 11:39:58 -0500
+  - Fixed configure requires bug
+  - Require Alien::Build 0.08
+
+0.02      2017-01-31 16:49:42 -0500
+  - Require Alien::Build 0.02
+
+0.01      2017-01-30 22:41:14 -0500
+  - initial version

@@ -1,0 +1,11 @@
+@multitable @columnfractions 0.029 0.058 0.144 0.183 0.125 0.163 0.106 0.125 0.067
+@item uid @tab string @tab integer_decimal @tab integer_hexadecimal @tab integer_octal @tab float_exponential @tab float_fixed @tab float_special @tab boolean
+@item 0 @tab " @tab 0 @tab 0x00 @tab 000 @tab 0e0 @tab 0.00 @tab inf @tab Y
+@item 1 @tab ! @tab +1000 @tab +0x3E8 @tab +01750 @tab +1.0000e+03 @tab +999.99 @tab -INF @tab YES
+@item 2 @tab @ @tab 1000000 @tab 0xF4240 @tab 03641100 @tab 1e6 @tab 54.1234 @tab nan @tab ON
+@item 3 @tab # @tab -1234 @tab 0x4d2 @tab 02322 @tab -1.234000e+03 @tab 1_234.56 @tab NAN @tab TRUE
+@item 4 @tab $ @tab -56789 @tab 0xDDD5 @tab 0156725 @tab 5.678900e+04 @tab 56_789.012 @tab NaN @tab N
+@item 5 @tab % @tab +0 @tab +0x00 @tab +000 @tab +0e0 @tab +0.00 @tab InF @tab FALSE
+@item 6 @tab & @tab -0 @tab -0x00 @tab -000 @tab -0e0 @tab -0.00 @tab infinity @tab NO
+@item 7 @tab * @tab 1234567890 @tab 0x499602D2 @tab 011145401322 @tab 1.234568e+09 @tab 1234567890 @tab -infinity @tab OFF
+@end multitable

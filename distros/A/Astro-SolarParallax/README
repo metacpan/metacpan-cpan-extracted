@@ -1,0 +1,35 @@
+Astro-SolarParallax version 0.04
+================================
+
+This module implements functions to find the Solar parallax from
+planetary transits, more specifically, in the present implementation,
+it uses a method described in detail by F. Mignard in "The Solar
+parallax with the transit of Venus", available at 
+<URL: http://www.obs-azur.fr/cerga/mignard/TRANSITS/venus_contact.pdf >
+Specifically, Section 7 of that paper. 
+
+INSTALLATION
+
+To install this module use CPAN or CPANPLUS tools or type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+  - Time::Piece
+  - Math::Trig
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Kjetil Kjernsmo
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

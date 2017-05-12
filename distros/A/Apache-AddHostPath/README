@@ -1,0 +1,122 @@
+NAME
+    Apache::AddHostPath - Adds some or all of the hostname and port
+    to the URI
+
+SYNOPSIS
+      # in httpd.conf
+      PerlTransHandler Apache::AddHostPath
+
+DESCRIPTION
+    This module transforms the requested URI based on the hostname
+    and port number from the http request header. It allows you to
+    manage an arbitrary number of domains and/or sub-domains all
+    pointed to the same document root, but for which you want a
+    combination of shared and distinct files.
+
+    Essentially the module implements Apache's URI translation phase
+    by attempting to use some or all of the URL hostname and port
+    number as the base of the URI. It simply does file and directory
+    existence tests on a series of URIs (from most-specific to
+    least-specific) and sets the URI to the most specific match.
+
+    If the requested is:
+
+     URL: http://www.alpha.cvsroot.org:8080/index.html
+     URI: /index.html
+
+    Apache::AddHostPath would go through the following list of
+    possible paths and set the new URI based on the first match
+    which passes a -f or -d existence test:
+
+     $docRoot/org/cvsroot/alpha/www/8080/index.html
+     $docRoot/org/cvsroot/alpha/www/index.html
+     $docRoot/org/cvsroot/alpha/index.html
+     $docRoot/org/cvsroot/index.html
+     $docRoot/org/index.html
+     $docRoot/index.html
+
+    For example if you have three domains cvsroot.org,
+    ransommoney.com, and inputsignal.com using the same apache
+    instance and DocumentRoot (without using VirtualHosts). If you
+    assume that the DocumentRoot contains the following files and
+    directories:
+
+     images/
+     images/bg.gif
+     org/
+     org/cvsroot/
+     org/cvsroot/images/logo.gif
+     com/
+     com/images/
+     com/images/bg.gif
+     com/ransommoney/
+     com/ransommoney/images/
+     com/ransommoney/images/logo.gif
+     com/ransommoney/images/bg.gif
+     com/inputsignal/
+     com/inputsignal/images/
+     com/inputsignal/images/logo.gif
+
+    Apache::AddHostPath would transform the following requested
+    URL/URIs as follows:
+
+     Input URL:  http://cvsroot.org/images/bg.gif
+     Input URI:  /images/bg.gif
+     Output URI: /images/bg.gif
+
+     Input URL:  http://cvsroot.org/images/logo.gif
+     Input URI:  /images/logo.gif
+     Output URI: /org/cvsroot/images/logo.gif
+
+     Input URL:  http://ransommoney.com/images/bg.gif
+     Input URI:  /images/bg.gif
+     Output URI: /com/ransommoney/images/bg.gif
+
+     Input URL:  http://inputsignal.com/images/bg.gif
+     Input URI:  /images/bg.gif
+     Output URI: /com/images/bg.gif
+
+    It also correctly handles extra path info to CGI scripts. For
+    example if you add the following files and dirs to the above
+    example:
+
+     cgi-bin/
+     cgi-bin/magic.pl
+     org/cvsroot/cgi-bin/
+     org/cvsroot/cgi-bin/magic.pl
+
+    Apache::AddHostPath would transform the following requested
+    URL/URIs as follows:
+
+     Input URL: http://cvsroot.org/cgi-bin/magic.pl/param1/param2
+     Input URI: /cgi-bin/magic.pl/param1/param2
+     Output URI: /org/cvsroot/cgi-bin/magic.pl/param1/param2
+
+     Input URL: http://ransommoney.com/cgi-bin/magic.pl/param1
+     Input URI: /cgi-bin/magic.pl/param1
+     Output URI: /cgi-bin/magic.pl/param1
+
+    You can debug this URI translation by setting your Apache
+    LogLevel to "debug". This will show add messages to your error
+    log showing every URI combination tested and which one it ended
+    up using.
+
+    This module adds powerful yet simplistic inheritance
+    capabilities to a multi-domain server. A number of domains could
+    be set to a single flat document root initially. Then individual
+    files could be overridden for a hostname, or set of hostnames,
+    simply by creating the appropriate directory structures and
+    specific files while leaving the rest of the domain untouched.
+
+AUTHOR
+    Robert C W Jenks, rjenks@cvsroot.org
+
+SEE ALSO
+    perl(1). the mod_perl manpage
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 2 of
+    the License, or (at your option) any later version.
+

@@ -1,0 +1,49 @@
+{
+   "abstract" : "This module is a subclass to Authen::Krb5, adding 'Effortless' ways to authenticate against a Kerberos Domain Controller.",
+   "author" : [
+      "Adam Faris <afaris@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Authen-Krb5-Effortless",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::Krb5" : "0",
+            "Carp" : "0",
+            "parent" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Authen::Krb5::Effortless" : {
+         "file" : "lib/Authen/Krb5/Effortless.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.apache.org/licenses/LICENSE-2.0.txt"
+      ]
+   },
+   "version" : "0.02"
+}

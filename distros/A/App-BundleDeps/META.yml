@@ -1,0 +1,30 @@
+---
+abstract: 'Bundle All Your Module Deps In A local::lib Dir'
+author:
+  - 'Daisuke Maki - C<< <daisuke@endeworks.jp> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.94'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-BundleDeps
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  YAML::XS: 0
+requires:
+  App::cpanminus: 0.9910
+  YAML: 0
+  local::lib: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.00006

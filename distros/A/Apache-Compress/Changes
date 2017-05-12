@@ -1,0 +1,53 @@
+Revision history for Perl extension Apache::Compress
+
+1.005  Wed Nov 17 13:59:58 CST 2004
+
+ - Fixed the documentation by adding a 'SetHandler perl-script' line
+   to each example. [Andy Lester]
+
+1.004  Sun Apr 18 21:37:16 CDT 2004
+
+ - Added the 'CompressDecision' configuration variable to control how
+   the decision to compress is made.  Rudimentary support for
+   user-agent sniffing is available.
+
+ - I think print() was buffering very short documents so they wouldn't
+   ever be output.  $r->print() seems to work better.
+
+ - Squelched a couple of warnings about undefined values. [Spotted by
+   Dave Rolsky]
+
+ - Added a Build.PL script that users can use instead of Makefile.PL
+   if they want.  Not surprisingly, it's a lot cleaner than the
+   Makefile.PL.
+
+ - Fixed some quoting problems when reading the user's existing
+   httpd.conf for testing purposes.
+
+ - The regression tests now use Test.pm.
+
+
+1.003  date: 2000/11/05 05:36:46
+
+ - Updated code to work with Apache::Filter 1.013 and greater.  If
+   you're using Apache::Filter 1.012 or lower, you must use 2.14 or
+   lower of Apache::Compress.  If you don't use Apache::Filter, you
+   don't need to care.
+
+ - Added Compress::Zlib to the PREREQ_PM list in Makefile.PL.
+
+
+1.002  date: 2000/08/22 05:30:11
+
+ - First release on CPAN.  Rewrote code to be a bit cleaner.  Changed
+   name from Apache::Gzip to Apache::Compress, because Apache::Gzip is
+   taken by a sample module in the Eagle book.
+
+ - Wrote some bare-bones documentation, but it probably needs more.
+
+
+1.001  date: 2000/05/31 01:43:20
+
+ - First revision, never released.  Based on code that Geoffrey Young
+   and Philippe Chiasson were working on a while back, but abandoned.
+   They based theirs on Apache::GzipChain.

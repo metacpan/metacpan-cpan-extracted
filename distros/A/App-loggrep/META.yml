@@ -1,0 +1,32 @@
+---
+abstract: 'quickly find relevant lines in a log searching by date'
+author:
+  - 'David F. Houghton <dfhoughton@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.88'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.023, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-loggrep
+no_index: {}
+requires:
+  Date::Parse: '0'
+  Getopt::Long::Descriptive: '0'
+  Tie::File: '0'
+  constant: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+version: '0.002'

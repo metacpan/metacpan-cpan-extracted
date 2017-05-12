@@ -1,0 +1,33 @@
+[% PROCESS header.html title='Merge pods called "' _ pod_name _ '"' %]
+[% PROCESS login_form.html %]
+[% PROCESS form.html %]
+
+<h2>Merge pods called "[% pod_name | html %]"</h2>
+<p>Please select the documents that are considered equivalent. (For example,
+a POD that is included in the core perl distribution could also be available
+as a separate CPAN distribution.)</p>
+
+<form method="POST" action="[% root_uri_rel %]/">
+<input type="hidden" name="mode" value="join_pod_save">
+<input type="hidden" name="name" value="[% pod_name | html %]">
+<table>
+<tr><th>POD</th><th>Distributions</th></tr>
+[% FOR pod = pods %]
+    <tr>
+    <td>[% link_perldoc(pod) %]</td>
+    <td>
+    [% FOR dist = pod.dists %]
+        [% link_dist_latest(dist); ', ' UNLESS loop.last  %]
+        [%# link_dist_pod_latest(dist, pod); ', ' UNLESS loop.last %]
+    [% END %]
+    </td>
+    <td><input type="checkbox" name="pod" value="[% pod.id %]"></td>
+    </tr>
+[% END %]
+</table>
+
+<input type="submit" value="Save">
+</form>
+
+[% PROCESS footer.html %]
+

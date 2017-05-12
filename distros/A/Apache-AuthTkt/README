@@ -1,0 +1,41 @@
+Apache::AuthTkt
+==================
+
+Apache::AuthTkt is a perl module used to generate and validate 
+authentication tickets used with the 'mod_auth_tkt' apache 
+authentication module. mod_auth_tkt is a lightweight cookie-based 
+authentication module written in C that is user repository agnostic 
+(i.e. not tied to ldap/pam/radius etc.), and supports single-signon 
+across multiple apaches and machines. 
+
+See http://www.openfusion.com.au/labs/mod_auth_tkt/ for details, 
+and the Apache::AuthTkt perldocs.
+
+
+INSTALLATION
+
+Install using the standard install tango:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Digest::MD5
+  MIME::Base64
+  Carp
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2001-2008 Gavin Carr and contributors.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+Prot.pm
+Prot.xs
+README
+hints/dec_osf.pl
+hints/hpux.pl
+hints/sco_sv.pl
+test.pl
+typemap
+xsgen.pl

@@ -1,0 +1,58 @@
+NAME
+    Acme::CPANAuthors::Austrian - We are Austrian CPAN authors
+
+VERSION
+    version 1.131810
+
+SYNOPSIS
+       use Acme::CPANAuthors;
+       use Acme::CPANAuthors::Austrian;
+
+       my $authors = Acme::CPANAuthors->new('Austrian');
+
+       my $number   = $authors->count;
+       my @ids      = $authors->id;
+       my @distros  = $authors->distributions('MARCEL');
+       my $url      = $authors->avatar_url('DOMM');
+       my $kwalitee = $authors->kwalitee('GARGAMEL');
+
+DESCRIPTION
+    This class provides a hash of Pause ID/name of Austrian CPAN authors.
+
+MAINTENANCE
+    If you are an Austrian CPAN author and are not listed here, please mail
+    the maintainers.
+
+SEE ALSO
+    Acme::CPANAuthors - Main class to manipulate this one.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANAuthors-Austr
+    ian>.
+
+AVAILABILITY
+    The project homepage is
+    <http://search.cpan.org/dist/Acme-CPANAuthors-Austrian/>.
+
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <https://metacpan.org/module/Acme::CPANAuthors::Austrian/>.
+
+AUTHORS
+    *   Marcel Gruenauer <marcel@cpan.org>
+
+    *   Philipp Gortan <gortan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2008 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

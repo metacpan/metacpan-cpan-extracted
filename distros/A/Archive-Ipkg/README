@@ -1,0 +1,30 @@
+Archive/Ipkg
+============
+
+This module aids in the construction of iPKG packages (See links below
+for description of the implemented package format). The interface is
+somewhat similar to that of the Archive::Tar manpage, but with a couple
+differences.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Archive::Tar
+   Compress::Zlib
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Christian Renz <crenz@web42.com>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

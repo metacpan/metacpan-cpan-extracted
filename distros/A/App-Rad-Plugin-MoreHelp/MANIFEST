@@ -1,0 +1,9 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/App/Rad/Plugin/MoreHelp.pm

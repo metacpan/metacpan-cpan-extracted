@@ -1,0 +1,35 @@
+{
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "generated_by" : "ExtUtils::MakeMaker::JSONMETA version 7.000",
+   "distribution_type" : "module",
+   "version" : "1.30",
+   "name" : "AnyEvent-MP",
+   "author" : [],
+   "license" : "unknown",
+   "build_requires" : {
+      "ExtUtils::MakeMaker" : 0
+   },
+   "requires" : {
+      "AnyEvent" : 5.11,
+      "Net::Interface" : 1.011,
+      "JSON::XS" : 2.25,
+      "Digest::HMAC_MD6" : 0,
+      "MIME::Base64" : 3,
+      "AnyEvent::Watchdog" : 1,
+      "common::sense" : 0,
+      "Digest::MD6" : 0
+   },
+   "abstract" : null,
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : 0
+   }
+}

@@ -1,0 +1,62 @@
+{
+   "abstract" : "Generalized REST forwarder for MFILE-based frontends",
+   "author" : [
+      "Smithfarm <presnypreklad@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-MFILE",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "App::CELL" : "0.196",
+            "Params::Validate" : "1.06",
+            "Test::Fatal" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.37",
+            "Software::License" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::CELL" : "0.196",
+            "HTTP::Request::Common" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Params::Validate" : "1.06",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "provides" : {
+      "App::MFILE" : {
+         "file" : "lib/App/MFILE.pm",
+         "version" : "0.181"
+      },
+      "App::MFILE::HTTP" : {
+         "file" : "lib/App/MFILE/HTTP.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://sourceforge.net/projects/mfile/",
+      "license" : [
+         "http://opensource.org/licenses/bsd-license.php"
+      ],
+      "repository" : {
+         "url" : "https://sourceforge.net/p/mfile/code/"
+      }
+   },
+   "version" : "0.181",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

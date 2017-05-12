@@ -1,0 +1,47 @@
+{
+   "abstract" : "Math is HARD (faster)",
+   "author" : [
+      "Ingy döt Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alt-Acme-Math-XS-ModuleBuild",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Math::XS" : {
+         "file" : "lib/Acme/Math/XS.pm"
+      },
+      "Acme::Math::XS::Inline" : {
+         "file" : "lib/Acme/Math/XS/Inline.pm"
+      },
+      "Alt::Acme::Math::XS::ModuleBuild" : {
+         "file" : "lib/Alt/Acme/Math/XS/ModuleBuild.pm",
+         "version" : "v0.0.6"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.6"
+}

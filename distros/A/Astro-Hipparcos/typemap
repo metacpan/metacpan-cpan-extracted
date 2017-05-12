@@ -1,0 +1,21 @@
+HipRecord*	O_OBJECT
+short int	T_IV
+std::string	T_STRING
+std::string*	T_STRINGPTR
+
+INPUT
+
+T_STRING
+	$var = $type(SvPV_nolen($arg))
+
+T_STRINGPTR
+	$var = new std::string(SvPV_nolen($arg))
+
+OUTPUT
+
+T_STRING
+	sv_setpv((SV*)$arg, $var.c_str());
+
+T_STRINGPTR
+	sv_setpv((SV*)$arg, $var->c_str());
+

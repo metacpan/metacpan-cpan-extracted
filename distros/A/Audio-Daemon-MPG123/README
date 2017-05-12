@@ -1,0 +1,29 @@
+Audio::Daemon::MPG123
+
+This is a simple wrapper for Audio::Play::MPG123, I'm pretty
+sick of writing documentation, so see the perldocs in the modules
+for details.  This is still in beta.
+
+Requires:
+
+for server:
+Audio::Play::MPG123 
+Audio::Mixer (for optional volume control)
+
+
+client just needs IO::Socket and IO::Select which should be a default.
+
+
+INSTALLATION:
+
+perl Makefile.PL
+make && make install
+
+see the examples/ directory for examples of how to run a server or client.
+
+The examples/client is crudely interactive (no help in it).
+The examples/Server should just work.
+
+Any and all Feedback is welcome.
+
+

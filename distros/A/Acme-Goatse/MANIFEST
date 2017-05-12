@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+lib/Acme/Goatse.pm
+README
+t/goatse.t
+META.yml                                 Module meta-data (added by MakeMaker)

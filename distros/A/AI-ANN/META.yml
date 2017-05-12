@@ -1,0 +1,20 @@
+---
+abstract: "an artificial neural network simulator\r"
+author:
+  - 'Dan Collins <DCOLLINS@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AI-ANN
+requires:
+  Inline::C: 0
+  Math::Libm: 0
+  Moose: 2.00
+  Storable: 0
+version: 0.008

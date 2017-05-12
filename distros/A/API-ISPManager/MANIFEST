@@ -1,0 +1,32 @@
+add_database.pl
+add_mailbox.pl
+add_www_domain.pl
+Changes
+lib/API/ISPManager.pm
+lib/API/ISPManager/backup.pm
+lib/API/ISPManager/db.pm
+lib/API/ISPManager/diskpreset.pm
+lib/API/ISPManager/dns.pm
+lib/API/ISPManager/domain.pm
+lib/API/ISPManager/file.pm
+lib/API/ISPManager/ftp.pm
+lib/API/ISPManager/ip.pm
+lib/API/ISPManager/mailbox.pm
+lib/API/ISPManager/misc.pm
+lib/API/ISPManager/order.pm
+lib/API/ISPManager/preset.pm
+lib/API/ISPManager/services.pm
+lib/API/ISPManager/software.pm
+lib/API/ISPManager/stat.pm
+lib/API/ISPManager/user.pm
+lib/API/ISPManager/vds.pm
+lib/API/ISPManager/vdspreset.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+runtests.sh
+t/01-test.t
+t/02-files.t
+upload_file.pl
+vdsmanager.pl
+META.yml                                 Module meta-data (added by MakeMaker)

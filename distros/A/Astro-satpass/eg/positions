@@ -1,0 +1,52 @@
+#!/usr/local/bin/perl
+
+# Compute the positions of satellites at the current time, as seen from
+# a pre-programmed position. The TLE data are read from standard in, or
+# from a file or files named on the command line.
+
+use strict;
+use warnings;
+
+use Astro::Coord::ECI;
+use Astro::Coord::ECI::TLE;
+use Astro::Coord::ECI::TLE::Set;
+use Astro::Coord::ECI::Utils qw{ deg2rad rad2deg :time };
+
+use POSIX qw{strftime};
+
+my $station = Astro::Coord::ECI->new(
+    name => 'Parliament House, Canberra ACT, Australia',
+)->geodetic(
+    deg2rad(-35.308232),	# Latitude in radians
+    deg2rad(149.124495),	# Longitude in radians
+    0.603,			# Elevation above sea level in kilometers
+);
+
+my @time = gmtime(time());
+splice @time, 0, 3, 0, 0, 0;
+my $start = timegm(@time);	# Start is today midnight GMT
+my $end = $start + 86400;	# End is tomorrow midnight GMT
+my $delta = 60;			# Step size is 60 seconds
+my $timfmt = '%d-%b-%Y %H:%M:%S';	# Date/time format.
+my $dtafmt = "%s  %6.2f  %6.2f  %5.0f\n";
+
+local $/ = undef;
+my @tle = Astro::Coord::ECI::TLE::Set->aggregate(
+    Astro::Coord::ECI::TLE->parse( { station => $station }, <>));
+
+print "date/time            azimuth elevation range\n";
+foreach my $body (@tle) {
+    print "\nOID ", $body->get('id'), ' ', $body->get('name'), "\n";
+    for (my $time = $start; $time < $end; $time += $delta) {
+	eval {$body->universal($time); 1;} or do {
+	    warn $@;
+	    last;
+	};
+	my ($azim, $elev, $range) = $body->azel();
+	$elev >= 0 or next;
+	printf $dtafmt, strftime($timfmt, gmtime $time), rad2deg($azim),
+	    rad2deg($elev), $range;
+    }
+}
+
+# ex: set textwidth=72 :

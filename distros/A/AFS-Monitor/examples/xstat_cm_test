@@ -1,0 +1,756 @@
+#!/usr/bin/perl -w
+#
+# Copyright © 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+#                  Elizabeth Cassell <e_a_c@mailsnare.net>
+#
+# $Revision: 1.8 $ $Date: 2006/05/31 16:22:51 $ $Author: alfw $
+#
+
+use blib;
+use strict;
+use AFS::Monitor qw(xstat_cm_test constant);
+use Data::Dumper;
+
+my @cmname = ("virtue.openafs.org", "andrew.e.kth.se");
+my @collID = (0, 1, 2);
+
+my @tests;      # choose which tests to run
+$tests[1] = 1;  # test of cmname @cmname and collIDs @collID
+$tests[2] = 0;  # test of cmname but no collID
+$tests[3] = 0;  # test of single cmname with collID
+$tests[4] = 0;  # test of single cmname but no single collID
+
+my $all = 1;
+
+my $showdump = 0;   # print entire contents of hash for each test
+my $formatted = 1;  # print formatted like original xstat_cm_test program
+
+print "# Starting now... #\n";
+my $result;
+
+
+if ($all || $tests[1]) {
+  print "\n******** TEST 1: ********\n";
+
+  print "\nxstat_cm_test -cmname ", join(" ", @cmname),
+        " -collID ", join(" ", @collID), "\n\n";
+
+  $result = xstat_cm_test(cmname => \@cmname,
+                          collID => \@collID);
+  parse_result($result);
+}
+
+if ($all || $tests[2]) {
+  print "\n******** TEST 2: ********\n";
+
+  print "\nxstat_cm_test -cmname ", join(" ", @cmname), "\n\n";
+
+  $result = xstat_cm_test(cmname => \@cmname);
+  parse_result($result);
+}
+
+
+if ($all || $tests[3]) {
+  print "\n******** TEST 3: ********\n";
+
+  print "\nxstat_cm_test -cmname ", $cmname[0],
+                       " -collID 2\n\n";
+
+  $result = xstat_cm_test(cmname => $cmname[0],
+                          collID => 2);
+  parse_result($result);
+}
+
+
+if ($all || $tests[4]) {
+  print "\n******** TEST 4: ********\n";
+
+  print "\nxstat_cm_test -cmname ", $cmname[0], "\n\n";
+
+  $result = xstat_cm_test(cmname => $cmname[0]);
+  parse_result($result);
+}
+
+
+
+sub parse_result {
+  my $info = shift;
+
+  if ($AFS::CODE) {
+    print "Error case: ", ref($info), "\n" if (defined($info));
+    # die("Error: AFS::CODE = $AFS::CODE (", ($AFS::CODE+0), ")\n");
+    print "Error: AFS::CODE = $AFS::CODE (", ($AFS::CODE+0), ")\n";
+    return;
+  }
+
+  if ($showdump) {
+    local $Data::Dumper::Quotekeys = 0;
+    local $Data::Dumper::Sortkeys = 1;
+    local $Data::Dumper::Indent = 1;
+    local $Data::Dumper::Maxdepth = 2;
+    local $Data::Dumper::Varname = "xstat_cm_test";
+    print Dumper($info);
+  }
+
+  if ($formatted) {
+    foreach my $host (@$info) {
+      if ($host->{probeOK} == 0) {
+        printf("CM_Handler: Probe 1, collection %d to CM on '%s' failed\n",
+                $host->{collectionNumber},
+                $host->{hostName});
+        return;
+      }
+      if ($host->{collectionNumber} == constant("AFSCB_XSTATSCOLL_CALL_INFO")) {
+        PrintCallInfo($host);
+      } elsif ($host->{collectionNumber} == constant("AFSCB_XSTATSCOLL_PERF_INFO")) {
+        PrintPerfInfo($host);
+      } elsif ($host->{collectionNumber} == constant("AFSCB_XSTATSCOLL_FULL_PERF_INFO")) {
+        PrintFullPerfInfo($host);
+      } else {
+        printf "** Unknown collection: %d\n", $host->{collectionNumber};
+      }
+    }
+  }
+}
+
+
+sub PrintPerfInfo {
+  my $host = shift;
+
+  printf("AFSCB_XSTATSCOLL_PERF_INFO (coll %d) for CM %s\n[Probe 1, %s]\n\n",
+          $host->{collectionNumber},
+          $host->{hostName},
+          scalar localtime $host->{probeTime});
+
+  PrintOverallPerfInfo($host->{data});
+}
+
+
+sub PrintFullPerfInfo {
+  my $host = shift;
+
+  printf("AFSCB_XSTATSCOLL_FULL_PERF_INFO (coll %d) for CM %s\n[Probe 1, %s]\n\n",
+          $host->{collectionNumber},
+          $host->{hostName},
+          scalar localtime $host->{probeTime});
+
+  print "Overall Performance Info:\n-------------------------\n";
+
+  PrintOverallPerfInfo($host->{data}->{perf});
+
+  print "\n";
+
+  PrintRPCPerfInfo($host->{data}->{rpc});
+
+  my $authentP = $host->{data}->{authent};
+  print "\nAuthentication info:\n--------------------\n";
+
+  printf("\t%d PAGS, %d records (%d auth, %d unauth), %d max in PAG, chain max: %d\n",
+          $authentP->{curr_PAGs},
+          $authentP->{curr_Records},
+          $authentP->{curr_AuthRecords},
+          $authentP->{curr_UnauthRecords},
+          $authentP->{curr_MaxRecordsInPAG},
+          $authentP->{curr_LongestChain});
+  printf("\t%d PAG creations, %d tkt updates\n",
+          $authentP->{PAGCreations},
+          $authentP->{TicketUpdates});
+  printf("\t[HWMs: %d PAGS, %d records, %d max in PAG, chain max: %d]\n",
+          $authentP->{HWM_PAGs},
+          $authentP->{HWM_Records},
+          $authentP->{HWM_MaxRecordsInPAG},
+          $authentP->{HWM_LongestChain});
+
+  my $accessinfP = $host->{data}->{accessinf};
+  print "\n[Un]replicated accesses:\n------------------------\n";
+  printf("\t%d unrep, %d rep, %d reps accessed, %d max reps/ref, %d first OK\n\n",
+          $accessinfP->{unreplicatedRefs},
+          $accessinfP->{replicatedRefs},
+          $accessinfP->{numReplicasAccessed},
+          $accessinfP->{maxReplicasPerRef},
+          $accessinfP->{refFirstReplicaOK});
+}
+
+
+sub PrintOverallPerfInfo {
+  my $perf = shift;
+
+  printf "\t%10d numPerfCalls\n", $perf->{numPerfCalls};
+
+  printf "\t%10d epoch\n",	 $perf->{epoch};
+  printf "\t%10d numCellsVisible\n", $perf->{numCellsVisible};
+  printf "\t%10d numCellsContacted\n", $perf->{numCellsContacted};
+  printf "\t%10d dlocalAccesses\n", $perf->{dlocalAccesses};
+  printf "\t%10d vlocalAccesses\n", $perf->{vlocalAccesses};
+  printf "\t%10d dremoteAccesses\n", $perf->{dremoteAccesses};
+  printf "\t%10d vremoteAccesses\n", $perf->{vremoteAccesses};
+  printf "\t%10d cacheNumEntries\n", $perf->{cacheNumEntries};
+  printf "\t%10d cacheBlocksTotal\n", $perf->{cacheBlocksTotal};
+  printf "\t%10d cacheBlocksInUse\n", $perf->{cacheBlocksInUse};
+  printf "\t%10d cacheBlocksOrig\n", $perf->{cacheBlocksOrig};
+  printf "\t%10d cacheMaxDirtyChunks\n", $perf->{cacheMaxDirtyChunks};
+  printf "\t%10d cacheCurrDirtyChunks\n", $perf->{cacheCurrDirtyChunks};
+  printf "\t%10d dcacheHits\n", $perf->{dcacheHits};
+  printf "\t%10d vcacheHits\n", $perf->{vcacheHits};
+  printf "\t%10d dcacheMisses\n", $perf->{dcacheMisses};
+  printf "\t%10d vcacheMisses\n", $perf->{vcacheMisses};
+  printf "\t%10d cacheFilesReused\n", $perf->{cacheFilesReused};
+  printf "\t%10d vcacheXAllocs\n", $perf->{vcacheXAllocs};
+  printf "\t%10d dcacheXAllocs\n", $perf->{dcacheXAllocs};
+
+  printf "\t%10d bufAlloced\n", $perf->{bufAlloced};
+  printf "\t%10d bufHits\n",	 $perf->{bufHits};
+  printf "\t%10d bufMisses\n", $perf->{bufMisses};
+  printf "\t%10d bufFlushDirty\n", $perf->{bufFlushDirty};
+
+  printf "\t%10d LargeBlocksActive\n", $perf->{LargeBlocksActive};
+  printf "\t%10d LargeBlocksAlloced\n", $perf->{LargeBlocksAlloced};
+  printf "\t%10d SmallBlocksActive\n", $perf->{SmallBlocksActive};
+  printf "\t%10d SmallBlocksAlloced\n", $perf->{SmallBlocksAlloced};
+  printf "\t%10d OutStandingMemUsage\n", $perf->{OutStandingMemUsage};
+  printf "\t%10d OutStandingAllocs\n", $perf->{OutStandingAllocs};
+  printf "\t%10d CallBackAlloced\n", $perf->{CallBackAlloced};
+  printf "\t%10d CallBackFlushes\n", $perf->{CallBackFlushes};
+  printf "\t%10d CallBackLoops\n", $perf->{cbloops};
+
+  printf "\t%10d srvRecords\n", $perf->{srvRecords};
+  printf "\t%10d srvNumBuckets\n", $perf->{srvNumBuckets};
+  printf "\t%10d srvMaxChainLength\n", $perf->{srvMaxChainLength};
+  printf "\t%10d srvMaxChainLengthHWM\n", $perf->{srvMaxChainLengthHWM};
+  printf "\t%10d srvRecordsHWM\n", $perf->{srvRecordsHWM};
+
+  printf "\t%10d sysName_ID\n", $perf->{sysName_ID};
+
+  print "\tFile Server up/downtimes, same cell:\n";
+  PrintUpDownStats($perf->{fs_UpDown}->[0]);
+
+  print "\tFile Server up/downtimes, diff cell:\n";
+  PrintUpDownStats($perf->{fs_UpDown}->[1]);
+
+  print "\tVL Server up/downtimes, same cell:\n";
+  PrintUpDownStats($perf->{vl_UpDown}->[0]);
+
+  print "\tVL Server up/downtimes, diff cell:\n";
+  PrintUpDownStats($perf->{vl_UpDown}->[1]);
+}
+
+
+sub PrintUpDownStats {
+  my $updown = shift;
+
+  printf "\t\t%10d numTtlRecords\n",	$updown->{numTtlRecords};
+  printf "\t\t%10d numUpRecords\n",	$updown->{numUpRecords};
+  printf "\t\t%10d numDownRecords\n",	$updown->{numDownRecords};
+  printf "\t\t%10d sumOfRecordAges\n",$updown->{sumOfRecordAges};
+  printf "\t\t%10d ageOfYoungestRecord\n",$updown->{ageOfYoungestRecord};
+  printf "\t\t%10d ageOfOldestRecord\n",$updown->{ageOfOldestRecord};
+  printf "\t\t%10d numDowntimeIncidents\n",$updown->{numDowntimeIncidents};
+  printf "\t\t%10d numRecordsNeverDown\n",$updown->{numRecordsNeverDown};
+  printf "\t\t%10d maxDowntimesInARecord\n",$updown->{maxDowntimesInARecord};
+  printf "\t\t%10d sumOfDowntimes\n",	$updown->{sumOfDowntimes};
+  printf "\t\t%10d shortestDowntime\n",$updown->{shortestDowntime};
+  printf "\t\t%10d longestDowntime\n",$updown->{longestDowntime};
+
+  printf "\t\tDowntime duration distribution:\n";
+  printf "\t\t\t%8d: 0 min .. 10 min\n",  $updown->{downDurations}->[0];
+  printf "\t\t\t%8d: 10 min .. 30 min\n", $updown->{downDurations}->[1];
+  printf "\t\t\t%8d: 30 min .. 1 hr\n",   $updown->{downDurations}->[2];
+  printf "\t\t\t%8d: 1 hr .. 2 hr\n",     $updown->{downDurations}->[3];
+  printf "\t\t\t%8d: 2 hr .. 4 hr\n",     $updown->{downDurations}->[4];
+  printf "\t\t\t%8d: 4 hr .. 8 hr\n",     $updown->{downDurations}->[5];
+  printf "\t\t\t%8d: > 8 hr\n",           $updown->{downDurations}->[6];
+
+  printf "\t\tDowntime incident distribution:\n";
+  printf "\t\t\t%8d: 0 times\n",        $updown->{downIncidents}->[0];
+  printf "\t\t\t%8d: 1 time\n",         $updown->{downIncidents}->[1];
+  printf "\t\t\t%8d: 2 .. 5 times\n",   $updown->{downIncidents}->[2];
+  printf "\t\t\t%8d: 6 .. 10 times\n",  $updown->{downIncidents}->[3];
+  printf "\t\t\t%8d: 10 .. 50 times\n", $updown->{downIncidents}->[4];
+  printf "\t\t\t%8d: > 50 times\n",     $updown->{downIncidents}->[5];
+}
+
+
+sub PrintRPCPerfInfo {
+  my $rpc = shift;
+
+  print "FS Operation Timings:\n---------------------\n";
+  foreach (sort keys %{$rpc->{fsRPCTimes}}) {
+    printf "%15s: %d ops (%d OK); sum=%f, sqr=%f, min=%f, max=%f\n",
+           $_,
+           $rpc->{fsRPCTimes}->{$_}->{numOps}, $rpc->{fsRPCTimes}->{$_}->{numSuccesses},
+           $rpc->{fsRPCTimes}->{$_}->{sumTime}, $rpc->{fsRPCTimes}->{$_}->{sqrTime},
+           $rpc->{fsRPCTimes}->{$_}->{minTime}, $rpc->{fsRPCTimes}->{$_}->{maxTime};
+  }
+
+  print "\nError Info:\n-----------\n";
+  foreach (sort keys %{$rpc->{fsRPCErrors}}) {
+    printf "%15s: %d server, %d network, %d prot, %d vol, %d busies, %d other\n",
+           $_,
+           $rpc->{fsRPCErrors}->{$_}->{err_Server},
+           $rpc->{fsRPCErrors}->{$_}->{err_Network},
+           $rpc->{fsRPCErrors}->{$_}->{err_Protection},
+           $rpc->{fsRPCErrors}->{$_}->{err_Volume},
+           $rpc->{fsRPCErrors}->{$_}->{err_VolumeBusies},
+           $rpc->{fsRPCErrors}->{$_}->{err_Other};
+  }
+
+  print "\nTransfer timings:\n-----------------\n";
+  foreach (sort keys %{$rpc->{fsXferTimes}}) {
+    printf "%s: %d xfers (%d OK), time sum=%f, sqr=%f, min=%f, max=%f\n",
+           $_,
+           $rpc->{fsXferTimes}->{$_}->{numXfers}, $rpc->{fsXferTimes}->{$_}->{numSuccesses},
+           $rpc->{fsXferTimes}->{$_}->{sumTime},
+           $rpc->{fsXferTimes}->{$_}->{sqrTime},
+           $rpc->{fsXferTimes}->{$_}->{minTime},
+           $rpc->{fsXferTimes}->{$_}->{maxTime};
+
+    printf "\t[bytes: sum=%d, min=%d, max=%d]\n",
+           $rpc->{fsXferTimes}->{$_}->{sumBytes},
+           $rpc->{fsXferTimes}->{$_}->{minBytes},
+           $rpc->{fsXferTimes}->{$_}->{maxBytes};
+
+    printf "\t[buckets: 0: %d, 1: %d, 2: %d, 3: %d, 4: %d, 5: %d, 6: %d, 7: %d, 8: %d]\n",
+           $rpc->{fsXferTimes}->{$_}->{count}->[0],
+           $rpc->{fsXferTimes}->{$_}->{count}->[1],
+           $rpc->{fsXferTimes}->{$_}->{count}->[2],
+           $rpc->{fsXferTimes}->{$_}->{count}->[3],
+           $rpc->{fsXferTimes}->{$_}->{count}->[4],
+           $rpc->{fsXferTimes}->{$_}->{count}->[5],
+           $rpc->{fsXferTimes}->{$_}->{count}->[6],
+           $rpc->{fsXferTimes}->{$_}->{count}->[7],
+           $rpc->{fsXferTimes}->{$_}->{count}->[8];
+  }
+
+  print "\nCM Operation Timings:\n---------------------\n";
+  foreach (sort keys %{$rpc->{cmRPCTimes}}) {
+    printf "%15s: %d ops (%d OK); sum=%f, sqr=%f, min=%f, max=%f\n",
+           $_,
+           $rpc->{cmRPCTimes}->{$_}->{numOps}, $rpc->{cmRPCTimes}->{$_}->{numSuccesses},
+           $rpc->{cmRPCTimes}->{$_}->{sumTime}, $rpc->{cmRPCTimes}->{$_}->{sqrTime},
+           $rpc->{cmRPCTimes}->{$_}->{minTime}, $rpc->{cmRPCTimes}->{$_}->{maxTime};
+  }
+}
+
+
+
+sub PrintCallInfo {
+  my $host = shift;
+
+  printf "AFSCB_XSTATSCOLL_CALL_INFO (coll %d) for CM %s\n[Probe 1, %s]\n\n",
+    $host->{collectionNumber},
+    $host->{hostName},
+    scalar localtime $host->{probeTime};
+
+  my $data = $host->{data};
+
+  printf "\t%10d afs_init\n", $data->{afs_init};
+  printf "\t%10d gop_rdwr\n", $data->{gop_rdwr};
+  printf "\t%10d aix_gnode_rele\n", $data->{aix_gnode_rele};
+  printf "\t%10d gettimeofday\n", $data->{gettimeofday};
+  printf "\t%10d m_cpytoc\n", $data->{m_cpytoc};
+  printf "\t%10d aix_vattr_null\n", $data->{aix_vattr_null};
+  printf "\t%10d afs_gn_frunc\n", $data->{afs_gn_ftrunc};
+  printf "\t%10d afs_gn_rdwr\n", $data->{afs_gn_rdwr};
+  printf "\t%10d afs_gn_ioctl\n", $data->{afs_gn_ioctl};
+  printf "\t%10d afs_gn_locktl\n", $data->{afs_gn_lockctl};
+  printf "\t%10d afs_gn_readlink\n", $data->{afs_gn_readlink};
+  printf "\t%10d afs_gn_readdir\n", $data->{afs_gn_readdir};
+  printf "\t%10d afs_gn_select\n", $data->{afs_gn_select};
+  printf "\t%10d afs_gn_strategy\n", $data->{afs_gn_strategy};
+  printf "\t%10d afs_gn_symlink\n", $data->{afs_gn_symlink};
+  printf "\t%10d afs_gn_revoke\n", $data->{afs_gn_revoke};
+  printf "\t%10d afs_gn_link\n", $data->{afs_gn_link};
+  printf "\t%10d afs_gn_mkdir\n", $data->{afs_gn_mkdir};
+  printf "\t%10d afs_gn_mknod\n", $data->{afs_gn_mknod};
+  printf "\t%10d afs_gn_remove\n", $data->{afs_gn_remove};
+  printf "\t%10d afs_gn_rename\n", $data->{afs_gn_rename};
+  printf "\t%10d afs_gn_rmdir\n", $data->{afs_gn_rmdir};
+  printf "\t%10d afs_gn_fid\n", $data->{afs_gn_fid};
+  printf "\t%10d afs_gn_lookup\n", $data->{afs_gn_lookup};
+  printf "\t%10d afs_gn_open\n", $data->{afs_gn_open};
+  printf "\t%10d afs_gn_create\n", $data->{afs_gn_create};
+  printf "\t%10d afs_gn_hold\n", $data->{afs_gn_hold};
+  printf "\t%10d afs_gn_rele\n", $data->{afs_gn_rele};
+  printf "\t%10d afs_gn_unmap\n", $data->{afs_gn_unmap};
+  printf "\t%10d afs_gn_access\n", $data->{afs_gn_access};
+  printf "\t%10d afs_gn_getattr\n", $data->{afs_gn_getattr};
+  printf "\t%10d afs_gn_setattr\n", $data->{afs_gn_setattr};
+  printf "\t%10d afs_gn_fclear\n", $data->{afs_gn_fclear};
+  printf "\t%10d afs_gn_fsync\n", $data->{afs_gn_fsync};
+  printf "\t%10d phash\n", $data->{pHash};
+  printf "\t%10d DInit\n", $data->{DInit};
+  printf "\t%10d DRead\n", $data->{DRead};
+  printf "\t%10d FixupBucket\n", $data->{FixupBucket};
+  printf "\t%10d afs_newslot\n", $data->{afs_newslot};
+  printf "\t%10d DRelease\n", $data->{DRelease};
+  printf "\t%10d DFlush\n", $data->{DFlush};
+  printf "\t%10d DFlushEntry\n", $data->{DFlushEntry};
+  printf "\t%10d DVOffset\n", $data->{DVOffset};
+  printf "\t%10d DZap\n", $data->{DZap};
+  printf "\t%10d DNew\n", $data->{DNew};
+  printf "\t%10d afs_RemoveVCB\n", $data->{afs_RemoveVCB};
+  printf "\t%10d afs_NewVCache\n", $data->{afs_NewVCache};
+  printf "\t%10d afs_FlushActiveVcaches\n", $data->{afs_FlushActiveVcaches};
+  printf "\t%10d afs_VerifyVCache\n", $data->{afs_VerifyVCache};
+  printf "\t%10d afs_WriteVCache\n", $data->{afs_WriteVCache};
+  printf "\t%10d afs_GetVCache\n", $data->{afs_GetVCache};
+  printf "\t%10d afs_StuffVcache\n", $data->{afs_StuffVcache};
+  printf "\t%10d afs_FindVCache\n", $data->{afs_FindVCache};
+  printf "\t%10d afs_PutDCache\n", $data->{afs_PutDCache};
+  printf "\t%10d afs_PutVCache\n", $data->{afs_PutVCache};
+  printf "\t%10d CacheStoreProc\n", $data->{CacheStoreProc};
+  printf "\t%10d afs_FindDcache\n", $data->{afs_FindDCache};
+  printf "\t%10d afs_TryToSmush\n", $data->{afs_TryToSmush};
+  printf "\t%10d afs_AdjustSize\n", $data->{afs_AdjustSize};
+  printf "\t%10d afs_CheckSize\n", $data->{afs_CheckSize};
+  printf "\t%10d afs_StoreWarn\n", $data->{afs_StoreWarn};
+  printf "\t%10d CacheFetchProc\n", $data->{CacheFetchProc};
+  printf "\t%10d UFS_CacheStoreProc\n", $data->{UFS_CacheStoreProc};
+  printf "\t%10d UFS_CacheFetchProc\n", $data->{UFS_CacheFetchProc};
+  printf "\t%10d afs_GetDCache\n", $data->{afs_GetDCache};
+  printf "\t%10d afs_SimpleVStat\n", $data->{afs_SimpleVStat};
+  printf "\t%10d afs_ProcessFS\n", $data->{afs_ProcessFS};
+  printf "\t%10d afs_InitCacheInfo\n", $data->{afs_InitCacheInfo};
+  printf "\t%10d afs_InitVolumeInfo\n", $data->{afs_InitVolumeInfo};
+  printf "\t%10d afs_InitCacheFile\n", $data->{afs_InitCacheFile};
+  printf "\t%10d afs_CacheInit\n", $data->{afs_CacheInit};
+  printf "\t%10d afs_GetDSlot\n", $data->{afs_GetDSlot};
+  printf "\t%10d afs_WriteThroughDSlots\n", $data->{afs_WriteThroughDSlots};
+  printf "\t%10d afs_MemGetDSlot\n", $data->{afs_MemGetDSlot};
+  printf "\t%10d afs_UFSGetDSlot\n", $data->{afs_UFSGetDSlot};
+  printf "\t%10d afs_StoreDCache\n", $data->{afs_StoreDCache};
+  printf "\t%10d afs_StoreMini\n", $data->{afs_StoreMini};
+  printf "\t%10d afs_StoreAllSegments\n", $data->{afs_StoreAllSegments};
+  printf "\t%10d afs_InvalidateAllSegments\n", $data->{afs_InvalidateAllSegments};
+  printf "\t%10d afs_TruncateAllSegments\n", $data->{afs_TruncateAllSegments};
+  printf "\t%10d afs_CheckVolSync\n", $data->{afs_CheckVolSync};
+  printf "\t%10d afs_wakeup\n", $data->{afs_wakeup};
+  printf "\t%10d afs_CFileOpen\n", $data->{afs_CFileOpen};
+  printf "\t%10d afs_CFileTruncate\n", $data->{afs_CFileTruncate};
+  printf "\t%10d afs_GetDownD\n", $data->{afs_GetDownD};
+  printf "\t%10d afs_WriteDCache\n", $data->{afs_WriteDCache};
+  printf "\t%10d afs_FlushDCache\n", $data->{afs_FlushDCache};
+  printf "\t%10d afs_GetDownDSlot\n", $data->{afs_GetDownDSlot};
+  printf "\t%10d afs_FlushVCache\n", $data->{afs_FlushVCache};
+  printf "\t%10d afs_GetDownV\n", $data->{afs_GetDownV};
+  printf "\t%10d afs_QueueVCB\n", $data->{afs_QueueVCB};
+  printf "\t%10d afs_call\n", $data->{afs_call};
+  printf "\t%10d afs_syscall_call\n", $data->{afs_syscall_call};
+  printf "\t%10d afs_syscall_icreate\n", $data->{afs_syscall_icreate};
+  printf "\t%10d afs_syscall_iopen\n", $data->{afs_syscall_iopen};
+  printf "\t%10d afs_syscall_iincdec\n", $data->{afs_syscall_iincdec};
+  printf "\t%10d afs_syscall_ireadwrite\n", $data->{afs_syscall_ireadwrite};
+  printf "\t%10d afs_syscall\n", $data->{afs_syscall};
+  printf "\t%10d lpioctl\n", $data->{lpioctl};
+  printf "\t%10d lsetpag\n", $data->{lsetpag};
+  printf "\t%10d afs_CheckInit\n", $data->{afs_CheckInit};
+  printf "\t%10d ClearCallback\n", $data->{ClearCallBack};
+  printf "\t%10d SRXAFSCB_GetCE\n", $data->{SRXAFSCB_GetCE};
+  printf "\t%10d SRXAFSCB_GetLock\n", $data->{SRXAFSCB_GetLock};
+  printf "\t%10d SRXAFSCB_CallBack\n", $data->{SRXAFSCB_CallBack};
+  printf "\t%10d SRXAFSCB_InitCallBackState\n", $data->{SRXAFSCB_InitCallBackState};
+  printf "\t%10d SRXAFSCB_Probe\n", $data->{SRXAFSCB_Probe};
+  printf "\t%10d afs_Chunk\n", $data->{afs_Chunk};
+  printf "\t%10d afs_ChunkBase\n", $data->{afs_ChunkBase};
+  printf "\t%10d afs_ChunkOffset\n", $data->{afs_ChunkOffset};
+  printf "\t%10d afs_ChunkSize\n", $data->{afs_ChunkSize};
+  printf "\t%10d afs_ChunkToBase\n", $data->{afs_ChunkToBase};
+  printf "\t%10d afs_ChunkToSize\n", $data->{afs_ChunkToSize};
+  printf "\t%10d afs_SetChunkSize\n", $data->{afs_SetChunkSize};
+  printf "\t%10d afs_config\n", $data->{afs_config};
+  printf "\t%10d mem_freebytes\n", $data->{mem_freebytes};
+  printf "\t%10d mem_getbytes\n", $data->{mem_getbytes};
+  printf "\t%10d afs_Daemon\n", $data->{afs_Daemon};
+  printf "\t%10d afs_CheckRootVolume\n", $data->{afs_CheckRootVolume};
+  printf "\t%10d BPath\n", $data->{BPath};
+  printf "\t%10d BPrefetch\n", $data->{BPrefetch};
+  printf "\t%10d BStore\n", $data->{BStore};
+  printf "\t%10d afs_BBusy\n", $data->{afs_BBusy};
+  printf "\t%10d afs_BQueue\n", $data->{afs_BQueue};
+  printf "\t%10d afs_BRelease\n", $data->{afs_BRelease};
+  printf "\t%10d afs_BackgroundDaemon\n", $data->{afs_BackgroundDaemon};
+  printf "\t%10d exporter_add\n", $data->{exporter_add};
+  printf "\t%10d exporter_find\n", $data->{exporter_find};
+  printf "\t%10d afs_gfs_kalloc\n", $data->{afs_gfs_kalloc};
+  printf "\t%10d afs_gfs_kfree\n", $data->{afs_gfs_kfree};
+  printf "\t%10d gop_lookupname\n", $data->{gop_lookupname};
+  printf "\t%10d afs_uniqtime\n", $data->{afs_uniqtime};
+  printf "\t%10d gfs_vattr_null\n", $data->{gfs_vattr_null};
+  printf "\t%10d afs_lock\n", $data->{afs_lock};
+  printf "\t%10d afs_unlock\n", $data->{afs_unlock};
+  printf "\t%10d afs_update\n", $data->{afs_update};
+  printf "\t%10d afs_gclose\n", $data->{afs_gclose};
+  printf "\t%10d afs_gopen\n", $data->{afs_gopen};
+  printf "\t%10d afs_greadlink\n", $data->{afs_greadlink};
+  printf "\t%10d afs_select\n", $data->{afs_select};
+  printf "\t%10d afs_gbmap\n", $data->{afs_gbmap};
+  printf "\t%10d afs_getfsdata\n", $data->{afs_getfsdata};
+  printf "\t%10d afs_gsymlink\n", $data->{afs_gsymlink};
+  printf "\t%10d afs_namei\n", $data->{afs_namei};
+  printf "\t%10d afs_gmount\n", $data->{afs_gmount};
+  printf "\t%10d afs_gget\n", $data->{afs_gget};
+  printf "\t%10d afs_glink\n", $data->{afs_glink};
+  printf "\t%10d afs_gmkdir\n", $data->{afs_gmkdir};
+  printf "\t%10d afs_unlink\n", $data->{afs_unlink};
+  printf "\t%10d afs_grmdir\n", $data->{afs_grmdir};
+  printf "\t%10d afs_makenode\n", $data->{afs_makenode};
+  printf "\t%10d afs_grename\n", $data->{afs_grename};
+  printf "\t%10d afs_rele\n", $data->{afs_rele};
+  printf "\t%10d afs_syncgp\n", $data->{afs_syncgp};
+  printf "\t%10d afs_getval\n", $data->{afs_getval};
+  printf "\t%10d afs_trunc\n", $data->{afs_trunc};
+  printf "\t%10d afs_rwgp\n", $data->{afs_rwgp};
+  printf "\t%10d afs_stat\n", $data->{afs_stat};
+  printf "\t%10d afsc_link\n", $data->{afsc_link};
+  printf "\t%10d afs_vfs_mount\n", $data->{afs_vfs_mount};
+  printf "\t%10d afs_uniqtime\n", $data->{afs_uniqtime};
+  printf "\t%10d iopen\n", $data->{iopen};
+  printf "\t%10d idec\n", $data->{idec};
+  printf "\t%10d iinc\n", $data->{iinc};
+  printf "\t%10d ireadwrite\n", $data->{ireadwrite};
+  printf "\t%10d iread\n", $data->{iread};
+  printf "\t%10d iwrite\n", $data->{iwrite};
+  printf "\t%10d iforget\n", $data->{iforget};
+  printf "\t%10d icreate\n", $data->{icreate};
+  printf "\t%10d igetinode\n", $data->{igetinode};
+  printf "\t%10d osi_SleepR\n", $data->{osi_SleepR};
+  printf "\t%10d osi_SleepS\n", $data->{osi_SleepS};
+  printf "\t%10d osi_SleepW\n", $data->{osi_SleepW};
+  printf "\t%10d osi_Sleep\n", $data->{osi_Sleep};
+  printf "\t%10d afs_LookupMCE\n", $data->{afs_LookupMCE};
+  printf "\t%10d afs_MemReadBlk\n", $data->{afs_MemReadBlk};
+  printf "\t%10d afs_MemReadUIO\n", $data->{afs_MemReadUIO};
+  printf "\t%10d afs_MemWriteBlk\n", $data->{afs_MemWriteBlk};
+  printf "\t%10d afs_MemWriteUIO\n", $data->{afs_MemWriteUIO};
+  printf "\t%10d afs_MemCacheStoreProc\n", $data->{afs_MemCacheStoreProc};
+  printf "\t%10d afs_MemCacheFetchProc\n", $data->{afs_MemCacheFetchProc};
+  printf "\t%10d afs_MemCacheTruncate\n", $data->{afs_MemCacheTruncate};
+  printf "\t%10d afs_MemCacheStoreProc\n", $data->{afs_MemCacheStoreProc};
+  printf "\t%10d afs_GetNfsClientPag\n", $data->{afs_GetNfsClientPag};
+  printf "\t%10d afs_FindNfsClientPag\n", $data->{afs_FindNfsClientPag};
+  printf "\t%10d afs_PutNfsClientPag\n", $data->{afs_PutNfsClientPag};
+  printf "\t%10d afs_nfsclient_reqhandler\n", $data->{afs_nfsclient_reqhandler};
+  printf "\t%10d afs_nfsclient_GC\n", $data->{afs_nfsclient_GC};
+  printf "\t%10d afs_nfsclient_hold\n", $data->{afs_nfsclient_hold};
+  printf "\t%10d afs_nfsclient_stats\n", $data->{afs_nfsclient_stats};
+  printf "\t%10d afs_nfsclient_sysname\n", $data->{afs_nfsclient_sysname};
+  printf "\t%10d afs_rfs_dispatch\n", $data->{afs_rfs_dispatch};
+  printf "\t%10d afs_nfs2afscall\n", $data->{Nfs2AfsCall};
+  printf "\t%10d afs_sun_xuntext\n", $data->{afs_sun_xuntext};
+  printf "\t%10d osi_Active\n", $data->{osi_Active};
+  printf "\t%10d osi_FlushPages\n", $data->{osi_FlushPages};
+  printf "\t%10d osi_FlushText\n", $data->{osi_FlushText};
+  printf "\t%10d osi_CallProc\n", $data->{osi_CallProc};
+  printf "\t%10d osi_CancelProc\n", $data->{osi_CancelProc};
+  printf "\t%10d osi_Invisible\n", $data->{osi_Invisible};
+  printf "\t%10d osi_Time\n", $data->{osi_Time};
+  printf "\t%10d osi_Alloc\n", $data->{osi_Alloc};
+  printf "\t%10d osi_SetTime\n", $data->{osi_SetTime};
+  printf "\t%10d osi_Dump\n", $data->{osi_Dump};
+  printf "\t%10d osi_Free\n", $data->{osi_Free};
+  printf "\t%10d osi_UFSOpen\n", $data->{osi_UFSOpen};
+  printf "\t%10d osi_Close\n", $data->{osi_Close};
+  printf "\t%10d osi_Stat\n", $data->{osi_Stat};
+  printf "\t%10d osi_Truncate\n", $data->{osi_Truncate};
+  printf "\t%10d osi_Read\n", $data->{osi_Read};
+  printf "\t%10d osi_Write\n", $data->{osi_Write};
+  printf "\t%10d osi_MapStrategy\n", $data->{osi_MapStrategy};
+  printf "\t%10d osi_AllocLargeSpace\n", $data->{osi_AllocLargeSpace};
+  printf "\t%10d osi_FreeLargeSpace\n", $data->{osi_FreeLargeSpace};
+  printf "\t%10d osi_AllocSmallSpace\n", $data->{osi_AllocSmallSpace};
+  printf "\t%10d osi_FreeSmallSpace\n", $data->{osi_FreeSmallSpace};
+  printf "\t%10d osi_CloseToTheEdge\n", $data->{osi_CloseToTheEdge};
+  printf "\t%10d osi_xgreedy\n", $data->{osi_xgreedy};
+  printf "\t%10d osi_FreeSocket\n", $data->{osi_FreeSocket};
+  printf "\t%10d osi_NewSocket\n", $data->{osi_NewSocket};
+  printf "\t%10d osi_NetSend\n", $data->{osi_NetSend};
+  printf "\t%10d WaitHack\n", $data->{WaitHack};
+  printf "\t%10d osi_CancelWait\n", $data->{osi_CancelWait};
+  printf "\t%10d osi_Wakeup\n", $data->{osi_Wakeup};
+  printf "\t%10d osi_Wait\n", $data->{osi_Wait};
+  printf "\t%10d dirp_Read\n", $data->{dirp_Read};
+  printf "\t%10d dirp_Cpy\n", $data->{dirp_Cpy};
+  printf "\t%10d dirp_Eq\n", $data->{dirp_Eq};
+  printf "\t%10d dirp_Write\n", $data->{dirp_Write};
+  printf "\t%10d dirp_Zap\n", $data->{dirp_Zap};
+  printf "\t%10d afs_ioctl\n", $data->{afs_ioctl};
+  printf "\t%10d handleIoctl\n", $data->{HandleIoctl};
+  printf "\t%10d afs_xioctl\n", $data->{afs_xioctl};
+  printf "\t%10d afs_pioctl\n", $data->{afs_pioctl};
+  printf "\t%10d HandlePioctl\n", $data->{HandlePioctl};
+  printf "\t%10d PGetVolumeStatus\n", $data->{PGetVolumeStatus};
+  printf "\t%10d PSetVolumeStatus\n", $data->{PSetVolumeStatus};
+  printf "\t%10d PFlush\n", $data->{PFlush};
+  printf "\t%10d PFlushVolumeData\n", $data->{PFlushVolumeData};
+  printf "\t%10d PNewStatMount\n", $data->{PNewStatMount};
+  printf "\t%10d PGetTokens\n", $data->{PGetTokens};
+  printf "\t%10d PSetTokens\n", $data->{PSetTokens};
+  printf "\t%10d PUnlog\n", $data->{PUnlog};
+  printf "\t%10d PCheckServers\n", $data->{PCheckServers};
+  printf "\t%10d PCheckAuth\n", $data->{PCheckAuth};
+  printf "\t%10d PCheckVolNames\n", $data->{PCheckVolNames};
+  printf "\t%10d PFindVolume\n", $data->{PFindVolume};
+  printf "\t%10d Prefetch\n", $data->{Prefetch};
+  printf "\t%10d PGetCacheSize\n", $data->{PGetCacheSize};
+  printf "\t%10d PSetCacheSize\n", $data->{PSetCacheSize};
+  printf "\t%10d PSetSysName\n", $data->{PSetSysName};
+  printf "\t%10d PExportAfs\n", $data->{PExportAfs};
+  printf "\t%10d HandleClientContext\n", $data->{HandleClientContext};
+  printf "\t%10d PViceAccess\n", $data->{PViceAccess};
+  printf "\t%10d PRemoveCallBack\n", $data->{PRemoveCallBack};
+  printf "\t%10d PRemoveMount\n", $data->{PRemoveMount};
+  printf "\t%10d PSetVolumeStatus\n", $data->{PSetVolumeStatus};
+  printf "\t%10d PListCells\n", $data->{PListCells};
+  printf "\t%10d PNewCell\n", $data->{PNewCell};
+  printf "\t%10d PGetUserCell\n", $data->{PGetUserCell};
+  printf "\t%10d PGetCellStatus\n", $data->{PGetCellStatus};
+  printf "\t%10d PSetCellStatus\n", $data->{PSetCellStatus};
+  printf "\t%10d PVenusLogging\n", $data->{PVenusLogging};
+  printf "\t%10d PGetAcl\n", $data->{PGetAcl};
+  printf "\t%10d PGetFID\n", $data->{PGetFID};
+  printf "\t%10d PSetAcl\n", $data->{PSetAcl};
+  printf "\t%10d PGetFileCell\n", $data->{PGetFileCell};
+  printf "\t%10d PGetWSCell\n", $data->{PGetWSCell};
+  printf "\t%10d PGetSPrefs\n", $data->{PGetSPrefs};
+  printf "\t%10d PSetSPrefs\n", $data->{PSetSPrefs};
+  printf "\t%10d afs_ResetAccessCache\n", $data->{afs_ResetAccessCache};
+  printf "\t%10d afs_FindUser\n", $data->{afs_FindUser};
+  printf "\t%10d afs_GetUser\n", $data->{afs_GetUser};
+  printf "\t%10d afs_GCUserData\n", $data->{afs_GCUserData};
+  printf "\t%10d afs_PutUser\n", $data->{afs_PutUser};
+  printf "\t%10d afs_SetPrimary\n", $data->{afs_SetPrimary};
+  printf "\t%10d afs_ResetUserConns\n", $data->{afs_ResetUserConns};
+  printf "\t%10d afs_RemoveUserConns\n", $data->{RemoveUserConns};
+  printf "\t%10d afs_ResourceInit\n", $data->{afs_ResourceInit};
+  printf "\t%10d afs_GetCell\n", $data->{afs_GetCell};
+  printf "\t%10d afs_GetCellByIndex\n", $data->{afs_GetCellByIndex};
+  printf "\t%10d afs_GetCellByName\n", $data->{afs_GetCellByName};
+  if (exists $data->{afs_GetRealCellByIndex}) {
+    printf "\t%10d afs_GetRealCellByIndex\n", $data->{afs_GetRealCellByIndex};
+  }
+  printf "\t%10d afs_NewCell\n", $data->{afs_NewCell};
+  printf "\t%10d CheckVLDB\n", $data->{CheckVLDB};
+  printf "\t%10d afs_GetVolume\n", $data->{afs_GetVolume};
+  printf "\t%10d afs_PutVolume\n", $data->{afs_PutVolume};
+  printf "\t%10d afs_GetVolumeByName\n", $data->{afs_GetVolumeByName};
+  printf "\t%10d afs_random\n", $data->{afs_random};
+  printf "\t%10d InstallVolumeEntry\n", $data->{InstallVolumeEntry};
+  printf "\t%10d InstallVolumeInfo\n", $data->{InstallVolumeInfo};
+  printf "\t%10d afs_ResetVolumeInfo\n", $data->{afs_ResetVolumeInfo};
+  printf "\t%10d afs_FindServer\n", $data->{afs_FindServer};
+  printf "\t%10d afs_GetServer\n", $data->{afs_GetServer};
+  printf "\t%10d afs_SortServers\n", $data->{afs_SortServers};
+  printf "\t%10d afs_CheckServers\n", $data->{afs_CheckServers};
+  printf "\t%10d ServerDown\n", $data->{ServerDown};
+  printf "\t%10d afs_Conn\n", $data->{afs_Conn};
+  printf "\t%10d afs_PutConn\n", $data->{afs_PutConn};
+  printf "\t%10d afs_ConnByHost\n", $data->{afs_ConnByHost};
+  printf "\t%10d afs_ConnByMHosts\n", $data->{afs_ConnByMHosts};
+  printf "\t%10d afs_Analyze\n", $data->{afs_Analyze};
+  printf "\t%10d afs_CheckLocks\n", $data->{afs_CheckLocks};
+  printf "\t%10d CheckVLServer\n", $data->{CheckVLServer};
+  printf "\t%10d afs_CheckCacheResets\n", $data->{afs_CheckCacheResets};
+  printf "\t%10d afs_CheckVolumeNames\n", $data->{afs_CheckVolumeNames};
+  printf "\t%10d afs_CheckCode\n", $data->{afs_CheckCode};
+  printf "\t%10d afs_CopyError\n", $data->{afs_CopyError};
+  printf "\t%10d afs_FinalizeReq\n", $data->{afs_FinalizeReq};
+  printf "\t%10d afs_GetVolCache\n", $data->{afs_GetVolCache};
+  printf "\t%10d afs_GetVolSlot\n", $data->{afs_GetVolSlot};
+  printf "\t%10d afs_UFSGetVolSlot\n", $data->{afs_UFSGetVolSlot};
+  printf "\t%10d afs_MemGetVolSlot\n", $data->{afs_MemGetVolSlot};
+  printf "\t%10d afs_WriteVolCache\n", $data->{afs_WriteVolCache};
+  printf "\t%10d haveCallbacksfrom\n", $data->{HaveCallBacksFrom};
+  printf "\t%10d afs_getpage\n", $data->{afs_getpage};
+  printf "\t%10d afs_putpage\n", $data->{afs_putpage};
+  printf "\t%10d afs_nfsrdwr\n", $data->{afs_nfsrdwr};
+  printf "\t%10d afs_map\n", $data->{afs_map};
+  printf "\t%10d afs_cmp\n", $data->{afs_cmp};
+  printf "\t%10d afs_PageLeft\n", $data->{afs_PageLeft};
+  printf "\t%10d afs_mount\n", $data->{afs_mount};
+  printf "\t%10d afs_unmount\n", $data->{afs_unmount};
+  printf "\t%10d afs_root\n", $data->{afs_root};
+  printf "\t%10d afs_statfs\n", $data->{afs_statfs};
+  printf "\t%10d afs_sync\n", $data->{afs_sync};
+  printf "\t%10d afs_vget\n", $data->{afs_vget};
+  printf "\t%10d afs_index\n", $data->{afs_index};
+  printf "\t%10d afs_setpag\n", $data->{afs_setpag};
+  printf "\t%10d genpag\n", $data->{genpag};
+  printf "\t%10d getpag\n", $data->{getpag};
+  printf "\t%10d afs_GetMariner\n", $data->{afs_GetMariner};
+  printf "\t%10d afs_AddMarinerName\n", $data->{afs_AddMarinerName};
+  printf "\t%10d afs_open\n", $data->{afs_open};
+  printf "\t%10d afs_close\n", $data->{afs_close};
+  printf "\t%10d afs_closex\n", $data->{afs_closex};
+  printf "\t%10d afs_write\n", $data->{afs_write};
+  printf "\t%10d afs_UFSwrite\n", $data->{afs_UFSWrite};
+  printf "\t%10d afs_Memwrite\n", $data->{afs_MemWrite};
+  printf "\t%10d afs_rdwr\n", $data->{afs_rdwr};
+  printf "\t%10d afs_read\n", $data->{afs_read};
+  printf "\t%10d afs_UFSread\n", $data->{afs_UFSRead};
+  printf "\t%10d afs_Memread\n", $data->{afs_MemRead};
+  printf "\t%10d afs_CopyOutAttrs\n", $data->{afs_CopyOutAttrs};
+  printf "\t%10d afs_access\n", $data->{afs_access};
+  printf "\t%10d afs_getattr\n", $data->{afs_getattr};
+  printf "\t%10d afs_setattr\n", $data->{afs_setattr};
+  printf "\t%10d afs_VAttrToAS\n", $data->{afs_VAttrToAS};
+  printf "\t%10d EvalMountPoint\n", $data->{EvalMountPoint};
+  printf "\t%10d afs_lookup\n", $data->{afs_lookup};
+  printf "\t%10d afs_create\n", $data->{afs_create};
+  printf "\t%10d afs_LocalHero\n", $data->{afs_LocalHero};
+  printf "\t%10d afs_remove\n", $data->{afs_remove};
+  printf "\t%10d afs_link\n", $data->{afs_link};
+  printf "\t%10d afs_rename\n", $data->{afs_rename};
+  printf "\t%10d afs_InitReq\n", $data->{afs_InitReq};
+  printf "\t%10d afs_mkdir\n", $data->{afs_mkdir};
+  printf "\t%10d afs_rmdir\n", $data->{afs_rmdir};
+  printf "\t%10d afs_readdir\n", $data->{afs_readdir};
+  printf "\t%10d afs_read1dir\n", $data->{afs_read1dir};
+  printf "\t%10d afs_readdir_move\n", $data->{afs_readdir_move};
+  printf "\t%10d afs_readdir_iter\n", $data->{afs_readdir_iter};
+  printf "\t%10d afs_symlink\n", $data->{afs_symlink};
+  printf "\t%10d afs_HandleLink\n", $data->{afs_HandleLink};
+  printf "\t%10d afs_MemHandleLink\n", $data->{afs_MemHandleLink};
+  printf "\t%10d afs_UFSHandleLink\n", $data->{afs_UFSHandleLink};
+  printf "\t%10d HandleFlock\n", $data->{HandleFlock};
+  printf "\t%10d afs_readlink\n", $data->{afs_readlink};
+  printf "\t%10d afs_fsync\n", $data->{afs_fsync};
+  printf "\t%10d afs_inactive\n", $data->{afs_inactive};
+  printf "\t%10d afs_ustrategy\n", $data->{afs_ustrategy};
+  printf "\t%10d afs_strategy\n", $data->{afs_strategy};
+  printf "\t%10d afs_bread\n", $data->{afs_bread};
+  printf "\t%10d afs_brelse\n", $data->{afs_brelse};
+  printf "\t%10d afs_bmap\n", $data->{afs_bmap};
+  printf "\t%10d afs_fid\n", $data->{afs_fid};
+  printf "\t%10d afs_FakeOpen\n", $data->{afs_FakeOpen};
+  printf "\t%10d afs_FakeClose\n", $data->{afs_FakeClose};
+  printf "\t%10d afs_StoreOnLastReference\n", $data->{afs_StoreOnLastReference};
+  printf "\t%10d afs_AccessOK\n", $data->{afs_AccessOK};
+  printf "\t%10d afs_GetAccessBits\n", $data->{afs_GetAccessBits};
+  printf "\t%10d afsio_copy\n", $data->{afsio_copy};
+  printf "\t%10d afsio_trim\n", $data->{afsio_trim};
+  printf "\t%10d afsio_skip\n", $data->{afsio_skip};
+  printf "\t%10d afs_page_read\n", $data->{afs_page_read};
+  printf "\t%10d afs_page_write\n", $data->{afs_page_write};
+  printf "\t%10d afs_page_read\n", $data->{afs_page_read};
+  printf "\t%10d afs_get_groups_from_pag\n", $data->{afs_get_groups_from_pag};
+  printf "\t%10d afs_get_pag_from_groups\n", $data->{afs_get_pag_from_groups};
+  printf "\t%10d AddPag\n", $data->{AddPag};
+  printf "\t%10d PagInCred\n", $data->{PagInCred};
+  printf "\t%10d afs_getgroups\n", $data->{afs_getgroups};
+  printf "\t%10d afs_page_in\n", $data->{afs_page_in};
+  printf "\t%10d afs_page_out\n", $data->{afs_page_out};
+  printf "\t%10d afs_AdvanceFD\n", $data->{afs_AdvanceFD};
+  printf "\t%10d afs_lockf\n", $data->{afs_lockf};
+  printf "\t%10d afs_xsetgroups\n", $data->{afs_xsetgroups};
+  printf "\t%10d afs_nlinks\n", $data->{afs_nlinks};
+  printf "\t%10d afs_lockctl\n", $data->{afs_lockctl};
+  printf "\t%10d afs_xflock\n", $data->{afs_xflock};
+  printf "\t%10d PGetCPrefs\n", $data->{PGetCPrefs};
+  printf "\t%10d PSetCPrefs\n", $data->{PSetCPrefs};
+  if (exists $host->{afs_pagein}) {
+    printf "\t%10d afs_pagein\n", $data->{afs_pagein};
+    printf "\t%10d afs_pageout\n", $data->{afs_pageout};
+    printf "\t%10d afs_hp_strategy\n", $data->{afs_hp_strategy};
+  }
+  printf "\t%10d PFlushMount\n", $data->{PFlushMount};
+}

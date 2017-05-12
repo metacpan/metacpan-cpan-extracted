@@ -1,0 +1,20 @@
+---
+abstract: 'Access the wireless at Starbucks (via AT&T)'
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-starbucksloginator
+requires:
+  Getopt::Long: 0
+  Getopt::Usaginator: 0
+  WWW::Mechanize: 0
+version: 0.0012

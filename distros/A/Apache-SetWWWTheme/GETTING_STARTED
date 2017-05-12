@@ -1,0 +1,127 @@
+Welcome to Apache::SetWWWTheme!  This file is a brief intro into getting
+this module up and running on your system.  There are a few requirements:
+
+1) a unixish operating system.  I developed on Solaris 2.6, and have
+tested it on Linux.  I don't foresee and sort of problems running it on
+any other unix.  VMS and/or Windows might be tricky though -- I'm quite
+clueless about other operating systems. If you can get it going on these
+platforms, please tell me!
+
+2) The Apache webserver
+
+3) The mod_perl Apache module.
+
+4) Finally, and MOST IMPORTANTLY -- you must have HTML::WWWTheme
+installed.  This module is also written by Chad Hogan (that's me) and
+it's designed to do most of the backend work for this module, and to
+provide a lower-level tool that CGI programmers can use when writing
+programs for a website with Apache::SetWWWTheme installed. 
+
+HTML::WWWTheme is available from the same place you got
+Apache::SetWWWTheme.  It can be found at CPAN.  Also, if you really get
+stuck, contact me directly (chogan@uvastro.phys.uvic.ca) and I'll set you
+up.  
+
+*********************************************
+
+INSTALLATION:
+------------
+
+Installation is very simple.  First, install and compile Perl 5 and
+Apache with mod_perl.  I'll leave that part up to you.  Once you've got
+this going to your satisfaction, you'll be on your way.
+
+1) Install HTML::WWWTheme.  
+
+	-download and automatically install this module from CPAN
+	 using the usual:
+	
+	  perl -MCPAN -e shell;	
+
+	once you're in the shell, type 'h' and you'll get some help.
+
+   or...
+	
+	-download the source code for HTML::WWWTheme
+
+	-gunzip/untar the package somewhere
+
+	-go into the WWWTheme directory and run:
+
+	  perl Makefile.PL;
+	  make;
+	  make test;
+	  make install;
+
+	Hopefully all will go well, and it will install without a hitch.
+	Naturally, you'll need to run "make install" as a privileged
+	user with permissions to write to your site_perl directory.  
+
+2) gunzip and untar this package.  Obviously, you've gotten this far or
+you wouldn't be reading this.  :^)
+
+3) Check out Makefile.PL.  If you understand it, and you know what you're
+doing, you might want to edit it.  If you don't, that's ok.  Perl will
+probably take care of the details for you.  
+
+4) Run 
+
+  perl Makefile.PL;
+  make;
+  make test;
+  make install;
+
+in the SetWWWTheme directory.  If all goes well, nothing bad will happen.
+If you -really- can't get it installed, just copy the SetWWWTheme.pm file
+into a perl library directory
+(/usr/lib/perl5/site_perl/5.005/Apache/SetWWWTheme.pm for example).  It
+must be in an Apache directory, whatever the case.  If you can't get it
+installed, email me and I'll help (chogan@uvastro.phys.uvic.ca)
+
+6) Ok, we've got it in -- we just need to get it running.  Edit your
+httpd.conf file and add in the following (edited to suit your site)
+
+ <Location /somewhere>
+	SetHandler perl-script
+	PerlHandler Apache::SetWWWTheme
+	PerlSetVar CONFIG_FILE /WWW/Configuration
+ </Location>
+
+You'll need to edit that to suit your particular tree.  "/somewhere"
+should be a subtree in your web directory.  If you want the module to
+affect the entire web tree, just put <Location />.  You can do as many of
+these <Location [subtree]> directives as you want.  Apache will handle
+them all.  You'll also need to change the CONFIG_FILE value from
+"/WWW/Configuration" to point to the name of the configuration file for
+that particular location.  It can be whatever (and wherever)  you want it
+to be, but the path must be a path on the real filesystem (ie not
+relative to the webserver document root). 
+
+7) Copy the templates from the SetWWWTheme/templates directory to their
+respective locations.  I recommend doing this:
+
+	-copy SetWWWTheme/templates/Configuration to your apache 
+	 document root, and calling it "Configuration".  So, if your 
+	 web document root is /WWW/apache/htdocs, then copy this template
+	 to /WWW/apache/htdocs/Configuration
+
+	-update your httpd.conf <Location> tag CONFIG_FILE so that it
+	 says 
+
+          PerlSetVar CONFIG_FILE /WWW/apache/htdocs/Configuration
+
+	-copy SetWWWTheme/templates/LookAndFeelConfig to any subdirectory
+	 in your webtree.  If you like, put it in the document root.
+
+	-edit Configuration and LookAndFeelConfig until you're happy with
+	 them.  Read the pod or the manpage to figure out what all the
+	 directives do (if you can't figure it out by playing with it)
+
+	-take a look at the SetWWWTheme/templates/example.html file to
+	 see how you embed directives into HTML files.  You could even
+	 copy it to a directory and test it out.  
+
+	-fire up Apache and test it out!
+
+Hopefully, this should get you rolling.  If you can't figure it out, drop
+me an email (chogan@uvastro.phys.uvic.ca) and I'll help you out.  

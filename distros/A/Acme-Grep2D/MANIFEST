@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Acme/Grep2D.pm
+t/00-load.t
+t/01-test.t
+t/01-hoz.t
+t/02-vert.t
+t/03-lr.t
+t/04-rl.t
+t/05-torture.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

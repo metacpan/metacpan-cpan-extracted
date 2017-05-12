@@ -1,0 +1,116 @@
+{
+   "abstract" : "App::financeta is a Technical Analysis GUI",
+   "author" : [
+      "Vikas N. Kumar <vikas@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4207",
+   "keywords" : [
+      "finance",
+      "technical-analysis",
+      "technical",
+      "analysis"
+   ],
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-financeta",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "share"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::ShareDir" : "0",
+            "File::Spec" : "0",
+            "Module::Build" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Browser::Open" : "0",
+            "Capture::Tiny" : "0",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "File::HomeDir" : "0",
+            "File::Path" : "0",
+            "File::ShareDir" : "1.00",
+            "File::Spec" : "0",
+            "Finance::QuoteHist" : "1.2",
+            "Getopt::Long" : "0",
+            "PDL" : "2.007",
+            "PDL::Finance::TA" : "0.008",
+            "PDL::Graphics::Gnuplot" : "0",
+            "POE::Loop::Prima" : "0",
+            "POSIX" : "0",
+            "Pegex" : "0.55",
+            "Prima" : "1.40_1",
+            "Scalar::Util" : "0",
+            "YAML::Any" : "0",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "App::financeta" : {
+         "file" : "lib/App/financeta.pm",
+         "version" : "0.10"
+      },
+      "App::financeta::editor" : {
+         "file" : "lib/App/financeta/editor.pm",
+         "version" : "0.10"
+      },
+      "App::financeta::gui" : {
+         "file" : "lib/App/financeta/gui.pm",
+         "version" : "0.10"
+      },
+      "App::financeta::indicators" : {
+         "file" : "lib/App/financeta/indicators.pm",
+         "version" : "0.10"
+      },
+      "App::financeta::language" : {
+         "file" : "lib/App/financeta/language.pm",
+         "version" : "0.10"
+      },
+      "App::financeta::language::grammar" : {
+         "file" : "lib/App/financeta/language.pm",
+         "version" : "0.10"
+      },
+      "App::financeta::language::receiver" : {
+         "file" : "lib/App/financeta/language.pm",
+         "version" : "0.10"
+      },
+      "App::financeta::mo" : {
+         "file" : "lib/App/financeta/mo.pm",
+         "version" : "0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vikasnkumar/financeta/issues"
+      },
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/vikasnkumar/financeta"
+      }
+   },
+   "version" : "0.10"
+}

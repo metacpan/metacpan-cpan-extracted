@@ -1,0 +1,14 @@
+Revision history for Perl extension Apache::AxKit::Language::SpellCheck
+
+0.03  Wed Jan 26 16:40:08 PST 2005
+  - Fixed bug where some words would be dropped
+  - Made it only match alpha characters
+  - Made it match unicode characters
+  - Improved the loop to be more sane with identifying words
+
+0.02  Thu Jan 20 10:22:00 PST 2005
+  - Added additional documentation
+  - Changed the namespace URI to point to the axkit.org domain
+
+0.01  Wed Jan 19 16:54:13 PST 2005
+  - Original version

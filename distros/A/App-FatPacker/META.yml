@@ -1,0 +1,38 @@
+---
+abstract: 'pack your dependencies onto your script file'
+author:
+  - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Test::More: '0.82'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-FatPacker
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  B: '1.01'
+  Cwd: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Spec::Functions: '0'
+  File::Spec::Unix: '0'
+  Getopt::Long: '0'
+  perl: '5.008000'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-FatPacker
+  repository: git://git.shadowcat.co.uk/p5sagit/App-FatPacker.git
+version: '0.010007'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

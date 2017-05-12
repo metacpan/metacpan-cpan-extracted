@@ -1,0 +1,23 @@
+Revision history for Perl extension Apache::Emulator.
+
+0.06  Tue Jul 19 2005
+	- namespace problems in CPAN indexing (thx EVO)
+
+0.05  Tue Jun 21 2005
+	- rewritten from HTML::Mason::FakeApache (thx David Wheeler)
+
+0.04  Fri Aug 22 2003
+	- unbundled from WWW::AdServer (as reuested by ADAMK)
+	- sorted out directory structure
+	- realized I should be ashamed of some of this code
+
+0.03  Tue Nov 20 2001
+	- added $r->header_in() [not yet documented] - NWETTERS
+
+0.02  ??? Nov ?? 2001
+	- test.pl now doesn't run for Apache::Emulator::Test - NWETTERS
+
+0.01  Mon Oct 29 20:45:53 2001
+	- original version; created by NWETTERS
+	- does what it says on the tin!
+

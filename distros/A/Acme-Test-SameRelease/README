@@ -1,0 +1,11 @@
+DESCRIPTION
+
+    This distribution is released in:
+
+     Acme-Test-SameRelease-x.yy.tar.gz
+
+    file, where another author (SHARYANTO) will have the same file for its
+    Acme::SHARYANTO::Test::SameRelease module.
+
+    This is done to test PAUSE indexing.
+

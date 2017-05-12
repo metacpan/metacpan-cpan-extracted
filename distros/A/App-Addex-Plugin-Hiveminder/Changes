@@ -1,0 +1,20 @@
+Revision history for App-Addex-Plugin-Hiveminder
+
+0.006     2013-11-19 23:18:12 America/New_York
+          update repo, request adoption
+
+0.005     2013-06-19 19:38:29 America/New_York
+          update bugtracker
+
+0.004     2009-01-16
+          add repository to metadata
+
+0.003     2008-11-01
+          add LICENSE
+
+0.002     2008-06-22
+          avoid a warning on undef label
+          add and respect a skip_hiveminder field (for Nobody)
+
+0.001     2008-02-26
+          first release

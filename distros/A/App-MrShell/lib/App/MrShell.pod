@@ -1,0 +1,164 @@
+
+=head1 NAME
+
+App::MrShell - do everything the mrsh commandline tool can do and more
+
+=head1 SYNOPSIS
+
+    my $mrsh = App::MrShell
+        -> new
+        -> set_hosts('host1', 'host2', 'host3')
+        -> queue_command('uptime')
+        -> queue_command('mii-tool', 'eth0')
+        -> queue_command('dmesg | head')
+        -> run_queue;
+
+=head1 DESCRIPTION
+
+This package can do all the things L<mrsh> can do and possibly more.  The
+methods mostly support chaining to make script writing easier and more
+attractive.  The API hides the L<POE> nature of the project, but the author is
+not opposed to exposing it if anybody wants such a thing.
+
+=head1 OPTIONS METHODS
+
+=over
+
+=item B<set_shell_command_option>
+
+The first argument is normally a space separated list of command-and-arguments
+(with some basic quoting support).   If called with no arguments, a null-command
+will be set indicating that there isn't a shell command to prepend hostnames
+with -- the author can't imagine why this would be useful, but allows that it
+could be someday for someone.
+
+If the first argument is an arrayref, all following arguments will be ignored.
+The arrayref will be copied as the shell command.  C<[]> can be used as the
+arrayref to set a null-command.
+
+=item B<set_group_option>
+
+Setup groups of hosts.  Pairs are L<spliced|perlfunc/splice> off the stack with
+first element as the name of a group, the second element as either a space
+delimited set of hostnames or an arrayref of hostnames.  Example:
+
+    $mrsh->set_group_option( group1 => [qw(host1 host2 host3)],
+        group2=>['localhost'] );
+
+=item B<set_logfile_option>
+
+When provided, write a logfile of all lines received, where and when they were
+executed.
+
+=item B<set_debug_option>
+
+Turn on various debugging messages.  The optional argument specifies the debug
+level.  No argument, 0, and 1 are all equivalent.  While levels greater than one
+indicate an increased amount of debugging noise.
+
+=item B<set_no_command_escapes_option>
+
+When expanding hosts in host-routing mode, slashes and spaces are escaped so
+they function correctly when subshelled.  This disables that functionality.
+
+=item B<read_config>
+
+The options above can be specified from a L<config file|mrsh/CONFIG FILE>, which
+is documented in the command line tool.  The config file is read using
+L<Config::Tiny>.
+
+=item B<set_usage_error>
+
+Pass in a function name to call on error.  Useful for showing
+L<pod2usage|Pod::Usage/pod2usage>() information.  Example:
+
+    my $mrsh = App::MrShell->new->set_usage_error("pod2usage");
+
+=back
+
+=head1 COMMAND METHODS
+
+=over
+
+=item B<set_hosts>
+
+Set the hosts, groups, and routed strings for the next L</queue_command>.  Hosts
+have some special magic concerning groups.  Hosts that being with an C<@>
+character are considered groups are are expanded that way (see
+L<config file|mrsh/[groups]>).
+
+Also see the section on L<--host|mrsh/--host -H> in the L<mrsh> documentation.
+
+=item B<queue_command>
+
+Push a command into the stack for the given hosts (specified by L</set_hosts> or
+by the default hosts in the L<config file|mrsh/CONFIG FILE>).
+
+Commands are pushed as an array, although, given the nature of
+L<http://openssh.com/> it's probably ok to pass in the command as a single
+string; or even to pass in multiple commands, C<;> separated and let the shell
+sort it out.
+
+=item B<set_subst_vars>
+
+Set any built in or extra subst vars.  These will only ever be set once per
+L</subst_cmd_vars>() call, so setting built-in keys will override the built-in
+values, with the exception of C<%u> at least and C<%u> during host-routing mode
+-- since those are special subst vars, their substitutions will be difficult to
+override.
+
+=item B<subst_cmd_vars>
+
+Substitute command vars, including the special magic of host routing and the
+escaping associated with it (e.g. C<%h> for the hostname).   These are better
+documented in the L<COMMAND ESCAPES|mrsh/COMMAND ESCAPES> section.
+
+Others (that is non-internal substs) can be added with L</set_subst_vars>(),
+although C<%h> and C<%u> are magic and setting them manually probably won't
+work.
+
+As arguments, the function takes the command, upon which substitution should
+occur, as an array.
+
+=item B<run_queue>
+
+Run whatever commands are queued.  This starts a L<POE::Session> and issues a
+L<POE::Kernel>->L<run|POE::Kernel/run>().
+
+=back
+
+=head1 VARS
+
+=over
+
+=item B<@DEFAULT_SHELL_COMMAND>
+
+This can be specified, perhaps better, via L</set_shell_command_option>() or via
+the L<config file|mrsh/CONFIG FILE>.
+
+=back
+
+=head1 REPORTING BUGS / REQUEST FEATURES
+
+You can report bugs either via L<http://rt.cpan.org/> or via the issue tracking
+system on github (L<http://github.com/jettero/mrsh/issues>).  I'm likely to
+notice either fairly quickly.
+
+For feature requests, just go ahead and email me.  I've never minded a
+discussion of this nature yet.
+
+=head1 AUTHOR
+
+Paul Miller C<< <jettero@cpan.org> >>
+
+=head1 THANKS
+
+Dennis Boone -- L<http://github.com/drboone>
+
+=head1 COPYRIGHT
+
+Copyright 2009-2010 Paul Miller -- released under the GPL
+
+=head1 SEE ALSO
+
+ssh(1), perl(1), L<mrsh>, L<POE>, L<POE::Wheel::Run>, L<Term::ANSIColor>

@@ -1,0 +1,76 @@
+{
+   "abstract" : "for enabling it to treat simply",
+   "author" : [
+      "meru_akimbo <merukatoruayu0@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amon2-Plugin-Redis",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Redis" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Amon2" : "0",
+            "Test::More" : "0.98",
+            "Test::RedisServer" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Amon2::Plugin::Redis" : {
+         "file" : "lib/Amon2/Plugin/Redis.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/meru-akimbo/Amon2-Plugin-Redis/issues"
+      },
+      "homepage" : "https://github.com/meru-akimbo/Amon2-Plugin-Redis",
+      "repository" : {
+         "url" : "git://github.com/meru-akimbo/Amon2-Plugin-Redis.git",
+         "web" : "https://github.com/meru-akimbo/Amon2-Plugin-Redis"
+      }
+   },
+   "version" : "0.04"
+}

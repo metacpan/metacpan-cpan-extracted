@@ -1,0 +1,193 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+AI::CleverbotIO - A Perl wrapper for the cleverbot.io API
+
+=head1 VERSION
+
+This document describes AI::CleverbotIO version 0.002.
+
+=begin html
+
+<a href="https://travis-ci.org/polettix/AI-CleverbotIO">
+<img alt="Build Status" src="https://travis-ci.org/polettix/AI-CleverbotIO.svg?branch=master">
+</a>
+
+<a href="https://www.perl.org/">
+<img alt="Perl Version" src="https://img.shields.io/badge/perl-5.10+-brightgreen.svg">
+</a>
+
+<a href="https://badge.fury.io/pl/AI-CleverbotIO">
+<img alt="Current CPAN version" src="https://badge.fury.io/pl/AI-CleverbotIO.svg">
+</a>
+
+<a href="http://cpants.cpanauthors.org/dist/AI-CleverbotIO">
+<img alt="Kwalitee" src="http://cpants.cpanauthors.org/dist/AI-CleverbotIO.png">
+</a>
+
+<a href="http://www.cpantesters.org/distro/A/AI-CleverbotIO.html?distmat=1">
+<img alt="CPAN Testers" src="https://img.shields.io/badge/cpan-testers-blue.svg">
+</a>
+
+<a href="http://matrix.cpantesters.org/?dist=AI-CleverbotIO">
+<img alt="CPAN Testers Matrix" src="https://img.shields.io/badge/matrix-@testers-blue.svg">
+</a>
+
+=end html
+
+=head1 SYNOPSIS
+
+   use AI::CleverbotIO;
+
+   my $cleverbot = AI::CleverbotIO->new(
+      key => $ENV{CLEVERBOT_API_KEY},
+      nick => $ENV{CLEVERBOT_NICK},
+      user => $ENV{CLEVERBOT_API_USER},
+   );
+
+   # call to create() is mostly safe, you might get an error
+   # back but still 200 OK. You can avoid this (and wasting one
+   # API call) if you know the nick is already active for these
+   # API credentials.
+   $cleverbot->create();
+
+   # then, it's just... ask()
+   my $answer = $cleverbot->ask('Hello darling!');
+   say $answer->{response};
+
+=head1 DESCRIPTION
+
+This module allows you to interact with the API served by
+L<https://cleverbot.io>.
+
+=head1 ACCESSORS
+
+=head2 key
+
+   my $api_key = $obj->key;
+
+Read-only accessor to the API key. MUST be provided upon instantiation.
+
+=head2 endpoints
+
+   my $endpoints_hashref = $obj->endpoints;
+
+Read-only accessor to a hash reference whose keys are the strings C<ask>
+and C<create> and the corresponding values are the API endoints (URIs).
+The default is:
+
+   {
+      ask    => 'https://cleverbot.io/1.0/ask',
+      create => 'https://cleverbot.io/1.0/create',
+   }
+
+=head2 logger
+
+   my $logger = $obj->logger;
+
+Read-only accessor to the logger object (L<Log::Any> compatible). See
+L</BUILD_logger> for the default value.
+
+=head2 nick
+
+   $obj->nick($some_string);
+   my $nick = $obj->nick;
+
+Read-write accessor to the nick for invoking API calls. If not set, it
+is set after a call to L</create>. See also L</has_nick>.
+
+=head2 ua
+
+   my $ua = $obj->ua;
+
+Read-only accessor to the user agent object (L<HTTP::Tiny> compatible). See
+L<BUILD_ua> for the default value.
+
+=head2 user
+
+   my $api_user = $obj->user;
+
+Read-only accessor to the API user. MUST be provided upon instantiation.
+
+=head1 METHODS
+
+=head2 BUILD_logger
+
+Called automatically if L</logger> is not set. By default, it
+returns whatever L<Log::Any/get_logger> provides, but you can
+easily override this in a derived class.
+
+=head2 BUILD_ua
+
+Called automatically if L</ua> is not set. By default, it returns
+a plain new instance of L<HTTP::Tiny>, without options.
+
+=head2 ask
+
+   my $answer = $obj->ask($some_text);
+
+Send a I<ask> API request. The returned C<$answer> is a hash reference
+derived by the JSON decoding of the response body, e.g.:
+
+   {
+      status   => 'success',
+      response => 'Hullo'
+   }
+
+=head2 create
+
+   my $answer = $obj->create();
+   my $other  = $obj->create($other_nick);
+
+Send a I<create> API request. The returned C<$answer> is a hash reference
+derived by the JSON decoding of the response body, e.g.:
+
+   {
+      status => 'success',
+      nick   => 'NickTheRobot',
+   }
+
+If the current L</nick> has already been used for creation, the API call
+will fail partially in that status 200 will be returned, but the C<status>
+field in the answer will contain an error about the fact that the nick
+already exists (C<Error: reference name already exists>). You can safely
+ignore this error.
+
+You can optionally pass a different C<other_nick>. This will be set as
+L</nick> and used for creation (this will overwrite whatever L</nick>
+contains though).
+
+=head2 has_nick
+
+   say $obj->nick if $obj->has_nick;
+   say 'no nick yet' unless $obj->has_nick;
+
+Predicate to check whether a L</nick> is already set or not.
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs either through RT or GitHub (patches welcome).
+
+=head1 SEE ALSO
+
+L<https://cleverbot.io>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

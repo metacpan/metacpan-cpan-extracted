@@ -1,0 +1,171 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-history
+# ABSTRACT: Show the history of a changeset
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    branch_basis
+    branch_point
+    changeset_merged_to
+    current_branch
+    full_changeset_name
+    git
+    history
+    history_owner
+    history_status
+    is_valid_ref
+    parse_changeset_spec
+    project_name
+    sort_changesets_by_name
+    unpromoted
+);
+use Time::Local qw( timelocal );
+use Getopt::Long;
+
+my $quiet = 0;
+GetOptions(
+    'q|quiet' => \$quiet,
+);
+
+# which changeset are we working with?
+my $changeset_spec = shift;
+my ( $project_name, $changeset ) = parse_changeset_spec($changeset_spec);
+
+# retrieve the changeset's history
+my $history = history($project_name, $changeset);
+die "There is no changeset named $project_name#$changeset\n" if not @$history;
+# display the history
+my $format = "%-20s %4s %-8s %-8s %-8s %-5s\n";
+printf $format, qw( Date Dur. Action User Reviewer Env. );
+print "="x57, "\n";
+for my $i ( 0 .. $#$history) {
+    my $event = $history->[$i];
+    my $next = $i > $#$history ? {} : $history->[$i+1];
+    printf $format,
+        $event->{stamp},
+        pretty_duration( $event->{stamp}, $next->{stamp} ),
+        $event->{action},
+        $event->{user},
+        $event->{reviewer} || '',
+        $event->{target} || '',
+    ;
+}
+
+# for the rest of this, we need to be in a repository
+if ( not -d '.git' ) {
+    warn  "\nTo get more detailed changeset history, your current\n"
+        . "working directory must be inside the project's repository.\n"
+        ;
+    exit;
+}
+elsif ( ( my $actual_project = project_name() ) ne $project_name ) {
+    die   "\nYou specified the project '$project_name' but your current\n"
+        . "working directory is for the project '$actual_project'.\n"
+        . "To get more detailed changeset history, these must match.\n"
+        ;
+}
+
+my $full = full_changeset_name($changeset);
+my $branch_point = branch_point($full);
+print "\n";
+print "Owner               : " . history_owner($history) . "\n";
+print "Current status      : " . history_status($history) . "\n";
+print "Based on            : " . branch_basis($branch_point) . "\n";
+print "Created from        : $branch_point\n";
+print "Merged to master    : " . ( merged_to_master($changeset) || '' ) . "\n";
+print "Changeset merged to : " . changeset_merged_to($changeset) . "\n";
+exit if $quiet;
+my @dependencies = grep { $_ ne $changeset } unpromoted( $full, 'origin/prod' );
+if (@dependencies) {
+    print "Depends on          :\n";
+    sort_changesets_by_name(\@dependencies);
+    print "    - $_\n" for @dependencies;
+}
+
+######################### helper subroutines ######################
+
+use Date::Parse;
+
+sub pretty_duration {
+    my $from = str2time(shift);
+    my $to = str2time(shift) || time;
+    my $diff = $to - $from;
+    my @units = (
+        y => 60*60*24*7*4*12,
+        M => 60*60*24*7*4,
+        w => 60*60*24*7,
+        d => 60*60*24,
+        h => 60*60,
+        m => 60,
+        s => 1,
+    );
+    while ( my ($unit,$seconds) = splice @units, 0, 2 ) {
+        if ( $diff >= $seconds ) {
+            $diff = int $diff/$seconds;
+            return "$diff$unit";
+        }
+    }
+    return '0s';
+}
+
+sub parse_stamp {
+    my ($stamp) = @_;
+    return if not $stamp;
+    my @parts = split /[-:T Z]/, $stamp;
+    $parts[0] -= 1900;
+    $parts[1]--;
+    return timelocal( reverse @parts );
+}
+
+# returns the ID of the commit in which this changeset was merged to master
+sub merged_to_master {
+    my ($cs) = @_;
+    our $merged;
+    return $merged if $merged;
+    return $merged = is_valid_ref("cs/$cs/to-master");
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-history - Show the history of a changeset
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

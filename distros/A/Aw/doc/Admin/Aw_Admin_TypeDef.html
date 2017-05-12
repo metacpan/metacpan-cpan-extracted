@@ -1,0 +1,52 @@
+<html>
+<head>
+  <title>Aw::Admin::TypeDef</title>
+</head>
+<body bgcolor="#f0f0f0" link="#cc0000" vlink="brown">
+
+<h1><u>Aw::Admin::TypeDef</u></h1>
+
+<table width="90%" border=1 bgcolor="#cccc99">
+<tr bgcolor="#bfbfbf"><th>Method</th><th>Arguments</th><th>Return</th><th>Throws<br>Exception</th></tr>
+<tr align="center"><th align="left"><a name="new"></a>new</th><td>( [ type_name, type, \%data ] )<br>( [ Aw::Admin::TypeDef | Aw::TypeDef ] )<br><div align="left"><em>All</em> arguments are optional, the typedef will setup using as much info (or none) as passed.<br>See examples.</div></td><td>Aw::Admin::TypeDef</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="clearField"></a>clearField</th><td>( [field_name] )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="clearModificationFlag"></a>clearModificationFlag</th><td>( )</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="copy"></a>copy</th><td>( )</td><td>Aw::Admin::TypeDef</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="delete"></a>delete</th><td>( )</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getBaseTypeName"></a>getBaseTypeName</th><td>( )</td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getDescription"></a>getDescription</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getFieldDef"></a>getFieldDef</th><td>( field_name )</td><td>Aw::Admin::TypeDef</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getFieldNames"></a>getFieldNames</th><td>( field_name )</td><td>@ of Strings</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getFieldType"></a>getFieldType</th><td>( field_name )</td><td>Type Id</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getScopeTypeName"></a>getScopeTypeName</th><td>( )</td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getStorageType"></a>getStorageType</th><td>( )</td><td>Number</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getTimeToLive"></a>getTimeToLive</th><td>( )</td><td>Number</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getBaseTypeName"></a>getTypeName</th><td>( )</td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="hasBeenModified"></a>hasBeenModified</th><td>( )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="insertFieldDef"></a>insertFieldDef</th><td>( field_name, index, Aw::Admin::TypeDef )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="isSystemDefined"></a>isSystemDefined</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="orderFields"></a>orderFields</th><td>( field_name, \@field_names )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="renameField"></a>renameField</th><td>( old_field_name, new_field_name )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setDescription"></a>setDescription</th><td>( description )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setFieldDef"></a>setFieldDef</th><td>( field_name, Aw::Admin::TypeDef )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setFieldType"></a>setFieldType</th><td>( field_name, field_type )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setModificationFlag"></a>setModificationFlag</th><td>( )</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setStorageType"></a>setStorageType</th><td>( number )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setTimeToLive"></a>setTimeToLive</th><td>( number )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setTypeName"></a>setTypeName</th><td>( type_name )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="toString"></a>toString</th><td>( [indent_level] )</td><td>String</td><td>NO</td></tr>
+
+<tr bgcolor="#bfbfbf" align="left"><th colspan=4>Inherited Methods</th></tr>
+<tr align="center"><th align="left"><a name="err"></a>err</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="errmsg"></a>errmsg</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="error"></a>error</th><td>( )</td><td>Aw::Error</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="hello"></a>hello</th><td>( )<br><div align="left">Returns the string "hello".  Useful for debugging.</div></td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getWarn"></a>getWarn</th><td>( )<br><div align="left">Returns current warn <b><code>level</code></b>.</div></th><td>Number</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setWarn"></a>setWarn</th><td>( level )<br><div align="left">Sets new warn <b><code>level</code></b>.<dir>0 : No warnings (quiet mode)<br>1 : Terse (uses awErrorToString)<br>2 : Verbose (uses awErrorToCompleteString)</dir>The Aw extensions must be compiled with AWXS_WARNS defined.</div></th><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="warn"></a>warn</th><td>( [string] )<br><div align="left">Warn message is <b><code>string</code></b> if passed, otherwise current err is converted to string.</div></th><td>void</td><td>YES</td></tr>
+</table>
+
+<p><hr size=3 noshade>
+
+</body>
+</html>

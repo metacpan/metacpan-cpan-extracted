@@ -1,0 +1,42 @@
+Revision history for Perl extension AxKit::XSP::PerForm.
+
+1.8.3
+    - Added support for a default form submit routine, in case the
+      form was submitted without clicking a button.
+
+1.8.2
+    - Add disabled, onclick and onchange attributes to each element
+
+1.8.1
+    - Really fix the problem with select boxes not loading contents on
+      a submit.
+    - Update WebUtils requirement to 1.5 in Makefile.PL
+
+1.8
+    - Change to use can() so we can use XSP inheritance
+    - Added onload and onvalidate attributes to each tag (allow to specify
+      external code to validate/load, or use single function for multiple
+      tags)
+    - Better support for multiple forms per page
+    - Numerous other minor bug fixes
+
+1.7
+    - Patch from nachoman to finally properly support single and
+      multiple select
+    - Patch from Mark Hershberger fixing:
+      - If the error message contains the word "at", everything
+        from that "at" to the end of the error is deleted.
+      - If a load_* function is defined, then the submit_*
+        functions get the value that load_* provides rather than
+        what was submitted.
+
+1.6
+    - Removed action from form to allow it to work with Session taglib
+
+1.4
+    - Documentation added
+    - More widgets implemented, some changed around a bit.
+
+0.01  Fri Jun  8 16:48:21 2001
+	- original version; created by h2xs 1.19
+

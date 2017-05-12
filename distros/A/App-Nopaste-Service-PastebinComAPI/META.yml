@@ -1,0 +1,26 @@
+---
+abstract: 'App::Nopaste service for www.pastebin.com using their API'
+author:
+  - 'Zoffix Znet <zoffix@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Nopaste-Service-PastebinComAPI
+provides:
+  App::Nopaste::Service::PastebinComAPI:
+    file: lib/App/Nopaste/Service/PastebinComAPI.pm
+    version: 1.002
+requires:
+  App::Nopaste::Service: 0
+  WWW::Pastebin::PastebinCom::API: 0.003
+  perl: 5.006
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: 1.002

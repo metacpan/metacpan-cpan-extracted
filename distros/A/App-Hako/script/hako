@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+use v5.12;
+use App::Hako;
+
+App::Hako::run(@ARGV);
+

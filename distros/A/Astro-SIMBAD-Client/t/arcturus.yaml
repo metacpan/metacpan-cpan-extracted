@@ -1,0 +1,2 @@
+format obj "---\nname: '%idlist(NAME|1)'\ntype: '%otype'\nlong: '%otypelist'\nra: %coord(d;A)\ndec: %coord(d;D)\nplx: %plx(V)\npm:\n  - %pm(A)\n  - %pm(D)\nradial: %rv(V)\nredshift: %rv(Z)\nspec: %sptype(S)\nbmag: %fluxlist(B)[%flux(F)]\nvmag: %fluxlist(V)[%flux(F)]\nident:\n%idlist[  - '%*'\n]"
+query id arcturus

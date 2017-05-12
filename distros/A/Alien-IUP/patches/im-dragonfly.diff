@@ -1,0 +1,66 @@
+diff -ru --strip-trailing-cr im.orig/src/libjasper/jasper/jas_types.h im/src/libjasper/jasper/jas_types.h
+--- im.orig/src/libjasper/jasper/jas_types.h	2009-10-01 18:40:40.000000000 +0200
++++ im/src/libjasper/jasper/jas_types.h	2010-09-29 09:46:56.051530600 +0200
+@@ -146,46 +146,62 @@
+ #include <limits.h>
+ /**********/
+ #if !defined(INT_FAST8_MIN)
++#  if !defined(__DragonFly__)
+ typedef signed char int_fast8_t;
++#  endif
+ #define INT_FAST8_MIN	(-127)
+ #define INT_FAST8_MAX	128
+ #endif
+ /**********/
+ #if !defined(UINT_FAST8_MAX)
++#  if !defined(__DragonFly__)
+ typedef unsigned char uint_fast8_t;
++#  endif
+ #define UINT_FAST8_MAX	255
+ #endif
+ /**********/
+ #if !defined(INT_FAST16_MIN)
++#  if !defined(__DragonFly__)
+ typedef short int_fast16_t;
++#  endif
+ #define INT_FAST16_MIN	SHRT_MIN
+ #define INT_FAST16_MAX	SHRT_MAX
+ #endif
+ /**********/
+ #if !defined(UINT_FAST16_MAX)
++#  if !defined(__DragonFly__)
+ typedef unsigned short uint_fast16_t;
++#  endif
+ #define UINT_FAST16_MAX	USHRT_MAX
+ #endif
+ /**********/
+ #if !defined(INT_FAST32_MIN)
++#  if !defined(__DragonFly__)
+ typedef int int_fast32_t;
++#  endif
+ #define INT_FAST32_MIN	INT_MIN
+ #define INT_FAST32_MAX	INT_MAX
+ #endif
+ /**********/
+ #if !defined(UINT_FAST32_MAX)
++#  if !defined(__DragonFly__)
+ typedef unsigned int uint_fast32_t;
++#  endif
+ #define UINT_FAST32_MAX	UINT_MAX
+ #endif
+ /**********/
+ #if !defined(INT_FAST64_MIN)
++#  if !defined(__DragonFly__)
+ typedef longlong int_fast64_t;
++#  endif
+ #define INT_FAST64_MIN	LLONG_MIN
+ #define INT_FAST64_MAX	LLONG_MAX
+ #endif
+ /**********/
+ #if !defined(UINT_FAST64_MAX)
++#  if !defined(__DragonFly__)
+ typedef ulonglong uint_fast64_t;
++#  endif
+ #define UINT_FAST64_MAX	ULLONG_MAX
+ #endif
+ /**********/

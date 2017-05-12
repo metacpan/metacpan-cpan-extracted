@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f57dd5c870ebbd4faa259ed4998a18573c1b9bd8 Build.PL
+SHA1 d4dd4a8904bc3cf774114b520944b7e09b4d5d26 Changes
+SHA1 efa6e0ab5fc2948e19f9c46fcca66403a864f58d MANIFEST
+SHA1 46ee3e3ccdfda2ca9824b19cdd034aa34ec101ee META.yml
+SHA1 4c7422b58a9cf8d715fa081390a1ce7833a31f32 Makefile.PL
+SHA1 f9a51214e37065f143814252453e9bd8debdfc4d README
+SHA1 d579fe88bf89cd06120ce3875ff1487efcc94fdd lib/Algorithm/SkipList.pm
+SHA1 f9aac081c9c4f0931b90c18b389d045fcad51227 lib/Algorithm/SkipList/Header.pm
+SHA1 b91c6d911f2b389c937c6bacd3f05f8ca8d3e7c0 lib/Algorithm/SkipList/Node.pm
+SHA1 6de8bf83df4f6781444d5dbf9e3cc45bd02903e3 lib/Algorithm/SkipList/PurePerl.pm
+SHA1 7c9b2e99a1af7929a09e7645559122c968180b2b lib/List/SkipList.pm
+SHA1 0d123db676e6f2628ea13981727ed079e53d97af t/01-basic-pp.t
+SHA1 28bed3b7eba166029b59c74b7a038ccc81f0fa8a t/01-basic.t
+SHA1 fe0701ec04c3dfcc7861d0d194af8547623edffd t/02-merge_append.t
+SHA1 2e9ab973ac825a55b99121040b2fe1ff61bc95fc t/03-tie.t
+SHA1 2510f36bf2a72ec031cf7a5331253a2374b2ba2c t/04-greatest.t
+SHA1 102abb5560a2fe03a73a91f1959aeb0027c6477f t/05-next_key.t
+SHA1 530d5092ec374ecbe623468beb002d36055ba528 t/06-duplicates.t
+SHA1 eeb059f1bb5a83ab23cc5da12b25cfc7d3f28bde t/07-max_level.t
+SHA1 9b4aeed2b78383eaee577277d54ee78141e0ee94 t/08-p.t
+SHA1 8a149976b522bc2dc6ff89d6ab404ffc97eaaec4 t/09-index.t
+SHA1 78130c9e9e3d2a675913c21cf7ea70f0d3666e5b t/10-deprecated.t
+SHA1 c0d306428c7aa9dc4e7a27368a9eca69437f4521 t/11-keys.t
+SHA1 26f8808ce2dc55f0bb7418304fe83ae4cf8c7b1c t/20-heavy.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (MingW32)
+
+iD8DBQFB2yQtV485gMKcmRARAm2fAKDPgrzyfPx1MKRWJFu1xVC5WlOMUACfdlqg
+XXBMMvjyCf/ptZXLaIpkV7g=
+=FZQT
+-----END PGP SIGNATURE-----

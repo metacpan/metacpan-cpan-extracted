@@ -1,0 +1,35 @@
+[% PROCESS header.html title=dist.name %]
+[% PROCESS login_form.html %]
+[% PROCESS form.html %]
+
+<h2>[% dist.name %] [% rating(dist) %]</h2>
+
+<p class="sisters">
+[% distver = dist.distvers.0 %]
+[ 
+[% link_dist_search_cpan_org(dist) %] |
+[% link_distver_kobes(distver) %] |
+[% link_distver_cpanforum(distver) %] |
+[% link_distver_cpanratings(distver) %] |
+[% link_distver_rt(distver) %] |
+[% link_distver_cpantesters(distver) %] |
+[% link_distver_download(distver) %]
+]
+</p>
+
+<table>
+[% FOR distver = distvers.nsort('mtime').reverse %]
+    <tr class="[% loop.count % 2 ? 'even' : 'odd' %]">
+        <td>[% link_author(distver.pause_id) %]</td>
+        <td>[% link_distver(distver) %]</td>
+        <td>[% YMD.format(distver.mtime) %]</td>
+        <td>[% SET count = distver.count_visible_notes; IF count > 0 %]
+            (<em>[% NO('note', count) %]; 
+            latest [% YMD.format(distver.latest_visible_note_date) %]</em>)
+        [% END %]</td>
+    </tr>
+[% END %]
+</table>
+
+[% PROCESS footer.html %]
+

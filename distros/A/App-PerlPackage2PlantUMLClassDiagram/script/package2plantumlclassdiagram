@@ -1,0 +1,71 @@
+#!perl
+
+use strict;
+use warnings;
+
+use App::PerlPackage2PlantUMLClassDiagram::Repository;
+
+my $repository = App::PerlPackage2PlantUMLClassDiagram::Repository->new;
+
+unless (@ARGV) {
+    exec "perldoc $0";
+}
+
+$repository->load_package($_) for @ARGV;
+
+print $repository->to_plantuml;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+package2plantumlclassdiagram - Generates Plant UML's Class Diagram from Perl Modules
+
+=head1 DESCRIPTION
+
+package2plantumlclassdiagram analyze Perl modules with PPI, and generate Plant UML's Class Diagram syntax.
+
+You can render the output result with PlantUML.
+
+L<Output Example is here.|https://gist.github.com/hitode909/ce22c46004f2ff1dac73>
+
+=head1 SYNOPSIS
+
+    % package2plantumlclassdiagram PATH_TO_MODULES > a.plantuml
+
+Then, render a.plantuml with PlantUML.
+
+    % GRAPHVIZ_DOT=$(which dot) plantuml -charset UTF-8 -tpng a.plantuml
+    % open a.png
+
+=head1 PLOT ALL MODULES I YOUR PROJECT
+
+Like this.
+
+    % package2plantumlclassdiagram ~/YourApp/lib/**/**.pm > a.plantuml
+
+=head1 PLOT ONLY INHERITANCE RELATIONSHIPS
+
+Use grep -P.
+
+    % package2plantumlclassdiagram PATH_TO_MODULES | ggrep -P '^(@startuml|@enduml)|(<|--)' > a.plantuml
+
+=head1 SEE ALSO
+
+L<http://plantuml.com/classes.html>
+
+=head1 LICENSE
+
+Copyright (C) hitode909.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+hitode909 E<lt>hitode909@gmail.comE<gt>
+
+=cut
+

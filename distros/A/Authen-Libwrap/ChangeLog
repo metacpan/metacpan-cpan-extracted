@@ -1,0 +1,46 @@
+Revision history for Perl extension Authen::Libwrap.
+
+0.23    Mon Nov 14 08:37:06 2016
+	- Add github URL to bug POD.
+        - thanks BDRACO: Avoid no warnings as it creates a cop_warnings for every cop in the scope
+        - Add generated from POD README.md
+
+0.22    Sun Jul 06 17:59:49 2010
+        - thanks BDRACO: needless importing is slow
+
+0.21    Sun Jul 20 17:59:49 2008
+        - DMUEY fix rt 25239
+        
+0.20    Wed Dec 17 2003
+        - re-org directories to fit current CPAN standards
+        - switch from ExtUtils::MakeMaker to Module::Build
+        - first shot at figuring out where libwrap is automatically
+        - minor pod fixup
+        - move test suite inline and use Test::More functionality
+        - removed AUTOLOAD constants and use plain Perl constants
+        - switched from DynaLoader to XSLoader
+        - moved hosts_ctl into the module and changed the XS function
+          name to _hosts_ctl to provide alternate Perl function
+          signatures
+        - added the ability to get hostname and ip address information
+          from an IO::Socket, a GLOB or GLOBREF
+
+0.10    Tue Feb 13 2001
+        - Three years and *still* nobody wrote something like this ? 
+        - Cleaned up a bit, verified on FreeBSD 4.
+        - renamed from TCP_Wrappers to Authen::Libwrap in prep for
+	      distribution on CPAN
+
+[...]   History unknown.  Module never received much fedback, so it wasn't
+        uploaded to CPAN.
+
+0.003   Fri Apr 3 1998
+        - Released to a few interested parties from comp.lang.perl.modules
+
+0.002	Wed Apr 1 1998
+        - I couldn't quite bring myself to release this on April Fool's day
+        (as appropriate as it may have been)
+
+0.001	Mon Mar 27 1998
+        - Damn! It compiles (and seems to work to boot!)
+

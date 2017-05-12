@@ -1,0 +1,49 @@
+create temp table page2 (                           id INTEGER PRIMARY KEY,
+                           name NOT NULL,
+                           formatterid NOT NULL,
+                           content,
+                           last_modified,
+                           ip_address
+                           );
+
+insert into page2 select * from Page;
+
+drop table Page;
+
+create table Page (
+                   id INTEGER PRIMARY KEY,
+                   name NOT NULL,
+                   formatterid NOT NULL,
+                   content,
+                   last_modified,
+                   ip_address,
+                   username
+                   );
+
+insert into Page (id, name, formatterid, content, last_modified, ip_address) select * from Page2;
+
+create temp table History2 (
+                      id INTEGER PRIMARY KEY,
+                      name NOT NULL,
+                      formatterid NOT NULL,
+                      content,
+                      modified,
+                      ip_address
+                     );
+
+insert into History2 select * from History;
+
+drop table History;
+
+create table History (
+                      id INTEGER PRIMARY KEY,
+                      name NOT NULL,
+                      formatterid NOT NULL,
+                      content,
+                      modified,
+                      ip_address,
+                      username
+                     );
+
+insert into History (id, name, formatterid, content, modified, ip_address) select * from History2;
+

@@ -1,0 +1,44 @@
+---
+abstract: 'Simple monitoring tool.'
+author:
+  - 'toritori0318 <lt>toritori0318@gmail.com<gt>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.8.3, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Monitor-Simple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Monitor::Simple:
+    file: lib/App/Monitor/Simple.pm
+    version: 0.01
+requires:
+  Getopt::Long: 0
+  IO::CaptureOutput: 0
+  Pod::Usage: 0
+  Test::MockTime: 0.12
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/toritori0318/p5-App-Monitor-Simple/issues
+  homepage: https://github.com/toritori0318/p5-App-Monitor-Simple
+  repository: git://github.com/toritori0318/p5-App-Monitor-Simple.git
+version: 0.01
+x_contributors:
+  - 'toritori0318 <toritori0318@gmail.com>'

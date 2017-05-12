@@ -1,0 +1,3 @@
+print "1..1\n";
+require App::Iops;
+print "1 ok\n";

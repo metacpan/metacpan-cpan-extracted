@@ -1,0 +1,13 @@
+Revision history for Perl extension Apache::Cookie::Encrypted.
+
+0.03  Mon June 4 15:00:00 2001
+	- changed the key retrieval system. This makes this module for use with
+	  mod_perl only. I guess I'll have to work on one for plain CGI using 
+	  CGI::Cookie just to be fair. :)
+
+0.02  Sat June 2 23:30:00 2001
+	- fixed inheritance. It just wasn't working for some reason.
+
+0.01  Thu May 31 23:00:22 2001
+	- original version;
+

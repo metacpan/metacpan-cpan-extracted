@@ -1,0 +1,60 @@
+Revision History for Alien-ZMQ
+==============================
+
+v0.06 2013-09-28
+----------------
+
+  232c208 switch distribution to zeromq-3.2.4
+  cbcb271 do not print Ø for the benefit of unicode-unaware terminals
+  8539173 remove use of `say' to support older perls
+
+v0.05 2013-05-02
+----------------
+
+  03cf2eb switch distribution to zeromq-3.2.3; bump version
+  f3a10ea add gitignore file
+  77bb082 cflags and libs can now return a list of flags
+  435ebe1 improve the abstract and add urls to dist metadata
+
+v0.0403 2013-01-23
+------------------
+
+  e4f59b5 mention cygwin in the documentation; bump version number
+  5b1617c require Archive::Tar 1.00 since older versions don't work
+  2b70311 require MB 0.40 to avoid RT#68585
+  78a45fb add example that compiles an executable with cbuilder
+
+v0.0402 2013-01-21
+------------------
+
+  9d4ada2 require perl 5.10.1 for File::Path::make_path
+
+v0.0401 2013-01-21
+------------------
+
+  db8094c add conditional-eproto patch; bump version number
+  a2fd0c4 require a more recent version of cbuilder
+  f5f2721 fix section references in the documentation
+
+v0.04 2013-01-19
+----------------
+
+  7837ede fix up documentation and bump version number
+  5aeb13f do not bother building the zeromq test programs
+  989b095 never treat zeromq compiler warnings as fatal
+  18a76a3 run the zeromq configure script through sh explicitly
+
+v0.03 2013-01-17
+----------------
+
+  0283879 bump version number for new release
+  e20f71b output log of zeromq installation
+  da7265e add smarter shell-quoting in the cflags and libs functions
+  2c02694 improve handling of spaces in build args
+  23f5d71 use cbuilder for cc and dlext
+  fb61bef make the auto-generated changelog less verbose
+  e04c8dc add markdown-formatted readme document
+
+===================================
+End of changes in the last 365 days
+===================================

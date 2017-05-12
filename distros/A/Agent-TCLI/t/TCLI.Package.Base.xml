@@ -1,0 +1,28 @@
+<package>
+<Parameter name="int5" help="integer five" manual="This is the manual text." type="integer">
+    <constraints>INT</constraints>
+  </Parameter>
+  <Parameter name="int6" help="integer six" manual="This is the manual text." type="integer">
+    <constraints>INT</constraints>
+  </Parameter>
+  <Parameter name="int7" help="integer seven" manual="This is some longer manual text that is supposed to be parsed by xml in this format. It is unclear from the YAML.pm pod how the indenting is supposed to be done on this type of text. Also, any use of non alpha-numeric charaters is not described." type="integer">
+    <constraints>INT</constraints>
+  </Parameter>
+  <Command name="showx" call_style="session" command="test3" handler="show" help="shows things that need showing" topic="attack prep" usage="&lt;context&gt; show &lt;something&gt;">
+    <contexts meganat="showx" noresets="showx">
+      <test1 UNIVERSAL="showx">
+        <test1.1 test1.1.1="showx" test1.1.2="showx" test1.1.3="showx" />
+        <test1.2 UNIVERSAL="showx" />
+        <test1.3 UNIVERSAL="showx" />
+      </test1>
+    </contexts>
+  </Command>
+  <Command name="cmd4" call_style="session" command="test4" handler="cmd4" help="cmd4 help" topic="test" usage="cmd4 usage">
+    <contexts ROOT="cmd4" />
+    <parameters int5="" int6="" />
+  </Command>
+  <Command name="cmd5" call_style="state" command="test5" handler="cmd5" help="cmd5 help" topic="test" usage="cmd5 usage">
+    <contexts ROOT="cmd5" />
+    <parameters int1="" int5="" int6="" int7="" />
+  </Command>
+</package>

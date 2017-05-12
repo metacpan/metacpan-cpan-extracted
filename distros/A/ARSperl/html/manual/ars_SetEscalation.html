@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Programmer's Manual - ars_SetEscalation</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+   <H2><CODE>ars_SetEscalation(ctrl, name, escalationHash)</CODE></H2>
+
+      This function modifies an existing escalation. You must first
+      populate the <CODE>escalationHash</CODE> before calling this routine.
+
+      <P><CODE>name</CODE> is the name of the escalation.
+      <P><CODE>escalationHash</CODE> is a partially assigned
+      <A HREF="ds_getescalation_hash.html">Escalation Attributes</a> hash. 
+
+      <P>
+
+      <DL>
+          <DT><B>On success</B><DD>
+              Returns 1
+          <DT><B>On failure</B><DD>
+              Returns 0
+      </DL>
+
+      <P>Example:
+
+      <P><BLOCKQUOTE>
+      <I> This example changes the name and disables 
+      the escalation "TEST:Escalation". </I></BLOCKQUOTE>
+
+      <PRE>
+      ars_SetEscalation( $c, "TEST:Escalation", {
+        name   => "# TEST:Escalation",
+        enable => 0,
+      } ) || die $ars_errstr;
+      </PRE>
+
+<P>
+<I>This function was introduced in version 1.90 of ARSperl</I>
+<P>
+
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Back to Table of Contents </A>
+</BODY>
+</HTML>

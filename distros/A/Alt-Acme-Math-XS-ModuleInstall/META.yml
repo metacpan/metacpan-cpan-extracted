@@ -1,0 +1,26 @@
+---
+abstract: 'Math is HARD (faster!)'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alt-Acme-Math-XS-ModuleInstall
+no_index:
+  directory:
+    - inc
+    - lib/Acme
+    - t
+requires:
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.0.6

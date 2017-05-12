@@ -1,0 +1,17 @@
+Revision history for App-Foca
+
+0.05    13-Aug-2012
+	POD tests fixes
+
+0.04    10-Aug-2012
+	Minor fixes.
+
+0.03    01-Aug-2012
+	Add missing dependency HTTP::Daemon
+
+0.02    01-Aug-2012
+	Documentation changes
+
+0.01    01-Aug-2012
+        First version (tho very well tested)
+

@@ -1,0 +1,26 @@
+---
+abstract: 'Interactive Pod spell checker'
+author:
+  - 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-podispell
+no_index:
+  directory:
+    - t
+    - xt
+requires: {}
+resources:
+  bugtracker: https://github.com/haarg/podispell/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/haarg/podispell.git
+version: '0.001004'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

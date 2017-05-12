@@ -1,0 +1,20 @@
+This repertory contains functionnal tests to invoke Camel-PKI with JSON
+from PHP. They are automatics tests written in Perl.
+
+Some files of this directory are used as code samples for the PHP developer
+who wants to invoke Camel-PKI va JSON-RPC. If it is your case, here is the 
+recommanded order :
+
+:01-apprentissage-JSONRPC.php: a PHP sample code which invoke
+									a JSON-RPS service.
+:acceptance-issue-certificates.php: a PHP sample code to create
+									real certificates
+:acceptance-revoke-certificates.php: a PHP sample code to revoke
+									certificates.
+:jsonrpc.inc.php: a PHP library to do some JSON-RPC. It has to be copied
+					in your path to libraries, and eventually modify it.
+:php-json.ini: an exctract from php-json.ini you have to add to your web server
+					to use JSON-RPC.
+
+With a good configuration of Apache, this directory ``t/php`` could become 
+a mini website to demonstrate Camel-PKI. This has not be tested.

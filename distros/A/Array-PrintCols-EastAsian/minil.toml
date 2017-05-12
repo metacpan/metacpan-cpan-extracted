@@ -1,0 +1,2 @@
+name = "Array-PrintCols-EastAsian"
+badges = ["travis", "coveralls"]

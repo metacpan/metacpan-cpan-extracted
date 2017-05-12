@@ -1,0 +1,13 @@
+<& /index.comp, title => 'adam.acme.com', content => $content &>
+<%init>
+my $content = <<'ENDCONTENT';
+<b>Contratulations!</b> you are now authenticated.<p>
+<ul>
+  <li> dc in 1 line of perl
+</ul>
+<pre>
+#!/usr/bin/perl -n
+chop;s/\^/**/;if($_ eq p){$o=pop@x;$a=pop@x;print eval"pop(\@x)$o$a","\n";}push(@x,$_);
+</pre>
+ENDCONTENT
+</%init>

@@ -1,0 +1,62 @@
+Revision history for Perl extension Apache::CryptHash.
+
+3.03  Fri Aug  8 18:16:29 PDT 2003
+	documentation update
+
+3.02  Sat Jan  4 16:31:48 PST 2003
+	remove really dumb reference to Apache.pm... sigh....
+
+3.01  Fri Jan  3 16:17:48 PST 2003
+	documentation update
+
+3.00  Sun Sep 22 16:15:16 PDT 2002
+	change group name to Apache
+
+2.07  Fri Sep 13 21:02:13 PDT 2002
+	update documentation on "decode"
+
+2.06  Thu Sep 12 20:46:30 PDT 2002
+	change default password the the value
+	returned by Sys::Hostname::hostname;
+
+2.05  Wed Jan 24 21:17:47 PST 2001
+	remove 'warnings' from t/basic.t for compatibility
+	with older versions of perl
+
+2.04  Tue Jan 2, 13:34:00 PST 2001
+	my $secret replaced with $self->{CRYPT}
+	error found where MAC used @keys instead of @vals
+	did some other bug fixes
+
+	Add method 'checkMAC' to allow client to do the
+	MAC checks on outside arrays
+
+	Add method 'md5_b64' to provide md5_base64 hashes
+
+	Changed MAC routine to output b64 instead of hex
+
+2.03  Thu Oct 26 14:37:06 PDT 2000
+	Added methods 'name' and 'passcode' to eliminate
+	CLASS data access from outside the package
+
+2.02  Thu Oct 26 11:31:02 PDT 2000
+	Changed encoding method from HEX to BASE64 to make 
+	cookies smaller. 
+
+	renamed routines 
+		encrypt_hex	-> encode
+		decrypt_hex	-> decode
+
+2.01  Wed Oct 25 22:03:16 PDT 2000
+	removed field value checking of 'states' included in 
+	MAC during decrypt operation -- this is redundant
+
+	included all CapnMidNite methods in @ISA
+
+1.07  Tue Oct 24 18:00:00 2000
+	upgrade + modifications of CryptHash -- obsolete
+
+0.01  Tue Oct 24 17:59:33 2000
+	- original version; created by h2xs 1.20 with options
+		-cn BZS::CryptHash
+

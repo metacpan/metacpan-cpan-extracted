@@ -1,0 +1,10 @@
+Revision history for Perl extension Apache::AuthLDAP.
+
+0.21  Sun Nov  8 17:40:51 1998
+	- Fixed a bug in parsing the results from a 'new Net::LDAPapi'.
+          Thanks to Mark Dedlow and Brian Thale on this one.
+
+0.20  Fri May 22 10:26:40 1998
+	- First Public Release Version
+	- Support for LDAP Attribute-based Access Controls added
+

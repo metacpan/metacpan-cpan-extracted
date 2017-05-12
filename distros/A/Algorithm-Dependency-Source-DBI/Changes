@@ -1,0 +1,24 @@
+Change for Perl extension Algorithm-Dependency-Source-DBI
+
+1.06 Thu 27 Aug 2009
+	- Updating to production version
+	- Updating to Module::Install 0.91
+	- Filter out links on BOTH source and destination
+
+0.05 Wed 14 Nov 2007
+	- No functional changes
+	- Adding debugging messages to work out why the AUTOMATED_TESTING
+	  tests were run when AUTOMATED_TESTING was NOT enabled at Makefile.PL
+
+0.04 Tue 21 Aug 2007
+	- Added a missing dependency on Parse::CSV under AUTOMATED_TESTING
+
+0.03 Fri 17 Aug 2007
+	- Skip tests properly, unless AUTOMATED_TESTING is enabled
+
+0.02 Tue 16 Aug 2007
+	- Removed boilerplate POD and added a real description
+	  (I am no longer an idiot)
+
+0.01 Tue  7 Aug 2007
+	- Created the initial version

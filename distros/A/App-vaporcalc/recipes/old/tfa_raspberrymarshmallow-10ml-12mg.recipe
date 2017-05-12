@@ -1,0 +1,34 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "EM",
+            "percentage" : "1"
+         },
+         {
+            "type" : "PG",
+            "tag" : "Raspberry (sweet)",
+            "percentage" : "5"
+         },
+         {
+            "type" : "PG",
+            "tag" : "Marshmallow",
+            "percentage" : "6"
+         }
+      ],
+      "target_pg" : "50",
+      "base_nic_per_ml" : "100",
+      "base_nic_type" : "PG",
+      "target_quantity" : "10",
+      "target_nic_per_ml" : "12",
+      "target_vg" : "50",
+      "notes" : [
+         "Try 1% EM with 5% raspberry and 6% marshmallow.",
+         "0.1ml EM 0.5ml rasp 0.6ml marshmallow in 10ml",
+         "Might need just a hair more flavor.",
+         "Long steep for best results.",
+         "(Tiffany)"
+      ]
+   }
+}

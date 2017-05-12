@@ -1,0 +1,23 @@
+---
+abstract: 'Make Dockerfile as Template Toolkit template file and use environment variables as data points'
+author:
+  - 'Michael Vu <email@michael.vu>'
+build_requires:
+  File::Temp: '0'
+  Sub::Override: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: restrictive
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Dockerfile-Template
+requires:
+  File::Temp: '0'
+  Module::Load: '0'
+  Pod::Perldoc: '0'
+  Template: '0'
+version: '2.00'

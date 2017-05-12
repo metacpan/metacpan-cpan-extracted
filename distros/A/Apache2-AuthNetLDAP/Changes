@@ -1,0 +1,51 @@
+Revision history for Perl extension Apache::AuthNetLDAP.
+
+0.01  Wed Aug 16 09:07:59 2000
+	- original version; created by h2xs 1.19
+
+0.20  Mon Jun 10 06:33:30 2003
+	- Makefile.PL updated to prompt for automatic downloading of module dependencies.
+	- using ExtUtils::AutoInstall Makefile now prompts for prereqs Net::LDAP and mod_perl
+	- AuthNetLDAP.pm modified to work with both mod_perl 1 and mod_perl-1.99 or greater
+
+0.21  Tue Jun 11 06:33:30 2003
+	- Move $VERSION number variable above the BEGIN block so that PAUSE will 
+	  recognize the $VERSION number of the module
+
+0.22  Wed Jun 12 06:33:30 2003
+	- Try to fix the "extended" text in the documentation of module
+
+0.23  Wed Jun 12 06:33:30 2003
+	- Fix the chmod on the files so that the installation will be able to manipulate
+	  the files.  
+
+0.24  Sat Jun 21 06:33:30 2003	
+	- Fix the Makefile.PL, to make sure that the module can not be made 
+	  without Net::LDAP
+
+0.25  Sun Jun 22 06:33:30 2003	
+	- Fix the Makefile.PL, to make sure that the module can not be made 
+	  without mod_perl
+	- Add an informational notice to the Makefile.PL to warn about 
+	  downloading mod_perl2 from CPAN 
+
+0.26  Thu Sep 25 06:33:30 2003
+	- Added the ability to use alternate methods of authentication (ie basic, etc)	
+
+0.27  Mon Mar 22 2004
+	- Added LDAPFilter, SearchScope and TLS connections to module (Thanks to Nick Urbanik!)
+	- Added documentation for LDAPFilter, SearchScope and TLS connections to module 
+	  (Also, thanks to Nick Urbanik)
+
+0.28  Wed Mar 24 2004
+	- Split domain\username as seen coming from winxp (Based on code from Carlos Ramirez)
+
+0.29  Sat May 01 2004
+	- add ability to test $password against an alternate password attribute.
+  	  The alt attribute is signified by PerlSetVar PWAttr.
+
+Split Apache::AuthNetLDAP into Apache2::AuthNetLDAP
+
+0.01  Wed May 04 2005
+	- Remove Apache mp1 code and prepare package for life >= mp2-rc5 renaming
+	- Push into Apache2::AuthNetLDAP namespace

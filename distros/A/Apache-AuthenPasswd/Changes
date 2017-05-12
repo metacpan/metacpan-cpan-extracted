@@ -1,0 +1,15 @@
+Revision history for Perl extension Apache::AuthenPasswd.
+
+0.10  Mon Oct 26 13:33 1998
+	- First Beta Release
+
+0.11  Tues Jul 01 13:33 2003
+	- Added test.pl to allow the user to run "make test"
+	- Updated the Makefile.PL to check and install mod_perl 
+	  automatically.
+	- Added notice of security problems associated with this
+	  module in Makefile, README and .pm files
+	- Ported module to work with both modperl 1 and 2
+
+0.12  Thur Jul 03 13:33 2003
+	- replaced some missing semi-colons

@@ -1,0 +1,8 @@
+Revision history for Acme-Lvalue
+
+0.03    2012-10-21
+        Skip failing tests under threaded perls.
+
+0.02    2012-10-20
+        First version, released on an unsuspecting world.
+

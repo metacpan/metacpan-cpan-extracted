@@ -1,0 +1,53 @@
+#!/usr/bin/perl -w
+
+if ($ARGV[0] eq '-v') {
+    print "Server version: Apache/2.0.55\nServer built:   Dec 28 2005 11:23:02\n";
+
+} elsif ($ARGV[0] eq '-V') {
+    print <<'EOF';
+Server version: Apache/2.0.55
+Server built:   Dec 28 2005 11:23:02
+Server's Module Magic Number: 20020903:11
+Architecture:   32-bit
+Server compiled with....
+ -D APACHE_MPM_DIR="server/mpm/prefork"
+ -D APR_HAS_MMAP
+ -D APR_HAVE_IPV6 (IPv4-mapped addresses enabled)
+ -D APR_USE_SYSVSEM_SERIALIZE
+ -D APR_USE_PTHREAD_SERIALIZE
+ -D SINGLE_LISTEN_UNSERIALIZED_ACCEPT
+ -D APR_HAS_OTHER_CHILD
+ -D AP_HAVE_RELIABLE_PIPED_LOGS
+ -D HTTPD_ROOT="t"
+ -D SUEXEC_BIN="/usr/local/apache2/bin/suexec"
+ -D DEFAULT_PIDLOG="logs/httpd.pid"
+ -D DEFAULT_SCOREBOARD="logs/apache_runtime_status"
+ -D DEFAULT_LOCKFILE="logs/accept.lock"
+ -D DEFAULT_ERRORLOG="logs/error_log"
+ -D AP_TYPES_CONFIG_FILE="conf/mime.types"
+ -D SERVER_CONFIG_FILE="conf/httpd.conf"
+EOF
+} elsif ($ARGV[0] eq '-l') {
+    print <<'EOF';
+Compiled in modules:
+  core.c
+  mod_access.c
+  mod_auth.c
+  mod_log_config.c
+  mod_setenvif.c
+  prefork.c
+  http_core.c
+  mod_mime.c
+  mod_status.c
+  mod_autoindex.c
+  mod_asis.c
+  mod_cgi.c
+  mod_negotiation.c
+  mod_dir.c
+  mod_imap.c
+  mod_actions.c
+  mod_userdir.c
+  mod_alias.c
+  mod_so.c
+EOF
+}

@@ -1,0 +1,45 @@
+AI-FuzzyEngine v0.2.2
+
+This module is yet another implementation of a fuzzy inference system.
+The aim was to  be able to code rules (no string parsing),
+but avoid operator overloading,
+and make it possible to split calculation into multiple steps.
+All intermediate results (memberships of sets of variables)
+should be available.
+
+Beginning with v0.2.0 it is PDL aware,
+meaning that it can handle piddles (PDL objects)
+when running the fuzzy operations.
+More information on PDL can be found at L<http://pdl.perl.org/>. 
+
+Credits to Ala Qumsieh and his L<AI::FuzzyInference>,
+that showed me that fuzzy is no magic.
+I learned a lot by analyzing his code,
+and he provides good information and links to learn more about Fuzzy Logics.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc AI::FuzzyEngine
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Juergen Mueck
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

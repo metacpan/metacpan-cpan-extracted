@@ -1,0 +1,6 @@
+Revision history for Perl extension Acme::CramCode.
+
+0.01  Sun Mar  2 11:51:44 2003
+	- original version; created by h2xs 1.21 with options
+		-XA Acme::CramCode
+

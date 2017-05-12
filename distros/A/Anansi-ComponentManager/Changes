@@ -1,0 +1,29 @@
+Revision history for Perl extension Anansi::ComponentManager.
+
+0.01  Fri Apr 12 00:46:55 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Anansi::ComponentManager
+0.02  Mon May 20 11:02:54 2013
+	- modified the "addComponent" POD to correct a fault.
+0.03  Tue May 21 03:18:20 2013
+	- modified the POD.
+	- corrected HASH reference deprecations.
+0.04  Sat May 25 02:29:52 2013
+        - modified "addComponent" and "removeComponent" to use "Anansi::Class::uses" and "Anansi::Class::used".
+        - modified the POD to reflect more concise examples and include method parameter.
+0.05  Thu May 30 11:28:56 2013
+	- made the POD more interactive.
+0.06  Fri May 31 16:06:34 2013
+	- fixed a POD bug that was introduced in the last version.
+0.07  Fri May 31 16:20:01 2013
+	- added "priorities" method.
+	- emended makefile to correct E-Mail address.
+        - modified the POD to describe priorities mechanism.
+0.08  Mon Jul 15 14:59:08 2013
+	- modified the POD.
+0.09  Fri Aug 09 15:02:01 2013
+	- modified the POD to incorporate changes in "Anansi::Class".
+0.10  Fri Aug 23 15:02:34 2013
+	- modified the POD.
+	- modified "componentIdentification" to incorporate the "IDENTIFICATION" parameter.
+	- added the "initialise" and "reinitialise" methods to conglomerate component instantiation.

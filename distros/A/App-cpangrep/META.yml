@@ -1,0 +1,38 @@
+---
+abstract: 'Grep CPAN from the command-line using grep.cpan.me'
+author:
+  - 'Thomas Sibley <tsibley@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-cpangrep
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  CPAN::DistnameInfo: '0'
+  JSON: '2.27'
+  LWP::UserAgent: '0'
+  List::Util: '0'
+  Term::ANSIColor: '0'
+  URI::Escape: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tsibley/App-cpangrep/issues
+  homepage: https://github.com/tsibley/App-cpangrep
+  repository: https://github.com/tsibley/App-cpangrep.git
+version: '0.07'
+x_contributors:
+  - 'Thomas Sibley <trsibley@uw.edu>'

@@ -1,0 +1,190 @@
+Revision history for App::JobLog
+
+1.042     2016-01-24 16:17:35-05:00 America/New_York
+  * same fix for regression.t
+
+1.041     2016-01-23 12:42:19-05:00 America/New_York
+  * improve app.t to make more certain a constant timezone is being used
+
+1.040     2016-01-17 09:52:13-05:00 America/New_York
+  * resume and last now properly skip notes
+
+1.039     2016-01-09 19:27:22-05:00 America/New_York
+  * changed --all for last and resume to --any and reversed the default behavior
+    of the commands
+
+1.038     2016-01-09 17:15:52-05:00 America/New_York
+  * more sensible grouping of commands
+
+1.037     2016-01-09 16:48:36-05:00 America/New_York
+  * removed code that was confusing Dist::Zilla's automatic version injection
+  * added --some and --all to last and resume commands
+
+1.036     2015-08-23 20:18:19-04:00 America/New_York
+  * swapped ReportVersions::Tiny for Test::ReportPrereqs to eliminate the
+    deprecation warning
+  * fixed nil invocant bug for 'when' command when last event is open and when is
+    in past
+  * fixed resumable note bug
+
+1.035     2015-07-30 17:03:50-04:00 America/New_York
+  * added --date option to summary
+
+1.034     2015-07-30 16:34:23-04:00 America/New_York
+  * fixed "advancing when" bug
+
+1.033     2015-06-27 19:24:44-04:00 America/New_York
+  * simple commands -- done, info, today -- fail verbosely if you give them arguments
+  * make resume announce what is being resumed
+
+1.032     2014-09-03 10:00:40-04:00 America/New_York
+  * various fixes to silence warnings in Perls >= 5.18
+
+1.031     2013-05-09 21:59:59 America/New_York
+  * small improvement to info output
+  * fixed binary search bug in log
+
+1.030     2012-12-27 20:05:35 EST5EDT
+  * silenced some Perl::Critic warnings
+  * fixed error when summarizing a period with an open task
+
+1.029     2012-03-06 07:53:56 EST5EDT
+  * improved layout of same-minute events in summary
+
+1.028     2012-03-04 12:51:08 EST5EDT
+  * fixed failure to reverse note list when scanning from end of log
+  * fixed warning thrown by App::JobLog::Log::_scan_for_previous_note()
+
+1.027     2012-03-03 12:49:40 EST5EDT
+  * made info command more up-to-date
+  * made time grammar understand future expressions like tomorrow and next
+    week
+  * improved last command so it properly reports events spanning the day
+    boundary
+
+1.026     2012-02-14 20:17:51 EST5EDT
+  * tinkered with app.t to get the test to pass on machines on which wrapping
+    is busted
+
+1.025     2012-02-13 15:40:30 EST5EDT
+  * got rid of annoying "next from when" warning which was showing up under
+    OS X Perl
+
+1.024     2012-02-12 11:59:53 EST5EDT
+  * put error handling into App::JobLog::Log::Format::wrap
+
+1.023     2012-02-06 17:10:17 EST5EDT
+  * fixed warning thrown during summarization when last event is open
+  * removed some dead code
+  * various refactorings related to creating App::JobLog::Note class
+  * addition of the note command
+  * numerous small bug fixes
+
+1.022     2011-12-07 20:41:01 EST5EDT
+  * replaced deprecated "given" construct everywhere with "for"
+
+1.021     2011-11-23 06:15:30 EST5EDT
+  * improved help doc for truncate command
+  * removed incorrect examples from configure command help
+  * added reverse_iterator method to App::JobLog::Log to facilitate iterating
+    over events in reverse chronological order
+  * added tag restriction options for resume and last commands
+
+1.020     2011-08-28 17:51:12 America/New_York
+  * fixed yet another documentation error in App::JobLog pod
+  * finished truncate command
+  * added missing Term::ReadKey dependency
+
+1.019     2011-08-05 10:53:20 America/New_York
+  * fixed error in description of vacation command options
+  * refactored "when done" functionality in "when" command and added task filtering options
+  * added mention of when command to App::JobLog pod
+
+1.018     2011-07-05 09:15:01 America/New_York
+  * fixed pay period arithmetic; s/subtract_datetime/delta_days/g
+
+1.017     2011-07-01 06:39:00 America/New_York
+  * added some missing documentation
+
+1.016     2011-06-30 22:30:45 America/New_York
+  * added tags command to list tags used in log
+  * fixed log tests so timezone peculiarities wouldn't prompt spurious failures
+
+1.015     2011-05-09 11:42:10 America/New_York
+  * fixed --columns option of summary command
+
+1.014     2011-03-20 05:15:15 America/New_York
+  * fixed more empty log bugs
+
+1.013     2011-03-19 20:37:32 America/New_York
+  * more monkeying with dist.ini to get the dependencies to list in the right order
+  * fixed empty log bug in summary command
+
+1.012     2011-03-19 14:18:26 America/New_York
+  * added error handling for time zones unfamiliar to DateTime::TimeZone
+  * made sure time zones were handled uniformly throughout application
+  * added undiscovered File::HomeDir prerequisite
+  * added Module::Build prerequisite so install will succeed on a clean Ubuntu box
+  * fixed empty log bug in add command
+
+1.011     2011-03-16 05:44:21 America/New_York
+  * cosmetic changes to info command
+  * further improvement to perldocs
+  * added time zone configuration parameter with Cygwin test so the Cygwin smoke test will pass
+
+1.010     2011-03-15 17:26:53 America/New_York
+  * fixed "last/this week" bug due to DateTime choosing Monday as first day in week
+  * fixed edit command so checksums are calculated correctly and backup is only saved in case of change
+  * fixed TimeGrammar; "jan 1 - 10" and such are properly handled
+  * fixed TimeGrammar; '2010' and such are properly handled
+  * fixed bug caused by end of month wrapping in DateTime
+  * changing the options for the info command so minimal information is returned by default
+  * improved text wrapping of full description for commands
+  * finished text of info command
+
+1.009     2011-03-13 15:14:27 America/New_York
+  * changed date format code to show year if span in question stretches over more than one year
+  * unrolled slow loop in summary after Devel::NYTProf profiling
+
+1.007     2011-03-12 12:32:32 America/New_York
+  * added File::ReadBackwards prerequisite to dist.ini
+  * added missing options to documentation for summary
+  * fixed bug in split_days
+  * added Nov, 2009 and 2009/11 type dates to TimeGrammar
+
+1.006     2011-03-11 16:13:57 America/New_York
+  * fixed problem with hidden wrap option
+
+1.005     2011-03-11 12:21:17 America/New_York
+  * added check for unclosed tasks to summary command
+  * removed eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}' from bin/job -- this was getting automatically inserted anyway
+
+1.004     2011-03-11 11:41:40 America/New_York
+  * fixed column count detection bug
+  * added --columns and --no-wrap options
+
+1.003 7 March, 2011
+  * added midnight check to add command
+  * fixed bug where one could close a closed event
+  * fixed floating timezone bug in TimeGrammar
+  * manually added Config::Tiny dependency that was getting missed by AutoPrereq
+  * fixed bug causing dates to display with same tag merge
+  * fixed bug in TimeGrammar concerning purely numeric dates such as '15' and '2011'
+  * fixed failure to pull arguments off stack in App::JobLog::Vacation::Period::cmp()
+  * fixed layout bug in vacation listing that gave too much space to vacation index
+  * fixed overlap logic for repeating vacations
+  * fixed flex vacation duration calculation ation ation ation ...
+  * fixed vacation/event sorting
+  * improved logic of find_previous_event in Log
+  * fixed closing time insertion bug
+  * improved output of log validation
+
+1.002 4 March, 2011
+  * added normalization of whitespace in log
+  * added options to summary and configuration to allow the hiding of various fields
+
+1.001 3 March, 2011
+  * fixed broken today --finish command
+
+1.000 3 March, 2011
+  * initial release; seems to be feature complete

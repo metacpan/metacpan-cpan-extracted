@@ -1,0 +1,5 @@
+An ability to process only a segment of a WAV file.
+Add attack/decay to a test file.
+Add different min_length for leading/trailing silence (e.g., tape sides are
+	well split with min_silence_sec => 11, but this may leave
+	leading and trailing silence...)

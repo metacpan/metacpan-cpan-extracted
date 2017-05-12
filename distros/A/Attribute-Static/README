@@ -1,0 +1,41 @@
+NAME
+       Attribute::Static - implementing static method with
+       attributes
+
+SYNOPSIS
+         package Foo;
+         use Attribute::Static;
+         sub new {
+             my $class = shift;
+             bless {}, $class;
+         }
+         sub bar : Static {
+             my $class = shift;
+         }
+
+         Foo->bar;  # OK
+         my $foo = Foo->new;
+         $foo->bar; # NG
+
+DESCRIPTION
+       Attribute::Static implements something like static methods
+       in Java.
+
+ATTRIBUTES
+       Static
+             sub foo : Static { }
+
+           must be called without instance.
+
+SEE ALSO
+       Attribute::Handlers
+
+AUTHOR
+       Jiro Nishiguchi <jiro@cpan.org>
+
+COPYRIGHT AND LICENSE
+       Copyright (C) 2005 by Jiro Nishiguchi
+
+       This library is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.
+

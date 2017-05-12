@@ -1,0 +1,25 @@
+Revision history for Perl extension Audio::Play::Mplayer.
+
+0.07  Wed Jan 15 08:59:08 AEST 2014
+	- New Makefile.PL - added dependencies
+
+0.06  Thu Jan 9 09:34:34 AEST 2014
+	- New Makefile.PL - tests accidentally removed in previous version
+
+0.05  Wen Jan 8 15:55:47 AEST 2014
+	- Fixed stop() method.
+
+0.04  Sun Mar 20 11:54:34 AEST 2011
+	- Use -v (verbose) flag on MPlayer instantiation
+	- Use EOF output marker to detect file playback completion
+
+0.03  Sun Apr 18 17:35:18 CEST 2010
+	- Stop poll() with 'wait' flag from hanging.
+
+0.02  Wed Jan 16 23:35:56 CET 2008
+	- Use MPlayer metadata commands instead of heuristics
+	  to parse track metadata.
+	- Add passthrough Makefile.PL.
+
+0.01  Tue Jan 15 21:51:22 CET 2008
+	- Original release.

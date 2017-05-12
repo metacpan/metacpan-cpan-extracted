@@ -1,0 +1,20 @@
+Revision history for Perl extension Apache::No404Proxy.
+
+0.05  Sat Apr 13 01:11:42 JST 2002
+	* [API change] uses Google Web APIs (via SOAP::Lite)
+
+0.04  Tue Mar 12 20:30:30 JST 2002
+	- fixed bug of multiple headers with the same name
+
+0.03  Fri Sep  7 14:43:16 JST 2001
+	- Added note about permissions before using.
+	- Added Ray's email address as Google contact address.
+
+0.02  Fri Sep  7 13:24:19 JST 2001
+	* Added exclusion for images (not complete)
+	- Documentation for Google ToS
+	- Minor documentation fix
+
+0.01  Sun Aug 19 06:49:59 2001
+	- original version; created by h2xs 1.19
+

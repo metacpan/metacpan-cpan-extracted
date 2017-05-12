@@ -1,0 +1,32 @@
+# Comment lines must begin with #
+#
+# IMPORTANT:  ONLY ONE BLANK SPACE ALLOWED BETWEEN CONSECUTIVE NUMBERS 
+# IN EACH LINE
+
+
+priors 0.34  0.33  0.33 
+
+cluster
+
+5 0 0.0
+
+3 0 0
+0 60 0
+0 0 60
+
+cluster
+
+20.0 0 0
+
+3 0 0
+0 60 0
+0 0 60
+
+cluster
+
+35.0 0 0
+
+3 0 0
+0 60 0
+0 0 60
+

@@ -1,0 +1,102 @@
+#!/usr/bin/perl
+#
+# Copyright 2014-2016 - Giovanni Simoni
+#
+# This file is part of PFT.
+#
+# PFT is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# PFT is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with PFT.  If not, see <http://www.gnu.org/licenses/>.
+#
+=head1 NAME
+
+pft show - Show the built site
+
+=head1 SYNOPSYS
+
+pft show [-v]
+
+=head1 DESCRIPTION
+
+Show the built site
+
+=head1 OPTIONS
+
+=over
+
+=item --browser <command>
+
+The browser can be specified by name (e.g. C<firefox>) or as a shell
+command, where C<%s> is replaced with the file name
+(e.g. C<firefox [options] %s>).
+
+This flag overrides the C<system.editor> setting in the main configuration
+file. If neither the flag nor the setting are specified, the C<$BROWSER>
+environment variable will be honored.
+
+=item --help | -h
+
+Show this help.
+
+=back
+
+=cut
+
+use v5.16;
+use strict;
+use warnings;
+use utf8;
+
+use feature qw/say/;
+
+use Pod::Usage;
+use File::Spec;
+
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+
+use PFT::Tree;
+
+my $tree = eval{ PFT::Tree->new } || do {
+    say STDERR $@ =~ s/ at.*$//rs;
+    exit 3
+};
+
+my $conf = eval{ $tree->conf } || do {
+    say STDERR 'Configuration error: ', $@ =~ s/ at.*$//rs;
+    exit 4
+};
+
+my $browser = $conf->{system}{browser} || $ENV{BROWSER};
+my $verbose = 0;
+GetOptions(
+    'browser=s' => \$browser,
+    'help|h' => sub {
+        pod2usage
+            -exitval => 1,
+            -verbose => 2,
+            -input => App::PFT::help_of 'show',
+    }
+) or exit 1;
+
+my $index = File::Spec->catfile($tree->dir_build, 'index.html');
+
+unless ($index) {
+    say STDERR 'Need to build first, use pft make';
+    exit 1;
+}
+
+if ($browser =~ s/(?<!%)%s/$index/g) {
+    system($browser)
+} else {
+    system($browser, $index)
+}

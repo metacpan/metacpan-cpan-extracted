@@ -1,0 +1,47 @@
+NAME
+
+    Alt::Alien::FFI::System - Simplified alternative to Alien::FFI that
+    uses system libffi
+
+VERSION
+
+    version 0.16
+
+SYNOPSIS
+
+     env PERL_ALT_INSTALL=OVERWRITE cpanm Alt::Alien::FFI::System
+
+DESCRIPTION
+
+    This distribution provides an alternative implementation of Alien::FFI
+    that is geared toward system integrators when libffi is provided by the
+    operating system. It has no non-core requirements for runtime as of
+    Perl 5.8. It now uses use Test::Alien for consistency with the original
+    Alien::FFI.
+
+    It will NOT attempt to download or install libffi. If you need that,
+    then install the original Alien::FFI instead.
+
+SEE ALSO
+
+    Alt
+
+    Alien::FFI
+
+    FFI::Platypus
+
+    FFI::Raw
+
+    FFI::CheckLib
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

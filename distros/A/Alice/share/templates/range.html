@@ -1,0 +1,18 @@
+? my ($app, $results, $position) = @_;
+
+<div style="display:none" id="wrap_<?= $position ?>" class="context_wrapper">
+  <ul class="<?= $position ?>">
+? for my $result (@$results) {
+  <li><strong><?= $result->[3] ?> </strong><?= $result->[5] ?></li>
+? }
+  </ul>
+</div>
+
+<script type="text/javascript">
+? if ($position eq "before") {
+  Effect.SlideDown("wrap_<?= $position ?>", { duration: 0.3 });  
+? }
+? else {
+  Effect.BlindDown("wrap_<?= $position ?>", { duration: 0.3 });  
+? }
+</script>

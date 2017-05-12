@@ -1,0 +1,32 @@
+TYPEMAP
+
+Permute*    O_OBJECT
+UINT    T_IV
+AV *    T_AvRV
+
+OUTPUT
+
+O_OBJECT
+    sv_setref_pv( $arg, CLASS, (void*)$var );
+
+T_AvRV
+    $arg = newRV((SV*)$var);
+
+INPUT
+
+O_OBJECT
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else{
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+T_AvRV
+    if( SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVAV) )
+        $var = (AV*)SvRV( $arg );
+    else {
+        warn( \"${Package}::$func_name() -- $var is not an AV reference\" );
+        XSRETURN_UNDEF;
+    }
+

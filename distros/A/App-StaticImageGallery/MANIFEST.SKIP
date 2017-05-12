@@ -1,0 +1,8 @@
+^styles/
+# Skip maint stuff
+^maint/
+
+^App-StaticImageGallery
+
+^TODO
+

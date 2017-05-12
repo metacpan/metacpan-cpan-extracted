@@ -1,0 +1,33 @@
+AI/NeuralNet/Kohonen/Visual version 0.01
+========================================
+
+A sub-class of "AI::NeuralNet::Kohonen" that Impliments extra methods
+to make use of TK for visualisations.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	AI::NeuralNet::Kohonen
+	Tk
+
+SEE ALSO
+    See the AI::NeuralNet::Kohonen manpage; the AI::NeuralNet::Kohonen::Node
+    manpage;
+
+AUTHOR AND COYRIGHT
+    This implimentation Copyright (C) Lee Goddard, 2003. All Rights
+    Reserved.
+
+    Available under the same terms as Perl itself.
+
+

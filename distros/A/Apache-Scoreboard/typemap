@@ -1,0 +1,9 @@
+Apache::RequestRec	        T_APACHEOBJ
+APR::Pool                       T_PTROBJ
+Apache::Scoreboard              T_PTROBJ
+Apache::ScoreboardWorkerScore   T_PTROBJ
+Apache::ScoreboardParentScore   T_PTROBJ
+pid_t	                        T_IV
+apr_uint32_t	                T_IV
+#float	T_FLOAT
+

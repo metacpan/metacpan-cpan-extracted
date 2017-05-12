@@ -1,0 +1,247 @@
+#!/usr/bin/perl
+
+# Created on: 2011-06-21 09:46:35
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use Getopt::Long;
+use English qw/ -no_match_vars /;
+use App::PS1;
+
+eval { require Term::Size::Any };
+my $tsa = !$EVAL_ERROR;
+if ($tsa) {
+    Term::Size::Any->import(qw/chars/);
+}
+
+our $VERSION = 0.04;
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+my %option = (
+    ps1     => $ENV{APP_PS1} || 'face;branch;date;directory;uptime',
+    theme   => $ENV{APP_PS1_THEME} || 'default',
+    verbose => 0,
+    man     => 0,
+    help    => 0,
+    VERSION => 0,
+);
+
+main();
+exit 0;
+
+sub main {
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'ps1|p=s',
+        'exit|e=s',
+        '256',
+        '16|low',
+        'bw|black-white|2|b!',
+        'theme|t=s',
+        'quick_start|quick-start|q',
+        'verbose|v+',
+        'man',
+        'help',
+        'VERSION!',
+    ) or pod2usage(2);
+
+    if ( $option{'VERSION'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+
+    # do stuff here
+    return quick_start() if $option{quick_start};
+
+    my @chars = term_chars();
+    eval {
+        my $ps1 = App::PS1->new({
+            ps1     => $option{ps1},
+            low     => $option{16},
+            bw      => $option{bw},
+            theme   => $option{theme},
+            exit    => $option{exit},
+            cols    => $chars[0],
+            verbose => $option{verbose},
+        });
+
+        print $ps1->cmd_prompt;
+    };
+
+    return;
+}
+
+sub quick_start {
+    print <<'QS';
+export PS1='\[\033[0m\]\[`ps1 -e $?`\]\n\[\033[1;32m\]\u\[\033[0m\]\[\033[0;33m\]\[\033[01;22m\]@\[\033[0m\]\[\033[1;35m\]\h \[\033[0m\]\$ '; export PATH=~/bin:$PATH; export TM_OUT=0; alias l='ls --ignore=.*.sw? -lAF -h'; alias gfind='find . | /bin/grep -v ".svn" | grep -r -P --color'
+alias ghistory='history | /bin/grep -r -P --color'; alias gps='ps aux | head -1; ps aux | grep -v " /bin/grep " | grep -r -P --color'; alias grep='/bin/grep -r -P --color'; alias less='less -R'; shopt -s checkwinsize; shopt -s cdspell
+QS
+    return;
+}
+
+sub term_chars {
+    my @chars;
+    @chars = chars() if $tsa;
+    @chars = (
+        $ENV{COLUMNS} || $ENV{PS1_COLS} || 90,
+        $ENV{LINES}   || $ENV{PS1_ROWS} || 40
+    ) if !@chars;
+    return @chars;
+}
+
+sub pod2usage {
+    require Pod::Usage;
+    Pod::Usage::pod2usage(@_);
+}
+
+__DATA__
+
+=head1 NAME
+
+app-ps1 - Command prompt generator
+
+=head1 VERSION
+
+This documentation refers to app-ps1 version 0.04.
+
+=head1 SYNOPSIS
+
+   app-ps1 --quick-start
+   app-ps1 -e $? [--256|--16|--2] [(--ps1|-p) 'semicolon-separaged-list']
+
+ OPTIONS:
+  -p --ps1[=]str    The prompt string (Default $ENV{APP_PS1} || 'face;branch;date;directory;uptime')
+                    Values:
+                        branch - Show the Git, SVN or CVS branch of the current directory (if any)
+                        date - the date and time of when the prompt is displayed
+                        directory - Info about the current directory (name, subdirs, files disk usage)
+                            abreviate - Abreviate parent directories to one character if true
+                            dir - If set to false turns off directory count
+                            file - If set to false turns off file count
+                            size - If set to false turns off directory size
+                        face - Happy face if last command exited with 0 sad otherwise
+                        node - Current nodejs version if using nvm or nave
+                        perl - Current perl version if using perlbrew
+                        processes - Info about the current processes
+                        ruby - Current ruby version if using rvm
+                        uptime - Current system uptime
+                    Options:
+                        After each value you can specify a JSON object where you can configure further
+                        options eg directory{"abreviate":true};uptime
+  -e --exit[=]str   Last program's exit code (needed for face)
+  -q --quick-start  A quick start helper
+     --256          Show colours for 256 colour terminal (Default)
+     --16           Terminal only supports 16 colours
+     --2            Terminal does no support colour
+
+  -v --verbose       Show more detailed option
+     --version       Prints the version information
+     --help          Prints this help information
+     --man           Prints the full documentation for app-ps1
+
+   # in your ~/.bashrc file
+   export APP_PS1='face;branch;date;direcory;perl;node;ruby;uptime'
+   export PS1="\[\`app-ps1 -e\$?\`\]\n\u@\h \\\$ "
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+Lots of environment variables are used to configure the command prompt
+
+=over 4
+
+=item C<$APP_PS1>
+
+Sets the elements to be displayed (overridden by C<--ps1>)
+
+Default 'face;branch;date;directory;uptime',
+
+=item C<$APP_PS1_THEME>
+
+Sets the colour theme for the prompt
+
+=over 4
+
+=item *
+
+default
+
+=item *
+
+green
+
+=item *
+
+blue
+
+=back
+
+Default 'default',
+
+=item C<$PS1_COLS>
+
+If L<Term::Size::Any> is not installed you can configure the width of your
+screen by setting this parameter.
+
+Default 90,
+
+=item C<$UNICODE_UNSAFE>
+
+If set to a true value this will allow UTF8 characters to be used displaying
+the prompt
+
+Default not set
+
+=item C<$APP_PS1_BACKGROUND>
+
+Set the line's background colour
+
+Default 52
+
+=back
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2011 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

@@ -1,0 +1,19 @@
+1.153400  2015-12-06 21:45:14GMT+0000 Europe/London
+    #6: Fix failing tests when AtomicParsley isn't installed
+    #5: Use `bsd_glob` for temp file finding (thanks jimgraham)
+
+1.130420  2013-02-11 00:08:59 Europe/London
+    #4: Fix reading tags that span multiple lines.
+
+1.130410  2013-02-10 19:49:54 Europe/London
+    #2: Ability to remove tags (thanks hiroaki)
+    Ability to set long description
+
+1.120620  2012-03-02 07:12:06 Europe/London
+    Better way to ensure we are only giving AtomicParsley strings
+
+1.120560  2012-02-25 18:54:28 Europe/London
+    Be more careful about what we pass to AtomicParsley
+
+1.112770  2011-10-04 20:55:38 Europe/London
+    Initial version.

@@ -1,0 +1,21 @@
+# $Id: Changes,v 1.4 2002/07/31 16:43:31 Administrator Exp $
+
+Revision history for Perl extension Apache::AuthenSecurID.
+
+
+0.01  Tue Nov 5 14:11:38 2000
+	- original version; created by db
+0.02  Fri Jan 5 18:09:10 2001
+	- changes to use cookies 
+0.03  Mon Jun 18 21:32:55 2001
+	- major overhaul 
+	- created single threaded ace auth server 
+	- create Auth handler instead of using basic auth 
+	- started using blowfish 
+	- better documentation 
+0.04  Mon Jul 31 16:05:00 2002
+	- fixed typo in docs
+	- added PerlModule in httpd.conf in docs
+	- fixed small scope bug
+	- changes colors so they are no longer awful
+

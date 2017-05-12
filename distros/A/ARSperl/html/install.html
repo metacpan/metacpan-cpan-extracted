@@ -1,0 +1,30 @@
+<HTML>
+ <HEAD>
+  <TITLE> ARSperl: Installation Notes </TITLE>
+ </HEAD>
+
+ <BODY BGCOLOR="#FFFFFF">
+ <H2> Installation of ARSperl </H2>
+
+ <OL>
+   <LI> <A HREF="http://sourceforge.net/project/showfiles.php?group_id=116013&package_id=125945">Download the distribution</A><P>It's also available via <a href="http://www.cpan.org/">CPAN</a>. T
+There are pre-compiled binaries for Windows (see below) available too.
+   <LI> Unpack (requires gzip and tar on Unix or 
+        <a href="http://www.winzip.com">WinZip</A> under Windows)
+   <LI> Edit the Makefile.PL and follow the brief instructions contained in 
+	it.
+   <LI> Type "perl Makefile.PL"
+   <LI> Type "make"
+   <LI> Type "make install" (may require special permission). This will
+        install the perl extension into the perl lib directory.
+   <LI> Try one of the example scripts.
+ </OL>
+
+ <H2> Notes </H2>
+
+ HPUX users may need to compile the extension statically into the Perl binary.
+
+ <B>Windows users</B> can use the <I>pre-compiled binary distribution</I> along with ActiveState Perl. <a href="http://developer.bmc.com/communities/docs/DOC-5262">Check here</a> (free registration required) for precompiled ActiveState PPD files.
+ 
+ </BODY>
+</HTML>

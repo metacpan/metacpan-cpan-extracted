@@ -1,0 +1,180 @@
+#############################################################################
+# CHANGE LOG
+#############################################################################
+
+VERSION 1.12
+ x Added a copyright statement at the request of a Debian administrator.
+   https://rt.cpan.org/Public/Bug/Display.html?id=62017
+
+VERSION 1.11
+ x Added prefixadmin to the MANIFEST
+
+VERSION 1.1
+ x Supports the "secure" option attribute. (Also, all options which end in "pass" or "password"
+   are assumed to be secure.) The value is a security level: 1=[don't print the value in a help screen].
+   2=[ensure that the value can never be supplied on a command line or from the environment but
+      only from a file that only the user running the program has read/write access to]
+
+VERSION 1.07
+ x Automagically add $PREFIX/lib/perl5 to @INC (only if it exists), else $PREFIX/lib/perl
+   Also check $PREFIX/share/perl and add it to @INC if it exists.
+   Surprisingly, $PREFIX/share/perl and $PREFIX/lib/perl seem to be the directories created
+   and used under Ubuntu 8.04's perl.
+ x Allow dashes ("-") as a variable name (i.e. foo-bar = 1).
+   In doing this, I actually allow that any characters other than spaces/tabs/= can make up the variable name
+ x Trim leading and trailing tabs (as well as spaces) from the line
+
+VERSION 1.06
+ x Remove trailing \r from option files (for Windows-edited .conf files)
+
+VERSION 1.05
+ x Substitutions of ${prefix} in option files now works even if only defined by assumption
+   This is particularly valuable for portability between environments of CGI scripts and cron scripts.
+
+VERSION 1.04
+ x Fixed RT Bug #33597: Problem of ignoring drive letter on Win32 filesystem.
+
+VERSION 1.03
+ x better use of /\s*/ instead of / */ so that tabs don't catch you off-guard
+ x enable application use of App::Options objects to read additional data structures
+   * $option_processor = App::Options->new(@args);
+   * $option_processor->read_option_files(\%values, [$file]);
+ x allow for subclassing (App::Options::YAML, etc.)
+   * made App::Options object-oriented to allow for subclassing
+   * split read_option_files() method out of the read_options() method (for subclassing)
+ x save the import arguments for later print_usage or later reparsing (as $self->{init_args})
+
+VERSION 1.02
+ x ENV{FOO} = x in app.conf sets environment variable "FOO" (i.e. LD_LIBRARY_PATH)
+ x added perl_restart option to re-exec() the program so that it picks up a new LD_LIBRARY_PATH
+ x save original @ARGV to @App::Options::ARGV (used for perl_restart/re-exec())
+ x line continuation characters strip off newlines and leading spaces
+
+VERSION 1.01
+ x removed dependency in Makefile.PL on Config.pm (which was causing a false error on "make test")
+
+VERSION 1.00
+ x clean up for v1.00. no dependency on Module::Build (which has been giving problems)
+ x add default values for MANPATH, LD_LIBRARY_PATH to bin/prefix
+ x added t/file.txt so the test process doesn't spew warnings
+
+VERSION 0.99
+ x fixed a condition that didn't work on Windows when executing in current dir
+ x fix double slash /usr/rubicon/test/bin//app.conf
+ x improved --debug_options, --debug_options=[1-7] output
+
+VERSION 0.98
+ x disabled some tests that cause failure on MSWin32
+
+VERSION 0.97
+ x enable "here documents", var = <<EOF
+ x enable file/cmd variables, var = < filename (or "cmd|")
+ x allow line continuation chars, i.e. var = hello \\nworld
+
+VERSION 0.96
+ x cleaned up some of the --debug_options output
+ x tests run clean on Win32
+ x used File::Spec to make file/directory manipulation platform-independent (i.e. Win32)
+   NOTE: I used a mix of platform-independent File::Spec functions and explicit
+   conversion from "\" paths to POSIX-compliant "/" paths.  This is because the
+   purist form of leaving "\" paths for Win32 was causing weirdness.  When
+   I would interpolated the string or use it in a regular expression, the
+   backslashes were interacting badly.  The only reason I'm not going to 1.0
+   with this is that I want to see it pass Win32 tests on the CPAN testers
+   farm before giving it that number.
+
+VERSION 0.95
+ x made a change (hack) to Build.PL to get it to work with the CPAN shell
+
+VERSION 0.94
+ x use Module::Build instead of ExtUtils::MakeMaker
+ x add a META.yaml file to the distribution (from "Build distmeta")
+ x add --version support (print out versions of all modules)
+ x make prefix authoritative before defaults so that we can use ${prefix} in substitutions
+ x set defaults in order of "options" to ensure the correct order for variable substitution
+
+VERSION 0.93
+ x prefix can now be set in $prog_dir/app.conf to find $prefix/etc/app/app.conf
+ x single-line sections in option files are no longer independent of the
+   section they are in.  Both the section-condition and the line-condition
+   must now be satisfied for a value to be set.
+
+VERSION 0.92
+ x cleaned up some warnings which appeared under -w (concatenation of undef)
+ x add system-supplied hostname and host options
+ x variable substitution works with environment vars (url = http://$ENV{HOST})
+ x auto-import of environment vars named "APP_*" even if not otherwise defined
+ x usage: undefined values appear as "[undef]" rather than "[]"
+ x usage: options appear as "--var=<value>" rather than "--var=<var>"
+ x usage: "args_description" describes what's left on cmd line after options removed
+ x usage: "value_description" describes option value (instead of "<value>")
+ x added an examples directory
+ x added a benchmark directory
+ x default is $Config{prefix} instead of /usr/local
+ x improve debug_options (env vars, etc.) (implemented 6 levels of debug_options)
+
+VERSION 0.91
+ x show_all is off by default whenever "option" or "options" used
+ x remove app_path_info
+
+VERSION 0.90
+ x new "use App::Options (...);" syntax (rather than ->init(...) syntax)
+
+VERSION 0.64
+ x added $VERSION to App::Options (use VERSION_FROM in Makefile.PL)
+ x fixed bug where "show_all" wasn't showing all on --help
+ x touched up titles on pod documentation
+ x implement import() method to use module outside the BEGIN block (i.e. use App::Options (@args))
+ x update documentation with new syntax using import() method
+ x improve show_all logic: show_all = 1 by default always unless overridden
+
+VERSION 0.63
+ x improve documentation (api reference, logic flow, usage tutorial)
+ x "integer" type now matches integers with underscores (i.e. 1_000_000)
+ x "float" type now matches numbers with underscores (i.e. 1_000.000_001)
+ x added /etc/app/app.conf to the end of the option file search path
+ x default "prefix" is now "/usr/local" instead of "."
+ x {env} attribute of "" means don't search any env variable
+
+VERSION 0.62
+ x [prog] matches "prog" only. [/prog/] matches by regular expression.
+   In version 0.61, the section [list] would match ($app =~ /list/).
+   In version 0.62, the section [list] only matches ($app eq "list"),
+   while [/list/] matches ($app =~ /list/).
+ x type="/regexp/" matches regexp. unknown types ignored.
+   In version 0.61, an option type which was not one of the known
+   option types (integer, float, date, datetime, etc.), was considered
+   automatically as a regular expression.
+   In version 0.62, only types which take the form "/regexp/" are
+   actually regular expressions.  All other unknown "types" are ignored.
+   This sets the groundwork for better forward-compatibility when new
+   types are introduced, they will not break older versions of the code.
+   It also just seems clearer.
+ x "show_all" option - shows all defined options, not just in [ options ]
+   In version 0.61, the --help option would show all variables defined
+   in the code, on the command line, or in any of the files (i.e.show_all=1).
+   However, if the "options" argument is used in the init() method in the
+   code, only those enumerated options would be shown (i.e. show_all=0).
+   In version 0.62, the same behavior applies unless the "show_all"
+   parameter is given explicitly.
+ x quoting, var = " hello world "
+   In version 0.61, variable values in the option file had leading and
+   trailing spaces removed.  This meant that a value of a single space
+   was not possible.
+   In version 0.62, the same behavior applies.  However, if the 
+   remaining text starts with " and ends with ", those quote marks are
+   removed.  i.e. var = " " will result in the value of a single space,
+   and message = "Hello world. " will have a trailing space.
+ x check list of configurable environment vars ("env") instead of
+   "APP_${uc_var}"
+   In version 0.61, variable values could be supplied by specifying the
+   variable prefixed with "APP_".  (i.e. "path" could be specified
+   with "APP_PATH")
+   In version 0.62, a list of environment variable names may be given
+   and the first with a supplied value is used for the value.
+   (i.e. options => { path => { env => "PATH" } } will cause the
+   "path" variable to be set from the "PATH" environment variable.)
+
+VERSION 0.61
+ x Initial release
+

@@ -1,0 +1,38 @@
+Acme-GuessNumber change log
+
+2013-05-10
+	 1. lib/Acme/GuessNumber.pm: Applied the patch from Mark A. Smith
+        <jprogrammer082@gmail.com>, in order to fix the English errors
+        in the POD.  Thank you, Mark, although I will not share my
+        jackpot with you.  You have to win your own. ^_^
+     2. lib/Acme/GuessNumber.pm: Fixed several other English mistakes
+        in the POD.
+
+2008-04-22
+	 1. Found the LICENSE in question is the work of
+	    ExtUtils::ModuleMaker.  RT bug#35271 was submit on this
+	    issue.
+	 2. INSTALL: Added.  Installation instructions moved from README
+	    to INSTALL.
+
+2008-04-21	version 0.03
+	 1. Todo: Renamed to TODO.
+	 2. TODO: Updated.
+	 3. Artistic and COPYING: Added, in replace of LICENSE.
+	 4. LICENSE: Deleted.  Its GPL v2 is outdated, and its Artistic
+	    license contains incorrect terms from unknown sources.
+
+2008-02-29	version 0.02
+
+2008-02-28
+	 1. Makefile.PL: Added conditional checks for whether LICENSE is
+	    available in ExtUtils::MakeMaker.
+	 2. Build.PL: Added "build_requires".
+	 3. Makefile.PL: Added conditional checks for whether SIGN is
+	    available in ExtUtils::MakeMaker.
+	 4. Makefile.PL: Added PL_FILES to disable PL files searching
+	    behavior, in order to work with ExtUtils::MakeMaker earlier
+	    than 6.25 that treats Build.PL as one of the PL files to run.
+
+2007-05-19	version 0.01
+	- original version

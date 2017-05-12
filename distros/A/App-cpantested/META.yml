@@ -1,0 +1,31 @@
+---
+abstract: 'delegate testing to the cloud'
+author:
+  - 'Stanislaw Pusep <stas@sysd.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-cpantested
+recommends:
+  App::cpanminus: '0'
+  App::cpanoutdated: '0'
+  App::cpantimes: '0'
+requires:
+  CPAN::DistnameInfo: '0'
+  HTTP::Tiny: '0'
+  IO::Uncompress::Gunzip: '0'
+  JSON::PP: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/creaktive/App-cpantested/issues
+  homepage: https://github.com/creaktive/App-cpantested
+  repository: git://github.com/creaktive/App-cpantested.git
+version: '0.003'
+x_contributors:
+  - 'Sergey Romanov <sromanov-dev@yandex.ru>'

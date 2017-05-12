@@ -1,0 +1,13 @@
+DESCRIPTION
+
+    This distribution contains module lists that are imported from various
+    web pages.
+
+append:SEE ALSO
+
+    App::lcpan and lcpan, particularly the related-mods subcommand.
+
+    Other Acme::CPANLists::Import::* modules, e.g.
+    Acme::CPANLists::Import::NEILB, Acme::CPANLists::Import::SHARYANTO,
+    Acme::CPANLists::Import::RSAVAGE.
+

@@ -1,0 +1,8 @@
+blib.sit.hqx
+Mac.pm
+Mac.xs
+Makefile.mk
+Makefile.PL
+MANIFEST
+README
+test.pl

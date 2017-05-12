@@ -1,0 +1,18 @@
+---
+abstract: 'this library provides physical constants for use in Astronomy'
+author:
+  - 'Boyd Duffee <duffee@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Astro-Constants
+requires:
+  Test::More: 0
+  Test::Number::Delta: 0
+version: 0.1002

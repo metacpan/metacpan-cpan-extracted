@@ -1,0 +1,23 @@
+<form action="[% root_uri_rel %]/#[% sect.pos %]" method="post" id="noteform" class="note [% note_form_class %]">
+    <a name="noteform"></a>
+
+    <input type="hidden" name="section" value="[% sect.id %]" />
+    <input type="hidden" name="notepos" value="[% notepos.id %]" />
+
+    <div class="note_header">Edit note 
+    <a href="[% root_uri_rel %]/note_help" target="_blank" id="note_help_link">[help]</a>
+    </div>
+    <div id="note_text"><textarea name="note_text" rows="5" cols="20">[% notepos.note.note | html %]</textarea></div>
+
+    <div id="note_buttons">
+    <button name="mode" value="save" id="save_button" title="Save note. The same text will apply to all versions of this document">Save</button>
+
+    [% UNLESS mode == 'Create' %]
+    <span id="edit_buttons">
+    <button name="mode" value="delete" id="del_button" title="This will delete the note from all versions of this document">Delete</button>
+    <button name="mode" value="hide" id="hide_button" title="This will hide this note for this version of this document only">Hide</button>
+    </span>
+    [% END %]
+
+    </div>
+</form>

@@ -1,0 +1,31 @@
+---
+abstract: ~
+author:
+  - 'Thomas Thurman <thomas@thurman.org.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.97'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Bernard
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::MimeInfo: 0
+  File::Slurp: 0
+  Getopt::Long: 0
+  LWP: 0
+  LWP::UserAgent: 0
+  Lingua::EN::Alphabet::Shaw: 0
+  Locale::PO::Callback: 0
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

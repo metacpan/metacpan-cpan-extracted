@@ -1,0 +1,7 @@
+Readme
+Manifest
+Makefile.PL
+SDKLinguistics.pm
+SDKLinguistics.xs
+test.pl
+typemap

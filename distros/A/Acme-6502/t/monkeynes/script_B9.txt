@@ -1,0 +1,49 @@
+clear
+power on
+regs
+
+# Normal condition (No Page Boundry) ------
+memset 839a 55
+op a0 28
+op b9 7283
+
+# Should be: ACC=55, IY=28, Cycles=4
+test acc = 55
+test iy = 28
+
+# Normal condition (Page Boundry) ---------
+power on
+
+memset 845f 55
+op a0 ed
+op b9 7283
+
+# Should be: ACC=55, IY=ED, Cycles=5
+test acc = 55
+test iy = ed
+
+# Zero condition --------------
+power on
+
+memset 839a 00
+op a0 28
+op b9 7283
+
+# Should be: ACC=0, IY=28, Z=1, Cycles=4
+test acc = 0
+test iy = 28
+test z = 1
+
+# Negative condition ----------
+power on
+
+memset 839a f2
+op a0 28
+op b9 7283
+
+# Should be: ACC=F2, IY=28, S=1, Cycles=4
+test acc = f2
+test iy = 28
+test s = 1
+
+save verify_B9.txt

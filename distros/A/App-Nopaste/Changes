@@ -1,0 +1,239 @@
+Revision history for App-Nopaste
+
+1.009   2017-04-13 22:08:42Z
+        - fixed arguments for the Mojopaste service, to work with the default
+          service provider at thorsen.pm (PR#14, Andrew Rodland)
+
+1.008   2017-02-27 01:05:29Z
+        - updated paste URLs for Debian and Ubuntu services (RT#120369, Gregor
+          Herrmann)
+        - deprecation warning added to the now-defunct Codepeek service
+
+1.007   2016-09-16 02:26:28Z
+        - fix handling of filename option in the Gist command (Zakariyya
+          Mughal, PR#13)
+
+1.006   2016-05-24 02:55:20Z
+        - fix failing tests with other locales, environment settings
+
+1.005   2016-05-20 02:39:52Z
+        - mark App::Nopaste::Service::Codepeek as deprecated in metadata
+        - the Gist command also looks in ~/.github for credentials
+        - many additional tests; thanks David J. Shultz!
+
+1.004   2015-03-05 05:18:44Z
+        - fix the Gist plugin to work with github's stricter validation
+          (PR #11, Tatsuhiko Miyagawa)
+        - removed +x permissions on files (RT#102361)
+        - mark the Codepeek service as deprecated (RT#101823)
+
+1.003   2015-01-03 20:52:17Z
+        - re-release to fix problematic $VERSION declaration (RT#101095)
+
+1.002   2014-12-19 06:50:34Z
+        - new Mojopaste plugin (thanks, Dean Hamstead!)
+
+1.001   2014-12-13 21:21:10Z
+        - fix test of installed plugins to allow for third-party plugins also
+          being installed
+
+1.000   2014-12-12 03:25:40Z
+        - fix the accidental loss of the plugins() method in 0.97 (thanks,
+          Dean Hamstead!)
+
+0.99    2014-12-10 04:53:43Z
+        - gist URLs now use HTTPS (thanks, Darian Anthony Patrick!)
+
+0.98    2014-11-22 07:45:48Z
+        - make install prompts a bit more intelligible
+
+0.97    2014-11-16 19:29:13Z
+        - switched the JSON backend in the Gist plugin from JSON.pm to
+          JSON::MaybeXS
+
+0.96    2014-01-29 03:24:58Z
+        - added missing prereqs
+
+0.95    2014-01-26 17:41:29Z
+        - bumped the minimum version needed for the (optional) prerequisite
+          WWW::Pastebin::PastebinCom::Create, to avoid errors in previous
+          versions (thanks, Zoffix!)
+
+0.94    2014-01-18 22:13:29Z
+        - updated and fixed debian and ubuntu language mappings (haarg, PR#1)
+
+0.93    2014-01-14 00:41:21Z
+        - packaging converted to Dist::Zilla; handling of optional features
+          fixed (see RT#91053)
+
+0.92    2013-04-26
+        Fix the language mappins for Ubuntu's pastebin (Sergey Romanov)
+        Don't need to load Moose in the tests (Sergey Romanov)
+
+0.91    2013-01-27
+        Decode incoming text as utf8 (Jesse Luehrs)
+        Support for GITHUB_USER and GITHUB_PASS (Rafael Kitover)
+        Name the gist file `nopaste` not `nopaste.txt` for possible syntax highlighting (Rafael Kitover)
+        Use decode_json not a regular expression to decode Gist response body (Shawn M Moore)
+        Give a hint to perldoc App::Nopaste::Service::Gist on 401 (Shawn M Moore)
+
+0.90    2012-10-30
+        Port from Moose and MooseX::Getopt to Getopt::Long::Descriptive (frew)
+            App::Nopaste is not using any interesting Moose features,
+            so it doesn't make sense to pay the startup cost (even
+            though it's probably dominated by network latency)
+
+            Please report any regressions!
+
+0.35    2012-07-17
+        Don't barf when gist-ing STDIN. (Ricardo SIGNES)
+
+0.34    2012-07-14
+        Support for GitHub's v3 API [Вячеслав Тихановский (vti)]
+            Thanks also to Ricardo SIGNES for the call to arms:
+                http://rjbs.manxome.org/rubric/entry/1964
+
+0.33    2011-12-15
+        Support for --description in Gist (zengargoyle@gmail.com) [rt.cpan.org #73272]
+
+0.32    2011-10-21
+        Better error reporting (David Golden)
+        Fix some attribution errors (Salvatore Bonaccorso) [rt.cpan.org #70434]
+
+0.31    2011-08-30
+        Better filenames for ssh service (Thomas Sibley)
+
+0.30    2011-08-26
+        Fix App::Nopaste::ssh's new filename description feature (Kevin Falcone)
+
+0.29    2011-08-22
+        Add --private to several services (François Gannaz)
+        Use Class::Load instead of require "Module/Name.pm" (Shawn M Moore)
+        Document --list and --private options (François Gannaz)
+        Less hardcoding of argument names to better support subclassing (Jason Mills)
+        New Ubuntu service (http://paste.ubuntu.com/) (gregoa@debian.org)
+        SSH: Add a small suggested Apache conf that's useful for paste directories (Thomas Sibley)
+        SSH: optionally use the supplied description in the paste filename (Thomas Sibley)
+
+0.28    2011-03-22
+        If LWP is producing errors, *report them* (Ricardo SIGNES)
+
+0.27    2011-03-10
+        Correct path to Pastie (Sebastian Paaske Tørholm )
+        Throw an error if you specify -p and files (Shawn M Moore)
+        Remove Mathbin; doy moved it to a separate dist (Shawn M Moore)
+
+0.26    2011-02-23
+        Add --open (-o) for opening the nopaste in your browser (Thomas Sibley)
+
+0.25    2011-01-03
+        Add support for $GITHUB_USER/$GITHUB_TOKEN to Gist service (Maximilian Gass)
+
+0.24    2010-12-21
+        Gist requires https (Ricardo SIGNES)
+
+0.23    2010-11-26
+        Preserve the source file's extension for ssh (Thomas Sibley)
+        Use Config::GitLike instead of Config::INI::Reader (Thomas Sibley)
+        Doc fixes (Thomas Sibley, Justin Hunter)
+        Code style fixes (Shawn M Moore)
+        Remove Rafb (Justin Hunter)
+        Remove Husk (Shawn M Moore)
+
+0.22    2010-06-10 12:58:00
+        Add NOPASTE_SSH_MODE for chmod'ing after uploading (Thomas Sibley)
+
+0.21    2010-05-01 09:32:10
+        Add a --list_services/-L option (David Bremner) [rt.cpan.org #55562]
+        Add --private support, used in Gist (John Goulah)
+        Doc fix (Salvatore Bonaccorso) [rt.cpan.org #53249]
+        Doc fix (Fabien Wernli) [rt.cpan.org #54928]
+        Mention 'nopaste' script (Damyan Ivanov) [rt.cpan.org #51065]
+
+0.20    2010-04-16 23:05:10
+        App::Nopaste::Service::Pastie would generate warnings via
+            Mechanize due to changes in http://pastie.org HTML (avar)
+        Add App::Nopaste::Service::Codepeek (arcanez)
+
+0.19    2010-02-21 15:39:27
+        Remove rafb.net support since it's been shut down
+            - See also http://rafb.net/paste/
+
+0.18    2009-12-30 16:04:45
+        Add ssh support (obra, jibsheet)
+
+0.17    2009-11-02 13:20:24
+        fix Gist support harder by using the API rather than scraping (rjbs)
+        Improve --lang support for Debian (gregoa@debian.org) [rt.cpan.org #47911]
+
+0.16    2009-10-16 14:32:09
+        Fix Gist support (ckuskie@sterling.net) [rt.cpan.org #50500]
+        Add --lang support to Debian (gregoa@debian.org) [rt.cpan.org #47911]
+
+0.15    2009-07-15 05:01:36
+        MANIFEST is really hard! :(
+
+0.14    2009-07-15 04:48:15
+        No code changes
+
+0.13    2009-07-15 04:47:21
+        Add support for paste.debian.net (Ryan Niebur)
+
+0.12    2009-07-13 19:35:10
+        Don't explicitly (optionally) depend on Git, but use it if
+            we have it (Sartak)
+
+0.11    2009-06-18 17:20:51
+        Service::Gist: use file_ext instead of file_name (nothingmuch)
+
+        Bump Moose dependencies to avoid deprecation warnings
+
+        Doc typo fix (rafl)
+
+0.10    2009-01-28 18:48:55
+        I was a little too aggressive in my s/user/login/ (Sartak)
+
+0.09    2009-01-28 18:34:31
+        The parameter for gist is "user" not "login" (Ricardo SIGNES)
+
+0.08    2009-01-22 21:44:51
+        Optional authentication for Gist, by Ricardo SIGNES.
+
+0.07    2009-01-16 16:04:45
+        Gist (github) support by Ricardo SIGNES.
+        Pastie support.
+
+0.06    2008-12-03 21:50:36
+        Silence the "exiting eval via next" warning
+
+0.05    2008-08-29 15:03:10
+        Allow specific pastebins to say "I don't want to be picked by default"
+            Apply this to Mathbin
+
+0.04    2008-06-11 00:48:53
+        Add Mathbin courtesy of doy
+        Add an "available" method to services which checks Perl dependencies
+        Add a warn_handler
+        Refactor the CLI into App::Nopaste::Command, using MooseX::Getopt:
+            -x/--copy for automatically copying the URL to your clipboard
+            -p/--paste for automatically taking the clipboard as input
+            -q/--quiet for silencing warnings
+            -d/--desc for setting the one-line description
+            -n/--nick for setting the nickname to something other than $USER
+            -l/--lang for setting the language to something other than Perl
+            -c/--chan for setting the channel, so pastebots auto-announce
+            -s/--services for setting the services to try
+
+0.03    2008-05-06 04:31:08
+        App::Nopaste will now look at environment variables instead of nopaste
+        Better handling of weird argument counts to nopaste
+        If $NOPASTE_NICK is unavailable, use $USER
+        Fix dependency declarations
+        Default error handler now includes service name
+
+0.02    2008-04-17 20:25:29
+        Use #!/usr/bin/perl instead of #!/usr/bin/env perl so M:I replaces it
+
+0.01    2008-03-09 07:48:49
+        First version, released on an unsuspecting world.
+

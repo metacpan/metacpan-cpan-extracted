@@ -1,0 +1,40 @@
+Revision history for Perl extension App::Xssh
+
+v1.0.0 2013-XX-XX (Evan Giles <EGILES@cpan.org>)
+  - Use Sematic Versioning
+  - Update copyright for 2013
+
+0.8    2012-02-18 (Evan Giles <EGILES@cpan.org>)
+  - Add a '--version' option
+  - More consitent testing
+  - Use 'UNIVERSAL::require instead of eval (PBP recommendation)
+  - Provide an OO interface to App::Xssh
+
+0.7    2011-03-25 (Evan Giles <EGILES@cpan.org>)
+  - Convert to Module::Build
+  - Use Moose
+  - Allow the user to specify hosts that are really regular expressions
+
+0.6    2011-02-26 (Evan Giles <EGILES@cpan.org>)
+  - Try to correct some CPAN testers problems 
+
+0.5    2011-02-24 (Evan Giles <EGILES@cpan.org>)
+  - Rename (and deprecate) setextraattr & sethostattr command
+    line arguments
+  - Refactor library layout
+  - Much more thorough tests
+
+0.4    2010-07-21 (Evan Giles <EGILES@cpan.org>)
+  - Allow user to reference multiple 'extra' attribues for
+    each host (closes rt 59401).
+  - Improve the readability of the showconfig option.
+  - Fix remaining CPAN testers issue (windows only).
+
+0.3 2010-07-08 (Evan Giles <EGILES@cpan.org>)
+  - Change the tests so that they don't make system calls
+
+0.2 2010-06-06 (Evan Giles <EGILES@cpan.org>)
+  - Need to specify the minimum perl version (5.6)
+
+0.1 2010-06-27 (Evan Giles <EGILES@cpan.org>)
+  - Original version.

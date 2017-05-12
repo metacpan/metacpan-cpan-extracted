@@ -1,0 +1,59 @@
+Revision history for App-SimpleScan-Plugin-Snapshot
+
+1.03  Tue Apr 25 17:14:47 PDT 2006
+	- interface mismatch: should be last_line, not
+	  current_line
+
+1.02  Mon Apr 10 10:01:24 PDT 2006
+	- failed upload; trying again
+
+1.01  Tue Mar 21 16:15:49 PST 2006
+	- added changelog entry for 1.00
+	- added support for snap_layout pragma and 
+	  command-line option
+
+1.00  Mon Mar 20 13:22:08 PST 2006
+	- Verified OK with 1.00 interfaces
+
+0.10  Fri Mar 17 11:11:58 PST 2006
+	- Now uses new filter() interface instead of
+	  nastily overriding App::SimpleScan's
+	  stack_test()
+
+0.09  Tue Feb 28 14:59:50 PST 2006
+	- per_test stuff redone again; remove per_test
+	- add stack_test override 
+
+0.08  Tue Feb  7 15:18:58 PST 2006
+	- conform to new per_test interface
+
+0.07  Tue Dec 20 17:36:36 PST 2005
+	- Added comment tesxt from the testspec to the
+	  snapshot comment area
+	- switched to qq() for string quoting
+
+0.06  Fri Dec  2 16:59:13 PST 2005
+	- changes to support new file versioning
+	  fixes in WW::Mechanize::Plugin::Snapshot
+
+0.05  Fri Dec  2 11:00:50 PST 2005
+	- Tag snapshot diags to allow specialized
+	  test harnesses to spot them
+
+0.04  Thu Dec  1 11:36:22 PST 2005
+	- added --snap_prefix and %%snap_prefix support
+
+0.03  Wed Nov 30 14:53:34 PST 2005
+	- Removed double-checking of directory; let
+	  the plugin do it
+	- Updated tests to reflect new per-run-directory
+	  changes in WWW::Mechanize::Plugin::Snapshot
+
+0.02  Tue Nov 22 15:31:26 PST 2005
+	- fix README to contain actual information.
+	- fix tests to work properly without $ENV{TMP}
+        - remove references to Yahoo!-local lib paths
+
+0.01  Wed Nov  9 13:17:55 2005
+       Initial release.
+

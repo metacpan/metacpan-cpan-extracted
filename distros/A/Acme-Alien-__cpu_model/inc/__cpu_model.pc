@@ -1,0 +1,14 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: __cpu_model
+Description: Provides __cpu_model for when the compiler doesn't provide it
+URL: http://a3f.at
+Version: 0.001
+Requires: 
+Libs: -L${libdir} -l__cpu_model
+Cflags:
+ 
+

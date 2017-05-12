@@ -1,0 +1,6 @@
+name = "App-JSON-Tools"
+# badges = ["travis"]
+authority="cpan:KABLAMO"
+
+module_maker="ModuleBuildTiny"
+

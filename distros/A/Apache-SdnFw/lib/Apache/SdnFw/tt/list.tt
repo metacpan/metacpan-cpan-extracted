@@ -1,0 +1,27 @@
+<div class="floatleft">
+<table>
+	<caption>[% s.object %]s</caption>
+	<thead>
+	<tr>
+		<th>ID</th>
+[% FOREACH f IN s.o.fields -%]
+	[% UNLESS f.hidelist %]
+		<th>[% f.t %]</th>
+	[% END -%]
+[% END -%]
+	</tr>
+	</thead>
+	<tbody>
+[% FOREACH l IN list -%]
+	<tr>
+		<td><a href="[% s.ubase %]/[% s.object %]/display?[% s.o.id %]=[% l.${s.o.id} %]">[% l.${s.o.id} %]</a></td>
+	[% FOREACH f IN s.o.fields -%]
+		[% UNLESS f.hidelist %]
+		<td>[% IF f.verify == 'phone' %][% s.format_phone(l.${f.k}) %][% ELSIF f.boolean %][% s.format_boolean(l.${f.k}) %][% ELSE %][% l.${f.k} %][% END %]</td>
+		[% END %]
+	[% END -%]
+	</tr>
+[% END -%]
+	</tbody>
+</table>
+</div>

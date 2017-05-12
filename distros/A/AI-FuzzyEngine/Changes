@@ -1,0 +1,24 @@
+Revision history for AI-FuzzyEngine
+
+0.1.0   2013-02-08
+        First version, released on an unsuspecting world.
+
+0.1.1   2013-02-08
+        README costumized. POD small improvement. 
+
+0.2.0   2013-02-13
+        PDL awareness
+        Tests re-factored
+        requires perl 5.8.9
+        POD improved, PDL sections added
+
+0.2.1   2013-02-14
+        Bug in test fixed (use PDL removed)
+        versioning of Set and Variable adapted
+
+0.2.2   2013-02-27
+        Declaring a version with version->declare() instead of qw()
+        A variable can change its sets' membership functions 
+        (e.g. within optimisation routines)
+        Providing $fe->true() and $fe->false()
+        

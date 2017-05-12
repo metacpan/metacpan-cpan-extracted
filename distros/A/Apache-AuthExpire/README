@@ -1,0 +1,60 @@
+Apache::AuthExpire module for use with a mod_perl enabled web server.
+
+Most Recent Modification:  09/06/2001
+
+Copyright (c) 2001 Jonathan J. Horner. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same terms as Perl itself. 
+
+1.  Purpose
+
+	As the title suggests, this PerlAuthenHandler will provide a means to set a server wide time out
+system for servers that contain sensitive data.  It does this by using file modification times in a 'times' 
+directory in <SERVERROOT>/conf/ to determine when an access_controlled request was made last, and if too 
+much time has passed since the last request, the module will return a status code of AUTH_REQUIRED to
+the browser to force a login.  It follows the rules of the AUTHENTICATION phase and standard
+PerlAuthenHandlers.
+
+2.  Usage
+
+	The usage is pretty simple:
+		1.  Install module using 'perl Makefile.PL && make && make test && make install'.
+		2.  Place the following lines in your <SERVERROOT>/conf/httpd.conf file, where appropriate:
+			PerlAuthenHandler Apache::AuthExpire
+			PerlSetVar  DefaultLimit <number of seconds for default timeout>
+		3.  The following line, optional in your httpd.conf file, will turn on debugging reports to
+		    your error_log (set by the httpd.conf file):
+			PerlSetVar TIMEOUT_DEBUG 1
+		4.  The following lines allow site maintainers to turn off timeouts for a directory or 
+		    change the value.  The value of the TimeLimit directive must be less than the 
+		    DefaultLimit.  These are optional in the .htaccess file:
+			PerlSetVar TimeLimit <number of seconds for this directory timeout>
+			PerlSetVar MODE Off
+		5.  After setting these, all directories will be subject to the PerlAuthenHandler if an
+		    .htaccess file is present, the AuthType must be set to 'Basic', the AuthName must be
+		    defined, at least one 'require' directive defined, and MODE is not set.
+		6.  Create a directory in your <SERVERROOT>/conf directory named 'times' and change 
+		    ownership to the user:group running the Apache child processes.
+		7.  Stop and restart the web server.
+
+3.  Contact Information
+
+	I can be reached by email at jjhorner@bellsouth.net or jhorner@2jnetworks.com.  
+	Home page is http://www.2jnetworks.com/~jhorner/AuthExpire.html. 
+	Please send any bug reports to me at the above address.
+
+4.  TODO List
+
+	* Add status codes to time files so that more intricate options can be added
+	* Rewrite so that instead of a 401 status response being returned(which isn't handled 
+	  well by all browsers), the serve will respond with a page html allowing another login.  
+	  This page will have to be addressed by browsers and should work better than a '401'.
+	* Work on Makefile generation so that the module goes to <SERVERROOT>/lib/perl/Apache/
+	* General cleanup
+	* make sure Apache::* dependencies are checked during install
+	* Generate better method of creating <SERVERROOT>/conf/times directory  
+
+5.  Credit Goes to:
+	- plaid from perlmonks.org (http://www.perlmonks.org/index.pl?node=plaid) for debugging code and 
+	  general help.
+	- merlyn (Randal Schwartz) from perlmonks.org (http://www.perlmonks.org/index.pl?node=merlyn) for
+	  general help and support.

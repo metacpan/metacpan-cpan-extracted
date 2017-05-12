@@ -1,0 +1,33 @@
+Revision history for Perl extension Apache::SdnFw.
+
+0.01  Mon Jun  8 21:28:55 2009
+	- original version; created by h2xs 1.23 with options
+		-X -n Apache::SdnFw
+
+0.90  Sat Mar 19 13:59:00 2011
+	- after years of exhaustive development, cleaning up things to share with 
+		rest of the world.
+
+0.91  Sat Mar 19 13:59:00 2011
+	- remove incorrect files from dist package (Makefile and pm_to_blib)
+
+0.92  Fri Mar 25 08:07:00 2011
+	- make username login lowercase all the time
+	- allow login cookies to live for more than a day with ETERNAL_COOKIE
+	- move crypt key out to CRYPT_KEY in site config file
+	- only load javascript files when needed
+	- only load favicon.ico if it exists
+	- load the css into the head instead of including it as a link
+	- in order to reduce multiple requests
+	- read apache min/max/clients/etc settings from sdnfw.conf file
+	- extend format_percent to allow control over number of decimals shown
+	- add file_path, filename, and content_type automatically when doing a csv db query
+	- add in_to_hash function
+	- add no_css flag to not include css in header
+	- break out common javascript into individual files and rework
+		add_js functionality a bit
+	- add html_caption_scroll function to make changing tbody elements scrollable
+	- add /code to PERL5LIB in apachectl to help with Apache::StatINC issues
+	- add html_input_number and html_input_email
+	- added object menu template selection and css and footer template
+	- added object head option

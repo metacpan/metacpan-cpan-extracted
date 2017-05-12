@@ -1,0 +1,12 @@
+pod2text Acme::Incorporated.pm > README
+
+Please install Module::Build to install this module.  It's terribly useful.
+Module::Build is, anyway.
+
+At the very least you should be able to use this set of instructions
+to install the module...
+
+	$ perl Build.PL
+	$ ./Build
+	$ ./Build test
+	$ sudo ./Build install

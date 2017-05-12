@@ -1,0 +1,19 @@
+Apache2::ScoreBoardFile			MY_OBJECT
+Apache2::ScoreBoardFile::Process	MY_OBJECT
+Apache2::ScoreBoardFile::Worker		MY_OBJECT
+
+INPUT
+MY_OBJECT
+        if (sv_derived_from($arg, \"${ntype}\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type,tmp);
+        }
+        else
+            Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+                        \"$var\", \"$ntype\")
+
+
+OUTPUT
+MY_OBJECT
+        sv_setref_pv($arg, \"${type}\", (void*)$var);

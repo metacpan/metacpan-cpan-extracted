@@ -1,0 +1,121 @@
+{
+   "abstract" : "Fetch/build/stash the SamTools headers and libs.",
+   "author" : [
+      "George Hartzell"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-SamTools",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0",
+            "Module::Build" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Authority" : "0",
+            "Dist::Zilla::Plugin::AutoPrereqs" : "4.300005",
+            "Dist::Zilla::Plugin::CPANFile" : "0",
+            "Dist::Zilla::Plugin::CheckChangesHasContent" : "0",
+            "Dist::Zilla::Plugin::CheckMetaResources" : "0",
+            "Dist::Zilla::Plugin::CheckPrereqsIndexed" : "0",
+            "Dist::Zilla::Plugin::ConfirmRelease" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::ExecDir" : "0",
+            "Dist::Zilla::Plugin::FileFinder::ByName" : "0",
+            "Dist::Zilla::Plugin::Git::Check" : "0",
+            "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" : "0",
+            "Dist::Zilla::Plugin::Git::Commit" : "0",
+            "Dist::Zilla::Plugin::Git::GatherDir" : "0",
+            "Dist::Zilla::Plugin::Git::NextVersion" : "0",
+            "Dist::Zilla::Plugin::Git::Push" : "0",
+            "Dist::Zilla::Plugin::Git::Tag" : "0",
+            "Dist::Zilla::Plugin::GithubMeta" : "0",
+            "Dist::Zilla::Plugin::License" : "0",
+            "Dist::Zilla::Plugin::Manifest" : "0",
+            "Dist::Zilla::Plugin::ManifestSkip" : "0",
+            "Dist::Zilla::Plugin::MetaJSON" : "0",
+            "Dist::Zilla::Plugin::MetaNoIndex" : "0",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::MetaYAML" : "0",
+            "Dist::Zilla::Plugin::MinimumPerl" : "0",
+            "Dist::Zilla::Plugin::ModuleBuild::Custom" : "0",
+            "Dist::Zilla::Plugin::NextRelease" : "0",
+            "Dist::Zilla::Plugin::PkgVersion" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0",
+            "Dist::Zilla::Plugin::PruneCruft" : "0",
+            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
+            "Dist::Zilla::Plugin::ReadmeFromPod" : "0",
+            "Dist::Zilla::Plugin::RunExtraTests" : "0",
+            "Dist::Zilla::Plugin::ShareDir" : "0",
+            "Dist::Zilla::Plugin::Test::Compile" : "0",
+            "Dist::Zilla::Plugin::TestRelease" : "0",
+            "Dist::Zilla::Plugin::UploadToCPAN" : "0",
+            "Software::License::Perl_5" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::SamTools" : {
+         "file" : "lib/Alien/SamTools.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hartzell/alien-samtools/issues"
+      },
+      "homepage" : "https://github.com/hartzell/alien-samtools",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hartzell/alien-samtools.git",
+         "web" : "https://github.com/hartzell/alien-samtools"
+      }
+   },
+   "version" : "0.002",
+   "x_authority" : "cpan:HARTZELL"
+}
+

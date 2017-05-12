@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Apache2-ClickPath
+version:             1.901
+abstract:            Apache WEB Server User Tracking
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Apache::Test:                  
+    Crypt::Blowfish:               
+    Crypt::CBC:                    2.14
+    Digest::CRC:                   
+    LWP::UserAgent:                
+    mod_perl2:                     0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Torsten Foertsch <torsten.foertsch@gmx.net>

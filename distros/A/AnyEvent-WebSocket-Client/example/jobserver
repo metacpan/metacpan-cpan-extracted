@@ -1,0 +1,270 @@
+#!/usr/bin/perl
+
+use autodie;
+use strict;
+use warnings;
+use Mojo::Redis;
+use Mojo::JSON;
+use Mojolicious::Lite;
+
+my $jobnumber = 0;
+my $redis = Mojo::Redis->new;
+my $json = Mojo::JSON->new;
+
+sub get_job_hash
+{
+  my($c, $cb) = @_;
+  $redis->hgetall(jobs => sub {
+    my($redis, $jobs) = @_;
+    
+    my %jobs;
+    
+    while(my($key,$val) = each %$jobs)
+    {
+      my($server, $id) = split /\./, $key;
+      $jobs{$server}->{$id} = $json->decode($val);
+    }
+    
+    $c->stash(jobs => \%jobs);
+    $cb->();
+  });
+  $c->render_later;
+}
+
+get '/' => sub {
+  shift->redirect_to('index');
+};
+
+get '/server.json' => sub {
+  my $self = shift;
+  get_job_hash($self, sub {
+    $self->render(json => $self->stash('jobs'));
+  });
+};
+
+get '/server' => sub {
+  my $self = shift;
+  get_job_hash($self, sub {
+    $self->render('index');
+  });
+} => 'index';
+
+get '/server/:server' => sub {
+  my $self = shift;
+  get_job_hash($self, sub {
+    my $server = $self->param('server');
+    if(defined $self->stash->{jobs}->{$server})
+    {
+      $self->stash(server => $server);
+      $self->render('server');
+    }
+    else
+    {
+      $self->render_not_found;
+    }
+  });
+} => 'server';
+
+sub get_old_events
+{
+  my($c, $cb) = @_;
+  my $key = join '.', $c->param('server'), $c->param('id');
+  my $list = join '.', qw( job event ), $key;
+  $redis->hget('jobs', $key, sub {
+    my($redis, $command) = @_;
+    my @command = @{ $json->decode($command) };
+    $c->stash(command => \@command);
+    $redis->lrange($list, 0, -1, sub {
+      my $redis = shift;
+      my $events = shift;
+      my @events = map { $json->decode($_) } @$events;
+      $c->stash(events => \@events);
+      $c->stash(encoded_events => $json->encode(\@events));      
+      my $url = $c->req->url->to_abs;
+      $url->path($c->url_for('events', server => $c->param('server'), id => $c->param('id')));
+      $url->scheme($url->scheme eq 'https' ? 'wss' : 'ws');
+      $c->stash(url => $url);
+      $cb->();
+    });
+  });
+  $c->render_later;
+}
+
+get '/job/:server/:id.json' => sub {
+  my $self = shift;
+  get_old_events($self, sub {
+    $self->render(json => { 
+      command   => $self->stash->{command},
+      events    => $self->stash->{events},
+      event_url => $self->stash->{url},
+    });
+  });
+};
+
+get '/job/:server/:id' => sub {
+  my $self = shift;
+  get_old_events($self, sub {
+    $self->render('job');
+  });
+} => 'job';
+
+websocket '/events/:server/:id' => sub {
+  my($self)  = @_;
+  my $server = $self->param('server');
+  my $id     = $self->param('id');
+  
+  # Increase inactivity timeout for connection a bit
+  Mojo::IOLoop->stream($self->tx->connection)->timeout(600);
+
+  my $redis = Mojo::Redis->new;
+  
+  $redis->subscribe(join('.', qw( job event ), $server, $id), sub {
+    my($redis, $payload) = @_;
+    my($type, $channel, $data) = @$payload;
+    return unless $type eq 'message';
+    $self->send($data);
+  });
+  
+  $self->on(finish => sub {
+    $redis->quit;
+    undef $redis;
+  });
+  
+} => 'events';
+
+websocket '/run' => sub {
+  my($self) = @_;
+
+  my $id1 = join '.', $$, $jobnumber;
+  my $id2 = join '.', qw( job event ), $$, $jobnumber++;
+  
+  # Increase inactivity timeout for connection a bit
+  Mojo::IOLoop->stream($self->tx->connection)->timeout(600);
+  
+  $self->on(message => sub {
+    my($self, $message) = @_;
+
+    my $payload = $json->decode($message);
+    unless(defined $payload)
+    {
+      warn "error decoding: $message";
+      return;
+    }
+    
+    if(ref($payload) eq 'ARRAY')
+    {
+      $redis->hset('jobs', $id1, $message);
+    }
+    else
+    {
+      $redis->rpush($id2, $message);
+      $redis->publish($id2, $message);
+    }
+
+  });
+  
+  $self->on(finish => sub {
+    my $message = $json->encode({ type => 'closed' });
+    $redis->rpush($id2, $message);
+    $redis->publish($id2, $message);
+    undef $id1;
+    undef $id2;
+  });
+};
+
+app->start;
+__DATA__
+
+@@ index.html.ep
+% layout 'default';
+% title 'job server';
+
+<ul>
+% foreach my $server (sort keys %$jobs) {
+  <li><a href="<%= url_for 'server', server => $server %>">server <%= $server %></a>
+    <ul>
+%     foreach my $id (sort keys %{ $jobs->{$server} }) {
+        <li>
+          <a href="<%= url_for 'job', server => $server, id => $id %>">
+            <%= join ' ', @{ $jobs->{$server}->{$id} } %> (<%= $id %>)
+          </a>
+        </li>
+%     }
+    </ul>
+  </li>
+
+% }
+
+@@ server.html.ep
+% layout 'default';
+% title 'server ' . $server;
+
+<ul>
+% foreach my $id (sort keys %{ $jobs->{$server} }) {
+  <li>
+    <a href="<%= url_for 'job', server => $server, id => $id %>">
+      <%= join ' ', @{ $jobs->{$server}->{$id} } %> (<%= $id %>)
+    </a>
+  </li>
+% }
+</ul>
+
+@@ job.html.ep
+% layout 'default';
+% title 'job';
+
+<input id="starter_events" value="<%= $encoded_events %>" type="hidden" />
+
+<pre id="output"></pre>
+
+<script language="javascript">
+
+function append_event(event)
+{
+  if(event.type == 'out')
+  {
+    $('#output').append(event.data + "\n");
+  }
+  else if(event.type == 'err')
+  {
+    $('#output').append(event.data + "\n");
+  }
+  else if(event.type == 'error')
+  {
+    $('#output').append("ERROR: " + event.data + "\n");
+  }
+  else if(event.type == 'exit')
+  {
+    $('#output').append("EXIT: " + event.exit);
+    if(event.signal > 0)
+    { $('#output').append(" SIGNAL: " + event.signal) }
+    $('#output').append("\n");
+  }
+  else if(event.type == 'closed')
+  {
+    $('#output').append("CONNECTION CLOSED\n");
+  }
+}
+
+$(document).ready(function() {
+  var ws = new WebSocket('<%= $url %>');
+  var events = $.parseJSON($('#starter_events').attr('value'));
+  $.each(events, function(index, event) {
+    append_event(event);
+    ws.onmessage = function(event) {
+      append_event($.parseJSON(event.data));
+    };
+  });
+});
+
+</script>
+
+@@ layouts/default.html.ep
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+  </head>
+  <body><%= content %></body>
+</html>

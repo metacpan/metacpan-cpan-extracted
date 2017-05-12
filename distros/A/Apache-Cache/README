@@ -1,0 +1,314 @@
+Apache::Cache version 0.05
+==========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Apache::SharedMem
+  Time::DateParse
+
+
+CHANGES
+
+0.05 Tue Oct  2 2001 16:09:37
+    - status now return bitmask values
+    - constructor parameter 'cachename' is now optional, default value is 
+      'default'
+    - feature enhancements, new clear method and new constructor parameter 
+      'default_lock_timeout'
+    - major documentation update (it's now readable, and understandable)
+    - new test scripts
+
+0.04 Wed August 29 2001 09:42:00
+    - major bugfix in "get" method: on first timeout, status was set to 
+      "delete" method's status (often SUCCESS) instead of EXPIRED
+    - bugfix in "set" method: wasn't unlock segment !
+    - major bugfix in _check_key: use of max_keys parameter wasn't work 
+      correctly
+
+0.03 Mon Jully 30, 2001 13:43:01
+    - fix major bug in "get" method: on unexists key, status was set to 
+      SUCCESS insted of EXPIRED
+
+0.02 Tue Junary 26, 2001 21:08:17
+    - correct major bugs.
+
+0.01 Mon Junary 25, 2001 07:43:48
+    - original version writen from scratch.
+    - fixing EXPORT_OK
+    - fixing referencing bug in delete method
+
+NAME
+    Apache::Cache - Cache data accessible between Apache childrens
+
+SYNOPSIS
+        use Apache::Cache qw(:status);
+
+        my $cache = new Apache::Cache(default_expires_in=>"5 minutes");
+
+        # if the if the next line is called within 10 minutes, then this 
+        # will return the cache value overwise, this will return undef and the
+        # status method will be equal to the constant EXPIRED (exported by Apache::Cache
+        # on demande via the :status tag)
+
+        # the next line try to get the data from the cache, if the data is stored in
+        # in the cache and if it not expired, then this return the data. Otherwise
+        # if data have never been store in the cache, or if it's expired, this will
+        # return undef and the status() method will be equal to constant EXPIRED (exported
+        # by Apache::Cache on demand, via the :status tag)
+
+        my $value = $cache->get('Key');
+
+        if($cache->status eq EXPIRED)
+        {
+            # can't get the data from the cache, we will need to get it by the normal way
+            # (via database, from file...)
+            $value = get_my_data('Key'); # here, the get_my_data() function is a function of your
+                                         # programe that generate a fresh value
+
+            # this data have to expires in 30 secondes
+            my $expires_in = '30 secondes';
+            $cache->set(Key => $value, $expires_in);
+        }
+        elsif($cache->status eq FAILURE)
+        {
+            # don't use cache, cache maybe busy by another child or something goes wrong
+            $value = get_my_data('Key');
+        }
+
+DESCRIPTION
+    This module allows you to cache data easily through shared memory.
+    Whithin the framework of an apache/mod_perl use, this cache is
+    accessible from any child process. The data validity is managed in the
+    Cache::Cache model, but as well based on time than on size or number of
+    keys.
+
+    Additionnally, you can implement a cache with Apache::Cache in your
+    module without the risk of namespace clash because Apache::Cache is
+    enclosed in the constructor's package's caller (see the
+    Apache::SharedMem manpage for more details).
+
+USAGE
+    For mod_perl users:
+
+    in your httpd.conf, put this directive:
+
+        PerlAddVar PROJECT_DOCUMENT_ROOT /path/to/your/project/root/
+
+    and in your startup.pl:
+
+        use Apache::Cache ();
+
+    See the Apache::SharedMem manpage for more details.
+
+METHODS
+  new  (cachename=> 'cachename', default_expires_in=> '1 second', max_keys=> 50, max_size=> 1_000)
+
+    Constuct a new Apache::Cache's instance.
+
+    *   "default_expires_in" optional, date
+
+        The default data expiration time for objects place in the cache.
+        Integers is interpreted in seconds, constant EXPIRES_NOW make data
+        expire imédiately and constant EXPIRES_NEVER make the data never
+        expire. The timeout can also be in a human readable format, see the
+        Time::ParseDate manpage for this format specification.
+
+        Defaults to constant EXPIRES_NEVER if not explicitly set.
+
+    *   "max_keys" optional, integer
+
+        If you set more than "max_keys" keys, olders are automatically
+        removed. Usefull to control the cache's grow. NOTE: if you know the
+        exact length of your keys, use this option to control the cache size
+        instead of the "max_size" option.
+
+        Defaults to no max_keys
+
+    *   "max_size" optional, integer
+
+        no yet implemented
+
+    *   "cachename" optional, string
+
+        The namespace associated with this cache.
+
+        Defaults to "Default" if not explicitly set.
+
+    *   "default_lock_timeout" optional, integer
+
+        Number of second(s) to wait for locks used each time manipulating
+        data in the shared memory.
+
+        Defaults to not waiting. This means a get() - for expample - on a
+        temporary locked key - certainely by another process - will return a
+        FAILED status.
+
+    Additionnaly, all Apache::SharedMem parameters are also customizable.
+    See the Apache::SharedMem manpage.
+
+  set (identifier => data, [timeout])
+
+        $cache->set(mykey=>'the data to cache', '15 minutes');
+        if($cache->status & FAILURE)
+        {
+            warn("can't save data to cache: $cache->error");
+        }
+
+    Store an item in the cache.
+
+    *   "identifier" required, string
+
+        A string uniquely identifying the data.
+
+    *   "data" required, scalar or reference to any perl data type, except
+        CODE and GLOB
+
+        The data to store in the cache.
+
+    *   "timeout" optional, date
+
+        The data expiration time for objects place in the cache. Integers is
+        interpreted in seconds, constant EXPIRES_NOW make data expire
+        imédiately and constant EXPIRES_NEVER make the data never expire.
+        The timeout can also be in a human readable format, see the
+        Time::ParseDate manpage for this format specification.
+
+    On failure this method return "undef()" and set status to FAILURE, see
+    status() method below
+
+    status : FAILURE SUCCESS
+
+  get (identifier)
+
+        my $value = $cache->get('Key');
+
+        if($cache->status & (EXPIRED | FAILURE)) # if status is EXPIRED or FAILURE
+        {
+            $value = 'fresh value';
+        }
+
+    Fetch the data specified. If data where never set, or if data have
+    expired, this method return "undef" and status is set to EXPIRED.
+
+    *   "identifier" required, string
+
+        A string uniquely identifying the data.
+
+    status : FAILURE SUCCESS EXPIRED
+
+  delete (identifier)
+
+    Delete the data associated with the identifier from the cache.
+
+    *   "identifier" required, string
+
+        A string uniquely identifying the data.
+
+    status: SUCCESS FAILURE
+
+  clear
+
+    Remove all objects from the namespace associated with this cache
+    instance.
+
+    status: SUCCESS FAILURE
+
+  status
+
+    Return the last called method status. This status should be used with
+    bitmask operators &, ^, ~ and | like this :
+
+        # is last method failed ?
+        if($object->status & FAILURE) {something to do on failure}
+
+        # is last method don't succed ?
+        if($object->status ^ SUCCESS) {something to do on failure}
+
+        # is last method failed or expired ?
+        if($object->status & (FAILURE | EXPIRED)) {something to do on expired or failure}
+
+    It's not recommended to use equality operator (== and !=) or (eq and
+    ne), they may don't work in future versions.
+
+    To import status' constants, you have to use the :status import tag,
+    like below :
+
+        use Apache::Cache qw(:status);
+
+EXPORTS
+  Default exports
+
+    None.
+
+  Available exports
+
+    Following constant is available for exports : EXPIRED SUCCESS FAILURE
+    EXPIRES_NOW EXPIRES_NEVER LOCK_EX LOCK_SH LOCK_UN.
+
+  Export tags defined
+
+    The tag ":all" will get all of the above exports. Following tags are
+    also available :
+
+        :status
+
+        Contents: SUCCESS FAILURE EXPIRED
+
+        This tag is really recommended to the importation all the time.
+
+        :expires
+
+        Contents: EXPIRES_NOW EXPIRES_NEVER
+
+        :lock
+
+        Contents: LOCK_EX LOCK_SH LOCK_UN LOCK_NB
+
+KNOW BUGS
+    Under mod_perl, with eavy load, this error may occured some time:
+
+        Apache::SharedMem object initialization: Unable to initialize root ipc shared memory
+        segment: File exists at /usr/local/lib/perl5/site_perl/5.005/Apache/SharedMem.pm line 929
+
+    We not really understand the probleme source, so any help will be
+    appreciated. For fixing this problem when it occured, you should stop
+    apache, clean the ipc segment and restart apache.
+
+AUTHOR
+    Olivier Poitrey <rs@rhapsodyk.net>
+
+LICENCE
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with the program; if not, write to the Free Software Foundation, Inc. :
+
+    59 Temple Place, Suite 330, Boston, MA 02111-1307
+
+COPYRIGHT
+    Copyright (C) 2001 - Olivier Poitrey
+
+PREREQUISITES
+    Apache::Cache needs Apache::SharedMem available from the CPAN.
+
+SEE ALSO
+    the Apache::SharedMem manpage

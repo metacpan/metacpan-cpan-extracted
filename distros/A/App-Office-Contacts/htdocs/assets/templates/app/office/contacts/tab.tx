@@ -1,0 +1,10 @@
+<div id="<: $div :>">
+    <ol>
+: for $list -> $item {
+        <li><a href="#<: $item.name :>"><span><: $item.header :></span></a></li>
+: }
+    </ol>
+: for $list -> $item {
+    <div id="<: $item.name :>"><: $item.body :></div>
+: }
+</div>

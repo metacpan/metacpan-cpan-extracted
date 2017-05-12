@@ -1,0 +1,35 @@
+---
+abstract: 'a very simple perl interface to play & interact with an Amazon Dash Button.'
+author:
+  - 'Nicolas R. <atoomic@cpan.org>'
+build_requires:
+  Carp: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Scalar::Util: '0'
+  Test::Deep: '0'
+  Test::More: '0.94'
+  blib: '1.01'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amazon-Dash-Button
+requires:
+  Net::Pcap::Easy: '0'
+  Simple::Accessor: '1.11'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://metacpan.org/dist/Amazon-Dash-Button
+  repository: https://github.com/atoomic/Amazon-Dash-Button.git
+version: '0.11'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,76 @@
+<html>
+<head>
+<title><% $sitename %> - <% $title %></title>
+<script>
+// <!--
+function focus_on_load() {
+	var form = document.forms[0];
+	if (form) form.elements[0].focus();
+}
+//   -->
+</script>
+<style type="text/css">
+	BODY { background: #d1cfdf url(/images/bg.gif) top left repeat-y; }
+	#hrule { background: #d1cfdf url(/images/hrule.gif) repeat-x; }
+	#dochead {
+		text-width: 70%;
+		vertical-align: center;
+		font-family: Ariel, Helvetica;
+		font-size: 18pt;
+		font-weight: bold;
+	}
+	#logo {
+		text-align: right;
+		vertical-align: top;
+	}
+	#menu-head {
+		vertical-align: top;
+		background-color: #4c0505;
+		color: #f0f0f0;
+		font-family: Ariel, Helvetica;
+		font-size: 14pt;
+		font-weight: bold;
+	}
+	#menu-item {
+		background-color: #e8e8ab;
+		color: #000000;
+		font-family: Ariel, Helvetica;
+		font-size: 12pt;
+		font-weight: normal;
+	}
+</style>
+</head>
+
+<!--
+  +-+-------------+
+  |s| head   logo |
+  |i| --- hr ---  |
+  |d| cont   menu |
+  |e|  -ent       |
+  |b|             |
+  |a| --- hr ---  |
+  |r|   footer    |
+  +-+-------------+
+-->
+<body>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr><td><img src="/images/bg0.gif"></td>
+<td>
+
+<table>
+
+<tr><td><table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+  <td ID="dochead"><% $title %></td>
+  <td ID="logo"><a href="/">
+    <img border="0" src="/images/logo.gif" alt="<% $sitename %>">
+  </a></td>
+</tr>
+</table></td></tr>
+
+<tr><td ID="hrule"><img src="/images/hrule0.gif"></td></tr>
+
+<%args>
+$sitename => ''
+$title => ''
+</%args>

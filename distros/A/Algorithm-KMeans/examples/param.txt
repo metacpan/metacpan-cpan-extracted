@@ -1,0 +1,46 @@
+# Comment lines must begin with #
+
+# This file shows how to specify the parameters for generating
+# synthetic data for clustering. Edit according to your needs.
+
+# In this parameter file, 'cluster' is a keyword that is
+# used to separate the parameters for the different
+# clusters. What follows this keyword is the mean vector
+# for the cluster.  After that, we have a blank line before
+# the covariance matrix.  The dimensionality of covariance
+# matrix must be the same as as that of the mean vector.
+# Additionally, the covariance matrix is expected to be
+# positive definite.  If it is not, you will hear from the
+# Math::Random module that is used to actually generate the
+# multivariate random numbers for the different clusters.
+
+# The example here is for clustering in 3D space.  But note
+# there are no constraints on the dimensionality of the
+# space in which you cluster as long as it is at least 2.
+# The dimensionality is set by the number of elements in the
+# first mean vector.
+
+cluster
+
+12 3 4.0
+
+5 0 0
+0 1 0
+0 0 1
+
+cluster
+
+3.0 2 1
+
+10 0 0
+0 2 0
+0 0 1
+
+cluster
+
+10 10.0 10
+
+6 0 0
+0 2 0
+0 0 20
+

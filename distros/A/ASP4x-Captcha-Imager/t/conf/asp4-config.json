@@ -1,0 +1,57 @@
+{
+  "system": {
+    "post_processors": [
+    ],
+    "libs": [
+      "@ServerRoot@/lib"
+    ],
+    "load_modules": [
+    ],
+    "env_vars": {
+    },
+    "settings": {
+      "captcha_key":      "Captcha-Is-Teh-Awesome",
+      "captcha_font":     "@ServerRoot@/etc/LiberationSans-Regular.ttf",
+      "captcha_width":    140,
+      "captcha_height":   40,
+      "captcha_bg_color": "FFFFFF",
+      "captcha_length":   4
+    }
+  },
+  "errors": {
+    "error_handler":    "ASP4::ErrorHandler",
+    "mail_errors_to":   "you@your-server.com",
+    "mail_errors_from": "root@localhost",
+    "smtp_server":      "localhost"
+  },
+  "web": {
+    "application_name": "ASP4xCaptcha",
+    "application_root": "@ServerRoot@",
+    "www_root":         "@ServerRoot@/htdocs",
+    "handler_root":     "@ServerRoot@/handlers",
+    "page_cache_root":  "/tmp/PAGE_CACHE",
+    "handler_resolver": "ASP4::HandlerResolver",
+    "handler_runner":   "ASP4::HandlerRunner",
+    "filter_resolver":  "ASP4::FilterResolver",
+    "request_filters": [
+    ],
+    "disable_persistence": [
+    ]
+  },
+  "data_connections": {
+    "session": {
+      "manager":          "ASP4::SessionStateManager",
+      "cookie_name":      "session-id",
+      "cookie_domain":    "*",
+      "session_timeout":  "*",
+      "dsn":              "DBI:SQLite:dbname=/tmp/db_asp4captcha",
+      "username":         "",
+      "password":         ""
+    },
+    "main": {
+      "dsn":      "DBI:SQLite:dbname=/tmp/db_asp4captcha",
+      "username": "",
+      "password": ""
+    }
+  }
+}

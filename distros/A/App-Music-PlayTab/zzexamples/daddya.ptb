@@ -1,0 +1,23 @@
+!t Daddy A
+!s Rick Piepers
+!w +15
+
+= A
+
+| besm f+7 | besm f+7 | asm7 des7 | gesmaj7 bmaj7 |
+| besm bmaj7 | besm bmaj7 | c7 f7 | besm . |
+
+= B
+
+| es7 as7 | es7 as7 | c7 f7 | besm . |
+
+= C
+!w +5
+| besm f+7/A | besm/as besm/g | asm7/ges '' des7 `` | gesmaj7 bmaj7 |
+| besm f7 | besm7 f7 | c7 f7 | besm . |
+!w -5
+= D
+
+| esm7 as7 | desmaj7 gesmaj7 | c7 f7 | besm . |
+
+= Volgorde: A A B B C D D

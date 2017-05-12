@@ -1,0 +1,24 @@
+---
+abstract: 'encode/decode text to lelek code.'
+author:
+  - 'Tiago Peczenyj <tiago.peczenyj@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Lelek
+requires:
+  Const::Fast: 0
+  Convert::BaseN: 0
+  Moo: 0
+  autobox::Core: 0
+resources:
+  bugtracker: https://github.com/peczenyj/Acme-Lelek/issues
+  homepage: https://github.com/peczenyj/Acme-Lelek
+  repository: git://github.com/peczenyj/Acme-Lelek.git
+version: 1.003

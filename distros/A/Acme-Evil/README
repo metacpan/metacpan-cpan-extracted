@@ -1,0 +1,33 @@
+Acme-Evil version 0.003001
+==========================
+
+RFC3514 introduces a new flag called the "evil bit" in all IP packets.
+The intention is to simplify the work of firewalls. Software that
+sends IP packets with malicious intent must set the evil bit to true,
+and firewalls can simply drop such packets.
+
+The evil pragma is a Perl implementation of the same concept. With
+this pragma malicious modules can declare their evil intent while
+critical modules can request that they will only use / run alongside
+non-evil code.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016-2017 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.22.2 or,
+at your option, any later version of Perl 5 you may have available.

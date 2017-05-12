@@ -1,0 +1,5 @@
+<h1>Hi [% name %]</h1>
+<p>This is test sent to</p>
+<ul><li><b>TO</b>: [% to %]</li>
+    <li><b>CC</b>: [% cc %]</li>
+</ul>

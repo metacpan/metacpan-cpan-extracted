@@ -1,0 +1,44 @@
+API-PleskExpand version 1.00
+=======================
+
+The given module is intended for interaction with the XML API of the Plesk Expand centralized hosting panel. API is realized not completely, but there is a full support of operations with Account and Domains. 
+
+API::PleskExpand module gives the convenient interface for addition of new functions. Extensions represent modules in a folder Expand with definitions of demanded functions. Each demanded operation is described by two functions: op and op_response_parse. The first sub generates XML query to Expand, the second is responsible for parse XML answer and its representation in Perl Native Structures. As a template for a writing of own expansions is better to use API/PleskExpand/Account.pm. In module API::Plesk::Methods (parent module) we can find service functions for a writing our extensions.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+TESTS
+	
+    make test
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    API::Plesk 1.04,
+    Carp (standard),
+    Data::Dumper,
+    Getopt::Long,
+    HTTP::Request,
+    LWP::UserAgent,
+    Test::More.
+
+AUTHOR
+    Odintsov Pavel nrg[at]cpan.org
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Odintsov Pavel.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
